@@ -1,0 +1,54 @@
+# WenQuest: one-command deployment.  Usage:  cp .env.example .env  (edit it)  &&  docker compose up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-moodle}
+      POSTGRES_USER: ${DB_USER:-moodle}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-moodle} -d ${DB_NAME:-moodle}"]
+      interval: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  moodle:
+    build:
+      context: .
+      dockerfile: moodle/Dockerfile
+    image: wenquest/engine:0.1
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DB_HOST: db
+      REDIS_HOST: redis
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    volumes:
+      - moodledata:/var/www/moodledata
+
+  cron:
+    image: wenquest/engine:0.1
+    restart: unless-stopped
+    depends_on:
+      - moodle
+    env_file: .env
+    environment:
+      DB_HOST: db
+      REDIS_HOST: redis
+    volumes:
+      - moodledata:/var/www/moodledata
+    command: ["sh", "-c", "sleep 60; while true; do su -s /bin/sh www-data -c 'php admin/cli/cron.php' ; sleep 60; done"]
+
+volumes:
+  dbdata:
+  moodledata:
