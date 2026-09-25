@@ -2,89 +2,677 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>机器人学院 · Robotics Academy</title>
-<meta name="description" content="仿真与实体一体化的机器人学院 · A robotics academy where simulation and real hardware meet.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>WenQuest Robotics Academy</title>
+<meta name="description" content="WenQuest Robotics Academy · 问渠机器人学院 — learn robotics in simulation, then run it on real robots.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112..125,600..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
   :root {
-    --bg: #f7f7f4; --fg: #1d1d1b; --muted: #5d5d58; --line: #dcdcd4; --accent: #0f6b5c; --accent-fg: #fff;
+    --bg: #eef1f0;
+    --surface: #ffffff;
+    --ink: #14212b;
+    --muted: #54656d;
+    --line: #cbd4d2;
+    --accent: #f2b705;          /* industrial robot yellow, used as fill */
+    --accent-ink: #7a5a00;      /* readable yellow-family text on light */
+    --on-accent: #14212b;
+    --trace: #1f6f8b;
+    --pole: #14212b;
+    --grid: #dde3e1;
+    --danger: #b3261e;
+    --display: "Archivo", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+    --body: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #151614; --fg: #ecece6; --muted: #a3a39b; --line: #33342f; --accent: #4cc2a8; --accent-fg: #0d1f1b; }
+    :root:not([data-theme="light"]) {
+      --bg: #0f171c; --surface: #16222a; --ink: #e5ecea; --muted: #93a4a9; --line: #2a3a42;
+      --accent: #f5c22e; --accent-ink: #f5c22e; --on-accent: #10181d; --trace: #6cc4e0; --pole: #e5ecea;
+      --grid: #1f2e36; --danger: #ff8a80; color-scheme: dark;
+    }
   }
+  :root[data-theme="dark"] {
+    --bg: #0f171c; --surface: #16222a; --ink: #e5ecea; --muted: #93a4a9; --line: #2a3a42;
+    --accent: #f5c22e; --accent-ink: #f5c22e; --on-accent: #10181d; --trace: #6cc4e0; --pole: #e5ecea;
+    --grid: #1f2e36; --danger: #ff8a80; color-scheme: dark;
+  }
+
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--fg);
-         font: 17px/1.65 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 64px; }
-  header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .brand { font-weight: 700; letter-spacing: .02em; }
-  button.lang { background: none; border: 1px solid var(--line); color: var(--fg); border-radius: 999px;
-                padding: 4px 14px; font: inherit; font-size: 14px; cursor: pointer; }
-  h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.2; margin: 72px 0 16px; }
-  .lead { font-size: 19px; color: var(--muted); max-width: 40em; }
-  .cta { display: inline-block; margin-top: 28px; background: var(--accent); color: var(--accent-fg);
-         text-decoration: none; padding: 12px 22px; border-radius: 8px; font-weight: 600; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 64px; }
-  .card { border-top: 2px solid var(--accent); padding-top: 12px; }
-  .card h2 { font-size: 17px; margin: 0 0 6px; }
-  .card p { margin: 0; color: var(--muted); font-size: 15px; }
-  footer { margin-top: 72px; font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
-  [data-en] { display: none; }
-  html[lang="en"] [data-zh] { display: none; }
-  html[lang="en"] [data-en] { display: revert; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.65 var(--body); }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  .wrap { max-width: 1160px; margin: 0 auto; padding-inline: 20px; }
+
+  /* Language switching: both languages are in the markup, one is shown. */
+  html:not([lang="en"]) [data-en], html[lang="en"] [data-zh] { display: none !important; }
+
+  /* ---------- Header ---------- */
+  .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg);
+         border-bottom: 1px solid var(--line); }
+  .top .wrap { display: flex; align-items: center; gap: 20px; min-height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; }
+  .brand svg { flex: none; }
+  .brand b { font: 800 17px/1.1 var(--display); font-stretch: 118%; letter-spacing: .01em; display: block; }
+  .brand small { font: 500 12px/1.2 var(--body); color: var(--muted); display: block; }
+  nav.main { display: flex; gap: 22px; font-size: 15px; }
+  nav.main a { text-decoration: none; color: var(--muted); }
+  nav.main a:hover { color: var(--ink); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font: 600 15px/1 var(--body); text-decoration: none;
+         padding: 11px 16px; border-radius: 6px; border: 1px solid var(--ink); background: none; color: var(--ink); cursor: pointer; }
+  .btn.solid { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn.small { padding: 8px 12px; font-size: 14px; }
+  .lang { font: 500 14px/1 var(--body); color: var(--muted); background: none; border: 0; cursor: pointer; padding: 8px 4px; }
+  .lang:hover { color: var(--ink); }
+  @media (max-width: 900px) { nav.main { display: none; } }
+  @media (max-width: 520px) { .top .btn.small { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 48px;
+                padding-block: 56px 64px; align-items: center; }
+  @media (max-width: 900px) { .hero .wrap { grid-template-columns: 1fr; gap: 32px; padding-block: 36px 48px; } }
+  .eyebrow { font: 500 13px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 16px; }
+  h1 { font: 800 clamp(38px, 6vw, 68px)/1.02 var(--display); font-stretch: 125%; letter-spacing: -.01em;
+       margin: 0 0 20px; text-wrap: balance; }
+  html:not([lang="en"]) h1 { font-stretch: 100%; letter-spacing: .02em; line-height: 1.15; }
+  h1 .hl { background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 92%, transparent 92%); }
+  .lede { font-size: 19px; color: var(--muted); max-width: 34em; margin: 0 0 28px; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  /* Instrument panel (live simulation) */
+  .instrument { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .inst-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px;
+               border-bottom: 1px solid var(--line); font: 500 12px/1.3 var(--mono); color: var(--muted);
+               letter-spacing: .04em; text-transform: uppercase; }
+  .inst-head .live { display: inline-flex; align-items: center; gap: 6px; }
+  .inst-head .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  canvas { display: block; width: 100%; }
+  #sim { aspect-ratio: 16 / 7.5; }
+  #scope { aspect-ratio: 16 / 3.6; border-top: 1px dashed var(--line); }
+  .readouts { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
+  .readouts div { padding: 8px 14px; border-right: 1px solid var(--line); }
+  .readouts div:last-child { border-right: 0; }
+  .readouts span { display: block; font: 500 11.5px/1.3 var(--mono); color: var(--muted); letter-spacing: .03em; }
+  .readouts output { font: 500 17px/1.4 var(--mono); font-variant-numeric: tabular-nums; }
+  .controls { display: grid; grid-template-columns: 1fr 1fr auto; gap: 14px 20px; align-items: end; padding: 14px;
+              border-top: 1px solid var(--line); }
+  .controls label { display: grid; gap: 4px; font: 500 12px/1.3 var(--mono); color: var(--muted); }
+  .controls label b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .controls input[type=range] { width: 100%; accent-color: var(--accent); }
+  .controls .btns { display: flex; gap: 8px; }
+  .inst-note { margin: 0; padding: 0 14px 14px; font-size: 13.5px; color: var(--muted); }
+  .inst-note.fail { color: var(--danger); }
+  @media (max-width: 520px) {
+    .controls { grid-template-columns: 1fr; }
+    .readouts { grid-template-columns: repeat(2, 1fr); }
+    .readouts div:nth-child(2) { border-right: 0; }
+    .readouts div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  }
+
+  /* ---------- Sections ---------- */
+  section.band { padding-block: 72px; border-top: 1px solid var(--line); }
+  .sec-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px; margin-bottom: 40px; align-items: end; }
+  @media (max-width: 900px) { .sec-head { grid-template-columns: 1fr; gap: 12px; } }
+  h2 { font: 800 clamp(28px, 3.6vw, 40px)/1.1 var(--display); font-stretch: 115%; margin: 0; text-wrap: balance; }
+  html:not([lang="en"]) h2 { font-stretch: 100%; letter-spacing: .02em; }
+  .sec-head p { margin: 0; color: var(--muted); max-width: 38em; }
+  h3 { font: 700 20px/1.3 var(--display); font-stretch: 108%; margin: 0 0 8px; }
+  html:not([lang="en"]) h3 { font-stretch: 100%; }
+
+  /* Method: a real sequence, so it is numbered */
+  .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; counter-reset: step; }
+  .step { padding: 0 28px 0 0; position: relative; }
+  .step + .step { padding-left: 28px; border-left: 1px solid var(--line); }
+  .step .n { font: 500 13px/1 var(--mono); color: var(--accent-ink); letter-spacing: .06em; display: block; margin-bottom: 14px; }
+  .step p { margin: 0; color: var(--muted); }
+  .step .tag { display: inline-block; margin-top: 14px; font: 500 12px/1.3 var(--mono); color: var(--muted);
+               border: 1px solid var(--line); border-radius: 4px; padding: 3px 8px; }
+  @media (max-width: 900px) {
+    .steps { grid-template-columns: 1fr; gap: 28px; }
+    .step, .step + .step { padding: 0 0 0 20px; border-left: 2px solid var(--line); }
+  }
+
+  /* Programs */
+  .tracks { display: grid; gap: 0; border-top: 2px solid var(--ink); }
+  .track { display: grid; grid-template-columns: 180px minmax(0, 1fr) minmax(0, 1fr) 150px; gap: 24px;
+           padding-block: 24px; border-bottom: 1px solid var(--line); align-items: start; }
+  .track .lvl { font: 500 12px/1.4 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .track .lvl strong { display: block; font: 800 22px/1.2 var(--display); font-stretch: 115%; color: var(--ink);
+                       text-transform: none; letter-spacing: 0; margin-top: 4px; }
+  html:not([lang="en"]) .track .lvl strong { font-stretch: 100%; }
+  .track ul { margin: 0; padding-left: 18px; }
+  .track li { margin-bottom: 2px; }
+  .track .kit { font-size: 15px; color: var(--muted); }
+  .track .kit b { display: block; font: 500 12px/1.4 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+  .status { justify-self: end; font: 500 12px/1 var(--mono); padding: 6px 10px; border-radius: 999px;
+            border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+  .status.now { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  @media (max-width: 900px) {
+    .track { grid-template-columns: 1fr; gap: 10px; }
+    .status { justify-self: start; }
+  }
+
+  /* Labs */
+  .labs { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 900px) { .labs { grid-template-columns: 1fr; } }
+  .lab { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 28px; }
+  .lab .kicker { font: 500 12px/1.3 var(--mono); color: var(--accent-ink); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 10px; }
+  .lab p { color: var(--muted); margin: 0 0 18px; }
+  dl.spec { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 10px 18px; font-size: 15px; }
+  dl.spec dt { font: 500 12px/1.9 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  dl.spec dd { margin: 0; }
+
+  /* Tutor */
+  .tutor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 48px; align-items: start; }
+  @media (max-width: 900px) { .tutor { grid-template-columns: 1fr; gap: 28px; } }
+  .motto { font: 800 clamp(24px, 3vw, 32px)/1.2 var(--display); font-stretch: 112%; margin: 0 0 12px; }
+  .motto-zh { font: 500 17px/1.6 var(--body); color: var(--muted); margin: 0 0 24px; }
+  ul.rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  ul.rules li { padding-left: 22px; position: relative; }
+  ul.rules li::before { content: ""; position: absolute; left: 0; top: .62em; width: 10px; height: 10px; background: var(--accent); }
+  .chat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 12px; }
+  .chat .ex { font: 500 11px/1 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .msg { padding: 12px 14px; border-radius: 8px; font-size: 15.5px; max-width: 92%; }
+  .msg.q { justify-self: end; background: var(--bg); }
+  .msg.a { border: 1px solid var(--line); }
+  .msg .src { display: block; margin-top: 8px; font: 500 12.5px/1.4 var(--mono); color: var(--accent-ink); }
+
+  /* Founder + Join */
+  .founder { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 48px; }
+  @media (max-width: 900px) { .founder { grid-template-columns: 1fr; gap: 16px; } }
+  .founder p { margin: 0 0 14px; max-width: 38em; }
+  .join { background: var(--ink); color: var(--bg); border-radius: 12px; padding: 44px 40px;
+          display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+  .join h2 { color: var(--bg); }
+  .join p { color: var(--bg); opacity: .8; margin: 12px 0 0; max-width: 34em; }
+  .mail { display: grid; gap: 10px; }
+  .mail .addr { font: 500 18px/1.3 var(--mono); padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--bg) 35%, transparent);
+                border-radius: 6px; user-select: all; overflow-wrap: anywhere; }
+  .mail .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .join .btn { border-color: var(--bg); color: var(--bg); }
+  .join .btn.solid { color: var(--on-accent); border-color: var(--accent); }
+  @media (max-width: 900px) { .join { grid-template-columns: 1fr; padding: 32px 22px; } }
+
+  footer { padding-block: 40px 56px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand"><span data-zh>机器人学院</span><span data-en>Robotics Academy</span></div>
-    <button class="lang" id="lang" type="button">English</button>
-  </header>
 
-  <h1><span data-zh>在仿真中学，在真机上验证</span><span data-en>Learn in simulation. Prove it on real robots.</span></h1>
-  <p class="lead">
-    <span data-zh>从控制原理到移动机器人、机械臂和人形机器人：先在浏览器仿真里动手，再预约实验室的真实设备部署。AI 助教全程陪练，每个回答都有出处。</span>
-    <span data-en>From control theory to mobile robots, manipulators and humanoids: practice in browser-based simulation, then book time on real lab hardware. An AI tutor works alongside you, and every answer cites its source.</span>
-  </p>
-  <a class="cta" href="https://learn.__SITE_DOMAIN__/"><span data-zh>进入学习平台</span><span data-en>Go to the learning platform</span></a>
-
-  <div class="grid">
-    <div class="card">
-      <h2><span data-zh>仿真实验</span><span data-en>Simulation labs</span></h2>
-      <p><span data-zh>倒立摆 PID、机械臂运动学等实验在浏览器中运行，无需安装。</span><span data-en>Inverted-pendulum PID, arm kinematics and more run in your browser, nothing to install.</span></p>
-    </div>
-    <div class="card">
-      <h2><span data-zh>真机部署</span><span data-en>Real hardware</span></h2>
-      <p><span data-zh>在仿真中训练好的控制器，预约时段部署到实验室真实机器人。</span><span data-en>Take the controller you trained in simulation and deploy it to lab robots in a booked session.</span></p>
-    </div>
-    <div class="card">
-      <h2><span data-zh>AI 助教</span><span data-en>AI tutor</span></h2>
-      <p><span data-zh>依据课程资料回答问题、诊断实验曲线，引导思考而不代做。</span><span data-en>Answers from course materials and diagnoses your experiment traces, guiding rather than doing the work.</span></p>
-    </div>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="WenQuest Robotics Academy">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <rect x="3" y="27" width="16" height="4" rx="1" fill="var(--ink)"/>
+        <line x1="11" y1="27" x2="11" y2="17" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="11" y1="17" x2="23" y2="9" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="23" y1="9" x2="29" y2="14" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="11" cy="17" r="3" fill="var(--accent)"/>
+        <circle cx="23" cy="9" r="3" fill="var(--accent)"/>
+      </svg>
+      <span>
+        <b>WenQuest Robotics</b>
+        <small><span data-zh>问渠机器人学院</span><span data-en>Academy · 问渠机器人学院</span></small>
+      </span>
+    </a>
+    <nav class="main" aria-label="Sections">
+      <a href="#method"><span data-zh>学习方法</span><span data-en>Method</span></a>
+      <a href="#programs"><span data-zh>课程</span><span data-en>Programs</span></a>
+      <a href="#labs"><span data-zh>实验室</span><span data-en>Labs</span></a>
+      <a href="#tutor"><span data-zh>AI 助教</span><span data-en>AI tutor</span></a>
+      <a href="#join"><span data-zh>加入</span><span data-en>Join</span></a>
+    </nav>
+    <button class="lang" id="langBtn" type="button">中文</button>
+    <a class="btn small" href="https://learn.wenquestrobotics.com/"><span data-zh>学习平台</span><span data-en>Learning platform</span></a>
   </div>
+</header>
 
-  <footer><span data-zh>网站建设中，更多课程信息即将发布。</span><span data-en>Site under construction. Course details coming soon.</span></footer>
-</div>
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow"><span data-zh>仿真 · 真机 · AI 助教</span><span data-en>Simulation · Real hardware · AI tutor</span></p>
+        <h1>
+          <span data-zh>在仿真中练，<br><span class="hl">在真机上跑</span></span>
+          <span data-en>Train it in simulation. <span class="hl">Run it on a real robot.</span></span>
+        </h1>
+        <p class="lede">
+          <span data-zh>从控制原理到移动机器人、机械臂和人形机器人。你先在浏览器里调参、试错，AI 助教读你的实验曲线给出诊断；练好了，再预约实验室，把同一个控制器部署到真实机器人上。</span>
+          <span data-en>From control theory to mobile robots, arms and humanoids. You tune and fail safely in the browser while an AI tutor reads your traces; when it works, you book the lab and run the same controller on real hardware.</span>
+        </p>
+        <div class="cta-row">
+          <a class="btn solid" href="#join"><span data-zh>申请首期班</span><span data-en>Apply for the first cohort</span></a>
+          <a class="btn" href="#programs"><span data-zh>看课程</span><span data-en>See the programs</span></a>
+        </div>
+      </div>
+
+      <div class="instrument" aria-label="Live inverted pendulum simulation">
+        <div class="inst-head">
+          <span class="live"><span class="dot" aria-hidden="true"></span><span data-zh>倒立摆 · PID 控制 · 实时仿真</span><span data-en>Cart-pole · PID control · live</span></span>
+          <span>dt = 2 ms · RK4</span>
+        </div>
+        <canvas id="sim" aria-hidden="true"></canvas>
+        <canvas id="scope" aria-hidden="true"></canvas>
+        <div class="readouts">
+          <div><span>θ (°)</span><output id="oTheta">0.0</output></div>
+          <div><span>x (m)</span><output id="oX">0.00</output></div>
+          <div><span>F (N)</span><output id="oF">0.0</output></div>
+          <div><span>t (s)</span><output id="oT">0.0</output></div>
+        </div>
+        <div class="controls">
+          <label for="kp">Kp <b id="kpV">60</b>
+            <input id="kp" type="range" min="0" max="120" step="1" value="60">
+          </label>
+          <label for="kd">Kd <b id="kdV">8.0</b>
+            <input id="kd" type="range" min="0" max="20" step="0.5" value="8">
+          </label>
+          <div class="btns">
+            <button class="btn small solid" id="push" type="button"><span data-zh>推一下</span><span data-en>Push</span></button>
+            <button class="btn small" id="reset" type="button"><span data-zh>重置</span><span data-en>Reset</span></button>
+          </div>
+        </div>
+        <p class="inst-note" id="note">
+          <span data-zh>试试把 Kp 调到 10 以下，或把 Kd 调到 0，再推一下。</span>
+          <span data-en>Try Kp below 10, or Kd at 0, then push.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="method">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2><span data-zh>一个控制器，从浏览器走到真机</span><span data-en>One controller, from browser to real robot</span></h2>
+        <p><span data-zh>我们不把仿真课和实物课分开上。每个实验都是同一条路：先在仿真里做对，再让 AI 帮你弄明白为什么，最后在真实设备上验证。</span><span data-en>Simulation and hardware are not separate courses here. Every lab follows the same path: get it right in simulation, understand why with the AI tutor, then prove it on real equipment.</span></p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="n">STEP 1</span>
+          <h3><span data-zh>在仿真中动手</span><span data-en>Build it in simulation</span></h3>
+          <p><span data-zh>物理仿真在浏览器里运行，不用装软件，也不怕撞坏设备。调参、试错、重来，都只要几秒。</span><span data-en>Physics runs in your browser. Nothing to install, nothing to break. Tuning, failing and retrying take seconds.</span></p>
+          <span class="tag">MuJoCo · WebAssembly</span>
+        </div>
+        <div class="step">
+          <span class="n">STEP 2</span>
+          <h3><span data-zh>让 AI 读你的曲线</span><span data-en>Let the AI read your traces</span></h3>
+          <p><span data-zh>AI 助教看的是你整条实验曲线：超调多少、振荡几次、多久稳定。它指出现象和原因，但不直接给你答案。</span><span data-en>The tutor reads your full trace: overshoot, oscillations, settling time. It names what happened and why, without handing you the answer.</span></p>
+          <span class="tag"><span data-zh>诊断 · 引导 · 示范</span><span data-en>Diagnose · Guide · Demonstrate</span></span>
+        </div>
+        <div class="step">
+          <span class="n">STEP 3</span>
+          <h3><span data-zh>部署到真实机器人</span><span data-en>Deploy on a real robot</span></h3>
+          <p><span data-zh>仿真通过后，预约实验室时段，把同一个控制器部署到真实设备上，比较仿真与现实的差距。</span><span data-en>Once it passes in simulation, book a lab slot and run the same controller on hardware, then compare sim against reality.</span></p>
+          <span class="tag"><span data-zh>预约制 · 远程或到场</span><span data-en>Booked sessions · remote or on site</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="programs">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2><span data-zh>课程</span><span data-en>Programs</span></h2>
+        <p><span data-zh>四个方向，由浅入深。首期班从控制与运动学开始；后续方向随实验室设备到位陆续开放。</span><span data-en>Four tracks, from foundations up. The first cohort starts with control and kinematics; later tracks open as lab equipment comes online.</span></p>
+      </div>
+      <div class="tracks">
+        <div class="track">
+          <div class="lvl"><span data-zh>基础</span><span data-en>Foundations</span><strong><span data-zh>控制与运动学</span><span data-en>Control &amp; Kinematics</span></strong></div>
+          <ul>
+            <li><span data-zh>PID 控制：P、I、D 各自的作用，稳定与抗扰</span><span data-en>PID control: what P, I and D each do; stability and disturbance rejection</span></li>
+            <li><span data-zh>机械臂正逆运动学、可达空间与奇异位形</span><span data-en>Arm forward and inverse kinematics, workspace, singularities</span></li>
+          </ul>
+          <div class="kit"><b><span data-zh>实验</span><span data-en>Labs</span></b><span data-zh>倒立摆、二连杆机械臂（已可运行）</span><span data-en>Cart-pole, two-link arm (running today)</span></div>
+          <span class="status now"><span data-zh>首期开放</span><span data-en>First cohort</span></span>
+        </div>
+        <div class="track">
+          <div class="lvl"><span data-zh>方向</span><span data-en>Track</span><strong><span data-zh>移动机器人</span><span data-en>Mobile Robots</span></strong></div>
+          <ul>
+            <li><span data-zh>传感器与差速控制：巡线小车</span><span data-en>Sensors and differential drive: line following</span></li>
+            <li><span data-zh>路径规划：A*、Dijkstra</span><span data-en>Path planning: A*, Dijkstra</span></li>
+            <li><span data-zh>SLAM 建图、定位与导航</span><span data-en>SLAM mapping, localization, navigation</span></li>
+          </ul>
+          <div class="kit"><b><span data-zh>实验</span><span data-en>Labs</span></b><span data-zh>浏览器仿真 → ROS 2 容器 → 实验室小车</span><span data-en>Browser sim → ROS 2 containers → lab robots</span></div>
+          <span class="status"><span data-zh>下一批</span><span data-en>Coming next</span></span>
+        </div>
+        <div class="track">
+          <div class="lvl"><span data-zh>方向</span><span data-en>Track</span><strong><span data-zh>机械臂</span><span data-en>Manipulators</span></strong></div>
+          <ul>
+            <li><span data-zh>运动规划与轨迹插值</span><span data-en>Motion planning and trajectory interpolation</span></li>
+            <li><span data-zh>抓取与放置（MoveIt 2）</span><span data-en>Grasping and pick-and-place (MoveIt 2)</span></li>
+          </ul>
+          <div class="kit"><b><span data-zh>实验</span><span data-en>Labs</span></b><span data-zh>Gazebo 仿真 → 实验室机械臂</span><span data-en>Gazebo simulation → lab arms</span></div>
+          <span class="status"><span data-zh>规划中</span><span data-en>Planned</span></span>
+        </div>
+        <div class="track">
+          <div class="lvl"><span data-zh>进阶</span><span data-en>Advanced</span><strong><span data-zh>人形与学习控制</span><span data-en>Humanoids &amp; Learned Control</span></strong></div>
+          <ul>
+            <li><span data-zh>在仿真中用强化学习训练策略</span><span data-en>Training policies with reinforcement learning in simulation</span></li>
+            <li><span data-zh>仿真到现实的迁移（sim-to-real）</span><span data-en>Sim-to-real transfer</span></li>
+          </ul>
+          <div class="kit"><b><span data-zh>实验</span><span data-en>Labs</span></b><span data-zh>自己电脑上训练 → 预约真机部署</span><span data-en>Train on your own machine → deploy on booked hardware</span></div>
+          <span class="status"><span data-zh>规划中</span><span data-en>Planned</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="labs">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2><span data-zh>两个实验室，一套数据</span><span data-en>Two labs, one record</span></h2>
+        <p><span data-zh>虚拟实验室和实体实验室用同样的参数和遥测格式，所以你的每一次尝试都能在两边对照，也都计入你的学习档案。</span><span data-en>The virtual and physical labs share one parameter and telemetry format, so every attempt can be compared across both and counts toward your learning record.</span></p>
+      </div>
+      <div class="labs">
+        <div class="lab">
+          <p class="kicker"><span data-zh>虚拟实验室</span><span data-en>Virtual lab</span></p>
+          <h3><span data-zh>随时随地，千人同时</span><span data-en>Anytime, at any scale</span></h3>
+          <p><span data-zh>基础实验在你的浏览器里运行；进阶实验在云端为每人开一个独立环境。</span><span data-en>Foundation labs run in your browser; advanced labs give each student their own cloud environment.</span></p>
+          <dl class="spec">
+            <dt><span data-zh>基础档</span><span data-en>Basic</span></dt><dd><span data-zh>MuJoCo 物理引擎（浏览器内运行）</span><span data-en>MuJoCo physics, running in the browser</span></dd>
+            <dt><span data-zh>进阶档</span><span data-en>Advanced</span></dt><dd><span data-zh>ROS 2 + Gazebo，每人一个容器</span><span data-en>ROS 2 + Gazebo, one container per student</span></dd>
+            <dt><span data-zh>验证</span><span data-en>Verified</span></dt><dd><span data-zh>每个实验上线前与 MuJoCo 逐步对照</span><span data-en>Each lab is checked step by step against MuJoCo before release</span></dd>
+          </dl>
+        </div>
+        <div class="lab">
+          <p class="kicker"><span data-zh>实体实验室</span><span data-en>Physical lab</span></p>
+          <h3><span data-zh>仿真过关，再上真机</span><span data-en>Pass in sim, then go physical</span></h3>
+          <p><span data-zh>按时段预约设备。仿真里通过的控制器，才进入真机部署队列，既保护设备，也让每次上机都有收获。</span><span data-en>Equipment is booked by time slot. Only controllers that pass in simulation enter the hardware queue, which protects the robots and makes every session count.</span></p>
+          <dl class="spec">
+            <dt><span data-zh>设备</span><span data-en>Robots</span></dt><dd><span data-zh>移动机器人、机械臂、人形机器人（清单确定后公布）</span><span data-en>Mobile robots, arms, humanoids (equipment list coming)</span></dd>
+            <dt><span data-zh>方式</span><span data-en>Access</span></dt><dd><span data-zh>预约制，支持到场或远程部署</span><span data-en>Booked slots, on site or remote deployment</span></dd>
+            <dt><span data-zh>记录</span><span data-en>Record</span></dt><dd><span data-zh>真机运行数据回到你的学习档案</span><span data-en>Hardware runs flow back to your learning record</span></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="tutor">
+    <div class="wrap tutor">
+      <div>
+        <h2 style="margin-bottom:24px"><span data-zh>AI 助教</span><span data-en>The AI tutor</span></h2>
+        <p class="motto">Every answer has a source.</p>
+        <p class="motto-zh">问渠那得清如许，为有源头活水来。</p>
+        <ul class="rules">
+          <li><span data-zh>只依据课程资料回答，每个回答注明出处，可以点回原文。</span><span data-en>Answers only from course materials, with a link back to the exact source.</span></li>
+          <li><span data-zh>作业和实验只引导思路，不代你完成。</span><span data-en>On assignments and labs it guides your thinking; it does not do the work for you.</span></li>
+          <li><span data-zh>你先自己试够次数，它才会亲自调用仿真做示范。</span><span data-en>It demonstrates in the simulator only after you have made your own attempts.</span></li>
+          <li><span data-zh>评分建议由老师复核后才生效。</span><span data-en>Any grading suggestion takes effect only after an instructor reviews it.</span></li>
+        </ul>
+      </div>
+      <div class="chat" aria-label="Example tutor exchange">
+        <span class="ex"><span data-zh>示例对话</span><span data-en>Example exchange</span></span>
+        <div class="msg q"><span data-zh>我把 Kd 调到 0 以后，摆一直来回晃，最后倒了。为什么？</span><span data-en>With Kd at 0 the pole kept swinging back and forth, then fell. Why?</span></div>
+        <div class="msg a">
+          <span data-zh>你的曲线里振荡幅度一次比一次大，这是阻尼不足的典型现象。Kp 负责“拉回来”，但没有东西抵消回摆时的速度。想一想：哪一项是对角速度起作用的？试着把它加回来，每次改一点，观察振荡次数怎么变。</span>
+          <span data-en>Your trace shows each swing growing larger, the signature of too little damping. Kp pulls the pole back, but nothing counters its speed on the way through. Which term acts on angular velocity? Add it back in small steps and watch how the number of oscillations changes.</span>
+          <span class="src"><span data-zh>出处：第 2 讲 PID 控制 · 2.3 微分项的作用</span><span data-en>Source: Lecture 2, PID control · 2.3 The derivative term</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="founder">
+    <div class="wrap founder">
+      <h2><span data-zh>创办人</span><span data-en>Founder</span></h2>
+      <div>
+        <p><strong><span data-zh>张国庆（Eddie Zhang）</span><span data-en>Guoqing (Eddie) Zhang</span></strong><br>
+          <span data-zh>曾任大学教授、院长和校长。</span><span data-en>Former university professor, dean and president.</span></p>
+        <p><span data-zh>我办这所学院，是想让学机器人的人少一点等待、多一点动手：不用等排到实验室才开始试，也不用在真机上从零试错。先在仿真里把道理弄懂，再到真机上验证，这是我认为最有效的学法。首期课程由我亲自讲授。</span><span data-en>I started this academy so people learning robotics can spend less time waiting and more time building: no queue for the lab before you can start, no trial and error from scratch on expensive hardware. Understand it in simulation, then prove it on a real robot. I teach the first courses myself.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="join" style="border-top:0">
+    <div class="wrap">
+      <div class="join">
+        <div>
+          <h2><span data-zh>首期班招募中</span><span data-en>Now forming the first cohort</span></h2>
+          <p><span data-zh>首期为小班，从“控制与运动学”开始，中英双语授课。来信简单介绍你的背景和想学的方向，我们会回复开课时间和安排。</span><span data-en>The first cohort is small, starts with Control &amp; Kinematics, and is taught in English and Chinese. Write to us with your background and what you want to learn; we will reply with dates and details.</span></p>
+        </div>
+        <div class="mail">
+          <div class="addr" id="addr">info@wenquestrobotics.com</div>
+          <div class="row">
+            <button class="btn solid" id="copy" type="button"><span data-zh>复制邮箱</span><span data-en>Copy email</span></button>
+            <a class="btn" href="https://learn.wenquestrobotics.com/"><span data-zh>进入学习平台</span><span data-en>Learning platform</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 WenQuest Robotics Academy · 问渠机器人学院</span>
+    <span>wenquestrobotics.com</span>
+  </div>
+</footer>
+
 <script>
-  (function () {
-    var html = document.documentElement, btn = document.getElementById('lang');
-    function set(lang) {
-      html.lang = lang === 'en' ? 'en' : 'zh-CN';
-      btn.textContent = lang === 'en' ? '中文' : 'English';
-      try { localStorage.setItem('lang', lang); } catch (e) {}
+(function () {
+  /* ---------- Language ---------- */
+  var root = document.documentElement, langBtn = document.getElementById('langBtn');
+  function setLang(l) {
+    root.lang = l === 'en' ? 'en' : 'zh-CN';
+    langBtn.textContent = l === 'en' ? '中文' : 'English';
+    try { localStorage.setItem('wq-lang', l); } catch (e) {}
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('wq-lang'); } catch (e) {}
+  setLang(saved || ((navigator.language || '').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en'));
+  langBtn.addEventListener('click', function () { setLang(root.lang === 'en' ? 'zh' : 'en'); });
+
+  /* ---------- Copy email ---------- */
+  var copyBtn = document.getElementById('copy'), addr = document.getElementById('addr');
+  copyBtn.addEventListener('click', function () {
+    var done = function () {
+      copyBtn.querySelector('[data-zh]').textContent = '已复制';
+      copyBtn.querySelector('[data-en]').textContent = 'Copied';
+    };
+    var select = function () {
+      var r = document.createRange(); r.selectNodeContents(addr);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(addr.textContent.trim()).then(done, select);
+    } else { select(); }
+  });
+
+  /* ---------- Cart-pole simulation ----------
+     Cart mass M, pole mass m, pole half-length l. theta = 0 is upright, positive leans right.
+     Control force F = Kp*theta + Kd*theta' + Kx*x + Kv*x' (position loop keeps the cart near center). */
+  var M = 1.0, m = 0.1, l = 0.5, g = 9.81, FMAX = 30, KX = 3, KV = 4.5, DT = 0.002, TRACK = 1.6;
+  var kp = 60, kd = 8;
+  var s, t, fallen, force, hist, lastPush, userTouched = false;
+
+  function reset() {
+    s = [0, 0, 5 * Math.PI / 180, 0];  // x, x', theta, theta'
+    t = 0; fallen = false; force = 0; hist = []; lastPush = 0;
+    setNote(false);
+  }
+  function ctrl(st) {
+    var f = kp * st[2] + kd * st[3] + KX * st[0] + KV * st[1];
+    return Math.max(-FMAX, Math.min(FMAX, f));
+  }
+  function deriv(st, f) {
+    var th = st[2], w = st[3], sin = Math.sin(th), cos = Math.cos(th), tot = M + m;
+    var tmp = (f + m * l * w * w * sin) / tot;
+    var alpha = (g * sin - cos * tmp) / (l * (4 / 3 - m * cos * cos / tot));
+    var acc = tmp - m * l * alpha * cos / tot;
+    return [st[1], acc, w, alpha];
+  }
+  function step() {
+    var f = ctrl(s); force = f;
+    var k1 = deriv(s, f);
+    var s2 = s.map(function (v, i) { return v + k1[i] * DT / 2; }), k2 = deriv(s2, f);
+    var s3 = s.map(function (v, i) { return v + k2[i] * DT / 2; }), k3 = deriv(s3, f);
+    var s4 = s.map(function (v, i) { return v + k3[i] * DT; }), k4 = deriv(s4, f);
+    s = s.map(function (v, i) { return v + DT / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]); });
+    t += DT;
+    if (Math.abs(s[2]) > Math.PI / 6 || Math.abs(s[0]) > TRACK) { fallen = true; setNote(true); }
+  }
+  function push() {
+    if (fallen) reset();
+    s[3] += 0.9; lastPush = t;
+  }
+
+  var note = document.getElementById('note');
+  var noteHTML = note.innerHTML;
+  function setNote(fail) {
+    note.classList.toggle('fail', fail);
+    note.innerHTML = fail
+      ? '<span data-zh>倒了。摆角超过 30° 或小车撞到轨道端点。调整参数后点“重置”。</span><span data-en>It fell: the pole passed 30° or the cart hit the end of the track. Adjust the gains and press Reset.</span>'
+      : noteHTML;
+  }
+
+  /* ---------- Drawing ---------- */
+  var sim = document.getElementById('sim'), scope = document.getElementById('scope');
+  var cs = sim.getContext('2d'), cc = scope.getContext('2d');
+  var colors = {};
+  function readColors() {
+    var st = getComputedStyle(root);
+    ['--ink', '--muted', '--line', '--accent', '--trace', '--pole', '--grid', '--surface', '--danger']
+      .forEach(function (k) { colors[k] = st.getPropertyValue(k).trim(); });
+  }
+  function fit(c) {
+    var r = c.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    var w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    return d;
+  }
+  function drawSim() {
+    var d = fit(sim), W = sim.width, H = sim.height, ctx = cs;
+    ctx.fillStyle = colors['--surface']; ctx.fillRect(0, 0, W, H);
+    var railY = H * 0.78, scale = (W * 0.42) / TRACK, cx = W / 2 + s[0] * scale;
+    // grid
+    ctx.strokeStyle = colors['--grid']; ctx.lineWidth = 1 * d;
+    for (var gx = -TRACK; gx <= TRACK + 1e-9; gx += 0.4) {
+      var px = W / 2 + gx * scale; ctx.beginPath(); ctx.moveTo(px, H * 0.08); ctx.lineTo(px, railY); ctx.stroke();
     }
-    var saved = null;
-    try { saved = localStorage.getItem('lang'); } catch (e) {}
-    set(saved || ((navigator.language || '').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en'));
-    btn.addEventListener('click', function () { set(html.lang === 'en' ? 'zh' : 'en'); });
-    // Point the learning-platform link at learn.<this domain> when served from the real domain.
-    var host = location.hostname.replace(/^www\./, '');
-    if (host && host.indexOf('.') > 0) {
-      document.querySelectorAll('a[href*="__SITE_DOMAIN__"]').forEach(function (a) {
-        a.href = 'https://learn.' + host + '/';
+    // rail and tick labels
+    ctx.strokeStyle = colors['--ink']; ctx.lineWidth = 2 * d;
+    ctx.beginPath(); ctx.moveTo(W / 2 - TRACK * scale, railY); ctx.lineTo(W / 2 + TRACK * scale, railY); ctx.stroke();
+    ctx.fillStyle = colors['--muted']; ctx.font = (11 * d) + 'px "IBM Plex Mono", monospace'; ctx.textAlign = 'center';
+    [-1.2, -0.8, -0.4, 0, 0.4, 0.8, 1.2].forEach(function (v) {
+      var px = W / 2 + v * scale;
+      ctx.fillRect(px - 0.5 * d, railY, 1 * d, 5 * d);
+      ctx.fillText((v > 0 ? '+' : '') + v.toFixed(1), px, railY + 18 * d);
+    });
+    // cart
+    var cw = 64 * d, ch = 22 * d;
+    ctx.fillStyle = colors['--accent'];
+    ctx.fillRect(cx - cw / 2, railY - ch - 4 * d, cw, ch);
+    ctx.fillStyle = colors['--ink'];
+    [cx - cw / 3, cx + cw / 3].forEach(function (wx) { ctx.beginPath(); ctx.arc(wx, railY - 3 * d, 4 * d, 0, 7); ctx.fill(); });
+    // pole
+    var pivotY = railY - ch - 4 * d, len = Math.min(H * 0.62, 2 * l * scale * 0.8);
+    var tx = cx + Math.sin(s[2]) * len, ty = pivotY - Math.cos(s[2]) * len;
+    ctx.strokeStyle = fallen ? colors['--danger'] : colors['--pole']; ctx.lineWidth = 6 * d; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx, pivotY); ctx.lineTo(tx, ty); ctx.stroke();
+    ctx.fillStyle = colors['--ink']; ctx.beginPath(); ctx.arc(cx, pivotY, 5 * d, 0, 7); ctx.fill();
+    // force arrow
+    if (Math.abs(force) > 0.3) {
+      var ax = Math.max(-1, Math.min(1, force / FMAX)) * 70 * d, ay = railY - ch / 2 - 4 * d;
+      ctx.strokeStyle = colors['--trace']; ctx.fillStyle = colors['--trace']; ctx.lineWidth = 2.5 * d;
+      var sx = force > 0 ? cx - cw / 2 - 6 * d : cx + cw / 2 + 6 * d;
+      ctx.beginPath(); ctx.moveTo(sx - ax, ay); ctx.lineTo(sx, ay); ctx.stroke();
+      var dir = force > 0 ? 1 : -1;
+      ctx.beginPath(); ctx.moveTo(sx, ay); ctx.lineTo(sx - dir * 8 * d, ay - 5 * d); ctx.lineTo(sx - dir * 8 * d, ay + 5 * d); ctx.fill();
+    }
+  }
+  var WINDOW = 6, YMAX = 20;
+  function drawScope() {
+    var d = fit(scope), W = scope.width, H = scope.height, ctx = cc;
+    ctx.fillStyle = colors['--surface']; ctx.fillRect(0, 0, W, H);
+    var left = 44 * d, right = W - 10 * d, top = 10 * d, bot = H - 10 * d, mid = (top + bot) / 2;
+    ctx.strokeStyle = colors['--grid']; ctx.lineWidth = 1 * d;
+    ctx.fillStyle = colors['--muted']; ctx.font = (10.5 * d) + 'px "IBM Plex Mono", monospace'; ctx.textAlign = 'right';
+    [-YMAX, -10, 0, 10, YMAX].forEach(function (v) {
+      var y = mid - v / YMAX * (bot - top) / 2;
+      ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
+      ctx.fillText((v > 0 ? '+' : '') + v + '°', left - 6 * d, y + 3.5 * d);
+    });
+    if (hist.length < 2) return;
+    var t0 = t - WINDOW;
+    ctx.save(); ctx.beginPath(); ctx.rect(left, top - 2 * d, right - left, bot - top + 4 * d); ctx.clip();
+    ctx.strokeStyle = colors['--trace']; ctx.lineWidth = 2 * d; ctx.lineJoin = 'round'; ctx.beginPath();
+    hist.forEach(function (p, i) {
+      var x = left + (p[0] - t0) / WINDOW * (right - left);
+      var y = mid - Math.max(-YMAX * 1.1, Math.min(YMAX * 1.1, p[1])) / YMAX * (bot - top) / 2;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke(); ctx.restore();
+  }
+  var oTheta = document.getElementById('oTheta'), oX = document.getElementById('oX'),
+      oF = document.getElementById('oF'), oT = document.getElementById('oT');
+  function readouts() {
+    oTheta.textContent = (s[2] * 180 / Math.PI).toFixed(1);
+    oX.textContent = s[0].toFixed(2);
+    oF.textContent = force.toFixed(1);
+    oT.textContent = t.toFixed(1);
+  }
+
+  /* ---------- Controls ---------- */
+  var kpIn = document.getElementById('kp'), kdIn = document.getElementById('kd');
+  function syncGains() {
+    kp = +kpIn.value; kd = +kdIn.value;
+    document.getElementById('kpV').textContent = kp.toFixed(0);
+    document.getElementById('kdV').textContent = kd.toFixed(1);
+  }
+  kpIn.addEventListener('input', function () { userTouched = true; syncGains(); });
+  kdIn.addEventListener('input', function () { userTouched = true; syncGains(); });
+  document.getElementById('push').addEventListener('click', function () { userTouched = true; push(); });
+  document.getElementById('reset').addEventListener('click', function () { userTouched = true; reset(); });
+
+  /* ---------- Loop ---------- */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var prev = null;
+  function frame(now) {
+    if (prev === null) prev = now;
+    var elapsed = Math.min(0.05, (now - prev) / 1000); prev = now;
+    if (!fallen) {
+      var n = Math.round(elapsed / DT);
+      for (var i = 0; i < n && !fallen; i++) step();
+      hist.push([t, s[2] * 180 / Math.PI]);
+      while (hist.length && hist[0][0] < t - WINDOW - 0.2) hist.shift();
+      // A gentle automatic nudge every 7 s until the visitor takes over.
+      if (!userTouched && t - lastPush > 7) push();
+    }
+    drawSim(); drawScope(); readouts();
+    requestAnimationFrame(frame);
+  }
+
+  readColors(); syncGains(); reset();
+  // Theme changes: re-read the palette.
+  new MutationObserver(readColors).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', readColors);
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { drawSim(); drawScope(); });
+
+  if (reduce) {
+    // Pre-run 4 s of the recovery so the still frame shows a real trace, then run only on request.
+    for (var i = 0; i < 2000; i++) { step(); if (i % 8 === 0) hist.push([t, s[2] * 180 / Math.PI]); }
+    drawSim(); drawScope(); readouts();
+    userTouched = true;
+    var started = false;
+    ['push', 'reset', 'kp', 'kd'].forEach(function (id) {
+      document.getElementById(id).addEventListener(id === 'kp' || id === 'kd' ? 'input' : 'click', function () {
+        if (!started) { started = true; requestAnimationFrame(frame); }
       });
-    }
-  })();
+    });
+  } else {
+    requestAnimationFrame(frame);
+  }
+})();
 </script>
 </body>
 </html>
