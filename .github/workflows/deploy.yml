@@ -1,0 +1,105 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Weekly fresh build picks up Moodle security fixes from the stable branch.
+  schedule:
+    - cron: "17 7 * * 1"
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        name: Image name
+        run: |
+          repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "image=ghcr.io/${repo}/engine:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "latest=ghcr.io/${repo}/engine:latest" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push engine image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: moodle/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}
+            ${{ steps.meta.outputs.latest }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          no-cache: ${{ github.event_name == 'schedule' }}
+
+      - name: Package the Claude plugin for manual installs
+        run: cd plugins && zip -qr ../aiprovider_claude.zip aiprovider_claude -x '*/tests/*'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aiprovider_claude
+          path: aiprovider_claude.zip
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      HOST: ${{ secrets.DEPLOY_HOST }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check deploy settings
+        run: |
+          if [ -z "$HOST" ]; then
+            echo "::warning::DEPLOY_HOST secret is not set; skipping deployment (image was still built)."
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Set up SSH
+        if: env.SKIP != '1'
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "${{ secrets.DEPLOY_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
+          fi
+
+      - name: Copy deployment files
+        if: env.SKIP != '1'
+        run: |
+          tar czf - docker-compose.yml docker-compose.prod.yml .env.example deploy site \
+            | ssh "deploy@$HOST" 'tar xzf - -C /opt/wenquest && chmod +x /opt/wenquest/deploy/*.sh'
+
+      - name: Update the server
+        if: env.SKIP != '1'
+        run: |
+          if ! ssh "deploy@$HOST" 'test -f /opt/wenquest/.env'; then
+            echo "::error::/opt/wenquest/.env is missing. On the server run: cd /opt/wenquest && deploy/init-env.sh  - then re-run this workflow."
+            exit 1
+          fi
+          echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "docker login ghcr.io -u ${{ github.actor }} --password-stdin"
+          ssh "deploy@$HOST" "/opt/wenquest/deploy/update.sh ${{ needs.build.outputs.image }}"

@@ -1,0 +1,35 @@
+# Production override for a single cloud server.
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-build
+# Adds Caddy in front (automatic HTTPS for the academy site and learn. subdomain) and
+# stops publishing Moodle's port directly; everything goes through Caddy on 80/443.
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - moodle
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?Set SITE_DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./site:/srv/site:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  moodle:
+    ports: !reset []
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://localhost/login/index.php || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15m
+
+volumes:
+  caddy_data:
+  caddy_config:

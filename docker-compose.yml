@@ -22,7 +22,7 @@ services:
     build:
       context: .
       dockerfile: moodle/Dockerfile
-    image: wenquest/engine:0.1
+    image: ${ENGINE_IMAGE:-wenquest/engine:0.1}
     restart: unless-stopped
     depends_on:
       db:
@@ -37,10 +37,11 @@ services:
       - moodledata:/var/www/moodledata
 
   cron:
-    image: wenquest/engine:0.1
+    image: ${ENGINE_IMAGE:-wenquest/engine:0.1}
     restart: unless-stopped
     depends_on:
       - moodle
+      - redis
     env_file: .env
     environment:
       DB_HOST: db

@@ -11,13 +11,21 @@
 | `docker-compose.yml` | Moodle、PostgreSQL 16、Redis、定时任务四个服务 |
 | `moodle/setup_ai.php` | 启动时按 `.env` 自动配置 AI 模型、启用 AI 功能、设置中文和时区 |
 | `.env.example` | 配置模板 |
+| `docker-compose.prod.yml`、`deploy/` | 云服务器生产部署：Caddy 自动 HTTPS、更新、回滚、备份与恢复脚本 |
+| `.github/workflows/deploy.yml` | 推送即自动构建镜像并部署到服务器 |
+| `site/` | 学院官网（静态页面，中英双语） |
+| `docs/上线手册.md` | 从零上线到 DigitalOcean 的分步手册 |
 
 启用后，Moodle 里立即可用的 AI 功能：
 
 - **课程助手**：学生和教师在课程页面一键“总结本页”“解释这段内容”。
 - **编辑器 AI**：在任何富文本编辑器里让 AI 起草文字（教案、作业说明、公告等）。
 
-## 快速开始
+## 上线到云服务器
+
+按 [docs/上线手册.md](docs/上线手册.md) 操作：官网在主域名，学习平台在 `learn.` 子域名，推送代码即自动部署，每天自动备份。
+
+## 本地快速试用
 
 需要一台 Linux 服务器（建议 4 核 8 GB 内存以上）并安装 Docker 24+。
 
@@ -48,14 +56,16 @@ docker compose logs -f moodle  # 看到 "Created AI provider" 即完成
   - 给 Docker 配置国内镜像加速器（阿里云、腾讯云控制台均提供）。
   - 构建时换成可访问的 Moodle 仓库镜像：
     `docker compose build --build-arg MOODLE_GIT=<镜像地址>`
-- **HTTPS**：生产环境请在前面加 Nginx 或云负载均衡做 HTTPS，并设 `MOODLE_SSLPROXY=true`。
+- **HTTPS**：`docker-compose.prod.yml` 里的 Caddy 会自动申请证书；也可以改用 Nginx 或云负载均衡，并设 `MOODLE_SSLPROXY=true`。
 
 ## 只安装插件（已有 Moodle 5.1 及以上）
 
-用 `aiprovider_claude.zip`：网站管理 → 插件 → 安装插件 → 上传 zip。
+用 `aiprovider_claude.zip`（GitHub Actions 每次构建都会生成，在该次运行的 Artifacts 里下载）：网站管理 → 插件 → 安装插件 → 上传 zip。
 然后在“网站管理 → AI → AI 提供方”新建 Claude 实例并填入 API 密钥，再到“AI 调用位置”启用课程助手和编辑器。
 
 ## 日常运维
+
+生产服务器上用 `deploy/` 里的脚本（见上线手册“日常维护”）。本地试用时：
 
 ```bash
 docker compose ps                                   # 查看状态

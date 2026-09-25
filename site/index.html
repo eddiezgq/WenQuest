@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>机器人学院 · Robotics Academy</title>
+<meta name="description" content="仿真与实体一体化的机器人学院 · A robotics academy where simulation and real hardware meet.">
+<style>
+  :root {
+    --bg: #f7f7f4; --fg: #1d1d1b; --muted: #5d5d58; --line: #dcdcd4; --accent: #0f6b5c; --accent-fg: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151614; --fg: #ecece6; --muted: #a3a39b; --line: #33342f; --accent: #4cc2a8; --accent-fg: #0d1f1b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 17px/1.65 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 64px; }
+  header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .brand { font-weight: 700; letter-spacing: .02em; }
+  button.lang { background: none; border: 1px solid var(--line); color: var(--fg); border-radius: 999px;
+                padding: 4px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.2; margin: 72px 0 16px; }
+  .lead { font-size: 19px; color: var(--muted); max-width: 40em; }
+  .cta { display: inline-block; margin-top: 28px; background: var(--accent); color: var(--accent-fg);
+         text-decoration: none; padding: 12px 22px; border-radius: 8px; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 64px; }
+  .card { border-top: 2px solid var(--accent); padding-top: 12px; }
+  .card h2 { font-size: 17px; margin: 0 0 6px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  footer { margin-top: 72px; font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+  [data-en] { display: none; }
+  html[lang="en"] [data-zh] { display: none; }
+  html[lang="en"] [data-en] { display: revert; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span data-zh>机器人学院</span><span data-en>Robotics Academy</span></div>
+    <button class="lang" id="lang" type="button">English</button>
+  </header>
+
+  <h1><span data-zh>在仿真中学，在真机上验证</span><span data-en>Learn in simulation. Prove it on real robots.</span></h1>
+  <p class="lead">
+    <span data-zh>从控制原理到移动机器人、机械臂和人形机器人：先在浏览器仿真里动手，再预约实验室的真实设备部署。AI 助教全程陪练，每个回答都有出处。</span>
+    <span data-en>From control theory to mobile robots, manipulators and humanoids: practice in browser-based simulation, then book time on real lab hardware. An AI tutor works alongside you, and every answer cites its source.</span>
+  </p>
+  <a class="cta" href="https://learn.__SITE_DOMAIN__/"><span data-zh>进入学习平台</span><span data-en>Go to the learning platform</span></a>
+
+  <div class="grid">
+    <div class="card">
+      <h2><span data-zh>仿真实验</span><span data-en>Simulation labs</span></h2>
+      <p><span data-zh>倒立摆 PID、机械臂运动学等实验在浏览器中运行，无需安装。</span><span data-en>Inverted-pendulum PID, arm kinematics and more run in your browser, nothing to install.</span></p>
+    </div>
+    <div class="card">
+      <h2><span data-zh>真机部署</span><span data-en>Real hardware</span></h2>
+      <p><span data-zh>在仿真中训练好的控制器，预约时段部署到实验室真实机器人。</span><span data-en>Take the controller you trained in simulation and deploy it to lab robots in a booked session.</span></p>
+    </div>
+    <div class="card">
+      <h2><span data-zh>AI 助教</span><span data-en>AI tutor</span></h2>
+      <p><span data-zh>依据课程资料回答问题、诊断实验曲线，引导思考而不代做。</span><span data-en>Answers from course materials and diagnoses your experiment traces, guiding rather than doing the work.</span></p>
+    </div>
+  </div>
+
+  <footer><span data-zh>网站建设中，更多课程信息即将发布。</span><span data-en>Site under construction. Course details coming soon.</span></footer>
+</div>
+<script>
+  (function () {
+    var html = document.documentElement, btn = document.getElementById('lang');
+    function set(lang) {
+      html.lang = lang === 'en' ? 'en' : 'zh-CN';
+      btn.textContent = lang === 'en' ? '中文' : 'English';
+      try { localStorage.setItem('lang', lang); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem('lang'); } catch (e) {}
+    set(saved || ((navigator.language || '').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en'));
+    btn.addEventListener('click', function () { set(html.lang === 'en' ? 'zh' : 'en'); });
+    // Point the learning-platform link at learn.<this domain> when served from the real domain.
+    var host = location.hostname.replace(/^www\./, '');
+    if (host && host.indexOf('.') > 0) {
+      document.querySelectorAll('a[href*="__SITE_DOMAIN__"]').forEach(function (a) {
+        a.href = 'https://learn.' + host + '/';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

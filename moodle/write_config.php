@@ -19,6 +19,21 @@ $out .= "\$CFG->routerconfigured = true;\n";
 // Behind an HTTPS reverse proxy (Nginx, cloud load balancer) Moodle must know the original scheme.
 if ($e('MOODLE_SSLPROXY') === 'true') {
     $out .= "\$CFG->sslproxy = true;\n";
+    // The proxy (Caddy) overwrites X-Forwarded-For with the real client address, so trust that header
+    // (skip only Client-IP), and ignore the Docker network addresses of the proxy itself.
+    $out .= "\$CFG->getremoteaddrconf = 1;\n";
+    $out .= "\$CFG->reverseproxyignore = '10.0.0.0/8,172.16.0.0/12,192.168.0.0/16';\n";
+}
+// Outgoing mail. Cloud hosts often block ports 25/465/587; email services also listen on 2525.
+if ($e('SMTP_HOST')) {
+    $out .= "\$CFG->smtphosts = " . var_export($e('SMTP_HOST') . ':' . $e('SMTP_PORT', '2525'), true) . ";\n";
+    $out .= "\$CFG->smtpsecure = " . var_export($e('SMTP_SECURE', 'tls'), true) . ";\n";
+    $out .= "\$CFG->smtpauthtype = 'LOGIN';\n";
+    $out .= "\$CFG->smtpuser = " . var_export($e('SMTP_USER'), true) . ";\n";
+    $out .= "\$CFG->smtppass = " . var_export($e('SMTP_PASSWORD'), true) . ";\n";
+}
+if ($e('MOODLE_NOREPLY_EMAIL')) {
+    $out .= "\$CFG->noreplyaddress = " . var_export($e('MOODLE_NOREPLY_EMAIL'), true) . ";\n";
 }
 if ($e('REDIS_HOST')) {
     $out .= "\$CFG->session_handler_class = '\\\\core\\\\session\\\\redis';\n";
