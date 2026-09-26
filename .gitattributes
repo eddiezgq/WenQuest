@@ -1,0 +1,5 @@
+# Keep Linux line endings for everything that runs on the server, even when edited on Windows.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.zip binary
