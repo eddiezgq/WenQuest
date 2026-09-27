@@ -128,9 +128,28 @@ def test_seed_against_erpnext_v16_schemas():
     fg_bom = next(b for b in mock.db["BOM"].values() if b["item"] == "WQR-105")
     assert all(r.get("bom_no") for r in fg_bom["items"] if r["item_code"] in D.BOMS)
 
-    # 再运行一次：全部跳过，不重复创建
+    # 有检验模板的零件，BOM 开启质检门；没有模板的不开
+    for b in mock.db["BOM"].values():
+        qit = D.ITEMS[b["item"]][5]
+        gated = [r for r in b["operations"] if r.get("quality_inspection_required")]
+        assert bool(b.get("inspection_required")) == bool(qit) == bool(gated), b["item"]
+    # 外购件不带 standard_rate（避免 ERPNext 自动生成销售价）
+    assert not any("standard_rate" in i for i in mock.db["Item"].values())
+
+    # 再运行一次（含期初库存）：全部跳过，不重复创建
     before = {k: len(v) for k, v in mock.db.items()}
     s2 = seed.Seeder(client, log=lambda *a: None)
-    s2.run()
+    s2.run(opening_stock=True)
     assert s2.created == 0
     assert {k: len(v) for k, v in mock.db.items()} == before
+
+
+def test_draft_bom_left_by_a_failed_run_is_submitted_not_duplicated():
+    mock = MockERPNext()
+    client = seed.Client.__new__(seed.Client)
+    client.base, client.s = "http://mock", mock
+    mock.db.setdefault("BOM", {})["BOM-SH-101-001"] = {"name": "BOM-SH-101-001", "item": "SH-101",
+                                                      "docstatus": 0, "is_default": 1}
+    seed.Seeder(client, log=lambda *a: None).run()
+    boms = [b for b in mock.db["BOM"].values() if b["item"] == "SH-101"]
+    assert len(boms) == 1 and boms[0]["docstatus"] == 1

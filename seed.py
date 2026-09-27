@@ -236,16 +236,27 @@ class Seeder:
                 self.bom_names[parent] = existing[0]["name"]
                 self.skipped += 1
                 continue
+            draft = self.c.find("BOM", [["item", "=", parent], ["docstatus", "=", 0]])
+            if draft:   # 上次导入时建好但没提交成功的草稿，直接提交
+                self.c.update("BOM", draft[0]["name"], {"docstatus": 1})
+                self.bom_names[parent] = draft[0]["name"]
+                self.created += 1
+                continue
             items = []
             for code, qty in lines:
                 row = {"item_code": code, "qty": qty, "uom": D.ITEMS[code][2], "rate": D.ITEMS[code][3] or 0}
                 if code in self.bom_names:
                     row["bom_no"] = self.bom_names[code]
                 items.append(row)
+            qit = D.ITEMS[parent][5]
             doc = {"item": parent, "quantity": 1, "company": self.company, "currency": self.currency,
                    "conversion_rate": 1, "is_active": 1, "is_default": 1, "with_operations": 1,
                    "rm_cost_as_per": "Valuation Rate", "routing": routing,
-                   "operations": operation_rows(D.ROUTINGS[routing]), "items": items}
+                   "operations": operation_rows(D.ROUTINGS[routing], quality_gate=bool(qit)), "items": items}
+            if qit:
+                # 质检门：BOM 要求检验，且检验工序标记为必检，工序卡才会要求先提交质量检验单
+                doc["inspection_required"] = 1
+                doc["quality_inspection_template"] = qit
             res = self.c.create("BOM", doc)
             self.c.update("BOM", res["name"], {"docstatus": 1})   # 提交，使 BOM 生效
             self.bom_names[parent] = res["name"]
@@ -254,6 +265,10 @@ class Seeder:
     # ---- 7 期初库存（可选）
     def opening_stock(self):
         self.log("期初库存：小五金与油品")
+        tag = "WQ 虚拟工厂期初库存 opening stock"
+        if self.c.find("Stock Entry", [["remarks", "=", tag], ["docstatus", "=", 1]]):
+            self.skipped += 1
+            return
         types = self.c.find("Stock Entry Type", [["purpose", "=", "Material Receipt"]])
         if not types:
             raise ERPError("找不到“物料入库”类型的库存凭证")
@@ -262,7 +277,7 @@ class Seeder:
                   "t_warehouse": self.wh(D.WAREHOUSES[1]), "basic_rate": D.ITEMS[code][3]}
                  for code, qty in D.OPENING_STOCK.items()]
         res = self.c.create("Stock Entry", {"stock_entry_type": types[0]["name"], "purpose": "Material Receipt",
-                                            "company": self.company, "items": items})
+                                            "company": self.company, "remarks": tag, "items": items})
         self.c.update("Stock Entry", res["name"], {"docstatus": 1})
         self.created += 1
 
@@ -299,13 +314,13 @@ def holidays(y0, y1):
     return out
 
 
-def operation_rows(ops):
+def operation_rows(ops, quality_gate=False):
     rows = []
     for seq, (op, minutes) in enumerate(ops, start=1):
         ws = D.OPERATIONS[op]
         row = {"operation": op, "workstation": ws, "time_in_mins": minutes, "sequence_id": seq,
                "hour_rate": sum(D.WORKSTATIONS[ws][1])}
-        if op in D.INSPECTION_OPS:
+        if quality_gate and op in D.INSPECTION_OPS:
             row["quality_inspection_required"] = 1
         rows.append(row)
     return rows
@@ -321,8 +336,7 @@ def item_doc(code, name, kind, uom, price, qit, note, company, warehouse, suppli
         "item_defaults": [{"company": company, "default_warehouse": warehouse}],
     }
     if price is not None:
-        doc["valuation_rate"] = price
-        doc["standard_rate"] = price
+        doc["valuation_rate"] = price   # 不设 standard_rate，否则 ERPNext 会顺带生成一条同价的销售价
     if supplier:
         doc["item_defaults"][0]["default_supplier"] = supplier
         doc["supplier_items"] = [{"supplier": supplier}]

@@ -130,9 +130,10 @@ def build():
         users = [p for p, (r, _) in D.BOMS.items() if r == rname]
         a("**{}**（用于 {}）：".format(rname, "、".join(users)))
         a("")
-        a(" → ".join("{} {} 分钟{}".format(o.split(" ")[0], m, "（质检门）" if o in D.INSPECTION_OPS else "") for o, m in ops))
+        a(" → ".join("{} {} 分钟".format(o.split(" ")[0], m) for o, m in ops))
         a("")
-    a("标注“质检门”的工序要求先提交质量检验单，工序卡才能完成。")
+    gated = [c for c in D.BOMS if D.ITEMS[c][5]]
+    a("质检门：{} 这几种有检验模板的物料，其“零件检验”或“出厂检验”工序要求先提交质量检验单，工序卡才能完成；其余物料的检验工序只记工时。".format("、".join(gated)))
     a("")
     a("## 每台产品占用的工作中心时间（找瓶颈）")
     a("")
