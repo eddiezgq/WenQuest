@@ -46,7 +46,10 @@ PasswordAuthentication no
 KbdInteractiveAuthentication no
 PermitRootLogin prohibit-password
 EOF
-systemctl reload ssh
+sshd -t
+# Ubuntu 24.04 starts sshd on demand (ssh.socket) and each new connection reads the config,
+# so a reload is only needed when the service is already running.
+if systemctl is-active --quiet ssh; then systemctl reload ssh; fi
 
 echo "== Firewall: SSH, HTTP, HTTPS only"
 ufw default deny incoming
