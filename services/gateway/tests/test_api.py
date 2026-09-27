@@ -45,6 +45,9 @@ def fake_moodle(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json={"error": "Invalid login", "errorcode": "invalidlogin"})
     if url.path.startswith("/webservice/pluginfile.php/"):
         assert parse_qs(url.query)["token"] == ["mtok"]
+        if url.path.endswith(".html"):
+            return httpx.Response(200, content=b"<script>steal()</script>", headers={
+                "content-type": "text/html", "content-disposition": 'inline; filename="x.html"'})
         return httpx.Response(200, content=b"PNG", headers={"content-type": "image/png"})
     q = parse_qs(url.query)
     fn = q["wsfunction"][0]
@@ -195,3 +198,16 @@ def test_connect_url_sends_public_host():
     assert seen == {"url": "http://moodle/login/token.php", "host": "classic.example.com", "proto": "https"}
     assert mc._url("https://classic.example.com/webservice/pluginfile.php/1/a.png") == \
         "http://moodle/webservice/pluginfile.php/1/a.png"
+
+
+def test_proxied_html_cannot_run_on_app_domain(client):
+    login(client)
+    tok = main.state.codec.fernet.encrypt(json.dumps(
+        {"u": f"{BASE}/webservice/pluginfile.php/9/mod_resource/content/0/x.html", "t": "mtok"}).encode()).decode()
+    r = client.get(f"/api/v1/files/{tok}")
+    assert r.headers["content-disposition"].startswith("attachment")
+    assert "sandbox" in r.headers["content-security-policy"]
+    assert r.headers["x-content-type-options"] == "nosniff"
+    img = main.state.codec.fernet.encrypt(json.dumps(
+        {"u": f"{BASE}/webservice/pluginfile.php/4/mod_page/content/1/x.png", "t": "mtok"}).encode()).decode()
+    assert "content-disposition" not in client.get(f"/api/v1/files/{img}").headers

@@ -246,11 +246,22 @@ def register(app: FastAPI) -> None:
             raise EngineError("link_expired", "file link expired", 410)
         d = json.loads(raw)
         r = await state.moodle.fetch_file(d["t"], d["u"])
-        headers = {"Cache-Control": "private, max-age=3600"}
-        if cd := r.headers.get("content-disposition"):
+        ctype = r.headers.get("content-type", "application/octet-stream")
+        headers = {
+            "Cache-Control": "private, max-age=3600",
+            "X-Content-Type-Options": "nosniff",
+            # Files are served from the app's own domain: never let one run script there.
+            "Content-Security-Policy": "default-src 'none'; img-src 'self' data:; media-src 'self'; "
+                                       "style-src 'unsafe-inline'; sandbox",
+        }
+        base_type = ctype.split(";")[0].strip().lower()
+        inline = base_type.startswith(("image/", "video/", "audio/")) or base_type in ("application/pdf", "text/plain")
+        if not inline:
+            name = r.headers.get("content-disposition", "")
+            headers["Content-Disposition"] = name.replace("inline", "attachment") if "filename" in name else "attachment"
+        elif cd := r.headers.get("content-disposition"):
             headers["Content-Disposition"] = cd
-        return Response(r.content, media_type=r.headers.get("content-type", "application/octet-stream"),
-                        headers=headers)
+        return Response(r.content, media_type=ctype, headers=headers)
 
 
 def _user(info: dict, lang: str) -> UserOut:
