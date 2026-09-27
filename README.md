@@ -31,7 +31,11 @@ docker compose logs -f create-site
 
 最后一条命令会显示建站过程，看到它结束（出现 `Current Site set to frontend` 一类的字样后自动退出），按 `Ctrl+C` 离开。首次约 5–10 分钟。
 
-浏览器打开 **http://localhost:8090**，用户名 `Administrator`，密码 `admin`。
+浏览器打开下面这个地址，用户名 `Administrator`，密码 `admin`：
+
+```
+http://localhost:8090
+```
 
 ## 三、完成初始设置向导
 
