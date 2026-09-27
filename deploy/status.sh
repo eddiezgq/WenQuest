@@ -14,7 +14,7 @@ echo "== Latest backup"
 find backups -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1
 echo "== Websites"
 DOMAIN=$(envval SITE_DOMAIN)
-for url in "https://$DOMAIN/" "https://learn.$DOMAIN/login/index.php"; do
+for url in "https://$DOMAIN/" "https://learn.$DOMAIN/api/health" "https://classic.$DOMAIN/login/index.php"; do
     code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$url" || echo "---")
     echo "$code  $url"
 done

@@ -2,3 +2,5 @@
 backups/
 .deploy-history
 aiprovider_claude.zip
+__pycache__/
+.pytest_cache/

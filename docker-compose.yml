@@ -36,6 +36,31 @@ services:
     volumes:
       - moodledata:/var/www/moodledata
 
+  # WenQuest API gateway: the single entry point for the WenQuest frontend.
+  gateway:
+    build: services/gateway
+    image: ${GATEWAY_IMAGE:-wenquest/gateway:0.2}
+    restart: unless-stopped
+    depends_on:
+      - moodle
+    environment:
+      WQ_MOODLE_URL: ${MOODLE_WWWROOT}
+      WQ_MOODLE_CONNECT_URL: http://moodle
+      WQ_SECRET_KEY: ${WQ_SECRET_KEY:?Set WQ_SECRET_KEY in .env}
+      WQ_DEFAULT_LANG: ${WQ_DEFAULT_LANG:-zh}
+      WQ_CORS_ORIGINS: ${APP_URL:-http://localhost:8088}
+      WQ_PUBLIC_URL: ${WQ_PUBLIC_URL:-}
+
+  # WenQuest web app (static files) with /api forwarded to the gateway.
+  web:
+    build: apps/web
+    image: ${WEB_IMAGE:-wenquest/web:0.2}
+    restart: unless-stopped
+    depends_on:
+      - gateway
+    ports:
+      - "${APP_PORT:-8088}:80"
+
   cron:
     image: ${ENGINE_IMAGE:-wenquest/engine:0.1}
     restart: unless-stopped

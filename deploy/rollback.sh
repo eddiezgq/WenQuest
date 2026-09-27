@@ -8,6 +8,6 @@
 PREV=$(tail -n 1 .deploy-history)
 sed -i '$ d' .deploy-history
 log "Rolling back to $PREV"
-envset ENGINE_IMAGE "$PREV"
+set_images "$PREV"
 dc up -d --no-build
 log "Done. Check: deploy/status.sh"

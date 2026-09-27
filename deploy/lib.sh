@@ -23,6 +23,14 @@ envset() {
     fi
 }
 
+# All three images are built from one commit and share a tag; derive the others from the engine image.
+#   ghcr.io/owner/repo/engine:abc123 -> ghcr.io/owner/repo/gateway:abc123
+set_images() {
+    envset ENGINE_IMAGE "$1"
+    envset GATEWAY_IMAGE "${1/\/engine:/\/gateway:}"
+    envset WEB_IMAGE "${1/\/engine:/\/web:}"
+}
+
 dc() {
     docker compose -f docker-compose.yml -f docker-compose.prod.yml "$@"
 }

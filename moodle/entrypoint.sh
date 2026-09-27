@@ -28,6 +28,7 @@ if [ "$1" = "apache2-foreground" ]; then
         su -s /bin/sh www-data -c "php admin/cli/upgrade.php --non-interactive"
     fi
     su -s /bin/sh www-data -c "php setup_ai.php"
+    su -s /bin/sh www-data -c "php setup_wenquest.php"
 fi
 
 exec "$@"

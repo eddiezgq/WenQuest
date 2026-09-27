@@ -1,0 +1,14 @@
+{
+  "pages": [
+    { "path": "pages/login/login", "style": { "navigationBarTitleText": "问渠", "h5": { "titleNView": false } } },
+    { "path": "pages/courses/courses", "style": { "navigationBarTitleText": "我的课程", "h5": { "titleNView": false } } },
+    { "path": "pages/course/course", "style": { "navigationBarTitleText": "课程", "h5": { "titleNView": false } } },
+    { "path": "pages/activity/activity", "style": { "navigationBarTitleText": "学习", "h5": { "titleNView": false } } }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "问渠",
+    "navigationBarBackgroundColor": "#14212B",
+    "backgroundColor": "#F4F6F5"
+  }
+}

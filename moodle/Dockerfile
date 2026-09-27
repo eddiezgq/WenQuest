@@ -34,7 +34,7 @@ RUN mkdir -p /opt/langpacks && for l in $LANGPACKS; do \
         && unzip -q /tmp/$l.zip -d /opt/langpacks && rm /tmp/$l.zip || echo "Language pack $l not downloaded"; \
     done
 
-COPY moodle/setup_ai.php moodle/write_config.php moodle/entrypoint.sh /var/www/moodle/
+COPY moodle/setup_ai.php moodle/setup_wenquest.php moodle/write_config.php moodle/entrypoint.sh /var/www/moodle/
 RUN chmod +x /var/www/moodle/entrypoint.sh \
     && mkdir -p /var/www/moodledata && chown -R www-data:www-data /var/www/moodledata /var/www/moodle
 

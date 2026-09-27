@@ -24,11 +24,15 @@ ANTHROPIC=$(ask "Anthropic API key (can be added later)" "")
 
 ADMIN_PASS=$(genpass)
 DB_PASS=$(genpass)
+SESSION_KEY=$(genpass)$(genpass)
 
 cp .env.example .env
 chmod 600 .env
 set_env() { sed -i "s|^$1=.*|$1=$2|" .env; }
-set_env MOODLE_WWWROOT "https://learn.$DOMAIN"
+set_env MOODLE_WWWROOT "https://classic.$DOMAIN"
+set_env APP_URL "https://learn.$DOMAIN"
+set_env WQ_SECRET_KEY "$SESSION_KEY"
+case "$LANG_DEFAULT" in zh*) set_env WQ_DEFAULT_LANG zh ;; *) set_env WQ_DEFAULT_LANG en ;; esac
 set_env MOODLE_SSLPROXY true
 set_env MOODLE_SITE_NAME "$SITE_NAME"
 set_env MOODLE_LANG "$LANG_DEFAULT"
@@ -41,6 +45,8 @@ set_env DB_PASSWORD "$DB_PASS"
 set_env ANTHROPIC_API_KEY "$ANTHROPIC"
 set_env MOODLE_NOREPLY_EMAIL "noreply@$DOMAIN"
 set_env ENGINE_IMAGE ""   # filled in by the first deployment
+set_env GATEWAY_IMAGE ""
+set_env WEB_IMAGE ""
 
 echo
 echo "Created .env. Save these somewhere safe (a password manager):"

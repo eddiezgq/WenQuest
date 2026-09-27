@@ -1,11 +1,16 @@
-# 问渠 WenQuest v0.1 部署包
+# 问渠 WenQuest v0.2
 
-问渠 WenQuest 的教学引擎部署包：开源教学引擎 Moodle 5.2 + Claude / DeepSeek 模型接入。一条命令启动，AI 功能开箱可用。问渠前端与 AI 服务层将在后续版本加入本包。
+问渠 WenQuest：自研前端（网页 + 微信小程序，一套 uni-app 代码）+ 接口网关（FastAPI）+ 开源教学引擎 Moodle 5.2（Claude / DeepSeek 模型接入）。一条命令启动。
+
+v0.2 新增：问渠自己的学习界面和接口网关。学生登录后可看我的课程、课程目录、阅读页、链接、作业说明和文件，中英文一键切换；新界面暂未支持的活动一键跳到经典界面。下一步：带出处的课程 AI 助教。
 
 ## 包里有什么
 
 | 内容 | 说明 |
 | --- | --- |
+| `apps/web/` | 问渠前端（uni-app + Vue 3）：`npm run dev:h5` 本地开发，`npm run build:mp-weixin` 出微信小程序 |
+| `services/gateway/` | 接口网关（FastAPI）：登录、课程、内容、文件代理、中英文解析；`python -m pytest` 运行测试 |
+| `moodle/setup_wenquest.php` | 启动时开启网关所需的 Web 服务和多语言过滤器 |
 | `plugins/aiprovider_claude/` | 自研 Moodle 插件：把 Anthropic Claude 接入 Moodle AI 子系统 |
 | `moodle/Dockerfile` | Moodle 5.2 镜像（PHP 8.3 + Apache），已内置 Claude 插件和中文语言包 |
 | `docker-compose.yml` | Moodle、PostgreSQL 16、Redis、定时任务四个服务 |
@@ -23,7 +28,7 @@
 
 ## 上线到云服务器
 
-按 [docs/上线手册.md](docs/上线手册.md) 操作：官网在主域名，学习平台在 `learn.` 子域名，推送代码即自动部署，每天自动备份。
+按 [docs/上线手册.md](docs/上线手册.md) 操作：官网在主域名，问渠学习平台在 `learn.` 子域名，经典界面（Moodle）在 `classic.` 子域名，推送代码即自动部署，每天自动备份。
 
 ## 本地快速试用
 
@@ -36,7 +41,7 @@ docker compose up -d --build   # 首次构建约 10–20 分钟
 docker compose logs -f moodle  # 看到 "Created AI provider" 即完成
 ```
 
-浏览器打开 `MOODLE_WWWROOT`，用 `.env` 里的管理员账号登录。
+浏览器打开 `MOODLE_WWWROOT`（经典界面），用 `.env` 里的管理员账号登录、建课、加学生；再打开 `APP_URL`（默认 http://localhost:8088）用学生账号登录问渠新界面。
 
 ## 模型选择
 

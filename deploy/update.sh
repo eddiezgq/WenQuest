@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Switch the learning platform to a new engine image and restart the stack.
+# Switch the platform to new images (engine, gateway, web from one build) and restart the stack.
 # Usage: deploy/update.sh [image]     (no image: restart with the current one, e.g. after editing .env)
 # Called by the GitHub Actions deploy job; can also be run by hand on the server.
 . "$(dirname "$0")/lib.sh"
@@ -15,12 +15,12 @@ if [ -n "$NEW_IMAGE" ] && [ "$NEW_IMAGE" != "$CURRENT" ]; then
     fi
     log "Engine image: ${CURRENT:-none} -> $NEW_IMAGE"
     [ -n "$CURRENT" ] && echo "$CURRENT" >> .deploy-history
-    envset ENGINE_IMAGE "$NEW_IMAGE"
+    set_images "$NEW_IMAGE"
 fi
 
 log "Pulling images..."
 dc pull --quiet --ignore-buildable
-dc pull --quiet moodle
+dc pull --quiet moodle gateway web
 
 log "Starting services..."
 dc up -d --no-build --remove-orphans

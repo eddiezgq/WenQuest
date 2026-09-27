@@ -25,8 +25,18 @@ www.{$SITE_DOMAIN} {
 	redir https://{$SITE_DOMAIN}{uri} permanent
 }
 
-# Learning platform (Moodle).
+# WenQuest learning platform: the web app, with /api handled by the gateway.
 learn.{$SITE_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+	request_body {
+		max_size 200MB
+	}
+	reverse_proxy web:80
+}
+
+# Classic view (Moodle): course authoring for teachers and activities the new app does not cover yet.
+classic.{$SITE_DOMAIN} {
 	import security_headers
 	encode zstd gzip
 	request_body {

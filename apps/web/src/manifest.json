@@ -1,0 +1,20 @@
+{
+  "name": "问渠 WenQuest",
+  "appid": "",
+  "description": "AI-native teaching platform",
+  "versionName": "0.2.0",
+  "versionCode": "20",
+  "transformPx": false,
+  "h5": {
+    "title": "问渠 WenQuest",
+    "router": { "mode": "history", "base": "/" }
+  },
+  "mp-weixin": {
+    "appid": "",
+    "setting": { "urlCheck": true, "es6": true, "minified": true },
+    "usingComponents": true
+  },
+  "app-plus": { "usingComponents": true, "compilerVersion": 3 },
+  "uniStatistics": { "enable": false },
+  "vueVersion": "3"
+}
