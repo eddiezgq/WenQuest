@@ -158,6 +158,8 @@ export interface SlideDeck {
   allow_download: boolean;
   file_name: string;
   download_url: string | null;
+  queue?: number;    // while converting: decks ahead of this one (0 = being converted now)
+  elapsed?: number;  // seconds this deck has been converting
   pages?: number;
   width?: number;
   height?: number;

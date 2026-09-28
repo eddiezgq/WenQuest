@@ -143,3 +143,40 @@ def test_convert_and_present(client):
     TEACHER["on"] = True
     t = client.get("/api/v1/slides/9", headers=h).json()
     assert t["slides"][0]["notes"] == "先问学生：车厢里的人看到什么？" and t["download_url"]
+
+
+def test_a_deck_someone_opens_jumps_the_queue(tmp_path, monkeypatch):
+    """Decks converted ahead of time wait; the deck a person is looking at goes next (Eddie, 2026-09-28)."""
+    import asyncio
+    order = []
+
+    def fake_convert(data, folder, ext=".pptx"):
+        time.sleep(0.05)
+        order.append(data.decode())
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "manifest.json").write_text(f'{{"version": {sl.VERSION}, "slides": []}}')
+
+    monkeypatch.setattr(sl, "convert", fake_convert)
+
+    async def scenario():
+        store = sl.SlideStore(str(tmp_path))
+        store.available = True
+
+        def fetch(name):
+            async def f():
+                return name.encode()
+            return f
+
+        for n in ("a", "b", "c", "d"):
+            store.start(n, fetch(n))            # ahead of time (priority 1)
+        await asyncio.sleep(0.01)                # "a" is converting now
+        assert store.progress("d")["queue"] == 3
+        store.start("d", fetch("d"), priority=0)  # someone opens "d"
+        assert store.progress("d")["queue"] == 1  # only the deck already converting is ahead
+        while store.pending or store.current:
+            await asyncio.sleep(0.02)
+        return store
+
+    store = asyncio.run(scenario())
+    assert order == ["a", "d", "b", "c"]
+    assert store.overview()["converted"] == 4 and store.overview()["waiting"] == 0

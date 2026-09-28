@@ -5,6 +5,7 @@ Creating the course and publishing a lesson happen only on the teacher's click, 
 teacher's own Moodle token.
 """
 
+import re
 import time
 from pathlib import Path
 from typing import Annotated, Any
@@ -340,9 +341,12 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             x = items.get(fid)
             if not x:
                 continue
-            role = proj["materials"]["files"].get(fid, {}).get("role", "other")
+            info = proj["materials"]["files"].get(fid, {})
+            role = info.get("role", "other")
             draft = await m.state.moodle.upload(sess.moodle_token, x.name, m.state.store.data(proj["import_id"], fid))
-            acts.append({"type": "resource", "name": Path(x.name).stem, "draftitemid": draft,
+            # A readable name: the document's own title, else the file name without download numbers.
+            name = (info.get("title") or "").strip() or readable_name(x.name)
+            acts.append({"type": "resource", "name": name[:250], "draftitemid": draft,
                          "visible": 0 if role in team.TEACHER_ONLY_ROLES else 1})
         return acts
 
@@ -397,6 +401,19 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         les["cmids"] = res.get("cmids", [])
         les["status"] = "published"
         les["published"] = time.time()
+
+
+def readable_name(filename: str) -> str:
+    """'1790630614206_Chapter_01_S3q00QP_1.pptx' -> 'Chapter 01': drop download numbers in front and
+    random codes at the end (letters mixed with digits or odd capitals), keep real words ('Circuits')."""
+    stem = re.sub(r"^\d{6,}[_-]", "", Path(filename).stem)
+    m = re.search(r"[_-]([A-Za-z0-9]{6,8})(?:_\d)?$", stem)
+    if m:
+        code = m.group(1)
+        random_like = bool(re.search(r"\d", code)) or bool(re.search(r"[a-z][A-Z]|[A-Z]{2}[a-z]", code))
+        if random_like:
+            stem = stem[:m.start()]
+    return stem.replace("_", " ").strip() or Path(filename).stem
 
 
 def _learn_from_answer(proj: dict, q: dict) -> None:

@@ -4,8 +4,13 @@
     <view v-if="!deck || deck.status !== 'ready'" class="state">
       <template v-if="!deck || deck.status === 'converting' || deck.status === 'missing'">
         <view class="spinner" />
-        <text class="st-title">{{ t("slides.converting") }}</text>
-        <text class="st-sub">{{ t("slides.convertingHint") }}</text>
+        <text class="st-title">{{ deck && deck.queue ? t("slides.queued", { n: deck.queue }) : t("slides.converting") }}</text>
+        <text class="st-sub">{{ deck && deck.elapsed ? t("slides.elapsed", { s: deck.elapsed }) : t("slides.convertingHint") }}</text>
+        <view v-if="waited > 180 && deck" class="st-btns">
+          <text class="st-sub">{{ t("slides.slow") }}</text>
+          <view class="btn" @click="retryConvert">{{ t("common.retry") }}</view>
+          <view v-if="deck.download_url" class="btn ghost" @click="download">{{ t("activity.download") }}</view>
+        </view>
       </template>
       <template v-else>
         <text class="st-title">{{ deck.status === "failed" ? t("slides.failed") : t("slides.unavailable") }}</text>
@@ -124,6 +129,8 @@ const labReady = ref(false);
 const pendingLab = ref("");
 const chosenLab = ref<LabRef | null>(null);
 let timer: ReturnType<typeof setTimeout> | null = null;
+const openedAt = Date.now();
+const waited = ref(0);  // seconds since the page asked for this deck
 
 const total = computed(() => deck.value?.slides?.length || 0);
 const slide = computed<Slide>(() => deck.value?.slides?.[i.value] || { image: "", thumb: "", labs: [], videos: [], links: [] });
@@ -271,6 +278,7 @@ async function load(force = false) {
       i.value = Math.min(Math.max(0, saved), (d.slides?.length || 1) - 1);
       preload(i.value);
     } else if (d.status === "converting" || d.status === "missing") {
+      waited.value = Math.round((Date.now() - openedAt) / 1000);
       timer = setTimeout(() => load(), 2000);
     }
   } catch (e) {
@@ -325,7 +333,7 @@ onBeforeUnmount(() => {
 .state.small { border: 0; padding: 80px 0; background: transparent; }
 .st-title { font-size: 17px; color: var(--wq-ink); font-weight: 600; }
 .st-sub { font-size: 13px; color: var(--wq-muted); }
-.st-btns { display: flex; gap: 10px; margin-top: 8px; }
+.st-btns { display: flex; gap: 10px; margin-top: 8px; align-items: center; flex-wrap: wrap; justify-content: center; }
 .err { color: var(--wq-danger); font-size: 13px; }
 .btn { padding: 8px 16px; border-radius: 8px; background: var(--wq-ink); color: #fff; cursor: pointer; font-size: 14px; }
 .btn.ghost { background: #fff; color: var(--wq-ink); border: 1px solid var(--wq-line); }

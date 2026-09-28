@@ -276,9 +276,12 @@ class SlideStore:
                 self.index = json.loads(self.index_path.read_text())
             except ValueError:
                 self.index = {}
-        self.busy: dict[str, asyncio.Task] = {}
+        self.pending: dict[str, dict] = {}   # waiting decks: {priority, seq, fetch, ext, queued}
+        self.current: dict | None = None     # the deck being converted now: {src, started}
+        self.worker: asyncio.Task | None = None
         self.failed: dict[str, float] = {}
-        self.lock = asyncio.Semaphore(1)  # LibreOffice is heavy: one deck at a time
+        self.done_count = 0
+        self.seq = 0
         self.available = bool(shutil.which("soffice"))
 
     @staticmethod
@@ -303,36 +306,68 @@ class SlideStore:
         key = self.index.get(src)
         if key and self.manifest(key):
             return "ready", key
-        if src in self.busy and not self.busy[src].done():
+        if (self.current and self.current["src"] == src) or src in self.pending:
             return "converting", None
         if src in self.failed and time.time() - self.failed[src] < 600:
             return "failed", None
         return "missing", None
 
-    def start(self, src: str, fetch: Callable[[], Awaitable[bytes]], ext: str = ".pptx") -> None:
-        """Convert in the background (no-op if ready or already running)."""
-        state, _ = self.status(src)
-        if state in ("ready", "converting") or not self.available:
-            return
-        self.failed.pop(src, None)
-        self.busy[src] = asyncio.create_task(self._run(src, fetch, ext))
+    def progress(self, src: str) -> dict:
+        """Where a deck stands: converting now (with seconds so far) or waiting behind N others."""
+        if self.current and self.current["src"] == src:
+            return {"queue": 0, "elapsed": round(time.time() - self.current["started"])}
+        if src in self.pending:
+            me = self.pending[src]
+            ahead = sum(1 for p in self.pending.values() if (p["priority"], p["seq"]) < (me["priority"], me["seq"]))
+            return {"queue": ahead + (1 if self.current else 0), "elapsed": 0}
+        return {"queue": 0, "elapsed": 0}
 
-    async def _run(self, src: str, fetch: Callable[[], Awaitable[bytes]], ext: str) -> None:
-        try:
-            async with self.lock:
-                data = await fetch()
+    def overview(self) -> dict:
+        return {"available": self.available, "waiting": len(self.pending), "converted": self.done_count,
+                "failed": len(self.failed),
+                "current_seconds": round(time.time() - self.current["started"]) if self.current else None}
+
+    def start(self, src: str, fetch: Callable[[], Awaitable[bytes]], ext: str = ".pptx", priority: int = 1) -> None:
+        """Queue a deck for conversion. priority 0 = someone is looking at it now (goes first);
+        1 = converting ahead of time. A queued deck that someone opens moves to the front."""
+        if not self.available:
+            return
+        state, _ = self.status(src)
+        if state == "ready" or (self.current and self.current["src"] == src):
+            return
+        if src in self.pending:
+            p = self.pending[src]
+            if priority < p["priority"]:
+                p.update(priority=priority, fetch=fetch)
+            return
+        if state == "failed" and priority > 0:
+            return  # do not retry failed decks in the background; a viewer's retry clears it
+        self.failed.pop(src, None)
+        self.seq += 1
+        self.pending[src] = {"priority": priority, "seq": self.seq, "fetch": fetch, "ext": ext, "queued": time.time()}
+        if not self.worker or self.worker.done():
+            self.worker = asyncio.create_task(self._work())
+
+    async def _work(self) -> None:
+        # LibreOffice is heavy: one deck at a time, most urgent first.
+        while self.pending:
+            src = min(self.pending, key=lambda k: (self.pending[k]["priority"], self.pending[k]["seq"]))
+            job = self.pending.pop(src)
+            self.current = {"src": src, "started": time.time()}
+            try:
+                data = await job["fetch"]()
                 key = hashlib.sha256(data).hexdigest()
                 if not self.manifest(key):
-                    started = time.time()
-                    await asyncio.to_thread(convert, data, self.root / key, ext)
-                    log.info("converted deck %s in %.1fs", key[:12], time.time() - started)
+                    await asyncio.to_thread(convert, data, self.root / key, job["ext"])
+                    log.info("converted deck %s in %.1fs (%d waiting)", key[:12], time.time() - self.current["started"], len(self.pending))
                 self.index[src] = key
                 self.index_path.write_text(json.dumps(self.index))
-        except Exception:
-            log.exception("slide conversion failed")
-            self.failed[src] = time.time()
-        finally:
-            self.busy.pop(src, None)
+                self.done_count += 1
+            except Exception:
+                log.exception("slide conversion failed")
+                self.failed[src] = time.time()
+            finally:
+                self.current = None
 
 
 class Settings:

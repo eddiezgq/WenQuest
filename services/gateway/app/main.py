@@ -31,7 +31,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.8.1"
+VERSION = "0.8.2"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -196,7 +196,8 @@ def register(app: FastAPI) -> None:
     @app.get("/api/health")
     async def health():
         # Which model is configured (never the key), so an administrator can check without logging in.
-        return {"ok": True, "version": VERSION, "ai": state.ai.provider, "slides": state.slides.available}
+        return {"ok": True, "version": VERSION, "ai": state.ai.provider, "slides": state.slides.available,
+                "slide_queue": state.slides.overview()}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)
     async def login(body: LoginIn):
@@ -500,9 +501,11 @@ def register(app: FastAPI) -> None:
         }
         if not state.slides.available:
             return {**out, "status": "unavailable"}
-        src = _prepare_deck(f, tok)
+        src = _prepare_deck(f, tok, priority=0)  # someone is looking at this deck: it goes first
         status, key = state.slides.status(src)
         out["status"] = status
+        if status == "converting":
+            out.update(state.slides.progress(src))
         if status == "ready" and key:
             m = state.slides.manifest(key) or {}
             base = f"{state.settings.public_url.rstrip('/')}/api/v1/slides/files/{key}/"
@@ -517,7 +520,7 @@ def register(app: FastAPI) -> None:
     @app.post("/api/v1/slides/{cmid}/retry")
     async def slides_retry(cmid: int, sess: Annotated[Session, Depends(current)]):
         state.slides.failed.clear()
-        return await slides(cmid, sess)
+        return await slides(cmid, sess)  # queues it again, at the front
 
     @app.put("/api/v1/slides/{cmid}/settings")
     async def slides_settings(cmid: int, body: SlideSettingsIn, sess: Annotated[Session, Depends(current)]):
@@ -673,14 +676,14 @@ async def ingest(iid: str, sess: Session, file: UploadFile, path: str) -> dict:
     return m.public()
 
 
-def _prepare_deck(f: dict, moodle_token: str) -> str:
+def _prepare_deck(f: dict, moodle_token: str, priority: int = 1) -> str:
     """Start converting a deck in the background if needed; return its source key."""
     src = sl.SlideStore.source_key(f["fileurl"], f.get("timemodified"), f.get("filesize"))
 
     async def fetch() -> bytes:
         return (await state.moodle.fetch_file(moodle_token, f["fileurl"])).content
 
-    state.slides.start(src, fetch, Path(f.get("filename") or "deck.pptx").suffix.lower())
+    state.slides.start(src, fetch, Path(f.get("filename") or "deck.pptx").suffix.lower(), priority)
     return src
 
 
