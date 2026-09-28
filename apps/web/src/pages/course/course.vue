@@ -298,7 +298,7 @@ function openClassic() {
   if (d.value) window.open(d.value.info.classic_url, "_blank", "noopener");
   // #endif
 }
-const create = () => uni.navigateTo({ url: "/pages/create/create" });
+const create = () => uni.navigateTo({ url: "/pages/studio/studio" });
 
 onLoad((q: any) => {
   id.value = Number(q?.id || 0);

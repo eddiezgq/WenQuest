@@ -132,9 +132,9 @@ class create_course extends external_api {
      * @param \stdClass $course
      * @param int $section Section number
      * @param array $activity
-     * @return bool Whether an activity was created
+     * @return int The new course module id, or 0 when the activity was skipped
      */
-    protected static function add_activity(\stdClass $course, int $section, array $activity): bool {
+    public static function add_activity(\stdClass $course, int $section, array $activity): int {
         $base = [
             'course' => $course->id,
             'section' => $section,
@@ -168,7 +168,7 @@ class create_course extends external_api {
                 break;
             case 'url':
                 if (!$activity['url']) {
-                    return false;
+                    return 0;
                 }
                 $info = $base + [
                     'modulename' => 'url',
@@ -215,7 +215,7 @@ class create_course extends external_api {
                 break;
             case 'resource':
                 if (!$activity['draftitemid']) {
-                    return false;
+                    return 0;
                 }
                 $info = $base + [
                     'modulename' => 'resource',
@@ -228,10 +228,10 @@ class create_course extends external_api {
                 ];
                 break;
             default:
-                return false; // Unknown types are skipped rather than failing the whole course.
+                return 0; // Unknown types are skipped rather than failing the whole course.
         }
-        create_module((object) $info);
-        return true;
+        $created = create_module((object) $info);
+        return (int) $created->coursemodule;
     }
 
     /**

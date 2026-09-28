@@ -106,6 +106,39 @@ export interface Material {
   teacher_only: boolean;
   error: string;
 }
+/** AI professor team (D30): one course project. */
+export type Stage = "intake" | "materials" | "outline" | "lessons";
+export type LessonStatus = "planned" | "writing" | "reviewing" | "awaiting" | "published" | "failed";
+export interface StudioFile {
+  id: string; name: string; path: string; size: number; pages: number; error: string;
+  role: string; role_label: string; chapters: number[]; title: string; confidence: string; note: string; by: string;
+}
+export interface StudioQuestion { id: string; text: string; options: string[]; status: "open" | "answered" | "dropped"; answer: string }
+export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"; text: string; ts: number; kind: string }
+export interface StudioLesson {
+  id: string; title: Text; goal: Text; week: number; sections: string[]; status: LessonStatus;
+  content: Text; exercises: Text; answers: Text; notes: string; error: string;
+  review: { verdict: "pass" | "revise"; issues: { severity: string; text: string }[]; summary: string; round: number } | null;
+}
+export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[] }
+export interface StudioOutline { title: Text; summary: Text; languages: Languages; chapters: StudioChapter[]; calendar_note: string }
+export interface StudioProject {
+  id: string; stage: Stage; created: number; updated: number;
+  requirements: Record<string, string>;
+  materials: { textbook: string; book_title: string; summary: string };
+  toc: { no: number; title: string; start: number | null; sections: { no: string; title: string; start: number | null }[] }[];
+  files: StudioFile[]; roles: Record<string, string>;
+  questions: StudioQuestion[]; messages: StudioMessage[]; outline: StudioOutline | null;
+  course: { id: number; shortname: string };
+  pace: { mode: "manual" | "daily"; hour: number; tz: string; last_auto: string };
+  busy: { label: string; since: number } | null;
+  progress: Record<LessonStatus | "total", number>;
+}
+export interface StudioSummary {
+  id: string; title: string; stage: Stage; updated: number; course_id: number;
+  lessons: number; published: number; awaiting: number; busy: boolean; open_questions: number;
+}
+
 /** A slide deck converted for presenting in the browser (R12). Positions are fractions of the slide. */
 export interface SlideBox { x: number; y: number; w: number; h: number }
 export interface Slide {
@@ -270,6 +303,43 @@ export const api = {
     const body = await res.json().catch(() => ({}));
     if (!res.ok) throw new ApiError(body.error || `http_${res.status}`, res.status);
     return body as Material;
+  },
+  studioProjects: () => request<{ projects: StudioSummary[] }>("GET", "/api/v1/studio/projects").then((r) => r.projects),
+  studioCreate: (description: string) => request<StudioProject>("POST", "/api/v1/studio/projects", { description }),
+  studio: (id: string) => request<StudioProject>("GET", `/api/v1/studio/projects/${id}`),
+  studioStart: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/start`, {}),
+  studioSay: (id: string, text: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/messages`, { text }),
+  studioAnswer: (id: string, qid: string, answer: string) =>
+    request<StudioProject>("POST", `/api/v1/studio/projects/${id}/questions/${qid}`, { answer }),
+  studioMaterials: (id: string, files: { id: string; role: string; chapters: number[] }[], textbook?: string) =>
+    request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/materials`, { files, textbook }),
+  studioApproveMaterials: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-materials`, {}),
+  studioOutline: (id: string, outline: StudioOutline) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/outline`, outline),
+  studioApproveOutline: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-outline`, {}, 300000),
+  studioNext: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/next`, {}),
+  studioWrite: (id: string, lid: string, note = "") =>
+    request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/write`, { note }),
+  studioPublish: (id: string, lid: string) =>
+    request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/approve`, {}, 300000),
+  studioStop: (id: string) => request<{ stopped: boolean }>("POST", `/api/v1/studio/projects/${id}/stop`, {}),
+  studioPace: (id: string, mode: "manual" | "daily", hour: number, tz: string) =>
+    request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/pace`, { mode, hour, tz }),
+  // Browser-only: one file into a course project.
+  async studioUpload(id: string, file: File, path: string): Promise<unknown> {
+    const form = new FormData();
+    form.append("file", file, file.name);
+    form.append("path", path);
+    let res: Response;
+    try {
+      res = await fetch(`${BASE}/api/v1/studio/projects/${id}/files`, {
+        method: "POST", body: form, headers: { Authorization: `Bearer ${token.value}` },
+      });
+    } catch {
+      throw new ApiError("network", 0);
+    }
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new ApiError(body.error || `http_${res.status}`, res.status);
+    return body;
   },
   slides: (cmid: number) => request<SlideDeck>("GET", `/api/v1/slides/${cmid}`),
   slidesRetry: (cmid: number) => request<SlideDeck>("POST", `/api/v1/slides/${cmid}/retry`, {}),

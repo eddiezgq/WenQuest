@@ -1,0 +1,216 @@
+"""AI professor team course building (round 3, D30), end to end against a fake Moodle and the fake model."""
+import asyncio
+import time
+from urllib.parse import parse_qs, urlparse
+
+import httpx
+import pytest
+from fastapi.testclient import TestClient
+
+from app import main
+from app import materials as mt
+from app import studio as st
+from app.ai import ModelGateway
+from app.moodle import MoodleClient
+from tests.test_materials import FOLDER, fake_moodle, login, upload
+
+CALLS: list[tuple[str, dict]] = []
+
+
+def moodle(request: httpx.Request) -> httpx.Response:
+    url = urlparse(str(request.url))
+    q = parse_qs(url.query)
+    fn = (q.get("wsfunction") or [""])[0]
+    if fn in ("local_wenquest_create_course", "local_wenquest_add_activities"):
+        CALLS.append((fn, {k: v[0] for k, v in parse_qs(request.content.decode()).items()}))
+        if fn == "local_wenquest_add_activities":
+            return httpx.Response(200, json={"courseid": 7, "sectionid": 30, "cmids": [101, 102, 103]})
+    return fake_moodle(request)
+
+
+@pytest.fixture
+def client(tmp_path):
+    with TestClient(main.app) as c:
+        main.state.http = httpx.AsyncClient(transport=httpx.MockTransport(moodle))
+        main.state.moodle = MoodleClient("http://moodle.test", "moodle_mobile_app", main.state.http)
+        main.state.ai = ModelGateway("fake", main.state.http)
+        main.state.store = mt.Store(str(tmp_path / "imports"))
+        main.state.projects_dir = str(tmp_path / "projects")
+        CALLS.clear()
+        yield c
+
+
+def settle(c, h, pid, timeout=10.0):
+    end = time.time() + timeout
+    while time.time() < end:
+        p = c.get(f"/api/v1/studio/projects/{pid}", headers=h).json()
+        if not p["busy"]:
+            return p
+        time.sleep(0.05)
+    raise AssertionError("the team did not finish")
+
+
+def make_project(c, h):
+    p = c.post("/api/v1/studio/projects", headers=h, json={"description": "大学物理A（上），给大一工科学生"}).json()
+    for path, data in FOLDER.items():
+        r = c.post(f"/api/v1/studio/projects/{p['id']}/files", headers=h, data={"path": path},
+                   files={"file": (path.rsplit("/", 1)[-1], data, "application/octet-stream")})
+        assert r.status_code == 200, r.text
+    return p["id"]
+
+
+def test_whole_flow_from_materials_to_a_published_lesson(client):
+    h = login(client)
+    pid = make_project(client, h)
+    p = client.get(f"/api/v1/studio/projects/{pid}", headers=h).json()
+    assert p["stage"] == "intake" and len(p["files"]) == len(FOLDER) and p["messages"][0]["role"] == "lead"
+
+    # 1. the librarian and the lead: materials list and at most five questions
+    client.post(f"/api/v1/studio/projects/{pid}/start", headers=h)
+    p = settle(client, h, pid)
+    assert p["stage"] == "materials"
+    roles = {f["path"]: f["role"] for f in p["files"]}
+    assert roles["课程/大学物理教学大纲.docx"] == "syllabus" and roles["课程/第1章/第1章教案.docx"] == "lesson_plan"
+    assert roles["课程/测验/期中参考答案.docx"] == "answer_key"
+    open_q = [q for q in p["questions"] if q["status"] == "open"]
+    assert 1 <= len(open_q) <= 5 and p["messages"][-1]["kind"] == "report"
+
+    # the teacher answers a question and corrects one file
+    lang_q = next(q for q in open_q if "语言" in q["text"])
+    p = client.post(f"/api/v1/studio/projects/{pid}/questions/{lang_q['id']}", headers=h, json={"answer": "中文"}).json()
+    assert p["requirements"]["language"] == "zh"
+    txt = next(f for f in p["files"] if f["path"].endswith("新建文本文档.txt"))
+    p = client.put(f"/api/v1/studio/projects/{pid}/materials", headers=h,
+                   json={"files": [{"id": txt["id"], "role": "reference", "chapters": []}]}).json()
+    assert next(f for f in p["files"] if f["id"] == txt["id"])["by"] == "teacher"
+
+    # 2. the designer: outline with real names, quality-checked
+    client.post(f"/api/v1/studio/projects/{pid}/approve-materials", headers=h)
+    p = settle(client, h, pid)
+    assert p["stage"] == "outline"
+    titles = [c["title"]["zh"] for c in p["outline"]["chapters"]]
+    assert "第1章 质点运动学" in titles and "第2章 牛顿运动定律" in titles
+    assert st.check_outline(p["outline"]) == []
+
+    # the teacher renames a lesson
+    o = p["outline"]
+    o["chapters"][0]["lessons"][0]["title"]["zh"] = "1.1 参考系、坐标系与质点"
+    p = client.put(f"/api/v1/studio/projects/{pid}/outline", headers=h, json=o).json()
+    assert p["outline"]["chapters"][0]["lessons"][0]["title"]["zh"] == "1.1 参考系、坐标系与质点"
+
+    # 3. outline settled: the course is created with its chapters, nothing published yet
+    p = client.post(f"/api/v1/studio/projects/{pid}/approve-outline", headers=h).json()
+    assert p["stage"] == "lessons" and p["course"]["id"] == 7
+    created = dict(CALLS)["local_wenquest_create_course"]
+    assert created["sections[1][name]"] == "第1章 质点运动学"
+
+    # 4. write the next lesson: author, assessor, reviewer
+    client.post(f"/api/v1/studio/projects/{pid}/lessons/next", headers=h)
+    p = settle(client, h, pid)
+    les = p["outline"]["chapters"][0]["lessons"][0]
+    assert les["status"] == "awaiting" and les["review"]["verdict"] == "pass"
+    assert "参考：" in les["content"]["zh"] and les["exercises"]["zh"] and les["answers"]["zh"]
+    assert p["progress"]["awaiting"] == 1
+
+    # 5. the teacher approves: lesson, practice and a hidden answer key, plus the chapter's files
+    p = client.post(f"/api/v1/studio/projects/{pid}/lessons/{les['id']}/approve", headers=h).json()
+    les = p["outline"]["chapters"][0]["lessons"][0]
+    assert les["status"] == "published" and les["cmids"] == [101, 102, 103]
+    sent = [c for f, c in CALLS if f == "local_wenquest_add_activities"][-1]
+    assert sent["section"] == "2" and sent["activities[0][type]"] == "page"
+    assert sent["activities[2][visible]"] == "0"  # answer key: teachers only
+    names = [v for k, v in sent.items() if k.endswith("[name]")]
+    assert "第1章教案" in names and "讲义" in names
+
+
+def test_rewrite_with_a_note_and_stop(client):
+    h = login(client)
+    pid = make_project(client, h)
+    client.post(f"/api/v1/studio/projects/{pid}/start", headers=h)
+    settle(client, h, pid)
+    client.post(f"/api/v1/studio/projects/{pid}/approve-materials", headers=h)
+    settle(client, h, pid)
+    client.post(f"/api/v1/studio/projects/{pid}/approve-outline", headers=h)
+    main.state.ai.fake_delay = 1.0
+    client.post(f"/api/v1/studio/projects/{pid}/lessons/next", headers=h)
+    time.sleep(0.2)
+    assert client.get(f"/api/v1/studio/projects/{pid}", headers=h).json()["busy"]
+    client.post(f"/api/v1/studio/projects/{pid}/stop", headers=h)
+    p = settle(client, h, pid)
+    assert p["outline"]["chapters"][0]["lessons"][0]["status"] == "planned"
+    assert "已停止" in p["messages"][-1]["text"]
+    main.state.ai.fake_delay = 0
+    lid = p["outline"]["chapters"][0]["lessons"][0]["id"]
+    client.post(f"/api/v1/studio/projects/{pid}/lessons/{lid}/write", headers=h, json={"note": "加一个 AGV 转弯的例子"})
+    p = settle(client, h, pid)
+    les = p["outline"]["chapters"][0]["lessons"][0]
+    assert les["status"] == "awaiting" and les["notes"] == "加一个 AGV 转弯的例子"
+
+
+def test_daily_pace_writes_one_lesson_a_day_and_waits_for_review(client):
+    h = login(client)
+    pid = make_project(client, h)
+    client.post(f"/api/v1/studio/projects/{pid}/start", headers=h)
+    settle(client, h, pid)
+    client.post(f"/api/v1/studio/projects/{pid}/approve-materials", headers=h)
+    settle(client, h, pid)
+    client.post(f"/api/v1/studio/projects/{pid}/approve-outline", headers=h)
+    client.put(f"/api/v1/studio/projects/{pid}/pace", headers=h, json={"mode": "daily", "hour": 0, "tz": "UTC"})
+    studio = main._studio()
+
+    def tick():
+        client.portal.call(studio.tick)  # run in the app's event loop, like the background loop does
+
+    tick()
+    p = settle(client, h, pid)
+    assert p["progress"]["awaiting"] == 1 and p["pace"]["last_auto"]
+    p["pace"]["last_auto"] = ""  # even on a new day, an unreviewed lesson blocks the next one
+    proj = studio.projects.load(pid)
+    proj["pace"]["last_auto"] = ""
+    studio.projects.save(proj)
+    tick()
+    p = settle(client, h, pid)
+    assert p["progress"]["awaiting"] == 1 and p["progress"]["planned"] == p["progress"]["total"] - 1
+
+
+def test_projects_are_private_and_need_permission(client):
+    h = login(client)
+    pid = make_project(client, h)
+    student = login(client, "s")
+    assert client.get(f"/api/v1/studio/projects/{pid}", headers=student).status_code == 403
+    assert client.post("/api/v1/studio/projects", headers=student, json={}).status_code == 403
+    assert client.get("/api/v1/studio/projects", headers=student).json() == {"projects": []}
+    mine = client.get("/api/v1/studio/projects", headers=h).json()["projects"]
+    assert [x["id"] for x in mine] == [pid]
+
+
+def test_quality_check_rejects_equations_and_empty_names():
+    o = {"title": {"zh": "新课程"}, "chapters": [{"no": 1, "title": {"zh": "第1章"}, "lessons": [
+        {"title": {"zh": "0.1 mm = 0.0001 m"}}, {"title": {"zh": "1.0598 T = 110 N"}}, {"title": {"zh": "1.2 Units and Standards"}}]}]}
+    problems = st.check_outline(o)
+    assert any("新课程" in x for x in problems) and any("第1章" in x for x in problems)
+    assert sum("像算式" in x for x in problems) == 2
+
+
+def test_textbook_contents_and_page_ranges():
+    pages = {1: "University Physics", 2: "Contents\nChapter 1 Units and Measurement 1\n1.1 The Scope and Scale of Physics 2\n"
+                                         "1.2 Units and Standards 4\nChapter 2 Vectors 9\n2.1 Scalars and Vectors 10\n2.2 Coordinate Systems 12",
+             3: "Preface"}
+    for n in range(4, 20):
+        pages[n] = f"body page {n}"
+    pages[5] += "\nCHAPTER 1 UNITS AND MEASUREMENT"
+    pages[6] += "\n1.1 The Scope and Scale of Physics"
+    pages[8] += "\n1.2 Units and Standards"
+    pages[13] += "\nChapter 2 Vectors\n2.1 Scalars and Vectors"
+    pages[15] += "\n2.2 Coordinate Systems"
+    toc_pages = st.find_toc_pages(pages)
+    assert toc_pages[0] == 2
+    chapters = st.fake_toc(pages, toc_pages)["chapters"]
+    assert [c["title"] for c in chapters] == ["Units and Measurement", "Vectors"]
+    for c in chapters:
+        c["sections"] = [{**s} for s in c["sections"]]
+    st.locate(chapters, pages, 3)
+    s11, s12 = chapters[0]["sections"]
+    assert (s11["start"], s11["end"], s12["start"]) == (6, 7, 8)
+    assert chapters[1]["sections"][0]["start"] == 13
+    assert st.pages_of("[第1页]\nA\n\n[第2页]\nB") == {1: "A", 2: "B"}

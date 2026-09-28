@@ -115,7 +115,7 @@ const menu = computed(() => (props.course ? courseMenu(props.course) : []));
 
 function go(where: string) {
   accountOpen.value = false;
-  if (where === "create") return uni.navigateTo({ url: "/pages/create/create" });
+  if (where === "create") return uni.reLaunch({ url: "/pages/studio/studio" });
   if (["calendar", "inbox", "help"].includes(where)) return uni.reLaunch({ url: `/pages/hub/hub?view=${where}` });
   uni.reLaunch({ url: where === "courses" ? "/pages/courses/courses?view=all" : "/pages/courses/courses" });
 }

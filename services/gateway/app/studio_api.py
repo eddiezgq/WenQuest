@@ -1,0 +1,416 @@
+"""HTTP endpoints of the AI professor team (round 3, D30). Registered by main.create_app().
+
+The team works in the background; the page polls GET /projects/{id} while `busy` is set.
+Creating the course and publishing a lesson happen only on the teacher's click, with the
+teacher's own Moodle token.
+"""
+
+import time
+from pathlib import Path
+from typing import Annotated, Any
+
+from fastapi import Depends, File, Form, UploadFile
+from pydantic import BaseModel, Field
+
+from . import course_builder as cb
+from . import materials as mt
+from . import team
+from .moodle import EngineError
+from .session import Session
+from .studio import disp, lang_keys, new_id, new_project
+
+
+class NewProject(BaseModel):
+    description: str = Field(default="", max_length=4000)
+
+
+class MessageIn(BaseModel):
+    text: str = Field(min_length=1, max_length=4000)
+
+
+class AnswerIn(BaseModel):
+    answer: str = Field(min_length=1, max_length=1000)
+
+
+class FileRoleIn(BaseModel):
+    id: str
+    role: str
+    chapters: list[int] = Field(default_factory=list, max_length=40)
+
+
+class MaterialsIn(BaseModel):
+    files: list[FileRoleIn] = Field(default_factory=list, max_length=400)
+    textbook: str | None = None
+
+
+class LessonIn(BaseModel):
+    id: str = ""
+    title: dict[str, str]
+    goal: dict[str, str] = Field(default_factory=dict)
+    week: int = 0
+    sections: list[str] = Field(default_factory=list, max_length=10)
+
+
+class ChapterIn(BaseModel):
+    id: str = ""
+    no: int = 0
+    title: dict[str, str]
+    summary: dict[str, str] = Field(default_factory=dict)
+    lessons: list[LessonIn] = Field(default_factory=list, max_length=20)
+
+
+class OutlineIn(BaseModel):
+    title: dict[str, str]
+    summary: dict[str, str] = Field(default_factory=dict)
+    chapters: list[ChapterIn] = Field(min_length=1, max_length=40)
+
+
+class NoteIn(BaseModel):
+    note: str = Field(default="", max_length=4000)
+
+
+class PaceIn(BaseModel):
+    mode: str = Field(pattern="^(manual|daily)$")
+    hour: int = Field(default=8, ge=0, le=23)
+    tz: str = Field(default="Asia/Shanghai", max_length=60)
+
+
+def register(app, m) -> None:  # m: the main module (state, current, helpers)
+    current = m.current
+
+    def studio():
+        return m._studio()
+
+    def load(pid: str, sess: Session) -> dict:
+        try:
+            proj = studio().projects.load(pid)
+        except KeyError:
+            raise EngineError("not_found", "no such course project", 404)
+        if proj["owner"] != sess.user_id:
+            raise EngineError("forbidden", "not your course project", 403)
+        return studio().reconcile(proj)
+
+    def view(proj: dict) -> dict:
+        items = {x.id: x for x in studio().items(proj)}
+        files = []
+        for fid, x in items.items():
+            f = proj["materials"]["files"].get(fid, {})
+            files.append({"id": fid, "name": x.name, "path": x.path, "size": x.size, "pages": x.pages, "error": x.error,
+                          "role": f.get("role", ""), "role_label": team.ROLES.get(f.get("role", ""), ""),
+                          "chapters": f.get("chapters", []), "title": f.get("title", ""),
+                          "confidence": f.get("confidence", ""), "note": f.get("note", ""), "by": f.get("by", "")})
+        files.sort(key=lambda f: f["path"])
+        lessons = [les for c in (proj.get("outline") or {}).get("chapters", []) for les in c["lessons"]]
+        out = {k: v for k, v in proj.items() if k not in ("owner",)}
+        out["files"] = files
+        out["roles"] = team.ROLES
+        out["progress"] = {s: sum(1 for les in lessons if les["status"] == s)
+                           for s in ("planned", "writing", "reviewing", "awaiting", "published", "failed")}
+        out["progress"]["total"] = len(lessons)
+        out["busy"] = proj.get("busy") if studio().is_busy(proj["id"]) else None
+        out["toc"] = [{"no": c["no"], "title": c["title"], "start": c.get("start"),
+                       "sections": [{"no": s["no"], "title": s["title"], "start": s.get("start")} for s in c["sections"]]}
+                      for c in proj["materials"].get("toc", [])]
+        out["materials"] = {k: v for k, v in proj["materials"].items() if k not in ("files", "toc")}
+        return out
+
+    async def need_creator(sess: Session) -> None:
+        await m.require_creator(sess)
+
+    # --- projects ------------------------------------------------------------------------------
+    @app.get("/api/v1/studio/projects")
+    async def projects(sess: Annotated[Session, Depends(current)]):
+        out = []
+        for p in studio().projects.all():
+            if p["owner"] != sess.user_id:
+                continue
+            o = p.get("outline") or {}
+            lessons = [les for c in o.get("chapters", []) for les in c["lessons"]]
+            out.append({"id": p["id"], "title": disp(o.get("title")) or p["requirements"].get("course_title") or "",
+                        "stage": p["stage"], "updated": p["updated"], "course_id": p["course"]["id"],
+                        "lessons": len(lessons), "published": sum(1 for x in lessons if x["status"] == "published"),
+                        "awaiting": sum(1 for x in lessons if x["status"] == "awaiting"),
+                        "busy": bool(p.get("busy")) and studio().is_busy(p["id"]),
+                        "open_questions": sum(1 for q in p["questions"] if q["status"] == "open")})
+        out.sort(key=lambda x: -x["updated"])
+        return {"projects": out}
+
+    @app.post("/api/v1/studio/projects")
+    async def create(body: NewProject, sess: Annotated[Session, Depends(current)]):
+        await need_creator(sess)
+        iid = m.state.store.new_session(sess.user_id, keep=True)
+        info = await m.state.moodle.site_info(sess.moodle_token)
+        proj = new_project(sess.user_id, info.get("fullname", ""), iid, body.description)
+        studio().say(proj, "你好，我是这门课的课程负责人。请把课程资料（整个文件夹）拖进来，也可以先用几句话说说这门课：给谁上、上多久、用什么教材。"
+                           "资料放好后点“交给教授团队”，资料馆员会逐个看一遍，然后我把需要确认的事一次问清楚。", "lead")
+        studio().projects.save(proj)
+        return view(proj)
+
+    @app.get("/api/v1/studio/projects/{pid}")
+    async def get(pid: str, sess: Annotated[Session, Depends(current)]):
+        return view(load(pid, sess))
+
+    @app.post("/api/v1/studio/projects/{pid}/files")
+    async def upload(pid: str, sess: Annotated[Session, Depends(current)],
+                     file: UploadFile = File(...), path: str = Form("")):
+        proj = load(pid, sess)
+        return await m.ingest(proj["import_id"], sess, file, path)
+
+    @app.post("/api/v1/studio/projects/{pid}/start")
+    async def start(pid: str, sess: Annotated[Session, Depends(current)]):
+        await need_creator(sess)
+        proj = load(pid, sess)
+        if proj["stage"] not in ("intake", "materials"):
+            raise EngineError("wrong_stage", "materials are already settled", 409)
+        if not studio().items(proj) and not proj["requirements"].get("notes"):
+            raise EngineError("nothing_to_build", "add materials or a description first", 422)
+        studio().run(proj, "资料馆员正在逐个阅读资料…", studio().study_materials)
+        return view(studio().projects.load(pid))
+
+    @app.post("/api/v1/studio/projects/{pid}/messages")
+    async def message(pid: str, body: MessageIn, sess: Annotated[Session, Depends(current)]):
+        await need_creator(sess)
+        proj = load(pid, sess)
+        if proj["stage"] == "intake" and not studio().is_busy(pid):
+            # Before the team starts, what the teacher writes is the course description.
+            proj["requirements"]["notes"] = (proj["requirements"].get("notes", "") + "\n" + body.text).strip()[:4000]
+        studio().say(proj, body.text, "teacher")
+        studio().projects.save(proj)
+        text = body.text
+        studio().run(proj, "课程负责人正在回复…", lambda p: studio().chat(p, text))
+        return view(studio().projects.load(pid))
+
+    @app.post("/api/v1/studio/projects/{pid}/questions/{qid}")
+    async def answer(pid: str, qid: str, body: AnswerIn, sess: Annotated[Session, Depends(current)]):
+        proj = load(pid, sess)
+        q = next((q for q in proj["questions"] if q["id"] == qid), None)
+        if not q:
+            raise EngineError("not_found", "no such question", 404)
+        q["answer"], q["status"] = body.answer, "answered"
+        _learn_from_answer(proj, q)
+        studio().projects.save(proj)
+        return view(proj)
+
+    @app.put("/api/v1/studio/projects/{pid}/materials")
+    async def materials(pid: str, body: MaterialsIn, sess: Annotated[Session, Depends(current)]):
+        proj = load(pid, sess)
+        files = proj["materials"]["files"]
+        for f in body.files:
+            if f.id in files and f.role in team.ROLES:
+                cur = files[f.id]
+                chapters = [c for c in f.chapters if 0 < c < 100]
+                if (cur["role"], cur.get("chapters")) != (f.role, chapters):
+                    cur.update(role=f.role, chapters=chapters, by="teacher", confidence="high")
+        if body.textbook is not None:
+            tb = body.textbook if body.textbook in files else ""
+            for fid, f in files.items():
+                if f["role"] == "main_textbook" and fid != tb:
+                    f.update(role="aux_textbook", by="teacher")
+            if tb:
+                files[tb].update(role="main_textbook", by="teacher", confidence="high")
+            if tb != proj["materials"]["textbook"]:
+                proj["materials"]["textbook"], proj["materials"]["toc"] = tb, []
+                studio().projects.save(proj)
+                if tb:
+                    studio().run(proj, "资料馆员正在读主教材的目录…", studio().read_contents)
+                    return view(studio().projects.load(pid))
+        studio().projects.save(proj)
+        return view(proj)
+
+    @app.post("/api/v1/studio/projects/{pid}/approve-materials")
+    async def approve_materials(pid: str, sess: Annotated[Session, Depends(current)]):
+        await need_creator(sess)
+        proj = load(pid, sess)
+        if proj["stage"] not in ("materials", "outline"):
+            raise EngineError("wrong_stage", "not at this stage", 409)
+        studio().say(proj, "资料清单确认了，课程设计师开始设计大纲和教学日历。", "system")
+        studio().run(proj, "课程设计师正在设计大纲和教学日历…", studio().design)
+        return view(studio().projects.load(pid))
+
+    @app.put("/api/v1/studio/projects/{pid}/outline")
+    async def edit_outline(pid: str, body: OutlineIn, sess: Annotated[Session, Depends(current)]):
+        proj = load(pid, sess)
+        o = proj.get("outline")
+        if not o:
+            raise EngineError("wrong_stage", "no outline yet", 409)
+        keys = lang_keys(o["languages"])
+        T = lambda d: {k: str(d.get(k, "")).strip()[:300] for k in keys}  # noqa: E731
+        old = {les["id"]: les for c in o["chapters"] for les in c["lessons"]}
+        old_ch = {c["id"]: c for c in o["chapters"]}
+        chapters = []
+        for i, c in enumerate(body.chapters):
+            prev = old_ch.get(c.id, {})
+            lessons = []
+            for les in c.lessons:
+                base = old.get(les.id) or {"id": new_id(), "status": "planned", "content": {}, "exercises": {},
+                                           "answers": {}, "review": None, "notes": "", "cmids": [], "error": ""}
+                if base["status"] == "published":
+                    lessons.append(base)  # already in the course: keep as it is
+                    continue
+                base.update(title=T(les.title), goal=T(les.goal), week=les.week, sections=les.sections)
+                lessons.append(base)
+            chapters.append({"id": prev.get("id") or new_id(), "no": c.no or i + 1, "title": T(c.title),
+                             "summary": T(c.summary), "lessons": lessons})
+        o.update(title=T(body.title), summary=T(body.summary), chapters=chapters)
+        studio().projects.save(proj)
+        return view(proj)
+
+    @app.post("/api/v1/studio/projects/{pid}/approve-outline")
+    async def approve_outline(pid: str, sess: Annotated[Session, Depends(current)]):
+        await need_creator(sess)
+        proj = load(pid, sess)
+        if proj["stage"] != "outline" or not proj.get("outline"):
+            raise EngineError("wrong_stage", "not at this stage", 409)
+        if not proj["course"]["id"]:
+            await create_course(proj, sess)
+        proj["stage"] = "lessons"
+        studio().say(proj, "大纲定稿，课程已经在平台上建好了（目前只有章节，学生还看不到课时）。"
+                           "接下来一课一课地写：点“写下一课”，或者在“节奏”里设成每天自动写一课。每一课都要你审过、点“通过并发布”，学生才看得到。", "lead")
+        studio().projects.save(proj)
+        return view(proj)
+
+    # --- lessons ---------------------------------------------------------------------------
+    @app.post("/api/v1/studio/projects/{pid}/lessons/next")
+    async def write_next(pid: str, sess: Annotated[Session, Depends(current)]):
+        await need_creator(sess)
+        proj = load(pid, sess)
+        if proj["stage"] != "lessons":
+            raise EngineError("wrong_stage", "settle the outline first", 409)
+        nxt = studio().next_lesson(proj)
+        if not nxt:
+            raise EngineError("all_written", "every lesson is written", 409)
+        lid = nxt[1]["id"]
+        studio().run(proj, f"主讲教授正在写：{disp(nxt[1]['title'])}", lambda p: studio().write_lesson(p, lid))
+        return view(studio().projects.load(pid))
+
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/write")
+    async def rewrite(pid: str, lid: str, body: NoteIn, sess: Annotated[Session, Depends(current)]):
+        await need_creator(sess)
+        proj = load(pid, sess)
+        _, les = studio().find_lesson(proj, lid)
+        if les["status"] == "published":
+            raise EngineError("published", "this lesson is already in the course", 409)
+        if body.note:
+            studio().say(proj, f"请修改《{disp(les['title'])}》：{body.note}", "teacher")
+        note = body.note
+        studio().run(proj, f"主讲教授正在修改：{disp(les['title'])}", lambda p: studio().write_lesson(p, lid, note))
+        return view(studio().projects.load(pid))
+
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/approve")
+    async def publish(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        await need_creator(sess)
+        proj = load(pid, sess)
+        chapter, les = studio().find_lesson(proj, lid)
+        if les["status"] != "awaiting":
+            raise EngineError("wrong_stage", "only a written lesson can be published", 409)
+        if not proj["course"]["id"]:
+            await create_course(proj, sess)
+        await publish_lesson(proj, chapter, les, sess)
+        studio().say(proj, f"《{disp(les['title'])}》已发布，学生现在能看到了。", "system")
+        studio().projects.save(proj)
+        return view(proj)
+
+    @app.post("/api/v1/studio/projects/{pid}/stop")
+    async def stop(pid: str, sess: Annotated[Session, Depends(current)]):
+        load(pid, sess)
+        studio().stop(pid)
+        return {"stopped": True}
+
+    @app.put("/api/v1/studio/projects/{pid}/pace")
+    async def pace(pid: str, body: PaceIn, sess: Annotated[Session, Depends(current)]):
+        proj = load(pid, sess)
+        try:
+            from zoneinfo import ZoneInfo
+            ZoneInfo(body.tz)
+            tz = body.tz
+        except Exception:
+            tz = "Asia/Shanghai"
+        proj["pace"].update(mode=body.mode, hour=body.hour, tz=tz)
+        studio().projects.save(proj)
+        return view(proj)
+
+    # --- publishing into Moodle -------------------------------------------------------------------
+    def ml(t: dict, languages: str, is_html: bool = False) -> str:
+        return cb.ml(cb.Text(zh=t.get("zh", ""), en=t.get("en", "")), languages, is_html)
+
+    async def upload_files(proj: dict, fids: list[str], sess: Session) -> list[dict]:
+        items = {x.id: x for x in studio().items(proj)}
+        acts = []
+        for fid in fids:
+            x = items.get(fid)
+            if not x:
+                continue
+            role = proj["materials"]["files"].get(fid, {}).get("role", "other")
+            draft = await m.state.moodle.upload(sess.moodle_token, x.name, m.state.store.data(proj["import_id"], fid))
+            acts.append({"type": "resource", "name": Path(x.name).stem, "draftitemid": draft,
+                         "visible": 0 if role in team.TEACHER_ONLY_ROLES else 1})
+        return acts
+
+    async def create_course(proj: dict, sess: Session) -> None:
+        o = proj["outline"]
+        lg = o["languages"]
+        files = proj["materials"]["files"]
+        info_files = [fid for fid, f in files.items() if f["role"] in team.INFO_ROLES]
+        info_name = {"zh": "课程说明", "en": "Course information"}
+        sections = [{"name": ml(info_name, lg), "summary": "", "activities": await upload_files(proj, info_files, sess)}]
+        for c in o["chapters"]:
+            sections.append({"name": ml(c["title"], lg) or f"{c['no']}",
+                             "summary": ml({k: cb.paragraphs(v) for k, v in c.get("summary", {}).items()}, lg, True),
+                             "activities": []})
+        draft = cb.Draft(title=cb.Text(**{k: v for k, v in o["title"].items() if k in ("zh", "en")}), languages=lg,
+                         sections=[cb.DraftSection(title=cb.Text(zh="x"))])
+        payload = {"fullname": ml(o["title"], lg) or "Course", "shortname": cb.shortname_for(draft),
+                   "summary": ml({k: cb.paragraphs(v) for k, v in o.get("summary", {}).items()}, lg, True),
+                   "sections": sections}
+        res = await m.state.moodle.call(sess.moodle_token, "local_wenquest_create_course", None, **payload)
+        proj["course"] = {"id": res["courseid"], "shortname": res["shortname"],
+                          "sections": {c["id"]: i + 2 for i, c in enumerate(o["chapters"])}, "attached": []}
+
+    async def publish_lesson(proj: dict, chapter: dict, les: dict, sess: Session) -> None:
+        lg = proj["outline"]["languages"]
+        course = proj["course"]
+        number = course["sections"].get(chapter["id"])
+        if not number:  # a chapter added after the course was created
+            number = max(list(course["sections"].values()) + [1]) + 1
+            course["sections"][chapter["id"]] = number
+        clean = lambda h: m._clean(h)  # noqa: E731
+        html_of = lambda t: ml({k: clean(v) for k, v in t.items()}, lg, True)  # noqa: E731
+        title = ml(les["title"], lg)
+        ex_name = {"zh": "练习：", "en": "Practice: "}
+        ans_name = {"zh": "练习参考答案：", "en": "Answer key: "}
+        acts: list[dict[str, Any]] = [{"type": "page", "name": title, "content": html_of(les["content"])}]
+        if any(les.get("exercises", {}).values()):
+            acts.append({"type": "page", "name": ml({k: ex_name[k] + v for k, v in les["title"].items() if k in ex_name}, lg),
+                         "content": html_of(les["exercises"])})
+        if any(les.get("answers", {}).values()):
+            acts.append({"type": "page", "name": ml({k: ans_name[k] + v for k, v in les["title"].items() if k in ans_name}, lg),
+                         "content": html_of(les["answers"]), "visible": 0})
+        if chapter["id"] not in course["attached"]:
+            fids = [fid for fid, f in proj["materials"]["files"].items()
+                    if f["role"] in team.ATTACH_ROLES and chapter["no"] in (f.get("chapters") or [])]
+            acts += await upload_files(proj, fids, sess)
+        res = await m.state.moodle.call(sess.moodle_token, "local_wenquest_add_activities", None,
+                                        courseid=course["id"], section=number, sectionname=ml(chapter["title"], lg),
+                                        activities=acts)
+        if chapter["id"] not in course["attached"]:
+            course["attached"].append(chapter["id"])
+        les["cmids"] = res.get("cmids", [])
+        les["status"] = "published"
+        les["published"] = time.time()
+
+
+def _learn_from_answer(proj: dict, q: dict) -> None:
+    """Answers to the standard questions also fill the requirements the team works from."""
+    text, ans = q["text"], q["answer"]
+    req = proj["requirements"]
+    if "语言" in text or "language" in text.lower():
+        req["language"] = "both" if ("双语" in ans or "bilingual" in ans.lower()) else "en" if ("英" in ans or ans.lower().startswith("en")) else "zh"
+    elif "周" in text or "week" in text.lower():
+        req.setdefault("schedule", ans)
+        req["schedule"] = ans
+    elif "学生" in text or "对象" in text or "student" in text.lower():
+        req["audience"] = ans
+    elif "课程名" in text or "title" in text.lower():
+        req["course_title"] = ans
+    else:
+        req["notes"] = (req.get("notes", "") + f"\n{text} → {ans}").strip()[:4000]

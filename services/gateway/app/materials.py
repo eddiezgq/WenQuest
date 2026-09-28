@@ -17,8 +17,8 @@ import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-MAX_FILE = 50 * 1024 * 1024
-MAX_TEXT = 60_000          # characters kept per file
+MAX_FILE = 190 * 1024 * 1024  # textbooks are often large PDFs; the web server allows 200 MB
+MAX_TEXT = 3_000_000       # characters kept per file (a whole textbook, page by page)
 SESSION_TTL = 24 * 3600
 
 CATEGORIES = {
@@ -73,12 +73,13 @@ class Store:
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
 
-    def new_session(self, user_id: int) -> str:
+    def new_session(self, user_id: int, keep: bool = False) -> str:
+        """A folder for one teacher's uploads. `keep` sessions (course projects) never expire."""
         self.cleanup()
         sid = uuid.uuid4().hex
         d = self.root / sid
         d.mkdir()
-        (d / "meta.json").write_text(json.dumps({"user": user_id, "created": time.time(), "files": []}))
+        (d / "meta.json").write_text(json.dumps({"user": user_id, "created": time.time(), "files": [], "keep": keep}))
         return sid
 
     def _meta_path(self, sid: str) -> Path:
@@ -133,7 +134,7 @@ class Store:
         for d in self.root.iterdir():
             try:
                 meta = json.loads((d / "meta.json").read_text())
-                if now - meta.get("created", 0) > SESSION_TTL:
+                if not meta.get("keep") and now - meta.get("created", 0) > SESSION_TTL:
                     shutil.rmtree(d, ignore_errors=True)
             except (OSError, ValueError):
                 continue
@@ -141,15 +142,60 @@ class Store:
 
 # --- text extraction -------------------------------------------------------------------
 
+class ScannedPDF(ValueError):
+    pass
+
+
+# Old Office and OpenDocument formats are converted with LibreOffice, then read like the new ones.
+LEGACY = {".doc": ".docx", ".rtf": ".docx", ".odt": ".docx", ".wps": ".docx",
+          ".ppt": ".pptx", ".pps": ".pptx", ".odp": ".pptx", ".dps": ".pptx",
+          ".xls": ".xlsx", ".ods": ".xlsx", ".et": ".xlsx"}
+
+
+def _pdf_pages(data: bytes) -> list[str]:
+    try:
+        import pypdfium2 as pdfium
+        pdf = pdfium.PdfDocument(data)
+        try:
+            return [pdf[i].get_textpage().get_text_range().replace("\r\n", "\n").strip() for i in range(len(pdf))]
+        finally:
+            pdf.close()
+    except ImportError:
+        from pypdf import PdfReader
+        return [(p.extract_text() or "").strip() for p in PdfReader(io.BytesIO(data)).pages]
+
+
+def _soffice_convert(data: bytes, ext: str, target: str) -> bytes:
+    import subprocess
+    import tempfile
+    if not shutil.which("soffice"):
+        raise ValueError("unsupported")
+    work = Path(tempfile.mkdtemp(prefix="wq-conv-"))
+    try:
+        src = work / ("in" + ext)
+        src.write_bytes(data)
+        subprocess.run(["soffice", f"-env:UserInstallation=file://{work}/profile", "--headless", "--norestore",
+                        "--convert-to", target.lstrip("."), "--outdir", str(work), str(src)],
+                       check=True, timeout=180, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        out = work / ("in" + target)
+        if not out.exists():
+            raise ValueError("unreadable")
+        return out.read_bytes()
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
 def extract(name: str, data: bytes) -> tuple[str, int]:
     """Return (text, pages). Raises ValueError for unreadable files."""
     ext = Path(name).suffix.lower()
     if ext == ".pdf":
-        from pypdf import PdfReader
-        reader = PdfReader(io.BytesIO(data))
-        pages = [(p.extract_text() or "").strip() for p in reader.pages]
+        pages = _pdf_pages(data)
+        if len(pages) >= 3 and sum(len(t) for t in pages) < 40 * len(pages):
+            raise ScannedPDF("scanned")  # pictures of pages: no text to read without OCR
         # Keep page markers so lessons can cite "p. N".
         return "\n\n".join(f"[第{i}页]\n{t}" for i, t in enumerate(pages, 1) if t), len(pages)
+    if ext in LEGACY:
+        return extract(Path(name).stem + LEGACY[ext], _soffice_convert(data, ext, LEGACY[ext]))
     if ext == ".docx":
         import docx
         doc = docx.Document(io.BytesIO(data))
@@ -233,18 +279,55 @@ def _decodes(data: bytes, enc: str) -> bool:
         return False
 
 
-HEADING = re.compile(r"^\s*(\d+\.\d+(?:\.\d+)?)\s+(\S.{1,40})$")
+HEADING = re.compile(r"^\s*(\d{1,2})\s*\.\s*(\d{1,2})\s+(\S.{1,70}?)\s*(?:\.{2,}\s*\d+|\s\d{1,4})?\s*$")
+_MATHY = re.compile(r"[=×÷±≈≤≥<>^+/∑∫√]|\d\s*[a-zA-Z]{1,3}\s*$")
+_WORDS = re.compile(r"[A-Za-z\u3400-\u9fff]")
 
 
-def headings(text: str) -> list[str]:
-    """Numbered section headings such as '1.3  抛体运动' (used to split chapters into lessons)."""
-    seen, out = set(), []
-    for line in text.splitlines():
+def _heading_title(title: str) -> bool:
+    """A real section title has words, starts with a word, and is not an equation or an answer."""
+    t = title.strip()
+    if len(_WORDS.findall(t)) < 3 or not _WORDS.match(t):
+        return False
+    if _MATHY.search(t):
+        return False
+    return not re.match(r"(mm|cm|km|kg|mg|ms|s|m|N|J|W|Pa|Hz|V|A)\b", t)
+
+
+def headings(text: str, chapter: int | None = None) -> list[str]:
+    """Numbered section headings such as '1.3  抛体运动' / '1.2 Units and Standards'.
+
+    Strict on purpose (R15): the number is chapter.section with chapter >= 1, the title has words
+    and no math, and a chapter only counts when it has at least two consecutive sections
+    (x.1 and x.2), so answer lines like '0.1 mm = 0.0001 m' never become lessons. With
+    `chapter`, only that chapter's sections are returned."""
+    found: dict[int, dict[int, str]] = {}
+    for line in clean(text).splitlines():
         m = HEADING.match(line)
-        if m and m.group(1).count(".") == 1 and m.group(1) not in seen:
-            seen.add(m.group(1))
-            out.append(f"{m.group(1)} {m.group(2).strip()}")
+        if not m:
+            continue
+        ch, sec, title = int(m.group(1)), int(m.group(2)), m.group(3).strip()
+        if ch < 1 or sec < 1 or (chapter and ch != chapter) or not _heading_title(title):
+            continue
+        found.setdefault(ch, {}).setdefault(sec, title)
+    out = []
+    for ch in sorted(found):
+        secs = found[ch]
+        if 1 not in secs or 2 not in secs:
+            continue
+        n = 1
+        while n in secs:  # keep the consecutive run 1, 2, 3, ... only
+            out.append(f"{ch}.{n} {secs[n]}")
+            n += 1
     return out
+
+
+_JUNK = re.compile("[\ue000-\uf8ff\ufffd\u25a1\u2610\u2612\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
+def clean(text: str) -> str:
+    """Drop characters that only appear when math fonts are extracted from PDFs (R16)."""
+    return _JUNK.sub("", text or "")
 
 
 # --- rule-based classification ---------------------------------------------------------
@@ -488,8 +571,9 @@ def rule_plan(items: list[Material], store_text) -> dict:
         heads: list[str] = []
         for cat in ("notes", "slides", "lesson_plan"):
             for m in items:
-                if m.chapter == ch and m.category == cat and m.headings:
-                    heads = m.headings
+                own = [h for h in m.headings if h.startswith(f"{ch}.")] if m.chapter == ch else []
+                if m.category == cat and own:
+                    heads = own
                     break
             if heads:
                 break

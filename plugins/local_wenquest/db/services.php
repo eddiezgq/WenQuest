@@ -31,4 +31,11 @@ $functions = [
         'capabilities' => 'moodle/course:create',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_wenquest_add_activities' => [
+        'classname'    => \local_wenquest\external\add_activities::class,
+        'description'  => 'Add lessons and files to one section of an existing course (publish lesson by lesson).',
+        'type'         => 'write',
+        'capabilities' => 'moodle/course:manageactivities',
+        'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
 ];

@@ -36,7 +36,12 @@
     <template #side>
       <view class="panel">
         <text class="ph">{{ t("dash.todo") }}</text>
-        <text class="muted small">{{ t("dash.todoEmpty") }}</text>
+        <view v-for="s in studioTodo" :key="s.id" class="todo" @click="openProject(s.id)">
+          <text class="todo-t">{{ s.title || t("studio.untitled") }}</text>
+          <text v-if="s.awaiting" class="todo-b">{{ t("studio.awaitingN", { n: s.awaiting }) }}</text>
+          <text v-if="s.open_questions" class="todo-b">{{ t("studio.questionsN", { n: s.open_questions }) }}</text>
+        </view>
+        <text v-if="!studioTodo.length" class="muted small">{{ t("dash.todoEmpty") }}</text>
       </view>
       <view v-if="user && user.can_create_courses" class="panel ai">
         <text class="ph">{{ t("dash.aiTitle") }}</text>
@@ -51,7 +56,7 @@
 import { computed, ref, watch } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
-import { absolute, api, ApiError, type Course, token, user } from "../../api";
+import { absolute, api, ApiError, type Course, type StudioSummary, token, user } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
 // Page query parameters (id, course, tab) must not fall through onto the layout component.
@@ -80,7 +85,11 @@ async function load() {
   }
 }
 
-const create = () => uni.navigateTo({ url: "/pages/create/create" });
+const create = () => uni.navigateTo({ url: "/pages/studio/studio" });
+// Teachers: lessons the professor team wrote that wait for review, and questions it asked.
+const studio = ref<StudioSummary[]>([]);
+const studioTodo = computed(() => studio.value.filter((s) => s.awaiting || s.open_questions));
+const openProject = (id: string) => uni.navigateTo({ url: `/pages/studio/project?id=${id}` });
 const open = (c: Course) => uni.navigateTo({ url: `/pages/course/course?id=${c.id}` });
 
 onLoad((q: any) => { all.value = q?.view === "all"; });
@@ -89,6 +98,7 @@ onShow(() => {
   uni.setNavigationBarTitle({ title: t(all.value ? "shell.courses" : "shell.dashboard") });
   load();
   api.me().catch(() => {}); // refresh permissions (e.g. the AI course button)
+  if (user.value?.can_create_courses) api.studioProjects().then((x) => (studio.value = x)).catch(() => {});
 });
 watch(locale, () => { load(); api.me().catch(() => {}); });
 </script>
@@ -120,6 +130,10 @@ watch(locale, () => { load(); api.me().catch(() => {}); });
 .fill { height: 100%; background: var(--wq-accent); }
 .pct { font-size: 12px; color: var(--wq-muted); }
 .panel { background: #fff; border: 1px solid var(--wq-line); border-radius: 8px; padding: 14px 16px; }
+.todo { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--wq-line); cursor: pointer; }
+.todo:first-of-type { border-top: 0; }
+.todo-t { flex: 1 1 100%; color: var(--wq-link); font-size: 14px; }
+.todo-b { font-size: 12px; background: #fff3d6; color: #7a5a00; padding: 1px 8px; border-radius: 999px; }
 .panel.ai { background: #fffaf0; border-color: #f1dfae; }
 .ph { display: block; font-weight: 600; color: var(--wq-ink); margin-bottom: 6px; padding-bottom: 8px; border-bottom: 1px solid var(--wq-line); }
 </style>

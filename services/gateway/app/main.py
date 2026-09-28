@@ -1,7 +1,9 @@
 """WenQuest API gateway: the single entry point for the WenQuest frontend."""
 from __future__ import annotations
 
+import asyncio
 import json
+import sys
 import logging
 import uuid
 from contextlib import asynccontextmanager
@@ -21,13 +23,15 @@ from . import course_builder as cb
 from . import generate as gen
 from . import materials as mt
 from . import slides as sl
+from . import studio as st
+from . import studio_api
 from .ai import ModelGateway
 from .config import Settings, get_settings
 from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.7.0"
+VERSION = "0.8.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -39,6 +43,7 @@ class State:
     ai: ModelGateway
     store: mt.Store
     slides: sl.SlideStore
+    studio: st.Studio
     slide_settings: sl.Settings
 
 
@@ -59,7 +64,10 @@ async def lifespan(app: FastAPI):
     state.store = mt.Store(s.import_dir)
     state.slides = sl.SlideStore(str(Path(s.data_dir) / "slides"))
     state.slide_settings = sl.Settings(str(Path(s.data_dir) / "settings.json"))
+    state.projects_dir = str(Path(s.data_dir) / "projects")
+    pace = asyncio.create_task(_pace_loop())
     yield
+    pace.cancel()
     await state.http.aclose()
 
 log = logging.getLogger("wenquest.gateway")
@@ -83,6 +91,7 @@ def create_app() -> FastAPI:
         return JSONResponse({"error": "server_error", "detail": type(exc).__name__}, status_code=500)
 
     register(app)
+    studio_api.register(app, sys.modules[__name__])
     return app
 
 
@@ -398,25 +407,7 @@ def register(app: FastAPI) -> None:
     @app.post("/api/v1/imports/{iid}/files")
     async def import_file(iid: str, sess: Annotated[Session, Depends(current)],
                           file: UploadFile = File(...), path: str = Form("")):
-        _materials(iid, sess)  # ownership check
-        data = await file.read(mt.MAX_FILE + 1)
-        if len(data) > mt.MAX_FILE:
-            raise EngineError("file_too_large", "files are limited to 50 MB", 413)
-        name = mt.fix_name(Path((file.filename or "file").replace("\\", "/")).name)
-        rel = mt.fix_name((path or name).replace("\\", "/").lstrip("/"))[:300]
-        m = mt.Material(id=uuid.uuid4().hex, name=name, path=rel, size=len(data), ext=Path(name).suffix.lower())
-        text = ""
-        try:
-            text, m.pages = mt.extract(name, data)
-        except ValueError:
-            m.error = "unsupported"
-        except Exception:  # corrupt or encrypted files must not break the whole import
-            m.error = "unreadable"
-        text = text[:mt.MAX_TEXT]
-        m.chars, m.excerpt, m.headings = len(text), text[:1200], mt.headings(text)
-        mt.classify_rule(m)
-        state.store.add(iid, sess.user_id, m, data, text)
-        return m.public()
+        return await ingest(iid, sess, file, path)
 
     @app.get("/api/v1/imports/{iid}")
     async def import_list(iid: str, sess: Annotated[Session, Depends(current)]):
@@ -655,6 +646,33 @@ def _materials(iid: str, sess: Session) -> list[mt.Material]:
         raise EngineError("not_found", "import not found or expired", 404)
 
 
+async def ingest(iid: str, sess: Session, file: UploadFile, path: str) -> dict:
+    """Store one uploaded file in an import session: repair its name, read its text, guess what it is."""
+    _materials(iid, sess)  # ownership check
+    data = await file.read(mt.MAX_FILE + 1)
+    if len(data) > mt.MAX_FILE:
+        raise EngineError("file_too_large", "files are limited to 190 MB", 413)
+    name = mt.fix_name(Path((file.filename or "file").replace("\\", "/")).name)
+    rel = mt.fix_name((path or name).replace("\\", "/").lstrip("/"))[:300]
+    m = mt.Material(id=uuid.uuid4().hex, name=name, path=rel, size=len(data), ext=Path(name).suffix.lower())
+    text = ""
+    try:
+        # Reading a whole textbook takes seconds: do it off the event loop.
+        text, m.pages = await asyncio.to_thread(mt.extract, name, data)
+    except mt.ScannedPDF:
+        m.error = "scanned"
+    except ValueError:
+        m.error = "unsupported"
+    except Exception:  # corrupt or encrypted files must not break the whole import
+        m.error = "unreadable"
+    text = mt.clean(text)[:mt.MAX_TEXT]
+    m.chars, m.excerpt = len(text), text[:1500]
+    mt.classify_rule(m)
+    m.headings = mt.headings(text, m.chapter)
+    state.store.add(iid, sess.user_id, m, data, text)
+    return m.public()
+
+
 def _prepare_deck(f: dict, moodle_token: str) -> str:
     """Start converting a deck in the background if needed; return its source key."""
     src = sl.SlideStore.source_key(f["fileurl"], f.get("timemodified"), f.get("filesize"))
@@ -668,6 +686,25 @@ def _prepare_deck(f: dict, moodle_token: str) -> str:
 
 def _clean(h: str) -> str:
     return content.clean(h, state.settings.moodle_url, lambda u: u)
+
+
+def _studio() -> st.Studio:
+    """The AI professor team, rebuilt if the store or model gateway was replaced (tests)."""
+    s = getattr(state, "studio", None)
+    if s is None or s.store is not state.store or s.ai is not state.ai:
+        s = state.studio = st.Studio(st.Projects(getattr(state, "projects_dir", "/tmp/wq-data/projects")),
+                                     state.store, state.ai, _clean)
+    return s
+
+
+async def _pace_loop() -> None:
+    """Daily pace: every five minutes, write the next lesson for courses that asked for one a day."""
+    while True:
+        await asyncio.sleep(300)
+        try:
+            await _studio().tick()
+        except Exception:
+            log.exception("daily pace check failed")
 
 
 def _gen() -> gen.Generator:
