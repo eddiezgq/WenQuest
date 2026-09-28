@@ -229,3 +229,129 @@ def test_unexpected_errors_return_a_code(client, monkeypatch):
     client._transport.raise_server_exceptions = False  # the handler answers, then Starlette re-raises for logging
     r = client.post(f"/api/v1/imports/{iid}/files", headers=h, data={"path": "a.txt"}, files={"file": ("a.txt", b"hi")})
     assert r.status_code == 500 and r.json()["error"] == "server_error"
+
+
+# --- one-click generation (D28) ----------------------------------------------------------
+
+def wait_job(c, h, iid, timeout=10.0):
+    import time as _t
+    end = _t.time() + timeout
+    while _t.time() < end:
+        job = c.get(f"/api/v1/imports/{iid}/job", headers=h).json()
+        if job.get("state") != "running":
+            return job
+        _t.sleep(0.05)
+    raise AssertionError("job did not finish")
+
+
+def test_one_click_from_materials_then_publish(client):
+    h = login(client)
+    iid = client.post("/api/v1/imports", headers=h).json()["import_id"]
+    for path, data in FOLDER.items():
+        upload(client, h, iid, path, data)
+    r = client.post(f"/api/v1/imports/{iid}/generate", headers=h, json={"languages": "zh"})
+    assert r.status_code == 200 and r.json()["state"] == "running"
+    job = wait_job(client, h, iid)
+    assert job["state"] == "done" and job["phase"] == "done", job
+    assert job["files"] == {"total": len(FOLDER), "readable": 7, "unreadable": 0}
+    p = job["progress"]
+    assert p["lessons_total"] == p["lessons_done"] > 0 and p["lessons_failed"] == 0
+    o = job["outline"]
+    assert o["title"]["zh"] == "大学物理A（上）"
+    assert "第1章 质点运动学" in [s["title"]["zh"] for s in o["sections"]]
+    assert all(l["content"]["zh"] for s in o["sections"] for l in s["lessons"])
+    # the finished outline publishes as is
+    r = client.post("/api/v1/courses", headers=h, json=o)
+    assert r.status_code == 200, r.text
+
+
+def test_one_click_from_a_sentence(client):
+    h = login(client)
+    iid = client.post("/api/v1/imports", headers=h).json()["import_id"]
+    r = client.post(f"/api/v1/imports/{iid}/generate", headers=h, json={
+        "languages": "zh", "brief": {"topic": "机器人运动学", "sections": 2, "lessons_per_section": 2, "languages": "zh"}})
+    assert r.status_code == 200
+    job = wait_job(client, h, iid)
+    assert job["state"] == "done" and job["progress"]["lessons_done"] == 4
+    assert job["outline"]["import_id"] == iid
+
+
+def test_failed_lesson_is_marked_and_retried_alone(client, monkeypatch):
+    from app import generate as g
+    h = login(client)
+    iid = client.post("/api/v1/imports", headers=h).json()["import_id"]
+    real = g.write_lesson
+    calls = {"n": 0}
+
+    async def flaky(ai, store, req, items, clean):
+        calls["n"] += 1
+        if req.lesson_title.endswith("第 2 课") and calls["n"] < 5:
+            raise g.EngineError("ai_timeout", "slow", 504)
+        return await real(ai, store, req, items, clean)
+
+    monkeypatch.setattr(g, "write_lesson", flaky)
+    client.post(f"/api/v1/imports/{iid}/generate", headers=h, json={
+        "brief": {"topic": "控制", "sections": 1, "lessons_per_section": 2, "languages": "zh"}})
+    job = wait_job(client, h, iid)
+    assert job["state"] == "done" and job["lessons"] == {"0-0": "done", "0-1": "fail"}
+    assert job["errors"] == {"0-1": "ai_timeout"} and job["progress"]["lessons_failed"] == 1
+    calls["n"] = 10
+    r = client.post(f"/api/v1/imports/{iid}/job/lessons/0/1", headers=h)
+    assert r.json()["lessons"]["0-1"] == "busy"
+    import time as _t
+    for _ in range(100):
+        job = client.get(f"/api/v1/imports/{iid}/job", headers=h).json()
+        if job["lessons"]["0-1"] != "busy":
+            break
+        _t.sleep(0.05)
+    assert job["lessons"] == {"0-0": "done", "0-1": "done"} and job["errors"] == {}
+
+
+def test_interrupted_job_resumes_without_rewriting(client):
+    import json as _j
+    h = login(client)
+    iid = client.post("/api/v1/imports", headers=h).json()["import_id"]
+    client.post(f"/api/v1/imports/{iid}/generate", headers=h, json={
+        "brief": {"topic": "控制", "sections": 1, "lessons_per_section": 2, "languages": "zh"}})
+    wait_job(client, h, iid)
+    # simulate a gateway restart halfway through: lesson 2 not written yet
+    p = main.state.store.root / iid / "job.json"
+    job = _j.loads(p.read_text())
+    job.update(state="running", phase="write")
+    job["lessons"]["0-1"] = "busy"
+    job["outline"]["sections"][0]["lessons"][0]["content"] = {"zh": "<p>老师已看过的第一课</p>"}
+    p.write_text(_j.dumps(job, ensure_ascii=False))
+    main._gen().jobs.clear()
+    main._gen().tasks.clear()
+    assert client.get(f"/api/v1/imports/{iid}/job", headers=h).json()["state"] == "interrupted"
+    client.post(f"/api/v1/imports/{iid}/generate", headers=h, json={})
+    job = wait_job(client, h, iid)
+    assert job["state"] == "done" and job["lessons"] == {"0-0": "done", "0-1": "done"}
+    assert job["outline"]["sections"][0]["lessons"][0]["content"]["zh"] == "<p>老师已看过的第一课</p>"
+
+
+def test_generation_is_private_and_needs_something_to_build(client):
+    h = login(client)
+    iid = client.post("/api/v1/imports", headers=h).json()["import_id"]
+    assert client.get(f"/api/v1/imports/{iid}/job", headers=h).status_code == 404
+    client.post(f"/api/v1/imports/{iid}/generate", headers=h, json={})
+    assert wait_job(client, h, iid)["error"] == "nothing_to_build"
+    student = login(client, "s")
+    assert client.get(f"/api/v1/imports/{iid}/job", headers=student).status_code == 403
+    assert client.post(f"/api/v1/imports/{iid}/generate", headers=student, json={}).status_code == 403
+
+
+def test_generic_names_fall_back_to_the_materials():
+    rule = {"title": "大学物理A（上）", "sections": [{"chapter": 1, "title": "第1章 质点运动学", "lessons": [{"title": "1.1"}]}]}
+    ai = {"title": "新课程", "sections": [{"chapter": 1, "title": "第1章 Chapter 1", "lessons": []},
+                                          {"chapter": "2", "title": "第2章 牛顿运动定律", "lessons": [{"title": "2.1"}]}]}
+    m = mt.merge_plan(ai, rule)
+    assert m["title"] == "大学物理A（上）"
+    assert [s["title"] for s in m["sections"]] == ["第1章 质点运动学", "第2章 牛顿运动定律"]
+    assert m["sections"][0]["lessons"] == [{"title": "1.1"}]
+
+
+def test_html_labs_are_read_as_text():
+    html = "<html><head><style>b{}</style><script>var x=1</script></head><body><h1>质点运动学实验台</h1><p>实验目的：观察轨迹</p></body></html>"
+    text, _ = mt.extract("lab.html", html.encode())
+    assert text == "质点运动学实验台\n实验目的：观察轨迹"

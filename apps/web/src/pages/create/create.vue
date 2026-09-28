@@ -1,27 +1,25 @@
 <template>
-  <view class="page">
-    <TopBar />
+  <AppShell nav="create" :title="t('create.title')">
     <view class="wrap">
-      <view class="back" @click="leave">‹ {{ t("nav.courses") }}</view>
       <text class="h1">{{ t("create.title") }}</text>
 
       <!-- steps -->
       <view class="steps">
-        <view v-for="(label, i) in stepLabels" :key="i" class="step" :class="{ on: step === i + 1, done: step > i + 1 }">
-          <text class="num">{{ step > i + 1 ? "✓" : i + 1 }}</text>
-          <text class="label">{{ label }}</text>
+        <view v-for="(k, i) in stepKeys" :key="k" class="step" :class="{ on: step === k, done: stepIndex > i }">
+          <text class="num">{{ stepIndex > i ? "✓" : i + 1 }}</text>
+          <text class="label">{{ t("gen.step." + k) }}</text>
         </view>
       </view>
 
       <view v-if="error" class="alert" role="alert">{{ errorText(error) }}</view>
 
-      <!-- 1. brief: from materials or from a description -->
-      <view v-if="step === 1" class="modes">
+      <!-- 1. materials or a description -->
+      <view v-if="step === 'input'" class="modes">
         <view class="mode" :class="{ on: mode === 'upload' }" @click="mode = 'upload'">{{ t("import.modeUpload") }}</view>
         <view class="mode" :class="{ on: mode === 'describe' }" @click="mode = 'describe'">{{ t("import.modeDescribe") }}</view>
       </view>
 
-      <view v-if="step === 1 && mode === 'upload'" class="card">
+      <view v-if="step === 'input' && mode === 'upload'" class="card">
         <!-- #ifdef H5 -->
         <!-- a native div: uni-app views do not forward drag-and-drop events -->
         <div class="drop" :class="{ over: dragOver }" @dragover.prevent="dragOver = true" @dragleave="dragOver = false" @drop.prevent="onDrop">
@@ -40,10 +38,10 @@
 
         <view v-if="files.length && phase === 'ready'">
           <view class="table-head">
-            <text class="lbl">{{ t("import.table") }}</text>
-            <text class="muted-s">{{ t("import.summary", { n: files.length, c: chapterCount }) }}</text>
+            <text class="lbl">{{ t("import.summary", { n: files.length, c: chapterCount }) }}</text>
+            <text class="link plain" @click="showTable = !showTable">{{ showTable ? t("gen.hideTable") : t("gen.reviewTable") }}</text>
           </view>
-          <view class="mtable">
+          <view v-if="showTable" class="mtable">
             <view class="mrow mhead">
               <text class="c-file">{{ t("import.file") }}</text>
               <text class="c-cat">{{ t("import.category") }}</text>
@@ -76,9 +74,11 @@
                     @click="importLang = lg as any">{{ t("create.lang." + lg) }}</view>
             </view>
           </view>
-          <view class="actions">
-            <view class="primary" :class="{ disabled: busy }" @click="makeImportOutline">
-              {{ busy ? t("import.planning") : "✨ " + t("import.makeOutline") }}
+          <view class="go">
+            <text class="go-hint">{{ t("gen.oneClickHint") }}</text>
+            <view class="actions">
+              <view class="ghost" :class="{ disabled: busy }" @click="makeImportOutline">{{ busy ? t("import.planning") : t("gen.outlineFirst") }}</view>
+              <view class="primary big" :class="{ disabled: busy }" @click="generateNow">✨ {{ t("gen.oneClick") }}</view>
             </view>
           </view>
         </view>
@@ -88,7 +88,7 @@
         <!-- #endif -->
       </view>
 
-      <view v-if="step === 1 && mode === 'describe'" class="card">
+      <view v-if="step === 'input' && mode === 'describe'" class="card">
         <view class="field">
           <text class="lbl">{{ t("create.topic") }} *</text>
           <input class="input" v-model="brief.topic" :placeholder="t('create.topicHint')" />
@@ -139,15 +139,17 @@
           <text class="lbl">{{ t("create.notes") }}</text>
           <textarea class="area" v-model="brief.notes" :maxlength="30000" :placeholder="t('create.notesHint')" />
         </view>
-        <view class="actions">
-          <view class="primary" :class="{ disabled: busy || brief.topic.trim().length < 2 }" @click="makeOutline">
-            {{ busy ? t("create.thinking") : "✨ " + t("create.makeOutline") }}
+        <view class="go">
+          <text class="go-hint">{{ t("gen.oneClickHintBrief") }}</text>
+          <view class="actions">
+            <view class="ghost" :class="{ disabled: busy || brief.topic.trim().length < 2 }" @click="makeOutline">{{ busy ? t("create.thinking") : t("gen.outlineFirst") }}</view>
+            <view class="primary big" :class="{ disabled: busy || brief.topic.trim().length < 2 }" @click="generateNow">✨ {{ t("gen.oneClick") }}</view>
           </view>
         </view>
       </view>
 
-      <!-- 2. outline -->
-      <view v-if="step === 2 && outline" class="card">
+      <!-- optional: adjust the outline first -->
+      <view v-if="step === 'outline' && outline" class="card">
         <view class="field">
           <text class="lbl">{{ t("create.courseTitle") }}</text>
           <view v-for="k in keys" :key="'t' + k" class="lang-line">
@@ -210,71 +212,111 @@
         </view>
 
         <view class="actions">
-          <view class="ghost" @click="step = 1">{{ t("create.back") }}</view>
-          <view class="ghost" :class="{ disabled: busy }" @click="makeOutline">{{ busy ? t("create.thinking") : t("create.regenOutline") }}</view>
-          <view class="primary" :class="{ disabled: !lessonCount }" @click="writeAll">✨ {{ t("create.writeAll") }}</view>
+          <view class="ghost" @click="step = 'input'">{{ t("create.back") }}</view>
+          <view v-if="mode === 'describe'" class="ghost" :class="{ disabled: busy }" @click="makeOutline">{{ busy ? t("create.thinking") : t("create.regenOutline") }}</view>
+          <view class="primary big" :class="{ disabled: !lessonCount || busy }" @click="generateFromOutline">✨ {{ t("create.writeAll") }}</view>
         </view>
       </view>
 
-      <!-- 3. writing -->
-      <view v-if="step === 3 && outline" class="card">
-        <text class="progress-text">{{ t("create.writing", { done: doneCount, total: lessonCount }) }}</text>
-        <view class="bar"><view class="fill" :style="{ width: (lessonCount ? (doneCount / lessonCount) * 100 : 0) + '%' }" /></view>
-        <view v-for="(sec, si) in outline.sections" :key="si" class="w-sec">
-          <text class="w-sec-title">{{ disp(sec.title) }}</text>
-          <view v-for="(les, li) in sec.lessons" :key="li" class="w-row">
-            <text class="w-name">{{ disp(les.title) }}</text>
-            <text class="w-status" :class="status[key(si, li)] || 'wait'">{{ t("create.status." + (status[key(si, li)] || "wait")) }}</text>
-            <text v-if="status[key(si, li)] === 'fail'" class="link" @click="writeOne(si, li)">{{ t("create.retry") }}</text>
+      <!-- 2. generating, in the background on the server -->
+      <view v-if="step === 'generate' && job" class="card">
+        <view v-if="restored" class="note">{{ t("gen.restored") }}</view>
+        <view class="phases">
+          <view v-if="job.files.total" class="ph done">
+            <text class="ph-mark">✓</text>
+            <text>{{ t("gen.phase.read", { n: job.files.total }) }}<text v-if="job.files.unreadable" class="muted-s">{{ t("gen.phase.readBad", { n: job.files.unreadable }) }}</text></text>
+          </view>
+          <view v-if="job.files.total" class="ph" :class="phaseClass('classify')">
+            <text class="ph-mark">{{ phaseMark("classify") }}</text><text>{{ t("gen.phase.classify") }}</text>
+          </view>
+          <view class="ph" :class="phaseClass('plan')">
+            <text class="ph-mark">{{ phaseMark("plan") }}</text><text>{{ t("gen.phase.plan") }}</text>
+          </view>
+          <view class="ph" :class="phaseClass('write')">
+            <text class="ph-mark">{{ phaseMark("write") }}</text>
+            <text>{{ t("gen.phase.write", { done: job.progress.lessons_done, total: job.progress.lessons_total || "…" }) }}</text>
           </view>
         </view>
+        <view class="bar"><view class="fill" :style="{ width: pct + '%' }" /></view>
+        <text v-if="job.state === 'running'" class="muted-s block">{{ t("gen.leaveOk") }}</text>
+        <view v-if="job.state === 'interrupted'" class="alert">{{ t("gen.interrupted") }}</view>
+        <view v-if="job.state === 'error'" class="alert">{{ t("gen.stopped") }}{{ errorText(job.error) }}</view>
+        <view v-if="job.progress.lessons_failed && job.state !== 'running'" class="warnbox">{{ t("gen.failedSome", { n: job.progress.lessons_failed }) }}</view>
+
+        <view v-if="job.outline" class="tree">
+          <text class="course-title">{{ disp(job.outline.title) }}</text>
+          <view v-for="(sec, si) in job.outline.sections" :key="si" class="w-sec">
+            <text class="w-sec-title">{{ disp(sec.title) }}</text>
+            <view v-for="(les, li) in sec.lessons" :key="li" class="w-row">
+              <text class="w-name">{{ disp(les.title) }}</text>
+              <text v-if="job.errors[key(si, li)]" class="w-err">{{ errorText(job.errors[key(si, li)]) }}</text>
+              <text class="w-status" :class="lessonState(si, li)">{{ t("create.status." + lessonState(si, li)) }}</text>
+              <text v-if="lessonState(si, li) === 'fail'" class="link" @click="retry(si, li)">{{ t("create.retry") }}</text>
+            </view>
+            <text v-if="!sec.lessons.length && sec.files && sec.files.length" class="muted-s">📎 {{ sec.files.length }}</text>
+          </view>
+        </view>
+
         <view class="actions">
-          <view class="ghost" @click="step = 2">{{ t("create.back") }}</view>
-          <view class="primary" :class="{ disabled: doneCount < lessonCount }" @click="step = 4">{{ t("create.preview") }} →</view>
+          <view class="ghost" @click="startOver">{{ t("gen.startOver") }}</view>
+          <view v-if="job.state === 'interrupted' || job.state === 'error'" class="ghost" @click="resume">{{ t("gen.resume") }}</view>
+          <view class="primary" :class="{ disabled: job.state !== 'done' }" @click="step = 'preview'">{{ t("gen.toPreview") }} →</view>
         </view>
       </view>
 
-      <!-- 4. review and publish -->
-      <view v-if="step === 4 && outline" class="card">
-        <text class="course-title">{{ disp(outline.title) }}</text>
-        <text class="course-summary">{{ disp(outline.summary) }}</text>
-        <view v-for="(sec, si) in outline.sections" :key="si" class="r-sec">
+      <!-- 3. review and publish -->
+      <view v-if="step === 'preview' && job && job.outline" class="card">
+        <view v-if="restored" class="note">{{ t("gen.restored") }}</view>
+        <text class="course-title">{{ disp(job.outline.title) }}</text>
+        <text class="course-summary">{{ disp(job.outline.summary) }}</text>
+        <view v-for="(sec, si) in job.outline.sections" :key="si" class="r-sec">
           <text class="w-sec-title">{{ disp(sec.title) }}</text>
           <view v-for="(les, li) in sec.lessons" :key="li" class="r-lesson">
             <view class="r-head" @click="toggle(key(si, li))">
               <text class="r-arrow">{{ open[key(si, li)] ? "▾" : "▸" }}</text>
               <text class="w-name">{{ disp(les.title) }}</text>
-              <text class="link" @click.stop="writeOne(si, li)">
-                {{ status[key(si, li)] === "busy" ? t("create.status.busy") : t("create.rewrite") }}
+              <text v-if="lessonState(si, li) === 'fail'" class="w-status fail">{{ t("create.status.fail") }}</text>
+              <text class="link" @click.stop="retry(si, li)">
+                {{ lessonState(si, li) === "busy" ? t("create.status.busy") : lessonState(si, li) === "fail" ? t("create.retry") : t("create.rewrite") }}
               </text>
             </view>
             <view v-if="open[key(si, li)]" class="r-body"><RichContent :html="disp(les.content)" /></view>
           </view>
           <view v-if="sec.assignment" class="r-assign">✎ {{ disp(sec.assignment.title) }}</view>
           <view v-if="sec.files && sec.files.length" class="r-files">
-            <text v-for="fid in sec.files" :key="fid" class="r-file">{{ outline.files?.[fid]?.teacher_only ? "🔒" : "📎" }} {{ outline.files?.[fid]?.name }}</text>
+            <text v-for="fid in sec.files" :key="fid" class="r-file">{{ job.outline.files?.[fid]?.teacher_only ? "🔒" : "📎" }} {{ job.outline.files?.[fid]?.name }}</text>
           </view>
         </view>
         <view class="actions">
-          <view class="ghost" @click="step = 2">{{ t("create.back") }}</view>
-          <view class="primary" :class="{ disabled: busy }" @click="publish">
+          <view class="ghost" @click="startOver">{{ t("gen.startOver") }}</view>
+          <view class="primary big" :class="{ disabled: busy || !allWritten }" @click="publish">
             {{ busy ? t("create.publishing") : t("create.publish") }}
           </view>
         </view>
       </view>
     </view>
-  </view>
+  </AppShell>
 </template>
 
 <script setup lang="ts">
+// Page query parameters must not fall through onto the layout component.
+defineOptions({ inheritAttrs: false });
+
 import { computed, reactive, ref } from "vue";
-import { onShow } from "@dcloudio/uni-app";
-import TopBar from "../../components/TopBar.vue";
+import { onHide, onShow, onUnload } from "@dcloudio/uni-app";
+import AppShell from "../../components/AppShell.vue";
 import RichContent from "../../components/RichContent.vue";
-import { api, ApiError, type Brief, type Material, type Outline, type OutlineSection, type Text, token, user } from "../../api";
+import {
+  api, ApiError, type Brief, type Job, type LessonState, type Material, type Outline, type OutlineSection, type Text, token, user,
+} from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
-const step = ref(1);
+// The import being generated survives leaving the page (D28): remember it per browser.
+const JOB_KEY = "wq_gen_import";
+
+type Step = "input" | "outline" | "generate" | "preview";
+const step = ref<Step>("input");
+const usedOutline = ref(false);
 const mode = ref<"upload" | "describe">("upload");
 const importId = ref("");
 const files = ref<Material[]>([]);
@@ -282,6 +324,7 @@ const categories = ref<Record<string, string>>({});
 const phase = ref<"idle" | "uploading" | "classifying" | "ready">("idle");
 const uploads = reactive({ total: 0, done: 0 });
 const dragOver = ref(false);
+const showTable = ref(false);
 const importLang = ref<"zh" | "en">(locale.value === "en" ? "en" : "zh");
 const TEACHER_ONLY = ["lesson_plan", "answer_key"];
 const teacherOnly = (cat: string) => TEACHER_ONLY.includes(cat);
@@ -294,13 +337,15 @@ const shortPath = (p: string) => (commonRoot.value && p.startsWith(commonRoot.va
 const chapterCount = computed(() => new Set(files.value.filter((f) => f.chapter && f.category !== "other").map((f) => f.chapter)).size);
 const busy = ref(false);
 const error = ref("");
-const outline = ref<Outline | null>(null);
-const status = reactive<Record<string, "wait" | "busy" | "done" | "fail">>({});
+const outline = ref<Outline | null>(null);   // only while the teacher adjusts the outline first
+const job = ref<Job | null>(null);
+const restored = ref(false);
 const open = reactive<Record<string, boolean>>({});
 
 const levels = ["intro", "mid", "adv"];
 const langs = ["zh", "en", "both"] as const;
-const stepLabels = computed(() => [t("create.step1"), t("create.step2"), t("create.step3"), t("create.step4")]);
+const stepKeys = computed<Step[]>(() => (usedOutline.value ? ["input", "outline", "generate", "preview"] : ["input", "generate", "preview"]));
+const stepIndex = computed(() => stepKeys.value.indexOf(step.value));
 
 const brief = reactive<Brief>({
   topic: "",
@@ -319,29 +364,165 @@ const keys = computed<("zh" | "en")[]>(() =>
 const key = (si: number, li: number) => `${si}-${li}`;
 const disp = (tx?: Text) => (tx ? tx[locale.value] || tx.zh || tx.en || "" : "");
 const lessonCount = computed(() => outline.value?.sections.reduce((n, s) => n + s.lessons.length, 0) || 0);
-const doneCount = computed(() => {
-  let n = 0;
-  outline.value?.sections.forEach((s, si) => s.lessons.forEach((_, li) => status[key(si, li)] === "done" && n++));
-  return n;
+const lessonState = (si: number, li: number): LessonState => job.value?.lessons[key(si, li)] || "wait";
+const allWritten = computed(() => !!job.value && job.value.progress.lessons_total > 0
+  && job.value.progress.lessons_done === job.value.progress.lessons_total);
+const pct = computed(() => {
+  const j = job.value;
+  if (!j) return 0;
+  // planning is the first 15%, writing the rest
+  if (j.phase === "classify") return 4;
+  if (j.phase === "plan") return 10;
+  const p = j.progress;
+  return p.lessons_total ? 15 + Math.round((p.lessons_done / p.lessons_total) * 85) : 15;
 });
+
+const ORDER = ["classify", "plan", "write", "done"];
+function phaseClass(p: string) {
+  const j = job.value;
+  if (!j) return "wait";
+  const at = ORDER.indexOf(j.phase);
+  const me = ORDER.indexOf(p);
+  if (at > me) return "done";
+  if (at < me) return "wait";
+  return j.state === "running" ? "on" : "err";
+}
+const phaseMark = (p: string) => ({ done: "✓", on: "◌", err: "!", wait: "·" })[phaseClass(p)];
 
 function fail(e: unknown) {
   error.value = e instanceof ApiError ? e.code : "unknown";
 }
 
+// --- polling the background job ------------------------------------------------------------
+let timer: ReturnType<typeof setTimeout> | null = null;
+function stopPolling() {
+  if (timer) clearTimeout(timer);
+  timer = null;
+}
+function needsPolling(j: Job) {
+  return j.state === "running" || Object.values(j.lessons).includes("busy");
+}
+async function poll() {
+  stopPolling();
+  if (!importId.value) return;
+  try {
+    const j = await api.job(importId.value);
+    const wasRunning = job.value?.state === "running";
+    job.value = j;
+    // Finished cleanly: go straight to the preview (D28).
+    if (wasRunning && j.state === "done" && !j.progress.lessons_failed && step.value === "generate") step.value = "preview";
+    if (needsPolling(j)) timer = setTimeout(poll, 2000);
+  } catch (e) {
+    fail(e);
+    timer = setTimeout(poll, 5000);
+  }
+}
+function follow(j: Job) {
+  job.value = j;
+  uni.setStorageSync(JOB_KEY, importId.value);
+  step.value = "generate";
+  timer = setTimeout(poll, 1000);
+}
+
+// --- starting generation ----------------------------------------------------------------------
+async function ensureImport() {
+  if (!importId.value) importId.value = (await api.importStart()).import_id;
+}
+
+async function generateNow() {
+  if (busy.value) return;
+  error.value = "";
+  busy.value = true;
+  try {
+    usedOutline.value = false;
+    if (mode.value === "upload") {
+      if (!importId.value || !files.value.length) return;
+      await api.importEdit(importId.value, files.value.map((f) => ({ id: f.id, category: f.category, chapter: f.chapter })));
+      follow(await api.generate(importId.value, { languages: importLang.value }));
+    } else {
+      if (brief.topic.trim().length < 2) return;
+      importId.value = "";  // a description builds from scratch
+      await ensureImport();
+      follow(await api.generate(importId.value, { languages: brief.languages, brief: { ...brief, topic: brief.topic.trim() } }));
+    }
+  } catch (e) {
+    fail(e);
+  } finally {
+    busy.value = false;
+  }
+}
+
+async function generateFromOutline() {
+  const o = outline.value;
+  if (!o || busy.value || !lessonCount.value) return;
+  error.value = "";
+  busy.value = true;
+  try {
+    await ensureImport();
+    follow(await api.generate(importId.value, { languages: o.languages, outline: o }));
+  } catch (e) {
+    fail(e);
+  } finally {
+    busy.value = false;
+  }
+}
+
+async function resume() {
+  if (!importId.value) return;
+  error.value = "";
+  try {
+    follow(await api.generate(importId.value, {}));
+  } catch (e) {
+    fail(e);
+  }
+}
+
+async function retry(si: number, li: number) {
+  if (!importId.value || lessonState(si, li) === "busy") return;
+  try {
+    job.value = await api.retryLesson(importId.value, si, li);
+    timer = setTimeout(poll, 1500);
+  } catch (e) {
+    fail(e);
+  }
+}
+
+// --- "review the outline first" (optional) -------------------------------------------------
 async function makeOutline() {
   if (busy.value || brief.topic.trim().length < 2) return;
   busy.value = true;
   error.value = "";
   try {
     outline.value = await api.aiOutline({ ...brief, topic: brief.topic.trim() });
-    Object.keys(status).forEach((k) => delete status[k]);
-    step.value = 2;
+    importId.value = "";
+    usedOutline.value = true;
+    step.value = "outline";
   } catch (e) {
     fail(e);
   } finally {
     busy.value = false;
   }
+}
+
+async function makeImportOutline() {
+  if (busy.value || !importId.value) return;
+  busy.value = true;
+  error.value = "";
+  try {
+    await api.importEdit(importId.value, files.value.map((f) => ({ id: f.id, category: f.category, chapter: f.chapter })));
+    outline.value = await api.importOutline(importId.value, importLang.value);
+    usedOutline.value = true;
+    step.value = "outline";
+  } catch (e) {
+    fail(e);
+  } finally {
+    busy.value = false;
+  }
+}
+
+function addLesson(sec: OutlineSection) {
+  const empty = () => Object.fromEntries(keys.value.map((k) => [k, ""])) as Text;
+  sec.lessons.push({ title: empty(), goal: empty(), content: empty() });
 }
 
 // --- materials import (browser only) ---------------------------------------------------
@@ -398,7 +579,7 @@ async function processFiles(list: Picked[]) {
   if (!list.length) return;
   error.value = "";
   try {
-    if (!importId.value) importId.value = (await api.importStart()).import_id;
+    await ensureImport();
     phase.value = "uploading";
     uploads.total += list.length;
     const queue = [...list];
@@ -427,85 +608,15 @@ async function processFiles(list: Picked[]) {
   }
 }
 
-async function makeImportOutline() {
-  if (busy.value || !importId.value) return;
-  busy.value = true;
-  error.value = "";
-  try {
-    await api.importEdit(importId.value, files.value.map((f) => ({ id: f.id, category: f.category, chapter: f.chapter })));
-    outline.value = await api.importOutline(importId.value, importLang.value);
-    brief.languages = outline.value.languages;
-    brief.notes = "";
-    Object.keys(status).forEach((k) => delete status[k]);
-    step.value = 2;
-  } catch (e) {
-    fail(e);
-  } finally {
-    busy.value = false;
-  }
-}
-
-function addLesson(sec: OutlineSection) {
-  const empty = () => Object.fromEntries(keys.value.map((k) => [k, ""])) as Text;
-  sec.lessons.push({ title: empty(), goal: empty(), content: empty() });
-}
-
-async function writeOne(si: number, li: number) {
-  const o = outline.value;
-  if (!o) return;
-  const sec = o.sections[si];
-  const les = sec.lessons[li];
-  const k = key(si, li);
-  if (status[k] === "busy") return;
-  status[k] = "busy";
-  try {
-    const r = await api.aiLesson({
-      import_id: o.import_id || "",
-      sources: les.sources || [],
-      course_title: disp(o.title),
-      section_title: disp(sec.title),
-      lesson_title: disp(les.title),
-      goal: disp(les.goal),
-      audience: brief.audience,
-      level: brief.level,
-      languages: o.languages,
-      notes: brief.notes,
-    });
-    les.content = r.content;
-    status[k] = "done";
-  } catch (e) {
-    status[k] = "fail";
-    fail(e);
-  }
-}
-
-async function writeAll() {
-  const o = outline.value;
-  if (!o || !lessonCount.value) return;
-  error.value = "";
-  step.value = 3;
-  const jobs: [number, number][] = [];
-  o.sections.forEach((s, si) => s.lessons.forEach((_, li) => status[key(si, li)] !== "done" && jobs.push([si, li])));
-  // Three at a time: fast enough, and gentle on the model's rate limits.
-  const worker = async () => {
-    while (jobs.length) {
-      const [si, li] = jobs.shift()!;
-      await writeOne(si, li);
-    }
-  };
-  await Promise.all([worker(), worker(), worker()]);
-  if (doneCount.value === lessonCount.value) step.value = 4;
-}
-
+// --- preview and publish ---------------------------------------------------------------------
 function toggle(k: string) {
   open[k] = !open[k];
 }
 
 async function publish() {
-  const o = outline.value;
+  const o = job.value?.outline;
   if (!o || busy.value) return;
-  if (doneCount.value < lessonCount.value) {
-    error.value = "";
+  if (!allWritten.value) {
     uni.showToast({ title: t("create.needAll"), icon: "none" });
     return;
   }
@@ -513,6 +624,7 @@ async function publish() {
   error.value = "";
   try {
     const r = await api.publish(o);
+    uni.removeStorageSync(JOB_KEY);
     uni.showToast({ title: t("create.published"), icon: "success" });
     setTimeout(() => uni.reLaunch({ url: `/pages/course/course?id=${r.course_id}` }), 800);
   } catch (e) {
@@ -522,20 +634,43 @@ async function publish() {
   }
 }
 
-function leave() {
-  uni.reLaunch({ url: "/pages/courses/courses" });
+function startOver() {
+  stopPolling();
+  uni.removeStorageSync(JOB_KEY);
+  uni.reLaunch({ url: "/pages/create/create" });
+}
+
+// Coming back to the page: pick up the course that is being (or was) generated.
+async function restore() {
+  const saved = uni.getStorageSync(JOB_KEY);
+  if (!saved || importId.value) return;
+  try {
+    importId.value = saved;
+    const j = await api.job(saved);
+    job.value = j;
+    restored.value = true;
+    step.value = j.state === "done" && !j.progress.lessons_failed ? "preview" : "generate";
+    if (needsPolling(j)) timer = setTimeout(poll, 2000);
+  } catch {
+    uni.removeStorageSync(JOB_KEY);  // expired (kept 24 hours) or someone else's
+    importId.value = "";
+  }
 }
 
 onShow(() => {
   if (!token.value) return uni.reLaunch({ url: "/pages/login/login" });
   uni.setNavigationBarTitle({ title: t("create.title") });
   if (user.value && user.value.can_create_courses === false) error.value = "forbidden";
+  if (importId.value && job.value && needsPolling(job.value)) poll();
+  else restore();
 });
+onHide(stopPolling);
+onUnload(stopPolling);
 </script>
 
 <style scoped>
 .page { min-height: 100vh; background: var(--wq-bg); }
-.wrap { max-width: 860px; margin: 0 auto; padding: 16px 16px 64px; }
+.wrap { max-width: 900px; }
 .back { color: var(--wq-link); font-size: 14px; cursor: pointer; margin-bottom: 8px; display: inline-block; }
 .h1 { display: block; font-size: 26px; font-weight: 700; color: var(--wq-ink); margin-bottom: 16px; }
 .steps { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -543,6 +678,26 @@ onShow(() => {
 .step.on { background: var(--wq-ink); color: #fff; }
 .step.done { background: #dcefe5; color: var(--wq-ok); }
 .num { font-weight: 700; }
+.primary.big { padding: 12px 26px; font-size: 16px; }
+.go { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--wq-line); }
+.go-hint { display: block; font-size: 13px; color: var(--wq-muted); line-height: 1.7; }
+.link.plain { margin-left: 0; }
+.block { display: block; margin-bottom: 12px; }
+.note { background: #e7f1f5; color: var(--wq-link); border-radius: 8px; padding: 8px 12px; font-size: 14px; margin-bottom: 14px; }
+.warnbox { background: #fff8e0; color: #7a5a00; border-radius: 8px; padding: 10px 14px; font-size: 14px; margin-bottom: 12px; }
+.phases { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.ph { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--wq-muted); }
+.ph.done { color: var(--wq-ok); }
+.ph.on { color: var(--wq-ink); font-weight: 600; }
+.ph.err { color: var(--wq-danger); }
+.ph-mark { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; background: #eef1f0; flex-shrink: 0; }
+.ph.done .ph-mark { background: #dcefe5; }
+.ph.on .ph-mark { background: var(--wq-accent); animation: spin 1.2s linear infinite; }
+.ph.err .ph-mark { background: #fdecea; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.tree { margin-top: 18px; border-top: 1px solid var(--wq-line); padding-top: 14px; }
+.tree .course-title { margin-bottom: 12px; }
+.w-err { font-size: 12px; color: var(--wq-danger); }
 .alert { background: #fdecea; color: var(--wq-danger); padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
 .card { background: #fff; border: 1px solid var(--wq-line); border-radius: 12px; padding: 20px 18px; }
 .field { display: flex; flex-direction: column; margin-bottom: 16px; }

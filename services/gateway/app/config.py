@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     deepseek_api_key: str = ""
     deepseek_model: str = "deepseek-chat"
     ai_timeout: float = 180.0
+    ai_fake_delay: float = 0.0  # local testing only: make the fake model take this many seconds per call
     # Where uploaded course materials are kept during an import (kept 24 hours).
     import_dir: str = "/tmp/wq-imports"
 

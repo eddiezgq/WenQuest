@@ -6,6 +6,7 @@ Every call asks for JSON that matches a schema, so callers get structured data b
 """
 from __future__ import annotations
 
+import asyncio
 import json
 from typing import Any
 
@@ -38,13 +39,14 @@ def unpack(v: Any) -> Any:
 class ModelGateway:
     def __init__(self, provider: str, http: httpx.AsyncClient, *, anthropic_key: str = "",
                  claude_model: str = "claude-sonnet-5", deepseek_key: str = "",
-                 deepseek_model: str = "deepseek-chat", timeout: float = 180.0):
+                 deepseek_model: str = "deepseek-chat", timeout: float = 180.0, fake_delay: float = 0.0):
         self.http = http
         self.anthropic_key = anthropic_key
         self.claude_model = claude_model
         self.deepseek_key = deepseek_key
         self.deepseek_model = deepseek_model
         self.timeout = timeout
+        self.fake_delay = fake_delay
         if provider == "auto":
             provider = "claude" if anthropic_key else "deepseek" if deepseek_key else "none"
         self.provider = provider
@@ -60,6 +62,8 @@ class ModelGateway:
         if self.provider == "deepseek":
             return unpack(await self._deepseek(system, prompt, schema, max_tokens))
         if self.provider == "fake":
+            if self.fake_delay:
+                await asyncio.sleep(self.fake_delay)
             return fake() if callable(fake) else (fake or {})
         raise AIError("ai_unavailable", "no AI model is configured", 503)
 

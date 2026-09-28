@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 
 from . import content
 from . import course_builder as cb
+from . import generate as gen
 from . import materials as mt
 from .ai import ModelGateway
 from .config import Settings, get_settings
@@ -25,7 +26,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.5.2"
+VERSION = "0.6.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -50,7 +51,8 @@ async def lifespan(app: FastAPI):
     state.codec = SessionCodec(s.secret_key, s.session_days)
     state.ai = ModelGateway(s.ai_provider, state.http, anthropic_key=s.anthropic_api_key,
                             claude_model=s.claude_model, deepseek_key=s.deepseek_api_key,
-                            deepseek_model=s.deepseek_model, timeout=s.ai_timeout)
+                            deepseek_model=s.deepseek_model, timeout=s.ai_timeout,
+                            fake_delay=s.ai_fake_delay)
     state.store = mt.Store(s.import_dir)
     yield
     await state.http.aclose()
@@ -131,6 +133,28 @@ class UserOut(BaseModel):
     lang: str
     can_create_courses: bool = False
     classic_url: str = ""  # Moodle's address, for pages the new UI links out to (calendar, messages)
+
+
+class GenLesson(BaseModel):
+    title: cb.Text
+    goal: cb.Text = cb.Text()
+    content: cb.Text = cb.Text()
+    sources: list[str] = Field(default_factory=list, max_length=8)
+
+
+class GenSection(cb.DraftSection):
+    lessons: list[GenLesson] = Field(default_factory=list, max_length=12)
+
+
+class GenOutline(cb.Draft):
+    sections: list[GenSection] = Field(min_length=1, max_length=20)
+    files: dict[str, Any] = Field(default_factory=dict)
+
+
+class GenerateIn(BaseModel):
+    languages: cb.Languages = "zh"
+    brief: cb.Brief | None = None        # describe mode: "one sentence" course building
+    outline: GenOutline | None = None    # the teacher looked at the outline first ("先看大纲")
 
 
 class LoginOut(BaseModel):
@@ -327,30 +351,8 @@ def register(app: FastAPI) -> None:
     @app.post("/api/v1/ai/lesson")
     async def ai_lesson(body: cb.LessonRequest, sess: Annotated[Session, Depends(current)]):
         await require_creator(sess)
-        src_text, first = "", None
-        if body.import_id and body.sources:
-            items = {m.id: m for m in _materials(body.import_id, sess)}
-            budget = 16000
-            for fid in body.sources:
-                m = items.get(fid)
-                if not m:
-                    continue
-                t = state.store.text(body.import_id, fid)[:budget]
-                if not t:
-                    continue
-                first = first or (m.name, t)
-                src_text += f"\n<<< 文件：{m.name}（{mt.CATEGORIES[m.category]}）\n{t}\n>>>"
-                budget -= len(t)
-                if budget <= 0:
-                    break
-        data = await state.ai.json(system=cb.SYSTEM, prompt=cb.lesson_prompt(body, src_text),
-                                   schema=cb.lesson_schema(body.languages),
-                                   max_tokens=12000 if body.languages == "both" else 6000,
-                                   fake=lambda: cb.fake_lesson(body, first))
-        text = cb.norm_text(data.get("content"), cb.lang_keys(body.languages))
-        clean = {k: content.clean(v, state.settings.moodle_url, lambda u: u) for k, v in text.items()}
-        if not any(clean.values()):
-            raise EngineError("ai_bad_output", "the model returned an empty lesson", 502)
+        items = {m.id: m for m in _materials(body.import_id, sess)} if body.import_id and body.sources else {}
+        clean = await gen.write_lesson(state.ai, state.store, body, items, _clean)
         return {"content": clean}
 
     @app.post("/api/v1/courses")
@@ -416,6 +418,7 @@ def register(app: FastAPI) -> None:
                                        schema=mt.classify_schema(), max_tokens=4000)
             mt.apply_ai(items, data)
             state.store.put_materials(iid, sess.user_id, items)
+            state.store.mark_classified(iid, sess.user_id)
         return {"files": [m.public() for m in items], "categories": mt.CATEGORIES}
 
     @app.put("/api/v1/imports/{iid}/files")
@@ -433,18 +436,36 @@ def register(app: FastAPI) -> None:
     @app.post("/api/v1/imports/{iid}/outline")
     async def import_outline(iid: str, body: PlanIn, sess: Annotated[Session, Depends(current)]):
         await require_creator(sess)
-        items = [m for m in _materials(iid, sess) if m.category != "other"]
-        if not mt.chapters(items):
-            raise EngineError("no_chapters", "no chapter could be found in the materials", 422)
         lang = "en" if body.languages == "en" else "zh"
-        text_of = lambda fid: state.store.text(iid, fid)  # noqa: E731
-        plan = mt.rule_plan(items, text_of)
-        if state.ai.provider not in ("fake", "none"):
-            ai_plan = await state.ai.json(system=cb.SYSTEM, prompt=mt.plan_prompt(items, text_of, lang),
-                                          schema=mt.plan_schema(), max_tokens=6000)
-            if isinstance(ai_plan, dict) and isinstance(ai_plan.get("sections"), list) and ai_plan["sections"]:
-                plan = ai_plan
-        return _outline_from_plan(plan, items, lang, text_of, iid)
+        return await gen.plan_from_materials(state.ai, _materials(iid, sess), lambda f: state.store.text(iid, f), lang, iid)
+
+    # --- one-click generation (D28) ------------------------------------------------
+
+    @app.post("/api/v1/imports/{iid}/generate")
+    async def import_generate(iid: str, body: GenerateIn, sess: Annotated[Session, Depends(current)]):
+        await require_creator(sess)
+        _materials(iid, sess)  # ownership check
+        outline = body.outline.model_dump() if body.outline else None
+        if outline:
+            outline["import_id"] = iid
+            for s in outline["sections"]:
+                for les in s["lessons"]:
+                    les.setdefault("goal", {})
+        return _gen().start(iid, sess.user_id, body.languages, body.brief, outline)
+
+    @app.get("/api/v1/imports/{iid}/job")
+    async def import_job(iid: str, sess: Annotated[Session, Depends(current)]):
+        _materials(iid, sess)
+        job = _gen().status(iid, sess.user_id)
+        if not job:
+            raise EngineError("not_found", "nothing is being generated", 404)
+        return job
+
+    @app.post("/api/v1/imports/{iid}/job/lessons/{si}/{li}")
+    async def import_job_retry(iid: str, si: int, li: int, sess: Annotated[Session, Depends(current)]):
+        await require_creator(sess)
+        _materials(iid, sess)
+        return _gen().retry(iid, sess.user_id, si, li)
 
     @app.get("/api/v1/ai/status")
     async def ai_status(sess: Annotated[Session, Depends(current)]):
@@ -561,41 +582,16 @@ def _materials(iid: str, sess: Session) -> list[mt.Material]:
         raise EngineError("not_found", "import not found or expired", 404)
 
 
-def _outline_from_plan(plan: dict, items: list[mt.Material], lang: str, text_of, iid: str) -> dict:
-    """Turn a plan into the builder's outline: chapter sections plus course-info, lab and quiz sections."""
-    T = lambda s: {lang: str(s or "").strip()}  # noqa: E731
-    raw = plan.get("sections") if isinstance(plan, dict) else None
-    by_ch = {mt.as_int(s.get("chapter")) or 0: s for s in (raw if isinstance(raw, list) else []) if isinstance(s, dict)}
-    plan = plan if isinstance(plan, dict) else {}
-    sections = []
-    info = mt.attachment_ids([m for m in items if m.category in ("syllabus", "calendar", "rubric", "media")], None)
-    if info:
-        sections.append({"title": T("课程说明" if lang == "zh" else "Course information"), "summary": T(""),
-                         "lessons": [], "assignment": None, "files": info})
-    for ch in mt.chapters(items):
-        s = by_ch.get(ch) or {"title": mt.section_title_for(ch, items, text_of), "summary": "", "lessons": []}
-        hw = mt.homework_brief(items, ch, text_of)
-        srcs = mt.source_ids(items, ch)
-        sections.append({
-            "title": T(s.get("title")), "summary": T(s.get("summary")),
-            "lessons": [{"title": T(l.get("title")), "goal": T(l.get("goal")), "content": T(""), "sources": srcs}
-                        for l in (s.get("lessons") if isinstance(s.get("lessons"), list) else [])[:6]
-                        if isinstance(l, dict)],
-            "assignment": {"title": T(hw[0]), "brief": T(hw[1])} if hw else None,
-            "files": mt.attachment_ids([m for m in items if m.category != "homework"], ch),
-        })
-    labs = [m.id for m in items if m.category == "lab" and m.chapter is None]
-    if labs:
-        sections.append({"title": T("实验" if lang == "zh" else "Labs"), "summary": T(""), "lessons": [],
-                         "assignment": None, "files": labs})
-    quiz = [m.id for m in items if m.category in ("quiz", "answer_key") and m.chapter is None]
-    if quiz:
-        sections.append({"title": T("测验与复习" if lang == "zh" else "Quizzes and review"), "summary": T(""),
-                         "lessons": [], "assignment": None, "files": quiz})
-    return {"title": T(plan.get("title")), "summary": T(plan.get("summary")), "languages": lang,
-            "import_id": iid, "sections": sections,
-            "files": {m.id: {"name": m.name, "category": m.category, "teacher_only": m.category in mt.TEACHER_ONLY}
-                      for m in items}}
+def _clean(h: str) -> str:
+    return content.clean(h, state.settings.moodle_url, lambda u: u)
+
+
+def _gen() -> gen.Generator:
+    """The background generator, rebuilt if the store or model gateway was replaced (tests)."""
+    g = getattr(state, "gen", None)
+    if g is None or g.store is not state.store or g.ai is not state.ai:
+        g = state.gen = gen.Generator(state.store, state.ai, _clean)
+    return g
 
 
 async def require_creator(sess: Session) -> None:

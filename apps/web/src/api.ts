@@ -106,6 +106,21 @@ export interface Material {
   teacher_only: boolean;
   error: string;
 }
+/** A one-click generation job (D28), as the gateway reports it. */
+export type LessonState = "wait" | "busy" | "done" | "fail";
+export interface Job {
+  state: "running" | "done" | "error" | "interrupted";
+  phase: "classify" | "plan" | "write" | "done";
+  error: string;
+  languages: Languages;
+  brief: Brief | null;
+  files: { total: number; readable: number; unreadable: number };
+  outline: Outline | null;
+  lessons: Record<string, LessonState>;
+  errors: Record<string, string>;
+  progress: { lessons_total: number; lessons_done: number; lessons_failed: number };
+}
+
 export interface Brief {
   topic: string;
   audience: string;
@@ -231,6 +246,10 @@ export const api = {
     if (!res.ok) throw new ApiError(body.error || `http_${res.status}`, res.status);
     return body as Material;
   },
+  generate: (id: string, body: { languages?: Languages; brief?: Brief; outline?: Outline }) =>
+    request<Job>("POST", `/api/v1/imports/${id}/generate`, body),
+  job: (id: string) => request<Job>("GET", `/api/v1/imports/${id}/job`),
+  retryLesson: (id: string, si: number, li: number) => request<Job>("POST", `/api/v1/imports/${id}/job/lessons/${si}/${li}`, {}),
   publish: (o: Outline) =>
     request<{ course_id: number; shortname: string; activities: number }>("POST", "/api/v1/courses", o, 120000),
   courses: () => request<{ courses: Course[] }>("GET", "/api/v1/courses").then((r) => r.courses),

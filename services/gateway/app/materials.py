@@ -113,6 +113,11 @@ class Store:
         meta["files"] = [asdict(m) for m in items]
         self.save(sid, meta)
 
+    def mark_classified(self, sid: str, user_id: int) -> None:
+        meta = self.load(sid, user_id)
+        meta["classified"] = True
+        self.save(sid, meta)
+
     def text(self, sid: str, fid: str) -> str:
         p = self.root / sid / f"{fid}.txt"
         return p.read_text() if p.exists() and re.fullmatch(r"[0-9a-f]{32}", fid) else ""
@@ -189,9 +194,43 @@ def extract(name: str, data: bytes) -> tuple[str, int]:
             except UnicodeDecodeError:
                 continue
         return data.decode("utf-8", "replace"), 0
+    if ext in (".html", ".htm"):
+        # Virtual labs: keep the visible text (task wording, labels), drop scripts and styles.
+        from html.parser import HTMLParser
+
+        class _Text(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.out: list[str] = []
+                self.skip = 0
+
+            def handle_starttag(self, tag, attrs):
+                if tag in ("script", "style", "svg"):
+                    self.skip += 1
+
+            def handle_endtag(self, tag):
+                if tag in ("script", "style", "svg") and self.skip:
+                    self.skip -= 1
+
+            def handle_data(self, d):
+                if not self.skip and d.strip():
+                    self.out.append(d.strip())
+
+        raw = next((data.decode(e) for e in ("utf-8", "gb18030") if _decodes(data, e)), data.decode("utf-8", "replace"))
+        parser = _Text()
+        parser.feed(raw)
+        return "\n".join(parser.out), 0
     if ext in MEDIA_EXT:
         return "", 0
     raise ValueError("unsupported")
+
+
+def _decodes(data: bytes, enc: str) -> bool:
+    try:
+        data.decode(enc)
+        return True
+    except UnicodeDecodeError:
+        return False
 
 
 HEADING = re.compile(r"^\s*(\d+\.\d+(?:\.\d+)?)\s+(\S.{1,40})$")
@@ -391,15 +430,59 @@ def plan_prompt(items: list[Material], store_text, language: str) -> str:
     return "\n".join(parts)
 
 
-def rule_plan(items: list[Material], store_text) -> dict:
-    """Outline without a model: chapters -> sections, numbered note headings -> lessons."""
-    title = "新课程"
+def course_title(items: list[Material], store_text) -> str:
+    """The course name: from the syllabus ("《大学物理A（上）》课程教学大纲"), else the folder name."""
     for m in items:
         if m.category == "syllabus":
-            mm = re.search(r"《([^》]{2,40})》", store_text(m.id)) or re.search(r"^(.{2,40})$", store_text(m.id), re.M)
+            t = store_text(m.id)
+            mm = re.search(r"《([^》]{2,40})》", t) or re.search(r"^\s*(\S.{1,39}?)\s*$", t, re.M)
             if mm:
-                title = mm.group(1).strip().replace("课程教学大纲", "")
-            break
+                name = re.sub(r"(课程)?教学大纲$", "", mm.group(1).strip()).strip()
+                if name and not generic_title(name):
+                    return name
+    roots = {m.path.split("/")[0] for m in items if "/" in m.path}
+    if len(roots) == 1:
+        name = re.sub(r"[\s_-]*(课程资料|教学资料|资料|materials?|course files?)$", "", roots.pop(), flags=re.I).strip()
+        if name and not generic_title(name):
+            return name
+    return "新课程"
+
+
+_GENERIC = {"", "新课程", "新建课程", "课程", "未命名", "untitled", "untitled course", "new course", "course"}
+
+
+def generic_title(t: str | None) -> bool:
+    """A name that says nothing: empty, "新课程", or only a number ("第1章", "Chapter 1", "第1章 Chapter 1")."""
+    t = (t or "").strip()
+    if t.lower() in _GENERIC:
+        return True
+    return bool(re.fullmatch(r"(第\s*\d+\s*章|chapter\s*\d+|ch\.?\s*\d+|\d+)([\s:：.、-]*(第\s*\d+\s*章|chapter\s*\d+))*[\s:：.、-]*", t, re.I))
+
+
+def merge_plan(ai_plan: dict, rule: dict) -> dict:
+    """Use the model's plan, but never a name that says nothing when the materials give a real one."""
+    plan = dict(ai_plan)
+    if generic_title(plan.get("title")):
+        plan["title"] = rule.get("title")
+    by_ch = {s["chapter"]: s for s in rule.get("sections") or []}
+    fixed = []
+    for s in plan.get("sections") or []:
+        if not isinstance(s, dict):
+            continue
+        s = dict(s)
+        r = by_ch.get(as_int(s.get("chapter")) or 0)
+        if r and generic_title(s.get("title")):
+            s["title"] = r["title"]
+        if r and not s.get("lessons"):
+            s["lessons"] = r["lessons"]
+        fixed.append(s)
+    plan["sections"] = fixed
+    return plan
+
+
+def rule_plan(items: list[Material], store_text) -> dict:
+    """Outline without a model: chapters -> sections, numbered note headings -> lessons."""
+    title = course_title(items, store_text)
     sections = []
     for ch in chapters(items):
         heads: list[str] = []
@@ -442,6 +525,43 @@ def attachment_ids(items: list[Material], ch: int | None) -> list[str]:
     keep = {"lesson_plan", "notes", "slides", "homework", "quiz", "answer_key", "lab", "rubric", "media",
             "syllabus", "calendar"}
     return [m.id for m in items if m.chapter == ch and m.category in keep]
+
+
+def outline_from_plan(plan: dict, items: list[Material], lang: str, text_of, iid: str) -> dict:
+    """Turn a plan into the builder's outline: chapter sections plus course-info, lab and quiz sections."""
+    T = lambda s: {lang: str(s or "").strip()}  # noqa: E731
+    raw = plan.get("sections") if isinstance(plan, dict) else None
+    by_ch = {as_int(s.get("chapter")) or 0: s for s in (raw if isinstance(raw, list) else []) if isinstance(s, dict)}
+    plan = plan if isinstance(plan, dict) else {}
+    sections = []
+    info = attachment_ids([m for m in items if m.category in ("syllabus", "calendar", "rubric", "media")], None)
+    if info:
+        sections.append({"title": T("课程说明" if lang == "zh" else "Course information"), "summary": T(""),
+                         "lessons": [], "assignment": None, "files": info})
+    for ch in chapters(items):
+        s = by_ch.get(ch) or {"title": section_title_for(ch, items, text_of), "summary": "", "lessons": []}
+        hw = homework_brief(items, ch, text_of)
+        srcs = source_ids(items, ch)
+        sections.append({
+            "title": T(s.get("title")), "summary": T(s.get("summary")),
+            "lessons": [{"title": T(l.get("title")), "goal": T(l.get("goal")), "content": T(""), "sources": srcs}
+                        for l in (s.get("lessons") if isinstance(s.get("lessons"), list) else [])[:6]
+                        if isinstance(l, dict)],
+            "assignment": {"title": T(hw[0]), "brief": T(hw[1])} if hw else None,
+            "files": attachment_ids([m for m in items if m.category != "homework"], ch),
+        })
+    labs = [m.id for m in items if m.category == "lab" and m.chapter is None]
+    if labs:
+        sections.append({"title": T("实验" if lang == "zh" else "Labs"), "summary": T(""), "lessons": [],
+                         "assignment": None, "files": labs})
+    quiz = [m.id for m in items if m.category in ("quiz", "answer_key") and m.chapter is None]
+    if quiz:
+        sections.append({"title": T("测验与复习" if lang == "zh" else "Quizzes and review"), "summary": T(""),
+                         "lessons": [], "assignment": None, "files": quiz})
+    return {"title": T(plan.get("title")), "summary": T(plan.get("summary")), "languages": lang,
+            "import_id": iid, "sections": sections,
+            "files": {m.id: {"name": m.name, "category": m.category, "teacher_only": m.category in TEACHER_ONLY}
+                      for m in items}}
 
 
 # --- file names garbled by unzipping ---------------------------------------------------------
