@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     deepseek_api_key: str = ""
     deepseek_model: str = "deepseek-chat"
     ai_timeout: float = 180.0
+    # Where uploaded course materials are kept during an import (kept 24 hours).
+    import_dir: str = "/tmp/wq-imports"
 
     @property
     def cors_list(self) -> list[str]:

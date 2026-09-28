@@ -15,8 +15,80 @@
 
       <view v-if="error" class="alert" role="alert">{{ errorText(error) }}</view>
 
-      <!-- 1. brief -->
-      <view v-if="step === 1" class="card">
+      <!-- 1. brief: from materials or from a description -->
+      <view v-if="step === 1" class="modes">
+        <view class="mode" :class="{ on: mode === 'upload' }" @click="mode = 'upload'">{{ t("import.modeUpload") }}</view>
+        <view class="mode" :class="{ on: mode === 'describe' }" @click="mode = 'describe'">{{ t("import.modeDescribe") }}</view>
+      </view>
+
+      <view v-if="step === 1 && mode === 'upload'" class="card">
+        <!-- #ifdef H5 -->
+        <!-- a native div: uni-app views do not forward drag-and-drop events -->
+        <div class="drop" :class="{ over: dragOver }" @dragover.prevent="dragOver = true" @dragleave="dragOver = false" @drop.prevent="onDrop">
+          <text class="drop-title">{{ t("import.drop") }}</text>
+          <text class="drop-hint">{{ t("import.dropHint") }}</text>
+          <view class="drop-buttons">
+            <view class="primary" @click="pick(true)">{{ files.length ? t("import.addMore") : t("import.pickFolder") }}</view>
+            <view class="ghost" @click="pick(false)">{{ t("import.pickFiles") }}</view>
+          </view>
+        </div>
+        <view v-if="phase === 'uploading'" class="phase">
+          <text>{{ t("import.uploading", { done: uploads.done, total: uploads.total }) }}</text>
+          <view class="bar"><view class="fill" :style="{ width: (uploads.total ? (uploads.done / uploads.total) * 100 : 0) + '%' }" /></view>
+        </view>
+        <view v-if="phase === 'classifying'" class="phase">{{ t("import.classifying") }}</view>
+
+        <view v-if="files.length && phase === 'ready'">
+          <view class="table-head">
+            <text class="lbl">{{ t("import.table") }}</text>
+            <text class="muted-s">{{ t("import.summary", { n: files.length, c: chapterCount }) }}</text>
+          </view>
+          <view class="mtable">
+            <view class="mrow mhead">
+              <text class="c-file">{{ t("import.file") }}</text>
+              <text class="c-cat">{{ t("import.category") }}</text>
+              <text class="c-ch">{{ t("import.chapter") }}</text>
+            </view>
+            <view v-for="f in files" :key="f.id" class="mrow" :class="{ unsure: f.confidence === 'unsure' }">
+              <view class="c-file">
+                <text class="fname">{{ shortPath(f.path) }}</text>
+                <text v-if="f.error" class="tag-err">{{ t("import.unreadable") }}</text>
+                <text v-else-if="f.confidence === 'unsure'" class="tag-warn">{{ t("import.unsure") }}</text>
+                <text v-if="teacherOnly(f.category)" class="tag-lock">🔒 {{ t("import.teacherOnly") }}</text>
+              </view>
+              <view class="c-cat">
+                <select class="msel" v-model="f.category" @change="f.confidence = 'teacher'">
+                  <option v-for="(label, key) in categories" :key="key" :value="key">{{ label }}</option>
+                </select>
+              </view>
+              <view class="c-ch">
+                <select class="msel" v-model="f.chapter" @change="f.confidence = 'teacher'">
+                  <option :value="null">{{ t("import.whole") }}</option>
+                  <option v-for="n in 20" :key="n" :value="n">{{ n }}</option>
+                </select>
+              </view>
+            </view>
+          </view>
+          <view class="row lang-row">
+            <text class="lbl">{{ t("create.languages") }}</text>
+            <view class="chips">
+              <view v-for="lg in ['zh', 'en']" :key="lg" class="chip" :class="{ sel: importLang === lg }"
+                    @click="importLang = lg as any">{{ t("create.lang." + lg) }}</view>
+            </view>
+          </view>
+          <view class="actions">
+            <view class="primary" :class="{ disabled: busy }" @click="makeImportOutline">
+              {{ busy ? t("import.planning") : "✨ " + t("import.makeOutline") }}
+            </view>
+          </view>
+        </view>
+        <!-- #endif -->
+        <!-- #ifndef H5 -->
+        <text class="muted-s">{{ t("import.webOnly") }}</text>
+        <!-- #endif -->
+      </view>
+
+      <view v-if="step === 1 && mode === 'describe'" class="card">
         <view class="field">
           <text class="lbl">{{ t("create.topic") }} *</text>
           <input class="input" v-model="brief.topic" :placeholder="t('create.topicHint')" />
@@ -110,10 +182,20 @@
                 <input class="input" v-model="les.title[k]" />
               </view>
               <text v-if="les.goal && disp(les.goal)" class="goal">{{ disp(les.goal) }}</text>
+              <text v-if="les.sources && les.sources.length" class="goal">📄 {{ t("import.sources") }}：{{ les.sources.map((id) => outline!.files?.[id]?.name).filter(Boolean).join("、") }}</text>
             </view>
             <text class="link danger" @click="sec.lessons.splice(li, 1)">✕</text>
           </view>
           <text class="link" @click="addLesson(sec)">{{ t("create.addLesson") }}</text>
+          <view v-if="sec.files && sec.files.length" class="attach">
+            <text class="lbl">📎 {{ t("import.attached") }}</text>
+            <view class="chips">
+              <view v-for="(fid, fi) in sec.files" :key="fid" class="fchip">
+                <text>{{ outline.files?.[fid]?.teacher_only ? "🔒 " : "" }}{{ outline.files?.[fid]?.name }}</text>
+                <text class="x" @click="sec.files!.splice(fi, 1)">✕</text>
+              </view>
+            </view>
+          </view>
           <view v-if="sec.assignment" class="assign">
             <text class="lbl">✎ {{ t("create.assignment") }}</text>
             <view v-for="k in keys" :key="'at' + k" class="lang-line">
@@ -169,6 +251,9 @@
             <view v-if="open[key(si, li)]" class="r-body"><RichContent :html="disp(les.content)" /></view>
           </view>
           <view v-if="sec.assignment" class="r-assign">✎ {{ disp(sec.assignment.title) }}</view>
+          <view v-if="sec.files && sec.files.length" class="r-files">
+            <text v-for="fid in sec.files" :key="fid" class="r-file">{{ outline.files?.[fid]?.teacher_only ? "🔒" : "📎" }} {{ outline.files?.[fid]?.name }}</text>
+          </view>
         </view>
         <view class="actions">
           <view class="ghost" @click="step = 2">{{ t("create.back") }}</view>
@@ -186,10 +271,27 @@ import { computed, reactive, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import TopBar from "../../components/TopBar.vue";
 import RichContent from "../../components/RichContent.vue";
-import { api, ApiError, type Brief, type Outline, type OutlineSection, type Text, token, user } from "../../api";
+import { api, ApiError, type Brief, type Material, type Outline, type OutlineSection, type Text, token, user } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
 const step = ref(1);
+const mode = ref<"upload" | "describe">("upload");
+const importId = ref("");
+const files = ref<Material[]>([]);
+const categories = ref<Record<string, string>>({});
+const phase = ref<"idle" | "uploading" | "classifying" | "ready">("idle");
+const uploads = reactive({ total: 0, done: 0 });
+const dragOver = ref(false);
+const importLang = ref<"zh" | "en">(locale.value === "en" ? "en" : "zh");
+const TEACHER_ONLY = ["lesson_plan", "answer_key"];
+const teacherOnly = (cat: string) => TEACHER_ONLY.includes(cat);
+// Hide the folder name every file shares ("大学物理（上）课程资料/…") so the table stays readable.
+const commonRoot = computed(() => {
+  const firsts = new Set(files.value.map((f) => (f.path.includes("/") ? f.path.split("/")[0] : "")));
+  return firsts.size === 1 && !firsts.has("") ? [...firsts][0] + "/" : "";
+});
+const shortPath = (p: string) => (commonRoot.value && p.startsWith(commonRoot.value) ? p.slice(commonRoot.value.length) : p);
+const chapterCount = computed(() => new Set(files.value.filter((f) => f.chapter && f.category !== "other").map((f) => f.chapter)).size);
 const busy = ref(false);
 const error = ref("");
 const outline = ref<Outline | null>(null);
@@ -242,6 +344,107 @@ async function makeOutline() {
   }
 }
 
+// --- materials import (browser only) ---------------------------------------------------
+type Picked = { file: File; path: string };
+const skip = (name: string) => name.startsWith(".") || name.startsWith("~$") || name === "Thumbs.db" || name === "desktop.ini";
+
+function pick(folder: boolean) {
+  // #ifdef H5
+  const input = document.createElement("input");
+  input.type = "file";
+  input.multiple = true;
+  if (folder) (input as any).webkitdirectory = true;
+  // Keep it in the DOM until used: some browsers ignore clicks on detached inputs.
+  input.style.display = "none";
+  document.body.appendChild(input);
+  input.onchange = () => {
+    const list = Array.from(input.files || []).map((f) => ({ file: f, path: (f as any).webkitRelativePath || f.name }));
+    input.remove();
+    processFiles(list);
+  };
+  input.click();
+  // #endif
+}
+
+async function readEntry(entry: any, prefix = ""): Promise<Picked[]> {
+  if (entry.isFile) {
+    return new Promise((res) => entry.file((f: File) => res([{ file: f, path: prefix + f.name }]), () => res([])));
+  }
+  const reader = entry.createReader();
+  const all: Picked[] = [];
+  // readEntries returns results in batches; keep reading until empty.
+  for (;;) {
+    const batch: any[] = await new Promise((res) => reader.readEntries(res, () => res([])));
+    if (!batch.length) break;
+    for (const e of batch) all.push(...(await readEntry(e, prefix + entry.name + "/")));
+  }
+  return all;
+}
+
+async function onDrop(e: DragEvent) {
+  dragOver.value = false;
+  const items = Array.from(e.dataTransfer?.items || []);
+  const list: Picked[] = [];
+  for (const it of items) {
+    const entry = (it as any).webkitGetAsEntry?.();
+    if (entry) list.push(...(await readEntry(entry)));
+    else if (it.kind === "file" && it.getAsFile()) list.push({ file: it.getAsFile()!, path: it.getAsFile()!.name });
+  }
+  processFiles(list);
+}
+
+async function processFiles(list: Picked[]) {
+  list = list.filter((p) => !skip(p.file.name)).slice(0, 300);
+  if (!list.length) return;
+  error.value = "";
+  try {
+    if (!importId.value) importId.value = (await api.importStart()).import_id;
+    phase.value = "uploading";
+    uploads.total += list.length;
+    const queue = [...list];
+    const worker = async () => {
+      while (queue.length) {
+        const p = queue.shift()!;
+        try {
+          const m = await api.importUpload(importId.value, p.file, p.path);
+          files.value = [...files.value.filter((f) => f.path !== m.path), m];
+        } catch (e) {
+          fail(e);
+        } finally {
+          uploads.done++;
+        }
+      }
+    };
+    await Promise.all([worker(), worker(), worker()]);
+    phase.value = "classifying";
+    const r = await api.importClassify(importId.value);
+    categories.value = r.categories;
+    files.value = r.files.sort((a, b) => a.path.localeCompare(b.path, "zh"));
+  } catch (e) {
+    fail(e);
+  } finally {
+    phase.value = files.value.length ? "ready" : "idle";
+  }
+}
+
+async function makeImportOutline() {
+  if (busy.value || !importId.value) return;
+  busy.value = true;
+  error.value = "";
+  try {
+    await api.importEdit(importId.value, files.value.map((f) => ({ id: f.id, category: f.category, chapter: f.chapter })));
+    outline.value = await api.importOutline(importId.value, importLang.value);
+    brief.languages = outline.value.languages;
+    brief.notes = "";
+    Object.keys(status).forEach((k) => delete status[k]);
+    step.value = 2;
+  } catch (e) {
+    fail(e);
+  } finally {
+    busy.value = false;
+  }
+}
+
 function addLesson(sec: OutlineSection) {
   const empty = () => Object.fromEntries(keys.value.map((k) => [k, ""])) as Text;
   sec.lessons.push({ title: empty(), goal: empty(), content: empty() });
@@ -257,6 +460,8 @@ async function writeOne(si: number, li: number) {
   status[k] = "busy";
   try {
     const r = await api.aiLesson({
+      import_id: o.import_id || "",
+      sources: les.sources || [],
       course_title: disp(o.title),
       section_title: disp(sec.title),
       lesson_title: disp(les.title),
@@ -389,4 +594,36 @@ onShow(() => {
 .r-arrow { color: var(--wq-muted); width: 12px; }
 .r-body { padding: 4px 16px 12px; border-top: 1px solid #f0f2f1; }
 .r-assign { font-size: 14px; color: #7a5a00; padding: 6px 12px; }
+.modes { display: flex; gap: 8px; margin-bottom: 12px; }
+.mode { flex: 1; text-align: center; padding: 12px; border-radius: 10px; border: 1px solid var(--wq-line); background: #fff; cursor: pointer; font-weight: 600; color: var(--wq-muted); }
+.mode.on { border-color: var(--wq-ink); color: var(--wq-ink); box-shadow: inset 0 0 0 1px var(--wq-ink); }
+.drop { border: 2px dashed #c5d0cc; border-radius: 12px; padding: 28px 20px; text-align: center; background: #fafbfa; }
+.drop.over { border-color: var(--wq-accent); background: #fffbea; }
+.drop-title { display: block; font-size: 18px; font-weight: 600; color: var(--wq-ink); }
+.drop-hint { display: block; font-size: 13px; color: var(--wq-muted); margin: 8px auto 16px; max-width: 560px; line-height: 1.6; }
+.drop-buttons { display: flex; gap: 10px; justify-content: center; }
+.phase { margin-top: 16px; font-size: 14px; color: var(--wq-ink); }
+.phase .bar { margin-top: 8px; }
+.table-head { display: flex; justify-content: space-between; align-items: baseline; margin: 20px 0 8px; gap: 12px; flex-wrap: wrap; }
+.muted-s { font-size: 13px; color: var(--wq-muted); }
+.mtable { border: 1px solid var(--wq-line); border-radius: 10px; overflow: hidden; }
+.mrow { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-top: 1px solid #eef1f0; }
+.mrow.mhead { background: #f4f6f5; border-top: 0; font-size: 13px; font-weight: 600; color: var(--wq-muted); }
+.mrow.unsure { background: #fffbea; }
+.c-file { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.fname { font-size: 13px; color: var(--wq-ink); word-break: break-all; }
+.c-cat { width: 130px; flex-shrink: 0; }
+.c-ch { width: 96px; flex-shrink: 0; }
+.msel { width: 100%; height: 32px; border: 1px solid var(--wq-line); border-radius: 6px; background: #fff; font-size: 13px; padding: 0 6px; }
+.tag-err, .tag-warn, .tag-lock { font-size: 11px; padding: 1px 6px; border-radius: 4px; }
+.tag-err { background: #fdecea; color: var(--wq-danger); }
+.tag-warn { background: #fff1bf; color: #7a5a00; }
+.tag-lock { background: #eef1f0; color: var(--wq-muted); }
+.lang-row { align-items: center; margin-top: 16px; gap: 12px; }
+.attach { margin: 10px 0 0 38px; }
+.fchip { display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #eef1f0; font-size: 12px; color: var(--wq-ink); }
+.fchip .x { color: var(--wq-muted); cursor: pointer; }
+.r-files { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 4px 12px 8px; }
+.r-file { font-size: 12px; color: var(--wq-muted); }
+@media (max-width: 560px) { .c-cat { width: 104px; } .c-ch { width: 80px; } }
 </style>

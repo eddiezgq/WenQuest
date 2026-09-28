@@ -55,14 +55,37 @@ export interface Activity {
 // --- AI course workshop ---
 export type Languages = "zh" | "en" | "both";
 export interface Text { zh?: string; en?: string }
-export interface OutlineLesson { title: Text; goal?: Text; content: Text }
+export interface OutlineLesson { title: Text; goal?: Text; content: Text; sources?: string[] }
 export interface OutlineSection {
   title: Text;
   summary: Text;
   lessons: OutlineLesson[];
   assignment: { title: Text; brief: Text } | null;
+  files?: string[];
 }
-export interface Outline { title: Text; summary: Text; languages: Languages; sections: OutlineSection[] }
+export interface Outline {
+  title: Text;
+  summary: Text;
+  languages: Languages;
+  sections: OutlineSection[];
+  import_id?: string;
+  files?: Record<string, { name: string; category: string; teacher_only: boolean }>;
+}
+export interface Material {
+  id: string;
+  name: string;
+  path: string;
+  size: number;
+  ext: string;
+  chars: number;
+  pages: number;
+  category: string;
+  category_label: string;
+  chapter: number | null;
+  confidence: string;
+  teacher_only: boolean;
+  error: string;
+}
 export interface Brief {
   topic: string;
   audience: string;
@@ -113,7 +136,7 @@ export function absolute(url: string | null | undefined): string {
   return url.startsWith("/") ? BASE + url : url;
 }
 
-function request<T>(method: "GET" | "POST", path: string, data?: unknown, timeout = 60000): Promise<T> {
+function request<T>(method: "GET" | "POST" | "PUT", path: string, data?: unknown, timeout = 60000): Promise<T> {
   const header: Record<string, string> = { "Content-Type": "application/json" };
   if (token.value) header.Authorization = `Bearer ${token.value}`;
   const sep = path.includes("?") ? "&" : "?";
@@ -164,6 +187,30 @@ export const api = {
   aiOutline: (b: Brief) => request<Outline>("POST", "/api/v1/ai/outline", b, 200000),
   aiLesson: (body: Record<string, unknown>) =>
     request<{ content: Text }>("POST", "/api/v1/ai/lesson", body, 200000),
+  importStart: () => request<{ import_id: string }>("POST", "/api/v1/imports"),
+  importClassify: (id: string) =>
+    request<{ files: Material[]; categories: Record<string, string> }>("POST", `/api/v1/imports/${id}/classify`, {}, 120000),
+  importEdit: (id: string, edits: { id: string; category: string; chapter: number | null }[]) =>
+    request<{ files: Material[] }>("PUT", `/api/v1/imports/${id}/files`, edits),
+  importOutline: (id: string, languages: Languages) =>
+    request<Outline>("POST", `/api/v1/imports/${id}/outline`, { languages }, 200000),
+  // Browser-only: multipart upload of one file with its path inside the chosen folder.
+  async importUpload(id: string, file: File, path: string): Promise<Material> {
+    const form = new FormData();
+    form.append("file", file, file.name);
+    form.append("path", path);
+    let res: Response;
+    try {
+      res = await fetch(`${BASE}/api/v1/imports/${id}/files`, {
+        method: "POST", body: form, headers: { Authorization: `Bearer ${token.value}` },
+      });
+    } catch {
+      throw new ApiError("network", 0);
+    }
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new ApiError(body.error || "unknown", res.status);
+    return body as Material;
+  },
   publish: (o: Outline) =>
     request<{ course_id: number; shortname: string; activities: number }>("POST", "/api/v1/courses", o, 120000),
   courses: () => request<{ courses: Course[] }>("GET", "/api/v1/courses").then((r) => r.courses),

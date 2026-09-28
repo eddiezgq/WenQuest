@@ -32,11 +32,13 @@ class create_course extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         $activity = new external_single_structure([
-            'type' => new external_value(PARAM_ALPHA, 'page, url or assign'),
+            'type' => new external_value(PARAM_ALPHA, 'page, url, assign or resource'),
             'name' => new external_value(PARAM_TEXT, 'Activity name (multilang allowed)'),
             'intro' => new external_value(PARAM_RAW, 'Short description (HTML)', VALUE_DEFAULT, ''),
             'content' => new external_value(PARAM_RAW, 'Page content (HTML)', VALUE_DEFAULT, ''),
             'url' => new external_value(PARAM_URL, 'Link target for url activities', VALUE_DEFAULT, ''),
+            'draftitemid' => new external_value(PARAM_INT, 'Draft area with the uploaded file (resource)', VALUE_DEFAULT, 0),
+            'visible' => new external_value(PARAM_INT, '1 = students see it, 0 = teachers only', VALUE_DEFAULT, 1),
         ]);
         $section = new external_single_structure([
             'name' => new external_value(PARAM_TEXT, 'Section name (multilang allowed)'),
@@ -136,7 +138,7 @@ class create_course extends external_api {
         $base = [
             'course' => $course->id,
             'section' => $section,
-            'visible' => 1,
+            'visible' => $activity['visible'] ? 1 : 0,
             'visibleoncoursepage' => 1,
             'name' => $activity['name'],
             'cmidnumber' => '',
@@ -209,6 +211,20 @@ class create_course extends external_api {
                     'assignfeedback_comments_enabled' => 1,
                     'completion' => COMPLETION_TRACKING_AUTOMATIC,
                     'completionsubmit' => 1,
+                ];
+                break;
+            case 'resource':
+                if (!$activity['draftitemid']) {
+                    return false;
+                }
+                $info = $base + [
+                    'modulename' => 'resource',
+                    'files' => $activity['draftitemid'],
+                    'display' => RESOURCELIB_DISPLAY_AUTO,
+                    'printintro' => 0,
+                    'showsize' => 1,
+                    'showtype' => 1,
+                    'completion' => COMPLETION_TRACKING_NONE,
                 ];
                 break;
             default:

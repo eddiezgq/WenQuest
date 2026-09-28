@@ -137,6 +137,20 @@ class MoodleClient:
             _raise_for(_json(r))
         return r
 
+    async def upload(self, token: str, filename: str, data: bytes) -> int:
+        """Put a file in the user's draft area; returns the draft item id for a resource."""
+        try:
+            r = await self.http.post(self._url("/webservice/upload.php"), headers=self.headers,
+                                     data={"token": token, "filearea": "draft", "itemid": "0"},
+                                     files={"file_1": (filename, data, "application/octet-stream")})
+        except httpx.HTTPError as exc:
+            raise EngineError("engine_unreachable", str(exc), 503) from exc
+        payload = _json(r)
+        _raise_for(payload)
+        if not isinstance(payload, list) or not payload:
+            raise EngineError("engine_error", "upload failed", 502)
+        return int(payload[0]["itemid"])
+
     # --- typed helpers -------------------------------------------------
     async def site_info(self, token: str, lang: str | None = None) -> dict:
         return await self.call(token, "core_webservice_get_site_info", lang)

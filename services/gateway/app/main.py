@@ -2,25 +2,28 @@
 from __future__ import annotations
 
 import json
+import uuid
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated, Any
 
 import httpx
 from cryptography.fernet import InvalidToken
-from fastapi import Depends, FastAPI, Header, Request
+from fastapi import Depends, FastAPI, File, Form, Header, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from . import content
 from . import course_builder as cb
+from . import materials as mt
 from .ai import ModelGateway
 from .config import Settings, get_settings
 from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -30,6 +33,7 @@ class State:
     moodle: MoodleClient
     codec: SessionCodec
     ai: ModelGateway
+    store: mt.Store
 
 
 state = State()
@@ -45,6 +49,7 @@ async def lifespan(app: FastAPI):
     state.ai = ModelGateway(s.ai_provider, state.http, anthropic_key=s.anthropic_api_key,
                             claude_model=s.claude_model, deepseek_key=s.deepseek_api_key,
                             deepseek_model=s.deepseek_model, timeout=s.ai_timeout)
+    state.store = mt.Store(s.import_dir)
     yield
     await state.http.aclose()
 
@@ -120,6 +125,16 @@ class UserOut(BaseModel):
 class LoginOut(BaseModel):
     token: str
     user: UserOut
+
+
+class FileEdit(BaseModel):
+    id: str
+    category: str
+    chapter: int | None = None
+
+
+class PlanIn(BaseModel):
+    languages: cb.Languages = "zh"
 
 
 # --- routes -------------------------------------------------------------
@@ -261,10 +276,26 @@ def register(app: FastAPI) -> None:
     @app.post("/api/v1/ai/lesson")
     async def ai_lesson(body: cb.LessonRequest, sess: Annotated[Session, Depends(current)]):
         await require_creator(sess)
-        data = await state.ai.json(system=cb.SYSTEM, prompt=cb.lesson_prompt(body),
+        src_text, first = "", None
+        if body.import_id and body.sources:
+            items = {m.id: m for m in _materials(body.import_id, sess)}
+            budget = 16000
+            for fid in body.sources:
+                m = items.get(fid)
+                if not m:
+                    continue
+                t = state.store.text(body.import_id, fid)[:budget]
+                if not t:
+                    continue
+                first = first or (m.name, t)
+                src_text += f"\n<<< 文件：{m.name}（{mt.CATEGORIES[m.category]}）\n{t}\n>>>"
+                budget -= len(t)
+                if budget <= 0:
+                    break
+        data = await state.ai.json(system=cb.SYSTEM, prompt=cb.lesson_prompt(body, src_text),
                                    schema=cb.lesson_schema(body.languages),
                                    max_tokens=12000 if body.languages == "both" else 6000,
-                                   fake=lambda: cb.fake_lesson(body))
+                                   fake=lambda: cb.fake_lesson(body, first))
         text = cb.norm_text(data.get("content"), cb.lang_keys(body.languages))
         clean = {k: content.clean(v, state.settings.moodle_url, lambda u: u) for k, v in text.items()}
         if not any(clean.values()):
@@ -276,8 +307,93 @@ def register(app: FastAPI) -> None:
         if not await can_create(sess.moodle_token):
             raise EngineError("forbidden", "you may not create courses", 403)
         payload = cb.to_moodle(draft, lambda h: content.clean(h, state.settings.moodle_url, lambda u: u))
+        if draft.import_id:
+            items = {m.id: m for m in _materials(draft.import_id, sess)}
+            for sec, out in zip(draft.sections, payload["sections"]):
+                for fid in sec.files:
+                    m = items.get(fid)
+                    if not m:
+                        continue
+                    item = await state.moodle.upload(sess.moodle_token, m.name, state.store.data(draft.import_id, fid))
+                    out["activities"].append({
+                        "type": "resource", "name": Path(m.name).stem, "draftitemid": item,
+                        "visible": 0 if m.category in mt.TEACHER_ONLY else 1,
+                    })
         result = await state.moodle.call(sess.moodle_token, "local_wenquest_create_course", None, **payload)
         return {"course_id": result["courseid"], "shortname": result["shortname"], "activities": result["activities"]}
+
+    # --- importing course materials ------------------------------------------
+
+    @app.post("/api/v1/imports")
+    async def import_start(sess: Annotated[Session, Depends(current)]):
+        if not await can_create(sess.moodle_token):
+            raise EngineError("forbidden", "you may not create courses", 403)
+        return {"import_id": state.store.new_session(sess.user_id)}
+
+    @app.post("/api/v1/imports/{iid}/files")
+    async def import_file(iid: str, sess: Annotated[Session, Depends(current)],
+                          file: UploadFile = File(...), path: str = Form("")):
+        _materials(iid, sess)  # ownership check
+        data = await file.read(mt.MAX_FILE + 1)
+        if len(data) > mt.MAX_FILE:
+            raise EngineError("file_too_large", "files are limited to 50 MB", 413)
+        name = Path(file.filename or "file").name
+        rel = (path or name).replace("\\", "/").lstrip("/")[:300]
+        m = mt.Material(id=uuid.uuid4().hex, name=name, path=rel, size=len(data), ext=Path(name).suffix.lower())
+        text = ""
+        try:
+            text, m.pages = mt.extract(name, data)
+        except ValueError:
+            m.error = "unsupported"
+        except Exception:  # corrupt or encrypted files must not break the whole import
+            m.error = "unreadable"
+        text = text[:mt.MAX_TEXT]
+        m.chars, m.excerpt, m.headings = len(text), text[:1200], mt.headings(text)
+        mt.classify_rule(m)
+        state.store.add(iid, sess.user_id, m, data, text)
+        return m.public()
+
+    @app.get("/api/v1/imports/{iid}")
+    async def import_list(iid: str, sess: Annotated[Session, Depends(current)]):
+        return {"files": [m.public() for m in _materials(iid, sess)], "categories": mt.CATEGORIES}
+
+    @app.post("/api/v1/imports/{iid}/classify")
+    async def import_classify(iid: str, sess: Annotated[Session, Depends(current)]):
+        items = _materials(iid, sess)
+        if state.ai.available and state.ai.provider != "fake" and items:
+            data = await state.ai.json(system=cb.SYSTEM, prompt=mt.classify_prompt(items),
+                                       schema=mt.classify_schema(), max_tokens=4000)
+            mt.apply_ai(items, data)
+            state.store.put_materials(iid, sess.user_id, items)
+        return {"files": [m.public() for m in items], "categories": mt.CATEGORIES}
+
+    @app.put("/api/v1/imports/{iid}/files")
+    async def import_edit(iid: str, edits: list[FileEdit], sess: Annotated[Session, Depends(current)]):
+        items = {m.id: m for m in _materials(iid, sess)}
+        for e in edits:
+            m = items.get(e.id)
+            if m and e.category in mt.CATEGORIES:
+                if (m.category, m.chapter) != (e.category, e.chapter):
+                    m.confidence = "teacher"
+                m.category, m.chapter = e.category, (e.chapter if e.chapter and e.chapter > 0 else None)
+        state.store.put_materials(iid, sess.user_id, list(items.values()))
+        return {"files": [m.public() for m in items.values()]}
+
+    @app.post("/api/v1/imports/{iid}/outline")
+    async def import_outline(iid: str, body: PlanIn, sess: Annotated[Session, Depends(current)]):
+        await require_creator(sess)
+        items = [m for m in _materials(iid, sess) if m.category != "other"]
+        if not mt.chapters(items):
+            raise EngineError("no_chapters", "no chapter could be found in the materials", 422)
+        lang = "en" if body.languages == "en" else "zh"
+        text_of = lambda fid: state.store.text(iid, fid)  # noqa: E731
+        plan = mt.rule_plan(items, text_of)
+        if state.ai.provider not in ("fake", "none"):
+            ai_plan = await state.ai.json(system=cb.SYSTEM, prompt=mt.plan_prompt(items, text_of, lang),
+                                          schema=mt.plan_schema(), max_tokens=6000)
+            if ai_plan.get("sections"):
+                plan = ai_plan
+        return _outline_from_plan(plan, items, lang, text_of, iid)
 
     @app.get("/api/v1/ai/status")
     async def ai_status(sess: Annotated[Session, Depends(current)]):
@@ -323,6 +439,49 @@ async def can_create(moodle_token: str) -> bool:
         return bool(perms.get("cancreatecourses"))
     except EngineError:
         return False
+
+
+def _materials(iid: str, sess: Session) -> list[mt.Material]:
+    try:
+        return state.store.materials(iid, sess.user_id)
+    except PermissionError:
+        raise EngineError("forbidden", "not your import", 403)
+    except (KeyError, OSError):
+        raise EngineError("not_found", "import not found or expired", 404)
+
+
+def _outline_from_plan(plan: dict, items: list[mt.Material], lang: str, text_of, iid: str) -> dict:
+    """Turn a plan into the builder's outline: chapter sections plus course-info, lab and quiz sections."""
+    T = lambda s: {lang: str(s or "").strip()}  # noqa: E731
+    by_ch = {int(s.get("chapter") or 0): s for s in plan.get("sections") or []}
+    sections = []
+    info = mt.attachment_ids([m for m in items if m.category in ("syllabus", "calendar", "rubric", "media")], None)
+    if info:
+        sections.append({"title": T("课程说明" if lang == "zh" else "Course information"), "summary": T(""),
+                         "lessons": [], "assignment": None, "files": info})
+    for ch in mt.chapters(items):
+        s = by_ch.get(ch) or {"title": mt.section_title_for(ch, items, text_of), "summary": "", "lessons": []}
+        hw = mt.homework_brief(items, ch, text_of)
+        srcs = mt.source_ids(items, ch)
+        sections.append({
+            "title": T(s.get("title")), "summary": T(s.get("summary")),
+            "lessons": [{"title": T(l.get("title")), "goal": T(l.get("goal")), "content": T(""), "sources": srcs}
+                        for l in (s.get("lessons") or [])[:6]],
+            "assignment": {"title": T(hw[0]), "brief": T(hw[1])} if hw else None,
+            "files": mt.attachment_ids([m for m in items if m.category != "homework"], ch),
+        })
+    labs = [m.id for m in items if m.category == "lab" and m.chapter is None]
+    if labs:
+        sections.append({"title": T("实验" if lang == "zh" else "Labs"), "summary": T(""), "lessons": [],
+                         "assignment": None, "files": labs})
+    quiz = [m.id for m in items if m.category in ("quiz", "answer_key") and m.chapter is None]
+    if quiz:
+        sections.append({"title": T("测验与复习" if lang == "zh" else "Quizzes and review"), "summary": T(""),
+                         "lessons": [], "assignment": None, "files": quiz})
+    return {"title": T(plan.get("title")), "summary": T(plan.get("summary")), "languages": lang,
+            "import_id": iid, "sections": sections,
+            "files": {m.id: {"name": m.name, "category": m.category, "teacher_only": m.category in mt.TEACHER_ONLY}
+                      for m in items}}
 
 
 async def require_creator(sess: Session) -> None:

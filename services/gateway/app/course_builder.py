@@ -34,6 +34,8 @@ class Brief(BaseModel):
 
 
 class LessonRequest(BaseModel):
+    import_id: str = ""
+    sources: list[str] = Field(default_factory=list, max_length=8)
     course_title: str = Field(max_length=300)
     section_title: str = Field(max_length=300)
     lesson_title: str = Field(max_length=300)
@@ -52,6 +54,7 @@ class Text(BaseModel):
 class DraftLesson(BaseModel):
     title: Text
     content: Text = Text()
+    sources: list[str] = Field(default_factory=list)
 
 
 class DraftAssignment(BaseModel):
@@ -64,12 +67,14 @@ class DraftSection(BaseModel):
     summary: Text = Text()
     lessons: list[DraftLesson] = Field(default_factory=list, max_length=12)
     assignment: DraftAssignment | None = None
+    files: list[str] = Field(default_factory=list, max_length=60)
 
 
 class Draft(BaseModel):
     title: Text
     summary: Text = Text()
     languages: Languages = "zh"
+    import_id: str = ""
     sections: list[DraftSection] = Field(min_length=1, max_length=20)
 
 
@@ -155,7 +160,7 @@ def outline_prompt(b: Brief) -> str:
     return "\n".join(parts)
 
 
-def lesson_prompt(r: LessonRequest) -> str:
+def lesson_prompt(r: LessonRequest, sources: str = "") -> str:
     langs = {"zh": "Simplified Chinese only", "en": "English only", "both": "both Simplified Chinese and English (one full version each)"}[r.languages]
     parts = [
         f"Write the full content of one lesson.\nCourse: {r.course_title}\nSection: {r.section_title}\n"
@@ -168,7 +173,12 @@ def lesson_prompt(r: LessonRequest) -> str:
         "Format: HTML using only h3, h4, p, ul, ol, li, strong, em, code, pre, blockquote, table, tr, th, td. "
         "No h1/h2, no inline styles, no scripts, no images. Write formulas as plain text, e.g. u = Kp·e.",
     ]
-    if r.notes.strip():
+    if sources:
+        parts.append("Write the lesson FROM the teacher's own files below: keep their scope, notation, examples and "
+                     "terminology, reorganise and explain rather than invent. After each paragraph or example that "
+                     "comes from a file, cite it inline in brackets, e.g. （参考：1-质点运动学讲义.pdf 第2页）. "
+                     "Only cover what belongs to this lesson title.\n" + sources)
+    elif r.notes.strip():
         parts.append("The teacher's material (stay consistent with it):\n<<<\n" + r.notes.strip()[:12000] + "\n>>>")
     return "\n".join(parts)
 
@@ -199,8 +209,13 @@ def fake_outline(b: Brief) -> dict:
             "sections": sections}
 
 
-def fake_lesson(r: LessonRequest) -> dict:
+def fake_lesson(r: LessonRequest, source: tuple[str, str] | None = None) -> dict:
     keys = lang_keys(r.languages)
+    if source:  # offline mode with materials: quote the start of the first source and cite it
+        name, text = source
+        para = html.escape(" ".join(text.split())[:300])
+        body = f"<h3>学习目标</h3><p>{html.escape(r.goal or r.lesson_title)}</p><h3>讲解</h3><p>{para}（参考：{html.escape(name)}）</p>"
+        return {"content": {k: body for k in keys}}
     body = {
         "zh": f"<h3>学习目标</h3><p>{html.escape(r.goal or r.lesson_title)}</p><h3>讲解</h3><p>这是《{html.escape(r.lesson_title)}》的示例内容。</p>"
               "<h3>小结</h3><ul><li>要点一</li><li>要点二</li></ul>",

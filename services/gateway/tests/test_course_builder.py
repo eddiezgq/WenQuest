@@ -81,7 +81,7 @@ def test_lesson_is_sanitized(client):
     h, _ = login(client)
     main.state.ai = ModelGateway("fake", main.state.http)
     orig = cb.fake_lesson
-    cb.fake_lesson = lambda r: {"content": {"zh": "<h3>目标</h3><script>alert(1)</script><p onclick='x'>正文</p>"}}
+    cb.fake_lesson = lambda r, src=None: {"content": {"zh": "<h3>目标</h3><script>alert(1)</script><p onclick='x'>正文</p>"}}
     try:
         r = client.post("/api/v1/ai/lesson", headers=h, json={
             "course_title": "c", "section_title": "s", "lesson_title": "l", "languages": "zh"})
