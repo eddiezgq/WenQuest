@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>小程序首页</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;family=Noto+Serif+SC:wght@700&amp;display=swap">
+<style>
+body{margin:0;font-family:'Noto Sans SC','PingFang SC',sans-serif;color:#16211F}
+a{color:#1E6A5F}a:hover{color:#14524A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F5F4; overflow: hidden">
+  <div style="height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 12px 0 16px; background: #F3F5F4">
+    <div style="font-size: 17px; font-weight: 700">问渠 WenQuest</div>
+    <div style="width: 87px; height: 32px; border-radius: 16px; border: 1px solid #D5DDDA; background: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 14px">
+      <svg width="18" height="6" viewBox="0 0 18 6" aria-hidden="true"><circle cx="3" cy="3" r="2" fill="#16211F"></circle><circle cx="9" cy="3" r="2.6" fill="#16211F"></circle><circle cx="15" cy="3" r="2" fill="#16211F"></circle></svg>
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="#16211F" stroke-width="1.6"></circle><circle cx="9" cy="9" r="2.5" fill="#16211F"></circle></svg>
+    </div>
+  </div>
+  <div style="flex-grow: 1; overflow: hidden; padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div style="font-size: 14px; color: #5E6F6B">周四 · 9 月 25 日</div>
+      <div style="font-family: 'Noto Serif SC', serif; font-size: 24px; font-weight: 700">早上好，李同学</div>
+    </div>
+    <div style="background: #1E6A5F; color: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 13px; opacity: 0.85">下一节课 · 10:10</span>
+        <span style="font-size: 12px; background: rgba(255,255,255,0.18); border-radius: 999px; padding: 2px 10px">教 3-205</span>
+      </div>
+      <div style="font-size: 20px; font-weight: 700">数据结构 · 栈与括号匹配</div>
+      <div style="display: flex; gap: 8px">
+        <button style="flex-grow: 1; height: 44px; border: 0; border-radius: 10px; background: #FFFFFF; color: #1E6A5F; font: inherit; font-weight: 700; font-size: 15px">课前预习 3 分钟微课</button>
+        <button style="width: 88px; height: 44px; border: 1px solid rgba(255,255,255,0.5); border-radius: 10px; background: transparent; color: #FFFFFF; font: inherit; font-size: 15px">扫码签到</button>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <div style="font-size: 17px; font-weight: 700">待办</div>
+      <a href="Course.dc.html" style="font-size: 14px; text-decoration: none">全部 3 项</a>
+    </div>
+    <div style="background: #FFFFFF; border-radius: 14px; display: flex; flex-direction: column">
+      <div style="display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-bottom: 1px solid #EBEFEE">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: #FCE9DD; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B4480F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6M8 13h8M8 17h5"></path></svg></div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 500">作业 5：用栈实现括号匹配</span><span style="font-size: 13px; color: #B4480F">明天 23:59 截止</span></div>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-bottom: 1px solid #EBEFEE">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: #DDEFEA; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E6A5F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9 12l2 2 4-4"></path></svg></div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 500">随堂测 · 栈的基本操作</span><span style="font-size: 13px; color: #5E6F6B">课上扫码开始 · 4 题</span></div>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center; padding: 14px 16px">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: #E6E4F4; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B3F8F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"></path></svg></div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 500">情景练习 · 实习面试</span><span style="font-size: 13px; color: #5E6F6B">英语口语 · 本周内完成</span></div>
+      </div>
+    </div>
+    <a href="Tutor.dc.html" style="text-decoration: none; color: inherit; background: #FFFFFF; border-radius: 14px; padding: 14px 16px; display: flex; gap: 12px; align-items: center">
+      <div style="width: 40px; height: 40px; border-radius: 20px; background: #1E6A5F; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">AI</div>
+      <div style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 500">问问课程 AI 助教</span><span style="font-size: 13px; color: #5E6F6B">只依据课程资料回答，并注明出处</span></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5E6F6B" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+    </a>
+  </div>
+  <div style="height: 64px; flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #E3E8E6; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center">
+    <a href="Main.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #1E6A5F; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>首页</a>
+    <a href="Course.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #5E6F6B; font-size: 11px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"></path><path d="M4 19V5"></path></svg>课程</a>
+    <a href="Tutor.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #5E6F6B; font-size: 11px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"></path></svg>AI 助教</a>
+    <a href="Messages.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #5E6F6B; font-size: 11px; position: relative"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>消息<span style="position: absolute; top: -4px; left: 50%; margin-left: 6px; min-width: 16px; height: 16px; border-radius: 8px; background: #C0392B; color: #FFFFFF; font-size: 10px; line-height: 16px; text-align: center; padding: 0 3px">3</span></a>
+    <a href="Main.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #5E6F6B; font-size: 11px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>我的</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>AI 助教</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;family=Noto+Serif+SC:wght@700&amp;display=swap">
+<style>
+body{margin:0;font-family:'Noto Sans SC','PingFang SC',sans-serif;color:#16211F}
+a{color:#1E6A5F}a:hover{color:#14524A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F5F4; overflow: hidden">
+  <div style="height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 12px 0 16px; background: #F3F5F4">
+    <div style="display: flex; align-items: center; gap: 2px"><a href="Main.dc.html" aria-label="返回首页" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: flex-start"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16211F" stroke-width="2" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a><span style="font-size: 17px; font-weight: 700">AI 助教</span></div>
+    <div style="width: 87px; height: 32px; border-radius: 16px; border: 1px solid #D5DDDA; background: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 14px">
+      <svg width="18" height="6" viewBox="0 0 18 6" aria-hidden="true"><circle cx="3" cy="3" r="2" fill="#16211F"></circle><circle cx="9" cy="3" r="2.6" fill="#16211F"></circle><circle cx="15" cy="3" r="2" fill="#16211F"></circle></svg>
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="#16211F" stroke-width="1.6"></circle><circle cx="9" cy="9" r="2.5" fill="#16211F"></circle></svg>
+    </div>
+  </div>
+  <div style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column">
+  <div style="padding: 6px 16px 10px; display: flex; gap: 8px; align-items: center">
+    <span style="font-size: 13px; background: #FFFFFF; border: 1px solid #D5DDDA; border-radius: 999px; padding: 4px 12px">数据结构 · 第 3 章</span>
+    <span style="font-size: 12px; color: #5E6F6B">作业 5：允许辅助，不给完整代码</span>
+  </div>
+  <div style="flex-grow: 1; overflow: hidden; padding: 0 16px; display: flex; flex-direction: column; gap: 12px; justify-content: flex-end">
+    <div style="align-self: flex-end; max-width: 78%; background: #1E6A5F; color: #FFFFFF; border-radius: 16px 16px 4px 16px; padding: 10px 14px; font-size: 15px; line-height: 1.55">递归为什么会栈溢出？</div>
+    <div style="align-self: flex-start; max-width: 86%; background: #FFFFFF; border-radius: 16px 16px 16px 4px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+      <span style="align-self: flex-start; font-size: 11px; font-weight: 700; color: #1E6A5F; background: #DDEFEA; border-radius: 999px; padding: 1px 8px">AI 生成</span>
+      <span style="font-size: 15px; line-height: 1.6">每次函数调用都会在调用栈上压入一帧。终止条件缺失或永远达不到时，调用会一直压栈，直到超出栈空间。检查两点：有没有终止条件？每次调用是否在向它靠近？</span>
+      <a href="Course.dc.html" style="font-size: 13px; text-decoration: none; border-top: 1px dashed #D5DDDA; padding-top: 8px">出处：讲义 4.2 节 · 往届答疑 #17</a>
+    </div>
+    <div style="align-self: flex-end; max-width: 78%; background: #1E6A5F; color: #FFFFFF; border-radius: 16px 16px 4px 16px; padding: 10px 14px; font-size: 15px; line-height: 1.55">作业 5 的代码能直接发我吗？</div>
+    <div style="align-self: flex-start; max-width: 86%; background: #FFFFFF; border-radius: 16px 16px 16px 4px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+      <span style="align-self: flex-start; font-size: 11px; font-weight: 700; color: #1E6A5F; background: #DDEFEA; border-radius: 999px; padding: 1px 8px">AI 生成</span>
+      <span style="font-size: 15px; line-height: 1.6">这是本周作业，我不能给完整代码。先想想：遇到右括号时，应该和栈里的哪个元素比较？写出伪代码后发给我，我帮你检查。</span>
+    </div>
+    <div style="display: flex; gap: 8px; overflow: hidden; padding-bottom: 4px">
+      <button style="flex-shrink: 0; height: 36px; border: 1px solid #D5DDDA; background: #FFFFFF; border-radius: 18px; padding: 0 14px; font: inherit; font-size: 13px; color: #16211F">栈和队列的区别</button>
+      <button style="flex-shrink: 0; height: 36px; border: 1px solid #D5DDDA; background: #FFFFFF; border-radius: 18px; padding: 0 14px; font: inherit; font-size: 13px; color: #16211F">循环队列怎么判满</button>
+    </div>
+  </div>
+  <div style="padding: 10px 12px; background: #FFFFFF; border-top: 1px solid #E3E8E6; display: flex; gap: 8px; align-items: center">
+    <button aria-label="语音输入" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: #F3F5F4; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16211F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button>
+    <label style="flex-grow: 1; display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">输入问题</span><input placeholder="问一个关于本课程的问题" style="width: 100%; height: 44px; box-sizing: border-box; border: 1px solid #D5DDDA; border-radius: 22px; padding: 0 16px; font: inherit; font-size: 15px; background: #F3F5F4"></label>
+    <button style="height: 44px; border: 0; border-radius: 22px; background: #1E6A5F; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; padding: 0 16px">发送</button>
+  </div>
+</div>
+<div style="height: 64px; flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #E3E8E6; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center">
+    <a href="Main.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #5E6F6B; font-size: 11px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>首页</a>
+    <a href="Course.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #5E6F6B; font-size: 11px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"></path><path d="M4 19V5"></path></svg>课程</a>
+    <a href="Tutor.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #1E6A5F; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"></path></svg>AI 助教</a>
+    <a href="Messages.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #5E6F6B; font-size: 11px; position: relative"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>消息<span style="position: absolute; top: -4px; left: 50%; margin-left: 6px; min-width: 16px; height: 16px; border-radius: 8px; background: #C0392B; color: #FFFFFF; font-size: 10px; line-height: 16px; text-align: center; padding: 0 3px">3</span></a>
+    <a href="Main.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #5E6F6B; font-size: 11px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>我的</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

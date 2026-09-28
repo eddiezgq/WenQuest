@@ -1,0 +1,40 @@
+<section id="simflow" data-transition="fade" style="background:#F7F5EF; color:#1F2A44; font-family:'Noto Sans SC', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:26px; color:#B5452F; letter-spacing:3px">AI 虚拟仿真实验 · 数据流</p>
+    <h2 style="font-family:'Noto Serif SC', Georgia, serif; font-size:60px; font-weight:600; line-height:1.15; color:#14213D">从一次实验到一条成绩，AI 贯穿全程</h2>
+  </div>
+  <div data-build-in="rise 1" style="position:absolute; left:128px; top:300px; width:288px; height:260px; display:flex; flex-direction:column; gap:10px; background:#FFFFFF; padding:28px; border-radius:12px; border:1px solid #E2DED3">
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">仿真内核</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">浏览器 MuJoCo，或 ROS 2 容器</p>
+  </div>
+  <x-connector x1="420" y1="430" x2="468" y2="430" head="end" style="color:#9AA3B2; border-width:4px"></x-connector>
+  <div data-build-in="rise 2" style="position:absolute; left:472px; top:300px; width:288px; height:260px; display:flex; flex-direction:column; gap:10px; background:#FFFFFF; padding:28px; border-radius:12px; border:1px solid #E2DED3">
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">过程遥测</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">参数、曲线、失败时刻、操作顺序</p>
+  </div>
+  <x-connector x1="764" y1="430" x2="812" y2="430" head="end" style="color:#9AA3B2; border-width:4px"></x-connector>
+  <div data-build-in="pop 3" style="position:absolute; left:816px; top:300px; width:288px; height:260px; display:flex; flex-direction:column; gap:10px; background:#B5452F; padding:28px; border-radius:12px">
+    <h3 style="font-size:30px; font-weight:700; color:#FBF3EF">AI 服务层</h3>
+    <p style="font-size:24px; line-height:1.5; color:#FBEDE8">诊断、示范调参、自然语言指挥、过程评价</p>
+  </div>
+  <x-connector x1="1108" y1="430" x2="1156" y2="430" head="end" style="color:#9AA3B2; border-width:4px"></x-connector>
+  <div data-build-in="rise 4" style="position:absolute; left:1160px; top:300px; width:288px; height:260px; display:flex; flex-direction:column; gap:10px; background:#FFFFFF; padding:28px; border-radius:12px; border:1px solid #E2DED3">
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">问渠课程</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">LTI 1.3 接入，成绩回写，教师复核</p>
+  </div>
+  <x-connector x1="1452" y1="430" x2="1500" y2="430" head="end" style="color:#9AA3B2; border-width:4px"></x-connector>
+  <div data-build-in="rise 5" style="position:absolute; left:1504px; top:300px; width:288px; height:260px; display:flex; flex-direction:column; gap:10px; background:#14213D; padding:28px; border-radius:12px">
+    <h3 style="font-size:30px; font-weight:700; color:#F7F5EF">实验空间</h3>
+    <p style="font-size:24px; line-height:1.5; color:#C9D3E3">按国家平台接口上报，支撑一流课程申报</p>
+  </div>
+  <div data-build-in="rise 6" style="position:absolute; left:128px; top:612px; width:804px; display:flex; flex-direction:column; gap:10px; background:#FFFFFF; padding:28px 32px; border-radius:12px; border-top:6px solid #2F7D5B">
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">基础档 · 浏览器仿真</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">MuJoCo 编译为 WebAssembly，在网页和小程序里运行。不占服务器，千人同时实验也不卡。</p>
+  </div>
+  <div data-build-in="rise 7" style="position:absolute; left:988px; top:612px; width:804px; display:flex; flex-direction:column; gap:10px; background:#FFFFFF; padding:28px 32px; border-radius:12px; border-top:6px solid #E08A2E">
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">进阶档 · ROS 2 容器</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">Gazebo + ROS 2，每人一个容器，做 SLAM、导航、抓取。按使用时长计费，是云服务的增值项。</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6B7280">仿真内核与 AI 之间只传遥测数据和参数，内核可替换；AI 调用同样经过模型网关，使用已备案模型</p>
+  <aside>从左到右逐个出现，讲一次实验的数据怎么流动。关键点有三个：第一，仿真内核和 AI 解耦，今天用 MuJoCo，明天换别的内核，AI 部分不用改；第二，成绩通过 LTI 回写问渠课程，老师复核后才生效；第三，数据可以按“实验空间”国家平台的规范上报，这是学校申报虚拟仿真一流课程时最关心的。下面两档：基础档零服务器成本，适合大规模必修课；进阶档给机器人、自动化专业，按时长收费。</aside>
+</section>

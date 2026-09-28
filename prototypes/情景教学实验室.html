@@ -1,0 +1,325 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>情景教学实验室</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F2F5F4; --surface:#FFFFFF; --surface2:#E7EEEC; --line:#D3DDDA;
+  --ink:#13211E; --ink2:#3F514D; --muted:#6B7C78;
+  --accent:#23796C; --accent-ink:#FFFFFF; --accent-soft:#DCEFEA;
+  --warm:#9A5B12; --warm-soft:#FBEEDB; --bad:#B42318; --bad-soft:#FBE4E1;
+  --me:#13211E; --me-ink:#F2F5F4;
+  --sans:'Noto Sans SC','PingFang SC','Microsoft YaHei',Arial,sans-serif;
+  --serif:'Noto Serif SC','Songti SC',Georgia,serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0F1614; --surface:#17211F; --surface2:#1F2C29; --line:#2C3D39;
+  --ink:#E6EFEC; --ink2:#B4C4C0; --muted:#879A95;
+  --accent:#5CC8B5; --accent-ink:#0B1614; --accent-soft:#16332D;
+  --warm:#E9B46A; --warm-soft:#33260F; --bad:#F08A7E; --bad-soft:#3A1D1A;
+  --me:#E6EFEC; --me-ink:#0F1614;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1614; --surface:#17211F; --surface2:#1F2C29; --line:#2C3D39;
+  --ink:#E6EFEC; --ink2:#B4C4C0; --muted:#879A95;
+  --accent:#5CC8B5; --accent-ink:#0B1614; --accent-soft:#16332D;
+  --warm:#E9B46A; --warm-soft:#33260F; --bad:#F08A7E; --bad-soft:#3A1D1A;
+  --me:#E6EFEC; --me-ink:#0F1614;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:28px 48px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:22px}
+h1{font-family:var(--serif);font-size:30px;margin:0;line-height:1.2}
+header p{margin:4px 0 0;color:var(--muted);max-width:640px}
+.pill{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+button{font:inherit;cursor:pointer}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;padding:9px 18px;border-radius:10px}
+.btn.ghost{background:var(--surface2);color:var(--ink);font-weight:500}
+.btn:disabled{opacity:.5;cursor:default}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px;text-align:left;color:var(--ink)}
+.card:hover{border-color:var(--accent)}
+.card .sub{font-size:12px;letter-spacing:1px;color:var(--accent);font-weight:700}
+.card h2{font-size:19px;margin:0}
+.card p{margin:0;color:var(--ink2);font-size:14px}
+.card.new{border-style:dashed;background:transparent}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.panel h3{margin:0 0 8px;font-size:15px}
+.panel p,.panel li{font-size:14px;color:var(--ink2);margin:0}
+.panel ul{padding-left:18px;margin:0;display:flex;flex-direction:column;gap:4px}
+.side{display:flex;flex-direction:column;gap:14px}
+.chat{display:flex;flex-direction:column;height:min(640px,72vh)}
+.chat-head{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
+.chat-head b{font-size:16px}
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:4px 2px}
+.m{max-width:82%;padding:10px 14px;border-radius:14px;white-space:pre-wrap;word-break:break-word}
+.m.role{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:4px}
+.m.me{align-self:flex-end;background:var(--me);color:var(--me-ink);border-bottom-right-radius:4px}
+.m.sys{align-self:center;background:transparent;color:var(--muted);font-size:13px;text-align:center}
+.who{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+.m.me .who{color:inherit;opacity:.7}
+.ask{display:flex;gap:8px;margin-top:10px}
+.ask textarea{flex:1;min-width:0;resize:none;height:48px;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.note{font-size:13px;color:var(--muted)}
+.warn{margin-bottom:16px;background:var(--warm-soft);color:var(--warm);border-radius:10px;padding:10px 14px;font-size:14px}
+details summary{cursor:pointer;font-weight:700;font-size:14px}
+details[open] summary{margin-bottom:8px}
+.hidden-info{background:var(--warm-soft);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--ink2);white-space:pre-wrap}
+/* debrief */
+.debrief{display:flex;flex-direction:column;gap:16px}
+.crit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.crit:last-child{border-bottom:0}
+.crit b{font-size:16px}
+.stars{font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent)}
+.bar{grid-column:1/-1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.crit p{grid-column:1/-1;margin:0;font-size:14px;color:var(--ink2)}
+.crit .ev{color:var(--muted);font-size:13px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:700px){.two{grid-template-columns:1fr}}
+.good{border-left:4px solid var(--accent)}
+.miss{border-left:4px solid var(--warm)}
+/* editor */
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:700px){.form{grid-template-columns:1fr}}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.form .full{grid-column:1/-1}
+.form input,.form textarea{font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink)}
+.form textarea{min-height:84px;resize:vertical}
+.thinking::after{content:"…";animation:dots 1.2s steps(3,end) infinite}
+@keyframes dots{0%{content:""}33%{content:"."}66%{content:".."}100%{content:"..."}}
+@media (prefers-reduced-motion:reduce){.thinking::after{animation:none;content:"…"}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>情景教学实验室</h1>
+      <p>AI 按老师设定扮演情景中的角色，学生在对话中完成任务；结束后按评分标准复盘。</p>
+    </div>
+    <span class="pill">问渠 WenQuest · 情景教学模块样品</span>
+  </header>
+  <div id="notice" class="warn" hidden></div>
+  <main id="app"></main>
+</div>
+
+<script>
+(function(){
+const app=document.getElementById('app');
+const notice=document.getElementById('notice');
+let sample=null, sampleReady=false;
+
+const SCENARIOS=[
+ {id:'nurse', sub:'护理学 · 急诊分诊', title:'胸闷的王先生',
+  role:'王建国，58 岁男性，出租车司机',
+  persona:'紧张、话少，一般只回答被问到的内容。如果护士语气冷淡、只顾记录，他会更不愿多说；护士先安抚、解释为什么要问这些，他会放松并说得更多。说话朴实口语化。',
+  public:'王先生自己走到急诊分诊台，说“胸口闷”。你是分诊护士，请完成初步问诊和分诊判断。',
+  hidden:'胸闷约 2 小时，是压迫感，像被石头压着，会往左肩和左臂放射；伴有出汗、有点恶心。\n今天早上搬家具之后开始。\n高血压 10 年，降压药“想起来才吃”。\n吸烟 30 年，每天一包。\n父亲 60 岁时因心梗去世。\n没有药物过敏。',
+  goals:'系统采集主诉、现病史、既往史和危险因素；识别急性冠脉综合征的危险信号并立即报告医生、安排优先处置；体现人文关怀。',
+  criteria:['病史采集完整性','危险信号识别与处置','沟通与人文关怀'],
+  opening:'（捂着胸口）护士……我这儿有点闷，能不能先让我看个医生？',
+  lang:'zh'},
+ {id:'zhangqian', sub:'历史 · 人物访谈', title:'对话张骞',
+  role:'张骞，西汉外交家，刚从西域归来，被封博望侯前后',
+  persona:'沉稳、坦率，愿意讲述亲身经历，语言为现代汉语但带一点古雅。只依据《史记·大宛列传》和《汉书·张骞传》的记载回答；史书没有记载的细节，以角色口吻说明“史书未载，不敢妄言”，绝不编造。',
+  public:'你是一名“穿越”的记者，获准采访刚回到长安的张骞。请通过提问了解他出使西域的经过与意义。',
+  hidden:'据史书记载：汉武帝建元年间应募出使，目的是联络大月氏共击匈奴；出发时随从一百多人，途中被匈奴扣留十余年，并在当地娶妻生子；后逃脱，经大宛、康居到达大月氏，但大月氏已安居，无意报复匈奴；归途又被匈奴扣留一年多，趁匈奴内乱逃回，出发十三年后只有他和堂邑父两人回到汉朝；他向武帝报告了西域诸国的地理、物产和风俗。',
+  goals:'通过有层次的提问还原出使经过；理解出使的目的与结果；思考这次出使对中西交通的意义。',
+  criteria:['提问的层次与深度','史实把握','历史思辨'],
+  opening:'记者远道而来，辛苦了。骞离开长安十三年，今日方归。你想问什么，但说无妨。',
+  lang:'zh'},
+ {id:'interview', sub:'英语 · 职场口语', title:'Internship Interview',
+  role:'Ms. Carter, engineering manager at a software company hiring summer interns',
+  persona:'Friendly but professional. Speaks natural, clear English at a moderate level. Asks one question at a time; if an answer is vague, asks for a concrete example. Never corrects the candidate\'s English during the interview.',
+  public:'You are applying for a software engineering summer internship. Answer the interviewer\'s questions in English.',
+  hidden:'The team values teamwork and clear communication. She plans to ask about: a project the candidate is proud of, a time they solved a hard bug, how they work in a team, and why this company. At the end she invites the candidate to ask questions.',
+  goals:'用英语清楚介绍自己和项目经历；用具体例子回答行为面试问题；恰当地提问和结束面试。',
+  criteria:['语言准确与流利','内容与例子','互动与礼仪'],
+  opening:'Hi, thanks for coming in today! Could you start by telling me a little about yourself?',
+  lang:'en'}
+];
+let custom=null;
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------- home ---------- */
+function home(){
+  app.innerHTML='<div class="cards" id="cards"></div>';
+  const list=[...SCENARIOS]; if(custom) list.push(custom);
+  const cards=document.getElementById('cards');
+  list.forEach(s=>{
+    const b=document.createElement('button');b.className='card';b.type='button';
+    b.innerHTML=`<span class="sub">${esc(s.sub)}</span><h2>${esc(s.title)}</h2><p>${esc(s.public)}</p>`;
+    b.onclick=()=>brief(s);cards.appendChild(b);
+  });
+  const n=document.createElement('button');n.className='card new';n.type='button';
+  n.innerHTML='<span class="sub">教师</span><h2>＋ 设计一个新情景</h2><p>填写角色、背景、隐藏信息和评分标准，立即试用。</p>';
+  n.onclick=editor;cards.appendChild(n);
+}
+
+/* ---------- teacher editor ---------- */
+function editor(){
+  const s=custom||{title:'',sub:'自定义情景',role:'',persona:'',public:'',hidden:'',goals:'',criteria:['',''],opening:'',lang:'zh'};
+  app.innerHTML=`<div class="panel"><h3>设计一个新情景</h3><p class="note" style="margin-bottom:14px">老师在这里设定，学生只会看到“公开背景”和“学习目标”。</p>
+  <form class="form" id="f">
+    <label>情景名称<input id="f-title" required value="${esc(s.title)}" placeholder="例：处理客户投诉"></label>
+    <label>课程 / 场景标签<input id="f-sub" value="${esc(s.sub)}" placeholder="例：市场营销 · 客户服务"></label>
+    <label class="full">AI 扮演的角色<input id="f-role" required value="${esc(s.role)}" placeholder="例：一位因物流延误而生气的老顾客"></label>
+    <label class="full">角色性格与说话方式<textarea id="f-persona" placeholder="例：情绪激动，被认真倾听后会逐渐缓和">${esc(s.persona)}</textarea></label>
+    <label class="full">公开背景（学生可见）<textarea id="f-public" required>${esc(s.public)}</textarea></label>
+    <label class="full">隐藏信息（学生问到才透露）<textarea id="f-hidden">${esc(s.hidden)}</textarea></label>
+    <label class="full">学习目标<textarea id="f-goals">${esc(s.goals)}</textarea></label>
+    <label>评分标准（每行一项）<textarea id="f-crit">${esc(s.criteria.join('\n'))}</textarea></label>
+    <label>角色开场白<textarea id="f-open" required>${esc(s.opening)}</textarea></label>
+    <div class="row full"><button class="btn" type="submit">保存并试用</button><button class="btn ghost" type="button" id="f-cancel">返回</button></div>
+  </form></div>`;
+  document.getElementById('f-cancel').onclick=home;
+  document.getElementById('f').addEventListener('submit',e=>{
+    e.preventDefault();const v=id=>document.getElementById(id).value.trim();
+    custom={id:'custom',sub:v('f-sub')||'自定义情景',title:v('f-title'),role:v('f-role'),persona:v('f-persona'),public:v('f-public'),hidden:v('f-hidden'),goals:v('f-goals'),
+      criteria:v('f-crit').split('\n').map(x=>x.trim()).filter(Boolean).slice(0,6),opening:v('f-open'),lang:/[一-鿿]/.test(v('f-open'))?'zh':'en'};
+    if(!custom.criteria.length)custom.criteria=['任务完成度','沟通表现'];
+    brief(custom);
+  });
+}
+
+/* ---------- scenario page ---------- */
+let turns=[], ctl=null, current=null, busy=false;
+function brief(s){
+  current=s;turns=[{role:'assistant',content:s.opening}];
+  app.innerHTML=`<div class="layout">
+   <section class="panel chat">
+     <div class="chat-head"><div><b>${esc(s.title)}</b><div class="note">AI 扮演：${esc(s.role)}</div></div>
+       <div class="row"><button class="btn ghost" id="back" type="button">换情景</button><button class="btn" id="end" type="button">结束并复盘</button></div></div>
+     <div class="msgs" id="msgs" aria-live="polite"></div>
+     <form class="ask" id="ask"><textarea id="input" placeholder="${s.lang==='en'?'Type your reply in English…':'输入你要说的话，Enter 发送'}" aria-label="你的回复"></textarea><button class="btn" id="send">发送</button></form>
+     <p class="note" id="status" style="margin:6px 0 0"></p>
+   </section>
+   <aside class="side">
+     <div class="panel"><h3>情景背景</h3><p>${esc(s.public)}</p></div>
+     <div class="panel"><h3>学习目标</h3><p>${esc(s.goals)}</p></div>
+     <div class="panel"><h3>评分标准</h3><ul>${s.criteria.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>
+     <div class="panel"><details><summary>教师视图：隐藏信息与角色设定</summary>
+       <p class="note" style="margin-bottom:6px">学生端不显示这一栏。</p>
+       <div class="hidden-info">${esc(s.hidden||'（无）')}</div>
+       <p class="note" style="margin-top:8px">角色性格：${esc(s.persona||'（未设定）')}</p></details></div>
+   </aside></div>`;
+  document.getElementById('back').onclick=()=>{ctl?.abort();home();};
+  document.getElementById('end').onclick=debrief;
+  const input=document.getElementById('input');
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send();}});
+  document.getElementById('ask').addEventListener('submit',e=>{e.preventDefault();send();});
+  renderMsgs();
+  if(!sample&&sampleReady)setStatus('当前环境不能调用 AI：请在 Claude 应用或 claude.ai 中打开此页面进行对话。');
+}
+function renderMsgs(streaming){
+  const box=document.getElementById('msgs');if(!box)return;
+  box.innerHTML='';
+  box.insertAdjacentHTML('beforeend',`<div class="m sys">情景开始 · 以下对话由 AI 扮演角色生成</div>`);
+  turns.forEach(t=>{const d=document.createElement('div');d.className='m '+(t.role==='user'?'me':'role');
+    d.innerHTML=`<span class="who">${t.role==='user'?'你':esc(current.role.split('，')[0].split(',')[0])}</span>`;
+    const span=document.createElement('span');span.textContent=t.content;d.appendChild(span);box.appendChild(d);});
+  if(streaming!==undefined){const d=document.createElement('div');d.className='m role';d.innerHTML=`<span class="who">${esc(current.role.split('，')[0].split(',')[0])}</span>`;
+    const span=document.createElement('span');span.id='live';if(streaming)span.textContent=streaming;else span.className='thinking';d.appendChild(span);box.appendChild(d);}
+  box.scrollTop=box.scrollHeight;
+}
+function setStatus(t){const el=document.getElementById('status');if(el)el.textContent=t||'';}
+function rules(s){
+  return `你正在一个教学情景模拟中扮演角色，对话对象是学生。
+【角色】${s.role}
+【性格与说话方式】${s.persona}
+【情景（学生已知）】${s.public}
+【隐藏信息】${s.hidden}
+规则：
+1. 始终以角色身份说话，不跳出角色，不给学生任何提示、教学点评或打分。
+2. 隐藏信息只有在学生问到相关内容时才透露，而且只透露被问到的那部分；不要主动一次说完。
+3. 回答简短自然、口语化，一般 1 到 4 句；可以用括号描写简单动作或神态。
+4. 如果学生说的话与情景无关或不恰当，以角色身份自然地把话题拉回情景。
+5. 不编造与设定矛盾的事实；设定中没有的信息，按角色合理地表示不知道或不清楚。
+6. ${s.lang==='en'?'Speak only in English.':'使用简体中文。'}
+下面是到目前为止的对话，最后一条是学生刚说的话。请只输出角色的下一句回复。`;
+}
+async function send(){
+  const input=document.getElementById('input');const text=input.value.trim();
+  if(!text||busy)return;
+  if(!sample){setStatus('当前环境不能调用 AI：请在 Claude 应用或 claude.ai 中打开此页面。');return;}
+  busy=true;input.value='';document.getElementById('send').disabled=true;setStatus('');
+  turns.push({role:'user',content:text});renderMsgs('');
+  ctl=new AbortController();
+  const payload=[{role:'user',content:rules(current)},...turns.slice(-24)];
+  try{
+    const {text:reply}=await sample(payload,{modelTier:'quick',cache:false,signal:ctl.signal,onText:({text})=>{const l=document.getElementById('live');if(l){l.className='';l.textContent=text;document.getElementById('msgs').scrollTop=1e9;}}});
+    turns.push({role:'assistant',content:reply.trim()});renderMsgs();
+  }catch(e){
+    if(e.text){turns.push({role:'assistant',content:e.text});}
+    else turns.pop();
+    renderMsgs();
+    if(e.code!=='cancelled')setStatus(errCopy(e.code));
+    if(!e.text&&e.code!=='cancelled')input.value=text;
+  }finally{busy=false;const b=document.getElementById('send');if(b)b.disabled=false;}
+}
+function errCopy(code){
+  return ({not_granted:'你没有允许此页面使用 Claude，对话功能已关闭。刷新页面可重新选择。',rate_limited:'请求太频繁或已达到使用上限，请稍后再试。',session_expired:'登录已过期，请重新登录 Claude。',sampling_disabled:'你的账户或组织未开启此功能。',refused:'这句话无法回应，换一种说法试试。'})[code]||'连接出了问题，请再发送一次。';
+}
+
+/* ---------- debrief ---------- */
+async function debrief(){
+  const said=turns.filter(t=>t.role==='user').length;
+  if(said<2){setStatus('至少对话两轮后再复盘。');return;}
+  if(!sample){setStatus('当前环境不能调用 AI。');return;}
+  ctl?.abort();
+  const s=current;
+  const transcript=turns.map(t=>(t.role==='user'?'学生：':'角色：')+t.content).join('\n');
+  app.innerHTML=`<div class="panel"><h3>${esc(s.title)} · 复盘</h3><p class="thinking" id="dstat">AI 正在按评分标准分析对话</p></div>`;
+  const prompt=`你是一位经验丰富的${s.sub}任课教师，请根据评分标准评价学生在下面这段情景模拟中的表现。
+【情景】${s.public}
+【学习目标】${s.goals}
+【只有老师知道的隐藏信息】${s.hidden}
+【评分标准】${s.criteria.map((c,i)=>(i+1)+'. '+c).join('；')}
+【对话记录】
+${transcript.slice(-20000)}
+
+要求：每项评分 1–5 分（5 为优秀），必须引用学生的原话作为依据；指出学生没有问到或没有做到的关键点（对照隐藏信息与学习目标）；语气具体、建设性，面向学生。${s.lang==='en'?'评语用中文写，并在 corrections 中给出学生英语表达的改进（原句→更好的说法），最多 4 条。':'corrections 返回空数组。'}
+只输出一个 JSON 对象，格式：
+{"overall":"两三句总体评价","criteria":[{"name":"评分标准名称","score":4,"evidence":"引用学生原话","suggestion":"改进建议"}],"strengths":["做得好的地方"],"missed":["遗漏的关键点"],"corrections":[{"original":"","better":""}]}`;
+  try{
+    const r=await sample.json(prompt,{cache:false});
+    renderDebrief(r,transcript);
+  }catch(e){
+    app.innerHTML=`<div class="panel"><h3>复盘没有完成</h3><p>${esc(e.code==='invalid_json'?'AI 返回的格式不对，请再试一次。':errCopy(e.code))}</p><div class="row" style="margin-top:12px"><button class="btn" id="retry">再试一次</button><button class="btn ghost" id="home2">换情景</button></div></div>`;
+    document.getElementById('retry').onclick=debrief;document.getElementById('home2').onclick=home;
+  }
+}
+function renderDebrief(r,transcript){
+  const s=current;const crit=Array.isArray(r.criteria)?r.criteria:[];
+  const avg=crit.length?(crit.reduce((a,c)=>a+(+c.score||0),0)/crit.length):0;
+  const list=a=>(Array.isArray(a)&&a.length)?'<ul>'+a.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':'<p class="note">（无）</p>';
+  app.innerHTML=`<div class="debrief">
+    <div class="panel"><div class="row" style="justify-content:space-between"><h3 style="margin:0">${esc(s.title)} · 复盘</h3><span class="pill">AI 生成 · 教师审核后计入成绩</span></div>
+      <p style="margin-top:10px;font-size:15px;color:var(--ink)">${esc(r.overall||'')}</p>
+      <p class="note" style="margin-top:8px">综合 ${avg.toFixed(1)} / 5 · 对话 ${turns.filter(t=>t.role==='user').length} 轮</p></div>
+    <div class="panel">${crit.map(c=>{const sc=Math.max(0,Math.min(5,+c.score||0));return `<div class="crit"><b>${esc(c.name||'')}</b><span class="stars">${sc} / 5</span><div class="bar"><i style="width:${sc*20}%"></i></div><p class="ev">依据：${esc(c.evidence||'')}</p><p>建议：${esc(c.suggestion||'')}</p></div>`}).join('')}</div>
+    <div class="two"><div class="panel good"><h3>做得好的地方</h3>${list(r.strengths)}</div><div class="panel miss"><h3>遗漏的关键点</h3>${list(r.missed)}</div></div>
+    ${Array.isArray(r.corrections)&&r.corrections.length?`<div class="panel"><h3>英语表达改进</h3><ul>${r.corrections.map(c=>`<li>${esc(c.original||'')} → <b>${esc(c.better||'')}</b></li>`).join('')}</ul></div>`:''}
+    <div class="panel"><details><summary>完整对话记录（教师可见）</summary><div class="hidden-info" style="background:var(--surface2)">${esc(transcript)}</div></details></div>
+    <div class="row"><button class="btn" id="again">再练一次</button><button class="btn ghost" id="home3">换情景</button></div></div>`;
+  document.getElementById('again').onclick=()=>brief(s);document.getElementById('home3').onclick=home;
+}
+
+/* ---------- boot ---------- */
+home();
+(async()=>{
+  try{ sample = window.claude?.use ? await window.claude.use('sample') : null; }catch(e){ sample=null; }
+  sampleReady=true;
+  if(!sample){notice.hidden=false;notice.textContent='对话功能需要在 Claude 应用或 claude.ai 中打开此页面。你仍可以浏览情景和设计新情景。';}
+})();
+})();
+</script>
+
+</body></html>

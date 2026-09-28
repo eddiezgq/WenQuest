@@ -1,0 +1,444 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>问渠早期原型</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --surface2:#E9EDF3; --line:#D8DEE7;
+  --ink:#14213D; --ink2:#44506A; --muted:#6B7488;
+  --accent:#B5452F; --accent-soft:#F8E6E0; --accent-ink:#7A2A1B;
+  --good:#1F7A55; --good-soft:#DDF1E7; --warn:#9A6200; --warn-soft:#FBEFD5; --bad:#B42318; --bad-soft:#FBE3E0;
+  --nav:#14213D; --nav-ink:#E9EDF5;
+  --sans:'Noto Sans SC','PingFang SC','Microsoft YaHei',Arial,sans-serif;
+  --serif:'Noto Serif SC','Songti SC',Georgia,serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0F1522; --surface:#172033; --surface2:#1E2940; --line:#2B3854;
+  --ink:#E9EDF5; --ink2:#B7C1D4; --muted:#8B96AD;
+  --accent:#E07A61; --accent-soft:#3A2520; --accent-ink:#F4B7A6;
+  --good:#5CC79A; --good-soft:#15332A; --warn:#E3B04F; --warn-soft:#352A12; --bad:#F07F72; --bad-soft:#3A1E1B;
+  --nav:#0A0F1A; --nav-ink:#E9EDF5;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1522; --surface:#172033; --surface2:#1E2940; --line:#2B3854;
+  --ink:#E9EDF5; --ink2:#B7C1D4; --muted:#8B96AD;
+  --accent:#E07A61; --accent-soft:#3A2520; --accent-ink:#F4B7A6;
+  --good:#5CC79A; --good-soft:#15332A; --warn:#E3B04F; --warn-soft:#352A12; --bad:#F07F72; --bad-soft:#3A1E1B;
+  --nav:#0A0F1A; --nav-ink:#E9EDF5;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:0 40px}
+header.top{background:var(--nav);color:var(--nav-ink);padding-inline:20px}
+.top-in{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding-block:14px}
+.brand{font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:.5px}
+.crumb{font-size:13px;opacity:.8}
+.demo-tag{margin-left:auto;font-size:12px;border:1px solid rgba(233,237,245,.4);padding:3px 10px;border-radius:999px}
+.course{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:28px 18px}
+.course h1{font-family:var(--serif);font-size:30px;margin:0;line-height:1.2;text-wrap:balance}
+.course p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.role{display:flex;gap:6px;background:var(--surface2);padding:4px;border-radius:10px}
+.role button{border:0;background:transparent;color:var(--ink2);font:inherit;font-size:14px;padding:6px 14px;border-radius:7px;cursor:pointer}
+.role button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+nav.tabs button{border:0;background:none;font:inherit;color:var(--muted);padding:10px 16px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{padding-top:22px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.box h2{font-size:16px;margin:0 0 12px}
+.label{font-size:12px;letter-spacing:1px;color:var(--muted)}
+.ai-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);padding:1px 8px;border-radius:999px;letter-spacing:.5px}
+/* chat */
+.chat{display:flex;flex-direction:column;height:560px}
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding-right:4px}
+.msg{max-width:88%;padding:10px 14px;border-radius:12px;white-space:pre-wrap}
+.msg.me{align-self:flex-end;background:var(--ink);color:var(--bg)}
+.msg.ai{align-self:flex-start;background:var(--surface2)}
+.msg .src{margin-top:8px;font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink2);font:inherit;font-size:13px;padding:4px 12px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--accent);color:var(--accent-ink)}
+.ask{display:flex;gap:8px}
+.ask input{flex:1;min-width:0;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.btn{border:0;font:inherit;font-weight:700;background:var(--accent);color:#fff;padding:9px 18px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:var(--surface2);color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.kb li{margin-bottom:6px}
+.kb{padding-left:18px;margin:0;color:var(--ink2);font-size:14px}
+.rule{font-size:13px;color:var(--ink2);background:var(--warn-soft);border-radius:8px;padding:10px 12px;margin-top:12px}
+/* grading */
+.sub-list{display:flex;flex-direction:column;gap:6px}
+.sub{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--surface);color:var(--ink);font:inherit;text-align:left}
+.sub[aria-current="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pill{font-size:12px;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.pill.pending{background:var(--warn-soft);color:var(--warn)}
+.pill.done{background:var(--good-soft);color:var(--good)}
+.pill.risk{background:var(--bad-soft);color:var(--bad)}
+.essay{background:var(--surface2);border-radius:10px;padding:14px;font-size:14px;color:var(--ink2);max-height:210px;overflow-y:auto;white-space:pre-wrap}
+.crit{display:grid;grid-template-columns:minmax(0,1fr) 150px 64px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.crit:last-of-type{border-bottom:0}
+.crit .why{grid-column:1/-1;font-size:13px;color:var(--muted);margin-top:-4px}
+.crit input[type=range]{width:100%;accent-color:var(--accent)}
+.score{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin:10px 0}
+.total b{font-size:28px;font-family:var(--serif);font-variant-numeric:tabular-nums}
+textarea{width:100%;min-height:110px;font:inherit;font-size:14px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);resize:vertical}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.note{font-size:13px;color:var(--muted)}
+/* analytics */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+@media (max-width:700px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi b{display:block;font-size:26px;font-family:var(--serif);font-variant-numeric:tabular-nums}
+.kpi span{font-size:13px;color:var(--muted)}
+.chartbox{overflow-x:auto}
+.risk-row{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
+.risk-row:last-child{border-bottom:0}
+.risk-row p{margin:0;font-size:13px;color:var(--ink2)}
+/* quiz gen */
+.form{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:16px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.q{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface);margin-bottom:12px}
+.q-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.tag{font-size:12px;background:var(--surface2);color:var(--ink2);padding:1px 8px;border-radius:6px}
+.q ol{margin:6px 0 0;padding-left:22px}
+.q .ans{font-size:13px;color:var(--muted);margin-top:8px}
+footer.gw{margin-top:28px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;display:flex;flex-wrap:wrap;gap:6px 18px}
+.typing::after{content:"▍";animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.typing::after{animation:none}}
+</style>
+
+<header class="top"><div class="top-in">
+  <span class="brand">问渠 WenQuest</span>
+  <span class="crumb">计算机学院 / 2026 秋季 / 数据结构</span>
+  <span class="demo-tag">演示原型 · 全部为模拟数据</span>
+</div></header>
+
+<div class="wrap">
+  <div class="course">
+    <div>
+      <h1>数据结构（CS201）</h1>
+      <p>主讲：王老师 · 选课 86 人 · 第 5 周：栈、队列与递归</p>
+    </div>
+    <div class="role" role="group" aria-label="切换视角">
+      <button id="role-student" aria-pressed="true">学生视角</button>
+      <button id="role-teacher" aria-pressed="false">教师视角</button>
+    </div>
+  </div>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <!-- AI 助教 -->
+  <section class="panel" id="p-tutor" data-roles="student">
+    <div class="grid2">
+      <div class="box chat">
+        <h2>课程 AI 助教 <span class="ai-badge">AI 生成</span></h2>
+        <div class="msgs" id="msgs" aria-live="polite"></div>
+        <div class="chips" id="chips"></div>
+        <form class="ask" id="ask-form">
+          <input id="ask-input" placeholder="问一个关于本课程的问题" autocomplete="off">
+          <button class="btn" id="ask-btn">发送</button>
+        </form>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="box">
+          <h2>助教的知识来源</h2>
+          <ul class="kb">
+            <li>讲义 第 3 章《栈与队列》</li>
+            <li>讲义 第 4 章《递归》</li>
+            <li>教材《数据结构（C 语言版）》第 3 章</li>
+            <li>往届答疑精选 42 条</li>
+          </ul>
+          <p class="note" style="margin:10px 0 0">回答只依据以上资料，并注明出处。</p>
+        </div>
+        <div class="box">
+          <h2>本周作业的 AI 使用规则</h2>
+          <p style="margin:0;font-size:14px"><b>作业 5：用栈实现括号匹配</b></p>
+          <div class="rule">允许辅助：助教可以解释概念、提示思路，但不会给出完整代码。提交时需声明 AI 使用情况。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 我的学习 -->
+  <section class="panel" id="p-path" data-roles="student" hidden>
+    <div class="grid2">
+      <div class="box">
+        <h2>我的知识点掌握度</h2>
+        <div class="chartbox" id="my-chart"></div>
+      </div>
+      <div class="box">
+        <h2>为你推荐 <span class="ai-badge">AI 生成</span></h2>
+        <ol class="kb" style="padding-left:20px">
+          <li><b>复习：递归的终止条件</b><br>讲义 4.2 节，约 15 分钟。你在测验 4 的第 3、5 题都与此有关。</li>
+          <li><b>练习：递归转非递归 3 题</b><br>基础难度，巩固用栈模拟递归调用。</li>
+          <li><b>预习：循环队列</b><br>下周课程内容，讲义 3.4 节。</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 智能批改 -->
+  <section class="panel" id="p-grade" data-roles="teacher" hidden>
+    <div class="grid2">
+      <div class="box">
+        <h2>作业 5 · 实验报告：用栈实现括号匹配</h2>
+        <p class="label" id="essay-who"></p>
+        <div class="essay" id="essay"></div>
+        <h2 style="margin-top:18px">评分量规与 AI 建议分 <span class="ai-badge">AI 建议</span></h2>
+        <div id="crits"></div>
+        <div class="total"><span>总分（满分 100）</span><b id="total"></b></div>
+        <label class="label" for="feedback">给学生的反馈（可修改）</label>
+        <textarea id="feedback"></textarea>
+        <div class="actions">
+          <button class="btn" id="approve">审核通过并发布</button>
+          <span class="note" id="grade-note">AI 只给建议，发布前由教师确认。</span>
+        </div>
+      </div>
+      <div class="box">
+        <h2>提交列表</h2>
+        <div class="sub-list" id="subs"></div>
+        <p class="note" style="margin-top:12px">已提交 4 份示例。AI 预批改平均用时 8 秒，教师审核后才对学生可见。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 学情分析 -->
+  <section class="panel" id="p-stats" data-roles="teacher" hidden>
+    <div class="kpis">
+      <div class="kpi"><b>86</b><span>选课人数</span></div>
+      <div class="kpi"><b>1,204</b><span>本周助教提问次数</span></div>
+      <div class="kpi"><b>78.4</b><span>测验 4 平均分</span></div>
+      <div class="kpi"><b style="color:var(--bad)">5</b><span>需关注学生</span></div>
+    </div>
+    <div class="grid2">
+      <div class="box">
+        <h2>全班知识点掌握度</h2>
+        <div class="chartbox" id="class-chart"></div>
+        <p class="note" style="margin:8px 0 0">“递归终止条件”掌握度最低，也是本周助教被问最多的主题（312 次）。建议下次课用 10 分钟集中讲解。</p>
+      </div>
+      <div class="box">
+        <h2>学业预警 <span class="ai-badge">AI 生成</span></h2>
+        <div id="risks"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 智能出题 -->
+  <section class="panel" id="p-quiz" data-roles="teacher" hidden>
+    <div class="box">
+      <h2>智能出题 <span class="ai-badge">AI 生成</span></h2>
+      <div class="form">
+        <label for="q-topic">知识点
+          <select id="q-topic"><option value="stack">栈的基本操作</option><option value="recur">递归终止条件</option><option value="queue">循环队列</option></select>
+        </label>
+        <label for="q-level">难度
+          <select id="q-level"><option value="1">基础</option><option value="2" selected>中等</option><option value="3">提高</option></select>
+        </label>
+        <button class="btn" id="q-gen">生成题目</button>
+        <span class="note" id="q-note"></span>
+      </div>
+      <div id="q-out"></div>
+    </div>
+  </section>
+
+  <footer class="gw">
+    <span>模型：[已备案模型名称] · 备案号：[待填写]</span>
+    <span>经模型网关调用，已去除学生身份信息</span>
+    <span>标有“AI”的内容由人工智能生成</span>
+  </footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const TABS = {
+  student:[["p-tutor","AI 助教"],["p-path","我的学习"]],
+  teacher:[["p-grade","智能批改"],["p-stats","学情分析"],["p-quiz","智能出题"]]
+};
+let role = "student";
+function renderTabs(active){
+  const nav = $("#tabs"); nav.innerHTML = "";
+  const list = TABS[role]; active = active || list[0][0];
+  list.forEach(([id,name])=>{
+    const b = document.createElement("button");
+    b.setAttribute("role","tab"); b.textContent = name;
+    b.setAttribute("aria-selected", id===active);
+    b.onclick = ()=>renderTabs(id);
+    nav.appendChild(b);
+  });
+  document.querySelectorAll(".panel").forEach(p=>p.hidden = p.id!==active);
+}
+function setRole(r){
+  role = r;
+  $("#role-student").setAttribute("aria-pressed", r==="student");
+  $("#role-teacher").setAttribute("aria-pressed", r==="teacher");
+  renderTabs();
+}
+$("#role-student").onclick=()=>setRole("student");
+$("#role-teacher").onclick=()=>setRole("teacher");
+
+/* ---------- AI 助教 ---------- */
+const QA = [
+  {k:["栈","队列","区别"], q:"栈和队列有什么区别？",
+   a:"栈是“后进先出”（LIFO）：只能在栈顶插入和删除，像一摞盘子。\n队列是“先进先出”（FIFO）：从队尾进、从队头出，像排队买饭。\n\n判断用哪个，可以问自己：最先处理的，是最早来的还是最晚来的？",
+   s:"讲义 3.1 节、3.3 节；教材 第 3 章"},
+  {k:["作业","括号","代码","答案"], q:"作业 5 的括号匹配代码怎么写？",
+   a:"这道题是本周作业，我不能直接给出代码，但可以帮你理清思路：\n\n1. 从左到右扫描字符串，遇到左括号时，你会怎么处理它？\n2. 遇到右括号时，应该和哪个左括号比较？为什么是“最近的”那个？\n3. 扫描结束后，栈处于什么状态才说明括号全部匹配？\n\n先试着回答这三个问题，写出伪代码后可以发给我，我帮你检查逻辑。",
+   s:"讲义 3.2 节“栈的应用”；作业规则：允许辅助，不提供完整代码"},
+  {k:["递归","终止","停","死循环","溢出"], q:"递归为什么会栈溢出？",
+   a:"每次函数调用都会在“调用栈”上压入一帧，保存参数和返回地址。如果递归没有正确的终止条件，或者终止条件永远达不到，调用会一直压栈，直到超出系统分配的栈空间，就会发生栈溢出。\n\n检查两点：\n• 是否写了终止条件（基本情况）？\n• 每次递归调用，问题规模是否都在向终止条件靠近？",
+   s:"讲义 4.2 节“递归的终止条件”；往届答疑 #17"},
+  {k:["循环队列","假溢出","取模"], q:"循环队列怎么判断队满？",
+   a:"常用做法是“牺牲一个存储单元”：\n• 队空：front == rear\n• 队满：(rear + 1) % MaxSize == front\n\n这样可以区分队空和队满两种情况。另一种做法是额外用一个计数变量记录元素个数。",
+   s:"讲义 3.4 节；教材 例 3-6"},
+  {k:["期中","考试","范围"], q:"期中考试考哪些内容？",
+   a:"根据课程公告，期中考试覆盖第 1–4 章：线性表、栈与队列、递归、串。具体题型请以王老师在课程公告中发布的通知为准。",
+   s:"课程公告（第 4 周）"}
+];
+const msgs = $("#msgs");
+function addMsg(who, text, src){
+  const d = document.createElement("div"); d.className = "msg "+who;
+  if(who==="me"){ d.textContent = text; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return Promise.resolve(); }
+  const body = document.createElement("div"); body.className = "typing"; d.appendChild(body);
+  msgs.appendChild(d);
+  return new Promise(res=>{
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let i = 0;
+    const step = ()=>{
+      i = reduce ? text.length : Math.min(text.length, i+3);
+      body.textContent = text.slice(0,i); msgs.scrollTop = msgs.scrollHeight;
+      if(i<text.length) setTimeout(step,18);
+      else { body.className=""; if(src){const s=document.createElement("div");s.className="src";s.textContent="出处："+src;d.appendChild(s);} msgs.scrollTop = msgs.scrollHeight; res(); }
+    };
+    step();
+  });
+}
+let busy = false;
+async function ask(text){
+  text = text.trim(); if(!text||busy) return;
+  busy = true; $("#ask-btn").disabled = true;
+  await addMsg("me", text);
+  const hit = QA.map(x=>({x,n:x.k.filter(k=>text.includes(k)).length})).sort((a,b)=>b.n-a.n)[0];
+  if(hit && hit.n>0) await addMsg("ai", hit.x.a, hit.x.s);
+  else await addMsg("ai","这个问题在本课程资料中没有找到依据，我不做猜测。我已把它转给王老师和助教团队，他们会在课程论坛中回复你。","已转人工答疑");
+  busy = false; $("#ask-btn").disabled = false;
+}
+QA.forEach(x=>{ const c=document.createElement("button"); c.className="chip"; c.type="button"; c.textContent=x.q; c.onclick=()=>ask(x.q); $("#chips").appendChild(c); });
+$("#ask-form").addEventListener("submit",e=>{e.preventDefault(); const v=$("#ask-input").value; $("#ask-input").value=""; ask(v);});
+// opening state: one example exchange
+msgs.innerHTML = "";
+(function seed(){
+  const a = document.createElement("div"); a.className="msg ai";
+  a.textContent = "你好，我是《数据结构》课程助教。我只根据本课程的讲义、教材和往届答疑回答问题，并会注明出处。本周作业题我会引导你思考，不直接给答案。";
+  msgs.appendChild(a);
+  const m = document.createElement("div"); m.className="msg me"; m.textContent="栈和队列有什么区别？"; msgs.appendChild(m);
+  const r = document.createElement("div"); r.className="msg ai"; r.textContent=QA[0].a;
+  const s = document.createElement("div"); s.className="src"; s.textContent="出处："+QA[0].s; r.appendChild(s); msgs.appendChild(r);
+})();
+
+/* ---------- 掌握度图 ---------- */
+function barChart(el, rows){
+  const W=560, rowH=38, left=150, right=48, H=rows.length*rowH+30;
+  const x = v => left + (W-left-right)*v/100;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:420px;display:block" role="img" aria-label="知识点掌握度条形图">`;
+  [0,50,100].forEach(t=>{ svg+=`<line x1="${x(t)}" x2="${x(t)}" y1="0" y2="${H-24}" stroke="var(--line)"/>`+
+    `<text x="${x(t)}" y="${H-6}" font-size="12" text-anchor="middle" fill="var(--muted)">${t}%</text>`; });
+  svg += `<line x1="${x(60)}" x2="${x(60)}" y1="0" y2="${H-24}" stroke="var(--warn)" stroke-dasharray="4 3"/><text x="${x(60)+4}" y="12" font-size="11" fill="var(--warn)">及格线 60%</text>`;
+  rows.forEach((r,i)=>{
+    const y=i*rowH+8, low=r[1]<60;
+    svg+=`<text x="${left-10}" y="${y+17}" font-size="13" text-anchor="end" fill="var(--ink2)">${r[0]}</text>`+
+      `<rect x="${x(0)}" y="${y+4}" width="${x(r[1])-x(0)}" height="20" rx="4" fill="${low?'var(--accent)':'var(--ink2)'}" opacity="${low?1:.55}"/>`+
+      `<text x="${x(r[1])+6}" y="${y+19}" font-size="13" fill="var(--ink)" font-weight="700">${r[1]}%${low?' 偏低':''}</text>`;
+  });
+  el.innerHTML = svg+"</svg>";
+}
+barChart($("#my-chart"), [["线性表",88],["栈的基本操作",82],["栈的应用",71],["队列",74],["递归终止条件",52],["递归转非递归",58]]);
+barChart($("#class-chart"), [["线性表",84],["栈的基本操作",79],["栈的应用",68],["队列",72],["递归终止条件",55],["递归转非递归",61]]);
+
+/* ---------- 学业预警 ---------- */
+const RISKS = [
+  ["学生 A","连续 2 次作业未提交；近 14 天未登录课程。","高"],
+  ["学生 B","测验 3、4 成绩下降 23 分；递归相关题目全部失分。","高"],
+  ["学生 C","助教提问集中在基础概念，测验 4 得分 52。","中"]
+];
+$("#risks").innerHTML = RISKS.map(r=>`<div class="risk-row"><b>${r[0]}</b><p>${r[1]}<br><span style="color:var(--muted)">建议：${r[2]==="高"?"辅导员与任课教师本周联系":"推荐递归专项练习，下周复查"}</span></p><span class="pill ${r[2]==="高"?"risk":"pending"}">${r[2]}风险</span></div>`).join("")+
+  `<p class="note" style="margin:8px 0 0">预警只提示依据，是否干预由教师决定。示例中学生姓名已隐去。</p>`;
+
+/* ---------- 智能批改 ---------- */
+const SUBS = [
+  {who:"学生 01", text:"一、实验目的\n掌握栈的基本操作，并用栈解决括号匹配问题。\n\n二、算法思路\n从左到右扫描表达式，遇到左括号入栈，遇到右括号时取栈顶比较，类型相同则出栈，否则匹配失败。扫描完成后若栈为空，则匹配成功。\n\n三、测试结果\n测试了 \"{[()]}\"、\"([)]\"、\"((\" 三组数据，结果正确。\n\n四、总结\n栈的后进先出特性正好对应括号“最近的左括号先匹配”。",
+   c:[["算法思路正确完整",40,36,"思路完整，正确处理了扫描结束时栈非空的情况。"],["测试覆盖",25,17,"只有 3 组测试，缺少空串和只有右括号开头的情况。"],["代码规范与注释",20,17,"命名清晰，关键步骤有注释。"],["总结与反思",15,11,"总结了栈的特性，但缺少复杂度分析。"]],
+   fb:"算法思路清晰，正确考虑了扫描结束后栈非空的情况。建议补充两类测试：空字符串，以及以右括号开头的字符串（例如 \")(\"）。总结部分可以加上时间和空间复杂度分析（均为 O(n)）。"},
+  {who:"学生 02", text:"用栈做括号匹配。遇到括号就入栈，遇到一样的就出栈。最后看栈空不空。测试了 \"()\" 正确。",
+   c:[["算法思路正确完整",40,22,"没有区分左右括号，也没有处理括号类型不同的情况。"],["测试覆盖",25,6,"只有 1 组测试。"],["代码规范与注释",20,12,"缺少注释。"],["总结与反思",15,3,"没有总结。"]],
+   fb:"基本想法方向正确，但需要区分左括号和右括号：只有左括号入栈，遇到右括号时和栈顶比较类型。请补充 \"([)]\"、\"((\" 等测试，并写出实验总结。欢迎在答疑时间来找助教讨论。"},
+  {who:"学生 03", done:true},
+  {who:"学生 04", done:true}
+];
+let cur = 0;
+function renderSubs(){
+  $("#subs").innerHTML = "";
+  SUBS.forEach((s,i)=>{
+    const b=document.createElement("button"); b.className="sub"; b.type="button";
+    b.setAttribute("aria-current", i===cur);
+    b.innerHTML=`<span>${s.who}</span><span class="pill ${s.done?'done':'pending'}">${s.done?'已发布':'待审核'}</span>`;
+    b.onclick=()=>{ if(!s.text) return; cur=i; renderGrade(); renderSubs(); };
+    if(!s.text) b.title="示例中只展示前两份的批改内容";
+    $("#subs").appendChild(b);
+  });
+}
+function renderGrade(){
+  const s = SUBS[cur];
+  $("#essay-who").textContent = s.who+" · 提交于 9 月 22 日";
+  $("#essay").textContent = s.text;
+  $("#crits").innerHTML = s.c.map((c,i)=>`<div class="crit"><label for="cr${i}">${c[0]}（${c[1]} 分）</label><input type="range" id="cr${i}" min="0" max="${c[1]}" value="${c[2]}" ${s.done?'disabled':''}><span class="score" id="cs${i}">${c[2]}</span><div class="why">AI 依据：${c[3]}</div></div>`).join("");
+  s.c.forEach((c,i)=>{ $("#cr"+i).oninput=e=>{ c[2]=+e.target.value; $("#cs"+i).textContent=c[2]; sumUp(); }; });
+  $("#feedback").value = s.fb; $("#feedback").disabled = !!s.done;
+  $("#approve").disabled = !!s.done;
+  $("#grade-note").textContent = s.done ? "已发布给学生。" : "AI 只给建议，发布前由教师确认。";
+  sumUp();
+}
+function sumUp(){ $("#total").textContent = SUBS[cur].c.reduce((a,c)=>a+c[2],0); }
+$("#feedback").oninput = e=>{ SUBS[cur].fb = e.target.value; };
+$("#approve").onclick = ()=>{ SUBS[cur].done = true; renderGrade(); renderSubs(); };
+renderSubs(); renderGrade();
+
+/* ---------- 智能出题 ---------- */
+const QB = {
+  stack:[
+    {t:"单选",l:1,s:"若入栈序列为 1, 2, 3，下列哪个不可能是出栈序列？",o:["1, 2, 3","3, 2, 1","3, 1, 2","2, 1, 3"],a:"C。3 先出栈时 1、2 都在栈内，2 在 1 之上，必须先于 1 出栈。"},
+    {t:"单选",l:2,s:"用数组实现容量为 n 的顺序栈，top 初值为 −1，判断栈满的条件是：",o:["top == 0","top == n","top == n − 1","top == −1"],a:"C。top 指向栈顶元素下标，最大为 n − 1。"},
+    {t:"简答",l:3,s:"设计一个栈，在 O(1) 时间内支持 push、pop 和取最小值 getMin，说明思路。",a:"参考：用辅助栈同步保存当前最小值；push 时压入 min(x, 辅助栈顶)，pop 时两栈同时出栈。"}
+  ],
+  recur:[
+    {t:"单选",l:1,s:"递归函数必须具备的两个要素是：",o:["循环和数组","终止条件和递归调用","指针和结构体","栈和队列"],a:"B。"},
+    {t:"单选",l:2,s:"下列函数调用 f(3) 的返回值是：int f(int n){ if(n<=1) return 1; return n*f(n-1); }",o:["3","6","9","无限递归"],a:"B。f(3)=3×2×1=6。"},
+    {t:"简答",l:3,s:"将计算斐波那契数的朴素递归改写为非递归算法，并比较两者的时间复杂度。",a:"参考：用两个变量迭代计算，O(n)；朴素递归为 O(2ⁿ)。"}
+  ],
+  queue:[
+    {t:"单选",l:1,s:"队列的操作特点是：",o:["后进先出","先进先出","随机存取","只能在一端操作"],a:"B。"},
+    {t:"单选",l:2,s:"容量为 MaxSize 的循环队列，牺牲一个单元时，队满的条件是：",o:["front == rear","(rear+1) % MaxSize == front","rear == MaxSize","front == 0"],a:"B。"},
+    {t:"简答",l:3,s:"说明顺序队列的“假溢出”现象，以及循环队列如何解决它。",a:"参考：队尾到达数组末端而前端仍有空位；循环队列用取模让下标回绕。"}
+  ]
+};
+const LV = {1:"基础",2:"中等",3:"提高"};
+const TOPIC = {stack:"栈的基本操作",recur:"递归终止条件",queue:"循环队列"};
+function genQuiz(){
+  const t=$("#q-topic").value, l=+$("#q-level").value;
+  const list = QB[t].slice().sort((a,b)=>Math.abs(a.l-l)-Math.abs(b.l-l));
+  $("#q-out").innerHTML = list.map((q,i)=>`<div class="q"><div class="q-head"><b>第 ${i+1} 题</b><span class="tag">${q.t}</span><span class="tag">${TOPIC[t]}</span><span class="tag">难度：${LV[q.l]}</span></div><div>${q.s}</div>${q.o?`<ol type="A">${q.o.map(o=>`<li>${o}</li>`).join("")}</ol>`:""}<div class="ans">答案与解析：${q.a}</div><div class="actions"><button class="btn ghost" type="button" onclick="this.textContent='已加入题库';this.disabled=true">加入题库</button></div></div>`).join("");
+  $("#q-note").textContent = "已生成 3 题，请审核后加入题库。";
+}
+$("#q-gen").onclick = genQuiz;
+genQuiz();
+
+setRole("student");
+</script>
+
+</body></html>

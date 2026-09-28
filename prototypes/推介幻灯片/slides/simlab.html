@@ -1,0 +1,68 @@
+<section id="simlab" data-transition="fade" style="background:#F7F5EF; color:#1F2A44; font-family:'Noto Sans SC', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:26px; color:#B5452F; letter-spacing:3px">AI 虚拟仿真实验</p>
+    <h2 style="font-family:'Noto Serif SC', Georgia, serif; font-size:60px; font-weight:600; line-height:1.15; color:#14213D">仿真负责算得对，AI 负责教得好</h2>
+  </div>
+  <div style="position:absolute; left:128px; top:300px; width:960px; height:560px; background:#FFFFFF; border:1px solid #E2DED3; border-radius:14px"></div>
+  <x-embed style="position:absolute; left:136px; top:308px; width:944px; height:544px"><style>html,body{margin:0;height:100%;background:#FFFFFF;overflow:hidden}canvas{display:block;width:100%;height:100%}</style>
+<canvas id="c"></canvas>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d');let W,H;
+function fit(){const d=devicePixelRatio||1;W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0);}fit();addEventListener('resize',fit);
+const M=1,m=.2,l=.3,I=m*.36/12,g=9.81,FONT='"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",sans-serif';
+function f(s,F){const c=Math.cos(s[2]),n=Math.sin(s[2]),a=M+m,b=m*l*c,d=m*l*l+I,r1=F+m*l*n*s[3]*s[3],r2=m*g*l*n,D=a*d-b*b;return[s[1],(r1*d-b*r2)/D,s[3],(a*r2-b*r1)/D];}
+function rk(s,F,h){const k1=f(s,F),k2=f(s.map((v,i)=>v+h/2*k1[i]),F),k3=f(s.map((v,i)=>v+h/2*k2[i]),F),k4=f(s.map((v,i)=>v+h*k3[i]),F);return s.map((v,i)=>v+h/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));}
+let s=[0,0,.1,0],t=0,F=0,hist=[],pushT=-2.5,dir=1,rec=null,lastOut=0,k=0,last=0;
+function step(){
+ if(k%5==0){F=80*s[2]+12*s[3]+4*s[0]+6*s[1];F=Math.max(-30,Math.min(30,F));}
+ let Fe=F;if(t-pushT<.1)Fe+=25*dir;s=rk(s,Fe,.002);k++;t+=.002;
+ if(Math.abs(s[2])>.01745)lastOut=t;
+ if(t-pushT>4.5){pushT=t;dir=-dir;rec=null;}
+ if(rec===null&&t-pushT>.3&&t-lastOut>.4)rec=lastOut-pushT;
+ if(k%10==0){hist.push([t,s[2]]);if(hist.length>800)hist.shift();}
+}
+function draw(){
+ x.clearRect(0,0,W,H);
+ const sc=(W-80)/4.8,cx=W/2,gy=H*.52;
+ x.font='600 26px '+FONT;x.fillStyle='#14213D';x.textAlign='left';x.fillText('实时仿真 · 倒立摆（PID + 位置环）',24,44);
+ x.font='24px '+FONT;x.fillStyle='#3D4860';x.textAlign='right';x.fillText('θ = '+(s[2]*57.3).toFixed(1)+'°   F = '+F.toFixed(0)+' N',W-24,44);
+ x.strokeStyle='#D8D3C6';x.lineWidth=5;x.beginPath();x.moveTo(cx-2.4*sc,gy+26);x.lineTo(cx+2.4*sc,gy+26);x.stroke();
+ x.fillStyle='#B5452F';x.fillRect(cx-2.4*sc-3,gy+8,6,30);x.fillRect(cx+2.4*sc-3,gy+8,6,30);
+ const px=cx+s[0]*sc,cw=.5*sc,ch=.22*sc;
+ x.fillStyle='#14213D';x.beginPath();x.roundRect?x.roundRect(px-cw/2,gy-ch/2,cw,ch,8):x.rect(px-cw/2,gy-ch/2,cw,ch);x.fill();
+ x.fillStyle='#3D4860';for(const o of[-cw*.3,cw*.3]){x.beginPath();x.arc(px+o,gy+ch/2+4,7,0,7);x.fill();}
+ const L=.6*sc*1.25,top=gy-ch/2,th=s[2];
+ x.setLineDash([6,6]);x.strokeStyle='#C9C3B4';x.lineWidth=2;x.beginPath();x.moveTo(px,top);x.lineTo(px,top-L-10);x.stroke();x.setLineDash([]);
+ x.strokeStyle=Math.abs(th)<.01745?'#2F7D5B':'#B5452F';x.lineWidth=12;x.lineCap='round';x.beginPath();x.moveTo(px,top);x.lineTo(px+Math.sin(th)*L,top-Math.cos(th)*L);x.stroke();
+ if(Math.abs(F)>.5){const len=F/30*110;x.strokeStyle='#E08A2E';x.fillStyle='#E08A2E';x.lineWidth=5;x.beginPath();x.moveTo(px,gy);x.lineTo(px+len,gy);x.stroke();x.beginPath();x.moveTo(px+len+Math.sign(len)*6,gy);x.lineTo(px+len-Math.sign(len)*10,gy-9);x.lineTo(px+len-Math.sign(len)*10,gy+9);x.fill();}
+ if(t-pushT<.8){x.font='700 28px '+FONT;x.fillStyle='#B5452F';x.textAlign='center';x.fillText(dir>0?'侧向冲击 →':'← 侧向冲击',px,top-L-24);}
+ const y0=H*.68,hh=H*.26,tx0=24,tw=W-48,A=.26;
+ x.fillStyle='#E7F1EC';x.fillRect(tx0,y0+hh/2-hh/2*.01745/A,tw,hh*.01745/A);
+ x.strokeStyle='#E2DED3';x.lineWidth=1;x.strokeRect(tx0,y0,tw,hh);
+ x.beginPath();x.moveTo(tx0,y0+hh/2);x.lineTo(tx0+tw,y0+hh/2);x.stroke();
+ if(hist.length>1){const t1=hist[hist.length-1][0];x.strokeStyle='#B5452F';x.lineWidth=3;x.beginPath();hist.forEach((r,i)=>{const X=tx0+tw-(t1-r[0])/8*tw,Y=y0+hh/2-Math.max(-A,Math.min(A,r[1]))/A*hh/2;i?x.lineTo(X,Y):x.moveTo(X,Y);});x.stroke();}
+ x.font='24px '+FONT;x.fillStyle='#6B7280';x.textAlign='left';x.fillText('摆角 θ · 近 8 秒 · 绿带 ±1°',tx0+10,y0-10);
+ if(rec!==null){x.textAlign='right';x.fillStyle='#2F7D5B';x.font='700 24px '+FONT;x.fillText('冲击后 '+rec.toFixed(1)+' s 回到 ±1° 内',tx0+tw,y0-10);}
+}
+function loop(ts){if(!last)last=ts;let dt=Math.min(.05,(ts-last)/1000);last=ts;for(let i=0;i<Math.round(dt/.002);i++)step();draw();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+</script></x-embed>
+  <div data-build-in="rise 1" style="position:absolute; left:1128px; top:300px; width:664px; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; padding:22px 28px; border-radius:12px; border-left:6px solid #B5452F">
+    <h3 style="font-size:32px; font-weight:700; color:#14213D">现象诊断</h3>
+    <p style="font-size:24px; color:#3D4860">读取整条曲线，只指方向，不给答案</p>
+  </div>
+  <div data-build-in="rise 2" style="position:absolute; left:1128px; top:444px; width:664px; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; padding:22px 28px; border-radius:12px; border-left:6px solid #B5452F">
+    <h3 style="font-size:32px; font-weight:700; color:#14213D">示范调参</h3>
+    <p style="font-size:24px; color:#3D4860">AI 亲自调用仿真，每次只改一个参数</p>
+  </div>
+  <div data-build-in="rise 3" style="position:absolute; left:1128px; top:588px; width:664px; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; padding:22px 28px; border-radius:12px; border-left:6px solid #B5452F">
+    <h3 style="font-size:32px; font-weight:700; color:#14213D">一句话指挥</h3>
+    <p style="font-size:24px; color:#3D4860">“画个圆”→ 运动计划 → 可达性检查 → 执行</p>
+  </div>
+  <div data-build-in="rise 4" style="position:absolute; left:1128px; top:732px; width:664px; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; padding:22px 28px; border-radius:12px; border-left:6px solid #B5452F">
+    <h3 style="font-size:32px; font-weight:700; color:#14213D">过程性评价</h3>
+    <p style="font-size:24px; color:#3D4860">评过程不只评结果，教师复核后计入成绩</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6B7280">已有可运行样品：倒立摆 PID、二连杆机械臂两个实验；倒立摆动力学已与 MuJoCo 逐步对照</p>
+  <aside>左边是实时运行的仿真，不是录像：控制器每隔几秒会被侧向推一下，然后自己回稳，下方曲线和“回稳用时”都是实时算出来的。右边四张卡片逐个出现，讲 AI 在实验里做的四件事。重点强调：AI 不替学生做实验，诊断只指方向；示范调参要学生先自己试三次才解锁。现场可以切到实验室页面，让校方老师亲手调参数。</aside>
+</section>

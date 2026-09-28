@@ -1,0 +1,77 @@
+<section id="simpack" data-transition="fade" style="background:#F7F5EF; color:#1F2A44; font-family:'Noto Sans SC', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:26px; color:#B5452F; letter-spacing:3px">AI 虚拟仿真实验 · 首批实验包</p>
+    <h2 style="font-family:'Noto Serif SC', Georgia, serif; font-size:60px; font-weight:600; line-height:1.15; color:#14213D">六个典型实验，覆盖控制与机器人主干课</h2>
+  </div>
+  <div data-build-in="pop 1" style="position:absolute; left:128px; top:300px; width:325px; height:250px; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; padding:24px; border-radius:12px; border:1px solid #E2DED3">
+    <p style="font-size:24px; font-weight:700; color:#2F7D5B">已实现 · 浏览器</p>
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">倒立摆 PID</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">P、I、D 作用，位置环，抗扰动</p>
+  </div>
+  <div data-build-in="pop 2" style="position:absolute; left:477px; top:300px; width:325px; height:250px; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; padding:24px; border-radius:12px; border:1px solid #E2DED3">
+    <p style="font-size:24px; font-weight:700; color:#2F7D5B">已实现 · 浏览器</p>
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">机械臂运动学</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">正逆解、可达空间、奇异位形</p>
+  </div>
+  <div data-build-in="pop 3" style="position:absolute; left:826px; top:300px; width:325px; height:250px; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; padding:24px; border-radius:12px; border:1px solid #E2DED3">
+    <p style="font-size:24px; font-weight:700; color:#3D6FA8">下一批 · 浏览器</p>
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">巡线小车</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">传感器与差速控制，AI 点评代码</p>
+  </div>
+  <div data-build-in="pop 4" style="position:absolute; left:128px; top:574px; width:325px; height:250px; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; padding:24px; border-radius:12px; border:1px solid #E2DED3">
+    <p style="font-size:24px; font-weight:700; color:#3D6FA8">下一批 · 浏览器</p>
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">路径规划</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">A*、Dijkstra 搜索过程对比</p>
+  </div>
+  <div data-build-in="pop 5" style="position:absolute; left:477px; top:574px; width:325px; height:250px; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; padding:24px; border-radius:12px; border:1px solid #E2DED3">
+    <p style="font-size:24px; font-weight:700; color:#B86A1B">进阶 · ROS 2</p>
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">SLAM 与导航</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">仓库场景建图、定位、导航</p>
+  </div>
+  <div data-build-in="pop 6" style="position:absolute; left:826px; top:574px; width:325px; height:250px; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; padding:24px; border-radius:12px; border:1px solid #E2DED3">
+    <p style="font-size:24px; font-weight:700; color:#B86A1B">进阶 · ROS 2</p>
+    <h3 style="font-size:30px; font-weight:700; color:#14213D">抓取与放置</h3>
+    <p style="font-size:24px; line-height:1.5; color:#3D4860">MoveIt 2 规划，适合课程设计</p>
+  </div>
+  <div style="position:absolute; left:1192px; top:300px; width:600px; height:524px; background:#FFFFFF; border:1px solid #E2DED3; border-radius:14px"></div>
+  <x-embed style="position:absolute; left:1200px; top:308px; width:584px; height:508px"><style>html,body{margin:0;height:100%;background:#FFFFFF;overflow:hidden}canvas{display:block;width:100%;height:100%}</style>
+<canvas id="c"></canvas>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d');let W,H;
+function fit(){const d=devicePixelRatio||1;W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0);}fit();addEventListener('resize',fit);
+const L1=1,L2=.7,FONT='"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",sans-serif';
+function ik(px,py){const c=(px*px+py*py-L1*L1-L2*L2)/(2*L1*L2);if(c>1||c<-1)return null;const q2=-Math.acos(c);return[Math.atan2(py,px)-Math.atan2(L2*Math.sin(q2),L1+L2*Math.cos(q2)),q2];}
+function circ(cx,cy,r){const a=[];for(let i=0;i<=60;i++){const t=i/60*2*Math.PI;a.push([cx+r*Math.cos(t),cy+r*Math.sin(t)]);}return a;}
+function poly(p){const a=[],q=[...p,p[0]];for(let i=0;i<q.length-1;i++)for(let j=0;j<=15;j++){const t=j/15;a.push([q[i][0]+(q[i+1][0]-q[i][0])*t,q[i][1]+(q[i+1][1]-q[i][1])*t]);}return a;}
+const tasks=[{cmd:'“画一个半径 0.35 m 的圆”',pts:circ(.9,.4,.35)},{cmd:'“画一个边长 0.6 m 的正方形”',pts:poly([[.6,-.3],[1.2,-.3],[1.2,.3],[.6,.3]])},{cmd:'“到 (1.9, 0.3) 去”',bad:[1.9,.3]}];
+let ti=0,i=0,trail=[],q=ik(1.2,.2),hold=0,msg='';
+function S(){return Math.min(W/2.5,H/2.45);}
+function P(px,py){const s=S();return[W*.17+px*s,H*.57-py*s];}
+function tick(){
+ const T=tasks[ti];
+ if(hold>0){hold--;if(!hold){ti=(ti+1)%tasks.length;i=0;trail=[];msg='';}return;}
+ if(T.bad){msg='不可达：距基座 '+Math.hypot(...T.bad).toFixed(2)+' m，超过 1.7 m';hold=150;return;}
+ const p=T.pts[i],g=ik(p[0],p[1]);
+ if(g){q=q.map((v,k)=>v+(g[k]-v)*(i==0?.08:1));if(i>0||Math.abs(q[0]-g[0])<.01){trail.push(p);i++;}}else i++;
+ if(i>=T.pts.length){msg='全部可达，已完成';hold=90;}
+}
+function draw(){
+ x.clearRect(0,0,W,H);const s=S(),[ox,oy]=P(0,0);
+ x.fillStyle='#EEF3F0';x.beginPath();x.arc(ox,oy,1.7*s,0,2*Math.PI);x.moveTo(ox+.3*s,oy);x.arc(ox,oy,.3*s,0,2*Math.PI);x.fill('evenodd');
+ x.strokeStyle='#E2DED3';x.lineWidth=1;x.beginPath();x.moveTo(0,oy);x.lineTo(W,oy);x.moveTo(ox,0);x.lineTo(ox,H);x.stroke();
+ x.strokeStyle='#B5452F';x.lineWidth=4;x.lineJoin='round';x.beginPath();trail.forEach((p,k)=>{const[a,b]=P(...p);k?x.lineTo(a,b):x.moveTo(a,b);});x.stroke();
+ const T=tasks[ti];if(T.bad){const[a,b]=P(...T.bad);x.strokeStyle='#B5452F';x.lineWidth=4;x.beginPath();x.moveTo(a-10,b-10);x.lineTo(a+10,b+10);x.moveTo(a+10,b-10);x.lineTo(a-10,b+10);x.stroke();}
+ const e=[L1*Math.cos(q[0]),L1*Math.sin(q[0])],t=[e[0]+L2*Math.cos(q[0]+q[1]),e[1]+L2*Math.sin(q[0]+q[1])],E=P(...e),Tp=P(...t);
+ x.lineCap='round';x.strokeStyle='#14213D';x.lineWidth=18;x.beginPath();x.moveTo(ox,oy);x.lineTo(...E);x.stroke();
+ x.strokeStyle='#3D6FA8';x.lineWidth=13;x.beginPath();x.moveTo(...E);x.lineTo(...Tp);x.stroke();
+ x.fillStyle='#1F2A44';x.beginPath();x.arc(ox,oy,11,0,7);x.fill();x.beginPath();x.arc(...E,8,0,7);x.fill();
+ x.fillStyle='#E08A2E';x.beginPath();x.arc(...Tp,7,0,7);x.fill();
+ x.textAlign='left';x.font='600 26px '+FONT;x.fillStyle='#14213D';x.fillText('AI 指令：'+T.cmd,20,40);
+ x.font='24px '+FONT;x.fillStyle='#6B7280';x.fillText('浅色环：可达空间 0.3 – 1.7 m',20,H-20);
+ if(msg){x.font='700 24px '+FONT;x.fillStyle=T.bad?'#B5452F':'#2F7D5B';x.fillText(msg,20,76);}
+}
+function loop(){tick();draw();requestAnimationFrame(loop);}loop();
+</script></x-embed>
+  <p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6B7280">每个实验都配 AI 诊断、示范和过程性评价；实验指导书、预习题和报告模板也可由 AI 按教师资料生成</p>
+  <aside>左边六个实验依次出现：前两个已经做出可运行样品，中间两个是下一批浏览器实验，最后两个是 ROS 2 进阶实验。右边是实时运行的机械臂：它按“AI 指令”依次画圆、画正方形，第三条指令的目标点超出可达范围，系统会标红并说明原因。这正是 AI 原生的体现：学生用自然语言下指令，系统负责安全检查，AI 负责解释背后的知识点。</aside>
+</section>

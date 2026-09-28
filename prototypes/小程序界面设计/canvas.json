@@ -1,0 +1,60 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Course.dc.html": {
+      "h": 844,
+      "title": "课程",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "title": "首页",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "Messages.dc.html": {
+      "h": 844,
+      "title": "消息",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "Tutor.dc.html": {
+      "h": 844,
+      "title": "AI 助教",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-25T02:30:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "t1": {
+      "kind": "title1",
+      "maxW": 1800,
+      "text": "问渠 WenQuest · 微信小程序界面样品",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Course.dc.html",
+    "Tutor.dc.html",
+    "Messages.dc.html"
+  ],
+  "pages": [],
+  "title": "问渠小程序"
+}
