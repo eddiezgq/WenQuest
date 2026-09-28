@@ -178,3 +178,12 @@ def test_ai_classification_only_fills_gaps():
                                    {"id": "b" * 32, "category": "notes", "chapter": 5}]})
     assert (a.category, a.chapter, a.confidence) == ("notes", 2, "ai")
     assert (b.category, b.chapter) == ("lesson_plan", None)  # teacher's choice is never overwritten
+
+
+def test_source_ids_capped_for_crowded_chapters():
+    from app import materials as mt
+    items = [mt.Material(id=f"m{i}", name=f"实验{i} 实验指导书.docx", path=f"第1章/实验{i}.docx", size=1, ext="docx",
+                         chars=100, category="lab", chapter=1) for i in range(12)]
+    items.append(mt.Material(id="notes", name="讲义.pdf", path="第1章/讲义.pdf", size=1, ext="pdf", chars=100, category="notes", chapter=1))
+    ids = mt.source_ids(items, 1)
+    assert len(ids) == mt.MAX_SOURCES and ids[0] == "notes"
