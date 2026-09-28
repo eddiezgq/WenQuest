@@ -1,0 +1,1191 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<div id="wq-home" style="background:#0a1216;padding:9px 20px;font:500 13px/1.2 system-ui,'Noto Sans SC',sans-serif"><a href="/" style="color:#e9eef0;text-decoration:none">← WenQuest Robotics · 问渠机器人学院</a></div>
+<script>if(window.top!==window.self){var e=document.getElementById("wq-home");if(e)e.remove();}</script>
+
+<title>质点运动学实验台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --bg: #eef2f1; --panel: #ffffff; --ink: #15212b; --muted: #5a6a73; --line: #d3dcdc; --soft: #e5ecea;
+  --accent: #1e2761; --accent-ink: #ffffff; --amber: #c98f00; --amber-soft: #fff4d1;
+  --blue: #1f6feb; --green: #1a7f37; --red: #cf222e; --orange: #c2570c; --violet: #8250df;
+  --stage: #f8faf9; --grid: #e3e9e7; --ground: #7c8b84; --water: #cfe3f1; --water-line: #9cc3de; --ok: #1a7f37;
+  --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e1418; --panel: #151d23; --ink: #e4ebef; --muted: #8d9ba5; --line: #283640; --soft: #1b262e;
+    --accent: #7aa2ff; --accent-ink: #0e1418; --amber: #f2c14e; --amber-soft: #2d2612;
+    --blue: #58a6ff; --green: #56d364; --red: #ff7b72; --orange: #ffa657; --violet: #d2a8ff;
+    --stage: #10181d; --grid: #1c2830; --ground: #5d6e67; --water: #0d3350; --water-line: #1e5a86; --ok: #56d364;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e1418; --panel: #151d23; --ink: #e4ebef; --muted: #8d9ba5; --line: #283640; --soft: #1b262e;
+  --accent: #7aa2ff; --accent-ink: #0e1418; --amber: #f2c14e; --amber-soft: #2d2612;
+  --blue: #58a6ff; --green: #56d364; --red: #ff7b72; --orange: #ffa657; --violet: #d2a8ff;
+  --stage: #10181d; --grid: #1c2830; --ground: #5d6e67; --water: #0d3350; --water-line: #1e5a86; --ok: #56d364;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; margin: 0; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 40px; }
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 20px; }
+.course { font-size: 13px; color: var(--muted); letter-spacing: 0.04em; }
+h1 { font-size: 26px; margin: 2px 0 0; text-wrap: balance; }
+.hright { display: flex; align-items: center; gap: 14px; }
+.lang { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+nav.tabs { display: flex; gap: 8px; margin: 18px 0 16px; overflow-x: auto; padding-bottom: 2px; }
+nav.tabs button {
+  flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 10px;
+  padding: 8px 14px; font: inherit; cursor: pointer; display: flex; gap: 8px; align-items: baseline;
+}
+nav.tabs button .no { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+nav.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+nav.tabs button[aria-selected="true"] .no { color: inherit; opacity: 0.8; }
+nav.tabs button .done { font-size: 12px; color: var(--ok); }
+nav.tabs button[aria-selected="true"] .done { color: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.lab { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; }
+@media (max-width: 900px) { .lab { grid-template-columns: 1fr; } }
+.stagebox { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.scenes { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); align-items: center; }
+.scenes .lbl { font-size: 13px; color: var(--muted); }
+.stagebox canvas { display: block; width: 100%; aspect-ratio: 16 / 10; background: var(--stage); touch-action: none; }
+.stagebar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); }
+.goal { padding: 12px 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.goal b { color: var(--ink); }
+.problem { padding: 12px 14px; border-top: 1px solid var(--line); background: var(--amber-soft); font-size: 14px; }
+.problem b { display: block; margin-bottom: 2px; }
+.side { display: flex; flex-direction: column; gap: 12px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.card h3 { margin: 0 0 10px; font-size: 13px; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+.ctl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; margin-bottom: 10px; }
+.ctl label { font-size: 14px; }
+.ctl output { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.ctl input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font: inherit; font-size: 14px; border-radius: 8px; padding: 6px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 500; }
+.btn.chip { padding: 4px 10px; font-size: 13px; }
+.btn.chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); font-weight: 500; }
+.check { display: flex; gap: 6px; align-items: center; font-size: 14px; }
+.check input { accent-color: var(--accent); }
+select, input[type="text"] { font: inherit; font-size: 14px; border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; background: var(--panel); color: var(--ink); width: 100%; }
+input[type="text"] { font-family: var(--mono); font-size: 13px; }
+.readout { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 14px; margin: 0; }
+.readout dt { color: var(--muted); }
+.readout dd { margin: 0; text-align: right; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.tasks li { display: grid; grid-template-columns: 20px 1fr; gap: 8px; font-size: 14px; }
+.tasks li .box { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--line); margin-top: 3px; display: grid; place-items: center; font-size: 12px; color: var(--accent-ink); }
+.tasks li.ok .box { background: var(--ok); border-color: var(--ok); }
+.tasks li.ok .t { color: var(--muted); }
+.tasks li .tag { font-size: 11px; color: var(--amber); border: 1px solid var(--amber); border-radius: 4px; padding: 0 4px; margin-right: 4px; }
+.hint { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+.note { background: var(--amber-soft); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+.toast { font-size: 13px; color: var(--ok); min-height: 1.4em; }
+footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="course" data-en="University Physics A (I) · Chapter 1 Kinematics of a Particle">大学物理A（上） · 第 1 章 质点运动学</div>
+      <h1 data-en="Kinematics Lab Bench">质点运动学实验台</h1>
+    </div>
+    <div class="hright">
+      <span class="course" id="progress"></span>
+      <button class="lang" id="lang" aria-label="切换语言 / Switch language">EN</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="实验 Labs">
+    <button role="tab" id="tab-1-1" data-lab="1-1"><span class="no">1.1</span><span data-en="Reference frames">参考系</span><span class="done"></span></button>
+    <button role="tab" id="tab-1-2" data-lab="1-2"><span class="no">1.2</span><span data-en="Position &amp; velocity">位矢与速度</span><span class="done"></span></button>
+    <button role="tab" id="tab-1-3" data-lab="1-3"><span class="no">1.3</span><span data-en="Projectiles">抛体运动</span><span class="done"></span></button>
+    <button role="tab" id="tab-1-4" data-lab="1-4"><span class="no">1.4</span><span data-en="Circular motion">圆周运动</span><span class="done"></span></button>
+    <button role="tab" id="tab-1-5" data-lab="1-5"><span class="no">1.5</span><span data-en="Relative motion">相对运动</span><span class="done"></span></button>
+  </nav>
+
+  <!-- 1.1 -->
+  <section class="lab" id="lab-1-1" role="tabpanel" hidden>
+    <div class="stagebox">
+      <div class="scenes"><span class="lbl" data-en="Scene">场景</span>
+        <button class="btn chip" data-s11="train" aria-pressed="true" data-en="Ball dropped in a train">列车上落球</button>
+        <button class="btn chip" data-s11="belt" aria-pressed="false" data-en="Robot: grasping from a conveyor">机器人：传送带抓取</button>
+      </div>
+      <canvas id="c11" aria-label="参考系实验 Reference frame lab"></canvas>
+      <div class="stagebar">
+        <button class="btn primary" id="go11" data-en="Start">开始</button>
+        <span class="legend"><span><i style="background:var(--amber)"></i><span data-en="Path in the chosen frame">所选参考系中的轨迹</span></span></span>
+      </div>
+      <div class="problem" id="prob11"></div>
+      <div class="goal" data-en="&lt;b&gt;Goal:&lt;/b&gt; watch the same motion from different observers and see how its path and velocity change.">
+        <b>实验目的：</b>换不同的观察者看同一个运动，观察轨迹和速度怎样变化。</div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl"><label for="u11" id="u11l"></label><output id="u11o"></output><input type="range" id="u11" min="0" max="30" step="1" value="12"></div>
+        <div class="ctl"><label for="o11" data-en="Observer speed (relative to ground)">观察者速度（相对地面）</label><output id="o11o"></output><input type="range" id="o11" min="-30" max="30" step="1" value="0"></div>
+        <div class="row">
+          <button class="btn chip" id="snapG11" data-en="On the ground">站在地面上</button>
+          <button class="btn chip" id="snapC11"></button>
+          <button class="btn chip" id="snapR11" data-en="Moving the other way">反向运动</button>
+        </div>
+        <div class="ctl" style="margin-top:12px"><label for="s11" data-en="Slow motion">慢放</label><output id="s11o"></output><input type="range" id="s11" min="0.1" max="1" step="0.05" value="0.3"></div>
+      </div>
+      <div class="card">
+        <h3 data-en="MEASUREMENTS">测量</h3>
+        <dl class="readout" id="read11"></dl>
+      </div>
+      <div class="card">
+        <h3 data-en="TASKS">任务</h3>
+        <ul class="tasks" id="tasks11"></ul>
+        <p class="hint" data-en="Think: the passenger says the ball falls straight down, the person on the ground says it is a projectile. Who is right?">思考：车厢里的人说小球“竖直下落”，地面上的人说它“做平抛运动”，谁对？</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1.2 -->
+  <section class="lab" id="lab-1-2" role="tabpanel" hidden>
+    <div class="stagebox">
+      <canvas id="c12" aria-label="位矢实验 Position vector lab"></canvas>
+      <div class="stagebar">
+        <button class="btn primary" id="play12" data-en="Play">播放</button>
+        <span class="legend" id="leg12">
+          <span><i style="background:var(--amber)"></i><span data-en="position r">位矢 r</span></span>
+          <span><i style="background:var(--red)"></i><span data-en="displacement Δr">位移 Δr</span></span>
+          <span><i style="background:var(--green)"></i><span data-en="path length Δs">路程 Δs</span></span>
+          <span><i style="background:var(--orange)"></i><span data-en="velocity v">速度 v</span></span>
+          <span><i style="background:var(--violet)"></i><span data-en="acceleration a">加速度 a</span></span>
+        </span>
+      </div>
+      <div class="problem" id="prob12" hidden></div>
+      <div class="goal" data-en="&lt;b&gt;Goal:&lt;/b&gt; start from the equation of motion r(t), compare displacement with path length, and shrink Δt to see the average velocity become the tangent velocity.">
+        <b>实验目的：</b>从运动方程 r(t) 出发，比较位移与路程；把 Δt 调小，看平均速度怎样变成切线方向的瞬时速度。</div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="MOTION">运动方程</h3>
+        <select id="pre12" aria-label="选择运动 Choose a motion">
+          <option value="ex" data-en="Example 1-1: r = 2t i + (19 − 2t²) j">例1-1：r = 2t i + (19 − 2t²) j</option>
+          <option value="circle" data-en="Uniform circle: r = 3cos t i + 3sin t j">匀速圆周：r = 3cos t i + 3sin t j</option>
+          <option value="cycloid" data-en="Point on a rolling wheel (cycloid)">车轮边缘一点：r = (t − sin t) i + (1 − cos t) j</option>
+          <option value="odo" data-en="Robot: odometry data">机器人：里程计数据</option>
+          <option value="custom" data-en="Write your own">自己写一个</option>
+        </select>
+        <div id="custom12" hidden style="margin-top:10px">
+          <div class="row"><label for="x12" style="width:3.2em">x(t) =</label><input type="text" id="x12" value="t*t/2" style="flex:1"></div>
+          <div class="row" style="margin-top:6px"><label for="y12" style="width:3.2em">y(t) =</label><input type="text" id="y12" value="2*sin(t)" style="flex:1"></div>
+          <div class="row" style="margin-top:6px"><label for="tm12" style="width:3.2em">t max</label><input type="text" id="tm12" value="6" style="flex:1"></div>
+          <button class="btn" id="apply12" style="margin-top:8px" data-en="Draw">画出轨迹</button>
+          <p class="hint" id="err12"></p>
+        </div>
+        <div id="std12">
+          <div class="ctl" style="margin-top:12px"><label for="t12" data-en="Time t">时刻 t</label><output id="t12o"></output><input type="range" id="t12" min="0" max="3" step="0.01" value="0.8"></div>
+          <div class="ctl"><label for="d12" data-en="Interval Δt">时间间隔 Δt</label><output id="d12o"></output><input type="range" id="d12" min="0" max="1" step="0.001" value="0.8"></div>
+          <div class="row">
+            <label class="check"><input type="checkbox" id="sv12" checked><span data-en="velocity">速度</span></label>
+            <label class="check"><input type="checkbox" id="sa12"><span data-en="acceleration">加速度</span></label>
+            <label class="check"><input type="checkbox" id="sd12" checked><span data-en="Δr and Δs">Δr 与 Δs</span></label>
+          </div>
+        </div>
+        <div id="odo12" hidden>
+          <div class="ctl" style="margin-top:12px"><label for="ts12" data-en="Sampling interval">采样间隔</label><output id="ts12o"></output><input type="range" id="ts12" min="0.02" max="1.5" step="0.01" value="0.1"></div>
+          <div class="ctl"><label for="sg12" data-en="Position noise σ">定位噪声 σ</label><output id="sg12o"></output><input type="range" id="sg12" min="0" max="0.03" step="0.001" value="0.01"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 data-en="MEASUREMENTS (SI)">测量（SI 单位）</h3>
+        <dl class="readout" id="read12"></dl>
+      </div>
+      <div class="card">
+        <h3 data-en="TASKS">任务</h3>
+        <ul class="tasks" id="tasks12"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1.3 -->
+  <section class="lab" id="lab-1-3" role="tabpanel" hidden>
+    <div class="stagebox">
+      <div class="scenes"><span class="lbl" data-en="Scene">场景</span>
+        <button class="btn chip" data-s13="range" aria-pressed="true" data-en="Target range">发射场打靶</button>
+        <button class="btn chip" data-s13="hoop" aria-pressed="false" data-en="Robot: shooting a basket">机器人：投篮</button>
+      </div>
+      <canvas id="c13" aria-label="抛体实验 Projectile lab"></canvas>
+      <div class="stagebar">
+        <button class="btn primary" id="fire13" data-en="Launch">发射</button>
+        <button class="btn" id="clear13" data-en="Clear">清除轨迹</button>
+        <button class="btn" id="target13" data-en="New target">换一个靶子</button>
+        <span class="toast" id="toast13" role="status"></span>
+      </div>
+      <div class="problem" id="prob13"></div>
+      <div class="goal" data-en="&lt;b&gt;Goal:&lt;/b&gt; vary launch speed, angle, height and gravity; measure range and height and compare with theory; then switch on air drag and see where the ideal model fails.">
+        <b>实验目的：</b>改变初速度、抛射角、抛出高度和重力加速度，测量射程与最大高度，与理论公式比较；再打开空气阻力，看理想模型在哪里失效。</div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl"><label for="v13" data-en="Launch speed v₀">初速度 v₀</label><output id="v13o"></output><input type="range" id="v13" min="3" max="40" step="0.1" value="20"></div>
+        <div class="ctl"><label for="a13" data-en="Launch angle θ">抛射角 θ</label><output id="a13o"></output><input type="range" id="a13" min="0" max="90" step="1" value="60"></div>
+        <div class="ctl"><label for="h13" data-en="Launch height h₀">抛出高度 h₀</label><output id="h13o"></output><input type="range" id="h13" min="0" max="30" step="0.1" value="0"></div>
+        <div class="row">
+          <span style="font-size:14px" data-en="Where">在哪里做实验</span>
+          <button class="btn chip" data-g="9.8" aria-pressed="true" data-en="Earth 9.8">地球 9.8</button>
+          <button class="btn chip" data-g="3.71" aria-pressed="false" data-en="Mars 3.71">火星 3.71</button>
+          <button class="btn chip" data-g="1.62" aria-pressed="false" data-en="Moon 1.62">月球 1.62</button>
+        </div>
+        <label class="check" style="margin-top:10px"><input type="checkbox" id="drag13"><span data-en="Air drag (f ∝ v², tennis-ball size)">空气阻力（f ∝ v²，网球大小）</span></label>
+      </div>
+      <div class="card">
+        <h3 data-en="LAST LAUNCH">最近一次发射</h3>
+        <dl class="readout" id="read13"></dl>
+      </div>
+      <div class="card">
+        <h3 data-en="TASKS">任务</h3>
+        <ul class="tasks" id="tasks13"></ul>
+        <p class="hint" data-en="Theory: R = v₀² sin2θ / g (h₀ = 0, no drag).">理论：R = v₀² sin2θ / g（h₀ = 0，无空气阻力）。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1.4 -->
+  <section class="lab" id="lab-1-4" role="tabpanel" hidden>
+    <div class="stagebox">
+      <div class="scenes"><span class="lbl" data-en="Mode">类型</span>
+        <button class="btn chip" data-mode="uniform" aria-pressed="true" data-en="Uniform">匀速圆周</button>
+        <button class="btn chip" data-mode="accel" aria-pressed="false" data-en="Speeding up">匀加速圆周</button>
+        <button class="btn chip" data-mode="example" aria-pressed="false" data-en="Example 1-3">例1-3</button>
+        <button class="btn chip" data-mode="agv" aria-pressed="false" data-en="Robot: AGV turning">机器人：AGV 转弯</button>
+      </div>
+      <canvas id="c14" aria-label="圆周运动实验 Circular motion lab"></canvas>
+      <div class="stagebar">
+        <button class="btn primary" id="play14" data-en="Pause">暂停</button>
+        <button class="btn" id="reset14" data-en="Restart">从头开始</button>
+        <button class="btn" id="jump14" hidden data-en="Jump to t = 2 s">跳到 t = 2 s</button>
+        <span class="legend" id="leg14">
+          <span><i style="background:var(--orange)"></i><span data-en="velocity v">速度 v</span></span>
+          <span><i style="background:var(--green)"></i><span data-en="tangential aₜ">切向 aₜ</span></span>
+          <span><i style="background:var(--red)"></i><span data-en="normal aₙ">法向 aₙ</span></span>
+          <span><i style="background:var(--violet)"></i><span data-en="total a">合加速度 a</span></span>
+        </span>
+      </div>
+      <div class="problem" id="prob14" hidden></div>
+      <div class="goal" data-en="&lt;b&gt;Goal:&lt;/b&gt; see the tangential acceleration change the speed and the normal acceleration change the direction; check aₙ = v²/R and aₜ = Rα. Arrow lengths are compressed; read the numbers on the right.">
+        <b>实验目的：</b>观察切向加速度改变速率、法向加速度改变方向；验证 aₙ = v²/R 与 aₜ = Rα。箭头长度按比例压缩显示，数值看右侧读数。</div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl" id="R14box"><label for="R14" data-en="Radius R">半径 R</label><output id="R14o"></output><input type="range" id="R14" min="0.5" max="3" step="0.1" value="2"></div>
+        <div class="ctl" id="w14box"><label for="w14" data-en="Angular speed ω (or initial ω₀)">角速度 ω（或初角速度 ω₀）</label><output id="w14o"></output><input type="range" id="w14" min="0" max="4" step="0.1" value="1.5"></div>
+        <div class="ctl" id="al14box" hidden><label for="al14" data-en="Angular acceleration α">角加速度 α</label><output id="al14o"></output><input type="range" id="al14" min="-1" max="1.5" step="0.05" value="0.4"></div>
+        <div class="ctl" id="v14box" hidden><label for="v14" data-en="Speed v">速度 v</label><output id="v14o"></output><input type="range" id="v14" min="0" max="4" step="0.05" value="1.5"></div>
+        <div class="note" id="ex14" hidden data-en="R = 0.10 m, θ = 2 + 4t³ (rad). Press “Jump to t = 2 s” and read aₜ and aₙ; compare with Example 1-3 in the notes.">R = 0.10 m，θ = 2 + 4t³（rad）。按“跳到 t = 2 s”读出 aₜ 和 aₙ，与讲义例1-3的答案对照。</div>
+        <div class="note" id="agv14" hidden data-en="Loaded AGV: centre of mass 0.6 m high, track width 0.5 m, tyre–floor friction μ = 0.6.">载货 AGV：质心高 0.6 m，轮距 0.5 m，轮胎与地面摩擦因数 μ = 0.6。</div>
+      </div>
+      <div class="card">
+        <h3 data-en="MEASUREMENTS (SI)">测量（SI 单位）</h3>
+        <dl class="readout" id="read14"></dl>
+      </div>
+      <div class="card">
+        <h3 data-en="TASKS">任务</h3>
+        <ul class="tasks" id="tasks14"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1.5 -->
+  <section class="lab" id="lab-1-5" role="tabpanel" hidden>
+    <div class="stagebox">
+      <div class="scenes"><span class="lbl" data-en="Scene">场景</span>
+        <button class="btn chip" data-s15="river" aria-pressed="true" data-en="Boat crossing a river">小船过河</button>
+        <button class="btn chip" data-s15="drone" aria-pressed="false" data-en="Robot: drone in a crosswind">机器人：无人机侧风</button>
+      </div>
+      <canvas id="c15" aria-label="相对运动实验 Relative motion lab"></canvas>
+      <div class="stagebar">
+        <button class="btn primary" id="go15" data-en="Go">出发</button>
+        <button class="btn" id="clear15" data-en="Clear">清除航迹</button>
+        <span class="legend">
+          <span><i style="background:var(--amber)"></i><span id="lg15a"></span></span>
+          <span><i style="background:var(--blue)"></i><span id="lg15b"></span></span>
+          <span><i style="background:var(--red)"></i><span id="lg15c"></span></span>
+        </span>
+      </div>
+      <div class="problem" id="prob15"></div>
+      <div class="goal" data-en="&lt;b&gt;Goal:&lt;/b&gt; use Galilean velocity addition v(A rel. C) = v(A rel. B) + v(B rel. C) to predict the path, then go and check.">
+        <b>实验目的：</b>用伽利略速度变换 v(A 对 C) = v(A 对 B) + v(B 对 C) 预测航迹，再出发验证。</div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl"><label for="u15" id="u15l"></label><output id="u15o"></output><input type="range" id="u15" min="0.5" max="5" step="0.1" value="2"></div>
+        <div class="ctl"><label for="w15" id="w15l"></label><output id="w15o"></output><input type="range" id="w15" min="0" max="5" step="0.1" value="1.2"></div>
+        <div class="ctl"><label for="p15" id="p15l"></label><output id="p15o"></output><input type="range" id="p15" min="-60" max="80" step="1" value="0"></div>
+        <label class="check"><input type="checkbox" id="pred15" checked><span data-en="Show predicted path">显示预测航迹</span></label>
+      </div>
+      <div class="card">
+        <h3 data-en="MEASUREMENTS">测量</h3>
+        <dl class="readout" id="read15"></dl>
+      </div>
+      <div class="card">
+        <h3 data-en="TASKS">任务</h3>
+        <ul class="tasks" id="tasks15"></ul>
+        <p class="hint" id="why15" hidden data-en="When the current is faster than the boat, the boat’s velocity relative to the bank always has a downstream part, so it cannot land straight across. The shortest path then has sinφ = v(boat)/v(water).">水速大于船速时，船对岸的速度总有向下游的分量，不可能正对岸靠岸。此时航程最短的船头方向满足 sinφ = v船 / v水。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer data-en="WenQuest virtual labs · use with the Chapter 1 notes, animations, lab guides and report templates. Task progress is saved only in this browser.">问渠 WenQuest 虚拟实验 · 与第 1 章讲义、动画、实验指导书和实验报告模板配套使用。任务进度只保存在这台设备的浏览器里。</footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = (id) => document.getElementById(id);
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const fmt = (x, d = 2) => (Math.abs(x) < 1e-9 ? 0 : x).toFixed(d);
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
+};
+
+// ---------- language ----------
+let lang = store.get("wq-ch1-lang") || ((navigator.language || "").startsWith("zh") ? "zh" : "zh");
+const T = (zh, en) => (lang === "en" ? en : zh);
+const langHooks = [];
+function applyLang() {
+  document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+  document.querySelectorAll("[data-en]").forEach((el) => {
+    if (el.dataset.zh === undefined) el.dataset.zh = el.innerHTML;
+    el.innerHTML = lang === "en" ? el.dataset.en : el.dataset.zh;
+  });
+  $("lang").textContent = lang === "en" ? "中文" : "EN";
+  document.title = T("质点运动学实验台", "Kinematics Lab Bench");
+  langHooks.forEach((f) => f());
+  paintTasks();
+}
+$("lang").onclick = () => { lang = lang === "en" ? "zh" : "en"; store.set("wq-ch1-lang", lang); applyLang(); };
+
+// ---------- canvas helpers ----------
+function stage(canvas) {
+  const ctx = canvas.getContext("2d");
+  const s = { canvas, ctx, w: 0, h: 0 };
+  s.fit = () => {
+    const r = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.width * 10 / 16));
+    if (w !== s.w || h !== s.h) { s.w = w; s.h = h; canvas.width = w * dpr; canvas.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  };
+  return s;
+}
+function arrow(ctx, x1, y1, x2, y2, color, width = 3) {
+  const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
+  if (L < 1) return;
+  const head = Math.min(12, L * 0.35), ang = Math.atan2(dy, dx);
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - head * 0.8 * Math.cos(ang), y2 - head * 0.8 * Math.sin(ang)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - head * Math.cos(ang - 0.4), y2 - head * Math.sin(ang - 0.4));
+  ctx.lineTo(x2 - head * Math.cos(ang + 0.4), y2 - head * Math.sin(ang + 0.4));
+  ctx.closePath(); ctx.fill();
+}
+function label(ctx, text, x, y, color, size = 13, align = "left") {
+  ctx.fillStyle = color; ctx.font = `${size}px ${css("--sans")}`; ctx.textAlign = align; ctx.textBaseline = "middle"; ctx.fillText(text, x, y);
+}
+function bindRange(id, show) {
+  const el = $(id), out = $(id + "o");
+  const upd = () => { if (out) out.textContent = show(+el.value); };
+  el.addEventListener("input", upd); upd();
+  el.refresh = upd;
+  return el;
+}
+function setRange(el, min, max, step, value) { el.min = min; el.max = max; el.step = step; el.value = value; el.refresh && el.refresh(); }
+function readout(id, rows) {
+  const dl = $(id);
+  if (dl.childElementCount !== rows.length * 2) dl.innerHTML = rows.map(() => "<dt></dt><dd></dd>").join("");
+  rows.forEach((r, i) => { dl.children[2 * i].textContent = r[0]; dl.children[2 * i + 1].textContent = r[1]; });
+}
+function pressed(sel, btn) { document.querySelectorAll(sel).forEach((x) => x.setAttribute("aria-pressed", x === btn)); }
+function problem(id, zhTitle, zhText, enTitle, enText) {
+  const el = $(id); el.hidden = false;
+  el.innerHTML = `<b></b><span></span>`;
+  el.firstChild.textContent = T(zhTitle, enTitle); el.lastChild.textContent = T(zhText, enText);
+}
+
+// ---------- tasks & progress ----------
+const TASKS = {};
+const saved = store.get("wq-ch1-tasks") || {};
+function tasks(lab, list) { TASKS[lab] = list.map((t) => ({ ...t, ok: !!saved[lab + ":" + t.id] })); }
+function done(lab, id) {
+  const t = TASKS[lab].find((x) => x.id === id);
+  if (!t || t.ok) return;
+  t.ok = true; saved[lab + ":" + id] = true; store.set("wq-ch1-tasks", saved); paintTasks();
+}
+function paintTasks() {
+  let n = 0, k = 0;
+  Object.entries(TASKS).forEach(([lab, list]) => {
+    const ul = $("tasks" + lab.replace("-", ""));
+    ul.innerHTML = "";
+    let labOk = 0;
+    list.forEach((t) => {
+      n++; if (t.ok) { k++; labOk++; }
+      const li = document.createElement("li");
+      li.className = t.ok ? "ok" : "";
+      li.innerHTML = `<span class="box" aria-hidden="true">${t.ok ? "✓" : ""}</span><span class="t"></span>`;
+      const span = li.querySelector(".t");
+      if (t.robot) { const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = T("机器人", "Robot"); span.appendChild(tag); }
+      span.appendChild(document.createTextNode(T(t.zh, t.en)));
+      ul.appendChild(li);
+    });
+    const tab = document.querySelector(`[data-lab="${lab}"] .done`);
+    if (tab) tab.textContent = labOk === list.length && list.length ? "✓" : labOk ? `${labOk}/${list.length}` : "";
+  });
+  $("progress").textContent = T(`已完成 ${k} / ${n} 个任务`, `${k} / ${n} tasks done`);
+}
+
+// ============================================================================ 1.1 reference frames
+const L11 = (() => {
+  const S = stage($("c11"));
+  let scene = "train";
+  const u = bindRange("u11", (v) => fmt(v, scene === "belt" ? 2 : 0) + " m/s");
+  const o = bindRange("o11", (v) => fmt(v, scene === "belt" ? 2 : 0) + " m/s");
+  const slow = bindRange("s11", (v) => "×" + v);
+  const g = 9.8;
+  const SC = {
+    train: { H: 1.8, floorY: 1.1, view: 24, x0: 0.35 },
+    belt: { y0: 0.7, yEnd: 0.2, vz: 0.25, view: 3.2, x0: 0.28, base: 0.95 },
+  };
+  let st = null;
+  tasks("1-1", [
+    { id: "line", zh: "列车：找到一个观察者，看到小球竖直下落。", en: "Train: find an observer who sees the ball fall straight down." },
+    { id: "back", zh: "列车：找到一个观察者，看到小球“向后”抛出。", en: "Train: find an observer who sees the ball thrown backwards." },
+    { id: "ground", zh: "列车：站在地面上看一次，落地点在松手点前方多远？", en: "Train: watch from the ground. How far ahead of the release point does it land?" },
+    { id: "belt", robot: true, zh: "传送带：在传送带参考系中，让末端竖直落到工件上。", en: "Conveyor: in the belt frame, make the gripper come straight down onto the part." },
+    { id: "beltg", robot: true, zh: "传送带：在地面参考系中读出抓取时末端对地速度的大小和方向。", en: "Conveyor: in the ground frame, read the gripper’s speed and direction relative to the ground." },
+  ]);
+  const T0 = () => (scene === "train" ? Math.sqrt(2 * SC.train.H / g) : (SC.belt.y0 - SC.belt.yEnd) / SC.belt.vz);
+  function setScene(sc) {
+    scene = sc; st = null;
+    pressed("[data-s11]", document.querySelector(`[data-s11="${sc}"]`));
+    if (sc === "train") { setRange(u, 0, 30, 1, 12); setRange(o, -30, 30, 1, 0); setRange(slow, 0.1, 1, 0.05, 0.3); }
+    else { setRange(u, 0, 1, 0.05, 0.5); setRange(o, -1, 1, 0.05, 0); setRange(slow, 0.1, 1, 0.05, 1); }
+    texts();
+  }
+  function texts() {
+    $("u11l").textContent = scene === "train" ? T("列车速度 u", "Train speed u") : T("传送带速度 u", "Belt speed u");
+    $("snapC11").textContent = scene === "train" ? T("坐在车厢里", "In the carriage") : T("随传送带运动", "Moving with the belt");
+    $("go11").textContent = scene === "train" ? T("松手，让小球下落", "Let go of the ball") : T("开始抓取", "Start grasp");
+    if (scene === "train") problem("prob11", "生活中的例子：", "下雨天坐车，车窗上的雨痕是斜的。雨痕的角度和车速有什么关系？", "Everyday example: ", "On a rainy day the raindrop streaks on a car window are slanted. How does the angle relate to the car’s speed?");
+    else problem("prob11", "机器人问题：传送带跟踪抓取", "工件在传送带上以 u 运动，机械臂要在运动中抓住它。在哪个参考系里规划抓取最简单？末端对地速度应是多少？", "Robot problem: grasping from a moving conveyor", "A part rides the belt at speed u and the arm must grab it on the move. In which frame is the grasp easiest to plan? What must the gripper’s velocity relative to the ground be?");
+    readouts();
+  }
+  document.querySelectorAll("[data-s11]").forEach((b) => (b.onclick = () => setScene(b.dataset.s11)));
+  $("snapG11").onclick = () => { o.value = 0; o.dispatchEvent(new Event("input")); };
+  $("snapC11").onclick = () => { o.value = u.value; o.dispatchEvent(new Event("input")); };
+  $("snapR11").onclick = () => { o.value = -u.value; o.dispatchEvent(new Event("input")); };
+  $("go11").onclick = () => { st = { u: +u.value, t: -0.5, landed: false }; readouts(); };
+  o.addEventListener("input", readouts); u.addEventListener("input", readouts);
+  function readouts() {
+    const uu = st ? st.u : +u.value, rel = uu - +o.value, TT = T0();
+    if (scene === "train") {
+      readout("read11", [
+        [T("下落高度", "Drop height"), "1.80 m"], [T("下落时间", "Fall time"), fmt(TT, 3) + " s"],
+        [T("小球相对观察者的水平速度", "Ball’s horizontal speed rel. observer"), fmt(rel, 1) + " m/s"],
+        [T("观察者看到的水平位移", "Horizontal shift seen"), st && st.landed ? fmt(rel * TT, 2) + " m" : "—"],
+      ]);
+    } else {
+      const vz = SC.belt.vz, vg = Math.hypot(uu, vz), ang = Math.atan2(vz, uu) * 180 / Math.PI;
+      readout("read11", [
+        [T("末端相对传送带", "Gripper rel. belt"), T("竖直向下 ", "straight down ") + fmt(vz, 2) + " m/s"],
+        [T("末端对地速度", "Gripper rel. ground"), st && st.landed ? fmt(vg, 3) + " m/s" : "—"],
+        [T("对地速度与水平方向夹角", "Angle below horizontal"), st && st.landed ? fmt(ang, 1) + "°" : "—"],
+        [T("末端相对观察者的水平速度", "Horizontal speed rel. observer"), fmt(rel, 2) + " m/s"],
+      ]);
+    }
+  }
+  function frame(dt) {
+    S.fit();
+    const { ctx, w, h } = S;
+    const vo = +o.value, TT = T0();
+    if (st && !st.landed) {
+      st.t += dt * +slow.value;
+      if (st.t >= TT) {
+        st.t = TT; st.landed = true;
+        const rel = st.u - vo;
+        if (scene === "train") {
+          if (Math.abs(rel) < 0.5) done("1-1", "line");
+          if (rel < -0.5) done("1-1", "back");
+          if (vo === 0 && st.u >= 5) done("1-1", "ground");
+        } else {
+          if (Math.abs(rel) < 0.03 && st.u > 0.05) done("1-1", "belt");
+          if (Math.abs(vo) < 1e-6 && st.u >= 0.2) done("1-1", "beltg");
+        }
+        readouts();
+      }
+    }
+    const P = SC[scene], ppm = w / P.view, x0 = w * P.x0, y0 = h * 0.82;
+    const t = st ? st.t : 0, uu = st ? st.u : +u.value;
+    const X = (x, tt) => x0 + (x - vo * tt) * ppm, Y = (y) => y0 - y * ppm;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = css("--ground"); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, y0); ctx.lineTo(w, y0); ctx.stroke();
+    const shift = vo * t, step = scene === "train" ? 3 : 0.25;
+    for (let k = Math.floor((shift - P.view) / step) * step; k < shift + P.view; k += step) {
+      const px = X(k, t);
+      ctx.strokeStyle = css("--ground"); ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(px, y0 + 2); ctx.lineTo(px, y0 + 10); ctx.stroke();
+      if (scene === "train") { ctx.strokeStyle = css("--grid"); ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(px, y0); ctx.lineTo(px, y0 - 3.6 * ppm); ctx.stroke(); }
+    }
+    let px, py, pathFn;
+    if (scene === "train") {
+      const { H, floorY } = P, relY = floorY + H;
+      const carX = uu * t, cl = X(carX - 4, t), cr = X(carX + 4, t);
+      ctx.fillStyle = css("--soft"); ctx.strokeStyle = css("--blue"); ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.roundRect(cl, Y(4.1), cr - cl, Y(floorY - 0.3) - Y(4.1), 8); ctx.fill(); ctx.stroke();
+      ctx.lineWidth = 1.5;
+      for (let k = -3; k <= 2; k += 1.6) ctx.strokeRect(X(carX + k, t), Y(3.7), 1.1 * ppm, 0.8 * ppm);
+      ctx.fillStyle = css("--ground");
+      [-2.8, 2.8].forEach((k) => { ctx.beginPath(); ctx.arc(X(carX + k, t), Y(0.35), 0.35 * ppm, 0, 7); ctx.fill(); });
+      ctx.strokeStyle = css("--blue"); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cl, Y(floorY)); ctx.lineTo(cr, Y(floorY)); ctx.stroke();
+      pathFn = (tt) => [uu * tt, relY - 0.5 * g * tt * tt];
+      const bt = Math.max(0, t);
+      px = X(uu * t, t); py = Y(st && st.t > 0 ? relY - 0.5 * g * bt * bt : relY);
+    } else {
+      const { y0: gy0, yEnd, vz, base } = P;
+      // conveyor: belt surface at 0.12 m, moving chevrons
+      const bl = X(-6, t), br = X(8, t), top = Y(0.12), bot = Y(0.04);
+      ctx.fillStyle = css("--soft"); ctx.strokeStyle = css("--ground"); ctx.lineWidth = 1.5;
+      ctx.fillRect(bl, top, br - bl, bot - top); ctx.strokeRect(bl, top, br - bl, bot - top);
+      ctx.strokeStyle = css("--muted"); ctx.lineWidth = 1.5;
+      for (let k = -6; k < 8; k += 0.2) {
+        const kx = X(k + (uu * t) % 0.2, t);
+        ctx.beginPath(); ctx.moveTo(kx - 4, top + 3); ctx.lineTo(kx + 2, (top + bot) / 2); ctx.lineTo(kx - 4, bot - 3); ctx.stroke();
+      }
+      // part on the belt
+      const partX = uu * t;
+      ctx.fillStyle = css("--orange"); ctx.fillRect(X(partX - 0.06, t), Y(0.2), 0.12 * ppm, 0.08 * ppm);
+      // gripper tracks the part and comes down at vz relative to the belt
+      const gx = partX, gy = st && st.t > 0 ? gy0 - vz * st.t : gy0;
+      // arm: base fixed to the ground at x = base
+      const bx = X(base, t), byy = Y(0), sh = [bx, Y(0.35)];
+      ctx.fillStyle = css("--ground"); ctx.fillRect(bx - 0.08 * ppm, sh[1], 0.16 * ppm, byy - sh[1]);
+      const tx = X(gx, t), ty = Y(gy + 0.06);
+      const L1 = 0.55 * ppm, L2 = 0.55 * ppm, dx = tx - sh[0], dy = ty - sh[1], d = Math.min(Math.hypot(dx, dy), L1 + L2 - 1);
+      const a0 = Math.atan2(dy, dx), a1 = Math.acos((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d));
+      const ex = sh[0] + L1 * Math.cos(a0 - a1), ey = sh[1] + L1 * Math.sin(a0 - a1);
+      ctx.strokeStyle = css("--blue"); ctx.lineWidth = 9; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(sh[0], sh[1]); ctx.lineTo(ex, ey); ctx.lineTo(tx, ty); ctx.stroke();
+      ctx.fillStyle = css("--panel"); ctx.strokeStyle = css("--ink"); ctx.lineWidth = 2;
+      [sh, [ex, ey]].forEach(([qx, qy]) => { ctx.beginPath(); ctx.arc(qx, qy, 6, 0, 7); ctx.fill(); ctx.stroke(); });
+      ctx.strokeStyle = css("--ink"); ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(tx - 10, ty); ctx.lineTo(tx + 10, ty); ctx.moveTo(tx - 10, ty); ctx.lineTo(tx - 10, ty + 12); ctx.moveTo(tx + 10, ty); ctx.lineTo(tx + 10, ty + 12); ctx.stroke();
+      pathFn = (tt) => [uu * tt, gy0 - vz * tt];
+      px = tx; py = Y(gy);
+    }
+    if (st && st.t > 0) {
+      ctx.strokeStyle = css("--amber"); ctx.lineWidth = 3; ctx.beginPath();
+      for (let i = 0; i <= 60; i++) {
+        const tt = st.t * i / 60, [x, y] = pathFn(tt), sx = x0 + (x - vo * tt) * ppm;
+        i ? ctx.lineTo(sx, Y(y)) : ctx.moveTo(sx, Y(y));
+      }
+      ctx.stroke();
+    }
+    if (scene === "train") { ctx.fillStyle = css("--amber"); ctx.beginPath(); ctx.arc(px, py, 7, 0, 7); ctx.fill(); }
+    const who = vo === 0 ? T("站在地面上看", "Seen from the ground") : Math.abs(vo - uu) < 1e-6
+      ? (scene === "train" ? T("坐在车厢里看", "Seen from the carriage") : T("随传送带运动时看", "Seen moving with the belt"))
+      : T(`观察者以 ${vo} m/s 运动`, `Observer moving at ${vo} m/s`);
+    label(ctx, who, 14, 20, css("--ink"), 15);
+    label(ctx, (scene === "train" ? T("列车 ", "Train ") : T("传送带 ", "Belt ")) + uu + " m/s →", 14, 42, css("--muted"), 13);
+    if (st && st.landed) {
+      const rel = st.u - vo;
+      const kind = Math.abs(rel) < (scene === "train" ? 0.5 : 0.03) ? T("轨迹：竖直直线", "Path: vertical line")
+        : scene === "train" ? (rel > 0 ? T("轨迹：向前的抛物线", "Path: forward parabola") : T("轨迹：向后的抛物线", "Path: backward parabola"))
+        : T("轨迹：斜直线", "Path: slanted line");
+      label(ctx, kind, w - 14, 20, css("--amber"), 15, "right");
+    }
+  }
+  langHooks.push(texts);
+  return { frame };
+})();
+
+// ============================================================================ 1.2 position, displacement, velocity, odometry
+const L12 = (() => {
+  const S = stage($("c12"));
+  const PRE = {
+    ex: { x: "2*t", y: "19-2*t^2", tmax: 3 },
+    circle: { x: "3*cos(t)", y: "3*sin(t)", tmax: 6.28 },
+    cycloid: { x: "t-sin(t)", y: "1-cos(t)", tmax: 12.56 },
+    odo: { x: "2*sin(0.3*t)", y: "sin(0.6*t)", tmax: 20 },
+  };
+  let fx, fy, tmax, key = "ex", playing = false, box;
+  const tEl = $("t12"), dEl = $("d12");
+  const dtVal = () => 0.002 * Math.pow(1000, +dEl.value);
+  const ts = bindRange("ts12", (v) => fmt(v, 2) + " s"), sg = bindRange("sg12", (v) => fmt(v * 100, 1) + " cm");
+  tasks("1-2", [
+    { id: "small", zh: "把 Δt 调小，直到 |Δr| 与 Δs 相差不到 1%。", en: "Shrink Δt until |Δr| and Δs differ by less than 1%." },
+    { id: "ex1", zh: "例1-1 中把 t 调到 1.00 s，验证 v = 2i − 4j。", en: "In Example 1-1 set t = 1.00 s and check v = 2i − 4j." },
+    { id: "circle", zh: "匀速圆周中：|r| 不变，d|r|/dt = 0，但速率不为零。为什么？", en: "Uniform circle: |r| is constant so d|r|/dt = 0, yet the speed is not zero. Why?" },
+    { id: "odo5", robot: true, zh: "里程计：定位噪声 1 cm 时，找一个采样间隔，使测得速率的误差小于 5%。", en: "Odometry: with 1 cm position noise, find a sampling interval that gives less than 5% speed error." },
+    { id: "odoN", robot: true, zh: "里程计：把采样间隔调到 0.05 s 以下，观察噪声怎样被放大。", en: "Odometry: set the interval below 0.05 s and see how the noise is amplified." },
+  ]);
+  function compile(src) {
+    if (!/^[\d\s.+\-*/^(),a-z]*$/i.test(src)) throw new Error(T("含有不支持的字符", "unsupported character"));
+    const ok = ["t", "sin", "cos", "tan", "exp", "sqrt", "log", "abs", "pi"];
+    (src.match(/[a-z]+/gi) || []).forEach((wd) => { if (!ok.includes(wd.toLowerCase())) throw new Error(T("不认识 “", "unknown “") + wd + "”"); });
+    const js = src.replace(/\^/g, "**").replace(/\bpi\b/gi, "Math.PI").replace(/\b(sin|cos|tan|exp|sqrt|log|abs)\b/g, "Math.$1");
+    const f = new Function("t", '"use strict"; return (' + js + ");");
+    if (!Number.isFinite(f(0.5))) throw new Error(T("在 t = 0.5 处没有定义", "undefined at t = 0.5"));
+    return f;
+  }
+  function load(x, y, tm) {
+    fx = compile(x); fy = compile(y); tmax = tm;
+    tEl.max = tm; if (+tEl.value > tm) tEl.value = Math.min(0.8, tm);
+    let xmin = 0, xmax = 0, ymin = 0, ymax = 0;
+    for (let i = 0; i <= 400; i++) {
+      const t = tm * i / 400, X = fx(t), Y = fy(t);
+      if (!Number.isFinite(X) || !Number.isFinite(Y)) continue;
+      xmin = Math.min(xmin, X); xmax = Math.max(xmax, X); ymin = Math.min(ymin, Y); ymax = Math.max(ymax, Y);
+    }
+    const padx = (xmax - xmin) * 0.12 + 0.3, pady = (ymax - ymin) * 0.12 + 0.3;
+    box = { xmin: xmin - padx, xmax: xmax + padx, ymin: ymin - pady, ymax: ymax + pady };
+    tEl.dispatchEvent(new Event("input"));
+  }
+  function modeUI() {
+    const odo = key === "odo";
+    $("std12").hidden = odo; $("odo12").hidden = !odo; $("leg12").hidden = odo; $("play12").hidden = odo;
+    $("custom12").hidden = key !== "custom";
+    if (odo) problem("prob12", "机器人问题：移动机器人的里程计", "机器人每隔一段时间记录一次自己的位置（定位误差约 1 cm），用相邻两点的位移除以时间间隔来算速度。采样间隔该怎么选？", "Robot problem: odometry of a mobile robot", "The robot logs its position at fixed intervals (about 1 cm error) and estimates speed from the displacement between samples. How should the interval be chosen?");
+    else problem("prob12", "生活中的例子：", "手机导航每秒得到一个 GPS 定位点，它显示的速度就是用相邻定位点算出来的平均速度。", "Everyday example: ", "A phone’s navigation gets one GPS fix per second; the speed it shows is the average velocity between neighbouring fixes.");
+    $("err12").textContent = T("可用 + − * / ^、sin cos tan exp sqrt log abs、pi。", "Use + − * / ^, sin cos tan exp sqrt log abs, pi.");
+  }
+  $("pre12").onchange = (e) => {
+    key = e.target.value; modeUI();
+    if (key === "custom") $("apply12").click(); else load(PRE[key].x, PRE[key].y, PRE[key].tmax);
+    if (key === "circle") done("1-2", "circle");
+  };
+  $("apply12").onclick = () => {
+    try { load($("x12").value, $("y12").value, Math.max(0.5, Math.min(50, +$("tm12").value || 6))); $("err12").textContent = T("已画出。", "Drawn."); }
+    catch (err) { $("err12").textContent = T("写法有误：", "Check the formula: ") + err.message; }
+  };
+  $("play12").onclick = () => { playing = !playing; $("play12").textContent = playing ? T("暂停", "Pause") : T("播放", "Play"); };
+  bindRange("t12", (v) => fmt(v, 2) + " s");
+  bindRange("d12", () => fmt(dtVal(), 3) + " s");
+  const d = (f, t, h = 1e-4) => (f(t + h) - f(t - h)) / (2 * h);
+  const d2 = (f, t, h = 1e-3) => (f(t + h) - 2 * f(t) + f(t - h)) / (h * h);
+  function arc(t0, t1) { const n = 300; let s = 0; for (let i = 0; i < n; i++) { const a = t0 + (t1 - t0) * (i + 0.5) / n; s += Math.hypot(d(fx, a), d(fy, a)) * (t1 - t0) / n; } return s; }
+  // repeatable Gaussian noise
+  const rnd = (i) => { const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); };
+  const gauss = (i) => Math.sqrt(-2 * Math.log(rnd(i) + 1e-12)) * Math.cos(2 * Math.PI * rnd(i + 0.5));
+  load(PRE.ex.x, PRE.ex.y, PRE.ex.tmax); modeUI();
+
+  function view(w, h, pad) {
+    const sc = Math.min((w - 2 * pad) / (box.xmax - box.xmin), (h - 2 * pad) / (box.ymax - box.ymin));
+    const ox = pad + ((w - 2 * pad) - sc * (box.xmax - box.xmin)) / 2 - box.xmin * sc;
+    const oy = h - pad - ((h - 2 * pad) - sc * (box.ymax - box.ymin)) / 2 + box.ymin * sc;
+    return { sc, P: (X, Y) => [ox + X * sc, oy - Y * sc] };
+  }
+  function grid(ctx, w, h, P) {
+    const step = Math.pow(10, Math.floor(Math.log10((box.xmax - box.xmin) / 6)));
+    const st2 = (box.xmax - box.xmin) / step > 14 ? step * 2 : step;
+    ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+    for (let gx = Math.ceil(box.xmin / st2) * st2; gx <= box.xmax; gx += st2) { const [px] = P(gx, 0); ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, h); ctx.stroke(); }
+    for (let gy = Math.ceil(box.ymin / st2) * st2; gy <= box.ymax; gy += st2) { const [, py] = P(0, gy); ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(w, py); ctx.stroke(); }
+    const [ax0, ay0] = P(0, 0);
+    ctx.strokeStyle = css("--muted"); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(0, ay0); ctx.lineTo(w, ay0); ctx.moveTo(ax0, 0); ctx.lineTo(ax0, h); ctx.stroke();
+    label(ctx, "x", w - 12, ay0 - 10, css("--muted")); label(ctx, "y", ax0 + 8, 12, css("--muted"));
+    label(ctx, T("网格 ", "grid ") + +st2.toPrecision(2) + " m", 10, h - 12, css("--muted"), 12);
+    return [ax0, ay0];
+  }
+  function frameOdo(ctx, w, h) {
+    const { P } = view(w, h * 0.62, 30);
+    ctx.save(); grid(ctx, w, h * 0.62, P); ctx.restore();
+    ctx.strokeStyle = css("--blue"); ctx.lineWidth = 2; ctx.beginPath();
+    for (let i = 0; i <= 500; i++) { const tt = tmax * i / 500; const [px, py] = P(fx(tt), fy(tt)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+    ctx.stroke();
+    const Ts = +ts.value, sig = +sg.value, N = Math.floor(tmax / Ts);
+    const pts = [];
+    for (let k = 0; k <= N; k++) { const t = k * Ts; pts.push([fx(t) + sig * gauss(k * 2 + 1), fy(t) + sig * gauss(k * 2 + 2), t]); }
+    ctx.fillStyle = css("--ink");
+    pts.forEach(([x, y]) => { const [px, py] = P(x, y); ctx.beginPath(); ctx.arc(px, py, N > 200 ? 1.5 : 3, 0, 7); ctx.fill(); });
+    // speed chart
+    const cx0 = 48, cy0 = h - 26, cw = w - 64, ch = h * 0.28;
+    const vTrue = (t) => Math.hypot(d(fx, t), d(fy, t));
+    let est = [], err2 = 0, n = 0;
+    for (let k = 0; k < pts.length - 1; k++) {
+      const v = Math.hypot(pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1]) / Ts, tm = pts[k][2] + Ts / 2;
+      est.push([tm, v]); const vt = vTrue(tm); err2 += ((v - vt) / vt) ** 2; n++;
+    }
+    const rms = n ? Math.sqrt(err2 / n) : 0;
+    const vmax = 1.2;
+    ctx.strokeStyle = css("--line"); ctx.lineWidth = 1; ctx.strokeRect(cx0, cy0 - ch, cw, ch);
+    label(ctx, T("速率 m/s", "speed m/s"), cx0, cy0 - ch - 10, css("--muted"), 12);
+    label(ctx, "0", cx0 - 6, cy0, css("--muted"), 11, "right"); label(ctx, String(vmax), cx0 - 6, cy0 - ch, css("--muted"), 11, "right");
+    label(ctx, "t = 20 s", cx0 + cw, cy0 + 12, css("--muted"), 11, "right");
+    const C = (t, v) => [cx0 + t / tmax * cw, cy0 - Math.min(v, vmax) / vmax * ch];
+    ctx.strokeStyle = css("--blue"); ctx.lineWidth = 2; ctx.beginPath();
+    for (let i = 0; i <= 300; i++) { const t = tmax * i / 300; const [px, py] = C(t, vTrue(t)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+    ctx.stroke();
+    ctx.strokeStyle = css("--red"); ctx.lineWidth = 1.5; ctx.beginPath();
+    est.forEach(([t, v], i) => { const [px, py] = C(t, v); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }); ctx.stroke();
+    label(ctx, T("蓝：真实速率　红：由采样点算出", "blue: true speed   red: from samples"), cx0 + cw, cy0 - ch - 10, css("--muted"), 12, "right");
+    readout("read12", [
+      [T("采样间隔", "Sampling interval"), fmt(Ts, 2) + " s"], [T("定位噪声", "Position noise"), fmt(sig * 100, 1) + " cm"],
+      [T("采样点数", "Samples"), String(pts.length)], [T("速率相对误差（均方根）", "Speed error (RMS)"), fmt(rms * 100, 1) + " %"],
+    ]);
+    if (sig >= 0.0095 && rms < 0.05) done("1-2", "odo5");
+    if (sig >= 0.0095 && Ts <= 0.05 && rms > 0.2) done("1-2", "odoN");
+  }
+  function frame(dt) {
+    S.fit();
+    const { ctx, w, h } = S;
+    ctx.clearRect(0, 0, w, h);
+    if (key === "odo") return frameOdo(ctx, w, h);
+    if (playing) { let t = +tEl.value + dt * 0.6; if (t > tmax) t = 0; tEl.value = t; $("t12o").textContent = fmt(t, 2) + " s"; }
+    const t = +tEl.value, Dt = Math.min(dtVal(), tmax - t);
+    const { P } = view(w, h, 36);
+    const [ax0, ay0] = grid(ctx, w, h, P);
+    ctx.strokeStyle = css("--blue"); ctx.lineWidth = 2.5; ctx.beginPath();
+    for (let i = 0; i <= 500; i++) { const tt = tmax * i / 500; const [px, py] = P(fx(tt), fy(tt)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+    ctx.stroke();
+    const X0 = fx(t), Y0 = fy(t), X1 = fx(t + Dt), Y1 = fy(t + Dt);
+    const [p0x, p0y] = P(X0, Y0), [p1x, p1y] = P(X1, Y1);
+    if ($("sd12").checked && Dt > 0) {
+      ctx.strokeStyle = css("--green"); ctx.lineWidth = 7; ctx.globalAlpha = 0.55; ctx.beginPath();
+      for (let i = 0; i <= 80; i++) { const tt = t + Dt * i / 80; const [px, py] = P(fx(tt), fy(tt)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+      ctx.stroke(); ctx.globalAlpha = 1;
+      arrow(ctx, ax0, ay0, p1x, p1y, css("--muted"), 1.5);
+      arrow(ctx, p0x, p0y, p1x, p1y, css("--red"), 3);
+    }
+    arrow(ctx, ax0, ay0, p0x, p0y, css("--amber"), 3);
+    const vx = d(fx, t), vy = d(fy, t), ax = d2(fx, t), ay = d2(fy, t);
+    const span = Math.max(box.xmax - box.xmin, box.ymax - box.ymin), vm = Math.hypot(vx, vy);
+    if ($("sv12").checked && vm > 1e-6) { const k = span * 0.18 / vm * Math.min(1, vm); const [qx, qy] = P(X0 + vx * k, Y0 + vy * k); arrow(ctx, p0x, p0y, qx, qy, css("--orange"), 3.5); }
+    if ($("sa12").checked) { const am = Math.hypot(ax, ay); const ka = am > 1e-6 ? span * 0.14 / am : 0; const [qx, qy] = P(X0 + ax * ka, Y0 + ay * ka); arrow(ctx, p0x, p0y, qx, qy, css("--violet"), 3); }
+    ctx.fillStyle = css("--ink"); ctx.beginPath(); ctx.arc(p0x, p0y, 5, 0, 7); ctx.fill();
+    const dr = Math.hypot(X1 - X0, Y1 - Y0), ds = Dt > 0 ? arc(t, t + Dt) : 0;
+    const rr = Math.hypot(X0, Y0), drdt = rr > 1e-9 ? (X0 * vx + Y0 * vy) / rr : 0;
+    readout("read12", [
+      ["r", `(${fmt(X0)}, ${fmt(Y0)})`], ["v", `(${fmt(vx)}, ${fmt(vy)})`], [T("速率 |v|", "speed |v|"), fmt(vm, 3)],
+      ["a", `(${fmt(ax)}, ${fmt(ay)})`], ["|Δr|", fmt(dr, 4)], ["Δs", fmt(ds, 4)], ["Δ|r|", fmt(Math.hypot(X1, Y1) - rr, 4)], ["d|r|/dt", fmt(drdt, 3)],
+    ]);
+    if (Dt > 0 && ds > 1e-6 && (ds - dr) / ds < 0.01 && Dt < 0.5) done("1-2", "small");
+    if (key === "ex" && Math.abs(t - 1) < 0.006) done("1-2", "ex1");
+  }
+  langHooks.push(() => { modeUI(); $("play12").textContent = playing ? T("暂停", "Pause") : T("播放", "Play"); });
+  return { frame };
+})();
+
+// ============================================================================ 1.3 projectile
+const L13 = (() => {
+  const S = stage($("c13"));
+  const v0 = bindRange("v13", (v) => fmt(v, 1) + " m/s"), th = bindRange("a13", (v) => v + "°"), h0 = bindRange("h13", (v) => fmt(v, 1) + " m");
+  let g = 9.8, shots = [], cur = null, target = 38, launched = {}, scene = "range", hoopHits = new Set();
+  const HOOP = { x: 4, y: 2.43, r: 0.225 };
+  const drag = $("drag13");
+  tasks("1-3", [
+    { id: "hit", zh: "命中地面靶子（落点在靶心 ±1.5 m 以内）。", en: "Hit the ground target (within ±1.5 m)." },
+    { id: "best", zh: "h₀ = 0、无空气阻力时，找出射程最大的抛射角。", en: "With h₀ = 0 and no drag, find the angle of maximum range." },
+    { id: "pair", zh: "同一初速度下分别以 30° 和 60° 发射，比较射程。", en: "Launch at 30° and 60° with the same speed and compare the ranges." },
+    { id: "drag", zh: "打开空气阻力，用两个不同角度发射：最佳角度还是 45° 吗？", en: "Switch on drag and launch at two angles. Is 45° still best?" },
+    { id: "hoop", robot: true, zh: "投篮：让球从上方落入篮筐。", en: "Basket: drop the ball into the hoop from above." },
+    { id: "hoop2", robot: true, zh: "投篮：用两个不同的角度都投进，比较所需的出手速度。", en: "Basket: score at two different angles and compare the launch speeds needed." },
+  ]);
+  function setScene(sc) {
+    scene = sc; shots = []; cur = null; $("toast13").textContent = "";
+    pressed("[data-s13]", document.querySelector(`[data-s13="${sc}"]`));
+    if (sc === "hoop") { setRange(v0, 3, 15, 0.1, 7.5); setRange(th, 0, 90, 1, 55); setRange(h0, 0, 3, 0.1, 0.8); }
+    else { setRange(v0, 3, 40, 0.1, 20); setRange(th, 0, 90, 1, 60); setRange(h0, 0, 30, 0.1, 0); }
+    $("target13").hidden = sc === "hoop";
+    texts();
+  }
+  function texts() {
+    if (scene === "hoop") problem("prob13", "机器人问题：投篮机器人", "出手点高 0.8 m，篮筐高 2.43 m、水平距离 4 m。给定出手角度，出手速度应是多少？角度大一些好还是小一些好？", "Robot problem: a basketball-shooting robot", "The ball leaves at 0.8 m; the hoop is 2.43 m high and 4 m away. For a given angle, what launch speed is needed? Is a steeper or flatter shot better?");
+    else problem("prob13", "生活中的例子：", "铅球运动员出手高度约 2 m、出手速度约 13–14 m/s，最佳出手角并不是 45°。把 h₀ 调到 2 m 试一试。", "Everyday example: ", "A shot-putter releases at about 2 m height and 13–14 m/s; the best angle is not 45°. Set h₀ to 2 m and try.");
+    lastReadout();
+  }
+  document.querySelectorAll("[data-s13]").forEach((b) => (b.onclick = () => setScene(b.dataset.s13)));
+  document.querySelectorAll("[data-g]").forEach((b) => (b.onclick = () => { g = +b.dataset.g; pressed("[data-g]", b); }));
+  $("clear13").onclick = () => { shots = []; cur = null; };
+  $("target13").onclick = () => { target = Math.round(15 + Math.random() * 45); $("toast13").textContent = T(`新靶子在 ${target} m 处`, `New target at ${target} m`); };
+  $("fire13").onclick = () => {
+    const a = +th.value * Math.PI / 180;
+    cur = { x: 0, y: +h0.value, vx: +v0.value * Math.cos(a), vy: +v0.value * Math.sin(a), t: 0, pts: [[0, +h0.value]], ymax: +h0.value,
+      drag: drag.checked, g, v0: +v0.value, th: +th.value, h0: +h0.value, hue: shots.length % 5, scored: false };
+    $("toast13").textContent = "";
+  };
+  ["v13", "a13", "h13"].forEach((id) => $(id).addEventListener("input", lastReadout));
+  function theory(s) {
+    const a = s.th * Math.PI / 180, vy = s.v0 * Math.sin(a), vx = s.v0 * Math.cos(a);
+    const TT = (vy + Math.sqrt(vy * vy + 2 * s.g * s.h0)) / s.g;
+    return { T: TT, R: vx * TT, H: s.h0 + (vy > 0 ? vy * vy / (2 * s.g) : 0) };
+  }
+  function needV() {
+    const a = +th.value * Math.PI / 180, X = HOOP.x, dy = HOOP.y - +h0.value, den = 2 * Math.cos(a) ** 2 * (X * Math.tan(a) - dy);
+    return den > 0 ? Math.sqrt(g * X * X / den) : NaN;
+  }
+  let last = null;
+  function lastReadout() {
+    const rows = [["", T("测量 ｜ 理论（无阻力）", "measured | theory (no drag)")]];
+    if (last) {
+      const t0 = theory(last);
+      rows.push([T("飞行时间", "Flight time"), `${fmt(last.t, 2)} s ｜ ${fmt(t0.T, 2)} s`]);
+      rows.push([T("射程", "Range"), `${fmt(last.x, 2)} m ｜ ${fmt(t0.R, 2)} m`]);
+      rows.push([T("最大高度", "Max height"), `${fmt(last.ymax, 2)} m ｜ ${fmt(t0.H, 2)} m`]);
+    } else rows.push([T("飞行时间", "Flight time"), "—"], [T("射程", "Range"), "—"], [T("最大高度", "Max height"), "—"]);
+    if (scene === "hoop") { const v = needV(); rows.push([T("此角度投进所需 v₀", "v₀ needed at this angle"), Number.isFinite(v) ? fmt(v, 2) + " m/s" : T("投不到", "cannot reach")]); }
+    readout("read13", rows);
+  }
+  function land(s) {
+    shots.push(s); if (shots.length > 12) shots.shift(); last = s; lastReadout();
+    if (scene === "hoop") {
+      $("toast13").textContent = s.scored ? T("投进了！", "Scored!") : T("没投进", "Missed");
+      return;
+    }
+    if (Math.abs(s.x - target) <= 1.5) { done("1-3", "hit"); $("toast13").textContent = T("命中！", "Hit!"); }
+    else $("toast13").textContent = s.x < target ? T(`近了 ${fmt(target - s.x, 1)} m`, `${fmt(target - s.x, 1)} m short`) : T(`远了 ${fmt(s.x - target, 1)} m`, `${fmt(s.x - target, 1)} m long`);
+    if (!s.drag && s.h0 === 0) {
+      launched[s.v0 + ":" + s.th] = s.x;
+      if (s.th === 45) done("1-3", "best");
+      if (launched[s.v0 + ":30"] !== undefined && launched[s.v0 + ":60"] !== undefined) done("1-3", "pair");
+    }
+    if (s.drag) { launched["d" + s.th] = 1; if (Object.keys(launched).filter((k) => k[0] === "d").length >= 2) done("1-3", "drag"); }
+  }
+  function frame(dt) {
+    S.fit();
+    const { ctx, w, h } = S;
+    if (cur) {
+      const k = 0.012;
+      let left = Math.min(dt, 0.05) * (scene === "hoop" ? 0.6 : 1);
+      while (left > 0 && cur) {
+        const h1 = Math.min(1 / 480, left); left -= h1;
+        const sp = Math.hypot(cur.vx, cur.vy), yPrev = cur.y;
+        cur.vx += (cur.drag ? -k * sp * cur.vx : 0) * h1; cur.vy += (-cur.g - (cur.drag ? k * sp * cur.vy : 0)) * h1;
+        cur.x += cur.vx * h1; cur.y += cur.vy * h1; cur.t += h1; cur.ymax = Math.max(cur.ymax, cur.y);
+        if (scene === "hoop" && !cur.scored && yPrev > HOOP.y && cur.y <= HOOP.y && Math.abs(cur.x - HOOP.x) < HOOP.r - 0.12) {
+          cur.scored = true; done("1-3", "hoop"); hoopHits.add(cur.th); if (hoopHits.size >= 2) done("1-3", "hoop2");
+        }
+        if (cur.y <= 0 && cur.t > 0.01) {
+          const back = cur.y / (cur.vy || -1); cur.x -= cur.vx * back; cur.t -= back; cur.y = 0; cur.pts.push([cur.x, 0]); land(cur); cur = null; break;
+        }
+      }
+      if (cur && cur.t - (cur.lastT || 0) > 0.01) { cur.pts.push([cur.x, cur.y]); cur.lastT = cur.t; }
+    }
+    const t0 = theory({ th: +th.value, v0: +v0.value, g, h0: +h0.value });
+    let xm, ym;
+    if (scene === "hoop") { xm = 6.5; ym = 4; } else {
+      xm = Math.max(50, t0.R * 1.1, target + 6); ym = Math.max(20, t0.H * 1.15, +h0.value + 5);
+      shots.concat(cur ? [cur] : []).forEach((s) => { xm = Math.max(xm, s.x * 1.05); ym = Math.max(ym, s.ymax * 1.1); });
+    }
+    const padL = 44, padB = 30, padT = 16, padR = 16;
+    const sc = Math.min((w - padL - padR) / xm, (h - padB - padT) / ym);
+    const P = (x, y) => [padL + x * sc, h - padB - y * sc];
+    ctx.clearRect(0, 0, w, h);
+    const tick = scene === "hoop" ? 1 : xm > 150 ? 50 : xm > 60 ? 20 : 10;
+    ctx.font = `12px ${css("--mono")}`; ctx.textBaseline = "top"; ctx.textAlign = "center";
+    for (let x = 0; x <= xm + 1e-9; x += tick) { const [px, py] = P(x, 0); ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, padT); ctx.stroke(); ctx.fillStyle = css("--muted"); ctx.fillText(x, px, py + 6); }
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (let y = 0; y <= ym + 1e-9; y += scene === "hoop" ? 0.5 : tick / 2) { const [px, py] = P(0, y); ctx.strokeStyle = css("--grid"); ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(w - padR, py); ctx.stroke(); ctx.fillStyle = css("--muted"); ctx.fillText(y, px - 6, py); }
+    label(ctx, T("单位：m", "units: m"), w - padR - 4, padT + 10, css("--muted"), 12, "right");
+    const [gx0, gy0] = P(0, 0);
+    ctx.strokeStyle = css("--ground"); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(gx0, gy0); ctx.lineTo(w - padR, gy0); ctx.stroke();
+    if (+h0.value > 0) {
+      const [px, py] = P(0, +h0.value); ctx.fillStyle = css("--soft"); ctx.strokeStyle = css("--ground"); ctx.lineWidth = 1.5;
+      const bw = scene === "hoop" ? 26 : 16; ctx.fillRect(px - bw, py, bw, gy0 - py); ctx.strokeRect(px - bw, py, bw, gy0 - py);
+      if (scene === "hoop") label(ctx, T("机器人", "robot"), px - bw / 2, py - 10, css("--muted"), 11, "center");
+    }
+    if (scene === "hoop") {
+      const [hx1, hy] = P(HOOP.x - HOOP.r, HOOP.y), [hx2] = P(HOOP.x + HOOP.r, HOOP.y), [bx, by] = P(HOOP.x + HOOP.r + 0.05, HOOP.y + 1.0), [, by2] = P(0, HOOP.y - 0.1);
+      ctx.strokeStyle = css("--red"); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(hx1, hy); ctx.lineTo(hx2, hy); ctx.stroke();
+      ctx.strokeStyle = css("--ground"); ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx, by2); ctx.stroke();
+      const [, pb] = P(0, 0); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(bx + 8, by2); ctx.lineTo(bx + 8, pb); ctx.stroke();
+      label(ctx, T("篮筐 2.43 m", "hoop 2.43 m"), hx1 - 4, hy - 12, css("--red"), 12, "right");
+    } else {
+      const [tx, ty] = P(target, 0); ctx.fillStyle = css("--red"); ctx.fillRect(tx - 1.5 * sc, ty - 5, 3 * sc, 5);
+      label(ctx, T("靶 ", "target ") + target + " m", tx, ty - 14, css("--red"), 12, "center");
+    }
+    const a = +th.value * Math.PI / 180, [lx, ly] = P(0, +h0.value);
+    arrow(ctx, lx, ly, lx + 46 * Math.cos(a), ly - 46 * Math.sin(a), css("--muted"), 2);
+    const hues = ["--blue", "--green", "--orange", "--violet", "--amber"];
+    shots.concat(cur ? [cur] : []).forEach((s, i, arr) => {
+      ctx.strokeStyle = css(hues[s.hue]); ctx.lineWidth = s === cur || i === arr.length - 1 ? 3 : 1.6;
+      ctx.setLineDash(s.drag ? [6, 4] : []); ctx.beginPath();
+      s.pts.forEach(([x, y], j) => { const [px, py] = P(x, y); j ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+      if (s === cur) { const [px, py] = P(s.x, s.y); ctx.lineTo(px, py); }
+      ctx.stroke(); ctx.setLineDash([]);
+      if (s !== cur && scene !== "hoop") { const [px, py] = P(s.x, 0); label(ctx, s.th + "°", px, py - 10, css(hues[s.hue]), 11, "center"); }
+    });
+    if (cur) {
+      const [px, py] = P(cur.x, cur.y);
+      ctx.fillStyle = scene === "hoop" ? css("--orange") : css("--ink"); ctx.beginPath(); ctx.arc(px, py, scene === "hoop" ? 0.12 * sc : 5, 0, 7); ctx.fill();
+      const kk = scene === "hoop" ? 8 : 1.6;
+      arrow(ctx, px, py, px + cur.vx * kk, py, css("--blue"), 2); arrow(ctx, px, py, px, py - cur.vy * kk, css("--green"), 2);
+    }
+    label(ctx, `g = ${g} m/s²${drag.checked ? T(" · 有空气阻力（虚线）", " · with drag (dashed)") : ""}`, padL + 8, padT + 10, css("--muted"), 12);
+  }
+  langHooks.push(texts);
+  return { frame };
+})();
+
+// ============================================================================ 1.4 circular motion
+const L14 = (() => {
+  const S = stage($("c14"));
+  const Rr = bindRange("R14", (v) => fmt(v, 1) + " m"), W = bindRange("w14", (v) => fmt(v, 1) + " rad/s");
+  const A = bindRange("al14", (v) => fmt(v, 2) + " rad/s²"), V = bindRange("v14", (v) => fmt(v, 2) + " m/s");
+  const AGV = { h: 0.6, b: 0.5, mu: 0.6, g: 9.8 };
+  let mode = "uniform", t = 0, playing = true;
+  tasks("1-4", [
+    { id: "an8", zh: "匀速圆周：调节 R 和 ω，让 aₙ 达到 8 m/s²（±0.3）。", en: "Uniform: adjust R and ω so that aₙ = 8 m/s² (±0.3)." },
+    { id: "angle", zh: "匀加速圆周：找到 a 与 v 夹角小于 60° 的时刻。", en: "Speeding up: find a moment when the angle between a and v is below 60°." },
+    { id: "ex", zh: "例1-3：读出 t = 2 s 时的 aₜ 和 aₙ。", en: "Example 1-3: read aₜ and aₙ at t = 2 s." },
+    { id: "agv", robot: true, zh: "AGV：转弯半径 1.5 m 时，找出不侧翻的最大速度（误差 0.06 m/s 以内）。", en: "AGV: at R = 1.5 m, find the highest speed without tipping over (within 0.06 m/s)." },
+    { id: "agv2", robot: true, zh: "AGV：再加速，看先发生侧翻还是打滑。", en: "AGV: go faster and see whether it tips or slides first." },
+  ]);
+  function setMode(m) {
+    mode = m; t = 0; playing = true;
+    pressed("[data-mode]", document.querySelector(`[data-mode="${m}"]`));
+    $("al14box").hidden = m !== "accel"; $("w14box").hidden = m === "example" || m === "agv"; $("v14box").hidden = m !== "agv";
+    $("R14box").hidden = m === "example"; $("ex14").hidden = m !== "example"; $("jump14").hidden = m !== "example"; $("agv14").hidden = m !== "agv";
+    $("leg14").hidden = m === "agv";
+    if (m === "agv") setRange(Rr, 0.5, 3, 0.1, 1.5);
+    texts();
+  }
+  function texts() {
+    $("play14").textContent = playing ? T("暂停", "Pause") : T("继续", "Resume");
+    if (mode === "agv") problem("prob14", "机器人问题：AGV 转弯限速", "仓储搬运机器人载货后质心高 0.6 m、轮距 0.5 m，转弯半径 1.5 m。最快能开多快，才不会侧翻、不会打滑？", "Robot problem: AGV cornering speed limit", "A loaded warehouse AGV has its centre of mass 0.6 m high and a 0.5 m track, turning on a 1.5 m radius. How fast can it go without tipping over or sliding?");
+    else problem("prob14", "生活中的例子：", "高速公路弯道的限速，就是按侧向加速度（aₙ = v²/R）不超过约 0.2g 定出来的。", "Everyday example: ", "Highway curve speed limits are set so that the sideways acceleration aₙ = v²/R stays below about 0.2g.");
+  }
+  document.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => setMode(b.dataset.mode)));
+  $("play14").onclick = () => { playing = !playing; texts(); };
+  $("reset14").onclick = () => { t = 0; };
+  $("jump14").onclick = () => { t = 2; playing = false; texts(); done("1-4", "ex"); };
+  function stateAt(tt) {
+    if (mode === "example") return { R: 0.1, th: 2 + 4 * tt ** 3, w: 12 * tt * tt, al: 24 * tt };
+    const R = +Rr.value;
+    if (mode === "agv") { const w = +V.value / R; return { R, th: w * tt, w, al: 0 }; }
+    const w0 = +W.value;
+    if (mode === "uniform") return { R, th: w0 * tt, w: w0, al: 0 };
+    const al = +A.value; return { R, th: w0 * tt + 0.5 * al * tt * tt, w: w0 + al * tt, al };
+  }
+  const squash = (m, ref) => m / (m + ref);
+  function frame(dt) {
+    S.fit();
+    const { ctx, w, h } = S;
+    if (playing) { t += dt * (mode === "example" ? 0.12 : 1); if (mode === "example" && t > 2.3) t = 0; if (mode === "accel" && Math.abs(stateAt(t).w) > 12) t = 0; }
+    const s = stateAt(t), v = s.R * s.w, at = s.R * s.al, an = s.R * s.w * s.w, am = Math.hypot(at, an);
+    const cx = w * 0.42, cy = h * 0.52, Rp = Math.min(w, h) * 0.3;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(cx - Rp * 1.6, cy); ctx.lineTo(cx + Rp * 1.6, cy); ctx.moveTo(cx, cy - Rp * 1.45); ctx.lineTo(cx, cy + Rp * 1.45); ctx.stroke();
+    ctx.strokeStyle = css("--muted"); ctx.lineWidth = mode === "agv" ? 14 : 1.5; ctx.globalAlpha = mode === "agv" ? 0.25 : 1;
+    ctx.beginPath(); ctx.arc(cx, cy, Rp, 0, 7); ctx.stroke(); ctx.globalAlpha = 1;
+    ctx.fillStyle = css("--muted"); ctx.beginPath(); ctx.arc(cx, cy, 3, 0, 7); ctx.fill();
+    const px = cx + Rp * Math.cos(s.th), py = cy - Rp * Math.sin(s.th);
+    const et = [-Math.sin(s.th), -Math.cos(s.th)], en = [-Math.cos(s.th), Math.sin(s.th)], sgn = Math.sign(s.w || 1);
+    label(ctx, `t = ${fmt(t, 2)} s`, 14, 20, css("--ink"), 15);
+    if (mode === "agv") {
+      const aTip = AGV.g * AGV.b / 2 / AGV.h, aSlip = AGV.mu * AGV.g;
+      const vTip = Math.sqrt(aTip * s.R), vSlip = Math.sqrt(aSlip * s.R);
+      const status = an > aTip ? "tip" : an > aSlip ? "slip" : "ok";
+      const col = status === "ok" ? css("--green") : css("--red");
+      ctx.save(); ctx.translate(px, py); ctx.rotate(Math.atan2(et[1], et[0]));
+      ctx.fillStyle = col; ctx.globalAlpha = 0.85; ctx.fillRect(-22, -14, 44, 28); ctx.globalAlpha = 1;
+      ctx.strokeStyle = css("--ink"); ctx.lineWidth = 1.5; ctx.strokeRect(-22, -14, 44, 28);
+      ctx.fillStyle = css("--panel"); ctx.fillRect(8, -8, 10, 16); ctx.restore();
+      arrow(ctx, px, py, px + en[0] * Rp * 0.9 * squash(an, 4), py + en[1] * Rp * 0.9 * squash(an, 4), css("--red"), 3);
+      // gauge
+      const gx = w - 36, gy1 = h * 0.14, gy2 = h * 0.86, amax = 8, Gy = (a) => gy2 - (Math.min(a, amax) / amax) * (gy2 - gy1);
+      ctx.fillStyle = css("--soft"); ctx.fillRect(gx - 10, gy1, 20, gy2 - gy1);
+      ctx.fillStyle = col; ctx.fillRect(gx - 10, Gy(an), 20, gy2 - Gy(an));
+      [[aTip, T("侧翻", "tip"), css("--red")], [aSlip, T("打滑", "slide"), css("--orange")]].forEach(([a, txt, c]) => {
+        ctx.strokeStyle = c; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(gx - 16, Gy(a)); ctx.lineTo(gx + 16, Gy(a)); ctx.stroke();
+        label(ctx, `${txt} ${fmt(a, 2)}`, gx - 20, Gy(a), c, 12, "right");
+      });
+      label(ctx, "aₙ m/s²", gx, gy1 - 12, css("--muted"), 12, "center");
+      label(ctx, status === "ok" ? T("安全", "Safe") : status === "tip" ? T("侧翻！", "Tipping over!") : T("打滑！", "Sliding!"), 14, 42, col, 15);
+      readout("read14", [
+        [T("速度 v", "Speed v"), fmt(v, 2) + " m/s"], [T("半径 R", "Radius R"), fmt(s.R, 1) + " m"], ["aₙ = v²/R", fmt(an, 2) + " m/s²"],
+        [T("侧翻临界 aₙ = g·(b/2)/h", "Tipping limit aₙ = g·(b/2)/h"), fmt(aTip, 2) + " m/s²"], [T("打滑临界 aₙ = μg", "Sliding limit aₙ = μg"), fmt(aSlip, 2) + " m/s²"],
+        [T("不侧翻的最大速度", "Max speed without tipping"), fmt(vTip, 2) + " m/s"], [T("不打滑的最大速度", "Max speed without sliding"), fmt(vSlip, 2) + " m/s"],
+      ]);
+      if (Math.abs(s.R - 1.5) < 0.05 && v <= vTip && v >= vTip - 0.06) done("1-4", "agv");
+      if (status === "tip") done("1-4", "agv2");
+      return;
+    }
+    ctx.strokeStyle = css("--grid"); ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(px, py); ctx.stroke(); ctx.setLineDash([]);
+    const Lv = Rp * 0.95 * squash(Math.abs(v), mode === "example" ? 2 : 3);
+    arrow(ctx, px, py, px + et[0] * Lv * sgn, py + et[1] * Lv * sgn, css("--orange"), 3.5);
+    const La = Rp * 0.95 * squash(am, mode === "example" ? 40 : 3), k = am > 1e-9 ? La / am : 0;
+    const tx = et[0] * at * k, ty = et[1] * at * k, nx = en[0] * an * k, ny = en[1] * an * k;
+    arrow(ctx, px, py, px + tx, py + ty, css("--green"), 2.5); arrow(ctx, px, py, px + nx, py + ny, css("--red"), 2.5); arrow(ctx, px, py, px + tx + nx, py + ty + ny, css("--violet"), 3);
+    ctx.fillStyle = css("--amber"); ctx.beginPath(); ctx.arc(px, py, 7, 0, 7); ctx.fill();
+    const ang = am > 1e-9 && Math.abs(v) > 1e-9 ? Math.acos(Math.max(-1, Math.min(1, (at * sgn) / am))) * 180 / Math.PI : NaN;
+    label(ctx, { uniform: T("匀速圆周运动", "Uniform circular motion"), accel: T("匀加速圆周运动", "Speeding up"), example: T("例1-3：θ = 2 + 4t³", "Example 1-3: θ = 2 + 4t³") }[mode], 14, 42, css("--muted"), 13);
+    readout("read14", [
+      [T("角速度 ω", "Angular speed ω"), fmt(s.w, 2) + " rad/s"], [T("角加速度 α", "Angular accel. α"), fmt(s.al, 2) + " rad/s²"], [T("速率 v = Rω", "Speed v = Rω"), fmt(Math.abs(v), 3) + " m/s"],
+      ["aₜ = Rα", fmt(at, 3) + " m/s²"], ["aₙ = v²/R", fmt(an, 3) + " m/s²"], ["|a|", fmt(am, 3) + " m/s²"],
+      [T("a 与 v 的夹角", "Angle between a and v"), Number.isFinite(ang) ? fmt(ang, 1) + "°" : "—"],
+    ]);
+    if (mode === "uniform" && Math.abs(an - 8) <= 0.3) done("1-4", "an8");
+    if (mode === "accel" && ang < 60 && s.al > 0) done("1-4", "angle");
+  }
+  langHooks.push(texts);
+  return { frame };
+})();
+
+// ============================================================================ 1.5 relative motion
+const L15 = (() => {
+  const S = stage($("c15"));
+  let scene = "river";
+  const U = bindRange("u15", (v) => fmt(v, 1) + " m/s"), Wv = bindRange("w15", (v) => fmt(v, 1) + " m/s"), Ph = bindRange("p15", (v) => v + "°");
+  let trips = [], cur = null, fastAttempts = 0, ripple = 0;
+  const D = () => (scene === "river" ? 100 : 1000);
+  tasks("1-5", [
+    { id: "fast", zh: "小船：用最短时间渡河（船头方向怎样？）。", en: "Boat: cross in the shortest time (which way should the bow point?)." },
+    { id: "straight", zh: "小船：正对岸靠岸，靠岸点偏离不超过 2 m。", en: "Boat: land straight across, within 2 m." },
+    { id: "cant", zh: "小船：把水速调得比船速大，再试着正对岸靠岸。能做到吗？", en: "Boat: make the current faster than the boat and try again. Can you land straight across?" },
+    { id: "drone", robot: true, zh: "无人机：侧风 5 m/s，沿直线飞到正北 1 km 的目标（偏差 ≤ 10 m），记下机头偏角和用时。", en: "Drone: in a 5 m/s crosswind, fly straight to the target 1 km north (within 10 m). Note the heading angle and time." },
+  ]);
+  function setScene(sc) {
+    scene = sc; trips = []; cur = null;
+    pressed("[data-s15]", document.querySelector(`[data-s15="${sc}"]`));
+    if (sc === "river") { setRange(U, 0.5, 5, 0.1, 2); setRange(Wv, 0, 5, 0.1, 1.2); }
+    else { setRange(U, 1, 20, 0.1, 12); setRange(Wv, 0, 15, 0.1, 5); }
+    setRange(Ph, -60, 80, 1, 0);
+    texts();
+  }
+  function texts() {
+    const r = scene === "river";
+    $("u15l").textContent = r ? T("船对水的速度", "Boat speed rel. water") : T("无人机空速（对空气）", "Drone airspeed");
+    $("w15l").textContent = r ? T("水流速度", "Current speed") : T("侧风风速（向东）", "Crosswind (toward east)");
+    $("p15l").textContent = r ? T("船头偏向上游的角度 φ", "Bow angle upstream φ") : T("机头偏向迎风一侧的角度 φ", "Heading into the wind φ");
+    $("lg15a").textContent = r ? T("船对水", "boat rel. water") : T("机对空气", "drone rel. air");
+    $("lg15b").textContent = r ? T("水对岸", "water rel. bank") : T("风对地", "wind rel. ground");
+    $("lg15c").textContent = r ? T("船对岸", "boat rel. bank") : T("机对地", "drone rel. ground");
+    $("go15").textContent = r ? T("开船", "Go") : T("起飞", "Take off");
+    if (r) problem("prob15", "生活中的例子：小船过河", "河宽 100 m，水向右流。船头垂直河岸时船会被冲向下游；想正对岸靠岸，船头要偏向上游多少？", "Everyday example: crossing a river", "The river is 100 m wide and flows right. With the bow straight across the boat drifts downstream; how far upstream must it point to land straight across?");
+    else problem("prob15", "机器人问题：无人机侧风航线修正", "巡检无人机空速 12 m/s，遇到 5 m/s 的东风侧风，要沿直线飞到正北 1 km 外的目标。机头要偏多少？要飞多久？", "Robot problem: drone crosswind correction", "An inspection drone flies at 12 m/s airspeed in a 5 m/s crosswind and must fly straight to a target 1 km north. How far must it turn into the wind, and how long will it take?");
+    readouts();
+  }
+  document.querySelectorAll("[data-s15]").forEach((b) => (b.onclick = () => setScene(b.dataset.s15)));
+  const vel = () => { const u = +U.value, w = +Wv.value, p = +Ph.value * Math.PI / 180; return { u, w, p, vx: w - u * Math.sin(p), vy: u * Math.cos(p) }; };
+  function predict() { const v = vel(); if (v.vy <= 0.01) return null; const TT = D() / v.vy; return { T: TT, x: v.vx * TT }; }
+  function readouts() {
+    const p = predict(), v = vel();
+    readout("read15", [
+      [scene === "river" ? T("船对岸的速度", "Boat speed rel. bank") : T("地速", "Ground speed"), fmt(Math.hypot(v.vx, v.vy), 2) + " m/s"],
+      [scene === "river" ? T("渡河时间", "Crossing time") : T("飞行时间", "Flight time"), p ? fmt(p.T, 1) + " s" : T("到不了", "never arrives")],
+      [scene === "river" ? T("靠岸点在出发点下游", "Landing point downstream") : T("到达点偏东", "Arrival east of target"), p ? fmt(p.x, 1) + " m" : "—"],
+    ]);
+  }
+  ["u15", "w15", "p15"].forEach((id) => $(id).addEventListener("input", readouts));
+  $("go15").onclick = () => { const v = vel(), p = predict(); if (!p) return; cur = { ...v, T: p.T, t: 0, pts: [[0, 0]], sc: scene }; };
+  $("clear15").onclick = () => { trips = []; };
+  function finish(c) {
+    trips.push(c); if (trips.length > 6) trips.shift();
+    const x = c.vx * c.T;
+    if (c.sc === "river") {
+      if (Math.abs(c.p) < 0.01) done("1-5", "fast");
+      if (Math.abs(x) <= 2) done("1-5", "straight");
+      if (c.w > c.u) { fastAttempts++; if (fastAttempts >= 2) { done("1-5", "cant"); $("why15").hidden = false; } }
+    } else if (Math.abs(x) <= 10 && Math.abs(c.w - 5) < 0.05) done("1-5", "drone");
+  }
+  function frame(dt) {
+    S.fit();
+    const { ctx, w, h } = S, DD = D();
+    ripple += dt * +Wv.value * (scene === "river" ? 4 : 0.6);
+    if (cur) {
+      cur.t += dt * cur.T / 5;
+      if (cur.t >= cur.T) { cur.t = cur.T; cur.pts.push([cur.vx * cur.T, DD]); finish(cur); cur = null; }
+      else cur.pts.push([cur.vx * cur.t, cur.vy * cur.t]);
+    }
+    const p = predict();
+    let xmin = -0.4 * DD, xmax = 1.2 * DD;
+    [p ? p.x : 0, ...trips.map((c) => c.vx * c.T), cur ? cur.vx * cur.T : 0].forEach((x) => { xmin = Math.min(xmin, x - 0.3 * DD); xmax = Math.max(xmax, x + 0.3 * DD); });
+    const padT = 44, padB = 44, sc = Math.min((h - padT - padB) / DD, w / (xmax - xmin));
+    const ox = (w - sc * (xmax - xmin)) / 2 - xmin * sc, oy = h - padB, P = (x, y) => [ox + x * sc, oy - y * sc];
+    ctx.clearRect(0, 0, w, h);
+    const [, yb] = P(0, 0), [, yt] = P(0, DD), [sx, sy] = P(0, 0), [ex] = P(0, DD);
+    if (scene === "river") {
+      ctx.fillStyle = css("--water"); ctx.fillRect(0, yt, w, yb - yt);
+      ctx.strokeStyle = css("--water-line"); ctx.lineWidth = 2;
+      for (let row = 1; row < 5; row++) { const y = yt + (yb - yt) * row / 5; for (let x = ((ripple * 10) % 60) - 60; x < w; x += 60) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 22, y); ctx.stroke(); } }
+      ctx.strokeStyle = css("--green"); ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0, yb); ctx.lineTo(w, yb); ctx.moveTo(0, yt); ctx.lineTo(w, yt); ctx.stroke();
+      label(ctx, T("对岸", "far bank"), 12, yt - 14, css("--muted"), 13); label(ctx, T("出发岸", "start bank"), 12, yb + 16, css("--muted"), 13);
+      label(ctx, T("水流 →", "current →"), w - 12, yt - 14, css("--blue"), 13, "right");
+    } else {
+      ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+      for (let gx = Math.floor(xmin / 100) * 100; gx <= xmax; gx += 100) { const [px] = P(gx, 0); ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, h); ctx.stroke(); }
+      for (let gy = 0; gy <= DD; gy += 100) { const [, py] = P(0, gy); ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(w, py); ctx.stroke(); }
+      ctx.strokeStyle = css("--blue"); ctx.globalAlpha = 0.5; ctx.lineWidth = 1.5;
+      for (let row = 0; row < 7; row++) { const y = yt + (yb - yt) * (row + 0.5) / 7; for (let x = ((ripple * 40 + row * 23) % 90) - 90; x < w; x += 90) { arrow(ctx, x, y, x + 26, y, css("--blue"), 1.5); } }
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = css("--red"); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(ex, yt, 9, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.arc(ex, yt, 3, 0, 7); ctx.stroke();
+      label(ctx, T("目标（正北 1 km）", "target (1 km north)"), ex + 14, yt, css("--red"), 12);
+      label(ctx, T("起飞点", "take-off"), sx + 12, sy + 14, css("--muted"), 12);
+      label(ctx, T("风 →", "wind →"), w - 12, 18, css("--blue"), 13, "right"); label(ctx, T("北 ↑", "N ↑"), 12, 18, css("--muted"), 13);
+    }
+    ctx.strokeStyle = css("--muted"); ctx.setLineDash([4, 5]); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, yt); ctx.stroke(); ctx.setLineDash([]);
+    const bar = scene === "river" ? 50 : 200, [b0] = P(xmax - bar * 1.1, 0), [b1] = P(xmax - bar * 0.1, 0);
+    ctx.strokeStyle = css("--ink"); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(b0, yb + 22); ctx.lineTo(b1, yb + 22); ctx.stroke();
+    label(ctx, bar + " m", (b0 + b1) / 2, yb + 34, css("--ink"), 12, "center");
+    if ($("pred15").checked && p) { const [lx, ly] = P(p.x, DD); ctx.strokeStyle = css("--red"); ctx.globalAlpha = 0.45; ctx.setLineDash([8, 6]); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(lx, ly); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1; }
+    trips.concat(cur ? [cur] : []).forEach((c) => { ctx.strokeStyle = css("--amber"); ctx.lineWidth = c === cur ? 3 : 2; ctx.beginPath(); c.pts.forEach(([x, y], i) => { const [qx, qy] = P(x, y); i ? ctx.lineTo(qx, qy) : ctx.moveTo(qx, qy); }); ctx.stroke(); });
+    const bnow = cur ? [cur.vx * cur.t, cur.vy * cur.t] : [0, 0], v = cur || vel(), [bx, by] = P(bnow[0], bnow[1]), head = Math.PI / 2 + v.p;
+    ctx.save(); ctx.translate(bx, by); ctx.rotate(-head);
+    if (scene === "river") {
+      ctx.fillStyle = css("--panel"); ctx.strokeStyle = css("--ink"); ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(16, 0); ctx.lineTo(5, 7); ctx.lineTo(-12, 7); ctx.lineTo(-12, -7); ctx.lineTo(5, -7); ctx.closePath(); ctx.fill(); ctx.stroke();
+    } else {
+      ctx.strokeStyle = css("--ink"); ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(-10, -10); ctx.lineTo(10, 10); ctx.moveTo(-10, 10); ctx.lineTo(10, -10); ctx.stroke();
+      ctx.fillStyle = css("--panel"); ctx.lineWidth = 1.5; [[-10, -10], [10, 10], [-10, 10], [10, -10]].forEach(([a, b]) => { ctx.beginPath(); ctx.arc(a, b, 6, 0, 7); ctx.fill(); ctx.stroke(); });
+      ctx.fillStyle = css("--red"); ctx.beginPath(); ctx.arc(14, 0, 3, 0, 7); ctx.fill();
+    }
+    ctx.restore();
+    const k = scene === "river" ? 22 : 4, ux = -v.u * Math.sin(v.p), uy = v.u * Math.cos(v.p);
+    arrow(ctx, bx, by, bx + ux * k, by - uy * k, css("--amber"), 3);
+    arrow(ctx, bx + ux * k, by - uy * k, bx + ux * k + v.w * k, by - uy * k, css("--blue"), 3);
+    arrow(ctx, bx, by, bx + (ux + v.w) * k, by - uy * k, css("--red"), 3);
+  }
+  langHooks.push(texts);
+  return { frame, setScene };
+})();
+
+// ---------- tabs & loop ----------
+const LABS = { "1-1": L11, "1-2": L12, "1-3": L13, "1-4": L14, "1-5": L15 };
+let active = "1-1";
+function show(lab) {
+  active = lab;
+  document.querySelectorAll("[role=tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.lab === lab));
+  document.querySelectorAll(".lab").forEach((s) => (s.hidden = s.id !== "lab-" + lab));
+  if (window.top === window.self) { try { history.replaceState(null, "", "#lab-" + lab); } catch (e) { /* ignore */ } }
+  store.set("wq-ch1-tab", lab);
+}
+document.querySelectorAll("[role=tab]").forEach((b) => b.addEventListener("click", () => show(b.dataset.lab)));
+const fromHash = (location.hash.match(/lab-(1-[1-5])/) || [])[1];
+if (!fromHash) addEventListener("load", () => setTimeout(() => scrollTo(0, 0), 0));
+show(fromHash || store.get("wq-ch1-tab") || "1-1");
+if (/(^|[-#])en$/.test(location.hash)) lang = "en";
+applyLang();
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+  try { LABS[active].frame(dt); } catch (e) { console.error(e); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>

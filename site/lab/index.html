@@ -1,0 +1,877 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<div id="wq-home" style="background:#0a1216;padding:9px 20px;font:500 13px/1.2 system-ui,'Noto Sans SC',sans-serif"><a href="/" style="color:#e9eef0;text-decoration:none">← WenQuest Robotics · 问渠机器人学院</a></div>
+<script>if(window.top!==window.self){var e=document.getElementById("wq-home");if(e)e.remove();}</script>
+
+<title>问渠机器人实验室</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#F2F5F4; --surface:#FFFFFF; --surface2:#E7EEEC; --line:#D3DDDA;
+  --ink:#13211E; --ink2:#3F514D; --muted:#6B7C78;
+  --accent:#23796C; --accent-ink:#FFFFFF; --accent-soft:#DCEFEA;
+  --hot:#C2410C; --hot-soft:#FDE8DC; --ok:#1F7A55; --ok-soft:#DDF1E7; --bad:#B42318; --bad-soft:#FBE4E1;
+  --plate:#3E6F8E; --plate-soft:#E1ECF3; --violet:#5B4BA8; --violet-soft:#E9E6F6;
+  --grid:#E3EAE8; --stage:#F8FAF9;
+  --sans:'Noto Sans SC','PingFang SC','Microsoft YaHei',Arial,sans-serif;
+  --serif:'Noto Serif SC','Songti SC',Georgia,serif;
+  --mono:'JetBrains Mono',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0F1614; --surface:#17211F; --surface2:#1F2C29; --line:#2C3D39;
+  --ink:#E6EFEC; --ink2:#B4C4C0; --muted:#879A95;
+  --accent:#5CC8B5; --accent-ink:#0B1614; --accent-soft:#16332D;
+  --hot:#F2945C; --hot-soft:#3A2416; --ok:#5CC79A; --ok-soft:#15332A; --bad:#F08A7E; --bad-soft:#3A1D1A;
+  --plate:#6FA6C8; --plate-soft:#172A36; --violet:#A99BF0; --violet-soft:#241F3F;
+  --grid:#223330; --stage:#131C1A;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1614; --surface:#17211F; --surface2:#1F2C29; --line:#2C3D39;
+  --ink:#E6EFEC; --ink2:#B4C4C0; --muted:#879A95;
+  --accent:#5CC8B5; --accent-ink:#0B1614; --accent-soft:#16332D;
+  --hot:#F2945C; --hot-soft:#3A2416; --ok:#5CC79A; --ok-soft:#15332A; --bad:#F08A7E; --bad-soft:#3A1D1A;
+  --plate:#6FA6C8; --plate-soft:#172A36; --violet:#A99BF0; --violet-soft:#241F3F;
+  --grid:#223330; --stage:#131C1A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:24px 48px}
+@media (max-width:600px){.wrap{padding-inline:16px}}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:30px;margin:0;line-height:1.2;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted)}
+.pill{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted);white-space:nowrap}
+.pill.ok{border-color:transparent;background:var(--ok-soft);color:var(--ok)}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
+nav button{border:0;background:none;font:inherit;color:var(--muted);padding:10px 16px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--accent)}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;padding:8px 16px;border-radius:9px}
+.btn.ghost{background:var(--surface2);color:var(--ink);font-weight:500}
+.btn.ai{background:var(--violet);color:#fff}
+:root[data-theme="dark"] .btn.ai{color:#150F2E}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.ai{color:#150F2E}}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.sm{padding:5px 10px;font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.panel h2{font-size:17px;margin:0 0 8px}
+.panel h3{font-size:14px;margin:12px 0 6px;color:var(--ink2)}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.lab{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.lab{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:16px}
+canvas{display:block;width:100%;max-width:100%;border-radius:10px;background:var(--stage);border:1px solid var(--line);touch-action:none}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctrl{display:grid;grid-template-columns:92px 1fr 58px;gap:10px;align-items:center;margin:4px 0}
+.ctrl label{font-size:14px;color:var(--ink2)}
+.ctrl label b{font-family:var(--mono);font-weight:700;color:var(--ink)}
+.ctrl output{font-family:var(--mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.law{font-family:var(--mono);font-size:13px;background:var(--surface2);border-radius:8px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:420px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.m{background:var(--surface2);border-radius:9px;padding:8px 10px;display:flex;flex-direction:column}
+.m span{font-size:12px;color:var(--muted)}
+.m b{font-family:var(--mono);font-size:17px;font-variant-numeric:tabular-nums}
+.state{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;border-radius:999px;padding:3px 10px}
+.state.run{background:var(--plate-soft);color:var(--plate)}
+.state.ok{background:var(--ok-soft);color:var(--ok)}
+.state.bad{background:var(--bad-soft);color:var(--bad)}
+.state.idle{background:var(--surface2);color:var(--muted)}
+.state.warn{background:var(--hot-soft);color:var(--hot)}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:500}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.aibox{border:1px solid var(--violet);border-radius:14px;padding:16px;background:var(--surface)}
+.aihead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.aibadge{width:30px;height:30px;border-radius:50%;background:var(--violet);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.aiout{font-size:14px;white-space:pre-wrap;min-height:1.6em}
+.aiout.card{white-space:normal}
+.aiout ul{margin:4px 0;padding-left:20px}
+.aiout .q{background:var(--violet-soft);border-radius:8px;padding:8px 10px;margin-top:8px}
+.note{font-size:13px;color:var(--muted);background:var(--surface2);border-radius:8px;padding:8px 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink2);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+textarea{width:100%;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--surface);color:var(--ink);resize:vertical}
+.seg{display:inline-flex;background:var(--surface2);border-radius:9px;padding:3px;gap:2px}
+.seg button{border:0;background:none;padding:5px 12px;border-radius:7px;color:var(--muted);font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;font-size:14px}
+.kv div{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:2px 0}
+.kv b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.warnline{color:var(--hot);font-size:13px}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch}
+@media (max-width:820px){.flow{grid-template-columns:1fr}}
+.fbox{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface);display:flex;flex-direction:column;gap:4px}
+.fbox b{font-size:14px}
+.fbox span{font-size:13px;color:var(--muted)}
+.fbox.ai{border-color:var(--violet);background:var(--violet-soft)}
+.cat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.cat{grid-template-columns:1fr}}
+.cat .fbox .tag{font-size:12px;color:var(--accent);font-weight:700}
+.score{display:grid;grid-template-columns:120px 1fr 36px;gap:10px;align-items:center;margin:6px 0;font-size:14px}
+.bar{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.big{font-family:var(--mono);font-size:40px;font-weight:700;line-height:1}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <h1>问渠 · AI 机器人虚拟仿真实验室</h1>
+    <p>浏览器端实时动力学仿真，AI 助教读取实验过程数据：诊断现象、示范调参、生成过程性评价。</p>
+  </div>
+  <div class="toolbar">
+    <span class="pill ok">倒立摆动力学已与 MuJoCo 3.4 逐步对照</span>
+    <span class="pill" id="aiState">AI：检测中…</span>
+  </div>
+</header>
+
+<nav role="tablist">
+  <button role="tab" aria-selected="true" data-tab="pend">实验一 · 倒立摆 PID 控制</button>
+  <button role="tab" aria-selected="false" data-tab="arm">实验二 · 二连杆机械臂</button>
+  <button role="tab" aria-selected="false" data-tab="report">实验报告与 AI 评价</button>
+  <button role="tab" aria-selected="false" data-tab="about">平台接入方案</button>
+</nav>
+
+<!-- ============ 实验一 ============ -->
+<section id="tab-pend">
+<div class="lab">
+  <div class="col">
+    <div class="panel">
+      <div class="toolbar" style="justify-content:space-between;margin-bottom:10px">
+        <h2 style="margin:0">一阶倒立摆 · 标准测试</h2>
+        <span class="state idle" id="pState">待开始</span>
+      </div>
+      <canvas id="pCanvas" height="300" aria-label="倒立摆仿真画面"></canvas>
+      <div class="toolbar" style="margin-top:10px">
+        <button class="btn" id="pRun">开始标准测试</button>
+        <button class="btn ghost" id="pPush">推一下</button>
+        <button class="btn ghost" id="pReset">重置</button>
+        <span class="muted small">t = <b id="pTime" style="font-family:var(--mono)">0.00</b> s · 测试时长 10 s，t = 5 s 自动施加侧向冲击</span>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="toolbar" style="justify-content:space-between">
+        <h2 style="margin:0">过程曲线</h2>
+        <div class="legend"><span><i style="background:var(--accent)"></i>摆角 θ（°）</span><span><i style="background:var(--plate)"></i>小车位置 x（m）</span><span><i style="background:var(--hot)"></i>控制力 F（N，缩放）</span></div>
+      </div>
+      <canvas id="pChart" height="220" aria-label="摆角与位置曲线" style="margin-top:8px"></canvas>
+      <p class="muted small" id="pChartNote" style="margin:6px 0 0">绿色带为 ±1° 稳定区。</p>
+    </div>
+    <div class="panel">
+      <h2>尝试记录</h2>
+      <div class="tbl-wrap"><table id="pLog"><thead><tr><th>#</th><th>来源</th><th>Kp</th><th>Ki</th><th>Kd</th><th>位置环</th><th>结果</th><th>最大偏角</th><th>调节时间</th><th>振荡</th><th>小车偏移</th><th></th></tr></thead><tbody></tbody></table></div>
+      <p class="muted small" id="pLogEmpty" style="margin:6px 0 0">还没有尝试。先用默认参数跑一次，观察现象。</p>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="panel">
+      <h2>控制器参数</h2>
+      <div class="law" id="pLaw">F = Kp·θ + Ki·∫θdt + Kd·θ̇</div>
+      <div class="ctrl"><label for="kp"><b>Kp</b> 比例</label><input type="range" id="kp" min="0" max="150" step="1" value="30"><output id="kpO">30</output></div>
+      <div class="ctrl"><label for="ki"><b>Ki</b> 积分</label><input type="range" id="ki" min="0" max="40" step="0.5" value="0"><output id="kiO">0</output></div>
+      <div class="ctrl"><label for="kd"><b>Kd</b> 微分</label><input type="range" id="kd" min="0" max="25" step="0.5" value="2"><output id="kdO">2</output></div>
+      <label class="small" style="display:flex;gap:8px;align-items:center;margin:10px 0 2px"><input type="checkbox" id="posOn"> 加入位置环（进阶：让小车回到中心）</label>
+      <div id="posCtrls" hidden>
+        <div class="ctrl"><label for="kx"><b>Kx</b> 位置</label><input type="range" id="kx" min="0" max="10" step="0.25" value="2"><output id="kxO">2</output></div>
+        <div class="ctrl"><label for="kv"><b>Kv</b> 速度</label><input type="range" id="kv" min="0" max="10" step="0.25" value="3"><output id="kvO">3</output></div>
+      </div>
+      <div class="ctrl" style="margin-top:8px"><label for="th0">初始偏角</label><input type="range" id="th0" min="1" max="15" step="1" value="6"><output id="th0O">6°</output></div>
+      <p class="muted small" style="margin:8px 0 0">系统：小车 1.0 kg，摆杆 0.2 kg / 0.6 m（均匀杆），轨道 ±2.4 m，推力限幅 ±30 N，控制周期 10 ms。失败条件：摆角超过 45° 或小车出轨。</p>
+    </div>
+
+    <div class="panel">
+      <div class="toolbar" style="justify-content:space-between"><h2 style="margin:0">本次指标</h2><span class="muted small" id="mSrc">—</span></div>
+      <div class="metrics" style="margin-top:10px">
+        <div class="m"><span>结果</span><b id="mRes">—</b></div>
+        <div class="m"><span>最大偏角</span><b id="mMax">—</b></div>
+        <div class="m"><span>调节时间</span><b id="mSettle">—</b></div>
+        <div class="m"><span>振荡次数</span><b id="mOsc">—</b></div>
+        <div class="m"><span>冲击恢复</span><b id="mRec">—</b></div>
+        <div class="m"><span>小车最大偏移</span><b id="mX">—</b></div>
+      </div>
+    </div>
+
+    <div class="aibox">
+      <div class="aihead"><div class="aibadge">AI</div><div><b>AI 实验助教</b><div class="muted small">读取本次曲线和全部尝试记录。只指方向，不直接给答案。</div></div></div>
+      <div class="toolbar">
+        <button class="btn ai" id="aiDiag" disabled>诊断这次实验</button>
+        <button class="btn ghost" id="aiTune" disabled title="完成 3 次尝试后解锁">AI 示范调参（完成 3 次尝试后解锁）</button>
+        <button class="btn ghost sm" id="aiStop" hidden>停止</button>
+      </div>
+      <div class="aiout card" id="aiOut" style="margin-top:10px"><span class="muted small">完成一次测试后，点“诊断这次实验”。</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 实验二 ============ -->
+<section id="tab-arm" hidden>
+<div class="lab">
+  <div class="col">
+    <div class="panel">
+      <div class="toolbar" style="justify-content:space-between;margin-bottom:10px">
+        <h2 style="margin:0">平面二连杆机械臂</h2>
+        <div class="seg" role="group" aria-label="模式">
+          <button aria-pressed="false" data-mode="fk">正运动学</button>
+          <button aria-pressed="true" data-mode="ik">逆运动学</button>
+        </div>
+      </div>
+      <canvas id="aCanvas" height="520" aria-label="机械臂仿真画面，逆运动学模式下点击设置目标点"></canvas>
+      <p class="muted small" style="margin:8px 0 0" id="aHint">逆运动学模式：在画面中点击设置目标点，机械臂自动求解关节角。浅色环形区域是可达空间。</p>
+    </div>
+  </div>
+  <div class="col">
+    <div class="panel">
+      <h2>关节与末端</h2>
+      <div id="fkCtrls" hidden>
+        <div class="ctrl"><label for="q1">θ₁ 肩关节</label><input type="range" id="q1" min="-180" max="180" step="1" value="40"><output id="q1O">40°</output></div>
+        <div class="ctrl"><label for="q2">θ₂ 肘关节</label><input type="range" id="q2" min="-180" max="180" step="1" value="-60"><output id="q2O">-60°</output></div>
+      </div>
+      <div id="ikCtrls">
+        <div class="toolbar" style="margin-bottom:8px">
+          <span class="small muted">肘部构型</span>
+          <div class="seg" role="group" aria-label="肘部构型"><button aria-pressed="true" data-elbow="up">肘上</button><button aria-pressed="false" data-elbow="down">肘下</button></div>
+          <span class="small muted">插值</span>
+          <div class="seg" role="group" aria-label="插值方式"><button aria-pressed="true" data-interp="joint">关节空间</button><button aria-pressed="false" data-interp="line">笛卡尔直线</button></div>
+        </div>
+      </div>
+      <div class="kv">
+        <div><span>θ₁</span><b id="aQ1">—</b></div>
+        <div><span>θ₂</span><b id="aQ2">—</b></div>
+        <div><span>末端 x</span><b id="aX">—</b></div>
+        <div><span>末端 y</span><b id="aY">—</b></div>
+        <div><span>雅可比 det J</span><b id="aDet">—</b></div>
+        <div><span>状态</span><b id="aSt">—</b></div>
+      </div>
+      <p class="muted small" style="margin:8px 0 0">L₁ = 1.0 m，L₂ = 0.7 m，可达半径 0.3 – 1.7 m。det J = L₁L₂ sin θ₂，接近 0 时为奇异位形。</p>
+      <div class="toolbar" style="margin-top:8px"><button class="btn ghost sm" id="aClear">清除轨迹</button><button class="btn ghost sm" id="aHome">回到初始位</button></div>
+    </div>
+
+    <div class="aibox">
+      <div class="aihead"><div class="aibadge">AI</div><div><b>用一句话指挥机械臂</b><div class="muted small">AI 把指令转成运动计划，系统检查可达性后执行。</div></div></div>
+      <textarea id="aCmd" rows="2" aria-label="给机械臂的指令">以 (0.9, 0.4) 为圆心画一个半径 0.35 m 的圆，走笛卡尔直线插值</textarea>
+      <div class="chips" style="margin:8px 0">
+        <button class="chip" data-cmd="画一个边长 0.6 m 的正方形，左下角在 (0.6, -0.3)">画正方形</button>
+        <button class="chip" data-cmd="依次到达 (1.2, 0.8)、(-0.5, 1.2)、(0.1, 0.1)，说明哪个点不可达以及原因">三个目标点</button>
+        <button class="chip" data-cmd="演示关节空间插值和笛卡尔直线插值的区别：都从 (1.4, -0.4) 到 (-0.2, 1.3)">两种插值对比</button>
+        <button class="chip" data-cmd="把手臂伸到最远，然后解释为什么这里是奇异位形">奇异位形</button>
+      </div>
+      <div class="toolbar"><button class="btn ai" id="aGo">让 AI 规划并执行</button><span class="muted small" id="aGoNote"></span></div>
+      <div class="aiout card" id="aOut" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 报告 ============ -->
+<section id="tab-report" hidden>
+<div class="lab">
+  <div class="col">
+    <div class="panel">
+      <h2>实验过程数据（自动采集）</h2>
+      <p class="muted small" style="margin-top:0">以下数据由仿真自动记录，是过程性评价的依据：尝试了几次、每次改了哪个参数、现象如何变化、是否用上了 AI 提示。</p>
+      <div id="rSummary" class="small"></div>
+    </div>
+    <div class="panel">
+      <h2>评价维度（教师可修改）</h2>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>维度</th><th>看什么</th><th>权重</th></tr></thead>
+        <tbody>
+          <tr><td>实验操作规范</td><td style="white-space:normal">是否先做基线测试，是否每次只改一个参数</td><td class="num">20%</td></tr>
+          <tr><td>参数调节策略</td><td style="white-space:normal">调参方向是否与观察到的现象相符，是否逐步逼近</td><td class="num">30%</td></tr>
+          <tr><td>现象与原理</td><td style="white-space:normal">能否把振荡、漂移、失稳和 P、I、D 的作用对应起来</td><td class="num">25%</td></tr>
+          <tr><td>结果达成</td><td style="white-space:normal">最终能否稳定、抗冲击，机械臂任务是否完成</td><td class="num">25%</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="aibox">
+      <div class="aihead"><div class="aibadge">AI</div><div><b>过程性评价</b><div class="muted small">评价的是实验过程，不只是最终结果。结果供教师复核后计入成绩。</div></div></div>
+      <label class="small muted" for="rThink">学生的实验心得（可选，AI 会一并评价）</label>
+      <textarea id="rThink" rows="3" placeholder="例如：Kd 增大后振荡明显减少，但小车还是会慢慢漂走……"></textarea>
+      <div class="toolbar" style="margin-top:8px"><button class="btn ai" id="rGo">生成 AI 评价</button><span class="muted small" id="rNote"></span></div>
+      <div id="rOut" style="margin-top:12px"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ 平台 ============ -->
+<section id="tab-about" hidden>
+<div class="col">
+  <div class="panel">
+    <h2>AI 如何嵌入仿真实验</h2>
+    <p class="muted small" style="margin-top:0">仿真内核只负责“算得对”，AI 服务层读取过程数据，负责“教得好”。两者之间只传遥测数据和参数，内核可以替换。</p>
+    <div class="flow">
+      <div class="fbox"><b>① 仿真内核</b><span>基础档：MuJoCo 编译为 WebAssembly，在浏览器或小程序里运行，不占服务器。进阶档：Gazebo + ROS 2 容器，每人一个。</span></div>
+      <div class="fbox"><b>② 过程遥测</b><span>参数、每次尝试的曲线、失败时刻、操作顺序。统一格式，与内核无关。</span></div>
+      <div class="fbox ai"><b>③ AI 服务层</b><span>现象诊断（苏格拉底式追问）、调参示范（AI 真的调用仿真做实验）、自然语言指挥、过程性评价。</span></div>
+      <div class="fbox"><b>④ 教学引擎</b><span>通过 LTI 1.3 接入问渠课程，成绩和评价回写成绩册，教师可复核。</span></div>
+      <div class="fbox"><b>⑤ 对外对接</b><span>按“实验空间”国家平台接口规范上报实验数据，支持申报虚拟仿真一流课程。</span></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>首批实验包</h2>
+    <div class="cat">
+      <div class="fbox"><span class="tag">本页已实现 · 浏览器</span><b>倒立摆 PID 控制</b><span>自动控制原理、机器人控制基础。P、I、D 作用，位置环，抗扰动。</span></div>
+      <div class="fbox"><span class="tag">本页已实现 · 浏览器</span><b>二连杆机械臂运动学</b><span>机器人学导论。正逆运动学、可达空间、奇异位形、插值方式。</span></div>
+      <div class="fbox"><span class="tag">下一批 · 浏览器</span><b>巡线小车</b><span>传感器读数与差速控制，AI 分析学生的控制代码。</span></div>
+      <div class="fbox"><span class="tag">下一批 · 浏览器</span><b>路径规划</b><span>A*、Dijkstra 在栅格地图上的搜索过程可视化与对比。</span></div>
+      <div class="fbox"><span class="tag">进阶 · ROS 2 容器</span><b>SLAM 建图与导航</b><span>Gazebo 仓库场景，建图、定位、导航全流程。</span></div>
+      <div class="fbox"><span class="tag">进阶 · ROS 2 容器</span><b>机械臂抓取与放置</b><span>MoveIt 2 运动规划，综合实验，适合课程设计。</span></div>
+    </div>
+    <p class="muted small" style="margin:12px 0 0">本页的倒立摆方程与 MuJoCo 3.4 在同一初始条件、同一外力下逐步对照（2 s，4000 步），摆角差异在浮点误差量级。正式版浏览器内核直接使用 MuJoCo WebAssembly 版本。</p>
+  </div>
+</div>
+</section>
+</div>
+
+<script>
+/* ================= 核心：倒立摆动力学（与 MuJoCo 对照过的方程） ================= */
+const CP={M:1.0,m:0.2,L:0.6,g:9.81,track:2.4,Fmax:30,dt:0.002,ctrlEvery:5,T:10,pushAt:5,pushF:25,pushDur:0.1,failAng:Math.PI/4};
+CP.l=CP.L/2; CP.I=CP.m*CP.L*CP.L/12;
+function cpDeriv(s,F){
+  const [x,xd,th,thd]=s,{M,m,l,I,g}=CP,c=Math.cos(th),sn=Math.sin(th);
+  const a=M+m,b=m*l*c,d=m*l*l+I,r1=F+m*l*sn*thd*thd,r2=m*g*l*sn,det=a*d-b*b;
+  return [xd,(r1*d-b*r2)/det,thd,(a*r2-b*r1)/det];
+}
+function cpStep(s,F,h){
+  const k1=cpDeriv(s,F),k2=cpDeriv(s.map((v,i)=>v+h/2*k1[i]),F),k3=cpDeriv(s.map((v,i)=>v+h/2*k2[i]),F),k4=cpDeriv(s.map((v,i)=>v+h*k3[i]),F);
+  return s.map((v,i)=>v+h/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));
+}
+class CartPole{
+  constructor(p){this.p=p;this.s=[0,0,p.th0,0];this.t=0;this.k=0;this.ie=0;this.F=0;this.extra=0;this.extraUntil=-1;this.trace=[];this.failed=null;this.done=false;this.peakF=0;this.manualPushes=0;}
+  push(dir=1){this.extra=CP.pushF*dir;this.extraUntil=this.t+CP.pushDur;this.manualPushes++;}
+  step(){
+    if(this.done)return;
+    const p=this.p,s=this.s;
+    if(this.k%CP.ctrlEvery===0){
+      this.ie+=s[2]*CP.dt*CP.ctrlEvery;
+      let F=p.Kp*s[2]+p.Ki*this.ie+p.Kd*s[3];
+      if(p.pos)F+=p.Kx*s[0]+p.Kv*s[1];
+      this.F=Math.max(-CP.Fmax,Math.min(CP.Fmax,F));
+      this.peakF=Math.max(this.peakF,Math.abs(this.F));
+    }
+    let Fe=this.F;
+    if(this.t>=CP.pushAt&&this.t<CP.pushAt+CP.pushDur)Fe+=CP.pushF;
+    if(this.t<this.extraUntil)Fe+=this.extra;
+    this.s=cpStep(s,Fe,CP.dt);this.k++;this.t=this.k*CP.dt;
+    if(this.k%10===0)this.trace.push([+this.t.toFixed(3),this.s[2],this.s[0],this.F]);
+    if(Math.abs(this.s[2])>CP.failAng){this.failed='摆杆倾倒';this.done=true;}
+    else if(Math.abs(this.s[0])>CP.track){this.failed='小车出轨';this.done=true;}
+    else if(this.t>=CP.T-1e-9)this.done=true;
+  }
+  metrics(){
+    const tr=this.trace,deg=180/Math.PI,band=1/deg;
+    let maxA=0,maxX=0,settle=null,rec=null,osc=0,lastSign=0,lastOut0=0,lastOut1=null;
+    for(const [t,th,x] of tr){
+      maxA=Math.max(maxA,Math.abs(th));maxX=Math.max(maxX,Math.abs(x));
+      if(t<CP.pushAt){if(Math.abs(th)>=band)lastOut0=t;const sg=Math.abs(th)>band*0.5?Math.sign(th):0;if(sg&&lastSign&&sg!==lastSign)osc++;if(sg)lastSign=sg;}
+      else{if(Math.abs(th)>=band)lastOut1=t;}
+    }
+    const endT=tr.length?tr[tr.length-1][0]:0;
+    if(!this.failed||this.failed&&endT>=CP.pushAt){settle=lastOut0>=CP.pushAt-0.05?null:lastOut0;}
+    if(!this.failed&&endT>=CP.T-0.02){rec=lastOut1===null?0:(lastOut1>=CP.T-0.05?null:lastOut1-CP.pushAt);}
+    return {ok:!this.failed&&endT>=CP.T-0.02,failed:this.failed,failT:this.failed?+endT.toFixed(2):null,maxAngDeg:+(maxA*deg).toFixed(1),settleS:settle===null?null:+settle.toFixed(2),oscillations:osc,recoverS:rec===null?null:+rec.toFixed(2),maxXm:+maxX.toFixed(2),finalXm:tr.length?+tr[tr.length-1][2].toFixed(2):0,peakFN:+this.peakF.toFixed(1)};
+  }
+}
+function runHeadless(p){const c=new CartPole(p);while(!c.done)c.step();return {sim:c,metrics:c.metrics()};}
+
+/* ================= 核心：二连杆运动学 ================= */
+const ARM={L1:1.0,L2:0.7};
+function fk(q1,q2){const e={x:ARM.L1*Math.cos(q1),y:ARM.L1*Math.sin(q1)};return {e,x:e.x+ARM.L2*Math.cos(q1+q2),y:e.y+ARM.L2*Math.sin(q1+q2)};}
+function ik(x,y,elbow){
+  const c2=(x*x+y*y-ARM.L1**2-ARM.L2**2)/(2*ARM.L1*ARM.L2);
+  if(c2>1+1e-9||c2<-1-1e-9)return null;
+  const q2=(elbow==='up'?-1:1)*Math.acos(Math.max(-1,Math.min(1,c2)));
+  const q1=Math.atan2(y,x)-Math.atan2(ARM.L2*Math.sin(q2),ARM.L1+ARM.L2*Math.cos(q2));
+  return [q1,q2];
+}
+const reach=(x,y)=>{const r=Math.hypot(x,y);return r>=Math.abs(ARM.L1-ARM.L2)-1e-9&&r<=ARM.L1+ARM.L2+1e-9;};
+</script>
+
+<script>
+/* ================= 界面 ================= */
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let C={};function readColors(){for(const k of ['ink','ink2','muted','line','grid','accent','accent-soft','plate','hot','bad','ok','ok-soft','violet','stage','surface','surface2'])C[k]=css('--'+k);}
+readColors();
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{readColors();drawAll();});}catch(e){}
+new MutationObserver(()=>{readColors();drawAll();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+function fitCanvas(cv){const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1,h=+cv.getAttribute('height');const w=Math.max(10,r.width);if(!cv._h)cv._h=h;const hh=cv.dataset.square?w:cv._h;cv.style.height=hh+'px';if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(hh*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(hh*dpr);}const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx,w,h:hh};}
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  for(const t of ['pend','arm','report','about'])$('tab-'+t).hidden=t!==b.dataset.tab;
+  if(b.dataset.tab==='report')renderSummary();
+  requestAnimationFrame(drawAll);
+});
+
+/* ---------- AI availability ---------- */
+let sample=null,toolsOK=false;
+async function initAI(){
+  try{sample=window.claude?.use?await window.claude.use('sample'):null;}catch(e){sample=null;}
+  if(sample){try{const lim=await sample.limits();toolsOK=!!lim?.tools;}catch(e){toolsOK=false;}}
+  $('aiState').textContent=sample?'AI：已连接':'AI：离线规则版';
+  $('aiState').className='pill'+(sample?' ok':'');
+  refreshAIButtons();
+}
+function aiErr(e){
+  const c=e?.code;
+  if(c==='not_granted'||c==='sampling_disabled'||c==='not_declared'||c==='capability_disabled'){sample=null;$('aiState').textContent='AI：离线规则版';$('aiState').className='pill';refreshAIButtons();return '没有获得调用 AI 的许可，已切换为离线规则版。';}
+  if(c==='rate_limited')return 'AI 调用太频繁，请稍后再试。';
+  if(c==='cancelled')return '已停止。';
+  if(c==='invalid_json')return 'AI 返回的格式不对，请再点一次。';
+  if(c==='session_expired')return '登录已过期，请重新登录 Claude 后再试。';
+  return 'AI 暂时不可用，请稍后再试。';
+}
+
+/* ================= 实验一 ================= */
+const pcv=$('pCanvas'),pch=$('pChart');
+const P={}; const sliders=['kp','ki','kd','kx','kv','th0'];
+function readP(){return {Kp:+$('kp').value,Ki:+$('ki').value,Kd:+$('kd').value,pos:$('posOn').checked,Kx:+$('kx').value,Kv:+$('kv').value,th0:+$('th0').value*Math.PI/180};}
+function setP(p){for(const [k,id] of [['Kp','kp'],['Ki','ki'],['Kd','kd'],['Kx','kx'],['Kv','kv']])if(p[k]!=null)$(id).value=p[k];if(p.pos!=null)$('posOn').checked=!!p.pos;syncOut();}
+function syncOut(){
+  for(const id of sliders)$(id+'O').textContent=id==='th0'?$(id).value+'°':$(id).value;
+  $('posCtrls').hidden=!$('posOn').checked;
+  $('pLaw').textContent='F = Kp·θ + Ki·∫θdt + Kd·θ̇'+($('posOn').checked?' + Kx·x + Kv·ẋ':'');
+}
+sliders.forEach(id=>$(id).addEventListener('input',()=>{syncOut();if(!running){sim=new CartPole(readP());drawPend();}}));
+$('posOn').addEventListener('change',()=>{syncOut();});
+syncOut();
+
+let sim=new CartPole(readP()),running=false,lastTs=0,overlay=null;
+const attempts=[];
+function setState(cls,txt){const el=$('pState');el.className='state '+cls;el.textContent=txt;}
+
+$('pRun').onclick=()=>{sim=new CartPole(readP());overlay=null;running=true;lastTs=0;setState('run','测试中');$('pRun').disabled=true;requestAnimationFrame(loop);};
+$('pReset').onclick=()=>{running=false;sim=new CartPole(readP());overlay=null;setState('idle','待开始');$('pRun').disabled=false;$('pTime').textContent='0.00';drawPend();drawChart();};
+$('pPush').onclick=()=>{if(running)sim.push(Math.random()<0.5?-1:1);};
+function loop(ts){
+  if(!running)return;
+  if(!lastTs)lastTs=ts;
+  let dt=Math.min(0.05,(ts-lastTs)/1000);lastTs=ts;
+  const n=Math.round(dt/CP.dt);
+  for(let i=0;i<n&&!sim.done;i++)sim.step();
+  $('pTime').textContent=sim.t.toFixed(2);
+  drawPend();drawChart();
+  if(sim.done){running=false;$('pRun').disabled=false;finishAttempt(sim,'学生');return;}
+  requestAnimationFrame(loop);
+}
+function finishAttempt(s,src){
+  const m=s.metrics();
+  const rec={n:attempts.length+1,src,p:{...s.p},metrics:m,manualPushes:s.manualPushes,trace:s.trace};
+  attempts.push(rec);
+  showMetrics(m,src==='学生'?'第 '+rec.n+' 次（学生）':'第 '+rec.n+' 次（AI 示范）');
+  setState(m.ok?(m.maxXm>1.5||m.oscillations>6?'warn':'ok'):'bad',m.ok?(m.maxXm>1.5?'稳住了，但小车跑偏':m.oscillations>6?'稳住了，但振荡明显':'稳定'):m.failed);
+  renderLog();refreshAIButtons();
+  return rec;
+}
+const fmt=(v,u)=>v==null?'未达到':v+u;
+function showMetrics(m,src){
+  $('mSrc').textContent=src;
+  $('mRes').textContent=m.ok?'稳定':m.failed+' @'+m.failT+'s';
+  $('mRes').style.color=m.ok?C.ok:C.bad;
+  $('mMax').textContent=m.maxAngDeg+'°';
+  $('mSettle').textContent=fmt(m.settleS,' s');
+  $('mOsc').textContent=m.oscillations;
+  $('mRec').textContent=m.ok?fmt(m.recoverS,' s'):'—';
+  $('mX').textContent=m.maxXm+' m';
+}
+function renderLog(){
+  const tb=$('pLog').querySelector('tbody');tb.innerHTML='';
+  $('pLogEmpty').hidden=attempts.length>0;
+  for(const a of attempts.slice().reverse()){
+    const m=a.metrics,tr=document.createElement('tr');
+    const res=m.ok?'<span class="state ok">稳定</span>':`<span class="state bad">${m.failed}</span>`;
+    tr.innerHTML=`<td class="num">${a.n}</td><td>${a.src}</td><td class="num">${a.p.Kp}</td><td class="num">${a.p.Ki}</td><td class="num">${a.p.Kd}</td><td class="num">${a.p.pos?a.p.Kx+' / '+a.p.Kv:'—'}</td><td>${res}</td><td class="num">${m.maxAngDeg}°</td><td class="num">${fmt(m.settleS,'s')}</td><td class="num">${m.oscillations}</td><td class="num">${m.maxXm} m</td><td><button class="btn ghost sm">查看</button></td>`;
+    tr.querySelector('button').onclick=()=>{running=false;overlay=a;setP(a.p);showMetrics(a.metrics,'第 '+a.n+' 次（'+a.src+'）');drawChart();};
+    tb.appendChild(tr);
+  }
+}
+
+function drawPend(){
+  const {ctx,w,h}=fitCanvas(pcv);ctx.clearRect(0,0,w,h);
+  const sc=Math.min((w-40)/(2*CP.track+0.4),110),cx=w/2,gy=h-60;
+  const s=sim.s,x=s[0],th=s[1+1];
+  // track
+  ctx.strokeStyle=C.line;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(cx-CP.track*sc,gy+22);ctx.lineTo(cx+CP.track*sc,gy+22);ctx.stroke();
+  ctx.fillStyle=C.bad;for(const sgn of [-1,1]){ctx.fillRect(cx+sgn*CP.track*sc-3,gy+6,6,24);}
+  ctx.fillStyle=C.muted;ctx.font='12px '+css('--mono');ctx.textAlign='center';
+  for(let v=-2;v<=2;v++){const px=cx+v*sc;ctx.fillRect(px-0.5,gy+26,1,6);ctx.fillText(v+' m',px,gy+46);}
+  // cart
+  const px=cx+x*sc,cw=0.5*sc,chh=0.26*sc;
+  ctx.fillStyle=C.plate;roundRect(ctx,px-cw/2,gy-chh/2,cw,chh,6);ctx.fill();
+  ctx.fillStyle=C.ink;for(const o of [-cw*0.3,cw*0.3]){ctx.beginPath();ctx.arc(px+o,gy+chh/2+2,5,0,7);ctx.fill();}
+  // pole
+  const tipX=px+Math.sin(th)*CP.L*sc*1.6,tipY=gy-chh/2-Math.cos(th)*CP.L*sc*1.6;
+  ctx.strokeStyle=Math.abs(th)*57.3<1?C.ok:Math.abs(th)>0.5?C.bad:C.accent;ctx.lineWidth=7;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(px,gy-chh/2);ctx.lineTo(tipX,tipY);ctx.stroke();
+  ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(px,gy-chh/2,4,0,7);ctx.fill();
+  // vertical reference
+  ctx.setLineDash([4,4]);ctx.strokeStyle=C.muted;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,gy-chh/2);ctx.lineTo(px,gy-chh/2-CP.L*sc*1.7);ctx.stroke();ctx.setLineDash([]);
+  // force arrow
+  const F=sim.F;if(Math.abs(F)>0.2){const len=F/CP.Fmax*70;ctx.strokeStyle=C.hot;ctx.fillStyle=C.hot;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(px,gy);ctx.lineTo(px+len,gy);ctx.stroke();ctx.beginPath();ctx.moveTo(px+len,gy);ctx.lineTo(px+len-Math.sign(len)*8,gy-5);ctx.lineTo(px+len-Math.sign(len)*8,gy+5);ctx.fill();}
+  // push flash
+  const pushing=(sim.t>=CP.pushAt&&sim.t<CP.pushAt+CP.pushDur+0.15)||sim.t<sim.extraUntil+0.15&&sim.manualPushes;
+  ctx.textAlign='left';ctx.font='13px '+css('--sans');ctx.fillStyle=C.ink2;
+  ctx.fillText(`θ = ${(th*57.2958).toFixed(1)}°`,14,22);ctx.fillText(`x = ${x.toFixed(2)} m`,14,42);ctx.fillText(`F = ${F.toFixed(1)} N`,14,62);
+  if(pushing){ctx.fillStyle=C.hot;ctx.font='bold 14px '+css('--sans');ctx.fillText('侧向冲击！',px-30,gy-chh/2-CP.L*sc*1.75);}
+}
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+function drawChart(){
+  const {ctx,w,h}=fitCanvas(pch);ctx.clearRect(0,0,w,h);
+  const padL=44,padR=40,padT=12,padB=26,W=w-padL-padR,H=h-padT-padB;
+  const tr=overlay?overlay.trace:sim.trace;
+  const aMax=Math.max(8,...tr.map(r=>Math.abs(r[1])*57.3).slice(-2000),0);const aLim=Math.min(50,Math.ceil(aMax/5)*5);
+  const xLim=2.5;
+  const X=t=>padL+t/CP.T*W, YA=a=>padT+H/2-a/aLim*H/2, YX=x=>padT+H/2-x/xLim*H/2;
+  // band
+  ctx.fillStyle=C['ok-soft'];ctx.fillRect(padL,YA(1),W,YA(-1)-YA(1));
+  // grid
+  ctx.strokeStyle=C.grid;ctx.lineWidth=1;ctx.font='11px '+css('--mono');ctx.fillStyle=C.muted;
+  for(let t=0;t<=10;t+=2){ctx.beginPath();ctx.moveTo(X(t),padT);ctx.lineTo(X(t),padT+H);ctx.stroke();ctx.textAlign='center';ctx.fillText(t+'s',X(t),h-8);}
+  for(const a of [-aLim,-aLim/2,0,aLim/2,aLim]){ctx.beginPath();ctx.moveTo(padL,YA(a));ctx.lineTo(padL+W,YA(a));ctx.stroke();ctx.textAlign='right';ctx.fillStyle=C.accent;ctx.fillText(a+'°',padL-6,YA(a)+4);}
+  ctx.textAlign='left';ctx.fillStyle=C.plate;for(const x of [-2,0,2])ctx.fillText(x+'m',padL+W+6,YX(x)+4);
+  // push marker
+  ctx.strokeStyle=C.hot;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(X(CP.pushAt),padT);ctx.lineTo(X(CP.pushAt),padT+H);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=C.hot;ctx.textAlign='left';ctx.fillText('冲击',X(CP.pushAt)+4,padT+12);
+  const line=(fn,col,wd,alpha=1)=>{if(tr.length<2)return;ctx.globalAlpha=alpha;ctx.strokeStyle=col;ctx.lineWidth=wd;ctx.beginPath();tr.forEach((r,i)=>{const px=X(r[0]),py=fn(r);i?ctx.lineTo(px,py):ctx.moveTo(px,py);});ctx.stroke();ctx.globalAlpha=1;};
+  line(r=>padT+H/2-r[3]/CP.Fmax*H/2,C.hot,1,0.45);
+  line(r=>YX(r[2]),C.plate,2);
+  line(r=>YA(Math.max(-aLim,Math.min(aLim,r[1]*57.2958))),C.accent,2.2);
+  if(tr.length){const r=tr[tr.length-1];ctx.fillStyle=C.accent;ctx.beginPath();ctx.arc(X(r[0]),YA(Math.max(-aLim,Math.min(aLim,r[1]*57.2958))),3.5,0,7);ctx.fill();}
+  $('pChartNote').textContent=overlay?`正在查看第 ${overlay.n} 次（${overlay.src}）的曲线。绿色带为 ±1° 稳定区。`:'绿色带为 ±1° 稳定区。';
+}
+
+/* ---------- AI：诊断 ---------- */
+function refreshAIButtons(){
+  const last=attempts[attempts.length-1];
+  $('aiDiag').disabled=!last||aiBusy;
+  $('aiDiag').textContent=sample?'诊断这次实验':'诊断这次实验（离线规则）';
+  const nStu=attempts.filter(a=>a.src==='学生').length;
+  const canTune=sample&&toolsOK&&nStu>=3&&!aiBusy;
+  $('aiTune').disabled=!canTune;
+  $('aiTune').textContent=!sample?'AI 示范调参（需连接 AI）':!toolsOK?'AI 示范调参（当前环境不支持）':nStu<3?`AI 示范调参（再完成 ${3-nStu} 次尝试后解锁）`:'AI 示范调参';
+  $('rGo').textContent=sample?'生成 AI 评价':'生成评价（离线规则）';
+}
+let aiBusy=false,aiCtl=null;
+$('aiStop').onclick=()=>aiCtl?.abort();
+const SYS=`系统：一阶倒立摆。小车1.0kg，摆杆0.2kg、长0.6m（均匀杆），轨道±2.4m，推力限幅±30N，控制周期10ms。
+控制律：F = Kp·θ + Ki·∫θdt + Kd·θ̇（可选位置环 + Kx·x + Kv·ẋ）。θ为摆杆偏离竖直的角度(rad)，向右为正；F向右为正。
+标准测试：初始偏角θ0，t=5s施加一次侧向冲击（25N×0.1s），共10s。失败：|θ|>45° 或小车出轨。
+提示：纯角度PID不控制小车位置，小车会漂移；稳住摆杆所需的Kp下限约为 (M+m)g ≈ 11.8。`;
+function attemptLine(a){const p=a.p,m=a.metrics;return `#${a.n}(${a.src}) Kp=${p.Kp} Ki=${p.Ki} Kd=${p.Kd}${p.pos?` Kx=${p.Kx} Kv=${p.Kv}`:' 无位置环'} θ0=${(p.th0*57.3).toFixed(0)}° → ${m.ok?'稳定':m.failed+'@'+m.failT+'s'}，最大偏角${m.maxAngDeg}°，调节时间${m.settleS??'未达到'}s，振荡${m.oscillations}次，冲击恢复${m.ok?(m.recoverS??'未达到')+'s':'—'}，小车最大偏移${m.maxXm}m，峰值力${m.peakFN}N`;}
+function traceStr(a){const out=[];for(const r of a.trace)if(Math.abs(r[0]/0.25-Math.round(r[0]/0.25))<1e-6)out.push(`${r[0].toFixed(2)}:${(r[1]*57.3).toFixed(1)}°/${r[2].toFixed(2)}m`);return out.join(' ');}
+function ruleDiag(a){
+  const p=a.p,m=a.metrics,ph=[],ca=[],sg=[];
+  if(!m.ok&&p.Kp<12){ph.push(`${m.failT} s 时${m.failed}，摆杆一直没有被扶正（最大偏角 ${m.maxAngDeg}°）。`);ca.push('比例作用太弱：摆杆偏一点，推力还抵不过重力让它继续倒的趋势。');sg.push({param:'Kp',direction:'增大',why:'先让比例作用足够强，摆杆才能被“推回来”。'});}
+  else if(!m.ok&&m.failed==='摆杆倾倒'){ph.push(`摆杆来回摆动且幅度越来越大，${m.failT} s 时倒下。`);ca.push('阻尼不足：系统会纠偏，但每次都“纠过头”。');sg.push({param:'Kd',direction:'增大',why:'微分项对角速度起作用，相当于给摆动加阻尼。'});}
+  if(!m.ok&&m.failed==='小车出轨'&&p.Kp>=12){ph.push(`摆杆基本竖着，但小车一路往一边跑，${m.failT} s 冲出轨道。`);ca.push('控制律只看角度、不看位置。为了扶住摆杆，小车需要持续朝一个方向加速。');sg.push({param:'位置环',direction:'打开',why:'把小车位置和速度也纳入反馈。'});}
+  if(m.ok&&m.oscillations>6){ph.push(`前 5 秒摆角过零 ${m.oscillations} 次，曲线呈明显振荡。`);ca.push('比例作用相对阻尼偏强。');sg.push({param:'Kd',direction:'增大',why:'增加阻尼，减少来回摆。'});}
+  if(m.ok&&!p.pos&&m.maxXm>1.0){ph.push(`小车最远偏离中心 ${m.maxXm} m，已接近轨道边缘。`);ca.push('没有位置反馈，小车的漂移没人管。');sg.push({param:'位置环',direction:'打开',why:'试试加入位置环，注意它的符号为什么是正的。'});}
+  if(p.Ki>0&&m.ok&&m.oscillations>3){ca.push('积分项在这个系统里作用有限，反而会引入超调。');sg.push({param:'Ki',direction:'减小或置零',why:'倒立摆的稳态角度误差本来就很小。'});}
+  if(!ph.length){ph.push('摆杆稳定，冲击后也能恢复。');ca.push('比例提供纠偏，微分提供阻尼，位置环让小车回中。');}
+  return {verdict:m.ok?(ph.length>1?'稳住了，但还有改进空间':'这组参数表现良好'):'这组参数没能稳住系统',phenomena:ph,causes:ca,suggestions:sg,question:m.ok?'如果把冲击加大一倍，你预测哪个指标会先变差？为什么？':'失败之前的曲线里，你能找到最早的“征兆”在哪一刻吗？'};
+}
+function renderDiag(d,src){
+  const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  $('aiOut').innerHTML=`<b>${esc(d.verdict)}</b>
+  <h3>看到的现象</h3><ul>${(d.phenomena||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+  <h3>可能的原因</h3><ul>${(d.causes||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+  <h3>调整方向</h3><ul>${(d.suggestions||[]).map(s=>`<li><b>${esc(s.param)}</b> ${esc(s.direction)}：${esc(s.why)}</li>`).join('')}</ul>
+  <div class="q"><b>想一想：</b>${esc(d.question)}</div>
+  <p class="muted small" style="margin:8px 0 0">${src}</p>`;
+}
+$('aiDiag').onclick=async()=>{
+  const a=overlay||attempts[attempts.length-1];if(!a)return;
+  a.askedAI=true;
+  if(!sample){renderDiag(ruleDiag(a),'离线规则版诊断。连接 AI 后可获得针对曲线细节的分析。');return;}
+  aiBusy=true;refreshAIButtons();aiCtl=new AbortController();$('aiStop').hidden=false;
+  $('aiOut').innerHTML='<span class="muted">AI 正在读取曲线…</span>';
+  const hist=attempts.slice(-6).map(attemptLine).join('\n');
+  const prompt=`你是"问渠"智慧教学平台的机器人实验 AI 助教，面对本科生，用中文。
+${SYS}
+
+要诊断的是第 ${a.n} 次尝试：
+${attemptLine(a)}
+摆角/小车位置采样（每0.25s，时间:摆角/位置）：
+${traceStr(a)}
+
+学生最近的尝试记录（按时间顺序）：
+${hist}
+
+教学原则：先描述曲线上的具体现象（引用时间和数值），再联系 P、I、D 各自作用解释原因，给出调整方向但不要给出具体数值，不要直接给出参考答案。可以点评学生的调参过程（比如是否一次改了多个参数）。最后提一个引导思考的问题。
+只返回 JSON：{"verdict":"一句话结论","phenomena":["现象1","现象2"],"causes":["原因1"],"suggestions":[{"param":"Kd","direction":"增大","why":"原因"}],"question":"引导问题"}`;
+  try{const d=await sample.json(prompt,{signal:aiCtl.signal,cache:false});renderDiag(d,'由 AI 根据本次曲线和尝试记录生成。');}
+  catch(e){$('aiOut').innerHTML=`<span class="warnline">${aiErr(e)}</span>`;}
+  finally{aiBusy=false;$('aiStop').hidden=true;refreshAIButtons();}
+};
+
+/* ---------- AI：示范调参（AI 真的调用仿真） ---------- */
+$('aiTune').onclick=async()=>{
+  if(!sample||!toolsOK)return;
+  aiBusy=true;refreshAIButtons();aiCtl=new AbortController();$('aiStop').hidden=false;
+  const th0=readP().th0;
+  $('aiOut').innerHTML='<div class="aiout" id="tuneText">AI 正在制定调参计划…</div><div class="tbl-wrap" style="margin-top:8px"><table id="tuneTbl"><thead><tr><th>#</th><th>参数</th><th>结果</th><th>振荡</th><th>偏移</th></tr></thead><tbody></tbody></table></div>';
+  const tools=[{name:'run_trial',description:'用给定参数在同一标准测试下运行一次完整的 10 秒倒立摆仿真，返回各项指标。pos 为 true 时启用位置环 Kx、Kv。',
+    inputSchema:{type:'object',properties:{Kp:{type:'number'},Ki:{type:'number'},Kd:{type:'number'},pos:{type:'boolean'},Kx:{type:'number'},Kv:{type:'number'}},required:['Kp','Ki','Kd']},
+    execute:(inp)=>{
+      const p={Kp:+inp.Kp||0,Ki:+inp.Ki||0,Kd:+inp.Kd||0,pos:!!inp.pos,Kx:+inp.Kx||0,Kv:+inp.Kv||0,th0};
+      for(const k of ['Kp','Ki','Kd','Kx','Kv'])p[k]=Math.max(0,Math.min(200,p[k]));
+      const {sim:s}=runHeadless(p);const rec=finishAttempt(s,'AI 示范');overlay=rec;setP(p);drawChart();
+      const m=rec.metrics,tr=document.createElement('tr');
+      tr.innerHTML=`<td class="num">${rec.n}</td><td class="num">${p.Kp}/${p.Ki}/${p.Kd}${p.pos?` +${p.Kx}/${p.Kv}`:''}</td><td>${m.ok?'稳定':m.failed}</td><td class="num">${m.oscillations}</td><td class="num">${m.maxXm} m</td>`;
+      document.querySelector('#tuneTbl tbody')?.appendChild(tr);
+      return m;
+    }}];
+  const hist=attempts.filter(a=>a.src==='学生').slice(-6).map(attemptLine).join('\n');
+  const prompt=`你是"问渠"平台的机器人实验 AI 助教，现在要给学生“示范”一套有条理的 PID 调参方法。用中文。
+${SYS}
+
+学生已经做过的尝试：
+${hist}
+
+请用工具 run_trial 真实做实验，最多调用 5 次。每次调用前用一句话说明你的假设（例如“振荡多说明阻尼不够，这次只把 Kd 加大”），每次只改一个方面。可以从学生最后一次的参数出发。
+目标：稳定、前 5 秒振荡不超过 3 次、冲击后能恢复、小车最大偏移小于 1 m（通常需要位置环；位置环增益为正是因为要让小车“先往外走一点”把摆杆带回来）。
+最后用 3–4 句话总结调参规律，并指出学生之前的尝试与这套方法相比差在哪里。不要使用 Markdown 标题。`;
+  try{
+    await sample(prompt,{tools,signal:aiCtl.signal,onText:({text})=>{const el=$('tuneText');if(el)el.textContent=text;}});
+    const last=attempts[attempts.length-1];showMetrics(last.metrics,'第 '+last.n+' 次（AI 示范）');
+  }catch(e){const el=$('tuneText');if(el)el.textContent=(e.text?e.text+'\n\n':'')+aiErr(e);}
+  finally{aiBusy=false;$('aiStop').hidden=true;refreshAIButtons();}
+};
+
+/* ================= 实验二 ================= */
+const acv=$('aCanvas');acv.dataset.square='1';
+let mode='ik',elbow='up',interp='joint';
+let q=[40*Math.PI/180,-60*Math.PI/180],target=null,penTrail=[],moveTrail=[],anim=null,armLog=[],marks=[];
+function segBtns(attr,cb){document.querySelectorAll(`[data-${attr}]`).forEach(b=>b.onclick=()=>{document.querySelectorAll(`[data-${attr}]`).forEach(x=>x.setAttribute('aria-pressed',x===b));cb(b.dataset[attr]);});}
+function setSeg(attr,val){document.querySelectorAll(`[data-${attr}]`).forEach(x=>x.setAttribute('aria-pressed',x.dataset[attr]===val));}
+segBtns('mode',v=>{mode=v;$('fkCtrls').hidden=v!=='fk';$('ikCtrls').hidden=v!=='ik';$('aHint').textContent=v==='fk'?'正运动学模式：拖动两个关节角，观察末端位置如何变化。':'逆运动学模式：在画面中点击设置目标点，机械臂自动求解关节角。浅色环形区域是可达空间。';syncFK();drawArm();});
+segBtns('elbow',v=>{elbow=v;});
+segBtns('interp',v=>{interp=v;});
+function syncFK(){$('q1').value=Math.round(q[0]*57.2958);$('q2').value=Math.round(q[1]*57.2958);$('q1O').textContent=$('q1').value+'°';$('q2O').textContent=$('q2').value+'°';}
+['q1','q2'].forEach(id=>$(id).addEventListener('input',()=>{q=[+$('q1').value/57.2958,+$('q2').value/57.2958];$('q1O').textContent=$('q1').value+'°';$('q2O').textContent=$('q2').value+'°';drawArm();}));
+syncFK();
+const WR=1.9;
+function a2c(w,x,y){const s=w/(2*WR);return [w/2+x*s,w/2-y*s];}
+function c2a(w,px,py){const s=w/(2*WR);return [(px-w/2)/s,(w/2-py)/s];}
+acv.addEventListener('pointerdown',ev=>{
+  if(mode!=='ik'||anim)return;
+  const r=acv.getBoundingClientRect();const [x,y]=c2a(r.width,ev.clientX-r.left,ev.clientY-r.top);
+  runPlan([{type:'move',x:+x.toFixed(2),y:+y.toFixed(2),elbow,interp}],'点击');
+});
+function wrapPi(a){while(a>Math.PI)a-=2*Math.PI;while(a<-Math.PI)a+=2*Math.PI;return a;}
+function segment(from,to,el,mode_,pen){
+  // returns list of q along the way; null entries mark unreachable
+  const steps=[],N=60;
+  if(mode_==='line'){
+    const p0=fk(from[0],from[1]);let bad=0;
+    for(let i=1;i<=N;i++){const t=i/N,x=p0.x+(to.x-p0.x)*t,y=p0.y+(to.y-p0.y)*t;const s=ik(x,y,el);if(s)steps.push({q:s,pen});else{bad++;}}
+    return {steps,bad};
+  }
+  const g=ik(to.x,to.y,el);if(!g)return {steps:[],bad:1};
+  const d1=wrapPi(g[0]-from[0]),d2=g[1]-from[1];
+  for(let i=1;i<=N;i++){const t=i/N,e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;steps.push({q:[from[0]+d1*e,from[1]+d2*e],pen});}
+  return {steps,bad:0};
+}
+function circlePts(cx,cy,r,n=48){const a=[];for(let i=0;i<=n;i++){const t=i/n*2*Math.PI;a.push([cx+r*Math.cos(t),cy+r*Math.sin(t)]);}return a;}
+function expandPlan(plan){
+  const ops=[];
+  for(const s of plan){
+    const el=s.elbow==='down'?'down':'up';
+    if(s.type==='move')ops.push({to:{x:+s.x,y:+s.y},el,interp:s.interp==='line'?'line':'joint',pen:false,label:`(${(+s.x).toFixed(2)}, ${(+s.y).toFixed(2)})`});
+    else if(s.type==='line'){ops.push({to:{x:+s.x1,y:+s.y1},el,interp:'joint',pen:false});ops.push({to:{x:+s.x2,y:+s.y2},el,interp:s.interp==='joint'?'joint':'line',pen:true});}
+    else{
+      let pts=s.type==='circle'?circlePts(+s.cx,+s.cy,+s.r):(s.points||[]).map(p=>[+p[0],+p[1]]);
+      if(s.type==='polygon'&&pts.length)pts=[...pts,pts[0]];
+      if(!pts.length)continue;
+      ops.push({to:{x:pts[0][0],y:pts[0][1]},el,interp:'joint',pen:false});
+      for(const p of pts.slice(1))ops.push({to:{x:p[0],y:p[1]},el,interp:s.interp==='joint'?'joint':'line',pen:true,fine:true});
+    }
+  }
+  return ops;
+}
+function runPlan(plan,src){
+  return new Promise(res=>{
+    const ops=expandPlan(plan);let cur=q.slice(),frames=[],report={ops:ops.length,unreachable:[],singularNear:0};
+    marks=[];
+    for(const op of ops){
+      if(!reach(op.to.x,op.to.y)){report.unreachable.push(`(${op.to.x.toFixed(2)}, ${op.to.y.toFixed(2)})`);marks.push({x:op.to.x,y:op.to.y,bad:true});continue;}
+      if(op.label)marks.push({x:op.to.x,y:op.to.y,bad:false});
+      const seg=segment(cur,op.to,op.el,op.interp,op.pen);
+      if(op.fine){seg.steps=seg.steps.filter((_,i)=>i%6===5||i===seg.steps.length-1);}
+      if(seg.bad)report.unreachable.push(`直线路径途经不可达区（到 (${op.to.x.toFixed(2)}, ${op.to.y.toFixed(2)})）`);
+      frames.push(...seg.steps);if(seg.steps.length)cur=seg.steps[seg.steps.length-1].q;
+    }
+    for(const f of frames)if(Math.abs(Math.sin(f.q[1]))<0.08)report.singularNear++;
+    target=ops.length?ops[ops.length-1].to:null;
+    armLog.push({src,plan:plan.map(s=>s.type).join('+'),unreachable:report.unreachable.length,singular:report.singularNear>0});
+    moveTrail=[];let i=0;
+    const speed=Math.max(1,Math.round(frames.length/240));
+    anim=true;
+    const tick=()=>{
+      for(let k=0;k<speed&&i<frames.length;k++,i++){const f=frames[i];q=f.q;const p=fk(q[0],q[1]);if(f.pen)penTrail.push([p.x,p.y]);else{moveTrail.push([p.x,p.y]);penTrail.push(null);}}
+      drawArm();
+      if(i<frames.length)requestAnimationFrame(tick);else{anim=null;syncFK();const p=fk(q[0],q[1]);report.final={x:+p.x.toFixed(3),y:+p.y.toFixed(3)};report.q={theta1Deg:+(q[0]*57.3).toFixed(1),theta2Deg:+(q[1]*57.3).toFixed(1)};res(report);}
+    };
+    if(!frames.length){anim=null;drawArm();res(report);return;}
+    requestAnimationFrame(tick);
+  });
+}
+$('aClear').onclick=()=>{penTrail=[];moveTrail=[];marks=[];target=null;drawArm();};
+$('aHome').onclick=()=>{if(anim)return;runPlan([{type:'move',...(()=>{const p=fk(40/57.3,-60/57.3);return {x:+p.x.toFixed(2),y:+p.y.toFixed(2)};})(),elbow:'up',interp:'joint'}],'复位');};
+function drawArm(){
+  const {ctx,w,h}=fitCanvas(acv);ctx.clearRect(0,0,w,h);const s=w/(2*WR);
+  const [ox,oy]=a2c(w,0,0);
+  // workspace annulus
+  ctx.fillStyle=C['accent-soft'];ctx.beginPath();ctx.arc(ox,oy,(ARM.L1+ARM.L2)*s,0,2*Math.PI);ctx.moveTo(ox+(ARM.L1-ARM.L2)*s,oy);ctx.arc(ox,oy,(ARM.L1-ARM.L2)*s,0,2*Math.PI);ctx.fill('evenodd');
+  // grid
+  ctx.strokeStyle=C.grid;ctx.lineWidth=1;ctx.font='11px '+css('--mono');ctx.fillStyle=C.muted;
+  for(let v=-1.5;v<=1.51;v+=0.5){const [gx]=a2c(w,v,0),[,gy]=a2c(w,0,v);ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,h);ctx.stroke();ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();if(Math.abs(v)>0.01){ctx.textAlign='center';ctx.fillText(v.toFixed(1),gx,oy+14);ctx.textAlign='left';ctx.fillText(v.toFixed(1),ox+4,gy-3);}}
+  ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(w,oy);ctx.moveTo(ox,0);ctx.lineTo(ox,h);ctx.stroke();
+  ctx.fillStyle=C.muted;ctx.textAlign='right';ctx.fillText('x / m',w-6,oy-6);ctx.textAlign='left';ctx.fillText('y / m',ox+6,12);
+  // trails
+  ctx.setLineDash([4,4]);ctx.strokeStyle=C.muted;ctx.lineWidth=1.2;ctx.beginPath();moveTrail.forEach((p,i)=>{const [x,y]=a2c(w,p[0],p[1]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=C.violet;ctx.lineWidth=2.6;ctx.lineJoin='round';ctx.beginPath();let pen=false;for(const p of penTrail){if(!p){pen=false;continue;}const [x,y]=a2c(w,p[0],p[1]);pen?ctx.lineTo(x,y):ctx.moveTo(x,y);pen=true;}ctx.stroke();
+  // marks
+  for(const m of marks){const [x,y]=a2c(w,m.x,m.y);ctx.strokeStyle=m.bad?C.bad:C.hot;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-6,y-6);ctx.lineTo(x+6,y+6);ctx.moveTo(x+6,y-6);ctx.lineTo(x-6,y+6);ctx.stroke();if(m.bad){ctx.fillStyle=C.bad;ctx.font='12px '+css('--sans');ctx.fillText('不可达',x+8,y-6);}}
+  // arm
+  const f=fk(q[0],q[1]);const [ex,ey]=a2c(w,f.e.x,f.e.y),[tx,ty]=a2c(w,f.x,f.y);
+  ctx.lineCap='round';ctx.strokeStyle=C.plate;ctx.lineWidth=16;ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ex,ey);ctx.stroke();
+  ctx.strokeStyle=C.accent;ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(tx,ty);ctx.stroke();
+  ctx.fillStyle=C.ink;for(const [x,y,r] of [[ox,oy,9],[ex,ey,7]]){ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();}
+  ctx.fillStyle=C.hot;ctx.beginPath();ctx.arc(tx,ty,6,0,7);ctx.fill();
+  // readouts
+  const det=ARM.L1*ARM.L2*Math.sin(q[1]);
+  $('aQ1').textContent=(wrapPi(q[0])*57.2958).toFixed(1)+'°';$('aQ2').textContent=(q[1]*57.2958).toFixed(1)+'°';
+  $('aX').textContent=f.x.toFixed(3)+' m';$('aY').textContent=f.y.toFixed(3)+' m';$('aDet').textContent=det.toFixed(3);
+  const sing=Math.abs(Math.sin(q[1]))<0.08;$('aSt').textContent=sing?'接近奇异':'正常';$('aSt').style.color=sing?C.hot:C.ok;
+}
+
+/* ---------- AI：自然语言指挥 ---------- */
+document.querySelectorAll('[data-cmd]').forEach(b=>b.onclick=()=>{$('aCmd').value=b.dataset.cmd;});
+const OFFLINE_PLANS={
+  '画正方形':{plan:[{type:'polygon',points:[[0.6,-0.3],[1.2,-0.3],[1.2,0.3],[0.6,0.3]],interp:'line',elbow:'up'}],explain:'（离线示例）正方形四个顶点都在可达环内，用笛卡尔直线插值保证每条边是直的。'},
+  'default':{plan:[{type:'circle',cx:0.9,cy:0.4,r:0.35,interp:'line',elbow:'up'}],explain:'（离线示例）圆上每个点离基座 0.64–1.34 m，都在可达环内，所以整圈都能画出来。'}
+};
+$('aGo').onclick=async()=>{
+  if(anim)return;
+  const cmd=$('aCmd').value.trim();if(!cmd)return;
+  $('aGo').disabled=true;
+  let plan,explain,warnings=[];
+  if(!sample){
+    const o=/正方形/.test(cmd)?OFFLINE_PLANS['画正方形']:OFFLINE_PLANS.default;plan=o.plan;explain=o.explain+' 连接 AI 后可以理解任意指令。';
+  }else{
+    $('aOut').innerHTML='<span class="muted">AI 正在规划…</span>';
+    const p=fk(q[0],q[1]);
+    const prompt=`你是"问渠"平台机器人实验的 AI 助教，负责把学生的中文指令转换成平面二连杆机械臂的运动计划。
+机械臂：基座在原点，L1=1.0m，L2=0.7m，可达区域为半径 0.3m 到 1.7m 的圆环。当前末端在 (${p.x.toFixed(2)}, ${p.y.toFixed(2)})，θ1=${(q[0]*57.3).toFixed(0)}°，θ2=${(q[1]*57.3).toFixed(0)}°。
+可用动作（坐标单位 m）：
+{"type":"move","x":..,"y":..,"elbow":"up|down","interp":"joint|line"} 移动到点，不画线
+{"type":"line","x1":..,"y1":..,"x2":..,"y2":..,"interp":"line|joint"} 画线段
+{"type":"circle","cx":..,"cy":..,"r":..,"interp":"line"} 画圆
+{"type":"polygon","points":[[x,y],...],"interp":"line"} 画闭合多边形
+interp: joint=关节空间插值（末端走曲线），line=笛卡尔直线插值（末端走直线）。
+系统会自动检查可达性：不可达的点照样放进计划，系统会标红，你在 warnings 里说明原因（算出离基座的距离）。
+学生指令：${cmd}
+只返回 JSON：{"plan":[...],"explain":"用两三句话向学生说明计划，并点出相关知识点（可达空间、奇异位形、插值方式、肘上/肘下多解等）","warnings":["..."]}`;
+    try{const r=await sample.json(prompt,{modelTier:'quick',cache:false});plan=Array.isArray(r.plan)?r.plan.slice(0,20):[];explain=r.explain||'';warnings=Array.isArray(r.warnings)?r.warnings:[];}
+    catch(e){$('aOut').innerHTML=`<span class="warnline">${aiErr(e)}</span>`;$('aGo').disabled=false;return;}
+  }
+  const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  $('aOut').innerHTML=`<div>${esc(explain)}</div>${warnings.map(w=>`<div class="warnline">⚠ ${esc(w)}</div>`).join('')}<div class="muted small" id="aExec" style="margin-top:6px">执行中…</div>`;
+  const rep=await runPlan(plan,sample?'AI 指令':'离线示例');
+  $('aExec').innerHTML=`系统执行结果：${rep.ops} 个动作，${rep.unreachable.length?`<span class="warnline">${rep.unreachable.length} 处不可达：${esc(rep.unreachable.slice(0,4).join('；'))}</span>`:'全部可达'}${rep.singularNear?'；途中经过奇异位形附近':''}。`;
+  armLog[armLog.length-1].cmd=cmd;
+  $('aGo').disabled=false;
+};
+
+/* ================= 报告 ================= */
+function studentAttempts(){return attempts.filter(a=>a.src==='学生');}
+function renderSummary(){
+  const st=studentAttempts(),ai=attempts.filter(a=>a.src!=='学生');
+  const best=st.filter(a=>a.metrics.ok).sort((a,b)=>(a.metrics.oscillations+a.metrics.maxXm*3)-(b.metrics.oscillations+b.metrics.maxXm*3))[0];
+  let changes=0,single=0;for(let i=1;i<st.length;i++){const a=st[i-1].p,b=st[i].p;const d=['Kp','Ki','Kd','Kx','Kv','pos'].filter(k=>a[k]!==b[k]).length;if(d)changes++;if(d===1)single++;}
+  $('rSummary').innerHTML=`<div class="kv">
+    <div><span>倒立摆：学生尝试</span><b>${st.length} 次</b></div>
+    <div><span>其中成功</span><b>${st.filter(a=>a.metrics.ok).length} 次</b></div>
+    <div><span>每次只改一个参数</span><b>${single} / ${changes}</b></div>
+    <div><span>使用了位置环</span><b>${st.some(a=>a.p.pos)?'是':'否'}</b></div>
+    <div><span>请求 AI 诊断</span><b>${attempts.filter(a=>a.askedAI).length} 次</b></div>
+    <div><span>观看 AI 示范</span><b>${ai.length?'是（'+ai.length+' 次试验）':'否'}</b></div>
+    <div><span>机械臂：执行指令</span><b>${armLog.length} 条</b></div>
+    <div><span>遇到不可达</span><b>${armLog.filter(a=>a.unreachable).length} 次</b></div>
+  </div>
+  <p class="muted" style="margin:10px 0 0">${best?'最佳一次：'+attemptLine(best):'还没有成功的尝试。'}</p>
+  ${st.length?'':'<p class="note" style="margin-top:10px">评价需要实验数据。先去“实验一”做几次尝试；没有数据时，AI 会按示例数据演示。</p>'}`;
+}
+function demoData(){
+  const mk=(p)=>{const r=runHeadless({...p,th0:0.1});return {n:0,src:'学生',p:{...p,th0:0.1},metrics:r.metrics};};
+  return [mk({Kp:30,Ki:0,Kd:2,pos:false,Kx:0,Kv:0}),mk({Kp:30,Ki:5,Kd:2,pos:false,Kx:0,Kv:0}),mk({Kp:60,Ki:0,Kd:8,pos:false,Kx:0,Kv:0}),mk({Kp:60,Ki:0,Kd:8,pos:true,Kx:3,Kv:4.5})].map((a,i)=>({...a,n:i+1}));
+}
+function ruleEval(st){
+  const ok=st.filter(a=>a.metrics.ok),final=st[st.length-1];
+  let single=0,ch=0;for(let i=1;i<st.length;i++){const d=['Kp','Ki','Kd','Kx','Kv','pos'].filter(k=>st[i-1].p[k]!==st[i].p[k]).length;if(d)ch++;if(d===1)single++;}
+  const s1=Math.min(5,2+(ch?Math.round(single/ch*3):0)),s2=Math.min(5,1+Math.min(4,st.length-1)),s3=$('rThink').value.trim().length>20?4:2,s4=final?.metrics.ok?(final.metrics.maxXm<1&&final.metrics.oscillations<=3?5:4):ok.length?3:1;
+  const total=Math.round((s1*20+s2*30+s3*25+s4*25)/5);
+  return {total,dims:[{name:'实验操作规范',score:s1,comment:`${ch} 次参数调整中有 ${single} 次只改了一个参数。`},{name:'参数调节策略',score:s2,comment:`共尝试 ${st.length} 次。`},{name:'现象与原理',score:s3,comment:s3>2?'写了实验心得，能联系现象。':'没有写实验心得，无法判断对原理的理解。'},{name:'结果达成',score:s4,comment:final?.metrics.ok?'最后一次稳定。':'最后一次没有稳住。'}],highlights:ok.length?['找到了能稳定的参数组合']:[],improve:['尝试写下每次调参前的预测，再和结果对照'],teacherNote:'离线规则版评分，仅供参考。'};
+}
+function renderEval(r,src){
+  const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  $('rOut').innerHTML=`<div style="display:flex;align-items:baseline;gap:8px"><span class="big">${Math.round(+r.total||0)}</span><span class="muted">/ 100</span></div>
+  ${(r.dims||[]).map(d=>`<div class="score"><span>${esc(d.name)}</span><div class="bar"><i style="width:${Math.max(0,Math.min(5,+d.score||0))*20}%"></i></div><b class="num" style="font-family:var(--mono)">${+d.score||0}/5</b></div><div class="muted small" style="margin:-2px 0 6px">${esc(d.comment)}</div>`).join('')}
+  ${(r.highlights||[]).length?`<h3>做得好的地方</h3><ul class="small">${r.highlights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+  ${(r.improve||[]).length?`<h3>下一步建议</h3><ul class="small">${r.improve.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+  ${r.teacherNote?`<div class="note" style="margin-top:10px"><b>给教师：</b>${esc(r.teacherNote)}</div>`:''}
+  <p class="muted small" style="margin:8px 0 0">${src}</p>`;
+}
+$('rGo').onclick=async()=>{
+  let st=studentAttempts(),demo=false;
+  if(!st.length){st=demoData();demo=true;}
+  const note=demo?'（使用示例数据演示：4 次尝试。）':'';
+  if(!sample){renderEval(ruleEval(st),'离线规则版评分'+note);return;}
+  $('rGo').disabled=true;$('rOut').innerHTML='<span class="muted">AI 正在阅读实验过程…</span>';
+  const prompt=`你是"问渠"平台的实验教学评价助手，用中文，对本科生的虚拟仿真实验做过程性评价。评价的是过程，不只是结果；要具体，引用学生的实际尝试编号和数据。
+${SYS}
+
+学生的倒立摆尝试记录（按时间顺序）：
+${st.map(attemptLine).join('\n')}
+请求 AI 诊断次数：${attempts.filter(a=>a.askedAI).length}；观看 AI 示范：${attempts.some(a=>a.src!=='学生')?'是':'否'}
+机械臂实验：${armLog.length?armLog.map(a=>`[${a.src}] ${a.cmd||a.plan}，不可达${a.unreachable}处`).join('；'):'未做'}
+学生实验心得：${$('rThink').value.trim()||'（未填写）'}
+
+评价维度与权重：实验操作规范20%（是否先做基线、是否每次只改一个参数）；参数调节策略30%（调整方向是否与现象相符、是否逐步逼近）；现象与原理25%（心得中能否把振荡、漂移、失稳与P/I/D作用对应）；结果达成25%。每个维度打 1–5 分，total 为按权重折算的百分制。
+只返回 JSON：{"total":0-100,"dims":[{"name":"实验操作规范","score":1-5,"comment":"具体评语"},{"name":"参数调节策略",...},{"name":"现象与原理",...},{"name":"结果达成",...}],"highlights":["..."],"improve":["..."],"teacherNote":"给任课教师的一句话（例如是否需要个别辅导、是否可能直接抄了参数）"}`;
+  try{const r=await sample.json(prompt,{cache:false});renderEval(r,'由 AI 生成，建议教师复核后计入成绩。'+note);}
+  catch(e){$('rOut').innerHTML=`<span class="warnline">${aiErr(e)}</span>`;}
+  finally{$('rGo').disabled=false;}
+};
+
+/* ---------- 初始 ---------- */
+function drawAll(){if(!$('tab-pend').hidden){drawPend();drawChart();}if(!$('tab-arm').hidden)drawArm();}
+window.addEventListener('resize',drawAll);
+if(document.fonts?.ready)document.fonts.ready.then(drawAll);
+drawAll();
+refreshAIButtons();
+initAI();
+</script>
+
+</body></html>

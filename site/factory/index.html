@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<div id="wq-home" style="background:#0a1216;padding:9px 20px;font:500 13px/1.2 system-ui,'Noto Sans SC',sans-serif"><a href="/" style="color:#e9eef0;text-decoration:none">← WenQuest Robotics · 问渠机器人学院</a></div>
+<script>if(window.top!==window.self){var e=document.getElementById("wq-home");if(e)e.remove();}</script>
+
+<title>问渠虚拟工厂</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112..125,600..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --bg: #eef1f0; --panel: #ffffff; --ink: #14212b; --muted: #55666e; --line: #cdd5d3; --grid: #e2e7e5;
+    --accent: #f2b705; --accent-ink: #7a5a00; --on-accent: #14212b;
+    --run: #1f8a5b; --idle: #9aa6ab; --down: #c2362b; --setup: #2f6fb0;
+    --t-shaft: #1f6f8b; --t-gear: #8a5cc2; --t-house: #b0702f; --t-asm: #14212b;
+    --spc: #1f6f8b; --tol: #c2362b;
+    --display: "Archivo", "Noto Sans SC", Arial, sans-serif;
+    --body: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f171c; --panel: #16222a; --ink: #e5ecea; --muted: #93a4a9; --line: #2a3a42; --grid: #1f2e36;
+      --accent: #f5c22e; --accent-ink: #f5c22e; --on-accent: #10181d;
+      --run: #3fbf85; --idle: #5f6f76; --down: #ff6b5e; --setup: #5aa0e6;
+      --t-shaft: #6cc4e0; --t-gear: #b99bf0; --t-house: #e0a45f; --t-asm: #e5ecea;
+      --spc: #6cc4e0; --tol: #ff6b5e; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f171c; --panel: #16222a; --ink: #e5ecea; --muted: #93a4a9; --line: #2a3a42; --grid: #1f2e36;
+    --accent: #f5c22e; --accent-ink: #f5c22e; --on-accent: #10181d;
+    --run: #3fbf85; --idle: #5f6f76; --down: #ff6b5e; --setup: #5aa0e6;
+    --t-shaft: #6cc4e0; --t-gear: #b99bf0; --t-house: #e0a45f; --t-asm: #e5ecea;
+    --spc: #6cc4e0; --tol: #ff6b5e; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.55 var(--body); }
+  .wrap { max-width: 1320px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 32px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; margin-bottom: 12px; }
+  h1 { font: 800 clamp(22px, 3vw, 30px)/1.15 var(--display); font-stretch: 112%; margin: 0; letter-spacing: .01em; }
+  .sub { color: var(--muted); font-size: 14px; margin: 4px 0 0; }
+  .clock { font: 500 14px/1.3 var(--mono); color: var(--muted); text-align: right; }
+  .clock b { display: block; font: 600 20px/1.2 var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* Story bar */
+  .story { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center;
+           background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+           border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+  .step-no { font: 600 12px/1 var(--mono); color: var(--accent-ink); letter-spacing: .06em; white-space: nowrap; }
+  .caption { margin: 0; font-size: 16px; line-height: 1.55; min-height: 3.1em; }
+  .caption strong { font-weight: 600; }
+  .story .btns { display: flex; gap: 6px; }
+  button, select { font: 500 14px/1 var(--body); color: var(--ink); background: var(--panel); border: 1px solid var(--line);
+           border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+  button:hover, select:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+  button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  @media (max-width: 720px) { .story { grid-template-columns: 1fr; } }
+
+  .main { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 12px; }
+  @media (max-width: 1000px) { .main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+  .panel h2 { font: 600 13px/1.3 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px;
+              display: flex; justify-content: space-between; gap: 8px; }
+  .panel h2 span.r { text-transform: none; letter-spacing: 0; }
+
+  #floor { width: 100%; height: auto; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .legend i.dot { border-radius: 50%; }
+
+  .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .kpi { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--panel); }
+  .kpi span { display: block; font-size: 12px; color: var(--muted); }
+  .kpi b { display: block; font: 600 22px/1.2 var(--mono); font-variant-numeric: tabular-nums; }
+  .kpi small { font: 500 11.5px/1.2 var(--mono); color: var(--muted); }
+  .kpi.warn b { color: var(--down); }
+  .side { display: grid; gap: 12px; align-content: start; }
+
+  #spc, #cap { width: 100%; height: auto; display: block; }
+  .andon { list-style: none; margin: 0; padding: 0; max-height: 150px; overflow: auto; font-size: 13px; }
+  .andon li { display: grid; grid-template-columns: 5.6em 10px minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 4px 0; border-bottom: 1px solid var(--grid); }
+  .andon time { font: 500 12px/1.3 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .andon i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 12px; }
+  .controls label { font-size: 13px; color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+  .bottom { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+  @media (max-width: 1000px) { .bottom { grid-template-columns: 1fr; } }
+  .erp { font-size: 13.5px; }
+  .erp dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; margin: 0; }
+  .erp dt { color: var(--muted); }
+  .erp dd { margin: 0; font: 500 13.5px/1.4 var(--mono); font-variant-numeric: tabular-nums; }
+  .note { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>问渠虚拟工厂 · 车间实时演示</h1>
+      <p class="sub">二级圆柱齿轮减速器 WQR-105 · 11 台设备 · 8 种自制零件 → 4 个部件 → 总装出厂</p>
+    </div>
+    <div class="clock">虚拟车间时间<b id="clock">第 1 天 08:00</b></div>
+  </header>
+
+  <section class="story" aria-live="polite">
+    <span class="step-no" id="stepNo">第 1 / 6 步</span>
+    <p class="caption" id="caption"></p>
+    <div class="btns">
+      <button id="prev" type="button">上一步</button>
+      <button id="next" type="button" class="primary">下一步</button>
+    </div>
+  </section>
+
+  <div class="main">
+    <section class="panel">
+      <h2>车间平面 <span class="r" id="floorNote">点设备可看详情</span></h2>
+      <svg id="floor" viewBox="0 0 900 420" role="img" aria-label="虚拟车间平面图，设备按状态着色"></svg>
+      <div class="legend">
+        <span><i style="background:var(--run)"></i>加工中</span>
+        <span><i style="background:var(--idle)"></i>空闲</span>
+        <span><i style="background:var(--setup)"></i>修整 / 换型</span>
+        <span><i style="background:var(--down)"></i>故障</span>
+        <span><i class="dot" style="background:var(--t-shaft)"></i>轴</span>
+        <span><i class="dot" style="background:var(--t-gear)"></i>齿轮</span>
+        <span><i class="dot" style="background:var(--t-house)"></i>箱体</span>
+        <span><i class="dot" style="background:var(--t-asm)"></i>部件 / 整机</span>
+      </div>
+      <div class="controls">
+        <label for="speed">速度
+          <select id="speed">
+            <option value="30">慢</option>
+            <option value="80" selected>中</option>
+            <option value="200">快</option>
+          </select>
+        </label>
+        <button id="pause" type="button" aria-pressed="false">暂停</button>
+        <button id="fault" type="button">注入故障：滚齿机停机 90 分钟</button>
+        <button id="spcBtn" type="button" aria-pressed="true">SPC 预警：开</button>
+        <button id="dressBtn" type="button" aria-pressed="false">每 3 件预防修整：关</button>
+        <label for="hob">滚刀
+          <select id="hob">
+            <option value="1" selected>单头</option>
+            <option value="2">双头（滚齿时间减半）</option>
+          </select>
+        </label>
+        <button id="reset" type="button">重新开始</button>
+      </div>
+    </section>
+
+    <div class="side">
+      <div class="kpis">
+        <div class="kpi"><span>完工出厂</span><b id="kDone">0</b><small>台</small></div>
+        <div class="kpi"><span>实测日产能</span><b id="kRate">–</b><small>台 / 班</small></div>
+        <div class="kpi"><span>在制品</span><b id="kWip">0</b><small>台份</small></div>
+        <div class="kpi"><span>滚齿机利用率</span><b id="kHob">–</b><small>瓶颈设备</small></div>
+        <div class="kpi" id="kCpkBox"><span>磨削过程能力 Cpk</span><b id="kCpk">–</b><small>近 20 件</small></div>
+        <div class="kpi" id="kScrapBox"><span>磨削废品</span><b id="kScrap">0</b><small>件（超出公差）</small></div>
+      </div>
+      <section class="panel">
+        <h2>SPC · 磨外圆 轴承位直径偏差 <span class="r">μm</span></h2>
+        <svg id="spc" viewBox="0 0 440 200" role="img" aria-label="轴承位直径偏差控制图"></svg>
+        <p class="note">Ø25 / Ø30 k6，公差 +2 ~ +15 μm。控制限来自过程能力研究（均值 ±3σ）；超出控制限或连续 6 点上升即报警。</p>
+      </section>
+      <section class="panel">
+        <h2>安灯与事件</h2>
+        <ul class="andon" id="andon"></ul>
+      </section>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <section class="panel">
+      <h2>各设备单班产能（按工艺路线计算） <span class="r">台 / 班</span></h2>
+      <svg id="cap" viewBox="0 0 760 300" role="img" aria-label="各设备单班产能，最短的一条是瓶颈"></svg>
+    </section>
+    <section class="panel erp">
+      <h2>实时回写 ERPNext</h2>
+      <dl>
+        <dt>工序卡实绩</dt><dd id="eJob">0 张</dd>
+        <dt>质量检验单</dt><dd id="eQi">0 张</dd>
+        <dt>不合格记录</dt><dd id="eNc">0 条</dd>
+        <dt>完工入库</dt><dd id="eFg">0 台</dd>
+        <dt>累计实际工时</dt><dd id="eHrs">0 小时</dd>
+      </dl>
+      <p class="note">演示中数据写在页面里；接入后由虚拟车间通过 ERPNext 接口写入对应单据，实际成本由 ERPNext 核算。</p>
+    </section>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  /* ================= 工厂数据（与 factory/data.py 一致） ================= */
+  var ST = {
+    SAW: { name: '带锯床', code: 'SAW-01', n: 1, x: 150, y: 16 },
+    CNC: { name: '数控车床', code: 'CNC-L01 ×2', n: 2, x: 300, y: 16 },
+    HT:  { name: '热处理炉', code: 'HT-01 装炉 20', n: 20, x: 450, y: 16 },
+    KEY: { name: '键槽铣床', code: 'KEY-01', n: 1, x: 600, y: 16 },
+    HOB: { name: '滚齿机', code: 'HOB-01', n: 1, x: 750, y: 16 },
+    VMC: { name: '立式加工中心', code: 'VMC-01', n: 1, x: 150, y: 160 },
+    HMC: { name: '卧式加工中心', code: 'HMC-01', n: 1, x: 300, y: 160 },
+    GRD: { name: '外圆磨床', code: 'GRD-01', n: 1, x: 450, y: 160 },
+    QC:  { name: '检验站', code: 'QC-01', n: 1, x: 600, y: 160 },
+    ASM: { name: '装配工位', code: 'ASM-01 ×2', n: 2, x: 300, y: 304 },
+    TEST:{ name: '跑合试验台', code: 'TEST-01', n: 1, x: 450, y: 304 }
+  };
+  var SRC = { x: 40, y: 142 }, SINK = { x: 750, y: 304 };
+  var R = {
+    shaft:   [['SAW',3],['CNC',18],['HT',12],['CNC',15],['KEY',10],['GRD',12],['QC',6]],
+    pinion:  [['SAW',3],['CNC',20],['CNC',15],['HOB',25],['HT',20],['GRD',15],['QC',8]],
+    forged:  [['CNC',20],['HT',15],['CNC',18],['KEY',12],['HOB',35],['QC',8]],
+    barpin:  [['SAW',3],['CNC',12],['CNC',10],['KEY',10],['HOB',20],['HT',15],['QC',6]],
+    housing: [['VMC',25],['VMC',20],['QC',5]],
+    bore:    [['HMC',15],['HMC',45],['QC',20]],
+    sub:     [['ASM',15],['QC',5]],
+    final:   [['ASM',45],['TEST',30],['QC',10],['ASM',10]]
+  };
+  var PARTS = {
+    'SH-101': { r: 'pinion', t: 'shaft', measure: true, name: '输入齿轮轴' },
+    'SH-201': { r: 'shaft', t: 'shaft', measure: true, name: '中间轴' },
+    'SH-301': { r: 'shaft', t: 'shaft', name: '输出轴' },
+    'GR-202': { r: 'forged', t: 'gear', name: '大齿轮 z72' },
+    'GR-203': { r: 'barpin', t: 'gear', name: '小齿轮 z20' },
+    'GR-302': { r: 'forged', t: 'gear', name: '大齿轮 z70' },
+    'HSG-001': { r: 'housing', t: 'house', name: '箱座' },
+    'HSG-002': { r: 'housing', t: 'house', name: '箱盖' },
+    'SA-000': { r: 'bore', t: 'house', deps: ['HSG-001', 'HSG-002'], name: '箱体组件' },
+    'SA-100': { r: 'sub', t: 'asm', deps: ['SH-101'], name: '输入轴组件' },
+    'SA-200': { r: 'sub', t: 'asm', deps: ['SH-201', 'GR-202', 'GR-203'], name: '中间轴组件' },
+    'SA-300': { r: 'sub', t: 'asm', deps: ['SH-301', 'GR-302'], name: '输出轴组件' },
+    'WQR-105': { r: 'final', t: 'asm', deps: ['SA-000', 'SA-100', 'SA-200', 'SA-300'], name: '减速器' }
+  };
+  var DAY = 480, WIP_CAP = 8;
+  var LSL = 2, USL = 15, MU0 = 8.5, SIGMA = 1.3, WEAR = 0.5, DRESS_N = 3;
+
+  /* ================= 随机数（固定种子，演示可复现） ================= */
+  var seed = 7;
+  function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+  function gauss() { var u = 1 - rnd(), v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+
+  /* ================= 仿真状态 ================= */
+  var S;
+  function init() {
+    seed = 7;
+    S = { t: 0, orders: [], nextOrder: 1, done: 0, doneTimes: [], jobs: [], wear: 0, sinceDress: 0,
+          spc: [], limits: { cl: MU0, ucl: MU0 + 3 * SIGMA, lcl: MU0 - 3 * SIGMA }, alarmCooldown: 0, scrap: 0, qi: 0, nc: 0, jobCards: 0, labour: 0,
+          hobBusy: 0, events: [], tokens: [], dressEvery: 0, spcOn: true, hobK: 1 };
+    Object.keys(ST).forEach(function (k) {
+      var s = ST[k]; s.queue = []; s.busy = []; s.down = 0; s.setup = 0; s.flash = 0;
+    });
+  }
+
+  function newOrder() {
+    var o = { id: S.nextOrder++, start: S.t, have: {} };
+    S.orders.push(o);
+    ['SH-101','SH-201','SH-301','GR-202','GR-203','GR-302','HSG-001','HSG-002'].forEach(function (p) { release(o, p); });
+  }
+  function release(o, part) {
+    var job = { order: o, part: part, step: 0, pos: SRC };
+    S.jobs.push(job);
+    enqueue(job, SRC);
+  }
+  function opTime(ws, base) {
+    var f = ws === 'HOB' ? 1 / S.hobK : 1;
+    return Math.max(1, base * f * Math.exp(0.08 * gauss() - 0.0032));
+  }
+  function enqueue(job, from) {
+    var op = R[PARTS[job.part].r][job.step];
+    var st = ST[op[0]];
+    st.queue.push(job);
+    animate(job, from, st);
+  }
+  function finishOp(st, key, slot) {
+    var job = slot.job;
+    S.jobCards++; S.labour += slot.dur;
+    if (key === 'GRD') grindMeasure(job);
+    if (job.scrapped) {
+      S.scrap++; S.nc++;
+      log('down', ST.GRD.code + ' ' + PARTS[job.part].name + '尺寸超差报废，补投一件');
+      release(job.order, job.part);
+      return;
+    }
+    job.step++;
+    var ops = R[PARTS[job.part].r];
+    if (job.step < ops.length) { enqueue(job, st); return; }
+    if (ops[ops.length - 1][0] === 'QC') S.qi++;
+    partDone(job, st);
+  }
+  function partDone(job, st) {
+    var o = job.order;
+    o.have[job.part] = true;
+    if (job.part === 'WQR-105') {
+      S.done++; S.doneTimes.push(S.t);
+      S.orders = S.orders.filter(function (x) { return x !== o; });
+      flyTo(st, SINK, 'asm');
+      return;
+    }
+    Object.keys(PARTS).forEach(function (p) {
+      var d = PARTS[p].deps;
+      if (d && !o.have[p] && !o['rel_' + p] && d.every(function (x) { return o.have[x]; })) {
+        o['rel_' + p] = true;
+        var j = { order: o, part: p, step: 0 };
+        S.jobs.push(j);
+        enqueue(j, st);
+      }
+    });
+  }
+  function grindMeasure(job) {
+    S.wear += WEAR; S.sinceDress++;
+    if (!PARTS[job.part].measure) return;
+    var v = MU0 + SIGMA * gauss() + S.wear;
+    var out = v > USL || v < LSL;
+    S.qi++;
+    var pt = { v: v, alarm: false, out: out, t: S.t };
+    S.spc.push(pt);
+    if (S.spc.length > 60) S.spc.shift();
+    if (out) job.scrapped = true;
+    if (S.spcOn && S.limits && S.alarmCooldown <= 0) {
+      var last = S.spc.slice(-6), rising = last.length === 6 && last.every(function (p, i) { return i === 0 || p.v > last[i - 1].v; });
+      if (v > S.limits.ucl || v < S.limits.lcl || rising) {
+        pt.alarm = true; S.alarmCooldown = 3;
+        log('warn', 'SPC 预警：磨外圆尺寸' + (rising ? '连续 6 点上升' : '超出控制限') + '，安灯亮起，停机修整砂轮');
+        dress('SPC 报警后');
+      }
+    }
+    if (S.alarmCooldown > 0) S.alarmCooldown--;
+    if (S.dressEvery && S.sinceDress >= S.dressEvery) dress('按工艺规定预防');
+  }
+  function dress(why) {
+    ST.GRD.setup = 10; S.wear = 0; S.sinceDress = 0; S.jobCards++;
+    log('setup', ST.GRD.code + ' ' + why + '修整砂轮 10 分钟');
+  }
+
+  /* 每一分钟推进一次 */
+  function tick() {
+    S.t++;
+    if (S.orders.length < WIP_CAP && S.t % 20 === 1) newOrder();
+    Object.keys(ST).forEach(function (k) {
+      var st = ST[k];
+      if (st.flash > 0) st.flash--;
+      if (st.down > 0) { st.down--; if (st.down === 0) log('run', st.code + ' 修复，恢复生产'); return; }
+      if (st.setup > 0) { st.setup--; return; }
+      if (k !== 'HT' && rnd() < 1 / 2400) {
+        st.down = 15 + Math.round(rnd() * 25);
+        log('down', st.code + ' ' + st.name + '故障停机，预计 ' + st.down + ' 分钟');
+        return;
+      }
+      st.busy = st.busy.filter(function (slot) {
+        slot.left--;
+        if (k === 'HOB') S.hobBusy++;
+        if (slot.left <= 0) { finishOp(st, k, slot); return false; }
+        return true;
+      });
+      while (st.busy.length < st.n && st.queue.length) {
+        var job = st.queue.shift();
+        var base = R[PARTS[job.part].r][job.step][1];
+        var d = opTime(k, base);
+        st.busy.push({ job: job, left: Math.round(d), dur: d });
+      }
+    });
+  }
+
+  /* ================= 事件日志 ================= */
+  function clockText(t) {
+    var day = Math.floor(t / DAY) + 1, m = t % DAY;
+    var h = m < 240 ? 8 * 60 + m : 13 * 60 + (m - 240);
+    return '第 ' + day + ' 天 ' + String(Math.floor(h / 60)).padStart(2, '0') + ':' + String(h % 60).padStart(2, '0');
+  }
+  function log(kind, text) {
+    S.events.unshift({ kind: kind, text: text, t: S.t });
+    if (S.events.length > 40) S.events.pop();
+    if (kind === 'down' || kind === 'warn') { var k = text.indexOf('HOB') >= 0 ? 'HOB' : text.indexOf('GRD') >= 0 || text.indexOf('磨') >= 0 ? 'GRD' : null; if (k) ST[k].flash = 30; }
+    renderLog();
+  }
+
+  /* ================= 零件动画 ================= */
+  var floor = document.getElementById('floor');
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(NS, name);
+    for (var a in attrs) e.setAttribute(a, attrs[a]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  var tokenLayer;
+  function animate(job, from, to) {
+    var t = PARTS[job.part].t;
+    flyTo(from, to, t);
+  }
+  function flyTo(from, to, type) {
+    if (!tokenLayer || S.tokens.length > 60) return;
+    var c = el('circle', { r: 5, fill: 'var(--t-' + type + ')', stroke: 'var(--panel)', 'stroke-width': 1.5 }, tokenLayer);
+    S.tokens.push({ el: c, x0: from.x, y0: from.y + 96, x1: to.x, y1: to.y + 96, t0: performance.now(), dur: 650 });
+  }
+  function moveTokens(now) {
+    S.tokens = S.tokens.filter(function (k) {
+      var p = Math.min(1, (now - k.t0) / k.dur), e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      var x = k.x0 + (k.x1 - k.x0) * e, y = k.y0 + (k.y1 - k.y0) * e - Math.sin(Math.PI * e) * 26;
+      k.el.setAttribute('cx', x.toFixed(1)); k.el.setAttribute('cy', y.toFixed(1));
+      if (p >= 1) { k.el.remove(); return false; }
+      return true;
+    });
+  }
+
+  /* ================= 车间平面图 ================= */
+  var boxes = {};
+  function buildFloor() {
+    floor.innerHTML = '';
+    var g0 = el('g', {}, floor);
+    // 毛坯库、成品库
+    [['毛坯库', SRC, '钢材 · 锻坯 · 铸件'], ['成品库', SINK, '序列号 WQR105-']].forEach(function (s) {
+      var g = el('g', {}, g0);
+      el('rect', { x: s[1].x - 32, y: s[1].y - 4, width: 64, height: 64, rx: 8, fill: 'none', stroke: 'var(--line)', 'stroke-dasharray': '4 4' }, g);
+      var tx = el('text', { x: s[1].x, y: s[1].y + 26, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600, fill: 'var(--ink)' }, g); tx.textContent = s[0];
+      var t2 = el('text', { x: s[1].x, y: s[1].y + 44, 'text-anchor': 'middle', 'font-size': 10.5, fill: 'var(--muted)' }, g); t2.textContent = s[2].slice(0, 7);
+    });
+    Object.keys(ST).forEach(function (k) {
+      var s = ST[k], g = el('g', { tabindex: 0, role: 'button', 'aria-label': s.name }, g0);
+      var r = el('rect', { x: s.x - 62, y: s.y, width: 124, height: 86, rx: 8, fill: 'var(--panel)', stroke: 'var(--line)', 'stroke-width': 1.25 }, g);
+      var bar = el('rect', { x: s.x - 62, y: s.y, width: 124, height: 6, rx: 3, fill: 'var(--idle)' }, g);
+      var n = el('text', { x: s.x, y: s.y + 28, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 600, fill: 'var(--ink)' }, g); n.textContent = s.name;
+      var c = el('text', { x: s.x, y: s.y + 45, 'text-anchor': 'middle', 'font-size': 11, 'font-family': 'var(--mono)', fill: 'var(--muted)' }, g); c.textContent = s.code;
+      var st = el('text', { x: s.x - 52, y: s.y + 70, 'font-size': 11.5, fill: 'var(--muted)' }, g);
+      var q = el('text', { x: s.x + 52, y: s.y + 70, 'text-anchor': 'end', 'font-size': 11.5, 'font-family': 'var(--mono)', fill: 'var(--muted)' }, g);
+      var qdots = el('g', {}, g);
+      boxes[k] = { rect: r, bar: bar, st: st, q: q, qdots: qdots };
+      g.addEventListener('click', function () { showStation(k); });
+      g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showStation(k); } });
+    });
+    tokenLayer = el('g', {}, floor);
+    var hl = el('rect', { id: 'hl', x: 0, y: 0, width: 0, height: 0, rx: 12, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3, opacity: 0 }, floor);
+    boxes._hl = hl;
+  }
+  function showStation(k) {
+    var s = ST[k];
+    document.getElementById('floorNote').textContent = s.name + '：加工中 ' + s.busy.length + '/' + s.n + '，排队 ' + s.queue.length + ' 件' +
+      (s.busy[0] ? '，当前 ' + PARTS[s.busy[0].job.part].name : '');
+  }
+  function highlight(k) {
+    var hl = boxes._hl;
+    if (!k) { hl.setAttribute('opacity', 0); return; }
+    var s = ST[k];
+    hl.setAttribute('x', s.x - 68); hl.setAttribute('y', s.y - 6); hl.setAttribute('width', 136); hl.setAttribute('height', 98); hl.setAttribute('opacity', 1);
+  }
+  function renderFloor() {
+    Object.keys(ST).forEach(function (k) {
+      var s = ST[k], b = boxes[k];
+      var state = s.down ? 'down' : s.setup ? 'setup' : s.busy.length ? 'run' : 'idle';
+      var label = { down: '故障 ' + s.down + ' 分', setup: '修整 ' + s.setup + ' 分', run: '加工 ' + s.busy.length + '/' + s.n, idle: '空闲' }[state];
+      b.bar.setAttribute('fill', 'var(--' + state + ')');
+      b.rect.setAttribute('stroke', state === 'down' ? 'var(--down)' : 'var(--line)');
+      b.rect.setAttribute('stroke-width', state === 'down' ? 2 : 1.25);
+      b.st.textContent = label;
+      b.q.textContent = s.queue.length ? '排队 ' + s.queue.length : '';
+      // 排队的小圆点
+      var dots = s.queue.slice(0, 12);
+      if (b.qdots.childNodes.length !== dots.length || true) {
+        b.qdots.innerHTML = '';
+        dots.forEach(function (j, i) {
+          el('circle', { cx: s.x - 56 + (i % 12) * 10, cy: s.y + 96, r: 3.5, fill: 'var(--t-' + PARTS[j.part].t + ')' }, b.qdots);
+        });
+      }
+    });
+  }
+
+  /* ================= 看板 ================= */
+  function mean(a) { return a.reduce(function (x, y) { return x + y; }, 0) / a.length; }
+  function std(a) { var m = mean(a); return Math.sqrt(a.reduce(function (x, y) { return x + (y - m) * (y - m); }, 0) / Math.max(1, a.length - 1)); }
+  function $(id) { return document.getElementById(id); }
+  function renderKpis() {
+    $('clock').textContent = clockText(S.t);
+    $('kDone').textContent = S.done;
+    var recent = S.doneTimes.filter(function (t) { return t > S.t - 3 * DAY; });
+    var span = Math.min(S.t, 3 * DAY);
+    $('kRate').textContent = S.t > DAY ? (recent.length / span * DAY).toFixed(1) : '–';
+    $('kWip').textContent = S.orders.length;
+    $('kHob').textContent = S.t > 60 ? Math.round(S.hobBusy / S.t * 100) + '%' : '–';
+    var last = S.spc.slice(-20).map(function (p) { return p.v; });
+    if (last.length >= 10) {
+      var m = mean(last), sd = std(last), cpk = Math.min(USL - m, m - LSL) / (3 * sd);
+      $('kCpk').textContent = cpk.toFixed(2);
+      $('kCpkBox').classList.toggle('warn', cpk < 1.0);
+    }
+    $('kScrap').textContent = S.scrap;
+    $('kScrapBox').classList.toggle('warn', S.scrap > 0);
+    $('eJob').textContent = S.jobCards + ' 张';
+    $('eQi').textContent = S.qi + ' 张';
+    $('eNc').textContent = S.nc + ' 条';
+    $('eFg').textContent = S.done + ' 台';
+    $('eHrs').textContent = (S.labour / 60).toFixed(1) + ' 小时';
+  }
+  var spcSvg = $('spc');
+  function renderSpc() {
+    var W = 440, H = 200, L = 34, Rt = 10, T = 12, B = 22;
+    var y = function (v) { return T + (18 - v) / 18 * (H - T - B); };
+    var pts = S.spc.slice(-40);
+    var x = function (i) { return L + i * (W - L - Rt) / 39; };
+    var h = '';
+    [0, 5, 10, 15].forEach(function (v) { h += '<line x1="' + L + '" x2="' + (W - Rt) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--grid)"/><text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--mono)">' + v + '</text>'; });
+    h += '<line x1="' + L + '" x2="' + (W - Rt) + '" y1="' + y(USL) + '" y2="' + y(USL) + '" stroke="var(--tol)" stroke-dasharray="5 4"/><text x="' + (W - Rt) + '" y="' + (y(USL) - 4) + '" text-anchor="end" font-size="10.5" fill="var(--tol)">上公差 +15</text>';
+    h += '<line x1="' + L + '" x2="' + (W - Rt) + '" y1="' + y(LSL) + '" y2="' + y(LSL) + '" stroke="var(--tol)" stroke-dasharray="5 4"/><text x="' + (W - Rt) + '" y="' + (y(LSL) + 13) + '" text-anchor="end" font-size="10.5" fill="var(--tol)">下公差 +2</text>';
+    if (S.limits) {
+      ['ucl', 'lcl'].forEach(function (k) { h += '<line x1="' + L + '" x2="' + (W - Rt) + '" y1="' + y(S.limits[k]) + '" y2="' + y(S.limits[k]) + '" stroke="var(--muted)" stroke-dasharray="2 3"/>'; });
+      h += '<text x="' + (L + 4) + '" y="' + (y(S.limits.ucl) - 4) + '" font-size="10.5" fill="var(--muted)">UCL ' + S.limits.ucl.toFixed(1) + '</text>';
+    }
+    if (pts.length > 1) h += '<polyline fill="none" stroke="var(--spc)" stroke-width="1.5" points="' + pts.map(function (p, i) { return x(i) + ',' + y(Math.max(-1, Math.min(18.5, p.v))); }).join(' ') + '"/>';
+    pts.forEach(function (p, i) {
+      var c = p.out ? 'var(--tol)' : p.alarm ? 'var(--accent)' : 'var(--spc)';
+      h += '<circle cx="' + x(i) + '" cy="' + y(Math.max(-1, Math.min(18.5, p.v))) + '" r="' + (p.alarm || p.out ? 4.5 : 3) + '" fill="' + c + '"/>';
+    });
+    spcSvg.innerHTML = h;
+  }
+  function renderLog() {
+    var colors = { down: 'var(--down)', warn: 'var(--accent)', setup: 'var(--setup)', run: 'var(--run)', info: 'var(--muted)' };
+    $('andon').innerHTML = S.events.slice(0, 14).map(function (e) {
+      return '<li><time>' + clockText(e.t).replace('第 ', 'D').replace(' 天 ', ' ') + '</time><i style="background:' + colors[e.kind] + '"></i><span>' + e.text + '</span></li>';
+    }).join('');
+  }
+  /* 产能：每台减速器在各设备占用的分钟数（按 BOM 展开） */
+  function capacity() {
+    var load = {};
+    Object.keys(ST).forEach(function (k) { load[k] = 0; });
+    Object.keys(PARTS).forEach(function (p) {
+      R[PARTS[p].r].forEach(function (op) { load[op[0]] += op[1] * (op[0] === 'HOB' ? 1 / S.hobK : 1); });
+    });
+    return Object.keys(ST).map(function (k) {
+      var n = k === 'HT' ? 1 : ST[k].n;   // 热处理分钟数已按炉分摊
+      return { k: k, mins: load[k], perDay: DAY * n / load[k] };
+    }).sort(function (a, b) { return a.perDay - b.perDay; });
+  }
+  function renderCap() {
+    var rows = capacity(), W = 760, L = 150, Rt = 60, rowH = 24, T = 8;
+    var max = 18, x = function (v) { return L + Math.min(v, max) / max * (W - L - Rt); };
+    var h = '';
+    [0, 4, 8, 12, 16].forEach(function (v) { h += '<line x1="' + x(v) + '" x2="' + x(v) + '" y1="' + T + '" y2="' + (T + rows.length * rowH) + '" stroke="var(--grid)"/><text x="' + x(v) + '" y="' + (T + rows.length * rowH + 16) + '" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--mono)">' + v + '</text>'; });
+    rows.forEach(function (r, i) {
+      var yy = T + i * rowH, first = i === 0;
+      h += '<text x="' + (L - 10) + '" y="' + (yy + 16) + '" text-anchor="end" font-size="12.5" fill="var(--ink)" font-weight="' + (first ? 600 : 400) + '">' + ST[r.k].name + '</text>';
+      h += '<rect x="' + L + '" y="' + (yy + 5) + '" width="' + (x(r.perDay) - L) + '" height="14" rx="3" fill="' + (first ? 'var(--accent)' : 'var(--idle)') + '" opacity="' + (first ? 1 : .55) + '"/>';
+      h += '<text x="' + (x(r.perDay) + 6) + '" y="' + (yy + 16) + '" font-size="11.5" font-family="var(--mono)" fill="var(--ink)">' + (r.perDay > max ? r.perDay.toFixed(0) : r.perDay.toFixed(1)) + (first ? '  ← 瓶颈' : '') + '</text>';
+    });
+    $('cap').setAttribute('viewBox', '0 0 ' + W + ' ' + (T + rows.length * rowH + 24));
+    $('cap').innerHTML = h;
+  }
+
+  /* ================= 讲解步骤 ================= */
+  var STEPS = [
+    { text: '一座虚拟工厂，只做一种产品：<strong>二级圆柱齿轮减速器</strong>。8 种零件按各自的工艺路线在 11 台设备间流转，装成 4 个部件，再总装、跑合、检验出厂。每个数字都来自工厂的设计与工艺数据。',
+      act: function () { highlight(null); } },
+    { text: '<strong>瓶颈</strong>：看滚齿机前越排越长的队。每台减速器要占用滚齿机 115 分钟，单班最多约 4.2 台；其他设备再快，产量也被它卡住。底部的产能图是按工艺路线算出来的。',
+      act: function () { highlight('HOB'); } },
+    { text: '<strong>质量</strong>：磨床砂轮在逐渐磨损，轴承位尺寸慢慢变大。SPC 在大多数零件超差<strong>之前</strong>就发现异常，安灯亮起，停机修整砂轮。试试关掉“SPC 预警”，看废品怎样成批出现。',
+      act: function () { highlight('GRD'); S.spcOn = true; syncBtns(); } },
+    { text: '<strong>改进</strong>：SPC 能及时报警，但过程能力仍不足（Cpk 低于 1.0）。工艺变更为“每 3 件预防修整一次”，报警消失，Cpk 稳定在 1.33 以上。这就是一次完整的纠正预防：发现 → 分析 → 变更 → 验证。',
+      act: function () { highlight('GRD'); S.dressEvery = DRESS_N; syncBtns(); log('info', '工艺变更生效：磨外圆每 3 件预防修整砂轮'); } },
+    { text: '<strong>一个参数改变全厂</strong>：换成双头滚刀，滚齿时间减半。可日产能只从 4.2 提高到 4.8 台，因为瓶颈转移到了数控车床。学生在这里学到的是系统思维，而不是单点优化。',
+      act: function () { highlight('CNC'); S.hobK = 2; $('hob').value = '2'; renderCap(); log('info', '工艺变更：滚齿改用双头滚刀，瓶颈转移到数控车床'); } },
+    { text: '每一道工序完成，<strong>实绩自动回写 ERPNext</strong>：工序卡工时、检验单、不合格记录、完工入库，实际成本随之核算。设计、工艺、计划、车间、质量，一条数据链贯通。',
+      act: function () { highlight(null); } }
+  ];
+  var step = 0;
+  function showStep(i) {
+    step = Math.max(0, Math.min(STEPS.length - 1, i));
+    $('stepNo').textContent = '第 ' + (step + 1) + ' / ' + STEPS.length + ' 步';
+    $('caption').innerHTML = STEPS[step].text;
+    STEPS[step].act();
+    $('prev').disabled = step === 0;
+    $('next').textContent = step === STEPS.length - 1 ? '从头再看' : '下一步';
+  }
+  function syncBtns() {
+    $('spcBtn').setAttribute('aria-pressed', S.spcOn); $('spcBtn').textContent = 'SPC 预警：' + (S.spcOn ? '开' : '关');
+    $('dressBtn').setAttribute('aria-pressed', !!S.dressEvery); $('dressBtn').textContent = '每 ' + DRESS_N + ' 件预防修整：' + (S.dressEvery ? '开' : '关');
+  }
+
+  /* ================= 控件 ================= */
+  var speed = 80, paused = false;
+  $('speed').addEventListener('change', function () { speed = +this.value; });
+  $('pause').addEventListener('click', function () { paused = !paused; this.setAttribute('aria-pressed', paused); this.textContent = paused ? '继续' : '暂停'; });
+  $('fault').addEventListener('click', function () { ST.HOB.down = 90; ST.HOB.flash = 30; log('down', 'HOB-01 滚齿机故障停机（教师注入），预计 90 分钟'); });
+  $('spcBtn').addEventListener('click', function () { S.spcOn = !S.spcOn; syncBtns(); });
+  $('dressBtn').addEventListener('click', function () { S.dressEvery = S.dressEvery ? 0 : DRESS_N; syncBtns(); });
+  $('hob').addEventListener('change', function () { S.hobK = +this.value; renderCap(); });
+  $('reset').addEventListener('click', function () { start(); showStep(0); });
+  $('prev').addEventListener('click', function () { showStep(step - 1); });
+  $('next').addEventListener('click', function () { if (step === STEPS.length - 1) { start(); showStep(0); } else showStep(step + 1); });
+
+  /* ================= 主循环 ================= */
+  var acc = 0, lastT = null, lastDraw = 0;
+  function frame(now) {
+    if (lastT === null) lastT = now;
+    var dt = Math.min(100, now - lastT); lastT = now;
+    if (!paused) {
+      acc += dt / 1000 * speed;
+      var n = Math.floor(acc); acc -= n;
+      for (var i = 0; i < n; i++) tick();
+    }
+    moveTokens(now);
+    if (now - lastDraw > 120) { renderFloor(); renderKpis(); renderSpc(); lastDraw = now; }
+    requestAnimationFrame(frame);
+  }
+  function start() {
+    init();
+    if (tokenLayer) tokenLayer.innerHTML = '';
+    $('hob').value = '1';
+    syncBtns();
+    log('info', '开班：按在制品上限 ' + WIP_CAP + ' 台份投料');
+    // 先快进约三个班，越过开工时的投料冲击，让画面一打开就是稳定的生产状态
+    for (var i = 0; i < 1500; i++) tick();
+    S.tokens.forEach(function (k) { k.el.remove(); }); S.tokens = [];
+    renderCap(); renderFloor(); renderKpis(); renderSpc(); renderLog();
+  }
+
+  buildFloor();
+  start();
+  showStep(0);
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    paused = true; $('pause').setAttribute('aria-pressed', 'true'); $('pause').textContent = '继续';
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
