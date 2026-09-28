@@ -18,11 +18,23 @@
         <text class="gicon">▤</text>
         <text class="glabel">{{ t("shell.courses") }}</text>
       </view>
+      <view class="gitem wide-only" :class="{ on: nav === 'calendar' }" @click="go('calendar')">
+        <text class="gicon">▦</text>
+        <text class="glabel">{{ t("shell.calendar") }}</text>
+      </view>
+      <view class="gitem wide-only" :class="{ on: nav === 'inbox' }" @click="go('inbox')">
+        <text class="gicon">✉</text>
+        <text class="glabel">{{ t("shell.inbox") }}</text>
+      </view>
       <view v-if="user && user.can_create_courses" class="gitem" :class="{ on: nav === 'create' }" @click="go('create')">
         <text class="gicon">✦</text>
         <text class="glabel">{{ t("create.button") }}</text>
       </view>
       <view class="gspacer" />
+      <view class="gitem wide-only" :class="{ on: nav === 'help' }" @click="go('help')">
+        <text class="gicon">?</text>
+        <text class="glabel">{{ t("shell.help") }}</text>
+      </view>
       <view class="gitem lang" @click="toggleLocale">
         <text class="gicon small">{{ t("lang.switch") }}</text>
         <text class="glabel">{{ t("shell.language") }}</text>
@@ -39,6 +51,9 @@
           <text class="acc-user">{{ user ? user.username : "" }}</text>
         </view>
       </view>
+      <view class="acc-row narrow-only" @click="go('calendar')">{{ t("shell.calendar") }}</view>
+      <view class="acc-row narrow-only" @click="go('inbox')">{{ t("shell.inbox") }}</view>
+      <view class="acc-row narrow-only" @click="go('help')">{{ t("shell.help") }}</view>
       <view class="acc-row" @click="toggleLocale">{{ t("shell.language") }} · {{ t("lang.switch") }}</view>
       <view class="acc-row" @click="logout">{{ t("nav.logout") }}</view>
     </view>
@@ -101,6 +116,7 @@ const menu = computed(() => (props.course ? courseMenu(props.course) : []));
 function go(where: string) {
   accountOpen.value = false;
   if (where === "create") return uni.navigateTo({ url: "/pages/create/create" });
+  if (["calendar", "inbox", "help"].includes(where)) return uni.reLaunch({ url: `/pages/hub/hub?view=${where}` });
   uni.reLaunch({ url: where === "courses" ? "/pages/courses/courses?view=all" : "/pages/courses/courses" });
 }
 
@@ -153,6 +169,7 @@ function logout() {
 .acc-user { display: block; font-size: 12px; color: var(--wq-muted); }
 .acc-row { padding: 10px 8px; border-radius: 6px; cursor: pointer; color: var(--wq-ink); font-size: 14px; }
 .acc-row:hover { background: var(--wq-bg); }
+.narrow-only { display: none; }
 
 /* ---- main ---- */
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -195,7 +212,8 @@ function logout() {
 @media (max-width: 860px) {
   .app { flex-direction: column; padding-bottom: 60px; }
   .gnav { position: fixed; left: 0; right: 0; bottom: 0; top: auto; width: auto; height: 60px; flex-direction: row; justify-content: space-around; padding-bottom: env(safe-area-inset-bottom); }
-  .logo, .gspacer { display: none; }
+  .logo, .gspacer, .wide-only { display: none; }
+  .narrow-only { display: block; }
   .gitem { flex: 1; padding: 6px 2px; }
   .gitem.on { background: transparent; color: #fff; }
   .gitem.on::before { left: 20%; right: 20%; top: 0; bottom: auto; width: auto; height: 3px; }

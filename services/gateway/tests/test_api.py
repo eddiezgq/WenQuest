@@ -100,7 +100,7 @@ def test_login_and_me(client):
     h = login(client)
     me = client.get("/api/v1/me", headers=h).json()
     assert me == {"id": 3, "fullname": "小明", "username": "s1", "avatar": None, "lang": "zh",
-                  "can_create_courses": False}
+                  "can_create_courses": False, "classic_url": "http://moodle.test"}
 
 
 def test_bad_password_is_401_with_code(client):

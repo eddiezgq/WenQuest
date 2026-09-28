@@ -14,6 +14,7 @@ export interface User {
   avatar: string | null;
   lang: "zh" | "en";
   can_create_courses?: boolean;
+  classic_url?: string;
 }
 export interface Course {
   id: number;

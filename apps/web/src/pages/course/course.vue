@@ -116,6 +116,31 @@
           </view>
         </view>
       </view>
+
+      <!-- ================= Menus the new UI completes in later steps (2B framework) ================= -->
+      <view v-else-if="HUB[tab]">
+        <text class="h1">{{ t("menu." + tab) }}</text>
+
+        <view v-if="tab === 'online'" class="empty">{{ t("hub.noOnline") }}</view>
+
+        <view v-if="hubItems.length" class="hub-list">
+          <text class="g-sub">{{ t("hub.existing") }}</text>
+          <view class="list">
+            <ModuleRow v-for="m in hubItems" :key="m.id" :m="m" :course-id="id" />
+          </view>
+        </view>
+        <view v-else-if="HUB[tab].lists" class="empty">{{ t("hub.noneYet") }}</view>
+
+        <view class="soon">
+          <text class="soon-h">{{ t("hub.what") }}</text>
+          <text class="soon-p">{{ t("hub." + tab) }}</text>
+          <text class="soon-step">{{ tab === "quizzes" ? t("hub.quizStep") : tab === "online" ? t("hub.onlineStep") : t("hub.step", { n: HUB[tab].step }) }}</text>
+          <view v-if="tab !== 'online'" class="soon-btns">
+            <view class="primary" @click="openUrl(classicLink(d, tab))">{{ t("hub.classic") }} ↗</view>
+            <view v-if="tab === 'people' && isTeacher(d)" class="ghost" @click="openUrl(classicLink(d, 'groups'))">{{ t("hub.classicGroups") }} ↗</view>
+          </view>
+        </view>
+      </view>
     </template>
 
     <template v-if="d && tab === 'home'" #side>
@@ -146,7 +171,7 @@ import { absolute, ApiError, type Module, type Section, token } from "../../api"
 import { errorText, locale, t } from "../../i18n";
 import {
   type CourseData, findModule, isTeacher, isUnit, lastVisited, loadCourse, moduleKind, studentPreview,
-  syllabusSection, units, visibleModules,
+  classicLink, isNewsForum, syllabusSection, units, visibleModules,
 } from "../../store";
 
 // Page query parameters (id, course, tab) must not fall through onto the layout component.
@@ -221,6 +246,28 @@ const grouped = computed(() => {
     .filter((g) => g.items.length || g.guides.length);
 });
 
+// Menu pages whose new-UI version comes later in this round; step = step number in the plan.
+const HUB: Record<string, { step: number; lists?: boolean }> = {
+  announcements: { step: 4, lists: true }, discussions: { step: 4, lists: true }, quizzes: { step: 5, lists: true },
+  online: { step: 4 }, grades: { step: 5 }, people: { step: 4 }, calendar: { step: 5 },
+};
+const hubItems = computed<Module[]>(() => {
+  if (!d.value) return [];
+  const mods = d.value.sections.flatMap((s) => visibleModules(d.value!, s));
+  if (tab.value === "announcements") return mods.filter(isNewsForum);
+  if (tab.value === "discussions") return mods.filter((m) => m.type === "forum" && !isNewsForum(m));
+  if (tab.value === "quizzes") return mods.filter((m) => m.type === "quiz");
+  return [];
+});
+function openUrl(url: string) {
+  // #ifdef H5
+  window.open(url, "_blank", "noopener");
+  // #endif
+  // #ifndef H5
+  uni.setClipboardData({ data: url, success: () => uni.showToast({ title: t("activity.linkCopied"), icon: "none" }) });
+  // #endif
+}
+
 const last = computed(() => {
   const cm = lastVisited(id.value);
   return cm && d.value ? findModule(d.value, cm) : null;
@@ -267,6 +314,15 @@ watch(studentPreview, () => { open.value = {}; });
 
 <style scoped>
 .muted { color: var(--wq-muted); }
+.empty { background: #fff; border: 1px dashed var(--wq-line); border-radius: 6px; padding: 18px 20px; color: var(--wq-muted); margin-bottom: 16px; }
+.hub-list { margin-bottom: 18px; }
+.soon { background: #fff; border: 1px solid var(--wq-line); border-left: 4px solid var(--wq-accent); border-radius: 6px; padding: 18px 22px; }
+.soon-h { display: block; font-weight: 600; color: var(--wq-ink); margin-bottom: 6px; }
+.soon-p { display: block; color: var(--wq-text); line-height: 1.75; }
+.soon-step { display: block; font-size: 13px; color: var(--wq-muted); margin-top: 10px; }
+.soon-btns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.soon .primary { display: inline-block; margin-top: 14px; background: var(--wq-accent); color: var(--wq-ink); font-weight: 600; padding: 9px 18px; border-radius: 8px; cursor: pointer; }
+.soon .ghost { display: inline-block; margin-top: 14px; border: 1px solid var(--wq-line); color: var(--wq-ink); padding: 8px 16px; border-radius: 8px; cursor: pointer; }
 .state { display: flex; align-items: center; gap: 12px; }
 .error { color: var(--wq-danger); }
 .btn { padding: 6px 14px; border-radius: 8px; background: var(--wq-ink); color: #fff; font-size: 14px; cursor: pointer; }

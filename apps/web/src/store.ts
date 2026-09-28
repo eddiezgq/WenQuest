@@ -1,6 +1,6 @@
 // Course data shared by the course, unit and activity pages, so moving between them is instant.
 import { ref, watch } from "vue";
-import { api, type CourseInfo, type Module, type Section } from "./api";
+import { api, type CourseInfo, type Module, type Section, user } from "./api";
 import { locale } from "./i18n";
 
 export interface CourseData { info: CourseInfo; sections: Section[] }
@@ -82,16 +82,57 @@ export function units(d: CourseData): Section[] {
   return d.sections.filter((s) => isUnit(d, s));
 }
 
-/** Items in the course menu; an item with nothing behind it is hidden from students. */
+/** The 13 items of the course menu (R11). Teachers always see all of them; students only see
+ * content menus that have something behind them, plus the class-wide ones. */
 export function courseMenu(d: CourseData): { key: string }[] {
   const mods = d.sections.flatMap((s) => visibleModules(d, s));
   const has = (...kinds: string[]) => mods.some((m) => kinds.includes(moduleKind(m)));
   const teacher = isTeacher(d);
-  const items = [{ key: "home" }];
-  if (syllabusSection(d) || d.info.summary) items.push({ key: "syllabus" });
-  items.push({ key: "modules" });
-  if (teacher || has("slides", "pdf")) items.push({ key: "slides" });
-  if (teacher || has("lab")) items.push({ key: "labs" });
-  if (teacher || has("assign")) items.push({ key: "assignments" });
-  return items;
+  const show: Record<string, boolean> = {
+    home: true,
+    announcements: true,
+    syllabus: teacher || !!syllabusSection(d) || !!d.info.summary,
+    modules: true,
+    slides: teacher || has("slides", "pdf"),
+    labs: teacher || has("lab"),
+    assignments: teacher || has("assign"),
+    quizzes: teacher || has("quiz"),
+    discussions: true,
+    online: teacher, // students see it once a class is scheduled (step 4)
+    grades: true,
+    people: true,
+    calendar: true,
+  };
+  return MENU_ORDER.filter((k) => show[k]).map((key) => ({ key }));
 }
+
+export const MENU_ORDER = [
+  "home", "announcements", "syllabus", "modules", "slides", "labs", "assignments",
+  "quizzes", "discussions", "online", "grades", "people", "calendar",
+];
+
+/** Moodle's address (no trailing slash), from the course or the signed-in user. */
+export function classicBase(d?: CourseData | null): string {
+  if (d?.info.classic_url) return d.info.classic_url.replace(/\/course\/view\.php.*$/, "");
+  return (user.value?.classic_url || "").replace(/\/$/, "");
+}
+
+/** Where each course menu item lives in the classic view, for pages the new UI does not do yet. */
+export function classicLink(d: CourseData, key: string): string {
+  const b = classicBase(d);
+  const id = d.info.id;
+  const teacher = isTeacher(d);
+  const links: Record<string, string> = {
+    announcements: `${b}/course/view.php?id=${id}`,
+    discussions: `${b}/mod/forum/index.php?id=${id}`,
+    quizzes: `${b}/mod/quiz/index.php?id=${id}`,
+    grades: teacher ? `${b}/grade/report/grader/index.php?id=${id}` : `${b}/grade/report/user/index.php?id=${id}`,
+    people: `${b}/user/index.php?id=${id}`,
+    groups: `${b}/group/index.php?id=${id}`,
+    calendar: `${b}/calendar/view.php?view=month&course=${id}`,
+  };
+  return links[key] || d.info.classic_url;
+}
+
+/** Forum activities: the course's announcements forum vs. discussion forums. */
+export const isNewsForum = (m: Module) => m.type === "forum" && /公告|announce|news/i.test(m.name || "");

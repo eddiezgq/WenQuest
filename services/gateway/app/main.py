@@ -25,7 +25,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.5.1"
+VERSION = "0.5.2"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -130,6 +130,7 @@ class UserOut(BaseModel):
     avatar: str | None = None
     lang: str
     can_create_courses: bool = False
+    classic_url: str = ""  # Moodle's address, for pages the new UI links out to (calendar, messages)
 
 
 class LoginOut(BaseModel):
@@ -538,7 +539,8 @@ def _byte_range(header: str, total: int) -> tuple[int, int] | None:
 def _user(info: dict, lang: str, creator: bool = False) -> UserOut:
     pic = info.get("userpictureurl")
     return UserOut(id=int(info["userid"]), fullname=info.get("fullname", ""),
-                   username=info.get("username", ""), avatar=pic, lang=lang, can_create_courses=creator)
+                   username=info.get("username", ""), avatar=pic, lang=lang, can_create_courses=creator,
+                   classic_url=state.settings.moodle_url.rstrip("/"))
 
 
 async def can_create(moodle_token: str) -> bool:
