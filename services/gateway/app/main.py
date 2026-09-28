@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -24,7 +25,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.5.0"
+VERSION = "0.5.1"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -54,6 +55,8 @@ async def lifespan(app: FastAPI):
     yield
     await state.http.aclose()
 
+log = logging.getLogger("wenquest.gateway")
+
 
 def create_app() -> FastAPI:
     s = get_settings()
@@ -65,6 +68,12 @@ def create_app() -> FastAPI:
     @app.exception_handler(EngineError)
     async def _engine_error(_: Request, exc: EngineError):
         return JSONResponse({"error": exc.code, "detail": exc.message}, status_code=exc.status)
+
+    @app.exception_handler(Exception)
+    async def _unexpected(req: Request, exc: Exception):
+        # Log the real cause for the administrator; give the page a code it can show instead of a bare 500.
+        log.exception("unhandled error on %s %s", req.method, req.url.path)
+        return JSONResponse({"error": "server_error", "detail": type(exc).__name__}, status_code=500)
 
     register(app)
     return app
@@ -378,8 +387,8 @@ def register(app: FastAPI) -> None:
         data = await file.read(mt.MAX_FILE + 1)
         if len(data) > mt.MAX_FILE:
             raise EngineError("file_too_large", "files are limited to 50 MB", 413)
-        name = Path(file.filename or "file").name
-        rel = (path or name).replace("\\", "/").lstrip("/")[:300]
+        name = mt.fix_name(Path((file.filename or "file").replace("\\", "/")).name)
+        rel = mt.fix_name((path or name).replace("\\", "/").lstrip("/"))[:300]
         m = mt.Material(id=uuid.uuid4().hex, name=name, path=rel, size=len(data), ext=Path(name).suffix.lower())
         text = ""
         try:
@@ -432,7 +441,7 @@ def register(app: FastAPI) -> None:
         if state.ai.provider not in ("fake", "none"):
             ai_plan = await state.ai.json(system=cb.SYSTEM, prompt=mt.plan_prompt(items, text_of, lang),
                                           schema=mt.plan_schema(), max_tokens=6000)
-            if ai_plan.get("sections"):
+            if isinstance(ai_plan, dict) and isinstance(ai_plan.get("sections"), list) and ai_plan["sections"]:
                 plan = ai_plan
         return _outline_from_plan(plan, items, lang, text_of, iid)
 
@@ -553,7 +562,9 @@ def _materials(iid: str, sess: Session) -> list[mt.Material]:
 def _outline_from_plan(plan: dict, items: list[mt.Material], lang: str, text_of, iid: str) -> dict:
     """Turn a plan into the builder's outline: chapter sections plus course-info, lab and quiz sections."""
     T = lambda s: {lang: str(s or "").strip()}  # noqa: E731
-    by_ch = {int(s.get("chapter") or 0): s for s in plan.get("sections") or []}
+    raw = plan.get("sections") if isinstance(plan, dict) else None
+    by_ch = {mt.as_int(s.get("chapter")) or 0: s for s in (raw if isinstance(raw, list) else []) if isinstance(s, dict)}
+    plan = plan if isinstance(plan, dict) else {}
     sections = []
     info = mt.attachment_ids([m for m in items if m.category in ("syllabus", "calendar", "rubric", "media")], None)
     if info:
@@ -566,7 +577,8 @@ def _outline_from_plan(plan: dict, items: list[mt.Material], lang: str, text_of,
         sections.append({
             "title": T(s.get("title")), "summary": T(s.get("summary")),
             "lessons": [{"title": T(l.get("title")), "goal": T(l.get("goal")), "content": T(""), "sources": srcs}
-                        for l in (s.get("lessons") or [])[:6]],
+                        for l in (s.get("lessons") if isinstance(s.get("lessons"), list) else [])[:6]
+                        if isinstance(l, dict)],
             "assignment": {"title": T(hw[0]), "brief": T(hw[1])} if hw else None,
             "files": mt.attachment_ids([m for m in items if m.category != "homework"], ch),
         })

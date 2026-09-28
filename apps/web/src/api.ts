@@ -170,7 +170,7 @@ function request<T>(method: "GET" | "POST" | "PUT", path: string, data?: unknown
       success(res) {
         const body: any = res.data;
         if (res.statusCode >= 200 && res.statusCode < 300) return resolve(body as T);
-        const code = (body && body.error) || "unknown";
+        const code = (body && typeof body === "object" && body.error) || `http_${res.statusCode}`;
         if (res.statusCode === 401 && token.value) {
           saveSession("", null);
           uni.reLaunch({ url: "/pages/login/login" });
@@ -227,7 +227,7 @@ export const api = {
       throw new ApiError("network", 0);
     }
     const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new ApiError(body.error || "unknown", res.status);
+    if (!res.ok) throw new ApiError(body.error || `http_${res.status}`, res.status);
     return body as Material;
   },
   publish: (o: Outline) =>

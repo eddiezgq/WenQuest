@@ -297,9 +297,26 @@ def classify_prompt(items: list[Material]) -> str:
     return "\n".join(lines)
 
 
+def as_int(v) -> int | None:
+    """Chapter numbers from a model may arrive as 3, "3", "第3章" or "Chapter 3"."""
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, int):
+        return v
+    if isinstance(v, float):
+        return int(v)
+    if isinstance(v, str):
+        mm = re.search(r"\d+", v)
+        return int(mm.group()) if mm else None
+    return None
+
+
 def apply_ai(items: list[Material], data: dict) -> None:
     by_id = {m.id: m for m in items}
-    for f in data.get("files") or []:
+    files = data.get("files") if isinstance(data, dict) else None
+    for f in files if isinstance(files, list) else []:
+        if not isinstance(f, dict):
+            continue
         m = by_id.get(str(f.get("id")))
         if not m or f.get("category") not in CATEGORIES:
             continue
@@ -307,8 +324,8 @@ def apply_ai(items: list[Material], data: dict) -> None:
             if m.confidence == "unsure" or m.category == "other":
                 m.category = f["category"]
                 m.confidence = "ai"
-            ch = f.get("chapter")
-            if m.chapter is None and isinstance(ch, int) and ch > 0:
+            ch = as_int(f.get("chapter"))
+            if m.chapter is None and ch and ch > 0:
                 m.chapter = ch
 
 
@@ -425,3 +442,28 @@ def attachment_ids(items: list[Material], ch: int | None) -> list[str]:
     keep = {"lesson_plan", "notes", "slides", "homework", "quiz", "answer_key", "lab", "rubric", "media",
             "syllabus", "calendar"}
     return [m.id for m in items if m.chapter == ch and m.category in keep]
+
+
+# --- file names garbled by unzipping ---------------------------------------------------------
+
+_CJK = re.compile(r"[\u3400-\u9fff]")
+
+
+def fix_name(name: str) -> str:
+    """Repair names garbled when a zip without the UTF-8 flag is unpacked on Windows
+    ("σè¿τö╗" → "动画"). Only accept a repair that produces Chinese text; otherwise keep the name."""
+    if not name or name.isascii() or _CJK.search(name):
+        return name
+    for legacy in ("cp437", "cp850", "latin-1"):
+        try:
+            raw = name.encode(legacy)
+        except UnicodeEncodeError:
+            continue
+        for enc in ("utf-8", "gb18030"):
+            try:
+                fixed = raw.decode(enc)
+            except UnicodeDecodeError:
+                continue
+            if _CJK.search(fixed):
+                return fixed
+    return name

@@ -187,3 +187,45 @@ def test_source_ids_capped_for_crowded_chapters():
     items.append(mt.Material(id="notes", name="讲义.pdf", path="第1章/讲义.pdf", size=1, ext="pdf", chars=100, category="notes", chapter=1))
     ids = mt.source_ids(items, 1)
     assert len(ids) == mt.MAX_SOURCES and ids[0] == "notes"
+
+
+def garble(s: str) -> str:
+    """What Windows does to a UTF-8 name from a zip without the UTF-8 flag."""
+    return s.encode("utf-8").decode("cp437")
+
+
+def test_garbled_names_are_repaired():
+    assert mt.fix_name(garble("第1章 质点运动学/动画/1.1 参考系.mp4")) == "第1章 质点运动学/动画/1.1 参考系.mp4"
+    assert mt.fix_name(garble("习题1.docx")) == "习题1.docx"
+    assert mt.fix_name("习题1.docx") == "习题1.docx"
+    assert mt.fix_name("notes.pdf") == "notes.pdf"
+    assert mt.fix_name("Ünïcode café.pdf") == "Ünïcode café.pdf"  # real accents are left alone
+
+
+def test_garbled_upload_is_classified_like_the_real_name(client):
+    h = login(client)
+    iid = client.post("/api/v1/imports", headers=h).json()["import_id"]
+    path = "课程/第1章/习题1.docx"
+    r = client.post(f"/api/v1/imports/{iid}/files", headers=h, data={"path": garble(path)},
+                    files={"file": (garble("习题1.docx"), docx_bytes(["1. 求速度。"]), "application/octet-stream")})
+    m = r.json()
+    assert (m["name"], m["path"], m["category"], m["chapter"]) == ("习题1.docx", path, "homework", 1)
+
+
+def test_model_output_in_odd_shapes_is_accepted():
+    from app.ai import unpack
+    a = mt.Material(id="a" * 32, name="x.txt", path="x.txt", size=1, ext=".txt", category="other", confidence="unsure")
+    data = unpack({"files": '[{"id": "' + "a" * 32 + '", "category": "notes", "chapter": "第3章"}]'})
+    mt.apply_ai([a], data)
+    assert (a.category, a.chapter) == ("notes", 3)
+    mt.apply_ai([a], {"files": "not json"})  # nonsense is ignored, never a crash
+    mt.apply_ai([a], {"files": ["x", 3, None]})
+
+
+def test_unexpected_errors_return_a_code(client, monkeypatch):
+    h = login(client)
+    iid = client.post("/api/v1/imports", headers=h).json()["import_id"]
+    monkeypatch.setattr(mt, "classify_rule", lambda m: 1 / 0)
+    client._transport.raise_server_exceptions = False  # the handler answers, then Starlette re-raises for logging
+    r = client.post(f"/api/v1/imports/{iid}/files", headers=h, data={"path": "a.txt"}, files={"file": ("a.txt", b"hi")})
+    assert r.status_code == 500 and r.json()["error"] == "server_error"

@@ -18,6 +18,23 @@ class AIError(EngineError):
     pass
 
 
+def unpack(v: Any) -> Any:
+    """Models sometimes return a nested list or object as a JSON string ("[{...}]"). Parse those back."""
+    if isinstance(v, str):
+        t = v.strip()
+        if t[:1] in "[{" and t[-1:] in "]}":
+            try:
+                return unpack(json.loads(t))
+            except ValueError:
+                return v
+        return v
+    if isinstance(v, dict):
+        return {k: unpack(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [unpack(x) for x in v]
+    return v
+
+
 class ModelGateway:
     def __init__(self, provider: str, http: httpx.AsyncClient, *, anthropic_key: str = "",
                  claude_model: str = "claude-sonnet-5", deepseek_key: str = "",
@@ -39,9 +56,9 @@ class ModelGateway:
     async def json(self, *, system: str, prompt: str, schema: dict, max_tokens: int = 8000,
                    fake: Any = None) -> dict:
         if self.provider == "claude":
-            return await self._claude(system, prompt, schema, max_tokens)
+            return unpack(await self._claude(system, prompt, schema, max_tokens))
         if self.provider == "deepseek":
-            return await self._deepseek(system, prompt, schema, max_tokens)
+            return unpack(await self._deepseek(system, prompt, schema, max_tokens))
         if self.provider == "fake":
             return fake() if callable(fake) else (fake or {})
         raise AIError("ai_unavailable", "no AI model is configured", 503)

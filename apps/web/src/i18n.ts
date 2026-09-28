@@ -206,6 +206,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "error.engine_misconfigured": "教学服务配置不完整，请联系管理员",
     "error.network": "网络连接失败，请检查网络",
     "error.unknown": "出错了，请稍后再试",
+    "error.server_error": "服务器处理出错（已记录），请重试；仍不行请把这句话截图发给管理员",
   },
   en: {
     "app.name": "WenQuest",
@@ -409,6 +410,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "error.engine_misconfigured": "The teaching service is not fully configured. Please contact the administrator.",
     "error.network": "Network error. Please check your connection.",
     "error.unknown": "Something went wrong. Please try again later.",
+    "error.server_error": "The server hit an error (logged). Please retry; if it persists, send a screenshot to the administrator.",
   },
 };
 
@@ -447,7 +449,9 @@ export function t(key: string, vars: Record<string, string | number> = {}): stri
 
 export function errorText(code: string): string {
   const key = `error.${code}`;
-  return messages[locale.value][key] ? t(key) : t("error.unknown");
+  if (messages[locale.value][key]) return t(key);
+  // Unmapped codes still tell the teacher (and us) what happened, e.g. "出错了（http_502）".
+  return code && code !== "unknown" ? `${t("error.unknown")}（${code}）` : t("error.unknown");
 }
 
 export function formatDate(ts: number | null | undefined): string {
