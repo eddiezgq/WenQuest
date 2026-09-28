@@ -408,11 +408,16 @@ def homework_brief(items: list[Material], ch: int, store_text) -> tuple[str, str
     return None
 
 
+MAX_SOURCES = 6
+
+
 def source_ids(items: list[Material], ch: int) -> list[str]:
     """Files a lesson in chapter `ch` is written from, most authoritative first."""
     order = {"notes": 0, "lesson_plan": 1, "slides": 2, "lab": 3}
     picked = [m for m in items if m.chapter == ch and m.category in order and m.chars]
-    return [m.id for m in sorted(picked, key=lambda m: order[m.category])]
+    # A chapter can hold many lab guides and templates; a lesson only needs the best few
+    # (the text budget per lesson is ~16k characters anyway) and requests allow at most 8.
+    return [m.id for m in sorted(picked, key=lambda m: order[m.category])][:MAX_SOURCES]
 
 
 def attachment_ids(items: list[Material], ch: int | None) -> list[str]:
