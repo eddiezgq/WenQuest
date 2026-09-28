@@ -54,6 +54,9 @@ services:
       WQ_ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       WQ_CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-sonnet-5}
       WQ_DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+    volumes:
+      # Uploaded materials, course generation progress and converted slides survive redeploys.
+      - gatewaydata:/data
 
   # WenQuest web app (static files) with /api forwarded to the gateway.
   web:
@@ -82,3 +85,4 @@ services:
 volumes:
   dbdata:
   moodledata:
+  gatewaydata:

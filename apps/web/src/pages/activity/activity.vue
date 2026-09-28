@@ -5,7 +5,7 @@
       <text class="error">{{ errorText(error) }}</text>
       <view class="btn" @click="load">{{ t("common.retry") }}</view>
     </view>
-    <view v-else-if="a" class="viewer" :class="{ wide: fileKind === 'lab' }">
+    <view v-else-if="a" class="viewer" :class="{ wide: fileKind === 'lab' || fileKind === 'slides' }">
       <view class="head">
         <text class="kind">{{ t("kind." + kindKey) }}</text>
         <text v-if="a.hidden" class="tag teacher">{{ t("course.teacherOnly") }}</text>
@@ -71,15 +71,8 @@
           <image class="img" :src="absolute(file.url)" mode="widthFix" />
         </view>
 
-        <!-- Slides: in-browser presentation arrives in step 3 of this round -->
-        <view v-else-if="fileKind === 'slides'" class="paper">
-          <text class="block">{{ t("viewer.slidesSoon") }}</text>
-          <view class="file">
-            <text class="file-name">{{ file.name }}</text>
-            <text class="file-size">{{ size(file.size) }}</text>
-            <view class="btn" @click="download(file.url, file.name)">{{ t("activity.download") }}</view>
-          </view>
-        </view>
+        <!-- Slides: presented in the page, with the unit's virtual lab one click away -->
+        <SlidePresenter v-else-if="fileKind === 'slides'" :cmid="id" :labs="unitLabs" />
 
         <!-- Word, Excel and other files -->
         <view v-else class="paper">
@@ -113,12 +106,13 @@ import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import RichContent from "../../components/RichContent.vue";
+import SlidePresenter from "../../components/SlidePresenter.vue";
 // #ifdef H5
 import PdfViewer from "../../components/PdfViewer.vue";
 // #endif
 import { absolute, api, ApiError, type Activity, token } from "../../api";
 import { errorText, formatDate, locale, t } from "../../i18n";
-import { type CourseData, findModule, KIND_ICON, loadCourse, rememberVisit, visibleModules } from "../../store";
+import { type CourseData, findModule, KIND_ICON, loadCourse, moduleKind, rememberVisit, visibleModules } from "../../store";
 
 // Page query parameters (id, course, tab) must not fall through onto the layout component.
 defineOptions({ inheritAttrs: false });
@@ -145,6 +139,10 @@ const siblings = computed(() => (d.value && ctx.value ? visibleModules(d.value, 
 const pos = computed(() => siblings.value.findIndex((m) => m.id === id.value));
 const prevMod = computed(() => (pos.value > 0 ? siblings.value[pos.value - 1] : null));
 const nextMod = computed(() => (pos.value >= 0 && pos.value < siblings.value.length - 1 ? siblings.value[pos.value + 1] : null));
+// The unit's virtual labs, for the presenter's "slides | virtual lab" switch.
+const unitLabs = computed(() => (d.value && ctx.value
+  ? visibleModules(d.value, ctx.value.section).filter((m) => moduleKind(m) === "lab").map((m) => ({ id: m.id, name: m.name || "" }))
+  : []));
 const crumb = computed(() => (ctx.value ? `${ctx.value.section.name} › ${a.value?.name || ""}` : a.value?.name || ""));
 
 async function load() {

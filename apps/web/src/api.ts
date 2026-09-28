@@ -106,6 +106,31 @@ export interface Material {
   teacher_only: boolean;
   error: string;
 }
+/** A slide deck converted for presenting in the browser (R12). Positions are fractions of the slide. */
+export interface SlideBox { x: number; y: number; w: number; h: number }
+export interface Slide {
+  image: string;
+  thumb: string;
+  labs: string[];
+  videos: (SlideBox & { src: string })[];
+  links: (SlideBox & { href: string; lab?: string })[];
+  notes?: string;
+}
+export interface SlideDeck {
+  id: number;
+  course_id: number;
+  name: string;
+  status: "ready" | "converting" | "failed" | "missing" | "unavailable";
+  teacher: boolean;
+  allow_download: boolean;
+  file_name: string;
+  download_url: string | null;
+  pages?: number;
+  width?: number;
+  height?: number;
+  slides?: Slide[];
+}
+
 /** A one-click generation job (D28), as the gateway reports it. */
 export type LessonState = "wait" | "busy" | "done" | "fail";
 export interface Job {
@@ -246,6 +271,10 @@ export const api = {
     if (!res.ok) throw new ApiError(body.error || `http_${res.status}`, res.status);
     return body as Material;
   },
+  slides: (cmid: number) => request<SlideDeck>("GET", `/api/v1/slides/${cmid}`),
+  slidesRetry: (cmid: number) => request<SlideDeck>("POST", `/api/v1/slides/${cmid}/retry`, {}),
+  slideSettings: (cmid: number, allow_download: boolean) =>
+    request<{ allow_download: boolean }>("PUT", `/api/v1/slides/${cmid}/settings`, { allow_download }),
   generate: (id: string, body: { languages?: Languages; brief?: Brief; outline?: Outline }) =>
     request<Job>("POST", `/api/v1/imports/${id}/generate`, body),
   job: (id: string) => request<Job>("GET", `/api/v1/imports/${id}/job`),

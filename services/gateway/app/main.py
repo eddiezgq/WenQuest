@@ -13,20 +13,21 @@ import httpx
 from cryptography.fernet import InvalidToken
 from fastapi import Depends, FastAPI, File, Form, Header, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from . import content
 from . import course_builder as cb
 from . import generate as gen
 from . import materials as mt
+from . import slides as sl
 from .ai import ModelGateway
 from .config import Settings, get_settings
 from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.6.0"
+VERSION = "0.7.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -37,6 +38,8 @@ class State:
     codec: SessionCodec
     ai: ModelGateway
     store: mt.Store
+    slides: sl.SlideStore
+    slide_settings: sl.Settings
 
 
 state = State()
@@ -54,6 +57,8 @@ async def lifespan(app: FastAPI):
                             deepseek_model=s.deepseek_model, timeout=s.ai_timeout,
                             fake_delay=s.ai_fake_delay)
     state.store = mt.Store(s.import_dir)
+    state.slides = sl.SlideStore(str(Path(s.data_dir) / "slides"))
+    state.slide_settings = sl.Settings(str(Path(s.data_dir) / "settings.json"))
     yield
     await state.http.aclose()
 
@@ -151,6 +156,10 @@ class GenOutline(cb.Draft):
     files: dict[str, Any] = Field(default_factory=dict)
 
 
+class SlideSettingsIn(BaseModel):
+    allow_download: bool
+
+
 class GenerateIn(BaseModel):
     languages: cb.Languages = "zh"
     brief: cb.Brief | None = None        # describe mode: "one sentence" course building
@@ -178,7 +187,7 @@ def register(app: FastAPI) -> None:
     @app.get("/api/health")
     async def health():
         # Which model is configured (never the key), so an administrator can check without logging in.
-        return {"ok": True, "version": VERSION, "ai": state.ai.provider}
+        return {"ok": True, "version": VERSION, "ai": state.ai.provider, "slides": state.slides.available}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)
     async def login(body: LoginIn):
@@ -270,6 +279,9 @@ def register(app: FastAPI) -> None:
                         item["file"] = {"name": f.get("filename"), "size": f.get("filesize"),
                                         "mimetype": f.get("mimetype"),
                                         "kind": content.file_kind(f.get("filename"), f.get("mimetype"))}
+                        if item["file"]["kind"] == "slides" and f.get("fileurl"):
+                            # Convert decks ahead of time, so opening the slides never waits.
+                            _prepare_deck(f, sess.moodle_token)
                 mods.append(item)
             name = plain(sec.get("name"), lg)
             if sec.get("section") == 0 and not mods:
@@ -472,6 +484,67 @@ def register(app: FastAPI) -> None:
         return {"available": state.ai.available, "provider": state.ai.provider,
                 "can_create_courses": await can_create(sess.moodle_token)}
 
+    # --- slides presented in the browser (R12) -------------------------------------
+
+    @app.get("/api/v1/slides/{cmid}")
+    async def slides(cmid: int, sess: Annotated[Session, Depends(current)], lang: str | None = None):
+        lg = lang_of(lang, sess)
+        tok = sess.moodle_token
+        cm = await state.moodle.course_module(tok, cmid, lg)
+        if cm.get("modname") != "resource":
+            raise EngineError("not_slides", "not a slide deck", 415)
+        courseid = int(cm["course"])
+        sections = await state.moodle.course_contents(tok, courseid, lg)
+        mod = next((m for s in sections for m in s.get("modules", []) if m["id"] == cmid), None)
+        f = next((x for x in (mod or {}).get("contents", []) if x.get("type") == "file"
+                  and content.file_kind(x.get("filename"), x.get("mimetype")) == "slides"), None)
+        if not f or not f.get("fileurl"):
+            raise EngineError("not_slides", "not a slide deck", 415)
+        teacher = await state.moodle.can_edit_course(tok, courseid)
+        allow = bool(state.slide_settings.get(cmid).get("allow_download"))
+        out: dict[str, Any] = {
+            "id": cmid, "course_id": courseid, "name": plain(cm.get("name"), lg), "teacher": teacher,
+            "allow_download": allow, "file_name": f.get("filename"),
+            "download_url": sign_file(tok)(f["fileurl"]) if teacher or allow else None,
+        }
+        if not state.slides.available:
+            return {**out, "status": "unavailable"}
+        src = _prepare_deck(f, tok)
+        status, key = state.slides.status(src)
+        out["status"] = status
+        if status == "ready" and key:
+            m = state.slides.manifest(key) or {}
+            base = f"{state.settings.public_url.rstrip('/')}/api/v1/slides/files/{key}/"
+            out.update(pages=m.get("pages", 0), width=m.get("width"), height=m.get("height"), slides=[{
+                "image": base + s["image"], "thumb": base + s["thumb"], "labs": s.get("labs", []),
+                "videos": [{**v, "src": base + v["src"]} for v in s.get("videos", [])],
+                "links": s.get("links", []),
+                **({"notes": s.get("notes", "")} if teacher else {}),
+            } for s in m.get("slides", [])])
+        return out
+
+    @app.post("/api/v1/slides/{cmid}/retry")
+    async def slides_retry(cmid: int, sess: Annotated[Session, Depends(current)]):
+        state.slides.failed.clear()
+        return await slides(cmid, sess)
+
+    @app.put("/api/v1/slides/{cmid}/settings")
+    async def slides_settings(cmid: int, body: SlideSettingsIn, sess: Annotated[Session, Depends(current)]):
+        cm = await state.moodle.course_module(sess.moodle_token, cmid)
+        if not await state.moodle.can_edit_course(sess.moodle_token, int(cm["course"])):
+            raise EngineError("forbidden", "only teachers change this", 403)
+        return state.slide_settings.set(cmid, allow_download=body.allow_download)
+
+    @app.get("/api/v1/slides/files/{key}/{name}")
+    async def slide_file(key: str, name: str):
+        """Slide images and embedded videos. The content hash in the path is the capability:
+        it is only handed to people who may open the deck, and the files never change."""
+        p = state.slides.file(key, name)
+        if not p:
+            raise EngineError("not_found", "no such slide file", 404)
+        return FileResponse(p, headers={"Cache-Control": "private, max-age=31536000, immutable",
+                                        "X-Content-Type-Options": "nosniff"})
+
     @app.get("/api/v1/labs/{signed}")
     async def labs(signed: str):
         """Run a teacher's HTML lab. The page gets its own opaque origin (CSP sandbox without
@@ -580,6 +653,17 @@ def _materials(iid: str, sess: Session) -> list[mt.Material]:
         raise EngineError("forbidden", "not your import", 403)
     except (KeyError, OSError):
         raise EngineError("not_found", "import not found or expired", 404)
+
+
+def _prepare_deck(f: dict, moodle_token: str) -> str:
+    """Start converting a deck in the background if needed; return its source key."""
+    src = sl.SlideStore.source_key(f["fileurl"], f.get("timemodified"), f.get("filesize"))
+
+    async def fetch() -> bytes:
+        return (await state.moodle.fetch_file(moodle_token, f["fileurl"])).content
+
+    state.slides.start(src, fetch, Path(f.get("filename") or "deck.pptx").suffix.lower())
+    return src
 
 
 def _clean(h: str) -> str:

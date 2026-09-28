@@ -1173,6 +1173,11 @@ function show(lab) {
   store.set("wq-ch1-tab", lab);
 }
 document.querySelectorAll("[role=tab]").forEach((b) => b.addEventListener("click", () => show(b.dataset.lab)));
+// WenQuest lab protocol: the platform can switch experiments without reloading the page
+// (so parameters already set are kept) — by message {type: "wq-lab", lab: "1.3"} or by #lab-1-3.
+const pickLab = (v) => { const k = String(v || "").replace(".", "-"); if (LABS[k] && k !== active) show(k); };
+addEventListener("message", (e) => { const d = e.data || {}; if (d && d.type === "wq-lab") pickLab(d.lab); });
+addEventListener("hashchange", () => pickLab((location.hash.match(/lab-(\d+-\d+)/) || [])[1]));
 const fromHash = (location.hash.match(/lab-(1-[1-5])/) || [])[1];
 if (!fromHash) addEventListener("load", () => setTimeout(() => scrollTo(0, 0), 0));
 show(fromHash || store.get("wq-ch1-tab") || "1-1");
