@@ -322,6 +322,33 @@ def headings(text: str, chapter: int | None = None) -> list[str]:
     return out
 
 
+_SLIDE = re.compile(r"\[(?:幻灯片|第)(\d+)页?\]\n")
+_SKIP_TITLE = re.compile(r"^(attribution|credits?|slides created|image credit|references?|questions\??)\b", re.I)
+
+
+def slide_outline(text: str, limit: int = 80) -> list[str]:
+    """Titles of a slide deck (first line of each slide), repeats merged, equations and page
+    numbers dropped. 'In this lesson you will…' slides keep their objectives: they mark lessons."""
+    parts = _SLIDE.split(text or "")
+    out: list[str] = []
+    for i in range(1, len(parts) - 1, 2):
+        lines = [ln.strip() for ln in parts[i + 1].splitlines() if ln.strip()]
+        if not lines:
+            continue
+        title = lines[0][:90]
+        if re.match(r"in this (lesson|unit|chapter) you will", title, re.I):
+            title = "▶ " + title + " " + "; ".join(ln[:60] for ln in lines[1:4])
+        elif (len(_WORDS.findall(title)) < 3 or _MATHY.search(title) or _SKIP_TITLE.match(title)
+              or re.search(r"[\U0001D400-\U0001D7FF]", title)):
+            continue
+        if out and out[-1] == title:
+            continue
+        out.append(title)
+        if len(out) >= limit:
+            break
+    return out
+
+
 _JUNK = re.compile("[\ue000-\uf8ff\ufffd\u25a1\u2610\u2612\x00-\x08\x0b\x0c\x0e-\x1f]")
 
 
@@ -347,15 +374,34 @@ _RULES = [  # order matters: first match wins
 ]
 
 
+_CHAPTER_PATTERNS = (
+    r"第\s*(\d{1,2})\s*[章单]",
+    r"第\s*([一二三四五六七八九十])\s*[章单]",
+    r"(?:^|[^a-z])(?:ch(?:apter)?|unit|module|lecture|topic)[\s_.-]*0*(\d{1,2})(?!\d)",
+    r"^0*(\d{1,2})\s*[-_、.\s]",                 # "03_讲义.pdf", "1、参考系.mp4"
+    r"(?:^|[_\-\s])0*(\d{1,2})(?=[_\-\s.]|$)",  # "HSPhysics_05_Keplers" (a lone 1-2 digit number)
+)
+
+
 def chapter_of(path: str) -> int | None:
-    for pat in (r"第\s*(\d+)\s*章", r"第\s*([一二三四五六七八九十])\s*章", r"\bch(?:apter)?\s*_?(\d+)", r"^(\d+)\s*[-_、.]"):
+    """Chapter number from a file or folder name. Only 1-2 digit numbers count, so long
+    numbers that download sites put in front of names ("1790630614203_Chapter_07") are ignored."""
+    for pat in _CHAPTER_PATTERNS:
         for part in reversed(Path(path).parts):
-            m = re.search(pat, part, re.I)
+            m = re.search(pat, Path(part).stem if part == Path(path).name else part, re.I)
             if m:
                 v = m.group(1)
-                return CN_NUM.get(v) or int(v)
-    m = re.search(r"(?:习题|作业|练习|homework)\s*(\d+)", Path(path).stem, re.I)
+                n = CN_NUM.get(v) or int(v)
+                if 0 < n < 100:
+                    return n
+    m = re.search(r"(?:习题|作业|练习|homework)\s*(\d{1,2})(?!\d)", Path(path).stem, re.I)
     return int(m.group(1)) if m else None
+
+
+def chapter_in_text(text: str) -> int | None:
+    """'Chapter 7 Work and Kinetic Energy', 'Physics Unit 05', '第 3 章' on the first page."""
+    m = re.search(r"\b(?:chapter|unit)\s*0*(\d{1,2})\b|第\s*(\d{1,2})\s*章", text[:400], re.I)
+    return int(m.group(1) or m.group(2)) if m else None
 
 
 def classify_rule(m: Material) -> None:
@@ -363,12 +409,15 @@ def classify_rule(m: Material) -> None:
     haystack = stem + " " + Path(m.path).parent.name
     cat = None
     for c, pat in _RULES:
+        # "Chapter_07.pptx" is a slide deck, not lecture notes: only strong names override the type.
+        if c == "notes" and ext in (".pptx", ".ppt", ".odp", ".key"):
+            continue
         if re.search(pat, stem, re.I):
             cat = c
             break
     if cat is None and ext in MEDIA_EXT:
         cat = "media"
-    if cat is None and ext == ".pptx":
+    if cat is None and ext in (".pptx", ".ppt", ".odp", ".key"):
         cat = "slides"
     if cat is None:
         for c, pat in _RULES:
@@ -378,13 +427,15 @@ def classify_rule(m: Material) -> None:
     # Content hints for files with vague names ("新建文本文档.txt").
     if cat is None and m.excerpt:
         head = m.excerpt[:400]
-        for c, pat in (("syllabus", r"教学大纲|课程目标"), ("lesson_plan", r"教学目标.*教学重点|教学过程"),
+        for c, pat in (("slides", r"slide\s*show|slides created|slides? by|幻灯片"), ("syllabus", r"教学大纲|课程目标"), ("lesson_plan", r"教学目标.*教学重点|教学过程"),
                        ("homework", r"^\s*1[.、]"), ("notes", r"本章|第\s*\d+\s*章")):
-            if re.search(pat, head, re.S | re.M):
+            if re.search(pat, head, re.S | re.M | re.I):
                 cat = c
                 break
     m.category = cat or "other"
     m.chapter = chapter_of(m.path) if m.category not in ("syllabus", "calendar", "rubric") else None
+    if m.chapter is None and m.category not in ("syllabus", "calendar", "rubric") and m.excerpt:
+        m.chapter = chapter_in_text(re.sub(r"\[(第\d+页|幻灯片\d+)\]", " ", m.excerpt))
     if m.category == "media" and m.chapter is None:
         m.chapter = None
     m.confidence = "rule" if cat else "unsure"

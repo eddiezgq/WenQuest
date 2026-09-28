@@ -67,7 +67,13 @@ LIBRARIAN = COMMON + (
     "report templates), media (videos, pictures), other (unrelated). Also give the chapter numbers a file "
     "covers (empty for whole-course files), the document's own title, and its language. Mark confidence "
     "'low' when you are guessing. Ask the teacher only about what you really cannot tell from the files "
-    "(at most 3 questions, with short answer options). Judge by content, not only by file name."
+    "(at most 3 questions, with short answer options). Judge by content, not only by file name. "
+    "Watch for two things and report them in the summary: (1) files that belong to DIFFERENT courses, levels "
+    "or textbooks (e.g. university slides next to high-school slides): say which files form which set and ask "
+    "which course to build; (2) a main textbook that the files refer to but that is not included (e.g. a "
+    "download link): name the book and ask the teacher to upload it, or to confirm teaching from the slides "
+    "and notes alone. Chapter numbers come from the content ('Chapter 7', 'Unit 05'), never from long numbers "
+    "in file names."
 )
 
 
@@ -94,6 +100,19 @@ def librarian_prompt(files: list[dict], description: str) -> str:
             lines.append(f["excerpt"][:1200])
     lines.append("\nReturn main_textbook as the id of the main textbook, or an empty string if there is none.")
     return "\n".join(lines)
+
+
+LIBRARIAN_UPDATE = COMMON + (
+    " Role: 资料馆员 (librarian). The teacher has answered the team's questions. Update the materials list so "
+    "it matches the answers: files that are not used for the course the teacher chose become 'other' (or "
+    "'reference' when the teacher wants to keep them as background); a newly named main textbook becomes "
+    "'main_textbook'; fix chapter numbers the answers make clear. Return only the files that change."
+)
+
+
+def update_schema() -> dict:
+    f = _obj({"id": STR, "role": {"type": "string", "enum": list(ROLES)}, "chapters": INTS, "why": STR}, ["id", "role", "chapters"])
+    return _obj({"files": {"type": "array", "items": f}, "note": STR}, ["files", "note"])
 
 
 TOC = COMMON + (

@@ -67,6 +67,12 @@ def pages_of(text: str) -> dict[int, str]:
     return out
 
 
+def similar(a: str, b: str) -> bool:
+    """Two questions asking the same thing (character overlap)."""
+    x, y = set(norm(a)), set(norm(b))
+    return bool(x and y) and len(x & y) / min(len(x), len(y)) > 0.7
+
+
 def norm(s: str) -> str:
     return re.sub(r"[^0-9a-z㐀-鿿]", "", (s or "").lower())
 
@@ -256,7 +262,12 @@ class Studio:
             if v and k in REQ_LABEL and not proj["requirements"].get(k):
                 proj["requirements"][k] = v
         proj["questions"] = [x for x in proj["questions"] if x["status"] != "open"]
-        for x in (q.get("questions") or [])[:5]:
+        # The librarian's own questions (e.g. "two courses: which one?") always reach the teacher, first.
+        asked = [x for x in lib_q[:3] if isinstance(x, dict) and x.get("text")]
+        for x in q.get("questions") or []:
+            if isinstance(x, dict) and x.get("text") and not any(similar(x["text"], y["text"]) for y in asked):
+                asked.append(x)
+        for x in asked[:5]:
             if isinstance(x, dict) and x.get("text"):
                 proj["questions"].append({"id": new_id(), "text": str(x["text"])[:400],
                                           "options": [str(o)[:120] for o in (x.get("options") or [])][:6],
@@ -316,8 +327,38 @@ class Studio:
         proj["materials"]["book_title"] = str((data or {}).get("book_title") or "")[:200]
 
     # stage 2: outline --------------------------------------------------------------------------
+    async def apply_answers(self, proj: dict, items: list[mt.Material]) -> str:
+        """Before designing: let the librarian bring the materials list in line with the teacher's answers."""
+        answered = [q for q in proj["questions"] if q["status"] == "answered"]
+        key = ";".join(q["id"] + q["answer"] for q in answered)
+        if not answered or proj["materials"].get("answers_applied") == key or not proj["materials"]["files"]:
+            return ""
+        qa = "\n".join(f"- {q['text']} → {q['answer']}" for q in answered)
+        data = await self.ai.json(system=team.LIBRARIAN_UPDATE, prompt=f"Answers:\n{qa}\n\n{summary(proj, items, False)}",
+                                  schema=team.update_schema(), max_tokens=4000, fake=lambda: {"files": [], "note": ""})
+        files = proj["materials"]["files"]
+        changed = 0
+        for f in (data.get("files") or []) if isinstance(data, dict) else []:
+            cur = files.get(f.get("id") if isinstance(f, dict) else None)
+            if not cur or cur.get("by") == "teacher" or f.get("role") not in team.ROLES:
+                continue
+            chapters = [c for c in f.get("chapters") or [] if isinstance(c, int) and 0 < c < 100]
+            if (cur["role"], cur.get("chapters")) != (f["role"], chapters):
+                cur.update(role=f["role"], chapters=chapters, by="librarian", note=str(f.get("why") or cur.get("note", ""))[:300])
+                changed += 1
+        tb = next((fid for fid, f in files.items() if f["role"] == "main_textbook"), "")
+        if tb != proj["materials"]["textbook"]:
+            proj["materials"]["textbook"], proj["materials"]["toc"] = tb, []
+            if tb:
+                await self.read_contents(proj)
+        proj["materials"]["answers_applied"] = key
+        return f"资料馆员按你的回答调整了 {changed} 份资料的身份。" if changed else ""
+
     async def design(self, proj: dict) -> None:
         items = self.items(proj)
+        note = await self.apply_answers(proj, items)
+        if note:
+            self.say(proj, note, "system")
         keys = lang_keys(proj["requirements"].get("language", "zh"))
         toc = proj["materials"]["toc"]
         toc_text = "\n".join(f"Chapter {c['no']} {c['title']}\n" + "\n".join(f"  {s['no']} {s['title']}" for s in c["sections"])
@@ -359,9 +400,13 @@ class Studio:
                 for m in items:
                     f = files.get(m.id, {})
                     if ch in (f.get("chapters") or []) and f.get("role") in ("notes", "slides", "lesson_plan", "aux_textbook"):
-                        heads = "; ".join(mt.headings(self.text(proj, m.id), ch))
-                        parts.append(f"- {team.ROLES[f['role']]} {m.path}. Section headings: {heads or '(none found)'}\n"
-                                     f"{self.text(proj, m.id)[:2500]}")
+                        text = self.text(proj, m.id)
+                        heads = "; ".join(mt.headings(text, ch))
+                        outline = " | ".join(mt.slide_outline(text))
+                        parts.append(f"- {team.ROLES[f['role']]} {m.path}"
+                                     + (f"\n  Section headings: {heads}" if heads else "")
+                                     + (f"\n  Slide titles in order (▶ marks a new lesson in the deck): {outline}" if outline else "")
+                                     + (f"\n  Beginning: {' '.join(text[:1200].split())}" if not (heads or outline) else ""))
         return "\n".join(parts)
 
     def build_outline(self, proj: dict, data: dict, keys: list[str]) -> dict:
@@ -428,7 +473,8 @@ class Studio:
                     t = t[:budget]
                     out.append(f"<<< {name}，第{n}页\n{t}\n>>>")
                     budget -= len(t)
-        budget = EXTRA_BUDGET
+        # Without textbook pages, the chapter's own slides and notes are the main source: give them more room.
+        budget = EXTRA_BUDGET if out else TEXTBOOK_BUDGET
         files = proj["materials"]["files"]
         for role in ("notes", "lesson_plan", "slides", "aux_textbook"):
             for fid, f in files.items():
@@ -725,22 +771,60 @@ def fake_toc(pages: dict[int, str], toc_pages: list[int]) -> dict:
 
 
 def fake_outline(proj: dict, items: list[mt.Material], keys: list[str], text_of: Callable[[str], str]) -> dict:
+    """Offline designer: textbook contents if there is one, otherwise each chapter's own materials
+    (numbered headings, or the slide deck's titles), using the roles in the materials list."""
     T = lambda s: {k: s for k in keys}  # noqa: E731
     chapters, week = [], 1
     toc = proj["materials"]["toc"]
+    title = proj["requirements"].get("course_title") or proj["materials"].get("book_title") or ""
     if toc:
         for c in toc:
             lessons = []
-            for s in c["sections"][:6]:
-                lessons.append({"title": T(f"{s['no']} {s['title']}"), "goal": T(f"掌握 {s['title']}"), "week": week, "sections": [s["no"]]})
+            for sec in c["sections"][:6]:
+                lessons.append({"title": T(f"{sec['no']} {sec['title']}"), "goal": T(f"掌握 {sec['title']}"), "week": week, "sections": [sec["no"]]})
                 week += 1
             chapters.append({"no": c["no"], "title": T(c["title"]), "summary": T(""), "lessons": lessons})
-        return {"title": T(proj["requirements"].get("course_title") or proj["materials"].get("book_title") or "课程"), "summary": T(""), "chapters": chapters}
-    plan = mt.rule_plan([m for m in items if m.category != "other"], text_of)
-    return {"title": T(proj["requirements"].get("course_title") or plan["title"]), "summary": T(""),
-            "chapters": [{"no": c["chapter"], "title": T(c["title"]), "summary": T(""),
-                          "lessons": [{"title": T(l["title"]), "goal": T(""), "week": 0, "sections": []} for l in c["lessons"]]}
-                         for c in plan["sections"]]}
+        return {"title": T(title or "课程"), "summary": T(""), "chapters": chapters}
+    files = proj["materials"]["files"]
+    by_id = {m.id: m for m in items}
+    use = ("notes", "slides", "lesson_plan", "aux_textbook")
+    numbers = sorted({c for fid, f in files.items() if f["role"] in use for c in f.get("chapters") or []})
+    for ch in numbers:
+        mine = [fid for fid, f in files.items() if f["role"] in use and ch in (f.get("chapters") or []) and fid in by_id]
+        mine.sort(key=lambda fid: use.index(files[fid]["role"]))
+        text = text_of(mine[0]) if mine else ""
+        name = mt.section_title_for(ch, [by_id[f] for f in mine], text_of)
+        first = [ln.strip() for ln in re.sub(r"\[(幻灯片|第)\d+页?\]", "\n", text[:400]).splitlines() if ln.strip()]
+        if first and re.match(rf"^(chapter|unit)\s*0*{ch}\b", first[0], re.I):
+            # The title slide may wrap the chapter name over several lines; stop at the course line.
+            name = first[0]
+            for ln in first[1:4]:
+                if re.search(r"\d{3,}|https?:|download|image|credit|slides?|standard|physics for", ln, re.I):
+                    break
+                name += " " + ln
+        heads = mt.headings(text, ch)
+        outline = mt.slide_outline(text)
+        if heads:
+            topics = heads
+        elif any(t.startswith("▶") for t in outline):
+            topics = [re.sub(r"^▶\s*in this lesson you will…?\s*", "", t, flags=re.I).replace("•", "").strip(" ;") for t in outline if t.startswith("▶")]
+        else:
+            topics = [t for t in outline[1:] if not re.match(rf"^(chapter|unit)\s*0*{ch}\b", t, re.I)]
+        topics = [t for t in topics if t][:12]
+        size = max(1, -(-len(topics) // 6))  # at most 6 lessons: group neighbouring topics
+        groups = [topics[i:i + size] for i in range(0, len(topics), size)] or [[name]]
+        lessons = []
+        for g in groups:
+            lessons.append({"title": T(" · ".join(g)[:80]), "goal": T(""), "week": week, "sections": []})
+            week += 1
+        chapters.append({"no": ch, "title": T(name), "summary": T(""), "lessons": lessons})
+    if not chapters:  # nothing chapter-shaped: fall back to the old rule plan
+        plan = mt.rule_plan([m for m in items if m.category != "other"], text_of)
+        chapters = [{"no": c["chapter"], "title": T(c["title"]), "summary": T(""),
+                     "lessons": [{"title": T(x["title"]), "goal": T(""), "week": 0, "sections": []} for x in c["lessons"]]}
+                    for c in plan["sections"]]
+        title = title or plan["title"]
+    return {"title": T(title or mt.course_title(items, text_of)), "summary": T(""), "chapters": chapters}
 
 
 def fake_lesson(les: dict, src: str, keys: list[str]) -> dict:

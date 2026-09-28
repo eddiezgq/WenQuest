@@ -1,6 +1,8 @@
 """AI professor team course building (round 3, D30), end to end against a fake Moodle and the fake model."""
 import asyncio
+import re
 import time
+from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 import httpx
@@ -214,3 +216,51 @@ def test_textbook_contents_and_page_ranges():
     assert (s11["start"], s11["end"], s12["start"]) == (6, 7, 8)
     assert chapters[1]["sections"][0]["start"] == 13
     assert st.pages_of("[第1页]\nA\n\n[第2页]\nB") == {1: "A", 2: "B"}
+
+
+EDDIE = Path(__file__).resolve().parents[3] / "samples" / "Eddie物理资料"
+
+
+@pytest.mark.skipif(not EDDIE.exists(), reason="Eddie's physics materials are not in this checkout")
+def test_eddies_materials_two_courses_one_chosen(client, monkeypatch):
+    """Eddie's real files: university slides (Ch 1-10) and high-school slides (Units 5-14), no textbook.
+    The model is scripted the way a good librarian answers; the gateway must turn that into a clean
+    university outline with real chapter names and no high-school material."""
+    from app import team
+    h = login(client)
+    p = client.post("/api/v1/studio/projects", headers=h, json={"description": ""}).json()
+    pid = p["id"]
+    for f in sorted(EDDIE.iterdir()):
+        r = client.post(f"/api/v1/studio/projects/{pid}/files", headers=h, data={"path": f.name},
+                        files={"file": (f.name, f.read_bytes(), "application/octet-stream")})
+        assert r.status_code == 200, r.text
+    real_json = main.state.ai.json
+
+    async def scripted(*, system, prompt, schema, max_tokens=8000, fake=None):
+        if system == team.LIBRARIAN:
+            ids = re.findall(r"### id=(\w+) \| ([^|]+)", prompt)
+            return {"course": {"title": "Physics for Scientists and Engineers I", "subject": "physics", "language": "en"},
+                    "main_textbook": "", "summary": "两套课件：PHYS 2425（大学，第1-10章）和 High School Physics（第5-14单元）；主教材 OpenStax University Physics Vol 1 未包含。",
+                    "files": [{"id": i, "role": "slides", "chapters": [int(re.search(r"(?:Chapter|Physics)_0*(\d+)", n).group(1))],
+                               "title": n, "language": "en", "confidence": "high"} for i, n in ids],
+                    "questions": [{"text": "资料里有两套课件：大学物理（PHYS 2425）和高中物理。这门课建哪一套？", "options": ["大学物理 PHYS 2425", "高中物理", "两套合并"]}]}
+        if system == team.LIBRARIAN_UPDATE:
+            ids = re.findall(r"- (\w+) \| ([^|]*HSPhysics[^|]*) \|", prompt)
+            return {"files": [{"id": i, "role": "other", "chapters": [], "why": "高中课程，不用于本课"} for i, _ in ids], "note": ""}
+        return await real_json(system=system, prompt=prompt, schema=schema, max_tokens=max_tokens, fake=fake)
+
+    monkeypatch.setattr(main.state.ai, "json", scripted)
+    client.post(f"/api/v1/studio/projects/{pid}/start", headers=h)
+    p = settle(client, h, pid)
+    assert p["requirements"]["course_title"] == "Physics for Scientists and Engineers I"
+    which = next(q for q in p["questions"] if "哪一套" in q["text"])
+    client.post(f"/api/v1/studio/projects/{pid}/questions/{which['id']}", headers=h, json={"answer": "大学物理 PHYS 2425"})
+    client.post(f"/api/v1/studio/projects/{pid}/approve-materials", headers=h)
+    p = settle(client, h, pid)
+    assert any("调整了 10 份资料" in m["text"] for m in p["messages"])
+    names = [c["title"]["zh"] for c in p["outline"]["chapters"]]
+    assert len(names) == 10 and names[0] == "Chapter 1 Units and Measurement" and names[6] == "Chapter 7 Work and Kinetic Energy"
+    ch7 = p["outline"]["chapters"][6]["lessons"]
+    assert [l["title"]["zh"] for l in ch7] == ["Work", "Work Done by Forces that Vary", "Kinetic Energy", "Work-Energy Theorem", "Power"]
+    assert st.check_outline(p["outline"]) == []
+    assert not any("Keplers" in l["title"]["zh"] or "Magnetism" in c["title"]["zh"] for c in p["outline"]["chapters"] for l in c["lessons"])

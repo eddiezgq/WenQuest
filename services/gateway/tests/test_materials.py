@@ -355,3 +355,28 @@ def test_html_labs_are_read_as_text():
     html = "<html><head><style>b{}</style><script>var x=1</script></head><body><h1>质点运动学实验台</h1><p>实验目的：观察轨迹</p></body></html>"
     text, _ = mt.extract("lab.html", html.encode())
     assert text == "质点运动学实验台\n实验目的：观察轨迹"
+
+
+EDDIE = Path(__file__).resolve().parents[3] / "samples" / "Eddie物理资料"
+
+
+@pytest.mark.skipif(not EDDIE.exists(), reason="Eddie's physics materials are not in this checkout")
+def test_real_materials_chapters_and_slide_outlines():
+    """Eddie's own files (2026-09-28): long download numbers in front of names must not become chapters,
+    slide decks are slides, and each deck yields a readable outline of its topics."""
+    seen = {}
+    for f in sorted(EDDIE.iterdir()):
+        text, _ = mt.extract(f.name, f.read_bytes())
+        m = mt.Material(id="x", name=f.name, path=f.name, size=1, ext=f.suffix.lower(), excerpt=mt.clean(text)[:1500])
+        mt.classify_rule(m)
+        seen[f.name] = (m.category, m.chapter, mt.slide_outline(mt.clean(text)))
+        assert m.category == "slides", f.name
+        assert m.chapter and m.chapter < 20, f.name
+    ch1 = next(v for k, v in seen.items() if "Chapter_01" in k)
+    assert ch1[1] == 1 and "Units and Standards" in ch1[2] and "Dimensional Analysis" in ch1[2]
+    ch7 = next(v for k, v in seen.items() if "Chapter_07" in k)
+    assert ch7[2][1:] == ["Work", "Work Done by Forces that Vary", "Kinetic Energy", "Work-Energy Theorem", "Power"]
+    hs6 = next(v for k, v in seen.items() if "HSPhysics_06" in k)
+    assert hs6[1] == 6 and sum(t.startswith("▶") for t in hs6[2]) >= 5
+    for _, _, outline in seen.values():  # no equations or answers among the titles
+        assert not any("=" in t for t in outline)
