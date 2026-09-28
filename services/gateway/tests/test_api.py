@@ -269,3 +269,9 @@ def test_chinese_file_names_are_served(client):
     doc = sign(f"{BASE}/webservice/pluginfile.php/9/mod_resource/content/0/a.html")
     assert client.get(f"/api/v1/files/{doc}").headers["content-disposition"] == \
         'attachment; filename="a.html"; filename*=UTF-8\'\'a.html'
+
+
+def test_health_reports_ai_provider_without_secrets(client):
+    r = client.get("/api/health").json()
+    assert r["ok"] is True and r["ai"] in ("claude", "deepseek", "fake", "none")
+    assert "key" not in str(r).lower()

@@ -143,7 +143,8 @@ class PlanIn(BaseModel):
 def register(app: FastAPI) -> None:
     @app.get("/api/health")
     async def health():
-        return {"ok": True, "version": VERSION}
+        # Which model is configured (never the key), so an administrator can check without logging in.
+        return {"ok": True, "version": VERSION, "ai": state.ai.provider}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)
     async def login(body: LoginIn):
