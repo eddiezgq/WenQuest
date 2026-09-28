@@ -38,6 +38,11 @@ foreach (['webservice/rest:use', 'moodle/webservice:createmobiletoken'] as $capa
 
 filter_set_global_state('multilang', TEXTFILTER_ON);
 filter_set_applies_to_strings('multilang', true);
+if (core_component::get_component_directory('filter_multilang2')) {
+    // Renders {mlang xx}...{mlang}, used for bilingual rich text (see the gateway's course builder).
+    filter_set_global_state('multilang2', TEXTFILTER_ON);
+    filter_set_applies_to_strings('multilang2', true);
+}
 set_config('filterall', 1);
 
-mtrace('WenQuest gateway access: web services, mobile service and multi-language filter enabled.');
+mtrace('WenQuest gateway access: web services, mobile service and multi-language filters enabled.');

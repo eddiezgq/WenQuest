@@ -27,6 +27,15 @@ class Settings(BaseSettings):
     # the WeChat mini program needs it set).
     public_url: str = ""
 
+    # --- AI models (see app/ai.py) ---
+    # auto = Claude if a key is set, else DeepSeek; or claude / deepseek / fake (tests and demos)
+    ai_provider: str = "auto"
+    anthropic_api_key: str = ""
+    claude_model: str = "claude-sonnet-5"
+    deepseek_api_key: str = ""
+    deepseek_model: str = "deepseek-chat"
+    ai_timeout: float = 180.0
+
     @property
     def cors_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]

@@ -2,7 +2,9 @@
 
 问渠 WenQuest：自研前端（网页 + 微信小程序，一套 uni-app 代码）+ 接口网关（FastAPI）+ 开源教学引擎 Moodle 5.2（Claude / DeepSeek 模型接入）。一条命令启动。
 
-v0.2 新增：问渠自己的学习界面和接口网关。学生登录后可看我的课程、课程目录、阅读页、链接、作业说明和文件，中英文一键切换；新界面暂未支持的活动一键跳到经典界面。下一步：带出处的课程 AI 助教。
+v0.3 新增：**AI 建课**。老师描述课程主题、学习对象和章节数（可粘贴自己的大纲或讲义），AI 先出课程大纲，老师修改确认后 AI 逐课撰写内容，预览无误一键发布成真实课程（章节、阅读页、作业），支持中文、英文或中英双语。
+
+v0.2：问渠自己的学习界面和接口网关。学生登录后可看我的课程、课程目录、阅读页、链接、作业说明和文件，中英文一键切换；新界面暂未支持的活动一键跳到经典界面。下一步：带出处的课程 AI 助教。
 
 ## 包里有什么
 
@@ -11,6 +13,7 @@ v0.2 新增：问渠自己的学习界面和接口网关。学生登录后可看
 | `apps/web/` | 问渠前端（uni-app + Vue 3）：`npm run dev:h5` 本地开发，`npm run build:mp-weixin` 出微信小程序 |
 | `services/gateway/` | 接口网关（FastAPI）：登录、课程、内容、文件代理、中英文解析；`python -m pytest` 运行测试 |
 | `moodle/setup_wenquest.php` | 启动时开启网关所需的 Web 服务和多语言过滤器 |
+| `plugins/local_wenquest/` | 自研 Moodle 插件：一次调用创建整门课程（AI 建课用），并告诉网关当前用户能否建课 |
 | `plugins/aiprovider_claude/` | 自研 Moodle 插件：把 Anthropic Claude 接入 Moodle AI 子系统 |
 | `moodle/Dockerfile` | Moodle 5.2 镜像（PHP 8.3 + Apache），已内置 Claude 插件和中文语言包 |
 | `docker-compose.yml` | Moodle、PostgreSQL 16、Redis、定时任务四个服务 |
@@ -42,6 +45,12 @@ docker compose logs -f moodle  # 看到 "Created AI provider" 即完成
 ```
 
 浏览器打开 `MOODLE_WWWROOT`（经典界面），用 `.env` 里的管理员账号登录、建课、加学生；再打开 `APP_URL`（默认 http://localhost:8088）用学生账号登录问渠新界面。
+
+## AI 建课
+
+- 需要在 `.env` 里填 `ANTHROPIC_API_KEY`（或国内部署填 `DEEPSEEK_API_KEY`），改完执行 `deploy/update.sh`。
+- 管理员自动有建课权限。给老师开权限：经典界面 → 网站管理 → 用户 → 权限 → 分配系统角色 → **课程创建者**，把老师加进去。老师重新登录问渠后，“我的课程”右上角会出现 **AI 建课** 按钮。
+- AI 生成的内容只是初稿，发布前请老师逐课预览；发布后也可以在经典界面里继续修改。
 
 ## 模型选择
 

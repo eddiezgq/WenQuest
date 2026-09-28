@@ -13,6 +13,7 @@ export interface User {
   username: string;
   avatar: string | null;
   lang: "zh" | "en";
+  can_create_courses?: boolean;
 }
 export interface Course {
   id: number;
@@ -49,6 +50,28 @@ export interface Activity {
   due?: number | null;
   files?: { name: string; size: number; mimetype: string; url: string }[];
   classic_url: string;
+}
+
+// --- AI course workshop ---
+export type Languages = "zh" | "en" | "both";
+export interface Text { zh?: string; en?: string }
+export interface OutlineLesson { title: Text; goal?: Text; content: Text }
+export interface OutlineSection {
+  title: Text;
+  summary: Text;
+  lessons: OutlineLesson[];
+  assignment: { title: Text; brief: Text } | null;
+}
+export interface Outline { title: Text; summary: Text; languages: Languages; sections: OutlineSection[] }
+export interface Brief {
+  topic: string;
+  audience: string;
+  level: string;
+  sections: number;
+  lessons_per_section: number;
+  assignments: boolean;
+  languages: Languages;
+  notes: string;
 }
 
 export class ApiError extends Error {
@@ -90,7 +113,7 @@ export function absolute(url: string | null | undefined): string {
   return url.startsWith("/") ? BASE + url : url;
 }
 
-function request<T>(method: "GET" | "POST", path: string, data?: unknown): Promise<T> {
+function request<T>(method: "GET" | "POST", path: string, data?: unknown, timeout = 60000): Promise<T> {
   const header: Record<string, string> = { "Content-Type": "application/json" };
   if (token.value) header.Authorization = `Bearer ${token.value}`;
   const sep = path.includes("?") ? "&" : "?";
@@ -100,6 +123,7 @@ function request<T>(method: "GET" | "POST", path: string, data?: unknown): Promi
       url,
       method,
       header,
+      timeout,
       data: data as any,
       success(res) {
         const body: any = res.data;
@@ -111,8 +135,9 @@ function request<T>(method: "GET" | "POST", path: string, data?: unknown): Promi
         }
         reject(new ApiError(code, res.statusCode));
       },
-      fail() {
-        reject(new ApiError("network", 0));
+      fail(err: any) {
+        const msg = String((err && err.errMsg) || "");
+        reject(new ApiError(msg.includes("timeout") ? "ai_timeout" : "network", 0));
       },
     });
   });
@@ -131,6 +156,16 @@ export const api = {
   logout() {
     saveSession("", null);
   },
+  async me(): Promise<User> {
+    const u = await request<User>("GET", "/api/v1/me");
+    saveSession(token.value, u);
+    return u;
+  },
+  aiOutline: (b: Brief) => request<Outline>("POST", "/api/v1/ai/outline", b, 200000),
+  aiLesson: (body: Record<string, unknown>) =>
+    request<{ content: Text }>("POST", "/api/v1/ai/lesson", body, 200000),
+  publish: (o: Outline) =>
+    request<{ course_id: number; shortname: string; activities: number }>("POST", "/api/v1/courses", o, 120000),
   courses: () => request<{ courses: Course[] }>("GET", "/api/v1/courses").then((r) => r.courses),
   outline: (id: number) =>
     request<{ sections: Section[] }>("GET", `/api/v1/courses/${id}/outline`).then((r) => r.sections),

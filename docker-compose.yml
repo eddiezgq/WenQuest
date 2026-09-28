@@ -50,6 +50,10 @@ services:
       WQ_DEFAULT_LANG: ${WQ_DEFAULT_LANG:-zh}
       WQ_CORS_ORIGINS: ${APP_URL:-http://localhost:8088}
       WQ_PUBLIC_URL: ${WQ_PUBLIC_URL:-}
+      # AI course builder and (later) the AI tutor use the same keys as Moodle's AI features.
+      WQ_ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      WQ_CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-sonnet-5}
+      WQ_DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
 
   # WenQuest web app (static files) with /api forwarded to the gateway.
   web:

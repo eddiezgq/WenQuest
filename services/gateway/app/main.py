@@ -13,12 +13,14 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from . import content
+from . import course_builder as cb
+from .ai import ModelGateway
 from .config import Settings, get_settings
 from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -27,6 +29,7 @@ class State:
     http: httpx.AsyncClient
     moodle: MoodleClient
     codec: SessionCodec
+    ai: ModelGateway
 
 
 state = State()
@@ -39,6 +42,9 @@ async def lifespan(app: FastAPI):
     state.http = httpx.AsyncClient(timeout=s.http_timeout, follow_redirects=False)
     state.moodle = MoodleClient(s.moodle_url, s.moodle_service, state.http, s.moodle_connect_url)
     state.codec = SessionCodec(s.secret_key, s.session_days)
+    state.ai = ModelGateway(s.ai_provider, state.http, anthropic_key=s.anthropic_api_key,
+                            claude_model=s.claude_model, deepseek_key=s.deepseek_api_key,
+                            deepseek_model=s.deepseek_model, timeout=s.ai_timeout)
     yield
     await state.http.aclose()
 
@@ -108,6 +114,7 @@ class UserOut(BaseModel):
     username: str
     avatar: str | None = None
     lang: str
+    can_create_courses: bool = False
 
 
 class LoginOut(BaseModel):
@@ -128,12 +135,12 @@ def register(app: FastAPI) -> None:
         info = await state.moodle.site_info(mtoken)
         lang = lang_of(body.lang or info.get("lang"))
         token = state.codec.issue(Session(moodle_token=mtoken, user_id=int(info["userid"]), lang=lang))
-        return LoginOut(token=token, user=_user(info, lang))
+        return LoginOut(token=token, user=_user(info, lang, await can_create(mtoken)))
 
     @app.get("/api/v1/me", response_model=UserOut)
     async def me(sess: Annotated[Session, Depends(current)], lang: str | None = None):
         info = await state.moodle.site_info(sess.moodle_token)
-        return _user(info, lang_of(lang, sess))
+        return _user(info, lang_of(lang, sess), await can_create(sess.moodle_token))
 
     @app.get("/api/v1/courses")
     async def courses(sess: Annotated[Session, Depends(current)], lang: str | None = None):
@@ -238,6 +245,45 @@ def register(app: FastAPI) -> None:
         base["classic_url"] = f"{state.settings.moodle_url.rstrip('/')}/mod/{kind}/view.php?id={cmid}"
         return base
 
+    # --- AI course workshop -------------------------------------------------
+
+    @app.post("/api/v1/ai/outline")
+    async def ai_outline(body: cb.Brief, sess: Annotated[Session, Depends(current)]):
+        await require_creator(sess)
+        data = await state.ai.json(system=cb.SYSTEM, prompt=cb.outline_prompt(body),
+                                   schema=cb.outline_schema(body.languages, body.assignments),
+                                   max_tokens=8000, fake=lambda: cb.fake_outline(body))
+        outline = cb.norm_outline(data, body)
+        if not outline["sections"]:
+            raise EngineError("ai_bad_output", "the model returned no sections", 502)
+        return outline
+
+    @app.post("/api/v1/ai/lesson")
+    async def ai_lesson(body: cb.LessonRequest, sess: Annotated[Session, Depends(current)]):
+        await require_creator(sess)
+        data = await state.ai.json(system=cb.SYSTEM, prompt=cb.lesson_prompt(body),
+                                   schema=cb.lesson_schema(body.languages),
+                                   max_tokens=12000 if body.languages == "both" else 6000,
+                                   fake=lambda: cb.fake_lesson(body))
+        text = cb.norm_text(data.get("content"), cb.lang_keys(body.languages))
+        clean = {k: content.clean(v, state.settings.moodle_url, lambda u: u) for k, v in text.items()}
+        if not any(clean.values()):
+            raise EngineError("ai_bad_output", "the model returned an empty lesson", 502)
+        return {"content": clean}
+
+    @app.post("/api/v1/courses")
+    async def publish_course(draft: cb.Draft, sess: Annotated[Session, Depends(current)]):
+        if not await can_create(sess.moodle_token):
+            raise EngineError("forbidden", "you may not create courses", 403)
+        payload = cb.to_moodle(draft, lambda h: content.clean(h, state.settings.moodle_url, lambda u: u))
+        result = await state.moodle.call(sess.moodle_token, "local_wenquest_create_course", None, **payload)
+        return {"course_id": result["courseid"], "shortname": result["shortname"], "activities": result["activities"]}
+
+    @app.get("/api/v1/ai/status")
+    async def ai_status(sess: Annotated[Session, Depends(current)]):
+        return {"available": state.ai.available, "provider": state.ai.provider,
+                "can_create_courses": await can_create(sess.moodle_token)}
+
     @app.get("/api/v1/files/{signed}")
     async def files(signed: str):
         try:
@@ -264,10 +310,26 @@ def register(app: FastAPI) -> None:
         return Response(r.content, media_type=ctype, headers=headers)
 
 
-def _user(info: dict, lang: str) -> UserOut:
+def _user(info: dict, lang: str, creator: bool = False) -> UserOut:
     pic = info.get("userpictureurl")
     return UserOut(id=int(info["userid"]), fullname=info.get("fullname", ""),
-                   username=info.get("username", ""), avatar=pic, lang=lang)
+                   username=info.get("username", ""), avatar=pic, lang=lang, can_create_courses=creator)
+
+
+async def can_create(moodle_token: str) -> bool:
+    """Whether this user may create courses (needs the local_wenquest plugin in Moodle)."""
+    try:
+        perms = await state.moodle.call(moodle_token, "local_wenquest_get_permissions")
+        return bool(perms.get("cancreatecourses"))
+    except EngineError:
+        return False
+
+
+async def require_creator(sess: Session) -> None:
+    if not await can_create(sess.moodle_token):
+        raise EngineError("forbidden", "you may not create courses", 403)
+    if not state.ai.available:
+        raise EngineError("ai_unavailable", "no AI model is configured", 503)
 
 
 app = create_app()

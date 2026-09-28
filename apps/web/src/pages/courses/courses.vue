@@ -2,7 +2,10 @@
   <view class="page">
     <TopBar />
     <view class="wrap">
-      <text class="h1">{{ t("nav.courses") }}</text>
+      <view class="head">
+        <text class="h1">{{ t("nav.courses") }}</text>
+        <view v-if="user && user.can_create_courses" class="create" @click="create">✨ {{ t("create.button") }}</view>
+      </view>
       <view v-if="loading" class="muted">{{ t("common.loading") }}</view>
       <view v-else-if="error" class="state">
         <text class="error">{{ errorText(error) }}</text>
@@ -34,7 +37,7 @@
 import { ref, watch } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import TopBar from "../../components/TopBar.vue";
-import { absolute, api, ApiError, type Course, token } from "../../api";
+import { absolute, api, ApiError, type Course, token, user } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
 const courses = ref<Course[]>([]);
@@ -56,6 +59,10 @@ async function load() {
   }
 }
 
+function create() {
+  uni.navigateTo({ url: "/pages/create/create" });
+}
+
 function open(c: Course) {
   uni.navigateTo({ url: `/pages/course/course?id=${c.id}` });
 }
@@ -64,17 +71,21 @@ onShow(() => {
   if (!token.value) return uni.reLaunch({ url: "/pages/login/login" });
   uni.setNavigationBarTitle({ title: t("nav.courses") });
   load();
+  api.me().catch(() => {}); // refresh permissions (e.g. the AI course button)
 });
 watch(locale, () => {
   uni.setNavigationBarTitle({ title: t("nav.courses") });
   load();
+  api.me().catch(() => {}); // refresh permissions (e.g. the AI course button)
 });
 </script>
 
 <style scoped>
 .page { min-height: 100vh; background: var(--wq-bg); }
 .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 48px; }
-.h1 { display: block; font-size: 26px; font-weight: 700; color: var(--wq-ink); margin-bottom: 20px; }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.h1 { display: block; font-size: 26px; font-weight: 700; color: var(--wq-ink); }
+.create { background: var(--wq-accent); color: var(--wq-ink); font-weight: 600; padding: 9px 18px; border-radius: 8px; cursor: pointer; font-size: 15px; }
 .muted { color: var(--wq-muted); font-size: 15px; }
 .state { display: flex; align-items: center; gap: 12px; }
 .error { color: var(--wq-danger); }

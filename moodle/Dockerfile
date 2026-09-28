@@ -27,6 +27,12 @@ RUN git clone --depth 1 -b "$MOODLE_BRANCH" "$MOODLE_GIT" . \
 
 # Our plugins.
 COPY plugins/aiprovider_claude public/ai/provider/claude
+COPY plugins/local_wenquest public/local/wenquest
+
+# Multi-language filter for {mlang xx}...{mlang} (bilingual content created by the AI course builder).
+ARG MULTILANG2_REF=0c6fc6f11b6cd8b729ce7ca261d593ba06a1cf35
+RUN git clone -q https://github.com/iarenaza/moodle-filter_multilang2.git public/filter/multilang2 \
+    && git -C public/filter/multilang2 checkout -q "$MULTILANG2_REF" && rm -rf public/filter/multilang2/.git
 
 # Language packs are downloaded at build time; a failed download is not fatal.
 RUN mkdir -p /opt/langpacks && for l in $LANGPACKS; do \

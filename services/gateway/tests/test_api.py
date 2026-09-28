@@ -92,7 +92,8 @@ def login(c, lang="zh"):
 def test_login_and_me(client):
     h = login(client)
     me = client.get("/api/v1/me", headers=h).json()
-    assert me == {"id": 3, "fullname": "小明", "username": "s1", "avatar": None, "lang": "zh"}
+    assert me == {"id": 3, "fullname": "小明", "username": "s1", "avatar": None, "lang": "zh",
+                  "can_create_courses": False}
 
 
 def test_bad_password_is_401_with_code(client):
