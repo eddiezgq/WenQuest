@@ -23,21 +23,38 @@ export interface Course {
   image: string | null;
   progress: number | null;
 }
+export type FileKind = "video" | "pdf" | "slides" | "lab" | "doc" | "sheet" | "image" | "audio" | "file";
+export interface ModuleFile { name: string; size: number; mimetype: string; kind: FileKind }
 export interface Module {
   id: number;
   type: string;
   name?: string;
   html?: string;
   locked?: boolean;
+  hidden?: boolean;
   completed?: boolean;
   has_completion?: boolean;
+  file?: ModuleFile;
 }
 export interface Section {
   id: number;
   number: number;
   name: string;
   summary: string;
+  visible?: boolean;
   modules: Module[];
+}
+export interface CourseInfo {
+  id: number;
+  shortname: string;
+  name: string;
+  summary: string;
+  image: string | null;
+  teachers: string[];
+  start: number | null;
+  end: number | null;
+  role: "teacher" | "student";
+  classic_url: string;
 }
 export interface Activity {
   id: number;
@@ -48,7 +65,9 @@ export interface Activity {
   intro?: string;
   url?: string;
   due?: number | null;
-  files?: { name: string; size: number; mimetype: string; url: string }[];
+  files?: { name: string; size: number; mimetype: string; kind: FileKind; url: string; lab_url?: string }[];
+  kind?: FileKind;
+  hidden?: boolean;
   classic_url: string;
 }
 
@@ -214,6 +233,7 @@ export const api = {
   publish: (o: Outline) =>
     request<{ course_id: number; shortname: string; activities: number }>("POST", "/api/v1/courses", o, 120000),
   courses: () => request<{ courses: Course[] }>("GET", "/api/v1/courses").then((r) => r.courses),
+  course: (id: number) => request<CourseInfo>("GET", `/api/v1/courses/${id}`),
   outline: (id: number) =>
     request<{ sections: Section[] }>("GET", `/api/v1/courses/${id}/outline`).then((r) => r.sections),
   activity: (id: number) => request<Activity>("GET", `/api/v1/activities/${id}`),

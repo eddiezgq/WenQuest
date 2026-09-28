@@ -1,71 +1,151 @@
 <template>
-  <view class="page">
-    <TopBar />
-    <view class="wrap">
-      <view class="back" @click="back">‹ {{ t("common.back") }}</view>
-      <view v-if="loading" class="muted">{{ t("common.loading") }}</view>
-      <view v-else-if="error" class="state">
-        <text class="error">{{ errorText(error) }}</text>
-        <view class="btn" @click="load">{{ t("common.retry") }}</view>
+  <AppShell nav="courses" :course="d" tab="modules" :crumb="crumb">
+    <view v-if="loading && !a" class="muted">{{ t("common.loading") }}</view>
+    <view v-else-if="error && !a" class="state">
+      <text class="error">{{ errorText(error) }}</text>
+      <view class="btn" @click="load">{{ t("common.retry") }}</view>
+    </view>
+    <view v-else-if="a" class="viewer" :class="{ wide: fileKind === 'lab' }">
+      <view class="head">
+        <text class="kind">{{ t("kind." + kindKey) }}</text>
+        <text v-if="a.hidden" class="tag teacher">{{ t("course.teacherOnly") }}</text>
       </view>
-      <view v-else-if="a" class="card">
-        <text class="kind">{{ t("type." + kind) }}</text>
-        <text class="h1">{{ a.name }}</text>
+      <text class="h1">{{ a.name }}</text>
 
-        <!-- Reading page -->
-        <RichContent v-if="a.type === 'page'" :html="a.html || ''" />
+      <!-- Reading page -->
+      <view v-if="a.type === 'page'" class="paper"><MathContent :html="a.html || ''" /></view>
 
-        <!-- External link -->
-        <view v-else-if="a.type === 'url'">
-          <RichContent v-if="a.intro" :html="a.intro" />
-          <view class="primary" @click="openLink(a.url || '')">{{ t("activity.openLink") }} ↗</view>
-          <text class="small">{{ a.url }}</text>
+      <!-- External link -->
+      <view v-else-if="a.type === 'url'" class="paper">
+        <RichContent v-if="a.intro" :html="a.intro" />
+        <view class="primary" @click="openLink(a.url || '')">{{ t("activity.openLink") }} ↗</view>
+        <text class="small">{{ a.url }}</text>
+      </view>
+
+      <!-- Assignment -->
+      <view v-else-if="a.type === 'assign'" class="paper">
+        <view class="due">
+          <text class="due-label">{{ t("activity.due") }}</text>
+          <text class="due-value">{{ a.due ? formatDate(a.due) : t("activity.noDue") }}</text>
+        </view>
+        <MathContent :html="a.intro || ''" />
+        <view class="primary" @click="openLink(a.classic_url)">{{ t("activity.submitClassic") }}</view>
+      </view>
+
+      <!-- Files -->
+      <view v-else-if="a.type === 'resource' && file">
+        <!-- Video -->
+        <view v-if="fileKind === 'video'" class="player">
+          <video class="video" :src="absolute(file.url)" controls preload="metadata" />
         </view>
 
-        <!-- Assignment -->
-        <view v-else-if="a.type === 'assign'">
-          <view class="due">
-            <text class="due-label">{{ t("activity.due") }}</text>
-            <text class="due-value">{{ a.due ? formatDate(a.due) : t("activity.noDue") }}</text>
+        <!-- PDF -->
+        <view v-else-if="fileKind === 'pdf'">
+          <!-- #ifdef H5 -->
+          <PdfViewer :url="absolute(file.url)" />
+          <!-- #endif -->
+          <!-- #ifndef H5 -->
+          <view class="primary" @click="download(file.url, file.name)">{{ t("activity.open") }}</view>
+          <!-- #endif -->
+        </view>
+
+        <!-- Virtual lab, running inside the page -->
+        <view v-else-if="fileKind === 'lab'">
+          <!-- #ifdef H5 -->
+          <view ref="labBox" class="lab-box">
+            <iframe class="lab" :src="absolute(file.lab_url || '')" :title="a.name"
+              sandbox="allow-scripts allow-popups allow-forms allow-modals allow-downloads" allow="fullscreen" />
           </view>
-          <RichContent :html="a.intro || ''" />
-          <view class="primary" @click="openLink(a.classic_url)">{{ t("activity.classic") }}</view>
+          <view class="lab-bar">
+            <text class="small">{{ t("viewer.labNote") }}</text>
+            <view class="ghost" @click="fullscreen">⛶ {{ t("viewer.fullscreen") }}</view>
+          </view>
+          <!-- #endif -->
+          <!-- #ifndef H5 -->
+          <text class="muted block">{{ t("viewer.labWebOnly") }}</text>
+          <!-- #endif -->
         </view>
 
-        <!-- Files -->
-        <view v-else-if="a.type === 'resource'">
+        <!-- Image -->
+        <view v-else-if="fileKind === 'image'" class="paper center">
+          <image class="img" :src="absolute(file.url)" mode="widthFix" />
+        </view>
+
+        <!-- Slides: in-browser presentation arrives in step 3 of this round -->
+        <view v-else-if="fileKind === 'slides'" class="paper">
+          <text class="block">{{ t("viewer.slidesSoon") }}</text>
+          <view class="file">
+            <text class="file-name">{{ file.name }}</text>
+            <text class="file-size">{{ size(file.size) }}</text>
+            <view class="btn" @click="download(file.url, file.name)">{{ t("activity.download") }}</view>
+          </view>
+        </view>
+
+        <!-- Word, Excel and other files -->
+        <view v-else class="paper">
           <view v-for="f in a.files" :key="f.url" class="file">
+            <text class="f-icon">{{ KIND_ICON[f.kind] || "▢" }}</text>
             <text class="file-name">{{ f.name }}</text>
             <text class="file-size">{{ size(f.size) }}</text>
             <view class="btn" @click="download(f.url, f.name)">{{ t("activity.download") }}</view>
           </view>
         </view>
+      </view>
 
-        <!-- Not yet supported in the new UI -->
-        <view v-else>
-          <text class="muted block">{{ t("activity.classicHint") }}</text>
-          <view class="primary" @click="openLink(a.classic_url)">{{ t("activity.classic") }}</view>
-        </view>
+      <!-- Not yet supported in the new UI -->
+      <view v-else class="paper">
+        <text class="muted block">{{ t("activity.classicHint") }}</text>
+        <view class="primary" @click="openLink(a.classic_url)">{{ t("activity.classic") }}</view>
+      </view>
+
+      <view v-if="ctx" class="pager">
+        <view v-if="prevMod" class="pg" @click="go(prevMod.id)">‹ {{ prevMod.name }}</view>
+        <view v-else class="pg" @click="openUnit">‹ {{ ctx.section.name }}</view>
+        <view v-if="nextMod" class="pg right" @click="go(nextMod.id)">{{ nextMod.name }} ›</view>
       </view>
     </view>
-  </view>
+  </AppShell>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
-import TopBar from "../../components/TopBar.vue";
+import AppShell from "../../components/AppShell.vue";
+import MathContent from "../../components/MathContent.vue";
 import RichContent from "../../components/RichContent.vue";
+// #ifdef H5
+import PdfViewer from "../../components/PdfViewer.vue";
+// #endif
 import { absolute, api, ApiError, type Activity, token } from "../../api";
 import { errorText, formatDate, locale, t } from "../../i18n";
+import { type CourseData, findModule, KIND_ICON, loadCourse, rememberVisit, visibleModules } from "../../store";
+
+// Page query parameters (id, course, tab) must not fall through onto the layout component.
+defineOptions({ inheritAttrs: false });
 
 const id = ref(0);
+const courseId = ref(0);
 const a = ref<Activity | null>(null);
+const d = ref<CourseData | null>(null);
 const loading = ref(true);
 const error = ref("");
+const labBox = ref<any>(null);
 
-const KNOWN = ["page", "url", "assign", "resource", "quiz", "forum"];
-const kind = computed(() => (a.value && KNOWN.includes(a.value.type) ? a.value.type : "other"));
+const file = computed(() => (a.value?.files || [])[0] || null);
+const fileKind = computed(() => file.value?.kind || "file");
+const kindKey = computed(() => {
+  if (!a.value) return "file";
+  if (a.value.type === "resource") return fileKind.value;
+  if (a.value.type === "page") return "reading";
+  if (a.value.type === "url") return "link";
+  return ["assign", "quiz", "forum"].includes(a.value.type) ? a.value.type : "file";
+});
+const ctx = computed(() => (d.value ? findModule(d.value, id.value) : null));
+const siblings = computed(() => (d.value && ctx.value ? visibleModules(d.value, ctx.value.section) : []));
+const pos = computed(() => siblings.value.findIndex((m) => m.id === id.value));
+const prevMod = computed(() => (pos.value > 0 ? siblings.value[pos.value - 1] : null));
+const nextMod = computed(() => (pos.value >= 0 && pos.value < siblings.value.length - 1 ? siblings.value[pos.value + 1] : null));
+const crumb = computed(() => (ctx.value ? `${ctx.value.section.name} › ${a.value?.name || ""}` : a.value?.name || ""));
 
 async function load() {
   loading.value = true;
@@ -73,11 +153,29 @@ async function load() {
   try {
     a.value = await api.activity(id.value);
     uni.setNavigationBarTitle({ title: a.value.name });
+    const cid = courseId.value || a.value.course_id;
+    courseId.value = cid;
+    rememberVisit(cid, id.value);
+    loadCourse(cid).then((x) => { d.value = x; }).catch(() => {});
   } catch (e) {
     error.value = e instanceof ApiError ? e.code : "unknown";
   } finally {
     loading.value = false;
   }
+}
+
+function go(cmid: number) {
+  uni.redirectTo({ url: `/pages/activity/activity?id=${cmid}&course=${courseId.value}` });
+}
+function openUnit() {
+  if (ctx.value) uni.redirectTo({ url: `/pages/unit/unit?course=${courseId.value}&section=${ctx.value.section.id}` });
+}
+
+function fullscreen() {
+  // #ifdef H5
+  const el = (labBox.value?.$el || labBox.value) as HTMLElement | null;
+  el?.requestFullscreen?.();
+  // #endif
 }
 
 function openLink(url: string) {
@@ -105,15 +203,9 @@ function download(url: string, name: string) {
 
 const size = (n: number) => (n > 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
-function back() {
-  const pages = getCurrentPages();
-  if (pages.length > 1) uni.navigateBack();
-  else if (a.value) uni.reLaunch({ url: `/pages/course/course?id=${a.value.course_id}` });
-  else uni.reLaunch({ url: "/pages/courses/courses" });
-}
-
 onLoad((q: any) => {
   id.value = Number(q?.id || 0);
+  courseId.value = Number(q?.course || 0);
 });
 onShow(() => {
   if (!token.value) return uni.reLaunch({ url: "/pages/login/login" });
@@ -123,26 +215,40 @@ watch(locale, load);
 </script>
 
 <style scoped>
-.page { min-height: 100vh; background: var(--wq-bg); }
-.wrap { max-width: 820px; margin: 0 auto; padding: 16px 16px 48px; }
-.back { color: var(--wq-link); font-size: 14px; cursor: pointer; margin-bottom: 8px; display: inline-block; }
-.card { background: #fff; border: 1px solid var(--wq-line); border-radius: 12px; padding: 24px 20px; }
-.kind { font-size: 12px; letter-spacing: 1px; color: var(--wq-muted); text-transform: uppercase; }
-.h1 { display: block; font-size: 24px; font-weight: 700; color: var(--wq-ink); margin: 6px 0 18px; line-height: 1.35; }
+.viewer { max-width: 900px; }
+.viewer.wide { max-width: none; }
+.head { display: flex; align-items: center; gap: 10px; }
+.kind { font-size: 12px; letter-spacing: 1px; color: var(--wq-muted); }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; }
+.tag.teacher { background: #fff3d6; color: #7a5a00; }
+.h1 { display: block; font-size: 26px; font-weight: 700; color: var(--wq-ink); margin: 4px 0 18px; line-height: 1.35; }
+.paper { background: #fff; border: 1px solid var(--wq-line); border-radius: 6px; padding: 24px 26px; }
+.paper.center { text-align: center; }
 .muted { color: var(--wq-muted); }
 .block { display: block; margin-bottom: 16px; }
 .state { display: flex; align-items: center; gap: 12px; }
 .error { color: var(--wq-danger); }
 .btn { padding: 6px 14px; border-radius: 8px; background: var(--wq-ink); color: #fff; font-size: 14px; cursor: pointer; flex-shrink: 0; }
-.primary {
-  display: inline-block; margin-top: 16px; background: var(--wq-accent); color: var(--wq-ink); font-weight: 600;
-  padding: 10px 20px; border-radius: 8px; cursor: pointer;
-}
-.small { display: block; font-size: 12px; color: var(--wq-muted); margin-top: 8px; word-break: break-all; }
+.ghost { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--wq-line); background: #fff; color: var(--wq-ink); font-size: 14px; cursor: pointer; }
+.primary { display: inline-block; margin-top: 16px; background: var(--wq-accent); color: var(--wq-ink); font-weight: 600; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.small { display: block; font-size: 12px; color: var(--wq-muted); word-break: break-all; }
 .due { display: flex; gap: 12px; align-items: baseline; padding: 10px 14px; background: #fff8e0; border-radius: 8px; margin-bottom: 16px; }
 .due-label { font-size: 13px; color: #7a5a00; }
 .due-value { font-size: 15px; color: var(--wq-ink); font-weight: 600; }
 .file { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--wq-line); }
+.file:last-child { border-bottom: 0; }
+.f-icon { width: 28px; text-align: center; color: var(--wq-muted); }
 .file-name { flex: 1; color: var(--wq-ink); word-break: break-all; }
 .file-size { font-size: 12px; color: var(--wq-muted); }
+.player { background: #000; border-radius: 6px; overflow: hidden; }
+.video { width: 100%; aspect-ratio: 16 / 9; display: block; }
+.img { max-width: 100%; }
+.lab-box { border: 1px solid var(--wq-line); border-radius: 6px; overflow: hidden; background: #fff; height: calc(100vh - 210px); min-height: 560px; }
+.lab-box:fullscreen { border-radius: 0; height: 100vh; }
+.lab { width: 100%; height: 100%; border: 0; display: block; }
+.lab-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; }
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--wq-line); }
+.pg { color: var(--wq-link); cursor: pointer; max-width: 48%; }
+.pg.right { margin-left: auto; text-align: right; }
+@media (max-width: 860px) { .paper { padding: 18px 16px; } .lab-box { height: 75vh; min-height: 480px; } }
 </style>

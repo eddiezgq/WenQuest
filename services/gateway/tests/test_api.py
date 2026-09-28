@@ -45,6 +45,8 @@ def fake_moodle(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json={"error": "Invalid login", "errorcode": "invalidlogin"})
     if url.path.startswith("/webservice/pluginfile.php/"):
         assert parse_qs(url.query)["token"] == ["mtok"]
+        if url.path.endswith(".mp4"):
+            return httpx.Response(200, content=b"0123456789", headers={"content-type": "video/mp4"})
         if url.path.endswith(".html"):
             return httpx.Response(200, content=b"<script>steal()</script>", headers={
                 "content-type": "text/html", "content-disposition": 'inline; filename="x.html"'})
@@ -70,6 +72,11 @@ def fake_moodle(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json={"pages": [{"id": 1, "intro": "", "content":
             ML('<p>内容<img src="' + BASE + '/webservice/pluginfile.php/4/mod_page/content/1/x.png"></p>',
                '<p onclick="evil()">Body</p>')}]})
+    if fn == "core_course_get_courses_by_field":
+        return httpx.Response(200, json={"courses": [{**COURSES[0], "contacts": [{"fullname": "王老师"}],
+                                                       "startdate": 100, "enddate": 0}]})
+    if fn == "core_course_get_user_administration_options":
+        return httpx.Response(200, json={"courses": [{"id": 2, "options": [{"name": "update", "available": False}]}]})
     if fn == "mod_page_view_page":
         return httpx.Response(200, json={"status": True})
     return httpx.Response(200, json={"exception": "x", "errorcode": "invalidrecord", "message": fn})
@@ -128,10 +135,11 @@ def test_outline(client):
     assert len(secs) == 1  # empty general section dropped
     mods = secs[0]["modules"]
     assert secs[0]["name"] == "Chapter 1"
-    assert mods[0] == {"id": 5, "type": "page", "name": "Page", "locked": False, "completed": True,
-                       "has_completion": True}
+    assert mods[0] == {"id": 5, "type": "page", "name": "Page", "locked": False, "hidden": False,
+                       "completed": True, "has_completion": True}
     assert mods[1]["type"] == "label" and "script" not in mods[1]["html"]
     assert mods[2]["locked"] is True
+    assert mods[2]["file"] == {"name": "a.pdf", "size": 3, "mimetype": "application/pdf", "kind": "pdf"}
 
 
 def test_page_is_sanitized_and_files_proxied(client):
@@ -211,4 +219,53 @@ def test_proxied_html_cannot_run_on_app_domain(client):
     assert r.headers["x-content-type-options"] == "nosniff"
     img = main.state.codec.fernet.encrypt(json.dumps(
         {"u": f"{BASE}/webservice/pluginfile.php/4/mod_page/content/1/x.png", "t": "mtok"}).encode()).decode()
-    assert "content-disposition" not in client.get(f"/api/v1/files/{img}").headers
+    assert client.get(f"/api/v1/files/{img}").headers["content-disposition"].startswith("inline;")
+
+
+def sign(url):
+    return main.state.codec.fernet.encrypt(json.dumps({"u": url, "t": "mtok"}).encode()).decode()
+
+
+def test_course_info_and_role(client):
+    h = login(client)
+    c = client.get("/api/v1/courses/2", headers=h).json()
+    assert c["name"] == "机器人学导论" and c["teachers"] == ["王老师"] and c["role"] == "student"
+    assert c["image"].startswith("/api/v1/files/") and c["classic_url"].endswith("/course/view.php?id=2")
+
+
+def test_video_supports_byte_ranges(client):
+    tok = sign(f"{BASE}/webservice/pluginfile.php/9/mod_resource/content/0/v.mp4")
+    r = client.get(f"/api/v1/files/{tok}", headers={"Range": "bytes=2-5"})
+    assert r.status_code == 206 and r.content == b"2345" and r.headers["content-range"] == "bytes 2-5/10"
+    assert client.get(f"/api/v1/files/{tok}", headers={"Range": "bytes=-3"}).content == b"789"
+    full = client.get(f"/api/v1/files/{tok}")
+    assert full.status_code == 200 and full.headers["accept-ranges"] == "bytes"
+
+
+def test_lab_runs_in_its_own_origin(client):
+    tok = sign(f"{BASE}/webservice/pluginfile.php/9/mod_resource/content/0/lab.html")
+    r = client.get(f"/api/v1/labs/{tok}")
+    csp = r.headers["content-security-policy"]
+    assert r.status_code == 200 and "allow-scripts" in csp and "allow-same-origin" not in csp
+    # The ordinary file proxy never runs HTML.
+    assert "sandbox" in client.get(f"/api/v1/files/{tok}").headers["content-security-policy"]
+    png = sign(f"{BASE}/webservice/pluginfile.php/9/mod_resource/content/0/a.png")
+    assert client.get(f"/api/v1/labs/{png}").status_code == 415
+
+
+def test_file_kinds():
+    from app.content import file_kind
+    assert [file_kind(n) for n in ["a.MP4", "b.pptx", "c.html", "d.docx", "e.xlsx", "f.pdf", "g.zip"]] == \
+        ["video", "slides", "lab", "doc", "sheet", "pdf", "file"]
+    assert file_kind("noext", "video/mp4") == "video"
+
+
+def test_chinese_file_names_are_served(client):
+    tok = sign(f"{BASE}/webservice/pluginfile.php/9/mod_resource/content/0/%E8%AE%B2%E4%B9%89.png")
+    r = client.get(f"/api/v1/files/{tok}")
+    assert r.status_code == 200
+    cd = r.headers["content-disposition"]
+    assert cd.startswith("inline;") and "filename*=UTF-8''%E8%AE%B2%E4%B9%89.png" in cd and 'filename="file.png"' in cd
+    doc = sign(f"{BASE}/webservice/pluginfile.php/9/mod_resource/content/0/a.html")
+    assert client.get(f"/api/v1/files/{doc}").headers["content-disposition"] == \
+        'attachment; filename="a.html"; filename*=UTF-8\'\'a.html'

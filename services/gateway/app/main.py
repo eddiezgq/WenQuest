@@ -5,6 +5,7 @@ import json
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
+from urllib.parse import quote, unquote, urlsplit
 from typing import Annotated, Any
 
 import httpx
@@ -23,7 +24,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.4.0"
+VERSION = "0.5.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -165,9 +166,8 @@ def register(app: FastAPI) -> None:
         for c in rows:
             if not c.get("visible", 1):
                 continue
-            image = c.get("courseimage") or next(
-                (f.get("fileurl") for f in c.get("overviewfiles") or [] if f.get("fileurl")), None)
-            image = proxied(image, sess.moodle_token)  # data: placeholders -> None; frontend draws its own
+            # Only a picture the teacher uploaded; Moodle's generated pattern is replaced by our own art.
+            image = proxied(_course_image(c), sess.moodle_token)
             out.append({
                 "id": c["id"],
                 "shortname": c.get("shortname", ""),
@@ -179,6 +179,30 @@ def register(app: FastAPI) -> None:
             })
         out.sort(key=lambda c: -(c["lastaccess"] or 0))
         return {"courses": out}
+
+    @app.get("/api/v1/courses/{courseid}")
+    async def course_info(courseid: int, sess: Annotated[Session, Depends(current)], lang: str | None = None):
+        lg = lang_of(lang, sess)
+        tok = sess.moodle_token
+        c = await state.moodle.course(tok, courseid, lg)
+        if not c:
+            raise EngineError("not_found", "course", 404)
+        try:
+            teacher = await state.moodle.can_edit_course(tok, courseid)
+        except EngineError:
+            teacher = False
+        return {
+            "id": courseid,
+            "shortname": c.get("shortname", ""),
+            "name": plain(c.get("fullname"), lg),
+            "summary": content.clean(resolve(c.get("summary"), lg), state.settings.moodle_url, sign_file(tok)),
+            "image": proxied(_course_image(c), tok),
+            "teachers": [plain(t.get("fullname"), lg) for t in c.get("contacts") or []],
+            "start": c.get("startdate") or None,
+            "end": c.get("enddate") or None,
+            "role": "teacher" if teacher else "student",
+            "classic_url": f"{state.settings.moodle_url.rstrip('/')}/course/view.php?id={courseid}",
+        }
 
     @app.get("/api/v1/courses/{courseid}/outline")
     async def outline(courseid: int, sess: Annotated[Session, Depends(current)], lang: str | None = None):
@@ -195,14 +219,23 @@ def register(app: FastAPI) -> None:
                                  "html": content.clean(resolve(m.get("description"), lg),
                                                        state.settings.moodle_url, sign_file(sess.moodle_token))})
                     continue
-                mods.append({
+                item = {
                     "id": m["id"],
                     "type": m.get("modname"),
                     "name": plain(m.get("name"), lg),
                     "locked": not m.get("uservisible", True),
+                    # Hidden from students; only teachers receive these modules at all.
+                    "hidden": not m.get("visible", 1),
                     "completed": (m.get("completiondata") or {}).get("state") in (1, 2),
                     "has_completion": bool(m.get("completion")),
-                })
+                }
+                if m.get("modname") == "resource":
+                    f = next((x for x in m.get("contents") or [] if x.get("type") == "file"), None)
+                    if f:
+                        item["file"] = {"name": f.get("filename"), "size": f.get("filesize"),
+                                        "mimetype": f.get("mimetype"),
+                                        "kind": content.file_kind(f.get("filename"), f.get("mimetype"))}
+                mods.append(item)
             name = plain(sec.get("name"), lg)
             if sec.get("section") == 0 and not mods:
                 continue
@@ -211,6 +244,7 @@ def register(app: FastAPI) -> None:
                 "number": sec.get("section"),
                 "name": name,
                 "summary": plain(sec.get("summary"), lg),
+                "visible": bool(sec.get("visible", 1)),
                 "modules": mods,
             })
         return {"course_id": courseid, "sections": out}
@@ -253,9 +287,15 @@ def register(app: FastAPI) -> None:
             files = []
             for f in (mod or {}).get("contents", []):
                 if f.get("type") == "file" and f.get("fileurl"):
-                    files.append({"name": f.get("filename"), "size": f.get("filesize"),
-                                  "mimetype": f.get("mimetype"), "url": sign(f["fileurl"])})
+                    kind = content.file_kind(f.get("filename"), f.get("mimetype"))
+                    item = {"name": f.get("filename"), "size": f.get("filesize"),
+                            "mimetype": f.get("mimetype"), "kind": kind, "url": sign(f["fileurl"])}
+                    if kind == "lab":
+                        item["lab_url"] = item["url"].replace("/api/v1/files/", "/api/v1/labs/", 1)
+                    files.append(item)
             base["files"] = files
+            base["kind"] = files[0]["kind"] if files else "file"
+            base["hidden"] = not (mod or {}).get("visible", 1)
         # Anything the new UI does not render yet opens in Moodle's classic view.
         base["classic_url"] = f"{state.settings.moodle_url.rstrip('/')}/mod/{kind}/view.php?id={cmid}"
         return base
@@ -400,14 +440,24 @@ def register(app: FastAPI) -> None:
         return {"available": state.ai.available, "provider": state.ai.provider,
                 "can_create_courses": await can_create(sess.moodle_token)}
 
+    @app.get("/api/v1/labs/{signed}")
+    async def labs(signed: str):
+        """Run a teacher's HTML lab. The page gets its own opaque origin (CSP sandbox without
+        allow-same-origin), so its scripts can run but cannot reach WenQuest cookies, storage or APIs."""
+        r = await state.moodle.fetch_file(*_unsign(signed))
+        if not r.headers.get("content-type", "").lower().startswith("text/html"):
+            raise EngineError("not_a_lab", "not an HTML file", 415)
+        return Response(r.content, media_type="text/html; charset=utf-8", headers={
+            "Cache-Control": "private, max-age=3600",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "sandbox allow-scripts allow-popups allow-forms allow-modals allow-downloads; "
+                                       "frame-ancestors 'self'",
+        })
+
     @app.get("/api/v1/files/{signed}")
-    async def files(signed: str):
-        try:
-            raw = state.codec.fernet.decrypt(signed.encode(), ttl=FILE_TTL)
-        except (InvalidToken, ValueError):
-            raise EngineError("link_expired", "file link expired", 410)
-        d = json.loads(raw)
-        r = await state.moodle.fetch_file(d["t"], d["u"])
+    async def files(signed: str, range: Annotated[str | None, Header()] = None):
+        mtoken, url = _unsign(signed)
+        r = await state.moodle.fetch_file(mtoken, url)
         ctype = r.headers.get("content-type", "application/octet-stream")
         headers = {
             "Cache-Control": "private, max-age=3600",
@@ -418,12 +468,61 @@ def register(app: FastAPI) -> None:
         }
         base_type = ctype.split(";")[0].strip().lower()
         inline = base_type.startswith(("image/", "video/", "audio/")) or base_type in ("application/pdf", "text/plain")
-        if not inline:
-            name = r.headers.get("content-disposition", "")
-            headers["Content-Disposition"] = name.replace("inline", "attachment") if "filename" in name else "attachment"
-        elif cd := r.headers.get("content-disposition"):
-            headers["Content-Disposition"] = cd
-        return Response(r.content, media_type=ctype, headers=headers)
+        headers["Content-Disposition"] = _disposition("inline" if inline else "attachment", _file_name(url))
+        headers["Accept-Ranges"] = "bytes"
+        body, total = r.content, len(r.content)
+        if range and (span := _byte_range(range, total)):
+            start, end = span
+            headers["Content-Range"] = f"bytes {start}-{end}/{total}"
+            return Response(body[start:end + 1], status_code=206, media_type=ctype, headers=headers)
+        return Response(body, media_type=ctype, headers=headers)
+
+
+def _unsign(signed: str) -> tuple[str, str]:
+    """(moodle token, file url) from a signed file link."""
+    try:
+        raw = state.codec.fernet.decrypt(signed.encode(), ttl=FILE_TTL)
+    except (InvalidToken, ValueError):
+        raise EngineError("link_expired", "file link expired", 410)
+    d = json.loads(raw)
+    return d["t"], d["u"]
+
+
+def _course_image(c: dict) -> str | None:
+    uploaded = next((f.get("fileurl") for f in c.get("overviewfiles") or [] if f.get("fileurl")), None)
+    if uploaded:
+        return uploaded
+    img = c.get("courseimage") or ""
+    return img if "/pluginfile.php/" in img and "/course/generated" not in img else None
+
+
+def _file_name(url: str) -> str:
+    """The file name at the end of a Moodle file URL (percent-decoded, query removed)."""
+    return unquote(urlsplit(url).path.rsplit("/", 1)[-1]) or "file"
+
+
+def _disposition(kind: str, name: str) -> str:
+    """Content-Disposition that survives non-ASCII names (headers must be Latin-1; RFC 6266 filename*)."""
+    stem, dot, ext = name.rpartition(".")
+    ascii_name = name if name.isascii() else (f"file.{ext}" if dot and ext.isascii() else "file")
+    ascii_name = ascii_name.replace('"', "").replace("\\", "")
+    return f"{kind}; filename=\"{ascii_name}\"; filename*=UTF-8''{quote(name, safe='')}"
+
+
+def _byte_range(header: str, total: int) -> tuple[int, int] | None:
+    """Parse a single 'bytes=a-b' range (what browsers send when seeking in a video)."""
+    if not header.startswith("bytes=") or "," in header or total == 0:
+        return None
+    a, _, b = header[6:].strip().partition("-")
+    try:
+        if a == "":
+            n = int(b)
+            return (max(0, total - n), total - 1) if n > 0 else None
+        start = int(a)
+        end = min(int(b), total - 1) if b else total - 1
+    except ValueError:
+        return None
+    return (start, end) if 0 <= start <= end else None
 
 
 def _user(info: dict, lang: str, creator: bool = False) -> UserOut:

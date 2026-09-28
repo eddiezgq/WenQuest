@@ -32,6 +32,7 @@
 | 接口网关（FastAPI） | `services/gateway/` | `pip install -r requirements-dev.txt && python -m pytest -q` |
 | Moodle 插件 | `plugins/` | — |
 | 部署 | `.github/workflows/deploy.yml`、`deploy/` | 推送 main 自动部署 |
+| 本地完整环境（Moodle + 网关 + 网页端） | `tools/local/setup.sh`，说明见 `docs/帮助/本地测试环境.md` | 推送前用老师和学生账号实际走一遍 |
 
 线上：学习平台 https://learn.wenquestrobotics.com ，经典界面 classic. 子域名，官网主域名。
 

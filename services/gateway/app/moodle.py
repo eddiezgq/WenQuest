@@ -175,6 +175,19 @@ class MoodleClient:
         courses = data.get("courses") or []
         return courses[0]["assignments"] if courses else []
 
+    async def course(self, token: str, courseid: int, lang: str | None = None) -> dict | None:
+        data = await self.call(token, "core_course_get_courses_by_field", lang, field="id", value=courseid)
+        courses = data.get("courses") or []
+        return courses[0] if courses else None
+
+    async def can_edit_course(self, token: str, courseid: int) -> bool:
+        """Teachers (who may update the course) see teacher-only material and editing tools."""
+        data = await self.call(token, "core_course_get_user_administration_options", None, courseids=[courseid])
+        for c in data.get("courses") or []:
+            if int(c.get("id", 0)) == courseid:
+                return any(o.get("name") == "update" and o.get("available") for o in c.get("options") or [])
+        return False
+
     async def view_page(self, token: str, pageid: int) -> None:
         """Record the view so completion and logs work as in Moodle's own UI."""
         await self.call(token, "mod_page_view_page", None, pageid=pageid)

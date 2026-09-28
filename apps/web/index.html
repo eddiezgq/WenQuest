@@ -6,6 +6,16 @@
     <meta name="theme-color" content="#14212b" />
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
     <title>问渠 WenQuest</title>
+    <script>
+      // Formulas in lessons: \( … \), \[ … \] and $$ … $$ (see components/MathContent.vue).
+      window.MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"], ["$$", "$$"]] },
+        options: { skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"] },
+        startup: { ready() { MathJax.startup.defaultReady(); window.dispatchEvent(new Event("wq-mathjax-ready")); } },
+      };
+    </script>
+    <!-- MathJax 3.2.2 is bundled (static/mathjax) so formulas work where overseas CDNs are slow or blocked. -->
+    <script async src="/static/h5/mathjax/tex-chtml.js"></script>
     <!--preload-links-->
     <!--app-context-->
   </head>

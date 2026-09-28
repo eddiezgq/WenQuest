@@ -3,6 +3,7 @@
     { "path": "pages/login/login", "style": { "navigationBarTitleText": "问渠", "h5": { "titleNView": false } } },
     { "path": "pages/courses/courses", "style": { "navigationBarTitleText": "我的课程", "h5": { "titleNView": false } } },
     { "path": "pages/course/course", "style": { "navigationBarTitleText": "课程", "h5": { "titleNView": false } } },
+    { "path": "pages/unit/unit", "style": { "navigationBarTitleText": "单元", "h5": { "titleNView": false } } },
     { "path": "pages/activity/activity", "style": { "navigationBarTitleText": "学习", "h5": { "titleNView": false } } },
     { "path": "pages/create/create", "style": { "navigationBarTitleText": "AI 建课", "h5": { "titleNView": false } } }
   ],
