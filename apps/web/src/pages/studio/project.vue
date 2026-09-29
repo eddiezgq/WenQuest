@@ -217,6 +217,23 @@
                         <text v-if="l.review.summary" class="rv-s">{{ l.review.summary }}</text>
                         <text v-for="(i, ii) in l.review.issues" :key="ii" class="rv-i">· {{ i.text }}</text>
                       </view>
+                      <view v-if="l.files?.length" class="deliv">
+                        <text class="h4">{{ t("studio.deliverables") }}</text>
+                        <view class="dv-list">
+                          <view v-for="f in l.files" :key="f.name" class="dv" @click="download(f.url)">
+                            <text class="dv-k">{{ t("studio.kind." + f.kind) }}</text>
+                            <text class="dv-n">{{ f.name }}</text>
+                            <text v-if="f.teacher_only" class="dv-t">{{ t("studio.teacherOnly") }}</text>
+                            <text class="dv-d">↓</text>
+                          </view>
+                        </view>
+                        <view v-if="l.files.some((f) => f.kind === 'slides')" class="ghost small" @click="previewDeck(l.id)">
+                          {{ deckFor === l.id && deckMsg ? deckMsg : t("studio.previewDeck") }}
+                        </view>
+                        <scroll-view v-if="deckFor === l.id && deckImgs.length" scroll-x class="dv-deck">
+                          <image v-for="(s, si) in deckImgs" :key="si" :src="s" mode="widthFix" class="dv-img" />
+                        </scroll-view>
+                      </view>
                       <view class="lesson-html"><MathContent :html="disp(l.content)" /></view>
                       <view v-if="disp(l.exercises)" class="sub">
                         <text class="h4">{{ t("studio.exercises") }}</text>
@@ -279,7 +296,7 @@ import { onHide, onLoad, onShow, onUnload } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import {
-  api, ApiError, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
+  absolute, api, ApiError, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
 } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
@@ -458,6 +475,33 @@ async function saveOutline() {
 }
 
 // --- lessons -------------------------------------------------------------------------------------
+const deckFor = ref("");
+const deckImgs = ref<string[]>([]);
+const deckMsg = ref("");
+
+function download(link: string) {
+  const url = absolute(link);
+  // #ifdef H5
+  window.open(url, "_blank", "noopener");
+  // #endif
+  // #ifndef H5
+  uni.downloadFile({ url, success: (r) => uni.openDocument({ filePath: r.tempFilePath, showMenu: true }) });
+  // #endif
+}
+
+async function previewDeck(lid: string) {
+  deckFor.value = lid;
+  deckImgs.value = [];
+  for (let n = 0; n < 120 && deckFor.value === lid; n++) {
+    try {
+      const d = await api.studioDeck(p.value!.id, lid);
+      if (d.status === "ready") { deckImgs.value = (d.slides || []).map((x) => absolute(x.image)); deckMsg.value = ""; return; }
+      if (d.status === "unavailable" || d.status === "failed") { deckMsg.value = t("studio.deckUnavailable"); return; }
+      deckMsg.value = t("studio.deckConverting") + (d.total ? ` ${d.done || 0}/${d.total}` : "");
+    } catch (e: any) { deckMsg.value = e?.message || String(e); return; }
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+}
 function rewrite(lid: string) {
   const note = (notes[lid] || "").trim();
   notes[lid] = "";
@@ -672,6 +716,16 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .review.revise { background: #fff3d6; color: #7a5a00; }
 .rv-h { display: block; font-weight: 600; }
 .rv-s, .rv-i { display: block; line-height: 1.6; }
+.deliv { margin: 8px 0 12px; }
+.dv-list { display: flex; flex-direction: column; gap: 6px; margin: 6px 0 8px; }
+.dv { display: flex; align-items: center; gap: 10px; border: 1px solid #e3e8e6; border-radius: 6px; padding: 8px 12px; cursor: pointer; background: #fff; }
+.dv:hover { border-color: #1e2761; }
+.dv-k { font-size: 12px; color: #fff; background: #1e2761; border-radius: 4px; padding: 1px 8px; flex-shrink: 0; }
+.dv-n { flex: 1; font-size: 13px; word-break: break-all; }
+.dv-t { font-size: 11px; color: #a15c00; background: #fff4de; border-radius: 4px; padding: 1px 6px; }
+.dv-d { color: #1e2761; font-weight: 700; }
+.dv-deck { white-space: nowrap; margin-top: 8px; }
+.dv-img { display: inline-block; width: 320px; margin-right: 8px; border: 1px solid #e3e8e6; border-radius: 4px; }
 .lesson-html { max-height: 520px; overflow: auto; border: 1px solid #f0f2f1; border-radius: 6px; padding: 4px 12px; }
 .sub { margin-top: 8px; }
 .sub.teacher { background: #fffbea; border-radius: 6px; padding: 2px 10px; }

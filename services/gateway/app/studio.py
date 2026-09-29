@@ -29,6 +29,7 @@ from zoneinfo import ZoneInfo
 from . import course_builder as cb
 from . import materials as mt
 from . import team
+from .production import spec as sp
 from .ai import ModelGateway
 from .moodle import EngineError
 
@@ -359,7 +360,8 @@ class Studio:
         note = await self.apply_answers(proj, items)
         if note:
             self.say(proj, note, "system")
-        keys = lang_keys(proj["requirements"].get("language", "zh"))
+        # Courseware is Chinese–English by standard (课件中英对照) unless the teacher chose one language.
+        keys = lang_keys(proj["requirements"].get("language", "both"))
         toc = proj["materials"]["toc"]
         toc_text = "\n".join(f"Chapter {c['no']} {c['title']}\n" + "\n".join(f"  {s['no']} {s['title']}" for s in c["sections"])
                              for c in toc)
@@ -421,7 +423,7 @@ class Studio:
             for les in c.get("lessons") or []:
                 if not isinstance(les, dict):
                     continue
-                lessons.append({"id": new_id(), "title": T(les.get("title")), "goal": T(les.get("goal")),
+                lessons.append({"id": new_id(), "title": T(les.get("title")), "goal": T(les.get("goal")), "problem": T(les.get("problem")),
                                 "week": mt.as_int(les.get("week")) or 0,
                                 "sections": [str(s)[:10] for s in les.get("sections") or []][:6],
                                 "status": "planned", "content": {}, "exercises": {}, "answers": {},
@@ -497,55 +499,106 @@ class Studio:
                 f"Write in: {team.LANG_NAME.get(lang, 'Simplified Chinese')}\n"
                 f"Animations and labs available for this chapter: {', '.join(media) or 'none'}")
 
+    def lesson_no(self, proj: dict, chapter: dict, les: dict) -> str:
+        return f"{chapter['no']}.{chapter['lessons'].index(les) + 1}"
+
+    def lesson_dir(self, proj: dict, les: dict) -> Path:
+        return self.projects.root / proj["id"] / "lessons" / les["id"]
+
     async def write_lesson(self, proj: dict, lid: str, teacher_note: str = "") -> None:
+        """One lesson to the benchmark (D31): lecturer writes the lesson spec, the designer the lab guide and
+        lesson plan, assessment the practice set; the reviewer checks; then every deliverable is rendered."""
         chapter, les = self.find_lesson(proj, lid)
         items = self.items(proj)
         keys = lang_keys(proj["outline"]["languages"])
-        ctx = self.lesson_context(proj, chapter, les, items)
+        no = self.lesson_no(proj, chapter, les)
+        ctx = self.lesson_context(proj, chapter, les, items) + f"\nLesson number: {no}"
         src = self.sources(proj, chapter, les, items)
+        exemplar = json.dumps(sp.EXEMPLAR, ensure_ascii=False)
         les["status"], les["error"] = "writing", ""
         if teacher_note:
             les["notes"] = teacher_note
-        proj["busy"] = {"label": f"主讲教授正在写：{disp(les['title'])}", "since": now()}
+        proj["busy"] = {"label": f"主讲教授正在写：{no} {disp(les['title'])}", "since": now()}
         self.projects.save(proj)
-        notes = teacher_note
-        review = None
+        notes, review, spec, gp = teacher_note, None, None, None
         for attempt in range(2):
-            data = await self.ai.json(system=team.AUTHOR, prompt=team.lesson_prompt(ctx, src, notes),
-                                      schema=team.lesson_schema(keys), max_tokens=16000 if len(keys) == 2 else 9000,
-                                      fake=lambda: fake_lesson(les, src, keys))
-            content = cb.norm_text((data or {}).get("content") if isinstance(data, dict) else None, keys)
-            les["content"] = {k: self.clean(v) for k, v in content.items()}
-            if not any(les["content"].values()):
-                raise EngineError("ai_bad_output", "empty lesson", 502)
-            proj["busy"] = {"label": f"习题与测评正在出题：{disp(les['title'])}", "since": now()}
+            data = await self.ai.json(system=team.AUTHOR, prompt=team.lesson_prompt(ctx, src, notes, exemplar),
+                                      schema=sp.lesson_schema(), max_tokens=16000, fake=lambda: fake_spec(les, no))
+            spec = sp.normalize_lesson(data)
+            missing = sp.check_lesson(spec)
+            if not spec["title"][0] or len(missing) > 6:
+                raise EngineError("ai_bad_output", "the lesson spec is empty", 502)
+            proj["busy"] = {"label": f"课程设计师正在写实验指导书和教案：{no}", "since": now()}
             self.projects.save(proj)
-            ex = await self.ai.json(system=team.ASSESSOR, prompt=f"{ctx}\n\nLesson:\n{disp(les['content'])[:12000]}\n\nSources:\n{src[:12000]}",
+            g = await self.ai.json(system=team.GUIDE_PLAN, prompt=f"{ctx}\n\nLesson spec:\n{json.dumps(spec, ensure_ascii=False)[:20000]}",
+                                   schema=sp.guide_plan_schema(), max_tokens=8000, fake=lambda: fake_guide_plan())
+            gp = sp.normalize_guide_plan(g)
+            proj["busy"] = {"label": f"习题与测评正在出题：{no}", "since": now()}
+            self.projects.save(proj)
+            ex = await self.ai.json(system=team.ASSESSOR,
+                                    prompt=f"{ctx}\n\nLesson spec:\n{json.dumps(spec, ensure_ascii=False)[:14000]}",
                                     schema=team.exercises_schema(keys), max_tokens=6000, fake=lambda: fake_exercises(keys))
             les["exercises"] = {k: self.clean(v) for k, v in cb.norm_text((ex or {}).get("questions"), keys).items()}
             les["answers"] = {k: self.clean(v) for k, v in cb.norm_text((ex or {}).get("answers"), keys).items()}
             les["status"] = "reviewing"
-            proj["busy"] = {"label": f"审稿人正在核对：{disp(les['title'])}", "since": now()}
+            proj["busy"] = {"label": f"审稿人正在核对：{no}", "since": now()}
             self.projects.save(proj)
             rv = await self.ai.json(system=team.REVIEWER,
-                                    prompt=team.review_prompt(ctx, disp(les["content"])[:20000],
-                                                              disp(les["exercises"])[:4000] + "\n" + disp(les["answers"])[:4000], src),
+                                    prompt=team.review_prompt(ctx, json.dumps(spec, ensure_ascii=False)[:24000],
+                                                              disp(les["exercises"])[:4000] + "\n" + disp(les["answers"])[:4000], src[:16000], missing),
                                     schema=team.review_schema(), max_tokens=3000,
-                                    fake=lambda: {"verdict": "pass", "issues": [], "summary": "与原文一致。"})
+                                    fake=lambda: {"verdict": "pass", "issues": [], "summary": "五步齐全，数值与已知条件一致。"})
+            rv = rv if isinstance(rv, dict) else {}
             review = {"verdict": rv.get("verdict") if rv.get("verdict") in ("pass", "revise") else "pass",
                       "issues": [i for i in rv.get("issues") or [] if isinstance(i, dict) and i.get("text")][:10],
                       "summary": str(rv.get("summary") or "")[:800], "round": attempt + 1}
+            for m in missing:  # what the benchmark requires is never optional
+                review["issues"].append({"severity": "high", "text": m})
+                review["verdict"] = "revise"
             if review["verdict"] == "pass":
                 break
             notes = (teacher_note + "\n" if teacher_note else "") + "审稿人意见：\n" + "\n".join(f"- {i['text']}" for i in review["issues"])
             les["status"] = "writing"
-            proj["busy"] = {"label": f"主讲教授按审稿意见重写：{disp(les['title'])}", "since": now()}
+            proj["busy"] = {"label": f"主讲教授按审稿意见重写：{no}", "since": now()}
             self.projects.save(proj)
+        proj["busy"] = {"label": f"正在排版课件、指导书、报告模板和教案：{no}", "since": now()}
+        self.projects.save(proj)
+        await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no)
         les["review"] = review
         les["status"] = "awaiting"
         les["written"] = now()
         verdict = "审稿通过" if review and review["verdict"] == "pass" else "审稿人仍有意见，请重点看审稿意见"
-        self.say(proj, f"《{disp(les['title'])}》写好了（{verdict}），请在右边“课时进度”里审阅：通过就发布给学生，或者告诉我怎么改。", "lead", "lesson")
+        self.say(proj, f"《{no} {disp(les['title'])}》做好了（{verdict}）：讲义、课件、练习与答案、实验指导书、实验报告模板、教案。"
+                       "请在右边“课时进度”里审阅：通过就发布给学生，或者告诉我怎么改。", "lead", "lesson")
+
+    def render(self, proj: dict, chapter: dict, les: dict, spec: dict, gp: dict, no: str) -> None:
+        """Every deliverable of one lesson, in the benchmark layout."""
+        from .production import deck, docs, page
+        o = proj["outline"]
+        pair_of = lambda t: [t.get("zh") or t.get("en") or "", t.get("en") or t.get("zh") or ""]  # noqa: E731
+        course, chap = pair_of(o["title"]), pair_of(chapter["title"])
+        d = self.lesson_dir(proj, les)
+        d.mkdir(parents=True, exist_ok=True)
+        for old in d.iterdir():
+            if old.suffix in (".pptx", ".docx", ".json"):
+                old.unlink()
+        # The lesson number is added by the layout; drop one the author may have put in the title.
+        spec["title"] = [re.sub(r"^\s*\d+(\.\d+)*\s*", "", x) or x for x in spec["title"]]
+        (d / "spec.json").write_text(json.dumps({"lesson": spec, "guide_plan": gp}, ensure_ascii=False))
+        files = []
+        name = re.sub(r'[\\/:*?"<>|]', "-", f"{no} {spec['title'][0]}")[:80]
+        deck.build(spec, d / f"{name} 课件.pptx", no=no, course=course, chapter=chap)
+        files.append({"name": f"{name} 课件.pptx", "kind": "slides", "teacher_only": False})
+        docs.guide(spec, gp, d / f"实验{no} 实验指导书.docx", no)
+        files.append({"name": f"实验{no} 实验指导书.docx", "kind": "guide", "teacher_only": False})
+        docs.report(spec, gp, d / f"实验{no} 实验报告模板.docx", no)
+        files.append({"name": f"实验{no} 实验报告模板.docx", "kind": "report", "teacher_only": False})
+        docs.plan(spec, gp, d / f"{no} 教案.docx", no, course[0], chap[0], proj.get("owner_name", ""))
+        files.append({"name": f"{no} 教案.docx", "kind": "plan", "teacher_only": True})
+        les["files"] = files
+        les["spec_title"] = spec["title"]
+        keys = lang_keys(o["languages"])
+        les["content"] = {k: self.clean(page.build(spec, k)) for k in keys}
 
     # talking with the teacher ------------------------------------------------------------------
     async def chat(self, proj: dict, text: str) -> None:
@@ -824,7 +877,33 @@ def fake_outline(proj: dict, items: list[mt.Material], keys: list[str], text_of:
                      "lessons": [{"title": T(x["title"]), "goal": T(""), "week": 0, "sections": []} for x in c["lessons"]]}
                     for c in plan["sections"]]
         title = title or plan["title"]
+    if not chapters:  # no materials at all: build from what the teacher asked for (AI first)
+        want = proj["requirements"].get("notes") or proj.get("description") or ""
+        for n, (no, name) in enumerate(re.findall(r"第\s*(\d{1,2})\s*章\s*([^\s，,。；;（(]+)", want) or [("1", "")]):
+            no = int(no)
+            name = name or "课程导论"
+            topics = [f"{name}（{k}）" for k in ("一", "二", "三")]
+            chapters.append({"no": no, "title": T(f"第{no}章 {name}"), "summary": T(""),
+                             "lessons": [{"title": T(f"{no}.{i + 1} {x}"), "goal": T(f"掌握{x}"), "week": week + i, "sections": []}
+                                         for i, x in enumerate(topics)]})
+            week += len(topics)
+        m = re.match(r"\s*([^\s，,。（(第]+)", want)
+        title = title or (m.group(1) if m else "")
     return {"title": T(title or mt.course_title(items, text_of)), "summary": T(""), "chapters": chapters}
+
+
+def fake_spec(les: dict, no: str) -> dict:
+    """Offline lecturer: the benchmark-level demo lesson, renamed to this lesson."""
+    import copy
+    from .production.demo import LESSON_2_1
+    s = copy.deepcopy(LESSON_2_1)
+    s["title"] = [disp(les["title"], "zh") or s["title"][0], disp(les["title"], "en") or s["title"][1]]
+    return s
+
+
+def fake_guide_plan() -> dict:
+    from .production.demo import GUIDE_PLAN_2_1
+    return GUIDE_PLAN_2_1
 
 
 def fake_lesson(les: dict, src: str, keys: list[str]) -> dict:

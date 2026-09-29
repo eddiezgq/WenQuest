@@ -191,18 +191,37 @@ def chat_prompt(project_summary: str, history: list[dict], text: str) -> str:
 
 # --- 课程设计师 designer -----------------------------------------------------------------------
 
-DESIGNER = COMMON + (
-    " Role: 课程设计师 (course designer). Design the course outline and teaching calendar: chapters follow the "
-    "main textbook's contents (use its chapter titles), each lesson is one class session with one clear goal, "
-    "and every lesson names the textbook sections it teaches. Fit the teacher's weeks and sessions; leave "
-    "room for review and exams when the calendar asks for it. Chapter and lesson titles are real topic names "
-    "(e.g. '1.2 Units and Standards' or '1.2 单位与标准'), never numbers, formulas or answers."
+# The WenQuest course standard (D31): every lesson is built like 大学物理 Chapter 1, the benchmark.
+AI_FIRST = (
+    " Use your full expert knowledge to design the BEST lesson, as a master teacher would; do not merely "
+    "summarise the teacher's files. The teacher's materials (if any) tell you their textbook, order, notation "
+    "and favourite examples: follow those, fix their mistakes, fill their gaps. With no materials you still "
+    "build a complete lesson."
+)
+STANDARD = (
+    "WenQuest course standard (the benchmark is 大学物理 Chapter 1): each lesson runs "
+    "real problem (a concrete ROBOTICS problem with real numbers that the lesson's model can solve, plus one "
+    "everyday-life example) → concept → animation (3Blue1Brown style; you write its question and a storyboard "
+    "of 5-8 beats, each beat one bilingual caption) → virtual lab (an interactive web lab with one robot scene and "
+    "one everyday scene, adjustable parameters and 3 auto-checked tasks) → modelling in five steps: problem, "
+    "model (assumptions), solution (numbers), check with the lab, where the model fails and how to improve it. "
+    "All student-facing text is Chinese–English (课件中英对照): every text is a pair [中文, English], each "
+    "written natively. Numbers, units and formulas must be correct; the answer to the robot problem must "
+    "follow from the given data."
+)
+
+DESIGNER = COMMON + AI_FIRST + (
+    " Role: 课程设计师 (course designer). Design the course outline and teaching calendar: chapters in a sound "
+    "teaching order (follow the main textbook's contents when there is one), each lesson one class session with "
+    "one clear goal and its own ROBOTICS problem, and every lesson names the textbook sections it teaches (if "
+    "any). Fit the teacher's weeks and sessions; leave room for review and exams when the calendar asks for it. "
+    "Chapter and lesson titles are real topic names, never numbers, formulas or answers. " + STANDARD
 )
 
 
 def outline_schema(lang_keys: list[str]) -> dict:
     t = _obj({k: STR for k in lang_keys})
-    lesson = _obj({"title": t, "goal": t, "week": INT, "sections": STRS}, ["title", "goal", "week", "sections"])
+    lesson = _obj({"title": t, "goal": t, "problem": t, "week": INT, "sections": STRS}, ["title", "goal", "problem", "week", "sections"])
     chapter = _obj({"no": INT, "title": t, "summary": t, "lessons": {"type": "array", "items": lesson}},
                    ["no", "title", "summary", "lessons"])
     return _obj({"title": t, "summary": t, "chapters": {"type": "array", "items": chapter}, "calendar_note": STR},
@@ -211,10 +230,11 @@ def outline_schema(lang_keys: list[str]) -> dict:
 
 def outline_prompt(project_summary: str, toc_text: str, extra: str, feedback: str = "") -> str:
     parts = [
-        "Design the outline. `sections` lists the textbook section numbers each lesson teaches (e.g. ['1.2','1.3']). "
-        "`week` is the teaching week of the lesson. Keep 2-6 lessons per chapter.",
+        "Design the outline. `problem` is the lesson's robotics problem in a few words (e.g. 'AGV emergency stop: "
+        "will the cargo slide?'). `sections` lists textbook section numbers the lesson teaches (e.g. ['1.2','1.3'], "
+        "empty if there is no textbook). `week` is the teaching week. Keep 2-6 lessons per chapter.",
         project_summary,
-        "Main textbook contents:\n" + (toc_text or "(no single textbook; use the chapter materials below)"),
+        "Main textbook contents:\n" + (toc_text or "(no single textbook: design the chapters yourself, using the materials below as hints)"),
     ]
     if extra:
         parts.append(extra)
@@ -223,44 +243,38 @@ def outline_prompt(project_summary: str, toc_text: str, extra: str, feedback: st
     return "\n\n".join(parts)
 
 
-# --- 主讲教授 author, 习题与测评 assessor, 审稿人 reviewer ------------------------------------------
+# --- 主讲教授 author, 课程设计师 guide & plan, 习题与测评 assessor, 审稿人 reviewer --------------------
 
-STANDARD = (
-    "Course standard for every science/engineering lesson (WenQuest): "
-    "1) a real problem to open with — mainly from robotics, plus one everyday-life example; "
-    "2) the concepts, built from intuition to formalism, with worked examples; "
-    "3) an animation moment (describe what the animation shows, in 3Blue1Brown style; if the course has an "
-    "animation video for this topic, point to it by name); "
-    "4) a virtual-lab moment (what to try in the chapter's virtual lab, if there is one); "
-    "5) modelling and solving the opening problem, and where the model fails; "
-    "then a short summary and 2-3 check-your-understanding questions."
+AUTHOR = COMMON + AI_FIRST + (
+    " Role: 主讲教授 (lecturer). Write ONE lesson as a lesson spec (JSON), to the level of the benchmark example "
+    "you are given. The notes are the lecture text students read: 3-6 sections of real teaching (intuition, "
+    "definitions, derivations, a worked example), HTML using p, ul, ol, li, strong, em, table, formulas as LaTeX in "
+    "\\( \\) or \\[ \\]. When you use the teacher's sources, keep their notation and cite them inline like "
+    "（参考：文件名 第12页）; never cite pages you were not given. " + STANDARD
 )
 
-AUTHOR = COMMON + (
-    " Role: 主讲教授 (lecturer). Write one lesson for students. Teach FROM the given source pages: keep their "
-    "notation, definitions and numbers; explain and reorganise rather than invent. After each paragraph, "
-    "example or formula taken from a source, cite it inline like （参考：University Physics Vol 1，第12页） or "
-    "(Source: University Physics Vol 1, p. 12). Only cite pages you were given. " + STANDARD
-)
 
-HTML_RULES = ("HTML using only h3, h4, p, ul, ol, li, strong, em, code, pre, blockquote, table, tr, th, td. "
-              "No h1/h2, no inline styles, no scripts, no images. Formulas as LaTeX between \\( \\) or \\[ \\].")
-
-
-def lesson_schema(lang_keys: list[str]) -> dict:
-    return _obj({"content": _obj({k: STR for k in lang_keys}), "summary": STR})
-
-
-def lesson_prompt(ctx: str, sources: str, notes: str) -> str:
-    return (f"{ctx}\n\nFormat: {HTML_RULES}\nLength: about 1200-2000 words (or 2000-3500 Chinese characters) per language.\n"
+def lesson_prompt(ctx: str, sources: str, notes: str, exemplar: str) -> str:
+    return (f"{ctx}\n\nThe benchmark lesson (1.1 of 大学物理 Chapter 1) — match its structure, depth and quality, "
+            f"but write about THIS lesson:\n{exemplar}\n"
             + (f"\nThe teacher / reviewer asked for these changes — follow them:\n{notes}\n" if notes else "")
-            + f"\nSources:\n{sources}")
+            + f"\nTeacher's materials for this lesson (hints, may be empty):\n{sources}")
 
+
+GUIDE_PLAN = COMMON + (
+    " Role: 课程设计师 (course designer). From the lesson spec, write (1) the lab guide for its virtual lab, in the "
+    "benchmark's layout: objectives, principles (formulas), the lab's parameters and ranges, numbered steps that "
+    "use the lab's robot scene and everyday scene, 1-2 data tables students fill in (headers and first column "
+    "given, measured cells empty), cautions, 2 thinking questions, and the robot problem as a 3-part question; "
+    "(2) the lesson plan (教案, Chinese): three objectives, key and difficult points, the class process in timed "
+    "phases (导入/新课/动画/实验/建模/小结, about 90 minutes), board layout and homework. Bilingual pairs are "
+    "[中文, English]."
+)
 
 ASSESSOR = COMMON + (
-    " Role: 习题与测评 (assessment). Write 4-6 practice questions for the lesson (mix of concept checks and "
-    "calculations, at least one about the opening robotics problem), in the style of the textbook's exercises, "
-    "and a separate answer key with worked solutions. Base them on the lesson and its sources only."
+    " Role: 习题与测评 (assessment). Write 4-6 practice questions for the lesson (concept checks and "
+    "calculations, at least one about the lesson's robotics problem with new numbers), and a separate answer key "
+    "with worked solutions. Chinese and English, as HTML (ol/li, p; formulas in \\( \\))."
 )
 
 
@@ -269,11 +283,13 @@ def exercises_schema(lang_keys: list[str]) -> dict:
 
 
 REVIEWER = COMMON + (
-    " Role: 审稿人 (reviewer), independent of the author. Check the lesson against the sources given: facts, "
-    "formulas, numbers and units must agree with the sources; every citation must point to a page that was "
-    "given and says that; nothing may be invented; the lesson must teach its stated goal and follow the "
-    "course standard. Verdict 'revise' only for real problems (wrong physics, wrong numbers, invented "
-    "citations, missing core content); list each problem concretely so the author can fix it."
+    " Role: 审稿人 (reviewer), independent of the author. Check the lesson spec against the WenQuest standard "
+    "and against physics: (1) all five steps present and consistent — the stated answer must follow from the "
+    "given data (recompute the numbers); (2) the robotics problem is realistic and solvable with this lesson's "
+    "model; (3) formulas, units and numbers correct; (4) Chinese and English say the same thing; (5) the "
+    "animation storyboard teaches the concept visually; (6) the lab tasks can be done and checked with the "
+    "stated parameters; (7) citations only point to pages given. Verdict 'revise' only for real problems; "
+    "list each concretely so the author can fix it. " + STANDARD
 )
 
 
@@ -283,6 +299,7 @@ def review_schema() -> dict:
                  "summary": STR})
 
 
-def review_prompt(ctx: str, lesson_html: str, exercises: str, sources: str) -> str:
-    return (f"{ctx}\n\nLesson to check:\n<<<\n{lesson_html}\n>>>\n\nPractice questions and answers:\n<<<\n{exercises}\n>>>\n"
-            f"\nSources the author was given:\n{sources}")
+def review_prompt(ctx: str, spec_json: str, exercises: str, sources: str, missing: list[str]) -> str:
+    return (f"{ctx}\n\nLesson spec to check:\n<<<\n{spec_json}\n>>>\n\nPractice questions and answers:\n<<<\n{exercises}\n>>>\n"
+            + (f"\nThe automatic check already found: {'; '.join(missing)}\n" if missing else "")
+            + f"\nTeacher's materials the author was given:\n{sources}")

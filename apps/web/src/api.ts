@@ -118,6 +118,7 @@ export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"
 export interface StudioLesson {
   id: string; title: Text; goal: Text; week: number; sections: string[]; status: LessonStatus;
   content: Text; exercises: Text; answers: Text; notes: string; error: string;
+  files?: { name: string; kind: "slides" | "guide" | "report" | "plan"; teacher_only: boolean; url: string }[];
   review: { verdict: "pass" | "revise"; issues: { severity: string; text: string }[]; summary: string; round: number } | null;
 }
 export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[] }
@@ -319,6 +320,9 @@ export const api = {
   studioOutline: (id: string, outline: StudioOutline) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/outline`, outline),
   studioApproveOutline: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-outline`, {}, 300000),
   studioNext: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/next`, {}),
+  studioDeck: (id: string, lid: string) =>
+    request<{ status: string; slides?: { image: string; thumb: string }[]; done?: number; total?: number }>(
+      "GET", `/api/v1/studio/projects/${id}/lessons/${lid}/deck`),
   studioWrite: (id: string, lid: string, note = "") =>
     request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/write`, { note }),
   studioPublish: (id: string, lid: string) =>

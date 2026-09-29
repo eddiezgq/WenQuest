@@ -111,17 +111,29 @@ def test_whole_flow_from_materials_to_a_published_lesson(client):
     p = settle(client, h, pid)
     les = p["outline"]["chapters"][0]["lessons"][0]
     assert les["status"] == "awaiting" and les["review"]["verdict"] == "pass"
-    assert "参考：" in les["content"]["zh"] and les["exercises"]["zh"] and les["answers"]["zh"]
+    assert "机器人问题" in les["content"]["zh"] and "虚拟实验" in les["content"]["zh"]
+    assert les["exercises"]["zh"] and les["answers"]["zh"]
+    kinds = {f["kind"]: f for f in les["files"]}
+    assert set(kinds) == {"slides", "guide", "report", "plan"} and kinds["plan"]["teacher_only"]
     assert p["progress"]["awaiting"] == 1
+    # the teacher can download each deliverable to check it
+    r = client.get(kinds["slides"]["url"])
+    assert r.status_code == 200 and r.content[:2] == b"PK"
+    assert client.get(kinds["plan"]["url"][:-4] + "abcd").status_code == 410
 
     # 5. the teacher approves: lesson, practice and a hidden answer key, plus the chapter's files
     p = client.post(f"/api/v1/studio/projects/{pid}/lessons/{les['id']}/approve", headers=h).json()
     les = p["outline"]["chapters"][0]["lessons"][0]
-    assert les["status"] == "published" and les["cmids"] == [101, 102, 103]
+    assert les["status"] == "published" and les["cmids"]
     sent = [c for f, c in CALLS if f == "local_wenquest_add_activities"][-1]
-    assert sent["section"] == "2" and sent["activities[0][type]"] == "page"
-    assert sent["activities[2][visible]"] == "0"  # answer key: teachers only
-    names = [v for k, v in sent.items() if k.endswith("[name]")]
+    assert sent["section"] == "2"
+    order = [(sent[f"activities[{i}][type]"], sent[f"activities[{i}][name]"], sent.get(f"activities[{i}][visible]", "1"))
+             for i in range(20) if f"activities[{i}][type]" in sent]
+    names = [n for _, n, _ in order]
+    # benchmark order: notes, slides, practice, lab guide, report template, then teacher-only answers and plan
+    assert order[0][0] == "page" and "课件" in order[1][1] and order[1][0] == "resource"
+    assert "练习" in order[2][1] and "实验指导书" in order[3][1] and "实验报告模板" in order[4][1]
+    assert "答案" in order[5][1] and order[5][2] == "0" and "教案" in order[6][1] and order[6][2] == "0"
     assert "第1章教案" in names and "讲义" in names
 
 

@@ -5,12 +5,14 @@ Creating the course and publishing a lesson happen only on the teacher's click, 
 teacher's own Moodle token.
 """
 
+import json
 import re
 import time
 from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import Depends, File, Form, UploadFile
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from . import course_builder as cb
@@ -113,7 +115,14 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
                        "sections": [{"no": s["no"], "title": s["title"], "start": s.get("start")} for s in c["sections"]]}
                       for c in proj["materials"].get("toc", [])]
         out["materials"] = {k: v for k, v in proj["materials"].items() if k not in ("files", "toc")}
+        for c in (out.get("outline") or {}).get("chapters", []):
+            for les in c["lessons"]:
+                les["files"] = [{**f, "url": sign_lesson_file(proj["id"], les["id"], f["name"])} for f in les.get("files") or []]
         return out
+
+    def sign_lesson_file(pid: str, lid: str, name: str) -> str:
+        tok = m.state.codec.fernet.encrypt(json.dumps({"p": pid, "l": lid, "n": name}).encode()).decode()
+        return f"{m.state.settings.public_url.rstrip('/')}/api/v1/studio/files/{tok}"
 
     async def need_creator(sess: Session) -> None:
         await m.require_creator(sess)
@@ -262,6 +271,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         proj = load(pid, sess)
         if proj["stage"] != "outline" or not proj.get("outline"):
             raise EngineError("wrong_stage", "not at this stage", 409)
+        if not proj["outline"]["chapters"] or not any(c["lessons"] for c in proj["outline"]["chapters"]):
+            raise EngineError("empty_outline", "the outline has no lessons yet", 409)
         if not proj["course"]["id"]:
             await create_course(proj, sess)
         proj["stage"] = "lessons"
@@ -310,6 +321,49 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         studio().say(proj, f"《{disp(les['title'])}》已发布，学生现在能看到了。", "system")
         studio().projects.save(proj)
         return view(proj)
+
+    @app.get("/api/v1/studio/files/{signed}")
+    async def lesson_file(signed: str):
+        """A deliverable of a lesson (slides, lab guide, report template, lesson plan) for the teacher to check."""
+        try:
+            d = json.loads(m.state.codec.fernet.decrypt(signed.encode(), ttl=m.FILE_TTL))
+        except Exception:
+            raise EngineError("link_expired", "file link expired", 410)
+        try:
+            proj = studio().projects.load(d["p"])
+            _, les = studio().find_lesson(proj, d["l"])
+        except KeyError:
+            raise EngineError("not_found", "no such file", 404)
+        f = next((x for x in les.get("files") or [] if x["name"] == d["n"]), None)
+        path = studio().lesson_dir(proj, les) / d["n"]
+        if not f or not path.exists():
+            raise EngineError("not_found", "no such file", 404)
+        return FileResponse(path, filename=d["n"], headers={"Cache-Control": "private, max-age=600"})
+
+    @app.get("/api/v1/studio/projects/{pid}/lessons/{lid}/deck")
+    async def lesson_deck(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        """Preview the lesson's slides while reviewing it (converted like any course deck)."""
+        proj = load(pid, sess)
+        _, les = studio().find_lesson(proj, lid)
+        f = next((x for x in les.get("files") or [] if x["kind"] == "slides"), None)
+        path = studio().lesson_dir(proj, les) / f["name"] if f else None
+        if not path or not path.exists():
+            raise EngineError("not_found", "no slides yet", 404)
+        slides = m.state.slides
+        if not slides.available:
+            return {"status": "unavailable"}
+        src = f"studio:{pid}:{lid}:{path.stat().st_mtime_ns}"
+
+        async def fetch() -> bytes:
+            return path.read_bytes()
+
+        slides.start(src, fetch, ".pptx", priority=0)
+        status, key = slides.status(src)
+        if status != "ready" or not key:
+            return {"status": status, **slides.progress(src)}
+        man = slides.manifest(key) or {}
+        base = f"{m.state.settings.public_url.rstrip('/')}/api/v1/slides/files/{key}/"
+        return {"status": "ready", "slides": [{"image": base + x["image"], "thumb": base + x["thumb"]} for x in man.get("slides", [])]}
 
     @app.post("/api/v1/studio/projects/{pid}/stop")
     async def stop(pid: str, sess: Annotated[Session, Depends(current)]):
@@ -382,13 +436,30 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         title = ml(les["title"], lg)
         ex_name = {"zh": "练习：", "en": "Practice: "}
         ans_name = {"zh": "练习参考答案：", "en": "Answer key: "}
+        d = studio().lesson_dir(proj, les)
+
+        async def produced(kind: str) -> list[dict[str, Any]]:
+            out = []
+            for f in les.get("files") or []:
+                path = d / f["name"]
+                if f["kind"] == kind and path.exists():
+                    draft = await m.state.moodle.upload(sess.moodle_token, f["name"], path.read_bytes())
+                    out.append({"type": "resource", "name": Path(f["name"]).stem, "draftitemid": draft,
+                                "visible": 0 if f.get("teacher_only") else 1})
+            return out
+
+        # The benchmark order: lecture notes, slides, practice, lab guide, report template; then teacher-only items.
         acts: list[dict[str, Any]] = [{"type": "page", "name": title, "content": html_of(les["content"])}]
+        acts += await produced("slides")
         if any(les.get("exercises", {}).values()):
             acts.append({"type": "page", "name": ml({k: ex_name[k] + v for k, v in les["title"].items() if k in ex_name}, lg),
                          "content": html_of(les["exercises"])})
+        acts += await produced("guide")
+        acts += await produced("report")
         if any(les.get("answers", {}).values()):
             acts.append({"type": "page", "name": ml({k: ans_name[k] + v for k, v in les["title"].items() if k in ans_name}, lg),
                          "content": html_of(les["answers"]), "visible": 0})
+        acts += await produced("plan")
         if chapter["id"] not in course["attached"]:
             fids = [fid for fid, f in proj["materials"]["files"].items()
                     if f["role"] in team.ATTACH_ROLES and chapter["no"] in (f.get("chapters") or [])]
