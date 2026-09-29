@@ -31,7 +31,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.10.0"
+VERSION = "0.10.1"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -196,8 +196,16 @@ def register(app: FastAPI) -> None:
     @app.get("/api/health")
     async def health():
         # Which model is configured (never the key), so an administrator can check without logging in.
+        animator: Any = False
+        if state.settings.animator_url:
+            try:
+                async with httpx.AsyncClient(timeout=2.0, trust_env=False) as c:
+                    r = await c.get(state.settings.animator_url.rstrip("/") + "/health")
+                animator = r.json() if r.status_code == 200 else "down"
+            except (httpx.HTTPError, ValueError):
+                animator = "down"
         return {"ok": True, "version": VERSION, "ai": state.ai.provider, "slides": state.slides.available,
-                "slide_queue": state.slides.overview()}
+                "slide_queue": state.slides.overview(), "animator": animator}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)
     async def login(body: LoginIn):
