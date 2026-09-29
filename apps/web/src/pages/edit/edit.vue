@@ -4,6 +4,23 @@
     <text v-else-if="error" class="wq-error">{{ errorText(error) }}</text>
     <view v-else class="editor">
       <text class="wq-h1">{{ heading }}</text>
+
+      <!-- AI sets the assignment from a chapter's lessons -->
+      <view v-if="type === 'assign'" class="wq-card ai">
+        <view class="wq-row">
+          <text class="ai-h">✦ {{ t("assignAi.button") }}</text>
+          <text class="wq-muted">{{ t("assignAi.hint") }}</text>
+        </view>
+        <view class="wq-row ai-row">
+          <picker :range="chapters" range-key="label" @change="(e: any) => (aiSection = chapters[e.detail.value].number)">
+            <view class="wq-input pk">{{ chapters.find((c) => c.number === aiSection)?.label || t("quizEdit.pickChapter") }} ▾</view>
+          </picker>
+          <input v-model="aiNote" class="wq-input grow" :placeholder="t('assignAi.note')" />
+          <view class="wq-btn dark" :class="{ disabled: aiBusy || !aiSection }" @click="aiWrite">{{ aiBusy ? t("assignAi.busy") : t("assignAi.go") }}</view>
+        </view>
+        <text v-if="aiError" class="wq-error">{{ aiError }}</text>
+      </view>
+
       <view class="wq-card">
         <BiField v-model="f.name" :label="t('edit.name')" :placeholder="t('edit.nameHint.' + type)" />
 
@@ -47,6 +64,14 @@
           </view>
         </template>
 
+        <template v-if="type === 'assign' && answers">
+          <text class="wq-label">{{ t("assignAi.answers") }}</text>
+          <RichEditor v-model="answers" />
+          <view class="wq-row sw" @click="saveAnswers = !saveAnswers">
+            <text class="chk" :class="{ on: saveAnswers }">{{ saveAnswers ? "☑" : "☐" }} {{ t("assignAi.saveAnswers") }}</text>
+          </view>
+        </template>
+
         <view v-if="!cmid" class="wq-row sw" @click="f.visible = !f.visible">
           <text class="chk" :class="{ on: f.visible }">{{ f.visible ? "☑" : "☐" }} {{ t("edit.visibleNow") }}</text>
         </view>
@@ -65,10 +90,11 @@ import { computed, reactive, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import BiField from "../../components/edit/BiField.vue";
+import RichEditor from "../../components/edit/RichEditor.vue";
 import { ApiError, token } from "../../api";
 import { type Bi, editApi } from "../../courseApi";
 import { errorText, t } from "../../i18n";
-import { type CourseData, loadCourse } from "../../store";
+import { type CourseData, loadCourse, units } from "../../store";
 
 defineOptions({ inheritAttrs: false });
 
@@ -85,6 +111,34 @@ const f = reactive<{ name: Bi; content: Bi; intro: Bi; url: string; grade: numbe
   name: { text: "" }, content: { text: "" }, intro: { text: "" }, url: "", grade: 100, allowtext: true, allowfiles: true, maxfiles: 5, visible: true,
 });
 const due = reactive({ date: "", time: "23:59" });
+const aiSection = ref(0);
+const aiNote = ref("");
+const aiBusy = ref(false);
+const aiError = ref("");
+const answers = ref("");
+const saveAnswers = ref(true);
+const chapters = computed(() => (d.value ? units(d.value).map((x) => ({ number: x.number ?? 0, label: x.name })) : []));
+const setText = (b: Bi, v: string): Bi => (b.text === undefined && (b.zh !== undefined || b.en !== undefined) ? { zh: v, en: b.en || "" } : { text: v });
+
+async function aiWrite() {
+  aiBusy.value = true;
+  aiError.value = "";
+  try {
+    const r = await editApi.aiAssignment(cid.value, aiSection.value, aiNote.value);
+    f.name = setText(f.name, r.name);
+    f.intro = setText(f.intro, r.intro);
+    f.grade = r.grade;
+    answers.value = r.answers;
+    const x = new Date(Date.now() + r.days * 86400000);
+    due.date = `${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())}`;
+    due.time = "23:59";
+    if (!section.value) section.value = aiSection.value;
+  } catch (e) {
+    aiError.value = errorText(e instanceof ApiError ? e.code : "unknown");
+  } finally {
+    aiBusy.value = false;
+  }
+}
 const heading = computed(() => t(cmid.value ? "edit.editKind" : "edit.newKind", { kind: t("edit.kind." + type.value) }));
 const pad = (n: number) => String(n).padStart(2, "0");
 const filled = (b: Bi) => !!(b.text || b.zh || b.en || "").trim();
@@ -94,6 +148,8 @@ async function load() {
   error.value = "";
   try {
     d.value = await loadCourse(cid.value);
+    if (!section.value && !cmid.value) section.value = chapters.value[0]?.number || 1;
+    aiSection.value = section.value || chapters.value[0]?.number || 0;
     if (cmid.value) {
       const c = await editApi.content(cid.value, cmid.value);
       type.value = c.type;
@@ -135,6 +191,12 @@ async function save() {
   try {
     if (cmid.value) await editApi.saveContent(cid.value, cmid.value, body);
     else await editApi.addActivity(cid.value, section.value, { ...body, type: type.value, visible: f.visible } as any);
+    if (type.value === "assign" && answers.value.trim() && saveAnswers.value) {
+      // The answer key sits next to the assignment, for teachers only.
+      const nm = (f.name.text ?? f.name.zh ?? "").trim();
+      await editApi.addActivity(cid.value, section.value || aiSection.value, {
+        type: "page", name: { text: t("assignAi.answersName", { name: nm }) }, content: { text: answers.value }, visible: false } as any);
+    }
     await loadCourse(cid.value, true);
     uni.showToast({ title: t("work.saved"), icon: "none" });
     back();
@@ -163,6 +225,10 @@ onShow(() => {
 
 <style scoped>
 .editor { max-width: 980px; }
+.ai { border-left: 4px solid var(--wq-ink); }
+.ai-h { font-weight: 700; color: var(--wq-ink); }
+.ai-row { margin-top: 8px; }
+.grow { flex: 1; min-width: 180px; }
 .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
 .pk { display: flex; align-items: center; min-width: 110px; cursor: pointer; }
 .chk { cursor: pointer; padding: 4px 8px; border-radius: 6px; }

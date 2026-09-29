@@ -27,7 +27,8 @@ export const courseApi = {
     request<{ forum: number | null; items: Discussion[]; can_post: boolean }>("GET", `/api/v1/courses/${cid}/announcements`),
   announce: (cid: number, subject: string, message: string) =>
     request<{ id: number }>("POST", `/api/v1/courses/${cid}/announcements`, { subject, message }),
-  forums: (cid: number) => request<{ forums: Forum[] }>("GET", `/api/v1/courses/${cid}/forums`),
+  forums: (cid: number) => request<{ forums: Forum[]; can_manage: boolean }>("GET", `/api/v1/courses/${cid}/forums`),
+  addForum: (cid: number, name: string, intro: string) => request<{ cmid: number; id: number }>("POST", `/api/v1/courses/${cid}/forums`, { name, intro }),
   discussions: (fid: number, page = 0) =>
     request<{ items: Discussion[]; can_post: boolean; can_pin: boolean }>("GET", `/api/v1/forums/${fid}/discussions?page=${page}`),
   startDiscussion: (fid: number, subject: string, message: string) =>
@@ -109,7 +110,7 @@ export interface QuizInfo {
 }
 export interface Attempt { id: number; state: string; start: number; deadline: number; now: number; quiz: { name: string; cmid: number; course_id: number }; questions: QuizQuestion[] }
 export interface Review { available: boolean; grade?: number | null; max_grade?: number; finish?: number; quiz?: { name: string; cmid: number; course_id: number }; questions?: QuizQuestion[] }
-export interface GradeItem { id: number; name: string; type: string; module: string | null; cmid: number | null; max: number }
+export interface GradeItem { id: number; name: string; type: string; module: string | null; cmid: number | null; max: number; needs_grading?: number }
 export interface GradeCell { raw: number | null; text: string; percent: string; feedback: string; hidden: boolean; graded_at: number }
 export interface CalEvent { id: number; name: string; description: string; start: number; duration: number; type: string; course_id: number; course: string; module: string; cmid: number | null; can_delete: boolean }
 export interface Conversation { id: number; name: string; group: boolean; members: number; unread: number; last: string; time: number; from_me: boolean }
@@ -249,6 +250,9 @@ export const editApi = {
   addActivity: (cid: number, section: number, body: Partial<ActivityContent> & { type: string }) =>
     request<{ cmid: number }>("POST", `/api/v1/courses/${cid}/sections/${section}/activities`, body),
   saveQuiz: (cid: number, q: QuizDef) => request<{ cmid: number; quizid: number; questions: number }>("POST", `/api/v1/courses/${cid}/quizzes`, q, 120000),
+  aiAssignment: (cid: number, section: number, note: string) =>
+    request<{ name: string; intro: string; answers: string; grade: number; days: number; chapter: string }>(
+      "POST", `/api/v1/courses/${cid}/assignments/ai`, { section, note }, 200000),
   aiQuiz: (cid: number, section: number, count: number, types: string[], note: string) =>
     request<{ questions: QuestionDef[]; title: string }>("POST", `/api/v1/courses/${cid}/quizzes/ai`, { section, count, types, note }, 200000),
 };

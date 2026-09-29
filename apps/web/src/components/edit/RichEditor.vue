@@ -34,7 +34,8 @@ const emit = defineEmits<{ (e: "update:modelValue", v: string): void }>();
 const box = ref<HTMLElement | null>(null);
 const raw = ref(props.modelValue || "");
 const mode = ref<"rich" | "html">("rich");
-const preview = ref(false);
+// Formulas cannot render while editing, so text with LaTeX opens with the preview shown.
+const preview = ref(/\\\(|\\\[/.test(props.modelValue || ""));
 let own = false;
 
 function sync() {
@@ -77,6 +78,7 @@ function toggleHtml() {
 }
 
 watch(() => props.modelValue, (v) => {
+  if (!preview.value && /\\\(|\\\[/.test(v || "")) preview.value = true;
   if (own) { own = false; return; }
   raw.value = v || "";
   // #ifdef H5

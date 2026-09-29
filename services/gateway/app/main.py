@@ -34,7 +34,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.13.0"
+VERSION = "0.13.1"
 FILE_TTL = 86400  # signed file links live one day
 
 

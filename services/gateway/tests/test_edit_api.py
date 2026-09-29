@@ -75,3 +75,10 @@ def test_check_questions_drops_broken_ones():
           {"type": "essay", "text": "x", "answers": []}]
     out = ea.check_questions(qs)
     assert [q["type"] for q in out] == ["truefalse"] and out[0]["mark"] == 10
+
+
+def test_ai_assignment_has_rubric_and_answer_key(client):
+    h = login(client)
+    r = client.post("/api/v1/courses/7/assignments/ai", headers=h, json={"section": 1, "note": "3 道计算题"}).json()
+    assert r["name"] and "评分标准" in r["intro"] and "<table>" in r["intro"] and r["answers"] and 1 <= r["days"] <= 60
+    assert client.post("/api/v1/courses/7/assignments/ai", headers=login(client, "s"), json={"section": 1}).status_code == 403

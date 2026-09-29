@@ -60,6 +60,8 @@ def moodle(request: httpx.Request) -> httpx.Response:
             {"userid": 10 + i, "gradeitems": [{"itemtype": "course", "graderaw": 60 + 4 * i}]} for i in range(9)]})
     if fn == "local_wenquest_manage_groups":
         return httpx.Response(200, json={"groups": [{"id": 9, "name": "第1组", "members": [10, 11]}], "skipped": []})
+    if fn == "local_wenquest_add_activities":
+        return httpx.Response(200, json={"courseid": 7, "sectionid": 1, "cmids": [2]})
     if fn == "local_wenquest_manage_members":
         return httpx.Response(200, json={"added": ["s9"], "already": [], "notfound": ["nobody"], "removed": 0})
     if fn == "local_wenquest_get_meetings":
@@ -138,3 +140,12 @@ def test_meetings_need_a_link_or_number(client):
 def test_plan_repair():
     plan = ca.validate_plan([{"name": "A", "members": [1, 2, 2, 99]}, {"name": "", "members": ["x", 3]}], [1, 2, 3, 4])
     assert plan[0]["members"] == [1, 2] and plan[1]["name"] == "第2组" and sorted(plan[1]["members"]) == [3, 4]
+
+
+def test_teachers_create_a_forum(client):
+    h = login(client)
+    assert client.get("/api/v1/courses/7/forums", headers=h).json()["can_manage"]
+    r = client.post("/api/v1/courses/7/forums", headers=h, json={"name": "第2章答疑", "intro": "有问题在这里问"}).json()
+    assert r["cmid"] == 2
+    sent = dict(CALLS)["local_wenquest_add_activities"]
+    assert sent["section"] == "0" and sent["activities[0][type]"] == "forum" and sent["activities[0][intro]"] == "<p>有问题在这里问</p>"

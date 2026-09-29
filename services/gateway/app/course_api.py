@@ -49,6 +49,11 @@ class EnrolIn(BaseModel):
     role: str = Field(default="student", pattern="^(student|teacher|editingteacher)$")
 
 
+class ForumIn(BaseModel):
+    name: str = Field(min_length=1, max_length=255)
+    intro: str = Field(default="", max_length=4000)
+
+
 class GroupIn(BaseModel):
     name: str = Field(default="", max_length=254)
     members: list[int] | None = Field(default=None, max_length=2000)
@@ -204,7 +209,16 @@ def register(app, m) -> None:
                         "intro": clean(f.get("intro"), lg, sess.moodle_token), "type": f.get("type"),
                         "discussions": f.get("numdiscussions"), "unread": f.get("unreadpostscount") or 0,
                         "can_post": bool(f.get("cancreatediscussions"))})
-        return {"forums": out}
+        return {"forums": out, "can_manage": await is_teacher(sess, courseid)}
+
+    @app.post("/api/v1/courses/{courseid}/forums")
+    async def add_forum(courseid: int, body: ForumIn, sess: Annotated[Session, Depends(current)]):
+        """A new discussion forum on the course front (teachers)."""
+        r = await call(sess, "local_wenquest_add_activities", None, courseid=courseid, section=0, activities=[{
+            "type": "forum", "name": body.name.strip(), "intro": text_html(body.intro) if body.intro.strip() else ""}])
+        cmid = (r.get("cmids") or [0])[0]
+        f = next((x for x in await forums(sess, courseid, None) if x.get("cmid") == cmid), None)
+        return {"cmid": cmid, "id": int(f["id"]) if f else 0}
 
     @app.get("/api/v1/forums/{forumid}/discussions")
     async def forum_discussions(forumid: int, sess: Annotated[Session, Depends(current)], lang: str | None = None, page: int = 0):

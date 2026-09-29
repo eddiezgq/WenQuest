@@ -441,6 +441,27 @@ def register(app, m) -> None:
         if teacher:
             rows = [{"id": u["userid"], "fullname": u.get("userfullname") or "",
                      "cells": {str(i["id"]): cell(i) for i in u.get("gradeitems") or []}} for u in users]
+            # How many submissions wait for grading, per assignment column.
+            try:
+                assigns = await state.moodle.assignments(sess.moodle_token, courseid, None)
+                ids = [a["id"] for a in assigns]
+                if ids:
+                    subs = await call(sess, "mod_assign_get_submissions", None, assignmentids=ids, status="submitted")
+                    grs = await call(sess, "mod_assign_get_grades", None, assignmentids=ids)
+                    graded = {(x["assignmentid"], g["userid"]): g for x in grs.get("assignments") or [] for g in x.get("grades") or []
+                              if g.get("grade") not in (None, "") and float(g["grade"]) >= 0}
+                    cm_of_assign = {a["id"]: a["cmid"] for a in assigns}
+                    waiting: dict[int, int] = {}
+                    for x in subs.get("assignments") or []:
+                        for sub in x.get("submissions") or []:
+                            g = graded.get((x["assignmentid"], sub["userid"]))
+                            if not g or (g.get("timemodified") or 0) < (sub.get("timemodified") or 0):
+                                cm = cm_of_assign.get(x["assignmentid"])
+                                waiting[cm] = waiting.get(cm, 0) + 1
+                    for it in items:
+                        it["needs_grading"] = waiting.get(it["cmid"], 0) if it["module"] == "assign" else 0
+            except EngineError:
+                pass
             return {"teacher": True, "items": items, "rows": rows}
         mine = users[0] if users else {}
         return {"teacher": False, "items": items, "cells": {str(i["id"]): cell(i) for i in mine.get("gradeitems") or []}}

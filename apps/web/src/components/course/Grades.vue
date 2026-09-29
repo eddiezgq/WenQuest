@@ -2,11 +2,20 @@
   <view>
     <view class="wq-head">
       <text class="wq-h1">{{ t("menu.grades") }}</text>
-      <input v-if="teacher" v-model="q" class="wq-input search" :placeholder="t('people.search')" />
+      <view v-if="teacher && work.length" class="wq-row nowrap">
+        <input v-model="q" class="wq-input search" :placeholder="t('people.search')" />
+        <view class="wq-btn" @click="exportCsv">⇩ {{ t("grades.export") }}</view>
+      </view>
     </view>
     <text v-if="loading && !items.length" class="wq-muted">{{ t("common.loading") }}</text>
     <text v-else-if="error" class="wq-error">{{ errorText(error) }}</text>
-    <view v-else-if="!work.length" class="wq-empty">{{ t("grades.none") }}</view>
+    <view v-else-if="!work.length" class="wq-empty">
+      <text class="block">{{ teacher ? t("grades.noneTeacher") : t("grades.none") }}</text>
+      <view v-if="teacher" class="wq-row center">
+        <view class="wq-btn primary" @click="go('/pages/edit/edit?type=assign&ai=1')">✦ {{ t("assignAi.button") }}</view>
+        <view class="wq-btn" @click="go('/pages/edit/quiz')">＋ {{ t("quizEdit.newTitle") }}</view>
+      </view>
+    </view>
 
     <!-- student: my grades -->
     <view v-else-if="!teacher" class="mine">
@@ -35,10 +44,13 @@
     <scroll-view v-else scroll-x class="book">
       <view class="grid" :style="{ gridTemplateColumns: `180px repeat(${work.length + (total ? 1 : 0)}, 110px)` }">
         <text class="h sticky">{{ t("grades.student") }}</text>
-        <text v-for="i in work" :key="'h' + i.id" class="h link" @click="openItem(i)">{{ i.name }}<text class="wq-muted"> /{{ i.max }}</text></text>
+        <view v-for="i in work" :key="'h' + i.id" class="h link" @click="openItem(i)">
+          <text>{{ i.name }}<text class="wq-muted"> /{{ i.max }}</text></text>
+          <text v-if="i.needs_grading" class="need">{{ t("grades.toGrade", { n: i.needs_grading }) }}</text>
+        </view>
         <text v-if="total" class="h">{{ t("grades.total") }}</text>
         <template v-for="r in shownRows" :key="r.id">
-          <text class="n sticky">{{ r.fullname }}</text>
+          <text class="n sticky link" @click="student = r">{{ r.fullname }}</text>
           <text v-for="i in work" :key="r.id + '-' + i.id" class="v" :class="{ empty: !r.cells[String(i.id)] || r.cells[String(i.id)].raw === null }">
             {{ r.cells[String(i.id)]?.raw !== null && r.cells[String(i.id)] ? r.cells[String(i.id)].text : "–" }}
           </text>
@@ -51,6 +63,16 @@
         </template>
       </view>
     </scroll-view>
+
+    <!-- one student's grades -->
+    <view v-if="student" class="wq-card detail">
+      <view class="wq-row d-head"><text class="d-name">{{ student.fullname }}</text><text class="wq-link" @click="student = null">✕</text></view>
+      <view v-for="i in [...work, ...(total ? [total] : [])]" :key="'d' + i.id" class="d-row">
+        <text class="d-item">{{ i.name }}</text>
+        <text class="d-g">{{ student.cells[String(i.id)]?.raw !== null && student.cells[String(i.id)] ? student.cells[String(i.id)].text : "–" }} / {{ i.max }}</text>
+        <view v-if="student.cells[String(i.id)]?.feedback" class="d-fb"><MathContent :html="student.cells[String(i.id)].feedback" /></view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -70,6 +92,7 @@ const loading = ref(true);
 const error = ref("");
 const q = ref("");
 const open = ref<Record<number, boolean>>({});
+const student = ref<{ id: number; fullname: string; cells: Record<string, GradeCell> } | null>(null);
 
 const work = computed(() => items.value.filter((i) => i.type !== "course" && i.type !== "category"));
 const total = computed(() => items.value.find((i) => i.type === "course") || null);
@@ -101,6 +124,28 @@ async function load() {
   }
 }
 const toggle = (id: number) => (open.value = { ...open.value, [id]: !(open.value[id] ?? true) });
+function go(path: string) {
+  uni.navigateTo({ url: `${path}${path.includes("?") ? "&" : "?"}course=${props.courseId}` });
+}
+/** The grade book as CSV (Excel opens it; the BOM keeps Chinese names readable). */
+function exportCsv() {
+  const cols = [...work.value, ...(total.value ? [total.value] : [])];
+  const q2 = (x: string) => `"${String(x).replace(/"/g, '""')}"`;
+  const lines = [[t("grades.student"), ...cols.map((i) => `${i.name} (/${i.max})`)].map(q2).join(",")];
+  for (const r of rows.value) {
+    lines.push([r.fullname, ...cols.map((i) => { const c = r.cells[String(i.id)]; return c && c.raw !== null ? String(c.raw) : ""; })].map(q2).join(","));
+  }
+  const csv = "\ufeff" + lines.join("\r\n");
+  // #ifdef H5
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  a.download = `grades-${props.courseId}.csv`;
+  a.click();
+  // #endif
+  // #ifndef H5
+  uni.setClipboardData({ data: csv, success: () => uni.showToast({ title: t("grades.copied"), icon: "none" }) });
+  // #endif
+}
 function openItem(i: GradeItem) {
   if (i.cmid) uni.navigateTo({ url: `/pages/activity/activity?id=${i.cmid}&course=${props.courseId}` });
 }
@@ -110,7 +155,19 @@ defineExpose({ load });
 </script>
 
 <style scoped>
-.search { max-width: 260px; }
+.search { width: 220px; }
+.block { display: block; }
+.nowrap { flex-wrap: nowrap; }
+.center { justify-content: center; margin-top: 12px; }
+.need { display: block; font-size: 11px; font-weight: 700; color: #7a5a00; background: #fff3d6; border-radius: 4px; padding: 0 4px; margin-top: 2px; }
+.link { cursor: pointer; }
+.n.link:hover { color: var(--wq-link); }
+.detail { margin-top: 14px; }
+.d-head { justify-content: space-between; margin-bottom: 8px; }
+.d-name { font-size: 17px; font-weight: 700; color: var(--wq-ink); }
+.d-row { display: grid; grid-template-columns: 1fr 120px; gap: 4px 12px; padding: 8px 0; border-top: 1px solid #eef1f0; }
+.d-g { text-align: right; font-family: "IBM Plex Mono", Menlo, monospace; }
+.d-fb { grid-column: 1 / -1; font-size: 13px; background: #fafbfb; padding: 6px 10px; border-radius: 6px; }
 .total { display: flex; align-items: baseline; gap: 14px; border-left: 4px solid var(--wq-ok); }
 .t-n { font-size: 28px; font-weight: 800; color: var(--wq-ok); font-family: "IBM Plex Mono", Menlo, monospace; }
 .table { background: #fff; border: 1px solid var(--wq-line); border-radius: 8px; overflow: hidden; }

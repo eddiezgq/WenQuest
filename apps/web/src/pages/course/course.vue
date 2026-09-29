@@ -101,7 +101,10 @@
       <view v-else-if="tab === 'slides' || tab === 'labs' || tab === 'assignments' || tab === 'quizzes'">
         <view class="h1-row">
           <text class="h1">{{ t("menu." + tab) }}</text>
-          <view v-if="isTeacher(d) && (tab === 'quizzes' || tab === 'assignments')" class="edit-btn" @click="newWork">＋ {{ t(tab === "quizzes" ? "quizEdit.newTitle" : "edit.newAssign") }}</view>
+          <view v-if="isTeacher(d) && (tab === 'quizzes' || tab === 'assignments')" class="h1-acts">
+            <view v-if="tab === 'assignments'" class="edit-btn" @click="newWork(true)">✦ {{ t("assignAi.button") }}</view>
+            <view class="edit-btn light" @click="newWork(false)">＋ {{ t(tab === "quizzes" ? "quizEdit.newTitle" : "edit.newAssign") }}</view>
+          </view>
         </view>
         <text v-if="tab === 'labs'" class="lead">{{ t("course.labsLead") }}</text>
         <view v-if="!grouped.length" class="muted">{{ t("course.nothing") }}</view>
@@ -275,11 +278,11 @@ function resume() {
 function startEdit() {
   uni.redirectTo({ url: `/pages/course/course?id=${id.value}&tab=modules&edit=1` });
 }
-function newWork() {
+function newWork(ai: boolean) {
   const first = unitList.value[0];
   const sec = first ? first.number : 1;
   if (tab.value === "quizzes") uni.navigateTo({ url: `/pages/edit/quiz?course=${id.value}&section=${sec}` });
-  else uni.navigateTo({ url: `/pages/edit/edit?course=${id.value}&section=${sec}&type=assign` });
+  else uni.navigateTo({ url: `/pages/edit/edit?course=${id.value}&section=${sec}&type=assign${ai ? "&ai=1" : ""}` });
 }
 const create = () => uni.navigateTo({ url: "/pages/studio/studio" });
 
@@ -315,6 +318,7 @@ watch(studentPreview, () => { open.value = {}; });
 .h1-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .h1-acts { display: flex; align-items: center; gap: 14px; }
 .edit-btn { padding: 7px 14px; border-radius: 8px; background: var(--wq-ink); color: #fff; font-size: 14px; cursor: pointer; }
+.edit-btn.light { background: #fff; color: var(--wq-ink); border: 1px solid var(--wq-line); }
 .h2 { display: block; font-size: 19px; font-weight: 700; color: var(--wq-ink); margin: 32px 0 12px; }
 .lead { display: block; color: var(--wq-text); margin: -6px 0 18px; }
 .link { color: var(--wq-link); cursor: pointer; font-size: 14px; }

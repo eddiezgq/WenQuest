@@ -6,6 +6,19 @@
         <text class="wq-h1">{{ forum ? forum.name : t("menu.discussions") }}</text>
       </view>
       <view v-if="forum && canPost && !writing" class="wq-btn primary" @click="startNew">＋ {{ t("disc.newTopic") }}</view>
+      <view v-if="!forum && canManage && !creating" class="wq-btn primary" @click="startForum">＋ {{ t("disc.newForum") }}</view>
+    </view>
+
+    <view v-if="creating" class="wq-card">
+      <text class="wq-label">{{ t("disc.forumName") }}</text>
+      <input v-model="forumForm.name" class="wq-input" :placeholder="t('disc.forumNameHint')" />
+      <text class="wq-label">{{ t("disc.forumIntro") }}</text>
+      <input v-model="forumForm.intro" class="wq-input" :placeholder="t('disc.forumIntroHint')" />
+      <text v-if="formError" class="wq-error">{{ formError }}</text>
+      <view class="wq-row actions">
+        <view class="wq-btn primary" :class="{ disabled: saving }" @click="createForum">{{ saving ? t("common.saving") : t("common.save") }}</view>
+        <view class="wq-btn" @click="creating = false">{{ t("common.cancel") }}</view>
+      </view>
     </view>
 
     <text v-if="loading" class="wq-muted">{{ t("common.loading") }}</text>
@@ -13,7 +26,10 @@
 
     <!-- forums of the course -->
     <template v-else-if="!forum">
-      <view v-if="!forums.length" class="wq-empty">{{ t("disc.noForums") }}</view>
+      <view v-if="!forums.length" class="wq-empty">
+        <text class="block">{{ canManage ? t("disc.noForumsTeacher") : t("disc.noForums") }}</text>
+        <view v-if="canManage && !creating" class="wq-btn primary one" :class="{ disabled: saving }" @click="quickForum">＋ {{ t("disc.quickForum") }}</view>
+      </view>
       <view v-for="f in forums" :key="f.id" class="wq-card forum" @click="openForum(f)">
         <view class="f-icon">✉</view>
         <view class="f-body">
@@ -77,6 +93,9 @@ const forums = ref<Forum[]>([]);
 const forum = ref<Forum | null>(null);
 const topics = ref<Discussion[]>([]);
 const canPost = ref(false);
+const canManage = ref(false);
+const creating = ref(false);
+const forumForm = reactive({ name: "", intro: "" });
 const loading = ref(true);
 const error = ref("");
 const writing = ref(false);
@@ -97,7 +116,9 @@ async function run(fn: () => Promise<void>) {
 }
 
 const load = () => run(async () => {
-  forums.value = (await courseApi.forums(props.courseId)).forums;
+  const fr = await courseApi.forums(props.courseId);
+  forums.value = fr.forums;
+  canManage.value = fr.can_manage;
   const wanted = props.forumCmid ? forums.value.find((f) => f.cmid === props.forumCmid) : null;
   if (wanted && !forum.value) await openForum(wanted);
   else if (forums.value.length === 1 && !forum.value) await openForum(forums.value[0]);
@@ -135,6 +156,28 @@ async function post() {
     saving.value = false;
   }
 }
+function startForum() {
+  Object.assign(forumForm, { name: "", intro: "" });
+  formError.value = "";
+  creating.value = true;
+}
+async function makeForum(name: string, intro: string) {
+  saving.value = true;
+  formError.value = "";
+  try {
+    await courseApi.addForum(props.courseId, name, intro);
+    creating.value = false;
+    forum.value = null;
+    await load();
+  } catch (e) {
+    formError.value = errorText(e instanceof ApiError ? e.code : "unknown");
+    uni.showToast({ title: formError.value, icon: "none" });
+  } finally {
+    saving.value = false;
+  }
+}
+const createForum = () => (forumForm.name.trim() ? makeForum(forumForm.name.trim(), forumForm.intro) : (formError.value = t("error.name_required")));
+const quickForum = () => makeForum(t("disc.defaultForum"), t("disc.defaultForumIntro"));
 function openThread(d: Discussion) {
   uni.navigateTo({ url: `/pages/discussion/discussion?id=${d.id}&course=${props.courseId}` });
 }
@@ -145,6 +188,8 @@ defineExpose({ load });
 
 <style scoped>
 .back { font-size: 14px; }
+.block { display: block; }
+.one { margin-top: 12px; }
 .actions { margin-top: 12px; }
 .intro { color: var(--wq-text); margin: -6px 0 14px; }
 .forum { display: flex; align-items: center; gap: 14px; cursor: pointer; }

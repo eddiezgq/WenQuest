@@ -4,6 +4,7 @@ assignments and quizzes (including AI-written quiz questions). Registered by mai
 Bilingual text (Moodle multilang markup) is edited as {zh, en}; single-language text as {text}.
 """
 
+import html as htmllib
 import json
 import re
 from typing import Annotated, Any
@@ -101,6 +102,11 @@ class QuizIn(BaseModel):
     keep_questions: bool = False    # update settings only
 
 
+class AiAssignIn(BaseModel):
+    section: int = Field(ge=0, le=200)
+    note: str = Field(default="", max_length=1000)
+
+
 class AiQuizIn(BaseModel):
     section: int = Field(ge=0, le=200)
     count: int = Field(default=8, ge=1, le=30)
@@ -118,6 +124,40 @@ QUIZ_WRITER = (
     "g in the text). Options must be plausible. Formulas in LaTeX within \\( \\). Write in Chinese unless the "
     "material is in English; keep the teacher's notation."
 )
+
+
+ASSIGN_WRITER = (
+    "You are the lead lecturer of a WenQuest university course. Set one homework assignment for the given chapter, "
+    "the way a strong professor would: 3-6 problems that go from checking the concepts to real problem solving, "
+    "at least one based on a robotics application (AGV, robot arm, drone, conveyor ...) and, when it fits, one "
+    "everyday-life problem. Give all data and units needed; ask for derivations, not just answers. Then the "
+    "submission requirements and a grading rubric (criteria with points adding up to the maximum grade). Also "
+    "write a complete answer key with worked solutions for the teacher. HTML (p, ol, li, strong, table); formulas "
+    "in LaTeX within \\( \\) or \\[ \\]. Write in Chinese unless the material is in English; keep the "
+    "teacher's notation. Follow the teacher's request when given."
+)
+
+
+def assign_schema() -> dict:
+    return {"type": "object", "additionalProperties": False,
+            "required": ["name", "problems", "requirements", "rubric", "answers", "grade", "days"],
+            "properties": {"name": {"type": "string"}, "problems": {"type": "string"}, "requirements": {"type": "string"},
+                           "rubric": {"type": "array", "items": {"type": "object", "additionalProperties": False,
+                                      "required": ["criterion", "points"],
+                                      "properties": {"criterion": {"type": "string"}, "points": {"type": "number"}}}},
+                           "answers": {"type": "string"}, "grade": {"type": "number"}, "days": {"type": "integer"}}}
+
+
+def fake_assignment(title: str) -> dict:
+    return {"name": f"{title} 作业", "grade": 100, "days": 7,
+            "problems": "<ol><li><p>AGV 以 1.5 m/s 行驶，0.5 s 内匀减速停下。求减速度；货箱与车板间静摩擦因数 0.3，判断货箱是否滑动。</p></li>"
+                        "<li><p>质量 2.0 kg 的木块放在倾角 30° 的斜面上，动摩擦因数 0.20，求下滑加速度（g 取 9.8 m/s²）。</p></li>"
+                        "<li><p>生活中的例子：公交车急刹时乘客为什么向前倾？用牛顿第一定律解释。</p></li></ol>",
+            "requirements": "<p>写出所用的物理规律和推导步骤，结果带单位；手写拍照或 Word 均可。</p>",
+            "rubric": [{"criterion": "物理规律与受力分析正确", "points": 40}, {"criterion": "推导与计算正确、单位规范", "points": 40},
+                       {"criterion": "应用题建模合理、结论清楚", "points": 20}],
+            "answers": "<ol><li><p>\\(a=1.5/0.5=3.0\\) m/s² &gt; \\(\\mu g=2.94\\) m/s²，会滑动。</p></li>"
+                       "<li><p>\\(a=g(\\sin30^\\circ-0.2\\cos30^\\circ)\\approx 3.2\\) m/s²。</p></li><li><p>惯性。</p></li></ol>"}
 
 
 def quiz_schema() -> dict:
@@ -372,6 +412,45 @@ def register(app, m) -> None:
                        timeopen=body.timeopen, timeclose=body.timeclose, timelimit=body.timelimit, attempts=body.attempts,
                        grade=body.grade, showanswers=body.showanswers, visible=1 if body.visible else 0, questions=qs)
         return r
+
+    async def chapter_material(sess: Session, courseid: int, section: int, lg: str) -> tuple[str, list[str]]:
+        tok = sess.moodle_token
+        secs = await state.moodle.course_contents(tok, courseid, None)
+        sec = next((s for s in secs if s.get("section") == section), None)
+        if not sec:
+            raise EngineError("not_found", "section", 404)
+        pages = {p["coursemodule"]: p for p in await state.moodle.pages(tok, courseid, None)}
+        parts = []
+        for mod in sec.get("modules") or []:
+            p = pages.get(mod["id"])
+            if p and mod.get("visible", 1):   # lessons students can see, not answer keys or plans
+                parts.append(f"## {m.plain(p.get('name'), lg)}\n{m.plain(p.get('content'), lg)[:12000]}")
+        return m.plain(sec.get("name"), lg), parts
+
+    @app.post("/api/v1/courses/{courseid}/assignments/ai")
+    async def ai_assignment(courseid: int, body: AiAssignIn, sess: Annotated[Session, Depends(current)], lang: str | None = None):
+        """A draft assignment (problems, requirements, rubric) and its answer key; nothing is saved here."""
+        await need_teacher(sess, courseid)
+        lg = m.lang_of(lang, sess)
+        title, parts = await chapter_material(sess, courseid, body.section, lg)
+        prompt = (f"Chapter: {title}\n" + (f"Teacher's request: {body.note}\n" if body.note else "")
+                  + ("\nLesson material:\n" + "\n\n".join(parts)[:60000] if parts
+                     else "\n(No lesson pages yet: set the assignment from your own knowledge of this chapter.)"))
+        out = await state.ai.json(system=ASSIGN_WRITER, prompt=prompt, schema=assign_schema(), max_tokens=12000,
+                                  fake=lambda: fake_assignment(title))
+        out = out or {}
+        grade = max(1.0, min(1000.0, float(out.get("grade") or 100)))
+        rubric = [r for r in out.get("rubric") or [] if isinstance(r, dict) and r.get("criterion")]
+        table = ""
+        if rubric:
+            rows = "".join(f"<tr><td>{htmllib.escape(str(r['criterion']))}</td><td>{float(r.get('points') or 0):g}</td></tr>" for r in rubric)
+            table = f"<h4>评分标准</h4><table><tr><th>项目</th><th>分值</th></tr>{rows}</table>"
+        intro = (str(out.get("problems") or "") + ("<h4>提交要求</h4>" + str(out.get("requirements")) if out.get("requirements") else "")
+                 + table)
+        if not intro.strip():
+            raise EngineError("ai_bad_output", "empty assignment", 502)
+        return {"name": str(out.get("name") or f"{title} 作业")[:200], "intro": intro, "answers": str(out.get("answers") or ""),
+                "grade": grade, "days": max(1, min(60, int(out.get("days") or 7))), "chapter": title}
 
     @app.post("/api/v1/courses/{courseid}/quizzes/ai")
     async def ai_quiz(courseid: int, body: AiQuizIn, sess: Annotated[Session, Depends(current)], lang: str | None = None):

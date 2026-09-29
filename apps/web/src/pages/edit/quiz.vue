@@ -49,6 +49,10 @@
         </view>
       </view>
 
+      <view class="wq-row pv-toggle" @click="showPreview = !showPreview">
+        <text class="chk" :class="{ on: showPreview }">{{ showPreview ? "☑" : "☐" }} {{ t("quizEdit.showPreview") }}</text>
+      </view>
+
       <!-- AI question writer -->
       <view v-if="!locked" class="wq-card ai">
         <view class="wq-row">
@@ -114,6 +118,20 @@
         </view>
         <text class="wq-label">{{ t("quiz.explanation") }}</text>
         <textarea v-model="x.feedback" class="wq-textarea small" auto-height :maxlength="-1" :disabled="locked" />
+
+        <!-- how students will see it, formulas rendered -->
+        <view v-if="showPreview" class="pv">
+          <text class="pv-h">{{ t("quizEdit.preview") }}</text>
+          <MathContent :html="html(x.text)" />
+          <view v-if="x.type === 'single' || x.type === 'multiple'" class="pv-opts">
+            <view v-for="(a, ai) in x.answers.filter((y) => String(y.text).trim())" :key="'p' + ai" class="pv-opt" :class="{ right: a.fraction > 0 }">
+              <text class="pv-l">{{ a.fraction > 0 ? "✓" : String.fromCharCode(65 + ai) }}</text><MathContent :html="html(String(a.text))" />
+            </view>
+          </view>
+          <text v-else-if="x.type === 'truefalse'" class="pv-ans">{{ t("quiz.rightAnswer") }}：{{ x.correct ? t("quiz.true") : t("quiz.false") }}</text>
+          <text v-else class="pv-ans">{{ t("quiz.rightAnswer") }}：{{ x.answers.map((a) => a.text).filter(Boolean).join(" / ") }}<text v-if="x.type === 'numerical' && x.answers[0]?.tolerance"> (± {{ x.answers[0].tolerance }})</text></text>
+          <view v-if="x.feedback.trim()" class="pv-fb"><text class="pv-k">{{ t("quiz.explanation") }}</text><MathContent :html="html(x.feedback)" /></view>
+        </view>
       </view>
 
       <view v-if="!locked" class="wq-row add">
@@ -132,6 +150,7 @@
 import { computed, reactive, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
+import MathContent from "../../components/MathContent.vue";
 import { ApiError, token } from "../../api";
 import { editApi, type QAnswer, type QuestionDef, type QuizDef } from "../../courseApi";
 import { errorText, t } from "../../i18n";
@@ -157,6 +176,7 @@ const aiCount = ref(8);
 const aiNote = ref("");
 const aiBusy = ref(false);
 const aiError = ref("");
+const showPreview = ref(true);
 
 const TYPES = computed(() => ["single", "multiple", "truefalse", "shortanswer", "numerical"].map((k) => ({
   key: k as QuestionDef["type"], label: t("quiz.type." + (k === "multiple" ? "multi" : k)) })));
@@ -328,6 +348,16 @@ onShow(() => {
 .chk { cursor: pointer; padding: 4px 10px; }
 .chk.on { font-weight: 700; color: var(--wq-ink); }
 .block { display: block; }
+.pv-toggle { margin: -4px 0 10px; }
+.pv { margin-top: 10px; background: #f7f9fa; border: 1px dashed #d5dde0; border-radius: 8px; padding: 10px 14px; line-height: 1.7; }
+.pv-h { display: block; font-size: 12px; color: var(--wq-muted); margin-bottom: 4px; }
+.pv-opts { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.pv-opt { display: flex; gap: 8px; align-items: baseline; }
+.pv-opt.right { color: var(--wq-ok); font-weight: 600; }
+.pv-l { width: 18px; }
+.pv-ans { display: block; margin-top: 6px; color: var(--wq-ok); }
+.pv-fb { margin-top: 6px; }
+.pv-k { font-size: 12px; color: var(--wq-muted); }
 .add { margin: 6px 0 16px; }
 .add-k { border: 1px solid var(--wq-line); border-radius: 999px; padding: 3px 12px; font-size: 13px; cursor: pointer; background: #fff; }
 .foot { justify-content: space-between; margin-bottom: 30px; }
