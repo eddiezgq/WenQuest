@@ -232,7 +232,7 @@ export function absolute(url: string | null | undefined): string {
   return url.startsWith("/") ? BASE + url : url;
 }
 
-function request<T>(method: "GET" | "POST" | "PUT", path: string, data?: unknown, timeout = 60000): Promise<T> {
+export function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", path: string, data?: unknown, timeout = 60000): Promise<T> {
   const header: Record<string, string> = { "Content-Type": "application/json" };
   if (token.value) header.Authorization = `Bearer ${token.value}`;
   const sep = path.includes("?") ? "&" : "?";

@@ -98,7 +98,7 @@ export function courseMenu(d: CourseData): { key: string }[] {
     assignments: teacher || has("assign"),
     quizzes: teacher || has("quiz"),
     discussions: true,
-    online: teacher, // students see it once a class is scheduled (step 4)
+    online: true,
     grades: true,
     people: true,
     calendar: true,

@@ -46,6 +46,15 @@
       }
     },
     {
+      "path": "pages/discussion/discussion",
+      "style": {
+        "navigationBarTitleText": "讨论",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
       "path": "pages/hub/hub",
       "style": {
         "navigationBarTitleText": "问渠",

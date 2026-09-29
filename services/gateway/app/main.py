@@ -19,6 +19,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from . import content
+from . import course_api
 from . import course_builder as cb
 from . import generate as gen
 from . import materials as mt
@@ -31,7 +32,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.10.1"
+VERSION = "0.11.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -92,6 +93,7 @@ def create_app() -> FastAPI:
 
     register(app)
     studio_api.register(app, sys.modules[__name__])
+    course_api.register(app, sys.modules[__name__])
     return app
 
 

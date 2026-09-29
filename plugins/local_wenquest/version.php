@@ -17,7 +17,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_wenquest';
-$plugin->version   = 2026092802;
+$plugin->version   = 2026092900;
 $plugin->requires  = 2024100700; // Moodle 4.5.
 $plugin->maturity  = MATURITY_BETA;
-$plugin->release   = '0.5.0';
+$plugin->release   = '0.6.0';

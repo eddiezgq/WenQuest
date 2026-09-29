@@ -227,6 +227,18 @@ class create_course extends external_api {
                     'completion' => COMPLETION_TRACKING_NONE,
                 ];
                 break;
+            case 'forum':
+                $info = $base + [
+                    'modulename' => 'forum',
+                    'type' => 'general',
+                    'forcesubscribe' => 0,
+                    'trackingtype' => 1,
+                    'maxbytes' => 0,
+                    'maxattachments' => 9,
+                    'displaywordcount' => 0,
+                    'completion' => COMPLETION_TRACKING_NONE,
+                ];
+                break;
             default:
                 return 0; // Unknown types are skipped rather than failing the whole course.
         }

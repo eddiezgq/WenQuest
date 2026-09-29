@@ -31,7 +31,7 @@ class add_activities extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         $activity = new external_single_structure([
-            'type' => new external_value(PARAM_ALPHA, 'page, url, assign or resource'),
+            'type' => new external_value(PARAM_ALPHA, 'page, url, assign, resource or forum'),
             'name' => new external_value(PARAM_TEXT, 'Activity name (multilang allowed)'),
             'intro' => new external_value(PARAM_RAW, 'Short description (HTML)', VALUE_DEFAULT, ''),
             'content' => new external_value(PARAM_RAW, 'Page content (HTML)', VALUE_DEFAULT, ''),

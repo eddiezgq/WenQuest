@@ -410,7 +410,11 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         files = proj["materials"]["files"]
         info_files = [fid for fid, f in files.items() if f["role"] in team.INFO_ROLES]
         info_name = {"zh": "课程说明", "en": "Course information"}
-        sections = [{"name": ml(info_name, lg), "summary": "", "activities": await upload_files(proj, info_files, sess)}]
+        forum = {"type": "forum", "name": ml({"zh": "课程讨论区", "en": "Course discussion"}, lg),
+                 "intro": ml({"zh": "<p>课程问题、学习心得都可以在这里讨论。</p>",
+                              "en": "<p>Ask questions and share what you learn here.</p>"}, lg, True)}
+        sections = [{"name": ml(info_name, lg), "summary": "",
+                     "activities": [forum] + await upload_files(proj, info_files, sess)}]
         for c in o["chapters"]:
             sections.append({"name": ml(c["title"], lg) or f"{c['no']}",
                              "summary": ml({k: cb.paragraphs(v) for k, v in c.get("summary", {}).items()}, lg, True),

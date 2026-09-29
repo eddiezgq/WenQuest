@@ -117,11 +117,15 @@
         </view>
       </view>
 
-      <!-- ================= Menus the new UI completes in later steps (2B framework) ================= -->
+      <!-- ================= Class-wide menus in WenQuest's own UI (step B1) ================= -->
+      <Announcements v-else-if="tab === 'announcements'" :course-id="id" />
+      <Discussions v-else-if="tab === 'discussions'" :course-id="id" />
+      <Online v-else-if="tab === 'online'" :course-id="id" />
+      <People v-else-if="tab === 'people'" :course-id="id" />
+
+      <!-- ================= Menus the new UI completes in later steps ================= -->
       <view v-else-if="HUB[tab]">
         <text class="h1">{{ t("menu." + tab) }}</text>
-
-        <view v-if="tab === 'online'" class="empty">{{ t("hub.noOnline") }}</view>
 
         <view v-if="hubItems.length" class="hub-list">
           <text class="g-sub">{{ t("hub.existing") }}</text>
@@ -134,10 +138,9 @@
         <view class="soon">
           <text class="soon-h">{{ t("hub.what") }}</text>
           <text class="soon-p">{{ t("hub." + tab) }}</text>
-          <text class="soon-step">{{ tab === "quizzes" ? t("hub.quizStep") : tab === "online" ? t("hub.onlineStep") : t("hub.step", { n: HUB[tab].step }) }}</text>
-          <view v-if="tab !== 'online'" class="soon-btns">
+          <text class="soon-step">{{ t("hub.soonB2") }}</text>
+          <view class="soon-btns">
             <view class="primary" @click="openUrl(classicLink(d, tab))">{{ t("hub.classic") }} ↗</view>
-            <view v-if="tab === 'people' && isTeacher(d)" class="ghost" @click="openUrl(classicLink(d, 'groups'))">{{ t("hub.classicGroups") }} ↗</view>
           </view>
         </view>
       </view>
@@ -167,11 +170,15 @@ import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import ModuleRow from "../../components/ModuleRow.vue";
+import Announcements from "../../components/course/Announcements.vue";
+import Discussions from "../../components/course/Discussions.vue";
+import Online from "../../components/course/Online.vue";
+import People from "../../components/course/People.vue";
 import { absolute, ApiError, type Module, type Section, token } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 import {
   type CourseData, findModule, isTeacher, isUnit, lastVisited, loadCourse, moduleKind, studentPreview,
-  classicLink, isNewsForum, syllabusSection, units, visibleModules,
+  classicLink, syllabusSection, units, visibleModules,
 } from "../../store";
 
 // Page query parameters (id, course, tab) must not fall through onto the layout component.
@@ -248,14 +255,11 @@ const grouped = computed(() => {
 
 // Menu pages whose new-UI version comes later in this round; step = step number in the plan.
 const HUB: Record<string, { step: number; lists?: boolean }> = {
-  announcements: { step: 4, lists: true }, discussions: { step: 4, lists: true }, quizzes: { step: 5, lists: true },
-  online: { step: 4 }, grades: { step: 5 }, people: { step: 4 }, calendar: { step: 5 },
+  quizzes: { step: 5, lists: true }, grades: { step: 5 }, calendar: { step: 5 },
 };
 const hubItems = computed<Module[]>(() => {
   if (!d.value) return [];
   const mods = d.value.sections.flatMap((s) => visibleModules(d.value!, s));
-  if (tab.value === "announcements") return mods.filter(isNewsForum);
-  if (tab.value === "discussions") return mods.filter((m) => m.type === "forum" && !isNewsForum(m));
   if (tab.value === "quizzes") return mods.filter((m) => m.type === "quiz");
   return [];
 });
