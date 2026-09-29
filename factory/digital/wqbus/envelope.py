@@ -1,0 +1,110 @@
+# -*- coding: utf-8 -*-
+"""消息信封与各类型 data 的校验（附录 A.2、A.3）。
+
+规则：只增加字段不改版本号；删改字段或改含义时 SPEC_VERSION 加一。
+校验只检查“必须有”的字段和取值范围，允许额外字段，这样加字段不会让旧组件报错。
+"""
+import datetime as _dt
+import json
+import uuid
+
+import jsonschema
+
+SPEC_VERSION = 1
+MODES = ("teach", "prod")
+
+
+class ValidationError(ValueError):
+    pass
+
+
+def now_iso(t=None):
+    t = t or _dt.datetime.now(_dt.timezone.utc)
+    return t.astimezone(_dt.timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def _obj(required, props=None):
+    return {"type": "object", "required": list(required), "properties": props or {}}
+
+
+NUM = {"type": "number"}
+STR = {"type": "string"}
+FRAC = {"type": "number", "minimum": 0, "maximum": 1}
+EVIDENCE = {"type": "array", "items": {"type": "object"}}
+
+DATA_SCHEMAS = {
+    "machine.status": _obj(["state"], {
+        "state": {"enum": ["run", "idle", "setup", "down", "fault"]},
+        "progress": FRAC, "tool_life_left": FRAC, "spindle_rpm": NUM, "feed_mm_min": NUM}),
+    "machine.event": _obj(["event"], {
+        "event": {"enum": ["cycle_start", "cycle_end", "alarm", "tool_change", "fault", "recover",
+                           "op_complete"]},
+        "cycle_time_s": NUM}),
+    "machine.cmd": _obj(["command"], {
+        "command": {"enum": ["dispatch", "start", "pause", "reset", "inject_fault",
+                                "load_scenario", "set_speed"]},
+        "qty": {"type": "integer", "minimum": 1}}),
+    "machine.ack": _obj(["accepted"], {"accepted": {"type": "boolean"}}),
+    "quality.measurement": _obj(
+        ["part_serial", "item", "characteristic", "nominal_mm", "lower_tol_mm", "upper_tol_mm",
+         "value_mm", "result"],
+        {"nominal_mm": NUM, "lower_tol_mm": NUM, "upper_tol_mm": NUM, "value_mm": NUM,
+         "result": {"enum": ["pass", "fail"]}}),
+    "quality.ncr": _obj(["ncr_id", "part_serial", "status"], {
+        "status": {"enum": ["open", "rework", "scrap", "use_as_is"]}}),
+    "erp.doc": _obj(["doctype", "name", "action"], {
+        "action": {"enum": ["created", "submitted", "updated", "cancelled", "snapshot", "failed"]}}),
+    "design.release": _obj(["item", "revision"], {"revision": {"type": "integer", "minimum": 1},
+                                                  "bom": {"type": "array"}, "files": {"type": "array"}}),
+    "design.gcode": _obj(["item", "revision", "operation", "machine", "gcode_ref"], {"est_time_s": NUM}),
+    "logistics.status": _obj(["x_m", "y_m"], {"x_m": NUM, "y_m": NUM, "battery": FRAC}),
+    "ai.alert": _obj(["level", "title"], {"level": {"enum": ["info", "warn", "critical"]},
+                                          "evidence": EVIDENCE}),
+    "ai.briefing": _obj(["summary", "items"], {"items": {"type": "array", "items": _obj(
+        ["text", "evidence"], {"evidence": EVIDENCE})}}),
+    "ai.proposal": _obj(["proposal_id", "action", "preview", "requires_confirm"], {
+        "requires_confirm": {"const": True}}),
+}
+
+ENVELOPE = {
+    "type": "object",
+    "required": ["v", "id", "ts", "type", "source", "mode", "data"],
+    "properties": {
+        "v": {"type": "integer", "minimum": 1},
+        "id": STR, "ts": STR, "source": STR, "corr": {"type": ["string", "null"]},
+        "type": {"enum": sorted(DATA_SCHEMAS)},
+        "mode": {"enum": list(MODES)},
+        "data": {"type": "object"},
+    },
+}
+
+
+_V = jsonschema.Draft202012Validator
+_ENV_V = _V(ENVELOPE)
+_DATA_V = {k: _V(v) for k, v in DATA_SCHEMAS.items()}
+
+
+def validate(msg):
+    """校验一条消息（dict），不合格抛 ValidationError，合格返回原消息。"""
+    try:
+        _ENV_V.validate(msg)
+        _DATA_V[msg["type"]].validate(msg["data"])
+    except jsonschema.ValidationError as e:
+        where = "/".join(str(p) for p in e.absolute_path) or "(根)"
+        raise ValidationError("{}：{} 处 {}".format(msg.get("type", "?"), where, e.message)) from None
+    if msg["v"] > SPEC_VERSION:
+        raise ValidationError("消息版本 v{} 比本组件支持的 v{} 新".format(msg["v"], SPEC_VERSION))
+    return msg
+
+
+def make(type_, source, data, mode="teach", corr=None, ts=None, id_=None):
+    msg = {"v": SPEC_VERSION, "id": id_ or str(uuid.uuid4()), "ts": ts or now_iso(),
+           "type": type_, "source": source, "mode": mode, "corr": corr, "data": data}
+    return validate(msg)
+
+
+def parse(payload):
+    """bytes / str → 校验过的 dict。"""
+    if isinstance(payload, (bytes, bytearray)):
+        payload = payload.decode("utf-8")
+    return validate(json.loads(payload))
