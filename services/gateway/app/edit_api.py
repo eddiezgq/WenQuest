@@ -193,6 +193,19 @@ def fake_questions(title: str, n: int) -> list[dict]:
     return [base[i % len(base)] for i in range(n)]
 
 
+_ESCAPED_TAG = re.compile(r"&lt;/?(p|strong|em|b|i|ol|ul|li|br|table|tr|td|th|h\d|div|span)\b", re.I)
+_REAL_TAG = re.compile(r"</?(p|strong|em|b|i|ol|ul|li|br|table|tr|td|th|h\d|div|span)\b", re.I)
+
+
+def fix_html(s: str) -> str:
+    """Models sometimes return HTML with the tags escaped (&lt;p&gt;); turn that back into real HTML."""
+    s = str(s or "")
+    for _ in range(2):
+        if _ESCAPED_TAG.search(s) and not _REAL_TAG.search(s):
+            s = htmllib.unescape(s)
+    return s
+
+
 def check_questions(qs: list[dict]) -> list[dict]:
     """Keep only questions that can be saved: choices need 2+ options and a right one; fill-ins an answer."""
     out = []
@@ -213,7 +226,9 @@ def check_questions(qs: list[dict]) -> list[dict]:
                     continue
         elif t != "truefalse":
             continue
-        q["answers"] = answers
+        q["answers"] = [{**a, "text": fix_html(a.get("text")), "feedback": fix_html(a.get("feedback"))} for a in answers]
+        q["text"] = fix_html(q.get("text"))
+        q["feedback"] = fix_html(q.get("feedback"))
         q["mark"] = max(0.5, min(10.0, float(q.get("mark") or 1)))
         out.append(q)
     return out
@@ -438,7 +453,7 @@ def register(app, m) -> None:
                      else "\n(No lesson pages yet: set the assignment from your own knowledge of this chapter.)"))
         out = await state.ai.json(system=ASSIGN_WRITER, prompt=prompt, schema=assign_schema(), max_tokens=12000,
                                   fake=lambda: fake_assignment(title))
-        out = out or {}
+        out = {k: (fix_html(v) if isinstance(v, str) else v) for k, v in (out or {}).items()}
         grade = max(1.0, min(1000.0, float(out.get("grade") or 100)))
         rubric = [r for r in out.get("rubric") or [] if isinstance(r, dict) and r.get("criterion")]
         table = ""

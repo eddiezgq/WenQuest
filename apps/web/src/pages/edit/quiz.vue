@@ -124,7 +124,7 @@
           <text class="pv-h">{{ t("quizEdit.preview") }}</text>
           <MathContent :html="html(x.text)" />
           <view v-if="x.type === 'single' || x.type === 'multiple'" class="pv-opts">
-            <view v-for="(a, ai) in x.answers.filter((y) => String(y.text).trim())" :key="'p' + ai" class="pv-opt" :class="{ right: a.fraction > 0 }">
+            <view v-for="(a, ai) in x.answers.filter((y) => String(y.text).trim())" :key="'p' + ai" class="pv-opt" :class="{ ok: a.fraction > 0 }">
               <text class="pv-l">{{ a.fraction > 0 ? "✓" : String.fromCharCode(65 + ai) }}</text><MathContent :html="html(String(a.text))" />
             </view>
           </view>
@@ -353,7 +353,8 @@ onShow(() => {
 .pv-h { display: block; font-size: 12px; color: var(--wq-muted); margin-bottom: 4px; }
 .pv-opts { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
 .pv-opt { display: flex; gap: 8px; align-items: baseline; }
-.pv-opt.right { color: var(--wq-ok); font-weight: 600; }
+.pv-opt > :last-child { flex: 1; min-width: 0; }
+.pv-opt.ok { color: var(--wq-ok); font-weight: 600; }
 .pv-l { width: 18px; }
 .pv-ans { display: block; margin-top: 6px; color: var(--wq-ok); }
 .pv-fb { margin-top: 6px; }
