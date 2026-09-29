@@ -21,6 +21,9 @@ services:
       - ./site:/srv/site:ro
       - caddy_data:/data
       - caddy_config:/config
+    networks:
+      - default
+      - qms-edge
 
   web:
     ports: !reset []
@@ -37,3 +40,7 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  
+networks:
+  qms-edge:
+    external: true
