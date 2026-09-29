@@ -81,4 +81,17 @@ $functions = [
         'capabilities' => 'moodle/course:manageactivities',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_wenquest_edit_course' => [
+        'classname'    => \local_wenquest\external\edit_course::class,
+        'description'  => 'Edit a course in WenQuest: settings, sections and activities.',
+        'type'         => 'write',
+        'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'local_wenquest_get_quiz' => [
+        'classname'    => \local_wenquest\external\get_quiz::class,
+        'description'  => 'A quiz with its questions, for editing in WenQuest.',
+        'type'         => 'read',
+        'capabilities' => 'mod/quiz:manage',
+        'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
 ];

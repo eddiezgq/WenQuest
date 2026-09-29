@@ -89,6 +89,24 @@
           "titleNView": false
         }
       }
+    },
+    {
+      "path": "pages/edit/edit",
+      "style": {
+        "navigationBarTitleText": "编辑",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/edit/quiz",
+      "style": {
+        "navigationBarTitleText": "测验出题",
+        "h5": {
+          "titleNView": false
+        }
+      }
     }
   ],
   "globalStyle": {

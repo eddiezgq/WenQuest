@@ -9,6 +9,7 @@
       <view class="head">
         <text class="kind">{{ t("kind." + kindKey) }}</text>
         <text v-if="a.hidden" class="tag teacher">{{ t("course.teacherOnly") }}</text>
+        <text v-if="canEdit" class="edit-link" @click="editThis">✎ {{ t("common.edit") }}</text>
       </view>
       <text class="h1">{{ a.name }}</text>
 
@@ -110,7 +111,7 @@ import PdfViewer from "../../components/PdfViewer.vue";
 // #endif
 import { absolute, api, ApiError, type Activity, token } from "../../api";
 import { errorText, formatDate, locale, t } from "../../i18n";
-import { type CourseData, findModule, KIND_ICON, loadCourse, moduleKind, rememberVisit, visibleModules } from "../../store";
+import { type CourseData, findModule, isTeacher, KIND_ICON, loadCourse, moduleKind, rememberVisit, visibleModules } from "../../store";
 
 // Page query parameters (id, course, tab) must not fall through onto the layout component.
 defineOptions({ inheritAttrs: false });
@@ -133,6 +134,11 @@ const kindKey = computed(() => {
   return ["assign", "quiz", "forum"].includes(a.value.type) ? a.value.type : "file";
 });
 const ctx = computed(() => (d.value ? findModule(d.value, id.value) : null));
+const canEdit = computed(() => !!a.value && isTeacher(d.value) && ["page", "url", "assign", "quiz"].includes(a.value.type));
+function editThis() {
+  if (!a.value) return;
+  uni.navigateTo({ url: `/pages/edit/${a.value.type === "quiz" ? "quiz" : "edit"}?course=${courseId.value}&cmid=${id.value}` });
+}
 const siblings = computed(() => (d.value && ctx.value ? visibleModules(d.value, ctx.value.section) : []));
 const pos = computed(() => siblings.value.findIndex((m) => m.id === id.value));
 const prevMod = computed(() => (pos.value > 0 ? siblings.value[pos.value - 1] : null));
@@ -219,6 +225,7 @@ watch(locale, load);
 .viewer.wide { max-width: none; }
 .head { display: flex; align-items: center; gap: 10px; }
 .kind { font-size: 12px; letter-spacing: 1px; color: var(--wq-muted); }
+.edit-link { margin-left: auto; font-size: 13px; color: #fff; background: var(--wq-ink); padding: 3px 12px; border-radius: 6px; cursor: pointer; }
 .tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; }
 .tag.teacher { background: #fff3d6; color: #7a5a00; }
 .h1 { display: block; font-size: 26px; font-weight: 700; color: var(--wq-ink); margin: 4px 0 18px; line-height: 1.35; }

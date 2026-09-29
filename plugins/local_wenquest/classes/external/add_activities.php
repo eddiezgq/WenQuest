@@ -38,6 +38,8 @@ class add_activities extends external_api {
             'url' => new external_value(PARAM_URL, 'Link target for url activities', VALUE_DEFAULT, ''),
             'draftitemid' => new external_value(PARAM_INT, 'Draft area with the uploaded file (resource)', VALUE_DEFAULT, 0),
             'visible' => new external_value(PARAM_INT, '1 = students see it, 0 = teachers only', VALUE_DEFAULT, 1),
+            'duedate' => new external_value(PARAM_INT, 'Assignment due date (0 = none)', VALUE_DEFAULT, 0),
+            'grade' => new external_value(PARAM_FLOAT, 'Assignment maximum grade', VALUE_DEFAULT, 100),
         ]);
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course id'),

@@ -19,3 +19,4 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'WenQuest services';
 $string['privacy:metadata'] = 'The WenQuest services plugin does not store personal data.';
 $string['emptycourse'] = 'A course needs at least one section.';
+$string['sectionnotempty'] = 'This section still has activities; delete them too or move them first.';

@@ -212,3 +212,75 @@ export function saveSubmission(cmid: number, fields: { text?: string; keep: stri
 
 /** "12 MB" style sizes. */
 export const fileSize = (n: number) => (n > 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
+
+// ------------------------------------------------------------------ B3: teachers edit the course
+
+/** Text as edited: one language (text) or both (zh, en). */
+export interface Bi { text?: string; zh?: string; en?: string }
+export interface EditModule { cmid: number; type: string; name: Bi; title: string; visible: boolean; file: { name: string; kind: string } | null }
+export interface EditSection { id: number; number: number; name: Bi; title: string; summary: Bi; visible: boolean; modules: EditModule[] }
+export interface Structure { course: { id: number; name: Bi; summary: Bi; visible: boolean }; sections: EditSection[] }
+export interface QAnswer { text: string; fraction: number; feedback: string; tolerance: number }
+export interface QuestionDef { type: "single" | "multiple" | "truefalse" | "shortanswer" | "numerical"; name?: string; text: string; answers: QAnswer[]; correct: boolean; feedback: string; mark: number }
+export interface QuizDef {
+  cmid: number; section: number; name: string; intro: string; timeopen: number; timeclose: number; timelimit: number; attempts: number;
+  grade: number; showanswers: "immediately" | "afterclose" | "never"; visible: boolean | number; questions: QuestionDef[];
+  hasattempts?: boolean; unsupported?: number; keep_questions?: boolean;
+}
+export interface ActivityContent {
+  cmid: number; type: string; name: Bi; visible: boolean; content?: Bi; intro?: Bi; url?: string; duedate?: number; cutoffdate?: number;
+  grade?: number; allowtext?: boolean; allowfiles?: boolean; maxfiles?: number; quiz?: QuizDef;
+}
+
+export const editApi = {
+  structure: (cid: number) => request<Structure>("GET", `/api/v1/courses/${cid}/structure`),
+  settings: (cid: number, body: { name?: Bi; summary?: Bi; visible?: boolean }) => request<{ ok: boolean }>("PUT", `/api/v1/courses/${cid}/settings`, body),
+  addSection: (cid: number, body: { name: Bi; summary?: Bi; position?: number }) => request<{ id: number }>("POST", `/api/v1/courses/${cid}/sections`, body),
+  editSection: (cid: number, sid: number, body: { name?: Bi; summary?: Bi; visible?: boolean }) =>
+    request<{ ok: boolean }>("PUT", `/api/v1/courses/${cid}/sections/${sid}`, body),
+  moveSection: (cid: number, sid: number, position: number) => request<{ ok: boolean }>("POST", `/api/v1/courses/${cid}/sections/${sid}/move`, { position }),
+  deleteSection: (cid: number, sid: number, force = false) => request<{ ok: boolean }>("DELETE", `/api/v1/courses/${cid}/sections/${sid}?force=${force}`),
+  editModule: (cid: number, cmid: number, body: { name?: Bi; visible?: boolean }) => request<{ ok: boolean }>("PUT", `/api/v1/courses/${cid}/modules/${cmid}`, body),
+  moveModule: (cid: number, cmid: number, section: number, before = 0) =>
+    request<{ ok: boolean }>("POST", `/api/v1/courses/${cid}/modules/${cmid}/move`, { section, before }),
+  deleteModule: (cid: number, cmid: number) => request<{ ok: boolean }>("DELETE", `/api/v1/courses/${cid}/modules/${cmid}`),
+  content: (cid: number, cmid: number) => request<ActivityContent>("GET", `/api/v1/courses/${cid}/modules/${cmid}/content`),
+  saveContent: (cid: number, cmid: number, body: Partial<ActivityContent>) => request<{ ok: boolean }>("PUT", `/api/v1/courses/${cid}/modules/${cmid}/content`, body),
+  addActivity: (cid: number, section: number, body: Partial<ActivityContent> & { type: string }) =>
+    request<{ cmid: number }>("POST", `/api/v1/courses/${cid}/sections/${section}/activities`, body),
+  saveQuiz: (cid: number, q: QuizDef) => request<{ cmid: number; quizid: number; questions: number }>("POST", `/api/v1/courses/${cid}/quizzes`, q, 120000),
+  aiQuiz: (cid: number, section: number, count: number, types: string[], note: string) =>
+    request<{ questions: QuestionDef[]; title: string }>("POST", `/api/v1/courses/${cid}/quizzes/ai`, { section, count, types, note }, 200000),
+};
+
+/** Upload one file as a new item in a section (browser File on the web, temp path in the mini program). */
+export function uploadToSection(cid: number, section: number, file: Picked, name = ""): Promise<{ cmid: number }> {
+  const url = `${BASE}/api/v1/courses/${cid}/sections/${section}/files`;
+  const fail = (status: number, body: any) => new ApiError((body && body.error) || `http_${status}`, status);
+  // #ifdef H5
+  return (async () => {
+    const fd = new FormData();
+    if (file.file) fd.append("file", file.file, file.name);
+    fd.append("name", name);
+    let res: Response;
+    try {
+      res = await fetch(url, { method: "POST", body: fd, headers: { Authorization: `Bearer ${token.value}` } });
+    } catch {
+      throw new ApiError("network", 0);
+    }
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw fail(res.status, body);
+    return body as { cmid: number };
+  })();
+  // #endif
+  // #ifndef H5
+  return new Promise((resolve, reject) => {
+    uni.uploadFile({ url, filePath: file.path || "", name: "file", formData: { name }, header: { Authorization: `Bearer ${token.value}` },
+      success: (r: any) => { const b = JSON.parse(r.data || "{}"); r.statusCode < 300 ? resolve(b) : reject(fail(r.statusCode, b)); },
+      fail: () => reject(new ApiError("network", 0)) });
+  });
+  // #endif
+}
+
+/** Display text of a Bi in the current language. */
+export const biText = (b: Bi | undefined, lang: string) => (b ? (b.text ?? (lang === "en" ? b.en || b.zh : b.zh || b.en) ?? "") : "");

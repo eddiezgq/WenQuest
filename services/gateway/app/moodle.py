@@ -38,6 +38,9 @@ _ERRORS = {
     "enablewsdescription": ("engine_misconfigured", 503),
     "accessexception": ("engine_misconfigured", 503),
     "servicenotavailable": ("engine_misconfigured", 503),
+    "sectionnotempty": ("section_not_empty", 409),
+    "cannoteditafterattempts": ("quiz_has_attempts", 409),
+    "invalidparameter": ("invalid_input", 400),
 }
 
 

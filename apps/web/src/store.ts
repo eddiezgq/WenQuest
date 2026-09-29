@@ -1,6 +1,6 @@
 // Course data shared by the course, unit and activity pages, so moving between them is instant.
 import { ref, watch } from "vue";
-import { api, type CourseInfo, type Module, type Section, user } from "./api";
+import { api, type CourseInfo, type Module, type Section } from "./api";
 import { locale } from "./i18n";
 
 export interface CourseData { info: CourseInfo; sections: Section[] }
@@ -110,29 +110,6 @@ export const MENU_ORDER = [
   "home", "announcements", "syllabus", "modules", "slides", "labs", "assignments",
   "quizzes", "discussions", "online", "grades", "people", "calendar",
 ];
-
-/** Moodle's address (no trailing slash), from the course or the signed-in user. */
-export function classicBase(d?: CourseData | null): string {
-  if (d?.info.classic_url) return d.info.classic_url.replace(/\/course\/view\.php.*$/, "");
-  return (user.value?.classic_url || "").replace(/\/$/, "");
-}
-
-/** Where each course menu item lives in the classic view, for pages the new UI does not do yet. */
-export function classicLink(d: CourseData, key: string): string {
-  const b = classicBase(d);
-  const id = d.info.id;
-  const teacher = isTeacher(d);
-  const links: Record<string, string> = {
-    announcements: `${b}/course/view.php?id=${id}`,
-    discussions: `${b}/mod/forum/index.php?id=${id}`,
-    quizzes: `${b}/mod/quiz/index.php?id=${id}`,
-    grades: teacher ? `${b}/grade/report/grader/index.php?id=${id}` : `${b}/grade/report/user/index.php?id=${id}`,
-    people: `${b}/user/index.php?id=${id}`,
-    groups: `${b}/group/index.php?id=${id}`,
-    calendar: `${b}/calendar/view.php?view=month&course=${id}`,
-  };
-  return links[key] || d.info.classic_url;
-}
 
 /** Forum activities: the course's announcements forum vs. discussion forums. */
 export const isNewsForum = (m: Module) => m.type === "forum" && /公告|announce|news/i.test(m.name || "");

@@ -74,10 +74,14 @@
       </view>
 
       <!-- ================= Modules ================= -->
+      <CourseEditor v-else-if="tab === 'modules' && editing" :course-id="id" @done="editing = false; load(true)" @changed="load(true)" />
       <view v-else-if="tab === 'modules'">
         <view class="h1-row">
           <text class="h1">{{ t("menu.modules") }}</text>
-          <text class="link" @click="toggleAll">{{ allOpen ? t("course.collapseAll") : t("course.expandAll") }}</text>
+          <view class="h1-acts">
+            <text class="link" @click="toggleAll">{{ allOpen ? t("course.collapseAll") : t("course.expandAll") }}</text>
+            <view v-if="isTeacher(d)" class="edit-btn" @click="editing = true">✎ {{ t("edit.title") }}</view>
+          </view>
         </view>
         <view v-for="s in shownSections" :key="s.id" class="module">
           <view class="m-head" @click="toggle(s.id)">
@@ -95,7 +99,10 @@
 
       <!-- ================= Slides / Labs / Assignments: grouped by unit ================= -->
       <view v-else-if="tab === 'slides' || tab === 'labs' || tab === 'assignments' || tab === 'quizzes'">
-        <text class="h1">{{ t("menu." + tab) }}</text>
+        <view class="h1-row">
+          <text class="h1">{{ t("menu." + tab) }}</text>
+          <view v-if="isTeacher(d) && (tab === 'quizzes' || tab === 'assignments')" class="edit-btn" @click="newWork">＋ {{ t(tab === "quizzes" ? "quizEdit.newTitle" : "edit.newAssign") }}</view>
+        </view>
         <text v-if="tab === 'labs'" class="lead">{{ t("course.labsLead") }}</text>
         <view v-if="!grouped.length" class="muted">{{ t("course.nothing") }}</view>
         <view v-for="g in grouped" :key="g.section.id" class="group">
@@ -138,7 +145,7 @@
       </view>
       <view v-if="isTeacher(d)" class="panel">
         <text class="ph">{{ t("course.teacherTools") }}</text>
-        <view class="side-btn" @click="openClassic">{{ t("course.editClassic") }} ↗</view>
+        <view class="side-btn" @click="startEdit">✎ {{ t("edit.title") }}</view>
         <view class="side-btn" @click="create">✦ {{ t("create.button") }}</view>
       </view>
     </template>
@@ -157,6 +164,7 @@ import Online from "../../components/course/Online.vue";
 import People from "../../components/course/People.vue";
 import Grades from "../../components/course/Grades.vue";
 import Calendar from "../../components/course/Calendar.vue";
+import CourseEditor from "../../components/course/CourseEditor.vue";
 import { absolute, ApiError, type Section, token } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 import {
@@ -170,6 +178,7 @@ defineOptions({ inheritAttrs: false });
 const id = ref(0);
 const tab = ref("home");
 const forumCmid = ref(0);
+const editing = ref(false);
 const d = ref<CourseData | null>(null);
 const loading = ref(true);
 const error = ref("");
@@ -263,10 +272,14 @@ function resume() {
   if (last.value) return openModule(last.value.module.id);
   if (unitList.value[0]) openUnit(unitList.value[0]);
 }
-function openClassic() {
-  // #ifdef H5
-  if (d.value) window.open(d.value.info.classic_url, "_blank", "noopener");
-  // #endif
+function startEdit() {
+  uni.redirectTo({ url: `/pages/course/course?id=${id.value}&tab=modules&edit=1` });
+}
+function newWork() {
+  const first = unitList.value[0];
+  const sec = first ? first.number : 1;
+  if (tab.value === "quizzes") uni.navigateTo({ url: `/pages/edit/quiz?course=${id.value}&section=${sec}` });
+  else uni.navigateTo({ url: `/pages/edit/edit?course=${id.value}&section=${sec}&type=assign` });
 }
 const create = () => uni.navigateTo({ url: "/pages/studio/studio" });
 
@@ -274,6 +287,7 @@ onLoad((q: any) => {
   id.value = Number(q?.id || 0);
   tab.value = String(q?.tab || "home");
   forumCmid.value = Number(q?.forum || 0);
+  editing.value = q?.edit === "1";
 });
 onShow(() => {
   if (!token.value) return uni.reLaunch({ url: "/pages/login/login" });
@@ -298,7 +312,9 @@ watch(studentPreview, () => { open.value = {}; });
 .error { color: var(--wq-danger); }
 .btn { padding: 6px 14px; border-radius: 8px; background: var(--wq-ink); color: #fff; font-size: 14px; cursor: pointer; }
 .h1 { display: block; font-size: 26px; font-weight: 700; color: var(--wq-ink); margin-bottom: 16px; }
-.h1-row { display: flex; justify-content: space-between; align-items: baseline; }
+.h1-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.h1-acts { display: flex; align-items: center; gap: 14px; }
+.edit-btn { padding: 7px 14px; border-radius: 8px; background: var(--wq-ink); color: #fff; font-size: 14px; cursor: pointer; }
 .h2 { display: block; font-size: 19px; font-weight: 700; color: var(--wq-ink); margin: 32px 0 12px; }
 .lead { display: block; color: var(--wq-text); margin: -6px 0 18px; }
 .link { color: var(--wq-link); cursor: pointer; font-size: 14px; }
