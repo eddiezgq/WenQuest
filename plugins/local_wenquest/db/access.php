@@ -7,7 +7,7 @@
 // (at your option) any later version.
 
 /**
- * WenQuest services for the WenQuest gateway.
+ * Capabilities.
  *
  * @package    local_wenquest
  * @copyright  2026 Guoqing Zhang
@@ -16,8 +16,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_wenquest';
-$plugin->version   = 2026092903;
-$plugin->requires  = 2024100700; // Moodle 4.5.
-$plugin->maturity  = MATURITY_BETA;
-$plugin->release   = '0.9.0';
+$capabilities = [
+    // Create accounts, reset passwords, suspend people, make teachers and open courses for them.
+    // Given only to the gateway's service account (site administrators have every capability).
+    'local/wenquest:manageaccounts' => [
+        'riskbitmask' => RISK_PERSONAL | RISK_CONFIG | RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [],
+    ],
+];

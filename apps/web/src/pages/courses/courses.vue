@@ -8,6 +8,13 @@
       <view v-if="user && user.can_create_courses" class="create" @click="create">✦ {{ t("create.button") }}</view>
     </view>
 
+    <!-- teacher application waiting for approval (step C) -->
+    <view v-if="myApp && ['pending', 'need_more'].includes(myApp.status)" class="appbar" :class="myApp.status" @click="go('/pages/apply/apply')">
+      <text class="ab-t">{{ t("apply.status." + myApp.status) }}</text>
+      <text class="ab-x">{{ t("apply.banner." + myApp.status) }}</text>
+      <text class="ab-go">→</text>
+    </view>
+
     <view v-if="loading" class="muted">{{ t("common.loading") }}</view>
     <view v-else-if="error" class="state">
       <text class="error">{{ errorText(error) }}</text>
@@ -15,6 +22,7 @@
     </view>
     <view v-else-if="!courses.length" class="empty">
       <text class="muted">{{ t("courses.empty") }}</text>
+      <view class="btn inline" @click="go('/pages/catalog/catalog')">{{ t("catalog.browse") }}</view>
     </view>
     <view v-else class="grid">
       <view v-for="c in courses" :key="c.id" class="card" @click="open(c)">
@@ -57,6 +65,7 @@ import { computed, ref, watch } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import { absolute, api, ApiError, type Course, type StudioSummary, token, user } from "../../api";
+import { type MyApplication, accountApi } from "../../accountApi";
 import { errorText, locale, t } from "../../i18n";
 
 // Page query parameters (id, course, tab) must not fall through onto the layout component.
@@ -86,6 +95,8 @@ async function load() {
 }
 
 const create = () => uni.navigateTo({ url: "/pages/studio/studio" });
+const go = (url: string) => uni.navigateTo({ url });
+const myApp = ref<MyApplication | null>(null);
 // Teachers: lessons the professor team wrote that wait for review, and questions it asked.
 const studio = ref<StudioSummary[]>([]);
 const studioTodo = computed(() => studio.value.filter((s) => s.awaiting || s.open_questions));
@@ -99,11 +110,18 @@ onShow(() => {
   load();
   api.me().catch(() => {}); // refresh permissions (e.g. the AI course button)
   if (user.value?.can_create_courses) api.studioProjects().then((x) => (studio.value = x)).catch(() => {});
+  else accountApi.myApplication().then((r) => (myApp.value = r.application)).catch(() => {});
 });
 watch(locale, () => { load(); api.me().catch(() => {}); });
 </script>
 
 <style scoped>
+.btn.inline { display: inline-block; margin-top: 12px; }
+.appbar { display: flex; align-items: center; gap: 12px; background: #e3eff4; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px; cursor: pointer; }
+.appbar.need_more { background: #fff6dc; }
+.ab-t { font-weight: 700; color: var(--wq-ink); white-space: nowrap; }
+.ab-x { flex: 1; color: var(--wq-text); font-size: 14px; }
+.ab-go { color: var(--wq-link); font-size: 18px; }
 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
 .hello { display: block; font-size: 26px; font-weight: 700; color: var(--wq-ink); }
 .date { display: block; font-size: 14px; color: var(--wq-muted); margin-top: 2px; }

@@ -41,6 +41,8 @@ _ERRORS = {
     "sectionnotempty": ("section_not_empty", 409),
     "cannoteditafterattempts": ("quiz_has_attempts", 409),
     "invalidparameter": ("invalid_input", 400),
+    "emailexists": ("email_taken", 409),
+    "suspended": ("account_suspended", 403),
 }
 
 

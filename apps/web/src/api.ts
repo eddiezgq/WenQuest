@@ -227,6 +227,11 @@ function saveSession(tok: string, u: User | null) {
   }
 }
 
+/** Keep a session that another call (sign-up, reset, site-wide sign-in) returned. */
+export function adoptSession(tok: string, u: User) {
+  saveSession(tok, u);
+}
+
 export function absolute(url: string | null | undefined): string {
   if (!url) return "";
   return url.startsWith("/") ? BASE + url : url;

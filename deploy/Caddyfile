@@ -16,9 +16,15 @@
 {$SITE_DOMAIN} {
 	import security_headers
 	encode zstd gzip
-	root * /srv/site
-	try_files {path} {path}/ {path}.html
-	file_server
+	# Sign-in state for the website header (who is signed in, sign out): same gateway as the platform.
+	handle /api/v1/auth/* {
+		reverse_proxy web:80
+	}
+	handle {
+		root * /srv/site
+		try_files {path} {path}/ {path}.html
+		file_server
+	}
 }
 
 www.{$SITE_DOMAIN} {

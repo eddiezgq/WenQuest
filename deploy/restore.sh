@@ -30,6 +30,12 @@ dc run --rm --no-deps -T --entrypoint sh moodle -c \
     'find /var/www/moodledata -mindepth 1 -maxdepth 1 -exec rm -rf {} + && tar xzf - -C /var/www/moodledata && chown -R www-data:www-data /var/www/moodledata' \
     < "$SRC/moodledata.tgz"
 
+if [ -s "$SRC/gateway.tgz" ]; then
+    log "Restoring sign-up records (teacher applications, course catalogue)..."
+    dc exec -T gateway sh -c 'rm -rf /data/accounts && tar xzf - -C /data' < "$SRC/gateway.tgz" || true
+    dc restart gateway
+fi
+
 log "Starting the learning platform..."
 dc up -d --no-build
 dc exec -T moodle su -s /bin/sh www-data -c 'php admin/cli/purge_caches.php' || true

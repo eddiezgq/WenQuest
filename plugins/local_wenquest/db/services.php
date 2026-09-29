@@ -94,4 +94,65 @@ $functions = [
         'capabilities' => 'mod/quiz:manage',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_wenquest_account_find' => [
+        'classname'    => \local_wenquest\external\accounts::class,
+        'methodname'   => 'find',
+        'description'  => 'Find one account by email, user name or id.',
+        'type'         => 'read',
+        'capabilities' => 'local/wenquest:manageaccounts',
+    ],
+    'local_wenquest_account_create' => [
+        'classname'    => \local_wenquest\external\accounts::class,
+        'methodname'   => 'create',
+        'description'  => 'Create an account whose email WenQuest has verified.',
+        'type'         => 'write',
+        'capabilities' => 'local/wenquest:manageaccounts',
+    ],
+    'local_wenquest_account_update' => [
+        'classname'    => \local_wenquest\external\accounts::class,
+        'methodname'   => 'update',
+        'description'  => 'Change a password, suspend or restore an account, or make a teacher.',
+        'type'         => 'write',
+        'capabilities' => 'local/wenquest:manageaccounts',
+    ],
+    'local_wenquest_account_search' => [
+        'classname'    => \local_wenquest\external\accounts::class,
+        'methodname'   => 'search',
+        'description'  => 'List accounts for WenQuest administration.',
+        'type'         => 'read',
+        'capabilities' => 'local/wenquest:manageaccounts',
+    ],
+    'local_wenquest_account_enrol' => [
+        'classname'    => \local_wenquest\external\accounts::class,
+        'methodname'   => 'enrol',
+        'description'  => 'Put a person in a course as a student (course catalogue).',
+        'type'         => 'write',
+        'capabilities' => 'local/wenquest:manageaccounts',
+    ],
+    'local_wenquest_account_courses' => [
+        'classname'    => \local_wenquest\external\accounts::class,
+        'methodname'   => 'courses',
+        'description'  => 'Public facts about courses for the course catalogue.',
+        'type'         => 'read',
+        'capabilities' => 'local/wenquest:manageaccounts',
+    ],
+];
+
+// Accounts: a separate service, used only by the gateway's wqservice account (see moodle/setup_wenquest.php).
+$services = [
+    'WenQuest accounts' => [
+        'shortname' => 'local_wenquest_accounts',
+        'functions' => [
+            'local_wenquest_account_find',
+            'local_wenquest_account_create',
+            'local_wenquest_account_update',
+            'local_wenquest_account_search',
+            'local_wenquest_account_enrol',
+            'local_wenquest_account_courses',
+        ],
+        'restrictedusers' => 1,
+        'enabled' => 1,
+        'downloadfiles' => 0,
+        'uploadfiles' => 0,
+    ],
 ];

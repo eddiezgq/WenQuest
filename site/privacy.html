@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>隐私说明 · Privacy — WenQuest</title>
+<style>
+  :root { --paper:#f4f2ec; --ink:#121c21; --muted:#56656b; --line:#d6d2c6; --accent:#f2b705; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#0f181c; --ink:#e6ecee; --muted:#93a3a9; --line:#2a3a41; } }
+  body { margin:0; background:var(--paper); color:var(--ink); font:400 16px/1.8 "IBM Plex Sans","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:32px 20px 64px; }
+  .top { display:flex; justify-content:space-between; align-items:center; }
+  .top a { color:var(--muted); text-decoration:none; font-size:14px; }
+  button { font:inherit; font-size:13px; background:none; color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:4px 12px; cursor:pointer; }
+  h1 { font-family:"Noto Serif SC","Songti SC",Georgia,serif; font-size:30px; line-height:1.3; margin:28px 0 4px; }
+  h2 { font-size:18px; margin:28px 0 6px; }
+  .date { color:var(--muted); font-size:14px; }
+  a { color:inherit; }
+  html:not([lang="en"]) [data-en], html[lang="en"] [data-zh] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+<div class="top"><a href="/">← <span data-zh>问渠机器人学院</span><span data-en>WenQuest Robotics Academy</span></a><button id="lang" type="button">EN</button></div>
+
+<h1><span data-zh>隐私说明</span><span data-en>Privacy Notice</span></h1>
+<p class="date"><span data-zh>生效日期：2026 年 9 月 29 日</span><span data-en>Effective 29 September 2026</span></p>
+
+<div data-zh>
+<h2>我们收集什么</h2>
+<p>注册信息：姓名、邮箱、密码（只保存加密后的形式）。教师另有：学校或单位、院系、职务、你上传的证明材料。学习记录：选课、作业、测验、成绩、讨论和实验数据。技术信息：登录时间、IP 地址（用于防止验证码滥用）。</p>
+<h2>用来做什么</h2>
+<p>开通和保护你的账号（发送验证码、找回密码）；审核教师身份；提供课程、批改和成绩；发送与你账号有关的通知（审核结果、课程开通）。我们不向第三方出售你的个人信息，也不发营销邮件。</p>
+<h2>AI 处理</h2>
+<p>教师申请信息和证明材料会交给 AI 模型预审；你的提问、作业可能交给 AI 生成答疑和批改建议。部署在中国境内的服务只使用已备案的国内模型（如 DeepSeek），境外服务可能使用 Anthropic 的 Claude。模型服务商只按我们的请求处理数据。</p>
+<h2>Cookie</h2>
+<p>我们只使用一个登录 Cookie（wq_sso），让你在官网、学习平台和虚拟实验室之间不用重复登录；不使用广告或跟踪 Cookie。</p>
+<h2>保存与删除</h2>
+<p>账号信息在账号存续期间保存；教师证明材料在审核结束后仅供必要的核查使用。你可以随时写信要求查看、更正或删除你的个人信息，或注销账号；我们会在 15 个工作日内处理。</p>
+<h2>未成年人</h2>
+<p>未满 14 周岁（在美国为未满 13 周岁）的用户，须在监护人同意和指导下注册使用。</p>
+<h2>联系我们</h2>
+<p><a href="mailto:info@wenquestrobotics.com">info@wenquestrobotics.com</a></p>
+</div>
+
+<div data-en>
+<h2>What we collect</h2>
+<p>Sign-up details: name, email and password (stored only in hashed form). For teachers: school or organisation, department, role and the evidence you upload. Learning records: enrolments, assignments, quizzes, grades, discussions and lab data. Technical data: sign-in times and IP address (used to stop abuse of email codes).</p>
+<h2>How we use it</h2>
+<p>To open and protect your account (codes, password resets); to check teacher applications; to run courses, marking and grades; and to send notices about your account (review results, course access). We do not sell personal data and do not send marketing email.</p>
+<h2>AI processing</h2>
+<p>Teacher application details and evidence are pre-checked by an AI model; your questions and work may be sent to AI for tutoring and marking suggestions. Services hosted in mainland China use only registered domestic models (such as DeepSeek); services elsewhere may use Anthropic's Claude. Model providers process data only on our instructions.</p>
+<h2>Cookies</h2>
+<p>We use one sign-in cookie (wq_sso) so you stay signed in across the website, the learning platform and the virtual labs. No advertising or tracking cookies.</p>
+<h2>Keeping and deleting</h2>
+<p>Account data is kept while your account exists; teacher evidence is kept after review only as needed for verification. Write to us at any time to see, correct or delete your personal data, or to close your account; we answer within 15 working days.</p>
+<h2>Children</h2>
+<p>Children under 14 (under 13 in the United States) may sign up only with a parent's or guardian's consent and supervision.</p>
+<h2>Contact</h2>
+<p><a href="mailto:info@wenquestrobotics.com">info@wenquestrobotics.com</a></p>
+</div>
+
+</main>
+<script>
+(() => {
+  const root = document.documentElement, btn = document.getElementById("lang");
+  let l = null; try { l = localStorage.getItem("wq-site-lang"); } catch (e) {}
+  l = l || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+  const set = (x) => { l = x; root.lang = x === "en" ? "en" : "zh-CN"; btn.textContent = x === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang", x); } catch (e) {} };
+  set(l); btn.onclick = () => set(l === "en" ? "zh" : "en");
+})();
+</script>
+</body>
+</html>

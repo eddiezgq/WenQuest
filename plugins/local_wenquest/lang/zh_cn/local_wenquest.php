@@ -20,3 +20,5 @@ $string['pluginname'] = '问渠服务';
 $string['privacy:metadata'] = '问渠服务插件不存储个人数据。';
 $string['emptycourse'] = '课程至少需要一个章节。';
 $string['sectionnotempty'] = '这一章里还有内容，请先移走或一并删除。';
+$string['wenquest:manageaccounts'] = '管理问渠账号（注册、教师审核）';
+$string['emailexists'] = '这个邮箱已经注册过了。';

@@ -55,10 +55,15 @@ class ModelGateway:
     def available(self) -> bool:
         return self.provider in ("claude", "deepseek", "fake")
 
+    @property
+    def sees_images(self) -> bool:
+        return self.provider in ("claude", "fake")
+
     async def json(self, *, system: str, prompt: str, schema: dict, max_tokens: int = 8000,
-                   fake: Any = None) -> dict:
+                   fake: Any = None, images: list[tuple[str, bytes]] | None = None) -> dict:
+        """`images` ((mime type, bytes) pairs) are shown to models that can see; others get the text only."""
         if self.provider == "claude":
-            return unpack(await self._claude(system, prompt, schema, max_tokens))
+            return unpack(await self._claude(system, prompt, schema, max_tokens, images or []))
         if self.provider == "deepseek":
             return unpack(await self._deepseek(system, prompt, schema, max_tokens))
         if self.provider == "fake":
@@ -67,12 +72,19 @@ class ModelGateway:
             return fake() if callable(fake) else (fake or {})
         raise AIError("ai_unavailable", "no AI model is configured", 503)
 
-    async def _claude(self, system: str, prompt: str, schema: dict, max_tokens: int) -> dict:
+    async def _claude(self, system: str, prompt: str, schema: dict, max_tokens: int,
+                      images: list[tuple[str, bytes]] | None = None) -> dict:
+        content: Any = prompt
+        if images:
+            import base64
+            content = [{"type": "image", "source": {"type": "base64", "media_type": mime,
+                                                    "data": base64.b64encode(data).decode()}} for mime, data in images]
+            content.append({"type": "text", "text": prompt})
         body = {
             "model": self.claude_model,
             "max_tokens": max_tokens,
             "system": system,
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": [{"role": "user", "content": content}],
             "tools": [{"name": "output", "description": "Return the result.", "input_schema": schema}],
             "tool_choice": {"type": "tool", "name": "output"},
         }

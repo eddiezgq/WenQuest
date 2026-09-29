@@ -18,6 +18,22 @@
         <view class="wq-row sw" @click="course.visible = !course.visible">
           <text class="switch" :class="{ on: course.visible }" /><text>{{ course.visible ? t("edit.courseVisible") : t("edit.courseHidden") }}</text>
         </view>
+        <!-- course catalogue (step C3) -->
+        <text class="wq-label">{{ t("listing.title") }}</text>
+        <view class="wq-row">
+          <text v-for="m in MODES" :key="m" class="lchip" :class="{ on: listing.mode === m }" @click="listing.mode = m">{{ t("listing." + m) }}</text>
+        </view>
+        <view v-if="listing.mode === 'paid'" class="wq-row lrow">
+          <picker :range="['CNY ¥', 'USD $']" @change="(e: any) => (listing.currency = e.detail.value == 1 ? 'USD' : 'CNY')">
+            <view class="wq-input pk">{{ listing.currency === 'USD' ? 'USD $' : 'CNY ¥' }} ▾</view>
+          </picker>
+          <input v-model.number="listing.price" type="digit" class="wq-input price" :placeholder="t('listing.price')" />
+          <text class="wq-muted">{{ t("listing.payLater") }}</text>
+        </view>
+        <template v-if="listing.mode !== 'private'">
+          <text class="wq-label">{{ t("listing.blurb") }}</text>
+          <textarea v-model="listing.blurb" class="wq-textarea blurb" :placeholder="t('listing.blurbHint')" />
+        </template>
         <view class="wq-row acts">
           <view class="wq-btn primary" :class="{ disabled: busy }" @click="saveSettings">{{ t("common.save") }}</view>
           <view class="wq-btn" @click="settingsOpen = false">{{ t("common.cancel") }}</view>
@@ -100,6 +116,7 @@ import { ApiError } from "../../api";
 import { type Bi, confirmAction, editApi, type EditModule, type EditSection, pickFiles, type Structure, uploadToSection } from "../../courseApi";
 import { errorText, t } from "../../i18n";
 import { KIND_ICON } from "../../store";
+import { type Listing, accountApi } from "../../accountApi";
 
 const props = defineProps<{ courseId: number }>();
 const emit = defineEmits<{ (e: "done"): void; (e: "changed"): void }>();
@@ -110,6 +127,8 @@ const error = ref("");
 const busy = ref(false);
 const settingsOpen = ref(false);
 const course = ref<{ name: Bi; summary: Bi; visible: boolean }>({ name: { text: "" }, summary: { text: "" }, visible: true });
+const MODES: Listing["mode"][] = ["private", "free", "paid"];
+const listing = ref<Listing>({ mode: "private", price: 0, currency: "CNY", blurb: "" });
 const renaming = ref("");
 const draftName = ref<Bi>({ text: "" });
 const summaryFor = ref(0);
@@ -128,6 +147,7 @@ async function load() {
   try {
     s.value = await editApi.structure(props.courseId);
     course.value = { name: { ...s.value.course.name }, summary: { ...s.value.course.summary }, visible: s.value.course.visible };
+    accountApi.listing(props.courseId).then((l) => (listing.value = l)).catch(() => null);
   } catch (e) {
     error.value = e instanceof ApiError ? e.code : "unknown";
   } finally {
@@ -149,6 +169,7 @@ async function run(fn: () => Promise<unknown>) {
 
 const saveSettings = () => run(async () => {
   await editApi.settings(props.courseId, course.value);
+  await accountApi.saveListing(props.courseId, { ...listing.value, price: Number(listing.value.price) || 0 });
   settingsOpen.value = false;
 });
 function startRename(key: string, name: Bi) {
@@ -239,4 +260,10 @@ defineExpose({ load });
 .switch::after { content: ""; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: left .15s; }
 .switch.on { background: var(--wq-ok); }
 .switch.on::after { left: 18px; }
+.lchip { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--wq-line); font-size: 13px; cursor: pointer; background: #fff; }
+.lchip.on { background: var(--wq-ink); color: #fff; border-color: var(--wq-ink); }
+.lrow { margin-top: 8px; }
+.lrow .pk { display: flex; align-items: center; min-width: 90px; cursor: pointer; }
+.lrow .price { width: 120px; }
+.blurb { min-height: 70px; }
 </style>

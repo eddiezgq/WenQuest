@@ -18,6 +18,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 
+from . import accounts
+from . import catalog_api
 from . import content
 from . import course_api
 from . import edit_api
@@ -29,12 +31,13 @@ from . import slides as sl
 from . import studio as st
 from . import studio_api
 from .ai import ModelGateway
+from .mailer import Mailer
 from .config import Settings, get_settings
 from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.13.2"
+VERSION = "0.14.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -68,9 +71,14 @@ async def lifespan(app: FastAPI):
     state.slides = sl.SlideStore(str(Path(s.data_dir) / "slides"))
     state.slide_settings = sl.Settings(str(Path(s.data_dir) / "settings.json"))
     state.projects_dir = str(Path(s.data_dir) / "projects")
+    state.accounts = accounts.Store(str(Path(s.data_dir) / "accounts"))
+    state.mailer = Mailer(s.smtp_host, s.smtp_port, s.smtp_secure, s.smtp_user, s.smtp_password,
+                          s.mail_from, s.mail_from_name)
     pace = asyncio.create_task(_pace_loop())
+    sweep = asyncio.create_task(_accounts_loop())
     yield
     pace.cancel()
+    sweep.cancel()
     await state.http.aclose()
 
 log = logging.getLogger("wenquest.gateway")
@@ -94,6 +102,8 @@ def create_app() -> FastAPI:
         return JSONResponse({"error": "server_error", "detail": type(exc).__name__}, status_code=500)
 
     register(app)
+    accounts.register(app, sys.modules[__name__])
+    catalog_api.register(app, sys.modules[__name__])
     studio_api.register(app, sys.modules[__name__])
     course_api.register(app, sys.modules[__name__])
     learn_api.register(app, sys.modules[__name__])
@@ -214,11 +224,13 @@ def register(app: FastAPI) -> None:
                 "slide_queue": state.slides.overview(), "animator": animator}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)
-    async def login(body: LoginIn):
+    async def login(body: LoginIn, response: Response):
+        # User name or email (Moodle's authloginviaemail is on).
         mtoken = await state.moodle.login(body.username.strip(), body.password)
         info = await state.moodle.site_info(mtoken)
         lang = lang_of(body.lang or info.get("lang"))
         token = state.codec.issue(Session(moodle_token=mtoken, user_id=int(info["userid"]), lang=lang))
+        set_sso_cookie(response, token)  # signed in on the academy website and every platform too
         return LoginOut(token=token, user=_user(info, lang, await can_create(mtoken)))
 
     @app.get("/api/v1/me", response_model=UserOut)
@@ -732,6 +744,16 @@ def _gen() -> gen.Generator:
     if g is None or g.store is not state.store or g.ai is not state.ai:
         g = state.gen = gen.Generator(state.store, state.ai, _clean)
     return g
+
+
+async def _accounts_loop() -> None:
+    """Review forgotten teacher applications and send the administrator's summary email."""
+    while True:
+        await asyncio.sleep(300)
+        try:
+            await accounts_sweep()
+        except Exception:  # noqa: BLE001 - keep the loop alive
+            log.exception("accounts sweep failed")
 
 
 async def require_creator(sess: Session) -> None:

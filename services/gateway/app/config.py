@@ -43,6 +43,21 @@ class Settings(BaseSettings):
     animator_timeout: float = 600.0
     data_dir: str = "/tmp/wq-data"  # converted slides and small settings; a persistent volume in production
 
+    # --- accounts: sign-up, email codes, teacher approval (app/accounts.py) ---
+    # Outgoing mail. Empty host = mail is not sent; codes and messages are written to the log instead.
+    smtp_host: str = ""
+    smtp_port: int = 2525
+    smtp_secure: str = "tls"   # tls = STARTTLS, ssl = TLS from the start, none
+    smtp_user: str = ""
+    smtp_password: str = ""
+    mail_from: str = ""        # e.g. noreply@wenquestrobotics.com
+    mail_from_name: str = "问渠机器人学院 WenQuest"
+    admin_email: str = ""      # where new teacher applications are reported
+    admin_email_fallback: str = ""  # MOODLE_ADMIN_EMAIL, used when admin_email is empty
+    app_url: str = "http://localhost:8088"   # the learning platform, for links in emails
+    site_domain: str = ""      # e.g. wenquestrobotics.com: the sign-in cookie is shared across it
+    accounts_service: str = "local_wenquest_accounts"
+
     @property
     def cors_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]

@@ -26,16 +26,25 @@
         <text class="gicon">✉</text>
         <text class="glabel">{{ t("shell.inbox") }}</text>
       </view>
+      <view class="gitem" :class="{ on: nav === 'catalog' }" @click="go('catalog')">
+        <text class="gicon">☷</text>
+        <text class="glabel">{{ t("catalog.nav") }}</text>
+      </view>
       <view v-if="user && user.can_create_courses" class="gitem" :class="{ on: nav === 'create' }" @click="go('create')">
         <text class="gicon">✦</text>
         <text class="glabel">{{ t("create.button") }}</text>
+      </view>
+      <view v-if="admin && admin.admin" class="gitem" :class="{ on: nav === 'admin' }" @click="go('admin')">
+        <text class="gicon">⚑</text>
+        <text class="glabel">{{ t("admin.nav") }}</text>
+        <text v-if="(admin.applications || 0) + (admin.requests || 0) > 0" class="badge">{{ (admin.applications || 0) + (admin.requests || 0) }}</text>
       </view>
       <view class="gspacer" />
       <view class="gitem wide-only" :class="{ on: nav === 'help' }" @click="go('help')">
         <text class="gicon">?</text>
         <text class="glabel">{{ t("shell.help") }}</text>
       </view>
-      <view class="gitem lang" @click="toggleLocale">
+      <view class="gitem lang wide-only" @click="toggleLocale">
         <text class="gicon small">{{ t("lang.switch") }}</text>
         <text class="glabel">{{ t("shell.language") }}</text>
       </view>
@@ -54,6 +63,7 @@
       <view class="acc-row narrow-only" @click="go('calendar')">{{ t("shell.calendar") }}</view>
       <view class="acc-row narrow-only" @click="go('inbox')">{{ t("shell.inbox") }}</view>
       <view class="acc-row narrow-only" @click="go('help')">{{ t("shell.help") }}</view>
+      <view v-if="user && !user.can_create_courses" class="acc-row" @click="go('apply')">{{ t("apply.menu") }}</view>
       <view class="acc-row" @click="toggleLocale">{{ t("shell.language") }} · {{ t("lang.switch") }}</view>
       <view class="acc-row" @click="logout">{{ t("nav.logout") }}</view>
     </view>
@@ -96,7 +106,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { admin, accountApi, loadAdmin } from "../accountApi";
 import { api, user } from "../api";
 import { t, toggleLocale } from "../i18n";
 import { type CourseData, courseMenu, studentPreview } from "../store";
@@ -116,6 +127,7 @@ const menu = computed(() => (props.course ? courseMenu(props.course) : []));
 function go(where: string) {
   accountOpen.value = false;
   if (where === "create") return uni.reLaunch({ url: "/pages/studio/studio" });
+  if (["catalog", "admin", "apply"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
   if (["calendar", "inbox", "help"].includes(where)) return uni.reLaunch({ url: `/pages/hub/hub?view=${where}` });
   uni.reLaunch({ url: where === "courses" ? "/pages/courses/courses?view=all" : "/pages/courses/courses" });
 }
@@ -129,10 +141,14 @@ function openCourse(key: string) {
   else uni.navigateTo({ url });
 }
 
-function logout() {
+async function logout() {
+  // Sign out everywhere: the site-wide cookie would otherwise sign this browser straight back in.
+  await accountApi.logoutEverywhere();
   api.logout();
+  admin.value = null;
   uni.reLaunch({ url: "/pages/login/login" });
 }
+onMounted(() => loadAdmin());
 </script>
 
 <style scoped>
@@ -154,6 +170,7 @@ function logout() {
 .gicon.small { font-size: 13px; font-weight: 600; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 0 8px; line-height: 22px; }
 .gitem.on .gicon.small { border-color: var(--wq-line); }
 .glabel { font-size: 12px; }
+.badge { position: absolute; top: 6px; right: 18px; background: var(--wq-danger); color: #fff; font-size: 10px; border-radius: 999px; padding: 0 5px; line-height: 15px; }
 .gspacer { flex: 1; }
 .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--wq-accent); color: var(--wq-ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
 .avatar.big { width: 44px; height: 44px; font-size: 20px; }

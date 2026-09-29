@@ -107,6 +107,51 @@
           "titleNView": false
         }
       }
+    },
+    {
+      "path": "pages/login/forgot",
+      "style": {
+        "navigationBarTitleText": "找回密码",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/register/register",
+      "style": {
+        "navigationBarTitleText": "注册",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/apply/apply",
+      "style": {
+        "navigationBarTitleText": "申请成为教师",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/admin/admin",
+      "style": {
+        "navigationBarTitleText": "管理",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/catalog/catalog",
+      "style": {
+        "navigationBarTitleText": "课程目录",
+        "h5": {
+          "titleNView": false
+        }
+      }
     }
   ],
   "globalStyle": {

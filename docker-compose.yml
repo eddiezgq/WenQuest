@@ -56,6 +56,17 @@ services:
       WQ_DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       # Lesson animations are rendered by the animator service (below).
       WQ_ANIMATOR_URL: http://animator:8000
+      # Sign-up, teacher approval and course notices by email (see docs/帮助/注册登录与审核.md).
+      WQ_SMTP_HOST: ${SMTP_HOST:-}
+      WQ_SMTP_PORT: ${SMTP_PORT:-2525}
+      WQ_SMTP_SECURE: ${SMTP_SECURE:-tls}
+      WQ_SMTP_USER: ${SMTP_USER:-}
+      WQ_SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      WQ_MAIL_FROM: ${MOODLE_NOREPLY_EMAIL:-}
+      WQ_ADMIN_EMAIL: ${WQ_ADMIN_EMAIL:-}
+      WQ_ADMIN_EMAIL_FALLBACK: ${MOODLE_ADMIN_EMAIL:-}
+      WQ_APP_URL: ${APP_URL:-http://localhost:8088}
+      WQ_SITE_DOMAIN: ${SITE_DOMAIN:-}
     volumes:
       # Uploaded materials, course generation progress and converted slides survive redeploys.
       - gatewaydata:/data

@@ -20,3 +20,5 @@ $string['pluginname'] = 'WenQuest services';
 $string['privacy:metadata'] = 'The WenQuest services plugin does not store personal data.';
 $string['emptycourse'] = 'A course needs at least one section.';
 $string['sectionnotempty'] = 'This section still has activities; delete them too or move them first.';
+$string['wenquest:manageaccounts'] = 'Manage WenQuest accounts (sign-up, teacher approval)';
+$string['emailexists'] = 'An account with this email already exists.';

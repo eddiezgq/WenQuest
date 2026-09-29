@@ -2,6 +2,10 @@
 {
 	admin off
 	auto_https off
+	servers {
+		# Keep the visitor's address from the front Caddy (used for sign-up code limits).
+		trusted_proxies static private_ranges
+	}
 }
 
 :80 {
