@@ -9,6 +9,7 @@ if ! curl -s -o /dev/null localhost:8080/login/index.php; then
     -d memory_limit=512M -S 0.0.0.0:8080 -t . $L/router.php > $L/php-server.log 2>&1 < /dev/null &)
 fi
 curl -s -o /dev/null localhost:8090/api/health || $L/start-gateway.sh
+curl -s -o /dev/null localhost:8095/health || $L/start-animator.sh
 curl -s -o /dev/null localhost:8088/ || (setsid nohup node $L/serve-web.js > $L/web.log 2>&1 < /dev/null &)
 sleep 3
 printf "moodle %s · gateway %s · web %s\n" "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080/login/index.php)" \

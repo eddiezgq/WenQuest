@@ -31,7 +31,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.9.0"
+VERSION = "0.10.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -697,6 +697,8 @@ def _studio() -> st.Studio:
     if s is None or s.store is not state.store or s.ai is not state.ai:
         s = state.studio = st.Studio(st.Projects(getattr(state, "projects_dir", "/tmp/wq-data/projects")),
                                      state.store, state.ai, _clean)
+    s.animator_url = state.settings.animator_url
+    s.animator_timeout = state.settings.animator_timeout
     return s
 
 

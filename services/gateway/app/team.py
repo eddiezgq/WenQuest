@@ -9,6 +9,7 @@ orchestrator (studio.py) can check every answer before anything reaches the teac
   主讲教授   author     writes one lesson to the course standard, from the textbook pages, citing them
   习题与测评 assessor   practice questions and an answer key for the lesson
   审稿人     reviewer   checks the lesson against the sources; sends it back when it is wrong
+  动画师     animator   turns the lesson's storyboard into a Manim scene (3Blue1Brown style), rendered on the server
 """
 from __future__ import annotations
 
@@ -303,3 +304,56 @@ def review_prompt(ctx: str, spec_json: str, exercises: str, sources: str, missin
     return (f"{ctx}\n\nLesson spec to check:\n<<<\n{spec_json}\n>>>\n\nPractice questions and answers:\n<<<\n{exercises}\n>>>\n"
             + (f"\nThe automatic check already found: {'; '.join(missing)}\n" if missing else "")
             + f"\nTeacher's materials the author was given:\n{sources}")
+
+
+# --- 动画师 animator ----------------------------------------------------------------------------------
+
+ANIM_API = r"""Write Python for Manim Community v0.19+ with the WenQuest parts. Start with `from wq_anim import *`
+(it brings in everything from manim, plus numpy as np). Define exactly one scene: `class Lesson(Base):` with
+`def construct(self):`. Allowed imports: wq_anim, manim, numpy, math, random. No files, images, SVGs, sounds,
+os/sys, getattr/eval/exec, or names/attributes starting with an underscore (the code is checked and rejected).
+
+Frame: 14.2 x 8 units, centre (0,0); the title takes the top-left corner (y > 2.6), captions the bottom (y < -2.6).
+Keep drawings inside x in [-6.8, 6.8], y in [-2.5, 2.5]. Background is dark (#0f1419); use light colours.
+
+Parts from wq_anim:
+  self.title(no, zh, en)                 title at the top-left (call once, first)
+  self.caption(zh, en, wait=1.5)         bilingual caption at the bottom; replaces the previous one
+  self.clear_stage()                     fade out everything except title and caption
+  self.card(lines, wait=2.5)             closing summary card; lines: [zh, en] pairs or MathTex objects
+  zh(text, size=30, color=WHITE, weight=NORMAL), en(text, size=20), bi([zh, en], size=28)   text
+  fit(mobject, width=12.5)               shrink if too wide
+  ground(y=-2.2, x0=-7, x1=7)            floor with hatching
+  agv(width=2.6, height=0.7, label="")   warehouse AGV (bottom at its own y=0; place with .move_to(p, aligned_edge=DOWN))
+  cargo(size=0.8, label="")              a box
+  conveyor(length=6)                     belt conveyor
+  arm(base, a1, a2, l1=2.2, l2=1.6)      two-link robot arm, angles in degrees; arm_tip(...) gives the gripper point
+  drone(width=1.8)                       quadcopter, side view
+  vec(start, end, color=C_V, label=r"\vec v", label_dir=UP)   vector arrow with LaTeX label
+  readout(name, value_str, unit, color, size)                   MathTex like "v = 1.50 m/s"
+Colours: C_V velocity (orange), C_A acceleration (red), C_F force, C_X / C_Y components, STEEL, YELLOW, GREY_B.
+Math: MathTex(r"...") (LaTeX); Chinese only through zh()/caption(), never inside MathTex.
+Motion: ValueTracker + always_redraw, TracedPath, MoveAlongPath, Axes(...).plot(...), GrowArrow, Transform.
+"""
+
+ANIMATOR = COMMON + (
+    " Role: 动画师 (animator). Turn the lesson's animation storyboard into ONE Manim scene in the style of "
+    "3Blue1Brown and of the WenQuest benchmark: every beat of the storyboard becomes a caption (Chinese and "
+    "English, as given) plus real motion that shows the physics — computed from the actual formulas with "
+    "ValueTracker/always_redraw, correct numbers and units, never just text on screen. Show the robot scene of the "
+    "lesson (AGV, arm, conveyor, drone ...) and end with self.card(...) holding the key formulas. 40-90 seconds, "
+    "at most about 25 self.play calls; simple shapes render fast. Return JSON {\"code\": \"...python...\"}.\n\n" + ANIM_API
+)
+
+
+def animation_schema() -> dict:
+    return _obj({"code": STR})
+
+
+def animation_prompt(no: str, spec_json: str, example: str, error: str = "", previous: str = "") -> str:
+    out = (f"Lesson {no}. The lesson spec (use its animation title, question and beats, its concept and robot problem):\n"
+           f"{spec_json}\n\nA complete example scene for lesson 2.1 in the house style — follow its structure:\n{example}\n")
+    if error:
+        out += (f"\nYour previous code failed. Fix it and return the whole corrected scene.\nError:\n{error}\n"
+                f"\nPrevious code:\n{previous}\n")
+    return out

@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     ai_fake_delay: float = 0.0  # local testing only: make the fake model take this many seconds per call
     # Where uploaded course materials are kept during an import (kept 24 hours).
     import_dir: str = "/tmp/wq-imports"
+    # The animation renderer (services/animator), e.g. http://animator:8000. Empty = lessons get no video.
+    animator_url: str = ""
+    animator_timeout: float = 600.0
     data_dir: str = "/tmp/wq-data"  # converted slides and small settings; a persistent volume in production
 
     @property

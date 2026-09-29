@@ -171,6 +171,8 @@ class Studio:
         self.clean = clean
         self.tasks: dict[str, asyncio.Task] = {}
         self.locks: dict[str, asyncio.Lock] = {}
+        self.animator_url = ""      # the animation renderer; empty = no videos
+        self.animator_timeout = 600.0
 
     # helpers ---------------------------------------------------------------------------------
     def items(self, proj: dict) -> list[mt.Material]:
@@ -561,17 +563,68 @@ class Studio:
             les["status"] = "writing"
             proj["busy"] = {"label": f"主讲教授按审稿意见重写：{no}", "since": now()}
             self.projects.save(proj)
+        video = await self.animate(proj, les, spec, no, review)
         proj["busy"] = {"label": f"正在排版课件、指导书、报告模板和教案：{no}", "since": now()}
         self.projects.save(proj)
-        await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no)
+        await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video)
         les["review"] = review
         les["status"] = "awaiting"
         les["written"] = now()
         verdict = "审稿通过" if review and review["verdict"] == "pass" else "审稿人仍有意见，请重点看审稿意见"
-        self.say(proj, f"《{no} {disp(les['title'])}》做好了（{verdict}）：讲义、课件、练习与答案、实验指导书、实验报告模板、教案。"
+        self.say(proj, f"《{no} {disp(les['title'])}》做好了（{verdict}）：讲义、{'动画、' if video else ''}课件、练习与答案、实验指导书、实验报告模板、教案。"
                        "请在右边“课时进度”里审阅：通过就发布给学生，或者告诉我怎么改。", "lead", "lesson")
 
-    def render(self, proj: dict, chapter: dict, les: dict, spec: dict, gp: dict, no: str) -> None:
+    async def animate(self, proj: dict, les: dict, spec: dict, no: str, review: dict | None) -> dict | None:
+        """动画师: the storyboard becomes a Manim scene rendered on the server (A2). Errors go back to the
+        animator twice; then the plain storyboard animation is used so the lesson still has a video."""
+        from .production import anim, demo_anim
+        if not self.animator_url:
+            return None
+        d = self.lesson_dir(proj, les)
+        spec_json = json.dumps({k: spec[k] for k in ("title", "goal", "problem", "concept", "animation", "model", "summary")},
+                               ensure_ascii=False)
+        code, error, used = "", "", "ai"
+        for attempt in range(3):
+            proj["busy"] = {"label": f"动画师正在{'写' if attempt == 0 else '修改'}动画：{no}", "since": now()}
+            self.projects.save(proj)
+            data = await self.ai.json(system=team.ANIMATOR, prompt=team.animation_prompt(no, spec_json, demo_anim.AGV_2_1, error, code),
+                                      schema=team.animation_schema(), max_tokens=12000, fake=lambda: {"code": demo_anim.AGV_2_1})
+            code = str((data or {}).get("code") or "")
+            code = re.sub(r"^```(?:python)?\s*|```\s*$", "", code.strip())
+            if not code:
+                error = "empty code"
+                continue
+            proj["busy"] = {"label": f"正在渲染动画：{no}（约 2–5 分钟）", "since": now()}
+            self.projects.save(proj)
+            try:
+                video, poster, secs = await anim.render(self.animator_url, code, self.animator_timeout)
+                break
+            except anim.RenderError as e:
+                if e.stage == "service":
+                    return self._no_video(review, f"动画渲染服务暂时不可用（{e}），这一课先没有动画，稍后可重写")
+                error = str(e)
+        else:
+            used = "storyboard"
+            try:
+                video, poster, secs = await anim.render(self.animator_url, anim.storyboard_code(spec, no), self.animator_timeout)
+            except anim.RenderError as e:
+                return self._no_video(review, f"动画没有做成（{str(e)[:200]}），这一课先没有动画，可以重写")
+            if review is not None:
+                review["issues"].append({"severity": "low", "text": "动画师写的动画渲染失败，先用了按分镜生成的简版动画；可按意见重写这一课"})
+        name = re.sub(r'[\\/:*?"<>|]', "-", f"{no} 动画 {spec['animation']['title'][0] or spec['title'][0]}")[:80]
+        for old in d.glob("*.mp4"):
+            old.unlink()
+        v, pp = await asyncio.to_thread(anim.save, d, name, video, poster)
+        (d / "animation.py").write_text(code if used == "ai" else anim.storyboard_code(spec, no))
+        return {"video": v, "poster": pp, "seconds": secs, "by": used}
+
+    @staticmethod
+    def _no_video(review: dict | None, text: str) -> None:
+        if review is not None:
+            review["issues"].append({"severity": "low", "text": text})
+        return None
+
+    def render(self, proj: dict, chapter: dict, les: dict, spec: dict, gp: dict, no: str, video: dict | None = None) -> None:
         """Every deliverable of one lesson, in the benchmark layout."""
         from .production import deck, docs, page
         o = proj["outline"]
@@ -580,14 +633,17 @@ class Studio:
         d = self.lesson_dir(proj, les)
         d.mkdir(parents=True, exist_ok=True)
         for old in d.iterdir():
-            if old.suffix in (".pptx", ".docx", ".json"):
+            if old.suffix in (".pptx", ".docx", ".json") or (not video and old.suffix in (".mp4", ".png")):
                 old.unlink()
         # The lesson number is added by the layout; drop one the author may have put in the title.
         spec["title"] = [re.sub(r"^\s*\d+(\.\d+)*\s*", "", x) or x for x in spec["title"]]
         (d / "spec.json").write_text(json.dumps({"lesson": spec, "guide_plan": gp}, ensure_ascii=False))
         files = []
         name = re.sub(r'[\\/:*?"<>|]', "-", f"{no} {spec['title'][0]}")[:80]
-        deck.build(spec, d / f"{name} 课件.pptx", no=no, course=course, chapter=chap)
+        if video:
+            files.append({"name": video["video"].name, "kind": "animation", "teacher_only": False, "seconds": video["seconds"]})
+        deck.build(spec, d / f"{name} 课件.pptx", no=no, course=course, chapter=chap,
+                   video=video["video"] if video else None, poster=video["poster"] if video else None)
         files.append({"name": f"{name} 课件.pptx", "kind": "slides", "teacher_only": False})
         docs.guide(spec, gp, d / f"实验{no} 实验指导书.docx", no)
         files.append({"name": f"实验{no} 实验指导书.docx", "kind": "guide", "teacher_only": False})

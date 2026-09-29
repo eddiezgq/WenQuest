@@ -29,6 +29,7 @@ set_images() {
     envset ENGINE_IMAGE "$1"
     envset GATEWAY_IMAGE "${1/\/engine:/\/gateway:}"
     envset WEB_IMAGE "${1/\/engine:/\/web:}"
+    envset ANIMATOR_IMAGE "${1/\/engine:/\/animator:}"
 }
 
 dc() {

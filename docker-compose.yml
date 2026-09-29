@@ -54,9 +54,33 @@ services:
       WQ_ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       WQ_CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-sonnet-5}
       WQ_DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      # Lesson animations are rendered by the animator service (below).
+      WQ_ANIMATOR_URL: http://animator:8000
     volumes:
       # Uploaded materials, course generation progress and converted slides survive redeploys.
       - gatewaydata:/data
+    networks:
+      - default
+      - render
+
+  # Renders the AI animator's Manim scenes to video. It holds no secrets and cannot reach the internet
+  # (the render network is internal); at most 2 CPUs and 3 GB so the site stays responsive.
+  animator:
+    build: services/animator
+    image: ${ANIMATOR_IMAGE:-wenquest/animator:0.1}
+    restart: unless-stopped
+    cpus: 2
+    mem_limit: 3g
+    pids_limit: 256
+    read_only: true
+    tmpfs:
+      - /tmp:size=1g
+      - /home/anim:size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    networks:
+      - render
 
   # WenQuest web app (static files) with /api forwarded to the gateway.
   web:
@@ -81,6 +105,11 @@ services:
     volumes:
       - moodledata:/var/www/moodledata
     command: ["sh", "-c", "sleep 60; while true; do su -s /bin/sh www-data -c 'php admin/cli/cron.php' ; sleep 60; done"]
+
+networks:
+  default:
+  render:
+    internal: true
 
 volumes:
   dbdata:

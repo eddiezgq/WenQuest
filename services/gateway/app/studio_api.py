@@ -450,6 +450,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
 
         # The benchmark order: lecture notes, slides, practice, lab guide, report template; then teacher-only items.
         acts: list[dict[str, Any]] = [{"type": "page", "name": title, "content": html_of(les["content"])}]
+        acts += await produced("animation")
         acts += await produced("slides")
         if any(les.get("exercises", {}).values()):
             acts.append({"type": "page", "name": ml({k: ex_name[k] + v for k, v in les["title"].items() if k in ex_name}, lg),

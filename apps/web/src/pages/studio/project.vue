@@ -227,6 +227,9 @@
                             <text class="dv-d">↓</text>
                           </view>
                         </view>
+                        <template v-for="f in l.files" :key="'v' + f.name">
+                          <video v-if="f.kind === 'animation'" class="dv-video" :src="absolute(f.url)" controls preload="metadata" />
+                        </template>
                         <view v-if="l.files.some((f) => f.kind === 'slides')" class="ghost small" @click="previewDeck(l.id)">
                           {{ deckFor === l.id && deckMsg ? deckMsg : t("studio.previewDeck") }}
                         </view>
@@ -724,6 +727,7 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .dv-n { flex: 1; font-size: 13px; word-break: break-all; }
 .dv-t { font-size: 11px; color: #a15c00; background: #fff4de; border-radius: 4px; padding: 1px 6px; }
 .dv-d { color: #1e2761; font-weight: 700; }
+.dv-video { width: 100%; max-width: 720px; aspect-ratio: 16 / 9; display: block; margin: 4px 0 10px; background: #0f1419; border-radius: 6px; }
 .dv-deck { white-space: nowrap; margin-top: 8px; }
 .dv-img { display: inline-block; width: 320px; margin-right: 8px; border: 1px solid #e3e8e6; border-radius: 4px; }
 .lesson-html { max-height: 520px; overflow: auto; border: 1px solid #f0f2f1; border-radius: 6px; padding: 4px 12px; }

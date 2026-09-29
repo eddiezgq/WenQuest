@@ -118,7 +118,7 @@ export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"
 export interface StudioLesson {
   id: string; title: Text; goal: Text; week: number; sections: string[]; status: LessonStatus;
   content: Text; exercises: Text; answers: Text; notes: string; error: string;
-  files?: { name: string; kind: "slides" | "guide" | "report" | "plan"; teacher_only: boolean; url: string }[];
+  files?: { name: string; kind: "animation" | "slides" | "guide" | "report" | "plan"; teacher_only: boolean; url: string; seconds?: number }[];
   review: { verdict: "pass" | "revise"; issues: { severity: string; text: string }[]; summary: string; round: number } | null;
 }
 export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[] }

@@ -276,3 +276,87 @@ def test_eddies_materials_two_courses_one_chosen(client, monkeypatch):
     assert [l["title"]["zh"] for l in ch7] == ["Work", "Work Done by Forces that Vary", "Kinetic Energy", "Work-Energy Theorem", "Power"]
     assert st.check_outline(p["outline"]) == []
     assert not any("Keplers" in l["title"]["zh"] or "Magnetism" in c["title"]["zh"] for c in p["outline"]["chapters"] for l in c["lessons"])
+
+
+def _write_first_lesson(client, h):
+    pid = make_project(client, h)
+    client.post(f"/api/v1/studio/projects/{pid}/start", headers=h)
+    settle(client, h, pid)
+    client.post(f"/api/v1/studio/projects/{pid}/approve-materials", headers=h)
+    settle(client, h, pid)
+    client.post(f"/api/v1/studio/projects/{pid}/approve-outline", headers=h)
+    client.post(f"/api/v1/studio/projects/{pid}/lessons/next", headers=h)
+    return pid, settle(client, h, pid)
+
+
+def test_animation_is_rendered_fixed_and_published(client, monkeypatch):
+    """A2: the animator's scene is rendered; a failed render goes back to the animator with the error."""
+    from app.production import anim
+    sent: list[str] = []
+
+    async def render(url, code, timeout=600.0):
+        sent.append(code)
+        if len(sent) == 1:
+            raise anim.RenderError("NameError: name 'Arow' is not defined")
+        from io import BytesIO
+        from PIL import Image
+        png = BytesIO()
+        Image.new("RGB", (64, 36), "#0f1419").save(png, "PNG")
+        return b"\x00\x00\x00\x18ftypmp42video", png.getvalue(), 42.0
+
+    monkeypatch.setattr(anim, "render", render)
+    monkeypatch.setattr(main.state.settings, "animator_url", "http://animator.test")
+    h = login(client)
+    pid, p = _write_first_lesson(client, h)
+    les = p["outline"]["chapters"][0]["lessons"][0]
+    assert len(sent) == 2 and "class Lesson(Base)" in sent[1]
+    kinds = [f["kind"] for f in les["files"]]
+    assert kinds[0] == "animation" and les["files"][0]["seconds"] == 42.0
+    assert client.get(les["files"][0]["url"]).content.startswith(b"\x00\x00\x00\x18ftyp")
+    assert "动画" in p["messages"][-1]["text"]
+    # the slides carry the video on the animation slide
+    from pptx import Presentation
+    d = main._studio().lesson_dir(main._studio().projects.load(pid), les)
+    deck = Presentation(str(next(d.glob("*课件.pptx"))))
+    assert any(s.shape_type == 16 or "movie" in s.name.lower() or s.shape_type == 13
+               for s in deck.slides[3].shapes if hasattr(s, "shape_type"))
+    # published right after the lecture notes
+    client.post(f"/api/v1/studio/projects/{pid}/lessons/{les['id']}/approve", headers=h)
+    sent_acts = [c for f, c in CALLS if f == "local_wenquest_add_activities"][-1]
+    assert sent_acts["activities[0][type]"] == "page"
+    assert sent_acts["activities[1][type]"] == "resource" and "动画" in sent_acts["activities[1][name]"]
+
+
+def test_animation_falls_back_to_the_storyboard(client, monkeypatch):
+    from app.production import anim
+    tries: list[str] = []
+
+    async def render(url, code, timeout=600.0):
+        tries.append(code)
+        if "ValueTracker" in code:  # the animator's scene; the storyboard version has none
+            raise anim.RenderError("render took longer than 420 s")
+        return b"video", b"", 20.0
+
+    monkeypatch.setattr(anim, "render", render)
+    monkeypatch.setattr(main.state.settings, "animator_url", "http://animator.test")
+    h = login(client)
+    _, p = _write_first_lesson(client, h)
+    les = p["outline"]["chapters"][0]["lessons"][0]
+    assert len(tries) == 4  # the animator's code three times, then the storyboard version
+    assert les["files"][0]["kind"] == "animation"
+    assert any("简版动画" in i["text"] for i in les["review"]["issues"])
+
+
+def test_no_renderer_no_video(client, monkeypatch):
+    from app.production import anim
+
+    async def down(url, code, timeout=600.0):
+        raise anim.RenderError("renderer unreachable: ConnectError", "service")
+
+    monkeypatch.setattr(anim, "render", down)
+    monkeypatch.setattr(main.state.settings, "animator_url", "http://animator.test")
+    h = login(client)
+    _, p = _write_first_lesson(client, h)
+    les = p["outline"]["chapters"][0]["lessons"][0]
+    assert les["status"] == "awaiting" and "animation" not in [f["kind"] for f in les["files"]]
+    assert any("动画渲染服务暂时不可用" in i["text"] for i in les["review"]["issues"])
