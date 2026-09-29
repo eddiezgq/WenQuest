@@ -25,6 +25,18 @@ dc pull --quiet moodle gateway web animator
 log "Starting services..."
 dc up -d --no-build --remove-orphans
 
+# Caddy keeps running with its old settings when only the Caddyfile changed: check the new file and
+# load it; a broken file is reported and the running settings are kept, so the site stays up.
+if [ -n "$(dc ps -q caddy 2>/dev/null)" ]; then
+    if dc exec -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null 2>&1; then
+        dc exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null 2>&1 \
+            && log "Web server settings reloaded." || log "WARNING: web server settings could not be reloaded."
+    else
+        log "WARNING: deploy/Caddyfile has an error; the web server keeps its previous settings:"
+        dc exec -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile 2>&1 | tail -5
+    fi
+fi
+
 # Wait for Moodle to finish installing or upgrading. First install can take several minutes.
 log "Waiting for the learning platform to become healthy..."
 for _ in $(seq 1 90); do

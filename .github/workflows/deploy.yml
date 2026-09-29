@@ -27,6 +27,8 @@ jobs:
       - name: Gateway tests
         working-directory: services/gateway
         run: pip install -q -r requirements-dev.txt && python -m pytest -q
+      - name: Web server settings (Caddyfile) are valid
+        run: docker run --rm -v "$PWD/deploy:/d:ro" -e SITE_DOMAIN=example.com -e ACME_EMAIL=ci@example.com caddy:2 caddy validate --config /d/Caddyfile --adapter caddyfile
       - name: Animator code check tests
         working-directory: services/animator
         run: pip install -q fastapi==0.141.1 pydantic==2.13.3 pytest && python -m pytest -q

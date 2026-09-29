@@ -48,11 +48,13 @@ classic.{$SITE_DOMAIN} {
 			write_timeout 300s
 		}
 	}
-qms.wenquestrobotics.com {
-    encode gzip
-    request_body {
-        max_size 100MB
-    }
-    reverse_proxy qms-demo-edge:80
 }
+
+# QMS demo (a separate project on the same server, reached over the external qms-edge network).
+qms.wenquestrobotics.com {
+	encode gzip
+	request_body {
+		max_size 100MB
+	}
+	reverse_proxy qms-demo-edge:80
 }
