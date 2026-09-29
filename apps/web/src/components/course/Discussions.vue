@@ -72,7 +72,7 @@ import { ApiError } from "../../api";
 import { courseApi, type Discussion, type Forum, initials } from "../../courseApi";
 import { errorText, formatDate, t } from "../../i18n";
 
-const props = defineProps<{ courseId: number }>();
+const props = defineProps<{ courseId: number; forumCmid?: number }>();
 const forums = ref<Forum[]>([]);
 const forum = ref<Forum | null>(null);
 const topics = ref<Discussion[]>([]);
@@ -98,7 +98,9 @@ async function run(fn: () => Promise<void>) {
 
 const load = () => run(async () => {
   forums.value = (await courseApi.forums(props.courseId)).forums;
-  if (forums.value.length === 1 && !forum.value) await openForum(forums.value[0]);
+  const wanted = props.forumCmid ? forums.value.find((f) => f.cmid === props.forumCmid) : null;
+  if (wanted && !forum.value) await openForum(wanted);
+  else if (forums.value.length === 1 && !forum.value) await openForum(forums.value[0]);
   else if (forum.value) await openForum(forum.value);
 });
 

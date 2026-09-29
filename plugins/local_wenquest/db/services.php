@@ -74,4 +74,11 @@ $functions = [
         'capabilities' => 'moodle/course:update',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_wenquest_create_quiz' => [
+        'classname'    => \local_wenquest\external\create_quiz::class,
+        'description'  => 'Create a quiz with its questions, or update a quiz and replace its questions.',
+        'type'         => 'write',
+        'capabilities' => 'moodle/course:manageactivities',
+        'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
 ];

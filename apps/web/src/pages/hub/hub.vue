@@ -10,16 +10,9 @@
       <text class="contact">{{ t("help.contact") }}</text>
     </view>
 
-    <!-- Calendar and inbox: new-UI versions come in steps 5 and 4 -->
-    <view v-else>
-      <text class="h1">{{ t("shell." + view) }}</text>
-      <view class="soon">
-        <text class="soon-h">{{ t("hub.what") }}</text>
-        <text class="soon-p">{{ t("hub." + view) }}</text>
-        <text class="soon-step">{{ t("hub.step", { n: view === "calendar" ? 5 : 4 }) }}</text>
-        <view v-if="link" class="primary" @click="open(link)">{{ t("hub.classic") }} ↗</view>
-      </view>
-    </view>
+    <!-- Calendar of all my courses, and the inbox -->
+    <Calendar v-else-if="view === 'calendar'" />
+    <Inbox v-else-if="view === 'inbox'" />
   </AppShell>
 </template>
 
@@ -27,9 +20,10 @@
 import { computed, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
-import { api, token } from "../../api";
+import { token } from "../../api";
+import Calendar from "../../components/course/Calendar.vue";
+import Inbox from "../../components/Inbox.vue";
 import { t } from "../../i18n";
-import { classicBase } from "../../store";
 
 // Page query parameters must not fall through onto the layout component.
 defineOptions({ inheritAttrs: false });
@@ -39,32 +33,13 @@ const FAQ = computed(() => [
   [t("help.qBuild"), t("help.aBuild")], [t("help.qDiffer"), t("help.aDiffer")],
 ]);
 const view = ref("help");
-const base = ref(classicBase());
-const link = computed(() => {
-  if (!base.value) return "";
-  if (view.value === "calendar") return `${base.value}/calendar/view.php?view=month`;
-  if (view.value === "inbox") return `${base.value}/message/index.php`;
-  return "";
-});
-
-function open(url: string) {
-  // #ifdef H5
-  window.open(url, "_blank", "noopener");
-  // #endif
-  // #ifndef H5
-  uni.setClipboardData({ data: url, success: () => uni.showToast({ title: t("activity.linkCopied"), icon: "none" }) });
-  // #endif
-}
 
 onLoad((q: any) => {
   view.value = ["calendar", "inbox", "help"].includes(q?.view) ? q.view : "help";
 });
-onShow(async () => {
+onShow(() => {
   if (!token.value) return uni.reLaunch({ url: "/pages/login/login" });
   uni.setNavigationBarTitle({ title: t(view.value === "help" ? "help.title" : "shell." + view.value) });
-  if (!base.value) {
-    try { await api.me(); base.value = classicBase(); } catch { /* the page still explains itself */ }
-  }
 });
 </script>
 

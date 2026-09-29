@@ -137,11 +137,11 @@ class MoodleClient:
             _raise_for(_json(r))
         return r
 
-    async def upload(self, token: str, filename: str, data: bytes) -> int:
-        """Put a file in the user's draft area; returns the draft item id for a resource."""
+    async def upload(self, token: str, filename: str, data: bytes, itemid: int = 0) -> int:
+        """Put a file in the user's draft area (a new one, or `itemid` to add to it); returns the draft item id."""
         try:
             r = await self.http.post(self._url("/webservice/upload.php"), headers=self.headers,
-                                     data={"token": token, "filearea": "draft", "itemid": "0"},
+                                     data={"token": token, "filearea": "draft", "itemid": str(itemid)},
                                      files={"file_1": (filename, data, "application/octet-stream")})
         except httpx.HTTPError as exc:
             raise EngineError("engine_unreachable", str(exc), 503) from exc

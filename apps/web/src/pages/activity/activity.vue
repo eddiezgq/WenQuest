@@ -22,15 +22,11 @@
         <text class="small">{{ a.url }}</text>
       </view>
 
-      <!-- Assignment -->
-      <view v-else-if="a.type === 'assign'" class="paper">
-        <view class="due">
-          <text class="due-label">{{ t("activity.due") }}</text>
-          <text class="due-value">{{ a.due ? formatDate(a.due) : t("activity.noDue") }}</text>
-        </view>
-        <MathContent :html="a.intro || ''" />
-        <view class="primary" @click="openLink(a.classic_url)">{{ t("activity.submitClassic") }}</view>
-      </view>
+      <!-- Assignment: hand in, or (teachers) grade -->
+      <AssignmentView v-else-if="a.type === 'assign'" :cmid="id" />
+
+      <!-- Quiz -->
+      <QuizView v-else-if="a.type === 'quiz'" :cmid="id" :course-id="courseId" />
 
       <!-- Files -->
       <view v-else-if="a.type === 'resource' && file">
@@ -85,10 +81,10 @@
         </view>
       </view>
 
-      <!-- Not yet supported in the new UI -->
+      <!-- Kinds of activity WenQuest does not use -->
       <view v-else class="paper">
-        <text class="muted block">{{ t("activity.classicHint") }}</text>
-        <view class="primary" @click="openLink(a.classic_url)">{{ t("activity.classic") }}</view>
+        <RichContent v-if="a.intro" :html="a.intro" />
+        <text class="muted block">{{ t("activity.unsupported") }}</text>
       </view>
 
       <view v-if="ctx" class="pager">
@@ -107,6 +103,8 @@ import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import RichContent from "../../components/RichContent.vue";
 import SlidePresenter from "../../components/SlidePresenter.vue";
+import AssignmentView from "../../components/work/AssignmentView.vue";
+import QuizView from "../../components/work/QuizView.vue";
 // #ifdef H5
 import PdfViewer from "../../components/PdfViewer.vue";
 // #endif
@@ -152,6 +150,10 @@ async function load() {
     a.value = await api.activity(id.value);
     uni.setNavigationBarTitle({ title: a.value.name });
     const cid = courseId.value || a.value.course_id;
+    if (a.value.type === "forum") {
+      // Discussion forums live under the course's Discussions menu.
+      return uni.redirectTo({ url: `/pages/course/course?id=${cid}&tab=discussions&forum=${id.value}` });
+    }
     courseId.value = cid;
     rememberVisit(cid, id.value);
     loadCourse(cid).then((x) => { d.value = x; }).catch(() => {});

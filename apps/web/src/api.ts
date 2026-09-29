@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { locale } from "./i18n";
 
 // Empty = same origin (the web app is served next to /api). The mini program needs an absolute URL.
-const BASE: string = (import.meta.env.VITE_API_BASE as string) || "";
+export const BASE: string = (import.meta.env.VITE_API_BASE as string) || "";
 const TOKEN_KEY = "wq.token";
 const USER_KEY = "wq.user";
 

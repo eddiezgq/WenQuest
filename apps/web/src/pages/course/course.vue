@@ -94,7 +94,7 @@
       </view>
 
       <!-- ================= Slides / Labs / Assignments: grouped by unit ================= -->
-      <view v-else-if="tab === 'slides' || tab === 'labs' || tab === 'assignments'">
+      <view v-else-if="tab === 'slides' || tab === 'labs' || tab === 'assignments' || tab === 'quizzes'">
         <text class="h1">{{ t("menu." + tab) }}</text>
         <text v-if="tab === 'labs'" class="lead">{{ t("course.labsLead") }}</text>
         <view v-if="!grouped.length" class="muted">{{ t("course.nothing") }}</view>
@@ -119,31 +119,12 @@
 
       <!-- ================= Class-wide menus in WenQuest's own UI (step B1) ================= -->
       <Announcements v-else-if="tab === 'announcements'" :course-id="id" />
-      <Discussions v-else-if="tab === 'discussions'" :course-id="id" />
+      <Discussions v-else-if="tab === 'discussions'" :course-id="id" :forum-cmid="forumCmid" />
       <Online v-else-if="tab === 'online'" :course-id="id" />
       <People v-else-if="tab === 'people'" :course-id="id" />
 
-      <!-- ================= Menus the new UI completes in later steps ================= -->
-      <view v-else-if="HUB[tab]">
-        <text class="h1">{{ t("menu." + tab) }}</text>
-
-        <view v-if="hubItems.length" class="hub-list">
-          <text class="g-sub">{{ t("hub.existing") }}</text>
-          <view class="list">
-            <ModuleRow v-for="m in hubItems" :key="m.id" :m="m" :course-id="id" />
-          </view>
-        </view>
-        <view v-else-if="HUB[tab].lists" class="empty">{{ t("hub.noneYet") }}</view>
-
-        <view class="soon">
-          <text class="soon-h">{{ t("hub.what") }}</text>
-          <text class="soon-p">{{ t("hub." + tab) }}</text>
-          <text class="soon-step">{{ t("hub.soonB2") }}</text>
-          <view class="soon-btns">
-            <view class="primary" @click="openUrl(classicLink(d, tab))">{{ t("hub.classic") }} ↗</view>
-          </view>
-        </view>
-      </view>
+      <Grades v-else-if="tab === 'grades'" :course-id="id" />
+      <Calendar v-else-if="tab === 'calendar'" :course-id="id" />
     </template>
 
     <template v-if="d && tab === 'home'" #side>
@@ -174,11 +155,13 @@ import Announcements from "../../components/course/Announcements.vue";
 import Discussions from "../../components/course/Discussions.vue";
 import Online from "../../components/course/Online.vue";
 import People from "../../components/course/People.vue";
-import { absolute, ApiError, type Module, type Section, token } from "../../api";
+import Grades from "../../components/course/Grades.vue";
+import Calendar from "../../components/course/Calendar.vue";
+import { absolute, ApiError, type Section, token } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 import {
   type CourseData, findModule, isTeacher, isUnit, lastVisited, loadCourse, moduleKind, studentPreview,
-  classicLink, syllabusSection, units, visibleModules,
+  syllabusSection, units, visibleModules,
 } from "../../store";
 
 // Page query parameters (id, course, tab) must not fall through onto the layout component.
@@ -186,6 +169,7 @@ defineOptions({ inheritAttrs: false });
 
 const id = ref(0);
 const tab = ref("home");
+const forumCmid = ref(0);
 const d = ref<CourseData | null>(null);
 const loading = ref(true);
 const error = ref("");
@@ -235,7 +219,7 @@ function unitMeta(s: Section): string {
   return parts.join(" · ");
 }
 
-const KINDS: Record<string, string[]> = { slides: ["slides", "pdf"], labs: ["lab"], assignments: ["assign"] };
+const KINDS: Record<string, string[]> = { slides: ["slides", "pdf"], labs: ["lab"], assignments: ["assign"], quizzes: ["quiz"] };
 const grouped = computed(() => {
   if (!d.value || !KINDS[tab.value]) return [];
   const want = KINDS[tab.value];
@@ -253,24 +237,6 @@ const grouped = computed(() => {
     .filter((g) => g.items.length || g.guides.length);
 });
 
-// Menu pages whose new-UI version comes later in this round; step = step number in the plan.
-const HUB: Record<string, { step: number; lists?: boolean }> = {
-  quizzes: { step: 5, lists: true }, grades: { step: 5 }, calendar: { step: 5 },
-};
-const hubItems = computed<Module[]>(() => {
-  if (!d.value) return [];
-  const mods = d.value.sections.flatMap((s) => visibleModules(d.value!, s));
-  if (tab.value === "quizzes") return mods.filter((m) => m.type === "quiz");
-  return [];
-});
-function openUrl(url: string) {
-  // #ifdef H5
-  window.open(url, "_blank", "noopener");
-  // #endif
-  // #ifndef H5
-  uni.setClipboardData({ data: url, success: () => uni.showToast({ title: t("activity.linkCopied"), icon: "none" }) });
-  // #endif
-}
 
 const last = computed(() => {
   const cm = lastVisited(id.value);
@@ -307,6 +273,7 @@ const create = () => uni.navigateTo({ url: "/pages/studio/studio" });
 onLoad((q: any) => {
   id.value = Number(q?.id || 0);
   tab.value = String(q?.tab || "home");
+  forumCmid.value = Number(q?.forum || 0);
 });
 onShow(() => {
   if (!token.value) return uni.reLaunch({ url: "/pages/login/login" });

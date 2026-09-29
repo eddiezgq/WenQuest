@@ -55,6 +55,15 @@
       }
     },
     {
+      "path": "pages/quiz/attempt",
+      "style": {
+        "navigationBarTitleText": "测验",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
       "path": "pages/hub/hub",
       "style": {
         "navigationBarTitleText": "问渠",
