@@ -17,7 +17,9 @@ services:
       SITE_DOMAIN: ${SITE_DOMAIN:?Set SITE_DOMAIN in .env}
       ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
     volumes:
-      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # The folder, not the single file: a deploy replaces deploy/Caddyfile with a new file, and a
+      # single-file mount would keep showing Caddy the old one (so "caddy reload" changed nothing).
+      - ./deploy:/etc/caddy:ro
       - ./site:/srv/site:ro
       - caddy_data:/data
       - caddy_config:/config
