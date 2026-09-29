@@ -22,6 +22,7 @@ v0.2：问渠自己的学习界面和接口网关。学生登录后可看我的�
 | `docker-compose.prod.yml`、`deploy/` | 云服务器生产部署：Caddy 自动 HTTPS、更新、回滚、备份与恢复脚本 |
 | `.github/workflows/deploy.yml` | 推送即自动构建镜像并部署到服务器 |
 | `site/` | 学院官网（静态页面，中英双语） |
+| `factory/` | 问渠数字工厂：ERPNext 减速器厂（`factory/`）与数字工厂第 1 轮（`factory/digital/`：统一数据总线、仿真车间、看板、AI 工厂助手、Node-RED 桥接、FreeCAD 发布）；单独用 Docker 运行，见 `factory/digital/README.md`。只改这里不会触发服务器部署 |
 | `docs/上线手册.md` | 从零上线到 DigitalOcean 的分步手册 |
 
 启用后，Moodle 里立即可用的 AI 功能：

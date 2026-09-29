@@ -21,10 +21,10 @@ Windows 10/11，内存 16 GB 更流畅（最低 8 GB），磁盘空余 15 GB。E
 
 ## 二、启动 ERPNext
 
-把本文件夹解压到比如 `D:\code\virtual-factory`，在 PowerShell 里：
+本文件夹在问渠仓库的 `factory` 目录里。把仓库克隆到比如 `D:\code\wenquest`（`git clone git@github.com:<你的用户名>/wenquest.git`），在 PowerShell 里：
 
 ```powershell
-cd D:\code\virtual-factory
+cd D:\code\wenquest\factory
 docker compose up -d
 docker compose logs -f create-site
 ```

@@ -1,5 +1,5 @@
 # 问渠数字工厂：枢纽服务（历史库写入、看板指标、AI 助手、MES、工作台网页）与仿真车间共用这个镜像
-# 构建上下文是上一级目录 virtual-factory（要用到工厂数据 factory/）
+# 构建上下文是上一级目录（问渠仓库的 factory/，要用到其中的工厂数据 factory/factory/）
 
 FROM node:22-slim AS web
 WORKDIR /web

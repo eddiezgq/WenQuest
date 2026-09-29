@@ -19,16 +19,16 @@
 | `mock_erpnext/` | 模拟 ERPNext，给自动测试和“先试一下”用 | 8091 |
 | `tests/` | 自动测试，含完整闭环测试 | — |
 
-ERPNext 沿用上一级目录 `virtual-factory` 里的那套（端口 8090，数据由 `seed.py` 导入）。
+ERPNext 沿用上一级目录 `factory` 里的那套（端口 8090，数据由 `seed.py` 导入）。
 
 ## 二、在 Windows 上安装（约 30 分钟）
 
-前提：已按 `virtual-factory/README.md` 装好 Docker Desktop，ERPNext 在 `http://localhost:8090` 能打开，并运行过 `py seed.py --opening-stock`。
+前提：已按 `factory/README.md` 装好 Docker Desktop，ERPNext 在 `http://localhost:8090` 能打开，并运行过 `py seed.py --opening-stock`。
 
 1. **给桥接一把 ERPNext 钥匙**：用 Administrator 登录 ERPNext → 右上角头像 → “我的设置” → 往下找“API 访问” → “生成密钥”。页面会弹出 API Secret（只显示一次），连同上方的 API Key 一起记下。
 2. **配置**：在 PowerShell 里
    ```powershell
-   cd D:\code\virtual-factory\digital
+   cd D:\code\wenquest\factory\digital
    copy .env.example .env
    notepad .env
    ```
@@ -44,6 +44,8 @@ ERPNext 沿用上一级目录 `virtual-factory` 里的那套（端口 8090，数
 还没装 ERPNext、只想先看看：`.env` 里设 `WQ_ERPNEXT_API=http://mock-erpnext:8091`，然后 `docker compose --profile mock up -d --build`。
 
 停止：`docker compose down`（数据保留）；连数据一起清掉：`docker compose down -v`。
+
+**更新到最新版本**：在 `factory\digital` 目录运行 `.\update.ps1`（拉取 GitHub 上的最新代码、重新构建并启动）。数字工厂的代码在问渠仓库的 `factory/` 目录；只改这里时，GitHub 不会重新部署学习平台的服务器。
 
 ## 三、日常使用
 

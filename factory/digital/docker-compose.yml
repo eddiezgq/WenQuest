@@ -2,7 +2,7 @@
 # 启动：docker compose up -d --build          打开工作台：http://localhost:8100
 # 没装 ERPNext 想先试：docker compose --profile mock up -d --build   （用模拟 ERPNext，见 README）
 # 组件：统一数据总线（Mosquitto）、历史库（PostgreSQL）、枢纽服务（看板 + AI 助手 + MES + 工作台网页）、
-#       仿真车间、Node-RED 桥接；ERPNext 用 virtual-factory 目录里原有的那套（端口 8090）。
+#       仿真车间、Node-RED 桥接；ERPNext 用上一级 factory 目录里原有的那套（端口 8090）。
 name: wq-digital-factory
 
 x-app: &app
