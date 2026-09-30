@@ -221,6 +221,12 @@ class Mock:
             wo["status"] = "In Process" if wo["status"] == "Not Started" else wo["status"]
             wo["modified"] = now_str()
         elif dt_ == "Stock Entry":
+            # ERPNext StockController.validate_inspection：单据要求检验时，入库行必须挂检验单
+            if doc.get("inspection_required"):
+                for i, it in enumerate(doc["items"]):
+                    if it.get("t_warehouse") and not it.get("quality_inspection"):
+                        raise Err(417, "QualityInspectionRequiredError",
+                                  "Row #{}: Quality Inspection is required for Item {}".format(i + 1, it["item_code"]))
             for it in doc["items"]:
                 q = float(it["qty"])
                 if it.get("s_warehouse"):
@@ -304,7 +310,9 @@ class Mock:
                       "is_finished_item": 1, "uom": "Nos", "stock_uom": "Nos", "conversion_factor": 1})
         return {"doctype": "Stock Entry", "stock_entry_type": "Manufacture", "purpose": purpose, "company": wo["company"],
                 "work_order": work_order_id, "fg_completed_qty": qty, "from_bom": 1, "bom_no": wo["bom_no"],
-                "use_multi_level_bom": 0, "items": items}
+                "use_multi_level_bom": 0, "items": items,
+                # 与 ERPNext 一样：从 BOM 继承“需要检验”
+                "inspection_required": 1 if bom.get("inspection_required") else 0}
 
 
 def _has_overlap(capacity, logs):

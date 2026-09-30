@@ -318,6 +318,10 @@ class ERP {
     const se = await this.method('erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry',
       { work_order_id: workOrder, purpose: 'Manufacture', qty });
     delete se.name;
+    // 完工入库单从 BOM 继承了“需要检验”，会要求成品行再挂一张检验单；本厂的检验在“零件检验”工序逐件完成
+    //（每件一张检验单，挂在该工序作业卡上，入库数量就是合格数），这里不再重复要求（第 3 轮演练发现）
+    se.inspection_required = 0;
+    se.remarks = `${se.remarks ? se.remarks + '；' : ''}检验已在“零件检验”工序逐件完成（见该工序作业卡的检验单），入库数量为合格数`;
     se.docstatus = 1;
     const doc = await this.insert('Stock Entry', se);
     const wo = await this.get('Work Order', workOrder);
