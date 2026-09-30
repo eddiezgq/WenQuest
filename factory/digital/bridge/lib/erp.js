@@ -61,7 +61,19 @@ class ERP {
   }
 
   // ------------------------------------------------------------ REST
-  async req(method, path, body) {
+  // 数据库冲突（多个请求同时改同一张作业卡）时 ERPNext 返回 500 QueryDeadlockError：稍等重试
+  async req(method, path, body, attempt = 0) {
+    try {
+      return await this.req1(method, path, body);
+    } catch (e) {
+      const deadlock = e instanceof ErpError && e.status >= 500 && /Deadlock|Record has changed since last read/i.test(e.message);
+      if (!deadlock || attempt >= 4) throw e;
+      await new Promise((r) => setTimeout(r, 400 * (attempt + 1) + Math.random() * 400));
+      return this.req(method, path, body, attempt + 1);
+    }
+  }
+
+  async req1(method, path, body) {
     const r = await fetch(this.url + path, {
       method,
       headers: { Authorization: this.auth, 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -267,6 +279,10 @@ class ERP {
   async onOpComplete(m) {
     const d = m.data;
     const out = [];
+    if (d.operation === INSPECTION_OP) {
+      // 检验工序：先等这张工单的检验单都建好（在锁外等，建检验单也要用同一把锁）
+      for (let i = 0; i < 160 && this.qiPending(d.work_order); i++) await new Promise((r) => setTimeout(r, 250));
+    }
     const jc = await this.withLock(`${d.work_order}|${d.operation}`, async () => {
       const name = await this.jobCard(d.work_order, d.operation);
       if (!name) return null;
@@ -274,8 +290,6 @@ class ERP {
       if (doc.docstatus !== 0) return name;
       const patch = { docstatus: 1 };
       if (d.operation === INSPECTION_OP) {
-        // 检验工序：等这张工单最后一件的检验单建好（测量值走另一条流程）
-        for (let i = 0; i < 20 && this.qiPending(d.work_order); i++) await new Promise((r) => setTimeout(r, 250));
         const qi = await this.list('Quality Inspection', [['reference_type', '=', 'Job Card'], ['reference_name', '=', name],
           ['docstatus', '=', 1]], ['name']);
         if (qi.length) patch.quality_inspection = qi[qi.length - 1].name;
@@ -326,7 +340,13 @@ class ERP {
   }
 
   async createQi(d, buf, m) {
-    const jc = d.work_order ? await this.jobCard(d.work_order, INSPECTION_OP) : null;
+    if (!d.work_order) return [];
+    // 建检验单时 ERPNext 会回写检验工序的作业卡：与该作业卡的报工排队进行，避免数据库冲突（第 3 轮演练发现）
+    return this.withLock(`${d.work_order}|${INSPECTION_OP}`, () => this.createQi1(d, buf, m));
+  }
+
+  async createQi1(d, buf, m) {
+    const jc = await this.jobCard(d.work_order, INSPECTION_OP);
     if (!jc) return [];
     const ok = buf.every((x) => x.result === 'pass');
     const doc = await this.insert('Quality Inspection', {
