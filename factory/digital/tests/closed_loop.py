@@ -139,7 +139,8 @@ def main():
                      for d in erp_docs("Item")), "ERPNext 物料版本更新", 30, 1)
     item = next(d for d in erp_docs("Item") if d["name"] == "SH-301")
     check(item.get("wq_revision") == res["revision"], "ERPNext 里 SH-301 版本 = {}".format(item.get("wq_revision")))
-    files = [f for f in erp_docs("File") if f["attached_to_name"] == "SH-301"]
+    files = wait(lambda: (lambda fs: fs if len(fs) >= 2 else None)(
+        [f for f in erp_docs("File") if f.get("attached_to_name") == "SH-301"]), "SH-301 附件", 30, 1) or []
     check(len(files) >= 2, "SH-301 附件 {} 个（STEP、G 代码…）".format(len(files)))
     st = hub("GET", "/api/teach", token=eng)
     check(st["tasks"][2]["score"] == 15, "任务 3 满分")

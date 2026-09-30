@@ -144,6 +144,8 @@ class Mock:
             fields = {f["fieldname"]: f for f in sch["fields"] if f["fieldtype"] not in NO_VALUE}
             if dt_ == "Item":
                 fields["wq_revision"] = {"fieldname": "wq_revision", "fieldtype": "Int"}
+            if dt_ == "Work Order":
+                fields["wq_sales_order"] = {"fieldname": "wq_sales_order", "fieldtype": "Link"}
             for k, v in doc.items():
                 if k in META:
                     continue
@@ -175,6 +177,12 @@ class Mock:
         elif dt_ == "Material Request":
             doc["status"] = "Pending"
         elif dt_ == "Work Order":
+            if doc.get("sales_order"):
+                # 真 ERPNext（work_order.validate_sales_order）：订单必须已提交，且订单行里有这个生产物料
+                so = self.db.get("Sales Order", {}).get(doc["sales_order"])
+                if not so or so.get("docstatus") != 1 or not any(
+                        i.get("item_code") == doc["production_item"] for i in so.get("items", [])):
+                    raise Err(417, "ValidationError", "Sales Order {} is not valid".format(doc["sales_order"]))
             bom = self.db["BOM"].get(doc["bom_no"])
             if not bom:
                 raise Err(417, "ValidationError", "BOM {} 不存在".format(doc["bom_no"]))

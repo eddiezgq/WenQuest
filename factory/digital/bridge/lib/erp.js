@@ -154,9 +154,17 @@ class ERP {
         created.push(['Sales Order', soDoc.name]);
         for (const w of pv.work_orders || []) {
           const bom = await this.defaultBom(w.production_item);
+          // ERPNext 只允许生产“订单上那个物料”的工单填 sales_order；零件工单（如 SH-301）把订单号记在
+          // 自定义字段 wq_sales_order 里，看板照样能把订单和工单对上（第 3 轮演练发现）
+          const direct = w.production_item === so.item_code;
+          if (!direct) {
+            await this.ensureCustomField('Work Order', 'wq_sales_order', { label: '对应销售订单 For sales order',
+              fieldtype: 'Link', options: 'Sales Order', insert_after: 'sales_order', read_only: 1 });
+          }
           const woDoc = await this.insert('Work Order', {
             production_item: w.production_item, bom_no: bom, qty: w.qty, company,
-            sales_order: soDoc.name, planned_start_date: `${w.planned_start_date} 08:00:00`,
+            ...(direct ? { sales_order: soDoc.name } : { wq_sales_order: soDoc.name }),
+            planned_start_date: `${w.planned_start_date} 08:00:00`,
             expected_delivery_date: w.expected_delivery_date, skip_transfer: 1,
             source_warehouse: WH.raw, wip_warehouse: WH.wip, fg_warehouse: MAKE_WH[w.production_item] || WH.semi,
             use_multi_level_bom: 0, docstatus: 1,
@@ -314,12 +322,17 @@ class ERP {
   }
 
   // ------------------------------------------------------------ 4. 设计发布 → 物料版本、BOM、附件
+  async ensureCustomField(dt, fieldname, spec) {
+    const key = `${dt}.${fieldname}`;
+    if (this.fieldsOk && this.fieldsOk.has(key)) return;
+    const rows = await this.list('Custom Field', [['dt', '=', dt], ['fieldname', '=', fieldname]], ['name']);
+    if (!rows.length) await this.insert('Custom Field', { dt, fieldname, ...spec });
+    (this.fieldsOk = this.fieldsOk || new Set()).add(key);
+  }
+
   async ensureRevisionField() {
-    const rows = await this.list('Custom Field', [['dt', '=', 'Item'], ['fieldname', '=', 'wq_revision']], ['name']);
-    if (!rows.length) {
-      await this.insert('Custom Field', { dt: 'Item', fieldname: 'wq_revision', label: '设计版本 Design revision',
-        fieldtype: 'Int', insert_after: 'item_name', read_only: 1 });
-    }
+    await this.ensureCustomField('Item', 'wq_revision', { label: '设计版本 Design revision',
+      fieldtype: 'Int', insert_after: 'item_name', read_only: 1 });
   }
 
   async onRelease(m) {
@@ -403,8 +416,9 @@ function summarize(doctype, d) {
       return { ...pick(['customer', 'delivery_date', 'transaction_date', 'status', 'docstatus', 'per_delivered']),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, delivered_qty: i.delivered_qty || 0 })) };
     case 'Work Order':
-      return { ...pick(['production_item', 'qty', 'produced_qty', 'sales_order', 'status', 'docstatus', 'bom_no',
-        'expected_delivery_date']), planned_start_date: String(d.planned_start_date || '').slice(0, 10) };
+      return { ...pick(['production_item', 'qty', 'produced_qty', 'status', 'docstatus', 'bom_no',
+        'expected_delivery_date']), planned_start_date: String(d.planned_start_date || '').slice(0, 10),
+        ...((d.sales_order || d.wq_sales_order) ? { sales_order: d.sales_order || d.wq_sales_order } : {}) };
     case 'Material Request':
       return { ...pick(['material_request_type', 'status', 'docstatus', 'transaction_date', 'schedule_date']),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, schedule_date: i.schedule_date })) };
