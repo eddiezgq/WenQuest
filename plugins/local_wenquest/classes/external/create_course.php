@@ -37,7 +37,7 @@ class create_course extends external_api {
             'intro' => new external_value(PARAM_RAW, 'Short description (HTML)', VALUE_DEFAULT, ''),
             'content' => new external_value(PARAM_RAW, 'Page content (HTML)', VALUE_DEFAULT, ''),
             'url' => new external_value(PARAM_URL, 'Link target for url activities', VALUE_DEFAULT, ''),
-            'draftitemid' => new external_value(PARAM_INT, 'Draft area with the uploaded file (resource)', VALUE_DEFAULT, 0),
+            'draftitemid' => new external_value(PARAM_INT, 'Draft area with the uploaded file (resource), or the pictures of a page', VALUE_DEFAULT, 0),
             'visible' => new external_value(PARAM_INT, '1 = students see it, 0 = teachers only', VALUE_DEFAULT, 1),
         ]);
         $section = new external_single_structure([
@@ -243,6 +243,15 @@ class create_course extends external_api {
                 return 0; // Unknown types are skipped rather than failing the whole course.
         }
         $created = create_module((object) $info);
+        if ($activity['type'] === 'page' && !empty($activity['draftitemid'])) {
+            // Pictures of the page (figures): uploaded to a draft area, referenced as @@PLUGINFILE@@/name.png in the content.
+            global $DB;
+            $context = \context_module::instance($created->coursemodule);
+            $page = $DB->get_record('page', ['id' => $created->instance], '*', MUST_EXIST);
+            $page->content = file_save_draft_area_files((int) $activity['draftitemid'], $context->id, 'mod_page', 'content', 0,
+                ['subdirs' => 0, 'maxfiles' => 50, 'maxbytes' => 0], $page->content);
+            $DB->update_record('page', $page);
+        }
         return (int) $created->coursemodule;
     }
 

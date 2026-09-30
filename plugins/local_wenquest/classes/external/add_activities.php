@@ -36,7 +36,7 @@ class add_activities extends external_api {
             'intro' => new external_value(PARAM_RAW, 'Short description (HTML)', VALUE_DEFAULT, ''),
             'content' => new external_value(PARAM_RAW, 'Page content (HTML)', VALUE_DEFAULT, ''),
             'url' => new external_value(PARAM_URL, 'Link target for url activities', VALUE_DEFAULT, ''),
-            'draftitemid' => new external_value(PARAM_INT, 'Draft area with the uploaded file (resource)', VALUE_DEFAULT, 0),
+            'draftitemid' => new external_value(PARAM_INT, 'Draft area with the uploaded file (resource), or the pictures of a page', VALUE_DEFAULT, 0),
             'visible' => new external_value(PARAM_INT, '1 = students see it, 0 = teachers only', VALUE_DEFAULT, 1),
             'duedate' => new external_value(PARAM_INT, 'Assignment due date (0 = none)', VALUE_DEFAULT, 0),
             'grade' => new external_value(PARAM_FLOAT, 'Assignment maximum grade', VALUE_DEFAULT, 100),

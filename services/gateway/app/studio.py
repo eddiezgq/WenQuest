@@ -899,6 +899,7 @@ class Studio:
             proj["busy"] = {"label": f"主讲教授按审稿意见重写：{no}", "since": now()}
             self.projects.save(proj)
         spec["sources"] = await self.lesson_assets(proj, les, spec)
+        spec["figures_made"] = await self.make_figures(proj, les, spec, no)
         video = await self.animate(proj, les, spec, no, review)
         lab = await self.make_lab(proj, chapter, les, spec, no, review)
         proj["busy"] = {"label": f"正在排版课件、指导书、报告模板和教案：{no}", "since": now()}
@@ -942,6 +943,9 @@ class Studio:
         ok, note = ai("problem")
         items.append({"key": "problem", "label": "机器人问题是本课的", "by": "ai", "ok": ok, "note": note})
         checks = les.get("checks") or {}
+        c = checks.get("figures") or {"ok": False, "note": "没有插图"}
+        items.append({"key": "figures", "label": "插图切题、标注正确", "by": "auto+ai", "ok": bool(c.get("ok")),
+                      "note": c.get("note", ""), "image": c.get("image", "")})
         if self.animator_url:
             c = checks.get("animation") or {"ok": False, "note": "没有动画"}
             items.append({"key": "animation", "label": "动画切题", "by": c.get("by", "auto+ai"), "ok": bool(c.get("ok")) and bool(video),
@@ -1024,6 +1028,97 @@ class Studio:
         (d / "animation.py").write_text(code if used == "ai" else anim.storyboard_code(spec, no))
         (d / "animation_by.txt").write_text(used)
         return {"video": v, "poster": pp, "seconds": secs, "by": used}
+
+    async def make_figures(self, proj: dict, les: dict, spec: dict, no: str) -> list[dict]:
+        """插图师: each figure the lecturer asked for is drawn by a program (scene / graph / chart / drawing), must render
+        to a real picture and pass the relevance check (the reviewer sees it); problems go back to the illustrator
+        once. A figure that still fails is left out and the checklist says so."""
+        from .production import figures as F
+        d = self.lesson_dir(proj, les)
+        d.mkdir(parents=True, exist_ok=True)
+        for old in d.glob("fig-*"):
+            old.unlink()
+        lang = {"zh": "zh", "en": "en"}.get(proj["outline"].get("languages"), "both")
+        course = self.course_brief(proj)
+        spec_json = json.dumps({k: spec[k] for k in ("title", "goal", "problem", "concept", "example", "model", "summary")},
+                               ensure_ascii=False)[:12000]
+        chapter, _ = self.find_lesson(proj, les["id"])
+        ch_no = chapter["no"]
+        # figures are numbered through the chapter, like a textbook: after the earlier lessons' figures
+        before = 0
+        for x in chapter["lessons"]:
+            if x["id"] == les["id"]:
+                break
+            before += len(x.get("figures") or [])
+        made, failed = [], []
+        for i, fig in enumerate(spec.get("figures") or [], 1):
+            dest = d / f"fig-{i}"
+            proj["busy"] = {"label": f"插图师正在画图 {ch_no}.{i}：{fig['title'][0]}", "since": now()}
+            self.projects.save(proj)
+            error, previous, ok, out = "", "", False, None
+            for attempt in range(2):
+                try:
+                    if fig["kind"] == "drawing":
+                        aid = fig["asset"] or next(iter(les.get("assets") or []), "")
+                        rec = (proj.get("assets") or {}).get(aid)
+                        if not rec:
+                            recs = await self.use_assets(proj, [aid]) if aid else []
+                            rec = recs[0] if recs else None
+                        svg = next((f for f in (rec or {}).get("files", []) if f.endswith(".svg")), "")
+                        if not svg:
+                            raise F.FigureError(f"no library drawing for {aid or '(none)'}")
+                        out = await asyncio.to_thread(F.render_drawing, self.assets_dir(proj) / rec["id"] / svg, dest)
+                    else:
+                        data = await self.ai.json(system=team.ILLUSTRATOR,
+                                                  prompt=team.figure_prompt(no, fig, spec_json, lang, course, error, previous),
+                                                  schema=team.figure_schema(fig["kind"]), max_tokens=8000,
+                                                  fake=lambda: fake_figure(fig, spec))
+                        data = data if isinstance(data, dict) else {}
+                        if fig["kind"] == "graph":
+                            previous = json.dumps(data.get("graph") or {}, ensure_ascii=False)[:4000]
+                            out = await asyncio.to_thread(F.render_graph, data.get("graph") or {}, lang, dest)
+                        elif fig["kind"] == "chart":
+                            previous = json.dumps(data.get("chart") or {}, ensure_ascii=False)[:4000]
+                            out = await asyncio.to_thread(F.render_chart, data.get("chart") or {}, lang, dest)
+                        else:
+                            if not self.animator_url:
+                                raise F.FigureError("the figure renderer (animator service) is not set up")
+                            code = re.sub(r"^```(?:python)?\s*|```\s*$", "", str(data.get("code") or "").strip())
+                            previous = code
+                            out = await F.render_scene(self.animator_url, code, dest)
+                    png = d / out["png"]
+                    if not F.png_ok(png):
+                        raise F.FigureError("the picture is blank")
+                    rel = await self.relevance(proj, les, spec, f"figure “{fig['title'][0]}” (must show: {fig['purpose'][0]})",
+                                               [fig["title"][0], fig["title"][1], fig["purpose"][0]], [("image/png", png.read_bytes())])
+                    if not rel["on_topic"]:
+                        raise F.FigureError(f"the reviewer found it does not show what was asked: {rel['reason']} {rel['fix']}")
+                    ok = True
+                    break
+                except F.FigureError as e:
+                    error = str(e)
+                    if "not set up" in error or "not installed" in error or "no library drawing" in error:
+                        break
+            if ok and out:
+                made.append({"no": f"{ch_no}.{before + len(made) + 1}", "kind": fig["kind"], "place": fig["place"], "title": fig["title"],
+                             "png": out["png"], "svg": out.get("svg", "")})
+            else:
+                failed.append(f"{fig['title'][0]}（{error[:120]}）")
+                for f in d.glob(f"fig-{i}.*"):
+                    f.unlink()
+        # numbered in the order they appear in the notes
+        order = ["problem", "concept", "notes", "example", "model", "summary"]
+        made.sort(key=lambda f: order.index(f["place"]))
+        for k, f in enumerate(made, 1):
+            f["no"] = f"{ch_no}.{before + k}"
+        les["figures"] = made
+        asked = len(spec.get("figures") or [])
+        les.setdefault("checks", {})["figures"] = {
+            "ok": bool(made) and not failed, "by": "auto+ai",
+            "note": (f"{len(made)}/{asked} 张插图通过切题检查" if asked else "主讲教授没有安排插图")
+                    + (f"；没画成：{'；'.join(failed)[:300]}" if failed else ""),
+            "image": made[0]["png"] if made else ""}
+        return made
 
     def anim_refs(self, proj: dict, les: dict) -> dict[str, str]:
         """What an animation must not copy: the examples and this course's other lessons' animations."""
@@ -1220,8 +1315,8 @@ class Studio:
         d = self.lesson_dir(proj, les)
         d.mkdir(parents=True, exist_ok=True)
         for old in d.iterdir():
-            if old.stem == "lab":
-                continue  # lab.js / lab.png / lab_check.json belong to make_lab
+            if old.stem == "lab" or old.stem.startswith("fig-"):
+                continue  # lab.* belong to make_lab, fig-* to make_figures
             if old.suffix in (".pptx", ".docx", ".json", ".html") or (not video and old.suffix in (".mp4", ".png")):
                 old.unlink()
         # The lesson number is added by the layout; drop one the author may have put in the title.
@@ -1247,6 +1342,9 @@ class Studio:
         files.append({"name": f"实验{no} 实验报告模板.docx", "kind": "report", "teacher_only": False})
         docs.plan(spec, gp, d / f"{no} 教案.docx", no, course[0], chap[0], proj.get("owner_name", ""))
         files.append({"name": f"{no} 教案.docx", "kind": "plan", "teacher_only": True})
+        for f in spec.get("figures_made") or []:
+            if (d / f["png"]).exists():
+                files.append({"name": f["png"], "kind": "figure", "teacher_only": False, "title": f["title"], "no": f["no"]})
         les["files"] = files
         les["spec_title"] = spec["title"]
         keys = lang_keys(o["languages"])
@@ -1626,7 +1724,28 @@ def fake_spec(les: dict, no: str) -> dict:
     from .production.demo import LESSON_2_1
     s = copy.deepcopy(LESSON_2_1)
     s["title"] = [disp(les["title"], "zh") or s["title"][0], disp(les["title"], "en") or s["title"][1]]
+    s.setdefault("figures", [
+        {"kind": "graph", "place": "concept", "title": ["本课概念图", "Concept map"], "purpose": ["概念与要点的关系", "How the ideas connect"],
+         "asset": "", "data": ""},
+        {"kind": "drawing", "place": "problem", "title": ["本课的机器人", "The robot in this lesson"],
+         "purpose": ["机构简图与关节编号", "Kinematic sketch with joint numbers"], "asset": "", "data": ""}])
     return s
+
+
+def fake_figure(fig: dict, spec: dict) -> dict:
+    """Offline illustrator: a small, correct figure of the asked kind."""
+    t = spec["concept"]["title"]
+    pts = spec["concept"]["points"][:4] or [["要点", "Point"]]
+    if fig["kind"] == "graph":
+        nodes = [{"id": "c", "label": t or ["概念", "Concept"], "emphasis": True}] + \
+                [{"id": f"p{i}", "label": p} for i, p in enumerate(pts)]
+        return {"graph": {"direction": "TB", "nodes": nodes, "edges": [{"from": "c", "to": f"p{i}"} for i in range(len(pts))]}}
+    if fig["kind"] == "chart":
+        xs = [i / 10 for i in range(0, 31)]
+        return {"chart": {"type": "line", "x_label": ["时间 t（s）", "time t (s)"], "y_label": ["角度 θ（rad）", "angle θ (rad)"],
+                          "series": [{"name": ["θ(t)", "θ(t)"], "x": xs, "y": [round(0.5 * x * x, 4) for x in xs]}]}}
+    return {"code": "from wq_anim import *\n\n\nclass Lesson(Base):\n    def construct(self):\n"
+                    "        self.add(frame2([-3, -1, 0], 0, 1.4, name=r\"\\{A\\}\"), frame2([2, 0, 0], 30, 1.4, name=r\"\\{B\\}\"))\n"}
 
 
 def fake_guide_plan() -> dict:

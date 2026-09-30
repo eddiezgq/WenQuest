@@ -39,6 +39,14 @@ def lesson_schema() -> dict:
         "everyday": _obj({"text": PAIR, "answer": PAIR}),
         "summary": PAIRS,
         "self_check": PAIRS,
+        "figures": {"type": "array", "items": _obj({
+            "kind": {"type": "string", "enum": ["scene", "graph", "chart", "drawing"]},
+            "place": {"type": "string", "enum": ["problem", "concept", "notes", "example", "model", "summary"]},
+            "title": PAIR, "purpose": PAIR, "asset": STR, "data": STR}),
+            "description": "3-6 illustrations: scene = schematic with formulas/frames/robot parts; graph = block diagram, flow, "
+                           "classification tree, course map; chart = plot of REAL numbers (the lesson's own formulas or "
+                           "given data only, never invented statistics; put the numbers or formula in `data`); drawing = a "
+                           "library entry's drawing (`asset` = its id). `purpose` says exactly what the figure must show."},
         "assets": {"type": "array", "items": _obj({"id": STR, "use": PAIR}),
                    "description": "问渠零件与机器人库 entries this lesson shows (ids exactly as listed; 0-6)"},
     })
@@ -173,6 +181,11 @@ def normalize_lesson(d: Any) -> dict:
         "model": {k: pair(mo.get(k)) for k in ("assume", "solve", "check", "improve")},
         "everyday": {"text": pair(ev.get("text")), "answer": pair(ev.get("answer"))},
         "summary": pairs(d.get("summary"), 6), "self_check": pairs(d.get("self_check"), 5),
+        "figures": [{"kind": f.get("kind") if f.get("kind") in ("scene", "graph", "chart", "drawing") else "scene",
+                     "place": f.get("place") if f.get("place") in ("problem", "concept", "notes", "example", "model", "summary") else "concept",
+                     "title": pair(f.get("title")), "purpose": pair(f.get("purpose")),
+                     "asset": str(f.get("asset") or "").strip(), "data": str(f.get("data") or "")[:2000]}
+                    for f in (d.get("figures") or []) if isinstance(f, dict) and pair(f.get("title"))[0]][:6],
         "assets": [{"id": str(a.get("id") or "").strip(), "use": pair(a.get("use"))}
                    for a in (d.get("assets") or []) if isinstance(a, dict) and a.get("id")][:6],
     }

@@ -54,6 +54,7 @@ STR = {"type": "string"}
 INT = {"type": "integer"}
 STRS = {"type": "array", "items": STR}
 INTS = {"type": "array", "items": INT}
+PAIR = {"type": "array", "items": STR, "minItems": 2, "maxItems": 2, "description": "[中文, English]"}
 QUESTIONS = {"type": "array", "items": _obj({"text": STR, "options": STRS}, ["text"])}
 
 
@@ -390,6 +391,63 @@ def relevance_schema() -> dict:
 def relevance_prompt(what: str, course: str, lesson: str, texts: list[str]) -> str:
     return (f"{course}\n\nThis lesson:\n{lesson}\n\nThe {what} to check — its texts:\n"
             + "\n".join(f"- {t}" for t in texts[:40]) + "\n\nIs it on topic for THIS lesson?")
+
+
+# --- 插图师 illustrator (round 4) --------------------------------------------------------------------------
+
+ILLUSTRATOR = COMMON + (
+    " Role: 插图师 (illustrator). Draw ONE figure for THIS lesson exactly as the lecturer asked (`purpose`), for "
+    "lecture notes and slides: clear, uncluttered, textbook quality, every label correct and in the course's language "
+    "setting. Use the course's robot platform from the design book. Never invent statistics or data: a chart uses only "
+    "the numbers given in `data` or values you compute from the lesson's own formulas. Return JSON as asked."
+)
+
+FIG_GRAPH = r"""Return {"graph": {...}} for a block diagram / flow / classification tree / course map:
+{"direction": "LR" | "TB",
+ "nodes": [{"id": "a", "label": ["中文", "English"], "shape": "round|box|diamond|circle|note|cylinder",
+            "group": "optional group id", "group_label": ["组名", "Group name"], "emphasis": false, "color": 0}],
+ "edges": [{"from": "a", "to": "b", "label": ["可选", "optional"], "dashed": false}]}
+4-18 nodes; short labels (≤ 12 Chinese characters); emphasis marks 1-2 key nodes; groups put related nodes in a frame."""
+
+FIG_CHART = r"""Return {"chart": {...}} for a plot of real numbers:
+{"type": "line" | "bar" | "scatter", "x_label": ["中文（单位）", "English (unit)"], "y_label": [..],
+ "series": [{"name": ["中文", "English"], "x": [numbers], "y": [numbers]}],
+ "categories": [["类别", "category"], ...] (bar charts only), "lines": [{"y": number, "label": ["限值", "limit"]}]}
+Compute the numbers from the lesson's formulas or take them from `data`; 10-200 points for curves."""
+
+FIG_SCENE = r"""Return {"code": "...python..."}: ONE still picture drawn with the WenQuest Manim parts (the same API as the
+animations, listed below). `class Lesson(Base):` with `def construct(self):` that only ADDS mobjects (self.add(...);
+no self.play, no waiting, no self.title/self.caption/self.card — the caption is under the figure). Fill the frame
+(x in [-6.8, 6.8], y in [-3.6, 3.6]); dark background; labels with zh()/en()/bi() or MathTex; label sizes 22-30.
+"""
+
+
+def figure_schema(kind: str) -> dict:
+    if kind == "graph":
+        node = _obj({"id": STR, "label": PAIR, "shape": STR, "group": STR, "group_label": PAIR, "emphasis": {"type": "boolean"},
+                     "color": INT}, ["id", "label"])
+        edge = _obj({"from": STR, "to": STR, "label": PAIR, "dashed": {"type": "boolean"}}, ["from", "to"])
+        return _obj({"graph": _obj({"direction": STR, "nodes": {"type": "array", "items": node},
+                                    "edges": {"type": "array", "items": edge}}, ["nodes", "edges"])})
+    if kind == "chart":
+        num = {"type": "array", "items": {"type": "number"}}
+        ser = _obj({"name": PAIR, "x": num, "y": num}, ["y"])
+        return _obj({"chart": _obj({"type": STR, "x_label": PAIR, "y_label": PAIR, "series": {"type": "array", "items": ser},
+                                    "categories": {"type": "array", "items": PAIR},
+                                    "lines": {"type": "array", "items": _obj({"y": {"type": "number"}, "label": PAIR}, ["y"])}},
+                                   ["type", "series"])})
+    return _obj({"code": STR})
+
+
+def figure_prompt(no: str, fig: dict, spec_json: str, lang: str, course: str, error: str = "", previous: str = "") -> str:
+    how = {"graph": FIG_GRAPH, "chart": FIG_CHART, "scene": FIG_SCENE + "\n" + ANIM_API}[fig["kind"]]
+    lang_rule = {"zh": "Chinese only", "en": "English only", "both": "Chinese and English (labels as [中文, English] pairs)"}.get(lang, "Chinese and English")
+    out = (f"{course}\n\nLesson {no}. Figure: {fig['title'][0]} / {fig['title'][1]}\nPurpose (what it must show): "
+           f"{fig['purpose'][0]} / {fig['purpose'][1]}\n" + (f"Data: {fig['data']}\n" if fig.get("data") else "")
+           + f"Labels: {lang_rule}.\n\nThe lesson spec:\n{spec_json}\n\n{how}")
+    if error:
+        out += f"\n\nYour previous figure was not accepted. Fix it.\nProblem:\n{error}\n" + (f"\nPrevious:\n{previous}\n" if previous else "")
+    return out
 
 
 # --- 动画师 animator ----------------------------------------------------------------------------------

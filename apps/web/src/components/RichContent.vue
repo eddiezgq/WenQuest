@@ -20,6 +20,9 @@ defineProps<{ html: string }>();
 .rich :deep(h1), .rich :deep(h2), .rich :deep(h3) { color: var(--wq-ink); margin: 20px 0 10px; line-height: 1.35; }
 .rich :deep(img), .rich :deep(iframe), .rich :deep([controls]) { max-width: 100%; height: auto; border-radius: 8px; }
 .rich :deep(iframe) { width: 100%; aspect-ratio: 16 / 9; border: 0; }
+.rich :deep(.wq-fig), .rich :deep(figure) { margin: 18px auto; text-align: center; max-width: 760px; }
+.rich :deep(.wq-fig img), .rich :deep(figure img) { max-height: 440px; width: auto; max-width: 100%; border: 1px solid var(--wq-line); background: #fff; }
+.rich :deep(.wq-cap), .rich :deep(figcaption) { font-size: 13px; color: var(--wq-muted); margin-top: 6px; }
 .rich :deep(pre) { background: #f2f4f3; padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 14px; }
 .rich :deep(code) { font-family: "IBM Plex Mono", Menlo, Consolas, monospace; }
 .rich :deep(table) { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }

@@ -264,6 +264,23 @@ def build(spec: dict, out: Path, *, no: str, course: list[str], chapter: list[st
     notes(sl, "对照五步讲解，强调第⑤步：模型在哪里失效。实验报告第六部分按这五步写。\n"
               "Walk through the five steps and stress step ⑤. Section 6 of the lab report follows the same steps.")
 
+    # figures (插图), one slide each, picture fitted and captioned
+    for f in s.get("figures_made") or []:
+        pic = out.parent / f["png"]
+        if not pic.exists():
+            continue
+        sl = prs.slides.add_slide(blank)
+        background(sl, WHITE)
+        tag(sl, f"图 {f['no']}  Figure {f['no']}")
+        from PIL import Image
+        with Image.open(pic) as im:
+            ratio = im.width / im.height
+        bw, bh = 11.9, 5.3
+        w, h = (bw, bw / ratio) if bw / ratio <= bh else (bh * ratio, bh)
+        sl.shapes.add_picture(str(pic), Inches(0.7 + (bw - w) / 2), Inches(1.05 + (bh - h) / 2), Inches(w), Inches(h))
+        bi(sl, 0.7, 6.5, 11.9, 0.8, f["title"], 16, 11, INK, MUTED, True)
+        notes(sl, "结合图讲解。\nWalk through the figure.")
+
     # worked example
     e = s["example"]
     sl = prs.slides.add_slide(blank)

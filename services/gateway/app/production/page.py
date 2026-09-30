@@ -23,6 +23,20 @@ def _e(s: str) -> str:
     return html.escape(s or "")
 
 
+FIG_SRC = "wqfig/"   # figure pictures: replaced by signed links (preview) or @@PLUGINFILE@@ (published page)
+
+
+def figures_at(spec: dict, place: str, i: int) -> str:
+    out = []
+    for f in spec.get("figures_made") or []:
+        if f["place"] == place:
+            cap = (f"图 {f['no']}　{_e(f['title'][0])}" if i == 0 else f"Figure {f['no']}. {_e(f['title'][1] or f['title'][0])}")
+            # div + p with our classes: Moodle's HTML filter drops <figure>, keeps these
+            out.append(f'<div class="wq-fig"><img src="{FIG_SRC}{f["png"]}" alt="{_e(f["title"][i] or f["title"][0])}">'
+                       f'<p class="wq-cap">{cap}</p></div>')
+    return "".join(out)
+
+
 def build(spec: dict, lang: str) -> str:
     i = 0 if lang == "zh" else 1
     L = LABELS["zh" if i == 0 else "en"]
@@ -36,19 +50,23 @@ def build(spec: dict, lang: str) -> str:
     out.append(f"<p>{_e(p['text'][i])}</p>")
     if p["given"]:
         out.append(f"<p><strong>{L['given']}</strong></p>" + ul(p["given"]))
+    out.append(figures_at(s, "problem", i))
     c = s["concept"]
     out.append(f"<h3>{L['concept']}：{_e(c['title'][i])}</h3>" if i == 0 else f"<h3>{L['concept']}: {_e(c['title'][i])}</h3>")
     out.append(ul(c["points"]))
     if c["formula"][i]:
         out.append(f"<blockquote><p><strong>{_e(c['formula'][i])}</strong></p></blockquote>")
+    out.append(figures_at(s, "concept", i))
     for n in s["notes"]:
         out.append(f"<h4>{_e(n['heading'][i])}</h4>")
         out.append(n["zh"] if i == 0 else n["en"])
+    out.append(figures_at(s, "notes", i))
     e = s["example"]
     if e["question"][i]:
         out.append(f"<h3>{L['example']}</h3><p>{_e(e['question'][i])}</p><p><strong>{L['solution']}</strong></p>" + ol(e["steps"]))
         if e["answer"][i]:
             out.append(f"<p><strong>{_e(e['answer'][i])}</strong></p>")
+        out.append(figures_at(s, "example", i))
     a = s["animation"]
     out.append(f"<h3>{L['animation']}：{_e(a['title'][i])}</h3>" if i == 0 else f"<h3>{L['animation']}: {_e(a['title'][i])}</h3>")
     out.append(f"<p>{L['anim_note']}<strong>{_e(a['question'][i])}</strong></p>")
@@ -62,6 +80,7 @@ def build(spec: dict, lang: str) -> str:
     m = s["model"]
     rows = [p["text"], m["assume"], m["solve"], m["check"], m["improve"]]
     out.append(f"<h3>{L['model']}</h3><table>" + "".join(f"<tr><th>{L['steps'][k]}</th><td>{_e(r[i])}</td></tr>" for k, r in enumerate(rows)) + "</table>")
+    out.append(figures_at(s, "model", i))
     ev = s["everyday"]
     if ev["text"][i]:
         out.append(f"<h3>{L['everyday']}</h3><p>{_e(ev['text'][i])}</p>")
@@ -69,6 +88,7 @@ def build(spec: dict, lang: str) -> str:
             out.append(f"<p><em>{L['answer']}：{_e(ev['answer'][i])}</em></p>" if i == 0 else f"<p><em>{L['answer']}: {_e(ev['answer'][i])}</em></p>")
     if s["summary"]:
         out.append(f"<h3>{L['summary']}</h3>" + ul(s["summary"]))
+    out.append(figures_at(s, "summary", i))
     if s["self_check"]:
         out.append(f"<h3>{L['check']}</h3>" + ol(s["self_check"]))
     if s.get("sources"):
@@ -76,4 +96,4 @@ def build(spec: dict, lang: str) -> str:
         out.append(f"<h4>{head}</h4><ul>" + "".join(
             f"<li>{_e(x['name'].get('zh' if i == 0 else 'en', ''))}（{_e(x['id'])} · {_e(x['version'])}）— "
             f"{_e(x['license'])}; {_e(x['attribution'])}</li>" for x in s["sources"]) + "</ul>")
-    return "\n".join(out)
+    return "\n".join(x for x in out if x)

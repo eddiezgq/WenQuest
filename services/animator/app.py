@@ -128,6 +128,24 @@ async def render(code: str, width: int = 1280, height: int = 720, fps: int = 30)
         shutil.rmtree(work, ignore_errors=True)
 
 
+async def still(code: str, width: int = 1600, height: int = 900) -> dict:
+    """A figure: the scene's last frame as a PNG (the same parts and checks as animations)."""
+    reason = check(code)
+    if reason:
+        return {"ok": False, "error": reason, "stage": "check"}
+    work = Path(tempfile.mkdtemp(prefix="wqfig-"))
+    try:
+        (work / "scene.py").write_text(code, encoding="utf-8")
+        rc, log = await _run(["manim", "-s", "-r", f"{width},{height}", "--disable_caching", "--media_dir", str(work / "media"),
+                              "-o", "figure", "--progress_bar", "none", "scene.py", "Lesson"], work, min(TIMEOUT, 180))
+        pngs = list((work / "media").rglob("figure*.png"))
+        if rc != 0 or not pngs:
+            return {"ok": False, "error": _tail(log) or f"manim exited with {rc}", "stage": "render"}
+        return {"ok": True, "png": base64.b64encode(pngs[0].read_bytes()).decode()}
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
 class Job(BaseModel):
     code: str
     width: int = 1280
@@ -149,6 +167,17 @@ async def health():
 async def check_only(job: Job):
     reason = check(job.code)
     return {"ok": not reason, "error": reason}
+
+
+@app.post("/still")
+async def still_job(job: Job):
+    async with _lock:
+        _state["busy"] = True
+        try:
+            out = await still(job.code, min(job.width, 2400), min(job.height, 1600))
+        finally:
+            _state["busy"] = False
+        return out
 
 
 @app.post("/render")

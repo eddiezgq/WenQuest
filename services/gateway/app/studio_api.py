@@ -133,6 +133,10 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         for c in (out.get("outline") or {}).get("chapters", []):
             for les in c["lessons"]:
                 les["files"] = [{**f, "url": sign_lesson_file(proj["id"], les["id"], f["name"])} for f in les.get("files") or []]
+                if les.get("content") and any(f["kind"] == "figure" for f in les["files"]):
+                    urls = {f["name"]: f["url"] for f in les["files"] if f["kind"] == "figure"}
+                    les["content"] = {k: re.sub(r'src="wqfig/([\w.\-]+)"', lambda mm: f'src="{urls.get(mm.group(1), "")}"', v)
+                                      for k, v in les["content"].items()}
                 les["checklist"] = [{**c, "image_url": sign_lesson_file(proj["id"], les["id"], c["image"]) if c.get("image") else ""}
                                     for c in les.get("checklist") or []]
         return out
@@ -738,7 +742,17 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             return out
 
         # The benchmark order: lecture notes, slides, practice, lab guide, report template; then teacher-only items.
-        acts: list[dict[str, Any]] = [{"type": "page", "name": title, "content": html_of(les["content"])}]
+        # The notes' figures travel with the page (its own files), referenced as @@PLUGINFILE@@/fig-n.png.
+        page_html = html_of(les["content"])
+        fig_draft = 0
+        for f in les.get("files") or []:
+            if f["kind"] == "figure" and (d / f["name"]).exists() and f"wqfig/{f['name']}" in page_html:
+                fig_draft = await m.state.moodle.upload(sess.moodle_token, f["name"], (d / f["name"]).read_bytes(), fig_draft)
+        page_html = page_html.replace('src="wqfig/', 'src="@@PLUGINFILE@@/')
+        page_act: dict[str, Any] = {"type": "page", "name": title, "content": page_html}
+        if fig_draft:
+            page_act["draftitemid"] = fig_draft
+        acts: list[dict[str, Any]] = [page_act]
         acts += await produced("animation")
         acts += await produced("slides")
         if any(les.get("exercises", {}).values()):

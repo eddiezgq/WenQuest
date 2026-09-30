@@ -1031,6 +1031,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "lib.sample": "数字工厂的正式零件库上线前，这里是临时样例库（自建简化模型）。",
     "lib.removeAsk": "从这门课里去掉“{name}”？之后写的课不再用它；已经写好的课保留原样。",
     "studio.db.library": "库中条目",
+    "studio.kind.figure": "插图",
   },
   en: {
     "app.name": "WenQuest",
@@ -2059,6 +2060,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "lib.sample": "Until the digital factory publishes the real library, this is a temporary sample (simple self-made models).",
     "lib.removeAsk": "Remove “{name}” from this course? Later lessons will not use it; lessons already written keep their copy.",
     "studio.db.library": "Library entries",
+    "studio.kind.figure": "Figure",
   },
 };
 

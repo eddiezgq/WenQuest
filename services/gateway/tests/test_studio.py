@@ -114,7 +114,14 @@ def test_whole_flow_from_materials_to_a_published_lesson(client):
     assert "机器人问题" in les["content"]["zh"] and "虚拟实验" in les["content"]["zh"]
     assert les["exercises"]["zh"] and les["answers"]["zh"]
     kinds = {f["kind"]: f for f in les["files"]}
-    assert set(kinds) == {"slides", "guide", "report", "plan"} and kinds["plan"]["teacher_only"]
+    assert set(kinds) == {"slides", "guide", "report", "plan", "figure"} and kinds["plan"]["teacher_only"]
+    # 插图: drawn, checked, placed in the notes (preview links are signed) and on their own slides
+    figs = [f for f in les["files"] if f["kind"] == "figure"]
+    assert len(figs) == 2 and all(f["url"] in les["content"]["zh"] for f in figs)
+    assert "wqfig/" not in les["content"]["zh"] and "图 1.1" in les["content"]["zh"]
+    assert les["content"]["zh"].index("图 1.1") < les["content"]["zh"].index("图 1.2")
+    assert client.get(figs[0]["url"]).content[:4] == b"\x89PNG"
+    assert next(c for c in les["checklist"] if c["key"] == "figures")["ok"] is True
     assert p["progress"]["awaiting"] == 1
     # the teacher can download each deliverable to check it
     r = client.get(kinds["slides"]["url"])
@@ -132,6 +139,8 @@ def test_whole_flow_from_materials_to_a_published_lesson(client):
     names = [n for _, n, _ in order]
     # benchmark order: notes, slides, practice, lab guide, report template, then teacher-only answers and plan
     assert order[0][0] == "page" and "课件" in order[1][1] and order[1][0] == "resource"
+    # the notes page carries its figures: one draft area, content points at the page's own files
+    assert "@@PLUGINFILE@@/fig-1.png" in sent["activities[0][content]"] and int(sent["activities[0][draftitemid]"]) > 0
     assert "练习" in order[2][1] and "实验指导书" in order[3][1] and "实验报告模板" in order[4][1]
     assert "答案" in order[5][1] and order[5][2] == "0" and "教案" in order[6][1] and order[6][2] == "0"
     assert "第1章教案" in names and "讲义" in names
