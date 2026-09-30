@@ -31,8 +31,7 @@ META = {"name", "doctype", "docstatus", "modified", "creation", "owner", "idx", 
         "modified_by", "__islocal", "__unsaved"}
 NO_VALUE = {"Section Break", "Column Break", "Tab Break", "HTML", "Button", "Heading", "Fold"}
 INSPECTION_OP = "零件检验 Part inspection"
-SCENARIO_STOCK = {"RM-45-D50": 60, "BRG-6205": 14, "BRG-6206": 16, "BRG-6207": 8, "SEAL-20": 12, "SEAL-30": 11,
-                  "RM-40CR-F225": 4, "RM-40CR-F155": 6, "OIL-CKC220": 46, "RM-20CR-D60": 40, "RM-20CR-D70": 30}
+SCENARIO_STOCK = dict(F.TEACH_STOCK)
 REQUIRED = {
     "Sales Order": ["customer", "company", "transaction_date", "delivery_date", "items"],
     "Sales Order Item": ["item_code", "qty", "delivery_date"],

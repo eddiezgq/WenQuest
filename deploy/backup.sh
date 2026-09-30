@@ -46,6 +46,11 @@ else
     log "BACKUP_S3_* not set; keeping the backup on this server only."
 fi
 
+# The digital factory (its own folder on this server) is backed up at the same time.
+if [ -x "$WQ_DIR/factory/deploy/backup.sh" ] && [ -f "$WQ_DIR/factory/.env" ]; then
+    "$WQ_DIR/factory/deploy/backup.sh" || log "WARNING: digital factory backup failed (see above)."
+fi
+
 # Local retention.
 find backups -mindepth 1 -maxdepth 1 -type d -mtime +"$KEEP_DAYS" -exec rm -rf {} +
 log "Backup finished."

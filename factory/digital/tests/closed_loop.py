@@ -7,6 +7,7 @@
 最后核对总线消息全部合规、看板指标更新、AI 能回答成本问题并注明来源。
 
 用法：python3 tests/closed_loop.py [--hub http://localhost:8100] [--erp http://localhost:8091]
+真 ERPNext（第 3 轮服务器演练）：加 --erp-kind real --erp-key <API Key> --erp-secret <API Secret>
 """
 import argparse
 import datetime as dt
@@ -21,14 +22,18 @@ P.add_argument("--hub", default="http://localhost:8100")
 P.add_argument("--erp", default="http://localhost:8091")
 P.add_argument("--speed", type=float, default=300)
 P.add_argument("--timeout", type=float, default=600)
+P.add_argument("--erp-kind", choices=("mock", "real"), default="mock")
+P.add_argument("--erp-key", default="")
+P.add_argument("--erp-secret", default="")
 A = P.parse_args()
 
 FAILS = []
 
 
-def call(method, url, body=None, token=None):
+def call(method, url, body=None, token=None, headers=None):
     req = urllib.request.Request(url, method=method, data=json.dumps(body).encode() if body is not None else None,
-                                 headers={"Content-Type": "application/json", **({"x-wq-token": token} if token else {})})
+                                 headers={"Content-Type": "application/json", **({"x-wq-token": token} if token else {}),
+                                          **(headers or {})})
     try:
         with urllib.request.urlopen(req, timeout=60) as r:
             return json.loads(r.read() or b"null")
@@ -42,6 +47,23 @@ def hub(method, path, body=None, token=None):
 
 def erp(path):
     return call("GET", A.erp + urllib.parse.quote(path))
+
+
+REAL = A.erp_kind == "real"
+
+
+def erp_docs(doctype):
+    """某类单据的全部记录（只含主表字段）：模拟 ERPNext 用它的调试接口，真 ERPNext 用 REST 接口。"""
+    if not REAL:
+        return erp("/api/mock/db/" + doctype)
+    q = urllib.parse.urlencode({"fields": '["*"]', "limit_page_length": 0})
+    return call("GET", "{}/api/resource/{}?{}".format(A.erp, urllib.parse.quote(doctype), q),
+                headers={"Authorization": "token {}:{}".format(A.erp_key, A.erp_secret)})["data"]
+
+
+def delivery_date():
+    d = dt.date.today() + dt.timedelta(days=16)
+    return (d + dt.timedelta(days=(7 - d.weekday()) % 7 if d.weekday() >= 5 else 0)).isoformat()
 
 
 def check(cond, what):
@@ -69,7 +91,9 @@ def main():
     student = "测试学生" + time.strftime("%H%M%S")
     teacher = login("测试教师", "manager")
     print("1. 教师重置实验 7 情景")
-    call("POST", A.erp + "/api/mock/reset")
+    if not REAL:
+        call("POST", A.erp + "/api/mock/reset")
+    steel0 = None if not REAL else sum(b["actual_qty"] for b in erp_docs("Bin") if b["item_code"] == "RM-45-D50")
     hub("POST", "/api/scenario/reset", {"speed": 1, "scores": True}, teacher)
     ov = wait(lambda: (lambda o: o if o["demo"] and any(m["state"] == "down" for m in o["machines"]) else None)(
         hub("GET", "/api/overview", token=teacher)), "情景载入", 60)
@@ -83,14 +107,14 @@ def main():
     print("3. 任务 2：接单与算料（计划员表单 → 提议 → 确认 → 桥接写入 ERPNext）")
     planner = login(student, "planner")
     pv = hub("POST", "/api/plan/order", {"customer": "示例·绿谷输送设备 GreenValley Conveyor (Demo)",
-                                         "item": "WQR-105", "qty": 10, "delivery_date": "2026-10-15"}, planner)
+                                         "item": "WQR-105", "qty": 10, "delivery_date": delivery_date()}, planner)
     steel = next(r for r in pv["mrp"] if r["item_code"] == "RM-45-D50")
     check(pv["work_orders"][0]["qty"] == 10 and pv["work_orders"][0]["production_item"] == "SH-301", "算料：SH-301 工单 10 件")
     check(any(m["item_code"] == "RM-45-D50" for m in pv["material_requests"]),
           "算料：45 钢要请购（毛需求 {} kg，库存 {} kg，占用 {} kg）".format(steel["gross"], steel["stock"], steel["committed"]))
     check(any(m["item_code"] == "BRG-6207" for m in pv["material_requests"]), "算料：BRG-6207 要请购")
     p = hub("POST", "/api/proposals", {"customer": "示例·绿谷输送设备 GreenValley Conveyor (Demo)", "item": "WQR-105",
-                                       "qty": 10, "delivery_date": "2026-10-15"}, planner)
+                                       "qty": 10, "delivery_date": delivery_date()}, planner)
     pid = p["proposal_id"]
     hub("POST", "/api/proposals/{}/confirm".format(pid), token=planner)
     prop = wait(lambda: (lambda x: x if x["status"] in ("executed", "failed") else None)(
@@ -112,10 +136,10 @@ def main():
                              change_note="键槽长 45 → 42 mm", step_bytes=b"ISO-10303-21; (test)")
     check(res["revision"] >= 2, "发布 rev {}，G 代码 {} 行".format(res["revision"], res["gcode_lines"]))
     wait(lambda: any(d["name"] == "SH-301" and d.get("wq_revision") == res["revision"]
-                     for d in erp("/api/mock/db/Item")), "ERPNext 物料版本更新", 30, 1)
-    item = next(d for d in erp("/api/mock/db/Item") if d["name"] == "SH-301")
+                     for d in erp_docs("Item")), "ERPNext 物料版本更新", 30, 1)
+    item = next(d for d in erp_docs("Item") if d["name"] == "SH-301")
     check(item.get("wq_revision") == res["revision"], "ERPNext 里 SH-301 版本 = {}".format(item.get("wq_revision")))
-    files = [f for f in erp("/api/mock/db/File") if f["attached_to_name"] == "SH-301"]
+    files = [f for f in erp_docs("File") if f["attached_to_name"] == "SH-301"]
     check(len(files) >= 2, "SH-301 附件 {} 个（STEP、G 代码…）".format(len(files)))
     st = hub("GET", "/api/teach", token=eng)
     check(st["tasks"][2]["score"] == 15, "任务 3 满分")
@@ -142,23 +166,26 @@ def main():
     st = hub("GET", "/api/teach", token=op)
     check(st["tasks"][3]["score"] == 20, "任务 4 满分")
 
-    print("6. 核对模拟 ERPNext")
-    jcs = [j for j in erp("/api/mock/db/Job Card") if j["work_order"] == wo]
+    print("6. 核对{} ERPNext".format("真实" if REAL else "模拟"))
+    jcs = [j for j in erp_docs("Job Card") if j["work_order"] == wo]
     check(len(jcs) == 7 and all(j["docstatus"] == 1 for j in jcs), "7 张作业卡全部提交")
     check(all(j["total_completed_qty"] == 10 for j in jcs), "每张作业卡完成 10 件")
-    qis = [q for q in erp("/api/mock/db/Quality Inspection") if any(q["reference_name"] == j["name"] for j in jcs)]
+    qis = [q for q in erp_docs("Quality Inspection") if any(q["reference_name"] == j["name"] for j in jcs)]
     check(len(qis) == 10, "每件一张质量检验单（{} 张）".format(len(qis)))
     good = sum(1 for q in qis if q["status"] == "Accepted")
-    ses = [s for s in erp("/api/mock/db/Stock Entry") if s.get("work_order") == wo]
+    ses = [s for s in erp_docs("Stock Entry") if s.get("work_order") == wo and s["docstatus"] == 1]
     check(len(ses) == 1 and ses[0]["docstatus"] == 1 and ses[0]["fg_completed_qty"] == good,
           "完工入库 {} 件（合格数）".format(ses[0]["fg_completed_qty"] if ses else 0))
-    wod = next(w for w in erp("/api/mock/db/Work Order") if w["name"] == wo)
+    wod = next(w for w in erp_docs("Work Order") if w["name"] == wo)
     check(wod["produced_qty"] == good, "工单完工数 {}".format(wod["produced_qty"]))
-    bins = {b["item_code"]: b for b in erp("/api/mock/db/Bin") if "原材料" in b["warehouse"] or "半成品" in b["warehouse"]}
-    check(abs(bins["RM-45-D50"]["actual_qty"] - (60 - 2.8 * good)) < 1e-6, "45 钢扣料：剩 {} kg".format(bins["RM-45-D50"]["actual_qty"]))
+    bins = {b["item_code"]: b for b in erp_docs("Bin") if "原材料" in b["warehouse"] or "半成品" in b["warehouse"]}
+    start = steel0 if REAL else 60
+    check(abs(bins["RM-45-D50"]["actual_qty"] - (start - 2.8 * good)) < 1e-6,
+          "45 钢扣料：{} → {} kg".format(start, bins["RM-45-D50"]["actual_qty"]))
     check(bins["SH-301"]["actual_qty"] == good, "SH-301 入库 {} 件".format(bins["SH-301"]["actual_qty"]))
-    errs = erp("/api/mock/errors")["errors"]
-    check(not errs, "ERPNext 字段校验无错误" + ("：" + "；".join(errs[:5]) if errs else ""))
+    if not REAL:
+        errs = erp("/api/mock/errors")["errors"]
+        check(not errs, "ERPNext 字段校验无错误" + ("：" + "；".join(errs[:5]) if errs else ""))
 
     print("7. 任务 5、6：质检处置与成本分析")
     q = login(student, "quality")

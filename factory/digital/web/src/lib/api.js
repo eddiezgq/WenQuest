@@ -33,8 +33,9 @@ export async function api(method, path, body) {
 export const get = (p) => api('GET', p);
 export const post = (p, b) => api('POST', p, b ?? {});
 
+// 本地版填名字；线上版（问渠账号）不传名字，枢纽凭全站登录凭证认人
 export async function login(name, role, mode) {
-  const r = await post('/login', { name, role, mode });
+  const r = await post('/login', name ? { name, role, mode } : { role, mode });
   session.token = r.token;
   session.user = r.user;
   save();
@@ -66,4 +67,6 @@ export const ROLES = [
   { key: 'operator', name: '操作工', en: 'Operator' },
   { key: 'quality', name: '质检员', en: 'Quality inspector' },
 ];
+// 学生可选的岗位（厂长只给老师，第 3 轮 D3）
+export const rolesFor = (user) => (user && user.teacher === false ? ROLES.filter((r) => r.key !== 'manager') : ROLES);
 export const roleName = (k) => (ROLES.find((r) => r.key === k) || {}).name || k;

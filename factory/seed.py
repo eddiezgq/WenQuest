@@ -281,7 +281,28 @@ class Seeder:
         self.c.update("Stock Entry", res["name"], {"docstatus": 1})
         self.created += 1
 
-    def run(self, opening_stock=False):
+    # ---- 8 教学情景库存（线上安装用，第 3 轮 D13）
+    def teach_stock(self):
+        """放入实验 7 开始时的关键物料库存，并允许负库存：公共工厂里很多学生反复做实验，扣料不能卡住。"""
+        self.log("教学情景库存：关键物料 + 允许负库存")
+        self.c.update("Stock Settings", "Stock Settings", {"allow_negative_stock": 1})
+        tag = "WQ 教学情景库存 teaching scenario stock"
+        if self.c.find("Stock Entry", [["remarks", "=", tag], ["docstatus", "=", 1]]):
+            self.skipped += 1
+            return
+        types = self.c.find("Stock Entry Type", [["purpose", "=", "Material Receipt"]])
+        if not types:
+            raise ERPError("找不到“物料入库”类型的库存凭证")
+        items = [{"item_code": code, "qty": qty, "uom": D.ITEMS[code][2], "stock_uom": D.ITEMS[code][2],
+                  "conversion_factor": 1, "transfer_qty": qty,
+                  "t_warehouse": self.wh(D.KIND_WAREHOUSE[D.ITEMS[code][1]]), "basic_rate": D.ITEMS[code][3]}
+                 for code, qty in D.TEACH_STOCK.items()]
+        res = self.c.create("Stock Entry", {"stock_entry_type": types[0]["name"], "purpose": "Material Receipt",
+                                            "company": self.company, "remarks": tag, "items": items})
+        self.c.update("Stock Entry", res["name"], {"docstatus": 1})
+        self.created += 1
+
+    def run(self, opening_stock=False, teach_stock=False):
         self.log("公司：{}（{}），币种 {}".format(self.company, self.abbr, self.currency))
         self.basics()
         self.parties()
@@ -291,6 +312,8 @@ class Seeder:
         self.boms()
         if opening_stock:
             self.opening_stock()
+        if teach_stock:
+            self.teach_stock()
         self.log("完成：新建 {} 条，已存在跳过 {} 条".format(self.created, self.skipped))
 
 
@@ -363,9 +386,10 @@ def main(argv=None):
     ap.add_argument("--password", default="admin")
     ap.add_argument("--company", default=None)
     ap.add_argument("--opening-stock", action="store_true")
+    ap.add_argument("--teach-stock", action="store_true", help="线上教学工厂：放入实验 7 的关键物料库存并允许负库存")
     args = ap.parse_args(argv)
     try:
-        Seeder(Client(args.url, args.user, args.password), args.company).run(args.opening_stock)
+        Seeder(Client(args.url, args.user, args.password), args.company).run(args.opening_stock, args.teach_stock)
     except ERPError as e:
         print("出错：{}".format(e), file=sys.stderr)
         return 1

@@ -56,6 +56,36 @@ classic.{$SITE_DOMAIN} {
 	}
 }
 
+# 问渠数字工厂（第 3 轮）：独立的一组容器，在 /opt/wenquest/factory，经 factory-edge 网络接过来。
+# 工作台与接口 → 枢纽 hub；/mqtt → 统一数据总线的 WebSocket（浏览器只读）。
+factory.{$SITE_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+	request_body {
+		max_size 60MB
+	}
+	handle /mqtt* {
+		reverse_proxy wqf-bus:9001
+	}
+	handle {
+		reverse_proxy wqf-hub:8100
+	}
+}
+
+# 数字工厂的 ERPNext（减速器厂）。
+erp.{$SITE_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+	request_body {
+		max_size 60MB
+	}
+	reverse_proxy wqf-erp:8080 {
+		transport http {
+			read_timeout 300s
+		}
+	}
+}
+
 # QMS demo (a separate project on the same server, reached over the external qms-edge network).
 qms.wenquestrobotics.com {
 	encode gzip

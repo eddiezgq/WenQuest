@@ -12,8 +12,10 @@ FROM python:3.12-slim
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 TZ=America/New_York
 WORKDIR /app
 COPY digital/requirements.txt digital/requirements.txt
-RUN pip install -r digital/requirements.txt
+RUN pip install -r digital/requirements.txt "requests>=2.31"
 COPY factory/ factory/
+# 服务器首次安装时用它把减速器厂数据导入 ERPNext（第 3 轮 D6）
+COPY seed.py seed.py
 COPY digital/wqbus/ digital/wqbus/
 COPY digital/sim/ digital/sim/
 COPY digital/hub/ digital/hub/

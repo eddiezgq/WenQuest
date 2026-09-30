@@ -138,8 +138,7 @@ def load(engine, publish, now=None, tz="America/New_York", fault_left_min=90):
         bom_no="BOM-SH-301-001", planned_start_date=today.isoformat(), expected_delivery_date=today.isoformat())
 
     # ---- 库存快照
-    stock = {"RM-45-D50": 60, "BRG-6205": 14, "BRG-6206": 16, "BRG-6207": 8, "SEAL-20": 12, "SEAL-30": 11,
-             "RM-40CR-F225": 4, "RM-40CR-F155": 6, "OIL-CKC220": 46, "RM-20CR-D60": 40, "RM-20CR-D70": 30}
+    stock = F.TEACH_STOCK
     for code, qty in stock.items():
         kind = F.ITEMS[code][1]
         wh = "{} - WQ".format(F.KIND_WAREHOUSE[kind])

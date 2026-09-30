@@ -6,6 +6,7 @@ on:
     # 数字工厂（factory/）单独运行，只改它时不重新部署学习平台
     paths-ignore:
       - "factory/**"
+      - ".github/workflows/factory.yml"
   workflow_dispatch:
   # Weekly fresh build picks up Moodle security fixes from the stable branch.
   schedule:

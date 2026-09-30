@@ -26,6 +26,7 @@ services:
     networks:
       - default
       - qms-edge
+      - factory-edge   # 数字工厂（factory. 与 erp. 两个网址）
 
   web:
     ports: !reset []
@@ -45,4 +46,6 @@ volumes:
   
 networks:
   qms-edge:
+    external: true
+  factory-edge:
     external: true

@@ -62,6 +62,7 @@ class MockERPNext:
                            {"name": "Standard Selling", "buying": 0, "selling": 1, "enabled": 1}],
             "Stock Entry Type": [{"name": "Material Receipt", "purpose": "Material Receipt"}],
             "User": [{"name": "Administrator"}],
+            "Stock Settings": [{"name": "Stock Settings", "allow_negative_stock": 0}],
         }
         for dt, rows in seed.items():
             for r in rows:

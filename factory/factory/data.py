@@ -310,6 +310,11 @@ def inspection_templates():
     }
 
 
+# 教学情景（实验 7）开始时的关键物料库存：仿真器的库存快照、模拟 ERPNext 的重置，以及线上真 ERPNext 安装时
+# （seed.py --teach-stock）都用这一份，三处一致
+TEACH_STOCK = {"RM-45-D50": 60, "BRG-6205": 14, "BRG-6206": 16, "BRG-6207": 8, "SEAL-20": 12, "SEAL-30": 11,
+               "RM-40CR-F225": 4, "RM-40CR-F155": 6, "OIL-CKC220": 46, "RM-20CR-D60": 40, "RM-20CR-D70": 30}
+
 # 期初库存（可选，seed.py --opening-stock）：只放小五金和油品，关键物料留给 MRP 去采购
 OPENING_STOCK = {
     "BOLT-M12x110": 60, "NUT-M12": 60, "WASHER-12": 60, "BOLT-M8x25": 240, "PIN-8x35": 20,

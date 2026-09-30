@@ -22,6 +22,10 @@ log "Pulling images..."
 dc pull --quiet --ignore-buildable
 dc pull --quiet moodle gateway web animator labcheck
 
+# The web server also serves the digital factory (factory./erp.), reached over this network; create it
+# if the factory has not been installed yet, so the web server can start either way.
+docker network inspect factory-edge >/dev/null 2>&1 || docker network create factory-edge >/dev/null 2>&1 || true
+
 log "Starting services..."
 dc up -d --no-build --remove-orphans
 

@@ -153,3 +153,23 @@ def test_draft_bom_left_by_a_failed_run_is_submitted_not_duplicated():
     seed.Seeder(client, log=lambda *a: None).run()
     boms = [b for b in mock.db["BOM"].values() if b["item"] == "SH-101"]
     assert len(boms) == 1 and boms[0]["docstatus"] == 1
+
+
+def test_teach_stock_matches_the_scenario_and_allows_negative_stock():
+    """第 3 轮 D13：线上真 ERPNext 放入实验 7 的关键物料库存（与仿真、模拟 ERPNext 同一份），并允许负库存。"""
+    mock = MockERPNext()
+    client = seed.Client.__new__(seed.Client)
+    client.base, client.s = "http://mock", mock
+    s = seed.Seeder(client, log=lambda *a: None)
+    s.run(opening_stock=True, teach_stock=True)
+    assert not mock.errors, mock.errors
+    client.db = mock.db
+    assert client.db["Stock Settings"]["Stock Settings"]["allow_negative_stock"] == 1
+    entries = [e for e in client.db["Stock Entry"].values() if e["remarks"].startswith("WQ 教学情景库存")]
+    assert len(entries) == 1 and entries[0]["docstatus"] == 1
+    got = {i["item_code"]: i["qty"] for i in entries[0]["items"]}
+    assert got == D.TEACH_STOCK
+    for i in entries[0]["items"]:
+        assert i["t_warehouse"] == "{} - WQ".format(D.KIND_WAREHOUSE[D.ITEMS[i["item_code"]][1]])
+    seed.Seeder(client, log=lambda *a: None).run(teach_stock=True)       # 重复运行不重复入库
+    assert len([e for e in client.db["Stock Entry"].values() if e["remarks"].startswith("WQ 教学情景库存")]) == 1

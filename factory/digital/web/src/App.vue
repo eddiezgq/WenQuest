@@ -36,11 +36,12 @@
         </div>
         <div class="modes" role="group" aria-label="模式">
           <button type="button" :class="{ on: session.user?.mode === 'teach' }" @click="setMode('teach')">教学模式</button>
-          <button type="button" :class="{ on: session.user?.mode === 'prod' }" @click="setMode('prod')">生产模式</button>
+          <button type="button" :class="{ on: session.user?.mode === 'prod' }" :disabled="session.user?.teacher === false"
+            :title="session.user?.teacher === false ? '生产模式只对老师开放' : ''" @click="setMode('prod')">生产模式</button>
         </div>
         <label class="role">角色
           <select :value="session.user?.role" @change="setRole($event.target.value)">
-            <option v-for="r in ROLES" :key="r.key" :value="r.key">{{ r.name }}</option>
+            <option v-for="r in rolesFor(session.user)" :key="r.key" :value="r.key">{{ r.name }}</option>
           </select>
         </label>
         <button class="avatar" :title="session.user?.name + '（点击退出）'" @click="doLogout">{{ (session.user?.name || '?').slice(0, 1) }}</button>
@@ -54,7 +55,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { session, ROLES, switchTo, logout, loadConfig } from './lib/api';
+import { session, rolesFor, switchTo, logout, loadConfig } from './lib/api';
 import { bus, connectBus, setBusMode } from './lib/bus';
 import AiDrawer from './components/AiDrawer.vue';
 import { ai } from './lib/ai';
@@ -76,7 +77,7 @@ const apps = computed(() => [
   { name: 'FreeCAD', role: 'CAD / CAM', href: '/work/engineer', route: '/work/engineer' },
   { name: '车间终端', role: 'MES', href: '/work/operator', route: '/work/operator' },
   { name: 'Node-RED', role: '数据流', href: cfg.value.nodered_url || '#', ext: true },
-]);
+].filter((a) => a.name !== 'Node-RED' || cfg.value.nodered_url));   // 线上 Node-RED 不对外（第 3 轮 D8）
 const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
   '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线',
@@ -88,7 +89,7 @@ function tick() {
   clock.value = d.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short',
     hour: '2-digit', minute: '2-digit', hour12: false });
 }
-async function setMode(m) { if (session.user.mode !== m) { await switchTo({ mode: m }); setBusMode(m); } }
+async function setMode(m) { if (session.user.mode !== m && !(m === 'prod' && session.user.teacher === false)) { await switchTo({ mode: m }); setBusMode(m); } }
 async function setRole(r) { await switchTo({ role: r }); }
 function doLogout() { if (confirm('退出登录？')) { logout(); router.push('/login'); } }
 
@@ -143,6 +144,7 @@ onUnmounted(() => clearInterval(timer));
 .modes { margin-left: auto; display: flex; gap: 4px; background: var(--bg); border-radius: 8px; padding: 3px; }
 .modes button { height: 30px; padding: 0 14px; border: 0; border-radius: 6px; background: transparent; color: #3D4852; cursor: pointer; }
 .modes button.on { background: var(--accent); color: #fff; font-weight: 500; }
+.modes button:disabled { opacity: .45; cursor: not-allowed; }
 .role { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
 .role select { height: 34px; border: 1px solid var(--line); border-radius: 6px; padding: 0 8px; background: #fff; }
 .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; border: 0;

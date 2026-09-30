@@ -2,8 +2,9 @@
 """数字工厂枢纽服务（hub）：历史库写入 + 看板指标 + AI 工厂助手 + MES + 教学评分 + 工作台网页。
 
 运行：uvicorn hub.app:app --port 8100
-环境变量：WQ_DB、WQ_MQTT_HOST/PORT、WQ_MQTT_WS（浏览器连总线的地址）、WQ_ERPNEXT_URL、WQ_NODERED_URL、
-WQ_TZ、WQ_SECRET、WQ_CLAUDE_KEY / WQ_DEEPSEEK_KEY（可选）。
+环境变量：WQ_DB、WQ_MQTT_HOST/PORT/USER/PASSWORD、WQ_MQTT_WS（浏览器连总线的地址）、WQ_ERPNEXT_URL、
+WQ_NODERED_URL、WQ_TZ、WQ_SECRET、WQ_CLAUDE_KEY / WQ_DEEPSEEK_KEY（可选）；
+线上另有 WQ_AUTH=wenquest、WQ_SSO_URL、WQ_LOGIN_URL、WQ_AI_PER_HOUR、WQ_HISTORY_DAYS（见第 3 轮细则）。
 """
 import base64
 import datetime as dt
@@ -20,7 +21,7 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.dirname(HERE), os.path.dirname(os.path.dirname(HERE))]
 
-from fastapi import Body, Depends, FastAPI, File, Header, HTTPException, UploadFile  # noqa: E402
+from fastapi import Body, Depends, FastAPI, File, Header, HTTPException, Request, UploadFile  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse, Response  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 
@@ -41,6 +42,15 @@ logging.basicConfig(level=os.environ.get("WQ_LOG", "INFO"), format="%(asctime)s 
 
 SECRET = (os.environ.get("WQ_SECRET") or secrets.token_hex(16)).encode()
 ROLES = ("planner", "engineer", "operator", "quality", "manager")
+STUDENT_ROLES = ("planner", "engineer", "operator", "quality")
+# 登录方式（第 3 轮 D2）：local = 填名字进入（自己电脑上用）；wenquest = 问渠账号（线上）
+AUTH = os.environ.get("WQ_AUTH", "local")
+SSO_URL = os.environ.get("WQ_SSO_URL", "")          # 学习平台核对登录的接口，如 https://learn.<域名>/api/v1/auth/sso
+LOGIN_URL = os.environ.get("WQ_LOGIN_URL", "")      # 学习平台登录页，如 https://learn.<域名>/pages/login/login
+SSO_COOKIE = "wq_sso"                               # 全站登录凭证（学习平台设置，整个域名共用）
+TOKEN_DAYS = float(os.environ.get("WQ_TOKEN_DAYS", "7"))
+# AI 工厂助手每人每小时提问上限（D7）；0 = 不限。线上默认 30，自己电脑上默认不限
+AI_PER_HOUR = int(os.environ.get("WQ_AI_PER_HOUR", "30" if AUTH == "wenquest" else "0"))
 DEFAULT_MODE = os.environ.get("WQ_MODE", "teach")
 WEB_DIST = os.environ.get("WQ_WEB_DIST", os.path.join(os.path.dirname(HERE), "web", "dist"))
 PUBLISH_ALLOW = ("wq/gearbox/design/",)       # HTTP → 总线网关只放行这些主题（FreeCAD 宏用）
@@ -115,6 +125,7 @@ class Hub:
         except Exception:  # noqa: BLE001
             log.exception("载入情景失败")
         while not self.stop.wait(float(os.environ.get("WQ_AI_EVERY_S", "20"))):
+            self._prune()
             for mode in self.active_modes():
                 try:
                     new = self.ai.evaluate(mode)
@@ -124,6 +135,22 @@ class Hub:
                         self.last_brief[mode] = time.time()
                 except Exception:  # noqa: BLE001
                     log.exception("AI 巡检出错（%s）", mode)
+
+    _pruned_day = None
+
+    def _prune(self):
+        """D9：历史库只保留最近 WQ_HISTORY_DAYS 天（0 = 全部保留），每天清理一次。"""
+        days = float(os.environ.get("WQ_HISTORY_DAYS", "0"))
+        today = dt.date.today()
+        if days <= 0 or self._pruned_day == today:
+            return
+        self._pruned_day = today
+        try:
+            for table in ("bus_message", "machine_state_log"):
+                self.db.x("delete from {} where ts < now() - make_interval(days => %s)".format(table), (int(days),))
+            log.info("历史库已清理 %s 天以前的记录", int(days))
+        except Exception:  # noqa: BLE001
+            log.exception("清理历史库失败")
 
     def active_modes(self):
         rows = self.db.q("select distinct mode from bus_message where ts > now() - interval '1 day' and mode is not null")
@@ -158,24 +185,85 @@ def user_of(x_wq_token: str = Header(default="")):
     try:
         raw, sig = x_wq_token.split(".")
         if hmac.compare_digest(sig, hmac.new(SECRET, raw.encode(), hashlib.sha256).hexdigest()[:32]):
-            return json.loads(base64.urlsafe_b64decode(raw.encode()))
+            u = json.loads(base64.urlsafe_b64decode(raw.encode()))
+            if u.get("exp", float("inf")) > time.time():
+                u.setdefault("teacher", True)      # 本地版的旧凭证：人人可用全部角色
+                return u
     except Exception:  # noqa: BLE001
         pass
     raise HTTPException(401, "请先登录")
 
 
-@app.post("/api/login")
-def login(body: dict = Body(...)):
-    name = str(body.get("name", "")).strip()[:40]
-    role = body.get("role", "manager")
-    mode = body.get("mode", DEFAULT_MODE)
-    if not name:
-        raise HTTPException(400, "请填写姓名")
+def check_allowed(teacher, role, mode):
+    """D3：学生只能用教学模式和四个岗位角色；厂长角色、生产模式、教师控制台只给老师。"""
     if role not in ROLES or mode not in ("teach", "prod"):
         raise HTTPException(400, "角色或模式不对")
-    u = {"name": name, "role": role, "mode": mode}
-    if mode == "teach":
-        H.teach.start(name)
+    if not teacher and (role not in STUDENT_ROLES or mode != "teach"):
+        raise HTTPException(403, "厂长角色和生产模式只对老师开放")
+
+
+def require_teacher(u):
+    if not u.get("teacher"):
+        raise HTTPException(403, "只有老师可以做这个操作")
+
+
+def wenquest_user(cookie):
+    """拿浏览器带来的全站登录凭证向学习平台核对身份。返回 {id, fullname, username, teacher} 或 None。"""
+    if not cookie or not SSO_URL:
+        return None
+    import httpx
+    try:
+        r = httpx.get(SSO_URL, cookies={SSO_COOKIE: cookie}, timeout=10)
+    except httpx.HTTPError:
+        log.exception("学习平台登录核对失败")
+        raise HTTPException(503, "暂时连不上学习平台，请稍后再试")
+    if r.status_code != 200:
+        return None
+    x = r.json().get("user") or {}
+    if not x.get("id"):
+        return None
+    return {"id": x["id"], "fullname": (x.get("fullname") or x.get("username") or "").strip(),
+            "username": x.get("username", ""), "teacher": bool(x.get("can_create_courses"))}
+
+
+def _display_name(w):
+    # 实验评分、提议记录按这个名字区分人；加上账号编号，重名的同学也不会混在一起
+    return "{}（{}）".format(w["fullname"] or w["username"], w["id"])[:60]
+
+
+@app.get("/api/login/info")
+def login_info(request: Request):
+    """登录页用：登录方式、学习平台登录页地址，以及（线上）此人是否已在学习平台登录。"""
+    out = {"auth": AUTH, "login_url": LOGIN_URL, "student_roles": STUDENT_ROLES}
+    if AUTH == "wenquest":
+        w = wenquest_user(request.cookies.get(SSO_COOKIE, ""))
+        out["account"] = {"fullname": w["fullname"], "teacher": w["teacher"]} if w else None
+    return out
+
+
+@app.post("/api/login")
+def login(request: Request, body: dict = Body(...)):
+    mode = body.get("mode", DEFAULT_MODE)
+    if AUTH == "wenquest":
+        w = wenquest_user(request.cookies.get(SSO_COOKIE, ""))
+        if not w:
+            raise HTTPException(401, "请先用问渠账号登录")
+        teacher = w["teacher"]
+        role = body.get("role") or ("manager" if teacher else "planner")
+        if not teacher:
+            mode = "teach"
+        check_allowed(teacher, role, mode)
+        u = {"name": _display_name(w), "uid": w["id"], "teacher": teacher, "role": role, "mode": mode,
+             "exp": int(time.time() + TOKEN_DAYS * 86400)}
+    else:
+        name = str(body.get("name", "")).strip()[:40]
+        role = body.get("role", "manager")
+        if not name:
+            raise HTTPException(400, "请填写姓名")
+        check_allowed(True, role, mode)
+        u = {"name": name, "role": role, "mode": mode, "teacher": True}
+    if u["mode"] == "teach":
+        H.teach.start(u["name"])
     return {"token": _sign(u), "user": u}
 
 
@@ -183,10 +271,27 @@ def login(body: dict = Body(...)):
 def switch(body: dict = Body(...), u=Depends(user_of)):
     role = body.get("role", u["role"])
     mode = body.get("mode", u["mode"])
-    if role not in ROLES or mode not in ("teach", "prod"):
-        raise HTTPException(400, "角色或模式不对")
+    check_allowed(u["teacher"], role, mode)
     nu = dict(u, role=role, mode=mode)
     return {"token": _sign(nu), "user": nu}
+
+
+_ai_calls = {}
+_ai_lock = threading.Lock()
+
+
+def ai_quota(u):
+    """D7：AI 工厂助手每人每小时最多 AI_PER_HOUR 次。"""
+    if AI_PER_HOUR <= 0:
+        return
+    now, key = time.time(), u.get("uid") or u["name"]
+    with _ai_lock:
+        recent = [t for t in _ai_calls.get(key, []) if now - t < 3600]
+        if len(recent) >= AI_PER_HOUR:
+            wait = int((3600 - (now - recent[0])) // 60) + 1
+            raise HTTPException(429, "本小时已问了 {} 次，请 {} 分钟后再问".format(AI_PER_HOUR, wait))
+        recent.append(now)
+        _ai_calls[key] = recent
 
 
 @app.get("/api/config")
@@ -194,7 +299,8 @@ def config():
     return {
         "mqtt_ws": os.environ.get("WQ_MQTT_WS", "ws://localhost:9001"),
         "erpnext_url": os.environ.get("WQ_ERPNEXT_URL", "http://localhost:8090"),
-        "nodered_url": os.environ.get("WQ_NODERED_URL", "http://localhost:1880"),
+        "nodered_url": os.environ.get("WQ_NODERED_URL", "http://localhost:1880"),   # 线上设为空：不对外（D8）
+        "auth": AUTH, "login_url": LOGIN_URL,
         "default_mode": DEFAULT_MODE, "roles": ROLE_NAMES, "ai_engine": H.ai.llm.name if H.ai else "rules",
         "tz": str(kpi.TZ), "customers": F.CUSTOMERS, "fg": [{"item_code": "WQR-105", "name": F.ITEMS["WQR-105"][0],
                                                                "price": F.FG_SELLING_PRICE}],
@@ -426,11 +532,13 @@ def ai_chat(body: dict = Body(...), u=Depends(user_of)):
     msgs = [m for m in body.get("messages", []) if m.get("role") in ("user", "assistant") and m.get("content")]
     if not msgs:
         raise HTTPException(400, "请输入问题")
+    ai_quota(u)
     return H.ai.chat(msgs, u["mode"], u["role"], u["name"])
 
 
 @app.post("/api/ai/briefing/refresh")
 def refresh_briefing(u=Depends(user_of)):
+    ai_quota(u)
     H.ai.evaluate(u["mode"])
     return H.ai.briefing(u["mode"])
 
@@ -452,6 +560,8 @@ def mes_cmd(body: dict = Body(...), u=Depends(user_of)):
     allowed = {"start", "pause", "reset"} | ({"inject_fault", "set_speed", "load_scenario"} if u["mode"] == "teach" else set())
     if cmd not in allowed:
         raise HTTPException(403, "不允许的指令 {}".format(cmd))
+    if cmd in ("inject_fault", "set_speed", "load_scenario"):
+        require_teacher(u)                 # 教师控制台（D3）
     extra = {k: v for k, v in body.items() if k in ("minutes", "reason", "kind", "speed")}
     try:
         H.mes.command(unit, cmd, u["mode"], u["name"], body.get("work_order"), body.get("operation"), **extra)
@@ -558,6 +668,7 @@ def teach_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
 @app.post("/api/scenario/reset")
 def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     """重置教学情景：清空教学模式的历史，让仿真器重新载入实验 7 情景。只有“厂长”角色（教师）能做。"""
+    require_teacher(u)
     if u["role"] != "manager":
         raise HTTPException(403, "请用厂长（教师）角色重置")
     H.db.x("delete from bus_message where mode='teach'")

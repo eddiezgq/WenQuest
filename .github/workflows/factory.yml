@@ -1,0 +1,191 @@
+# 数字工厂部署（第 3 轮 D10）：只在推送改动 factory/ 时运行，与学习平台的“Build and deploy”互不影响。
+#   测试 → 服务器演练（在 GitHub 的机器上按服务器配置装一套真 ERPNext，走完整闭环）→ 构建镜像 → 部署到服务器
+name: Digital factory 数字工厂部署
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "factory/**"
+      - ".github/workflows/factory.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: factory-deploy
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: 测试
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ["5433:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 工厂数据与导入脚本
+        working-directory: factory
+        run: pip install -q -r digital/requirements.txt pytest "requests>=2.31" && python -m pytest -q tests
+      - name: 总线、仿真、枢纽、登录与权限
+        working-directory: factory/digital
+        run: python -m pytest -q tests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: 工作台网页能打包
+        working-directory: factory/digital/web
+        run: npm ci --no-audit --no-fund && npm run build
+
+  rehearsal:
+    name: 服务器演练（真 ERPNext）
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      FACTORY_DIR: /tmp/fac
+      LEARN_DIR: /tmp/nolearn
+      FACTORY_COMPOSE: docker-compose.yml ci.yml
+    steps:
+      - uses: actions/checkout@v4
+      - name: 构建镜像
+        run: |
+          docker build -q -t wqf-app:ci -f factory/digital/Dockerfile factory
+          docker build -q -t wqf-bridge:ci factory/digital/bridge
+      - name: 按服务器目录布置
+        run: |
+          mkdir -p "$FACTORY_DIR/mosquitto" "$LEARN_DIR"
+          cp factory/deploy/docker-compose.server.yml "$FACTORY_DIR/docker-compose.yml"
+          cp -r factory/deploy "$FACTORY_DIR/deploy"
+          cp factory/digital/mosquitto/server/* "$FACTORY_DIR/mosquitto/"
+          # 演练时把端口开到本机，登录用本地方式（CI 没有学习平台）
+          printf 'services:\n  hub: {ports: ["8100:8100"]}\n  erp-frontend: {ports: ["8090:8080"]}\n  bus: {ports: ["1883:1883", "9001:9001"]}\n' > "$FACTORY_DIR/ci.yml"
+          printf 'FACTORY_APP_IMAGE=wqf-app:ci\nFACTORY_BRIDGE_IMAGE=wqf-bridge:ci\nSITE_DOMAIN=example.test\nWQ_AUTH=local\nWQ_AI_PER_HOUR=0\n' > "$FACTORY_DIR/.env"
+      - name: 首次安装（建站、设置向导、API 钥匙、导入数据）
+        run: bash "$FACTORY_DIR/deploy/install.sh"
+      - name: 启动全部服务
+        working-directory: /tmp/fac
+        run: |
+          docker compose -p wq-factory -f docker-compose.yml -f ci.yml up -d
+          for i in $(seq 1 40); do curl -fsS localhost:8100/api/health && break; sleep 5; done
+          echo; docker compose -p wq-factory -f docker-compose.yml -f ci.yml ps
+      - name: 总线加锁检查
+        working-directory: factory/digital
+        run: |
+          pip install -q -r requirements.txt
+          val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
+          python tests/check_bus_lock.py --hub-password "$(val WQ_MQTT_HUB_PASSWORD)" \
+            --sim-password "$(val WQ_MQTT_SIM_PASSWORD)" --bridge-password "$(val WQ_MQTT_BRIDGE_PASSWORD)"
+      - name: 完整闭环（真 ERPNext）
+        working-directory: factory/digital
+        run: |
+          val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
+          python tests/closed_loop.py --hub http://localhost:8100 --erp http://localhost:8090 --erp-kind real \
+            --erp-key "$(val WQ_ERP_API_KEY)" --erp-secret "$(val WQ_ERP_API_SECRET)" --speed 300 --timeout 900
+      - name: 出错时的日志
+        if: failure()
+        working-directory: /tmp/fac
+        run: |
+          dc() { docker compose -p wq-factory -f docker-compose.yml -f ci.yml "$@"; }
+          dc ps -a
+          dc logs --tail 150 hub bridge sim bus
+          dc logs --tail 80 erp-backend erp-frontend erp-queue-short erp-queue-long
+          dc exec -T erp-backend bash -c 'tail -n 120 logs/*.log' || true
+
+  build:
+    name: 构建镜像
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.meta.outputs.app }}
+      bridge: ${{ steps.meta.outputs.bridge }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        run: |
+          repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "app=ghcr.io/${repo}/factory-app:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "bridge=ghcr.io/${repo}/factory-bridge:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: factory
+          file: factory/digital/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.app }}
+          cache-from: type=gha,scope=factory-app
+          cache-to: type=gha,mode=max,scope=factory-app
+      - uses: docker/build-push-action@v6
+        with:
+          context: factory/digital/bridge
+          push: true
+          tags: ${{ steps.meta.outputs.bridge }}
+          cache-from: type=gha,scope=factory-bridge
+          cache-to: type=gha,mode=max,scope=factory-bridge
+
+  deploy:
+    name: 部署到服务器
+    needs: [build, rehearsal]
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      HOST: ${{ secrets.DEPLOY_HOST }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 检查部署设置
+        run: |
+          if [ -z "$HOST" ]; then
+            echo "::warning::DEPLOY_HOST 没有设置，跳过部署（镜像已构建）。"
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+      - name: SSH
+        if: env.SKIP != '1'
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "${{ secrets.DEPLOY_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
+          fi
+      - name: 复制部署文件到 /opt/wenquest/factory
+        if: env.SKIP != '1'
+        run: |
+          mkdir -p stage/deploy stage/mosquitto
+          cp factory/deploy/docker-compose.server.yml stage/docker-compose.yml
+          cp factory/deploy/*.sh stage/deploy/
+          cp factory/digital/mosquitto/server/* stage/mosquitto/
+          tar czf - -C stage . | ssh "deploy@$HOST" \
+            'mkdir -p /opt/wenquest/factory && tar xzf - -C /opt/wenquest/factory && chmod +x /opt/wenquest/factory/deploy/*.sh'
+      - name: 更新数字工厂
+        if: env.SKIP != '1'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "docker login ghcr.io -u ${{ github.actor }} --password-stdin"
+          ssh "deploy@$HOST" "/opt/wenquest/factory/deploy/update.sh ${{ needs.build.outputs.app }} ${{ needs.build.outputs.bridge }}"
+      - name: 检查两个网址
+        if: env.SKIP != '1'
+        run: |
+          domain=$(ssh "deploy@$HOST" "grep '^SITE_DOMAIN=' /opt/wenquest/factory/.env | cut -d= -f2")
+          for u in "https://factory.$domain/api/health" "https://erp.$domain/api/method/ping"; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$u" || true)
+            echo "$u → $code"
+            if [ "$code" != 200 ]; then
+              echo "::warning::$u 还打不开（$code）。如果刚加了域名解析，等几分钟后再试；学习平台的部署完成后网址才会接通。"
+            fi
+          done
