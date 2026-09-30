@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import Depends, File, Form, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 
 from . import course_builder as cb
@@ -111,6 +111,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
                            for s in ("planned", "writing", "reviewing", "awaiting", "published", "failed")}
         out["progress"]["total"] = len(lessons)
         out["busy"] = proj.get("busy") if studio().is_busy(proj["id"]) else None
+        out["labs_on"] = bool(studio().labcheck_url)   # virtual labs can be made (the lab checker is set up)
         out["toc"] = [{"no": c["no"], "title": c["title"], "start": c.get("start"),
                        "sections": [{"no": s["no"], "title": s["title"], "start": s.get("start")} for s in c["sections"]]}
                       for c in proj["materials"].get("toc", [])]
@@ -308,6 +309,26 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         studio().run(proj, f"主讲教授正在修改：{disp(les['title'])}", lambda p: studio().write_lesson(p, lid, note))
         return view(studio().projects.load(pid))
 
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/lab")
+    async def redo_lab(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        """重做实验: write and try the lesson's virtual lab again; a published lesson's chapter lab page is updated too."""
+        await need_creator(sess)
+        proj = load(pid, sess)
+        chapter, les = studio().find_lesson(proj, lid)
+        if les["status"] not in ("awaiting", "published") or not (studio().lesson_dir(proj, les) / "spec.json").exists():
+            raise EngineError("wrong_stage", "write the lesson first", 409)
+        if not studio().labcheck_url:
+            raise EngineError("labs_unavailable", "the lab checker is not set up", 503)
+
+        async def job(p: dict) -> None:
+            await studio().redo_lab(p, lid)
+            ch, ls = studio().find_lesson(p, lid)
+            if ls["status"] == "published":
+                await update_chapter_lab(p, ch, ls, sess)
+
+        studio().run(proj, f"实验师正在重做虚拟实验：{disp(les['title'])}", job)
+        return view(studio().projects.load(pid))
+
     @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/approve")
     async def publish(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
         await need_creator(sess)
@@ -338,6 +359,11 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         path = studio().lesson_dir(proj, les) / d["n"]
         if not f or not path.exists():
             raise EngineError("not_found", "no such file", 404)
+        if f["kind"] == "lab":
+            # A virtual lab runs sandboxed (its own opaque origin), exactly as students get it.
+            return Response(path.read_bytes(), media_type="text/html; charset=utf-8", headers={
+                "Cache-Control": "private, max-age=600", "X-Content-Type-Options": "nosniff",
+                "Content-Security-Policy": "sandbox allow-scripts allow-popups allow-forms allow-modals; frame-ancestors 'self'"})
         return FileResponse(path, filename=d["n"], headers={"Cache-Control": "private, max-age=600"})
 
     @app.get("/api/v1/studio/projects/{pid}/lessons/{lid}/deck")
@@ -428,6 +454,52 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         proj["course"] = {"id": res["courseid"], "shortname": res["shortname"],
                           "sections": {c["id"]: i + 2 for i, c in enumerate(o["chapters"])}, "attached": []}
 
+    async def _lab_upload(proj: dict, chapter: dict, les: dict, sess: Session) -> tuple[str, int] | None:
+        """The chapter's lab page with every published lab plus this lesson's, uploaded as a draft: (name, draft id)."""
+        lessons = [x for x in chapter["lessons"] if x["status"] == "published" or x is les]
+        page_html = studio().lab_page(proj, chapter, lessons)
+        if not page_html:
+            return None
+        lg = proj["outline"]["languages"]
+        no = chapter["no"]
+        name = ml({"zh": f"第{no}章 虚拟实验", "en": f"Chapter {no} virtual lab"}, lg) or f"第{no}章 虚拟实验"
+        fname = f"第{no}章虚拟实验（中英）.html" if lg != "en" else f"Chapter{no}-virtual-lab.html"
+        draft = await m.state.moodle.upload(sess.moodle_token, fname, page_html.encode("utf-8"))
+        return name, draft
+
+
+    async def chapter_lab(proj: dict, chapter: dict, les: dict, sess: Session) -> dict | None:
+        """Publishing a lesson: replace the chapter's lab page in the course, or return the activity that adds it
+        (one lab file per chapter, never one per lesson)."""
+        up = await _lab_upload(proj, chapter, les, sess)
+        if not up:
+            return None
+        name, draft = up
+        cmid = (proj["course"].get("labs") or {}).get(chapter["id"])
+        if cmid:
+            try:
+                await m.state.moodle.call(sess.moodle_token, "local_wenquest_edit_course", None, courseid=proj["course"]["id"],
+                                          action="replacefile", cmid=cmid, draftitemid=draft)
+                return None
+            except EngineError as exc:
+                if exc.code not in ("not_found", "invalid_input"):
+                    raise
+                proj["course"]["labs"].pop(chapter["id"], None)  # the teacher deleted it: add a new one
+                up = await _lab_upload(proj, chapter, les, sess)
+                name, draft = up if up else (name, draft)
+        return {"type": "resource", "name": name, "draftitemid": draft, "visible": 1}
+
+
+    async def update_chapter_lab(proj: dict, chapter: dict, les: dict, sess: Session) -> None:
+        """After redoing a published lesson's lab: put the new chapter page into the course."""
+        act = await chapter_lab(proj, chapter, les, sess)
+        if act:
+            number = proj["course"]["sections"].get(chapter["id"])
+            res = await m.state.moodle.call(sess.moodle_token, "local_wenquest_add_activities", None, courseid=proj["course"]["id"],
+                                            section=number, activities=[act])
+            if res.get("cmids"):
+                proj["course"].setdefault("labs", {})[chapter["id"]] = res["cmids"][0]
+
     async def publish_lesson(proj: dict, chapter: dict, les: dict, sess: Session) -> None:
         lg = proj["outline"]["languages"]
         course = proj["course"]
@@ -461,6 +533,11 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
                          "content": html_of(les["exercises"])})
         acts += await produced("guide")
         acts += await produced("report")
+        lab_act = await chapter_lab(proj, chapter, les, sess)
+        lab_index = -1
+        if lab_act:
+            lab_index = len(acts)
+            acts.append(lab_act)
         if any(les.get("answers", {}).values()):
             acts.append({"type": "page", "name": ml({k: ans_name[k] + v for k, v in les["title"].items() if k in ans_name}, lg),
                          "content": html_of(les["answers"]), "visible": 0})
@@ -475,6 +552,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         if chapter["id"] not in course["attached"]:
             course["attached"].append(chapter["id"])
         les["cmids"] = res.get("cmids", [])
+        if lab_index >= 0 and lab_index < len(les["cmids"]):
+            course.setdefault("labs", {})[chapter["id"]] = les["cmids"][lab_index]
         les["status"] = "published"
         les["published"] = time.time()
 

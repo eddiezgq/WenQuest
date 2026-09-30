@@ -56,6 +56,8 @@ services:
       WQ_DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       # Lesson animations are rendered by the animator service (below).
       WQ_ANIMATOR_URL: http://animator:8000
+      # AI-written virtual labs are tried in a headless browser by the lab checker (below).
+      WQ_LABCHECK_URL: http://labcheck:8000
       # Sign-up, teacher approval and course notices by email (see docs/帮助/注册登录与审核.md).
       WQ_SMTP_HOST: ${SMTP_HOST:-}
       WQ_SMTP_PORT: ${SMTP_PORT:-2525}
@@ -87,6 +89,26 @@ services:
     tmpfs:
       - /tmp:size=1g
       - /home/anim:size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    networks:
+      - render
+
+  # Tries AI-written virtual labs in headless Chromium (no errors, not blank, every task can be done) and
+  # takes the picture for the slides. Like the animator: no secrets, no internet, 1 CPU and 2 GB.
+  labcheck:
+    build: services/labcheck
+    image: ${LABCHECK_IMAGE:-wenquest/labcheck:0.1}
+    restart: unless-stopped
+    cpus: 1
+    mem_limit: 2g
+    shm_size: 256m
+    pids_limit: 256
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m
+      - /home/lab:size=128m
     security_opt:
       - no-new-privileges:true
     cap_drop: [ALL]

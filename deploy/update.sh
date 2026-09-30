@@ -20,7 +20,7 @@ fi
 
 log "Pulling images..."
 dc pull --quiet --ignore-buildable
-dc pull --quiet moodle gateway web animator
+dc pull --quiet moodle gateway web animator labcheck
 
 log "Starting services..."
 dc up -d --no-build --remove-orphans

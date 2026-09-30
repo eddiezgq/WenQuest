@@ -48,6 +48,7 @@ set_env ENGINE_IMAGE ""   # filled in by the first deployment
 set_env GATEWAY_IMAGE ""
 set_env WEB_IMAGE ""
 set_env ANIMATOR_IMAGE ""
+set_env LABCHECK_IMAGE ""
 
 echo
 echo "Created .env. Save these somewhere safe (a password manager):"

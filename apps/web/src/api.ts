@@ -118,7 +118,7 @@ export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"
 export interface StudioLesson {
   id: string; title: Text; goal: Text; week: number; sections: string[]; status: LessonStatus;
   content: Text; exercises: Text; answers: Text; notes: string; error: string;
-  files?: { name: string; kind: "animation" | "slides" | "guide" | "report" | "plan"; teacher_only: boolean; url: string; seconds?: number }[];
+  files?: { name: string; kind: "animation" | "lab" | "slides" | "guide" | "report" | "plan"; teacher_only: boolean; url: string; seconds?: number }[];
   review: { verdict: "pass" | "revise"; issues: { severity: string; text: string }[]; summary: string; round: number } | null;
 }
 export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[] }
@@ -134,6 +134,7 @@ export interface StudioProject {
   pace: { mode: "manual" | "daily"; hour: number; tz: string; last_auto: string };
   busy: { label: string; since: number } | null;
   progress: Record<LessonStatus | "total", number>;
+  labs_on?: boolean;
 }
 export interface StudioSummary {
   id: string; title: string; stage: Stage; updated: number; course_id: number;
@@ -328,6 +329,7 @@ export const api = {
   studioDeck: (id: string, lid: string) =>
     request<{ status: string; slides?: { image: string; thumb: string }[]; done?: number; total?: number }>(
       "GET", `/api/v1/studio/projects/${id}/lessons/${lid}/deck`),
+  studioRedoLab: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/lab`, {}),
   studioWrite: (id: string, lid: string, note = "") =>
     request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/write`, { note }),
   studioPublish: (id: string, lid: string) =>

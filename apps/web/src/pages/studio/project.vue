@@ -229,7 +229,14 @@
                         </view>
                         <template v-for="f in l.files" :key="'v' + f.name">
                           <video v-if="f.kind === 'animation'" class="dv-video" :src="absolute(f.url)" controls preload="metadata" />
+                          <!-- #ifdef H5 -->
+                          <iframe v-if="f.kind === 'lab'" class="dv-lab" :src="absolute(f.url)" :title="f.name"
+                                  sandbox="allow-scripts allow-popups allow-forms allow-modals" />
+                          <!-- #endif -->
                         </template>
+                        <view v-if="p.labs_on" class="ghost small" :class="{ disabled: !!p.busy }" @click="redoLab(l.id)">
+                          ⚗ {{ l.files.some((f) => f.kind === 'lab') ? t("studio.redoLab") : t("studio.makeLab") }}
+                        </view>
                         <view v-if="l.files.some((f) => f.kind === 'slides')" class="ghost small" @click="previewDeck(l.id)">
                           {{ deckFor === l.id && deckMsg ? deckMsg : t("studio.previewDeck") }}
                         </view>
@@ -505,6 +512,9 @@ async function previewDeck(lid: string) {
     await new Promise((r) => setTimeout(r, 2000));
   }
 }
+function redoLab(lid: string) {
+  act(() => api.studioRedoLab(id.value, lid));
+}
 function rewrite(lid: string) {
   const note = (notes[lid] || "").trim();
   notes[lid] = "";
@@ -612,7 +622,7 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 @keyframes pulse { to { opacity: .3; } }
 .stop { color: var(--wq-danger); cursor: pointer; font-weight: 600; margin-left: 4px; }
 .mtabs { display: none; }
-.cols { display: grid; grid-template-columns: minmax(320px, 5fr) 7fr; gap: 16px; align-items: start; }
+.cols { display: grid; grid-template-columns: minmax(320px, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
 
 /* conversation */
 .chat { background: #fff; border: 1px solid var(--wq-line); border-radius: 10px; display: flex; flex-direction: column; height: calc(100vh - 170px); min-height: 520px; position: sticky; top: 12px; }
@@ -728,7 +738,7 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .dv-t { font-size: 11px; color: #a15c00; background: #fff4de; border-radius: 4px; padding: 1px 6px; }
 .dv-d { color: #1e2761; font-weight: 700; }
 .dv-video { width: 100%; max-width: 720px; aspect-ratio: 16 / 9; display: block; margin: 4px 0 10px; background: #0f1419; border-radius: 6px; }
-.dv-deck { white-space: nowrap; margin-top: 8px; }
+.dv-deck { white-space: nowrap; margin-top: 8px; width: 100%; max-width: 100%; }
 .dv-img { display: inline-block; width: 320px; margin-right: 8px; border: 1px solid #e3e8e6; border-radius: 4px; }
 .lesson-html { max-height: 520px; overflow: auto; border: 1px solid #f0f2f1; border-radius: 6px; padding: 4px 12px; }
 .sub { margin-top: 8px; }
@@ -750,4 +760,5 @@ onUnload(() => { if (timer) clearTimeout(timer); });
   .hide { display: none; }
   .f-role { width: 96px; }
 }
+.dv-lab { display: block; width: 100%; height: 780px; border: 1px solid var(--wq-line); border-radius: 8px; margin-top: 10px; background: #fff; }
 </style>

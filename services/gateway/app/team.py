@@ -357,3 +357,71 @@ def animation_prompt(no: str, spec_json: str, example: str, error: str = "", pre
         out += (f"\nYour previous code failed. Fix it and return the whole corrected scene.\nError:\n{error}\n"
                 f"\nPrevious code:\n{previous}\n")
     return out
+
+
+# --- 实验师 lab engineer (A3) --------------------------------------------------------------------------
+
+LAB_API = r"""Write ONE virtual lab as plain JavaScript that calls WQ.lab({...}) exactly once. The WenQuest lab kit
+already draws the page (tabs, EN/中文, scene buttons, sliders, measurement panel, task list, progress, canvas
+and animation loop); you only give the physics and the pictures. Every text is a pair ["中文", "English"].
+
+WQ.lab({
+  title: [zh, en],                       // short, e.g. ["惯性与急停", "Inertia and emergency stops"]
+  goal: [zh, en],                        // one sentence: what the student should see
+  scenes: [                              // exactly two: the robot scene first, then the everyday scene
+    { id: "robot", robot: true, name: [zh, en], problem: { title: [zh, en], text: [zh, en] } },
+    { id: "life", name: [zh, en], problem: {...}, hide: ["paramId"], params: { paramId: { min, max, step, value } } },
+  ],                                     // hide/params: per-scene slider changes (optional)
+  params: [ { id, name: [zh, en], min, max, step, value, unit: "m/s", digits: 1 } ],   // 2-5 sliders
+  buttons: [ { id: "start", name: [zh, en], primary: true }, { id: "reset", name: [zh, en] } ],  // optional;
+                                         // "start" and "reset" are built in; other ids call action(id, api, state)
+  legend: [ { color: "var(--orange)", name: [zh, en] } ],                              // optional
+  tasks: [                               // 3 tasks; each ticked by your code with api.done(id)
+    { id: "slide", robot: true, text: [zh, en],
+      demo: { scene: "robot", set: { paramId: value, ... }, press: ["start"], wait: 3 } },
+  ],                                     // demo = how to complete it; the checker does exactly this and
+                                         // waits `wait` seconds of lab time, then the task MUST be ticked
+  think: [zh, en],                       // a question to think about (optional)
+  reset(api, state) { ... },             // set up `state` (a plain object) from api.p; called on load,
+                                         // scene change, slider change while stopped, and "reset"
+  start(api, state) { ... },             // optional, after "start" (the kit calls reset first, then sets running)
+  update(dt, api, state) { ... },        // physics step, called only while api.running; dt in seconds
+  readouts(api, state) { return [[ [zh, en], "1.50 m/s" ], ...]; },   // measurement rows
+  draw(api, state) { ... },              // draw the current picture (the canvas is cleared for you)
+});
+
+api: api.w, api.h (canvas size in px, 16:10), api.ctx (CanvasRenderingContext2D), api.p (slider values by id),
+api.scene (scene id), api.t (seconds since start), api.running, api.stop() (end the run; call it when the motion
+is over), api.done(taskId), api.T(zh, en) and api.P([zh, en]) (text in the current language), api.fmt(x, digits),
+api.css("--ink") colours: --ink --muted --accent --amber --blue --green --red --orange --violet --ground --grid
+--water --water-line --panel. Drawing helpers: api.line(x1,y1,x2,y2,color,width,dash), api.arrow(x1,y1,x2,y2,color,
+width), api.label(text,x,y,color,size,align), api.rect(x,y,w,h,fill,stroke,radius), api.circle(x,y,r,fill,stroke),
+api.ground(y, width, scroll, step), api.grid(w, h, step), api.agv(x, yBottom, width, color), api.box(x, yBottom, size, color).
+Scale with api.w/api.h (never fixed pixel sizes); y grows downwards; keep a margin of 12 px.
+
+Rules (checked automatically; the lab is rejected otherwise): no fetch/XMLHttpRequest/WebSocket, no import,
+no eval/Function, no localStorage/cookies, no location/window.open/parent/top/postMessage, no innerHTML or
+document.write, no web addresses, no setTimeout/setInterval/requestAnimationFrame (the kit runs the loop), and
+never call other WQ functions. Put helper functions and constants above or below the WQ.lab call.
+"""
+
+LAB_ENGINEER = COMMON + (
+    " Role: 实验师 (lab engineer). Build the lesson's virtual lab from the lesson spec: its robot scene and everyday "
+    "scene, its adjustable parameters and its tasks. The physics must be real and correct (compute it from the "
+    "lesson's formulas with correct units), the picture must show what the student has to notice (vectors, "
+    "readings, paths), and each task must be checkable by your code and reachable with its demo. Match the house "
+    "example in structure and quality. Return JSON {\"code\": \"...javascript...\"}.\n\n" + LAB_API
+)
+
+
+def lab_schema() -> dict:
+    return _obj({"code": STR})
+
+
+def lab_prompt(no: str, spec_json: str, example: str, problems: list[str] | None = None, previous: str = "") -> str:
+    out = (f"Lesson {no}. The lesson spec (use its lab title, scenes, params and tasks, its concept, formulas and robot problem):\n"
+           f"{spec_json}\n\nThe house example (lesson 2.1) — follow its structure:\n{example}\n")
+    if problems:
+        out += ("\nYour previous lab failed the automatic check. Fix every problem and return the whole corrected code.\n"
+                "Problems:\n" + "\n".join(f"- {p}" for p in problems[:15]) + f"\n\nPrevious code:\n{previous}\n")
+    return out

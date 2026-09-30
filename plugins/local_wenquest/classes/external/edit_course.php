@@ -51,6 +51,7 @@ class edit_course extends external_api {
             'allowtext' => $opt(PARAM_BOOL, 'Assignment accepts online text'),
             'allowfiles' => $opt(PARAM_BOOL, 'Assignment accepts files'),
             'maxfiles' => $opt(PARAM_INT, 'Assignment: most files a student may upload'),
+            'draftitemid' => $opt(PARAM_INT, 'replacefile: the uploaded file (draft area) that replaces a file activity\'s file'),
         ]);
     }
 
@@ -76,18 +77,20 @@ class edit_course extends external_api {
      * @param bool|null $allowtext
      * @param bool|null $allowfiles
      * @param int|null $maxfiles
+     * @param int|null $draftitemid
      * @return array
      */
     public static function execute(int $courseid, string $action, ?int $sectionid = null, ?int $cmid = null, ?string $name = null,
             ?string $summary = null, ?int $visible = null, ?int $position = null, ?int $beforecmid = null, ?bool $force = null,
             ?string $content = null, ?string $url = null, ?string $intro = null, ?int $duedate = null, ?int $cutoffdate = null,
-            ?float $grade = null, ?bool $allowtext = null, ?bool $allowfiles = null, ?int $maxfiles = null): array {
+            ?float $grade = null, ?bool $allowtext = null, ?bool $allowfiles = null, ?int $maxfiles = null,
+            ?int $draftitemid = null): array {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/course/lib.php');
         require_once($CFG->dirroot . '/course/modlib.php');
         $p = self::validate_parameters(self::execute_parameters(), compact('courseid', 'action', 'sectionid', 'cmid', 'name',
             'summary', 'visible', 'position', 'beforecmid', 'force', 'content', 'url', 'intro', 'duedate', 'cutoffdate', 'grade',
-            'allowtext', 'allowfiles', 'maxfiles'));
+            'allowtext', 'allowfiles', 'maxfiles', 'draftitemid'));
         $course = get_course($p['courseid']);
         $context = \context_course::instance($course->id);
         self::validate_context($context);
@@ -274,6 +277,29 @@ class edit_course extends external_api {
                     $assign = new \assign($modcontext, $cm, $course);
                     $assign->update_calendar($cm->id);
                 }
+                \core\event\course_module_updated::create_from_cm($cm)->trigger();
+                $out['cmid'] = (int) $cm->id;
+                break;
+
+            case 'replacefile':
+                // Replace the file of a file activity (e.g. the chapter's virtual lab page) and keep the activity.
+                $need('cmid', 'draftitemid');
+                if ($cm->modname !== 'resource') {
+                    throw new \invalid_parameter_exception('replacefile works on file activities only');
+                }
+                $modcontext = \context_module::instance($cm->id);
+                require_capability('moodle/course:manageactivities', $modcontext);
+                file_save_draft_area_files($p['draftitemid'], $modcontext->id, 'mod_resource', 'content', 0,
+                    ['subdirs' => 0, 'maxfiles' => 1]);
+                $fs = get_file_storage();
+                $files = $fs->get_area_files($modcontext->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
+                if (!$files) {
+                    throw new \invalid_parameter_exception('no file was uploaded');
+                }
+                $main = reset($files);
+                file_set_sortorder($modcontext->id, 'mod_resource', 'content', 0, $main->get_filepath(), $main->get_filename(), 1);
+                $rev = (int) $DB->get_field('resource', 'revision', ['id' => $cm->instance]);
+                $DB->update_record('resource', (object) ['id' => $cm->instance, 'revision' => $rev + 1, 'timemodified' => time()]);
                 \core\event\course_module_updated::create_from_cm($cm)->trigger();
                 $out['cmid'] = (int) $cm->id;
                 break;

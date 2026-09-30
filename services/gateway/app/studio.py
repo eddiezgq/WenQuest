@@ -173,6 +173,8 @@ class Studio:
         self.locks: dict[str, asyncio.Lock] = {}
         self.animator_url = ""      # the animation renderer; empty = no videos
         self.animator_timeout = 600.0
+        self.labcheck_url = ""      # the lab checker (headless browser); empty = no virtual labs
+        self.labcheck_timeout = 150.0
 
     # helpers ---------------------------------------------------------------------------------
     def items(self, proj: dict) -> list[mt.Material]:
@@ -564,14 +566,15 @@ class Studio:
             proj["busy"] = {"label": f"主讲教授按审稿意见重写：{no}", "since": now()}
             self.projects.save(proj)
         video = await self.animate(proj, les, spec, no, review)
+        lab = await self.make_lab(proj, chapter, les, spec, no, review)
         proj["busy"] = {"label": f"正在排版课件、指导书、报告模板和教案：{no}", "since": now()}
         self.projects.save(proj)
-        await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video)
+        await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video, lab)
         les["review"] = review
         les["status"] = "awaiting"
         les["written"] = now()
         verdict = "审稿通过" if review and review["verdict"] == "pass" else "审稿人仍有意见，请重点看审稿意见"
-        self.say(proj, f"《{no} {disp(les['title'])}》做好了（{verdict}）：讲义、{'动画、' if video else ''}课件、练习与答案、实验指导书、实验报告模板、教案。"
+        self.say(proj, f"《{no} {disp(les['title'])}》做好了（{verdict}）：讲义、{'动画、' if video else ''}{'虚拟实验、' if lab else ''}课件、练习与答案、实验指导书、实验报告模板、教案。"
                        "请在右边“课时进度”里审阅：通过就发布给学生，或者告诉我怎么改。", "lead", "lesson")
 
     async def animate(self, proj: dict, les: dict, spec: dict, no: str, review: dict | None) -> dict | None:
@@ -618,13 +621,108 @@ class Studio:
         (d / "animation.py").write_text(code if used == "ai" else anim.storyboard_code(spec, no))
         return {"video": v, "poster": pp, "seconds": secs, "by": used}
 
+    def pairs_for(self, proj: dict, chapter: dict) -> tuple[list[str], list[str], str]:
+        o = proj["outline"]
+        pair_of = lambda t: [t.get("zh") or t.get("en") or "", t.get("en") or t.get("zh") or ""]  # noqa: E731
+        return pair_of(o["title"]), pair_of(chapter["title"]), ("en" if o.get("languages") == "en" else "zh")
+
+    async def make_lab(self, proj: dict, chapter: dict, les: dict, spec: dict, no: str, review: dict | None) -> dict | None:
+        """实验师 (A3): one lab in the lab kit, checked for safety, then tried in a headless browser — every scene
+        draws, every slider moves, every task's demo ticks it. Problems go back to the lab engineer twice;
+        a lab that still fails is not used (the lesson is finished without it and the review says so)."""
+        from .production import labs
+        d = self.lesson_dir(proj, les)
+        d.mkdir(parents=True, exist_ok=True)
+        for name in ("lab.js", "lab.png", "lab_check.json"):
+            (d / name).unlink(missing_ok=True)
+        les.pop("lab_problems", None)
+        if not self.labcheck_url:
+            return None
+        course, chap, lang = self.pairs_for(proj, chapter)
+        spec_json = json.dumps({k: spec[k] for k in ("title", "goal", "problem", "concept", "lab", "model", "everyday")},
+                               ensure_ascii=False)
+        lab_id = no.replace(".", "-")
+        code, problems, result = "", [], None
+        for attempt in range(3):
+            proj["busy"] = {"label": f"实验师正在{'写' if attempt == 0 else '修改'}虚拟实验：{no}", "since": now()}
+            self.projects.save(proj)
+            data = await self.ai.json(system=team.LAB_ENGINEER, prompt=team.lab_prompt(no, spec_json, labs.example_code(), problems, code),
+                                      schema=team.lab_schema(), max_tokens=14000, fake=lambda: {"code": labs.example_code()})
+            code = re.sub(r"^```(?:js|javascript)?\s*|```\s*$", "", str((data or {}).get("code") or "").strip())
+            problems = labs.static_problems(code)
+            if problems:
+                continue
+            proj["busy"] = {"label": f"正在试运行虚拟实验：{no}（约 30 秒）", "since": now()}
+            self.projects.save(proj)
+            page_html = labs.page([(no, code)], course=course, chapter=chap, lang=lang)
+            try:
+                result = await labs.trial_run(self.labcheck_url, page_html, lab_id, self.labcheck_timeout)
+            except labs.CheckError as e:
+                return self._no_video(review, f"实验检查服务暂时不可用（{e}），这一课先没有虚拟实验，可以点“重做实验”")
+            if result["ok"]:
+                break
+            problems = result["problems"]
+        else:
+            les["lab_problems"] = problems[:10]
+            if review is not None:
+                review["issues"].append({"severity": "medium", "text": "虚拟实验三次都没有通过试运行，这一课先不带实验，可以点“重做实验”。"
+                                                                       "问题：" + "；".join(problems[:3])})
+            return None
+        (d / "lab.js").write_text(code, encoding="utf-8")
+        image = None
+        if result and result["screenshot"]:
+            image = d / "lab.png"
+            image.write_bytes(result["screenshot"])
+        (d / "lab_check.json").write_text(json.dumps({"tasks": result["tasks"] if result else {}, "seconds": result["seconds"] if result else 0,
+                                                      "checked": now()}, ensure_ascii=False))
+        return {"code": d / "lab.js", "image": image}
+
+    def lab_page(self, proj: dict, chapter: dict, lessons: list[dict]) -> str | None:
+        """The chapter's lab page: the labs of the given lessons, in lesson order."""
+        from .production import labs
+        items = []
+        for les in chapter["lessons"]:
+            if les in lessons:
+                js = self.lesson_dir(proj, les) / "lab.js"
+                if js.exists():
+                    items.append((self.lesson_no(proj, chapter, les), js.read_text(encoding="utf-8")))
+        if not items:
+            return None
+        course, chap, lang = self.pairs_for(proj, chapter)
+        return labs.page(items, course=course, chapter=chap, lang=lang, key=f"wq-lab-{proj['id'][:8]}-{chapter['id'][:8]}")
+
+    async def redo_lab(self, proj: dict, lid: str) -> None:
+        """重做实验: only the lab of a written lesson, then the slides again (to show the new picture)."""
+        chapter, les = self.find_lesson(proj, lid)
+        d = self.lesson_dir(proj, les)
+        data = json.loads((d / "spec.json").read_text())
+        spec, gp = data["lesson"], data["guide_plan"]
+        no = self.lesson_no(proj, chapter, les)
+        review = les.get("review")
+        if review:
+            review["issues"] = [i for i in review.get("issues", []) if "实验" not in i.get("text", "") or "动画" in i.get("text", "")]
+        lab = await self.make_lab(proj, chapter, les, spec, no, review)
+        mp4 = next(iter(sorted(d.glob("*.mp4"))), None)
+        video = None
+        if mp4:
+            png = mp4.with_suffix(".png")
+            secs = next((f.get("seconds", 0) for f in les.get("files") or [] if f["kind"] == "animation"), 0)
+            video = {"video": mp4, "poster": png if png.exists() else None, "seconds": secs}
+        proj["busy"] = {"label": f"正在重新排版课件：{no}", "since": now()}
+        self.projects.save(proj)
+        await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video, lab)
+        les["review"] = review
+        self.say(proj, f"《{no}》的虚拟实验{'重做好了，已通过试运行，课件里的实验页也换成了新截图' if lab else '还是没有通过试运行，请看审稿意见里的问题'}。",
+                 "lead", "lesson")
+
     @staticmethod
     def _no_video(review: dict | None, text: str) -> None:
         if review is not None:
             review["issues"].append({"severity": "low", "text": text})
         return None
 
-    def render(self, proj: dict, chapter: dict, les: dict, spec: dict, gp: dict, no: str, video: dict | None = None) -> None:
+    def render(self, proj: dict, chapter: dict, les: dict, spec: dict, gp: dict, no: str, video: dict | None = None,
+               lab: dict | None = None) -> None:
         """Every deliverable of one lesson, in the benchmark layout."""
         from .production import deck, docs, page
         o = proj["outline"]
@@ -633,7 +731,9 @@ class Studio:
         d = self.lesson_dir(proj, les)
         d.mkdir(parents=True, exist_ok=True)
         for old in d.iterdir():
-            if old.suffix in (".pptx", ".docx", ".json") or (not video and old.suffix in (".mp4", ".png")):
+            if old.stem == "lab":
+                continue  # lab.js / lab.png / lab_check.json belong to make_lab
+            if old.suffix in (".pptx", ".docx", ".json", ".html") or (not video and old.suffix in (".mp4", ".png")):
                 old.unlink()
         # The lesson number is added by the layout; drop one the author may have put in the title.
         spec["title"] = [re.sub(r"^\s*\d+(\.\d+)*\s*", "", x) or x for x in spec["title"]]
@@ -642,8 +742,15 @@ class Studio:
         name = re.sub(r'[\\/:*?"<>|]', "-", f"{no} {spec['title'][0]}")[:80]
         if video:
             files.append({"name": video["video"].name, "kind": "animation", "teacher_only": False, "seconds": video["seconds"]})
+        lab_image = lab["image"] if lab and lab.get("image") else None
         deck.build(spec, d / f"{name} 课件.pptx", no=no, course=course, chapter=chap,
-                   video=video["video"] if video else None, poster=video["poster"] if video else None)
+                   video=video["video"] if video else None, poster=video["poster"] if video else None, lab_image=lab_image)
+        if lab:
+            from .production import labs
+            lab_name = f"实验{no} 虚拟实验.html"
+            (d / lab_name).write_text(labs.page([(no, (d / "lab.js").read_text(encoding="utf-8"))], course=course, chapter=chap,
+                                                lang="en" if o.get("languages") == "en" else "zh"), encoding="utf-8")
+            files.append({"name": lab_name, "kind": "lab", "teacher_only": False})
         files.append({"name": f"{name} 课件.pptx", "kind": "slides", "teacher_only": False})
         docs.guide(spec, gp, d / f"实验{no} 实验指导书.docx", no)
         files.append({"name": f"实验{no} 实验指导书.docx", "kind": "guide", "teacher_only": False})

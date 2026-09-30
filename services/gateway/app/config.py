@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     # The animation renderer (services/animator), e.g. http://animator:8000. Empty = lessons get no video.
     animator_url: str = ""
     animator_timeout: float = 600.0
+    # The lab checker (services/labcheck), e.g. http://labcheck:8000. Empty = lessons get no virtual lab.
+    labcheck_url: str = ""
+    labcheck_timeout: float = 150.0
     data_dir: str = "/tmp/wq-data"  # converted slides and small settings; a persistent volume in production
 
     # --- accounts: sign-up, email codes, teacher approval (app/accounts.py) ---

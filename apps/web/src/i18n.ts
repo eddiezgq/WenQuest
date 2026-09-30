@@ -945,6 +945,9 @@ const messages: Record<Locale, Record<string, string>> = {
     "error.price_required": "收费课程请填写价格",
     "admin.roleTeacher": "教师",
     "admin.roleStudent": "学生",
+    "studio.kind.lab": "虚拟实验",
+    "studio.redoLab": "重做实验",
+    "studio.makeLab": "做虚拟实验",
   },
   en: {
     "app.name": "WenQuest",
@@ -1887,6 +1890,9 @@ const messages: Record<Locale, Record<string, string>> = {
     "error.price_required": "A paid course needs a price",
     "admin.roleTeacher": "Teacher",
     "admin.roleStudent": "Learner",
+    "studio.kind.lab": "Virtual lab",
+    "studio.redoLab": "Redo the lab",
+    "studio.makeLab": "Make the lab",
   },
 };
 

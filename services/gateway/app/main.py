@@ -37,7 +37,7 @@ from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
 
-VERSION = "0.14.0"
+VERSION = "0.15.0"
 FILE_TTL = 86400  # signed file links live one day
 
 
@@ -220,8 +220,16 @@ def register(app: FastAPI) -> None:
                 animator = r.json() if r.status_code == 200 else "down"
             except (httpx.HTTPError, ValueError):
                 animator = "down"
+        labcheck: Any = False
+        if state.settings.labcheck_url:
+            try:
+                async with httpx.AsyncClient(timeout=2.0, trust_env=False) as c:
+                    r = await c.get(state.settings.labcheck_url.rstrip("/") + "/health")
+                labcheck = r.json() if r.status_code == 200 else "down"
+            except (httpx.HTTPError, ValueError):
+                labcheck = "down"
         return {"ok": True, "version": VERSION, "ai": state.ai.provider, "slides": state.slides.available,
-                "slide_queue": state.slides.overview(), "animator": animator}
+                "slide_queue": state.slides.overview(), "animator": animator, "labcheck": labcheck}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)
     async def login(body: LoginIn, response: Response):
@@ -725,6 +733,8 @@ def _studio() -> st.Studio:
                                      state.store, state.ai, _clean)
     s.animator_url = state.settings.animator_url
     s.animator_timeout = state.settings.animator_timeout
+    s.labcheck_url = state.settings.labcheck_url
+    s.labcheck_timeout = state.settings.labcheck_timeout
     return s
 
 
