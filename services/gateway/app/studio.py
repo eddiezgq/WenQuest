@@ -852,7 +852,8 @@ class Studio:
         tb_ai, tb_note = ai("textbook")
         items = [{"key": "textbook", "label": "教材对应章节已参照", "by": "auto+ai",
                   "ok": (found and tb_ai is not False) if proj["materials"].get("textbook") else False,
-                  "note": ("参照：" + "、".join(les.get("sections") or []) if found else "没有找到这一课对应的教材页")
+                  "note": (("参照：" + "、".join(les["sections"]) if les.get("sections") else "已找到这一课对应的教材内容") if found
+                           else "没有找到这一课对应的教材页")
                           + (f"；{tb_note}" if tb_note else "")}]
         ok, note = ai("problem")
         items.append({"key": "problem", "label": "机器人问题是本课的", "by": "ai", "ok": ok, "note": note})

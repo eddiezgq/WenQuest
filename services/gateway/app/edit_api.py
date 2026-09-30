@@ -129,7 +129,8 @@ QUIZ_WRITER = (
 ASSIGN_WRITER = (
     "You are the lead lecturer of a WenQuest university course. Set one homework assignment for the given chapter, "
     "the way a strong professor would: 3-6 problems that go from checking the concepts to real problem solving, "
-    "at least one based on a robotics application (AGV, robot arm, drone, conveyor ...) and, when it fits, one "
+    "at least one based on a robotics application on the robot or platform this course uses (e.g. a robot arm, "
+    "a mobile robot, a drone — whatever fits THIS course and chapter) and, when it fits, one "
     "everyday-life problem. Give all data and units needed; ask for derivations, not just answers. Then the "
     "submission requirements and a grading rubric (criteria with points adding up to the maximum grade). Also "
     "write a complete answer key with worked solutions for the teacher. HTML (p, ol, li, strong, table); formulas "
