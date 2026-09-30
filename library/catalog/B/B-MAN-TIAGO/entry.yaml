@@ -1,0 +1,48 @@
+# B-MAN-TIAGO · TIAGo 移动操作机器人（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-MAN-TIAGO
+kind: robot
+name:
+  zh: TIAGo 移动操作机器人
+  en: TIAGo
+category: MAN
+tags:
+- 移动操作机器人
+- mobile manipulator
+- pal
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:pal_tiago/tiago.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: mobile_manipulator
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: pal_tiago/
+  license: Apache-2.0
+  attribution: MuJoCo Menagerie（Google DeepMind）· pal_tiago；Apache-2.0；Apache License
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 移动底盘加机械臂：既能在场地里走，又能伸手操作。
+  uses:
+  - 仓储搬运
+  - 服务机器人
+  courses:
+  - course: 移动机器人
+    chapter: 移动操作
+  labs:
+  - 底盘与机械臂的协同
+factory:
+  erp_items: []
+  suppliers: []

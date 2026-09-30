@@ -1,0 +1,48 @@
+# B-SEN-D435I · Realsense D435i 传感器（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-SEN-D435I
+kind: robot
+name:
+  zh: Realsense D435i 传感器
+  en: Realsense D435i
+category: SEN
+tags:
+- 传感器
+- sensor
+- realsense
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:realsense_d435i/d435i.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: sensor
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: realsense_d435i/
+  license: Apache-2.0
+  attribution: MuJoCo Menagerie（Google DeepMind）· realsense_d435i；Apache-2.0；Apache License
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 深度相机用双目或结构光测距，同时输出彩色图像和深度图。
+  uses:
+  - 机器人视觉
+  - 三维重建
+  courses:
+  - course: 机器人技术
+    chapter: 机器人视觉与传感器
+  labs:
+  - 深度图与点云演示
+factory:
+  erp_items: []
+  suppliers: []

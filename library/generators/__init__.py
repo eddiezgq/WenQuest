@@ -7,4 +7,7 @@ def get_builder(entry):
     if eng.startswith("bd_warehouse:"):
         from generators import a_standard
         return a_standard.build
+    if eng.startswith("menagerie:"):
+        from generators import b_robot
+        return b_robot.build
     raise ValueError("没有造型程序：" + eng)

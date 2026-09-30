@@ -1,0 +1,49 @@
+# B-EEF-SHARPAWAVE · Sharpa Wave 末端执行器（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-EEF-SHARPAWAVE
+kind: robot
+name:
+  zh: Sharpa Wave 末端执行器
+  en: Sharpa Wave
+category: EEF
+tags:
+- 末端执行器
+- end effector
+- sharpa
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:sharpa_wave/left_hand.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: end_effector
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: sharpa_wave/
+  license: Apache-2.0
+  attribution: MuJoCo Menagerie（Google DeepMind）· sharpa_wave；Apache-2.0；Apache License
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 装在机械臂末端：夹爪靠手指开合夹持物体，灵巧手用多个关节模仿人手。
+  uses:
+  - 抓取
+  - 精细操作
+  courses:
+  - course: 机器人技术
+    chapter: 末端执行器与抓取
+  labs:
+  - 手指关节拖动
+  - 抓取姿态演示
+factory:
+  erp_items: []
+  suppliers: []

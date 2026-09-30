@@ -1,0 +1,48 @@
+# B-UAV-CF2 · Bitcraze Crazyflie 2 无人机（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-UAV-CF2
+kind: robot
+name:
+  zh: Bitcraze Crazyflie 2 无人机
+  en: Bitcraze Crazyflie 2
+category: UAV
+tags:
+- 无人机
+- drone
+- bitcraze
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:bitcraze_crazyflie_2/cf2.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: drone
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: bitcraze_crazyflie_2/
+  license: MIT
+  attribution: MuJoCo Menagerie（Google DeepMind）· bitcraze_crazyflie_2；MIT；The MIT License (MIT)
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 多个旋翼转速不同产生升力差和反扭矩，从而控制姿态和位置。
+  uses:
+  - 航拍
+  - 巡检
+  courses:
+  - course: 无人机
+    chapter: 多旋翼动力学
+  labs:
+  - 姿态控制演示
+factory:
+  erp_items: []
+  suppliers: []

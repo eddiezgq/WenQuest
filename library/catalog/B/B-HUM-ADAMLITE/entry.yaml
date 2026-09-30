@@ -1,0 +1,50 @@
+# B-HUM-ADAMLITE · PNDbotics Adam_lite 人形机器人（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-HUM-ADAMLITE
+kind: robot
+name:
+  zh: PNDbotics Adam_lite 人形机器人
+  en: PNDbotics Adam_lite
+category: HUM
+tags:
+- 人形机器人
+- humanoid
+- pndbotics
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:pndbotics_adam_lite/adam_lite.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: humanoid
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: pndbotics_adam_lite/
+  license: MIT
+  attribution: MuJoCo Menagerie（Google DeepMind）· pndbotics_adam_lite；MIT；MIT License
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 躯干、双臂、双腿按人体比例布置，行走时控制质心，手臂负责操作。
+  uses:
+  - 科研
+  - 服务
+  - 制造
+  courses:
+  - course: 人形与学习控制
+    chapter: 人形机器人结构
+  labs:
+  - 全身关节拖动
+  - 行走动画
+factory:
+  erp_items: []
+  suppliers: []

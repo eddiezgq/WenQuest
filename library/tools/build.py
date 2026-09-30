@@ -34,6 +34,8 @@ ANG_TOL = 0.25
 
 def _mesh(shape):
     import numpy as np
+    if type(shape).__name__ == "Trimesh":                             # 已经是网格（机器人）
+        return (np.asarray(shape.vertices, dtype=float), np.asarray(shape.faces, dtype=int)) if len(shape.faces) else None
     v, t = shape.tessellate(LIN_TOL_MM * 5, ANG_TOL)
     if not t:
         return None
@@ -111,8 +113,17 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
         nodes = get_builder(e)(e, row)
         d = Path(out_ver) / e["id"]
         d.mkdir(parents=True, exist_ok=True)
-        (d / (code + ".glb")).write_bytes(glb_bytes(nodes))
-        (d / (code + ".png")).write_bytes(png_bytes(nodes))
+        extra = {}
+        if nodes and nodes[0][0] == "__scene__":          # 机器人：连杆分节点的场景 + 关节表
+            from generators import b_robot
+            part = nodes[0][1]
+            (d / (code + ".glb")).write_bytes(b_robot.glb_bytes(part))
+            (d / (code + ".png")).write_bytes(png_bytes([("robot", part["world"])]))
+            extra["robot"] = part["robot"]
+            nodes = [(b["name"], None) for b in part["bodies"]]
+        else:
+            (d / (code + ".glb")).write_bytes(glb_bytes(nodes))
+            (d / (code + ".png")).write_bytes(png_bytes(nodes))
         fmts = e["model"].get("formats", [])
         if cad_dir and ("step" in fmts or "stl" in fmts):
             from build123d import Compound, export_step, export_stl
@@ -124,8 +135,8 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
             if "stl" in fmts:
                 export_stl(shape, str(cd / (code + ".stl")), tolerance=LIN_TOL_MM)
         files = {"glb": "{}/{}.glb".format(e["id"], code), "png": "{}/{}.png".format(e["id"], code)}
-        return {"ref": wqlib.ref(e, size), "ok": True, "files": files, "s": round(time.time() - t0, 2),
-                "nodes": [n for n, _ in nodes]}
+        return dict({"ref": wqlib.ref(e, size), "ok": True, "files": files, "s": round(time.time() - t0, 2),
+                     "nodes": [n for n, _ in nodes]}, **extra)
     except Exception as ex:  # noqa: BLE001
         return {"ref": wqlib.ref(e, size), "ok": False, "error": "{}: {}".format(type(ex).__name__, ex)[:300],
                 "trace": traceback.format_exc()[-800:], "s": round(time.time() - t0, 2)}
@@ -140,7 +151,11 @@ def entry_json(e, rows, results, version):
     doc = {k: v for k, v in e.items() if not k.startswith("_")}
     doc.pop("specs", None)
     doc["version"] = version
-    doc["package"] = "{}/releases/download/library-v{}/{}.zip".format(REPO, version, e["id"])
+    src = e.get("source") or {}
+    if src.get("origin") == "menagerie":          # 现成机器人：完整 MJCF 与网格在原仓库（固定提交），不另存
+        doc["package"] = "{}/tree/{}/{}".format(src["repo"], src["commit"], src.get("path", "").rstrip("/"))
+    else:
+        doc["package"] = "{}/releases/download/library-v{}/{}.zip".format(REPO, version, e["id"])
     doc["sizes"] = []
     for r in rows:
         res = results.get(wqlib.ref(e, r["size"]))
@@ -148,9 +163,10 @@ def entry_json(e, rows, results, version):
             continue
         doc["sizes"].append({"size": str(r["size"]), "params": {k: v for k, v in r.items() if k != "size" and v not in (None, "")},
                              "files": res["files"]})
-    extra = results.get("_extra", {}).get(e["id"])
-    if extra:
-        doc.update(extra)
+    for r in rows:                                 # 机器人：构建时提取的连杆与关节（B.13）
+        res = results.get(wqlib.ref(e, r["size"]))
+        if res and res.get("robot"):
+            doc["robot"] = dict(doc.get("robot") or {}, **res["robot"])
     return doc
 
 
@@ -213,7 +229,7 @@ def main(argv=None):
                           "params": key_params(e, dict(s["params"], size=s["size"])),
                           "license": e["source"]["license"], "erp_items": erp.get(s["size"], []),
                           "files": s["files"], "entry": "{}/entry.json".format(e["id"])})
-        if cad_dir:
+        if cad_dir and e["kind"] != "robot":
             write_package(e, doc, cad_dir, out / "packages")
 
     index = {"schema": 1, "version": a.version, "released": released,

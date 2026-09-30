@@ -1,0 +1,48 @@
+# B-ARM-ALOHA · ALOHA 双臂机器人（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-ARM-ALOHA
+kind: robot
+name:
+  zh: ALOHA 双臂机器人
+  en: ALOHA
+category: ARM
+tags:
+- 双臂机器人
+- dual arm
+- aloha
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:aloha/aloha.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: dual_arm
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: aloha/
+  license: BSD-3-Clause
+  attribution: MuJoCo Menagerie（Google DeepMind）· aloha；BSD-3-Clause；Copyright (c) 2023, Trossen Robotics
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 两条机械臂协同工作，一条固定、一条操作，或两条一起搬运、装配。
+  uses:
+  - 双手操作
+  - 遥操作数据采集
+  courses:
+  - course: 机器人技术
+    chapter: 多臂协作
+  labs:
+  - 双臂协同搬运演示
+factory:
+  erp_items: []
+  suppliers: []

@@ -1,0 +1,49 @@
+# B-LEG-GO1 · Unitree Go1 四足机器人（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-LEG-GO1
+kind: robot
+name:
+  zh: Unitree Go1 四足机器人
+  en: Unitree Go1
+category: LEG
+tags:
+- 四足机器人
+- quadruped
+- unitree
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:unitree_go1/go1.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: quadruped
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: unitree_go1/
+  license: BSD-3-Clause
+  attribution: MuJoCo Menagerie（Google DeepMind）· unitree_go1；BSD-3-Clause；BSD 3-Clause License
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 每条腿 3 个关节，四条腿交替支撑与摆动（步态），保持机身平衡前进。
+  uses:
+  - 巡检
+  - 野外作业
+  courses:
+  - course: 足式机器人
+    chapter: 步态与平衡
+  labs:
+  - 单腿关节拖动
+  - 步态动画
+factory:
+  erp_items: []
+  suppliers: []

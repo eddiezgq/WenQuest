@@ -1,0 +1,48 @@
+# B-MOB-ROBOTSOCCERKIT · Robot soccer kit omnidirectional 移动机器人（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-MOB-ROBOTSOCCERKIT
+kind: robot
+name:
+  zh: Robot soccer kit omnidirectional 移动机器人
+  en: Robot soccer kit omnidirectional
+category: MOB
+tags:
+- 移动机器人
+- mobile base
+- robot
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:robot_soccer_kit/robot_soccer_kit.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: mobile_base
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: robot_soccer_kit/
+  license: MIT
+  attribution: MuJoCo Menagerie（Google DeepMind）· robot_soccer_kit；MIT；Copyright 2019-2099 Rhoban Team <Grégoire Passault>
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 轮式底盘靠两侧车轮转速差转向（差速驱动），在平面上移动。
+  uses:
+  - 巡检
+  - 竞赛
+  courses:
+  - course: 移动机器人
+    chapter: 差速驱动运动学
+  labs:
+  - 差速小车轨迹
+factory:
+  erp_items: []
+  suppliers: []

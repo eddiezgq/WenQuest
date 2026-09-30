@@ -1,0 +1,47 @@
+# B-LEG-CASSIE · Agility Cassie 双足机器人（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-LEG-CASSIE
+kind: robot
+name:
+  zh: Agility Cassie 双足机器人
+  en: Agility Cassie
+category: LEG
+tags:
+- 双足机器人
+- biped
+- agility
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:agility_cassie/cassie.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: biped
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: agility_cassie/
+  license: MIT
+  attribution: MuJoCo Menagerie（Google DeepMind）· agility_cassie；MIT；Copyright (c) 2022 Agility Robotics
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 两条腿交替支撑行走，靠控制质心和落脚点保持动态平衡。
+  uses:
+  - 双足行走研究
+  courses:
+  - course: 足式机器人
+    chapter: 双足行走
+  labs:
+  - 腿部关节拖动
+factory:
+  erp_items: []
+  suppliers: []

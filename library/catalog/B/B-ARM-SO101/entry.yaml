@@ -1,0 +1,52 @@
+# B-ARM-SO101 · The Robot Studio SO101 机械臂（第一期，现成模型：MuJoCo Menagerie）
+schema: 1
+id: B-ARM-SO101
+kind: robot
+name:
+  zh: The Robot Studio SO101 机械臂
+  en: The Robot Studio SO101
+category: ARM
+tags:
+- 机械臂
+- arm
+- robotstudio
+standards: []
+params: []
+defaults: {}
+model:
+  engine: menagerie:robotstudio_so101/so101.xml
+  formats:
+  - mjcf
+  - glb
+  origin: MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名
+  note: 网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取
+robot:
+  type: arm
+source:
+  origin: menagerie
+  repo: https://github.com/google-deepmind/mujoco_menagerie
+  commit: 4d038b3feae26ec82b46a4d586379114012a8ac7
+  path: robotstudio_so101/
+  license: Apache-2.0
+  attribution: MuJoCo Menagerie（Google DeepMind）· robotstudio_so101；Apache-2.0；Apache License
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）
+teaching:
+  principle: 多个转动关节串联：前几个关节主要决定末端位置，腕部关节决定姿态。
+  uses:
+  - 装配
+  - 上下料
+  - 人机协作
+  courses:
+  - course: 机器人技术
+    chapter: 串联机械臂正运动学
+  - course: 机器人技术
+    chapter: 逆运动学与轨迹规划
+  labs:
+  - 拖动关节看末端轨迹
+  - 正逆运动学虚拟实验
+factory:
+  erp_items: []
+  suppliers: []

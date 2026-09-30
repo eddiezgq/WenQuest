@@ -14,7 +14,7 @@ import wqlib  # noqa: E402
 
 CATEGORIES = {
     "A": {"BLT", "SCR", "NUT", "WSH", "PIN", "KEY", "RNG", "BRG", "BSC", "LGD", "PUL", "SPK", "CPL", "SPR", "SEL", "PLG"},
-    "B": {"ARM", "MOB", "LEG", "HUM", "EEF", "UAV", "CRT", "SCA", "PAR", "EDU", "HAND", "MAN"},
+    "B": {"ARM", "MOB", "LEG", "HUM", "EEF", "UAV", "CRT", "SCA", "PAR", "EDU", "MAN", "SEN"},
     "C": {"LNK", "CAM", "GER", "WRM", "BLT", "RAT", "GNV", "SCN", "RED"},
 }
 
