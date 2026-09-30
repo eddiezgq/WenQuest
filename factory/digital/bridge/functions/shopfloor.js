@@ -10,5 +10,10 @@ if (!job) return null;
 job.then((out) => {
   if (out.length) node.status({ fill: 'green', shape: 'dot', text: m.data.work_order + ' ' + m.data.operation.split(' ')[0] + ' ' + m.data.event });
   node.send([out]);
-}).catch((e) => { node.status({ fill: 'red', shape: 'ring', text: e.message.slice(0, 50) }); node.error(e.message, msg); });
+}).catch((e) => {
+  node.status({ fill: 'red', shape: 'ring', text: e.message.slice(0, 50) });
+  node.error(e.message, msg);
+  // 写 ERPNext 失败也发到总线（erp.doc，action=failed），看板、AI 和老师都能看到原因
+  node.send([[erp.failed('Job Card', e, { corr: m.corr, mode: m.mode, extra: { work_order: m.data.work_order, operation: m.data.operation, event: m.data.event } })]]);
+});
 return null;

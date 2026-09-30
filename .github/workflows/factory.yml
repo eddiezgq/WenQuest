@@ -113,6 +113,7 @@ jobs:
             grep -v "Connected to broker\|Started flows\|Starting flows" /tmp/logs/bridge.log > /tmp/logs/bridge2.log || true
             a 桥接 /tmp/logs/bridge2.log 120
             a ERPNext日志 /tmp/logs/erp-files.log 60
+            ls -la /tmp/logs > /tmp/logs/ls.txt; a 日志文件 /tmp/logs/ls.txt 30
           else
             [ -s /tmp/logs/install.log ] && a 安装 /tmp/logs/install.log 120
             a 容器 /tmp/logs/ps.log 40

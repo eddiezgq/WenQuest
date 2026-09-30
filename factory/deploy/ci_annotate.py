@@ -12,7 +12,7 @@ try:
     lines = open(path, encoding="utf-8", errors="replace").read().splitlines()[-n:]
 except OSError as e:
     lines = ["（读不到日志：{}）".format(e)]
-lines = [re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", x)[:300] for x in lines]
+lines = [re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", x)[:300] for x in lines] or ["（日志是空的：{}）".format(path)]
 for i in range(0, len(lines), 60):
     msg = "\n".join(lines[i:i + 60]).replace("%", "%25").replace("\r", "").replace("\n", "%0A")
     print("::error title={} ({}/{})::{}".format(title, i // 60 + 1, (len(lines) + 59) // 60, msg or "（空）"))
