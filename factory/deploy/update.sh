@@ -36,6 +36,17 @@ for _ in $(seq 1 40); do
     st=$(docker inspect -f '{{.State.Health.Status}}' "$(dc ps -q hub)" 2>/dev/null || echo unknown)
     if [ "$st" = healthy ]; then
         log "数字工厂已就绪。"
+        # 零件库编号（第 5 轮 P10②）：每次部署补到 ERPNext 物料上；失败不影响运行，下次部署再试
+        if [ "$(envval FACTORY_INSTALLED)" = 1 ]; then
+            if dc run --rm seed python seed.py --url http://erp-frontend:8080 --user Administrator \
+                    --password "$(envval ERP_ADMIN_PASSWORD)" --library-refs-only \
+                    --factory-url "https://factory.$(envval SITE_DOMAIN)" > /tmp/wq-libref.log 2>&1; then
+                log "零件库编号已同步到 ERPNext。"
+            else
+                log "警告：零件库编号没有同步到 ERPNext（不影响运行，下次部署再试）："
+                tail -5 /tmp/wq-libref.log
+            fi
+        fi
         docker image prune -f >/dev/null
         "$(dirname "$0")/status.sh" || true
         exit 0

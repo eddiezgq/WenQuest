@@ -151,6 +151,12 @@
                   <dt v-if="entry.source.checked">核对</dt><dd v-if="entry.source.checked">{{ entry.source.checked.by }} · {{ entry.source.checked.on }}<template v-if="entry.source.checked.note"> · {{ entry.source.checked.note }}</template></dd>
                 </dl>
                 <div v-if="entry.source.attribution" class="attr">{{ entry.source.attribution }}</div>
+                <div v-if="entry.source.data_sources?.length" class="dsrc">
+                  <div class="small muted">尺寸与参数出处</div>
+                  <div v-for="d in entry.source.data_sources" :key="d.url" class="small">
+                    <a :href="d.url" target="_blank" rel="noopener">{{ d.title }}</a> · 取用 {{ d.retrieved }}<span v-if="d.note" class="muted"> · {{ d.note }}</span>
+                  </div>
+                </div>
               </template>
             </div>
           </template>
@@ -168,6 +174,7 @@ import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { useRoute } from 'vue-router';
 
 const BASE = '/library/';
 const ORIGINS = { bd_warehouse: 'bd_warehouse', wenquest: '问渠自建', menagerie: 'MuJoCo Menagerie',
@@ -175,6 +182,7 @@ const ORIGINS = { bd_warehouse: 'bd_warehouse', wenquest: '问渠自建', menage
 const JT = { revolute: '转动', continuous: '转动（不限位）', prismatic: '移动' };
 const originName = (o) => ORIGINS[o] || o;
 
+const useRouteRef = useRoute();
 const index = ref(null);
 const error = ref('');
 const q = ref('');
@@ -289,7 +297,7 @@ const dtabList = computed(() => {
   return [entry.value.robot ? '关节' : '规格', ...(entry.value.teaching?.principle || entry.value.teaching?.uses ? ['教学'] : []), '来源'];
 });
 
-async function select(id) {
+async function select(id, wantSize) {
   sel.value = id;
   sq.value = '';
   const f = families.value.find((x) => x.id === id);
@@ -297,7 +305,7 @@ async function select(id) {
     const e = await getJson(BASE + index.value.version + '/' + id + '/entry.json');
     if (sel.value !== id) return;
     entry.value = e;
-    const want = q.value.trim().toLowerCase();
+    const want = (wantSize || q.value).trim().toLowerCase();
     const hit = e.sizes.find((s) => s.size.toLowerCase() === want);
     size.value = hit ? hit.size : (e.sizes.find((s) => s.size === String(e.default))?.size || e.sizes[0]?.size || 'default');
     dtab.value = e.robot ? '关节' : '规格';
@@ -413,6 +421,10 @@ onMounted(async () => {
   try {
     const latest = await getJson(BASE + 'latest.json');
     index.value = await getJson('/' + latest.index);
+    // ?ref=A-BRG-DG/6207：从 ERPNext 物料上的“零件库页面”链接进来，直接打开这个规格（第 5 轮 P10②）
+    const [rid, rsize] = String(useRouteRef.query.ref || '').split('/');
+    const hit = families.value.find((f) => f.id === rid);
+    if (hit) { part.value = hit.part; select(hit.id, rsize || ''); return; }
     const first = families.value.find((f) => f.id === 'A-BRG-DG') || families.value[0];
     if (first) select(first.id);
   } catch (e) {
@@ -491,6 +503,7 @@ table.t tbody tr { cursor: pointer; }
 dl.kv { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 6px 12px; margin: 0; }
 dl.kv dt { color: var(--muted); }
 dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+.dsrc { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
 .attr { margin-top: 10px; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 6px; padding: 8px 10px; font-size: 12px; }
 .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px;
   border-radius: 8px; font-size: 13px; z-index: 50; }

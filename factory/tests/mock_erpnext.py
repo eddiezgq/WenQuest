@@ -148,6 +148,17 @@ class MockERPNext:
             return Resp(200, {"message": "Logged In"}, "POST", url)
         doctype = parts[2]
         doc = dict(json)
+        if doctype == "Custom Field":                  # 自定义字段：检查必填，把字段加进目标单据的定义
+            miss = [k for k in ("dt", "fieldname", "fieldtype", "label") if not doc.get(k)]
+            if miss or doc.get("dt") not in self.schemas:
+                self.errors.append("新建 Custom Field：缺 {} 或单据 {} 不存在".format(miss, doc.get("dt")))
+            else:
+                self.schemas[doc["dt"]]["fields"].append({"fieldname": doc["fieldname"], "fieldtype": doc["fieldtype"],
+                                                          "options": doc.get("options")})
+            name = "{}-{}".format(doc.get("dt"), doc.get("fieldname"))
+            doc.update(name=name, docstatus=0)
+            self.db.setdefault(doctype, {})[name] = doc
+            return Resp(200, {"data": doc}, "POST", url)
         self._validate(doctype, doc, "新建 " + doctype)
         name = self._name_for(doctype, doc)
         if self._exists(doctype, name):

@@ -3,38 +3,279 @@
   "$id": "https://github.com/eddiezgq/WenQuest/library/schema/entry.v1.json",
   "title": "问渠零件库条目 v1（第 2 轮附录 B.3）",
   "type": "object",
-  "required": ["schema", "id", "kind", "name", "category", "params", "model", "source", "teaching"],
+  "required": [
+    "schema",
+    "id",
+    "kind",
+    "name",
+    "category",
+    "params",
+    "model",
+    "source",
+    "teaching"
+  ],
   "properties": {
-    "schema": {"const": 1},
-    "id": {"type": "string", "pattern": "^[ABC]-[A-Z0-9]{2,5}-[A-Z0-9]+(-[A-Z0-9]+)*$"},
-    "kind": {"enum": ["family", "robot", "mechanism", "case"]},
-    "name": {"type": "object", "required": ["zh", "en"],
-             "properties": {"zh": {"type": "string", "minLength": 1}, "en": {"type": "string", "minLength": 1}}},
-    "category": {"type": "string"},
-    "tags": {"type": "array", "items": {"type": "string"}},
-    "standards": {"type": "array", "items": {"type": "object", "required": ["code"],
-                  "properties": {"code": {"type": "string"}, "title": {"type": "string"}}}},
-    "params": {"type": "array", "items": {"type": "object", "required": ["key", "zh", "en", "role"],
-               "properties": {"key": {"type": "string", "pattern": "^[A-Za-z0-9_]+$"}, "zh": {"type": "string"},
-                              "en": {"type": "string"}, "role": {"enum": ["key", "dim", "perf", "info"]}}}},
-    "specs": {"type": "string"},
-    "defaults": {"type": "object"},
-    "ranges": {"type": "object"},
-    "default": {"type": ["string", "null"]},
-    "model": {"type": "object", "required": ["engine", "formats"],
-              "properties": {"engine": {"type": "string"}, "formats": {"type": "array", "items": {"enum": ["step", "stl", "glb", "urdf", "mjcf"]}},
-                             "origin": {"type": "string"}, "nodes": {"type": "array"}, "note": {"type": "string"}}},
-    "robot": {"type": "object"},
-    "mechanism": {"type": "object"},
-    "source": {"type": "object", "required": ["origin", "license", "attribution", "checked"],
-               "properties": {"origin": {"enum": ["wenquest", "bd_warehouse", "menagerie", "robot_descriptions", "freecad-library"]},
-                              "repo": {"type": "string"}, "commit": {"type": "string"}, "path": {"type": "string"},
-                              "license": {"type": "string"}, "attribution": {"type": "string", "minLength": 1},
-                              "checked": {"type": "object", "required": ["by", "on"]}}},
-    "teaching": {"type": "object", "required": ["principle"],
-                 "properties": {"principle": {"type": "string", "minLength": 1}, "uses": {"type": "array"},
-                                "courses": {"type": "array"}, "labs": {"type": "array"}}},
-    "factory": {"type": "object", "properties": {"erp_items": {"type": "array"}, "suppliers": {"type": "array"}}}
+    "schema": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[ABC]-[A-Z0-9]{2,5}-[A-Z0-9]+(-[A-Z0-9]+)*$"
+    },
+    "kind": {
+      "enum": [
+        "family",
+        "robot",
+        "mechanism",
+        "case"
+      ]
+    },
+    "name": {
+      "type": "object",
+      "required": [
+        "zh",
+        "en"
+      ],
+      "properties": {
+        "zh": {
+          "type": "string",
+          "minLength": 1
+        },
+        "en": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "category": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "standards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "params": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "zh",
+          "en",
+          "role"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_]+$"
+          },
+          "zh": {
+            "type": "string"
+          },
+          "en": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "key",
+              "dim",
+              "perf",
+              "info"
+            ]
+          }
+        }
+      }
+    },
+    "specs": {
+      "type": "string"
+    },
+    "defaults": {
+      "type": "object"
+    },
+    "ranges": {
+      "type": "object"
+    },
+    "default": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "model": {
+      "type": "object",
+      "required": [
+        "engine",
+        "formats"
+      ],
+      "properties": {
+        "engine": {
+          "type": "string"
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "step",
+              "stl",
+              "glb",
+              "urdf",
+              "mjcf"
+            ]
+          }
+        },
+        "origin": {
+          "type": "string"
+        },
+        "nodes": {
+          "type": "array"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "robot": {
+      "type": "object"
+    },
+    "mechanism": {
+      "type": "object"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "origin",
+        "license",
+        "attribution",
+        "checked"
+      ],
+      "properties": {
+        "origin": {
+          "enum": [
+            "wenquest",
+            "bd_warehouse",
+            "menagerie",
+            "robot_descriptions",
+            "freecad-library"
+          ]
+        },
+        "repo": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "attribution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checked": {
+          "type": "object",
+          "required": [
+            "by",
+            "on"
+          ]
+        },
+        "data_sources": {
+          "type": "array",
+          "description": "参数表的出处（第 5 轮 P6、四节规则 1）：每一项 {title, url, retrieved, note}",
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "url",
+              "retrieved"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "retrieved": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "teaching": {
+      "type": "object",
+      "required": [
+        "principle"
+      ],
+      "properties": {
+        "principle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uses": {
+          "type": "array"
+        },
+        "courses": {
+          "type": "array"
+        },
+        "labs": {
+          "type": "array"
+        }
+      }
+    },
+    "factory": {
+      "type": "object",
+      "properties": {
+        "erp_items": {
+          "type": "array"
+        },
+        "suppliers": {
+          "type": "array"
+        }
+      }
+    }
   },
-  "allOf": [{"if": {"properties": {"kind": {"const": "family"}}}, "then": {"required": ["specs", "default"]}}]
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "family"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "specs",
+          "default"
+        ]
+      }
+    }
+  ]
 }

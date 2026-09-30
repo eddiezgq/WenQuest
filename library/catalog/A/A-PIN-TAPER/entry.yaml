@@ -1,0 +1,77 @@
+# A-PIN-TAPER · 圆锥销（A 型）（第 5 轮第 1 步，P7）
+schema: 1
+id: A-PIN-TAPER
+kind: family
+name:
+  zh: 圆锥销（A 型）
+  en: Taper pin, type A
+category: PIN
+tags:
+- 销
+- 定位销
+- 圆锥销
+- taper pin
+standards:
+- code: GB/T 117-2000
+  title: 圆锥销
+- code: ISO 2339:1986
+  title: Taper pins, unhardened
+params:
+- key: d_mm
+  zh: 公称直径（小端）
+  en: Nominal diameter (small end)
+  role: key
+- key: l_mm
+  zh: 长度
+  en: Length
+  role: key
+- key: a_mm
+  zh: 端部倒圆 a≈
+  en: End radius a≈
+  role: dim
+- key: D_mm
+  zh: 大端直径（锥度 1:50）
+  en: Large-end diameter (taper 1:50)
+  role: dim
+specs: specs.csv
+default: 8x35
+model:
+  engine: wenquest:taper_pin
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 大端在 z=0，轴线沿 Z
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序与规格表）；尺寸取自所列标准的公开尺寸表
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 尺寸按下列出处录入；测试逐行核对单调性与抽查值
+  data_sources:
+  - title: ISO 2339:1986 样本（iTeh）：公称直径 d 与 a
+    url: https://cdn.standards.iteh.ai/samples/7174/6d3e6dec32224d188b9d378f45e19cf7/ISO-2339-1986.pdf
+    retrieved: '2026-09-30'
+  - title: 易紧通 GB/T 117-2000 圆锥销：长度系列
+    url: https://www.164580.com/info_19244.html?pc=1
+    retrieved: '2026-09-30'
+  - title: Boltport ISO 2339 重量表：各直径的常用长度范围
+    url: https://www.boltport.com/weights/iso-2339/
+    retrieved: '2026-09-30'
+    note: 长度取长度系列中落在该范围内的值；标准本身允许的范围更宽
+teaching:
+  principle: 1:50 的锥度靠楔紧定位，可多次拆装而定位精度不变，常用于需要反复拆装的两零件定位。
+  uses:
+  - 箱座与箱盖合箱定位（WQR-105）
+  - 端盖、法兰定位
+  courses:
+  - course: 机械设计基础
+    chapter: 销联接
+  labs: []
+factory:
+  erp_items:
+  - item_code: PIN-8x35
+    size: 8x35
+  suppliers: []

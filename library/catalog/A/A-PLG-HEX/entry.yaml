@@ -1,0 +1,90 @@
+# A-PLG-HEX · 外六角带肩螺塞（重型）（第 5 轮第 1 步，P7）
+schema: 1
+id: A-PLG-HEX
+kind: family
+name:
+  zh: 外六角带肩螺塞（重型）
+  en: Hexagon head screw plug with collar, heavy
+category: PLG
+tags:
+- 螺塞
+- 放油螺塞
+- 油塞
+- screw plug
+- drain plug
+standards:
+- code: DIN 910:1992
+  title: Heavy-duty hexagon head screw plugs, cylindrical thread
+params:
+- key: d_mm
+  zh: 螺纹大径
+  en: Thread diameter
+  role: key
+- key: P_mm
+  zh: 螺距
+  en: Pitch
+  role: dim
+- key: d2_mm
+  zh: 肩径
+  en: Collar diameter
+  role: dim
+- key: l_mm
+  zh: 总长
+  en: Overall length
+  role: dim
+- key: c_mm
+  zh: 肩厚
+  en: Collar thickness
+  role: dim
+- key: i_mm
+  zh: 螺纹长度
+  en: Thread length
+  role: dim
+- key: m_mm
+  zh: 头高
+  en: Head height
+  role: dim
+- key: s_mm
+  zh: 对边宽度
+  en: Width across flats
+  role: dim
+- key: mass_kg_per_1000
+  zh: 千件重（kg）
+  en: Mass per 1000 (kg)
+  role: info
+specs: specs.csv
+default: M16x1.5
+model:
+  engine: wenquest:hex_plug
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 螺纹端在 z=0，轴线沿 Z
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序与规格表）；尺寸取自所列标准的公开尺寸表
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 尺寸按下列出处录入；测试逐行核对单调性与抽查值
+  data_sources:
+  - title: Aspen Fasteners：Metric DIN 910 spec
+    url: https://www.aspenfasteners.com/v/vspfiles/files/docs/Metric_DIN_910_spec.pdf
+    retrieved: '2026-09-30'
+    note: M26、M36 两行总长与分段之和不符，未收；e 值有误印，不收（可由 s 算出）
+teaching:
+  principle: 细牙螺纹拧入箱体油孔，肩部压紧密封垫圈，放油时拧下；细牙自锁性好，不易振松。
+  uses:
+  - 减速器箱座最低处放油孔（WQR-105）
+  - 液压、润滑系统的工艺孔
+  courses:
+  - course: 机械设计基础
+    chapter: 减速器附件
+  labs: []
+factory:
+  erp_items:
+  - item_code: PLUG-M16
+    size: M16x1.5
+  suppliers: []

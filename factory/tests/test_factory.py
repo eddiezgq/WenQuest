@@ -121,9 +121,17 @@ def test_seed_against_erpnext_v16_schemas():
     client = seed.Client.__new__(seed.Client)
     client.base, client.s = "http://mock", mock
     s = seed.Seeder(client, log=lambda *a: None)
-    s.run(opening_stock=True)
+    s.run(opening_stock=True, factory_url="https://factory.example.com")
     assert mock.errors == [], "\n".join(mock.errors)
     assert len(mock.db["Item"]) == len(D.ITEMS)
+    # 零件库编号（第 5 轮 P10②）：两个自定义字段，标准外购件都填上；再跑一次不重复建、不重复改
+    brg = mock.db["Item"]["BRG-6207"]
+    assert brg["wq_library_ref"] == "A-BRG-DG/6207"
+    assert brg["wq_library_url"] == "https://factory.example.com/library?ref=A-BRG-DG/6207"
+    assert len(mock.db["Custom Field"]) == 2
+    n = s.created
+    s.library_refs("https://factory.example.com")
+    assert s.created == n and mock.errors == []
     assert len([b for b in mock.db["BOM"].values() if b["docstatus"] == 1]) == len(D.BOMS)
     fg_bom = next(b for b in mock.db["BOM"].values() if b["item"] == "WQR-105")
     assert all(r.get("bom_no") for r in fg_bom["items"] if r["item_code"] in D.BOMS)

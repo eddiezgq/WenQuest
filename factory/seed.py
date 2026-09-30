@@ -311,7 +311,32 @@ class Seeder:
         self.c.update("Stock Entry", res["name"], {"docstatus": 1})
         self.created += 1
 
-    def run(self, opening_stock=False, teach_stock=False):
+    # ---- 零件库编号（第 5 轮 P10②）：可单独重复运行，已安装的服务器每次部署都跑一遍
+    def library_refs(self, factory_url=""):
+        self.log("零件库编号")
+        fields = [("wq_library_ref", {"label": "零件库编号 Library ref", "fieldtype": "Data", "insert_after": "item_name",
+                                      "read_only": 1}),
+                  ("wq_library_url", {"label": "零件库页面 Library page", "fieldtype": "Data", "options": "URL",
+                                      "insert_after": "wq_library_ref", "read_only": 1})]
+        for fn, spec in fields:
+            if not self.c.find("Custom Field", [["dt", "=", "Item"], ["fieldname", "=", fn]]):
+                self.c.create("Custom Field", dict(spec, dt="Item", fieldname=fn))
+                self.created += 1
+        base = factory_url.rstrip("/")
+        n = 0
+        for code, ref in D.LIBRARY_REFS.items():
+            if code not in D.ITEMS or not self.c.get("Item", code):
+                continue
+            want = {"wq_library_ref": ref}
+            if base:
+                want["wq_library_url"] = "{}/library?ref={}".format(base, ref)
+            cur = self.c.get("Item", code) or {}
+            if any(cur.get(k) != v for k, v in want.items()):
+                self.c.update("Item", code, want)
+                n += 1
+        self.log("  更新 {} 个物料".format(n))
+
+    def run(self, opening_stock=False, teach_stock=False, factory_url=""):
         self.log("公司：{}（{}），币种 {}".format(self.company, self.abbr, self.currency))
         self.basics()
         self.parties()
@@ -323,6 +348,7 @@ class Seeder:
             self.opening_stock()
         if teach_stock:
             self.teach_stock()
+        self.library_refs(factory_url)
         self.log("完成：新建 {} 条，已存在跳过 {} 条".format(self.created, self.skipped))
 
 
@@ -396,9 +422,15 @@ def main(argv=None):
     ap.add_argument("--company", default=None)
     ap.add_argument("--opening-stock", action="store_true")
     ap.add_argument("--teach-stock", action="store_true", help="线上教学工厂：放入实验 7 的关键物料库存并允许负库存")
+    ap.add_argument("--factory-url", default="", help="数字工厂网址，物料上的“零件库页面”链接用，如 https://factory.example.com")
+    ap.add_argument("--library-refs-only", action="store_true", help="只补零件库编号（已安装的服务器更新时用）")
     args = ap.parse_args(argv)
     try:
-        Seeder(Client(args.url, args.user, args.password), args.company).run(args.opening_stock, args.teach_stock)
+        sd = Seeder(Client(args.url, args.user, args.password), args.company)
+        if args.library_refs_only:
+            sd.library_refs(args.factory_url)
+        else:
+            sd.run(args.opening_stock, args.teach_stock, args.factory_url)
     except ERPError as e:
         print("出错：{}".format(e), file=sys.stderr)
         return 1

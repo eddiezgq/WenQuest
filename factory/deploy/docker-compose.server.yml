@@ -132,7 +132,8 @@ services:
     restart: "no"
     working_dir: /app
     command: ["python", "seed.py", "--url", "http://erp-frontend:8080", "--user", "Administrator",
-              "--password", "${ERP_ADMIN_PASSWORD:?}", "--opening-stock", "--teach-stock"]
+              "--password", "${ERP_ADMIN_PASSWORD:?}", "--opening-stock", "--teach-stock",
+              "--factory-url", "https://factory.${SITE_DOMAIN:?}"]
     networks: [erp]
 
   # ------------------------------------------------------------------ ERPNext v16（官方镜像，对应本地 factory/docker-compose.yml）

@@ -1,0 +1,67 @@
+# A-SEL-LIP · 旋转轴唇形密封圈（骨架油封）（第 5 轮第 1 步，P7）
+schema: 1
+id: A-SEL-LIP
+kind: family
+name:
+  zh: 旋转轴唇形密封圈（骨架油封）
+  en: Rotary shaft lip seal
+category: SEL
+tags:
+- 密封件
+- 油封
+- 骨架油封
+- oil seal
+- lip seal
+standards:
+- code: GB/T 13871.1-2007
+  title: 密封元件为弹性体材料的旋转轴唇形密封圈 第1部分：基本尺寸和公差
+params:
+- key: d1_mm
+  zh: 轴径
+  en: Shaft diameter
+  role: key
+- key: D_mm
+  zh: 外径（座孔）
+  en: Outside diameter (bore)
+  role: key
+- key: b_mm
+  zh: 宽度
+  en: Width
+  role: key
+specs: specs.csv
+default: 20x35x7
+model:
+  engine: wenquest:lip_seal
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 油封中心，轴线沿 Z，底面在 z=0
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序与规格表）；尺寸取自所列标准的公开尺寸表
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 尺寸按下列出处录入；测试逐行核对单调性与抽查值
+  data_sources:
+  - title: 易紧通 GB/T 13871.1-2007 旋转轴唇形密封圈：基本尺寸表
+    url: https://www.164580.com/info_399381.html?pc=1
+    retrieved: '2026-09-30'
+teaching:
+  principle: 橡胶唇口在弹簧箍紧下贴住旋转轴表面，形成很窄的密封带，把润滑油封在箱内、把灰尘挡在外面。
+  uses:
+  - 减速器输入、输出轴伸出端（WQR-105）
+  - 电机、泵的旋转轴
+  courses:
+  - course: 机械设计基础
+    chapter: 密封装置
+  labs: []
+factory:
+  erp_items:
+  - item_code: SEAL-20
+    size: 20x35x7
+  - item_code: SEAL-30
+    size: 30x47x7
+  suppliers: []

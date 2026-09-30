@@ -136,6 +136,15 @@ ITEMS = {
 }
 FG_SELLING_PRICE = 1650.00
 
+# 标准外购件在问渠零件库里的编号（第 5 轮 P10②）；与零件库各条目的 factory.erp_items 一致（library/tests 核对）
+LIBRARY_REFS = {
+    "BRG-6205": "A-BRG-DG/6205", "BRG-6206": "A-BRG-DG/6206", "BRG-6207": "A-BRG-DG/6207",
+    "KEY-6x6x25": "A-KEY-FLAT/6x6x25", "KEY-8x7x36": "A-KEY-FLAT/8x7x36", "KEY-10x8x28": "A-KEY-FLAT/10x8x28",
+    "KEY-12x8x45": "A-KEY-FLAT/12x8x45", "BOLT-M12x110": "A-BLT-HEX/M12x110", "NUT-M12": "A-NUT-HEX/M12",
+    "BOLT-M8x25": "A-SCR-SHC/M8x25", "WASHER-12": "A-WSH-SPR/12", "PIN-8x35": "A-PIN-TAPER/8x35",
+    "SEAL-20": "A-SEL-LIP/20x35x7", "SEAL-30": "A-SEL-LIP/30x47x7", "PLUG-M16": "A-PLG-HEX/M16x1.5",
+}
+
 KIND_GROUP = {"raw": ITEM_GROUPS[0], "buy": ITEM_GROUPS[1], "make": ITEM_GROUPS[2],
               "sub": ITEM_GROUPS[3], "fg": ITEM_GROUPS[4]}
 KIND_WAREHOUSE = {"raw": WAREHOUSES[0], "buy": WAREHOUSES[1], "make": WAREHOUSES[2],
