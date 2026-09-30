@@ -1244,7 +1244,8 @@ class Studio:
 
     def lab_refs(self, proj: dict, les: dict) -> dict[str, str]:
         from .production import labs
-        refs = {"the technique example": labs.example_code(), "the physics sample lab 2.1": labs.physics_example()}
+        refs = {"the technique example": labs.example_code(), "the 3D technique example": labs.example_code3d(),
+                "the physics sample lab 2.1": labs.physics_example()}
         refs.update(self._other_lessons(proj, les, "lab.js"))
         return refs
 
@@ -1305,12 +1306,19 @@ class Studio:
         spec_json = json.dumps({k: spec[k] for k in ("title", "goal", "problem", "concept", "lab", "model", "everyday")},
                                ensure_ascii=False)
         lab_id = no.replace(".", "-")
+        from .production import scene3d as S3
+        mids = list(dict.fromkeys((les.get("assets") or []) + [x["id"] for x in (proj.get("design_book") or {}).get("library", [])]))
+        await self.use_assets(proj, mids)
+        models = await asyncio.to_thread(S3.load_models, self.assets_dir(proj), mids)
+        models_text = self.models_text(models) if models else ""
         code, problems, result = "", [], None
         check = {"ok": None, "by": "auto+ai", "note": ""}
         for attempt in range(3):
             proj["busy"] = {"label": f"实验师正在{'写' if attempt == 0 else '修改'}虚拟实验：{no}", "since": now()}
             self.projects.save(proj)
-            data = await self.ai.json(system=team.LAB_ENGINEER, prompt=team.lab_prompt(no, spec_json, labs.example_code(), problems, code, self.course_brief(proj)),
+            data = await self.ai.json(system=team.LAB_ENGINEER,
+                                      prompt=team.lab_prompt(no, spec_json, labs.example_code(), problems, code, self.course_brief(proj),
+                                                             models_text, labs.example_code3d() if models else ""),
                                       schema=team.lab_schema(), max_tokens=14000, fake=lambda: {"code": labs.example_code()})
             code = re.sub(r"^```(?:js|javascript)?\s*|```\s*$", "", str((data or {}).get("code") or "").strip())
             problems = labs.static_problems(code)
@@ -1321,7 +1329,7 @@ class Studio:
                 continue
             proj["busy"] = {"label": f"正在试运行虚拟实验：{no}（约 30 秒）", "since": now()}
             self.projects.save(proj)
-            page_html = labs.page([(no, code)], course=course, chapter=chap, lang=lang)
+            page_html = labs.page([(no, code)], course=course, chapter=chap, lang=lang, models=models)
             try:
                 result = await labs.trial_run(self.labcheck_url, page_html, lab_id, self.labcheck_timeout)
             except labs.CheckError as e:
@@ -1352,6 +1360,7 @@ class Studio:
             return None
         les.setdefault("checks", {})["lab"] = check
         (d / "lab.js").write_text(code, encoding="utf-8")
+        les["lab_models"] = labs.models_used(code, models)
         image = None
         if result and result["screenshot"]:
             image = d / "lab.png"
@@ -1372,7 +1381,11 @@ class Studio:
         if not items:
             return None
         course, chap, lang = self.pairs_for(proj, chapter)
-        return labs.page(items, course=course, chapter=chap, lang=lang, key=f"wq-lab-{proj['id'][:8]}-{chapter['id'][:8]}")
+        from .production import scene3d as S3
+        mids = sorted({m for les in lessons for m in les.get("lab_models") or []})
+        models = S3.load_models(self.assets_dir(proj), mids) if mids else {}
+        return labs.page(items, course=course, chapter=chap, lang=lang, key=f"wq-lab-{proj['id'][:8]}-{chapter['id'][:8]}",
+                         models=models)
 
     async def redo_lab(self, proj: dict, lid: str) -> None:
         await self.redo_media(proj, lid, "lab")
@@ -1447,8 +1460,10 @@ class Studio:
         if lab:
             from .production import labs
             lab_name = f"实验{no} 虚拟实验.html"
+            from .production import scene3d as S3
+            lab_models = S3.load_models(self.assets_dir(proj), les.get("lab_models") or []) if les.get("lab_models") else {}
             (d / lab_name).write_text(labs.page([(no, (d / "lab.js").read_text(encoding="utf-8"))], course=course, chapter=chap,
-                                                lang="en" if o.get("languages") == "en" else "zh"), encoding="utf-8")
+                                                lang="en" if o.get("languages") == "en" else "zh", models=lab_models), encoding="utf-8")
             files.append({"name": lab_name, "kind": "lab", "teacher_only": False})
         files.append({"name": f"{name} 课件.pptx", "kind": "slides", "teacher_only": False})
         docs.guide(spec, gp, d / f"实验{no} 实验指导书.docx", no)

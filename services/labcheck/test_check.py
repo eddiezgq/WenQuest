@@ -88,3 +88,15 @@ def test_a_broken_scene_is_reported():
     with TestClient(checker.app) as c:
         r = c.post("/render3d", json={"html": "<html><script>window.FAIL='model missing'</script></html>", "duration": 1}).json()
     assert not r["ok"] and "model missing" in r["error"]
+
+
+def test_the_3d_example_lab_passes(tmp_path):
+    pytest.importorskip("trimesh")
+    L = _gateway_module("gateway_library_sample2", "library_sample.py")
+    S = _gateway_module("gateway_scene3d2", "scene3d.py")
+    models = S.load_models(L.build(tmp_path) / L.VERSION, ["B-ARM-6R-S"])
+    page = labs.page([("1.1", labs.example_code3d())], course=["机器人学", "Robotics"], chapter=["第1章", "Chapter 1"], models=models)
+    with TestClient(checker.app) as c:
+        r = c.post("/check", json={"html": page, "lab": "1-1"}).json()
+    assert r["ok"], r["problems"]
+    assert r["tasks"] == {"high": True, "far": True, "sweep": True} and r["screenshot"]

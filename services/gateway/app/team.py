@@ -593,6 +593,19 @@ above), api.lidar(x, y, anglesDeg, rangesPx, color), api.plot(x, y, w, h, [{pts:
 ymax, xlabel, ylabel}) (a small chart; returns {X, Y} to map values to pixels).
 Scale with api.w/api.h (never fixed pixel sizes); y grows downwards; keep a margin of 12 px.
 
+3D labs (use them when the lab is about a robot's joints, configuration, workspace or kinematics and a library model
+of the course is listed): add `view: "3d"` and `models: ["<id>", ...]` (ids exactly as listed). The kit loads the
+models, draws a 3D stage (the student can rotate the view with the mouse) and gives: api.m[id] (a model handle:
+h.set({joint: value, ...}) with joint names and limits as listed, h.get(), h.tool() world point for traces,
+h.toolLocal() / h.local(link, [x, y, z]) = the point in the robot's own base frame, Z up, metres — use these for
+readouts; h.visible(true|false) and h.place(x, z) to show one robot at a time or set them side by side — models
+start side by side 1.2 m apart), api.keep (objects that must survive reset, e.g. traces), api.trace(color) → {add(point), clear()},
+api.axes(h, link, size) (coordinate frame on a link), api.view(azimuthDeg, elevationDeg, fill, h?) (camera on all
+models, or on one handle h — frames its whole workspace),
+api.three (THREE). Add setup3d(api, keep) (called once when the models are loaded) for frames, traces and the
+camera; draw(api, state) sets the joints each frame (the kit renders); readouts compute from h.toolLocal().
+Do not create your own renderer, canvas or loader.
+
 Rules (checked automatically; the lab is rejected otherwise): no fetch/XMLHttpRequest/WebSocket, no import,
 no eval/Function, no localStorage/cookies, no location/window.open/parent/top/postMessage, no innerHTML or
 document.write, no web addresses, no setTimeout/setInterval/requestAnimationFrame (the kit runs the loop), and
@@ -614,11 +627,14 @@ def lab_schema() -> dict:
 
 
 def lab_prompt(no: str, spec_json: str, example: str, problems: list[str] | None = None, previous: str = "",
-               course: str = "") -> str:
+               course: str = "", models: str = "", example3d: str = "") -> str:
     out = (f"{course}\n\n" if course else "") + (
         f"Lesson {no}. The lesson spec (use its lab title, scenes, params and tasks, its concept, formulas and robot problem):\n"
         f"{spec_json}\n\nTECHNIQUE example (structure only; its content is a placeholder — never copy its topic, "
         f"texts or numbers):\n{example}\n")
+    if models:
+        out += (f"\nLibrary models of this course you may use in a 3D lab (id | name | kind | joints name[lower..upper] rest | "
+                f"tool link):\n{models}\n\n3D TECHNIQUE example (structure only):\n{example3d}\n")
     if problems:
         out += ("\nYour previous lab failed the automatic check. Fix every problem and return the whole corrected code.\n"
                 "Problems:\n" + "\n".join(f"- {p}" for p in problems[:15]) + f"\n\nPrevious code:\n{previous}\n")

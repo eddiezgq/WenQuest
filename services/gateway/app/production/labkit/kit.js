@@ -227,6 +227,7 @@ function setScene(L, sid) {
   reset(L);
 }
 function reset(L) {
+  if (!L.ready) return;   // a 3D lab resets once its models are loaded
   L.api.running = false; L.api.t = 0;
   L.state = {};
   safe(L, () => L.def.reset && L.def.reset(L.api, L.state));
@@ -238,6 +239,7 @@ function start(L) {
   safe(L, () => L.def.start && L.def.start(L.api, L.state));
 }
 function readouts(L) {
+  if (!L.ready) return;
   const rows = safe(L, () => (L.def.readouts ? L.def.readouts(L.api, L.state) : [])) || [];
   const dl = L.dom.read;
   if (dl.childElementCount !== rows.length * 2) dl.innerHTML = rows.map(() => "<dt></dt><dd></dd>").join("");
@@ -306,8 +308,9 @@ function build(id, def) {
   sec.append(stageBox, side);
   $("labs").appendChild(sec);
 
-  const ctx = canvas.getContext("2d");
-  const L = { id, def, broken: false, state: {}, sceneDef: def.scenes[0],
+  const is3d = def.view === "3d";
+  const ctx = is3d ? null : canvas.getContext("2d");
+  const L = { id, def, broken: false, state: {}, sceneDef: def.scenes[0], is3d, ready: !is3d,
     dom: { tab, tabDone: tab.querySelector(".done"), sec, canvas, chips, params, read, tasks, err, problem } };
   const api = {
     ctx, canvas, w: 0, h: 0, p: {}, scene: def.scenes[0].id, t: 0, running: false,
@@ -322,6 +325,7 @@ function build(id, def) {
     lidar: (...a) => lidar(ctx, ...a), plot: (...a) => plot(ctx, ...a),
   };
   L.api = api;
+  if (is3d) setup3d(L);
   def.tasks.forEach((t) => { t.ok = !!saved[id + ":" + t.id]; });
   LABS[id] = L; ORDER.push(id);
   // controls
@@ -346,7 +350,57 @@ function fit(L) {
   const c = L.dom.canvas, r = c.getBoundingClientRect();
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.width * 10 / 16));
-  if (w !== L.api.w || h !== L.api.h) { L.api.w = w; L.api.h = h; c.width = w * dpr; c.height = h * dpr; L.api.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  if (w !== L.api.w || h !== L.api.h) {
+    L.api.w = w; L.api.h = h;
+    if (L.is3d) { if (L.st) { L.st.renderer.setPixelRatio(dpr); L.st.resize(w, h); } }
+    else { c.width = w * dpr; c.height = h * dpr; L.api.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  }
+}
+
+// ---------- 3D labs: the course's library models on a 3D stage (WQ3D engine, models embedded in the page) ----------
+function setup3d(L) {
+  const api = L.api, def = L.def;
+  if (!window.WQ3D) { fail(L.id, new Error("this page has no 3D engine (view: '3d' needs the models listed in models: [...])")); return; }
+  const E = window.WQ3D;
+  const st = E.stage(L.dom.canvas, { width: 800, height: 500, theme: "light" });
+  L.st = st;
+  api.three = E.THREE; api.st = st; api.m = {}; api.keep = {};   // keep: 3D objects that outlive reset (traces…)
+  api.trace = (color) => E.trace(st, color);
+  api.axes = (h, link, size) => E.axes(h, link, size);
+  // Frame what the robots can reach (their workspace), so moving joints never leaves the picture.
+  const reachBox = (h) => {
+    const b = h.box();
+    const r = ((h.entry.robot || {}).reach_mm || 0) / 1000;
+    if (r > 0) {
+      const c = h.point(h.entry.root);
+      b.union(new E.THREE.Box3(new E.THREE.Vector3(c.x - r, 0, c.z - r), new E.THREE.Vector3(c.x + r, c.y + r, c.z + r)));
+    }
+    return b;
+  };
+  api.view = (az = 35, el = 22, fill = 0.8, target) => {
+    const b = new E.THREE.Box3();
+    Object.values(api.m).forEach((h) => { if (!target || h === target) b.union(reachBox(h)); });
+    if (!b.isEmpty()) E.frame(st, b, az, el, fill);
+    if (L.orbit) { L.orbit.target.copy(b.getCenter(new E.THREE.Vector3())); L.orbit.update(); }
+  };
+  const models = window.WQ_MODELS || {};
+  const ids = def.models || [];
+  Promise.all(ids.map(async (mid, k) => {
+    const m = models[mid];
+    if (!m) throw new Error(`model ${mid} is not in this page (use the ids listed for this course)`);
+    api.m[mid] = await E.loadModel(st, m.glb, m.entry, { x: k * 1.2 });
+    api.m[mid].rows = m.motion || [];
+  })).then(() => {
+    api.view();
+    try {
+      L.orbit = new E.OrbitControls(st.camera, L.dom.canvas);
+      L.orbit.enableDamping = true;
+    } catch (e) { /* view rotation is optional */ }
+    api.view();
+    safe(L, () => def.setup3d && def.setup3d(api, api.keep));
+    L.ready = true;
+    reset(L);
+  }).catch((e) => fail(L.id, e));
 }
 
 function show(id) {
@@ -384,7 +438,7 @@ window.WQ = {
     const labs = {};
     ORDER.forEach((id) => {
       const L = LABS[id];
-      labs[id] = { broken: L.broken, scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
+      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.is3d ? "3d" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
         tasks: Object.fromEntries(L.def.tasks.map((t) => [t.id, !!t.ok])), demos: Object.fromEntries(L.def.tasks.map((t) => [t.id, t.demo || null])) };
     });
     return { errors: errors.slice(), active, labs };
@@ -420,7 +474,7 @@ function begin() {
   function loop(now) {
     const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
     const L = LABS[active];
-    if (L && !L.broken) {
+    if (L && !L.broken && L.ready) {
       fit(L);
       const n = Math.max(1, Math.min(20, Math.round(WQ.speed)));
       for (let i = 0; i < n && L.api.running; i++) {
@@ -428,7 +482,11 @@ function begin() {
         safe(L, () => L.def.update && L.def.update(dt, L.api, L.state));
       }
       if (L.api.running || !L.drawn || L.api.w !== L.lastW) { readouts(L); }
-      safe(L, () => { L.api.ctx.clearRect(0, 0, L.api.w, L.api.h); L.def.draw(L.api, L.state); });
+      if (L.is3d) {
+        safe(L, () => { L.def.draw(L.api, L.state); if (L.orbit) L.orbit.update(); L.st.render(); });
+      } else {
+        safe(L, () => { L.api.ctx.clearRect(0, 0, L.api.w, L.api.h); L.def.draw(L.api, L.state); });
+      }
       L.drawn = true; L.lastW = L.api.w;
     }
     requestAnimationFrame(loop);

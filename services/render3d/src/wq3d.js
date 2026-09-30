@@ -104,6 +104,16 @@ export async function loadModel(st, src, entry, opts = {}) {
       return n ? new THREE.Vector3(...xyz).applyMatrix4(n.matrixWorld) : holder.position.clone();
     },
     tool() { return entry.tool ? h.point(entry.tool.link, entry.tool.xyz) : null; },
+    /** A point of a link in the robot's own base frame (Z up, metres) — for readouts that match the textbook. */
+    local(link, xyz = [0, 0, 0]) {
+      const base = nodes[entry.root] || root;
+      root.updateMatrixWorld(true);
+      const w = h.point(link, xyz);
+      const inv = new THREE.Matrix4().copy(base.matrixWorld).invert();
+      const p = w.applyMatrix4(inv);
+      return [p.x, p.y, p.z];
+    },
+    toolLocal() { return entry.tool ? h.local(entry.tool.link, entry.tool.xyz) : null; },
     box() { root.updateMatrixWorld(true); return new THREE.Box3().setFromObject(root); },
     place(x = 0, z = 0, yaw = 0) {
       holder.position.set(0, 0, 0);

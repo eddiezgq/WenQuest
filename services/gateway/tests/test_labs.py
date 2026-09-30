@@ -169,3 +169,15 @@ def test_no_checker_no_lab(client, monkeypatch):
     les = p["outline"]["chapters"][0]["lessons"][0]
     assert les["status"] == "awaiting" and "lab" not in [f["kind"] for f in les["files"]]
     assert any("实验检查服务暂时不可用" in i["text"] for i in les["review"]["issues"])
+
+
+def test_3d_labs_carry_the_engine_and_only_the_models_they_name(tmp_path):
+    from app.production import library_sample as L, scene3d as S
+    models = S.load_models(L.build(tmp_path) / L.VERSION, ["B-ARM-6R-S", "C-LNK-4BAR-S"])
+    code = labs.example_code3d()
+    assert labs.static_problems(code) == [] and labs.models_used(code, models) == ["B-ARM-6R-S"]
+    page = labs.page([("1.1", code)], course=COURSE, chapter=CHAPTER, models=models)
+    assert "window.WQ_MODELS" in page and "B-ARM-6R-S" in page and "C-LNK-4BAR-S" not in page
+    assert "connect-src 'none'" in page                       # still no network
+    plain = labs.page([("1.1", labs.example_code())], course=COURSE, chapter=CHAPTER, models=models)
+    assert "window.WQ_MODELS =" not in plain and len(plain) < 200_000   # 2D labs stay small (no engine)

@@ -25,9 +25,14 @@ RENDER_LIMIT = 900.0   # seconds for one 3D animation
 DONE = {"checked": 0, "failed": 0}
 
 BLANK_JS = """(sel) => {
+  // Copy the canvas (2D or WebGL) into a small 2D canvas and count distinct colours.
   const c = document.querySelector(sel);
   if (!c || !c.width || !c.height) return -1;
-  const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+  const t = document.createElement("canvas");
+  t.width = Math.min(c.width, 400); t.height = Math.max(1, Math.round(t.width * c.height / c.width));
+  const x = t.getContext("2d");
+  x.drawImage(c, 0, 0, t.width, t.height);
+  const d = x.getImageData(0, 0, t.width, t.height).data;
   const seen = new Set();
   const step = Math.max(4, Math.floor(d.length / 4 / 4000)) * 4;
   for (let i = 0; i < d.length; i += step) { seen.add((d[i] >> 4) + "," + (d[i + 1] >> 4) + "," + (d[i + 2] >> 4) + "," + (d[i + 3] >> 5)); if (seen.size > 50) break; }
@@ -145,7 +150,8 @@ async def run(html: str, lab: str) -> dict:
     tasks: dict[str, bool] = {}
     shot = b""
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(args=["--disable-dev-shm-usage", "--no-proxy-server"])
+        browser = await pw.chromium.launch(args=["--disable-dev-shm-usage", "--no-proxy-server", "--use-gl=angle",
+                                                 "--use-angle=swiftshader", "--enable-unsafe-swiftshader"])
         try:
             ctx = await browser.new_context(viewport={"width": 1280, "height": 860}, device_scale_factor=1.5,
                                             locale="zh-CN", java_script_enabled=True)
@@ -167,6 +173,13 @@ async def run(html: str, lab: str) -> dict:
                 problems.append("the lab did not start (WQ.lab was not called, or threw an error before it finished)")
                 return result(problems, errors, tasks, shot)
             info = status["labs"][lab]
+            if not info.get("ready", True) and not info["broken"]:   # a 3D lab: wait for its models
+                try:
+                    await page.wait_for_function(f"() => {{ const s = WQ.status().labs[{lab!r}]; return s.ready || s.broken; }}", timeout=30000)
+                except Exception:
+                    problems.append("the 3D lab's models did not load within 30 s")
+                    return result(problems, errors, tasks, shot)
+                info = (await page.evaluate("() => WQ.status()"))["labs"][lab]
             if info["broken"]:
                 problems.append("the lab stopped with an error while starting")
             sec = f"#lab-{lab}"
