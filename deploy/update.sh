@@ -26,6 +26,18 @@ dc pull --quiet moodle gateway web animator labcheck voice
 # if the factory has not been installed yet, so the web server can start either way.
 docker network inspect factory-edge >/dev/null 2>&1 || docker network create factory-edge >/dev/null 2>&1 || true
 
+# Digital factory course API (factory round 4, C2): copy its read-only key so the gateway can call
+# https://factory.<domain>/api/course/*. The factory generates the key on its own deploys.
+FACTORY_ENV="${FACTORY_DIR:-$WQ_DIR/factory}/.env"
+if [ -r "$FACTORY_ENV" ]; then
+    fk=$(grep -E '^WQ_FACTORY_READ_KEY=' "$FACTORY_ENV" | tail -n 1 | cut -d= -f2- || true)
+    if [ -n "$fk" ] && [ "$fk" != "$(envval WQ_FACTORY_READ_KEY)" ]; then
+        envset WQ_FACTORY_READ_KEY "$fk"
+        log "Digital factory read key updated."
+    fi
+    [ -n "$(envval WQ_FACTORY_URL)" ] || envset WQ_FACTORY_URL "https://factory.$(envval SITE_DOMAIN)"
+fi
+
 log "Starting services..."
 dc up -d --no-build --remove-orphans
 

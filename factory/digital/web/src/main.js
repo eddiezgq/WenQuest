@@ -6,6 +6,7 @@ import { session } from './lib/api';
 
 const routes = [
   { path: '/login', component: () => import('./pages/Login.vue'), meta: { public: true } },
+  { path: '/embed/workshop', component: () => import('./pages/EmbedWorkshop.vue'), meta: { public: true } },
   { path: '/', component: () => import('./pages/Home.vue') },
   { path: '/work/planner', component: () => import('./pages/Planner.vue') },
   { path: '/work/engineer', component: () => import('./pages/Engineer.vue') },

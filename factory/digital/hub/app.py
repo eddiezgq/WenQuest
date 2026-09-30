@@ -696,6 +696,10 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
 from hub import library as _library  # noqa: E402
 _library.mount(app)
 
+# ---------------------------------------------------------------- 课程接口（第 4 轮）
+from hub import course as _course  # noqa: E402
+_course.mount(app, H)
+
 
 # ---------------------------------------------------------------- 网页
 if os.path.isdir(WEB_DIST):
@@ -708,5 +712,10 @@ if os.path.isdir(WEB_DIST):
         f = os.path.join(WEB_DIST, path)
         if path and os.path.isfile(f):
             return FileResponse(f)
+        if path.startswith("embed/"):            # 嵌入式 3D 车间（第 4 轮 C8）：只许学习平台和本站嵌入
+            anc = " ".join(["'self'"] + [o for o in os.environ.get("WQ_EMBED_ORIGINS", os.environ.get(
+                "WQ_LIBRARY_ORIGINS", "")).split(",") if o.strip()] + ["http://localhost:*", "http://127.0.0.1:*"])
+            return FileResponse(os.path.join(WEB_DIST, "index.html"),
+                                headers={"Content-Security-Policy": "frame-ancestors " + anc, "Cache-Control": "no-cache"})
         return FileResponse(os.path.join(WEB_DIST, "index.html"))
 

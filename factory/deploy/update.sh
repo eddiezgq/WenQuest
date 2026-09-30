@@ -9,6 +9,9 @@ APP="${1:-}"; BRIDGE="${2:-}"
 [ -n "$BRIDGE" ] && envset FACTORY_BRIDGE_IMAGE "$BRIDGE"
 [ -n "$(envval FACTORY_APP_IMAGE)" ] || { echo "还没有镜像：请通过 GitHub Actions 部署" >&2; exit 1; }
 
+# 课程接口只读钥匙（第 4 轮 C2）：没有就生成；学习平台的 deploy/update.sh 从这里读去用
+[ -n "$(envval WQ_FACTORY_READ_KEY)" ] || envset WQ_FACTORY_READ_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
+
 if [ "$(envval FACTORY_INSTALLED)" != 1 ]; then
     # D1：ERPNext 加数字工厂约需 3 GB 内存。不够就停下，提示升级服务器，免得拖垮学习平台
     avail=$(awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo)

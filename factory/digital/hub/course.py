@@ -1,0 +1,490 @@
+# -*- coding: utf-8 -*-
+"""工作台课程接口（第 4 轮）：学习平台的网关用只读钥匙，服务器对服务器地取真实案例和生产数据。
+
+路径都在 /api/course/ 下（C1），只读；请求头 Authorization: Bearer <WQ_FACTORY_READ_KEY>（C2）。
+返回的数据里操作人只写角色，不含姓名、账号编号（C4）；每次返回带 as_of、source（C6）；列表一页最多 10 000 行（C7）；
+只开放教学情景 lab7（C10）。另有嵌入式 3D 车间用的嵌入凭证与回放数据（C8）、零件库对照（C9）。
+"""
+import base64
+import datetime as dt
+import hashlib
+import hmac
+import json
+import os
+import re
+import threading
+import time
+import urllib.request
+
+from fastapi import Depends, Header, HTTPException, Query, Request
+
+from factory import data as F
+import wqbus
+from wqbus import layout as L
+
+PAGE_MAX = 10000
+CASE_MODE = {"lab7": "teach"}                       # C10：生产模式的数据不开放
+KINDS = ("measurement", "event", "agv", "order", "kpi")
+ORDER_DOCTYPES = ("Sales Order", "Work Order", "Purchase Order", "Material Request")
+ROLE_ZH = {"planner": "计划员", "engineer": "工艺员", "operator": "操作工", "quality": "质检员", "manager": "厂长",
+           "system": "系统", "sim": "仿真", "ai": "AI 助手"}
+GUIDE_URL = "https://github.com/eddiezgq/WenQuest/blob/main/factory/digital/实验7_数字工厂闭环.md"
+EMBED_TTL_MAX = 1800
+
+
+# ---------------------------------------------------------------- 钥匙与公共部分（C2、C6、C7）
+def _key():
+    return os.environ.get("WQ_FACTORY_READ_KEY", "")
+
+
+def require_key(authorization: str = Header(default="")):
+    k = _key()
+    got = authorization[7:].strip() if authorization.lower().startswith("bearer ") else ""
+    if not k or not got or not hmac.compare_digest(got.encode(), k.encode()):
+        raise HTTPException(401, "需要数字工厂只读钥匙（Authorization: Bearer …）")
+    return True
+
+
+def now_utc():
+    return dt.datetime.now(dt.timezone.utc)
+
+
+def iso(t):
+    if isinstance(t, str):
+        return t
+    return t.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def head(source, **kw):
+    return dict({"as_of": iso(now_utc()), "source": source}, **kw)
+
+
+def public_base(request):
+    return (os.environ.get("WQ_PUBLIC_URL") or str(request.base_url)).rstrip("/")
+
+
+def split_name(text, codes=False):
+    """“深沟球轴承 6205-2RS Ball bearing 25×52×15” → {zh: 深沟球轴承 6205-2RS, en: Ball bearing 25×52×15}
+    codes=True 时把英文部分里的规格代号（带数字或 Ø 的，如 Ø35、k6、W3）也补进中文名：检验项目要靠它区分。"""
+    toks = str(text).split()
+    last_cjk = max((i for i, t in enumerate(toks) if re.search(r"[一-鿿]", t)), default=-1)
+    cut = next((i for i in range(last_cjk + 1, len(toks)) if re.match(r"[A-Za-z]", toks[i])), len(toks))
+    extra = [t for t in toks[cut:] if codes and re.search(r"[0-9Ø]", t) and t not in toks[:cut]]
+    zh, en = " ".join(toks[:cut] + extra), " ".join(toks[cut:])
+    return {"zh": zh or en, "en": en or zh}
+
+
+def role_of(source):
+    """总线消息的 source → 角色（C4）：sim/… → sim；workbench/planner·a7f3 → planner；hub → system"""
+    s = str(source or "")
+    if s.startswith("sim"):
+        return "sim"
+    if s.startswith("ai"):
+        return "ai"
+    tail = s.split("/", 1)[1] if "/" in s else s
+    if "·" in tail:
+        r = tail.split("·")[0]
+        return r if r in ROLE_ZH else "user"
+    return "system" if s in ("hub", "system", "") or s.startswith(("hub", "bridge", "mes/system")) else "user"
+
+
+# ---------------------------------------------------------------- 零件库对照（C9）
+class LibraryMap:
+    """每天读一次零件库的 latest.json 与 index.json，建立 ERPNext 物料号 → 库规格编号的对照。"""
+
+    def __init__(self):
+        self.map, self.at, self.lock = {}, 0.0, threading.Lock()
+
+    def _load(self):
+        d = os.environ.get("WQ_LIBRARY_DIR", "/library")
+        try:
+            latest = json.load(open(os.path.join(d, "latest.json"), encoding="utf-8"))
+            idx = json.load(open(os.path.join(d, latest["index"].split("library/", 1)[1]), encoding="utf-8"))
+        except (OSError, ValueError, KeyError, IndexError):
+            url = os.environ.get("WQ_LIBRARY_URL", "")
+            if not url:
+                return {}
+            try:
+                latest = json.load(urllib.request.urlopen(url.rstrip("/") + "/library/latest.json", timeout=10))
+                idx = json.load(urllib.request.urlopen(url.rstrip("/") + "/" + latest["index"], timeout=30))
+            except Exception:  # noqa: BLE001
+                return {}
+        out = {}
+        for it in idx.get("items", []):
+            for code in it.get("erp_items") or []:
+                out.setdefault(code, it["ref"])
+        return out
+
+    def get(self, code):
+        with self.lock:
+            if time.time() - self.at > 86400 or not self.at:
+                self.map, self.at = self._load(), time.time()
+        return self.map.get(code)
+
+
+LIB = LibraryMap()
+
+
+# ---------------------------------------------------------------- 产品（工厂设计数据）
+def ws_code(ws_name):
+    return ws_name.split()[-1].lower()                     # “数控车床 CNC-L01” → cnc-l01
+
+
+def ws_units(ws_name):
+    return [u for u, v in wqbus.UNITS.items() if v[3] == ws_name]
+
+
+def ws_rate(ws_name):
+    return float(sum(F.WORKSTATIONS[ws_name][1]))
+
+
+def routing(item):
+    if item not in F.BOMS:
+        return []
+    return [{"seq": i + 1, "operation": split_name(op), "workstation": ws_code(F.OPERATIONS[op]), "minutes": m}
+            for i, (op, m) in enumerate(F.ROUTINGS[F.BOMS[item][0]])]
+
+
+def bom_tree(code, qty=1):
+    name, kind, uom = F.ITEMS[code][0], F.ITEMS[code][1], F.ITEMS[code][2]
+    node = {"item_code": code, "name": split_name(name), "kind": kind, "qty": qty, "uom": uom,
+            "library_ref": LIB.get(code)}
+    if code in F.BOMS:
+        node["children"] = [bom_tree(c, q) for c, q in F.BOMS[code][1]]
+    return node
+
+
+def std_cost(code):
+    """标准成本（美元/件）：材料 = 外购件与原材料价格 × 用量（逐级累加）；工序 = 工时 × 工位费率（逐级累加）"""
+    if code not in F.BOMS:
+        return {"material": float(F.ITEMS[code][3] or 0), "operations": 0.0}
+    mat = ops = 0.0
+    for c, q in F.BOMS[code][1]:
+        s = std_cost(c)
+        mat += s["material"] * q
+        ops += s["operations"] * q
+    ops += sum(m / 60 * ws_rate(F.OPERATIONS[op]) for op, m in F.ROUTINGS[F.BOMS[code][0]])
+    return {"material": mat, "operations": ops}
+
+
+GAUGES = [("硬度", "硬度计"), ("粗糙度", "粗糙度仪"), ("公法线", "公法线千分尺"), ("噪声", "声级计"), ("温升", "温度计"),
+          ("转速", "转速表"), ("直径", "三坐标"), ("孔径", "三坐标"), ("中心距", "三坐标"), ("平行度", "三坐标"),
+          ("键槽", "三坐标"), ("偏差", "内径表")]
+
+
+def characteristic(c):
+    text = c["parameter"]
+    m = re.search(r"\(([^()]*)\)\s*$", text)
+    unit = m.group(1) if m else None
+    base = text[: m.start()].strip() if m else text
+    out = {"name": split_name(base, codes=True), "numeric": bool(c["numeric"]), "unit": unit}
+    if c["numeric"]:
+        out.update({"min": c["min"], "max": c["max"]})
+        out["gauge"] = next((g for k, g in GAUGES if k in base), None)
+    else:
+        out.update({"requirement": c["value"], "gauge": "目测"})
+    return out
+
+
+def quality_plans():
+    tpl = F.inspection_templates()
+    by_tpl = {}
+    for code, v in F.ITEMS.items():
+        if v[5]:
+            by_tpl.setdefault(v[5], []).append(code)
+    return [{"template": t, "item_code": (by_tpl.get(t) or [None])[0], "items": by_tpl.get(t, []),
+             "characteristics": [characteristic(c) for c in cs]} for t, cs in tpl.items()]
+
+
+def product_specs():
+    a1 = F.center_distance(2, 24, 72)
+    a2 = F.center_distance(3, 20, 70)
+    return {"ratio": round(F.ratio(), 3), "input_speed_rpm": F.INPUT_SPEED_RPM,
+            "output_speed_rpm": round(F.INPUT_SPEED_RPM / F.ratio(), 1),
+            "center_distance_mm": [a1, a2], "stages": [
+                {"pinion": {"code": a, **F.GEARS[a]}, "gear": {"code": b, **F.GEARS[b]}} for a, b in F.STAGES]}
+
+
+def product_summary(code):
+    return {"code": code, "name": split_name(F.ITEMS[code][0]), "summary": F.ITEMS[code][6], "image": None,
+            "specs": product_specs() if code == "WQR-105" else {}}
+
+
+def product_detail(code):
+    tree = bom_tree(code)
+    items, stack = [], [tree]
+    while stack:
+        n = stack.pop()
+        items.append(n["item_code"])
+        stack.extend(n.get("children", []))
+    made = [i for i in items if i in F.BOMS]
+    used_ws = sorted({F.OPERATIONS[op] for i in made for op, _ in F.ROUTINGS[F.BOMS[i][0]]})
+    costs = {}
+    for i in made:
+        s = std_cost(i)
+        costs[i] = {"material": round(s["material"], 2), "operations": round(s["operations"], 2),
+                    "total": round(s["material"] + s["operations"], 2), "currency": "USD"}
+    return head(["factory-data"], **product_summary(code), bom=tree,
+                routings={i: routing(i) for i in made},
+                workstations=[{"unit": ws_code(w), "name": split_name(wqbus.UNITS[ws_units(w)[0]][1] + " " +
+                                                                        wqbus.UNITS[ws_units(w)[0]][2]),
+                               "units": ws_units(w), "rate_per_hour": ws_rate(w),
+                               "rate_parts": dict(zip(("depreciation", "labour", "energy"), F.WORKSTATIONS[w][1])),
+                               "capacity": F.WORKSTATIONS[w][0]} for w in used_ws],
+                quality_plans=[q for q in quality_plans() if set(q["items"]) & set(items)],
+                std_cost=costs)
+
+
+# ---------------------------------------------------------------- 设计版本（FreeCAD 发布，历史库）
+def designs(db, item, base):
+    rel = db.messages(["design.release"], mode="teach")
+    gcs = db.messages(["design.gcode"], mode="teach")
+    out = []
+    for r in rel:
+        d = r["data"]
+        if str(d.get("item", "")).upper() != item.upper():
+            continue
+        files = []
+        for f in d.get("files") or []:
+            kind = {"drawing": "svg"}.get(f.get("kind"), f.get("kind"))
+            files.append({"kind": kind, "name": f.get("name"), "url": base + "/api/files/" + f["sha256"], "sha256": f["sha256"]})
+        g = next((x["data"] for x in reversed(gcs) if x["data"].get("item") == d["item"]
+                  and x["data"].get("revision") == d["revision"]), None)
+        gco = None
+        if g:
+            sha = g.get("sha256") or str(g.get("gcode_ref", "")).rsplit("/", 1)[-1]
+            row = db.one("select name, content from stored_file where sha256=%s", (sha,)) if sha else None
+            if row:
+                files.append({"kind": "gcode", "name": row["name"], "url": base + "/api/files/" + sha, "sha256": sha})
+            gco = {"operation": split_name(g.get("operation", "")), "machine": g.get("machine"),
+                   "est_time_s": g.get("est_time_s"), "cut_length_mm": g.get("cut_length_mm"),
+                   "lines": bytes(row["content"]).count(b"\n") if row else None}
+        out.append({"revision": d["revision"], "released_at": r["ts"], "author_role": _author_role(d.get("author")),
+                    "change_note": d.get("change_note") or "", "params": d.get("params") or {},
+                    "bom": d.get("bom") or [], "files": files, "gcode": gco})
+    out.sort(key=lambda x: x["revision"])
+    return head(["freecad", "historian"], item=item.upper(), revisions=out)
+
+
+def _author_role(a):
+    a = str(a or "")
+    return a.split("·")[0] if "·" in a else "engineer"
+
+
+# ---------------------------------------------------------------- 生产数据（历史库）
+def _range(frm, to):
+    try:
+        t1 = dt.datetime.fromisoformat(to.replace("Z", "+00:00")) if to else now_utc()
+        t0 = dt.datetime.fromisoformat(frm.replace("Z", "+00:00")) if frm else t1 - dt.timedelta(days=7)
+    except ValueError:
+        raise HTTPException(400, "from、to 要用 ISO 时间，如 2026-10-01T00:00:00Z")
+    t0 = t0 if t0.tzinfo else t0.replace(tzinfo=dt.timezone.utc)
+    t1 = t1 if t1.tzinfo else t1.replace(tzinfo=dt.timezone.utc)
+    if t1 <= t0:
+        raise HTTPException(400, "to 要晚于 from")
+    return t0, t1
+
+
+def _page(db, sql, args, page):
+    rows = db.q(sql + " limit %s offset %s", list(args) + [PAGE_MAX + 1, (page - 1) * PAGE_MAX])
+    return rows[:PAGE_MAX], (page + 1 if len(rows) > PAGE_MAX else None)
+
+
+BUS_ROWS = ("select ts, topic, payload from bus_message where valid and mode=%s and type=%s and ts >= %s and ts <= %s "
+            "order by ts, seq")
+
+
+def data_rows(db, case, kind, t0, t1, page):
+    mode = CASE_MODE[case]
+    if kind == "measurement":
+        rows, nxt = _page(db, BUS_ROWS, (mode, "quality.measurement", t0, t1), page)
+        keys = ("part_serial", "item", "work_order", "characteristic", "name", "nominal_mm", "lower_tol_mm",
+                "upper_tol_mm", "value_mm", "result")
+        return [dict({"ts": iso(r["ts"])}, **{k: r["payload"]["data"].get(k) for k in keys}) for r in rows], nxt
+    if kind == "agv":
+        rows, nxt = _page(db, BUS_ROWS, (mode, "logistics.status", t0, t1), page)
+        return [{"ts": iso(r["ts"]), "unit": r["topic"].split("/")[3], **{k: r["payload"]["data"].get(k)
+                for k in ("x_m", "y_m", "heading_deg", "load", "task")}} for r in rows], nxt
+    if kind == "event":
+        sql = ("select * from (select ts, seq, topic, payload, null as state from bus_message where valid and mode=%s "
+               "and type='machine.event' and ts >= %s and ts <= %s "
+               "union all select ts, 0 as seq, 'wq/gearbox/x/' || unit || '/status' as topic, null as payload, state "
+               "from machine_state_log where mode=%s and ts >= %s and ts <= %s) x order by ts, seq")
+        rows, nxt = _page(db, sql, (mode, t0, t1, mode, t0, t1), page)
+        out = []
+        for r in rows:
+            unit = r["topic"].split("/")[3]
+            if r["payload"] is None:
+                out.append({"ts": iso(r["ts"]), "unit": unit, "event": "state", "state": r["state"], "work_order": None,
+                            "operation": None, "code": None, "message": None, "cycle_time_s": None, "actor_role": "sim"})
+                continue
+            d = r["payload"]["data"]
+            out.append({"ts": iso(r["ts"]), "unit": unit, "event": d["event"], "state": None,
+                        "work_order": d.get("work_order"), "operation": d.get("operation"), "code": d.get("code"),
+                        "message": d.get("message") or d.get("reason"), "cycle_time_s": d.get("cycle_time_s"),
+                        "actor_role": role_of(r["payload"].get("source"))})
+        return out, nxt
+    if kind == "order":
+        sql = ("select ts, payload from bus_message where valid and mode=%s and type='erp.doc' and ts >= %s and ts <= %s "
+               "and payload->'data'->>'doctype' = any(%s) and payload->'data'->>'action' <> 'failed' order by ts, seq")
+        rows, nxt = _page(db, sql, (mode, t0, t1, list(ORDER_DOCTYPES)), page)
+        out = []
+        for r in rows:
+            d = r["payload"]["data"]
+            it = (d.get("items") or [{}])[0]
+            out.append({"ts": iso(r["ts"]), "doctype": d["doctype"], "name": d["name"], "action": d["action"],
+                        "status": d.get("status"), "customer": d.get("customer") or d.get("supplier"),
+                        "item_code": d.get("production_item") or it.get("item_code"),
+                        "qty": d.get("qty") if d.get("qty") is not None else it.get("qty"),
+                        "delivery_date": d.get("delivery_date") or d.get("expected_delivery_date") or it.get("schedule_date"),
+                        "produced_qty": d.get("produced_qty")})
+        return out, nxt
+    if kind == "kpi":
+        return kpi_rows(db, mode, t0, t1), None
+    raise HTTPException(400, "kind 只能是 " + "、".join(KINDS))
+
+
+def kpi_rows(db, mode, t0, t1):
+    """每个本地日期一行（工作日），指标算法与看板相同（hub/kpi.py）；otd 为当月累计准时交付率。"""
+    from hub import kpi
+    if t1 - t0 > dt.timedelta(days=62):
+        raise HTTPException(400, "kpi 一次最多取 62 天")
+    out = []
+    d = t0.astimezone(kpi.TZ).date()
+    last = t1.astimezone(kpi.TZ).date()
+    while d <= last:
+        if d.weekday() < 5:
+            day0 = dt.datetime(d.year, d.month, d.day, tzinfo=kpi.TZ).astimezone(dt.timezone.utc)
+            end = min(day0 + dt.timedelta(days=1), t1)
+            if end > day0:
+                ov = kpi.Overview(db, now=end, mode=mode)
+                c = ov.cost(day0)
+                out.append({"date": d.isoformat(), "otd": _r(ov.on_time()[0]), "oee": _r(ov.oee(day0)["value"]),
+                            "fpy": _r(ov.fpy(day0)["value"]), "wip": ov.wip(end),
+                            "output": sum(sum(v.values()) for v in ov.completions(day0, end).values()),
+                            "cost_variance_pct": _r(c["value"] * 100 if c.get("value") is not None else None, 2)})
+        d += dt.timedelta(days=1)
+    return out
+
+
+def _r(v, n=4):
+    return None if v is None else round(float(v), n)
+
+
+# ---------------------------------------------------------------- 嵌入凭证与回放（C8）
+def _secret():
+    return (os.environ.get("WQ_SECRET") or "wq-local").encode()
+
+
+def embed_token(ttl):
+    exp = int(time.time()) + max(60, min(int(ttl), EMBED_TTL_MAX))
+    raw = base64.urlsafe_b64encode(json.dumps({"k": "embed", "exp": exp}).encode()).decode().rstrip("=")
+    sig = hmac.new(_secret(), raw.encode(), hashlib.sha256).hexdigest()[:32]
+    return raw + "." + sig, exp
+
+
+def check_embed_token(tok):
+    try:
+        raw, sig = tok.split(".")
+        if not hmac.compare_digest(sig, hmac.new(_secret(), raw.encode(), hashlib.sha256).hexdigest()[:32]):
+            return False
+        p = json.loads(base64.urlsafe_b64decode(raw + "=" * (-len(raw) % 4)))
+        return p.get("k") == "embed" and p.get("exp", 0) > time.time()
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def replay_rows(db, t0, t1):
+    """回放一段：设备状态和 AGV 位置（只教学情景）。开头补上每台设备在 t0 之前的最后状态。"""
+    first = db.q("select distinct on (topic) topic, ts, payload from bus_message where valid and mode='teach' "
+                 "and type in ('machine.status','logistics.status') and ts < %s and ts > %s - interval '1 day' "
+                 "order by topic, ts desc, seq desc", (t0, t0))
+    rows = db.q("select topic, ts, payload from bus_message where valid and mode='teach' "
+                "and type in ('machine.status','logistics.status') and ts >= %s and ts < %s order by ts, seq limit 50000",
+                (t0, t1))
+    out = []
+    for r in list(first) + list(rows):
+        d = r["payload"]["data"]
+        unit = r["topic"].split("/")[3]
+        if r["payload"]["type"] == "machine.status":
+            x = {k: d.get(k) for k in ("state", "queue", "work_order", "operation", "qty", "qty_done", "reason")}
+            out.append({"ts": iso(r["ts"]), "unit": unit, "kind": "machine", **x})
+        else:
+            out.append({"ts": iso(r["ts"]), "unit": unit, "kind": "agv",
+                        **{k: d.get(k) for k in ("x_m", "y_m", "heading_deg", "load")}})
+    return out
+
+
+# ---------------------------------------------------------------- 路由
+def mount(app, H):
+    K = Depends(require_key)
+
+    @app.get("/api/course/products", dependencies=[K])
+    def course_products():
+        return head(["factory-data"], items=[product_summary(c) for c, v in F.ITEMS.items() if v[1] == "fg"])
+
+    @app.get("/api/course/products/{code}", dependencies=[K])
+    def course_product(code: str):
+        code = code.upper()
+        if code not in F.ITEMS or F.ITEMS[code][1] != "fg":
+            raise HTTPException(404, "没有这个产品")
+        return product_detail(code)
+
+    @app.get("/api/course/designs/{item}", dependencies=[K])
+    def course_designs(item: str, request: Request):
+        if item.upper() not in F.ITEMS:
+            raise HTTPException(404, "没有这个物料")
+        return designs(H.db, item, public_base(request))
+
+    @app.get("/api/course/cases", dependencies=[K])
+    def course_cases():
+        return head(["factory-data"], items=[{
+            "id": "lab7", "name": {"zh": "实验 7：数字工厂闭环", "en": "Lab 7: the closed loop in a digital factory"},
+            "summary": "WQR-105 减速器厂的一周：接单、算料排产、设计发布、车间加工、在线检测与不合格品处置、看板与 AI 提醒。",
+            "mode": "teach", "guide_url": GUIDE_URL, "products": ["WQR-105"]}])
+
+    @app.get("/api/course/layout", dependencies=[K])
+    def course_layout():
+        units = []
+        for u, (x, y, w, d) in L.LAYOUT.items():
+            v = wqbus.UNITS[u]
+            ops = [split_name(op) for op, ws in F.OPERATIONS.items() if ws == v[3]]
+            units.append({"unit": u, "name": {"zh": v[1], "en": v[2]}, "x_m": x, "y_m": y, "w_m": w, "d_m": d,
+                          "area": v[0], "operations": ops})
+        return head(["factory-data"], floor={"w_m": L.FLOOR[0], "d_m": L.FLOOR[1]}, units=units,
+                    aisles=[{"axis": "x", "y_m": a, "width_m": 2.2} for a in L.AISLES] +
+                           [{"axis": "y", "x_m": L.CROSS_X, "from_y_m": L.AISLES[0], "to_y_m": L.AISLES[1], "width_m": 2.2}],
+                    agv_home={a: {"x_m": p[0], "y_m": p[1]} for a, p in L.AGV_HOME.items()})
+
+    @app.get("/api/course/data", dependencies=[K])
+    def course_data(case: str = "lab7", kind: str = "measurement", frm: str = Query(default="", alias="from"),
+                    to: str = "", page: int = Query(default=1, ge=1)):
+        if case not in CASE_MODE:
+            raise HTTPException(404, "没有这个教学情景（目前只有 lab7）")
+        if kind not in KINDS:
+            raise HTTPException(400, "kind 只能是 " + "、".join(KINDS))
+        t0, t1 = _range(frm, to)
+        rows, nxt = data_rows(H.db, case, kind, t0, t1, page)
+        return head("historian", case=case, kind=kind, **{"from": iso(t0), "to": iso(t1)}, rows=rows, page=page, next=nxt)
+
+    @app.get("/api/course/embed-token", dependencies=[K])
+    def course_embed_token(ttl: int = EMBED_TTL_MAX):
+        tok, exp = embed_token(ttl)
+        return {"token": tok, "expires": iso(dt.datetime.fromtimestamp(exp, dt.timezone.utc))}
+
+    # 嵌入页面自己用的两个接口（不用只读钥匙）：总线地址（实时，匿名只读）；回放数据（要嵌入凭证）
+    @app.get("/api/embed/config")
+    def embed_config():
+        return {"mqtt_ws": os.environ.get("WQ_MQTT_WS", "ws://localhost:9001/mqtt"), "mode": "teach"}
+
+    @app.get("/api/embed/replay")
+    def embed_replay(token: str = "", t0: str = "", minutes: float = Query(default=10, gt=0, le=60)):
+        if not check_embed_token(token):
+            raise HTTPException(401, "回放需要有效的嵌入凭证（30 分钟内有效）")
+        try:
+            a = dt.datetime.fromisoformat(t0.replace("Z", "+00:00"))
+        except ValueError:
+            raise HTTPException(400, "t0 要用 ISO 时间，如 2026-10-20T13:00:00Z")
+        a = a if a.tzinfo else a.replace(tzinfo=dt.timezone.utc)
+        b = a + dt.timedelta(minutes=minutes)
+        return {"from": iso(a), "to": iso(b), "rows": replay_rows(H.db, a, b)}

@@ -71,6 +71,9 @@ services:
       WQ_ADMIN_EMAIL_FALLBACK: ${MOODLE_ADMIN_EMAIL:-}
       WQ_APP_URL: ${APP_URL:-http://localhost:8088}
       WQ_SITE_DOMAIN: ${SITE_DOMAIN:-}
+      # Digital factory course API (docs/方案/数字工厂资源接口约定.md §3): read-only key copied by deploy/update.sh.
+      WQ_FACTORY_URL: ${WQ_FACTORY_URL:-}
+      WQ_FACTORY_READ_KEY: ${WQ_FACTORY_READ_KEY:-}
     volumes:
       # Uploaded materials, course generation progress and converted slides survive redeploys.
       - gatewaydata:/data
