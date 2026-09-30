@@ -161,14 +161,15 @@ class ERP {
             await this.ensureCustomField('Work Order', 'wq_sales_order', { label: '对应销售订单 For sales order',
               fieldtype: 'Link', options: 'Sales Order', insert_after: 'sales_order', read_only: 1 });
           }
-          const woDoc = await this.insert('Work Order', {
+          const wo = await this.withBomOperations({
             production_item: w.production_item, bom_no: bom, qty: w.qty, company,
             ...(direct ? { sales_order: soDoc.name } : { wq_sales_order: soDoc.name }),
             planned_start_date: `${w.planned_start_date} 08:00:00`,
             expected_delivery_date: w.expected_delivery_date, skip_transfer: 1,
             source_warehouse: WH.raw, wip_warehouse: WH.wip, fg_warehouse: MAKE_WH[w.production_item] || WH.semi,
-            use_multi_level_bom: 0, docstatus: 1,
+            use_multi_level_bom: 0,
           });
+          const woDoc = await this.insert('Work Order', { ...wo, docstatus: 1 });
           out.push(this.doc('Work Order', woDoc, 'submitted', opt));
           created.push(['Work Order', woDoc.name]);
         }
@@ -203,6 +204,24 @@ class ERP {
       items: rows.map((r) => ({ item_code: r.item_code, qty: r.qty, schedule_date: r.schedule_date,
         warehouse: r.uom === 'Kg' || r.item_code.startsWith('RM-') ? WH.raw : WH.purchased })),
     });
+  }
+
+  // 与 ERPNext 网页上选 BOM 时一样：请 ERPNext 从 BOM 带出工序和所需物料（get_items_and_operations_from_bom）。
+  // 工单里没有工序，ERPNext 提交时就不会生成作业卡（第 3 轮真 ERPNext 演练发现）
+  async withBomOperations(wo) {
+    const r = await this.req('POST', '/api/method/run_doc_method', {
+      docs: JSON.stringify({ doctype: 'Work Order', __islocal: 1, ...wo }), method: 'get_items_and_operations_from_bom',
+    });
+    const full = ((r && r.docs) || [])[0];
+    if (!full || !(full.operations || []).length) {
+      throw new Error(`工单 ${wo.production_item}：从 BOM ${wo.bom_no} 带不出工序`);
+    }
+    const drop = ['name', 'owner', 'creation', 'modified', 'modified_by', '__islocal', '__unsaved', '__onload', 'idx',
+      'parent', 'parenttype', 'parentfield', 'docstatus'];
+    const clean = (o) => Object.fromEntries(Object.entries(o).filter(([k, v]) => !drop.includes(k) && v !== null));
+    const out = clean(full);
+    for (const k of ['operations', 'required_items']) if (Array.isArray(full[k])) out[k] = full[k].map(clean);
+    return out;
   }
 
   async defaultBom(item) {

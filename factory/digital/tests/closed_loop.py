@@ -181,7 +181,7 @@ def main():
     print("6. 核对{} ERPNext".format("真实" if REAL else "模拟"))
     jcs = [j for j in erp_docs("Job Card") if j["work_order"] == wo]
     check(len(jcs) == 7 and all(j["docstatus"] == 1 for j in jcs), "7 张作业卡全部提交")
-    check(all(j["total_completed_qty"] == 10 for j in jcs), "每张作业卡完成 10 件")
+    check(len(jcs) == 7 and all(j["total_completed_qty"] == 10 for j in jcs), "每张作业卡完成 10 件（{} 张）".format(len(jcs)))
     qis = [q for q in erp_docs("Quality Inspection") if any(q["reference_name"] == j["name"] for j in jcs)]
     check(len(qis) == 10, "每件一张质量检验单（{} 张）".format(len(qis)))
     good = sum(1 for q in qis if q["status"] == "Accepted")

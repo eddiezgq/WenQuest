@@ -189,18 +189,16 @@ class Mock:
             if not doc.get("skip_transfer") and not doc.get("wip_warehouse"):
                 raise Err(417, "ValidationError", "需要在制品仓库 wip_warehouse")
             doc.update(status="Not Started", produced_qty=0)
-            doc["operations"] = []
-            for op in bom["operations"]:
-                doc["operations"].append({"operation": op["operation"], "workstation": op["workstation"],
-                                          "time_in_mins": op["time_in_mins"] * float(doc["qty"]), "status": "Pending",
-                                          "completed_qty": 0})
+            # 与真 ERPNext 一样：只按工单里的工序生成作业卡；工单没带工序（没先从 BOM 带出）就没有作业卡
+            for i, op in enumerate(doc.get("operations") or []):
                 jc = self.put("Job Card", {"name": self.name_for("Job Card", {}), "work_order": doc["name"],
                                            "operation": op["operation"], "workstation": op["workstation"],
                                            "company": doc["company"], "for_quantity": float(doc["qty"]),
                                            "production_item": doc["production_item"], "status": "Open",
                                            "time_logs": [], "total_completed_qty": 0, "total_time_in_mins": 0,
-                                           "sequence_id": op["idx"]})
+                                           "sequence_id": op.get("sequence_id") or i + 1})
                 self.log.append(("create", "Job Card", jc["name"]))
+
         elif dt_ == "Job Card":
             if doc["total_completed_qty"] <= 0:
                 raise Err(417, "ValidationError", "作业卡 {} 完成数量为 0，不能提交".format(doc["name"]))
@@ -262,6 +260,18 @@ class Mock:
         doc["total_time_in_mins"] = round(tot_t, 3)
         if doc.get("docstatus", 0) == 0 and tot_q > 0:
             doc["status"] = "Work In Progress"
+
+    def bom_operations(self, doc):
+        """get_items_and_operations_from_bom：按 BOM 填工单的工序（与 ERPNext 同名字段）。"""
+        bom = self.db["BOM"].get(doc.get("bom_no"))
+        if not bom:
+            raise Err(417, "ValidationError", "BOM {} 不存在".format(doc.get("bom_no")))
+        doc["operations"] = [{"operation": op["operation"], "workstation": op["workstation"], "bom": bom["name"],
+                              "time_in_mins": op["time_in_mins"] * float(doc.get("qty") or 1), "status": "Pending",
+                              "completed_qty": 0, "sequence_id": op.get("idx") or i + 1,
+                              "quality_inspection_required": op.get("quality_inspection_required", 0)}
+                             for i, op in enumerate(bom["operations"])]
+        return doc
 
     def make_stock_entry(self, work_order_id, purpose, qty):
         wo = self.db["Work Order"].get(work_order_id)
@@ -343,6 +353,14 @@ def login():
 @app.get("/api/method/frappe.auth.get_logged_user")
 def logged():
     return {"message": "Administrator"}
+
+
+@app.post("/api/method/run_doc_method")
+def run_doc_method(body: dict = Body(...)):
+    doc = json.loads(body["docs"]) if isinstance(body.get("docs"), str) else body.get("docs")
+    if body.get("method") != "get_items_and_operations_from_bom" or doc.get("doctype") != "Work Order":
+        raise Err(417, "ValidationError", "模拟 ERPNext 不支持 {}".format(body.get("method")))
+    return {"docs": [M.bom_operations(doc)], "message": None}
 
 
 @app.post("/api/method/erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry")
