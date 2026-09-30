@@ -116,6 +116,9 @@
                 <view class="f-name">
                   <text class="fname">{{ f.id === p.materials.textbook ? "★ " : "" }}{{ f.path }}</text>
                   <text class="fsub">{{ size(f.size) }}<text v-if="f.pages"> · {{ f.pages }} {{ t("studio.pages") }}</text><text v-if="f.ocr"> · {{ t("studio.ocrPages", { n: f.ocr }) }}</text><text v-if="f.title"> · {{ f.title }}</text></text>
+                  <text v-if="f.id === p.materials.textbook" class="freread" :class="{ disabled: !!p.busy }" @click="reread">
+                    ↻ {{ t("studio.reread") }}<text v-if="p.toc.length" class="fsub"> · {{ t("studio.tocChapters", { n: p.toc.length }) }}</text>
+                  </text>
                   <text v-if="f.error" class="ferr">{{ t("studio.fileError." + f.error) }}</text>
                   <text v-else-if="f.confidence === 'low'" class="fwarn">{{ t("studio.lowConfidence") }}<text v-if="f.note">：{{ f.note }}</text></text>
                 </view>
@@ -157,6 +160,11 @@
             <view v-if="!ed" class="empty">{{ t("studio.noOutline") }}</view>
             <template v-else>
               <input class="o-title" v-model="ed.title[lang]" :disabled="p.stage === 'lessons'" @input="dirty = true" />
+              <view v-if="!p.design_book" class="dbook empty-book">
+                <text class="h3">{{ t("studio.designBook") }}</text>
+                <text class="note">{{ t("studio.noDesignBook") }}</text>
+                <view class="primary small" :class="{ disabled: !!p.busy }" @click="makeBook">{{ t("studio.makeDesignBook") }}</view>
+              </view>
               <view v-if="p.design_book" class="dbook">
                 <view class="dbook-head">
                   <text class="h3">{{ t("studio.designBook") }}</text>
@@ -694,6 +702,12 @@ async function upload(list: Picked[]) {
   // Once the materials were read, the librarian sorts the new files at once (before that, "start" reads them all).
   try { take(await api.studioFilesDone(id.value)); } catch { await load(); }
 }
+function reread() {
+  act(() => api.studioRereadTextbook(id.value));
+}
+function makeBook() {
+  act(() => api.studioMakeDesignBook(id.value));
+}
 function setTextbook(fid: string) {
   if (fid === p.value?.materials.textbook) return;
   act(() => api.studioMaterials(id.value, [], fid));
@@ -896,6 +910,9 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .mtools.over { border-color: var(--wq-link); background: #eef6f9; }
 .mt-btn { color: var(--wq-link); cursor: pointer; font-size: 14px; font-weight: 600; }
 .mt-btn.right { margin-left: auto; }
+.freread { font-size: 12px; color: var(--wq-link); cursor: pointer; margin-top: 2px; }
+.freread.disabled { opacity: 0.45; pointer-events: none; }
+.empty-book { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
 .f-act { width: 80px; display: flex; gap: 10px; justify-content: flex-end; }
 .fa { cursor: pointer; color: var(--wq-link); font-size: 15px; }
 .fa.del { color: var(--wq-muted); }

@@ -31,5 +31,15 @@ function xmldb_local_wenquest_upgrade($oldversion) {
         }
         upgrade_plugin_savepoint(true, 2026092900, 'local', 'wenquest');
     }
+    if ($oldversion < 2026093000) {
+        $table = new xmldb_table('local_wenquest_trash');
+        if (!$dbman->table_exists($table)) {
+            $dbman->install_one_table_from_xmldb_file(__DIR__ . '/install.xml', 'local_wenquest_trash');
+        }
+        // Deleted courses go to the recycle bin and stay there until someone deletes them for good.
+        set_config('categorybinenable', 1, 'tool_recyclebin');
+        set_config('categorybinexpiry', 0, 'tool_recyclebin');
+        upgrade_plugin_savepoint(true, 2026093000, 'local', 'wenquest');
+    }
     return true;
 }

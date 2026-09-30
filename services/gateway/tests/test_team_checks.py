@@ -164,3 +164,23 @@ def test_every_lesson_has_a_checklist(client):
     keys = [c["key"] for c in les["checklist"]]
     assert keys[:2] == ["textbook", "problem"] and keys[-2:] == ["numbers", "bilingual"]
     assert all(c["by"] in ("ai", "auto+ai") for c in les["checklist"])
+
+
+def test_older_projects_can_get_a_design_book_and_reread_the_textbook(client):
+    h = login(client)
+    pid, p = _write_first_lesson(client, h)
+    studio = main._studio()
+    proj = studio.projects.load(pid)
+    proj.pop("design_book")          # planned before the design book existed
+    studio.projects.save(proj)
+    r = client.post(f"/api/v1/studio/projects/{pid}/design-book", headers=h)
+    assert r.status_code == 200
+    p = settle(client, h, pid)
+    assert p["design_book"]["platform"] and "设计书" in p["messages"][-1]["text"]
+    r = client.post(f"/api/v1/studio/projects/{pid}/textbook/reread", headers=h)
+    if p["materials"].get("textbook"):
+        assert r.status_code == 200
+        p = settle(client, h, pid)
+        assert "目录" in p["messages"][-1]["text"]
+    else:
+        assert r.status_code == 409

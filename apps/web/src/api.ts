@@ -23,6 +23,8 @@ export interface Course {
   summary: string;
   image: string | null;
   progress: number | null;
+  /** 已下架: only its teachers still get it in the list */
+  hidden?: boolean;
 }
 export type FileKind = "video" | "pdf" | "slides" | "lab" | "doc" | "sheet" | "image" | "audio" | "file";
 export interface ModuleFile { name: string; size: number; mimetype: string; kind: FileKind }
@@ -55,6 +57,8 @@ export interface CourseInfo {
   start: number | null;
   end: number | null;
   role: "teacher" | "student";
+  /** false = 已下架 (students do not see the course) */
+  visible?: boolean;
   classic_url: string;
 }
 export interface Activity {
@@ -337,6 +341,8 @@ export const api = {
     request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/materials`, { files, textbook }),
   studioApproveMaterials: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-materials`, {}),
   studioRedoAnimation: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/animation`),
+  studioMakeDesignBook: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/design-book`),
+  studioRereadTextbook: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/textbook/reread`),
   studioDesignBook: (id: string, book: Partial<DesignBook>) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/design-book`, book),
   studioOutline: (id: string, outline: StudioOutline) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/outline`, outline),
   studioApproveOutline: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-outline`, {}, 300000),

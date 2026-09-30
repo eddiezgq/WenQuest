@@ -22,3 +22,8 @@ $string['emptycourse'] = 'A course needs at least one section.';
 $string['sectionnotempty'] = 'This section still has activities; delete them too or move them first.';
 $string['wenquest:manageaccounts'] = 'Manage WenQuest accounts (sign-up, teacher approval)';
 $string['emailexists'] = 'An account with this email already exists.';
+
+$string['coursevisible'] = 'Take the course down (hide it from students) before deleting it.';
+$string['nobin'] = 'The recycle bin did not keep this course.';
+$string['restorefailed'] = 'The course could not be restored.';
+$string['backupfailed'] = 'The backup could not be made.';

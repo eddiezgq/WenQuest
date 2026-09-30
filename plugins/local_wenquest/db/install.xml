@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/wenquest/db" VERSION="2026092900" COMMENT="WenQuest tables"
+<XMLDB PATH="local/wenquest/db" VERSION="2026093000" COMMENT="WenQuest tables"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
@@ -24,6 +24,26 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="coursetime" UNIQUE="false" FIELDS="courseid, timestart"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_wenquest_trash" COMMENT="Courses deleted into the recycle bin: who taught them, so they can find and restore them">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="binid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="tool_recyclebin_category id"/>
+        <FIELD NAME="oldcourseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="fullname" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="shortname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="teachers" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT=",id,id, of users who may restore it"/>
+        <FIELD NAME="deletedby" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="filesize" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="binid" UNIQUE="true" FIELDS="binid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

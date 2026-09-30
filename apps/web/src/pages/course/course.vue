@@ -7,6 +7,22 @@
     </view>
 
     <template v-else-if="d">
+      <!-- 下架 / course life: teachers only -->
+      <view v-if="isTeacher(d) && d.info.visible === false" class="life down">
+        <text class="lf-t">{{ t("life.isDown") }}</text>
+        <view class="lf-acts">
+          <view class="lf-btn primary" :class="{ disabled: lifeBusy }" @click="reopen">{{ t("life.reopen") }}</view>
+          <view class="lf-btn" @click="askExport">↓ {{ t("life.download") }}</view>
+          <view class="lf-btn danger" :class="{ disabled: lifeBusy }" @click="removeCourse">{{ t("life.delete") }}</view>
+        </view>
+      </view>
+      <view v-else-if="isTeacher(d) && tab === 'home'" class="life">
+        <text class="lf-t muted">{{ t("life.manage") }}</text>
+        <view class="lf-acts">
+          <view class="lf-btn" :class="{ disabled: lifeBusy }" @click="takedown">{{ t("life.takedown") }}</view>
+          <view class="lf-btn" @click="askExport">↓ {{ t("life.download") }}</view>
+        </view>
+      </view>
       <!-- ================= Home ================= -->
       <view v-if="tab === 'home'" class="home">
         <view class="banner">
@@ -168,6 +184,7 @@ import People from "../../components/course/People.vue";
 import Grades from "../../components/course/Grades.vue";
 import Calendar from "../../components/course/Calendar.vue";
 import CourseEditor from "../../components/course/CourseEditor.vue";
+import { confirmAction, lifeApi } from "../../courseApi";
 import { absolute, ApiError, type Section, token } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 import {
@@ -183,6 +200,56 @@ const tab = ref("home");
 const forumCmid = ref(0);
 const editing = ref(false);
 const d = ref<CourseData | null>(null);
+const lifeBusy = ref(false);
+
+// --- course life: 下架 / 重新开课 / 删除 / 下载 -----------------------------------------------------
+async function lifeDo(fn: () => Promise<unknown>, done: string) {
+  lifeBusy.value = true;
+  try {
+    await fn();
+    uni.showToast({ title: done, icon: "none" });
+    await load(true);
+  } catch (e) {
+    uni.showToast({ title: errorText(e instanceof ApiError ? e.code : "unknown"), icon: "none" });
+  } finally {
+    lifeBusy.value = false;
+  }
+}
+async function takedown() {
+  if (await confirmAction(t("life.takedownAsk"), t("life.takedown"), t("common.cancel"))) {
+    await lifeDo(() => lifeApi.takedown(id.value), t("life.takenDown"));
+  }
+}
+async function reopen() {
+  await lifeDo(() => lifeApi.reopen(id.value), t("life.reopened"));
+}
+async function removeCourse() {
+  if (!(await confirmAction(t("life.deleteAsk"), t("life.delete"), t("common.cancel")))) return;
+  lifeBusy.value = true;
+  try {
+    await lifeApi.remove(id.value);
+    uni.showToast({ title: t("life.deleted"), icon: "none" });
+    uni.redirectTo({ url: "/pages/trash/trash" });
+  } catch (e) {
+    uni.showToast({ title: errorText(e instanceof ApiError ? e.code : "unknown"), icon: "none" });
+  } finally {
+    lifeBusy.value = false;
+  }
+}
+function askExport() {
+  uni.showActionSheet({
+    itemList: [t("life.kindBackupLong"), t("life.kindFilesLong")],
+    success: async (r) => {
+      try {
+        await lifeApi.exportCourse(id.value, r.tapIndex === 0 ? "backup" : "files");
+        uni.showToast({ title: t("life.packingStarted"), icon: "none" });
+        uni.navigateTo({ url: "/pages/trash/trash" });
+      } catch (e) {
+        uni.showToast({ title: errorText(e instanceof ApiError ? e.code : "unknown"), icon: "none" });
+      }
+    },
+  });
+}
 const loading = ref(true);
 const error = ref("");
 const open = ref<Record<number, boolean>>({});
@@ -405,4 +472,13 @@ watch(studentPreview, () => { open.value = {}; });
   .c-text { flex: 1; min-height: 0; font-size: 12px; }
   .c-btn { display: none; }
 }
+.life { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.life.down { background: #eef0f2; border: 1px solid #d5d9de; border-radius: 8px; padding: 10px 14px; }
+.lf-t { font-size: 14px; font-weight: 600; color: #4a5560; }
+.lf-t.muted { font-weight: 400; color: #889; font-size: 13px; }
+.lf-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.lf-btn { border: 1px solid var(--wq-line); border-radius: 6px; padding: 4px 12px; font-size: 13px; background: #fff; cursor: pointer; }
+.lf-btn.primary { background: var(--wq-accent, #1f5f8b); color: #fff; border-color: transparent; }
+.lf-btn.danger { color: #b42318; border-color: #f3b4b4; }
+.lf-btn.disabled { opacity: 0.45; pointer-events: none; }
 </style>

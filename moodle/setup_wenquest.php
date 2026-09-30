@@ -47,6 +47,9 @@ set_config('filterall', 1);
 
 // People sign in with their email as well as their user name.
 set_config('authloginviaemail', 1);
+// Deleted courses go to the recycle bin and stay there until someone deletes them for good (round 3).
+set_config('categorybinenable', 1, 'tool_recyclebin');
+set_config('categorybinexpiry', 0, 'tool_recyclebin');
 // The same password rule as WenQuest's sign-up page: at least 8 characters with letters and digits
 // (the gateway checks the letters; Moodle's policy cannot express "any letter").
 set_config('passwordpolicy', 1);

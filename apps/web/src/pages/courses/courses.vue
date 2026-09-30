@@ -5,7 +5,11 @@
         <text class="hello">{{ all ? t("shell.courses") : t("dash.hello", { name: firstName }) }}</text>
         <text class="date">{{ today }}</text>
       </view>
-      <view v-if="user && user.can_create_courses" class="create" @click="create">✦ {{ t("create.button") }}</view>
+      <view class="head-acts">
+        <text v-if="all && (courses.some((c) => c.hidden) || (user && user.can_create_courses))" class="trash-link"
+              @click="go('/pages/trash/trash')">{{ t("life.title") }}</text>
+        <view v-if="user && user.can_create_courses" class="create" @click="create">✦ {{ t("create.button") }}</view>
+      </view>
     </view>
 
     <!-- teacher application waiting for approval (step C) -->
@@ -31,7 +35,7 @@
           <text v-else class="code">{{ c.shortname }}</text>
         </view>
         <view class="body">
-          <text class="name">{{ c.name }}</text>
+          <text class="name">{{ c.name }}<text v-if="c.hidden" class="down">{{ t("life.downTag") }}</text></text>
           <text class="summary">{{ c.summary }}</text>
           <view v-if="c.progress !== null && c.progress !== undefined" class="progress">
             <view class="bar"><view class="fill" :style="{ width: Math.round(c.progress) + '%' }" /></view>
@@ -154,4 +158,7 @@ watch(locale, () => { load(); api.me().catch(() => {}); });
 .todo-b { font-size: 12px; background: #fff3d6; color: #7a5a00; padding: 1px 8px; border-radius: 999px; }
 .panel.ai { background: #fffaf0; border-color: #f1dfae; }
 .ph { display: block; font-weight: 600; color: var(--wq-ink); margin-bottom: 6px; padding-bottom: 8px; border-bottom: 1px solid var(--wq-line); }
+.head-acts { display: flex; align-items: center; gap: 14px; }
+.trash-link { color: var(--wq-link, #1f5f8b); font-size: 14px; cursor: pointer; }
+.down { margin-left: 8px; font-size: 12px; font-weight: 400; color: #4a5560; background: #eef0f2; border-radius: 10px; padding: 1px 8px; }
 </style>

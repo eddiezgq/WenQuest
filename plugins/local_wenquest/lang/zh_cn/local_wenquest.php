@@ -22,3 +22,8 @@ $string['emptycourse'] = '课程至少需要一个章节。';
 $string['sectionnotempty'] = '这一章里还有内容，请先移走或一并删除。';
 $string['wenquest:manageaccounts'] = '管理问渠账号（注册、教师审核）';
 $string['emailexists'] = '这个邮箱已经注册过了。';
+
+$string['coursevisible'] = '请先下架这门课（对学生隐藏），再删除。';
+$string['nobin'] = '回收站里没有找到这门课。';
+$string['restorefailed'] = '课程没能恢复。';
+$string['backupfailed'] = '备份没能做成。';

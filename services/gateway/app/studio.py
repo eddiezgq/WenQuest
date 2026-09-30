@@ -104,6 +104,11 @@ class Projects:
         tmp.write_text(json.dumps(proj, ensure_ascii=False))
         tmp.replace(p)
 
+    def remove(self, pid: str) -> None:
+        """Delete a project with all its materials and lesson files."""
+        import shutil
+        shutil.rmtree(self.path(pid).parent, ignore_errors=True)
+
     def all(self) -> list[dict]:
         out = []
         for d in self.root.iterdir():
@@ -467,6 +472,26 @@ class Studio:
                                          "options": [m.name for m in cands] + ["资料里没有这本书，先不用教材"],
                                          "status": "open", "answer": "", "stage": proj["stage"]})
         return text + "（请在“待回答的问题”里选，或把这本书上传到资料清单。）"
+
+    async def reread_contents(self, proj: dict) -> None:
+        """重新读目录: scanned files not recognised yet are read first, then the main textbook's contents again."""
+        await self.read_scanned(proj)
+        proj["materials"]["toc"] = []
+        await self.read_contents(proj)
+        toc = proj["materials"].get("toc") or []
+        if toc:
+            text = f"主教材的目录重新读好了：{len(toc)} 章。"
+        elif not pages_of(self.text(proj, proj["materials"]["textbook"])):
+            text = ("这个主教材文件没有页码（例如 Word 文件），没法按页读目录；写课时会按章节标题去找内容。"
+                    "如果有这本书的 PDF 版，上传后点 ☆ 设为主教材效果更好。")
+        else:
+            text = "主教材还是没读出目录（可能目录页不清楚或不在前 40 页）。可以换一个版本的文件，或在对话里告诉我各章的起始页。"
+        self.say(proj, text, "lead")
+
+    async def design_book_now(self, proj: dict) -> None:
+        """生成课程设计书 for a project planned before the design book existed."""
+        await self.make_design_book(proj)
+        self.say(proj, "《课程设计书》写好了，在“大纲与日历”里，请看一下、需要就改；之后写的课都照它来。", "lead")
 
     async def read_contents(self, proj: dict) -> None:
         """Read the main textbook's table of contents and find where each section starts."""

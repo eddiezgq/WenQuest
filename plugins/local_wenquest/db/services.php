@@ -87,6 +87,12 @@ $functions = [
         'type'         => 'write',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_wenquest_course_life' => [
+        'classname'    => \local_wenquest\external\course_life::class,
+        'description'  => 'Delete a course into the recycle bin, list, restore or delete it for good, or make a backup file.',
+        'type'         => 'write',
+        'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
     'local_wenquest_get_quiz' => [
         'classname'    => \local_wenquest\external\get_quiz::class,
         'description'  => 'A quiz with its questions, for editing in WenQuest.',

@@ -288,3 +288,26 @@ export function uploadToSection(cid: number, section: number, file: Picked, name
 
 /** Display text of a Bi in the current language. */
 export const biText = (b: Bi | undefined, lang: string) => (b ? (b.text ?? (lang === "en" ? b.en || b.zh : b.zh || b.en) ?? "") : "");
+
+// ------------------------------------------------------------------ course life: 下架, recycle bin, downloads
+
+export interface TrashItem {
+  binid: number; oldcourseid: number; name: string; shortname: string; deletedby: string; filesize: number; timecreated: number;
+  projects: { id: string; title: string }[];
+}
+export interface ExportJob {
+  id: string; kind: "backup" | "files"; name: string; courseid: number; binid: number;
+  status: "running" | "done" | "failed"; file: string; size: number; error: string; created: number; url: string;
+}
+export const lifeApi = {
+  takedown: (cid: number) => request<{ ok: boolean }>("POST", `/api/v1/courses/${cid}/takedown`),
+  reopen: (cid: number) => request<{ ok: boolean }>("POST", `/api/v1/courses/${cid}/reopen`),
+  remove: (cid: number) => request<{ ok: boolean; binid: number }>("DELETE", `/api/v1/courses/${cid}`),
+  trash: () => request<{ items: TrashItem[] }>("GET", "/api/v1/trash"),
+  restore: (bid: number) => request<{ ok: boolean; courseid: number }>("POST", `/api/v1/trash/${bid}/restore`),
+  purge: (bid: number, deleteProject: boolean) =>
+    request<{ ok: boolean; deleted_projects: string[] }>("DELETE", `/api/v1/trash/${bid}?delete_project=${deleteProject}`),
+  exportCourse: (cid: number, kind: "backup" | "files") => request<ExportJob>("POST", `/api/v1/courses/${cid}/exports`, { kind }),
+  exportBin: (bid: number) => request<ExportJob>("POST", `/api/v1/trash/${bid}/exports`),
+  exports: () => request<{ exports: ExportJob[] }>("GET", "/api/v1/exports"),
+};

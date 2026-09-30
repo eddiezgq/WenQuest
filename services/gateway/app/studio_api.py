@@ -339,6 +339,27 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         studio().projects.save(proj)
         return view(proj)
 
+    @app.post("/api/v1/studio/projects/{pid}/design-book")
+    async def make_design_book(pid: str, sess: Annotated[Session, Depends(current)]):
+        """生成课程设计书 (projects planned before the design book existed; or to write it again)."""
+        proj = load(pid, sess)
+        if not proj.get("outline"):
+            raise EngineError("wrong_stage", "no outline yet", 409)
+        if (proj.get("design_book") or {}).get("by") == "teacher":
+            proj["design_book"]["by"] = "ai"   # asked for a new one: the AI may write it again
+        proj.pop("design_book", None)
+        studio().run(proj, "课程设计师正在写《课程设计书》…", studio().design_book_now)
+        return view(studio().projects.load(pid))
+
+    @app.post("/api/v1/studio/projects/{pid}/textbook/reread")
+    async def reread_textbook(pid: str, sess: Annotated[Session, Depends(current)]):
+        """重新读目录 of the main textbook (scanned ones are recognised first)."""
+        proj = load(pid, sess)
+        if not proj["materials"].get("textbook"):
+            raise EngineError("no_textbook", "choose the main textbook first", 409)
+        studio().run(proj, "资料馆员正在重新读主教材的目录…", studio().reread_contents)
+        return view(studio().projects.load(pid))
+
     @app.put("/api/v1/studio/projects/{pid}/design-book")
     async def edit_design_book(pid: str, body: dict, sess: Annotated[Session, Depends(current)]):
         """The teacher corrects the course design book; every later lesson, animation and lab follows it."""

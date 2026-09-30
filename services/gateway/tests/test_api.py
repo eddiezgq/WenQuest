@@ -122,7 +122,9 @@ def test_requires_login(client):
 def test_courses_language_and_hidden(client):
     h = login(client)
     zh = client.get("/api/v1/courses", headers=h).json()["courses"]
-    assert [c["name"] for c in zh] == ["机器人学导论"]
+    # a course taken down (下架) is listed only when Moodle returns it (to its teachers), marked hidden
+    assert [c["name"] for c in zh if not c["hidden"]] == ["机器人学导论"]
+    assert all(c["hidden"] for c in zh if c["name"] != "机器人学导论")
     assert zh[0]["summary"] == "简介"
     assert zh[0]["image"].startswith("/api/v1/files/")
     en = client.get("/api/v1/courses?lang=en", headers=h).json()["courses"]

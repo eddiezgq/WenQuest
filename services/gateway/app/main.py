@@ -24,6 +24,7 @@ from . import content
 from . import course_api
 from . import edit_api
 from . import learn_api
+from . import life_api
 from . import course_builder as cb
 from . import generate as gen
 from . import materials as mt
@@ -108,6 +109,7 @@ def create_app() -> FastAPI:
     course_api.register(app, sys.modules[__name__])
     learn_api.register(app, sys.modules[__name__])
     edit_api.register(app, sys.modules[__name__])
+    life_api.register(app, sys.modules[__name__])
     return app
 
 
@@ -252,8 +254,8 @@ def register(app: FastAPI) -> None:
         rows = await state.moodle.user_courses(sess.moodle_token, sess.user_id, lg)
         out = []
         for c in rows:
-            if not c.get("visible", 1):
-                continue
+            # A course taken down (下架) is only listed for its teachers (Moodle does not return it to students).
+            hidden = not c.get("visible", 1)
             # Only a picture the teacher uploaded; Moodle's generated pattern is replaced by our own art.
             image = proxied(_course_image(c), sess.moodle_token)
             out.append({
@@ -264,6 +266,7 @@ def register(app: FastAPI) -> None:
                 "image": image,
                 "progress": c.get("progress"),
                 "lastaccess": c.get("lastaccess"),
+                "hidden": hidden,
             })
         out.sort(key=lambda c: -(c["lastaccess"] or 0))
         return {"courses": out}
@@ -289,6 +292,7 @@ def register(app: FastAPI) -> None:
             "start": c.get("startdate") or None,
             "end": c.get("enddate") or None,
             "role": "teacher" if teacher else "student",
+            "visible": bool(c.get("visible", 1)),
             "classic_url": f"{state.settings.moodle_url.rstrip('/')}/course/view.php?id={courseid}",
         }
 

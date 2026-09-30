@@ -152,6 +152,15 @@
           "titleNView": false
         }
       }
+    },
+    {
+      "path": "pages/trash/trash",
+      "style": {
+        "navigationBarTitleText": "回收站与下载",
+        "h5": {
+          "titleNView": false
+        }
+      }
     }
   ],
   "globalStyle": {
