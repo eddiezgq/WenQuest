@@ -221,9 +221,10 @@ class ERP {
     const clean = (o) => Object.fromEntries(Object.entries(o).filter(([k, v]) => !drop.includes(k) && v !== null));
     const out = clean(full);
     for (const k of ['operations', 'required_items']) if (Array.isArray(full[k])) out[k] = full[k].map(clean);
-    // 去掉工序顺序号：ERPNext 带顺序号时要求前一道工序的作业卡提交后，后一道才能记完工数；
-    // 车间是流水作业（一件做完就进下一道），逐件报工会被拒（第 3 轮真 ERPNext 演练发现）
-    out.operations = out.operations.map((o) => ({ ...o, sequence_id: 0 }));
+    // 工序顺序号全部设为 1（ERPNext 允许相同顺序号，表示可并行）。顺序号不同时，ERPNext 要求前一道工序的
+    // 作业卡提交后后一道才能记完工数；车间是流水作业（一件做完就进下一道），逐件报工会被拒。
+    // 顺序号留空也不行：ERPNext 会自动按行号编成 1、2、3…（第 3 轮真 ERPNext 演练发现）
+    out.operations = out.operations.map((o) => ({ ...o, sequence_id: 1 }));
     return out;
   }
 

@@ -190,7 +190,11 @@ class Mock:
                 raise Err(417, "ValidationError", "需要在制品仓库 wip_warehouse")
             doc.update(status="Not Started", produced_qty=0)
             # 与真 ERPNext 一样：只按工单里的工序生成作业卡；工单没带工序（没先从 BOM 带出）就没有作业卡
-            for i, op in enumerate(doc.get("operations") or []):
+            ops = doc.get("operations") or []
+            if ops and not any(o.get("sequence_id") for o in ops):     # validate_operations_sequence：全空按行号编
+                for i, o in enumerate(ops):
+                    o["sequence_id"] = i + 1
+            for i, op in enumerate(ops):
                 jc = self.put("Job Card", {"name": self.name_for("Job Card", {}), "work_order": doc["name"],
                                            "operation": op["operation"], "workstation": op["workstation"],
                                            "company": doc["company"], "for_quantity": float(doc["qty"]),
