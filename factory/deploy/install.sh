@@ -51,7 +51,7 @@ if [ "$setup" != "true" ] && [ "$setup" != "True" ] && [ "$setup" != "1" ]; then
     log "完成 ERPNext 设置向导（公司：问渠减速器厂 WenQuest Gearbox，缩写 WQ）..."
     year=$(date +%Y)
     bench_exec frappe.desk.page.setup_wizard.setup_wizard.initialize_system_settings_and_user --kwargs \
-        "{'system_settings_data': {'language': 'English', 'country': 'United States', 'currency': 'USD', 'time_zone': 'America/New_York'}, 'user_data': {}}"
+        "{'system_settings_data': {'language': 'en', 'country': 'United States', 'currency': 'USD', 'time_zone': 'America/New_York'}, 'user_data': {}}"
     bench_exec frappe.desk.page.setup_wizard.setup_wizard.setup_complete --kwargs \
         "{'args': {'language': 'English', 'country': 'United States', 'timezone': 'America/New_York', 'currency': 'USD',
           'company_name': '问渠减速器厂 WenQuest Gearbox', 'company_abbr': 'WQ', 'chart_of_accounts': 'Standard',
