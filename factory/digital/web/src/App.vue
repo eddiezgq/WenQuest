@@ -15,6 +15,10 @@
         <router-link v-if="session.user?.mode === 'teach'" to="/teach" class="nav">实验 7 · 任务</router-link>
       </div>
       <div class="group">
+        <span class="group-title">资源</span>
+        <router-link to="/library" class="nav">零件与机器人库</router-link>
+      </div>
+      <div class="group">
         <span class="group-title">专业软件</span>
         <a v-for="a in apps" :key="a.name" :href="a.href" :target="a.ext ? '_blank' : null" class="app"
           @click="a.route && ($event.preventDefault(), router.push(a.route))">
@@ -80,7 +84,7 @@ const apps = computed(() => [
 ].filter((a) => a.name !== 'Node-RED' || cfg.value.nodered_url));   // 线上 Node-RED 不对外（第 3 轮 D8）
 const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
-  '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线',
+  '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
 }[route.path] || ''));
 const clock = ref('');
 let timer;

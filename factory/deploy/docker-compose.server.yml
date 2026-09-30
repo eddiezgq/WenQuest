@@ -75,8 +75,12 @@ services:
       WQ_NODERED_URL: ""
       WQ_AI_PER_HOUR: ${WQ_AI_PER_HOUR:-30}
       WQ_HISTORY_DAYS: ${WQ_HISTORY_DAYS:-30}
+      WQ_LIBRARY_DIR: /library
+      WQ_LIBRARY_ORIGINS: https://learn.${SITE_DOMAIN},https://factory.${SITE_DOMAIN}
       WQ_CLAUDE_KEY: ${WQ_CLAUDE_KEY:-}
       WQ_CLAUDE_MODEL: ${WQ_CLAUDE_MODEL:-claude-sonnet-5}
+    volumes:
+      - ./library:/library:ro            # 零件库文件（library.yml 发布时解包进来）
     depends_on:
       db: { condition: service_healthy }
       bus: { condition: service_started }

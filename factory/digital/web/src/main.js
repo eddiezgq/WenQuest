@@ -15,6 +15,7 @@ const routes = [
   { path: '/3d', component: () => import('./pages/Factory3D.vue') },
   { path: '/teach', component: () => import('./pages/Teach.vue') },
   { path: '/bus', component: () => import('./pages/BusView.vue') },
+  { path: '/library', component: () => import('./pages/Library.vue') },
   { path: '/:p(.*)*', redirect: '/' },
 ];
 

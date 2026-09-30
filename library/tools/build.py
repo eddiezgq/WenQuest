@@ -184,6 +184,7 @@ def main(argv=None):
     ap.add_argument("--limit", type=int, default=0, help="每个条目最多造几个规格（本地试跑用）")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 2)
     ap.add_argument("--no-cad", action="store_true", help="不出 STEP/STL")
+    ap.add_argument("--robot-jobs", type=int, default=2, help="机器人同时生成几个（每个要 1～2 GB 内存）")
     a = ap.parse_args(argv)
 
     out = Path(a.out)
@@ -199,19 +200,28 @@ def main(argv=None):
             keep = [r for r in rows if str(r["size"]) == str(e.get("default"))]
             rows = keep + [r for r in rows if r not in keep][: max(0, a.limit - len(keep))]
         for r in rows:
-            jobs.append((e["_dir"], r["size"]))
+            jobs.append((e["_dir"], r["size"], e["kind"] == "robot"))
 
     results = {}
     t0 = time.time()
-    with ProcessPoolExecutor(max_workers=a.jobs) as ex:
-        futs = [ex.submit(build_variant, str(d), s, str(ver_dir), str(cad_dir) if cad_dir else None) for d, s in jobs]
-        for i, f in enumerate(as_completed(futs), 1):
-            r = f.result()
-            results[r["ref"]] = r
-            if not r["ok"]:
-                print("  失败 {}：{}".format(r["ref"], r["error"]), flush=True)
-            if i % 50 == 0:
-                print("  {}/{}（{:.0f} 秒）".format(i, len(jobs), time.time() - t0), flush=True)
+    done = 0
+    # 标准件按 --jobs 并行；机器人每个要 1～2 GB 内存：每批 --robot-jobs 个，一批一个新进程池（用完释放内存）。
+    # 不用 max_tasks_per_child：Python 3.11/3.12 的进程池用它会卡住（gh-115634）
+    std = [(d, s) for d, s, r in jobs if not r]
+    rob = [(d, s) for d, s, r in jobs if r]
+    rj = max(1, min(a.jobs, a.robot_jobs))
+    batches = ([(std, a.jobs)] if std else []) + [(rob[i:i + rj], rj) for i in range(0, len(rob), rj)]
+    for part, workers in batches:
+        with ProcessPoolExecutor(max_workers=workers) as ex:
+            futs = [ex.submit(build_variant, str(d), s, str(ver_dir), str(cad_dir) if cad_dir else None) for d, s in part]
+            for f in as_completed(futs):
+                r = f.result()
+                results[r["ref"]] = r
+                done += 1
+                if not r["ok"]:
+                    print("  失败 {}：{}".format(r["ref"], r["error"]), flush=True)
+                if done % 50 == 0:
+                    print("  {}/{}（{:.0f} 秒）".format(done, len(jobs), time.time() - t0), flush=True)
 
     items = []
     for e in ents:
@@ -228,12 +238,23 @@ def main(argv=None):
                           "tags": e.get("tags", []), "standards": [x["code"] for x in e.get("standards") or []],
                           "params": key_params(e, dict(s["params"], size=s["size"])),
                           "license": e["source"]["license"], "erp_items": erp.get(s["size"], []),
-                          "files": s["files"], "entry": "{}/entry.json".format(e["id"])})
+                          "files": s["files"], "entry": "{}/entry.json".format(e["id"]),
+                          "family": e["name"], "origin": e["source"]["origin"],
+                          "default": str(s["size"]) == str(e.get("default", "default")),
+                          **({"dof": doc["robot"]["dof"]} if doc.get("robot") else {})})
         if cad_dir and e["kind"] != "robot":
             write_package(e, doc, cad_dir, out / "packages")
 
+    collections = []                                # 只收索引的外部零件库（B.6 第 5 条）
+    if not a.only:
+        import freecad_index
+        c = freecad_index.build(ver_dir)
+        if c:
+            collections.append(c)
+            print("FreeCAD-library 索引：{} 个零件，缩略图 {} 张".format(c["count"], c["thumbs"]))
     index = {"schema": 1, "version": a.version, "released": released,
-             "count": {"entries": len(ents), "items": len(items)}, "items": items}
+             "count": {"entries": len(ents), "items": len(items)}, "items": items, "collections": collections,
+             "categories": {p: {c: {"zh": n[0], "en": n[1]} for c, n in v.items()} for p, v in wqlib.CATEGORY_NAMES.items()}}
     (ver_dir / "index.json").write_text(json.dumps(index, ensure_ascii=False), encoding="utf-8")
     latest = {"schema": 1, "version": a.version, "released": released,
               "index": "library/{}/index.json".format(a.version),

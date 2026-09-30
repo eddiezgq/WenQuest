@@ -1,0 +1,127 @@
+# 零件库发布（数字工厂第 2 轮 L13 第一期、L14）：只在推送改动 library/ 时运行。
+#   校验条目 → 测试 → 生成全部模型 → 发布到 GitHub Releases（library-vYYYY.MM.N）→ 解包到数字工厂服务器
+#   https://factory.<域名>/library/latest.json 指向最新版本。
+name: Parts library 零件库发布
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "library/**"
+      - ".github/workflows/library.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: library-publish
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: 生成与发布
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    environment: production
+    env:
+      WQ_MENAGERIE: ${{ github.workspace }}/library/vendor_src/mujoco_menagerie
+      WQ_FCLIB: ${{ github.workspace }}/library/vendor_src/FreeCAD-library
+      HOST: ${{ secrets.DEPLOY_HOST }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: library/requirements.txt
+      - name: 安装
+        run: pip install -r library/requirements.txt
+      - name: 取来源仓库（固定提交）
+        run: |
+          fetch() {   # 目录 仓库 提交 [稀疏路径…]
+            local d=$1 repo=$2 sha=$3; shift 3
+            git init -q "$d" && git -C "$d" remote add origin "$repo"
+            if [ $# -gt 0 ]; then
+              git -C "$d" sparse-checkout set --no-cone "$@"
+              git -C "$d" fetch -q --depth 1 --filter=blob:none origin "$sha"
+            else
+              git -C "$d" fetch -q --depth 1 origin "$sha"
+            fi
+            git -C "$d" checkout -q FETCH_HEAD
+          }
+          y() { python3 -c "import yaml,sys; print(yaml.safe_load(open(sys.argv[1]))[sys.argv[2]])" "$@"; }
+          fetch "$WQ_MENAGERIE" "$(y library/vendor/menagerie.yaml repo)" "$(y library/vendor/menagerie.yaml commit)"
+          fetch "$WQ_FCLIB" "$(y library/vendor/freecad_library.yaml repo)" "$(y library/vendor/freecad_library.yaml commit)" \
+            /index.html /thumbnails/ /LICENSE-Assets
+          du -sh library/vendor_src/*
+      - name: 校验条目
+        run: python3 library/tools/validate.py
+      - name: 测试
+        run: cd library && python3 -m pytest -q tests
+      - name: 定版本号
+        run: |
+          m=$(date -u +%Y.%m)
+          n=$(git ls-remote --tags origin "refs/tags/library-v$m.*" | sed -E 's|.*library-v[0-9]+\.[0-9]+\.([0-9]+)$|\1|' | sort -n | tail -1)
+          ver="$m.$(( ${n:--1} + 1 ))"
+          echo "VER=$ver" >> "$GITHUB_ENV"
+          echo "版本 $ver"
+      - name: 生成全部模型
+        run: |
+          set +e
+          python3 library/tools/build.py --version "$VER" --jobs 4 2>&1 | tee /tmp/build.log
+          st=${PIPESTATUS[0]}
+          if [ "$st" != 0 ]; then python3 factory/deploy/ci_annotate.py 零件库生成 /tmp/build.log 120; fi
+          exit "$st"
+      - name: 打包
+        run: |
+          cd library/build
+          tar czf "library-web-$VER.tar.gz" -C library .
+          cp "library/$VER/index.json" "index-$VER.json"
+          ls -la *.tar.gz packages | head -30
+          du -sh library
+      - name: 发布到 GitHub Releases
+        run: |
+          cd library/build
+          python3 - > notes.md <<'PY'
+          import json, os
+          v = os.environ["VER"]
+          i = json.load(open("library/%s/index.json" % v))
+          r = json.load(open("report.json"))
+          print("问渠零件库 %s（第一期）\n" % v)
+          print("- 条目 %d 个，规格 %d 个；生成用时 %d 秒" % (i["count"]["entries"], i["count"]["items"], r["seconds"]))
+          for c in i.get("collections", []):
+              print("- 另收 %s 索引：%d 个零件（%s，只含索引与缩略图，模型从原仓库下载）" % (c["name"]["zh"], c["count"], c["license"]))
+          print("\n网页浏览：https://factory.wenquestrobotics.com （工作台 → 零件库）\n")
+          print("`library-web-%s.tar.gz` 是网页用的模型与索引；每个标准件族一个压缩包（STEP、STL、许可说明）；机器人的完整模型见各条目 `package` 指向的原仓库固定提交。" % v)
+          PY
+          gh release create "library-v$VER" --target "$GITHUB_SHA" --title "零件库 $VER" --notes-file notes.md \
+            "library-web-$VER.tar.gz" "index-$VER.json" packages/*.zip
+      - name: 解包到数字工厂服务器
+        if: env.HOST != ''
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "${{ secrets.DEPLOY_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
+          fi
+          tar czf - -C factory/deploy lib.sh library.sh | ssh "deploy@$HOST" \
+            'mkdir -p /opt/wenquest/factory/deploy && tar xzf - -C /opt/wenquest/factory/deploy && chmod +x /opt/wenquest/factory/deploy/*.sh'
+          ssh "deploy@$HOST" /opt/wenquest/factory/deploy/library.sh < "library/build/library-web-$VER.tar.gz"
+      - name: 检查网址
+        if: env.HOST != ''
+        run: |
+          domain=$(ssh "deploy@$HOST" "grep '^SITE_DOMAIN=' /opt/wenquest/factory/.env | cut -d= -f2")
+          got=$(curl -s --max-time 20 "https://factory.$domain/library/latest.json" | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])" 2>/dev/null || true)
+          echo "https://factory.$domain/library/latest.json → ${got:-打不开}"
+          if [ "$got" != "$VER" ]; then
+            echo "::warning::线上 latest.json 还不是 $VER（${got:-打不开}）。如果数字工厂这次也有更新，等它部署完成后再打开看。"
+          fi

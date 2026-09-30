@@ -692,13 +692,18 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     return {"reset": True}
 
 
+# ---------------------------------------------------------------- 零件库文件（第 2 轮 L14）
+from hub import library as _library  # noqa: E402
+_library.mount(app)
+
+
 # ---------------------------------------------------------------- 网页
 if os.path.isdir(WEB_DIST):
     app.mount("/assets", StaticFiles(directory=os.path.join(WEB_DIST, "assets")), name="assets")
 
     @app.get("/{path:path}")
     def spa(path: str):
-        if path.startswith("api/"):
+        if path.startswith("api/") or path.startswith("library/"):
             return JSONResponse({"detail": "Not Found"}, 404)
         f = os.path.join(WEB_DIST, path)
         if path and os.path.isfile(f):

@@ -1,0 +1,12 @@
+# 零件库构建（library.yml 与本地开发）；版本固定，换版本先在本地跑通测试
+build123d==0.13.0
+bd_warehouse @ git+https://github.com/gumyr/bd_warehouse@eed2da118da99007ad2d3904466ac0b24964f84d
+mujoco==3.14.0
+trimesh==5.1.0
+fast-simplification==0.2.0
+matplotlib==3.10.9
+scipy==1.17.1
+numpy==2.4.4
+PyYAML==6.0.3
+jsonschema==4.26.0
+pytest

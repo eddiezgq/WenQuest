@@ -1,0 +1,16 @@
+# FreeCAD-library（FreeCAD 零件库）：第一期只收索引和缩略图，模型点击时从原仓库固定提交下载（附录 B.6 第 5 条）
+repo: https://github.com/FreeCAD/FreeCAD-library
+commit: 544a254e090eaf7bfbb6a9b69e249dc0d3d29d67
+license: CC-BY-3.0            # LICENSE-Assets：全部零件与缩略图；作者见原仓库 git 历史与 FCStd 文件属性
+attribution: "FreeCAD Parts Library (https://github.com/FreeCAD/FreeCAD-library), CC BY 3.0; each part © its author"
+# 与机器人、机械制造相关的顶层分类；建筑、医疗、运动、暖通、雕塑等不收
+categories:
+  Mechanical Parts: { zh: 机械零件, en: Mechanical parts }
+  Electronics Parts: { zh: 电子元件, en: Electronics parts }
+  Electrical Parts: { zh: 电气零件, en: Electrical parts }
+  Electro-pneumatic: { zh: 电气与气动, en: Electro-pneumatic }
+  Robots: { zh: 机器人, en: Robots }
+  Computing: { zh: 计算机硬件, en: Computing }
+  Hydraulics: { zh: 液压, en: Hydraulics }
+  Pipes and tubes: { zh: 管材管件, en: Pipes and tubes }
+  Logistics: { zh: 物流, en: Logistics }

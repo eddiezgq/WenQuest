@@ -53,3 +53,20 @@ def file_code(size):
 
 def ref(e, size):
     return "{}/{}".format(e["id"], size)
+
+
+# 类别词表（附录 B.2）：部分 → 代号 → 名称；validate.py 校验、index.json 带上给网页和学习平台用
+CATEGORY_NAMES = {
+    "A": {"BLT": ("螺栓", "Bolts"), "SCR": ("螺钉", "Screws"), "NUT": ("螺母", "Nuts"), "WSH": ("垫圈", "Washers"),
+          "PIN": ("销", "Pins"), "KEY": ("键", "Keys"), "RNG": ("挡圈", "Retaining rings"), "BRG": ("滚动轴承", "Rolling bearings"),
+          "BSC": ("滚珠丝杠", "Ball screws"), "LGD": ("直线导轨", "Linear guides"), "PUL": ("同步带轮", "Timing pulleys"),
+          "SPK": ("链轮", "Sprockets"), "CPL": ("联轴器", "Couplings"), "SPR": ("弹簧", "Springs"), "SEL": ("密封件", "Seals"),
+          "PLG": ("螺塞", "Plugs")},
+    "B": {"ARM": ("机械臂", "Arms"), "MOB": ("移动机器人", "Mobile robots"), "LEG": ("足式机器人", "Legged robots"),
+          "HUM": ("人形机器人", "Humanoids"), "EEF": ("末端执行器", "End effectors"), "UAV": ("无人机", "Drones"),
+          "CRT": ("直角坐标", "Cartesian"), "SCA": ("SCARA", "SCARA"), "PAR": ("并联", "Parallel"),
+          "EDU": ("教学模型", "Teaching models"), "MAN": ("移动操作", "Mobile manipulators"), "SEN": ("其他", "Other")},
+    "C": {"LNK": ("连杆机构", "Linkages"), "CAM": ("凸轮", "Cams"), "GER": ("齿轮与齿轮系", "Gears"), "WRM": ("蜗轮蜗杆", "Worm gears"),
+          "BLT": ("带传动", "Belt drives"), "RAT": ("棘轮", "Ratchets"), "GNV": ("槽轮", "Geneva drives"),
+          "SCN": ("丝杠螺母", "Lead screws"), "RED": ("减速器案例", "Reducer cases")},
+}

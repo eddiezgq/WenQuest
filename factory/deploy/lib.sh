@@ -6,6 +6,7 @@ set -euo pipefail
 FD="${FACTORY_DIR:-/opt/wenquest/factory}"
 LEARN_DIR="${LEARN_DIR:-$(dirname "$FD")}"
 cd "$FD"
+mkdir -p library        # 零件库文件；先建好，免得 docker 以 root 身份建目录
 
 # 从 .env 读一项（不 source，值里可能有空格）
 envval() {
