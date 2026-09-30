@@ -248,7 +248,9 @@ class Studio:
 
     # stage 1: materials ---------------------------------------------------------------------------
     async def study_materials(self, proj: dict) -> None:
+        await self.read_scanned(proj)
         items = self.items(proj)
+        textbook_note = ""
         files = [{"id": m.id, "path": m.path, "ext": m.ext, "size": m.size, "pages": m.pages,
                   "error": m.error, "excerpt": m.excerpt} for m in items]
         if files:
@@ -256,6 +258,7 @@ class Studio:
                                       schema=team.librarian_schema(), max_tokens=8000,
                                       fake=lambda: fake_librarian(items))
             self.apply_librarian(proj, items, data)
+            textbook_note = self.apply_teacher_textbook(proj, items)
             if proj["materials"]["textbook"]:
                 await self.read_contents(proj)
         lib_q = (data.get("questions") if files and isinstance(data, dict) else None) or []
@@ -266,7 +269,7 @@ class Studio:
         for k, v in (q.get("known") or {}).items():
             if v and k in REQ_LABEL and not proj["requirements"].get(k):
                 proj["requirements"][k] = v
-        proj["questions"] = [x for x in proj["questions"] if x["status"] != "open"]
+        proj["questions"] = [x for x in proj["questions"] if x["status"] != "open" or x.get("kind") == "textbook"]
         # The librarian's own questions (e.g. "two courses: which one?") always reach the teacher, first.
         asked = [x for x in lib_q[:3] if isinstance(x, dict) and x.get("text")]
         for x in q.get("questions") or []:
@@ -277,7 +280,10 @@ class Studio:
                 proj["questions"].append({"id": new_id(), "text": str(x["text"])[:400],
                                           "options": [str(o)[:120] for o in (x.get("options") or [])][:6],
                                           "status": "open", "answer": "", "stage": "materials"})
-        self.say(proj, str(q.get("message") or "资料看完了，请核对右边的资料清单。"), "lead", "report")
+        message = str(q.get("message") or "资料看完了，请核对右边的资料清单。")
+        if files and textbook_note:
+            message = textbook_note + "\n\n" + message
+        self.say(proj, message, "lead", "report")
         proj["stage"] = "materials"
 
     def apply_librarian(self, proj: dict, items: list[mt.Material], data: dict) -> None:
@@ -312,6 +318,7 @@ class Studio:
     async def classify_new(self, proj: dict) -> None:
         """Files added after the materials were settled: the librarian sorts just those, then the lead says
         what they change — lessons not written yet use them; written ones are named for a possible rewrite."""
+        await self.read_scanned(proj)
         items = self.items(proj)
         known = proj["materials"]["files"]
         new = [m for m in items if m.id not in known]
@@ -338,7 +345,10 @@ class Studio:
             tb = next((fid for fid in ids if known[fid]["role"] == "main_textbook"), "")
             if tb:
                 proj["materials"]["textbook"] = tb
-        self.say(proj, self.new_files_report(proj, new), "lead", "report")
+        note = self.apply_teacher_textbook(proj, items)
+        if note and proj["materials"]["textbook"] and not proj["materials"].get("toc"):
+            await self.read_contents(proj)
+        self.say(proj, ((note + "\n\n") if note else "") + self.new_files_report(proj, new), "lead", "report")
 
     def new_files_report(self, proj: dict, new: list) -> str:
         known = proj["materials"]["files"]
@@ -369,6 +379,93 @@ class Studio:
                              + str(extra[0]) + "章”。")
         return "\n".join(lines)
 
+    # scanned books: text recognition (OCR) ----------------------------------------------------
+    async def ocr_file(self, proj: dict, fid: str, pages: list[int]) -> int:
+        """Recognise the given pages of a scanned PDF (those not read yet). Returns how many were read now."""
+        cache = self.store.ocr_cache(proj["import_id"], fid)
+        todo = sorted({n for n in pages if n not in cache})
+        if not todo or not mt.ocr_available():
+            return 0
+        data = self.store.data(proj["import_id"], fid)
+        got = await asyncio.to_thread(mt.ocr_pages, data, todo)
+        cache.update(got)
+        self.store.save_ocr(proj["import_id"], proj["owner"], fid, cache)
+        return len(got)
+
+    def is_scanned(self, m: mt.Material) -> bool:
+        return m.ext == ".pdf" and (m.error == "scanned" or m.ocr > 0)
+
+    async def read_scanned(self, proj: dict) -> None:
+        """Scanned PDFs (pictures of pages) are read by text recognition: the front pages first (title, contents,
+        the first chapter), the rest of a textbook later, chapter by chapter, when a lesson needs it."""
+        for m in self.items(proj):
+            if m.ext == ".pdf" and m.error == "scanned" and not m.ocr:
+                if not mt.ocr_available():
+                    return
+                n = min(m.pages or 40, 40 if m.pages >= 60 else 12)
+                proj["busy"] = {"label": f"正在识别扫描版资料的文字：{m.name}（前 {n} 页，约 {max(1, n // 20)} 分钟）", "since": now()}
+                self.projects.save(proj)
+                await self.ocr_file(proj, m.id, list(range(1, n + 1)))
+
+    async def ocr_lesson_pages(self, proj: dict, chapter: dict, les: dict) -> None:
+        """Before a lesson is written from a scanned textbook: recognise its sections' pages."""
+        tb = proj["materials"]["textbook"]
+        m = next((x for x in self.items(proj) if x.id == tb), None)
+        if not m or not self.is_scanned(m) or not proj["materials"].get("toc"):
+            return
+        wanted = set(les.get("sections") or [])
+        pages: list[int] = []
+        for c in proj["materials"]["toc"]:
+            for x in c["sections"]:
+                if x["no"] in wanted and x.get("start"):
+                    pages += list(range(x["start"], min(x.get("end") or x["start"] + 6, x["start"] + 14) + 1))
+            if not wanted and c["no"] == chapter["no"] and c.get("start"):
+                pages += list(range(c["start"], min(c.get("end") or c["start"] + 8, c["start"] + 14) + 1))
+        pages = sorted(set(pages))[:24]
+        if pages:
+            proj["busy"] = {"label": f"正在识别教材第 {pages[0]}–{pages[-1]} 页的文字", "since": now()}
+            self.projects.save(proj)
+            await self.ocr_file(proj, tb, pages)
+
+    # the teacher's textbook is an instruction ---------------------------------------------------
+    def teacher_texts(self, proj: dict) -> list[str]:
+        out = [proj["requirements"].get("notes", "")]
+        out += [m["text"] for m in proj["messages"] if m["role"] == "teacher"]
+        out += [f"{q['text']} {q['answer']}" for q in proj["questions"] if q["status"] == "answered"]
+        return [t for t in out if t]
+
+    def apply_teacher_textbook(self, proj: dict, items: list[mt.Material]) -> str:
+        """When the teacher named the textbook, that book is the main textbook — found by title, author or file
+        name. If it is not among the files, say so and ask (with the likeliest files as options); never guess."""
+        names = named_textbooks(self.teacher_texts(proj))
+        if not names:
+            return ""
+        files = proj["materials"]["files"]
+        cur = proj["materials"]["textbook"]
+        if cur and files.get(cur, {}).get("by") == "teacher" and files[cur].get("role") == "main_textbook":
+            return ""  # the teacher already chose it in the materials list
+        best, score = match_textbook(names, items, {fid: f.get("title", "") for fid, f in files.items()},
+                                     lambda fid: self.text(proj, fid)[:3000])
+        proj["requirements"]["textbook"] = "、".join(f"《{n}》" for n in names)[:300]
+        if best and score >= 0.6:
+            for fid, f in files.items():
+                if f.get("role") == "main_textbook" and fid != best:
+                    f.update(role="aux_textbook")
+            files.setdefault(best, {"chapters": [], "title": "", "language": "", "note": ""})
+            files[best].update(role="main_textbook", by="teacher", confidence="high", note=f"老师指定的教材《{names[0]}》")
+            if cur != best:
+                proj["materials"]["textbook"], proj["materials"]["toc"] = best, []
+            name = next((m.name for m in items if m.id == best), "")
+            return f"按你的要求，主教材定为《{names[0]}》（文件：{name}）。"
+        # Not found: ask, with the files most likely to be a textbook as the options.
+        cands = sorted(items, key=lambda m: (-(m.ext == ".pdf"), -m.pages, -m.size))[:4]
+        text = f"没有在资料里找到你指定的教材《{names[0]}》。它是下面哪一份？"
+        if not any(q.get("kind") == "textbook" and q["status"] == "open" for q in proj["questions"]):
+            proj["questions"].insert(0, {"id": new_id(), "text": text, "kind": "textbook",
+                                         "options": [m.name for m in cands] + ["资料里没有这本书，先不用教材"],
+                                         "status": "open", "answer": "", "stage": proj["stage"]})
+        return text + "（请在“待回答的问题”里选，或把这本书上传到资料清单。）"
+
     async def read_contents(self, proj: dict) -> None:
         """Read the main textbook's table of contents and find where each section starts."""
         fid = proj["materials"]["textbook"]
@@ -388,13 +485,42 @@ class Studio:
                     for s in c.get("sections") or [] if isinstance(s, dict) and s.get("title")]
             chapters.append({"no": c["no"], "title": str(c.get("title", "")).strip(), "page": c.get("page"), "sections": secs})
         locate(chapters, pages, max(toc_pages) if toc_pages else 0)
+        m = next((x for x in self.items(proj) if x.id == fid), None)
+        if m and self.is_scanned(m) and chapters and not any(c.get("start") for c in chapters):
+            await self.find_offset_scanned(proj, fid, chapters, max(toc_pages) if toc_pages else 0)
         proj["materials"]["toc"] = chapters
         proj["materials"]["book_title"] = str((data or {}).get("book_title") or "")[:200]
+
+    async def find_offset_scanned(self, proj: dict, fid: str, chapters: list[dict], after: int) -> None:
+        """Printed page numbers differ from PDF pages by the front matter. Read the pages where the second
+        chapter could start and use the one whose text carries its title; then every start follows."""
+        target = next((c for c in chapters[1:] if c.get("page")), None) or next((c for c in chapters if c.get("page")), None)
+        if not target:
+            return
+        for off in range(0, 41, 4):
+            n = target["page"] + off
+            await self.ocr_file(proj, fid, [n, n + 1, n + 2, n + 3])
+            pages = pages_of(self.text(proj, fid))
+            key = norm(target["title"])
+            hit = next((k for k in range(n, n + 4) if key and key in norm(pages.get(k, ""))), None)
+            if hit:
+                off = hit - target["page"]
+                for c in chapters:
+                    for x in [c, *c["sections"]]:
+                        if x.get("page"):
+                            x["start"] = x["page"] + off
+                flat = sorted((x for c in chapters for x in [c, *c["sections"]] if x.get("start")), key=lambda x: x["start"])
+                for a, b in zip(flat, flat[1:] + [None]):
+                    a["end"] = max(a["start"], (b["start"] - 1) if b else a["start"] + 10)
+                return
 
     # stage 2: outline --------------------------------------------------------------------------
     async def apply_answers(self, proj: dict, items: list[mt.Material]) -> str:
         """Before designing: let the librarian bring the materials list in line with the teacher's answers."""
         answered = [q for q in proj["questions"] if q["status"] == "answered"]
+        tb = proj["materials"]["textbook"]
+        if tb and not proj["materials"].get("toc"):  # e.g. the teacher picked the textbook in a question
+            await self.read_contents(proj)
         key = ";".join(q["id"] + q["answer"] for q in answered)
         if not answered or proj["materials"].get("answers_applied") == key or not proj["materials"]["files"]:
             return ""
@@ -577,6 +703,7 @@ class Studio:
         keys = lang_keys(proj["outline"]["languages"])
         no = self.lesson_no(proj, chapter, les)
         ctx = self.lesson_context(proj, chapter, les, items) + f"\nLesson number: {no}"
+        await self.ocr_lesson_pages(proj, chapter, les)
         src = self.sources(proj, chapter, les, items)
         exemplar = json.dumps(sp.EXEMPLAR, ensure_ascii=False)
         les["status"], les["error"] = "writing", ""
@@ -935,6 +1062,39 @@ def find_toc_pages(pages: dict[int, str]) -> list[int]:
         else:
             break
     return out
+
+
+def named_textbooks(texts: list[str]) -> list[str]:
+    """Book titles the teacher named: 《...》, or after 教材 / 课本 / textbook."""
+    out: list[str] = []
+    for t in texts:
+        for name in re.findall(r"《([^《》]{2,60})》", t):
+            if name not in out and not re.search(r"大纲|计划|说明|日历", name):
+                out.append(name)
+        for name in re.findall(r"(?:教材|课本|主教材|textbook)\s*(?:是|为|用|采用|选用|:|：|is)\s*[“\"']?([^\s，。,；;“”\"'《》]{2,40})", t, re.I):
+            if name not in out:
+                out.append(name)
+    return out[:3]
+
+
+def match_textbook(names: list[str], items: list, titles: dict[str, str], text_of) -> tuple[str, float]:
+    """The file that is the named book: the name in its file name, own title or first pages (score 1.0),
+    else the best character overlap (0..1)."""
+    best, score = "", 0.0
+    for m in items:
+        hay = norm(m.name) + "|" + norm(titles.get(m.id, "")) + "|" + norm(text_of(m.id))
+        for n in names:
+            k = norm(n)
+            if not k:
+                continue
+            if k in hay:
+                s = 1.0
+            else:
+                pool = norm(m.name) + norm(titles.get(m.id, ""))
+                s = sum(1 for ch in set(k) if ch in pool) / max(1, len(set(k)))
+            if s > score or (s == score and best and m.pages > 0):
+                best, score = m.id, s
+    return best, score
 
 
 def locate(chapters: list[dict], pages: dict[int, str], after: int) -> None:

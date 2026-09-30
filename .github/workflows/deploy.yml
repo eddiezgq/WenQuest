@@ -29,7 +29,9 @@ jobs:
           python-version: "3.12"
       - name: Gateway tests
         working-directory: services/gateway
-        run: pip install -q -r requirements-dev.txt && python -m pytest -q
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-chi-sim > /dev/null
+          pip install -q -r requirements-dev.txt && python -m pytest -q
       - name: Web server settings (Caddyfile) are valid
         run: docker run --rm -v "$PWD/deploy:/d:ro" -e SITE_DOMAIN=example.com -e ACME_EMAIL=ci@example.com caddy:2 caddy validate --config /d/Caddyfile --adapter caddyfile
       - name: Animator code check tests

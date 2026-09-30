@@ -79,6 +79,8 @@ class PaceIn(BaseModel):
 
 
 def register(app, m) -> None:  # m: the main module (state, current, helpers)
+    global STUDIO_ITEMS
+    STUDIO_ITEMS = lambda proj: m._studio().items(proj)  # noqa: E731
     current = m.current
 
     def studio():
@@ -99,7 +101,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         for fid, x in items.items():
             f = proj["materials"]["files"].get(fid, {})
             files.append({"id": fid, "name": x.name, "path": x.path, "size": x.size, "pages": x.pages, "error": x.error,
-                          "url": sign_material(proj["id"], fid),
+                          "url": sign_material(proj["id"], fid), "ocr": x.ocr,
                           "role": f.get("role", ""), "role_label": team.ROLES.get(f.get("role", ""), ""),
                           "chapters": f.get("chapters", []), "title": f.get("title", ""),
                           "confidence": f.get("confidence", ""), "note": f.get("note", ""), "by": f.get("by", "")})
@@ -639,10 +641,28 @@ def readable_name(filename: str) -> str:
     return stem.replace("_", " ").strip() or Path(filename).stem
 
 
+STUDIO_ITEMS = None  # set by register(): the files of a project (for answers that name one)
+
+
+def studio_items(proj: dict) -> list:
+    return STUDIO_ITEMS(proj) if STUDIO_ITEMS else []
+
+
 def _learn_from_answer(proj: dict, q: dict) -> None:
     """Answers to the standard questions also fill the requirements the team works from."""
     text, ans = q["text"], q["answer"]
     req = proj["requirements"]
+    if q.get("kind") == "textbook":
+        files = proj["materials"]["files"]
+        fid = next((x.id for x in studio_items(proj) if x.name == ans.strip()), "")
+        for k, f in files.items():
+            if f.get("role") == "main_textbook" and k != fid:
+                f.update(role="aux_textbook")
+        if fid:
+            files.setdefault(fid, {"chapters": [], "title": "", "language": "", "note": ""})
+            files[fid].update(role="main_textbook", by="teacher", confidence="high")
+        proj["materials"]["textbook"], proj["materials"]["toc"] = fid, []
+        return
     if "语言" in text or "language" in text.lower():
         req["language"] = "both" if ("双语" in ans or "bilingual" in ans.lower()) else "en" if ("英" in ans or ans.lower().startswith("en")) else "zh"
     elif "周" in text or "week" in text.lower():

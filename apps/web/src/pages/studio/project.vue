@@ -115,7 +115,7 @@
               <view v-for="f in p.files" :key="f.id" class="frow" :class="{ low: f.confidence === 'low', bad: f.error }">
                 <view class="f-name">
                   <text class="fname">{{ f.id === p.materials.textbook ? "★ " : "" }}{{ f.path }}</text>
-                  <text class="fsub">{{ size(f.size) }}<text v-if="f.pages"> · {{ f.pages }} {{ t("studio.pages") }}</text><text v-if="f.title"> · {{ f.title }}</text></text>
+                  <text class="fsub">{{ size(f.size) }}<text v-if="f.pages"> · {{ f.pages }} {{ t("studio.pages") }}</text><text v-if="f.ocr"> · {{ t("studio.ocrPages", { n: f.ocr }) }}</text><text v-if="f.title"> · {{ f.title }}</text></text>
                   <text v-if="f.error" class="ferr">{{ t("studio.fileError." + f.error) }}</text>
                   <text v-else-if="f.confidence === 'low'" class="fwarn">{{ t("studio.lowConfidence") }}<text v-if="f.note">：{{ f.note }}</text></text>
                 </view>
@@ -133,6 +133,7 @@
                   <input class="chin" :value="f.chapters.join(',')" @blur="(e: any) => setChapters(f, e.detail.value)" />
                 </view>
                 <view class="f-act">
+                  <text class="fa star" :class="{ on: f.id === p.materials.textbook }" :title="t('studio.setTextbook')" @click="setTextbook(f.id)">{{ f.id === p.materials.textbook ? "★" : "☆" }}</text>
                   <text class="fa" :title="t('studio.download')" @click="download(f.url || '')">↓</text>
                   <text class="fa del" :title="t('common.delete')" @click="removeFile(f)">✕</text>
                 </view>
@@ -611,6 +612,10 @@ async function upload(list: Picked[]) {
   // Once the materials were read, the librarian sorts the new files at once (before that, "start" reads them all).
   try { take(await api.studioFilesDone(id.value)); } catch { await load(); }
 }
+function setTextbook(fid: string) {
+  if (fid === p.value?.materials.textbook) return;
+  act(() => api.studioMaterials(id.value, [], fid));
+}
 async function removeFile(f: { id: string; name: string }) {
   if (!(await confirmAction(t("studio.deleteFileConfirm", { name: f.name }), t("common.delete"), t("common.cancel")))) return;
   act(() => api.studioDeleteFile(id.value, f.id));
@@ -786,8 +791,10 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .mtools.over { border-color: var(--wq-link); background: #eef6f9; }
 .mt-btn { color: var(--wq-link); cursor: pointer; font-size: 14px; font-weight: 600; }
 .mt-btn.right { margin-left: auto; }
-.f-act { width: 56px; display: flex; gap: 10px; justify-content: flex-end; }
+.f-act { width: 80px; display: flex; gap: 10px; justify-content: flex-end; }
 .fa { cursor: pointer; color: var(--wq-link); font-size: 15px; }
 .fa.del { color: var(--wq-muted); }
+.fa.star { color: #b9c2bf; }
+.fa.star.on { color: var(--wq-accent); }
 .fa.del:hover { color: var(--wq-danger); }
 </style>

@@ -697,7 +697,8 @@ async def ingest(iid: str, sess: Session, file: UploadFile, path: str) -> dict:
         # Reading a whole textbook takes seconds: do it off the event loop.
         text, m.pages = await asyncio.to_thread(mt.extract, name, data)
     except mt.ScannedPDF:
-        m.error = "scanned"
+        m.error = "scanned"  # the team reads it by text recognition (OCR) when it studies the materials
+        m.pages = mt.pdf_page_count(data)
     except ValueError:
         m.error = "unsupported"
     except Exception:  # corrupt or encrypted files must not break the whole import

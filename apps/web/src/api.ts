@@ -110,7 +110,7 @@ export interface Material {
 export type Stage = "intake" | "materials" | "outline" | "lessons";
 export type LessonStatus = "planned" | "writing" | "reviewing" | "awaiting" | "published" | "failed";
 export interface StudioFile {
-  id: string; name: string; path: string; size: number; pages: number; error: string; url?: string;
+  id: string; name: string; path: string; size: number; pages: number; error: string; url?: string; ocr?: number;
   role: string; role_label: string; chapters: number[]; title: string; confidence: string; note: string; by: string;
 }
 export interface StudioQuestion { id: string; text: string; options: string[]; status: "open" | "answered" | "dropped"; answer: string }

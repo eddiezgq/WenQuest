@@ -222,7 +222,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "studio.noFiles": "还没有资料。可以把资料拖进左边，也可以只用对话描述这门课。",
     "studio.role": "身份",
     "studio.pages": "页",
-    "studio.fileError.scanned": "扫描版 PDF，读不出文字：请换文字版，或者告诉团队只作参考",
+    "studio.fileError.scanned": "扫描版 PDF：团队开始阅读资料时会自动识别文字（文字识别）",
     "studio.fileError.unsupported": "这种格式读不了，会作为附件保留",
     "studio.fileError.unreadable": "文件损坏或加密，读不出来",
     "studio.lowConfidence": "拿不准，请确认",
@@ -954,6 +954,8 @@ const messages: Record<Locale, Record<string, string>> = {
     "studio.downloadAll": "全部下载（zip）",
     "studio.download": "下载",
     "studio.deleteFileConfirm": "删除“{name}”？以后写课不再用它，已经写好的课不受影响。",
+    "studio.ocrPages": "已识别 {n} 页文字",
+    "studio.setTextbook": "设为主教材",
   },
   en: {
     "app.name": "WenQuest",
@@ -1173,7 +1175,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "studio.noFiles": "No materials yet. Drop them on the left, or just describe the course in the conversation.",
     "studio.role": "What it is",
     "studio.pages": "pages",
-    "studio.fileError.scanned": "Scanned PDF with no text: use a text version, or tell the team it is only a reference",
+    "studio.fileError.scanned": "Scanned PDF: the team reads it by text recognition (OCR) when it studies the materials",
     "studio.fileError.unsupported": "This format cannot be read; it is kept as an attachment",
     "studio.fileError.unreadable": "Damaged or encrypted; cannot be read",
     "studio.lowConfidence": "Not sure — please check",
@@ -1905,6 +1907,8 @@ const messages: Record<Locale, Record<string, string>> = {
     "studio.downloadAll": "Download all (zip)",
     "studio.download": "Download",
     "studio.deleteFileConfirm": "Delete “{name}”? Later lessons won't use it; lessons already written stay as they are.",
+    "studio.ocrPages": "{n} pages read by OCR",
+    "studio.setTextbook": "Make this the main textbook",
   },
 };
 

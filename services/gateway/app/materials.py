@@ -56,6 +56,7 @@ class Material:
     confidence: str = "rule"   # rule | ai | teacher
     error: str = ""
     headings: list[str] = field(default_factory=list)
+    ocr: int = 0               # scanned PDF: pages read so far by text recognition (OCR)
 
     def public(self) -> dict:
         d = asdict(self)
@@ -142,6 +143,31 @@ class Store:
                 (self.root / sid / f"{fid}.{ext}").unlink(missing_ok=True)
         return True
 
+    def ocr_cache(self, sid: str, fid: str) -> dict[int, str]:
+        p = self.root / sid / f"{fid}.ocr.json"
+        if not re.fullmatch(r"[0-9a-f]{32}", fid) or not p.exists():
+            return {}
+        return {int(k): v for k, v in json.loads(p.read_text()).items()}
+
+    def save_ocr(self, sid: str, user_id: int, fid: str, pages: dict[int, str]) -> Material | None:
+        """Keep recognised pages; the file's text becomes the pages read so far (with page markers)."""
+        if not re.fullmatch(r"[0-9a-f]{32}", fid):
+            return None
+        (self.root / sid / f"{fid}.ocr.json").write_text(json.dumps(pages, ensure_ascii=False))
+        text = "\n\n".join(f"[第{n}页]\n{t}" for n, t in sorted(pages.items()) if t)
+        (self.root / sid / f"{fid}.txt").write_text(text)
+        meta = self.load(sid, user_id)
+        for f in meta["files"]:
+            if f["id"] == fid:
+                f["ocr"] = len(pages)
+                f["chars"] = len(text)
+                f["excerpt"] = clean(text)[:1500]
+                if any(t.strip() for t in pages.values()):
+                    f["error"] = ""
+                self.save(sid, meta)
+                return Material(**f)
+        return None
+
     def cleanup(self) -> None:
         now = time.time()
         for d in self.root.iterdir():
@@ -163,6 +189,52 @@ class ScannedPDF(ValueError):
 LEGACY = {".doc": ".docx", ".rtf": ".docx", ".odt": ".docx", ".wps": ".docx",
           ".ppt": ".pptx", ".pps": ".pptx", ".odp": ".pptx", ".dps": ".pptx",
           ".xls": ".xlsx", ".ods": ".xlsx", ".et": ".xlsx"}
+
+
+def pdf_page_count(data: bytes) -> int:
+    try:
+        import pypdfium2 as pdfium
+        pdf = pdfium.PdfDocument(data)
+        try:
+            return len(pdf)
+        finally:
+            pdf.close()
+    except Exception:  # noqa: BLE001 - a broken file just has no pages
+        return 0
+
+
+def ocr_available() -> bool:
+    return shutil.which("tesseract") is not None
+
+
+def ocr_pages(data: bytes, pages: list[int], langs: str = "chi_sim+eng") -> dict[int, str]:
+    """Text of scanned PDF pages (1-based numbers) by text recognition (Tesseract, runs on this server)."""
+    import subprocess
+
+    import pypdfium2 as pdfium
+    out: dict[int, str] = {}
+    if not pages or not ocr_available():
+        return out
+    pdf = pdfium.PdfDocument(data)
+    try:
+        for n in pages:
+            if not 1 <= n <= len(pdf):
+                continue
+            img = pdf[n - 1].render(scale=2.4, grayscale=True).to_pil()
+            buf = io.BytesIO()
+            img.save(buf, "PNG")
+            try:
+                r = subprocess.run(["tesseract", "stdin", "stdout", "-l", langs, "--psm", "3"], input=buf.getvalue(),
+                                   capture_output=True, timeout=90)
+                text = r.stdout.decode("utf-8", "replace")
+            except (subprocess.TimeoutExpired, OSError):
+                text = ""
+            # Tesseract puts spaces between Chinese characters; take them out.
+            text = re.sub(r"(?<=[\u3400-\u9fff\uff00-\uffef])[ \t]+(?=[\u3400-\u9fff\uff00-\uffef])", "", text)
+            out[n] = text.strip()
+    finally:
+        pdf.close()
+    return out
 
 
 def _pdf_pages(data: bytes) -> list[str]:
