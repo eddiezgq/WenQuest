@@ -18,8 +18,8 @@ class RenderError(Exception):
         self.stage = stage
 
 
-async def render(url: str, code: str, timeout: float = 600.0) -> tuple[bytes, bytes, float]:
-    """(video, poster, seconds) or RenderError with the renderer's message (fed back to the animator)."""
+async def render(url: str, code: str, timeout: float = 600.0) -> tuple:
+    """(video, poster, seconds, key frames) or RenderError with the renderer's message (fed back to the animator)."""
     try:
         async with httpx.AsyncClient(timeout=timeout, trust_env=False) as c:
             r = await c.post(url.rstrip("/") + "/render", json={"code": code})
@@ -30,7 +30,8 @@ async def render(url: str, code: str, timeout: float = 600.0) -> tuple[bytes, by
     d = r.json()
     if not d.get("ok"):
         raise RenderError(str(d.get("error") or "render failed")[:4000], str(d.get("stage") or "render"))
-    return base64.b64decode(d["video"]), base64.b64decode(d.get("poster") or ""), float(d.get("seconds") or 0)
+    return (base64.b64decode(d["video"]), base64.b64decode(d.get("poster") or ""), float(d.get("seconds") or 0),
+            [base64.b64decode(f) for f in d.get("frames") or []])
 
 
 def _s(x: str) -> str:

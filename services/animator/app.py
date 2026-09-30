@@ -114,9 +114,16 @@ async def render(code: str, width: int = 1280, height: int = 720, fps: int = 30)
         poster = work / "poster.png"
         await _run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{max(0.0, seconds * 0.45):.2f}", "-i", str(video),
                     "-frames:v", "1", str(poster)], work, 60)
+        frames = []  # key frames for the reviewer's relevance check (small JPEGs)
+        for i, at in enumerate((0.2, 0.5, 0.8)):
+            f = work / f"key{i}.jpg"
+            await _run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{seconds * at:.2f}", "-i", str(video),
+                        "-frames:v", "1", "-vf", "scale=640:-2", "-q:v", "5", str(f)], work, 60)
+            if f.exists():
+                frames.append(base64.b64encode(f.read_bytes()).decode())
         return {"ok": True, "seconds": round(seconds, 1), "render_seconds": round(time.monotonic() - t0, 1),
                 "video": base64.b64encode(video.read_bytes()).decode(),
-                "poster": base64.b64encode(poster.read_bytes()).decode() if poster.exists() else ""}
+                "poster": base64.b64encode(poster.read_bytes()).decode() if poster.exists() else "", "frames": frames}
     finally:
         shutil.rmtree(work, ignore_errors=True)
 

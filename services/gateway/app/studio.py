@@ -175,6 +175,8 @@ class Studio:
         self.animator_timeout = 600.0
         self.labcheck_url = ""      # the lab checker (headless browser); empty = no virtual labs
         self.labcheck_timeout = 150.0
+        # 相似度检查 is off only for the offline stand-in model (its answers are fixed examples by design)
+        self.copy_check = getattr(ai, "provider", "") != "fake"
 
     # helpers ---------------------------------------------------------------------------------
     def items(self, proj: dict) -> list[mt.Material]:
@@ -765,6 +767,7 @@ class Studio:
         ctx = self.lesson_context(proj, chapter, les, items) + f"\nLesson number: {no}"
         previous = self.previous_spec(proj, les)
         les["status"], les["error"] = "writing", ""
+        les["attention"], les["checks"] = [], {}
         if teacher_note:
             les["notes"] = teacher_note
         proj["busy"] = {"label": f"主讲教授正在写：{no} {disp(les['title'])}", "since": now()}
@@ -796,8 +799,10 @@ class Studio:
                                     prompt=team.review_prompt(ctx, json.dumps(spec, ensure_ascii=False)[:24000],
                                                               disp(les["exercises"])[:4000] + "\n" + disp(les["answers"])[:4000], src[:16000], missing),
                                     schema=team.review_schema(), max_tokens=3000,
-                                    fake=lambda: {"verdict": "pass", "issues": [], "summary": "五步齐全，数值与已知条件一致。"})
+                                    fake=lambda: {"verdict": "pass", "issues": [], "summary": "五步齐全，数值与已知条件一致。",
+                                                  "checks": {k: {"ok": True, "note": ""} for k in ("textbook", "problem", "numbers", "bilingual")}})
             rv = rv if isinstance(rv, dict) else {}
+            ai_checks = rv.get("checks") if isinstance(rv.get("checks"), dict) else {}
             review = {"verdict": rv.get("verdict") if rv.get("verdict") in ("pass", "revise") else "pass",
                       "issues": [i for i in rv.get("issues") or [] if isinstance(i, dict) and i.get("text")][:10],
                       "summary": str(rv.get("summary") or "")[:800], "round": attempt + 1}
@@ -818,21 +823,67 @@ class Studio:
         les["review"] = review
         les["status"] = "awaiting"
         les["written"] = now()
-        verdict = "审稿通过" if review and review["verdict"] == "pass" else "审稿人仍有意见，请重点看审稿意见"
-        self.say(proj, f"《{no} {disp(les['title'])}》做好了（{verdict}）：讲义、{'动画、' if video else ''}{'虚拟实验、' if lab else ''}课件、练习与答案、实验指导书、实验报告模板、教案。"
-                       "请在右边“课时进度”里审阅：通过就发布给学生，或者告诉我怎么改。", "lead", "lesson")
+        les["ai_checks"] = ai_checks
+        les["sources_found"] = bool(src) and not src.startswith("(no source pages")
+        les["checklist"] = self.checklist(proj, les, video, lab)
+        self.say(proj, self.done_message(les, no, review, video, lab), "lead", "lesson")
+
+    def done_message(self, les: dict, no: str, review: dict | None, video, lab) -> str:
+        """Honest: '做好了（审稿通过）' only when nothing needs the teacher; otherwise say what is missing."""
+        made = f"讲义、{'动画、' if video else ''}{'虚拟实验、' if lab else ''}课件、练习与答案、实验指导书、实验报告模板、教案"
+        todo = les.get("attention") or []
+        failed = [c["label"] for c in les.get("checklist") or [] if c["ok"] is False]
+        if todo:
+            return (f"《{no} {disp(les['title'])}》初稿有了（{made}），但需要你处理：" + "；".join(x["text"] for x in todo)
+                    + " 详见右边“课时进度”里这一课的清单。")
+        verdict = ("审稿通过" if review and review["verdict"] == "pass" and not failed
+                   else "清单里这几项没打勾：" + "、".join(failed) if failed else "审稿人仍有意见，请重点看审稿意见")
+        return (f"《{no} {disp(les['title'])}》做好了（{verdict}）：{made}。"
+                "请在右边“课时进度”里审阅：通过就发布给学生，或者告诉我怎么改。")
+
+    def checklist(self, proj: dict, les: dict, video, lab) -> list[dict]:
+        """每课一张清单: each item ticked or crossed, and who checked it (自动检查 / AI 自查)."""
+        ai_checks = les.get("ai_checks") or {}
+
+        def ai(key):
+            c = ai_checks.get(key) if isinstance(ai_checks.get(key), dict) else {}
+            return (c.get("ok") is True) if c else None, str(c.get("note") or "")[:200]
+        found = bool(les.get("sources_found"))
+        tb_ai, tb_note = ai("textbook")
+        items = [{"key": "textbook", "label": "教材对应章节已参照", "by": "auto+ai",
+                  "ok": (found and tb_ai is not False) if proj["materials"].get("textbook") else False,
+                  "note": ("参照：" + "、".join(les.get("sections") or []) if found else "没有找到这一课对应的教材页")
+                          + (f"；{tb_note}" if tb_note else "")}]
+        ok, note = ai("problem")
+        items.append({"key": "problem", "label": "机器人问题是本课的", "by": "ai", "ok": ok, "note": note})
+        checks = les.get("checks") or {}
+        if self.animator_url:
+            c = checks.get("animation") or {"ok": False, "note": "没有动画"}
+            items.append({"key": "animation", "label": "动画切题", "by": c.get("by", "auto+ai"), "ok": bool(c.get("ok")) and bool(video),
+                          "note": c.get("note", ""), "image": video["poster"].name if video and video.get("poster") else ""})
+        if self.labcheck_url:
+            c = checks.get("lab") or {"ok": False, "note": "没有虚拟实验"}
+            items.append({"key": "lab", "label": "实验切题、能完成", "by": c.get("by", "auto+ai"), "ok": bool(c.get("ok")) and bool(lab),
+                          "note": c.get("note", ""), "image": lab["image"].name if lab and lab.get("image") else ""})
+        for key, label in (("numbers", "数值和单位已核对"), ("bilingual", "中英一致")):
+            ok, note = ai(key)
+            items.append({"key": key, "label": label, "by": "ai", "ok": ok, "note": note})
+        return items
 
     async def animate(self, proj: dict, les: dict, spec: dict, no: str, review: dict | None) -> dict | None:
-        """动画师: the storyboard becomes a Manim scene rendered on the server (A2). Errors go back to the
-        animator twice; then the plain storyboard animation is used so the lesson still has a video."""
-        from .production import anim, demo_anim
+        """动画师: the storyboard becomes a Manim scene rendered on the server (A2). Before rendering, the code must
+        not be a copy of an example or of another lesson (相似度检查); after rendering, the reviewer checks the key
+        frames and captions are about THIS lesson (切题检查). Problems go back to the animator twice; then the plain
+        storyboard animation (this lesson's own words and formulas) is used and the lesson is marked 需要你处理."""
+        from .production import anim, demo_anim, similar
         if not self.animator_url:
             return None
         d = self.lesson_dir(proj, les)
         spec_json = json.dumps({k: spec[k] for k in ("title", "goal", "problem", "concept", "animation", "model", "summary")},
                                ensure_ascii=False)
-        code, error, used = "", "", "ai"
+        code, error, used, why = "", "", "ai", ""
         course = self.course_brief(proj)
+        check = {"ok": None, "by": "auto+ai", "note": ""}
         for attempt in range(3):
             proj["busy"] = {"label": f"动画师正在{'写' if attempt == 0 else '修改'}动画：{no}", "since": now()}
             self.projects.save(proj)
@@ -842,31 +893,101 @@ class Studio:
             code = str((data or {}).get("code") or "")
             code = re.sub(r"^```(?:python)?\s*|```\s*$", "", code.strip())
             if not code:
-                error = "empty code"
+                error = why = "empty code"
                 continue
+            if self.copy_check:
+                error = similar.problem(code, self.anim_refs(proj, les))
+                if error:
+                    why = "动画程序和范例或别的课大段雷同"
+                    continue
             proj["busy"] = {"label": f"正在渲染动画：{no}（约 2–5 分钟）", "since": now()}
             self.projects.save(proj)
             try:
-                video, poster, secs = await anim.render(self.animator_url, code, self.animator_timeout)
-                break
+                res = await anim.render(self.animator_url, code, self.animator_timeout)
             except anim.RenderError as e:
                 if e.stage == "service":
-                    return self._no_video(review, f"动画渲染服务暂时不可用（{e}），这一课先没有动画，稍后可重写")
-                error = str(e)
+                    self.needs_you(les, "animation", f"动画渲染服务暂时不可用（{e}），这一课还没有动画。稍后点“重做动画”。")
+                    return self._no_video(review, f"动画渲染服务暂时不可用（{e}），这一课先没有动画")
+                error, why = str(e), "动画程序渲染出错"
+                continue
+            video, poster, secs = res[:3]
+            frames = list(res[3]) if len(res) > 3 else []
+            proj["busy"] = {"label": f"审稿人正在核对动画是否切题：{no}", "since": now()}
+            self.projects.save(proj)
+            images = [("image/jpeg", f) for f in frames] or ([("image/png", poster)] if poster else [])
+            rel = await self.relevance(proj, les, spec, "animation", anim_texts(code), images)
+            check = {"ok": rel["on_topic"], "by": "auto+ai", "note": rel["reason"]}
+            if rel["on_topic"]:
+                break
+            error = f"The reviewer found the animation off topic: {rel['reason']} What to change: {rel['fix']}"
+            why = f"审稿人认为动画不切题：{rel['reason']}"
         else:
             used = "storyboard"
             try:
-                video, poster, secs = await anim.render(self.animator_url, anim.storyboard_code(spec, no), self.animator_timeout)
+                video, poster, secs = (await anim.render(self.animator_url, anim.storyboard_code(spec, no), self.animator_timeout))[:3]
             except anim.RenderError as e:
-                return self._no_video(review, f"动画没有做成（{str(e)[:200]}），这一课先没有动画，可以重写")
-            if review is not None:
-                review["issues"].append({"severity": "low", "text": "动画师写的动画渲染失败，先用了按分镜生成的简版动画；可按意见重写这一课"})
+                self.needs_you(les, "animation", f"动画没有做成（{why or str(e)[:120]}），这一课还没有动画。可以点“重做动画”，或告诉我怎么改。")
+                return self._no_video(review, f"动画没有做成（{str(e)[:200]}）")
+            check = {"ok": False, "by": "auto+ai", "note": f"动画师三次都没做成（{why}），先用了只有本课文字和公式的简版动画"}
+            self.needs_you(les, "animation", f"动画师三次都没做成合格的动画（{why}），现在是只有本课文字和公式的简版。"
+                                             "可以点“重做动画”，或告诉我想要什么画面。")
+        les.setdefault("checks", {})["animation"] = check
         name = re.sub(r'[\\/:*?"<>|]', "-", f"{no} 动画 {spec['animation']['title'][0] or spec['title'][0]}")[:80]
         for old in d.glob("*.mp4"):
             old.unlink()
         v, pp = await asyncio.to_thread(anim.save, d, name, video, poster)
         (d / "animation.py").write_text(code if used == "ai" else anim.storyboard_code(spec, no))
+        (d / "animation_by.txt").write_text(used)
         return {"video": v, "poster": pp, "seconds": secs, "by": used}
+
+    def anim_refs(self, proj: dict, les: dict) -> dict[str, str]:
+        """What an animation must not copy: the examples and this course's other lessons' animations."""
+        from .production import demo_anim
+        refs = {"the technique example": demo_anim.TECHNIQUE, "the physics sample lesson 2.1": demo_anim.AGV_2_1}
+        refs.update(self._other_lessons(proj, les, "animation.py", "animation_by.txt"))
+        return refs
+
+    def lab_refs(self, proj: dict, les: dict) -> dict[str, str]:
+        from .production import labs
+        refs = {"the technique example": labs.example_code(), "the physics sample lab 2.1": labs.physics_example()}
+        refs.update(self._other_lessons(proj, les, "lab.js"))
+        return refs
+
+    def _other_lessons(self, proj: dict, les: dict, name: str, by: str = "") -> dict[str, str]:
+        out = {}
+        for c in (proj.get("outline") or {}).get("chapters", []):
+            for x in c["lessons"]:
+                f = self.lesson_dir(proj, x) / name
+                if x["id"] == les["id"] or not f.exists():
+                    continue
+                if by and (self.lesson_dir(proj, x) / by).exists() and (self.lesson_dir(proj, x) / by).read_text() != "ai":
+                    continue  # the plain storyboard version is a template, not someone's design
+                out[f"lesson {self.lesson_no(proj, c, x)}"] = f.read_text(encoding="utf-8")
+        return out
+
+    async def relevance(self, proj: dict, les: dict, spec: dict, what: str, texts: list[str],
+                        images: list[tuple[str, bytes]]) -> dict:
+        """切题检查: the reviewer looks at the pictures and texts the student will see."""
+        lesson = json.dumps({"title": spec["title"], "concept": spec["concept"].get("title"), "points": spec["concept"].get("points"),
+                             "robot problem": spec["problem"].get("title"), "problem text": spec["problem"].get("text")},
+                            ensure_ascii=False)
+        data = await self.ai.json(system=team.RELEVANCE, prompt=team.relevance_prompt(what, self.course_brief(proj), lesson, texts),
+                                  schema=team.relevance_schema(), max_tokens=800, images=images[:4],
+                                  fake=lambda: {"on_topic": True, "reason": "画面和字幕讲的是本课的概念和机器人问题", "fix": ""})
+        data = data if isinstance(data, dict) else {}
+        return {"on_topic": data.get("on_topic") is not False, "reason": str(data.get("reason") or "")[:300],
+                "fix": str(data.get("fix") or "")[:500]}
+
+    @staticmethod
+    def needs_you(les: dict, kind: str, text: str) -> None:
+        """需要你处理: something the team could not finish honestly; shown prominently with a button to redo it."""
+        items = [x for x in les.get("attention") or [] if x["kind"] != kind]
+        items.append({"kind": kind, "text": text})
+        les["attention"] = items
+
+    @staticmethod
+    def clear_attention(les: dict, kind: str) -> None:
+        les["attention"] = [x for x in les.get("attention") or [] if x["kind"] != kind]
 
     def pairs_for(self, proj: dict, chapter: dict) -> tuple[list[str], list[str], str]:
         o = proj["outline"]
@@ -877,7 +998,7 @@ class Studio:
         """实验师 (A3): one lab in the lab kit, checked for safety, then tried in a headless browser — every scene
         draws, every slider moves, every task's demo ticks it. Problems go back to the lab engineer twice;
         a lab that still fails is not used (the lesson is finished without it and the review says so)."""
-        from .production import labs
+        from .production import labs, similar
         d = self.lesson_dir(proj, les)
         d.mkdir(parents=True, exist_ok=True)
         for name in ("lab.js", "lab.png", "lab_check.json"):
@@ -890,6 +1011,7 @@ class Studio:
                                ensure_ascii=False)
         lab_id = no.replace(".", "-")
         code, problems, result = "", [], None
+        check = {"ok": None, "by": "auto+ai", "note": ""}
         for attempt in range(3):
             proj["busy"] = {"label": f"实验师正在{'写' if attempt == 0 else '修改'}虚拟实验：{no}", "since": now()}
             self.projects.save(proj)
@@ -897,6 +1019,9 @@ class Studio:
                                       schema=team.lab_schema(), max_tokens=14000, fake=lambda: {"code": labs.example_code()})
             code = re.sub(r"^```(?:js|javascript)?\s*|```\s*$", "", str((data or {}).get("code") or "").strip())
             problems = labs.static_problems(code)
+            if not problems and self.copy_check:
+                copy = similar.problem(code, self.lab_refs(proj, les))
+                problems = [copy] if copy else []
             if problems:
                 continue
             proj["busy"] = {"label": f"正在试运行虚拟实验：{no}（约 30 秒）", "since": now()}
@@ -905,16 +1030,32 @@ class Studio:
             try:
                 result = await labs.trial_run(self.labcheck_url, page_html, lab_id, self.labcheck_timeout)
             except labs.CheckError as e:
+                self.needs_you(les, "lab", f"实验检查服务暂时不可用（{e}），这一课还没有虚拟实验。稍后点“重做实验”。")
                 return self._no_video(review, f"实验检查服务暂时不可用（{e}），这一课先没有虚拟实验，可以点“重做实验”")
-            if result["ok"]:
+            if not result["ok"]:
+                problems = result["problems"]
+                continue
+            proj["busy"] = {"label": f"审稿人正在核对实验是否切题：{no}", "since": now()}
+            self.projects.save(proj)
+            shot = [("image/png", result["screenshot"])] if result.get("screenshot") else []
+            rel = await self.relevance(proj, les, spec, "virtual lab", lab_texts(code), shot)
+            done = sum(1 for v in (result.get("tasks") or {}).values() if v)
+            check = {"ok": rel["on_topic"], "by": "auto+ai",
+                     "note": f"试运行通过，{done} 个任务都能完成；{rel['reason']}" if rel["on_topic"] else rel["reason"]}
+            if rel["on_topic"]:
                 break
-            problems = result["problems"]
+            problems = [f"the reviewer found the lab off topic: {rel['reason']} What to change: {rel['fix']}"]
+            result = None
         else:
             les["lab_problems"] = problems[:10]
+            les.setdefault("checks", {})["lab"] = {"ok": False, "by": "auto+ai", "note": "；".join(problems[:2])[:300]}
+            self.needs_you(les, "lab", "虚拟实验三次都没有通过检查，这一课先不带实验。问题：" + "；".join(problems[:2])[:300]
+                           + "。可以点“重做实验”，或告诉我想要什么实验。")
             if review is not None:
                 review["issues"].append({"severity": "medium", "text": "虚拟实验三次都没有通过试运行，这一课先不带实验，可以点“重做实验”。"
                                                                        "问题：" + "；".join(problems[:3])})
             return None
+        les.setdefault("checks", {})["lab"] = check
         (d / "lab.js").write_text(code, encoding="utf-8")
         image = None
         if result and result["screenshot"]:
@@ -939,28 +1080,44 @@ class Studio:
         return labs.page(items, course=course, chapter=chap, lang=lang, key=f"wq-lab-{proj['id'][:8]}-{chapter['id'][:8]}")
 
     async def redo_lab(self, proj: dict, lid: str) -> None:
-        """重做实验: only the lab of a written lesson, then the slides again (to show the new picture)."""
+        await self.redo_media(proj, lid, "lab")
+
+    async def redo_media(self, proj: dict, lid: str, kind: str) -> None:
+        """重做动画 / 重做实验: only that part of a written lesson, then the slides again (new video or picture)."""
         chapter, les = self.find_lesson(proj, lid)
         d = self.lesson_dir(proj, les)
         data = json.loads((d / "spec.json").read_text())
         spec, gp = data["lesson"], data["guide_plan"]
         no = self.lesson_no(proj, chapter, les)
         review = les.get("review")
+        word = "实验" if kind == "lab" else "动画"
         if review:
-            review["issues"] = [i for i in review.get("issues", []) if "实验" not in i.get("text", "") or "动画" in i.get("text", "")]
-        lab = await self.make_lab(proj, chapter, les, spec, no, review)
+            review["issues"] = [i for i in review.get("issues", []) if word not in i.get("text", "")]
+        self.clear_attention(les, kind)
         mp4 = next(iter(sorted(d.glob("*.mp4"))), None)
         video = None
-        if mp4:
+        if kind == "animation":
+            video = await self.animate(proj, les, spec, no, review)
+        elif mp4:
             png = mp4.with_suffix(".png")
             secs = next((f.get("seconds", 0) for f in les.get("files") or [] if f["kind"] == "animation"), 0)
             video = {"video": mp4, "poster": png if png.exists() else None, "seconds": secs}
+        if kind == "lab":
+            lab = await self.make_lab(proj, chapter, les, spec, no, review)
+        else:
+            js, shot = d / "lab.js", d / "lab.png"
+            lab = {"code": js, "image": shot if shot.exists() else None} if js.exists() else None
         proj["busy"] = {"label": f"正在重新排版课件：{no}", "since": now()}
         self.projects.save(proj)
         await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video, lab)
         les["review"] = review
-        self.say(proj, f"《{no}》的虚拟实验{'重做好了，已通过试运行，课件里的实验页也换成了新截图' if lab else '还是没有通过试运行，请看审稿意见里的问题'}。",
-                 "lead", "lesson")
+        les["checklist"] = self.checklist(proj, les, video, lab)
+        todo = next((x["text"] for x in les.get("attention") or [] if x["kind"] == kind), "")
+        if kind == "lab":
+            text = "重做好了，已通过试运行和切题检查，课件里的实验页也换成了新截图" if lab and not todo else f"还是没做成：{todo or '请看清单'}"
+        else:
+            text = "重做好了，已通过切题检查，课件里的动画也换了" if video and not todo else f"还是没做成：{todo or '请看清单'}"
+        self.say(proj, f"《{no}》的{'虚拟实验' if kind == 'lab' else '动画'}{text}。", "lead", "lesson")
 
     @staticmethod
     def _no_video(review: dict | None, text: str) -> None:
@@ -1122,6 +1279,21 @@ def find_toc_pages(pages: dict[int, str]) -> list[int]:
         else:
             break
     return out
+
+
+def anim_texts(code: str) -> list[str]:
+    """The words a student sees in an animation: its string literals with letters in them (titles, captions)."""
+    out = []
+    for q in re.findall(r"""r?(["'])((?:\\.|(?!\1).){2,300})\1""", code or ""):
+        t = q[1].strip()
+        if re.search(r"[\u4e00-\u9fff]|[A-Za-z]{3,}", t) and not re.fullmatch(r"[\w.]+|#[0-9a-fA-F]{3,8}", t) and t not in out:
+            out.append(t)
+    return out[:40]
+
+
+def lab_texts(code: str) -> list[str]:
+    """The words a student sees in a lab: its [中文, English] pairs (titles, scenes, tasks)."""
+    return anim_texts(code)
 
 
 def normalize_design_book(d, outline: dict) -> dict:

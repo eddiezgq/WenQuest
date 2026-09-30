@@ -345,7 +345,11 @@ def test_animation_falls_back_to_the_storyboard(client, monkeypatch):
     assert len(tries) == 4  # the animator's code three times, then the storyboard version
     assert "agv(" not in tries[-1] and "cargo(" not in tries[-1]  # the plain version draws no stock robot
     assert les["files"][0]["kind"] == "animation"
-    assert any("简版动画" in i["text"] for i in les["review"]["issues"])
+    # honest: the lesson needs the teacher, the message says so, the checklist crosses the animation
+    assert [x["kind"] for x in les["attention"]] == ["animation"] and "简版" in les["attention"][0]["text"]
+    assert "需要你处理" in p["messages"][-1]["text"] and "审稿通过" not in p["messages"][-1]["text"]
+    anim_item = next(c for c in les["checklist"] if c["key"] == "animation")
+    assert anim_item["ok"] is False
 
 
 def test_no_renderer_no_video(client, monkeypatch):

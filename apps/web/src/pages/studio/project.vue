@@ -265,12 +265,34 @@
                   <view class="l-head" @click="openLesson = openLesson === l.id ? '' : l.id">
                     <text class="l-week">{{ l.week ? t("studio.weekShort", { n: l.week }) : "" }}</text>
                     <text class="l-title">{{ disp(l.title) }}</text>
+                    <text v-if="l.attention?.length && l.status === 'awaiting'" class="st needs">{{ t("studio.needsYou") }}</text>
                     <text class="st" :class="l.status">{{ t("studio.status." + l.status) }}</text>
                   </view>
                   <view v-if="openLesson === l.id" class="l-body">
                     <template v-if="l.status === 'awaiting' || l.status === 'published'">
+                      <view v-if="l.attention?.length" class="attn">
+                        <text class="attn-h">{{ t("studio.needsYou") }}</text>
+                        <text v-for="(a, ai) in l.attention" :key="ai" class="attn-i">· {{ a.text }}</text>
+                        <view class="attn-b">
+                          <view v-if="p.anims_on && l.status === 'awaiting' && l.attention.some((a) => a.kind === 'animation')"
+                                class="primary small" :class="{ disabled: !!p.busy }" @click="redoAnimation(l.id)">{{ t("studio.redoAnimation") }}</view>
+                          <view v-if="p.labs_on && l.attention.some((a) => a.kind === 'lab')"
+                                class="primary small" :class="{ disabled: !!p.busy }" @click="redoLab(l.id)">{{ t("studio.redoLab") }}</view>
+                        </view>
+                      </view>
+                      <view v-if="l.checklist?.length" class="ck">
+                        <text class="h4">{{ t("studio.checklist") }}</text>
+                        <view v-for="c in l.checklist" :key="c.key" class="ck-row">
+                          <text class="ck-mark" :class="c.ok === true ? 'ok' : c.ok === false ? 'no' : 'unk'">{{ c.ok === true ? "✓" : c.ok === false ? "✗" : "?" }}</text>
+                          <view class="ck-body">
+                            <text class="ck-l">{{ c.label }}<text class="ck-by">{{ c.by === "ai" ? t("studio.byAi") : t("studio.byAuto") }}</text></text>
+                            <text v-if="c.note" class="ck-n">{{ c.note }}</text>
+                          </view>
+                          <image v-if="c.image_url" class="ck-img" :src="absolute(c.image_url)" mode="aspectFit" />
+                        </view>
+                      </view>
                       <view v-if="l.review" class="review" :class="l.review.verdict">
-                        <text class="rv-h">{{ l.review.verdict === "pass" ? t("studio.reviewPass") : t("studio.reviewRevise") }}</text>
+                        <text class="rv-h">{{ l.review.verdict === "pass" && !l.attention?.length ? t("studio.reviewPass") : t("studio.reviewRevise") }}</text>
                         <text v-if="l.review.summary" class="rv-s">{{ l.review.summary }}</text>
                         <text v-for="(i, ii) in l.review.issues" :key="ii" class="rv-i">· {{ i.text }}</text>
                       </view>
@@ -586,6 +608,9 @@ async function previewDeck(lid: string) {
     await new Promise((r) => setTimeout(r, 2000));
   }
 }
+function redoAnimation(lid: string) {
+  act(() => api.studioRedoAnimation(id.value, lid));
+}
 function redoLab(lid: string) {
   act(() => api.studioRedoLab(id.value, lid));
 }
@@ -816,6 +841,20 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .st.published { background: #dcefe5; color: var(--wq-ok); }
 .st.failed { background: #fdecea; color: var(--wq-danger); }
 .l-body { border-top: 1px solid var(--wq-line); padding: 10px 14px 12px; }
+.st.needs { background: #fde8e8; color: #b42318; font-weight: 600; margin-right: 6px; }
+.attn { border: 1px solid #f3b4b4; background: #fff5f5; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; color: #8a1c1c; }
+.attn-h { display: block; font-weight: 700; margin-bottom: 4px; }
+.attn-i { display: block; line-height: 1.6; }
+.attn-b { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.ck { border: 1px solid var(--wq-line); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; }
+.ck-row { display: flex; gap: 8px; align-items: flex-start; padding: 5px 0; border-top: 1px dashed var(--wq-line); font-size: 13px; }
+.ck-row:first-of-type { border-top: 0; }
+.ck-mark { flex: 0 0 18px; font-weight: 700; text-align: center; }
+.ck-mark.ok { color: var(--wq-ok, #1f7a4d); } .ck-mark.no { color: #b42318; } .ck-mark.unk { color: #999; }
+.ck-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ck-by { margin-left: 6px; font-size: 11px; color: #889; }
+.ck-n { color: #667; line-height: 1.5; }
+.ck-img { flex: 0 0 160px; width: 160px; height: 90px; border-radius: 4px; background: #0f1419; }
 .review { border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; font-size: 13px; }
 .review.pass { background: #eef8f2; color: var(--wq-ok); }
 .review.revise { background: #fff3d6; color: #7a5a00; }

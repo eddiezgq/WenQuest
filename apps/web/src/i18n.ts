@@ -971,6 +971,11 @@ const messages: Record<Locale, Record<string, string>> = {
     "studio.db.problems": "机器人问题",
     "studio.db.avoid": "不要出现",
     "studio.db.avoidHint": "每行一条，例如：不用物理课的 AGV 例子",
+    "studio.needsYou": "需要你处理",
+    "studio.redoAnimation": "重做动画",
+    "studio.checklist": "审稿清单",
+    "studio.byAi": "AI 自查",
+    "studio.byAuto": "自动检查 + AI",
   },
   en: {
     "app.name": "WenQuest",
@@ -1939,6 +1944,11 @@ const messages: Record<Locale, Record<string, string>> = {
     "studio.db.problems": "Robot problems",
     "studio.db.avoid": "Avoid",
     "studio.db.avoidHint": "One per line, e.g. no AGV examples from the physics course",
+    "studio.needsYou": "Needs you",
+    "studio.redoAnimation": "Redo animation",
+    "studio.checklist": "Review checklist",
+    "studio.byAi": "AI self-check",
+    "studio.byAuto": "automatic + AI check",
   },
 };
 

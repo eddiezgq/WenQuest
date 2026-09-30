@@ -114,6 +114,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
                            for s in ("planned", "writing", "reviewing", "awaiting", "published", "failed")}
         out["progress"]["total"] = len(lessons)
         out["busy"] = proj.get("busy") if studio().is_busy(proj["id"]) else None
+        out["anims_on"] = bool(studio().animator_url)  # animations can be made (the renderer is set up)
         out["labs_on"] = bool(studio().labcheck_url)   # virtual labs can be made (the lab checker is set up)
         out["zip_url"] = sign_material(proj["id"], "*") if files else ""
         out["toc"] = [{"no": c["no"], "title": c["title"], "start": c.get("start"),
@@ -123,6 +124,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         for c in (out.get("outline") or {}).get("chapters", []):
             for les in c["lessons"]:
                 les["files"] = [{**f, "url": sign_lesson_file(proj["id"], les["id"], f["name"])} for f in les.get("files") or []]
+                les["checklist"] = [{**c, "image_url": sign_lesson_file(proj["id"], les["id"], c["image"]) if c.get("image") else ""}
+                                    for c in les.get("checklist") or []]
         return out
 
     def sign_material(pid: str, fid: str) -> str:
@@ -413,6 +416,19 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         studio().run(proj, f"实验师正在重做虚拟实验：{disp(les['title'])}", job)
         return view(studio().projects.load(pid))
 
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/animation")
+    async def redo_animation(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        """重做动画: write, check and render the lesson's animation again (a lesson not yet published)."""
+        await need_creator(sess)
+        proj = load(pid, sess)
+        _, les = studio().find_lesson(proj, lid)
+        if les["status"] != "awaiting" or not (studio().lesson_dir(proj, les) / "spec.json").exists():
+            raise EngineError("wrong_stage", "write the lesson first", 409)
+        if not studio().animator_url:
+            raise EngineError("animations_unavailable", "the animation renderer is not set up", 503)
+        studio().run(proj, f"动画师正在重做动画：{disp(les['title'])}", lambda p: studio().redo_media(p, lid, "animation"))
+        return view(studio().projects.load(pid))
+
     @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/approve")
     async def publish(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
         await need_creator(sess)
@@ -440,6 +456,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         except KeyError:
             raise EngineError("not_found", "no such file", 404)
         f = next((x for x in les.get("files") or [] if x["name"] == d["n"]), None)
+        if not f and d["n"] in {c.get("image") for c in les.get("checklist") or [] if c.get("image")}:
+            f = {"kind": "image"}
         path = studio().lesson_dir(proj, les) / d["n"]
         if not f or not path.exists():
             raise EngineError("not_found", "no such file", 404)

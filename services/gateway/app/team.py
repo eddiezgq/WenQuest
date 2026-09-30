@@ -342,14 +342,44 @@ REVIEWER = COMMON + (
 
 def review_schema() -> dict:
     issue = _obj({"severity": {"type": "string", "enum": ["high", "low"]}, "text": STR})
+    item = _obj({"ok": {"type": "boolean"}, "note": STR})
+    checks = _obj({"textbook": item, "problem": item, "numbers": item, "bilingual": item})
     return _obj({"verdict": {"type": "string", "enum": ["pass", "revise"]}, "issues": {"type": "array", "items": issue},
-                 "summary": STR})
+                 "summary": STR, "checks": checks})
+
+
+REVIEW_CHECKS = ("\n\nAlso fill `checks`, one line each, true only when you verified it: textbook — the lesson follows "
+                 "the textbook pages it was given (false when none were given or it ignores them); problem — the robot "
+                 "problem is THIS lesson's and uses the course's robot/platform; numbers — every number, unit and final "
+                 "answer is recomputed and right; bilingual — Chinese and English say the same thing.")
 
 
 def review_prompt(ctx: str, spec_json: str, exercises: str, sources: str, missing: list[str]) -> str:
-    return (f"{ctx}\n\nLesson spec to check:\n<<<\n{spec_json}\n>>>\n\nPractice questions and answers:\n<<<\n{exercises}\n>>>\n"
+    return REVIEW_CHECKS.strip() + "\n\n" + (f"{ctx}\n\nLesson spec to check:\n<<<\n{spec_json}\n>>>\n\nPractice questions and answers:\n<<<\n{exercises}\n>>>\n"
             + (f"\nThe automatic check already found: {'; '.join(missing)}\n" if missing else "")
             + f"\nTeacher's materials the author was given:\n{sources}")
+
+
+# --- 切题检查 relevance check (team rebuild R3) --------------------------------------------------------
+
+RELEVANCE = COMMON + (
+    " Role: 审稿人 (reviewer), relevance check. You see what the student will see of one lesson's animation or "
+    "virtual lab: its key pictures (when given), its titles, captions and task texts. Decide whether it teaches THIS "
+    "lesson: its concept and its robot problem, on the robot or platform the course design book names, in THIS "
+    "course's subject. It is off topic when it shows another subject or course (e.g. a physics AGV/crate example in "
+    "a robotics kinematics lesson), another lesson's content, placeholder text, or pictures that do not match the "
+    "captions. Small style issues do not matter. Return JSON {\"on_topic\": true/false, \"reason\": \"one sentence\", "
+    "\"fix\": \"what to change (when off topic)\"}."
+)
+
+
+def relevance_schema() -> dict:
+    return _obj({"on_topic": {"type": "boolean"}, "reason": STR, "fix": STR})
+
+
+def relevance_prompt(what: str, course: str, lesson: str, texts: list[str]) -> str:
+    return (f"{course}\n\nThis lesson:\n{lesson}\n\nThe {what} to check — its texts:\n"
+            + "\n".join(f"- {t}" for t in texts[:40]) + "\n\nIs it on topic for THIS lesson?")
 
 
 # --- 动画师 animator ----------------------------------------------------------------------------------

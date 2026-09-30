@@ -120,6 +120,10 @@ export interface StudioLesson {
   content: Text; exercises: Text; answers: Text; notes: string; error: string;
   files?: { name: string; kind: "animation" | "lab" | "slides" | "guide" | "report" | "plan"; teacher_only: boolean; url: string; seconds?: number }[];
   review: { verdict: "pass" | "revise"; issues: { severity: string; text: string }[]; summary: string; round: number } | null;
+  /** 需要你处理: what the team could not finish (kind "animation" | "lab"), shown prominently with a redo button. */
+  attention?: { kind: string; text: string }[];
+  /** 每课一张清单: ok true = ticked, false = crossed, null = not checked; by "ai" | "auto+ai". */
+  checklist?: { key: string; label: string; ok: boolean | null; by: string; note: string; image?: string; image_url?: string }[];
 }
 export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[] }
 export interface StudioOutline { title: Text; summary: Text; languages: Languages; chapters: StudioChapter[]; calendar_note: string }
@@ -135,6 +139,7 @@ export interface StudioProject {
   busy: { label: string; since: number } | null;
   progress: Record<LessonStatus | "total", number>;
   labs_on?: boolean;
+  anims_on?: boolean;
   zip_url?: string;
   design_book?: DesignBook | null;
 }
@@ -331,6 +336,7 @@ export const api = {
   studioMaterials: (id: string, files: { id: string; role: string; chapters: number[] }[], textbook?: string) =>
     request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/materials`, { files, textbook }),
   studioApproveMaterials: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-materials`, {}),
+  studioRedoAnimation: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/animation`),
   studioDesignBook: (id: string, book: Partial<DesignBook>) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/design-book`, book),
   studioOutline: (id: string, outline: StudioOutline) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/outline`, outline),
   studioApproveOutline: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-outline`, {}, 300000),
