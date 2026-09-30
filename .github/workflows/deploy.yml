@@ -25,6 +25,8 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # A stuck runner should fail, not hold the deploy queue for hours.
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -47,6 +49,12 @@ jobs:
           python -m playwright install --with-deps --only-shell chromium
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk > /dev/null
           python -m pytest -q
+      - name: Voice service tests (speech synthesis and recognition with the real models)
+        working-directory: services/voice
+        run: |
+          ./fetch_models.sh "$RUNNER_TEMP/voice-models"
+          pip install -q -r requirements.txt pytest httpx
+          VOICE_MODELS="$RUNNER_TEMP/voice-models" python -m pytest -q
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -72,6 +80,7 @@ jobs:
           echo "web=ghcr.io/${repo}/web:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
           echo "animator=ghcr.io/${repo}/animator:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
           echo "labcheck=ghcr.io/${repo}/labcheck:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "voice=ghcr.io/${repo}/voice:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -129,6 +138,15 @@ jobs:
           tags: ${{ steps.meta.outputs.labcheck }}
           cache-from: type=gha,scope=labcheck
           cache-to: type=gha,mode=max,scope=labcheck
+
+      - name: Build and push voice image
+        uses: docker/build-push-action@v6
+        with:
+          context: services/voice
+          push: true
+          tags: ${{ steps.meta.outputs.voice }}
+          cache-from: type=gha,scope=voice
+          cache-to: type=gha,mode=max,scope=voice
 
       - name: Package the Claude plugin for manual installs
         run: cd plugins && zip -qr ../aiprovider_claude.zip aiprovider_claude -x '*/tests/*'

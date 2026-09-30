@@ -45,6 +45,8 @@ class Settings(BaseSettings):
     labcheck_url: str = ""
     # 问渠零件与机器人库 (digital factory). Empty = the built-in sample library generated into data_dir.
     library_url: str = ""
+    # The voice service (services/voice): speech synthesis and recognition for lecture videos. Empty = no lecture videos.
+    voice_url: str = ""
     labcheck_timeout: float = 150.0
     data_dir: str = "/tmp/wq-data"  # converted slides and small settings; a persistent volume in production
 

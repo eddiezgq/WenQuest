@@ -482,6 +482,54 @@ def plan3d_prompt(no: str, spec_json: str, models_text: str, course: str, proble
     return out
 
 
+# --- 讲解 narrator and 字幕翻译 subtitle translator (round 4, step 5) -------------------------------------------
+
+NARRATOR = COMMON + (
+    " Role: 主讲教授 recording the lesson's micro-lecture (讲解视频). You get the lesson's slides in order (their text) "
+    "and the lesson spec. For EVERY slide write what you say while it is on screen, in Chinese and in English (the "
+    "English is a faithful spoken version of the Chinese, not a word-for-word translation). Speak to one student, warm "
+    "and clear, like a good university lecturer: explain, do not read the slide aloud; connect each slide to the "
+    "robot problem; on the animation slide describe what the student is watching as it happens; on the lab slide say "
+    "what to try and what to notice. Everything you write is read by a voice, so write it as speech: no formulas in "
+    "symbols (say 'theta one' / 'θ一' as words: 'theta 1', '角速度乘以半径'), no brackets, no lists, no markup, "
+    "numbers with their units spoken ('0.5 米', '0.5 metres'). Length: 2-5 sentences per slide (Chinese 50-160 characters); "
+    "the cover and the summary slides shorter. Return JSON as asked, one entry per slide, in order."
+)
+
+
+def narration_schema() -> dict:
+    return _obj({"slides": {"type": "array", "items": _obj({"n": INT, "zh": STR, "en": STR})}})
+
+
+def narration_prompt(no: str, course: str, spec_json: str, slides: list[dict], problem: str = "") -> str:
+    lines = "\n".join(f"Slide {i}: {s['text'][:700]}" for i, s in enumerate(slides, 1))
+    out = (f"{course}\n\nLesson {no}. The lesson spec:\n{spec_json}\n\nThe slides ({len(slides)}), in order:\n{lines}\n\n"
+           f"Write the narration for all {len(slides)} slides: {{\"slides\": [{{\"n\": 1, \"zh\": \"...\", \"en\": \"...\"}}, ...]}}.")
+    if problem:
+        out += f"\n\nYour previous narration was not accepted: {problem}"
+    return out
+
+
+SUBTITLER = COMMON + (
+    " Role: 字幕编辑 for the teacher's own recorded lecture. You get the speech-recognition lines (Chinese, no "
+    "punctuation, possibly with recognition mistakes) with their numbers. For EVERY line return: `zh` — the same words "
+    "with punctuation added and obvious recognition mistakes fixed (technical terms of this course, numbers, units); "
+    "never add, drop or reorder content, never merge or split lines; and `en` — a natural English subtitle for that "
+    "line that a voice will read in about the same time (concise; keep technical terms exact). Return one entry per "
+    "line, same numbers, same order."
+)
+
+
+def subtitle_schema() -> dict:
+    return _obj({"lines": {"type": "array", "items": _obj({"n": INT, "zh": STR, "en": STR})}})
+
+
+def subtitle_prompt(course: str, lesson: str, lines: list[dict]) -> str:
+    rows = "\n".join(f"{x['n']}: {x['text']}" for x in lines)
+    return (f"{course}\nLesson: {lesson}\n\nRecognised lines ({len(lines)}):\n{rows}\n\n"
+            f"Return {{\"lines\": [{{\"n\": ..., \"zh\": \"...\", \"en\": \"...\"}}, ...]}} for all {len(lines)} lines.")
+
+
 # --- 动画师 animator ----------------------------------------------------------------------------------
 
 ANIM_API = r"""Write Python for Manim Community v0.19+ with the WenQuest parts. Start with `from wq_anim import *`

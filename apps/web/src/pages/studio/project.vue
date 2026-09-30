@@ -306,6 +306,17 @@
                   </template>
                 </view>
                 <text class="muted-s">{{ t("studio.progress", { published: p.progress.published, total: p.progress.total, awaiting: p.progress.awaiting }) }}</text>
+                <view v-if="p.voices_on && voiceList.length" class="pace-row voices">
+                  <text class="muted-s">{{ t("lec.voices") }}</text>
+                  <template v-for="lang in VOICE_LANGS" :key="lang">
+                    <!-- #ifdef H5 -->
+                    <select class="sel small" :value="p.voices?.[lang]" @change="(e: any) => setVoice(lang, e.target.value)">
+                      <option v-for="v in voiceList.filter((x) => x.lang === lang)" :key="v.id" :value="v.id">{{ locale === 'en' ? v.en : v.zh }}</option>
+                    </select>
+                    <!-- #endif -->
+                    <text class="chip2" @click="playSample(p.voices?.[lang] || '')">▶ {{ lang === "zh" ? "中文" : "English" }}</text>
+                  </template>
+                </view>
               </view>
               <view v-for="c in p.outline.chapters" :key="c.id" class="l-ch">
                 <text class="l-ch-t">{{ disp(c.title) }}</text>
@@ -324,6 +335,8 @@
                         <view class="attn-b">
                           <view v-if="p.anims_on && l.status === 'awaiting' && l.attention.some((a) => a.kind === 'animation')"
                                 class="primary small" :class="{ disabled: !!p.busy }" @click="redoAnimation(l.id)">{{ t("studio.redoAnimation") }}</view>
+                          <view v-if="p.voices_on && l.status === 'awaiting' && l.attention.some((a) => a.kind === 'lecture')"
+                                class="primary small" :class="{ disabled: !!p.busy }" @click="act(() => api.studioRedoLecture(id, l.id))">{{ t("lec.redoAi") }}</view>
                           <view v-if="p.labs_on && l.attention.some((a) => a.kind === 'lab')"
                                 class="primary small" :class="{ disabled: !!p.busy }" @click="redoLab(l.id)">{{ t("studio.redoLab") }}</view>
                         </view>
@@ -361,6 +374,8 @@
                                   sandbox="allow-scripts allow-popups allow-forms allow-modals" />
                           <!-- #endif -->
                         </template>
+                        <LectureStudio v-if="p.voices_on || l.files.some((f) => f.kind === 'lecture')" :pid="p.id" :lesson="l" :busy="!!p.busy"
+                                       @act="(fn: any) => act(fn)" />
                         <view v-if="p.labs_on" class="ghost small" :class="{ disabled: !!p.busy }" @click="redoLab(l.id)">
                           ⚗ {{ l.files.some((f) => f.kind === 'lab') ? t("studio.redoLab") : t("studio.makeLab") }}
                         </view>
@@ -433,8 +448,9 @@ import { onHide, onLoad, onShow, onUnload } from "@dcloudio/uni-app";
 import { confirmAction } from "../../courseApi";
 import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
+import LectureStudio from "../../components/studio/LectureStudio.vue";
 import {
-  absolute, api, ApiError, type DesignBook, type LibraryItem, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
+  absolute, api, ApiError, type DesignBook, type Voice, type LibraryItem, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
 } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
@@ -656,6 +672,27 @@ async function previewDeck(lid: string) {
     await new Promise((r) => setTimeout(r, 2000));
   }
 }
+// 讲解声音: the course's voices for AI narration and the English dub, with a sample to listen to
+const VOICE_LANGS: ("zh" | "en")[] = ["zh", "en"];
+const voiceList = ref<Voice[]>([]);
+async function loadVoices() {
+  if (voiceList.value.length) return;
+  try { const r = await api.studioVoices(); voiceList.value = r.available ? r.voices : []; } catch { /* no voice service */ }
+}
+function setVoice(lang: "zh" | "en", v: string) {
+  act(() => api.studioSetVoices(id.value, { [lang]: v }));
+}
+let sampleAudio: any = null;
+function playSample(v: string) {
+  const s = voiceList.value.find((x) => x.id === v);
+  if (!s) return;
+  try { sampleAudio?.stop?.(); } catch { /* ignore */ }
+  sampleAudio = uni.createInnerAudioContext();
+  sampleAudio.src = absolute(s.sample);
+  sampleAudio.play();
+}
+watch(() => p.value?.voices_on, (on) => { if (on) loadVoices(); }, { immediate: true });
+
 function redoAnimation(lid: string) {
   act(() => api.studioRedoAnimation(id.value, lid));
 }

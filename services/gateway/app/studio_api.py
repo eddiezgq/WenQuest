@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import Annotated, Any
 
-from fastapi import Depends, File, Form, UploadFile
+from fastapi import Depends, File, Form, Request, UploadFile
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 
@@ -68,6 +68,26 @@ class OutlineIn(BaseModel):
     chapters: list[ChapterIn] = Field(min_length=1, max_length=40)
 
 
+class VoicesIn(BaseModel):
+    zh: str = Field(default="", max_length=40)
+    en: str = Field(default="", max_length=40)
+
+
+class LectureRow(BaseModel):
+    n: int
+    zh: str | None = Field(default=None, max_length=1500)
+    en: str | None = Field(default=None, max_length=1500)
+
+
+class LectureIn(BaseModel):
+    rows: list[LectureRow] = Field(default_factory=list, max_length=2000)
+
+
+RECORDING_EXT = {".mp4", ".mov", ".m4v", ".webm", ".mkv", ".avi"}
+RECORDING_MAX = 3 * 1024 ** 3        # 3 GB in all, sent in pieces of at most 64 MB
+CHUNK_MAX = 64 * 1024 ** 2
+
+
 class NoteIn(BaseModel):
     note: str = Field(default="", max_length=4000)
 
@@ -116,6 +136,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         out["busy"] = proj.get("busy") if studio().is_busy(proj["id"]) else None
         out["anims_on"] = bool(studio().animator_url)  # animations can be made (the renderer is set up)
         out["labs_on"] = bool(studio().labcheck_url)   # virtual labs can be made (the lab checker is set up)
+        out["voices_on"] = bool(studio().voice_url)    # lecture videos can be made (the voice service is set up)
+        out["voices"] = studio().voices_of(proj)
         out["zip_url"] = sign_material(proj["id"], "*") if files else ""
         used: dict[str, list[str]] = {}
         for c in (proj.get("outline") or {}).get("chapters", []):
@@ -133,6 +155,10 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         for c in (out.get("outline") or {}).get("chapters", []):
             for les in c["lessons"]:
                 les["files"] = [{**f, "url": sign_lesson_file(proj["id"], les["id"], f["name"])} for f in les.get("files") or []]
+                for f in les["files"]:
+                    if f["kind"] == "lecture":
+                        f["url"] = sign_lesson_file(proj["id"], les["id"], "lecture/zh.mp4" if "zh" in f["langs"] else "lecture/en.mp4")
+                        f["lecture"] = lecture_urls(proj["id"], les["id"], f["langs"])
                 if les.get("content") and any(f["kind"] == "figure" for f in les["files"]):
                     urls = {f["name"]: f["url"] for f in les["files"] if f["kind"] == "figure"}
                     les["content"] = {k: re.sub(r'src="wqfig/([\w.\-]+)"', lambda mm: f'src="{urls.get(mm.group(1), "")}"', v)
@@ -151,6 +177,11 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             return ""
         tok = m.state.codec.fernet.encrypt(json.dumps({"p": pid, "a": aid, "n": name}).encode()).decode()
         return f"{m.state.settings.public_url.rstrip('/')}/api/v1/studio/assets/{tok}"
+
+    def lecture_urls(pid: str, lid: str, langs: list[str]) -> dict:
+        return {"video": {x: sign_lesson_file(pid, lid, f"lecture/{x}.mp4") for x in langs},
+                "subs": {x: sign_lesson_file(pid, lid, f"lecture/{x}.vtt") for x in langs},
+                "poster": sign_lesson_file(pid, lid, "lecture/poster.jpg")}
 
     def sign_lesson_file(pid: str, lid: str, name: str) -> str:
         tok = m.state.codec.fernet.encrypt(json.dumps({"p": pid, "l": lid, "n": name}).encode()).decode()
@@ -544,6 +575,143 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         studio().run(proj, f"动画师正在重做动画：{disp(les['title'])}", lambda p: studio().redo_media(p, lid, "animation"))
         return view(studio().projects.load(pid))
 
+    # --- 讲解视频 lecture videos (round 4, step 5) ---------------------------------------------------------
+    voice_list: dict[str, Any] = {"at": 0.0, "voices": []}
+
+    def sign_sample(voice: str) -> str:
+        tok = m.state.codec.fernet.encrypt(json.dumps({"v": voice}).encode()).decode()
+        return f"{m.state.settings.public_url.rstrip('/')}/api/v1/studio/voice-sample/{tok}"
+
+    @app.get("/api/v1/studio/voices")
+    async def voices(sess: Annotated[Session, Depends(current)]):
+        """The voices teachers can choose for AI narration and the English dub, each with a short sample."""
+        await need_creator(sess)
+        if not studio().voice_url:
+            return {"available": False, "voices": [], "default": {}}
+        from .production import voice as V
+        if not voice_list["voices"] or time.time() - voice_list["at"] > 3600:
+            try:
+                voice_list["voices"], voice_list["at"] = await V.voices(studio().voice_url), time.time()
+            except V.VoiceError:
+                return {"available": False, "voices": [], "default": {}}
+        from .lectures import DEFAULT_VOICES
+        return {"available": True, "default": DEFAULT_VOICES,
+                "voices": [{**v, "sample": sign_sample(v["id"])} for v in voice_list["voices"]]}
+
+    @app.get("/api/v1/studio/voice-sample/{signed}")
+    async def voice_sample(signed: str):
+        try:
+            d = json.loads(m.state.codec.fernet.decrypt(signed.encode(), ttl=m.FILE_TTL))
+        except Exception:
+            raise EngineError("link_expired", "link expired", 410)
+        v = next((x for x in voice_list["voices"] if x["id"] == d.get("v")), None)
+        if not v or not studio().voice_url:
+            raise EngineError("not_found", "no such voice", 404)
+        from .production import voice as V
+        try:
+            wav = await studio().voice_sample(Path(m.state.settings.data_dir) / "voice_samples", v["id"], v["lang"])
+        except V.VoiceError as e:
+            raise EngineError("voice_unavailable", str(e), 503)
+        return FileResponse(wav, media_type="audio/wav", headers={"Cache-Control": "private, max-age=86400"})
+
+    @app.put("/api/v1/studio/projects/{pid}/voices")
+    async def set_voices(pid: str, body: VoicesIn, sess: Annotated[Session, Depends(current)]):
+        """The course's voices (Chinese narration, English narration and dub). Lectures made afterwards use them."""
+        await need_creator(sess)
+        proj = load(pid, sess)
+        known = {v["id"]: v["lang"] for v in voice_list["voices"]}
+        cur = dict(proj.get("voices") or {})
+        for lang, vid in (("zh", body.zh), ("en", body.en)):
+            if vid:
+                if known and known.get(vid) != lang:
+                    raise EngineError("bad_voice", f"{vid} is not a {lang} voice", 400)
+                cur[lang] = vid
+        proj["voices"] = cur
+        studio().projects.save(proj)
+        return view(proj)
+
+    def lecture_lesson(pid: str, lid: str, sess: Session, *, editable: bool = True) -> tuple[dict, dict, dict]:
+        proj = load(pid, sess)
+        chapter, les = studio().find_lesson(proj, lid)
+        if editable and les["status"] == "published":
+            raise EngineError("published", "this lesson is already in the course", 409)
+        if not studio().voice_url:
+            raise EngineError("voice_unavailable", "the voice service is not set up", 503)
+        return proj, chapter, les
+
+    @app.get("/api/v1/studio/projects/{pid}/lessons/{lid}/lecture")
+    async def lecture_view(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        """The lecture's lines to check and edit: AI narration per slide, or the recording's subtitles."""
+        proj = load(pid, sess)
+        _, les = studio().find_lesson(proj, lid)
+        out = studio().lecture_view(proj, les)
+        lec = les.get("lecture") or {}
+        if lec.get("langs"):
+            out["urls"] = lecture_urls(pid, lid, lec["langs"])
+        out["locked"] = les["status"] == "published"
+        return out
+
+    @app.put("/api/v1/studio/projects/{pid}/lessons/{lid}/lecture")
+    async def lecture_edit(pid: str, lid: str, body: LectureIn, sess: Annotated[Session, Depends(current)]):
+        await need_creator(sess)
+        proj, _, les = lecture_lesson(pid, lid, sess)
+        if not (les.get("lecture") or {}).get("langs"):
+            raise EngineError("no_lecture", "this lesson has no lecture video yet", 409)
+        rows = [r.model_dump() for r in body.rows]
+        studio().run(proj, f"正在按你改的内容重新配音：{disp(les['title'])}", lambda p: studio().edit_lecture(p, lid, rows))
+        return view(studio().projects.load(pid))
+
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/lecture/redo")
+    async def lecture_redo(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        """重做讲解视频 with AI narration (replaces a teacher recording)."""
+        await need_creator(sess)
+        proj, _, les = lecture_lesson(pid, lid, sess)
+        if les["status"] != "awaiting":
+            raise EngineError("wrong_stage", "write the lesson first", 409)
+        studio().run(proj, f"主讲教授正在重做讲解视频：{disp(les['title'])}", lambda p: studio().redo_lecture(p, lid))
+        return view(studio().projects.load(pid))
+
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/recording")
+    async def recording(pid: str, lid: str, request: Request, sess: Annotated[Session, Depends(current)],
+                        upload: str = "", index: int = 0, total: int = 1, name: str = ""):
+        """老师亲讲: the teacher's recording, sent in pieces (index 0..total-1, each at most 64 MB). After the last piece
+        it is converted, recognised, translated and dubbed in the background."""
+        await need_creator(sess)
+        proj, _, les = lecture_lesson(pid, lid, sess)
+        if les["status"] != "awaiting":
+            raise EngineError("wrong_stage", "write the lesson first", 409)
+        ext = Path(name).suffix.lower()
+        if ext not in RECORDING_EXT:
+            raise EngineError("bad_file", "a video file (.mp4 .mov .webm .mkv .m4v .avi) please", 400)
+        if not re.fullmatch(r"[a-z0-9]{8,32}", upload) or not (0 <= index < total <= RECORDING_MAX // CHUNK_MAX + 1):
+            raise EngineError("bad_request", "bad upload piece", 400)
+        if studio().is_busy(pid) and index == 0:
+            raise EngineError("busy", "the team is working on this course; try again when it is done", 409)
+        folder = studio().projects.root / pid / "uploads"
+        folder.mkdir(parents=True, exist_ok=True)
+        part = folder / f"{upload}.part"
+        if index == 0:
+            part.unlink(missing_ok=True)
+        elif not part.exists():
+            raise EngineError("bad_request", "upload the pieces in order", 400)
+        size, got = part.stat().st_size if part.exists() else 0, 0
+        with part.open("ab") as fh:
+            async for chunk in request.stream():
+                got += len(chunk)
+                if got > CHUNK_MAX or size + got > RECORDING_MAX:
+                    fh.close()
+                    part.unlink(missing_ok=True)
+                    raise EngineError("too_large", "the recording is too large (3 GB at most)", 413)
+                fh.write(chunk)
+        if index < total - 1:
+            return {"ok": True, "received": index + 1}
+        src = folder / f"{upload}{ext}"
+        part.rename(src)
+        studio().say(proj, f"收到《{disp(les['title'])}》的讲课录像（{round(src.stat().st_size / 1024 ** 2)} MB），正在处理。", "teacher")
+        studio().projects.save(proj)
+        studio().run(proj, f"正在处理你的讲课录像：{disp(les['title'])}", lambda p: studio().take_recording(p, lid, src))
+        return view(studio().projects.load(pid))
+
     @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/approve")
     async def publish(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
         await need_creator(sess)
@@ -573,7 +741,11 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         f = next((x for x in les.get("files") or [] if x["name"] == d["n"]), None)
         if not f and d["n"] in {c.get("image") for c in les.get("checklist") or [] if c.get("image")}:
             f = {"kind": "image"}
+        if not f and d["n"] in LECTURE_FILES:
+            f = {"kind": "lecture_part"}
         path = studio().lesson_dir(proj, les) / d["n"]
+        if d["n"].endswith(".vtt") and path.exists():
+            return Response(path.read_bytes(), media_type="text/vtt; charset=utf-8", headers={"Cache-Control": "private, max-age=60"})
         if not f or not path.exists():
             raise EngineError("not_found", "no such file", 404)
         if f["kind"] == "lab":
@@ -581,6 +753,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             return Response(path.read_bytes(), media_type="text/html; charset=utf-8", headers={
                 "Cache-Control": "private, max-age=600", "X-Content-Type-Options": "nosniff",
                 "Content-Security-Policy": "sandbox allow-scripts allow-popups allow-forms allow-modals; frame-ancestors 'self'"})
+        if f["kind"] == "lecture_part":
+            return FileResponse(path, headers={"Cache-Control": "private, max-age=600"})
         return FileResponse(path, filename=d["n"], headers={"Cache-Control": "private, max-age=600"})
 
     @app.get("/api/v1/studio/projects/{pid}/lessons/{lid}/deck")
@@ -717,6 +891,27 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             if res.get("cmids"):
                 proj["course"].setdefault("labs", {})[chapter["id"]] = res["cmids"][0]
 
+    async def lecture_resource(les: dict, d: Path, sess: Session) -> list[dict[str, Any]]:
+        """讲解视频 as one file activity: the main video first (Chinese voice, or English for an English course),
+        then the other voice as <name>.en.mp4 and the subtitles as <name>.zh.vtt / .en.vtt. The app finds them
+        together; the classic view plays the main video."""
+        f = next((x for x in les.get("files") or [] if x["kind"] == "lecture"), None)
+        if not f:
+            return []
+        lec = d / "lecture"
+        stem = Path(f["name"]).stem
+        langs = [x for x in f["langs"] if (lec / f"{x}.mp4").exists()]
+        if not langs:
+            return []
+        draft = 0
+        for i, lang in enumerate(langs):
+            with (lec / f"{lang}.mp4").open("rb") as fh:
+                draft = await m.state.moodle.upload(sess.moodle_token, f"{stem}.mp4" if i == 0 else f"{stem}.{lang}.mp4", fh, draft)
+        for lang in langs:
+            if (lec / f"{lang}.vtt").exists():
+                draft = await m.state.moodle.upload(sess.moodle_token, f"{stem}.{lang}.vtt", (lec / f"{lang}.vtt").read_bytes(), draft)
+        return [{"type": "resource", "name": stem, "draftitemid": draft, "visible": 1}]
+
     async def publish_lesson(proj: dict, chapter: dict, les: dict, sess: Session) -> None:
         lg = proj["outline"]["languages"]
         course = proj["course"]
@@ -753,6 +948,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         if fig_draft:
             page_act["draftitemid"] = fig_draft
         acts: list[dict[str, Any]] = [page_act]
+        acts += await lecture_resource(les, d, sess)
         acts += await produced("animation")
         acts += await produced("slides")
         if any(les.get("exercises", {}).values()):
@@ -783,6 +979,9 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             course.setdefault("labs", {})[chapter["id"]] = les["cmids"][lab_index]
         les["status"] = "published"
         les["published"] = time.time()
+
+
+LECTURE_FILES = {f"lecture/{x}" for x in ("zh.mp4", "en.mp4", "zh.vtt", "en.vtt", "poster.jpg")}
 
 
 def readable_name(filename: str) -> str:

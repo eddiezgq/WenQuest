@@ -32,6 +32,7 @@ from . import team
 from .production import spec as sp
 from .ai import ModelGateway
 from .moodle import EngineError
+from .lectures import LectureMixin
 
 log = logging.getLogger("wenquest.studio")
 
@@ -168,7 +169,7 @@ def summary(proj: dict, items: list[mt.Material] | None = None, with_outline: bo
 
 # --- the orchestrator ---------------------------------------------------------------------------
 
-class Studio:
+class Studio(LectureMixin):
     def __init__(self, projects: Projects, store: mt.Store, ai: ModelGateway, clean: Callable[[str], str]):
         self.projects = projects
         self.store = store
@@ -180,6 +181,7 @@ class Studio:
         self.animator_timeout = 600.0
         self.labcheck_url = ""      # the lab checker (headless browser); empty = no virtual labs
         self.labcheck_timeout = 150.0
+        self.voice_url = ""         # the voice service (speech synthesis / recognition); empty = no lecture videos
         # 相似度检查 is off only for the offline stand-in model (its answers are fixed examples by design)
         self.copy_check = getattr(ai, "provider", "") != "fake"
 
@@ -911,6 +913,7 @@ class Studio:
         proj["busy"] = {"label": f"正在排版课件、指导书、报告模板和教案：{no}", "since": now()}
         self.projects.save(proj)
         await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video, lab)
+        await self.make_lecture(proj, chapter, les, spec, no)
         les["review"] = review
         les["status"] = "awaiting"
         les["written"] = now()
@@ -962,6 +965,9 @@ class Studio:
             c = checks.get("lab") or {"ok": False, "note": "没有虚拟实验"}
             items.append({"key": "lab", "label": "实验切题、能完成", "by": c.get("by", "auto+ai"), "ok": bool(c.get("ok")) and bool(lab),
                           "note": c.get("note", ""), "image": lab["image"].name if lab and lab.get("image") else ""})
+        if self.voice_url:
+            c = self.lecture_check(les)
+            items.append({"key": "lecture", "label": "讲解视频", "by": "auto", "ok": bool(c.get("ok")), "note": c.get("note", "")})
         for key, label in (("numbers", "数值和单位已核对"), ("bilingual", "中英一致")):
             ok, note = ai(key)
             items.append({"key": key, "label": label, "by": "ai", "ok": ok, "note": note})
@@ -1418,6 +1424,7 @@ class Studio:
         proj["busy"] = {"label": f"正在重新排版课件：{no}", "since": now()}
         self.projects.save(proj)
         await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video, lab)
+        await self.make_lecture(proj, chapter, les, spec, no)
         les["review"] = review
         les["checklist"] = self.checklist(proj, les, video, lab)
         todo = next((x["text"] for x in les.get("attention") or [] if x["kind"] == kind), "")
@@ -1476,6 +1483,7 @@ class Studio:
             if (d / f["png"]).exists():
                 files.append({"name": f["png"], "kind": "figure", "teacher_only": False, "title": f["title"], "no": f["no"]})
         les["files"] = files
+        self.set_lecture_file(proj, les, no)
         les["spec_title"] = spec["title"]
         keys = lang_keys(o["languages"])
         les["content"] = {k: self.clean(page.build(spec, k)) for k in keys}

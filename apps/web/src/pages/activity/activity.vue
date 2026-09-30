@@ -31,8 +31,11 @@
 
       <!-- Files -->
       <view v-else-if="a.type === 'resource' && file">
+        <!-- 讲解视频: Chinese / English voice, subtitles -->
+        <LecturePlayer v-if="a.lecture" :lecture="a.lecture" />
+
         <!-- Video -->
-        <view v-if="fileKind === 'video'" class="player">
+        <view v-else-if="fileKind === 'video'" class="player">
           <video class="video" :src="absolute(file.url)" controls preload="metadata" />
         </view>
 
@@ -104,6 +107,7 @@ import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import RichContent from "../../components/RichContent.vue";
 import SlidePresenter from "../../components/SlidePresenter.vue";
+import LecturePlayer from "../../components/LecturePlayer.vue";
 import AssignmentView from "../../components/work/AssignmentView.vue";
 import QuizView from "../../components/work/QuizView.vue";
 // #ifdef H5
@@ -128,7 +132,7 @@ const file = computed(() => (a.value?.files || [])[0] || null);
 const fileKind = computed(() => file.value?.kind || "file");
 const kindKey = computed(() => {
   if (!a.value) return "file";
-  if (a.value.type === "resource") return fileKind.value;
+  if (a.value.type === "resource") return a.value.lecture ? "lecture" : fileKind.value;
   if (a.value.type === "page") return "reading";
   if (a.value.type === "url") return "link";
   return ["assign", "quiz", "forum"].includes(a.value.type) ? a.value.type : "file";

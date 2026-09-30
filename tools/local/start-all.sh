@@ -10,6 +10,8 @@ if ! curl -s -o /dev/null localhost:8080/login/index.php; then
 fi
 curl -s -o /dev/null localhost:8090/api/health || $L/start-gateway.sh
 curl -s -o /dev/null localhost:8095/health || $L/start-animator.sh
+curl -s -o /dev/null localhost:8096/health || $L/start-labcheck.sh
+curl -s -o /dev/null localhost:8098/health || $L/start-voice.sh
 curl -s -o /dev/null localhost:8088/ || (setsid nohup node $L/serve-web.js > $L/web.log 2>&1 < /dev/null &)
 sleep 3
 printf "moodle %s · gateway %s · web %s\n" "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080/login/index.php)" \

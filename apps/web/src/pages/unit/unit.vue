@@ -24,7 +24,8 @@
           <view class="tabs">
             <view v-for="(m, i) in groups.video" :key="m.id" class="vtab" :class="{ on: i === videoIndex }" @click="playVideo(i)">{{ m.name }}</view>
           </view>
-          <view class="player">
+          <LecturePlayer v-if="lecture" :lecture="lecture" />
+          <view v-else class="player">
             <!-- #ifdef H5 -->
             <video v-if="videoUrl" :key="videoUrl" class="video" :src="videoUrl" controls preload="metadata" />
             <!-- #endif -->
@@ -93,7 +94,8 @@ import { computed, ref, watch } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import ModuleRow from "../../components/ModuleRow.vue";
-import { absolute, api, ApiError, type Module, type Section, token } from "../../api";
+import LecturePlayer from "../../components/LecturePlayer.vue";
+import { absolute, api, ApiError, type LectureMedia, type Module, type Section, token } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 import { type CourseData, loadCourse, moduleKind, studentPreview, units, visibleModules } from "../../store";
 
@@ -106,6 +108,7 @@ const d = ref<CourseData | null>(null);
 const error = ref("");
 const videoIndex = ref(0);
 const videoUrl = ref("");
+const lecture = ref<LectureMedia | null>(null);
 
 const section = computed(() => d.value?.sections.find((s) => s.id === sectionId.value) || null);
 const unitList = computed(() => (d.value ? units(d.value) : []));
@@ -136,10 +139,12 @@ const progress = computed(() => (trackable.value.length ? Math.round((doneCount.
 async function playVideo(i: number) {
   videoIndex.value = i;
   videoUrl.value = "";
+  lecture.value = null;
   const m = groups.value.video[i];
   if (!m) return;
   try {
     const a = await api.activity(m.id);
+    if (a.lecture) { lecture.value = a.lecture; return; }
     const f = (a.files || []).find((x) => x.kind === "video") || (a.files || [])[0];
     videoUrl.value = f ? absolute(f.url) : "";
   } catch { /* keep the loading text; the row below still opens it */ }
@@ -150,7 +155,7 @@ async function load(force = false) {
   try {
     d.value = await loadCourse(courseId.value, force);
     if (section.value) uni.setNavigationBarTitle({ title: section.value.name });
-    if (groups.value.video.length && !videoUrl.value) playVideo(videoIndex.value);
+    if (groups.value.video.length && !videoUrl.value && !lecture.value) playVideo(videoIndex.value);
   } catch (e) {
     error.value = e instanceof ApiError ? e.code : "unknown";
   }
@@ -167,8 +172,8 @@ onShow(() => {
   if (!token.value) return uni.reLaunch({ url: "/pages/login/login" });
   load();
 });
-watch(locale, () => { videoUrl.value = ""; load(true); });
-watch(studentPreview, () => { videoIndex.value = 0; videoUrl.value = ""; if (groups.value.video.length) playVideo(0); });
+watch(locale, () => { videoUrl.value = ""; lecture.value = null; load(true); });
+watch(studentPreview, () => { videoIndex.value = 0; videoUrl.value = ""; lecture.value = null; if (groups.value.video.length) playVideo(0); });
 </script>
 
 <style scoped>

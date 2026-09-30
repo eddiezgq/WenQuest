@@ -23,7 +23,7 @@ envset() {
     fi
 }
 
-# All three images are built from one commit and share a tag; derive the others from the engine image.
+# All images are built from one commit and share a tag; derive the others from the engine image.
 #   ghcr.io/owner/repo/engine:abc123 -> ghcr.io/owner/repo/gateway:abc123
 set_images() {
     envset ENGINE_IMAGE "$1"
@@ -31,6 +31,7 @@ set_images() {
     envset WEB_IMAGE "${1/\/engine:/\/web:}"
     envset ANIMATOR_IMAGE "${1/\/engine:/\/animator:}"
     envset LABCHECK_IMAGE "${1/\/engine:/\/labcheck:}"
+    envset VOICE_IMAGE "${1/\/engine:/\/voice:}"
 }
 
 dc() {

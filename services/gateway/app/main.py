@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
+import os
+import time
 import sys
 import logging
 import uuid
@@ -230,8 +233,16 @@ def register(app: FastAPI) -> None:
                 labcheck = r.json() if r.status_code == 200 else "down"
             except (httpx.HTTPError, ValueError):
                 labcheck = "down"
+        voice: Any = False
+        if state.settings.voice_url:
+            try:
+                async with httpx.AsyncClient(timeout=2.0, trust_env=False) as c:
+                    r = await c.get(state.settings.voice_url.rstrip("/") + "/health")
+                voice = r.json() if r.status_code == 200 else "down"
+            except (httpx.HTTPError, ValueError):
+                voice = "down"
         return {"ok": True, "version": VERSION, "ai": state.ai.provider, "slides": state.slides.available,
-                "slide_queue": state.slides.overview(), "animator": animator, "labcheck": labcheck}
+                "slide_queue": state.slides.overview(), "animator": animator, "labcheck": labcheck, "voice": voice}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)
     async def login(body: LoginIn, response: Response):
@@ -390,6 +401,9 @@ def register(app: FastAPI) -> None:
                     files.append(item)
             base["files"] = files
             base["kind"] = files[0]["kind"] if files else "file"
+            lecture = _lecture_of(files)
+            if lecture:
+                base["kind"], base["lecture"] = "lecture", lecture
             base["hidden"] = not (mod or {}).get("visible", 1)
         # Anything the new UI does not render yet opens in Moodle's classic view.
         base["classic_url"] = f"{state.settings.moodle_url.rstrip('/')}/mod/{kind}/view.php?id={cmid}"
@@ -594,6 +608,15 @@ def register(app: FastAPI) -> None:
     @app.get("/api/v1/files/{signed}")
     async def files(signed: str, range: Annotated[str | None, Header()] = None):
         mtoken, url = _unsign(signed)
+        # Videos and other large files are kept on the gateway's disk for a while and served from there with
+        # byte ranges (seeking in a lecture video must not download the whole file from Moodle each time).
+        cached = await _large_file(mtoken, url)
+        if cached:
+            path, ctype = cached
+            return FileResponse(path, media_type=ctype, headers={
+                "Cache-Control": "private, max-age=3600", "X-Content-Type-Options": "nosniff",
+                "Content-Security-Policy": "default-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'unsafe-inline'; sandbox",
+                "Content-Disposition": _disposition("inline" if ctype.startswith(("video/", "audio/")) else "attachment", _file_name(url))})
         r = await state.moodle.fetch_file(mtoken, url)
         ctype = r.headers.get("content-type", "application/octet-stream")
         headers = {
@@ -613,6 +636,75 @@ def register(app: FastAPI) -> None:
             headers["Content-Range"] = f"bytes {start}-{end}/{total}"
             return Response(body[start:end + 1], status_code=206, media_type=ctype, headers=headers)
         return Response(body, media_type=ctype, headers=headers)
+
+
+def _lecture_of(files: list[dict]) -> dict | None:
+    """讲解视频: one file activity with the main video, the other voice (<name>.en.mp4 / <name>.zh.mp4) and
+    subtitles (<name>.zh.vtt, <name>.en.vtt) -> {video: {zh, en}, subs: {zh, en}}."""
+    names = {f["name"]: f["url"] for f in files}
+    if not any(n.lower().endswith(".vtt") for n in names):
+        return None
+    mains = [n for n in names if n.lower().endswith(".mp4") and not n.lower().endswith((".zh.mp4", ".en.mp4"))]
+    if len(mains) != 1:
+        return None
+    stem = mains[0][:-4]
+    video = {lang: names[f"{stem}.{lang}.mp4"] for lang in ("zh", "en") if f"{stem}.{lang}.mp4" in names}
+    subs = {lang: names[f"{stem}.{lang}.vtt"] for lang in ("zh", "en") if f"{stem}.{lang}.vtt" in names}
+    main = "en" if "zh" in video else "zh" if "en" in video else ("zh" if "zh" in subs else "en")
+    video[main] = names[mains[0]]
+    return {"video": video, "subs": subs}
+
+
+LARGE = 8 * 1024 * 1024
+MEDIA_EXT = (".mp4", ".m4v", ".webm", ".mov", ".mp3", ".m4a", ".wav", ".ogg")
+
+
+async def _large_file(mtoken: str, url: str) -> tuple[Path, str] | None:
+    """A Moodle video/audio file on the gateway's disk (downloaded once, streamed; kept 3 days, 8 GB at most)."""
+    name = _file_name(url).lower()
+    if not name.endswith(MEDIA_EXT):
+        return None
+    folder = Path(state.settings.data_dir) / "filecache"
+    folder.mkdir(parents=True, exist_ok=True)
+    key = hashlib.sha256(url.encode()).hexdigest()[:32]
+    path, meta = folder / key, folder / f"{key}.json"
+    if path.exists() and meta.exists():
+        os.utime(path)
+        return path, json.loads(meta.read_text()).get("type", "application/octet-stream")
+    m = state.moodle
+    if not url.startswith(m.base + "/"):
+        raise EngineError("forbidden", "foreign file url", 403)
+    sep = "&" if "?" in url else "?"
+    tmp = folder / f"{key}.{uuid.uuid4().hex[:8]}.tmp"
+    try:
+        async with m.http.stream("GET", f"{m._url(url)}{sep}token={mtoken}", headers=m.headers) as r:
+            ctype = r.headers.get("content-type", "application/octet-stream")
+            if r.status_code == 404:
+                raise EngineError("not_found", "file", 404)
+            if r.status_code != 200 or "application/json" in ctype:
+                return None     # let the ordinary path report Moodle's error
+            with tmp.open("wb") as fh:
+                async for chunk in r.aiter_bytes(1 << 20):
+                    fh.write(chunk)
+    except httpx.HTTPError as exc:
+        tmp.unlink(missing_ok=True)
+        raise EngineError("engine_unreachable", str(exc), 503) from exc
+    if not tmp.exists():
+        return None
+    tmp.replace(path)
+    meta.write_text(json.dumps({"type": ctype, "url": url[-200:]}))
+    _sweep_file_cache(folder)
+    return path, ctype
+
+
+def _sweep_file_cache(folder: Path, keep_days: float = 3, max_bytes: int = 8 * 1024 ** 3) -> None:
+    files = sorted((p for p in folder.iterdir() if p.suffix == ""), key=lambda p: p.stat().st_mtime)
+    total, cutoff = sum(p.stat().st_size for p in files), time.time() - keep_days * 86400
+    for p in files:
+        if p.stat().st_mtime < cutoff or total > max_bytes:
+            total -= p.stat().st_size
+            p.unlink(missing_ok=True)
+            (folder / f"{p.name}.json").unlink(missing_ok=True)
 
 
 def _unsign(signed: str) -> tuple[str, str]:
@@ -739,6 +831,7 @@ def _studio() -> st.Studio:
     s.animator_url = state.settings.animator_url
     s.animator_timeout = state.settings.animator_timeout
     s.labcheck_url = state.settings.labcheck_url
+    s.voice_url = state.settings.voice_url
     lib_key = (state.settings.library_url, state.settings.data_dir)
     if getattr(s, "library_key", None) != lib_key:
         from .library import Library

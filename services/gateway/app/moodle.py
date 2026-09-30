@@ -142,8 +142,9 @@ class MoodleClient:
             _raise_for(_json(r))
         return r
 
-    async def upload(self, token: str, filename: str, data: bytes, itemid: int = 0) -> int:
-        """Put a file in the user's draft area (a new one, or `itemid` to add to it); returns the draft item id."""
+    async def upload(self, token: str, filename: str, data: Any, itemid: int = 0) -> int:
+        """Put a file in the user's draft area (a new one, or `itemid` to add to it); returns the draft item id.
+        `data`: bytes, or an open binary file (streamed, for large videos)."""
         try:
             r = await self.http.post(self._url("/webservice/upload.php"), headers=self.headers,
                                      data={"token": token, "filearea": "draft", "itemid": str(itemid)},

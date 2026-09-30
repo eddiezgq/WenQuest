@@ -71,10 +71,13 @@ export interface Activity {
   url?: string;
   due?: number | null;
   files?: { name: string; size: number; mimetype: string; kind: FileKind; url: string; lab_url?: string }[];
-  kind?: FileKind;
+  kind?: FileKind | "lecture";
+  /** 讲解视频: the two voices and the subtitles */
+  lecture?: LectureMedia;
   hidden?: boolean;
   classic_url: string;
 }
+export interface LectureMedia { video: { zh?: string; en?: string }; subs: { zh?: string; en?: string }; poster?: string }
 
 // --- AI course workshop ---
 export type Languages = "zh" | "en" | "both";
@@ -122,7 +125,10 @@ export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"
 export interface StudioLesson {
   id: string; title: Text; goal: Text; week: number; sections: string[]; status: LessonStatus;
   content: Text; exercises: Text; answers: Text; notes: string; error: string;
-  files?: { name: string; kind: "animation" | "lab" | "slides" | "guide" | "report" | "plan"; teacher_only: boolean; url: string; seconds?: number }[];
+  files?: {
+    name: string; kind: "animation" | "lecture" | "lab" | "slides" | "guide" | "report" | "plan" | "figure"; teacher_only: boolean; url: string;
+    seconds?: number; langs?: ("zh" | "en")[]; source?: "ai" | "teacher"; lecture?: LectureMedia;
+  }[];
   review: { verdict: "pass" | "revise"; issues: { severity: string; text: string }[]; summary: string; round: number } | null;
   /** 需要你处理: what the team could not finish (kind "animation" | "lab"), shown prominently with a redo button. */
   attention?: { kind: string; text: string }[];
@@ -144,9 +150,19 @@ export interface StudioProject {
   progress: Record<LessonStatus | "total", number>;
   labs_on?: boolean;
   anims_on?: boolean;
+  /** 讲解视频 can be made (the voice service is set up); the course's voices */
+  voices_on?: boolean;
+  voices?: { zh: string; en: string };
   zip_url?: string;
   design_book?: DesignBook | null;
   assets?: CourseAsset[];
+}
+export interface Voice { id: string; lang: "zh" | "en"; gender: string; zh: string; en: string; sample: string }
+/** The lines of a lecture video: AI narration per slide, or the recording's subtitles. */
+export interface LectureRows {
+  source: "" | "ai" | "teacher"; seconds?: number; langs?: string[]; locked?: boolean;
+  rows: { n: number; start: number; end?: number; zh: string; en: string; raw?: string; edited?: boolean }[];
+  urls?: LectureMedia;
 }
 /** 课程设计书: the course's own subject, robot platform, notation and per-chapter means (every lesson follows it). */
 export interface DesignBook {
@@ -364,6 +380,35 @@ export const api = {
   studioFilesDone: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/files/done`, {}),
   studioDeleteFile: (id: string, fid: string) => request<StudioProject>("DELETE", `/api/v1/studio/projects/${id}/files/${fid}`),
   studioRedoLab: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/lab`, {}),
+  studioVoices: () => request<{ available: boolean; voices: Voice[]; default: { zh?: string; en?: string } }>("GET", "/api/v1/studio/voices"),
+  studioSetVoices: (id: string, v: { zh?: string; en?: string }) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/voices`, v),
+  studioLecture: (id: string, lid: string) => request<LectureRows>("GET", `/api/v1/studio/projects/${id}/lessons/${lid}/lecture`),
+  studioEditLecture: (id: string, lid: string, rows: { n: number; zh?: string; en?: string }[]) =>
+    request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/lessons/${lid}/lecture`, { rows }),
+  studioRedoLecture: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/lecture/redo`, {}),
+  // Browser-only: the teacher's lecture recording, sent in 32 MB pieces (resumes nothing; one try per piece).
+  async studioUploadRecording(id: string, lid: string, file: File, progress: (done: number) => void): Promise<StudioProject> {
+    const piece = 32 * 1024 * 1024;
+    const total = Math.max(1, Math.ceil(file.size / piece));
+    const upload = Math.random().toString(36).slice(2, 12).replace(/[^a-z0-9]/g, "x").padEnd(10, "0");
+    let body: any = {};
+    for (let i = 0; i < total; i++) {
+      const q = `upload=${upload}&index=${i}&total=${total}&name=${encodeURIComponent(file.name)}`;
+      let res: Response;
+      try {
+        res = await fetch(`${BASE}/api/v1/studio/projects/${id}/lessons/${lid}/recording?${q}`, {
+          method: "POST", body: file.slice(i * piece, (i + 1) * piece),
+          headers: { Authorization: `Bearer ${token.value}`, "Content-Type": "application/octet-stream" },
+        });
+      } catch {
+        throw new ApiError("network", 0);
+      }
+      body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new ApiError(body.error || `http_${res.status}`, res.status);
+      progress((i + 1) / total);
+    }
+    return body as StudioProject;
+  },
   studioWrite: (id: string, lid: string, note = "") =>
     request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/write`, { note }),
   studioPublish: (id: string, lid: string) =>
