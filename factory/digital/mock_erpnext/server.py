@@ -210,6 +210,9 @@ class Mock:
             bom = self.db["BOM"][wo["bom_no"]]
             if doc["operation"] == INSPECTION_OP and bom.get("inspection_required") and not doc.get("quality_inspection"):
                 raise Err(417, "ValidationError", "作业卡 {} 需要先关联质量检验单".format(doc["name"]))
+            qi = self.db.get("Quality Inspection", {}).get(doc.get("quality_inspection") or "")
+            if qi and qi.get("status") == "Rejected":     # ERPNext 默认：检验单不合格时停止（Stock Settings）
+                raise Err(417, "QualityInspectionRejectedError", "Quality Inspection {} is rejected".format(qi["name"]))
             doc["status"] = "Completed"
             for op in wo["operations"]:
                 if op["operation"] == doc["operation"]:

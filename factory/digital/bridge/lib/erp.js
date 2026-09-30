@@ -290,9 +290,13 @@ class ERP {
       if (doc.docstatus !== 0) return name;
       const patch = { docstatus: 1 };
       if (d.operation === INSPECTION_OP) {
+        // 作业卡只能关联一张检验单；ERPNext 默认“检验单判不合格就不许提交”，所以关联最近一张合格的
+        //（不合格的零件已在总线上走不合格品处置，完工入库只按合格数）
         const qi = await this.list('Quality Inspection', [['reference_type', '=', 'Job Card'], ['reference_name', '=', name],
-          ['docstatus', '=', 1]], ['name']);
-        if (qi.length) patch.quality_inspection = qi[qi.length - 1].name;
+          ['docstatus', '=', 1]], ['name', 'status'], { order_by: 'creation asc' });
+        const ok = qi.filter((q) => q.status === 'Accepted');
+        const pick = ok.length ? ok[ok.length - 1] : qi[qi.length - 1];
+        if (pick) patch.quality_inspection = pick.name;
       }
       const upd = await this.update('Job Card', name, patch);
       out.push(this.doc('Job Card', upd, 'submitted', { corr: m.corr, mode: m.mode }));
