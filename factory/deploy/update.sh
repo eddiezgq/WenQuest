@@ -19,8 +19,7 @@ if [ "$(envval FACTORY_INSTALLED)" != 1 ]; then
         echo "::error::服务器可用内存只有 ${avail} MB，装数字工厂需要 ${need} MB。请在 DigitalOcean 控制台把这台服务器升到 16 GB（Resize），完成后重新运行“数字工厂部署”。学习平台未受影响。"
         exit 3
     fi
-    log "第一次部署：执行安装..."
-    dc pull --quiet
+    log "第一次部署：执行安装（先生成密码和配置，再拉镜像、启动）..."
     "$(dirname "$0")/install.sh"
 fi
 
