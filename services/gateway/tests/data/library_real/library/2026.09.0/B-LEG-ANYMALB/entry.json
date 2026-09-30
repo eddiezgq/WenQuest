@@ -1,0 +1,422 @@
+{
+ "schema": 1,
+ "id": "B-LEG-ANYMALB",
+ "kind": "robot",
+ "name": {
+  "zh": "ANYmal B 四足机器人",
+  "en": "ANYmal B"
+ },
+ "category": "LEG",
+ "tags": [
+  "四足机器人",
+  "quadruped",
+  "anybotics"
+ ],
+ "standards": [],
+ "params": [],
+ "defaults": {},
+ "model": {
+  "engine": "menagerie:anybotics_anymal_b/anymal_b.xml",
+  "formats": [
+   "mjcf",
+   "glb"
+  ],
+  "origin": "MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名",
+  "note": "网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取"
+ },
+ "robot": {
+  "type": "quadruped",
+  "links": [
+   {
+    "name": "base",
+    "node": "base",
+    "mass_kg": 19.2035
+   },
+   {
+    "name": "LF_HIP",
+    "node": "LF_HIP",
+    "mass_kg": 1.4246
+   },
+   {
+    "name": "LF_THIGH",
+    "node": "LF_THIGH",
+    "mass_kg": 1.635
+   },
+   {
+    "name": "LF_SHANK",
+    "node": "LF_SHANK",
+    "mass_kg": 0.4722
+   },
+   {
+    "name": "RF_HIP",
+    "node": "RF_HIP",
+    "mass_kg": 1.4246
+   },
+   {
+    "name": "RF_THIGH",
+    "node": "RF_THIGH",
+    "mass_kg": 1.635
+   },
+   {
+    "name": "RF_SHANK",
+    "node": "RF_SHANK",
+    "mass_kg": 0.4722
+   },
+   {
+    "name": "LH_HIP",
+    "node": "LH_HIP",
+    "mass_kg": 1.4246
+   },
+   {
+    "name": "LH_THIGH",
+    "node": "LH_THIGH",
+    "mass_kg": 1.635
+   },
+   {
+    "name": "LH_SHANK",
+    "node": "LH_SHANK",
+    "mass_kg": 0.4722
+   },
+   {
+    "name": "RH_HIP",
+    "node": "RH_HIP",
+    "mass_kg": 1.4246
+   },
+   {
+    "name": "RH_THIGH",
+    "node": "RH_THIGH",
+    "mass_kg": 1.635
+   },
+   {
+    "name": "RH_SHANK",
+    "node": "RH_SHANK",
+    "mass_kg": 0.4722
+   }
+  ],
+  "joints": [
+   {
+    "name": "LF_HAA",
+    "type": "continuous",
+    "parent": "base",
+    "child": "LF_HIP",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.277,
+      0.116,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "LF_HFE",
+    "type": "continuous",
+    "parent": "LF_HIP",
+    "child": "LF_THIGH",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0635,
+      0.041,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "LF_KFE",
+    "type": "continuous",
+    "parent": "LF_THIGH",
+    "child": "LF_SHANK",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.109,
+      -0.25
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "RF_HAA",
+    "type": "continuous",
+    "parent": "base",
+    "child": "RF_HIP",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.277,
+      -0.116,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "RF_HFE",
+    "type": "continuous",
+    "parent": "RF_HIP",
+    "child": "RF_THIGH",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0635,
+      -0.041,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "RF_KFE",
+    "type": "continuous",
+    "parent": "RF_THIGH",
+    "child": "RF_SHANK",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      -0.109,
+      -0.25
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "LH_HAA",
+    "type": "continuous",
+    "parent": "base",
+    "child": "LH_HIP",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.277,
+      0.116,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "LH_HFE",
+    "type": "continuous",
+    "parent": "LH_HIP",
+    "child": "LH_THIGH",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.0635,
+      0.041,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "LH_KFE",
+    "type": "continuous",
+    "parent": "LH_THIGH",
+    "child": "LH_SHANK",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.109,
+      -0.25
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "RH_HAA",
+    "type": "continuous",
+    "parent": "base",
+    "child": "RH_HIP",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.277,
+      -0.116,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "RH_HFE",
+    "type": "continuous",
+    "parent": "RH_HIP",
+    "child": "RH_THIGH",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.0635,
+      -0.041,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "RH_KFE",
+    "type": "continuous",
+    "parent": "RH_THIGH",
+    "child": "RH_SHANK",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      -0.109,
+      -0.25
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    }
+   }
+  ],
+  "dof": 12
+ },
+ "source": {
+  "origin": "menagerie",
+  "repo": "https://github.com/google-deepmind/mujoco_menagerie",
+  "commit": "4d038b3feae26ec82b46a4d586379114012a8ac7",
+  "path": "anybotics_anymal_b/",
+  "license": "BSD-3-Clause",
+  "attribution": "MuJoCo Menagerie（Google DeepMind）· anybotics_anymal_b；BSD-3-Clause；Copyright 2019, ANYbotics AG.",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-09-30",
+   "note": "按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）"
+  }
+ },
+ "teaching": {
+  "principle": "每条腿 3 个关节，四条腿交替支撑与摆动（步态），保持机身平衡前进。",
+  "uses": [
+   "巡检",
+   "野外作业"
+  ],
+  "courses": [
+   {
+    "course": "足式机器人",
+    "chapter": "步态与平衡"
+   }
+  ],
+  "labs": [
+   "单腿关节拖动",
+   "步态动画"
+  ]
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "version": "2026.09.0",
+ "package": "https://github.com/google-deepmind/mujoco_menagerie/tree/4d038b3feae26ec82b46a4d586379114012a8ac7/anybotics_anymal_b",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {},
+   "files": {
+    "glb": "B-LEG-ANYMALB/default.glb",
+    "png": "B-LEG-ANYMALB/default.png"
+   }
+  }
+ ]
+}

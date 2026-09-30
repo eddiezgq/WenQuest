@@ -1,0 +1,512 @@
+{
+ "schema": 1,
+ "id": "B-ARM-XARM7",
+ "kind": "robot",
+ "name": {
+  "zh": "xArm7 机械臂",
+  "en": "xArm7"
+ },
+ "category": "ARM",
+ "tags": [
+  "机械臂",
+  "arm",
+  "ufactory"
+ ],
+ "standards": [],
+ "params": [],
+ "defaults": {},
+ "model": {
+  "engine": "menagerie:ufactory_xarm7/xarm7.xml",
+  "formats": [
+   "mjcf",
+   "glb"
+  ],
+  "origin": "MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名",
+  "note": "网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取"
+ },
+ "robot": {
+  "type": "arm",
+  "links": [
+   {
+    "name": "link_base",
+    "node": "link_base",
+    "mass_kg": 0.8856
+   },
+   {
+    "name": "link1",
+    "node": "link1",
+    "mass_kg": 2.382
+   },
+   {
+    "name": "link2",
+    "node": "link2",
+    "mass_kg": 1.869
+   },
+   {
+    "name": "link3",
+    "node": "link3",
+    "mass_kg": 1.6383
+   },
+   {
+    "name": "link4",
+    "node": "link4",
+    "mass_kg": 1.7269
+   },
+   {
+    "name": "link5",
+    "node": "link5",
+    "mass_kg": 1.3203
+   },
+   {
+    "name": "link6",
+    "node": "link6",
+    "mass_kg": 1.325
+   },
+   {
+    "name": "link7",
+    "node": "link7",
+    "mass_kg": 0.17
+   },
+   {
+    "name": "xarm_gripper_base_link",
+    "node": "xarm_gripper_base_link",
+    "mass_kg": 0.5416
+   },
+   {
+    "name": "left_outer_knuckle",
+    "node": "left_outer_knuckle",
+    "mass_kg": 0.0336
+   },
+   {
+    "name": "left_finger",
+    "node": "left_finger",
+    "mass_kg": 0.0483
+   },
+   {
+    "name": "left_inner_knuckle",
+    "node": "left_inner_knuckle",
+    "mass_kg": 0.023
+   },
+   {
+    "name": "right_outer_knuckle",
+    "node": "right_outer_knuckle",
+    "mass_kg": 0.0336
+   },
+   {
+    "name": "right_finger",
+    "node": "right_finger",
+    "mass_kg": 0.0483
+   },
+   {
+    "name": "right_inner_knuckle",
+    "node": "right_inner_knuckle",
+    "mass_kg": 0.023
+   }
+  ],
+  "joints": [
+   {
+    "name": "joint1",
+    "type": "revolute",
+    "parent": "link_base",
+    "child": "link1",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.267
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -6.28319,
+     "upper": 6.28319
+    }
+   },
+   {
+    "name": "joint2",
+    "type": "revolute",
+    "parent": "link1",
+    "child": "link2",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      -1.570796,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.059,
+     "upper": 2.0944
+    }
+   },
+   {
+    "name": "joint3",
+    "type": "revolute",
+    "parent": "link2",
+    "child": "link3",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      -0.293,
+      0.0
+     ],
+     "rpy": [
+      1.570796,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -6.28319,
+     "upper": 6.28319
+    }
+   },
+   {
+    "name": "joint4",
+    "type": "revolute",
+    "parent": "link3",
+    "child": "link4",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0525,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      1.570796,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -0.19198,
+     "upper": 3.927
+    }
+   },
+   {
+    "name": "joint5",
+    "type": "revolute",
+    "parent": "link4",
+    "child": "link5",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0775,
+      -0.3425,
+      0.0
+     ],
+     "rpy": [
+      1.570796,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -6.28319,
+     "upper": 6.28319
+    }
+   },
+   {
+    "name": "joint6",
+    "type": "revolute",
+    "parent": "link5",
+    "child": "link6",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      1.570796,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -1.69297,
+     "upper": 3.14159
+    }
+   },
+   {
+    "name": "joint7",
+    "type": "revolute",
+    "parent": "link6",
+    "child": "link7",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.076,
+      0.097,
+      0.0
+     ],
+     "rpy": [
+      -1.570796,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -6.28319,
+     "upper": 6.28319
+    }
+   },
+   {
+    "name": "left_driver_joint",
+    "type": "revolute",
+    "parent": "xarm_gripper_base_link",
+    "child": "left_outer_knuckle",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.035,
+      0.059098
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": 0.0,
+     "upper": 0.85
+    }
+   },
+   {
+    "name": "left_finger_joint",
+    "type": "revolute",
+    "parent": "left_outer_knuckle",
+    "child": "left_finger",
+    "axis": [
+     -1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.035465,
+      0.042039
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": 0.0,
+     "upper": 0.85
+    }
+   },
+   {
+    "name": "left_inner_knuckle_joint",
+    "type": "revolute",
+    "parent": "xarm_gripper_base_link",
+    "child": "left_inner_knuckle",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.02,
+      0.074098
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": 0.0,
+     "upper": 0.85
+    }
+   },
+   {
+    "name": "right_driver_joint",
+    "type": "revolute",
+    "parent": "xarm_gripper_base_link",
+    "child": "right_outer_knuckle",
+    "axis": [
+     -1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      -0.035,
+      0.059098
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": 0.0,
+     "upper": 0.85
+    }
+   },
+   {
+    "name": "right_finger_joint",
+    "type": "revolute",
+    "parent": "right_outer_knuckle",
+    "child": "right_finger",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      -0.035465,
+      0.042039
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": 0.0,
+     "upper": 0.85
+    }
+   },
+   {
+    "name": "right_inner_knuckle_joint",
+    "type": "revolute",
+    "parent": "xarm_gripper_base_link",
+    "child": "right_inner_knuckle",
+    "axis": [
+     -1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      -0.02,
+      0.074098
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": 0.0,
+     "upper": 0.85
+    }
+   }
+  ],
+  "dof": 13
+ },
+ "source": {
+  "origin": "menagerie",
+  "repo": "https://github.com/google-deepmind/mujoco_menagerie",
+  "commit": "4d038b3feae26ec82b46a4d586379114012a8ac7",
+  "path": "ufactory_xarm7/",
+  "license": "BSD-3-Clause",
+  "attribution": "MuJoCo Menagerie（Google DeepMind）· ufactory_xarm7；BSD-3-Clause；Copyright (c) 2018, UFACTORY Inc.",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-09-30",
+   "note": "按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）"
+  }
+ },
+ "teaching": {
+  "principle": "多个转动关节串联：前几个关节主要决定末端位置，腕部关节决定姿态。",
+  "uses": [
+   "装配",
+   "上下料",
+   "人机协作"
+  ],
+  "courses": [
+   {
+    "course": "机器人技术",
+    "chapter": "串联机械臂正运动学"
+   },
+   {
+    "course": "机器人技术",
+    "chapter": "逆运动学与轨迹规划"
+   }
+  ],
+  "labs": [
+   "拖动关节看末端轨迹",
+   "正逆运动学虚拟实验"
+  ]
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "version": "2026.09.0",
+ "package": "https://github.com/google-deepmind/mujoco_menagerie/tree/4d038b3feae26ec82b46a4d586379114012a8ac7/ufactory_xarm7",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {},
+   "files": {
+    "glb": "B-ARM-XARM7/default.glb",
+    "png": "B-ARM-XARM7/default.png"
+   }
+  }
+ ]
+}

@@ -185,6 +185,21 @@ def render_drawing(svg_path: Path, dest: Path) -> dict:
     return {"png": dest.with_suffix(".png").name, "svg": dest.with_suffix(".svg").name}
 
 
+def render_picture(png_path: Path, dest: Path) -> dict:
+    """A rendered picture from the library (transparent PNG) on white, enlarged to figure size."""
+    from PIL import Image
+    if not png_path.exists():
+        raise FigureError("the library entry has no picture")
+    im = Image.open(png_path).convert("RGBA")
+    scale = max(1, 1100 // max(im.size))
+    im = im.resize((im.width * scale, im.height * scale), Image.LANCZOS)
+    w, h = max(im.width + 160, int((im.height + 120) * 4 / 3)), im.height + 120
+    bg = Image.new("RGB", (w, h), "white")
+    bg.paste(im, ((w - im.width) // 2, (h - im.height) // 2), im)
+    bg.save(dest.with_suffix(".png"), "PNG")
+    return {"png": dest.with_suffix(".png").name}
+
+
 # --- scene (Manim still via the animator) -------------------------------------------------------------------------
 
 async def render_scene(url: str, code: str, dest: Path, timeout: float = 240.0) -> dict:

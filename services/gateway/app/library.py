@@ -64,7 +64,8 @@ class Library:
         if self._index and time.time() - self._at < 600:
             return self._index
         latest = json.loads(await self._get("latest.json"))
-        idx = json.loads(await self._get(latest.get("index") or f"{latest['version']}/index.json"))
+        rel = re.sub(r"^/?library/", "", latest.get("index") or f"{latest['version']}/index.json")
+        idx = json.loads(await self._get(rel))
         idx.setdefault("version", latest["version"])
         self._index, self._at = idx, time.time()
         return idx
@@ -79,7 +80,8 @@ class Library:
         """One row per entry (the default spec), by id."""
         out: dict[str, dict] = {}
         for row in (await self.index()).get("items") or []:
-            out.setdefault(row["id"], row)
+            if row["id"] not in out or (row.get("default") and not out[row["id"]].get("default")):
+                out[row["id"]] = row
         return out
 
     async def catalog_text(self, words: str = "", limit: int = 40) -> str:
@@ -90,7 +92,7 @@ class Library:
         def score(r):
             hay = " ".join([r["id"], r["name"].get("zh", ""), r["name"].get("en", ""), " ".join(r.get("tags") or [])]).lower()
             return -sum(1 for t in toks if t in hay)
-        rows.sort(key=score)
+        rows.sort(key=lambda r: (score(r), 0 if r.get("kind") == "robot" or r["id"].startswith("B-") else 1, r["id"]))
         lines = [f"{r['id']} | {r['name'].get('zh', '')} / {r['name'].get('en', '')} | {r.get('category', '')} | "
                  f"{', '.join((r.get('tags') or [])[:6])} | {r.get('principle', '')[:80]}" for r in rows[:limit]]
         return "\n".join(lines)
@@ -104,16 +106,19 @@ class Library:
         rows = [r for r in idx.get("items") or [] if r["id"] == eid]
         if not rows:
             raise LibraryError(f"{eid} is not in the library")
-        entry = await self.entry(eid, version)
-        spec = entry.get("default") or rows[0].get("spec") or "default"
-        spec = spec if any(r.get("spec") == spec for r in rows) else rows[0].get("spec", "default")
+        entry = normalize_entry(await self.entry(eid, version))
+        row = next((r for r in rows if r.get("default")), rows[0])
+        spec = row.get("size") or row.get("spec") or entry.get("default") or "default"
         dest = folder / eid
         tmp = folder / f".{eid}.part"
         shutil.rmtree(tmp, ignore_errors=True)
         tmp.mkdir(parents=True)
         (tmp / "entry.json").write_text(json.dumps(entry, ensure_ascii=False), encoding="utf-8")
         files = ["entry.json"]
-        for name in (f"{spec}.glb", f"{spec}.svg", f"{spec}.png", "motion.csv"):
+        wanted = {f"{spec}.glb", f"{spec}.svg", f"{spec}.png", "motion.csv"}
+        for name in [Path(v).name for v in (row.get("files") or {}).values()] + sorted(wanted):
+            if name in files or not (name in wanted or name.startswith(spec + ".")):
+                continue
             try:
                 (tmp / name).write_bytes(await self._get(f"{version}/{eid}/{name}"))
                 files.append(name)
@@ -128,6 +133,117 @@ class Library:
         return {"id": eid, "version": version, "spec": spec, "name": entry["name"], "kind": entry.get("kind", ""),
                 "category": entry.get("category", ""), "license": src.get("license", ""),
                 "attribution": src.get("attribution", ""), "files": files, "added": int(time.time())}
+
+
+SPIN = re.compile(r"wheel|rotor|prop|caster|spin", re.I)
+
+
+def normalize_entry(entry: dict) -> dict:
+    """Entries of the published library (robot.links / robot.joints with limit{lower, upper}) get the fields the course
+    tools use: links, root, joints (lower/upper), tool (end of the longest chain, arms only), rest and demo ranges.
+    Entries that already have them (the built-in sample) are left as they are."""
+    e = dict(entry)
+    if isinstance(e.get("default"), dict):
+        e.pop("default")
+    rob = e.get("robot") or {}
+    if e.get("joints") or not rob.get("joints"):
+        return e
+    joints = []
+    for j in rob["joints"]:
+        if j.get("type") not in ("revolute", "continuous", "prismatic") or not j.get("child"):
+            continue
+        lim = j.get("limit") or {}
+        lo, hi = lim.get("lower"), lim.get("upper")
+        if j["type"] == "continuous" or lo is None or hi is None:
+            lo, hi = (-3.14159, 3.14159) if j["type"] != "prismatic" else (-0.1, 0.1)
+        joints.append({"name": j["name"], "type": j["type"], "parent": j.get("parent"), "child": j["child"],
+                       "axis": j.get("axis") or [0, 0, 1], "lower": float(lo), "upper": float(hi), "origin": j.get("origin")})
+    links = [x["node"] if isinstance(x, dict) else x for x in rob.get("links") or []]
+    links = [x.get("name") if isinstance(x, dict) else x for x in links]
+    children = {j["child"] for j in joints}
+    root = next((x for x in links if x not in children), links[0] if links else "")
+    e["links"], e["root"], e["joints"] = links, root, joints
+    if rob.get("type") == "arm" and joints:
+        kids: dict[str, list[str]] = {}
+        for j in joints:
+            kids.setdefault(j["parent"], []).append(j["child"])
+
+        node, seen = root, set()
+        while len(kids.get(node, [])) == 1 and node not in seen:   # down the arm; stop where a gripper branches
+            seen.add(node)
+            node = kids[node][0]
+        e["tool"] = {"link": node, "xyz": [0, 0, 0]}
+    rest, demo = {}, {}
+    given = rob.get("rest") or rob.get("home") or {}          # the model's own standing pose, when the library gives one
+    posed = {k: float(v) for k, v in given.items() if isinstance(v, (int, float))} or (_arm_rest(e) if e.get("tool") else {})
+    for j in joints:
+        lo, hi = j["lower"], j["upper"]
+        mid = posed.get(j["name"], min(max(0.0, lo), hi))
+        rest[j["name"]] = mid
+        if j["type"] == "continuous" and SPIN.search(j["name"] + " " + j["child"]):
+            demo[j["name"]] = [0.0, 12.566]
+        else:
+            amp = min(0.9 if j["type"] != "prismatic" else 0.05, (hi - lo) / 4)
+            demo[j["name"]] = [max(lo, mid - amp), min(hi, mid + amp)]
+    e.setdefault("rest", rest)
+    e.setdefault("demo", demo)
+    return e
+
+
+def _tf(xyz, rpy):
+    import numpy as np
+    r, p, y = rpy
+    cx, sx, cy, sy, cz, sz = np.cos(r), np.sin(r), np.cos(p), np.sin(p), np.cos(y), np.sin(y)
+    m = np.eye(4)
+    m[:3, :3] = [[cz * cy, cz * sy * sx - sz * cx, cz * sy * cx + sz * sx],
+                 [sz * cy, sz * sy * sx + cz * cx, sz * sy * cx - cz * sx],
+                 [-sy, cy * sx, cy * cx]]
+    m[:3, 3] = xyz
+    return m
+
+
+def _rot(axis, q):
+    import numpy as np
+    a = np.asarray(axis, float) / (np.linalg.norm(axis) or 1)
+    k = np.array([[0, -a[2], a[1]], [a[2], 0, -a[0]], [-a[1], a[0], 0]])
+    m = np.eye(4)
+    m[:3, :3] = np.eye(3) + np.sin(q) * k + (1 - np.cos(q)) * k @ k
+    return m
+
+
+def _arm_rest(e: dict) -> dict:
+    """A natural-looking rest pose for an arm: shoulder and elbow bent so the tool stands up and forward (every joint
+    at zero often leaves an arm lying flat). Forward kinematics from the entry's joint origins and axes."""
+    import itertools
+    import numpy as np
+    chain, node = [], e["tool"]["link"]
+    by_child = {j["child"]: j for j in e["joints"]}
+    while node in by_child:
+        chain.insert(0, by_child[node])
+        node = by_child[node]["parent"]
+    rev = [j for j in chain if j["type"] == "revolute"]
+    if len(rev) < 3 or any(not (j.get("origin") or {}).get("xyz") for j in chain):
+        return {}
+
+    def tool(vals):
+        m = np.eye(4)
+        for j in chain:
+            o = j.get("origin") or {}
+            m = m @ _tf(o.get("xyz", [0, 0, 0]), o.get("rpy", [0, 0, 0])) @ _rot(j["axis"], vals.get(j["name"], 0.0))
+        return m[:3, 3]
+    length = sum(float(np.linalg.norm((j.get("origin") or {}).get("xyz", [0, 0, 0]))) for j in chain) or 1.0
+    grid = [x * 0.3 for x in range(-6, 7)]
+    best, pose = -1e9, {}
+    for a, b in itertools.combinations(rev[1:4], 2):     # shoulder and elbow (7-axis arms have a roll joint between)
+        for qa, qb in itertools.product(grid, grid):
+            if not (a["lower"] <= qa <= a["upper"] and b["lower"] <= qb <= b["upper"]):
+                continue
+            p = tool({a["name"]: qa, b["name"]: qb})
+            reach = float(np.hypot(p[0], p[1]))
+            score = p[2] + 0.6 * min(reach, 0.45 * length) - 0.02 * (abs(qa) + abs(qb))
+            if p[2] > 0.25 * length and reach > 0.2 * length and score > best:
+                best, pose = score, {a["name"]: qa, b["name"]: qb}
+    return pose
 
 
 class _nullctx:

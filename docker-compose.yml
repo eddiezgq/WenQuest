@@ -60,6 +60,8 @@ services:
       WQ_LABCHECK_URL: http://labcheck:8000
       # Lecture videos: speech synthesis and recognition by the voice service (below).
       WQ_VOICE_URL: http://voice:8000
+      # 问渠零件与机器人库, published by the digital factory (docs/方案/数字工厂资源接口约定.md). Empty = built-in sample.
+      WQ_LIBRARY_URL: ${WQ_LIBRARY_URL:-https://factory.wenquestrobotics.com}
       # Sign-up, teacher approval and course notices by email (see docs/帮助/注册登录与审核.md).
       WQ_SMTP_HOST: ${SMTP_HOST:-}
       WQ_SMTP_PORT: ${SMTP_PORT:-2525}

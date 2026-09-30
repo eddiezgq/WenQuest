@@ -1186,9 +1186,13 @@ class Studio(LectureMixin):
                             recs = await self.use_assets(proj, [aid]) if aid else []
                             rec = recs[0] if recs else None
                         svg = next((f for f in (rec or {}).get("files", []) if f.endswith(".svg")), "")
-                        if not svg:
+                        png = next((f for f in (rec or {}).get("files", []) if f.endswith(".png")), "")
+                        if svg:
+                            out = await asyncio.to_thread(F.render_drawing, self.assets_dir(proj) / rec["id"] / svg, dest)
+                        elif png:    # the published library's first phase has rendered pictures, no drawings yet
+                            out = await asyncio.to_thread(F.render_picture, self.assets_dir(proj) / rec["id"] / png, dest)
+                        else:
                             raise F.FigureError(f"no library drawing for {aid or '(none)'}")
-                        out = await asyncio.to_thread(F.render_drawing, self.assets_dir(proj) / rec["id"] / svg, dest)
                     else:
                         data = await self.ai.json(system=team.ILLUSTRATOR,
                                                   prompt=team.figure_prompt(no, fig, spec_json, lang, course, error, previous),
@@ -1642,7 +1646,9 @@ def fake_design_book(proj: dict) -> dict:
             "chapters": [{"no": c["no"], "animation": "本章机构与坐标系的动态示意", "lab": "调节本章参数，观察机器人响应",
                           "problems": "本章概念在机器人上的应用"} for c in o.get("chapters") or []],
             "avoid": ["不用其他学科、其他课程的例子"],
-            "library": [{"id": "B-ARM-6R-S", "role": "贯穿全课的机械臂"}, {"id": "B-MOB-DIFF-S", "role": "移动机器人章节"}]}
+            # the built-in sample and the published library; ids the library does not have are dropped afterwards
+            "library": [{"id": "B-ARM-6R-S", "role": "贯穿全课的机械臂"}, {"id": "B-MOB-DIFF-S", "role": "移动机器人章节"},
+                        {"id": "B-ARM-UR5E", "role": "贯穿全课的机械臂"}, {"id": "B-LEG-GO2", "role": "足式机器人章节"}]}
 
 
 def named_textbooks(texts: list[str]) -> list[str]:
@@ -1891,7 +1897,8 @@ def fake_plan3d(models: dict) -> dict:
     robots = [k for k, m in models.items() if m["entry"].get("kind") == "robot"]
     if len(robots) >= 2:
         return {"template": "showcase", "items": [{"id": k, "name": list(models[k]["entry"]["name"].values()),
-                                                   "line": [models[k]["entry"]["teaching"]["principle"], ""]} for k in robots[:4]]}
+                                                   "line": [((models[k]["entry"].get("teaching") or {}).get("principle") or models[k]["entry"]["name"].get("zh", "")), ""]}
+                                                  for k in robots[:4]]}
     k = (robots or list(models))[0]
     e = models[k]["entry"]
     if e.get("kind") == "mechanism":
