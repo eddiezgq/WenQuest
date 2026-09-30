@@ -163,6 +163,17 @@ def main():
     done = wait(finished, "10 根轴全部完工", A.timeout, 3)
     print("   用时 {:.0f} 秒".format(time.time() - t0))
     check(done and len(done) == 7, "7 道工序全部完工")
+    if REAL:
+        # 真 ERPNext 每记一次工时要一两秒，桥接按顺序补记：等作业卡全部提交、完工入库做完再核对
+        t1 = time.time()
+
+        def erp_caught_up():
+            jc = [j for j in erp_docs("Job Card") if j["work_order"] == wo]
+            n_sub = sum(1 for j in jc if j["docstatus"] == 1)
+            se = [x for x in erp_docs("Stock Entry") if x.get("work_order") == wo and x["docstatus"] == 1]
+            print("   ERPNext 进度（{:.0f} 秒）：作业卡已提交 {}/{}，完工入库 {} 张".format(time.time() - t1, n_sub, len(jc), len(se)))
+            return len(jc) == 7 and n_sub == 7 and se
+        wait(erp_caught_up, "ERPNext 作业卡与完工入库", 360, 15)
     time.sleep(6)       # 等桥接把最后的入库写完
     st = hub("GET", "/api/teach", token=op)
     check(st["tasks"][3]["score"] == 20, "任务 4 满分")
