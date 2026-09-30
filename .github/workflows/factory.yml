@@ -107,13 +107,18 @@ jobs:
           for s in hub bridge sim erp-backend erp-queue-short; do dc logs --no-color --tail 200 "$s" > "/tmp/logs/$s.log" 2>&1 || true; done
           dc exec -T erp-backend bash -c 'tail -n 80 logs/frappe.log logs/web.error.log 2>/dev/null' > /tmp/logs/erp-files.log 2>&1 || true
           a() { python3 "$GITHUB_WORKSPACE/factory/deploy/ci_annotate.py" "$@"; }
-          [ -s /tmp/logs/closed_loop.log ] && a 闭环测试 /tmp/logs/closed_loop.log 120
-          [ -s /tmp/logs/install.log ] && a 安装 /tmp/logs/install.log 120
-          a 容器 /tmp/logs/ps.log 40
-          a 枢纽 /tmp/logs/hub.log 60
-          a 桥接 /tmp/logs/bridge.log 60
-          a ERPNext /tmp/logs/erp-backend.log 60
-          a ERPNext日志 /tmp/logs/erp-files.log 60
+          # GitHub 每步最多显示约 10 条注释：闭环测试失败时只发与它相关的
+          if [ -s /tmp/logs/closed_loop.log ]; then
+            a 闭环测试 /tmp/logs/closed_loop.log 120
+            grep -v "Connected to broker\|Started flows\|Starting flows" /tmp/logs/bridge.log > /tmp/logs/bridge2.log || true
+            a 桥接 /tmp/logs/bridge2.log 120
+            a ERPNext日志 /tmp/logs/erp-files.log 60
+          else
+            [ -s /tmp/logs/install.log ] && a 安装 /tmp/logs/install.log 120
+            a 容器 /tmp/logs/ps.log 40
+            a 枢纽 /tmp/logs/hub.log 60
+            a ERPNext /tmp/logs/erp-backend.log 60
+          fi
           true
 
   build:

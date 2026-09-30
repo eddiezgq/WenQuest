@@ -215,6 +215,19 @@ def main():
     check(bad["ok"] and bad["bus"], "枢纽健康，历史库 {} 条消息".format(bad["messages"]))
     print()
     if FAILS:
+        # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位
+        errs = [e for e in hub("GET", "/api/history?type=erp.doc&limit=500", token=mgr) if e["data"].get("action") == "failed"]
+        if errs:
+            print("ERPNext 退回的出错（最近 {} 条）：".format(min(len(errs), 12)))
+            seen = set()
+            for e in errs:
+                k = (e["data"].get("doctype"), e["data"].get("error", "")[:160])
+                if k in seen:
+                    continue
+                seen.add(k)
+                print("  - {} {}：{}".format(e["data"].get("doctype"), e["data"].get("name"), e["data"].get("error", "")[:400]))
+                if len(seen) >= 12:
+                    break
         print("失败 {} 项：".format(len(FAILS)))
         for f in FAILS:
             print("  - " + f)
