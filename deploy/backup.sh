@@ -23,9 +23,16 @@ dc exec -T moodle tar czf - -C /var/www/moodledata \
 log "Archiving sign-up records (teacher applications, course catalogue)..."
 dc exec -T gateway tar czf - -C /data accounts settings.json 2>/dev/null > "$OUT/gateway.tgz" || true
 
+log "Archiving AI course projects and teachers' materials..."
+# Everything the AI course builder made (lessons, videos, labs, chat, decisions) and the materials teachers uploaded.
+# Left out: caches that are made again on demand (spoken sentences, video pieces, converted slides, file cache).
+dc exec -T gateway tar czf - -C /data \
+    --exclude='./projects/*/voice_cache' --exclude='./projects/*/uploads' --exclude='./projects/*/lessons/*/lecture/slides' \
+    ./projects ./imports 2>/dev/null > "$OUT/studio.tgz" || true
+
 # Record which engine image produced this backup, for restores and rollbacks.
 envval ENGINE_IMAGE > "$OUT/engine-image.txt"
-( cd "$OUT" && sha256sum db.dump moodledata.tgz gateway.tgz > SHA256SUMS )
+( cd "$OUT" && sha256sum db.dump moodledata.tgz gateway.tgz studio.tgz > SHA256SUMS )
 log "Local backup: $OUT ($(du -sh "$OUT" | cut -f1))"
 
 ENDPOINT=$(envval BACKUP_S3_ENDPOINT)

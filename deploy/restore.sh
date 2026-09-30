@@ -33,6 +33,12 @@ dc run --rm --no-deps -T --entrypoint sh moodle -c \
 if [ -s "$SRC/gateway.tgz" ]; then
     log "Restoring sign-up records (teacher applications, course catalogue)..."
     dc exec -T gateway sh -c 'rm -rf /data/accounts && tar xzf - -C /data' < "$SRC/gateway.tgz" || true
+fi
+if [ -s "$SRC/studio.tgz" ]; then
+    log "Restoring AI course projects and teachers' materials..."
+    dc exec -T gateway sh -c 'rm -rf /data/projects /data/imports && tar xzf - -C /data' < "$SRC/studio.tgz" || true
+fi
+if [ -s "$SRC/gateway.tgz" ] || [ -s "$SRC/studio.tgz" ]; then
     dc restart gateway
 fi
 
