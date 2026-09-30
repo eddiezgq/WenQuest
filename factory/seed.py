@@ -139,9 +139,18 @@ class Seeder:
                 "holiday_list_name": hl, "from_date": "2026-01-01", "to_date": "2027-12-31",
                 "holidays": holidays(2026, 2027)})
             self.created += 1
-        if not self.c.get("Company", self.company).get("default_holiday_list"):
+        comp = self.c.get("Company", self.company)
+        if not comp.get("default_holiday_list"):
             self.c.update("Company", self.company, {"default_holiday_list": hl})
         self.holiday_list = hl
+        # 完工入库时，工序的加工费记入“默认加工费科目”；新建的公司没设这一项，入库记账会报“Account is required”。
+        # 用公司自己的“计入存货价值的费用”科目（ERPNext 一向把制造加工费记在这里）（第 3 轮真 ERPNext 演练发现）
+        if not comp.get("default_operating_cost_account"):
+            acc = comp.get("expenses_included_in_valuation") or comp.get("default_expense_account")
+            if acc:
+                self.c.update("Company", self.company, {"default_operating_cost_account": acc})
+            else:
+                self.log("提醒：公司没有“计入存货价值的费用”科目，请在 ERPNext 公司设置里手动填“默认加工费科目”")
 
         ig_root = self.root("Item Group", "parent_item_group")
         for g in D.ITEM_GROUPS:

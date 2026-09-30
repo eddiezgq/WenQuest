@@ -165,6 +165,8 @@ def test_teach_stock_matches_the_scenario_and_allows_negative_stock():
     assert not mock.errors, mock.errors
     client.db = mock.db
     assert client.db["Stock Settings"]["Stock Settings"]["allow_negative_stock"] == 1
+    # 完工入库记加工费要用的科目（真 ERPNext 演练发现）
+    assert client.db["Company"][s.company]["default_operating_cost_account"] == "Expenses Included In Valuation - WQ"
     entries = [e for e in client.db["Stock Entry"].values() if e["remarks"].startswith("WQ 教学情景库存")]
     assert len(entries) == 1 and entries[0]["docstatus"] == 1
     got = {i["item_code"]: i["qty"] for i in entries[0]["items"]}

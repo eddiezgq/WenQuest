@@ -48,7 +48,8 @@ class MockERPNext:
         self.abbr = abbr
         seed = {
             "Company": [{"name": company, "company_name": company, "abbr": abbr, "default_currency": "USD",
-                         "country": "United States"}],
+                         "country": "United States",
+                         "expenses_included_in_valuation": "Expenses Included In Valuation - " + abbr}],
             "Currency": [{"name": "USD"}],
             "Country": [{"name": "United States"}],
             "UOM": [{"name": u} for u in ("Nos", "Kg", "Litre", "Unit", "Meter")],
