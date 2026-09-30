@@ -117,6 +117,15 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         out["anims_on"] = bool(studio().animator_url)  # animations can be made (the renderer is set up)
         out["labs_on"] = bool(studio().labcheck_url)   # virtual labs can be made (the lab checker is set up)
         out["zip_url"] = sign_material(proj["id"], "*") if files else ""
+        used: dict[str, list[str]] = {}
+        for c in (proj.get("outline") or {}).get("chapters", []):
+            for i, les in enumerate(c["lessons"], 1):
+                for a in les.get("assets") or []:
+                    used.setdefault(a, []).append(f"{c['no']}.{i}")
+        out["assets"] = [{**{k: v for k, v in a.items() if k != "files"},
+                          "thumb": sign_asset(proj["id"], a["id"], next((f for f in a.get("files", []) if f.endswith(".svg")), "")),
+                          "used_in": used.get(a["id"], [])}
+                         for a in sorted((proj.get("assets") or {}).values(), key=lambda a: a["id"])]
         out["toc"] = [{"no": c["no"], "title": c["title"], "start": c.get("start"),
                        "sections": [{"no": s["no"], "title": s["title"], "start": s.get("start")} for s in c["sections"]]}
                       for c in proj["materials"].get("toc", [])]
@@ -132,6 +141,12 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         """A one-day link to one of the teacher's own materials ("*" = all of them as a zip)."""
         tok = m.state.codec.fernet.encrypt(json.dumps({"p": pid, "f": fid}).encode()).decode()
         return f"{m.state.settings.public_url.rstrip('/')}/api/v1/studio/materials/{tok}"
+
+    def sign_asset(pid: str, aid: str, name: str) -> str:
+        if not name:
+            return ""
+        tok = m.state.codec.fernet.encrypt(json.dumps({"p": pid, "a": aid, "n": name}).encode()).decode()
+        return f"{m.state.settings.public_url.rstrip('/')}/api/v1/studio/assets/{tok}"
 
     def sign_lesson_file(pid: str, lid: str, name: str) -> str:
         tok = m.state.codec.fernet.encrypt(json.dumps({"p": pid, "l": lid, "n": name}).encode()).decode()
@@ -338,6 +353,81 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         o.update(title=T(body.title), summary=T(body.summary), chapters=chapters)
         studio().projects.save(proj)
         return view(proj)
+
+    # --- 问渠零件与机器人库 ------------------------------------------------------------------------
+
+    @app.get("/api/v1/studio/library")
+    async def library_list(sess: Annotated[Session, Depends(current)], q: str = ""):
+        """The library's entries (default spec), for the teacher to add to a course."""
+        await need_creator(sess)
+        lib = studio().library
+        try:
+            rows = list((await lib.entries()).values())
+            version = (await lib.index())["version"]
+        except Exception as e:  # noqa: BLE001
+            raise EngineError("library_unavailable", str(e)[:200], 503)
+        words = [w for w in q.lower().split() if w]
+        if words:
+            rows = [r for r in rows if all(w in " ".join([r["id"], r["name"].get("zh", ""), r["name"].get("en", ""),
+                                                          " ".join(r.get("tags") or [])]).lower() for w in words)]
+        tok = lambda r: m.state.codec.fernet.encrypt(json.dumps({"l": r["id"], "n": f"{r['spec']}.svg"}).encode()).decode()  # noqa: E731
+        return {"version": version, "sample": lib.builtin,
+                "items": [{"id": r["id"], "name": r["name"], "category": r.get("category", ""), "kind": r.get("kind", ""),
+                           "tags": r.get("tags", []), "principle": r.get("principle", ""), "license": r.get("license", ""),
+                           "thumb": f"{m.state.settings.public_url.rstrip('/')}/api/v1/studio/assets/{tok(r)}"}
+                          for r in sorted(rows, key=lambda r: r["id"])]}
+
+    @app.post("/api/v1/studio/projects/{pid}/assets/{aid}")
+    async def add_asset(pid: str, aid: str, sess: Annotated[Session, Depends(current)]):
+        proj = load(pid, sess)
+        recs = await studio().use_assets(proj, [aid], by="teacher")
+        if not recs:
+            raise EngineError("not_found", "no such library entry", 404)
+        studio().projects.save(proj)
+        return view(proj)
+
+    @app.delete("/api/v1/studio/projects/{pid}/assets/{aid}")
+    async def remove_asset(pid: str, aid: str, sess: Annotated[Session, Depends(current)]):
+        """Taken out of the course: later lessons will not use it (lessons already written keep their copy)."""
+        import shutil
+        proj = load(pid, sess)
+        if aid in (proj.get("assets") or {}):
+            proj["assets"].pop(aid)
+            shutil.rmtree(studio().assets_dir(proj) / aid, ignore_errors=True)
+            book = proj.get("design_book")
+            if book and book.get("library"):
+                book["library"] = [x for x in book["library"] if x["id"] != aid]
+            studio().projects.save(proj)
+        return view(proj)
+
+    @app.get("/api/v1/studio/assets/{signed}")
+    async def asset_file(signed: str):
+        """A course's copy of a library file, or (for the picker) a library file itself."""
+        try:
+            d = json.loads(m.state.codec.fernet.decrypt(signed.encode(), ttl=m.FILE_TTL))
+        except Exception:
+            raise EngineError("link_expired", "file link expired", 410)
+        name = str(d.get("n") or "")
+        if not re.fullmatch(r"[\w.\-]{1,80}", name):
+            raise EngineError("not_found", "no such file", 404)
+        types = {".svg": "image/svg+xml", ".png": "image/png", ".glb": "model/gltf-binary", ".json": "application/json",
+                 ".csv": "text/csv", ".txt": "text/plain"}
+        ctype = types.get(Path(name).suffix, "application/octet-stream")
+        headers = {"Cache-Control": "private, max-age=3600", "X-Content-Type-Options": "nosniff",
+                   "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox"}
+        if "l" in d:
+            lib = studio().library
+            idx = await lib.index()
+            data = await lib._get(f"{idx['version']}/{d['l']}/{name}")
+            return Response(data, media_type=ctype, headers=headers)
+        try:
+            proj = studio().projects.load(d["p"])
+        except KeyError:
+            raise EngineError("not_found", "no such file", 404)
+        path = studio().assets_dir(proj) / str(d["a"]) / name
+        if d["a"] not in (proj.get("assets") or {}) or not path.exists():
+            raise EngineError("not_found", "no such file", 404)
+        return Response(path.read_bytes(), media_type=ctype, headers=headers)
 
     @app.post("/api/v1/studio/projects/{pid}/design-book")
     async def make_design_book(pid: str, sess: Annotated[Session, Depends(current)]):

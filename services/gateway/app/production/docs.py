@@ -108,7 +108,7 @@ def report(spec: dict, gp: dict, out: Path, no: str) -> Path:
     d.lines(2)
     d.bh("评分量规", "Rubric")
     d.table(["项目 Criterion", "分值 Points", "要求 What earns full marks"],
-            [["原理 Principles", "20", "公式正确、说明物理意义 / correct formulas with physical meaning"],
+            [["原理 Principles", "20", "公式正确、说明其含义 / correct formulas with their meaning"],
              ["数据 Data", "25", "数据完整、单位与有效数字规范 / complete data, correct units and significant figures"],
              ["分析 Analysis", "25", "理论与测量比较、误差来源分析 / theory vs measurement, sources of error"],
              ["实际问题 Real problem", "20", "五步完整，假设清楚，指出模型局限 / all five steps, clear assumptions, limits named"],

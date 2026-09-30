@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>library preview</title>
+<script type="importmap">{"imports": {"three": "./vendor/three.module.min.js"}}</script>
+<style>body{margin:0;background:#0f1419}canvas{display:block}</style></head>
+<body><canvas id="c" width="640" height="480"></canvas>
+<script type="module">
+import { stage, loadModel, frame } from "./wq3d.js";
+const q = new URLSearchParams(location.search);
+const st = stage(document.getElementById("c"), { width: 640, height: 480, theme: q.get("theme") || "dark" });
+const base = q.get("lib");
+const entry = await (await fetch(`${base}/entry.json`)).json();
+const h = await loadModel(st, `${base}/${q.get("spec") || "default"}.glb`, entry);
+const pose = q.get("pose") === "demo" ? Object.fromEntries(Object.entries(entry.demo || {}).map(([k, v]) => [k, v[1]])) : {};
+h.set(pose); h.place();
+frame(st, h.box(), Number(q.get("az") || 35), Number(q.get("el") || 22), 0.85);
+st.render();
+window.READY = true;
+</script></body></html>

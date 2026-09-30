@@ -71,4 +71,9 @@ def build(spec: dict, lang: str) -> str:
         out.append(f"<h3>{L['summary']}</h3>" + ul(s["summary"]))
     if s["self_check"]:
         out.append(f"<h3>{L['check']}</h3>" + ol(s["self_check"]))
+    if s.get("sources"):
+        head = "素材来源" if i == 0 else "Sources"
+        out.append(f"<h4>{head}</h4><ul>" + "".join(
+            f"<li>{_e(x['name'].get('zh' if i == 0 else 'en', ''))}（{_e(x['id'])} · {_e(x['version'])}）— "
+            f"{_e(x['license'])}; {_e(x['attribution'])}</li>" for x in s["sources"]) + "</ul>")
     return "\n".join(out)

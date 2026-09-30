@@ -182,7 +182,7 @@ def build(spec: dict, out: Path, *, no: str, course: list[str], chapter: list[st
     bi_list(sl, 0.7, 1.8, 11.9, 3.4, c["points"])
     shape(sl, MSO_SHAPE.ROUNDED_RECTANGLE, 0.7, 5.35, 11.9, 1.4, ICE)
     bi(sl, 1.0, 5.4, 11.4, 1.3, c["formula"], 18, 13, NAVY, MUTED, True, MSO_ANCHOR.MIDDLE)
-    notes(sl, "讲清公式的物理意义，再进入动画。\nExplain the physical meaning of each formula before the animation.")
+    notes(sl, "讲清公式的含义，再进入动画。\nExplain what each formula means before the animation.")
 
     # C. animation
     a = s["animation"]
@@ -259,8 +259,8 @@ def build(spec: dict, out: Path, *, no: str, course: list[str], chapter: list[st
     q.space_before = Pt(8)
     _run(q, s["everyday"]["text"][0], 13, INK)
     _run(tf.add_paragraph(), s["everyday"]["text"][1], 10, MUTED, False, EN)
-    text(sl, 9.4, 5.5, 3.3, 1.4, "物理学通过建立模型来观察和描述世界：先简化，再求解，再用实验检验，最后找出模型的局限。\n"
-         "Physics describes the world through models: simplify, solve, test, then find where the model breaks.", 10.5, MUTED)
+    text(sl, 9.4, 5.5, 3.3, 1.4, "工程和科学都靠建立模型来描述世界：先简化，再求解，再用实验检验，最后找出模型的局限。\n"
+         "Engineering and science describe the world through models: simplify, solve, test, then find where the model breaks.", 10.5, MUTED)
     notes(sl, "对照五步讲解，强调第⑤步：模型在哪里失效。实验报告第六部分按这五步写。\n"
               "Walk through the five steps and stress step ⑤. Section 6 of the lab report follows the same steps.")
 
@@ -284,6 +284,16 @@ def build(spec: dict, out: Path, *, no: str, course: list[str], chapter: list[st
         text(sl, 0.8, 4.9, 11.8, 0.35, "想一想  Check yourself", 14, AMBER, True)
         bi_list(sl, 0.8, 5.3, 11.8, 1.9, s["self_check"][:3], 13, 10.5, "E6EDF7", "9FB3D1", numbered=True)
     notes(sl, "回顾本节要点，提醒练习和实验报告。\nReview the lesson and remind students of the practice set and the lab report.")
+
+    # sources: library entries used (问渠零件与机器人库) with their licences
+    if spec.get("sources"):
+        sl = prs.slides.add_slide(blank)
+        background(sl, ICE)
+        tag(sl, f"{no}  素材来源  Sources")
+        lines = [[f"{x['name'].get('zh', '')}（{x['id']} · {x['version']}）",
+                  f"{x['name'].get('en', '')} — {x['license']}; {x['attribution']}"] for x in spec["sources"][:10]]
+        bi_list(sl, 0.8, 1.0, 11.8, 5.8, lines, 13, 10)
+        notes(sl, "本课用到的模型、图纸来自问渠零件与机器人库。\nModels and drawings in this lesson come from the WenQuest parts and robot library.")
 
     out.parent.mkdir(parents=True, exist_ok=True)
     prs.save(str(out))

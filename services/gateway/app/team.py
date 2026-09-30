@@ -277,19 +277,26 @@ DESIGN_BOOK = COMMON + (
     "terms consistent with the textbook; the visual style of the animations for this subject; and for every "
     "chapter the means its animations and virtual labs will use (what is drawn, what the student adjusts, what "
     "is measured) and the theme of its robot problems. List what the team must avoid (e.g. examples from other "
-    "subjects). The teacher's requirements are binding. Chinese, concise."
+    "subjects). The teacher's requirements are binding. Chinese, concise. From the 问渠零件与机器人库 listing "
+    "you are given, choose the entries the course will use throughout (its robot platform first, then typical "
+    "parts and mechanisms) — `library`: their ids exactly as listed and the role of each; describe the platform "
+    "with those entries' real parameters. Never invent ids."
 )
 
 
 def design_book_schema() -> dict:
     ch = _obj({"no": INT, "animation": STR, "lab": STR, "problems": STR})
+    lib = _obj({"id": STR, "role": STR})
     return _obj({"subject": STR, "audience": STR, "textbook": STR, "platform": STR, "notation": STR,
-                 "visual_style": STR, "chapters": {"type": "array", "items": ch}, "avoid": STRS})
+                 "visual_style": STR, "chapters": {"type": "array", "items": ch}, "avoid": STRS,
+                 "library": {"type": "array", "items": lib}})
 
 
-def design_book_prompt(project_summary: str, outline: str, requirements: str) -> str:
+def design_book_prompt(project_summary: str, outline: str, requirements: str, catalog: str = "") -> str:
     return (f"{project_summary}\n\nThe teacher's requirements (binding):\n{requirements}\n\n"
-            f"The approved outline:\n{outline}\n\nWrite the course design book.")
+            f"The approved outline:\n{outline}\n\n"
+            + (f"问渠零件与机器人库 (id | name | category | tags | principle):\n{catalog}\n\n" if catalog else "")
+            + "Write the course design book.")
 
 
 def design_book_text(b: dict | None) -> str:
@@ -302,6 +309,9 @@ def design_book_text(b: dict | None) -> str:
     for c in b.get("chapters") or []:
         lines.append(f"Chapter {c.get('no')}: animations — {c.get('animation', '')}; labs — {c.get('lab', '')}; "
                      f"robot problems — {c.get('problems', '')}")
+    if b.get("library"):
+        lines.append("Library entries used throughout (问渠零件与机器人库): "
+                     + "; ".join(f"{x['id']} ({x.get('role', '')})" for x in b["library"]))
     if b.get("avoid"):
         lines.append("Avoid: " + "; ".join(b["avoid"]))
     return "\n".join(x for x in lines if x.split(":", 1)[-1].strip(" ;—"))

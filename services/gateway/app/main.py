@@ -739,6 +739,10 @@ def _studio() -> st.Studio:
     s.animator_url = state.settings.animator_url
     s.animator_timeout = state.settings.animator_timeout
     s.labcheck_url = state.settings.labcheck_url
+    lib_key = (state.settings.library_url, state.settings.data_dir)
+    if getattr(s, "library_key", None) != lib_key:
+        from .library import Library
+        s.library, s.library_key = Library(state.settings.library_url, state.settings.data_dir), lib_key
     s.labcheck_timeout = state.settings.labcheck_timeout
     return s
 

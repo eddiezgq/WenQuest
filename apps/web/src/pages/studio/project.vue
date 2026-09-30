@@ -146,6 +146,42 @@
               <text>{{ t("studio.unsaved") }}</text>
               <view class="primary small" @click="saveMaterials">{{ t("studio.save") }}</view>
             </view>
+            <!-- 问渠零件与机器人库: entries this course uses (copied into the course) -->
+            <view class="lib">
+              <view class="lib-head">
+                <text class="h3">{{ t("lib.title") }}</text>
+                <text class="grow"></text>
+                <text class="link" @click="openPicker">＋ {{ t("lib.add") }}</text>
+              </view>
+              <text class="note">{{ t("lib.hint") }}</text>
+              <view v-if="!(p.assets || []).length" class="muted-s">{{ t("lib.none") }}</view>
+              <view class="lib-grid">
+                <view v-for="a in p.assets || []" :key="a.id" class="lib-card">
+                  <image v-if="a.thumb" class="lib-img" :src="absolute(a.thumb)" mode="aspectFit" />
+                  <text class="lib-n">{{ disp(a.name) }}</text>
+                  <text class="lib-m">{{ a.id }} · {{ a.version }}</text>
+                  <text class="lib-m">{{ a.license }}<text v-if="a.used_in.length"> · {{ t("lib.usedIn", { list: a.used_in.join("、") }) }}</text></text>
+                  <text class="lib-x" :title="t('common.delete')" @click="removeAsset(a)">✕</text>
+                </view>
+              </view>
+              <view v-if="picker" class="lib-pick">
+                <view class="lib-head">
+                  <input class="lib-q" v-model="pickQ" :placeholder="t('lib.search')" @confirm="loadPicker" />
+                  <text class="link" @click="loadPicker">{{ t("lib.find") }}</text>
+                  <text class="grow"></text>
+                  <text class="link" @click="picker = false">{{ t("common.close") }}</text>
+                </view>
+                <text v-if="pickSample" class="note">{{ t("lib.sample") }}</text>
+                <view class="lib-grid">
+                  <view v-for="it in pickItems" :key="it.id" class="lib-card pick" :class="{ on: (p.assets || []).some((a) => a.id === it.id) }" @click="addAsset(it.id)">
+                    <image class="lib-img" :src="absolute(it.thumb)" mode="aspectFit" />
+                    <text class="lib-n">{{ disp(it.name) }}</text>
+                    <text class="lib-m">{{ it.id }}</text>
+                    <text class="lib-p">{{ it.principle }}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
             <view v-if="p.toc.length" class="toc">
               <text class="h3">{{ t("studio.tocOf", { name: p.materials.book_title || textbookName }) }}</text>
               <view v-for="c in p.toc" :key="c.no" class="toc-ch">
@@ -180,6 +216,10 @@
                   <view v-for="c in p.design_book.chapters" :key="c.no" class="db-row">
                     <text class="db-k">{{ t("studio.chapterN", { n: c.no }) }}</text>
                     <text class="db-v">{{ t("studio.db.animation") }}：{{ c.animation || "—" }}；{{ t("studio.db.lab") }}：{{ c.lab || "—" }}；{{ t("studio.db.problems") }}：{{ c.problems || "—" }}</text>
+                  </view>
+                  <view v-if="(p.design_book.library || []).length" class="db-row">
+                    <text class="db-k">{{ t("studio.db.library") }}</text>
+                    <text class="db-v">{{ (p.design_book.library || []).map((x) => x.id + (x.role ? "（" + x.role + "）" : "")).join("；") }}</text>
                   </view>
                   <view v-if="p.design_book.avoid.length" class="db-row">
                     <text class="db-k">{{ t("studio.db.avoid") }}</text><text class="db-v">{{ p.design_book.avoid.join("；") }}</text>
@@ -394,7 +434,7 @@ import { confirmAction } from "../../courseApi";
 import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import {
-  absolute, api, ApiError, type DesignBook, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
+  absolute, api, ApiError, type DesignBook, type LibraryItem, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
 } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
@@ -702,6 +742,33 @@ async function upload(list: Picked[]) {
   // Once the materials were read, the librarian sorts the new files at once (before that, "start" reads them all).
   try { take(await api.studioFilesDone(id.value)); } catch { await load(); }
 }
+// --- 问渠零件与机器人库 -------------------------------------------------------------------------------
+const picker = ref(false);
+const pickQ = ref("");
+const pickItems = ref<LibraryItem[]>([]);
+const pickSample = ref(false);
+async function loadPicker() {
+  try {
+    const r = await api.studioLibrary(pickQ.value.trim());
+    pickItems.value = r.items;
+    pickSample.value = r.sample;
+  } catch (e) {
+    uni.showToast({ title: errorText(e instanceof ApiError ? e.code : "unknown"), icon: "none" });
+  }
+}
+function openPicker() {
+  picker.value = true;
+  loadPicker();
+}
+function addAsset(aid: string) {
+  if ((p.value?.assets || []).some((a) => a.id === aid)) return;
+  act(() => api.studioAddAsset(id.value, aid));
+}
+async function removeAsset(a: { id: string; name: Text }) {
+  if (await confirmAction(t("lib.removeAsk", { name: disp(a.name) }), t("common.delete"), t("common.cancel"))) {
+    act(() => api.studioRemoveAsset(id.value, a.id));
+  }
+}
 function reread() {
   act(() => api.studioRereadTextbook(id.value));
 }
@@ -910,6 +977,21 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .mtools.over { border-color: var(--wq-link); background: #eef6f9; }
 .mt-btn { color: var(--wq-link); cursor: pointer; font-size: 14px; font-weight: 600; }
 .mt-btn.right { margin-left: auto; }
+.lib { margin-top: 18px; border-top: 1px solid var(--wq-line); padding-top: 12px; }
+.lib-head { display: flex; align-items: center; gap: 10px; }
+.lib .grow { flex: 1; }
+.lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin-top: 8px; }
+.lib-card { position: relative; border: 1px solid var(--wq-line); border-radius: 8px; padding: 8px; background: #fff; display: flex; flex-direction: column; gap: 2px; }
+.lib-card.pick { cursor: pointer; }
+.lib-card.pick:hover { border-color: var(--wq-link); }
+.lib-card.on { border-color: var(--wq-ok, #1f7a4d); background: #f1faf4; }
+.lib-img { width: 100%; height: 100px; background: #fff; }
+.lib-n { font-size: 13px; font-weight: 600; line-height: 1.4; }
+.lib-m { font-size: 11px; color: #778; }
+.lib-p { font-size: 11px; color: #556; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.lib-x { position: absolute; top: 4px; right: 8px; color: #b42318; cursor: pointer; }
+.lib-pick { margin-top: 12px; padding: 10px; border: 1px dashed var(--wq-line); border-radius: 8px; background: #fbfcfd; }
+.lib-q { flex: 0 1 260px; height: 32px; border: 1px solid var(--wq-line); border-radius: 6px; padding: 0 8px; background: #fff; }
 .freread { font-size: 12px; color: var(--wq-link); cursor: pointer; margin-top: 2px; }
 .freread.disabled { opacity: 0.45; pointer-events: none; }
 .empty-book { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }

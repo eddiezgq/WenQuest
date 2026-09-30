@@ -146,13 +146,21 @@ export interface StudioProject {
   anims_on?: boolean;
   zip_url?: string;
   design_book?: DesignBook | null;
+  assets?: CourseAsset[];
 }
 /** 课程设计书: the course's own subject, robot platform, notation and per-chapter means (every lesson follows it). */
 export interface DesignBook {
   subject: string; audience: string; textbook: string; platform: string; notation: string; visual_style: string;
   chapters: { no: number; animation: string; lab: string; problems: string }[];
   avoid: string[]; by?: string;
+  library?: { id: string; role: string }[];
 }
+/** 问渠零件与机器人库: an entry this course uses (a copy lives in the course). */
+export interface CourseAsset {
+  id: string; version: string; spec: string; name: Text; kind: string; category: string; license: string; attribution: string;
+  by: string; added: number; thumb: string; used_in: string[];
+}
+export interface LibraryItem { id: string; name: Text; category: string; kind: string; tags: string[]; principle: string; license: string; thumb: string }
 export interface StudioSummary {
   id: string; title: string; stage: Stage; updated: number; course_id: number;
   lessons: number; published: number; awaiting: number; busy: boolean; open_questions: number;
@@ -341,6 +349,9 @@ export const api = {
     request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/materials`, { files, textbook }),
   studioApproveMaterials: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-materials`, {}),
   studioRedoAnimation: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/animation`),
+  studioLibrary: (q: string) => request<{ version: string; sample: boolean; items: LibraryItem[] }>("GET", `/api/v1/studio/library?q=${encodeURIComponent(q)}`),
+  studioAddAsset: (id: string, aid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/assets/${aid}`),
+  studioRemoveAsset: (id: string, aid: string) => request<StudioProject>("DELETE", `/api/v1/studio/projects/${id}/assets/${aid}`),
   studioMakeDesignBook: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/design-book`),
   studioRereadTextbook: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/textbook/reread`),
   studioDesignBook: (id: string, book: Partial<DesignBook>) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/design-book`, book),

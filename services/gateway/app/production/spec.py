@@ -39,6 +39,8 @@ def lesson_schema() -> dict:
         "everyday": _obj({"text": PAIR, "answer": PAIR}),
         "summary": PAIRS,
         "self_check": PAIRS,
+        "assets": {"type": "array", "items": _obj({"id": STR, "use": PAIR}),
+                   "description": "问渠零件与机器人库 entries this lesson shows (ids exactly as listed; 0-6)"},
     })
 
 
@@ -171,6 +173,8 @@ def normalize_lesson(d: Any) -> dict:
         "model": {k: pair(mo.get(k)) for k in ("assume", "solve", "check", "improve")},
         "everyday": {"text": pair(ev.get("text")), "answer": pair(ev.get("answer"))},
         "summary": pairs(d.get("summary"), 6), "self_check": pairs(d.get("self_check"), 5),
+        "assets": [{"id": str(a.get("id") or "").strip(), "use": pair(a.get("use"))}
+                   for a in (d.get("assets") or []) if isinstance(a, dict) and a.get("id")][:6],
     }
 
 

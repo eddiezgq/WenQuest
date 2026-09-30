@@ -721,6 +721,57 @@ class Studio:
                 f"\nThe teacher's requirements (binding):\n{self.requirements_text(proj)}\n"
                 + (f"\nThe course design book (follow it):\n{book}\n" if book else ""))
 
+    # 问渠零件与机器人库 ---------------------------------------------------------------------------------
+    async def library_catalog(self, proj: dict, extra: str = "") -> str:
+        lib = getattr(self, "library", None)
+        if not lib:
+            return ""
+        words = " ".join([disp((proj.get("outline") or {}).get("title")), proj["requirements"].get("notes", "")[:300], extra])
+        try:
+            return await lib.catalog_text(words)
+        except Exception:
+            return ""
+
+    async def library_ids(self) -> set[str]:
+        lib = getattr(self, "library", None)
+        try:
+            return set(await lib.entries()) if lib else set()
+        except Exception:
+            return set()
+
+    def assets_dir(self, proj: dict) -> Path:
+        return self.projects.root / proj["id"] / "library"
+
+    async def use_assets(self, proj: dict, ids: list[str], by: str = "ai") -> list[dict]:
+        """Copy library entries into the course (once); returns their records (for the sources list)."""
+        lib = getattr(self, "library", None)
+        out = []
+        if not lib:
+            return out
+        known = await self.library_ids()
+        assets = proj.setdefault("assets", {})
+        for eid in dict.fromkeys(ids):
+            if eid not in known:
+                continue
+            if eid not in assets or not (self.assets_dir(proj) / eid / "entry.json").exists():
+                try:
+                    assets[eid] = {**await lib.copy_into(self.assets_dir(proj), eid), "by": by}
+                except Exception as e:  # noqa: BLE001 - a missing entry must not stop the lesson
+                    log.warning("library copy %s: %s", eid, e)
+                    continue
+            out.append(assets[eid])
+        return out
+
+    async def lesson_assets(self, proj: dict, les: dict, spec: dict) -> list[dict]:
+        """The library entries this lesson shows: what the lecturer listed, else the course's platform."""
+        ids = [a["id"] for a in spec.get("assets") or []]
+        if not ids:
+            ids = [x["id"] for x in (proj.get("design_book") or {}).get("library", [])[:1]]
+        recs = await self.use_assets(proj, ids)
+        les["assets"] = [r["id"] for r in recs]
+        return [{"id": r["id"], "version": r["version"], "name": r["name"], "license": r["license"],
+                 "attribution": r["attribution"]} for r in recs]
+
     def course_brief(self, proj: dict) -> str:
         """What the animator and the lab engineer must know about THIS course (subject, platform, design book)."""
         book = team.design_book_text(proj.get("design_book"))
@@ -767,10 +818,14 @@ class Studio:
                             for c in o["chapters"])
         proj["busy"] = {"label": "课程设计师正在写《课程设计书》…", "since": now()}
         self.projects.save(proj)
+        catalog = await self.library_catalog(proj)
         data = await self.ai.json(system=team.DESIGN_BOOK,
-                                  prompt=team.design_book_prompt(summary(proj, items, False), outline, self.requirements_text(proj)),
+                                  prompt=team.design_book_prompt(summary(proj, items, False), outline, self.requirements_text(proj), catalog),
                                   schema=team.design_book_schema(), max_tokens=5000, fake=lambda: fake_design_book(proj))
-        proj["design_book"] = normalize_design_book(data, o)
+        book = normalize_design_book(data, o)
+        known = await self.library_ids()
+        book["library"] = [x for x in book.get("library", []) if x["id"] in known]
+        proj["design_book"] = book
 
     def lesson_no(self, proj: dict, chapter: dict, les: dict) -> str:
         return f"{chapter['no']}.{chapter['lessons'].index(les) + 1}"
@@ -789,7 +844,10 @@ class Studio:
         src = self.sources(proj, chapter, les, items)
         if not proj.get("design_book"):  # courses planned before the design book existed get one now
             await self.make_design_book(proj)
-        ctx = self.lesson_context(proj, chapter, les, items) + f"\nLesson number: {no}"
+        catalog = await self.library_catalog(proj, disp(les["title"]))
+        ctx = (self.lesson_context(proj, chapter, les, items) + f"\nLesson number: {no}"
+               + (f"\n\n问渠零件与机器人库 — entries you may show (id | name | category | tags | principle); list the ones this "
+                  f"lesson uses in `assets`, ids exactly as written:\n{catalog}" if catalog else ""))
         previous = self.previous_spec(proj, les)
         les["status"], les["error"] = "writing", ""
         les["attention"], les["checks"] = [], {}
@@ -840,6 +898,7 @@ class Studio:
             les["status"] = "writing"
             proj["busy"] = {"label": f"主讲教授按审稿意见重写：{no}", "since": now()}
             self.projects.save(proj)
+        spec["sources"] = await self.lesson_assets(proj, les, spec)
         video = await self.animate(proj, les, spec, no, review)
         lab = await self.make_lab(proj, chapter, les, spec, no, review)
         proj["busy"] = {"label": f"正在排版课件、指导书、报告模板和教案：{no}", "since": now()}
@@ -1334,6 +1393,8 @@ def normalize_design_book(d, outline: dict) -> dict:
     return {"subject": s("subject", 200), "audience": s("audience", 200), "textbook": s("textbook", 300),
             "platform": s("platform"), "notation": s("notation"), "visual_style": s("visual_style", 500),
             "chapters": chapters, "avoid": [str(a)[:200] for a in d.get("avoid") or [] if a][:8],
+            "library": [{"id": str(x.get("id") or "").strip(), "role": str(x.get("role") or "")[:120]}
+                        for x in d.get("library") or [] if isinstance(x, dict) and x.get("id")][:12],
             **({"by": "teacher"} if d.get("by") == "teacher" else {})}
 
 
@@ -1344,7 +1405,8 @@ def fake_design_book(proj: dict) -> dict:
             "notation": "与主教材一致", "visual_style": "深色背景，坐标系与机构示意，中英字幕",
             "chapters": [{"no": c["no"], "animation": "本章机构与坐标系的动态示意", "lab": "调节本章参数，观察机器人响应",
                           "problems": "本章概念在机器人上的应用"} for c in o.get("chapters") or []],
-            "avoid": ["不用其他学科、其他课程的例子"]}
+            "avoid": ["不用其他学科、其他课程的例子"],
+            "library": [{"id": "B-ARM-6R-S", "role": "贯穿全课的机械臂"}, {"id": "B-MOB-DIFF-S", "role": "移动机器人章节"}]}
 
 
 def named_textbooks(texts: list[str]) -> list[str]:
