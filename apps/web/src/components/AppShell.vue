@@ -158,7 +158,9 @@ onMounted(() => loadAdmin());
 .gnav {
   width: 84px; flex-shrink: 0; background: var(--wq-ink); color: #c9d4d8; display: flex; flex-direction: column;
   position: sticky; top: 0; height: 100vh; z-index: 20;
+  overflow-y: auto; overflow-x: hidden; scrollbar-width: none;   /* never cut off the bottom (help, language) */
 }
+.gnav::-webkit-scrollbar { display: none; }
 .logo { display: flex; flex-direction: column; align-items: center; padding: 16px 4px 14px; border-bottom: 1px solid rgba(255,255,255,.08); cursor: pointer; }
 .logo-mark { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 900; font-size: 20px; color: #fff; letter-spacing: 2px; }
 .logo-sub { font-family: "IBM Plex Mono", Menlo, monospace; font-size: 9px; letter-spacing: 1.5px; color: var(--wq-accent); margin-top: 3px; }
@@ -220,6 +222,18 @@ onMounted(() => loadAdmin());
 .pv-banner { background: #e7f1f5; color: var(--wq-link); border-radius: 8px; padding: 8px 14px; font-size: 14px; margin-bottom: 14px; display: flex; justify-content: space-between; gap: 12px; }
 .pv-exit { font-weight: 600; cursor: pointer; }
 
+/* shorter screens: a more compact rail so every item, down to 语言, stays in view */
+@media (min-width: 861px) and (max-height: 940px) {
+  .logo { padding: 10px 4px 8px; }
+  .gitem { padding: 7px 4px; gap: 2px; }
+  .gicon { font-size: 18px; line-height: 21px; }
+  .avatar { width: 24px; height: 24px; font-size: 12px; }
+  .glabel { font-size: 11px; }
+}
+@media (min-width: 861px) and (max-height: 720px) {
+  .gitem { padding: 5px 4px; }
+  .logo-sub { display: none; }
+}
 @media (max-width: 1180px) {
   .body { grid-template-columns: 160px minmax(0, 1fr); }
   .side { grid-column: 2; position: static; }
