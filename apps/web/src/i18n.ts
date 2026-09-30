@@ -948,6 +948,12 @@ const messages: Record<Locale, Record<string, string>> = {
     "studio.kind.lab": "虚拟实验",
     "studio.redoLab": "重做实验",
     "studio.makeLab": "做虚拟实验",
+    "studio.addFiles": "上传文件",
+    "studio.addFolder": "上传文件夹",
+    "studio.dropAnytime": "也可以把文件拖到这里，随时都能加",
+    "studio.downloadAll": "全部下载（zip）",
+    "studio.download": "下载",
+    "studio.deleteFileConfirm": "删除“{name}”？以后写课不再用它，已经写好的课不受影响。",
   },
   en: {
     "app.name": "WenQuest",
@@ -1893,6 +1899,12 @@ const messages: Record<Locale, Record<string, string>> = {
     "studio.kind.lab": "Virtual lab",
     "studio.redoLab": "Redo the lab",
     "studio.makeLab": "Make the lab",
+    "studio.addFiles": "Add files",
+    "studio.addFolder": "Add a folder",
+    "studio.dropAnytime": "Or drop files here, at any time",
+    "studio.downloadAll": "Download all (zip)",
+    "studio.download": "Download",
+    "studio.deleteFileConfirm": "Delete “{name}”? Later lessons won't use it; lessons already written stay as they are.",
   },
 };
 

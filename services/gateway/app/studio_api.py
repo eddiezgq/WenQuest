@@ -99,6 +99,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         for fid, x in items.items():
             f = proj["materials"]["files"].get(fid, {})
             files.append({"id": fid, "name": x.name, "path": x.path, "size": x.size, "pages": x.pages, "error": x.error,
+                          "url": sign_material(proj["id"], fid),
                           "role": f.get("role", ""), "role_label": team.ROLES.get(f.get("role", ""), ""),
                           "chapters": f.get("chapters", []), "title": f.get("title", ""),
                           "confidence": f.get("confidence", ""), "note": f.get("note", ""), "by": f.get("by", "")})
@@ -112,6 +113,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         out["progress"]["total"] = len(lessons)
         out["busy"] = proj.get("busy") if studio().is_busy(proj["id"]) else None
         out["labs_on"] = bool(studio().labcheck_url)   # virtual labs can be made (the lab checker is set up)
+        out["zip_url"] = sign_material(proj["id"], "*") if files else ""
         out["toc"] = [{"no": c["no"], "title": c["title"], "start": c.get("start"),
                        "sections": [{"no": s["no"], "title": s["title"], "start": s.get("start")} for s in c["sections"]]}
                       for c in proj["materials"].get("toc", [])]
@@ -120,6 +122,11 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             for les in c["lessons"]:
                 les["files"] = [{**f, "url": sign_lesson_file(proj["id"], les["id"], f["name"])} for f in les.get("files") or []]
         return out
+
+    def sign_material(pid: str, fid: str) -> str:
+        """A one-day link to one of the teacher's own materials ("*" = all of them as a zip)."""
+        tok = m.state.codec.fernet.encrypt(json.dumps({"p": pid, "f": fid}).encode()).decode()
+        return f"{m.state.settings.public_url.rstrip('/')}/api/v1/studio/materials/{tok}"
 
     def sign_lesson_file(pid: str, lid: str, name: str) -> str:
         tok = m.state.codec.fernet.encrypt(json.dumps({"p": pid, "l": lid, "n": name}).encode()).decode()
@@ -166,6 +173,67 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
                      file: UploadFile = File(...), path: str = Form("")):
         proj = load(pid, sess)
         return await m.ingest(proj["import_id"], sess, file, path)
+
+    @app.post("/api/v1/studio/projects/{pid}/files/done")
+    async def files_done(pid: str, sess: Annotated[Session, Depends(current)]):
+        """The teacher finished adding files. Once the materials were read, the librarian sorts the new ones
+        at once and the lead says what they change (before that, 'start' reads everything)."""
+        proj = load(pid, sess)
+        known = proj["materials"]["files"]
+        if proj["stage"] != "intake" and any(x.id not in known for x in studio().items(proj)):
+            studio().run(proj, "资料馆员正在阅读新加的资料…", studio().classify_new)
+        return view(studio().projects.load(pid))
+
+    @app.delete("/api/v1/studio/projects/{pid}/files/{fid}")
+    async def delete_file(pid: str, fid: str, sess: Annotated[Session, Depends(current)]):
+        """Remove a material. Lessons already written keep what they are; later lessons no longer use it."""
+        proj = load(pid, sess)
+        if studio().is_busy(pid):
+            raise EngineError("team_busy", "wait until the team has finished", 409)
+        if not m.state.store.remove(proj["import_id"], sess.user_id, fid):
+            raise EngineError("not_found", "no such file", 404)
+        proj["materials"]["files"].pop(fid, None)
+        if proj["materials"].get("textbook") == fid:
+            proj["materials"]["textbook"] = ""
+            proj["materials"]["toc"] = []
+        studio().projects.save(proj)
+        return view(proj)
+
+    @app.get("/api/v1/studio/materials/{signed}")
+    async def material_file(signed: str):
+        """Download one of the teacher's materials, or all of them as a zip in their folders."""
+        try:
+            d = json.loads(m.state.codec.fernet.decrypt(signed.encode(), ttl=m.FILE_TTL))
+            proj = studio().projects.load(d["p"])
+        except KeyError:
+            raise EngineError("not_found", "no such file", 404)
+        except Exception:
+            raise EngineError("link_expired", "file link expired", 410)
+        items = studio().items(proj)
+        if d["f"] == "*":
+            import io
+            import zipfile
+            buf = io.BytesIO()
+            with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+                used: set[str] = set()
+                for x in items:
+                    name = re.sub(r"^/+|\.\.", "", x.path or x.name) or x.id
+                    while name in used:
+                        name = "_" + name
+                    used.add(name)
+                    try:
+                        z.writestr(name, m.state.store.data(proj["import_id"], x.id))
+                    except KeyError:
+                        continue
+            title = re.sub(r'[\\/:*?"<>|]', "-", disp(proj["outline"]["title"]) if proj.get("outline") else "") or "资料"
+            return Response(buf.getvalue(), media_type="application/zip", headers={
+                "Content-Disposition": m._disposition("attachment", f"{title} 资料.zip"), "Cache-Control": "private, max-age=600"})
+        x = next((i for i in items if i.id == d["f"]), None)
+        if not x:
+            raise EngineError("not_found", "no such file", 404)
+        return Response(m.state.store.data(proj["import_id"], x.id), media_type="application/octet-stream", headers={
+            "Content-Disposition": m._disposition("attachment", x.name), "Cache-Control": "private, max-age=600",
+            "X-Content-Type-Options": "nosniff"})
 
     @app.post("/api/v1/studio/projects/{pid}/start")
     async def start(pid: str, sess: Annotated[Session, Depends(current)]):

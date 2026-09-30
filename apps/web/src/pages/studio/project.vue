@@ -93,6 +93,16 @@
 
           <!-- materials list -->
           <view v-if="tab === 'materials'" class="pane">
+            <!-- add, download: at any stage (files added after the materials were settled are sorted at once) -->
+            <!-- #ifdef H5 -->
+            <div class="mtools" :class="{ over: dragOver }" @dragover.prevent="dragOver = true" @dragleave="dragOver = false" @drop.prevent="onDrop">
+              <text class="mt-btn" @click="pick(false)">＋ {{ t("studio.addFiles") }}</text>
+              <text class="mt-btn" @click="pick(true)">＋ {{ t("studio.addFolder") }}</text>
+              <text v-if="uploading" class="muted-s">{{ t("import.uploading", { done: uploads.done, total: uploads.total }) }}</text>
+              <text v-else class="muted-s">{{ t("studio.dropAnytime") }}</text>
+              <text v-if="p.zip_url" class="mt-btn right" @click="download(p.zip_url)">↓ {{ t("studio.downloadAll") }}</text>
+            </div>
+            <!-- #endif -->
             <text v-if="p.materials.summary" class="note">{{ p.materials.summary }}</text>
             <view v-if="!p.files.length" class="empty">{{ t("studio.noFiles") }}</view>
             <view v-else class="ftable">
@@ -100,6 +110,7 @@
                 <text class="f-name">{{ t("import.file") }}</text>
                 <text class="f-role">{{ t("studio.role") }}</text>
                 <text class="f-ch">{{ t("import.chapter") }}</text>
+                <text class="f-act"></text>
               </view>
               <view v-for="f in p.files" :key="f.id" class="frow" :class="{ low: f.confidence === 'low', bad: f.error }">
                 <view class="f-name">
@@ -110,7 +121,7 @@
                 </view>
                 <view class="f-role">
                   <!-- #ifdef H5 -->
-                  <select class="sel" :value="f.role" :disabled="p.stage === 'lessons'" @change="(e: any) => setRole(f, e.target.value)">
+                  <select class="sel" :value="f.role" @change="(e: any) => setRole(f, e.target.value)">
                     <option v-for="(label, key) in p.roles" :key="key" :value="key">{{ label }}</option>
                   </select>
                   <!-- #endif -->
@@ -119,7 +130,11 @@
                   <!-- #endif -->
                 </view>
                 <view class="f-ch">
-                  <input class="chin" :value="f.chapters.join(',')" :disabled="p.stage === 'lessons'" @blur="(e: any) => setChapters(f, e.detail.value)" />
+                  <input class="chin" :value="f.chapters.join(',')" @blur="(e: any) => setChapters(f, e.detail.value)" />
+                </view>
+                <view class="f-act">
+                  <text class="fa" :title="t('studio.download')" @click="download(f.url || '')">↓</text>
+                  <text class="fa del" :title="t('common.delete')" @click="removeFile(f)">✕</text>
                 </view>
               </view>
             </view>
@@ -303,6 +318,7 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, watch } from "vue";
 import { onHide, onLoad, onShow, onUnload } from "@dcloudio/uni-app";
+import { confirmAction } from "../../courseApi";
 import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import {
@@ -592,7 +608,12 @@ async function upload(list: Picked[]) {
     }
   };
   await Promise.all([worker(), worker(), worker()]);
-  await load();
+  // Once the materials were read, the librarian sorts the new files at once (before that, "start" reads them all).
+  try { take(await api.studioFilesDone(id.value)); } catch { await load(); }
+}
+async function removeFile(f: { id: string; name: string }) {
+  if (!(await confirmAction(t("studio.deleteFileConfirm", { name: f.name }), t("common.delete"), t("common.cancel")))) return;
+  act(() => api.studioDeleteFile(id.value, f.id));
 }
 
 const size = (n: number) => (n > 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
@@ -761,4 +782,12 @@ onUnload(() => { if (timer) clearTimeout(timer); });
   .f-role { width: 96px; }
 }
 .dv-lab { display: block; width: 100%; height: 780px; border: 1px solid var(--wq-line); border-radius: 8px; margin-top: 10px; background: #fff; }
+.mtools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; margin-bottom: 10px; border: 1px dashed var(--wq-line); border-radius: 8px; background: #fbfcfc; }
+.mtools.over { border-color: var(--wq-link); background: #eef6f9; }
+.mt-btn { color: var(--wq-link); cursor: pointer; font-size: 14px; font-weight: 600; }
+.mt-btn.right { margin-left: auto; }
+.f-act { width: 56px; display: flex; gap: 10px; justify-content: flex-end; }
+.fa { cursor: pointer; color: var(--wq-link); font-size: 15px; }
+.fa.del { color: var(--wq-muted); }
+.fa.del:hover { color: var(--wq-danger); }
 </style>

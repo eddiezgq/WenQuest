@@ -309,6 +309,66 @@ class Studio:
         if course.get("title") and not proj["requirements"].get("course_title"):
             proj["requirements"]["course_title"] = str(course["title"])[:200]
 
+    async def classify_new(self, proj: dict) -> None:
+        """Files added after the materials were settled: the librarian sorts just those, then the lead says
+        what they change — lessons not written yet use them; written ones are named for a possible rewrite."""
+        items = self.items(proj)
+        known = proj["materials"]["files"]
+        new = [m for m in items if m.id not in known]
+        if not new:
+            return
+        files = [{"id": m.id, "path": m.path, "ext": m.ext, "size": m.size, "pages": m.pages,
+                  "error": m.error, "excerpt": m.excerpt} for m in new]
+        data = await self.ai.json(system=team.LIBRARIAN, prompt=team.librarian_prompt(files, proj["requirements"].get("notes", "")),
+                                  schema=team.librarian_schema(), max_tokens=6000, fake=lambda: fake_librarian(new))
+        data = data if isinstance(data, dict) else {}
+        ids = {m.id for m in new}
+        got = {f["id"]: f for f in data.get("files") or [] if isinstance(f, dict) and f.get("id") in ids}
+        for m in new:
+            f = got.get(m.id)
+            if f:
+                role = f.get("role") if f.get("role") in team.ROLES else "other"
+                known[m.id] = {"role": role, "chapters": [c for c in (f.get("chapters") or []) if isinstance(c, int) and 0 < c < 100],
+                               "title": str(f.get("title") or "")[:200], "language": f.get("language") or "",
+                               "confidence": f.get("confidence") or "high", "note": str(f.get("note") or "")[:300], "by": "librarian"}
+            else:
+                known[m.id] = {"role": ROLE_OF_CATEGORY.get(m.category, "other"), "chapters": [m.chapter] if m.chapter else [],
+                               "title": "", "language": "", "confidence": "low", "note": "", "by": "rules"}
+        if not proj["materials"]["textbook"]:
+            tb = next((fid for fid in ids if known[fid]["role"] == "main_textbook"), "")
+            if tb:
+                proj["materials"]["textbook"] = tb
+        self.say(proj, self.new_files_report(proj, new), "lead", "report")
+
+    def new_files_report(self, proj: dict, new: list) -> str:
+        known = proj["materials"]["files"]
+        lines = [f"新加了 {len(new)} 份资料，我已经看过并分好类（可以在资料清单里改）："]
+        for m in new[:12]:
+            f = known[m.id]
+            ch = "、".join(f"第{c}章" for c in f["chapters"]) or "全书通用"
+            lines.append(f"· {m.name} → {team.ROLES.get(f['role'], f['role'])}，{ch}")
+        if len(new) > 12:
+            lines.append(f"……共 {len(new)} 份")
+        chapters = (proj.get("outline") or {}).get("chapters") or []
+        if chapters:
+            touched = {c for m in new for c in known[m.id]["chapters"]}
+            general = any(not known[m.id]["chapters"] for m in new)
+            in_outline = {c["no"] for c in chapters}
+            def nos(status: str) -> list[str]:
+                return [f"{c['no']}.{i + 1}" for c in chapters if general or c["no"] in touched
+                        for i, les in enumerate(c["lessons"]) if les["status"] == status]
+            short = lambda xs: "、".join(xs[:10]) + (" 等" if len(xs) > 10 else "")  # noqa: E731
+            lines.append("还没写的课会自动用上这些资料。")
+            if nos("awaiting"):
+                lines.append(f"写好还没发布的 {short(nos('awaiting'))} 可以参考新资料重写：需要的话在“课时进度”里点那一课的“重写”。")
+            if nos("published"):
+                lines.append(f"已经发布的 {short(nos('published'))} 不会自动改。")
+            extra = sorted(c for c in touched if c not in in_outline)
+            if extra:
+                lines.append("资料里有" + "、".join(f"第{c}章" for c in extra) + "的内容，大纲里还没有这一章；需要的话告诉我“加上第"
+                             + str(extra[0]) + "章”。")
+        return "\n".join(lines)
+
     async def read_contents(self, proj: dict) -> None:
         """Read the main textbook's table of contents and find where each section starts."""
         fid = proj["materials"]["textbook"]

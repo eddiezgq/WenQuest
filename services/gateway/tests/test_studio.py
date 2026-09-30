@@ -360,3 +360,38 @@ def test_no_renderer_no_video(client, monkeypatch):
     les = p["outline"]["chapters"][0]["lessons"][0]
     assert les["status"] == "awaiting" and "animation" not in [f["kind"] for f in les["files"]]
     assert any("动画渲染服务暂时不可用" in i["text"] for i in les["review"]["issues"])
+
+
+def test_materials_can_be_added_downloaded_and_deleted_at_any_stage(client):
+    """Materials list: add files after the outline (sorted at once, written lessons named for a rewrite),
+    download one or all (zip, original folders), delete one."""
+    import io
+    import zipfile
+    from tests.test_materials import docx_bytes
+    h = login(client)
+    pid, p = _write_first_lesson(client, h)
+    written = [f"{c['no']}.{i + 1}" for c in p["outline"]["chapters"] for i, les in enumerate(c["lessons"]) if les["status"] == "awaiting"]
+    before = len(p["files"])
+    r = client.post(f"/api/v1/studio/projects/{pid}/files", headers=h, data={"path": "新资料/第1章/补充例题.docx"},
+                    files={"file": ("补充例题.docx", docx_bytes(["第1章 补充例题", "例1 AGV 转弯"]), "application/octet-stream")})
+    assert r.status_code == 200
+    client.post(f"/api/v1/studio/projects/{pid}/files/done", headers=h)
+    p = settle(client, h, pid)
+    new = next(f for f in p["files"] if f["name"] == "补充例题.docx")
+    assert len(p["files"]) == before + 1 and new["role"] and new["url"]
+    msg = p["messages"][-1]["text"]
+    assert "新加了 1 份资料" in msg and "补充例题.docx" in msg and "还没写的课会自动用上" in msg
+    assert not written or (written[0] in msg and "重写" in msg)
+    # download one, then all
+    one = client.get(new["url"])
+    assert one.status_code == 200 and one.content[:2] == b"PK" and "attachment" in one.headers["content-disposition"]
+    z = zipfile.ZipFile(io.BytesIO(client.get(p["zip_url"]).content))
+    assert "新资料/第1章/补充例题.docx" in z.namelist() and len(z.namelist()) == before + 1
+    # someone else's link does not open, a forged one neither
+    assert client.get("/api/v1/studio/materials/not-a-token").status_code == 410
+    # delete
+    p = client.delete(f"/api/v1/studio/projects/{pid}/files/{new['id']}", headers=h).json()
+    assert len(p["files"]) == before and all(f["id"] != new["id"] for f in p["files"])
+    assert client.delete(f"/api/v1/studio/projects/{pid}/files/{new['id']}", headers=h).status_code == 404
+    s = login(client, "s")
+    assert client.delete(f"/api/v1/studio/projects/{pid}/files/{p['files'][0]['id']}", headers=s).status_code == 403

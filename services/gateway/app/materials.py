@@ -129,6 +129,19 @@ class Store:
             raise KeyError("no file")
         return p.read_bytes()
 
+    def remove(self, sid: str, user_id: int, fid: str) -> bool:
+        """Drop one file from a session (the teacher deleted it)."""
+        meta = self.load(sid, user_id)
+        before = len(meta["files"])
+        meta["files"] = [f for f in meta["files"] if f["id"] != fid]
+        if len(meta["files"]) == before:
+            return False
+        self.save(sid, meta)
+        if re.fullmatch(r"[0-9a-f]{32}", fid):
+            for ext in ("bin", "txt"):
+                (self.root / sid / f"{fid}.{ext}").unlink(missing_ok=True)
+        return True
+
     def cleanup(self) -> None:
         now = time.time()
         for d in self.root.iterdir():
