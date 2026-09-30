@@ -1,0 +1,71 @@
+# A-BRG-CR · 圆柱滚子轴承（第一期，L13）
+schema: 1
+id: A-BRG-CR
+kind: family
+name:
+  zh: 圆柱滚子轴承
+  en: Cylindrical roller bearing
+category: BRG
+tags:
+- 滚动轴承
+- NU/N 系列
+standards:
+- code: ISO 15:2017
+  title: Rolling bearings — Radial bearings — Boundary dimensions
+params:
+- key: d_mm
+  zh: 内径
+  en: Bore
+  role: key
+- key: D_mm
+  zh: 外径
+  en: Outside diameter
+  role: key
+- key: B_mm
+  zh: 宽度
+  en: Width
+  role: key
+- key: Cr_kN
+  zh: 额定动载荷
+  en: Dynamic load rating
+  role: perf
+- key: C0r_kN
+  zh: 额定静载荷
+  en: Static load rating
+  role: perf
+- key: bd_size
+  zh: bd_warehouse 规格
+  en: bd_warehouse size
+  role: info
+specs: specs.csv
+default: NJ204ECP
+model:
+  engine: bd_warehouse:SingleRowCylindricalRollerBearing
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 轴承中心，轴线沿 Z
+  note: 尺寸与额定载荷取 bd_warehouse 的 SKF 样本数据（NU/N 系列）
+source:
+  origin: bd_warehouse
+  repo: https://github.com/gumyr/bd_warehouse
+  commit: eed2da1
+  license: Apache-2.0
+  attribution: 问渠零件库；造型程序与尺寸数据 bd_warehouse（Apache-2.0，© gumyr），数据源自 SKF 样本
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: bd_warehouse 仓库 LICENSE 为 Apache-2.0
+teaching:
+  principle: 滚子与滚道线接触，径向承载能力大，允许内外圈少量轴向错动，适合轴有热伸长的场合。
+  uses:
+  - 机床主轴
+  - 齿轮箱
+  courses:
+  - course: 机械设计基础
+    chapter: 滚动轴承的类型与选择
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

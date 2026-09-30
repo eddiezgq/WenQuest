@@ -1,0 +1,89 @@
+# A-KEY-FLAT · 普通平键（A 型）（第一期，L13）
+schema: 1
+id: A-KEY-FLAT
+kind: family
+name:
+  zh: 普通平键（A 型）
+  en: Parallel key, form A
+category: KEY
+tags:
+- 键
+- 轴毂联接
+- key
+standards:
+- code: GB/T 1096-2003
+  title: 普通型 平键
+- code: GB/T 1095-2003
+  title: 平键 键槽的剖面尺寸
+- code: DIN 6885-1
+  title: Parallel keys, keyways, deep pattern
+params:
+- key: b_mm
+  zh: 键宽
+  en: Width
+  role: key
+- key: h_mm
+  zh: 键高
+  en: Height
+  role: key
+- key: l_mm
+  zh: 键长
+  en: Length
+  role: key
+- key: shaft_min_mm
+  zh: 适用轴径（大于）
+  en: Shaft over
+  role: dim
+- key: shaft_max_mm
+  zh: 适用轴径（至）
+  en: Shaft up to
+  role: dim
+- key: t1_mm
+  zh: 轴槽深
+  en: Shaft keyway depth
+  role: dim
+- key: t2_mm
+  zh: 毂槽深
+  en: Hub keyway depth
+  role: dim
+specs: specs.csv
+default: 12x8x45
+model:
+  engine: bd_warehouse:ShaftKey:A
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 键的中心，长度沿 X
+  note: b、h、槽深取 bd_warehouse 的 DIN 6885 数据，与 GB/T 1095 核对一致；长度系列与范围按 GB/T 1096
+source:
+  origin: bd_warehouse
+  repo: https://github.com/gumyr/bd_warehouse
+  commit: eed2da1
+  license: Apache-2.0
+  attribution: 问渠零件库（长度系列按 GB/T 1096）；造型程序与键槽数据 bd_warehouse（Apache-2.0，© gumyr）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: bd_warehouse 仓库 LICENSE 为 Apache-2.0
+teaching:
+  principle: 键的两侧面是工作面，靠侧面挤压传递转矩；装拆方便、对中好。
+  uses:
+  - 齿轮、带轮与轴的联接
+  - 电机轴伸
+  courses:
+  - course: 机械设计基础
+    chapter: 键联接
+  labs:
+  - 平键强度校核（挤压与剪切）
+factory:
+  erp_items:
+  - item_code: KEY-6x6x25
+    size: 6x6x25
+  - item_code: KEY-8x7x36
+    size: 8x7x36
+  - item_code: KEY-10x8x28
+    size: 10x8x28
+  - item_code: KEY-12x8x45
+    size: 12x8x45
+  suppliers: []

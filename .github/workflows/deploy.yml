@@ -7,6 +7,8 @@ on:
     paths-ignore:
       - "factory/**"
       - ".github/workflows/factory.yml"
+      - "library/**"
+      - ".github/workflows/library.yml"
   workflow_dispatch:
   # Weekly fresh build picks up Moodle security fixes from the stable branch.
   schedule:

@@ -1,0 +1,75 @@
+# A-BLT-HEX · 六角头螺栓（第一期，L13）
+schema: 1
+id: A-BLT-HEX
+kind: family
+name:
+  zh: 六角头螺栓
+  en: Hex head bolt
+category: BLT
+tags:
+- 螺栓
+- 紧固件
+- 部分螺纹
+- bolt
+standards:
+- code: GB/T 5782-2016
+  title: 六角头螺栓
+- code: ISO 4014:2011
+  title: Hexagon head bolts — Product grades A and B
+params:
+- key: d_mm
+  zh: 公称直径
+  en: Nominal diameter
+  role: key
+- key: P_mm
+  zh: 螺距
+  en: Pitch
+  role: dim
+- key: l_mm
+  zh: 公称长度
+  en: Nominal length
+  role: key
+- key: k_mm
+  zh: 头部高度
+  en: Head height
+  role: dim
+- key: s_mm
+  zh: 对边宽度
+  en: Width across flats
+  role: dim
+specs: specs.csv
+default: M12x110
+model:
+  engine: bd_warehouse:HexHeadScrew:iso4014
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 头部支承面中心，螺杆沿 -Z
+  note: 螺纹简化为光杆（simple=True）
+source:
+  origin: bd_warehouse
+  repo: https://github.com/gumyr/bd_warehouse
+  commit: eed2da1
+  license: Apache-2.0
+  attribution: 问渠零件库；造型程序与尺寸数据 bd_warehouse（Apache-2.0，© gumyr）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: bd_warehouse 仓库 LICENSE 为 Apache-2.0
+teaching:
+  principle: 靠螺纹的斜面把拧紧力矩转成很大的轴向预紧力，使被连接件压紧，靠摩擦传力。
+  uses:
+  - 箱体、法兰联接
+  - 机架与设备固定
+  courses:
+  - course: 机械设计基础
+    chapter: 螺纹联接
+  labs:
+  - 预紧力与拧紧力矩计算
+  - 螺栓组受力分析
+factory:
+  erp_items:
+  - item_code: BOLT-M12x110
+    size: M12x110
+  suppliers: []

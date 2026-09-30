@@ -1,0 +1,95 @@
+# A-BRG-DG · 深沟球轴承（第一期，L13）
+schema: 1
+id: A-BRG-DG
+kind: family
+name:
+  zh: 深沟球轴承
+  en: Deep groove ball bearing
+category: BRG
+tags:
+- 滚动轴承
+- 60系列
+- 62系列
+- 63系列
+- 微型轴承
+- ball bearing
+standards:
+- code: GB/T 276-2013
+  title: 滚动轴承 深沟球轴承 外形尺寸
+- code: ISO 15:2017
+  title: Rolling bearings — Radial bearings — Boundary dimensions
+params:
+- key: d_mm
+  zh: 内径
+  en: Bore
+  role: key
+- key: D_mm
+  zh: 外径
+  en: Outside diameter
+  role: key
+- key: B_mm
+  zh: 宽度
+  en: Width
+  role: key
+- key: r_min_mm
+  zh: 倒角最小尺寸
+  en: Chamfer min
+  role: dim
+- key: Cr_kN
+  zh: 额定动载荷
+  en: Dynamic load rating
+  role: perf
+- key: C0r_kN
+  zh: 额定静载荷
+  en: Static load rating
+  role: perf
+- key: data_source
+  zh: 数据来源
+  en: Data source
+  role: info
+specs: specs.csv
+default: '6207'
+model:
+  engine: bd_warehouse:SingleRowDeepGrooveBallBearing
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 轴承中心，轴线沿 Z
+  nodes:
+  - OuterRace
+  - InnerRace
+  - Roller
+  note: 60/62/63 系列外形尺寸按 GB/T 276（内部滚道与钢球为示意）；内径 10 mm 以下的微型轴承取 bd_warehouse 的 SKF 数据（含额定载荷）
+source:
+  origin: wenquest
+  repo: https://github.com/gumyr/bd_warehouse
+  commit: eed2da1
+  license: Apache-2.0
+  attribution: 问渠零件库（尺寸按 GB/T 276）；造型程序 bd_warehouse（Apache-2.0，© gumyr）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 外形尺寸按 GB/T 276-2013；造型程序 Apache-2.0
+teaching:
+  principle: 钢球在内外圈滚道间滚动，以滚动摩擦代替滑动摩擦；主要承受径向载荷，也能承受一定轴向载荷。
+  uses:
+  - 减速器、电机转轴支承
+  - 机器人关节
+  courses:
+  - course: 机械设计基础
+    chapter: 滚动轴承的类型与选择
+  - course: 机器人技术
+    chapter: 关节传动与支承
+  labs:
+  - 轴承寿命计算虚拟实验
+  - 拆装动画
+factory:
+  erp_items:
+  - item_code: BRG-6205
+    size: '6205'
+  - item_code: BRG-6206
+    size: '6206'
+  - item_code: BRG-6207
+    size: '6207'
+  suppliers: []

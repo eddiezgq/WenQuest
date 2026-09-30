@@ -1,0 +1,73 @@
+# A-RNG-SHAFT · 轴用弹性挡圈（第一期，L13）
+schema: 1
+id: A-RNG-SHAFT
+kind: family
+name:
+  zh: 轴用弹性挡圈
+  en: External retaining ring
+category: RNG
+tags:
+- 挡圈
+- 轴向定位
+- circlip
+standards:
+- code: GB/T 894-2017
+  title: 轴用弹性挡圈
+- code: DIN 471
+  title: Retaining rings for shafts
+params:
+- key: d1_mm
+  zh: 适用轴径
+  en: Shaft diameter
+  role: key
+- key: s_mm
+  zh: 厚度
+  en: Thickness
+  role: dim
+- key: d3_mm
+  zh: 自由内径
+  en: Free inside diameter
+  role: dim
+- key: d2_mm
+  zh: 沟槽直径
+  en: Groove diameter
+  role: dim
+- key: a_mm
+  zh: 耳部宽度
+  en: Lug width
+  role: dim
+- key: m_mm
+  zh: 沟槽宽度
+  en: Groove width
+  role: dim
+specs: specs.csv
+default: '20'
+model:
+  engine: bd_warehouse:ExternalSnapRing
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 挡圈中心，轴线沿 Z
+source:
+  origin: bd_warehouse
+  repo: https://github.com/gumyr/bd_warehouse
+  commit: eed2da1
+  license: Apache-2.0
+  attribution: 问渠零件库；造型程序与尺寸数据 bd_warehouse（Apache-2.0，© gumyr）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: bd_warehouse 仓库 LICENSE 为 Apache-2.0
+teaching:
+  principle: 卡在轴上的沟槽里，承受不大的轴向力，给轴承、齿轮等做轴向定位。
+  uses:
+  - 轴承外侧定位
+  - 轴上零件定位
+  courses:
+  - course: 机械设计基础
+    chapter: 轴上零件的轴向定位
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

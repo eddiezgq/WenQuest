@@ -1,0 +1,64 @@
+# A-WSH-PLN · 平垫圈（第一期，L13）
+schema: 1
+id: A-WSH-PLN
+kind: family
+name:
+  zh: 平垫圈
+  en: Plain washer
+category: WSH
+tags:
+- 垫圈
+- 紧固件
+- washer
+standards:
+- code: GB/T 97.1-2002
+  title: 平垫圈 A 级
+- code: ISO 7089:2000
+  title: Plain washers — Normal series
+params:
+- key: d_mm
+  zh: 螺纹规格
+  en: For thread
+  role: key
+- key: d1_mm
+  zh: 内径
+  en: Inside diameter
+  role: dim
+- key: d2_mm
+  zh: 外径
+  en: Outside diameter
+  role: dim
+- key: h_mm
+  zh: 厚度
+  en: Thickness
+  role: dim
+specs: specs.csv
+default: M12
+model:
+  engine: bd_warehouse:PlainWasher:iso7089
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 垫圈中心，轴线沿 Z
+source:
+  origin: bd_warehouse
+  repo: https://github.com/gumyr/bd_warehouse
+  commit: eed2da1
+  license: Apache-2.0
+  attribution: 问渠零件库；造型程序与尺寸数据 bd_warehouse（Apache-2.0，© gumyr）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: bd_warehouse 仓库 LICENSE 为 Apache-2.0
+teaching:
+  principle: 增大支承面积、降低接触压强，保护被联接件表面。
+  uses:
+  - 螺栓、螺母下面
+  courses:
+  - course: 机械设计基础
+    chapter: 螺纹联接
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

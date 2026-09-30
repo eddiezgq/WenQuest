@@ -1,0 +1,62 @@
+# A-SEL-ORING · O 形圈（第一期，L13）
+schema: 1
+id: A-SEL-ORING
+kind: family
+name:
+  zh: O 形圈
+  en: O-ring
+category: SEL
+tags:
+- 密封
+- O形圈
+- o-ring
+standards:
+- code: ISO 3601-1:2012
+  title: Fluid power systems — O-rings — Inside diameters, cross-sections
+- code: GB/T 3452.1-2005
+  title: 液压气动用 O 形橡胶密封圈 尺寸系列
+params:
+- key: id_mm
+  zh: 内径
+  en: Inside diameter
+  role: key
+- key: w_mm
+  zh: 截面直径
+  en: Cross-section
+  role: key
+- key: od_mm
+  zh: 外径
+  en: Outside diameter
+  role: dim
+specs: specs.csv
+default: '210'
+model:
+  engine: bd_warehouse:ORing:iso3601
+  formats:
+  - step
+  - stl
+  - glb
+  origin: O 形圈中心，轴线沿 Z
+  note: 规格代号为 ISO 3601-1 A 系列代号（与 AS568 一致）；收内径 2–120 mm
+source:
+  origin: bd_warehouse
+  repo: https://github.com/gumyr/bd_warehouse
+  commit: eed2da1
+  license: Apache-2.0
+  attribution: 问渠零件库；造型程序与尺寸数据 bd_warehouse（Apache-2.0，© gumyr）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: bd_warehouse 仓库 LICENSE 为 Apache-2.0
+teaching:
+  principle: 装进沟槽后被压缩变形，靠橡胶的弹性贴紧两个面实现密封。
+  uses:
+  - 液压、气动元件
+  - 端盖、法兰静密封
+  courses:
+  - course: 机械设计基础
+    chapter: 密封装置
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

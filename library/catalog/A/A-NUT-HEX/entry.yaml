@@ -1,0 +1,67 @@
+# A-NUT-HEX · 六角螺母（第一期，L13）
+schema: 1
+id: A-NUT-HEX
+kind: family
+name:
+  zh: 六角螺母
+  en: Hex nut
+category: NUT
+tags:
+- 螺母
+- 紧固件
+- nut
+standards:
+- code: GB/T 6170-2015
+  title: 1 型六角螺母
+- code: ISO 4032:2012
+  title: Hexagon regular nuts (style 1)
+params:
+- key: d_mm
+  zh: 公称直径
+  en: Nominal diameter
+  role: key
+- key: P_mm
+  zh: 螺距
+  en: Pitch
+  role: dim
+- key: m_mm
+  zh: 螺母高度
+  en: Height
+  role: dim
+- key: s_mm
+  zh: 对边宽度
+  en: Width across flats
+  role: dim
+specs: specs.csv
+default: M12
+model:
+  engine: bd_warehouse:HexNut:iso4032
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 螺母中心，轴线沿 Z
+  note: 螺纹简化（simple=True）
+source:
+  origin: bd_warehouse
+  repo: https://github.com/gumyr/bd_warehouse
+  commit: eed2da1
+  license: Apache-2.0
+  attribution: 问渠零件库；造型程序与尺寸数据 bd_warehouse（Apache-2.0，© gumyr）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: bd_warehouse 仓库 LICENSE 为 Apache-2.0
+teaching:
+  principle: 与螺栓配对，把拧紧力矩转成预紧力；高度保证螺纹牙足够承载。
+  uses:
+  - 螺栓联接
+  courses:
+  - course: 机械设计基础
+    chapter: 螺纹联接
+  labs: []
+factory:
+  erp_items:
+  - item_code: NUT-M12
+    size: M12
+  suppliers: []
