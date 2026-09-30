@@ -24,10 +24,23 @@
     var html = user
       ? '<a class="wq-me" href="' + learn + '/pages/courses/courses"><span class="wq-av">' + esc((user.fullname || "?").trim().slice(0, 1)) +
         "</span>" + esc(user.fullname) + "</a>" +
-        '<a class="wq-up" href="' + learn + '/pages/courses/courses">' + T("进入学习平台", "Learning platform") + "</a>"
+        '<a class="wq-up" href="' + learn + '/pages/courses/courses">' + T("进入学习平台", "Learning platform") + "</a>" +
+        '<a href="#" data-wq-out>' + T("退出", "Sign out") + "</a>"
       : '<a href="' + learn + "/pages/login/login?back=" + here + '">' + T("登录", "Sign in") + "</a>" +
         '<a class="wq-up" href="' + learn + "/pages/register/register?back=" + here + '">' + T("注册", "Sign up") + "</a>";
-    for (var i = 0; i < els.length; i++) { els[i].classList.add("wq-auth"); els[i].innerHTML = html; }
+    for (var i = 0; i < els.length; i++) {
+      els[i].classList.add("wq-auth");
+      els[i].innerHTML = html;
+      var out = els[i].querySelector("[data-wq-out]");
+      if (out) out.addEventListener("click", signOut);
+    }
+  }
+  // Sign out everywhere: clearing the shared cookie also signs the learning platform out the next time it opens.
+  function signOut(e) {
+    e.preventDefault();
+    fetch("/api/v1/auth/logout", { method: "POST", credentials: "same-origin" })
+      .catch(function () {})
+      .then(function () { render(null); });
   }
   render(null);
   if (local) return;

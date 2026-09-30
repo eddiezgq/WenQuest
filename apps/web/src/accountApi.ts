@@ -145,3 +145,13 @@ export function siteUrl(path: string): string {
   // #endif
   return `https://wenquestrobotics.com${path}`;
 }
+
+/** The learning platform follows the site-wide sign-in: if the academy website signed out (cookie gone),
+ *  the stored session ends too. Only on the real site (learn.<domain>); the mini program has no cookie. */
+export async function syncSiteSignIn() {
+  // #ifdef H5
+  if (!token.value || !window.location.hostname.startsWith("learn.")) return;
+  // A 401 here clears the stored session and returns to the sign-in page (see request() in api.ts).
+  await accountApi.sso();
+  // #endif
+}

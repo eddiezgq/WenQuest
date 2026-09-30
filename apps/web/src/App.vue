@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { onLaunch } from "@dcloudio/uni-app";
+import { onLaunch, onShow } from "@dcloudio/uni-app";
+import { syncSiteSignIn } from "./accountApi";
 onLaunch(() => {});
+// Signed out on the academy website? Then this platform signs out too (web only, on the site's domain).
+onShow(() => syncSiteSignIn());
 </script>
 
 <style>
