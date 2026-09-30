@@ -13,6 +13,6 @@ try:
 except OSError as e:
     lines = ["（读不到日志：{}）".format(e)]
 lines = [re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", x)[:300] for x in lines] or ["（日志是空的：{}）".format(path)]
-for i in range(0, len(lines), 60):
-    msg = "\n".join(lines[i:i + 60]).replace("%", "%25").replace("\r", "").replace("\n", "%0A")
-    print("::error title={} ({}/{})::{}".format(title, i // 60 + 1, (len(lines) + 59) // 60, msg or "（空）"))
+for i in range(0, len(lines), 160):
+    msg = "\n".join(lines[i:i + 160]).replace("%", "%25").replace("\r", "").replace("\n", "%0A")
+    print("::error title={} ({}/{})::{}".format(title, i // 160 + 1, (len(lines) + 159) // 160, msg or "（空）"))

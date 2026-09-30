@@ -25,6 +25,7 @@ P.add_argument("--timeout", type=float, default=600)
 P.add_argument("--erp-kind", choices=("mock", "real"), default="mock")
 P.add_argument("--erp-key", default="")
 P.add_argument("--erp-secret", default="")
+P.add_argument("--diag", default="", help="出错时把 ERPNext 错误日志写到这个文件（CI 用）")
 A = P.parse_args()
 
 FAILS = []
@@ -59,6 +60,33 @@ def erp_docs(doctype):
     q = urllib.parse.urlencode({"fields": '["*"]', "limit_page_length": 0})
     return call("GET", "{}/api/resource/{}?{}".format(A.erp, urllib.parse.quote(doctype), q),
                 headers={"Authorization": "token {}:{}".format(A.erp_key, A.erp_secret)})["data"]
+
+
+def erp_error_log(n=4):
+    """真 ERPNext 的错误日志（Error Log）：最近几条出错的最后几行，写到 --diag 文件并打印。"""
+    q = urllib.parse.urlencode({"fields": '["name","method","error","creation"]', "order_by": "creation desc",
+                                "limit_page_length": 30})
+    try:
+        rows = call("GET", "{}/api/resource/Error%20Log?{}".format(A.erp, q),
+                    headers={"Authorization": "token {}:{}".format(A.erp_key, A.erp_secret)})["data"]
+    except RuntimeError as e:
+        rows = [{"method": "读不到 Error Log", "error": str(e), "creation": ""}]
+    out, seen = [], set()
+    for r in rows:
+        tail = [x for x in (r.get("error") or "").strip().splitlines() if x.strip()][-6:]
+        key = tail[-1] if tail else r.get("method")
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append("[ERPNext 错误日志] {} {}".format(r.get("creation", "")[:19], r.get("method") or ""))
+        out += ["    " + x.strip()[:280] for x in tail]
+        if len(seen) >= n:
+            break
+    text = "\n".join(out) or "[ERPNext 错误日志] 空"
+    print(text)
+    if A.diag:
+        with open(A.diag, "w", encoding="utf-8") as f:
+            f.write(text + "\n")
 
 
 def delivery_date():
@@ -239,6 +267,8 @@ def main():
                 print("  - {} {}：{}".format(e["data"].get("doctype"), e["data"].get("name"), e["data"].get("error", "")[:400]))
                 if len(seen) >= 12:
                     break
+        if REAL:
+            erp_error_log()
         print("失败 {} 项：".format(len(FAILS)))
         for f in FAILS:
             print("  - " + f)

@@ -96,6 +96,7 @@ jobs:
           val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
           python tests/closed_loop.py --hub http://localhost:8100 --erp http://localhost:8090 --erp-kind real \
             --erp-key "$(val WQ_ERP_API_KEY)" --erp-secret "$(val WQ_ERP_API_SECRET)" --speed 300 --timeout 900 \
+            --diag /tmp/logs/erp_errors.log \
             2>&1 | tee /tmp/logs/closed_loop.log
       - name: 出错时的日志
         if: failure()
@@ -110,8 +111,15 @@ jobs:
           # GitHub 每步最多显示约 10 条注释：闭环测试失败时只发与它相关的
           if [ -s /tmp/logs/closed_loop.log ]; then
             # 闭环测试的输出后面接上桥接日志，作为同一组注释发出
-            { cat /tmp/logs/closed_loop.log; echo "---------- 桥接日志 ----------"; tail -n 80 /tmp/logs/bridge.log; } > /tmp/logs/combined.log
-            a 闭环测试与桥接 /tmp/logs/combined.log 180
+            # 最要紧的放最前面：ERPNext 错误日志、桥接报的错（去重、去 HTML），然后是测试输出
+            {
+              cat /tmp/logs/erp_errors.log 2>/dev/null || true
+              echo "---------- 桥接报错 ----------"
+              grep "\[error\]" /tmp/logs/bridge.log | sed -e 's/<[^>]*>//g' -e 's/^.*\[error\] //' | cut -c1-260 | sort | uniq -c | sort -rn | head -15 || true
+              echo "---------- 闭环测试 ----------"
+              grep -v "ERPNext 进度" /tmp/logs/closed_loop.log | tail -n 60
+            } > /tmp/logs/combined.log
+            a 诊断 /tmp/logs/combined.log 150
             a ERPNext日志 /tmp/logs/erp-files.log 60
             ls -la /tmp/logs > /tmp/logs/ls.txt; a 日志文件 /tmp/logs/ls.txt 30
           else
