@@ -8,6 +8,7 @@ import json
 
 from factory import data as F
 from hub import kpi, mrp
+from hub.privacy import is_me
 
 TASKS = [
     {"id": "t1", "points": 15, "role": "manager", "title": "读懂首页看板",
@@ -90,7 +91,8 @@ class Teach:
         if not self._full(user, "t3"):
             st = self._result(user, "start")["done_at"]
             rel = self.db.messages(["design.release"], since=st, mode="teach")
-            mine = [m for m in rel if m["data"]["item"] == "SH-301" and m["data"].get("author") in (user, None, "")]
+            mine = [m for m in rel if m["data"]["item"] == "SH-301" and (not m["data"].get("author")
+                                                                       or is_me(m["data"]["author"], user))]
             if mine:
                 g = self.db.messages(["design.gcode"], since=st, mode="teach")
                 self._save(user, "t3", 15 if g else 10, {"release": mine[-1]["id"], "revision": mine[-1]["data"]["revision"],

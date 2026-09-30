@@ -34,6 +34,7 @@ from hub import kpi, mrp  # noqa: E402
 from hub.ai import Assistant, ROLE_NAMES  # noqa: E402
 from hub.db import DB  # noqa: E402
 from hub.historian import Historian  # noqa: E402
+from hub.privacy import actor  # noqa: E402
 from hub.mes import MES  # noqa: E402
 from hub.teach import Teach  # noqa: E402
 
@@ -200,6 +201,11 @@ def check_allowed(teacher, role, mode):
         raise HTTPException(400, "角色或模式不对")
     if not teacher and (role not in STUDENT_ROLES or mode != "teach"):
         raise HTTPException(403, "厂长角色和生产模式只对老师开放")
+
+
+def who(u):
+    """总线上代表这个人的写法：线上版“角色·匿名编号”，本地版姓名（第 4 轮 C5）。"""
+    return actor(u["name"], u.get("role"))
 
 
 def require_teacher(u):
@@ -492,7 +498,7 @@ def create_proposal(body: dict = Body(...), u=Depends(user_of)):
         title = "下达工单 " + body["work_order"]
     else:
         raise HTTPException(400, "不支持的提议 " + action)
-    pid = H.ai.propose(action, pv, u["mode"], u["name"], title, source="workbench/" + u["name"])
+    pid = H.ai.propose(action, pv, u["mode"], u["name"], title, source="workbench/" + who(u), role=u["role"])
     return {"proposal_id": pid, "preview": pv, "title": title}
 
 
@@ -516,9 +522,9 @@ def get_proposal(pid: str, u=Depends(user_of)):
 def decide(pid: str, decision: str, u=Depends(user_of)):
     if decision not in ("confirm", "reject"):
         raise HTTPException(404)
-    executors = {"release_work_order": lambda p: {"dispatched": H.mes.release(p["preview"]["work_order"], p["mode"], u["name"])}}
+    executors = {"release_work_order": lambda p: {"dispatched": H.mes.release(p["preview"]["work_order"], p["mode"], who(u))}}
     try:
-        st = H.ai.decide(pid, u["name"], decision == "confirm", executors)
+        st = H.ai.decide(pid, u["name"], decision == "confirm", executors, role=u["role"])
     except KeyError:
         raise HTTPException(404, "没有这个提议")
     except ValueError as e:
@@ -547,7 +553,7 @@ def refresh_briefing(u=Depends(user_of)):
 @app.post("/api/mes/release")
 def release(body: dict = Body(...), u=Depends(user_of)):
     try:
-        return {"dispatched": H.mes.release(body["work_order"], u["mode"], u["name"], body.get("units"))}
+        return {"dispatched": H.mes.release(body["work_order"], u["mode"], who(u), body.get("units"))}
     except KeyError as e:
         raise HTTPException(404, str(e))
     except ValueError as e:
@@ -564,7 +570,7 @@ def mes_cmd(body: dict = Body(...), u=Depends(user_of)):
         require_teacher(u)                 # 教师控制台（D3）
     extra = {k: v for k, v in body.items() if k in ("minutes", "reason", "kind", "speed")}
     try:
-        H.mes.command(unit, cmd, u["mode"], u["name"], body.get("work_order"), body.get("operation"), **extra)
+        H.mes.command(unit, cmd, u["mode"], who(u), body.get("work_order"), body.get("operation"), **extra)
     except KeyError as e:
         raise HTTPException(404, str(e))
     return {"sent": True}
@@ -579,8 +585,8 @@ def ncr_decide(ncr_id: str, body: dict = Body(...), u=Depends(user_of)):
     if not r:
         raise HTTPException(404, "没有这张不合格品单")
     H.db.x("update ncr set status=%s, decided_by=%s, decided_at=now() where ncr_id=%s", (disp, u["name"], ncr_id))
-    H.publish(topic("quality", "qc-01", "ncr"), "quality.ncr", "workbench/" + u["name"],
-              {"ncr_id": ncr_id, "part_serial": r["part_serial"], "status": disp, "decided_by": u["name"],
+    H.publish(topic("quality", "qc-01", "ncr"), "quality.ncr", "workbench/" + who(u),
+              {"ncr_id": ncr_id, "part_serial": r["part_serial"], "status": disp, "decided_by": who(u),
                "note": body.get("note", ""), "item": r["item"], "work_order": r["work_order"]}, r["work_order"], u["mode"])
     return {"status": disp}
 
@@ -630,6 +636,8 @@ def http_publish(body: dict = Body(...), u=Depends(user_of)):
     tp, msg = body.get("topic", ""), body.get("message")
     if not tp.startswith(PUBLISH_ALLOW):
         raise HTTPException(403, "这个接口只能发布设计类主题")
+    if isinstance(msg, dict) and isinstance(msg.get("data"), dict) and "author" in msg["data"]:
+        msg = dict(msg, data=dict(msg["data"], author=who(u)))       # 作者也不以姓名上总线（C5）
     try:
         msg = wqbus.validate(dict(msg, mode=u["mode"]))
     except (wqbus.ValidationError, TypeError) as e:
@@ -680,7 +688,7 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     H.hist._last_state = {k: v for k, v in H.hist._last_state.items() if k[1] != "teach"}
     H.hist._failed_parts.clear()
     H.ai._sent = {k: v for k, v in H.ai._sent.items() if k[0] != "teach"}
-    H.mes.command("sim", "load_scenario", "teach", u["name"], speed=float(body.get("speed", 1)))
+    H.mes.command("sim", "load_scenario", "teach", who(u), speed=float(body.get("speed", 1)))
     return {"reset": True}
 
 

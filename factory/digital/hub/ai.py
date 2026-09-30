@@ -17,6 +17,7 @@ from wqbus import UNITS
 from wqbus.topics import topic, unit_topic
 from hub import kpi, mrp
 from hub.llm import LLM
+from hub.privacy import actor
 
 log = logging.getLogger("ai")
 
@@ -209,17 +210,17 @@ class Assistant:
         return [dict(i, text=str(t)) for i, t in zip(items, arr)]
 
     # ================================================================ 提议
-    def propose(self, action, preview, mode, requested_by, title, source="ai"):
+    def propose(self, action, preview, mode, requested_by, title, source="ai", role=None):
         pid = "P-" + uuid.uuid4().hex[:8].upper()
         self.db.x("insert into ai_proposal (proposal_id, mode, action, title, preview, requested_by) "
                   "values (%s,%s,%s,%s,%s,%s)", (pid, mode, action, title, json.dumps(preview, ensure_ascii=False),
                                                    requested_by))
         self.publish(topic("ai", "proposal"), "ai.proposal", source,
                      {"proposal_id": pid, "action": action, "title": title, "preview": preview,
-                      "requires_confirm": True, "status": "pending", "requested_by": requested_by}, pid, mode)
+                      "requires_confirm": True, "status": "pending", "requested_by": actor(requested_by, role)}, pid, mode)
         return pid
 
-    def decide(self, pid, user, accept, executor=None):
+    def decide(self, pid, user, accept, executor=None, role=None):
         p = self.db.one("select * from ai_proposal where proposal_id=%s", (pid,))
         if p is None:
             raise KeyError(pid)
@@ -229,10 +230,11 @@ class Assistant:
         status = "confirmed" if accept else "rejected"
         self.db.x("update ai_proposal set status=%s, confirmed_by=%s, decided_at=now() where proposal_id=%s",
                   (status, user, pid))
-        self.publish(topic("ai", "proposal"), "ai.proposal", "workbench/" + user,
+        who = actor(user, role)
+        self.publish(topic("ai", "proposal"), "ai.proposal", "workbench/" + who,
                      {"proposal_id": pid, "action": p["action"], "title": p["title"], "preview": p["preview"],
-                      "requires_confirm": True, "status": status, "confirmed_by": user if accept else None,
-                      "rejected_by": None if accept else user, "requested_by": p["requested_by"]}, pid, p["mode"])
+                      "requires_confirm": True, "status": status, "confirmed_by": who if accept else None,
+                      "rejected_by": None if accept else who, "requested_by": actor(p["requested_by"])}, pid, p["mode"])
         if accept and executor and p["action"] in executor:
             try:
                 result = executor[p["action"]](p)
