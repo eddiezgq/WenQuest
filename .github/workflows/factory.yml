@@ -18,6 +18,10 @@ concurrency:
   group: factory-deploy
   cancel-in-progress: false
 
+defaults:
+  run:
+    shell: bash          # 带 pipefail：用 tee 记日志时不会吞掉出错
+
 jobs:
   test:
     name: 测试
@@ -187,7 +191,15 @@ jobs:
         if: env.SKIP != '1'
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "docker login ghcr.io -u ${{ github.actor }} --password-stdin"
-          ssh "deploy@$HOST" "/opt/wenquest/factory/deploy/update.sh ${{ needs.build.outputs.app }} ${{ needs.build.outputs.bridge }}"
+          set +e
+          ssh "deploy@$HOST" "/opt/wenquest/factory/deploy/update.sh ${{ needs.build.outputs.app }} ${{ needs.build.outputs.bridge }}" 2>&1 | tee /tmp/update.log
+          st=${PIPESTATUS[0]}
+          if [ "$st" != 0 ]; then
+            python3 factory/deploy/ci_annotate.py 服务器更新 /tmp/update.log 180
+            ssh "deploy@$HOST" "cd /opt/wenquest/factory && docker compose -p wq-factory ps -a && docker compose -p wq-factory logs --no-color --tail 60 hub bridge erp-backend" > /tmp/server.log 2>&1
+            python3 factory/deploy/ci_annotate.py 服务器容器 /tmp/server.log 180
+          fi
+          exit "$st"
       - name: 检查两个网址
         if: env.SKIP != '1'
         run: |
