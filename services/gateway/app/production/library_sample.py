@@ -364,7 +364,9 @@ def _mesh(shape):
         m.apply_translation(xyz)
     else:
         raise ValueError(kind)
-    m.visual.face_colors = _hex(color)
+    # one material colour per part (no per-face colours: those need scipy to convert and make files bigger)
+    m.visual = trimesh.visual.TextureVisuals(material=trimesh.visual.material.PBRMaterial(
+        baseColorFactor=_hex(color), metallicFactor=0.2, roughnessFactor=0.6))
     return m
 
 
