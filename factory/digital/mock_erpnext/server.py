@@ -196,7 +196,7 @@ class Mock:
                                            "company": doc["company"], "for_quantity": float(doc["qty"]),
                                            "production_item": doc["production_item"], "status": "Open",
                                            "time_logs": [], "total_completed_qty": 0, "total_time_in_mins": 0,
-                                           "sequence_id": op.get("sequence_id") or i + 1})
+                                           "sequence_id": op.get("sequence_id") or 0})
                 self.log.append(("create", "Job Card", jc["name"]))
 
         elif dt_ == "Job Card":
@@ -243,6 +243,17 @@ class Mock:
         if tot_q > float(doc["for_quantity"]) + 1e-9:
             raise Err(417, "ValidationError", "作业卡 {} 完成数量 {:g} 超过工单数量 {:g}".format(
                 doc["name"], tot_q, doc["for_quantity"]))
+        # 工序顺序（ERPNext v16 job_card.validate_sequence_id）：作业卡带顺序号时，前面工序在工单里的完工数
+        # （作业卡提交后才更新）不能少于本工序的完成数
+        if doc.get("sequence_id"):
+            wo = self.db["Work Order"][doc["work_order"]]
+            for op in wo.get("operations", []):
+                if op.get("sequence_id") and op["sequence_id"] < doc["sequence_id"]:
+                    done = float(op.get("completed_qty") or 0)
+                    if not done or done < tot_q:
+                        raise Err(417, "OperationSequenceError", "Job Card {}: As per the sequence of the operations "
+                                  "in the work order {}, complete the operation {} before the operation {}.".format(
+                                      doc["name"], wo["name"], op["operation"], doc["operation"]))
         # 工位台数检查：照搬 ERPNext v16 job_card.py 的 get_overlap_for / has_overlap——
         # 找出本工位其他作业卡与这条工时重叠的记录，按时间排成“车道”，车道数达到台数就报重叠
         cap = int(self.db["Workstation"][doc["workstation"]]["production_capacity"] or 1)
