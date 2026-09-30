@@ -450,6 +450,38 @@ def figure_prompt(no: str, fig: dict, spec_json: str, lang: str, course: str, er
     return out
 
 
+# --- 三维动画师 3D animator (round 4) ---------------------------------------------------------------------
+
+ANIMATOR_3D = COMMON + (
+    " Role: 三维动画师 (3D animator). Plan a short 3D clip (10-25 s) that opens THIS lesson's animation with the "
+    "course's real robots and parts from the library copies you are given. You do not write code: choose one "
+    "template and fill in its content. showcase = several robots appear one after another, each with its name and "
+    "one line on what makes it that kind of robot (for overviews and classification); joints = one robot moves "
+    "through 2-5 key poses that show THIS lesson's idea (joint values must stay inside each joint's limits; the "
+    "tool point leaves a trace); mechanism = a mechanism turns through its motion; explode = an assembly flies apart "
+    "and back to show its parts. Captions (2-5, bilingual) say what to watch, with times in seconds inside the clip. "
+    "Use only the ids listed. Return JSON."
+)
+
+
+def plan3d_schema() -> dict:
+    item = _obj({"id": STR, "name": PAIR, "line": PAIR}, ["id", "name", "line"])
+    val = _obj({"joint": STR, "value": {"type": "number"}})
+    cap = _obj({"from": {"type": "number"}, "to": {"type": "number"}, "text": PAIR})
+    return _obj({"template": {"type": "string", "enum": ["showcase", "joints", "mechanism", "explode"]},
+                 "items": {"type": "array", "items": item}, "item": STR,
+                 "poses": {"type": "array", "items": _obj({"values": {"type": "array", "items": val}})},
+                 "captions": {"type": "array", "items": cap}}, ["template"])
+
+
+def plan3d_prompt(no: str, spec_json: str, models_text: str, course: str, problem: str = "") -> str:
+    out = (f"{course}\n\nLesson {no}. The lesson spec:\n{spec_json}\n\nLibrary copies in this course (id | name | kind | "
+           f"joints name[lower..upper] rest | tool link):\n{models_text}\n")
+    if problem:
+        out += f"\nYour previous clip was not accepted: {problem}\nPlan it again so it shows THIS lesson's idea.\n"
+    return out
+
+
 # --- 动画师 animator ----------------------------------------------------------------------------------
 
 ANIM_API = r"""Write Python for Manim Community v0.19+ with the WenQuest parts. Start with `from wq_anim import *`

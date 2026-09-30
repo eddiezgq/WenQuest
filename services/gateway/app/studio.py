@@ -750,10 +750,16 @@ class Studio:
             return out
         known = await self.library_ids()
         assets = proj.setdefault("assets", {})
+        version = ""
+        try:
+            version = (await lib.index())["version"]
+        except Exception:
+            pass
         for eid in dict.fromkeys(ids):
             if eid not in known:
                 continue
-            if eid not in assets or not (self.assets_dir(proj) / eid / "entry.json").exists():
+            stale = eid in assets and version and assets[eid].get("version") != version   # rewriting takes the newer version
+            if eid not in assets or stale or not (self.assets_dir(proj) / eid / "entry.json").exists():
                 try:
                     assets[eid] = {**await lib.copy_into(self.assets_dir(proj), eid), "by": by}
                 except Exception as e:  # noqa: BLE001 - a missing entry must not stop the lesson
@@ -900,7 +906,7 @@ class Studio:
             self.projects.save(proj)
         spec["sources"] = await self.lesson_assets(proj, les, spec)
         spec["figures_made"] = await self.make_figures(proj, les, spec, no)
-        video = await self.animate(proj, les, spec, no, review)
+        video = await self.make_video(proj, les, spec, no, review)
         lab = await self.make_lab(proj, chapter, les, spec, no, review)
         proj["busy"] = {"label": f"正在排版课件、指导书、报告模板和教案：{no}", "since": now()}
         self.projects.save(proj)
@@ -948,8 +954,10 @@ class Studio:
                       "note": c.get("note", ""), "image": c.get("image", "")})
         if self.animator_url:
             c = checks.get("animation") or {"ok": False, "note": "没有动画"}
+            c3 = checks.get("animation3d") or {}
             items.append({"key": "animation", "label": "动画切题", "by": c.get("by", "auto+ai"), "ok": bool(c.get("ok")) and bool(video),
-                          "note": c.get("note", ""), "image": video["poster"].name if video and video.get("poster") else ""})
+                          "note": "；".join(x for x in (c.get("note", ""), c3.get("note", "")) if x),
+                          "image": video["poster"].name if video and video.get("poster") else ""})
         if self.labcheck_url:
             c = checks.get("lab") or {"ok": False, "note": "没有虚拟实验"}
             items.append({"key": "lab", "label": "实验切题、能完成", "by": c.get("by", "auto+ai"), "ok": bool(c.get("ok")) and bool(lab),
@@ -958,6 +966,113 @@ class Studio:
             ok, note = ai(key)
             items.append({"key": key, "label": label, "by": "ai", "ok": ok, "note": note})
         return items
+
+    async def make_video(self, proj: dict, les: dict, spec: dict, no: str, review: dict | None) -> dict | None:
+        """The lesson video: a 3D opener with the course's real robots (when the library copies allow) followed by
+        the formula animation (Manim). Either part alone is fine; both are checked for relevance."""
+        video = await self.animate(proj, les, spec, no, review)
+        clip = await self.animate3d(proj, les, spec, no)
+        if not clip:
+            return video
+        return await asyncio.to_thread(self.join_clips, proj, les, spec, no, clip, video)
+
+    def models_text(self, models: dict) -> str:
+        lines = []
+        for eid, m in models.items():
+            e = m["entry"]
+            js = ", ".join(f"{j['name']}[{j['lower']:.2f}..{j['upper']:.2f}] rest {float((e.get('rest') or {}).get(j['name'], 0)):.2f}"
+                           for j in e.get("joints") or [] if j["type"] != "continuous")
+            lines.append(f"{eid} | {e['name'].get('zh', '')} / {e['name'].get('en', '')} | {e.get('kind', '')} | {js or '-'} | "
+                         f"{(e.get('tool') or {}).get('link', '-')}")
+        return "\n".join(lines)
+
+    async def animate3d(self, proj: dict, les: dict, spec: dict, no: str) -> dict | None:
+        """三维动画师: a template filled with this lesson's content, rendered by the browser service, checked on its
+        key frames. Not made when the service is off or the course has no library models."""
+        from .production import scene3d as S
+        les.setdefault("checks", {}).pop("animation3d", None)
+        if not self.labcheck_url:
+            return None
+        ids = list(dict.fromkeys((les.get("assets") or []) + [x["id"] for x in (proj.get("design_book") or {}).get("library", [])]))
+        await self.use_assets(proj, ids)
+        models = await asyncio.to_thread(S.load_models, self.assets_dir(proj), ids)
+        if not models:
+            return None
+        d = self.lesson_dir(proj, les)
+        lang = {"zh": "zh", "en": "en"}.get(proj["outline"].get("languages"), "both")
+        spec_json = json.dumps({k: spec[k] for k in ("title", "goal", "problem", "concept", "animation", "summary")},
+                               ensure_ascii=False)[:9000]
+        problem = ""
+        for attempt in range(2):
+            proj["busy"] = {"label": f"三维动画师正在{'安排' if attempt == 0 else '重新安排'}三维动画：{no}", "since": now()}
+            self.projects.save(proj)
+            plan = await self.ai.json(system=team.ANIMATOR_3D,
+                                      prompt=team.plan3d_prompt(no, spec_json, self.models_text(models), self.course_brief(proj), problem),
+                                      schema=team.plan3d_schema(), max_tokens=3000, fake=lambda: fake_plan3d(models))
+            plan = normalize_plan3d(plan if isinstance(plan, dict) else {}, models)
+            try:
+                script = S.build(plan, models, title=spec["animation"]["title"] if spec["animation"]["title"][0] else spec["title"],
+                                 no=no, lang=lang)
+            except S.Render3DError as e:
+                problem = str(e)
+                continue
+            proj["busy"] = {"label": f"正在渲染三维动画：{no}（约 1–3 分钟）", "since": now()}
+            self.projects.save(proj)
+            try:
+                video, poster, secs, frames = await S.render(self.labcheck_url, S.page(script, models), S.seconds(script),
+                                                             timeout=self.labcheck_timeout * 6)
+            except S.Render3DError as e:
+                if e.stage == "service":
+                    les["checks"]["animation3d"] = {"ok": None, "note": f"三维渲染服务暂时不可用（{e}）"}
+                    return None
+                problem = str(e)
+                continue
+            rel = await self.relevance(proj, les, spec, "3D animation", [c[2][0] for c in script.get("captions") or []]
+                                       + [str(x.get("id")) for x in script.get("actors") or []],
+                                       [("image/jpeg", f) for f in frames[:3]])
+            if not rel["on_topic"]:
+                problem = f"{rel['reason']} {rel['fix']}"
+                continue
+            (d / "anim3d.mp4").write_bytes(video)
+            if poster:
+                (d / "anim3d.jpg").write_bytes(poster)
+            les["checks"]["animation3d"] = {"ok": True, "note": f"三维动画 {secs:.0f} 秒（{plan['template']}），切题"}
+            return {"video": d / "anim3d.mp4", "poster": d / "anim3d.jpg" if poster else None, "seconds": secs}
+        les["checks"]["animation3d"] = {"ok": False, "note": f"三维动画没做成：{problem[:200]}"}
+        return None
+
+    def join_clips(self, proj: dict, les: dict, spec: dict, no: str, clip: dict, video: dict | None) -> dict:
+        """3D opener + formula animation → one MP4 (re-encoded to 1280×720, 30 fps). Without ffmpeg, the formula
+        animation stays as it is and the 3D clip is kept as its own file."""
+        import shutil
+        import subprocess
+        d = self.lesson_dir(proj, les)
+        name = re.sub(r'[\\/:*?"<>|]', "-", f"{no} 动画 {spec['animation']['title'][0] or spec['title'][0]}")[:80]
+        target = d / f"{name}.mp4"
+        if not video:
+            for old in d.glob("*.mp4"):
+                if old != clip["video"]:
+                    old.unlink()
+            shutil.copyfile(clip["video"], target)
+            poster = None
+            if clip.get("poster"):
+                poster = target.with_suffix(".png")
+                from PIL import Image
+                Image.open(clip["poster"]).save(poster)
+            return {"video": target, "poster": poster, "seconds": clip["seconds"], "by": "3d"}
+        if not shutil.which("ffmpeg"):
+            return video
+        out = d / "joined.mp4"
+        norm = "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p"
+        r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(clip["video"]), "-i", str(video["video"]),
+                            "-filter_complex", f"[0:v]{norm}[a];[1:v]{norm}[b];[a][b]concat=n=2:v=1:a=0[v]",
+                            "-map", "[v]", "-c:v", "libx264", "-crf", "21", "-preset", "veryfast", "-movflags", "+faststart", str(out)],
+                           capture_output=True, timeout=600)
+        if r.returncode != 0 or not out.exists():
+            log.warning("joining the 3D clip failed: %s", r.stderr[-300:])
+            return video
+        out.replace(video["video"])
+        return {**video, "seconds": round(float(video.get("seconds") or 0) + float(clip["seconds"]), 1), "with3d": True}
 
     async def animate(self, proj: dict, les: dict, spec: dict, no: str, review: dict | None) -> dict | None:
         """动画师: the storyboard becomes a Manim scene rendered on the server (A2). Before rendering, the code must
@@ -1277,7 +1392,7 @@ class Studio:
         mp4 = next(iter(sorted(d.glob("*.mp4"))), None)
         video = None
         if kind == "animation":
-            video = await self.animate(proj, les, spec, no, review)
+            video = await self.make_video(proj, les, spec, no, review)
         elif mp4:
             png = mp4.with_suffix(".png")
             secs = next((f.get("seconds", 0) for f in les.get("files") or [] if f["kind"] == "animation"), 0)
@@ -1746,6 +1861,52 @@ def fake_figure(fig: dict, spec: dict) -> dict:
                           "series": [{"name": ["θ(t)", "θ(t)"], "x": xs, "y": [round(0.5 * x * x, 4) for x in xs]}]}}
     return {"code": "from wq_anim import *\n\n\nclass Lesson(Base):\n    def construct(self):\n"
                     "        self.add(frame2([-3, -1, 0], 0, 1.4, name=r\"\\{A\\}\"), frame2([2, 0, 0], 30, 1.4, name=r\"\\{B\\}\"))\n"}
+
+
+def fake_plan3d(models: dict) -> dict:
+    """Offline 3D animator: a showcase when there are several robots, otherwise the first model's typical motion."""
+    robots = [k for k, m in models.items() if m["entry"].get("kind") == "robot"]
+    if len(robots) >= 2:
+        return {"template": "showcase", "items": [{"id": k, "name": list(models[k]["entry"]["name"].values()),
+                                                   "line": [models[k]["entry"]["teaching"]["principle"], ""]} for k in robots[:4]]}
+    k = (robots or list(models))[0]
+    e = models[k]["entry"]
+    if e.get("kind") == "mechanism":
+        return {"template": "mechanism", "item": k}
+    demo = e.get("demo") or {}
+    return {"template": "joints", "item": k,
+            "poses": [{"values": [{"joint": j, "value": v[1]} for j, v in demo.items()]},
+                      {"values": [{"joint": j, "value": v[0]} for j, v in demo.items()]}],
+            "captions": [{"from": 0, "to": 4, "text": [e["name"].get("zh", ""), e["name"].get("en", "")]}]}
+
+
+def normalize_plan3d(p: dict, models: dict) -> dict:
+    """Keep only known ids and joints, clamp joint values to their limits, captions to [from, to, [zh, en]]."""
+    tpl = p.get("template") if p.get("template") in ("showcase", "joints", "mechanism", "explode") else "joints"
+    items = [{"id": str(i.get("id")), "name": i.get("name") or ["", ""], "line": i.get("line") or ["", ""]}
+             for i in p.get("items") or [] if isinstance(i, dict) and i.get("id") in models][:8]
+    item = p.get("item") if p.get("item") in models else next(iter(models), "")
+    limits = {j["name"]: (j["lower"], j["upper"]) for j in (models.get(item) or {}).get("entry", {}).get("joints", [])}
+    poses = []
+    for pose in p.get("poses") or []:
+        vals = {}
+        for v in (pose or {}).get("values") or []:
+            if isinstance(v, dict) and v.get("joint") in limits:
+                lo, hi = limits[v["joint"]]
+                try:
+                    vals[v["joint"]] = min(max(float(v.get("value") or 0), lo), hi)
+                except (TypeError, ValueError):
+                    continue
+        if vals:
+            poses.append(vals)
+    caps = []
+    for c in p.get("captions") or []:
+        if isinstance(c, dict) and c.get("text"):
+            try:
+                caps.append([float(c.get("from") or 0), float(c.get("to") or 0), c["text"]])
+            except (TypeError, ValueError):
+                continue
+    return {"template": tpl, "items": items, "item": item, "poses": poses[:6], "captions": caps[:6]}
 
 
 def fake_guide_plan() -> dict:

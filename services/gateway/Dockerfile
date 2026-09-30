@@ -8,7 +8,7 @@ RUN apt-get update \
      || apt-get install -y --no-install-recommends libreoffice-impress) \
  && apt-get install -y --no-install-recommends fonts-noto-cjk fonts-dejavu-core \
  && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-chi-sim tesseract-ocr-eng \
- && apt-get install -y --no-install-recommends graphviz librsvg2-bin fontconfig \
+ && apt-get install -y --no-install-recommends graphviz librsvg2-bin fontconfig ffmpeg \
  && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

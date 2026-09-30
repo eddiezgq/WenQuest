@@ -25,7 +25,7 @@ from pathlib import Path
 
 import numpy as np
 
-VERSION = "sample-2026.09.30"
+VERSION = "sample-2026.09.30b"
 LICENSE = "Apache-2.0"
 ATTRIB = "问渠零件与机器人库 · 临时样例（自建简化几何，正式库上线后替换）"
 STEEL, BLUE, ORANGE, DARK, GREY, YELLOW = "#9aa7b0", "#3b82c4", "#e8913a", "#2b3238", "#c9d1d6", "#f2c14e"
@@ -371,12 +371,14 @@ def _mesh(shape):
 
 
 def glb(item: dict, q: dict | None = None) -> bytes:
-    """One node per link (node name = link name), nested along the joints; root node `zup` turns Z-up into Y-up."""
+    """One node per link (node name = link name), nested along the joints; root node `zup` turns Z-up into Y-up.
+    Exported at the ZERO pose (joint values 0): each node's transform is just its joint origin, so a viewer that
+    sets joint q gets origin · R(axis, q). The rest pose (entry `rest`) is applied by the viewer, never baked in."""
     import trimesh
     scene = trimesh.Scene()
     scene.graph.update(frame_from=scene.graph.base_frame, frame_to="zup", matrix=axis_angle((1, 0, 0), -math.pi / 2))
     scene.graph.update(frame_from="zup", frame_to=item["root"], matrix=np.eye(4))
-    q = q if q is not None else item.get("rest", {})
+    q = q or {}
     for j in item["joints"]:
         scene.graph.update(frame_from=j["parent"], frame_to=j["child"],
                            matrix=tf(j["xyz"], j["rpy"]) @ joint_motion(j, q.get(j["name"], 0.0)))

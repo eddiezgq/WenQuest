@@ -1,4 +1,5 @@
-# WenQuest lab checker: opens AI-written virtual labs in headless Chromium and runs their tasks.
+# WenQuest lab checker: opens AI-written virtual labs in headless Chromium and runs their tasks; it also renders
+# 3D animations (POST /render3d: a self-contained scene page stepped frame by frame, encoded with ffmpeg).
 # No secrets, no internet (internal network only, see docker-compose.yml); the lab page itself also
 # forbids every network request (Content-Security-Policy) and the checker aborts any that is tried.
 # Debian 12 (bookworm): a distribution Playwright installs Chromium's system libraries for.
@@ -8,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PLAYWRIGHT_BROWSERS_PATH=/opt/p
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
  && playwright install --with-deps --only-shell chromium \
- && apt-get update && apt-get install -y --no-install-recommends fonts-noto-cjk \
+ && apt-get update && apt-get install -y --no-install-recommends fonts-noto-cjk ffmpeg \
  && rm -rf /var/lib/apt/lists/*
 COPY app.py ./
 RUN useradd -r -u 10003 -m lab

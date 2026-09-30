@@ -60,3 +60,31 @@ def test_the_technique_example_passes_too():
     r = check(TECHNIQUE)
     assert r["ok"], r["problems"]
     assert r["tasks"] == {"reach": True, "slow": True, "life": True}
+
+
+def _gateway_module(name, rel):
+    spec = importlib.util.spec_from_file_location(name, Path(__file__).resolve().parents[1] / "gateway" / "app" / "production" / rel)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_a_3d_scene_renders_to_video(tmp_path):
+    pytest.importorskip("trimesh")
+    L = _gateway_module("gateway_library_sample", "library_sample.py")
+    S = _gateway_module("gateway_scene3d", "scene3d.py")
+    root = L.build(tmp_path)
+    models = S.load_models(root / L.VERSION, ["B-ARM-6R-S"])
+    script = S.joints("B-ARM-6R-S", models, [{"shoulder_pan": 1.0}], seg=0.6, captions=[[0, 2, ["转", "Turn"]]])
+    with TestClient(checker.app) as c:
+        r = c.post("/render3d", json={"html": S.page(script, models), "duration": 2.0, "fps": 10}).json()
+    assert r["ok"], r.get("error")
+    import base64
+    video = base64.b64decode(r["video"])
+    assert video[4:8] == b"ftyp" and len(r["frames"]) >= 2 and r["poster"]
+
+
+def test_a_broken_scene_is_reported():
+    with TestClient(checker.app) as c:
+        r = c.post("/render3d", json={"html": "<html><script>window.FAIL='model missing'</script></html>", "duration": 1}).json()
+    assert not r["ok"] and "model missing" in r["error"]
