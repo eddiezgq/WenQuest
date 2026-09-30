@@ -217,3 +217,28 @@ def check_lesson(s: dict) -> list[str]:
     if len(s["lab"]["tasks"]) < 2:
         problems.append("虚拟实验任务少于 2 个")
     return problems
+
+
+# What each field of the lesson spec must hold: structure and depth only, no subject content, so the
+# lecturer writes about its own course (an example lesson from another subject leaked into other courses).
+STRUCTURE_GUIDE = """\
+title: [中文, English] — the topic of this lesson (no number).
+goal: one sentence — what students can do after the lesson.
+problem: the lesson's robot problem, on the course's robot platform: title; text (a concrete situation, 2-4
+  sentences); given (3-6 data items with real numbers and units); answer (the numeric result that follows from
+  the given data with this lesson's model).
+concept: title; points (3-6 key ideas, each one sentence); formula (the central formula(s), LaTeX).
+notes: 3-6 sections of real teaching, 150-500 characters each (per language): intuition → definitions →
+  derivation → a worked example → pitfalls. HTML (p, ul, ol, li, strong, em, table), formulas in \\( \\) or \\[ \\].
+example: a worked example different from the robot problem: question, 3-8 solution steps, answer.
+animation: title; question (what the animation makes the student see); beats (5-8 storyboard beats; each beat
+  says what moves on screen and its caption) — drawn with this course's own objects and notation.
+lab: title; robot_scene (on the course's platform); life_scene (an everyday situation with the same idea);
+  params (2-5 adjustable quantities with ranges and units); tasks (3 tasks the lab can check automatically,
+  at least one on the robot scene).
+model: the five modelling steps for the robot problem — assume (model and assumptions), solve (the numbers),
+  check (how the lab confirms it), improve (where the model fails and how to do better).
+everyday: text (the everyday example) and answer.
+summary: 3-6 key points.
+self_check: 3-5 short questions students answer themselves.
+Every text is a pair [中文, English], each written natively (not word-by-word)."""

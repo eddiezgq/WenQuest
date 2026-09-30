@@ -16,7 +16,8 @@ labs = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(labs)
 
 COURSE, CHAPTER = ["大学物理", "Physics"], ["第2章", "Chapter 2"]
-EXAMPLE = labs.example_code()
+EXAMPLE = labs.physics_example()
+TECHNIQUE = labs.example_code()
 
 
 def check(code: str) -> dict:
@@ -53,3 +54,9 @@ def test_network_is_blocked():
     code = EXAMPLE + "\nconst img = new Image(); img.src = 'ht' + 'tp://example.com/x.png';"
     r = check(code)
     assert not r["ok"]
+
+
+def test_the_technique_example_passes_too():
+    r = check(TECHNIQUE)
+    assert r["ok"], r["problems"]
+    assert r["tasks"] == {"reach": True, "slow": True, "life": True}

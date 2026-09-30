@@ -567,12 +567,14 @@ class Studio:
                 break
             feedback = "\n".join(problems)
         proj["outline"] = outline
+        await self.make_design_book(proj)
         problems = check_outline(outline)
         n = sum(len(c["lessons"]) for c in outline["chapters"])
         last_week = max([les["week"] or 0 for c in outline["chapters"] for les in c["lessons"]] or [0])
         cal = f"教学日历排到第 {last_week} 周" if last_week else "还没排周次（可以在右边给每次课填上周次）"
         msg = (f"大纲草稿出来了：{len(outline['chapters'])} 章、{n} 次课，{cal}。请在右边“大纲与日历”里看，"
-               "可以直接改名、调顺序、删课或加课。没问题就点“大纲定稿”。")
+               "可以直接改名、调顺序、删课或加课。下面还有一份《课程设计书》：这门课用哪台机器人贯穿全课、每章的动画和实验"
+               "怎么做、符号约定——每一课都照它写，请一起看，可以直接改。没问题就点“大纲定稿”。")
         if problems:
             msg += "\n\n质量检查还有几处拿不准，请特别看一下：\n" + "\n".join(f"· {p}" for p in problems[:6])
         self.say(proj, msg, "lead", "report")
@@ -683,11 +685,65 @@ class Studio:
         media = [m.name for m in items if files.get(m.id, {}).get("role") in ("media", "lab")
                  and chapter["no"] in (files[m.id].get("chapters") or [])]
         r = proj["requirements"]
+        book = team.design_book_text(proj.get("design_book"))
         return (f"Course: {disp(proj['outline']['title'])}\nChapter {chapter['no']}: {disp(chapter['title'])}\n"
                 f"Lesson: {disp(les['title'])}\nGoal: {disp(les['goal'])}\nTextbook sections: {', '.join(les.get('sections') or []) or '-'}\n"
                 f"Students: {r.get('audience') or 'university students'}; level: {r.get('level') or '-'}\n"
                 f"Write in: {team.LANG_NAME.get(lang, 'Simplified Chinese')}\n"
-                f"Animations and labs available for this chapter: {', '.join(media) or 'none'}")
+                f"Animations and labs available for this chapter: {', '.join(media) or 'none'}\n"
+                f"\nThe teacher's requirements (binding):\n{self.requirements_text(proj)}\n"
+                + (f"\nThe course design book (follow it):\n{book}\n" if book else ""))
+
+    def course_brief(self, proj: dict) -> str:
+        """What the animator and the lab engineer must know about THIS course (subject, platform, design book)."""
+        book = team.design_book_text(proj.get("design_book"))
+        return (f"Course: {disp(proj['outline']['title'])}\nThe teacher's requirements (binding):\n{self.requirements_text(proj)}"
+                + (f"\n\nThe course design book (follow it):\n{book}" if book else ""))
+
+    @staticmethod
+    def fake_animation(spec: dict, no: str) -> str:
+        from .production import anim
+        return anim.storyboard_code(spec, no)
+
+    def requirements_text(self, proj: dict) -> str:
+        r = proj["requirements"]
+        lines = [f"- {REQ_LABEL.get(k, k)}: {v}" for k, v in r.items() if v and k not in ("notes",)]
+        lines += [f"- 老师说：{t[:600]}" for t in self.teacher_texts(proj)[:8]]
+        return "\n".join(lines) or "(none)"
+
+    def previous_spec(self, proj: dict, les: dict) -> str:
+        """The latest written lesson of this course before `les` (its spec), for continuity."""
+        prev = ""
+        for c in proj["outline"]["chapters"]:
+            for x in c["lessons"]:
+                if x is les or x["id"] == les["id"]:
+                    return prev
+                f = self.lesson_dir(proj, x) / "spec.json"
+                if x["status"] in ("awaiting", "published") and f.exists():
+                    try:
+                        prev = json.dumps(json.loads(f.read_text())["lesson"], ensure_ascii=False)[:7000]
+                    except (ValueError, KeyError):
+                        pass
+        return prev
+
+    async def make_design_book(self, proj: dict) -> None:
+        """课程设计书: the course's own subject, robot platform, notation and per-chapter means — written once the
+        outline exists, followed by every lesson. The teacher can read and change it."""
+        o = proj.get("outline") or {}
+        if not o.get("chapters"):
+            return
+        if (proj.get("design_book") or {}).get("by") == "teacher":  # the teacher's own version is kept
+            proj["design_book"] = normalize_design_book(proj["design_book"], o)
+            return
+        items = self.items(proj)
+        outline = "\n".join(f"Chapter {c['no']} {disp(c['title'])}: " + "; ".join(disp(x["title"]) for x in c["lessons"])
+                            for c in o["chapters"])
+        proj["busy"] = {"label": "课程设计师正在写《课程设计书》…", "since": now()}
+        self.projects.save(proj)
+        data = await self.ai.json(system=team.DESIGN_BOOK,
+                                  prompt=team.design_book_prompt(summary(proj, items, False), outline, self.requirements_text(proj)),
+                                  schema=team.design_book_schema(), max_tokens=5000, fake=lambda: fake_design_book(proj))
+        proj["design_book"] = normalize_design_book(data, o)
 
     def lesson_no(self, proj: dict, chapter: dict, les: dict) -> str:
         return f"{chapter['no']}.{chapter['lessons'].index(les) + 1}"
@@ -702,10 +758,12 @@ class Studio:
         items = self.items(proj)
         keys = lang_keys(proj["outline"]["languages"])
         no = self.lesson_no(proj, chapter, les)
-        ctx = self.lesson_context(proj, chapter, les, items) + f"\nLesson number: {no}"
         await self.ocr_lesson_pages(proj, chapter, les)
         src = self.sources(proj, chapter, les, items)
-        exemplar = json.dumps(sp.EXEMPLAR, ensure_ascii=False)
+        if not proj.get("design_book"):  # courses planned before the design book existed get one now
+            await self.make_design_book(proj)
+        ctx = self.lesson_context(proj, chapter, les, items) + f"\nLesson number: {no}"
+        previous = self.previous_spec(proj, les)
         les["status"], les["error"] = "writing", ""
         if teacher_note:
             les["notes"] = teacher_note
@@ -713,7 +771,7 @@ class Studio:
         self.projects.save(proj)
         notes, review, spec, gp = teacher_note, None, None, None
         for attempt in range(2):
-            data = await self.ai.json(system=team.AUTHOR, prompt=team.lesson_prompt(ctx, src, notes, exemplar),
+            data = await self.ai.json(system=team.AUTHOR, prompt=team.lesson_prompt(ctx, src, notes, sp.STRUCTURE_GUIDE, previous),
                                       schema=sp.lesson_schema(), max_tokens=16000, fake=lambda: fake_spec(les, no))
             spec = sp.normalize_lesson(data)
             missing = sp.check_lesson(spec)
@@ -774,11 +832,13 @@ class Studio:
         spec_json = json.dumps({k: spec[k] for k in ("title", "goal", "problem", "concept", "animation", "model", "summary")},
                                ensure_ascii=False)
         code, error, used = "", "", "ai"
+        course = self.course_brief(proj)
         for attempt in range(3):
             proj["busy"] = {"label": f"动画师正在{'写' if attempt == 0 else '修改'}动画：{no}", "since": now()}
             self.projects.save(proj)
-            data = await self.ai.json(system=team.ANIMATOR, prompt=team.animation_prompt(no, spec_json, demo_anim.AGV_2_1, error, code),
-                                      schema=team.animation_schema(), max_tokens=12000, fake=lambda: {"code": demo_anim.AGV_2_1})
+            data = await self.ai.json(system=team.ANIMATOR,
+                                      prompt=team.animation_prompt(no, spec_json, demo_anim.TECHNIQUE, error, code, course),
+                                      schema=team.animation_schema(), max_tokens=12000, fake=lambda: {"code": self.fake_animation(spec, no)})
             code = str((data or {}).get("code") or "")
             code = re.sub(r"^```(?:python)?\s*|```\s*$", "", code.strip())
             if not code:
@@ -833,7 +893,7 @@ class Studio:
         for attempt in range(3):
             proj["busy"] = {"label": f"实验师正在{'写' if attempt == 0 else '修改'}虚拟实验：{no}", "since": now()}
             self.projects.save(proj)
-            data = await self.ai.json(system=team.LAB_ENGINEER, prompt=team.lab_prompt(no, spec_json, labs.example_code(), problems, code),
+            data = await self.ai.json(system=team.LAB_ENGINEER, prompt=team.lab_prompt(no, spec_json, labs.example_code(), problems, code, self.course_brief(proj)),
                                       schema=team.lab_schema(), max_tokens=14000, fake=lambda: {"code": labs.example_code()})
             code = re.sub(r"^```(?:js|javascript)?\s*|```\s*$", "", str((data or {}).get("code") or "").strip())
             problems = labs.static_problems(code)
@@ -1062,6 +1122,31 @@ def find_toc_pages(pages: dict[int, str]) -> list[int]:
         else:
             break
     return out
+
+
+def normalize_design_book(d, outline: dict) -> dict:
+    d = d if isinstance(d, dict) else {}
+    s = lambda k, n=800: str(d.get(k) or "")[:n].strip()  # noqa: E731
+    chapters = []
+    by_no = {c.get("no"): c for c in d.get("chapters") or [] if isinstance(c, dict)}
+    for c in outline.get("chapters") or []:
+        x = by_no.get(c["no"]) or {}
+        chapters.append({"no": c["no"], "animation": str(x.get("animation") or "")[:500], "lab": str(x.get("lab") or "")[:500],
+                         "problems": str(x.get("problems") or "")[:400]})
+    return {"subject": s("subject", 200), "audience": s("audience", 200), "textbook": s("textbook", 300),
+            "platform": s("platform"), "notation": s("notation"), "visual_style": s("visual_style", 500),
+            "chapters": chapters, "avoid": [str(a)[:200] for a in d.get("avoid") or [] if a][:8],
+            **({"by": "teacher"} if d.get("by") == "teacher" else {})}
+
+
+def fake_design_book(proj: dict) -> dict:
+    o = proj.get("outline") or {}
+    return {"subject": disp(o.get("title")) or "课程", "audience": proj["requirements"].get("audience", "本科生"),
+            "textbook": proj["requirements"].get("textbook", ""), "platform": "六轴机械臂 + 差速移动机器人（离线示范）",
+            "notation": "与主教材一致", "visual_style": "深色背景，坐标系与机构示意，中英字幕",
+            "chapters": [{"no": c["no"], "animation": "本章机构与坐标系的动态示意", "lab": "调节本章参数，观察机器人响应",
+                          "problems": "本章概念在机器人上的应用"} for c in o.get("chapters") or []],
+            "avoid": ["不用其他学科、其他课程的例子"]}
 
 
 def named_textbooks(texts: list[str]) -> list[str]:

@@ -37,23 +37,43 @@ def _s(x: str) -> str:
     return repr(str(x or ""))
 
 
+def _wrap(t, width: int, lines: int) -> list[str]:
+    """Up to `lines` lines of about `width` characters (words kept whole for English)."""
+    t = " ".join(str(t or "").split())
+    if not t:
+        return []
+    words = sum(ch.isascii() for ch in t) > 0.8 * len(t)
+    out, cur = [], ""
+    for w in (t.split(" ") if words else list(t)):
+        sep = " " if (cur and words) else ""
+        if len(cur) + len(sep) + len(w) > width and cur:
+            out.append(cur)
+            cur = w
+        else:
+            cur += sep + w
+    out.append(cur)
+    if len(out) > lines:
+        out = out[:lines]
+        out[-1] = out[-1][: width - 1] + "…"
+    return out
+
+
 def storyboard_code(spec: dict, no: str) -> str:
     """A safe, always-renderable scene from the lesson spec: the storyboard beats as captions over the
-    lesson's robot problem, the question, the concept points and a closing card."""
+    lesson's own problem, the question, the concept points and a closing card. It draws no robot (a stock robot
+    could belong to another subject); only this lesson's words and formulas appear."""
     a, c, p = spec["animation"], spec["concept"], spec["problem"]
     beats = a["beats"] or [a["question"]]
     lines = [
         "from wq_anim import *", "", "", "class Lesson(Base):", "    def construct(self):",
         f"        self.title({_s(no)}, {_s(a['title'][0] or spec['title'][0])}, {_s(a['title'][1] or spec['title'][1])})",
-        "        floor = ground(-1.2, -6.5, 6.5)",
-        "        car = agv(2.6).move_to([-4.5, -1.2, 0], aligned_edge=DOWN).shift(UP * 0.18)",
-        "        box = cargo(0.7).next_to(car, UP, buff=0)",
-        "        robot = VGroup(car, box)",
-        "        self.play(FadeIn(floor), FadeIn(robot))",
-        f"        q = VGroup(zh({_s(p['title'][0])}, 30, YELLOW), en({_s(p['title'][1])}, 20)).arrange(DOWN, buff=0.1)",
-        "        fit(q, 11).move_to([0, 1.6, 0])",
+        f"        q = VGroup(zh({_s(p['title'][0])}, 32, YELLOW), en({_s(p['title'][1])}, 22)).arrange(DOWN, buff=0.12)",
+        "        fit(q, 12).move_to([0, 1.5, 0])",
         "        self.play(Write(q))",
-        "        self.play(robot.animate.shift(RIGHT * 4.5), run_time=2.0)",
+        "        body = VGroup(" + ", ".join([f"zh({_s(t)}, 24, GREY_B)" for t in _wrap(p['text'][0], 30, 2)]
+                                    + [f"en({_s(t)}, 20)" for t in _wrap(p['text'][1], 70, 2)]) + ").arrange(DOWN, buff=0.1)",
+        "        fit(body, 12).next_to(q, DOWN, buff=0.4)",
+        "        self.play(FadeIn(body, shift=UP * 0.1))",
     ]
     for zh_b, en_b in beats[:8]:
         lines.append(f"        self.caption({_s(zh_b)}, {_s(en_b)}, wait=2.2)")

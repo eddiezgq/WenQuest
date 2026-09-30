@@ -157,6 +157,47 @@
             <view v-if="!ed" class="empty">{{ t("studio.noOutline") }}</view>
             <template v-else>
               <input class="o-title" v-model="ed.title[lang]" :disabled="p.stage === 'lessons'" @input="dirty = true" />
+              <view v-if="p.design_book" class="dbook">
+                <view class="dbook-head">
+                  <text class="h3">{{ t("studio.designBook") }}</text>
+                  <text v-if="p.design_book.by === 'teacher'" class="tag">{{ t("studio.designBookByYou") }}</text>
+                  <text class="grow"></text>
+                  <text v-if="!bk" class="link" @click="editBook">{{ t("studio.edit") }}</text>
+                </view>
+                <text class="note">{{ t("studio.designBookHint") }}</text>
+                <template v-if="!bk">
+                  <view v-for="f in BOOK_FIELDS" :key="f" class="db-row">
+                    <text class="db-k">{{ t("studio.db." + f) }}</text><text class="db-v">{{ p.design_book[f] || "—" }}</text>
+                  </view>
+                  <view v-for="c in p.design_book.chapters" :key="c.no" class="db-row">
+                    <text class="db-k">{{ t("studio.chapterN", { n: c.no }) }}</text>
+                    <text class="db-v">{{ t("studio.db.animation") }}：{{ c.animation || "—" }}；{{ t("studio.db.lab") }}：{{ c.lab || "—" }}；{{ t("studio.db.problems") }}：{{ c.problems || "—" }}</text>
+                  </view>
+                  <view v-if="p.design_book.avoid.length" class="db-row">
+                    <text class="db-k">{{ t("studio.db.avoid") }}</text><text class="db-v">{{ p.design_book.avoid.join("；") }}</text>
+                  </view>
+                </template>
+                <template v-else>
+                  <view v-for="f in BOOK_FIELDS" :key="f" class="db-row">
+                    <text class="db-k">{{ t("studio.db." + f) }}</text>
+                    <textarea class="db-in" v-model="bk[f]" auto-height maxlength="800" />
+                  </view>
+                  <view v-for="c in bk.chapters" :key="c.no" class="db-ch">
+                    <text class="db-k">{{ t("studio.chapterN", { n: c.no }) }}</text>
+                    <textarea class="db-in" v-model="c.animation" auto-height maxlength="500" :placeholder="t('studio.db.animation')" />
+                    <textarea class="db-in" v-model="c.lab" auto-height maxlength="500" :placeholder="t('studio.db.lab')" />
+                    <textarea class="db-in" v-model="c.problems" auto-height maxlength="400" :placeholder="t('studio.db.problems')" />
+                  </view>
+                  <view class="db-row">
+                    <text class="db-k">{{ t("studio.db.avoid") }}</text>
+                    <textarea class="db-in" v-model="bkAvoid" auto-height maxlength="1200" :placeholder="t('studio.db.avoidHint')" />
+                  </view>
+                  <view class="bar-save">
+                    <text class="link" @click="bk = null">{{ t("studio.discard") }}</text>
+                    <view class="primary small" @click="saveBook">{{ t("studio.save") }}</view>
+                  </view>
+                </template>
+              </view>
               <view v-for="(c, ci) in ed.chapters" :key="c.id || ci" class="o-ch">
                 <view class="o-ch-head">
                   <text class="o-no">{{ ci + 1 }}</text>
@@ -323,7 +364,7 @@ import { confirmAction } from "../../courseApi";
 import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import {
-  absolute, api, ApiError, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
+  absolute, api, ApiError, type DesignBook, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
 } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
@@ -458,6 +499,22 @@ async function saveMaterials() {
   const tb = files.find((f) => f.role === "main_textbook");
   roleEdits.value = new Map();
   await act(() => api.studioMaterials(id.value, files, tb ? tb.id : undefined));
+}
+
+// --- design book --------------------------------------------------------------------------------
+const BOOK_FIELDS = ["subject", "audience", "textbook", "platform", "notation", "visual_style"] as const;
+const bk = ref<DesignBook | null>(null);
+const bkAvoid = ref("");
+function editBook() {
+  if (!p.value?.design_book) return;
+  bk.value = JSON.parse(JSON.stringify(p.value.design_book));
+  bkAvoid.value = p.value.design_book.avoid.join("\n");
+}
+async function saveBook() {
+  if (!bk.value || !p.value) return;
+  const book = { ...bk.value, avoid: bkAvoid.value.split(/[\n；;]/).map((x) => x.trim()).filter(Boolean) };
+  bk.value = null;
+  await act(() => api.studioDesignBook(id.value, book));
 }
 
 // --- outline ------------------------------------------------------------------------------------
@@ -715,6 +772,15 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .toc-s { display: block; font-size: 13px; color: var(--wq-text); padding-left: 16px; }
 .pg { color: var(--wq-muted); font-size: 11px; }
 .o-title { width: 100%; height: 40px; font-size: 18px; font-weight: 700; border: 1px solid transparent; border-radius: 6px; padding: 0 8px; box-sizing: border-box; }
+.dbook { margin: 10px 0 14px; padding: 12px 14px; border: 1px solid var(--wq-line); border-radius: 8px; background: #fbfcfd; }
+.dbook-head { display: flex; align-items: center; gap: 8px; }
+.dbook .grow { flex: 1; }
+.dbook .tag { font-size: 12px; color: var(--wq-accent, #2d6a4f); border: 1px solid currentColor; border-radius: 10px; padding: 0 6px; }
+.db-row, .db-ch { display: flex; gap: 10px; margin-top: 6px; font-size: 14px; line-height: 1.6; }
+.db-ch { flex-direction: column; gap: 4px; }
+.db-k { flex: 0 0 96px; color: var(--wq-muted, #667); }
+.db-v { flex: 1; min-width: 0; white-space: pre-wrap; }
+.db-in { flex: 1; width: 100%; min-height: 32px; border: 1px solid var(--wq-line); border-radius: 6px; padding: 6px 8px; box-sizing: border-box; font-size: 14px; }
 .o-title:hover, .o-in:hover { border-color: var(--wq-line); }
 .o-ch { border-top: 1px solid var(--wq-line); padding: 10px 0; }
 .o-ch-head { display: flex; align-items: center; gap: 6px; }

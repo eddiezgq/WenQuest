@@ -136,6 +136,13 @@ export interface StudioProject {
   progress: Record<LessonStatus | "total", number>;
   labs_on?: boolean;
   zip_url?: string;
+  design_book?: DesignBook | null;
+}
+/** 课程设计书: the course's own subject, robot platform, notation and per-chapter means (every lesson follows it). */
+export interface DesignBook {
+  subject: string; audience: string; textbook: string; platform: string; notation: string; visual_style: string;
+  chapters: { no: number; animation: string; lab: string; problems: string }[];
+  avoid: string[]; by?: string;
 }
 export interface StudioSummary {
   id: string; title: string; stage: Stage; updated: number; course_id: number;
@@ -324,6 +331,7 @@ export const api = {
   studioMaterials: (id: string, files: { id: string; role: string; chapters: number[] }[], textbook?: string) =>
     request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/materials`, { files, textbook }),
   studioApproveMaterials: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-materials`, {}),
+  studioDesignBook: (id: string, book: Partial<DesignBook>) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/design-book`, book),
   studioOutline: (id: string, outline: StudioOutline) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/outline`, outline),
   studioApproveOutline: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/approve-outline`, {}, 300000),
   studioNext: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/next`, {}),

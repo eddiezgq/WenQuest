@@ -333,7 +333,7 @@ def test_animation_falls_back_to_the_storyboard(client, monkeypatch):
 
     async def render(url, code, timeout=600.0):
         tries.append(code)
-        if "ValueTracker" in code:  # the animator's scene; the storyboard version has none
+        if len(tries) <= 3:  # the animator's three tries fail; the storyboard version renders
             raise anim.RenderError("render took longer than 420 s")
         return b"video", b"", 20.0
 
@@ -343,6 +343,7 @@ def test_animation_falls_back_to_the_storyboard(client, monkeypatch):
     _, p = _write_first_lesson(client, h)
     les = p["outline"]["chapters"][0]["lessons"][0]
     assert len(tries) == 4  # the animator's code three times, then the storyboard version
+    assert "agv(" not in tries[-1] and "cargo(" not in tries[-1]  # the plain version draws no stock robot
     assert les["files"][0]["kind"] == "animation"
     assert any("简版动画" in i["text"] for i in les["review"]["issues"])
 

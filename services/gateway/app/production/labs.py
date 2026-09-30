@@ -58,6 +58,12 @@ def static_problems(code: str) -> list[str]:
 
 
 def example_code() -> str:
+    """The technique example shown to the lab engineer (placeholder content, nothing of it may be reused)."""
+    return (KIT / "technique_lab.js").read_text(encoding="utf-8")
+
+
+def physics_example() -> str:
+    """The physics lab 2.1 (AGV emergency stop): a full working lab, kept for the checker's tests."""
     return (KIT / "demo_lab_2_1.js").read_text(encoding="utf-8")
 
 

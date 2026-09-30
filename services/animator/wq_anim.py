@@ -187,3 +187,112 @@ def readout(name, value, unit="", color=WHITE, size=30):
     """A 'v = 1.50 m/s' style number display; rebuild it inside always_redraw to animate the value."""
     return MathTex(r"%s = %s\,\mathrm{%s}" % (name, value, unit) if unit else r"%s = %s" % (name, value),
                    color=color, font_size=size)
+
+
+# --- robotics parts (round 3, team rebuild): frames, rotations, n-link arms, mobile robots, sensors -----
+
+def rot_z(deg):
+    """3x3 rotation about z (degrees)."""
+    t = np.radians(deg)
+    return np.array([[np.cos(t), -np.sin(t), 0], [np.sin(t), np.cos(t), 0], [0, 0, 1]])
+
+
+def rot_y(deg):
+    t = np.radians(deg)
+    return np.array([[np.cos(t), 0, np.sin(t)], [0, 1, 0], [-np.sin(t), 0, np.cos(t)]])
+
+
+def rot_x(deg):
+    t = np.radians(deg)
+    return np.array([[1, 0, 0], [0, np.cos(t), -np.sin(t)], [0, np.sin(t), np.cos(t)]])
+
+
+def proj3(p, origin=ORIGIN, scale=1.0):
+    """A 3D point on the 2D screen (oblique view: x to the lower left, y to the right, z up)."""
+    x, y, z = (float(v) for v in p)
+    return np.array(origin, dtype=float) + scale * np.array([y - 0.55 * x, z - 0.35 * x, 0])
+
+
+def frame2(origin=ORIGIN, angle=0, length=1.2, labels=("x", "y"), color=STEEL, name=None):
+    """A 2D coordinate frame: two arrows (angle in degrees) with labels, optional frame name like r"\\{B\\}"."""
+    o = np.array(origin, dtype=float)
+    t = np.radians(angle)
+    ex = np.array([np.cos(t), np.sin(t), 0]) * length
+    ey = np.array([-np.sin(t), np.cos(t), 0]) * length
+    g = VGroup(Arrow(o, o + ex, buff=0, color=RED, stroke_width=5), Arrow(o, o + ey, buff=0, color=GREEN, stroke_width=5),
+               MathTex(labels[0], color=RED, font_size=30).move_to(o + ex * 1.18),
+               MathTex(labels[1], color=GREEN, font_size=30).move_to(o + ey * 1.18), Dot(o, radius=0.05, color=color))
+    if name:
+        g.add(MathTex(name, color=color, font_size=28).next_to(Dot(o), DL, buff=0.1))
+    return g
+
+
+def frame3(origin=ORIGIN, R=None, length=1.2, labels=("x", "y", "z"), scale=1.0, name=None):
+    """A 3D coordinate frame (rotation matrix R, 3x3) drawn with proj3; x red, y green, z blue."""
+    R = np.eye(3) if R is None else np.array(R, dtype=float)
+    o = np.array(origin, dtype=float)
+    g = VGroup()
+    for i, col in enumerate((RED, GREEN, BLUE)):
+        tip = proj3(R[:, i] * length, o, scale)
+        g.add(Arrow(o, tip, buff=0, color=col, stroke_width=5))
+        g.add(MathTex(labels[i], color=col, font_size=28).move_to(o + (tip - o) * 1.18))
+    if name:
+        g.add(MathTex(name, color=INK, font_size=28).next_to(Dot(o), DL, buff=0.1))
+    return g
+
+
+def planar_fk(base, angles, lengths):
+    """Joint points of a planar n-link arm (angles in degrees, each relative to the previous link)."""
+    pts = [np.array(base, dtype=float)]
+    t = 0.0
+    for a, l in zip(angles, lengths):
+        t += np.radians(a)
+        pts.append(pts[-1] + l * np.array([np.cos(t), np.sin(t), 0]))
+    return pts
+
+
+def planar_arm(base, angles, lengths, color=STEEL, joint_labels=None):
+    """A planar n-link arm: pedestal, links, joints and a gripper at the end (see planar_fk)."""
+    pts = planar_fk(base, angles, lengths)
+    b = pts[0]
+    pedestal = Polygon(b + LEFT * 0.5 + DOWN * 0.3, b + RIGHT * 0.5 + DOWN * 0.3, b + RIGHT * 0.25, b + LEFT * 0.25,
+                       color=GREY_B, fill_color=GREY_E, fill_opacity=1)
+    links = VGroup(*[Line(p, q, color=color, stroke_width=max(6, 14 - 3 * i)) for i, (p, q) in enumerate(zip(pts, pts[1:]))])
+    joints = VGroup(*[Dot(p, radius=0.12, color=WHITE) for p in pts[:-1]])
+    t = np.radians(sum(angles))
+    e = pts[-1]
+    grip = VGroup(Line(e, e + 0.3 * np.array([np.cos(t + 0.5), np.sin(t + 0.5), 0]), color=WHITE, stroke_width=5),
+                  Line(e, e + 0.3 * np.array([np.cos(t - 0.5), np.sin(t - 0.5), 0]), color=WHITE, stroke_width=5))
+    g = VGroup(pedestal, links, joints, grip)
+    if joint_labels:
+        for p, lab in zip(pts, joint_labels):
+            g.add(MathTex(lab, color=YELLOW, font_size=26).next_to(Dot(p), UR, buff=0.08))
+    return g
+
+
+def mobile_robot(pos=ORIGIN, heading=0, size=0.9, color=STEEL):
+    """A differential-drive mobile robot seen from above (heading in degrees): body, two wheels, front marker."""
+    body = Circle(radius=size / 2, color=color, fill_color=NAVY, fill_opacity=1, stroke_width=3)
+    wheels = VGroup(*[RoundedRectangle(width=size * 0.35, height=size * 0.12, corner_radius=0.03, color=GREY_B,
+                                       fill_color=GREY_D, fill_opacity=1).move_to(UP * s * size * 0.52) for s in (1, -1)])
+    front = Triangle(color=YELLOW, fill_color=YELLOW, fill_opacity=1).scale(size * 0.12).rotate(-PI / 2).move_to(RIGHT * size * 0.3)
+    g = VGroup(body, wheels, front)
+    g.rotate(np.radians(heading))
+    return g.move_to(np.array(pos, dtype=float))
+
+
+def lidar(center, angles_deg, ranges, color=YELLOW):
+    """Laser rays from `center` (degrees and lengths) with hit points."""
+    c = np.array(center, dtype=float)
+    g = VGroup()
+    for a, r in zip(angles_deg, ranges):
+        t = np.radians(a)
+        end = c + r * np.array([np.cos(t), np.sin(t), 0])
+        g.add(Line(c, end, color=color, stroke_width=1.5, stroke_opacity=0.6), Dot(end, radius=0.04, color=color))
+    return g
+
+
+def matrix_tex(M, digits=2, color=WHITE, size=30):
+    """A numeric matrix as LaTeX (e.g. a rotation or transform)."""
+    rows = r" \\ ".join(" & ".join(f"{float(v):.{digits}f}" for v in row) for row in np.array(M))
+    return MathTex(r"\begin{bmatrix}" + rows + r"\end{bmatrix}", color=color, font_size=size)

@@ -120,3 +120,46 @@ class Lesson(Base):
             MathTex(r"a > \mu g \ \Rightarrow\ \text{slides}", font_size=40),
         ])
 '''
+
+
+# The pattern shown to the animator since the team rebuild: HOW a lesson animation is written (title,
+# a moving picture driven by the real formula with ValueTracker/always_redraw, live readings, captions for
+# each beat, a closing card) with placeholder content. Its subject is deliberately empty so nothing of it
+# can end up in a real course; AGV_2_1 above stays only as a physics sample for tests.
+TECHNIQUE = r'''
+from wq_anim import *
+
+
+class Lesson(Base):
+    def construct(self):
+        # Title: lesson number and THIS lesson's title (placeholders here).
+        self.title("X.Y", "（本课标题）", "(lesson title)")
+
+        # 1. The situation: draw THIS lesson's own objects (for a robotics course: planar_arm, frame3,
+        #    mobile_robot, lidar ...). Here only a placeholder shape on axes.
+        ax = Axes(x_range=[0, 4, 1], y_range=[0, 2.5, 0.5], x_length=6, y_length=3.2, tips=False,
+                  axis_config={"color": GREY_B}).shift(LEFT * 2.6 + DOWN * 0.2)
+        labels = VGroup(MathTex("s", font_size=30).next_to(ax.x_axis, RIGHT), MathTex("q(s)", font_size=30).next_to(ax.y_axis, UP))
+        self.play(Create(ax), FadeIn(labels))
+        self.caption("先看要研究的量怎样随参数变化", "First, how the quantity changes with the parameter")
+
+        # 2. Motion computed from the formula (never hand-placed): a tracker drives the picture and readings.
+        s = ValueTracker(0.0)
+        f = lambda x: 2.0 * (1 - np.exp(-x))
+        curve = always_redraw(lambda: ax.plot(f, x_range=[0, max(s.get_value(), 0.01)], color=C_V))
+        dot = always_redraw(lambda: Dot(ax.c2p(s.get_value(), f(s.get_value())), color=YELLOW))
+        reading = always_redraw(lambda: readout("q", f"{f(s.get_value()):.2f}", "", YELLOW, 32).to_corner(UR).shift(DOWN * 1.1 + LEFT * 0.4))
+        self.add(curve, dot, reading)
+        self.play(s.animate.set_value(4.0), run_time=4, rate_func=linear)
+        self.caption("读数由公式实时算出，与画面同步", "The reading is computed from the formula, in step with the picture")
+
+        # 3. The key moment: point at it and name it.
+        mark = DashedLine(ax.c2p(0, 2.0), ax.c2p(4, 2.0), color=GREY_B)
+        note = MathTex(r"q \to q_{\max}", font_size=32, color=GREY_B).next_to(mark, UP, buff=0.1).align_to(mark, RIGHT)
+        self.play(Create(mark), Write(note))
+        self.caption("关键现象：说清它为什么发生", "The key effect, and why it happens", wait=2.0)
+
+        # 4. Closing card: the lesson's key formula(s) and one sentence each.
+        self.clear_stage()
+        self.card([MathTex(r"q(s) = q_{\max}\,(1 - e^{-s})", font_size=44), ["（本课的结论）", "(the lesson's conclusion)"]])
+'''

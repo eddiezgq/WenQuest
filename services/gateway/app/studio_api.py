@@ -336,6 +336,20 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         studio().projects.save(proj)
         return view(proj)
 
+    @app.put("/api/v1/studio/projects/{pid}/design-book")
+    async def edit_design_book(pid: str, body: dict, sess: Annotated[Session, Depends(current)]):
+        """The teacher corrects the course design book; every later lesson, animation and lab follows it."""
+        from .studio import normalize_design_book
+        proj = load(pid, sess)
+        if not proj.get("outline"):
+            raise EngineError("wrong_stage", "no outline yet", 409)
+        book = normalize_design_book({**(proj.get("design_book") or {}), **body}, proj["outline"])
+        book["by"] = "teacher"
+        proj["design_book"] = book
+        studio().say(proj, "课程设计书按你的修改更新了，之后写的课时、动画和实验都照它来；已经写好的课时如需跟着改，可以点“重写”。", "lead")
+        studio().projects.save(proj)
+        return view(proj)
+
     @app.post("/api/v1/studio/projects/{pid}/approve-outline")
     async def approve_outline(pid: str, sess: Annotated[Session, Depends(current)]):
         await need_creator(sess)

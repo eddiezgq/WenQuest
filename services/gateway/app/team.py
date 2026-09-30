@@ -200,7 +200,7 @@ AI_FIRST = (
     "build a complete lesson."
 )
 STANDARD = (
-    "WenQuest course standard (the benchmark is 大学物理 Chapter 1): each lesson runs "
+    "WenQuest course standard: each lesson runs "
     "real problem (a concrete ROBOTICS problem with real numbers that the lesson's model can solve, plus one "
     "everyday-life example) → concept → animation (3Blue1Brown style; you write its question and a storyboard "
     "of 5-8 beats, each beat one bilingual caption) → virtual lab (an interactive web lab with one robot scene and "
@@ -208,7 +208,9 @@ STANDARD = (
     "model (assumptions), solution (numbers), check with the lab, where the model fails and how to improve it. "
     "All student-facing text is Chinese–English (课件中英对照): every text is a pair [中文, English], each "
     "written natively. Numbers, units and formulas must be correct; the answer to the robot problem must "
-    "follow from the given data."
+    "follow from the given data. Everything is about THIS course's subject and follows the course design book "
+    "(its robot platform, notation and the chapter's animation and lab means); never borrow the topic, robot, "
+    "scene or numbers of another course or of an example."
 )
 
 DESIGNER = COMMON + AI_FIRST + (
@@ -231,8 +233,8 @@ def outline_schema(lang_keys: list[str]) -> dict:
 
 def outline_prompt(project_summary: str, toc_text: str, extra: str, feedback: str = "") -> str:
     parts = [
-        "Design the outline. `problem` is the lesson's robotics problem in a few words (e.g. 'AGV emergency stop: "
-        "will the cargo slide?'). `sections` lists textbook section numbers the lesson teaches (e.g. ['1.2','1.3'], "
+        "Design the outline. `problem` is the lesson's robotics problem in a few words, taken from THIS course's "
+        "subject (for a robotics course e.g. 'where must joint 2 turn so the gripper reaches the part?'). `sections` lists textbook section numbers the lesson teaches (e.g. ['1.2','1.3'], "
         "empty if there is no textbook). `week` is the teaching week. Keep 2-6 lessons per chapter.",
         project_summary,
         "Main textbook contents:\n" + (toc_text or "(no single textbook: design the chapters yourself, using the materials below as hints)"),
@@ -247,19 +249,62 @@ def outline_prompt(project_summary: str, toc_text: str, extra: str, feedback: st
 # --- 主讲教授 author, 课程设计师 guide & plan, 习题与测评 assessor, 审稿人 reviewer --------------------
 
 AUTHOR = COMMON + AI_FIRST + (
-    " Role: 主讲教授 (lecturer). Write ONE lesson as a lesson spec (JSON), to the level of the benchmark example "
-    "you are given. The notes are the lecture text students read: 3-6 sections of real teaching (intuition, "
+    " Role: 主讲教授 (lecturer). Write ONE lesson as a lesson spec (JSON), to the depth the structure guide asks "
+    "for, about THIS course's subject and following its design book. The notes are the lecture text students read: 3-6 sections of real teaching (intuition, "
     "definitions, derivations, a worked example), HTML using p, ul, ol, li, strong, em, table, formulas as LaTeX in "
     "\\( \\) or \\[ \\]. When you use the teacher's sources, keep their notation and cite them inline like "
     "（参考：文件名 第12页）; never cite pages you were not given. " + STANDARD
 )
 
 
-def lesson_prompt(ctx: str, sources: str, notes: str, exemplar: str) -> str:
-    return (f"{ctx}\n\nThe benchmark lesson (1.1 of 大学物理 Chapter 1) — match its structure, depth and quality, "
-            f"but write about THIS lesson:\n{exemplar}\n"
+def lesson_prompt(ctx: str, sources: str, notes: str, guide: str, previous: str = "") -> str:
+    return (f"{ctx}\n\nWhat each part of the lesson spec must contain (structure and depth only — the content is yours, "
+            f"about THIS lesson):\n{guide}\n"
+            + (f"\nThe previous lesson of this course, for continuity of notation, robot platform and level "
+               f"(do not repeat its problem or examples):\n{previous}\n" if previous else "")
             + (f"\nThe teacher / reviewer asked for these changes — follow them:\n{notes}\n" if notes else "")
             + f"\nTeacher's materials for this lesson (hints, may be empty):\n{sources}")
+
+
+# --- 课程设计书 course design book ----------------------------------------------------------------------
+
+DESIGN_BOOK = COMMON + (
+    " Role: 课程设计师 (course designer). Before any lesson is written, write the course design book that every "
+    "member of the team follows, so the whole course is about its own subject and hangs together: the subject "
+    "and level; the main textbook and how it is used; ONE robot platform (or two) that runs through the whole "
+    "course and fits the subject (e.g. for a robotics course a 6-axis arm and a differential-drive mobile robot; "
+    "for circuits the robot's motor drive board), described concretely with its key parameters; notation and "
+    "terms consistent with the textbook; the visual style of the animations for this subject; and for every "
+    "chapter the means its animations and virtual labs will use (what is drawn, what the student adjusts, what "
+    "is measured) and the theme of its robot problems. List what the team must avoid (e.g. examples from other "
+    "subjects). The teacher's requirements are binding. Chinese, concise."
+)
+
+
+def design_book_schema() -> dict:
+    ch = _obj({"no": INT, "animation": STR, "lab": STR, "problems": STR})
+    return _obj({"subject": STR, "audience": STR, "textbook": STR, "platform": STR, "notation": STR,
+                 "visual_style": STR, "chapters": {"type": "array", "items": ch}, "avoid": STRS})
+
+
+def design_book_prompt(project_summary: str, outline: str, requirements: str) -> str:
+    return (f"{project_summary}\n\nThe teacher's requirements (binding):\n{requirements}\n\n"
+            f"The approved outline:\n{outline}\n\nWrite the course design book.")
+
+
+def design_book_text(b: dict | None) -> str:
+    """The design book as the team reads it in every prompt."""
+    if not b:
+        return ""
+    lines = [f"Subject and level: {b.get('subject', '')}; students: {b.get('audience', '')}",
+             f"Textbook: {b.get('textbook', '')}", f"Robot platform used throughout: {b.get('platform', '')}",
+             f"Notation: {b.get('notation', '')}", f"Animation style: {b.get('visual_style', '')}"]
+    for c in b.get("chapters") or []:
+        lines.append(f"Chapter {c.get('no')}: animations — {c.get('animation', '')}; labs — {c.get('lab', '')}; "
+                     f"robot problems — {c.get('problems', '')}")
+    if b.get("avoid"):
+        lines.append("Avoid: " + "; ".join(b["avoid"]))
+    return "\n".join(x for x in lines if x.split(":", 1)[-1].strip(" ;—"))
 
 
 GUIDE_PLAN = COMMON + (
@@ -284,8 +329,9 @@ def exercises_schema(lang_keys: list[str]) -> dict:
 
 
 REVIEWER = COMMON + (
-    " Role: 审稿人 (reviewer), independent of the author. Check the lesson spec against the WenQuest standard "
-    "and against physics: (1) all five steps present and consistent — the stated answer must follow from the "
+    " Role: 审稿人 (reviewer), independent of the author. Check the lesson spec against the WenQuest standard, "
+    "the course design book and the subject: (0) it is about THIS course and lesson — a topic, robot or example "
+    "taken from another subject is a 'high' issue; (1) all five steps present and consistent — the stated answer must follow from the "
     "given data (recompute the numbers); (2) the robotics problem is realistic and solvable with this lesson's "
     "model; (3) formulas, units and numbers correct; (4) Chinese and English say the same thing; (5) the "
     "animation storyboard teaches the concept visually; (6) the lab tasks can be done and checked with the "
@@ -329,6 +375,15 @@ Parts from wq_anim:
   conveyor(length=6)                     belt conveyor
   arm(base, a1, a2, l1=2.2, l2=1.6)      two-link robot arm, angles in degrees; arm_tip(...) gives the gripper point
   drone(width=1.8)                       quadcopter, side view
+  (robotics) rot_x(deg), rot_y(deg), rot_z(deg)  3x3 rotation matrices (numpy; combine with @)
+  proj3(p, origin=ORIGIN, scale=1.0)     a 3D point on screen (oblique view, z up)
+  frame2(origin, angle=0, length=1.2, labels=("x","y"), name=r"\{A\}")   2D coordinate frame
+  frame3(origin, R, length=1.2, scale=1.0, name=r"\{B\}")   3D frame for rotation matrix R (x red, y green, z blue)
+  planar_fk(base, angles, lengths)       joint points of a planar n-link arm (relative angles, degrees)
+  planar_arm(base, angles, lengths, joint_labels=[r"\theta_1", ...])   planar n-link arm drawing
+  mobile_robot(pos, heading=0, size=0.9) differential-drive robot seen from above
+  lidar(center, angles_deg, ranges)      laser rays with hit points
+  matrix_tex(M, digits=2)                numeric matrix as LaTeX
   vec(start, end, color=C_V, label=r"\vec v", label_dir=UP)   vector arrow with LaTeX label
   readout(name, value_str, unit, color, size)                   MathTex like "v = 1.50 m/s"
 Colours: C_V velocity (orange), C_A acceleration (red), C_F force, C_X / C_Y components, STEEL, YELLOW, GREY_B.
@@ -339,9 +394,11 @@ Motion: ValueTracker + always_redraw, TracedPath, MoveAlongPath, Axes(...).plot(
 ANIMATOR = COMMON + (
     " Role: 动画师 (animator). Turn the lesson's animation storyboard into ONE Manim scene in the style of "
     "3Blue1Brown and of the WenQuest benchmark: every beat of the storyboard becomes a caption (Chinese and "
-    "English, as given) plus real motion that shows the physics — computed from the actual formulas with "
-    "ValueTracker/always_redraw, correct numbers and units, never just text on screen. Show the robot scene of the "
-    "lesson (AGV, arm, conveyor, drone ...) and end with self.card(...) holding the key formulas. 40-90 seconds, "
+    "English, as given) plus real motion that shows THIS lesson's idea — computed from the lesson's actual formulas "
+    "with ValueTracker/always_redraw, correct numbers and units, never just text on screen. Draw the robot or "
+    "platform the course design book names for this course (use the parts that fit it; never pick a robot the course "
+    "does not use) and end with self.card(...) holding the key formulas. The example you are given shows technique "
+    "only: its content is a placeholder and must never appear in your scene. 40-90 seconds, "
     "at most about 25 self.play calls; simple shapes render fast. Return JSON {\"code\": \"...python...\"}.\n\n" + ANIM_API
 )
 
@@ -350,9 +407,11 @@ def animation_schema() -> dict:
     return _obj({"code": STR})
 
 
-def animation_prompt(no: str, spec_json: str, example: str, error: str = "", previous: str = "") -> str:
-    out = (f"Lesson {no}. The lesson spec (use its animation title, question and beats, its concept and robot problem):\n"
-           f"{spec_json}\n\nA complete example scene for lesson 2.1 in the house style — follow its structure:\n{example}\n")
+def animation_prompt(no: str, spec_json: str, example: str, error: str = "", previous: str = "", course: str = "") -> str:
+    out = (f"{course}\n\n" if course else "") + (
+        f"Lesson {no}. The lesson spec (use its animation title, question and beats, its concept and robot problem):\n"
+        f"{spec_json}\n\nTECHNIQUE example (house style: structure, ValueTracker, readouts, captions, closing card). "
+        f"Its content is a placeholder — copy the technique, never its shapes, numbers or text:\n{example}\n")
     if error:
         out += (f"\nYour previous code failed. Fix it and return the whole corrected scene.\nError:\n{error}\n"
                 f"\nPrevious code:\n{previous}\n")
@@ -397,6 +456,11 @@ api.css("--ink") colours: --ink --muted --accent --amber --blue --green --red --
 --water --water-line --panel. Drawing helpers: api.line(x1,y1,x2,y2,color,width,dash), api.arrow(x1,y1,x2,y2,color,
 width), api.label(text,x,y,color,size,align), api.rect(x,y,w,h,fill,stroke,radius), api.circle(x,y,r,fill,stroke),
 api.ground(y, width, scroll, step), api.grid(w, h, step), api.agv(x, yBottom, width, color), api.box(x, yBottom, size, color).
+Robotics helpers (angles in degrees, counter-clockwise on screen): api.rot2(deg) (2x2 matrix), api.fk(x, y, angles, lengths)
+(joint points of a planar arm, angles relative), api.arm(x, y, angles, lengths, color, width) (draws it, returns the points),
+api.frame(x, y, deg, len, ["x","y"], "{B}") (coordinate frame), api.robot(x, y, headingDeg, size, color) (mobile robot from
+above), api.lidar(x, y, anglesDeg, rangesPx, color), api.plot(x, y, w, h, [{pts: [[x, y], ...], color}], {xmin, xmax, ymin,
+ymax, xlabel, ylabel}) (a small chart; returns {X, Y} to map values to pixels).
 Scale with api.w/api.h (never fixed pixel sizes); y grows downwards; keep a margin of 12 px.
 
 Rules (checked automatically; the lab is rejected otherwise): no fetch/XMLHttpRequest/WebSocket, no import,
@@ -407,10 +471,11 @@ never call other WQ functions. Put helper functions and constants above or below
 
 LAB_ENGINEER = COMMON + (
     " Role: 实验师 (lab engineer). Build the lesson's virtual lab from the lesson spec: its robot scene and everyday "
-    "scene, its adjustable parameters and its tasks. The physics must be real and correct (compute it from the "
-    "lesson's formulas with correct units), the picture must show what the student has to notice (vectors, "
-    "readings, paths), and each task must be checkable by your code and reachable with its demo. Match the house "
-    "example in structure and quality. Return JSON {\"code\": \"...javascript...\"}.\n\n" + LAB_API
+    "scene, its adjustable parameters and its tasks. The model must be real and correct (compute it from THIS "
+    "lesson's formulas with correct units), the picture must show what the student has to notice (vectors, frames, "
+    "readings, paths, curves), and each task must be checkable by your code and reachable with its demo. The robot "
+    "scene shows the robot or platform the course design book names for this course. The example you are given "
+    "shows technique only: its content is a placeholder and must never appear in your lab. Return JSON {\"code\": \"...javascript...\"}.\n\n" + LAB_API
 )
 
 
@@ -418,9 +483,12 @@ def lab_schema() -> dict:
     return _obj({"code": STR})
 
 
-def lab_prompt(no: str, spec_json: str, example: str, problems: list[str] | None = None, previous: str = "") -> str:
-    out = (f"Lesson {no}. The lesson spec (use its lab title, scenes, params and tasks, its concept, formulas and robot problem):\n"
-           f"{spec_json}\n\nThe house example (lesson 2.1) — follow its structure:\n{example}\n")
+def lab_prompt(no: str, spec_json: str, example: str, problems: list[str] | None = None, previous: str = "",
+               course: str = "") -> str:
+    out = (f"{course}\n\n" if course else "") + (
+        f"Lesson {no}. The lesson spec (use its lab title, scenes, params and tasks, its concept, formulas and robot problem):\n"
+        f"{spec_json}\n\nTECHNIQUE example (structure only; its content is a placeholder — never copy its topic, "
+        f"texts or numbers):\n{example}\n")
     if problems:
         out += ("\nYour previous lab failed the automatic check. Fix every problem and return the whole corrected code.\n"
                 "Problems:\n" + "\n".join(f"- {p}" for p in problems[:15]) + f"\n\nPrevious code:\n{previous}\n")

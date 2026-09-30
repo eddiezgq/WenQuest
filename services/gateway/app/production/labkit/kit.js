@@ -90,6 +90,61 @@ function box(ctx, x, y, s, color) {   // a crate: bottom-centre at (x, y)
   line(ctx, x - s / 2, y - s, x + s / 2, y, css("--ink"), 1); line(ctx, x + s / 2, y - s, x - s / 2, y, css("--ink"), 1);
 }
 
+// ---------- robotics helpers (angles in degrees, counter-clockwise on screen; y grows downwards) ----------
+function rot2(deg) { const t = deg * Math.PI / 180, c = Math.cos(t), s = Math.sin(t); return [[c, -s], [s, c]]; }
+function fk(x, y, angles, lengths) {   // joint points of a planar n-link arm; each angle relative to the previous link
+  const pts = [[x, y]]; let t = 0;
+  angles.forEach((a, i) => { t += a * Math.PI / 180; const [px, py] = pts[pts.length - 1];
+    pts.push([px + lengths[i] * Math.cos(t), py - lengths[i] * Math.sin(t)]); });
+  return pts;
+}
+function frame(ctx, x, y, deg, len, labels, name, color) {   // a 2D coordinate frame (x axis red, y axis green)
+  const t = deg * Math.PI / 180, lb = labels || ["x", "y"];
+  const xe = [x + len * Math.cos(t), y - len * Math.sin(t)], ye = [x - len * Math.sin(t), y - len * Math.cos(t)];
+  arrow(ctx, x, y, xe[0], xe[1], css("--red"), 2.5); arrow(ctx, x, y, ye[0], ye[1], css("--green"), 2.5);
+  label(ctx, lb[0], xe[0] + 6 * Math.cos(t), xe[1] - 6 * Math.sin(t), css("--red"), 13, "center");
+  label(ctx, lb[1], ye[0] - 6 * Math.sin(t), ye[1] - 6 * Math.cos(t), css("--green"), 13, "center");
+  circle(ctx, x, y, 3, color || css("--ink"));
+  if (name) label(ctx, name, x - 8, y + 12, color || css("--blue"), 13, "right");
+}
+function arm(ctx, x, y, angles, lengths, color, width) {   // planar n-link arm with base, joints and gripper; returns the joint points
+  const pts = fk(x, y, angles, lengths), w = width || Math.max(6, lengths[0] * 0.08);
+  ctx.fillStyle = css("--muted"); ctx.beginPath(); ctx.moveTo(x - w * 2, y + w * 1.2); ctx.lineTo(x + w * 2, y + w * 1.2);
+  ctx.lineTo(x + w, y); ctx.lineTo(x - w, y); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = color || css("--accent"); ctx.lineWidth = w; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); pts.slice(1).forEach((p) => ctx.lineTo(p[0], p[1])); ctx.stroke();
+  pts.slice(0, -1).forEach((p) => circle(ctx, p[0], p[1], w * 0.6, css("--panel"), css("--ink")));
+  const e = pts[pts.length - 1], q = pts[pts.length - 2], t = Math.atan2(e[1] - q[1], e[0] - q[0]);
+  [0.5, -0.5].forEach((d) => line(ctx, e[0], e[1], e[0] + w * 1.6 * Math.cos(t + d), e[1] + w * 1.6 * Math.sin(t + d), css("--ink"), 2.5));
+  return pts;
+}
+function robot(ctx, x, y, deg, size, color) {   // differential-drive mobile robot seen from above; heading in degrees
+  const t = -deg * Math.PI / 180;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(t);
+  rect(ctx, -size * 0.2, -size * 0.62, size * 0.4, size * 0.14, css("--ink"), null, 3);
+  rect(ctx, -size * 0.2, size * 0.48, size * 0.4, size * 0.14, css("--ink"), null, 3);
+  circle(ctx, 0, 0, size / 2, color || css("--accent"), css("--ink"));
+  ctx.fillStyle = css("--amber"); ctx.beginPath(); ctx.moveTo(size * 0.46, 0); ctx.lineTo(size * 0.02, -size * 0.22); ctx.lineTo(size * 0.02, size * 0.22); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function lidar(ctx, x, y, angles, ranges, color) {   // laser rays (degrees, lengths in px) with hit points
+  angles.forEach((a, i) => { const t = a * Math.PI / 180, ex = x + ranges[i] * Math.cos(t), ey = y - ranges[i] * Math.sin(t);
+    ctx.globalAlpha = 0.6; line(ctx, x, y, ex, ey, color || css("--amber"), 1); ctx.globalAlpha = 1; circle(ctx, ex, ey, 2.5, color || css("--amber")); });
+}
+function plot(ctx, x, y, w, h, series, opt) {   // a small chart: series = [{pts: [[x, y], ...], color, name}], opt = {xmin, xmax, ymin, ymax, xlabel, ylabel}
+  const o = opt || {}, all = series.flatMap((s) => s.pts);
+  const xmin = o.xmin ?? Math.min(0, ...all.map((p) => p[0])), xmax = o.xmax ?? Math.max(1, ...all.map((p) => p[0]));
+  const ymin = o.ymin ?? Math.min(0, ...all.map((p) => p[1])), ymax = o.ymax ?? Math.max(1, ...all.map((p) => p[1]));
+  const X = (v) => x + (v - xmin) / ((xmax - xmin) || 1) * w, Y = (v) => y + h - (v - ymin) / ((ymax - ymin) || 1) * h;
+  rect(ctx, x, y, w, h, null, css("--grid"));
+  if (ymin < 0 && ymax > 0) line(ctx, x, Y(0), x + w, Y(0), css("--grid"), 1);
+  series.forEach((s) => { if (!s.pts.length) return; ctx.strokeStyle = s.color || css("--accent"); ctx.lineWidth = 2; ctx.beginPath();
+    s.pts.forEach((p, i) => (i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1])))); ctx.stroke(); });
+  if (o.xlabel) label(ctx, o.xlabel, x + w, y + h + 12, css("--muted"), 12, "right");
+  if (o.ylabel) label(ctx, o.ylabel, x + 4, y + 10, css("--muted"), 12, "left");
+  return { X, Y };
+}
+
 // ---------- tasks & progress ----------
 function paintTasks() {
   let n = 0, k = 0;
@@ -263,6 +318,8 @@ function build(id, def) {
     arrow: (...a) => arrow(ctx, ...a), label: (...a) => label(ctx, ...a), line: (...a) => line(ctx, ...a),
     rect: (...a) => rect(ctx, ...a), circle: (...a) => circle(ctx, ...a), ground: (...a) => ground(ctx, ...a),
     grid: (...a) => grid(ctx, ...a), agv: (...a) => agv(ctx, ...a), box: (...a) => box(ctx, ...a),
+    rot2, fk, frame: (...a) => frame(ctx, ...a), arm: (...a) => arm(ctx, ...a), robot: (...a) => robot(ctx, ...a),
+    lidar: (...a) => lidar(ctx, ...a), plot: (...a) => plot(ctx, ...a),
   };
   L.api = api;
   def.tasks.forEach((t) => { t.ok = !!saved[id + ":" + t.id]; });
