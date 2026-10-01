@@ -28,7 +28,7 @@ x, y = 0.2, 0.1
 th = math.radians(30)
 r, phi = math.hypot(x, y), math.atan2(y, x)
 xp, yp = r * math.cos(phi + th), r * math.sin(phi + th)
-part = np.array([[-0.25, -0.13], [0.2, -0.13], [0.2, 0.1], [-0.25, 0.1], [-0.25, -0.13]])
+part = np.array([[-0.2, -0.1], [0.2, -0.1], [0.2, 0.1], [-0.2, 0.1], [-0.2, -0.1]])   # 0.4 m × 0.2 m，中心在 O
 R = np.array([[math.cos(th), -math.sin(th)], [math.sin(th), math.cos(th)]])
 
 fig, ax = plt.subplots(figsize=(5.2, 4.0))

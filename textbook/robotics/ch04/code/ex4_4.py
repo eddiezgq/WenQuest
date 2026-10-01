@@ -17,7 +17,7 @@ d = math.radians
 
 
 def rodrigues_vector(w, t, v):
-    """式 (4.4.1)：矢量形式。"""
+    """式 (4.4.2)：矢量形式。"""
     return v * math.cos(t) + np.cross(w, v) * math.sin(t) + w * (w @ v) * (1 - math.cos(t))
 
 

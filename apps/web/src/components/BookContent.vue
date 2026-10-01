@@ -31,6 +31,7 @@ defineProps<{ html: string }>();
 .book :deep(.wq-eq svg) { max-width: 100%; }
 .book :deep(.wq-tagno) { float: right; }
 .book :deep(figure) { margin: 18px 0; }
+.book :deep(.wq-tabcap) { font-family: "Noto Sans CJK SC", sans-serif; font-size: 13px; color: #5d6b73; text-align: center; margin-top: 18px; }
 .book :deep(figcaption) { font-family: "Noto Sans CJK SC", sans-serif; font-size: 13px; color: #5d6b73; text-align: center; margin-top: 6px; }
 .book :deep(.wq-media-box) { border: 1px dashed #b9c2c8; border-radius: 6px; padding: 26px 16px; text-align: center; color: #5d6b73; font-size: 13.5px; background: #fafbfb; }
 .book :deep(.wq-lab .wq-media-box) { border-color: #b8860b; background: #fffaf0; }

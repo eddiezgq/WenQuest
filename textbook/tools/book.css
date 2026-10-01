@@ -29,8 +29,9 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 28px 0; }
 
 /* figures, animations, labs, programs */
 figure { margin: 18px 0; }
+.wq-tabcap { margin-top: 18px; }
 .wq-figimg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
-figcaption { font-family: "Noto Sans CJK SC", sans-serif; font-size: 13px; color: var(--muted); text-align: center; margin-top: 6px; }
+figcaption, .wq-tabcap { font-family: "Noto Sans CJK SC", sans-serif; font-size: 13px; color: var(--muted); text-align: center; margin-top: 6px; }
 .wq-media-box { border: 1px dashed #b9c2c8; border-radius: 6px; padding: 26px 16px; text-align: center; color: var(--muted);
   font-family: "Noto Sans CJK SC", sans-serif; font-size: 13.5px; background: #fafbfb; }
 .wq-lab .wq-media-box { border-color: var(--accent); background: #fffaf0; }

@@ -108,6 +108,9 @@ FRONT = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 def load_sections(book: dict, rep: Report, only: set | None = None) -> list[Section]:
     out = []
     known = {s["id"]: (c["no"], s["title"]) for c in book["chapters"] for s in c["sections"]}
+    for c in book["chapters"]:      # 章首提要 NN-0.md (id "N.0") and 章末小结 NN-99.md (id "N.end")
+        known[f"{c['no']}.0"] = (c["no"], "本章提要")
+        known[f"{c['no']}.end"] = (c["no"], "本章小结")
     for path in sorted(book["root"].glob("ch[0-9][0-9]/[0-9][0-9]-*.md"), key=lambda p: [int(x) for x in re.findall(r"\d+", p.name)]):
         text = path.read_text(encoding="utf-8")
         m = FRONT.match(text)
@@ -269,6 +272,8 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
         data = base64.b64encode(p.read_bytes()).decode()
         return (f"<figure class='wq-fig' id='{kind}-{num}'><img class='wq-figimg' alt='{label}' src='data:image/svg+xml;base64,{data}'/>"
                 f"<figcaption>{label}　{cap}</figcaption>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
+    if kind == "表":     # the table itself follows in Markdown; here only its numbered caption
+        return f"<div class='wq-tabcap' id='{kind}-{num}'>{label}　{cap}</div>"
     if kind == "动画":
         fig = meta.get("图", "")
         sec.anim_figs.append((label, fig))
@@ -445,7 +450,7 @@ def check_numbers(sec: Section, rep: Report) -> None:
     text = FENCE.sub("", sec.source)
     text = PLACE.sub("", text)
     text = re.sub(r"https?://\S+", "", text)
-    text = text.split("**本节参考文献**")[0].split("## 参考文献")[0]
+    text = re.split(r"\*\*本节参考文献\*\*|#+\s*(?:本章)?参考文献", text)[0]
     for line_no, line in enumerate(text.splitlines(), 1):
         for m in NUMBER.finditer(line):
             digits = m.group(1).replace(".", "").lstrip("0")
@@ -459,9 +464,14 @@ TERM = re.compile(r"\*\*([\u4e00-\u9fff][\u4e00-\u9fff·\-–]{1,11})\*\*(?![：
 LABELS = {"工程师笔记", "习题", "证明", "参考文献", "本节参考文献", "本章参考文献", "章首提要", "本章小结", "注意", "提示", "历史注记"}
 
 
+def _norm_term(t: str) -> str:
+    return re.sub(r"[-–—]", "-", t)
+
+
 def check_terms(sec: Section, terms: set[str], rep: Report) -> None:
+    known = {_norm_term(x) for x in terms}
     for t in dict.fromkeys(TERM.findall(sec.source)):
-        if t not in terms and t not in LABELS:
+        if _norm_term(t) not in known and t not in LABELS:
             rep.add("error", "术语", sec.id, f"“{t}” 不在术语表里（conventions/术语表.csv）")
 
 
@@ -474,6 +484,16 @@ def page(title: str, body: str) -> str:
     return (f"<!doctype html><html lang='zh-CN'><head><meta charset='utf-8'><title>{html.escape(title)}</title>"
             f"<meta name='viewport' content='width=device-width, initial-scale=1'><style>{CSS.read_text(encoding='utf-8')}</style>"
             f"</head><body><main class='wq-book'>{body}</main></body></html>")
+
+
+def _toc_sections(c: dict, sections: list) -> list[dict]:
+    have = {x.id: x for x in sections}
+    out = [{"id": s["id"], "title": s["title"], "written": s["id"] in have} for s in c["sections"]]
+    for sid, at in ((f"{c['no']}.0", 0), (f"{c['no']}.end", None)):
+        if sid in have:
+            item = {"id": sid, "title": have[sid].title, "written": True, "kind": "intro" if at == 0 else "summary"}
+            out.insert(0, item) if at == 0 else out.append(item)
+    return out
 
 
 def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: Path | None = None,
@@ -512,14 +532,14 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     titles = {c["no"]: c["title"] for c in book["chapters"]}
     index = {"book": book_name, "title": book["title"], "parts": book["parts"],
              "chapters": [{"no": c["no"], "title": c["title"], "level": c["level"], "part": c["part"],
-                           "sections": [{"id": s["id"], "title": s["title"], "written": s["id"] in {x.id for x in sections}}
-                                        for s in c["sections"]]} for c in book["chapters"]],
+                           "sections": _toc_sections(c, sections)} for c in book["chapters"]],
              "errors": len(rep.errors)}
     for sec in sections:
-        frag = f"<section class='wq-sec' id='sec-{sec.id}'><h2>{sec.id}　{html.escape(sec.title)}</h2>{sec.html}</section>"
+        head = html.escape(sec.title) if sec.id.endswith((".0", ".end")) else f"{sec.id}　{html.escape(sec.title)}"
+        frag = f"<section class='wq-sec' id='sec-{sec.id}'><h2>{head}</h2>{sec.html}</section>"
         (web / f"{sec.id}.html").write_text(frag, encoding="utf-8")
         (web / f"{sec.id}.mp.html").write_text(
-            f"<section class='wq-sec'><h2>{sec.id}　{html.escape(sec.title)}</h2>{sec.html_mp}</section>", encoding="utf-8")
+            f"<section class='wq-sec'><h2>{head}</h2>{sec.html_mp}</section>", encoding="utf-8")
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     by_ch: dict[int, list[Section]] = {}
     for sec in sections:
@@ -528,7 +548,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     for ch, secs in by_ch.items():
         body = (f"<h1>第 {ch} 章　{html.escape(titles[ch])}</h1>"
-                + "".join(f"<section class='wq-sec'><h2>{s.id}　{html.escape(s.title)}</h2>{s.html}</section>" for s in secs))
+                + "".join(f"<section class='wq-sec'><h2>{html.escape(s.title) if s.id.endswith(('.0', '.end')) else s.id + '　' + html.escape(s.title)}</h2>{s.html}</section>" for s in secs))
         (out / f"ch{ch:02d}.html").write_text(page(f"第 {ch} 章 {titles[ch]}", body), encoding="utf-8")
     if pdf and not rep.errors:
         make_pdfs(out, sorted(by_ch), rep)

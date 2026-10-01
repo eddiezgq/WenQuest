@@ -25,7 +25,7 @@
               <view v-if="expanded.has(c.no)" class="toc-secs">
                 <view v-for="s in c.sections" :key="s.id" class="toc-sec" :class="{ on: cur && cur.id === s.id, off: !s.written }"
                       @click="s.written && read(s.id)">
-                  <text>{{ s.id }} {{ s.title }}</text>
+                  <text>{{ s.kind ? "" : s.id }} {{ s.title }}</text>
                   <text v-if="!s.written" class="todo">{{ t("book.unwritten") }}</text>
                 </view>
               </view>
@@ -42,9 +42,9 @@
           <text v-if="!cur && loaded && !error" class="wq-empty">{{ t("book.nothing") }}</text>
           <BookContent v-if="cur" :html="cur.html" />
           <view v-if="cur" class="pager">
-            <view v-if="cur.prev" class="pg" @click="read(cur.prev.id)">‹ {{ cur.prev.id }} {{ cur.prev.title }}</view>
+            <view v-if="cur.prev" class="pg" @click="read(cur.prev.id)">‹ {{ cur.prev.kind ? "" : cur.prev.id }} {{ cur.prev.title }}</view>
             <view class="sp" />
-            <view v-if="cur.next" class="pg" @click="read(cur.next.id)">{{ cur.next.id }} {{ cur.next.title }} ›</view>
+            <view v-if="cur.next" class="pg" @click="read(cur.next.id)">{{ cur.next.kind ? "" : cur.next.id }} {{ cur.next.title }} ›</view>
           </view>
         </view>
       </view>

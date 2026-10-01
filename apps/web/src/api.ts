@@ -147,7 +147,7 @@ export interface ReviewFlow {
   state: "" | "prereviewed" | "submitted" | "returned" | "approved"; prereview?: ReviewOpinion; note?: string;
   history: { ts: number; who: string; action: string; comment: string }[];
 }
-export interface TextbookSectionRef { id: string; title: string; written?: boolean; chapter?: number }
+export interface TextbookSectionRef { id: string; title: string; written?: boolean; chapter?: number; kind?: "intro" | "summary" }
 export interface TextbookChapter { no: number; title: string; level: string; part: string; sections: TextbookSectionRef[] }
 export interface TextbookIndex { book: string; title: string; parts: { title: string }[]; chapters: TextbookChapter[]; teacher: boolean; pdf: number[] }
 export interface TextbookSection { id: string; title: string; chapter: { no: number; title: string }; html: string;

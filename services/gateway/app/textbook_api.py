@@ -19,7 +19,7 @@ from .moodle import EngineError
 from .session import Session
 
 BOOK = re.compile(r"^[a-z][a-z0-9_-]{0,40}$")
-SECTION = re.compile(r"^\d{1,3}\.\d{1,3}$")
+SECTION = re.compile(r"^\d{1,3}\.(\d{1,3}|end)$")
 PDF_TTL = 3600
 
 

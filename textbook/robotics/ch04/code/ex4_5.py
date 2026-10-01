@@ -25,7 +25,7 @@ def zyx(psi, th, phi):
 
 
 def zyx_angles(R):
-    """式 (4.5.5)：取 cos θ ≥ 0 的一组解。"""
+    """式 (4.5.4)：取 cos θ ≥ 0 的一组解。"""
     th = math.atan2(-R[2, 0], math.hypot(R[0, 0], R[1, 0]))
     psi = math.atan2(R[1, 0], R[0, 0])
     phi = math.atan2(R[2, 1], R[2, 2])
