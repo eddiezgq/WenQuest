@@ -1,0 +1,6 @@
+# B-MOB-ROBOTSOCCERKIT 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+alt_models:
+- format: urdf
+  url: https://github.com/Rhoban/onshape-to-robot-examples/blob/911abb069c781e4c717c10643b975f55f7a64fe8/rsk_urdf/robot.urdf
+  license: MIT
+  via: robot_descriptions/rsk_description

@@ -1,0 +1,6 @@
+# B-LEG-CASSIE 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+alt_models:
+- format: urdf
+  url: https://github.com/robot-descriptions/cassie_description/blob/81a2d8bbd77201cc974afb127adda4e2857a6dbf/urdf/cassie_v4.urdf
+  license: MIT
+  via: robot_descriptions/cassie_description

@@ -1,0 +1,51 @@
+# B-MAN-FETCH · Fetch Robotics Fetch 移动操作机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-MAN-FETCH
+kind: robot
+name:
+  zh: Fetch Robotics Fetch 移动操作机器人
+  en: Fetch Robotics Fetch
+category: MAN
+tags:
+- 移动操作机器人
+- mobile_manipulator
+- Fetch Robotics
+standards: []
+params: []
+defaults: {}
+model:
+  engine: urdf:roboschool/roboschool/models_robot/fetch_description/robots/fetch.urdf
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: mobile_manipulator
+source:
+  origin: robot_descriptions
+  repo: https://github.com/openai/roboschool
+  commit: 1.0.49
+  path: roboschool/models_robot/fetch_description/robots/fetch.urdf
+  license: MIT
+  attribution: Fetch（Fetch Robotics）；经 robot_descriptions 登记；MIT
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 MIT；原仓库 LICENSE 识别为 MIT
+  registry:
+    name: fetch_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 移动底盘加机械臂：既能在场地里走，又能伸手操作。
+  uses:
+  - 仓储搬运
+  - 服务机器人
+  courses:
+  - course: 移动机器人
+    chapter: 移动操作
+  labs:
+  - 底盘与机械臂的协同
+factory:
+  erp_items: []
+  suppliers: []

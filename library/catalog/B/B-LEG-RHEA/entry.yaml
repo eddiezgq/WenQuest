@@ -1,0 +1,51 @@
+# B-LEG-RHEA · Gabrael Levine Rhea 双足机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-LEG-RHEA
+kind: robot
+name:
+  zh: Gabrael Levine Rhea 双足机器人
+  en: Gabrael Levine Rhea
+category: LEG
+tags:
+- 双足机器人
+- biped
+- Gabrael Levine
+standards: []
+params: []
+defaults: {}
+model:
+  engine: urdf:rhea_description/urdf/rhea.urdf
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: biped
+  dof: 7
+source:
+  origin: robot_descriptions
+  repo: https://github.com/G-Levine/rhea_description
+  commit: 1dc0f1abcf51b5d8a8f7ff8a548399ff0df1414f
+  path: urdf/rhea.urdf
+  license: Apache-2.0
+  attribution: Rhea（Gabrael Levine）；经 robot_descriptions 登记；Apache-2.0
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 Apache-2.0；原仓库 LICENSE 识别为 Apache-2.0
+  registry:
+    name: rhea_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 两条腿交替支撑行走，靠控制质心和落脚点保持动态平衡。
+  uses:
+  - 双足行走研究
+  courses:
+  - course: 足式机器人
+    chapter: 双足行走
+  labs:
+  - 腿部关节拖动
+factory:
+  erp_items: []
+  suppliers: []

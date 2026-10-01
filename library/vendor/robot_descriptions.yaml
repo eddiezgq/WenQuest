@@ -1,0 +1,33 @@
+# robot_descriptions.py（第 5 轮 P8 / 第 4 步）：只用它的模型登记表（哪个机器人、在哪个仓库哪个提交、许可）。
+# 模型本身从各原仓库按登记的提交取（tools/fetch_sources.py，清单 vendor/rd_repos.yaml 由 import_rd.py 生成）。
+repo: https://github.com/robot-descriptions/robot_descriptions.py
+commit: d6b206deb9e6d461616f9552171549987cee0f0a
+date: 2026-09-19
+# 规则：只收 URDF；许可在可收名单（B.6）且原仓库根目录 LICENSE 核对一致；不收 MuJoCo Menagerie 来源（已有）；
+# 不收 Universal Robots（网格的许可是 UR 自己的图形文件条款，不在可收名单；UR 已由 Menagerie 和 DH 模型覆盖）；
+# 需要 xacro 预处理的暂不收（第二批）；与已有条目同一型号的，不新建，在已有条目上加“另有 URDF 版本”的链接。
+duplicates:
+  a1_description: B-LEG-A1
+  anymal_b_description: B-LEG-ANYMALB
+  anymal_c_description: B-LEG-ANYMALC
+  berkeley_humanoid_description: B-HUM-BERKELEYHUMANOID
+  booster_t1_description: B-HUM-T1
+  cassie_description: B-LEG-CASSIE
+  g1_description: B-HUM-G1
+  go1_description: B-LEG-GO1
+  go2_description: B-LEG-GO2
+  h1_description: B-HUM-H1
+  iiwa14_description: B-ARM-IIWA14
+  n1_description: B-HUM-N1
+  omy_3m_description: B-ARM-OMY3M
+  panda_description: B-ARM-PANDA
+  piper_description: B-ARM-PIPER
+  rby1_description: B-MAN-RBY1A12
+  skydio_x2_description: B-UAV-X2
+  toddlerbot_description: B-HUM-TODDLERBOT2XC
+  yam_description: B-ARM-YAM
+  cf2_description: B-UAV-CF2
+  rsk_description: B-MOB-ROBOTSOCCERKIT
+  so_arm100_description: B-ARM-SOARM100
+  so_arm101_description: B-ARM-SO101
+  leap_hand_v1_description: B-EEF-LEAPHAND

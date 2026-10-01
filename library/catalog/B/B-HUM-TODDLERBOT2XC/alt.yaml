@@ -1,0 +1,6 @@
+# B-HUM-TODDLERBOT2XC 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+alt_models:
+- format: urdf
+  url: https://github.com/hshi74/toddlerbot/blob/067f9dc4f50143e36334877b9395b9c5c29ee30c/toddlerbot/descriptions/toddlerbot_2xc/toddlerbot_2xc.urdf
+  license: MIT
+  via: robot_descriptions/toddlerbot_description

@@ -3,6 +3,7 @@ build123d==0.13.0
 bd_warehouse @ git+https://github.com/gumyr/bd_warehouse@eed2da118da99007ad2d3904466ac0b24964f84d
 mujoco==3.14.0
 trimesh==5.1.0
+yourdfpy==0.0.60
 fast-simplification==0.2.0
 matplotlib==3.10.9
 scipy==1.17.1

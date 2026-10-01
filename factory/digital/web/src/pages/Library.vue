@@ -113,6 +113,7 @@
               <a v-if="curSize?.files.motion" class="btn ghost" :href="fileUrl(curSize.files.motion)" download>运动表 CSV</a>
               <a v-if="!entry.robot" class="btn" :href="entry.package">STEP / STL 压缩包（整族）</a>
               <a v-else-if="entry.model.engine.startsWith('menagerie:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 MJCF（{{ originName(entry.source.origin) }}）</a>
+              <a v-else-if="entry.model.engine.startsWith('urdf:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 URDF（原仓库）</a>
               <a v-else-if="entry.source.origin === 'vendor'" class="btn" :href="entry.package" target="_blank" rel="noopener">官方技术参数表</a>
               <a v-else class="btn ghost" :href="entry.package" target="_blank" rel="noopener">生成程序</a>
               <button class="btn ghost" type="button" @click="copy(size === 'default' ? entry.id : entry.id + '/' + size)">复制编号</button>
@@ -180,6 +181,12 @@
                   <dt v-if="entry.source.checked">核对</dt><dd v-if="entry.source.checked">{{ entry.source.checked.by }} · {{ entry.source.checked.on }}<template v-if="entry.source.checked.note"> · {{ entry.source.checked.note }}</template></dd>
                 </dl>
                 <div v-if="entry.source.attribution" class="attr">{{ entry.source.attribution }}</div>
+                <div v-if="entry.alt_models?.length" class="dsrc">
+                  <div class="small muted">另有版本</div>
+                  <div v-for="m in entry.alt_models" :key="m.url" class="small">
+                    <a :href="m.url" target="_blank" rel="noopener">{{ m.format.toUpperCase() }}</a> · {{ m.license }} · {{ m.via }}
+                  </div>
+                </div>
                 <div v-if="entry.source.notes" class="attr">{{ entry.source.notes }}</div>
                 <div v-if="entry.source.data_sources?.length" class="dsrc">
                   <div class="small muted">尺寸与参数出处</div>

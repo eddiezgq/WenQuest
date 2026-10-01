@@ -1,0 +1,53 @@
+# B-HUM-LUNA · LimX Dynamics Luna 人形机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-HUM-LUNA
+kind: robot
+name:
+  zh: LimX Dynamics Luna 人形机器人
+  en: LimX Dynamics Luna
+category: HUM
+tags:
+- 人形机器人
+- humanoid
+- LimX Dynamics
+standards: []
+params: []
+defaults: {}
+model:
+  engine: urdf:luna_description/HU_L04_description/urdf/HU_L04_01.urdf
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: humanoid
+source:
+  origin: robot_descriptions
+  repo: https://github.com/limxdynamics/luna-description
+  commit: 21608d34151fdedfd3c2b6fc03d1e2ba22e503a1
+  path: HU_L04_description/urdf/HU_L04_01.urdf
+  license: Apache-2.0
+  attribution: Luna（LimX Dynamics）；经 robot_descriptions 登记；Apache-2.0
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 Apache-2.0；原仓库 LICENSE 识别为 Apache-2.0
+  registry:
+    name: luna_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 躯干、双臂、双腿按人体比例布置，行走时控制质心，手臂负责操作。
+  uses:
+  - 科研
+  - 服务
+  - 制造
+  courses:
+  - course: 人形与学习控制
+    chapter: 人形机器人结构
+  labs:
+  - 全身关节拖动
+  - 行走动画
+factory:
+  erp_items: []
+  suppliers: []

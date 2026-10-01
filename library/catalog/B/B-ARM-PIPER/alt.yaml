@@ -1,0 +1,6 @@
+# B-ARM-PIPER 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+alt_models:
+- format: urdf
+  url: https://github.com/agilexrobotics/Piper_ros/blob/f2ec6a67e1f404bcb478529e89861ccdf43fa298/src/piper_description/urdf/piper_description.urdf
+  license: MIT
+  via: robot_descriptions/piper_description

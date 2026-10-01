@@ -44,22 +44,8 @@ jobs:
         run: pip install -r library/requirements.txt
       - name: 取来源仓库（固定提交）
         run: |
-          fetch() {   # 目录 仓库 提交 [稀疏路径…]
-            local d=$1 repo=$2 sha=$3; shift 3
-            git init -q "$d" && git -C "$d" remote add origin "$repo"
-            if [ $# -gt 0 ]; then
-              git -C "$d" sparse-checkout set --no-cone "$@"
-              git -C "$d" fetch -q --depth 1 --filter=blob:none origin "$sha"
-            else
-              git -C "$d" fetch -q --depth 1 origin "$sha"
-            fi
-            git -C "$d" checkout -q FETCH_HEAD
-          }
-          y() { python3 -c "import yaml,sys; print(yaml.safe_load(open(sys.argv[1]))[sys.argv[2]])" "$@"; }
-          fetch "$WQ_MENAGERIE" "$(y library/vendor/menagerie.yaml repo)" "$(y library/vendor/menagerie.yaml commit)"
-          fetch "$WQ_FCLIB" "$(y library/vendor/freecad_library.yaml repo)" "$(y library/vendor/freecad_library.yaml commit)" \
-            /index.html /thumbnails/ /LICENSE-Assets
-          du -sh library/vendor_src/*
+          python3 library/tools/fetch_sources.py --strict
+          du -sh library/vendor_src/* library/vendor_src/rd 2>/dev/null || true
       - name: 校验条目
         run: python3 library/tools/validate.py
       - name: 测试

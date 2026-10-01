@@ -1,0 +1,6 @@
+# B-LEG-ANYMALC 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+alt_models:
+- format: urdf
+  url: https://github.com/ANYbotics/anymal_c_simple_description/blob/f160b8f7fed840c47a6febe8e2bc78b32bf43a68/urdf/anymal.urdf
+  license: BSD-3-Clause
+  via: robot_descriptions/anymal_c_description

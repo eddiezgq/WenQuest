@@ -1,0 +1,52 @@
+# B-ARM-BAXTER · Rethink Robotics Baxter 双臂机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-ARM-BAXTER
+kind: robot
+name:
+  zh: Rethink Robotics Baxter 双臂机器人
+  en: Rethink Robotics Baxter
+category: ARM
+tags:
+- 双臂机器人
+- dual_arm
+- Rethink Robotics
+standards: []
+params: []
+defaults: {}
+model:
+  engine: urdf:baxter_common/baxter_description/urdf/baxter.urdf
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: dual_arm
+  dof: 15
+source:
+  origin: robot_descriptions
+  repo: https://github.com/RethinkRobotics/baxter_common
+  commit: 6c4b0f375fe4e356a3b12df26ef7c0d5e58df86e
+  path: baxter_description/urdf/baxter.urdf
+  license: BSD-3-Clause
+  attribution: Baxter（Rethink Robotics）；经 robot_descriptions 登记；BSD-3-Clause
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 BSD-3-Clause；原仓库 LICENSE 识别为 BSD-3-Clause
+  registry:
+    name: baxter_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 两条机械臂协同工作，一条固定、一条操作，或两条一起搬运、装配。
+  uses:
+  - 双手操作
+  - 遥操作数据采集
+  courses:
+  - course: 机器人技术
+    chapter: 多臂协作
+  labs:
+  - 双臂协同搬运演示
+factory:
+  erp_items: []
+  suppliers: []

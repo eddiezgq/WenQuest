@@ -31,6 +31,9 @@ def load(d):
             src["data_sources"] = list(src.get("data_sources") or []) + v["data_sources"]
         if v.get("tags"):
             e["tags"] = list(dict.fromkeys(list(e.get("tags") or []) + v["tags"]))
+    alt = d / "alt.yaml"                         # 同一型号的其他来源版本（第 5 轮第 4 步）
+    if alt.exists():
+        e["alt_models"] = (yaml.safe_load(open(alt, encoding="utf-8")) or {}).get("alt_models", [])
     e["_dir"] = d
     return e
 

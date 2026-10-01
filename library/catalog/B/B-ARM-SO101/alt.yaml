@@ -1,0 +1,6 @@
+# B-ARM-SO101 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+alt_models:
+- format: urdf
+  url: https://github.com/TheRobotStudio/SO-ARM100/blob/63eede5a636e548eb8f2854e558bd343c21db9f7/Simulation/SO101/so101_new_calib.urdf
+  license: Apache-2.0
+  via: robot_descriptions/so_arm101_description

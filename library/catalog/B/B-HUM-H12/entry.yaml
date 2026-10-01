@@ -1,0 +1,53 @@
+# B-HUM-H12 · UNITREE Robotics H1_2 人形机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-HUM-H12
+kind: robot
+name:
+  zh: UNITREE Robotics H1_2 人形机器人
+  en: UNITREE Robotics H1_2
+category: HUM
+tags:
+- 人形机器人
+- humanoid
+- UNITREE Robotics
+standards: []
+params: []
+defaults: {}
+model:
+  engine: urdf:unitree_ros/robots/h1_2_description/h1_2.urdf
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: humanoid
+source:
+  origin: robot_descriptions
+  repo: https://github.com/unitreerobotics/unitree_ros
+  commit: 267182b8521c8d6a631bab1fe63836873237a525
+  path: robots/h1_2_description/h1_2.urdf
+  license: BSD-3-Clause
+  attribution: H1_2（UNITREE Robotics）；经 robot_descriptions 登记；BSD-3-Clause
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 BSD-3-Clause；原仓库 LICENSE 识别为 BSD-3-Clause
+  registry:
+    name: h1_2_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 躯干、双臂、双腿按人体比例布置，行走时控制质心，手臂负责操作。
+  uses:
+  - 科研
+  - 服务
+  - 制造
+  courses:
+  - course: 人形与学习控制
+    chapter: 人形机器人结构
+  labs:
+  - 全身关节拖动
+  - 行走动画
+factory:
+  erp_items: []
+  suppliers: []

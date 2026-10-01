@@ -1,0 +1,53 @@
+# B-HUM-SIGMABAN · Rhoban SigmaBan 人形机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-HUM-SIGMABAN
+kind: robot
+name:
+  zh: Rhoban SigmaBan 人形机器人
+  en: Rhoban SigmaBan
+category: HUM
+tags:
+- 人形机器人
+- humanoid
+- Rhoban
+standards: []
+params: []
+defaults: {}
+model:
+  engine: urdf:sigmaban_urdf/robot.urdf
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: humanoid
+source:
+  origin: robot_descriptions
+  repo: https://github.com/Rhoban/sigmaban_urdf
+  commit: d5d023fd35800d00d7647000bce8602617a4960d
+  path: robot.urdf
+  license: MIT
+  attribution: SigmaBan（Rhoban）；经 robot_descriptions 登记；MIT
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 MIT；原仓库 LICENSE 识别为 MIT
+  registry:
+    name: sigmaban_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 躯干、双臂、双腿按人体比例布置，行走时控制质心，手臂负责操作。
+  uses:
+  - 科研
+  - 服务
+  - 制造
+  courses:
+  - course: 人形与学习控制
+    chapter: 人形机器人结构
+  labs:
+  - 全身关节拖动
+  - 行走动画
+factory:
+  erp_items: []
+  suppliers: []

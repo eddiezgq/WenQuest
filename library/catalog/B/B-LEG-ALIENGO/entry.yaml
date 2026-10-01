@@ -1,0 +1,53 @@
+# B-LEG-ALIENGO · UNITREE Robotics Aliengo 四足机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-LEG-ALIENGO
+kind: robot
+name:
+  zh: UNITREE Robotics Aliengo 四足机器人
+  en: UNITREE Robotics Aliengo
+category: LEG
+tags:
+- 四足机器人
+- quadruped
+- UNITREE Robotics
+standards: []
+params: []
+defaults: {}
+model:
+  engine: urdf:unitree_ros/robots/aliengo_description/urdf/aliengo.urdf
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: quadruped
+  dof: 12
+source:
+  origin: robot_descriptions
+  repo: https://github.com/unitreerobotics/unitree_ros
+  commit: 267182b8521c8d6a631bab1fe63836873237a525
+  path: robots/aliengo_description/urdf/aliengo.urdf
+  license: BSD-3-Clause
+  attribution: Aliengo（UNITREE Robotics）；经 robot_descriptions 登记；BSD-3-Clause
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 BSD-3-Clause；原仓库 LICENSE 识别为 BSD-3-Clause
+  registry:
+    name: aliengo_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 每条腿 3 个关节，四条腿交替支撑与摆动（步态），保持机身平衡前进。
+  uses:
+  - 巡检
+  - 野外作业
+  courses:
+  - course: 足式机器人
+    chapter: 步态与平衡
+  labs:
+  - 单腿关节拖动
+  - 步态动画
+factory:
+  erp_items: []
+  suppliers: []

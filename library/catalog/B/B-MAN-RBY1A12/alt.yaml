@@ -1,0 +1,6 @@
+# B-MAN-RBY1A12 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+alt_models:
+- format: urdf
+  url: https://github.com/uynitsuj/rby1_description/blob/e4c07203aa0a0d1b6b3b39da105cb00a77e2bc72/models/rby1a/urdf/model.urdf
+  license: MIT
+  via: robot_descriptions/rby1_description

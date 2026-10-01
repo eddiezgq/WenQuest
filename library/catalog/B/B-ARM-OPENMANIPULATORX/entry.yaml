@@ -1,0 +1,55 @@
+# B-ARM-OPENMANIPULATORX · ROBOTIS OpenMANIPULATOR-X 机械臂（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-ARM-OPENMANIPULATORX
+kind: robot
+name:
+  zh: ROBOTIS OpenMANIPULATOR-X 机械臂
+  en: ROBOTIS OpenMANIPULATOR-X
+category: ARM
+tags:
+- 机械臂
+- arm
+- ROBOTIS
+standards: []
+params: []
+defaults: {}
+model:
+  engine: urdf:open_manipulator/open_manipulator_description/urdf/open_manipulator_x/open_manipulator_x.urdf
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: arm
+source:
+  origin: robot_descriptions
+  repo: https://github.com/ROBOTIS-GIT/open_manipulator
+  commit: bc555a9c41ebd7493dc945ddabc43fc649681b62
+  path: open_manipulator_description/urdf/open_manipulator_x/open_manipulator_x.urdf
+  license: Apache-2.0
+  attribution: OpenMANIPULATOR-X（ROBOTIS）；经 robot_descriptions 登记；Apache-2.0
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 Apache-2.0；原仓库 LICENSE 识别为 Apache-2.0
+  registry:
+    name: open_manipulator_x_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 多个转动关节串联：前几个关节主要决定末端位置，腕部关节决定姿态。
+  uses:
+  - 装配
+  - 上下料
+  - 人机协作
+  courses:
+  - course: 机器人技术
+    chapter: 串联机械臂正运动学
+  - course: 机器人技术
+    chapter: 逆运动学与轨迹规划
+  labs:
+  - 拖动关节看末端轨迹
+  - 正逆运动学虚拟实验
+factory:
+  erp_items: []
+  suppliers: []

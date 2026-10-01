@@ -1,0 +1,6 @@
+# B-ARM-OMY3M 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+alt_models:
+- format: urdf
+  url: https://github.com/ROBOTIS-GIT/open_manipulator/blob/bc555a9c41ebd7493dc945ddabc43fc649681b62/open_manipulator_description/urdf/omy_3m/omy_3m.urdf
+  license: Apache-2.0
+  via: robot_descriptions/omy_3m_description

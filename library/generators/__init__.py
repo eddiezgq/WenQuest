@@ -13,6 +13,9 @@ def get_builder(entry):
     if eng.startswith("proxy:"):
         from generators import d_proxy
         return d_proxy.build
+    if eng.startswith("urdf:"):
+        from generators import b_urdf
+        return b_urdf.build
     if eng.startswith("wqrobot:"):
         from generators import b_wq
         return b_wq.build

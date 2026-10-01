@@ -168,6 +168,8 @@ def entry_json(e, rows, results, version):
     src = e.get("source") or {}
     if src.get("origin") == "menagerie":          # 现成机器人：完整 MJCF 与网格在原仓库（固定提交），不另存
         doc["package"] = "{}/tree/{}/{}".format(src["repo"], src["commit"], src.get("path", "").rstrip("/"))
+    elif src.get("origin") == "robot_descriptions":   # URDF 机器人：原仓库固定提交里 URDF 所在目录
+        doc["package"] = "{}/tree/{}/{}".format(src["repo"], src["commit"], src.get("path", "").rsplit("/", 1)[0])
     elif src.get("origin") == "wenquest" and e["kind"] == "robot":   # 自建机器人：参数化生成程序（URDF、glTF 都在网页包里）
         doc["package"] = "{}/blob/main/library/generators/b_wq.py".format(REPO)
     elif src.get("origin") == "vendor" and e["kind"] == "robot":   # 按 DH 生成的厂商机器人：没有原始模型，指向官方技术参数表
