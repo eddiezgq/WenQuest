@@ -86,8 +86,19 @@ jobs:
           print("\n网页浏览：https://factory.wenquestrobotics.com （工作台 → 零件库）\n")
           print("`library-web-%s.tar.gz` 是网页用的模型与索引；每个标准件族一个压缩包（STEP、STL、许可说明）；机器人的完整模型见各条目 `package` 指向的原仓库固定提交。" % v)
           PY
-          gh release create "library-v$VER" --target "$GITHUB_SHA" --title "零件库 $VER" --notes-file notes.md \
-            "library-web-$VER.tar.gz" "index-$VER.json" packages/*.zip
+          # 上传偶尔会被 GitHub 断开：失败时删掉半成品再试，最多 3 次；仍失败把出错信息发成注释
+          for i in 1 2 3; do
+            if gh release create "library-v$VER" --target "$GITHUB_SHA" --title "零件库 $VER" --notes-file notes.md \
+                "library-web-$VER.tar.gz" "index-$VER.json" packages/*.zip > /tmp/release.log 2>&1; then
+              cat /tmp/release.log; exit 0
+            fi
+            cat /tmp/release.log
+            gh release delete "library-v$VER" --yes --cleanup-tag >/dev/null 2>&1 || true
+            sleep 20
+          done
+          ls -la "library-web-$VER.tar.gz" packages | tail -n 20 >> /tmp/release.log
+          python3 ../../factory/deploy/ci_annotate.py 发布 /tmp/release.log 60
+          exit 1
       - name: 解包到数字工厂服务器
         if: env.HOST != ''
         run: |
