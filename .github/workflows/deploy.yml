@@ -62,9 +62,9 @@ jobs:
         working-directory: textbook/tools
         run: |
           npm ci --no-audit --no-fund
-          pip install -q markdown-it-py pyyaml numpy scipy matplotlib pytest
+          pip install -q markdown-it-py pyyaml numpy scipy matplotlib pytest httpx fastapi pydantic
           python -m pytest -q tests
-          python build.py robotics --pdf
+          python build.py robotics --pdf --labs
       - name: Keep the built textbooks for the deploy
         uses: actions/upload-artifact@v4
         with:

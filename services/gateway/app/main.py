@@ -81,9 +81,11 @@ async def lifespan(app: FastAPI):
                           s.mail_from, s.mail_from_name)
     pace = asyncio.create_task(_pace_loop())
     sweep = asyncio.create_task(_accounts_loop())
+    books = asyncio.create_task(textbook_api.media_loop(sys.modules[__name__]))
     yield
     pace.cancel()
     sweep.cancel()
+    books.cancel()
     await state.http.aclose()
 
 log = logging.getLogger("wenquest.gateway")

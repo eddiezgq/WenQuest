@@ -31,6 +31,10 @@ defineProps<{ html: string }>();
 .book :deep(.wq-eq svg) { max-width: 100%; }
 .book :deep(.wq-tagno) { float: right; }
 .book :deep(figure) { margin: 18px 0; }
+.book :deep(.wq-video) { display: block; width: 100%; max-height: 70vh; border-radius: 6px; background: #0f1419; }
+.book :deep(.wq-poster) { display: block; width: 100%; border-radius: 6px; }
+.book :deep(.wq-labbtn) { display: inline-block; margin: 6px 0 4px; padding: 10px 18px; border-radius: 8px; background: #b8860b; color: #fff; font-family: "Noto Sans CJK SC", sans-serif; font-size: 15px; text-decoration: none; }
+.book :deep(.wq-note) { font-size: 13px; color: #5d6b73; text-align: center; }
 .book :deep(.wq-tabcap) { font-family: "Noto Sans CJK SC", sans-serif; font-size: 13px; color: #5d6b73; text-align: center; margin-top: 18px; }
 .book :deep(figcaption) { font-family: "Noto Sans CJK SC", sans-serif; font-size: 13px; color: #5d6b73; text-align: center; margin-top: 6px; }
 .book :deep(.wq-media-box) { border: 1px dashed #b9c2c8; border-radius: 6px; padding: 26px 16px; text-align: center; color: #5d6b73; font-size: 13.5px; background: #fafbfb; }

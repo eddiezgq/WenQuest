@@ -43,6 +43,50 @@ from markdown_it import MarkdownIt
 
 TOOLS = Path(__file__).resolve().parent
 ROOT = TOOLS.parents[1]
+WQ_ANIM = ROOT / "services" / "animator" / "wq_anim.py"
+_ANIM_CHECK = None
+
+
+_LABKIT = None
+
+
+def labkit():
+    """The platform's lab kit (services/gateway/app/production/labs.py): static check and the lab page."""
+    global _LABKIT
+    if _LABKIT is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("wq_labs", ROOT / "services" / "gateway" / "app" / "production" / "labs.py")
+        _LABKIT = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_LABKIT)
+    return _LABKIT
+
+
+def trial_labs(page_html: str, ids: list[str], rep: "Report", where: str) -> None:
+    """Run every lab's tasks in headless Chromium with the lab checker's own code (services/labcheck)."""
+    import asyncio
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("wq_labcheck", ROOT / "services" / "labcheck" / "app.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    for lab in ids:
+        res = asyncio.run(mod.run(page_html, lab))
+        for p in res.get("problems") or []:
+            rep.add("error", "实验", where, f"实验 {lab.replace('-', '.')}：{p}")
+
+
+def anim_check(code: str) -> str:
+    """The animation service's own safety check (services/animator/app.py: check), without importing the service."""
+    global _ANIM_CHECK
+    if _ANIM_CHECK is None:
+        import ast
+        tree = ast.parse((ROOT / "services" / "animator" / "app.py").read_text(encoding="utf-8"))
+        names = {"ALLOWED_IMPORTS", "FORBIDDEN_NAMES", "FORBIDDEN_ATTRS", "MAX_CODE"}
+        keep = [n for n in tree.body if (isinstance(n, ast.FunctionDef) and n.name == "check")
+                or (isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id in names for t in n.targets))]
+        ns: dict = {"ast": ast}
+        exec(compile(ast.Module(body=keep, type_ignores=[]), "animator-check", "exec"), ns)
+        _ANIM_CHECK = ns["check"]
+    return _ANIM_CHECK(code)
 KINDS = ("程序", "动画", "实验", "图", "表")
 REF_KINDS = ("式", "定义", "定理", "引理", "推论", "算例", "程序", "图", "表", "动画", "实验", "习题")
 
@@ -69,6 +113,8 @@ class Section:
     html_mp: str = ""
     figdir: Path = Path(".")
     anim_figs: list = field(default_factory=list)
+    anims: list = field(default_factory=list)
+    labs: list = field(default_factory=list)
     defines: set = field(default_factory=set)
 
 
@@ -277,6 +323,33 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
     if kind == "动画":
         fig = meta.get("图", "")
         sec.anim_figs.append((label, fig))
+        name = meta.get("src", "")
+        script = sec.path.parent / "anim" / f"{name}.py" if name else None
+        if not script or not script.exists():
+            rep.add("error", "动画", sec.id, f"{label}：没有场景程序（写 src: 名称，放在 anim/名称.py）")
+        else:
+            code = script.read_text(encoding="utf-8")
+            why = anim_check(code)
+            if why:
+                rep.add("error", "动画", sec.id, f"{label}：场景程序不能通过渲染服务的检查：{why}")
+            h = hashlib.sha256(code.encode() + WQ_ANIM.read_bytes()).hexdigest()[:12]
+            sec.anims.append((name, h, code))
+            # the gateway puts the rendered video here once it is ready; until then this box shows
+            return (f"<figure class='wq-anim' id='{kind}-{num}'><div class='wq-media-box' data-anim='{name}' data-hash='{h}'>"
+                    f"【{label}】{cap}</div><figcaption>{label}　{cap}</figcaption>"
+                    f"{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
+    if kind == "实验":
+        name = meta.get("src", "")
+        script = sec.path.parent / "lab" / f"{name}.js" if name else None
+        if not script or not script.exists():
+            rep.add("error", "实验", sec.id, f"{label}：没有实验程序（写 src: 名称，放在 lab/名称.js）")
+        else:
+            code = script.read_text(encoding="utf-8")
+            for why in labkit().static_problems(code):
+                rep.add("error", "实验", sec.id, f"{label}：{why}")
+            sec.labs.append((num, code))
+            return (f"<figure class='wq-lab' id='{kind}-{num}'><div class='wq-media-box wq-labbox' data-lab='{num.replace('.', '-')}'>"
+                    f"【{label}】{cap}</div>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     cls = {"动画": "wq-anim", "实验": "wq-lab", "表": "wq-tab"}[kind]
     src = html.escape(meta.get("src", ""))
     # media are produced in later steps (animator, labkit); until then a placeholder box shows what will be there
@@ -497,7 +570,7 @@ def _toc_sections(c: dict, sections: list) -> list[dict]:
 
 
 def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: Path | None = None,
-          root: Path | None = None) -> Report:
+          root: Path | None = None, labs: bool = False) -> Report:
     """root: a book folder elsewhere (tests); its book.yaml is then not compared with the outline."""
     rep = Report()
     book = load_book(book_name, root)
@@ -545,6 +618,27 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     for sec in sections:
         by_ch.setdefault(sec.chapter, []).append(sec)
     index["pdf"] = sorted(by_ch) if pdf and not rep.errors else []
+    anim_dir = out / "anim"
+    anim_dir.mkdir(exist_ok=True)
+    index["anims"] = {}
+    for sec in sections:
+        for name, h, code in sec.anims:
+            (anim_dir / f"{name}.py").write_text(code, encoding="utf-8")
+            index["anims"][name] = h
+    (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
+    lab_dir = out / "lab"
+    lab_dir.mkdir(exist_ok=True)
+    index["labs"] = {}
+    for ch, secs in sorted(by_ch.items()):
+        items = [x for sec in secs for x in sec.labs]
+        if not items:
+            continue
+        page_html = labkit().page(items, course=[book["title"], book.get("title_en", "")], chapter=[f"第{ch}章", f"Chapter {ch}"],
+                                  key=f"wq-book-{book_name}")
+        (lab_dir / f"ch{ch:02d}.html").write_text(page_html, encoding="utf-8")
+        index["labs"][str(ch)] = [no for no, _ in items]
+        if labs:
+            trial_labs(page_html, [no.replace(".", "-") for no, _ in items], rep, f"第 {ch} 章实验页")
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     for ch, secs in by_ch.items():
         body = (f"<h1>第 {ch} 章　{html.escape(titles[ch])}</h1>"
@@ -577,8 +671,9 @@ def main() -> int:
     ap.add_argument("book", nargs="?", default="robotics")
     ap.add_argument("--pdf", action="store_true", help="同时生成每章 PDF")
     ap.add_argument("--only", help="只构建这些节，逗号分隔，如 4.1,4.2")
+    ap.add_argument("--labs", action="store_true", help="在无头浏览器里试做每个虚拟实验的全部任务")
     a = ap.parse_args()
-    rep = build(a.book, a.pdf, set(a.only.split(",")) if a.only else None)
+    rep = build(a.book, a.pdf, set(a.only.split(",")) if a.only else None, labs=a.labs)
     for p in rep.problems:
         print(p)
     n_err, n_warn = len(rep.errors), len(rep.problems) - len(rep.errors)

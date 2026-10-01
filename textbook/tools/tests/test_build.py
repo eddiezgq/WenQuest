@@ -97,8 +97,25 @@ def test_significant_digits_keep_trailing_zeros():
 
 def test_an_animation_needs_its_static_figure(book):
     """动画代替不了示意图，两个都要 (Eddie 2026-10-01)."""
-    edit(book, "::: 动画 4.1.1\n图: 4.1.1\n", "::: 动画 4.1.1\n")
+    edit(book, "::: 动画 4.1.1\nsrc: a4_1_1\n图: 4.1.1\n", "::: 动画 4.1.1\nsrc: a4_1_1\n")
     rep = run(book)
     assert any("动画 4.1.1 没有配示意图" in p.text for p in rep.errors)
     frag = (book.parent / "build" / "robotics" / "web" / "4.1.html").read_text(encoding="utf-8")
     assert "data:image/svg+xml;base64" in frag and "图 4.1.2" in frag      # the figures are in the page itself
+
+
+def test_animations_and_labs_are_packaged_and_checked(book):
+    """Scenes must exist and pass the animation service's own check; labs must exist and pass the lab kit's check."""
+    rep = run(book)
+    out = book.parent / "build" / "robotics"
+    assert (out / "anim" / "a4_1_1.py").exists() and (out / "lab" / "ch04.html").exists()
+    p = book / "ch04" / "anim" / "a4_1_1.py"
+    p.write_text(p.read_text(encoding="utf-8").replace("import math", "import math\nimport os"), encoding="utf-8")
+    q = book / "ch04" / "lab" / "lab4_1.js"
+    q.write_text(q.read_text(encoding="utf-8") + "\nfetch('x');\n", encoding="utf-8")
+    edit(book, "src: a4_1_2\n", "src: no_such_scene\n")
+    rep = run(book)
+    text = "\n".join(map(str, rep.errors))
+    assert "动画 4.1.1：场景程序不能通过渲染服务的检查" in text
+    assert "动画 4.1.2：没有场景程序" in text
+    assert "实验 4.1：not allowed: network access (fetch)" in text
