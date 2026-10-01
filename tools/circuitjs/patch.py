@@ -6,7 +6,7 @@
 2. 语言：window.CircuitJSLocaleText 有内容时直接用它，不联网取 locale_xx.txt；
 3. 示例电路列表 setuplist.txt、右侧面板 iframe.html：window.CircuitJSEmbedded 为真时不取；
 4. GWT 模块：单文件输出（sso 链接器、单一排列），样式不由 GWT 注入（由嵌入页内联）；
-5. 编译选项：OBFUSCATED，减小体积。
+5. 编译选项：OBF（混淆压缩），减小体积。
 每处改动都先确认原文存在，找不到就报错，避免上游改版后悄悄失效。
 """
 import sys
@@ -56,5 +56,5 @@ edit(gwt, "<stylesheet src='style.css' />", "<!-- style.css 由嵌入页内联 -
 edit(gwt, "</module>",
      "    <add-linker name=\"sso\" />\n    <collapse-all-properties />\n</module>")
 
-edit(root / "build.gradle", "style = \"PRETTY\"", "style = \"OBFUSCATED\"")
+edit(root / "build.gradle", "style = \"PRETTY\"", "style = \"OBF\"")
 print("patch: 完成")
