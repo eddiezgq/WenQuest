@@ -33,6 +33,7 @@ from .production import spec as sp
 from .ai import ModelGateway
 from .moodle import EngineError
 from .lectures import LectureMixin
+from .lead import LeadMixin, chapter_confirmed
 
 log = logging.getLogger("wenquest.studio")
 
@@ -98,9 +99,18 @@ class Projects:
         return json.loads(p.read_text())
 
     def save(self, proj: dict) -> None:
+        """Write the project. The conversation, proposals and answered questions are merged with what is on disk:
+        the course lead replies while a job holds an older copy of the project (round 5), and neither may lose the
+        other's messages."""
         proj["updated"] = now()
         p = self.path(proj["id"])
         p.parent.mkdir(parents=True, exist_ok=True)
+        if p.exists():
+            try:
+                disk = json.loads(p.read_text())
+            except ValueError:
+                disk = {}
+            merge_side(proj, disk)
         tmp = p.with_suffix(".tmp")
         tmp.write_text(json.dumps(proj, ensure_ascii=False))
         tmp.replace(p)
@@ -118,6 +128,25 @@ class Projects:
             except (OSError, ValueError):
                 continue
         return out
+
+
+def merge_side(proj: dict, disk: dict) -> None:
+    seen = {m["id"] for m in proj.get("messages") or []}
+    extra = [m for m in disk.get("messages") or [] if m["id"] not in seen]
+    if extra:
+        proj["messages"] = sorted((proj.get("messages") or []) + extra, key=lambda m: m.get("ts") or 0)
+    rank = {"open": 0, "superseded": 1, "cancelled": 2, "done": 3}
+    mine = {x["id"]: x for x in proj.get("proposals") or []}
+    for x in disk.get("proposals") or []:
+        if x["id"] not in mine or rank.get(x["status"], 0) > rank.get(mine[x["id"]]["status"], 0):
+            mine[x["id"]] = x
+    if mine:
+        proj["proposals"] = sorted(mine.values(), key=lambda x: x.get("created") or 0)[-60:]
+    qs = {q["id"]: q for q in disk.get("questions") or []}
+    for q in proj.get("questions") or []:
+        d = qs.get(q["id"])
+        if d and q["status"] == "open" and d["status"] != "open":
+            q.update(status=d["status"], answer=d.get("answer", ""))
 
 
 def new_project(owner: int, owner_name: str, import_id: str, description: str) -> dict:
@@ -169,7 +198,7 @@ def summary(proj: dict, items: list[mt.Material] | None = None, with_outline: bo
 
 # --- the orchestrator ---------------------------------------------------------------------------
 
-class Studio(LectureMixin):
+class Studio(LeadMixin, LectureMixin):
     def __init__(self, projects: Projects, store: mt.Store, ai: ModelGateway, clean: Callable[[str], str]):
         self.projects = projects
         self.store = store
@@ -656,10 +685,11 @@ class Studio(LectureMixin):
 
     # stage 3: lessons ---------------------------------------------------------------------------
     def next_lesson(self, proj: dict) -> tuple[dict, dict] | None:
+        """The next lesson to write — only in a chapter the teacher confirmed (E2); an unconfirmed chapter waits."""
         for c in (proj.get("outline") or {}).get("chapters", []):
-            for les in c["lessons"]:
-                if les["status"] in ("planned", "failed"):
-                    return c, les
+            todo = [les for les in c["lessons"] if les["status"] in ("planned", "failed")]
+            if todo:
+                return (c, todo[0]) if chapter_confirmed(c) else None
         return None
 
     def awaiting(self, proj: dict) -> int:
@@ -1589,66 +1619,7 @@ class Studio(LectureMixin):
         keys = lang_keys(o["languages"])
         les["content"] = {k: self.clean(page.build(spec, k)) for k in keys}
 
-    # talking with the teacher ------------------------------------------------------------------
-    async def chat(self, proj: dict, text: str) -> None:
-        items = self.items(proj)
-        history = [m for m in proj["messages"] if m["role"] in ("teacher", "lead")]
-        data = await self.ai.json(system=team.LEAD, prompt=team.chat_prompt(summary(proj, items), history[:-1], text),
-                                  schema=team.chat_schema(), max_tokens=3000,
-                                  fake=lambda: {"reply": "好的，记下了。", "actions": []})
-        data = data if isinstance(data, dict) else {}
-        follow_up = self.apply_actions(proj, data.get("actions") or [])
-        self.say(proj, str(data.get("reply") or "好的。"), "lead")
-        self.projects.save(proj)
-        if follow_up:
-            await follow_up(proj)
-
-    def apply_actions(self, proj: dict, actions: list[dict]):
-        """Record what the teacher decided. Returns follow-up work (at most one) to run now."""
-        follow_up = None
-        files = proj["materials"]["files"]
-        for a in actions[:10]:
-            if not isinstance(a, dict):
-                continue
-            kind = a.get("type")
-            if kind == "answer_question":
-                q = next((q for q in proj["questions"] if q["id"] == a.get("id")), None)
-                if q and a.get("answer"):
-                    q["answer"], q["status"] = str(a["answer"])[:500], "answered"
-            elif kind == "set_requirement" and a.get("key") in REQ_LABEL and a.get("value") not in (None, ""):
-                val = str(a["value"])[:1000]
-                if a["key"] == "language":
-                    val = {"中文": "zh", "英文": "en", "中英双语": "both", "双语": "both"}.get(val, val)
-                    val = val if val in ("zh", "en", "both") else "zh"
-                proj["requirements"][a["key"]] = val
-            elif kind == "set_role" and a.get("file_id") in files and a.get("role") in team.ROLES:
-                files[a["file_id"]].update(role=a["role"], by="teacher", confidence="high")
-            elif kind == "set_textbook" and a.get("file_id") in files:
-                for f in files.values():
-                    if f["role"] == "main_textbook":
-                        f["role"] = "aux_textbook"
-                files[a["file_id"]].update(role="main_textbook", by="teacher", confidence="high")
-                proj["materials"]["textbook"] = a["file_id"]
-                proj["materials"]["toc"] = []
-                follow_up = follow_up or self.read_contents
-            elif kind == "set_pace" and a.get("mode") in ("manual", "daily"):
-                proj["pace"]["mode"] = a["mode"]
-                if isinstance(a.get("hour"), int) and 0 <= a["hour"] <= 23:
-                    proj["pace"]["hour"] = a["hour"]
-            elif kind == "revise_lesson" and proj.get("outline") and not follow_up:
-                try:
-                    _, les = self.find_lesson(proj, str(a.get("lesson_id")))
-                    note = str(a.get("note") or "")[:2000]
-                    follow_up = lambda p, lid=les["id"], n=note: self.write_lesson(p, lid, n)  # noqa: E731
-                except EngineError:
-                    pass
-            elif kind == "write_next" and proj["stage"] == "lessons" and not follow_up:
-                nxt = self.next_lesson(proj)
-                if nxt:
-                    follow_up = lambda p, lid=nxt[1]["id"]: self.write_lesson(p, lid)  # noqa: E731
-            elif kind == "proceed" and proj["stage"] == "materials" and not follow_up:
-                follow_up = self.design
-        return follow_up
+    # talking with the teacher: see lead.py (round 5) -----------------------------------------
 
     # the daily pace --------------------------------------------------------------------------
     async def tick(self) -> None:

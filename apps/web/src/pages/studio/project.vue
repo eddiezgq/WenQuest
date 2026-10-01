@@ -30,7 +30,18 @@
             <view v-for="m in p.messages" :id="'m' + m.id" :key="m.id" class="msg" :class="[m.role, m.kind]">
               <text v-if="m.role === 'lead'" class="who">{{ t("studio.role.lead") }}</text>
               <text class="bubble">{{ m.text }}</text>
+              <!-- 提议: nothing happens until the teacher confirms -->
+              <view v-if="m.kind === 'proposal' && propOf(m)" class="prop" :class="propOf(m)!.status">
+                <text class="prop-h">{{ t("lead.willDo") }}</text>
+                <text v-for="(ln, li) in propOf(m)!.lines" :key="li" class="prop-l">· {{ ln }}</text>
+                <view v-if="propOf(m)!.status === 'open'" class="prop-b">
+                  <view class="primary small" @click="confirmProp(m.proposal!)">{{ p.busy ? t("lead.confirmStop") : t("lead.confirm") }}</view>
+                  <view class="ghost small" @click="cancelProp(m.proposal!)">{{ t("lead.notThis") }}</view>
+                </view>
+                <text v-else class="prop-s">{{ t("lead.status." + propOf(m)!.status) }}</text>
+              </view>
             </view>
+            <view v-if="p.lead_thinking" class="msg lead thinking"><text class="bubble">{{ t("lead.thinking") }}</text></view>
             <!-- open questions, answered with one click -->
             <view v-for="q in openQuestions" :id="'q' + q.id" :key="q.id" class="qcard">
               <text class="q-text">{{ q.text }}</text>
@@ -58,7 +69,7 @@
 
           <view class="compose">
             <textarea v-model="draft" class="input" :placeholder="t('studio.say.' + p.stage)" auto-height :maxlength="4000" />
-            <view class="send" :class="{ disabled: !draft.trim() || !!p.busy }" @click="send">{{ t("studio.send") }}</view>
+            <view class="send" :class="{ disabled: !draft.trim() }" @click="send">{{ t("studio.send") }}</view>
           </view>
 
           <!-- the one action that moves the course forward -->
@@ -319,7 +330,14 @@
                 </view>
               </view>
               <view v-for="c in p.outline.chapters" :key="c.id" class="l-ch">
-                <text class="l-ch-t">{{ disp(c.title) }}</text>
+                <view class="l-ch-head">
+                  <text class="l-ch-t">{{ disp(c.title) }}</text>
+                  <template v-if="p.stage === 'lessons' && !c.ready">
+                    <text class="st needs">{{ t("chapter.waiting") }}</text>
+                    <view class="primary small" :class="{ disabled: !!p.busy }" @click="confirmChapter(c.no)">{{ t("chapter.confirm") }}</view>
+                  </template>
+                </view>
+                <text v-if="p.stage === 'lessons' && !c.ready" class="muted-s">{{ t("chapter.hint") }}</text>
                 <view v-for="l in c.lessons" :key="l.id" class="l-row" :class="{ open: openLesson === l.id }">
                   <view class="l-head" @click="openLesson = openLesson === l.id ? '' : l.id">
                     <text class="l-week">{{ l.week ? t("studio.weekShort", { n: l.week }) : "" }}</text>
@@ -522,7 +540,7 @@ watch(tab, () => { tabChosen = true; });
 
 function schedule() {
   if (timer) clearTimeout(timer);
-  if (p.value?.busy) timer = setTimeout(load, 2000);
+  if (p.value?.busy || p.value?.lead_thinking) timer = setTimeout(load, p.value?.lead_thinking ? 1000 : 2000);
 }
 
 async function load() {
@@ -548,7 +566,7 @@ async function act(fn: () => Promise<StudioProject>) {
 // --- conversation ----------------------------------------------------------------------------
 function send() {
   const text = draft.value.trim();
-  if (!text || p.value?.busy) return;
+  if (!text) return;     // the course lead answers even while the team works (round 5)
   draft.value = "";
   act(() => api.studioSay(id.value, text));
 }
@@ -692,6 +710,20 @@ function playSample(v: string) {
   sampleAudio.play();
 }
 watch(() => p.value?.voices_on, (on) => { if (on) loadVoices(); }, { immediate: true });
+
+// --- the course lead's proposals and chapter confirmation (round 5) ---------------------------------
+function propOf(m: { proposal?: string }) {
+  return (p.value?.proposals || []).find((x) => x.id === m.proposal) || null;
+}
+function confirmProp(prop: string) {
+  act(() => api.studioConfirmProposal(id.value, prop, !!p.value?.busy));
+}
+function cancelProp(prop: string) {
+  act(() => api.studioCancelProposal(id.value, prop));
+}
+function confirmChapter(no: number) {
+  act(() => api.studioConfirmChapter(id.value, no));
+}
 
 function redoAnimation(lid: string) {
   act(() => api.studioRedoAnimation(id.value, lid));
@@ -847,6 +879,14 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--wq-accent); animation: pulse 1s ease-in-out infinite alternate; }
 @keyframes pulse { to { opacity: .3; } }
 .stop { color: var(--wq-danger); cursor: pointer; font-weight: 600; margin-left: 4px; }
+.prop { margin-top: 6px; padding: 10px 12px; border: 1px solid var(--wq-accent); border-radius: 8px; background: #fffaf0; display: flex; flex-direction: column; gap: 4px; max-width: 92%; }
+.prop.done, .prop.cancelled, .prop.superseded { border-color: var(--wq-line); background: #f7f8f9; }
+.prop-h { font-size: 12px; color: var(--wq-muted); }
+.prop-l { font-size: 14px; line-height: 1.5; }
+.prop-b { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.prop-s { font-size: 12px; color: var(--wq-muted); }
+.msg.thinking .bubble { color: var(--wq-muted); font-style: italic; }
+.l-ch-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .mtabs { display: none; }
 .cols { display: grid; grid-template-columns: minmax(320px, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
 

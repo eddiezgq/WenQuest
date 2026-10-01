@@ -121,7 +121,7 @@ export interface StudioFile {
   role: string; role_label: string; chapters: number[]; title: string; confidence: string; note: string; by: string;
 }
 export interface StudioQuestion { id: string; text: string; options: string[]; status: "open" | "answered" | "dropped"; answer: string }
-export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"; text: string; ts: number; kind: string }
+export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"; text: string; ts: number; kind: string; proposal?: string }
 export interface StudioLesson {
   id: string; title: Text; goal: Text; week: number; sections: string[]; status: LessonStatus;
   content: Text; exercises: Text; answers: Text; notes: string; error: string;
@@ -135,7 +135,10 @@ export interface StudioLesson {
   /** 每课一张清单: ok true = ticked, false = crossed, null = not checked; by "ai" | "auto+ai". */
   checklist?: { key: string; label: string; ok: boolean | null; by: string; note: string; image?: string; image_url?: string }[];
 }
-export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[] }
+/** ready: the teacher confirmed this chapter's lessons (本章确认); only then are they written. */
+export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[]; confirmed?: boolean; ready?: boolean }
+/** 课程负责人的提议: what the lead will do once the teacher confirms. */
+export interface StudioProposal { id: string; summary: string; lines: string[]; status: "open" | "done" | "cancelled" | "superseded"; result: string[] }
 export interface StudioOutline { title: Text; summary: Text; languages: Languages; chapters: StudioChapter[]; calendar_note: string }
 export interface StudioProject {
   id: string; stage: Stage; created: number; updated: number;
@@ -150,6 +153,9 @@ export interface StudioProject {
   progress: Record<LessonStatus | "total", number>;
   labs_on?: boolean;
   anims_on?: boolean;
+  proposals?: StudioProposal[];
+  /** the course lead is answering the teacher's last message */
+  lead_thinking?: boolean;
   /** 讲解视频 can be made (the voice service is set up); the course's voices */
   voices_on?: boolean;
   voices?: { zh: string; en: string };
@@ -414,6 +420,10 @@ export const api = {
   studioPublish: (id: string, lid: string) =>
     request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/approve`, {}, 300000),
   studioStop: (id: string) => request<{ stopped: boolean }>("POST", `/api/v1/studio/projects/${id}/stop`, {}),
+  studioConfirmProposal: (id: string, prop: string, stopFirst = false) =>
+    request<StudioProject>("POST", `/api/v1/studio/projects/${id}/proposals/${prop}/confirm${stopFirst ? "?stop_first=true" : ""}`, {}),
+  studioCancelProposal: (id: string, prop: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/proposals/${prop}/cancel`, {}),
+  studioConfirmChapter: (id: string, no: number) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/chapters/${no}/confirm`, {}),
   studioPace: (id: string, mode: "manual" | "daily", hour: number, tz: string) =>
     request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/pace`, { mode, hour, tz }),
   // Browser-only: one file into a course project.

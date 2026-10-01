@@ -15,7 +15,7 @@ from app import main
 from app.production import lecture as L
 from app.production import voice as V
 from tests.test_materials import UPLOADS, login
-from tests.test_studio import CALLS, client, make_project, settle  # noqa: F401 - the fixture
+from tests.test_studio import CALLS, client, confirm_chapters, make_project, settle  # noqa: F401 - the fixture
 
 need_ffmpeg = pytest.mark.skipif(not (shutil.which("ffmpeg") and shutil.which("soffice")), reason="needs ffmpeg and LibreOffice")
 
@@ -155,6 +155,7 @@ def _write_first_lesson(client, h):
     client.post(f"/api/v1/studio/projects/{pid}/approve-materials", headers=h)
     settle(client, h, pid)
     client.post(f"/api/v1/studio/projects/{pid}/approve-outline", headers=h)
+    confirm_chapters(client, h, pid)
     client.post(f"/api/v1/studio/projects/{pid}/lessons/next", headers=h)
     return pid, settle(client, h, pid, 180)
 

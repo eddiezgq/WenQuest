@@ -52,6 +52,13 @@ def settle(c, h, pid, timeout=10.0):
     raise AssertionError("the team did not finish")
 
 
+def confirm_chapters(c, h, pid):
+    """本章确认 for every chapter (round 5: a chapter is written only after the teacher confirms it)."""
+    p = c.get(f"/api/v1/studio/projects/{pid}", headers=h).json()
+    for ch in p["outline"]["chapters"]:
+        c.post(f"/api/v1/studio/projects/{pid}/chapters/{ch['no']}/confirm", headers=h)
+
+
 def make_project(c, h):
     p = c.post("/api/v1/studio/projects", headers=h, json={"description": "大学物理A（上），给大一工科学生"}).json()
     for path, data in FOLDER.items():
@@ -102,6 +109,7 @@ def test_whole_flow_from_materials_to_a_published_lesson(client):
 
     # 3. outline settled: the course is created with its chapters, nothing published yet
     p = client.post(f"/api/v1/studio/projects/{pid}/approve-outline", headers=h).json()
+    confirm_chapters(client, h, pid)
     assert p["stage"] == "lessons" and p["course"]["id"] == 7
     created = dict(CALLS)["local_wenquest_create_course"]
     assert created["sections[1][name]"] == "第1章 质点运动学"
@@ -154,6 +162,7 @@ def test_rewrite_with_a_note_and_stop(client):
     client.post(f"/api/v1/studio/projects/{pid}/approve-materials", headers=h)
     settle(client, h, pid)
     client.post(f"/api/v1/studio/projects/{pid}/approve-outline", headers=h)
+    confirm_chapters(client, h, pid)
     main.state.ai.fake_delay = 1.0
     client.post(f"/api/v1/studio/projects/{pid}/lessons/next", headers=h)
     time.sleep(0.2)
@@ -178,6 +187,7 @@ def test_daily_pace_writes_one_lesson_a_day_and_waits_for_review(client):
     client.post(f"/api/v1/studio/projects/{pid}/approve-materials", headers=h)
     settle(client, h, pid)
     client.post(f"/api/v1/studio/projects/{pid}/approve-outline", headers=h)
+    confirm_chapters(client, h, pid)
     client.put(f"/api/v1/studio/projects/{pid}/pace", headers=h, json={"mode": "daily", "hour": 0, "tz": "UTC"})
     studio = main._studio()
 
@@ -294,6 +304,7 @@ def _write_first_lesson(client, h):
     client.post(f"/api/v1/studio/projects/{pid}/approve-materials", headers=h)
     settle(client, h, pid)
     client.post(f"/api/v1/studio/projects/{pid}/approve-outline", headers=h)
+    confirm_chapters(client, h, pid)
     client.post(f"/api/v1/studio/projects/{pid}/lessons/next", headers=h)
     return pid, settle(client, h, pid)
 

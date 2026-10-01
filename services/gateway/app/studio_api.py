@@ -5,6 +5,7 @@ Creating the course and publishing a lesson happen only on the teacher's click, 
 teacher's own Moodle token.
 """
 
+import asyncio
 import json
 import re
 import time
@@ -152,7 +153,9 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
                        "sections": [{"no": s["no"], "title": s["title"], "start": s.get("start")} for s in c["sections"]]}
                       for c in proj["materials"].get("toc", [])]
         out["materials"] = {k: v for k, v in proj["materials"].items() if k not in ("files", "toc")}
+        from .lead import chapter_confirmed
         for c in (out.get("outline") or {}).get("chapters", []):
+            c["ready"] = chapter_confirmed(c)
             for les in c["lessons"]:
                 les["files"] = [{**f, "url": sign_lesson_file(proj["id"], les["id"], f["name"])} for f in les.get("files") or []]
                 for f in les["files"]:
@@ -309,10 +312,57 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             # Before the team starts, what the teacher writes is the course description.
             proj["requirements"]["notes"] = (proj["requirements"].get("notes", "") + "\n" + body.text).strip()[:4000]
         studio().say(proj, body.text, "teacher")
+        proj["lead_thinking"] = True
         studio().projects.save(proj)
         text = body.text
-        studio().run(proj, "课程负责人正在回复…", lambda p: studio().chat(p, text))
+
+        async def answer_it():
+            try:
+                await studio().reply(pid, text)
+            finally:
+                p = studio().projects.load(pid)
+                p["lead_thinking"] = False
+                studio().projects.save(p)
+        # The course lead answers at once, in its own lane — never queued behind the team's work (round 5).
+        task = asyncio.get_running_loop().create_task(answer_it())
+        studio().__dict__.setdefault("_chat_tasks", set()).add(task)
+        task.add_done_callback(lambda t: studio().__dict__.get("_chat_tasks", set()).discard(t))
         return view(studio().projects.load(pid))
+
+    @app.post("/api/v1/studio/projects/{pid}/proposals/{prop}/confirm")
+    async def confirm_proposal(pid: str, prop: str, sess: Annotated[Session, Depends(current)], stop_first: bool = False):
+        """确认: carry out what the course lead proposed. stop_first: stop the team's current work first."""
+        await need_creator(sess)
+        load(pid, sess)
+        if stop_first and studio().is_busy(pid):
+            studio().stop(pid)
+            t = studio().tasks.get(pid)
+            if t:
+                try:
+                    await asyncio.wait_for(asyncio.shield(t), 10)
+                except (asyncio.CancelledError, asyncio.TimeoutError, Exception):  # noqa: BLE001
+                    pass
+        return view(studio().confirm_proposal(pid, prop))
+
+    @app.post("/api/v1/studio/projects/{pid}/proposals/{prop}/cancel")
+    async def cancel_proposal(pid: str, prop: str, sess: Annotated[Session, Depends(current)]):
+        load(pid, sess)
+        return view(studio().cancel_proposal(pid, prop))
+
+    @app.post("/api/v1/studio/projects/{pid}/chapters/{no}/confirm")
+    async def confirm_chapter(pid: str, no: int, sess: Annotated[Session, Depends(current)]):
+        """本章确认 (round 5, E2): this chapter's lessons may now be written."""
+        await need_creator(sess)
+        proj = load(pid, sess)
+        ch = next((c for c in (proj.get("outline") or {}).get("chapters", []) if c["no"] == no), None)
+        if not ch:
+            raise EngineError("not_found", "no such chapter", 404)
+        if proj["stage"] != "lessons":
+            raise EngineError("wrong_stage", "settle the outline first", 409)
+        ch["confirmed"] = True
+        studio().say(proj, f"第 {no} 章的课时安排确认了，可以开始写。", "system")
+        studio().projects.save(proj)
+        return view(proj)
 
     @app.post("/api/v1/studio/projects/{pid}/questions/{qid}")
     async def answer(pid: str, qid: str, body: AnswerIn, sess: Annotated[Session, Depends(current)]):
@@ -371,6 +421,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         T = lambda d: {k: str(d.get(k, "")).strip()[:300] for k in keys}  # noqa: E731
         old = {les["id"]: les for c in o["chapters"] for les in c["lessons"]}
         old_ch = {c["id"]: c for c in o["chapters"]}
+        before = {c["id"]: [(x["id"], json.dumps(x.get("title"), sort_keys=True), json.dumps(x.get("goal"), sort_keys=True))
+                            for x in c["lessons"]] for c in o["chapters"]}
         chapters = []
         for i, c in enumerate(body.chapters):
             prev = old_ch.get(c.id, {})
@@ -383,8 +435,11 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
                     continue
                 base.update(title=T(les.title), goal=T(les.goal), week=les.week, sections=les.sections)
                 lessons.append(base)
+            same = prev and before.get(prev["id"]) == [(x["id"], json.dumps(x.get("title"), sort_keys=True),
+                                                          json.dumps(x.get("goal"), sort_keys=True)) for x in lessons]
             chapters.append({"id": prev.get("id") or new_id(), "no": c.no or i + 1, "title": T(c.title),
-                             "summary": T(c.summary), "lessons": lessons})
+                             "summary": T(c.summary), "lessons": lessons,
+                             "confirmed": bool(prev.get("confirmed")) and bool(same)})
         o.update(title=T(body.title), summary=T(body.summary), chapters=chapters)
         studio().projects.save(proj)
         return view(proj)
@@ -524,7 +579,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             raise EngineError("wrong_stage", "settle the outline first", 409)
         nxt = studio().next_lesson(proj)
         if not nxt:
-            raise EngineError("all_written", "every lesson is written", 409)
+            msg = studio().nothing_to_write(proj)
+            raise EngineError("chapter_unconfirmed" if "确认" in msg else "all_written", msg, 409)
         lid = nxt[1]["id"]
         studio().run(proj, f"主讲教授正在写：{disp(nxt[1]['title'])}", lambda p: studio().write_lesson(p, lid))
         return view(studio().projects.load(pid))
@@ -533,9 +589,12 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
     async def rewrite(pid: str, lid: str, body: NoteIn, sess: Annotated[Session, Depends(current)]):
         await need_creator(sess)
         proj = load(pid, sess)
-        _, les = studio().find_lesson(proj, lid)
+        chapter, les = studio().find_lesson(proj, lid)
         if les["status"] == "published":
             raise EngineError("published", "this lesson is already in the course", 409)
+        from .lead import chapter_confirmed
+        if les["status"] in ("planned", "failed") and not chapter_confirmed(chapter):
+            raise EngineError("chapter_unconfirmed", f"第 {chapter['no']} 章的课时安排还没确认", 409)
         if body.note:
             studio().say(proj, f"请修改《{disp(les['title'])}》：{body.note}", "teacher")
         note = body.note
