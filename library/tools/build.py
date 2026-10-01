@@ -120,6 +120,16 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
             (d / (code + ".glb")).write_bytes(b_robot.glb_bytes(part))
             (d / (code + ".png")).write_bytes(png_bytes([("robot", part["world"])]))
             extra["robot"] = part["robot"]
+            if part.get("urdf"):                       # 自建机器人：URDF（第 5 轮 P9）
+                (d / (code + ".urdf")).write_text(part["urdf"], encoding="utf-8")
+                extra["urdf"] = "{}/{}.urdf".format(e["id"], code)
+            if part.get("motion"):                     # 并联机构：运动表（R5）
+                import csv
+                with open(d / "motion.csv", "w", newline="", encoding="utf-8") as f:
+                    w = csv.writer(f, lineterminator="\n")
+                    w.writerow(part["motion"][0])
+                    w.writerows(part["motion"][1])
+                extra["mechanism"] = part["mechanism"]
             nodes = [(b["name"], None) for b in part["bodies"]]
         else:
             (d / (code + ".glb")).write_bytes(glb_bytes(nodes))
@@ -135,6 +145,10 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
             if "stl" in fmts:
                 export_stl(shape, str(cd / (code + ".stl")), tolerance=LIN_TOL_MM)
         files = {"glb": "{}/{}.glb".format(e["id"], code), "png": "{}/{}.png".format(e["id"], code)}
+        if extra.get("urdf"):
+            files["urdf"] = extra.pop("urdf")
+        if extra.get("mechanism"):
+            files["motion"] = "{}/motion.csv".format(e["id"])
         return dict({"ref": wqlib.ref(e, size), "ok": True, "files": files, "s": round(time.time() - t0, 2),
                      "nodes": [n for n, _ in nodes]}, **extra)
     except Exception as ex:  # noqa: BLE001
@@ -154,6 +168,8 @@ def entry_json(e, rows, results, version):
     src = e.get("source") or {}
     if src.get("origin") == "menagerie":          # 现成机器人：完整 MJCF 与网格在原仓库（固定提交），不另存
         doc["package"] = "{}/tree/{}/{}".format(src["repo"], src["commit"], src.get("path", "").rstrip("/"))
+    elif src.get("origin") == "wenquest" and e["kind"] == "robot":   # 自建机器人：参数化生成程序（URDF、glTF 都在网页包里）
+        doc["package"] = "{}/blob/main/library/generators/b_wq.py".format(REPO)
     elif src.get("origin") == "vendor" and e["kind"] == "robot":   # 按 DH 生成的厂商机器人：没有原始模型，指向官方技术参数表
         doc["package"] = (e.get("datasheet") or {}).get("src") or (e.get("vendor") or {}).get("site")
     else:
@@ -169,6 +185,8 @@ def entry_json(e, rows, results, version):
         res = results.get(wqlib.ref(e, r["size"]))
         if res and res.get("robot"):
             doc["robot"] = dict(doc.get("robot") or {}, **res["robot"])
+        if res and res.get("mechanism"):
+            doc["mechanism"] = res["mechanism"]
     return doc
 
 

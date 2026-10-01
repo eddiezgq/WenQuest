@@ -1,0 +1,105 @@
+# B-PAR-DELTA · Delta 并联机器人（问渠）（自建，第 5 轮 P12：学习平台 R8）
+schema: 1
+id: B-PAR-DELTA
+kind: robot
+name:
+  zh: Delta 并联机器人（问渠）
+  en: Delta parallel robot (WenQuest)
+category: PAR
+tags:
+- Delta
+- 并联机器人
+- 蜘蛛手
+- 分拣
+- 自建
+- parallel
+standards: []
+params:
+- key: base_radius_m
+  zh: 静平台半径
+  en: Base radius
+  role: key
+  unit: m
+- key: platform_radius_m
+  zh: 动平台半径
+  en: Platform radius
+  role: key
+  unit: m
+- key: upper_arm_m
+  zh: 主动臂长
+  en: Upper arm length
+  role: key
+  unit: m
+- key: lower_arm_m
+  zh: 从动臂长
+  en: Lower arm length
+  role: key
+  unit: m
+- key: parallelogram_width_m
+  zh: 平行四边形宽
+  en: Parallelogram width
+  role: key
+  unit: m
+- key: rod_radius_m
+  zh: 杆半径
+  en: Rod radius
+  role: key
+  unit: m
+- key: path_radius_m
+  zh: 演示轨迹半径
+  en: Demo path radius
+  role: key
+  unit: m
+- key: path_z_m
+  zh: 演示轨迹高度
+  en: Demo path height
+  role: key
+  unit: m
+defaults:
+  base_radius_m: 0.15
+  platform_radius_m: 0.04
+  upper_arm_m: 0.22
+  lower_arm_m: 0.5
+  parallelogram_width_m: 0.06
+  rod_radius_m: 0.008
+  path_radius_m: 0.12
+  path_z_m: -0.42
+ranges:
+  upper_arm_m:
+  - 0.12
+  - 0.4
+  lower_arm_m:
+  - 0.3
+  - 0.9
+  path_z_m:
+  - -0.6
+  - -0.3
+model:
+  engine: wqrobot:delta
+  formats:
+  - glb
+  origin: 基座/车体坐标系（Z 向上）；每个连杆（构件）一个节点
+  note: 参数化自建模型：改参数可重新生成
+robot:
+  type: delta
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（参数化生成器 generators/b_wq.py）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 自建；运动学由测试核对
+teaching:
+  principle: 三条相同的支链把动平台连到静平台，每条支链的从动臂是平行四边形，所以动平台只能平移不能转动；三个电机都装在静平台上，运动部分很轻，适合高速分拣。
+  uses:
+  - 食品、药品高速分拣
+  - 包装
+  - 3D 打印
+  courses:
+  - course: 机器人技术
+    chapter: 并联机器人与逆运动学
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

@@ -1,0 +1,87 @@
+# B-SCA-WQ4 · SCARA 机器人（问渠）（自建，第 5 轮 P12：学习平台 R8）
+schema: 1
+id: B-SCA-WQ4
+kind: robot
+name:
+  zh: SCARA 机器人（问渠）
+  en: SCARA robot (WenQuest)
+category: SCA
+tags:
+- SCARA
+- 选择顺应性装配机器人
+- 平面关节机器人
+- 装配
+- 自建
+standards: []
+params:
+- key: column_height_m
+  zh: 立柱高
+  en: Column height
+  role: key
+  unit: m
+- key: arm1_m
+  zh: 大臂长
+  en: Arm 1 length
+  role: key
+  unit: m
+- key: arm2_m
+  zh: 小臂长
+  en: Arm 2 length
+  role: key
+  unit: m
+- key: stroke_m
+  zh: 丝杠行程
+  en: Z stroke
+  role: key
+  unit: m
+- key: arm_radius_m
+  zh: 臂宽（半）
+  en: Arm half-width
+  role: key
+  unit: m
+defaults:
+  column_height_m: 0.4
+  arm1_m: 0.35
+  arm2_m: 0.25
+  stroke_m: 0.15
+  arm_radius_m: 0.04
+ranges:
+  arm1_m:
+  - 0.15
+  - 0.6
+  arm2_m:
+  - 0.1
+  - 0.5
+  stroke_m:
+  - 0.05
+  - 0.3
+model:
+  engine: wqrobot:scara
+  formats:
+  - glb
+  - urdf
+  origin: 基座/车体坐标系（Z 向上）；每个连杆（构件）一个节点
+  note: 参数化自建模型：改参数可重新生成
+robot:
+  type: scara
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（参数化生成器 generators/b_wq.py）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 自建；运动学由测试核对
+teaching:
+  principle: 两个绕竖直轴的转动关节决定末端在水平面内的位置，丝杠升降、末端转动：水平方向柔顺、竖直方向刚硬，最适合平面内的快速取放和插装。
+  uses:
+  - 电子装配
+  - 取放
+  - 拧螺丝
+  courses:
+  - course: 机器人技术
+    chapter: SCARA 机器人运动学
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

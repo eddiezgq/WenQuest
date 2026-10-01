@@ -90,14 +90,17 @@
               <div v-if="entry.source.origin === 'vendor' && entry.model.note" class="small proxy-note">{{ entry.model.note }}</div>
             </div>
             <div class="viewer" ref="viewerEl">
-              <div class="v-tools" v-if="entry.robot">
-                <button class="btn ghost" type="button" @click="resetJoints('zero')">零位</button>
-                <button v-if="entry.robot.rest" class="btn ghost" type="button" @click="resetJoints('init')"
+              <div class="v-tools" v-if="entry.robot || entry.mechanism">
+                <button v-if="entry.mechanism?.motion" class="btn ghost" type="button" @click="toggleMotion"
+                  :title="entry.mechanism.input?.path?.zh || ''">{{ playing ? '停止' : '播放运动' }}</button>
+                <button v-if="entry.robot && !entry.robot.parallel" class="btn ghost" type="button" @click="resetJoints('zero')">零位</button>
+                <button v-if="entry.robot?.rest && !entry.robot.parallel" class="btn ghost" type="button" @click="resetJoints('init')"
                   :title="'取自模型的关键帧 ' + (entry.robot.rest_source || '')">初始姿态</button>
               </div>
               <div class="v-note">{{ viewNote }}</div>
             </div>
-            <div v-if="entry.robot && joints.length" class="joints">
+            <p v-if="entry.robot?.parallel" class="small muted pad-x">并联机构是闭链，只拖主动臂不能保持闭合；点“播放运动”看{{ entry.mechanism?.input?.path?.zh || '运动' }}。</p>
+            <div v-if="entry.robot && !entry.robot.parallel && joints.length" class="joints">
               <label v-for="j in joints" :key="j.name" :title="j.name">
                 <span class="jn mono">{{ j.short }}</span>
                 <input type="range" :min="j.min" :max="j.max" :step="(j.max - j.min) / 400" v-model.number="j.value" @input="applyJoint(j)">
@@ -106,9 +109,12 @@
             </div>
             <div class="actions">
               <a class="btn primary" :href="fileUrl(curSize?.files.glb)" download>glTF（米）</a>
+              <a v-if="curSize?.files.urdf" class="btn" :href="fileUrl(curSize.files.urdf)" download>URDF</a>
+              <a v-if="curSize?.files.motion" class="btn ghost" :href="fileUrl(curSize.files.motion)" download>运动表 CSV</a>
               <a v-if="!entry.robot" class="btn" :href="entry.package">STEP / STL 压缩包（整族）</a>
               <a v-else-if="entry.model.engine.startsWith('menagerie:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 MJCF（{{ originName(entry.source.origin) }}）</a>
-              <a v-else class="btn" :href="entry.package" target="_blank" rel="noopener">官方技术参数表</a>
+              <a v-else-if="entry.source.origin === 'vendor'" class="btn" :href="entry.package" target="_blank" rel="noopener">官方技术参数表</a>
+              <a v-else class="btn ghost" :href="entry.package" target="_blank" rel="noopener">生成程序</a>
               <button class="btn ghost" type="button" @click="copy(size === 'default' ? entry.id : entry.id + '/' + size)">复制编号</button>
             </div>
             <div class="tabs dtabs">
@@ -375,7 +381,43 @@ function resize() {
   const { clientWidth: w, clientHeight: h } = viewerEl.value;
   renderer.setSize(w, h); camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix();
 }
+// 运动表（R5）：每行各活动构件在机构坐标系下的位姿，按行循环播放
+const playing = ref(false);
+let motion = null, motionTimer = null;
+async function toggleMotion() {
+  if (playing.value) { stopMotion(); return; }
+  if (!model || !curSize.value?.files.motion) return;
+  if (!motion || motion.id !== entry.value.id) {
+    const text = await (await fetch(fileUrl(curSize.value.files.motion))).text();
+    const lines = text.trim().split(/\r?\n/);
+    const head = lines[0].split(',');
+    motion = { id: entry.value.id, head, rows: lines.slice(1).map((l) => l.split(',').map(Number)) };
+  }
+  const ids = [...new Set(motion.head.slice(1).map((h) => h.split('.')[0]))];
+  const nodes = Object.fromEntries(ids.map((id) => {
+    const m = entry.value.mechanism.members.find((x) => x.id === id);
+    return [id, model.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(m?.node || id))];
+  }));
+  const col = (id, k) => motion.head.indexOf(id + '.' + k);
+  let i = 0;
+  playing.value = true;
+  motionTimer = setInterval(() => {
+    const r = motion.rows[i % motion.rows.length];
+    for (const id of ids) {
+      const n = nodes[id];
+      if (!n) continue;
+      n.matrixAutoUpdate = false;
+      n.matrix.compose(new THREE.Vector3(r[col(id, 'x_m')], r[col(id, 'y_m')], r[col(id, 'z_m')]),
+        new THREE.Quaternion(r[col(id, 'qx')], r[col(id, 'qy')], r[col(id, 'qz')], r[col(id, 'qw')]), new THREE.Vector3(1, 1, 1));
+      n.matrixWorldNeedsUpdate = true;
+    }
+    viewNote.value = `运动表第 ${(i % motion.rows.length) + 1}/${motion.rows.length} 行 · 输入 ${r[0]} ${entry.value.mechanism.input?.unit || ''}`;
+    i += 1;
+  }, 80);
+}
+function stopMotion() { clearInterval(motionTimer); motionTimer = null; playing.value = false; }
 function disposeModel() {
+  stopMotion();
   if (!model) return;
   scene.remove(model);
   model.traverse((o) => { o.geometry?.dispose(); [].concat(o.material || []).forEach((m) => m.dispose()); });
@@ -532,6 +574,7 @@ dl.kv.wide { grid-template-columns: 120px minmax(0, 1fr); }
 dl.kv { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 6px 12px; margin: 0; }
 dl.kv dt { color: var(--muted); }
 dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+.pad-x { padding: 0 18px; margin: 0; }
 .proxy-note { color: var(--warn-ink); background: var(--warn-bg); border-radius: 6px; padding: 4px 8px; margin-top: 4px; }
 .dsrc { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
 .attr { margin-top: 10px; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 6px; padding: 8px 10px; font-size: 12px; }

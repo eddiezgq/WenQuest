@@ -1,0 +1,91 @@
+# B-EDU-DIFF · 差速小车（问渠）（自建，第 5 轮 P12：学习平台 R8）
+schema: 1
+id: B-EDU-DIFF
+kind: robot
+name:
+  zh: 差速小车（问渠）
+  en: Differential-drive cart (WenQuest)
+category: EDU
+tags:
+- 差速
+- 移动机器人
+- AGV
+- 轮式
+- 自建
+- differential drive
+standards: []
+params:
+- key: wheel_radius_m
+  zh: 驱动轮半径
+  en: Wheel radius
+  role: key
+  unit: m
+- key: track_m
+  zh: 轮距
+  en: Track width
+  role: key
+  unit: m
+- key: chassis_length_m
+  zh: 车体长
+  en: Chassis length
+  role: key
+  unit: m
+- key: chassis_width_m
+  zh: 车体宽
+  en: Chassis width
+  role: key
+  unit: m
+- key: chassis_height_m
+  zh: 车体高
+  en: Chassis height
+  role: key
+  unit: m
+- key: wheel_speed_rad_s
+  zh: 轮子最高转速
+  en: Max wheel speed
+  role: key
+  unit: rad/s
+defaults:
+  wheel_radius_m: 0.05
+  track_m: 0.26
+  chassis_length_m: 0.32
+  chassis_width_m: 0.22
+  chassis_height_m: 0.08
+  wheel_speed_rad_s: 20
+ranges:
+  wheel_radius_m:
+  - 0.03
+  - 0.15
+  track_m:
+  - 0.15
+  - 0.6
+model:
+  engine: wqrobot:diff_cart
+  formats:
+  - glb
+  - urdf
+  origin: 基座/车体坐标系（Z 向上）；每个连杆（构件）一个节点
+  note: 参数化自建模型：改参数可重新生成
+robot:
+  type: mobile
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（参数化生成器 generators/b_wq.py）
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 自建；运动学由测试核对
+teaching:
+  principle: 左右两个驱动轮各自调速：同速直行，异速转弯，反向原地转；后面的万向轮只起支撑。车体速度 v = r(ωR+ωL)/2，角速度 ω = r(ωR−ωL)/b。
+  uses:
+  - 车间物流 AGV（数字工厂的 AGV-01/02）
+  - 扫地机器人
+  - 教学小车
+  courses:
+  - course: 机器人技术
+    chapter: 轮式移动机器人运动学
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []
