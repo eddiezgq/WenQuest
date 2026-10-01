@@ -76,6 +76,7 @@ const nav = [
   { to: '/work/manager', label: '经营与成本', role: 'manager' },
   { to: '/3d', label: '3D 车间' },
   { to: '/design', label: '设计发布与审批' },
+  { to: '/configurator', label: '参数配置器', role: 'sales' },
 ];
 const cfg = ref({});
 const apps = computed(() => [
@@ -87,7 +88,7 @@ const apps = computed(() => [
 const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
   '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
-  '/design': '设计发布与审批', '/members': '企业成员',
+  '/design': '设计发布与审批', '/members': '企业成员', '/configurator': '参数配置器',
 }[route.path] || (route.path.startsWith('/design/') ? '设计审阅' : '')));
 const clock = ref('');
 let timer;

@@ -36,6 +36,7 @@ from hub import select as lib_select  # noqa: E402
 from hub import design as design_web  # noqa: E402
 from hub import erp_sso  # noqa: E402
 from hub import plm  # noqa: E402
+from hub import configurator  # noqa: E402
 from hub.ai import Assistant, ROLE_NAMES  # noqa: E402
 from hub.db import DB  # noqa: E402
 from hub.historian import Historian  # noqa: E402
@@ -903,6 +904,63 @@ def plm_decision(sid: str, body: dict = Body(...), u=Depends(user_of)):
             raise HTTPException(403, "只有提交人能撤回")
         return _plm_call(plm.decide, H.db, _emit_as(u), sid, s["author"], "withdrawn", note)
     raise HTTPException(400, "decision 只能是 approve / reject / withdraw")
+
+
+# 参数配置器（第 8 轮 Q6）
+@app.get("/api/configurator")
+def cfg_templates(u=Depends(user_of)):
+    return configurator.templates()
+
+
+@app.post("/api/configurator/{tid}/evaluate")
+def cfg_evaluate(tid: str, body: dict = Body(default={}), u=Depends(user_of)):
+    try:
+        return configurator.evaluate(tid, body.get("values"), int(body.get("qty") or 1))
+    except KeyError as e:
+        raise HTTPException(404, str(e).strip("'"))
+
+
+@app.post("/api/configurator/{tid}/model")
+def cfg_model(tid: str, body: dict = Body(default={}), u=Depends(user_of)):
+    """三维（glb）和图纸（SVG）：按参数缓存，同一组参数只生成一次"""
+    if tid not in configurator.TEMPLATES:
+        raise HTTPException(404, "没有这个模板")
+    key = configurator.model_key(tid, body.get("values"))
+    got = {r["name"]: r["sha256"] for r in H.db.q("select name, sha256 from stored_file where name = any(%s)",
+                                                       (["cfg-{}.glb".format(key), "cfg-{}.svg".format(key)],))}
+    if len(got) < 2:
+        try:
+            glb, svg = configurator.model(tid, body.get("values"))
+        except Exception as e:  # noqa: BLE001
+            log.exception("配置器建模失败")
+            raise HTTPException(500, "三维生成失败：{}".format(str(e)[:120]))
+        got = {"cfg-{}.glb".format(key): plm.store(H.db, "cfg-{}.glb".format(key), "model/gltf-binary", glb)["sha256"],
+               "cfg-{}.svg".format(key): plm.store(H.db, "cfg-{}.svg".format(key), "image/svg+xml", svg)["sha256"]}
+    return {"glb": "/api/files/" + got["cfg-{}.glb".format(key)], "drawing": "/api/files/" + got["cfg-{}.svg".format(key)]}
+
+
+@app.post("/api/configurator/{tid}/order")
+def cfg_order(tid: str, body: dict = Body(...), u=Depends(user_of)):
+    """按报价草拟订单：走现有“提议—确认”，确认后桥接写入 ERPNext（销售订单带报价单价）"""
+    if u["mode"] == "prod" and u["role"] not in ("sales", "planner", "manager"):
+        raise HTTPException(403, "下单要用销售、计划员或厂长角色")
+    try:
+        r = configurator.evaluate(tid, body.get("values"), int(body.get("qty") or 1))
+    except KeyError as e:
+        raise HTTPException(404, str(e).strip("'"))
+    if not r["ok"]:
+        raise HTTPException(422, "校核没通过，不能下单：" + "；".join(r["errors"]))
+    q = r["quote"]
+    try:
+        pv = mrp.plan_order(H.db, body.get("customer"), r["item"], q["qty"], body["delivery_date"], u["mode"])
+    except (KeyError, ValueError) as e:
+        raise HTTPException(400, "订单信息不完整：{}".format(e))
+    pv["sales_order"].update(rate=q["unit_price"], amount=q["total"])
+    pv["configuration"] = {"template": tid, "values": r["values"], "figures": r["figures"], "quote": q}
+    from hub.ai import _order_title
+    title = "配置器：" + _order_title(pv)
+    pid = H.ai.propose("create_order_and_plan", pv, u["mode"], u["name"], title, source="configurator/" + who(u), role=u["role"])
+    return {"proposal_id": pid, "title": title, "preview": pv}
 
 
 # 企业成员（第 8 轮 Q7）：老师授权登录过的问渠账号在生产模式使用某些角色

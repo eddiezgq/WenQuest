@@ -20,6 +20,7 @@ const routes = [
   { path: '/design', component: () => import('./pages/DesignRelease.vue') },
   { path: '/design/:id', component: () => import('./pages/DesignReview.vue') },
   { path: '/members', component: () => import('./pages/Members.vue') },
+  { path: '/configurator', component: () => import('./pages/Configurator.vue') },
   { path: '/:p(.*)*', redirect: '/' },
 ];
 

@@ -157,7 +157,7 @@ function fit() {
   bbox = new THREE.Box3().setFromObject(models.new || models.diff);
   const c = bbox.getCenter(new THREE.Vector3()), r = bboxSize();
   camera.near = r / 500; camera.far = r * 50; camera.updateProjectionMatrix();
-  camera.position.copy(c).add(new THREE.Vector3(r * 0.7, r * 0.5, r * 0.9));
+  camera.position.copy(c).add(new THREE.Vector3(r * 0.85, r * 0.6, r * 1.1));
   controls.target.copy(c);
   const s = bbox.getSize(new THREE.Vector3());
   note.value = `拖动旋转 · 滚轮缩放 · 外形 ${s.x.toFixed(1)} × ${s.y.toFixed(1)} × ${s.z.toFixed(1)} mm`;
