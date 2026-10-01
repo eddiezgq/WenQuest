@@ -32,6 +32,7 @@ from wqbus.topics import topic, unit_topic  # noqa: E402
 from factory import data as F  # noqa: E402
 from hub import kpi, mrp  # noqa: E402
 from hub import select as lib_select  # noqa: E402
+from hub import design as design_web  # noqa: E402
 from hub.ai import Assistant, ROLE_NAMES  # noqa: E402
 from hub.db import DB  # noqa: E402
 from hub.historian import Historian  # noqa: E402
@@ -674,6 +675,47 @@ def design(item: str, u=Depends(user_of)):
     gc = H.db.messages(["design.gcode"], mode=u["mode"], order="desc", limit=20)
     return {"releases": [dict(r["data"], id=r["id"], ts=r["ts"]) for r in rel if r["data"]["item"] == item],
             "gcode": [dict(r["data"], id=r["id"], ts=r["ts"]) for r in gc if r["data"]["item"] == item]}
+
+
+# 网页设计台（第 6 轮 W2、W3）：不装 FreeCAD 也能改参数、校核、发布
+def _design_item(item):
+    if item != design_web.ITEM:
+        raise HTTPException(404, "网页设计台目前只支持 {}".format(design_web.ITEM))
+
+
+@app.get("/api/design/{item}/params")
+def design_params(item: str, u=Depends(user_of)):
+    """现行参数：本模式最新发布版的参数；没发布过用工厂数据里的第 1 版"""
+    _design_item(item)
+    rel = [r for r in H.db.messages(["design.release"], mode=u["mode"], order="desc", limit=50) if r["data"]["item"] == item]
+    params = rel[0]["data"].get("params") if rel else None
+    params = design_web.normalize(params) if params else design_web.normalize(design_web.defaults())
+    return {"item": item, "revision": rel[0]["data"]["revision"] if rel else 1, "params": params,
+            "check": design_web.check(params), "limits": design_web.LIMITS}
+
+
+@app.post("/api/design/{item}/check")
+def design_check(item: str, body: dict = Body(...), u=Depends(user_of)):
+    _design_item(item)
+    try:
+        return design_web.check(design_web.normalize(body.get("params") or {}))
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@app.post("/api/design/{item}/publish")
+def design_publish(item: str, body: dict = Body(...), u=Depends(user_of)):
+    _design_item(item)
+
+    def emit(tp, type_, data):
+        msg = wqbus.make(type_, "web-cad", data, mode=u["mode"])
+        H.bus.publish_msg(tp, msg)
+        H.hist.handle(tp, msg)
+    try:
+        params = design_web.normalize(body.get("params") or {})
+        return design_web.publish(H.db, emit, params, who(u), u["mode"], (body.get("change_note") or "").strip()[:200])
+    except ValueError as e:
+        raise HTTPException(422, str(e))
 
 
 # ---------------------------------------------------------------- 教学

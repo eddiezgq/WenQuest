@@ -175,6 +175,17 @@ def main():
     alerts = hub("GET", "/api/overview", token=eng)["alerts"]
     check(any("设计改版" in a["title"] for a in alerts), "AI 提醒了设计改版的影响")
 
+    print("4b. 网页设计台在线发布（第 6 轮 W3：不装 FreeCAD，服务器出 STEP）")
+    p = hub("GET", "/api/design/SH-301/params", token=eng)
+    check(p["revision"] == res["revision"] and p["params"]["keyway"]["L"] == 42, "设计台读到现行参数 rev {}".format(p["revision"]))
+    bad = dict(p["params"], keyway=dict(p["params"]["keyway"], L=70))
+    check(not hub("POST", "/api/design/SH-301/check", {"params": bad}, eng)["ok"], "键槽超长校核不通过")
+    web = hub("POST", "/api/design/SH-301/publish", {"params": dict(p["params"], keyway=dict(p["params"]["keyway"], L=40)),
+                                                     "change_note": "网页设计台：键槽长 42 → 40 mm"}, eng)
+    check(web["revision"] == res["revision"] + 1 and web["step"], "在线发布 rev {}，带 STEP".format(web["revision"]))
+    wait(lambda: any(d["name"] == "SH-301" and d.get("wq_revision") == web["revision"]
+                     for d in erp_docs("Item")), "ERPNext 物料版本随在线发布更新", 30, 1)
+
     print("5. 任务 4：下达车间，操作工逐道开工（仿真倍速 {:g}）".format(A.speed))
     hub("POST", "/api/mes/cmd", {"unit": "sim", "command": "set_speed", "speed": A.speed}, teacher)
     op = login(student, "operator")
