@@ -57,6 +57,13 @@ jobs:
           ver="$m.$(( ${n:--1} + 1 ))"
           echo "VER=$ver" >> "$GITHUB_ENV"
           echo "版本 $ver"
+          # 一开始就把版本标签建好：GitHub 不许自动部署的令牌给“工作流文件与 main 最新提交不同”的提交建标签，
+          # 生成要 20 分钟，期间别人推送改了 .github/workflows 就会在发布时被拒（2026-10-01 两次 403）
+          if ! gh api -X POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/library-v$ver" -f sha="$GITHUB_SHA" > /tmp/tag.log 2>&1; then
+            cat /tmp/tag.log
+            echo "::error title=建版本标签失败::main 上已有更新的提交改了工作流文件，本次不发布；下一次推送 library/ 会自动发布包含本次改动的版本。"
+            exit 1
+          fi
       - name: 生成全部模型
         run: |
           set +e
@@ -88,12 +95,12 @@ jobs:
           PY
           # 上传偶尔会被 GitHub 断开：失败时删掉半成品再试，最多 3 次；仍失败把出错信息发成注释
           for i in 1 2 3; do
-            if gh release create "library-v$VER" --target "$GITHUB_SHA" --title "零件库 $VER" --notes-file notes.md \
+            if gh release create "library-v$VER" --verify-tag --title "零件库 $VER" --notes-file notes.md \
                 "library-web-$VER.tar.gz" "index-$VER.json" packages/*.zip > /tmp/release.log 2>&1; then
               cat /tmp/release.log; exit 0
             fi
             cat /tmp/release.log
-            gh release delete "library-v$VER" --yes --cleanup-tag >/dev/null 2>&1 || true
+            gh release delete "library-v$VER" --yes >/dev/null 2>&1 || true          # 标签留着（重建要受上面的限制）
             sleep 20
           done
           ls -la "library-web-$VER.tar.gz" packages | tail -n 20 >> /tmp/release.log
