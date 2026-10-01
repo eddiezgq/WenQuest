@@ -63,6 +63,27 @@ def labkit():
     return _LABKIT
 
 
+_MODELS: dict = {}
+
+
+def book_models(book: dict) -> dict:
+    """The library models copied into the book (textbook/<book>/models/<id>/entry.json + default.glb), in the form the
+    lab kit embeds for 3D labs: {id: {entry (normalised like the platform does), glb (base64), motion}}."""
+    key = str(book["root"])
+    if key not in _MODELS:
+        import base64
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("wq_library", ROOT / "services" / "gateway" / "app" / "library.py")
+        lib = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(lib)
+        out = {}
+        for d in sorted((book["root"] / "models").glob("*/entry.json")):
+            entry = lib.normalize_entry(json.loads(d.read_text(encoding="utf-8")))
+            out[d.parent.name] = {"entry": entry, "glb": base64.b64encode((d.parent / "default.glb").read_bytes()).decode(), "motion": []}
+        _MODELS[key] = out
+    return _MODELS[key]
+
+
 def trial_labs(page_html: str, ids: list[str], rep: "Report", where: str) -> None:
     """Run every lab's tasks in headless Chromium with the lab checker's own code (services/labcheck)."""
     import asyncio
@@ -196,6 +217,7 @@ def run_programs(book: dict, chapters: set[int], rep: Report) -> dict[str, dict]
     for ch in sorted(chapters):
         code = book["root"] / f"ch{ch:02d}" / "code"
         shared = b"".join(p.read_bytes() for p in sorted(code.glob("_*.py")))   # helper modules (not run themselves)
+        shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "models").glob("*/*")))   # library models the programs read
         for prog in sorted(p for p in code.glob("*.py") if not p.name.startswith("_")):
             where = str(prog.relative_to(book["root"].parent))
             digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes()).hexdigest()[:16]
@@ -642,7 +664,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         if not items:
             continue
         page_html = labkit().page(items, course=[book["title"], book.get("title_en", "")], chapter=[f"第{ch}章", f"Chapter {ch}"],
-                                  key=f"wq-book-{book_name}")
+                                  key=f"wq-book-{book_name}", models=book_models(book))
         (lab_dir / f"ch{ch:02d}.html").write_text(page_html, encoding="utf-8")
         index["labs"][str(ch)] = [no for no, _ in items]
         for sec in secs:      # 实验指导书与报告模板 (第 7 轮第 4 步补充)

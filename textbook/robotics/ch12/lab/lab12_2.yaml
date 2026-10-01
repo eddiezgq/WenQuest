@@ -1,0 +1,28 @@
+# 实验 12.2 的指导书与报告模板。目的、场景、参数、任务取自 lab12_2.js。
+原理:
+  - ["指数积公式的空间形式：从零位出发，想象先转最外面的关节 n，再转关节 n − 1，……最后转关节 1。每转一个关节，它以内的连杆都还没动，所以它的轴仍在零位时的位置。",
+     "Space form: from home, imagine turning the outermost joint first, then the next one in, and joint 1 last. When a joint turns, the links inside it have not moved, so its axis is still where it was at home."]
+  - 式: "T = e^[S₁]θ₁ e^[S₂]θ₂ ⋯ e^[Sₙ]θₙ M          (12.2.3)"
+  - ["把 M 搬到左边，各旋量轴换成在零位末端坐标系 {b} 中的表示 B_i = [Ad_{M⁻¹}] S_i，得到物体形式：", "Moving M to the left and expressing the axes in the home tool frame {b}, B_i = [Ad_{M⁻¹}] S_i, gives the body form:"]
+  - 式: "T = M e^[B₁]θ₁ e^[B₂]θ₂ ⋯ e^[Bₙ]θₙ          (12.2.5)"
+  - ["平面 3R 臂（L₁ = 0.425 m，L₂ = 0.392 m，L₃ = 0.1 m）可以用几何方法核对：x = L₁cos θ₁ + L₂cos(θ₁ + θ₂) + L₃cos(θ₁ + θ₂ + θ₃)，y 同理。",
+     "For the planar 3R arm (L₁ = 0.425 m, L₂ = 0.392 m, L₃ = 0.1 m) geometry gives a check: x = L₁cos θ₁ + L₂cos(θ₁ + θ₂) + L₃cos(θ₁ + θ₂ + θ₃), and likewise y."]
+步骤:
+  - ["打开实验 12.2，场景“平面 3R 臂”。设 θ = (30°, 45°, −90°)，公式选 0（空间形式），读出末端位置和朝向（任务 1），与算例 12.2.1 比较。",
+     "Open Lab 12.2, scene “Planar 3R arm”. Set θ = (30°, 45°, −90°), formula 0 (space form); read the tip position and direction (task 1) and compare with Example 12.2.1."]
+  - ["公式改为 1（物体形式），读数应不变（任务 2）。", "Switch to formula 1 (body form): the reading is unchanged (task 2)."]
+  - ["公式改回 0，按“逐步演示”（任务 3）。每一步红圈标出下一步要绕的点，记录每一步后的末端位置，填入表 1。", "Back to formula 0, press “Step through” (task 3). The red ring marks the next pivot; record the tip after each step in Table 1."]
+  - ["公式改为 1，再逐步演示一次，记录每一步后的末端，比较两种形式的中间过程有何不同、最终结果是否相同。", "With formula 1, step through again; compare the intermediate steps of the two forms and their final results."]
+  - ["自选两组关节角，分别用指数积和几何方法计算末端，记入表 2。", "Choose two sets of angles; compute the tip with the PoE and with geometry; record in Table 2."]
+数据表:
+  - 标题: ["表 1  逐步演示（θ = 30°, 45°, −90°）", "Table 1  Step by step (θ = 30°, 45°, −90°)"]
+    表头: ["步", "空间形式：作用的指数", "空间形式：末端 / m", "物体形式：作用的指数", "物体形式：末端 / m"]
+    行: [["1", "e^[S₃]θ₃", "", "e^[B₁]θ₁", ""], ["2", "e^[S₂]θ₂", "", "e^[B₂]θ₂", ""], ["3", "e^[S₁]θ₁", "", "e^[B₃]θ₃", ""]]
+  - 标题: ["表 2  指数积与几何方法", "Table 2  PoE vs geometry"]
+    表头: ["θ₁, θ₂, θ₃ / °", "指数积：x, y / m", "几何：x, y / m", "末端朝向 / °"]
+    行: [["30, 45, −90", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["空间形式的中间步骤并不是机器人真实运动的过程，只是计算的次序；最终形态才有物理意义。", "The intermediate steps are an order of calculation, not the robot's real motion; only the final configuration is physical."]
+  - ["读数中“与几何解法之差”应为 0（显示为 0.000）。", "“vs. geometry” should read 0 (0.000)."]
+思考题:
+  - ["换一把更长的工具（L₃ 变大），空间形式和物体形式各要改哪些量？", "With a longer tool (larger L₃), what changes in the space form and in the body form?"]

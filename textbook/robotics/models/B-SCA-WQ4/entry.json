@@ -1,0 +1,304 @@
+{
+ "schema": 1,
+ "id": "B-SCA-WQ4",
+ "kind": "robot",
+ "name": {
+  "zh": "SCARA 机器人（问渠）",
+  "en": "SCARA robot (WenQuest)"
+ },
+ "category": "SCA",
+ "tags": [
+  "SCARA",
+  "选择顺应性装配机器人",
+  "平面关节机器人",
+  "装配",
+  "自建"
+ ],
+ "standards": [],
+ "params": [
+  {
+   "key": "column_height_m",
+   "zh": "立柱高",
+   "en": "Column height",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "arm1_m",
+   "zh": "大臂长",
+   "en": "Arm 1 length",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "arm2_m",
+   "zh": "小臂长",
+   "en": "Arm 2 length",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "stroke_m",
+   "zh": "丝杠行程",
+   "en": "Z stroke",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "arm_radius_m",
+   "zh": "臂宽（半）",
+   "en": "Arm half-width",
+   "role": "key",
+   "unit": "m"
+  }
+ ],
+ "defaults": {
+  "column_height_m": 0.4,
+  "arm1_m": 0.35,
+  "arm2_m": 0.25,
+  "stroke_m": 0.15,
+  "arm_radius_m": 0.04
+ },
+ "ranges": {
+  "arm1_m": [
+   0.15,
+   0.6
+  ],
+  "arm2_m": [
+   0.1,
+   0.5
+  ],
+  "stroke_m": [
+   0.05,
+   0.3
+  ]
+ },
+ "model": {
+  "engine": "wqrobot:scara",
+  "formats": [
+   "glb",
+   "urdf"
+  ],
+  "origin": "基座/车体坐标系（Z 向上）；每个连杆（构件）一个节点",
+  "note": "参数化自建模型：改参数可重新生成"
+ },
+ "robot": {
+  "type": "scara",
+  "dof": 4,
+  "links": [
+   {
+    "name": "base",
+    "node": "base",
+    "mass_kg": null
+   },
+   {
+    "name": "arm1",
+    "node": "arm1",
+    "mass_kg": null
+   },
+   {
+    "name": "arm2",
+    "node": "arm2",
+    "mass_kg": null
+   },
+   {
+    "name": "quill",
+    "node": "quill",
+    "mass_kg": null
+   },
+   {
+    "name": "tool",
+    "node": "tool",
+    "mass_kg": null
+   }
+  ],
+  "joints": [
+   {
+    "name": "J1",
+    "type": "revolute",
+    "parent": "base",
+    "child": "arm1",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.4
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.443461,
+     "upper": 2.443461,
+     "velocity": 7.330383
+    }
+   },
+   {
+    "name": "J2",
+    "type": "revolute",
+    "parent": "arm1",
+    "child": "arm2",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.35,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.530727,
+     "upper": 2.530727,
+     "velocity": 12.566371
+    }
+   },
+   {
+    "name": "J3",
+    "type": "prismatic",
+    "parent": "arm2",
+    "child": "quill",
+    "axis": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.25,
+      0.0,
+      0.048
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": 0.0,
+     "upper": 0.15,
+     "velocity": 1.1
+    }
+   },
+   {
+    "name": "J4",
+    "type": "revolute",
+    "parent": "quill",
+    "child": "tool",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      -0.206
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -6.283185,
+     "upper": 6.283185,
+     "velocity": 34.906585
+    }
+   }
+  ],
+  "rest": {
+   "J1": 0.0,
+   "J2": 1.047198,
+   "J3": 0.075,
+   "J4": 0.0
+  },
+  "rest_source": "问渠默认姿态（肘部 60°、丝杠中位）",
+  "tool": {
+   "parent": "tool",
+   "xyz": [
+    0,
+    0,
+    -0.05
+   ]
+  },
+  "kinematics": {
+   "type": "scara",
+   "arm1_m": 0.35,
+   "arm2_m": 0.25,
+   "column_height_m": 0.4,
+   "stroke_m": 0.15,
+   "workspace": {
+    "r_min_m": 0.1,
+    "r_max_m": 0.6
+   }
+  }
+ },
+ "source": {
+  "origin": "wenquest",
+  "license": "Apache-2.0",
+  "attribution": "问渠零件库（参数化生成器 generators/b_wq.py）",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-09-30",
+   "note": "自建；运动学由测试核对"
+  }
+ },
+ "teaching": {
+  "principle": "两个绕竖直轴的转动关节决定末端在水平面内的位置，丝杠升降、末端转动：水平方向柔顺、竖直方向刚硬，最适合平面内的快速取放和插装。",
+  "uses": [
+   "电子装配",
+   "取放",
+   "拧螺丝"
+  ],
+  "courses": [
+   {
+    "course": "机器人技术",
+    "chapter": "SCARA 机器人运动学"
+   }
+  ],
+  "labs": []
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "version": "2026.10.9",
+ "package": "https://github.com/eddiezgq/WenQuest/blob/main/library/generators/b_wq.py",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {
+    "column_height_m": 0.4,
+    "arm1_m": 0.35,
+    "arm2_m": 0.25,
+    "stroke_m": 0.15,
+    "arm_radius_m": 0.04
+   },
+   "files": {
+    "glb": "B-SCA-WQ4/default.glb",
+    "png": "B-SCA-WQ4/default.png",
+    "urdf": "B-SCA-WQ4/default.urdf"
+   }
+  }
+ ]
+}

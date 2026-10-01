@@ -1,0 +1,521 @@
+{
+ "schema": 1,
+ "id": "B-ARM-PANDA",
+ "kind": "robot",
+ "name": {
+  "zh": "Franka Emika Panda 机械臂",
+  "en": "Franka Emika Panda"
+ },
+ "category": "ARM",
+ "tags": [
+  "机械臂",
+  "arm",
+  "franka",
+  "Franka Robotics",
+  "Franka Emika Robot（Panda）"
+ ],
+ "standards": [],
+ "params": [],
+ "defaults": {},
+ "model": {
+  "engine": "menagerie:franka_emika_panda/panda.xml",
+  "formats": [
+   "mjcf",
+   "glb"
+  ],
+  "origin": "MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名",
+  "note": "网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取"
+ },
+ "robot": {
+  "type": "arm",
+  "links": [
+   {
+    "name": "link0",
+    "node": "link0",
+    "mass_kg": 0.6298
+   },
+   {
+    "name": "link1",
+    "node": "link1",
+    "mass_kg": 4.9707
+   },
+   {
+    "name": "link2",
+    "node": "link2",
+    "mass_kg": 0.6469
+   },
+   {
+    "name": "link3",
+    "node": "link3",
+    "mass_kg": 3.2286
+   },
+   {
+    "name": "link4",
+    "node": "link4",
+    "mass_kg": 3.5879
+   },
+   {
+    "name": "link5",
+    "node": "link5",
+    "mass_kg": 1.2259
+   },
+   {
+    "name": "link6",
+    "node": "link6",
+    "mass_kg": 1.6666
+   },
+   {
+    "name": "link7",
+    "node": "link7",
+    "mass_kg": 0.7355
+   },
+   {
+    "name": "hand",
+    "node": "hand",
+    "mass_kg": 0.73
+   },
+   {
+    "name": "left_finger",
+    "node": "left_finger",
+    "mass_kg": 0.015
+   },
+   {
+    "name": "right_finger",
+    "node": "right_finger",
+    "mass_kg": 0.015
+   }
+  ],
+  "joints": [
+   {
+    "name": "joint1",
+    "type": "revolute",
+    "parent": "link0",
+    "child": "link1",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.333
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.8973,
+     "upper": 2.8973
+    }
+   },
+   {
+    "name": "joint2",
+    "type": "revolute",
+    "parent": "link1",
+    "child": "link2",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      -1.570796,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -1.7628,
+     "upper": 1.7628
+    }
+   },
+   {
+    "name": "joint3",
+    "type": "revolute",
+    "parent": "link2",
+    "child": "link3",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      -0.316,
+      0.0
+     ],
+     "rpy": [
+      1.570796,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.8973,
+     "upper": 2.8973
+    }
+   },
+   {
+    "name": "joint4",
+    "type": "revolute",
+    "parent": "link3",
+    "child": "link4",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0825,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      1.570796,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -3.0718,
+     "upper": -0.0698
+    }
+   },
+   {
+    "name": "joint5",
+    "type": "revolute",
+    "parent": "link4",
+    "child": "link5",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.0825,
+      0.384,
+      0.0
+     ],
+     "rpy": [
+      -1.570796,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.8973,
+     "upper": 2.8973
+    }
+   },
+   {
+    "name": "joint6",
+    "type": "revolute",
+    "parent": "link5",
+    "child": "link6",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      1.570796,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -0.0175,
+     "upper": 3.7525
+    }
+   },
+   {
+    "name": "joint7",
+    "type": "revolute",
+    "parent": "link6",
+    "child": "link7",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.088,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      1.570796,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.8973,
+     "upper": 2.8973
+    }
+   },
+   {
+    "name": "finger_joint1",
+    "type": "prismatic",
+    "parent": "hand",
+    "child": "left_finger",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.0584
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": 0.0,
+     "upper": 0.04
+    }
+   },
+   {
+    "name": "finger_joint2",
+    "type": "prismatic",
+    "parent": "hand",
+    "child": "right_finger",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.0584
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      3.141593
+     ]
+    },
+    "limit": {
+     "lower": 0.0,
+     "upper": 0.04
+    }
+   }
+  ],
+  "dof": 9,
+  "rest": {
+   "joint1": 0.0,
+   "joint2": 0.0,
+   "joint3": 0.0,
+   "joint4": -1.57079,
+   "joint5": 0.0,
+   "joint6": 1.57079,
+   "joint7": -0.7853,
+   "finger_joint1": 0.04,
+   "finger_joint2": 0.04
+  },
+  "rest_source": "home"
+ },
+ "source": {
+  "origin": "menagerie",
+  "repo": "https://github.com/google-deepmind/mujoco_menagerie",
+  "commit": "4d038b3feae26ec82b46a4d586379114012a8ac7",
+  "path": "franka_emika_panda/",
+  "license": "Apache-2.0",
+  "attribution": "MuJoCo Menagerie（Google DeepMind）· franka_emika_panda；Apache-2.0；Apache License",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-09-30",
+   "note": "按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）"
+  },
+  "data_sources": [
+   {
+    "title": "Franka Emika DATA SHEET — ROBOT ARM & CONTROL（Release Version: April 2020，© 2020 Franka Emika；即 Panda 一代机型的官方存档数据表）",
+    "url": "https://download.franka.de/Datasheet-EN.pdf",
+    "retrieved": "2026-10-01",
+    "note": "第 1 页"
+   }
+  ]
+ },
+ "teaching": {
+  "principle": "多个转动关节串联：前几个关节主要决定末端位置，腕部关节决定姿态。",
+  "uses": [
+   "装配",
+   "上下料",
+   "人机协作"
+  ],
+  "courses": [
+   {
+    "course": "机器人技术",
+    "chapter": "串联机械臂正运动学"
+   },
+   {
+    "course": "机器人技术",
+    "chapter": "逆运动学与轨迹规划"
+   }
+  ],
+  "labs": [
+   "拖动关节看末端轨迹",
+   "正逆运动学虚拟实验"
+  ]
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "datasheet": {
+  "vendor": "Franka Robotics",
+  "model": "Franka Emika Robot（Panda）",
+  "values": {
+   "payload_kg": 3,
+   "reach_mm": 855,
+   "dof": 7,
+   "repeatability_mm": 0.1,
+   "tcp_speed_m_s": 2
+  },
+  "labels": {
+   "payload_kg": {
+    "zh": "额定负载",
+    "en": "Payload",
+    "unit": "kg"
+   },
+   "reach_mm": {
+    "zh": "工作半径",
+    "en": "Reach",
+    "unit": "mm"
+   },
+   "dof": {
+    "zh": "自由度",
+    "en": "DOF",
+    "unit": ""
+   },
+   "repeatability_mm": {
+    "zh": "重复定位精度 ±",
+    "en": "Pose repeatability ±",
+    "unit": "mm"
+   },
+   "tcp_speed_m_s": {
+    "zh": "末端最大速度",
+    "en": "TCP speed",
+    "unit": "m/s"
+   }
+  },
+  "src": "https://download.franka.de/Datasheet-EN.pdf",
+  "note": "已停产；用官方下载站 download.franka.de 的 2020-04 版数据表。该文档未出现 \"Panda\" 字样，抬头为 \"ROBOT ARM & CONTROL\"、© 2020 Franka Emika，按发布时间与参数判定为 Panda 一代（FR3 之前的唯一机型），如需确证请抽查。Payload 3 kg、Maximum reach 855 mm（未写参考点）、Pose repeatability \"<+/- 0.1 mm (ISO 9283)\"、Cartesian \"up to 2 m/s end effector speed\"，多次读取一致。关节范围原文 \"A1, A3, A5, A7: -166°/166° | A2: -101°/101° | A4: -176°/-4° | A6: -1°/215°\"；关节速度 \"A1, A2, A3, A4: 150°/s | A5, A6, A7: 180°/s\"。重量与 IP 留空：三次读取结果不一致——一次读成 Weight ~12.8 kg、IP30；逐行照抄时 12.8 kg 的行名是 \"Moving mass\"（运动质量，不是本体重量）；按词逐项列出时另有 \"Weight ~ 17.8 kg\" 与 \"Protection rating IP30\"，但所属栏目被读成 \"ARM & CONTROL\"，CONTROL 栏另有 Weight ~7 kg、IP20。PDF 为双栏排版，无法确定 17.8 kg / IP30 是本体还是含控制柜，故不收。Path deviation <+/- 1.25 mm（未收）。控制柜 Power consumption ~80 W（非本体，未收）。",
+  "axes": [
+   {
+    "axis": 1,
+    "range_deg": [
+     -166,
+     166
+    ],
+    "speed_deg_s": 150
+   },
+   {
+    "axis": 2,
+    "range_deg": [
+     -101,
+     101
+    ],
+    "speed_deg_s": 150
+   },
+   {
+    "axis": 3,
+    "range_deg": [
+     -166,
+     166
+    ],
+    "speed_deg_s": 150
+   },
+   {
+    "axis": 4,
+    "range_deg": [
+     -176,
+     -4
+    ],
+    "speed_deg_s": 150
+   },
+   {
+    "axis": 5,
+    "range_deg": [
+     -166,
+     166
+    ],
+    "speed_deg_s": 180
+   },
+   {
+    "axis": 6,
+    "range_deg": [
+     -1,
+     215
+    ],
+    "speed_deg_s": 180
+   },
+   {
+    "axis": 7,
+    "range_deg": [
+     -166,
+     166
+    ],
+    "speed_deg_s": 180
+   }
+  ]
+ },
+ "vendor": {
+  "id": "FRANKA",
+  "name": {
+   "zh": "Franka Robotics",
+   "en": "Franka Robotics"
+  },
+  "site": "https://franka.de",
+  "model": "Franka Emika Robot（Panda）"
+ },
+ "alt_models": [
+  {
+   "format": "urdf",
+   "url": "https://github.com/Gepetto/example-robot-data/blob/d0d9098d752014aec3725b07766962acf06c5418/robots/panda_description/urdf/panda.urdf",
+   "license": "Apache-2.0",
+   "via": "robot_descriptions/panda_description"
+  }
+ ],
+ "version": "2026.10.9",
+ "package": "https://github.com/google-deepmind/mujoco_menagerie/tree/4d038b3feae26ec82b46a4d586379114012a8ac7/franka_emika_panda",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {},
+   "files": {
+    "glb": "B-ARM-PANDA/default.glb",
+    "png": "B-ARM-PANDA/default.png"
+   }
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+# 实验 12.1 的指导书与报告模板。目的、场景、参数、任务取自 lab12_1.js。
+原理:
+  - ["只转动一个关节 i、其余关节保持为零时，关节 i 以外的部分作为一个刚体，绕关节 i 的轴转过 θ。轴由方向 ω̂ 和轴上一点 q 确定，末端上每一点按 p′ = q + R(p − q) 运动，R = e^[ω̂]θ。",
+     "When only joint i turns, everything beyond it turns as one rigid body about the joint axis, given by its direction ω̂ and a point q on it: p′ = q + R(p − q), R = e^[ω̂]θ."]
+  - 式: "T = [R  (I − R)q;  0  1] M          (12.1.2)"
+  - ["因此末端在一个圆上运动：圆心在轴上，圆所在的平面垂直于轴，半径等于末端到轴的距离。末端恰好在轴上时，它不动。",
+     "The tool therefore moves on a circle centred on the axis, in a plane perpendicular to it, with radius equal to its distance from the axis. A point on the axis does not move."]
+  - ["把轴写成旋量轴 S = (ω̂, −ω̂ × q)（式 (12.1.3)）。UR5e 的六个旋量轴见表 12.1.1，零位时法兰盘中心位于 (−0.817, −0.234, 0.063) m。",
+     "The axis is written as the screw axis S = (ω̂, −ω̂ × q) (Eq. (12.1.3)). Table 12.1.1 lists the six for the UR5e; at home the flange centre is at (−0.817, −0.234, 0.063) m."]
+步骤:
+  - ["打开实验 12.1。所有滑块为 0 时机器人处于零位：手臂沿 −x 方向水平伸出。读出法兰盘中心坐标，与表 12.1.1 下方的 M 比较，记入表 1。",
+     "Open Lab 12.1. With every slider at 0 the robot is at home, the arm stretched horizontally along −x. Read the flange centre and compare with M below Table 12.1.1; record in Table 1."]
+  - ["只拖动关节 1，从 0° 到 90°（任务 1）。观察橙色轨迹：末端在哪个平面内、绕哪根轴运动？记录 90° 时的坐标和“到关节 1 轴的距离”，验证距离不变。",
+     "Drag only joint 1 from 0° to 90° (task 1). In which plane and about which axis does the tool move? Record the coordinates at 90° and confirm the distance from the joint-1 axis is unchanged."]
+  - ["按“清除轨迹”，把关节 1 回到 0，只拖动关节 6（任务 2）。记录法兰盘中心坐标，解释它为什么不变。",
+     "Clear the trace, return joint 1 to 0, and drag only joint 6 (task 2). Record the flange centre and explain why it stays put."]
+  - ["把关节 6 回到 0，只把关节 2 转到 −90°（任务 3），手臂竖直向上。读出末端高度，用 H₁ + L₁ + L₂ 手算核对。",
+     "Return joint 6 to 0 and turn only joint 2 to −90° (task 3); the arm points straight up. Check the height against H₁ + L₁ + L₂."]
+  - ["切换到场景“只用关节 2、3、4”，分别拖动这三个关节，观察三根平行轴使手臂只在一个竖直平面内运动。",
+     "Switch to “Joints 2, 3, 4 only” and drag them in turn: the three parallel axes keep the arm in one vertical plane."]
+数据表:
+  - 标题: ["表 1  只转动一个关节时的法兰盘中心", "Table 1  Flange centre when one joint turns"]
+    表头: ["转动的关节与角度", "x / m", "y / m", "z / m", "到关节 1 轴的距离 / m", "手算值或说明"]
+    行: [["零位", "", "", "", "", "M 的第四列"], ["关节 1 = 90°", "", "", "", "", ""], ["关节 6 = 60°", "", "", "", "", ""], ["关节 2 = −90°", "", "", "", "", "z = H₁ + L₁ + L₂"]]
+注意:
+  - ["界面读数以机器人基座坐标系 {s} 表示，与表 12.1.1 相同；三维视图中的坐标轴（红 x、绿 y、蓝 z）画的就是 {s}。", "Readings are in the base frame {s}, as in Table 12.1.1; the axes drawn in the view (red x, green y, blue z) are {s}."]
+  - ["关节角的正方向按右手定则与图中金色箭头（关节轴正方向）一致。", "Positive joint angles follow the right-hand rule about the gold arrows (positive axis directions)."]
+  - ["用鼠标拖动可以旋转视角，不影响读数。", "Dragging with the mouse rotates the view without changing any reading."]
+思考题:
+  - ["把关节 2 转到 −90° 后，关节 1 的轴与手臂在同一条竖直线上吗？此时只转关节 1，末端怎样运动？", "With joint 2 at −90°, is the arm on joint 1's axis? How does the tool move if only joint 1 turns now?"]

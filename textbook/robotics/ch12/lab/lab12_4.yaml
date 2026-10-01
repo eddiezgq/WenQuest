@@ -1,0 +1,27 @@
+# 实验 12.4 的指导书与报告模板。目的、场景、参数、任务取自 lab12_4.js。
+原理:
+  - ["指数积 e^[S₁]θ₁ e^[S₂]θ₂ e^[S₃]θ₃ M 有两种正确的读法。从右往左（从外往里）：先转关节 3，各轴都在零位时的位置。从左往右（从里往外）：先转关节 1，然后把外侧各关节的轴搬到新位置，再转关节 2，依此类推。",
+     "The product e^[S₁]θ₁ e^[S₂]θ₂ e^[S₃]θ₃ M has two correct readings. Right to left (outside-in): joint 3 first, every axis at home. Left to right (inside-out): joint 1 first, then move the outer axes to their new places, then joint 2, and so on."]
+  - 式: "e^[S₁]θ₁ e^[S₂]θ₂ = e^[S₂′]θ₂ e^[S₁]θ₁，  S₂′ = [Ad_E₁] S₂          （定理 12.4.1）"
+  - ["写反次序 e^[S₃]θ₃ e^[S₂]θ₂ e^[S₁]θ₁ M 是错误的：先绕 q₁ 转动以后，关节 2 已经不在零位处，再绕零位的 q₂ 转，就是绕空中的一点转。算出的末端可能落到工作空间（半径 L₁ + L₂ + L₃ = 0.917 m 的圆）以外。",
+     "The reversed product e^[S₃]θ₃ e^[S₂]θ₂ e^[S₁]θ₁ M is wrong: after turning about q₁, joint 2 is no longer at its home position, so turning about the home q₂ pivots about empty space. The computed tip may land outside the workspace (radius L₁ + L₂ + L₃ = 0.917 m)."]
+步骤:
+  - ["打开实验 12.4。设 θ = (30°, 45°, −90°)，读法选 1（从里往外），按“逐步演示”（任务 1）。第一步后记下关节 2 的中心，与 (L₁cos 30°, L₁sin 30°) 比较。",
+     "Open Lab 12.4. Set θ = (30°, 45°, −90°), reading 1 (inside-out), press “Step through” (task 1). After step 1 note joint 2's centre and compare with (L₁cos 30°, L₁sin 30°)."]
+  - ["读法选 0（从外往里），再演示一遍（任务 2）。比较两种读法每一步红圈的位置：一种总在零位处，一种跟着手臂走。演示结束后对照“另一种读法的末端”。",
+     "Reading 0 (outside-in), step through again (task 2). Compare where the red ring sits in each step: always at home in one reading, moving with the arm in the other. Compare with “tip by the other reading”."]
+  - ["读法选 2（写反次序），观察末端（红点）与工作空间边界（虚线圆）的关系；改变关节角，找出使末端离原点超过 0.917 m 的一组（任务 3），记入表 2。",
+     "Reading 2 (reversed): watch the tip (red) against the workspace boundary (dashed circle); change the angles until the tip is more than 0.917 m from the origin (task 3); record in Table 2."]
+  - ["再找一组关节角，使写反次序算出的末端仍在工作空间以内。说明为什么不能只靠“是否在工作空间内”判断程序是否正确。", "Find angles for which the reversed result still lies inside the workspace. Explain why “inside the workspace” cannot prove a program correct."]
+数据表:
+  - 标题: ["表 1  两种正确读法（θ = 30°, 45°, −90°）", "Table 1  The two correct readings (θ = 30°, 45°, −90°)"]
+    表头: ["读法", "第 1 步绕的点", "第 1 步后关节 2 的中心 / m", "最终末端 / m"]
+    行: [["从外往里（0）", "q₃（零位）", "", ""], ["从里往外（1）", "q₁", "", ""]]
+  - 标题: ["表 2  写反次序（读法 2）", "Table 2  Reversed order (reading 2)"]
+    表头: ["θ₁, θ₂, θ₃ / °", "算出的末端 / m", "到原点的距离 / m", "正确的末端 / m"]
+    行: [["30, 45, −90", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["写反次序时界面只画末端一段：错误公式只给出 M 被搬到哪里，手臂其余部分没有意义。", "In the reversed reading only the last link is drawn: the wrong formula only says where M goes."]
+  - ["演示进行中拖动滑块会重新开始。", "Dragging a slider during the demonstration restarts it."]
+思考题:
+  - ["θ₁ = 0 时，写反次序还会出错吗？为什么？", "With θ₁ = 0, is the reversed order still wrong? Why?"]

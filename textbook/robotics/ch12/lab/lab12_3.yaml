@@ -1,0 +1,28 @@
+# 实验 12.3 的指导书与报告模板。目的、场景、参数、任务取自 lab12_3.js。
+原理:
+  - ["UR5e 的正运动学用表 12.1.1 的六个旋量轴和零位位姿 M 代入指数积公式；SCARA 用表 12.3.2，其中第 3 个关节是移动关节，旋量轴为 (0, v)，关节变量是下降的距离。",
+     "The UR5e uses the six screw axes of Table 12.1.1 and M in the PoE formula; the SCARA uses Table 12.3.2, whose joint 3 is prismatic with screw axis (0, v) and the drop distance as its variable."]
+  - 式: "T = e^[S₁]θ₁ ⋯ e^[Sₙ]θₙ M          (12.2.3)"
+  - ["三维模型用另一种算法：三维引擎按模型文件中各连杆的相对位置，从基座开始逐个连杆累乘。两种算法输入不同，结果应相同，差别只有计算机的舍入误差。",
+     "The 3D model uses a different method: the engine multiplies the link transforms of the model file from the base outwards. Different inputs, same answer, up to rounding."]
+  - ["SCARA 的核对办法：高度 = 0.242 m − d₃；水平位置由两段长 0.35 m、0.25 m 的平面 2R 臂给出；工具转向 = θ₁ + θ₂ + θ₄。",
+     "SCARA check: height = 0.242 m − d₃; horizontal position from a planar 2R arm with links 0.35 m and 0.25 m; tool heading = θ₁ + θ₂ + θ₄."]
+步骤:
+  - ["打开实验 12.3，场景“UR5e”。设置算例 12.3.1 的关节角 (30°, −60°, 90°, −120°, −90°, 45°)（任务 1），记录两组末端坐标和二者之差，与书中结果比较。",
+     "Open Lab 12.3, scene “UR5e”. Set Example 12.3.1 (30°, −60°, 90°, −120°, −90°, 45°) (task 1); record both tool positions and their difference, and compare with the book."]
+  - ["任意转动至少三个关节（任务 3），记录三组关节角下的两组坐标和差值，填入表 1。", "Turn at least three joints anyhow (task 3); record three sets with both positions and the difference in Table 1."]
+  - ["切换到场景“SCARA”，设置算例 12.3.2：θ₁ = 40°，θ₂ = −70°，d₃ = 120 mm，θ₄ = 90°（任务 2）。按原理中的方法手算高度、水平位置和工具转向，与读数比较，记入表 2。",
+     "Switch to “SCARA” and set Example 12.3.2: θ₁ = 40°, θ₂ = −70°, d₃ = 120 mm, θ₄ = 90° (task 2). Compute height, horizontal position and heading by hand and compare (Table 2)."]
+  - ["只改变 d₃，观察末端只沿竖直方向移动；只改变 θ₄，观察末端位置不变而朝向改变。", "Change only d₃: the tool moves only vertically. Change only θ₄: the position stays, the heading changes."]
+数据表:
+  - 标题: ["表 1  UR5e：指数积与三维模型", "Table 1  UR5e: PoE vs 3D model"]
+    表头: ["关节角 θ₁–θ₆ / °", "指数积 (x, y, z) / m", "模型 (x, y, z) / m", "差值 / m"]
+    行: [["30, −60, 90, −120, −90, 45", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+  - 标题: ["表 2  SCARA：手算与读数", "Table 2  SCARA: by hand and on screen"]
+    表头: ["量", "手算", "指数积读数", "模型读数"]
+    行: [["高度 z / m", "", "", ""], ["水平位置 (x, y) / m", "", "", ""], ["工具转向 / °", "", "", "—"]]
+注意:
+  - ["UR5e 场景中“关节 3 下降量 d₃”不起作用；SCARA 场景中只用到关节 1、2、4 和 d₃。", "In the UR5e scene the SCARA drop d₃ has no effect; the SCARA scene uses joints 1, 2, 4 and d₃ only."]
+  - ["差值以科学计数法显示，例如 4.4e-16 m 表示 4.4 × 10⁻¹⁶ m。", "The difference is shown in scientific notation: 4.4e-16 m means 4.4 × 10⁻¹⁶ m."]
+思考题:
+  - ["如果把表 12.1.1 中的 0.392 改成厂家参数 0.3922，表 1 中的差值会变成多大？先估算，再说明理由。", "If 0.392 in Table 12.1.1 were replaced by the maker's 0.3922, how large would the differences in Table 1 become? Estimate first, then explain."]
