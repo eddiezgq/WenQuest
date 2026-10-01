@@ -16,3 +16,7 @@ python3 tools/validate.py
 python3 -m pytest -q tests
 python3 tools/build.py --version 2026.10.0 --limit 3      # 每个条目只造 3 个规格，结果在 build/
 ```
+
+## 发布失败“建版本标签失败”怎么办
+
+GitHub 不许自动部署的令牌给“工作流文件与 main 最新提交不同”的提交建标签。发布开始时就先建标签；如果恰好有人在这几秒内推送了 `.github/workflows` 的改动，本次会停在“定版本号”一步并注明原因。处理：在 Actions → “Parts library 零件库发布” 点 **Run workflow**（分支 main），从最新提交重新发布即可。
