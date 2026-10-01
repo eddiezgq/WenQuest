@@ -1,0 +1,84 @@
+# B-ARM-IRB1600 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: ABB
+  name:
+    zh: ABB
+    en: ABB
+  site: https://new.abb.com/products/robotics
+  model: IRB 1600-10/1.45
+datasheet:
+  vendor: ABB
+  model: IRB 1600-10/1.45
+  values:
+    payload_kg: 10
+    reach_mm: 1450
+    dof: 6
+    repeatability_mm: 0.05
+    weight_kg: 250
+    ip: IP54
+    footprint_mm: 484 x 648
+    power_typical_w: 580
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+    power_typical_w:
+      zh: 典型功耗
+      en: Typical power
+      unit: W
+  src: https://library.e.abb.com/public/4995e4ba2c0c4083aa16768d8fee679d/3HAC023604%20PS%20IRB%201600-1660%20on%20IRC5-en.pdf
+  note: 工作半径到手腕中心（PS 第 56 页）。RP 0.05 mm 见 PS 第 59 页 ISO 9283 表（10/1.45 列；其他变体为 0.02）。重量
+    250 kg（PS 第 22 页，不含工具）。IP54 为标准本体防护（PS 第 25 页；Foundry Plus 2 可选 IP67）。功耗 580 W
+    为 ISO Cube 最大速度（PS 第 15 页）。轴速度见 PS 第 61 页，与德文数据表 10 kg 列一致。底座 484 x 648 mm 取自德文数据表
+    irb1600_ds_de（Sockelmaße），PS 未读到同一数字。未收 joint_range_deg：轴 2 范围两次读取结果相反（+110/-63
+    与 +120/-90 归属哪种半径不一致，原表还带选项值 +136/-63、+150/-90 及脚注），无法确认；其余轴读到一致：轴1 ±180，轴3 +65/-245（1.45
+    m），轴4 ±200，轴5 ±115，轴6 ±400（默认）。
+  axes:
+  - axis: 1
+    speed_deg_s: 180
+  - axis: 2
+    speed_deg_s: 180
+  - axis: 3
+    speed_deg_s: 185
+  - axis: 4
+    speed_deg_s: 385
+  - axis: 5
+    speed_deg_s: 400
+  - axis: 6
+    speed_deg_s: 460
+data_sources:
+- title: ABB Product specification IRB 1600/1660ID, 3HAC023604-001 Rev. AW (release
+    26B)
+  url: https://library.e.abb.com/public/4995e4ba2c0c4083aa16768d8fee679d/3HAC023604%20PS%20IRB%201600-1660%20on%20IRC5-en.pdf
+  retrieved: '2026-09-30'
+  note: 第 59 页
+tags:
+- ABB
+- ABB
+- IRB 1600-10/1.45
+- IRB 1600-10/1.45

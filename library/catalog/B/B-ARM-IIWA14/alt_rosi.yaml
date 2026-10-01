@@ -1,0 +1,6 @@
+# B-ARM-IIWA14 的其他版本（第 5 轮第 3 步第 3 批：ROS-Industrial xacro）
+alt_models:
+- format: xacro
+  url: https://github.com/ros-industrial/kuka_experimental/blob/8d9292b04a22628b1b78d989e2ddd3abb913bf92/kuka_lbr_iiwa_support/urdf/lbr_iiwa_14_r820.xacro
+  license: Apache-2.0
+  via: ROS-Industrial/lbr_iiwa_14_r820

@@ -1,0 +1,47 @@
+# B-ARM-IIWA14 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: KUKA
+  name:
+    zh: 库卡
+    en: KUKA
+  site: https://www.kuka.com/en-de/products/robot-systems/industrial-robots
+  model: LBR iiwa 14 R820
+datasheet:
+  vendor: KUKA
+  model: LBR iiwa 14 R820
+  values:
+    payload_kg: 14
+    reach_mm: 820
+    dof: 7
+    ip: IP54
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+  src: https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa
+  note: Total load 14 kg、Maximum reach 820 mm、Protection class IP 54，四个地区页读取一致；页面未写明工作半径参考点，IP
+    未分部位。轴数 7 取页面正文 "joint torque sensors in all seven axes"。页面另写 axis-specific torque
+    accuracy ±2% of the maximum torque（未收）。控制柜 KUKA Sunrise Cabinet。重复精度、重量、底座、轴范围与速度、TCP
+    速度官网页无（官方宣传册 PDF 链接未能取到），未收。
+data_sources:
+- title: KUKA 官网 LBR iiwa 产品页（技术数据表；en-us、en-de、en-hu、kuka.cn en-cn 四个地区页内容一致）
+  url: https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa
+  retrieved: '2026-09-30'
+tags:
+- 库卡
+- KUKA
+- LBR iiwa 14 R820
+- LBR iiwa 14 R820

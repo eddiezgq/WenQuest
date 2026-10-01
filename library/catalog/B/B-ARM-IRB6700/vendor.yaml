@@ -1,0 +1,94 @@
+# B-ARM-IRB6700 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: ABB
+  name:
+    zh: ABB
+    en: ABB
+  site: https://new.abb.com/products/robotics
+  model: IRB 6700-200/2.60
+datasheet:
+  vendor: ABB
+  model: IRB 6700-200/2.60
+  values:
+    payload_kg: 200
+    reach_mm: 2600
+    dof: 6
+    repeatability_mm: 0.05
+    weight_kg: 1250
+    ip: IP67
+    footprint_mm: 1004 x 720
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+  src: https://library.e.abb.com/public/89053ecb3e5a44b4bff1b809ae1540f6/IRB6700_20231206_RR_V1%20kopia.pdf
+  note: 数据表未写明工作半径参考点。重复定位精度 0.05 mm（数据表 Position repeatability 列，两次读取一致；未核实原文是否注明
+    ISO 9283）。重量 1250 kg 不含 DressPack。IP67 为标准（Foundry Plus 2 可选），未分部位。数据表写 Energy
+    consumption 2.8 kW 但未注明工况，未收 power。轴1 默认 ±170°（选项 ±220°）；轴5/6 带 LeanID 时为 ±120°/±220°。轴速度为
+    200/2.60 单独一行。
+  axes:
+  - axis: 1
+    range_deg:
+    - -170
+    - 170
+    speed_deg_s: 110
+  - axis: 2
+    range_deg:
+    - -65
+    - 85
+    speed_deg_s: 110
+  - axis: 3
+    range_deg:
+    - -180
+    - 70
+    speed_deg_s: 110
+  - axis: 4
+    range_deg:
+    - -300
+    - 300
+    speed_deg_s: 190
+  - axis: 5
+    range_deg:
+    - -130
+    - 130
+    speed_deg_s: 150
+  - axis: 6
+    range_deg:
+    - -360
+    - 360
+    speed_deg_s: 210
+data_sources:
+- title: ABB IRB 6700 data sheet, ROB0252EN (file IRB6700_20231206)
+  url: https://library.e.abb.com/public/89053ecb3e5a44b4bff1b809ae1540f6/IRB6700_20231206_RR_V1%20kopia.pdf
+  retrieved: '2026-09-30'
+  note: 第 1-2 页
+tags:
+- ABB
+- ABB
+- IRB 6700-200/2.60
+- IRB 6700-200/2.60

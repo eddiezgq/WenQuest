@@ -1,0 +1,36 @@
+# B-ARM-GOFA 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: ABB
+  name:
+    zh: ABB
+    en: ABB
+  site: https://new.abb.com/products/robotics
+  model: GoFa CRB 15000-5/0.95
+datasheet:
+  vendor: ABB
+  model: GoFa CRB 15000-5/0.95
+  values:
+    payload_kg: 5
+    reach_mm: 950
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+  src: https://www.abb.com/global/en/areas/robotics/products/robots/collaborative-robots/gofa
+  note: 工作半径 0.95 m 到手腕中心（官网原文 0.95 (wrist) | 1.05 (flange)）。CRB 15000 产品规格书（library.e.abb.com）返回
+    403、new.abb.com 产品页权限请求超时，只能用 abb.com 产品页，故其余参数未收：官网只给全系列 up to 值（重复精度 0.02 mm、TCP
+    速度 up to 2.2 m/s、防护 up to IP67），不能确定适用 5/0.95；页面未写轴数。
+data_sources:
+- title: ABB 官网 GoFa 产品页（变体表）
+  url: https://www.abb.com/global/en/areas/robotics/products/robots/collaborative-robots/gofa
+  retrieved: '2026-09-30'
+tags:
+- ABB
+- ABB
+- GoFa CRB 15000-5/0.95
+- GoFa CRB 15000-5/0.95

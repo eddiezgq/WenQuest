@@ -1,0 +1,63 @@
+# B-ARM-M10IA 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: FANUC
+  name:
+    zh: 发那科
+    en: FANUC
+  site: https://www.fanucamerica.com/products/robot
+  model: M-10iA/12
+datasheet:
+  vendor: FANUC
+  model: M-10iA/12
+  values:
+    payload_kg: 12
+    reach_mm: 1420
+    dof: 6
+    repeatability_mm: 0.08
+    weight_kg: 130
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+  src: https://www.fanucamerica.com/products/robot/m-10ia-12
+  note: 官网已无不带后缀的 M-10iA，取其后续型号 M-10iA/12（官网标为 legacy，已停产）；ROS 模型对应原 M-10iA（原型额定负载
+    10 kg），参数以 M-10iA/12 为准，二者负载不同；工作半径到手腕中心；官网规格表无 IP 等级、无耗电；各轴运动范围总角度 340/250/445/380/380/720°。
+  axes:
+  - axis: 1
+    speed_deg_s: 230
+  - axis: 2
+    speed_deg_s: 225
+  - axis: 3
+    speed_deg_s: 230
+  - axis: 4
+    speed_deg_s: 430
+  - axis: 5
+    speed_deg_s: 430
+  - axis: 6
+    speed_deg_s: 630
+data_sources:
+- title: FANUC America 产品页 M-10iA/12（Specifications 规格表，页面标为 legacy）
+  url: https://www.fanucamerica.com/products/robot/m-10ia-12
+  retrieved: '2026-09-30'
+tags:
+- 发那科
+- FANUC
+- M-10iA/12
+- M-10iA

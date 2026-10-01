@@ -1,0 +1,83 @@
+# B-ARM-IRB4600 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: ABB
+  name:
+    zh: ABB
+    en: ABB
+  site: https://new.abb.com/products/robotics
+  model: IRB 4600-60/2.05
+datasheet:
+  vendor: ABB
+  model: IRB 4600-60/2.05
+  values:
+    payload_kg: 60
+    reach_mm: 2050
+    dof: 6
+    ip: IP67
+    footprint_mm: 512 x 676
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+  src: https://library.e.abb.com/public/7f776502855949bba39e2105e6d70209/IRB%204600_DATASHEET.pdf
+  note: 只取到 ABB 官方意大利文数据表；英文数据表与产品规格书（library.e.abb.com）均返回 403。数据表未写明工作半径参考点。重复定位精度只给全系列范围
+    0.05-0.06 mm、重量只给 412-435 kg 范围，无法对应到 60/2.05，均未收。IP67 为标准（Foundry Plus 2 可选），未分部位。数据表无功耗数字。dof
+    6 为本体轴数（另可带 3 个外部轴）。轴速度为 60/2.05 适用值（20/2.50 轴4/5/6 更快）；轴5 +120/-125。
+  axes:
+  - axis: 1
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 175
+  - axis: 2
+    range_deg:
+    - -90
+    - 150
+    speed_deg_s: 175
+  - axis: 3
+    range_deg:
+    - -180
+    - 75
+    speed_deg_s: 175
+  - axis: 4
+    range_deg:
+    - -400
+    - 400
+    speed_deg_s: 250
+  - axis: 5
+    range_deg:
+    - -125
+    - 120
+    speed_deg_s: 250
+  - axis: 6
+    range_deg:
+    - -400
+    - 400
+    speed_deg_s: 360
+data_sources:
+- title: ABB IRB 4600 scheda tecnica (italiano), ROB0109ITH, Feb 2016
+  url: https://library.e.abb.com/public/7f776502855949bba39e2105e6d70209/IRB%204600_DATASHEET.pdf
+  retrieved: '2026-09-30'
+  note: 第 1-2 页
+tags:
+- ABB
+- ABB
+- IRB 4600-60/2.05
+- IRB 4600-60/2.05

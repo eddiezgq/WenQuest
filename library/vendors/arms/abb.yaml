@@ -1,0 +1,76 @@
+vendor: {id: ABB, name: {zh: ABB, en: ABB}, site: https://new.abb.com/products/robotics}
+retrieved: "2026-09-30"
+# 说明：library.e.abb.com 上带 ?x-sign= 的链接是限时签名链接，过期后会 403；需要时在 ABB Library 按文档号重新搜索下载。
+sources:
+  irb120_ds: {title: "ABB IRB 120 data sheet, ROBO149EN_D Rev. J (Nov 2019)", url: "https://library.e.abb.com/public/7aa0711a20fa41c49a8fdf3bbc3d5bb0/IRB120-Rev.J-ROBO149EN_D.pdf"}
+  irb120_ps: {title: "ABB Product specification IRB 120, 3HAC035960-001 Rev. W (release 23A)", url: "https://library.e.abb.com/public/429d251dbce44b049ba7d6107a422de0/3HAC035960%20PS%20IRB%20120-en.pdf"}
+  irb1200_ds: {title: "ABB IRB 1200 data sheet, ROB0275EN_A", url: "https://library.e.abb.com/public/6f866d55894a49a7b44384db76e01b4b/IRB1200_ROB0275EN_A.pdf"}
+  irb1600_ps: {title: "ABB Product specification IRB 1600/1660ID, 3HAC023604-001 Rev. AW (release 26B)", url: "https://library.e.abb.com/public/4995e4ba2c0c4083aa16768d8fee679d/3HAC023604%20PS%20IRB%201600-1660%20on%20IRC5-en.pdf"}
+  irb1600_ds_de: {title: "ABB IRB 1600 Datenblatt (deutsch, ©2024)", url: "https://library.e.abb.com/public/46ef4d53008c45fb8c6158fc92b3abdd/Datenblatt_IRB1600_lowres.pdf"}
+  irb2600_ps: {title: "ABB Product specification IRB 2600 (on IRC5), 3HAC035959-001 Rev. AG", url: "https://library.e.abb.com/public/b158e2dcf8cc41b4a724eda1e22f87fb/3HAC035959%20PS%20IRB%202600%20on%20IRC5-en.pdf"}
+  irb4600_ds_it: {title: "ABB IRB 4600 scheda tecnica (italiano), ROB0109ITH, Feb 2016", url: "https://library.e.abb.com/public/7f776502855949bba39e2105e6d70209/IRB%204600_DATASHEET.pdf"}
+  irb6700_ds: {title: "ABB IRB 6700 data sheet, ROB0252EN (file IRB6700_20231206)", url: "https://library.e.abb.com/public/89053ecb3e5a44b4bff1b809ae1540f6/IRB6700_20231206_RR_V1%20kopia.pdf"}
+  irb7600_ps: {title: "ABB Product specification IRB 7600, 3HAC023934-001 Rev. AL (release R21B)", url: "https://library.e.abb.com/public/dcc0e6b63edc418aab5464687f599414/3HAC023934%20PS%20IRB%207600-en.pdf"}
+  irb7600_ds: {title: "ABB IRB 7600 data sheet, PR10074 EN (file IRB7600_datasheet_20231206)", url: "https://library.e.abb.com/public/149ea673a73f43da93bdc9caacf56ec9/IRB7600_datasheet_20231206.pdf"}
+  gofa_web: {title: "ABB 官网 GoFa 产品页（变体表）", url: "https://www.abb.com/global/en/areas/robotics/products/robots/collaborative-robots/gofa"}
+robots:
+  - model: IRB 120-3/0.6
+    key: irb120_3_58
+    src: irb120_ds
+    page: "1-2"
+    datasheet: {payload_kg: 3, reach_mm: 580, dof: 6, repeatability_mm: 0.01, weight_kg: 25, ip: IP30, footprint_mm: "180 x 180", power_typical_w: 240}
+    joint_range_deg: [[-165, 165], [-110, 110], [-110, 70], [-160, 160], [-120, 120], [-400, 400]]
+    joint_speed_deg_s: [250, 250, 250, 320, 320, 420]
+    note: "ABB 官方型号写作 IRB 120-3/0.6（工作半径 0.58 m）。工作半径到手腕中心（irb120_ps 原文：extreme positions ... specified at the wrist center）。负载 3 kg，手腕垂直向下时 4 kg。IP30 为整个本体（All variants, manipulator）。底座 180 x 180 mm 为数据表 Robot base 尺寸。重复定位精度 0.01 mm 为 ISO 9283 RP（irb120_ps 同值）。功耗 240 W 为 ISO Cube 最大速度工况（irb120_ps）。轴 6 默认 ±400°，最大可达 ±242 圈。"
+  - model: IRB 1200-7/0.7
+    key: irb1200_7_70
+    src: irb1200_ds
+    page: "1-2"
+    datasheet: {payload_kg: 7, reach_mm: 703, dof: 6, repeatability_mm: 0.02, weight_kg: 52, ip: IP40, footprint_mm: "210 x 210"}
+    joint_range_deg: [[-170, 170], [-100, 135], [-200, 70], [-270, 270], [-130, 130], [-360, 360]]
+    joint_speed_deg_s: [288, 240, 300, 400, 405, 600]
+    note: "工作半径 703 mm，数据表未写明到哪个点（ABB 产品规格书惯例为手腕中心，未在本文核实）。重复定位精度 0.02 mm：数据表写 Position repeatability，未注明 ISO 9283。IP40 为标准防护（可选 IP67、Foundry Plus），数据表未分部位。数据表写功耗 0.39 kW 但未注明工况，故未收 power。数据表较旧（ROB0275EN_A），新一代 IRB 1200 参数可能有变。"
+  - model: IRB 1600-10/1.45
+    key: irb1600_10_145
+    src: irb1600_ps
+    page: 59
+    datasheet: {payload_kg: 10, reach_mm: 1450, dof: 6, repeatability_mm: 0.05, weight_kg: 250, ip: IP54, footprint_mm: "484 x 648", power_typical_w: 580}
+    joint_speed_deg_s: [180, 180, 185, 385, 400, 460]
+    note: "工作半径到手腕中心（PS 第 56 页）。RP 0.05 mm 见 PS 第 59 页 ISO 9283 表（10/1.45 列；其他变体为 0.02）。重量 250 kg（PS 第 22 页，不含工具）。IP54 为标准本体防护（PS 第 25 页；Foundry Plus 2 可选 IP67）。功耗 580 W 为 ISO Cube 最大速度（PS 第 15 页）。轴速度见 PS 第 61 页，与德文数据表 10 kg 列一致。底座 484 x 648 mm 取自德文数据表 irb1600_ds_de（Sockelmaße），PS 未读到同一数字。未收 joint_range_deg：轴 2 范围两次读取结果相反（+110/-63 与 +120/-90 归属哪种半径不一致，原表还带选项值 +136/-63、+150/-90 及脚注），无法确认；其余轴读到一致：轴1 ±180，轴3 +65/-245（1.45 m），轴4 ±200，轴5 ±115，轴6 ±400（默认）。"
+  - model: IRB 2600-12/1.65
+    key: irb2600_12_165
+    src: irb2600_ps
+    page: 67
+    datasheet: {payload_kg: 12, reach_mm: 1650, dof: 6, repeatability_mm: 0.04, weight_kg: 284, ip: IP67, power_typical_w: 953}
+    joint_range_deg: [[-180, 180], [-95, 155], [-180, 75], [-400, 400], [-120, 120], [-400, 400]]
+    joint_speed_deg_s: [175, 175, 175, 360, 360, 500]
+    note: "PS 未明说工作半径的参考点（未核实是否为手腕中心）。RP 0.04 mm 为 ISO 9283（第 67 页）。重量 284 kg 为 PS 第 23 页 IRB 2600 统一值（不含工具），未分变体。IP67 为本体标准防护（第 26 页）。功耗 953 W 为 ISO Cube 最大速度（第 14 页）。轴范围第 64-66 页，轴速度第 68 页（各变体相同）；轴 4、6 的 ±400° 为默认范围。PS 只给底座安装孔（3×M16，分布圆 433 mm），无外形尺寸，故未收 footprint。"
+  - model: IRB 4600-60/2.05
+    key: irb4600_60_205
+    src: irb4600_ds_it
+    page: "1-2"
+    datasheet: {payload_kg: 60, reach_mm: 2050, dof: 6, ip: IP67, footprint_mm: "512 x 676"}
+    joint_range_deg: [[-180, 180], [-90, 150], [-180, 75], [-400, 400], [-125, 120], [-400, 400]]
+    joint_speed_deg_s: [175, 175, 175, 250, 250, 360]
+    note: "只取到 ABB 官方意大利文数据表；英文数据表与产品规格书（library.e.abb.com）均返回 403。数据表未写明工作半径参考点。重复定位精度只给全系列范围 0.05-0.06 mm、重量只给 412-435 kg 范围，无法对应到 60/2.05，均未收。IP67 为标准（Foundry Plus 2 可选），未分部位。数据表无功耗数字。dof 6 为本体轴数（另可带 3 个外部轴）。轴速度为 60/2.05 适用值（20/2.50 轴4/5/6 更快）；轴5 +120/-125。"
+  - model: IRB 6700-200/2.60
+    key: irb6700_200_260
+    src: irb6700_ds
+    page: "1-2"
+    datasheet: {payload_kg: 200, reach_mm: 2600, dof: 6, repeatability_mm: 0.05, weight_kg: 1250, ip: IP67, footprint_mm: "1004 x 720"}
+    joint_range_deg: [[-170, 170], [-65, 85], [-180, 70], [-300, 300], [-130, 130], [-360, 360]]
+    joint_speed_deg_s: [110, 110, 110, 190, 150, 210]
+    note: "数据表未写明工作半径参考点。重复定位精度 0.05 mm（数据表 Position repeatability 列，两次读取一致；未核实原文是否注明 ISO 9283）。重量 1250 kg 不含 DressPack。IP67 为标准（Foundry Plus 2 可选），未分部位。数据表写 Energy consumption 2.8 kW 但未注明工况，未收 power。轴1 默认 ±170°（选项 ±220°）；轴5/6 带 LeanID 时为 ±120°/±220°。轴速度为 200/2.60 单独一行。"
+  - model: IRB 7600-150/3.50
+    key: irb7600_150_350
+    src: irb7600_ps
+    page: 64
+    datasheet: {payload_kg: 150, reach_mm: 3500, dof: 6, repeatability_mm: 0.19, weight_kg: 2450, ip: IP67, footprint_mm: "1206.5 x 791", power_typical_w: 3400}
+    joint_range_deg: [[-180, 180], [-60, 85], [-180, 60], [-300, 300], [-100, 100], [-360, 360]]
+    joint_speed_deg_s: [100, 60, 60, 100, 100, 190]
+    note: "PS 中型号写作 IRB 7600-150/3.5。工作半径到手腕中心（PS）。RP 0.19 mm 见 PS 第 64 页（数据表 irb7600_ds 同值）。重量 2450 kg 不含 DressPack（PS 第 15 页）。IP67 为本体标准（IEC 60529）。功耗 3400 W 为 ISO Cube（PS；数据表同为 3.4 kW）；PS 另有 normal robot movements 5.8 kW 一项，含义不清未收为 max。轴范围第 61 页，轴速度第 65 页（150/3.5 列）。轴6 默认 ±360°（数据表两次读取分别读到 ±360 与 ±220，后者应为 LeanID 值，采用 PS 默认值）。底座 1206.5 x 791 mm 取自数据表 irb7600_ds。"
+  - model: GoFa CRB 15000-5/0.95
+    key: crb15000_5_95
+    src: gofa_web
+    datasheet: {payload_kg: 5, reach_mm: 950}
+    note: "工作半径 0.95 m 到手腕中心（官网原文 0.95 (wrist) | 1.05 (flange)）。CRB 15000 产品规格书（library.e.abb.com）返回 403、new.abb.com 产品页权限请求超时，只能用 abb.com 产品页，故其余参数未收：官网只给全系列 up to 值（重复精度 0.02 mm、TCP 速度 up to 2.2 m/s、防护 up to IP67），不能确定适用 5/0.95；页面未写轴数。"

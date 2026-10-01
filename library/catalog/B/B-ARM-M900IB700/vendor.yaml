@@ -1,0 +1,73 @@
+# B-ARM-M900IB700 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: FANUC
+  name:
+    zh: 发那科
+    en: FANUC
+  site: https://www.fanucamerica.com/products/robot
+  model: M-900iB/700
+datasheet:
+  vendor: FANUC
+  model: M-900iB/700
+  values:
+    payload_kg: 700
+    reach_mm: 2832
+    dof: 6
+    repeatability_mm: 0.1
+    weight_kg: 2800
+    ip: IP54
+    power_typical_w: 5000
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    power_typical_w:
+      zh: 典型功耗
+      en: Typical power
+      unit: W
+  src: https://www.fanucamerica.com/products/robot/m-900ib-700
+  note: 工作半径到手腕中心；ip 为本体标准 IP54（选配 IP56），手腕及 J3 臂为 IP67；power_typical_w 为官网平均耗电 5
+    kW；重复精度原文 ±0.10 mm；各轴运动范围总角度 360/154/160/720/244/720°。
+  axes:
+  - axis: 1
+    speed_deg_s: 80
+  - axis: 2
+    speed_deg_s: 80
+  - axis: 3
+    speed_deg_s: 80
+  - axis: 4
+    speed_deg_s: 100
+  - axis: 5
+    speed_deg_s: 100
+  - axis: 6
+    speed_deg_s: 160
+data_sources:
+- title: FANUC America 产品页 M-900iB/700（Specifications 规格表）
+  url: https://www.fanucamerica.com/products/robot/m-900ib-700
+  retrieved: '2026-09-30'
+tags:
+- 发那科
+- FANUC
+- M-900iB/700
+- M-900iB/700

@@ -1,0 +1,87 @@
+# B-ARM-GP225 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: YASKAWA
+  name:
+    zh: 安川电机
+    en: Yaskawa Motoman
+  site: https://www.yaskawa.eu.com
+  model: GP225
+datasheet:
+  vendor: Yaskawa Motoman
+  model: GP225
+  values:
+    payload_kg: 225
+    reach_mm: 2702
+    dof: 6
+    repeatability_mm: 0.05
+    weight_kg: 1080
+    ip: IP54 (S/L/U main axes), IP67 (wrist)
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+  src: https://www.yaskawa.it/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP225_D_11.2020.pdf
+  note: 德文 flyer（到手腕 P 点）；IP 为标准版 YR-1-06VX225-A00（主轴 IP54、手腕 IP67），C00 版主轴 IP65；平均功率
+    5,0 KVA；仅地装。数值与 Yaskawa PL 官方产品页一致。
+  axes:
+  - axis: 1
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 120
+  - axis: 2
+    range_deg:
+    - -60
+    - 76
+    speed_deg_s: 97
+  - axis: 3
+    range_deg:
+    - -86
+    - 90
+    speed_deg_s: 115
+  - axis: 4
+    range_deg:
+    - -360
+    - 360
+    speed_deg_s: 145
+  - axis: 5
+    range_deg:
+    - -125
+    - 125
+    speed_deg_s: 145
+  - axis: 6
+    range_deg:
+    - -360
+    - 360
+    speed_deg_s: 220
+data_sources:
+- title: Yaskawa Europe — Flyer MOTOMAN GP225（德文版 D），页脚 YR-1-06VX225-A00/-C00, C-10-2020,
+    A-Nr. 195945
+  url: https://www.yaskawa.it/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP225_D_11.2020.pdf
+  retrieved: '2026-09-30'
+tags:
+- 安川电机
+- Yaskawa Motoman
+- GP225
+- GP225

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """把零件库用到的第三方仓库按固定提交取到 library/vendor_src/（不进仓库）。本地和 library.yml 都用它。
 
-    python3 tools/fetch_sources.py              # 全部：Menagerie、FreeCAD-library、robot_descriptions 及其各模型仓库
+    python3 tools/fetch_sources.py              # 全部：Menagerie、FreeCAD-library、robot_descriptions 及其各模型仓库、ROS-Industrial
     python3 tools/fetch_sources.py rd           # 只取 robot_descriptions 的模型仓库（按 vendor/rd_repos.yaml）
 已经取过且提交一致的跳过。
 """
@@ -60,8 +60,8 @@ def main(which=("menagerie", "fclib", "rd"), strict=False):
     if "rd" in which:
         p = pin("robot_descriptions.yaml")
         print("robot_descriptions:", fetch(SRC / "robot_descriptions", p["repo"] + ".git", p["commit"]))
-        repos = ROOT / "vendor" / "rd_repos.yaml"
-        if repos.exists():
+        lists = [ROOT / "vendor" / n for n in ("rd_repos.yaml", "rosi_repos.yaml")]     # robot_descriptions 各原仓库；ROS-Industrial（第 3 批）
+        for repos in [x for x in lists if x.exists()]:
             for key, r in (yaml.safe_load(repos.read_text(encoding="utf-8")) or {}).items():
                 try:
                     print("  {}: {}".format(key, fetch(SRC / "rd" / key, r["url"], r["commit"], sparse=r.get("sparse"))))

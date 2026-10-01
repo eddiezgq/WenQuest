@@ -1,0 +1,82 @@
+# B-ARM-MOTOMINI 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: YASKAWA
+  name:
+    zh: 安川电机
+    en: Yaskawa Motoman
+  site: https://www.yaskawa.eu.com
+  model: MotoMINI
+datasheet:
+  vendor: Yaskawa Motoman
+  model: MotoMINI
+  values:
+    payload_kg: 0.5
+    reach_mm: 350
+    dof: 6
+    repeatability_mm: 0.02
+    weight_kg: 7
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+  src: https://www.yaskawa.es/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/MotoMINI/Flyer_Robot_MotoMINI_E.pdf
+  note: 工作半径为 Max. working range R（安川口径：S 轴中心到手腕 P 点）；本 flyer 重复精度未标 ISO 9283 脚注；文中无
+    IP 等级，未收；底座图有 4×Ø5.5 孔但无明确安装尺寸，未收 footprint；平均电源 0.5 kVA；安装：地/顶/壁/斜。
+  axes:
+  - axis: 1
+    range_deg:
+    - -170
+    - 170
+    speed_deg_s: 315
+  - axis: 2
+    range_deg:
+    - -85
+    - 90
+    speed_deg_s: 315
+  - axis: 3
+    range_deg:
+    - -50
+    - 90
+    speed_deg_s: 420
+  - axis: 4
+    range_deg:
+    - -140
+    - 140
+    speed_deg_s: 600
+  - axis: 5
+    range_deg:
+    - -30
+    - 210
+    speed_deg_s: 600
+  - axis: 6
+    range_deg:
+    - -360
+    - 360
+    speed_deg_s: 600
+data_sources:
+- title: Yaskawa Europe — Flyer MOTOMAN MotoMINI (E)，页脚 YR-1-06VX05-A00, D-11-2022,
+    A-No. 194523
+  url: https://www.yaskawa.es/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/MotoMINI/Flyer_Robot_MotoMINI_E.pdf
+  retrieved: '2026-09-30'
+tags:
+- 安川电机
+- Yaskawa Motoman
+- MotoMINI
+- MotoMINI

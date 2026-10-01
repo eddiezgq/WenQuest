@@ -1,0 +1,100 @@
+# B-ARM-IRB7600 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: ABB
+  name:
+    zh: ABB
+    en: ABB
+  site: https://new.abb.com/products/robotics
+  model: IRB 7600-150/3.50
+datasheet:
+  vendor: ABB
+  model: IRB 7600-150/3.50
+  values:
+    payload_kg: 150
+    reach_mm: 3500
+    dof: 6
+    repeatability_mm: 0.19
+    weight_kg: 2450
+    ip: IP67
+    footprint_mm: 1206.5 x 791
+    power_typical_w: 3400
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+    power_typical_w:
+      zh: 典型功耗
+      en: Typical power
+      unit: W
+  src: https://library.e.abb.com/public/dcc0e6b63edc418aab5464687f599414/3HAC023934%20PS%20IRB%207600-en.pdf
+  note: PS 中型号写作 IRB 7600-150/3.5。工作半径到手腕中心（PS）。RP 0.19 mm 见 PS 第 64 页（数据表 irb7600_ds
+    同值）。重量 2450 kg 不含 DressPack（PS 第 15 页）。IP67 为本体标准（IEC 60529）。功耗 3400 W 为 ISO Cube（PS；数据表同为
+    3.4 kW）；PS 另有 normal robot movements 5.8 kW 一项，含义不清未收为 max。轴范围第 61 页，轴速度第 65 页（150/3.5
+    列）。轴6 默认 ±360°（数据表两次读取分别读到 ±360 与 ±220，后者应为 LeanID 值，采用 PS 默认值）。底座 1206.5 x 791
+    mm 取自数据表 irb7600_ds。
+  axes:
+  - axis: 1
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 100
+  - axis: 2
+    range_deg:
+    - -60
+    - 85
+    speed_deg_s: 60
+  - axis: 3
+    range_deg:
+    - -180
+    - 60
+    speed_deg_s: 60
+  - axis: 4
+    range_deg:
+    - -300
+    - 300
+    speed_deg_s: 100
+  - axis: 5
+    range_deg:
+    - -100
+    - 100
+    speed_deg_s: 100
+  - axis: 6
+    range_deg:
+    - -360
+    - 360
+    speed_deg_s: 190
+data_sources:
+- title: ABB Product specification IRB 7600, 3HAC023934-001 Rev. AL (release R21B)
+  url: https://library.e.abb.com/public/dcc0e6b63edc418aab5464687f599414/3HAC023934%20PS%20IRB%207600-en.pdf
+  retrieved: '2026-09-30'
+  note: 第 64 页
+tags:
+- ABB
+- ABB
+- IRB 7600-150/3.50
+- IRB 7600-150/3.50

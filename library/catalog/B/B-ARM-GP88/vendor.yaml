@@ -1,0 +1,87 @@
+# B-ARM-GP88 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: YASKAWA
+  name:
+    zh: 安川电机
+    en: Yaskawa Motoman
+  site: https://www.yaskawa.eu.com
+  model: GP88
+datasheet:
+  vendor: Yaskawa Motoman
+  model: GP88
+  values:
+    payload_kg: 88
+    reach_mm: 2236
+    dof: 6
+    repeatability_mm: 0.03
+    weight_kg: 630
+    ip: IP65 (S/L/U main axes), IP67 (wrist)
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+  src: https://www.yaskawa.de/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP88_D_06.2020.pdf
+  note: 德文 flyer（Max. Arbeitsbereich R，到手腕 P 点）；IP 为 Version YR-1-06VX88-D00：Hauptachsen
+    IP65, Handgelenk IP67；平均功率 4,0 KVA；安装：地/顶/壁/斜。数值与 Yaskawa DE 官方产品页一致。
+  axes:
+  - axis: 1
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 170
+  - axis: 2
+    range_deg:
+    - -90
+    - 155
+    speed_deg_s: 140
+  - axis: 3
+    range_deg:
+    - -80
+    - 90
+    speed_deg_s: 160
+  - axis: 4
+    range_deg:
+    - -360
+    - 360
+    speed_deg_s: 230
+  - axis: 5
+    range_deg:
+    - -125
+    - 125
+    speed_deg_s: 230
+  - axis: 6
+    range_deg:
+    - -360
+    - 360
+    speed_deg_s: 350
+data_sources:
+- title: Yaskawa Europe — Flyer MOTOMAN GP88（德文版 D），页脚 YR-1-06VX88-D00, D-02-2026,
+    A-Nr. 195935（文件名仍为 06.2020）
+  url: https://www.yaskawa.de/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP88_D_06.2020.pdf
+  retrieved: '2026-09-30'
+tags:
+- 安川电机
+- Yaskawa Motoman
+- GP88
+- GP88

@@ -1,0 +1,99 @@
+# B-ARM-IRB120 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: ABB
+  name:
+    zh: ABB
+    en: ABB
+  site: https://new.abb.com/products/robotics
+  model: IRB 120-3/0.6
+datasheet:
+  vendor: ABB
+  model: IRB 120-3/0.6
+  values:
+    payload_kg: 3
+    reach_mm: 580
+    dof: 6
+    repeatability_mm: 0.01
+    weight_kg: 25
+    ip: IP30
+    footprint_mm: 180 x 180
+    power_typical_w: 240
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+    power_typical_w:
+      zh: 典型功耗
+      en: Typical power
+      unit: W
+  src: https://library.e.abb.com/public/7aa0711a20fa41c49a8fdf3bbc3d5bb0/IRB120-Rev.J-ROBO149EN_D.pdf
+  note: ABB 官方型号写作 IRB 120-3/0.6（工作半径 0.58 m）。工作半径到手腕中心（irb120_ps 原文：extreme positions
+    ... specified at the wrist center）。负载 3 kg，手腕垂直向下时 4 kg。IP30 为整个本体（All variants,
+    manipulator）。底座 180 x 180 mm 为数据表 Robot base 尺寸。重复定位精度 0.01 mm 为 ISO 9283 RP（irb120_ps
+    同值）。功耗 240 W 为 ISO Cube 最大速度工况（irb120_ps）。轴 6 默认 ±400°，最大可达 ±242 圈。
+  axes:
+  - axis: 1
+    range_deg:
+    - -165
+    - 165
+    speed_deg_s: 250
+  - axis: 2
+    range_deg:
+    - -110
+    - 110
+    speed_deg_s: 250
+  - axis: 3
+    range_deg:
+    - -110
+    - 70
+    speed_deg_s: 250
+  - axis: 4
+    range_deg:
+    - -160
+    - 160
+    speed_deg_s: 320
+  - axis: 5
+    range_deg:
+    - -120
+    - 120
+    speed_deg_s: 320
+  - axis: 6
+    range_deg:
+    - -400
+    - 400
+    speed_deg_s: 420
+data_sources:
+- title: ABB IRB 120 data sheet, ROBO149EN_D Rev. J (Nov 2019)
+  url: https://library.e.abb.com/public/7aa0711a20fa41c49a8fdf3bbc3d5bb0/IRB120-Rev.J-ROBO149EN_D.pdf
+  retrieved: '2026-09-30'
+  note: 第 1-2 页
+tags:
+- ABB
+- ABB
+- IRB 120-3/0.6
+- IRB 120-3/0.58

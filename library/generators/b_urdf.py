@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """B 部分 URDF 机器人（robot_descriptions 登记的原仓库，第 5 轮 P8）：按连杆分节点的 glTF 与关节表（R4）。
 
-engine: urdf:<仓库键>/<URDF 相对路径>；仓库在 library/vendor_src/rd/<仓库键>（tools/fetch_sources.py 按固定提交稀疏检出）。
+engine: urdf:<仓库键>/<URDF 相对路径>（或 xacro:<仓库键>/<xacro 相对路径>，ROS-Industrial，先展开）；仓库在 library/vendor_src/rd/<仓库键>（tools/fetch_sources.py 按固定提交稀疏检出）。
 连杆坐标系 = URDF 连杆坐标系；子连杆相对父连杆的零位 = 关节 origin；关节轴在子连杆坐标系（URDF 定义即如此），anchor 为原点。
 """
 import os
@@ -86,11 +86,21 @@ def _geom(g, handle):
 def build(entry, row):
     import trimesh
     import yourdfpy
-    key, _, rel = entry["model"]["engine"].split(":", 1)[1].partition("/")
+    kind, _, spec = entry["model"]["engine"].partition(":")
+    key, _, rel = spec.partition("/")
     repo = RD / key
     handle = _resolver(repo, rel)
-    robot = yourdfpy.URDF.load(str(repo / rel), load_meshes=False, build_scene_graph=False,
-                               filename_handler=lambda f: f).robot
+    if kind == "xacro":                       # ROS-Industrial（第 3 批）：先展开成 URDF
+        import io
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+        from xacro_util import expand
+        expanded = expand(repo, rel)
+        src = io.BytesIO(expanded.encode("utf-8"))
+    else:
+        expanded = None
+        src = str(repo / rel)
+    robot = yourdfpy.URDF.load(src, load_meshes=False, build_scene_graph=False, filename_handler=lambda f: f).robot
     mats = {m.name: m for m in robot.materials or []}
     links = {l.name: l for l in robot.links}
     parent_of = {j.child: j for j in robot.joints}
@@ -158,6 +168,9 @@ def build(entry, row):
                 jt["limit"]["effort"] = round(float(lim.effort), 6)
         elif typ == "revolute":
             jt["type"] = "continuous"
+        if getattr(j, "mimic", None) is not None and j.mimic.joint:     # 从动关节（平衡缸等）：跟随主动关节，不单独拖
+            jt["mimic"] = {"joint": j.mimic.joint, "multiplier": float(j.mimic.multiplier if j.mimic.multiplier is not None else 1.0),
+                           "offset": float(j.mimic.offset or 0.0)}
         joints.append(jt)
     if not world:
         raise ValueError("URDF 没有可显示的几何（网格文件缺失？）")
@@ -169,13 +182,16 @@ def build(entry, row):
     for j in joints:
         j["parent"], j["child"] = ren.get(j["parent"], j["parent"]), ren.get(j["child"], j["child"])
     links = {ren.get(k, k): v for k, v in links.items()}
-    moving = [j for j in joints if j["type"] != "fixed"]
+    moving = [j for j in joints if j["type"] != "fixed" and "mimic" not in j]
     def mass(n):
         lk = links.get(n)
         return round(float(lk.inertial.mass), 4) if lk is not None and lk.inertial is not None and lk.inertial.mass else None
     rob = {"links": [{"name": b["name"], "node": b["name"], "mass_kg": mass(b["name"])} for b in bodies],
            "joints": joints, "dof": len(moving)}
-    return [("__scene__", {"bodies": bodies, "world": trimesh.util.concatenate(world).apply_scale(1000.0), "robot": rob})]
+    scene = {"bodies": bodies, "world": trimesh.util.concatenate(world).apply_scale(1000.0), "robot": rob}
+    if expanded:                               # 展开后的 URDF 一并提供下载（网格仍是 package:// 路径，配合原仓库用）
+        scene["urdf"] = expanded
+    return [("__scene__", scene)]
 
 
 def _rpy_quat(T):

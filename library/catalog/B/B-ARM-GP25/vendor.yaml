@@ -1,0 +1,82 @@
+# B-ARM-GP25 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: YASKAWA
+  name:
+    zh: 安川电机
+    en: Yaskawa Motoman
+  site: https://www.yaskawa.eu.com
+  model: GP25
+datasheet:
+  vendor: Yaskawa Motoman
+  model: GP25
+  values:
+    payload_kg: 25
+    reach_mm: 1730
+    dof: 6
+    weight_kg: 250
+    ip: IP54 (S/L/U main axes), IP67 (wrist)
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+  src: https://www.yaskawa.se/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP25_GP25-12_E_03.2022.pdf
+  note: 重复精度留空：官方 flyer（2024 版）两次读取均为 ±0.02（ISO 9283），但 Yaskawa UK 官方产品页写 0.03 mm（同
+    flyer 中 GP25-12 的值），无法判定哪个为准。工作半径到手腕 P 点；平均电源 2.0 kVA；安装：地/顶/壁/斜。
+  axes:
+  - axis: 1
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 210
+  - axis: 2
+    range_deg:
+    - -105
+    - 155
+    speed_deg_s: 210
+  - axis: 3
+    range_deg:
+    - -86
+    - 160
+    speed_deg_s: 265
+  - axis: 4
+    range_deg:
+    - -200
+    - 200
+    speed_deg_s: 420
+  - axis: 5
+    range_deg:
+    - -150
+    - 150
+    speed_deg_s: 420
+  - axis: 6
+    range_deg:
+    - -455
+    - 455
+    speed_deg_s: 885
+data_sources:
+- title: Yaskawa Europe — Flyer MOTOMAN GP25, GP25-12 (E)，页脚 E-03-2024, A-No. 206026（文件名仍为
+    03.2022）
+  url: https://www.yaskawa.se/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP25_GP25-12_E_03.2022.pdf
+  retrieved: '2026-09-30'
+tags:
+- 安川电机
+- Yaskawa Motoman
+- GP25
+- GP25

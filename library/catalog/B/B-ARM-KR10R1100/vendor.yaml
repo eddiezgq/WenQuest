@@ -1,0 +1,46 @@
+# B-ARM-KR10R1100 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: KUKA
+  name:
+    zh: 库卡
+    en: KUKA
+  site: https://www.kuka.com/en-de/products/robot-systems/industrial-robots
+  model: KR 10 R1100-2
+datasheet:
+  vendor: KUKA
+  model: KR 10 R1100-2
+  values:
+    payload_kg: 11
+    reach_mm: 1101
+    dof: 6
+    ip: IP65/IP67
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+  src: https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/kr-agilus
+  note: 官网已不列 KR 10 R1100 sixx，只剩新一代 KR 10 R1100-2，此条取 KR 10 R1100-2 的参数（sixx 老型号数据未取）。注意型号名带
+    10，但官网 Total load 写 11 kg（三个地区页读取一致），按原文收 11。Maximum reach 1101 mm，未写明参考点。轴数取页面正文
+    six-axis（系列通用）。Protection class 原文 "IP 65, IP 67"，未分部位。重复精度、重量、底座、轴范围与速度官网页无，未收。
+data_sources:
+- title: KUKA 官网 KR AGILUS 产品页（技术数据表；en-us、en-gb、en-at 三个地区页内容一致）
+  url: https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/kr-agilus
+  retrieved: '2026-09-30'
+tags:
+- 库卡
+- KUKA
+- KR 10 R1100-2
+- KR 10 R1100 sixx

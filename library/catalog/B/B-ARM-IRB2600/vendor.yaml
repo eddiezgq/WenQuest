@@ -1,0 +1,94 @@
+# B-ARM-IRB2600 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: ABB
+  name:
+    zh: ABB
+    en: ABB
+  site: https://new.abb.com/products/robotics
+  model: IRB 2600-12/1.65
+datasheet:
+  vendor: ABB
+  model: IRB 2600-12/1.65
+  values:
+    payload_kg: 12
+    reach_mm: 1650
+    dof: 6
+    repeatability_mm: 0.04
+    weight_kg: 284
+    ip: IP67
+    power_typical_w: 953
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    power_typical_w:
+      zh: 典型功耗
+      en: Typical power
+      unit: W
+  src: https://library.e.abb.com/public/b158e2dcf8cc41b4a724eda1e22f87fb/3HAC035959%20PS%20IRB%202600%20on%20IRC5-en.pdf
+  note: PS 未明说工作半径的参考点（未核实是否为手腕中心）。RP 0.04 mm 为 ISO 9283（第 67 页）。重量 284 kg 为 PS 第
+    23 页 IRB 2600 统一值（不含工具），未分变体。IP67 为本体标准防护（第 26 页）。功耗 953 W 为 ISO Cube 最大速度（第 14
+    页）。轴范围第 64-66 页，轴速度第 68 页（各变体相同）；轴 4、6 的 ±400° 为默认范围。PS 只给底座安装孔（3×M16，分布圆 433
+    mm），无外形尺寸，故未收 footprint。
+  axes:
+  - axis: 1
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 175
+  - axis: 2
+    range_deg:
+    - -95
+    - 155
+    speed_deg_s: 175
+  - axis: 3
+    range_deg:
+    - -180
+    - 75
+    speed_deg_s: 175
+  - axis: 4
+    range_deg:
+    - -400
+    - 400
+    speed_deg_s: 360
+  - axis: 5
+    range_deg:
+    - -120
+    - 120
+    speed_deg_s: 360
+  - axis: 6
+    range_deg:
+    - -400
+    - 400
+    speed_deg_s: 500
+data_sources:
+- title: ABB Product specification IRB 2600 (on IRC5), 3HAC035959-001 Rev. AG
+  url: https://library.e.abb.com/public/b158e2dcf8cc41b4a724eda1e22f87fb/3HAC035959%20PS%20IRB%202600%20on%20IRC5-en.pdf
+  retrieved: '2026-09-30'
+  note: 第 67 页
+tags:
+- ABB
+- ABB
+- IRB 2600-12/1.65
+- IRB 2600-12/1.65

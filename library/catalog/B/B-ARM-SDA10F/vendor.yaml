@@ -1,0 +1,46 @@
+# B-ARM-SDA10F 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: YASKAWA
+  name:
+    zh: 安川电机
+    en: Yaskawa Motoman
+  site: https://www.yaskawa.eu.com
+  model: SDA10F
+datasheet:
+  vendor: Yaskawa Motoman
+  model: SDA10F
+  values:
+    payload_kg: 10
+    dof: 15
+    repeatability_mm: 0.1
+    weight_kg: 220
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+  src: https://www.yaskawa.co.uk/products/robots/handling-assembly/productdetail/product/sda10f_714
+  note: 未找到可直接读取的官方 SDA flyer（官网下载链接不可取），只用两个官方产品页（UK、FR，内容一致）；页面未标停产。负载 10 kg 为每臂。产品页
+    Max Working Range 845 mm 未说明参考点（单臂/何点），未收。产品页只列 S/L/U/R/B/T 六轴速度（130/170/170/200/200/400），缺
+    E 轴与腰部轴，未收关节数组。平均电源 2.5 kVA。
+data_sources:
+- title: Yaskawa UK / Yaskawa France 官方产品页 SDA10F（技术数据栏，两站内容一致）
+  url: https://www.yaskawa.co.uk/products/robots/handling-assembly/productdetail/product/sda10f_714
+  retrieved: '2026-09-30'
+tags:
+- 安川电机
+- Yaskawa Motoman
+- SDA10F
+- SDA10F

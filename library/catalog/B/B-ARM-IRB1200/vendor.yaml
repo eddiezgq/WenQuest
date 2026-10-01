@@ -1,0 +1,93 @@
+# B-ARM-IRB1200 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: ABB
+  name:
+    zh: ABB
+    en: ABB
+  site: https://new.abb.com/products/robotics
+  model: IRB 1200-7/0.7
+datasheet:
+  vendor: ABB
+  model: IRB 1200-7/0.7
+  values:
+    payload_kg: 7
+    reach_mm: 703
+    dof: 6
+    repeatability_mm: 0.02
+    weight_kg: 52
+    ip: IP40
+    footprint_mm: 210 x 210
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+  src: https://library.e.abb.com/public/6f866d55894a49a7b44384db76e01b4b/IRB1200_ROB0275EN_A.pdf
+  note: 工作半径 703 mm，数据表未写明到哪个点（ABB 产品规格书惯例为手腕中心，未在本文核实）。重复定位精度 0.02 mm：数据表写 Position
+    repeatability，未注明 ISO 9283。IP40 为标准防护（可选 IP67、Foundry Plus），数据表未分部位。数据表写功耗 0.39
+    kW 但未注明工况，故未收 power。数据表较旧（ROB0275EN_A），新一代 IRB 1200 参数可能有变。
+  axes:
+  - axis: 1
+    range_deg:
+    - -170
+    - 170
+    speed_deg_s: 288
+  - axis: 2
+    range_deg:
+    - -100
+    - 135
+    speed_deg_s: 240
+  - axis: 3
+    range_deg:
+    - -200
+    - 70
+    speed_deg_s: 300
+  - axis: 4
+    range_deg:
+    - -270
+    - 270
+    speed_deg_s: 400
+  - axis: 5
+    range_deg:
+    - -130
+    - 130
+    speed_deg_s: 405
+  - axis: 6
+    range_deg:
+    - -360
+    - 360
+    speed_deg_s: 600
+data_sources:
+- title: ABB IRB 1200 data sheet, ROB0275EN_A
+  url: https://library.e.abb.com/public/6f866d55894a49a7b44384db76e01b4b/IRB1200_ROB0275EN_A.pdf
+  retrieved: '2026-09-30'
+  note: 第 1-2 页
+tags:
+- ABB
+- ABB
+- IRB 1200-7/0.7
+- IRB 1200-7/0.7

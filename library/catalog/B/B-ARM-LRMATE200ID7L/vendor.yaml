@@ -1,0 +1,74 @@
+# B-ARM-LRMATE200ID7L 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: FANUC
+  name:
+    zh: 发那科
+    en: FANUC
+  site: https://www.fanucamerica.com/products/robot
+  model: LR Mate 200iD/7L
+datasheet:
+  vendor: FANUC
+  model: LR Mate 200iD/7L
+  values:
+    payload_kg: 7
+    reach_mm: 911
+    dof: 6
+    repeatability_mm: 0.01
+    weight_kg: 27
+    ip: IP67
+    power_typical_w: 500
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    power_typical_w:
+      zh: 典型功耗
+      en: Typical power
+      unit: W
+  src: https://www.fanucamerica.com/products/robots/series/lr-mate/lr-mate-200id-7l
+  note: 工作半径到手腕中心（J5 轴回转中心）；ip 为本体及手腕/J3 臂标准等级 IP67，选配 IP69K；power_typical_w 为官网平均耗电
+    0.5 kW；各轴运动范围总角度 340/245/430/380/250/720°。另一地址 /products/robot/lr-mate-200id-7l
+    只有简介、无规格表。
+  axes:
+  - axis: 1
+    speed_deg_s: 370
+  - axis: 2
+    speed_deg_s: 310
+  - axis: 3
+    speed_deg_s: 410
+  - axis: 4
+    speed_deg_s: 550
+  - axis: 5
+    speed_deg_s: 545
+  - axis: 6
+    speed_deg_s: 1000
+data_sources:
+- title: FANUC America 产品页 LR Mate 200iD/7L（Specifications 规格表）
+  url: https://www.fanucamerica.com/products/robots/series/lr-mate/lr-mate-200id-7l
+  retrieved: '2026-09-30'
+tags:
+- 发那科
+- FANUC
+- LR Mate 200iD/7L
+- LR Mate 200iD/7L

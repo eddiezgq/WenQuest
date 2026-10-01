@@ -1,0 +1,58 @@
+# B-ARM-CRX10IAL 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: FANUC
+  name:
+    zh: 发那科
+    en: FANUC
+  site: https://www.fanucamerica.com/products/robot
+  model: CRX-10iA/L
+datasheet:
+  vendor: FANUC
+  model: CRX-10iA/L
+  values:
+    payload_kg: 10
+    reach_mm: 1418
+    dof: 6
+    ip: IP67
+    footprint_mm: Ø190
+    tcp_speed_m_s: 2.0
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+    tcp_speed_m_s:
+      zh: 末端最大速度
+      en: TCP speed
+      unit: m/s
+  src: https://www.fanucamerica.com/products/robot/crx-10ia-l
+  note: 协作机器人；工作半径到手腕中心；ip 为本体及手腕/J3 臂 IP67；tcp_speed 取 High Speed Mode 2000 mm/s，协作模式
+    1000 mm/s（fanucamerica 主站与 crx.fanucamerica 子站一致）；footprint 为圆形底座直径 190 mm，出处
+    crx10ial_eu（“⌀ 190mm Footprint”）；官网未给各轴最大速度；各轴运动范围总角度 360/360/540/380/360/380°。重复精度与本体质量官方各站不一致，留空：fanucamerica
+    主站 ±0.05 mm / 39 kg，crx.fanuc.eu 39 kg；日本总部 fanuc.co.jp 与 crx.fanucamerica 子站
+    ±0.04 mm / 40 kg（可能是规格修订，未能确认）。
+data_sources:
+- title: FANUC America 产品页 CRX-10iA/L（Specifications 规格表）
+  url: https://www.fanucamerica.com/products/robot/crx-10ia-l
+  retrieved: '2026-09-30'
+tags:
+- 发那科
+- FANUC
+- CRX-10iA/L
+- CRX-10iA/L

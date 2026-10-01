@@ -1,0 +1,52 @@
+# B-ARM-SDA10F · 安川电机 SDA10F 双臂机器人（第 5 轮第 3 步第 3 批：ROS-Industrial）
+schema: 1
+id: B-ARM-SDA10F
+kind: robot
+name:
+  zh: 安川电机 SDA10F 双臂机器人
+  en: Yaskawa SDA10F
+category: ARM
+tags:
+- 双臂机器人
+- dual_arm
+- 工业机器人
+- 安川电机
+- Yaskawa
+- SDA10F
+standards: []
+params: []
+defaults: {}
+model:
+  engine: xacro:rosi_motoman/motoman_sda10f_support/urdf/sda10f.xacro
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆（base_link）坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型由 ROS-Industrial 的 xacro 展开成 URDF 后，按可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: dual_arm
+source:
+  origin: ros_industrial
+  repo: https://github.com/ros-industrial/motoman
+  commit: 846fbbc57c60223f12bf4795ea6404982d57709e
+  path: motoman_sda10f_support/urdf/sda10f.xacro
+  license: BSD-3-Clause
+  attribution: Yaskawa SDA10F（ROS-Industrial motoman_sda10f_support 支持包）；BSD-3-Clause
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 许可取 motoman_sda10f_support/package.xml 的 <license>（BSD-3-Clause）
+teaching:
+  principle: 两条机械臂协同工作，一条固定、一条操作，或两条一起搬运、装配。
+  uses:
+  - 双手操作
+  - 遥操作数据采集
+  courses:
+  - course: 机器人技术
+    chapter: 多臂协作
+  labs:
+  - 双臂协同搬运演示
+factory:
+  erp_items: []
+  suppliers:
+  - Yaskawa

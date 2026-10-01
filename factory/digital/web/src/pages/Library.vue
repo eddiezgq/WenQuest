@@ -114,6 +114,7 @@
               <a v-if="!entry.robot" class="btn" :href="entry.package">STEP / STL 压缩包（整族）</a>
               <a v-else-if="entry.model.engine.startsWith('menagerie:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 MJCF（{{ originName(entry.source.origin) }}）</a>
               <a v-else-if="entry.model.engine.startsWith('urdf:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 URDF（原仓库）</a>
+              <a v-else-if="entry.model.engine.startsWith('xacro:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 xacro（ROS-Industrial）</a>
               <a v-else-if="entry.source.origin === 'vendor'" class="btn" :href="entry.package" target="_blank" rel="noopener">官方技术参数表</a>
               <a v-else class="btn ghost" :href="entry.package" target="_blank" rel="noopener">生成程序</a>
               <button class="btn ghost" type="button" @click="copy(size === 'default' ? entry.id : entry.id + '/' + size)">复制编号</button>
@@ -147,6 +148,14 @@
                 </dl>
                 <p class="small muted">{{ entry.datasheet.vendor }} {{ entry.datasheet.model }} 官方技术参数，
                   <a :href="entry.datasheet.src" target="_blank" rel="noopener">出处</a><template v-if="entry.datasheet.note"> · {{ entry.datasheet.note }}</template></p>
+                <div v-if="entry.datasheet.axes?.length" class="tbl-wrap"><table class="t">
+                  <thead><tr><th>轴</th><th>运动范围（°）</th><th>最大速度（°/s）</th></tr></thead>
+                  <tbody><tr v-for="a in entry.datasheet.axes" :key="a.axis">
+                    <td>{{ a.axis }}</td>
+                    <td class="mono">{{ a.range_deg ? `${a.range_deg[0]} ～ ${a.range_deg[1]}` : '—' }}</td>
+                    <td class="mono">{{ a.speed_deg_s ?? '—' }}</td>
+                  </tr></tbody>
+                </table></div>
                 <template v-if="entry.dh">
                   <div class="small muted" style="margin-top:8px">DH 参数（{{ entry.dh.convention }}，米、弧度）</div>
                   <div class="tbl-wrap"><table class="t">
@@ -162,7 +171,7 @@
                   <table class="t">
                     <thead><tr><th>关节</th><th>类型</th><th>父 → 子</th><th>范围</th></tr></thead>
                     <tbody><tr v-for="j in entry.robot.joints" :key="j.name">
-                      <td class="mono">{{ j.name }}</td><td class="nw">{{ JT[j.type] }}</td><td class="small">{{ j.parent }} → {{ j.child }}</td>
+                      <td class="mono">{{ j.name }}</td><td class="nw">{{ JT[j.type] }}<template v-if="j.mimic">（从动：跟随 {{ j.mimic.joint }} ×{{ j.mimic.multiplier }}）</template></td><td class="small">{{ j.parent }} → {{ j.child }}</td>
                       <td class="num">{{ j.limit && j.limit.lower != null ? fmtLim(j) : '不限' }}</td></tr></tbody>
                   </table>
                 </div>
@@ -215,7 +224,7 @@ import { useRoute } from 'vue-router';
 
 const BASE = '/library/';
 const ORIGINS = { bd_warehouse: 'bd_warehouse', wenquest: '问渠自建', menagerie: 'MuJoCo Menagerie', vendor: '厂商目录',
-  robot_descriptions: 'robot_descriptions', 'freecad-library': 'FreeCAD-library' };
+  robot_descriptions: 'robot_descriptions', ros_industrial: 'ROS-Industrial', 'freecad-library': 'FreeCAD-library' };
 const JT = { revolute: '转动', continuous: '转动（不限位）', prismatic: '移动' };
 const originName = (o) => ORIGINS[o] || o;
 
@@ -467,6 +476,7 @@ function setupJoints() {
   joints.value = [];
   if (!entry.value?.robot || !model) return;
   const list = [];
+  mimics = {};
   for (const j of entry.value.robot.joints) {
     const node = model.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(j.child));
     if (!node) continue;
@@ -475,14 +485,18 @@ function setupJoints() {
     const lim = j.limit && j.limit.lower != null ? j.limit : { lower: -Math.PI, upper: Math.PI };
     const zero = Math.min(Math.max(0, lim.lower), lim.upper);
     const restQ = entry.value.robot.rest?.[j.name];
-    list.push({ name: j.name, short: j.name.replace(/_joint$|joint_?/i, '').slice(0, 10) || j.name, type: j.type,
+    const item = { name: j.name, short: j.name.replace(/_joint$|joint_?/i, '').slice(0, 10) || j.name, type: j.type,
       min: lim.lower, max: lim.upper, value: restQ ?? zero, zero, init: restQ ?? zero, node, rest: node.matrix.clone(),
-      axis: new THREE.Vector3(...j.axis).normalize(), anchor: new THREE.Vector3(...(j.anchor || [0, 0, 0])) });
+      axis: new THREE.Vector3(...j.axis).normalize(), anchor: new THREE.Vector3(...(j.anchor || [0, 0, 0])) };
+    if (j.mimic) (mimics[j.mimic.joint] ||= []).push({ ...item, mimic: j.mimic });   // 从动关节：跟随主动关节，不出滑块
+    else list.push(item);
   }
   joints.value = list;
   list.forEach(applyJoint);
 }
+let mimics = {};
 function applyJoint(j) {
+  for (const f of mimics[j.name] || []) { f.value = f.mimic.multiplier * j.value + f.mimic.offset; applyJoint(f); }
   const m = new THREE.Matrix4();
   if (j.type === 'prismatic') m.makeTranslation(j.axis.x * j.value, j.axis.y * j.value, j.axis.z * j.value);
   else {

@@ -1,0 +1,41 @@
+# ROS-Industrial 的工业机械臂模型（第 5 轮第 3 步第 3 批）：各厂商 support 包里的 xacro，按固定提交取。
+# 许可按 xacro 所在包的 package.xml；仓库检出到 library/vendor_src/rd/<键>（与 robot_descriptions 的原仓库同一处）。
+# 稀疏检出清单由 tools/import_rosi.py list 生成到 vendor/rosi_repos.yaml（只取 xacro、package.xml、LICENSE 和用到的可视网格）。
+repos:
+  rosi_abb: {url: https://github.com/ros-industrial/abb.git, commit: 45f4769d826cf3ac62a65495f2db67b78b0c81df, vendor: ABB}
+  rosi_fanuc: {url: https://github.com/ros-industrial/fanuc.git, commit: d8f42bd73584b255df87098395512538882caea1, vendor: FANUC}
+  rosi_kuka_experimental: {url: https://github.com/ros-industrial/kuka_experimental.git, commit: 8d9292b04a22628b1b78d989e2ddd3abb913bf92, vendor: KUKA}
+  rosi_motoman: {url: https://github.com/ros-industrial/motoman.git, commit: 846fbbc57c60223f12bf4795ea6404982d57709e, vendor: Yaskawa}
+# key：xacro 文件名（不含 .xacro）；model：厂商型号写法；id：零件库编号（与已有条目同型号的写 dup_of，只加“另有版本”链接）
+robots:
+  - {repo: rosi_abb, key: irb120_3_58, model: IRB 120-3/0.58, id: B-ARM-IRB120}
+  - {repo: rosi_abb, key: irb1200_7_70, model: IRB 1200-7/0.7, id: B-ARM-IRB1200}
+  - {repo: rosi_abb, key: irb1600_10_145, model: IRB 1600-10/1.45, id: B-ARM-IRB1600}
+  - {repo: rosi_abb, key: irb2600_12_165, model: IRB 2600-12/1.65, id: B-ARM-IRB2600, model_note: "模型（ROS-Industrial）的轴 2 方向与厂商表相反（模型 -155～+95°，样本 +155～-95°），轴 3 下限模型 -155°、样本 -180°"}
+  - {repo: rosi_abb, key: irb4600_60_205, model: IRB 4600-60/2.05, id: B-ARM-IRB4600}
+  - {repo: rosi_abb, key: irb6700_200_260, model: IRB 6700-200/2.60, id: B-ARM-IRB6700}
+  - {repo: rosi_abb, key: irb7600_150_350, model: IRB 7600-150/3.50, id: B-ARM-IRB7600}
+  - {repo: rosi_abb, key: crb15000_5_95, model: GoFa CRB 15000-5/0.95, id: B-ARM-GOFA, cobot: true}
+  - {repo: rosi_fanuc, key: lrmate200id, model: LR Mate 200iD, id: B-ARM-LRMATE200ID}
+  - {repo: rosi_fanuc, key: lrmate200id7l, model: LR Mate 200iD/7L, id: B-ARM-LRMATE200ID7L}
+  - {repo: rosi_fanuc, key: cr7ia, model: CR-7iA, id: B-ARM-CR7IA, cobot: true}
+  - {repo: rosi_fanuc, key: crx10ial, model: CRX-10iA/L, id: B-ARM-CRX10IAL, cobot: true}
+  - {repo: rosi_fanuc, key: m10ia, model: M-10iA, id: B-ARM-M10IA, model_note: "模型是原 M-10iA；“参数”页是后续型号 M-10iA/12（官网已无原型号），两者轴速度不同"}
+  - {repo: rosi_fanuc, key: m20ib25, model: M-20iB/25, id: B-ARM-M20IB25}
+  - {repo: rosi_fanuc, key: r2000ic165f, model: R-2000iC/165F, id: B-ARM-R2000IC165F, model_note: "模型各轴速度（130/115/125/180/180/260 °/s）与 FANUC 官网现行表（120/105/110/140/140/220 °/s）不同，以官网为准"}
+  - {repo: rosi_fanuc, key: m900ib700, model: M-900iB/700, id: B-ARM-M900IB700}
+  - {repo: rosi_kuka_experimental, key: kr3r540, model: KR 3 R540, id: B-ARM-KR3R540}
+  - {repo: rosi_kuka_experimental, key: kr6r900sixx, model: KR 6 R900 sixx, id: B-ARM-KR6R900}
+  - {repo: rosi_kuka_experimental, key: kr10r1100sixx, model: KR 10 R1100 sixx, id: B-ARM-KR10R1100}
+  - {repo: rosi_kuka_experimental, key: kr16_2, model: KR 16-2, id: B-ARM-KR16}
+  - {repo: rosi_kuka_experimental, key: kr120r2500pro, model: KR 120 R2500 pro, id: B-ARM-KR120R2500}
+  - {repo: rosi_kuka_experimental, key: kr210l150, model: KR 210 L150, id: B-ARM-KR210L150}
+  - {repo: rosi_kuka_experimental, key: lbr_iiwa_14_r820, model: LBR iiwa 14 R820, dup_of: B-ARM-IIWA14}
+  - {repo: rosi_motoman, key: motomini, model: MotoMINI, id: B-ARM-MOTOMINI}
+  - {repo: rosi_motoman, key: gp7, model: GP7, id: B-ARM-GP7}
+  - {repo: rosi_motoman, key: gp12, model: GP12, id: B-ARM-GP12, model_note: "模型轴 3 上限 +150°，安川样本 +155°"}
+  - {repo: rosi_motoman, key: gp25, model: GP25, id: B-ARM-GP25}
+  - {repo: rosi_motoman, key: gp88, model: GP88, id: B-ARM-GP88}
+  - {repo: rosi_motoman, key: gp225, model: GP225, id: B-ARM-GP225}
+  - {repo: rosi_motoman, key: hc10, model: HC10, id: B-ARM-HC10, cobot: true}
+  - {repo: rosi_motoman, key: sda10f, model: SDA10F, id: B-ARM-SDA10F, type: DUAL_ARM}

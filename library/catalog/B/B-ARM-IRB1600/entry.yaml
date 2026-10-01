@@ -1,0 +1,55 @@
+# B-ARM-IRB1600 · ABB IRB 1600-10/1.45 机械臂（第 5 轮第 3 步第 3 批：ROS-Industrial）
+schema: 1
+id: B-ARM-IRB1600
+kind: robot
+name:
+  zh: ABB IRB 1600-10/1.45 机械臂
+  en: ABB IRB 1600-10/1.45
+category: ARM
+tags:
+- 机械臂
+- arm
+- 工业机器人
+- ABB
+- IRB 1600-10/1.45
+standards: []
+params: []
+defaults: {}
+model:
+  engine: xacro:rosi_abb/abb_irb1600_support/urdf/irb1600_10_145.xacro
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆（base_link）坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型由 ROS-Industrial 的 xacro 展开成 URDF 后，按可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: arm
+source:
+  origin: ros_industrial
+  repo: https://github.com/ros-industrial/abb
+  commit: 45f4769d826cf3ac62a65495f2db67b78b0c81df
+  path: abb_irb1600_support/urdf/irb1600_10_145.xacro
+  license: Apache-2.0
+  attribution: ABB IRB 1600-10/1.45（ROS-Industrial abb_irb1600_support 支持包）；Apache-2.0
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 许可取 abb_irb1600_support/package.xml 的 <license>（Apache-2.0）
+teaching:
+  principle: 多个转动关节串联：前几个关节主要决定末端位置，腕部关节决定姿态。
+  uses:
+  - 装配
+  - 上下料
+  - 人机协作
+  courses:
+  - course: 机器人技术
+    chapter: 串联机械臂正运动学
+  - course: 机器人技术
+    chapter: 逆运动学与轨迹规划
+  labs:
+  - 拖动关节看末端轨迹
+  - 正逆运动学虚拟实验
+factory:
+  erp_items: []
+  suppliers:
+  - ABB

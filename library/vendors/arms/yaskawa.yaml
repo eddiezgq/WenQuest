@@ -1,0 +1,70 @@
+vendor: {id: YASKAWA, name: {zh: 安川电机, en: Yaskawa Motoman}, site: https://www.yaskawa.eu.com}
+retrieved: "2026-09-30"
+# 说明：motoman.com / yaskawa.com 本环境不可达（代理 403 / robots 禁止），全部改用 Yaskawa Europe 官方各国站点（同一 Global Assets 文件库）的官方 Flyer 数据表与产品页。
+# 页码：WebFetch 读 PDF 不返回页码，未写 page（flyer 均为 1～2 页的单张数据表）。
+# 功率：官方只给“Power supply, average [kVA]”（视在功率，非 W），未换算，未填 power_*_w，数值写在 note。
+sources:
+  motomini: {title: "Yaskawa Europe — Flyer MOTOMAN MotoMINI (E)，页脚 YR-1-06VX05-A00, D-11-2022, A-No. 194523", url: "https://www.yaskawa.es/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/MotoMINI/Flyer_Robot_MotoMINI_E.pdf"}
+  gp7: {title: "Yaskawa Europe — Flyer MOTOMAN GP7 (E)，页脚 YR-1-06VX7-A00, E-03-2024, A-No. 206020（文件名仍为 10.2021）", url: "https://www.yaskawa.fr/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP7_E_10.2021.pdf"}
+  gp12: {title: "Yaskawa Europe — Flyer MOTOMAN GP12 (E)，页脚 C-03-2024, A-No. 206024（文件名仍为 11.2020）", url: "https://www.yaskawa.co.uk/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP12_E_11.2020.pdf"}
+  gp25: {title: "Yaskawa Europe — Flyer MOTOMAN GP25, GP25-12 (E)，页脚 E-03-2024, A-No. 206026（文件名仍为 03.2022）", url: "https://www.yaskawa.se/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP25_GP25-12_E_03.2022.pdf"}
+  gp25_web: {title: "Yaskawa UK 官方产品页 GP25（技术数据栏）", url: "https://www.yaskawa.co.uk/robotics/robots/handling-assembly/productdetail/product/gp25_699"}
+  gp88: {title: "Yaskawa Europe — Flyer MOTOMAN GP88（德文版 D），页脚 YR-1-06VX88-D00, D-02-2026, A-Nr. 195935（文件名仍为 06.2020）", url: "https://www.yaskawa.de/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP88_D_06.2020.pdf"}
+  gp225: {title: "Yaskawa Europe — Flyer MOTOMAN GP225（德文版 D），页脚 YR-1-06VX225-A00/-C00, C-10-2020, A-Nr. 195945", url: "https://www.yaskawa.it/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/GP-Series/Flyer_Robot_GP225_D_11.2020.pdf"}
+  hc10: {title: "Yaskawa Europe — Flyer MOTOMAN HC10 / HC10DT (E)，页脚 YR-1-06VXHC10-A00/A10/B10/B12, B-10-2021, A-No. 180780", url: "https://www.yaskawa.co.uk/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/HC10_HC10DT/Flyer_Robot_HC10_HC10DT_E_10.2021.pdf"}
+  sda10f: {title: "Yaskawa UK / Yaskawa France 官方产品页 SDA10F（技术数据栏，两站内容一致）", url: "https://www.yaskawa.co.uk/products/robots/handling-assembly/productdetail/product/sda10f_714"}
+robots:
+  - model: MotoMINI
+    key: motomini
+    src: motomini
+    datasheet: {payload_kg: 0.5, reach_mm: 350, dof: 6, repeatability_mm: 0.02, weight_kg: 7}
+    joint_range_deg: [[-170, 170], [-85, 90], [-50, 90], [-140, 140], [-30, 210], [-360, 360]]
+    joint_speed_deg_s: [315, 315, 420, 600, 600, 600]
+    note: "工作半径为 Max. working range R（安川口径：S 轴中心到手腕 P 点）；本 flyer 重复精度未标 ISO 9283 脚注；文中无 IP 等级，未收；底座图有 4×Ø5.5 孔但无明确安装尺寸，未收 footprint；平均电源 0.5 kVA；安装：地/顶/壁/斜。"
+  - model: GP7
+    key: gp7
+    src: gp7
+    datasheet: {payload_kg: 7, reach_mm: 927, dof: 6, repeatability_mm: 0.01, weight_kg: 37, ip: IP67}
+    joint_range_deg: [[-170, 170], [-65, 145], [-70, 190], [-190, 190], [-135, 135], [-360, 360]]
+    joint_speed_deg_s: [375, 315, 410, 550, 550, 1000]
+    note: "工作半径为 Max. working range R（到手腕 P 点）；重复精度原文 ±0.01★（★=Conforms to ISO 9283）；IP 原文“IP Protection: IP67”，未分本体/手腕；平均电源 1 kVA；安装：地/顶/壁/斜。"
+  - model: GP12
+    key: gp12
+    src: gp12
+    datasheet: {payload_kg: 12, reach_mm: 1440, dof: 6, repeatability_mm: 0.02, weight_kg: 150, ip: "IP54 (S/L/U main axes), IP67 (wrist)"}
+    joint_range_deg: [[-170, 170], [-90, 155], [-85, 155], [-200, 200], [-150, 150], [-455, 455]]
+    joint_speed_deg_s: [260, 230, 260, 470, 470, 700]
+    note: "工作半径为 Max. working range R（到手腕 P 点）；重复精度符合 ISO 9283；IP 为标准版 YR-1-06VX12-A00（主轴 IP54、手腕 IP67），C00 版主轴 IP65；平均电源 1.5 kVA。"
+  - model: GP25
+    key: gp25
+    src: gp25
+    datasheet: {payload_kg: 25, reach_mm: 1730, dof: 6, weight_kg: 250, ip: "IP54 (S/L/U main axes), IP67 (wrist)"}
+    joint_range_deg: [[-180, 180], [-105, 155], [-86, 160], [-200, 200], [-150, 150], [-455, 455]]
+    joint_speed_deg_s: [210, 210, 265, 420, 420, 885]
+    note: "重复精度留空：官方 flyer（2024 版）两次读取均为 ±0.02（ISO 9283），但 Yaskawa UK 官方产品页写 0.03 mm（同 flyer 中 GP25-12 的值），无法判定哪个为准。工作半径到手腕 P 点；平均电源 2.0 kVA；安装：地/顶/壁/斜。"
+  - model: GP88
+    key: gp88
+    src: gp88
+    datasheet: {payload_kg: 88, reach_mm: 2236, dof: 6, repeatability_mm: 0.03, weight_kg: 630, ip: "IP65 (S/L/U main axes), IP67 (wrist)"}
+    joint_range_deg: [[-180, 180], [-90, 155], [-80, 90], [-360, 360], [-125, 125], [-360, 360]]
+    joint_speed_deg_s: [170, 140, 160, 230, 230, 350]
+    note: "德文 flyer（Max. Arbeitsbereich R，到手腕 P 点）；IP 为 Version YR-1-06VX88-D00：Hauptachsen IP65, Handgelenk IP67；平均功率 4,0 KVA；安装：地/顶/壁/斜。数值与 Yaskawa DE 官方产品页一致。"
+  - model: GP225
+    key: gp225
+    src: gp225
+    datasheet: {payload_kg: 225, reach_mm: 2702, dof: 6, repeatability_mm: 0.05, weight_kg: 1080, ip: "IP54 (S/L/U main axes), IP67 (wrist)"}
+    joint_range_deg: [[-180, 180], [-60, 76], [-86, 90], [-360, 360], [-125, 125], [-360, 360]]
+    joint_speed_deg_s: [120, 97, 115, 145, 145, 220]
+    note: "德文 flyer（到手腕 P 点）；IP 为标准版 YR-1-06VX225-A00（主轴 IP54、手腕 IP67），C00 版主轴 IP65；平均功率 5,0 KVA；仅地装。数值与 Yaskawa PL 官方产品页一致。"
+  - model: HC10
+    key: hc10
+    src: hc10
+    datasheet: {payload_kg: 10, reach_mm: 1200, dof: 6, repeatability_mm: 0.1, weight_kg: 47, ip: IP67}
+    joint_range_deg: [[-180, 180], [-180, 180], [-5, 355], [-180, 180], [-180, 180], [-180, 180]]
+    joint_speed_deg_s: [130, 130, 180, 180, 250, 250]
+    note: "取原版 HC10（YR-1-06VXHC10-A00），官网仍有该型号页面；HC10DT 同表（重 48 kg，R/B 允许力矩不同），HC10DTP 未收。reach 取 Effective reach 1200（S/L 轴中心到 P 点）；Absolute reach 1379（到 R/T 轴中心），产品页只写 1379。IP 原文“Protection class: IP67”，未分部位。flyer 无 TCP 速度。平均电源 1 kVA。"
+  - model: SDA10F
+    key: sda10f
+    src: sda10f
+    datasheet: {payload_kg: 10, dof: 15, repeatability_mm: 0.1, weight_kg: 220}
+    note: "未找到可直接读取的官方 SDA flyer（官网下载链接不可取），只用两个官方产品页（UK、FR，内容一致）；页面未标停产。负载 10 kg 为每臂。产品页 Max Working Range 845 mm 未说明参考点（单臂/何点），未收。产品页只列 S/L/U/R/B/T 六轴速度（130/170/170/200/200/400），缺 E 轴与腰部轴，未收关节数组。平均电源 2.5 kVA。"

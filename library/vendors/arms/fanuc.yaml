@@ -1,0 +1,75 @@
+vendor: {id: FANUC, name: {zh: 发那科, en: FANUC}, site: https://www.fanucamerica.com/products/robot}
+retrieved: "2026-09-30"
+# 说明：
+# - 所有数字取自 FANUC 官方站点产品页的规格表（HTML），每个型号同一页面独立取两次、两种问法逐字比对，全部一致（例外见各型号 note）。
+# - FANUC 官方规格表只给每轴“运动范围总角度”（如 J1 340°），不给上下限，故不收 joint_range_deg；总角度写在 note 里，按轴 1～6。
+# - 工作半径口径：FANUC 样本的工作空间图标注为 “Operating space of the J5-axis rotation center”（见 src fanuc_reach_def），即到手腕中心（J5 轴回转中心）。
+# - power_typical_w 对应官网 “Average Power Consumption”（平均耗电）。
+# - FANUC 官方 PDF 样本（fanuc.co.jp / fanuc.com 的 LR Mate、M-20iB 样本）文本抽取后表格列错位，数字无法可靠对应型号，未用作数据出处。
+sources:
+  lrmate200id: {title: "FANUC America 产品页 LR Mate 200iD（Specifications 规格表）", url: "https://www.fanucamerica.com/products/robot/lr-mate-200id"}
+  lrmate200id7l: {title: "FANUC America 产品页 LR Mate 200iD/7L（Specifications 规格表）", url: "https://www.fanucamerica.com/products/robots/series/lr-mate/lr-mate-200id-7l"}
+  cr7ia: {title: "FANUC America 产品页 CR-7iA（Specifications 规格表，页面标为 legacy）", url: "https://www.fanucamerica.com/products/robot/cr-7ia"}
+  crx10ial: {title: "FANUC America 产品页 CRX-10iA/L（Specifications 规格表）", url: "https://www.fanucamerica.com/products/robot/crx-10ia-l"}
+  crx10ial_jp: {title: "FANUC 日本总部 协働ロボットCRX 产品页（仕様表）", url: "https://www.fanuc.co.jp/ja/product/robot/f_r_collabo.html"}
+  crx10ial_crxus: {title: "FANUC America CRX 子站 CRX-10iA/L 页", url: "https://crx.fanucamerica.com/crx-10ia-l"}
+  crx10ial_eu: {title: "FANUC Europe CRX 子站 CRX-10iA/L 页", url: "https://crx.fanuc.eu/fanuc-cobot-crx-10ia-l-2/"}
+  m10ia12: {title: "FANUC America 产品页 M-10iA/12（Specifications 规格表，页面标为 legacy）", url: "https://www.fanucamerica.com/products/robot/m-10ia-12"}
+  m20ib25: {title: "FANUC America 产品页 M-20iB/25（Specifications 规格表）", url: "https://www.fanucamerica.com/products/robot/m-20ib-25"}
+  r2000ic165f: {title: "FANUC America 产品页 R-2000iC/165F（Specifications 规格表）", url: "https://www.fanucamerica.com/products/robots/series/r-2000/r-2000ic-165f"}
+  m900ib700: {title: "FANUC America 产品页 M-900iB/700（Specifications 规格表）", url: "https://www.fanucamerica.com/products/robot/m-900ib-700"}
+  fanuc_reach_def: {title: "FANUC 样本 FANUC Robot M-20iB，RM-20iB(E)-05b, 2022.4（仅用于确认工作半径口径与 M-20iB/25 半径/质量/精度交叉核对）", url: "https://www.fanuc.co.jp/en/product/catalog/pdf/robot/RM-20iB(E)-05b.pdf"}
+robots:
+  - model: LR Mate 200iD
+    key: lrmate200id
+    src: lrmate200id
+    datasheet: {payload_kg: 7, reach_mm: 717, dof: 6, repeatability_mm: 0.01, weight_kg: 25, ip: IP67}
+    joint_speed_deg_s: [450, 380, 520, 550, 545, 1000]
+    note: "工作半径到手腕中心（J5 轴回转中心）；ip 为本体及手腕/J3 臂标准等级 IP67，选配 IP69K；各轴运动范围总角度 340/245/420/380/250/720°（官方只给总角度，无上下限）；官网 Average Power Consumption 写 1 kW，但同系列 /7L 页写 0.5 kW，存疑未收。"
+
+  - model: LR Mate 200iD/7L
+    key: lrmate200id7l
+    src: lrmate200id7l
+    datasheet: {payload_kg: 7, reach_mm: 911, dof: 6, repeatability_mm: 0.01, weight_kg: 27, ip: IP67, power_typical_w: 500}
+    joint_speed_deg_s: [370, 310, 410, 550, 545, 1000]
+    note: "工作半径到手腕中心（J5 轴回转中心）；ip 为本体及手腕/J3 臂标准等级 IP67，选配 IP69K；power_typical_w 为官网平均耗电 0.5 kW；各轴运动范围总角度 340/245/430/380/250/720°。另一地址 /products/robot/lr-mate-200id-7l 只有简介、无规格表。"
+
+  - model: CR-7iA
+    key: cr7ia
+    src: cr7ia
+    datasheet: {payload_kg: 7, reach_mm: 717, dof: 6, repeatability_mm: 0.01, weight_kg: 53, ip: IP67, power_typical_w: 1000, tcp_speed_m_s: 1.0}
+    note: "协作机器人（官网标为 legacy，推荐以 CRX-10iA 替代）；工作半径到手腕中心；ip 为本体及手腕/J3 臂 IP67；tcp_speed 取官网 High Speed Mode 1000 mm/s，协作模式 Collaborative Mode 为 500 mm/s；power_typical_w 为官网平均耗电 1 kW；官网未给各轴最大速度；各轴运动范围总角度 340/166/373/380/180/720°。"
+
+  - model: CRX-10iA/L
+    key: crx10ial
+    src: crx10ial
+    datasheet: {payload_kg: 10, reach_mm: 1418, dof: 6, ip: IP67, footprint_mm: "Ø190", tcp_speed_m_s: 2.0}
+    note: "协作机器人；工作半径到手腕中心；ip 为本体及手腕/J3 臂 IP67；tcp_speed 取 High Speed Mode 2000 mm/s，协作模式 1000 mm/s（fanucamerica 主站与 crx.fanucamerica 子站一致）；footprint 为圆形底座直径 190 mm，出处 crx10ial_eu（“⌀ 190mm Footprint”）；官网未给各轴最大速度；各轴运动范围总角度 360/360/540/380/360/380°。重复精度与本体质量官方各站不一致，留空：fanucamerica 主站 ±0.05 mm / 39 kg，crx.fanuc.eu 39 kg；日本总部 fanuc.co.jp 与 crx.fanucamerica 子站 ±0.04 mm / 40 kg（可能是规格修订，未能确认）。"
+
+  - model: M-10iA/12
+    key: m10ia
+    src: m10ia12
+    datasheet: {payload_kg: 12, reach_mm: 1420, dof: 6, repeatability_mm: 0.08, weight_kg: 130}
+    joint_speed_deg_s: [230, 225, 230, 430, 430, 630]
+    note: "官网已无不带后缀的 M-10iA，取其后续型号 M-10iA/12（官网标为 legacy，已停产）；ROS 模型对应原 M-10iA（原型额定负载 10 kg），参数以 M-10iA/12 为准，二者负载不同；工作半径到手腕中心；官网规格表无 IP 等级、无耗电；各轴运动范围总角度 340/250/445/380/380/720°。"
+
+  - model: M-20iB/25
+    key: m20ib25
+    src: m20ib25
+    datasheet: {payload_kg: 25, reach_mm: 1853, dof: 6, repeatability_mm: 0.02, weight_kg: 210, ip: IP67, power_typical_w: 1000}
+    joint_speed_deg_s: [205, 205, 260, 415, 415, 880]
+    note: "工作半径到手腕中心（J5 轴回转中心，样本 RM-20iB(E)-05b 工作空间图标注）；ip 为本体及手腕/J3 臂 IP67；power_typical_w 为官网平均耗电 1 kW；各轴运动范围总角度 340/240/303/400/290/540°。半径 1853 mm、质量 210 kg、精度 ±0.02 mm 与样本一致（样本表格各轴列错位，轴数据未用）。"
+
+  - model: R-2000iC/165F
+    key: r2000ic165f
+    src: r2000ic165f
+    datasheet: {payload_kg: 165, reach_mm: 2655, dof: 6, repeatability_mm: 0.05, weight_kg: 1090, ip: IP54, power_typical_w: 3000}
+    joint_speed_deg_s: [120, 105, 110, 140, 140, 220]
+    note: "工作半径到手腕中心；ip 为本体标准 IP54（选配 IP56），手腕及 J3 臂为 IP67；power_typical_w 为官网平均耗电 3 kW；各轴运动范围总角度 370/136/312/720/250/720°。负载、半径、IP 与 fanuc.eu 产品页一致。"
+
+  - model: M-900iB/700
+    key: m900ib700
+    src: m900ib700
+    datasheet: {payload_kg: 700, reach_mm: 2832, dof: 6, repeatability_mm: 0.1, weight_kg: 2800, ip: IP54, power_typical_w: 5000}
+    joint_speed_deg_s: [80, 80, 80, 100, 100, 160]
+    note: "工作半径到手腕中心；ip 为本体标准 IP54（选配 IP56），手腕及 J3 臂为 IP67；power_typical_w 为官网平均耗电 5 kW；重复精度原文 ±0.10 mm；各轴运动范围总角度 360/154/160/720/244/720°。"

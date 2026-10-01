@@ -1,0 +1,32 @@
+# B-ARM-KR3R540 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: KUKA
+  name:
+    zh: 库卡
+    en: KUKA
+  site: https://www.kuka.com/en-de/products/robot-systems/industrial-robots
+  model: KR 3 R540
+datasheet:
+  vendor: KUKA
+  model: KR 3 R540
+  values:
+    payload_kg: 3
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+  src: https://www.kuka.com/en-us/company/press/news/2016/07/the-new-kr-3-agilus
+  note: KR 3 AGILUS 已不在 kuka.com KR AGILUS 产品页上，只有 2016 年官方新闻稿可用：原文 "With a payload
+    capacity of 3 kg and a reach of 540 mm"（两次读取一致）。新闻稿的 540 mm 是概数、未写明到哪个点，与型号规格书常见的
+    541 mm 可能不一致（后者只在第三方网站见到，不采用），故 reach 留空。新闻稿另写可在 600 x 600 mm 的工作单元内使用，这是单元尺寸不是底座尺寸，未收
+    footprint。轴数、重复精度、重量、IP 均无官方可读来源，未收。
+data_sources:
+- title: KUKA 官方新闻稿 The new agile lightweight robot KR 3 AGILUS（2016-07-07）
+  url: https://www.kuka.com/en-us/company/press/news/2016/07/the-new-kr-3-agilus
+  retrieved: '2026-09-30'
+tags:
+- 库卡
+- KUKA
+- KR 3 R540
+- KR 3 R540

@@ -1,0 +1,88 @@
+# B-ARM-HC10 的厂商参数（第 5 轮第 3 步第 3 批）
+vendor:
+  id: YASKAWA
+  name:
+    zh: 安川电机
+    en: Yaskawa Motoman
+  site: https://www.yaskawa.eu.com
+  model: HC10
+datasheet:
+  vendor: Yaskawa Motoman
+  model: HC10
+  values:
+    payload_kg: 10
+    reach_mm: 1200
+    dof: 6
+    repeatability_mm: 0.1
+    weight_kg: 47
+    ip: IP67
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+  src: https://www.yaskawa.co.uk/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/HC10_HC10DT/Flyer_Robot_HC10_HC10DT_E_10.2021.pdf
+  note: '取原版 HC10（YR-1-06VXHC10-A00），官网仍有该型号页面；HC10DT 同表（重 48 kg，R/B 允许力矩不同），HC10DTP
+    未收。reach 取 Effective reach 1200（S/L 轴中心到 P 点）；Absolute reach 1379（到 R/T 轴中心），产品页只写
+    1379。IP 原文“Protection class: IP67”，未分部位。flyer 无 TCP 速度。平均电源 1 kVA。'
+  axes:
+  - axis: 1
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 130
+  - axis: 2
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 130
+  - axis: 3
+    range_deg:
+    - -5
+    - 355
+    speed_deg_s: 180
+  - axis: 4
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 180
+  - axis: 5
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 250
+  - axis: 6
+    range_deg:
+    - -180
+    - 180
+    speed_deg_s: 250
+data_sources:
+- title: Yaskawa Europe — Flyer MOTOMAN HC10 / HC10DT (E)，页脚 YR-1-06VXHC10-A00/A10/B10/B12,
+    B-10-2021, A-No. 180780
+  url: https://www.yaskawa.co.uk/Global%20Assets/Downloads/Brochures_Catalogues/Robotics/MOTOMAN_Robots/HC10_HC10DT/Flyer_Robot_HC10_HC10DT_E_10.2021.pdf
+  retrieved: '2026-09-30'
+tags:
+- 安川电机
+- Yaskawa Motoman
+- HC10
+- HC10
