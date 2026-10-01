@@ -79,5 +79,18 @@ say("  消息种类：" + "，".join("{} {}".format(k, v) for k, v in sorted(sta
 if state["connected"] != "Success" or not state["units"].get("teach"):
     ok = False
 
+# 3. ERPNext 登录页：问渠单点登录按钮和自动跳转脚本（第 7 轮）
+try:
+    with urllib.request.urlopen("https://erp.{}/login".format(domain), timeout=30) as r:
+        page = r.read().decode("utf-8", "replace")
+    with urllib.request.urlopen("https://erp.{}/website_script.js".format(domain), timeout=30) as r:
+        js = r.read().decode("utf-8", "replace")
+    btn, auto = "btn-wenquest" in page, "wenquest-sso" in js
+    say("ERPNext 单点登录：登录按钮{}，自动跳转脚本{}".format("有" if btn else "没有", "有" if auto else "没有"))
+    ok = ok and btn and auto
+except Exception as e:  # noqa: BLE001
+    say("读不到 ERPNext 登录页：{}".format(e))
+    ok = False
+
 msg = "%0A".join(x.replace("%", "%25") for x in lines)
 print("::{} title=线上车间检查（{}）::{}".format("notice" if ok else "warning", "正常" if ok else "有问题", msg))
