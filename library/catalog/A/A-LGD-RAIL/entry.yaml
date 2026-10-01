@@ -1,0 +1,181 @@
+# A-LGD-RAIL · 滚动直线导轨副（HG 型）（第 5 轮第 5 步，P7）
+schema: 1
+id: A-LGD-RAIL
+kind: family
+name:
+  zh: 滚动直线导轨副（HG 型）
+  en: Linear guideway (HG type)
+category: LGD
+tags:
+- 直线导轨
+- 导轨
+- 滑块
+- linear guide
+- HIWIN HG
+standards:
+- code: 行业通用尺寸
+  title: 四列钢球方形导轨 15～45（HIWIN HG 系列；安装尺寸与 THK HSR 互换）
+params:
+- key: rail_W_mm
+  zh: 导轨宽 WR
+  en: Rail width WR
+  role: dim
+  unit: mm
+- key: rail_H_mm
+  zh: 导轨高 HR
+  en: Rail height HR
+  role: dim
+  unit: mm
+- key: rail_pitch_mm
+  zh: 导轨安装孔距 P
+  en: Rail hole pitch P
+  role: dim
+  unit: mm
+- key: rail_E_mm
+  zh: 孔距端距 E
+  en: Rail end distance E
+  role: dim
+  unit: mm
+- key: rail_bolt
+  zh: 导轨螺栓
+  en: Rail bolt
+  role: dim
+- key: rail_d_mm
+  zh: 导轨孔径 d
+  en: Rail hole d
+  role: dim
+  unit: mm
+- key: rail_D_mm
+  zh: 沉头孔径 D
+  en: Counterbore D
+  role: dim
+  unit: mm
+- key: rail_h_mm
+  zh: 沉头孔深 h
+  en: Counterbore depth h
+  role: dim
+  unit: mm
+- key: H_mm
+  zh: 组件高度 H
+  en: Assembly height H
+  role: dim
+  unit: mm
+- key: H1_mm
+  zh: 滑块底面间隙 H1
+  en: Clearance H1
+  role: dim
+  unit: mm
+- key: N_mm
+  zh: 导轨侧到滑块侧 N
+  en: Rail to block side N
+  role: dim
+  unit: mm
+- key: W_mm
+  zh: 滑块宽 W
+  en: Block width W
+  role: dim
+  unit: mm
+- key: B_mm
+  zh: 安装孔横向距 B
+  en: Mounting B
+  role: dim
+  unit: mm
+- key: C_mm
+  zh: 安装孔纵向距 C
+  en: Mounting C
+  role: dim
+  unit: mm
+- key: L1_mm
+  zh: 滑块本体长 L1
+  en: Block body length L1
+  role: dim
+  unit: mm
+- key: L_mm
+  zh: 滑块总长 L
+  en: Block length L
+  role: dim
+  unit: mm
+- key: block_bolt
+  zh: 滑块安装螺纹
+  en: Block mounting thread
+  role: dim
+- key: C_N
+  zh: 额定动载荷 C
+  en: Dynamic load rating C
+  role: perf
+  unit: N
+- key: C0_N
+  zh: 额定静载荷 C0
+  en: Static load rating C0
+  role: perf
+  unit: N
+- key: block_mass_kg
+  zh: 滑块质量
+  en: Block mass
+  role: info
+  unit: kg
+- key: rail_mass_kg_per_m
+  zh: 导轨每米质量
+  en: Rail mass per metre
+  role: info
+  unit: kg/m
+specs: specs.csv
+default: HGH20CA
+model:
+  engine: wenquest:linear_guide
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 导轨底面中心在原点，导轨沿 X，滑块居中；导轨长度为示意（取孔距的整数倍）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序与规格表）；尺寸取自所列标准与样本的公开尺寸表
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 尺寸表两次独立读取一致，另抽查核对；测试逐行核对公式与单调性
+  data_sources:
+  - title: HIWIN GmbH 官方产品页（hiwin.de）HGH15/20/25/30/35/45CAZAC、HGW15/20/25/30/35/45CCZAC
+      技术数据，2026-10 读取
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+    retrieved: '2026-10-01'
+    note: 第一遍：滑块全部外形尺寸、C_N、C0_N、block_mass_kg（现行版额定载荷以此为准）。其余型号页同路径：HGH15 p/5-001623，HGH25
+      p/5-001652，HGH30 p/5-003157，HGH35 p/5-003129，HGH45 p/5-003130；HGW-QHW/ 下 HGW15CCZAC
+      p/5-003167，HGW20 p/5-001118，HGW25 p/5-001153，HGW30 p/5-003168，HGW35 p/5-001224，HGW45
+      p/5-001259
+  - title: HIWIN GmbH 官方产品页（hiwin.de）HGR15/20/25/30/35/45R4000H 导轨技术数据
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR20R4000H/p/5-001922
+    retrieved: '2026-10-01'
+    note: 第一遍：rail_W/H/pitch/d/D/h、rail_mass_kg_per_m、标准端距 E1=20（45 为 22.5）。其余：HGR15
+      p/5-001920，HGR25 p/5-001924，HGR30 p/5-001926，HGR35 p/5-001927，HGR45 p/5-001929
+  - title: HIWIN Linear Guideway Technical Information 样本 G99TE17-1306（HG Series 章节，经销商
+      lm76 转存的官方样本 PDF）
+    url: https://www.lm76.com/HG-Series-Catalog_opt.pdf
+    retrieved: '2026-10-01'
+    note: 第二遍：2-1-13(1) HGH-CA/HGH-HA 表与 2-1-13(5) HGW-CC/HGW-HC 表，逐字逐格重读全部外形尺寸、导轨尺寸、导轨螺栓
+      rail_bolt、E、质量；额定载荷为旧版数值（见 notes）
+  - title: HIWIN Linear Guideway Technical Information 样本 G99TE14-1006（motionusa 转存）
+    url: https://s3.amazonaws.com/www.motionusa.com/hiwin/Hiwin_GuidewayCatalog.pdf
+    retrieved: '2026-10-01'
+    note: 辅助核对：p.35 HGH-CA 表（含 rail_bolt）；该版无 HGW-CC 表；用于查明 HGH25 K1 版本差异
+  - title: THK 综合样本 LM Guide 型号 HSR 尺寸表（A1-192 HSR-C 法兰型、A1-196 HSR-R 无法兰型）
+    url: https://tech.thk.com/en/products/pdfs/en_a01_196.pdf
+    retrieved: '2026-10-01'
+    note: 互换性核对，不入表；HSR-C 页：https://tech.thk.com/en/products/pdfs/en_a01_192.pdf
+  notes: 按 HIWIN HG 系列（现行官网参数；额定载荷比 2013 版样本高，按官网）；安装尺寸（H、W、B×C、螺纹、导轨宽与孔距）与 THK HSR
+    一致可互换，但滑块长度和导轨高度略有不同，导轨与滑块须同一家配对。行业标准 JB/T 7175 的尺寸未取得可读文本。
+teaching:
+  principle: 滑块里的四列钢球在导轨的四条滚道上滚动并循环，滑块沿导轨直线移动，摩擦小、刚度高，能承受上下左右各方向的载荷和力矩。
+  uses:
+  - 直角坐标机器人的各轴
+  - 数控机床工作台
+  - 自动化设备的直线模组
+  courses:
+  - course: 机械设计基础
+    chapter: 直线导轨与直线运动单元
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

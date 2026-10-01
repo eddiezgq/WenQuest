@@ -1,0 +1,155 @@
+# A-BSC-SFU · 滚珠丝杠副（法兰单螺母 SFU）（第 5 轮第 5 步，P7）
+schema: 1
+id: A-BSC-SFU
+kind: family
+name:
+  zh: 滚珠丝杠副（法兰单螺母 SFU）
+  en: Ball screw with flanged single nut (SFU)
+category: BSC
+tags:
+- 滚珠丝杠
+- 丝杠
+- 直线传动
+- ball screw
+- SFU
+standards:
+- code: GB/T 17587.2
+  title: 滚珠丝杠副 第2部分：公称直径和公称导程 公制系列
+- code: ISO 3408-2
+  title: Ball screws — Nominal diameters and nominal leads — Metric series
+- code: DIN 69051-5
+  title: Ball screws — Dimensions for flanged ball nuts (form B)
+params:
+- key: d0_mm
+  zh: 公称直径 d0
+  en: Nominal diameter d0
+  role: key
+  unit: mm
+- key: Ph_mm
+  zh: 导程 Ph
+  en: Lead Ph
+  role: key
+  unit: mm
+- key: Dw_mm
+  zh: 钢球直径
+  en: Ball diameter
+  role: dim
+  unit: mm
+- key: D_mm
+  zh: 螺母外径 D
+  en: Nut diameter D
+  role: dim
+  unit: mm
+- key: L_mm
+  zh: 螺母长度 L（含法兰）
+  en: Nut length L
+  role: dim
+  unit: mm
+- key: D1_mm
+  zh: 法兰外径 D1
+  en: Flange diameter D1
+  role: dim
+  unit: mm
+- key: L1_mm
+  zh: 法兰厚度
+  en: Flange thickness
+  role: dim
+  unit: mm
+- key: D5_mm
+  zh: 螺栓孔分布圆直径
+  en: Bolt circle diameter
+  role: dim
+  unit: mm
+- key: X_mm
+  zh: 法兰安装孔直径
+  en: Flange hole diameter
+  role: dim
+  unit: mm
+- key: W_mm
+  zh: 法兰切边宽度
+  en: Flange flat width
+  role: dim
+  unit: mm
+- key: n_holes
+  zh: 法兰孔数
+  en: Flange holes
+  role: dim
+- key: circuits
+  zh: 滚珠循环圈数
+  en: Ball circuits
+  role: info
+- key: Ca_N
+  zh: 额定动载荷 Ca
+  en: Dynamic load rating Ca
+  role: perf
+  unit: N
+- key: C0a_N
+  zh: 额定静载荷 C0a
+  en: Static load rating C0a
+  role: perf
+  unit: N
+- key: tbi_model
+  zh: 样本型号（TBI）
+  en: Catalog model (TBI)
+  role: info
+specs: specs.csv
+default: 16x5
+model:
+  engine: wenquest:ball_screw
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 丝杠轴线沿 Z，螺母法兰端面在 z=0；丝杠长度为示意（3×螺母长 + 2×d0）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序与规格表）；尺寸取自所列标准与样本的公开尺寸表
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 尺寸表两次独立读取一致，另抽查核对；测试逐行核对公式与单调性
+  data_sources:
+  - title: TBI MOTION Ball Screw 样本，SFNU/SFU (DIN 69051 FORM B) Series Specifications
+      页（经销商 Kalatec 托管的 TBI 原版单页 PDF）
+    url: https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+    retrieved: '2026-10-01'
+    note: 全部尺寸列与 Ca/C0a（原表单位 kgf）；该页即 TBI 总样本 C46–C48 节
+  - title: TBI MOTION Ball Screw 总样本（TBI 官网 25.02 版 / Anaheim Automation 托管 2019 版）
+    url: https://i0528.tbimotion.com.tw/storage/pdf/TBIMOTION_BallScrew_25.02-F(EN).pdf
+    retrieved: '2026-10-01'
+    note: 确认表名“SFNU/SFU (DIN 69051 FORM B)”、页码 C46–C48、d≤32 用 6 孔、d≥40 用 8 孔；工具只取到前段，Anaheim
+      版 C46 的 SFNU01605-4、SFNU01610-3、SFNU02005-4（前半行）与 s1 逐字一致
+  - title: HIWIN Italia 官网 FSC/FSI flange screws DIN 69051 规格表
+    url: https://www.hiwin.it/en/products/ballscrews/ground-in-stock/fsc-fsi-flange-screws-din-69051
+    retrieved: '2026-10-01'
+    note: 仅用于核对法兰外形（D、D1、D5、X、L1、W），不入表
+  - title: HIWIN UK Data Sheets for Hiwin Ground ballscrews, Table 6.4 FSC (DIN 69051
+      Part 5)
+    url: https://hiwin.co.uk/wp-content/uploads/2017/05/Data-Sheets-for-Hiwin-Ground-ballscrews.pdf
+    retrieved: '2026-10-01'
+    note: 仅用于核对法兰外形，不入表；p.6–7
+  - title: IS 14872-2:2000 Ball Screws Part 2（印度标准，声明等同 ISO 3408-2:1991）
+    url: https://law.resource.org/pub/in/bis/S01/is.14872.2.2000.pdf
+    retrieved: '2026-10-01'
+    note: Table 1 优选组合 / Table 2 其他组合，用于 is_preferred 列；p.3
+  - title: ISO 3408-2:2021 iTeh 公开样本
+    url: https://cdn.standards.iteh.ai/samples/75530/3b276b7193ff42ab9184d881f3d00bf7/ISO-3408-2-2021.pdf
+    retrieved: '2026-10-01'
+    note: 确认 2021 版已增加螺母安装尺寸（B6/B8 两平面型等）及符号定义；样本不含尺寸表
+  notes: 螺母外形与载荷取 TBI MOTION SFNU/SFU（DIN 69051 B 型）样本，载荷由 kgf 按 9.80665 换算；外形与 HIWIN
+    FSI 互核一致（25×10 法兰厚 TBI 12、HIWIN 10，按 TBI）；12×4 属 ISO 3408-2 表 2（非优选组合），DIN 69051-5
+    从 d0=16 起，12×4 外形按 TBI；20×10 两份 HIWIN 资料长度不一、TBI 无载荷，未收。不同厂家的螺母长度与载荷不同，选型以所购厂家样本为准。
+teaching:
+  principle: 丝杠与螺母的螺旋滚道之间装满钢球，转动丝杠时钢球滚动并经螺母内的循环通道返回，把旋转变成直线移动；滚动摩擦使效率达 90% 以上，可加预紧消除间隙，定位精度高。
+  uses:
+  - 数控机床进给轴
+  - 直角坐标机器人与模组
+  - 精密升降台
+  courses:
+  - course: 机械设计基础
+    chapter: 螺旋传动与滚珠丝杠
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

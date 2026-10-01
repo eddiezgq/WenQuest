@@ -1,0 +1,13 @@
+size,rail_W_mm,rail_H_mm,rail_pitch_mm,rail_E_mm,rail_bolt,rail_d_mm,rail_D_mm,rail_h_mm,H_mm,H1_mm,N_mm,W_mm,B_mm,C_mm,L1_mm,L_mm,block_bolt,C_N,C0_N,block_mass_kg,rail_mass_kg_per_m,src_url
+HGH15CA,15,15,60,20,M4x16,4.5,7.5,5.3,28,4.3,9.5,34,26,26,39.4,61.4,M4x5,14700,23470,0.18,1.45,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGH20CA,20,17.5,60,20,M5x16,6,9.5,8.5,30,4.6,12,44,32,36,50.5,77.5,M5x6,27100,36680,0.3,2.21,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGH25CA,23,22,60,20,M6x20,7,11,9,40,5.5,12.5,48,35,35,58,84,M6x8,34900,52820,0.51,3.21,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGH30CA,28,26,80,20,M8x25,9,14,12,45,6,16,60,40,40,70,97.4,M8x10,48500,71870,0.88,4.47,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGH35CA,34,29,80,20,M8x25,9,14,12,55,7.5,18,70,50,50,80,112.4,M8x12,64600,93880,1.45,6.3,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGH45CA,45,38,105,22.5,M12x35,14,20,17,70,9.5,20.5,86,60,60,97,139.4,M10x17,103800,146710,2.73,10.41,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGW15CC,15,15,60,20,M4x16,4.5,7.5,5.3,24,4.3,16,47,38,30,39.4,61.4,M5,14700,23470,0.17,1.45,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGW20CC,20,17.5,60,20,M5x16,6,9.5,8.5,30,4.6,21.5,63,53,40,50.5,77.5,M6,27100,36680,0.4,2.21,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGW25CC,23,22,60,20,M6x20,7,11,9,36,5.5,23.5,70,57,45,58,84,M8,34900,52820,0.59,3.21,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGW30CC,28,26,80,20,M8x25,9,14,12,42,6,31,90,72,52,70,97.4,M10,48500,71870,1.09,4.47,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGW35CC,34,29,80,20,M8x25,9,14,12,48,7.5,33,100,82,62,80,112.4,M10,64600,93880,1.56,6.3,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+HGW45CC,45,38,105,22.5,M12x35,14,20,17,60,9.5,37.5,120,100,80,97,139.4,M12,103800,146710,2.79,10.41,https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633

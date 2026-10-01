@@ -1,0 +1,12 @@
+size,d0_mm,Ph_mm,Dw_mm,D_mm,L_mm,D1_mm,L1_mm,D5_mm,X_mm,W_mm,n_holes,circuits,Ca_N,C0a_N,tbi_model,src_url
+12x4,12,4,2.5,24,40,40,10,32,4.5,30,6,4,8846,18476,SFU01204-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+16x5,16,5,3.175,28,45,48,10,38,5.5,40,6,4,13533,29930,SFNU01605-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+16x10,16,10,3.175,28,57,48,10,38,5.5,40,6,3,10817,23546,SFNU01610-3,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+20x5,20,5,3.175,36,51,58,10,47,6.6,44,6,4,15210,38001,SFNU02005-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+25x5,25,5,3.175,40,51,62,10,51,6.6,48,6,4,16907,48092,SFNU02505-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+25x10,25,10,4.762,40,85,62,12,51,6.6,48,6,4,28969,71540,SFNU02510-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+32x5,32,5,3.175,50,52,80,12,65,9,62,6,4,18848,62204,SFNU03205-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+32x10,32,10,6.35,50,85,80,12,65,9,62,6,4,47121,119720,SFNU03210-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+40x5,40,5,3.175,63,55,93,14,78,9,70,8,4,20692,78336,SFNU04005-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+40x10,40,10,6.35,63,88,93,14,78,9,70,8,4,52946,152003,SFNU04010-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf
+50x10,50,10,6.35,75,88,110,16,93,11,85,8,4,58879,192348,SFNU05010-4,https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf

@@ -1,0 +1,98 @@
+# A-SPR-CMP · 圆柱螺旋压缩弹簧（YA 型）（第 5 轮第 5 步，P7）
+schema: 1
+id: A-SPR-CMP
+kind: family
+name:
+  zh: 圆柱螺旋压缩弹簧（YA 型）
+  en: Cylindrical helical compression spring, type YA
+category: SPR
+tags:
+- 弹簧
+- 压缩弹簧
+- 螺旋弹簧
+- compression spring
+standards:
+- code: GB/T 2089-2009
+  title: 普通圆柱螺旋压缩弹簧尺寸及参数（两端圈并紧磨平或制扁）
+params:
+- key: d_mm
+  zh: 材料直径 d
+  en: Wire diameter d
+  role: key
+  unit: mm
+- key: D_mm
+  zh: 弹簧中径 D
+  en: Mean diameter D
+  role: key
+  unit: mm
+- key: H0_mm
+  zh: 自由高度 H0
+  en: Free length H0
+  role: key
+  unit: mm
+- key: n
+  zh: 有效圈数 n
+  en: Active coils n
+  role: dim
+- key: Fs_N
+  zh: 最大工作负荷 Fn
+  en: Max working load Fn
+  role: perf
+  unit: N
+- key: fs_mm
+  zh: 最大工作变形量
+  en: Max working deflection
+  role: perf
+  unit: mm
+- key: k_N_per_mm
+  zh: 刚度
+  en: Spring rate
+  role: perf
+  unit: N/mm
+specs: specs.csv
+default: 1.6x12x32
+model:
+  engine: wenquest:compression_spring
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 弹簧轴线沿 Z，底面在 z=0；两端各一圈并紧（简化为端部节距等于线径）
+  mesh:
+    lin_mm: 0.05
+    ang_rad: 0.5
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序与规格表）；尺寸取自所列标准与样本的公开尺寸表
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 尺寸表两次独立读取一致，另抽查核对；测试逐行核对公式与单调性
+  data_sources:
+  - title: 易紧通 164580.com《GB/T 2089-2009 普通圆柱螺旋压缩弹簧（两端圈并紧磨平或制扁）》转载尺寸表（HTML 表，按 d 分组的转置表，每表
+      16 列）
+    url: https://www.164580.com/info_95047.html
+    retrieved: '2026-10-01'
+    note: 所有行的 Fs_N、H0_mm、fs_mm、k_N_per_mm 主出处（d=1.6 的 D=8、9 两列除外）
+  - title: 机械工具网 mechtool.cn《普通圆柱螺旋压缩弹簧(两端圈并紧磨平或制扁) GB/T 2089-2009》尺寸表（HTML 表，每行一个
+      d×D）
+    url: https://www.mechtool.cn/spring/spring_cylindricalspiralcompressionspring.html
+    retrieved: '2026-10-01'
+    note: d=0.5、0.8 全部列及 d=1.6（D=10~16）的互核；d=1.6 的 D=8、9 两行唯一出处
+  notes: 收 d = 0.5、0.8、1、1.6、6、10 mm 六档（每个 d×D 收标准表的 6 个有效圈数）；表里刚度按 G ≈ 79 000 N/mm²
+    计算，测试按公式逐行核对。负荷 Fn 为标准表“最大工作负荷”。d = 1 的 D 4.5～8、d = 2.5、d = 4 等档转载表读取错位，未收；少数行变形量与
+    负荷÷刚度 差 4～8%（原表如此），照录。
+teaching:
+  principle: 压缩时簧丝主要受扭转，刚度 k = G·d⁴ /(8·D³·n)：线径越粗刚度越大，中径越大、有效圈数越多刚度越小；YA 型两端圈并紧磨平，端面平整，受力均匀。
+  uses:
+  - 安全阀、离合器的压紧
+  - 机构复位与缓冲
+  - 机器人夹爪的回位
+  courses:
+  - course: 机械设计基础
+    chapter: 弹簧
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

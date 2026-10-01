@@ -1,0 +1,50 @@
+# 滚珠丝杠副 A-BSC-SFU：单螺母、法兰式内循环（国内通称 SFU；DIN 69051-5 B 型 / HIWIN FSI·FSC 式）
+standard: {code: "GB/T 17587.2（等同 ISO 3408-2）；螺母外形 DIN 69051-5", title: "滚珠丝杠副 第2部分：公称直径和公称导程 公制系列（d0×Ph 组合）；螺母外形与载荷按 TBI MOTION SFNU/SFU (DIN 69051 FORM B) 样本"}
+sources:
+  - {key: s1, title: "TBI MOTION Ball Screw 样本，SFNU/SFU (DIN 69051 FORM B) Series Specifications 页（经销商 Kalatec 托管的 TBI 原版单页 PDF）", url: "https://www.kalatec.com.br/wp-content/uploads/2019/08/10-Fuso_de_esferas_SFU_SFNU.pdf", note: "全部尺寸列与 Ca/C0a（原表单位 kgf）；该页即 TBI 总样本 C46–C48 节"}
+  - {key: s2, title: "TBI MOTION Ball Screw 总样本（TBI 官网 25.02 版 / Anaheim Automation 托管 2019 版）", url: "https://i0528.tbimotion.com.tw/storage/pdf/TBIMOTION_BallScrew_25.02-F(EN).pdf", note: "确认表名“SFNU/SFU (DIN 69051 FORM B)”、页码 C46–C48、d≤32 用 6 孔、d≥40 用 8 孔；工具只取到前段，Anaheim 版 C46 的 SFNU01605-4、SFNU01610-3、SFNU02005-4（前半行）与 s1 逐字一致"}
+  - {key: s3, title: "HIWIN Italia 官网 FSC/FSI flange screws DIN 69051 规格表", url: "https://www.hiwin.it/en/products/ballscrews/ground-in-stock/fsc-fsi-flange-screws-din-69051", note: "仅用于核对法兰外形（D、D1、D5、X、L1、W），不入表"}
+  - {key: s4, title: "HIWIN UK Data Sheets for Hiwin Ground ballscrews, Table 6.4 FSC (DIN 69051 Part 5)", url: "https://hiwin.co.uk/wp-content/uploads/2017/05/Data-Sheets-for-Hiwin-Ground-ballscrews.pdf", note: "仅用于核对法兰外形，不入表；p.6–7"}
+  - {key: s5, title: "IS 14872-2:2000 Ball Screws Part 2（印度标准，声明等同 ISO 3408-2:1991）", url: "https://law.resource.org/pub/in/bis/S01/is.14872.2.2000.pdf", note: "Table 1 优选组合 / Table 2 其他组合，用于 is_preferred 列；p.3"}
+  - {key: s6, title: "ISO 3408-2:2021 iTeh 公开样本", url: "https://cdn.standards.iteh.ai/samples/75530/3b276b7193ff42ab9184d881f3d00bf7/ISO-3408-2-2021.pdf", note: "确认 2021 版已增加螺母安装尺寸（B6/B8 两平面型等）及符号定义；样本不含尺寸表"}
+columns:
+  - [d0_mm, 公称直径, nominal diameter, mm]
+  - [Ph_mm, 公称导程, nominal lead, mm]
+  - [Dw_mm, 钢球直径, ball diameter, mm]
+  - [D_mm, 螺母外径（圆柱段）, nut outer diameter, mm]
+  - [L_mm, 螺母总长（含法兰）, nut overall length incl. flange, mm]
+  - [D1_mm, 法兰外径, flange outer diameter, mm]
+  - [L1_mm, 法兰厚度, flange thickness, mm]
+  - [D5_mm, 法兰安装孔分布圆直径, bolt circle diameter, mm]
+  - [X_mm, 法兰安装孔直径（通孔）, mounting hole diameter, mm]
+  - [W_mm, 法兰两平行切边间距, width across flats, mm]
+  - [n_holes, 法兰安装孔数（d0≤32 为 6，d0≥40 为 8）, number of mounting holes, 个]
+  - [circuits, 循环圈数（列×圈）, number of ball circuits, 圈]
+  - [Ca_N, 额定动载荷（TBI 样本值，kgf×9.80665 取整）, basic dynamic load rating, N]
+  - [C0a_N, 额定静载荷（TBI 样本值，kgf×9.80665 取整）, basic static load rating, N]
+  - [is_preferred, 是否 ISO 3408-2:1991 Table 1 优选组合, preferred d0×Ph combination, 是/否]
+  - [tbi_model, TBI 型号, TBI model no., —]
+rows:
+  - {size: "12x4", src: s1, tbi_model: SFU01204-4, d0_mm: 12, Ph_mm: 4, Dw_mm: 2.5, D_mm: 24, L_mm: 40, D1_mm: 40, L1_mm: 10, D5_mm: 32, X_mm: 4.5, W_mm: 30, n_holes: 6, circuits: 4, Ca_N: 8846, C0a_N: 18476, is_preferred: false}
+  - {size: "16x5", src: s1, tbi_model: SFNU01605-4, d0_mm: 16, Ph_mm: 5, Dw_mm: 3.175, D_mm: 28, L_mm: 45, D1_mm: 48, L1_mm: 10, D5_mm: 38, X_mm: 5.5, W_mm: 40, n_holes: 6, circuits: 4, Ca_N: 13533, C0a_N: 29930, is_preferred: true}
+  - {size: "16x10", src: s1, tbi_model: SFNU01610-3, d0_mm: 16, Ph_mm: 10, Dw_mm: 3.175, D_mm: 28, L_mm: 57, D1_mm: 48, L1_mm: 10, D5_mm: 38, X_mm: 5.5, W_mm: 40, n_holes: 6, circuits: 3, Ca_N: 10817, C0a_N: 23546, is_preferred: true}
+  - {size: "20x5", src: s1, tbi_model: SFNU02005-4, d0_mm: 20, Ph_mm: 5, Dw_mm: 3.175, D_mm: 36, L_mm: 51, D1_mm: 58, L1_mm: 10, D5_mm: 47, X_mm: 6.6, W_mm: 44, n_holes: 6, circuits: 4, Ca_N: 15210, C0a_N: 38001, is_preferred: true}
+  - {size: "25x5", src: s1, tbi_model: SFNU02505-4, d0_mm: 25, Ph_mm: 5, Dw_mm: 3.175, D_mm: 40, L_mm: 51, D1_mm: 62, L1_mm: 10, D5_mm: 51, X_mm: 6.6, W_mm: 48, n_holes: 6, circuits: 4, Ca_N: 16907, C0a_N: 48092, is_preferred: true}
+  - {size: "25x10", src: s1, tbi_model: SFNU02510-4, d0_mm: 25, Ph_mm: 10, Dw_mm: 4.762, D_mm: 40, L_mm: 85, D1_mm: 62, L1_mm: 12, D5_mm: 51, X_mm: 6.6, W_mm: 48, n_holes: 6, circuits: 4, Ca_N: 28969, C0a_N: 71540, is_preferred: true}
+  - {size: "32x5", src: s1, tbi_model: SFNU03205-4, d0_mm: 32, Ph_mm: 5, Dw_mm: 3.175, D_mm: 50, L_mm: 52, D1_mm: 80, L1_mm: 12, D5_mm: 65, X_mm: 9, W_mm: 62, n_holes: 6, circuits: 4, Ca_N: 18848, C0a_N: 62204, is_preferred: true}
+  - {size: "32x10", src: s1, tbi_model: SFNU03210-4, d0_mm: 32, Ph_mm: 10, Dw_mm: 6.35, D_mm: 50, L_mm: 85, D1_mm: 80, L1_mm: 12, D5_mm: 65, X_mm: 9, W_mm: 62, n_holes: 6, circuits: 4, Ca_N: 47121, C0a_N: 119720, is_preferred: true}
+  - {size: "40x5", src: s1, tbi_model: SFNU04005-4, d0_mm: 40, Ph_mm: 5, Dw_mm: 3.175, D_mm: 63, L_mm: 55, D1_mm: 93, L1_mm: 14, D5_mm: 78, X_mm: 9, W_mm: 70, n_holes: 8, circuits: 4, Ca_N: 20692, C0a_N: 78336, is_preferred: true}
+  - {size: "40x10", src: s1, tbi_model: SFNU04010-4, d0_mm: 40, Ph_mm: 10, Dw_mm: 6.35, D_mm: 63, L_mm: 88, D1_mm: 93, L1_mm: 14, D5_mm: 78, X_mm: 9, W_mm: 70, n_holes: 8, circuits: 4, Ca_N: 52946, C0a_N: 152003, is_preferred: true}
+  - {size: "50x10", src: s1, tbi_model: SFNU05010-4, d0_mm: 50, Ph_mm: 10, Dw_mm: 6.35, D_mm: 75, L_mm: 88, D1_mm: 110, L1_mm: 16, D5_mm: 93, X_mm: 11, W_mm: 85, n_holes: 8, circuits: 4, Ca_N: 58879, C0a_N: 192348, is_preferred: true}
+excluded:
+  - "20x10：TBI SFNU/SFU (DIN 69051 FORM B) 表中没有 20×10（只有 SFNU02005-4、SFU02004-4）；HIWIN 有 R20-10K3-FSC（外形 36/58/47/6.6/10/44，螺母长 47/48，两份 HIWIN 资料不一致），但无同一主出处的载荷与长度，不收。"
+notes: |
+  1. 型号口径：TBI 现行样本（2018、2019、25.02 版）把 DIN 69051 B 型单螺母合为一张“SFNU/SFU”表：1605、1610、2005、2505、2510、3205、3210、4005、4010、5010 只以 SFNU（强防尘型）出现，1204 仍为 SFU。所以除 12x4 外，各行实际是 TBI SFNU 的数据，法兰外形与 SFU 相同（DIN 69051-5 B 型）；螺母长 L 是 SFNU 的值，可能和老 SFU 及市售国产“SFU”螺母不同（如 SFU1605 常见长度有别），造型时 L 只能当 TBI 的参考值用。
+  2. 两次读取：s1 读了两遍（第一遍整表照抄，第二遍逐型号逐键要求按字符串原样输出），11 行全部列逐格一致。s2（Anaheim 托管的 TBI 2019 版）独立读到 SFNU01605-4、SFNU01610-3 整行和 SFNU02005-4 前 11 个数，与 s1 一致；TBI 官网 25.02 版太长，工具只取到 C48 之前的部分，没取到这张表的数据。
+  3. 符号对照：TBI 原表 D=螺母外径、A=法兰外径、B=法兰厚、L=螺母长、W=孔分布圆、H=两平面间距、X=孔径。本表列键按任务约定（D/D1/D5/X/W/L1），注意和 ISO 3408-2:2021 的符号不同（该标准 D1=螺母外径、D4=分布圆、D5=螺栓孔径、D6=法兰外径）。ISO 3408-2:2021 把 B 型定义为“两平面”法兰，s1 图上 H 也是两平行平面之间的距离，所以 W_mm 是两平面间距。孔数：s1/s2 图上 d≤32 标“6-X”，d≥40 标“8-X”；孔的角度在图上为 22.5°/30°/45° 等，具体分度需对照原图。
+  4. 载荷：原表单位 kgf，按 1 kgf = 9.80665 N 换算后取整。原值（Ca/C0a，kgf）：1204 902/1884；1605 1380/3052；1610 1103/2401；2005 1551/3875；2505 1724/4904；2510 2954/7295；3205 1922/6343；3210 4805/12208；4005 2110/7988；4010 5399/15500；5010 6004/19614。只代表 TBI；HIWIN 同规格的载荷不同（圈数、钢球不同），不能混用。
+  5. 与 HIWIN 核对外形：s3（HIWIN 意大利，FSC/FSI DIN 69051）中 20x5、20x10、25x5、25x10、32x5、32x10、40x5、50x5、50x10 的螺母外径、法兰外径、分布圆、孔径、两平面间距、法兰厚与 TBI 完全一致，只有一处不同：TBI 25x10 法兰厚 12，HIWIN 25 系列都是 10（TBI 两遍读都是 12，保留 TBI 值并标注）。16x5 只核对到法兰外径 48、分布圆 38、孔 5.5、法兰厚 10、两平面 40，一致；HIWIN 该行的螺母外径一格网页抽取错位，没能核对。螺母长度两家不同（如 20x5：TBI 51，HIWIN 40），属各家设计差异。s4（HIWIN UK 磨制 FSC）中 32x5 为 48/70/59/6.6/平面 54，钢球较大的规格螺母外径加大并带脚注（非 DIN 尺寸），说明 HIWIN 磨制系列个别规格与 DIN 基本外形不同；s4 网页抽取列有错位，只作参考。
+  6. 自洽检查：随 d0 增大，D、D1、D5、W、X、L1 都单调不减；同一 d0 下导程变大螺母变长（1605 45<1610 57，2505 51<2510 85，3205 52<3210 85，4005 55<4010 88）；每行都满足 D+X < D5 且 D5+X < D1（孔不破螺母体、不破法兰边）、W > D（平面不切到螺母体）、Dw < Ph。推不出的：Ca、C0a 无法由外形推算。
+  7. 标准组合：按 s5（IS 14872-2 = ISO 3408-2:1991）Table 1，16x5、16x10、20x5、25x5、25x10、32x5、32x10、40x5、40x10、50x10 是优选组合（d0=12 的优选导程为 2.5、5、10）；12x4 只在 Table 2（其他组合）里，所以 is_preferred=false。s6（2021 版）的组合表网页抽取时优选标记（灰底粗体）读不准，未采用。DIN 69051-5 外形表从 d0=16 起，12x4 的外形只是 TBI 自定，不属 DIN 尺寸。
+  8. GB/T 17587.2-2025 已改名为《公称直径、公称导程、螺母尺寸和安装螺栓 公制系列》（对应 ISO 3408-2:2021，含螺母安装尺寸），但没找到公开原文，以后拿到标准原文可用来复核法兰尺寸。
+  9. 本次 curl 下载 TBI、HIWIN 官方 PDF 被代理拒绝（403），只能用网页抓取工具读，长 PDF 会被截断，所以主出处用了 TBI 原版单页 PDF。

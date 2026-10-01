@@ -1,0 +1,149 @@
+# A-PUL-HTD · 同步带轮（GT2 / HTD 3M / HTD 5M）（第 5 轮第 5 步，P7）
+schema: 1
+id: A-PUL-HTD
+kind: family
+name:
+  zh: 同步带轮（GT2 / HTD 3M / HTD 5M）
+  en: Timing pulley (GT2 / HTD 3M / HTD 5M)
+category: PUL
+tags:
+- 同步带轮
+- 带轮
+- 同步带
+- timing pulley
+- GT2
+- HTD
+standards:
+- code: ISO 13050
+  title: Synchronous belt drives — Metric pitch, curvilinear profile systems（HTD 3M、5M）
+- code: JB/T 7512.2
+  title: 圆弧齿同步带传动 带轮（轮槽尺寸）
+- code: Gates PowerGrip GT2
+  title: GT2 齿形（Gates 专有，2 mm 节距）
+params:
+- key: profile
+  zh: 齿形
+  en: Profile
+  role: key
+- key: z
+  zh: 齿数
+  en: Teeth
+  role: key
+- key: b_mm
+  zh: 带宽
+  en: Belt width
+  role: key
+  unit: mm
+- key: p_mm
+  zh: 节距
+  en: Pitch
+  role: dim
+  unit: mm
+- key: PD_mm
+  zh: 节圆直径 PD = z·p/π
+  en: Pitch diameter
+  role: dim
+  unit: mm
+- key: OD_mm
+  zh: 齿顶圆直径 OD = PD − 2δ
+  en: Outside diameter
+  role: dim
+  unit: mm
+- key: delta_mm
+  zh: 节线差 δ
+  en: Pitch line differential
+  role: dim
+  unit: mm
+- key: groove_depth_mm
+  zh: 轮槽深
+  en: Groove depth
+  role: dim
+  unit: mm
+- key: groove_r_mm
+  zh: 轮槽圆弧半径
+  en: Groove radius
+  role: dim
+  unit: mm
+- key: z_min
+  zh: 推荐最少齿数
+  en: Recommended min teeth
+  role: info
+specs: specs.csv
+default: GT2-20-6
+model:
+  engine: wenquest:timing_pulley
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 带轮轴线沿 Z，轮毂端面在 z=0；轮毂、挡边和孔径为常见比例示意
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序与规格表）；尺寸取自所列标准与样本的公开尺寸表
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 尺寸表两次独立读取一致，另抽查核对；测试逐行核对公式与单调性
+  data_sources:
+  - title: Gates Light Power & Precision Drive Design Manual — 'Synchronous Belt Drives
+      – Engineering' 章（pp.60–75）；第 73 页 '2mm Pitch Sprocket Diameters – PowerGrip
+      GT3'，第 74 页 '3mm Pitch Sprocket Diameters – PowerGrip GT3 and HTD'，第 75 页 '5mm
+      Pitch Sprocket Diameters – PowerGrip GT3 and HTD'
+    url: https://rodavigo.net/catalogos/GATES/Potencia%20ligera%20y%20precisi%C3%B3n/GATES%2009%20Correas%20de%20transmisi%C3%B3n%20s%C3%ADncronas.%20Ingenier%C3%ADa..pdf
+    retrieved: '2026-10-01'
+    note: 'Gates 官方手册的分章 PDF（由西班牙经销商 Rodavigo 原样托管；gates.com 上的整本手册 https://www.gates.com/content/dam/documents-library/catalogs/light-power-and-precision-manual.pdf
+      取回时被截断，读不到这几页）。用于 check_rows（PD/OD）、z_range（表列齿数首末行）；δ 由表中 PD−OD 反算核对（2 mm:
+      .020 in；3 mm: .030 in；5 mm: .045 in）。'
+  - title: Gates Belt I.D. Chart（12998-J NOV18），PowerGrip GT3 Belts / PowerGrip HTD
+      Belts 尺寸表（A=节距，B=带总厚，C=齿高）
+    url: https://www.gates.com/content/dam/documents-library/application-specs/gatescorporationbeltidchart.pdf
+    retrieved: '2026-10-01'
+    note: 用于 tooth_h_mm、belt_t_mm、widths_mm。该图把 2 mm 列在 'PowerGrip GT3' 名下；GT3 是 GT2
+      的直接替代型，带/轮齿形尺寸相同（SDP/SI 带目录原文：'GT3 is an equivalent and direct replacement for
+      GT2 belts'）。
+  - title: SDP/SI (Stock Drive Products) Handbook of Timing Belts and Pulleys — Technical
+      Section：Table 4 'Basic Belt Dimensions'（U 值）、式 (8-2) 'O.D. = pd − 2U'、Fig. 19e/19f/19g
+      带截面尺寸、Table 8 'Minimum Pulley Diameters'（p. T-15、T-16、T-21）
+    url: https://sdp-si.com/D820/PDFS/Technical-Section.pdf
+    retrieved: '2026-10-01'
+    note: 用于 delta_mm（U：2 mm GT .010 in，3 mm HTD .015 in，5 mm HTD .0225 in）；复核 tooth_h_mm、belt_t_mm（Fig.19
+      英寸值 .030/.060、.048/.095、.082/.150）。Table 8 的 HTD 行两次读取不一致，未采用（见 notes）。
+  - title: SDP/SI 'GT2 / GT3 PULLEY STOCK • 2 mm PITCH' 目录页（P.D. 与齿顶径 Dia. D 表，10–150
+      齿）
+    url: https://shop.sdp-si.com/media/pdf/80502140.pdf
+    retrieved: '2026-10-01'
+    note: 复核 GT2 check_rows（20/40/60 齿：12.7/12.2、25.5/25.0、38.2/37.7，保留 0.1 mm）；GT2
+      z_range 的 SDP 侧参考。
+  - title: 机械设计手册类网站 mechtool.cn：圆弧齿同步带尺寸规格（JB/T 7512.1-1994）、圆弧齿同步带轮（JB/T 7512.2-1994）
+    url: https://www.mechtool.cn/beltdrive/beltdrive_curvedtoothsynchronousbeltwheel.html
+    retrieved: '2026-10-01'
+    note: 用于 3M/5M 的 groove_depth_mm（hg）、groove_r_mm（齿槽圆弧半径 R）、groove_w_mm（齿槽宽 s）、z_min（≤900
+      r/min 档）；2δ=0.762/1.144 与 s3 的 U 值互证。带的齿形表在 https://www.mechtool.cn/beltdrive/beltdrive_curvedtoothsynchronousbeltdrive.html
+      （ht 1.22/2.06，hs 2.4/3.8，作复核）。
+  - title: ISO 13050:2022 iTeh 公开样本（及 ISO 13050:2014 样本）
+    url: https://cdn.standards.iteh.ai/samples/82453/0e1d2bcffa7845508a40c1398697a52b/ISO-13050-2022.pdf
+    retrieved: '2026-10-01'
+    note: 只用于确认标准名称与 H 齿型 3M/5M 归属；样本只含 G 齿型（8M/14M）的表，H 齿型第 9 章只有标题、无数值，故本表数值都不出自
+      ISO 原文。
+  - title: SDP/SI 官方网店产品页（A 6A22M160TM20：3 mm HTD 160 齿 O.D. 152.03 mm；A 6A25M020DF0908：5
+      mm HTD 20 齿 O.D. 30.7 mm）
+    url: https://shop.sdp-si.com/a-6a22m160tm20.html
+    retrieved: '2026-10-01'
+    note: 只作 check_rows 的旁证（与 s1 的 3 mm 160 齿 OD 152.03、5 mm 20 齿 OD 30.69 一致），不单独入表。另一页：https://shop.sdp-si.com/a-6a25m020df0908.html
+  notes: 规格按公式由齿形常数生成：PD = z·p/π，OD = PD − 2δ；与 Gates 样本 9 个表列值核对（3M 60 齿 OD 差 0.01
+    mm，为样本先按英寸取整）。GT2 的轮槽是 Gates 专有，公开资料不给，造型按近似圆弧（深 0.75、半径 0.555）示意；3M、5M 轮槽深与圆弧半径取
+    JB/T 7512.2 转载值。z_min 是低速（3M、5M ≤900 r/min；GT2 1160 r/min）时的推荐值，转速高要更多齿。
+teaching:
+  principle: 带内侧的齿与带轮轮槽啮合传动，不打滑、传动比准确；节圆直径 = 齿数 × 节距 ÷ π，齿顶圆比节圆小两个节线差。GT2、HTD 的圆弧齿比梯形齿应力集中小、回差小。
+  uses:
+  - 3D 打印机与小型直角坐标机构（GT2）
+  - 机器人关节与伺服减速传动（HTD 3M、5M）
+  - 输送线
+  courses:
+  - course: 机械设计基础
+    chapter: 带传动（同步带）
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

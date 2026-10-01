@@ -30,13 +30,14 @@ import wqlib  # noqa: E402
 REPO = "https://github.com/eddiezgq/WenQuest"
 LIN_TOL_MM = 0.02          # B.5：弦高误差
 ANG_TOL = 0.25
+MESH = {"lin": LIN_TOL_MM, "ang": ANG_TOL}   # 条目可用 model.mesh {lin_mm, ang_rad} 放粗（如细长的弹簧），在 build_variant 里设
 
 
 def _mesh(shape):
     import numpy as np
     if type(shape).__name__ == "Trimesh":                             # 已经是网格（机器人）
         return (np.asarray(shape.vertices, dtype=float), np.asarray(shape.faces, dtype=int)) if len(shape.faces) else None
-    v, t = shape.tessellate(LIN_TOL_MM * 5, ANG_TOL)
+    v, t = shape.tessellate(MESH["lin"] * 5, MESH["ang"])
     if not t:
         return None
     return np.array([[p.X, p.Y, p.Z] for p in v], dtype=float), np.array(t, dtype=int)
@@ -106,6 +107,8 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
     """在子进程里造一个规格，写 glb、png、step、stl；返回报告。"""
     t0 = time.time()
     e = wqlib.load(entry_dir)
+    m = e["model"].get("mesh") or {}
+    MESH.update(lin=float(m.get("lin_mm", LIN_TOL_MM)), ang=float(m.get("ang_rad", ANG_TOL)))
     row = next(r for r in wqlib.specs(e) if str(r["size"]) == str(size))
     code = wqlib.file_code(size)
     try:
@@ -143,7 +146,7 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
             if "step" in fmts:
                 export_step(shape, str(cd / (code + ".step")))
             if "stl" in fmts:
-                export_stl(shape, str(cd / (code + ".stl")), tolerance=LIN_TOL_MM)
+                export_stl(shape, str(cd / (code + ".stl")), tolerance=MESH["lin"], angular_tolerance=MESH["ang"])
         files = {"glb": "{}/{}.glb".format(e["id"], code), "png": "{}/{}.png".format(e["id"], code)}
         if extra.get("urdf"):
             files["urdf"] = extra.pop("urdf")

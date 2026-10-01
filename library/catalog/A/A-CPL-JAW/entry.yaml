@@ -1,0 +1,113 @@
+# A-CPL-JAW · 梅花形弹性联轴器（LM 基本型）（第 5 轮第 5 步，P7）
+schema: 1
+id: A-CPL-JAW
+kind: family
+name:
+  zh: 梅花形弹性联轴器（LM 基本型）
+  en: Plum-blossom elastic coupling, type LM
+category: CPL
+tags:
+- 联轴器
+- 弹性联轴器
+- 梅花联轴器
+- coupling
+- jaw coupling
+standards:
+- code: GB/T 5272-2002
+  title: 梅花形弹性联轴器（尺寸表；现行版 2017 的表未取得可读文本）
+params:
+- key: Tn_a_Nm
+  zh: 公称转矩（a 型弹性件）
+  en: Nominal torque (element a)
+  role: perf
+  unit: N·m
+- key: Tn_b_Nm
+  zh: 公称转矩（b 型弹性件）
+  en: Nominal torque (element b)
+  role: perf
+  unit: N·m
+- key: n_max_rpm
+  zh: 许用转速
+  en: Allowable speed
+  role: perf
+  unit: r/min
+- key: d_min_mm
+  zh: 轴孔直径最小
+  en: Min bore
+  role: dim
+  unit: mm
+- key: d_max_mm
+  zh: 轴孔直径最大
+  en: Max bore
+  role: dim
+  unit: mm
+- key: d_series
+  zh: 轴孔直径与长度分档
+  en: Bore series
+  role: dim
+- key: L_mm
+  zh: 半联轴器轴孔长（推荐）
+  en: Hub bore length (recommended)
+  role: dim
+  unit: mm
+- key: L0_mm
+  zh: 联轴器总长
+  en: Overall length
+  role: dim
+  unit: mm
+- key: D_mm
+  zh: 外径
+  en: Outer diameter
+  role: dim
+  unit: mm
+- key: mass_kg
+  zh: 质量（近似）
+  en: Mass (approx.)
+  role: info
+  unit: kg
+- key: J_kgm2
+  zh: 转动惯量（近似）
+  en: Moment of inertia (approx.)
+  role: info
+  unit: kg·m²
+specs: specs.csv
+default: LM3
+model:
+  engine: wenquest:jaw_coupling
+  formats:
+  - step
+  - stl
+  - glb
+  origin: 联轴器轴线沿 Z，一端轮毂端面在 z=0
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序与规格表）；尺寸取自所列标准与样本的公开尺寸表
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 尺寸表两次独立读取一致，另抽查核对；测试逐行核对公式与单调性
+  data_sources:
+  - title: 嘉立创FA机械设计手册 · 梅花形弹性联轴器(GB/T 5272-2002) · LM型-基本型、LMD型-单法兰型、LMS型-双法兰型联轴器「基本参数和主要尺寸」表
+    url: https://www.jlc-jdgf.com/mcbook/06133-2.htm
+    retrieved: '2026-10-01'
+    note: 全部列的主出处；表注 1~5；页面无页码，按型号行定位
+  - title: 机械工具网 mechtool.cn · 梅花形弹性联轴器(GB/T 5272-2002) · LM型—基本型、LMD型—单法兰型、LMS型—双法兰型联轴器表
+    url: https://www.mechtool.cn/shaftsandcouplings/shaftsandcouplings_plumblossomelasticcoupling.html
+    retrieved: '2026-10-01'
+    note: 全表逐格互核；LM8 第一档轴孔长度两处都缺
+  notes: 按 GB/T 5272-2002 LM 基本型（两处转载互核）；2017 版的尺寸表只有图片，未用。LM13 一行原表“公称转矩 b”印为 2000（小于
+    a 档 11200，明显漏位），未收。公称转矩按两种弹性件（a、b）分列；最大转矩、弹性件型号两处转载读不到，未收。
+teaching:
+  principle: 两个带凸爪的半联轴器之间夹一个梅花形弹性件，转矩经凸爪挤压弹性件传递；弹性件能补偿两轴少量的径向、角向偏差，并缓冲振动，不用润滑。
+  uses:
+  - 电机与减速器、泵的联接
+  - 伺服电机与丝杠的联接
+  - 减速器输入轴
+  courses:
+  - course: 机械设计基础
+    chapter: 联轴器
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []
