@@ -80,7 +80,7 @@ if s:
 
 print("3. 工作台入口 /api/erp/sso（不靠登录页脚本）")
 s = requests.Session()
-r = s.get(A.hub + "/api/erp/sso", params={"wq_token": sign({"name": "演练老师二", "role": "manager", "mode": "teach", "teacher": True})},
+r = s.get(A.hub + "/api/erp/sso", params={"go": 1, "wq_token": sign({"name": "演练老师二", "role": "manager", "mode": "teach", "teacher": True})},
           allow_redirects=False, timeout=60)
 if check(r.status_code == 302 and "code=" in r.headers.get("location", ""), "枢纽直接给出授权码（{} {}）".format(r.status_code, r.text[:200])):
     r = s.get(local(r.headers["location"]), allow_redirects=False, timeout=60)

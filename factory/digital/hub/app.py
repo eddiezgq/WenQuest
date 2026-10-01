@@ -769,9 +769,14 @@ def oauth_authorize(request: Request, client_id: str = "", redirect_uri: str = "
 
 
 @app.get("/api/erp/sso")
-def erp_sso_start(request: Request, next: str = "", wq_token: str = ""):
+def erp_sso_start(request: Request, next: str = "", wq_token: str = "", go: int = 0):
     """工作台“ERPNext”入口（第 7 轮补）：不靠 ERPNext 登录页上的脚本（浏览器可能缓存了旧脚本），
-    由枢纽向 ERPNext 要一个登录请求编号（state），直接走完授权，浏览器一步进到 ERPNext"""
+    由枢纽向 ERPNext 要一个登录请求编号（state），直接走完授权，浏览器一步进到 ERPNext。
+    先回一个“正在进入”的等待页（建账号、登录、打开 ERPNext 要几秒），再自动接着走（go=1）"""
+    if not go:
+        from fastapi.responses import HTMLResponse
+        q = dict(request.query_params, go="1")
+        return HTMLResponse(ERP_WAIT_PAGE.replace("__URL__", json.dumps(request.url.path + "?" + urllib.parse.urlencode(q))))
     if not erp_sso.enabled():
         raise HTTPException(503, "ERPNext 单点登录还没有配置")
     person, go = _sso_person(request, wq_token)
@@ -783,6 +788,26 @@ def erp_sso_start(request: Request, next: str = "", wq_token: str = ""):
         log.exception("向 ERPNext 要登录请求失败")
         raise HTTPException(502, "ERPNext 暂时不能登录：{}".format(e))
     return _sso_finish(person, auth["redirect_uri"], auth["state"])
+
+
+ERP_WAIT_PAGE = """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>正在进入 ERPNext…</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F4F6F8;
+ font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#1F2A33}
+.box{width:min(420px,90vw);text-align:center}
+h1{font-size:18px;font-weight:600;margin:0 0 6px}
+p{font-size:13px;color:#5B6B78;margin:0 0 18px;min-height:1.4em}
+.bar{height:6px;border-radius:3px;background:#DDE3E8;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#1E6A7A;border-radius:3px;transition:width .6s ease}
+</style></head><body><div class="box">
+<h1>正在进入 ERPNext</h1><p id="t">核对问渠账号…</p><div class="bar"><i id="b"></i></div>
+</div><script>
+var steps=[[8,"核对问渠账号…"],[30,"准备你的 ERPNext 账号…"],[55,"登录 ERPNext…"],[75,"打开 ERPNext 工作台（第一次会慢一些）…"],[90,"快好了…"]];
+var k=0,b=document.getElementById("b"),t=document.getElementById("t");
+function tick(){if(k<steps.length){b.style.width=steps[k][0]+"%";t.textContent=steps[k][1];k++;setTimeout(tick,k<3?900:2500);}}
+tick();setTimeout(function(){location.replace(__URL__);},150);
+</script></body></html>"""
 
 
 @app.post("/api/oauth/token")

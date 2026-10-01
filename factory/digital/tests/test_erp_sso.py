@@ -114,7 +114,9 @@ def test_workbench_entry(monkeypatch):
     monkeypatch.setattr(app_mod.erp_sso, "login_request", lambda redirect_to="", session=None: {"state": "st1", "redirect_uri": CB})
     c = TestClient(app_mod.app)
     c.cookies.set("wq_sso", "tea")
-    code = _code(c.get("/api/erp/sso", follow_redirects=False))
+    wait = c.get("/api/erp/sso", params={"next": "/app/work-order"})
+    assert "正在进入 ERPNext" in wait.text and "go=1" in wait.text and "next=%2Fapp%2Fwork-order" in wait.text
+    code = _code(c.get("/api/erp/sso", params={"go": 1}, follow_redirects=False))
     assert made[0]["email"] == "wq7@users.example.com"
     form = {"grant_type": "authorization_code", "code": code, "redirect_uri": CB, "client_id": "wenquest-erp",
             "client_secret": "oauth-secret"}
