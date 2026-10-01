@@ -1,0 +1,30 @@
+name: CircuitJS embed build 电路仿真器编译
+
+# 从源码编译电路仿真器 CircuitJS1 的嵌入版（GPL-2.0），作为发布附件上传；教材把它复制到 textbook/vendor/circuitjs/。
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["tools/circuitjs/**", ".github/workflows/circuitjs.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "8"
+      - name: Build
+        run: tools/circuitjs/build.sh dist/circuitjs-embed.html
+      - name: Publish as a release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="circuitjs-$(cut -c1-12 tools/circuitjs/COMMIT)-$(cat tools/circuitjs/*.py tools/circuitjs/build.sh | sha256sum | cut -c1-8)"
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --title "$tag" --notes "CircuitJS1 (GPL-2.0) embed build. Upstream https://github.com/pfalstad/circuitjs1 commit $(cat tools/circuitjs/COMMIT); patch and build script in tools/circuitjs/."
+          gh release upload "$tag" dist/circuitjs-embed.html --clobber
