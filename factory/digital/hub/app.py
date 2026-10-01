@@ -31,6 +31,7 @@ from wqbus.client import Bus  # noqa: E402
 from wqbus.topics import topic, unit_topic  # noqa: E402
 from factory import data as F  # noqa: E402
 from hub import kpi, mrp  # noqa: E402
+from hub import select as lib_select  # noqa: E402
 from hub.ai import Assistant, ROLE_NAMES  # noqa: E402
 from hub.db import DB  # noqa: E402
 from hub.historian import Historian  # noqa: E402
@@ -540,6 +541,26 @@ def ai_chat(body: dict = Body(...), u=Depends(user_of)):
         raise HTTPException(400, "请输入问题")
     ai_quota(u)
     return H.ai.chat(msgs, u["mode"], u["role"], u["name"])
+
+
+_catalog = lib_select.Catalog()
+
+
+@app.post("/api/library/select")
+def library_select(body: dict = Body(...), u=Depends(user_of)):
+    """AI 选型（零件库第 5 轮 P10③）：只从零件库里挑，答案里的编号逐个核对"""
+    q = (body.get("question") or "").strip()
+    if not q:
+        raise HTTPException(400, "请用一句话说需求，例如：35 mm 轴、1450 r/min、径向载荷为主用什么轴承")
+    if len(q) > 500:
+        raise HTTPException(400, "需求请写短一些（500 字以内）")
+    ai_quota(u)
+    llm = H.ai.llm if getattr(H, "ai", None) else None
+    try:
+        return lib_select.answer(_catalog, llm, q)
+    except Exception as ex:  # noqa: BLE001 —— 模型出错时退回规则回答
+        log.warning("AI 选型出错，改用规则：%s", ex)
+        return lib_select.answer(_catalog, None, q)
 
 
 @app.post("/api/ai/briefing/refresh")

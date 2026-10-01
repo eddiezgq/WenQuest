@@ -16,6 +16,19 @@
           <input id="q" v-model="q" type="search" placeholder="如 6207、GB/T 1096、M8x25、UR5e、humanoid" autocomplete="off">
           <button class="btn ghost" type="button" @click="q = ''">清除</button>
         </div>
+        <label class="lbl ai-lbl" for="ask">AI 选型：一句话说需求，只从零件库里挑</label>
+        <form class="field-row" @submit.prevent="ask">
+          <input id="ask" v-model="askQ" type="text" placeholder="如：35 mm 轴、1450 r/min、径向载荷为主用什么轴承" autocomplete="off" maxlength="500">
+          <button class="btn primary" type="submit" :disabled="asking || !askQ.trim()">{{ asking ? '正在查库…' : '选型' }}</button>
+        </form>
+        <div v-if="askErr" class="small err">{{ askErr }}</div>
+        <div v-if="askRes" class="ai-res">
+          <p class="ai-text">{{ askRes.answer }}</p>
+          <div v-if="askRes.refs.length" class="ai-refs">
+            <button v-for="r in askRes.refs" :key="r.ref" type="button" class="chip mono" @click="openRef(r)" :title="r.name">{{ r.ref }}</button>
+          </div>
+          <p class="small muted">{{ askRes.engine === 'rules' ? '规则匹配（未配 AI 模型）' : '由 ' + askRes.engine + ' 回答' }}；只推荐零件库 v{{ askRes.library_version }} 里有的规格，答案里的编号已逐个核对<template v-if="askRes.invalid_refs.length">（去掉了库里没有的：{{ askRes.invalid_refs.join('、') }}）</template>。点编号打开详情；寿命、强度请按样本另行计算。</p>
+        </div>
       </section>
 
       <div class="tabs" role="tablist">
@@ -247,6 +260,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useRoute } from 'vue-router';
+import { post } from '../lib/api.js';
 
 const BASE = '/library/';
 const ORIGINS = { bd_warehouse: 'bd_warehouse', wenquest: '问渠自建', menagerie: 'MuJoCo Menagerie', vendor: '厂商目录',
@@ -255,6 +269,22 @@ const JT = { revolute: '转动', continuous: '转动（不限位）', prismatic:
 const originName = (o) => ORIGINS[o] || o;
 
 const useRouteRef = useRoute();
+const askQ = ref('');
+const asking = ref(false);
+const askErr = ref('');
+const askRes = ref(null);
+async function ask() {
+  askErr.value = ''; asking.value = true;
+  try { askRes.value = await post('/library/select', { question: askQ.value.trim() }); }
+  catch (e) { askErr.value = e.message; askRes.value = null; }
+  finally { asking.value = false; }
+}
+function openRef(r) {
+  const f = families.value.find((x) => x.id === r.entry);
+  if (!f) return;
+  part.value = f.part;
+  select(r.entry, r.size || '');
+}
 const index = ref(null);
 const error = ref('');
 const q = ref('');
@@ -600,6 +630,12 @@ onUnmounted(() => { cancelAnimationFrame(raf); ro?.disconnect(); disposeModel();
 .v-note { position: absolute; left: 10px; bottom: 8px; font-size: 11px; color: var(--muted); pointer-events: none; }
 .v-tools { position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; }
 .v-tools .btn { height: 28px; font-size: 12px; padding: 0 10px; }
+.ai-lbl { margin-top: 12px; }
+.ai-res { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-soft, #F7F8F6); }
+.ai-text { white-space: pre-wrap; margin: 0 0 8px; font-size: 13px; line-height: 1.6; }
+.ai-refs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.ai-refs .chip { border: 1px solid var(--accent); color: var(--accent); background: #fff; border-radius: 999px; padding: 2px 10px; font-size: 12px; cursor: pointer; }
+.err { color: #B3261E; margin-top: 6px; }
 .drawing { width: 100%; border: 1px solid var(--line); background: #fff; display: block; }
 .joints { padding: 0 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 16px; max-height: 220px; overflow-y: auto; }
 .joints label { font-size: 12px; display: grid; grid-template-columns: 64px minmax(0, 1fr) 48px; align-items: center; gap: 6px; }
