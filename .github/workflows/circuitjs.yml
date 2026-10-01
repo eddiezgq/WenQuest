@@ -20,7 +20,13 @@ jobs:
           distribution: temurin
           java-version: "8"
       - name: Build
-        run: tools/circuitjs/build.sh dist/circuitjs-embed.html
+        run: |
+          if ! tools/circuitjs/build.sh dist/circuitjs-embed.html > build.log 2>&1; then
+            tail -n 60 build.log
+            echo "::error title=CircuitJS build::$(grep -v '^\s*$' build.log | tail -n 40 | cut -c1-200 | sed ':a;N;$!ba;s/\n/%0A/g')"
+            exit 1
+          fi
+          tail -n 5 build.log
       - name: Publish as a release asset
         env:
           GH_TOKEN: ${{ github.token }}
