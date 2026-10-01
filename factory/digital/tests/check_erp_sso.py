@@ -78,5 +78,14 @@ if s:
     r = s.post(A.erp + "/api/resource/Customer", json={"customer_name": "演练学生建的客户", "customer_type": "Company"}, timeout=30)
     check(r.status_code in (401, 403), "学生不能新建单据（{}）".format(r.status_code))
 
+print("3. 工作台入口 /api/erp/sso（不靠登录页脚本）")
+s = requests.Session()
+r = s.get(A.hub + "/api/erp/sso", params={"wq_token": sign({"name": "演练老师二", "role": "manager", "mode": "teach", "teacher": True})},
+          allow_redirects=False, timeout=60)
+if check(r.status_code == 302 and "code=" in r.headers.get("location", ""), "枢纽直接给出授权码（{} {}）".format(r.status_code, r.text[:200])):
+    r = s.get(local(r.headers["location"]), allow_redirects=False, timeout=60)
+    who = s.get(A.erp + "/api/method/frappe.auth.get_logged_user", timeout=30).json().get("message")
+    check(who and who.startswith("wq"), "一步进入 ERPNext：{}".format(who))
+
 print("单点登录演练{}".format("全部通过。" if ok else "有失败。"))
 sys.exit(0 if ok else 1)

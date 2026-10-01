@@ -24,7 +24,7 @@ def _hub(monkeypatch, auth):
     for k, v in {"WQ_HUB_NO_START": "1", "WQ_SECRET": "s", "WQ_AUTH": auth, "WQ_ERPNEXT_URL": ERP,
                  "WQ_ERPNEXT_API": "http://erp-frontend:8080", "WQ_ERP_API_KEY": "k", "WQ_ERP_API_SECRET": "x",
                  "WQ_ERP_OAUTH_SECRET": "oauth-secret", "WQ_SSO_URL": "https://learn.example.com/api/v1/auth/sso",
-                 "WQ_LOGIN_URL": "https://learn.example.com/pages/login/login"}.items():
+                 "WQ_LOGIN_URL": "https://learn.example.com/pages/login/login", "WQ_PUBLIC_URL": "https://factory.example.com"}.items():
         monkeypatch.setenv(k, v)
     import hub.app as app_mod
     app_mod = importlib.reload(app_mod)
@@ -103,3 +103,35 @@ def test_wenquest_student_and_login_redirect(monkeypatch):
     c.cookies.set("wq_sso", "stu")
     _code(_authorize(c))
     assert made[0]["email"] == "wq101@users.example.com" and made[0]["roles"] == [app_mod.erp_sso.STUDENT_ROLE]
+
+
+def test_workbench_entry(monkeypatch):
+    """工作台入口 /api/erp/sso：枢纽替浏览器向 ERPNext 要 state，直接带授权码进 ERPNext"""
+    app_mod, made = _hub(monkeypatch, "wenquest")
+    import httpx
+    monkeypatch.setattr(httpx, "get", lambda url, cookies=None, timeout=None: _Resp(
+        200, {"user": {"id": 7, "fullname": "李老师", "username": "li", "can_create_courses": True}}))
+    monkeypatch.setattr(app_mod.erp_sso, "login_request", lambda redirect_to="", session=None: {"state": "st1", "redirect_uri": CB})
+    c = TestClient(app_mod.app)
+    c.cookies.set("wq_sso", "tea")
+    code = _code(c.get("/api/erp/sso", follow_redirects=False))
+    assert made[0]["email"] == "wq7@users.example.com"
+    form = {"grant_type": "authorization_code", "code": code, "redirect_uri": CB, "client_id": "wenquest-erp",
+            "client_secret": "oauth-secret"}
+    assert c.post("/api/oauth/token", data=form).status_code == 200
+    assert c.get("/api/config").json()["erpnext_url"].endswith("/api/erp/sso")
+
+
+def test_login_request_parses_erp_page(monkeypatch):
+    from hub import erp_sso as E
+    monkeypatch.setenv("WQ_ERPNEXT_URL", ERP)
+    monkeypatch.setenv("WQ_ERPNEXT_API", "http://erp-frontend:8080")
+
+    class S:
+        def get(self, url, params=None, timeout=None):
+            assert url == "http://erp-frontend:8080/login"
+            href = "https://factory.example.com/api/oauth/authorize?redirect_uri={}&amp;state=abc&amp;client_id=wenquest-erp".format(
+                urllib.parse.quote(CB, safe=""))
+            return type("R", (), {"text": '<a href="{}"\n class="btn btn-block btn-wenquest">x</a>'.format(href),
+                                  "raise_for_status": lambda self: None})()
+    assert E.login_request(session=S()) == {"state": "abc", "redirect_uri": CB}

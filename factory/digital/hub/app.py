@@ -308,7 +308,8 @@ def ai_quota(u):
 def config():
     return {
         "mqtt_ws": os.environ.get("WQ_MQTT_WS", "ws://localhost:9001"),
-        "erpnext_url": os.environ.get("WQ_ERPNEXT_URL", "http://localhost:8090"),
+        "erpnext_url": ((os.environ.get("WQ_PUBLIC_URL", "").rstrip("/") + "/api/erp/sso") if AUTH == "wenquest" and erp_sso.enabled()
+                        else os.environ.get("WQ_ERPNEXT_URL", "http://localhost:8090")),   # 线上：经单点登录入口（第 7 轮）
         "nodered_url": os.environ.get("WQ_NODERED_URL", "http://localhost:1880"),   # 线上设为空：不对外（D8）
         "auth": AUTH, "login_url": LOGIN_URL,
         "default_mode": DEFAULT_MODE, "roles": ROLE_NAMES, "ai_engine": H.ai.llm.name if H.ai else "rules",
@@ -724,6 +725,37 @@ def design_publish(item: str, body: dict = Body(...), u=Depends(user_of)):
 _codes = erp_sso.Codes()
 
 
+def _sso_person(request, wq_token):
+    """当前是谁：线上看学习平台登录（没登录返回跳转），本地版看工作台凭证。返回 (person, redirect)"""
+    from fastapi.responses import RedirectResponse
+    if AUTH == "wenquest":
+        w = wenquest_user(request.cookies.get(SSO_COOKIE, ""))
+        if not w:                                    # 还没登录学习平台：先去登录，登录后回到这里
+            proto = request.headers.get("x-forwarded-proto") or request.url.scheme
+            here = "{}://{}{}?{}".format(proto, request.headers.get("host") or request.url.netloc,
+                                         request.url.path, request.url.query)
+            return None, RedirectResponse((LOGIN_URL or "/") + "?back=" + urllib.parse.quote(here, safe=""), 302)
+        return {"uid": w["id"], "name": w["fullname"] or w["username"], "teacher": w["teacher"]}, None
+    try:                                             # 本地版（和 CI 演练）：用工作台凭证代表身份
+        u = user_of(wq_token)
+    except HTTPException:
+        raise HTTPException(401, "本地版请带工作台登录凭证 wq_token")
+    return {"uid": erp_sso.local_uid(u["name"]), "name": u["name"], "teacher": u.get("teacher", True)}, None
+
+
+def _sso_finish(person, redirect_uri, state):
+    """在 ERPNext 建好账号，带一次性授权码回到 ERPNext"""
+    from fastapi.responses import RedirectResponse
+    ident = erp_sso.erp_identity(person, erp_sso.config()["user_domain"])
+    try:
+        erp_sso.provision(ident)
+    except Exception as e:  # noqa: BLE001
+        log.exception("ERPNext 建账号失败")
+        raise HTTPException(502, "ERPNext 暂时不能登录：{}".format(e))
+    code = _codes.issue(ident, redirect_uri)
+    return RedirectResponse("{}?{}".format(redirect_uri, urllib.parse.urlencode({"code": code, "state": state})), 302)
+
+
 @app.get("/api/oauth/authorize")
 def oauth_authorize(request: Request, client_id: str = "", redirect_uri: str = "", state: str = "",
                     response_type: str = "code", wq_token: str = ""):
@@ -732,30 +764,25 @@ def oauth_authorize(request: Request, client_id: str = "", redirect_uri: str = "
         raise HTTPException(400, "登录请求不合规范")
     if not erp_sso.enabled():
         raise HTTPException(503, "ERPNext 单点登录还没有配置")
-    if AUTH == "wenquest":
-        w = wenquest_user(request.cookies.get(SSO_COOKIE, ""))
-        if not w:                                    # 还没登录学习平台：先去登录，登录后回到这里
-            from fastapi.responses import RedirectResponse
-            proto = request.headers.get("x-forwarded-proto") or request.url.scheme
-            here = "{}://{}{}?{}".format(proto, request.headers.get("host") or request.url.netloc,
-                                         request.url.path, request.url.query)
-            return RedirectResponse((LOGIN_URL or "/") + "?back=" + urllib.parse.quote(here, safe=""), 302)
-        person = {"uid": w["id"], "name": w["fullname"] or w["username"], "teacher": w["teacher"]}
-    else:                                            # 本地版（和 CI 演练）：用工作台凭证代表身份
-        try:
-            u = user_of(wq_token)
-        except HTTPException:
-            raise HTTPException(401, "本地版请带工作台登录凭证 wq_token")
-        person = {"uid": erp_sso.local_uid(u["name"]), "name": u["name"], "teacher": u.get("teacher", True)}
-    ident = erp_sso.erp_identity(person, erp_sso.config()["user_domain"])
+    person, go = _sso_person(request, wq_token)
+    return go or _sso_finish(person, redirect_uri, state)
+
+
+@app.get("/api/erp/sso")
+def erp_sso_start(request: Request, next: str = "", wq_token: str = ""):
+    """工作台“ERPNext”入口（第 7 轮补）：不靠 ERPNext 登录页上的脚本（浏览器可能缓存了旧脚本），
+    由枢纽向 ERPNext 要一个登录请求编号（state），直接走完授权，浏览器一步进到 ERPNext"""
+    if not erp_sso.enabled():
+        raise HTTPException(503, "ERPNext 单点登录还没有配置")
+    person, go = _sso_person(request, wq_token)
+    if go:
+        return go
     try:
-        erp_sso.provision(ident)
+        auth = erp_sso.login_request(next if next.startswith("/") else "")
     except Exception as e:  # noqa: BLE001
-        log.exception("ERPNext 建账号失败")
+        log.exception("向 ERPNext 要登录请求失败")
         raise HTTPException(502, "ERPNext 暂时不能登录：{}".format(e))
-    code = _codes.issue(ident, redirect_uri)
-    from fastapi.responses import RedirectResponse
-    return RedirectResponse("{}?{}".format(redirect_uri, urllib.parse.urlencode({"code": code, "state": state})), 302)
+    return _sso_finish(person, auth["redirect_uri"], auth["state"])
 
 
 @app.post("/api/oauth/token")

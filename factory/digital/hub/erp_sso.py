@@ -142,6 +142,24 @@ def check_client(client_id, client_secret):
     return client_id == CLIENT_ID and bool(c["secret"]) and hmac.compare_digest(client_secret or "", c["secret"])
 
 
+def login_request(redirect_to="", session=None):
+    """向 ERPNext 登录页（内部地址）要“用问渠账号登录”的链接，取出其中的 state 和回调地址。
+    ERPNext 只按 state 在缓存里认这次登录请求，不绑浏览器，所以枢纽可以替浏览器要。"""
+    import re
+    import requests
+    c = config()
+    s = session or requests.Session()
+    r = s.get(c["erp_api"] + "/login", params={"redirect-to": redirect_to} if redirect_to else None, timeout=20)
+    r.raise_for_status()
+    m = re.search(r'href="([^"]+)"\s+class="[^"]*btn-' + PROVIDER, r.text)
+    if not m:
+        raise RuntimeError("ERPNext 登录页上没有“用问渠账号登录”（单点登录还没配置好）")
+    q = dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(m.group(1).replace("&amp;", "&")).query))
+    if not valid_redirect(q.get("redirect_uri", "")) or not q.get("state"):
+        raise RuntimeError("ERPNext 登录链接不合规范：{}".format(q.get("redirect_uri")))
+    return {"state": q["state"], "redirect_uri": q["redirect_uri"]}
+
+
 # ---------------------------------------------------------------- ERPNext 登录页上的自动跳转脚本（seed.py 写入 Website Script）
 AUTO_LOGIN_JS = """// 问渠单点登录（数字工厂第 7 轮）：登录页自动点“Login with WenQuest”；管理员用密码登录请打开 /login?manual=1
 (function () {
