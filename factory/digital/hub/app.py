@@ -1048,7 +1048,7 @@ def freecad_pack(request: Request, x_wq_token: str = Header(default=""), u=Depen
     base = "{}://{}".format(proto, request.headers.get("host") or request.url.netloc)
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
-        for name in ("wq_shaft.py", "wq_publish.py", "wq_drawing.py", "wq_cam_keyway.py", "wq_library.py"):
+        for name in ("wq_shaft.py", "wq_publish.py", "wq_drawing.py", "wq_cam_keyway.py", "wq_library.py", "wq_submit.py"):
             text = open(os.path.join(design_web.FREECAD_DIR, name), encoding="utf-8").read()
             if name == "wq_publish.py":
                 text = (text.replace('os.environ.get("WQ_HUB_URL", "http://localhost:8100")', 'os.environ.get("WQ_HUB_URL", {!r})'.format(base))
@@ -1058,6 +1058,9 @@ def freecad_pack(request: Request, x_wq_token: str = Header(default=""), u=Depen
             if name == "wq_library.py":
                 text = text.replace('"https://factory.wenquestrobotics.com"', repr(base))
             z.writestr("wenquest-freecad/" + name, text)
+            z.writestr("wenquest-freecad/Mod/WenQuest/" + name, text)      # 第 8 轮：“问渠”工作台（工具栏按钮）
+        z.writestr("wenquest-freecad/Mod/WenQuest/InitGui.py",
+                   open(os.path.join(design_web.FREECAD_DIR, "Mod", "WenQuest", "InitGui.py"), encoding="utf-8").read())
         z.writestr("wenquest-freecad/使用说明.txt", FREECAD_README.format(base=base, mode="教学" if u["mode"] == "teach" else "生产"))
     return Response(buf.getvalue(), media_type="application/zip",
                     headers={"Content-Disposition": "attachment; filename=wenquest-freecad.zip"})
@@ -1073,6 +1076,14 @@ FREECAD_README = """问渠数字工厂 · 桌面 FreeCAD 宏包（进阶，选�
 4. 改设计：在宏列表里选 wq_shaft.py → 编辑，修改 PARAMS（例如键槽长 45 → 42），保存。
 5. 发布：选 wq_publish.py → 执行。成功后回到 {base}/work/engineer 刷新，能看到新版本、零件图和 G 代码。
 6. 插入零件库标准件：执行 wq_library.py，搜索 6207 等编号。
+
+任何零件提交到工厂（企业版）：
+7. 把压缩包里的 Mod\\WenQuest 文件夹复制到 FreeCAD 的用户 Mod 目录
+   （Windows：%APPDATA%\\FreeCAD\\Mod；macOS：~/Library/Application Support/FreeCAD/Mod；Linux：~/.local/share/FreeCAD/Mod），重启 FreeCAD。
+8. 工作台列表里选“问渠”，工具栏出现“提交到问渠工厂”“插入零件库标准件”两个按钮。
+9. 在模型树里选中零件 → 点“提交到问渠工厂” → 填物料编号和改动说明 → 提交。文档里有 TechDraw 图纸页的会一并导出 PDF。
+   企业（生产）模式进“设计发布与审批”待审，审批人批准后才进 ERPNext 和车间。
+   不装工作台也行：选中零件后执行 wq_submit.py 宏。
 
 说明：wq_publish.py 里已经填好了工作台地址和你的登录凭证（{mode}模式，7 天内有效）。
 发布时提示“请先登录”，说明凭证过期了：回到“设计与工艺”页重新下载宏包即可。
