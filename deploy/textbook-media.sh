@@ -19,7 +19,7 @@ for idx in sorted(root.glob("*/web/index.json")):
             ready += 1
         elif (d / f"{name}-{h}.err").exists():
             err = json.loads((d / f"{name}-{h}.err").read_text(encoding="utf-8")).get("error", "")
-            print(f"FAILED {book}/{name}: {err[-600:]}")
+            print(f"FAILED {book}/{name}: " + " | ".join(err.splitlines())[:1500])
 print(f"READY {ready}/{total}")
 PY
 }

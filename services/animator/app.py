@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import ast
 import asyncio
+import re
 import base64
 import os
 import shutil
@@ -74,7 +75,9 @@ def check(code: str) -> str:
 def _tail(text: str, lines: int = 30) -> str:
     """The useful end of Manim's output: the traceback without the progress bars."""
     keep = [ln for ln in text.splitlines() if ln.strip() and "it/s]" not in ln and "Animation" not in ln[:12]]
-    return "\n".join(keep[-lines:])[-4000:]
+    # Manim prints the LaTeX error well above the traceback; keep it, or the reason is lost
+    tex = [ln.strip() for ln in keep[:-lines] if re.search(r"LaTeX compilation error|^\s*! |Context of error|not found", ln)][:8]
+    return "\n".join(tex + keep[-lines:])[-4000:]
 
 
 async def _run(cmd: list[str], cwd: Path, timeout: int) -> tuple[int, str]:

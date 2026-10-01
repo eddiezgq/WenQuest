@@ -1,4 +1,5 @@
 # WenQuest animation renderer: Manim + LaTeX + ffmpeg, no secrets, no internet (see docker-compose.yml).
+# MathTex needs standalone.cls (texlive-latex-extra) and preview.sty (preview-latex-style): Manim's TeX template.
 FROM python:3.12-slim
 WORKDIR /srv
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
@@ -8,6 +9,7 @@ RUN apt-get update \
       libcairo2 libpango-1.0-0 libpangocairo-1.0-0 \
       build-essential pkg-config libcairo2-dev libpango1.0-dev \
       dvisvgm texlive-latex-base texlive-latex-recommended texlive-fonts-recommended \
+      texlive-latex-extra preview-latex-style \
  && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \

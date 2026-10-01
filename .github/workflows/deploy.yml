@@ -239,4 +239,4 @@ jobs:
         continue-on-error: true
         run: |
           ssh "deploy@$HOST" '/opt/wenquest/deploy/textbook-media.sh 600' 2>&1 | tee /tmp/media.log
-          grep '^FAILED' /tmp/media.log | head -n 9 | while read -r l; do echo "::warning title=Textbook animation::${l:0:300}"; done || true
+          grep '^FAILED' /tmp/media.log | head -n 9 | while read -r l; do echo "::warning title=Textbook animation::${l:0:1500}"; done || true
