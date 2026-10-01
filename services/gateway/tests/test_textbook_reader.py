@@ -11,6 +11,20 @@ def student(client):
     return {"Authorization": f"Bearer {r.json()['token']}"}
 
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _restore_settings(client):  # noqa: F811 - after the app has started
+    """These tests point the gateway at temporary folders and a fake animation service; put everything back after."""
+    st = getattr(main.state, "settings", None)
+    saved = {k: getattr(st, k) for k in ("textbook_dir", "data_dir", "animator_url")} if st else {}
+    yield
+    if st:
+        for k, v in saved.items():
+            setattr(st, k, v)
+
+
 def built_book(tmp_path):
     web = tmp_path / "robotics" / "web"
     web.mkdir(parents=True)
