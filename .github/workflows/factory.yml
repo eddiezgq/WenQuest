@@ -204,9 +204,9 @@ jobs:
       - name: 更新数字工厂
         if: env.SKIP != '1'
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "docker login ghcr.io -u ${{ github.actor }} --password-stdin"
+          # 学习平台与数字工厂部署在同一台服务器：登录、拉镜像、清理镜像排队做（同一把锁），避免同时推送时互相打断
           set +e
-          ssh "deploy@$HOST" "/opt/wenquest/factory/deploy/update.sh ${{ needs.build.outputs.app }} ${{ needs.build.outputs.bridge }}" 2>&1 | tee /tmp/update.log
+          echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock sh -c 'docker login ghcr.io -u ${{ github.actor }} --password-stdin && /opt/wenquest/factory/deploy/update.sh ${{ needs.build.outputs.app }} ${{ needs.build.outputs.bridge }}'" 2>&1 | tee /tmp/update.log
           st=${PIPESTATUS[0]}
           if [ "$st" != 0 ]; then
             python3 factory/deploy/ci_annotate.py 服务器更新 /tmp/update.log 180

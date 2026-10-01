@@ -197,5 +197,12 @@ jobs:
             echo "::error::/opt/wenquest/.env is missing. On the server run: cd /opt/wenquest && deploy/init-env.sh  - then re-run this workflow."
             exit 1
           fi
-          echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "docker login ghcr.io -u ${{ github.actor }} --password-stdin"
-          ssh "deploy@$HOST" "/opt/wenquest/deploy/update.sh ${{ needs.build.outputs.image }}"
+          # The digital factory deploys to the same server: login, pulls and image pruning take turns under one lock,
+          # so pushes that trigger both deploys do not break each other. The update log is kept for annotations.
+          set +e
+          echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock sh -c 'docker login ghcr.io -u ${{ github.actor }} --password-stdin && /opt/wenquest/deploy/update.sh ${{ needs.build.outputs.image }}'" 2>&1 | tee /tmp/update.log
+          st=${PIPESTATUS[0]}
+          if [ "$st" != 0 ]; then
+            python3 factory/deploy/ci_annotate.py "Server update" /tmp/update.log 180
+            exit "$st"
+          fi
