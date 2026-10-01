@@ -31,7 +31,7 @@ def expand(repo, rel, mappings=None):
     old = substitution_args._eval_find
     substitution_args._eval_find = find
     try:
-        doc = xacro.process_file(str(Path(repo) / rel), mappings=mappings or {})
+        doc = xacro.process_file(str(Path(repo) / rel), mappings=dict(mappings or {}))   # 传副本：xacro 会把解析出的参数写回字典
     finally:
         substitution_args._eval_find = old
     return doc.toprettyxml(indent="  ")

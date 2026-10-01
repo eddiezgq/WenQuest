@@ -4,6 +4,7 @@
     python3 tools/validate.py       # 有问题时列出并返回 1
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -32,6 +33,9 @@ def problems():
         part = str(e.get("id", "?"))[0]
         if e.get("category") not in CATEGORIES.get(part, set()):
             out.append("{}：类别 {} 不在 {} 部分的词表里".format(where, e.get("category"), part))
+        local = re.search(r"(/home/|/tmp/|/root/|/Users/|[A-Za-z]:\\\\)[^\s\"']*", json.dumps(doc, ensure_ascii=False, default=str))
+        if local:                                          # 本机路径混进条目（如 xacro 参数被写回）：线上构建会找不到
+            out.append("{}：条目里有本机路径 {}".format(where, local.group(0)[:80]))
         lic = (e.get("source") or {}).get("license")
         if lic not in wqlib.ALLOWED_LICENSES:
             out.append("{}：许可 {} 不在可收名单（B.6）".format(where, lic))

@@ -20,32 +20,6 @@ model:
   - glb
   xacro_args:
     robot_type: Rizon10
-    arm_prefix: ''
-    robot_sn: ''
-    joint_limits_parameters_file: /home/claude/wenquest/library/vendor_src/rd/flexiv_description/config/Rizon10/joint_limits.yaml
-    kinematics_parameters_file: ''
-    inertia_parameters_file: /home/claude/wenquest/library/vendor_src/rd/flexiv_description/config/Rizon10/inertia_parameters.yaml
-    visual_parameters_file: /home/claude/wenquest/library/vendor_src/rd/flexiv_description/config/Rizon10/visual_parameters.yaml
-    load_gripper: 'false'
-    gripper_name: Flexiv-GN01
-    load_mounted_ft_sensor: 'false'
-    mounting_file: /home/claude/wenquest/library/vendor_src/rd/flexiv_description/config/single_robot_mounting.yaml
-    dual_mounting_file: /home/claude/wenquest/library/vendor_src/rd/flexiv_description/config/dual_robot_mounting.yaml
-    paired_mounting_file: /home/claude/wenquest/library/vendor_src/rd/flexiv_description/config/dual_arm_mounting.yaml
-    external_axis_prefix: ''
-    arm_type: ''
-    robot_sn_left: ''
-    robot_sn_right: ''
-    arm_type_left: ''
-    arm_type_right: ''
-    load_gripper_left: 'false'
-    load_gripper_right: 'false'
-    gripper_name_left: Flexiv-GN01
-    gripper_name_right: Flexiv-GN01
-    load_mounted_ft_sensor_left: 'false'
-    load_mounted_ft_sensor_right: 'false'
-    kinematics_parameters_file_left: ''
-    kinematics_parameters_file_right: ''
   origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
   note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
 robot:
