@@ -34,6 +34,11 @@
         <text class="gicon">✦</text>
         <text class="glabel">{{ t("create.button") }}</text>
       </view>
+      <view v-if="cm && cm.member" class="gitem" :class="{ on: nav === 'committee' }" @click="go('committee')">
+        <text class="gicon">✓</text>
+        <text class="glabel">{{ t("rev.nav") }}</text>
+        <text v-if="cm.waiting" class="badge">{{ cm.waiting }}</text>
+      </view>
       <view v-if="admin && admin.admin" class="gitem" :class="{ on: nav === 'admin' }" @click="go('admin')">
         <text class="gicon">⚑</text>
         <text class="glabel">{{ t("admin.nav") }}</text>
@@ -121,13 +126,14 @@ const props = defineProps<{
 }>();
 
 const accountOpen = ref(false);
+const cm = ref<{ member: boolean; waiting?: number } | null>(null);
 const initial = computed(() => (user.value?.fullname || "?").trim().slice(0, 1).toUpperCase());
 const menu = computed(() => (props.course ? courseMenu(props.course) : []));
 
 function go(where: string) {
   accountOpen.value = false;
   if (where === "create") return uni.reLaunch({ url: "/pages/studio/studio" });
-  if (["catalog", "admin", "apply"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
+  if (["catalog", "admin", "apply", "committee"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
   if (["calendar", "inbox", "help"].includes(where)) return uni.reLaunch({ url: `/pages/hub/hub?view=${where}` });
   uni.reLaunch({ url: where === "courses" ? "/pages/courses/courses?view=all" : "/pages/courses/courses" });
 }
@@ -148,7 +154,10 @@ async function logout() {
   admin.value = null;
   uni.reLaunch({ url: "/pages/login/login" });
 }
-onMounted(() => loadAdmin());
+onMounted(() => {
+  loadAdmin();
+  if (user.value?.can_create_courses || user.value) api.committeeMe().then((r) => (cm.value = r)).catch(() => {});
+});
 </script>
 
 <style scoped>

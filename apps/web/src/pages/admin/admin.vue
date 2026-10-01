@@ -14,6 +14,7 @@
           <text class="wq-tab" :class="{ on: tab === 'apps' }" @click="setTab('apps')">{{ t("admin.apps") }}<text v-if="info?.applications" class="count">{{ info.applications }}</text></text>
           <text class="wq-tab" :class="{ on: tab === 'requests' }" @click="setTab('requests')">{{ t("admin.requests") }}<text v-if="info?.requests" class="count">{{ info.requests }}</text></text>
           <text class="wq-tab" :class="{ on: tab === 'users' }" @click="setTab('users')">{{ t("admin.users") }}</text>
+          <text class="wq-tab" :class="{ on: tab === 'committee' }" @click="setTab('committee')">{{ t("rev.committee") }}</text>
         </view>
 
         <!-- teacher applications -->
@@ -123,6 +124,21 @@
             <view v-if="(page + 1) * 50 < total" class="wq-btn small" @click="loadUsers(page + 1)">›</view>
           </view>
         </template>
+        <!-- course committee (round 6) -->
+        <template v-if="tab === 'committee'">
+          <view class="com">
+            <text class="wq-muted">{{ t("rev.adminHint") }}</text>
+            <text class="com-l">{{ t("rev.members") }}</text>
+            <textarea v-model="comMembers" class="com-in" auto-height :placeholder="t('rev.membersHint')" />
+            <text class="com-l">{{ t("rev.chair") }}</text>
+            <input v-model="comChair" class="wq-input" :placeholder="t('rev.chairHint')" />
+            <label class="wq-row"><switch :checked="comSelf" @change="(e: any) => (comSelf = e.detail.value)" /><text>{{ t("rev.selfReview") }}</text></label>
+            <view class="wq-row"><view class="wq-btn primary" @click="saveCommittee">{{ t("common.save") }}</view></view>
+            <view v-if="comNow.length" class="com-now">
+              <text v-for="m in comNow" :key="m.id" class="wq-tag" :class="m.id === comChairId ? 'live' : 'info'">{{ m.name }}{{ m.id === comChairId ? " · " + t("rev.chair") : "" }}</text>
+            </view>
+          </view>
+        </template>
         <text v-if="error" class="wq-error">{{ error }}</text>
       </template>
     </view>
@@ -134,11 +150,35 @@ import { ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import { type AdminUser, type Application, type EnrolRequest, accountApi, loadAdmin } from "../../accountApi";
-import { ApiError, token } from "../../api";
+import { api, ApiError, token } from "../../api";
 import { confirmAction } from "../../courseApi";
 import { errorText, t } from "../../i18n";
 
-const tab = ref<"apps" | "requests" | "users">("apps");
+const tab = ref<"apps" | "requests" | "users" | "committee">("apps");
+const comMembers = ref("");
+const comChair = ref("");
+const comSelf = ref(true);
+const comNow = ref<{ id: number; name: string; email: string; key?: string }[]>([]);
+const comChairId = ref(0);
+function showCommittee(r: { members: { id: number; name: string; email: string; key?: string }[]; chair: number; self_review: boolean }) {
+  comNow.value = r.members;
+  comChairId.value = r.chair;
+  comMembers.value = r.members.map((m) => m.key || m.email || m.name).join("\n");
+  const c = r.members.find((m) => m.id === r.chair);
+  comChair.value = c ? c.key || c.email || c.name : "";
+  comSelf.value = r.self_review;
+}
+async function loadCommittee() {
+  try { showCommittee(await api.adminCommittee()); } catch (e) { fail(e); }
+}
+async function saveCommittee() {
+  error.value = "";
+  try {
+    const members = comMembers.value.split(/[\n,，;；]+/).map((x) => x.trim()).filter(Boolean);
+    showCommittee(await api.adminSetCommittee(members, comChair.value.trim(), comSelf.value));
+    uni.showToast({ title: t("rev.saved"), icon: "none" });
+  } catch (e) { fail(e); }
+}
 const info = ref<{ admin: boolean; applications?: number; requests?: number; mail?: boolean; ai?: string } | null>(null);
 const denied = ref(false);
 const loading = ref(false);
@@ -182,6 +222,7 @@ function setTab(x: typeof tab.value) {
   error.value = "";
   if (x === "apps") loadApps();
   else if (x === "requests") loadReqs();
+  else if (x === "committee") loadCommittee();
   else loadUsers(0);
 }
 
@@ -286,6 +327,10 @@ onShow(async () => {
 .r-main { display: flex; flex-direction: column; gap: 2px; }
 .r-course { font-size: 14px; color: var(--wq-ink); }
 .search { width: 260px; }
+.com { display: flex; flex-direction: column; gap: 8px; max-width: 560px; }
+.com-l { font-weight: 600; margin-top: 6px; }
+.com-in { width: 100%; min-height: 80px; border: 1px solid var(--wq-line); border-radius: 6px; padding: 8px; box-sizing: border-box; background: #fff; }
+.com-now { display: flex; flex-wrap: wrap; gap: 6px; }
 .table { background: #fff; border: 1px solid var(--wq-line); border-radius: 8px; }
 .tr { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-top: 1px solid var(--wq-line); }
 .tr.th { border-top: 0; background: #f3f5f5; font-size: 13px; color: var(--wq-muted); }

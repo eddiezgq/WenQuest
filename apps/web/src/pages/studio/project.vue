@@ -9,6 +9,9 @@
           <text>{{ t("studio.stage." + s) }}</text>
         </view>
         <view class="grow" />
+        <text v-if="p.lead_v2_available" class="chip2 leadv2" :class="{ on: p.lead_v2 }" @click="toggleLead">
+          {{ p.lead_v2 ? "✓ " : "" }}{{ t("lead.v2") }}
+        </text>
         <view v-if="p.busy" class="working">
           <view class="dot" />
           <text>{{ p.busy.label }}</text>
@@ -41,7 +44,7 @@
                 <text v-else class="prop-s">{{ t("lead.status." + propOf(m)!.status) }}</text>
               </view>
             </view>
-            <view v-if="p.lead_thinking" class="msg lead thinking"><text class="bubble">{{ t("lead.thinking") }}</text></view>
+            <view v-if="p.lead_thinking" class="msg lead thinking"><text class="bubble">{{ p.lead_status ? p.lead_status + "…" : t("lead.thinking") }}</text></view>
             <!-- open questions, answered with one click -->
             <view v-for="q in openQuestions" :id="'q' + q.id" :key="q.id" class="qcard">
               <text class="q-text">{{ q.text }}</text>
@@ -104,6 +107,17 @@
 
           <!-- materials list -->
           <view v-if="tab === 'materials'" class="pane">
+            <!-- 教材研读笔记: what the course lead learned from the textbook (round 5) -->
+            <view v-if="p.textbook_notes && Object.keys(p.textbook_notes).length" class="notes-box">
+              <text class="h4">{{ t("lead.notes") }}</text>
+              <view v-for="k in Object.keys(p.textbook_notes).sort((a, b) => Number(a) - Number(b))" :key="k" class="note-ch">
+                <text class="note-h" @click="openNote = openNote === k ? '' : k">
+                  {{ openNote === k ? "▾" : "▸" }} {{ t("lead.chapter", { n: k }) }} {{ p.textbook_notes[k].title }}
+                  <text v-if="!p.textbook_notes[k].seen_book" class="st needs">{{ t("lead.unseen") }}</text>
+                </text>
+                <text v-if="openNote === k" class="note-t">{{ p.textbook_notes[k].notes }}</text>
+              </view>
+            </view>
             <!-- add, download: at any stage (files added after the materials were settled are sorted at once) -->
             <!-- #ifdef H5 -->
             <div class="mtools" :class="{ over: dragOver }" @dragover.prevent="dragOver = true" @dragleave="dragOver = false" @drop.prevent="onDrop">
@@ -342,8 +356,9 @@
                   <view class="l-head" @click="openLesson = openLesson === l.id ? '' : l.id">
                     <text class="l-week">{{ l.week ? t("studio.weekShort", { n: l.week }) : "" }}</text>
                     <text class="l-title">{{ disp(l.title) }}</text>
-                    <text v-if="l.attention?.length && l.status === 'awaiting'" class="st needs">{{ t("studio.needsYou") }}</text>
-                    <text class="st" :class="l.status">{{ t("studio.status." + l.status) }}</text>
+                    <text v-if="l.attention?.length && l.status === 'awaiting' && !l.review_flow?.state" class="st needs">{{ t("studio.needsYou") }}</text>
+                    <text v-if="l.status === 'awaiting' && l.review_flow?.state" class="st" :class="l.review_flow.state === 'returned' ? 'needs' : 'awaiting'">{{ l.review_flow.state === "submitted" ? t("rev.waiting") : t("rev.state." + l.review_flow.state) }}</text>
+                    <text v-else class="st" :class="l.status">{{ t("studio.status." + l.status) }}</text>
                   </view>
                   <view v-if="openLesson === l.id" class="l-body">
                     <template v-if="l.status === 'awaiting' || l.status === 'published'">
@@ -425,11 +440,21 @@
                         <view v-if="l.status === 'planned' || l.status === 'failed'" class="ghost" :class="{ disabled: !!p.busy || p.stage !== 'lessons' }" @click="rewrite(l.id)">
                           {{ t("studio.writeThis") }}
                         </view>
-                        <view v-if="l.status === 'awaiting'" class="primary small" :class="{ disabled: busyAction }" @click="publish(l.id)">
-                          {{ busyAction ? t("create.publishing") : t("studio.approve") }}
+                        <!-- round 6: AI 预审 → 课程委员会 → 发布 -->
+                        <view v-if="l.status === 'awaiting' && !['prereviewed', 'submitted'].includes(l.review_flow?.state || '')"
+                              class="primary small" :class="{ disabled: !!p.busy }" @click="submitReview(l.id)">{{ t("rev.submit") }}</view>
+                        <view v-if="l.status === 'awaiting' && ['prereviewed', 'returned'].includes(l.review_flow?.state || '')"
+                              class="ghost" :class="{ disabled: !!p.busy }" @click="reviseFromReview(l.id)">{{ t("rev.revise") }}</view>
+                        <view v-if="l.status === 'awaiting' && l.review_flow?.state === 'prereviewed'"
+                              class="primary small" :class="{ disabled: !!p.busy }" @click="toCommittee(l.id)">{{ t("rev.toCommittee") }}</view>
+                        <text v-if="l.review_flow?.state === 'submitted'" class="st needs">{{ t("rev.waiting") }}</text>
+                        <view v-if="l.review_flow?.state === 'submitted' && cm?.chair" class="primary small" :class="{ disabled: busyAction }" @click="publish(l.id)">
+                          {{ busyAction ? t("create.publishing") : t("rev.approveAsChair") }}
                         </view>
                       </view>
+                      <text v-if="l.status === 'awaiting' && l.review_flow?.state === 'prereviewed'" class="muted-s">{{ t("rev.noteHint") }}</text>
                     </view>
+                    <ReviewOpinion v-if="l.review_flow" :flow="l.review_flow" />
                     <view v-if="l.status === 'published' && p.course.id" class="l-actions">
                       <text class="link" @click="openCourse">{{ t("studio.seeInCourse") }} ›</text>
                     </view>
@@ -467,6 +492,7 @@ import { confirmAction } from "../../courseApi";
 import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import LectureStudio from "../../components/studio/LectureStudio.vue";
+import ReviewOpinion from "../../components/studio/ReviewOpinion.vue";
 import {
   absolute, api, ApiError, type DesignBook, type Voice, type LibraryItem, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
 } from "../../api";
@@ -721,6 +747,10 @@ function confirmProp(prop: string) {
 function cancelProp(prop: string) {
   act(() => api.studioCancelProposal(id.value, prop));
 }
+const openNote = ref("");
+function toggleLead() {
+  act(() => api.studioLeadV2(id.value, !p.value?.lead_v2));
+}
 function confirmChapter(no: number) {
   act(() => api.studioConfirmChapter(id.value, no));
 }
@@ -735,6 +765,20 @@ function rewrite(lid: string) {
   const note = (notes[lid] || "").trim();
   notes[lid] = "";
   act(() => api.studioWrite(id.value, lid, note));
+}
+// --- round 6: review and committee ------------------------------------------------------------
+const cm = ref<{ member: boolean; chair: boolean } | null>(null);
+api.committeeMe().then((r) => { cm.value = r; }).catch(() => { /* not a member */ });
+function submitReview(lid: string) {
+  act(() => api.studioSubmitReview(id.value, lid));
+}
+function reviseFromReview(lid: string) {
+  act(() => api.studioReviseFromReview(id.value, lid));
+}
+function toCommittee(lid: string) {
+  const note = (notes[lid] || "").trim();
+  notes[lid] = "";
+  act(() => api.studioToCommittee(id.value, lid, note));
 }
 async function publish(lid: string) {
   busyAction.value = true;
@@ -886,6 +930,10 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .prop-b { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
 .prop-s { font-size: 12px; color: var(--wq-muted); }
 .msg.thinking .bubble { color: var(--wq-muted); font-style: italic; }
+.notes-box { margin: 0 0 14px; padding: 10px 12px; border: 1px solid var(--wq-line); border-radius: 8px; background: #fbfcfd; display: flex; flex-direction: column; gap: 6px; }
+.note-h { font-size: 14px; font-weight: 600; cursor: pointer; }
+.note-t { white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: var(--wq-text); padding: 4px 0 8px 14px; }
+.leadv2 { margin-right: 10px; }
 .l-ch-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .mtabs { display: none; }
 .cols { display: grid; grid-template-columns: minmax(320px, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }

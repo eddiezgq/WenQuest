@@ -137,6 +137,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         out["busy"] = proj.get("busy") if studio().is_busy(proj["id"]) else None
         out["anims_on"] = bool(studio().animator_url)  # animations can be made (the renderer is set up)
         out["labs_on"] = bool(studio().labcheck_url)   # virtual labs can be made (the lab checker is set up)
+        out["lead_status"] = studio().__dict__.get("lead_status", {}).get(proj["id"], "")
+        out["lead_v2_available"] = bool(getattr(studio().ai, "agentic", False))
         out["voices_on"] = bool(studio().voice_url)    # lecture videos can be made (the voice service is set up)
         out["voices"] = studio().voices_of(proj)
         out["zip_url"] = sign_material(proj["id"], "*") if files else ""
@@ -348,6 +350,20 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
     async def cancel_proposal(pid: str, prop: str, sess: Annotated[Session, Depends(current)]):
         load(pid, sess)
         return view(studio().cancel_proposal(pid, prop))
+
+    class LeadV2In(BaseModel):
+        on: bool
+
+    @app.put("/api/v1/studio/projects/{pid}/lead-v2")
+    async def lead_v2(pid: str, body: LeadV2In, sess: Annotated[Session, Depends(current)]):
+        """专家版课程负责人（试用）: Claude itself as the course lead, for this project."""
+        await need_creator(sess)
+        proj = load(pid, sess)
+        proj["lead_v2"] = body.on
+        studio().say(proj, "已换成专家版课程负责人（试用）：它会先读教材、查资料、想清楚再答，回复可能要一两分钟。" if body.on
+                     else "已换回原来的课程负责人。", "system")
+        studio().projects.save(proj)
+        return view(proj)
 
     @app.post("/api/v1/studio/projects/{pid}/chapters/{no}/confirm")
     async def confirm_chapter(pid: str, no: int, sess: Annotated[Session, Depends(current)]):
@@ -593,6 +609,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         if les["status"] == "published":
             raise EngineError("published", "this lesson is already in the course", 409)
         from .lead import chapter_confirmed
+        if (les.get("review_flow") or {}).get("state") == "submitted":
+            raise EngineError("already_submitted", "the committee has this lesson; wait for its decision", 409)
         if les["status"] in ("planned", "failed") and not chapter_confirmed(chapter):
             raise EngineError("chapter_unconfirmed", f"第 {chapter['no']} 章的课时安排还没确认", 409)
         if body.note:
@@ -771,19 +789,223 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         studio().run(proj, f"正在处理你的讲课录像：{disp(les['title'])}", lambda p: studio().take_recording(p, lid, src))
         return view(studio().projects.load(pid))
 
-    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/approve")
-    async def publish(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+    # --- 课程委员会: AI 预审 → 委员会批准 → 发布 (round 6) ------------------------------------------------
+    class ReviewIn(BaseModel):
+        comment: str = Field(default="", max_length=4000)
+
+    def who(sess: Session, proj: dict | None = None) -> str:
+        """A readable name for the review record: the committee member's name, else the project owner's."""
+        for x in studio().committee.load().get("members") or []:
+            if x["id"] == sess.user_id and x.get("name"):
+                return x["name"]
+        if proj and proj.get("owner") == sess.user_id and proj.get("owner_name"):
+            return proj["owner_name"]
+        return f"user {sess.user_id}"
+
+    async def notify(to_ids: list[int], subject: str, text: str, sess: Session) -> None:
+        """Email committee members / teachers (best effort; the project conversation always has the record)."""
+        com = studio().committee.load()
+        mails = [m.get("email") for m in com.get("members") or [] if m["id"] in to_ids and m.get("email")]
+        for addr in dict.fromkeys(mails):
+            try:
+                await m.state.mailer.send(addr, subject, text + f"\n\n{m.state.settings.app_url.rstrip('/')}/pages/committee/committee")
+            except Exception:  # noqa: BLE001
+                pass
+
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/submit")
+    async def submit_review(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        """提交审核: the AI pre-review starts; the teacher then sees its opinion."""
         await need_creator(sess)
         proj = load(pid, sess)
-        chapter, les = studio().find_lesson(proj, lid)
+        _, les = studio().find_lesson(proj, lid)
         if les["status"] != "awaiting":
-            raise EngineError("wrong_stage", "only a written lesson can be published", 409)
+            raise EngineError("wrong_stage", "only a written lesson can be submitted", 409)
+        if studio().flow(les).get("state") == "submitted":
+            raise EngineError("already_submitted", "the committee has it already", 409)
+        studio().log_flow(les, who(sess, proj), "submit")
+        studio().projects.save(proj)
+        studio().run(proj, f"AI 预审正在审《{disp(les['title'])}》", lambda p: studio().prereview(p, lid))
+        return view(studio().projects.load(pid))
+
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/to-committee")
+    async def to_committee(pid: str, lid: str, body: ReviewIn, sess: Annotated[Session, Depends(current)]):
+        """提交委员会 (with the AI pre-review attached and the teacher's note)."""
+        await need_creator(sess)
+        proj = load(pid, sess)
+        _, les = studio().find_lesson(proj, lid)
+        f = studio().flow(les)
+        if les["status"] != "awaiting" or f.get("state") not in ("prereviewed",):
+            raise EngineError("wrong_stage", "run the AI pre-review first", 409)
+        com = studio().committee.load()
+        if not com.get("chair"):
+            raise EngineError("no_committee", "the course committee has not been set up", 409)
+        f["state"], f["note"], f["submitted"] = "submitted", body.comment, time.time()
+        f["owner"] = proj["owner"]
+        studio().log_flow(les, who(sess, proj), "to_committee", body.comment)
+        studio().say(proj, f"《{disp(les['title'])}》已提交课程委员会，等待主任审核。", "system")
+        studio().projects.save(proj)
+        await notify([com["chair"]], f"问渠：《{disp(les['title'])}》等你审核",
+                     f"{proj.get('owner_name', '')}提交了《{disp(les['title'])}》，AI 预审：{(f.get('prereview') or {}).get('summary', '')}", sess)
+        return view(proj)
+
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/revise-from-review")
+    async def revise_from_review(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        """按审核意见修改: the lecturer rewrites the lesson with the pre-review issues and the committee's comments."""
+        await need_creator(sess)
+        proj = load(pid, sess)
+        _, les = studio().find_lesson(proj, lid)
+        if les["status"] != "awaiting" or studio().flow(les).get("state") == "submitted":
+            raise EngineError("wrong_stage", "not now", 409)
+        note = studio().revise_note(les)
+        studio().flow(les)["state"] = ""
+        studio().log_flow(les, who(sess, proj), "revise")
+        studio().projects.save(proj)
+        studio().run(proj, f"主讲教授按审核意见修改：{disp(les['title'])}", lambda p: studio().write_lesson(p, lid, note))
+        return view(studio().projects.load(pid))
+
+    def committee_role(sess: Session) -> dict:
+        com = studio().committee.load()
+        return {"member": studio().committee.member(sess.user_id), "chair": studio().committee.chair(sess.user_id),
+                "self_review": bool(com.get("self_review", True))}
+
+    @app.get("/api/v1/committee/me")
+    async def committee_me(sess: Annotated[Session, Depends(current)]):
+        r = committee_role(sess)
+        if r["member"]:
+            r["waiting"] = sum(1 for _ in submitted_items())
+        return r
+
+    def submitted_items():
+        for proj in studio().projects.all():
+            for c in (proj.get("outline") or {}).get("chapters", []):
+                for les in c["lessons"]:
+                    if (les.get("review_flow") or {}).get("state") == "submitted":
+                        yield proj, c, les
+
+    @app.get("/api/v1/committee/queue")
+    async def committee_queue(sess: Annotated[Session, Depends(current)], done: bool = False):
+        if not committee_role(sess)["member"]:
+            raise EngineError("forbidden", "committee members only", 403)
+        out = []
+        for proj in studio().projects.all():
+            for c in (proj.get("outline") or {}).get("chapters", []):
+                for les in c["lessons"]:
+                    f = les.get("review_flow") or {}
+                    if (f.get("state") == "submitted") if not done else (f.get("state") in ("approved", "returned")):
+                        out.append({"pid": proj["id"], "lid": les["id"], "course": proj["outline"]["title"], "chapter": c["title"],
+                                    "no": studio().lesson_no(proj, c, les), "title": les["title"], "teacher": proj.get("owner_name", ""),
+                                    "state": f.get("state"), "submitted": f.get("submitted"),
+                                    "verdict": (f.get("prereview") or {}).get("verdict", "")})
+        return {"items": sorted(out, key=lambda x: -(x.get("submitted") or 0))[:200]}
+
+    @app.get("/api/v1/committee/items/{pid}/{lid}")
+    async def committee_item(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        if not committee_role(sess)["member"]:
+            raise EngineError("forbidden", "committee members only", 403)
+        try:
+            proj = studio().projects.load(pid)
+            c, les = studio().find_lesson(proj, lid)
+        except (KeyError, EngineError):
+            raise EngineError("not_found", "no such lesson", 404)
+        v = view(proj)
+        lv = next(x for ch in v["outline"]["chapters"] for x in ch["lessons"] if x["id"] == lid)
+        return {"pid": pid, "lid": lid, "course": proj["outline"]["title"], "chapter": c["title"], "no": studio().lesson_no(proj, c, les),
+                "teacher": proj.get("owner_name", ""), "owner": proj["owner"], "lesson": lv, "flow": les.get("review_flow") or {},
+                "role": committee_role(sess)}
+
+    async def committee_approve(pid: str, lid: str, sess: Session, comment: str) -> dict:
+        r = committee_role(sess)
+        try:
+            proj = studio().projects.load(pid)
+            chapter, les = studio().find_lesson(proj, lid)
+        except KeyError:
+            raise EngineError("not_found", "no such project", 404)
+        f = studio().flow(les)
+        if not r["chair"]:
+            raise EngineError("forbidden", "only the committee chair approves", 403)
+        if f.get("state") != "submitted" or les["status"] != "awaiting":
+            raise EngineError("wrong_stage", "this lesson is not waiting for the committee", 409)
+        own = proj["owner"] == sess.user_id
+        if own and not r["self_review"]:
+            raise EngineError("own_lesson", "another member must approve your own lesson", 403)
         if not proj["course"]["id"]:
             await create_course(proj, sess)
         await publish_lesson(proj, chapter, les, sess)
-        studio().say(proj, f"《{disp(les['title'])}》已发布，学生现在能看到了。", "system")
+        f["state"], f["approved"] = "approved", time.time()
+        studio().log_flow(les, who(sess, proj) + ("（本人审核）" if own else ""), "approve", comment)
+        studio().say(proj, f"课程委员会批准了《{disp(les['title'])}》{'（本人审核）' if own else ''}，已发布，学生现在能看到了。"
+                     + (f"\n主任意见：{comment}" if comment else ""), "system")
         studio().projects.save(proj)
+        return proj
+
+    @app.post("/api/v1/committee/items/{pid}/{lid}/approve")
+    async def committee_approve_ep(pid: str, lid: str, body: ReviewIn, sess: Annotated[Session, Depends(current)]):
+        await committee_approve(pid, lid, sess, body.comment)
+        return {"ok": True}
+
+    @app.post("/api/v1/committee/items/{pid}/{lid}/return")
+    async def committee_return(pid: str, lid: str, body: ReviewIn, sess: Annotated[Session, Depends(current)]):
+        if not committee_role(sess)["member"]:
+            raise EngineError("forbidden", "committee members only", 403)
+        if not body.comment.strip():
+            raise EngineError("comment_needed", "say what should change", 422)
+        proj = studio().projects.load(pid)
+        _, les = studio().find_lesson(proj, lid)
+        f = studio().flow(les)
+        if f.get("state") != "submitted":
+            raise EngineError("wrong_stage", "this lesson is not waiting for the committee", 409)
+        f["state"] = "returned"
+        studio().log_flow(les, who(sess, proj), "return", body.comment)
+        studio().say(proj, f"课程委员会退回了《{disp(les['title'])}》：{body.comment}\n可以点“按审核意见修改”，改好后重新提交审核。", "system")
+        studio().projects.save(proj)
+        return {"ok": True}
+
+    @app.post("/api/v1/studio/projects/{pid}/lessons/{lid}/approve")
+    async def publish(pid: str, lid: str, sess: Annotated[Session, Depends(current)]):
+        """The chair's approval from the course page (the same as in the committee page)."""
+        proj = await committee_approve(pid, lid, sess, "")
         return view(proj)
+
+    class CommitteeIn(BaseModel):
+        members: list[str] = Field(default_factory=list, max_length=50)
+        chair: str = Field(default="", max_length=200)
+        self_review: bool = True
+
+    @app.get("/api/v1/admin/committee")
+    async def committee_get(sess: Annotated[Session, Depends(current)]):
+        await require_admin(sess)
+        return studio().committee.load()
+
+    @app.put("/api/v1/admin/committee")
+    async def committee_put(body: CommitteeIn, sess: Annotated[Session, Depends(current)]):
+        """Set the committee: members by user name or email; the chair is one of them."""
+        await require_admin(sess)
+        members = []
+        for key in dict.fromkeys(x.strip() for x in body.members if x.strip()):
+            u = None
+            for field in ("username", "email"):
+                try:
+                    r = await m.state.moodle.call(sess.moodle_token, "core_user_get_users_by_field", None, field=field, values=[key])
+                except EngineError:
+                    r = []
+                if r:
+                    u = r[0]
+                    break
+            if not u:
+                raise EngineError("user_not_found", f"no user {key}", 404)
+            members.append({"id": int(u["id"]), "name": u.get("fullname") or key, "email": u.get("email", ""), "key": key})
+        chair = next((x["id"] for x in members if x["key"] == body.chair.strip()), members[0]["id"] if members else 0)
+        d = {"members": members, "chair": chair, "self_review": body.self_review}
+        studio().committee.save(d)
+        return d
+
+    async def require_admin(sess: Session) -> None:
+        try:
+            p = await m.state.moodle.call(sess.moodle_token, "local_wenquest_get_permissions")
+        except EngineError:
+            p = {}
+        if not p.get("issiteadmin"):
+            raise EngineError("forbidden", "administrators only", 403)
 
     @app.get("/api/v1/studio/files/{signed}")
     async def lesson_file(signed: str):

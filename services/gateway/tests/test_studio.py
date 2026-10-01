@@ -59,6 +59,15 @@ def confirm_chapters(c, h, pid):
         c.post(f"/api/v1/studio/projects/{pid}/chapters/{ch['no']}/confirm", headers=h)
 
 
+def publish(c, h, pid, lid):
+    """Round 6: AI pre-review → committee (the teacher is the chair, self-review allowed) → published."""
+    main._studio().committee.save({"members": [{"id": 5, "name": "T", "email": ""}], "chair": 5, "self_review": True})
+    c.post(f"/api/v1/studio/projects/{pid}/lessons/{lid}/submit", headers=h)
+    settle(c, h, pid)
+    c.post(f"/api/v1/studio/projects/{pid}/lessons/{lid}/to-committee", headers=h, json={"comment": ""})
+    return c.post(f"/api/v1/studio/projects/{pid}/lessons/{lid}/approve", headers=h)
+
+
 def make_project(c, h):
     p = c.post("/api/v1/studio/projects", headers=h, json={"description": "大学物理A（上），给大一工科学生"}).json()
     for path, data in FOLDER.items():
@@ -137,7 +146,7 @@ def test_whole_flow_from_materials_to_a_published_lesson(client):
     assert client.get(kinds["plan"]["url"][:-4] + "abcd").status_code == 410
 
     # 5. the teacher approves: lesson, practice and a hidden answer key, plus the chapter's files
-    p = client.post(f"/api/v1/studio/projects/{pid}/lessons/{les['id']}/approve", headers=h).json()
+    p = publish(client, h, pid, les["id"]).json()
     les = p["outline"]["chapters"][0]["lessons"][0]
     assert les["status"] == "published" and les["cmids"]
     sent = [c for f, c in CALLS if f == "local_wenquest_add_activities"][-1]
@@ -341,7 +350,7 @@ def test_animation_is_rendered_fixed_and_published(client, monkeypatch):
     assert any(s.shape_type == 16 or "movie" in s.name.lower() or s.shape_type == 13
                for s in deck.slides[3].shapes if hasattr(s, "shape_type"))
     # published right after the lecture notes
-    client.post(f"/api/v1/studio/projects/{pid}/lessons/{les['id']}/approve", headers=h)
+    publish(client, h, pid, les["id"])
     sent_acts = [c for f, c in CALLS if f == "local_wenquest_add_activities"][-1]
     assert sent_acts["activities[0][type]"] == "page"
     assert sent_acts["activities[1][type]"] == "resource" and "动画" in sent_acts["activities[1][name]"]

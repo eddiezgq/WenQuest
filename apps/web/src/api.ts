@@ -132,10 +132,22 @@ export interface StudioLesson {
   review: { verdict: "pass" | "revise"; issues: { severity: string; text: string }[]; summary: string; round: number } | null;
   /** 需要你处理: what the team could not finish (kind "animation" | "lab"), shown prominently with a redo button. */
   attention?: { kind: string; text: string }[];
+  review_flow?: ReviewFlow;
   /** 每课一张清单: ok true = ticked, false = crossed, null = not checked; by "ai" | "auto+ai". */
   checklist?: { key: string; label: string; ok: boolean | null; by: string; note: string; image?: string; image_url?: string }[];
 }
 /** ready: the teacher confirmed this chapter's lessons (本章确认); only then are they written. */
+export interface ReviewOpinion {
+  verdict: "approve" | "revise" | "reject"; summary: string;
+  items: { area: string; label: string; ok: boolean | null; note: string }[];
+  issues: { severity: "high" | "medium" | "low"; where: string; text: string; fix: string }[]; highlights?: string[];
+}
+/** 审核流程 of a lesson (round 6) */
+export interface ReviewFlow {
+  state: "" | "prereviewed" | "submitted" | "returned" | "approved"; prereview?: ReviewOpinion; note?: string;
+  history: { ts: number; who: string; action: string; comment: string }[];
+}
+export interface CommitteeItem { pid: string; lid: string; course: Text; chapter: Text; no: string; title: Text; teacher: string; state: string; submitted?: number; verdict: string }
 export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[]; confirmed?: boolean; ready?: boolean }
 /** 课程负责人的提议: what the lead will do once the teacher confirms. */
 export interface StudioProposal { id: string; summary: string; lines: string[]; status: "open" | "done" | "cancelled" | "superseded"; result: string[] }
@@ -154,6 +166,13 @@ export interface StudioProject {
   labs_on?: boolean;
   anims_on?: boolean;
   proposals?: StudioProposal[];
+  /** 专家版课程负责人（试用）: Claude itself as the course lead */
+  lead_v2?: boolean;
+  lead_v2_available?: boolean;
+  /** what the course lead is doing right now ("正在查阅资料（第 3–8 页）") */
+  lead_status?: string;
+  /** 教材研读笔记, by chapter number */
+  textbook_notes?: Record<string, { title: string; notes: string; seen_book: boolean }>;
   /** the course lead is answering the teacher's last message */
   lead_thinking?: boolean;
   /** 讲解视频 can be made (the voice service is set up); the course's voices */
@@ -423,6 +442,20 @@ export const api = {
   studioConfirmProposal: (id: string, prop: string, stopFirst = false) =>
     request<StudioProject>("POST", `/api/v1/studio/projects/${id}/proposals/${prop}/confirm${stopFirst ? "?stop_first=true" : ""}`, {}),
   studioCancelProposal: (id: string, prop: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/proposals/${prop}/cancel`, {}),
+  studioLeadV2: (id: string, on: boolean) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/lead-v2`, { on }),
+  studioSubmitReview: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/submit`, {}),
+  studioToCommittee: (id: string, lid: string, comment: string) =>
+    request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/to-committee`, { comment }),
+  studioReviseFromReview: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/revise-from-review`, {}),
+  committeeMe: () => request<{ member: boolean; chair: boolean; self_review: boolean; waiting?: number }>("GET", "/api/v1/committee/me"),
+  committeeQueue: (done = false) => request<{ items: CommitteeItem[] }>("GET", `/api/v1/committee/queue${done ? "?done=true" : ""}`),
+  committeeItem: (pid: string, lid: string) => request<{ pid: string; lid: string; course: Text; chapter: Text; no: string; teacher: string; owner: number;
+    lesson: StudioLesson; flow: ReviewFlow; role: { member: boolean; chair: boolean; self_review: boolean } }>("GET", `/api/v1/committee/items/${pid}/${lid}`),
+  committeeApprove: (pid: string, lid: string, comment: string) => request<{ ok: boolean }>("POST", `/api/v1/committee/items/${pid}/${lid}/approve`, { comment }),
+  committeeReturn: (pid: string, lid: string, comment: string) => request<{ ok: boolean }>("POST", `/api/v1/committee/items/${pid}/${lid}/return`, { comment }),
+  adminCommittee: () => request<{ members: { id: number; name: string; email: string; key?: string }[]; chair: number; self_review: boolean }>("GET", "/api/v1/admin/committee"),
+  adminSetCommittee: (members: string[], chair: string, self_review: boolean) =>
+    request<{ members: { id: number; name: string; email: string; key?: string }[]; chair: number; self_review: boolean }>("PUT", "/api/v1/admin/committee", { members, chair, self_review }),
   studioConfirmChapter: (id: string, no: number) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/chapters/${no}/confirm`, {}),
   studioPace: (id: string, mode: "manual" | "daily", hour: number, tz: string) =>
     request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/pace`, { mode, hour, tz }),

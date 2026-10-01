@@ -10,7 +10,7 @@ from PIL import Image
 from app import main
 from app.production import labs
 from tests.test_materials import fake_moodle, login
-from tests.test_studio import CALLS, _write_first_lesson, client, settle  # noqa: F401 - the fixture
+from tests.test_studio import CALLS, _write_first_lesson, client, publish, settle  # noqa: F401 - the fixture
 
 COURSE, CHAPTER = ["大学物理A（上）", "University Physics A (I)"], ["第2章 牛顿运动定律", "Chapter 2 Newton's laws"]
 
@@ -112,7 +112,7 @@ def test_lab_is_written_checked_fixed_and_published_once_per_chapter(client, mon
     assert any(s.shape_type == 13 for s in deck.slides[4].shapes)  # a picture on the lab slide
 
     # publish: the chapter lab page goes in once
-    client.post(f"/api/v1/studio/projects/{pid}/lessons/{les['id']}/approve", headers=h)
+    publish(client, h, pid, les["id"])
     acts = [c for f, c in CALLS if f == "local_wenquest_add_activities"][-1]
     names = [v for k, v in acts.items() if re.fullmatch(r"activities\[\d+\]\[name\]", k)]
     assert sum("虚拟实验" in n for n in names) == 1
@@ -124,7 +124,7 @@ def test_lab_is_written_checked_fixed_and_published_once_per_chapter(client, mon
     nxt = p["outline"]["chapters"][0]["lessons"][1]
     client.post(f"/api/v1/studio/projects/{pid}/lessons/next", headers=h)
     settle(client, h, pid)
-    client.post(f"/api/v1/studio/projects/{pid}/lessons/{nxt['id']}/approve", headers=h)
+    publish(client, h, pid, nxt["id"])
     acts = [c for f, c in CALLS if f == "local_wenquest_add_activities"][-1]
     names = [v for k, v in acts.items() if re.fullmatch(r"activities\[\d+\]\[name\]", k)]
     assert not any("虚拟实验" in n for n in names)

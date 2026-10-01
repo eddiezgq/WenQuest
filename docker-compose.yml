@@ -53,6 +53,8 @@ services:
       # AI course builder and (later) the AI tutor use the same keys as Moodle's AI features.
       WQ_ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       WQ_CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-sonnet-5}
+      # The course lead (专家版) and the AI pre-review use the strongest model.
+      WQ_LEAD_MODEL: ${LEAD_MODEL:-claude-opus-5-5}
       WQ_DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       # Lesson animations are rendered by the animator service (below).
       WQ_ANIMATOR_URL: http://animator:8000

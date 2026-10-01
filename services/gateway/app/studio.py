@@ -34,6 +34,8 @@ from .ai import ModelGateway
 from .moodle import EngineError
 from .lectures import LectureMixin
 from .lead import LeadMixin, chapter_confirmed
+from .expert import ExpertMixin
+from .review import ReviewMixin
 
 log = logging.getLogger("wenquest.studio")
 
@@ -198,7 +200,7 @@ def summary(proj: dict, items: list[mt.Material] | None = None, with_outline: bo
 
 # --- the orchestrator ---------------------------------------------------------------------------
 
-class Studio(LeadMixin, LectureMixin):
+class Studio(ReviewMixin, ExpertMixin, LeadMixin, LectureMixin):
     def __init__(self, projects: Projects, store: mt.Store, ai: ModelGateway, clean: Callable[[str], str]):
         self.projects = projects
         self.store = store
@@ -613,7 +615,7 @@ class Studio(LeadMixin, LectureMixin):
         toc = proj["materials"]["toc"]
         toc_text = "\n".join(f"Chapter {c['no']} {c['title']}\n" + "\n".join(f"  {s['no']} {s['title']}" for s in c["sections"])
                              for c in toc)
-        extra = self.designer_extra(proj, items)
+        extra = self.designer_extra(proj, items) + self.notes_for(proj)
         feedback, outline = "", None
         for _ in range(2):  # one retry after the quality check (R17)
             data = await self.ai.json(system=team.DESIGNER, prompt=team.outline_prompt(summary(proj, items, False), toc_text, extra, feedback),
@@ -751,7 +753,19 @@ class Studio(LeadMixin, LectureMixin):
                 f"Write in: {team.LANG_NAME.get(lang, 'Simplified Chinese')}\n"
                 f"Animations and labs available for this chapter: {', '.join(media) or 'none'}\n"
                 f"\nThe teacher's requirements (binding):\n{self.requirements_text(proj)}\n"
-                + (f"\nThe course design book (follow it):\n{book}\n" if book else ""))
+                + (f"\nThe course design book (follow it):\n{book}\n" if book else "")
+                + self.notes_for(proj, chapter["no"]))
+
+    def notes_for(self, proj: dict, chapter_no: int | None = None) -> str:
+        """The course lead's textbook notes (教材研读笔记) for a chapter (or all chapters, shortened)."""
+        notes = proj.get("textbook_notes") or {}
+        if not notes:
+            return ""
+        if chapter_no is not None:
+            n = notes.get(str(chapter_no))
+            return f"\nThe course lead's notes on the textbook chapter (follow them):\n{n['notes'][:8000]}\n" if n else ""
+        return "\nThe course lead's textbook notes:\n" + "\n".join(
+            f"Chapter {k} {v['title']}: {v['notes'][:1500]}" for k, v in sorted(notes.items(), key=lambda kv: int(kv[0])))[:20000]
 
     # 问渠零件与机器人库 ---------------------------------------------------------------------------------
     async def library_catalog(self, proj: dict, extra: str = "") -> str:
@@ -907,6 +921,8 @@ class Studio(LeadMixin, LectureMixin):
         previous = self.previous_spec(proj, les)
         les["status"], les["error"] = "writing", ""
         les["attention"], les["checks"] = [], {}
+        if (les.get("review_flow") or {}).get("state") in ("prereviewed", "returned"):
+            les["review_flow"]["state"] = ""          # a rewritten lesson is reviewed afresh
         if teacher_note:
             les["notes"] = teacher_note
         proj["busy"] = {"label": f"主讲教授正在写：{no} {disp(les['title'])}", "since": now()}

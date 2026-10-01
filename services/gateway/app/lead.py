@@ -146,6 +146,9 @@ class LeadMixin:
                             pass
                     stopped = label or "当前工作"
             proj = self.projects.load(pid)
+            if getattr(self, "lead_v2_on", None) and self.lead_v2_on(proj):
+                await self.expert_reply(pid, text, stopped)     # 专家版: Claude itself, thinking and looking things up
+                return
             history = [x for x in proj["messages"] if x["role"] in ("teacher", "lead")][-14:]
             hist = "\n".join(f"{x['role']}: {x['text'][:700]}" for x in history[:-1])
             prompt = (f"{self.lead_state(proj)}\n\n{STEP_DOC}\n\nRecent conversation:\n{hist}\n\n"
@@ -225,6 +228,10 @@ class LeadMixin:
             return proj["stage"] == "materials"
         if t == "set_pace":
             return s.get("mode") in ("manual", "daily")
+        if t == "start_over":
+            return bool(o) or proj["stage"] in ("materials", "outline")
+        if t == "study_textbook":
+            return bool(proj["materials"].get("textbook") or proj["materials"].get("book_title") or proj["requirements"].get("textbook"))
         return False
 
     def describe(self, proj: dict, s: dict) -> str:
@@ -268,6 +275,10 @@ class LeadMixin:
             return "资料清单定下来，开始设计大纲"
         if t == "set_pace":
             return "改为每天自动写一课" if s["mode"] == "daily" else "改为手动：你说写才写"
+        if t == "start_over":
+            return f"推倒重来：重读教材、重做课程设计书和整份大纲（已发布的课保留，待审的课改为待重写）：{str(s.get('note') or '')[:300]}"
+        if t == "study_textbook":
+            return "重新研读主教材，逐章写教材研读笔记"
         return t
 
     # --- confirming ---------------------------------------------------------------------------------------------------
@@ -445,6 +456,10 @@ class LeadMixin:
             await self.write_lesson(proj, nxt[1]["id"])
         elif t == "proceed":
             await self.design(proj)
+        elif t == "start_over":
+            await self.start_over(proj, str(s.get("note") or ""))
+        elif t == "study_textbook":
+            await self.study_textbook(proj)
 
     def nothing_to_write(self, proj: dict) -> str:
         pending = [c for c in (proj.get("outline") or {}).get("chapters", []) if not chapter_confirmed(c)
@@ -468,7 +483,7 @@ class LeadMixin:
                     f"Main textbook: {proj['materials'].get('book_title') or proj['requirements'].get('textbook') or '(none)'}\n"
                     f"Current outline:\n{current}")
         data = await self.ai.json(system=team.DESIGNER, prompt=team.outline_prompt(summary(proj, items, False), toc_text,
-                                                                                   self.designer_extra(proj, items), feedback),
+                                                                                   self.designer_extra(proj, items) + self.notes_for(proj), feedback),
                                   schema=team.outline_schema(keys), max_tokens=12000,
                                   fake=lambda: fake_outline(proj, items, keys, lambda f: self.text(proj, f)))
         new = self.build_outline(proj, data, keys)

@@ -15,7 +15,7 @@ from app import main
 from app.production import lecture as L
 from app.production import voice as V
 from tests.test_materials import UPLOADS, login
-from tests.test_studio import CALLS, client, confirm_chapters, make_project, settle  # noqa: F401 - the fixture
+from tests.test_studio import CALLS, client, confirm_chapters, make_project, publish, settle  # noqa: F401 - the fixture
 
 need_ffmpeg = pytest.mark.skipif(not (shutil.which("ffmpeg") and shutil.which("soffice")), reason="needs ffmpeg and LibreOffice")
 
@@ -136,7 +136,7 @@ def test_ai_lecture_is_made_edited_and_published(client, monkeypatch):
     assert client.put(f"/api/v1/studio/projects/{pid}/voices", headers=h, json={"zh": "zm_yunxi"}).json()["voices"]["zh"] == "zm_yunxi"
     # publishing: one file activity with the main video, the English voice and both subtitles
     UPLOADS.clear()
-    p = client.post(f"/api/v1/studio/projects/{pid}/lessons/{les['id']}/approve", headers=h).json()
+    p = publish(client, h, pid, les["id"]).json()
     sent = [c for f, c in CALLS if f == "local_wenquest_add_activities"][-1]
     order = [(sent[f"activities[{i}][type]"], sent[f"activities[{i}][name]"]) for i in range(20) if f"activities[{i}][type]" in sent]
     assert order[1][0] == "resource" and "讲解视频" in order[1][1]

@@ -136,6 +136,15 @@
       }
     },
     {
+      "path": "pages/committee/committee",
+      "style": {
+        "navigationBarTitleText": "课程审核",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
       "path": "pages/admin/admin",
       "style": {
         "navigationBarTitleText": "管理",

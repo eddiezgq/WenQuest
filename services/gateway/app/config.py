@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     library_url: str = ""
     # The voice service (services/voice): speech synthesis and recognition for lecture videos. Empty = no lecture videos.
     voice_url: str = ""
+    # The course lead's model (专家版, round 5): the strongest available; empty = the same as the rest of the team.
+    lead_model: str = "claude-opus-5-5"
     # 问渠数字工厂 course interface (read-only key copied by deploy/update.sh). Empty = lessons without factory data.
     factory_url: str = ""
     factory_read_key: str = ""

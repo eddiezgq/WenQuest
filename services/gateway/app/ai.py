@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from typing import Any
 
 import httpx
@@ -96,6 +97,74 @@ class ModelGateway:
                 return block.get("input") or {}
         raise AIError("ai_bad_output", "model returned no structured output", 502)
 
+    # --- the expert lane (round 5–6): a stronger model that thinks first, and may use tools --------------------
+    @property
+    def agentic(self) -> bool:
+        return self.provider == "claude"
+
+    async def agent(self, *, system: str, messages: list[dict], tools: list[dict], run_tool, model: str = "",
+                    thinking: int = 6000, max_tokens: int = 16000, max_rounds: int = 12, on_step=None) -> str:
+        """Claude as itself: a multi-turn conversation with extended thinking and tools. `run_tool(name, input)`
+        returns the tool's text result (awaitable). Returns the final reply text."""
+        if self.provider != "claude":
+            raise AIError("agent_unsupported", "the expert lane needs Claude", 503)
+        msgs = [dict(m) for m in messages]
+        headers = {"x-api-key": self.anthropic_key, "anthropic-version": "2023-06-01", "content-type": "application/json"}
+        text = ""
+        for _ in range(max_rounds):
+            body = {"model": model or self.claude_model, "max_tokens": max_tokens, "system": system, "messages": msgs,
+                    "tools": tools}
+            if thinking:
+                body["thinking"] = {"type": "enabled", "budget_tokens": thinking}
+            try:
+                data = await self._post("https://api.anthropic.com/v1/messages", body, headers, timeout=max(self.timeout, 600))
+            except AIError as e:
+                if model and model != self.claude_model and "not_found" in str(e):   # that model is not on this account
+                    model = self.claude_model
+                    continue
+                raise
+            content = data.get("content") or []
+            text = "\n".join(b.get("text", "") for b in content if b.get("type") == "text").strip() or text
+            uses = [b for b in content if b.get("type") == "tool_use"]
+            if data.get("stop_reason") != "tool_use" or not uses:
+                return text
+            msgs.append({"role": "assistant", "content": content})
+            results = []
+            for u in uses:
+                if on_step:
+                    await on_step(u["name"], u.get("input") or {})
+                try:
+                    out = await run_tool(u["name"], u.get("input") or {})
+                except Exception as e:  # noqa: BLE001 - the model sees the error and can recover
+                    out = f"ERROR: {type(e).__name__}: {e}"
+                results.append({"type": "tool_result", "tool_use_id": u["id"], "content": str(out)[:60000]})
+            msgs.append({"role": "user", "content": results})
+        return text or "（我查了很多轮还没想清楚，请把问题说得再具体一点。）"
+
+    async def think_json(self, *, system: str, prompt: str, schema: dict, model: str = "", thinking: int = 8000,
+                         max_tokens: int = 20000, fake: Any = None) -> dict:
+        """A considered answer: the model thinks first, then writes JSON (Claude); other providers use json()."""
+        if self.provider != "claude":
+            return await self.json(system=system, prompt=prompt, schema=schema, max_tokens=min(max_tokens, 8000), fake=fake)
+        body = {"model": model or self.claude_model, "max_tokens": max_tokens, "system": system,
+                "thinking": {"type": "enabled", "budget_tokens": thinking},
+                "messages": [{"role": "user", "content": prompt + "\n\nAfter thinking, reply with ONE JSON object matching this "
+                                                               "JSON Schema and nothing else:\n" + json.dumps(schema, ensure_ascii=False)}]}
+        headers = {"x-api-key": self.anthropic_key, "anthropic-version": "2023-06-01", "content-type": "application/json"}
+        try:
+            data = await self._post("https://api.anthropic.com/v1/messages", body, headers, timeout=max(self.timeout, 600))
+        except AIError as e:
+            if not (model and model != self.claude_model and "not_found" in str(e)):
+                raise
+            body["model"] = self.claude_model
+            data = await self._post("https://api.anthropic.com/v1/messages", body, headers, timeout=max(self.timeout, 600))
+        text = "\n".join(b.get("text", "") for b in data.get("content") or [] if b.get("type") == "text")
+        m = re.search(r"\{.*\}", text, re.S)
+        try:
+            return json.loads(m.group(0)) if m else {}
+        except ValueError as exc:
+            raise AIError("ai_bad_output", "model returned invalid JSON", 502) from exc
+
     async def _deepseek(self, system: str, prompt: str, schema: dict, max_tokens: int) -> dict:
         body = {
             "model": self.deepseek_model,
@@ -114,9 +183,9 @@ class ModelGateway:
         except (KeyError, IndexError, ValueError) as exc:
             raise AIError("ai_bad_output", "model returned invalid JSON", 502) from exc
 
-    async def _post(self, url: str, body: dict, headers: dict) -> dict:
+    async def _post(self, url: str, body: dict, headers: dict, timeout: float | None = None) -> dict:
         try:
-            r = await self.http.post(url, json=body, headers=headers, timeout=self.timeout)
+            r = await self.http.post(url, json=body, headers=headers, timeout=timeout or self.timeout)
         except httpx.TimeoutException as exc:
             raise AIError("ai_timeout", "the model took too long", 504) from exc
         except httpx.HTTPError as exc:
