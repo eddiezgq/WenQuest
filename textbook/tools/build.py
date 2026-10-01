@@ -142,9 +142,11 @@ def run_programs(book: dict, chapters: set[int], rep: Report) -> dict[str, dict]
     cache = book["root"].parent / "build" / book["book"] / "values"
     cache.mkdir(parents=True, exist_ok=True)
     for ch in sorted(chapters):
-        for prog in sorted((book["root"] / f"ch{ch:02d}" / "code").glob("*.py")):
+        code = book["root"] / f"ch{ch:02d}" / "code"
+        shared = b"".join(p.read_bytes() for p in sorted(code.glob("_*.py")))   # helper modules (not run themselves)
+        for prog in sorted(p for p in code.glob("*.py") if not p.name.startswith("_")):
             where = str(prog.relative_to(book["root"].parent))
-            digest = hashlib.sha256(prog.read_bytes() + (TOOLS / "bookout.py").read_bytes()).hexdigest()[:16]
+            digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes()).hexdigest()[:16]
             hit = cache / f"{prog.stem}.{digest}.json"
             if hit.exists():
                 values[prog.stem] = json.loads(hit.read_text(encoding="utf-8"))
@@ -198,6 +200,11 @@ def fill(sec: Section, values: dict, rep: Report) -> str:
             rep.add("error", "占位符", sec.id, f"{{{{{prog}.{name}}}}}：程序 {prog}.py 没有交出 {name}")
             return m.group(0)
         v = values[prog][name]
+        if isinstance(v, (int, float)) and not isinstance(v, bool) and fmt and fmt.strip().startswith("sci"):
+            # {{p.x:sci1}} → 7.2\times 10^{-13} (inside a formula)
+            digits = int(fmt.strip()[3:] or 1)
+            m_, e_ = f"{v:.{digits}e}".split("e")
+            return f"{m_}\\times 10^{{{int(e_)}}}"
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             try:
                 return format(v, fmt.strip()) if fmt else (str(v) if isinstance(v, int) else sig(v))
@@ -446,7 +453,7 @@ def check_numbers(sec: Section, rep: Report) -> None:
                 rep.add("error", "手写数字", sec.id, f"“{m.group(1)}” 应由程序给出（写成 {{{{程序.名称}}}}）：{line.strip()[:60]}")
 
 
-TERM = re.compile(r"\*\*([\u4e00-\u9fff][\u4e00-\u9fff·\-–]{1,11})\*\*")
+TERM = re.compile(r"\*\*([\u4e00-\u9fff][\u4e00-\u9fff·\-–]{1,11})\*\*(?![：:])")   # "**小标题**：" is a lead-in, not a term
 
 
 LABELS = {"工程师笔记", "习题", "证明", "参考文献", "本节参考文献", "本章参考文献", "章首提要", "本章小结", "注意", "提示", "历史注记"}

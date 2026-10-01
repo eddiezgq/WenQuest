@@ -62,7 +62,7 @@ jobs:
         working-directory: textbook/tools
         run: |
           npm ci --no-audit --no-fund
-          pip install -q markdown-it-py pyyaml numpy pytest
+          pip install -q markdown-it-py pyyaml numpy scipy matplotlib pytest
           python -m pytest -q tests
           python build.py robotics --pdf
       - name: Keep the built textbooks for the deploy

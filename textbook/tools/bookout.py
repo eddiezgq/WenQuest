@@ -58,3 +58,28 @@ def figure(fig, name: str) -> None:
         print(f"figure saved: {path}")
     _values.setdefault("_figures", []).append(name)
     out()
+
+
+# ---------------------------------------------------------------- matrices for the text
+
+def num(x: float, digits: int = 4) -> str:
+    """A number as printed in the book: fixed decimals, exact integers without decimals, no "-0"."""
+    if abs(x - round(x)) < 1e-12:
+        return str(int(round(x)))
+    s = f"{x:.{digits}f}"
+    return "0" if float(s) == 0 else s
+
+
+def tex(M, digits: int = 4, env: str = "pmatrix") -> str:
+    """A matrix or column vector as LaTeX, e.g. out(R=tex(R)) and {{ex.R}} inside $$...$$."""
+    import numpy as np
+    A = np.atleast_2d(np.asarray(M, dtype=float))
+    if A.shape[0] == 1 and np.asarray(M).ndim == 1:
+        A = A.T
+    rows = [" & ".join(num(v, digits) for v in row) for row in A]
+    return f"\\begin{{{env}}} " + r" \\ ".join(rows) + f" \\end{{{env}}}"
+
+
+def vec(v, digits: int = 4) -> str:
+    """A column vector written on one line, (a, b, c)^T, for use inside running text."""
+    return "(" + ",\\ ".join(num(float(x), digits) for x in v) + ")^{\\mathsf T}"
