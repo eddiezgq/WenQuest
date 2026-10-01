@@ -30,6 +30,7 @@ export function connectBus(url, m) {
       'wq/gearbox/+/+/cmd/ack'], { qos: 0 });
   });
   client.on('close', () => { bus.connected = false; });
+  client.on('offline', () => { bus.connected = false; if (!bus.error) bus.error = '网络断开或服务器不可达'; });
   client.on('error', (e) => { bus.error = String(e.message || e); });
   client.on('message', (topic, payload) => {
     let m;
@@ -47,6 +48,14 @@ export function connectBus(url, m) {
     for (const fn of listeners) fn(topic, m);
   });
 }
+
+// 第 6 轮 W7②：页面上的“重试”按钮
+export function reconnectBus() {
+  bus.error = null;
+  if (client) client.reconnect();
+}
+
+export function busMode() { return mode; }
 
 export function setBusMode(m) {
   mode = m;

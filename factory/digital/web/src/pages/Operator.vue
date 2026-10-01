@@ -2,6 +2,7 @@
   <div class="page">
     <TaskBar v-if="teachStatus" :t="teachStatus" />
     <div class="page-title"><h1>车间终端</h1><span class="muted">操作工工作区 · 选你的工位，开工、暂停、复位；数据实时来自统一数据总线</span></div>
+    <BusNotice />
     <div class="tabs" role="tablist">
       <button v-for="m in machines" :key="m.unit" role="tab" :aria-selected="unit === m.unit" :class="{ on: unit === m.unit }"
         @click="pick(m.unit)">
@@ -33,7 +34,8 @@
           <div class="bar"><div :style="{ width: Math.round((cur.tool_life_left ?? 1) * 100) + '%', background: (cur.tool_life_left ?? 1) < 0.15 ? 'var(--bad)' : 'var(--good)' }"></div></div></div>
 
         <h3>派到本工位的工序</h3>
-        <div v-if="!(cur.dispatched || []).length" class="empty">没有派工。计划员在“订单与计划”下达工单后，这里会出现要做的工序。</div>
+        <div v-if="!(cur.dispatched || []).length" class="empty">这台设备还没有派工，所以没有“开工”按钮。先到
+          <router-link to="/work/planner">订单与计划</router-link> 下达工单（或请计划员下达），这里就会出现要做的工序。</div>
         <div v-for="j in cur.dispatched || []" :key="j.work_order + j.operation" class="job">
           <div class="jinfo"><b class="mono">{{ j.work_order }}</b> {{ j.operation }}<span class="muted small"> · {{ j.done }} / {{ j.qty }} 件</span></div>
           <span class="pill" :class="j.started ? 'good' : 'warn'">{{ j.started ? '已开工' : '待开工' }}</span>
@@ -54,13 +56,14 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { get, post, session } from '../lib/api';
 import { onBus } from '../lib/bus';
 import { useOverview } from '../lib/overview';
 import { STATE, timeOf } from '../lib/fmt';
 import TaskBar from '../components/TaskBar.vue';
+import BusNotice from '../components/BusNotice.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -71,6 +74,14 @@ const msg = ref('');
 const msgOk = ref(true);
 const teachStatus = ref(null);
 const cur = computed(() => machines.value.find((m) => m.unit === unit.value));
+// 没指定工位时，先打开有派工或正在运行的设备（第 6 轮 W7）
+let autoPicked = !!route.query.unit;
+watch(machines, (ms) => {
+  if (autoPicked || !ms.length) return;
+  autoPicked = true;
+  const busy = ms.find((m) => (m.dispatched || []).length) || ms.find((m) => m.state === 'run');
+  if (busy && busy.unit !== unit.value) { unit.value = busy.unit; loadEvents(); }
+});
 const area = computed(() => (unit.value === 'qc-01' ? 'quality' : 'machining'));
 function pick(u) { unit.value = u; router.replace({ query: { unit: u } }); loadEvents(); }
 async function loadEvents() {

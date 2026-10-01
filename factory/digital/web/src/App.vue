@@ -21,7 +21,7 @@
       <div class="group">
         <span class="group-title">专业软件</span>
         <a v-for="a in apps" :key="a.name" :href="a.href" :target="a.ext ? '_blank' : null" class="app"
-          @click="a.route && ($event.preventDefault(), router.push(a.route))">
+          @click="a.route && ($event.preventDefault(), openApp(a))">
           <span>{{ a.name }}</span><span class="muted-r">{{ a.role }}</span>
         </a>
       </div>
@@ -78,7 +78,7 @@ const nav = [
 const cfg = ref({});
 const apps = computed(() => [
   { name: 'ERPNext', role: 'ERP / MRP', href: cfg.value.erpnext_url || '#', ext: true },
-  { name: 'FreeCAD', role: 'CAD / CAM', href: '/work/engineer', route: '/work/engineer' },
+  { name: '设计台', role: 'CAD / CAM', href: '/work/engineer', route: '/work/engineer' },
   { name: '车间终端', role: 'MES', href: '/work/operator', route: '/work/operator' },
   { name: 'Node-RED', role: '数据流', href: cfg.value.nodered_url || '#', ext: true },
 ].filter((a) => a.name !== 'Node-RED' || cfg.value.nodered_url));   // 线上 Node-RED 不对外（第 3 轮 D8）
@@ -94,6 +94,11 @@ function tick() {
     hour: '2-digit', minute: '2-digit', hour12: false });
 }
 async function setMode(m) { if (session.user.mode !== m && !(m === 'prod' && session.user.teacher === false)) { await switchTo({ mode: m }); setBusMode(m); } }
+// 第 6 轮 W6：已经在这一页时也给出反应（回到页首），不再像“点了没反应”
+function openApp(a) {
+  if (route.path === a.route) window.scrollTo({ top: 0, behavior: 'smooth' });
+  else router.push(a.route);
+}
 async function setRole(r) { await switchTo({ role: r }); }
 function doLogout() { if (confirm('退出登录？')) { logout(); router.push('/login'); } }
 
