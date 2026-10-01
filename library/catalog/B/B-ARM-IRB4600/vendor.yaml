@@ -33,8 +33,8 @@ datasheet:
       en: IP rating
       unit: ''
     footprint_mm:
-      zh: 底座直径
-      en: Footprint Ø
+      zh: 底座/机身平面尺寸
+      en: Footprint
       unit: mm
   src: https://library.e.abb.com/public/7f776502855949bba39e2105e6d70209/IRB%204600_DATASHEET.pdf
   note: 只取到 ABB 官方意大利文数据表；英文数据表与产品规格书（library.e.abb.com）均返回 403。数据表未写明工作半径参考点。重复定位精度只给全系列范围

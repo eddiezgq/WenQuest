@@ -43,8 +43,8 @@ datasheet:
       en: IP rating
       unit: ''
     footprint_mm:
-      zh: 底座直径
-      en: Footprint Ø
+      zh: 底座/机身平面尺寸
+      en: Footprint
       unit: mm
   src: https://library.e.abb.com/public/89053ecb3e5a44b4bff1b809ae1540f6/IRB6700_20231206_RR_V1%20kopia.pdf
   note: 数据表未写明工作半径参考点。重复定位精度 0.05 mm（数据表 Position repeatability 列，两次读取一致；未核实原文是否注明

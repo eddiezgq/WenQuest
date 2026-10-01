@@ -1,0 +1,8 @@
+# 厂商官方开源的机器人模型（第 5 轮第 3 步第 4 批）：只收厂商官方账号发布、带明确开源许可的；按固定提交取。
+# 仓库检出到 library/vendor_src/rd/<键>；稀疏清单由 tools/import_rosi.py list 一并生成到 vendor/rosi_repos.yaml。
+repos:
+  vendor_ubtech_tienkung: {url: https://github.com/UBTECH-Robot/TienKung-Lab.git, commit: 243dfe2d9268581599b03bc2c87ba372546e30be,
+                           vendor: UBTECH, license: BSD-3-Clause}
+robots:
+  - {repo: vendor_ubtech_tienkung, file: legged_lab/assets/tienkung2_lite/urdf/tienkung2_lite.urdf, model: Walker Tienkung 2 Lite (TK2101),
+     id: B-HUM-TIENKUNG2LITE, type: HUMANOID}

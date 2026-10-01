@@ -1,0 +1,48 @@
+# B-HUM-TIENKUNG2LITE 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: UBTECH
+  name:
+    zh: 优必选
+    en: UBTECH
+  site: https://www.ubtrobot.com/en/humanoid/products/walker
+  model: Walker Tienkung (TK2101)
+datasheet:
+  vendor: UBTECH
+  model: Walker Tienkung (TK2101)
+  values:
+    height_mm: 1730
+    weight_kg: 64
+    dof: 20
+    runtime_h: 3.5
+  labels:
+    height_mm:
+      zh: 高度
+      en: Height
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    runtime_h:
+      zh: 续航
+      en: Runtime
+      unit: h
+  src: https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/
+  note: '基础版。原文身高 "1730 ± 10 mm"；净重 "64 kg"；"20 integrated joints (arms: 4 × 2; legs:
+    6 × 2)"；续航 "More than 3.5 hours"；电池同上，battery_wh 留空。臂展 535 mm。两次读取一致（第二次逐字读关节行）。官方开源
+    URDF（UBTECH-Robot/TienKung-Lab 的 tienkung2_lite.urdf）恰为 20 个关节，对应此版本。中间版 TK2201（Voice
+    & Vision）：68 kg、21 关节（多一个腰），本次未单列。'
+data_sources:
+- title: UBTECH Walker Tienkung 用户手册（docs.ubtrobot.com，英文网页版）第 5 章 Product Composition
+    / 规格表
+  url: https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/
+  retrieved: '2026-10-01'
+tags:
+- 优必选
+- UBTECH
+- Walker Tienkung (TK2101)
+- Walker Tienkung (TK2101)

@@ -1,0 +1,41 @@
+# B-LEG-A1 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: UNITREE
+  name:
+    zh: 宇树科技
+    en: Unitree Robotics
+  site: https://www.unitree.com
+  model: A1
+datasheet:
+  vendor: Unitree Robotics
+  model: A1
+  values:
+    payload_kg: 5
+    max_speed_m_s: 3.3
+    runtime_h: 1-2.5
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    max_speed_m_s:
+      zh: 最大移动速度
+      en: Max speed
+      unit: m/s
+    runtime_h:
+      zh: 续航
+      en: Runtime
+      unit: h
+  src: https://www.unitree.com/products/a1/
+  note: 已停产，用 unitree.com 仍保留的 A1 产品页；两次读取（第二次要求按页面顺序列出全部数字）一致。原文 "5 kg Effective
+    Load"、"Maximum continuous running speed 3.3m/s (11.88km/h)"、续航 "1-2.5 h"、关节扭矩
+    "33.5NM (MAX)"、最大关节速度 "21rad/s"、外部供电 24V。该页没有重量、尺寸、电池容量、自由度、IP，均未收。
+data_sources:
+- title: Unitree 官网 A1 存档产品页（已停产）
+  url: https://www.unitree.com/products/a1/
+  retrieved: '2026-10-01'
+tags:
+- 宇树科技
+- Unitree Robotics
+- A1
+- A1

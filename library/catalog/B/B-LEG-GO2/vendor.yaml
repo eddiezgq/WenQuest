@@ -1,0 +1,79 @@
+# B-LEG-GO2 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: UNITREE
+  name:
+    zh: 宇树科技
+    en: Unitree Robotics
+  site: https://www.unitree.com
+  model: Go2 EDU
+datasheet:
+  vendor: Unitree Robotics
+  model: Go2 EDU
+  values:
+    weight_kg: 15
+    dof: 12
+    payload_kg: 8
+    max_speed_m_s: 3.7
+    runtime_h: 2-4
+    height_mm: 400
+    footprint_mm: 700 x 310
+  labels:
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    max_speed_m_s:
+      zh: 最大移动速度
+      en: Max speed
+      unit: m/s
+    runtime_h:
+      zh: 续航
+      en: Runtime
+      unit: h
+    height_mm:
+      zh: 高度
+      en: Height
+      unit: mm
+    footprint_mm:
+      zh: 底座/机身平面尺寸
+      en: Footprint
+      unit: mm
+  src: https://www.unitree.com/go2/
+  note: 取 Go2 EDU 列。重量原文 "About 15kg"（带电池，各版本相同）。站立尺寸 70cm x 31cm x 40cm → 高 400 mm、长宽
+    700 x 310；趴下 76 x 31 x 20 cm。关节电机 12 个（"12 set"/"12个"）→ dof 12。负载原文 "≈8kg (MAX
+    ~ 12kg)"，收 8（极限 12）。速度原文 "0 ~ 3.7m/s (MAX ~ 5m/s)"，收 3.7（极限约 5）。关节范围原文 机身 -48~48°、大腿
+    -200°~90°、小腿 -156°~-48°（每条腿 3 轴，按 机身/髋外摆、大腿、小腿 顺序，四条腿相同）。最大关节扭矩约 45 N·m；工作最大功率约
+    3000 W；供电 28V~33.6V。电池：EDU 列为 "long endurance (15000mAh)"、续航 "About 2-4h"、快充 33.6V
+    9A。不一致与处理：英文页第一次读取把 EDU 电池读成 standard 8000mAh / 1-2h，专门按列重读英文页与中文页均为 15000mAh
+    / 2-4h，判定第一次为串列误读，按后者收。battery_wh 留空：官方只给 15000mAh；电池配件页只给标准电池 BT2-05 "8000mAh
+    236.8Wh、DC 29.6V"，长续航电池 BT2-06 未列 Wh/电压。IP 等级页面未给，未收。
+  axes:
+  - axis: 1
+    range_deg:
+    - -48
+    - 48
+  - axis: 2
+    range_deg:
+    - -200
+    - 90
+  - axis: 3
+    range_deg:
+    - -156
+    - -48
+data_sources:
+- title: Unitree 官网 Go2 产品页规格表（AIR / PRO / X / EDU 四列；英文页与中文页 /cn/go2/ 一致）
+  url: https://www.unitree.com/go2/
+  retrieved: '2026-10-01'
+tags:
+- 宇树科技
+- Unitree Robotics
+- Go2 EDU
+- Go2 EDU

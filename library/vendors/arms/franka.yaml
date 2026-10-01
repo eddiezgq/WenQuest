@@ -1,0 +1,25 @@
+# Franka Robotics 协作机械臂（第 5 轮第 3 步第 3 批）。
+# 出处：只用 franka.de / download.franka.de 官方数据表 PDF。franka.de 对命令行一律 403，经网页抓取工具读取。
+# 每个型号独立读取两遍以上（第二遍要求逐行照抄原表），数字逐个比对。
+vendor: {id: FRANKA, name: {zh: Franka Robotics, en: Franka Robotics}, site: https://franka.de}
+retrieved: "2026-10-01"
+sources:
+  fr3_ds: {title: "Franka Robotics Datasheet Franka Research 3（文档号 R02212，Version 2.4，2025-10；ARM v2.1 / CONTROL v5.1），单页", url: "https://franka.de/hubfs/Datasheet_FrankaResearch3_R02212_2.4.pdf?hsLang=en"}
+  panda_ds: {title: "Franka Emika DATA SHEET — ROBOT ARM & CONTROL（Release Version: April 2020，© 2020 Franka Emika；即 Panda 一代机型的官方存档数据表）", url: "https://download.franka.de/Datasheet-EN.pdf"}
+robots:
+  - model: Franka Research 3 (FR3)
+    key: B-ARM-FR3
+    src: fr3_ds
+    page: 1
+    datasheet: {payload_kg: 3, reach_mm: 855, dof: 7, repeatability_mm: 0.1, weight_kg: 18.3, ip: IP40, tcp_speed_m_s: 2}
+    joint_range_deg: [[-166, 166], [-105, 105], [-166, 166], [-176, -7], [-165, 165], [25, 265], [-175, 175]]
+    joint_speed_deg_s: [150, 150, 150, 150, 301, 301, 301]
+    note: "三次读取一致。Rated payload 3 kg；Maximum reach 855 mm（数据表未写明参考点）；Position repeatability 原文 \"<+/- 0.1 mm (ISO 9283)\"，按规则写 0.1（原文为“小于”）。Weight 原文 \"~ 18.3 kg\"（ARM 段，近似值）。Ingress protection IP40 为 ARM 段（本体）。Cartesian velocity 原文 \"up to 2 m/s at TCP\"。关节速度原文 \"A1-A4: 150 deg/s / A5-A7: 301 deg/s (FCI use, A6: 239 deg/s)\"：A6 在 FCI（研究接口）下限 239 deg/s，表中按 301 收，用 FCI 时以 239 为准。法兰 DIN ISO 9409-1-A50。功率：数据表只有控制柜 \"Power consumption ~ 80 W\"（CONTROL 段，非本体功率），未收进 power 键；控制柜 19 寸机架 355 x 483 x 89 mm、约 7 kg、IP20。底座安装尺寸表中无，footprint 未收。另有 Joint torque limits A1–A4 ±87 Nm、A5–A7 ±12 Nm（未收）。"
+  - model: Franka Emika Robot（Panda）
+    key: B-ARM-PANDA
+    src: panda_ds
+    page: 1
+    datasheet: {payload_kg: 3, reach_mm: 855, dof: 7, repeatability_mm: 0.1, tcp_speed_m_s: 2}
+    joint_range_deg: [[-166, 166], [-101, 101], [-166, 166], [-176, -4], [-166, 166], [-1, 215], [-166, 166]]
+    joint_speed_deg_s: [150, 150, 150, 150, 180, 180, 180]
+    note: "已停产；用官方下载站 download.franka.de 的 2020-04 版数据表。该文档未出现 \"Panda\" 字样，抬头为 \"ROBOT ARM & CONTROL\"、© 2020 Franka Emika，按发布时间与参数判定为 Panda 一代（FR3 之前的唯一机型），如需确证请抽查。Payload 3 kg、Maximum reach 855 mm（未写参考点）、Pose repeatability \"<+/- 0.1 mm (ISO 9283)\"、Cartesian \"up to 2 m/s end effector speed\"，多次读取一致。关节范围原文 \"A1, A3, A5, A7: -166°/166° | A2: -101°/101° | A4: -176°/-4° | A6: -1°/215°\"；关节速度 \"A1, A2, A3, A4: 150°/s | A5, A6, A7: 180°/s\"。重量与 IP 留空：三次读取结果不一致——一次读成 Weight ~12.8 kg、IP30；逐行照抄时 12.8 kg 的行名是 \"Moving mass\"（运动质量，不是本体重量）；按词逐项列出时另有 \"Weight ~ 17.8 kg\" 与 \"Protection rating IP30\"，但所属栏目被读成 \"ARM & CONTROL\"，CONTROL 栏另有 Weight ~7 kg、IP20。PDF 为双栏排版，无法确定 17.8 kg / IP30 是本体还是含控制柜，故不收。Path deviation <+/- 1.25 mm（未收）。控制柜 Power consumption ~80 W（非本体，未收）。"

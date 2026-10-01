@@ -10,7 +10,7 @@ import wqlib
 RD = wqlib.ROOT / "vendor_src" / "rd"
 PIN = yaml.safe_load((wqlib.ROOT / "vendor" / "ros_industrial.yaml").read_text(encoding="utf-8"))
 REPOS = yaml.safe_load((wqlib.ROOT / "vendor" / "rosi_repos.yaml").read_text(encoding="utf-8"))
-have_src = all((RD / k / ".git").exists() for k in PIN["repos"])
+have_src = all((RD / k / ".git").exists() for k in REPOS)
 need_src = pytest.mark.skipif(not have_src, reason="没有 ROS-Industrial 源仓库（tools/fetch_sources.py）")
 
 
@@ -73,3 +73,24 @@ def test_model_matches_vendor_axes(key):
         lo, hi = r["joint_range_deg"][i]
         assert abs(math.degrees(j.limit.lower) - lo) <= 1.5 and abs(math.degrees(j.limit.upper) - hi) <= 1.5, (key, i)
         assert abs(math.degrees(j.limit.velocity) - r["joint_speed_deg_s"][i]) <= 2, (key, i)
+
+
+def test_vendor_open_models_and_overlays():
+    """第 4 批：厂商官方开源模型（优必选天工 2 Lite）与已有条目上的厂商参数"""
+    tk = next(e for e in wqlib.entries(["B-HUM-TIENKUNG2LITE"]) if e["id"] == "B-HUM-TIENKUNG2LITE")
+    assert tk["source"]["origin"] == "vendor" and tk["source"]["license"] == "BSD-3-Clause"
+    assert tk["source"]["repo"].startswith("https://github.com/UBTECH-Robot/")
+    assert tk["datasheet"]["values"]["dof"] == 20
+    fr3 = next(e for e in wqlib.entries(["B-ARM-FR3"]) if e["id"] == "B-ARM-FR3")
+    assert fr3["model"]["engine"].startswith("menagerie:") and fr3["datasheet"]["values"]["reach_mm"] == 855
+    assert [a["range_deg"] for a in fr3["datasheet"]["axes"]][5] == [25, 265]
+    for eid in ("B-LEG-GO2", "B-LEG-B2", "B-HUM-G1", "B-HUM-H1", "B-ARM-Z1", "B-ARM-GEN3", "B-LEG-SPOTARM"):
+        e = next(x for x in wqlib.entries([eid]) if x["id"] == eid)
+        assert e.get("datasheet") and e["source"]["data_sources"], eid
+
+
+@need_src
+def test_tienkung_dof_matches_vendor():
+    from generators import b_urdf
+    tk = next(e for e in wqlib.entries(["B-HUM-TIENKUNG2LITE"]) if e["id"] == "B-HUM-TIENKUNG2LITE")
+    assert b_urdf.build(tk, {"size": "default"})[0][1]["robot"]["dof"] == tk["datasheet"]["values"]["dof"]

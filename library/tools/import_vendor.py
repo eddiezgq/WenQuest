@@ -21,8 +21,10 @@ LICENSE = "Apache-2.0"
 DATASHEET_LABELS = {
     "payload_kg": ("额定负载", "Payload", "kg"), "reach_mm": ("工作半径", "Reach", "mm"), "dof": ("自由度", "DOF", ""),
     "repeatability_mm": ("重复定位精度 ±", "Pose repeatability ±", "mm"), "tcp_speed_m_s": ("末端最大速度", "TCP speed", "m/s"),
-    "footprint_mm": ("底座直径", "Footprint Ø", "mm"), "weight_kg": ("重量", "Weight", "kg"), "ip": ("防护等级", "IP rating", ""),
+    "footprint_mm": ("底座/机身平面尺寸", "Footprint", "mm"), "weight_kg": ("重量", "Weight", "kg"), "ip": ("防护等级", "IP rating", ""),
     "power_typical_w": ("典型功耗", "Typical power", "W"), "power_max_w": ("最大功耗", "Max power", "W"),
+    "max_speed_m_s": ("最大移动速度", "Max speed", "m/s"), "battery_wh": ("电池容量", "Battery", "Wh"),
+    "runtime_h": ("续航", "Runtime", "h"), "height_mm": ("高度", "Height", "mm"),
 }
 
 

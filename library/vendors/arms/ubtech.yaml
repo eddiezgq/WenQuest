@@ -1,0 +1,60 @@
+# 说明：只有天工 2 Lite（TK2101，B-HUM-TIENKUNG2LITE）有官方开源模型（UBTECH-Robot/TienKung-Lab，BSD-3-Clause），建了条目；其余型号暂无可用的官方模型，参数先留在这里。
+# 优必选 UBTECH 人形机器人（第 5 轮第 3 步第 3 批）。
+# 出处：ubtrobot.com 官方产品页、docs.ubtrobot.com 官方 Walker Tienkung 用户手册（网页版）。
+# 人形不收工作半径/重复精度，改收 weight_kg、dof、height_mm、payload_kg、max_speed_m_s、battery_wh、runtime_h。
+# 读不到的：Walker S2、Walker S1、Walker S 的规格表在官网是图片（如 S1 的 owebsite-cdn.ubtrobot.com/.../693097528242245.png），
+#   CDN 被出口代理 403、抓取工具也不放行；ubtrobot.com/en/ai-education/products/walker-tienkung 规格表同样是图片（08_table.png）。
+#   中文页 /cn/humanoid/products/walker-s2 抓取被拦。
+# 不收：Walker S（文字里只有 \"a height of 1.7 meters\" 与 \"41 servo joints\" 两个数，规格在图片里，信息太少）、Walker S1（文字无参数）、Walker C/C1（本次未取）。
+# key 规则：型号小写，空格换下划线。
+# 官方开源模型（任务 A 的结果，供三维模型另行引用）：见文件末尾 open_models。
+vendor: {id: UBTECH, name: {zh: 优必选, en: UBTECH}, site: https://www.ubtrobot.com/en/humanoid/products/walker}
+retrieved: "2026-10-01"
+sources:
+  walker_web: {title: "UBTECH 官网 Walker 产品页（英文）", url: "https://www.ubtrobot.com/en/humanoid/products/walker"}
+  walkerx_web: {title: "UBTECH 官网 Walker X 产品页（英文）", url: "https://www.ubtrobot.com/en/humanoid/products/walker-x"}
+  walkers2_web: {title: "UBTECH 官网 Walker S2 产品页（英文；规格表为图片，仅正文文字可读）", url: "https://www.ubtrobot.com/en/humanoid/products/walker-s2"}
+  tienkung_docs: {title: "UBTECH Walker Tienkung 用户手册（docs.ubtrobot.com，英文网页版）第 5 章 Product Composition / 规格表", url: "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/"}
+  tienkung_overview: {title: "UBTECH Walker Tienkung 用户手册 第 4 章 Product Overview", url: "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/5/"}
+robots:
+  - model: Walker
+    key: walker
+    src: walker_web
+    datasheet: {height_mm: 1450, weight_kg: 77, dof: 36, payload_kg: 1.5, runtime_h: 2}
+    note: "原文 \"Height: 145cm Weight: 77kg\"；\"Legs：6x2 Arms：7x2 Hands：4x2 Neck：2\"（合计 36，第一次读取页面另写 36 total）；\"Load : Extended state single arm 1.5kg\"（单臂伸展状态负载，不是整机）；\"Arm span : single arm 540mm\"（无对应键未收）；\"Lithium iron phosphate 54.6V/10Ah/ 6 kg Charging time: 2h Usage time: 2h\"。原文只有 54.6 V/10 Ah，没有 Wh 数，不另换算。两次读取一致。页面无最高步速，未收。页面另写仿真平台 \"URDF+Gazebo\"，但没有给模型下载。这是 2019 年前后的初代 Walker。"
+  - model: Walker X
+    key: walker_x
+    src: walkerx_web
+    datasheet: {height_mm: 1300, weight_kg: 63, dof: 41, payload_kg: 1.5, max_speed_m_s: 0.83, runtime_h: 2}
+    note: "原文 \"Height: 130cm\" \"Weight: 63kg\" \"41 high-performance servo joints\" \"Legs 6x2; arms 7x2; hands 6x2; neck 3\"（合计 41）\"Max. walking speed: 3km/h\"（换算 0.83 m/s）\"Load: Single arm 1.5kg in extended state\" \"Arm span: single arm 600mm\" \"Lithium battery 54.6V/10Ah/ 3.6 kg\" \"Usage time (combined working conditions): 2h\"。原文只有 54.6 V/10 Ah，没有 Wh 数，不另换算。两次读取一致。"
+  - model: Walker Tienkung · Embodied Intelligence (TK2301)
+    key: walker_tienkung_tk2301
+    src: tienkung_docs
+    datasheet: {height_mm: 1730, weight_kg: 75, dof: 42, runtime_h: 3.5}
+    note: "原文身高 \"1730 ± 10 mm\"；净重 \"75 kg\"；\"42 integrated joints (head: 3; arms: 7 × 2; hands: 6 × 2; waist: 1; legs: 6 × 2)\"；续航 \"More than 3.5 hours\"（收 3.5 为下限）；电池 \"Type: ternary lithium; capacity: 30 Ah + 3 Ah; voltage: 48 V\"——30 Ah + 3 Ah 含义未说明（主电池+备用？），不换算 Wh，battery_wh 留空。臂展 600 mm（无对应键）。规格表没有负载与最高速度，未收。两次读取一致；第 4 章 Product Overview 另写 \"up to 42 degrees of freedom\" \"continuous operating time of more than 3.5 hours\"，与规格表一致。"
+  - model: Walker Tienkung (TK2101)
+    key: B-HUM-TIENKUNG2LITE
+    src: tienkung_docs
+    datasheet: {height_mm: 1730, weight_kg: 64, dof: 20, runtime_h: 3.5}
+    note: "基础版。原文身高 \"1730 ± 10 mm\"；净重 \"64 kg\"；\"20 integrated joints (arms: 4 × 2; legs: 6 × 2)\"；续航 \"More than 3.5 hours\"；电池同上，battery_wh 留空。臂展 535 mm。两次读取一致（第二次逐字读关节行）。官方开源 URDF（UBTECH-Robot/TienKung-Lab 的 tienkung2_lite.urdf）恰为 20 个关节，对应此版本。中间版 TK2201（Voice & Vision）：68 kg、21 关节（多一个腰），本次未单列。"
+  - model: Walker S2
+    key: walker_s2
+    src: walkers2_web
+    datasheet: {payload_kg: 15}
+    note: "规格表是图片读不到，只收正文：\"Walker S2 can lift 15kg payload and reach ±162° rotation angle\"、\"handle 15kg payload within 0-1.8 meters workspace\"（两次读取一致）。15 kg 是官网正文说的搬运负载（结合腰部电机描述），不是单臂伸展负载，口径与 Walker/Walker X 的 1.5 kg 不同。另有 \"swap battery autonomously within 3 minutes\"。身高、体重、自由度、电池官网文字均无，未收（第三方站写的 176 cm、52 DoF 等不采用）。"
+open_models:
+  - repo: https://github.com/UBTECH-Robot/WalkerS2
+    official: true
+    license: "OpenAtom Open Hardware License（开放原子开放硬件许可证）第一版；LICENSE 文件英文行写 \"Version 0.4.3\"，与中文“第一版”不一致；版权行 \"版权所有 (c) 2026 UBT\""
+    files: [walker_s2_with_gripper_urdf/walker_s2.urdf, walker_s2_urdf_with_hand3/walker_s2.urdf, walker_s2_v1_world_description/urdf/s2_v1_world/s2_v1_world.urdf, Collected_WalkerS2/s2_v1.usd]
+    note: "README：适用于 Walker S2 EDU 探索者，是全球人形机器人挑战赛 2026 官方指定仿真模型。带夹爪版 28 个转动 + 4 个移动关节；带 3 代灵巧手版 50 个转动关节。STL 网格在各目录 meshes/。LICENSE 里列的目录名（WalkerS2_URDF/、WalkerS2_USD/）与仓库实际目录名不同。最近提交 2026-05-26。"
+  - repo: https://github.com/UBTECH-Robot/TienKung-Lab
+    official: true
+    license: "BSD-3-Clause（LICENSE 逐层写明 RSL-RL、Isaac Lab、Legged Lab、TienKung-Lab 修改均为 BSD-3-Clause）"
+    files: [legged_lab/assets/tienkung2_lite/urdf/tienkung2_lite.urdf, legged_lab/assets/tienkung2_lite/mjcf/tienkung.xml, legged_lab/assets/tienkung2_lite/usd/tienkung2_lite.usd, legged_lab/assets/tienkung2_lite/meshes/]
+    note: "UBTECH 官方文档 docs.ubtrobot.com/walker-tienkung 的步态训练章节直接链接此仓库。URDF robot name=tienkung2_EVT_V4_urdf，20 个关节（对应 TK2101 基础版）。仓库是北京人形机器人创新中心 Open-X-Humanoid/TienKung-Lab 的同名版本（README 末尾 Project Link 指回 Open-X-Humanoid）。"
+  - repo: https://github.com/Open-X-Humanoid/TienKung_URDF
+    official: false
+    license: "OpenAtom Open Hardware License 第一版（licence 文件）"
+    files: [tiangong2pro_urdf/, tiangong2dex_urdf/, tiangong3_urdf/, lite_urdf_publish/, pro_urdf_publish/, tianyi2_urdf/, servoarm/]
+    note: "非优必选账号：北京人形机器人创新中心（X-Humanoid）发布的“天工”系列 URDF/STL/STEP。Walker Tienkung 是优必选面向科教的天工版本，仅供参考。"

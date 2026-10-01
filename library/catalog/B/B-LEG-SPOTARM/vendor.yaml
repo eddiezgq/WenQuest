@@ -1,0 +1,78 @@
+# B-LEG-SPOTARM 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: BOSTONDYNAMICS
+  name:
+    zh: 波士顿动力
+    en: Boston Dynamics
+  site: https://bostondynamics.com/products/spot/
+  model: Spot（Spot Arm 另列于 note）
+datasheet:
+  vendor: Boston Dynamics
+  model: Spot（Spot Arm 另列于 note）
+  values:
+    dof: 12
+    payload_kg: 14
+    max_speed_m_s: 1.6
+    battery_wh: 564
+    runtime_h: 1.5
+    height_mm: 610
+    footprint_mm: 1100 x 500
+    ip: IP54
+  labels:
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    max_speed_m_s:
+      zh: 最大移动速度
+      en: Max speed
+      unit: m/s
+    battery_wh:
+      zh: 电池容量
+      en: Battery
+      unit: Wh
+    runtime_h:
+      zh: 续航
+      en: Runtime
+      unit: h
+    height_mm:
+      zh: 高度
+      en: Height
+      unit: mm
+    footprint_mm:
+      zh: 底座/机身平面尺寸
+      en: Footprint
+      unit: mm
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+  src: https://bostondynamics.com/wp-content/uploads/2020/10/spot-specifications.pdf
+  note: '本体：规格 PDF 与官网产品页各读两遍。Max payload 14 kg（PDF "14 kg (30 lbs)"，网页 "14 kg (30.9
+    lbs)"，公斤值一致）；Max speed 1.6 m/s；Battery 564 Wh；Average runtime 90 mins → 1.5 h（平均续航口径），Standby
+    180 mins，Recharge 60 mins，Spot Dock 充电 2-3.5 h；IP54；工作温度 -20~55 °C；Max slope ±30°；Max
+    step height 300 mm。尺寸：Length 1100 mm（PDF；官网页写 "110mm (43.3 in)"，43.3 in = 1100
+    mm，判定网页漏 0）、Width 500 mm；height_mm 取 Default Height (Walking) 610 mm（坐姿 191、行走最高
+    700、最低 520）。dof 12 取 SDK 文档原文 "12 DOFs, 3 per leg"（src: spot_sdk），腿关节范围：HX ±45°、HY
+    ±91°（偏置 50°）、膝 14–160°（各腿相同，未收进 joint_range_deg）。weight_kg 留空：两份官方资料不一致——PDF（2024-05-22）"Net
+    Mass/Weight (Spot with battery) 32.7 kg (72.1 lbs)"，官网产品页（2026 年仍在更新）"33.8 kg
+    (74.5 lb)"，各自磅值与公斤值自洽，无法确认是硬件版本变化还是笔误，按规则留空。Spot Arm（src: spot_arm_pdf，两遍读取一致）：自由度
+    "6 + gripper"；全伸长度 984 mm；臂重（含夹爪）8 kg；Max lift capacity up to 11 kg；Continuous
+    lift capacity (at 0.5 m extension) 5 kg；Max drag capacity (on carpet) up to 25
+    kg（负载均为 22°C 下测得）；Max reach height 1800 mm（离地可达高度，不是工作半径）；整机带臂 Total mass 39.7
+    kg (87.5 lbs)；夹爪最大开口 175 mm、指尖峰值夹持力 130 N。Arm PDF 第二次读取多出一行 "Max. Endpoint Speed
+    10 m/s"，第一次没有，且数值存疑，不收。'
+data_sources:
+- title: 'Boston Dynamics Spot 规格单 PDF（spot-specifications.pdf，页脚 Updated: 05/22/2024）'
+  url: https://bostondynamics.com/wp-content/uploads/2020/10/spot-specifications.pdf
+  retrieved: '2026-10-01'
+  note: 第 1 页
+tags:
+- 波士顿动力
+- Boston Dynamics
+- Spot（Spot Arm 另列于 note）
+- Spot（Spot Arm 另列于 note）

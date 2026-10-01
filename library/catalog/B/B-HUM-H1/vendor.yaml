@@ -1,0 +1,53 @@
+# B-HUM-H1 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: UNITREE
+  name:
+    zh: 宇树科技
+    en: Unitree Robotics
+  site: https://www.unitree.com
+  model: H1
+datasheet:
+  vendor: Unitree Robotics
+  model: H1
+  values:
+    weight_kg: 47
+    max_speed_m_s: 3.3
+    battery_wh: 864
+    height_mm: 1800
+    footprint_mm: 570 x 220
+  labels:
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    max_speed_m_s:
+      zh: 最大移动速度
+      en: Max speed
+      unit: m/s
+    battery_wh:
+      zh: 电池容量
+      en: Battery
+      unit: Wh
+    height_mm:
+      zh: 高度
+      en: Height
+      unit: mm
+    footprint_mm:
+      zh: 底座/机身平面尺寸
+      en: Footprint
+      unit: mm
+  src: https://www.unitree.com/h1/
+  note: 取 H1 列（非 H1-2），英文页、中文页两次读取一致。身高原文 "about 180CM"；关键尺寸 (1520+285)mm × 570mm
+    × 220mm（footprint 写 宽 x 厚）。重量约 47 kg。移动速度 3.3 m/s（中文页注“世界纪录”，潜在运动性能 >5 m/s）。电池
+    15Ah (0.864KWh) → 864 Wh，最大电压 67.2V。自由度：单腿 5（髋×3+膝×1+踝×1）、单臂 4（可拓展），规格表没有 H1 的“总自由度”行（英文页第一次读取给出
+    18，专门核对后确认原文无此行，属读取工具自行相加），dof 留空。负载、续航、IP 页面未给，未收。关节极限扭矩：膝约 360、髋约 220、踝约 59、手臂约
+    75 N·m。H1-2 列差异：约 178 cm、约 70 kg、总自由度 27、速度 <2 m/s。
+data_sources:
+- title: Unitree 官网 H1 产品页规格表（H1 / H1-2 两列；英文页与中文页 /cn/h1/ 一致）
+  url: https://www.unitree.com/h1/
+  retrieved: '2026-10-01'
+tags:
+- 宇树科技
+- Unitree Robotics
+- H1
+- H1

@@ -1,0 +1,54 @@
+# B-HUM-TIENKUNG2LITE · 优必选 Walker Tienkung 2 Lite (TK2101) 人形机器人（第 5 轮第 3 步第 4 批：厂商官方开源模型）
+schema: 1
+id: B-HUM-TIENKUNG2LITE
+kind: robot
+name:
+  zh: 优必选 Walker Tienkung 2 Lite (TK2101) 人形机器人
+  en: UBTECH Walker Tienkung 2 Lite (TK2101)
+category: HUM
+tags:
+- 人形机器人
+- humanoid
+- 优必选
+- UBTECH
+- Walker Tienkung 2 Lite (TK2101)
+standards: []
+params: []
+defaults: {}
+model:
+  engine: urdf:vendor_ubtech_tienkung/legged_lab/assets/tienkung2_lite/urdf/tienkung2_lite.urdf
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 厂商官方开源模型；网页模型按 URDF 的可视几何生成并简化网格，关节表取自 URDF
+robot:
+  type: humanoid
+source:
+  origin: vendor
+  vendor: UBTECH
+  repo: https://github.com/UBTECH-Robot/TienKung-Lab
+  commit: 243dfe2d9268581599b03bc2c87ba372546e30be
+  path: legged_lab/assets/tienkung2_lite/urdf/tienkung2_lite.urdf
+  license: BSD-3-Clause
+  attribution: UBTECH Walker Tienkung 2 Lite (TK2101)（UBTECH 官方开源模型）；BSD-3-Clause
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 厂商官方 GitHub 账号发布；仓库 LICENSE 识别为 BSD-3-Clause
+teaching:
+  principle: 躯干、双臂、双腿按人体比例布置，行走时控制质心，手臂负责操作。
+  uses:
+  - 科研
+  - 服务
+  - 制造
+  courses:
+  - course: 人形与学习控制
+    chapter: 人形机器人结构
+  labs:
+  - 全身关节拖动
+  - 行走动画
+factory:
+  erp_items: []
+  suppliers:
+  - UBTECH

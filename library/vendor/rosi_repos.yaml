@@ -1,4 +1,4 @@
-# 由 tools/import_rosi.py list 生成：ROS-Industrial 仓库（固定提交、稀疏检出清单）
+# 由 tools/import_rosi.py list 生成：ROS-Industrial 与厂商官方模型仓库（固定提交、稀疏检出清单）
 rosi_abb:
   url: https://github.com/ros-industrial/abb.git
   commit: 45f4769d826cf3ac62a65495f2db67b78b0c81df
@@ -256,3 +256,31 @@ rosi_motoman:
   - /motoman_sda10f_support/meshes/sda10f/visual/link_s.stl
   - /motoman_sda10f_support/meshes/sda10f/visual/link_t.stl
   - /motoman_sda10f_support/meshes/sda10f/visual/link_u.stl
+vendor_ubtech_tienkung:
+  url: https://github.com/UBTECH-Robot/TienKung-Lab.git
+  commit: 243dfe2d9268581599b03bc2c87ba372546e30be
+  sparse:
+  - /legged_lab/assets/tienkung2_lite/urdf/tienkung2_lite.urdf
+  - /LICEN[CS]E*
+  - /README*
+  - /legged_lab/assets/tienkung2_lite/meshes/ankle_pitch_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/ankle_pitch_r_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/ankle_roll_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/ankle_roll_r_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/elbow_pitch_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/elbow_pitch_r_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/hip_pitch_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/hip_pitch_r_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/hip_roll_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/hip_roll_r_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/hip_yaw_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/hip_yaw_r_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/knee_pitch_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/knee_pitch_r_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/pelvis.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/shoulder_pitch_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/shoulder_pitch_r_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/shoulder_roll_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/shoulder_roll_r_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/shoulder_yaw_l_link.STL
+  - /legged_lab/assets/tienkung2_lite/meshes/shoulder_yaw_r_link.STL

@@ -42,8 +42,8 @@ datasheet:
       en: TCP speed
       unit: m/s
     footprint_mm:
-      zh: 底座直径
-      en: Footprint Ø
+      zh: 底座/机身平面尺寸
+      en: Footprint
       unit: mm
     weight_kg:
       zh: 重量

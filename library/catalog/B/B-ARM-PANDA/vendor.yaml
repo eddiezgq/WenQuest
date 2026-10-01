@@ -1,0 +1,95 @@
+# B-ARM-PANDA 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: FRANKA
+  name:
+    zh: Franka Robotics
+    en: Franka Robotics
+  site: https://franka.de
+  model: Franka Emika Robot（Panda）
+datasheet:
+  vendor: Franka Robotics
+  model: Franka Emika Robot（Panda）
+  values:
+    payload_kg: 3
+    reach_mm: 855
+    dof: 7
+    repeatability_mm: 0.1
+    tcp_speed_m_s: 2
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    tcp_speed_m_s:
+      zh: 末端最大速度
+      en: TCP speed
+      unit: m/s
+  src: https://download.franka.de/Datasheet-EN.pdf
+  note: '已停产；用官方下载站 download.franka.de 的 2020-04 版数据表。该文档未出现 "Panda" 字样，抬头为 "ROBOT
+    ARM & CONTROL"、© 2020 Franka Emika，按发布时间与参数判定为 Panda 一代（FR3 之前的唯一机型），如需确证请抽查。Payload
+    3 kg、Maximum reach 855 mm（未写参考点）、Pose repeatability "<+/- 0.1 mm (ISO 9283)"、Cartesian
+    "up to 2 m/s end effector speed"，多次读取一致。关节范围原文 "A1, A3, A5, A7: -166°/166° | A2:
+    -101°/101° | A4: -176°/-4° | A6: -1°/215°"；关节速度 "A1, A2, A3, A4: 150°/s | A5,
+    A6, A7: 180°/s"。重量与 IP 留空：三次读取结果不一致——一次读成 Weight ~12.8 kg、IP30；逐行照抄时 12.8 kg 的行名是
+    "Moving mass"（运动质量，不是本体重量）；按词逐项列出时另有 "Weight ~ 17.8 kg" 与 "Protection rating IP30"，但所属栏目被读成
+    "ARM & CONTROL"，CONTROL 栏另有 Weight ~7 kg、IP20。PDF 为双栏排版，无法确定 17.8 kg / IP30 是本体还是含控制柜，故不收。Path
+    deviation <+/- 1.25 mm（未收）。控制柜 Power consumption ~80 W（非本体，未收）。'
+  axes:
+  - axis: 1
+    range_deg:
+    - -166
+    - 166
+    speed_deg_s: 150
+  - axis: 2
+    range_deg:
+    - -101
+    - 101
+    speed_deg_s: 150
+  - axis: 3
+    range_deg:
+    - -166
+    - 166
+    speed_deg_s: 150
+  - axis: 4
+    range_deg:
+    - -176
+    - -4
+    speed_deg_s: 150
+  - axis: 5
+    range_deg:
+    - -166
+    - 166
+    speed_deg_s: 180
+  - axis: 6
+    range_deg:
+    - -1
+    - 215
+    speed_deg_s: 180
+  - axis: 7
+    range_deg:
+    - -166
+    - 166
+    speed_deg_s: 180
+data_sources:
+- title: 'Franka Emika DATA SHEET — ROBOT ARM & CONTROL（Release Version: April 2020，©
+    2020 Franka Emika；即 Panda 一代机型的官方存档数据表）'
+  url: https://download.franka.de/Datasheet-EN.pdf
+  retrieved: '2026-10-01'
+  note: 第 1 页
+tags:
+- Franka Robotics
+- Franka Robotics
+- Franka Emika Robot（Panda）
+- Franka Emika Robot（Panda）

@@ -1,0 +1,50 @@
+# 宇树 Unitree 四足 / 人形 / 机械臂（第 5 轮第 3 步第 3 批）。
+# 出处：只用 unitree.com（含 /cn/ 中文页、/mobile/ 移动页）与 shop.unitree.com 官方页。unitree.com 对命令行一律 403，经网页抓取工具读取。
+# 读取方法：每个型号英文页、中文页（或移动页）各读一遍，第二遍要求逐行逐列照抄，数字逐个比对。
+#   注意：Go2 的移动页（/mobile/go2/、/cn/mobile/go2/）抓回来规格表多列被压成一列（各版本都读成 AIR 的值），不可靠，未采用；以桌面页 /go2/ 与 /cn/go2/ 为准。
+# 四足/人形按委托改收：weight_kg、dof、payload_kg、max_speed_m_s、battery_wh、runtime_h（区间写字符串，原文口径见 note）、height_mm、footprint_mm（站立 长 x 宽）、ip。
+# 不做非官方换算：官方只给 mAh、不给 Wh 的，battery_wh 留空（不自行乘电压）。
+vendor: {id: UNITREE, name: {zh: 宇树科技, en: Unitree Robotics}, site: https://www.unitree.com}
+retrieved: "2026-10-01"
+sources:
+  go2_web: {title: "Unitree 官网 Go2 产品页规格表（AIR / PRO / X / EDU 四列；英文页与中文页 /cn/go2/ 一致）", url: "https://www.unitree.com/go2/"}
+  go2_battery: {title: "Unitree 官网 Go2 电池配件页（BT2-05 标准电池参数）", url: "https://www.unitree.com/go2/battery/"}
+  b2_web: {title: "Unitree 官网 B2 产品页（英文页与中文页 /cn/b2/ 一致）", url: "https://www.unitree.com/b2/"}
+  g1_web: {title: "Unitree 官网 G1 产品页规格表（G1 / G1 EDU 两列；英文页与中文页 /cn/g1/ 一致）", url: "https://www.unitree.com/g1/"}
+  h1_web: {title: "Unitree 官网 H1 产品页规格表（H1 / H1-2 两列；英文页与中文页 /cn/h1/ 一致）", url: "https://www.unitree.com/h1/"}
+  z1_web: {title: "Unitree 官网 Z1 机械臂产品页规格表（Z1 AIR / Z1 PRO 两列；桌面页与移动页 /mobile/z1/ 一致）", url: "https://www.unitree.com/z1/"}
+  a1_web: {title: "Unitree 官网 A1 存档产品页（已停产）", url: "https://www.unitree.com/products/a1/"}
+robots:
+  - model: Go2 EDU
+    key: B-LEG-GO2
+    src: go2_web
+    datasheet: {weight_kg: 15, dof: 12, payload_kg: 8, max_speed_m_s: 3.7, runtime_h: "2-4", height_mm: 400, footprint_mm: "700 x 310"}
+    joint_range_deg: [[-48, 48], [-200, 90], [-156, -48]]
+    note: "取 Go2 EDU 列。重量原文 \"About 15kg\"（带电池，各版本相同）。站立尺寸 70cm x 31cm x 40cm → 高 400 mm、长宽 700 x 310；趴下 76 x 31 x 20 cm。关节电机 12 个（\"12 set\"/\"12个\"）→ dof 12。负载原文 \"≈8kg (MAX ~ 12kg)\"，收 8（极限 12）。速度原文 \"0 ~ 3.7m/s (MAX ~ 5m/s)\"，收 3.7（极限约 5）。关节范围原文 机身 -48~48°、大腿 -200°~90°、小腿 -156°~-48°（每条腿 3 轴，按 机身/髋外摆、大腿、小腿 顺序，四条腿相同）。最大关节扭矩约 45 N·m；工作最大功率约 3000 W；供电 28V~33.6V。电池：EDU 列为 \"long endurance (15000mAh)\"、续航 \"About 2-4h\"、快充 33.6V 9A。不一致与处理：英文页第一次读取把 EDU 电池读成 standard 8000mAh / 1-2h，专门按列重读英文页与中文页均为 15000mAh / 2-4h，判定第一次为串列误读，按后者收。battery_wh 留空：官方只给 15000mAh；电池配件页只给标准电池 BT2-05 \"8000mAh 236.8Wh、DC 29.6V\"，长续航电池 BT2-06 未列 Wh/电压。IP 等级页面未给，未收。"
+  - model: B2
+    key: B-LEG-B2
+    src: b2_web
+    datasheet: {weight_kg: 60, payload_kg: 40, max_speed_m_s: 6, battery_wh: 2250, runtime_h: "4-6", height_mm: 645, footprint_mm: "1098 x 450", ip: IP67}
+    note: "英文页、中文页两次读取一致。重量原文 \"≈ 60kg\"（整机含电池）。站立尺寸 ≈1098mm×450mm×645mm（长×宽×高），趴下 ≈880×460×330 mm。负载：持续行走负载 \"> 40kg\"（收 40，原文为大于），站立负载 \"≥ 120kg\"。速度原文 \"> 6m/s\"（最大奔跑速度，收 6，原文为大于）。电池 \"45Ah(2250Wh)\"、电压 58V。续航：综合运行 4-6 h；空载持续行走 > 5 h（> 20 km）；20 kg 负载持续行走 > 4 h（> 15 km）。IP67（整机）。最大关节扭矩约 360 N·m；工作温度 -20~55 ℃。关节数/自由度官网页未写，dof 未收。shop.unitree.com B2 商品页只有宣传语（6m/s、360N.m、>40kg、>5h），与官网页一致。"
+  - model: G1
+    key: B-HUM-G1
+    src: g1_web
+    datasheet: {weight_kg: 35, dof: 23, payload_kg: 2, runtime_h: 2, height_mm: 1320, footprint_mm: "450 x 200"}
+    note: "取 G1 基础版列，英文页、中文页两次读取一致。站立 高宽厚 1320x450x200mm（footprint 写 宽 x 厚），折叠 690x450x300mm。重量 \"About 35kg\"（带电池）。总自由度（关节电机）23：单腿 6、腰 1、单臂 5、无灵巧手。payload_kg 为 \"Arm Maximum Load About 2Kg\"（手臂最大负载，非整机负重）。续航 \"About 2h\"。电池 9000mAh（快拆）、13 串锂电池、充电器 54V 5A；官方未给 Wh，battery_wh 留空。最大行走速度、IP 等级页面规格表未给，未收。膝关节最大扭矩 90 N·m。G1 EDU 列差异：重量 35kg+、自由度 23–43（可加腰 2、Dex3-1 灵巧手 7×2、手腕 2×2）、膝关节 120 N·m、手臂负载约 3 kg。"
+  - model: H1
+    key: B-HUM-H1
+    src: h1_web
+    datasheet: {weight_kg: 47, max_speed_m_s: 3.3, battery_wh: 864, height_mm: 1800, footprint_mm: "570 x 220"}
+    note: "取 H1 列（非 H1-2），英文页、中文页两次读取一致。身高原文 \"about 180CM\"；关键尺寸 (1520+285)mm × 570mm × 220mm（footprint 写 宽 x 厚）。重量约 47 kg。移动速度 3.3 m/s（中文页注“世界纪录”，潜在运动性能 >5 m/s）。电池 15Ah (0.864KWh) → 864 Wh，最大电压 67.2V。自由度：单腿 5（髋×3+膝×1+踝×1）、单臂 4（可拓展），规格表没有 H1 的“总自由度”行（英文页第一次读取给出 18，专门核对后确认原文无此行，属读取工具自行相加），dof 留空。负载、续航、IP 页面未给，未收。关节极限扭矩：膝约 360、髋约 220、踝约 59、手臂约 75 N·m。H1-2 列差异：约 178 cm、约 70 kg、总自由度 27、速度 <2 m/s。"
+  - model: Z1 AIR
+    key: B-ARM-Z1
+    src: z1_web
+    datasheet: {payload_kg: 2, reach_mm: 740, dof: 6, repeatability_mm: 0.1, weight_kg: 4.3, power_max_w: 500}
+    joint_range_deg: [[-150, 150], [0, 180], [-165, 0], [-80, 80], [-85, 85], [-160, 160]]
+    joint_speed_deg_s: [180, 180, 180, 180, 180, 180]
+    note: "取 Z1 AIR 列，桌面页与移动页两次读取一致。DOF \"6 Axis\"；Weight 4.3kg；Payload 2kg；Reach 740mm（未写参考点）；Repeatability 原文 \"～0.1mm\"（约值，未注明 ISO 9283 口径）；供电 24V、电流 >20A；Max power \"MAX 500w\"。关节范围原文 J1 ±150°、J2 0-180°、J3 -165°-0、J4 ±80°、J5 ±85°、J6 ±160°，各轴最大速度 180°/s。Z1 PRO 列差异：重量 4.5 kg、负载 \"≥3kg\"，其余同。IP 等级页面未给，未收。"
+  - model: A1
+    key: B-LEG-A1
+    src: a1_web
+    datasheet: {payload_kg: 5, max_speed_m_s: 3.3, runtime_h: "1-2.5"}
+    note: "已停产，用 unitree.com 仍保留的 A1 产品页；两次读取（第二次要求按页面顺序列出全部数字）一致。原文 \"5 kg Effective Load\"、\"Maximum continuous running speed 3.3m/s (11.88km/h)\"、续航 \"1-2.5 h\"、关节扭矩 \"33.5NM (MAX)\"、最大关节速度 \"21rad/s\"、外部供电 24V。该页没有重量、尺寸、电池容量、自由度、IP，均未收。"

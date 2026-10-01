@@ -43,8 +43,8 @@ datasheet:
       en: IP rating
       unit: ''
     footprint_mm:
-      zh: 底座直径
-      en: Footprint Ø
+      zh: 底座/机身平面尺寸
+      en: Footprint
       unit: mm
   src: https://library.e.abb.com/public/6f866d55894a49a7b44384db76e01b4b/IRB1200_ROB0275EN_A.pdf
   note: 工作半径 703 mm，数据表未写明到哪个点（ABB 产品规格书惯例为手腕中心，未在本文核实）。重复定位精度 0.02 mm：数据表写 Position

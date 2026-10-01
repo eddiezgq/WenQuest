@@ -1,0 +1,58 @@
+# B-HUM-G1 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: UNITREE
+  name:
+    zh: 宇树科技
+    en: Unitree Robotics
+  site: https://www.unitree.com
+  model: G1
+datasheet:
+  vendor: Unitree Robotics
+  model: G1
+  values:
+    weight_kg: 35
+    dof: 23
+    payload_kg: 2
+    runtime_h: 2
+    height_mm: 1320
+    footprint_mm: 450 x 200
+  labels:
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    runtime_h:
+      zh: 续航
+      en: Runtime
+      unit: h
+    height_mm:
+      zh: 高度
+      en: Height
+      unit: mm
+    footprint_mm:
+      zh: 底座/机身平面尺寸
+      en: Footprint
+      unit: mm
+  src: https://www.unitree.com/g1/
+  note: 取 G1 基础版列，英文页、中文页两次读取一致。站立 高宽厚 1320x450x200mm（footprint 写 宽 x 厚），折叠 690x450x300mm。重量
+    "About 35kg"（带电池）。总自由度（关节电机）23：单腿 6、腰 1、单臂 5、无灵巧手。payload_kg 为 "Arm Maximum Load
+    About 2Kg"（手臂最大负载，非整机负重）。续航 "About 2h"。电池 9000mAh（快拆）、13 串锂电池、充电器 54V 5A；官方未给
+    Wh，battery_wh 留空。最大行走速度、IP 等级页面规格表未给，未收。膝关节最大扭矩 90 N·m。G1 EDU 列差异：重量 35kg+、自由度
+    23–43（可加腰 2、Dex3-1 灵巧手 7×2、手腕 2×2）、膝关节 120 N·m、手臂负载约 3 kg。
+data_sources:
+- title: Unitree 官网 G1 产品页规格表（G1 / G1 EDU 两列；英文页与中文页 /cn/g1/ 一致）
+  url: https://www.unitree.com/g1/
+  retrieved: '2026-10-01'
+tags:
+- 宇树科技
+- Unitree Robotics
+- G1
+- G1

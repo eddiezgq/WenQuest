@@ -1,0 +1,68 @@
+# B-LEG-B2 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: UNITREE
+  name:
+    zh: 宇树科技
+    en: Unitree Robotics
+  site: https://www.unitree.com
+  model: B2
+datasheet:
+  vendor: Unitree Robotics
+  model: B2
+  values:
+    weight_kg: 60
+    payload_kg: 40
+    max_speed_m_s: 6
+    battery_wh: 2250
+    runtime_h: 4-6
+    height_mm: 645
+    footprint_mm: 1098 x 450
+    ip: IP67
+  labels:
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    max_speed_m_s:
+      zh: 最大移动速度
+      en: Max speed
+      unit: m/s
+    battery_wh:
+      zh: 电池容量
+      en: Battery
+      unit: Wh
+    runtime_h:
+      zh: 续航
+      en: Runtime
+      unit: h
+    height_mm:
+      zh: 高度
+      en: Height
+      unit: mm
+    footprint_mm:
+      zh: 底座/机身平面尺寸
+      en: Footprint
+      unit: mm
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+  src: https://www.unitree.com/b2/
+  note: 英文页、中文页两次读取一致。重量原文 "≈ 60kg"（整机含电池）。站立尺寸 ≈1098mm×450mm×645mm（长×宽×高），趴下 ≈880×460×330
+    mm。负载：持续行走负载 "> 40kg"（收 40，原文为大于），站立负载 "≥ 120kg"。速度原文 "> 6m/s"（最大奔跑速度，收 6，原文为大于）。电池
+    "45Ah(2250Wh)"、电压 58V。续航：综合运行 4-6 h；空载持续行走 > 5 h（> 20 km）；20 kg 负载持续行走 > 4 h（>
+    15 km）。IP67（整机）。最大关节扭矩约 360 N·m；工作温度 -20~55 ℃。关节数/自由度官网页未写，dof 未收。shop.unitree.com
+    B2 商品页只有宣传语（6m/s、360N.m、>40kg、>5h），与官网页一致。
+data_sources:
+- title: Unitree 官网 B2 产品页（英文页与中文页 /cn/b2/ 一致）
+  url: https://www.unitree.com/b2/
+  retrieved: '2026-10-01'
+tags:
+- 宇树科技
+- Unitree Robotics
+- B2
+- B2

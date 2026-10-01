@@ -1,0 +1,19 @@
+# Kinova 机械臂（第 5 轮第 3 步第 3 批）。
+# 出处：只用 kinovarobotics.com 官方 PDF。kinovarobotics.com 对命令行一律 403，经网页抓取工具读取。
+#   Gen3 产品页 https://www.kinovarobotics.com/product/gen3-robots 为 JS 渲染，抓回来没有参数；改用官方单页规格书（Onepager）。
+#   Gen3 用户手册（User-Guide-Gen3-R07.pdf，技术规格在第 63 页起）抓取工具只能读到目录，读不到规格表，所以关节范围/关节速度/重复精度无可用出处，未收。
+# 不收：Gen2（Jaco 2 6DOF）——官方 Gen2 产品页 https://www.kinovarobotics.com/product/gen2-robots 抓回只有一句宣传语（\"6 or 7 axis\"），无参数；
+#   能读到的两份官方 PDF 都不是 Jaco 2 6DOF 科研版：
+#   (a) EN-UG-011 Remote robotic manipulation system user guide r4（Gen2 Ultra lightweight robot KR846，正文写明 7 DoF），型号不符；
+#   (b) assistive.kinovarobotics.com 的 Jaco 辅助机械臂宣传册（轮椅用 Jaco，six-axis，5.2 kg，90 cm），文中不出现 Gen2/Jaco 2，属辅助产品线，不能确认与科研版 Jaco 2 6DOF 参数相同。宁少勿错，不收。
+vendor: {id: KINOVA, name: {zh: Kinova, en: Kinova}, site: https://www.kinovarobotics.com}
+retrieved: "2026-10-01"
+sources:
+  gen3_onepager: {title: "Kinova Gen3 官方单页规格书（Kinova_Onepager_Gen3_2024_EN，6 DoF / 7 DoF 两列，无版本号）", url: "https://www.kinovarobotics.com/uploads/Kinova_Onepager_Gen3_2024_EN.pdf"}
+robots:
+  - model: Kinova Gen3 7 DoF
+    key: B-ARM-GEN3
+    src: gen3_onepager
+    page: 1
+    datasheet: {payload_kg: 2.0, reach_mm: 902, dof: 7, weight_kg: 8.2, ip: IP33, tcp_speed_m_s: 0.5, power_typical_w: 36}
+    note: "两次读取一致（第二次逐行照抄两列表格）。负载原文两行：\"Payload* (full-range continuous)** 2.0 kg\"、\"(mid-range continuous) 4.0 kg\"，脚注 *without gripper、**in motion；payload_kg 取全行程连续 2.0 kg（保守口径），中程连续 4.0 kg 写在此处。Maximum reach 902 mm（未写参考点）。Total weight 8.2 kg（规格书写 total weight，未说明是否含底座接口/线缆）。Maximum Cartesian translation speed 50 cm/s → 0.5 m/s。Average power 36 W（平均功率，收作 power_typical_w；无最大功率）。Ingress protection IP33（未分部位）。Actuator position range 原文 \"Infinite\"（执行器本身可无限转，实际关节限位由软件/结构决定），故 joint_range_deg 不收。供电 18–30 VDC（24 VDC 标称）。6 DoF 版对应值：7.2 kg、891 mm，其余同。重复精度、关节速度、底座尺寸规格书无，未收。"

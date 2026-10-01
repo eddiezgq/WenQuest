@@ -168,7 +168,7 @@ def entry_json(e, rows, results, version):
     src = e.get("source") or {}
     if src.get("origin") == "menagerie":          # 现成机器人：完整 MJCF 与网格在原仓库（固定提交），不另存
         doc["package"] = "{}/tree/{}/{}".format(src["repo"], src["commit"], src.get("path", "").rstrip("/"))
-    elif src.get("origin") in ("robot_descriptions", "ros_industrial"):   # URDF/xacro 机器人：原仓库固定提交里模型文件所在目录
+    elif src.get("origin") in ("robot_descriptions", "ros_industrial") or (src.get("origin") == "vendor" and src.get("repo")):   # URDF/xacro 机器人：原仓库固定提交里模型文件所在目录
         doc["package"] = "{}/tree/{}/{}".format(src["repo"], src["commit"], src.get("path", "").rsplit("/", 1)[0])
     elif src.get("origin") == "wenquest" and e["kind"] == "robot":   # 自建机器人：参数化生成程序（URDF、glTF 都在网页包里）
         doc["package"] = "{}/blob/main/library/generators/b_wq.py".format(REPO)

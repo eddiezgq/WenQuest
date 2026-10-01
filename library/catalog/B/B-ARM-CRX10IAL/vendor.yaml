@@ -34,8 +34,8 @@ datasheet:
       en: IP rating
       unit: ''
     footprint_mm:
-      zh: 底座直径
-      en: Footprint Ø
+      zh: 底座/机身平面尺寸
+      en: Footprint
       unit: mm
     tcp_speed_m_s:
       zh: 末端最大速度

@@ -1,0 +1,103 @@
+# B-ARM-FR3 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: FRANKA
+  name:
+    zh: Franka Robotics
+    en: Franka Robotics
+  site: https://franka.de
+  model: Franka Research 3 (FR3)
+datasheet:
+  vendor: Franka Robotics
+  model: Franka Research 3 (FR3)
+  values:
+    payload_kg: 3
+    reach_mm: 855
+    dof: 7
+    repeatability_mm: 0.1
+    weight_kg: 18.3
+    ip: IP40
+    tcp_speed_m_s: 2
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    tcp_speed_m_s:
+      zh: 末端最大速度
+      en: TCP speed
+      unit: m/s
+  src: https://franka.de/hubfs/Datasheet_FrankaResearch3_R02212_2.4.pdf?hsLang=en
+  note: '三次读取一致。Rated payload 3 kg；Maximum reach 855 mm（数据表未写明参考点）；Position repeatability
+    原文 "<+/- 0.1 mm (ISO 9283)"，按规则写 0.1（原文为“小于”）。Weight 原文 "~ 18.3 kg"（ARM 段，近似值）。Ingress
+    protection IP40 为 ARM 段（本体）。Cartesian velocity 原文 "up to 2 m/s at TCP"。关节速度原文
+    "A1-A4: 150 deg/s / A5-A7: 301 deg/s (FCI use, A6: 239 deg/s)"：A6 在 FCI（研究接口）下限
+    239 deg/s，表中按 301 收，用 FCI 时以 239 为准。法兰 DIN ISO 9409-1-A50。功率：数据表只有控制柜 "Power consumption
+    ~ 80 W"（CONTROL 段，非本体功率），未收进 power 键；控制柜 19 寸机架 355 x 483 x 89 mm、约 7 kg、IP20。底座安装尺寸表中无，footprint
+    未收。另有 Joint torque limits A1–A4 ±87 Nm、A5–A7 ±12 Nm（未收）。'
+  axes:
+  - axis: 1
+    range_deg:
+    - -166
+    - 166
+    speed_deg_s: 150
+  - axis: 2
+    range_deg:
+    - -105
+    - 105
+    speed_deg_s: 150
+  - axis: 3
+    range_deg:
+    - -166
+    - 166
+    speed_deg_s: 150
+  - axis: 4
+    range_deg:
+    - -176
+    - -7
+    speed_deg_s: 150
+  - axis: 5
+    range_deg:
+    - -165
+    - 165
+    speed_deg_s: 301
+  - axis: 6
+    range_deg:
+    - 25
+    - 265
+    speed_deg_s: 301
+  - axis: 7
+    range_deg:
+    - -175
+    - 175
+    speed_deg_s: 301
+data_sources:
+- title: Franka Robotics Datasheet Franka Research 3（文档号 R02212，Version 2.4，2025-10；ARM
+    v2.1 / CONTROL v5.1），单页
+  url: https://franka.de/hubfs/Datasheet_FrankaResearch3_R02212_2.4.pdf?hsLang=en
+  retrieved: '2026-10-01'
+  note: 第 1 页
+tags:
+- Franka Robotics
+- Franka Robotics
+- Franka Research 3 (FR3)
+- Franka Research 3 (FR3)

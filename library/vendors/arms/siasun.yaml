@@ -1,0 +1,54 @@
+# 说明：新松（含 DUCO 多可）暂无官方公开的三维模型，参数先留在这里，未建条目（每个条目要能三维预览）。
+# 新松 Siasun 工业机械臂与 GCR 协作机器人（第 5 轮第 3 步第 3 批）。
+# 出处：en.siasun.com 官方产品页（工业机器人、协作机器人）；GCR 协作机器人另用 DUCO 多可官网 ducorobots.cn 产品页补关节范围/速度/功耗。
+#   GCR 系列在新松英文官网仍列在 Collaborative Robot 下；DUCO 多可官网页标题写“中科新松工业机器人品牌-DUCO多可机器人”，
+#   DUCO 文档中心页脚为“版权所有©中科新松有限公司”。两站都算厂商官方。
+# 读不到的：www.siasun.com 中文产品页（PROVENANCE 拦截/404）；ducorobots.com 英文站 403；
+#   DUCO 硬件手册 PDF（docs.ducorobots.cn/download/manual/en/duco-hardware-v4.2-en.pdf，2025-04-15）抓取只返回目录，
+#   docs.ducorobots.cn 网页版 GCR5-910 页参数表（基本参数、工作空间、DH）全是图片，读不到数字。
+#   因此本体重量、底座尺寸、IP 分部位、DH 都没收。
+# key 规则：型号小写，“-”“/”换成下划线，小数点去掉（SR12A-12/1.46 -> sr12a_12_146）。
+# 两次读取：每个型号都重新抓取原页、第二次要求逐字照抄；数字全部一致（见各条 note）。
+# 未收：SR210A-210/2.65（只读了一遍，凑够 5 个型号即停）；新松 SCARA、并联、码垛型号不在本次范围。
+vendor: {id: SIASUN, name: {zh: 新松, en: SIASUN}, site: https://en.siasun.com/}
+retrieved: "2026-10-01"
+sources:
+  sr12a_web: {title: "SIASUN 官网 SR12A-12/1.46 产品页（Small Payload Series）", url: "https://en.siasun.com/sr12a-12-1-46.html"}
+  sr25a25_web: {title: "SIASUN 官网 SR25A-25/1.80 产品页（注意网址是 sr25a-12-2-01-2.html，页面标题为 SR25A-25/1.80）", url: "https://en.siasun.com/sr25a-12-2-01-2.html"}
+  sr50a50_web: {title: "SIASUN 官网 SR50A-50/2.15 产品页", url: "https://en.siasun.com/sr50a-50-2-15.html"}
+  gcr5_siasun: {title: "SIASUN 官网 GCR5-910 产品页（GCR Series Cobot）", url: "https://en.siasun.com/gcr5-910-2.html"}
+  gcr10_siasun: {title: "SIASUN 官网 GCR10-1300 产品页（GCR Series Cobot）", url: "https://en.siasun.com/gcr10-1300-2.html"}
+  gcr5_duco: {title: "DUCO 多可官网 GCR5-910 产品页（产品参数表，中文）", url: "https://www.ducorobots.cn/prodetail/2.html"}
+  gcr10_duco: {title: "DUCO 多可官网 GCR10-1300 产品页（产品参数表，中文）", url: "https://www.ducorobots.cn/prodetail/5.html"}
+robots:
+  - model: SR12A-12/1.46
+    key: sr12a_12_146
+    src: sr12a_web
+    datasheet: {payload_kg: 12, reach_mm: 1465, dof: 6, repeatability_mm: 0.03, ip: IP65}
+    note: "原文 \"Payload：12 kg (26.5 lbs)\" \"Reach：1465mm\" \"Repeatability：±0.03mm\" \"DOF：6\" \"Protection（wrist）：IP65\"，两次读取一致。IP65 是手腕。页面未写工作半径参考点。重量、底座、轴范围与速度页面无，未收。"
+  - model: SR25A-25/1.80
+    key: sr25a_25_180
+    src: sr25a25_web
+    datasheet: {payload_kg: 25, reach_mm: 1803, dof: 6, repeatability_mm: 0.05, ip: IP65}
+    note: "原文 \"Payload：25 kg (55.1 lbs)\" \"Reach：1803mm\" \"Repeatability：±0.05mm\" \"DOF：6\" \"Protection（wrist）：IP65\"，两次读取一致。官网网址 sr25a-12-2-01-2.html 与型号不符（像是复制 SR25A-12/2.01 页面改的），但页面标题与参数都是 SR25A-25/1.80，按页面收。IP65 是手腕。未写工作半径参考点。"
+  - model: SR50A-50/2.15
+    key: sr50a_50_215
+    src: sr50a50_web
+    datasheet: {payload_kg: 50, reach_mm: 2158, dof: 6, repeatability_mm: 0.05, ip: IP65}
+    note: "原文 \"Payload：50 kg (110.2 lbs)\" \"Reach：2158mm\" \"Repeatability：±0.05mm\" \"DOF：6\" \"Protection（wrist）：IP65\"，两次读取一致。IP65 是手腕。未写工作半径参考点。"
+  - model: GCR5-910
+    key: gcr5_910
+    src: gcr5_siasun
+    datasheet: {payload_kg: 5, reach_mm: 917, dof: 6, repeatability_mm: 0.02, tcp_speed_m_s: 3.6, power_typical_w: 200, ip: "IP54/IP65"}
+    joint_range_deg: [[-360, 360], [-360, 360], [-360, 360], [-360, 360], [-360, 360], [-360, 360]]
+    joint_speed_deg_s: [225, 225, 225, 225, 225, 225]
+    note: "新松页：\"Max Payload：5kg\" \"Reach：917mm\" \"Repeatability：±0.02mm\" \"Max TCP Speed：3.6m/s\" \"Max Straight-line speed：1.5m/s\" \"IP class：IP54/IP65\" \"Degress of Freedom：6\"；DUCO 页（src2: gcr5_duco）同值，另有关节表 \"运动范围 ±360°×6\" \"最大速度 225°/s×6\"、\"功耗 典型功耗200W\"。两站、两次读取全部一致。型号名 910 而工作半径 917 mm，两站都写 917，照收。IP54/IP65 原文未分部位。直线速度 1.5 m/s 无对应键未收。重量、底座尺寸官网页无（硬件手册里是图片），未收。DUCO 页“电源”一行第一次读成 200-240VAC、第二次 100-200VAC，与本表无关，未收。"
+    src2: gcr5_duco
+  - model: GCR10-1300
+    key: gcr10_1300
+    src: gcr10_siasun
+    datasheet: {payload_kg: 10, reach_mm: 1300, dof: 6, repeatability_mm: 0.03, tcp_speed_m_s: 3.8, power_typical_w: 400, ip: "IP54/IP65"}
+    joint_range_deg: [[-360, 360], [-360, 360], [-360, 360], [-360, 360], [-360, 360], [-360, 360]]
+    joint_speed_deg_s: [180, 180, 225, 225, 225, 225]
+    note: "新松页：\"Max Payload：10kg\" \"Reach：1300mm\" \"Repeatability：±0.03mm\" \"Max TCP Speed：3.8m/s\" \"Max Straight-line speed：1.5m/s\" \"IP class：IP54/IP65\" \"Degress of Freedom：6\"；DUCO 页（src2: gcr10_duco）同值，关节表 \"运动范围 ±360°×6\"、\"最大速度 180°/s 180°/s 225°/s 225°/s 225°/s 225°/s\"、\"功耗 典型功耗400W\"。第一次读 DUCO 页只说“180°/s 到 225°/s”，第二次逐字读出逐轴值，以第二次为准。IP 未分部位。重量、底座尺寸无，未收。"
+    src2: gcr10_duco

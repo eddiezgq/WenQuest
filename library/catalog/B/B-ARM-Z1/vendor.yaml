@@ -1,0 +1,88 @@
+# B-ARM-Z1 的厂商参数（第 5 轮第 3 步第 4 批）
+vendor:
+  id: UNITREE
+  name:
+    zh: 宇树科技
+    en: Unitree Robotics
+  site: https://www.unitree.com
+  model: Z1 AIR
+datasheet:
+  vendor: Unitree Robotics
+  model: Z1 AIR
+  values:
+    payload_kg: 2
+    reach_mm: 740
+    dof: 6
+    repeatability_mm: 0.1
+    weight_kg: 4.3
+    power_max_w: 500
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    power_max_w:
+      zh: 最大功耗
+      en: Max power
+      unit: W
+  src: https://www.unitree.com/z1/
+  note: 取 Z1 AIR 列，桌面页与移动页两次读取一致。DOF "6 Axis"；Weight 4.3kg；Payload 2kg；Reach 740mm（未写参考点）；Repeatability
+    原文 "～0.1mm"（约值，未注明 ISO 9283 口径）；供电 24V、电流 >20A；Max power "MAX 500w"。关节范围原文 J1
+    ±150°、J2 0-180°、J3 -165°-0、J4 ±80°、J5 ±85°、J6 ±160°，各轴最大速度 180°/s。Z1 PRO 列差异：重量
+    4.5 kg、负载 "≥3kg"，其余同。IP 等级页面未给，未收。
+  axes:
+  - axis: 1
+    range_deg:
+    - -150
+    - 150
+    speed_deg_s: 180
+  - axis: 2
+    range_deg:
+    - 0
+    - 180
+    speed_deg_s: 180
+  - axis: 3
+    range_deg:
+    - -165
+    - 0
+    speed_deg_s: 180
+  - axis: 4
+    range_deg:
+    - -80
+    - 80
+    speed_deg_s: 180
+  - axis: 5
+    range_deg:
+    - -85
+    - 85
+    speed_deg_s: 180
+  - axis: 6
+    range_deg:
+    - -160
+    - 160
+    speed_deg_s: 180
+data_sources:
+- title: Unitree 官网 Z1 机械臂产品页规格表（Z1 AIR / Z1 PRO 两列；桌面页与移动页 /mobile/z1/ 一致）
+  url: https://www.unitree.com/z1/
+  retrieved: '2026-10-01'
+tags:
+- 宇树科技
+- Unitree Robotics
+- Z1 AIR
+- Z1 AIR

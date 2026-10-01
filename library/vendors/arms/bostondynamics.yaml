@@ -1,0 +1,17 @@
+# Boston Dynamics 四足机器人（第 5 轮第 3 步第 3 批）。
+# 出处：只用 bostondynamics.com 官方产品页、官方规格 PDF 与官方 SDK 文档站 dev.bostondynamics.com。命令行一律 403，经网页抓取工具读取。
+# 条目 B-LEG-SPOTARM 的模型是带机械臂的 Spot：datasheet 录 Spot 本体规格，Spot Arm 规格写进 note。
+vendor: {id: BOSTONDYNAMICS, name: {zh: 波士顿动力, en: Boston Dynamics}, site: https://bostondynamics.com/products/spot/}
+retrieved: "2026-10-01"
+sources:
+  spot_spec_pdf: {title: "Boston Dynamics Spot 规格单 PDF（spot-specifications.pdf，页脚 Updated: 05/22/2024）", url: "https://bostondynamics.com/wp-content/uploads/2020/10/spot-specifications.pdf"}
+  spot_web: {title: "Boston Dynamics 官网 Spot 产品页规格栏（页面元数据修改时间 2026-09-22）", url: "https://bostondynamics.com/products/spot/"}
+  spot_sdk: {title: "Spot SDK 官方文档 Concepts › About Spot（Hips and joints）", url: "https://dev.bostondynamics.com/docs/concepts/about_spot.html"}
+  spot_arm_pdf: {title: "Boston Dynamics Spot Arm 规格单 PDF（无日期）", url: "https://www.bostondynamics.com/sites/default/files/inline-files/spot-arm.pdf"}
+robots:
+  - model: Spot（Spot Arm 另列于 note）
+    key: B-LEG-SPOTARM
+    src: spot_spec_pdf
+    page: 1
+    datasheet: {dof: 12, payload_kg: 14, max_speed_m_s: 1.6, battery_wh: 564, runtime_h: 1.5, height_mm: 610, footprint_mm: "1100 x 500", ip: IP54}
+    note: "本体：规格 PDF 与官网产品页各读两遍。Max payload 14 kg（PDF \"14 kg (30 lbs)\"，网页 \"14 kg (30.9 lbs)\"，公斤值一致）；Max speed 1.6 m/s；Battery 564 Wh；Average runtime 90 mins → 1.5 h（平均续航口径），Standby 180 mins，Recharge 60 mins，Spot Dock 充电 2-3.5 h；IP54；工作温度 -20~55 °C；Max slope ±30°；Max step height 300 mm。尺寸：Length 1100 mm（PDF；官网页写 \"110mm (43.3 in)\"，43.3 in = 1100 mm，判定网页漏 0）、Width 500 mm；height_mm 取 Default Height (Walking) 610 mm（坐姿 191、行走最高 700、最低 520）。dof 12 取 SDK 文档原文 \"12 DOFs, 3 per leg\"（src: spot_sdk），腿关节范围：HX ±45°、HY ±91°（偏置 50°）、膝 14–160°（各腿相同，未收进 joint_range_deg）。weight_kg 留空：两份官方资料不一致——PDF（2024-05-22）\"Net Mass/Weight (Spot with battery) 32.7 kg (72.1 lbs)\"，官网产品页（2026 年仍在更新）\"33.8 kg (74.5 lb)\"，各自磅值与公斤值自洽，无法确认是硬件版本变化还是笔误，按规则留空。Spot Arm（src: spot_arm_pdf，两遍读取一致）：自由度 \"6 + gripper\"；全伸长度 984 mm；臂重（含夹爪）8 kg；Max lift capacity up to 11 kg；Continuous lift capacity (at 0.5 m extension) 5 kg；Max drag capacity (on carpet) up to 25 kg（负载均为 22°C 下测得）；Max reach height 1800 mm（离地可达高度，不是工作半径）；整机带臂 Total mass 39.7 kg (87.5 lbs)；夹爪最大开口 175 mm、指尖峰值夹持力 130 N。Arm PDF 第二次读取多出一行 \"Max. Endpoint Speed 10 m/s\"，第一次没有，且数值存疑，不收。"
