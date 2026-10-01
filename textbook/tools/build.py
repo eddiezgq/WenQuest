@@ -645,7 +645,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                                   key=f"wq-book-{book_name}")
         (lab_dir / f"ch{ch:02d}.html").write_text(page_html, encoding="utf-8")
         index["labs"][str(ch)] = [no for no, _ in items]
-        for sec in secs:      # 实验指导书与报告模板 (第 7 轮第 5 步)
+        for sec in secs:      # 实验指导书与报告模板 (第 7 轮第 4 步补充)
             for no, script, g in sec.labdocs:
                 try:
                     m = labdocs.meta(script)

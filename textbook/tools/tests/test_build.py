@@ -122,7 +122,7 @@ def test_animations_and_labs_are_packaged_and_checked(book):
 
 
 def test_every_lab_has_a_guide_and_a_report_template(book):
-    """第 7 轮第 5 步: lab/NAME.yaml → 实验指导书 and 实验报告模板 (Word); a missing or broken file stops the build."""
+    """第 7 轮第 4 步补充: lab/NAME.yaml → 实验指导书 and 实验报告模板 (Word); a missing or broken file stops the build."""
     import docx
     rep = run(book)
     assert not rep.errors

@@ -1,4 +1,4 @@
-"""实验指导书与实验报告模板（第 7 轮第 5 步）。
+"""实验指导书与实验报告模板（第 7 轮第 4 步补充）。
 
 Each lab ``lab/NAME.js`` has a companion ``lab/NAME.yaml`` (principles, steps, data tables, cautions, extra
 questions, all Chinese/English pairs). The title, goal, scenes, sliders, tasks and the first question come from the
