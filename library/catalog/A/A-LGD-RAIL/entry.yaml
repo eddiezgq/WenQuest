@@ -138,14 +138,15 @@ source:
     note: 尺寸表两次独立读取一致，另抽查核对；测试逐行核对公式与单调性
   data_sources:
   - title: HIWIN GmbH 官方产品页（hiwin.de）HGH15/20/25/30/35/45CAZAC、HGW15/20/25/30/35/45CCZAC
-      技术数据，2026-10 读取
+      技术数据，2026-10 读取（示例页；各型号见 b_ 开头的出处）
     url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
     retrieved: '2026-10-01'
     note: 第一遍：滑块全部外形尺寸、C_N、C0_N、block_mass_kg（现行版额定载荷以此为准）。其余型号页同路径：HGH15 p/5-001623，HGH25
       p/5-001652，HGH30 p/5-003157，HGH35 p/5-003129，HGH45 p/5-003130；HGW-QHW/ 下 HGW15CCZAC
       p/5-003167，HGW20 p/5-001118，HGW25 p/5-001153，HGW30 p/5-003168，HGW35 p/5-001224，HGW45
       p/5-001259
-  - title: HIWIN GmbH 官方产品页（hiwin.de）HGR15/20/25/30/35/45R4000H 导轨技术数据
+  - title: HIWIN GmbH 官方产品页（hiwin.de）HGR15/20/25/30/35/45R4000H 导轨技术数据（示例页；各规格见 r_
+      开头的出处）
     url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR20R4000H/p/5-001922
     retrieved: '2026-10-01'
     note: 第一遍：rail_W/H/pitch/d/D/h、rail_mass_kg_per_m、标准端距 E1=20（45 为 22.5）。其余：HGR15
@@ -164,6 +165,60 @@ source:
     url: https://tech.thk.com/en/products/pdfs/en_a01_196.pdf
     retrieved: '2026-10-01'
     note: 互换性核对，不入表；HSR-C 页：https://tech.thk.com/en/products/pdfs/en_a01_192.pdf
+  - title: HIWIN HGH15CAZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH15CAZAC/p/5-001623
+    retrieved: '2026-10-01'
+  - title: HIWIN HGH20CAZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+    retrieved: '2026-10-01'
+  - title: HIWIN HGH25CAZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH25CAZAC/p/5-001652
+    retrieved: '2026-10-01'
+  - title: HIWIN HGH30CAZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH30CAZAC/p/5-003157
+    retrieved: '2026-10-01'
+  - title: HIWIN HGH35CAZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH35CAZAC/p/5-003129
+    retrieved: '2026-10-01'
+  - title: HIWIN HGH45CAZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH45CAZAC/p/5-003130
+    retrieved: '2026-10-01'
+  - title: HIWIN HGW15CCZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW15CCZAC/p/5-003167
+    retrieved: '2026-10-01'
+  - title: HIWIN HGW20CCZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW20CCZAC/p/5-001118
+    retrieved: '2026-10-01'
+  - title: HIWIN HGW25CCZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW25CCZAC/p/5-001153
+    retrieved: '2026-10-01'
+  - title: HIWIN HGW30CCZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW30CCZAC/p/5-003168
+    retrieved: '2026-10-01'
+  - title: HIWIN HGW35CCZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW35CCZAC/p/5-001224
+    retrieved: '2026-10-01'
+  - title: HIWIN HGW45CCZAC（官网产品页，滑块外形与额定载荷）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW45CCZAC/p/5-001259
+    retrieved: '2026-10-01'
+  - title: HIWIN HGR15R4000H（官网产品页，导轨尺寸）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR15R4000H/p/5-001920
+    retrieved: '2026-10-01'
+  - title: HIWIN HGR20R4000H（官网产品页，导轨尺寸）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR20R4000H/p/5-001922
+    retrieved: '2026-10-01'
+  - title: HIWIN HGR25R4000H（官网产品页，导轨尺寸）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR25R4000H/p/5-001924
+    retrieved: '2026-10-01'
+  - title: HIWIN HGR30R4000H（官网产品页，导轨尺寸）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR30R4000H/p/5-001926
+    retrieved: '2026-10-01'
+  - title: HIWIN HGR35R4000H（官网产品页，导轨尺寸）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR35R4000H/p/5-001927
+    retrieved: '2026-10-01'
+  - title: HIWIN HGR45R4000H（官网产品页，导轨尺寸）
+    url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR45R4000H/p/5-001929
+    retrieved: '2026-10-01'
   notes: 按 HIWIN HG 系列（现行官网参数；额定载荷比 2013 版样本高，按官网）；安装尺寸（H、W、B×C、螺纹、导轨宽与孔距）与 THK HSR
     一致可互换，但滑块长度和导轨高度略有不同，导轨与滑块须同一家配对。行业标准 JB/T 7175 的尺寸未取得可读文本。
 teaching:

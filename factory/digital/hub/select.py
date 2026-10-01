@@ -14,7 +14,9 @@ import time
 from hub import library as L
 
 REF = re.compile(r"\b([ABCD]-[A-Z0-9]{2,5}-[A-Z0-9]+(?:-[A-Z0-9]+)*)(?:/([A-Za-z0-9.×x*\-]+))?")
-NUM = re.compile(r"(\d+(?:\.\d+)?)\s*(mm|毫米|kg|公斤|N·m|Nm|N|r/min|rpm|转|W|V)?", re.I)
+NUM = re.compile(r"(\d+(?:\.\d+)?)\s*(mm|毫米|kg|公斤|N·m|Nm|N|r/min|rpm|转|W|V|齿|个|台|[A-Za-z])?", re.I)
+TEETH = re.compile(r"(\d+)\s*齿")
+PROFILE = re.compile(r"\b(GT2|3M|5M)\b", re.I)
 
 # 规则回答用：关键词 → 首选条目（按顺序）；数字按单位落到哪个关键参数
 RULES = [
@@ -27,6 +29,9 @@ RULES = [
     (("谐波",), ["D-RDC-HD-CSF"]), (("RV",), ["D-RDC-NABTESCO-RVN"]), (("夹爪",), ["D-GRP-ROBOTIQ", "D-GRP-ONROBOT"]),
     (("激光雷达", "雷达"), ["D-LDR-OUSTER", "D-LDR-SICK-TIM"]), (("力传感器", "六维力"), ["D-FTS-ATI-FT"]),
 ]
+# 句子里的毫米数对应哪个参数：区间（键按轴径、联轴器按孔径）或等于（导轨按导轨宽、弹簧按中径）；没列的取第一个直径类关键参数
+DIM_RULE = {"A-KEY-FLAT": ("range", "shaft_min_mm", "shaft_max_mm", "gt"), "A-CPL-JAW": ("range", "d_min_mm", "d_max_mm", "ge"),
+            "A-LGD-RAIL": ("eq", "rail_W_mm"), "A-SPR-CMP": ("eq", "D_mm"), "A-PUL-HTD": ("pulley",)}
 SERIES_PREF = ["62", "63", "60", "72", "73", "302", "303", "NU2", "NU3"]       # 规则：轴承优先轻系列（常用、机械设计教材的首选）
 
 SYSTEM = """你是问渠零件库的选型助手。规矩：
@@ -208,17 +213,41 @@ def rules_answer(cat, question):
         return "零件库里没有找到和“{}”相关的条目。".format(q.strip()), []
     nums = [(float(m.group(1)), (m.group(2) or "").lower()) for m in NUM.finditer(q)]
     mm = [v for v, u in nums if u in ("mm", "毫米")] or [v for v, u in nums if u == "" and v < 400]
-    picks = []
+    picks, unfiltered = [], []
     for fid in fams:
         e = cat.entry(fid)
         keys = [p["key"] for p in e.get("params") or [] if p.get("role") == "key"]
-        dkey = next((k for k in keys if k.startswith(("d_", "d0_", "d1_", "D_"))), keys[0] if keys else None)
-        res = cat.find_sizes(fid, [{"key": dkey, "op": "=", "value": mm[0]}] if (mm and dkey) else [], limit=50)
-        rows = res.get("rows") or []
+        rule = DIM_RULE.get(fid)
+        if rule is None:
+            dkey = next((k for k in keys if k.startswith(("d_", "d0_", "d1_", "id_"))), None)
+            rule = ("eq", dkey) if dkey else ("none",)
+        if rule[0] == "pulley":                            # 同步带轮：按“N 齿”和齿形（GT2、3M、5M）筛
+            where = [{"key": "z", "op": "=", "value": int(m.group(1))} for m in TEETH.finditer(q)][:1]
+            where += [{"key": "profile", "op": "=", "value": m.group(1).upper()} for m in PROFILE.finditer(q)][:1]
+            if not where and mm:
+                unfiltered.append(fid)
+                continue
+            rows = cat.find_sizes(fid, where, limit=50).get("rows") or []
+        elif mm and rule[0] == "range":
+            rows = [r for r in (cat.find_sizes(fid, [], limit=10000).get("rows") or [])
+                    if _num(r["params"].get(rule[1])) is not None and _num(r["params"].get(rule[2])) is not None
+                    and (_num(r["params"][rule[1]]) < mm[0] if rule[3] == "gt" else _num(r["params"][rule[1]]) <= mm[0])
+                    and mm[0] <= _num(r["params"][rule[2]])]
+        elif mm and rule[0] == "eq":
+            rows = cat.find_sizes(fid, [{"key": rule[1], "op": "=", "value": mm[0]}], limit=50).get("rows") or []
+        elif mm:                                           # 这个族不能按毫米数直接筛：不挑规格，提示看规格表
+            unfiltered.append(fid)
+            continue
+        else:
+            rows = cat.find_sizes(fid, [], limit=50).get("rows") or []
         rows.sort(key=lambda r: next((i for i, p in enumerate(SERIES_PREF) if str(r["size"]).startswith(p)), 99))
         picks += [{"ref": r["ref"], "entry": fid, "size": r["size"]} for r in rows[:3 - len(picks)]]
         if len(picks) >= 3:
             break
+    if not picks and unfiltered:
+        names = "、".join((cat.entry(f) or {}).get("name", {}).get("zh", f) for f in unfiltered)
+        return "零件库里有相关的族（{}），但没法按“{}”直接筛规格，请在库页面打开这个族看规格表。".format(
+            names, "、".join(fmt(v) + " mm" for v in mm)), []
     if not picks:
         names = "、".join((cat.entry(f) or {}).get("name", {}).get("zh", f) for f in fams)
         return "零件库里有相关的族（{}），但没有符合“{}”尺寸的规格。".format(names, "、".join(fmt(v) + " mm" for v in mm)), []
@@ -232,6 +261,13 @@ def rules_answer(cat, question):
         lines.append("说明：" + e0["teaching"]["principle"])
     lines.append("排序：同一内径时先列轻系列（如 62 系列），寿命和载荷要按样本额定载荷另算。")
     return "\n".join(lines), picks
+
+
+def _num(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
 
 
 def fmt(v):

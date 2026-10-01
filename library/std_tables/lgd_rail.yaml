@@ -1,78 +1,594 @@
 standard:
-  code: "行业通用尺寸：HIWIN HG 系列（四列钢球、方形导轨，15/20/25/30/35/45）"
-  title: "滚动直线导轨副（A-LGD-RAIL）——HGH…CA 标准型无法兰滑块、HGW…CC 法兰型滑块、HGR 导轨"
+  code: 行业通用尺寸：HIWIN HG 系列（四列钢球、方形导轨，15/20/25/30/35/45）
+  title: 滚动直线导轨副（A-LGD-RAIL）——HGH…CA 标准型无法兰滑块、HGW…CC 法兰型滑块、HGR 导轨
 sources:
-  - {key: s1, title: "HIWIN GmbH 官方产品页（hiwin.de）HGH15/20/25/30/35/45CAZAC、HGW15/20/25/30/35/45CCZAC 技术数据，2026-10 读取", url: "https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633", note: "第一遍：滑块全部外形尺寸、C_N、C0_N、block_mass_kg（现行版额定载荷以此为准）。其余型号页同路径：HGH15 p/5-001623，HGH25 p/5-001652，HGH30 p/5-003157，HGH35 p/5-003129，HGH45 p/5-003130；HGW-QHW/ 下 HGW15CCZAC p/5-003167，HGW20 p/5-001118，HGW25 p/5-001153，HGW30 p/5-003168，HGW35 p/5-001224，HGW45 p/5-001259"}
-  - {key: s2, title: "HIWIN GmbH 官方产品页（hiwin.de）HGR15/20/25/30/35/45R4000H 导轨技术数据", url: "https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR20R4000H/p/5-001922", note: "第一遍：rail_W/H/pitch/d/D/h、rail_mass_kg_per_m、标准端距 E1=20（45 为 22.5）。其余：HGR15 p/5-001920，HGR25 p/5-001924，HGR30 p/5-001926，HGR35 p/5-001927，HGR45 p/5-001929"}
-  - {key: s3, title: "HIWIN Linear Guideway Technical Information 样本 G99TE17-1306（HG Series 章节，经销商 lm76 转存的官方样本 PDF）", url: "https://www.lm76.com/HG-Series-Catalog_opt.pdf", note: "第二遍：2-1-13(1) HGH-CA/HGH-HA 表与 2-1-13(5) HGW-CC/HGW-HC 表，逐字逐格重读全部外形尺寸、导轨尺寸、导轨螺栓 rail_bolt、E、质量；额定载荷为旧版数值（见 notes）"}
-  - {key: s4, title: "HIWIN Linear Guideway Technical Information 样本 G99TE14-1006（motionusa 转存）", url: "https://s3.amazonaws.com/www.motionusa.com/hiwin/Hiwin_GuidewayCatalog.pdf", note: "辅助核对：p.35 HGH-CA 表（含 rail_bolt）；该版无 HGW-CC 表；用于查明 HGH25 K1 版本差异"}
-  - {key: s5, title: "THK 综合样本 LM Guide 型号 HSR 尺寸表（A1-192 HSR-C 法兰型、A1-196 HSR-R 无法兰型）", url: "https://tech.thk.com/en/products/pdfs/en_a01_196.pdf", note: "互换性核对，不入表；HSR-C 页：https://tech.thk.com/en/products/pdfs/en_a01_192.pdf"}
+- key: s1
+  title: HIWIN GmbH 官方产品页（hiwin.de）HGH15/20/25/30/35/45CAZAC、HGW15/20/25/30/35/45CCZAC 技术数据，2026-10 读取（示例页；各型号见 b_ 开头的出处）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+  note: 第一遍：滑块全部外形尺寸、C_N、C0_N、block_mass_kg（现行版额定载荷以此为准）。其余型号页同路径：HGH15 p/5-001623，HGH25 p/5-001652，HGH30 p/5-003157，HGH35 p/5-003129，HGH45 p/5-003130；HGW-QHW/ 下 HGW15CCZAC p/5-003167，HGW20 p/5-001118，HGW25
+    p/5-001153，HGW30 p/5-003168，HGW35 p/5-001224，HGW45 p/5-001259
+- key: s2
+  title: HIWIN GmbH 官方产品页（hiwin.de）HGR15/20/25/30/35/45R4000H 导轨技术数据（示例页；各规格见 r_ 开头的出处）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR20R4000H/p/5-001922
+  note: 第一遍：rail_W/H/pitch/d/D/h、rail_mass_kg_per_m、标准端距 E1=20（45 为 22.5）。其余：HGR15 p/5-001920，HGR25 p/5-001924，HGR30 p/5-001926，HGR35 p/5-001927，HGR45 p/5-001929
+- key: s3
+  title: HIWIN Linear Guideway Technical Information 样本 G99TE17-1306（HG Series 章节，经销商 lm76 转存的官方样本 PDF）
+  url: https://www.lm76.com/HG-Series-Catalog_opt.pdf
+  note: 第二遍：2-1-13(1) HGH-CA/HGH-HA 表与 2-1-13(5) HGW-CC/HGW-HC 表，逐字逐格重读全部外形尺寸、导轨尺寸、导轨螺栓 rail_bolt、E、质量；额定载荷为旧版数值（见 notes）
+- key: s4
+  title: HIWIN Linear Guideway Technical Information 样本 G99TE14-1006（motionusa 转存）
+  url: https://s3.amazonaws.com/www.motionusa.com/hiwin/Hiwin_GuidewayCatalog.pdf
+  note: 辅助核对：p.35 HGH-CA 表（含 rail_bolt）；该版无 HGW-CC 表；用于查明 HGH25 K1 版本差异
+- key: s5
+  title: THK 综合样本 LM Guide 型号 HSR 尺寸表（A1-192 HSR-C 法兰型、A1-196 HSR-R 无法兰型）
+  url: https://tech.thk.com/en/products/pdfs/en_a01_196.pdf
+  note: 互换性核对，不入表；HSR-C 页：https://tech.thk.com/en/products/pdfs/en_a01_192.pdf
+- key: b_HGH15
+  title: HIWIN HGH15CAZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH15CAZAC/p/5-001623
+- key: b_HGH20
+  title: HIWIN HGH20CAZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH20CAZAC/p/5-001633
+- key: b_HGH25
+  title: HIWIN HGH25CAZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH25CAZAC/p/5-001652
+- key: b_HGH30
+  title: HIWIN HGH30CAZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH30CAZAC/p/5-003157
+- key: b_HGH35
+  title: HIWIN HGH35CAZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH35CAZAC/p/5-003129
+- key: b_HGH45
+  title: HIWIN HGH45CAZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGH-QHH/HGH45CAZAC/p/5-003130
+- key: b_HGW15
+  title: HIWIN HGW15CCZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW15CCZAC/p/5-003167
+- key: b_HGW20
+  title: HIWIN HGW20CCZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW20CCZAC/p/5-001118
+- key: b_HGW25
+  title: HIWIN HGW25CCZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW25CCZAC/p/5-001153
+- key: b_HGW30
+  title: HIWIN HGW30CCZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW30CCZAC/p/5-003168
+- key: b_HGW35
+  title: HIWIN HGW35CCZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW35CCZAC/p/5-001224
+- key: b_HGW45
+  title: HIWIN HGW45CCZAC（官网产品页，滑块外形与额定载荷）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Blocks/Ball-guides/Series-HG-QH/HGW-QHW/HGW45CCZAC/p/5-001259
+- key: r_15
+  title: HIWIN HGR15R4000H（官网产品页，导轨尺寸）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR15R4000H/p/5-001920
+- key: r_20
+  title: HIWIN HGR20R4000H（官网产品页，导轨尺寸）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR20R4000H/p/5-001922
+- key: r_25
+  title: HIWIN HGR25R4000H（官网产品页，导轨尺寸）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR25R4000H/p/5-001924
+- key: r_30
+  title: HIWIN HGR30R4000H（官网产品页，导轨尺寸）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR30R4000H/p/5-001926
+- key: r_35
+  title: HIWIN HGR35R4000H（官网产品页，导轨尺寸）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR35R4000H/p/5-001927
+- key: r_45
+  title: HIWIN HGR45R4000H（官网产品页，导轨尺寸）
+  url: https://www.hiwin.de/en/Products/Linear-guideways/Profile-rails/Ball-guides/Series-HGR/HGR-R/HGR45R4000H/p/5-001929
 columns:
-  - [size, 规格型号, Model, "-"]
-  - [block_type, 滑块型式, Block type, "-"]
-  - [rail_W_mm, 导轨宽 WR, Rail width WR, mm]
-  - [rail_H_mm, 导轨高 HR, Rail height HR, mm]
-  - [rail_pitch_mm, 导轨安装孔距 P, Rail mounting hole pitch P, mm]
-  - [rail_E_mm, 导轨端孔到端面距离 E（标准值）, Standard end distance E, mm]
-  - [rail_bolt, 导轨安装螺栓（规格x长度）, Rail mounting bolt, "-"]
-  - [rail_d_mm, 导轨通孔直径 d, Rail through-hole dia. d, mm]
-  - [rail_D_mm, 导轨沉头孔直径 D, Rail counterbore dia. D, mm]
-  - [rail_h_mm, 导轨沉头孔深 h, Rail counterbore depth h, mm]
-  - [H_mm, 组件总高（导轨底面到滑块顶面）H, Assembly height H, mm]
-  - [H1_mm, 导轨底面到滑块底面间隙 H1, Clearance rail bottom to block bottom H1, mm]
-  - [N_mm, 导轨侧面到滑块基准侧面距离 N, Rail side to block side N, mm]
-  - [W_mm, 滑块宽 W, Block width W, mm]
-  - [B_mm, 滑块安装孔横向距 B, Block mounting hole spacing (transverse) B, mm]
-  - [B1_mm, 滑块侧面到安装孔中心 B1, Block side to hole center B1, mm]
-  - [C_mm, 滑块安装孔纵向距 C, Block mounting hole spacing (longitudinal) C, mm]
-  - [L1_mm, 滑块本体长 L1, Block body length L1, mm]
-  - [L_mm, 滑块总长（含端盖）L, Block overall length L, mm]
-  - [K1_mm, 样本尺寸 K1（滑块安装孔到本体端部）, Catalog dim. K1, mm]
-  - [K2_mm, 样本尺寸 K2（端盖油嘴位置）, Catalog dim. K2, mm]
-  - [G_mm, 油嘴伸出长度 G, Grease nipple length G, mm]
-  - [T_mm, 滑块安装面厚度 T, Block flange/top thickness T, mm]
-  - [T1_mm, 法兰型螺纹有效厚度 T1（仅 HGW）, Flange thread thickness T1, mm]
-  - [H2_mm, 滑块顶面到端盖顶面高差 H2, Dim. H2, mm]
-  - [H3_mm, 滑块顶面到导轨顶面距离 H3, Dim. H3, mm]
-  - [block_bolt, 滑块安装螺纹（HGH 为螺纹x深度；HGW-CC 为贯通螺纹，可上下安装）, Block mounting thread, "-"]
-  - [C_N, 额定动载荷（现行版）, Basic dynamic load rating C, N]
-  - [C0_N, 额定静载荷（现行版）, Basic static load rating C0, N]
-  - [block_mass_kg, 滑块质量, Block mass, kg]
-  - [rail_mass_kg_per_m, 导轨每米质量, Rail mass per metre, kg]
+- - size
+  - 规格型号
+  - Model
+  - '-'
+- - block_type
+  - 滑块型式
+  - Block type
+  - '-'
+- - rail_W_mm
+  - 导轨宽 WR
+  - Rail width WR
+  - mm
+- - rail_H_mm
+  - 导轨高 HR
+  - Rail height HR
+  - mm
+- - rail_pitch_mm
+  - 导轨安装孔距 P
+  - Rail mounting hole pitch P
+  - mm
+- - rail_E_mm
+  - 导轨端孔到端面距离 E（标准值）
+  - Standard end distance E
+  - mm
+- - rail_bolt
+  - 导轨安装螺栓（规格x长度）
+  - Rail mounting bolt
+  - '-'
+- - rail_d_mm
+  - 导轨通孔直径 d
+  - Rail through-hole dia. d
+  - mm
+- - rail_D_mm
+  - 导轨沉头孔直径 D
+  - Rail counterbore dia. D
+  - mm
+- - rail_h_mm
+  - 导轨沉头孔深 h
+  - Rail counterbore depth h
+  - mm
+- - H_mm
+  - 组件总高（导轨底面到滑块顶面）H
+  - Assembly height H
+  - mm
+- - H1_mm
+  - 导轨底面到滑块底面间隙 H1
+  - Clearance rail bottom to block bottom H1
+  - mm
+- - N_mm
+  - 导轨侧面到滑块基准侧面距离 N
+  - Rail side to block side N
+  - mm
+- - W_mm
+  - 滑块宽 W
+  - Block width W
+  - mm
+- - B_mm
+  - 滑块安装孔横向距 B
+  - Block mounting hole spacing (transverse) B
+  - mm
+- - B1_mm
+  - 滑块侧面到安装孔中心 B1
+  - Block side to hole center B1
+  - mm
+- - C_mm
+  - 滑块安装孔纵向距 C
+  - Block mounting hole spacing (longitudinal) C
+  - mm
+- - L1_mm
+  - 滑块本体长 L1
+  - Block body length L1
+  - mm
+- - L_mm
+  - 滑块总长（含端盖）L
+  - Block overall length L
+  - mm
+- - K1_mm
+  - 样本尺寸 K1（滑块安装孔到本体端部）
+  - Catalog dim. K1
+  - mm
+- - K2_mm
+  - 样本尺寸 K2（端盖油嘴位置）
+  - Catalog dim. K2
+  - mm
+- - G_mm
+  - 油嘴伸出长度 G
+  - Grease nipple length G
+  - mm
+- - T_mm
+  - 滑块安装面厚度 T
+  - Block flange/top thickness T
+  - mm
+- - T1_mm
+  - 法兰型螺纹有效厚度 T1（仅 HGW）
+  - Flange thread thickness T1
+  - mm
+- - H2_mm
+  - 滑块顶面到端盖顶面高差 H2
+  - Dim. H2
+  - mm
+- - H3_mm
+  - 滑块顶面到导轨顶面距离 H3
+  - Dim. H3
+  - mm
+- - block_bolt
+  - 滑块安装螺纹（HGH 为螺纹x深度；HGW-CC 为贯通螺纹，可上下安装）
+  - Block mounting thread
+  - '-'
+- - C_N
+  - 额定动载荷（现行版）
+  - Basic dynamic load rating C
+  - N
+- - C0_N
+  - 额定静载荷（现行版）
+  - Basic static load rating C0
+  - N
+- - block_mass_kg
+  - 滑块质量
+  - Block mass
+  - kg
+- - rail_mass_kg_per_m
+  - 导轨每米质量
+  - Rail mass per metre
+  - kg
 rows:
-  - {size: "HGH15CA", block_type: "square", src: s1, rail_W_mm: 15, rail_H_mm: 15, rail_pitch_mm: 60, rail_E_mm: 20, rail_bolt: "M4x16", rail_d_mm: 4.5, rail_D_mm: 7.5, rail_h_mm: 5.3, H_mm: 28, H1_mm: 4.3, N_mm: 9.5, W_mm: 34, B_mm: 26, B1_mm: 4, C_mm: 26, L1_mm: 39.4, L_mm: 61.4, K1_mm: 10, K2_mm: 4.85, G_mm: 5.3, T_mm: 6, H2_mm: 7.95, H3_mm: 7.7, block_bolt: "M4x5", C_N: 14700, C0_N: 23470, block_mass_kg: 0.18, rail_mass_kg_per_m: 1.45}
-  - {size: "HGH20CA", block_type: "square", src: s1, rail_W_mm: 20, rail_H_mm: 17.5, rail_pitch_mm: 60, rail_E_mm: 20, rail_bolt: "M5x16", rail_d_mm: 6, rail_D_mm: 9.5, rail_h_mm: 8.5, H_mm: 30, H1_mm: 4.6, N_mm: 12, W_mm: 44, B_mm: 32, B1_mm: 6, C_mm: 36, L1_mm: 50.5, L_mm: 77.5, K1_mm: 12.25, K2_mm: 6, G_mm: 12, T_mm: 8, H2_mm: 6, H3_mm: 6, block_bolt: "M5x6", C_N: 27100, C0_N: 36680, block_mass_kg: 0.30, rail_mass_kg_per_m: 2.21}
-  - {size: "HGH25CA", block_type: "square", src: s1, rail_W_mm: 23, rail_H_mm: 22, rail_pitch_mm: 60, rail_E_mm: 20, rail_bolt: "M6x20", rail_d_mm: 7, rail_D_mm: 11, rail_h_mm: 9, H_mm: 40, H1_mm: 5.5, N_mm: 12.5, W_mm: 48, B_mm: 35, B1_mm: 6.5, C_mm: 35, L1_mm: 58, L_mm: 84, K1_mm: 15.7, K2_mm: 6, G_mm: 12, T_mm: 8, H2_mm: 10, H3_mm: 9, block_bolt: "M6x8", C_N: 34900, C0_N: 52820, block_mass_kg: 0.51, rail_mass_kg_per_m: 3.21}
-  - {size: "HGH30CA", block_type: "square", src: s1, rail_W_mm: 28, rail_H_mm: 26, rail_pitch_mm: 80, rail_E_mm: 20, rail_bolt: "M8x25", rail_d_mm: 9, rail_D_mm: 14, rail_h_mm: 12, H_mm: 45, H1_mm: 6, N_mm: 16, W_mm: 60, B_mm: 40, B1_mm: 10, C_mm: 40, L1_mm: 70, L_mm: 97.4, K1_mm: 20.25, K2_mm: 6, G_mm: 12, T_mm: 8.5, H2_mm: 9.5, H3_mm: 13.8, block_bolt: "M8x10", C_N: 48500, C0_N: 71870, block_mass_kg: 0.88, rail_mass_kg_per_m: 4.47}
-  - {size: "HGH35CA", block_type: "square", src: s1, rail_W_mm: 34, rail_H_mm: 29, rail_pitch_mm: 80, rail_E_mm: 20, rail_bolt: "M8x25", rail_d_mm: 9, rail_D_mm: 14, rail_h_mm: 12, H_mm: 55, H1_mm: 7.5, N_mm: 18, W_mm: 70, B_mm: 50, B1_mm: 10, C_mm: 50, L1_mm: 80, L_mm: 112.4, K1_mm: 20.6, K2_mm: 7, G_mm: 12, T_mm: 10.2, H2_mm: 16, H3_mm: 19.6, block_bolt: "M8x12", C_N: 64600, C0_N: 93880, block_mass_kg: 1.45, rail_mass_kg_per_m: 6.30}
-  - {size: "HGH45CA", block_type: "square", src: s1, rail_W_mm: 45, rail_H_mm: 38, rail_pitch_mm: 105, rail_E_mm: 22.5, rail_bolt: "M12x35", rail_d_mm: 14, rail_D_mm: 20, rail_h_mm: 17, H_mm: 70, H1_mm: 9.5, N_mm: 20.5, W_mm: 86, B_mm: 60, B1_mm: 13, C_mm: 60, L1_mm: 97, L_mm: 139.4, K1_mm: 23, K2_mm: 10, G_mm: 12.9, T_mm: 16, H2_mm: 18.5, H3_mm: 30.5, block_bolt: "M10x17", C_N: 103800, C0_N: 146710, block_mass_kg: 2.73, rail_mass_kg_per_m: 10.41}
-  - {size: "HGW15CC", block_type: "flange", src: s1, rail_W_mm: 15, rail_H_mm: 15, rail_pitch_mm: 60, rail_E_mm: 20, rail_bolt: "M4x16", rail_d_mm: 4.5, rail_D_mm: 7.5, rail_h_mm: 5.3, H_mm: 24, H1_mm: 4.3, N_mm: 16, W_mm: 47, B_mm: 38, B1_mm: 4.5, C_mm: 30, L1_mm: 39.4, L_mm: 61.4, K1_mm: 8, K2_mm: 4.85, G_mm: 5.3, T_mm: 6, T1_mm: 8.9, H2_mm: 3.95, H3_mm: 3.7, block_bolt: "M5", C_N: 14700, C0_N: 23470, block_mass_kg: 0.17, rail_mass_kg_per_m: 1.45}
-  - {size: "HGW20CC", block_type: "flange", src: s1, rail_W_mm: 20, rail_H_mm: 17.5, rail_pitch_mm: 60, rail_E_mm: 20, rail_bolt: "M5x16", rail_d_mm: 6, rail_D_mm: 9.5, rail_h_mm: 8.5, H_mm: 30, H1_mm: 4.6, N_mm: 21.5, W_mm: 63, B_mm: 53, B1_mm: 5, C_mm: 40, L1_mm: 50.5, L_mm: 77.5, K1_mm: 10.25, K2_mm: 6, G_mm: 12, T_mm: 8, T1_mm: 10, H2_mm: 6, H3_mm: 6, block_bolt: "M6", C_N: 27100, C0_N: 36680, block_mass_kg: 0.40, rail_mass_kg_per_m: 2.21}
-  - {size: "HGW25CC", block_type: "flange", src: s1, rail_W_mm: 23, rail_H_mm: 22, rail_pitch_mm: 60, rail_E_mm: 20, rail_bolt: "M6x20", rail_d_mm: 7, rail_D_mm: 11, rail_h_mm: 9, H_mm: 36, H1_mm: 5.5, N_mm: 23.5, W_mm: 70, B_mm: 57, B1_mm: 6.5, C_mm: 45, L1_mm: 58, L_mm: 84, K1_mm: 10.7, K2_mm: 6, G_mm: 12, T_mm: 8, T1_mm: 14, H2_mm: 6, H3_mm: 5, block_bolt: "M8", C_N: 34900, C0_N: 52820, block_mass_kg: 0.59, rail_mass_kg_per_m: 3.21}
-  - {size: "HGW30CC", block_type: "flange", src: s1, rail_W_mm: 28, rail_H_mm: 26, rail_pitch_mm: 80, rail_E_mm: 20, rail_bolt: "M8x25", rail_d_mm: 9, rail_D_mm: 14, rail_h_mm: 12, H_mm: 42, H1_mm: 6, N_mm: 31, W_mm: 90, B_mm: 72, B1_mm: 9, C_mm: 52, L1_mm: 70, L_mm: 97.4, K1_mm: 14.25, K2_mm: 6, G_mm: 12, T_mm: 8.5, T1_mm: 16, H2_mm: 6.5, H3_mm: 10.8, block_bolt: "M10", C_N: 48500, C0_N: 71870, block_mass_kg: 1.09, rail_mass_kg_per_m: 4.47}
-  - {size: "HGW35CC", block_type: "flange", src: s1, rail_W_mm: 34, rail_H_mm: 29, rail_pitch_mm: 80, rail_E_mm: 20, rail_bolt: "M8x25", rail_d_mm: 9, rail_D_mm: 14, rail_h_mm: 12, H_mm: 48, H1_mm: 7.5, N_mm: 33, W_mm: 100, B_mm: 82, B1_mm: 9, C_mm: 62, L1_mm: 80, L_mm: 112.4, K1_mm: 14.6, K2_mm: 7, G_mm: 12, T_mm: 10.1, T1_mm: 18, H2_mm: 9, H3_mm: 12.6, block_bolt: "M10", C_N: 64600, C0_N: 93880, block_mass_kg: 1.56, rail_mass_kg_per_m: 6.30}
-  - {size: "HGW45CC", block_type: "flange", src: s1, rail_W_mm: 45, rail_H_mm: 38, rail_pitch_mm: 105, rail_E_mm: 22.5, rail_bolt: "M12x35", rail_d_mm: 14, rail_D_mm: 20, rail_h_mm: 17, H_mm: 60, H1_mm: 9.5, N_mm: 37.5, W_mm: 120, B_mm: 100, B1_mm: 10, C_mm: 80, L1_mm: 97, L_mm: 139.4, K1_mm: 13, K2_mm: 10, G_mm: 12.9, T_mm: 15.1, T1_mm: 22, H2_mm: 8.5, H3_mm: 20.5, block_bolt: "M12", C_N: 103800, C0_N: 146710, block_mass_kg: 2.79, rail_mass_kg_per_m: 10.41}
+- size: HGH15CA
+  block_type: square
+  src: b_HGH15+r_15+s3
+  rail_W_mm: 15
+  rail_H_mm: 15
+  rail_pitch_mm: 60
+  rail_E_mm: 20
+  rail_bolt: M4x16
+  rail_d_mm: 4.5
+  rail_D_mm: 7.5
+  rail_h_mm: 5.3
+  H_mm: 28
+  H1_mm: 4.3
+  N_mm: 9.5
+  W_mm: 34
+  B_mm: 26
+  B1_mm: 4
+  C_mm: 26
+  L1_mm: 39.4
+  L_mm: 61.4
+  K1_mm: 10
+  K2_mm: 4.85
+  G_mm: 5.3
+  T_mm: 6
+  H2_mm: 7.95
+  H3_mm: 7.7
+  block_bolt: M4x5
+  C_N: 14700
+  C0_N: 23470
+  block_mass_kg: 0.18
+  rail_mass_kg_per_m: 1.45
+- size: HGH20CA
+  block_type: square
+  src: b_HGH20+r_20+s3
+  rail_W_mm: 20
+  rail_H_mm: 17.5
+  rail_pitch_mm: 60
+  rail_E_mm: 20
+  rail_bolt: M5x16
+  rail_d_mm: 6
+  rail_D_mm: 9.5
+  rail_h_mm: 8.5
+  H_mm: 30
+  H1_mm: 4.6
+  N_mm: 12
+  W_mm: 44
+  B_mm: 32
+  B1_mm: 6
+  C_mm: 36
+  L1_mm: 50.5
+  L_mm: 77.5
+  K1_mm: 12.25
+  K2_mm: 6
+  G_mm: 12
+  T_mm: 8
+  H2_mm: 6
+  H3_mm: 6
+  block_bolt: M5x6
+  C_N: 27100
+  C0_N: 36680
+  block_mass_kg: 0.3
+  rail_mass_kg_per_m: 2.21
+- size: HGH25CA
+  block_type: square
+  src: b_HGH25+r_25+s3
+  rail_W_mm: 23
+  rail_H_mm: 22
+  rail_pitch_mm: 60
+  rail_E_mm: 20
+  rail_bolt: M6x20
+  rail_d_mm: 7
+  rail_D_mm: 11
+  rail_h_mm: 9
+  H_mm: 40
+  H1_mm: 5.5
+  N_mm: 12.5
+  W_mm: 48
+  B_mm: 35
+  B1_mm: 6.5
+  C_mm: 35
+  L1_mm: 58
+  L_mm: 84
+  K1_mm: 15.7
+  K2_mm: 6
+  G_mm: 12
+  T_mm: 8
+  H2_mm: 10
+  H3_mm: 9
+  block_bolt: M6x8
+  C_N: 34900
+  C0_N: 52820
+  block_mass_kg: 0.51
+  rail_mass_kg_per_m: 3.21
+- size: HGH30CA
+  block_type: square
+  src: b_HGH30+r_30+s3
+  rail_W_mm: 28
+  rail_H_mm: 26
+  rail_pitch_mm: 80
+  rail_E_mm: 20
+  rail_bolt: M8x25
+  rail_d_mm: 9
+  rail_D_mm: 14
+  rail_h_mm: 12
+  H_mm: 45
+  H1_mm: 6
+  N_mm: 16
+  W_mm: 60
+  B_mm: 40
+  B1_mm: 10
+  C_mm: 40
+  L1_mm: 70
+  L_mm: 97.4
+  K1_mm: 20.25
+  K2_mm: 6
+  G_mm: 12
+  T_mm: 8.5
+  H2_mm: 9.5
+  H3_mm: 13.8
+  block_bolt: M8x10
+  C_N: 48500
+  C0_N: 71870
+  block_mass_kg: 0.88
+  rail_mass_kg_per_m: 4.47
+- size: HGH35CA
+  block_type: square
+  src: b_HGH35+r_35+s3
+  rail_W_mm: 34
+  rail_H_mm: 29
+  rail_pitch_mm: 80
+  rail_E_mm: 20
+  rail_bolt: M8x25
+  rail_d_mm: 9
+  rail_D_mm: 14
+  rail_h_mm: 12
+  H_mm: 55
+  H1_mm: 7.5
+  N_mm: 18
+  W_mm: 70
+  B_mm: 50
+  B1_mm: 10
+  C_mm: 50
+  L1_mm: 80
+  L_mm: 112.4
+  K1_mm: 20.6
+  K2_mm: 7
+  G_mm: 12
+  T_mm: 10.2
+  H2_mm: 16
+  H3_mm: 19.6
+  block_bolt: M8x12
+  C_N: 64600
+  C0_N: 93880
+  block_mass_kg: 1.45
+  rail_mass_kg_per_m: 6.3
+- size: HGH45CA
+  block_type: square
+  src: b_HGH45+r_45+s3
+  rail_W_mm: 45
+  rail_H_mm: 38
+  rail_pitch_mm: 105
+  rail_E_mm: 22.5
+  rail_bolt: M12x35
+  rail_d_mm: 14
+  rail_D_mm: 20
+  rail_h_mm: 17
+  H_mm: 70
+  H1_mm: 9.5
+  N_mm: 20.5
+  W_mm: 86
+  B_mm: 60
+  B1_mm: 13
+  C_mm: 60
+  L1_mm: 97
+  L_mm: 139.4
+  K1_mm: 23
+  K2_mm: 10
+  G_mm: 12.9
+  T_mm: 16
+  H2_mm: 18.5
+  H3_mm: 30.5
+  block_bolt: M10x17
+  C_N: 103800
+  C0_N: 146710
+  block_mass_kg: 2.73
+  rail_mass_kg_per_m: 10.41
+- size: HGW15CC
+  block_type: flange
+  src: b_HGW15+r_15+s3
+  rail_W_mm: 15
+  rail_H_mm: 15
+  rail_pitch_mm: 60
+  rail_E_mm: 20
+  rail_bolt: M4x16
+  rail_d_mm: 4.5
+  rail_D_mm: 7.5
+  rail_h_mm: 5.3
+  H_mm: 24
+  H1_mm: 4.3
+  N_mm: 16
+  W_mm: 47
+  B_mm: 38
+  B1_mm: 4.5
+  C_mm: 30
+  L1_mm: 39.4
+  L_mm: 61.4
+  K1_mm: 8
+  K2_mm: 4.85
+  G_mm: 5.3
+  T_mm: 6
+  T1_mm: 8.9
+  H2_mm: 3.95
+  H3_mm: 3.7
+  block_bolt: M5
+  C_N: 14700
+  C0_N: 23470
+  block_mass_kg: 0.17
+  rail_mass_kg_per_m: 1.45
+- size: HGW20CC
+  block_type: flange
+  src: b_HGW20+r_20+s3
+  rail_W_mm: 20
+  rail_H_mm: 17.5
+  rail_pitch_mm: 60
+  rail_E_mm: 20
+  rail_bolt: M5x16
+  rail_d_mm: 6
+  rail_D_mm: 9.5
+  rail_h_mm: 8.5
+  H_mm: 30
+  H1_mm: 4.6
+  N_mm: 21.5
+  W_mm: 63
+  B_mm: 53
+  B1_mm: 5
+  C_mm: 40
+  L1_mm: 50.5
+  L_mm: 77.5
+  K1_mm: 10.25
+  K2_mm: 6
+  G_mm: 12
+  T_mm: 8
+  T1_mm: 10
+  H2_mm: 6
+  H3_mm: 6
+  block_bolt: M6
+  C_N: 27100
+  C0_N: 36680
+  block_mass_kg: 0.4
+  rail_mass_kg_per_m: 2.21
+- size: HGW25CC
+  block_type: flange
+  src: b_HGW25+r_25+s3
+  rail_W_mm: 23
+  rail_H_mm: 22
+  rail_pitch_mm: 60
+  rail_E_mm: 20
+  rail_bolt: M6x20
+  rail_d_mm: 7
+  rail_D_mm: 11
+  rail_h_mm: 9
+  H_mm: 36
+  H1_mm: 5.5
+  N_mm: 23.5
+  W_mm: 70
+  B_mm: 57
+  B1_mm: 6.5
+  C_mm: 45
+  L1_mm: 58
+  L_mm: 84
+  K1_mm: 10.7
+  K2_mm: 6
+  G_mm: 12
+  T_mm: 8
+  T1_mm: 14
+  H2_mm: 6
+  H3_mm: 5
+  block_bolt: M8
+  C_N: 34900
+  C0_N: 52820
+  block_mass_kg: 0.59
+  rail_mass_kg_per_m: 3.21
+- size: HGW30CC
+  block_type: flange
+  src: b_HGW30+r_30+s3
+  rail_W_mm: 28
+  rail_H_mm: 26
+  rail_pitch_mm: 80
+  rail_E_mm: 20
+  rail_bolt: M8x25
+  rail_d_mm: 9
+  rail_D_mm: 14
+  rail_h_mm: 12
+  H_mm: 42
+  H1_mm: 6
+  N_mm: 31
+  W_mm: 90
+  B_mm: 72
+  B1_mm: 9
+  C_mm: 52
+  L1_mm: 70
+  L_mm: 97.4
+  K1_mm: 14.25
+  K2_mm: 6
+  G_mm: 12
+  T_mm: 8.5
+  T1_mm: 16
+  H2_mm: 6.5
+  H3_mm: 10.8
+  block_bolt: M10
+  C_N: 48500
+  C0_N: 71870
+  block_mass_kg: 1.09
+  rail_mass_kg_per_m: 4.47
+- size: HGW35CC
+  block_type: flange
+  src: b_HGW35+r_35+s3
+  rail_W_mm: 34
+  rail_H_mm: 29
+  rail_pitch_mm: 80
+  rail_E_mm: 20
+  rail_bolt: M8x25
+  rail_d_mm: 9
+  rail_D_mm: 14
+  rail_h_mm: 12
+  H_mm: 48
+  H1_mm: 7.5
+  N_mm: 33
+  W_mm: 100
+  B_mm: 82
+  B1_mm: 9
+  C_mm: 62
+  L1_mm: 80
+  L_mm: 112.4
+  K1_mm: 14.6
+  K2_mm: 7
+  G_mm: 12
+  T_mm: 10.1
+  T1_mm: 18
+  H2_mm: 9
+  H3_mm: 12.6
+  block_bolt: M10
+  C_N: 64600
+  C0_N: 93880
+  block_mass_kg: 1.56
+  rail_mass_kg_per_m: 6.3
+- size: HGW45CC
+  block_type: flange
+  src: b_HGW45+r_45+s3
+  rail_W_mm: 45
+  rail_H_mm: 38
+  rail_pitch_mm: 105
+  rail_E_mm: 22.5
+  rail_bolt: M12x35
+  rail_d_mm: 14
+  rail_D_mm: 20
+  rail_h_mm: 17
+  H_mm: 60
+  H1_mm: 9.5
+  N_mm: 37.5
+  W_mm: 120
+  B_mm: 100
+  B1_mm: 10
+  C_mm: 80
+  L1_mm: 97
+  L_mm: 139.4
+  K1_mm: 13
+  K2_mm: 10
+  G_mm: 12.9
+  T_mm: 15.1
+  T1_mm: 22
+  H2_mm: 8.5
+  H3_mm: 20.5
+  block_bolt: M12
+  C_N: 103800
+  C0_N: 146710
+  block_mass_kg: 2.79
+  rail_mass_kg_per_m: 10.41
 excluded:
-  - "无整行剔除。未收的列：HGW 的 T2（s1 HGW15 为 7，s3 为 6.95，版本差异且造型不需要）；静力矩 M0X/M0Y/M0Z（现行版与旧版口径不同，造型不需要）；HA/HC 加长型、CB 等其他滑块型式不在本族范围。"
-notes: >-
-  口径：JB/T 7175 的尺寸表在许可网站上取不到，按要求用行业通用尺寸，以 HIWIN HG 系列为准。
-  所有行的导轨列取自 s2（导轨页），滑块列取自 s1（滑块页）；rail_bolt 两个 HIWIN 页面都没给，取自 s3，并经 s4 核对。
-  rail_E_mm 是 HIWIN 的标准端距 E（15~35 为 20，45 为 22.5），s2 的标准出厂长度 E1 也是这个值；用户自定长度时 E 可在 E1/2 min~max（如 HGR20 为 7~53）内取，推荐 E=P/2。
-  block_bolt：HGH-CA 写成“螺纹x螺纹深”（样本 M x l）；HGW-CC 的法兰孔是贯通螺纹，既可从上面拧螺钉也可从下面穿螺栓，所以只写螺纹规格，螺纹有效厚度见 T1。
-  两遍读取：第一遍 = s1/s2 官方现行产品页；第二遍 = 重新取 s3 官方样本 G99TE17-1306 的 HGH-CA 表和 HGW-CC 表，换一种问法要求逐位抄写。
-  全部外形尺寸、导轨尺寸、质量逐格一致。不一致只有两处，都是样本版本不同造成的，处理如下：
-  (1) 额定载荷：现行 s1 比 s3（2013 版）高，例如 20 规格 27100/36680 N 对 17.75/27.76 kN，25 规格 34900/52820 N 对 26.48/36.49 kN。
-  表中收现行 s1 值。每个规格的 HGH 页和 HGW 页是两个独立页面，载荷值彼此一致，算作第二遍核对。
-  (2) HGH25CA 的 K1：s1 和 s3 都是 15.7，更早的 s4（G99TE14-1006，2010 版）印的是 16.8（同版 HGW25CA 为 11.8）。表中收 15.7。
-  另外，s1 的 HGW20CC 页第一次读取没有拿到数值，换一个网址重取后与 s3 一致。
-  自洽检查全部通过：N = (W − WR)/2 与 B1 = (W − B)/2 在 12 行都成立；
-  同规格 HGH 和 HGW 的 K1 差 = (C_HGW − C_HGH)/2，H2、H3 的差 = 两者 H 的差，全部对得上；
-  H、H1、W、B、L1、L、K1、导轨各列、质量、载荷都随规格单调递增。唯一例外：HGH25CA 的 C=35，小于 HGH20CA 的 36。
-  这一点 s1、s3、s4 都这么印，THK HSR25R 也是 35，所以确认是真值，不是错误。
-  rail_d/D/h 在 30 和 35 规格相同，rail_pitch 在 15~25 都是 60，这些是持平，不是递减。H 与 H1 之间推不出关系，K1 也不能由 L1 和 C 推出（只能在同规格 HGH/HGW 之间互相核对）。
-  互换性（s5，THK HSR 官方样本）：THK HSR-R 对 HGH-CA、HSR-C 对 HGW-CC，以下尺寸在 6 个规格上全部相同：
-  组件高 H/M（HGH 28/30/40/45/55/70，HGW 24/30/36/42/48/60）、滑块宽 W、安装孔距 B×C、安装螺纹（HGH M4x5/M5x6/M6x8/M8x10/M8x12/M10x17；HGW M5/M6/M8/M10/M10/M12）、
-  导轨宽 WR/W1、侧距 N/W2、导轨孔距 P/F、导轨孔 d×D×h；导轨高除 20 规格外也相同。所以安装接口可互换。
-  不同之处：THK 滑块总长 L 较短（15/20/25/30/35/45 分别为 56.6/74/83.1/98/109.4/138.9，HIWIN 为 61.4/77.5/84/97.4/112.4/139.4）；
-  20 规格导轨高 THK HSR20 为 18，HIWIN HGR20 为 17.5，组件总高都是 30；载荷与质量也不同。
-  所以，混用时只能在同一家内配对导轨和滑块，外部安装尺寸可以互换，但长度方向的包络要按各家自己的 L 留空间。
+- 无整行剔除。未收的列：HGW 的 T2（s1 HGW15 为 7，s3 为 6.95，版本差异且造型不需要）；静力矩 M0X/M0Y/M0Z（现行版与旧版口径不同，造型不需要）；HA/HC 加长型、CB 等其他滑块型式不在本族范围。
+notes: 口径：JB/T 7175 的尺寸表在许可网站上取不到，按要求用行业通用尺寸，以 HIWIN HG 系列为准。 所有行的导轨列取自 s2（导轨页），滑块列取自 s1（滑块页）；rail_bolt 两个 HIWIN 页面都没给，取自 s3，并经 s4 核对。 rail_E_mm 是 HIWIN 的标准端距 E（15~35 为 20，45 为 22.5），s2 的标准出厂长度 E1 也是这个值；用户自定长度时
+  E 可在 E1/2 min~max（如 HGR20 为 7~53）内取，推荐 E=P/2。 block_bolt：HGH-CA 写成“螺纹x螺纹深”（样本 M x l）；HGW-CC 的法兰孔是贯通螺纹，既可从上面拧螺钉也可从下面穿螺栓，所以只写螺纹规格，螺纹有效厚度见 T1。 两遍读取：第一遍 = s1/s2 官方现行产品页；第二遍 = 重新取 s3 官方样本 G99TE17-1306 的 HGH-CA
+  表和 HGW-CC 表，换一种问法要求逐位抄写。 全部外形尺寸、导轨尺寸、质量逐格一致。不一致只有两处，都是样本版本不同造成的，处理如下： (1) 额定载荷：现行 s1 比 s3（2013 版）高，例如 20 规格 27100/36680 N 对 17.75/27.76 kN，25 规格 34900/52820 N 对 26.48/36.49 kN。 表中收现行 s1 值。每个规格的 HGH 页和
+  HGW 页是两个独立页面，载荷值彼此一致，算作第二遍核对。 (2) HGH25CA 的 K1：s1 和 s3 都是 15.7，更早的 s4（G99TE14-1006，2010 版）印的是 16.8（同版 HGW25CA 为 11.8）。表中收 15.7。 另外，s1 的 HGW20CC 页第一次读取没有拿到数值，换一个网址重取后与 s3 一致。 自洽检查全部通过：N = (W − WR)/2 与
+  B1 = (W − B)/2 在 12 行都成立； 同规格 HGH 和 HGW 的 K1 差 = (C_HGW − C_HGH)/2，H2、H3 的差 = 两者 H 的差，全部对得上； H、H1、W、B、L1、L、K1、导轨各列、质量、载荷都随规格单调递增。唯一例外：HGH25CA 的 C=35，小于 HGH20CA 的 36。 这一点 s1、s3、s4 都这么印，THK HSR25R 也是 35，所以确认是真值，不是错误。
+  rail_d/D/h 在 30 和 35 规格相同，rail_pitch 在 15~25 都是 60，这些是持平，不是递减。H 与 H1 之间推不出关系，K1 也不能由 L1 和 C 推出（只能在同规格 HGH/HGW 之间互相核对）。 互换性（s5，THK HSR 官方样本）：THK HSR-R 对 HGH-CA、HSR-C 对 HGW-CC，以下尺寸在 6 个规格上全部相同： 组件高 H/M（HGH
+  28/30/40/45/55/70，HGW 24/30/36/42/48/60）、滑块宽 W、安装孔距 B×C、安装螺纹（HGH M4x5/M5x6/M6x8/M8x10/M8x12/M10x17；HGW M5/M6/M8/M10/M10/M12）、 导轨宽 WR/W1、侧距 N/W2、导轨孔距 P/F、导轨孔 d×D×h；导轨高除 20 规格外也相同。所以安装接口可互换。 不同之处：THK 滑块总长
+  L 较短（15/20/25/30/35/45 分别为 56.6/74/83.1/98/109.4/138.9，HIWIN 为 61.4/77.5/84/97.4/112.4/139.4）； 20 规格导轨高 THK HSR20 为 18，HIWIN HGR20 为 17.5，组件总高都是 30；载荷与质量也不同。 所以，混用时只能在同一家内配对导轨和滑块，外部安装尺寸可以互换，但长度方向的包络要按各家自己的
+  L 留空间。

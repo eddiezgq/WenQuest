@@ -20,9 +20,10 @@ def lib(tmp_path):
         items.append({"ref": "A-BRG-DG/" + size, "id": "A-BRG-DG", "size": size, "part": "A", "kind": "family", "category": "BRG",
                       "name": {"zh": "深沟球轴承 " + size}, "family": {"zh": "深沟球轴承", "en": "Deep groove ball bearing"},
                       "tags": ["滚动轴承", "ball bearing"], "standards": ["GB/T 276-2013"], "params": {"d_mm": d, "D_mm": D, "B_mm": B}})
-    items.append({"ref": "A-KEY-FLAT/10x8x28", "id": "A-KEY-FLAT", "size": "10x8x28", "part": "A", "kind": "family", "category": "KEY",
-                  "name": {"zh": "普通平键"}, "family": {"zh": "普通平键"}, "tags": ["键"], "standards": ["GB/T 1096"],
-                  "params": {"b_mm": 10, "h_mm": 8, "L_mm": 28}})
+    for size in ("4x4x10", "10x8x28"):
+        items.append({"ref": "A-KEY-FLAT/" + size, "id": "A-KEY-FLAT", "size": size, "part": "A", "kind": "family", "category": "KEY",
+                      "name": {"zh": "普通平键"}, "family": {"zh": "普通平键"}, "tags": ["键"], "standards": ["GB/T 1096"],
+                      "params": {"b_mm": int(size.split("x")[0])}})
     (root / ver / "index.json").write_text(json.dumps({"version": ver, "items": items,
                                                        "categories": {"A": {"BRG": {"zh": "滚动轴承"}, "KEY": {"zh": "键"}}}}), encoding="utf-8")
     (root / "latest.json").write_text(json.dumps({"version": ver, "index": "library/{}/index.json".format(ver)}), encoding="utf-8")
@@ -35,7 +36,8 @@ def lib(tmp_path):
     (root / ver / "A-BRG-DG" / "entry.json").write_text(json.dumps(entry), encoding="utf-8")
     key = {"id": "A-KEY-FLAT", "kind": "family", "name": {"zh": "普通平键", "en": "Parallel key"},
            "params": [{"key": "b_mm", "zh": "键宽", "role": "key", "unit": "mm"}], "source": {},
-           "sizes": [{"size": "10x8x28", "params": {"b_mm": 10, "h_mm": 8, "L_mm": 28}}]}
+           "sizes": [{"size": "4x4x10", "params": {"b_mm": 4, "h_mm": 4, "l_mm": 10, "shaft_min_mm": 10, "shaft_max_mm": 12}},
+                     {"size": "10x8x28", "params": {"b_mm": 10, "h_mm": 8, "l_mm": 28, "shaft_min_mm": 30, "shaft_max_mm": 38}}]}
     (root / ver / "A-KEY-FLAT" / "entry.json").write_text(json.dumps(key), encoding="utf-8")
     return S.Catalog(str(root))
 
@@ -87,3 +89,12 @@ def test_llm_refs_are_checked(lib):
 def test_no_library_published(tmp_path):
     r = S.answer(S.Catalog(str(tmp_path / "none")), None, EXAMPLE)
     assert r["refs"] == [] and "还没有发布" in r["answer"]
+
+
+def test_rules_use_the_right_dimension(lib):
+    """键按适用轴径区间选（不是按键宽）：12 mm 轴 → 4x4（轴径 10～12）"""
+    r = S.answer(lib, None, "直径 12 的轴用多宽的平键")
+    assert [x["ref"] for x in r["refs"]] == ["A-KEY-FLAT/4x4x10"]
+    r = S.answer(lib, None, "直径 20 的轴用多宽的平键")                    # 20 不在任何区间
+    assert r["refs"] == [] and "没有" in r["answer"]
+
