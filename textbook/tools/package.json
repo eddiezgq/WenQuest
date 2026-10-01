@@ -1,0 +1,9 @@
+{
+  "name": "wenquest-textbook-tools",
+  "private": true,
+  "type": "module",
+  "description": "Builds WenQuest textbooks: formulas typeset to SVG on the server so web, mini program and PDF look the same.",
+  "dependencies": {
+    "mathjax-full": "3.2.2"
+  }
+}

@@ -4,3 +4,6 @@ backups/
 aiprovider_claude.zip
 __pycache__/
 .pytest_cache/
+
+textbook/build/
+textbook/tools/node_modules/

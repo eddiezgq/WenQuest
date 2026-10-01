@@ -1,0 +1,923 @@
+# 由 textbook/tools/outline.py 从提纲生成，请改提纲后重新生成，不要手改。
+book: robotics
+title: 机器人学
+title_en: Robotics
+source: docs/教材/机器人学/00_提纲.md
+parts:
+- title: 导论
+- title: 第一篇 数学基础篇
+- title: 第二篇 运动学篇
+- title: 第三篇 动力学篇
+- title: 第四篇 结构与机电设计篇
+- title: 第五篇 控制篇
+- title: 第六篇 编程与 AI 篇
+chapters:
+- 'no': 1
+  title: 机器人概论
+  level: 基础
+  part: 导论
+  sections:
+  - id: '1.1'
+    title: 什么是机器人：定义与边界
+  - id: '1.2'
+    title: 历史：从自动机到具身智能
+  - id: '1.3'
+    title: 分类：工业臂、协作臂、移动、足式、仿人、空中、水下、医疗、服务
+  - id: '1.4'
+    title: 机器人的组成：机构、驱动、电气、传感、控制、软件、智能
+  - id: '1.5'
+    title: 应用：制造（数字工厂车间）、物流、医疗、家庭
+  - id: '1.6'
+    title: 本书路线图与五台贯穿机器人
+- 'no': 2
+  title: 线性代数要点
+  level: 基础
+  part: 第一篇 数学基础篇
+  sections:
+  - id: '2.1'
+    title: 向量与矩阵的代数运算
+  - id: '2.2'
+    title: 矩阵与线性变换
+  - id: '2.3'
+    title: 特征值与特征向量
+  - id: '2.4'
+    title: 奇异值分解
+  - id: '2.5'
+    title: 最小二乘与伪逆
+  - id: '2.6'
+    title: 零空间与值域
+- 'no': 3
+  title: 矢量与张量
+  level: 基础
+  part: 第一篇 数学基础篇
+  sections:
+  - id: '3.1'
+    title: 矢量：与坐标系无关的量；矢量与它在某一坐标系中的分量
+  - id: '3.2'
+    title: 点积、叉积的几何意义；叉积的反对称矩阵表示
+  - id: '3.3'
+    title: 坐标变换下分量的变化规律：方向余弦与变换矩阵
+  - id: '3.4'
+    title: 二阶张量：线性算子、换坐标系时按 R T Rᵀ 变换；惯量张量、应力张量预告
+  - id: '3.5'
+    title: 指标记号与求和约定（进阶小节）
+- 'no': 4
+  title: 刚体的转动：从欧拉到四元数
+  level: 基础
+  part: 第一篇 数学基础篇
+  sections:
+  - id: '4.1'
+    title: 平面转动与旋转矩阵
+  - id: '4.2'
+    title: 空间转动与 SO(3)：旋转矩阵作为作用在矢量上的转动算子
+  - id: '4.3'
+    title: 欧拉转动定理（1775）：任何转动都是绕某一固定轴转过一个角度
+  - id: '4.4'
+    title: 罗德里格斯公式（1840）：轴角表示与矩阵指数
+  - id: '4.5'
+    title: 欧拉角与横滚-俯仰-偏航；万向节锁
+  - id: '4.6'
+    title: 欧拉–罗德里格斯参数与单位四元数（哈密顿，1843）
+  - id: '4.7'
+    title: 各种表示的换算与插值（Slerp）
+  - id: '4.8'
+    title: 姿态误差的度量与矩阵正交化
+- 'no': 5
+  title: 位姿与齐次变换
+  level: 基础
+  part: 第一篇 数学基础篇
+  sections:
+  - id: '5.1'
+    title: 坐标系
+  - id: '5.2'
+    title: 齐次变换与 SE(3)
+  - id: '5.3'
+    title: 复合与求逆
+  - id: '5.4'
+    title: 坐标系树
+  - id: '5.5'
+    title: 实例：相机-机械臂-工件的坐标链
+- 'no': 6
+  title: 旋量、李群与李代数
+  level: 基础
+  part: 第一篇 数学基础篇
+  sections:
+  - id: '6.1'
+    title: 从欧拉定理到沙勒定理（Mozzi 1763，Chasles 1830）：任何刚体位移都是螺旋运动
+  - id: '6.2'
+    title: 角速度矢量与 so(3)，转动的指数坐标
+  - id: '6.3'
+    title: 运动旋量与 se(3)：旋量描述的是运动，位姿是 SE(3) 中的矩阵
+  - id: '6.4'
+    title: 指数映射与对数映射：由旋量得到位移，由位移求旋量
+  - id: '6.5'
+    title: 伴随变换：旋量在不同坐标系之间的变换
+  - id: '6.6'
+    title: 力旋量、互易积与功率；Ball 的旋量理论（1900）
+  - id: '6.7'
+    title: 李括号与旋量代数（进阶小节）
+- 'no': 7
+  title: 微分方程与数值方法
+  level: 基础
+  part: 第一篇 数学基础篇
+  sections:
+  - id: '7.1'
+    title: 常微分方程与状态空间
+  - id: '7.2'
+    title: 数值积分（欧拉、龙格-库塔、辛积分、李群积分）与误差
+  - id: '7.3'
+    title: 非线性方程求解（牛顿法）
+  - id: '7.4'
+    title: 数值微分与刚性问题
+- 'no': 8
+  title: 优化基础
+  level: 基础/进阶
+  part: 第一篇 数学基础篇
+  sections:
+  - id: '8.1'
+    title: 无约束优化：梯度下降、牛顿法
+  - id: '8.2'
+    title: 约束优化与拉格朗日乘子
+  - id: '8.3'
+    title: 二次规划
+  - id: '8.4'
+    title: 凸优化入门
+  - id: '8.5'
+    title: 非线性最小二乘：高斯-牛顿、LM
+- 'no': 9
+  title: 概率与估计基础
+  level: 基础
+  part: 第一篇 数学基础篇
+  sections:
+  - id: '9.1'
+    title: 随机变量与高斯分布
+  - id: '9.2'
+    title: 协方差与不确定性传播
+  - id: '9.3'
+    title: 贝叶斯公式
+  - id: '9.4'
+    title: 最大似然与最小二乘
+  - id: '9.5'
+    title: 为卡尔曼滤波做准备
+- 'no': 10
+  title: 点的运动学
+  level: 基础
+  part: 第二篇 运动学篇
+  sections:
+  - id: '10.1'
+    title: 参考系与坐标系：运动学研究什么
+  - id: '10.2'
+    title: 直角坐标下的位置、速度、加速度
+  - id: '10.3'
+    title: 柱面坐标与极坐标：径向、横向分量
+  - id: '10.4'
+    title: 球面坐标
+  - id: '10.5'
+    title: 自然坐标：切向加速度与法向加速度，曲率
+  - id: '10.6'
+    title: 旋转参考系：绝对、相对与牵连运动；科氏加速度与向心加速度
+  - id: '10.7'
+    title: 为什么刚体需要六个数：从点过渡到刚体
+- 'no': 11
+  title: 机构、自由度与构型空间
+  level: 基础
+  part: 第二篇 运动学篇
+  sections:
+  - id: '11.1'
+    title: 连杆与关节类型（关节即旋量）
+  - id: '11.2'
+    title: 自由度与 Grübler 公式
+  - id: '11.3'
+    title: 构型空间与任务空间
+  - id: '11.4'
+    title: 工作空间
+  - id: '11.5'
+    title: 闭链与约束
+- 'no': 12
+  title: 正运动学：指数积公式
+  level: 基础
+  part: 第二篇 运动学篇
+  sections:
+  - id: '12.1'
+    title: 零位与关节旋量
+  - id: '12.2'
+    title: 空间形式与物体形式
+  - id: '12.3'
+    title: UR5e、Panda、SCARA 实例
+  - id: '12.4'
+    title: 指数积的几何直观
+- 'no': 13
+  title: 正运动学：DH 参数法
+  level: 基础
+  part: 第二篇 运动学篇
+  sections:
+  - id: '13.1'
+    title: 标准 DH 与改进 DH（Craig）
+  - id: '13.2'
+    title: 建立连杆坐标系的步骤
+  - id: '13.3'
+    title: UR5e 的 DH 参数表（厂商手册形式）
+  - id: '13.4'
+    title: DH 与指数积的对照与相互换算
+  - id: '13.5'
+    title: DH 的局限
+- 'no': 14
+  title: 逆运动学：解析解
+  level: 基础
+  part: 第二篇 运动学篇
+  sections:
+  - id: '14.1'
+    title: 可解性与多解
+  - id: '14.2'
+    title: 平面两连杆、三连杆
+  - id: '14.3'
+    title: Paden–Kahan 子问题（旋量法的解析逆解）
+  - id: '14.4'
+    title: Pieper 准则与六轴臂的封闭解
+  - id: '14.5'
+    title: UR5e 的 8 组解
+  - id: '14.6'
+    title: SCARA 与 Delta 的逆解
+- 'no': 15
+  title: 逆运动学：数值解
+  level: 基础
+  part: 第二篇 运动学篇
+  sections:
+  - id: '15.1'
+    title: 李群上的牛顿-拉夫森迭代
+  - id: '15.2'
+    title: 雅可比转置法
+  - id: '15.3'
+    title: 阻尼最小二乘
+  - id: '15.4'
+    title: 关节限位与多目标
+  - id: '15.5'
+    title: 收敛与初值
+- 'no': 16
+  title: 速度运动学与雅可比矩阵
+  level: 基础
+  part: 第二篇 运动学篇
+  sections:
+  - id: '16.1'
+    title: 空间雅可比与物体雅可比
+  - id: '16.2'
+    title: 解析雅可比与几何雅可比的关系
+  - id: '16.3'
+    title: 奇异性及其物理意义
+  - id: '16.4'
+    title: 可操作度椭球
+  - id: '16.5'
+    title: 静力学：τ = Jᵀ F
+  - id: '16.6'
+    title: 灵巧性指标
+- 'no': 17
+  title: 冗余机器人
+  level: 进阶
+  part: 第二篇 运动学篇
+  sections:
+  - id: '17.1'
+    title: 冗余度
+  - id: '17.2'
+    title: 零空间运动
+  - id: '17.3'
+    title: 次要任务：避限位、避障、提高可操作度
+  - id: '17.4'
+    title: 七轴 Panda 实例
+- 'no': 18
+  title: 并联机构
+  level: 进阶
+  part: 第二篇 运动学篇
+  sections:
+  - id: '18.1'
+    title: 并联与串联对比
+  - id: '18.2'
+    title: 旋量理论分析并联机构的约束与奇异
+  - id: '18.3'
+    title: Stewart 平台的逆解与正解
+  - id: '18.4'
+    title: Delta 机器人
+- 'no': 19
+  title: 移动机器人运动学
+  level: 基础
+  part: 第二篇 运动学篇
+  sections:
+  - id: '19.1'
+    title: 非完整约束
+  - id: '19.2'
+    title: 差速驱动
+  - id: '19.3'
+    title: 全向轮与麦克纳姆轮
+  - id: '19.4'
+    title: 阿克曼转向
+  - id: '19.5'
+    title: 里程计
+- 'no': 20
+  title: 足式与仿人机器人运动学
+  level: 进阶
+  part: 第二篇 运动学篇
+  sections:
+  - id: '20.1'
+    title: 腿的运动学
+  - id: '20.2'
+    title: 浮动基座
+  - id: '20.3'
+    title: 步态与支撑相
+  - id: '20.4'
+    title: 质心与支撑多边形
+  - id: '20.5'
+    title: Go2 与仿人实例
+- 'no': 21
+  title: 空中机器人运动学
+  level: 进阶
+  part: 第二篇 运动学篇
+  sections:
+  - id: '21.1'
+    title: 四旋翼结构
+  - id: '21.2'
+    title: 姿态与位置的耦合
+  - id: '21.3'
+    title: 欠驱动
+  - id: '21.4'
+    title: 微分平坦
+- 'no': 22
+  title: 轨迹规划
+  level: 基础
+  part: 第二篇 运动学篇
+  sections:
+  - id: '22.1'
+    title: 点到点：三次、五次多项式
+  - id: '22.2'
+    title: 梯形与 S 形速度曲线
+  - id: '22.3'
+    title: 样条与过路径点
+  - id: '22.4'
+    title: 笛卡尔直线与圆弧
+  - id: '22.5'
+    title: SE(3) 上的位姿插值
+  - id: '22.6'
+    title: 时间最优轨迹
+- 'no': 23
+  title: 刚体动力学基础
+  level: 基础
+  part: 第三篇 动力学篇
+  sections:
+  - id: '23.1'
+    title: 质量、质心与惯量张量
+  - id: '23.2'
+    title: 平行轴定理
+  - id: '23.3'
+    title: 旋量形式的牛顿-欧拉方程（空间惯量）
+  - id: '23.4'
+    title: 动量与能量
+  - id: '23.5'
+    title: 从零件库模型读取惯性参数
+- 'no': 24
+  title: 拉格朗日动力学
+  level: 基础
+  part: 第三篇 动力学篇
+  sections:
+  - id: '24.1'
+    title: 广义坐标与拉格朗日方程
+  - id: '24.2'
+    title: 两连杆臂的完整推导
+  - id: '24.3'
+    title: M(q)、C(q, q̇)、g(q) 的结构
+  - id: '24.4'
+    title: 能量守恒检验
+- 'no': 25
+  title: 旋量形式的牛顿-欧拉递推
+  level: 基础/进阶
+  part: 第三篇 动力学篇
+  sections:
+  - id: '25.1'
+    title: 前向递推运动旋量与加速度
+  - id: '25.2'
+    title: 反向递推力旋量
+  - id: '25.3'
+    title: 闭式动力学方程
+  - id: '25.4'
+    title: 计算量对比
+  - id: '25.5'
+    title: UR5e 关节力矩计算
+- 'no': 26
+  title: 动力学性质与参数辨识
+  level: 进阶
+  part: 第三篇 动力学篇
+  sections:
+  - id: '26.1'
+    title: 正定性、反对称性、线性参数化
+  - id: '26.2'
+    title: 激励轨迹设计
+  - id: '26.3'
+    title: 最小二乘辨识
+  - id: '26.4'
+    title: 摩擦模型
+- 'no': 27
+  title: 接触、碰撞与摩擦
+  level: 进阶
+  part: 第三篇 动力学篇
+  sections:
+  - id: '27.1'
+    title: 接触模型
+  - id: '27.2'
+    title: 库仑摩擦与摩擦锥
+  - id: '27.3'
+    title: 碰撞与恢复系数
+  - id: '27.4'
+    title: 抓取的力封闭（力旋量分析）
+- 'no': 28
+  title: 移动、足式与空中机器人的动力学
+  level: 进阶
+  part: 第三篇 动力学篇
+  sections:
+  - id: '28.1'
+    title: 轮式动力学与打滑
+  - id: '28.2'
+    title: 线性倒立摆模型（LIP）与零力矩点（ZMP）
+  - id: '28.3'
+    title: 四旋翼动力学
+  - id: '28.4'
+    title: 浮动基座动力学
+- 'no': 29
+  title: 动力学仿真
+  level: 基础
+  part: 第三篇 动力学篇
+  sections:
+  - id: '29.1'
+    title: 物理引擎原理
+  - id: '29.2'
+    title: MuJoCo 模型（MJCF）
+  - id: '29.3'
+    title: 时间步长与稳定性
+  - id: '29.4'
+    title: 仿真与现实的差距
+- 'no': 30
+  title: 机器人总体设计
+  level: 基础
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '30.1'
+    title: 需求分析：负载、工作空间、节拍、精度
+  - id: '30.2'
+    title: 构型选择
+  - id: '30.3'
+    title: 尺寸综合
+  - id: '30.4'
+    title: 机电一体化设计流程与评审
+- 'no': 31
+  title: 结构、材料与强度
+  level: 进阶
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '31.1'
+    title: 连杆受力分析
+  - id: '31.2'
+    title: 刚度与变形
+  - id: '31.3'
+    title: 有限元入门
+  - id: '31.4'
+    title: 材料与轻量化
+  - id: '31.5'
+    title: 振动与模态
+- 'no': 32
+  title: 传动与减速器
+  level: 基础
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '32.1'
+    title: 齿轮传动基础
+  - id: '32.2'
+    title: 谐波减速器
+  - id: '32.3'
+    title: RV 减速器
+  - id: '32.4'
+    title: 行星减速器
+  - id: '32.5'
+    title: 丝杠、带与连杆传动
+  - id: '32.6'
+    title: 背隙、刚度与效率
+- 'no': 33
+  title: 末端执行器
+  level: 基础
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '33.1'
+    title: 平行夹爪与自适应夹爪
+  - id: '33.2'
+    title: 真空吸盘（零件库 OnRobot）
+  - id: '33.3'
+    title: 工具快换与专用工具
+  - id: '33.4'
+    title: 抓取力计算
+- 'no': 34
+  title: 数字样机
+  level: 基础
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '34.1'
+    title: CAD 建模与装配
+  - id: '34.2'
+    title: URDF 与 MJCF
+  - id: '34.3'
+    title: 从 CAD 到仿真模型
+  - id: '34.4'
+    title: 问渠零件库与 FreeCAD 插入
+- 'no': 35
+  title: 电路与电子基础
+  level: 基础
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '35.1'
+    title: 电路定律与等效
+  - id: '35.2'
+    title: RC、RL 与滤波
+  - id: '35.3'
+    title: 二极管与三极管、MOSFET 开关
+  - id: '35.4'
+    title: 运算放大器
+  - id: '35.5'
+    title: 数字电路与逻辑
+  - id: '35.6'
+    title: 读懂原理图与数据手册
+- 'no': 36
+  title: 电机原理与驱动电路
+  level: 基础
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '36.1'
+    title: 直流有刷、无刷、步进、伺服电机原理与模型
+  - id: '36.2'
+    title: 转矩-转速特性与选型（峰值与均方根转矩）
+  - id: '36.3'
+    title: H 桥与 PWM 调速
+  - id: '36.4'
+    title: 无刷电机驱动：换相与磁场定向控制（FOC）
+  - id: '36.5'
+    title: 电流采样与保护
+  - id: '36.6'
+    title: 液压与气动驱动简介
+- 'no': 37
+  title: 控制器硬件
+  level: 基础
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '37.1'
+    title: 单片机与嵌入式系统（GPIO、定时器、中断、ADC）
+  - id: '37.2'
+    title: 可编程控制器（PLC）与梯形图
+  - id: '37.3'
+    title: 运动控制卡与伺服驱动器
+  - id: '37.4'
+    title: 工控机与实时系统
+  - id: '37.5'
+    title: 机器人控制柜的组成
+- 'no': 38
+  title: 传感器原理
+  level: 基础
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '38.1'
+    title: 编码器（增量、绝对、磁编）
+  - id: '38.2'
+    title: 惯性测量单元（IMU）
+  - id: '38.3'
+    title: 力/力矩传感器与应变片
+  - id: '38.4'
+    title: 接近、光电、限位开关
+  - id: '38.5'
+    title: 相机与深度相机
+  - id: '38.6'
+    title: 激光雷达与安全激光扫描仪（零件库 SICK）
+  - id: '38.7'
+    title: 触觉传感器
+- 'no': 39
+  title: 信号调理与自动检测
+  level: 基础
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '39.1'
+    title: 测量误差与不确定度
+  - id: '39.2'
+    title: 惠斯通电桥与放大
+  - id: '39.3'
+    title: 模数转换：采样定理、分辨率、混叠
+  - id: '39.4'
+    title: 数字滤波
+  - id: '39.5'
+    title: 传感器标定
+  - id: '39.6'
+    title: 自动检测系统：测试工位、判定规则、统计过程控制
+- 'no': 40
+  title: 通信与总线
+  level: 进阶
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '40.1'
+    title: 串口、I²C、SPI
+  - id: '40.2'
+    title: CAN 总线
+  - id: '40.3'
+    title: 工业以太网与 EtherCAT
+  - id: '40.4'
+    title: 实时性与同步
+  - id: '40.5'
+    title: 无线通信
+- 'no': 41
+  title: 电源、电池与电气安全
+  level: 进阶
+  part: 第四篇 结构与机电设计篇
+  sections:
+  - id: '41.1'
+    title: 电源设计与配电
+  - id: '41.2'
+    title: 锂电池与电池管理
+  - id: '41.3'
+    title: 电磁兼容与接地
+  - id: '41.4'
+    title: 电气安全与急停回路
+  - id: '41.5'
+    title: 机器人安全标准（ISO 10218、ISO/TS 15066）与协作安全
+- 'no': 42
+  title: 控制理论基础
+  level: 基础
+  part: 第五篇 控制篇
+  sections:
+  - id: '42.1'
+    title: 传递函数与状态空间
+  - id: '42.2'
+    title: 稳定性
+  - id: '42.3'
+    title: 时域与频域性能
+  - id: '42.4'
+    title: PID 控制与整定
+  - id: '42.5'
+    title: 数字控制与离散化
+- 'no': 43
+  title: 单关节控制
+  level: 基础
+  part: 第五篇 控制篇
+  sections:
+  - id: '43.1'
+    title: 电机与负载模型
+  - id: '43.2'
+    title: 电流、速度、位置三环
+  - id: '43.3'
+    title: 前馈与重力补偿
+  - id: '43.4'
+    title: 柔性关节
+- 'no': 44
+  title: 多关节运动控制
+  level: 基础/进阶
+  part: 第五篇 控制篇
+  sections:
+  - id: '44.1'
+    title: 独立关节 PD
+  - id: '44.2'
+    title: 计算力矩法
+  - id: '44.3'
+    title: 鲁棒控制
+  - id: '44.4'
+    title: 自适应控制
+  - id: '44.5'
+    title: 李雅普诺夫稳定性
+- 'no': 45
+  title: 力控制与阻抗控制
+  level: 进阶
+  part: 第五篇 控制篇
+  sections:
+  - id: '45.1'
+    title: 力旋量空间中的力位混合控制
+  - id: '45.2'
+    title: 阻抗与导纳控制
+  - id: '45.3'
+    title: 协作机器人拖动示教
+  - id: '45.4'
+    title: 轴孔装配
+- 'no': 46
+  title: 状态估计
+  level: 进阶
+  part: 第五篇 控制篇
+  sections:
+  - id: '46.1'
+    title: 卡尔曼滤波
+  - id: '46.2'
+    title: 扩展卡尔曼、无迹卡尔曼与李群上的滤波
+  - id: '46.3'
+    title: 粒子滤波
+  - id: '46.4'
+    title: 传感器融合
+- 'no': 47
+  title: 移动机器人：定位、建图与导航
+  level: 进阶
+  part: 第五篇 控制篇
+  sections:
+  - id: '47.1'
+    title: 地图表示
+  - id: '47.2'
+    title: 定位
+  - id: '47.3'
+    title: SLAM 入门
+  - id: '47.4'
+    title: 路径规划与跟踪
+  - id: '47.5'
+    title: 车间 AGV 导航
+- 'no': 48
+  title: 足式与仿人机器人控制
+  level: 专题
+  part: 第五篇 控制篇
+  sections:
+  - id: '48.1'
+    title: ZMP 步行
+  - id: '48.2'
+    title: 模型预测控制（MPC）
+  - id: '48.3'
+    title: 全身控制（WBC）
+  - id: '48.4'
+    title: 学习型运动控制（与第 56 章呼应）
+  - id: '48.5'
+    title: 平衡与抗扰
+- 'no': 49
+  title: 四旋翼控制
+  level: 进阶
+  part: 第五篇 控制篇
+  sections:
+  - id: '49.1'
+    title: SO(3) 上的姿态控制
+  - id: '49.2'
+    title: 位置控制
+  - id: '49.3'
+    title: 轨迹跟踪
+  - id: '49.4'
+    title: 抗风扰
+- 'no': 50
+  title: 视觉伺服
+  level: 专题
+  part: 第五篇 控制篇
+  sections:
+  - id: '50.1'
+    title: 基于位置的视觉伺服
+  - id: '50.2'
+    title: 基于图像的视觉伺服
+  - id: '50.3'
+    title: 手眼标定
+- 'no': 51
+  title: 机器人编程基础
+  level: 基础
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '51.1'
+    title: Python 与科学计算
+  - id: '51.2'
+    title: 示教编程
+  - id: '51.3'
+    title: 工业机器人语言概览
+  - id: '51.4'
+    title: 离线编程
+- 'no': 52
+  title: ROS 2
+  level: 基础
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '52.1'
+    title: 节点、话题、服务、动作
+  - id: '52.2'
+    title: 坐标变换（tf2）
+  - id: '52.3'
+    title: URDF 与可视化
+  - id: '52.4'
+    title: 仿真联调
+  - id: '52.5'
+    title: ros2_control 与硬件接口
+- 'no': 53
+  title: 运动规划
+  level: 进阶
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '53.1'
+    title: 构型空间中的障碍
+  - id: '53.2'
+    title: 碰撞检测
+  - id: '53.3'
+    title: PRM 与 RRT
+  - id: '53.4'
+    title: 轨迹优化
+  - id: '53.5'
+    title: MoveIt
+- 'no': 54
+  title: 机器人视觉
+  level: 进阶
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '54.1'
+    title: 相机模型与标定
+  - id: '54.2'
+    title: 图像处理基础
+  - id: '54.3'
+    title: 目标检测与分割
+  - id: '54.4'
+    title: 位姿估计
+  - id: '54.5'
+    title: 点云处理
+- 'no': 55
+  title: 机器学习基础
+  level: 基础
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '55.1'
+    title: 回归与分类
+  - id: '55.2'
+    title: 神经网络与反向传播
+  - id: '55.3'
+    title: 训练、验证与过拟合
+  - id: '55.4'
+    title: Transformer 与注意力（为具身智能做准备）
+- 'no': 56
+  title: 强化学习
+  level: 进阶
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '56.1'
+    title: 马尔可夫决策过程
+  - id: '56.2'
+    title: 价值方法与策略梯度（PPO）
+  - id: '56.3'
+    title: 奖励设计
+  - id: '56.4'
+    title: 大规模并行仿真训练
+  - id: '56.5'
+    title: 仿真到现实：域随机化与系统辨识
+  - id: '56.6'
+    title: 足式运动学习实例
+- 'no': 57
+  title: 模仿学习与数据
+  level: 专题
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '57.1'
+    title: 行为克隆
+  - id: '57.2'
+    title: 示教数据采集：遥操作、动作捕捉、人类视频
+  - id: '57.3'
+    title: 动作分块与扩散策略、流匹配
+  - id: '57.4'
+    title: 数据集与数据飞轮
+- 'no': 58
+  title: 具身智能：原理
+  level: 专题
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '58.1'
+    title: 从“编程”到“学习”：具身智能是什么
+  - id: '58.2'
+    title: 视觉-语言-动作模型（VLA）：结构、动作表示（离散 token 与连续动作）
+  - id: '58.3'
+    title: 分层架构：慢思考（语义推理）+ 快反应（视觉运动策略）+ 全身控制器
+  - id: '58.4'
+    title: 世界模型：预测与想象
+  - id: '58.5'
+    title: 数据从哪里来：真机、仿真、合成数据、人类视频
+  - id: '58.6'
+    title: 评测、泛化与安全
+- 'no': 59
+  title: 具身智能：主要技术路线探秘
+  level: 专题
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '59.1'
+    title: Figure（Helix）：三层分层架构
+  - id: '59.2'
+    title: 特斯拉（Optimus）：沿用自动驾驶的端到端神经网络路线，从遥操作数据转向从人类视频中学习，依托自家工厂大规模部署。
+  - id: '59.3'
+    title: 宇树（Unitree）：
+  - id: '59.4'
+    title: 其他代表：
+  - id: '59.5'
+    title: 路线比较：
+  - id: '59.6'
+    title: 开放问题与趋势
+- 'no': 60
+  title: 系统集成与数字工厂
+  level: 进阶
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '60.1'
+    title: 机器人工作站设计
+  - id: '60.2'
+    title: 产线节拍与瓶颈
+  - id: '60.3'
+    title: 多 AGV 调度
+  - id: '60.4'
+    title: 生产数据与质量控制
+  - id: '60.5'
+    title: 数字孪生
+- 'no': 61
+  title: 伦理、法规与职业
+  level: 基础
+  part: 第六篇 编程与 AI 篇
+  sections:
+  - id: '61.1'
+    title: 伦理与社会影响
+  - id: '61.2'
+    title: 法规与责任
+  - id: '61.3'
+    title: 工程师的职业责任
