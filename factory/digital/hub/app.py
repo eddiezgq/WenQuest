@@ -17,6 +17,7 @@ import secrets
 import sys
 import threading
 import time
+import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.dirname(HERE), os.path.dirname(os.path.dirname(HERE))]
@@ -33,6 +34,7 @@ from factory import data as F  # noqa: E402
 from hub import kpi, mrp  # noqa: E402
 from hub import select as lib_select  # noqa: E402
 from hub import design as design_web  # noqa: E402
+from hub import erp_sso  # noqa: E402
 from hub.ai import Assistant, ROLE_NAMES  # noqa: E402
 from hub.db import DB  # noqa: E402
 from hub.historian import Historian  # noqa: E402
@@ -716,6 +718,68 @@ def design_publish(item: str, body: dict = Body(...), u=Depends(user_of)):
         return design_web.publish(H.db, emit, params, who(u), u["mode"], (body.get("change_note") or "").strip()[:200])
     except ValueError as e:
         raise HTTPException(422, str(e))
+
+
+# ---------------------------------------------------------------- ERPNext 单点登录（第 7 轮）
+_codes = erp_sso.Codes()
+
+
+@app.get("/api/oauth/authorize")
+def oauth_authorize(request: Request, client_id: str = "", redirect_uri: str = "", state: str = "",
+                    response_type: str = "code", wq_token: str = ""):
+    """ERPNext 登录页跳过来：核对问渠账号 → 在 ERPNext 建好账号 → 带一次性授权码回去"""
+    if client_id != erp_sso.CLIENT_ID or response_type != "code" or not erp_sso.valid_redirect(redirect_uri):
+        raise HTTPException(400, "登录请求不合规范")
+    if not erp_sso.enabled():
+        raise HTTPException(503, "ERPNext 单点登录还没有配置")
+    if AUTH == "wenquest":
+        w = wenquest_user(request.cookies.get(SSO_COOKIE, ""))
+        if not w:                                    # 还没登录学习平台：先去登录，登录后回到这里
+            from fastapi.responses import RedirectResponse
+            proto = request.headers.get("x-forwarded-proto") or request.url.scheme
+            here = "{}://{}{}?{}".format(proto, request.headers.get("host") or request.url.netloc,
+                                         request.url.path, request.url.query)
+            return RedirectResponse((LOGIN_URL or "/") + "?back=" + urllib.parse.quote(here, safe=""), 302)
+        person = {"uid": w["id"], "name": w["fullname"] or w["username"], "teacher": w["teacher"]}
+    else:                                            # 本地版（和 CI 演练）：用工作台凭证代表身份
+        try:
+            u = user_of(wq_token)
+        except HTTPException:
+            raise HTTPException(401, "本地版请带工作台登录凭证 wq_token")
+        person = {"uid": erp_sso.local_uid(u["name"]), "name": u["name"], "teacher": u.get("teacher", True)}
+    ident = erp_sso.erp_identity(person, erp_sso.config()["user_domain"])
+    try:
+        erp_sso.provision(ident)
+    except Exception as e:  # noqa: BLE001
+        log.exception("ERPNext 建账号失败")
+        raise HTTPException(502, "ERPNext 暂时不能登录：{}".format(e))
+    code = _codes.issue(ident, redirect_uri)
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse("{}?{}".format(redirect_uri, urllib.parse.urlencode({"code": code, "state": state})), 302)
+
+
+@app.post("/api/oauth/token")
+async def oauth_token(request: Request):
+    """ERPNext 服务器用授权码和密钥换令牌（表单提交）"""
+    f = await request.form()
+    if not erp_sso.check_client(f.get("client_id"), f.get("client_secret")):
+        return JSONResponse({"error": "invalid_client"}, 401)
+    if f.get("grant_type") != "authorization_code":
+        return JSONResponse({"error": "unsupported_grant_type"}, 400)
+    ident = _codes.take(f.get("code", ""), f.get("redirect_uri", ""))
+    if not ident:
+        return JSONResponse({"error": "invalid_grant"}, 400)
+    key = erp_sso.config()["secret"].encode()
+    return {"access_token": erp_sso.sign_token(ident, key), "token_type": "Bearer", "expires_in": erp_sso.TOKEN_TTL}
+
+
+@app.get("/api/oauth/userinfo")
+def oauth_userinfo(authorization: str = Header(default="")):
+    key = erp_sso.config()["secret"].encode()
+    body = erp_sso.read_token(authorization.replace("Bearer ", "", 1).strip(), key) if key else None
+    if not body:
+        return JSONResponse({"error": "invalid_token"}, 401)
+    return {k: body[k] for k in ("sub", "email", "email_verified", "name", "given_name")}
 
 
 @app.get("/api/freecad/pack.zip")

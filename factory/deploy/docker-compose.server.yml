@@ -73,6 +73,11 @@ services:
       WQ_MQTT_WS: wss://factory.${SITE_DOMAIN}/mqtt
       WQ_ERPNEXT_URL: https://erp.${SITE_DOMAIN}
       WQ_NODERED_URL: ""
+      # ERPNext 单点登录（第 7 轮）：枢纽替问渠账号在 ERPNext 建账号，再交给 ERPNext 登录
+      WQ_ERPNEXT_API: http://erp-frontend:8080
+      WQ_ERP_API_KEY: ${WQ_ERP_API_KEY:-}
+      WQ_ERP_API_SECRET: ${WQ_ERP_API_SECRET:-}
+      WQ_ERP_OAUTH_SECRET: ${WQ_ERP_OAUTH_SECRET:-}
       WQ_AI_PER_HOUR: ${WQ_AI_PER_HOUR:-30}
       WQ_HISTORY_DAYS: ${WQ_HISTORY_DAYS:-30}
       WQ_LIBRARY_DIR: /library
@@ -95,6 +100,7 @@ services:
     networks:
       default: {}
       edge: { aliases: [wqf-hub] }
+      erp: { aliases: [wqf-hub] }          # ERPNext 服务器换令牌、取用户信息走内部网络（第 7 轮 E6）
 
   sim:
     <<: *app

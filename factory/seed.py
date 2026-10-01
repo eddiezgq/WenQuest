@@ -12,6 +12,7 @@
 import argparse
 import datetime as dt
 import json
+import os
 import sys
 import urllib.parse
 
@@ -67,6 +68,10 @@ class Client:
 
     def create(self, doctype, doc):
         r = self.s.post("{}/api/resource/{}".format(self.base, self._q(doctype)), json=doc, timeout=60)
+        return self._check(r)
+
+    def call(self, method, **kwargs):
+        r = self.s.post("{}/api/method/{}".format(self.base, method), data=kwargs, timeout=60)
         return self._check(r)
 
     def update(self, doctype, name, values):
@@ -336,6 +341,36 @@ class Seeder:
                 n += 1
         self.log("  更新 {} 个物料".format(n))
 
+    def erp_sso(self, factory_url, secret, hub_internal="http://wqf-hub:8100"):
+        """第 7 轮：问渠单点登录——只读角色与查看权限、社交登录“WenQuest”、登录页自动跳转脚本（可重复执行）"""
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "digital"))
+        from hub import erp_sso as E
+        c = self.c
+        if not c.get("Role", E.STUDENT_ROLE):
+            c.create("Role", {"role_name": E.STUDENT_ROLE, "desk_access": 1})
+            self.log("新建角色：" + E.STUDENT_ROLE)
+        have = {(p["parent"]) for p in c.find("Custom DocPerm", [["role", "=", E.STUDENT_ROLE]], ("parent",))}
+        for dt in E.STUDENT_READ_DOCTYPES:
+            if dt not in have:     # add() 会先把标准权限复制成自定义权限，再加这一条只读，不影响其他角色
+                c.call("frappe.core.page.permission_manager.permission_manager.add", parent=dt, role=E.STUDENT_ROLE, permlevel=0)
+        self.log("只读角色可查看 {} 种单据".format(len(E.STUDENT_READ_DOCTYPES)))
+        key = {"provider_name": "WenQuest", "social_login_provider": "Custom", "enable_social_login": 1,
+               "client_id": E.CLIENT_ID, "client_secret": secret, "base_url": factory_url.rstrip("/"), "custom_base_url": 1,
+               "authorize_url": "/api/oauth/authorize", "access_token_url": hub_internal + "/api/oauth/token",
+               "api_endpoint": hub_internal + "/api/oauth/userinfo", "redirect_url": E.CALLBACK_PATH,
+               "user_id_property": "sub", "sign_ups": "Deny"}
+        if c.get("Social Login Key", E.PROVIDER):
+            c.update("Social Login Key", E.PROVIDER, key)
+        else:
+            c.create("Social Login Key", key)
+        ws = c.get("Website Script", "Website Script") or {}
+        js = ws.get("javascript") or ""
+        a, b = "// >>> wenquest-sso", "// <<< wenquest-sso"
+        block = "{}\n{}\n{}".format(a, E.AUTO_LOGIN_JS, b)
+        js = (js[:js.index(a)] + block + js[js.index(b) + len(b):]) if a in js and b in js else (js + "\n" + block).strip()
+        c.update("Website Script", "Website Script", {"javascript": js})
+        self.log("问渠单点登录已配置：{} → ERPNext".format(factory_url))
+
     def run(self, opening_stock=False, teach_stock=False, factory_url=""):
         self.log("公司：{}（{}），币种 {}".format(self.company, self.abbr, self.currency))
         self.basics()
@@ -424,10 +459,17 @@ def main(argv=None):
     ap.add_argument("--teach-stock", action="store_true", help="线上教学工厂：放入实验 7 的关键物料库存并允许负库存")
     ap.add_argument("--factory-url", default="", help="数字工厂网址，物料上的“零件库页面”链接用，如 https://factory.example.com")
     ap.add_argument("--library-refs-only", action="store_true", help="只补零件库编号（已安装的服务器更新时用）")
+    ap.add_argument("--erp-sso-only", action="store_true", help="只配置问渠单点登录（第 7 轮；每次部署时执行）")
+    ap.add_argument("--sso-secret", default=os.environ.get("WQ_ERP_OAUTH_SECRET", ""), help="单点登录密钥（与枢纽相同）")
     args = ap.parse_args(argv)
     try:
         sd = Seeder(Client(args.url, args.user, args.password), args.company)
-        if args.library_refs_only:
+        if args.erp_sso_only:
+            if not (args.factory_url and args.sso_secret):
+                print("出错：--erp-sso-only 需要 --factory-url 和 --sso-secret", file=sys.stderr)
+                return 1
+            sd.erp_sso(args.factory_url, args.sso_secret)
+        elif args.library_refs_only:
             sd.library_refs(args.factory_url)
         else:
             sd.run(args.opening_stock, args.teach_stock, args.factory_url)

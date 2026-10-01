@@ -11,6 +11,8 @@ APP="${1:-}"; BRIDGE="${2:-}"
 
 # 课程接口只读钥匙（第 4 轮 C2）：没有就生成；学习平台的 deploy/update.sh 从这里读去用
 [ -n "$(envval WQ_FACTORY_READ_KEY)" ] || envset WQ_FACTORY_READ_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
+# ERPNext 单点登录密钥（第 7 轮 E5）：枢纽与 ERPNext 社交登录共用；没有就生成
+[ -n "$(envval WQ_ERP_OAUTH_SECRET)" ] || envset WQ_ERP_OAUTH_SECRET "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 
 if [ "$(envval FACTORY_INSTALLED)" != 1 ]; then
     # D1：ERPNext 加数字工厂约需 3 GB 内存。不够就停下，提示升级服务器，免得拖垮学习平台
@@ -45,6 +47,15 @@ for _ in $(seq 1 40); do
             else
                 log "警告：零件库编号没有同步到 ERPNext（不影响运行，下次部署再试）："
                 tail -5 /tmp/wq-libref.log
+            fi
+            # 问渠单点登录（第 7 轮 E5）：每次部署检查并补齐 ERPNext 侧设置
+            if dc run --rm seed python seed.py --url http://erp-frontend:8080 --user Administrator \
+                    --password "$(envval ERP_ADMIN_PASSWORD)" --erp-sso-only --sso-secret "$(envval WQ_ERP_OAUTH_SECRET)" \
+                    --factory-url "https://factory.$(envval SITE_DOMAIN)" > /tmp/wq-sso.log 2>&1; then
+                log "ERPNext 单点登录已配置。"
+            else
+                log "警告：ERPNext 单点登录没有配置成功（下次部署再试）："
+                tail -5 /tmp/wq-sso.log
             fi
         fi
         docker image prune -f >/dev/null
