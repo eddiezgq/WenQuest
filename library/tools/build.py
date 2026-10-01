@@ -117,6 +117,15 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
         d = Path(out_ver) / e["id"]
         d.mkdir(parents=True, exist_ok=True)
         extra = {}
+        try:                                               # 二维图（R3）：出不了不影响模型
+            import svg2d
+            svg = svg2d.drawing(e, row, nodes=None if nodes and nodes[0][0] == "__scene__" else nodes,
+                                part=nodes[0][1] if nodes and nodes[0][0] == "__scene__" else None)
+            if svg:
+                (d / (code + ".svg")).write_text(svg, encoding="utf-8")
+                extra["svg"] = "{}/{}.svg".format(e["id"], code)
+        except Exception as ex:  # noqa: BLE001
+            extra["svg_error"] = "{}: {}".format(type(ex).__name__, ex)[:200]
         if nodes and nodes[0][0] == "__scene__":          # 机器人：连杆分节点的场景 + 关节表
             from generators import b_robot
             part = nodes[0][1]
@@ -151,6 +160,8 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
         files = {"glb": "{}/{}.glb".format(e["id"], code), "png": "{}/{}.png".format(e["id"], code)}
         if extra.get("urdf"):
             files["urdf"] = extra.pop("urdf")
+        if extra.get("svg"):
+            files["svg"] = extra.pop("svg")
         if extra.get("mechanism"):
             files["motion"] = "{}/motion.csv".format(e["id"])
         return dict({"ref": wqlib.ref(e, size), "ok": True, "files": files, "s": round(time.time() - t0, 2),

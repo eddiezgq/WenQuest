@@ -111,6 +111,7 @@
               <a class="btn primary" :href="fileUrl(curSize?.files.glb)" download>glTF（米）</a>
               <a v-if="curSize?.files.urdf" class="btn" :href="fileUrl(curSize.files.urdf)" download>URDF</a>
               <a v-if="curSize?.files.motion" class="btn ghost" :href="fileUrl(curSize.files.motion)" download>运动表 CSV</a>
+              <a v-if="curSize?.files.svg" class="btn ghost" :href="fileUrl(curSize.files.svg)" download>二维图 SVG</a>
               <a v-if="!entry.robot && entry.kind !== 'mechanism'" class="btn" :href="entry.package">STEP / STL 压缩包（整族）</a>
               <a v-else-if="entry.model.engine.startsWith('menagerie:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 MJCF（{{ originName(entry.source.origin) }}）</a>
               <a v-else-if="entry.model.engine.startsWith('urdf:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 URDF（原仓库）</a>
@@ -165,6 +166,11 @@
                       <td class="num">{{ entry.dh.speed_deg_s?.[i] ? entry.dh.speed_deg_s[i] + ' °/s' : '' }}</td></tr></tbody>
                   </table></div>
                 </template>
+              </template>
+              <template v-else-if="dtab === '图纸'">
+                <a :href="fileUrl(curSize.files.svg)" target="_blank" rel="noopener" title="新窗口打开（可缩放、打印）">
+                  <img class="drawing" :src="fileUrl(curSize.files.svg)" :alt="entry.name.zh + ' 二维图'"></a>
+                <p class="small muted">{{ entry.id.startsWith('A') ? '主视图 + 俯视/侧视图，标总体尺寸，主要尺寸见标题栏上方' : entry.id.startsWith('B') ? '关节示意图（零位）' : '机构运动简图（默认参数）' }}；点图在新窗口打开。格式见《数字工厂资源接口约定》2.4。</p>
               </template>
               <template v-else-if="dtab === '机构'">
                 <div class="tbl-wrap">
@@ -365,7 +371,7 @@ const sizeRows = computed(() => {
 });
 const dtabList = computed(() => {
   if (!entry.value) return [];
-  return [...(entry.value.datasheet ? ['参数'] : []), entry.value.robot ? '关节' : entry.value.kind === 'mechanism' ? '机构' : '规格', ...(entry.value.teaching?.principle || entry.value.teaching?.uses ? ['教学'] : []), '来源'];
+  return [...(entry.value.datasheet ? ['参数'] : []), entry.value.robot ? '关节' : entry.value.kind === 'mechanism' ? '机构' : '规格', ...(curSize.value?.files?.svg ? ['图纸'] : []), ...(entry.value.teaching?.principle || entry.value.teaching?.uses ? ['教学'] : []), '来源'];
 });
 
 async function select(id, wantSize) {
@@ -594,6 +600,7 @@ onUnmounted(() => { cancelAnimationFrame(raf); ro?.disconnect(); disposeModel();
 .v-note { position: absolute; left: 10px; bottom: 8px; font-size: 11px; color: var(--muted); pointer-events: none; }
 .v-tools { position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; }
 .v-tools .btn { height: 28px; font-size: 12px; padding: 0 10px; }
+.drawing { width: 100%; border: 1px solid var(--line); background: #fff; display: block; }
 .joints { padding: 0 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 16px; max-height: 220px; overflow-y: auto; }
 .joints label { font-size: 12px; display: grid; grid-template-columns: 64px minmax(0, 1fr) 48px; align-items: center; gap: 6px; }
 .joints .jn { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
