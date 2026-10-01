@@ -1,0 +1,133 @@
+# D-GRP-ONROBOT-VG · OnRobot 电动真空吸盘夹爪（厂商目录，第 5 轮）
+schema: 1
+id: D-GRP-ONROBOT-VG
+kind: product
+name:
+  zh: OnRobot 电动真空吸盘夹爪
+  en: OnRobot electric vacuum gripper
+category: GRP
+tags:
+- 夹爪
+- 真空吸盘
+- 真空夹爪
+- 末端执行器
+- vacuum gripper
+- end effector
+- OnRobot
+standards: []
+params:
+- key: vacuum_max_pct
+  zh: 最大真空度
+  en: Max vacuum
+  role: perf
+  unit: '%'
+- key: vacuum_max_kPa
+  zh: 最大真空（负压）
+  en: Max vacuum (negative pressure)
+  role: perf
+  unit: kPa
+- key: air_flow_max_L_min
+  zh: 最大抽气流量
+  en: Max air flow
+  role: perf
+  unit: L/min
+- key: payload_rated_kg
+  zh: 额定负载
+  en: Rated payload
+  role: perf
+  unit: kg
+- key: payload_max_kg
+  zh: 最大负载
+  en: Max payload
+  role: perf
+  unit: kg
+- key: cups_max
+  zh: 吸盘数上限
+  en: Max vacuum cups
+  role: info
+  unit: 个
+- key: weight_kg
+  zh: 质量
+  en: Weight
+  role: info
+  unit: kg
+- key: ip_rating
+  zh: 防护等级
+  en: IP rating
+  role: info
+- key: power_V
+  zh: 供电电压（额定）
+  en: Supply voltage (typical)
+  role: info
+  unit: V DC
+- key: height_mm
+  zh: 外形高
+  en: Height
+  role: dim
+  unit: mm
+- key: width_mm
+  zh: 外形宽
+  en: Width
+  role: dim
+  unit: mm
+- key: depth_mm
+  zh: 外形深
+  en: Depth
+  role: dim
+  unit: mm
+specs: specs.csv
+default: VGC10
+model:
+  engine: proxy:box
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    w: width_mm
+    d: depth_mm
+    h: height_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载；外形按数据表 Dimensions 三个数字顺序录为 高 x 宽 x 深（VG10
+    105 x 146 x 146 可确认第一个是高）；VG10 取收拢状态
+source:
+  origin: vendor
+  vendor: OnRobot
+  catalog: OnRobot Datasheet VGC10 v1.7（PDF 页码）；OnRobot Datasheet VG10 v2.6（PDF 页码）
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 OnRobot 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 两次独立读取官方资料，结果一致；另抽查核对
+  data_sources:
+  - title: OnRobot Datasheet VGC10 v1.7（PDF 页码）
+    url: https://onrobot.com/storage/datasheets/vgc10/datasheet_vgc10_v1.7_en.pdf
+    retrieved: '2026-09-30'
+  - title: OnRobot Datasheet VG10 v2.6（PDF 页码）
+    url: https://onrobot.com/storage/datasheets/vg10/datasheet_vg10_v2.6_en.pdf
+    retrieved: '2026-09-30'
+  notes: 真空度上限 80 %（-0.810 bar，即 -81 kPa）；VGC10 用默认附件最大 6 kg，定制附件典型 10 kg、最大 15 kg（表中未单列“额定”，额定负载列留空，最大负载取
+    15 kg）；VG10 额定 10 kg、最大 15 kg。VG10 两臂可展开，展开外形 105 x 390 x 390 mm。供电 20.4～28.8
+    V，额定 24 V。官方提示：真空夹爪不要用于潮湿或有切削液的环境。
+vendor:
+  id: ONROBOT
+  name:
+    zh: OnRobot
+    en: OnRobot
+  site: https://onrobot.com
+  series: VGC10 / VG10
+teaching:
+  principle: 内置电动真空泵抽走吸盘与工件之间的空气，大气压把工件压在吸盘上；软件可调真空度，多个吸盘可分路控制，不用外接气源。
+  uses:
+  - 纸箱和板材搬运
+  - 码垛
+  - 平面工件上下料
+  courses:
+  - course: 机器人技术
+    chapter: 末端执行器
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - OnRobot

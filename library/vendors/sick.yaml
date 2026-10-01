@@ -1,0 +1,131 @@
+# SICK 二维激光扫描仪（第 5 轮第 3 步第 2 批）。每个型号取 sick.com 上该料号自己的英文 PDF 数据表（2026-07/08/09 版）。
+# page = 数据表页脚印的页码（与 PDF 第几页相同）；技术数据在第 2～3 页（波长在安全扫描仪数据表第 4 页），外形图在后页。
+# 外形：TiM、LMS1xx 数据表写 “Dimensions (L x W x H)”，L 为深；nanoScan3、microScan3 写 “Dimensions (W x H x D)”。已逐一换成 宽 w / 深 d / 高 h。
+# 每张表两次独立读取，数字一致；microScan3 的外形是否含系统插头另做第三次逐字核对。
+# 不收：microScan3 Core 单独传感器料号 MICS3-AAAZ40AZ1（1067360）数据表没有外形和质量，改收含系统插头的 1075842；
+#       microScan3 数据表没有“测距范围”一项，该列留空；TiM781S 数据表没有 SIL 和 PFHd，只收 PL b / Cat. B。
+vendor: {id: SICK, name: {zh: 西克（SICK）, en: SICK}, site: https://www.sick.com}
+retrieved: "2026-09-30"
+sources:
+  tim561: {title: "SICK Data sheet TiM561-2050101 (1071419), 2026-08-04", url: "https://www.sick.com/media/pdf/6/46/446/dataSheet_TiM561-2050101_1071419_en.pdf"}
+  tim571: {title: "SICK Data sheet TiM571-2050101 (1075091), 2026-08-04", url: "https://www.sick.com/media/pdf/4/44/444/dataSheet_TiM571-2050101_1075091_en.pdf"}
+  tim781: {title: "SICK Data sheet TIM781-2174101 (1096807), 2026-08-04", url: "https://www.sick.com/media/pdf/8/48/148/dataSheet_TIM781-2174101_1096807_en.pdf"}
+  tim781s: {title: "SICK Data sheet TIM781S-2174104 (1096363), 2026-09-18", url: "https://www.sick.com/media/pdf/9/49/149/dataSheet_TIM781S-2174104_1096363_en.pdf"}
+  nans3_core: {title: "SICK Data sheet nanoScan3 NANS3-AAAZ30AN1 (1100333), 2026-09-15", url: "https://www.sick.com/media/pdf/9/79/979/dataSheet_NANS3-AAAZ30AN1_1100333_en.pdf"}
+  nans3_pro: {title: "SICK Data sheet nanoScan3 NANS3-CAAZ30AN1 (1100334), 2026-09-15", url: "https://www.sick.com/media/pdf/0/80/980/dataSheet_NANS3-CAAZ30AN1_1100334_en.pdf"}
+  mics3_core: {title: "SICK Data sheet microScan3 MICS3-AAAZ40AZ1P01 (1075842), 2026-08-11", url: "https://www.sick.com/media/pdf/5/45/945/dataSheet_MICS3-AAAZ40AZ1P01_1075842_en.pdf"}
+  mics3_pro: {title: "SICK Data sheet microScan3 MICS3-CBAZ40ZA1P01 (1091037), 2026-08-11", url: "https://www.sick.com/media/pdf/4/44/544/dataSheet_MICS3-CBAZ40ZA1P01_1091037_en.pdf"}
+  lms111: {title: "SICK Data sheet LMS111-10100 (1041114), 2026-07-26", url: "https://www.sick.com/media/pdf/2/42/842/dataSheet_LMS111-10100_1041114_en.pdf"}
+  lms151: {title: "SICK Data sheet LMS151-10100 (1047607), 2026-07-26", url: "https://www.sick.com/media/pdf/0/40/840/dataSheet_LMS151-10100_1047607_en.pdf"}
+products:
+  - id: D-LDR-SICK-TIM
+    name: {zh: SICK TiM 小型二维激光扫描仪, en: SICK TiM compact 2D LiDAR sensor}
+    category: LDR
+    series: TiM5xx / TiM7xx / TiM7xxS
+    tags: [激光雷达, 二维激光雷达, 激光扫描仪, 2D LiDAR, 移动机器人, AGV, SLAM]
+    default: TiM571-2050101
+    proxy: box
+    dims: {w: width_mm, d: depth_mm, h: height_mm}
+    principle: 激光器发出红外脉冲，内部转镜让光束在一个平面内扫过 270°，测出每个方向上光从发出到反射回来的时间（飞行时间）就得到距离，一圈下来就是一条二维轮廓线。
+    uses: [移动机器人与 AGV 的避障和定位建图（SLAM）, 区域监控与物体检测, 机器人教学实验]
+    chapter: 激光雷达与环境感知
+    notes: "工作范围是最大量程（TiM781S 注明为反射率 >90%）；“10% 反射率扫描距离”是暗目标上的典型距离，均为 8 m。TiM781S 是安全型（PL b、Cat. B，EN ISO 13849-1），安全相关工作范围 0.05～5 m（5% 反射率），数据表未给 SIL/PFHd；TiM781S 只用于室内。质量不含连接电缆。TiM561 与 TiM571 区别在量程（10 m / 25 m），TiM781 在 TiM571 基础上增加数字输出等功能。"
+    checked_note: "两次独立读取 4 份官方数据表，所有数字一致；另核对外形行在第 2 页、标注为 L x W x H"
+    params:
+      - [part_no, 料号, Part no., info, ""]
+      - [range_min_m, 最小工作距离, Working range min, perf, m]
+      - [range_max_m, 最大工作距离, Working range max, perf, m]
+      - [range_10pct_m, 扫描距离（10% 反射率）, Scanning range at 10% remission, perf, m]
+      - [aperture_deg, 扫描角, Aperture angle, perf, °]
+      - [ang_res_deg, 角分辨率, Angular resolution, perf, °]
+      - [scan_freq_Hz, 扫描频率, Scanning frequency, perf, Hz]
+      - [safety_range_m, 安全相关工作范围（5% 反射率）, Safety-related working range (5% remission), perf, m]
+      - [safety_level, 安全等级, Safety level, info, ""]
+      - [wavelength_nm, 光源波长, Wavelength, info, nm]
+      - [ip_rating, 防护等级, Enclosure rating, info, ""]
+      - [voltage_V, 供电电压, Supply voltage, info, V DC]
+      - [power_W, 典型功耗, Typical power, info, W]
+      - [weight_g, 质量, Weight, info, g]
+      - [operating_temp, 工作温度, Operating temperature, info, ""]
+      - [width_mm, 宽, Width, dim, mm]
+      - [depth_mm, 深, Depth, dim, mm]
+      - [height_mm, 高, Height, dim, mm]
+    rows:
+      - {size: TiM561-2050101, src: tim561, page: 2–3, part_no: "1071419", range_min_m: 0.05, range_max_m: 10, range_10pct_m: 8, aperture_deg: 270, ang_res_deg: 0.33, scan_freq_Hz: 15, wavelength_nm: 850, ip_rating: IP67, voltage_V: 9～28, power_W: 4, weight_g: 250, operating_temp: -25～+50 °C, width_mm: 60, depth_mm: 60, height_mm: 86}
+      - {size: TiM571-2050101, src: tim571, page: 2–3, part_no: "1075091", range_min_m: 0.05, range_max_m: 25, range_10pct_m: 8, aperture_deg: 270, ang_res_deg: 0.33, scan_freq_Hz: 15, wavelength_nm: 850, ip_rating: IP67, voltage_V: 9～28, power_W: 4, weight_g: 250, operating_temp: -25～+50 °C, width_mm: 60, depth_mm: 60, height_mm: 86}
+      - {size: TiM781-2174101, src: tim781, page: 2–3, part_no: "1096807", range_min_m: 0.05, range_max_m: 25, range_10pct_m: 8, aperture_deg: 270, ang_res_deg: 0.33, scan_freq_Hz: 15, wavelength_nm: 850, ip_rating: IP67, voltage_V: 9～28, power_W: 4, weight_g: 250, operating_temp: -25～+50 °C, width_mm: 60, depth_mm: 60, height_mm: 86}
+      - {size: TiM781S-2174104, src: tim781s, page: 2–3, part_no: "1096363", range_min_m: 0.05, range_max_m: 25, range_10pct_m: 8, aperture_deg: 270, ang_res_deg: 0.33, scan_freq_Hz: 15, safety_range_m: 5, safety_level: "PL b, Cat. B", wavelength_nm: 850, ip_rating: IP67, voltage_V: 9～28, power_W: 4, weight_g: 250, operating_temp: -25～+50 °C, width_mm: 60, depth_mm: 60, height_mm: 86}
+  - id: D-LDR-SICK-SAFETY
+    name: {zh: SICK 安全激光扫描仪, en: SICK safety laser scanner}
+    category: LDR
+    series: nanoScan3 / microScan3
+    tags: [激光雷达, 安全激光扫描仪, 安全传感器, safety laser scanner, AGV, 移动机器人, 功能安全]
+    default: NANS3-AAAZ30AN1
+    proxy: box
+    dims: {w: width_mm, d: depth_mm, h: height_mm}
+    proxy_note: "microScan3 Pro 的高度不含装在底面的系统插头，实物更高"
+    principle: 与普通激光扫描仪一样靠激光飞行时间在一个平面内测距，但内部电路按功能安全标准做了冗余和自检；人或物体闯入事先设定的保护区时，安全输出在规定的响应时间内断开，让 AGV 或机器停下。
+    uses: [AGV 与移动机器人的人员防护和避障减速, 危险区域与机器人工作站的安全防护, 功能安全（PL/SIL）教学]
+    chapter: 激光雷达与环境感知
+    notes: "保护区范围是可设定的安全停机区域的最大半径；警告区范围是非安全的预警区。nanoScan3 的“测距范围 40 m”是数据输出的测距范围；microScan3 数据表没有这一项，留空。功耗为典型值，不含输出负载（microScan3 Pro 写 typical 7.2 W）。nanoScan3 外形含系统插头；microScan3 Core（1075842 = 传感器 1067360 + 系统插头 2073156）外形 112×135.1×111.1 mm；microScan3 Pro（1091037）数据表外形注明“不含系统插头”，质量 1.45 kg 未注明是否含插头。"
+    checked_note: "两次独立读取 4 份官方数据表，所有数字一致；microScan3 两型的外形行第三次逐字核对（Core 含插头、Pro 不含插头）"
+    params:
+      - [part_no, 料号, Part no., info, ""]
+      - [variant, 型式, Variant, key, ""]
+      - [protective_field_m, 保护区范围, Protective field range, perf, m]
+      - [warning_field_m, 警告区范围, Warning field range, perf, m]
+      - [measuring_range_m, 测距范围, Distance measuring range, perf, m]
+      - [scan_angle_deg, 扫描角, Scanning angle, perf, °]
+      - [ang_res_deg, 角分辨率, Angular resolution, perf, °]
+      - [response_time_ms, 响应时间, Response time, perf, ms]
+      - [sil, 安全完整性等级, Safety integrity level, perf, ""]
+      - [pl, 性能等级, Performance level, perf, ""]
+      - [category, 类别, Category, info, ""]
+      - [pfhd, PFHd, PFHd, info, 1/h]
+      - [wavelength_nm, 光源波长, Wavelength, info, nm]
+      - [ip_rating, 防护等级, Enclosure rating, info, ""]
+      - [voltage_V, 供电电压, Supply voltage, info, V DC]
+      - [power_W, 典型功耗, Typical power, info, W]
+      - [weight_kg, 质量, Weight, info, kg]
+      - [operating_temp, 工作温度, Operating temperature, info, ""]
+      - [width_mm, 宽, Width, dim, mm]
+      - [depth_mm, 深, Depth, dim, mm]
+      - [height_mm, 高, Height, dim, mm]
+    rows:
+      - {size: NANS3-AAAZ30AN1, src: nans3_core, page: 2–4, part_no: "1100333", variant: nanoScan3 Core I/O, protective_field_m: 3, warning_field_m: 10, measuring_range_m: 40, scan_angle_deg: 275, ang_res_deg: 0.17, response_time_ms: 70, sil: SIL 2 (IEC 61508), pl: PL d (EN ISO 13849), category: Cat. 3, pfhd: 8.0e-8, wavelength_nm: 905, ip_rating: IP65, voltage_V: 24（16.8～30）, power_W: 3.9, weight_kg: 0.67, operating_temp: -10～+50 °C, width_mm: 106.6, depth_mm: 117.5, height_mm: 80}
+      - {size: NANS3-CAAZ30AN1, src: nans3_pro, page: 2–4, part_no: "1100334", variant: nanoScan3 Pro I/O, protective_field_m: 3, warning_field_m: 10, measuring_range_m: 40, scan_angle_deg: 275, ang_res_deg: 0.17, response_time_ms: 70, sil: SIL 2 (IEC 61508), pl: PL d (EN ISO 13849), category: Cat. 3, pfhd: 8.0e-8, wavelength_nm: 905, ip_rating: IP65, voltage_V: 24（16.8～30）, power_W: 3.9, weight_kg: 0.67, operating_temp: -10～+50 °C, width_mm: 106.6, depth_mm: 117.5, height_mm: 80}
+      - {size: MICS3-AAAZ40AZ1P01, src: mics3_core, page: 2–4, part_no: "1075842", variant: microScan3 Core I/O, protective_field_m: 4, warning_field_m: 40, scan_angle_deg: 275, ang_res_deg: 0.39, response_time_ms: 70, sil: SIL 2 (IEC 61508), pl: PL d (EN ISO 13849), category: Cat. 3, pfhd: 8.0e-8, wavelength_nm: 845, ip_rating: IP65, voltage_V: 24（16.8～30）, power_W: 7, weight_kg: 1.15, operating_temp: -10～+50 °C, width_mm: 112, depth_mm: 111.1, height_mm: 135.1}
+      - {size: MICS3-CBAZ40ZA1P01, src: mics3_pro, page: 2–4, part_no: "1091037", variant: microScan3 Pro EFI-pro, protective_field_m: 4, warning_field_m: 40, scan_angle_deg: 275, ang_res_deg: 0.39, response_time_ms: 95, sil: SIL 2 (IEC 61508), pl: PL d (EN ISO 13849), category: Cat. 3, pfhd: 8.0e-8, wavelength_nm: 845, ip_rating: IP65, voltage_V: 24（16.8～30）, power_W: 7.2, weight_kg: 1.45, operating_temp: -10～+50 °C, width_mm: 112, depth_mm: 111.1, height_mm: 150.7}
+  - id: D-LDR-SICK-LMS1XX
+    name: {zh: SICK LMS1xx 二维激光扫描仪, en: SICK LMS1xx 2D LiDAR sensor}
+    category: LDR
+    series: LMS1xx
+    tags: [激光雷达, 二维激光雷达, 激光扫描仪, 2D LiDAR, 室外, 移动机器人]
+    default: LMS111-10100
+    proxy: box
+    dims: {w: width_mm, d: depth_mm, h: height_mm}
+    principle: 905 nm 红外激光脉冲经转镜在一个平面内扫过 270°，按飞行时间测距；壳体带加热，能在室外雨雾和低温下工作，常装在室外移动机器人和车辆上。
+    uses: [室外移动机器人导航与建图, 车辆与人员检测, 区域与围界监控]
+    chapter: 激光雷达与环境感知
+    notes: "扫描频率与角分辨率成对：25 Hz 时 0.25°，50 Hz 时 0.5°。典型功耗 8 W，加热时另需约 35 W。LMS111 与 LMS151 在 10% 反射率下都是 18 m，最大量程分别为 20 m、50 m（90% 反射率）。"
+    checked_note: "两次独立读取 2 份官方数据表，所有数字一致"
+    params:
+      - [part_no, 料号, Part no., info, ""]
+      - [range_min_m, 最小工作距离, Working range min, perf, m]
+      - [range_max_m, 最大工作距离（90% 反射率）, Working range max (90% remission), perf, m]
+      - [range_10pct_m, 扫描距离（10% 反射率）, Scanning range at 10% remission, perf, m]
+      - [aperture_deg, 扫描角, Aperture angle, perf, °]
+      - [ang_res_deg, 角分辨率, Angular resolution, perf, °]
+      - [scan_freq_Hz, 扫描频率, Scanning frequency, perf, Hz]
+      - [wavelength_nm, 光源波长, Wavelength, info, nm]
+      - [ip_rating, 防护等级, Enclosure rating, info, ""]
+      - [voltage_V, 供电电压, Supply voltage, info, V DC]
+      - [power_W, 典型功耗（不含加热）, Typical power (without heating), info, W]
+      - [weight_kg, 质量, Weight, info, kg]
+      - [operating_temp, 工作温度, Operating temperature, info, ""]
+      - [width_mm, 宽, Width, dim, mm]
+      - [depth_mm, 深, Depth, dim, mm]
+      - [height_mm, 高, Height, dim, mm]
+    rows:
+      - {size: LMS111-10100, src: lms111, page: 2–3, part_no: "1041114", range_min_m: 0.5, range_max_m: 20, range_10pct_m: 18, aperture_deg: 270, ang_res_deg: 0.25 或 0.5, scan_freq_Hz: 25 或 50, wavelength_nm: 905, ip_rating: IP67, voltage_V: 10.8～30, power_W: 8, weight_kg: 1.1, operating_temp: -30～+50 °C, width_mm: 102, depth_mm: 105, height_mm: 162}
+      - {size: LMS151-10100, src: lms151, page: 2–3, part_no: "1047607", range_min_m: 0.5, range_max_m: 50, range_10pct_m: 18, aperture_deg: 270, ang_res_deg: 0.25 或 0.5, scan_freq_Hz: 25 或 50, wavelength_nm: 905, ip_rating: IP67, voltage_V: 10.8～30, power_W: 8, weight_kg: 1.1, operating_temp: -30～+50 °C, width_mm: 102, depth_mm: 105, height_mm: 162}

@@ -1,0 +1,3 @@
+size,vacuum_max_pct,vacuum_max_kPa,air_flow_max_L_min,payload_rated_kg,payload_max_kg,cups_max,weight_kg,ip_rating,power_V,height_mm,width_mm,depth_mm,src_url,src_page
+VGC10,80,81,12,,15,7,0.814,IP54,24,101,100,100,https://onrobot.com/storage/datasheets/vgc10/datasheet_vgc10_v1.7_en.pdf,1-2
+VG10,80,81,12,10,15,16,1.62,IP54,24,105,146,146,https://onrobot.com/storage/datasheets/vg10/datasheet_vg10_v2.6_en.pdf,1-2

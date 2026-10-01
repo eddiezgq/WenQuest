@@ -1,0 +1,177 @@
+# D-RDC-NABTESCO-RVN · 纳博特斯克 RV-N 精密减速器（紧凑型）（厂商目录，第 5 轮）
+schema: 1
+id: D-RDC-NABTESCO-RVN
+kind: product
+name:
+  zh: 纳博特斯克 RV-N 精密减速器（紧凑型）
+  en: Nabtesco RV-N precision reduction gear (compact)
+category: RDC
+tags:
+- RV减速器
+- 摆线针轮减速器
+- 精密减速器
+- 机器人关节
+- cycloidal gear
+- RV reducer
+- 纳博特斯克
+- Nabtesco
+standards: []
+params:
+- key: ratios
+  zh: 标准减速比
+  en: Standard speed ratios
+  role: key
+- key: T0_Nm
+  zh: 额定转矩 T0
+  en: Rated torque T0
+  role: perf
+  unit: N·m
+- key: N0_rpm
+  zh: 额定输出转速 N0
+  en: Rated output speed N0
+  role: perf
+  unit: rpm
+- key: K_h
+  zh: 额定寿命 K
+  en: Rated service life K
+  role: perf
+  unit: h
+- key: TS1_Nm
+  zh: 启停允许转矩 TS1
+  en: Allowable acceleration/deceleration torque TS1
+  role: perf
+  unit: N·m
+- key: TS2_Nm
+  zh: 瞬时最大允许转矩 TS2
+  en: Momentary maximum allowable torque TS2
+  role: perf
+  unit: N·m
+- key: NS0_rpm
+  zh: 允许输出转速（占空比 100%）
+  en: Allowable output speed NS0 (100% duty)
+  role: perf
+  unit: rpm
+- key: NS1_rpm
+  zh: 允许输出转速（占空比 40%）
+  en: Allowable output speed NS1 (40% duty)
+  role: perf
+  unit: rpm
+- key: backlash_arcmin
+  zh: 背隙
+  en: Backlash
+  role: perf
+  unit: arcmin
+- key: lost_motion_arcmin
+  zh: 空程
+  en: Lost motion
+  role: perf
+  unit: arcmin
+- key: OD_mm
+  zh: 外径
+  en: Outer diameter
+  role: dim
+  unit: mm
+- key: A_mm
+  zh: 轴向长 A
+  en: Axial length A
+  role: dim
+  unit: mm
+- key: mass_kg
+  zh: 质量
+  en: Mass
+  role: info
+  unit: kg
+specs: specs.csv
+default: RV-42N
+model:
+  engine: proxy:cylinder
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    d: OD_mm
+    h: A_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载；RV 减速器画成圆柱示意；直径取外径，高度取官网数据表的轴向长 A
+source:
+  origin: vendor
+  vendor: Nabtesco
+  catalog: 'Nabtesco Precision Reduction Gear RV N Series catalogue (EN), rating table
+    p.9；Nabtesco Precision Europe: RV-N cycloidal gearbox with solid shaft (technical
+    data table)；Nabtesco Precision Europe: RV-25N；Nabtesco Precision Europe: RV-42N；Nabtesco
+    Precision Europe: RV-60N；Nabtesco Precision Europe: RV-80N；Nabtesco Precision
+    Europe: RV-100N；Nabtesco Precision Europe: RV-125N；Nabtesco Precision Europe:
+    RV-160N；Nabtesco Precision Europe: RV-380N；Nabtesco Precision Europe: RV-500N；Nabtesco
+    Precision Europe: RV-700N'
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 Nabtesco 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 样本额定表两次独立读取一致；外径、轴向长两次读取官网数据表一致，外径另与各型号页核对一致；RV-160N 的 NS1 原文矛盾，留空
+  data_sources:
+  - title: Nabtesco Precision Reduction Gear RV N Series catalogue (EN), rating table
+      p.9
+    url: https://www.nabtesco.de/fileadmin/04_Service/05_Downloads/01_Produktkataloge/RV-N_catalogue_EN.pdf
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-N cycloidal gearbox with solid shaft (technical
+      data table)'
+    url: https://www.nabtesco.de/en/products/cycloidal-gears/rv-n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-25N'
+    url: https://www.nabtesco.de/en/product/rv-25n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-42N'
+    url: https://www.nabtesco.de/en/product/rv-42n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-60N'
+    url: https://www.nabtesco.de/en/product/rv-60n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-80N'
+    url: https://www.nabtesco.de/en/product/rv-80n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-100N'
+    url: https://www.nabtesco.de/en/product/rv-100n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-125N'
+    url: https://www.nabtesco.de/en/product/rv-125n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-160N'
+    url: https://www.nabtesco.de/en/product/rv-160n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-380N'
+    url: https://www.nabtesco.de/en/product/rv-380n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-500N'
+    url: https://www.nabtesco.de/en/product/rv-500n
+    retrieved: '2026-09-30'
+  - title: 'Nabtesco Precision Europe: RV-700N'
+    url: https://www.nabtesco.de/en/product/rv-700n
+    retrieved: '2026-09-30'
+  notes: 减速比列出的是样本额定表中的标准减速比（以文本存），其他减速比需向厂商询问。背隙、空程为样本所列上限 1.0 arc min（空程在 ±3% 额定转矩下测量）。NS0、NS1
+    分别是占空比 100% 和 40% 时的允许输出转速，实际随占空比、负载和环境温度变化。RV-160N 的 NS1：样本读到 48 rpm、型号页写 73
+    rpm，互相矛盾，留空。轴向长 A 取自 nabtesco.de 系列页技术数据表的 A 列，未在样本外形图中复核是否含输出轴伸出部分。
+vendor:
+  id: NABTESCO
+  name:
+    zh: 纳博特斯克
+    en: Nabtesco
+  site: https://www.nabtesco.com
+  series: RV-N
+teaching:
+  principle: RV 减速器分两级：第一级是渐开线行星齿轮——输入轴上的太阳轮带动几个行星轮，先减一次速；行星轮装在曲柄轴上，第二级是摆线针轮——曲柄轴带两片摆线轮做偏心摆动，摆线轮与壳体内一圈针齿啮合，摆动一周只转过一个齿，再大幅减速后由曲柄轴把转动传到输出盘。两级合起来减速比大、刚性高、抗冲击，同时啮合的齿多，背隙小于
+    1 弧分。
+  uses:
+  - 工业机器人腰、肩、肘等重载关节
+  - 变位机与精密转台
+  - 机床刀库与分度盘
+  - 自动化搬运设备
+  courses:
+  - course: 机器人技术
+    chapter: 关节驱动与减速器
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - Nabtesco

@@ -1,0 +1,5 @@
+size,part_no,range_min_m,range_max_m,range_10pct_m,aperture_deg,ang_res_deg,scan_freq_Hz,safety_range_m,safety_level,wavelength_nm,ip_rating,voltage_V,power_W,weight_g,operating_temp,width_mm,depth_mm,height_mm,src_url,src_page
+TiM561-2050101,1071419,0.05,10,8,270,0.33,15,,,850,IP67,9～28,4,250,-25～+50 °C,60,60,86,https://www.sick.com/media/pdf/6/46/446/dataSheet_TiM561-2050101_1071419_en.pdf,2–3
+TiM571-2050101,1075091,0.05,25,8,270,0.33,15,,,850,IP67,9～28,4,250,-25～+50 °C,60,60,86,https://www.sick.com/media/pdf/4/44/444/dataSheet_TiM571-2050101_1075091_en.pdf,2–3
+TiM781-2174101,1096807,0.05,25,8,270,0.33,15,,,850,IP67,9～28,4,250,-25～+50 °C,60,60,86,https://www.sick.com/media/pdf/8/48/148/dataSheet_TIM781-2174101_1096807_en.pdf,2–3
+TiM781S-2174104,1096363,0.05,25,8,270,0.33,15,5,"PL b, Cat. B",850,IP67,9～28,4,250,-25～+50 °C,60,60,86,https://www.sick.com/media/pdf/9/49/149/dataSheet_TIM781S-2174104_1096363_en.pdf,2–3

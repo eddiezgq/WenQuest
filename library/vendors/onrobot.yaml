@@ -1,0 +1,85 @@
+# OnRobot 电动夹爪（第 5 轮第 3 步第 2 批）。全部取官网产品页链接的现行数据表 PDF（onrobot.com/storage/datasheets/…）；
+# page 写的是 PDF 第几页（1 起算），规格表在第 1～2 页（供电电压等“工作条件”有的在第 2 页）。每张表两次独立读取，数字一致。
+# 不收：RG6 的行程——数据表 v2.0 写 160 mm，官网产品页写 150 mm，原文矛盾，留空；RG2-FT、2FGP20、软夹爪、磁吸等非主力系列不收。
+# 外形：2FG7/2FG14 表头标明 [L x W x D]；RG2/RG6 的“213 x 149 x 36”“262 x 212 x 42”表头未标轴向，按 OnRobot 同一写法顺序录为 长 x 宽 x 厚；
+# 3FG15/3FG25 表头为 [L, W, Ø]，Ø 是三指张开的外包络直径，厚度列留空。数据表里的外形图是图片，读不到图上标注，未能用图核对轴向。
+# VG 真空吸盘：VGC10、VG10 外形齐全，另收一项；VG10 用收拢状态外形，展开 105 x 390 x 390 mm 写在 notes。
+vendor: {id: ONROBOT, name: {zh: OnRobot, en: OnRobot}, site: https://onrobot.com}
+retrieved: "2026-09-30"
+sources:
+  rg2: {title: "OnRobot Datasheet RG2 v1.8（PDF 页码）", url: "https://onrobot.com/storage/datasheets/rg2/datasheet_rg2_v1.8_en.pdf"}
+  rg6: {title: "OnRobot Datasheet RG6 v2.0（PDF 页码）", url: "https://onrobot.com/storage/datasheets/rg6/datasheet_rg6_v2.0_en.pdf"}
+  rg6_page: {title: "OnRobot RG6 产品页（行程 150 mm，与数据表 160 mm 不一致）", url: "https://onrobot.com/en/products/rg6-gripper"}
+  2fg7: {title: "OnRobot Datasheet 2FG7 v2.0（PDF 页码）", url: "https://onrobot.com/storage/datasheets/2fg7/datasheet_2fg7_v2.0_en.pdf"}
+  2fg14: {title: "OnRobot Datasheet 2FG14 v1.3（PDF 页码）", url: "https://onrobot.com/storage/datasheets/2fg14/datasheet_2fg14_v1.3_en.pdf"}
+  3fg15: {title: "OnRobot Datasheet 3FG15 v2.1（PDF 页码）", url: "https://onrobot.com/storage/datasheets/3fg15/datasheet_3fg15_v2.1_en.pdf"}
+  3fg25: {title: "OnRobot Datasheet 3FG25 v1.3（PDF 页码）", url: "https://onrobot.com/storage/datasheets/3fg25/datasheet_3fg25_v1.3_en.pdf"}
+  vgc10: {title: "OnRobot Datasheet VGC10 v1.7（PDF 页码）", url: "https://onrobot.com/storage/datasheets/vgc10/datasheet_vgc10_v1.7_en.pdf"}
+  vg10: {title: "OnRobot Datasheet VG10 v2.6（PDF 页码）", url: "https://onrobot.com/storage/datasheets/vg10/datasheet_vg10_v2.6_en.pdf"}
+products:
+  - id: D-GRP-ONROBOT
+    name: {zh: OnRobot 电动手指夹爪, en: OnRobot electric finger gripper}
+    category: GRP
+    series: RG / 2FG / 3FG
+    tags: [夹爪, 电动夹爪, 平行夹爪, 三指夹爪, 末端执行器, gripper, end effector]
+    default: RG2
+    proxy: gripper
+    dims: {w: width_mm, h: length_mm, d: depth_mm}
+    proxy_note: "3FG15/3FG25 是三指夹爪，按平行两指夹爪示意（宽取表中 W，厚度未给，按比例示意）；RG2/RG6 的长、宽、厚按数据表数字顺序录入"
+    principle: 内置无刷电机经丝杠或连杆带动手指开合，软件可设定夹持力、速度和开口宽度；RG 系列是连杆式长行程夹爪，2FG 是平行夹爪，3FG 三指同步向心收拢，能自动对中夹住圆柱件。
+    uses: [协作机器人上下料, 数控机床上下料, 装配, 搬运与码放]
+    chapter: 末端执行器
+    notes: "负载分摩擦夹持（force fit）和包络夹持（form fit）两种；3FG 另有“柔性夹持”负载（3FG15 8 kg、3FG25 10 kg）和柔性夹持力（3FG15 10～140 N、3FG25 50～300 N），未单列。3FG 的夹持范围是外夹直径；2FG 的行程是表中 Total stroke（典型值），外夹宽度视手指朝内/朝外安装：2FG7 1～39/35～73 mm，2FG14 5～55/55～105 mm。3FG 夹持速度只给上限（直径变化速度）。RG6 行程：数据表 160 mm、产品页 150 mm，不一致，留空。供电 20～25 V，额定 24 V。"
+    params:
+      - [stroke_mm, 行程, Stroke, perf, mm]
+      - [ext_grip_dia_min_mm, 外夹直径下限, External grip diameter min, perf, mm]
+      - [ext_grip_dia_max_mm, 外夹直径上限, External grip diameter max, perf, mm]
+      - [grip_force_min_N, 夹持力下限, Grip force min, perf, N]
+      - [grip_force_max_N, 夹持力上限, Grip force max, perf, N]
+      - [payload_friction_kg, 摩擦夹持负载, Force-fit payload, perf, kg]
+      - [payload_form_kg, 包络夹持负载, Form-fit payload, perf, kg]
+      - [speed_min_mm_s, 夹持速度下限, Gripping speed min, perf, mm/s]
+      - [speed_max_mm_s, 夹持速度上限, Gripping speed max, perf, mm/s]
+      - [weight_kg, 质量, Weight, info, kg]
+      - [ip_rating, 防护等级, IP rating, info, ""]
+      - [power_V, 供电电压（额定）, Supply voltage (typical), info, V DC]
+      - [length_mm, 外形长（沿工具轴，总高）, Length (overall height), dim, mm]
+      - [width_mm, 外形宽, Width, dim, mm]
+      - [depth_mm, 外形厚, Depth, dim, mm]
+      - [envelope_dia_mm, 外包络直径（三指）, Envelope diameter (3-finger), dim, mm]
+    rows:
+      - {size: RG2, src: rg2, page: "1-2", stroke_mm: 110, grip_force_min_N: 3, grip_force_max_N: 40, payload_friction_kg: 2, payload_form_kg: 5, speed_min_mm_s: 38, speed_max_mm_s: 127, weight_kg: 0.78, ip_rating: IP54, power_V: 24, length_mm: 213, width_mm: 149, depth_mm: 36}
+      - {size: RG6, src: [rg6, rg6_page], page: "1-2", grip_force_min_N: 25, grip_force_max_N: 120, payload_friction_kg: 6, payload_form_kg: 10, speed_min_mm_s: 51, speed_max_mm_s: 140, weight_kg: 1.25, ip_rating: IP54, power_V: 24, length_mm: 262, width_mm: 212, depth_mm: 42}
+      - {size: 2FG7, src: 2fg7, page: "1-2", stroke_mm: 38, grip_force_min_N: 20, grip_force_max_N: 140, payload_friction_kg: 7, payload_form_kg: 11, speed_min_mm_s: 16, speed_max_mm_s: 450, weight_kg: 1.1, ip_rating: IP67, power_V: 24, length_mm: 144, width_mm: 90, depth_mm: 71}
+      - {size: 2FG14, src: 2fg14, page: "1-2", stroke_mm: 50, grip_force_min_N: 40, grip_force_max_N: 280, payload_friction_kg: 14, payload_form_kg: 20, speed_min_mm_s: 16, speed_max_mm_s: 450, weight_kg: 1.5, ip_rating: IP67, power_V: 24, length_mm: 155.2, width_mm: 115, depth_mm: 70}
+      - {size: 3FG15, src: 3fg15, page: "1-2", ext_grip_dia_min_mm: 4, ext_grip_dia_max_mm: 152, grip_force_min_N: 10, grip_force_max_N: 240, payload_friction_kg: 10, payload_form_kg: 15, speed_max_mm_s: 125, weight_kg: 1.15, ip_rating: IP67, power_V: 24, length_mm: 156, width_mm: 158, envelope_dia_mm: 180}
+      - {size: 3FG25, src: 3fg25, page: "1-2", ext_grip_dia_min_mm: 18, ext_grip_dia_max_mm: 155, grip_force_min_N: 50, grip_force_max_N: 450, payload_friction_kg: 15, payload_form_kg: 25, speed_max_mm_s: 90, weight_kg: 1.6, ip_rating: IP67, power_V: 24, length_mm: 156, width_mm: 168, envelope_dia_mm: 187}
+  - id: D-GRP-ONROBOT-VG
+    name: {zh: OnRobot 电动真空吸盘夹爪, en: OnRobot electric vacuum gripper}
+    category: GRP
+    series: VGC10 / VG10
+    tags: [夹爪, 真空吸盘, 真空夹爪, 末端执行器, vacuum gripper, end effector]
+    default: VGC10
+    proxy: box
+    dims: {w: width_mm, d: depth_mm, h: height_mm}
+    proxy_note: "外形按数据表 Dimensions 三个数字顺序录为 高 x 宽 x 深（VG10 105 x 146 x 146 可确认第一个是高）；VG10 取收拢状态"
+    principle: 内置电动真空泵抽走吸盘与工件之间的空气，大气压把工件压在吸盘上；软件可调真空度，多个吸盘可分路控制，不用外接气源。
+    uses: [纸箱和板材搬运, 码垛, 平面工件上下料]
+    chapter: 末端执行器
+    notes: "真空度上限 80 %（-0.810 bar，即 -81 kPa）；VGC10 用默认附件最大 6 kg，定制附件典型 10 kg、最大 15 kg（表中未单列“额定”，额定负载列留空，最大负载取 15 kg）；VG10 额定 10 kg、最大 15 kg。VG10 两臂可展开，展开外形 105 x 390 x 390 mm。供电 20.4～28.8 V，额定 24 V。官方提示：真空夹爪不要用于潮湿或有切削液的环境。"
+    params:
+      - [vacuum_max_pct, 最大真空度, Max vacuum, perf, "%"]
+      - [vacuum_max_kPa, 最大真空（负压）, Max vacuum (negative pressure), perf, kPa]
+      - [air_flow_max_L_min, 最大抽气流量, Max air flow, perf, L/min]
+      - [payload_rated_kg, 额定负载, Rated payload, perf, kg]
+      - [payload_max_kg, 最大负载, Max payload, perf, kg]
+      - [cups_max, 吸盘数上限, Max vacuum cups, info, 个]
+      - [weight_kg, 质量, Weight, info, kg]
+      - [ip_rating, 防护等级, IP rating, info, ""]
+      - [power_V, 供电电压（额定）, Supply voltage (typical), info, V DC]
+      - [height_mm, 外形高, Height, dim, mm]
+      - [width_mm, 外形宽, Width, dim, mm]
+      - [depth_mm, 外形深, Depth, dim, mm]
+    rows:
+      - {size: VGC10, src: vgc10, page: "1-2", vacuum_max_pct: 80, vacuum_max_kPa: 81, air_flow_max_L_min: 12, payload_max_kg: 15, cups_max: 7, weight_kg: 0.814, ip_rating: IP54, power_V: 24, height_mm: 101, width_mm: 100, depth_mm: 100}
+      - {size: VG10, src: vg10, page: "1-2", vacuum_max_pct: 80, vacuum_max_kPa: 81, air_flow_max_L_min: 12, payload_rated_kg: 10, payload_max_kg: 15, cups_max: 16, weight_kg: 1.62, ip_rating: IP54, power_V: 24, height_mm: 105, width_mm: 146, depth_mm: 146}

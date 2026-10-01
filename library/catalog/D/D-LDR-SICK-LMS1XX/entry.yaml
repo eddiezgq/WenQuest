@@ -1,0 +1,151 @@
+# D-LDR-SICK-LMS1XX · SICK LMS1xx 二维激光扫描仪（厂商目录，第 5 轮）
+schema: 1
+id: D-LDR-SICK-LMS1XX
+kind: product
+name:
+  zh: SICK LMS1xx 二维激光扫描仪
+  en: SICK LMS1xx 2D LiDAR sensor
+category: LDR
+tags:
+- 激光雷达
+- 二维激光雷达
+- 激光扫描仪
+- 2D LiDAR
+- 室外
+- 移动机器人
+- 西克（SICK）
+- SICK
+standards: []
+params:
+- key: part_no
+  zh: 料号
+  en: Part no.
+  role: info
+- key: range_min_m
+  zh: 最小工作距离
+  en: Working range min
+  role: perf
+  unit: m
+- key: range_max_m
+  zh: 最大工作距离（90% 反射率）
+  en: Working range max (90% remission)
+  role: perf
+  unit: m
+- key: range_10pct_m
+  zh: 扫描距离（10% 反射率）
+  en: Scanning range at 10% remission
+  role: perf
+  unit: m
+- key: aperture_deg
+  zh: 扫描角
+  en: Aperture angle
+  role: perf
+  unit: °
+- key: ang_res_deg
+  zh: 角分辨率
+  en: Angular resolution
+  role: perf
+  unit: °
+- key: scan_freq_Hz
+  zh: 扫描频率
+  en: Scanning frequency
+  role: perf
+  unit: Hz
+- key: wavelength_nm
+  zh: 光源波长
+  en: Wavelength
+  role: info
+  unit: nm
+- key: ip_rating
+  zh: 防护等级
+  en: Enclosure rating
+  role: info
+- key: voltage_V
+  zh: 供电电压
+  en: Supply voltage
+  role: info
+  unit: V DC
+- key: power_W
+  zh: 典型功耗（不含加热）
+  en: Typical power (without heating)
+  role: info
+  unit: W
+- key: weight_kg
+  zh: 质量
+  en: Weight
+  role: info
+  unit: kg
+- key: operating_temp
+  zh: 工作温度
+  en: Operating temperature
+  role: info
+- key: width_mm
+  zh: 宽
+  en: Width
+  role: dim
+  unit: mm
+- key: depth_mm
+  zh: 深
+  en: Depth
+  role: dim
+  unit: mm
+- key: height_mm
+  zh: 高
+  en: Height
+  role: dim
+  unit: mm
+specs: specs.csv
+default: LMS111-10100
+model:
+  engine: proxy:box
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    w: width_mm
+    d: depth_mm
+    h: height_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载
+source:
+  origin: vendor
+  vendor: SICK
+  catalog: SICK Data sheet LMS111-10100 (1041114), 2026-07-26；SICK Data sheet LMS151-10100
+    (1047607), 2026-07-26
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 SICK 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 两次独立读取 2 份官方数据表，所有数字一致
+  data_sources:
+  - title: SICK Data sheet LMS111-10100 (1041114), 2026-07-26
+    url: https://www.sick.com/media/pdf/2/42/842/dataSheet_LMS111-10100_1041114_en.pdf
+    retrieved: '2026-09-30'
+  - title: SICK Data sheet LMS151-10100 (1047607), 2026-07-26
+    url: https://www.sick.com/media/pdf/0/40/840/dataSheet_LMS151-10100_1047607_en.pdf
+    retrieved: '2026-09-30'
+  notes: 扫描频率与角分辨率成对：25 Hz 时 0.25°，50 Hz 时 0.5°。典型功耗 8 W，加热时另需约 35 W。LMS111 与 LMS151
+    在 10% 反射率下都是 18 m，最大量程分别为 20 m、50 m（90% 反射率）。
+vendor:
+  id: SICK
+  name:
+    zh: 西克（SICK）
+    en: SICK
+  site: https://www.sick.com
+  series: LMS1xx
+teaching:
+  principle: 905 nm 红外激光脉冲经转镜在一个平面内扫过 270°，按飞行时间测距；壳体带加热，能在室外雨雾和低温下工作，常装在室外移动机器人和车辆上。
+  uses:
+  - 室外移动机器人导航与建图
+  - 车辆与人员检测
+  - 区域与围界监控
+  courses:
+  - course: 机器人技术
+    chapter: 激光雷达与环境感知
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - SICK

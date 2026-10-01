@@ -1,0 +1,7 @@
+size,stroke_mm,ext_grip_dia_min_mm,ext_grip_dia_max_mm,grip_force_min_N,grip_force_max_N,payload_friction_kg,payload_form_kg,speed_min_mm_s,speed_max_mm_s,weight_kg,ip_rating,power_V,length_mm,width_mm,depth_mm,envelope_dia_mm,src_url,src_page
+RG2,110,,,3,40,2,5,38,127,0.78,IP54,24,213,149,36,,https://onrobot.com/storage/datasheets/rg2/datasheet_rg2_v1.8_en.pdf,1-2
+RG6,,,,25,120,6,10,51,140,1.25,IP54,24,262,212,42,,https://onrobot.com/storage/datasheets/rg6/datasheet_rg6_v2.0_en.pdf ; https://onrobot.com/en/products/rg6-gripper,1-2
+2FG7,38,,,20,140,7,11,16,450,1.1,IP67,24,144,90,71,,https://onrobot.com/storage/datasheets/2fg7/datasheet_2fg7_v2.0_en.pdf,1-2
+2FG14,50,,,40,280,14,20,16,450,1.5,IP67,24,155.2,115,70,,https://onrobot.com/storage/datasheets/2fg14/datasheet_2fg14_v1.3_en.pdf,1-2
+3FG15,,4,152,10,240,10,15,,125,1.15,IP67,24,156,158,,180,https://onrobot.com/storage/datasheets/3fg15/datasheet_3fg15_v2.1_en.pdf,1-2
+3FG25,,18,155,50,450,15,25,,90,1.6,IP67,24,156,168,,187,https://onrobot.com/storage/datasheets/3fg25/datasheet_3fg25_v1.3_en.pdf,1-2

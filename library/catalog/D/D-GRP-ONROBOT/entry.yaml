@@ -1,0 +1,174 @@
+# D-GRP-ONROBOT · OnRobot 电动手指夹爪（厂商目录，第 5 轮）
+schema: 1
+id: D-GRP-ONROBOT
+kind: product
+name:
+  zh: OnRobot 电动手指夹爪
+  en: OnRobot electric finger gripper
+category: GRP
+tags:
+- 夹爪
+- 电动夹爪
+- 平行夹爪
+- 三指夹爪
+- 末端执行器
+- gripper
+- end effector
+- OnRobot
+standards: []
+params:
+- key: stroke_mm
+  zh: 行程
+  en: Stroke
+  role: perf
+  unit: mm
+- key: ext_grip_dia_min_mm
+  zh: 外夹直径下限
+  en: External grip diameter min
+  role: perf
+  unit: mm
+- key: ext_grip_dia_max_mm
+  zh: 外夹直径上限
+  en: External grip diameter max
+  role: perf
+  unit: mm
+- key: grip_force_min_N
+  zh: 夹持力下限
+  en: Grip force min
+  role: perf
+  unit: N
+- key: grip_force_max_N
+  zh: 夹持力上限
+  en: Grip force max
+  role: perf
+  unit: N
+- key: payload_friction_kg
+  zh: 摩擦夹持负载
+  en: Force-fit payload
+  role: perf
+  unit: kg
+- key: payload_form_kg
+  zh: 包络夹持负载
+  en: Form-fit payload
+  role: perf
+  unit: kg
+- key: speed_min_mm_s
+  zh: 夹持速度下限
+  en: Gripping speed min
+  role: perf
+  unit: mm/s
+- key: speed_max_mm_s
+  zh: 夹持速度上限
+  en: Gripping speed max
+  role: perf
+  unit: mm/s
+- key: weight_kg
+  zh: 质量
+  en: Weight
+  role: info
+  unit: kg
+- key: ip_rating
+  zh: 防护等级
+  en: IP rating
+  role: info
+- key: power_V
+  zh: 供电电压（额定）
+  en: Supply voltage (typical)
+  role: info
+  unit: V DC
+- key: length_mm
+  zh: 外形长（沿工具轴，总高）
+  en: Length (overall height)
+  role: dim
+  unit: mm
+- key: width_mm
+  zh: 外形宽
+  en: Width
+  role: dim
+  unit: mm
+- key: depth_mm
+  zh: 外形厚
+  en: Depth
+  role: dim
+  unit: mm
+- key: envelope_dia_mm
+  zh: 外包络直径（三指）
+  en: Envelope diameter (3-finger)
+  role: dim
+  unit: mm
+specs: specs.csv
+default: RG2
+model:
+  engine: proxy:gripper
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    w: width_mm
+    h: length_mm
+    d: depth_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载；3FG15/3FG25 是三指夹爪，按平行两指夹爪示意（宽取表中 W，厚度未给，按比例示意）；RG2/RG6
+    的长、宽、厚按数据表数字顺序录入
+source:
+  origin: vendor
+  vendor: OnRobot
+  catalog: OnRobot Datasheet RG2 v1.8（PDF 页码）；OnRobot Datasheet RG6 v2.0（PDF 页码）；OnRobot
+    RG6 产品页（行程 150 mm，与数据表 160 mm 不一致）；OnRobot Datasheet 2FG7 v2.0（PDF 页码）；OnRobot
+    Datasheet 2FG14 v1.3（PDF 页码）；OnRobot Datasheet 3FG15 v2.1（PDF 页码）；OnRobot Datasheet
+    3FG25 v1.3（PDF 页码）
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 OnRobot 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 两次独立读取官方资料，结果一致；另抽查核对
+  data_sources:
+  - title: OnRobot Datasheet RG2 v1.8（PDF 页码）
+    url: https://onrobot.com/storage/datasheets/rg2/datasheet_rg2_v1.8_en.pdf
+    retrieved: '2026-09-30'
+  - title: OnRobot Datasheet RG6 v2.0（PDF 页码）
+    url: https://onrobot.com/storage/datasheets/rg6/datasheet_rg6_v2.0_en.pdf
+    retrieved: '2026-09-30'
+  - title: OnRobot RG6 产品页（行程 150 mm，与数据表 160 mm 不一致）
+    url: https://onrobot.com/en/products/rg6-gripper
+    retrieved: '2026-09-30'
+  - title: OnRobot Datasheet 2FG7 v2.0（PDF 页码）
+    url: https://onrobot.com/storage/datasheets/2fg7/datasheet_2fg7_v2.0_en.pdf
+    retrieved: '2026-09-30'
+  - title: OnRobot Datasheet 2FG14 v1.3（PDF 页码）
+    url: https://onrobot.com/storage/datasheets/2fg14/datasheet_2fg14_v1.3_en.pdf
+    retrieved: '2026-09-30'
+  - title: OnRobot Datasheet 3FG15 v2.1（PDF 页码）
+    url: https://onrobot.com/storage/datasheets/3fg15/datasheet_3fg15_v2.1_en.pdf
+    retrieved: '2026-09-30'
+  - title: OnRobot Datasheet 3FG25 v1.3（PDF 页码）
+    url: https://onrobot.com/storage/datasheets/3fg25/datasheet_3fg25_v1.3_en.pdf
+    retrieved: '2026-09-30'
+  notes: 负载分摩擦夹持（force fit）和包络夹持（form fit）两种；3FG 另有“柔性夹持”负载（3FG15 8 kg、3FG25 10 kg）和柔性夹持力（3FG15
+    10～140 N、3FG25 50～300 N），未单列。3FG 的夹持范围是外夹直径；2FG 的行程是表中 Total stroke（典型值），外夹宽度视手指朝内/朝外安装：2FG7
+    1～39/35～73 mm，2FG14 5～55/55～105 mm。3FG 夹持速度只给上限（直径变化速度）。RG6 行程：数据表 160 mm、产品页
+    150 mm，不一致，留空。供电 20～25 V，额定 24 V。
+vendor:
+  id: ONROBOT
+  name:
+    zh: OnRobot
+    en: OnRobot
+  site: https://onrobot.com
+  series: RG / 2FG / 3FG
+teaching:
+  principle: 内置无刷电机经丝杠或连杆带动手指开合，软件可设定夹持力、速度和开口宽度；RG 系列是连杆式长行程夹爪，2FG 是平行夹爪，3FG 三指同步向心收拢，能自动对中夹住圆柱件。
+  uses:
+  - 协作机器人上下料
+  - 数控机床上下料
+  - 装配
+  - 搬运与码放
+  courses:
+  - course: 机器人技术
+    chapter: 末端执行器
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - OnRobot

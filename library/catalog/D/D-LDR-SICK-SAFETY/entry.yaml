@@ -1,0 +1,184 @@
+# D-LDR-SICK-SAFETY · SICK 安全激光扫描仪（厂商目录，第 5 轮）
+schema: 1
+id: D-LDR-SICK-SAFETY
+kind: product
+name:
+  zh: SICK 安全激光扫描仪
+  en: SICK safety laser scanner
+category: LDR
+tags:
+- 激光雷达
+- 安全激光扫描仪
+- 安全传感器
+- safety laser scanner
+- AGV
+- 移动机器人
+- 功能安全
+- 西克（SICK）
+- SICK
+standards: []
+params:
+- key: part_no
+  zh: 料号
+  en: Part no.
+  role: info
+- key: variant
+  zh: 型式
+  en: Variant
+  role: key
+- key: protective_field_m
+  zh: 保护区范围
+  en: Protective field range
+  role: perf
+  unit: m
+- key: warning_field_m
+  zh: 警告区范围
+  en: Warning field range
+  role: perf
+  unit: m
+- key: measuring_range_m
+  zh: 测距范围
+  en: Distance measuring range
+  role: perf
+  unit: m
+- key: scan_angle_deg
+  zh: 扫描角
+  en: Scanning angle
+  role: perf
+  unit: °
+- key: ang_res_deg
+  zh: 角分辨率
+  en: Angular resolution
+  role: perf
+  unit: °
+- key: response_time_ms
+  zh: 响应时间
+  en: Response time
+  role: perf
+  unit: ms
+- key: sil
+  zh: 安全完整性等级
+  en: Safety integrity level
+  role: perf
+- key: pl
+  zh: 性能等级
+  en: Performance level
+  role: perf
+- key: category
+  zh: 类别
+  en: Category
+  role: info
+- key: pfhd
+  zh: PFHd
+  en: PFHd
+  role: info
+  unit: 1/h
+- key: wavelength_nm
+  zh: 光源波长
+  en: Wavelength
+  role: info
+  unit: nm
+- key: ip_rating
+  zh: 防护等级
+  en: Enclosure rating
+  role: info
+- key: voltage_V
+  zh: 供电电压
+  en: Supply voltage
+  role: info
+  unit: V DC
+- key: power_W
+  zh: 典型功耗
+  en: Typical power
+  role: info
+  unit: W
+- key: weight_kg
+  zh: 质量
+  en: Weight
+  role: info
+  unit: kg
+- key: operating_temp
+  zh: 工作温度
+  en: Operating temperature
+  role: info
+- key: width_mm
+  zh: 宽
+  en: Width
+  role: dim
+  unit: mm
+- key: depth_mm
+  zh: 深
+  en: Depth
+  role: dim
+  unit: mm
+- key: height_mm
+  zh: 高
+  en: Height
+  role: dim
+  unit: mm
+specs: specs.csv
+default: NANS3-AAAZ30AN1
+model:
+  engine: proxy:box
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    w: width_mm
+    d: depth_mm
+    h: height_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载；microScan3 Pro 的高度不含装在底面的系统插头，实物更高
+source:
+  origin: vendor
+  vendor: SICK
+  catalog: SICK Data sheet nanoScan3 NANS3-AAAZ30AN1 (1100333), 2026-09-15；SICK Data
+    sheet nanoScan3 NANS3-CAAZ30AN1 (1100334), 2026-09-15；SICK Data sheet microScan3
+    MICS3-AAAZ40AZ1P01 (1075842), 2026-08-11；SICK Data sheet microScan3 MICS3-CBAZ40ZA1P01
+    (1091037), 2026-08-11
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 SICK 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 两次独立读取 4 份官方数据表，所有数字一致；microScan3 两型的外形行第三次逐字核对（Core 含插头、Pro 不含插头）
+  data_sources:
+  - title: SICK Data sheet nanoScan3 NANS3-AAAZ30AN1 (1100333), 2026-09-15
+    url: https://www.sick.com/media/pdf/9/79/979/dataSheet_NANS3-AAAZ30AN1_1100333_en.pdf
+    retrieved: '2026-09-30'
+  - title: SICK Data sheet nanoScan3 NANS3-CAAZ30AN1 (1100334), 2026-09-15
+    url: https://www.sick.com/media/pdf/0/80/980/dataSheet_NANS3-CAAZ30AN1_1100334_en.pdf
+    retrieved: '2026-09-30'
+  - title: SICK Data sheet microScan3 MICS3-AAAZ40AZ1P01 (1075842), 2026-08-11
+    url: https://www.sick.com/media/pdf/5/45/945/dataSheet_MICS3-AAAZ40AZ1P01_1075842_en.pdf
+    retrieved: '2026-09-30'
+  - title: SICK Data sheet microScan3 MICS3-CBAZ40ZA1P01 (1091037), 2026-08-11
+    url: https://www.sick.com/media/pdf/4/44/544/dataSheet_MICS3-CBAZ40ZA1P01_1091037_en.pdf
+    retrieved: '2026-09-30'
+  notes: 保护区范围是可设定的安全停机区域的最大半径；警告区范围是非安全的预警区。nanoScan3 的“测距范围 40 m”是数据输出的测距范围；microScan3
+    数据表没有这一项，留空。功耗为典型值，不含输出负载（microScan3 Pro 写 typical 7.2 W）。nanoScan3 外形含系统插头；microScan3
+    Core（1075842 = 传感器 1067360 + 系统插头 2073156）外形 112×135.1×111.1 mm；microScan3 Pro（1091037）数据表外形注明“不含系统插头”，质量
+    1.45 kg 未注明是否含插头。
+vendor:
+  id: SICK
+  name:
+    zh: 西克（SICK）
+    en: SICK
+  site: https://www.sick.com
+  series: nanoScan3 / microScan3
+teaching:
+  principle: 与普通激光扫描仪一样靠激光飞行时间在一个平面内测距，但内部电路按功能安全标准做了冗余和自检；人或物体闯入事先设定的保护区时，安全输出在规定的响应时间内断开，让
+    AGV 或机器停下。
+  uses:
+  - AGV 与移动机器人的人员防护和避障减速
+  - 危险区域与机器人工作站的安全防护
+  - 功能安全（PL/SIL）教学
+  courses:
+  - course: 机器人技术
+    chapter: 激光雷达与环境感知
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - SICK

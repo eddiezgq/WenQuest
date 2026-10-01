@@ -1,0 +1,65 @@
+# 纳博特斯克 Nabtesco RV-N 精密减速器（第 5 轮第 3 步第 2 批）。
+# 出处：Nabtesco Precision Europe GmbH（纳博特斯克欧洲官方子公司，nabtesco.de）的 RV-N 英文样本 PDF 与官网产品页。
+#   nabtesco.com / precision.nabtesco.com 的样本 PDF 要会员登录，取不到；precision.nabtesco.com 产品页的大表抽取时列错位，不采用。
+# 额定/启停/瞬时转矩、允许输出转速 NS0/NS1、额定寿命、背隙/空程、质量、减速比：取样本额定表（rating table），
+#   page 填 9，是抓取工具报告的额定表所在页码，未能核对是印刷页码还是 PDF 页序，抽查时请两种都看。两次独立读取一致。
+# 外径、轴向长 A：取 nabtesco.de RV-N 系列页的技术数据表（外径 B、A 列），两次独立读取一致；外径另与每个型号的产品页逐个核对一致。
+#   样本 PDF 的外形图是图形，抽不出尺寸文字，所以外形改用官网数据表。
+# 不收：RV-160N 的 NS1（40% 占空比允许输出转速）——样本两次读到 48 rpm，型号页“Maximum Speed”写 73 rpm，原文互相矛盾，留空。
+#   扭转刚性、力矩刚性、允许力矩只有官网型号页一处来源、未在样本中复核，不收。
+#   RV-900N / RV-2800N / RV-1500E 不在 RV-N 样本额定表里，不收；RV-E 系列未取到可两次核对的样本，不另收。
+vendor: {id: NABTESCO, name: {zh: 纳博特斯克, en: Nabtesco}, site: https://www.nabtesco.com}
+retrieved: "2026-09-30"
+sources:
+  rvn_cat: {title: "Nabtesco Precision Reduction Gear RV N Series catalogue (EN), rating table p.9", url: "https://www.nabtesco.de/fileadmin/04_Service/05_Downloads/01_Produktkataloge/RV-N_catalogue_EN.pdf"}
+  rvn_web: {title: "Nabtesco Precision Europe: RV-N cycloidal gearbox with solid shaft (technical data table)", url: "https://www.nabtesco.de/en/products/cycloidal-gears/rv-n"}
+  rv25n: {title: "Nabtesco Precision Europe: RV-25N", url: "https://www.nabtesco.de/en/product/rv-25n"}
+  rv42n: {title: "Nabtesco Precision Europe: RV-42N", url: "https://www.nabtesco.de/en/product/rv-42n"}
+  rv60n: {title: "Nabtesco Precision Europe: RV-60N", url: "https://www.nabtesco.de/en/product/rv-60n"}
+  rv80n: {title: "Nabtesco Precision Europe: RV-80N", url: "https://www.nabtesco.de/en/product/rv-80n"}
+  rv100n: {title: "Nabtesco Precision Europe: RV-100N", url: "https://www.nabtesco.de/en/product/rv-100n"}
+  rv125n: {title: "Nabtesco Precision Europe: RV-125N", url: "https://www.nabtesco.de/en/product/rv-125n"}
+  rv160n: {title: "Nabtesco Precision Europe: RV-160N", url: "https://www.nabtesco.de/en/product/rv-160n"}
+  rv380n: {title: "Nabtesco Precision Europe: RV-380N", url: "https://www.nabtesco.de/en/product/rv-380n"}
+  rv500n: {title: "Nabtesco Precision Europe: RV-500N", url: "https://www.nabtesco.de/en/product/rv-500n"}
+  rv700n: {title: "Nabtesco Precision Europe: RV-700N", url: "https://www.nabtesco.de/en/product/rv-700n"}
+products:
+  - id: D-RDC-NABTESCO-RVN
+    name: {zh: 纳博特斯克 RV-N 精密减速器（紧凑型）, en: Nabtesco RV-N precision reduction gear (compact)}
+    category: RDC
+    series: RV-N
+    tags: [RV减速器, 摆线针轮减速器, 精密减速器, 机器人关节, cycloidal gear, RV reducer]
+    default: RV-42N
+    proxy: cylinder
+    dims: {d: OD_mm, h: A_mm}
+    proxy_note: "RV 减速器画成圆柱示意；直径取外径，高度取官网数据表的轴向长 A"
+    principle: RV 减速器分两级：第一级是渐开线行星齿轮——输入轴上的太阳轮带动几个行星轮，先减一次速；行星轮装在曲柄轴上，第二级是摆线针轮——曲柄轴带两片摆线轮做偏心摆动，摆线轮与壳体内一圈针齿啮合，摆动一周只转过一个齿，再大幅减速后由曲柄轴把转动传到输出盘。两级合起来减速比大、刚性高、抗冲击，同时啮合的齿多，背隙小于 1 弧分。
+    uses: [工业机器人腰、肩、肘等重载关节, 变位机与精密转台, 机床刀库与分度盘, 自动化搬运设备]
+    chapter: 关节驱动与减速器
+    checked_note: 样本额定表两次独立读取一致；外径、轴向长两次读取官网数据表一致，外径另与各型号页核对一致；RV-160N 的 NS1 原文矛盾，留空
+    notes: "减速比列出的是样本额定表中的标准减速比（以文本存），其他减速比需向厂商询问。背隙、空程为样本所列上限 1.0 arc min（空程在 ±3% 额定转矩下测量）。NS0、NS1 分别是占空比 100% 和 40% 时的允许输出转速，实际随占空比、负载和环境温度变化。RV-160N 的 NS1：样本读到 48 rpm、型号页写 73 rpm，互相矛盾，留空。轴向长 A 取自 nabtesco.de 系列页技术数据表的 A 列，未在样本外形图中复核是否含输出轴伸出部分。"
+    params:
+      - [ratios, 标准减速比, Standard speed ratios, key, ""]
+      - [T0_Nm, 额定转矩 T0, Rated torque T0, perf, N·m]
+      - [N0_rpm, 额定输出转速 N0, Rated output speed N0, perf, rpm]
+      - [K_h, 额定寿命 K, Rated service life K, perf, h]
+      - [TS1_Nm, 启停允许转矩 TS1, Allowable acceleration/deceleration torque TS1, perf, N·m]
+      - [TS2_Nm, 瞬时最大允许转矩 TS2, Momentary maximum allowable torque TS2, perf, N·m]
+      - [NS0_rpm, 允许输出转速（占空比 100%）, Allowable output speed NS0 (100% duty), perf, rpm]
+      - [NS1_rpm, 允许输出转速（占空比 40%）, Allowable output speed NS1 (40% duty), perf, rpm]
+      - [backlash_arcmin, 背隙, Backlash, perf, arcmin]
+      - [lost_motion_arcmin, 空程, Lost motion, perf, arcmin]
+      - [OD_mm, 外径, Outer diameter, dim, mm]
+      - [A_mm, 轴向长 A, Axial length A, dim, mm]
+      - [mass_kg, 质量, Mass, info, kg]
+    rows:
+      - {size: RV-25N, src: [rvn_cat, rvn_web, rv25n], page: 9, ratios: "41, 81, 107.66, 126, 137, 164.07", T0_Nm: 245, N0_rpm: 15, K_h: 6000, TS1_Nm: 612, TS2_Nm: 1225, NS0_rpm: 57, NS1_rpm: 110, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 133, A_mm: 62, mass_kg: 3.8}
+      - {size: RV-42N, src: [rvn_cat, rvn_web, rv42n], page: 9, ratios: "41, 81, 105, 126, 141, 164.07", T0_Nm: 412, N0_rpm: 15, K_h: 6000, TS1_Nm: 1029, TS2_Nm: 2058, NS0_rpm: 52, NS1_rpm: 100, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 159, A_mm: 65.5, mass_kg: 6.3}
+      - {size: RV-60N, src: [rvn_cat, rvn_web, rv60n], page: 9, ratios: "41, 81, 102.17, 121, 145.61, 161", T0_Nm: 600, N0_rpm: 15, K_h: 6000, TS1_Nm: 1500, TS2_Nm: 3000, NS0_rpm: 44, NS1_rpm: 94, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 183, A_mm: 69.5, mass_kg: 8.9}
+      - {size: RV-80N, src: [rvn_cat, rvn_web, rv80n], page: 9, ratios: "41, 81, 101, 129, 141, 171", T0_Nm: 784, N0_rpm: 15, K_h: 6000, TS1_Nm: 1960, TS2_Nm: 3920, NS0_rpm: 40, NS1_rpm: 88, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 189, A_mm: 74, mass_kg: 9.3}
+      - {size: RV-100N, src: [rvn_cat, rvn_web, rv100n], page: 9, ratios: "41, 81, 102.17, 121, 141, 161", T0_Nm: 1000, N0_rpm: 15, K_h: 6000, TS1_Nm: 2500, TS2_Nm: 5000, NS0_rpm: 35, NS1_rpm: 83, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 208, A_mm: 80, mass_kg: 13.0}
+      - {size: RV-125N, src: [rvn_cat, rvn_web, rv125n], page: 9, ratios: "41, 81, 102.17, 121, 145.61, 161", T0_Nm: 1225, N0_rpm: 15, K_h: 6000, TS1_Nm: 3062, TS2_Nm: 6125, NS0_rpm: 35, NS1_rpm: 79, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 221, A_mm: 80, mass_kg: 13.9}
+      - {size: RV-160N, src: [rvn_cat, rvn_web, rv160n], page: 9, ratios: "41, 81, 102.81, 125.21, 156, 201", T0_Nm: 1600, N0_rpm: 15, K_h: 6000, TS1_Nm: 4000, TS2_Nm: 8000, NS0_rpm: 19, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 238, A_mm: 104, mass_kg: 22.1}
+      - {size: RV-380N, src: [rvn_cat, rvn_web, rv380n], page: 9, ratios: "75, 93, 117, 139, 162, 185", T0_Nm: 3724, N0_rpm: 15, K_h: 6000, TS1_Nm: 9310, TS2_Nm: 18620, NS0_rpm: 11.5, NS1_rpm: 27, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 295, A_mm: 131, mass_kg: 44}
+      - {size: RV-500N, src: [rvn_cat, rvn_web, rv500n], page: 9, ratios: "81, 105, 123, 144, 159, 192.75", T0_Nm: 4900, N0_rpm: 15, K_h: 6000, TS1_Nm: 12250, TS2_Nm: 24500, NS0_rpm: 11, NS1_rpm: 25, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 325, A_mm: 137.5, mass_kg: 57.2}
+      - {size: RV-700N, src: [rvn_cat, rvn_web, rv700n], page: 9, ratios: "105, 118, 142.44, 159, 183, 203.52", T0_Nm: 7000, N0_rpm: 15, K_h: 6000, TS1_Nm: 17500, TS2_Nm: 35000, NS0_rpm: 7.5, NS1_rpm: 19, backlash_arcmin: 1.0, lost_motion_arcmin: 1.0, OD_mm: 395, A_mm: 170, mass_kg: 102.0}
