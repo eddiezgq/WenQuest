@@ -43,7 +43,12 @@ jobs:
         run: pip install -q -r digital/requirements.txt pytest "requests>=2.31" && python -m pytest -q tests
       - name: 总线、仿真、枢纽、登录与权限
         working-directory: factory/digital
-        run: python -m pytest -q tests
+        run: |
+          set +e
+          python -m pytest -q tests 2>&1 | tee /tmp/pytest.log
+          st=${PIPESTATUS[0]}
+          if [ "$st" != 0 ]; then python3 ../deploy/ci_annotate.py 单元测试 /tmp/pytest.log 120; fi
+          exit "$st"
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
