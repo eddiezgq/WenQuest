@@ -3,9 +3,55 @@
     <TaskBar v-if="teachStatus" :t="teachStatus" />
     <div class="page-title"><h1>设计与工艺</h1><span class="muted">工艺员工作区 · 输出轴 SH-301 的设计版本、工艺路线与键槽 G 代码</span></div>
 
+    <!-- 第 6 轮 W2：网页设计台，不用装软件 -->
+    <section id="design" class="card">
+      <div class="card-head"><h2>在线设计 · 输出轴 SH-301</h2>
+        <span class="muted small">改参数 → 看三维与校核 → 发布。服务器生成 STEP、零件图、键槽 G 代码，与 FreeCAD 发布效果相同</span></div>
+      <div v-if="!form" class="empty">正在读取现行设计…</div>
+      <div v-else class="design">
+        <div class="form">
+          <table class="t segs">
+            <thead><tr><th>轴段</th><th class="num">直径 mm</th><th class="num">长度 mm</th><th></th></tr></thead>
+            <tbody><tr v-for="(sg, i) in form.segments" :key="i">
+              <td>{{ i + 1 }}<span v-if="form.keyway && form.keyway.segment === i" class="pill info">键槽</span></td>
+              <td class="num"><input v-model.number="sg[0]" type="number" step="0.5" min="5" max="48" :aria-label="'第' + (i + 1) + '段直径'"></td>
+              <td class="num"><input v-model.number="sg[1]" type="number" step="1" min="2" max="300" :aria-label="'第' + (i + 1) + '段长度'"></td>
+              <td><button class="btn ghost small" :disabled="form.segments.length <= 1" title="删除这一段" @click="delSeg(i)">删除</button></td>
+            </tr></tbody>
+          </table>
+          <div class="line">
+            <button class="btn ghost small" :disabled="form.segments.length >= 8" @click="addSeg">＋ 加一段</button>
+            <label>两端倒角 <input v-model.number="form.chamfer" type="number" step="0.5" min="0" max="5"> mm</label>
+          </div>
+          <div class="line kw">
+            <label><input v-model="hasKey" type="checkbox"> 平键槽</label>
+            <template v-if="form.keyway">
+              <label>在第 <select v-model.number="form.keyway.segment"><option v-for="(sg, i) in form.segments" :key="i" :value="i">{{ i + 1 }}</option></select> 段</label>
+              <label>键宽 b <input v-model.number="form.keyway.b" type="number" step="1" min="1"></label>
+              <label>槽深 t <input v-model.number="form.keyway.t" type="number" step="0.5" min="0.5"></label>
+              <label>槽长 L <input v-model.number="form.keyway.L" type="number" step="1" min="1"></label>
+            </template>
+          </div>
+          <div v-if="chk" class="checks small">
+            <div v-for="e in chk.errors" :key="e" class="err">✗ {{ e }}</div>
+            <div v-for="w in chk.warnings" :key="w" class="warnline">！{{ w }}
+              <button v-if="chk.recommended" class="btn ghost small" @click="useRec">用推荐值</button></div>
+            <div v-if="chk.ok" class="okline">✓ 校核通过 · 总长 {{ chk.total_length_mm }} mm · 45 钢下料 {{ chk.bom?.[0]?.qty }} kg</div>
+          </div>
+          <div class="line">
+            <input v-model="note" class="note" maxlength="200" placeholder="改动说明，例如：键槽长 45 → 42">
+            <button class="btn primary" :disabled="!chk?.ok || busy" @click="publish">{{ busy ? '正在生成…' : '发布新版本' }}</button>
+            <button class="btn ghost" :disabled="busy" @click="loadParams">恢复现行版</button>
+          </div>
+          <div v-if="pubMsg" :class="pubOk ? 'ok' : 'err'">{{ pubMsg }}</div>
+        </div>
+        <ShaftView class="view" :params="form" />
+      </div>
+    </section>
+
     <div class="row">
       <section class="card grow">
-        <div class="card-head"><h2>设计版本</h2><span class="muted small">由 FreeCAD 发布宏经总线发来（design/sh-301/release）</span></div>
+        <div class="card-head"><h2>设计版本</h2><span class="muted small">由上面的在线设计或 FreeCAD 发布宏经总线发来（design/sh-301/release）</span></div>
         <div v-if="!d.releases.length" class="empty">还没有发布过新版本。现行为工厂数据里的第 1 版。</div>
         <table v-else class="t">
           <thead><tr><th>版本</th><th>时间</th><th>设计者</th><th>改动</th><th>BOM（45 钢）</th><th>文件</th></tr></thead>
@@ -18,14 +64,17 @@
         <div v-if="drawing" class="drawing"><img :src="drawing" alt="最新版零件图"></div>
       </section>
       <section class="card side">
-        <div class="card-head"><h2>怎样发布新版本</h2></div>
+        <div class="card-head"><h2>进阶：用桌面 FreeCAD 发布（选做）</h2></div>
+        <p class="small muted">上面的“在线设计”不用装任何软件。想学真 CAD 的同学，可以装 FreeCAD 1.1 后用宏包发布，效果相同：</p>
         <ol class="small steps">
-          <li>在 FreeCAD 里打开“宏 → 宏…”，把宏目录设为 <span class="mono">digital\freecad</span>。</li>
-          <li>用 VS Code 打开 <span class="mono">wq_shaft.py</span>，修改 <span class="mono">PARAMS</span>（例如键槽长 45 → 42），保存。</li>
-          <li>打开 <span class="mono">wq_publish.py</span>，把 CONFIG 里的名字改成你的名字，然后执行这个宏。</li>
-          <li>回到这里刷新：新版本、零件图、G 代码出现；ERPNext 里 SH-301 的“设计版本”加一。</li>
+          <li>安装 <a href="https://www.freecad.org/downloads.php" target="_blank" rel="noopener">FreeCAD 1.1</a>。</li>
+          <li><button class="btn ghost small" :disabled="packBusy" @click="downloadPack">{{ packBusy ? '正在打包…' : '下载我的 FreeCAD 宏包' }}</button>
+            解压到任意文件夹（工作台地址和你的登录凭证已填好，7 天有效）。</li>
+          <li>FreeCAD：宏 → 宏…，把“用户宏的位置”设为这个文件夹。</li>
+          <li>编辑 <span class="mono">wq_shaft.py</span> 的 <span class="mono">PARAMS</span>（例如键槽长 45 → 42）并保存，再执行 <span class="mono">wq_publish.py</span>。</li>
+          <li>回到这里刷新：新版本、零件图、G 代码出现。详细步骤见宏包里的“使用说明.txt”。</li>
         </ol>
-        <p class="muted small">没装 FreeCAD 的电脑也能发布（不导出 STEP）：<span class="mono">py wq_publish.py --note "改动说明"</span></p>
+        <div v-if="packErr" class="err small">{{ packErr }}</div>
         <div v-for="a in alerts" :key="a.id" class="alert small"><b>{{ a.title }}</b><div>{{ a.detail }}</div></div>
       </section>
     </div>
@@ -57,8 +106,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { get, session } from '../lib/api';
+import { computed, onMounted, ref, watch } from 'vue';
+import { get, post, session } from '../lib/api';
+import ShaftView from '../components/ShaftView.vue';
 import { timeOf } from '../lib/fmt';
 import GcodeView from '../components/GcodeView.vue';
 import TaskBar from '../components/TaskBar.vue';
@@ -73,7 +123,71 @@ const drawing = computed(() => {
   const f = d.value.releases[0]?.files?.find((x) => x.kind === 'drawing');
   return f ? f.url : null;
 });
+// ---- 在线设计（第 6 轮 W2、W3）
+const ITEM = 'SH-301';
+const form = ref(null);
+const chk = ref(null);
+const note = ref('');
+const busy = ref(false);
+const pubMsg = ref('');
+const pubOk = ref(true);
+let lastKey = null;
+const hasKey = computed({
+  get: () => !!form.value?.keyway,
+  set: (v) => { form.value.keyway = v ? (lastKey || { segment: 0, b: 6, t: 3.5, L: 20 }) : null; },
+});
+async function loadParams() {
+  const r = await get(`/design/${ITEM}/params`);
+  form.value = r.params;
+  lastKey = r.params.keyway;
+  chk.value = r.check;
+}
+function addSeg() { const l = form.value.segments[form.value.segments.length - 1]; form.value.segments.push([l[0], 20]); }
+function delSeg(i) {
+  form.value.segments.splice(i, 1);
+  const kw = form.value.keyway;
+  if (kw && kw.segment >= form.value.segments.length) kw.segment = form.value.segments.length - 1;
+}
+function useRec() { Object.assign(form.value.keyway, { b: chk.value.recommended.b, t: chk.value.recommended.t }); }
+let tmr;
+watch(() => JSON.stringify(form.value), () => {
+  if (!form.value) return;
+  if (form.value.keyway) lastKey = form.value.keyway;
+  clearTimeout(tmr);
+  tmr = setTimeout(async () => {
+    try { chk.value = await post(`/design/${ITEM}/check`, { params: form.value }); } catch (e) { chk.value = { ok: false, errors: [e.message], warnings: [] }; }
+  }, 300);
+});
+async function publish() {
+  busy.value = true; pubMsg.value = '';
+  try {
+    const r = await post(`/design/${ITEM}/publish`, { params: form.value, change_note: note.value });
+    pubOk.value = true;
+    pubMsg.value = `已发布 rev ${r.revision}：${r.step ? 'STEP、' : ''}零件图、键槽 G 代码（${r.gcode_lines} 行）已生成，ERPNext 设计版本随后更新。`;
+    note.value = '';
+    await loadDesign();
+  } catch (e) { pubOk.value = false; pubMsg.value = e.message; } finally { busy.value = false; }
+}
+const packBusy = ref(false);
+const packErr = ref('');
+async function downloadPack() {
+  packBusy.value = true; packErr.value = '';
+  try {
+    const r = await fetch('/api/freecad/pack.zip', { headers: { 'x-wq-token': session.token } });
+    if (!r.ok) throw new Error('下载失败（' + r.status + '）');
+    const url = URL.createObjectURL(await r.blob());
+    const a = document.createElement('a');
+    a.href = url; a.download = 'wenquest-freecad.zip'; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  } catch (e) { packErr.value = e.message; } finally { packBusy.value = false; }
+}
+async function loadDesign() {
+  d.value = await get('/design/' + ITEM);
+  if (g.value) code.value = await (await fetch(g.value.gcode_ref)).text();
+}
+
 onMounted(async () => {
+  loadParams();
   [d.value, rt.value] = await Promise.all([get('/design/SH-301'), get('/routing/SH-301')]);
   if (g.value) code.value = await (await fetch(g.value.gcode_ref)).text();
   const al = await get('/history?type=ai.alert&hours=72&limit=50');
@@ -91,6 +205,18 @@ onMounted(async () => {
 .drawing img { width: 100%; display: block; }
 .steps { padding-left: 18px; line-height: 1.7; margin: 0 0 8px; }
 .alert { background: var(--accent-bg); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+.design { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.form input[type=number] { width: 72px; }
+.segs input { text-align: right; }
+.line { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.kw select { margin: 0 4px; }
+.note { flex-grow: 1; min-width: 200px; }
+.checks { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.err { color: var(--bad); }
+.ok, .okline { color: var(--good); }
+.warnline { color: var(--warn-ink); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pill.info { margin-left: 6px; }
+@media (max-width: 900px) { .design { grid-template-columns: 1fr; } }
 .code { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-family: var(--mono); font-size: 12px; max-height: 220px; overflow: auto; }
 @media (max-width: 1100px) { .side { width: auto; } }
 </style>

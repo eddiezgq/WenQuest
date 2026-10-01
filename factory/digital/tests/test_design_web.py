@@ -78,3 +78,24 @@ def test_step_geometry():
     size = shape.bounding_box().size
     assert round(size.Z) == 167 and round(size.X) == 40
     assert 150000 < shape.volume < 160478                                 # 各段圆柱体积和减去键槽、倒角
+
+
+def test_freecad_pack(monkeypatch):
+    """W5：宏包里已填好工作台地址、本人凭证和模式"""
+    import importlib
+    import io
+    import zipfile
+    from fastapi.testclient import TestClient
+    monkeypatch.setenv("WQ_HUB_NO_START", "1")
+    monkeypatch.setenv("WQ_SECRET", "test-secret")
+    import hub.app as app_mod
+    app_mod = importlib.reload(app_mod)
+    c = TestClient(app_mod.app)
+    assert c.get("/api/freecad/pack.zip").status_code == 401
+    tok = app_mod._sign({"name": "小李", "role": "engineer", "mode": "teach", "teacher": False, "exp": 4e9})
+    r = c.get("/api/freecad/pack.zip", headers={"x-wq-token": tok, "host": "factory.example.com", "x-forwarded-proto": "https"})
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    pub = z.read("wenquest-freecad/wq_publish.py").decode("utf-8")
+    assert "'https://factory.example.com'" in pub and repr(tok) in pub and "'teach'" in pub
+    assert "https://factory.example.com" in z.read("wenquest-freecad/wq_library.py").decode("utf-8")
+    assert "7 天内有效" in z.read("wenquest-freecad/使用说明.txt").decode("utf-8")

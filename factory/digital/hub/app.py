@@ -718,6 +718,47 @@ def design_publish(item: str, body: dict = Body(...), u=Depends(user_of)):
         raise HTTPException(422, str(e))
 
 
+@app.get("/api/freecad/pack.zip")
+def freecad_pack(request: Request, x_wq_token: str = Header(default=""), u=Depends(user_of)):
+    """进阶：桌面 FreeCAD 宏包（第 6 轮 W5）。工作台地址、本人凭证、模式已填进 wq_publish.py，解压即用"""
+    import io
+    import zipfile
+    proto = request.headers.get("x-forwarded-proto") or request.url.scheme
+    base = "{}://{}".format(proto, request.headers.get("host") or request.url.netloc)
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        for name in ("wq_shaft.py", "wq_publish.py", "wq_drawing.py", "wq_cam_keyway.py", "wq_library.py"):
+            text = open(os.path.join(design_web.FREECAD_DIR, name), encoding="utf-8").read()
+            if name == "wq_publish.py":
+                text = (text.replace('os.environ.get("WQ_HUB_URL", "http://localhost:8100")', 'os.environ.get("WQ_HUB_URL", {!r})'.format(base))
+                        .replace('os.environ.get("WQ_USER", "工艺员")', 'os.environ.get("WQ_USER", {!r})'.format(who(u)))
+                        .replace('os.environ.get("WQ_MODE", "teach")', 'os.environ.get("WQ_MODE", {!r})'.format(u["mode"]))
+                        .replace('os.environ.get("WQ_TOKEN", "")', 'os.environ.get("WQ_TOKEN", {!r})'.format(x_wq_token)))
+            if name == "wq_library.py":
+                text = text.replace('"https://factory.wenquestrobotics.com"', repr(base))
+            z.writestr("wenquest-freecad/" + name, text)
+        z.writestr("wenquest-freecad/使用说明.txt", FREECAD_README.format(base=base, mode="教学" if u["mode"] == "teach" else "生产"))
+    return Response(buf.getvalue(), media_type="application/zip",
+                    headers={"Content-Disposition": "attachment; filename=wenquest-freecad.zip"})
+
+
+FREECAD_README = """问渠数字工厂 · 桌面 FreeCAD 宏包（进阶，选做）
+
+不想装软件的话，直接用“设计与工艺”页上的“在线设计”即可，效果相同。
+
+1. 安装 FreeCAD 1.1（https://www.freecad.org/downloads.php），装好后打开。
+2. 把本压缩包解压到任意文件夹，例如“文档\\wenquest-freecad”。
+3. FreeCAD 菜单：宏 → 宏…，在“用户宏的位置”里选这个文件夹。
+4. 改设计：在宏列表里选 wq_shaft.py → 编辑，修改 PARAMS（例如键槽长 45 → 42），保存。
+5. 发布：选 wq_publish.py → 执行。成功后回到 {base}/work/engineer 刷新，能看到新版本、零件图和 G 代码。
+6. 插入零件库标准件：执行 wq_library.py，搜索 6207 等编号。
+
+说明：wq_publish.py 里已经填好了工作台地址和你的登录凭证（{mode}模式，7 天内有效）。
+发布时提示“请先登录”，说明凭证过期了：回到“设计与工艺”页重新下载宏包即可。
+不要把这个宏包转给别人——别人用它发布会记在你名下。
+"""
+
+
 # ---------------------------------------------------------------- 教学
 @app.get("/api/teach")
 def teach_status(u=Depends(user_of)):

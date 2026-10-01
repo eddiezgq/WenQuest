@@ -35,6 +35,7 @@ CONFIG = {
     "hub": os.environ.get("WQ_HUB_URL", "http://localhost:8100"),   # 数字工厂工作台地址
     "name": os.environ.get("WQ_USER", "工艺员"),                    # 你的名字（教学模式按它记分）
     "mode": os.environ.get("WQ_MODE", "teach"),                     # teach 教学 / prod 生产
+    "token": os.environ.get("WQ_TOKEN", ""),                        # 线上登录凭证：从“设计与工艺”页下载的宏包里已填好（7 天有效）
     "item": "SH-301",
     "title": "输出轴 Output shaft",
     "material_item": "RM-45-D50",      # 45 钢圆棒 Ø50
@@ -99,7 +100,7 @@ def publish(hub_url=None, token=None, author=None, params=None, change_note="", 
     problems = wq_shaft.check_keyway(params["segments"], params["keyway"])
     if problems:
         raise ValueError("；".join(problems))
-    token = token or login(hub, author, mode)
+    token = token or cfg.get("token") or login(hub, author, mode)
     item = cfg["item"]
     rev = current_revision(hub, token, item) + 1
     tag = "{}-rev{}".format(item, rev)
