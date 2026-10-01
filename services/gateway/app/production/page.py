@@ -91,6 +91,13 @@ def build(spec: dict, lang: str) -> str:
     out.append(figures_at(s, "summary", i))
     if s["self_check"]:
         out.append(f"<h3>{L['check']}</h3>" + ol(s["self_check"]))
+    if s.get("factory_live"):
+        url = _e(s["factory_live"])
+        out.append(f"<h3>{'数字工厂车间（实时）' if i == 0 else 'The digital factory workshop (live)'}</h3><p>"
+                   + (f"本课的例子来自问渠数字工厂。<a class=\"wq-factory\" href=\"{url}\">打开数字工厂车间（实时）</a>，"
+                      "看看 AGV 和机床此刻在做什么。" if i == 0 else
+                      f"This lesson's examples come from the WenQuest digital factory. <a class=\"wq-factory\" href=\"{url}\">"
+                      "Open the workshop (live)</a> to see what the AGVs and machines are doing right now.") + "</p>")
     if s.get("sources"):
         head = "素材来源" if i == 0 else "Sources"
         out.append(f"<h4>{head}</h4><ul>" + "".join(

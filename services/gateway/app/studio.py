@@ -833,7 +833,21 @@ class Studio(LectureMixin):
         book = normalize_design_book(data, o)
         known = await self.library_ids()
         book["library"] = [x for x in book.get("library", []) if x["id"] in known]
+        fs = await self.factory_summary()
+        if fs:
+            book["factory"] = {"case": fs["case"], "name": fs["case_name"], "products": fs["products"]}
         proj["design_book"] = book
+
+    async def factory_summary(self) -> dict | None:
+        """The digital factory's teaching case for the AI team, or None when it is not connected or does not answer."""
+        fac = getattr(self, "factory", None)
+        if not fac or not fac.available:
+            return None
+        try:
+            return await fac.summary()
+        except Exception as e:  # noqa: BLE001 - the factory being down must not stop a lesson
+            log.warning("factory: %s", e)
+            return None
 
     def lesson_no(self, proj: dict, chapter: dict, les: dict) -> str:
         return f"{chapter['no']}.{chapter['lessons'].index(les) + 1}"
@@ -856,6 +870,10 @@ class Studio(LectureMixin):
         ctx = (self.lesson_context(proj, chapter, les, items) + f"\nLesson number: {no}"
                + (f"\n\n问渠零件与机器人库 — entries you may show (id | name | category | tags | principle); list the ones this "
                   f"lesson uses in `assets`, ids exactly as written:\n{catalog}" if catalog else ""))
+        fs = await self.factory_summary() if (proj.get("design_book") or {}).get("factory") else None
+        if fs:
+            ctx += ("\n\n问渠数字工厂 — this course's factory case. Real facts you may use for the robot problem, examples and figures "
+                    "(say the data comes from 问渠数字工厂; never invent factory numbers; the workshop has no robot arms):\n" + fs["text"])
         previous = self.previous_spec(proj, les)
         les["status"], les["error"] = "writing", ""
         les["attention"], les["checks"] = [], {}
@@ -907,9 +925,16 @@ class Studio(LectureMixin):
             proj["busy"] = {"label": f"主讲教授按审稿意见重写：{no}", "since": now()}
             self.projects.save(proj)
         spec["sources"] = await self.lesson_assets(proj, les, spec)
+        les.pop("factory_used", None)
         spec["figures_made"] = await self.make_figures(proj, les, spec, no)
         video = await self.make_video(proj, les, spec, no, review)
         lab = await self.make_lab(proj, chapter, les, spec, no, review)
+        if les.get("factory_used") and fs:
+            from .factory import source_record
+            spec["sources"] = (spec.get("sources") or []) + [source_record(fs)]
+        spec.pop("factory_live", None)
+        if fs:
+            spec["factory_live"] = f"{self.factory.url}/embed/workshop?view=overview&mode=live"
         proj["busy"] = {"label": f"正在排版课件、指导书、报告模板和教案：{no}", "since": now()}
         self.projects.save(proj)
         await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video, lab)
@@ -994,7 +1019,8 @@ class Studio(LectureMixin):
 
     async def animate3d(self, proj: dict, les: dict, spec: dict, no: str) -> dict | None:
         """三维动画师: a template filled with this lesson's content, rendered by the browser service, checked on its
-        key frames. Not made when the service is off or the course has no library models."""
+        key frames. With a digital-factory case the workshop itself can be replayed from the factory's data, followed by
+        one robot shot (marked as an illustration). Not made when the service is off or there is nothing to show."""
         from .production import scene3d as S
         les.setdefault("checks", {}).pop("animation3d", None)
         if not self.labcheck_url:
@@ -1002,50 +1028,108 @@ class Studio(LectureMixin):
         ids = list(dict.fromkeys((les.get("assets") or []) + [x["id"] for x in (proj.get("design_book") or {}).get("library", [])]))
         await self.use_assets(proj, ids)
         models = await asyncio.to_thread(S.load_models, self.assets_dir(proj), ids)
-        if not models:
+        fdata, fsum = await self.workshop_data(proj)
+        if not models and not fdata:
             return None
         d = self.lesson_dir(proj, les)
         lang = {"zh": "zh", "en": "en"}.get(proj["outline"].get("languages"), "both")
         spec_json = json.dumps({k: spec[k] for k in ("title", "goal", "problem", "concept", "animation", "summary")},
                                ensure_ascii=False)[:9000]
+        title = spec["animation"]["title"] if spec["animation"]["title"][0] else spec["title"]
+        source = ""
+        if fsum:
+            source = "数据来自问渠数字工厂，截至 " + (fsum.get("as_of") or "").replace("T", " ").replace("Z", " UTC")
         problem = ""
         for attempt in range(2):
             proj["busy"] = {"label": f"三维动画师正在{'安排' if attempt == 0 else '重新安排'}三维动画：{no}", "since": now()}
             self.projects.save(proj)
             plan = await self.ai.json(system=team.ANIMATOR_3D,
-                                      prompt=team.plan3d_prompt(no, spec_json, self.models_text(models), self.course_brief(proj), problem),
-                                      schema=team.plan3d_schema(), max_tokens=3000, fake=lambda: fake_plan3d(models))
-            plan = normalize_plan3d(plan if isinstance(plan, dict) else {}, models)
+                                      prompt=team.plan3d_prompt(no, spec_json, self.models_text(models), self.course_brief(proj), problem,
+                                                                fsum["text"] if fsum and fdata else ""),
+                                      schema=team.plan3d_schema(), max_tokens=3500, fake=lambda: fake_plan3d(models, bool(fdata)))
+            plan = normalize_plan3d(plan if isinstance(plan, dict) else {}, models, bool(fdata))
+            plans = [plan] + ([plan["also"]] if plan.get("also") else [])
             try:
-                script = S.build(plan, models, title=spec["animation"]["title"] if spec["animation"]["title"][0] else spec["title"],
-                                 no=no, lang=lang)
+                scripts = []
+                for k, pl in enumerate(plans):
+                    illustration = k > 0 and plans[0]["template"] == "workshop"
+                    t = (["上下料示意（非工厂数据）", "Loading — an illustration, not factory data"] if illustration else title)
+                    scripts.append(S.build(pl, models, title=t, no=no, lang=lang, factory_data=fdata,
+                                           source=source if pl["template"] == "workshop" else ""))
             except S.Render3DError as e:
                 problem = str(e)
                 continue
             proj["busy"] = {"label": f"正在渲染三维动画：{no}（约 1–3 分钟）", "since": now()}
             self.projects.save(proj)
-            try:
-                video, poster, secs, frames = await S.render(self.labcheck_url, S.page(script, models), S.seconds(script),
-                                                             timeout=self.labcheck_timeout * 6)
-            except S.Render3DError as e:
-                if e.stage == "service":
-                    les["checks"]["animation3d"] = {"ok": None, "note": f"三维渲染服务暂时不可用（{e}）"}
-                    return None
-                problem = str(e)
+            clips, frames_all, err = [], [], ""
+            for k, script in enumerate(scripts):
+                try:
+                    video, poster, secs, frames = await S.render(self.labcheck_url, S.page(script, models), S.seconds(script),
+                                                                 timeout=self.labcheck_timeout * 6)
+                except S.Render3DError as e:
+                    if e.stage == "service":
+                        les["checks"]["animation3d"] = {"ok": None, "note": f"三维渲染服务暂时不可用（{e}）"}
+                        return None
+                    err = str(e)
+                    break
+                (d / f"anim3d-{k}.mp4").write_bytes(video)
+                if k == 0 and poster:
+                    (d / "anim3d.jpg").write_bytes(poster)
+                clips.append((d / f"anim3d-{k}.mp4", secs))
+                frames_all += frames[:2]
+            if err:
+                problem = err
                 continue
-            rel = await self.relevance(proj, les, spec, "3D animation", [c[2][0] for c in script.get("captions") or []]
-                                       + [str(x.get("id")) for x in script.get("actors") or []],
-                                       [("image/jpeg", f) for f in frames[:3]])
+            words = [c[2][0] for sc in scripts for c in sc.get("captions") or []] + [str(x.get("id")) for sc in scripts for x in sc.get("actors") or []]
+            rel = await self.relevance(proj, les, spec, "3D animation", words, [("image/jpeg", f) for f in frames_all[:4]])
             if not rel["on_topic"]:
                 problem = f"{rel['reason']} {rel['fix']}"
                 continue
-            (d / "anim3d.mp4").write_bytes(video)
-            if poster:
-                (d / "anim3d.jpg").write_bytes(poster)
-            les["checks"]["animation3d"] = {"ok": True, "note": f"三维动画 {secs:.0f} 秒（{plan['template']}），切题"}
-            return {"video": d / "anim3d.mp4", "poster": d / "anim3d.jpg" if poster else None, "seconds": secs}
+            out = d / "anim3d.mp4"
+            if len(clips) == 1:
+                clips[0][0].replace(out)
+            else:
+                await asyncio.to_thread(self._concat_clips, [c[0] for c in clips], out)
+                for c in clips:
+                    c[0].unlink(missing_ok=True)
+            secs = sum(c[1] for c in clips)
+            if any(p["template"] == "workshop" for p in plans):
+                les["factory_used"] = True
+            note = "＋".join(p["template"] for p in plans)
+            les["checks"]["animation3d"] = {"ok": True, "note": f"三维动画 {secs:.0f} 秒（{note}），切题"}
+            return {"video": out, "poster": d / "anim3d.jpg" if (d / "anim3d.jpg").exists() else None, "seconds": secs}
         les["checks"]["animation3d"] = {"ok": False, "note": f"三维动画没做成：{problem[:200]}"}
         return None
+
+    @staticmethod
+    def _concat_clips(parts: list, out) -> None:
+        import subprocess
+        norm = "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p"
+        args = ["ffmpeg", "-y", "-loglevel", "error"]
+        for p in parts:
+            args += ["-i", str(p)]
+        fc = ";".join(f"[{i}:v]{norm}[v{i}]" for i in range(len(parts))) + ";" + "".join(f"[v{i}]" for i in range(len(parts))) \
+            + f"concat=n={len(parts)}:v=1:a=0[v]"
+        subprocess.run(args + ["-filter_complex", fc, "-map", "[v]", "-c:v", "libx264", "-crf", "21", "-preset", "veryfast",
+                               "-movflags", "+faststart", str(out)], check=True, capture_output=True, timeout=600)
+
+    async def workshop_data(self, proj: dict) -> tuple[dict | None, dict | None]:
+        """The busiest recent hour of the factory's workshop (layout, AGV moves, machine states) for a workshop clip."""
+        if not (proj.get("design_book") or {}).get("factory"):
+            return None, None
+        fac = getattr(self, "factory", None)
+        fsum = await self.factory_summary()
+        if not fsum:
+            return None, None
+        try:
+            frm, to, agv = await fac.busy_window(1.0)
+            if not agv:
+                return None, fsum
+            events = (await fac.data("event")).get("rows") or []
+            return {"layout": await fac.layout(), "agv": agv, "event": events, "from": frm, "to": to}, fsum
+        except Exception as e:  # noqa: BLE001
+            log.warning("factory workshop data: %s", e)
+            return None, fsum
 
     def join_clips(self, proj: dict, les: dict, spec: dict, no: str, clip: dict, video: dict | None) -> dict:
         """3D opener + formula animation → one MP4 (re-encoded to 1280×720, 30 fps). Without ffmpeg, the formula
@@ -1193,6 +1277,19 @@ class Studio(LectureMixin):
                             out = await asyncio.to_thread(F.render_picture, self.assets_dir(proj) / rec["id"] / png, dest)
                         else:
                             raise F.FigureError(f"no library drawing for {aid or '(none)'}")
+                    elif fig["kind"] == "factory":
+                        from .production import factory_figs
+                        fac = getattr(self, "factory", None)
+                        if not fac or not fac.available or not (proj.get("design_book") or {}).get("factory"):
+                            raise F.FigureError("the digital factory is not set up for this course")
+                        try:
+                            out = await factory_figs.make(fac, fig["asset"] or "layout", dest, lang,
+                                                          [x.strip() for x in re.split(r"[,，\s]+", fig.get("data") or "") if x.strip()])
+                        except Exception as e:  # noqa: BLE001 - FactoryError, bad data
+                            if isinstance(e, F.FigureError):
+                                raise
+                            raise F.FigureError(f"digital factory: {e} (not set up)") from e
+                        les["factory_used"] = True
                     else:
                         data = await self.ai.json(system=team.ILLUSTRATOR,
                                                   prompt=team.figure_prompt(no, fig, spec_json, lang, course, error, previous),
@@ -1635,6 +1732,7 @@ def normalize_design_book(d, outline: dict) -> dict:
             "chapters": chapters, "avoid": [str(a)[:200] for a in d.get("avoid") or [] if a][:8],
             "library": [{"id": str(x.get("id") or "").strip(), "role": str(x.get("role") or "")[:120]}
                         for x in d.get("library") or [] if isinstance(x, dict) and x.get("id")][:12],
+            **({"factory": d["factory"]} if isinstance(d.get("factory"), dict) and d["factory"].get("case") else {}),
             **({"by": "teacher"} if d.get("by") == "teacher" else {})}
 
 
@@ -1892,8 +1990,15 @@ def fake_figure(fig: dict, spec: dict) -> dict:
                     "        self.add(frame2([-3, -1, 0], 0, 1.4, name=r\"\\{A\\}\"), frame2([2, 0, 0], 30, 1.4, name=r\"\\{B\\}\"))\n"}
 
 
-def fake_plan3d(models: dict) -> dict:
-    """Offline 3D animator: a showcase when there are several robots, otherwise the first model's typical motion."""
+def fake_plan3d(models: dict, factory: bool = False) -> dict:
+    """Offline 3D animator: the factory workshop (then a robot) when the course has a factory case; otherwise a
+    showcase when there are several robots, else the first model's typical motion."""
+    if factory:
+        out = {"template": "workshop", "follow": "agv-01", "highlight": ["cnc-l01-a"],
+               "captions": [{"from": 1, "to": 9, "text": ["AGV 把工件送到下一道工序", "AGVs carry parts to the next operation"]}]}
+        if models:
+            out["also"] = fake_plan3d(models)
+        return out
     robots = [k for k, m in models.items() if m["entry"].get("kind") == "robot"]
     if len(robots) >= 2:
         return {"template": "showcase", "items": [{"id": k, "name": list(models[k]["entry"]["name"].values()),
@@ -1910,9 +2015,11 @@ def fake_plan3d(models: dict) -> dict:
             "captions": [{"from": 0, "to": 4, "text": [e["name"].get("zh", ""), e["name"].get("en", "")]}]}
 
 
-def normalize_plan3d(p: dict, models: dict) -> dict:
-    """Keep only known ids and joints, clamp joint values to their limits, captions to [from, to, [zh, en]]."""
-    tpl = p.get("template") if p.get("template") in ("showcase", "joints", "mechanism", "explode") else "joints"
+def normalize_plan3d(p: dict, models: dict, factory: bool = False, nested: bool = False) -> dict:
+    """Keep only known ids and joints, clamp joint values to their limits, captions to [from, to, [zh, en]];
+    `also` = one more clip (not a workshop again)."""
+    allowed = ("showcase", "joints", "mechanism", "explode") + (("workshop",) if factory and not nested else ())
+    tpl = p.get("template") if p.get("template") in allowed else ("joints" if models else "workshop" if factory else "joints")
     items = [{"id": str(i.get("id")), "name": i.get("name") or ["", ""], "line": i.get("line") or ["", ""]}
              for i in p.get("items") or [] if isinstance(i, dict) and i.get("id") in models][:8]
     item = p.get("item") if p.get("item") in models else next(iter(models), "")
@@ -1936,7 +2043,13 @@ def normalize_plan3d(p: dict, models: dict) -> dict:
                 caps.append([float(c.get("from") or 0), float(c.get("to") or 0), c["text"]])
             except (TypeError, ValueError):
                 continue
-    return {"template": tpl, "items": items, "item": item, "poses": poses[:6], "captions": caps[:6]}
+    out = {"template": tpl, "items": items, "item": item, "poses": poses[:6], "captions": caps[:6]}
+    if tpl == "workshop":
+        out["follow"] = str(p.get("follow") or "")[:40]
+        out["highlight"] = [str(x)[:40] for x in p.get("highlight") or []][:6]
+    if not nested and isinstance(p.get("also"), dict) and p["also"].get("template") and models:
+        out["also"] = normalize_plan3d(p["also"], models, factory, True)
+    return out
 
 
 def fake_guide_plan() -> dict:

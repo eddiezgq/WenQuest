@@ -832,6 +832,10 @@ def _studio() -> st.Studio:
     s.animator_timeout = state.settings.animator_timeout
     s.labcheck_url = state.settings.labcheck_url
     s.voice_url = state.settings.voice_url
+    fkey = (state.settings.factory_url, state.settings.factory_read_key)
+    if getattr(s, "factory_key", None) != fkey:
+        from .factory import Factory
+        s.factory, s.factory_key = Factory(*fkey), fkey
     lib_key = (state.settings.library_url, state.settings.data_dir)
     if getattr(s, "library_key", None) != lib_key:
         from .library import Library

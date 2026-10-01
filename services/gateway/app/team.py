@@ -313,6 +313,10 @@ def design_book_text(b: dict | None) -> str:
     if b.get("library"):
         lines.append("Library entries used throughout (问渠零件与机器人库): "
                      + "; ".join(f"{x['id']} ({x.get('role', '')})" for x in b["library"]))
+    f = b.get("factory") or {}
+    if f.get("case"):
+        lines.append(f"Digital-factory case (问渠数字工厂, real teaching data): {f['case']} {(f.get('name') or {}).get('zh', '')}; "
+                     f"products {', '.join(f.get('products') or [])}")
     if b.get("avoid"):
         lines.append("Avoid: " + "; ".join(b["avoid"]))
     return "\n".join(x for x in lines if x.split(":", 1)[-1].strip(" ;—"))
@@ -459,8 +463,12 @@ ANIMATOR_3D = COMMON + (
     "one line on what makes it that kind of robot (for overviews and classification); joints = one robot moves "
     "through 2-5 key poses that show THIS lesson's idea (joint values must stay inside each joint's limits; the "
     "tool point leaves a trace); mechanism = a mechanism turns through its motion; explode = an assembly flies apart "
-    "and back to show its parts. Captions (2-5, bilingual) say what to watch, with times in seconds inside the clip. "
-    "Use only the ids listed. Return JSON."
+    "and back to show its parts; workshop = (only when the course has a digital-factory case) the factory's own "
+    "workshop replayed from its recorded data: AGVs carrying parts, machines running — set `follow` (a unit or AGV id "
+    "to close in on) and `highlight` (unit ids) from the workshop facts; never claim anything the data does not show "
+    "(the workshop has no robot arms). You may add ONE more clip in `also` (template showcase or joints) — e.g. after a "
+    "workshop clip, a robot loading a machine; such a robot shot is marked as an illustration automatically. "
+    "Captions (2-5, bilingual) say what to watch, with times in seconds inside the clip. Use only the ids listed. Return JSON."
 )
 
 
@@ -468,15 +476,18 @@ def plan3d_schema() -> dict:
     item = _obj({"id": STR, "name": PAIR, "line": PAIR}, ["id", "name", "line"])
     val = _obj({"joint": STR, "value": {"type": "number"}})
     cap = _obj({"from": {"type": "number"}, "to": {"type": "number"}, "text": PAIR})
-    return _obj({"template": {"type": "string", "enum": ["showcase", "joints", "mechanism", "explode"]},
-                 "items": {"type": "array", "items": item}, "item": STR,
-                 "poses": {"type": "array", "items": _obj({"values": {"type": "array", "items": val}})},
-                 "captions": {"type": "array", "items": cap}}, ["template"])
+    one = {"template": {"type": "string", "enum": ["showcase", "joints", "mechanism", "explode", "workshop"]},
+           "items": {"type": "array", "items": item}, "item": STR,
+           "poses": {"type": "array", "items": _obj({"values": {"type": "array", "items": val}})},
+           "follow": STR, "highlight": STRS, "captions": {"type": "array", "items": cap}}
+    return _obj({**one, "also": _obj(dict(one), ["template"])}, ["template"])
 
 
-def plan3d_prompt(no: str, spec_json: str, models_text: str, course: str, problem: str = "") -> str:
+def plan3d_prompt(no: str, spec_json: str, models_text: str, course: str, problem: str = "", factory: str = "") -> str:
     out = (f"{course}\n\nLesson {no}. The lesson spec:\n{spec_json}\n\nLibrary copies in this course (id | name | kind | "
            f"joints name[lower..upper] rest | tool link):\n{models_text}\n")
+    if factory:
+        out += f"\nDigital-factory workshop (template workshop is available):\n{factory}\n"
     if problem:
         out += f"\nYour previous clip was not accepted: {problem}\nPlan it again so it shows THIS lesson's idea.\n"
     return out

@@ -40,13 +40,15 @@ def lesson_schema() -> dict:
         "summary": PAIRS,
         "self_check": PAIRS,
         "figures": {"type": "array", "items": _obj({
-            "kind": {"type": "string", "enum": ["scene", "graph", "chart", "drawing"]},
+            "kind": {"type": "string", "enum": ["scene", "graph", "chart", "drawing", "factory"]},
             "place": {"type": "string", "enum": ["problem", "concept", "notes", "example", "model", "summary"]},
             "title": PAIR, "purpose": PAIR, "asset": STR, "data": STR}),
             "description": "3-6 illustrations: scene = schematic with formulas/frames/robot parts; graph = block diagram, flow, "
                            "classification tree, course map; chart = plot of REAL numbers (the lesson's own formulas or "
                            "given data only, never invented statistics; put the numbers or formula in `data`); drawing = a "
-                           "library entry's drawing (`asset` = its id). `purpose` says exactly what the figure must show."},
+                           "library entry's drawing (`asset` = its id); factory = drawn from the 问渠数字工厂 data when the course has a "
+                           "factory case (`asset` = layout | bom:<product code> | routing:<item code> | control:<characteristic>; "
+                           "`data` = unit codes to highlight on the layout, comma-separated). `purpose` says exactly what the figure must show."},
         "assets": {"type": "array", "items": _obj({"id": STR, "use": PAIR}),
                    "description": "问渠零件与机器人库 entries this lesson shows (ids exactly as listed; 0-6)"},
     })
@@ -181,7 +183,7 @@ def normalize_lesson(d: Any) -> dict:
         "model": {k: pair(mo.get(k)) for k in ("assume", "solve", "check", "improve")},
         "everyday": {"text": pair(ev.get("text")), "answer": pair(ev.get("answer"))},
         "summary": pairs(d.get("summary"), 6), "self_check": pairs(d.get("self_check"), 5),
-        "figures": [{"kind": f.get("kind") if f.get("kind") in ("scene", "graph", "chart", "drawing") else "scene",
+        "figures": [{"kind": f.get("kind") if f.get("kind") in ("scene", "graph", "chart", "drawing", "factory") else "scene",
                      "place": f.get("place") if f.get("place") in ("problem", "concept", "notes", "example", "model", "summary") else "concept",
                      "title": pair(f.get("title")), "purpose": pair(f.get("purpose")),
                      "asset": str(f.get("asset") or "").strip(), "data": str(f.get("data") or "")[:2000]}

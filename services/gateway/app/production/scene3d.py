@@ -24,7 +24,7 @@ from pathlib import Path
 import httpx
 
 ENGINE = Path(__file__).parent / "three" / "wq3d.js"
-TEMPLATES = ("showcase", "joints", "mechanism", "explode")
+TEMPLATES = ("showcase", "joints", "mechanism", "explode", "workshop")
 
 
 class Render3DError(Exception):
@@ -141,9 +141,109 @@ def explode(item: str, models: dict, *, amount=0.9, captions=None, title=None, n
             "captions": caps, "camera": {"keys": [[0, 30, 35, 0.6, "e"], [10, 80, 30, 0.6, "e"]]}}
 
 
-def build(plan: dict, models: dict, *, title=None, no="", lang="both") -> dict:
+def _ts(s: str):
+    from datetime import datetime
+    return datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+
+def _route(a, b, ys, vx):
+    """The factory's AGV routing: into the nearest aisle, along it (changing aisle on the cross aisle), into the dock."""
+    if abs(a[0] - b[0]) < 1e-6 and abs(a[1] - b[1]) < 1e-6:
+        return [a]
+    ay = min(ys, key=lambda y: abs(y - a[1])) if ys else a[1]
+    by = min(ys, key=lambda y: abs(y - b[1])) if ys else b[1]
+    pts = [a, (a[0], ay)]
+    if ay != by and vx is not None:
+        pts += [(vx, ay), (vx, by)]
+    pts += [(b[0], by), b]
+    out = [pts[0]]
+    for p in pts[1:]:
+        if abs(p[0] - out[-1][0]) > 1e-6 or abs(p[1] - out[-1][1]) > 1e-6:
+            out.append(p)
+    return out
+
+
+def workshop(data: dict, *, follow: str = "", highlight=None, captions=None, title=None, no="", lang="both",
+             seconds: float = 24.0, source: str = "") -> dict:
+    """车间: the digital factory's floor in a time window, from its own data — units coloured by their state, AGVs on
+    their recorded moves (routed along the aisles as in the factory). data = {layout, agv (rows), event (rows), from, to}."""
+    layout = data["layout"]
+    t0, t1 = _ts(data["from"]), _ts(data["to"])
+    span = max(60.0, (t1 - t0).total_seconds())
+    usable = max(6.0, seconds - 1.0)
+    T = lambda ts: round(0.5 + (_ts(ts) - t0).total_seconds() / span * usable, 3)  # noqa: E731
+    ys = sorted(a["y_m"] for a in layout.get("aisles") or [] if a.get("axis") == "x")
+    vx = next((a["x_m"] for a in layout.get("aisles") or [] if a.get("axis") == "y"), None)
+    hi = set(highlight or [])
+    states: dict[str, list] = {}
+    for r in sorted(data.get("event") or [], key=lambda r: r["ts"]):
+        if r.get("event") != "state" or not r.get("state"):
+            continue
+        t = max(0.0, T(r["ts"])) if _ts(r["ts"]) >= t0 else 0.0
+        if _ts(r["ts"]) <= t1:
+            states.setdefault(r["unit"], []).append([t, r["state"]])
+    units = [{"id": u["unit"], "x": u["x_m"], "y": u["y_m"], "w": u["w_m"], "d": u["d_m"], "h": 2.6 if u.get("area") == "warehouse" else 1.6,
+              "store": u.get("area") == "warehouse",
+              "name": (u["name"].get("en") if lang == "en" else u["name"].get("zh")) or u["unit"],
+              "highlight": u["unit"] in hi, "states": states.get(u["unit"], [])} for u in layout.get("units") or []]
+    by_agv: dict[str, list] = {}
+    for r in sorted(data.get("agv") or [], key=lambda r: r["ts"]):
+        by_agv.setdefault(r["unit"], []).append(r)
+    agvs = []
+    for aid, rows in by_agv.items():
+        keys = []
+        for a, b in zip(rows, rows[1:] + [None]):
+            ta = T(a["ts"])
+            keys.append([ta, a["x_m"], a["y_m"], 1 if a.get("load") else 0])
+            if b is None:
+                break
+            path = _route((a["x_m"], a["y_m"]), (b["x_m"], b["y_m"]), ys, vx)
+            if len(path) < 2:
+                continue
+            tb = T(b["ts"])
+            lens = [((q[0] - p[0]) ** 2 + (q[1] - p[1]) ** 2) ** 0.5 for p, q in zip(path, path[1:])]
+            total = sum(lens) or 1.0
+            acc = 0.0
+            for q, ln in zip(path[1:-1], lens):
+                acc += ln
+                keys.append([round(ta + (tb - ta) * acc / total, 3), q[0], q[1], 1 if a.get("load") else 0])
+        for name, p in (layout.get("agv_home") or {}).items():
+            if name == aid and not keys:
+                keys.append([0.0, p["x_m"], p["y_m"], 0])
+        agvs.append({"id": aid, "keys": keys})
+    for name, p in (layout.get("agv_home") or {}).items():
+        if name not in by_agv:
+            agvs.append({"id": name, "keys": [[0.0, p["x_m"], p["y_m"], 0]]})
+    aisles = []
+    fw, fd = layout["floor"]["w_m"], layout["floor"]["d_m"]
+    for a in layout.get("aisles") or []:
+        if a.get("axis") == "x":
+            aisles.append({"x": fw / 2, "y": a["y_m"], "w": fw, "d": a.get("width_m", 2.2)})
+        elif a.get("axis") == "y":
+            y0, y1 = a.get("from_y_m", 0), a.get("to_y_m", fd)
+            aisles.append({"x": a["x_m"], "y": (y0 + y1) / 2, "w": a.get("width_m", 2.2), "d": y1 - y0})
+    caps = [[float(c[0]), float(c[1]), _pair(c[2])] for c in (captions or []) if isinstance(c, (list, tuple)) and len(c) == 3]
+    target = follow if follow in {u["id"] for u in units} | {a["id"] for a in agvs} else ""
+    mid = seconds * 0.5
+    cam = [[0, 15, 52, 1.7, "workshop"], [mid - 2, 35, 44, 1.7, "workshop"]]
+    cam += [[mid, 30, 35, 1.0, target], [seconds - 3, 55, 32, 1.0, target]] if target else [[seconds, 55, 40, 1.7, "workshop"]]
+    if target:
+        cam.append([seconds, 30, 48, 1.7, "workshop"])
+    sod = t0.hour * 3600 + t0.minute * 60 + t0.second
+    return {"theme": "dark", "lang": lang, "duration": round(seconds, 2), "title": _pair(title) if title else None, "no": no,
+            "actors": [], "captions": caps, "source": source,
+            "workshop": {"floor": {"w": fw, "d": fd}, "aisles": aisles, "units": units, "agvs": agvs, "clock": [sod, span / usable]},
+            "camera": {"keys": cam}}
+
+
+def build(plan: dict, models: dict, *, title=None, no="", lang="both", factory_data: dict | None = None, source: str = "") -> dict:
     """A scene script from the 3D animator's plan {template, items|item, poses, captions, ...}."""
     tpl = plan.get("template")
+    if tpl == "workshop":
+        if not factory_data:
+            raise Render3DError("the digital factory is not connected for this course", "plan")
+        return workshop(factory_data, follow=plan.get("follow") or "", highlight=plan.get("highlight"), captions=plan.get("captions"),
+                        title=title, no=no, lang=lang, source=source)
     if tpl == "showcase":
         return showcase(plan.get("items") or [], models, title=title, no=no, lang=lang)
     item = plan.get("item") or next(iter(models), "")

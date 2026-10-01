@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     library_url: str = ""
     # The voice service (services/voice): speech synthesis and recognition for lecture videos. Empty = no lecture videos.
     voice_url: str = ""
+    # 问渠数字工厂 course interface (read-only key copied by deploy/update.sh). Empty = lessons without factory data.
+    factory_url: str = ""
+    factory_read_key: str = ""
     labcheck_timeout: float = 150.0
     data_dir: str = "/tmp/wq-data"  # converted slides and small settings; a persistent volume in production
 

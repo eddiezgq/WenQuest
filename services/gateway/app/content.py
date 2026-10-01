@@ -40,7 +40,7 @@ def clean(html: str, moodle_base: str, sign: Callable[[str], str]) -> str:
         tags=TAGS,
         attributes=ATTRS,
         set_tag_attribute_values=FORCED,
-        allowed_classes={"div": {"wq-fig"}, "p": {"wq-cap"}},   # figures in lecture notes (survive Moodle too)
+        allowed_classes={"div": {"wq-fig"}, "p": {"wq-cap"}, "a": {"wq-factory"}},   # figures; the live factory workshop
         url_schemes={"http", "https", "mailto"},
         link_rel=None,
     )
