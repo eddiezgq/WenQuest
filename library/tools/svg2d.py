@@ -210,7 +210,12 @@ def a_drawing(entry, row, nodes):
         sh.poly(p, 0.35)
     for p in spp:
         sh.poly(p, 0.35)
-    revolute = cat not in ("KEY", "LGD")
+    eng = (entry.get("model") or {}).get("engine", "")
+    if entry["id"].startswith("D"):                         # D 部分按外形示意的形状：圆柱、谐波杯型是回转体
+        revolute = eng in ("proxy:cylinder", "proxy:strain_wave")
+    else:
+        revolute = cat not in ("KEY", "LGD")
+    round_top = revolute and (cat in ROUND_CATS or entry["id"].startswith("D"))
     if revolute:                                            # 中心线（点画线）
         ax_x = fcx + (0 - fmx) * k                          # 轴线 x = 0
         sh.line(ax_x, cy - fh * k / 2 - 4, ax_x, cy + fh * k / 2 + 4, 0.18, "6,1.5,1,1.5")
@@ -222,8 +227,10 @@ def a_drawing(entry, row, nodes):
     sh.dim_h(x1, x2, yb + 1, yb + 8, fmt(fw))
     sh.dim_v(cy - fh * k / 2, cy + fh * k / 2, x1 - 1, x1 - 8, fmt(fh))
     sx1, sx2, syb = scx - sw * k / 2, scx + sw * k / 2, cy + shh * k / 2
-    sh.dim_h(sx1, sx2, syb + 1, syb + 8, ("⌀" if cat in ROUND_CATS else "") + fmt(sw))
+    sh.dim_h(sx1, sx2, syb + 1, syb + 8, ("⌀" if round_top else "") + fmt(sw))
     sh.text(fcx, 14, "主视图" + ("（剖视）" if cut_faces else ""), 3, "middle")
+    if entry["id"].startswith("D"):
+        sh.text(15, H - 10, "外形示意：按厂商样本的外形尺寸生成，不是厂商图纸；安装尺寸请以厂商样本为准", 2.6)
     sh.text(scx, 14, "侧视图" if cat in SIDE_VIEW_CATS else "俯视图", 3, "middle")
     size = row.get("size", "default")
     title_block(sh, entry, size, label, key_rows(entry, row))
@@ -608,7 +615,7 @@ def c_diagram(entry, p, mech):
 def drawing(entry, row, nodes=None, part=None):
     """build.py 调用：按部分出图；出不了返回 None（不影响模型）"""
     part_letter = entry["id"][0]
-    if part_letter == "A" and nodes:
+    if part_letter in ("A", "D") and nodes:              # D 部分：外形示意（按样本外形尺寸），同 A 的两视图
         return a_drawing(entry, row, nodes)
     if part_letter == "B" and part and part.get("robot"):
         return b_diagram(entry, part["robot"], part["bodies"])
