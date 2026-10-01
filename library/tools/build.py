@@ -122,7 +122,8 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
             part = nodes[0][1]
             (d / (code + ".glb")).write_bytes(b_robot.glb_bytes(part))
             (d / (code + ".png")).write_bytes(png_bytes([("robot", part["world"])]))
-            extra["robot"] = part["robot"]
+            if part.get("robot"):
+                extra["robot"] = part["robot"]
             if part.get("urdf"):                       # 自建机器人：URDF（第 5 轮 P9）
                 (d / (code + ".urdf")).write_text(part["urdf"], encoding="utf-8")
                 extra["urdf"] = "{}/{}.urdf".format(e["id"], code)
@@ -175,6 +176,8 @@ def entry_json(e, rows, results, version):
         doc["package"] = "{}/tree/{}/{}".format(src["repo"], src["commit"], src.get("path", "").rsplit("/", 1)[0])
     elif src.get("origin") == "wenquest" and e["kind"] == "robot":   # 自建机器人：参数化生成程序（URDF、glTF 都在网页包里）
         doc["package"] = "{}/blob/main/library/generators/b_wq.py".format(REPO)
+    elif src.get("origin") == "wenquest" and e["kind"] == "mechanism":   # 自建机构：生成程序（glTF、运动表都在网页包里）
+        doc["package"] = "{}/blob/main/library/generators/c_mech.py".format(REPO)
     elif src.get("origin") == "vendor" and e["kind"] == "robot":   # 按 DH 生成的厂商机器人：没有原始模型，指向官方技术参数表
         doc["package"] = (e.get("datasheet") or {}).get("src") or (e.get("vendor") or {}).get("site")
     else:

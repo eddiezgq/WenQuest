@@ -16,6 +16,9 @@ def get_builder(entry):
     if eng.startswith(("urdf:", "xacro:")):
         from generators import b_urdf
         return b_urdf.build
+    if eng.startswith("wqmech:"):
+        from generators import c_mech
+        return c_mech.build
     if eng.startswith("wqrobot:"):
         from generators import b_wq
         return b_wq.build

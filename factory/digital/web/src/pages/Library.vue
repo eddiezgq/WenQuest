@@ -111,7 +111,7 @@
               <a class="btn primary" :href="fileUrl(curSize?.files.glb)" download>glTF（米）</a>
               <a v-if="curSize?.files.urdf" class="btn" :href="fileUrl(curSize.files.urdf)" download>URDF</a>
               <a v-if="curSize?.files.motion" class="btn ghost" :href="fileUrl(curSize.files.motion)" download>运动表 CSV</a>
-              <a v-if="!entry.robot" class="btn" :href="entry.package">STEP / STL 压缩包（整族）</a>
+              <a v-if="!entry.robot && entry.kind !== 'mechanism'" class="btn" :href="entry.package">STEP / STL 压缩包（整族）</a>
               <a v-else-if="entry.model.engine.startsWith('menagerie:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 MJCF（{{ originName(entry.source.origin) }}）</a>
               <a v-else-if="entry.model.engine.startsWith('urdf:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 URDF（原仓库）</a>
               <a v-else-if="entry.model.engine.startsWith('xacro:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 xacro（ROS-Industrial）</a>
@@ -165,6 +165,26 @@
                       <td class="num">{{ entry.dh.speed_deg_s?.[i] ? entry.dh.speed_deg_s[i] + ' °/s' : '' }}</td></tr></tbody>
                   </table></div>
                 </template>
+              </template>
+              <template v-else-if="dtab === '机构'">
+                <div class="tbl-wrap">
+                  <table class="t">
+                    <thead><tr><th>构件</th><th>节点</th></tr></thead>
+                    <tbody><tr v-for="m in entry.mechanism?.members || []" :key="m.id">
+                      <td>{{ m.name.zh }}<template v-if="m.ground">（固定）</template><template v-if="m.id === entry.mechanism.input?.member">（主动）</template></td>
+                      <td class="mono small">{{ m.node }}</td></tr></tbody>
+                  </table>
+                </div>
+                <dl class="kv wide">
+                  <template v-for="(v, k) in entry.defaults || {}" :key="k">
+                    <dt>{{ (entry.params || []).find((x) => x.key === k)?.zh || k }}</dt>
+                    <dd class="mono">{{ v }} {{ (entry.params || []).find((x) => x.key === k)?.unit || '' }}</dd>
+                  </template>
+                </dl>
+                <p v-if="entry.mechanism?.analysis?.formula" class="small">{{ entry.mechanism.analysis.formula.zh }}</p>
+                <p class="small muted">{{ entry.mechanism?.dof }} 个自由度；输入：{{ entry.mechanism?.input?.path?.zh
+                  || ((entry.mechanism?.members || []).find((m) => m.id === entry.mechanism?.input?.member)?.name.zh + ' ' + (entry.mechanism?.input?.range || []).join('～') + ' ' + (entry.mechanism?.input?.unit || '')) }}。
+                  点“播放运动”看运动；运动表格式见《数字工厂资源接口约定》2.4。<template v-if="entry.mechanism?.note"> {{ entry.mechanism.note.zh }}</template></p>
               </template>
               <template v-else-if="dtab === '关节'">
                 <div class="tbl-wrap">
@@ -281,11 +301,12 @@ const catName = (p, c) => index.value?.categories?.[p]?.[c]?.zh || c;
 const counts = computed(() => {
   const A = families.value.filter((f) => f.part === 'A');
   return { A: A.length, Asizes: A.reduce((n, f) => n + f.sizes.length, 0), B: families.value.filter((f) => f.part === 'B').length,
-    D: families.value.filter((f) => f.part === 'D').length };
+    C: families.value.filter((f) => f.part === 'C').length, D: families.value.filter((f) => f.part === 'D').length };
 });
 const tabs = computed(() => [
   { key: 'A', name: 'A 标准件', count: counts.value.A },
   { key: 'B', name: 'B 机器人', count: counts.value.B },
+  ...(counts.value.C ? [{ key: 'C', name: 'C 机构', count: counts.value.C }] : []),
   ...(counts.value.D ? [{ key: 'D', name: 'D 机器人零部件', count: counts.value.D }] : []),
   ...(index.value?.collections || []).map((c) => ({ key: 'F', name: c.name.zh, count: c.count })),
 ]);
@@ -344,7 +365,7 @@ const sizeRows = computed(() => {
 });
 const dtabList = computed(() => {
   if (!entry.value) return [];
-  return [...(entry.value.datasheet ? ['参数'] : []), entry.value.robot ? '关节' : '规格', ...(entry.value.teaching?.principle || entry.value.teaching?.uses ? ['教学'] : []), '来源'];
+  return [...(entry.value.datasheet ? ['参数'] : []), entry.value.robot ? '关节' : entry.value.kind === 'mechanism' ? '机构' : '规格', ...(entry.value.teaching?.principle || entry.value.teaching?.uses ? ['教学'] : []), '来源'];
 });
 
 async function select(id, wantSize) {
@@ -358,7 +379,7 @@ async function select(id, wantSize) {
     const want = (wantSize || q.value).trim().toLowerCase();
     const hit = e.sizes.find((s) => s.size.toLowerCase() === want);
     size.value = hit ? hit.size : (e.sizes.find((s) => s.size === String(e.default))?.size || e.sizes[0]?.size || 'default');
-    dtab.value = e.datasheet ? '参数' : e.robot ? '关节' : '规格';
+    dtab.value = e.datasheet ? '参数' : e.robot ? '关节' : e.kind === 'mechanism' ? '机构' : '规格';
     await nextTick();
     loadModel();
   } catch (err) {
