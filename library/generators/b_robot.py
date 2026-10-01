@@ -140,6 +140,16 @@ def build(entry, row):
             jt["limit"] = {"lower": round(float(m.jnt_range[j][0]), 6), "upper": round(float(m.jnt_range[j][1]), 6)}
         robot["joints"].append(jt)
     robot["dof"] = dof
+    if m.nkey:                                 # 学习平台 R7：第一个关键帧（通常是 home）的关节值 = 站立/初始姿态
+        kq = m.key_qpos[0]
+        rest = {}
+        for j in range(m.njnt):
+            if int(m.jnt_type[j]) in (int(J.mjJNT_HINGE), int(J.mjJNT_SLIDE)):
+                rest[mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j) or "joint_{}".format(j)] = round(
+                    float(kq[m.jnt_qposadr[j]]), 6)
+        if any(abs(v) > 1e-9 for v in rest.values()):
+            robot["rest"] = rest
+            robot["rest_source"] = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_KEY, 0) or "keyframe 0"
     world_mm = trimesh.util.concatenate(world).apply_scale(1000.0) if world else None
     return [("__scene__", {"bodies": bodies, "world": world_mm, "robot": robot})]
 

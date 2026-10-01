@@ -41,7 +41,7 @@ def problems():
             out.append("{}：读不了规格表（{}）".format(where, ex))
             continue
         if e.get("specs"):
-            cols = set(rows[0].keys()) - {"size"} if rows else set()
+            cols = {c for c in rows[0].keys() if c != "size" and not c.startswith("src")} if rows else set()   # src*：出处列（第 5 轮规则 1）
             keys = {p["key"] for p in e.get("params", [])}
             if cols != keys:
                 out.append("{}：规格表列 {} 与参数定义 {} 不一致".format(where, sorted(cols), sorted(keys)))

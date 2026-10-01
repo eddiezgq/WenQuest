@@ -20,14 +20,15 @@
     },
     "id": {
       "type": "string",
-      "pattern": "^[ABC]-[A-Z0-9]{2,5}-[A-Z0-9]+(-[A-Z0-9]+)*$"
+      "pattern": "^[ABCD]-[A-Z0-9]{2,5}-[A-Z0-9]+(-[A-Z0-9]+)*$"
     },
     "kind": {
       "enum": [
         "family",
         "robot",
         "mechanism",
-        "case"
+        "case",
+        "product"
       ]
     },
     "name": {
@@ -174,7 +175,8 @@
             "bd_warehouse",
             "menagerie",
             "robot_descriptions",
-            "freecad-library"
+            "freecad-library",
+            "vendor"
           ]
         },
         "repo": {
@@ -225,6 +227,14 @@
               }
             }
           }
+        },
+        "vendor": {
+          "type": "string",
+          "description": "厂商名（第 5 轮 P2）"
+        },
+        "catalog": {
+          "type": "string",
+          "description": "样本名称与版本"
         }
       }
     },

@@ -1,0 +1,111 @@
+# B-ARM-UR5E 的厂商参数（第 5 轮 P4，叠加在 Menagerie 条目上）
+vendor:
+  id: UR
+  name:
+    zh: 优傲机器人
+    en: Universal Robots
+  site: https://www.universal-robots.com
+  model: UR5e
+datasheet:
+  vendor: Universal Robots
+  model: UR5e
+  values:
+    payload_kg: 5
+    reach_mm: 850
+    dof: 6
+    repeatability_mm: 0.03
+    tcp_speed_m_s: 4
+    footprint_mm: 151
+    weight_kg: 20.6
+    ip: IP54
+    power_typical_w: 200
+    power_max_w: 570
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    tcp_speed_m_s:
+      zh: 末端最大速度
+      en: TCP speed
+      unit: m/s
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    power_typical_w:
+      zh: 典型功耗
+      en: Typical power
+      unit: W
+    power_max_w:
+      zh: 最大功耗
+      en: Max power
+      unit: W
+  src: https://www.universal-robots.com/manuals/EN/TechSheets/UR5e_techsheet_pdf_online/UR5e_techsheet_en.pdf
+dh:
+  params:
+  - - 0
+    - 0.1625
+    - 1.5707963
+  - - -0.425
+    - 0
+    - 0
+  - - -0.3922
+    - 0
+    - 0
+  - - 0
+    - 0.1333
+    - 1.5707963
+  - - 0
+    - 0.0997
+    - -1.5707963
+  - - 0
+    - 0.0996
+    - 0
+  convention: standard DH (a, d, alpha)
+  range_deg:
+  - 360
+  - 360
+  - 360
+  - 360
+  - 360
+  - 360
+  speed_deg_s:
+  - 180
+  - 180
+  - 180
+  - 180
+  - 180
+  - 180
+  reach_mm: 850
+data_sources:
+- title: UR5e Technical specifications（官方技术参数表）
+  url: https://www.universal-robots.com/manuals/EN/TechSheets/UR5e_techsheet_pdf_online/UR5e_techsheet_en.pdf
+  retrieved: '2026-09-30'
+- title: Universal Robots：DH Parameters for calculations of kinematics and dynamics
+  url: https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/
+  retrieved: '2026-09-30'
+tags:
+- 优傲机器人
+- Universal Robots
+- UR5e

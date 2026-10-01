@@ -154,6 +154,8 @@ def entry_json(e, rows, results, version):
     src = e.get("source") or {}
     if src.get("origin") == "menagerie":          # 现成机器人：完整 MJCF 与网格在原仓库（固定提交），不另存
         doc["package"] = "{}/tree/{}/{}".format(src["repo"], src["commit"], src.get("path", "").rstrip("/"))
+    elif src.get("origin") == "vendor" and e["kind"] == "robot":   # 按 DH 生成的厂商机器人：没有原始模型，指向官方技术参数表
+        doc["package"] = (e.get("datasheet") or {}).get("src") or (e.get("vendor") or {}).get("site")
     else:
         doc["package"] = "{}/releases/download/library-v{}/{}.zip".format(REPO, version, e["id"])
     doc["sizes"] = []
@@ -240,6 +242,7 @@ def main(argv=None):
                           "license": e["source"]["license"], "erp_items": erp.get(s["size"], []),
                           "files": s["files"], "entry": "{}/entry.json".format(e["id"]),
                           "family": e["name"], "origin": e["source"]["origin"],
+                          **({"vendor": e["vendor"]["name"]} if e.get("vendor") else {}),
                           "default": str(s["size"]) == str(e.get("default", "default")),
                           **({"dof": doc["robot"]["dof"]} if doc.get("robot") else {})})
         if cad_dir and e["kind"] != "robot":

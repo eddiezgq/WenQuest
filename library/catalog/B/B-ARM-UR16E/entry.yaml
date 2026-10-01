@@ -1,0 +1,159 @@
+# B-ARM-UR16E · Universal Robots UR16e 协作机械臂（厂商目录，第 5 轮第 2 步）
+schema: 1
+id: B-ARM-UR16E
+kind: robot
+name:
+  zh: Universal Robots UR16e 协作机械臂
+  en: Universal Robots UR16e
+category: ARM
+tags:
+- 机械臂
+- 协作机器人
+- arm
+- cobot
+- 优傲机器人
+- UR16e
+standards: []
+params: []
+defaults: {}
+model:
+  engine: 'dh:'
+  formats:
+  - glb
+  origin: 基座坐标系 = DH 坐标系 {0}（Z 向上）；每个连杆一个节点
+  note: 按厂商公布的 DH 参数生成的示意模型（关节位置、连杆长度准确，外形简化）；厂商 CAD 请到厂商网站下载
+robot:
+  type: arm
+  payload_kg: 16
+  reach_mm: 900
+source:
+  origin: vendor
+  vendor: Universal Robots
+  catalog: UR16e Technical specifications（官方技术参数表）
+  license: Apache-2.0
+  attribution: 问渠零件库（示意模型）；参数摘自 Universal Robots 官方技术参数表与 DH 参数，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 照官方表录入
+  data_sources:
+  - title: UR16e Technical specifications（官方技术参数表）
+    url: https://www.universal-robots.com/manuals/EN/TechSheets/UR16e_techsheet_pdf_online/UR16e_techsheet_en.pdf
+    retrieved: '2026-09-30'
+  - title: Universal Robots：DH Parameters for calculations of kinematics and dynamics
+    url: https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/
+    retrieved: '2026-09-30'
+vendor:
+  id: UR
+  name:
+    zh: 优傲机器人
+    en: Universal Robots
+  site: https://www.universal-robots.com
+  model: UR16e
+datasheet:
+  vendor: Universal Robots
+  model: UR16e
+  values:
+    payload_kg: 16
+    reach_mm: 900
+    dof: 6
+    repeatability_mm: 0.05
+    tcp_speed_m_s: 3
+    footprint_mm: 190
+    weight_kg: 33.1
+    ip: IP54
+    power_typical_w: 350
+    power_max_w: 585
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    tcp_speed_m_s:
+      zh: 末端最大速度
+      en: TCP speed
+      unit: m/s
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    power_typical_w:
+      zh: 典型功耗
+      en: Typical power
+      unit: W
+    power_max_w:
+      zh: 最大功耗
+      en: Max power
+      unit: W
+  src: https://www.universal-robots.com/manuals/EN/TechSheets/UR16e_techsheet_pdf_online/UR16e_techsheet_en.pdf
+dh:
+  params:
+  - - 0
+    - 0.1807
+    - 1.5707963
+  - - -0.4784
+    - 0
+    - 0
+  - - -0.36
+    - 0
+    - 0
+  - - 0
+    - 0.17415
+    - 1.5707963
+  - - 0
+    - 0.11985
+    - -1.5707963
+  - - 0
+    - 0.11655
+    - 0
+  convention: standard DH (a, d, alpha)
+  range_deg:
+  - 360
+  - 360
+  - 360
+  - 360
+  - 360
+  - 360
+  speed_deg_s:
+  - 120
+  - 120
+  - 180
+  - 180
+  - 180
+  - 180
+  reach_mm: 900
+teaching:
+  principle: 六个转动关节串联：前三个关节主要决定末端位置，后三个（腕部）决定姿态；协作机器人带力矩感知，可与人同区工作。
+  uses:
+  - 装配
+  - 上下料
+  - 打磨
+  - 码垛
+  courses:
+  - course: 机器人技术
+    chapter: 串联机械臂运动学（DH 参数）
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - Universal Robots

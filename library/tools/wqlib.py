@@ -16,8 +16,21 @@ def entry_dirs():
 
 
 def load(d):
+    """读条目；同目录有 vendor.yaml（厂商样本数据，第 5 轮 P4）就合并进来：datasheet、dh、vendor，出处追加到 data_sources。
+    这样 import_menagerie.py 重写 entry.yaml 时厂商数据不会丢。"""
     d = Path(d)
     e = yaml.safe_load(open(d / "entry.yaml", encoding="utf-8"))
+    ov = d / "vendor.yaml"
+    if ov.exists():
+        v = yaml.safe_load(open(ov, encoding="utf-8")) or {}
+        for k in ("datasheet", "dh", "vendor"):
+            if k in v:
+                e[k] = v[k]
+        if v.get("data_sources"):
+            src = e.setdefault("source", {})
+            src["data_sources"] = list(src.get("data_sources") or []) + v["data_sources"]
+        if v.get("tags"):
+            e["tags"] = list(dict.fromkeys(list(e.get("tags") or []) + v["tags"]))
     e["_dir"] = d
     return e
 
@@ -66,6 +79,10 @@ CATEGORY_NAMES = {
           "HUM": ("人形机器人", "Humanoids"), "EEF": ("末端执行器", "End effectors"), "UAV": ("无人机", "Drones"),
           "CRT": ("直角坐标", "Cartesian"), "SCA": ("SCARA", "SCARA"), "PAR": ("并联", "Parallel"),
           "EDU": ("教学模型", "Teaching models"), "MAN": ("移动操作", "Mobile manipulators"), "SEN": ("其他", "Other")},
+    "D": {"MOT": ("伺服电机", "Servo motors"), "RDC": ("精密减速器", "Precision reducers"), "DRV": ("驱动器", "Drives"),
+          "ENC": ("编码器", "Encoders"), "FTS": ("力/力矩传感器", "Force/torque sensors"), "IMU": ("惯性测量单元", "IMUs"),
+          "LDR": ("激光雷达", "Lidars"), "CAM": ("相机", "Cameras"), "CTL": ("控制器", "Controllers"),
+          "BAT": ("电池", "Batteries"), "ACT": ("执行器模组", "Actuator modules"), "GRP": ("夹爪", "Grippers")},
     "C": {"LNK": ("连杆机构", "Linkages"), "CAM": ("凸轮", "Cams"), "GER": ("齿轮与齿轮系", "Gears"), "WRM": ("蜗轮蜗杆", "Worm gears"),
           "BLT": ("带传动", "Belt drives"), "RAT": ("棘轮", "Ratchets"), "GNV": ("槽轮", "Geneva drives"),
           "SCN": ("丝杠螺母", "Lead screws"), "RED": ("减速器案例", "Reducer cases")},

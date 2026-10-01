@@ -87,10 +87,13 @@
               <div class="src mono">{{ entry.id }}<template v-if="size !== 'default'"> / {{ size }}</template></div>
               <h2>{{ entry.name.zh }}{{ size !== 'default' ? ' ' + size : '' }}</h2>
               <div class="small muted">{{ entry.name.en }}</div>
+              <div v-if="entry.source.origin === 'vendor' && entry.model.note" class="small proxy-note">{{ entry.model.note }}</div>
             </div>
             <div class="viewer" ref="viewerEl">
               <div class="v-tools" v-if="entry.robot">
-                <button class="btn ghost" type="button" @click="resetJoints">回到零位</button>
+                <button class="btn ghost" type="button" @click="resetJoints('zero')">零位</button>
+                <button v-if="entry.robot.rest" class="btn ghost" type="button" @click="resetJoints('init')"
+                  :title="'取自模型的关键帧 ' + (entry.robot.rest_source || '')">初始姿态</button>
               </div>
               <div class="v-note">{{ viewNote }}</div>
             </div>
@@ -104,7 +107,8 @@
             <div class="actions">
               <a class="btn primary" :href="fileUrl(curSize?.files.glb)" download>glTF（米）</a>
               <a v-if="!entry.robot" class="btn" :href="entry.package">STEP / STL 压缩包（整族）</a>
-              <a v-else class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 MJCF（{{ originName(entry.source.origin) }}）</a>
+              <a v-else-if="entry.model.engine.startsWith('menagerie:')" class="btn" :href="entry.package" target="_blank" rel="noopener">原始模型 MJCF（{{ originName(entry.source.origin) }}）</a>
+              <a v-else class="btn" :href="entry.package" target="_blank" rel="noopener">官方技术参数表</a>
               <button class="btn ghost" type="button" @click="copy(size === 'default' ? entry.id : entry.id + '/' + size)">复制编号</button>
             </div>
             <div class="tabs dtabs">
@@ -127,13 +131,32 @@
                 </div>
                 <p v-if="entry.standards?.length" class="small muted">标准：{{ entry.standards.map((s) => s.code).join(' · ') }}</p>
               </template>
+              <template v-else-if="dtab === '参数'">
+                <dl class="kv wide">
+                  <template v-for="(v, k) in entry.datasheet.values" :key="k">
+                    <dt>{{ entry.datasheet.labels?.[k]?.zh || k }}</dt>
+                    <dd class="mono">{{ v }} {{ entry.datasheet.labels?.[k]?.unit || '' }}</dd>
+                  </template>
+                </dl>
+                <p class="small muted">{{ entry.datasheet.vendor }} {{ entry.datasheet.model }} 官方技术参数，
+                  <a :href="entry.datasheet.src" target="_blank" rel="noopener">出处</a><template v-if="entry.datasheet.note"> · {{ entry.datasheet.note }}</template></p>
+                <template v-if="entry.dh">
+                  <div class="small muted" style="margin-top:8px">DH 参数（{{ entry.dh.convention }}，米、弧度）</div>
+                  <div class="tbl-wrap"><table class="t">
+                    <thead><tr><th>关节</th><th>a</th><th>d</th><th>α</th><th>最大速度</th></tr></thead>
+                    <tbody><tr v-for="(p, i) in entry.dh.params" :key="i"><td class="mono">{{ i + 1 }}</td>
+                      <td class="num">{{ p[0] }}</td><td class="num">{{ p[1] }}</td><td class="num">{{ (p[2] * 180 / Math.PI).toFixed(0) }}°</td>
+                      <td class="num">{{ entry.dh.speed_deg_s?.[i] ? entry.dh.speed_deg_s[i] + ' °/s' : '' }}</td></tr></tbody>
+                  </table></div>
+                </template>
+              </template>
               <template v-else-if="dtab === '关节'">
                 <div class="tbl-wrap">
                   <table class="t">
                     <thead><tr><th>关节</th><th>类型</th><th>父 → 子</th><th>范围</th></tr></thead>
                     <tbody><tr v-for="j in entry.robot.joints" :key="j.name">
                       <td class="mono">{{ j.name }}</td><td class="nw">{{ JT[j.type] }}</td><td class="small">{{ j.parent }} → {{ j.child }}</td>
-                      <td class="num">{{ j.limit ? fmtLim(j) : '不限' }}</td></tr></tbody>
+                      <td class="num">{{ j.limit && j.limit.lower != null ? fmtLim(j) : '不限' }}</td></tr></tbody>
                   </table>
                 </div>
                 <p class="small muted">{{ entry.robot.dof }} 个自由度；连杆 {{ entry.robot.links.length }} 个。字段见《数字工厂资源接口约定》R4。</p>
@@ -177,7 +200,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useRoute } from 'vue-router';
 
 const BASE = '/library/';
-const ORIGINS = { bd_warehouse: 'bd_warehouse', wenquest: '问渠自建', menagerie: 'MuJoCo Menagerie',
+const ORIGINS = { bd_warehouse: 'bd_warehouse', wenquest: '问渠自建', menagerie: 'MuJoCo Menagerie', vendor: '厂商目录',
   robot_descriptions: 'robot_descriptions', 'freecad-library': 'FreeCAD-library' };
 const JT = { revolute: '转动', continuous: '转动（不限位）', prismatic: '移动' };
 const originName = (o) => ORIGINS[o] || o;
@@ -214,7 +237,7 @@ const families = computed(() => {
     let f = m.get(it.id);
     if (!f) {
       f = { id: it.id, part: it.part, kind: it.kind, category: it.category, name: it.family || it.name, license: it.license,
-        origin: it.origin, standards: it.standards, tags: it.tags, sizes: [], erp: [], thumb: null, dof: it.dof };
+        origin: it.origin, vendor: it.vendor, standards: it.standards, tags: it.tags, sizes: [], erp: [], thumb: null, dof: it.dof };
       m.set(it.id, f);
     }
     f.sizes.push(it.size);
@@ -223,20 +246,24 @@ const families = computed(() => {
   }
   return [...m.values()].map((f) => {
     const cat = catName(f.part, f.category);
-    const line = f.kind === 'robot' ? `${cat} · ${f.dof ?? '?'} 个关节`
-      : `${f.standards.slice(0, 2).join(' · ') || cat} · ${f.sizes.length} 个规格`;
-    const text = [f.id, f.name.zh, f.name.en, cat, ...f.standards, ...f.tags, ...f.sizes, ...f.erp].join(' ').toLowerCase();
+    const who = f.vendor ? f.vendor.zh : '';
+    const line = f.kind === 'robot' ? `${who ? who + ' · ' : ''}${cat} · ${f.dof ?? '?'} 个关节`
+      : `${who || f.standards.slice(0, 2).join(' · ') || cat} · ${f.sizes.length} 个规格`;
+    const text = [f.id, f.name.zh, f.name.en, cat, who, f.vendor?.en || '', ...f.standards, ...f.tags, ...f.sizes, ...f.erp]
+      .join(' ').toLowerCase();
     return { ...f, line, text, wqr: f.erp.length > 0 };
   });
 });
 const catName = (p, c) => index.value?.categories?.[p]?.[c]?.zh || c;
 const counts = computed(() => {
   const A = families.value.filter((f) => f.part === 'A');
-  return { A: A.length, Asizes: A.reduce((n, f) => n + f.sizes.length, 0), B: families.value.filter((f) => f.part === 'B').length };
+  return { A: A.length, Asizes: A.reduce((n, f) => n + f.sizes.length, 0), B: families.value.filter((f) => f.part === 'B').length,
+    D: families.value.filter((f) => f.part === 'D').length };
 });
 const tabs = computed(() => [
   { key: 'A', name: 'A 标准件', count: counts.value.A },
   { key: 'B', name: 'B 机器人', count: counts.value.B },
+  ...(counts.value.D ? [{ key: 'D', name: 'D 机器人零部件', count: counts.value.D }] : []),
   ...(index.value?.collections || []).map((c) => ({ key: 'F', name: c.name.zh, count: c.count })),
 ]);
 const pool = computed(() => families.value.filter((f) => f.part === part.value));
@@ -294,7 +321,7 @@ const sizeRows = computed(() => {
 });
 const dtabList = computed(() => {
   if (!entry.value) return [];
-  return [entry.value.robot ? '关节' : '规格', ...(entry.value.teaching?.principle || entry.value.teaching?.uses ? ['教学'] : []), '来源'];
+  return [...(entry.value.datasheet ? ['参数'] : []), entry.value.robot ? '关节' : '规格', ...(entry.value.teaching?.principle || entry.value.teaching?.uses ? ['教学'] : []), '来源'];
 });
 
 async function select(id, wantSize) {
@@ -308,7 +335,7 @@ async function select(id, wantSize) {
     const want = (wantSize || q.value).trim().toLowerCase();
     const hit = e.sizes.find((s) => s.size.toLowerCase() === want);
     size.value = hit ? hit.size : (e.sizes.find((s) => s.size === String(e.default))?.size || e.sizes[0]?.size || 'default');
-    dtab.value = e.robot ? '关节' : '规格';
+    dtab.value = e.datasheet ? '参数' : e.robot ? '关节' : '规格';
     await nextTick();
     loadModel();
   } catch (err) {
@@ -395,10 +422,11 @@ function setupJoints() {
     if (!node) continue;
     node.matrixAutoUpdate = false;
     node.updateMatrix();
-    const lim = j.limit || { lower: -Math.PI, upper: Math.PI };
+    const lim = j.limit && j.limit.lower != null ? j.limit : { lower: -Math.PI, upper: Math.PI };
     const zero = Math.min(Math.max(0, lim.lower), lim.upper);
+    const restQ = entry.value.robot.rest?.[j.name];
     list.push({ name: j.name, short: j.name.replace(/_joint$|joint_?/i, '').slice(0, 10) || j.name, type: j.type,
-      min: lim.lower, max: lim.upper, value: zero, node, rest: node.matrix.clone(),
+      min: lim.lower, max: lim.upper, value: restQ ?? zero, zero, init: restQ ?? zero, node, rest: node.matrix.clone(),
       axis: new THREE.Vector3(...j.axis).normalize(), anchor: new THREE.Vector3(...(j.anchor || [0, 0, 0])) });
   }
   joints.value = list;
@@ -415,7 +443,7 @@ function applyJoint(j) {
   j.node.matrix.copy(j.rest).multiply(m);
   j.node.matrixWorldNeedsUpdate = true;
 }
-function resetJoints() { joints.value.forEach((j) => { j.value = Math.min(Math.max(0, j.min), j.max); applyJoint(j); }); }
+function resetJoints(to = 'zero') { joints.value.forEach((j) => { j.value = to === 'init' ? j.init : j.zero; applyJoint(j); }); }
 
 onMounted(async () => {
   try {
@@ -500,9 +528,11 @@ table.t td.num, table.t td.nw { white-space: nowrap; }
 table.t td.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 table.t tr.sel td { background: var(--accent-bg); }
 table.t tbody tr { cursor: pointer; }
+dl.kv.wide { grid-template-columns: 120px minmax(0, 1fr); }
 dl.kv { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 6px 12px; margin: 0; }
 dl.kv dt { color: var(--muted); }
 dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+.proxy-note { color: var(--warn-ink); background: var(--warn-bg); border-radius: 6px; padding: 4px 8px; margin-top: 4px; }
 .dsrc { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
 .attr { margin-top: 10px; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 6px; padding: 8px 10px; font-size: 12px; }
 .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px;

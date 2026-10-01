@@ -57,3 +57,12 @@ def test_every_robot_entry_points_at_pinned_menagerie():
     for e in robots:
         assert e["source"]["commit"] == pin
         assert (b_robot.MENAGERIE / e["model"]["engine"].split(":", 1)[1]).exists(), e["id"]
+
+
+def test_rest_pose_from_keyframe():
+    """学习平台 R7：有关键帧的模型带 robot.rest，关节名与关节表一致"""
+    e = _entry("B-ARM-UR5E")
+    r = b_robot.build(e, {})[0][1]["robot"]
+    names = {j["name"] for j in r["joints"]}
+    assert r["rest"] and set(r["rest"]) <= names and r["rest_source"]
+    assert abs(r["rest"]["elbow_joint"] - 1.5708) < 1e-3

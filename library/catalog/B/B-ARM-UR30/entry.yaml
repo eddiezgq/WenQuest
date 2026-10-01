@@ -1,0 +1,160 @@
+# B-ARM-UR30 · Universal Robots UR30 协作机械臂（厂商目录，第 5 轮第 2 步）
+schema: 1
+id: B-ARM-UR30
+kind: robot
+name:
+  zh: Universal Robots UR30 协作机械臂
+  en: Universal Robots UR30
+category: ARM
+tags:
+- 机械臂
+- 协作机器人
+- arm
+- cobot
+- 优傲机器人
+- UR30
+standards: []
+params: []
+defaults: {}
+model:
+  engine: 'dh:'
+  formats:
+  - glb
+  origin: 基座坐标系 = DH 坐标系 {0}（Z 向上）；每个连杆一个节点
+  note: 按厂商公布的 DH 参数生成的示意模型（关节位置、连杆长度准确，外形简化）；厂商 CAD 请到厂商网站下载
+robot:
+  type: arm
+  payload_kg: 30
+  reach_mm: 1300
+source:
+  origin: vendor
+  vendor: Universal Robots
+  catalog: UR30 Technical specifications（官方技术参数表）
+  license: Apache-2.0
+  attribution: 问渠零件库（示意模型）；参数摘自 Universal Robots 官方技术参数表与 DH 参数，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 照官方表录入
+  data_sources:
+  - title: UR30 Technical specifications（官方技术参数表）
+    url: https://www.universal-robots.com/manuals/EN/TechSheets/UR30_techsheet_pdf_online/UR30_techsheet_en.pdf
+    retrieved: '2026-09-30'
+  - title: Universal Robots：DH Parameters for calculations of kinematics and dynamics
+    url: https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/
+    retrieved: '2026-09-30'
+vendor:
+  id: UR
+  name:
+    zh: 优傲机器人
+    en: Universal Robots
+  site: https://www.universal-robots.com
+  model: UR30
+datasheet:
+  vendor: Universal Robots
+  model: UR30
+  values:
+    payload_kg: 30
+    reach_mm: 1300
+    dof: 6
+    repeatability_mm: 0.1
+    tcp_speed_m_s: 4
+    footprint_mm: 245
+    weight_kg: 63.5
+    ip: IP65
+    power_typical_w: 300
+    power_max_w: 750
+  labels:
+    payload_kg:
+      zh: 额定负载
+      en: Payload
+      unit: kg
+    reach_mm:
+      zh: 工作半径
+      en: Reach
+      unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
+    tcp_speed_m_s:
+      zh: 末端最大速度
+      en: TCP speed
+      unit: m/s
+    footprint_mm:
+      zh: 底座直径
+      en: Footprint Ø
+      unit: mm
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    ip:
+      zh: 防护等级
+      en: IP rating
+      unit: ''
+    power_typical_w:
+      zh: 典型功耗
+      en: Typical power
+      unit: W
+    power_max_w:
+      zh: 最大功耗
+      en: Max power
+      unit: W
+  src: https://www.universal-robots.com/manuals/EN/TechSheets/UR30_techsheet_pdf_online/UR30_techsheet_en.pdf
+  note: 官方表：有边界条件时负载可到 35 kg；重量不含电缆
+dh:
+  params:
+  - - 0
+    - 0.2363
+    - 1.5707963
+  - - -0.637
+    - 0
+    - 0
+  - - -0.5037
+    - 0
+    - 0
+  - - 0
+    - 0.201
+    - 1.5707963
+  - - 0
+    - 0.1593
+    - -1.5707963
+  - - 0
+    - 0.1543
+    - 0
+  convention: standard DH (a, d, alpha)
+  range_deg:
+  - 360
+  - 360
+  - 360
+  - 360
+  - 360
+  - 360
+  speed_deg_s:
+  - 120
+  - 120
+  - 150
+  - 210
+  - 210
+  - 210
+  reach_mm: 1300
+teaching:
+  principle: 六个转动关节串联：前三个关节主要决定末端位置，后三个（腕部）决定姿态；协作机器人带力矩感知，可与人同区工作。
+  uses:
+  - 装配
+  - 上下料
+  - 打磨
+  - 码垛
+  courses:
+  - course: 机器人技术
+    chapter: 串联机械臂运动学（DH 参数）
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - Universal Robots
