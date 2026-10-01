@@ -1,0 +1,24 @@
+# 实验 39.2 的指导书与报告模板。目的、场景、参数、任务取自 lab39_2.js。
+原理:
+  - ["应变片的电阻变化与应变成正比：ΔR/R = Kε，金属箔应变片 K ≈ 2。满量程应变 1000 με 时 ΔR/R 只有 0.2%。", "A strain gauge changes resistance in proportion to strain, ΔR/R = Kε with K ≈ 2; at 1000 με full scale ΔR/R is only 0.2%."]
+  - 式: "V_o = V_p − V_m，单臂 V_o ≈ V_ex·Kε/4，半桥 V_ex·Kε/2，全桥 V_ex·Kε          (39.2.3)、(39.2.4)"
+  - ["三运放仪表放大器只放大两个输入之差，增益由一个电阻设定：", "The three-op-amp instrumentation amplifier amplifies only the difference of its inputs, with gain set by one resistor:"]
+  - 式: "G = 1 + 2R/R_g，R = 24.7 kΩ          (39.2.5)"
+  - ["增益要使满量程输出接近而不超过模数转换器的参考电压（本实验为 2.5 V）。", "The gain should bring full scale close to, but not above, the ADC reference (2.5 V here)."]
+步骤:
+  - ["打开实验 39.2，场景“全桥”。F = 0，读出 Vp、Vm、Vp − Vm 和 Vout（任务 1）。在电路图中把鼠标移到各节点上，核对电压。", "Open Lab 39.2, scene “Full bridge”. With F = 0 read Vp, Vm, Vp − Vm and Vout (task 1); hover over the nodes to check."]
+  - ["保持 R_g = 500 Ω，把 F 依次设为 20、40、60、80、100 N，记录 Vp − Vm 和 Vout，填入表 1，算出增益。", "Keep R_g = 500 Ω; set F to 20, 40, 60, 80, 100 N; record Vp − Vm and Vout in Table 1 and compute the gain."]
+  - ["F = 100 N，调节 R_g，使 Vout 在 2.45–2.50 V 之间（任务 2）。记录 R_g，与式 (39.2.5) 的计算值比较。", "With F = 100 N adjust R_g until Vout is 2.45–2.50 V (task 2); compare R_g with Eq. (39.2.5)."]
+  - ["切换到场景“单臂电桥”，R_g 不变，重复第 2 步（任务 3），填入表 2。比较两种接法的输出与线性。", "Switch to “Quarter bridge”, keep R_g, repeat step 2 (task 3) into Table 2; compare output and linearity."]
+数据表:
+  - 标题: ["表 1  全桥（R_g = 500 Ω）", "Table 1  Full bridge (R_g = 500 Ω)"]
+    表头: ["F / N", "Vp − Vm / mV", "Vout / V", "增益 Vout/(Vp − Vm)"]
+    行: [["0", "", "", "—"], ["20", "", "", ""], ["40", "", "", ""], ["60", "", "", ""], ["80", "", "", ""], ["100", "", "", ""]]
+  - 标题: ["表 2  单臂电桥与全桥的比较（R_g 取任务 2 的值）", "Table 2  Quarter vs full bridge (R_g from task 2)"]
+    表头: ["F / N", "全桥 Vp − Vm / mV", "单臂 Vp − Vm / mV", "单臂 / 全桥"]
+    行: [["20", "", "", ""], ["60", "", "", ""], ["100", "", "", ""]]
+注意:
+  - ["仿真器中运算放大器的开环增益为 10⁵，所以实测增益比式 (39.2.5) 小约 0.25%。实际器件还有失调电压、偏置电流和有限的共模抑制比。", "The simulator's op-amps have an open-loop gain of 10⁵, so the measured gain is about 0.25% below Eq. (39.2.5). Real parts also have offset, bias current and finite CMRR."]
+  - ["Vout 超过 2.5 V 时，模数转换器的读数会停在最大码值（溢出）。", "Above 2.5 V the ADC reading sticks at full code (overflow)."]
+思考题:
+  - ["全桥为什么能自动补偿温度引起的电阻变化？单臂电桥的输出为什么不是严格的直线？", "Why does a full bridge cancel temperature effects? Why is a quarter bridge not exactly linear?"]

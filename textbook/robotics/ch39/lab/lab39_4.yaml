@@ -1,0 +1,24 @@
+# 实验 39.4 的指导书与报告模板。目的、场景、参数、任务取自 lab39_4.js。
+原理:
+  - ["滑动平均取最近 N 个采样的平均，对频率为 f_s/N 整数倍的干扰响应为零，延迟约 (N − 1)/2 个采样周期。", "A moving average of N samples has zero response at multiples of f_s/N and a delay of about (N − 1)/2 samples."]
+  - 式: "y_k = (1/N) Σ x_(k−i)，i = 0 … N − 1          (39.4.1)"
+  - ["一阶低通每步朝新读数走一小步，截止频率 f_c 由 α 决定：", "The first-order low-pass moves a small step towards each new reading; α sets the cut-off f_c:"]
+  - 式: "y_k = y_(k−1) + α (x_k − y_(k−1))，α = 1 − e^(−2π f_c / f_s)          (39.4.3)、(39.4.4)"
+  - ["信号：0.2 s 内升到 30 N 的夹紧力，叠加 2 N、50 Hz 工频干扰和 0.3 N 随机噪声，采样 1 kHz。", "Signal: clamping force rising to 30 N in 0.2 s, plus 2 N of 50 Hz hum and 0.3 N noise, sampled at 1 kHz."]
+步骤:
+  - ["打开实验 39.4，场景“夹爪夹紧力”，选滑动平均。N 从 5 起逐步增加，记录残余波动和延迟（表 1），找出完全消除 50 Hz 的最小 N（任务 1）。", "Open Lab 39.4, scene “Clamping force”, moving average. Increase N from 5, record ripple and delay (Table 1); find the smallest N that removes 50 Hz (task 1)."]
+  - ["改为一阶低通，f_c 从 50 Hz 逐步降低，记录（表 2），找出残余波动低于 0.5 N 时的 f_c 和延迟（任务 2）。", "Switch to the low-pass, lower f_c from 50 Hz, record (Table 2); find f_c and the delay when the ripple drops below 0.5 N (task 2)."]
+  - ["切换到场景“电子秤”，一阶低通 f_c = 2 Hz，读出延迟（任务 3）。", "Switch to “Kitchen scale”, low-pass f_c = 2 Hz; read the delay (task 3)."]
+  - ["比较：残余波动都降到 0.3 N 以下时，两种滤波器的延迟各是多少？", "Compare the delays of the two filters when both bring the ripple below 0.3 N."]
+数据表:
+  - 标题: ["表 1  滑动平均", "Table 1  Moving average"]
+    表头: ["N", "残余波动 / N", "延迟 / ms"]
+    行: [["5", "", ""], ["10", "", ""], ["15", "", ""], ["20", "", ""], ["25", "", ""], ["40", "", ""]]
+  - 标题: ["表 2  一阶低通", "Table 2  First-order low-pass"]
+    表头: ["f_c / Hz", "α", "残余波动 / N", "延迟 / ms"]
+    行: [["50", "", "", ""], ["30", "", "", ""], ["15", "", "", ""], ["10", "", "", ""], ["5", "", "", ""], ["2", "", "", ""]]
+注意:
+  - ["残余波动取 0.35 s 以后（力已稳定）滤波输出与真实值之差的标准差；延迟取上升段到达 15 N 的时间差。", "Ripple is the standard deviation of output minus true force after 0.35 s; delay is the time lag at 15 N on the rise."]
+  - ["随机噪声用固定种子生成，每次相同，便于比较。", "The noise uses a fixed seed, so runs are comparable."]
+思考题:
+  - ["同样把残余波动降到 0.3 N 以下，哪种滤波器的延迟更短？为什么？", "For ripple below 0.3 N, which filter has the shorter delay, and why?"]

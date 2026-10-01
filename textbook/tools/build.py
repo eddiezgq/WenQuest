@@ -553,6 +553,7 @@ def check_numbers(sec: Section, rep: Report) -> None:
     text = FENCE.sub("", sec.source)
     text = PLACE.sub("", text)
     text = re.sub(r"https?://\S+", "", text)
+    text = re.sub(r"\b(?:JJF|JJG|GB(?:/T)?|ISO|IEC|IEEE)\s*[\d.]+", "", text)     # standard numbers, e.g. JJF 1059.1
     text = re.split(r"\*\*本节参考文献\*\*|#+\s*(?:本章)?参考文献", text)[0]
     for line_no, line in enumerate(text.splitlines(), 1):
         for m in NUMBER.finditer(line):

@@ -1,0 +1,23 @@
+# 实验 39.6 的指导书与报告模板。目的、场景、参数、任务取自 lab39_6.js。
+原理:
+  - ["每 5 件为一组，组均值 x̄、组极差 R；均值控制图的控制限为 x̿ ± A₂R̄（n = 5 时 A₂ = 0.577）：", "Subgroups of 5; means x̄ and ranges R; the X̄ chart limits are x̿ ± A₂R̄ (A₂ = 0.577 for n = 5):"]
+  - 式: "UCL、LCL = x̿ ± A₂ R̄          (39.6.2)"
+  - ["判异规则：一点越出控制限；连续 6 点递增或递减；连续 9 点在中心线同侧。", "Signals: a point beyond a limit; 6 points rising or falling; 9 points on one side of the centre line."]
+  - 式: "C_p = (H − L)/(6R̄/d₂)，P_pk = min(H − x̄, x̄ − L)/(3s)          (39.6.3)"
+  - ["磨削模型：直径均值 35.0065 + 0.0125 × 砂轮磨损 mm，标准差 0.0012 mm；每磨一件磨损 1/30，剩余寿命低于 8% 时修整。", "Grinding model: mean 35.0065 + 0.0125 × wheel wear mm, sd 0.0012 mm; wear 1/30 per part; dress when life is below 8%."]
+步骤:
+  - ["打开实验 39.6，场景“机器人磨削单元”。修整间隔 0（按寿命）、补偿关，按“开始生产”。生产完 100 件后记录超差件数、第一件超差的序号、首次判异的组号、C_p、P_pk（任务 1）。", "Open Lab 39.6, scene “Grinding cell”. Interval 0 (by life), compensation off; run 100 parts; record rejects, first reject, first signal, C_p and P_pk (task 1)."]
+  - ["把修整间隔依次设为 10、14、20、25 件，各生产 100 件，填入表 1，找出既无废品、P_pk ≥ 1 的间隔（任务 2）。", "Set the interval to 10, 14, 20, 25 parts; run each; fill Table 1; find intervals with no rejects and P_pk ≥ 1 (task 2)."]
+  - ["切换到场景“矿泉水灌装线”，清洗间隔 0、补偿开，生产 100 瓶（任务 3），记录；再关掉补偿比较。", "Switch to “Filling line”, interval 0, compensation on; run 100 bottles (task 3); then compare with compensation off."]
+数据表:
+  - 标题: ["表 1  修整间隔的影响（磨削单元，补偿关）", "Table 1  Effect of the dressing interval (grinding, no compensation)"]
+    表头: ["修整间隔 / 件", "超差件数", "首次判异（组）", "C_p", "P_pk", "100 件中的修整次数"]
+    行: [["按寿命", "", "", "", "", ""], ["10", "", "", "", "", "10"], ["14", "", "", "", "", "7"], ["20", "", "", "", "", "5"], ["25", "", "", "", "", "4"]]
+  - 标题: ["表 2  灌装线：补偿的效果（清洗按寿命）", "Table 2  Filling line: effect of compensation"]
+    表头: ["补偿", "不合格瓶数", "首次判异（组）", "C_p", "P_pk"]
+    行: [["关", "", "", "", ""], ["开", "", "", "", ""]]
+注意:
+  - ["判异按实时使用的方式：每完成一组，用到此为止的各组计算控制限，从第 4 组开始检查。实际工厂用稳定时期的数据算出控制限后固定下来。", "Signals are judged as in real time: after each subgroup the limits use only the subgroups so far, from subgroup 4 on. A real plant fixes them from a stable period."]
+  - ["模型与正文算例 39.6.2 相同，但随机数不同，具体件数会有差别。灌装线把同一过程换算成灌装量，结垢使灌装量逐渐变少。", "Same model as Example 39.6.2 but different random numbers, so counts differ. The filling line maps the same process to fill volume; scale makes the fill shrink."]
+思考题:
+  - ["控制图报警时，所有零件都还在公差之内。这时该不该停机？如果不停，可能付出什么代价？", "When the chart alarms every part is still in tolerance. Should the line stop? What may it cost not to?"]

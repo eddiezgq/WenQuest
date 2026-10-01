@@ -1,0 +1,23 @@
+# 实验 39.3 的指导书与报告模板。目的、场景、参数、任务取自 lab39_3.js。
+原理:
+  - ["采样定理：要由采样值完整地恢复信号，采样频率必须高于信号最高频率的两倍。", "Sampling theorem: to recover a signal from its samples, sample faster than twice its highest frequency."]
+  - 式: "f_s > 2 f_max          (39.3.4)"
+  - ["高于奈奎斯特频率 f_s/2 的成分采样后表现为较低的表观频率：", "Components above the Nyquist frequency f_s/2 appear at a lower apparent frequency:"]
+  - 式: "f_a = |f − k f_s|，k 取使 f_a ≤ f_s/2 的整数          (39.3.5)"
+步骤:
+  - ["打开实验 39.3，场景“电机振动”。设 f_s = 1000 Hz、f = 950 Hz，按“开始”观察，读出表观频率（任务 1），与式 (39.3.5) 比较。", "Open Lab 39.3, scene “Motor vibration”. Set f_s = 1000 Hz, f = 950 Hz, press Start, read the apparent frequency (task 1) and check Eq. (39.3.5)."]
+  - ["保持 f = 950 Hz，逐步提高 f_s，找出不再混叠的最低采样频率（任务 2），填入表 2。", "Keep f = 950 Hz and raise f_s to the lowest rate with no aliasing (task 2); record in Table 2."]
+  - ["f_s = 1000 Hz，按表 1 改变 f，记录表观频率，画出 f_a—f 的折线。", "With f_s = 1000 Hz vary f as in Table 1, record f_a and plot f_a against f."]
+  - ["切换到场景“视频里的风扇”，f = 50 Hz、f_s = 60 Hz（任务 3），观察 10 Hz 的伪波动。", "Switch to “A fan on video”, f = 50 Hz, f_s = 60 Hz (task 3); watch the false 10 Hz wave."]
+数据表:
+  - 标题: ["表 1  表观频率（f_s = 1000 Hz）", "Table 1  Apparent frequency (f_s = 1000 Hz)"]
+    表头: ["f / Hz", "f_a（读数）/ Hz", "f_a（式 (39.3.5)）/ Hz", "是否混叠"]
+    行: [["100", "", "", ""], ["400", "", "", ""], ["600", "", "", ""], ["950", "", "", ""], ["1050", "", "", ""], ["1900", "", "", ""]]
+  - 标题: ["表 2  消除混叠所需的采样频率", "Table 2  Sampling rate needed to avoid aliasing"]
+    表头: ["f / Hz", "最低 f_s / Hz", "2f / Hz"]
+    行: [["950", "", ""], ["", "", ""]]
+注意:
+  - ["界面中的时间轴已放慢，便于观察；表观频率按式 (39.3.5) 计算。", "The time axis is slowed down for viewing; f_a follows Eq. (39.3.5)."]
+  - ["f 恰好等于 f_s/2 时，采样值取决于相位，可能全为零。", "At exactly f = f_s/2 the samples depend on phase and may all be zero."]
+思考题:
+  - ["改变采样频率时，如果读数中某个波动的频率跟着变，说明了什么？", "If a ripple's frequency moves when you change the sampling rate, what does that tell you?"]

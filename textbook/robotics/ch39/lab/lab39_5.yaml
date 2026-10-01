@@ -1,0 +1,21 @@
+# 实验 39.5 的指导书与报告模板。目的、场景、参数、任务取自 lab39_5.js。
+原理:
+  - ["测试工位依次加载 0 → 100 N → 0（每级 20 N），用最小二乘拟合输出 y = a + bF：", "The station loads 0 → 100 N → 0 in 20 N steps and fits y = a + bF by least squares:"]
+  - 式: "b = Σ(F − F̄)(y − ȳ) / Σ(F − F̄)²，a = ȳ − bF̄          (39.5.2)"
+  - ["满量程输出 y_FS = 100b；线性度为偏离拟合直线的最大值占 y_FS 的百分数（式 (39.5.4)）；零点温漂为升温 20 K 前后零点之差，按 %FS/K 计。", "Full scale y_FS = 100b; linearity is the largest deviation from the line in %FS (Eq. (39.5.4)); zero drift is the change of zero over a 20 K rise, in %FS/K."]
+  - ["读数经 12 位、参考电压 2.5 V 的模数转换器，低于 0 或高于 2.5 V 即溢出。", "Readings pass through a 12-bit ADC with a 2.5 V reference; below 0 or above 2.5 V it overflows."]
+  - ["规格：满量程输出 2.43–2.50 V，零点 ±10 mV，线性度 ≤ 0.1 %FS，零点温漂 ≤ 0.005 %FS/K。各项都合格才判合格。", "Specification: full scale 2.43–2.50 V, zero within ±10 mV, linearity ≤ 0.1 %FS, zero drift ≤ 0.005 %FS/K; all must pass."]
+步骤:
+  - ["打开实验 39.5，场景“出厂检测工位”。ΔR = 0、R_g = 200 Ω、Δα = 0.2 ppm/K，按“自动检测”，等报告出来（任务 1），把各项结果填入表 1。", "Open Lab 39.5, scene “Test station”. ΔR = 0, R_g = 200 Ω, Δα = 0.2 ppm/K; press Run test and wait for the report (task 1); record in Table 1."]
+  - ["ΔR = 0.02 Ω，其余不变，再检测（任务 2），记录。再试 ΔR = 0.05 Ω，观察满量程处 ADC 溢出对各项结果的影响。", "Set ΔR = 0.02 Ω and test (task 2); record. Then try ΔR = 0.05 Ω and see how the ADC overflow at full scale affects the report."]
+  - ["ΔR = 0，R_g 依次取 190 Ω、197 Ω 和 210 Ω，各检测一次，记录满量程输出，找出满量程合格的 R_g 范围。", "ΔR = 0; test with R_g = 190, 197 and 210 Ω; find the range of R_g for which full scale passes."]
+  - ["切换到场景“维修后复检”，R_g = 200 Ω、Δα = 1 ppm/K，检测（任务 3），记录。", "Switch to “Re-test after repair”, R_g = 200 Ω, Δα = 1 ppm/K; test (task 3); record."]
+数据表:
+  - 标题: ["表 1  自动检测报告", "Table 1  Test reports"]
+    表头: ["ΔR / Ω", "R_g / Ω", "Δα / (ppm/K)", "满量程输出 / V", "零点 / mV", "线性度 / %FS", "零点温漂 / (%FS/K)", "结论"]
+    行: [["0", "200", "0.2", "", "", "", "", ""], ["0.02", "200", "0.2", "", "", "", "", ""], ["0.05", "200", "0.2", "", "", "", "", ""], ["0", "190", "0.2", "", "", "", "", ""], ["0", "197", "0.2", "", "", "", "", ""], ["0", "210", "0.2", "", "", "", "", ""], ["0", "200", "1", "", "", "", "", ""]]
+注意:
+  - ["程序在每级加载后等电路稳定再读数，检测一次需要十几秒。", "The program waits for the circuit to settle at each step; a test takes ten seconds or so."]
+  - ["仿真电路没有噪声和非线性，线性度只反映 ADC 的量化；实际传感器的线性度见正文算例 39.5.1。", "The simulated circuit has no noise or nonlinearity, so linearity only reflects ADC quantization; see Example 39.5.1 for a real sensor."]
+思考题:
+  - ["零点不合格的传感器，能否通过“去皮”（软件扣除零点）继续使用？零点温漂不合格的呢？", "Can a sensor that fails on zero be used after taring? One that fails on zero drift?"]

@@ -373,6 +373,7 @@ function setupCircuit(L) {
   api.simTime = () => (api.cj ? api.cj.getTime() : 0);
   CJ_WAIT[L.id] = (cj) => {
     api.cj = cj;
+    if (active !== L.id) try { cj.setSimRunning(false); } catch (e) { /* older build */ }
     cj.onupdate = () => { if (L.ready && !L.broken && active === L.id) readouts(L); };
     safe(L, () => def.setupCircuit && def.setupCircuit(api));
     L.ready = true;
@@ -434,6 +435,7 @@ function show(id) {
   if (!LABS[id]) return;
   active = id;
   ORDER.forEach((k) => { LABS[k].dom.tab.setAttribute("aria-selected", String(k === id)); LABS[k].dom.sec.hidden = k !== id; });
+  ORDER.forEach((k) => { const c = LABS[k].api && LABS[k].api.cj; if (c) try { c.setSimRunning(k === id); } catch (e) { /* older build */ } });   // hidden circuits pause
   try { history.replaceState(null, "", "#lab-" + id); } catch (e) { /* ignore */ }
   store.set(KEY + "-tab", id);
 }

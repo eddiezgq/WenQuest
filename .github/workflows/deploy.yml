@@ -62,7 +62,7 @@ jobs:
         working-directory: textbook/tools
         run: |
           npm ci --no-audit --no-fund
-          pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib pytest httpx fastapi pydantic
+          pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 pytest httpx fastapi pydantic
           python -m pytest -q tests
           python build.py robotics --pdf --labs
       - name: Keep the built textbooks for the deploy
