@@ -66,7 +66,16 @@ export const ROLES = [
   { key: 'engineer', name: '工艺员', en: 'Process engineer' },
   { key: 'operator', name: '操作工', en: 'Operator' },
   { key: 'quality', name: '质检员', en: 'Quality inspector' },
+  { key: 'approver', name: '审批人', en: 'Approver', prod: true },
+  { key: 'sales', name: '销售', en: 'Sales', prod: true },
 ];
 // 学生可选的岗位（厂长只给老师，第 3 轮 D3）
-export const rolesFor = (user) => (user && user.teacher === false ? ROLES.filter((r) => r.key !== 'manager') : ROLES);
+// 企业版（第 8 轮）：审批人、销售只在生产模式；企业成员在生产模式只能用授权给他的角色
+export const rolesFor = (user, mode) => {
+  const m = mode || user?.mode;
+  if (!user || user.teacher !== false) return m === 'prod' ? ROLES : ROLES.filter((r) => !r.prod);
+  if (m === 'prod') return ROLES.filter((r) => (user.member || []).includes(r.key));
+  return ROLES.filter((r) => r.key !== 'manager' && !r.prod);
+};
+export const canProd = (user) => !user || user.teacher !== false || !!(user.member || []).length;
 export const roleName = (k) => (ROLES.find((r) => r.key === k) || {}).name || k;

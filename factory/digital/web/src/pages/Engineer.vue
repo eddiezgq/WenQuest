@@ -40,7 +40,7 @@
           </div>
           <div class="line">
             <input v-model="note" class="note" maxlength="200" placeholder="改动说明，例如：键槽长 45 → 42">
-            <button class="btn primary" :disabled="!chk?.ok || busy" @click="publish">{{ busy ? '正在生成…' : '发布新版本' }}</button>
+            <button class="btn primary" :disabled="!chk?.ok || busy" @click="publish">{{ busy ? '正在生成…' : (session.user?.mode === 'prod' ? '提交审批' : '发布新版本') }}</button>
             <button class="btn ghost" :disabled="busy" @click="loadParams">恢复现行版</button>
           </div>
           <div v-if="pubMsg" :class="pubOk ? 'ok' : 'err'">{{ pubMsg }}</div>
@@ -163,7 +163,9 @@ async function publish() {
   try {
     const r = await post(`/design/${ITEM}/publish`, { params: form.value, change_note: note.value });
     pubOk.value = true;
-    pubMsg.value = `已发布 rev ${r.revision}：${r.step ? 'STEP、' : ''}零件图、键槽 G 代码（${r.gcode_lines} 行）已生成，ERPNext 设计版本随后更新。`;
+    pubMsg.value = r.pending
+      ? '已提交审批（生产模式）：审批人在“设计发布与审批”里看图、批准后生效，ERPNext 和车间才会更新。'
+      : `已发布 rev ${r.revision}：${r.step ? 'STEP、' : ''}零件图、键槽 G 代码（${r.gcode_lines} 行）已生成，ERPNext 设计版本随后更新。`;
     note.value = '';
     await loadDesign();
   } catch (e) { pubOk.value = false; pubMsg.value = e.message; } finally { busy.value = false; }

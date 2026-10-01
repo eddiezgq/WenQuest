@@ -158,3 +158,18 @@ def publish(db, emit, params, author, mode, change_note=""):
     emit("wq/gearbox/design/{}/gcode".format(ITEM.lower()), "design.gcode", g)
     return {"revision": rev, "files": files, "gcode": gfile, "gcode_lines": gcode.count("\n"), "bom": res["bom"],
             "step": bool(step), "warnings": res["warnings"]}
+
+
+def submit_prod(db, emit, params, author, author_uid, change_note=""):
+    """企业版（第 8 轮）：生产模式下网页设计台的发布先进待审；文件与一步发布相同"""
+    from hub import plm
+    res = check(params)
+    if not res["ok"]:
+        raise ValueError("；".join(res["errors"]))
+    rev = plm.current_revision(db, "prod", ITEM) + 1                   # 图纸上写预定版本号
+    drawing = wq_drawing.svg(params, ITEM, wq_publish.CONFIG["title"], rev, author).encode("utf-8")
+    gcode, info = wq_cam_keyway.generate(params, item=ITEM, revision=rev)
+    gi = {k: info[k] for k in ("tools", "est_time_s", "cut_length_mm", "slot")}
+    return plm.submit(db, emit, "prod", author, author_uid, ITEM, step=step_bytes(params), step_name="{}-rev{}.step".format(ITEM, rev),
+                      drawing=drawing, drawing_name="{}-rev{}-drawing.svg".format(ITEM, rev), gcode=gcode.encode("utf-8"),
+                      operation="铣键槽 Keyway milling", note=change_note, params=params, gcode_info=gi)

@@ -418,7 +418,8 @@ class Assistant:
         return r["corr"] if r else None
 
 
-ROLE_NAMES = {"planner": "计划员", "engineer": "工艺员", "operator": "操作工", "quality": "质检员", "manager": "厂长"}
+ROLE_NAMES = {"planner": "计划员", "engineer": "工艺员", "operator": "操作工", "quality": "质检员", "manager": "厂长",
+              "approver": "审批人", "sales": "销售"}
 
 
 def _cust_keys(c):

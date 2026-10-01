@@ -17,6 +17,7 @@
       <div class="group">
         <span class="group-title">资源</span>
         <router-link to="/library" class="nav">零件与机器人库</router-link>
+        <router-link v-if="session.user?.teacher !== false" to="/members" class="nav">企业成员</router-link>
       </div>
       <div class="group">
         <span class="group-title">专业软件</span>
@@ -40,8 +41,8 @@
         </div>
         <div class="modes" role="group" aria-label="模式">
           <button type="button" :class="{ on: session.user?.mode === 'teach' }" @click="setMode('teach')">教学模式</button>
-          <button type="button" :class="{ on: session.user?.mode === 'prod' }" :disabled="session.user?.teacher === false"
-            :title="session.user?.teacher === false ? '生产模式只对老师开放' : ''" @click="setMode('prod')">生产模式</button>
+          <button type="button" :class="{ on: session.user?.mode === 'prod' }" :disabled="!canProd(session.user)"
+            :title="canProd(session.user) ? '' : '生产模式只对老师和企业成员开放'" @click="setMode('prod')">生产模式</button>
         </div>
         <label class="role">角色
           <select :value="session.user?.role" @change="setRole($event.target.value)">
@@ -59,7 +60,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { session, rolesFor, switchTo, logout, loadConfig } from './lib/api';
+import { session, rolesFor, canProd, switchTo, logout, loadConfig } from './lib/api';
 import { bus, connectBus, setBusMode } from './lib/bus';
 import AiDrawer from './components/AiDrawer.vue';
 import { ai } from './lib/ai';
@@ -74,6 +75,7 @@ const nav = [
   { to: '/work/quality', label: '质量', role: 'quality' },
   { to: '/work/manager', label: '经营与成本', role: 'manager' },
   { to: '/3d', label: '3D 车间' },
+  { to: '/design', label: '设计发布与审批' },
 ];
 const cfg = ref({});
 const apps = computed(() => [
@@ -85,7 +87,8 @@ const apps = computed(() => [
 const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
   '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
-}[route.path] || ''));
+  '/design': '设计发布与审批', '/members': '企业成员',
+}[route.path] || (route.path.startsWith('/design/') ? '设计审阅' : '')));
 const clock = ref('');
 let timer;
 function tick() {
@@ -93,7 +96,12 @@ function tick() {
   clock.value = d.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short',
     hour: '2-digit', minute: '2-digit', hour12: false });
 }
-async function setMode(m) { if (session.user.mode !== m && !(m === 'prod' && session.user.teacher === false)) { await switchTo({ mode: m }); setBusMode(m); } }
+async function setMode(m) {
+  if (session.user.mode === m || (m === 'prod' && !canProd(session.user))) return;
+  const ok = rolesFor(session.user, m).map((r) => r.key);           // 换模式时角色不可用就换成可用的第一个
+  await switchTo({ mode: m, ...(ok.includes(session.user.role) ? {} : { role: ok[0] }) });
+  setBusMode(m);
+}
 // 第 6 轮 W6：已经在这一页时也给出反应（回到页首），不再像“点了没反应”
 function openApp(a) {
   if (route.path === a.route) window.scrollTo({ top: 0, behavior: 'smooth' });

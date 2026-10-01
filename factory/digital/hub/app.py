@@ -22,7 +22,7 @@ import urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.dirname(HERE), os.path.dirname(os.path.dirname(HERE))]
 
-from fastapi import Body, Depends, FastAPI, File, Header, HTTPException, Request, UploadFile  # noqa: E402
+from fastapi import Body, Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse, Response  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 
@@ -35,6 +35,7 @@ from hub import kpi, mrp  # noqa: E402
 from hub import select as lib_select  # noqa: E402
 from hub import design as design_web  # noqa: E402
 from hub import erp_sso  # noqa: E402
+from hub import plm  # noqa: E402
 from hub.ai import Assistant, ROLE_NAMES  # noqa: E402
 from hub.db import DB  # noqa: E402
 from hub.historian import Historian  # noqa: E402
@@ -46,7 +47,7 @@ log = logging.getLogger("hub")
 logging.basicConfig(level=os.environ.get("WQ_LOG", "INFO"), format="%(asctime)s hub %(levelname)s %(message)s")
 
 SECRET = (os.environ.get("WQ_SECRET") or secrets.token_hex(16)).encode()
-ROLES = ("planner", "engineer", "operator", "quality", "manager")
+ROLES = ("planner", "engineer", "operator", "quality", "manager", "approver", "sales")   # 后两个：企业版（第 8 轮）
 STUDENT_ROLES = ("planner", "engineer", "operator", "quality")
 # 登录方式（第 3 轮 D2）：local = 填名字进入（自己电脑上用）；wenquest = 问渠账号（线上）
 AUTH = os.environ.get("WQ_AUTH", "local")
@@ -199,12 +200,34 @@ def user_of(x_wq_token: str = Header(default="")):
     raise HTTPException(401, "请先登录")
 
 
-def check_allowed(teacher, role, mode):
-    """D3：学生只能用教学模式和四个岗位角色；厂长角色、生产模式、教师控制台只给老师。"""
+def check_allowed(teacher, role, mode, member=None):
+    """D3：学生只能用教学模式和四个岗位角色；厂长角色、生产模式、教师控制台只给老师。
+    第 8 轮：企业成员（老师在“企业成员”页授权）在生产模式可用授权给他的角色。"""
     if role not in ROLES or mode not in ("teach", "prod"):
         raise HTTPException(400, "角色或模式不对")
-    if not teacher and (role not in STUDENT_ROLES or mode != "teach"):
-        raise HTTPException(403, "厂长角色和生产模式只对老师开放")
+    if teacher:
+        return
+    if mode == "teach" and role in STUDENT_ROLES:
+        return
+    if mode == "prod" and member and role in member:
+        return
+    raise HTTPException(403, "这个角色或生产模式没有授权给你（请老师或企业管理员在“企业成员”里授权）")
+
+
+def _member_roles(uid):
+    try:
+        r = H.db.one("select roles from enterprise_member where uid=%s", (str(uid),))
+        return list(r["roles"]) if r else None
+    except Exception:  # noqa: BLE001 —— 测试里没有数据库
+        return None
+
+
+def _seen(uid, name, teacher):
+    try:
+        H.db.x("insert into known_user (uid, name, teacher) values (%s,%s,%s) on conflict (uid) do update "
+               "set name=excluded.name, teacher=excluded.teacher, last_seen=now()", (str(uid), name, teacher))
+    except Exception:  # noqa: BLE001
+        pass
 
 
 def who(u):
@@ -259,12 +282,18 @@ def login(request: Request, body: dict = Body(...)):
         if not w:
             raise HTTPException(401, "请先用问渠账号登录")
         teacher = w["teacher"]
-        role = body.get("role") or ("manager" if teacher else "planner")
-        if not teacher:
+        member = None if teacher else _member_roles(w["id"])
+        role = body.get("role") or ("manager" if teacher else (member[0] if member and mode == "prod" else "planner"))
+        if not teacher and not member:
             mode = "teach"
-        check_allowed(teacher, role, mode)
+        if member and mode == "prod" and role not in member:            # 登录页按学生角色选的：换成授权的第一个
+            role = member[0]
+        check_allowed(teacher, role, mode, member)
         u = {"name": _display_name(w), "uid": w["id"], "teacher": teacher, "role": role, "mode": mode,
              "exp": int(time.time() + TOKEN_DAYS * 86400)}
+        if member:
+            u["member"] = member
+        _seen(w["id"], _display_name(w), teacher)
     else:
         name = str(body.get("name", "")).strip()[:40]
         role = body.get("role", "manager")
@@ -281,8 +310,13 @@ def login(request: Request, body: dict = Body(...)):
 def switch(body: dict = Body(...), u=Depends(user_of)):
     role = body.get("role", u["role"])
     mode = body.get("mode", u["mode"])
-    check_allowed(u["teacher"], role, mode)
+    member = None if u["teacher"] or AUTH != "wenquest" else _member_roles(u.get("uid"))   # 授权随时生效
+    check_allowed(u["teacher"], role, mode, member)
     nu = dict(u, role=role, mode=mode)
+    if member:
+        nu["member"] = member
+    else:
+        nu.pop("member", None)
     return {"token": _sign(nu), "user": nu}
 
 
@@ -667,6 +701,8 @@ def http_publish(body: dict = Body(...), u=Depends(user_of)):
         msg = wqbus.validate(dict(msg, mode=u["mode"]))
     except (wqbus.ValidationError, TypeError) as e:
         raise HTTPException(422, "消息不合规范：{}".format(e))
+    if u["mode"] == "prod" and msg["type"] in ("design.release", "design.gcode"):     # 企业版：桌面宏的发布也先进待审（第 8 轮）
+        return _desktop_submit(msg, u)
     H.bus.publish_msg(tp, msg)
     H.hist.handle(tp, msg)
     return {"id": msg["id"]}
@@ -716,9 +752,178 @@ def design_publish(item: str, body: dict = Body(...), u=Depends(user_of)):
         H.hist.handle(tp, msg)
     try:
         params = design_web.normalize(body.get("params") or {})
-        return design_web.publish(H.db, emit, params, who(u), u["mode"], (body.get("change_note") or "").strip()[:200])
+        note = (body.get("change_note") or "").strip()[:200]
+        if u["mode"] == "teach":
+            return design_web.publish(H.db, emit, params, who(u), u["mode"], note)
+        return dict(design_web.submit_prod(H.db, emit, params, who(u), _uid(u), note), pending=True)   # 企业版：先审批（第 8 轮）
     except ValueError as e:
         raise HTTPException(422, str(e))
+
+
+# ---------------------------------------------------------------- 企业版：通用发布、看图、审批（第 8 轮）
+def _uid(u):
+    return str(u.get("uid") or erp_sso.local_uid(u["name"]))
+
+
+def _emit_as(u, source="plm"):
+    def emit(tp, type_, data):
+        msg = wqbus.make(type_, source, data, mode=u["mode"])
+        H.bus.publish_msg(tp, msg)
+        H.hist.handle(tp, msg)
+    return emit
+
+
+def _can_submit(u):
+    if u["mode"] == "teach" or u["role"] in ("engineer", "manager"):
+        return
+    raise HTTPException(403, "提交设计要用工艺员（设计工程师）或厂长角色")
+
+
+def _can_approve(u):
+    if u["role"] in ("approver", "manager"):
+        return
+    raise HTTPException(403, "审批要用审批人或厂长角色")
+
+
+def _plm_call(fn, *a, **k):
+    try:
+        return fn(*a, **k)
+    except KeyError as e:
+        raise HTTPException(404, str(e).strip("'"))
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+def _desktop_submit(msg, u):
+    d = msg["data"]
+    if msg["type"] == "design.gcode":
+        sid = _plm_call(plm.attach_gcode, H.db, u["mode"], d["item"], _uid(u), d)
+        return {"submission": sid, "pending": True}
+    _can_submit(u)
+    files = d.get("files") or []
+    step = next((f for f in files if f.get("kind") == "step"), None)
+    drw = next((f for f in files if f.get("kind") == "drawing"), None)
+    r = _plm_call(plm.submit, H.db, _emit_as(u, "freecad"), u["mode"], who(u), _uid(u), d["item"],
+                  step=plm.load_file(H.db, step["url"]) if step else None, step_name=step and step["name"],
+                  drawing=plm.load_file(H.db, drw["url"]) if drw else None, drawing_name=drw and drw["name"],
+                  note=d.get("change_note") or "", params=d.get("params"))
+    return {"submission": r["id"], "pending": True, "id": r["id"]}
+
+
+@app.get("/api/plm/item/{item}")
+def plm_item(item: str, u=Depends(user_of)):
+    info = plm.item_info(item, plm.erp_item_name if AUTH == "wenquest" else None)
+    if not info:
+        raise HTTPException(404, "物料 {} 不存在（先在 ERPNext 里建物料）".format(item))
+    return dict(info, revision=plm.current_revision(H.db, u["mode"], item))
+
+
+@app.post("/api/plm/submit")
+async def plm_submit(item: str = Form(...), note: str = Form(""), operation: str = Form(""),
+                     step: UploadFile = File(None), drawing: UploadFile = File(None), gcode: UploadFile = File(None),
+                     u=Depends(user_of)):
+    """网页上传发布（任何 CAD 导出的 STEP 都行）：教学模式直接生效，生产模式进待审"""
+    _can_submit(u)
+    item = item.strip()
+    if not plm.item_info(item, plm.erp_item_name if AUTH == "wenquest" else None):
+        raise HTTPException(404, "物料 {} 不存在（先在 ERPNext 里建物料）".format(item))
+    blobs = {}
+    for k, f in (("step", step), ("drawing", drawing), ("gcode", gcode)):
+        if f is not None and f.filename:
+            b = await f.read()
+            if len(b) > 50 * 1024 * 1024:
+                raise HTTPException(413, "文件超过 50 MB")
+            blobs[k] = (b, f.filename)
+    if "step" not in blobs and "drawing" not in blobs:
+        raise HTTPException(422, "至少要上传 STEP 模型或图纸")
+    return _plm_call(plm.submit, H.db, _emit_as(u), u["mode"], who(u), _uid(u), item,
+                     step=blobs.get("step", (None, None))[0], step_name=blobs.get("step", (None, None))[1],
+                     drawing=blobs.get("drawing", (None, None))[0], drawing_name=blobs.get("drawing", (None, None))[1],
+                     gcode=blobs.get("gcode", (None, None))[0], operation=operation.strip() or None, note=note.strip()[:500])
+
+
+@app.get("/api/plm/submissions")
+def plm_list(status: str = "", item: str = "", u=Depends(user_of)):
+    where, args = ["mode=%s"], [u["mode"]]
+    if status:
+        where.append("status=%s")
+        args.append(status)
+    if item:
+        where.append("item=%s")
+        args.append(item)
+    rows = H.db.q("select s.id, s.item, s.status, s.author, s.author_uid, s.ts, s.note, s.base_rev, s.revision, s.decided_by, "
+                  "s.decided_at, s.decision, (select count(*) from design_comment c where c.sub_id=s.id and not c.resolved) "
+                  "as open_comments from design_submission s where " + " and ".join(where) + " order by s.ts desc limit 200", args)
+    me = _uid(u)
+    out = []
+    for r in rows:
+        r = dict(r)
+        r["mine"] = r.pop("author_uid") == me
+        out.append(r)
+    return out
+
+
+@app.get("/api/plm/submissions/{sid}")
+def plm_get(sid: str, u=Depends(user_of)):
+    s = plm.get(H.db, sid)
+    if not s or s["mode"] != u["mode"]:
+        raise HTTPException(404, "没有这次提交")
+    _, base = plm.current_glb(H.db, s["mode"], s["item"]) if s["status"] == "pending" else (None, None)
+    s["base_glb"] = base["url"] if base else None
+    s["mine"] = s["author_uid"] == _uid(u)
+    s["can_approve"] = u["role"] in ("approver", "manager") and not s["mine"] and s["status"] == "pending"
+    s.pop("author_uid", None)
+    return s
+
+
+@app.post("/api/plm/submissions/{sid}/comments")
+def plm_comment(sid: str, body: dict = Body(...), u=Depends(user_of)):
+    return _plm_call(plm.comment, H.db, sid, who(u), body.get("body"), body.get("anchor"))
+
+
+@app.post("/api/plm/submissions/{sid}/comments/{cid}")
+def plm_resolve(sid: str, cid: int, body: dict = Body(default={}), u=Depends(user_of)):
+    return plm.resolve_comment(H.db, sid, cid, bool(body.get("resolved", True)))
+
+
+@app.post("/api/plm/submissions/{sid}/decision")
+def plm_decision(sid: str, body: dict = Body(...), u=Depends(user_of)):
+    d, note = body.get("decision"), (body.get("note") or "").strip()[:500]
+    if d == "approve":
+        _can_approve(u)
+        return _plm_call(plm.approve, H.db, _emit_as(u), sid, who(u), note, approver_uid=_uid(u))
+    if d == "reject":
+        _can_approve(u)
+        return _plm_call(plm.decide, H.db, _emit_as(u), sid, who(u), "rejected", note)
+    if d == "withdraw":
+        s = plm.get(H.db, sid)
+        if not s or s["author_uid"] != _uid(u):
+            raise HTTPException(403, "只有提交人能撤回")
+        return _plm_call(plm.decide, H.db, _emit_as(u), sid, s["author"], "withdrawn", note)
+    raise HTTPException(400, "decision 只能是 approve / reject / withdraw")
+
+
+# 企业成员（第 8 轮 Q7）：老师授权登录过的问渠账号在生产模式使用某些角色
+@app.get("/api/plm/members")
+def plm_members(u=Depends(user_of)):
+    require_teacher(u)
+    rows = H.db.q("select k.uid, k.name, k.teacher, k.last_seen, m.roles from known_user k "
+                  "left join enterprise_member m on m.uid=k.uid order by m.roles is null, k.last_seen desc limit 500")
+    return [dict(r, roles=list(r["roles"] or [])) for r in rows]
+
+
+@app.post("/api/plm/members/{uid}")
+def plm_member_set(uid: str, body: dict = Body(...), u=Depends(user_of)):
+    require_teacher(u)
+    roles = [r for r in body.get("roles") or [] if r in ROLES and r != "manager"]
+    if roles:
+        H.db.x("insert into enterprise_member (uid, roles, added_by) values (%s,%s,%s) on conflict (uid) do update "
+               "set roles=excluded.roles, added_by=excluded.added_by, added_at=now()", (uid, roles, who(u)))
+    else:
+        H.db.x("delete from enterprise_member where uid=%s", (uid,))
+    return {"uid": uid, "roles": roles}
 
 
 # ---------------------------------------------------------------- ERPNext 单点登录（第 7 轮）

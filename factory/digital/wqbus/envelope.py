@@ -56,6 +56,8 @@ DATA_SCHEMAS = {
         "action": {"enum": ["created", "submitted", "updated", "cancelled", "snapshot", "failed"]}}),
     "design.release": _obj(["item", "revision"], {"revision": {"type": "integer", "minimum": 1},
                                                   "bom": {"type": "array"}, "files": {"type": "array"}}),
+    "design.submit": _obj(["item", "submission"], {}),                        # 企业版：提交待审（第 8 轮）
+    "design.review": _obj(["item", "submission", "decision"], {"decision": {"enum": ["approved", "rejected", "withdrawn"]}}),
     "design.gcode": _obj(["item", "revision", "operation", "machine", "gcode_ref"], {"est_time_s": NUM}),
     "logistics.status": _obj(["x_m", "y_m"], {"x_m": NUM, "y_m": NUM, "battery": FRAC}),
     "ai.alert": _obj(["level", "title"], {"level": {"enum": ["info", "warn", "critical"]},

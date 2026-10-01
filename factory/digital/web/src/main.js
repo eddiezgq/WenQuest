@@ -17,6 +17,9 @@ const routes = [
   { path: '/teach', component: () => import('./pages/Teach.vue') },
   { path: '/bus', component: () => import('./pages/BusView.vue') },
   { path: '/library', component: () => import('./pages/Library.vue') },
+  { path: '/design', component: () => import('./pages/DesignRelease.vue') },
+  { path: '/design/:id', component: () => import('./pages/DesignReview.vue') },
+  { path: '/members', component: () => import('./pages/Members.vue') },
   { path: '/:p(.*)*', redirect: '/' },
 ];
 

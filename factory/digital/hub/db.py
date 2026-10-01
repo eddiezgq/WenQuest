@@ -82,6 +82,50 @@ create table if not exists stored_file (
     content    bytea not null,
     created_at timestamptz not null default now()
 );
+
+-- 企业版第一期（第 8 轮）：设计提交与审批、批注、登录过的人、企业成员
+create table if not exists design_submission (
+    id          text primary key,
+    mode        text not null,
+    item        text not null,
+    status      text not null,             -- pending 待审 / approved 已批准 / rejected 退回 / withdrawn 撤回
+    author      text not null,
+    author_uid  text,
+    ts          timestamptz not null default now(),
+    note        text,
+    files       jsonb not null,             -- [{kind: step|glb|drawing|gcode|diff, name, url, sha256, size}]
+    gcode       jsonb,                      -- {operation, machine, url, sha256, ...}
+    params      jsonb,
+    base_rev    integer,                    -- 提交时的现行版本
+    revision    integer,                    -- 批准后的版本号
+    diff        jsonb,                      -- 与现行版的差异统计
+    decided_by  text,
+    decided_at  timestamptz,
+    decision    text
+);
+create index if not exists design_submission_item on design_submission (mode, item, ts desc);
+create table if not exists design_comment (
+    id          bigserial primary key,
+    sub_id      text not null,
+    author      text not null,
+    ts          timestamptz not null default now(),
+    body        text not null,
+    anchor      jsonb,                      -- 三维模型上的点 {x, y, z}（mm），没有就是整体意见
+    resolved    boolean not null default false
+);
+create index if not exists design_comment_sub on design_comment (sub_id, id);
+create table if not exists known_user (
+    uid         text primary key,
+    name        text not null,
+    teacher     boolean not null default false,
+    last_seen   timestamptz not null default now()
+);
+create table if not exists enterprise_member (
+    uid         text primary key,
+    roles       text[] not null,
+    added_by    text,
+    added_at    timestamptz not null default now()
+);
 """
 
 
