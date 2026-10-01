@@ -460,6 +460,7 @@ def main(argv=None):
     ap.add_argument("--factory-url", default="", help="数字工厂网址，物料上的“零件库页面”链接用，如 https://factory.example.com")
     ap.add_argument("--library-refs-only", action="store_true", help="只补零件库编号（已安装的服务器更新时用）")
     ap.add_argument("--erp-sso-only", action="store_true", help="只配置问渠单点登录（第 7 轮；每次部署时执行）")
+    ap.add_argument("--hub-internal", default="http://wqf-hub:8100", help="ERPNext 服务器访问枢纽的内部地址（演示工厂用 wqf-hub-demo）")
     ap.add_argument("--sso-secret", default=os.environ.get("WQ_ERP_OAUTH_SECRET", ""), help="单点登录密钥（与枢纽相同）")
     args = ap.parse_args(argv)
     try:
@@ -468,7 +469,7 @@ def main(argv=None):
             if not (args.factory_url and args.sso_secret):
                 print("出错：--erp-sso-only 需要 --factory-url 和 --sso-secret", file=sys.stderr)
                 return 1
-            sd.erp_sso(args.factory_url, args.sso_secret)
+            sd.erp_sso(args.factory_url, args.sso_secret, args.hub_internal)
         elif args.library_refs_only:
             sd.library_refs(args.factory_url)
         else:

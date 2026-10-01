@@ -12,7 +12,7 @@ domain="${SITE_DOMAIN:-$(envval SITE_DOMAIN)}"
 [ -n "$domain" ] || domain=$(learnval SITE_DOMAIN)
 [ -n "$domain" ] || { echo "找不到域名：学习平台的 $LEARN_DIR/.env 里没有 SITE_DOMAIN" >&2; exit 1; }
 envset SITE_DOMAIN "$domain"
-for k in WQ_DB_PASSWORD WQ_MQTT_HUB_PASSWORD WQ_MQTT_SIM_PASSWORD WQ_MQTT_BRIDGE_PASSWORD WQ_SECRET ERP_DB_ROOT_PASSWORD; do
+for k in WQ_DB_PASSWORD WQ_MQTT_HUB_PASSWORD WQ_MQTT_SIM_PASSWORD WQ_MQTT_BRIDGE_PASSWORD WQ_SECRET WQ_DEMO_SECRET ERP_DB_ROOT_PASSWORD; do
     [ -n "$(envval "$k")" ] || envset "$k" "$(rand 32)"
 done
 [ -n "$(envval ERP_ADMIN_PASSWORD)" ] || envset ERP_ADMIN_PASSWORD "$(rand 20)"

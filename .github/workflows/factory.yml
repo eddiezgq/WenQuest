@@ -78,7 +78,7 @@ jobs:
           cp -r factory/deploy "$FACTORY_DIR/deploy"
           cp factory/digital/mosquitto/server/* "$FACTORY_DIR/mosquitto/"
           # 演练时把端口开到本机，登录用本地方式（CI 没有学习平台）
-          printf 'services:\n  hub: {ports: ["8100:8100"]}\n  erp-frontend: {ports: ["8090:8080"]}\n  bus: {ports: ["1883:1883", "9001:9001"]}\n' > "$FACTORY_DIR/ci.yml"
+          printf 'services:\n  hub: {ports: ["8100:8100"]}\n  erp-frontend: {ports: ["8090:8080"]}\n  bus: {ports: ["1883:1883", "9001:9001"]}\n  hub-demo: {ports: ["8101:8100"]}\n  erp-frontend-demo: {ports: ["8092:8080"]}\n' > "$FACTORY_DIR/ci.yml"
           printf 'FACTORY_APP_IMAGE=wqf-app:ci\nFACTORY_BRIDGE_IMAGE=wqf-bridge:ci\nSITE_DOMAIN=example.test\nWQ_AUTH=local\nWQ_AI_PER_HOUR=0\nWQ_ERP_OAUTH_SECRET=ci-sso-secret\n' > "$FACTORY_DIR/.env"
       - name: 首次安装（建站、设置向导、API 钥匙、导入数据）
         run: mkdir -p /tmp/logs && bash "$FACTORY_DIR/deploy/install.sh" 2>&1 | tee /tmp/logs/install.log
@@ -119,6 +119,27 @@ jobs:
             { cat /tmp/logs/erp_sso_seed.log; echo "---- 演练 ----"; cat /tmp/logs/erp_sso.log; echo "---- 枢纽 ----"; dc logs --no-color --tail 40 hub;
               echo "---- ERPNext ----"; dc exec -T erp-backend bash -c 'tail -n 60 logs/frappe.log logs/web.error.log 2>/dev/null'; } > /tmp/logs/sso_diag.log 2>&1 || true
             python3 "$GITHUB_WORKSPACE/factory/deploy/ci_annotate.py" 单点登录诊断 /tmp/logs/sso_diag.log 200
+          fi
+          exit "$st"
+      - name: 企业版演示工厂（第 9 轮）
+        run: |
+          set +e
+          val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
+          bash -c ". '$FACTORY_DIR/deploy/lib.sh'; demo_setup" 2>&1 | tee /tmp/logs/demo_setup.log
+          st=${PIPESTATUS[0]}
+          if [ "$st" = 0 ]; then
+            sleep 20
+            python factory/digital/tests/check_demo.py --hub http://localhost:8101 --erp http://localhost:8092 \
+              --key "$(val WQ_DEMO_ERP_API_KEY)" --secret "$(val WQ_DEMO_ERP_API_SECRET)" \
+              --teach-erp http://localhost:8090 --teach-key "$(val WQ_ERP_API_KEY)" --teach-secret "$(val WQ_ERP_API_SECRET)" \
+              2>&1 | tee /tmp/logs/demo.log
+            st=${PIPESTATUS[0]}
+          fi
+          if [ "$st" != 0 ]; then
+            dc() { docker compose -p wq-factory -f /tmp/fac/docker-compose.yml -f /tmp/fac/ci.yml "$@"; }
+            { tail -n 60 /tmp/logs/demo_setup.log; echo "---- 演练 ----"; cat /tmp/logs/demo.log 2>/dev/null;
+              echo "---- 枢纽 ----"; dc logs --no-color --tail 40 hub-demo; echo "---- 桥接 ----"; dc logs --no-color --tail 40 bridge-demo | grep -v "^$"; } > /tmp/logs/demo_diag.log 2>&1
+            python3 factory/deploy/ci_annotate.py 演示工厂诊断 /tmp/logs/demo_diag.log 200
           fi
           exit "$st"
       - name: 出错时的日志

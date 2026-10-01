@@ -13,6 +13,8 @@ APP="${1:-}"; BRIDGE="${2:-}"
 [ -n "$(envval WQ_FACTORY_READ_KEY)" ] || envset WQ_FACTORY_READ_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # ERPNext 单点登录密钥（第 7 轮 E5）：枢纽与 ERPNext 社交登录共用；没有就生成
 [ -n "$(envval WQ_ERP_OAUTH_SECRET)" ] || envset WQ_ERP_OAUTH_SECRET "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
+# 企业版演示工厂（第 9 轮）的工作台密钥：启动前要有
+[ -n "$(envval WQ_DEMO_SECRET)" ] || envset WQ_DEMO_SECRET "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 || true)"
 
 if [ "$(envval FACTORY_INSTALLED)" != 1 ]; then
     # D1：ERPNext 加数字工厂约需 3 GB 内存。不够就停下，提示升级服务器，免得拖垮学习平台
@@ -56,6 +58,15 @@ for _ in $(seq 1 40); do
             else
                 log "警告：ERPNext 单点登录没有配置成功（下次部署再试）："
                 tail -5 /tmp/wq-sso.log
+            fi
+            # 企业版演示工厂（第 9 轮）：可用内存够才建；失败不影响教学工厂，下次部署再试
+            avail=$(awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo)
+            if [ "$avail" -lt "${DEMO_MIN_MEM_MB:-1200}" ] && ! dc exec -T erp-backend test -d sites/demo; then
+                log "警告：可用内存只有 ${avail} MB，演示工厂暂不建（需要约 1.2 GB）。请把服务器升到 16 GB 后重新部署。"
+            elif bash -c ". '$(dirname "$0")/lib.sh'; demo_setup"; then
+                log "演示工厂已就绪：https://demo.$(envval SITE_DOMAIN)"
+            else
+                log "警告：演示工厂没有配置完成（不影响教学工厂，下次部署再试）"
             fi
         fi
         docker image prune -f >/dev/null

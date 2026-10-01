@@ -86,6 +86,34 @@ erp.{$SITE_DOMAIN} {
 	}
 }
 
+# 数字工厂企业版演示工厂（第 9 轮）：生产模式，与教学工厂隔离；ERPNext 用 demo 站点
+demo.{$SITE_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+	request_body {
+		max_size 60MB
+	}
+	handle /mqtt* {
+		reverse_proxy wqf-bus-demo:9001
+	}
+	handle {
+		reverse_proxy wqf-hub-demo:8100
+	}
+}
+
+demo-erp.{$SITE_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+	request_body {
+		max_size 60MB
+	}
+	reverse_proxy wqf-erp-demo:8080 {
+		transport http {
+			read_timeout 300s
+		}
+	}
+}
+
 # QMS demo (a separate project on the same server, reached over the external qms-edge network).
 qms.wenquestrobotics.com {
 	encode gzip
