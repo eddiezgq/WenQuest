@@ -31,10 +31,14 @@ def expand(repo, rel, mappings=None):
     old = substitution_args._eval_find
     substitution_args._eval_find = find
     try:
-        doc = xacro.process_file(str(Path(repo) / rel), mappings=dict(mappings or {}))   # 传副本：xacro 会把解析出的参数写回字典
+        # 传副本：xacro 会把解析出的参数写回字典；参数里的 $R 代表仓库目录（条目里不能存本机路径）
+        args = {k: (v.replace("$R", str(repo)) if isinstance(v, str) else v) for k, v in (mappings or {}).items()}
+        doc = xacro.process_file(str(Path(repo) / rel), mappings=args)
     finally:
         substitution_args._eval_find = old
-    return doc.toprettyxml(indent="  ")
+    text = doc.toprettyxml(indent="  ")
+    # 参数里带仓库目录时，展开结果会有本机绝对路径：换成相对仓库根目录的路径（下载的 URDF 不能带本机路径）
+    return text.replace("file://" + str(repo) + "/", "").replace(str(repo) + "/", "")
 
 
 def package_license(repo, rel):

@@ -1692,6 +1692,11 @@ ros2_kortex:
   - /kortex_description/arms/gen3_lite/6dof/meshes/lower_wrist_link.STL
   - /kortex_description/arms/gen3_lite/6dof/meshes/shoulder_link.STL
   - /kortex_description/arms/gen3_lite/6dof/meshes/upper_wrist_link.STL
+  - /kortex_description/grippers/gen3_lite_2f/meshes/gripper_base_link.STL
+  - /kortex_description/grippers/gen3_lite_2f/meshes/left_finger_dist_link.STL
+  - /kortex_description/grippers/gen3_lite_2f/meshes/left_finger_prox_link.STL
+  - /kortex_description/grippers/gen3_lite_2f/meshes/right_finger_dist_link.STL
+  - /kortex_description/grippers/gen3_lite_2f/meshes/right_finger_prox_link.STL
 sigmaban_urdf:
   url: https://github.com/Rhoban/sigmaban_urdf.git
   commit: d5d023fd35800d00d7647000bce8602617a4960d
@@ -1735,6 +1740,62 @@ stretch4_urdf:
   - '!*.usdc'
   - /LICEN[CS]E*
   - /COPYING*
+  - /stretch4_urdf/SE4_francis/meshes/arm_l0_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/arm_l0_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/arm_l1_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/arm_l1_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/arm_l2_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/arm_l2_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/arm_l3_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/arm_l3_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/arm_l4_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/arm_l4_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/base_collision_link.obj
+  - /stretch4_urdf/SE4_francis/meshes/base_link.obj
+  - /stretch4_urdf/SE4_francis/meshes/gripper_camera_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/gripper_camera_link_collision.STL
+  - /stretch4_urdf/SE4_francis/meshes/head_collision_link.obj
+  - /stretch4_urdf/SE4_francis/meshes/head_link.obj
+  - /stretch4_urdf/SE4_francis/meshes/lift_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/lift_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/mast_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/mast_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/tool_attachment_site_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/tool_attachment_site_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wheel_0_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wheel_0_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wheel_1_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wheel_1_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wheel_2_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wheel_2_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_aruco_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_aruco_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_pitch_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_pitch_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_reflector_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_reflector_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_roll_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_roll_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_yaw_collision_link.STL
+  - /stretch4_urdf/SE4_francis/meshes/wrist_yaw_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/aruco_fingertip_left_collision_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/aruco_fingertip_left_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/aruco_fingertip_right_collision_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/aruco_fingertip_right_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/grasp_center_collision_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/grasp_center_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/gripper_finger_left_collision_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/gripper_finger_left_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/gripper_finger_right_collision_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/gripper_finger_right_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/gripper_fingertip_left_collision_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/gripper_fingertip_left_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/gripper_fingertip_right_collision_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/gripper_fingertip_right_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/quick_connect_interface_collision_link.STL
+  - /stretch4_urdf/SE4_tools/eoa_wrist_dw4_tool_sg4/meshes/quick_connect_interface_link.STL
 toddlerbot:
   url: https://github.com/hshi74/toddlerbot.git
   commit: 067f9dc4f50143e36334877b9395b9c5c29ee30c

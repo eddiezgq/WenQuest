@@ -5,8 +5,9 @@ commit: d6b206deb9e6d461616f9552171549987cee0f0a
 date: 2026-09-19
 # 规则：只收 URDF；许可在可收名单（B.6）且原仓库根目录 LICENSE 核对一致；不收 MuJoCo Menagerie 来源（已有）；
 # 不收 Universal Robots（网格的许可是 UR 自己的图形文件条款，不在可收名单；UR 已由 Menagerie 和 DH 模型覆盖）；
-# 需要 xacro 预处理的：第 3 批起能展开，收单个原仓库的（多仓库组合的如 TIAGo 官方版暂不收）；与已有条目同一型号的，不新建，在已有条目上加“另有 URDF 版本”的链接。
+# 需要 xacro 预处理的：第 3 批起能展开，收单个原仓库的（多仓库组合的如 TIAGo 官方版：与已有同型号时作为“另有版本”链接）；与已有条目同一型号的，不新建，在已有条目上加“另有 URDF 版本”的链接。
 duplicates:
+  tiago_official_description: B-MAN-TIAGO
   a1_description: B-LEG-A1
   anymal_b_description: B-LEG-ANYMALB
   anymal_c_description: B-LEG-ANYMALC

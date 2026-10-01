@@ -1,0 +1,6 @@
+# B-MAN-TIAGO 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）
+alt_models:
+- format: xacro
+  url: https://github.com/pal-robotics/tiago_robot/blob/f1c33c92bdde7c1dd79f0c3e739e98a233dbd30b/tiago_description/robots/tiago.urdf.xacro
+  license: Apache-2.0
+  via: robot_descriptions/tiago_official_description

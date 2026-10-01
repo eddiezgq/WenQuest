@@ -1,0 +1,55 @@
+# B-MAN-STRETCH4 · Hello Robot Stretch 4 移动操作机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-MAN-STRETCH4
+kind: robot
+name:
+  zh: Hello Robot Stretch 4 移动操作机器人
+  en: Hello Robot Stretch 4
+category: MAN
+tags:
+- 移动操作机器人
+- mobile_manipulator
+- Hello Robot
+standards: []
+params: []
+defaults: {}
+model:
+  engine: xacro:stretch4_urdf/stretch4_urdf/SE4.xacro
+  formats:
+  - urdf
+  - glb
+  xacro_args:
+    batch: francis
+    tool: eoa_wrist_dw4_tool_sg4
+    pkg_path: $R/stretch4_urdf
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: mobile_manipulator
+source:
+  origin: robot_descriptions
+  repo: https://github.com/hello-robot/stretch4_urdf
+  commit: 7b35e66a3d7e3863c7188e46e98c196dcdab2609
+  path: stretch4_urdf/SE4.xacro
+  license: BSD-3-Clause-Clear
+  attribution: Stretch 4（Hello Robot）；经 robot_descriptions 登记；BSD-3-Clause-Clear
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 BSD-3-Clause-Clear；原仓库 LICENSE 识别为 BSD-3-Clause-Clear
+  registry:
+    name: stretch_4_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 移动底盘加机械臂：既能在场地里走，又能伸手操作。
+  uses:
+  - 仓储搬运
+  - 服务机器人
+  courses:
+  - course: 移动机器人
+    chapter: 移动操作
+  labs:
+  - 底盘与机械臂的协同
+factory:
+  erp_items: []
+  suppliers: []

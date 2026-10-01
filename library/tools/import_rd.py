@@ -59,7 +59,7 @@ def candidates():
         if not o["has_urdf"] or o["repo"] == "mujoco_menagerie":
             continue
         if not o["urdf"]:                                  # 只有 xacro 的（第 5 轮第 3 批起能展开）：只收单个原仓库的
-            if not o["xacro_path"] or o["n_repos"] != 1:
+            if not o["xacro_path"] or (o["n_repos"] != 1 and o["name"] not in dup):   # 多仓库组合的：只作为已有条目的“另有版本”链接
                 continue
             o = dict(o, model=o["xacro_path"], engine="xacro")
         else:
@@ -86,6 +86,9 @@ def resolve(ref, urdf_rel, files):
         return min(cands, key=len) if cands else None
     if ref.startswith("file://"):
         ref = ref[len("file://"):]
+    if posixpath.isabs(ref):                      # 绝对路径（xacro 参数里带了仓库目录展开出来的）：按仓库内路径后缀匹配
+        cands = [f for f in files if ref.endswith("/" + f)]
+        return max(cands, key=len) if cands else None
     d = posixpath.dirname(urdf_rel)
     while True:                                   # 相对路径：先按 URDF 所在目录，不在就逐级往上找（有的按包根目录写）
         p = posixpath.normpath(posixpath.join(d, ref))
@@ -117,7 +120,7 @@ def write_repo_list():
     from fetch_sources import SRC, fetch, git
     new, dups = candidates()
     by_repo = {}
-    for o in new + dups:
+    for o in new + [d for d in dups if d["n_repos"] == 1]:     # 多仓库组合的只给链接，不取仓库
         by_repo.setdefault(o["repo"], {"url": o["url"], "commit": o["commit"], "models": []})["models"].append(o)
     repos, failed = {}, []
     for key, r in sorted(by_repo.items()):
