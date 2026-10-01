@@ -68,6 +68,9 @@ async def render_pending(m, limit: int = 0) -> int:
         try:
             video, poster, secs, _ = await anim.render(url, code, 900)
         except anim.RenderError as e:
+            if e.stage == "service":              # renderer restarting or busy: try again on the next round
+                log.warning("textbook animation %s/%s postponed: %s", book, name, e)
+                return made
             (md / f"{name}-{h}.err").write_text(json.dumps({"error": str(e)[:2000], "at": time.time()}), encoding="utf-8")
             log.warning("textbook animation %s/%s failed: %s", book, name, str(e)[:300])
             continue

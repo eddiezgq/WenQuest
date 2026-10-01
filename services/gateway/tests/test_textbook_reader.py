@@ -99,6 +99,19 @@ def test_animations_are_rendered_once_and_shown(client, tmp_path):
         made = asyncio.run(textbook_api.render_pending(main))
         assert made == 1 and len(calls) == 2
         assert textbook_api.pending(main) == []                  # the failure is not retried within a day
+        for f in (tmp_path / "data" / "textbook-media" / "robotics").glob("*.err"):
+            f.unlink()
+
+        async def unreachable(url, code, timeout=600):
+            raise anim.RenderError("renderer unreachable: ConnectError", "service")
+        anim.render = unreachable
+        assert asyncio.run(textbook_api.render_pending(main)) == 0
+        assert len(textbook_api.pending(main)) == 1              # a service hiccup is retried on the next round
+        anim.render = fake_render
+        calls.clear()
+        assert asyncio.run(textbook_api.render_pending(main)) == 1 and textbook_api.pending(main) == []
+        for f in (tmp_path / "data" / "textbook-media" / "robotics").glob("a4_1_2-*"):
+            f.unlink()                                           # back to: one ready, one not yet
     finally:
         anim.render = real
     hs = student(client)
