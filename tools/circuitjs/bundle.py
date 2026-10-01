@@ -33,10 +33,23 @@ if "fontello.eot" in font_css or "fontello.svg" in font_css:
 
 clean_dir = gwt_out / "gwt" / "clean"
 clean_css = (clean_dir / "clean.css").read_text(encoding="utf-8")
-clean_css = re.sub(r"url\(images/([\w.-]+)\)", lambda m: f"url({data_uri(clean_dir / 'images' / m.group(1), 'image/png' if m.group(1).endswith('.png') else 'image/gif')})", clean_css)
+
+
+def inline_url(m):
+    ref = m.group(2)
+    f = (clean_dir / ref).resolve()
+    if ref.startswith("data:") or not f.exists():
+        return m.group(0) if ref.startswith("data:") else "none"
+    mime = {"png": "image/png", "gif": "image/gif", "jpg": "image/jpeg", "svg": "image/svg+xml"}.get(f.suffix[1:].lower(), "application/octet-stream")
+    return f"url({data_uri(f, mime)})"
+
+
+URL = re.compile(r"""url\(\s*(['"]?)([^'")]+)\1\s*\)""")
+clean_css = URL.sub(inline_url, clean_css)
 module_css = (pub / "style.css").read_text(encoding="utf-8")
-if re.search(r"url\((?!data:)", clean_css + module_css):
-    sys.exit("bundle: 样式里还有外部 url")
+left = [u for u in URL.findall(clean_css + module_css) if not u[1].startswith("data:")]
+if left:
+    sys.exit(f"bundle: 样式里还有外部 url：{left[:5]}")
 
 script = (gwt_out / "circuitjs1.nocache.js").read_text(encoding="utf-8")
 lz = (war / "lz-string.min.js").read_text(encoding="utf-8")
@@ -48,6 +61,9 @@ def js_str(s: str) -> str:
     return json.dumps(s, ensure_ascii=False).replace("</", "<\\/")
 
 
+lz_safe = lz.replace("</script", "<\\/script")
+script_safe = script.replace("</script", "<\\/script")
+zh_js = js_str(zh)
 html = f"""<!DOCTYPE html>
 <!-- CircuitJS1 by Paul Falstad and Iain Sharp, GPL-2.0. Upstream https://github.com/pfalstad/circuitjs1 commit {commit};
      embedding patch and build script: WenQuest repository tools/circuitjs/. -->
@@ -57,10 +73,10 @@ html = f"""<!DOCTYPE html>
 <style>{clean_css}</style>
 <style>{module_css}</style>
 </head><body>
-<script>window.CircuitJSEmbedded = true; window.CircuitJSLocaleText = {js_str(zh)};</script>
+<script>window.CircuitJSEmbedded = true; window.CircuitJSLocaleText = {zh_js};</script>
 <!--WQ-CONFIG-->
-<script>{lz.replace("</script", "<\\/script")}</script>
-<script>{script.replace("</script", "<\\/script")}</script>
+<script>{lz_safe}</script>
+<script>{script_safe}</script>
 </body></html>
 """
 out.parent.mkdir(parents=True, exist_ok=True)
