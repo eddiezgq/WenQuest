@@ -225,3 +225,14 @@ jobs:
               echo "::warning::$u 还打不开（$code）。如果刚加了域名解析，等几分钟后再试；学习平台的部署完成后网址才会接通。"
             fi
           done
+      - name: 线上车间检查
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: |
+          # 第 6 轮 W7①：像浏览器一样连总线，看设备有没有在发数据；再读服务器上的容器状态和仿真日志。结果写成注释
+          domain=$(ssh "deploy@$HOST" "grep '^SITE_DOMAIN=' /opt/wenquest/factory/.env | cut -d= -f2")
+          pip install -q "paho-mqtt==2.1.0"
+          sleep 20
+          python3 factory/deploy/online_check.py "$domain" 30 || true
+          ssh "deploy@$HOST" "cd /opt/wenquest/factory && docker compose -p wq-factory ps --format 'table {{.Service}}\t{{.State}}\t{{.Status}}' && echo && docker compose -p wq-factory logs --no-color --tail 25 sim bus" > /tmp/workshop.log 2>&1 || true
+          python3 factory/deploy/ci_annotate.py 服务器车间状态 /tmp/workshop.log 80 | sed 's/^::error /::notice /'
