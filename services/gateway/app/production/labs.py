@@ -77,6 +77,9 @@ def _js_string(s: str) -> str:
 
 
 THREE_ENGINE = Path(__file__).parent / "three" / "wq3d.js"
+# CircuitJS1 (GPL-2.0) built from source without network access: tools/circuitjs/ (patch, bundle) and its README.
+CIRCUITJS = KIT / "circuitjs-embed.html"
+CIRCUIT_VIEW = re.compile(r"""view\s*:\s*["']circuit["']""")
 
 
 def models_used(code: str, models: dict) -> list[str]:
@@ -96,6 +99,14 @@ def page(labs: list[tuple[str, str]], *, course: list[str], chapter: list[str], 
         engine = THREE_ENGINE.read_text(encoding="utf-8").replace("</script", "<\\/script")
         data = json.dumps({k: models[k] for k in used}).replace("</", "<\\/")
         three = f"<script>\n{engine}\n</script>\n<script>window.WQ_MODELS = {data};</script>\n"
+    if any(CIRCUIT_VIEW.search(code or "") for _, code in labs):
+        if not CIRCUITJS.exists():
+            raise FileNotFoundError(f"circuit labs need {CIRCUITJS} (build it with tools/circuitjs/build.sh)")
+        cj = json.dumps(CIRCUITJS.read_text(encoding="utf-8"), ensure_ascii=False).replace("</", "<\\/")
+        three += f"<script>window.WQ_CIRCUITJS = {cj};</script>\n"
+    cj_note = ("<footer class=\"bi\" data-zh=\"电路仿真器 CircuitJS1（Paul Falstad、Iain Sharp，GPL-2.0），源码：github.com/pfalstad/circuitjs1；嵌入用的改动见问渠仓库 tools/circuitjs/。\" "
+               "data-en=\"Circuit simulator CircuitJS1 (Paul Falstad, Iain Sharp; GPL-2.0), source: github.com/pfalstad/circuitjs1; embedding changes in the WenQuest repository, tools/circuitjs/.\">"
+               "电路仿真器 CircuitJS1（GPL-2.0）</footer>") if "WQ_CIRCUITJS" in three else ""
     title = [f"{chapter[0]} 虚拟实验", f"{chapter[1]} · Virtual lab"]
     esc = html.escape
     scripts = []
@@ -129,6 +140,7 @@ def page(labs: list[tuple[str, str]], *, course: list[str], chapter: list[str], 
   <div id="labs"></div>
   <footer class="bi" data-zh="问渠 WenQuest 虚拟实验 · 与本章讲义、动画、实验指导书和实验报告模板配套使用。任务进度只保存在这台设备的浏览器里。"
     data-en="WenQuest virtual labs · use with this chapter's notes, animations, lab guides and report templates. Task progress is saved only in this browser.">问渠 WenQuest 虚拟实验</footer>
+  {cj_note}
 </div>
 {three}<script>
 {kit}

@@ -48,6 +48,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .scenes { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); align-items: center; }
 .scenes .lbl { font-size: 13px; color: var(--muted); }
 .stagebox canvas { display: block; width: 100%; aspect-ratio: 16 / 10; background: var(--stage); touch-action: none; }
+.stagebox.withcircuit canvas { aspect-ratio: 16 / 5; }
+.stagebox iframe.circuit { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-bottom: 1px solid var(--line); background: #fff; }
 .stagebar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); }
 .goal { padding: 12px 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
 .goal b { color: var(--ink); }

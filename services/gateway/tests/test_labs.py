@@ -181,3 +181,15 @@ def test_3d_labs_carry_the_engine_and_only_the_models_they_name(tmp_path):
     assert "connect-src 'none'" in page                       # still no network
     plain = labs.page([("1.1", labs.example_code())], course=COURSE, chapter=CHAPTER, models=models)
     assert "window.WQ_MODELS =" not in plain and len(plain) < 200_000   # 2D labs stay small (no engine)
+
+
+def test_circuit_labs_carry_the_simulator_without_network():
+    """第 7 轮第 6 步：view "circuit" labs embed CircuitJS (GPL-2.0, built from source) once, with its source notice; others do not."""
+    code = labs.example_code().replace("WQ.lab({", 'WQ.lab({\n  view: "circuit",\n  circuit: "$ 1 0.000005 10 50 5 50\\n",', 1)
+    assert labs.static_problems(code) == []
+    page = labs.page([("2.1", code)], course=COURSE, chapter=CHAPTER)
+    assert page.count("window.WQ_CIRCUITJS =") == 1 and "CircuitJSEmbedded" in page and "GPL-2.0" in page
+    assert "connect-src 'none'" in page and "<!--WQ-CONFIG-->" in page
+    assert not re.search(r"""<script[^>]+src=|<link[^>]+href=["']?(?!data:)""", page)   # nothing is fetched
+    plain = labs.page([("2.1", labs.example_code())], course=COURSE, chapter=CHAPTER)
+    assert "WQ_CIRCUITJS" not in plain.split("<script>\n", 1)[0] and "window.WQ_CIRCUITJS =" not in plain

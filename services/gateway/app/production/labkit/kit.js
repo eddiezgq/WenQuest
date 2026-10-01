@@ -283,7 +283,9 @@ function build(id, def) {
   const problem = el("div", "problem"); problem.hidden = true;
   const goal = el("div", "goal");
   goal.append(biText(el("b"), ["实验目的：", "Goal: "]), biText(el("span"), def.goal || ["", ""]));
-  stageBox.append(scenes, canvas, bar, err, problem, goal);
+  const circuit = def.view === "circuit" ? el("iframe", "circuit") : null;
+  if (circuit) { circuit.title = `${def.title[0]} · CircuitJS`; stageBox.classList.add("withcircuit"); stageBox.append(scenes, circuit, canvas, bar, err, problem, goal); }
+  else stageBox.append(scenes, canvas, bar, err, problem, goal);
   // side
   const side = el("div", "side");
   const pc = el("div", "card"); pc.appendChild(biText(el("h3"), ["参数", "PARAMETERS"]));
@@ -310,7 +312,7 @@ function build(id, def) {
 
   const is3d = def.view === "3d";
   const ctx = is3d ? null : canvas.getContext("2d");
-  const L = { id, def, broken: false, state: {}, sceneDef: def.scenes[0], is3d, ready: !is3d,
+  const L = { id, def, broken: false, state: {}, sceneDef: def.scenes[0], is3d, ready: !is3d && !circuit, circuit,
     dom: { tab, tabDone: tab.querySelector(".done"), sec, canvas, chips, params, read, tasks, err, problem } };
   const api = {
     ctx, canvas, w: 0, h: 0, p: {}, scene: def.scenes[0].id, t: 0, running: false,
@@ -326,6 +328,7 @@ function build(id, def) {
   };
   L.api = api;
   if (is3d) setup3d(L);
+  if (circuit) setupCircuit(L);
   def.tasks.forEach((t) => { t.ok = !!saved[id + ":" + t.id]; });
   LABS[id] = L; ORDER.push(id);
   // controls
@@ -349,12 +352,36 @@ function build(id, def) {
 function fit(L) {
   const c = L.dom.canvas, r = c.getBoundingClientRect();
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.width * 10 / 16));
+  const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.width * (L.circuit ? 5 : 10) / 16));   // circuit labs: a short instrument strip under the circuit
   if (w !== L.api.w || h !== L.api.h) {
     L.api.w = w; L.api.h = h;
     if (L.is3d) { if (L.st) { L.st.renderer.setPixelRatio(dpr); L.st.resize(w, h); } }
     else { c.width = w * dpr; c.height = h * dpr; L.api.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
   }
+}
+
+// ---------- circuit labs: CircuitJS (GPL-2.0, embedded without network) in a same-origin frame ----------
+// def.circuit: the circuit in CircuitJS text form. api.cj: CircuitJS's own interface; api.v(label): voltage of a labelled
+// node; api.setV(name, volts): an "external voltage" source; api.load(text): replace the circuit (e.g. a new resistor value).
+const CJ_WAIT = {};
+function setupCircuit(L) {
+  const api = L.api, def = L.def;
+  if (!window.WQ_CIRCUITJS) { fail(L.id, new Error("this page has no circuit simulator (view: 'circuit')")); return; }
+  api.v = (name) => (api.cj ? api.cj.getNodeVoltage(name) : NaN);
+  api.setV = (name, v) => { if (api.cj) api.cj.setExtVoltage(name, v); };
+  api.load = (text) => { if (api.cj) api.cj.importCircuit(text, false); };
+  api.simTime = () => (api.cj ? api.cj.getTime() : 0);
+  CJ_WAIT[L.id] = (cj) => {
+    api.cj = cj;
+    cj.onupdate = () => { if (L.ready && !L.broken && active === L.id) readouts(L); };
+    safe(L, () => def.setupCircuit && def.setupCircuit(api));
+    L.ready = true;
+    reset(L);
+  };
+  const q = "?hideSidebar=true&hideInfoBox=false&whiteBackground=true&lang=zh&editable=true&running=true" + (def.circuitQuery || "");
+  const cfg = "<script>window.CircuitJSQuery = " + JSON.stringify(q) + "; window.startCircuitText = " +
+    JSON.stringify(def.circuit || "").replace(/</g, "\\u003c") + "; window.oncircuitjsloaded = function (c) { parent.WQ._cj(" + JSON.stringify(L.id) + ", c); };<\/script>";
+  L.circuit.srcdoc = window.WQ_CIRCUITJS.replace("<!--WQ-CONFIG-->", cfg);
 }
 
 // ---------- 3D labs: the course's library models on a 3D stage (WQ3D engine, models embedded in the page) ----------
@@ -434,11 +461,12 @@ window.WQ = {
     try { check(def); build(id, def); } catch (e) { fail(id, e); if (!LABS[id]) { const d = el("div", "empty", String(e.message || e)); $("labs").appendChild(d); } }
   },
   fail,
+  _cj(id, c) { const f = CJ_WAIT[id]; if (f) { delete CJ_WAIT[id]; const L = LABS[id]; if (L) safe(L, () => f(c)); } },
   status() {
     const labs = {};
     ORDER.forEach((id) => {
       const L = LABS[id];
-      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.is3d ? "3d" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
+      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.is3d ? "3d" : L.circuit ? "circuit" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
         tasks: Object.fromEntries(L.def.tasks.map((t) => [t.id, !!t.ok])), demos: Object.fromEntries(L.def.tasks.map((t) => [t.id, t.demo || null])) };
     });
     return { errors: errors.slice(), active, labs };
