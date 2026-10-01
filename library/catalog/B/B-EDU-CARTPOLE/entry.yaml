@@ -1,0 +1,90 @@
+# B-EDU-CARTPOLE · 倒立摆小车（问渠）（自建，第 5 轮第 6 步）
+schema: 1
+id: B-EDU-CARTPOLE
+kind: robot
+name:
+  zh: 倒立摆小车（问渠）
+  en: Cart-pole inverted pendulum (WenQuest)
+category: EDU
+tags:
+- 倒立摆
+- 小车倒立摆
+- 控制
+- LQR
+- 教学模型
+- 自建
+- cart-pole
+standards: []
+params:
+- key: rail_length_m
+  zh: 导轨长
+  en: Rail length
+  role: key
+  unit: m
+- key: pole_length_m
+  zh: 摆杆长
+  en: Pole length
+  role: key
+  unit: m
+- key: rail_height_m
+  zh: 导轨高
+  en: Rail height
+  role: key
+  unit: m
+- key: cart_mass_kg
+  zh: 小车质量
+  en: Cart mass
+  role: key
+  unit: kg
+- key: pole_mass_kg
+  zh: 摆杆质量
+  en: Pole mass
+  role: key
+  unit: kg
+defaults:
+  rail_length_m: 1.0
+  pole_length_m: 0.5
+  rail_height_m: 0.08
+  cart_mass_kg: 1.0
+  pole_mass_kg: 0.1
+ranges:
+  pole_length_m:
+  - 0.2
+  - 1.0
+  cart_mass_kg:
+  - 0.3
+  - 5.0
+  pole_mass_kg:
+  - 0.05
+  - 1.0
+model:
+  engine: wqrobot:cart_pole
+  formats:
+  - glb
+  - urdf
+  origin: 基座坐标系（Z 向上）；每个连杆（构件）一个节点
+  note: 参数化自建模型：改参数可重新生成
+robot:
+  type: cart_pole
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（参数化生成器 generators/b_wq.py）
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 自建；运动学（与动力学）由测试核对
+teaching:
+  principle: 小车只能沿导轨左右移动，摆杆靠铰链立在小车上，竖直向上是不稳定平衡：摆杆一倒，就要把小车往同一侧推。条目给出非线性方程和在竖直位置的线性化模型（A、B
+    矩阵），可直接做极点配置、LQR 等控制实验。
+  uses:
+  - 状态反馈与 LQR 控制
+  - PID 与模糊控制对比
+  - 强化学习的经典环境
+  courses:
+  - course: 机器人技术
+    chapter: 欠驱动系统与倒立摆控制
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

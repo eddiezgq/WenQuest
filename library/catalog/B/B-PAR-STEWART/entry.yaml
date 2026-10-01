@@ -1,0 +1,103 @@
+# B-PAR-STEWART · Stewart 六自由度平台（问渠）（自建，第 5 轮第 6 步）
+schema: 1
+id: B-PAR-STEWART
+kind: robot
+name:
+  zh: Stewart 六自由度平台（问渠）
+  en: Stewart platform (WenQuest)
+category: PAR
+tags:
+- Stewart
+- 六自由度平台
+- 并联机器人
+- 运动模拟
+- 自建
+- hexapod
+standards: []
+params:
+- key: base_radius_m
+  zh: 基座铰点圆半径
+  en: Base joint radius
+  role: key
+  unit: m
+- key: platform_radius_m
+  zh: 平台铰点圆半径
+  en: Platform joint radius
+  role: key
+  unit: m
+- key: base_half_angle_deg
+  zh: 基座每组两点半夹角
+  en: Base pair half-angle
+  role: key
+  unit: deg
+- key: platform_half_angle_deg
+  zh: 平台每组两点半夹角
+  en: Platform pair half-angle
+  role: key
+  unit: deg
+- key: home_height_m
+  zh: 原位高度
+  en: Home height
+  role: key
+  unit: m
+- key: leg_stroke_m
+  zh: 腿伸缩行程
+  en: Leg stroke
+  role: key
+  unit: m
+- key: demo_amplitude_m
+  zh: 演示运动幅度
+  en: Demo amplitude
+  role: key
+  unit: m
+- key: demo_tilt_deg
+  zh: 演示倾角
+  en: Demo tilt
+  role: key
+  unit: deg
+defaults:
+  base_radius_m: 0.25
+  platform_radius_m: 0.15
+  base_half_angle_deg: 12
+  platform_half_angle_deg: 12
+  home_height_m: 0.32
+  leg_stroke_m: 0.12
+  demo_amplitude_m: 0.03
+  demo_tilt_deg: 6
+ranges:
+  home_height_m:
+  - 0.2
+  - 0.6
+  leg_stroke_m:
+  - 0.05
+  - 0.3
+model:
+  engine: wqrobot:stewart
+  formats:
+  - glb
+  - urdf
+  origin: 基座坐标系（Z 向上）；每个连杆（构件）一个节点
+  note: 参数化自建模型：改参数可重新生成
+robot:
+  type: stewart
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（参数化生成器 generators/b_wq.py）
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 自建；运动学（与动力学）由测试核对
+teaching:
+  principle: 六根可伸缩的腿把动平台连到基座，改变六根腿的长度就能让平台在空间里平移和转动（六个自由度）。由平台位姿求腿长（逆解）只要算两点距离，由腿长求位姿（正解）要解非线性方程组——和串联机械臂正好相反。
+  uses:
+  - 飞行与驾驶模拟器
+  - 精密定位与对接
+  - 振动台
+  courses:
+  - course: 机器人技术
+    chapter: 并联机器人运动学
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

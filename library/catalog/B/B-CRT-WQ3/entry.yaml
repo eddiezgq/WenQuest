@@ -1,0 +1,89 @@
+# B-CRT-WQ3 · 直角坐标机器人（龙门，问渠）（自建，第 5 轮第 6 步）
+schema: 1
+id: B-CRT-WQ3
+kind: robot
+name:
+  zh: 直角坐标机器人（龙门，问渠）
+  en: Cartesian gantry robot (WenQuest)
+category: CRT
+tags:
+- 直角坐标机器人
+- 龙门
+- 桁架机器人
+- 笛卡尔
+- 自建
+- cartesian
+- gantry
+standards: []
+params:
+- key: stroke_x_m
+  zh: X 行程
+  en: X stroke
+  role: key
+  unit: m
+- key: stroke_y_m
+  zh: Y 行程
+  en: Y stroke
+  role: key
+  unit: m
+- key: stroke_z_m
+  zh: Z 行程
+  en: Z stroke
+  role: key
+  unit: m
+- key: frame_height_m
+  zh: 立柱高
+  en: Frame height
+  role: key
+  unit: m
+- key: beam_m
+  zh: 梁截面边长
+  en: Beam section
+  role: key
+  unit: m
+defaults:
+  stroke_x_m: 0.6
+  stroke_y_m: 0.4
+  stroke_z_m: 0.25
+  frame_height_m: 0.5
+  beam_m: 0.04
+ranges:
+  stroke_x_m:
+  - 0.2
+  - 2.0
+  stroke_y_m:
+  - 0.2
+  - 1.5
+  stroke_z_m:
+  - 0.1
+  - 0.6
+model:
+  engine: wqrobot:cartesian
+  formats:
+  - glb
+  - urdf
+  origin: 基座坐标系（Z 向上）；每个连杆（构件）一个节点
+  note: 参数化自建模型：改参数可重新生成
+robot:
+  type: cartesian
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（参数化生成器 generators/b_wq.py）
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 自建；运动学（与动力学）由测试核对
+teaching:
+  principle: 三个互相垂直的移动关节，每个关节只管一个坐标方向：关节值直接就是末端的 x、y、z，运动学最简单，刚度好、精度高，但占地大。
+  uses:
+  - 码垛与上下料（桁架机械手）
+  - 3D 打印机、数控雕刻
+  - 点胶、检测
+  courses:
+  - course: 机器人技术
+    chapter: 直角坐标机器人与运动学入门
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

@@ -1,0 +1,80 @@
+# B-EDU-2R · 两连杆平面臂（问渠）（自建，第 5 轮第 6 步）
+schema: 1
+id: B-EDU-2R
+kind: robot
+name:
+  zh: 两连杆平面臂（问渠）
+  en: Two-link planar arm (WenQuest)
+category: EDU
+tags:
+- 两连杆
+- 平面机械臂
+- 2R
+- 运动学
+- 教学模型
+- 自建
+- planar arm
+standards: []
+params:
+- key: link1_m
+  zh: 连杆 1 长
+  en: Link 1 length
+  role: key
+  unit: m
+- key: link2_m
+  zh: 连杆 2 长
+  en: Link 2 length
+  role: key
+  unit: m
+- key: base_height_m
+  zh: 底座高
+  en: Base height
+  role: key
+  unit: m
+- key: link_radius_m
+  zh: 连杆截面（半）
+  en: Link half-width
+  role: key
+  unit: m
+defaults:
+  link1_m: 0.3
+  link2_m: 0.25
+  base_height_m: 0.12
+  link_radius_m: 0.018
+ranges:
+  link1_m:
+  - 0.1
+  - 0.6
+  link2_m:
+  - 0.1
+  - 0.6
+model:
+  engine: wqrobot:planar_2r
+  formats:
+  - glb
+  - urdf
+  origin: 基座坐标系（Z 向上）；每个连杆（构件）一个节点
+  note: 参数化自建模型：改参数可重新生成
+robot:
+  type: planar_2r
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（参数化生成器 generators/b_wq.py）
+  checked:
+    by: Claude
+    'on': '2026-10-01'
+    note: 自建；运动学（与动力学）由测试核对
+teaching:
+  principle: 竖直平面内两个转动关节串联：末端位置由两个关节角唯一确定（正运动学），反过来给定末端位置一般有“肘上”“肘下”两组关节角（逆运动学），是学习运动学、雅可比和奇异位形的最小例子。
+  uses:
+  - 正逆运动学入门
+  - 雅可比与奇异位形
+  - 轨迹规划与 PID 控制实验
+  courses:
+  - course: 机器人技术
+    chapter: 平面机械臂运动学
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []
