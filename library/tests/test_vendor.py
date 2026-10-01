@@ -77,3 +77,34 @@ def test_vendor_files_regenerate_identically(tmp_path, monkeypatch):
     import_vendor.main()
     after = {p: p.read_text(encoding="utf-8") for p in (wqlib.CATALOG / "D").rglob("*") if p.is_file()}
     assert before == after
+
+
+def _rows(eid):
+    return list(csv.DictReader(open(wqlib.CATALOG / "D" / eid / "specs.csv", encoding="utf-8")))
+
+
+@pytest.mark.parametrize("eid", ["D-ACT-ROBOTIS-X", "D-FTS-ATI-FT", "D-GRP-ROBOTIQ", "D-CAM-REALSENSE-D400", "D-LDR-OUSTER", "D-RDC-HD-CSF"])
+def test_every_vendor_row_has_source_and_proxy_dims(eid):
+    e = entry(eid)
+    rows = _rows(eid)
+    assert rows and all(r["src_url"].startswith("https://") for r in rows)
+    urls = {d["url"] for d in e["source"]["data_sources"]}
+    assert all(set(r["src_url"].split(" ; ")) <= urls for r in rows)
+    for r in rows:
+        for k, col in e["model"]["dims"].items():
+            if r.get(col):
+                assert float(r[col]) > 0, (eid, r["size"], col)
+
+
+def test_vendor_tables_sanity():
+    for r in _rows("D-FTS-ATI-FT"):
+        assert float(r["Fxy_overload_N"]) > float(r["Fxy_range_N"]) and float(r["Fz_overload_N"]) > float(r["Fz_range_N"])
+    for r in _rows("D-ACT-ROBOTIS-X"):
+        assert float(r["voltage_min_V"]) <= float(r["stall_torque_at_V"]) <= float(r["voltage_max_V"])
+    for r in _rows("D-LDR-OUSTER"):
+        if r["range_10pct_m"]:
+            assert float(r["range_10pct_m"]) < float(r["range_max_m"])
+    for r in _rows("D-GRP-ROBOTIQ"):
+        assert float(r["grip_force_min_N"]) < float(r["grip_force_max_N"])
+    xm = {r["size"]: r for r in _rows("D-ACT-ROBOTIS-X")}["XM540-W270"]          # 抽查值（官方 e-Manual）
+    assert (xm["stall_torque_Nm"], xm["no_load_speed_rpm"], xm["weight_g"]) == ("10.6", "30", "165")

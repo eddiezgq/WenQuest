@@ -1,0 +1,166 @@
+# D-ACT-ROBOTIS-X · DYNAMIXEL X 系列智能舵机（厂商目录，第 5 轮）
+schema: 1
+id: D-ACT-ROBOTIS-X
+kind: product
+name:
+  zh: DYNAMIXEL X 系列智能舵机
+  en: DYNAMIXEL X-series smart servo
+category: ACT
+tags:
+- 舵机
+- 智能舵机
+- 执行器模组
+- 机器人关节
+- servo
+- Dynamixel
+- 乐博特（ROBOTIS）
+- ROBOTIS
+standards: []
+params:
+- key: stall_torque_Nm
+  zh: 失速转矩
+  en: Stall torque
+  role: perf
+  unit: N·m
+- key: stall_torque_at_V
+  zh: 失速转矩对应电压
+  en: Stall torque voltage
+  role: perf
+  unit: V
+- key: no_load_speed_rpm
+  zh: 空载转速
+  en: No-load speed
+  role: perf
+  unit: r/min
+- key: no_load_speed_at_V
+  zh: 空载转速对应电压
+  en: No-load speed voltage
+  role: perf
+  unit: V
+- key: stall_current_A
+  zh: 失速电流
+  en: Stall current
+  role: perf
+  unit: A
+- key: voltage_min_V
+  zh: 工作电压下限
+  en: Voltage min
+  role: perf
+  unit: V
+- key: voltage_max_V
+  zh: 工作电压上限
+  en: Voltage max
+  role: perf
+  unit: V
+- key: gear_ratio
+  zh: 减速比
+  en: Gear ratio
+  role: dim
+- key: resolution_steps_per_rev
+  zh: 分辨率（每转脉冲）
+  en: Resolution (pulse/rev)
+  role: perf
+- key: motor
+  zh: 电机
+  en: Motor
+  role: info
+- key: protocol
+  zh: 通信
+  en: Communication
+  role: info
+- key: weight_g
+  zh: 质量
+  en: Weight
+  role: info
+  unit: g
+- key: width_mm
+  zh: 宽 W
+  en: Width W
+  role: dim
+  unit: mm
+- key: height_mm
+  zh: 高 H
+  en: Height H
+  role: dim
+  unit: mm
+- key: depth_mm
+  zh: 深 D
+  en: Depth D
+  role: dim
+  unit: mm
+specs: specs.csv
+default: XM430-W350
+model:
+  engine: proxy:box
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    w: width_mm
+    d: depth_mm
+    h: height_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载；外形按 e-Manual 的 W×H×D 尺寸生成
+source:
+  origin: vendor
+  vendor: ROBOTIS
+  catalog: 'ROBOTIS e-Manual: XL330-M288-T；ROBOTIS e-Manual: XL430-W250-T；ROBOTIS
+    e-Manual: XC430-W150-T；ROBOTIS e-Manual: XM430-W210-T/R；ROBOTIS e-Manual: XM430-W350-T/R；ROBOTIS
+    e-Manual: XH430-W350-T/R；ROBOTIS e-Manual: XM540-W150-T/R；ROBOTIS e-Manual: XM540-W270-T/R；ROBOTIS
+    e-Manual: XH540-W270-T/R'
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 ROBOTIS 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 两次独立读取官方资料，结果一致；另抽查核对
+  data_sources:
+  - title: 'ROBOTIS e-Manual: XL330-M288-T'
+    url: https://emanual.robotis.com/docs/en/dxl/x/xl330-m288/
+    retrieved: '2026-09-30'
+  - title: 'ROBOTIS e-Manual: XL430-W250-T'
+    url: https://emanual.robotis.com/docs/en/dxl/x/xl430-w250/
+    retrieved: '2026-09-30'
+  - title: 'ROBOTIS e-Manual: XC430-W150-T'
+    url: https://emanual.robotis.com/docs/en/dxl/x/xc430-w150/
+    retrieved: '2026-09-30'
+  - title: 'ROBOTIS e-Manual: XM430-W210-T/R'
+    url: https://emanual.robotis.com/docs/en/dxl/x/xm430-w210/
+    retrieved: '2026-09-30'
+  - title: 'ROBOTIS e-Manual: XM430-W350-T/R'
+    url: https://emanual.robotis.com/docs/en/dxl/x/xm430-w350/
+    retrieved: '2026-09-30'
+  - title: 'ROBOTIS e-Manual: XH430-W350-T/R'
+    url: https://emanual.robotis.com/docs/en/dxl/x/xh430-w350/
+    retrieved: '2026-09-30'
+  - title: 'ROBOTIS e-Manual: XM540-W150-T/R'
+    url: https://emanual.robotis.com/docs/en/dxl/x/xm540-w150/
+    retrieved: '2026-09-30'
+  - title: 'ROBOTIS e-Manual: XM540-W270-T/R'
+    url: https://emanual.robotis.com/docs/en/dxl/x/xm540-w270/
+    retrieved: '2026-09-30'
+  - title: 'ROBOTIS e-Manual: XH540-W270-T/R'
+    url: https://emanual.robotis.com/docs/en/dxl/x/xh540-w270/
+    retrieved: '2026-09-30'
+vendor:
+  id: ROBOTIS
+  name:
+    zh: 乐博特（ROBOTIS）
+    en: ROBOTIS
+  site: https://www.robotis.com
+  series: DYNAMIXEL X
+teaching:
+  principle: 直流电机、减速齿轮、位置传感器（磁编码器）和控制电路装在一个壳体里，通过总线接收目标位置、速度或电流，自己闭环控制，多个舵机串在一条总线上。
+  uses:
+  - 教学机械臂与机器人手
+  - 双足和四足小型机器人
+  - 云台
+  courses:
+  - course: 机器人技术
+    chapter: 关节驱动与舵机
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - ROBOTIS

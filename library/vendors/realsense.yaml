@@ -1,0 +1,44 @@
+# Intel RealSense 深度相机（第 5 轮第 3 步第 1 批）。取官方产品页（两次独立读取一致，另抽查 D455）。
+# D415（页上视场角与数据手册矛盾）、D457（尺寸标注顺序存疑）、L515、T265（已停产/无深度输出）暂不收。
+vendor: {id: REALSENSE, name: {zh: 英特尔 RealSense, en: Intel RealSense}, site: https://www.intelrealsense.com}
+retrieved: "2026-09-30"
+sources:
+  d405: {title: "Intel RealSense Depth Camera D405", url: "https://www.intelrealsense.com/depth-camera-d405/"}
+  d435: {title: "Intel RealSense Depth Camera D435", url: "https://www.intelrealsense.com/depth-camera-d435/"}
+  d435i: {title: "RealSense D435i", url: "https://www.realsenseai.com/products/depth-camera-d435i/"}
+  d455: {title: "Intel RealSense Depth Camera D455", url: "https://www.intelrealsense.com/depth-camera-d455/"}
+products:
+  - id: D-CAM-REALSENSE-D400
+    name: {zh: RealSense D400 系列双目深度相机, en: RealSense D400-series stereo depth camera}
+    category: CAM
+    series: D400
+    tags: [深度相机, 双目视觉, 3D 视觉, depth camera, stereo]
+    default: D435
+    proxy: box
+    dims: {w: width_mm, d: depth_mm, h: height_mm}
+    principle: 两个红外相机相隔一段距离（基线）同时拍摄，同一点在两幅图里的位置差（视差）与距离成反比，由此算出每个像素的深度；红外投射器在无纹理表面投出散斑帮助匹配。
+    uses: [机器人抓取定位, 移动机器人避障与建图, 人体姿态识别]
+    chapter: 视觉传感与三维感知
+    notes: "D405 的尺寸页面写作“长×深×高 42×42×23”，按 23 mm 为厚度示意。"
+    params:
+      - [ideal_range_min_m, 理想测距下限, Ideal range min, perf, m]
+      - [ideal_range_max_m, 理想测距上限, Ideal range max, perf, m]
+      - [depth_fov_h_deg, 深度视场角（水平）, Depth FOV H, perf, °]
+      - [depth_fov_v_deg, 深度视场角（垂直）, Depth FOV V, perf, °]
+      - [depth_resolution, 深度分辨率, Depth resolution, perf, ""]
+      - [depth_fps_max, 深度最高帧率, Depth max fps, perf, fps]
+      - [rgb_resolution, 彩色分辨率, RGB resolution, perf, ""]
+      - [rgb_fov_h_deg, 彩色视场角（水平）, RGB FOV H, perf, °]
+      - [rgb_fov_v_deg, 彩色视场角（垂直）, RGB FOV V, perf, °]
+      - [shutter, 深度快门, Depth shutter, info, ""]
+      - [imu, 惯性测量单元, IMU, info, ""]
+      - [baseline_mm, 基线, Baseline, dim, mm]
+      - [interface, 接口, Interface, info, ""]
+      - [width_mm, 长, Length, dim, mm]
+      - [height_mm, 高, Height, dim, mm]
+      - [depth_mm, 厚, Depth, dim, mm]
+    rows:
+      - {size: D405, src: d405, ideal_range_min_m: 0.07, ideal_range_max_m: 0.5, depth_fov_h_deg: 87, depth_fov_v_deg: 58, depth_resolution: "1280x720", rgb_resolution: "1280x720", rgb_fov_h_deg: 87, rgb_fov_v_deg: 58, shutter: global, width_mm: 42, height_mm: 42, depth_mm: 23, interface: "USB 2 / USB 3.1"}
+      - {size: D435, src: d435, ideal_range_min_m: 0.3, ideal_range_max_m: 3, depth_fov_h_deg: 87, depth_fov_v_deg: 58, depth_resolution: "1280x720", depth_fps_max: 90, rgb_resolution: "2 MP", rgb_fov_h_deg: 69, rgb_fov_v_deg: 42, shutter: global, width_mm: 90, height_mm: 25, depth_mm: 25, interface: "USB-C 3.1 Gen 1"}
+      - {size: D435i, src: d435i, ideal_range_min_m: 0.3, ideal_range_max_m: 3, depth_fov_h_deg: 87, depth_fov_v_deg: 58, depth_resolution: "1280x720", depth_fps_max: 90, rgb_resolution: "1920x1080", rgb_fov_h_deg: 69, rgb_fov_v_deg: 42, imu: "有", shutter: global, width_mm: 90, height_mm: 25, depth_mm: 25, interface: "USB-C 3.1 Gen 1"}
+      - {size: D455, src: d455, ideal_range_min_m: 0.6, ideal_range_max_m: 6, depth_fov_h_deg: 87, depth_fov_v_deg: 58, depth_resolution: "1280x720", depth_fps_max: 90, rgb_resolution: "1 MP", rgb_fov_h_deg: 90, rgb_fov_v_deg: 65, imu: "有（Bosch BMI055）", shutter: global, baseline_mm: 95, width_mm: 124, height_mm: 29, depth_mm: 26, interface: "USB-C 3.1 Gen 1"}

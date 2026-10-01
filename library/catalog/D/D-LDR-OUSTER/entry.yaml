@@ -1,0 +1,158 @@
+# D-LDR-OUSTER · Ouster / Velodyne 旋转式激光雷达（厂商目录，第 5 轮）
+schema: 1
+id: D-LDR-OUSTER
+kind: product
+name:
+  zh: Ouster / Velodyne 旋转式激光雷达
+  en: Ouster / Velodyne spinning lidar
+category: LDR
+tags:
+- 激光雷达
+- 三维激光雷达
+- lidar
+- 建图
+- 自动驾驶
+- Ouster（含 Velodyne）
+- Ouster
+standards: []
+params:
+- key: channels
+  zh: 线数
+  en: Channels
+  role: key
+- key: range_max_m
+  zh: 测程（80% 反射率）
+  en: Range (80% reflectivity)
+  role: perf
+  unit: m
+- key: range_10pct_m
+  zh: 测程（10% 反射率）
+  en: Range (10% reflectivity)
+  role: perf
+  unit: m
+- key: range_min_m
+  zh: 最小测程
+  en: Min range
+  role: perf
+  unit: m
+- key: fov_h_deg
+  zh: 水平视场角
+  en: Horizontal FOV
+  role: perf
+  unit: °
+- key: fov_v_deg
+  zh: 垂直视场角
+  en: Vertical FOV
+  role: perf
+  unit: °
+- key: rotation_rate_hz
+  zh: 转速
+  en: Rotation rate
+  role: perf
+  unit: Hz
+- key: points_per_second
+  zh: 每秒点数
+  en: Points per second
+  role: perf
+- key: accuracy_cm
+  zh: 测距精度 ±
+  en: Range accuracy ±
+  role: perf
+  unit: cm
+- key: wavelength_nm
+  zh: 波长
+  en: Wavelength
+  role: info
+  unit: nm
+- key: power_W
+  zh: 额定功耗
+  en: Power
+  role: info
+  unit: W
+- key: weight_g
+  zh: 质量
+  en: Weight
+  role: info
+  unit: g
+- key: diameter_mm
+  zh: 直径
+  en: Diameter
+  role: dim
+  unit: mm
+- key: height_mm
+  zh: 高度
+  en: Height
+  role: dim
+  unit: mm
+- key: ip_rating
+  zh: 防护等级
+  en: IP rating
+  role: info
+- key: operating_temp
+  zh: 工作温度
+  en: Operating temperature
+  role: info
+specs: specs.csv
+default: OS1-64
+model:
+  engine: proxy:cylinder
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    d: diameter_mm
+    h: height_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载
+source:
+  origin: vendor
+  vendor: Ouster
+  catalog: Ouster OS0 Datasheet, HW REV7.1, FW 3.2.x；Ouster OS1 Datasheet, HW REV7.1；Ouster
+    OS2 Datasheet, HW REV7, FW v2.5.x；Ouster OSDome Datasheet, HW REV7.1；Velodyne
+    Ultra Puck (VLP-32C) Datasheet 63-9378 Rev-F
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 Ouster 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 两次独立读取官方数据手册，VLP-32C 高度两次不一致，第三次按尺寸图读为 86.9 mm；另抽查 OS1
+  data_sources:
+  - title: Ouster OS0 Datasheet, HW REV7.1, FW 3.2.x
+    url: https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-v3p2-os0.pdf
+    retrieved: '2026-09-30'
+  - title: Ouster OS1 Datasheet, HW REV7.1
+    url: https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-os1.pdf
+    retrieved: '2026-09-30'
+  - title: Ouster OS2 Datasheet, HW REV7, FW v2.5.x
+    url: https://data.ouster.io/downloads/datasheets/datasheet-rev7-v2p5-os2.pdf
+    retrieved: '2026-09-30'
+  - title: Ouster OSDome Datasheet, HW REV7.1
+    url: https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-osdome.pdf
+    retrieved: '2026-09-30'
+  - title: Velodyne Ultra Puck (VLP-32C) Datasheet 63-9378 Rev-F
+    url: https://data.ouster.io/downloads/datasheets/velodyne/63-9378_Rev-F_Ultra-Puck_Datasheet_Web.pdf
+    retrieved: '2026-09-30'
+  notes: 测程按 80% 漫反射目标（另列 10% 目标）；最小测程 0.5 m 为默认，OS0/OS1/OSDome 可设 0；OS2 样本没有单一的额定功耗（正常
+    18～24 W）；重量、高度不含散热帽。
+vendor:
+  id: OUSTER
+  name:
+    zh: Ouster（含 Velodyne）
+    en: Ouster
+  site: https://ouster.com
+  series: OS / VLP
+teaching:
+  principle: 多路激光束随头部旋转扫描，测量每个脉冲从发出到返回的时间（飞行时间）算出距离，配合角度得到周围环境的三维点云。
+  uses:
+  - 移动机器人定位与建图（SLAM）
+  - 自动驾驶感知
+  - 测绘
+  courses:
+  - course: 机器人技术
+    chapter: 激光雷达与环境感知
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - Ouster

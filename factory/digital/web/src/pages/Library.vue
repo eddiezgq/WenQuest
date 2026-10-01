@@ -180,6 +180,7 @@
                   <dt v-if="entry.source.checked">核对</dt><dd v-if="entry.source.checked">{{ entry.source.checked.by }} · {{ entry.source.checked.on }}<template v-if="entry.source.checked.note"> · {{ entry.source.checked.note }}</template></dd>
                 </dl>
                 <div v-if="entry.source.attribution" class="attr">{{ entry.source.attribution }}</div>
+                <div v-if="entry.source.notes" class="attr">{{ entry.source.notes }}</div>
                 <div v-if="entry.source.data_sources?.length" class="dsrc">
                   <div class="small muted">尺寸与参数出处</div>
                   <div v-for="d in entry.source.data_sources" :key="d.url" class="small">

@@ -36,47 +36,44 @@ def _dump(path, head, doc):
 
 
 def product(v, p):
+    """一个产品系列一个 D 条目。p.params: [[键, 中文, 英文, 角色, 单位], …]；p.rows: [{size, src(键或键列表), page, 各参数…}]"""
     eid = p["id"]
     d = CATALOG / "D" / eid
     d.mkdir(parents=True, exist_ok=True)
     keys = [x[0] for x in p["params"]]
-    pages = sorted({x[6] for x in p["params"] if len(x) > 6})
-    params = [{"key": k, "zh": zh, "en": en, "role": role, **({"unit": u} if u else {})}
-              for k, zh, en, role, u, *_ in p["params"] if k not in ("size",)]
-    # 规格表：尺寸-减速比；外形按尺寸
-    rows = []
-    for r in p["rows"]:
-        size, ratio, *vals = r
-        od, length, mass = p["sizes"][size]
-        rec = dict(zip(["T_rated_Nm", "T_repeat_Nm", "T_avg_Nm", "T_momentary_Nm", "n_max_oil_rpm", "n_max_grease_rpm",
-                        "n_avg_oil_rpm", "n_avg_grease_rpm", "J_1e4_kgm2"], vals))
-        rec.update(size_code=size, ratio=ratio, OD_mm=od, L_mm=length, mass_kg=mass)
-        rows.append(rec)
-    header = ["size", "size_code", "ratio"] + [k for k in keys if k not in ("size", "ratio")] + ["src_page"]
+    params = [{"key": k, "zh": zh, "en": en, "role": role, **({"unit": u} if u else {})} for k, zh, en, role, u, *_ in p["params"]]
+    used = []
     with open(d / "specs.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, lineterminator="\n")
-        w.writerow(header)
-        for rec in rows:
-            w.writerow(["{}-{}".format(rec["size_code"], rec["ratio"]), rec["size_code"], rec["ratio"]]
-                       + [rec[k] for k in header[3:-1]] + ["/".join(str(x) for x in pages)])
-    params = [{"key": "size_code", "zh": "型号尺寸", "en": "Size", "role": "key"}] + [x for x in params if x["key"] != "size_code"]
+        w.writerow(["size"] + keys + ["src_url", "src_page"])
+        for r in p["rows"]:
+            srcs = r["src"] if isinstance(r["src"], list) else [r["src"]]
+            for k in srcs:
+                if k not in used:
+                    used.append(k)
+            w.writerow([r["size"]] + ["" if r.get(k) is None else r.get(k) for k in keys]
+                       + [" ; ".join(v["sources"][k]["url"] for k in srcs), "" if r.get("page") is None else r["page"]])
+    vname = v["vendor"]["name"]
     doc = {
         "schema": 1, "id": eid, "kind": "product", "name": p["name"], "category": p["category"],
-        "tags": p.get("tags", []) + [v["vendor"]["name"]["zh"], v["vendor"]["name"]["en"]],
+        "tags": list(dict.fromkeys(p.get("tags", []) + [vname["zh"], vname["en"]])),
         "standards": [], "params": params, "specs": "specs.csv", "default": p["default"],
-        "model": {"engine": "proxy:" + p["proxy"], "formats": ["step", "stl", "glb"],
-                  "origin": "输出端在 z<0，轴线沿 Z", "note": "外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载"},
-        "source": {"origin": "vendor", "vendor": v["vendor"]["name"]["en"], "catalog": v["sources"]["csf"]["title"],
-                   "license": LICENSE, "attribution": "问渠零件库（规格表整理与外形示意模型）；参数摘自 {} 公开样本，商标归厂商所有".format(
-                       v["vendor"]["name"]["en"]),
-                   "checked": {"by": "Claude", "on": str(v["retrieved"]), "note": "两次独立读取样本表格，结果一致"},
-                   "data_sources": [_src(v, "csf", "、".join(str(x) for x in pages))]},
-        "vendor": {"id": v["vendor"]["id"], "name": v["vendor"]["name"], "site": v["vendor"]["site"], "series": p.get("series")},
+        "model": {"engine": "proxy:" + p["proxy"], "formats": ["step", "stl", "glb"], "dims": p["dims"],
+                  "origin": p.get("origin", "安装面中心，轴线沿 Z"),
+                  "note": "外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载"
+                          + ("；" + p["proxy_note"] if p.get("proxy_note") else "")},
+        "source": {"origin": "vendor", "vendor": vname["en"], "catalog": "；".join(v["sources"][k]["title"] for k in used),
+                   "license": LICENSE, "attribution": "问渠零件库（规格表整理与外形示意模型）；参数摘自 {} 公开资料，商标归厂商所有".format(vname["en"]),
+                   "checked": {"by": "Claude", "on": str(v["retrieved"]), "note": p.get("checked_note", "两次独立读取官方资料，结果一致；另抽查核对")},
+                   "data_sources": [_src(v, k) for k in used]},
+        "vendor": {"id": v["vendor"]["id"], "name": vname, "site": v["vendor"]["site"], "series": p.get("series")},
         "teaching": {"principle": p["principle"], "uses": p["uses"],
-                     "courses": [{"course": "机器人技术", "chapter": "关节驱动与减速器"}], "labs": []},
-        "factory": {"erp_items": [], "suppliers": [v["vendor"]["name"]["en"]]},
+                     "courses": [{"course": "机器人技术", "chapter": p["chapter"]}], "labs": []},
+        "factory": {"erp_items": [], "suppliers": [vname["en"]]},
     }
-    _dump(d / "entry.yaml", "# {} · {}（厂商目录，第 5 轮第 2 步）\n".format(eid, p["name"]["zh"]), doc)
+    if p.get("notes"):
+        doc["source"]["notes"] = p["notes"]
+    _dump(d / "entry.yaml", "# {} · {}（厂商目录，第 5 轮）\n".format(eid, p["name"]["zh"]), doc)
     return eid
 
 

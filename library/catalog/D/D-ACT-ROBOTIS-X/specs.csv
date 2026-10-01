@@ -1,0 +1,10 @@
+size,stall_torque_Nm,stall_torque_at_V,no_load_speed_rpm,no_load_speed_at_V,stall_current_A,voltage_min_V,voltage_max_V,gear_ratio,resolution_steps_per_rev,motor,protocol,weight_g,width_mm,height_mm,depth_mm,src_url,src_page
+XL330-M288,0.52,5.0,103,5.0,1.47,3.7,6.0,288.4:1,4096,Cored,DYNAMIXEL Protocol 2.0；TTL,18,20.0,34.0,26.0,https://emanual.robotis.com/docs/en/dxl/x/xl330-m288/,
+XL430-W250,1.4,11.1,57,11.1,1.3,6.5,12.0,258.5:1,4096,Cored,DYNAMIXEL Protocol 2.0；TTL,57.2,28.5,46.5,34,https://emanual.robotis.com/docs/en/dxl/x/xl430-w250/,
+XC430-W150,1.6,12.0,106,12.0,1.4,6.5,14.8,159.59:1,4096,Coreless,DYNAMIXEL Protocol 2.0/1.0；TTL,65,28.5,46.5,34,https://emanual.robotis.com/docs/en/dxl/x/xc430-w150/,
+XM430-W210,3.0,12.0,77,12.0,2.3,10.0,14.8,212.6:1,4096,Coreless,DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）,82,28.5,46.5,34,https://emanual.robotis.com/docs/en/dxl/x/xm430-w210/,
+XM430-W350,4.1,12.0,46,12.0,2.3,10.0,14.8,353.5:1,4096,Coreless,DYNAMIXEL Protocol 2.0；RS-485（-R）/TTL（-T）,82,28.5,46.5,34,https://emanual.robotis.com/docs/en/dxl/x/xm430-w350/,
+XH430-W350,3.4,12.0,30,12.0,1.3,10.0,14.8,353.5:1,4096,Coreless (Maxon),DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）,82,28.5,46.5,34,https://emanual.robotis.com/docs/en/dxl/x/xh430-w350/,
+XM540-W150,7.3,12.0,53,12.0,4.4,10.0,14.8,152.3:1,4096,Coreless,DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）,165,33.5,58.5,44,https://emanual.robotis.com/docs/en/dxl/x/xm540-w150/,
+XM540-W270,10.6,12.0,30,12.0,4.4,10.0,14.8,272.5:1,4096,Coreless,DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）,165,33.5,58.5,44,https://emanual.robotis.com/docs/en/dxl/x/xm540-w270/,
+XH540-W270,9.9,12.0,39,12.0,4.9,10.0,14.8,272.5:1,4096,Coreless (Maxon),DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）,165,33.5,58.5,44,https://emanual.robotis.com/docs/en/dxl/x/xh540-w270/,

@@ -1,0 +1,153 @@
+# D-CAM-REALSENSE-D400 · RealSense D400 系列双目深度相机（厂商目录，第 5 轮）
+schema: 1
+id: D-CAM-REALSENSE-D400
+kind: product
+name:
+  zh: RealSense D400 系列双目深度相机
+  en: RealSense D400-series stereo depth camera
+category: CAM
+tags:
+- 深度相机
+- 双目视觉
+- 3D 视觉
+- depth camera
+- stereo
+- 英特尔 RealSense
+- Intel RealSense
+standards: []
+params:
+- key: ideal_range_min_m
+  zh: 理想测距下限
+  en: Ideal range min
+  role: perf
+  unit: m
+- key: ideal_range_max_m
+  zh: 理想测距上限
+  en: Ideal range max
+  role: perf
+  unit: m
+- key: depth_fov_h_deg
+  zh: 深度视场角（水平）
+  en: Depth FOV H
+  role: perf
+  unit: °
+- key: depth_fov_v_deg
+  zh: 深度视场角（垂直）
+  en: Depth FOV V
+  role: perf
+  unit: °
+- key: depth_resolution
+  zh: 深度分辨率
+  en: Depth resolution
+  role: perf
+- key: depth_fps_max
+  zh: 深度最高帧率
+  en: Depth max fps
+  role: perf
+  unit: fps
+- key: rgb_resolution
+  zh: 彩色分辨率
+  en: RGB resolution
+  role: perf
+- key: rgb_fov_h_deg
+  zh: 彩色视场角（水平）
+  en: RGB FOV H
+  role: perf
+  unit: °
+- key: rgb_fov_v_deg
+  zh: 彩色视场角（垂直）
+  en: RGB FOV V
+  role: perf
+  unit: °
+- key: shutter
+  zh: 深度快门
+  en: Depth shutter
+  role: info
+- key: imu
+  zh: 惯性测量单元
+  en: IMU
+  role: info
+- key: baseline_mm
+  zh: 基线
+  en: Baseline
+  role: dim
+  unit: mm
+- key: interface
+  zh: 接口
+  en: Interface
+  role: info
+- key: width_mm
+  zh: 长
+  en: Length
+  role: dim
+  unit: mm
+- key: height_mm
+  zh: 高
+  en: Height
+  role: dim
+  unit: mm
+- key: depth_mm
+  zh: 厚
+  en: Depth
+  role: dim
+  unit: mm
+specs: specs.csv
+default: D435
+model:
+  engine: proxy:box
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    w: width_mm
+    d: depth_mm
+    h: height_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载
+source:
+  origin: vendor
+  vendor: Intel RealSense
+  catalog: Intel RealSense Depth Camera D405；Intel RealSense Depth Camera D435；RealSense
+    D435i；Intel RealSense Depth Camera D455
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 Intel RealSense 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 两次独立读取官方资料，结果一致；另抽查核对
+  data_sources:
+  - title: Intel RealSense Depth Camera D405
+    url: https://www.intelrealsense.com/depth-camera-d405/
+    retrieved: '2026-09-30'
+  - title: Intel RealSense Depth Camera D435
+    url: https://www.intelrealsense.com/depth-camera-d435/
+    retrieved: '2026-09-30'
+  - title: RealSense D435i
+    url: https://www.realsenseai.com/products/depth-camera-d435i/
+    retrieved: '2026-09-30'
+  - title: Intel RealSense Depth Camera D455
+    url: https://www.intelrealsense.com/depth-camera-d455/
+    retrieved: '2026-09-30'
+  notes: D405 的尺寸页面写作“长×深×高 42×42×23”，按 23 mm 为厚度示意。
+vendor:
+  id: REALSENSE
+  name:
+    zh: 英特尔 RealSense
+    en: Intel RealSense
+  site: https://www.intelrealsense.com
+  series: D400
+teaching:
+  principle: 两个红外相机相隔一段距离（基线）同时拍摄，同一点在两幅图里的位置差（视差）与距离成反比，由此算出每个像素的深度；红外投射器在无纹理表面投出散斑帮助匹配。
+  uses:
+  - 机器人抓取定位
+  - 移动机器人避障与建图
+  - 人体姿态识别
+  courses:
+  - course: 机器人技术
+    chapter: 视觉传感与三维感知
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - Intel RealSense

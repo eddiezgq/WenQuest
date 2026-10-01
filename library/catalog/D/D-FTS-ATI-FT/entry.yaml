@@ -1,0 +1,160 @@
+# D-FTS-ATI-FT · ATI 六维力/力矩传感器（厂商目录，第 5 轮）
+schema: 1
+id: D-FTS-ATI-FT
+kind: product
+name:
+  zh: ATI 六维力/力矩传感器
+  en: ATI six-axis force/torque sensor
+category: FTS
+tags:
+- 力传感器
+- 六维力传感器
+- 力控
+- F/T sensor
+- ATI 工业自动化
+- ATI Industrial Automation
+standards: []
+params:
+- key: calibration
+  zh: 标定
+  en: Calibration
+  role: key
+- key: Fxy_range_N
+  zh: Fx/Fy 量程
+  en: Fx/Fy range
+  role: perf
+  unit: N
+- key: Fz_range_N
+  zh: Fz 量程
+  en: Fz range
+  role: perf
+  unit: N
+- key: Txy_range_Nm
+  zh: Tx/Ty 量程
+  en: Tx/Ty range
+  role: perf
+  unit: N·m
+- key: Tz_range_Nm
+  zh: Tz 量程
+  en: Tz range
+  role: perf
+  unit: N·m
+- key: Fxy_resolution_N
+  zh: Fx/Fy 分辨率
+  en: Fx/Fy resolution
+  role: perf
+  unit: N
+- key: Fz_resolution_N
+  zh: Fz 分辨率
+  en: Fz resolution
+  role: perf
+  unit: N
+- key: Txy_resolution_Nm
+  zh: Tx/Ty 分辨率
+  en: Tx/Ty resolution
+  role: perf
+  unit: N·m
+- key: Tz_resolution_Nm
+  zh: Tz 分辨率
+  en: Tz resolution
+  role: perf
+  unit: N·m
+- key: Fxy_overload_N
+  zh: Fx/Fy 过载
+  en: Fx/Fy overload
+  role: perf
+  unit: N
+- key: Fz_overload_N
+  zh: Fz 过载
+  en: Fz overload
+  role: perf
+  unit: N
+- key: diameter_mm
+  zh: 直径
+  en: Diameter
+  role: dim
+  unit: mm
+- key: height_mm
+  zh: 高度
+  en: Height
+  role: dim
+  unit: mm
+- key: weight_g
+  zh: 质量
+  en: Weight
+  role: info
+  unit: g
+specs: specs.csv
+default: Mini45
+model:
+  engine: proxy:cylinder
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    d: diameter_mm
+    h: height_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载
+source:
+  origin: vendor
+  vendor: ATI Industrial Automation
+  catalog: ATI F/T Sensor Nano17；ATI F/T Sensor Nano25；ATI F/T Sensor Mini40；ATI F/T
+    Sensor Mini45；ATI F/T Sensor Mini58；ATI F/T Sensor Gamma；ATI F/T Sensor Delta；ATI
+    F/T Sensor Theta；ATI F/T Sensor Omega85
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 ATI Industrial Automation 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 两次独立读取官方资料，结果一致；另抽查核对
+  data_sources:
+  - title: ATI F/T Sensor Nano17
+    url: https://www.ati-ia.com/products/ft/ft_models.aspx?id=Nano17
+    retrieved: '2026-09-30'
+  - title: ATI F/T Sensor Nano25
+    url: https://www.ati-ia.com/products/ft/ft_models.aspx?id=Nano25
+    retrieved: '2026-09-30'
+  - title: ATI F/T Sensor Mini40
+    url: https://www.ati-ia.com/products/ft/ft_models.aspx?id=mini40
+    retrieved: '2026-09-30'
+  - title: ATI F/T Sensor Mini45
+    url: https://www.ati-ia.com/products/ft/ft_models.aspx?id=mini45
+    retrieved: '2026-09-30'
+  - title: ATI F/T Sensor Mini58
+    url: https://www.ati-ia.com/products/ft/ft_models.aspx?id=Mini58
+    retrieved: '2026-09-30'
+  - title: ATI F/T Sensor Gamma
+    url: https://www.ati-ia.com/products/ft/ft_models.aspx?id=gamma
+    retrieved: '2026-09-30'
+  - title: ATI F/T Sensor Delta
+    url: https://www.ati-ia.com/products/ft/ft_models.aspx?id=Delta
+    retrieved: '2026-09-30'
+  - title: ATI F/T Sensor Theta
+    url: https://www.ati-ia.com/products/ft/ft_models.aspx?id=Theta
+    retrieved: '2026-09-30'
+  - title: ATI F/T Sensor Omega85
+    url: https://www.ati-ia.com/products/ft/ft_models.aspx?id=Omega85
+    retrieved: '2026-09-30'
+vendor:
+  id: ATI
+  name:
+    zh: ATI 工业自动化
+    en: ATI Industrial Automation
+  site: https://www.ati-ia.com
+  series: Nano/Mini/Gamma/Delta/Theta/Omega
+teaching:
+  principle: 弹性体上贴应变片，三个方向的力和三个方向的力矩使弹性体产生微小变形，应变片电阻随之变化，经标定矩阵换算成 Fx、Fy、Fz、Tx、Ty、Tz。
+  uses:
+  - 机械臂末端力控（打磨、装配、拖动示教）
+  - 抓取力测量
+  - 康复与人机交互研究
+  courses:
+  - course: 机器人技术
+    chapter: 力觉传感与力控制
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - ATI Industrial Automation

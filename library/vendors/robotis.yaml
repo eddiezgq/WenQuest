@@ -1,0 +1,53 @@
+# ROBOTIS DYNAMIXEL X 系列智能舵机（第 5 轮第 3 步第 1 批）。每个型号取官方 e-Manual 页；两次独立读取一致，另抽查 XM540-W270。
+# 失速转矩、空载转速取各页“推荐电压”下的值（XL330 为 5.0 V，XL430、XC430 为 11.1/12.0 V，其余 12.0 V），电压列写明。
+vendor: {id: ROBOTIS, name: {zh: 乐博特（ROBOTIS）, en: ROBOTIS}, site: https://www.robotis.com}
+retrieved: "2026-09-30"
+sources:
+  xl330_m288: {title: "ROBOTIS e-Manual: XL330-M288-T", url: "https://emanual.robotis.com/docs/en/dxl/x/xl330-m288/"}
+  xl430_w250: {title: "ROBOTIS e-Manual: XL430-W250-T", url: "https://emanual.robotis.com/docs/en/dxl/x/xl430-w250/"}
+  xc430_w150: {title: "ROBOTIS e-Manual: XC430-W150-T", url: "https://emanual.robotis.com/docs/en/dxl/x/xc430-w150/"}
+  xm430_w210: {title: "ROBOTIS e-Manual: XM430-W210-T/R", url: "https://emanual.robotis.com/docs/en/dxl/x/xm430-w210/"}
+  xm430_w350: {title: "ROBOTIS e-Manual: XM430-W350-T/R", url: "https://emanual.robotis.com/docs/en/dxl/x/xm430-w350/"}
+  xh430_w350: {title: "ROBOTIS e-Manual: XH430-W350-T/R", url: "https://emanual.robotis.com/docs/en/dxl/x/xh430-w350/"}
+  xm540_w150: {title: "ROBOTIS e-Manual: XM540-W150-T/R", url: "https://emanual.robotis.com/docs/en/dxl/x/xm540-w150/"}
+  xm540_w270: {title: "ROBOTIS e-Manual: XM540-W270-T/R", url: "https://emanual.robotis.com/docs/en/dxl/x/xm540-w270/"}
+  xh540_w270: {title: "ROBOTIS e-Manual: XH540-W270-T/R", url: "https://emanual.robotis.com/docs/en/dxl/x/xh540-w270/"}
+products:
+  - id: D-ACT-ROBOTIS-X
+    name: {zh: DYNAMIXEL X 系列智能舵机, en: DYNAMIXEL X-series smart servo}
+    category: ACT
+    series: DYNAMIXEL X
+    tags: [舵机, 智能舵机, 执行器模组, 机器人关节, servo, Dynamixel]
+    default: XM430-W350
+    proxy: box
+    dims: {w: width_mm, d: depth_mm, h: height_mm}
+    proxy_note: "外形按 e-Manual 的 W×H×D 尺寸生成"
+    principle: 直流电机、减速齿轮、位置传感器（磁编码器）和控制电路装在一个壳体里，通过总线接收目标位置、速度或电流，自己闭环控制，多个舵机串在一条总线上。
+    uses: [教学机械臂与机器人手, 双足和四足小型机器人, 云台]
+    chapter: 关节驱动与舵机
+    params:
+      - [stall_torque_Nm, 失速转矩, Stall torque, perf, N·m]
+      - [stall_torque_at_V, 失速转矩对应电压, Stall torque voltage, perf, V]
+      - [no_load_speed_rpm, 空载转速, No-load speed, perf, r/min]
+      - [no_load_speed_at_V, 空载转速对应电压, No-load speed voltage, perf, V]
+      - [stall_current_A, 失速电流, Stall current, perf, A]
+      - [voltage_min_V, 工作电压下限, Voltage min, perf, V]
+      - [voltage_max_V, 工作电压上限, Voltage max, perf, V]
+      - [gear_ratio, 减速比, Gear ratio, dim, ""]
+      - [resolution_steps_per_rev, 分辨率（每转脉冲）, Resolution (pulse/rev), perf, ""]
+      - [motor, 电机, Motor, info, ""]
+      - [protocol, 通信, Communication, info, ""]
+      - [weight_g, 质量, Weight, info, g]
+      - [width_mm, 宽 W, Width W, dim, mm]
+      - [height_mm, 高 H, Height H, dim, mm]
+      - [depth_mm, 深 D, Depth D, dim, mm]
+    rows:
+      - {size: XL330-M288, src: xl330_m288, stall_torque_Nm: 0.52, stall_torque_at_V: 5.0, no_load_speed_rpm: 103, no_load_speed_at_V: 5.0, voltage_min_V: 3.7, voltage_max_V: 6.0, weight_g: 18, width_mm: 20.0, depth_mm: 26.0, height_mm: 34.0, gear_ratio: "288.4:1", resolution_steps_per_rev: 4096, motor: Cored, protocol: "DYNAMIXEL Protocol 2.0；TTL", stall_current_A: 1.47}
+      - {size: XL430-W250, src: xl430_w250, stall_torque_Nm: 1.4, stall_torque_at_V: 11.1, no_load_speed_rpm: 57, no_load_speed_at_V: 11.1, voltage_min_V: 6.5, voltage_max_V: 12.0, weight_g: 57.2, width_mm: 28.5, depth_mm: 34, height_mm: 46.5, gear_ratio: "258.5:1", resolution_steps_per_rev: 4096, motor: Cored, protocol: "DYNAMIXEL Protocol 2.0；TTL", stall_current_A: 1.3}
+      - {size: XC430-W150, src: xc430_w150, stall_torque_Nm: 1.6, stall_torque_at_V: 12.0, no_load_speed_rpm: 106, no_load_speed_at_V: 12.0, voltage_min_V: 6.5, voltage_max_V: 14.8, weight_g: 65, width_mm: 28.5, depth_mm: 34, height_mm: 46.5, gear_ratio: "159.59:1", resolution_steps_per_rev: 4096, motor: Coreless, protocol: "DYNAMIXEL Protocol 2.0/1.0；TTL", stall_current_A: 1.4}
+      - {size: XM430-W210, src: xm430_w210, stall_torque_Nm: 3.0, stall_torque_at_V: 12.0, no_load_speed_rpm: 77, no_load_speed_at_V: 12.0, voltage_min_V: 10.0, voltage_max_V: 14.8, weight_g: 82, width_mm: 28.5, depth_mm: 34, height_mm: 46.5, gear_ratio: "212.6:1", resolution_steps_per_rev: 4096, motor: Coreless, protocol: "DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）", stall_current_A: 2.3}
+      - {size: XM430-W350, src: xm430_w350, stall_torque_Nm: 4.1, stall_torque_at_V: 12.0, no_load_speed_rpm: 46, no_load_speed_at_V: 12.0, voltage_min_V: 10.0, voltage_max_V: 14.8, weight_g: 82, width_mm: 28.5, depth_mm: 34, height_mm: 46.5, gear_ratio: "353.5:1", resolution_steps_per_rev: 4096, motor: Coreless, protocol: "DYNAMIXEL Protocol 2.0；RS-485（-R）/TTL（-T）", stall_current_A: 2.3}
+      - {size: XH430-W350, src: xh430_w350, stall_torque_Nm: 3.4, stall_torque_at_V: 12.0, no_load_speed_rpm: 30, no_load_speed_at_V: 12.0, voltage_min_V: 10.0, voltage_max_V: 14.8, weight_g: 82, width_mm: 28.5, depth_mm: 34, height_mm: 46.5, gear_ratio: "353.5:1", resolution_steps_per_rev: 4096, motor: "Coreless (Maxon)", protocol: "DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）", stall_current_A: 1.3}
+      - {size: XM540-W150, src: xm540_w150, stall_torque_Nm: 7.3, stall_torque_at_V: 12.0, no_load_speed_rpm: 53, no_load_speed_at_V: 12.0, voltage_min_V: 10.0, voltage_max_V: 14.8, weight_g: 165, width_mm: 33.5, depth_mm: 44, height_mm: 58.5, gear_ratio: "152.3:1", resolution_steps_per_rev: 4096, motor: Coreless, protocol: "DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）", stall_current_A: 4.4}
+      - {size: XM540-W270, src: xm540_w270, stall_torque_Nm: 10.6, stall_torque_at_V: 12.0, no_load_speed_rpm: 30, no_load_speed_at_V: 12.0, voltage_min_V: 10.0, voltage_max_V: 14.8, weight_g: 165, width_mm: 33.5, depth_mm: 44, height_mm: 58.5, gear_ratio: "272.5:1", resolution_steps_per_rev: 4096, motor: Coreless, protocol: "DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）", stall_current_A: 4.4}
+      - {size: XH540-W270, src: xh540_w270, stall_torque_Nm: 9.9, stall_torque_at_V: 12.0, no_load_speed_rpm: 39, no_load_speed_at_V: 12.0, voltage_min_V: 10.0, voltage_max_V: 14.8, weight_g: 165, width_mm: 33.5, depth_mm: 44, height_mm: 58.5, gear_ratio: "272.5:1", resolution_steps_per_rev: 4096, motor: "Coreless (Maxon)", protocol: "DYNAMIXEL Protocol 2.0/1.0；RS-485（-R）/TTL（-T）", stall_current_A: 4.9}

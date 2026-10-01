@@ -1,0 +1,51 @@
+# ATI 六维力/力矩传感器（第 5 轮第 3 步第 1 批）。每个型号取官方产品页，用页上列出的第一种 SI 标定；两次独立读取一致，另抽查 Mini45。
+# 分辨率是官方分数的小数（保留 6 位有效数字）；质量和外形含标准接口板。
+vendor: {id: ATI, name: {zh: ATI 工业自动化, en: ATI Industrial Automation}, site: https://www.ati-ia.com}
+retrieved: "2026-09-30"
+sources:
+  nano17: {title: "ATI F/T Sensor Nano17", url: "https://www.ati-ia.com/products/ft/ft_models.aspx?id=Nano17"}
+  nano25: {title: "ATI F/T Sensor Nano25", url: "https://www.ati-ia.com/products/ft/ft_models.aspx?id=Nano25"}
+  mini40: {title: "ATI F/T Sensor Mini40", url: "https://www.ati-ia.com/products/ft/ft_models.aspx?id=mini40"}
+  mini45: {title: "ATI F/T Sensor Mini45", url: "https://www.ati-ia.com/products/ft/ft_models.aspx?id=mini45"}
+  mini58: {title: "ATI F/T Sensor Mini58", url: "https://www.ati-ia.com/products/ft/ft_models.aspx?id=Mini58"}
+  gamma: {title: "ATI F/T Sensor Gamma", url: "https://www.ati-ia.com/products/ft/ft_models.aspx?id=gamma"}
+  delta: {title: "ATI F/T Sensor Delta", url: "https://www.ati-ia.com/products/ft/ft_models.aspx?id=Delta"}
+  theta: {title: "ATI F/T Sensor Theta", url: "https://www.ati-ia.com/products/ft/ft_models.aspx?id=Theta"}
+  omega85: {title: "ATI F/T Sensor Omega85", url: "https://www.ati-ia.com/products/ft/ft_models.aspx?id=Omega85"}
+products:
+  - id: D-FTS-ATI-FT
+    name: {zh: ATI 六维力/力矩传感器, en: ATI six-axis force/torque sensor}
+    category: FTS
+    series: Nano/Mini/Gamma/Delta/Theta/Omega
+    tags: [力传感器, 六维力传感器, 力控, F/T sensor]
+    default: Mini45
+    proxy: cylinder
+    dims: {d: diameter_mm, h: height_mm}
+    principle: 弹性体上贴应变片，三个方向的力和三个方向的力矩使弹性体产生微小变形，应变片电阻随之变化，经标定矩阵换算成 Fx、Fy、Fz、Tx、Ty、Tz。
+    uses: [机械臂末端力控（打磨、装配、拖动示教）, 抓取力测量, 康复与人机交互研究]
+    chapter: 力觉传感与力控制
+    params:
+      - [calibration, 标定, Calibration, key, ""]
+      - [Fxy_range_N, Fx/Fy 量程, Fx/Fy range, perf, N]
+      - [Fz_range_N, Fz 量程, Fz range, perf, N]
+      - [Txy_range_Nm, Tx/Ty 量程, Tx/Ty range, perf, N·m]
+      - [Tz_range_Nm, Tz 量程, Tz range, perf, N·m]
+      - [Fxy_resolution_N, Fx/Fy 分辨率, Fx/Fy resolution, perf, N]
+      - [Fz_resolution_N, Fz 分辨率, Fz resolution, perf, N]
+      - [Txy_resolution_Nm, Tx/Ty 分辨率, Tx/Ty resolution, perf, N·m]
+      - [Tz_resolution_Nm, Tz 分辨率, Tz resolution, perf, N·m]
+      - [Fxy_overload_N, Fx/Fy 过载, Fx/Fy overload, perf, N]
+      - [Fz_overload_N, Fz 过载, Fz overload, perf, N]
+      - [diameter_mm, 直径, Diameter, dim, mm]
+      - [height_mm, 高度, Height, dim, mm]
+      - [weight_g, 质量, Weight, info, g]
+    rows:
+      - {size: Nano17, src: nano17, calibration: SI-12-0.12, Fxy_range_N: 12, Fz_range_N: 17, Txy_range_Nm: 0.12, Tz_range_Nm: 0.12, Fxy_resolution_N: 0.003125, Fz_resolution_N: 0.003125, Txy_resolution_Nm: 0.000015625, Tz_resolution_Nm: 0.000015625, diameter_mm: 17, height_mm: 14.5, weight_g: 9.07, Fxy_overload_N: 250, Fz_overload_N: 480}
+      - {size: Nano25, src: nano25, calibration: SI-125-3, Fxy_range_N: 125, Fz_range_N: 500, Txy_range_Nm: 3, Tz_range_Nm: 3, Fxy_resolution_N: 0.0208333, Fz_resolution_N: 0.0625, Txy_resolution_Nm: 0.000757576, Tz_resolution_Nm: 0.000378788, diameter_mm: 25, height_mm: 21.6, weight_g: 63.4, Fxy_overload_N: 2300, Fz_overload_N: 7300}
+      - {size: Mini40, src: mini40, calibration: SI-20-1, Fxy_range_N: 20, Fz_range_N: 60, Txy_range_Nm: 1, Tz_range_Nm: 1, Fxy_resolution_N: 0.005, Fz_resolution_N: 0.01, Txy_resolution_Nm: 0.000125, Tz_resolution_Nm: 0.000125, diameter_mm: 40, height_mm: 12.2, weight_g: 49.9, Fxy_overload_N: 810, Fz_overload_N: 2400}
+      - {size: Mini45, src: mini45, calibration: SI-145-5, Fxy_range_N: 145, Fz_range_N: 290, Txy_range_Nm: 5, Tz_range_Nm: 5, Fxy_resolution_N: 0.0625, Fz_resolution_N: 0.0625, Txy_resolution_Nm: 0.00132979, Tz_resolution_Nm: 0.000664894, diameter_mm: 45, height_mm: 15.7, weight_g: 91.7, Fxy_overload_N: 5100, Fz_overload_N: 10000}
+      - {size: Mini58, src: mini58, calibration: SI-700-30, Fxy_range_N: 700, Fz_range_N: 1700, Txy_range_Nm: 30, Tz_range_Nm: 30, Fxy_resolution_N: 0.166667, Fz_resolution_N: 0.291667, Txy_resolution_Nm: 0.005625, Tz_resolution_Nm: 0.003125, diameter_mm: 58, height_mm: 30, weight_g: 345, Fxy_overload_N: 21000, Fz_overload_N: 48000}
+      - {size: Gamma, src: gamma, calibration: SI-32-2.5, Fxy_range_N: 32, Fz_range_N: 100, Txy_range_Nm: 2.5, Tz_range_Nm: 2.5, Fxy_resolution_N: 0.00625, Fz_resolution_N: 0.0125, Txy_resolution_Nm: 0.0005, Tz_resolution_Nm: 0.0005, diameter_mm: 75.4, height_mm: 33.3, weight_g: 255, Fxy_overload_N: 1200, Fz_overload_N: 4100}
+      - {size: Delta, src: delta, calibration: SI-165-15, Fxy_range_N: 165, Fz_range_N: 495, Txy_range_Nm: 15, Tz_range_Nm: 15, Fxy_resolution_N: 0.03125, Fz_resolution_N: 0.0625, Txy_resolution_Nm: 0.00189394, Tz_resolution_Nm: 0.00189394, diameter_mm: 94.5, height_mm: 33.3, weight_g: 913, Fxy_overload_N: 3700, Fz_overload_N: 10000}
+      - {size: Theta, src: theta, calibration: SI-1000-120, Fxy_range_N: 1000, Fz_range_N: 2500, Txy_range_Nm: 120, Tz_range_Nm: 120, Fxy_resolution_N: 0.25, Fz_resolution_N: 0.25, Txy_resolution_Nm: 0.025, Tz_resolution_Nm: 0.0125, diameter_mm: 155, height_mm: 61.1, weight_g: 4990, Fxy_overload_N: 20000, Fz_overload_N: 51000}
+      - {size: Omega85, src: omega85, calibration: SI-475-20, Fxy_range_N: 475, Fz_range_N: 950, Txy_range_Nm: 20, Tz_range_Nm: 20, Fxy_resolution_N: 0.0714286, Fz_resolution_N: 0.107143, Txy_resolution_Nm: 0.00334225, Tz_resolution_Nm: 0.00233957, diameter_mm: 85.1, height_mm: 33.4, weight_g: 658, Fxy_overload_N: 13000, Fz_overload_N: 27000}

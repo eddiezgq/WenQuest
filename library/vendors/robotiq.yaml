@@ -1,0 +1,41 @@
+# Robotiq 自适应夹爪（第 5 轮第 3 步第 1 批）。性能参数取现行产品样本（两次独立读取一致，另抽查 2F-85/2F-140）；
+# 外形（张开最大宽、最大高）与电压取官方使用手册。3 指夹爪的手册规格章节读不到，暂不收。
+vendor: {id: ROBOTIQ, name: {zh: Robotiq, en: Robotiq}, site: https://robotiq.com}
+retrieved: "2026-09-30"
+sources:
+  ag_sheet: {title: "Robotiq Adaptive Grippers 2F-85/2F-140 product sheet (May 2025)", url: "https://robotiq.com/hubfs/Product-sheets/Adaptive%20Grippers/Product-sheet-Adaptive-Grippers-EN.pdf"}
+  2f_manual: {title: "Robotiq 2F-85 & 2F-140 Instruction Manual, 6. Specifications", url: "https://assets.robotiq.com/website-assets/support_documents/document/online/2F-85_2F-140_TM_InstructionManual_HTML5_20190503.zip/2F-85_2F-140_TM_InstructionManual_HTML5/Content/6.%20Specifications.htm"}
+  he_sheet: {title: "Robotiq Hand-E Adaptive Gripper product sheet", url: "https://robotiq.com/hubfs/Hand-E_Adaptive_Gripper_ProductSheet_EN_2024-11_WEB.pdf"}
+  he_manual: {title: "Robotiq Hand-E Instruction Manual, 6. Specifications", url: "https://assets.robotiq.com/website-assets/support_documents/document/online/Hand-E_Instruction_Manual_Web_20190122.zip/Hand-E_Instruction_Manual_Web/Content/6.%20Specifications.htm"}
+products:
+  - id: D-GRP-ROBOTIQ
+    name: {zh: Robotiq 自适应电动夹爪, en: Robotiq adaptive electric gripper}
+    category: GRP
+    series: 2F / Hand-E
+    tags: [夹爪, 电动夹爪, 末端执行器, gripper, end effector]
+    default: 2F-85
+    proxy: gripper
+    dims: {w: max_width_mm, h: max_height_mm, d: depth_mm}
+    proxy_note: "2F 的厚度按宽度比例示意"
+    principle: 电机经丝杠或连杆带动两指开合；2F 系列的欠驱动连杆让手指在接触物体后自动包络，既能平行夹持也能包住不规则物体。
+    uses: [机械臂上下料, 装配, 协作机器人教学]
+    chapter: 末端执行器
+    notes: "Hand-E 的夹持力是每指 20～185 N（两指合计 40～370 N），2019 版手册写 60～130 N，按现行样本；2F 的“最大宽、最大高”是手指张开、装平面指垫时的外形。"
+    params:
+      - [stroke_mm, 行程, Stroke, perf, mm]
+      - [grip_force_min_N, 夹持力下限, Grip force min, perf, N]
+      - [grip_force_max_N, 夹持力上限, Grip force max, perf, N]
+      - [payload_form_kg, 包络夹持负载, Form-fit payload, perf, kg]
+      - [payload_friction_kg, 摩擦夹持负载, Friction payload, perf, kg]
+      - [closing_speed_min_mm_s, 闭合速度下限, Closing speed min, perf, mm/s]
+      - [closing_speed_max_mm_s, 闭合速度上限, Closing speed max, perf, mm/s]
+      - [weight_kg, 质量, Weight, info, kg]
+      - [ip_rating, 防护等级, IP rating, info, ""]
+      - [power_V, 供电电压, Supply voltage, info, V DC]
+      - [max_width_mm, 最大宽（张开）, Max width (open), dim, mm]
+      - [max_height_mm, 最大高, Max height, dim, mm]
+      - [depth_mm, 厚度, Depth, dim, mm]
+    rows:
+      - {size: 2F-85, src: [ag_sheet, 2f_manual], stroke_mm: 85, grip_force_min_N: 20, grip_force_max_N: 235, payload_form_kg: 5, payload_friction_kg: 5, closing_speed_min_mm_s: 20, closing_speed_max_mm_s: 150, weight_kg: 0.9, ip_rating: IP40, power_V: 24, max_width_mm: 148.6, max_height_mm: 162.8}
+      - {size: 2F-140, src: [ag_sheet, 2f_manual], stroke_mm: 140, grip_force_min_N: 10, grip_force_max_N: 125, payload_form_kg: 2.5, payload_friction_kg: 2.5, closing_speed_min_mm_s: 30, closing_speed_max_mm_s: 250, weight_kg: 1.0, ip_rating: IP40, power_V: 24, max_width_mm: 202.1, max_height_mm: 232.8}
+      - {size: Hand-E, src: [he_sheet, he_manual], stroke_mm: 50, grip_force_min_N: 20, grip_force_max_N: 185, payload_form_kg: 7, closing_speed_min_mm_s: 20, closing_speed_max_mm_s: 150, weight_kg: 1.0, ip_rating: IP67, power_V: 24, max_width_mm: 75, max_height_mm: 100.5, depth_mm: 75}

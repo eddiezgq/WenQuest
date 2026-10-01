@@ -1,0 +1,5 @@
+size,ideal_range_min_m,ideal_range_max_m,depth_fov_h_deg,depth_fov_v_deg,depth_resolution,depth_fps_max,rgb_resolution,rgb_fov_h_deg,rgb_fov_v_deg,shutter,imu,baseline_mm,interface,width_mm,height_mm,depth_mm,src_url,src_page
+D405,0.07,0.5,87,58,1280x720,,1280x720,87,58,global,,,USB 2 / USB 3.1,42,42,23,https://www.intelrealsense.com/depth-camera-d405/,
+D435,0.3,3,87,58,1280x720,90,2 MP,69,42,global,,,USB-C 3.1 Gen 1,90,25,25,https://www.intelrealsense.com/depth-camera-d435/,
+D435i,0.3,3,87,58,1280x720,90,1920x1080,69,42,global,有,,USB-C 3.1 Gen 1,90,25,25,https://www.realsenseai.com/products/depth-camera-d435i/,
+D455,0.6,6,87,58,1280x720,90,1 MP,90,65,global,有（Bosch BMI055）,95,USB-C 3.1 Gen 1,124,29,26,https://www.intelrealsense.com/depth-camera-d455/,

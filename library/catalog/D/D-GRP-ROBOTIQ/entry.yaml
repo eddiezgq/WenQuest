@@ -1,0 +1,142 @@
+# D-GRP-ROBOTIQ · Robotiq 自适应电动夹爪（厂商目录，第 5 轮）
+schema: 1
+id: D-GRP-ROBOTIQ
+kind: product
+name:
+  zh: Robotiq 自适应电动夹爪
+  en: Robotiq adaptive electric gripper
+category: GRP
+tags:
+- 夹爪
+- 电动夹爪
+- 末端执行器
+- gripper
+- end effector
+- Robotiq
+standards: []
+params:
+- key: stroke_mm
+  zh: 行程
+  en: Stroke
+  role: perf
+  unit: mm
+- key: grip_force_min_N
+  zh: 夹持力下限
+  en: Grip force min
+  role: perf
+  unit: N
+- key: grip_force_max_N
+  zh: 夹持力上限
+  en: Grip force max
+  role: perf
+  unit: N
+- key: payload_form_kg
+  zh: 包络夹持负载
+  en: Form-fit payload
+  role: perf
+  unit: kg
+- key: payload_friction_kg
+  zh: 摩擦夹持负载
+  en: Friction payload
+  role: perf
+  unit: kg
+- key: closing_speed_min_mm_s
+  zh: 闭合速度下限
+  en: Closing speed min
+  role: perf
+  unit: mm/s
+- key: closing_speed_max_mm_s
+  zh: 闭合速度上限
+  en: Closing speed max
+  role: perf
+  unit: mm/s
+- key: weight_kg
+  zh: 质量
+  en: Weight
+  role: info
+  unit: kg
+- key: ip_rating
+  zh: 防护等级
+  en: IP rating
+  role: info
+- key: power_V
+  zh: 供电电压
+  en: Supply voltage
+  role: info
+  unit: V DC
+- key: max_width_mm
+  zh: 最大宽（张开）
+  en: Max width (open)
+  role: dim
+  unit: mm
+- key: max_height_mm
+  zh: 最大高
+  en: Max height
+  role: dim
+  unit: mm
+- key: depth_mm
+  zh: 厚度
+  en: Depth
+  role: dim
+  unit: mm
+specs: specs.csv
+default: 2F-85
+model:
+  engine: proxy:gripper
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    w: max_width_mm
+    h: max_height_mm
+    d: depth_mm
+  origin: 安装面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载；2F 的厚度按宽度比例示意
+source:
+  origin: vendor
+  vendor: Robotiq
+  catalog: Robotiq Adaptive Grippers 2F-85/2F-140 product sheet (May 2025)；Robotiq
+    2F-85 & 2F-140 Instruction Manual, 6. Specifications；Robotiq Hand-E Adaptive Gripper
+    product sheet；Robotiq Hand-E Instruction Manual, 6. Specifications
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 Robotiq 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: 两次独立读取官方资料，结果一致；另抽查核对
+  data_sources:
+  - title: Robotiq Adaptive Grippers 2F-85/2F-140 product sheet (May 2025)
+    url: https://robotiq.com/hubfs/Product-sheets/Adaptive%20Grippers/Product-sheet-Adaptive-Grippers-EN.pdf
+    retrieved: '2026-09-30'
+  - title: Robotiq 2F-85 & 2F-140 Instruction Manual, 6. Specifications
+    url: https://assets.robotiq.com/website-assets/support_documents/document/online/2F-85_2F-140_TM_InstructionManual_HTML5_20190503.zip/2F-85_2F-140_TM_InstructionManual_HTML5/Content/6.%20Specifications.htm
+    retrieved: '2026-09-30'
+  - title: Robotiq Hand-E Adaptive Gripper product sheet
+    url: https://robotiq.com/hubfs/Hand-E_Adaptive_Gripper_ProductSheet_EN_2024-11_WEB.pdf
+    retrieved: '2026-09-30'
+  - title: Robotiq Hand-E Instruction Manual, 6. Specifications
+    url: https://assets.robotiq.com/website-assets/support_documents/document/online/Hand-E_Instruction_Manual_Web_20190122.zip/Hand-E_Instruction_Manual_Web/Content/6.%20Specifications.htm
+    retrieved: '2026-09-30'
+  notes: Hand-E 的夹持力是每指 20～185 N（两指合计 40～370 N），2019 版手册写 60～130 N，按现行样本；2F 的“最大宽、最大高”是手指张开、装平面指垫时的外形。
+vendor:
+  id: ROBOTIQ
+  name:
+    zh: Robotiq
+    en: Robotiq
+  site: https://robotiq.com
+  series: 2F / Hand-E
+teaching:
+  principle: 电机经丝杠或连杆带动两指开合；2F 系列的欠驱动连杆让手指在接触物体后自动包络，既能平行夹持也能包住不规则物体。
+  uses:
+  - 机械臂上下料
+  - 装配
+  - 协作机器人教学
+  courses:
+  - course: 机器人技术
+    chapter: 末端执行器
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - Robotiq

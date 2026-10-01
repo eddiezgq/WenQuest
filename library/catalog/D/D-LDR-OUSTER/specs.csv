@@ -1,0 +1,14 @@
+size,channels,range_max_m,range_10pct_m,range_min_m,fov_h_deg,fov_v_deg,rotation_rate_hz,points_per_second,accuracy_cm,wavelength_nm,power_W,weight_g,diameter_mm,height_mm,ip_rating,operating_temp,src_url,src_page
+OS0-32,32,75,35,0.5,360,90.8,10 或 20,1310720,2.5,865,16,430,87,58.35,"IP68, IP69K",-40～+60 °C（带支座）,https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-v3p2-os0.pdf,1–3
+OS0-64,64,75,35,0.5,360,90.8,10 或 20,2621440,2.5,865,16,430,87,58.35,"IP68, IP69K",-40～+60 °C（带支座）,https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-v3p2-os0.pdf,1–3
+OS0-128,128,75,35,0.5,360,90.8,10 或 20,5242880,2.5,865,16,430,87,58.35,"IP68, IP69K",-40～+60 °C（带支座）,https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-v3p2-os0.pdf,1–3
+OS1-32,32,170,90,0.5,360,42.4,10 或 20,1310720,2.5,865,16,430,87,58.35,"IP68, IP69K",-40～+60 °C（带支座）,https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-os1.pdf,1–2
+OS1-64,64,170,90,0.5,360,42.4,10 或 20,2621440,2.5,865,16,430,87,58.35,"IP68, IP69K",-40～+60 °C（带支座）,https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-os1.pdf,1–2
+OS1-128,128,170,90,0.5,360,42.4,10 或 20,5242880,2.5,865,16,430,87,58.35,"IP68, IP69K",-40～+60 °C（带支座）,https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-os1.pdf,1–2
+OS2-32,32,350,200,0.8,360,22.5,10 或 20,655360,2.5,865,,1100,119.6,102.9,"IP68, IP69K",-20～+60 °C,https://data.ouster.io/downloads/datasheets/datasheet-rev7-v2p5-os2.pdf,1
+OS2-64,64,350,200,0.8,360,22.5,10 或 20,1310720,2.5,865,,1100,119.6,102.9,"IP68, IP69K",-20～+60 °C,https://data.ouster.io/downloads/datasheets/datasheet-rev7-v2p5-os2.pdf,1
+OS2-128,128,350,200,0.8,360,22.5,10 或 20,2621440,2.5,865,,1100,119.6,102.9,"IP68, IP69K",-20～+60 °C,https://data.ouster.io/downloads/datasheets/datasheet-rev7-v2p5-os2.pdf,1
+OSDome-32,32,45,20,0.5,360,180,10 或 20,1310720,2.5,865,16,470,87,85.27,"IP68, IP69K",-40～+60 °C（带支座）,https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-osdome.pdf,1–3
+OSDome-64,64,45,20,0.5,360,180,10 或 20,2621440,2.5,865,16,470,87,85.27,"IP68, IP69K",-40～+60 °C（带支座）,https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-osdome.pdf,1–3
+OSDome-128,128,45,20,0.5,360,180,10 或 20,5242880,2.5,865,16,470,87,85.27,"IP68, IP69K",-40～+60 °C（带支座）,https://data.ouster.io/downloads/datasheets/datasheet-rev7p1-osdome.pdf,1–3
+VLP-32C,32,200,,,360,40,5～20,600000,3,903,10,925,100,86.9,IP67,-20～+60 °C,https://data.ouster.io/downloads/datasheets/velodyne/63-9378_Rev-F_Ultra-Puck_Datasheet_Web.pdf,2

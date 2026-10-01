@@ -1,4 +1,4 @@
-# D-RDC-HD-CSF · CSF-2A 谐波减速器组件（杯型）（厂商目录，第 5 轮第 2 步）
+# D-RDC-HD-CSF · CSF-2A 谐波减速器组件（杯型）（厂商目录，第 5 轮）
 schema: 1
 id: D-RDC-HD-CSF
 kind: product
@@ -91,6 +91,9 @@ model:
   - step
   - stl
   - glb
+  dims:
+    d: OD_mm
+    h: L_mm
   origin: 输出端在 z<0，轴线沿 Z
   note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载
 source:
@@ -98,7 +101,7 @@ source:
   vendor: Harmonic Drive
   catalog: Harmonic Drive：CSF & CSG Series Cup Type Component Sets & Housed Units（样本）
   license: Apache-2.0
-  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 Harmonic Drive 公开样本，商标归厂商所有
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 Harmonic Drive 公开资料，商标归厂商所有
   checked:
     by: Claude
     'on': '2026-09-30'
@@ -107,7 +110,6 @@ source:
   - title: Harmonic Drive：CSF & CSG Series Cup Type Component Sets & Housed Units（样本）
     url: https://www.harmonicdrive.net/_hd/content/catalogs/pdf/csf-csg-catalog.pdf
     retrieved: '2026-09-30'
-    note: 第 10、19 页
 vendor:
   id: HD
   name:
