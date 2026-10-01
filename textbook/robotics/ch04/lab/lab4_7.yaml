@@ -1,0 +1,31 @@
+# 实验 4.7 的指导书与报告模板。目的、场景、参数、任务取自 lab4_7.js。
+原理:
+  - ["在两个姿态 R₀、R₁ 之间插值，最“直接”的路径是绕一根固定轴匀速转过它们之间的转角（式 (4.7.1)）：", "The most direct path between R₀ and R₁ turns at constant speed about one fixed axis (Eq. (4.7.1)):"]
+  - 式: "R(t) = R₀ exp([ω̂]θ t)，  ω̂θ = log(R₀ᵀ R₁)          (4.7.1)"
+  - ["用四元数写出来就是球面线性插值 Slerp，其中 Ω 是 q_A 与 q_B 在四维单位球面上的夹角，cos Ω = q_A·q_B：", "With quaternions this is spherical linear interpolation (Slerp), with cos Ω = q_A·q_B:"]
+  - 式: "slerp(q_A, q_B; t) = [sin((1 − t)Ω) q_A + sin(tΩ) q_B] / sin Ω          (4.7.2)"
+  - ["q_B 与 −q_B 是同一个姿态。若 q_A·q_B < 0，应先把 q_B 换成 −q_B，否则 Slerp 会沿“长路”转过 360° 减去最短转角。",
+     "q_B and −q_B are the same attitude. If q_A·q_B < 0, replace q_B by −q_B first; otherwise Slerp takes the long way, 360° minus the shortest angle."]
+  - ["欧拉角插值把三个角度分别线性插值，路径和角速度都依赖于所用的欧拉角约定，一般既不最短，角速度也不均匀；归一化线性插值（Nlerp）路径正确，但角速度中间快、两头慢。",
+     "Euler interpolation interpolates each angle separately; its path and speed depend on the convention and are generally neither shortest nor even. Nlerp follows the right path but is faster in the middle."]
+步骤:
+  - ["打开实验 4.7，选择场景“工具换姿态”，终止姿态设为偏航 90°、俯仰 45°、横滚 90°（算例 4.7.1），按“播放”（任务 1）。观察三个末端的运动和下方三条角速度曲线，记录最短转角和两种插值的路径长度。",
+     "Open Lab 4.7, scene “Tool reorientation”, end attitude yaw 90°, pitch 45°, roll 90° (Example 4.7.1), press “Play” (task 1). Watch the three tools and the speed curves; record the shortest angle and both path lengths."]
+  - ["描述三条角速度曲线的形状：哪一条是水平直线？哪一条中间高、两头低？哪一条变化最大？", "Describe the three speed curves: which is flat, which peaks in the middle, which varies most?"]
+  - ["改变终止姿态，找出一组使欧拉角插值的路径比最短路径长 50% 以上的姿态（任务 2；提示：偏航和横滚取接近 180°，俯仰取较大值）。在表 1 中记录至少三组尝试。",
+     "Change the end attitude until the Euler path is more than 50% longer than the shortest one (task 2; hint: yaw and roll near 180°, large pitch). Record at least three tries in Table 1."]
+  - ["切换到场景“相机云台”，设偏航 180°、俯仰 0°、横滚 120°，此时 q_A·q_B < 0。把“不做最短路径处理”分别设为 0 和 1（任务 3），记录 Slerp 转过的角度，与最短转角比较。",
+     "Switch to “Camera gimbal”: yaw 180°, pitch 0°, roll 120°, where q_A·q_B < 0. Set “no shortest-path fix” to 0 and to 1 (task 3); record the Slerp angle and compare with the shortest angle."]
+  - ["让俯仰接近 89°，再播放一次，观察欧拉角插值的角速度曲线在经过万向节锁附近时的变化。", "Set pitch close to 89° and play again; watch the Euler speed curve near gimbal lock."]
+数据表:
+  - 标题: ["表 1  路径长度比较", "Table 1  Path lengths"]
+    表头: ["终止姿态 (ψ, θ, φ) / °", "最短转角 / °", "欧拉角插值路径 / °", "Slerp 路径 / °", "欧拉角路径 ÷ 最短"]
+    行: [["(90, 45, 90)", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]]
+  - 标题: ["表 2  q 与 −q 的选择（相机云台）", "Table 2  Choosing q or −q (camera gimbal)"]
+    表头: ["是否做最短路径处理", "q_A·q_B", "Slerp 转过的角度 / °", "最短转角 / °"]
+    行: [["做", "", "", ""], ["不做", "", "", ""]]
+注意:
+  - ["“路径长度”指末端姿态实际转过的总角度，不是三个欧拉角变化量之和。", "“Path length” is the total angle the tool actually turns, not the sum of the three Euler-angle changes."]
+  - ["每次改变终止姿态后，先按“重置”再“播放”。", "After changing the end attitude, press “Reset” before “Play”."]
+思考题:
+  - ["机器人控制器为什么通常对位置做线性插值，对姿态却用 Slerp？", "Why do robot controllers interpolate position linearly but orientation with Slerp?"]

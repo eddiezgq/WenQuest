@@ -41,6 +41,8 @@ from pathlib import Path
 import yaml
 from markdown_it import MarkdownIt
 
+import labdocs
+
 TOOLS = Path(__file__).resolve().parent
 ROOT = TOOLS.parents[1]
 WQ_ANIM = ROOT / "services" / "animator" / "wq_anim.py"
@@ -115,6 +117,7 @@ class Section:
     anim_figs: list = field(default_factory=list)
     anims: list = field(default_factory=list)
     labs: list = field(default_factory=list)
+    labdocs: list = field(default_factory=list)
     defines: set = field(default_factory=set)
 
 
@@ -348,6 +351,11 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
             for why in labkit().static_problems(code):
                 rep.add("error", "实验", sec.id, f"{label}：{why}")
             sec.labs.append((num, code))
+            g, bad = labdocs.load(script.with_suffix(".yaml"))
+            for why in bad:
+                rep.add("error", "实验", sec.id, f"{label}：{why}")
+            if g is not None and not bad:
+                sec.labdocs.append((num, script, g))
             return (f"<figure class='wq-lab' id='{kind}-{num}'><div class='wq-media-box wq-labbox' data-lab='{num.replace('.', '-')}'>"
                     f"【{label}】{cap}</div>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     cls = {"动画": "wq-anim", "实验": "wq-lab", "表": "wq-tab"}[kind]
@@ -637,6 +645,17 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                                   key=f"wq-book-{book_name}")
         (lab_dir / f"ch{ch:02d}.html").write_text(page_html, encoding="utf-8")
         index["labs"][str(ch)] = [no for no, _ in items]
+        for sec in secs:      # 实验指导书与报告模板 (第 7 轮第 5 步)
+            for no, script, g in sec.labdocs:
+                try:
+                    m = labdocs.meta(script)
+                except ValueError as e:
+                    rep.add("error", "实验", sec.id, f"实验 {no}：{e}")
+                    continue
+                where = (f"《{book['title']}》{sec.id} 节", f"{book.get('title_en') or book['title']}, Section {sec.id}")
+                stem = f"lab{no.replace('.', '_')}"
+                labdocs.guide(m, g, lab_dir / f"{stem}-guide.docx", no, where)
+                labdocs.report(m, g, lab_dir / f"{stem}-report.docx", no, where)
         if labs:
             trial_labs(page_html, [no.replace(".", "-") for no, _ in items], rep, f"第 {ch} 章实验页")
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")

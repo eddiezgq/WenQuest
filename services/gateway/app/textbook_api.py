@@ -159,10 +159,16 @@ def register(app, m) -> None:
             if not page.exists():
                 return mt.group(0)
             if mp:
-                return f"<p class='wq-note'>{label}：请在网页端打开虚拟实验</p>"
+                return f"<p class='wq-note'>{label}：请在网页端打开虚拟实验，并下载实验指导书和报告模板</p>"
             tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": int(ch)}).encode()).decode()
             url = f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-lab/{tok}#lab-{ch}-{k}"
-            return f"<a class='wq-labbtn' href='{url}' target='_blank' rel='noopener'>▶ 打开{label}</a>"
+            out = f"<a class='wq-labbtn' href='{url}' target='_blank' rel='noopener'>▶ 打开{label}</a>"
+            for kind, text in (("guide", "实验指导书"), ("report", "实验报告模板")):
+                if (root() / book / "lab" / f"lab{ch}_{k}-{kind}.docx").exists():
+                    t = m.state.codec.fernet.encrypt(json.dumps({"b": book, "l": f"{ch}_{k}", "d": kind}).encode()).decode()
+                    out += (f" <a class='wq-labdoc' href='{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-labdoc/{t}' "
+                            f"download>{text}（Word）</a>")
+            return out
         return LABBOX.sub(lab, html_)
 
     @app.get("/api/v1/textbook-lab/{signed}")
@@ -180,6 +186,23 @@ def register(app, m) -> None:
             raise EngineError("not_found", "no such lab", 404)
         return HTMLResponse(p.read_text(encoding="utf-8"), headers={"Content-Security-Policy": labkit.CSP,
                                                                      "Cache-Control": "private, max-age=3600"})
+
+    @app.get("/api/v1/textbook-labdoc/{signed}")
+    async def lab_doc(signed: str):
+        """A lab's guide or report template (Word), built from lab/NAME.yaml with the lab program."""
+        try:
+            d = json.loads(m.state.codec.fernet.decrypt(signed.encode(), ttl=MEDIA_TTL))
+        except (InvalidToken, ValueError):
+            raise EngineError("link_expired", "link expired", 410)
+        if not (BOOK.match(d["b"]) and re.fullmatch(r"\d{1,3}_\d{1,3}", d["l"]) and d["d"] in ("guide", "report")):
+            raise EngineError("not_found", "no such file", 404)
+        p = root() / d["b"] / "lab" / f"lab{d['l']}-{d['d']}.docx"
+        if not p.exists():
+            raise EngineError("not_found", "no such file", 404)
+        idx = index(d["b"])
+        kind = "实验指导书" if d["d"] == "guide" else "实验报告模板"
+        return FileResponse(p, filename=f"{idx.get('title', '')}-实验{d['l'].replace('_', '.')}-{kind}.docx",
+                            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
     @app.get("/api/v1/textbook-media/{signed}")
     async def media(signed: str):

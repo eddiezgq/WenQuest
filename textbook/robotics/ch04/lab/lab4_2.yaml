@@ -1,0 +1,36 @@
+# 实验 4.2 的指导书与报告模板。目的、场景、参数、任务取自 lab4_2.js。
+原理:
+  - ["物体的姿态用旋转矩阵 R_sb 表示，它的三列依次是物体坐标系 {b} 的三根轴在固定坐标系 {s} 中的分量（式 (4.2.1)）。",
+     "The attitude is the rotation matrix R_sb; its columns are the axes of the body frame {b} written in the fixed frame {s} (Eq. (4.2.1))."]
+  - 式: "Rot(x̂, θ)、Rot(ŷ, θ)、Rot(ẑ, θ)          (4.2.4)、(4.2.5)"
+  - ["再转一次 R 时，有两种情形：绕固定坐标系 {s} 的轴转，新姿态是 R·R_sb（左乘）；绕物体自己的轴转，新姿态是 R_sb·R（右乘）。矩阵乘法一般不能交换次序，所以同样两次转动，次序不同或参照的轴不同，结果可能不同。",
+     "For one more turn R: about an axis of the fixed frame {s}, the new attitude is R·R_sb (left-multiply); about the body's own axis, it is R_sb·R (right-multiply). Matrix products do not commute, so the same two turns can end differently."]
+  - ["由此得到正文的结论：先绕固定轴 x 再绕固定轴 z，得到 Rot(ẑ)Rot(x̂)；先绕自身轴 z 再绕自身轴 x，同样得到 Rot(ẑ)Rot(x̂)。两种做法结果相同，只是次序相反。",
+     "Hence: fixed x then fixed z gives Rot(ẑ)Rot(x̂); body z then body x gives the same product. The two agree, in reverse order."]
+步骤:
+  - ["打开实验 4.2，选择场景“一本书”，按“回到起始”。书平放、书脊朝前（沿 x_s）。记下此时的旋转矩阵（应为单位矩阵）。",
+     "Open Lab 4.2, choose “A book”, press “Back to start”. The book lies flat, spine forward along x_s. Record R (the identity)."]
+  - ["做法 A：先按“绕 x_s 转 90°”，再按“绕 z_s 转 90°”（任务 1）。先预测书脊的方向，再观察；把旋转矩阵抄入表 1。",
+     "Method A: press “90° about x_s”, then “90° about z_s” (task 1). Predict the spine direction first, then look; copy R into Table 1."]
+  - ["按“回到起始”，做法 B：先绕 z_s、再绕 x_s 各转 90°（任务 2）。记录矩阵，与做法 A 比较。",
+     "Back to start. Method B: z_s first, then x_s (task 2). Record R and compare with A."]
+  - ["用式 (4.2.4)、(4.2.5) 手算 Rot(ẑ,90°)Rot(x̂,90°) 和 Rot(x̂,90°)Rot(ẑ,90°)，分别与做法 A、B 的读数比较，判断哪一个对应左乘。",
+     "Compute Rot(ẑ,90°)Rot(x̂,90°) and Rot(x̂,90°)Rot(ẑ,90°) by hand; match them with A and B and decide which corresponds to left-multiplication."]
+  - ["切换到场景“机械臂末端”，按“回到起始”，只用绕自身轴的按钮：先绕 z_b、再绕 x_b（任务 3）。记录矩阵，与做法 A 比较。",
+     "Switch to “Robot tool”, back to start, and use only body-axis buttons: z_b then x_b (task 3). Record R and compare with A."]
+  - ["自选一组三次转动（固定轴与自身轴混用），先手算，再在界面上验证，记入表 2。",
+     "Choose three turns of your own (mixing fixed and body axes); compute first, then check on screen; record in Table 2."]
+数据表:
+  - 标题: ["表 1  两次 90° 转动", "Table 1  Two 90° turns"]
+    表头: ["做法", "按钮次序", "书脊方向（观察）", "旋转矩阵（读数）", "手算的乘积", "是否一致"]
+    行: [["A", "x_s → z_s", "", "", "", ""], ["B", "z_s → x_s", "", "", "", ""], ["自身轴", "z_b → x_b", "", "", "", ""]]
+  - 标题: ["表 2  自选的三次转动", "Table 2  Three turns of your choice"]
+    表头: ["次序", "转动（轴与角）", "左乘还是右乘", "手算结果", "界面读数"]
+    行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""]]
+注意:
+  - ["每做一组之前先按“回到起始”，否则转动会叠加在上一次的结果上。", "Press “Back to start” before each run, or the turns pile up."]
+  - ["“观察方向”只改变看的角度，不改变物体的姿态。", "“View direction” changes only the camera, not the attitude."]
+  - ["记录矩阵时注意正负号；90° 转动的矩阵只含 0 和 ±1。", "Mind the signs; 90° turns give only 0 and ±1."]
+思考题:
+  - ["示教器上的“基坐标系微动”和“工具坐标系微动”分别对应左乘还是右乘？", "Do base-frame and tool-frame jogs on a pendant correspond to left or right multiplication?"]
+  - ["如果两次转动绕的是同一根轴，次序还有影响吗？为什么？", "If both turns are about the same axis, does the order matter? Why?"]

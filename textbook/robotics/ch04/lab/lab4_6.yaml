@@ -1,0 +1,28 @@
+# 实验 4.6 的指导书与报告模板。目的、场景、参数、任务取自 lab4_6.js。
+原理:
+  - ["绕单位轴 ω̂ 转过 θ 的转动，对应单位四元数", "A turn by θ about the unit axis ω̂ corresponds to the unit quaternion"]
+  - 式: "q = (cos(θ/2), sin(θ/2) ω̂)          (4.6.5)"
+  - ["矢量 v 的转动写成 (0, v′) = q (0, v) q*（式 (4.6.6)），由此得到四元数与旋转矩阵的换算式 (4.6.7)。式中每一项都是 q 的分量的二次式，所以 q 和 −q 给出同一个旋转矩阵、同一个姿态。",
+     "A vector turns as (0, v′) = q (0, v) q* (Eq. (4.6.6)), which gives the matrix of Eq. (4.6.7). Every entry is quadratic in q, so q and −q give the same matrix and the same attitude."]
+  - ["因为四元数里出现的是半角 θ/2：转角增加 360° 时，q₀ = cos(θ/2) 从 1 变为 −1，q 变成 −q，姿态复原但四元数没有复原；转角增加 720° 时，q 才回到原值。",
+     "Because of the half angle θ/2, adding 360° turns q₀ = cos(θ/2) from 1 into −1: q becomes −q, the attitude is back but the quaternion is not. Only after 720° does q return."]
+步骤:
+  - ["打开实验 4.6，选择场景“无人机绕竖直轴转”，仰角调到 90°（转轴为竖直方向）。", "Open Lab 4.6, scene “Drone yawing”, elevation 90° (vertical axis)."]
+  - ["把转角依次调到 0°、90°、180°、270°、360°（任务 1）、450°、540°、630°、720°（任务 2），每次记录四元数四个分量和旋转矩阵的第 1 行，填入表 1。先用式 (4.6.5) 预测 q₀，再读数。",
+     "Set the angle to 0°, 90°, …, 360° (task 1), …, 720° (task 2). Each time record q and row 1 of R in Table 1. Predict q₀ with Eq. (4.6.5) first."]
+  - ["画出 q₀ 随转角变化的曲线，并在同一张图上画出 r₁₁ = cos θ，比较两条曲线的周期。", "Plot q₀ against the angle together with r₁₁ = cos θ; compare their periods."]
+  - ["切换到场景“盘子把戏”，任选一个不是 360° 整数倍的转角，把“用 −q 代替 q”设为 1（任务 3），观察画面中的姿态是否改变，记录两种情形下的 q 和 R。",
+     "Switch to “The plate trick”, choose an angle that is not a multiple of 360°, set “use −q” to 1 (task 3); see whether the picture changes, and record q and R in both cases."]
+  - ["自选一个倾斜转轴和转角，用式 (4.6.5) 手算 q，再用式 (4.6.7) 手算 R 的第 1 行，与读数比较，记入表 2。", "Choose a tilted axis and angle; compute q with Eq. (4.6.5) and row 1 of R with Eq. (4.6.7); compare with the screen in Table 2."]
+数据表:
+  - 标题: ["表 1  转角从 0° 到 720°（竖直轴）", "Table 1  Angle from 0° to 720° (vertical axis)"]
+    表头: ["转角 θ / °", "q₀ 预测", "q = (q₀, q₁, q₂, q₃) 读数", "R 第 1 行", "姿态是否与 0° 相同"]
+    行: [["0", "", "", "", "—"], ["90", "", "", "", ""], ["180", "", "", "", ""], ["270", "", "", "", ""], ["360", "", "", "", ""], ["450", "", "", "", ""], ["540", "", "", "", ""], ["630", "", "", "", ""], ["720", "", "", "", ""]]
+  - 标题: ["表 2  q 与 −q；手算与读数", "Table 2  q and −q; by hand and on screen"]
+    表头: ["情形", "转轴与转角", "q", "R 第 1 行", "与读数是否一致"]
+    行: [["用 q", "", "", "", ""], ["用 −q", "", "", "", ""], ["自选（手算）", "", "", "", ""]]
+注意:
+  - ["本书四元数的实部写在最前面：q = (q₀, q₁, q₂, q₃)。有些软件（如部分图形库）把实部放在最后，换算时要注意。", "This book puts the real part first: q = (q₀, q₁, q₂, q₃). Some software puts it last; take care when converting."]
+  - ["读数保留 4 位小数；cos 90° 等值可能显示为极小的数（如 1e-16），按 0 处理。", "Keep 4 decimals; values like cos 90° may show as tiny numbers (e.g. 1e-16) — treat them as 0."]
+思考题:
+  - ["飞控程序在比较两个四元数是否“同一个姿态”时，为什么不能直接比较 q₁ = q₂？应该怎样比较？", "Why can't flight software test whether two quaternions mean the same attitude by q₁ = q₂? How should it compare them?"]

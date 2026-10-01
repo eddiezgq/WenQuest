@@ -1,0 +1,30 @@
+# 实验 4.5 的指导书与报告模板。目的、场景、参数、任务取自 lab4_5.js。
+原理:
+  - ["ZYX 欧拉角（偏航 ψ、俯仰 θ、横滚 φ）把姿态写成三次绕坐标轴转动的乘积：", "ZYX Euler angles (yaw ψ, pitch θ, roll φ) write the attitude as a product of three turns:"]
+  - 式: "R = Rot(ẑ, ψ) Rot(ŷ, θ) Rot(x̂, φ)          (4.5.2)"
+  - ["由 R 反求欧拉角时，按式 (4.5.4)：θ = atan2(−r₃₁, √(r₁₁² + r₂₁²))，ψ = atan2(r₂₁, r₁₁)，φ = atan2(r₃₂, r₃₃)。当 cos θ = 0（俯仰 ±90°）时，r₁₁、r₂₁、r₃₂、r₃₃ 全为零，ψ 和 φ 无法分别求出。",
+     "Recovering the angles uses Eq. (4.5.4). When cos θ = 0 (pitch ±90°), r₁₁, r₂₁, r₃₂, r₃₃ all vanish and ψ, φ cannot be found separately."]
+  - ["俯仰为 90° 时，矩阵化为式 (4.5.5)，只含 ψ − φ：第一次转动（偏航）和第三次转动（横滚）的转轴重合，三个角度只剩两个自由度，这就是万向节锁。在 90° 附近，姿态的微小变化会使反求的 ψ、φ 大幅跳变。",
+     "At 90° pitch the matrix becomes Eq. (4.5.5) and depends only on ψ − φ: the yaw and roll axes coincide, three angles keep only two degrees of freedom. This is gimbal lock. Near 90°, a tiny attitude change makes the recovered ψ and φ jump."]
+步骤:
+  - ["打开实验 4.5，选择场景“飞机姿态”。把俯仰调到 90°、偏航 40°、横滚 10°（任务 1），记录旋转矩阵和反求的 (ψ, θ, φ)。",
+     "Open Lab 4.5, scene “Aircraft attitude”. Set pitch 90°, yaw 40°, roll 10° (task 1); record R and the recovered (ψ, θ, φ)."]
+  - ["保持俯仰 90°，改为偏航 70°、横滚 40°（任务 2），记录矩阵，与上一步比较。再试两组 ψ − φ = 30° 的组合，以及一组 ψ + φ = 50° 的组合，说明哪一种保持矩阵不变。",
+     "Keep pitch 90°, set yaw 70°, roll 40° (task 2) and compare. Try two more pairs with ψ − φ = 30° and one with ψ + φ = 50°; which keeps R unchanged?"]
+  - ["用式 (4.5.5) 手算俯仰 90°、ψ − φ = 30° 时的 R，与读数比较。", "Compute R from Eq. (4.5.5) for pitch 90°, ψ − φ = 30°, and compare."]
+  - ["切换到场景“接近 90° 时”。设俯仰 89.5°、偏航 10°、横滚 20°，再把“再绕地面 x 轴转”调到 0.5°（任务 3），记录反求的偏航变化。",
+     "Switch to “Near 90°”. Set pitch 89.5°, yaw 10°, roll 20°, then the extra turn about ground x to 0.5° (task 3); record the change in recovered yaw."]
+  - ["把俯仰依次改为 80°、85°、88°、89°，每次都加 0.5° 的额外转动，记录偏航的变化，画出“偏航变化—俯仰”曲线，与正文图 4.5.2 比较。",
+     "Repeat with pitch 80°, 85°, 88°, 89°, each with the 0.5° extra turn; plot yaw change against pitch and compare with Fig. 4.5.2."]
+数据表:
+  - 标题: ["表 1  俯仰 90° 时的矩阵", "Table 1  The matrix at 90° pitch"]
+    表头: ["偏航 ψ / °", "横滚 φ / °", "ψ − φ / °", "R（读数）", "反求的 (ψ, θ, φ)", "与第一行是否相同"]
+    行: [["40", "10", "30", "", "", "—"], ["70", "40", "30", "", "", ""], ["", "", "30", "", "", ""], ["", "", "", "", "", ""]]
+  - 标题: ["表 2  接近 90° 时的跳变（额外转动 0.5°）", "Table 2  Jumps near 90° (extra turn 0.5°)"]
+    表头: ["俯仰 θ / °", "加转前的偏航 / °", "加转后的偏航 / °", "偏航变化 / °"]
+    行: [["80", "", "", ""], ["85", "", "", ""], ["88", "", "", ""], ["89", "", "", ""], ["89.5", "", "", ""]]
+注意:
+  - ["额外转动是绕地面 x 轴（固定轴）的转动，不是改变横滚角。", "The extra turn is about the ground x axis (a fixed axis), not a change of roll."]
+  - ["俯仰正好为 90° 时，程序按约定取一组解；不同软件的约定可能不同。", "At exactly 90° the program picks one solution by convention; other software may pick differently."]
+思考题:
+  - ["工程上怎样避免万向节锁？比较“换一种欧拉角约定”和“改用四元数”两种办法的优缺点。", "How do engineers avoid gimbal lock? Compare switching conventions with using quaternions."]

@@ -119,3 +119,24 @@ def test_animations_and_labs_are_packaged_and_checked(book):
     assert "动画 4.1.1：场景程序不能通过渲染服务的检查" in text
     assert "动画 4.1.2：没有场景程序" in text
     assert "实验 4.1：not allowed: network access (fetch)" in text
+
+
+def test_every_lab_has_a_guide_and_a_report_template(book):
+    """第 7 轮第 5 步: lab/NAME.yaml → 实验指导书 and 实验报告模板 (Word); a missing or broken file stops the build."""
+    import docx
+    rep = run(book)
+    assert not rep.errors
+    lab = book.parent / "build" / "robotics" / "lab"
+    for k in range(1, 9):
+        for kind in ("guide", "report"):
+            assert (lab / f"lab4_{k}-{kind}.docx").exists()
+    text = "\n".join(p.text for p in docx.Document(str(lab / "lab4_3-guide.docx")).paragraphs)
+    assert "实验 4.3 找出看不见的转轴" in text and "四、实验步骤" in text and "让一次转动与目标姿态相差不到 1°" in text
+    rtext = "\n".join(p.text for p in docx.Document(str(lab / "lab4_3-report.docx")).paragraphs)
+    assert "九、AI 使用声明" in rtext and "为什么转角为 180° 时" in rtext
+    (book / "ch04" / "lab" / "lab4_2.yaml").unlink()
+    y = book / "ch04" / "lab" / "lab4_3.yaml"
+    y.write_text(y.read_text(encoding="utf-8").replace('["(0.6, 0.8, 0)", "", "", "", ""]', '["(0.6, 0.8, 0)", "", ""]'), encoding="utf-8")
+    text = "\n".join(map(str, run(book).errors))
+    assert "实验 4.2：没有实验说明文件 lab4_2.yaml" in text
+    assert "实验 4.3：lab4_3.yaml“表 2  转了半圈”有一行 3 格，表头是 5 格" in text

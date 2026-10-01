@@ -1,0 +1,31 @@
+# 实验 4.4 的指导书与报告模板。目的、场景、参数、任务取自 lab4_4.js。
+原理:
+  - ["矢量 v 绕单位轴 ω̂ 转过 θ：把 v 分成沿轴的分量和垂直于轴的分量，沿轴的分量不变，垂直的分量在垂直于轴的平面内转过 θ。合起来就是罗德里格斯公式的矢量形式（式 (4.4.2)）。",
+     "Turning v by θ about the unit axis ω̂: split v along and across the axis; the part along stays, the part across turns by θ in the plane. Together this is Rodrigues' formula in vector form (Eq. (4.4.2))."]
+  - ["用反对称矩阵 [ω̂] 表示叉乘 ω̂ × v（式 (4.4.3)），就得到矩阵形式：", "Writing ω̂ × v as [ω̂]v (Eq. (4.4.3)) gives the matrix form:"]
+  - 式: "Rot(ω̂, θ) = I + sin θ [ω̂] + (1 − cos θ) [ω̂]²          (4.4.5)"
+  - ["反过来由 R 求轴：R − Rᵀ = 2 sin θ [ω̂]（式 (4.4.10)），所以 sin θ ≠ 0 时 [ω̂] = (R − Rᵀ)/(2 sin θ)（式 (4.4.11)）。θ = 180° 时 sin θ = 0，R − Rᵀ 变成零矩阵，必须改用 ω̂ω̂ᵀ = (R + I)/2（式 (4.4.12)）。",
+     "Backwards: R − Rᵀ = 2 sin θ [ω̂] (Eq. (4.4.10)), so [ω̂] = (R − Rᵀ)/(2 sin θ) when sin θ ≠ 0 (Eq. (4.4.11)). At 180°, R − Rᵀ vanishes; use ω̂ω̂ᵀ = (R + I)/2 instead (Eq. (4.4.12))."]
+步骤:
+  - ["打开实验 4.4，选择场景“绕倾斜方向转工具”。把仰角调到 90°（转轴为 z 轴），转角调到 30°。用式 (4.4.5) 手算 R，与读数和 Rot(ẑ, 30°) 比较（任务 1）。",
+     "Open Lab 4.4, scene “Turn the tool about a tilted axis”. Set elevation 90° (axis z) and angle 30°. Compute R with Eq. (4.4.5) and compare with the reading and Rot(ẑ, 30°) (task 1)."]
+  - ["自选一个倾斜的转轴（例如方位角 30°、仰角 40°）和转角 15°，按式 (4.4.5) 分三项手算 I、sin θ[ω̂]、(1 − cos θ)[ω̂]²，再相加，与读数比较，记入表 1。",
+     "Pick a tilted axis (e.g. azimuth 30°, elevation 40°) and 15°. Compute the three terms of Eq. (4.4.5), add them, compare with the reading; record in Table 1."]
+  - ["由读出的 R，用式 (4.3.2) 和 (4.4.11) 反求转角和转轴，检验与所设的一致。",
+     "From the reading of R, recover θ and ω̂ with Eqs. (4.3.2) and (4.4.11), and check them against your settings."]
+  - ["切换到场景“立方体沿对角线转”。调节转轴与转角，使 R 只含 0 和 1（任务 2：(1,1,1) 方向，即方位角 45°、仰角约 35.3°，转 120°）。说明三根坐标轴怎样轮换。",
+     "Switch to “A cube about its diagonal”. Make R contain only 0 and 1 (task 2: axis (1,1,1), azimuth 45°, elevation about 35.3°, 120°). Describe how the axes trade places."]
+  - ["回到第一个场景，把转角调到 180°（任务 3），观察 R − Rᵀ 变为零；改用式 (4.4.12) 由 R 求出转轴，记入表 2。",
+     "Back in the first scene set 180° (task 3); see R − Rᵀ become zero; recover the axis from Eq. (4.4.12) instead; record in Table 2."]
+数据表:
+  - 标题: ["表 1  罗德里格斯公式的三项", "Table 1  The three terms of Rodrigues' formula"]
+    表头: ["转轴 ω̂", "θ", "sin θ[ω̂]", "(1 − cos θ)[ω̂]²", "手算 R", "读数 R"]
+    行: [["(0, 0, 1)", "30°", "", "", "", ""], ["", "15°", "", "", "", ""], ["(1,1,1)/√3", "120°", "", "", "", ""]]
+  - 标题: ["表 2  由 R 反求轴和角", "Table 2  Axis and angle from R"]
+    表头: ["设定的轴与角", "tr R", "由式 (4.3.2) 得 θ", "由式 (4.4.11) 或 (4.4.12) 得 ω̂", "是否一致"]
+    行: [["", "", "", "", ""], ["", "", "", "", ""], ["θ = 180°", "", "", "", ""]]
+注意:
+  - ["[ω̂]² 不是把 [ω̂] 的每个元素平方，而是矩阵自乘；可用式 (4.4.4) 核对：[ω̂]² = ω̂ω̂ᵀ − I。", "[ω̂]² is the matrix squared, not each entry squared; check with Eq. (4.4.4): [ω̂]² = ω̂ω̂ᵀ − I."]
+  - ["由式 (4.4.12) 求得的 ω̂ 有正负两个解，在 θ = 180° 时两个都对。", "Eq. (4.4.12) gives ω̂ up to sign; at 180° both signs are correct."]
+思考题:
+  - ["把转角从 179° 逐渐调到 180°，用式 (4.4.11) 求出的轴为什么越来越不可靠？", "As θ goes from 179° to 180°, why does Eq. (4.4.11) become less and less reliable?"]

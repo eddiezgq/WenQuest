@@ -1,0 +1,33 @@
+# 实验 4.3 的指导书与报告模板。目的、场景、参数、任务取自 lab4_3.js。
+原理:
+  - ["欧拉转动定理（定理 4.3.1）：任何转动都是绕某一根轴转过一个角度。转轴方向 ω̂ 是 R 的特征值 1 对应的特征向量，满足 Rω̂ = ω̂。",
+     "Euler's rotation theorem (Theorem 4.3.1): every rotation is a turn by some angle about some axis. The axis ω̂ is the eigenvector of R for eigenvalue 1: Rω̂ = ω̂."]
+  - ["转角可以由矩阵的迹求出。迹不随坐标系改变，在以转轴为 z 轴的坐标系中，迹为 1 + 2cos θ，所以",
+     "The angle follows from the trace, which does not depend on the frame; with the axis as z the trace is 1 + 2cos θ, so"]
+  - 式: "tr R = 1 + 2cos θ，  θ = arccos[(tr R − 1)/2]          (4.3.2)"
+  - ["转轴有方向相反的两个单位解，应取使转角为正的那一个；转角为 180° 时，两个方向给出同一个转动，都对。",
+     "The axis has two opposite unit solutions; take the one that makes θ positive. At 180° both directions give the same rotation."]
+  - ["界面用方位角 α 和仰角 β 表示转轴方向：ω̂ = (cos β cos α, cos β sin α, sin β)。", "The screen sets the axis by azimuth α and elevation β: ω̂ = (cos β cos α, cos β sin α, sin β)."]
+步骤:
+  - ["打开实验 4.3，选择场景“两步转动的结果”。目标姿态是算例 4.3.1 的 R：先绕 z 转 30°，再绕自身 x 轴转 45°。",
+     "Open Lab 4.3, scene “Result of two turns”. The target is R of Example 4.3.1: 30° about z, then 45° about the body x."]
+  - ["先不计算，只看画面，调节转轴的方位角、仰角和转角，使“与目标相差”小于 1°（任务 1）。记录你找到的轴和角，以及用了几次尝试。",
+     "Without calculating, adjust azimuth, elevation and angle until “off the target” is below 1° (task 1). Record the axis, the angle and how many tries it took."]
+  - ["读出目标 R 的迹，用式 (4.3.2) 手算转角（任务 2），与你找到的转角和算例 4.3.1 的结果比较。",
+     "Read the trace of the target, compute θ with Eq. (4.3.2) (task 2), and compare with your angle and Example 4.3.1."]
+  - ["把你找到的转轴换算成单位矢量，与算例 4.3.1 的 ω̂ 比较，计算二者的夹角。",
+     "Convert your axis to a unit vector and compare it with ω̂ of Example 4.3.1; compute the angle between them."]
+  - ["切换到场景“转了半圈”。目标是绕 (0.6, 0.8, 0) 转 180°。先用方位角 53°、仰角 0°、转角 180° 与目标重合（任务 3），再用相反方向（方位角 −127°）验证同样重合（任务 4）。",
+     "Switch to “Half a turn”: 180° about (0.6, 0.8, 0). Match it with azimuth 53°, elevation 0°, angle 180° (task 3), then with the opposite direction, azimuth −127° (task 4)."]
+数据表:
+  - 标题: ["表 1  两步转动的结果", "Table 1  Result of two turns"]
+    表头: ["量", "凭观察找到", "按式 (4.3.2) 计算", "算例 4.3.1", "差值"]
+    行: [["转角 θ / °", "", "", "", ""], ["转轴方位角 / °", "", "—", "", ""], ["转轴仰角 / °", "", "—", "", ""], ["目标 R 的迹", "—", "", "", ""]]
+  - 标题: ["表 2  转了半圈", "Table 2  Half a turn"]
+    表头: ["转轴", "方位角 / °", "仰角 / °", "转角 / °", "与目标相差 / °"]
+    行: [["(0.6, 0.8, 0)", "", "", "", ""], ["(−0.6, −0.8, 0)", "", "", "", ""]]
+注意:
+  - ["计算 arccos 前，先确认 (tr R − 1)/2 在 [−1, 1] 内；数值误差可能使它略超出。", "Before arccos, make sure (tr R − 1)/2 lies in [−1, 1]; rounding can push it outside."]
+  - ["“与目标相差”是两个姿态之间的转角（式 (4.8.2)），不是三个角度的差。", "“Off the target” is the angle between two attitudes (Eq. (4.8.2)), not a difference of three angles."]
+思考题:
+  - ["转角接近 0° 时，凭观察找转轴为什么特别困难？与正文中“由特征向量求轴在数值上不稳定”有什么联系？", "Why is the axis hard to find by eye when θ is near 0°? How does this relate to the numerical instability mentioned in the text?"]

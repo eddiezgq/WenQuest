@@ -1,0 +1,34 @@
+# 实验 4.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab4_1.js。
+原理:
+  - ["零件绕吸盘中心 O 转动时，零件上每一点到 O 的距离不变，只是方位角增加了转角 θ。把角点 P 写成极坐标 x = r cos φ、y = r sin φ，转动后变为 x′ = r cos(φ + θ)、y′ = r sin(φ + θ)，用和角公式展开，就得到正文的式 (4.1.4)。",
+     "When the part turns about the suction-cup centre O, every point keeps its distance to O and its direction angle grows by θ. With x = r cos φ, y = r sin φ, the turned point is x′ = r cos(φ + θ), y′ = r sin(φ + θ); expanding gives Eq. (4.1.4)."]
+  - 式: "p′ = R(θ) p，  R(θ) = [cos θ  −sin θ;  sin θ  cos θ]          (4.1.5)"
+  - ["旋转矩阵的第 1 列是转动后的 x 轴在原坐标系中的分量，第 2 列是转动后的 y 轴的分量。因此只要读出两列，就能画出转动后的坐标轴。",
+     "Column 1 of the rotation matrix is the turned x axis written in the original frame; column 2 is the turned y axis. Reading the two columns is enough to draw the turned axes."]
+  - ["同一个转动矩阵有两种用法：零件转动、坐标系不动时，R 把转动前的坐标变成转动后的坐标（主动观点）；零件不动、坐标系 {b} 相对 {a} 转过 θ 时，同一点在 {b} 中的分量是 p_b = R_abᵀ p_a（被动观点，式 (4.1.6)）。两者相差一个转置。",
+     "The same matrix is used in two ways: if the part turns and the frame stays, R maps old coordinates to new ones (active view); if the part stays and frame {b} is turned by θ from {a}, the point's components in {b} are p_b = R_abᵀ p_a (passive view, Eq. (4.1.6)). The two differ by a transpose."]
+步骤:
+  - ["打开实验 4.1，选择场景“零件转动（主动）”。先把转角调到 0°，记下角点 P 的坐标 (0.2, 0.1) m 和 P 到 O 的距离。",
+     "Open Lab 4.1, choose “Part turns (active)”. At θ = 0° record corner P = (0.2, 0.1) m and its distance to O."]
+  - ["先用式 (4.1.4) 手算转角为 30° 时 P′ 的坐标，填入表 1；再把转角调到 30°，读出界面上的值，比较二者。观察零件长边是否与托盘边平行（任务 1）。",
+     "Compute P′ for θ = 30° with Eq. (4.1.4) by hand, enter it in Table 1; then set 30°, read the screen and compare. Check that the long edge is parallel to the tray (task 1)."]
+  - ["依次把转角调到 60°、90°、−45°，在表 1 中记录 R(θ) 和 P 到 O 的距离，验证距离始终不变。",
+     "Set θ to 60°, 90°, −45°; record R(θ) and the distance in Table 1, and confirm the distance never changes."]
+  - ["找出使旋转矩阵第 1 列等于 (0, 1) 的转角（任务 2）。在坐标纸上只根据矩阵的两列画出转动后的两根坐标轴，再与屏幕对照。",
+     "Find the angle that makes column 1 equal to (0, 1) (task 2). Using only the two columns, draw the turned axes on paper and compare with the screen."]
+  - ["切换到场景“坐标系转动（被动）”，把转角调到 30°（任务 3）。读出 P 在 {b} 中的分量，填入表 2；再用 p_b = R_abᵀ p_a 手算一次，比较。",
+     "Switch to “Frame turns (passive)” and set 30° (task 3). Read P in {b}, enter it in Table 2, and check it with p_b = R_abᵀ p_a."]
+数据表:
+  - 标题: ["表 1  零件转动（主动）", "Table 1  The part turns (active)"]
+    表头: ["转角 θ", "R(θ) 第 1 列", "R(θ) 第 2 列", "P′ 手算 / m", "P′ 读数 / m", "P 到 O 的距离 / m"]
+    行: [["0°", "", "", "", "", ""], ["30°", "", "", "", "", ""], ["60°", "", "", "", "", ""], ["90°", "", "", "", "", ""], ["−45°", "", "", "", "", ""]]
+  - 标题: ["表 2  坐标系转动（被动），θ = 30°", "Table 2  The frame turns (passive), θ = 30°"]
+    表头: ["量", "手算", "读数", "与表 1 中 30° 一行比较"]
+    行: [["P 在 {b} 中的分量 / m", "", "", ""], ["所用矩阵", "R_abᵀ", "—", ""]]
+注意:
+  - ["转角的正方向是逆时针（从 z 轴正向往下看）。负的转角表示顺时针转动。", "Positive angles are counter-clockwise (seen from +z); negative angles turn clockwise."]
+  - ["手算时保留 4 位小数，与界面读数相差在最后一位以内即可认为一致。", "Keep 4 decimals by hand; agreement within the last digit counts as equal."]
+  - ["主动与被动两种观点用的是同一个矩阵的不同用法，记录时写清楚是哪一种。", "Active and passive views use the same matrix in different ways; label which one you record."]
+思考题:
+  - ["转角为 θ 和 −θ 的两个旋转矩阵是什么关系？用表 1 的数据说明。", "How are the matrices for θ and −θ related? Use Table 1."]
+  - ["托盘边倾斜 30°，零件也可以转 −150° 放进去吗？对吸盘上的气管走线有什么影响？", "With the tray at 30°, could the part also go in after −150°? What would that mean for the suction hose?"]

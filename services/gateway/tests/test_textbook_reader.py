@@ -143,3 +143,14 @@ def test_virtual_labs_open_from_the_page(client, tmp_path):
     assert r.status_code == 200 and "虚拟实验" in r.text and "default-src 'none'" in r.headers["content-security-policy"]
     mp = client.get("/api/v1/textbooks/robotics/sections/4.1?mp=true", headers=hs).json()["html"]
     assert "请在网页端打开虚拟实验" in mp
+    assert "wq-labdoc" not in html                                # no guide built yet: no links
+    (tmp_path / "robotics" / "lab" / "lab4_1-guide.docx").write_bytes(b"PK-GUIDE")
+    (tmp_path / "robotics" / "lab" / "lab4_1-report.docx").write_bytes(b"PK-REPORT")
+    html = client.get("/api/v1/textbooks/robotics/sections/4.1", headers=hs).json()["html"]
+    assert "实验指导书（Word）" in html and "实验报告模板（Word）" in html
+    links = [h.split("'")[0] for h in html.split("class='wq-labdoc' href='")[1:]]
+    g = client.get(links[0][links[0].index("/api/"):])
+    assert g.status_code == 200 and g.content == b"PK-GUIDE" and "wordprocessingml" in g.headers["content-type"]
+    assert "filename*=utf-8''" in g.headers["content-disposition"].lower()
+    assert client.get(links[1][links[1].index("/api/"):]).content == b"PK-REPORT"
+    assert client.get("/api/v1/textbook-labdoc/garbage").status_code == 410

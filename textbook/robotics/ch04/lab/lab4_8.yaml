@@ -1,0 +1,27 @@
+# 实验 4.8 的指导书与报告模板。目的、场景、参数、任务取自 lab4_8.js。
+原理:
+  - ["控制器每个周期用陀螺仪或指令的角速度 ω_b 更新姿态。若用一阶近似", "Each cycle the controller updates the attitude with the body angular velocity ω_b. With the first-order step"]
+  - 式: "R_{k+1} = R_k (I + [ω_b] Δt)          (4.8.6)"
+  - ["I + [ω_b]Δt 不是旋转矩阵：它的各列长度略大于 1。误差一步只有 Δt² 量级，但累积起来使 RᵀR 逐渐偏离 I，坐标轴不再互相垂直、长度不再为 1。若每步改用罗德里格斯公式 Rot(ω̂_b, |ω_b|Δt)，每一步都是精确的转动，只剩舍入误差。",
+     "I + [ω_b]Δt is not a rotation: its columns are slightly longer than 1. The error per step is of order Δt², but it accumulates and RᵀR drifts from I. With Rodrigues' formula each step is an exact rotation and only rounding error remains."]
+  - ["把偏离的矩阵拉回 SO(3)，最好的办法是奇异值分解 R = UΣVᵀ，再取", "The best way back to SO(3) is the SVD R = UΣVᵀ, then"]
+  - 式: "R = U diag(1, 1, det(UVᵀ)) Vᵀ          (4.8.7)"
+  - ["它是在所有旋转矩阵中与原矩阵最接近的一个（定理 4.8.1）。也可以用格拉姆-施密特正交化，计算更快，但结果依赖于先处理哪一列。", "It is the closest rotation (Theorem 4.8.1). Gram–Schmidt is faster but depends on which column comes first."]
+步骤:
+  - ["打开实验 4.8，选择场景“控制器里的姿态更新”。角速度 ω_b = (0.3, −0.5, 0.8) rad/s。设 Δt = 10 ms、更新方法 0（一阶近似）、正交化周期 0，按“运行 20 s”（任务 1），记录 RᵀR 偏离 I 的最大值和三根轴的长度。",
+     "Open Lab 4.8, scene “Attitude update in a controller”, ω_b = (0.3, −0.5, 0.8) rad/s. Set Δt = 10 ms, method 0, no re-orthonormalization, press “Run 20 s” (task 1); record the maximum deviation and the axis lengths."]
+  - ["保持一阶近似，把 Δt 依次设为 20、10、5、2、1 ms，记录 20 s 后的偏差，填入表 1，在对数坐标中画出“偏差—步长”曲线，求出斜率。", "Keep method 0 and use Δt = 20, 10, 5, 2, 1 ms; record the drift after 20 s in Table 1 and plot it against Δt on log axes; find the slope."]
+  - ["改用罗德里格斯公式（更新方法 1），Δt = 10 ms，再运行 20 s（任务 2），记录偏差。", "Switch to Rodrigues (method 1), Δt = 10 ms, run 20 s (task 2), record the drift."]
+  - ["切换到场景“手机里的陀螺仪”，一阶近似、Δt = 10 ms，正交化周期依次设为 200、100、50、20 步（任务 3），记录偏差，填入表 2。", "Switch to “A phone's gyroscope”, method 0, Δt = 10 ms, re-orthonormalize every 200, 100, 50, 20 steps (task 3); record the drift in Table 2."]
+数据表:
+  - 标题: ["表 1  一阶近似：步长与漂移（不正交化，运行 20 s）", "Table 1  First-order step: drift vs step size (no fix, 20 s)"]
+    表头: ["Δt / ms", "更新次数", "RᵀR 偏离 I 的最大值", "三根轴的长度"]
+    行: [["20", "", "", ""], ["10", "", "", ""], ["5", "", "", ""], ["2", "", "", ""], ["1", "", "", ""]]
+  - 标题: ["表 2  更新方法与正交化周期（Δt = 10 ms，运行 20 s）", "Table 2  Method and re-orthonormalization (Δt = 10 ms, 20 s)"]
+    表头: ["更新方法", "正交化周期 / 步", "RᵀR 偏离 I 的最大值", "是否小于 0.5%"]
+    行: [["罗德里格斯", "0", "", ""], ["一阶近似", "200", "", ""], ["一阶近似", "100", "", ""], ["一阶近似", "50", "", ""], ["一阶近似", "20", "", ""]]
+注意:
+  - ["“偏离 I 的最大值”指 RᵀR − I 各元素绝对值的最大值，0.01 即 1%。", "“Maximum deviation” is the largest |entry| of RᵀR − I; 0.01 means 1%."]
+  - ["步长很小时运行会慢一些，等“模拟时间”到 20 s 再读数。", "Small steps run slower; wait until simulated time reaches 20 s before reading."]
+思考题:
+  - ["真实控制器的周期常为 1 ms 甚至更短。按表 1 的规律，连续运行一小时不做正交化，偏差大约是多少？这说明什么？", "Real controllers run at 1 ms or faster. Using Table 1, roughly how large would the drift be after an hour without re-orthonormalization? What does that tell you?"]
