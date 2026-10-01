@@ -79,7 +79,7 @@ jobs:
           v = os.environ["VER"]
           i = json.load(open("library/%s/index.json" % v))
           r = json.load(open("report.json"))
-          print("问渠零件库 %s（第一期）\n" % v)
+          print("问渠零件库 %s\n" % v)
           print("- 条目 %d 个，规格 %d 个；生成用时 %d 秒" % (i["count"]["entries"], i["count"]["items"], r["seconds"]))
           for c in i.get("collections", []):
               print("- 另收 %s 索引：%d 个零件（%s，只含索引与缩略图，模型从原仓库下载）" % (c["name"]["zh"], c["count"], c["license"]))
