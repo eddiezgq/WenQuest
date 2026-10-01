@@ -64,7 +64,14 @@ jobs:
           npm ci --no-audit --no-fund
           pip install -q markdown-it-py pyyaml numpy pytest
           python -m pytest -q tests
-          python build.py robotics
+          python build.py robotics --pdf
+      - name: Keep the built textbooks for the deploy
+        uses: actions/upload-artifact@v4
+        with:
+          name: textbook
+          path: |
+            textbook/build/
+            !textbook/build/*/values/
       - name: Web app tests and builds (web + WeChat mini program)
         working-directory: apps/web
         run: npm ci --no-audit --no-fund && npm test && npm run build:h5 && npm run build:mp-weixin
@@ -196,6 +203,19 @@ jobs:
         run: |
           tar czf - docker-compose.yml docker-compose.prod.yml .env.example deploy site \
             | ssh "deploy@$HOST" 'tar xzf - -C /opt/wenquest && chmod +x /opt/wenquest/deploy/*.sh'
+
+      - name: Get the built textbooks
+        if: env.SKIP != '1'
+        uses: actions/download-artifact@v4
+        with:
+          name: textbook
+          path: textbook-build
+
+      - name: Copy the textbooks (read by the gateway from /opt/wenquest/textbook)
+        if: env.SKIP != '1'
+        run: |
+          books=$(ls textbook-build)
+          tar czf - -C textbook-build . | ssh "deploy@$HOST" "set -e; mkdir -p /opt/wenquest/textbook; cd /opt/wenquest/textbook; for b in $books; do rm -rf \"\$b\"; done; tar xzf -"
 
       - name: Update the server
         if: env.SKIP != '1'

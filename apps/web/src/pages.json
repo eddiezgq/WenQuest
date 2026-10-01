@@ -136,6 +136,15 @@
       }
     },
     {
+      "path": "pages/textbook/textbook",
+      "style": {
+        "navigationBarTitleText": "教材",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
       "path": "pages/committee/committee",
       "style": {
         "navigationBarTitleText": "课程审核",

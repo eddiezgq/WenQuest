@@ -53,6 +53,8 @@ class Settings(BaseSettings):
     factory_url: str = ""
     factory_read_key: str = ""
     labcheck_timeout: float = 150.0
+    # Built textbooks (textbook/ in the repository, built by CI): <dir>/<book>/web/index.json …
+    textbook_dir: str = "/textbook"
     data_dir: str = "/tmp/wq-data"  # converted slides and small settings; a persistent volume in production
 
     # --- accounts: sign-up, email codes, teacher approval (app/accounts.py) ---

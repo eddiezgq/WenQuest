@@ -35,10 +35,10 @@ def edit(root, old, new, path="ch04/04-1.md"):
     p.write_text(t.replace(old, new, 1), encoding="utf-8")
 
 
-def test_the_real_book_passes_and_is_in_line_with_the_outline():
-    rep = build.build("robotics")
+def test_the_real_book_passes_and_is_in_line_with_the_outline(tmp_path):
+    out = tmp_path / "out"
+    rep = build.build("robotics", out_dir=out)
     assert not rep.errors, "\n".join(map(str, rep.errors))
-    out = TOOLS.parent / "build" / "robotics"
     frag = (out / "web" / "4.1.html").read_text(encoding="utf-8")
     assert "<svg" in frag and "x_p = 0.123205" in frag and "{{" not in frag   # numbers in formulas are SVG glyphs
     assert "WQMATH" not in frag and "WQTOKEN" not in frag

@@ -78,9 +78,12 @@ services:
       # Digital factory course API (docs/方案/数字工厂资源接口约定.md §3): read-only key copied by deploy/update.sh.
       WQ_FACTORY_URL: ${WQ_FACTORY_URL:-}
       WQ_FACTORY_READ_KEY: ${WQ_FACTORY_READ_KEY:-}
+      WQ_TEXTBOOK_DIR: /textbook
     volumes:
       # Uploaded materials, course generation progress and converted slides survive redeploys.
       - gatewaydata:/data
+      # 问渠教材: built from textbook/ by CI and copied next to this file (第 7 轮).
+      - ./textbook:/textbook:ro
     networks:
       - default
       - render

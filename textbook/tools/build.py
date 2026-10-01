@@ -66,6 +66,7 @@ class Section:
     path: Path
     source: str
     html: str = ""
+    html_mp: str = ""
     defines: set = field(default_factory=set)
 
 
@@ -281,24 +282,55 @@ def render_section(sec: Section, text: str, values: dict, rep: Report, formulas:
     return out
 
 
-def typeset(formulas: list, rep: Report) -> list[str]:
-    if not formulas:
-        return []
-    r = subprocess.run(["node", str(TOOLS / "tex2svg.mjs")], input=json.dumps([{"tex": f[1], "display": f[2]} for f in formulas]),
-                       capture_output=True, text=True, timeout=600)
+def _mathjax(items: list[dict], rep: Report) -> list[dict] | None:
+    r = subprocess.run(["node", str(TOOLS / "tex2svg.mjs")], input=json.dumps(items), capture_output=True, text=True, timeout=600)
     if r.returncode != 0:
         rep.add("error", "公式", "排版", "MathJax 运行失败：" + r.stderr[-300:] + "（先在 textbook/tools 运行 npm ci）")
-        return ["" for _ in formulas]
-    res = json.loads(r.stdout)
-    svgs = []
-    for (sid, tex, disp), x in zip(formulas, res):
+        return None
+    return json.loads(r.stdout)
+
+
+def as_img(svg: str, cls: str) -> str:
+    """An SVG formula as an <img> (the mini program's rich-text cannot show inline SVG): size kept in ex units."""
+    import base64
+    style = []
+    for attr in ("width", "height"):
+        m = re.search(attr + r'="([\d.]+ex)"', svg)
+        if m:
+            style.append(f"{attr}:{m.group(1)}")
+    m = re.search(r'vertical-align:\s*(-?[\d.]+ex)', svg)
+    if m:
+        style.append(f"vertical-align:{m.group(1)}")
+    data = base64.b64encode(svg.encode()).decode()
+    return f"<img class='{cls}' style='{';'.join(style)}' src='data:image/svg+xml;base64,{data}'/>"
+
+
+def typeset(formulas: list, rep: Report) -> tuple[list[str], list[str]]:
+    """(web, mini program) renderings of every formula. Numbered display formulas are typeset a second time without
+    \\tag for the mini program, where the number is written beside the image."""
+    if not formulas:
+        return [], []
+    res = _mathjax([{"tex": f[1], "display": f[2]} for f in formulas], rep)
+    if res is None:
+        return ["" for _ in formulas], ["" for _ in formulas]
+    tagged = [i for i, f in enumerate(formulas) if f[2] and TAG.search(f[1])]
+    plain = _mathjax([{"tex": TAG.sub("", formulas[i][1]), "display": True} for i in tagged], rep) or []
+    plain_of = dict(zip(tagged, plain))
+    web, mp = [], []
+    for i, ((sid, tex, disp), x) in enumerate(zip(formulas, res)):
         if "error" in x:
             rep.add("error", "公式", sid, f"{x['error']}：{tex[:80]}")
-            svgs.append(f"<code>{html.escape(tex)}</code>")
+            web.append(f"<code>{html.escape(tex)}</code>")
+            mp.append(f"<code>{html.escape(tex)}</code>")
+            continue
+        cls = "wq-md" if disp else "wq-mi"
+        web.append(f"<span class='{cls}'>{x['svg']}</span>")
+        if i in plain_of and "svg" in plain_of[i]:
+            tag = TAG.search(tex).group(1)
+            mp.append(f"{as_img(plain_of[i]['svg'], cls)}<span class='wq-tagno'>({tag})</span>")
         else:
-            cls = "wq-md" if disp else "wq-mi"
-            svgs.append(f"<span class='{cls}'>{x['svg']}</span>")
-    return svgs
+            mp.append(as_img(x["svg"], cls))
+    return web, mp
 
 
 # ---------------------------------------------------------------- checks
@@ -437,8 +469,9 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         check_terms(sec, terms, rep)
         sec.html = render_section(sec, fill(sec, values, rep), values, rep, formulas)
     check_refs(sections, book, rep)
-    svgs = typeset(formulas, rep)
+    svgs, imgs = typeset(formulas, rep)
     for sec in sections:
+        sec.html_mp = re.sub(r"WQMATH(\d+)Z", lambda m: imgs[int(m.group(1))], sec.html)
         sec.html = re.sub(r"WQMATH(\d+)Z", lambda m: svgs[int(m.group(1))], sec.html)
 
     out = out_dir or (book["root"].parent / "build" / book_name)
@@ -453,10 +486,14 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     for sec in sections:
         frag = f"<section class='wq-sec' id='sec-{sec.id}'><h2>{sec.id}　{html.escape(sec.title)}</h2>{sec.html}</section>"
         (web / f"{sec.id}.html").write_text(frag, encoding="utf-8")
+        (web / f"{sec.id}.mp.html").write_text(
+            f"<section class='wq-sec'><h2>{sec.id}　{html.escape(sec.title)}</h2>{sec.html_mp}</section>", encoding="utf-8")
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     by_ch: dict[int, list[Section]] = {}
     for sec in sections:
         by_ch.setdefault(sec.chapter, []).append(sec)
+    index["pdf"] = sorted(by_ch) if pdf and not rep.errors else []
+    (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     for ch, secs in by_ch.items():
         body = (f"<h1>第 {ch} 章　{html.escape(titles[ch])}</h1>"
                 + "".join(f"<section class='wq-sec'><h2>{s.id}　{html.escape(s.title)}</h2>{s.html}</section>" for s in secs))

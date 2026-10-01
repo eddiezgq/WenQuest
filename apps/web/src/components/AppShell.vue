@@ -30,6 +30,10 @@
         <text class="gicon">☷</text>
         <text class="glabel">{{ t("catalog.nav") }}</text>
       </view>
+      <view v-if="user" class="gitem" :class="{ on: nav === 'textbook' }" @click="go('textbook')">
+        <text class="gicon">❏</text>
+        <text class="glabel">{{ t("book.nav") }}</text>
+      </view>
       <view v-if="user && user.can_create_courses" class="gitem" :class="{ on: nav === 'create' }" @click="go('create')">
         <text class="gicon">✦</text>
         <text class="glabel">{{ t("create.button") }}</text>
@@ -133,7 +137,7 @@ const menu = computed(() => (props.course ? courseMenu(props.course) : []));
 function go(where: string) {
   accountOpen.value = false;
   if (where === "create") return uni.reLaunch({ url: "/pages/studio/studio" });
-  if (["catalog", "admin", "apply", "committee"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
+  if (["catalog", "admin", "apply", "committee", "textbook"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
   if (["calendar", "inbox", "help"].includes(where)) return uni.reLaunch({ url: `/pages/hub/hub?view=${where}` });
   uni.reLaunch({ url: where === "courses" ? "/pages/courses/courses?view=all" : "/pages/courses/courses" });
 }

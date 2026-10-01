@@ -147,6 +147,11 @@ export interface ReviewFlow {
   state: "" | "prereviewed" | "submitted" | "returned" | "approved"; prereview?: ReviewOpinion; note?: string;
   history: { ts: number; who: string; action: string; comment: string }[];
 }
+export interface TextbookSectionRef { id: string; title: string; written?: boolean; chapter?: number }
+export interface TextbookChapter { no: number; title: string; level: string; part: string; sections: TextbookSectionRef[] }
+export interface TextbookIndex { book: string; title: string; parts: { title: string }[]; chapters: TextbookChapter[]; teacher: boolean; pdf: number[] }
+export interface TextbookSection { id: string; title: string; chapter: { no: number; title: string }; html: string;
+  prev: TextbookSectionRef | null; next: TextbookSectionRef | null }
 export interface CommitteeItem { pid: string; lid: string; course: Text; chapter: Text; no: string; title: Text; teacher: string; state: string; submitted?: number; verdict: string }
 export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[]; confirmed?: boolean; ready?: boolean }
 /** 课程负责人的提议: what the lead will do once the teacher confirms. */
@@ -456,6 +461,12 @@ export const api = {
   adminCommittee: () => request<{ members: { id: number; name: string; email: string; key?: string }[]; chair: number; self_review: boolean }>("GET", "/api/v1/admin/committee"),
   adminSetCommittee: (members: string[], chair: string, self_review: boolean) =>
     request<{ members: { id: number; name: string; email: string; key?: string }[]; chair: number; self_review: boolean }>("PUT", "/api/v1/admin/committee", { members, chair, self_review }),
+  // 问渠教材（第 7 轮）
+  textbooks: () => request<{ books: { book: string; title: string; chapters: number; sections: number; written: number }[] }>("GET", "/api/v1/textbooks"),
+  textbook: (book: string) => request<TextbookIndex>("GET", `/api/v1/textbooks/${book}`),
+  textbookSection: (book: string, sid: string, mp = false) =>
+    request<TextbookSection>("GET", `/api/v1/textbooks/${book}/sections/${sid}${mp ? "?mp=true" : ""}`),
+  textbookPdf: (book: string, chapter: number) => request<{ url: string }>("GET", `/api/v1/textbooks/${book}/pdf/${chapter}`),
   studioConfirmChapter: (id: string, no: number) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/chapters/${no}/confirm`, {}),
   studioPace: (id: string, mode: "manual" | "daily", hour: number, tz: string) =>
     request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/pace`, { mode, hour, tz }),
