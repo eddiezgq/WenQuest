@@ -744,6 +744,169 @@ fanuc_m710ic_description:
   - /meshes/m710ic50/visual/link_4.stl
   - /meshes/m710ic50/visual/link_5.stl
   - /meshes/m710ic50/visual/link_6.stl
+flexiv_description:
+  url: https://github.com/flexivrobotics/flexiv_description.git
+  commit: f33331a7f75b9a25ec903674595ddfebbe1fb998
+  sparse:
+  - /*
+  - '!*.stl'
+  - '!*.STL'
+  - '!*.dae'
+  - '!*.DAE'
+  - '!*.obj'
+  - '!*.OBJ'
+  - '!*.ply'
+  - '!*.PLY'
+  - '!*.glb'
+  - '!*.gltf'
+  - '!*.png'
+  - '!*.jpg'
+  - '!*.usd'
+  - '!*.usda'
+  - '!*.usdc'
+  - /LICEN[CS]E*
+  - /COPYING*
+  - /meshes/Enlight-L/collision/link0.stl
+  - /meshes/Enlight-L/collision/link1.stl
+  - /meshes/Enlight-L/collision/link2.stl
+  - /meshes/Enlight-L/collision/link3.stl
+  - /meshes/Enlight-L/collision/link4.stl
+  - /meshes/Enlight-L/collision/link5.stl
+  - /meshes/Enlight-L/collision/link6.stl
+  - /meshes/Enlight-L/collision/link7.stl
+  - /meshes/Enlight-L/visual/link0.obj
+  - /meshes/Enlight-L/visual/link1.obj
+  - /meshes/Enlight-L/visual/link2.obj
+  - /meshes/Enlight-L/visual/link3.obj
+  - /meshes/Enlight-L/visual/link4.obj
+  - /meshes/Enlight-L/visual/link5.obj
+  - /meshes/Enlight-L/visual/link6.obj
+  - /meshes/Enlight-L/visual/link7.obj
+  - /meshes/MICO-Core/collision/Core-link.stl
+  - /meshes/MICO-Core/visual/Core-link.obj
+  - /meshes/Rizon10/collision/link0.stl
+  - /meshes/Rizon10/collision/link1.stl
+  - /meshes/Rizon10/collision/link2.stl
+  - /meshes/Rizon10/collision/link3.stl
+  - /meshes/Rizon10/collision/link4.stl
+  - /meshes/Rizon10/collision/link5.stl
+  - /meshes/Rizon10/collision/link6.stl
+  - /meshes/Rizon10/collision/link7.stl
+  - /meshes/Rizon10/visual/link0.obj
+  - /meshes/Rizon10/visual/link1.obj
+  - /meshes/Rizon10/visual/link2.obj
+  - /meshes/Rizon10/visual/link3.obj
+  - /meshes/Rizon10/visual/link4.obj
+  - /meshes/Rizon10/visual/link5.obj
+  - /meshes/Rizon10/visual/link6.obj
+  - /meshes/Rizon10/visual/link7.obj
+  - /meshes/Rizon10/visual/ring.obj
+  - /meshes/Rizon4/collision/link0.stl
+  - /meshes/Rizon4/collision/link1.stl
+  - /meshes/Rizon4/collision/link2.stl
+  - /meshes/Rizon4/collision/link3.stl
+  - /meshes/Rizon4/collision/link4.stl
+  - /meshes/Rizon4/collision/link5.stl
+  - /meshes/Rizon4/collision/link6.stl
+  - /meshes/Rizon4/collision/link7.stl
+  - /meshes/Rizon4/visual/link0.obj
+  - /meshes/Rizon4/visual/link1.obj
+  - /meshes/Rizon4/visual/link2.obj
+  - /meshes/Rizon4/visual/link3.obj
+  - /meshes/Rizon4/visual/link4.obj
+  - /meshes/Rizon4/visual/link5.obj
+  - /meshes/Rizon4/visual/link6.obj
+  - /meshes/Rizon4/visual/link7.obj
+  - /meshes/Rizon4/visual/ring.obj
+franka_description:
+  url: https://github.com/frankarobotics/franka_description.git
+  commit: 72baf5bf4e88eaec27f0eb61be1b20a001abf2ab
+  sparse:
+  - /*
+  - '!*.stl'
+  - '!*.STL'
+  - '!*.dae'
+  - '!*.DAE'
+  - '!*.obj'
+  - '!*.OBJ'
+  - '!*.ply'
+  - '!*.PLY'
+  - '!*.glb'
+  - '!*.gltf'
+  - '!*.png'
+  - '!*.jpg'
+  - '!*.usd'
+  - '!*.usda'
+  - '!*.usdc'
+  - /LICEN[CS]E*
+  - /COPYING*
+  - /meshes/robot_ee/franka_hand_white/collision/hand.stl
+  - /meshes/robot_ee/franka_hand_white/visual/finger.dae
+  - /meshes/robot_ee/franka_hand_white/visual/hand.dae
+  - /meshes/robots/fer/collision/link0.stl
+  - /meshes/robots/fer/collision/link1.stl
+  - /meshes/robots/fer/collision/link2.stl
+  - /meshes/robots/fer/collision/link3.stl
+  - /meshes/robots/fer/collision/link4.stl
+  - /meshes/robots/fer/collision/link5.stl
+  - /meshes/robots/fer/collision/link6.stl
+  - /meshes/robots/fer/collision/link7.stl
+  - /meshes/robots/fer/visual/link0.dae
+  - /meshes/robots/fer/visual/link1.dae
+  - /meshes/robots/fer/visual/link2.dae
+  - /meshes/robots/fer/visual/link3.dae
+  - /meshes/robots/fer/visual/link4.dae
+  - /meshes/robots/fer/visual/link5.dae
+  - /meshes/robots/fer/visual/link6.dae
+  - /meshes/robots/fer/visual/link7.dae
+  - /meshes/robots/fr3/collision/link0.stl
+  - /meshes/robots/fr3/collision/link1.stl
+  - /meshes/robots/fr3/collision/link2.stl
+  - /meshes/robots/fr3/collision/link3.stl
+  - /meshes/robots/fr3/collision/link4.stl
+  - /meshes/robots/fr3/collision/link5.stl
+  - /meshes/robots/fr3/collision/link6.stl
+  - /meshes/robots/fr3/collision/link7.stl
+  - /meshes/robots/fr3/visual/link0.dae
+  - /meshes/robots/fr3/visual/link1.dae
+  - /meshes/robots/fr3/visual/link2.dae
+  - /meshes/robots/fr3/visual/link3.dae
+  - /meshes/robots/fr3/visual/link4.dae
+  - /meshes/robots/fr3/visual/link5.dae
+  - /meshes/robots/fr3/visual/link6.dae
+  - /meshes/robots/fr3/visual/link7.dae
+  - /meshes/robots/fr3v2/collision/link0.stl
+  - /meshes/robots/fr3v2/collision/link1.stl
+  - /meshes/robots/fr3v2/collision/link2.stl
+  - /meshes/robots/fr3v2/collision/link3.stl
+  - /meshes/robots/fr3v2/collision/link4.stl
+  - /meshes/robots/fr3v2/collision/link5.stl
+  - /meshes/robots/fr3v2/collision/link6.stl
+  - /meshes/robots/fr3v2/collision/link7.stl
+  - /meshes/robots/fr3v2/visual/link0.dae
+  - /meshes/robots/fr3v2/visual/link1.dae
+  - /meshes/robots/fr3v2/visual/link2.dae
+  - /meshes/robots/fr3v2/visual/link3.dae
+  - /meshes/robots/fr3v2/visual/link4.dae
+  - /meshes/robots/fr3v2/visual/link5.dae
+  - /meshes/robots/fr3v2/visual/link6.dae
+  - /meshes/robots/fr3v2/visual/link7.dae
+  - /meshes/robots/fr3v2_1/collision/link0.stl
+  - /meshes/robots/fr3v2_1/collision/link1.stl
+  - /meshes/robots/fr3v2_1/collision/link2.stl
+  - /meshes/robots/fr3v2_1/collision/link3.stl
+  - /meshes/robots/fr3v2_1/collision/link4.stl
+  - /meshes/robots/fr3v2_1/collision/link5.stl
+  - /meshes/robots/fr3v2_1/collision/link6.stl
+  - /meshes/robots/fr3v2_1/collision/link7.stl
+  - /meshes/robots/fr3v2_1/visual/link0.dae
+  - /meshes/robots/fr3v2_1/visual/link1.dae
+  - /meshes/robots/fr3v2_1/visual/link2.dae
+  - /meshes/robots/fr3v2_1/visual/link3.dae
+  - /meshes/robots/fr3v2_1/visual/link4.dae
+  - /meshes/robots/fr3v2_1/visual/link5.dae
+  - /meshes/robots/fr3v2_1/visual/link6.dae
+  - /meshes/robots/fr3v2_1/visual/link7.dae
 gym-pybullet-drones:
   url: https://github.com/utiasDSL/gym-pybullet-drones.git
   commit: 2c2470c2043eb4cf474d9af2681c9fa10f2d0e2f
@@ -752,6 +915,91 @@ gym-pybullet-drones:
   - /LICEN[CS]E*
   - /COPYING*
   - /gym_pybullet_drones/assets/cf2.dae
+hsrb_common:
+  url: https://github.com/hsr-project/hsrb_common.git
+  commit: 5ad6946064b6031a2dd90be926e4d9b77f84d785
+  sparse:
+  - /*
+  - '!*.stl'
+  - '!*.STL'
+  - '!*.dae'
+  - '!*.DAE'
+  - '!*.obj'
+  - '!*.OBJ'
+  - '!*.ply'
+  - '!*.PLY'
+  - '!*.glb'
+  - '!*.gltf'
+  - '!*.png'
+  - '!*.jpg'
+  - '!*.usd'
+  - '!*.usda'
+  - '!*.usdc'
+  - /LICEN[CS]E*
+  - /COPYING*
+  - /hsrb_description/meshes/arm_v0/arm_flex.stl
+  - /hsrb_description/meshes/arm_v0/arm_flex_light.dae
+  - /hsrb_description/meshes/arm_v0/arm_roll.stl
+  - /hsrb_description/meshes/arm_v0/arm_roll_light.dae
+  - /hsrb_description/meshes/arm_v0/shoulder.dae
+  - /hsrb_description/meshes/arm_v0/shoulder.stl
+  - /hsrb_description/meshes/base_v2/base.stl
+  - /hsrb_description/meshes/base_v2/base_light.dae
+  - /hsrb_description/meshes/base_v2/body_light.dae
+  - /hsrb_description/meshes/base_v2/bumper.dae
+  - /hsrb_description/meshes/base_v2/bumper.stl
+  - /hsrb_description/meshes/base_v2/torso_base.dae
+  - /hsrb_description/meshes/hand_v0/l_distal.dae
+  - /hsrb_description/meshes/hand_v0/l_proximal.dae
+  - /hsrb_description/meshes/hand_v0/palm.stl
+  - /hsrb_description/meshes/hand_v0/palm_light.dae
+  - /hsrb_description/meshes/hand_v0/r_distal.dae
+  - /hsrb_description/meshes/hand_v0/r_proximal.dae
+  - /hsrb_description/meshes/head_v1/head.stl
+  - /hsrb_description/meshes/head_v1/head_pan.dae
+  - /hsrb_description/meshes/head_v1/head_pan.stl
+  - /hsrb_description/meshes/head_v1/head_tilt.dae
+  - /hsrb_description/meshes/head_v1/head_upper.dae
+  - /hsrb_description/meshes/head_v1/tablet.stl
+  - /hsrb_description/meshes/head_v1/tablet_base.dae
+  - /hsrb_description/meshes/torso_v0/torso.stl
+  - /hsrb_description/meshes/torso_v0/torso_light.dae
+  - /hsrb_description/meshes/wrist_v0/wrist_flex.dae
+  - /hsrb_description/meshes/wrist_v0/wrist_roll.dae
+  - /hsrb_description/meshes/wrist_v0/wrist_roll.stl
+  - /hsrb_parts_description/meshes/sensors/head_camera.dae
+  - /hsrb_parts_description/meshes/sensors/laser.dae
+  - /hsrb_parts_description/meshes/sensors/laser.stl
+  - /hsrb_parts_description/meshes/sensors/xtion.dae
+  - /hsrb_parts_description/meshes/sensors/xtion.stl
+  - /hsrc_description/meshes/arm_v0/arm_flex.dae
+  - /hsrc_description/meshes/arm_v0/arm_flex.stl
+  - /hsrc_description/meshes/arm_v0/arm_roll.dae
+  - /hsrc_description/meshes/arm_v0/arm_roll.stl
+  - /hsrc_description/meshes/arm_v0/shoulder.dae
+  - /hsrc_description/meshes/arm_v0/shoulder.stl
+  - /hsrc_description/meshes/base_v0/base.stl
+  - /hsrc_description/meshes/base_v0/base_light.dae
+  - /hsrc_description/meshes/base_v0/body_light.dae
+  - /hsrc_description/meshes/base_v0/bumper.dae
+  - /hsrc_description/meshes/base_v0/bumper.stl
+  - /hsrc_description/meshes/base_v0/torso_base.dae
+  - /hsrc_description/meshes/hand_v0/l_distal.dae
+  - /hsrc_description/meshes/hand_v0/l_proximal.dae
+  - /hsrc_description/meshes/hand_v0/palm.dae
+  - /hsrc_description/meshes/hand_v0/palm.stl
+  - /hsrc_description/meshes/hand_v0/r_distal.dae
+  - /hsrc_description/meshes/hand_v0/r_proximal.dae
+  - /hsrc_description/meshes/head_v0/head.dae
+  - /hsrc_description/meshes/head_v0/head.stl
+  - /hsrc_description/meshes/head_v0/head_pan.dae
+  - /hsrc_description/meshes/head_v0/head_pan.stl
+  - /hsrc_description/meshes/torso_v0/torso.dae
+  - /hsrc_description/meshes/torso_v0/torso.stl
+  - /hsrc_description/meshes/wrist_v0/wrist_flex.dae
+  - /hsrc_description/meshes/wrist_v0/wrist_roll.dae
+  - /hsrc_description/meshes/wrist_v0/wrist_roll_1.stl
+  - /hsrc_description/meshes/wrist_v0/wrist_roll_2.stl
 humanoid_description:
   url: https://github.com/limxdynamics/humanoid-description.git
   commit: 97b2174054103f9f7085ec1e3533972e4d0f2a50
@@ -855,6 +1103,43 @@ jvrc_description:
   - /meshes/R_WRIST_Y_S.dae
   - /meshes/WAIST_R_S.dae
   - /meshes/WAIST_Y_S.dae
+kinova-ros:
+  url: https://github.com/Kinovarobotics/kinova-ros.git
+  commit: 924781d3dfe241b2b94b3c72a804b80d3658cf02
+  sparse:
+  - /*
+  - '!*.stl'
+  - '!*.STL'
+  - '!*.dae'
+  - '!*.DAE'
+  - '!*.obj'
+  - '!*.OBJ'
+  - '!*.ply'
+  - '!*.PLY'
+  - '!*.glb'
+  - '!*.gltf'
+  - '!*.png'
+  - '!*.jpg'
+  - '!*.usd'
+  - '!*.usda'
+  - '!*.usdc'
+  - /LICEN[CS]E*
+  - /COPYING*
+  - /kinova_description/meshes/arm.dae
+  - /kinova_description/meshes/arm_half_1.dae
+  - /kinova_description/meshes/arm_half_2.dae
+  - /kinova_description/meshes/base.dae
+  - /kinova_description/meshes/finger_distal.dae
+  - /kinova_description/meshes/finger_proximal.dae
+  - /kinova_description/meshes/forearm.dae
+  - /kinova_description/meshes/hand_2finger.dae
+  - /kinova_description/meshes/hand_3finger.dae
+  - /kinova_description/meshes/ring_big.dae
+  - /kinova_description/meshes/ring_small.dae
+  - /kinova_description/meshes/shoulder.dae
+  - /kinova_description/meshes/wrist.dae
+  - /kinova_description/meshes/wrist_spherical_1.dae
+  - /kinova_description/meshes/wrist_spherical_2.dae
 limxdynamics_robot-description:
   url: https://github.com/limxdynamics/robot-description.git
   commit: a097533372a08298d45af391cbdfc2fd2dc3da6f
@@ -1031,6 +1316,72 @@ open_manipulator:
   - /open_manipulator_description/meshes/rh_p12_rn_a/l2.stl
   - /open_manipulator_description/meshes/rh_p12_rn_a/r1.stl
   - /open_manipulator_description/meshes/rh_p12_rn_a/r2.stl
+openarm_description:
+  url: https://github.com/enactic/openarm_description.git
+  commit: 1daa95b71565a6696242013a42c4d3af689cbdb3
+  sparse:
+  - /*
+  - '!*.stl'
+  - '!*.STL'
+  - '!*.dae'
+  - '!*.DAE'
+  - '!*.obj'
+  - '!*.OBJ'
+  - '!*.ply'
+  - '!*.PLY'
+  - '!*.glb'
+  - '!*.gltf'
+  - '!*.png'
+  - '!*.jpg'
+  - '!*.usd'
+  - '!*.usda'
+  - '!*.usdc'
+  - /LICEN[CS]E*
+  - /COPYING*
+  - /assets/end_effector/parallel_link/meshes/collision/finger.stl
+  - /assets/end_effector/parallel_link/meshes/collision/hand.stl
+  - /assets/end_effector/parallel_link/meshes/visual/finger.dae
+  - /assets/end_effector/parallel_link/meshes/visual/hand.dae
+  - /assets/end_effector/pinch_gripper/meshes/collision/ee_base_link.stl
+  - /assets/end_effector/pinch_gripper/meshes/collision/finger_inner.stl
+  - /assets/end_effector/pinch_gripper/meshes/collision/finger_outer.stl
+  - /assets/end_effector/pinch_gripper/meshes/visual/ee_base_link.dae
+  - /assets/end_effector/pinch_gripper/meshes/visual/finger_inner.dae
+  - /assets/end_effector/pinch_gripper/meshes/visual/finger_outer.dae
+  - /assets/robot/openarm_v1.0/mesh/arm/collision/link0_symp.stl
+  - /assets/robot/openarm_v1.0/mesh/arm/collision/link1_symp.stl
+  - /assets/robot/openarm_v1.0/mesh/arm/collision/link2_symp.stl
+  - /assets/robot/openarm_v1.0/mesh/arm/collision/link3_symp.stl
+  - /assets/robot/openarm_v1.0/mesh/arm/collision/link4_symp.stl
+  - /assets/robot/openarm_v1.0/mesh/arm/collision/link5_symp.stl
+  - /assets/robot/openarm_v1.0/mesh/arm/collision/link6_symp.stl
+  - /assets/robot/openarm_v1.0/mesh/arm/collision/link7_symp.stl
+  - /assets/robot/openarm_v1.0/mesh/arm/visual/link0.dae
+  - /assets/robot/openarm_v1.0/mesh/arm/visual/link1.dae
+  - /assets/robot/openarm_v1.0/mesh/arm/visual/link2.dae
+  - /assets/robot/openarm_v1.0/mesh/arm/visual/link3.dae
+  - /assets/robot/openarm_v1.0/mesh/arm/visual/link4.dae
+  - /assets/robot/openarm_v1.0/mesh/arm/visual/link5.dae
+  - /assets/robot/openarm_v1.0/mesh/arm/visual/link6.dae
+  - /assets/robot/openarm_v1.0/mesh/arm/visual/link7.dae
+  - /assets/robot/openarm_v1.0/mesh/body/collision/body_link0_symp.stl
+  - /assets/robot/openarm_v1.0/mesh/body/visual/body_link0.dae
+  - /assets/robot/openarm_v2.0/meshes/arm/collision/base_link.stl
+  - /assets/robot/openarm_v2.0/meshes/arm/collision/link1.stl
+  - /assets/robot/openarm_v2.0/meshes/arm/collision/link2.stl
+  - /assets/robot/openarm_v2.0/meshes/arm/collision/link3.stl
+  - /assets/robot/openarm_v2.0/meshes/arm/collision/link4.stl
+  - /assets/robot/openarm_v2.0/meshes/arm/collision/link5.stl
+  - /assets/robot/openarm_v2.0/meshes/arm/collision/link6.stl
+  - /assets/robot/openarm_v2.0/meshes/arm/visual/base_link.dae
+  - /assets/robot/openarm_v2.0/meshes/arm/visual/link1.dae
+  - /assets/robot/openarm_v2.0/meshes/arm/visual/link2.dae
+  - /assets/robot/openarm_v2.0/meshes/arm/visual/link3.dae
+  - /assets/robot/openarm_v2.0/meshes/arm/visual/link4.dae
+  - /assets/robot/openarm_v2.0/meshes/arm/visual/link5.dae
+  - /assets/robot/openarm_v2.0/meshes/arm/visual/link6.dae
+  - /assets/robot/openarm_v2.0/meshes/body/collision/body_link0_symp.stl
+  - /assets/robot/openarm_v2.0/meshes/body/visual/body_link0.dae
 pepper_description:
   url: https://github.com/jrl-umi3218/pepper_description.git
   commit: cd9715bb5df7ad57445d953db7b1924255305944
@@ -1273,6 +1624,74 @@ roboschool:
   - /roboschool/models_robot/fetch_description/meshes/wrist_roll_link.dae
   - /roboschool/models_robot/fetch_description/meshes/wrist_roll_link_collision.STL
   - /roboschool/models_robot/multisense_sl_description/meshes/head.dae
+robotiq_2f_85:
+  url: https://github.com/nickswalker/robotiq-2f-85.git
+  commit: 319f7b94587c97f09e732a7b2ed7babbe0250b9e
+  sparse:
+  - /*
+  - '!*.stl'
+  - '!*.STL'
+  - '!*.dae'
+  - '!*.DAE'
+  - '!*.obj'
+  - '!*.OBJ'
+  - '!*.ply'
+  - '!*.PLY'
+  - '!*.glb'
+  - '!*.gltf'
+  - '!*.png'
+  - '!*.jpg'
+  - '!*.usd'
+  - '!*.usda'
+  - '!*.usdc'
+  - /LICEN[CS]E*
+  - /COPYING*
+  - /robotiq_2f_85_gripper_visualization/meshes/collision/bar.stl
+  - /robotiq_2f_85_gripper_visualization/meshes/collision/base_link.stl
+  - /robotiq_2f_85_gripper_visualization/meshes/collision/distal_phalanx.stl
+  - /robotiq_2f_85_gripper_visualization/meshes/collision/outer_knuckle.stl
+  - /robotiq_2f_85_gripper_visualization/meshes/collision/proximal_phalanx.stl
+  - /robotiq_2f_85_gripper_visualization/meshes/visual/bar.stl
+  - /robotiq_2f_85_gripper_visualization/meshes/visual/base_link.dae
+  - /robotiq_2f_85_gripper_visualization/meshes/visual/distal_phalanx.stl
+  - /robotiq_2f_85_gripper_visualization/meshes/visual/outer_knuckle.stl
+  - /robotiq_2f_85_gripper_visualization/meshes/visual/proximal_phalanx.stl
+ros2_kortex:
+  url: https://github.com/Kinovarobotics/ros2_kortex.git
+  commit: ca433b079d672100cb1d42ee27049da548c08e2c
+  sparse:
+  - /*
+  - '!*.stl'
+  - '!*.STL'
+  - '!*.dae'
+  - '!*.DAE'
+  - '!*.obj'
+  - '!*.OBJ'
+  - '!*.ply'
+  - '!*.PLY'
+  - '!*.glb'
+  - '!*.gltf'
+  - '!*.png'
+  - '!*.jpg'
+  - '!*.usd'
+  - '!*.usda'
+  - '!*.usdc'
+  - /LICEN[CS]E*
+  - /COPYING*
+  - /kortex_description/arms/gen3/7dof/meshes/base_link.dae
+  - /kortex_description/arms/gen3/7dof/meshes/bracelet_no_vision_link.dae
+  - /kortex_description/arms/gen3/7dof/meshes/forearm_link.dae
+  - /kortex_description/arms/gen3/7dof/meshes/half_arm_1_link.dae
+  - /kortex_description/arms/gen3/7dof/meshes/half_arm_2_link.dae
+  - /kortex_description/arms/gen3/7dof/meshes/shoulder_link.dae
+  - /kortex_description/arms/gen3/7dof/meshes/spherical_wrist_1_link.dae
+  - /kortex_description/arms/gen3/7dof/meshes/spherical_wrist_2_link.dae
+  - /kortex_description/arms/gen3_lite/6dof/meshes/arm_link.STL
+  - /kortex_description/arms/gen3_lite/6dof/meshes/base_link.STL
+  - /kortex_description/arms/gen3_lite/6dof/meshes/forearm_link.STL
+  - /kortex_description/arms/gen3_lite/6dof/meshes/lower_wrist_link.STL
+  - /kortex_description/arms/gen3_lite/6dof/meshes/shoulder_link.STL
+  - /kortex_description/arms/gen3_lite/6dof/meshes/upper_wrist_link.STL
 sigmaban_urdf:
   url: https://github.com/Rhoban/sigmaban_urdf.git
   commit: d5d023fd35800d00d7647000bce8602617a4960d
@@ -1292,6 +1711,28 @@ skydio_x2_description:
   commit: 9a6a057a055babaf47119fac42c361fffc189128
   sparse:
   - urdf/skydio_x2.urdf
+  - /LICEN[CS]E*
+  - /COPYING*
+stretch4_urdf:
+  url: https://github.com/hello-robot/stretch4_urdf.git
+  commit: 7b35e66a3d7e3863c7188e46e98c196dcdab2609
+  sparse:
+  - /*
+  - '!*.stl'
+  - '!*.STL'
+  - '!*.dae'
+  - '!*.DAE'
+  - '!*.obj'
+  - '!*.OBJ'
+  - '!*.ply'
+  - '!*.PLY'
+  - '!*.glb'
+  - '!*.gltf'
+  - '!*.png'
+  - '!*.jpg'
+  - '!*.usd'
+  - '!*.usda'
+  - '!*.usdc'
   - /LICEN[CS]E*
   - /COPYING*
 toddlerbot:
@@ -1366,12 +1807,14 @@ unitree_ros:
   sparse:
   - robots/a1_description/urdf/a1.urdf
   - robots/aliengo_description/urdf/aliengo.urdf
+  - robots/b1_description/xacro/b1.urdf
   - robots/b2_description/urdf/b2_description.urdf
   - robots/g1_description/g1_29dof.urdf
   - robots/go1_description/urdf/go1.urdf
   - robots/go2_description/urdf/go2_description.urdf
   - robots/h1_2_description/h1_2.urdf
   - robots/h1_description/urdf/h1.urdf
+  - robots/z1_description/xacro/z1.urdf
   - /LICEN[CS]E*
   - /COPYING*
   - /robots/a1_description/meshes/calf.dae
@@ -1384,6 +1827,11 @@ unitree_ros:
   - /robots/aliengo_description/meshes/thigh.dae
   - /robots/aliengo_description/meshes/thigh_mirror.dae
   - /robots/aliengo_description/meshes/trunk.dae
+  - /robots/b1_description/meshes/calfb.dae
+  - /robots/b1_description/meshes/hipb.dae
+  - /robots/b1_description/meshes/thigh_mirrorb.dae
+  - /robots/b1_description/meshes/thighb.dae
+  - /robots/b1_description/meshes/trunkb.dae
   - /robots/b2_description/meshes/FL_calf.dae
   - /robots/b2_description/meshes/FL_hip.dae
   - /robots/b2_description/meshes/FL_thigh.dae
@@ -1522,6 +1970,13 @@ unitree_ros:
   - /robots/h1_description/meshes/right_shoulder_roll_link.dae
   - /robots/h1_description/meshes/right_shoulder_yaw_link.dae
   - /robots/h1_description/meshes/torso_link.dae
+  - /robots/z1_description/meshes/visual/z1_Link00.dae
+  - /robots/z1_description/meshes/visual/z1_Link01.dae
+  - /robots/z1_description/meshes/visual/z1_Link02.dae
+  - /robots/z1_description/meshes/visual/z1_Link03.dae
+  - /robots/z1_description/meshes/visual/z1_Link04.dae
+  - /robots/z1_description/meshes/visual/z1_Link05.dae
+  - /robots/z1_description/meshes/visual/z1_Link06.dae
 upkie_description:
   url: https://github.com/upkie/upkie_description.git
   commit: 19a91ce69cab6742c613cab104986e3f8a18d6a5
@@ -1539,3 +1994,41 @@ upkie_description:
   - /meshes/mjbots/qdd100_stator.stl
   - /meshes/wheel_hub.stl
   - /meshes/wheel_tire/wheel_tire.stl
+xarm_ros2:
+  url: https://github.com/xArm-Developer/xarm_ros2.git
+  commit: 5bb832f72ca665f1236a9d8ed1c3a82f308db489
+  sparse:
+  - /*
+  - '!*.stl'
+  - '!*.STL'
+  - '!*.dae'
+  - '!*.DAE'
+  - '!*.obj'
+  - '!*.OBJ'
+  - '!*.ply'
+  - '!*.PLY'
+  - '!*.glb'
+  - '!*.gltf'
+  - '!*.png'
+  - '!*.jpg'
+  - '!*.usd'
+  - '!*.usda'
+  - '!*.usdc'
+  - /LICEN[CS]E*
+  - /COPYING*
+  - /xarm_description/meshes/end_tool/collision/end_tool.stl
+  - /xarm_description/meshes/xarm6/visual/link1.stl
+  - /xarm_description/meshes/xarm6/visual/link2.stl
+  - /xarm_description/meshes/xarm6/visual/link3.stl
+  - /xarm_description/meshes/xarm6/visual/link4.stl
+  - /xarm_description/meshes/xarm6/visual/link5.stl
+  - /xarm_description/meshes/xarm6/visual/link6.stl
+  - /xarm_description/meshes/xarm6/visual/link_base.stl
+  - /xarm_description/meshes/xarm7/visual/link1.stl
+  - /xarm_description/meshes/xarm7/visual/link2.stl
+  - /xarm_description/meshes/xarm7/visual/link3.stl
+  - /xarm_description/meshes/xarm7/visual/link4.stl
+  - /xarm_description/meshes/xarm7/visual/link5.stl
+  - /xarm_description/meshes/xarm7/visual/link6.stl
+  - /xarm_description/meshes/xarm7/visual/link7.stl
+  - /xarm_description/meshes/xarm7/visual/link_base.stl

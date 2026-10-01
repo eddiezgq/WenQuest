@@ -1,0 +1,6 @@
+# B-EEF-ROBOTIQ2F85V4 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）
+alt_models:
+- format: xacro
+  url: https://github.com/nickswalker/robotiq-2f-85/blob/319f7b94587c97f09e732a7b2ed7babbe0250b9e/robotiq_2f_85_gripper_visualization/urdf/robotiq_arg2f_85.xacro
+  license: BSD-2-Clause
+  via: robot_descriptions/robotiq_2f85_v4_description

@@ -1,4 +1,4 @@
-# B-EEF-LEAPHAND 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+# B-EEF-LEAPHAND 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）
 alt_models:
 - format: urdf
   url: https://github.com/leap-hand/LEAP_Hand_Sim/blob/150bc3d4b61fd6619193ba5a8ef209f3609ced89/assets/leap_hand/robot.urdf

@@ -1,0 +1,94 @@
+# B-ARM-XARM6 · UFACTORY xArm6 机械臂（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-ARM-XARM6
+kind: robot
+name:
+  zh: UFACTORY xArm6 机械臂
+  en: UFACTORY xArm6
+category: ARM
+tags:
+- 机械臂
+- arm
+- UFACTORY
+standards: []
+params: []
+defaults: {}
+model:
+  engine: xacro:xarm_ros2/xarm_description/urdf/xarm_device.urdf.xacro
+  formats:
+  - urdf
+  - glb
+  xacro_args:
+    dof: '6'
+    robot_type: xarm
+    prefix: ''
+    hw_ns: xarm
+    limited: 'false'
+    effort_control: 'false'
+    velocity_control: 'false'
+    add_gripper: 'false'
+    add_vacuum_gripper: 'false'
+    add_bio_gripper: 'false'
+    model1300: 'false'
+    robot_ip: ''
+    robot_sn: ''
+    report_type: normal
+    ros2_control_plugin: uf_robot_hardware/UFRobotSystemHardware
+    ros2_control_params: ''
+    add_realsense_d435i: 'false'
+    add_d435i_links: 'true'
+    use_gazebo_camera: 'false'
+    add_other_geometry: 'false'
+    geometry_type: box
+    geometry_mass: '0.1'
+    geometry_height: '0.1'
+    geometry_radius: '0.1'
+    geometry_length: '0.1'
+    geometry_width: '0.1'
+    geometry_mesh_filename: ''
+    geometry_mesh_origin_xyz: 0 0 0
+    geometry_mesh_origin_rpy: 0 0 0
+    geometry_mesh_tcp_xyz: 0 0 0
+    geometry_mesh_tcp_rpy: 0 0 0
+    baud_checkset: 'true'
+    default_gripper_baud: '2000000'
+    attach_to: world
+    attach_xyz: 0 0 0
+    attach_rpy: 0 0 0
+    mesh_suffix: stl
+    kinematics_suffix: ''
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: arm
+source:
+  origin: robot_descriptions
+  repo: https://github.com/xArm-Developer/xarm_ros2
+  commit: 5bb832f72ca665f1236a9d8ed1c3a82f308db489
+  path: xarm_description/urdf/xarm_device.urdf.xacro
+  license: BSD-3-Clause
+  attribution: xArm6（UFACTORY）；经 robot_descriptions 登记；BSD-3-Clause
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 BSD-3-Clause；原仓库 LICENSE 识别为 BSD-3-Clause
+  registry:
+    name: xarm6_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 多个转动关节串联：前几个关节主要决定末端位置，腕部关节决定姿态。
+  uses:
+  - 装配
+  - 上下料
+  - 人机协作
+  courses:
+  - course: 机器人技术
+    chapter: 串联机械臂正运动学
+  - course: 机器人技术
+    chapter: 逆运动学与轨迹规划
+  labs:
+  - 拖动关节看末端轨迹
+  - 正逆运动学虚拟实验
+factory:
+  erp_items: []
+  suppliers: []

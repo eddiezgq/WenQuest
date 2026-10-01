@@ -1,0 +1,6 @@
+# B-ARM-GEN3 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）
+alt_models:
+- format: xacro
+  url: https://github.com/Kinovarobotics/ros2_kortex/blob/ca433b079d672100cb1d42ee27049da548c08e2c/kortex_description/robots/gen3.xacro
+  license: BSD-3-Clause
+  via: robot_descriptions/gen3_description

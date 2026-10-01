@@ -1,0 +1,10 @@
+# B-ARM-FR3V2 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）
+alt_models:
+- format: xacro
+  url: https://github.com/frankarobotics/franka_description/blob/72baf5bf4e88eaec27f0eb61be1b20a001abf2ab/robots/fr3v2_1/fr3v2_1.urdf.xacro
+  license: Apache-2.0
+  via: robot_descriptions/fr3_v2_1_description
+- format: xacro
+  url: https://github.com/frankarobotics/franka_description/blob/72baf5bf4e88eaec27f0eb61be1b20a001abf2ab/robots/fr3v2/fr3v2.urdf.xacro
+  license: Apache-2.0
+  via: robot_descriptions/fr3_v2_description

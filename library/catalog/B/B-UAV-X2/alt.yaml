@@ -1,4 +1,4 @@
-# B-UAV-X2 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+# B-UAV-X2 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）
 alt_models:
 - format: urdf
   url: https://github.com/lvjonok/skydio_x2_description/blob/9a6a057a055babaf47119fac42c361fffc189128/urdf/skydio_x2.urdf

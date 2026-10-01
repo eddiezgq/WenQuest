@@ -95,7 +95,7 @@ def build(entry, row):
         import sys
         sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
         from xacro_util import expand
-        expanded = expand(repo, rel)
+        expanded = expand(repo, rel, mappings=entry["model"].get("xacro_args") or None)
         src = io.BytesIO(expanded.encode("utf-8"))
     else:
         expanded = None

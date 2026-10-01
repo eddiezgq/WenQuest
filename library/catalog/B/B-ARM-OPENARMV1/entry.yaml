@@ -1,0 +1,52 @@
+# B-ARM-OPENARMV1 · Enactic OpenArm v1 双臂机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-ARM-OPENARMV1
+kind: robot
+name:
+  zh: Enactic OpenArm v1 双臂机器人
+  en: Enactic OpenArm v1
+category: ARM
+tags:
+- 双臂机器人
+- dual_arm
+- Enactic
+standards: []
+params: []
+defaults: {}
+model:
+  engine: xacro:openarm_description/assets/robot/openarm_v1.0/urdf/openarm_v10.urdf.xacro
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: dual_arm
+  dof: 18
+source:
+  origin: robot_descriptions
+  repo: https://github.com/enactic/openarm_description
+  commit: 1daa95b71565a6696242013a42c4d3af689cbdb3
+  path: assets/robot/openarm_v1.0/urdf/openarm_v10.urdf.xacro
+  license: Apache-2.0
+  attribution: OpenArm v1（Enactic）；经 robot_descriptions 登记；Apache-2.0
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 Apache-2.0；原仓库 LICENSE 识别为 Apache-2.0
+  registry:
+    name: openarm_v1_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 两条机械臂协同工作，一条固定、一条操作，或两条一起搬运、装配。
+  uses:
+  - 双手操作
+  - 遥操作数据采集
+  courses:
+  - course: 机器人技术
+    chapter: 多臂协作
+  labs:
+  - 双臂协同搬运演示
+factory:
+  erp_items: []
+  suppliers: []

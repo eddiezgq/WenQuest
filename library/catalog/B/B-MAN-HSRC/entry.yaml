@@ -1,0 +1,51 @@
+# B-MAN-HSRC · Toyota Motor Corporation HSR-C 移动操作机器人（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-MAN-HSRC
+kind: robot
+name:
+  zh: Toyota Motor Corporation HSR-C 移动操作机器人
+  en: Toyota Motor Corporation HSR-C
+category: MAN
+tags:
+- 移动操作机器人
+- mobile_manipulator
+- Toyota Motor Corporation
+standards: []
+params: []
+defaults: {}
+model:
+  engine: xacro:hsrb_common/hsrc_description/robots/hsrc1s.urdf.xacro
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: mobile_manipulator
+source:
+  origin: robot_descriptions
+  repo: https://github.com/hsr-project/hsrb_common
+  commit: 5ad6946064b6031a2dd90be926e4d9b77f84d785
+  path: hsrc_description/robots/hsrc1s.urdf.xacro
+  license: BSD-3-Clause-Clear
+  attribution: HSR-C（Toyota Motor Corporation）；经 robot_descriptions 登记；BSD-3-Clause-Clear
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 BSD-3-Clause-Clear；原仓库 LICENSE 识别为 BSD-3-Clause-Clear
+  registry:
+    name: hsrc_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 移动底盘加机械臂：既能在场地里走，又能伸手操作。
+  uses:
+  - 仓储搬运
+  - 服务机器人
+  courses:
+  - course: 移动机器人
+    chapter: 移动操作
+  labs:
+  - 底盘与机械臂的协同
+factory:
+  erp_items: []
+  suppliers: []

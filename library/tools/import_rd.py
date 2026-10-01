@@ -38,14 +38,16 @@ def registry():
         g = {}
         try:
             exec(code, g)  # noqa: S102 —— 登记表模块只拼路径；克隆函数已换成占位
-            urdf = g.get("URDF_PATH")
+            urdf, xacro = g.get("URDF_PATH"), g.get("XACRO_PATH")
         except Exception:  # noqa: BLE001
-            urdf = None
+            urdf = xacro = None
         r = REPOSITORIES.get(key)
+        rel = lambda x: x.replace("$R/", "", 1) if isinstance(x, str) and x.startswith("$R/") else None  # noqa: E731
         out.append({"name": name, "maker": d.maker, "robot": d.robot, "dof": d.dof, "license": d.license_spdx,
                     "tags": sorted(d.tags), "repo": key, "url": r.url if r else None, "commit": r.commit if r else None,
-                    "urdf": urdf.replace("$R/", "", 1) if isinstance(urdf, str) else None, "xacro": "xacro" in src.lower(),
-                    "has_urdf": Format.URDF in d.formats})
+                    "urdf": rel(urdf), "xacro": "xacro" in src.lower(), "xacro_path": rel(xacro),
+                    "xacro_args": {k: str(v) for k, v in (g.get("XACRO_ARGS") or {}).items()},
+                    "n_repos": src.count("_clone_to_cache("), "has_urdf": Format.URDF in d.formats})
     return out
 
 
@@ -54,8 +56,14 @@ def candidates():
     dup = pin.get("duplicates") or {}
     new, dups = [], []
     for o in registry():
-        if not o["has_urdf"] or o["xacro"] or not o["urdf"] or o["repo"] == "mujoco_menagerie":
+        if not o["has_urdf"] or o["repo"] == "mujoco_menagerie":
             continue
+        if not o["urdf"]:                                  # 只有 xacro 的（第 5 轮第 3 批起能展开）：只收单个原仓库的
+            if not o["xacro_path"] or o["n_repos"] != 1:
+                continue
+            o = dict(o, model=o["xacro_path"], engine="xacro")
+        else:
+            o = dict(o, model=o["urdf"], engine="urdf")
         if o["license"] not in ALLOWED_LICENSES or (o["maker"] or "").startswith("Universal Robots"):
             continue
         (dups if o["name"] in dup else new).append(dict(o, dup_of=dup.get(o["name"])))
@@ -91,18 +99,31 @@ def resolve(ref, urdf_rel, files):
     return cands[0] if len(cands) == 1 else None
 
 
+NO_MESH = ["/*", "!*.stl", "!*.STL", "!*.dae", "!*.DAE", "!*.obj", "!*.OBJ", "!*.ply", "!*.PLY", "!*.glb", "!*.gltf",
+           "!*.png", "!*.jpg", "!*.usd", "!*.usda", "!*.usdc"]
+
+
+def model_text(dest, o):
+    """URDF 文本：URDF 直接读，xacro 先展开（带登记表里的参数）"""
+    if o["engine"] == "xacro":
+        from xacro_util import expand
+        return expand(dest, o["model"], mappings=o.get("xacro_args") or None)
+    return (dest / o["model"]).read_text(encoding="utf-8", errors="replace")
+
+
 def write_repo_list():
-    """两步取：先只取 URDF 和 LICENSE，解析出用到的网格，再把稀疏清单扩到这些网格（省空间）。"""
+    """两步取：先只取模型文件（URDF；有 xacro 的取除网格外的全部文件）和 LICENSE，解析出用到的网格，再把稀疏清单扩到这些网格。"""
     import subprocess
     from fetch_sources import SRC, fetch, git
     new, dups = candidates()
     by_repo = {}
     for o in new + dups:
-        by_repo.setdefault(o["repo"], {"url": o["url"], "commit": o["commit"], "urdfs": set()})["urdfs"].add(o["urdf"])
-    repos = {}
+        by_repo.setdefault(o["repo"], {"url": o["url"], "commit": o["commit"], "models": []})["models"].append(o)
+    repos, failed = {}, []
     for key, r in sorted(by_repo.items()):
         dest = SRC / "rd" / key
-        base = sorted(r["urdfs"]) + ["/LICEN[CS]E*", "/COPYING*"]
+        xac = any(o["engine"] == "xacro" for o in r["models"])
+        base = (NO_MESH if xac else sorted({o["model"] for o in r["models"]})) + ["/LICEN[CS]E*", "/COPYING*"]
         try:
             fetch(dest, r["url"], r["commit"], sparse=base)
         except subprocess.CalledProcessError as e:
@@ -110,12 +131,16 @@ def write_repo_list():
             continue
         files = set(git("ls-tree", "-r", "--name-only", "HEAD", cwd=dest).splitlines())
         need, missing = set(), 0
-        for u in r["urdfs"]:
-            f = dest / u
-            if not f.exists():
+        for o in r["models"]:
+            if not (dest / o["model"]).exists():
                 continue
-            for ref in mesh_refs(f.read_text(encoding="utf-8", errors="replace")):
-                p = resolve(ref, u, files)
+            try:
+                text = model_text(dest, o)
+            except Exception as ex:  # noqa: BLE001
+                failed.append((o["name"], "xacro 展开失败：{}".format(str(ex)[:120])))
+                continue
+            for ref in mesh_refs(text):
+                p = resolve(ref, o["model"], files)
                 if p:
                     need.add(p)
                 else:
@@ -123,10 +148,12 @@ def write_repo_list():
         sparse = base + ["/" + p for p in sorted(need)]
         fetch(dest, r["url"], r["commit"], sparse=sparse)
         repos[key] = {"url": r["url"], "commit": r["commit"], "sparse": sparse}
-        print("  {}：{} 个 URDF、{} 个网格{}".format(key, len(r["urdfs"]), len(need), "，{} 个找不到".format(missing) if missing else ""))
+        print("  {}：{} 个模型、{} 个网格{}".format(key, len(r["models"]), len(need), "，{} 个找不到".format(missing) if missing else ""))
     REPOS.write_text("# 由 tools/import_rd.py list 生成：robot_descriptions 登记的各模型原仓库（固定提交、稀疏检出清单）\n"
                      + yaml.safe_dump(repos, sort_keys=False, allow_unicode=True, width=200), encoding="utf-8")
     print("候选：新建 {} 个、并入已有 {} 个；原仓库 {} 个（取到 {} 个）".format(len(new), len(dups), len(by_repo), len(repos)))
+    for n, why in failed:
+        print("  不收 {}：{}".format(n, why))
 
 
 LICENSE_PATTERNS = [("Apache-2.0", r"Apache License\s+Version 2\.0"), ("MIT", r"Permission is hereby granted, free of charge"),
@@ -172,11 +199,23 @@ def write_entries():
     fetched = yaml.safe_load(REPOS.read_text(encoding="utf-8")) if REPOS.exists() else {}
     new, dups = candidates()
     ids = {d.name for d in (CATALOG / "B").iterdir()}
+    mine = {}                                              # 以前导入过的：登记名 → 编号（重跑时沿用，不另起编号）
+    for d in (CATALOG / "B").iterdir():
+        f = d / "entry.yaml"
+        if f.exists() and "robot_descriptions" in f.read_text(encoding="utf-8"):
+            reg = ((yaml.safe_load(f.read_text(encoding="utf-8")) or {}).get("source") or {}).get("registry") or {}
+            if reg.get("name"):
+                mine[reg["name"]] = d.name
     made, skipped, merged = [], [], []
     for o in new:
         repo = ROOT / "vendor_src" / "rd" / o["repo"]
-        if o["repo"] not in fetched or not (repo / o["urdf"]).exists():
+        if o["repo"] not in fetched or not (repo / o["model"]).exists():
             skipped.append((o["name"], "原仓库取不到"))
+            continue
+        try:
+            model_text(repo, o)
+        except Exception as ex:  # noqa: BLE001
+            skipped.append((o["name"], "xacro 展开失败：{}".format(str(ex)[:100])))
             continue
         lic = repo_license(repo)
         if lic is None or lic == "unknown" or (lic != o["license"] and not (lic.startswith("BSD") and o["license"].startswith("BSD"))):
@@ -187,10 +226,12 @@ def write_entries():
             cat, rtype, zh_type, principle, courses, labs, uses = ("EDU", "educational") + EDU
         else:
             cat, rtype, zh_type, principle, courses, labs, uses = TYPES[TAG_TYPE[t]]
-        eid = "B-{}-{}".format(cat, slug(o["robot"]))
-        if eid in ids:
-            eid = "B-{}-{}".format(cat, slug((o["maker"] or "") + o["robot"]))
-        ids.add(eid)
+        eid = mine.get(o["name"])
+        if eid is None:
+            eid = "B-{}-{}".format(cat, slug(o["robot"]))
+            if eid in ids:
+                eid = "B-{}-{}".format(cat, slug((o["maker"] or "") + o["robot"]))
+            ids.add(eid)
         maker = o["maker"] or ""
         doc = {
             "schema": 1, "id": eid, "kind": "robot",
@@ -198,12 +239,13 @@ def write_entries():
                      "en": "{} {}".format(maker, o["robot"]).strip()},
             "category": cat, "tags": [zh_type, rtype] + [x for x in o["tags"] if x != rtype] + ([maker] if maker else []),
             "standards": [], "params": [], "defaults": {},
-            "model": {"engine": "urdf:{}/{}".format(o["repo"], o["urdf"]), "formats": ["urdf", "glb"],
+            "model": {"engine": "{}:{}/{}".format(o["engine"], o["repo"], o["model"]), "formats": ["urdf", "glb"],
+                      **({"xacro_args": o["xacro_args"]} if o["engine"] == "xacro" and o.get("xacro_args") else {}),
                       "origin": "URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名",
                       "note": "网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF"},
             "robot": {"type": rtype, **({"dof": o["dof"]} if o["dof"] else {})},
             "source": {"origin": "robot_descriptions", "repo": o["url"][:-4] if o["url"].endswith(".git") else o["url"],
-                       "commit": o["commit"], "path": o["urdf"], "license": o["license"],
+                       "commit": o["commit"], "path": o["model"], "license": o["license"],
                        "attribution": "{}（{}）；经 robot_descriptions 登记；{}".format(o["robot"], maker or "开源社区", o["license"]),
                        "checked": {"by": "Claude", "on": "2026-09-30",
                                    "note": "robot_descriptions 登记 {}；原仓库 LICENSE 识别为 {}".format(o["license"], lic)},
@@ -217,20 +259,21 @@ def write_entries():
                                       + yaml.safe_dump(doc, allow_unicode=True, sort_keys=False), encoding="utf-8")
         made.append(eid)
     # 已有型号：在已有条目上记“另有 URDF 版本”（alt.yaml，load 时合并到 alt_models）
-    for o in dups:
-        if o["repo"] not in fetched:
-            continue
+    alts = {}
+    for o in dups:                                         # 链接不必取到原仓库：按登记的提交指向模型文件
         d = CATALOG / "B" / o["dup_of"]
         if not d.exists():
             continue
-        url = (o["url"][:-4] if o["url"].endswith(".git") else o["url"]) + "/blob/{}/{}".format(o["commit"], o["urdf"])
-        (d / "alt.yaml").write_text("# {} 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）\n".format(o["dup_of"])
-                                    + yaml.safe_dump({"alt_models": [{"format": "urdf", "url": url, "license": o["license"],
-                                                                      "via": "robot_descriptions/{}".format(o["name"])}]},
-                                                     allow_unicode=True, sort_keys=False), encoding="utf-8")
-        merged.append(o["dup_of"])
+        url = (o["url"][:-4] if o["url"].endswith(".git") else o["url"]) + "/blob/{}/{}".format(o["commit"], o["model"])
+        alts.setdefault(o["dup_of"], []).append({"format": o["engine"], "url": url, "license": o["license"],
+                                                 "via": "robot_descriptions/{}".format(o["name"])})
+    for eid, lst in alts.items():
+        (CATALOG / "B" / eid / "alt.yaml").write_text(
+            "# {} 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）\n".format(eid)
+            + yaml.safe_dump({"alt_models": lst}, allow_unicode=True, sort_keys=False), encoding="utf-8")
+        merged.append(eid)
     print("新建 {} 个：{}".format(len(made), "、".join(made)))
-    print("已有条目加 URDF 版本 {} 个".format(len(merged)))
+    print("已有条目加 URDF / xacro 版本 {} 个".format(len(merged)))
     for n, why in skipped:
         print("  不收 {}：{}".format(n, why))
     return made, skipped

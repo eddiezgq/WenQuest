@@ -1,4 +1,4 @@
-# B-LEG-A1 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+# B-LEG-A1 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）
 alt_models:
 - format: urdf
   url: https://github.com/unitreerobotics/unitree_ros/blob/267182b8521c8d6a631bab1fe63836873237a525/robots/a1_description/urdf/a1.urdf

@@ -1,0 +1,55 @@
+# B-ARM-JACO2J2S7S300 · Kinova Jaco2 j2s7s300 机械臂（第 5 轮第 4 步：robot_descriptions）
+schema: 1
+id: B-ARM-JACO2J2S7S300
+kind: robot
+name:
+  zh: Kinova Jaco2 j2s7s300 机械臂
+  en: Kinova Jaco2 j2s7s300
+category: ARM
+tags:
+- 机械臂
+- arm
+- Kinova
+standards: []
+params: []
+defaults: {}
+model:
+  engine: xacro:kinova-ros/kinova_description/urdf/j2s7s300_standalone.xacro
+  formats:
+  - urdf
+  - glb
+  origin: URDF 根连杆坐标系；glTF 里每个连杆一个节点，节点名 = URDF 连杆名
+  note: 网页模型按 URDF 的可视几何生成并简化网格；关节表取自 URDF
+robot:
+  type: arm
+source:
+  origin: robot_descriptions
+  repo: https://github.com/Kinovarobotics/kinova-ros
+  commit: 924781d3dfe241b2b94b3c72a804b80d3658cf02
+  path: kinova_description/urdf/j2s7s300_standalone.xacro
+  license: BSD-3-Clause
+  attribution: Jaco2 j2s7s300（Kinova）；经 robot_descriptions 登记；BSD-3-Clause
+  checked:
+    by: Claude
+    'on': '2026-09-30'
+    note: robot_descriptions 登记 BSD-3-Clause；原仓库 LICENSE 识别为 BSD-3-Clause
+  registry:
+    name: j2s7s300_description
+    commit: d6b206deb9e6d461616f9552171549987cee0f0a
+teaching:
+  principle: 多个转动关节串联：前几个关节主要决定末端位置，腕部关节决定姿态。
+  uses:
+  - 装配
+  - 上下料
+  - 人机协作
+  courses:
+  - course: 机器人技术
+    chapter: 串联机械臂正运动学
+  - course: 机器人技术
+    chapter: 逆运动学与轨迹规划
+  labs:
+  - 拖动关节看末端轨迹
+  - 正逆运动学虚拟实验
+factory:
+  erp_items: []
+  suppliers: []

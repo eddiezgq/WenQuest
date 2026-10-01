@@ -5,7 +5,7 @@ commit: d6b206deb9e6d461616f9552171549987cee0f0a
 date: 2026-09-19
 # 规则：只收 URDF；许可在可收名单（B.6）且原仓库根目录 LICENSE 核对一致；不收 MuJoCo Menagerie 来源（已有）；
 # 不收 Universal Robots（网格的许可是 UR 自己的图形文件条款，不在可收名单；UR 已由 Menagerie 和 DH 模型覆盖）；
-# 需要 xacro 预处理的暂不收（第二批）；与已有条目同一型号的，不新建，在已有条目上加“另有 URDF 版本”的链接。
+# 需要 xacro 预处理的：第 3 批起能展开，收单个原仓库的（多仓库组合的如 TIAGo 官方版暂不收）；与已有条目同一型号的，不新建，在已有条目上加“另有 URDF 版本”的链接。
 duplicates:
   a1_description: B-LEG-A1
   anymal_b_description: B-LEG-ANYMALB
@@ -31,3 +31,15 @@ duplicates:
   so_arm100_description: B-ARM-SOARM100
   so_arm101_description: B-ARM-SO101
   leap_hand_v1_description: B-EEF-LEAPHAND
+  # 第 5 轮第 3 批后补（xacro）：与已有条目同型号
+  z1_description: B-ARM-Z1
+  fr3_description: B-ARM-FR3
+  fer_description: B-ARM-PANDA
+  fr3_v2_description: B-ARM-FR3V2
+  fr3_v2_1_description: B-ARM-FR3V2
+  gen3_description: B-ARM-GEN3
+  rizon4_description: B-ARM-FLEXIVRIZON4
+  xarm7_description: B-ARM-XARM7
+  robotiq_2f85_v4_description: B-EEF-ROBOTIQ2F85V4
+  j2s6s300_description: B-ARM-GEN2
+  stretch_se3_description: B-MAN-HELLOROBOTSTRETCH3

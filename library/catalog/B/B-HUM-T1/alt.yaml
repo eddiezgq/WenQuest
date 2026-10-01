@@ -1,4 +1,4 @@
-# B-HUM-T1 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+# B-HUM-T1 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）
 alt_models:
 - format: urdf
   url: https://github.com/BoosterRobotics/booster_gym/blob/687a33d08b08875fe45dc8d91b54db83766df8b9/resources/T1/T1_serial.urdf

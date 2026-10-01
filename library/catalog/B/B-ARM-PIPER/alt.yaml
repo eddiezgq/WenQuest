@@ -1,4 +1,4 @@
-# B-ARM-PIPER 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF）
+# B-ARM-PIPER 的其他版本（第 5 轮第 4 步：robot_descriptions 登记的 URDF / xacro）
 alt_models:
 - format: urdf
   url: https://github.com/agilexrobotics/Piper_ros/blob/f2ec6a67e1f404bcb478529e89861ccdf43fa298/src/piper_description/urdf/piper_description.urdf
