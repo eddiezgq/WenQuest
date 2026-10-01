@@ -8,6 +8,7 @@ import json
 import ssl
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -86,6 +87,20 @@ try:
     with urllib.request.urlopen("https://erp.{}/website_script.js".format(domain), timeout=30) as r:
         js = r.read().decode("utf-8", "replace")
     btn, auto = "btn-wenquest" in page, "wenquest-sso" in js
+    import re
+    m = re.search(r'href="([^"]+)"\s+class="[^"]*btn-wenquest', page)
+    if m:
+        href = m.group(1).replace("&amp;", "&")
+        say("  登录按钮指向：" + href.split("&state=")[0])
+
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, *a, **k):
+                return None
+        try:
+            urllib.request.build_opener(NoRedirect).open(href, timeout=30)
+            say("  授权接口（没带问渠登录）：没有跳转")
+        except urllib.error.HTTPError as e:
+            say("  授权接口（没带问渠登录）：{} → {}".format(e.code, (e.headers.get("location") or e.read().decode("utf-8", "replace"))[:160]))
     say("ERPNext 单点登录：登录按钮{}，自动跳转脚本{}".format("有" if btn else "没有", "有" if auto else "没有"))
     ok = ok and btn and auto
 except Exception as e:  # noqa: BLE001
