@@ -30,3 +30,31 @@ def out(**values) -> None:
     else:
         for k, v in values.items():
             print(f"{k} = {_values[k]}", file=sys.stdout)
+
+
+# ---------------------------------------------------------------- figures (示意图)
+
+COLORS = {"x": "#d62728", "y": "#2ca02c", "z": "#1f77b4", "ink": "#1d2327", "muted": "#7a868d", "accent": "#b8860b"}
+
+
+def style():
+    """The book's figure style: Chinese labels in Noto Sans CJK, thin lines, x red / y green / z blue."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({
+        "font.family": ["Noto Sans CJK SC", "Noto Sans CJK JP", "DejaVu Sans"], "mathtext.fontset": "cm", "font.size": 11,
+        "axes.unicode_minus": False, "svg.fonttype": "path", "figure.dpi": 100,
+    })
+    return plt
+
+
+def figure(fig, name: str) -> None:
+    """Save a static figure for the book as <name>.svg; the text shows it with ``::: 图 x.y.z`` / ``src: name``."""
+    folder = os.environ.get("WQ_BOOK_FIGDIR")
+    path = os.path.join(folder, f"{name}.svg") if folder else f"{name}.svg"
+    fig.savefig(path, format="svg", bbox_inches="tight", pad_inches=0.05, transparent=True)
+    if not folder:
+        print(f"figure saved: {path}")
+    _values.setdefault("_figures", []).append(name)
+    out()

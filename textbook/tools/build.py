@@ -67,6 +67,8 @@ class Section:
     source: str
     html: str = ""
     html_mp: str = ""
+    figdir: Path = Path(".")
+    anim_figs: list = field(default_factory=list)
     defines: set = field(default_factory=set)
 
 
@@ -149,7 +151,9 @@ def run_programs(book: dict, chapters: set[int], rep: Report) -> dict[str, dict]
                 continue
             outp = cache / f"{prog.stem}.out.json"
             outp.unlink(missing_ok=True)
-            env = {**os.environ, "WQ_BOOK_OUT": str(outp), "PYTHONPATH": str(TOOLS), "MPLBACKEND": "Agg"}
+            figs = cache.parent / "figs"
+            figs.mkdir(exist_ok=True)
+            env = {**os.environ, "WQ_BOOK_OUT": str(outp), "WQ_BOOK_FIGDIR": str(figs), "PYTHONPATH": str(TOOLS), "MPLBACKEND": "Agg"}
             try:
                 r = subprocess.run([sys.executable, prog.name], cwd=prog.parent, env=env, capture_output=True, text=True, timeout=300)
             except subprocess.TimeoutExpired:
@@ -223,7 +227,7 @@ def protect(text: str, store: list, pattern: re.Pattern, make) -> str:
 def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, rep: Report) -> str:
     meta, rest = {}, []
     for line in body.splitlines():
-        m = re.match(r"^(src|说明|模板|模型|caption)\s*[:：]\s*(.*)$", line.strip())
+        m = re.match(r"^(src|说明|模板|模型|caption|图)\s*[:：]\s*(.*)$", line.strip())
         if m and not rest:
             meta[m.group(1)] = m.group(2).strip()
         else:
@@ -244,11 +248,24 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
         res = ""
         if result:
             res = "<div class='wq-prog-out'><b>运行结果</b><pre>" + html.escape(
-                "\n".join(f"{k} = {format(v, '.6g') if isinstance(v, float) else v}" for k, v in result.items())) + "</pre></div>"
+                "\n".join(f"{k} = {format(v, '.6g') if isinstance(v, float) else v}" for k, v in result.items() if not k.startswith("_"))) + "</pre></div>"
         return (f"<figure class='wq-prog' id='{kind}-{num}'><figcaption>{label}　{cap}</figcaption>"
                 f"<details><summary>程序 {html.escape(src)}</summary><pre class='wq-code'><code>{html.escape(code)}</code></pre></details>"
                 f"{res}{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
-    cls = {"动画": "wq-anim", "实验": "wq-lab", "图": "wq-fig", "表": "wq-tab"}[kind]
+    if kind == "图":
+        src = meta.get("src", "")
+        p = sec.figdir / f"{src}.svg" if src else None
+        if not p or not p.exists():
+            rep.add("error", "图", sec.id, f"{label}：没有找到示意图 {src or '（未写 src）'}（由 code/ 里的程序用 bookout.figure 生成）")
+            return f"<figure class='wq-fig' id='{kind}-{num}'><div class='wq-media-box'>【{label}】</div></figure>"
+        import base64
+        data = base64.b64encode(p.read_bytes()).decode()
+        return (f"<figure class='wq-fig' id='{kind}-{num}'><img class='wq-figimg' alt='{label}' src='data:image/svg+xml;base64,{data}'/>"
+                f"<figcaption>{label}　{cap}</figcaption>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
+    if kind == "动画":
+        fig = meta.get("图", "")
+        sec.anim_figs.append((label, fig))
+    cls = {"动画": "wq-anim", "实验": "wq-lab", "表": "wq-tab"}[kind]
     src = html.escape(meta.get("src", ""))
     # media are produced in later steps (animator, labkit); until then a placeholder box shows what will be there
     return (f"<figure class='{cls}' id='{kind}-{num}' data-src='{src}'><div class='wq-media-box'>【{label}】{cap}</div>"
@@ -463,12 +480,20 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     terms = glossary(book)
     values = run_programs(book, {s.chapter for s in sections}, rep)
     formulas: list = []
+    figdir = book["root"].parent / "build" / book_name / "figs"
     for sec in sections:
+        sec.figdir = figdir
         check_tags(sec, rep)
         check_numbers(sec, rep)
         check_terms(sec, terms, rep)
         sec.html = render_section(sec, fill(sec, values, rep), values, rep, formulas)
     check_refs(sections, book, rep)
+    for sec in sections:      # 动画代替不了示意图 (Eddie 2026-10-01): every animation has its static figure
+        for label, fig in sec.anim_figs:
+            if not fig:
+                rep.add("error", "图", sec.id, f"{label} 没有配示意图（在动画里写“图: x.y.z”，并在正文放这张图）")
+            elif f"图 {fig}" not in sec.defines:
+                rep.add("error", "图", sec.id, f"{label} 配的图 {fig} 不在本节")
     svgs, imgs = typeset(formulas, rep)
     for sec in sections:
         sec.html_mp = re.sub(r"WQMATH(\d+)Z", lambda m: imgs[int(m.group(1))], sec.html)

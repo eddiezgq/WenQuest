@@ -93,3 +93,12 @@ def test_significant_digits_keep_trailing_zeros():
     assert build.sig(0.1866025403784) == "0.18660"
     assert build.sig(26.565051177) == "26.565"
     assert build.sig(0.05) == "0.050000"
+
+
+def test_an_animation_needs_its_static_figure(book):
+    """动画代替不了示意图，两个都要 (Eddie 2026-10-01)."""
+    edit(book, "::: 动画 4.1.1\n图: 4.1.1\n", "::: 动画 4.1.1\n")
+    rep = run(book)
+    assert any("动画 4.1.1 没有配示意图" in p.text for p in rep.errors)
+    frag = (book.parent / "build" / "robotics" / "web" / "4.1.html").read_text(encoding="utf-8")
+    assert "data:image/svg+xml;base64" in frag and "图 4.1.2" in frag      # the figures are in the page itself
