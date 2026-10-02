@@ -1,0 +1,33 @@
+# 实验 11.1 的指导书与报告模板。目的、场景、参数、任务取自 lab11_1.js。
+原理:
+  - ["单自由度的低副都是一根旋量轴：转动关节节距 h = 0，螺旋副节距 h 为有限值，移动关节相当于 h → ∞。导程（转一整圈前进的距离）等于 2πh。",
+     "Every one-DOF lower pair is a screw axis: a revolute joint has pitch h = 0, a helical joint a finite h, a prismatic joint the limit h → ∞. The lead (advance per full turn) is 2πh."]
+  - 式: "𝒮 = (ω̂, −ω̂ × q + h ω̂)          (11.1.1)"
+  - ["关节转过 θ 时，构件绕轴转 θ，同时沿轴前进 hθ：", "When the joint turns θ the body turns θ about the axis and advances hθ along it:"]
+  - 式: "e^[𝒮]θ = [ e^[ω̂]θ   (I − e^[ω̂]θ) q + hθ ω̂ ;  0   1 ]          (11.1.2)"
+  - ["理想（无摩擦）关节的约束力旋量对一切允许的运动都不做功，ℱᵀ𝒱 = 0。对螺旋副，这要求沿轴的力 F 伴随绕轴的扭矩 hF。",
+     "The constraint wrenches of an ideal (frictionless) joint do no work in any allowed motion, ℱᵀ𝒱 = 0. For a helical joint an axial force F must come with a torque hF about the axis."]
+  - 式: "τ = h F          (理想螺旋副 / ideal screw)"
+步骤:
+  - ["打开实验 11.1，场景“SCARA 的滚珠丝杠花键轴”。关节类型取 1（螺旋副），导程 20 mm，转角依次取 0°、90°、180°、360°，记录轴的位移，填入表 1（任务 1）。",
+     "Open Lab 11.1, scene “SCARA ball-screw spline”. Type 1 (helical), lead 20 mm; set the turn to 0°, 90°, 180°, 360° and record the advance in Table 1 (task 1)."]
+  - ["把关节类型改为 0（转动关节），转过 180° 以上，记录位移（任务 2）；再改为 2（移动关节），拖动“移动距离 d”，观察点只上下移动、不转动。",
+     "Change to type 0 (revolute) and turn more than 180°; record the advance (task 2). Then type 2 (prismatic): drag the slide d and see the point move without turning."]
+  - ["关节类型取 1，导程 20 mm，轴向载荷依次取 0、50、100、200 N，记录所需扭矩，填入表 2（任务 3）；再把导程改为 5 mm 和 40 mm 各做一遍。",
+     "Type 1, lead 20 mm; set the axial load to 0, 50, 100, 200 N and record the torque in Table 2 (task 3); repeat with leads of 5 mm and 40 mm."]
+  - ["切换到生活场景“拧瓶盖”，导程 3 mm，拧两圈（720°），记录瓶盖升高多少（任务 4）。", "Switch to “Unscrewing a bottle cap”, lead 3 mm, turn two turns (720°) and record the rise (task 4)."]
+数据表:
+  - 标题: ["表 1  螺旋副：转角与位移（导程 20 mm）", "Table 1  Helical joint: turn and advance (lead 20 mm)"]
+    表头: ["转角 θ / °", "θ / rad", "读数 hθ / mm", "按式 (11.1.2) 计算 / mm"]
+    表头英文: ["Turn θ / °", "θ / rad", "Reading hθ / mm", "From Eq. (11.1.2) / mm"]
+    行: [["0", "", "", ""], ["90", "", "", ""], ["180", "", "", ""], ["360", "", "", ""]]
+  - 标题: ["表 2  轴向载荷与扭矩", "Table 2  Axial load and torque"]
+    表头: ["导程 / mm", "载荷 F / N", "读数 τ / (N·m)", "hF / (N·m)"]
+    表头英文: ["Lead / mm", "Load F / N", "Reading τ / (N·m)", "hF / (N·m)"]
+    行: [["20", "50", "", ""], ["20", "100", "", ""], ["20", "200", "", ""], ["5", "100", "", ""], ["40", "100", "", ""]]
+注意:
+  - ["界面中的位移放大画出，读数以测量区为准。机器人场景中轴的正方向向下（与 SCARA 关节 3 一致），生活场景中向上。",
+     "Displacements are drawn enlarged; use the readouts. In the robot scene the axis points down (as SCARA joint 3), in the everyday scene up."]
+  - ["扭矩按理想螺旋副计算，没有计入摩擦。实际滚珠丝杠的效率约 90%，梯形丝杠更低。", "The torque is for an ideal screw without friction. Real ball screws are about 90% efficient, lead screws much less."]
+思考题:
+  - ["转动关节为什么不需要扭矩来承受轴向载荷？用约束力旋量的概念说明。", "Why does a revolute joint need no torque to carry an axial load? Explain with constraint wrenches."]

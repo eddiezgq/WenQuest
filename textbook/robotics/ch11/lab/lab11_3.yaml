@@ -1,0 +1,28 @@
+# 实验 11.3 的指导书与报告模板。目的、场景、参数、任务取自 lab11_3.js。
+原理:
+  - ["构型空间是机器人所有可能构型的集合，维数等于自由度。转动关节的变量是角度，θ 与 θ + 360° 是同一个构型，所以平面 2R 臂的构型空间是环面 T²：关节角正方形的左右两边、上下两边分别粘合。",
+     "The C-space is the set of all configurations; its dimension is the number of DOF. A revolute joint's variable is an angle, θ and θ + 360° being the same, so a planar 2R arm's C-space is the torus T²: the square's opposite edges are glued."]
+  - 式: "Δθ = wrap(θ_b − θ_a)，wrap 把角度化到 [−180°, 180°)          (11.3.1)"
+  - ["构型空间障碍物：使机器人与障碍物相交的全部构型。在构型空间中，机器人是一个点，无碰撞的运动是一条不进入障碍物区域的曲线。",
+     "C-obstacle: all configurations in which the robot meets an obstacle. In C-space the robot is a point and a collision-free motion is a curve that avoids those regions."]
+  - ["正运动学不是一一对应的：平面 2R 臂到达同一点一般有肘上、肘下两组关节角。", "Forward kinematics is not one-to-one: a planar 2R arm generally reaches a point with elbow up and elbow down."]
+步骤:
+  - ["场景“两连杆臂与立柱”：只改变 θ₁，观察右边的点水平移动；只改变 θ₂，点竖直移动。把 θ₁ 拖过 180°，观察点从右边界消失、从左边界出现。", "Scene “2R arm and a post”: change only θ₁ and the point moves horizontally; only θ₂, vertically. Drag θ₁ past 180° and see the point leave on the right and reappear on the left."]
+  - ["让手臂碰到立柱（任务 1），记录三组碰撞构型，在表 1 中标出它们都在灰色区域内。", "Make the arm touch the post (task 1); record three colliding configurations in Table 1."]
+  - ["用肘上、肘下两种构型分别到达目标点 (0.55, −0.25) m（任务 2、3），记录两组关节角，填入表 2。", "Reach the target (0.55, −0.25) m with elbow up and elbow down (tasks 2, 3); record both pairs in Table 2."]
+  - ["场景“钟表的两根指针”：拖动时间，观察红点沿橙色曲线运动；找出两针第一次重合的时刻（任务 4），并数出 12 小时内的重合次数。", "Scene “Clock hands”: drag the time, watch the red point run along the orange curve; find the first overlap (task 4) and count the overlaps in 12 hours."]
+数据表:
+  - 标题: ["表 1  碰撞构型", "Table 1  Colliding configurations"]
+    表头: ["θ₁ / °", "θ₂ / °", "碰到的连杆", "点是否在灰区"]
+    表头英文: ["θ₁ / °", "θ₂ / °", "Link that hits", "Point in grey region?"]
+    行: [["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+  - 标题: ["表 2  同一目标点的两组解", "Table 2  Two solutions for one target"]
+    表头: ["肘向", "θ₁ / °", "θ₂ / °", "末端 (x, y) / m", "离目标 / mm"]
+    表头英文: ["Elbow", "θ₁ / °", "θ₂ / °", "Tip (x, y) / m", "To target / mm"]
+    行: [["上", "", "", "", ""], ["下", "", "", "", ""]]
+    行英文: [["up", "", "", "", ""], ["down", "", "", "", ""]]
+注意:
+  - ["构型空间正方形的边界是“粘合”的：靠近右边界的灰色区域与左边界的灰色区域可能属于同一块障碍物。", "The square's edges are glued: grey near the right edge may continue at the left edge."]
+  - ["关节角滑块的步长为 0.5°，到达目标点时允许 1 cm 的误差。", "The joint sliders step by 0.5°; reaching the target allows 1 cm of error."]
+思考题:
+  - ["在构型空间中从 (150°, −60°) 走到 (−120°, 60°)，为什么沿正方形内部的直线会碰撞，而跨过边界的路径不会？", "Going from (150°, −60°) to (−120°, 60°), why does the straight line inside the square collide while the path across the edge does not?"]

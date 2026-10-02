@@ -1,0 +1,27 @@
+# 实验 11.2 的指导书与报告模板。目的、场景、参数、任务取自 lab11_2.js。
+原理:
+  - ["格吕布勒公式：N 个构件（含机架）、J 个关节、第 i 个关节自由度为 fᵢ 的机构，若约束彼此独立，自由度为", "Grübler's formula: for N links (ground included) and J joints with fᵢ freedoms, if the constraints are independent,"]
+  - 式: "M = m(N − 1 − J) + Σ fᵢ ，平面 m = 3，空间 m = 6          (11.2.2)"
+  - ["按秩计算：把各运动构件的运动旋量和各关节速度当作未知数，每个关节给出“两侧构件运动旋量之差 = 关节允许的运动旋量”的方程，瞬时自由度 = 未知数个数 − 系数矩阵的秩。单回路时化为", "By rank: take the twists of the moving links and the joint rates as unknowns; each joint says the difference of the twists equals an allowed joint twist. Instantaneous mobility = unknowns − rank. For one loop this is"]
+  - 式: "M_inst = n − rank(𝒮₁ ⋯ 𝒮ₙ) ≥ M          (11.2.6)"
+  - ["两者不同，说明有重复的约束：过约束机构（如平行四边形加一根等长平行的曲柄），或机构处在奇异位置（如平行四边形机构的共线位置）。", "A difference means repeated constraints: an overconstrained mechanism (a parallelogram with an equal parallel extra crank) or a singular position (the collinear position of a parallelogram)."]
+步骤:
+  - ["场景“平面五杆机器人”：先只改变输入 1，观察末端走一条曲线；再只改变输入 2。然后同时调两个输入，把末端送到绿色目标点（任务 1），记录两个输入的值和读数，填入表 1。", "Scene “Planar five-bar robot”: change only input 1 and watch the tip trace a curve; then only input 2. Then use both to bring the tip to the green target (task 1); record in Table 1."]
+  - ["场景“平行四边形机构”：记录不加第三根曲柄时的 N、J、公式 M 和瞬时自由度；加上第三根曲柄，再记录一次，并把曲柄转动 30° 以上（任务 2）。", "Scene “Parallelogram linkage”: record N, J, Grübler M and the instantaneous mobility; add the extra crank, record again, and turn the crank by more than 30° (task 2)."]
+  - ["去掉第三根曲柄，把曲柄转到 0° 或 180°，记录瞬时自由度（任务 3）；再转到 5°，记录。", "Remove the extra crank, turn the crank to 0° or 180° and record the instantaneous mobility (task 3); then at 5°."]
+  - ["场景“剪叉式升降台”：改变夹角 φ，记录平台高度和两种自由度，把平台升到 1.5 m 以上（任务 4）。", "Scene “Scissor lift”: vary φ, record the height and both counts, and raise the platform above 1.5 m (task 4)."]
+数据表:
+  - 标题: ["表 1  各机构的计数", "Table 1  Counts for each mechanism"]
+    表头: ["机构与位置", "N", "J", "公式 M", "瞬时自由度"]
+    表头英文: ["Mechanism and position", "N", "J", "Grübler M", "Instantaneous mobility"]
+    行: [["五杆机构", "", "", "", ""], ["平行四边形，θ₁ = 60°", "", "", "", ""], ["平行四边形加曲柄", "", "", "", ""], ["平行四边形，θ₁ = 0°", "", "", "", ""], ["平行四边形，θ₁ = 5°", "", "", "", ""], ["剪叉升降台", "", "", "", ""]]
+    行英文: [["Five-bar", "", "", "", ""], ["Parallelogram, θ₁ = 60°", "", "", "", ""], ["Parallelogram + extra crank", "", "", "", ""], ["Parallelogram, θ₁ = 0°", "", "", "", ""], ["Parallelogram, θ₁ = 5°", "", "", "", ""], ["Scissor lift", "", "", "", ""]]
+  - 标题: ["表 2  五杆机器人到达目标", "Table 2  Five-bar robot reaching the target"]
+    表头: ["输入 1 θ₁ / °", "输入 2 θ₂ / °", "末端 (x, y) / m", "离目标 / mm"]
+    表头英文: ["Input 1 θ₁ / °", "Input 2 θ₂ / °", "Tip (x, y) / m", "To target / mm"]
+    行: [["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["瞬时自由度只反映此刻能不能“动一点”，在奇异位置会比一般位置大。", "The instantaneous mobility tells whether the mechanism can move a little right now; at singular positions it exceeds the generic value."]
+  - ["五杆机器人在某些输入下无法装配（两根连杆够不到），界面会给出提示。", "For some inputs the five-bar cannot be assembled (the couplers cannot meet); the screen says so."]
+思考题:
+  - ["为什么剪叉升降台加多少级，自由度都还是 1？用式 (11.2.4) 解释每加一级增加的关节自由度和回路数。", "Why does a scissor lift keep one degree of freedom however many stages it has? Use Eq. (11.2.4) to count joints and loops per stage."]

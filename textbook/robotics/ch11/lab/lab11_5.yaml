@@ -1,0 +1,38 @@
+# 实验 11.5 的指导书与报告模板。目的、场景、参数、任务取自 lab11_5.js。
+原理:
+  - ["闭链的关节变量之间有闭环方程，它们是完整约束：把构型空间削成低维的曲面。Delta 有 39 个关节变量，只有 3 个自由度。",
+     "The joint variables of a closed chain obey loop-closure equations, which are holonomic constraints that cut the C-space down. The Delta has 39 joint variables but only 3 degrees of freedom."]
+  - 式: "Delta 第 k 条支链：|p + Rp e_k − E_k(θ_k)| = Lb，E_k = Rb e_k + La (cos θ_k e_k − sin θ_k z)"
+  - ["逆运动学：给定平台中心 p，每条支链单独解 A cos θ + B sin θ = C，θ = atan2(B, A) ± arccos(C / √(A² + B²))；|C| > √(A² + B²) 时这条支链够不着。",
+     "Inverse kinematics: for a given platform centre p each leg solves A cos θ + B sin θ = C alone, θ = atan2(B, A) ± arccos(C / √(A² + B²)); if |C| > √(A² + B²) the leg cannot reach."]
+  - ["正运动学：给定三个转角，平台中心是三个半径为 Lb 的球面的交点，一般有两个，取下方的一个。", "Forward kinematics: for given angles the platform centre is where three spheres of radius Lb meet; of the two points the lower one is taken."]
+  - 式: "差速 AGV：ẋ cos φ + ẏ sin φ = r(θ̇R + θ̇L)/2，ẋ sin φ − ẏ cos φ = 0，φ̇ = r(θ̇R − θ̇L)/b"
+  - ["第三个约束可积：φ − r(θR − θL)/b = 常数；另两个不可积（非完整约束），车的位置不由轮转角决定，要由轮速的全部历史积分得到。",
+     "The third constraint integrates to φ − r(θR − θL)/b = const; the other two do not (nonholonomic), so the position is not fixed by the wheel angles and must be integrated from the whole history of wheel speeds."]
+步骤:
+  - ["场景“Delta：给平台位置”：把平台中心调到 (100, 0, −450) mm（任务 1），记录三个转角和闭合误差，与算例 11.5.3 比较；再调到 (0, 0, −420) mm，记录转角。填入表 1。",
+     "Scene “Delta: set the platform”: move the centre to (100, 0, −450) mm (task 1), record the three angles and the closure error, compare with Example 11.5.3; then (0, 0, −420) mm. Fill in Table 1."]
+  - ["保持 x = y = 0，把 z 逐渐减小，直到“装配”一栏报告装不上（任务 2），记录此时的 z 和原因；再试一个 x 很大的点。", "Keep x = y = 0 and lower z until the assembly line reports failure (task 2); record z and the reason; then try a point with a large x."]
+  - ["场景“Delta：给电机转角”：先令三个转角都为 20°，记录平台位置；再只把电机 1 改为 45°（任务 3），记录平台位置，观察平台是否转动。填入表 2。",
+     "Scene “Delta: set the motors”: set all three angles to 20° and record the platform position; then change motor 1 alone to 45° (task 3), record the position and see whether the platform turns. Fill in Table 2."]
+  - ["场景“AGV：两种轮速过程”：按“运行”（任务 4），等 A、B 都完成后，记录两终点的轮转角、车头方向和位置，填入表 3。", "Scene “AGV”: press Run (task 4); when A and B are both done, record the wheel angles, heading and position at both ends (Table 3)."]
+  - ["生活场景“侧方停车”：按“运行”（任务 5），观察小车只用倒车转向和直行两种动作就横向挪进了车位，记录横向移动量。", "Everyday scene: press Run (task 5); the car slides sideways into the gap using only reversing with steering and driving straight. Record the sideways shift."]
+数据表:
+  - 标题: ["表 1  Delta 的逆运动学", "Table 1  Inverse kinematics of the Delta"]
+    表头: ["平台中心 p / mm", "θ₁ / °", "θ₂ / °", "θ₃ / °", "闭合误差 / mm"]
+    表头英文: ["Platform centre p / mm", "θ₁ / °", "θ₂ / °", "θ₃ / °", "Closure error / mm"]
+    行: [["(100, 0, −450)", "", "", "", ""], ["(0, 0, −420)", "", "", "", ""], ["", "", "", "", ""]]
+  - 标题: ["表 2  Delta 的正运动学", "Table 2  Forward kinematics of the Delta"]
+    表头: ["θ₁, θ₂, θ₃ / °", "平台中心 p / mm", "平台是否转动"]
+    表头英文: ["θ₁, θ₂, θ₃ / °", "Platform centre p / mm", "Does the platform turn?"]
+    行: [["20, 20, 20", "", ""], ["45, 20, 20", "", ""]]
+  - 标题: ["表 3  两种轮速过程的终点", "Table 3  Ends of the two wheel programmes"]
+    表头: ["过程", "θR / rad", "θL / rad", "φ / °", "(x, y) / m"]
+    表头英文: ["Programme", "θR / rad", "θL / rad", "φ / °", "(x, y) / m"]
+    行: [["A", "", "", "", ""], ["B", "", "", "", ""]]
+注意:
+  - ["Delta 的工作空间计算没有考虑杆件之间的碰撞和球关节的转角限制，真实机器人的可用范围更小。", "The Delta workspace here ignores collisions between rods and the ball joints' angle limits; the real usable range is smaller."]
+  - ["AGV 按纯滚动、不侧滑积分；真实车轮有打滑和轮径误差，里程计的误差会随行驶距离累积。", "The AGV is integrated with pure rolling and no side slip; real wheels slip and differ in diameter, so odometry errors grow with distance."]
+思考题:
+  - ["两种轮速过程的终点车头方向相同、位置不同。如果再给你一个“只读两轮转角”的传感器，能否由它确定车的位置？需要什么额外信息？",
+     "The two programmes end with the same heading but different positions. With a sensor that reads only the two wheel angles, could you tell where the car is? What else would you need?"]
