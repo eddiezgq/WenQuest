@@ -1131,7 +1131,7 @@ def freecad_pack(request: Request, x_wq_token: str = Header(default=""), u=Depen
             z.writestr("wenquest-freecad/Mod/WenQuest/" + name, text)      # 第 8 轮：“问渠”工作台（工具栏按钮）
         sw = open(os.path.join(design_web.FREECAD_DIR, "wq_submit_solidworks.swb"), encoding="ascii").read()     # 第 10 轮 S1
         z.writestr("wenquest-freecad/SolidWorks/wq_submit_solidworks.swb",
-                   sw.replace("__WQ_HUB__", base).replace("__WQ_TOKEN__", x_wq_token))
+                   sw.replace("__WQ_HUB__", base).replace("__WQ_TOKEN__", x_wq_token).replace("\r\n", "\n").replace("\n", "\r\n"))   # VBA 宏用 CRLF
         z.writestr("wenquest-freecad/Mod/WenQuest/InitGui.py",
                    open(os.path.join(design_web.FREECAD_DIR, "Mod", "WenQuest", "InitGui.py"), encoding="utf-8").read())
         z.writestr("wenquest-freecad/使用说明.txt", FREECAD_README.format(base=base, mode="教学" if u["mode"] == "teach" else "生产"))
