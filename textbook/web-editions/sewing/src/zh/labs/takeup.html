@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>挑线机构与供线量</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = mechanism (face-plate view) + hook inset, then the supply/demand curves; right rail = indicators, parameters, guided tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --plate:#eef1f2; --plate2:#dfe4e6; --cloth:#e9e2d2; --clothline:#c9bea4;
+  --needle-thread:#2a5fb8; --demand:#c4531d; --steel:#5c6670; --link:#7b4bc4; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f; --spring:#1e8449;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--plate:#1e2731;--plate2:#26313c;--cloth:#4a4436;--clothline:#6b624d;--needle-thread:#7fa9f2;--demand:#f08c58;--steel:#b7c0c9;--link:#b190f0;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--spring:#5fd08a}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--plate:#1e2731;--plate2:#26313c;--cloth:#4a4436;--clothline:#6b624d;--needle-thread:#7fa9f2;--demand:#f08c58;--steel:#b7c0c9;--link:#b190f0;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--spring:#5fd08a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.two{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.row label{font-size:.84rem;color:var(--muted)}
+input[type=range]{accent-color:var(--accent);width:100%}
+.ang{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:1rem;min-width:4.5em}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 4.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.meter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.meter div{border-top:3px solid var(--rule);padding-top:4px}
+.meter div.ok{border-top-color:var(--ok)} .meter div.bad{border-top-color:var(--bad)} .meter div.warn{border-top-color:var(--warn)}
+.meter b{display:block;font-family:var(--f-mono);font-size:1.08rem;font-variant-numeric:tabular-nums}
+.meter small{color:var(--muted);font-size:.74rem;line-height:1.35;display:block}
+.state{margin-top:10px;font-size:.88rem;min-height:4.2em;border-left:3px solid var(--rule);padding-left:8px}
+.state.ok{border-left-color:var(--ok)} .state.bad{border-left-color:var(--bad)} .state.warn{border-left-color:var(--warn)}
+.state b{display:block}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+details summary{cursor:pointer;font-size:.84rem;color:var(--muted);margin-top:10px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:3px;background:var(--c)}
+.hide{display:none!important}
+</style>
+<div class="wrap">
+<header><h1>挑线机构与供线量</h1><span class="sub">《缝纫机设计与制造》第 4 章 · 虚拟实验 4-1 · 挑线杆放多少线、什么时候放，够不够旋梭用</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <div class="row" style="margin-top:0;justify-content:space-between">
+        <div class="row" style="margin-top:0" id="modes">
+          <button type="button" data-m="link" aria-pressed="true">连杆式（四连杆）</button>
+          <button type="button" data-m="cam">凸轮式（自己设计供线曲线）</button>
+        </div>
+        <span class="note" style="margin:0" id="viewNote">机头面板视图：顺着上轴从左端看，面板已拆下（算例尺寸，示意）</span>
+      </div>
+      <div class="two" style="margin-top:8px">
+        <div><canvas id="mech" width="900" height="680" aria-label="挑线机构与面线线路动画"></canvas></div>
+        <div>
+          <h3 style="margin-top:4px">旋梭处（顺着旋梭轴看，机针从梭壳前面经过）</h3>
+          <canvas id="hook" width="480" height="560" aria-label="机针、旋梭与线环的示意图"></canvas>
+          <p class="note" id="hookNote"></p>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" id="play" aria-pressed="true">暂停</button>
+        <button type="button" id="step">单步 +5°</button>
+        <span class="note" style="margin:0">主轴转角</span><span class="ang" id="angOut">0°</span>
+        <div style="flex:1;min-width:180px"><input id="ang" type="range" min="0" max="359" step="1" value="0" aria-label="主轴转角"></div>
+        <label for="spd">速度</label><input id="spd" type="range" min="0.2" max="3" step="0.1" value="1" style="width:110px">
+      </div>
+      <div class="legend"><span style="--c:var(--needle-thread)">面线</span><span style="--c:var(--link)">挑线连杆与摇杆</span><span style="--c:var(--steel)">曲柄、针杆、旋梭</span><span style="--c:var(--spring)">挑线簧</span></div>
+    </section>
+    <section class="panel">
+      <h3>供线量、耗线量与余线（一针 = 主轴一转）</h3>
+      <canvas id="cv" width="1200" height="560" aria-label="供线量与耗线量曲线"></canvas>
+      <div class="legend"><span style="--c:var(--needle-thread)">供线量 S：挑线杆从收线最紧处放下的线</span><span style="--c:var(--demand)">耗线量 D：机针和线环需要的线</span><span style="--c:var(--ink)">余线 S − D</span><span style="--c:var(--spring)">挑线簧可吸收的范围</span></div>
+      <p class="note" id="camHint">耗线量按简化几何模型计算（见第 4.5 节），供线量由挑线机构几何算出；数值是算例，用来比较趋势。</p>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>指标</h3>
+      <div class="meter" id="meter"></div>
+      <div class="state" id="state"></div>
+    </section>
+    <section class="panel">
+      <h3>参数</h3>
+      <div class="prm" id="prm"></div>
+      <div id="linkMore">
+        <details><summary>连杆尺寸（改了以后机构可能装不上）</summary><div class="prm" id="prmLink"></div>
+          <div class="row"><button type="button" id="lkReset">恢复算例尺寸</button></div></details>
+      </div>
+      <div id="camMore" class="hide">
+        <p class="note">在下方曲线图上拖动蓝色圆点，改变每隔 30° 的供线量；凸轮廓线随之重画。</p>
+        <div class="row"><button type="button" id="camFromLink">从连杆式曲线开始</button><button type="button" id="camSmooth">平滑一次</button></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h3>任务（自动判定）</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+const DEG=Math.PI/180, $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// ---------- needle bar (chapter 3 worked example) ----------
+const RN=15.5, LN=55;
+const xN=f=>{const a=f*DEG,l=RN/LN;return RN*(1-Math.cos(a))-LN*(1-Math.sqrt(1-(l*Math.sin(a))**2));};
+// ---------- hook & loop geometry (axial view of the hook, origin = hook centre) ----------
+const RH=13.5, RC=11.0, EYE_TDC=20, TIP_TDC=18;
+const YP=xN(206)-8;                       // needle-plate top above hook centre: beak passes 1.5 mm above the eye at a 206° catch
+function hullPerim(pts){
+  const p=pts.map(q=>[q[0],q[1]]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+  if(p.length<2)return 0;
+  const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+  const lo=[],up=[];
+  for(const q of p){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q);}
+  for(let i=p.length-1;i>=0;i--){const q=p[i];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q);}
+  const h=lo.slice(0,-1).concat(up.slice(0,-1));let s=0;
+  for(let i=0;i<h.length;i++){const a=h[i],b=h[(i+1)%h.length];s+=Math.hypot(b[0]-a[0],b[1]-a[1]);}
+  return s;
+}
+const smooth=u=>{u=Math.min(1,Math.max(0,u));return u*u*(3-2*u);};
+function loopPts(f,t,phc){
+  const x=xN(f),e=EYE_TDC-t-x,F=[0,YP+t],th=(90-2*(f-phc))*DEG,H=[RH*Math.cos(th),RH*Math.sin(th)];
+  const pts=[F,H],sw=2*(f-phc);
+  for(let a=0;a<sw;a+=1){const q=(90-a)*DEG;pts.push([RC*Math.cos(q),RC*Math.sin(q)]);}
+  if(e<0)pts.push([0,YP+t+e]);
+  return {pts,e,x,H,F};
+}
+function demandRaw(f,t,phc){
+  const x=xN(f),e=EYE_TDC-t-x;
+  if(f<phc)return 2*Math.max(0,-e);
+  const L=loopPts(f,t,phc),P=hullPerim(L.pts),tail=e<0?P+e:e+P;
+  return x+tail-(EYE_TDC-t);
+}
+function demand(f,t,s,phc){
+  const bot=phc+90,off=phc+135,c=s+t;
+  if(f<=bot)return demandRaw(f,t,phc);
+  if(f<=off){const Lb=demandRaw(bot,t,phc),u=smooth((f-bot)/(off-bot));return Lb*(1-u)+c*u;}
+  return c;
+}
+// ---------- take-up four-bar (worked example; coordinates in mm, origin = upper shaft centre, z to the right, y up) ----------
+const LK0={r:20.7,d:-6.8,Qz:21.5,Qy:-45.5,a:43.4,b:40.9,c:65.7,al:2.8};
+const AC=[122.2,-45.7], ADIR=[Math.cos(285.2*DEG),Math.sin(285.2*DEG)], B=[66.4,-117.7];
+const T_DISC=[178,-60], K_PIV=[158,-88], K_ARM=24;
+function linkPose(f,lk){
+  const q=(f+lk.d)*DEG,P=[-lk.r*Math.sin(q),-lk.r*Math.cos(q)],Q=[lk.Qz,lk.Qy];
+  const dz=Q[0]-P[0],dy=Q[1]-P[1],D=Math.hypot(dz,dy),tt=(lk.a*lk.a-lk.b*lk.b+D*D)/(2*D),h2=lk.a*lk.a-tt*tt;
+  if(!(h2>0))return null;
+  const h=Math.sqrt(h2),mz=P[0]+tt*dz/D,my=P[1]+tt*dy/D,M=[mz-h*dy/D,my+h*dz/D];
+  const uz=(M[0]-P[0])/lk.a,uy=(M[1]-P[1])/lk.a,ca=Math.cos(lk.al*DEG),sa=Math.sin(lk.al*DEG);
+  const E=[P[0]+lk.c*(uz*ca-uy*sa),P[1]+lk.c*(uz*sa+uy*ca)];
+  const w1=[P[0]-M[0],P[1]-M[1]],w2=[Q[0]-M[0],Q[1]-M[1]];
+  const mu=Math.acos(Math.max(-1,Math.min(1,(w1[0]*w2[0]+w1[1]*w2[1])/lk.a/lk.b)))/DEG;
+  return {P,M,E,Q,mu};
+}
+// ---------- cam mode: supply defined at 12 points (every 30°), periodic monotone cubic ----------
+let camPts=null;
+function pchipPeriodic(ys){
+  const n=ys.length,h=30,dl=[];for(let i=0;i<n;i++)dl.push((ys[(i+1)%n]-ys[i])/h);
+  const m=[];for(let i=0;i<n;i++){const a=dl[(i-1+n)%n],b=dl[i];m.push(a*b<=0?0:2/(1/a+1/b));}
+  return f=>{f=((f%360)+360)%360;const i=Math.floor(f/h)%n,u=(f-i*h)/h,y0=ys[i],y1=ys[(i+1)%n],m0=m[i]*h,m1=m[(i+1)%n]*h;
+    const u2=u*u,u3=u2*u;return (2*u3-3*u2+1)*y0+(u3-2*u2+u)*m0+(-2*u3+3*u2)*y1+(u3-u2)*m1;};
+}
+// ---------- state ----------
+const ST={mode:'link',phi:0,play:true,spd:1,u:0,t:1.5,s:3,phc:206,stroke:10,rpm:5000,lk:Object.assign({},LK0)};
+const seen={early:false,late:false,bLo:false,bHi:false};
+let R=null;   // computed results
+function compute(){
+  const N=360,ph=[],S=new Array(N),D=new Array(N),E=[],mu=[];
+  let ok=true;
+  const A=[AC[0]+ST.u*ADIR[0],AC[1]+ST.u*ADIR[1]];
+  if(ST.mode==='link'){
+    const Lp=[];
+    for(let i=0;i<N;i++){const p=linkPose(i,ST.lk);if(!p){ok=false;break;}E.push(p.E);mu.push(p.mu);
+      Lp.push(Math.hypot(p.E[0]-A[0],p.E[1]-A[1])+Math.hypot(p.E[0]-B[0],p.E[1]-B[1]));}
+    if(!ok)return {ok:false};
+    const mx=Math.max(...Lp);for(let i=0;i<N;i++)S[i]=mx-Lp[i];
+  }else{
+    const fn=pchipPeriodic(camPts);for(let i=0;i<N;i++)S[i]=Math.max(0,fn(i));
+    const mn=Math.min(...S);for(let i=0;i<N;i++)S[i]-=mn;
+  }
+  let top=0;for(let i=1;i<N;i++)if(S[i]<S[top])top=i;
+  let bot=0;for(let i=1;i<N;i++)if(S[i]>S[bot])bot=i;
+  const c=ST.s+ST.t;
+  for(let i=0;i<N;i++)D[i]=i<top?c:demand(i,ST.t,ST.s,ST.phc);
+  const sl=S.map((v,i)=>v-D[i]);
+  let fin=0;while(fin<180&&xN(fin)<EYE_TDC-ST.t)fin++;   // needle eye enters the fabric
+  let margin=1e9,at=0;for(let i=ST.phc;i<=Math.min(359,ST.phc+135);i++)if(sl[i]<margin){margin=sl[i];at=i;}
+  let waste=-1e9;for(let i=ST.phc;i<=Math.min(359,ST.phc+90);i++)waste=Math.max(waste,sl[i]);
+  let pre=-1e9;for(let i=top;i<=fin;i++)pre=Math.max(pre,sl[i]);
+  let neg=0;for(let i=fin;i<ST.phc;i++)neg=Math.max(neg,-sl[i]);
+  // thread acceleration at ST.rpm: second difference of S
+  const w=ST.rpm*2*Math.PI/60;let acc=0;
+  for(let i=0;i<N;i++){const d2=(S[(i+1)%N]-2*S[i]+S[(i-1+N)%N])/(DEG*DEG);acc=Math.max(acc,Math.abs(d2));}
+  R={ok:true,S,D,sl,top,bot,fin,margin,at,waste,pre,neg,entry:sl[fin],c,Smax:S[bot],acc:acc*w*w/1000,
+     mu:mu.length?[Math.min(...mu),Math.max(...mu)]:null,E,A};
+  return R;
+}
+// ---------- UI: parameters ----------
+const PRM=[
+  ['u','过线板位置（+ 多放线，− 少放线）',-12,24,1,'mm','link'],
+  ['t','布料厚度',0.5,5,0.1,'mm'],
+  ['s','针距',1,5,0.1,'mm'],
+  ['phc','钩线时刻（梭尖到达机针）',190,222,1,'°'],
+  ['stroke','挑线簧行程',4,16,0.5,'mm'],
+  ['rpm','转速（算线的加速度用）',1000,6000,100,'r/min']];
+const PRML=[['a','连杆长（曲柄销—摇杆铰点）',38,48,0.1,'mm'],['b','摇杆长',36,46,0.1,'mm'],['c','线孔到曲柄销',58,74,0.1,'mm'],['d','挑线曲柄相位（相对针杆曲柄的对面）',-30,15,0.1,'°']];
+function buildPrm(host,list,obj){
+  host.innerHTML=list.map(([k,l,mn,mx,st,u,only])=>`<label for="p_${k}" ${only?`data-only="${only}"`:''}>${l}</label><input id="p_${k}" type="range" min="${mn}" max="${mx}" step="${st}" ${only?`data-only="${only}"`:''}><output id="o_${k}" ${only?`data-only="${only}"`:''}></output>`).join('');
+  list.forEach(([k,,,,st,u])=>{const el=$('p_'+k);el.value=obj[k];const show=()=>{$('o_'+k).textContent=(+obj[k]).toFixed(st<1?1:0)+' '+u;};show();
+    el.addEventListener('input',()=>{obj[k]=+el.value;show();changed();});});
+}
+function syncPrm(){[...PRM.map(p=>[p,ST]),...PRML.map(p=>[p,ST.lk])].forEach(([[k,,,,st,u],o])=>{const el=$('p_'+k);if(el){el.value=o[k];$('o_'+k).textContent=(+o[k]).toFixed(st<1?1:0)+' '+u;}});}
+buildPrm($('prm'),PRM,ST);buildPrm($('prmLink'),PRML,ST.lk);
+function changed(){compute();if(std()&&R.ok&&ST.phc<=198&&R.waste<=18.5)seen.early=true;if(std()&&R.ok&&ST.phc>=214&&R.margin<1)seen.late=true;
+  if(ST.mode==='link'&&R.ok){if(ST.lk.b<=38.5)seen.bLo=true;if(ST.lk.b>=43.5)seen.bHi=true;}
+  draw();checkTasks();}
+$('lkReset').onclick=()=>{ST.lk=Object.assign({},LK0);syncPrm();changed();};
+function setMode(m){ST.mode=m;document.querySelectorAll('#modes button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));
+  $('linkMore').classList.toggle('hide',m!=='link');$('camMore').classList.toggle('hide',m!=='cam');
+  document.querySelectorAll('[data-only]').forEach(el=>el.classList.toggle('hide',m!==el.dataset.only));
+  if(m==='cam'&&!camPts)camFromLink();
+  $('viewNote').textContent=m==='link'?'机头面板视图：顺着上轴从左端看，面板已拆下（算例尺寸，示意）':'凸轮式：上轴上的挑线凸轮推动摆杆，线孔沿弧线上下（示意）';
+  changed();}
+document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+function camFromLink(){const keep=ST.mode;ST.mode='link';const r=compute();ST.mode=keep;
+  camPts=r.ok?[...Array(12)].map((_,i)=>+r.S[i*30].toFixed(1)):[0,2,6,10,20,40,60,80,70,30,8,1];}
+$('camFromLink').onclick=()=>{camFromLink();changed();};
+$('camSmooth').onclick=()=>{const p=camPts.slice();camPts=p.map((v,i)=>Math.max(0,(p[(i+11)%12]+2*v+p[(i+1)%12])/4));changed();};
+// ---------- animation controls ----------
+$('play').onclick=()=>{ST.play=!ST.play;$('play').textContent=ST.play?'暂停':'播放';$('play').setAttribute('aria-pressed',ST.play);};
+$('step').onclick=()=>{ST.play=false;$('play').textContent='播放';$('play').setAttribute('aria-pressed',false);ST.phi=(ST.phi+5)%360;draw();checkTasks();};
+$('ang').addEventListener('input',e=>{ST.play=false;$('play').textContent='播放';$('play').setAttribute('aria-pressed',false);ST.phi=+e.target.value;draw();checkTasks();});
+$('spd').addEventListener('input',e=>ST.spd=+e.target.value);
+// ---------- drawing helpers ----------
+function line(g,a,b){g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();}
+function dot(g,p,r,fill){g.beginPath();g.arc(p[0],p[1],r,0,2*Math.PI);if(fill){g.fillStyle=fill;g.fill();}g.stroke();}
+function bar(g,a,b,w,col){g.save();g.strokeStyle=col;g.lineWidth=w;g.lineCap='round';line(g,a,b);g.restore();}
+function label(g,txt,p,anchor,col){g.fillStyle=col||css('--muted');g.textAlign=anchor||'left';g.fillText(txt,p[0],p[1]);}
+// ---------- mechanism view ----------
+const MV={z0:-38,z1:198,y0:-140,y1:38};
+function mechDraw(){
+  const cv=$('mech'),g=cv.getContext('2d'),W=cv.width,H=cv.height;
+  const sc=Math.min(W/(MV.z1-MV.z0),H/(MV.y1-MV.y0)),T=p=>[(p[0]-MV.z0)*sc,(MV.y1-p[1])*sc];
+  g.clearRect(0,0,W,H);g.font='15px '+css('--f-body');g.lineJoin='round';
+  const ink=css('--ink'),mut=css('--muted'),st=css('--steel'),lk=css('--link'),th=css('--needle-thread'),sp=css('--spring');
+  // housing face
+  g.fillStyle=css('--plate');g.strokeStyle=css('--rule');g.lineWidth=1.5;
+  const fr=[T([-32,32]),T([194,-136])];g.beginPath();g.roundRect(fr[0][0],fr[0][1],fr[1][0]-fr[0][0],fr[1][1]-fr[0][1],18);g.fill();g.stroke();
+  const f=ST.phi;
+  // needle bar (z = 0) with crank
+  const qn=f*DEG,pinN=[RN*Math.sin(qn),RN*Math.cos(qn)],yj=pinN[1]-Math.sqrt(LN*LN-pinN[0]*pinN[0]);
+  g.strokeStyle=st;g.lineWidth=1.2;
+  bar(g,T([0,yj+34]),T([0,-140]),9*sc/3.2,css('--plate2'));g.strokeStyle=st;g.lineWidth=1.2;
+  line(g,T([-1.6,yj+34]),T([-1.6,-140]));line(g,T([1.6,yj+34]),T([1.6,-140]));
+  // break mark on needle bar
+  g.strokeStyle=mut;g.beginPath();const bk=T([0,-131]);g.moveTo(bk[0]-14,bk[1]+6);g.lineTo(bk[0]-4,bk[1]-6);g.lineTo(bk[0]+4,bk[1]+6);g.lineTo(bk[0]+14,bk[1]-6);g.stroke();
+  bar(g,T(pinN),T([0,yj]),5,st);
+  // crank disc
+  g.strokeStyle=st;g.lineWidth=1.5;g.fillStyle=css('--plate2');dot(g,T([0,0]),24*sc,css('--plate2'));dot(g,T([0,0]),6*sc,css('--sheet'));
+  dot(g,T(pinN),3*sc,st);
+  if(ST.mode==='link'&&R.ok){
+    const p=linkPose(f,ST.lk);
+    // coupler curve
+    g.save();g.setLineDash([4,4]);g.strokeStyle=mut;g.lineWidth=1;g.beginPath();
+    R.E.forEach((e,i)=>{const q=T(e);i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);});g.closePath();g.stroke();g.restore();
+    g.fillStyle=mut;g.font='12px '+css('--f-mono');
+    for(let k=0;k<360;k+=30){const q=T(R.E[k]);g.beginPath();g.arc(q[0],q[1],2.2,0,7);g.fill();g.fillText(k+'°',q[0]+(R.E[k][0]>62?6:-30),q[1]+4);}
+    g.font='15px '+css('--f-body');
+    // ground pivot hatch
+    const Qs=T(p.Q);g.strokeStyle=mut;g.lineWidth=1;for(let k=-2;k<=2;k++)line(g,[Qs[0]+k*6-4,Qs[1]+14],[Qs[0]+k*6+4,Qs[1]+6]);line(g,[Qs[0]-16,Qs[1]+6],[Qs[0]+16,Qs[1]+6]);
+    bar(g,T(p.Q),T(p.M),7,lk);
+    bar(g,T(p.P),T(p.E),9,lk);
+    g.strokeStyle=st;g.lineWidth=1.5;dot(g,T(p.P),4,css('--sheet'));dot(g,T(p.M),3.5,css('--sheet'));dot(g,T(p.Q),4,css('--sheet'));
+    g.strokeStyle=lk;g.lineWidth=3;dot(g,T(p.E),6,css('--sheet'));
+    // crank arm to pin
+    bar(g,T([0,0]),T(p.P),6,st);
+    R._E=p.E;R._mu=p.mu;
+    
+  }else if(ST.mode==='cam'){
+    // cam on the upper shaft; a roller lever pivoted on the housing carries the eye (schematic proportions)
+    const fn=pchipPeriodic(camPts),mx=Math.max(...R.S)||1,KL=14/mx;
+    g.beginPath();for(let k=0;k<=360;k+=2){const ang=(k)*DEG,lift=Math.max(0,fn(((f-k)%360+360)%360))*KL,r=24+lift;const pt=T([r*Math.cos(ang),r*Math.sin(ang)]);k?g.lineTo(pt[0],pt[1]):g.moveTo(pt[0],pt[1]);}
+    g.closePath();g.fillStyle=css('--plate2');g.fill();g.strokeStyle=lk;g.lineWidth=2;g.stroke();
+    g.strokeStyle=st;dot(g,T([0,0]),6*sc,css('--sheet'));
+    const lift0=Math.max(0,fn(f))*KL, Rr=[24+lift0+4,0], O=[58,-34];
+    const psi=Math.atan2(Rr[1]-O[1],Rr[0]-O[0]), E2=[O[0]+64*Math.cos(psi-1.25),O[1]+64*Math.sin(psi-1.25)];
+    bar(g,T(O),T(Rr),7,lk);bar(g,T(O),T(E2),8,lk);
+    g.strokeStyle=st;g.lineWidth=1.5;dot(g,T(Rr),4,css('--sheet'));dot(g,T(O),4,css('--sheet'));
+    const Os=T(O);g.strokeStyle=mut;g.lineWidth=1;for(let k=-2;k<=2;k++)line(g,[Os[0]+k*6-4,Os[1]+14],[Os[0]+k*6+4,Os[1]+6]);line(g,[Os[0]-16,Os[1]+6],[Os[0]+16,Os[1]+6]);
+    g.strokeStyle=lk;g.lineWidth=3;dot(g,T(E2),6,css('--sheet'));R._E=E2;R._mu=null;
+    // eye path trace
+    g.save();g.setLineDash([4,4]);g.strokeStyle=mut;g.lineWidth=1;g.beginPath();
+    for(let k=0;k<=360;k+=4){const l=Math.max(0,fn(k%360))*KL,rr=[24+l+4,0],ps=Math.atan2(rr[1]-O[1],rr[0]-O[0]),e=T([O[0]+64*Math.cos(ps-1.25),O[1]+64*Math.sin(ps-1.25)]);k?g.lineTo(e[0],e[1]):g.moveTo(e[0],e[1]);}g.stroke();g.restore();
+    label(g,'挑线凸轮',[T([0,-30])[0]-34,T([0,-30])[1]+18],'left',mut);label(g,'摆杆',[T(O)[0]+12,T(O)[1]+26],'left',lk);
+  }
+  // thread path: tension disc → check spring → guide A → eye → guide B → face-plate guide → needle-bar guide → needle
+  const slack=R.ok?R.sl[Math.round(f)%360]:0, defl=Math.max(0,Math.min(ST.stroke,slack));
+  const springAng=(200-defl/ST.stroke*55)*DEG, K=[K_PIV[0]+K_ARM*Math.cos(springAng),K_PIV[1]+K_ARM*Math.sin(springAng)];
+  const A=ST.mode==='link'?R.A:[150,-40], Bp=ST.mode==='link'?B:[96,-112];
+  const G1=[30,-128],NBG=[3,yj-50];
+  // guides and slot
+  if(ST.mode==='link'){g.strokeStyle=mut;g.lineWidth=7;g.lineCap='round';g.globalAlpha=.35;line(g,T([AC[0]-12*ADIR[0],AC[1]-12*ADIR[1]]),T([AC[0]+12*ADIR[0],AC[1]+12*ADIR[1]]));g.globalAlpha=1;g.lineCap='butt';}
+  g.strokeStyle=st;g.lineWidth=2;[A,Bp,G1].forEach(q=>dot(g,T(q),4,css('--sheet')));
+  // tension disc
+  g.fillStyle=css('--plate2');g.strokeStyle=st;dot(g,T(T_DISC),11*sc/3,css('--plate2'));dot(g,T(T_DISC),3,st);
+  // check spring arm
+  g.strokeStyle=sp;g.lineWidth=2.5;line(g,T(K_PIV),T(K));g.lineWidth=1.5;dot(g,T(K_PIV),3,css('--sheet'));
+  g.save();g.strokeStyle=sp;g.lineWidth=1;g.beginPath();for(let k=0;k<=40;k++){const a=k/40*4*2*Math.PI,r=5+k*0.04;const q=T([K_PIV[0]+r*Math.cos(a)/sc*3,K_PIV[1]+r*Math.sin(a)/sc*3]);k?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);}g.stroke();g.restore();
+  // thread
+  const E=R._E||[60,0];
+  const loose=R.ok&&slack>ST.stroke+0.5&&f>=R.top&&f<=R.fin;
+  g.strokeStyle=th;g.lineWidth=2.4;g.beginPath();
+  const pts=[[T_DISC[0]+12,T_DISC[1]+40],[T_DISC[0],T_DISC[1]-4],K,A,E,Bp,G1,NBG,[2,-140]].map(T);
+  pts.forEach((q,i)=>{if(!i)g.moveTo(q[0],q[1]);else if(loose&&i===4){const m=[(pts[3][0]+q[0])/2+18,(pts[3][1]+q[1])/2+26];g.quadraticCurveTo(m[0],m[1],q[0],q[1]);}else g.lineTo(q[0],q[1]);});g.stroke();
+  // labels
+  g.font='15px '+css('--f-body');
+  label(g,'上轴与曲柄盘',[T([-30,30])[0],T([-30,30])[1]],'left',mut);
+  if(ST.mode==='link'){const p=linkPose(f,ST.lk);label(g,'机架铰点',[T(p.Q)[0]-80,T(p.Q)[1]+30],'left',mut);label(g,'摇杆',[(T(p.Q)[0]+T(p.M)[0])/2-38,(T(p.Q)[1]+T(p.M)[1])/2],'left',lk);
+    label(g,'过线板（可调）',[T(A)[0]-50,T(A)[1]+34],'left',mut);label(g,'过线点',[T(Bp)[0]+10,T(Bp)[1]+20],'left',mut);}
+  label(g,'挑线杆线孔',[T(E)[0]+12,T(E)[1]-10],'left',ink);
+  label(g,'夹线器',[T(T_DISC)[0]-58,T(T_DISC)[1]-16],'left',mut);
+  label(g,'挑线簧',[T(K_PIV)[0]-14,T(K_PIV)[1]+34],'left',sp);
+  label(g,'针杆',[T([0,-118])[0]+12,T([0,-118])[1]],'left',mut);
+  label(g,'面板过线',[T(G1)[0]+10,T(G1)[1]+6],'left',mut);
+  if(loose){g.fillStyle=css('--bad');g.font='bold 15px '+css('--f-body');g.fillText('余线超过挑线簧行程，面线松垮',T(A)[0]-150,T(A)[1]+64);}
+}
+// ---------- hook inset ----------
+function hookDraw(){
+  const cv=$('hook'),g=cv.getContext('2d'),W=cv.width,H=cv.height,f=ST.phi;
+  const span=48,sc=W/span,T=p=>[W/2+p[0]*sc,H*0.62-p[1]*sc];
+  g.clearRect(0,0,W,H);g.lineJoin='round';
+  const st=css('--steel'),th=css('--needle-thread'),mut=css('--muted');
+  // fabric & plate
+  const yTop=YP+ST.t;g.fillStyle=css('--cloth');g.fillRect(0,T([0,yTop])[1],W,ST.t*sc);
+  g.strokeStyle=css('--clothline');g.lineWidth=1;line(g,[0,T([0,YP])[1]],[W,T([0,YP])[1]]);
+  g.fillStyle=css('--plate2');g.fillRect(0,T([0,YP])[1],W,2.5*sc);
+  // hook body (circle) and bobbin case
+  g.strokeStyle=st;g.lineWidth=2;dot(g,T([0,0]),(RH+2.5)*sc,null);
+  g.fillStyle=css('--plate2');dot(g,T([0,0]),RC*sc,css('--plate2'));g.fillStyle=mut;g.font='13px '+css('--f-body');g.textAlign='center';g.fillText('梭壳',T([0,0])[0],T([0,0])[1]+5);
+  // beak (2 turns per stitch)
+  const hb=(90-2*(f-ST.phc))*DEG,Hb=[RH*Math.cos(hb),RH*Math.sin(hb)];
+  g.strokeStyle=st;g.lineWidth=4;g.beginPath();g.arc(T([0,0])[0],T([0,0])[1],RH*sc,-hb-40*DEG,-hb);g.stroke();
+  g.fillStyle=st;g.beginPath();const bp=T(Hb);g.arc(bp[0],bp[1],4,0,7);g.fill();
+  // needle
+  const x=xN(f),tip=YP+TIP_TDC-x,eyeY=YP+EYE_TDC-x;
+  g.fillStyle=st;const nt=T([0,tip]),ntop=T([0,YP+24]);g.beginPath();g.moveTo(nt[0],nt[1]);g.lineTo(nt[0]-0.5*sc,nt[1]-2*sc);g.lineTo(ntop[0]-0.5*sc,ntop[1]);g.lineTo(ntop[0]+0.5*sc,ntop[1]);g.lineTo(nt[0]+0.5*sc,nt[1]-2*sc);g.closePath();g.fill();
+  g.fillStyle=css('--sheet');g.beginPath();const ey=T([0,eyeY]);g.ellipse(ey[0],ey[1],1.6,0.6*sc,0,0,7);g.fill();
+  // thread / loop
+  g.strokeStyle=th;g.lineWidth=2.2;
+  const bot=ST.phc+90,off=ST.phc+135,F=[0,yTop];
+  let mode='';
+  if(f>=ST.phc&&f<=bot){
+    const L=loopPts(f,ST.t,ST.phc);
+    // draw the hull polygon (loop)
+    const p=L.pts.map(q=>[q[0],q[1]]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]),cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]),lo=[],up=[];
+    for(const q of p){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q);}
+    for(let i=p.length-1;i>=0;i--){const q=p[i];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q);}
+    const h=lo.slice(0,-1).concat(up.slice(0,-1));g.beginPath();h.forEach((q,i)=>{const s=T(q);i?g.lineTo(s[0],s[1]):g.moveTo(s[0],s[1]);});g.closePath();g.stroke();
+    mode='梭尖钩住线环，转了 '+Math.round(2*(f-ST.phc))+'°，线环被拉大、绕向梭壳（梭尖转到最下面时最大）';
+  }else if(f>bot&&f<=off){
+    // loop lies around the case and is being drawn off it: F -> right tangent -> arc under the case -> left tangent -> F
+    const u=smooth((f-bot)/(off-bot)),r=RC+1.2,dF=Math.hypot(F[0],F[1]),aF=Math.atan2(F[1],F[0]),dA=Math.acos(r/dF);
+    g.save();g.globalAlpha=1-0.6*u;g.beginPath();const tf=T(F);g.moveTo(tf[0],tf[1]);
+    for(let a=aF-dA;a>=aF+dA-2*Math.PI;a-=0.05){const q=T([r*Math.cos(a),r*Math.sin(a)]);g.lineTo(q[0],q[1]);}
+    g.closePath();g.stroke();g.restore();
+    mode='线环滑过梭壳，挑线杆开始收线；到 '+off+'° 左右线环脱出梭壳';
+  }else{
+    const tf=T(F);
+    if(eyeY<yTop){line(g,[tf[0]-1.5,tf[1]],[ey[0]-1.5,ey[1]]);line(g,[tf[0]+2.5,tf[1]],[ey[0]+2.5,ey[1]]);mode='机针带着面线穿过布料，布下的面线是“下去—回来”两股';}
+    else {line(g,tf,[ey[0],ey[1]]);mode=f<ST.phc?'机针还在布面以上，机针这一侧暂时不要线':'线环已脱出，挑线杆收紧线迹';}
+  }
+  // labels
+  g.fillStyle=mut;g.font='13px '+css('--f-body');g.textAlign='left';
+  g.fillText('布',6,T([0,yTop])[1]-4);g.fillText('针板',6,T([0,YP])[1]+16);g.fillText('梭尖',bp[0]+8,bp[1]+4);
+  $('hookNote').textContent=mode;
+}
+// ---------- curves ----------
+const CV={x0:70,x1:1180,yA0:28,yA1:330,yB0:370,yB1:540};
+let drag=-1;
+function curvesDraw(){
+  const cv=$('cv'),g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);
+  const ink=css('--ink'),mut=css('--muted'),rule=css('--rule'),th=css('--needle-thread'),dm=css('--demand'),sp=css('--spring'),bad=css('--bad');
+  const X=f=>CV.x0+(CV.x1-CV.x0)*f/360;
+  if(!R.ok){g.fillStyle=bad;g.font='18px '+css('--f-body');g.fillText('机构在某些转角无法装配：连杆和摇杆够不着。请改回连杆尺寸。',CV.x0,120);return;}
+  const top=Math.max(90,Math.ceil(Math.max(...R.S,...R.D)/10)*10+10);
+  const YA=v=>CV.yA1-(CV.yA1-CV.yA0)*v/top;
+  const lo=-15,hi=Math.max(35,Math.ceil(Math.max(...R.sl)/10)*10);
+  const YB=v=>CV.yB1-(CV.yB1-CV.yB0)*(v-lo)/(hi-lo);
+  g.font='13px '+css('--f-mono');g.strokeStyle=rule;g.lineWidth=1;g.fillStyle=mut;g.textAlign='right';
+  for(let v=0;v<=top;v+=20){line(g,[CV.x0,YA(v)],[CV.x1,YA(v)]);g.fillText(v,CV.x0-8,YA(v)+4);}
+  for(let v=-10;v<=hi;v+=10){line(g,[CV.x0,YB(v)],[CV.x1,YB(v)]);g.fillText(v,CV.x0-8,YB(v)+4);}
+  g.textAlign='center';for(let f=0;f<=360;f+=30){line(g,[X(f),CV.yA0],[X(f),CV.yA1]);line(g,[X(f),CV.yB0],[X(f),CV.yB1]);g.fillText(f+'°',X(f),CV.yB1+18);}
+  g.save();g.translate(18,(CV.yA0+CV.yA1)/2);g.rotate(-Math.PI/2);g.fillText('线量 mm',0,0);g.restore();
+  g.save();g.translate(18,(CV.yB0+CV.yB1)/2);g.rotate(-Math.PI/2);g.fillText('余线 mm',0,0);g.restore();
+  // phase bands on top plot
+  const band=(a,b,txt,col)=>{g.fillStyle=col;g.globalAlpha=.08;g.fillRect(X(a),CV.yA0,X(b)-X(a),CV.yB1-CV.yA0);g.globalAlpha=1;g.fillStyle=mut;g.font='13px '+css('--f-body');g.textAlign='center';g.fillText(txt,(X(a)+X(b))/2,CV.yA0+14);};
+  band(ST.phc,Math.min(360,ST.phc+135),'钩线 → 绕梭 → 脱环',dm);
+  band(0,R.top,'收线（上一针）',ink);
+  // spring band on slack plot
+  g.fillStyle=sp;g.globalAlpha=.13;g.fillRect(CV.x0,YB(ST.stroke),CV.x1-CV.x0,YB(0)-YB(ST.stroke));g.globalAlpha=1;
+  g.strokeStyle=ink;g.lineWidth=1.2;line(g,[CV.x0,YB(0)],[CV.x1,YB(0)]);
+  // S and D
+  const plot=(arr,col,Y,wid,dash)=>{g.save();g.strokeStyle=col;g.lineWidth=wid;if(dash)g.setLineDash(dash);g.beginPath();arr.forEach((v,i)=>{const p=[X(i),Y(v)];i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);});g.stroke();g.restore();};
+  plot(R.S,th,YA,3);
+  // D with a jump at take-up top
+  g.save();g.strokeStyle=dm;g.lineWidth=3;g.beginPath();for(let i=0;i<R.top;i++){const p=[X(i),YA(R.D[i])];i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();
+  g.beginPath();for(let i=R.top;i<360;i++){const p=[X(i),YA(R.D[i])];i>R.top?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();
+  g.setLineDash([3,3]);g.lineWidth=1.5;line(g,[X(R.top),YA(R.c)],[X(R.top),YA(0)]);g.restore();
+  g.fillStyle=dm;g.font='13px '+css('--f-body');g.textAlign='left';g.fillText('拉线 '+R.c.toFixed(1)+' mm',X(R.top)+6,YA(R.c)-6);
+  // slack: colour segments
+  for(let i=0;i<359;i++){const a=R.sl[i],b=R.sl[i+1];let col=ink;
+    const inHook=i>=ST.phc&&i<=ST.phc+135;
+    if(inHook&&a<0)col=bad;else if(i>=R.top&&i<=R.fin&&a>ST.stroke)col=bad;else if(i>=R.fin&&i<ST.phc&&a<-1)col=bad;
+    g.strokeStyle=col;g.lineWidth=col===bad?3.2:2;line(g,[X(i),YB(a)],[X(i+1),YB(b)]);}
+  // markers
+  const mk=(f,txt,y)=>{g.save();g.strokeStyle=mut;g.setLineDash([2,4]);line(g,[X(f),CV.yA0+20],[X(f),CV.yB1]);g.restore();g.fillStyle=mut;g.font='12px '+css('--f-body');g.textAlign='left';g.fillText(txt,X(f)+4,y);};
+  mk(R.top,'收线最紧 '+R.top+'°',CV.yA1-6);mk(R.bot,'放线最多 '+R.bot+'°',CV.yA0+34);mk(R.fin,'针眼入布 '+R.fin+'°',CV.yB0+14);mk(ST.phc,'钩线 '+ST.phc+'°',CV.yA1-24);
+  // minimum margin marker
+  g.fillStyle=R.margin<1?bad:css('--ok');g.beginPath();g.arc(X(R.at),YB(R.margin),5,0,7);g.fill();
+  g.font='13px '+css('--f-body');g.textAlign='left';g.fillText('最小余量 '+R.margin.toFixed(1),X(R.at)+8,YB(R.margin)+16);
+  g.fillStyle=sp;g.fillText('挑线簧行程 '+ST.stroke+' mm',CV.x0+6,YB(ST.stroke)-4);
+  // cam handles
+  if(ST.mode==='cam'){g.fillStyle=th;g.strokeStyle=css('--sheet');g.lineWidth=2;camPts.forEach((v,i)=>{g.beginPath();g.arc(X(i*30),YA(v-Math.min(...camPts)),7,0,7);g.fill();g.stroke();});}
+  // cursor
+  g.strokeStyle=ink;g.lineWidth=1.5;line(g,[X(ST.phi),CV.yA0],[X(ST.phi),CV.yB1]);
+  const i=Math.round(ST.phi)%360;g.fillStyle=th;g.beginPath();g.arc(X(i),YA(R.S[i]),5,0,7);g.fill();g.fillStyle=dm;g.beginPath();g.arc(X(i),YA(R.D[i]),5,0,7);g.fill();
+  CV._YA=YA;CV._top=top;
+}
+// cam point dragging
+(function(){const cv=$('cv');
+  const pos=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height];};
+  cv.addEventListener('pointerdown',e=>{if(ST.mode!=='cam')return;const [x,y]=pos(e);const mn=Math.min(...camPts);
+    camPts.forEach((v,i)=>{const X=CV.x0+(CV.x1-CV.x0)*i*30/360;if(Math.hypot(X-x,CV._YA(v-mn)-y)<18)drag=i;});if(drag>=0)cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',e=>{if(drag<0)return;const [,y]=pos(e);const v=(CV.yA1-y)/(CV.yA1-CV.yA0)*CV._top;camPts[drag]=Math.max(0,Math.min(CV._top,+v.toFixed(1)));changed();});
+  cv.addEventListener('pointerup',()=>drag=-1);
+})();
+// ---------- indicators & state ----------
+function meters(){
+  if(!R.ok){$('meter').innerHTML='<div class="bad"><b>—</b><small>机构无法装配</small></div>';$('state').textContent='';return;}
+  const m=[
+    [R.margin.toFixed(1)+' mm','最小余量（钩线到脱环，应 ≥ 1 mm）',R.margin>=1?'ok':R.margin>=0?'warn':'bad'],
+    [R.pre.toFixed(1)+' / '+ST.stroke+' mm','针眼入布前的最大余线 / 挑线簧行程（应能被挑线簧收住）',R.pre<=ST.stroke?'ok':'bad'],
+    [R.neg.toFixed(1)+' mm','针眼入布后到钩线的欠线（应 ≤ 1 mm）',R.neg<=1?'ok':'bad'],
+    [R.waste.toFixed(1)+' mm','绕梭时的最大余线（多放的线）',R.waste<=26?'ok':'warn'],
+    [R.top+'° / '+R.bot+'°','收线最紧（S = 0）/ 放线最多时的主轴转角',''],
+    [R.mu?Math.round(R.mu[0])+'°–'+Math.round(R.mu[1])+'°':'—','传动角（最小值不宜低于 40° 左右）',R.mu?(R.mu[0]>=39.5&&R.mu[1]<=140.5?'ok':'warn'):''],
+    [(R.acc/1000).toFixed(1)+' km/s²','面线最大加速度（'+ST.rpm+' r/min）',''],
+    [R.Smax.toFixed(1)+' mm','最大供线量','']];
+  $('meter').innerHTML=m.map(([v,l,c])=>`<div class="${c}"><b>${v}</b><small>${l}</small></div>`).join('');
+  const f=Math.round(ST.phi)%360,sl=R.sl[f];let cls='ok',t='',d='';
+  if(f<R.top||f>ST.phc+135){t='收线与拉线';d='线环已脱出，挑线杆上升，把多余的线收回、把交织点拉进布料中间；到收线最紧（'+R.top+'°）时再从线团经夹线器拉出下一针要用的约 '+R.c.toFixed(1)+' mm。';}
+  else if(f<=R.fin){if(sl>ST.stroke+0.05){cls='bad';t='余线太多';d='挑线杆已经放下 '+R.S[f].toFixed(1)+' mm，针眼还没入布、机针一侧一点线也没用，多出的 '+sl.toFixed(1)+' mm 超过挑线簧行程，面线松垮，可能被机针刺穿或绕住。';}
+    else {t='挑线簧收着余线';d='针眼还在布面以上。挑线杆已放下 '+R.S[f].toFixed(1)+' mm，挑线簧把这些线收着，面线不松。';}}
+  else if(f<ST.phc){if(sl<-0.05){cls=sl<-1?'bad':'warn';t='机针在拉线';d='机针要的线比挑线杆放下的多 '+(-sl).toFixed(1)+' mm。差 1 mm 以内可以靠线的弹性伸长消化；再多，面线就被从夹线器里硬拉，张力突然增大，线环也难张开。';}
+    else {t=f<180?'机针下行用线':'机针回升、线环在形成';d='挑线杆放下 '+R.S[f].toFixed(1)+' mm，机针一侧要 '+R.D[f].toFixed(1)+' mm，余线 '+sl.toFixed(1)+' mm。'+(f>=180?'机针回升时退回来的线和挑线杆放下的线一起，在针眼上方鼓成线环。':'');}}
+  else {if(sl<0){cls='bad';t='线不够：旋梭在硬拉面线';d='线环需要 '+R.D[f].toFixed(1)+' mm，挑线杆只放了 '+R.S[f].toFixed(1)+' mm。旋梭会把线从夹线器里硬拉出来或把上一针拉紧，容易断线、线迹不匀。';}
+    else if(sl<1){cls='warn';t='余量很小';d='还剩 '+sl.toFixed(1)+' mm 余量，线环刚够绕过梭壳。';}
+    else {t='线环在长大';d='线环需要 '+R.D[f].toFixed(1)+' mm，挑线杆放了 '+R.S[f].toFixed(1)+' mm，余量 '+sl.toFixed(1)+' mm。';}}
+  $('state').className='state '+cls;$('state').innerHTML='<b>'+f+'°　'+t+'</b>'+d;
+}
+// ---------- tasks ----------
+const std=()=>ST.mode==='link'&&ST.lk.a===LK0.a&&ST.lk.b===LK0.b&&ST.lk.c===LK0.c&&ST.lk.d===LK0.d;
+const good=()=>R.ok&&R.margin>=1&&R.pre<=ST.stroke&&R.neg<=1;
+const TASKS=[
+  {t:'读图：把主轴转到挑线杆收线最紧的位置（供线量为 0，±3°）。',d:'暂停后拖动转角滑块。这一刻挑线杆把线收得最紧，也是从夹线器拉出下一针用线的时刻；它并不正好是线孔几何上最高的时刻。',ok:()=>ST.mode==='link'&&R.ok&&!ST.play&&Math.abs(ST.phi-R.top)<=3},
+  {t:'厚料：布厚改到 3 mm 以上，只调过线板，使最小余量 ≥ 1 mm、入布前余线不超过挑线簧行程、入布后欠线 ≤ 1 mm。',d:'厚料的针孔和线环都更费线。挑线簧行程保持 10 mm 以下，连杆尺寸保持算例值，钩线时刻保持 206°。',ok:()=>std()&&ST.phc===206&&ST.t>=3&&ST.stroke<=10&&good()},
+  {t:'钩线时刻：先提前到 198° 以前，看绕梭时多放的线降到 18 mm 以下；再推迟到 214° 以后，看最小余量掉到 1 mm 以下。',d:'梭尖早到，挑线杆放下的线马上被线环用上；梭尖晚到，线环最大时挑线杆已经开始收线。第 5 章讲钩线时刻怎样调。',ok:()=>seen.early&&seen.late},
+  {t:'凸轮式：布厚 1.5 mm、钩线 206° 时，把绕梭最大余线压到 8 mm 以下，同时满足另外三条（余量 ≥ 1、入布前余线不超过行程、欠线 ≤ 1）。再看面线最大加速度是连杆式的几倍。',d:'凸轮可以让供线曲线贴着耗线曲线走，但贴得越紧，曲线越陡，线的加速度越大。',ok:()=>ST.mode==='cam'&&Math.abs(ST.t-1.5)<0.05&&ST.phc===206&&good()&&R.waste<=8},
+  {t:'连杆尺寸：把摇杆长度分别改到 38.5 mm 以下和 43.5 mm 以上，比较线孔轨迹、收线最紧的时刻、供线量和传动角。',d:'看一看为什么摇杆长度不能随便改：它同时改变了放线多少、放线时刻和受力。',ok:()=>seen.bLo&&seen.bHi}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{try{if(k.ok())done.add(i);}catch(e){}});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+// ---------- main loop ----------
+function draw(){if(!R)compute();$('ang').value=Math.round(ST.phi)%360;$('angOut').textContent=Math.round(ST.phi)%360+'°';
+  if(R.ok){mechDraw();hookDraw();}else{const g=$('mech').getContext('2d');g.clearRect(0,0,9999,9999);}
+  curvesDraw();meters();}
+let last=performance.now();
+function loop(now){const dt=Math.min(0.1,(now-last)/1000);last=now;
+  if(ST.play){ST.phi=(ST.phi+dt*60*ST.spd)%360;draw();}
+  requestAnimationFrame(loop);}
+setMode('link');checkTasks();requestAnimationFrame(loop);
+if(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').addEventListener)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+window.__api={ST,compute,changed,setMode,R:()=>R,TASKS,done,checkTasks,seen,set:(o)=>{Object.assign(ST,o);if(o.lk)ST.lk=Object.assign({},LK0,o.lk);syncPrm();changed();},
+  cam:(p)=>{camPts=p.slice();changed();},camPts:()=>camPts.slice(),demand,xN,linkPose,LK0};
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

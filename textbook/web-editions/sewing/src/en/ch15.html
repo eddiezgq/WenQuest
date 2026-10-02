@@ -1,0 +1,385 @@
+<p class="eyebrow">Part V · Electrical Control</p><h1><span class="chno">Chapter 15</span>Control of Pattern Sewers, Buttonholers and Bartackers</h1><div class="seam" aria-hidden="true"></div><div class="chips"><span class="chips-label">Interactive resources in this chapter</span><a class="chip" href="#lab-pattern"><b>Virtual lab</b>Pattern sewer simulation</a><a class="chip" href="#lab-patprog"><b>Virtual lab</b>Pattern programming</a><a class="chip" href="#lab-model-pattern"><b>3D model</b>Programmable pattern sewer</a></div><aside class="field">
+<p>This is the first core chapter of Volume 2. Readers need the timing chart of Chapter 2 and the needle-bar motion formula of Chapter 3; the servo, stepper and encoder material of Chapter 13 is used only at the conceptual level.</p>
+</aside>
+<p><strong>Opening problem</strong>　Decorative stitching on pocket flaps, shoulder straps, shoe uppers and car seats has complex shapes, but every piece is the same. Having a skilled operator steer the fabric on a lockstitch machine while it feeds takes several minutes per piece, and the stitching is good one time and poor the next. A programmable pattern sewer splits the job up: the machine head only pierces the fabric up and down, while the fabric is clamped in a template and carried along by an X–Y table under program control. The operator only has to place the fabric in the template and press the pedal. The question then becomes: when should the table move, how fast, and how far can it travel in one stitch at most? That is what this chapter answers.</p>
+<h3 id="s15-1">15.1 Composition and core mechanisms of the pattern sewer</h3>
+<figure class="fig"><a class="zoom" href="img/fig_pattern_struct.png"><img src="img/fig_pattern_struct.png" alt="Fig. 15-1 Composition of a programmable (template) pattern sewer" loading="lazy"></a><figcaption>Fig. 15-1 Composition of a programmable (template) pattern sewer (schematic)</figcaption></figure>
+<p>Compared with a lockstitch machine, the head of a pattern sewer lacks one thing: the <strong>feed dog</strong>. The needle, take-up and hook mechanisms are exactly as in Chapter 2: one stitch per revolution of the main shaft, with the same timing. The fabric is no longer pushed by a feed dog; instead it is clamped in a template and moved in the plane by the table. The main components in Fig. 15-1 are as follows.</p>
+<p>First, the machine head. A direct-drive servo motor sits at the end of the main shaft, with an encoder. The main-shaft angle φ read by the encoder is the time base for every action of the machine: the table moves, intermediate presser foot and trimming described later are all of the form “do something when the main shaft reaches a certain angle”.</p>
+<p>The feed dog is replaced by the X–Y table. The Y beam moves forwards and backwards on two linear guides, and the X carriage moves left and right on the beam, each driven by a servo (or closed-loop stepper) motor through a timing belt. The clamp and template are mounted on the X carriage; combining the two directions, the fabric can reach any point in the sewing area.</p>
+<p>The fabric is held by the template and a pneumatic clamp. The template consists of an upper and a lower plate with the fabric sandwiched between them; the slot milled in the plates is the sewing path, only slightly wider than the presser foot. The clamp is pressed down by pneumatic cylinders and lifted to change templates.</p>
+<p>A pattern sewer cannot use an ordinary presser foot, because it would obstruct the template’s movement. It uses instead a small foot that bounces up and down with the needle bar, called the intermediate presser foot. As the needle descends, it presses the fabric down first; as the needle rises, it lifts with it, preventing the fabric from being lifted by the needle and causing skipped stitches.</p>
+<p>There are also thread-trimming, thread-wiping and tension-release devices, the same as on an electronically controlled lockstitch machine, driven by solenoids and actuated at the end of a pattern section or before a jump move.</p>
+<p>The pattern sewer loses the feed mechanism but gains the X–Y table, the intermediate presser foot, the clamp and the trimmer. The 3D model below takes them one by one.</p>
+<figure class="fig"><a class="zoom" href="img/fig_ps3d_iso.png"><img src="img/fig_ps3d_iso.png" alt="Fig. 15-1b 3D model of the pattern sewer" loading="lazy"></a><figcaption>Fig. 15-1b Model 15-1: template-type programmable pattern sewer (for easier viewing, the X–Y mechanism is drawn in front of the machine head; <a href="#lab-model-pattern" class="labref">open the 3D model</a> to rotate it, view it in X-ray mode, explode it and play the sewing process)</figcaption></figure><section class="lab" id="lab-model-pattern" data-src="labs/model-pattern.html"><div class="lab-head"><span class="lab-kind">3D model</span><h4 id="x57563">Model 15-1 Programmable pattern sewer</h4></div><p>X–Y table, intermediate presser foot and machine head; can be rotated, viewed in X-ray mode and exploded.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/model-pattern.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<figure class="fig"><a class="zoom" href="img/ps_exp.png"><img src="img/ps_exp.png" alt="Fig. 15-1c Exploded view of the pattern sewer" loading="lazy"></a><figcaption>Fig. 15-1c Exploded view of the pattern sewer: machine head, needle bar and intermediate presser foot, template and clamp, bed, X axis (orange), Y axis (green)</figcaption></figure>
+<h4 id="s15-1-1">15.1.1 The X–Y table</h4>
+<p>The table is a two-axis gantry mechanism: each end of the Y beam rides on a linear guide and moves forwards and backwards along Y; the X carriage runs on guides on the beam and moves left and right along X; the clamp is fixed to the X carriage by a connecting arm. So the X motor drives only the carriage and clamp, while the Y motor must drive the whole beam together with the X axis — which is why Section 15.8 says “the Y axis is heavier”.</p>
+<p>There are three common drive arrangements for the two axes.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Arrangement</th>
+<th>Advantages</th>
+<th>Disadvantages</th>
+<th>Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Timing belt</td>
+<td>Light, fast, cheap; a longer stroke adds no inertia</td>
+<td>The belt is elastic: low stiffness, prone to vibration</td>
+<td>Small and medium pattern sewers; the most common</td>
+</tr>
+<tr>
+<td>Ball screw</td>
+<td>High stiffness, accurate positioning</td>
+<td>High screw inertia; on long strokes speed is limited by the critical speed</td>
+<td>Short strokes with high accuracy requirements</td>
+</tr>
+<tr>
+<td>Linear motor</td>
+<td>No transmission elements, best dynamics</td>
+<td>Expensive, runs hot, needs a linear scale and a brake</td>
+<td>High-speed, large-area models</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example: belt elasticity and vibration</strong>　A timing belt can be treated as two springs: the belt lengths on either side of the carriage are L₁ and L₂, and the belt’s tensile stiffness (elastic modulus times cross-sectional area) is EA. The two belt spans act in parallel:</p>
+<div class="math">\[k = \frac{EA}{L_1} + \frac{EA}{L_2}, \qquad \Delta x = \frac{F}{k}, \qquad f_n = \frac{1}{2\pi}\sqrt{\frac{k}{m}}\]</div>
+<p>Take a 15 mm wide steel-cord timing belt with EA = 150 kN (example value) and the carriage slightly off centre, L₁ = 0.3 m, L₂ = 0.5 m; then k = 500 + 300 = 800 kN/m. With an X-axis moving mass of 3 kg and an acceleration of 50 m/s², F = 150 N and the elastic stretch of the belt is Δx = 150 / 800 000 = 0.19 mm — about 6% of a 3 mm stitch length. More important is the natural frequency: fₙ = √(800 000 / 3) / 2π ≈ 82 Hz, a period of 12 ms, the same order as the travel time of one stitch (15–20 ms). As soon as a move stops, the template oscillates back and forth at 82 Hz; if the needle enters before this oscillation has died away, the needle position is off. There are three remedies: a wider belt (at 25 mm width k rises to about 1.33 N/μm and fₙ to about 106 Hz); a lighter clamp; and a motion law with continuous acceleration (Section 15.4.2), which excites less vibration. This is the concrete consequence on a pattern sewer of what textbooks call “soft impact”.</p>
+<h4 id="s15-1-2">15.1.2 The intermediate presser foot mechanism</h4>
+<p>The intermediate presser foot is a small ring around the needle, driven by a cam on the main shaft through links and bouncing in step with the needle bar. Its job is to hold the fabric down as the needle rises so that the fabric is not lifted with the needle — once the fabric lifts, the loop forms poorly, the hook misses it and a stitch is skipped. Its timing has two hard requirements: <strong>it must press down before the needle enters the fabric, and lift only after the needle has left the fabric</strong>; and the template may move only after it has lifted, otherwise the foot drags the fabric.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_ef69cb27.png"><img src="img/w_ef69cb27.png" alt="Data chart" loading="lazy"></a><figcaption>Fig. 15-1d Timing of the intermediate presser foot and the needle (example)</figcaption></figure>
+<p>Thick and thin fabrics put the fabric surface at different heights, so the foot’s lowest point must follow. Mechanically this is done by hand-adjusting an eccentric on the link; an <strong>electronic intermediate presser foot</strong> sets the lowest-point height with a stepper motor, and it can be changed section by section by a PRESS command in the pattern file (e.g. automatically raised by 1.5 mm where the seam reaches a layered section). This is another example of a “mechanical parameter becoming a program parameter”.</p>
+<h4 id="s15-1-3">15.1.3 The clamp and its pneumatic circuit</h4>
+<p>The clamp is driven by 2–4 double-acting cylinders. A typical circuit is: air supply → filter-regulator (0.5–0.6 MPa) → 5/2-way solenoid valve → one-way flow control valve (setting the lowering and lifting speeds; lowering too fast slaps the fabric out of position) → cylinder. Magnetic switches on the cylinders confirm that the clamp is fully down. Many models split the clamp into left and right halves that close in two steps, so the operator can smooth one half of the fabric before clamping the other.</p>
+<p>Estimating the cylinder force: with a 32 mm bore at 0.5 MPa, F = p·πd²/4 = 0.5 × 10⁶ × π × 0.032² / 4 ≈ 400 N. What the clamp has to resist is not inertia (the template itself is rigidly mounted on the clamp), but the fabric sliding between the two template plates: the needle drags the fabric as it is withdrawn, and with too little pressure the fabric creeps bit by bit, which shows up as the stitching gradually drifting away from the centre of the slot.</p>
+<h4 id="s15-1-4">15.1.4 Trimming, wiping and the large hook</h4>
+<p>The trimming mechanism sits under the throat plate: a moving knife is driven by a trimming cam, with the cam and roller normally disengaged. At a specified angle on the last stitch the controller energises the trimming solenoid, pushing the roller into the cam groove; the moving knife then swings out with the main shaft, catches the needle and bobbin threads and cuts them against the fixed knife. After the cut, the wiper sweeps above the throat plate and moves the needle-thread end aside. The trimming moment must line up with the timing of Chapter 2: before the loop has passed around the bobbin case and the take-up lever draws in the thread. This part is the same as on a lockstitch machine and is discussed in detail in Chapter 14.</p>
+<p>A pattern sewer sews long runs of stitching in one go and uses thick thread, so it usually has a <strong>large hook</strong>: a larger bobbin holds more bobbin thread and needs changing less often. The price is a hook with more inertia, so the head’s maximum speed is lower than that of an equivalent lockstitch machine.</p>
+<p>By now it is clear that none of the pattern sewer’s mechanisms is complicated on its own; the difficulty is how they coordinate with the main shaft. The intermediate presser foot and the trimmer are locked to the main shaft by cams, while the X–Y table is locked to it by the program — and the latter is the control this chapter goes on to discuss.</p>
+<h3 id="s15-2">15.2 Composition of the control system</h3>
+<figure class="fig chart"><a class="zoom" href="img/w_e7c09f47.png"><img src="img/w_e7c09f47.png" alt="Data chart" loading="lazy"></a><figcaption>Fig. 15-2 Block diagram of the pattern sewer’s electrical control system. Inputs on the left (operator panel; pattern file from USB stick, network or template barcode) feed the main controller (application processor above, motion-control core on a DSP or FPGA below), which drives, via the main-shaft servo drive, X and Y drives and I/O driver board, the main-shaft motor (with encoder), the X and Y servo motors (timing belt to carriage and beam) and the on/off actuators (clamp and intermediate-foot valves; trimming, wiping and tension-release solenoids). Solid lines: commands; dashed lines: feedback (encoder angle φ and speed; sensors for X/Y home, clamp in position, thread break, light curtain, air pressure)</figcaption></figure>
+<p>Fig. 15-2 divides the control system into three layers.</p>
+<p>At the top is the application layer, running on the main controller’s application processor. It reads the pattern file and parses it into a sequence of “stitch points”; it performs look-ahead planning, assigning a main-shaft speed to each stitch; and it manages all the logic of one sewing cycle, from clamp down, start, stitch-by-stitch sewing, trimming, jump move to the next section, through to return to home and clamp up. This layer computes only once per stitch, so being a few milliseconds slow does no harm.</p>
+<p>In the middle is the motion-control layer, implemented on a DSP or FPGA. Using the main-shaft encoder as master, it generates the X and Y position commands within the specified angle window (that is, the electronic cam), and triggers the intermediate presser foot, trimming and wiping at specified angles, with an update period of 0.1–1 ms. This layer must be hard real-time: at a main-shaft speed of 2800 r/min, 1 ms is 16.8°, and a single miss can break a needle.</p>
+<p>At the bottom is the drive layer, comprising the main-shaft servo drive, the X/Y drives and the I/O driver board. They turn commands into currents and valve actions, and send encoder, home, thread-break and other signals back up.</p>
+<p>Compared with the lockstitch machine control of Chapter 14, there are now two extra position axes strictly synchronised with the main shaft. On a lockstitch machine the feed amount is locked mechanically to the main shaft by an eccentric; the pattern sewer replaces that mechanical chain with “encoder + software”. Chapter 2 said that “one main shaft branches into four drive chains, so the four motions are always synchronised”; on a pattern sewer, synchronisation of the feed chain has to be guaranteed by the program.</p>
+<h3 id="s15-3">15.3 The core constraint: the template must not move while the needle is in the fabric</h3>
+<p>The feed dog of a lockstitch machine rises above the throat plate to push the fabric only after the needle has left the fabric; this rule is guaranteed by the mounting angle of the eccentric (Chapter 6). A pattern sewer must obey the same rule in its program: <strong>once the needle has entered the fabric, the template must be stationary</strong>. Otherwise, at best the needle hole is enlarged and the stitching runs crooked; at worst the needle is bent by the template, strikes the hook point and breaks.</p>
+<p><strong>How large is the window?</strong>　Use the needle-bar displacement x(φ) of Chapter 3 (measured downwards from top dead centre). In the worked example the needle point is 18 mm above the throat plate at top dead centre, so the height of the needle point above the throat plate is</p>
+<div class="math">\[h(\varphi) = 18 - x(\varphi), \qquad x(\varphi) = r(1-\cos\varphi) - l\left(1-\sqrt{1-\lambda^2\sin^2\varphi}\right)\]</div>
+<p>Let the total thickness of fabric plus lower template plate be t. The angle at which h falls to t is the <strong>entry angle</strong> φ₁, and the angle at which it rises back to t is the <strong>exit angle</strong> φ₂. The angle window in which the template may move is</p>
+<div class="math">\[W = 360^\circ - (\varphi_2 - \varphi_1)\]</div>
+<figure class="fig chart"><a class="zoom" href="img/w_85b283fd.png"><img src="img/w_85b283fd.png" alt="Data chart" loading="lazy"></a><figcaption>Fig. 15-3 Needle-point height and the template movement window (r = 15.5 mm, l = 55 mm)</figcaption></figure>
+<p>Substituting the worked-example data gives the results for three thicknesses in the table below. The thicker the fabric, the earlier the needle enters it and the later it leaves, and the narrower the window.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Total thickness t (mm)</th>
+<th>Entry angle φ₁</th>
+<th>Exit angle φ₂</th>
+<th>Window W</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.5</td>
+<td>101.7°</td>
+<td>258.3°</td>
+<td>203.4°</td>
+</tr>
+<tr>
+<td>3</td>
+<td>96.3°</td>
+<td>263.7°</td>
+<td>192.6°</td>
+</tr>
+<tr>
+<td>6</td>
+<td>85.2°</td>
+<td>274.8°</td>
+<td>170.5°</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>How long does one stitch move take?</strong>　Let the maximum acceleration of each axis be a and its maximum velocity v. For short moves the axis has to decelerate before reaching v, so the velocity profile is triangular; for distances greater than v²/a it is trapezoidal. The time to travel a distance s is</p>
+<div class="math">\[t_{move} = \begin{cases} 2\sqrt{s/a}, &amp; s \le v^2/a \\ s/v + v/a, &amp; s &gt; v^2/a \end{cases}\]</div>
+<p>With a = 50 m/s² and v = 1 m/s, v²/a = 20 mm, so all pattern-sewer stitch lengths (0.1–12.7 mm) fall in the triangular region. For a 3 mm stitch, t_move = 2√(0.003/50) = 15.5 ms.</p>
+<p><strong>Upper speed limit</strong>　At a main-shaft speed n (r/min), the time to turn through the window W (degrees) is (W/360)·(60/n). Requiring this to be no less than t_move gives</p>
+<div class="math">\[n_{max} = \frac{W}{6\,t_{move}} \qquad (W\ \text{in degrees},\ t_{move}\ \text{in seconds})\]</div>
+<p>For a 3 mm stitch and 1.5 mm fabric: n_max = 203.4 / (6 × 0.0155) ≈ 2190 r/min. Repeating the calculation for each stitch length gives Fig. 15-4.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_a1581ea5.png"><img src="img/w_a1581ea5.png" alt="Data chart" loading="lazy"></a><figcaption>Fig. 15-4 Stitch length versus upper speed limit (a = 50 m/s², v = 1 m/s)</figcaption></figure>
+<p>Fig. 15-4 shows four things.</p>
+<p>First, the longer the stitch, the lower the speed. With a triangular velocity profile t_move is proportional to √s, so n_max is proportional to 1/√s: quadrupling the stitch length halves the speed limit. The “stitch length vs. maximum speed” table often found in pattern-sewer manuals is this curve in tabular form.</p>
+<p>Second, the thicker the fabric, the lower the speed. As t rises from 1.5 mm to 6 mm, the window shrinks from 203° to 170°, and the speed limit drops by about 16% at every stitch length. For thick work such as bags, shoe uppers and seat belts, a further margin is needed.</p>
+<p>Third, a diagonal stitch is actually faster. When the X and Y axes each have their own acceleration limit, a stitch at 45° moves each axis only s/√2, so the time shrinks to 1/2^(1/4) ≈ 0.84 of the original and the speed can be about 19% higher. Speed planning should therefore be based on the per-axis components, not on stitch length alone.</p>
+<p>Fourth, at short stitch lengths the limit is set by the machine head. Below about 2 mm the theoretical limit exceeds the head’s own maximum speed (2800 r/min in the figure, an example value); speed is then limited by the inertia of the needle and hook mechanisms and by thread strength, not by the X–Y table.</p>
+<p><strong>The margin needed in practice</strong>　The W above is a geometric window. A real design must also deduct: the servo’s following error and settling time after reaching position (usually 10°–20° is allowed); the height to which the fabric is lifted by the needle; and the moment the intermediate presser foot lifts (the template should not move before it has lifted). These values depend on the specific model and should be calibrated on a prototype with high-speed video or encoder logging.</p>
+<h3 id="s15-4">15.4 Motion planning: electronic cam and look-ahead speed control</h3>
+<h4 id="s15-4-1">15.4.1 Why angle rather than time</h4>
+<p>Main-shaft speed is not constant: slow at the start, fast in the middle, slow again before trimming, and load changes also make it fluctuate. If X–Y moves were started on time (“begin moving 8 ms before top dead centre”), every change in shaft speed would throw them out of step. Instead, the X–Y position is written as a <strong>function of main-shaft angle</strong>:</p>
+<div class="math">\[x(\varphi) = x_{i-1} + s_x \, f(\tau), \qquad \tau = \frac{\varphi - \varphi_s}{\Delta\varphi}, \quad 0 \le \tau \le 1\]</div>
+<p>where φ_s is the start of the window, Δφ the window width actually used, and f(τ) a motion law running from 0 to 1. This is the <strong>electronic cam</strong>: the main shaft is the “camshaft”, X and Y are the “followers”, and f(τ) is the cam profile — except that the profile is stored in memory and can differ from stitch to stitch. When the shaft changes speed, the shape of the curve stays the same and only the time taken to traverse it changes, so synchronisation holds automatically.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_c8dfdae2.png"><img src="img/w_c8dfdae2.png" alt="Data chart" loading="lazy"></a><figcaption>Fig. 15-5 Electronic cam: needle-point height, X position and X velocity over two stitches (stitch length 3 mm, n = 1600 r/min)</figcaption></figure>
+<p><strong>Implementation</strong>　In every interpolation period (for example 250 μs) the motion-control core does the following: read the encoder to get φ → compute τ → look up f(τ) in a table → send position commands to the X and Y drives. With a 2500-line encoder and quadrature (×4) decoding, the resolution is 360°/10000 = 0.036°, which is sufficient. What needs attention is <strong>delay</strong>: from issuing a command to the motor actually following it takes T_d ≈ 0.5–2 ms. At 2800 r/min, 1 ms is 16.8°, so the predicted angle φ + ω·T_d must be used in place of φ for the table look-up; otherwise the template lags until after the needle has entered the fabric.</p>
+<h4 id="s15-4-2">15.4.2 Which motion law to choose</h4>
+<p>This is the question from the cam chapter of a mechanisms (theory of machines) course, and the answer is the same. To travel a distance s in time Δt, the peak acceleration can always be written a = C·s/Δt²; only the coefficient C differs.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Motion law</th>
+<th>Coefficient C</th>
+<th>Acceleration at the ends</th>
+<th>Effect on a pattern sewer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Constant acceleration / deceleration</td>
+<td>4.00</td>
+<td>Steps</td>
+<td>Lowest peak and highest speed limit; but the step in acceleration excites vibration of the template and beam, and after reaching position one must wait for it to die away</td>
+</tr>
+<tr>
+<td>Modified trapezoidal</td>
+<td>4.89</td>
+<td>Zero</td>
+<td>A compromise, common in high-speed cam mechanisms</td>
+</tr>
+<tr>
+<td>Cycloidal</td>
+<td>6.28</td>
+<td>Zero</td>
+<td>Smoothest, highest peak</td>
+</tr>
+</tbody>
+</table></div>
+<p>The speed limits of Section 15.3 use C = 4. Switching to the cycloidal law, for the same acceleration capability Δt must grow by a factor of √(6.28/4) = 1.25, and the speed limit is multiplied by 0.80. Fig. 15-5 was computed this way: stitch length 3 mm, usable window 183.4°, n = 1600 r/min, Δt = 19.1 ms, peak acceleration 2π × 0.003 / 0.0191² ≈ 52 m/s², just reaching the set capability. A common engineering practice is to use a “harder” law on light fabrics and short stitches to gain speed, and a smooth law on large templates and long stitches to gain stability.</p>
+<h4 id="s15-4-3">15.4.3 Look-ahead speed control</h4>
+<p>Stitch lengths within a pattern differ. If every stitch ran at its own speed limit, the main shaft would have to slow down abruptly within one revolution, which is impossible: the main shaft, together with the rotor, crank and hook, has inertia, and can change its speed by only a limited amount per revolution, denoted Δn. So the controller must first “look” a number of stitches ahead and slow down in advance. The algorithm is the same as look-ahead interpolation on CNC machine tools: one backward pass followed by one forward pass.</p>
+<pre><code class="language-text">Input: stitch points P[0..N], off-fabric window W, head max speed n_head, allowed speed change per stitch Δn
+1  for i = 1..N                          # each stitch's own limit
+       tx = t_move(|x[i]-x[i-1]|);  ty = t_move(|y[i]-y[i-1]|)
+       cap[i] = min(n_head, W / (6 * max(tx, ty)))
+2  for k stitches after the start and before each trim: cap[i] = min(cap[i], n_slow)
+3  for i = N-1 down to 1                 # backward: slow down early for slow stitches ahead
+       cap[i] = min(cap[i], cap[i+1] + Δn)
+4  n[1] = n_start
+   for i = 2..N                          # forward: acceleration must not be too abrupt either
+       n[i] = min(cap[i], n[i-1] + Δn)
+Output: main-shaft speed n[i] for each stitch
+</code></pre>
+<p><strong>Worked example</strong>　A pattern section runs steadily at 2 mm stitch length and 2680 r/min; the 5th stitch is a long 10 mm stitch. Take Δn = 300 r/min (C = 4 on each axis, fabric 1.5 mm thick).</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Stitch no.</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stitch length (mm)</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>10</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Own limit cap (r/min)</td>
+<td>2680</td>
+<td>2680</td>
+<td>2680</td>
+<td>2680</td>
+<td>1198</td>
+<td>2680</td>
+<td>2680</td>
+<td>2680</td>
+</tr>
+<tr>
+<td>Speed after look-ahead n (r/min)</td>
+<td>2398</td>
+<td>2098</td>
+<td>1798</td>
+<td>1498</td>
+<td>1198</td>
+<td>1498</td>
+<td>1798</td>
+<td>2098</td>
+</tr>
+</tbody>
+</table></div>
+<p>Without look-ahead, the 5th stitch would have to travel 10 mm at 2680 r/min in only 12.7 ms, whereas it needs 28.3 ms; the template would certainly still be moving after the needle entered the fabric, and the needle would break. With look-ahead, the controller starts slowing down from the 1st stitch and reaches exactly 1198 r/min at the 5th.</p>
+<p><strong>Jump moves</strong>　Long moves between two pattern sections are not made during sewing: the thread is trimmed first, the main shaft stops at the needle-up position, the intermediate presser foot lifts, and the X–Y table travels at maximum velocity along a trapezoidal profile to the start of the next section; then the foot is lowered and sewing starts slowly. Jump moves are not limited by the off-fabric window, but trimming and restarting take time, so patterns should be designed with as few sections as possible.</p>
+<h3 id="s15-5">15.5 Pattern data and programming</h3>
+<p>Pattern file formats differ between manufacturers, but the content is much the same: a <strong>header</strong> (pattern number, origin, maximum speed, scale) followed by a sequence of <strong>stitch records</strong>. Each record is “command + ΔX + ΔY”, where Δ is the displacement relative to the previous stitch, usually in units of 0.1 mm or 0.05 mm and stored as integers. Integer increments are used instead of floating-point absolute coordinates to keep the data compact and so that accumulation introduces no rounding error.</p>
+<pre><code class="language-text">HEAD  No=0123  ORG=(0,0)  UNIT=0.1mm  NMAX=2500
+SEW    +0    +0      ; start point (jump here from the origin)
+SEW    +0   +30      ; backtack ↓
+SEW    +0   -30      ; backtack ↑
+SEW    +0   +30      ; first real stitch, 3.0 mm
+  …
+SEW   +26   +10      ; a stitch on the rounded corner, about 2.8 mm
+  …
+TRIM                 ; trim thread
+JUMP  -150  +155     ; jump to the start of section 2
+SEW   …
+END
+</code></pre>
+<figure class="fig chart"><a class="zoom" href="img/w_91e0852b.png"><img src="img/w_91e0852b.png" alt="Data chart" loading="lazy"></a><figcaption>Fig. 15-6 From outline to stitch points (pocket-flap example)</figcaption></figure>
+<p>To generate a pattern from a style outline, the programming software goes through six steps.</p>
+<p>The first step is to obtain the outline. It can be read from a CAD DXF file or obtained by scanning a physical template; the sewing path is the centre line of the template slot.</p>
+<p>Next the outline is segmented into straight lines and arcs (or splines). A stitch must fall exactly on each junction between segments; otherwise sharp corners are “cut” into rounded ones.</p>
+<p>Then each segment is divided evenly. For a segment of length L, the number of stitches is n = ⌈L/s⌉ and the actual stitch length is L/n. This keeps the stitch length uniform within each segment while placing a stitch exactly on each end point. On small-radius arcs the stitch length must be reduced further, or the stitching becomes a visible polygon.</p>
+<p>After division, process stitches are added: start backtack, end backtack or condensed stitches, and where necessary double stitching (sewing over a section a second time).</p>
+<p>If the pattern consists of several sections, they must also be ordered. The order and direction in which the sections are sewn determine the jump distances and number of trims; this is an optimisation problem similar to the travelling salesman problem.</p>
+<p>The last step is simulation and checking. Following Sections 15.3–15.4, check stitch by stitch that each move can be completed within the window and generate the speed profile; check that the table stroke is not exceeded; and estimate how long one cycle takes.</p>
+<h3 id="s15-6">15.6 Templates and pneumatic control</h3>
+<p>The accuracy of a pattern sewer depends not only on the motors but also on the template. Template design is half of pattern-sewer process engineering.</p>
+<p>Templates are usually made of PVC, acrylic or epoxy board, 1–3 mm thick per plate, laser cut. The thickness of the lower plate counts towards t in Section 15.3 and narrows the off-fabric window, so the thinner the lower plate the better.</p>
+<p>The slot width equals the outside diameter of the intermediate presser foot plus a 1–2 mm clearance. Too narrow, and the foot strikes the template; too wide, and the fabric bulges at the slot edges. If the slot is a closed contour, the piece of plate inside it falls out; the remedy is to offset the slots in the upper and lower plates, or to join the inner and outer pieces with another thin layer of board, called a bridge.</p>
+<p>The inner faces of the template are lined with abrasive paper or rubber strips to prevent slipping. Once the fabric slips during fast moves, no amount of programming accuracy helps.</p>
+<p>The template is located on the clamp by dowel pins, and at power-up X and Y first return to home. A barcode or RFID tag can also be attached to the template; when the machine reads it, it loads the corresponding pattern automatically. This is not just a convenience: with the wrong pattern, the needle strikes the template directly.</p>
+<p><strong>Pneumatics and interlocks</strong>　The clamp is pressed down by 2–4 cylinders supplied at 0.5–0.6 MPa, each controlled by a solenoid valve. The controller allows a start only when three conditions are all met: the clamp-in-position signal is active, air pressure is normal, and the safety light curtain is unobstructed. If any condition fails during sewing, the main shaft stops immediately at the needle-up position.</p>
+<p><strong>Estimating cycle time</strong>　Take the pocket flap of Fig. 15-6 as an example (the following are estimates): about 60 stitches at an average of 2000 r/min take 1.8 s; two trims, one jump move and start/stop acceleration add about 1.5 s; sewing takes about 3.3 s in total. Yet manually loading and unloading the template and placing the fabric takes 8–10 s. So the output of a pattern sewer is limited mainly by loading and unloading, not by speed. This is the origin of two-station pattern sewers (one template sewing while the other is being loaded) and automatic loading devices, and it is the problem the automatic sewing units of Chapter 12 set out to solve.</p>
+<h3 id="s15-7">15.7 Bartacking, button sewing and buttonholing: special cases of fixed patterns</h3>
+<p>Bartackers, button sewers and buttonholers are the most numerous special machines in a garment factory. From a control point of view they are all small-area pattern sewers with few stitches: the patterns are a few fixed types, and only a few parameters such as length, width and stitch count can be adjusted.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_12ef282f.png"><img src="img/w_12ef282f.png" alt="Data chart" loading="lazy"></a><figcaption>Fig. 15-7 Stitch breakdown of a bartack, a sewn-on button and a straight-end (square-end) buttonhole</figcaption></figure>
+<p><strong>From pattern cam to program</strong>　Mechanical bartackers and button sewers contain a large <strong>pattern cam</strong>, driven from the main shaft through a high-ratio worm gear and turning once per sewing cycle; two grooves on the cam move the clamp in X and Y through levers. Changing to a different pattern means changing the cam. The electronic version replaces the cam with two stepper motors and a piece of program, and changing the pattern is just a matter of changing parameters. This is the “electronic cam” of Section 15.4 in the literal sense: an electronic pattern replaces the steel pattern cam.</p>
+<p><strong>Parametric generation</strong>　Machines of this kind generally do not store stitch-point sequences; they store the pattern type and parameters and generate the stitch points in real time. For a bartack with length L, width W, N₁ underlay stitches and N₂ covering stitches:</p>
+<div class="math">\[\text{Underlay}: \; x_j = \frac{jL}{N_1},\; y_j = \pm 0.3W \qquad \text{Covering}: \; x_k = L - \frac{kL}{N_2},\; y_k = \pm \frac{W}{2}\]</div>
+<p>Changing the parameters gives bartacks of different sizes without reprogramming.</p>
+<p><strong>Key points of the three machines</strong></p>
+<p>The bartacker is used at stress points such as belt loops, pocket openings and the ends of flies. It first sews an underlay and then covers it, so the underlay threads are wrapped inside the zigzag stitching and the bartack is especially strong. Its stepper-driven X–Y stage typically has a stroke of only a few tens of millimetres.</p>
+<p>The button sewer holds the button in a button clamp; fabric and button move together while the needle sews back and forth between the two button holes. A mismatch between the button-hole spacing and the program is the main cause of needle breakage, so the hole spacing must be checked whenever buttons are changed. Buttons on coats need a “thread shank”, which requires an additional shank-wrapping device.</p>
+<p>Buttonholers come in two types: straight-end and eyelet (keyhole). Straight-end buttonholes use a lockstitch and are common on shirts; eyelet buttonholes use a chainstitch with a gimp (filler cord) and are common on suits and jeans. The sideways zigzag swing comes from <strong>needle-bar swing</strong> and the lengthwise advance from the <strong>feed</strong>; for the second row the feed reverses. The knife works either “sew first, cut after” or “cut first, sew after”: the former gives neat edges and is common on shirts; with the latter the cut edge is wrapped by the thread and does not fray easily.</p>
+<p><strong>Knife timing and interlocks</strong>　The knife is an independent on/off action (driven by a solenoid, cylinder or motor). It may operate only when the main shaft is stopped at the needle-up position and the needle is clear of the knife’s stroke; the main shaft may not start while the knife has not returned. These two interlocks are implemented with a state machine in the controller and are a typical example of the software safety design of Chapter 18.</p>
+<p><strong>Worked example</strong>　A straight-end buttonhole 12 mm long with a lengthwise pitch of 0.4 mm has 30 stitches per row; each end bartack has 8 stitches; about 76 stitches in total. At an average speed of 3000 r/min (example value), sewing takes about 1.5 s, or about 2.5 s including start/stop and the knife. A shirt has 7–8 buttonholes, and once again handling the fabric takes longer than sewing, which is why shirt factories commonly use continuous buttonholers with automatic feeding (Chapters 12 and 29).</p>
+<h3 id="s15-8">15.8 Design example: sizing the X-axis servo motor</h3>
+<p>So far we have assumed each axis can deliver a = 50 m/s². Where this figure comes from, and how large a motor is needed to achieve it, is the first calculation in pattern-sewer design. The masses and motor parameters below are example values; a real design should take them from the 3D model and the motor catalogue.</p>
+<p><strong>Given</strong>　X-axis moving parts (clamp, template, carriage) m = 3 kg; required a = 50 m/s², v = 1 m/s; timing-pulley pitch radius r_p = 15 mm; guide friction coefficient μ = 0.05; the candidate motor is a 400 W servo with typical parameters: rated torque 1.27 N·m, peak 3.8 N·m, rated speed 3000 r/min, rotor inertia J_m ≈ 0.3 × 10⁻⁴ kg·m².</p>
+<p><strong>Step 1: peak torque</strong></p>
+<div class="math">\[F = ma + \mu m g = 3 \times 50 + 0.05 \times 3 \times 9.8 \approx 151.5\ \text{N}\]</div>
+<div class="math">\[T_{peak} = F r_p + J_m \frac{a}{r_p} = 151.5 \times 0.015 + 0.3\times10^{-4} \times \frac{50}{0.015} \approx 2.27 + 0.10 = 2.37\ \text{N·m}\]</div>
+<p>This is below the 3.8 N·m peak, so it is acceptable.</p>
+<p><strong>Step 2: speed</strong>　At v = 1 m/s, ω = v/r_p = 66.7 rad/s, i.e. 637 r/min, far below the rated speed. The motor’s speed capability is going unused — a signal worth noting.</p>
+<p><strong>Step 3: heating (RMS torque)</strong>　Whether a motor burns out depends on average heating, not on the peak. With constant acceleration and deceleration, the torque is ±T_peak during the move part of each stitch and close to zero during the stationary part. In the worst case every stitch uses the full off-fabric window, so moves take a fraction 203.4/360 ≈ 0.57 of the time:</p>
+<div class="math">\[T_{rms} \approx T_{peak}\sqrt{0.57} = 2.37 \times 0.75 \approx 1.79\ \text{N·m} \; &gt; \; 1.27\ \text{N·m}\]</div>
+<p>Sewing continuously at the limiting speed, this motor would overheat.</p>
+<p><strong>Step 4: redesign</strong>　There are three routes.</p>
+<p>The first is the simplest: switch to a 750 W motor (typical rated torque 2.39 N·m). The cost is a heavier, more expensive motor — which the Y axis then has to carry around as well.</p>
+<p>The second is to change the pulley radius to 10 mm. F·r_p then drops to 1.52 N·m and the inertia term rises to 0.15 N·m, giving T_peak ≈ 1.67 N·m and T_rms ≈ 1.26 N·m, just within the rating; 1 m/s corresponds to 955 r/min, still within rated speed. In essence this trades the motor’s speed margin for torque margin.</p>
+<p>The third is to reduce the moving mass: an aluminium-extrusion clamp and a thin-plate template. Every kilogram saved reduces the peak force by 50 N.</p>
+<p>Nor is a smaller pulley always better: below a certain radius, the motor’s own rotor inertia becomes the main load. Setting the derivative of T_peak with respect to r_p to zero gives the optimum radius r_p = √(J_m / m), about 3.2 mm here — too small to make a pulley, and it would exceed the motor’s speed. So in practice the value is a compromise between torque, speed, pulley tooth count and positioning resolution. The section on inertia matching in Chapter 13 discusses this further.</p>
+<p><strong>The Y axis is heavier</strong>　The Y axis has to drive the whole X axis (including the X motor and the beam), so its mass may be 2–3 times that of the X axis. Designs therefore always put the light axis on top and the heavy axis underneath; some models drive the two ends of the Y beam with two synchronised motors. If the Y axis can deliver only a lower acceleration, the speed limits of Section 15.3 must be calculated separately with the Y-axis a — stitches along Y will be slower than stitches along X.</p>
+<h3 id="s15-9">15.9 Design and manufacture of the controller</h3>
+<p>The electronic cam, look-ahead speed control and pattern parsing of the preceding sections all have to end up in a control box. This section covers what is specific to pattern-sewer controllers in the order “hardware → key circuits → software → manufacturing and testing”; general issues such as EMC, thermal design and reliability are left to Chapter 18.</p>
+<h4 id="s15-9-1">15.9.1 Hardware composition</h4>
+<figure class="fig chart"><a class="zoom" href="img/w_7eeeef88.png"><img src="img/w_7eeeef88.png" alt="Data chart" loading="lazy"></a><figcaption>Fig. 15-8 Hardware composition of a pattern-sewer control box (one typical partitioning)</figcaption></figure>
+<p>A control box generally contains five boards (some designs merge the main controller and I/O, or combine the three drives on one board). Three design principles apply:</p>
+<p>First, separate high-power and low-power zones. The 310 V DC bus and inverters go on one side, the processor and sensors on the other; the grounds of the two sides are joined at a single point only, so that no large ground loop forms.</p>
+<p>Second, send position signals differentially. The encoder cable from the machine head to the control box is 1–2 m long and runs alongside the motor power cables all the way. With RS-422 differential signalling and shielded twisted pair, interference couples equally into both wires and cancels when the receiver subtracts them. This is crucial: losing a single encoder pulse throws the electronic cam out of step, and so does one extra noise pulse.</p>
+<p>Third, opto-isolate the inputs and provide freewheeling on the outputs. The 24 V signals from sensors and switches pass through optocouplers before entering the low-power zone; pneumatic valves and solenoids are inductive loads that generate a back-EMF of several hundred volts at turn-off, so a freewheeling path must be provided.</p>
+<h4 id="s15-9-2">15.9.2 Key circuit: driving the trimming solenoid</h4>
+<p>The trimming solenoid must pull in within a very narrow main-shaft angle window. At 1500 r/min one revolution takes 40 ms; if the window is 60°, that is only 6.7 ms. Suppose the coil has R = 6 Ω and L = 30 mH (τ = L/R = 5 ms) and needs 3 A to pull in (example values). The current rises exponentially:</p>
+<div class="math">\[i(t) = \frac{U}{R}\left(1 - e^{-t/\tau}\right), \qquad t_{pull} = -\tau \ln\left(1 - \frac{I_{pull}R}{U}\right)\]</div>
+<p>Driven directly from 24 V, the steady-state current is 4 A and the pull-in time is t_pull = −5 × ln(1 − 3/4) = 6.9 ms, longer than the window; and when energised for long periods the coil dissipates 4² × 6 = 96 W, which it cannot withstand.</p>
+<p>With a 75 V overvoltage start instead, the steady-state current “wants” to reach 12.5 A, so the current rises much faster, reaching 3 A in only t_pull = −5 × ln(1 − 3/12.5) = 1.37 ms. Once pulled in, the armature air gap is smaller and much less current is needed to hold, so the drive switches to 24 V PWM at 30% duty cycle for holding, with an average current of about 1.2 A.</p>
+<p>At turn-off the problem is exactly reversed: a freewheeling diode lets the current decay slowly with τ = 5 ms, and falling from 1.7 A to the 0.6 A release current takes τ·ln(1.7/0.6) ≈ 5 ms, so the knife cannot retract in time. With a 48 V TVS in series, the coil voltage is clamped at 48 V and the current falls linearly at di/dt = −U_z/L, giving a release time of L·I/U_z = 0.03 × 1.7 / 48 ≈ 1 ms. The price is that the MOSFET must withstand the supply voltage plus 48 V, and the TVS must absorb the energy stored in the coil, ½LI².</p>
+<figure class="fig chart"><a class="zoom" href="img/w_830708e2.png"><img src="img/w_830708e2.png" alt="Data chart" loading="lazy"></a><figcaption>Fig. 15-9 Three drive and freewheeling schemes for the trimming solenoid (parameters are example values)</figcaption></figure>
+<p>This combination of overvoltage start + PWM hold + fast freewheeling appears again in the electromagnetic needle selectors of Chapter 17, only on a time scale an order of magnitude shorter.</p>
+<h4 id="s15-9-3">15.9.3 Software structure</h4>
+<p>The main board’s software is layered by real-time requirement; the lower the layer, the faster and harder its deadlines:</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Runs on</th>
+<th>Period</th>
+<th>Main tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hardware logic</td>
+<td>FPGA</td>
+<td>Every clock</td>
+<td>Encoder decoding, main-shaft angle counting, angle-triggered trimming and intermediate presser foot</td>
+</tr>
+<tr>
+<td>Motion kernel</td>
+<td>Processor interrupt</td>
+<td>0.25–1 ms</td>
+<td>Electronic-cam interpolation, issuing X/Y position commands and the main-shaft speed command</td>
+</tr>
+<tr>
+<td>Sewing sequence</td>
+<td>Real-time task</td>
+<td>Every stitch</td>
+<td>State machine: start → sew → trim → jump → … → return to home; interlock checks</td>
+</tr>
+<tr>
+<td>Pattern and planning</td>
+<td>Background task</td>
+<td>Every pattern section</td>
+<td>Pattern-file parsing, look-ahead speed control (planning several tens of stitches ahead)</td>
+</tr>
+<tr>
+<td>User interface and management</td>
+<td>Ordinary task</td>
+<td>Human actions</td>
+<td>Touch screen, files, production counts, networking (Chapter 26)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Safety-related decisions — clamp in position, safety light curtain, air pressure, knife returned — must not live only in the user-interface layer. A common approach is to check them in the sewing-sequence state machine and also have the FPGA or a hardware circuit independently remove the main-shaft enable: two layers of protection. A watchdog resets the processor if the software hangs and puts all outputs into a safe state.</p>
+<h4 id="s15-9-4">15.9.4 Manufacturing and testing</h4>
+<p>From bare board to installation in the machine, a control board generally goes through the following operations (values are examples):</p>
+<p>The first step is the printed circuit board and SMT placement. The main board is usually a 4–6-layer board with dedicated power and ground planes; the driver boards place more emphasis on copper thickness and high-voltage clearances. After placement, solder joints are inspected by automated optical inspection (AOI), and through-hole components are wave-soldered or selectively soldered.</p>
+<p>The second step is in-circuit test (ICT). Probes on a bed-of-nails fixture contact test points on the board to check for opens, shorts and component values — so test points must be provided when the board is designed.</p>
+<p>The third step is programming and functional test (FCT). On a test fixture, with simulated encoder inputs, simulated loads (resistor plus inductor) and simulated sensors, every input and output, the communications and the electronic-cam timing are checked channel by channel. This step usually uses automated test scripts, and the results for every board are recorded in a traceability database.</p>
+<p>The fourth step is burn-in. The complete control box runs under load at 45–50 °C for 8–24 h to bring early failures to light.</p>
+<p>The last step is commissioning on the complete machine. With the head and table fitted, the main shaft’s needle-up and needle-down positions and the X/Y home are calibrated, standard patterns are run, and needle-position accuracy is checked, as well as whether stitches skip or needles break at maximum speed.</p>
+<p>Of these five steps, the ones design engineers most often neglect are steps 2 and 3: boards without provision for test points and self-test can only be debugged manually in volume production, with poor efficiency and consistency.</p>
+<h3 id="s15-10">15.10 Virtual labs and 3D model</h3>
+<p><a href="#lab-pattern" class="labref">Open Virtual lab 15-1: pattern sewer simulation</a></p><section class="lab" id="lab-pattern" data-src="labs/pattern.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4 id="x21743">Virtual lab 15-1 Pattern sewer simulation</h4></div><p>Draw a pattern, set the stitch length and speed, and check whether each move can be completed while the needle is out of the fabric.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/pattern.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<p>In the simulator you can choose a pocket flap, circle, five-pointed star, bartack, large zigzag and other patterns, or click out your own outline on the plot. Adjust the stitch length, fabric thickness, per-axis acceleration and maximum velocity, window margin, speed and motion law, and the program computes stitch by stitch with the formulas of Sections 15.3–15.4: blue stitch points can be completed, red ones cannot. “Auto look-ahead” mode runs the algorithm of Section 15.4.3 and plots each stitch’s speed and limit; the dial at the top right shows the main-shaft angle and the off-fabric window, and during playback you can see that the template moves only within the blue arc. The lab tasks are listed at the bottom right of the page.</p>
+<p><a href="#lab-patprog" class="labref">Open Virtual lab 15-2: pattern programming</a></p><section class="lab" id="lab-patprog" data-src="labs/patprog.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4 id="x51462">Virtual lab 15-2 Pattern programming</h4></div><p>Imitates pattern-programming software: draw lines, set stitch lengths, insert start backtacks and trims, and output a pattern file.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/patprog.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<p>This lab imitates pattern-programming software: on a 120 × 80 mm template, draw a pattern with lines, three-point arcs, circles and curves; for each section set the stitch length, speed limit, start and end backtacks, double stitching and trimming. The program generates the stitch points and pattern file by the method of Section 15.5, checks and plans the speeds per Sections 15.3–15.4, reports the cycle time, and can simulate sewing. On the left are a 7-step programming guide and 4 automatically scored tasks: a rectangular frame, a pocket flap, a two-section pattern, and cutting the cycle time.</p>
+<p><a href="#lab-model-pattern" class="labref">Open Model 15-1: 3D structure of the programmable pattern sewer</a></p>
+<p>The 3D model can be rotated, viewed in X-ray mode and exploded. During playback the X–Y table carries the template through a pocket flap, while the right-hand panel shows the main-shaft angle and “needle in fabric / out of fabric” in real time, so you can see directly that the template moves only within the off-fabric window.</p>
+<aside class="field">
+<p><strong>Shop-floor notes</strong></p>
+<ul>
+<li>For broken needles, check three things first: whether the template slot touches the intermediate presser foot; whether the pattern’s stitch lengths and speeds exceed the stitch-length/speed table; and whether home has been lost (timing belt jumping a tooth, home switch loose).</li>
+<li>Sew the first piece on a new template at low speed (e.g. 300–500 r/min), and use the “step” function to check that the needle falls in the centre of the slot at every corner.</li>
+<li>After changing templates, check the pattern number loaded from the barcode or RFID; take particular care on machines without automatic recognition.</li>
+<li>Below 0.5 MPa air pressure the clamp force is insufficient and the fabric slips in the template; this shows up as distorted stitching, not as an alarm.</li>
+<li>Check the tension of the X and Y timing belts regularly; a slack belt lets positioning error accumulate over sewing time.</li>
+</ul>
+</aside>
+<h3 id="x55057">Chapter 15 exercises</h3>
+<ol>
+<li>Fabric plus lower template plate is t = 3 mm thick, each axis has a = 50 m/s², with constant acceleration and deceleration. Find the upper speed limit for a 5 mm stitch along X.<details class="ans"><summary>Answer</summary>About 1600 r/min</details></li>
+<li>Prove that with a triangular velocity profile n_max is inversely proportional to √s. If 2000 r/min is still required at a stitch length of 8 mm and a fabric thickness of 1.5 mm, what is the minimum acceleration per axis?<details class="ans"><summary>Answer</summary>About 111 m/s²</details></li>
+<li>The X and Y axes have the same acceleration capability. A stitch of length s makes an angle θ with the X axis; write its move time as a function of θ. At which angle is it slowest, and at which fastest? How does the conclusion change if the resultant acceleration is limited instead?</li>
+<li>Using the worked example of Section 15.4.3, change Δn to 200 r/min and recompute the speeds of the first 8 stitches. How many stitches ahead must the controller begin to slow down?</li>
+<li>Why does the electronic cam use main-shaft angle rather than time as its independent variable? At 2800 r/min with a drive delay of 1.5 ms, by how many degrees will the template motion lag if no delay compensation is applied?</li>
+<li>The intermediate presser foot of a pocket-flap template has an outside diameter of 4 mm. Determine the slot width, and explain how to keep the inner plate from falling out of a closed slot.</li>
+<li>In Section 15.8, if the moving mass is reduced to 2 kg and the pulley radius is 12 mm, does the 400 W motor meet the peak and heating requirements?</li>
+<li>(Discussion) Using Virtual lab 15-1, compare the sewing time of the same pattern under the three motion laws. With reference to the cycle-time estimate in Section 15.6, explain why factories care more about loading and unloading than about speed.</li>
+</ol>

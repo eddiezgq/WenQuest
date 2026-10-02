@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>平缝机原型调试台</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = ① encoder calibration, ② event-table editor, ③ trial sewing + statistics; right rail = checks, parameters, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --tl:#0f6e74; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--tl:#4cc3c9;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--tl:#4cc3c9;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.pri{background:var(--accent);color:#fff;border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:3px 6px;width:5.6em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,350px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:760px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.read{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:1.05rem}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:.88rem;align-items:baseline}
+.kv b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+table.ev{border-collapse:collapse;width:100%;font-size:.82rem;margin-top:8px}
+table.ev th,table.ev td{border-bottom:1px solid var(--rule);padding:3px 6px;text-align:left}
+table.ev th{color:var(--muted);font-weight:600}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.8rem}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style>
+<div class="wrap">
+<header><h1>平缝机原型调试台</h1><span class="sub">《缝纫机设计与制造》第 20 章 · 虚拟实验 20-1 · 一台刚装好的 WQ-SC/LS：标定编码器，编剪线事件表，试缝 100 次看剪线成功率和停针误差</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>① 编码器方向与 Z 相偏置标定（转手轮，看百分表和编码器读数）</h3>
+      <div class="two">
+        <canvas id="cal" width="640" height="330" aria-label="手轮、针杆和百分表"></canvas>
+        <div>
+          <div class="kv"><span>百分表：针杆离上止点</span><b id="gauge" class="read"></b><span>编码器读数（固件角度）</span><b id="enc" class="read"></b></div>
+          <div class="row" aria-label="转手轮">转手轮（正转为 +）：<button data-d="-10">−10°</button><button data-d="-1">−1°</button><button data-d="-0.1">−0.1°</button><button data-d="0.1">+0.1°</button><button data-d="1">+1°</button><button data-d="10">+10°</button></div>
+          <div class="prm" style="margin-top:6px"><label for="hw">手轮（拖动粗调）</label><input id="hw" type="range" min="0" max="359.9" step="0.1"><span></span></div>
+          <div class="row">计数方向：<select id="dir"><option value="1">正常</option><option value="-1">取反（A/B 对调）</option></select></div>
+          <div class="row">Z 相偏置：<input id="off" type="number" step="0.1" aria-label="Z 相偏置（度）"> °<button id="write" class="pri" type="button">写入参数</button></div>
+          <div class="msg" id="calmsg"></div>
+          <p class="note">书中的角度约定：0° = 针杆上止点。百分表分辨率 0.01 mm。上止点附近百分表约 ±1.8° 内读不出变化，所以用对称两点法：在下行和上行两处找同一个百分表读数，两次编码器读数的平均就是下止点（应为 180°）。</p>
+        </div>
+      </div>
+    </section>
+    <section class="panel">
+      <h3>② 剪线事件表（拖动色条两端；绿色为第 14 章的窗口，深色为按电磁铁延迟算出的实际动作范围）</h3>
+      <canvas id="evc" width="1100" height="330" aria-label="事件表编辑器"></canvas>
+      <table class="ev"><thead><tr><th>动作</th><th>起</th><th>止</th><th>条件</th></tr></thead><tbody>
+        <tr><td>TRIM 剪线电磁铁</td><td><input id="trim_on" type="number" step="1" aria-label="剪线通电角"> °</td><td><input id="trim_off" type="number" step="1" aria-label="剪线断电角"> °</td><td>剪线周期；360 以上为下一转</td></tr>
+        <tr><td>TREL 松线电磁铁</td><td><input id="trel_on" type="number" step="1" aria-label="松线通电角"> °</td><td><input id="trel_off" type="number" step="1" aria-label="松线断电角"> °</td><td>止角 ≥ 430° 表示保持到停稳</td></tr>
+        <tr><td>WIPE 拨线电磁铁</td><td>停稳 + <input id="wipe_on" type="number" step="5" aria-label="拨线延时"> ms</td><td>持续 <input id="wipe_len" type="number" step="5" aria-label="拨线持续"> ms</td><td>停稳标志</td></tr>
+        <tr><td>PFL 抬压脚电磁铁</td><td>停稳 + <input id="pfl_on" type="number" step="5" aria-label="抬压脚延时"> ms</td><td>到下一次踩踏板</td><td>停稳标志</td></tr>
+      </tbody></table>
+    </section>
+    <section class="panel">
+      <h3>③ 试缝：缝 N 针后剪线（慢放），再统计 100 次</h3>
+      <div class="two">
+        <canvas id="anim" width="640" height="360" aria-label="试缝动画"></canvas>
+        <canvas id="stat" width="640" height="360" aria-label="100 次统计"></canvas>
+      </div>
+      <div class="row"><button id="sew" type="button" class="pri">试缝一次（动画）</button><button id="sew100" type="button">试缝 100 次</button><span class="note" id="stattxt" style="margin:0"></span></div>
+    </section>
+    <p class="note">模型（示意，与正文一致）：主轴伺服用第 13 章的模型（J = 6×10⁻⁴ kg·m²，K<sub>p</sub> = 200 s⁻¹，K<sub>v</sub> = 0.2 N·m·s/rad，T<sub>i</sub> = 12 ms，峰值 2.5 N·m，摩擦 0.15 N·m），剪线那一针以剪线转速匀速转动，在 25° 切入位置环（定位速度 200 r/min），目标上针位 70°；“停稳”= 误差 ≤ 0.5° 且转速 &lt; 10 r/min 持续 5 ms。剪线、松线电磁铁用第 13 章的模型（R = 8 Ω，L 20→80 mH，24 V 强激磁 10 ms，1 A 维持，48 V 稳压管续流）。窗口取自第 14 章：动刀 300°–330° 进刀，下一转 45°–65° 剪断（55° ± 10°，示意），松线覆盖 335°–55°。拨线电磁铁吸合 12 ms、复位 15 ms，抬压脚 40 ms（示意）。100 次试缝中，电源 24 V ± 10%、线圈 8–9.5 Ω（冷/热）、转速 ±2%、摩擦 0.12–0.18 N·m、负载 ±0.05 N·m 随机。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>判定（按延迟最坏情况）</h3><div class="checks" id="checks"></div><div class="msg" id="verdict" style="font-weight:600"></div></section>
+    <section class="panel">
+      <h3>参数</h3>
+      <div class="prm">
+        <label for="n">剪线转速（r/min）</label><input id="n" type="range" min="200" max="900" step="10"><output id="nv"></output>
+        <label for="ns">试缝针数 N</label><input id="ns" type="range" min="3" max="30" step="1"><output id="nsv"></output>
+      </div>
+      <div class="row"><button id="reset" type="button">恢复标准</button><button id="mess" type="button">打乱事件表</button></div>
+      <div class="kv" style="margin-top:8px"><span>剪线电磁铁吸合</span><b id="tpv"></b><span>释放</span><b id="trv"></b><span>每毫秒主轴转过</span><b id="dpm"></b></div>
+    </section>
+    <section class="panel">
+      <h3>任务</h3><div id="tasks"></div>
+      <div class="msg" id="msg"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), D=Math.PI/180;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+// ================= model (figsrc/ch20_model.py) =================
+const B=2e-4,TMAX=2.5,TAUI=0.5e-3,SV={Kp:200,Kv:0.2,Ti:12e-3,J:6e-4,Tf:0.15,wp:200,e0:45};
+const TARGET=430,ENGAGE=TARGET-SV.e0,KNIFE=[300,330],CUT=[405,425],REL=[335,415],NEEDLE_IN=360+101.7;
+const WIPE_PULL=12,WIPE_RET=15,PFL_T=40;
+function stopSim(n0,Tf,Tl){const dt=2e-5,J=SV.J,wpos=SV.wp*2*Math.PI/60;let th=-SV.e0*D,w=n0*2*Math.PI/60,Tm=Tf+B*w+Tl,integ=(Tf+B*w+Tl)/SV.Kv;const N=Math.round(0.25/dt),res=[];
+  for(let k=0;k<N;k++){const e=-th;const wref=Math.max(-wpos,Math.min(wpos,SV.Kp*e));const ew=wref-w;integ+=ew*dt/SV.Ti;let Tref=SV.Kv*(ew+integ);
+    if(Math.abs(Tref)>TMAX){Tref=Math.sign(Tref)*TMAX;integ-=ew*dt/SV.Ti;}Tm+=(Tref-Tm)*dt/TAUI;const Td=Tm-B*w-Tl;let acc;
+    if(Math.abs(w)<1e-3&&Math.abs(Td)<=Tf)acc=-w/dt;else acc=(Td-Tf*(Math.abs(w)>=1e-3?Math.sign(w):Math.sign(Td)))/J;
+    w+=acc*dt;th+=w*dt;if(k%5===0)res.push([k*dt,TARGET+th/D,w*60/2/Math.PI]);}
+  return res;}
+const SOL={L1:0.08,ga:1e-3,xmax:3e-3,m:0.02,k:1000,c:4,F0:7};
+function solSim(V,R){const P=SOL,dt=2e-6,tb=10e-3,Ih=1,Vz=48,ton=30e-3;const Lx=x=>P.L1*P.ga/(P.ga+P.xmax-x),dLx=x=>P.L1*P.ga/(P.ga+P.xmax-x)**2;
+  let lam=0,x=0,v=0,pull=null,rel=null;for(let k=0;;k++){const t=k*dt;if(t>ton+0.04)break;const L=Lx(x);let i=lam/L,u;
+    if(t<ton)u=(t<tb||i<Ih)?V:-0.7;else{if(i>1e-4)u=-Vz;else{u=0;lam=0;i=0;}}
+    lam+=(u-i*R)*dt;const F=0.5*i*i*dLx(x),Fs=P.F0+P.k*x;let a=(F-Fs-P.c*v)/P.m;
+    if(x<=0&&a<0){a=0;v=0;}if(x>=P.xmax&&a>0){a=0;v=0;}v+=a*dt;x=Math.min(P.xmax,Math.max(0,x+v*dt));
+    if((x===0&&v<0)||(x===P.xmax&&v>0))v=0;if(pull===null&&x>=0.999*P.xmax)pull=t;if(rel===null&&t>ton&&x<=0.001*P.xmax){rel=t-ton;break;}}
+  return [pull,rel];}
+const GV=[],GR=[],G=[];for(let i=0;i<17;i++)GV.push(20+0.5*i);for(let j=0;j<11;j++)GR.push(7.5+0.25*j);
+for(const V of GV)G.push(GR.map(R=>solSim(V,R)));
+function solDelay(V,R){const fi=(V-GV[0])/0.5,fj=(R-GR[0])/0.25;const i=Math.min(GV.length-2,Math.max(0,Math.floor(fi))),j=Math.min(GR.length-2,Math.max(0,Math.floor(fj)));
+  const u=Math.min(1,Math.max(0,fi-i)),w=Math.min(1,Math.max(0,fj-j));return [0,1].map(q=>G[i][j][q]*(1-u)*(1-w)+G[i+1][j][q]*u*(1-w)+G[i][j+1][q]*(1-u)*w+G[i+1][j+1][q]*u*w);}
+const TPMIN=solDelay(26.4,8)[0],TPMAX=solDelay(21.6,9.5)[0],TPNOM=solDelay(24,8)[0],TR=solDelay(24,8)[1];
+class Trace{constructor(n,Tf,Tl){this.n=n;this.tA=(ENGAGE-180)/(6*n);this.res=stopSim(n,Tf,Tl);this.tstop=null;let run=0,prev=0;
+    for(const [t,a,sp] of this.res){if(Math.abs(a-TARGET)<=0.5&&Math.abs(sp)<10)run+=t-prev;else run=0;prev=t;if(run>=5e-3){this.tstop=this.tA+t;break;}}
+    if(this.tstop===null)this.tstop=this.tA+this.res[this.res.length-1][0];}
+  ang(t){if(t<=this.tA)return 180+6*this.n*t;const k=Math.min(this.res.length-1,Math.floor((t-this.tA)/1e-4));return this.res[k][1];}
+  spd(t){if(t<=this.tA)return this.n;const k=Math.min(this.res.length-1,Math.floor((t-this.tA)/1e-4));return this.res[k][2];}
+  tOf(a){if(a<=ENGAGE)return (a-180)/(6*this.n);for(const [t,x] of this.res)if(x>=a)return this.tA+t;return null;}}
+function trial(ev,tr,tp,trl,calib){const cmd=a=>{const t=tr.tOf(a);return (t===null||t>tr.tstop)?tr.tstop:t;};const phys=t=>tr.ang(t)-calib;
+  const t1=cmd(ev.trim_on),t2=cmd(ev.trim_off),t3=cmd(ev.trel_on),t4=cmd(ev.trel_off);
+  const r={entry:phys(t1+tp),cut:phys(t2+trl),ropen:phys(t3+tp),rclose:t4<tr.tstop?phys(t4+trl):1e9,stop:tr.ang(tr.tstop)-calib,tstop:tr.tstop,t1,t2,t3,t4,tp,trl};
+  r.ok={entry:r.entry>=KNIFE[0]&&r.entry<=KNIFE[1],cut:r.cut>=CUT[0]&&r.cut<=CUT[1],rel:r.ropen<=REL[0]&&r.rclose>=REL[1],stop:Math.abs(r.stop-TARGET)<=1,
+    wipe:ev.wipe_len>=WIPE_PULL,pfl:ev.pfl_on>=ev.wipe_on+ev.wipe_len+WIPE_RET};r.all=Object.values(r.ok).every(Boolean);return r;}
+// seeded RNG so that tests are repeatable
+let seed=12345;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+const gauss=()=>{let u=0,v=0;while(u===0)u=rnd();v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+// ================= hidden machine: encoder mounted reversed, index at 137.6 deg =================
+const HID={d:-1,z:137.6};
+const STDEV={trim_on:300,trim_off:408,trel_on:310,trel_off:440,wipe_on:0,wipe_len:40,pfl_on:80};
+const ST={phi:30,dir:1,off:0,n:300,ns:8,...STDEV};
+const wrap=a=>((a%360)+360)%360, wrap180=a=>{const x=wrap(a);return x>180?x-360:x;};
+const Xn=f=>{const Rr=15.5,Ll=55,l=Rr/Ll,a=f*D;return Rr*(1-Math.cos(a))-Ll*(1-Math.sqrt(1-(l*Math.sin(a))**2));};
+const reading=phi=>wrap(ST.dir*HID.d*(phi-HID.z)+ST.off);
+function calibState(){const dirOK=ST.dir*HID.d===1;const res=dirOK?wrap180(ST.off-HID.z):null;return {dirOK,res,ok:dirOK&&Math.abs(res)<=0.3};}
+// ================= evaluation (worst case over delay range) =================
+let NOM=null,NOMn=null;
+function nomTrace(){if(NOMn!==ST.n){NOM=new Trace(ST.n,0.15,0);NOMn=ST.n;}return NOM;}
+function evaluate(){const cs=calibState(),tr=nomTrace(),cal=cs.dirOK?cs.res:0;const a=trial(ST,tr,TPMIN,TR,cal),b=trial(ST,tr,TPMAX,TR,cal);
+  const e1=Math.min(a.entry,b.entry),e2=Math.max(a.entry,b.entry),o1=Math.min(a.ropen,b.ropen),o2=Math.max(a.ropen,b.ropen);
+  const C=[
+   {k:'cal',n:'编码器方向与 Z 相偏置',ok:cs.ok,v:!cs.dirOK?'方向反':`残差 ${cs.res.toFixed(1)}°`,bad:!cs.dirOK?'正转时读数在减小：A/B 计数方向反了。真机上速度环会变成正反馈，驱动器报飞车或编码器故障。':'读数的 0° 没有对准针杆上止点，所有事件和停针位置都跟着偏；残差要 ≤ 0.3°'},
+   {k:'entry',n:'动刀进刀在 300°–330°',ok:e1>=KNIFE[0]&&e2<=KNIFE[1],v:`${e1.toFixed(0)}–${e2.toFixed(0)}°`,bad:e1<KNIFE[0]?'进刀太早：线环还没转到刀的路径上，面线剪不断':'进刀太晚：线环已脱出，面线剪不断'},
+   {k:'cut',n:'剪断在下一转 45°–65°',ok:a.ok.cut&&b.ok.cut,v:`${wrap(a.cut).toFixed(0)}°`,bad:'剪断点离挑线杆最高点（55°）太远：早了线没收紧，晚了已经停车或机针下行'},
+   {k:'rel',n:'松线覆盖 335°–55°',ok:o2<=REL[0]&&a.rclose>=REL[1],v:`开 ${o2.toFixed(0)}° / ${a.rclose>1e8?'停稳关':wrap(a.rclose).toFixed(0)+'°关'}`,bad:'没松开或关得太早：挑线杆从线头一侧抽线，留头太短，起缝脱线'},
+   {k:'stop',n:'停针误差 ≤ ±1°（上针位 70°）',ok:Math.abs(a.stop-TARGET)<=1,v:`${(a.stop-TARGET).toFixed(2)}°`,bad:'停针超差：多半是标定残差太大'},
+   {k:'wipe',n:'拨线持续 ≥ 吸合 12 ms',ok:a.ok.wipe,v:`${ST.wipe_len} ms`,bad:'通电时间比吸合还短，拨线杆扫不到针下'},
+   {k:'pfl',n:'拨线复位后才抬压脚',ok:a.ok.pfl,v:`${ST.pfl_on} ms`,bad:`拨线杆还没回位（≥ ${ST.wipe_on+ST.wipe_len+WIPE_RET} ms）压脚就抬起，拨线杆被压脚夹住`}];
+  return {C,allOK:C.every(c=>c.ok),e1,e2,o1,o2,a,b,cs};}
+// ================= drawing: calibration =================
+function drawCal(){const [c,g]=ctx('cal'),W=c.width,H=c.height,cx=470,cy=170,R=115;const phi=ST.phi;
+  g.strokeStyle=css('--ink');g.lineWidth=10;g.beginPath();g.arc(cx,cy,R,0,7);g.stroke();g.lineWidth=5;
+  for(let k=0;k<5;k++){const b=-Math.PI/2+phi*D+k*2*Math.PI/5;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+R*Math.cos(b),cy+R*Math.sin(b));g.stroke();}
+  const bz=-Math.PI/2+(phi-HID.z)*D;g.fillStyle=css('--warn');g.beginPath();g.arc(cx+(R+16)*Math.cos(bz),cy+(R+16)*Math.sin(bz),7,0,7);g.fill();
+  g.fillStyle=css('--bad');g.fillRect(cx-2,cy-R-30,4,22);
+  g.font='16px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';g.fillText('手轮（橙点 = 码盘 Z 相刻线）',cx,H-10);
+  // frame, needle bar, dial gauge
+  const x0=150,yTop=70,s=5;const z=Xn(phi);
+  g.fillStyle=css('--soft');g.fillRect(x0-60,yTop-6,120,26);g.fillRect(x0-60,yTop+90,120,22);
+  g.fillStyle=css('--muted');g.fillRect(x0-8,yTop+20+z*s,16,150);g.fillStyle=css('--ink');g.fillRect(x0-2,yTop+170+z*s,4,26);
+  g.strokeStyle=css('--ink');g.lineWidth=2;g.beginPath();g.moveTo(x0+8,yTop+30+z*s);g.lineTo(x0+60,yTop+30+z*s);g.stroke();
+  g.strokeStyle=css('--nt');g.lineWidth=3;g.beginPath();g.moveTo(x0+60,yTop+30+z*s);g.lineTo(x0+60,yTop+32);g.stroke();
+  const gx=x0+60,gy=yTop-12;g.fillStyle=css('--sheet');g.strokeStyle=css('--nt');g.lineWidth=3;g.beginPath();g.arc(gx,gy,40,0,7);g.fill();g.stroke();
+  for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5;g.beginPath();g.moveTo(gx+32*Math.cos(a),gy+32*Math.sin(a));g.lineTo(gx+38*Math.cos(a),gy+38*Math.sin(a));g.lineWidth=1.5;g.stroke();}
+  const ang=-Math.PI/2+(z%1)*2*Math.PI;g.strokeStyle=css('--bad');g.lineWidth=2.5;g.beginPath();g.moveTo(gx,gy);g.lineTo(gx+30*Math.cos(ang),gy+30*Math.sin(ang));g.stroke();
+  g.fillStyle=css('--ink');g.font='600 17px '+css('--f-mono');g.textAlign='start';g.fillText(z.toFixed(2)+' mm',gx+48,gy+6);
+  g.font='16px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';g.fillText('针杆 + 百分表',x0+20,H-10);g.textAlign='start';
+  $('gauge').textContent=z.toFixed(2)+' mm';$('enc').textContent=reading(phi).toFixed(1)+'°';$('hw').value=phi.toFixed(1);}
+// ================= drawing: event table =================
+const XA0=255,XA1=450;let xA,xT;
+function drawEv(){const [c,g]=ctx('evc'),W=c.width,H=c.height,L=150,M=W-250;xA=f=>L+(M-L)*(f-XA0)/(XA1-XA0);xT=t=>M+40+(W-20-M-40)*t/160;
+  const R=evaluate();g.font='14px '+css('--f-body');
+  for(let f=270;f<=450;f+=15){g.strokeStyle=css('--rule');g.lineWidth=1;g.beginPath();g.moveTo(xA(f),20);g.lineTo(xA(f),H-22);g.stroke();g.fillStyle=css('--muted');g.textAlign='center';g.fillText(wrap(f).toFixed(0)+'°',xA(f),H-6);}
+  for(let t=0;t<=160;t+=40){g.beginPath();g.moveTo(xT(t),20);g.lineTo(xT(t),H-22);g.stroke();g.fillText(String(t),xT(t),H-6);}
+  g.fillText('停稳后（ms）',xT(80),14);
+  const rows={trim:60,knife:115,trel:190,spd:260,wipe:60,pfl:160};g.textAlign='end';g.fillStyle=css('--ink');g.font='600 15px '+css('--f-body');
+  g.fillText('TRIM 发令',L-8,rows.trim+5);g.fillText('动刀 进刀/剪断',L-8,rows.knife+5);g.fillText('TREL 松线',L-8,rows.trel+5);g.fillText('主轴转速',L-8,rows.spd+5);
+  g.textAlign='start';g.fillText('WIPE',M+2,rows.wipe-22);g.fillText('PFL',M+2,rows.pfl-22);g.font='14px '+css('--f-body');
+  // windows
+  g.fillStyle=css('--win');g.globalAlpha=.16;g.fillRect(xA(KNIFE[0]),rows.knife-16,xA(KNIFE[1])-xA(KNIFE[0]),32);g.fillRect(xA(CUT[0]),rows.knife-16,xA(CUT[1])-xA(CUT[0]),32);g.globalAlpha=1;
+  g.strokeStyle=css('--ink');g.beginPath();g.moveTo(xA(REL[0]),rows.trel-20);g.lineTo(xA(REL[1]),rows.trel-20);g.stroke();g.fillStyle=css('--muted');g.fillText('需要 335°–55°',xA(REL[0]),rows.trel-25);
+  // command bars + handles
+  const bar=(a,b,y,col)=>{g.fillStyle=col;g.globalAlpha=.85;g.fillRect(xA(a),y-8,Math.max(2,xA(Math.min(b,XA1))-xA(a)),16);g.globalAlpha=1;for(const v of [a,Math.min(b,XA1)]){g.fillStyle=css('--sheet');g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.rect(xA(v)-5,y-12,10,24);g.fill();g.stroke();}};
+  bar(ST.trim_on,ST.trim_off,rows.trim,css('--bt'));bar(ST.trel_on,ST.trel_off>=TARGET?TARGET:ST.trel_off,rows.trel,css('--tl'));
+  g.fillStyle=css('--bt');g.fillText(`${ST.trim_on}° → ${wrap(ST.trim_off).toFixed(0)}°`,xA(ST.trim_on),rows.trim-16);
+  g.fillStyle=css('--tl');g.fillText(`${ST.trel_on}° → ${ST.trel_off>=TARGET?'停稳':wrap(ST.trel_off).toFixed(0)+'°'}`,xA(ST.trel_on),rows.trel+26);
+  // actual ranges
+  g.fillStyle=R.C[1].ok?css('--bad'):css('--bad');g.globalAlpha=.8;g.fillRect(xA(Math.max(XA0,R.e1)),rows.knife-7,Math.max(3,xA(Math.min(XA1,R.e2))-xA(Math.max(XA0,R.e1))),14);
+  g.fillStyle=css('--warn');g.fillRect(xA(Math.min(XA1,R.a.cut))-2,rows.knife-7,5,14);
+  g.fillStyle=css('--tl');g.globalAlpha=.85;g.fillRect(xA(Math.max(XA0,R.o1)),rows.trel+9,Math.max(3,xA(Math.min(XA1,R.o2))-xA(Math.max(XA0,R.o1))),6);g.globalAlpha=.3;
+  const cl=Math.min(XA1,R.a.rclose>1e8?TARGET:R.a.rclose);g.fillRect(xA(Math.min(XA1,R.o2)),rows.trel+9,Math.max(0,xA(cl)-xA(Math.min(XA1,R.o2))),6);g.globalAlpha=1;
+  // speed curve (nominal)
+  const tr=nomTrace();g.strokeStyle=css('--nt');g.lineWidth=2;g.beginPath();let first=true;
+  for(let t=0;t<=tr.tstop+0.01;t+=2e-4){const a=tr.ang(t);if(a<XA0)continue;const y=rows.spd+30-55*tr.spd(t)/Math.max(300,ST.n);first?g.moveTo(xA(a),y):g.lineTo(xA(a),y);first=false;}g.stroke();
+  g.fillStyle=css('--nt');g.beginPath();g.arc(xA(TARGET),rows.spd+30,5,0,7);g.fill();g.fillText(`${ST.n} r/min；25° 切入位置环；停 70°`,xA(270),rows.spd+44);
+  g.strokeStyle=css('--nt');g.setLineDash([3,3]);g.beginPath();g.moveTo(xA(ENGAGE),rows.trim-20);g.lineTo(xA(ENGAGE),rows.spd+34);g.stroke();g.setLineDash([]);
+  if(anim&&anim.phase===2){g.strokeStyle=css('--warn');g.lineWidth=2;g.beginPath();g.moveTo(xA(Math.min(XA1,anim.cur)),20);g.lineTo(xA(Math.min(XA1,anim.cur)),H-22);g.stroke();}
+  // post-stop rows
+  g.fillStyle=css('--muted');g.fillRect(xT(ST.wipe_on),rows.wipe-8,xT(ST.wipe_on+ST.wipe_len)-xT(ST.wipe_on),16);g.globalAlpha=.35;g.fillRect(xT(ST.wipe_on+ST.wipe_len),rows.wipe-8,xT(WIPE_RET)-xT(0),16);g.globalAlpha=1;
+  g.fillStyle=css('--win');g.fillRect(xT(Math.min(160,ST.pfl_on)),rows.pfl-8,Math.max(2,xT(160)-xT(Math.min(160,ST.pfl_on))),16);
+  for(const [v,y,col] of [[ST.wipe_on,rows.wipe,css('--muted')],[ST.wipe_on+ST.wipe_len,rows.wipe,css('--muted')],[ST.pfl_on,rows.pfl,css('--win')]]){g.fillStyle=css('--sheet');g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.rect(xT(Math.min(160,v))-5,y-12,10,24);g.fill();g.stroke();}
+  g.fillStyle=css('--ink');g.fillText(`拨线 ${ST.wipe_len} ms + 复位 15`,xT(0),rows.wipe+28);g.fillText(`抬压脚 停稳 + ${ST.pfl_on} ms`,xT(0),rows.pfl+28);
+  return R;}
+// drag handling
+const HANDLES=[['trim_on','a',60],['trim_off','a',60],['trel_on','a',190],['trel_off','a',190],['wipe_on','t',60],['wipe_end','t',60],['pfl_on','t',160]];
+const LIMS={trim_on:[250,360],trim_off:[370,450],trel_on:[250,360],trel_off:[330,450],wipe_on:[0,100],wipe_len:[0,120],pfl_on:[0,160]};
+let drag=null;
+function hval(k){return k==='wipe_end'?ST.wipe_on+ST.wipe_len:k==='trel_off'?Math.min(ST.trel_off,XA1):ST[k];}
+function evPos(e){const c=$('evc'),r=c.getBoundingClientRect();return [(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height];}
+$('evc').addEventListener('pointerdown',e=>{const [x,y]=evPos(e);let best=null,bd=20;for(const [k,ty,yy] of HANDLES){const hx=ty==='a'?xA(hval(k)):xT(Math.min(160,hval(k)));const d=Math.hypot(hx-x,(yy-y)*0.5);if(d<bd){bd=d;best=[k,ty];}}
+  if(best){drag=best;$('evc').setPointerCapture(e.pointerId);}});
+$('evc').addEventListener('pointermove',e=>{if(!drag)return;const [x]=evPos(e);const [k,ty]=drag;const W=$('evc').width,L=150,M=W-250;
+  let v=ty==='a'?XA0+(x-L)*(XA1-XA0)/(M-L):(x-(M+40))*160/(W-20-M-40);v=Math.round(ty==='a'?v:v/5*5);
+  if(k==='wipe_end')ST.wipe_len=Math.max(0,Math.min(120,v-ST.wipe_on));else{const [lo,hi]=LIMS[k];ST[k]=Math.max(lo,Math.min(hi,v));}changed();});
+$('evc').addEventListener('pointerup',()=>{drag=null;});
+// ================= trial animation & statistics =================
+let anim=null,STATS=null;
+function randomTrial(){const cs=calibState();const V=Math.min(26.4,Math.max(21.6,24+gauss())),R=8+1.5*rnd();const n=ST.n*(1+Math.max(-0.03,Math.min(0.03,0.01*gauss())));
+  const Tf=0.12+0.06*rnd(),Tl=-0.05+0.1*rnd(),jit=0.2e-3*gauss();const tr=new Trace(n,Tf,Tl);const [tp,trl]=solDelay(V,R);
+  if(!cs.dirOK)return {fail:'dir',all:false,ok:{},tr,V,R};const r=trial(ST,tr,tp+jit,trl,cs.res);r.tr=tr;r.V=V;r.R=R;return r;}
+function run100(){const out=[];for(let k=0;k<100;k++)out.push(randomTrial());STATS=out;drawStat();checkTasks();return out;}
+function drawStat(){const [c,g]=ctx('stat'),W=c.width,H=c.height;g.font='15px '+css('--f-body');g.fillStyle=css('--ink');
+  if(!STATS){g.fillStyle=css('--muted');g.fillText('按“试缝 100 次”：每次的电源电压、线圈温度、',16,30);g.fillText('转速、摩擦都随机。',16,54);return;}
+  const ok=STATS.filter(s=>s.all).length;g.font='600 17px '+css('--f-body');g.fillText(`剪线周期合格 ${ok} / 100`,16,22);
+  if(STATS[0].fail==='dir'){g.fillStyle=css('--bad');g.fillText('编码器方向反：主轴一启动速度环就正反馈，',16,54);g.fillText('驱动器报警，进入 SAFE。',16,78);$('stattxt').textContent='先完成 ① 的方向标定。';return;}
+  const hist=(vals,lo,hi,y0,h,win,col,lab,fmt)=>{const nb=40,cnt=new Array(nb).fill(0);for(const v of vals){const i=Math.floor((v-lo)/(hi-lo)*nb);if(i>=0&&i<nb)cnt[i]++;}const m=Math.max(1,...cnt);
+    const X=v=>30+(W-50)*(v-lo)/(hi-lo);g.fillStyle=css('--win');g.globalAlpha=.15;g.fillRect(X(win[0]),y0,X(win[1])-X(win[0]),h);g.globalAlpha=1;
+    g.fillStyle=col;cnt.forEach((c2,i)=>{if(c2)g.fillRect(X(lo+(i+.1)*(hi-lo)/nb),y0+h-h*c2/m,(W-50)/nb*0.8,h*c2/m);});
+    g.strokeStyle=css('--rule');g.beginPath();g.moveTo(30,y0+h);g.lineTo(W-20,y0+h);g.stroke();g.fillStyle=css('--muted');g.font='14px '+css('--f-body');g.textAlign='center';
+    for(let k=0;k<=4;k++){const v=lo+(hi-lo)*k/4;g.fillText(fmt(v),X(v),y0+h+15);}g.textAlign='start';g.fillStyle=css('--ink');g.font='15px '+css('--f-body');g.fillText(lab,30,y0-8);};
+  const E=STATS.map(s=>s.entry),S=STATS.map(s=>s.stop-TARGET);
+  hist(E,290,340,62,105,KNIFE,css('--bad'),`动刀进刀角（绿 = 300°–330°）：${Math.min(...E).toFixed(1)}–${Math.max(...E).toFixed(1)}°`,v=>v.toFixed(0)+'°');
+  hist(S,-2,2,225,105,[-1,1],css('--nt'),`停针误差（绿 = ±1°）：${Math.min(...S).toFixed(2)} 到 ${Math.max(...S).toFixed(2)}°`,v=>v.toFixed(1)+'°');
+  const k={entry:0,cut:0,rel:0,stop:0};for(const s of STATS)for(const q in k)if(!s.ok[q])k[q]++;
+  $('stattxt').textContent=`失败分项：进刀 ${k.entry}、剪断 ${k.cut}、松线 ${k.rel}、停针 ${k.stop}`;}
+function startAnim(){const r=randomTrial();anim={r,phase:1,t0:performance.now(),cur:180};}
+function drawAnim(){const [c,g]=ctx('anim'),W=c.width,H=c.height;g.font='16px '+css('--f-body');
+  if(!anim){g.fillStyle=css('--muted');g.fillText('按“试缝一次”：先以 3000 r/min 缝 N 针（快放），',16,30);g.fillText('再慢放剪线那一针（放慢 15 倍）。',16,54);return;}
+  const r=anim.r,tr=r.tr,now=performance.now(),el=(now-anim.t0)/1000;let phi,sp,stitch,t=null;
+  const T1=ST.ns*0.12;if(el<T1){anim.phase=1;stitch=Math.floor(el/0.12)+1;phi=wrap((el/0.12)*360);sp=3000;}
+  else{anim.phase=2;t=Math.min(tr.tstop+0.1,(el-T1)/15);phi=tr.ang(t);sp=tr.spd(t);anim.cur=phi;stitch=ST.ns;if(t>=tr.tstop+0.1&&!anim.done){anim.done=true;}}
+  const cx=150,cy=210,R=100;g.strokeStyle=css('--ink');g.lineWidth=9;g.beginPath();g.arc(cx,cy,R,0,7);g.stroke();g.lineWidth=4;
+  for(let k=0;k<5;k++){const b=-Math.PI/2+phi*D+k*2*Math.PI/5;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+R*Math.cos(b),cy+R*Math.sin(b));g.stroke();}
+  g.fillStyle=css('--win');g.globalAlpha=.2;g.beginPath();g.moveTo(cx,cy);g.arc(cx,cy,R+18,-Math.PI/2+69*D,-Math.PI/2+71*D);g.fill();g.globalAlpha=1;
+  g.fillStyle=css('--ink');g.font='600 17px '+css('--f-body');g.fillText(anim.phase===1?`缝纫 第 ${stitch} / ${ST.ns} 针`:`剪线那一针（慢放）`,16,24);
+  g.font='16px '+css('--f-body');g.fillText(`主轴角 ${wrap(phi).toFixed(1)}°　转速 ${sp.toFixed(0)} r/min`,16,46);
+  if(r.fail==='dir'){g.fillStyle=css('--bad');g.fillText('方向反 → 飞车报警，SAFE',16,70);}
+  // lamps
+  const lamps=[['TRIM',r.t1,r.t2,r.tp,r.trl,css('--bt')],['TREL',r.t3,r.t4,r.tp,r.trl,css('--tl')]];let y=100;
+  if(t!==null&&!r.fail){for(const [n2,a,b,tp,trl,col] of lamps){const cmd=t>=a&&t<b,pos=t>=a+tp&&t<b+trl;g.fillStyle=cmd?col:css('--soft');g.fillRect(330,y,24,18);g.fillStyle=pos?col:css('--soft');g.fillRect(360,y,24,18);g.fillStyle=css('--ink');g.fillText(`${n2}　指令 / 衔铁`,392,y+15);y+=30;}
+    const stopped=t>=tr.tstop;const wt=(t-tr.tstop)*1000;const wipe=stopped&&wt>=ST.wipe_on&&wt<ST.wipe_on+ST.wipe_len,pfl=stopped&&wt>=ST.pfl_on;
+    g.fillStyle=wipe?css('--muted'):css('--soft');g.fillRect(330,y,54,18);g.fillStyle=css('--ink');g.fillText('WIPE 拨线',392,y+15);y+=30;
+    g.fillStyle=pfl?css('--win'):css('--soft');g.fillRect(330,y,54,18);g.fillStyle=css('--ink');g.fillText('PFL 抬压脚',392,y+15);y+=40;
+    if(phi>=r.entry)g.fillText(`动刀进刀 ${wrap(r.entry).toFixed(1)}° ${r.ok.entry?'✓':'✗'}`,330,y);y+=26;
+    if(phi>=r.cut)g.fillText(`剪断 ${wrap(r.cut).toFixed(1)}° ${r.ok.cut?'✓':'✗'}`,330,y);y+=26;
+    if(stopped){g.fillText(`停稳 ${wrap(r.stop).toFixed(2)}°（${(r.stop-TARGET).toFixed(2)}°）${r.ok.stop?'✓':'✗'}`,330,y);y+=26;
+      g.font='600 17px '+css('--f-body');g.fillStyle=r.all?css('--ok'):css('--bad');g.fillText(r.all?'结果：剪断，停在上针位':'结果：有问题，看右侧判定',330,y+6);}}
+}
+function loop(){drawAnim();if(anim&&anim.phase===2&&!anim.drawnDone){drawEv();if(anim.done)anim.drawnDone=true;}requestAnimationFrame(loop);}
+// ================= controls =================
+const IDS=['trim_on','trim_off','trel_on','trel_off','wipe_on','wipe_len','pfl_on'];
+function syncUI(){for(const k of IDS)$(k).value=ST[k];$('n').value=ST.n;$('nv').textContent=ST.n;$('ns').value=ST.ns;$('nsv').textContent=ST.ns;$('dir').value=String(ST.dir);
+  $('tpv').textContent=`${(TPMIN*1e3).toFixed(1)}–${(TPMAX*1e3).toFixed(1)} ms = ${(6*ST.n*TPMIN).toFixed(0)}–${(6*ST.n*TPMAX).toFixed(0)}°`;$('trv').textContent=`${(TR*1e3).toFixed(1)} ms`;$('dpm').textContent=`${(6*ST.n/1000).toFixed(1)}°`;}
+let R_=null;
+function render(){$('checks').innerHTML=R_.C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${c.ok?'':`<small>${c.bad}</small>`}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');
+  $('verdict').innerHTML=R_.allOK?'<span style="color:var(--ok)">全部判定通过：可以试缝 100 次</span>':'<span style="color:var(--bad)">有未通过的判定，见打 ✗ 的项</span>';}
+function changed(){syncUI();R_=drawEv();render();drawCal();if(STATS&&STATS.stale!==false){}checkTasks();}
+for(const k of IDS)$(k).addEventListener('change',()=>{const v=+$(k).value;if(isFinite(v)){const [lo,hi]=LIMS[k];ST[k]=Math.max(lo,Math.min(hi,v));}STATS=null;drawStat();changed();});
+$('n').addEventListener('input',()=>{ST.n=+$('n').value;STATS=null;drawStat();changed();});
+$('ns').addEventListener('input',()=>{ST.ns=+$('ns').value;syncUI();});
+for(const b of document.querySelectorAll('[data-d]'))b.onclick=()=>{ST.phi=wrap(Math.round((ST.phi+ +b.dataset.d)*10)/10);drawCal();};
+$('hw').addEventListener('input',()=>{ST.phi=+$('hw').value;drawCal();});
+$('dir').onchange=()=>{ST.dir=+$('dir').value;STATS=null;changed();};
+$('write').onclick=()=>{const v=+$('off').value;if($('off').value===''||!isFinite(v)){$('calmsg').textContent='先填偏置。';return;}ST.off=wrap(v);STATS=null;changed();const cs=calibState();
+  $('calmsg').textContent=!cs.dirOK?'已写入。正转时读数仍在减小：先把计数方向取反。':cs.ok?`已写入。标定残差 ${cs.res.toFixed(2)}°，合格。`:`已写入。还没对准：转到上止点附近看看读数，或用对称两点法再测一次。`;};
+$('reset').onclick=()=>{Object.assign(ST,STDEV,{n:300});seen.messed=false;STATS=null;drawStat();changed();};
+$('mess').onclick=()=>{Object.assign(ST,{trim_on:270,trim_off:385,trel_on:340,trel_off:400,wipe_on:0,wipe_len:8,pfl_on:30,n:300});seen.messed=true;STATS=null;drawStat();changed();};
+$('sew').onclick=()=>{startAnim();};
+$('sew100').onclick=()=>{run100();};
+// ================= tasks =================
+const seen={messed:false,t2:false,t3:false};
+const TASKS=[
+ {t:'① 标定编码器：转手轮判断计数方向，再用对称两点法求 Z 相偏置，写入后让标定残差 ≤ 0.3°。',d:'这台原型的编码器装反了，Z 相刻线也不在上止点。正转时读数应当增大；上止点附近百分表读不出变化，要用两侧对称的同一读数取平均（下止点应读 180°）。',ok:()=>calibState().ok},
+ {t:'② 按“打乱事件表”，再改回一张能用的表（剪线转速保持 300 r/min）：右侧七项判定全过，试缝 100 次合格 ≥ 99 次。',d:'先看红色的实际进刀范围落在哪里；松线要在 335° 以前打开、保持到停稳；拨线复位以后才能抬压脚。按“恢复标准”不算。',ok:()=>seen.t2},
+ {t:'③ 把剪线转速提到 700 r/min 以上，重编事件表，让七项判定全过、100 次试缝合格 ≥ 99 次。',d:'每毫秒转过的度数翻了一倍多：吸合 6.2–9.4 ms 折合多少度？进刀和松线的发令角都要提前，范围也变宽了。注意：这时吸合折合 26°–40°，已超出平台指标 ≤ 20°（正文 20.5 节），这里只作练习。',ok:()=>seen.t3}];
+const done=new Set();
+function checkTasks(){const ok100=STATS&&STATS[0]&&!STATS[0].fail&&STATS.filter(s=>s.all).length>=99;
+  if(seen.messed&&ok100&&R_.allOK&&ST.n===300)seen.t2=true;
+  if(ok100&&R_.allOK&&ST.n>=700)seen.t3=true;
+  TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');
+  $('msg').textContent=STATS&&!ok100&&R_.allOK?'判定都过了，但 100 次里合格不到 99 次：留的余量不够，随机的电压、温度和转速把动作推出了窗口。':'';}
+window.__api={ST,STDEV,HID,evaluate,changed,run100,calibState,done,seen,TPMIN,TPMAX,TR,reading,
+  calibrate:(dir,off)=>{ST.dir=dir;$('dir').value=String(dir);$('off').value=off;$('write').click();},
+  setEv:o=>{Object.assign(ST,o);STATS=null;changed();},mess:()=>$('mess').click()};
+$('off').value=ST.off;changed();drawStat();requestAnimationFrame(loop);
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

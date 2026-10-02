@@ -1,0 +1,30 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.st{display:grid;grid-template-columns:repeat(6,1fr);gap:0 26px;position:relative}
+.st .box{text-align:left;font-size:12.3px;position:relative}
+.st .box b{font-size:16px;margin-bottom:4px}
+.st .box:not(:last-child):after{content:"→";position:absolute;right:-22px;top:40%;color:#5a6570;font-size:18px}
+.st ul{margin:4px 0 0;padding-left:16px;color:#1b2430}.st li{margin:2px 0}
+.st .h{color:#5a6570;font-size:12px;display:block;margin-bottom:2px}
+.loop{display:flex;align-items:stretch;margin-top:22px}
+.loop .box{flex:1;font-size:12.5px}.loop .ar{width:30px;display:flex;align-items:center;justify-content:center;color:#5a6570;font-size:20px}
+.back{margin-top:6px;border-top:2px dashed #c4531d;color:#c4531d;font-size:12.5px;padding-top:4px;text-align:center}
+</style>
+<div class="fig" style="--w:1320px">
+<p class="title">从原型到工业级：用测试数据决定能不能进下一级</p><p class="sub">每一级的退出条件都写成可以由自动测试判定的数字（示意值，22.8 节表 22-7 有完整版）；量产以后，出厂测试和现场数据流回需求和用例</p>
+<div class="st">
+<div class="box k"><b>P0 能动</b><span class="h">手搭一台</span><ul><li>主轴转、能停在上针位</li><li>单元、SIL 框架跑通</li><li>网关能上报版本号</li></ul></div>
+<div class="box b fill-b"><b>P1 功能全</b><span class="h">1–2 台</span><ul><li>全部动作按事件表执行</li><li>每条 REQ 至少 1 个用例</li><li>SIL 100%，HIL ≥ 80% 通过</li></ul></div>
+<div class="box p fill-p"><b>EVT 工程验证</b><span class="h">2–3 台</span><ul><li>停针 Cpk ≥ 1.33（50 次）</li><li>剪线 1000 次 ≤ 1 次失败</li><li>回针 ≤ 0.3 mm，电磁铁 ≤ 20°</li><li>HIL 连续 10 晚全绿</li></ul></div>
+<div class="box o fill-o"><b>DVT 设计验证</b><span class="h">3–5 台，固件冻结</span><ul><li>EMC、电压 ±10%、5–45 °C（第 18 章）</li><li>剪线 99.9%/90%：2302 次零失效</li><li>4 h 长跑 × 每台，无故障</li></ul></div>
+<div class="box y fill-y"><b>PVT 小批验证</b><span class="h">20–50 台，按生产工艺</span><ul><li>EOL 一次通过率 ≥ 98%</li><li>老化后无早期失效</li><li>测试数据随序列号入库</li></ul></div>
+<div class="box g fill-g"><b>量产</b><span class="h">每台</span><ul><li>EOL + 老化</li><li>现场数据每月复审</li><li>改固件仍走全套 CI</li></ul></div>
+</div>
+<div class="loop">
+<div class="box y"><b>出厂测试 EOL</b><span>每台：停针、剪线 20 次、电磁铁、绝缘耐压</span></div><div class="ar">→</div>
+<div class="box t fill-t"><b>数字工厂</b><span class="mono" style="font-size:11.5px">wq/sewing/eol/eol-01/measurement</span><span>按序列号存历史库、质量系统</span></div><div class="ar">→</div>
+<div class="box b"><b>现场运行（第 26 章）</b><span>status / event：剪线次数、故障码、固件与参数版本</span></div><div class="ar">→</div>
+<div class="box o fill-o"><b>质量闭环（第 27 章）</b><span>按版本、批次、序列号对比；异常 → 新需求或新用例</span></div>
+</div>
+<div class="back">↺ 现场发现的问题变成追溯矩阵里的一条新 REQ 和一个新用例，下次改固件时自动测（22.3、22.8 节）</div>
+</div>

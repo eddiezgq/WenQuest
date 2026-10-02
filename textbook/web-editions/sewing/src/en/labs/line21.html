@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Line balancing</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = charts and operation list, right rail = results and controls; tasks at bottom */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style><style>
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page[hidden]{display:none}
+.oplist{width:100%;border-collapse:collapse;font-size:.84rem}
+.oplist td,.oplist th{padding:3px 6px;border-bottom:1px solid var(--rule);text-align:left;white-space:nowrap}
+.oplist th{color:var(--muted);font-weight:500;font-size:.76rem}
+.oplist td.num{font-family:var(--f-mono);text-align:right}
+.oplist tr.gh td{background:var(--soft);font-weight:600;font-size:.8rem}
+.oplist tr.gh td .bad{color:var(--bad)}
+.oplist button{padding:1px 7px;font-size:.76rem}
+.oplist .cut{color:var(--accent)}
+.tblwrap{overflow-x:auto}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+</style>
+<div class="wrap">
+<header><h1>Line balancing</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 28 · Virtual lab 28-1 · Assigning the 23 operations of a pair of casual trousers to operators; how many automatic machines one person should tend</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tabA" aria-selected="true" type="button">① Grouping and balancing operations</button><button role="tab" id="tabB" aria-selected="false" type="button">② Multi-machine tending and machine time</button></div>
+<div class="page" id="pageA">
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Balance chart: load per operator in each group (min/piece); red dashed line = takt time, black line = actual cycle time (the highest group)</h3><canvas id="bal" width="1100" height="320" aria-label="Line balance chart"></canvas></section>
+    <section class="panel"><h3>Operation sequence and grouping (click “Split here” to cut after that operation; ↑↓ change the order without violating precedence)</h3><div class="tblwrap"><table class="oplist" id="oplist"></table></div></section>
+    <p class="note">Model (same as the book’s model21.py): operations and standard minute values are worked-example values (min/piece, allowances included). Several adjacent operations form a group shared by k operators, k = ⌈group work content ÷ takt time⌉; the operations in a group can be split among operators by piece count, and load per operator = group work content ÷ k. A group has at most 4 operators, 4 operations and 2 machine types (manual work not counted); automatic grouping uses dynamic programming to cut the sequence ordered by positional weight, and after switching to special machines the original equipment’s order is kept. Actual cycle time = largest load per operator, output = 60 ÷ cycle time; balance efficiency = total work content ÷ (operators × cycle time). Machines of each type = sum over groups of ⌈work content on that type ÷ cycle time⌉ (not more than the group’s operators). Output is a theoretical value from standard minutes; in practice multiply by the workshop efficiency.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results</h3><div class="checks" id="checksA"></div></section>
+    <section class="panel"><h3>Adjust</h3>
+      <div class="prm">
+        <label for="tgt">Target output (pcs/h)</label><input id="tgt" type="range" min="60" max="180" step="1" value="120"><output id="tgtv"></output>
+        <label for="imp">Equipment</label><select id="imp"><option value="0" selected>Original equipment</option><option value="1">Automatic pocket welter for back pockets, waistband machine for waistband</option></select><output id="impv"></output>
+      </div>
+      <div class="row"><button id="one" type="button">One operation per group</button><button id="auto" type="button">Auto-group (dynamic programming)</button><button id="order" type="button">Reset default order</button></div>
+    </section>
+    <section class="panel"><h3>Machines by type (excluding spares)</h3><div class="checks" id="machA"></div></section>
+  </div>
+</div>
+</div>
+<div class="page" id="pageB" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Operator–machine chart (two steady cycles; blue = operator loading/unloading, light grey = operator walking, orange = machine sewing automatically, blank = waiting)</h3><canvas id="gantt" width="1100" height="240" aria-label="Operator–machine chart"></canvas></section>
+    <section class="panel"><h3>Machines tended and cost per piece (dot = current number)</h3><canvas id="costc" width="1100" height="250" aria-label="Cost per piece"></canvas></section>
+    <section class="panel"><h3>Machine time for one seam: from first stitch to trim and full stop (soft start 3 stitches at 400 r/min, trim at 300 r/min, acceleration/deceleration as in Chapter 14)</h3><canvas id="seam" width="1100" height="260" aria-label="Sewing time"></canvas>
+      <div class="prm" style="margin-top:8px"><label for="stn">Stitches (100 cm ≈ 333 stitches at 3 mm stitch length)</label><input id="stn" type="range" min="10" max="600" step="1" value="333"><output id="stnv"></output>
+      <label for="nmx">Maximum speed (r/min)</label><input id="nmx" type="range" min="2500" max="6000" step="100" value="5000"><output id="nmxv"></output></div>
+      <div class="msg" id="seamtxt"></div></section>
+    <p class="note">Model (same as the book’s model21.py): one operator tends n automatic machines (programmable pattern sewers, template machines, etc.); each machine needs a min of loading/unloading and w min of walking per cycle, and sews automatically for t min. Cycle time C = max(n(a+w), a+t); operator utilisation = n(a+w)/C, machine utilisation = (a+t)/C; cost per piece = (labour + n × machine rate) × C ÷ n. Wage 0.5 yuan/min and machine rate 0.08 yuan/min per machine are worked-example values. The speed profile of one seam is the same as Chapter 14’s model14.py.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results</h3><div class="checks" id="checksB"></div></section>
+    <section class="panel"><h3>Adjust</h3>
+      <div class="prm">
+        <label for="n">Machines tended n</label><input id="n" type="range" min="1" max="6" step="1" value="2"><output id="nv"></output>
+        <label for="a">Load/unload time per machine a (min)</label><input id="a" type="range" min="0.1" max="0.8" step="0.05" value="0.3"><output id="av"></output>
+        <label for="t">Automatic sewing time t (min)</label><input id="t" type="range" min="0.2" max="2" step="0.05" value="0.9"><output id="tv"></output>
+        <label for="w">Walking time per machine w (min)</label><input id="w" type="range" min="0" max="0.3" step="0.01" value="0.05"><output id="wv"></output>
+        <label for="mr">Machine rate (yuan/min per machine)</label><input id="mr" type="range" min="0.02" max="0.3" step="0.01" value="0.08"><output id="mrv"></output>
+      </div>
+      <div class="row"><button id="resetB" type="button">Reset to default</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<section class="panel" style="margin-top:14px"><h3>Tasks</h3><div id="tasks"></div><div class="msg" id="msg"></div></section>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+function tab(b){$('tabA').setAttribute('aria-selected',!b);$('tabB').setAttribute('aria-selected',b);$('pageA').hidden=b;$('pageB').hidden=!b;}
+$('tabA').onclick=()=>tab(false);$('tabB').onclick=()=>tab(true);
+// ---- model (model21.py) ----
+const OPS=[[1,'Overlock back panels','OL',0.45,[]],[2,'Sew back darts','SN',0.40,[1]],[3,'Make back welt pockets','SN',1.20,[2]],[4,'Close back pocket bags','SN',0.60,[3]],[5,'Bartack back pockets','BT',0.25,[4]],
+[6,'Overlock front panels','OL',0.45,[]],[7,'Make slant pockets','SN',0.90,[6]],[8,'Topstitch pocket mouths','SN',0.50,[7]],[9,'Overlock fly and fly shield','OL',0.35,[]],[10,'Set zip','SN',0.70,[6,9]],[11,'Topstitch fly','SN',0.55,[10]],
+[12,'Join front and back rise','OL',0.50,[5,11]],[13,'Close side seams','OL',0.80,[8,12]],[14,'Topstitch side seams','SN',0.60,[13]],[15,'Close inseam','OL',0.70,[14]],[16,'Make belt loops','CS',0.25,[]],[17,'Attach waistband','SN',1.30,[15,16]],
+[18,'Finish waistband ends','SN',0.60,[17]],[19,'Attach belt loops','BT',0.55,[18]],[20,'Hem legs','SN',0.55,[15]],[21,'Buttonhole','BH',0.20,[18]],[22,'Sew button','BS',0.20,[21]],[23,'Trim threads and inspect','HD',0.60,[19,20,22]]];
+const MN={SN:'Lockstitch',OL:'Overlock',CS:'Chainstitch',BT:'Bartacker',BH:'Buttonholer',BS:'Button sewer',HD:'Manual',AP:'Auto pocket welter',WB:'Waistband machine'};
+const IMP={3:['Back welt pockets (auto welter)','AP',0.45],17:['Attach waistband (waistband machine)','WB',0.80]};
+const MCOL={SN:'--nt',OL:'--bt',CS:'--win',BT:'--warn',BH:'--accent',BS:'--accent',HD:'--muted',AP:'--bad',WB:'--bad'};
+function ops(imp){const o={};OPS.forEach(([i,n,m,s,p])=>{if(imp&&IMP[i])[n,m,s]=IMP[i];o[i]={id:i,name:n,m,sam:s,pre:p};});return o;}
+function succW(by){const S={};for(const i in by)S[i]=new Set();for(const i in by)by[i].pre.forEach(p=>S[p].add(+i));const memo={};
+  const all=i=>{if(memo[i])return memo[i];let r=new Set();S[i].forEach(j=>{r.add(j);all(j).forEach(x=>r.add(x));});return memo[i]=r;};const W={};for(const i in by){let s=by[i].sam;all(+i).forEach(j=>s+=by[j].sam);W[i]=s;}return W;}
+function topo(by){const W=succW(by),done=[],s=new Set();const ids=Object.keys(by).map(Number);while(done.length<ids.length){const av=ids.filter(i=>!s.has(i)&&by[i].pre.every(p=>s.has(p)));
+  av.sort((a,b)=>(W[b]-W[a])||(a-b));done.push(av[0]);s.add(av[0]);}return done;}
+const types=(by,g)=>new Set(g.map(i=>by[i].m).filter(m=>m!=='HD'));
+function groups(by,seq,cuts,takt){const gs=[];let cur=[];seq.forEach((i,k)=>{cur.push(i);if(cuts.has(i)||k===seq.length-1){gs.push(cur);cur=[];}});
+  return gs.map(g=>{const ld=g.reduce((a,i)=>a+by[i].sam,0);return {ops:g,ld,k:Math.max(1,Math.ceil(ld/takt-1e-9))};});}
+function metrics(by,gs){const loads=gs.map(g=>g.ld/g.k),N=gs.reduce((a,g)=>a+g.k,0),mx=Math.max(...loads),T=Object.values(by).reduce((a,o)=>a+o.sam,0),mach={};
+  gs.forEach(g=>{const sm={};g.ops.forEach(i=>{const m=by[i].m;if(m!=='HD')sm[m]=(sm[m]||0)+by[i].sam;});for(const m in sm)mach[m]=(mach[m]||0)+Math.min(g.k,Math.ceil(sm[m]/mx-1e-9));});
+  return {N,mx,out:60/mx,bal:T/(N*mx),T,loads,mach};}
+function dp(by,seq,takt){const n=seq.length,best=new Array(n+1).fill(null),arg=new Array(n+1);best[0]=[0,0];
+  for(let j=1;j<=n;j++)for(let i=Math.max(0,j-4);i<j;i++){const g=seq.slice(i,j),ld=g.reduce((a,x)=>a+by[x].sam,0);if(types(by,g).size>2)continue;const k=Math.max(1,Math.ceil(ld/takt-1e-9));if(k>4||!best[i])continue;
+    const c=[best[i][0]+k,Math.max(best[i][1],ld/k)];if(!best[j]||c[0]<best[j][0]||(c[0]===best[j][0]&&c[1]<best[j][1]-1e-12)){best[j]=c;arg[j]=i;}}
+  const cuts=new Set();let j=n;while(j>0){cuts.add(seq[j-1]);j=arg[j];}return cuts;}
+// ---- page A ----
+const A={tgt:120,imp:0,seq:null,cuts:new Set()};let RA=null;
+function by(){return ops(A.imp);}
+function reset1(){A.cuts=new Set(A.seq);}
+function changedA(){const b=by(),takt=60/A.tgt,gs=groups(b,A.seq,A.cuts,takt),m=metrics(b,gs);
+  const badT=gs.filter(g=>types(b,g.ops).size>2).length,badK=gs.filter(g=>g.k>4||g.ops.length>4).length;RA={b,takt,gs,m,ok:!badT&&!badK};
+  $('tgt').value=A.tgt;$('tgtv').textContent=A.tgt;$('imp').value=A.imp;$('impv').textContent=A.imp?'Special':'Original';
+  const th=Math.ceil(m.T/takt-1e-9);
+  const C=[{n:'Takt time = 60 ÷ target output',v:takt.toFixed(3)+' min',ok:true},{n:'Total work content / theoretical minimum operators',v:`${m.T.toFixed(2)} min / ${th}`,ok:true},
+   {n:'Operators (groups)',v:`${m.N} (${gs.length} groups)`,ok:true},{n:'Actual cycle time (highest load per operator)',v:m.mx.toFixed(3)+' min',ok:m.mx<=takt+1e-9},
+   {n:'Output',v:m.out.toFixed(1)+' pcs/h',ok:m.out>=A.tgt-1e-6,bad:'The group with the highest load per operator limits output'},{n:'Balance efficiency',v:(m.bal*100).toFixed(1)+'%',ok:m.bal>=0.85,bad:'Balance loss = 1 − balance efficiency: everyone is waiting for the slowest group'},
+   {n:'Output per operator',v:(m.out/m.N).toFixed(2)+' pcs/op·h',ok:true},{n:'Grouping rules (≤ 4 operators, ≤ 4 operations, ≤ 2 machine types)',v:RA.ok?'OK':`${badT+badK} groups violate`,ok:RA.ok,bad:'Too many machine types in a group, or too many operators in a group'}];
+  renderChecks('checksA',C);const tm=Object.values(m.mach).reduce((a,b)=>a+b,0);
+  $('machA').innerHTML=Object.entries(m.mach).map(([k,v])=>`<div><span class="sw" style="background:${css(MCOL[k])}"></span><span>${MN[k]}</span><b>${v}</b></div>`).join('')+`<div><span></span><span>Total / machine-to-operator ratio (machines ÷ operators)</span><b>${tm} / ${(tm/m.N).toFixed(2)}</b></div>`;
+  drawBal();list();noteA();checkTasks();}
+function renderChecks(id,C){$(id).innerHTML=C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${(!c.ok&&c.bad)?`<small>${c.bad}</small>`:''}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');}
+function drawBal(){const [c,g]=ctx('bal'),W=c.width,H=c.height,x0=56,x1=W-16,y0=16,y1=H-46,{gs,m,takt,b}=RA;const vm=Math.max(takt,m.mx)*1.25,Y=v=>y1-(y1-y0)*v/vm;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let v=0;v<=vm;v+=0.1){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v.toFixed(1),x0-6,Y(v)+4);}
+  const tot=m.N,pw=(x1-x0)/tot;let x=x0;gs.forEach((gr,gi)=>{const w=pw*gr.k;let y=y1;gr.ops.forEach(i=>{const h=(y1-y0)*b[i].sam/gr.k/vm;g.fillStyle=css(MCOL[b[i].m]);g.globalAlpha=.85;g.fillRect(x+2,y-h,w-4,h-1);g.globalAlpha=1;
+      if(h>13&&w>34){g.fillStyle='#fff';g.textAlign='center';g.font='11px '+css('--f-body');g.fillText(b[i].name.slice(0,Math.max(2,Math.floor(w/6.5))),x+w/2,y-h/2+4);}y-=h;});
+    g.fillStyle=css('--muted');g.textAlign='center';g.font='11px '+css('--f-body');g.fillText(`G${gi+1}`,x+w/2,y1+14);g.fillText(`${gr.k} op`,x+w/2,y1+28);x+=w;});
+  g.strokeStyle=css('--bad');g.setLineDash([6,4]);g.lineWidth=1.5;g.beginPath();g.moveTo(x0,Y(takt));g.lineTo(x1,Y(takt));g.stroke();g.setLineDash([]);
+  g.strokeStyle=css('--ink');g.beginPath();g.moveTo(x0,Y(m.mx));g.lineTo(x1,Y(m.mx));g.stroke();g.font='12px '+css('--f-body');g.textAlign='start';g.fillStyle=css('--bad');g.fillText(`Takt ${takt.toFixed(3)}`,x0+4,Y(takt)-5);
+  g.fillStyle=css('--ink');g.textAlign='end';g.fillText(`Cycle ${m.mx.toFixed(3)}`,x1-4,Y(m.mx)-5);g.textAlign='start';g.fillStyle=css('--muted');g.fillText('Load per operator (min/piece); bar width proportional to operators',x0+4,y0+2);}
+function canUp(k){if(k<=0)return false;const b=by(),i=A.seq[k],j=A.seq[k-1];return !b[i].pre.includes(j);}
+function list(){const {b,gs}=RA;let h='<tr><th>No.</th><th>Operation</th><th>Machine</th><th>SMV</th><th>Preceded by</th><th></th></tr>';let k=0;
+  gs.forEach((gr,gi)=>{const ty=types(b,gr.ops).size;h+=`<tr class="gh"><td colspan="6">Group ${gi+1}: ${gr.k} operator${gr.k>1?'s':''}, work content ${gr.ld.toFixed(2)} min, ${(gr.ld/gr.k).toFixed(3)} min per operator${ty>2?' <span class="bad">more than 2 machine types</span>':''}${gr.k>4?' <span class="bad">more than 4 operators</span>':''}${gr.ops.length>4?' <span class="bad">more than 4 operations</span>':''}</td></tr>`;
+    gr.ops.forEach(i=>{const o=b[i],last=k===A.seq.length-1;h+=`<tr><td class="num">${o.id}</td><td>${o.name}</td><td><span class="sw" style="background:${css(MCOL[o.m])}"></span>${MN[o.m]}</td><td class="num">${o.sam.toFixed(2)}</td><td>${o.pre.join(', ')||'—'}</td><td><button data-up="${k}" ${canUp(k)?'':'disabled'} type="button" aria-label="Move up">↑</button> <button data-up="${k+1}" ${(k<A.seq.length-1&&canUp(k+1))?'':'disabled'} type="button" aria-label="Move down">↓</button> ${last?'':`<button data-cut="${i}" type="button" class="${A.cuts.has(i)?'cut':''}">${A.cuts.has(i)?'Merge with next group':'Split here'}</button>`}</td></tr>`;k++;});});
+  $('oplist').innerHTML=h;
+  $('oplist').querySelectorAll('[data-up]').forEach(e=>e.onclick=()=>{const k=+e.dataset.up;[A.seq[k-1],A.seq[k]]=[A.seq[k],A.seq[k-1]];changedA();});
+  $('oplist').querySelectorAll('[data-cut]').forEach(e=>e.onclick=()=>{const i=+e.dataset.cut;A.cuts.has(i)?A.cuts.delete(i):A.cuts.add(i);changedA();});}
+$('tgt').addEventListener('input',()=>{A.tgt=+$('tgt').value;changedA();});
+$('imp').addEventListener('input',()=>{A.imp=+$('imp').value;changedA();});
+$('one').onclick=()=>{reset1();changedA();};
+$('auto').onclick=()=>{A.cuts=dp(by(),A.seq,60/A.tgt);changedA();};
+$('order').onclick=()=>{A.seq=topo(ops(0));reset1();changedA();};
+// ---- page B ----
+const WAGE=0.5;const STDB={n:2,a:0.3,t:0.9,w:0.05,mr:0.08,stn:333,nmx:5000};const B={...STDB};let RB=null;
+function mm(n,a,t,w,mr){const C=Math.max(n*(a+w),a+t);return {C,out:60*n/C,uo:n*(a+w)/C,um:(a+t)/C,cost:(WAGE+n*mr)*C/n};}
+const ALPHA=(2.5+0.15)/6e-4;
+function seamTime(st,nmax,nsoft=400,ks=3,ntrim=300){const al=ALPHA*0.6,dt=2e-4;let th=0,w=nsoft*2*Math.PI/60,t=0;const wm=nmax*2*Math.PI/60,wt=ntrim*2*Math.PI/60;let ph='soft';
+  for(let it=0;it<1e6;it++){const s=th/(2*Math.PI);if(ph==='soft'&&s>=ks)ph='run';
+    if(ph==='run'){const rem=(st-1)*2*Math.PI-th;if((w*w-wt*wt)/(2*al)>=rem)ph='dec';else w=Math.min(wm,w+al*dt);}
+    if(ph==='dec'){w=Math.max(wt,w-al*dt);if(th>=(st-1)*2*Math.PI)ph='trim';}
+    if(ph==='trim'&&th>=st*2*Math.PI+55*Math.PI/180)ph='stop';
+    if(ph==='stop'){w=Math.max(0,w-ALPHA*dt);if(w===0)return t;}th+=w*dt;t+=dt;}return t;}
+function changedB(){const r=mm(B.n,B.a,B.t,B.w,B.mr);let bn=1,bc=1e9;for(let n=1;n<=6;n++){const c=mm(n,B.a,B.t,B.w,B.mr).cost;if(c<bc-1e-12){bc=c;bn=n;}}
+  const nid=(B.a+B.t)/(B.a+B.w);const t4=seamTime(B.stn,4000),tx=seamTime(B.stn,B.nmx);RB={r,bn,bc,nid,t4,tx};
+  const C=[{n:'Cycle time C',v:r.C.toFixed(2)+' min',ok:true},{n:'Output (all n machines)',v:r.out.toFixed(1)+' pcs/h',ok:true},{n:'Operator utilisation / machine utilisation',v:`${(r.uo*100).toFixed(0)}% / ${(r.um*100).toFixed(0)}%`,ok:true},
+   {n:'Cost per piece',v:r.cost.toFixed(3)+' yuan',ok:B.n===bn,bad:`With these parameters ${bn} machines is cheapest (${bc.toFixed(3)} yuan)`},{n:'Machines with neither operator nor machine waiting (a+t)/(a+w)',v:nid.toFixed(2),ok:true},
+   {n:'One seam: 4000 r/min / current speed',v:`${t4.toFixed(2)} / ${tx.toFixed(2)} s`,ok:true}];renderChecks('checksB',C);
+  for(const k of ['n','a','t','w','mr','stn','nmx']){$(k).value=B[k];$(k+'v').textContent=(k==='n'||k==='stn'||k==='nmx')?B[k]:B[k].toFixed(2);}
+  const save=t4-tx;$('seamtxt').textContent=`For a ${B.stn}-stitch seam, raising the maximum speed from 4000 to ${B.nmx} r/min saves ${save.toFixed(2)} s (${(save/t4*100).toFixed(0)}%); if this operation’s standard time is 36 s, that is only ${(save/36*100).toFixed(1)}%.`;
+  drawGantt();drawCost();drawSeam();noteB();checkTasks();}
+function drawGantt(){const [c,g]=ctx('gantt'),W=c.width,H=c.height,x0=90,x1=W-16,y0=14,{r}=RB;const span=Math.max(r.C*2,0.5),X=t=>x0+(x1-x0)*t/span;const rows=B.n+1,rh=Math.min(36,(H-50)/rows);
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';for(let t=0;t<=span+1e-9;t+=span>3?0.5:0.2)g.fillText(t.toFixed(1),X(t),H-14);g.fillText('Time (min), two cycles shown',(x0+x1)/2,H-1);
+  const bar=(row,t0,t1,col)=>{t0=Math.max(0,t0);t1=Math.min(span,t1);if(t1<=t0)return;g.fillStyle=css(col);g.fillRect(X(t0),y0+row*rh+4,X(t1)-X(t0),rh-8);};
+  g.textAlign='end';g.fillStyle=css('--ink');g.fillText('Operator',x0-8,y0+rh/2+4);for(let i=0;i<B.n;i++)g.fillText(`Machine ${i+1}`,x0-8,y0+(i+1)*rh+rh/2+4);
+  for(let cy=-1;cy<3;cy++){const base=cy*r.C;for(let i=0;i<B.n;i++){const s=base+i*(B.a+B.w);bar(0,s,s+B.a,'--nt');g.globalAlpha=.5;bar(0,s+B.a,s+B.a+B.w,'--rule');g.globalAlpha=1;bar(i+1,s,s+B.a,'--nt');bar(i+1,s+B.a,s+B.a+B.t,'--bt');}}
+  g.strokeStyle=css('--rule');for(let k=0;k<=2;k++){g.beginPath();g.moveTo(X(k*r.C),y0);g.lineTo(X(k*r.C),y0+rows*rh);g.stroke();}}
+function drawCost(){const [c,g]=ctx('costc'),W=c.width,H=c.height,x0=60,x1=W-16,y0=14,y1=H-36;const v=[];for(let n=1;n<=6;n++)v.push(mm(n,B.a,B.t,B.w,B.mr).cost);const vm=Math.max(...v)*1.15,X=n=>x0+(x1-x0)*(n-0.5)/6,Y=y=>y1-(y1-y0)*y/vm;
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';for(let n=1;n<=6;n++){g.fillText(n+(n===1?' machine':' machines'),X(n),H-16);}g.fillText('Machines tended',(x0+x1)/2,H-1);
+  g.textAlign='end';for(let k=0;k<=4;k++){const y=vm*k/4;g.fillText(y.toFixed(2),x0-6,Y(y)+4);}
+  g.strokeStyle=css('--accent');g.lineWidth=2;g.beginPath();v.forEach((y,i)=>{const q=[X(i+1),Y(y)];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  v.forEach((y,i)=>{g.fillStyle=(i+1===B.n)?css('--bad'):css('--accent');g.beginPath();g.arc(X(i+1),Y(y),(i+1===B.n)?7:4,0,7);g.fill();g.fillStyle=css('--ink');g.textAlign='center';g.fillText(y.toFixed(3),X(i+1),Y(y)-10);});
+  g.textAlign='start';g.fillStyle=css('--muted');g.fillText('Cost per piece (yuan)',x0+4,y0+4);}
+function drawSeam(){const [c,g]=ctx('seam'),W=c.width,H=c.height,x0=60,x1=W-16,y0=14,y1=H-36,smax=600;const P=[];for(let s=10;s<=smax;s+=20)P.push([s,seamTime(s,4000),seamTime(s,B.nmx)]);const vm=Math.max(...P.map(p=>p[1]))*1.1,X=s=>x0+(x1-x0)*s/smax,Y=t=>y1-(y1-y0)*t/vm;
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.strokeStyle=css('--rule');for(let t=0;t<=vm;t+=2){g.beginPath();g.moveTo(x0,Y(t));g.lineTo(x1,Y(t));g.stroke();g.textAlign='end';g.fillText(t+' s',x0-6,Y(t)+4);}
+  g.textAlign='center';for(let s=0;s<=smax;s+=100)g.fillText(s,X(s),H-16);g.fillText('Stitches',(x0+x1)/2,H-1);
+  const line=(k,col,dash)=>{g.strokeStyle=css(col);g.setLineDash(dash);g.lineWidth=2;g.beginPath();P.forEach((p,i)=>{const q=[X(p[0]),Y(p[k])];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();g.setLineDash([]);};
+  line(1,'--muted',[6,4]);line(2,'--accent',[]);g.textAlign='start';g.fillStyle=css('--muted');g.fillText('Dashed: 4000 r/min',x0+8,y0+6);g.fillStyle=css('--accent');g.fillText(`Solid: ${B.nmx} r/min`,x0+150,y0+6);
+  g.fillStyle=css('--bad');g.beginPath();g.arc(X(B.stn),Y(RB.tx),6,0,7);g.fill();}
+for(const k of ['n','a','t','w','mr','stn','nmx'])$(k).addEventListener('input',()=>{B[k]=+$(k).value;changedB();});$('resetB').onclick=()=>{Object.assign(B,STDB);changedB();};
+// ---- tasks ----
+const seen={a:false,b:false,c:false,d:false,e:false};
+function noteA(){const {m}=RA;if(!RA.ok)return;
+  if(!A.imp&&m.out>=120-1e-6&&m.N<=28)seen.a=true;
+  if(!A.imp&&m.out>=100-1e-6&&m.N<=24)seen.b=true;
+  if(A.imp&&m.out>=120-1e-6&&m.N<=25)seen.c=true;}
+function noteB(){if(Math.abs(B.a-0.3)<1e-9&&Math.abs(B.t-0.9)<1e-9&&Math.abs(B.w-0.05)<1e-9&&Math.abs(B.mr-0.08)<1e-9&&B.n===RB.bn)seen.d=true;
+  if(Math.abs(B.a-0.3)<1e-9&&Math.abs(B.t-0.6)<1e-9&&Math.abs(B.w-0.05)<1e-9&&Math.abs(B.mr-0.08)<1e-9&&B.n===RB.bn)seen.e=true;}
+const TASKS=[{t:'Page ①: with the original equipment, reach 120 pcs/h with no more than 28 operators, following the grouping rules.',d:'First click “One operation per group” to see how many operators are needed, then click “Auto-group”: 29 operators. Auto-grouping only cuts the sequence and does not reorder it; use ↑↓ to swap operations without violating precedence — for example, move the unconstrained “Make belt loops” next to the overlocking operations.',ok:()=>seen.a},
+ {t:'Page ①: with the original equipment, reach 100 pcs/h with no more than 24 operators.',d:'Once the takt time becomes 0.6 min, is the grouping that worked before still suitable? Auto-grouping needs 25 operators; try changing the order.',ok:()=>seen.b},
+ {t:'Page ①: with the automatic pocket welter and waistband machine, reach 120 pcs/h with no more than 25 operators.',d:'The case in Section 28.8 reaches 120 pcs/h with 26 operators; reordering operations can save one more.',ok:()=>seen.c},
+ {t:'Page ②: with the default parameters (a = 0.3, t = 0.9, w = 0.05, machine 0.08 yuan/min), choose the number of machines tended that gives the lowest cost per piece.',d:'Compare operator and machine utilisation: with more machines, who is waiting for whom?',ok:()=>seen.d},
+ {t:'Page ②: cut the automatic sewing time to 0.6 min (e.g. by raising the pattern sewer’s speed) and find the lowest-cost number of machines again.',d:'The machine is faster, yet one person can tend fewer machines — why?',ok:()=>seen.e}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});$('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+A.seq=topo(ops(0));reset1();
+window.__api={A,B,changedA,changedB,evalA:()=>RA,evalB:()=>RB,done,seen,dp,topo,ops,metrics,groups,seamTime,mm,tab};
+changedA();changedB();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

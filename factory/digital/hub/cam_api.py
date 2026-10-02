@@ -66,7 +66,7 @@ def op_kind(op):
     return "mill25", ""
 
 
-def mount(app, H, user_of, who, uid_of, is_teacher):
+def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
     from hub import plm
 
     def mine(u, j):
@@ -186,6 +186,30 @@ def mount(app, H, user_of, who, uid_of, is_teacher):
             raise HTTPException(400, str(e)) from None
         spec["recognized"] = {"turn": not r["turn"].get("error"), "mill": not r["mill"].get("error")}
         return spec
+
+    @app.post("/api/cam/ai-setup")
+    def cam_ai_setup(body: dict = Body(...), u=Depends(user_of)):
+        """一句话编程：只改编程单（返回修改清单，网页写回表格，人确认后才生成）"""
+        from hub import cam_ai
+        if ai_quota and H.ai and H.ai.llm.available():
+            ai_quota(u)
+        try:
+            return cam_ai.setup(H.ai.llm if H.ai else None, body.get("text"), body.get("spec") or {})
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+
+    @app.post("/api/cam/jobs/{jid}/explain")
+    def cam_explain(jid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        """逐段讲解 G 代码、指出风险"""
+        from hub import cam_ai
+        j = mine(u, call("GET", "/jobs/{}".format(jid)).json())
+        k = int(body.get("k") or 0)
+        if j["status"] != "done" or not 0 <= k < len(j.get("programs") or []):
+            raise HTTPException(404, "没有这个程序")
+        if ai_quota and H.ai and H.ai.llm.available():
+            ai_quota(u)
+        nc = call("GET", "/cam/jobs/{}/{}.nc".format(jid, k)).text
+        return cam_ai.explain(H.ai.llm if H.ai else None, j, k, nc)
 
     @app.post("/api/cam/examples/{key}")
     def cam_example(key: str, u=Depends(user_of)):

@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Pattern Programming</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: guide / tasks on the left rail, drawing canvas in the middle, segment properties + output on the right; stacks on phones */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --bad:#d1495b; --ok:#1e8449; --seam:#2f6fd6; --jump:#e0662f; --sel:#d4a017; --tpl:#dcebf4; --ghost:#9aa4ae;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--seam:#6ea8ff;--jump:#ff8c55;--sel:#f4d03f;--tpl:#1e3140;--ghost:#5d6b7a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--seam:#6ea8ff;--jump:#ff8c55;--sel:#f4d03f;--tpl:#1e3140;--ghost:#5d6b7a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr) minmax(0,320px);gap:14px;align-items:start}
+@media (max-width:1100px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,320px)}.guide{grid-column:1 / -1}}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border-radius:6px}
+.tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)} button.primary{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{font-size:.8rem;color:var(--muted);margin:6px 0 0;min-height:1.3em}
+.ctl{display:grid;grid-template-columns:minmax(0,8.5em) minmax(0,1fr) 4.6em;gap:6px 8px;align-items:center}
+.ctl label{font-size:.85rem;color:var(--muted)}
+.ctl b{font-family:var(--f-mono);font-size:.85rem;text-align:right}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=checkbox]{accent-color:var(--accent)}
+.seglist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:180px;overflow:auto}
+.seglist li button{width:100%;text-align:left;display:flex;justify-content:space-between;gap:8px}
+.seglist li button.on{border-color:var(--sel);box-shadow:inset 3px 0 0 var(--sel)}
+.kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1rem}
+.kpi small{color:var(--muted);font-size:.74rem;display:block;line-height:1.3}
+pre{font-family:var(--f-mono);font-size:.74rem;background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:8px;max-height:220px;overflow:auto;margin:6px 0 0;white-space:pre}
+.steps{margin:0;padding-left:1.2em;font-size:.86rem}
+.steps li{margin:3px 0;cursor:pointer}
+.steps li.on{font-weight:600;color:var(--accent)}
+.lesson{font-size:.86rem;background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px}
+.lesson p{margin:0 0 6px}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--bad)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.warn{font-size:.8rem;color:var(--bad);margin:4px 0 0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.76rem;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:3px;margin-right:4px}
+</style>
+<div class="wrap">
+<header><h1>Pattern Programming</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 15 · Virtual lab 15-2 · As in a pattern sewer’s programming software: draw a pattern, set stitch lengths, add backtacks and trims, then generate and check the pattern file</span></header>
+<div class="grid">
+  <div class="col guide">
+    <section class="panel">
+      <h3>Programming guide (click a step to view)</h3>
+      <ol class="steps" id="steps"></ol>
+      <div class="lesson" id="lesson"></div>
+    </section>
+    <section class="panel">
+      <h3>Programming tasks (graded automatically)</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>Clamp (120 × 80 mm sewing area, origin at centre, 5 mm grid, 1 mm snap)</h3>
+      <div class="tools" role="toolbar" aria-label="Drawing tools">
+        <button type="button" data-tool="line" aria-pressed="true">Line</button>
+        <button type="button" data-tool="arc" aria-pressed="false">Arc (3-point)</button>
+        <button type="button" data-tool="circle" aria-pressed="false">Circle</button>
+        <button type="button" data-tool="curve" aria-pressed="false">Curve</button>
+        <button type="button" id="finish">End segment</button>
+        <button type="button" id="undo">Undo point</button>
+        <button type="button" id="del">Delete selected</button>
+        <button type="button" id="clear">Clear</button>
+      </div>
+      <canvas id="cv" width="960" height="660" aria-label="Pattern drawing area"></canvas>
+      <p class="hint" id="hint"></p>
+      <div class="legend"><span><i style="background:var(--seam)"></i>Seam (dot = needle penetration)</span><span><i style="background:var(--jump)"></i>Jump</span><span><i style="background:var(--sel)"></i>Selected segment</span><span><i style="background:var(--bad)"></i>Problem stitch</span></div>
+      <div class="tools" style="margin-top:8px">
+        <button type="button" id="sim" class="primary">Simulate sewing</button>
+        <button type="button" id="ex1">Example: pocket flap</button>
+        <button type="button" id="ex2">Example: rectangle + circle</button>
+      </div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>Pattern segments</h3>
+      <ul class="seglist" id="seglist"></ul>
+      <div id="props" style="margin-top:10px"></div>
+    </section>
+    <section class="panel">
+      <h3>Machine conditions</h3>
+      <div class="ctl">
+        <label for="thk">Fabric + lower clamp thickness</label><input id="thk" type="range" min="0.5" max="6" step="0.5" value="1.5"><b id="thkv">1.5 mm</b>
+        <label for="nmax">Max. head speed</label><input id="nmax" type="range" min="1000" max="3200" step="100" value="2800"><b id="nmaxv">2800</b>
+      </div>
+      <p class="hint">Acceleration 50 m/s² and max. 1 m/s per axis, max. speed change 300 r/min per stitch; same algorithm as Sections 15.3–15.4.</p>
+    </section>
+    <section class="panel">
+      <h3>Check results</h3>
+      <div class="kpi">
+        <div><b id="k-st">0</b><small>Stitches</small></div>
+        <div><b id="k-tr">0 / 0</b><small>Trims / jumps</small></div>
+        <div><b id="k-t">—</b><small>Cycle time s<br>(excl. loading/unloading)</small></div>
+        <div><b id="k-lim">0</b><small>Speed-limited stitches</small></div>
+      </div>
+      <div id="warns"></div>
+      <h3 style="margin-top:12px">Pattern file (units 0.1 mm, relative coordinates)</h3>
+      <pre id="file"></pre>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const FX = 60, FY = 40;                         // half field (mm)
+const A = 50, V = 1, DN = 300, NSLOW = 400;     // axis accel, vmax, speed change per stitch
+let tool = 'line', segs = [], cur = null, selIdx = -1, hover = null;
+let stitches = [], sim = { on:false, i:0, t:0, last:0 };
+const R = 15.5, LC = 55, TIP = 18, lam = R / LC;
+const xN = p => R * (1 - Math.cos(p)) - LC * (1 - Math.sqrt(1 - lam * lam * Math.sin(p) ** 2));
+function windowFor(t){ let e = 0, l = 360; for (let d = 0; d <= 180; d += .1){ if (TIP - xN(d * Math.PI / 180) < t){ e = d; break; } } for (let d = 180; d <= 360; d += .1){ if (TIP - xN(d * Math.PI / 180) >= t){ l = d; break; } } return 360 - (l - e); }
+const P = { thk:1.5, nmax:2800 };
+
+// ---------- geometry ----------
+function circ3(a, b, c){
+  const d = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1])); if (Math.abs(d) < 1e-9) return null;
+  const a2 = a[0] ** 2 + a[1] ** 2, b2 = b[0] ** 2 + b[1] ** 2, c2 = c[0] ** 2 + c[1] ** 2;
+  const ux = (a2 * (b[1] - c[1]) + b2 * (c[1] - a[1]) + c2 * (a[1] - b[1])) / d, uy = (a2 * (c[0] - b[0]) + b2 * (a[0] - c[0]) + c2 * (b[0] - a[0])) / d;
+  return { cx:ux, cy:uy, r:Math.hypot(a[0] - ux, a[1] - uy) };
+}
+function arcAngles(a, b, c, C){
+  const ang = p => Math.atan2(p[1] - C.cy, p[0] - C.cx);
+  let t0 = ang(a), t1 = ang(b), t2 = ang(c);
+  const norm = x => { while (x < 0) x += 2 * Math.PI; while (x >= 2 * Math.PI) x -= 2 * Math.PI; return x; };
+  const ccwB = norm(t1 - t0), ccwC = norm(t2 - t0);
+  if (ccwB < ccwC) return { t0, sweep: ccwC }; else return { t0, sweep: -(2 * Math.PI - ccwC) };
+}
+// dense polyline describing a segment's path (for drawing) + list of "must-hit" corner indices
+function pathOf(sg){
+  const P_ = sg.pts;
+  if (sg.type === 'line') return { pts: P_.map(p => p.slice()), corners: P_.map((_, i) => i) };
+  if (sg.type === 'arc' && P_.length === 3){
+    const C = circ3(P_[0], P_[1], P_[2]); if (!C) return { pts: P_.slice(), corners: [0, 2] };
+    const { t0, sweep } = arcAngles(P_[0], P_[1], P_[2], C); const n = 96, out = [];
+    for (let k = 0; k <= n; k++){ const t = t0 + sweep * k / n; out.push([C.cx + C.r * Math.cos(t), C.cy + C.r * Math.sin(t)]); }
+    return { pts: out, corners: [0, n] };
+  }
+  if (sg.type === 'circle' && P_.length === 2){
+    const r = Math.hypot(P_[1][0] - P_[0][0], P_[1][1] - P_[0][1]), t0 = Math.atan2(P_[1][1] - P_[0][1], P_[1][0] - P_[0][0]), n = 144, out = [];
+    for (let k = 0; k <= n; k++){ const t = t0 + 2 * Math.PI * k / n; out.push([P_[0][0] + r * Math.cos(t), P_[0][1] + r * Math.sin(t)]); }
+    return { pts: out, corners: [0, n] };
+  }
+  if (sg.type === 'curve' && P_.length >= 2){
+    const pts = P_, out = [];
+    for (let i = 0; i < pts.length - 1; i++){
+      const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      for (let k = 0; k < 24; k++){ const t = k / 24, t2 = t * t, t3 = t2 * t;
+        out.push([0, 1].map(j => 0.5 * ((2 * p1[j]) + (-p0[j] + p2[j]) * t + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2 + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3))); }
+    }
+    out.push(pts[pts.length - 1].slice());
+    return { pts: out, corners: [0, out.length - 1] };
+  }
+  return { pts: P_.map(p => p.slice()), corners: [] };
+}
+// resample a path at equal arc length between consecutive corners
+function stitchesOf(sg){
+  const { pts, corners } = pathOf(sg); if (pts.length < 2) return pts.slice();
+  const out = [pts[0].slice()];
+  const cs = corners.length >= 2 ? corners : [0, pts.length - 1];
+  for (let c = 0; c + 1 < cs.length; c++){
+    const sub = pts.slice(cs[c], cs[c + 1] + 1); const cum = [0];
+    for (let i = 1; i < sub.length; i++) cum.push(cum[i - 1] + Math.hypot(sub[i][0] - sub[i - 1][0], sub[i][1] - sub[i - 1][1]));
+    const L = cum[cum.length - 1]; if (L < 1e-6) continue;
+    const n = Math.max(1, Math.ceil(L / sg.s - 1e-9));
+    let j = 1;
+    for (let k = 1; k <= n; k++){
+      const d = L * k / n; while (j < sub.length - 1 && cum[j] < d) j++;
+      const f = (d - cum[j - 1]) / Math.max(1e-9, cum[j] - cum[j - 1]);
+      out.push([sub[j - 1][0] + (sub[j][0] - sub[j - 1][0]) * f, sub[j - 1][1] + (sub[j][1] - sub[j - 1][1]) * f]);
+    }
+  }
+  return out;
+}
+function withBacktacks(seq, sg){
+  if (seq.length < 2) return seq.map(p => ({ p, kind:'sew' }));
+  const out = []; const k0 = Math.min(sg.bt0, seq.length - 1), k1 = Math.min(sg.bt1, seq.length - 1);
+  // start: forward k0, back k0, then the run
+  for (let i = 0; i <= k0; i++) out.push({ p: seq[i], kind: i ? 'bt' : 'sew' });
+  for (let i = k0 - 1; i >= 0; i--) out.push({ p: seq[i], kind:'bt' });
+  for (let i = 1; i < seq.length; i++) out.push({ p: seq[i], kind:'sew' });
+  if (sg.dbl) for (let i = seq.length - 2; i >= 0; i--) out.push({ p: seq[i], kind:'sew' });
+  const endSeq = sg.dbl ? seq.slice().reverse() : seq;
+  const n = endSeq.length - 1;
+  for (let i = 1; i <= k1; i++) out.push({ p: endSeq[n - i], kind:'bt' });
+  for (let i = k1 - 1; i >= 0; i--) out.push({ p: endSeq[n - i], kind:'bt' });
+  return out;
+}
+
+// ---------- compile ----------
+function compile(){
+  stitches = []; let jumps = 0, trims = 0; const warns = [];
+  let pos = [0, 0];
+  const W = windowFor(P.thk);
+  const contig = [];
+  segs.forEach((sg, si) => {
+    const seq = stitchesOf(sg); if (seq.length < 2) return;
+    const run = withBacktacks(seq, sg);
+    const start = run[0].p;
+    const contiguous = Math.hypot(start[0] - pos[0], start[1] - pos[1]) <= 0.05 && stitches.length && stitches[stitches.length - 1].kind !== 'trim';
+    contig[si] = !!contiguous;
+    if (!contiguous && Math.hypot(start[0] - pos[0], start[1] - pos[1]) > 0.05){ stitches.push({ p:start, kind:'jump', seg:si }); jumps++; }
+    run.forEach((r, i) => { if (i === 0){ if (!contiguous) stitches.push({ p:r.p, kind:'sew', seg:si, first:true, lim:sg.speed }); return; } stitches.push({ p:r.p, kind:r.kind, seg:si, lim:sg.speed }); });
+    pos = run[run.length - 1].p;
+    if (sg.trim){ stitches.push({ p:pos, kind:'trim', seg:si }); trims++; }
+  });
+  // checks
+  stitches.forEach((st, i) => {
+    st.bad = null;
+    if (Math.abs(st.p[0]) > FX || Math.abs(st.p[1]) > FY) st.bad = 'outside sewing area';
+    if (i > 0 && (st.kind === 'sew' || st.kind === 'bt') && stitches[i - 1].kind !== 'jump' && stitches[i - 1].kind !== 'trim'){
+      const a = stitches[i - 1].p, d = Math.hypot(st.p[0] - a[0], st.p[1] - a[1]);
+      if (d > 12.7) st.bad = `stitch length ${d.toFixed(1)} mm exceeds 12.7 mm`;
+      if (d < 0.2 && d > 0) st.bad = `stitch length ${d.toFixed(2)} mm too small`;
+    }
+  });
+  // speed plan per sewing stitch
+  const tm = s => s <= 0 ? 0 : Math.max(2 * Math.sqrt(s / 1000 / A), 2 * s / 1000 / V);
+  const idx = []; stitches.forEach((st, i) => { if (st.kind === 'sew' || st.kind === 'bt') idx.push(i); });
+  const cap = idx.map((i, k) => {
+    const st = stitches[i], pv = stitches[i - 1];
+    let c = Math.min(P.nmax, st.lim || P.nmax);
+    if (pv && (pv.kind === 'sew' || pv.kind === 'bt')){ const t = Math.max(tm(Math.abs(st.p[0] - pv.p[0])), tm(Math.abs(st.p[1] - pv.p[1]))); if (t > 0) c = Math.min(c, W / (6 * t)); }
+    return c;
+  });
+  // slow start / end around trims and jumps
+  idx.forEach((i, k) => { const prevBreak = !stitches[i - 1] || ['jump','trim'].includes(stitches[i - 1].kind) || stitches[i].first; if (prevBreak) for (let j = k; j < Math.min(idx.length, k + 3); j++) cap[j] = Math.min(cap[j], NSLOW);
+    const nx = stitches[i + 1]; if (!nx || ['jump','trim'].includes(nx.kind)) for (let j = Math.max(0, k - 1); j <= k; j++) cap[j] = Math.min(cap[j], NSLOW); });
+  for (let k = cap.length - 2; k >= 0; k--) cap[k] = Math.min(cap[k], cap[k + 1] + DN);
+  const sp = []; cap.forEach((c, k) => sp.push(k === 0 ? Math.min(c, NSLOW) : Math.min(c, sp[k - 1] + DN)));
+  let time = 0, limited = 0;
+  idx.forEach((i, k) => { stitches[i].n = sp[k]; time += 60 / sp[k]; if (sp[k] < Math.min(P.nmax, stitches[i].lim || P.nmax) - 1 && sp[k] > NSLOW) limited++; });
+  stitches.forEach((st, i) => { if (st.kind === 'trim') time += 0.3; if (st.kind === 'jump'){ const a = i ? stitches[i - 1].p : [0, 0]; const d = Math.max(Math.abs(st.p[0] - a[0]), Math.abs(st.p[1] - a[1])) / 1000; time += 0.15 + (d <= V * V / A ? 2 * Math.sqrt(d / A) : d / V + V / A); } });
+  // return to origin
+  if (stitches.length){ const e = stitches[stitches.length - 1].p; const d = Math.max(Math.abs(e[0]), Math.abs(e[1])) / 1000; time += d <= V * V / A ? 2 * Math.sqrt(d / A) : d / V + V / A; }
+  // file text: integer 0.1 mm deltas computed from rounded absolute positions (no drift)
+  const lines = [`HEAD  ORG=(0,0)  UNIT=0.1mm  NMAX=${P.nmax}  SEG=${segs.length}`];
+  let prev = [0, 0];
+  stitches.forEach(st => {
+    if (st.kind === 'trim'){ lines.push('TRIM'); return; }
+    const q = [Math.round(st.p[0] * 10), Math.round(st.p[1] * 10)], d = [q[0] - prev[0], q[1] - prev[1]]; prev = q;
+    const f = v => (v >= 0 ? '+' : '') + v;
+    const cmd = st.kind === 'jump' ? 'JUMP' : 'SEW ';
+    lines.push(`${cmd} ${f(d[0]).padStart(6)} ${f(d[1]).padStart(6)}${st.kind === 'bt' ? '   ; backtack' : ''}${st.first ? '   ; start' : ''}`);
+  });
+  lines.push('END');
+  $('file').textContent = lines.join('\n');
+  const nSew = idx.length;
+  $('k-st').textContent = nSew; $('k-tr').textContent = `${trims} / ${jumps}`; $('k-t').textContent = nSew ? time.toFixed(1) : '—'; $('k-lim').textContent = limited;
+  const bads = stitches.filter(s => s.bad);
+  const w = []; if (bads.length) w.push(`${bads.length} problem stitch(es): ${[...new Set(bads.map(b => b.bad))].slice(0, 3).join('; ')}`);
+  segs.forEach((sg, i) => { const nextContig = i < segs.length - 1 && contig[i + 1]; const chainStart = !contig[i], chainEnd = !nextContig;
+    if (!sg.trim && i < segs.length - 1 && !nextContig) w.push(`No trim after segment ${i + 1}: the jump will drag out a long thread`);
+    if (chainStart && sg.bt0 === 0) w.push(`Segment ${i + 1} has no start backtack: the thread end may unravel`);
+    if (chainEnd && sg.bt1 === 0) w.push(`Segment ${i + 1} has no end backtack: the thread end may unravel`);
+    if (chainEnd && !sg.trim && i === segs.length - 1) w.push('No trim after the last segment'); });
+  $('warns').innerHTML = w.map(x => `<p class="warn">${x}</p>`).join('');
+  compile.time = time; compile.bad = bads.length; compile.trims = trims; compile.jumps = jumps;
+  grade();
+}
+
+// ---------- canvas ----------
+const cv = $('cv'), g = cv.getContext('2d');
+const K = () => (cv.width - 40) / (2 * FX);
+const toPx = p => [cv.width / 2 + p[0] * K(), cv.height / 2 - p[1] * K()];
+const toMm = (x, y) => [Math.round((x - cv.width / 2) / K()), Math.round(-(y - cv.height / 2) / K())];
+function draw(){
+  const w = cv.width, h = cv.height; g.clearRect(0, 0, w, h);
+  const a = toPx([-FX, FY]), b = toPx([FX, -FY]);
+  g.fillStyle = css('--tpl'); g.fillRect(a[0], a[1], b[0] - a[0], b[1] - a[1]);
+  g.lineWidth = 1;
+  for (let x = -FX; x <= FX; x += 5){ const p = toPx([x, FY]), q = toPx([x, -FY]); g.strokeStyle = css('--rule'); g.globalAlpha = x % 10 ? .45 : .9; g.beginPath(); g.moveTo(p[0], p[1]); g.lineTo(q[0], q[1]); g.stroke(); }
+  for (let y = -FY; y <= FY; y += 5){ const p = toPx([-FX, y]), q = toPx([FX, y]); g.globalAlpha = y % 10 ? .45 : .9; g.beginPath(); g.moveTo(p[0], p[1]); g.lineTo(q[0], q[1]); g.stroke(); }
+  g.globalAlpha = 1;
+  const o = toPx([0, 0]); g.strokeStyle = css('--muted'); g.lineWidth = 1.5; g.beginPath(); g.moveTo(o[0] - 10, o[1]); g.lineTo(o[0] + 10, o[1]); g.moveTo(o[0], o[1] - 10); g.lineTo(o[0], o[1] + 10); g.stroke();
+  g.fillStyle = css('--muted'); g.font = '18px ' + css('--f-body'); g.fillText('Origin', o[0] + 8, o[1] - 8);
+  // stitches
+  stitches.forEach((st, i) => {
+    const p = toPx(st.p), pv = i ? stitches[i - 1] : null, q = toPx(pv ? pv.p : [0, 0]);
+    if (st.kind === 'jump'){ g.setLineDash([7, 5]); g.strokeStyle = css('--jump'); g.lineWidth = 2; g.beginPath(); g.moveTo(q[0], q[1]); g.lineTo(p[0], p[1]); g.stroke(); g.setLineDash([]); }
+    else if ((st.kind === 'sew' || st.kind === 'bt') && pv && pv.kind !== 'trim'){ g.strokeStyle = st.seg === selIdx ? css('--sel') : css('--seam'); g.lineWidth = st.kind === 'bt' ? 3.5 : 2; g.beginPath(); g.moveTo(q[0], q[1]); g.lineTo(p[0], p[1]); g.stroke(); }
+    if (st.kind === 'trim'){ g.fillStyle = css('--ink'); g.fillRect(p[0] - 6, p[1] - 6, 12, 12); }
+  });
+  stitches.forEach(st => { if (st.kind === 'sew' || st.kind === 'bt'){ const p = toPx(st.p); g.beginPath(); g.arc(p[0], p[1], st.bad ? 6 : 3.2, 0, 7); g.fillStyle = st.bad ? css('--bad') : (st.seg === selIdx ? css('--sel') : css('--seam')); g.fill(); } });
+  // segment in progress
+  if (cur){
+    const tmp = { ...cur, pts: hover ? cur.pts.concat([hover]) : cur.pts };
+    const { pts } = pathOf(tmp);
+    g.strokeStyle = css('--sel'); g.lineWidth = 2; g.setLineDash([5, 4]); g.beginPath(); pts.forEach((p, i) => { const q = toPx(p); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }); g.stroke(); g.setLineDash([]);
+    cur.pts.forEach(p => { const q = toPx(p); g.fillStyle = css('--sel'); g.fillRect(q[0] - 5, q[1] - 5, 10, 10); });
+  }
+  if (hover){ const q = toPx(hover); g.fillStyle = css('--muted'); g.font = '18px ' + css('--f-mono'); g.fillText(`(${hover[0]}, ${hover[1]})`, q[0] + 10, q[1] - 10); }
+  // simulation needle
+  if (sim.on && stitches.length){ const st = stitches[Math.min(sim.i, stitches.length - 1)]; const q = toPx(st.p); g.strokeStyle = css('--bad'); g.lineWidth = 2.5; g.beginPath(); g.arc(q[0], q[1], 12, 0, 7); g.moveTo(q[0] - 18, q[1]); g.lineTo(q[0] + 18, q[1]); g.moveTo(q[0], q[1] - 18); g.lineTo(q[0], q[1] + 18); g.stroke();
+    g.fillStyle = css('--ink'); g.font = '20px ' + css('--f-mono'); g.fillText(st.n ? `${Math.round(st.n)} r/min` : (st.kind === 'jump' ? 'Jump' : st.kind === 'trim' ? 'Trim' : ''), 16, 30); }
+}
+function hintText(){
+  const m = { line:'Line: click each corner point in turn; press “End segment” or Enter to finish.', arc:'Arc: click the start point, a point on the arc and the end point; it ends automatically after three points.', circle:'Circle: click the centre first, then a point on the circumference (also the start point).', curve:'Curve: click the points the curve passes through in turn (at least 2); press “End segment” or Enter to finish.' };
+  $('hint').textContent = (cur ? `Drawing segment ${segs.length + 1}, ${cur.pts.length} point(s) so far. ` : '') + m[tool];
+}
+function newSeg(type){ return { type, pts:[], s:3, speed:2800, bt0:2, bt1:2, trim:true, dbl:false }; }
+function finish(){
+  if (!cur) return;
+  const need = { line:2, arc:3, circle:2, curve:2 }[cur.type];
+  if (cur.pts.length >= need){ segs.push(cur); selIdx = segs.length - 1; }
+  cur = null; refresh();
+}
+cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); const p = toMm((e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height); hover = p; draw(); });
+cv.addEventListener('pointerleave', () => { hover = null; draw(); });
+cv.addEventListener('pointerdown', e => {
+  const r = cv.getBoundingClientRect(); const p = toMm((e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height);
+  if (!cur) cur = newSeg(tool);
+  if (cur.pts.length && cur.pts[cur.pts.length - 1][0] === p[0] && cur.pts[cur.pts.length - 1][1] === p[1]) return;
+  cur.pts.push(p);
+  if ((cur.type === 'arc' && cur.pts.length === 3) || (cur.type === 'circle' && cur.pts.length === 2)) finish();
+  else { draw(); hintText(); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Enter') finish(); if (e.key === 'Escape'){ cur = null; refresh(); } if (e.key === 'Backspace' && cur && document.activeElement === document.body){ cur.pts.pop(); e.preventDefault(); draw(); hintText(); } });
+document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => { finish(); tool = b.dataset.tool; document.querySelectorAll('[data-tool]').forEach(x => x.setAttribute('aria-pressed', x === b)); hintText(); }));
+$('finish').addEventListener('click', finish);
+$('undo').addEventListener('click', () => { if (cur){ cur.pts.pop(); if (!cur.pts.length) cur = null; } else if (segs.length){ const s = segs[segs.length - 1]; s.pts.pop(); const need = { line:2, arc:3, circle:2, curve:2 }[s.type]; if (s.pts.length < need) segs.pop(); } refresh(); });
+$('del').addEventListener('click', () => { if (selIdx >= 0){ segs.splice(selIdx, 1); selIdx = Math.min(selIdx, segs.length - 1); refresh(); } });
+$('clear').addEventListener('click', () => { segs = []; cur = null; selIdx = -1; refresh(); });
+
+// ---------- segment list & properties ----------
+const TNAME = { line:'Line', arc:'Arc', circle:'Circle', curve:'Curve' };
+function refresh(){
+  const ul = $('seglist'); ul.innerHTML = '';
+  segs.forEach((sg, i) => { const li = document.createElement('li'); const b = document.createElement('button'); b.type = 'button'; b.className = i === selIdx ? 'on' : '';
+    b.innerHTML = `<span>${i + 1}. ${TNAME[sg.type]} (${sg.pts.length} pts)</span><span style="color:var(--muted)">${sg.s} mm${sg.trim ? ' · trim' : ''}</span>`;
+    b.addEventListener('click', () => { selIdx = i; refresh(); }); li.appendChild(b); ul.appendChild(li); });
+  if (!segs.length) ul.innerHTML = '<li class="hint">No pattern segments yet. Draw on the clamp with the tools on the left.</li>';
+  const pr = $('props'); pr.innerHTML = '';
+  if (selIdx >= 0 && segs[selIdx]){
+    const sg = segs[selIdx];
+    pr.innerHTML = `<div class="ctl">
+      <label for="p-s">Stitch length</label><input id="p-s" type="range" min="0.5" max="12" step="0.5" value="${sg.s}"><b id="p-sv">${sg.s} mm</b>
+      <label for="p-n">Segment speed limit</label><input id="p-n" type="range" min="400" max="3200" step="100" value="${sg.speed}"><b id="p-nv">${sg.speed}</b>
+      <label for="p-b0">Start backtack</label><input id="p-b0" type="range" min="0" max="4" step="1" value="${sg.bt0}"><b id="p-b0v">${sg.bt0} sti</b>
+      <label for="p-b1">End backtack</label><input id="p-b1" type="range" min="0" max="4" step="1" value="${sg.bt1}"><b id="p-b1v">${sg.bt1} sti</b>
+      <label for="p-tr">Trim at end</label><input id="p-tr" type="checkbox" ${sg.trim ? 'checked' : ''}><span></span>
+      <label for="p-db">Double stitch (same path back)</label><input id="p-db" type="checkbox" ${sg.dbl ? 'checked' : ''}><span></span></div>`;
+    const bindR = (id, key, fmt) => $(id).addEventListener('input', e => { sg[key] = +e.target.value; $(id + 'v').textContent = fmt(sg[key]); compile(); draw(); listOnly(); });
+    bindR('p-s', 's', v => v + ' mm'); bindR('p-n', 'speed', v => v + ''); bindR('p-b0', 'bt0', v => v + ' sti'); bindR('p-b1', 'bt1', v => v + ' sti');
+    $('p-tr').addEventListener('change', e => { sg.trim = e.target.checked; compile(); draw(); listOnly(); });
+    $('p-db').addEventListener('change', e => { sg.dbl = e.target.checked; compile(); draw(); });
+  }
+  compile(); draw(); hintText();
+}
+function listOnly(){ const items = $('seglist').querySelectorAll('button'); segs.forEach((sg, i) => { if (items[i]) items[i].lastElementChild.textContent = `${sg.s} mm${sg.trim ? ' · trim' : ''}`; }); }
+
+// ---------- simulation ----------
+$('sim').addEventListener('click', () => { if (!stitches.length) return; sim = { on:true, i:0, t:0, last:0 }; requestAnimationFrame(step); });
+function step(ts){
+  if (!sim.on) return; if (!sim.last) sim.last = ts; const dt = (ts - sim.last) / 1000; sim.last = ts;
+  const st = stitches[sim.i]; const dur = st.n ? 60 / st.n * 8 : 0.25; // shown 8x slower
+  sim.t += dt; if (sim.t >= dur){ sim.t = 0; sim.i++; }
+  if (sim.i >= stitches.length){ sim.on = false; draw(); return; }
+  draw(); requestAnimationFrame(step);
+}
+// ---------- examples ----------
+function exFlap(){ segs = [ { ...newSeg('line'), pts:[[-30,20],[-30,-10]] , trim:false, bt1:0 }, { ...newSeg('arc'), pts:[[-30,-10],[-27,-17],[-20,-20]], bt0:0, bt1:0, trim:false }, { ...newSeg('line'), pts:[[-20,-20],[20,-20]], bt0:0, bt1:0, trim:false }, { ...newSeg('arc'), pts:[[20,-20],[27,-17],[30,-10]], bt0:0, bt1:0, trim:false }, { ...newSeg('line'), pts:[[30,-10],[30,20]], bt0:0 } ]; selIdx = 0; refresh(); }
+function exRectCircle(){ segs = [ { ...newSeg('line'), pts:[[-20,15],[20,15],[20,-15],[-20,-15],[-20,15]] }, { ...newSeg('circle'), pts:[[0,0],[8,0]] } ]; selIdx = 0; refresh(); }
+$('ex1').addEventListener('click', exFlap); $('ex2').addEventListener('click', exRectCircle);
+$('thk').addEventListener('input', e => { P.thk = +e.target.value; $('thkv').textContent = P.thk + ' mm'; compile(); draw(); });
+$('nmax').addEventListener('input', e => { P.nmax = +e.target.value; $('nmaxv').textContent = P.nmax; compile(); draw(); });
+
+// ---------- guide ----------
+const LESSONS = [
+  ['Clamp coordinates', '<p>The pattern sewer’s coordinate origin is at the centre of the clamp (after homing at power-up, the needle is directly above this point). X points right, Y points up, units are millimetres. In this lab the grid is 5 mm, the mouse position snaps to whole millimetres, and the coordinates are shown at the top right.</p><p>The pattern file records each stitch’s displacement relative to the previous one (in units of 0.1 mm), so the origin must be aligned with the real clamp.</p>'],
+  ['Drawing line segments', '<p>Choose “Line”, click the corner points in turn, then press “End segment” or Enter. The program divides each side evenly by the stitch length and <b>puts a needle penetration at every corner</b>, so sharp corners are not sewn round.</p><p>Try it: draw a 40 × 30 mm rectangle, clicking back on the start point last to close it.</p>'],
+  ['Arcs and rounded corners', '<p>Choose “Arc (3-point)” and click the start point, any point on the arc, and the end point. The rounded corners of a pocket flap are arcs. On small-radius arcs the stitch length should be reduced (e.g. 2 mm for R5), otherwise the seam becomes a polyline.</p><p>Press “Example: pocket flap” to see how lines and arcs join end to end into one continuous segment.</p>'],
+  ['Stitch length, backtacks and double stitching', '<p>Select a segment under “Pattern segments” on the right to change its stitch length, segment speed limit, and the number of start and end backtack stitches. A backtack sews a few stitches back and forth at the start and end to lock the thread ends; too many build up into a hard lump on the fabric — 2–3 stitches is typical.</p><p>Double stitching makes the machine sew the same path a second time; it is used where the seam is highly loaded.</p>'],
+  ['Multi-segment patterns: trims and jumps', '<p>Between two unconnected segments the machine must trim, lift the intermediate presser foot, jump to the start of the next segment, lower the intermediate presser foot and start slowly. The orange dashed lines are jumps.</p><p>If “Trim at end” is not ticked for a segment, the jump drags out a long thread. Fewer segments and a good segment order reduce the time spent trimming and jumping.</p>'],
+  ['Checking and speed limiting', '<p>The program computes stitch by stitch as in Sections 15.3–15.4: each stitch move must be completed within the window while the needle is out of the fabric, and the speed is scheduled with the look-ahead algorithm. The bottom right shows the number of speed-limited stitches and the cycle time; stitches outside the sewing area or longer than 12.7 mm are marked red.</p><p>Increase “Fabric + lower clamp thickness” and watch the cycle time grow.</p>'],
+  ['Writing the pattern file', '<p>The bottom right shows the generated pattern file: HEAD file header, SEW one stitch, JUMP jump, TRIM trim, END end. Coordinates are integer increments in 0.1 mm, obtained by subtracting rounded absolute coordinates, so errors do not accumulate.</p><p>Press “Simulate sewing” to watch the needle follow the file in order.</p>'],
+];
+let lessonIdx = 0;
+function renderSteps(){ const ol = $('steps'); ol.innerHTML = ''; LESSONS.forEach((l, i) => { const li = document.createElement('li'); li.textContent = l[0]; li.className = i === lessonIdx ? 'on' : ''; li.tabIndex = 0; li.addEventListener('click', () => { lessonIdx = i; renderSteps(); }); li.addEventListener('keydown', e => { if (e.key === 'Enter'){ lessonIdx = i; renderSteps(); } }); ol.appendChild(li); }); $('lesson').innerHTML = LESSONS[lessonIdx][1]; }
+
+// ---------- tasks (auto graded) ----------
+function bbox(pts){ const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; }
+const TASKS = [
+  { t:'Task 1: rectangle', d:'Sew a closed 40 × 30 mm rectangle, stitch length 3 mm, with 2 backtack stitches at both start and end.', check(){
+    const s = segs.filter(x => x.type === 'line'); if (!s.length) return [false, 'No line segment yet'];
+    for (const sg of s){ const p = sg.pts; if (p.length < 5) continue; const c = p[0][0] === p[p.length - 1][0] && p[0][1] === p[p.length - 1][1]; const b = bbox(p);
+      if (!c) return [false, 'Rectangle not closed: the last point must return to the start'];
+      if (Math.abs(b[2] - b[0] - 40) > 1 || Math.abs(b[3] - b[1] - 30) > 1) return [false, `Size is ${b[2] - b[0]} × ${b[3] - b[1]} mm`];
+      if (Math.abs(sg.s - 3) > 0.01) return [false, 'Stitch length is not 3 mm'];
+      if (sg.bt0 < 2 || sg.bt1 < 2) return [false, 'Fewer than 2 backtack stitches'];
+      return [true, 'Done']; }
+    return [false, 'Needs one line segment with 5 points (including the return to the start)']; } },
+  { t:'Task 2: pocket flap', d:'Sew a U-shaped 60 × 40 mm pocket flap with two rounded bottom corners (top edge not sewn), as one continuous seam with only one trim.', check(){
+    if (!stitches.length) return [false, 'No pattern yet'];
+    const sew = stitches.filter(x => x.kind === 'sew' || x.kind === 'bt').map(x => x.p); const b = bbox(sew);
+    if (Math.abs(b[2] - b[0] - 60) > 1.5 || Math.abs(b[3] - b[1] - 40) > 1.5) return [false, `Outline is ${(b[2] - b[0]).toFixed(0)} × ${(b[3] - b[1]).toFixed(0)} mm`];
+    if (!segs.some(x => x.type === 'arc')) return [false, 'The bottom corners must be arcs'];
+    if (compile.jumps > 1) return [false, `${compile.jumps} jumps: segments must join end to end (only one jump, at the start)`];
+    if (compile.trims !== 1) return [false, `${compile.trims} trims: trim only once, at the end`];
+    return [true, 'Done']; } },
+  { t:'Task 3: two-segment pattern', d:'Inside the rectangle of Task 1, sew a circle of 16 mm diameter; trim between the two segments, with no stitches marked red.', check(){
+    const hasRect = segs.some(x => x.type === 'line' && x.pts.length >= 5), hasC = segs.some(x => x.type === 'circle' && Math.abs(Math.hypot(x.pts[1][0] - x.pts[0][0], x.pts[1][1] - x.pts[0][1]) - 8) <= 0.6);
+    if (!hasRect) return [false, 'Rectangle missing']; if (!hasC) return [false, 'Circle of 16 mm diameter missing'];
+    if (compile.trims < 2) return [false, 'Both segments must end with a trim'];
+    if (compile.bad) return [false, 'Some stitches are marked red']; return [true, 'Done']; } },
+  { t:'Task 4: cut the cycle time', d:'Starting from Task 3, set fabric + lower clamp thickness to 3 mm and, without changing the shapes, bring the cycle time below 4.7 s by choosing stitch lengths, backtacks and segment start points; stitch length no more than 4 mm, at least 1 backtack stitch at the start and end of each segment.', check(){
+    if (P.thk !== 3) return [false, 'First set fabric + lower clamp thickness to 3 mm'];
+    if (segs.length < 2) return [false, 'Complete Task 3 first'];
+    if (segs.some(x => x.s > 4)) return [false, 'A segment has a stitch length above 4 mm'];
+    if (compile.bad) return [false, 'Some stitches are marked red'];
+    if (segs.some(x => x.bt0 < 1 || x.bt1 < 1)) return [false, 'Each segment needs at least 1 backtack stitch at start and end'];
+    if (!(compile.time < 4.7)) return [false, `Now ${compile.time.toFixed(1)} s, ${(compile.time - 4.7).toFixed(1)} s too long`];
+    return [true, `Done: ${compile.time.toFixed(1)} s`]; } },
+];
+function grade(){ const box = $('tasks'); box.innerHTML = TASKS.map(t => { const [ok, msg] = t.check(); return `<div class="task"><span class="st ${ok ? 'ok' : 'no'}">${ok ? '✓' : '○'}</span> <b>${t.t}</b><small>${t.d}</small><small style="color:${ok ? 'var(--ok)' : 'var(--muted)'}">${msg}</small></div>`; }).join(''); }
+
+renderSteps(); refresh();
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

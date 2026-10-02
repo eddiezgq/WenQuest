@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>自动化测试台</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = version/level/case selection, results table, trend charts; right rail = changelog, calculator, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f; --pur:#7444b4;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--pur:#b394e6}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--pur:#b394e6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:default}
+button.pri{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number],input[type=text]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,350px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.lbl{font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+.cases{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;font-size:.84rem;max-height:none}
+.cases label{display:grid;grid-template-columns:1.4em 7.6em minmax(0,1fr) 6.6em 4.2em;gap:6px;align-items:baseline;padding:3px 4px;border-bottom:1px solid var(--rule);cursor:pointer}
+.cases label:hover{background:var(--soft)}
+.cases .id,.mono{font-family:var(--f-mono);font-size:.78rem}
+.cases .req{font-family:var(--f-mono);font-size:.74rem;color:var(--pur)}
+.cases .min{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:640px){.cases label{grid-template-columns:1.4em minmax(0,1fr) 4em}.cases .id,.cases .req{display:none}}
+.bar{height:12px;background:var(--soft);border-radius:6px;overflow:hidden;position:relative}
+.bar i{display:block;height:100%;background:var(--accent);width:0}
+.bar.over i{background:var(--bad)}
+.budget{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-top:4px}
+.tblw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.82rem}
+th,td{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;border-bottom:1.5px solid var(--ink)}
+td.v,td.c{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.78rem}
+td.r{font-weight:700;text-align:center}
+td.r.ok{color:var(--ok)} td.r.bad{color:var(--bad)} td.r.run{color:var(--warn)}
+td small{display:block;color:var(--muted);font-size:.72rem}
+.sum{font-size:.86rem;margin-top:8px;font-weight:600}
+.sum.ok{color:var(--ok)} .sum.bad{color:var(--bad)}
+.chg{font-size:.82rem;margin:0;padding-left:1.1em}
+.chg li{margin:2px 0}
+.chg li.cur{font-weight:700}
+.calc{display:grid;grid-template-columns:minmax(0,1fr) 6.2em;gap:4px 10px;align-items:center;font-size:.84rem}
+.calc output{font-family:var(--f-mono);font-weight:700;text-align:right}
+.calc hr{grid-column:1/-1;border:0;border-top:1px solid var(--rule);margin:6px 0}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.task .row{margin-top:4px}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style>
+<div class="wrap">
+<header><h1 id="h1"></h1><span class="sub" id="hsub"></span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3 id="t_sel"></h3>
+      <div class="lbl" id="t_ver"></div><div class="seg" id="vers"></div>
+      <div class="lbl" id="t_lay"></div><div class="seg" id="lays"></div>
+      <div class="lbl" id="t_cases"></div><div class="cases" id="cases"></div>
+      <div class="lbl" id="t_bud"></div><div class="bar" id="bbar"><i></i></div><div class="budget"><span id="btxt"></span><span id="blim"></span></div>
+      <div class="row"><button class="pri" id="run" type="button"></button><button id="def" type="button"></button><button id="all" type="button"></button><button id="none" type="button"></button></div>
+    </section>
+    <section class="panel"><h3 id="t_res"></h3>
+      <div class="bar" id="pbar"><i></i></div><div class="budget"><span id="ptxt"></span><span id="pver"></span></div>
+      <div class="tblw"><table><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table></div>
+      <div class="sum" id="sum"></div>
+    </section>
+    <section class="panel"><h3 id="t_trend"></h3><canvas id="trend" width="1100" height="300" aria-label="trend"></canvas><p class="note" id="trendnote"></p></section>
+    <p class="note" id="model"></p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3 id="t_chg"></h3><ul class="chg" id="chg"></ul></section>
+    <section class="panel"><h3 id="t_calc"></h3>
+      <div class="calc">
+        <label for="cR" id="l_cR"></label><input id="cR" type="number" step="0.1" min="50" max="99.99" value="99">
+        <label for="cC" id="l_cC"></label><input id="cC" type="number" step="1" min="50" max="99.9" value="90">
+        <label for="cX" id="l_cX"></label><input id="cX" type="number" step="1" min="0" max="20" value="0">
+        <span id="l_cN"></span><output id="cN"></output>
+        <hr>
+        <label for="dN" id="l_dN"></label><input id="dN" type="number" step="1" min="1" max="100000" value="1000">
+        <label for="dX" id="l_dX"></label><input id="dX" type="number" step="1" min="0" max="1000" value="2">
+        <span id="l_dR"></span><output id="dR"></output>
+      </div>
+      <p class="note" id="calcnote"></p>
+    </section>
+    <section class="panel"><h3 id="t_tasks"></h3><div id="tasks"></div><div class="msg" id="msg"></div></section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const LANG=document.documentElement.lang.startsWith('en')?'en':'zh';
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const S={
+zh:{h1:'自动化测试台',hsub:'《缝纫机设计与制造》第 22 章 · 虚拟实验 22-1 · 选固件版本和测试层级，跑用例，看哪条需求失败；再算一算要测多少次才算数',
+ t_sel:'① 选择固件版本、测试层级和用例',t_ver:'固件版本（WQ-SC/LS 平缝原型）',t_lay:'测试层级',t_cases:'用例（勾选要跑的；右边是这一层的单次耗时）',t_bud:'本层时间预算',
+ run:'▶ 运行',running:'运行中…',def:'默认用例集',all:'全选',none:'全不选',
+ t_res:'② 用例结果',th:['用例','需求','测量值','判据','结果'],t_trend:'③ 版本趋势（只画你跑过的结果）',
+ trendnote:'左：剪线——各次运行里最差转速点的失败率（对数刻度，红线 0.5%）；右：停针误差——各次运行里的最大值（红线 1°）。实心点为 HIL / 整机，空心点为 SIL。',
+ t_chg:'版本记录',t_calc:'要测多少次（二项分布，单侧）',l_cR:'要验证的可靠度 R（%）',l_cC:'置信度 C（%）',l_cX:'允许的失败次数 x',l_cN:'需要的试验次数 n',
+ l_dN:'已试验次数 n',l_dX:'其中失败 x 次',l_dR:'可靠度的置信下限（置信度用上面的 C）',calcnote:'零失效时 n = ln(1−C)/ln R；有失败时用 Clopper–Pearson 单侧下限（与正文 22.6 节相同）。',
+ t_tasks:'任务',done:'✓ 完成',notdone:'○ 未完成',check:'核对',
+ lay:{unit:'单元',sil:'软件在环 SIL',hil:'硬件在环 HIL',bench:'整机测试台'},
+ bud:{unit:'每次提交 1 min',sil:'每次提交 10 min',hil:'每晚 240 min',bench:'每周 48 h'},
+ total:(t,b)=>`已选 ${t} / 预算 ${b}`,over:'超出预算',min:'min',
+ sumok:(v,l)=>`${v} · ${l}：全部通过`,sumbad:(v,l,n,r)=>`${v} · ${l}：${n} 个用例失败（${r}）`,
+ progress:(i,n)=>`第 ${i} / ${n} 个用例`,
+ model:'模型（示意，与正文 22.5–22.9 节、figsrc/ch22_model.py 相同）：剪线电磁铁在剪线针 290° 发令，延迟 N(8, 0.667) ms，进刀角 290° + 6·n·t 须在 300°–330°；n 为发令时的实际转速。伺服减速能力 4400 rad/s²，高于基速（4100 r/min × κ，κ~N(1, 5%)，随电网电压变化）进入恒功率区；SIL 用理想电机（无恒功率区）。v1.3.x 按 60% 能力减速、在剪线针 0° 前结束；v1.4.0 按 100% 能力、终点推迟到 180°；v1.4.1 按转矩–转速曲线的 90% 规划并在 270° 查转速。停针用第 13 章伺服模型（HIL 惯量 6.3×10⁻⁴ kg·m²，每次摩擦 N(0.15, 0.015) N·m），误差 = 越过目标的最大角度与最终误差中较大者，另加 0.03° 测量噪声。随机数按“版本 + 用例”固定种子，同一组合重跑结果相同。',
+ tasks:[
+  {t:'找出引入剪线回归的固件版本和失败的需求编号。',d:'在 HIL 层跑“剪线转速扫描”，逐个版本比较。'},
+  {t:'在 v1.4.0 上，用每晚 240 min 的 HIL 预算选一组用例：必须保留故障注入，并且同时抓住两个回归（剪线和停针）。',d:'默认用例集 207 min，两个回归一个也抓不住。哪两个用例最“划算”？'},
+  {t:'算出验证 R = 99.5%、C = 95% 需要的零失效试验次数；再算允许 1 次失败时需要多少次。',d:'用右上的计算器；填进两个框里点核对。'}],
+ a1v:'版本',a1r:'需求',a2:['零失效 n','允许 1 次 n'],
+ m1ok:'对：v1.4.0 的“快速剪线”在 4750 r/min 以上让剪线失败，违反 REQ-TRM-01。',m1no:'不对。提示：失败只在 HIL 和整机上、起始转速高时出现。',
+ m3ok:'对：598 次零失效；允许 1 次失败要 947 次。',m3no:'不对，再用计算器算一算（R 填 99.5，C 填 95）。',
+ m2ok:'好：这组用例在预算内抓住了两个回归。',
+ crit:{trm:(n,x)=>`可靠度下限 ≥ 99.5%（C = 95%），${n} 次最多失败 ${x} 次`,pos1:'≤ 1.00°',posn:'最大 ≤ 1.00° 且 Cpk ≥ 1.33',possw:'扫描中最大 ≤ 1.00°',sol:'吸合、释放 ≤ 20°',bt:'最大 ≤ 0.30 mm',flt:'全部进 SAFE ≤ 50 ms',xy:'≤ 0.050 mm；针在布中位移 0',kn:'≤ 0.10 针距',thm:'温升 ≤ 40 K，无故障',fw:'全部断言通过'},
+ vals:{fail:(x,n)=>`失败 ${x}/${n}`,rl:r=>`下限 ${r}%`,worst:'最差',max:'最大',mean:'均值',pull:'吸合',rel:'释放',faults:'种故障',longest:'最长',rise:'温升',asserts:'个断言'},
+},
+en:{h1:'Automated test bench',hsub:'Sewing Machine Design and Manufacturing, Chapter 22 · Virtual lab 22-1 · Pick a firmware version and a test level, run the cases, see which requirement fails; then work out how many tests are enough',
+ t_sel:'① Choose firmware version, test level and cases',t_ver:'Firmware version (WQ-SC/LS lockstitch prototype)',t_lay:'Test level',t_cases:'Test cases (tick the ones to run; right: time for one run at this level)',t_bud:'Time budget for this level',
+ run:'▶ Run',running:'Running…',def:'Default set',all:'All',none:'None',
+ t_res:'② Results',th:['Case','Req.','Measured','Criterion','Result'],t_trend:'③ Trend across versions (only results you have run)',
+ trendnote:'Left: trimming — failure rate at the worst speed point of each run (log scale, red line 0.5 %); right: stop error — maximum of each run (red line 1°). Filled dots: HIL / machine bench; open dots: SIL.',
+ t_chg:'Change log',t_calc:'How many tests (binomial, one-sided)',l_cR:'Reliability to demonstrate R (%)',l_cC:'Confidence C (%)',l_cX:'Failures allowed x',l_cN:'Trials needed n',
+ l_dN:'Trials run n',l_dX:'of which failed x',l_dR:'Lower confidence bound on R (at the C above)',calcnote:'With no failures n = ln(1−C)/ln R; with failures the Clopper–Pearson one-sided bound is used (as in Section 22.6).',
+ t_tasks:'Tasks',done:'✓ Done',notdone:'○ Not done',check:'Check',
+ lay:{unit:'Unit',sil:'Software-in-the-loop (SIL)',hil:'Hardware-in-the-loop (HIL)',bench:'Machine test bench'},
+ bud:{unit:'1 min per commit',sil:'10 min per commit',hil:'240 min nightly',bench:'48 h weekly'},
+ total:(t,b)=>`selected ${t} / budget ${b}`,over:'over budget',min:'min',
+ sumok:(v,l)=>`${v} · ${l}: all passed`,sumbad:(v,l,n,r)=>`${v} · ${l}: ${n} case(s) failed (${r})`,
+ progress:(i,n)=>`case ${i} of ${n}`,
+ model:'Model (illustrative; the same as Sections 22.5–22.9 and figsrc/ch22_model.py): the trimmer solenoid is fired at 290° of the trimming stitch with a delay N(8, 0.667) ms; knife entry 290° + 6·n·t must lie in 300°–330°, n being the actual speed at firing. Servo deceleration capability 4400 rad/s²; above the base speed (4100 r/min × κ, κ ~ N(1, 5 %), varying with mains voltage) the motor is in its constant-power region; SIL uses an ideal motor (no constant-power region). v1.3.x decelerates at 60 % capability, finishing before 0° of the trimming stitch; v1.4.0 at 100 % with the end moved to 180°; v1.4.1 plans with 90 % of the torque–speed curve and checks the speed at 270°. Stopping uses the servo model of Chapter 13 (HIL inertia 6.3×10⁻⁴ kg·m², friction N(0.15, 0.015) N·m per stop); error = the larger of the overshoot past the target and the final error, plus 0.03° measurement noise. Random numbers are seeded by "version + case", so re-running a combination gives the same result.',
+ tasks:[
+  {t:'Find the firmware version that introduced the trimming regression, and the requirement it fails.',d:'Run the "trim speed sweep" at the HIL level and compare versions one by one.'},
+  {t:'On v1.4.0, pick an HIL case set within the 240 min nightly budget that keeps fault injection and catches both regressions (trimming and stopping).',d:'The default set takes 207 min and catches neither. Which two cases give the most for their time?'},
+  {t:'Work out the number of zero-failure trials needed to demonstrate R = 99.5 % at C = 95 %; then the number needed if one failure is allowed.',d:'Use the calculator at the top right; type both numbers and press Check.'}],
+ a1v:'Version',a1r:'Requirement',a2:['zero-failure n','1 failure allowed n'],
+ m1ok:'Right: the v1.4.0 "fast trim" makes trims fail above about 4750 r/min, violating REQ-TRM-01.',m1no:'Not yet. Hint: the failures appear only on HIL and the machine bench, and only from high speeds.',
+ m3ok:'Right: 598 trials with no failure; 947 if one failure is allowed.',m3no:'Not yet; try the calculator (R = 99.5, C = 95).',
+ m2ok:'Good: this set catches both regressions within the budget.',
+ crit:{trm:(n,x)=>`lower bound ≥ 99.5 % (C = 95 %): at most ${x} failure(s) in ${n}`,pos1:'≤ 1.00°',posn:'max ≤ 1.00° and Cpk ≥ 1.33',possw:'max over sweep ≤ 1.00°',sol:'pull-in, release ≤ 20°',bt:'max ≤ 0.30 mm',flt:'all reach SAFE ≤ 50 ms',xy:'≤ 0.050 mm; zero motion with needle in fabric',kn:'≤ 0.10 needle pitch',thm:'rise ≤ 40 K, no fault',fw:'all assertions pass'},
+ vals:{fail:(x,n)=>`fail ${x}/${n}`,rl:r=>`bound ${r} %`,worst:'worst',max:'max',mean:'mean',pull:'pull-in',rel:'release',faults:'faults',longest:'longest',rise:'rise',asserts:'assertions'},
+}}[LANG];
+const N=(zh,en)=>LANG==='en'?en:zh;
+
+// ---------------- model (same as figsrc/ch22_model.py) ----------------
+const PI=Math.PI,ACAP0=4400,NB0=4100,NB_SD=0.05,TAU=0.003,NT=300,CMD=290,W1=300,W2=330,T_MU=8e-3,T_SD=0.667e-3;
+const VERS=['v1.3.0','v1.3.1','v1.3.2','v1.4.0','v1.4.1','v1.4.2'];
+const FW={'v1.3.0':{plan:'v13',Kp:200,bt:[0.20,0.04]},'v1.3.1':{plan:'v13',Kp:200,bt:[0.12,0.03]},'v1.3.2':{plan:'v13',Kp:300,bt:[0.12,0.03]},
+ 'v1.4.0':{plan:'v140',Kp:300,bt:[0.12,0.03]},'v1.4.1':{plan:'v141',Kp:300,bt:[0.12,0.03]},'v1.4.2':{plan:'v141',Kp:220,bt:[0.12,0.03]}};
+const CHG={'v1.3.0':N('基线：减速按伺服能力的 60%，剪线针前减到 300 r/min；位置增益 Kp = 200 s⁻¹','Baseline: deceleration at 60 % of servo capability, down to 300 r/min before the trimming stitch; position gain Kp = 200 s⁻¹'),
+ 'v1.3.1':N('加回针补偿（回针第一针单独调针距）','Backtack compensation added (first reverse stitch length adjusted)'),
+ 'v1.3.2':N('“停车更快”：Kp 200 → 300 s⁻¹，停稳时间缩短','"Faster stop": Kp 200 → 300 s⁻¹, shorter settling'),
+ 'v1.4.0':N('“快速剪线”：减速按 100% 能力规划，终点推迟到剪线针 180°，停车剪线省约 0.16 s','"Fast trim": deceleration planned at 100 % capability, end moved to 180° of the trimming stitch, about 0.16 s saved per trim'),
+ 'v1.4.1':N('修复剪线：按转矩–转速曲线的 90% 规划；270° 时转速 > 400 r/min 就推迟一针剪线','Trim fix: plan with 90 % of the torque–speed curve; if the speed at 270° exceeds 400 r/min, trim one stitch later'),
+ 'v1.4.2':N('Kp 改为 220 s⁻¹','Kp changed to 220 s⁻¹')};
+function acap(n,nb){return ACAP0*Math.min(1,nb/Math.max(n,1));}
+function aRef(plan,w){if(plan==='v13')return 0.6*ACAP0;if(plan==='v140')return ACAP0;return 0.9*acap(w*30/PI,0.9*NB0);}
+function nAtCmd(n0,plan,nb,motor){const dt=2e-5,w0=n0*PI/30,wt=NT*PI/30,nbm=motor==='hil'?nb:1e9;const end=plan==='v13'?0:180;
+  let w=w0,th=0;while(w>wt){th+=w*dt;w-=aRef(plan,w)*dt;}
+  th=end*PI/180-th;w=w0;let wr=w0,def=false;
+  while(th<CMD*PI/180){if(wr>wt)wr=Math.max(wt,wr-aRef(plan,wr)*dt);const a=acap(w*30/PI,nbm);const acc=Math.max(-a,Math.min(a,(wr-w)/TAU));w+=acc*dt;th+=w*dt;
+    if(plan==='v141'&&!def&&th>=270*PI/180&&w*30/PI>400)def=true;}
+  return def?NT:w*30/PI;}
+function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+function pFailAt(n){const th=(W2-CMD)/(6*n),tl=(W1-CMD)/(6*n);return (1-Phi((th-T_MU)/T_SD))+Phi((tl-T_MU)/T_SD);}
+const KS=[],WK=[];{let s=0;for(let i=0;i<13;i++){const k=1-3*NB_SD+i*NB_SD/2;KS.push(k);const w=Math.exp(-0.5*((k-1)/NB_SD)**2);WK.push(w);s+=w;}for(let i=0;i<13;i++)WK[i]/=s;}
+const PCACHE={};
+function pTrim(n0,ver,motor){const key=n0+ver+motor;if(PCACHE[key]!=null)return PCACHE[key];const plan=FW[ver].plan;let p=0;
+  for(let i=0;i<13;i++)p+=WK[i]*pFailAt(nAtCmd(n0,plan,NB0*KS[i],motor));return PCACHE[key]=p;}
+// servo stop (chapter 13 model)
+function servoStop(Kp,J,Tf,wp,DT){const Kv=0.2,Ti=0.012,B=2e-4,TMAX=2.5,TAUI=0.5e-3,e0=45,D=PI/180;J*=1e-4;const wpos=wp*2*PI/60;
+  let th=-e0*D,w=wpos,Tm=Tf+B*w,integ=Tm/Kv,over=0;const n=Math.round(0.25/DT);
+  for(let k=0;k<n;k++){const e=-th;const wref=Math.max(-wpos,Math.min(wpos,Kp*e));const ew=wref-w;integ+=ew*DT/Ti;let Tref=Kv*(ew+integ);
+    if(Math.abs(Tref)>TMAX){Tref=Math.sign(Tref)*TMAX;integ-=ew*DT/Ti;}
+    Tm+=(Tref-Tm)*DT/TAUI;const Td=Tm-B*w;let acc;
+    if(Math.abs(w)<1e-3&&Math.abs(Td)<=Tf)acc=-w/DT;else acc=(Td-Tf*(Math.abs(w)>=1e-3?Math.sign(w):Math.sign(Td)))/J;
+    w+=acc*DT;th+=w*DT;if(th/D>over)over=th/D;}
+  return Math.max(over,Math.abs(th/D));}
+// statistics
+function lgam(x){const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(x<0.5)return Math.log(PI/Math.sin(PI*x))-lgam(1-x);x-=1;let a=c[0];const t=x+g+0.5;for(let i=1;i<9;i++)a+=c[i]/(x+i);return 0.5*Math.log(2*PI)+(x+0.5)*Math.log(t)-t+Math.log(a);}
+function binCdf(x,n,p){if(p<=0)return 1;if(p>=1)return x>=n?1:0;let s=0;const ln=lgam(n+1);for(let k=0;k<=x;k++)s+=Math.exp(ln-lgam(k+1)-lgam(n-k+1)+k*Math.log(p)+(n-k)*Math.log(1-p));return Math.min(1,s);}
+function rLower(n,x,C){if(x>=n)return 0;let lo=0,hi=1;for(let i=0;i<60;i++){const m=(lo+hi)/2;if(binCdf(x,n,m)>1-C)lo=m;else hi=m;}return 1-(lo+hi)/2;}
+function nZero(R,C){return Math.ceil(Math.log(1-C)/Math.log(R));}
+function nWith(R,C,x){if(x===0)return nZero(R,C);let lo=x+1,hi=Math.max(x+2,nZero(R,C)*(x+3));while(rLower(hi,x,C)<R)hi*=2;while(hi-lo>1){const m=(lo+hi)>>1;if(rLower(m,x,C)>=R)hi=m;else lo=m;}return hi;}
+function maxFail(n,R,C){let x=-1;while(rLower(n,x+1,C)>=R)x++;return x;}
+// rng
+function rng(seed){let s=seed>>>0;return ()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+function hash(str){let h=2166136261;for(const ch of str){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*PI*r());}
+function binom(r,n,p){let x=0;for(let i=0;i<n;i++)if(r()<p)x++;return x;}
+
+// ---------------- test cases ----------------
+const C=S.crit;
+const CASES=[
+ {id:'UT-ANG',lay:'unit',req:'REQ-FW-01',min:0.2,name:N('角度换算、事件表解析','Angle conversion, event-table parsing'),def:1,k:'fw',na:64},
+ {id:'UT-SM',lay:'unit',req:'REQ-SAFE-01',min:0.2,name:N('状态机转移（含 FAULT→SAFE）','State-machine transitions (incl. FAULT→SAFE)'),def:1,k:'fw',na:118},
+ {id:'UT-TRM',lay:'unit',req:'REQ-TRM-01',min:0.1,name:N('剪线发令角与减速规划函数','Trim firing angle and deceleration planner'),def:1,k:'fw',na:42},
+ {id:'UT-PRM',lay:'unit',req:'REQ-FW-02',min:0.1,name:N('参数表校验与版本号','Parameter-table checks and version numbers'),def:1,k:'fw',na:37},
+ {id:'SIL-POS',lay:'sil',req:'REQ-POS-01',min:0.5,name:N('停针（标称参数，1 次）','Stop (nominal parameters, 1 run)'),def:1,k:'pos1',J:6.0},
+ {id:'SIL-POS-SW',lay:'sil',req:'REQ-POS-01',min:3,name:N('停针扫描（惯量 ±20%、摩擦 ±30%）','Stop sweep (inertia ±20 %, friction ±30 %)'),def:0,k:'possw'},
+ {id:'SIL-TRM',lay:'sil',req:'REQ-TRM-01',min:2,name:N('剪线转速扫描 3000–5000（理想电机）','Trim speed sweep 3000–5000 (ideal motor)'),def:1,k:'trm',motor:'sil',sp:[3000,3500,4000,4500,4750,5000],per:200},
+ {id:'SIL-BT',lay:'sil',req:'REQ-BT-01',min:1,name:N('回针对齐（模型无间隙）','Backtack alignment (model without backlash)'),def:1,k:'btsil'},
+ {id:'HIL-TRM-4000',lay:'hil',req:'REQ-TRM-01',min:55,name:N('剪线 1000 次 @ 4000 r/min','1000 trims @ 4000 r/min'),def:1,k:'trm',motor:'hil',sp:[4000],per:1000},
+ {id:'HIL-TRM-SW',lay:'hil',req:'REQ-TRM-01',min:80,name:N('剪线转速扫描 3000–5000，6 点 × 250','Trim speed sweep 3000–5000, 6 × 250'),def:0,k:'trm',motor:'hil',sp:[3000,3500,4000,4500,4750,5000],per:250},
+ {id:'HIL-POS-1',lay:'hil',req:'REQ-POS-01',min:2,name:N('停针 1 次','Stop, 1 run'),def:1,k:'pos1',J:6.3},
+ {id:'HIL-POS-50',lay:'hil',req:'REQ-POS-01',min:6,name:N('停针 50 次统计（Cpk）','Stop, 50 runs with statistics (Cpk)'),def:0,k:'posn',J:6.3,n:50},
+ {id:'HIL-SOL',lay:'hil',req:'REQ-SOL-01',min:10,name:N('电磁铁吸合/释放 100 次','Solenoid pull-in/release, 100 runs'),def:1,k:'sol'},
+ {id:'HIL-BT',lay:'hil',req:'REQ-BT-01',min:20,name:N('回针 200 段（送布电机编码器）','Backtack, 200 seams (feed motor encoder)'),def:1,k:'bt',n:200},
+ {id:'HIL-FLT',lay:'hil',req:'REQ-SAFE-01',min:35,name:N('故障注入 12 种 × 5 次','Fault injection, 12 kinds × 5'),def:1,k:'flt',must:1},
+ {id:'HIL-XY',lay:'hil',req:'REQ-XY-01',min:45,name:N('X–Y 跟随（PS 配置）','X–Y following (PS configuration)'),def:1,k:'xy'},
+ {id:'HIL-KN',lay:'hil',req:'REQ-KN-01',min:40,name:N('选针时序（FK 配置）','Needle-selection timing (FK configuration)'),def:1,k:'kn'},
+ {id:'HIL-SOAK',lay:'hil',req:'REQ-THM-01',min:120,name:N('2 h 浸泡（最高转速）','2 h soak (top speed)'),def:0,k:'thm',rise:24},
+ {id:'BEN-TRM',lay:'bench',req:'REQ-TRM-01',min:90,name:N('真机剪线 1000 次 @ 5000 r/min','1000 real trims @ 5000 r/min'),def:1,k:'trm',motor:'hil',sp:[5000],per:1000},
+ {id:'BEN-POS',lay:'bench',req:'REQ-POS-01',min:10,name:N('停针 50 次（真机）','Stop, 50 runs (real head)'),def:1,k:'posn',J:6.3,n:50},
+ {id:'BEN-BT',lay:'bench',req:'REQ-BT-01',min:60,name:N('回针 200 段（线迹相机）','Backtack, 200 seams (stitch camera)'),def:1,k:'bt',n:200},
+ {id:'BEN-RUN',lay:'bench',req:'REQ-THM-01',min:240,name:N('4 h 最高转速长跑','4 h run at top speed'),def:1,k:'thm',rise:31},
+];
+const BUD={unit:1,sil:10,hil:240,bench:2880};
+const LAYS=['unit','sil','hil','bench'];
+function runCase(c,ver){const r=rng(hash(ver+'|'+c.id)),f=FW[ver];const V=S.vals;let val='',det='',pass=true,metric=null;
+  if(c.k==='fw'){val=`${c.na}/${c.na} ${V.asserts}`;}
+  else if(c.k==='trm'){let X=0,Nn=0,worst=0;const parts=[];for(const s of c.sp){const p=pTrim(s,ver,c.motor);const x=binom(r,c.per,p);X+=x;Nn+=c.per;worst=Math.max(worst,x/c.per);parts.push(`${s}:${x}`);}
+    const rl=rLower(Nn,X,0.95);const mx=maxFail(Nn,0.995,0.95);pass=rl>=0.995;val=`${V.fail(X,Nn)}; ${V.rl((rl*100).toFixed(2))}`;det=c.sp.length>1?parts.join(' · '):'';
+    metric={type:'trm',v:Math.max(worst,0.5/ c.per),zero:worst===0,sil:c.motor==='sil'};c._crit=C.trm(Nn,mx);}
+  else if(c.k==='pos1'){const e=servoStop(f.Kp,c.J,0.15,200,4e-5)+0.03*gauss(r);pass=e<=1;val=`${e.toFixed(2)}°`;metric={type:'pos',v:e,sil:c.lay==='sil'};}
+  else if(c.k==='possw'){let m=0;for(const J of [4.8,5.4,6.0,6.6,7.2])for(const Tf of [0.105,0.15,0.195])m=Math.max(m,servoStop(f.Kp,J,Tf,200,4e-5));pass=m<=1;val=`${V.max} ${m.toFixed(2)}°`;metric={type:'pos',v:m,sil:true};}
+  else if(c.k==='posn'){const xs=[];for(let i=0;i<c.n;i++)xs.push(servoStop(f.Kp,c.J,0.15+0.015*gauss(r),200+8*gauss(r),4e-5)+0.03*gauss(r));
+    const mu=xs.reduce((a,b)=>a+b,0)/xs.length,sd=Math.sqrt(xs.reduce((a,b)=>a+(b-mu)**2,0)/(xs.length-1)),mx=Math.max(...xs),cpk=(1-mu)/(3*sd);
+    pass=mx<=1&&cpk>=1.33;val=`${V.max} ${mx.toFixed(2)}°, Cpk ${cpk.toFixed(2)}`;det=`${V.mean} ${mu.toFixed(2)}°, σ ${sd.toFixed(3)}°`;metric={type:'pos',v:mx,sil:false};}
+  else if(c.k==='sol'){const a=6*300*(6.9e-3+0.0002*gauss(r)),b=6*300*(5.1e-3+0.0002*gauss(r));val=`${V.pull} ${a.toFixed(1)}°, ${V.rel} ${b.toFixed(1)}°`;pass=a<=20&&b<=20;}
+  else if(c.k==='bt'){let m=0;for(let i=0;i<c.n;i++)m=Math.max(m,Math.abs(f.bt[0]+f.bt[1]*gauss(r)));pass=m<=0.3;val=`${V.max} ${m.toFixed(2)} mm`;det=`${V.mean} ${f.bt[0].toFixed(2)} mm`;}
+  else if(c.k==='btsil'){val=`${V.max} ${(0.05+0.005*gauss(r)).toFixed(2)} mm`;}
+  else if(c.k==='flt'){val=`12/12 ${V.faults}, ${V.longest} ${(18+2*r()).toFixed(0)} ms`;}
+  else if(c.k==='xy'){val=`${(0.032+0.002*gauss(r)).toFixed(3)} mm`;}
+  else if(c.k==='kn'){val=`${(0.06+0.005*gauss(r)).toFixed(2)}`;}
+  else if(c.k==='thm'){val=`${V.rise} ${(c.rise+r()).toFixed(0)} K`;}
+  const crit=c.k==='trm'?c._crit:c.k==='btsil'?C.bt:C[c.k];
+  return {id:c.id,req:c.req,val,det,crit,pass,metric,ver,lay:c.lay};}
+
+// ---------------- state & UI ----------------
+const ST={ver:'v1.3.0',lay:'hil',sel:{},running:false,last:null};
+const HIST=[];  // all results
+LAYS.forEach(l=>{ST.sel[l]=new Set(CASES.filter(c=>c.lay===l&&c.def).map(c=>c.id));});
+function txt(){for(const k of ['h1','hsub','t_sel','t_ver','t_lay','t_cases','t_bud','t_res','t_trend','trendnote','t_chg','t_calc','l_cR','l_cC','l_cX','l_cN','l_dN','l_dX','l_dR','calcnote','t_tasks','model'])$(k).textContent=S[k];
+  $('def').textContent=S.def;$('all').textContent=S.all;$('none').textContent=S.none;$('run').textContent=S.run;
+  $('thead').innerHTML=S.th.map(h=>`<th>${h}</th>`).join('');}
+function drawSel(){
+  $('vers').innerHTML=VERS.map(v=>`<button type="button" aria-pressed="${v===ST.ver}" data-v="${v}">${v}</button>`).join('');
+  $('vers').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(ST.running)return;ST.ver=b.dataset.v;drawSel();drawChg();});
+  $('lays').innerHTML=LAYS.map(l=>`<button type="button" aria-pressed="${l===ST.lay}" data-l="${l}">${S.lay[l]}</button>`).join('');
+  $('lays').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(ST.running)return;ST.lay=b.dataset.l;drawSel();});
+  const cs=CASES.filter(c=>c.lay===ST.lay),sel=ST.sel[ST.lay];
+  $('cases').innerHTML=cs.map(c=>`<label><input type="checkbox" data-c="${c.id}" ${sel.has(c.id)?'checked':''}><span class="id">${c.id}</span><span>${c.name}</span><span class="req">${c.req}</span><span class="min">${fmtMin(c.min)}</span></label>`).join('');
+  $('cases').querySelectorAll('input').forEach(i=>i.onchange=()=>{if(i.checked)sel.add(i.dataset.c);else sel.delete(i.dataset.c);budget();});
+  budget();}
+function fmtMin(m){return m>=60&&m%60===0&&m>=120?`${m/60} h`:`${m} ${S.min}`;}
+function selMin(){return CASES.filter(c=>c.lay===ST.lay&&ST.sel[ST.lay].has(c.id)).reduce((s,c)=>s+c.min,0);}
+function budget(){const t=selMin(),b=BUD[ST.lay];$('bbar').classList.toggle('over',t>b);$('bbar').firstElementChild.style.width=Math.min(100,100*t/b)+'%';
+  $('btxt').textContent=S.total(fmtMin(+t.toFixed(1)),fmtMin(b))+(t>b?' · '+S.over:'');$('blim').textContent=S.bud[ST.lay];}
+function drawChg(){$('chg').innerHTML=VERS.map(v=>`<li class="${v===ST.ver?'cur':''}"><span class="mono">${v}</span> ${CHG[v]}</li>`).join('');}
+$('def').onclick=()=>{ST.sel[ST.lay]=new Set(CASES.filter(c=>c.lay===ST.lay&&c.def).map(c=>c.id));drawSel();};
+$('all').onclick=()=>{ST.sel[ST.lay]=new Set(CASES.filter(c=>c.lay===ST.lay).map(c=>c.id));drawSel();};
+$('none').onclick=()=>{ST.sel[ST.lay]=new Set();drawSel();};
+function rowHTML(c,res){if(!res)return `<tr><td class="c">${c.id}<small>${c.name}</small></td><td class="c" style="white-space:nowrap">${c.req}</td><td class="v">…</td><td></td><td class="r run">⋯</td></tr>`;
+  return `<tr><td class="c">${c.id}<small>${c.name}</small></td><td class="c" style="white-space:nowrap">${c.req}</td><td class="v">${res.val}${res.det?`<small>${res.det}</small>`:''}</td><td><small style="color:inherit">${res.crit}</small></td><td class="r ${res.pass?'ok':'bad'}">${res.pass?'✓':'✗'}</td></tr>`;}
+function finish(cs,results,ver,lay,total){
+  const bad=results.filter(r=>!r.pass);const s=$('sum');s.className='sum '+(bad.length?'bad':'ok');
+  s.textContent=bad.length?S.sumbad(ver,S.lay[lay],bad.length,[...new Set(bad.map(r=>r.req))].join(', ')):S.sumok(ver,S.lay[lay]);
+  const run={ver,lay,total,ids:cs.map(c=>c.id),results};ST.last=run;HIST.push(run);
+  if(ver==='v1.4.0'&&lay==='hil'&&total<=240&&run.ids.includes('HIL-FLT')&&bad.some(r=>r.req==='REQ-TRM-01')&&bad.some(r=>r.req==='REQ-POS-01')){seen.b=true;$('msg').textContent=S.m2ok;}
+  drawTrend();checkTasks();}
+function runNow(instant){if(ST.running)return null;const ver=ST.ver,lay=ST.lay;const cs=CASES.filter(c=>c.lay===lay&&ST.sel[lay].has(c.id));if(!cs.length)return null;
+  const total=cs.reduce((s,c)=>s+c.min,0);$('pver').textContent=`${ver} · ${S.lay[lay]}`;
+  if(instant){const res=cs.map(c=>runCase(c,ver));$('tbody').innerHTML=cs.map((c,i)=>rowHTML(c,res[i])).join('');$('pbar').firstElementChild.style.width='100%';$('ptxt').textContent=S.progress(cs.length,cs.length);finish(cs,res,ver,lay,total);return ST.last;}
+  ST.running=true;$('run').disabled=true;$('run').textContent=S.running;$('sum').textContent='';
+  const res=[];$('tbody').innerHTML=cs.map(c=>rowHTML(c,null)).join('');let i=0;
+  const step=()=>{if(i>=cs.length){ST.running=false;$('run').disabled=false;$('run').textContent=S.run;finish(cs,res,ver,lay,total);return;}
+    $('ptxt').textContent=S.progress(i+1,cs.length);const c=cs[i];const dur=Math.min(1100,260+c.min*5);const t0=performance.now();
+    const anim=()=>{const fr=Math.min(1,(performance.now()-t0)/dur);$('pbar').firstElementChild.style.width=(100*(i+fr)/cs.length)+'%';if(fr<1)requestAnimationFrame(anim);else{res.push(runCase(c,ver));$('tbody').innerHTML=cs.map((cc,k)=>rowHTML(cc,res[k])).join('');i++;step();}};
+    requestAnimationFrame(anim);};
+  step();return true;}
+$('run').onclick=()=>runNow(false);
+// trend
+function drawTrend(){const c=$('trend'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);const W=c.width,H=c.height;
+  g.font='12px '+css('--f-body');const panels=[[60,W/2-20,'trm'],[W/2+50,W-20,'pos']];
+  const pts={trm:[],pos:[]};HIST.forEach(run=>run.results.forEach(r=>{if(r.metric)pts[r.metric.type].push({ver:run.ver,...r.metric});}));
+  for(const [x0,x1,type] of panels){const y0=24,y1=H-36,X=v=>x0+(x1-x0)*(VERS.indexOf(v)+0.5)/VERS.length;
+    let Y,ticks,lim;if(type==='trm'){const lo=Math.log10(0.0005),hi=Math.log10(1);Y=v=>y1-(y1-y0)*(Math.log10(Math.max(v,0.0005))-lo)/(hi-lo);ticks=[[0.001,'0.1%'],[0.01,'1%'],[0.1,'10%'],[1,'100%']];lim=0.005;}
+    else{Y=v=>y1-(y1-y0)*Math.min(v,1.6)/1.6;ticks=[[0,'0°'],[0.5,'0.5°'],[1,'1°'],[1.5,'1.5°']];lim=1;}
+    g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.lineWidth=1;
+    for(const [v,l] of ticks){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(l,x0-6,Y(v)+4);}
+    g.textAlign='center';VERS.forEach(v=>g.fillText(v,X(v),H-16));
+    g.textAlign='start';g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.fillText(type==='trm'?N('剪线失败率（最差转速点）','Trim failure rate (worst speed)'):N('停针误差最大值','Max stop error'),x0,14);g.font='12px '+css('--f-body');
+    g.strokeStyle=css('--bad');g.setLineDash([6,4]);g.beginPath();g.moveTo(x0,Y(lim));g.lineTo(x1,Y(lim));g.stroke();g.setLineDash([]);
+    for(const p of pts[type]){const off=p.sil?-8:8;const xx=X(p.ver)+off,yy=type==='trm'&&p.zero?Y(0.0005)-4:Y(p.v);const bad=type==='trm'?(!p.zero&&p.v>lim):p.v>lim;
+      g.beginPath();g.arc(xx,yy,5,0,7);g.lineWidth=2;g.strokeStyle=bad?css('--bad'):css('--ok');if(p.sil){g.stroke();}else{g.fillStyle=g.strokeStyle;g.fill();}}
+    if(type==='trm'){g.fillStyle=css('--muted');g.textAlign='start';g.textAlign='end';g.fillText(N('0 次失败画在最下面','zero failures plotted at the bottom'),x1,y0+4);}}}
+// calculator
+function calc(){const R=+$('cR').value/100,Cc=+$('cC').value/100,x=Math.max(0,Math.round(+$('cX').value));
+  $('cN').textContent=(R>0&&R<1&&Cc>0&&Cc<1)?nWith(R,Cc,x):'—';
+  const n=Math.round(+$('dN').value),xd=Math.round(+$('dX').value);$('dR').textContent=(n>0&&xd>=0&&xd<=n)?(rLower(n,xd,Cc)*100).toFixed(2)+'%':'—';}
+['cR','cC','cX','dN','dX'].forEach(k=>$(k).addEventListener('input',calc));
+// tasks
+const seen={a:false,b:false,c:false};
+function taskHTML(){const T=S.tasks;
+  return `<div class="task"><span class="st" id="st0"></span> ${T[0].t}<small>${T[0].d}</small><div class="row"><label>${S.a1v} <select id="a1v">${['—',...VERS].map(v=>`<option>${v}</option>`).join('')}</select></label><label>${S.a1r} <select id="a1r">${['—','REQ-POS-01','REQ-TRM-01','REQ-BT-01','REQ-SOL-01','REQ-SAFE-01','REQ-THM-01'].map(v=>`<option>${v}</option>`).join('')}</select></label><button type="button" id="a1b">${S.check}</button></div></div>
+  <div class="task"><span class="st" id="st1"></span> ${T[1].t}<small>${T[1].d}</small></div>
+  <div class="task"><span class="st" id="st2"></span> ${T[2].t}<small>${T[2].d}</small><div class="row"><label>${S.a2[0]} <input id="a3a" type="number"></label><label>${S.a2[1]} <input id="a3b" type="number"></label><button type="button" id="a3btn">${S.check}</button></div></div>`;}
+function checkTasks(){[seen.a,seen.b,seen.c].forEach((d,i)=>{const e=$('st'+i);e.className='st '+(d?'ok':'no');e.textContent=d?S.done:S.notdone;});}
+function wireTasks(){$('tasks').innerHTML=taskHTML();
+  $('a1b').onclick=()=>{const ok=$('a1v').value==='v1.4.0'&&$('a1r').value==='REQ-TRM-01';if(ok)seen.a=true;$('msg').textContent=ok?S.m1ok:S.m1no;checkTasks();};
+  $('a3btn').onclick=()=>{const ok=+$('a3a').value===598&&+$('a3b').value===947;if(ok)seen.c=true;$('msg').textContent=ok?S.m3ok:S.m3no;checkTasks();};
+  checkTasks();}
+window.__api={ST,CASES,FW,VERS,HIST,seen,pTrim,nAtCmd,pFailAt,servoStop,rLower,nZero,nWith,maxFail,runCase,
+  run:(ver,lay,ids)=>{ST.ver=ver;ST.lay=lay;if(ids)ST.sel[lay]=new Set(ids);drawSel();drawChg();return runNow(true);},
+  setLang:()=>LANG};
+txt();drawSel();drawChg();wireTasks();calc();drawTrend();
+$('tbody').innerHTML=`<tr><td colspan="5" style="color:var(--muted)">${N('选好版本、层级和用例，点“运行”。','Choose a version, a level and cases, then press Run.')}</td></tr>`;
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

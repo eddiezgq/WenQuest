@@ -1,0 +1,101 @@
+<p class="eyebrow">Part II · Lockstitch Mechanisms</p><h1><span class="chno">Chapter 3</span>The Needle-Bar Mechanism</h1><div class="seam" aria-hidden="true"></div><div class="chips"><span class="chips-label">Interactive resources in this chapter</span><a class="chip" href="#lab-model-lockstitch"><b>3D model</b>Industrial lockstitch machine</a><a class="chip" href="#lab-slidercrank"><b>Virtual lab</b>Needle-bar slider-crank mechanism</a></div><p>Chapter 2 showed that a stitch is formed by four coordinated motions. This chapter deals with the first drive train: the main shaft drives the needle bar up and down through the needle-bar crank and link; this is called the <strong>needle-bar mechanism</strong>. It is the simplest in construction, yet it sets the machine’s upper speed limit and its vibration level, and it is the timing reference for all the other mechanisms.</p>
+<h3 id="s3-1">3.1 What the needle-bar mechanism must do</h3>
+<p>The needle-bar mechanism has to meet five requirements at once.</p>
+<p>First, the stroke must be sufficient. At top dead centre the needle point must be above the fabric with the presser foot raised, otherwise the fabric cannot be put in; at bottom dead centre the eye must be below the path of the hook point, otherwise the hook point cannot catch the loop. The needle-bar stroke of an industrial lockstitch machine is generally 31–35 mm (to be verified).</p>
+<p>Second, the timing must be exact. Main-shaft angle and needle-bar position must correspond one to one: bottom dead centre falls at 180°, and when the needle has risen about 2 mm from bottom dead centre the hook point must be just catching the loop.</p>
+<p>Third, it must run at high speed. The main shaft of an industrial lockstitch machine can reach 4000–6000 r/min (to be verified); the needle bar reciprocates eighty or ninety times a second, and the mechanism must withstand that speed.</p>
+<p>Fourth, vibration must be low. The inertia force of the needle bar is passed through the bushings to the housing and is the main source of vibration and noise in the machine.</p>
+<p>Finally, the needle bar must not rotate, and its height must be adjustable. The scarf of the needle must always face the hook point; if the needle bar turns, the scarf is misaligned. The needle-bar height must be finely adjustable so that it can be aligned with the rotary hook.</p>
+<h3 id="s3-2">3.2 Construction</h3>
+<p>Fig. 3-1 shows the needle-bar mechanism viewed along the main shaft with the face plate removed. The front end of the main shaft carries the <strong>needle-bar crank</strong>, which has a counterweight cast on the side opposite the crank pin; one end of the <strong>needle-bar link</strong> fits over the crank pin and the other end is pinned to the <strong>needle-bar connecting stud</strong> (clamp) gripped on the needle bar. The needle bar slides in upper and lower bushings, and a <strong>guide block</strong> on the other end of the connecting stud runs in a guide slot in the head, ensuring that the needle bar only moves up and down and does not rotate. The needle is held at the lower end of the needle bar by the needle clamp and needle-clamp screw.</p>
+<figure class="fig"><a class="zoom" href="img/fig_needlebar_mech.png"><img src="img/fig_needlebar_mech.png" alt="Fig. 3-1　Construction of the needle-bar mechanism" loading="lazy"></a><figcaption>Fig. 3-1　Construction of the needle-bar mechanism (viewed along the main shaft, face plate removed, φ = 60°; schematic)</figcaption></figure>
+<p>There are two adjustments in this construction. Loosening the screw of the needle-bar connecting stud lets the needle bar move up or down relative to the stud, changing the <strong>needle-bar height</strong>, i.e. the height difference between hook point and needle eye at the moment of loop catching. Loosening the needle-clamp screw lets you adjust how far the needle is inserted and which way it faces. Neither changes the motion law of the needle bar, only its absolute position.</p>
+<h3 id="s3-3">3.3 Kinematic diagram</h3>
+<p>Strip away the shapes and keep only how the members are connected, and the needle-bar mechanism is an <strong>in-line (centric) slider-crank mechanism</strong> (Fig. 3-2): the main shaft is the crank OA, the needle-bar link is the connecting rod AB, and the needle bar is the slider B.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_f239087a.png"><img src="img/w_f239087a.png" alt="Fig. 3-2　Kinematic diagram of the needle-bar mechanism: an in-line slider-crank with the slider (needle bar) below the crank. O: main-shaft centre; A: crank pin; B: needle-bar connecting stud; r = OA crank radius; l = AB link length; φ: main-shaft angle measured from crank pin pointing up; β: angle between link and centreline; x: needle-bar displacement from top dead centre, downward positive; λ = r/l link ratio. Drawn at φ = 70°" loading="lazy"></a></figure>
+
+<p>Pay particular attention to where the slider is. The piston of an internal-combustion engine is above the crankshaft: at the piston’s highest point the crank pin points towards the piston and OB = r + l. The needle bar, however, <strong>hangs below the main shaft</strong>: at the needle bar’s highest point the crank pin points up, away from the needle bar, and OB = l − r. The two cases have their dead centres exactly swapped, and applying the formulas from an engine textbook directly will swap the accelerations at top and bottom dead centre.</p>
+<h3 id="s3-4">3.4 Displacement, velocity and acceleration</h3>
+<p>Take top dead centre as zero displacement, with downward positive. From Fig. 3-2, OB = l cosβ − r cosφ and r sinφ = l sinβ, which gives</p>
+<div class="math">\[x = r(1-\cos\varphi) - l\left(1-\sqrt{1-\lambda^{2}\sin^{2}\varphi}\right),\qquad \lambda=\frac{r}{l}\]</div>
+<p>Differentiating with respect to time (main shaft at constant speed, φ = ωt) and writing S = √(1 − λ²sin²φ):</p>
+<div class="math">\[v = r\omega\sin\varphi\left(1-\frac{\lambda\cos\varphi}{S}\right),\qquad a = r\omega^{2}\left(\cos\varphi-\lambda\,\frac{\cos2\varphi+\lambda^{2}\sin^{4}\varphi}{S^{3}}\right)\]</div>
+<p>In practice λ generally does not exceed 0.35, and expanding the square root to the λ² term gives the usual approximations:</p>
+<div class="math">\[x \approx r\left[(1-\cos\varphi)-\frac{\lambda}{4}(1-\cos2\varphi)\right],\quad v \approx r\omega\left(\sin\varphi-\frac{\lambda}{2}\sin2\varphi\right),\quad a \approx r\omega^{2}(\cos\varphi-\lambda\cos2\varphi)\]</div>
+<p>Two conclusions follow at once from the approximations: at top dead centre (φ = 0) a = rω²(1 − λ), and at bottom dead centre (φ = 180°) a = −rω²(1 + λ), so <strong>the acceleration at bottom dead centre is larger than at top dead centre</strong>; and the acceleration is the sum of a first-order term varying at ω and a second-order term varying at 2ω, the size of the second-order term being proportional to λ.</p>
+<h3 id="s3-5">3.5 Worked example</h3>
+<p>Take r = 15.5 mm, l = 55 mm (λ = 0.282), main-shaft speed n = 5000 r/min, ω = 2πn/60 = 523.6 rad/s. At top dead centre the needle point is 18 mm above the throat plate, and the fabric is 1.5 mm thick (both illustrative values). Results from the exact formulas:</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Needle-bar stroke 2r</td>
+<td>31.0 mm</td>
+</tr>
+<tr>
+<td>Maximum velocity</td>
+<td>8.43 m/s, at φ ≈ 104.7° and 255.3°</td>
+</tr>
+<tr>
+<td>Acceleration at top dead centre</td>
+<td>3052 m/s² (about 311 g)</td>
+</tr>
+<tr>
+<td>Acceleration at bottom dead centre</td>
+<td>−5447 m/s² (about 555 g)</td>
+</tr>
+<tr>
+<td>Crank angle at 2 mm needle rise</td>
+<td>206.1°</td>
+</tr>
+<tr>
+<td>Interval with the needle in the fabric</td>
+<td>101.7° – 258.3°</td>
+</tr>
+</tbody>
+</table></div>
+<p>Fig. 3-3 shows the displacement, velocity and acceleration curves over one revolution.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_f0f8ad0a.png"><img src="img/w_f0f8ad0a.png" alt="Fig. 3-3　Needle-bar displacement, velocity and acceleration curves (worked-example values): r = 15.5 mm, l = 55 mm, n = 5000 r/min, exact formulas, one point every 10°. Displacement x (mm) peaks at 31 mm at 180°; velocity v peaks at 8.4 m/s; acceleration a is 3.05 km/s² at top dead centre and −5.45 km/s² at bottom dead centre, about 80% larger" loading="lazy"></a></figure>
+
+<p>When reading Fig. 3-3, note three points.</p>
+<p>First, the displacement curve is not symmetric about 90°. When the main shaft is at 90°, the needle bar has travelled only 13.3 mm, less than half the stroke; nor is the moment of maximum velocity at 90°, but at 104.7°. This is caused by the inclination of the link; the larger λ is, the greater the offset.</p>
+<p>Second, the curve is flat near top dead centre and sharp near bottom dead centre. The acceleration at top dead centre is 3.05 km/s² and barely changes over 30° either side, while at bottom dead centre it reaches 5.45 km/s². In other words, the needle “dwells” a long time at the top and turns round quickly at the bottom.</p>
+<p>Third, the maximum inertia force occurs at bottom dead centre. And the period around bottom dead centre is precisely when the needle is in the fabric, the loop is forming and the hook point is about to catch it, so wear and clearance in the needle-bar bushings directly affect whether loop catching is reliable.</p>
+<p>To change the parameters yourself and see how the curves change, use <a href="#lab-slidercrank" class="labref">Virtual lab 3-1　Needle-bar slider-crank mechanism</a>.</p><section class="lab" id="lab-slidercrank" data-src="labs/slidercrank.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4 id="x55541">Virtual lab 3-1　Needle-bar slider-crank mechanism</h4></div><p>Adjust crank radius, link length and speed and see how the displacement, velocity and acceleration curves and the loop-catching moment change.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/slidercrank.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<h3 id="s3-6">3.6 Link ratio and loop-catching timing</h3>
+<p>Chapter 2 said that the hook point should catch the loop when the needle has risen about 2 mm from its lowest point. Expanding the displacement formula about φ = 180° + δ gives the needle rise near bottom dead centre:</p>
+<div class="math">\[h(\delta) = x(180^{\circ}) - x(180^{\circ}+\delta) \approx \frac{r}{2}(1+\lambda)\,\delta^{2}\]</div>
+<p>With the worked-example values, h = 2 mm at δ ≈ 26°, i.e. loop catching at φ ≈ 206°. The formula shows that, for a fixed stroke r, <strong>the larger λ is, the faster the needle rises and the earlier loop catching occurs</strong> (Fig. 3-4).</p>
+<figure class="fig chart"><a class="zoom" href="img/w_55ae5477.png"><img src="img/w_55ae5477.png" alt="Fig. 3-4　Effect of link ratio on needle rise after bottom dead centre (exact formulas): r = 15.5 mm fixed, only the link length changed; l = 77.5, 55 and 38.75 mm give λ = 0.20, 0.282 and 0.40. Needle rise (mm) against main-shaft angle 180°–220°; dashed line at 2 mm rise marks hook-point loop catching. The larger the link ratio, the faster the rise and the earlier loop catching" loading="lazy"></a></figure>
+
+<p>By exact calculation, for λ = 0.20, 0.282 and 0.40 the angle at 2 mm rise is 206.9°, 206.1° and 204.9° respectively, and the acceleration at bottom dead centre is 5099, 5447 and 5949 m/s². The differences are only a degree or two, but for loop catching they can no longer be ignored: in the Chapter 2 virtual lab, the window of loop-catching timing without skipped stitches is only a dozen or so degrees wide. So after changing the link length or crank radius, both the mounting angle of the rotary hook and the needle-bar height must be re-set.</p>
+<p>Seen the other way round, a small λ (long link) has the advantage of a lower acceleration at bottom dead centre and motion closer to simple harmonic; the price is a taller head and a longer, heavier needle-bar assembly. The λ of industrial lockstitch machines is mostly between 0.25 and 0.32 (to be verified), a compromise between the two.</p>
+<h3 id="s3-7">3.7 Inertia forces and balancing</h3>
+<p>The needle bar, needle clamp and needle, together with the part of the link mass referred to the needle-bar end, are collectively called the <strong>reciprocating mass</strong> m. Its inertia force is</p>
+<div class="math">\[F = -m\,a \approx -m r\omega^{2}\cos\varphi + m r\omega^{2}\lambda\cos2\varphi\]</div>
+<p>Taking m = 120 g (illustrative value, to be verified by weighing the actual parts), the inertia force in the worked example is about 0.12 × 5447 ≈ 654 N at bottom dead centre and about 366 N at top dead centre. Inertia force is proportional to the square of speed: raising the speed from 5000 to 6000 r/min increases it 1.44 times, to about 942 N. For the reciprocating assembly of needle bar, clamp and needle, which weighs only a little over 100 g, this is a force hundreds of times its own weight, reversing more than eighty times a second.</p>
+<p>The inertia force has two parts.</p>
+<p>The first part is the first-order inertia force m r ω² cosφ, whose frequency equals the main-shaft speed. A counterweight on the crank, on the side opposite the crank pin, produces a centrifugal force at the same frequency; it can cancel the inertia force of rotating masses such as the crank and crank pin, and can also cancel part of the first-order reciprocating inertia force. But the direction of the counterweight’s centrifugal force rotates with the crank: while cancelling the vertical reciprocating force, it creates a new unbalanced force in the horizontal direction, so the reciprocating mass is usually only partly balanced.</p>
+<p>The second part is the second-order inertia force m r ω² λ cos2φ, whose frequency is twice the main-shaft speed; a counterweight on the crank can do nothing about it. Its size is proportional to λ — another reason not to make the link too short.</p>
+<p>The most effective way to reduce vibration is still to reduce m: use hollow steel tube for the needle bar and keep the needle clamp and connecting stud as small and light as possible.</p>
+<h3 id="s3-8">3.8 Design notes</h3>
+<p>When designing a needle-bar mechanism, the parameters are fixed in a definite order. First determine the stroke 2r from the fabric thickness, the presser-foot lift and the position of the rotary hook; then choose the link length within λ = 0.25–0.32 (to be verified); finally work back from the loop-catching timing to the mounting angle of the rotary hook.</p>
+<p>Once the parameters are fixed, find ways to lighten the reciprocating mass, since the inertia force is proportional to it. Common measures are a hollow needle bar, a small needle clamp, and an I-section or lightened (pocketed) link. The remaining inertia force is handled by the counterweight: the rotating masses of the crank and crank pin should be fully balanced, the reciprocating mass only partly, with the exact proportion determined by vibration measurements on the complete machine.</p>
+<p>High-speed running also brings lubrication and wear problems. The needle-bar bushings, the crank pin and both ends of the link are high-speed friction pairs under varying load and need a reliable oil supply; on high-speed models both ends of the link mostly use needle roller bearings (to be verified). Finally, do not forget anti-rotation and adjustability: the clearance between guide block and guide slot determines whether the needle bar will wobble, the needle-bar connecting stud must make needle-bar height easy to adjust, and the needle clamp must keep the scarf of the needle always facing the hook point.</p>
+<h3 id="x40115">Chapter 3 exercises</h3>
+<ol>
+<li>Derive the exact formula for needle-bar displacement, and explain why its second term has the opposite sign to the piston displacement formula in internal-combustion engine textbooks.</li>
+<li>Starting from the approximations, show that the ratio of accelerations at top and bottom dead centre is (1 − λ) : (1 + λ), and check it with the worked-example data.</li>
+<li>A machine has r = 17 mm, l = 60 mm, n = 5500 r/min. Find the stroke, the maximum velocity, the accelerations at top and bottom dead centre, and the main-shaft angle at which the needle has risen 2 mm. Check your results with Virtual lab 3-1.</li>
+<li>Keeping the stroke unchanged, the link is shortened from 55 mm to 45 mm. By roughly how many degrees does the loop-catching moment change? How should the mounting angle of the rotary hook be adjusted?</li>
+<li>With a reciprocating mass of 100 g and a requirement that the maximum inertia force not exceed 500 N, what is the highest speed allowed for the worked-example mechanism?</li>
+<li>Why can a counterweight on the crank not fully balance the reciprocating inertia force of the needle bar? Give two reasons.</li>
+</ol>
+<h3 id="x78051">Companion resources</h3>
+<p><a href="#lab-slidercrank" class="labref">Virtual lab 3-1　Needle-bar slider-crank mechanism</a>　Adjust r, l, n and the reciprocating mass and watch the displacement, velocity, acceleration, inertia force and loop-catching moment change in real time; a grey dashed curve keeps the worked example for comparison, and four lab tasks are included.</p>
+<p><a href="#lab-model-lockstitch" class="labref">Model 2-1　3D structure of an industrial lockstitch machine</a>　Switch to “X-ray” and click the “needle-bar” train to see the slider-crank mechanism just analysed inside the complete machine.</p><section class="lab" id="lab-model-lockstitch" data-src="labs/model-lockstitch.html"><div class="lab-head"><span class="lab-kind">3D model</span><h4 id="x21282">Model 2-1　Industrial lockstitch machine</h4></div><p>Rotate, X-ray and explode the whole machine and its four drive trains; click a part to see its name.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/model-lockstitch.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>

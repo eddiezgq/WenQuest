@@ -412,6 +412,10 @@ def test_hub_cam_api(tmp_path, monkeypatch):
         sp = c.post("/api/cam/spec/geometry", json={"sha": ex["sha"]}, headers=hd).json()
         assert sp["kind"] == "mill25" and sp["recognized"] == {"turn": False, "mill": True}
         assert c.post("/api/cam/spec", json={"item": "SH-301", "seq": 30}, headers=hd).status_code == 400   # 调质不用编程
+        r = c.post("/api/cam/ai-setup", json={"text": "分 5 层，每齿 0.04", "spec": spec}, headers=hd).json()
+        assert r["engine"] == "rules" and [p["path"] for p in r["patch"]] == ["cut.ap", "cut.fz"]
+        e = c.post("/api/cam/jobs/{}/explain".format(j["id"]), json={"k": 0}, headers=hd).json()
+        assert e["blocks"][0]["from"] == 1 and e["blocks"][-1]["to"] == len(nc.text.rstrip("\n").split("\n"))
 
 
 # ---------------------------------------------------------------- 第 4 步：挂到工艺规程、审批生效、下发
@@ -476,3 +480,67 @@ def test_programs_ride_on_process_approval(camdb, plan, shaft):
     d20 = next(d for d in sent if d["operation"].startswith("粗车"))
     assert d20["gcode_ref"] == g[0]["gcode_ref"] and d20["gcode_refs"] == [x["gcode_ref"] for x in g]
     assert next(d for d in sent if d["operation"].startswith("铣键槽"))["gcode_ref"] is None
+
+
+# ---------------------------------------------------------------- 第 5 步：一句话编程、AI 讲解（规则兜底）
+def test_one_sentence_rules(plan, shaft):
+    from hub import cam_ai as A
+    design = cam.design_profile(shaft[0]["segments"], shaft[0]["chamfer"])
+    s = J.plan_turn(plan, 20, design, 1)
+    r = A.setup(None, "粗车外圆，每刀 2.5，留 0.3 精车余量", s)
+    assert r["engine"] == "rules" and not r["unmatched"]
+    assert {(p["path"], p["value"]) for p in r["patch"]} == {("cut.ap", 2.5), ("cut.radial_allow", 0.3)}
+    s["cut"]["radial_allow"] = 0.3                                  # 网页按修改清单写回后生成：粗车目标多留 0.3
+    p = J.generate(s)[0]
+    assert p["sim"]["dev_max"] <= 0.01 and abs(p["sim"]["target"][0][1] - (31.0945 + 0.6)) < 1e-6
+    r = A.setup(None, "线速度 150，进给 0.12，限速 2500，只车右端，加点冷却", s)
+    assert {(p["path"], str(p["value"])) for p in r["patch"]} == {("cut.vc", "150.0"), ("cut.f", "0.12"), ("cut.max_rpm", "2500.0"),
+                                                                 ("setups", "['right']")}
+    assert r["unmatched"] == ["加点冷却"]
+    k = J.plan_slot(plan, 50, shaft[0], 1)
+    r = A.setup(None, "铣键槽，分 5 层", k)
+    assert r["patch"][0]["path"] == "cut.ap" and r["patch"][0]["value"] * 5 >= k["depth"] - 1e-9
+    with pytest.raises(ValueError):
+        A.setup(None, "  ", k)
+
+
+def test_explain_covers_every_line(plan, shaft, plate_step):
+    from hub import cam_ai as A
+    design = cam.design_profile(shaft[0]["segments"], shaft[0]["chamfer"])
+    f = CG.mill_features(plate_step)
+    for spec in (J.plan_turn(plan, 20, design, 1), J.plan_turn(plan, 40, design, 1), J.plan_slot(plan, 50, shaft[0], 1),
+                 J.plan_mill(f, "VMC-01", "6061", 2.0, "WQ-PLATE")):
+        progs = J.generate(spec)
+        nc = progs[0]["gcode"]
+        e = A.explain(None, {"spec": spec, "programs": progs}, 0, nc)
+        n = len(nc.rstrip("\n").split("\n"))
+        got = [ln for b in e["blocks"] for ln in range(b["from"], b["to"] + 1)]
+        assert got == list(range(1, n + 1)), spec["kind"]               # 每一行都讲到、不重复
+        assert all(b["text"] for b in e["blocks"]) and e["risks"]
+        kinds = " ".join(b["text"] for b in e["blocks"])
+        assert "程序头" in kinds and ("M30" in kinds)
+
+
+def test_cutting_power_check(plan, shaft):
+    """与工艺规程同一张 Kienzle 表：45 钢 kc1.1 = 2220 MPa、mc = 0.14；ap 2.5、f 0.3、vc 120 → 约 3.94 kW"""
+    design = cam.design_profile(shaft[0]["segments"], shaft[0]["chamfer"])
+    s = J.plan_turn(plan, 20, design, 1)
+    p = J.generate(s)[0]
+    hand = 2220 * 2.5 * 0.3 ** 0.86 * 120 / 60000
+    assert p["power"]["items"][0]["P_kw"] == pytest.approx(hand, rel=1e-3) and not p["checks"]
+    from hub import process
+    assert process.cutting_power_kw("45", {"ap_mm": 2.5, "f_mm_r": 0.3, "vc_m_min": 120})[0] == pytest.approx(hand, rel=1e-3)
+    s["cut"].update(ap=6.0, f=0.5)                                    # 每刀 6、进给 0.5：超过 11 kW
+    assert any("超过" in c["text"] and c["level"] == "error" for c in J.generate(s)[0]["checks"])
+
+
+def test_lab10_documents():
+    import io
+    import docx
+    from cae import labdoc
+    g = docx.Document(io.BytesIO(labdoc.guide_docx("lab10")))
+    text = "\n".join(p.text for p in g.paragraphs)
+    assert "实验 10" in text and "公差带中间" in text and len(g.tables) >= 2
+    t = docx.Document(io.BytesIO(labdoc.report_template_docx("lab10")))
+    cells = " ".join(c.text for tb in t.tables for r in tb.rows for c in r.cells)
+    assert "编程直径" in cells and "槽深" in cells and "P_c" in cells

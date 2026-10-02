@@ -1,0 +1,148 @@
+<p class="eyebrow">Part I · Introduction</p><h1><span class="chno">Chapter 2</span>How a Stitch Is Formed</h1><div class="seam" aria-hidden="true"></div><div class="chips"><span class="chips-label">Interactive resources in this chapter</span><a class="chip" href="#lab-lockstitch"><b>Animation</b>Forming lockstitch 301</a><a class="chip" href="#lab-model-lockstitch"><b>3D model</b>Industrial lockstitch machine</a></div><p>Every mechanism in a sewing machine exists for one purpose: to make the needle thread and the bobbin thread meet in the fabric at the right moment and interlace. This chapter first looks at the stitch itself, then at how it is formed stitch by stitch, and finally breaks it down into four motions that must be precisely coordinated. The following chapters each discuss the mechanisms that produce those four motions.</p>
+<h3 id="s2-1">2.1 The whole machine first: layout of an industrial lockstitch machine</h3>
+<p>Before discussing stitches, let us get to know a complete machine. Fig. 2-1 shows the most common single-needle industrial lockstitch machine. Its housing is a casting shaped like a “⊐” turned on its side: on the right is the pillar, along the top is the horizontal <strong>arm</strong>, the part hanging down at the left end is the <strong>head</strong>, and underneath is the <strong>bed</strong>, set into the table top. The operator sits facing the machine, the fabric is fed away from the operator, and it is sewn between the presser foot and the throat plate under the head.</p>
+<figure class="fig"><a class="zoom" href="img/fig_whole.png"><img src="img/fig_whole.png" alt="Fig. 2-1　External view of an industrial lockstitch machine" loading="lazy"></a><figcaption>Fig. 2-1　External view of an industrial lockstitch machine (rendered from Model 2-1; schematic)</figcaption></figure><section class="lab" id="lab-model-lockstitch" data-src="labs/model-lockstitch.html"><div class="lab-head"><span class="lab-kind">3D model</span><h4 id="x21282">Model 2-1　Industrial lockstitch machine</h4></div><p>Rotate, X-ray and explode the whole machine and its four drive trains; click a part to see its name.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/model-lockstitch.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<p>The parts visible from outside fall into three groups:</p>
+<p>The first group carries the thread. The needle thread comes down from the thread stand and first passes through the tension assembly, which presses on the thread with a spring to give it tension; it then passes through the take-up lever, which swings up and down at the front of the head, and finally runs down to the needle eye. This is the order in which the thread is guided and controlled.</p>
+<p>The second group touches the fabric directly: the needle bar with the needle fitted at its lower end, the presser foot that holds the fabric down, the throat plate that supports it, and the feed dog hidden under the throat plate, of which only the tips of the teeth periodically rise into view. The fabric is gripped between the presser foot and the feed dog and pushed forward one stitch at a time.</p>
+<p>The third group is for the operator: the handwheel on the right lets you turn the main shaft by hand, which is often done when adjusting the machine; the stitch-length regulator changes the stitch length; and the reverse lever makes the fabric feed backwards. The motor, mounted on the handwheel side and driving the main shaft, is not shown.</p>
+<p>Make the housing semi-transparent (Fig. 2-2) and you see that inside the machine there are really only two through shafts: the <strong>main shaft</strong> (arm shaft) in the arm and the <strong>hook shaft</strong> (bed shaft) in the bed, linked by a timing belt in the pillar and turning at the same speed. All the other mechanisms hang off these two shafts.</p>
+<figure class="fig"><a class="zoom" href="img/fig_xray.png"><img src="img/fig_xray.png" alt="Fig. 2-2　X-ray view of the drive system" loading="lazy"></a><figcaption>Fig. 2-2　X-ray view of the drive system: blue, needle-bar train; purple, take-up train; orange, loop-catching (hook) train; green, feed train (schematic)</figcaption></figure>
+<p>Fig. 2-3 draws these relationships as a block diagram. One main shaft branches into four drive trains, each driving one of the four motions discussed in Section 2.6:</p>
+<figure class="fig chart"><a class="zoom" href="img/w_423def1c.png"><img src="img/w_423def1c.png" alt="Fig. 2-3　Drive block diagram of a lockstitch machine. Main shaft (one revolution = one stitch) → needle-bar crank → needle-bar link → (slider-crank) needle bar and needle: piercing, one reciprocation; → take-up crank pin → (four-bar linkage, the take-up lever is the coupler) take-up lever: one swing; → timing belt 1:1 → hook shaft → gears 1:2 → rotary hook: two turns; hook shaft → feed-lift eccentric → feed-lift rock shaft, and main shaft → feed eccentric → stitch-length regulator → feed rock shaft, both → feed bar and feed dog: horizontal + vertical motion combine into one elliptical path" loading="lazy"></a></figure>
+
+<p>This block diagram is the key to the chapter. Remember three points:</p>
+<p>First, the four motions are always synchronised. All of them are driven by the same main shaft through fixed ratios, with no clutch and no element that can slip, so once you know the main-shaft angle you know where every mechanism is at that moment. That is why the whole machine can be described by a single <strong>motion timing diagram</strong> with main-shaft angle on the horizontal axis (Fig. 2-9).</p>
+<p>Second, the rotary hook turns at twice the speed of the main shaft. The timing belt from main shaft to hook shaft is 1:1 and the gears from hook shaft to the hook drive are 1:2, so for one revolution of the main shaft — one stitch — the hook makes two turns. Why it must be exactly twice is left as an exercise at the end of the chapter.</p>
+<p>Third, the feed is the combination of two motions. The horizontal motion of the feed dog comes from the feed eccentric on the main shaft via the stitch-length regulator, so the stitch length is adjustable and reverse stitching is possible; the vertical motion comes from the feed-lift eccentric on the hook shaft. Superimposed, the two motions make the tips of the feed-dog teeth trace a roughly elliptical path: pushing the fabric forward while above the plate, returning after dropping below the throat plate.</p>
+<p>Fig. 2-4 is an exploded assembly view of the whole machine, with the assemblies laid out roughly in the direction of disassembly: first remove the face plate and the fittings on the housing, then withdraw the main-shaft assembly, the needle bar and the take-up assembly; under the bed are the hook shaft, the rotary hook and the feed assembly. When reading the figure, match each assembly to one of the trains in Fig. 2-3.</p>
+<figure class="fig"><a class="zoom" href="img/fig_explode.png"><img src="img/fig_explode.png" alt="Fig. 2-4　Exploded assembly view of the whole machine" loading="lazy"></a><figcaption>Fig. 2-4　Exploded assembly view of the whole machine (schematic)</figcaption></figure>
+<p>A static picture shows only one angle. <a href="#lab-model-lockstitch" class="labref">Model 2-1　3D structure of an industrial lockstitch machine</a> can be dragged to rotate it, switched between exterior, X-ray and exploded views, and any one drive train can be clicked to highlight it on its own; press “Play” and the whole machine turns with its true kinematic relationships, the needle thread paying out and drawing back with the take-up lever. We suggest looking at each of the four trains in the model before reading on.</p>
+<h3 id="s2-2">2.2 Opening: why do skipped stitches happen?</h3>
+<p>One of the most common complaints in a sewing room is the skipped stitch: a stitch is missing from what should be a continuous seam. The machine runs as usual and the needle goes up and down as usual, but the threads have not interlaced. The cause is almost always the same — the hook point of the rotary hook did not catch the loop formed by the needle thread at the right moment and in the right place. To understand skipped stitches, we first need to understand how the loop is produced and how long it exists.</p>
+<h3 id="s2-3">2.3 Classes of stitch</h3>
+<p>The international standard ISO 4915 divides stitches into six classes according to how the threads interlace:</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Name</th>
+<th>Characteristics</th>
+<th>Typical uses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Class 100</td>
+<td>Single-thread chainstitch</td>
+<td>One thread loops through itself; pulling one end undoes it</td>
+<td>Temporary seams, closing bag mouths</td>
+</tr>
+<tr>
+<td>Class 200</td>
+<td>Imitation hand stitch</td>
+<td>Imitates hand-needle sewing</td>
+<td>Decorative stitching</td>
+</tr>
+<tr>
+<td>Class 300</td>
+<td>Lockstitch</td>
+<td>Needle and bobbin threads interlace in the middle of the fabric; face and back look the same</td>
+<td>Plain seams in garments, leather, bags and luggage; the most widely used</td>
+</tr>
+<tr>
+<td>Class 400</td>
+<td>Multi-thread chainstitch</td>
+<td>Needle and looper threads interloop; good elasticity</td>
+<td>Knitted garments, trouser back rise</td>
+</tr>
+<tr>
+<td>Class 500</td>
+<td>Overedge stitch</td>
+<td>Thread wraps the fabric edge to stop fraying</td>
+<td>Edge finishing</td>
+</tr>
+<tr>
+<td>Class 600</td>
+<td>Covering stitch</td>
+<td>Several needle threads plus a cover thread; thread covers both face and back</td>
+<td>Knitted underwear, T-shirt hems</td>
+</tr>
+</tbody>
+</table></div>
+<p>This book takes the most basic and most widely used stitch, the <strong>301 lockstitch</strong>, as its main thread: it is what both domestic sewing machines and industrial lockstitch machines produce.</p>
+<h3 id="s2-4">2.4 Structure of lockstitch 301</h3>
+<p>Stitch 301 is made of two threads: the <strong>needle thread</strong> (top thread), which passes through the needle, and the <strong>bobbin thread</strong>, wound on the bobbin. On every stitch the needle thread carries a loop through to the underside of the fabric and the bobbin thread passes through that loop; the needle thread is then pulled tight, drawing the interlacing point into the middle of the fabric thickness. When the interlacing point is in the right place, only a row of straight segments is visible on both face and back, and the seam is at its strongest.</p>
+<p>Where the interlacing point sits is determined by the balance between needle-thread tension and bobbin-thread tension: if the needle-thread tension is too high, the interlacing point is pulled up onto the top of the fabric and small dots of bobbin thread show on the face; too much bobbin-thread tension does the opposite. This is the problem addressed by the thread take-up mechanism in Chapter 4 and by thread tension in Chapter 7.</p>
+<figure class="fig"><a class="zoom" href="img/fig_section.png"><img src="img/fig_section.png" alt="Fig. 2-5　Cross-section of stitch 301 and tension balance" loading="lazy"></a><figcaption>Fig. 2-5　Cross-section of stitch 301 and tension balance (schematic)</figcaption></figure>
+<p>Fig. 2-5 is a section cut along the seam line. On a piece of sewn fabric, dots of bobbin thread on the face mean the needle thread is relatively too tight (or the bobbin thread too loose); dots of needle thread on the back mean the bobbin thread is relatively too tight (or the needle thread too loose) — Chapter 7 covers this in detail. This is the quickest way to judge tension on the shop floor.</p>
+<h3 id="s2-5">2.5 How one stitch is formed</h3>
+<p>Take as an example the horizontal full rotary hook commonly used on industrial lockstitch machines: one revolution of the main shaft makes one stitch, and the hook makes two turns (speed ratio 2:1). One stitch can be divided into five stages.</p>
+<p>First, get to know the needle (Fig. 2-6). The two sides of the needle are not symmetric: one side has a <strong>long groove</strong> running the length of the blade, while the other has only a <strong>short groove</strong> near the eye, with a <strong>scarf</strong> ground above the short groove. Whether a loop forms and whether the hook point can catch it both depend on this asymmetry.</p>
+<figure class="fig"><a class="zoom" href="img/fig_needle.png"><img src="img/fig_needle.png" alt="Fig. 2-6　Structure of the needle" loading="lazy"></a><figcaption>Fig. 2-6　Structure of the needle: front view, side view and enlarged detail near the eye (schematic, widths exaggerated)</figcaption></figure>
+<p>Next, the rotary hook (Fig. 2-7). The rotary hook is not a single part. The <strong>hook body</strong> is mounted on the hook drive shaft and rotates, with the hook point on its rim; the <strong>bobbin-case holder</strong> sits in the race of the hook body and is held by a <strong>positioning finger</strong> fixed to the housing, so it does not turn with the hook; the <strong>bobbin case</strong>, together with the <strong>bobbin</strong> full of bobbin thread, fits on the centre post of the bobbin-case holder; and the <strong>gib</strong> is screwed to the front of the hook body to keep the bobbin-case holder from coming out. So when the hook turns, the hook point carries the loop around a bobbin case that is stationary; the bobbin thread stays put inside the bobbin case, and that is what allows the loop to “enclose” the bobbin thread.</p>
+<figure class="fig"><a class="zoom" href="img/fig_hook_exploded.png"><img src="img/fig_hook_exploded.png" alt="Fig. 2-7　Exploded view of the rotary hook assembly" loading="lazy"></a><figcaption>Fig. 2-7　Exploded view of a horizontal full rotary hook assembly (schematic; parts arranged left to right in order of disassembly)</figcaption></figure>
+<p>A stitch begins with piercing. The needle carries the needle thread down and pierces the fabric. One side of the needle has a <strong>long groove</strong>; on the way down the needle thread lies in this groove and is not abraded by the fabric.</p>
+<p>Next comes loop formation. After the needle reaches its lowest point it starts to rise. The other side of the needle has only the <strong>short groove</strong> and the scarf; on this side the needle thread is unprotected, is gripped by the fabric and cannot keep up with the needle, so a loop bulges out on the scarf side. When the needle has risen about 2 mm, the loop is at its widest and most stable.</p>
+<p>Then comes loop catching, the moment that decides success or failure. Just when the loop is widest, the <strong>hook point</strong> of the rotary hook sweeps past the scarf of the needle and catches the loop. Too early and the loop has not yet opened; too late and it has already shrunk — either way the stitch is skipped.</p>
+<p>Once caught, the loop is carried around the hook. The hook keeps turning, pulling the loop larger and larger and carrying it around the bobbin case that holds the bobbin thread. During this time the take-up lever moves down, paying out the amount of thread the loop needs.</p>
+<p>Finally, tightening and feeding. The loop slips off the hook, the take-up lever rises quickly and draws back the surplus needle thread, so that the interlacing point of the two threads is pulled into the middle of the fabric; after the needle has left the fabric, the feed dog pushes the fabric forward by one stitch length, and the next stitch can begin.</p>
+<figure class="fig"><a class="zoom" href="img/fig_stages.png"><img src="img/fig_stages.png" alt="Fig. 2-8　The five stages of one stitch" loading="lazy"></a><figcaption>Fig. 2-8　The five stages of one stitch, viewed along the hook axis and drawn with the needle-bar motion of the Chapter 3 worked example; circles are enlarged details. ① piercing (φ = 150°), ② loop formation (φ = 202°), ③ loop catching (φ = 210°), ④ carrying the loop round the hook (φ = 300°), ⑤ tightening and feeding (φ = 30°). φ is main-shaft angle, 0° at needle bar top position. Key — blue: needle thread; orange: bobbin thread; blue dashed: the part of the loop passing behind the bobbin case; red dotted circle: hook-point position</figcaption></figure>
+<p>Fig. 2-8 puts the five stages together, each panel viewed along the hook axis. A static figure cannot show how the loop gradually opens, is caught and then passes round the bobbin case, so read it alongside <a href="#lab-lockstitch" class="labref">Animation 2-1　Forming lockstitch 301</a>: you can pause it, drag the main-shaft angle degree by degree, and compare with the timing diagram on the right to see what each mechanism is doing.</p><section class="lab" id="lab-lockstitch" data-src="labs/lockstitch.html"><div class="lab-head"><span class="lab-kind">Animation</span><h4 id="x85200">Animation 2-1　Forming lockstitch 301</h4></div><p>Needle, rotary hook, take-up lever and feed dog move in step with the main-shaft angle; pause and drag degree by degree to see how the loop is caught, carried round the bobbin case and pulled tight.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/lockstitch.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<h3 id="s2-6">2.6 The four motions and how they are coordinated</h3>
+<p>The process above is carried out by four mechanisms working together. The presser foot holds the fabric down throughout and generally does not move with the main shaft, so it is not counted among them.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Motion</th>
+<th>Working element</th>
+<th>Task</th>
+<th>Key moments (main-shaft angle)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Piercing</td>
+<td>Needle bar and needle</td>
+<td>Carry the needle thread through the fabric and form a loop on the rise</td>
+<td>Lowest point at 180°; loop catching when the needle has risen about 2 mm</td>
+</tr>
+<tr>
+<td>Loop catching</td>
+<td>Rotary hook</td>
+<td>Catch the loop and carry it round the bobbin case</td>
+<td>The moment the hook point reaches the needle centreline must coincide with the moment the loop is largest</td>
+</tr>
+<tr>
+<td>Take-up</td>
+<td>Take-up lever</td>
+<td>Pay out thread while the loop goes round the hook; take it up and tighten the stitch after loop catching is complete</td>
+<td>Moves down to pay out while the loop goes round the hook; rises quickly after the loop is shed</td>
+</tr>
+<tr>
+<td>Feed</td>
+<td>Feed dog</td>
+<td>Advance the fabric one stitch length after the needle has left it</td>
+<td>Feeding completed while the needle is above the fabric</td>
+</tr>
+</tbody>
+</table></div>
+<p>All four motions are driven by the same main shaft, and the phase relations between them are fixed. Drawing them on one chart with main-shaft angle on the horizontal axis gives the sewing machine’s <strong>motion timing diagram</strong> (Chapter 8). Designing a sewing machine is essentially designing a set of mechanisms so that every key moment on the timing diagram lines up.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_2a86e05b.png"><img src="img/w_2a86e05b.png" alt="Fig. 2-9　Motion timing diagram (needle-bar displacement calculated; other bands illustrative). Needle-bar displacement x (downward positive, 0 to 31 mm) against main-shaft angle φ: lowest point at 180°, hook point catches the loop at 206° after the needle has risen about 2 mm; needle in fabric 102°–258°; hook carries the loop 206°–341°; feed 0°–60° and 290°–360°" loading="lazy"></a></figure>
+
+<p>When reading Fig. 2-9, focus on three moments: the needle reaches its lowest point at 180°; the hook point catches the loop when the needle has risen about 2 mm, at a main-shaft angle of about 206°; and the feed dog starts pushing the fabric only after the needle has left the fabric (about 258°). If loop catching comes a dozen or so degrees early or late, the needle rise moves out of the range where the loop is largest, and that is where skipped stitches come from. The “virtual lab” in Animation 2-1 lets you drag the loop-catching moment directly to verify this.</p>
+<h3 id="s2-7">2.7 Limits of the model</h3>
+<p>The description above treats the thread as inextensible and the fabric as rigidly clamped, which is enough to explain how a stitch is formed. In practice, the elasticity and twist direction of the thread, the thickness and elasticity of the fabric, and the size of the needle all change the size of the loop and the moment it forms: heavy fabric needs a larger needle and a larger loop, and elastic knits tend to make the loop unstable and cause skipped stitches. These factors are discussed in Chapter 7 (thread tension and stitch quality).</p>
+<h3 id="x38939">Chapter 2 exercises</h3>
+<ol>
+<li>Explain in your own words why the loop forms on only one side of the needle. What would happen if the needle were fitted the wrong way round (long groove facing the hook)?</li>
+<li>What are the advantages and disadvantages of lockstitch 301 and single-thread chainstitch 101? Why do plain seams in garments almost all use 301?</li>
+<li>Why is the speed ratio of rotary hook to main shaft 2:1? If it were 1:1, could the loop still pass round the bobbin case? (Hint: consider the angle of rotation needed for the loop to be shed.)</li>
+<li>List the order of the four motions in one stitch, and explain why feeding must take place after the needle has left the fabric. What would happen if feeding started while the needle was still in the fabric?</li>
+<li>On the shop floor, a lockstitch machine sews light fabric normally but skips stitches frequently after changing to heavy denim. From the point of view of loop formation, give at least three possible causes and the corresponding adjustments.</li>
+</ol>
+<h3 id="x78051">Companion resources</h3>
+<p>Animation 2-1, “The complete formation of stitch 301”, turns the main shaft through one revolution and shows the positions of the needle, rotary hook, take-up lever and feed dog in step; the thread is drawn as a flexible cord, and you can pause or step frame by frame through the moment of loop catching.</p>
+<p>Virtual lab 2-1, “Loop-catching timing and skipped stitches”, lets students drag a “hook-point phase” slider, watch how the loop size changes with needle rise, find the phase range in which no stitches are skipped, and compare it with the needle rise of about 2 mm given in this chapter.</p>
+<p>If you have a real machine, you can also make an observation: remove the throat plate and rotary hook, turn the handwheel by hand, mark on the handwheel with a marker pen the needle’s lowest point and the position where the hook point reaches the needle centre, and measure the angle between them.</p>
+<p>Animation 2-1 and Virtual lab 2-1 are available as a web page: <a href="#lab-lockstitch" class="labref">Animation of lockstitch 301 formation</a>.</p>

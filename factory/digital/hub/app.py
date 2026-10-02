@@ -1340,7 +1340,7 @@ _cae.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quot
 
 # ---------------------------------------------------------------- 数控编程（第 13 轮）
 from hub import cam_api as _cam  # noqa: E402
-_cam.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")))
+_cam.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
 _cam.mount_release(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), _emit_as, _can_submit)
 
 

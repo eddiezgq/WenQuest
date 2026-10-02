@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>花样编程实验</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: guide / tasks on the left rail, drawing canvas in the middle, segment properties + output on the right; stacks on phones */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --bad:#d1495b; --ok:#1e8449; --seam:#2f6fd6; --jump:#e0662f; --sel:#d4a017; --tpl:#dcebf4; --ghost:#9aa4ae;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--seam:#6ea8ff;--jump:#ff8c55;--sel:#f4d03f;--tpl:#1e3140;--ghost:#5d6b7a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--seam:#6ea8ff;--jump:#ff8c55;--sel:#f4d03f;--tpl:#1e3140;--ghost:#5d6b7a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr) minmax(0,320px);gap:14px;align-items:start}
+@media (max-width:1100px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,320px)}.guide{grid-column:1 / -1}}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;border-radius:6px}
+.tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)} button.primary{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{font-size:.8rem;color:var(--muted);margin:6px 0 0;min-height:1.3em}
+.ctl{display:grid;grid-template-columns:auto minmax(0,1fr) 4.6em;gap:6px 8px;align-items:center}
+.ctl label{font-size:.85rem;color:var(--muted)}
+.ctl b{font-family:var(--f-mono);font-size:.85rem;text-align:right}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=checkbox]{accent-color:var(--accent)}
+.seglist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:180px;overflow:auto}
+.seglist li button{width:100%;text-align:left;display:flex;justify-content:space-between;gap:8px}
+.seglist li button.on{border-color:var(--sel);box-shadow:inset 3px 0 0 var(--sel)}
+.kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1rem}
+.kpi small{color:var(--muted);font-size:.74rem;display:block;line-height:1.3}
+pre{font-family:var(--f-mono);font-size:.74rem;background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:8px;max-height:220px;overflow:auto;margin:6px 0 0;white-space:pre}
+.steps{margin:0;padding-left:1.2em;font-size:.86rem}
+.steps li{margin:3px 0;cursor:pointer}
+.steps li.on{font-weight:600;color:var(--accent)}
+.lesson{font-size:.86rem;background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px}
+.lesson p{margin:0 0 6px}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--bad)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.warn{font-size:.8rem;color:var(--bad);margin:4px 0 0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.76rem;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:3px;margin-right:4px}
+</style>
+<div class="wrap">
+<header><h1>花样编程实验</h1><span class="sub">《缝纫机设计与制造》第 15 章 · 虚拟实验 15-2 · 像在花样机编程软件里一样画花样、设针距、加回针和剪线，生成花样文件并检查</span></header>
+<div class="grid">
+  <div class="col guide">
+    <section class="panel">
+      <h3>编程指导（点击步骤查看）</h3>
+      <ol class="steps" id="steps"></ol>
+      <div class="lesson" id="lesson"></div>
+    </section>
+    <section class="panel">
+      <h3>编程任务（自动评分）</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>模板（120 × 80 mm 缝纫区，原点在中心，网格 5 mm，吸附 1 mm）</h3>
+      <div class="tools" role="toolbar" aria-label="绘图工具">
+        <button type="button" data-tool="line" aria-pressed="true">直线</button>
+        <button type="button" data-tool="arc" aria-pressed="false">圆弧（三点）</button>
+        <button type="button" data-tool="circle" aria-pressed="false">圆</button>
+        <button type="button" data-tool="curve" aria-pressed="false">曲线</button>
+        <button type="button" id="finish">结束本段</button>
+        <button type="button" id="undo">撤销一点</button>
+        <button type="button" id="del">删除所选段</button>
+        <button type="button" id="clear">清空</button>
+      </div>
+      <canvas id="cv" width="960" height="660" aria-label="花样绘图区"></canvas>
+      <p class="hint" id="hint"></p>
+      <div class="legend"><span><i style="background:var(--seam)"></i>缝纫针迹（点 = 落针）</span><span><i style="background:var(--jump)"></i>空走</span><span><i style="background:var(--sel)"></i>所选段</span><span><i style="background:var(--bad)"></i>有问题的针</span></div>
+      <div class="tools" style="margin-top:8px">
+        <button type="button" id="sim" class="primary">仿真缝制</button>
+        <button type="button" id="ex1">示例：口袋盖</button>
+        <button type="button" id="ex2">示例：矩形 + 圆</button>
+      </div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>花样段</h3>
+      <ul class="seglist" id="seglist"></ul>
+      <div id="props" style="margin-top:10px"></div>
+    </section>
+    <section class="panel">
+      <h3>机器条件</h3>
+      <div class="ctl">
+        <label for="thk">布 + 下模板厚</label><input id="thk" type="range" min="0.5" max="6" step="0.5" value="1.5"><b id="thkv">1.5 mm</b>
+        <label for="nmax">机头最高转速</label><input id="nmax" type="range" min="1000" max="3200" step="100" value="2800"><b id="nmaxv">2800</b>
+      </div>
+      <p class="hint">每轴加速度 50 m/s²、最高 1 m/s、每针最大变速 300 r/min，算法同第 15.3–15.4 节。</p>
+    </section>
+    <section class="panel">
+      <h3>检查结果</h3>
+      <div class="kpi">
+        <div><b id="k-st">0</b><small>针数</small></div>
+        <div><b id="k-tr">0 / 0</b><small>剪线 / 空走</small></div>
+        <div><b id="k-t">—</b><small>周期时间 s<br>（不含上下料）</small></div>
+        <div><b id="k-lim">0</b><small>被限速的针</small></div>
+      </div>
+      <div id="warns"></div>
+      <h3 style="margin-top:12px">花样文件（单位 0.1 mm，相对坐标）</h3>
+      <pre id="file"></pre>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const FX = 60, FY = 40;                         // half field (mm)
+const A = 50, V = 1, DN = 300, NSLOW = 400;     // axis accel, vmax, speed change per stitch
+let tool = 'line', segs = [], cur = null, selIdx = -1, hover = null;
+let stitches = [], sim = { on:false, i:0, t:0, last:0 };
+const R = 15.5, LC = 55, TIP = 18, lam = R / LC;
+const xN = p => R * (1 - Math.cos(p)) - LC * (1 - Math.sqrt(1 - lam * lam * Math.sin(p) ** 2));
+function windowFor(t){ let e = 0, l = 360; for (let d = 0; d <= 180; d += .1){ if (TIP - xN(d * Math.PI / 180) < t){ e = d; break; } } for (let d = 180; d <= 360; d += .1){ if (TIP - xN(d * Math.PI / 180) >= t){ l = d; break; } } return 360 - (l - e); }
+const P = { thk:1.5, nmax:2800 };
+
+// ---------- geometry ----------
+function circ3(a, b, c){
+  const d = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1])); if (Math.abs(d) < 1e-9) return null;
+  const a2 = a[0] ** 2 + a[1] ** 2, b2 = b[0] ** 2 + b[1] ** 2, c2 = c[0] ** 2 + c[1] ** 2;
+  const ux = (a2 * (b[1] - c[1]) + b2 * (c[1] - a[1]) + c2 * (a[1] - b[1])) / d, uy = (a2 * (c[0] - b[0]) + b2 * (a[0] - c[0]) + c2 * (b[0] - a[0])) / d;
+  return { cx:ux, cy:uy, r:Math.hypot(a[0] - ux, a[1] - uy) };
+}
+function arcAngles(a, b, c, C){
+  const ang = p => Math.atan2(p[1] - C.cy, p[0] - C.cx);
+  let t0 = ang(a), t1 = ang(b), t2 = ang(c);
+  const norm = x => { while (x < 0) x += 2 * Math.PI; while (x >= 2 * Math.PI) x -= 2 * Math.PI; return x; };
+  const ccwB = norm(t1 - t0), ccwC = norm(t2 - t0);
+  if (ccwB < ccwC) return { t0, sweep: ccwC }; else return { t0, sweep: -(2 * Math.PI - ccwC) };
+}
+// dense polyline describing a segment's path (for drawing) + list of "must-hit" corner indices
+function pathOf(sg){
+  const P_ = sg.pts;
+  if (sg.type === 'line') return { pts: P_.map(p => p.slice()), corners: P_.map((_, i) => i) };
+  if (sg.type === 'arc' && P_.length === 3){
+    const C = circ3(P_[0], P_[1], P_[2]); if (!C) return { pts: P_.slice(), corners: [0, 2] };
+    const { t0, sweep } = arcAngles(P_[0], P_[1], P_[2], C); const n = 96, out = [];
+    for (let k = 0; k <= n; k++){ const t = t0 + sweep * k / n; out.push([C.cx + C.r * Math.cos(t), C.cy + C.r * Math.sin(t)]); }
+    return { pts: out, corners: [0, n] };
+  }
+  if (sg.type === 'circle' && P_.length === 2){
+    const r = Math.hypot(P_[1][0] - P_[0][0], P_[1][1] - P_[0][1]), t0 = Math.atan2(P_[1][1] - P_[0][1], P_[1][0] - P_[0][0]), n = 144, out = [];
+    for (let k = 0; k <= n; k++){ const t = t0 + 2 * Math.PI * k / n; out.push([P_[0][0] + r * Math.cos(t), P_[0][1] + r * Math.sin(t)]); }
+    return { pts: out, corners: [0, n] };
+  }
+  if (sg.type === 'curve' && P_.length >= 2){
+    const pts = P_, out = [];
+    for (let i = 0; i < pts.length - 1; i++){
+      const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      for (let k = 0; k < 24; k++){ const t = k / 24, t2 = t * t, t3 = t2 * t;
+        out.push([0, 1].map(j => 0.5 * ((2 * p1[j]) + (-p0[j] + p2[j]) * t + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2 + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3))); }
+    }
+    out.push(pts[pts.length - 1].slice());
+    return { pts: out, corners: [0, out.length - 1] };
+  }
+  return { pts: P_.map(p => p.slice()), corners: [] };
+}
+// resample a path at equal arc length between consecutive corners
+function stitchesOf(sg){
+  const { pts, corners } = pathOf(sg); if (pts.length < 2) return pts.slice();
+  const out = [pts[0].slice()];
+  const cs = corners.length >= 2 ? corners : [0, pts.length - 1];
+  for (let c = 0; c + 1 < cs.length; c++){
+    const sub = pts.slice(cs[c], cs[c + 1] + 1); const cum = [0];
+    for (let i = 1; i < sub.length; i++) cum.push(cum[i - 1] + Math.hypot(sub[i][0] - sub[i - 1][0], sub[i][1] - sub[i - 1][1]));
+    const L = cum[cum.length - 1]; if (L < 1e-6) continue;
+    const n = Math.max(1, Math.ceil(L / sg.s - 1e-9));
+    let j = 1;
+    for (let k = 1; k <= n; k++){
+      const d = L * k / n; while (j < sub.length - 1 && cum[j] < d) j++;
+      const f = (d - cum[j - 1]) / Math.max(1e-9, cum[j] - cum[j - 1]);
+      out.push([sub[j - 1][0] + (sub[j][0] - sub[j - 1][0]) * f, sub[j - 1][1] + (sub[j][1] - sub[j - 1][1]) * f]);
+    }
+  }
+  return out;
+}
+function withBacktacks(seq, sg){
+  if (seq.length < 2) return seq.map(p => ({ p, kind:'sew' }));
+  const out = []; const k0 = Math.min(sg.bt0, seq.length - 1), k1 = Math.min(sg.bt1, seq.length - 1);
+  // start: forward k0, back k0, then the run
+  for (let i = 0; i <= k0; i++) out.push({ p: seq[i], kind: i ? 'bt' : 'sew' });
+  for (let i = k0 - 1; i >= 0; i--) out.push({ p: seq[i], kind:'bt' });
+  for (let i = 1; i < seq.length; i++) out.push({ p: seq[i], kind:'sew' });
+  if (sg.dbl) for (let i = seq.length - 2; i >= 0; i--) out.push({ p: seq[i], kind:'sew' });
+  const endSeq = sg.dbl ? seq.slice().reverse() : seq;
+  const n = endSeq.length - 1;
+  for (let i = 1; i <= k1; i++) out.push({ p: endSeq[n - i], kind:'bt' });
+  for (let i = k1 - 1; i >= 0; i--) out.push({ p: endSeq[n - i], kind:'bt' });
+  return out;
+}
+
+// ---------- compile ----------
+function compile(){
+  stitches = []; let jumps = 0, trims = 0; const warns = [];
+  let pos = [0, 0];
+  const W = windowFor(P.thk);
+  const contig = [];
+  segs.forEach((sg, si) => {
+    const seq = stitchesOf(sg); if (seq.length < 2) return;
+    const run = withBacktacks(seq, sg);
+    const start = run[0].p;
+    const contiguous = Math.hypot(start[0] - pos[0], start[1] - pos[1]) <= 0.05 && stitches.length && stitches[stitches.length - 1].kind !== 'trim';
+    contig[si] = !!contiguous;
+    if (!contiguous && Math.hypot(start[0] - pos[0], start[1] - pos[1]) > 0.05){ stitches.push({ p:start, kind:'jump', seg:si }); jumps++; }
+    run.forEach((r, i) => { if (i === 0){ if (!contiguous) stitches.push({ p:r.p, kind:'sew', seg:si, first:true, lim:sg.speed }); return; } stitches.push({ p:r.p, kind:r.kind, seg:si, lim:sg.speed }); });
+    pos = run[run.length - 1].p;
+    if (sg.trim){ stitches.push({ p:pos, kind:'trim', seg:si }); trims++; }
+  });
+  // checks
+  stitches.forEach((st, i) => {
+    st.bad = null;
+    if (Math.abs(st.p[0]) > FX || Math.abs(st.p[1]) > FY) st.bad = '超出缝纫区';
+    if (i > 0 && (st.kind === 'sew' || st.kind === 'bt') && stitches[i - 1].kind !== 'jump' && stitches[i - 1].kind !== 'trim'){
+      const a = stitches[i - 1].p, d = Math.hypot(st.p[0] - a[0], st.p[1] - a[1]);
+      if (d > 12.7) st.bad = `针距 ${d.toFixed(1)} mm 超过 12.7 mm`;
+      if (d < 0.2 && d > 0) st.bad = `针距 ${d.toFixed(2)} mm 太小`;
+    }
+  });
+  // speed plan per sewing stitch
+  const tm = s => s <= 0 ? 0 : Math.max(2 * Math.sqrt(s / 1000 / A), 2 * s / 1000 / V);
+  const idx = []; stitches.forEach((st, i) => { if (st.kind === 'sew' || st.kind === 'bt') idx.push(i); });
+  const cap = idx.map((i, k) => {
+    const st = stitches[i], pv = stitches[i - 1];
+    let c = Math.min(P.nmax, st.lim || P.nmax);
+    if (pv && (pv.kind === 'sew' || pv.kind === 'bt')){ const t = Math.max(tm(Math.abs(st.p[0] - pv.p[0])), tm(Math.abs(st.p[1] - pv.p[1]))); if (t > 0) c = Math.min(c, W / (6 * t)); }
+    return c;
+  });
+  // slow start / end around trims and jumps
+  idx.forEach((i, k) => { const prevBreak = !stitches[i - 1] || ['jump','trim'].includes(stitches[i - 1].kind) || stitches[i].first; if (prevBreak) for (let j = k; j < Math.min(idx.length, k + 3); j++) cap[j] = Math.min(cap[j], NSLOW);
+    const nx = stitches[i + 1]; if (!nx || ['jump','trim'].includes(nx.kind)) for (let j = Math.max(0, k - 1); j <= k; j++) cap[j] = Math.min(cap[j], NSLOW); });
+  for (let k = cap.length - 2; k >= 0; k--) cap[k] = Math.min(cap[k], cap[k + 1] + DN);
+  const sp = []; cap.forEach((c, k) => sp.push(k === 0 ? Math.min(c, NSLOW) : Math.min(c, sp[k - 1] + DN)));
+  let time = 0, limited = 0;
+  idx.forEach((i, k) => { stitches[i].n = sp[k]; time += 60 / sp[k]; if (sp[k] < Math.min(P.nmax, stitches[i].lim || P.nmax) - 1 && sp[k] > NSLOW) limited++; });
+  stitches.forEach((st, i) => { if (st.kind === 'trim') time += 0.3; if (st.kind === 'jump'){ const a = i ? stitches[i - 1].p : [0, 0]; const d = Math.max(Math.abs(st.p[0] - a[0]), Math.abs(st.p[1] - a[1])) / 1000; time += 0.15 + (d <= V * V / A ? 2 * Math.sqrt(d / A) : d / V + V / A); } });
+  // return to origin
+  if (stitches.length){ const e = stitches[stitches.length - 1].p; const d = Math.max(Math.abs(e[0]), Math.abs(e[1])) / 1000; time += d <= V * V / A ? 2 * Math.sqrt(d / A) : d / V + V / A; }
+  // file text: integer 0.1 mm deltas computed from rounded absolute positions (no drift)
+  const lines = [`HEAD  ORG=(0,0)  UNIT=0.1mm  NMAX=${P.nmax}  SEG=${segs.length}`];
+  let prev = [0, 0];
+  stitches.forEach(st => {
+    if (st.kind === 'trim'){ lines.push('TRIM'); return; }
+    const q = [Math.round(st.p[0] * 10), Math.round(st.p[1] * 10)], d = [q[0] - prev[0], q[1] - prev[1]]; prev = q;
+    const f = v => (v >= 0 ? '+' : '') + v;
+    const cmd = st.kind === 'jump' ? 'JUMP' : 'SEW ';
+    lines.push(`${cmd} ${f(d[0]).padStart(6)} ${f(d[1]).padStart(6)}${st.kind === 'bt' ? '   ; 回针' : ''}${st.first ? '   ; 起针' : ''}`);
+  });
+  lines.push('END');
+  $('file').textContent = lines.join('\n');
+  const nSew = idx.length;
+  $('k-st').textContent = nSew; $('k-tr').textContent = `${trims} / ${jumps}`; $('k-t').textContent = nSew ? time.toFixed(1) : '—'; $('k-lim').textContent = limited;
+  const bads = stitches.filter(s => s.bad);
+  const w = []; if (bads.length) w.push(`${bads.length} 针有问题：${[...new Set(bads.map(b => b.bad))].slice(0, 3).join('；')}`);
+  segs.forEach((sg, i) => { const nextContig = i < segs.length - 1 && contig[i + 1]; const chainStart = !contig[i], chainEnd = !nextContig;
+    if (!sg.trim && i < segs.length - 1 && !nextContig) w.push(`第 ${i + 1} 段结束后没有剪线，空走时会拖出一根长线`);
+    if (chainStart && sg.bt0 === 0) w.push(`第 ${i + 1} 段起针没有回针，线头容易脱开`);
+    if (chainEnd && sg.bt1 === 0) w.push(`第 ${i + 1} 段收尾没有回针，线头容易脱开`);
+    if (chainEnd && !sg.trim && i === segs.length - 1) w.push('最后一段结束后没有剪线'); });
+  $('warns').innerHTML = w.map(x => `<p class="warn">${x}</p>`).join('');
+  compile.time = time; compile.bad = bads.length; compile.trims = trims; compile.jumps = jumps;
+  grade();
+}
+
+// ---------- canvas ----------
+const cv = $('cv'), g = cv.getContext('2d');
+const K = () => (cv.width - 40) / (2 * FX);
+const toPx = p => [cv.width / 2 + p[0] * K(), cv.height / 2 - p[1] * K()];
+const toMm = (x, y) => [Math.round((x - cv.width / 2) / K()), Math.round(-(y - cv.height / 2) / K())];
+function draw(){
+  const w = cv.width, h = cv.height; g.clearRect(0, 0, w, h);
+  const a = toPx([-FX, FY]), b = toPx([FX, -FY]);
+  g.fillStyle = css('--tpl'); g.fillRect(a[0], a[1], b[0] - a[0], b[1] - a[1]);
+  g.lineWidth = 1;
+  for (let x = -FX; x <= FX; x += 5){ const p = toPx([x, FY]), q = toPx([x, -FY]); g.strokeStyle = css('--rule'); g.globalAlpha = x % 10 ? .45 : .9; g.beginPath(); g.moveTo(p[0], p[1]); g.lineTo(q[0], q[1]); g.stroke(); }
+  for (let y = -FY; y <= FY; y += 5){ const p = toPx([-FX, y]), q = toPx([FX, y]); g.globalAlpha = y % 10 ? .45 : .9; g.beginPath(); g.moveTo(p[0], p[1]); g.lineTo(q[0], q[1]); g.stroke(); }
+  g.globalAlpha = 1;
+  const o = toPx([0, 0]); g.strokeStyle = css('--muted'); g.lineWidth = 1.5; g.beginPath(); g.moveTo(o[0] - 10, o[1]); g.lineTo(o[0] + 10, o[1]); g.moveTo(o[0], o[1] - 10); g.lineTo(o[0], o[1] + 10); g.stroke();
+  g.fillStyle = css('--muted'); g.font = '18px ' + css('--f-body'); g.fillText('原点', o[0] + 8, o[1] - 8);
+  // stitches
+  stitches.forEach((st, i) => {
+    const p = toPx(st.p), pv = i ? stitches[i - 1] : null, q = toPx(pv ? pv.p : [0, 0]);
+    if (st.kind === 'jump'){ g.setLineDash([7, 5]); g.strokeStyle = css('--jump'); g.lineWidth = 2; g.beginPath(); g.moveTo(q[0], q[1]); g.lineTo(p[0], p[1]); g.stroke(); g.setLineDash([]); }
+    else if ((st.kind === 'sew' || st.kind === 'bt') && pv && pv.kind !== 'trim'){ g.strokeStyle = st.seg === selIdx ? css('--sel') : css('--seam'); g.lineWidth = st.kind === 'bt' ? 3.5 : 2; g.beginPath(); g.moveTo(q[0], q[1]); g.lineTo(p[0], p[1]); g.stroke(); }
+    if (st.kind === 'trim'){ g.fillStyle = css('--ink'); g.fillRect(p[0] - 6, p[1] - 6, 12, 12); }
+  });
+  stitches.forEach(st => { if (st.kind === 'sew' || st.kind === 'bt'){ const p = toPx(st.p); g.beginPath(); g.arc(p[0], p[1], st.bad ? 6 : 3.2, 0, 7); g.fillStyle = st.bad ? css('--bad') : (st.seg === selIdx ? css('--sel') : css('--seam')); g.fill(); } });
+  // segment in progress
+  if (cur){
+    const tmp = { ...cur, pts: hover ? cur.pts.concat([hover]) : cur.pts };
+    const { pts } = pathOf(tmp);
+    g.strokeStyle = css('--sel'); g.lineWidth = 2; g.setLineDash([5, 4]); g.beginPath(); pts.forEach((p, i) => { const q = toPx(p); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }); g.stroke(); g.setLineDash([]);
+    cur.pts.forEach(p => { const q = toPx(p); g.fillStyle = css('--sel'); g.fillRect(q[0] - 5, q[1] - 5, 10, 10); });
+  }
+  if (hover){ const q = toPx(hover); g.fillStyle = css('--muted'); g.font = '18px ' + css('--f-mono'); g.fillText(`(${hover[0]}, ${hover[1]})`, q[0] + 10, q[1] - 10); }
+  // simulation needle
+  if (sim.on && stitches.length){ const st = stitches[Math.min(sim.i, stitches.length - 1)]; const q = toPx(st.p); g.strokeStyle = css('--bad'); g.lineWidth = 2.5; g.beginPath(); g.arc(q[0], q[1], 12, 0, 7); g.moveTo(q[0] - 18, q[1]); g.lineTo(q[0] + 18, q[1]); g.moveTo(q[0], q[1] - 18); g.lineTo(q[0], q[1] + 18); g.stroke();
+    g.fillStyle = css('--ink'); g.font = '20px ' + css('--f-mono'); g.fillText(st.n ? `${Math.round(st.n)} r/min` : (st.kind === 'jump' ? '空走' : st.kind === 'trim' ? '剪线' : ''), 16, 30); }
+}
+function hintText(){
+  const m = { line:'直线：依次点击各个转角点，点“结束本段”或按回车结束。', arc:'圆弧：点起点、弧上一点、终点，三点后自动结束。', circle:'圆：先点圆心，再点圆周上一点（也是起针点）。', curve:'曲线：依次点击曲线经过的点（至少 2 个），点“结束本段”或按回车结束。' };
+  $('hint').textContent = (cur ? `正在画第 ${segs.length + 1} 段，已点 ${cur.pts.length} 点。` : '') + m[tool];
+}
+function newSeg(type){ return { type, pts:[], s:3, speed:2800, bt0:2, bt1:2, trim:true, dbl:false }; }
+function finish(){
+  if (!cur) return;
+  const need = { line:2, arc:3, circle:2, curve:2 }[cur.type];
+  if (cur.pts.length >= need){ segs.push(cur); selIdx = segs.length - 1; }
+  cur = null; refresh();
+}
+cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); const p = toMm((e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height); hover = p; draw(); });
+cv.addEventListener('pointerleave', () => { hover = null; draw(); });
+cv.addEventListener('pointerdown', e => {
+  const r = cv.getBoundingClientRect(); const p = toMm((e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height);
+  if (!cur) cur = newSeg(tool);
+  if (cur.pts.length && cur.pts[cur.pts.length - 1][0] === p[0] && cur.pts[cur.pts.length - 1][1] === p[1]) return;
+  cur.pts.push(p);
+  if ((cur.type === 'arc' && cur.pts.length === 3) || (cur.type === 'circle' && cur.pts.length === 2)) finish();
+  else { draw(); hintText(); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Enter') finish(); if (e.key === 'Escape'){ cur = null; refresh(); } if (e.key === 'Backspace' && cur && document.activeElement === document.body){ cur.pts.pop(); e.preventDefault(); draw(); hintText(); } });
+document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => { finish(); tool = b.dataset.tool; document.querySelectorAll('[data-tool]').forEach(x => x.setAttribute('aria-pressed', x === b)); hintText(); }));
+$('finish').addEventListener('click', finish);
+$('undo').addEventListener('click', () => { if (cur){ cur.pts.pop(); if (!cur.pts.length) cur = null; } else if (segs.length){ const s = segs[segs.length - 1]; s.pts.pop(); const need = { line:2, arc:3, circle:2, curve:2 }[s.type]; if (s.pts.length < need) segs.pop(); } refresh(); });
+$('del').addEventListener('click', () => { if (selIdx >= 0){ segs.splice(selIdx, 1); selIdx = Math.min(selIdx, segs.length - 1); refresh(); } });
+$('clear').addEventListener('click', () => { segs = []; cur = null; selIdx = -1; refresh(); });
+
+// ---------- segment list & properties ----------
+const TNAME = { line:'直线', arc:'圆弧', circle:'圆', curve:'曲线' };
+function refresh(){
+  const ul = $('seglist'); ul.innerHTML = '';
+  segs.forEach((sg, i) => { const li = document.createElement('li'); const b = document.createElement('button'); b.type = 'button'; b.className = i === selIdx ? 'on' : '';
+    b.innerHTML = `<span>${i + 1}. ${TNAME[sg.type]}（${sg.pts.length} 点）</span><span style="color:var(--muted)">${sg.s} mm${sg.trim ? ' · 剪线' : ''}</span>`;
+    b.addEventListener('click', () => { selIdx = i; refresh(); }); li.appendChild(b); ul.appendChild(li); });
+  if (!segs.length) ul.innerHTML = '<li class="hint">还没有花样段。用左边的工具在模板上画。</li>';
+  const pr = $('props'); pr.innerHTML = '';
+  if (selIdx >= 0 && segs[selIdx]){
+    const sg = segs[selIdx];
+    pr.innerHTML = `<div class="ctl">
+      <label for="p-s">针距</label><input id="p-s" type="range" min="0.5" max="12" step="0.5" value="${sg.s}"><b id="p-sv">${sg.s} mm</b>
+      <label for="p-n">本段限速</label><input id="p-n" type="range" min="400" max="3200" step="100" value="${sg.speed}"><b id="p-nv">${sg.speed}</b>
+      <label for="p-b0">起针回针</label><input id="p-b0" type="range" min="0" max="4" step="1" value="${sg.bt0}"><b id="p-b0v">${sg.bt0} 针</b>
+      <label for="p-b1">收尾回针</label><input id="p-b1" type="range" min="0" max="4" step="1" value="${sg.bt1}"><b id="p-b1v">${sg.bt1} 针</b>
+      <label for="p-tr">结束后剪线</label><input id="p-tr" type="checkbox" ${sg.trim ? 'checked' : ''}><span></span>
+      <label for="p-db">双重缝（原路返回）</label><input id="p-db" type="checkbox" ${sg.dbl ? 'checked' : ''}><span></span></div>`;
+    const bindR = (id, key, fmt) => $(id).addEventListener('input', e => { sg[key] = +e.target.value; $(id + 'v').textContent = fmt(sg[key]); compile(); draw(); listOnly(); });
+    bindR('p-s', 's', v => v + ' mm'); bindR('p-n', 'speed', v => v + ''); bindR('p-b0', 'bt0', v => v + ' 针'); bindR('p-b1', 'bt1', v => v + ' 针');
+    $('p-tr').addEventListener('change', e => { sg.trim = e.target.checked; compile(); draw(); listOnly(); });
+    $('p-db').addEventListener('change', e => { sg.dbl = e.target.checked; compile(); draw(); });
+  }
+  compile(); draw(); hintText();
+}
+function listOnly(){ const items = $('seglist').querySelectorAll('button'); segs.forEach((sg, i) => { if (items[i]) items[i].lastElementChild.textContent = `${sg.s} mm${sg.trim ? ' · 剪线' : ''}`; }); }
+
+// ---------- simulation ----------
+$('sim').addEventListener('click', () => { if (!stitches.length) return; sim = { on:true, i:0, t:0, last:0 }; requestAnimationFrame(step); });
+function step(ts){
+  if (!sim.on) return; if (!sim.last) sim.last = ts; const dt = (ts - sim.last) / 1000; sim.last = ts;
+  const st = stitches[sim.i]; const dur = st.n ? 60 / st.n * 8 : 0.25; // shown 8x slower
+  sim.t += dt; if (sim.t >= dur){ sim.t = 0; sim.i++; }
+  if (sim.i >= stitches.length){ sim.on = false; draw(); return; }
+  draw(); requestAnimationFrame(step);
+}
+// ---------- examples ----------
+function exFlap(){ segs = [ { ...newSeg('line'), pts:[[-30,20],[-30,-10]] , trim:false, bt1:0 }, { ...newSeg('arc'), pts:[[-30,-10],[-27,-17],[-20,-20]], bt0:0, bt1:0, trim:false }, { ...newSeg('line'), pts:[[-20,-20],[20,-20]], bt0:0, bt1:0, trim:false }, { ...newSeg('arc'), pts:[[20,-20],[27,-17],[30,-10]], bt0:0, bt1:0, trim:false }, { ...newSeg('line'), pts:[[30,-10],[30,20]], bt0:0 } ]; selIdx = 0; refresh(); }
+function exRectCircle(){ segs = [ { ...newSeg('line'), pts:[[-20,15],[20,15],[20,-15],[-20,-15],[-20,15]] }, { ...newSeg('circle'), pts:[[0,0],[8,0]] } ]; selIdx = 0; refresh(); }
+$('ex1').addEventListener('click', exFlap); $('ex2').addEventListener('click', exRectCircle);
+$('thk').addEventListener('input', e => { P.thk = +e.target.value; $('thkv').textContent = P.thk + ' mm'; compile(); draw(); });
+$('nmax').addEventListener('input', e => { P.nmax = +e.target.value; $('nmaxv').textContent = P.nmax; compile(); draw(); });
+
+// ---------- guide ----------
+const LESSONS = [
+  ['认识模板坐标', '<p>花样机的坐标原点在模板中心（开机回原点后，机针正对这一点）。X 向右、Y 向上，单位毫米。本实验网格 5 mm，鼠标位置吸附到整毫米，右上角显示坐标。</p><p>花样文件里记录的是每一针相对上一针的位移（单位 0.1 mm），所以原点必须和实际模板对准。</p>'],
+  ['画直线段', '<p>选“直线”，依次点击转角点，点“结束本段”或按回车。程序把每条边按针距等分，<b>每个转角都会落一针</b>，所以尖角不会被缝成圆角。</p><p>试一试：画一个 40 × 30 mm 的矩形，最后一点点回起点闭合。</p>'],
+  ['圆弧与圆角', '<p>选“圆弧（三点）”，点起点、弧上任一点、终点。口袋盖的圆角就是一段圆弧。小半径圆弧上针距应该缩小（例如 R5 用 2 mm），否则线迹会变成折线。</p><p>点“示例：口袋盖”看直线和圆弧怎样首尾相接成一个连续段。</p>'],
+  ['针距、回针与双重缝', '<p>在右边“花样段”里选中一段，可以改针距、本段限速、起针和收尾的回针针数。回针是在起点和终点来回缝几针，把线头锁住；回针太多会在布面上堆成硬疙瘩，一般 2–3 针。</p><p>双重缝让机器沿原路再缝一遍，用在受力大的地方。</p>'],
+  ['多段花样：剪线与空走', '<p>两段不相连的花样之间，机器要先剪线、抬中压脚，空走到下一段起点，再放下中压脚、慢速起针。橙色虚线就是空走。</p><p>一段结束后若没有勾选“剪线”，空走会拖出一根长线。减少段数、安排好段的顺序，可以减少剪线和空走的时间。</p>'],
+  ['检查与限速', '<p>程序按第 15.3–15.4 节逐针计算：每针要在机针离布的窗口内走完，并按前瞻算法安排转速。右下角显示被限速的针数和周期时间；超出缝纫区、针距超过 12.7 mm 的针标红。</p><p>把“布 + 下模板厚”调大，看周期时间怎样变长。</p>'],
+  ['输出花样文件', '<p>右下角是生成的花样文件：HEAD 文件头，SEW 缝一针，JUMP 空走，TRIM 剪线，END 结束。坐标用整数 0.1 mm 的增量表示，由四舍五入后的绝对坐标相减得到，所以不会累积误差。</p><p>点“仿真缝制”，看机针按文件顺序走一遍。</p>'],
+];
+let lessonIdx = 0;
+function renderSteps(){ const ol = $('steps'); ol.innerHTML = ''; LESSONS.forEach((l, i) => { const li = document.createElement('li'); li.textContent = l[0]; li.className = i === lessonIdx ? 'on' : ''; li.tabIndex = 0; li.addEventListener('click', () => { lessonIdx = i; renderSteps(); }); li.addEventListener('keydown', e => { if (e.key === 'Enter'){ lessonIdx = i; renderSteps(); } }); ol.appendChild(li); }); $('lesson').innerHTML = LESSONS[lessonIdx][1]; }
+
+// ---------- tasks (auto graded) ----------
+function bbox(pts){ const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; }
+const TASKS = [
+  { t:'任务 1：矩形框', d:'缝一个 40 × 30 mm 的闭合矩形，针距 3 mm，起针、收尾各回针 2 针。', check(){
+    const s = segs.filter(x => x.type === 'line'); if (!s.length) return [false, '还没有直线段'];
+    for (const sg of s){ const p = sg.pts; if (p.length < 5) continue; const c = p[0][0] === p[p.length - 1][0] && p[0][1] === p[p.length - 1][1]; const b = bbox(p);
+      if (!c) return [false, '矩形没有闭合：最后一点要回到起点'];
+      if (Math.abs(b[2] - b[0] - 40) > 1 || Math.abs(b[3] - b[1] - 30) > 1) return [false, `尺寸是 ${b[2] - b[0]} × ${b[3] - b[1]} mm`];
+      if (Math.abs(sg.s - 3) > 0.01) return [false, '针距不是 3 mm'];
+      if (sg.bt0 < 2 || sg.bt1 < 2) return [false, '回针不足 2 针'];
+      return [true, '完成']; }
+    return [false, '需要一段 5 个点（含回到起点）的直线段']; } },
+  { t:'任务 2：口袋盖', d:'缝一个 60 × 40 mm、底部两个圆角的 U 形口袋盖（上边不缝），全程一段连续线迹、只剪一次线。', check(){
+    if (!stitches.length) return [false, '还没有花样'];
+    const sew = stitches.filter(x => x.kind === 'sew' || x.kind === 'bt').map(x => x.p); const b = bbox(sew);
+    if (Math.abs(b[2] - b[0] - 60) > 1.5 || Math.abs(b[3] - b[1] - 40) > 1.5) return [false, `外形是 ${(b[2] - b[0]).toFixed(0)} × ${(b[3] - b[1]).toFixed(0)} mm`];
+    if (!segs.some(x => x.type === 'arc')) return [false, '底部圆角要用圆弧'];
+    if (compile.jumps > 1) return [false, `空走了 ${compile.jumps} 次：各段要首尾相接（只有开头一次空走）`];
+    if (compile.trims !== 1) return [false, `剪线 ${compile.trims} 次：只在最后剪一次`];
+    return [true, '完成']; } },
+  { t:'任务 3：两段花样', d:'在任务 1 的矩形里再缝一个直径 16 mm 的圆，两段之间要剪线，不能有标红的针。', check(){
+    const hasRect = segs.some(x => x.type === 'line' && x.pts.length >= 5), hasC = segs.some(x => x.type === 'circle' && Math.abs(Math.hypot(x.pts[1][0] - x.pts[0][0], x.pts[1][1] - x.pts[0][1]) - 8) <= 0.6);
+    if (!hasRect) return [false, '缺矩形']; if (!hasC) return [false, '缺直径 16 mm 的圆'];
+    if (compile.trims < 2) return [false, '两段各自结束后都要剪线'];
+    if (compile.bad) return [false, '有标红的针']; return [true, '完成']; } },
+  { t:'任务 4：压缩周期时间', d:'在任务 3 的基础上，布 + 下模板厚设为 3 mm，不改形状，通过针距、回针和段的起点安排，把周期时间压到 4.7 秒以内；针距不大于 4 mm，每段起止至少回针 1 针。', check(){
+    if (P.thk !== 3) return [false, '先把布 + 下模板厚设为 3 mm'];
+    if (segs.length < 2) return [false, '先完成任务 3'];
+    if (segs.some(x => x.s > 4)) return [false, '有段的针距大于 4 mm'];
+    if (compile.bad) return [false, '有标红的针'];
+    if (segs.some(x => x.bt0 < 1 || x.bt1 < 1)) return [false, '每段起止至少回针 1 针'];
+    if (!(compile.time < 4.7)) return [false, `现在是 ${compile.time.toFixed(1)} s，还差 ${(compile.time - 4.7).toFixed(1)} s`];
+    return [true, `完成：${compile.time.toFixed(1)} s`]; } },
+];
+function grade(){ const box = $('tasks'); box.innerHTML = TASKS.map(t => { const [ok, msg] = t.check(); return `<div class="task"><span class="st ${ok ? 'ok' : 'no'}">${ok ? '✓' : '○'}</span> <b>${t.t}</b><small>${t.d}</small><small style="color:${ok ? 'var(--ok)' : 'var(--muted)'}">${msg}</small></div>`; }).join(''); }
+
+renderSteps(); refresh();
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

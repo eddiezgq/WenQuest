@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>剪线时序编辑器</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = needle path (front view), timing chart, stitch preview; right rail = checks, controls, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style>
+<div class="wrap">
+<header><h1>剪线时序编辑器</h1><span class="sub">《缝纫机设计与制造》第 14 章 · 虚拟实验 14-1 · 在第 8 章的时刻表上安排剪线电磁铁、松线、停针和拨线，看是剪断、剪不断还是起缝脱线</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>时刻表（横轴从最后一针的 180° 画到下一转的 120°；绿色为允许进刀的窗口，红色为考虑延迟后的实际进刀范围）</h3>
+      <canvas id="tl" width="1100" height="560" aria-label="剪线时序图"></canvas>
+    </section>
+    <section class="panel">
+      <h3>试剪 50 次（每次的延迟在设定范围内随机）</h3>
+      <canvas id="trials" width="1100" height="150" aria-label="50 次试剪的结果"></canvas>
+      <div class="row"><button id="try" type="button">再试 50 次</button><span class="note" style="margin:0" id="trialtxt"></span></div>
+    </section>
+    <p class="note">模型（示意）：针杆运动和时刻表取自第 3、8 章算例；动刀由电磁铁经连杆直接驱动，进刀角 = 发令角 + 6 × 转速 × 延迟，要在 300°–330° 之间钻进线环（专利中在针尖高出针板约 10 mm、本模型约 291° 时通电）；动刀在挑线杆最高点（下一转 55°）与定刀剪断；剪断后伺服以最大减速度（约 4400 rad/s²，第 13 章）停车，必须在针尖入布（101.7°）前 5° 停住；夹线器至少要在 335°–下一转 55° 松开，否则面线留头太短。电磁铁延迟在设定的最小、最大值之间变化。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>判定</h3><div class="checks" id="checks"></div><div class="msg" id="verdict" style="font-weight:600"></div></section>
+    <section class="panel">
+      <h3>调整</h3>
+      <div class="prm">
+        <label for="n">剪线转速（r/min）</label><input id="n" type="range" min="100" max="1200" step="10" value="300"><output id="nv"></output>
+        <label for="pc">剪线电磁铁发令角（°）</label><input id="pc" type="range" min="200" max="359" step="1" value="290"><output id="pcv"></output>
+        <label for="t1">电磁铁延迟：最小（ms）</label><input id="t1" type="range" min="2" max="20" step="0.5" value="6"><output id="t1v"></output>
+        <label for="t2">电磁铁延迟：最大（ms）</label><input id="t2" type="range" min="2" max="20" step="0.5" value="10"><output id="t2v"></output>
+        <label for="r1">松线开始（°）</label><input id="r1" type="range" min="280" max="400" step="1" value="330"><output id="r1v"></output>
+        <label for="r2">松线结束（°，360 以上为下一转）</label><input id="r2" type="range" min="340" max="460" step="1" value="420"><output id="r2v"></output>
+        <label for="wp">剪线后拨线</label><select id="wp"><option value="1">拨线</option><option value="0">不拨线</option></select><span></span>
+      </div>
+      <div class="row"><button id="reset" type="button">恢复标准</button><button id="mess" type="button">打乱</button></div>
+    </section>
+    <section class="panel">
+      <h3>任务</h3><div id="tasks"></div>
+      <div class="row" style="font-size:.84rem">最高剪线转速：<input id="nm" type="number" step="10" aria-label="最高剪线转速"> r/min<button id="nmChk" type="button">核对</button></div>
+      <div class="msg" id="msg"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), D=Math.PI/180;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+// ---------- model (model14.py) ----------
+const Rr=15.5,Ll=55,T=1.5,lam=Rr/Ll;
+const X=f=>{const a=f*D;return Rr*(1-Math.cos(a))-Ll*(1-Math.sqrt(1-(lam*Math.sin(a))**2));};
+const HT=T+X(101.7), ztip=f=>HT-X(((f%360)+360)%360);
+const KN=[300,330], CUT=415, REL=[335,415], STOPMAX=360+101.7-5, ALPHA=(2.5+0.15)/6e-4;
+const STD={n:300,pc:290,t1:6,t2:10,r1:330,r2:420,wp:1};
+const ST={...STD};
+const stopAngle=n=>{const w=n*2*Math.PI/60;return CUT+w*w/(2*ALPHA)/D;};
+function judgeOne(p,td){const e=p.pc+6*p.n*td;const f=[];if(e<KN[0])f.push('early');if(e>KN[1])f.push('late');return {e,f};}
+function evaluate(){const p=ST,lo=Math.min(p.t1,p.t2)/1000,hi=Math.max(p.t1,p.t2)/1000;
+  const e1=p.pc+6*p.n*lo,e2=p.pc+6*p.n*hi,st=stopAngle(p.n);
+  const C=[
+    {k:'early',n:'动刀进刀不早于 300°',ok:e1>=KN[0],v:`${e1.toFixed(0)}°`,bad:'进得太早：线环还没被梭带过梭壳、转到刀的路径上，挂不住连布的那根面线，面线剪不断（只剪断底线）'},
+    {k:'late',n:'动刀进刀不晚于 330°',ok:e2<=KN[1],v:`${e2.toFixed(0)}°`,bad:'进得太晚：线环已经脱出、被挑线杆拉走，面线剪不断'},
+    {k:'stop',n:'剪断后在入布前停住（≤ 96.7°）',ok:st<=STOPMAX,v:`${(st-360).toFixed(0)}°`,bad:'剪线转速太高，剪断后停不住，机针扎进布里'},
+    {k:'rel',n:'松线覆盖 335°–下一转 55°',ok:p.r1<=REL[0]&&p.r2>=REL[1],v:`${p.r1}°–${p.r2>=360?(p.r2-360)+'°(次转)':p.r2+'°'}`,bad:'没松线或松得不够：挑线杆收线时从针眼外的线头抽线，留头太短，起缝脱线'},
+    {k:'wipe',n:'剪线后拨线',ok:p.wp===1,v:p.wp?'拨':'不拨',bad:'面线头留在压脚下，下一道起缝时容易在布底绕成线团'}];
+  const allOK=C.every(c=>c.ok);return {C,allOK,e1,e2,st};}
+let R_=null,TR=[];
+function render(){$('checks').innerHTML=R_.C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${c.ok?'':`<small>${c.bad}</small>`}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');
+  $('verdict').innerHTML=R_.allOK?'<span class="ok" style="color:var(--ok)">结果：剪断，停在上针位，下一道顺利起缝</span>':'<span style="color:var(--bad)">结果：有问题，见上面打 ✗ 的项</span>';}
+// ---------- drawing ----------
+function draw(){const [c,g]=ctx('tl'),W=c.width,H=c.height,x0=110,x1=W-16,Xf=f=>x0+(x1-x0)*(f-180)/300;const mut=css('--muted');g.font='12px '+css('--f-body');
+  for(let f=180;f<=480;f+=30){g.strokeStyle=css('--rule');g.beginPath();g.moveTo(Xf(f),10);g.lineTo(Xf(f),H-24);g.stroke();g.fillStyle=mut;g.textAlign='center';g.fillText((f%360)+'°',Xf(f),H-8);}
+  // needle
+  const Yn=z=>130-100*(z+2)/34;g.strokeStyle=css('--ink');g.lineWidth=2;g.beginPath();for(let f=180;f<=480;f+=2){const p=[Xf(f),Yn(ztip(f))];f>180?g.lineTo(...p):g.moveTo(...p);}g.stroke();
+  g.setLineDash([4,4]);g.strokeStyle=mut;g.lineWidth=1;g.beginPath();g.moveTo(x0,Yn(0));g.lineTo(x1,Yn(0));g.stroke();g.setLineDash([]);
+  g.textAlign='start';g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.fillText('针尖',10,60);
+  const ev=[[206,'钩线'],[258.3,'针出布'],[293,'放线最多'],[341,'线环脱出'],[415,'挑线杆最高'],[461.7,'针入布']];
+  g.font='12px '+css('--f-body');for(const [f,l] of ev){g.fillStyle=css('--ink');g.fillRect(Xf(f)-1,140,2,14);g.textAlign='center';g.fillText(l,Xf(f),168);}
+  const rows={knife:200,cut:270,rel:340,stop:410,wipe:480};g.textAlign='start';g.font='600 13px '+css('--f-body');g.fillStyle=css('--ink');
+  g.fillText('动刀进刀',10,rows.knife+18);g.fillText('剪断',10,rows.cut+18);g.fillText('松线',10,rows.rel+18);g.fillText('停针',10,rows.stop+18);g.fillText('拨线',10,rows.wipe+18);
+  g.font='12px '+css('--f-body');
+  g.fillStyle=css('--ok');g.globalAlpha=.2;g.fillRect(Xf(KN[0]),rows.knife,Xf(KN[1])-Xf(KN[0]),28);g.globalAlpha=1;
+  g.fillStyle=css('--bad');g.beginPath();g.arc(Xf(ST.pc),rows.knife+14,6,0,7);g.fill();g.textAlign='end';g.fillText(`发令 ${ST.pc}°`,Xf(ST.pc)-10,rows.knife+18);g.textAlign='start';
+  const a=Math.max(180,R_.e1),b=Math.min(480,R_.e2);g.globalAlpha=.75;g.fillRect(Xf(a),rows.knife+6,Math.max(2,Xf(b)-Xf(a)),16);g.globalAlpha=1;
+  g.strokeStyle=css('--bad');g.setLineDash([3,3]);g.beginPath();g.moveTo(Xf(ST.pc),rows.knife+14);g.lineTo(Xf(a),rows.knife+14);g.stroke();g.setLineDash([]);
+  // trial dots
+  for(const t of TR){g.fillStyle=t.ok?css('--ok'):css('--bad');g.beginPath();g.arc(Xf(Math.min(480,t.e)),rows.knife+36,2.5,0,7);g.fill();}
+  // knife motion & cut
+  g.strokeStyle=css('--bad');g.lineWidth=3;g.beginPath();g.moveTo(Xf(Math.min(480,R_.e2)),rows.cut+18);g.lineTo(Xf(340),rows.cut+18);g.lineTo(Xf(CUT),rows.cut+4);g.stroke();g.lineWidth=1;
+  g.fillStyle=css('--warn');g.beginPath();g.arc(Xf(CUT),rows.cut+4,6,0,7);g.fill();g.fillText('与定刀剪断（下一转 55°）',Xf(CUT)+10,rows.cut+8);
+  // release
+  g.fillStyle=css('--bt');g.globalAlpha=.25;g.fillRect(Xf(REL[0]),rows.rel-6,Xf(REL[1])-Xf(REL[0]),4);g.globalAlpha=1;g.fillStyle=css('--muted');g.fillText('需要：335°–55°',Xf(REL[0]),rows.rel-10);
+  g.fillStyle=css('--bt');g.globalAlpha=.55;g.fillRect(Xf(Math.max(180,ST.r1)),rows.rel,Xf(Math.min(480,ST.r2))-Xf(Math.max(180,ST.r1)),28);g.globalAlpha=1;
+  // stop
+  g.fillStyle=css('--nt');g.globalAlpha=.15;g.fillRect(Xf(420),rows.stop,Xf(STOPMAX)-Xf(420),28);g.globalAlpha=1;
+  const st=Math.min(480,R_.st);g.fillStyle=R_.C[2].ok?css('--nt'):css('--bad');g.beginPath();g.arc(Xf(st),rows.stop+14,7,0,7);g.fill();g.fillText(`停在 ${(R_.st-360).toFixed(0)}°`,Xf(st)+10,rows.stop+18);
+  if(ST.wp){g.fillStyle=css('--muted');g.beginPath();g.arc(Xf(st),rows.wipe+14,7,0,7);g.fill();g.fillText('主轴停稳以后拨线器一扫',Xf(st)+12,rows.wipe+18);}
+  else{g.fillStyle=css('--bad');g.fillText('不拨线',Xf(420),rows.wipe+18);}}
+function trials(){TR=[];const lo=Math.min(ST.t1,ST.t2)/1000,hi=Math.max(ST.t1,ST.t2)/1000;let ok=0;
+  for(let k=0;k<50;k++){const td=lo+(hi-lo)*Math.random();const j=judgeOne(ST,td);const good=j.f.length===0&&R_.C[2].ok&&R_.C[3].ok&&R_.C[4].ok;if(good)ok++;TR.push({e:j.e,ok:good});}
+  const [c,g]=ctx('trials'),W=c.width;const w=(W-40)/50;TR.forEach((t,i)=>{g.fillStyle=t.ok?css('--ok'):css('--bad');g.fillRect(20+i*w,30,w-3,70);});
+  g.fillStyle=css('--ink');g.font='600 14px '+css('--f-body');g.fillText(`成功 ${ok} / 50`,20,20);$('trialtxt').textContent=ok===50?'每次都剪断了。':`有 ${50-ok} 次失败：延迟的变化把进刀角推出了窗口，或其他条件不满足。`;return ok;}
+// ---------- controls ----------
+const fmt={n:v=>v.toFixed(0),pc:v=>v.toFixed(0),t1:v=>v.toFixed(1),t2:v=>v.toFixed(1),r1:v=>v.toFixed(0),r2:v=>v>=360?`${v-360}（次转）`:v.toFixed(0)};
+function syncUI(){for(const k in fmt){$(k).value=ST[k];$(k+'v').textContent=fmt[k](ST[k]);}$('wp').value=String(ST.wp);}
+function changed(){syncUI();R_=evaluate();render();trials();draw();note();checkTasks();}
+for(const k in fmt)$(k).addEventListener('input',()=>{ST[k]=+$(k).value;changed();});
+$('wp').onchange=()=>{ST.wp=+$('wp').value;changed();};
+$('reset').onclick=()=>{Object.assign(ST,STD);seen.messed=false;changed();};
+$('mess').onclick=()=>{Object.assign(ST,{pc:250,r1:350,r2:380,wp:0});seen.messed=true;changed();};
+$('try').onclick=()=>{trials();draw();};
+// ---------- tasks ----------
+const seen={messed:false,fast:false,nm:false};
+function note(){if(ST.n>=700&&ST.t1===STD.t1&&ST.t2===STD.t2&&R_.allOK)seen.fast=true;}
+const TASKS=[
+  {t:'按“打乱”，再把发令角、松线和拨线调好，让五项判定全部通过（转速和延迟保持标准）。',d:'先看红色的实际进刀范围落在哪里，再看松线覆盖了哪一段。按“恢复标准”不算。',ok:()=>seen.messed&&R_.allOK&&ST.n===STD.n&&ST.t1===STD.t1&&ST.t2===STD.t2},
+  {t:'把剪线转速提到 700 r/min 以上（延迟仍为 6–10 ms），重新选发令角，让全部判定通过、50 次试剪都成功。',d:'转速翻倍，同样的毫秒数折合的度数也翻倍，发令要更早；红色范围也变宽了。',ok:()=>seen.fast},
+  {t:'电源电压偏低、弹簧磨损，延迟变成 5–15 ms。算出这时还能保证每次剪断的最高剪线转速，填在下面。',d:'红色范围的宽度是 6n(t_max − t_min)，它要装进 30° 的窗口；别忘了停车的限制。允许 ±5%。',ok:()=>seen.nm}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+function nmax(lo,hi){const a=hi>lo?30/(6*(hi-lo)):1e9;const w=Math.sqrt((STOPMAX-CUT)*D*2*ALPHA);return Math.min(a,w*60/(2*Math.PI));}
+$('nmChk').onclick=()=>{const m=nmax(0.005,0.015),v=+$('nm').value;
+  if($('nm').value!==''&&Math.abs(v-m)/m<=0.05){seen.nm=true;$('msg').textContent=`正确：约 ${m.toFixed(0)} r/min。延迟变化 10 ms，30° 的窗口只容得下 n = 30 /(6 × 0.010) = 500 r/min；停车限制约 770 r/min，不起作用。把延迟调成 5–15 ms、转速 500、发令角调到 285°（进刀正好 300°–330°），试一试 50 次是否都成功。`;}
+  else $('msg').textContent='还不对：6 × n × (0.015 − 0.005) ≤ 30，解出 n；再和停车限制比较，取小的那个。';checkTasks();};
+window.__api={ST,STD,evaluate,changed,done,seen,nmax,trials,mess:()=>$('mess').click(),nm:v=>{$('nm').value=v;$('nmChk').click();}};
+changed();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

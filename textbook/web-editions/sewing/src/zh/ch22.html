@@ -1,0 +1,336 @@
+<p class="eyebrow">auto</p><h1>auto</h1><div class="seam" aria-hidden="true"></div>
+<div class="chips"><span class="chips-label">本章互动资源</span><a class="chip" href="#lab-testbench"><b>虚拟实验</b>自动化测试台</a><a class="chip" href="#lab-trim"><b>虚拟实验</b>剪线时序编辑器</a><a class="chip" href="#lab-servo"><b>虚拟实验</b>停针定位：伺服调参</a></div>
+<aside class="field"><p>本章用到第 13 章的停针定位模型和电磁铁延迟、第 14 章的剪线时序、第 18 章的生产测试与老化、第 26 章的 MQTT 上报，以及第 19 章的 WQ-SC 平台（事件表、状态机、硬件抽象层）。统计部分只需要二项分布和正态分布的基本概念。</p></aside>
+<p>第 19 章用零件库里的模块搭起了 WQ-SC 平台，第 20、21 章在它上面做出了平缝、包缝、花样机和缩比横机四种电控原型。原型能动、能缝，离工业级产品还差得很远：它要在几千台机器上、几年里、几百万次剪线中都按同一个样子工作。这一段距离不是靠哪一次灵感走完的，而是靠一轮又一轮“改一点、测一遍”。零件库让配套快，平台让搭建快，固件框架让改动快；三者都快了以后，瓶颈就落在测试上。如果每改一次固件都要一个老师傅坐在机器前试缝半天，迭代就快不起来，而且他测不出的东西照样会流到用户手里。</p>
+<p>所以本章讲的是测试的<strong>自动化</strong>：每一次改动都被自动测出来，测试结果都对应到需求编号上，进数字工厂的历史库；原型能不能升到下一个成熟度，也由这些数据决定。全章围绕一个贯穿的例子：一次看起来很划算的固件优化，让剪线在高转速下偶发失败，手工试缝发现不了，每晚的硬件在环测试当天夜里就把它抓住了。</p>
+<h3 id="s22-1">22.1 引子：一个只在高速时出现的剪线失败</h3>
+<p>WQ-SC/LS 平缝原型的固件到了 v1.3.2，各项指标都已达标。一位工程师想把停车剪线做快一点。第 14 章算过，从 4000 r/min 停车剪线约 0.38 s：主轴先按伺服能力的 60% 减速到 300 r/min，减速段在剪线那一针开始（0°）之前结束，然后以 300 r/min 缝完剪线针，290° 给剪线电磁铁发令，下一转 55° 剪断。他的改法很直接（v1.4.0）：减速按伺服能力的 100% 规划；减速段不必在剪线针之前结束，推迟到剪线针的 180°，让减速和剪线针重叠。算下来，从 4000 r/min 停车到剪断从 377 ms 缩到 219 ms，每次省约 0.16 s。按第 14 章的说法，一个操作工一天剪几千次线，这就是每天十来分钟。</p>
+<p>他在原型上试缝：3000、3500、4000 r/min 各踩几十次，剪线干净利落，再在软件在环（SIL）里跑了一遍剪线转速扫描，全部通过。版本合并了。当天夜里，硬件在环（HIL）台架上的剪线转速扫描报了红：从 5000 r/min 停车的 250 次剪线里，43 次没有剪断面线。</p>
+<p>原因藏在一条他没有想到的曲线里（图 22-1）。伺服电机的减速能力并不是常数：转速低于基速时，能力受电流限制，约 4400 rad/s²（第 13 章）；高于基速，电机进入恒功率区，可用转矩随转速升高而下降，基速本身又随电网电压变化。v1.3.2 只用 60% 的能力，余量把这一点吞掉了；v1.4.0 用满 100%，又把减速终点推到剪线针中间，高速起步时主轴跟不上参考曲线，到 290° 发令时还没有降到 300 r/min。剪线电磁铁的延迟是 6–10 ms，动刀进刀角 = 290° + 6nt（第 14 章）；发令时转速超过约 667 r/min，延迟 10 ms 时进刀就晚过 330°，剪不断。算例中电网电压正常时，从 5000 r/min 停车发令时的转速约 514 r/min，还剪得断；电压低 10%，转速约 1150 r/min，必然剪不断。电压随时在波动，于是失败是“偶发”的：4500 r/min 以下与改动前相同（约 0.012%，来自电磁铁延迟本身的尾部），4750 r/min 约 1.2%，5000 r/min 约 17%。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c22_intro.png"><img src="img/fig_c22_intro.png" alt="图 22-1　只在高速时出现的剪线失败" loading="lazy"></a><figcaption>图 22-1　只在高速时出现的剪线失败：一次剪线失败的概率（左）和剪线电磁铁发令时的主轴转速（右）与松开脚踏时转速的关系（算例，示意值）</figcaption></figure>
+<p>手工试缝为什么测不出？有三个原因，每一个都是本章要解决的问题。第一，<strong>工况覆盖不到</strong>：人试缝时习惯在 3000–4000 r/min 踩，很少一脚踩到 5000 r/min 再松开，而且不会特意在电网电压偏低时试；在 3000–4000 r/min 试 50 次，看到一次失败的概率只有约 0.6%。第二，<strong>次数不够</strong>：即使在 4750 r/min 试，失败率 1.2%，试 50 次有一半的机会一次也看不到（22.6 节）。第三，<strong>模型不够</strong>：SIL 用的是第 13 章的理想电机，没有恒功率区，所以 SIL 扫描全部通过；HIL 台架的电机仿真器用的是按样机实测的转矩–转速曲线，才把它暴露出来。这三条合起来就是自动化测试的出发点：让机器按规定的工况、足够的次数、足够真实的模型，每天晚上把该测的都测一遍。</p>
+<h3 id="s22-2">22.2 测试金字塔</h3>
+<p>把测试按“离真机多远”分层，越往下越快、越便宜、跑得越勤，用例也越多；越往上越接近真实，但越慢、越贵。画出来是一个金字塔（图 22-2）。WQ-SC 平台的测试分五层，和第 18 章的 V 模型右边那一路是对应的。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c22_pyramid.png"><img src="img/fig_c22_pyramid.png" alt="图 22-2　测试金字塔" loading="lazy"></a><figcaption>图 22-2　测试金字塔：五层测试各测什么、多快、多贵（WQ-SC/LS 原型的示意值）</figcaption></figure>
+<p><strong>单元测试</strong>　测固件里的单个函数：编码器计数换算成 0.1° 角度、事件表的解析和查找、状态机在每种输入下转到哪个状态、故障码的编码。第 19 章的固件框架把硬件访问都收在 HAL 后面，所以这些函数可以在电脑上编译运行，几百个用例一分钟跑完。单元测试能发现的是逻辑错误：边界角 359.9° 到 0° 的跨越、参数越界、状态机漏了一条转移。它测不出时序和物理：v1.4.0 的减速规划函数本身算得完全正确，单元测试通过。</p>
+<p><strong>软件在环 SIL</strong>　把固件的控制部分和一个机器模型连起来，在电脑上按仿真时间运行。机器模型就是本书各章虚拟实验里的那些模型：第 13 章的主轴伺服和电磁铁，第 14 章的剪线时序，第 15 章的 X–Y 插补，第 17 章的选针。SIL 一次跑几分钟，可以做大量参数扫描：惯量 ±20%、摩擦 ±30%、电磁铁延迟 6–10 ms。它的边界就是模型的边界：模型里没有的物理（恒功率区、中断抖动、真实的电磁铁），SIL 看不见。</p>
+<p><strong>硬件在环 HIL</strong>　真的 WQ-SC 主控板、真的驱动板和电磁铁，接到一台实时仿真器上；仿真器按实测参数算主轴和机构的运动，产生编码器信号送回主控。固件跑在真实的芯片上，中断、DMA、CAN FD 总线都是真的，所以实时性问题、驱动器的真实特性、电磁铁的真实延迟都能测到；还可以故意制造现实中难得一见的故障：编码器断线、过流、电压跌落。HIL 一轮几个小时，放在晚上跑。</p>
+<p><strong>整机测试台</strong>　真机头装在通用测试台上（22.4 节），负载电机加载，相机看线迹，长时间跑。它测的是模型里根本没有的东西：线迹质量、回针对齐、机械间隙、温升、噪声。一轮一两天，每周或每个候选版本跑一次。</p>
+<p><strong>出厂测试 EOL</strong>　产品下线时每台都做的测试（第 18 章）。它的对象和前四层不同：前四层验证的是<em>设计</em>，假定被测的那台样机是好的；EOL 验证的是<em>这一台</em>装得对不对、元件好不好，设计默认已经验证过了。</p>
+<div class="tbl"><table><caption>表 22-1　测试金字塔的五层（WQ-SC/LS 原型，示意值）</caption><thead><tr><th>层</th><th>被测对象 + 环境</th><th>用例数</th><th>跑一遍</th><th>频率</th><th>主要缺陷类型</th><th>贵在哪里</th></tr></thead><tbody>
+<tr><td>单元</td><td>固件函数，电脑上</td><td>≈400</td><td>&lt; 1 min</td><td>每次提交</td><td>逻辑、边界、换算</td><td>几乎为零</td></tr>
+<tr><td>SIL</td><td>固件 + 机器模型，电脑上</td><td>≈60</td><td>5–10 min</td><td>每次提交</td><td>时序配合、控制参数、参数敏感性</td><td>服务器时间；建模</td></tr>
+<tr><td>HIL</td><td>真主控与驱动 + 实时仿真器</td><td>≈40</td><td>3–4 h</td><td>每晚</td><td>实时性、真实驱动与执行器、故障处理</td><td>台架（每套几万元量级，示意）</td></tr>
+<tr><td>整机测试台</td><td>真机头 + 测功 + 相机</td><td>≈15</td><td>约 2 天</td><td>每周 / 候选版本</td><td>线迹、机械、热、噪声</td><td>机头磨损、布和线、人工看结果</td></tr>
+<tr><td>出厂 EOL</td><td>每台产品 + 工装</td><td>≈12 项</td><td>3–5 min/台</td><td>每台</td><td>装配、元件、接线</td><td>节拍和工装</td></tr>
+</tbody></table></div>
+<p>分层的要点是：<strong>一个缺陷应该在能发现它的最低那一层被发现</strong>。同一个缺陷，在单元测试里发现，改代码几分钟；在 HIL 里发现，要等一夜、要二分定位；在整机测试台发现，要拆机头；到了用户那里，就是返修、索赔和名声。所以每当高层抓到一个缺陷，修完以后都要问一句：能不能在低一层加一个用例把它抓住？22.9 节的案例最后做的就是这件事。</p>
+<h3 id="s22-3">22.3 需求—测试—结果的追溯</h3>
+<p>自动化测试的第一步不是写脚本，而是把“要测什么”写成编号的需求。每一条需求有编号（REQ-…）、一句可以判定的话、一个数值判据和它的来源；每一个测试用例都标明它验证哪一条需求。PLATFORM 共用设定里的那组验收指标，第 20–22 章都用同一组编号（表 22-2）。</p>
+<div class="tbl"><table><caption>表 22-2　WQ-SC 原型的验收需求（示意值）</caption><thead><tr><th>编号</th><th>需求（可判定的说法）</th><th>判据</th><th>来源</th></tr></thead><tbody>
+<tr><td>REQ-POS-01</td><td>主轴停在上针位，停车过程中越过目标的最大角度和最终误差都不超过限值</td><td>≤ ±1°；50 次停车 Cpk ≥ 1.33</td><td>第 13 章</td></tr>
+<tr><td>REQ-TRM-01</td><td>从 3000 r/min 到最高转速的任一转速停车剪线，面线、底线都剪断</td><td>成功率 ≥ 99.5%（置信度 95%）；单点 1000 次最多 1 次失败</td><td>第 14 章</td></tr>
+<tr><td>REQ-BT-01</td><td>自动回针的针迹与正缝对齐</td><td>偏差 ≤ 0.3 mm（200 段的最大值）</td><td>第 14 章</td></tr>
+<tr><td>REQ-SOL-01</td><td>剪线等电磁铁在剪线转速下的吸合、释放延迟折算转角</td><td>≤ 20°</td><td>第 13 章</td></tr>
+<tr><td>REQ-THM-01</td><td>最高转速连续运转 4 h</td><td>温升 ≤ 40 K（示意），无故障码</td><td>第 18 章</td></tr>
+<tr><td>REQ-XY-01</td><td>花样机 X–Y 跟随；针在布中时 X–Y 不动</td><td>跟随误差 ≤ 0.05 mm；针在布中位移为 0</td><td>第 15、21 章</td></tr>
+<tr><td>REQ-KN-01</td><td>横机选针器按机头位置逐针动作</td><td>时序误差 ≤ 0.1 针距对应的机头位移</td><td>第 17、21 章</td></tr>
+<tr><td>REQ-SAFE-01</td><td>过流、编码器丢失、超时、急停任一发生，进入 SAFE 状态</td><td>≤ 50 ms（示意），执行器全部断电</td><td>第 19 章状态机</td></tr>
+</tbody></table></div>
+<p>需求和用例之间是多对多的：一条需求在不同层有不同的用例，一个用例也可能同时验证几条需求。把它们排成一张表，就是<strong>追溯矩阵</strong>（表 22-3）。它回答三个问题：每条需求有没有被测到（没有用例的需求等于没有需求）；某个用例失败了，影响哪条需求、哪些产品；某条需求改了（比如剪线成功率提到 99.9%），要改哪些用例。追溯矩阵不需要手工维护：用例代码里用一个标记写明需求编号（22.5 节的 <code>@pytest.mark.req</code>），每次运行后由脚本汇总成表，和需求清单比对，出现“没有用例的需求”就报警。</p>
+<div class="tbl"><table><caption>表 22-3　追溯矩阵（节选；最后一列为 v1.4.2 的结果，示意）</caption><thead><tr><th>需求</th><th>单元</th><th>SIL</th><th>HIL</th><th>整机测试台</th><th>EOL</th><th>v1.4.2</th></tr></thead><tbody>
+<tr><td>REQ-POS-01</td><td>—</td><td>SIL-POS、SIL-POS-SW</td><td>HIL-POS-1、HIL-POS-50</td><td>BEN-POS</td><td>停针 10 次</td><td>✓ Cpk 6.9</td></tr>
+<tr><td>REQ-TRM-01</td><td>UT-TRM</td><td>SIL-TRM</td><td>HIL-TRM-4000、HIL-TRM-SW</td><td>BEN-TRM</td><td>剪线 20 次</td><td>✓ 1/1500</td></tr>
+<tr><td>REQ-BT-01</td><td>—</td><td>SIL-BT</td><td>HIL-BT</td><td>BEN-BT</td><td>—</td><td>✓ 0.19 mm</td></tr>
+<tr><td>REQ-SOL-01</td><td>—</td><td>—</td><td>HIL-SOL</td><td>—</td><td>线圈电流波形</td><td>✓ 12.4°</td></tr>
+<tr><td>REQ-THM-01</td><td>—</td><td>—</td><td>HIL-SOAK</td><td>BEN-RUN</td><td>老化（第 18 章）</td><td>✓ 32 K</td></tr>
+<tr><td>REQ-SAFE-01</td><td>UT-SM</td><td>—</td><td>HIL-FLT</td><td>—</td><td>急停按钮</td><td>✓ 12/12</td></tr>
+</tbody></table></div>
+<p>结果也要能追溯到“哪一个版本在哪一台样机上测的”。所以每一条测试结果都带着五样东西：需求编号、用例名、被测样机的序列号、固件版本号、参数版本号（第 19 章规定它们随原型上报）。少了任何一样，几个月以后翻出一条“失败”的记录，就说不清它到底说明了什么。</p>
+<h3 id="s22-4">22.4 通用测试台</h3>
+<p>要让测试自动化，先得有一台能被程序指挥、能自己测量的测试台。第 19 章的思路是“一套平台做四种机器”，测试台也照此办理：一套测量模块，换一块适配板，测四种原型（图 22-3）。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c22_bench.png"><img src="img/fig_c22_bench.png" alt="图 22-3　通用测试台" loading="lazy"></a><figcaption>图 22-3　通用测试台：测试计算机、被测原型和测试台模块；下方为四种原型的换型（示意；模块编号为建议编号，计划入库）</figcaption></figure>
+<p>测试台有三部分。左边是<strong>测试计算机</strong>：跑 Python 测试脚本，经被测原型的网关下发命令、读回原型自己报的数据，同时从测试台模块读“真值”，判定、写报告，把结果发到数字工厂总线。中间是<strong>被测原型</strong>（DUT，device under test）：网关、WQ-SC 主控、驱动层，以及机头（整机测试台时是真机头，HIL 时由仿真器代替）。右边是<strong>测试台模块</strong>，它们独立于被测原型测量，这一点很重要：如果停针误差只读原型自己的编码器，编码器装偏了，原型和测试一起“正确”地错下去。</p>
+<p>各模块的作用：</p>
+<ul>
+<li><strong>负载电机与测功</strong>：一台伺服电机经梅花联轴器（零件库已有条目 A-CPL-JAW）接在主轴手轮一侧，按程序加负载转矩（模拟厚料刺布的阻力、或者模拟更大的惯量），同时测主轴的转矩和转速。</li>
+<li><strong>编码器信号模拟</strong>：HIL 时代替主轴编码器，按仿真器算出的转角产生 A、B、Z 信号（2500 线、四倍频 10000 计数/转，与第 19 章一致），还能按指令注入丢脉冲、断线、抖动。</li>
+<li><strong>HIL 实时仿真器</strong>：按实测的转矩–转速曲线、惯量和摩擦算主轴运动，步长 1 ms 以下；它的模型比 SIL 的“真”一层，因为参数来自对样机的实测（22.1 节的恒功率区就是这样进来的）。</li>
+<li><strong>数据采集与电流探头</strong>：电磁铁线圈电流、母线电压、编码器角度和固件的发令信号同步采样，后者用主控板的一个调试输出脚引出。</li>
+<li><strong>行程传感器</strong>：测电磁铁衔铁或动刀的位移，得到真实的吸合、释放时刻；和发令时刻相减就是延迟，再按转速折成转角（REQ-SOL-01）。</li>
+<li><strong>线迹相机</strong>：拍布面，识别针迹位置，算回针对齐偏差、跳针、线头长度；剪线是否剪断也可以由它判定（面线是否被拉出一长段）。</li>
+<li><strong>温度采集</strong>：电机、散热器、电磁铁线圈和环境温度，供 4 h 长跑判定温升。</li>
+</ul>
+<p>这些模块和第 19 章的电控模块一样，应当进零件库，让“配一台测试台”也能按参数选型、自动出 BOM。目前它们都不在库里，表 22-4 给出建议编号和关键参数。</p>
+<div class="tbl"><table><caption>表 22-4　测试台模块（建议编号，计划入库；参数为示意）</caption><thead><tr><th>建议编号</th><th>名称</th><th>关键参数（key）</th><th>WQ-SC/LS 的示意取值</th></tr></thead><tbody>
+<tr><td>D-TB-LOAD</td><td>负载电机与测功单元</td><td>rated_torque_Nm, max_speed_rpm, torque_accuracy_pct</td><td>3 N·m，6000 r/min，±1%</td></tr>
+<tr><td>D-TB-ENCEMU</td><td>编码器信号模拟器</td><td>ppr, max_freq_kHz, index (bool), fault_inject (bool)</td><td>2500，≥ 1000 kHz，是，是</td></tr>
+<tr><td>D-TB-HIL</td><td>HIL 实时仿真器</td><td>step_us, enc_channels, analog_out, can_fd (bool)</td><td>≤ 50 μs，2，8，是</td></tr>
+<tr><td>D-TB-DAQ</td><td>数据采集卡 + 电流探头</td><td>channels, rate_kSps, bits, current_range_A</td><td>8，≥ 100 kSps，16，±10 A</td></tr>
+<tr><td>D-TB-STROKE</td><td>位移（行程）传感器</td><td>range_mm, resolution_um, bandwidth_kHz</td><td>10 mm，≤ 10 μm，≥ 5 kHz</td></tr>
+<tr><td>D-TB-CAM</td><td>线迹相机（含光源）</td><td>resolution_px, field_mm, fps</td><td>500 万像素，60 × 45 mm，≥ 30</td></tr>
+<tr><td>D-TB-TEMP</td><td>温度采集</td><td>channels, range_C, accuracy_K</td><td>8，−20–150 °C，±1 K</td></tr>
+</tbody></table></div>
+<p><strong>换型</strong>　同一台测试台测四种原型，靠的是三件“标准化”的事。机械上，每种原型做一块适配板，把机头或平台固定在测试台的同一组安装孔上，主轴（或横机的机头驱动轴）经同一种联轴器接负载电机；花样机的 X–Y 平台再加两把光栅尺或一个激光位移传感器测实际位置，横机则用编码器模拟器模拟机头位置、用行程传感器看选针器。电气上，测试台和原型之间用同一套带编号的插头，第 19 章的接线表决定哪个插针接什么。软件上，每种原型一个测试配置文件，写明接线表、HAL 驱动、该跑哪些用例；测试脚本本身不变。换型一次只要拆装适配板、换配置文件，半小时以内（示意）。</p>
+<aside class="field"><p><strong>现场要点</strong></p><ul><li>测试台的测量链本身要定期校准：用一个已知转角的分度盘核编码器模拟器和行程传感器，用砝码和力臂核测功单元。测试台不准，所有结论都不可信。</li><li>“真值”要来自独立的传感器，不能只读被测原型自己报的数。两者都记下来，它们的差本身就是一个很有用的指标。</li><li>每台测试台也有序列号和“固件版本”（测试脚本的版本），一起写进结果。</li></ul></aside>
+<h3 id="s22-5">22.5 测试脚本：用 Python 和 pytest 驱动</h3>
+<p>测试脚本用 Python 写，用 pytest 组织。选它们的理由很朴素：语法简单，工程师和学生都能读；pytest 的“夹具（fixture）”正好用来管理“连上样机、测完断电”这类准备和收尾；参数化测试（parametrize）一行就能把一个用例扩成一组转速；结果能输出成持续集成服务器认识的格式。问渠数字工厂的自动测试也是这样做的：<code>pytest -q tests</code> 跑单元测试，另有一个完整闭环脚本按实验流程把整个工厂走一遍，在推送代码后由 CI 自动运行（数字工厂 README 第五节）。</p>
+<p><strong>夹具：连上原型、发结果</strong>　下面的 <code>conftest.py</code> 定义两个夹具。<code>dut</code> 经网关的网页接口连上被测原型，读出序列号、固件版本和参数版本；它提供一个 <code>cmd()</code> 方法，下发命令并等它做完，返回原型和测试台测到的数据。<code>report</code> 连上数字工厂的 MQTT 代理，把每条结果按统一信封格式发到 <code>…/measurement</code> 主题。网关的接口名（<code>/api/v1/info</code>、<code>/api/v1/cmd</code>）是本章的示意，以第 19 章网关的实际定义为准。</p>
+<pre><code class="language-python"># tests/conftest.py —— 连接被测原型（DUT），把结果发到数字工厂
+import datetime as dt, json, os, uuid
+import pytest, requests
+import paho.mqtt.client as mqtt
+
+GW    = os.environ.get("WQ_DUT", "http://192.168.10.21")   # 原型网关（示例地址）
+BUS   = os.environ.get("WQ_BUS", "bus.lab.local")          # 数字工厂 MQTT 代理
+TOPIC = "wq/sewing/lab/tb-01/measurement"                  # 工厂/区域/单元/类别
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "req(id): 这个用例验证的需求编号")
+
+class Dut:
+    def __init__(self, base):
+        self.base = base
+        info = requests.get(base + "/api/v1/info", timeout=5).json()
+        self.serial, self.fw, self.param = info["serial"], info["fw"], info["param_ver"]
+
+    def cmd(self, name, **kw):
+        """下发一条命令，等原型做完，返回测量结果（dict）。"""
+        r = requests.post(self.base + "/api/v1/cmd", json={"cmd": name, **kw}, timeout=300)
+        r.raise_for_status()
+        return r.json()
+
+@pytest.fixture(scope="session")
+def dut():
+    d = Dut(GW)
+    d.cmd("reset_faults")
+    yield d
+    d.cmd("safe")                      # 无论成败，测完把执行器断电
+
+@pytest.fixture(scope="session")
+def report(dut):
+    cli = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="tb-01-pytest")
+    cli.connect(BUS)
+    cli.loop_start()
+    run = "run-" + uuid.uuid4().hex[:8]          # 同一轮测试共用一个关联号
+
+    def send(req, case, value, unit, limit, ok, **extra):
+        ts = dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds")
+        msg = {"v": 1, "id": uuid.uuid4().hex, "ts": ts.replace("+00:00", "Z"),
+               "type": "test.result", "source": "tb-01/pytest", "mode": "prod", "corr": run,
+               "data": {"req": req, "case": case, "dut_serial": dut.serial,
+                        "fw": dut.fw, "param_ver": dut.param,
+                        "value": value, "unit": unit, "limit": limit,
+                        "result": "pass" if ok else "fail", **extra}}
+        cli.publish(TOPIC, json.dumps(msg, ensure_ascii=False), qos=1).wait_for_publish()
+    yield send
+    cli.loop_stop()
+    cli.disconnect()
+</code></pre>
+<p>消息的外层信封（v、id、ts、type、source、mode、corr、data）沿用问渠数字工厂的格式（第 26 章）；<code>test.result</code> 是按规范“只增加、不改动”的原则为测试结果新增的数据类型，主题里的区域 <code>lab</code> 和单元 <code>tb-01</code> 也是本章的示例命名。QoS 用 1 级，接收方按消息编号去重（第 26 章）。</p>
+<p><strong>用例</strong>　下面是 WQ-SC/LS 验收用例的节选。每个用例做三件事：按规定的工况让原型动作若干次，算出统计量，和判据比较；结果无论成败都先发到总线，再用 <code>assert</code> 判定。</p>
+<pre><code class="language-python"># tests/test_ls_acceptance.py —— WQ-SC/LS 验收用例（节选）
+import statistics as st
+import pytest
+from stats import r_lower, max_fail        # 22.6 节的两个函数
+
+SPEEDS = [3000, 3500, 4000, 4500, 4750, 5000]
+TRIMS = {}                                 # 各转速点的 (次数, 失败)，最后汇总判定
+
+@pytest.mark.req("REQ-POS-01")
+def test_stop_position(dut, report):
+    """停针：50 次停车，最大误差 ≤ 1°，Cpk ≥ 1.33。"""
+    e = [abs(dut.cmd("run_and_stop", rpm=3000, stitches=20)["stop_err_deg"]) for _ in range(50)]
+    mu, sd, mx = st.mean(e), st.stdev(e), max(e)
+    cpk = (1.0 - mu) / (3 * sd)            # 只有上限，用单侧 Cpk
+    ok = mx &lt;= 1.0 and cpk &gt;= 1.33
+    report("REQ-POS-01", "test_stop_position", mx, "deg", 1.0, ok, cpk=round(cpk, 2), n=50)
+    assert ok, f"最大 {mx:.2f}°，Cpk {cpk:.2f}"
+
+@pytest.mark.req("REQ-TRM-01")
+@pytest.mark.parametrize("rpm", SPEEDS)
+def test_trim_point(dut, report, rpm):
+    """剪线：从 rpm 起停车剪线 250 次，记下失败次数（相机判定面线、底线是否剪断）。"""
+    n = 250
+    fails = sum(not dut.cmd("sew_and_trim", rpm=rpm, stitches=20)["trim_ok"] for _ in range(n))
+    TRIMS[rpm] = (n, fails)
+    report("REQ-TRM-01", f"test_trim_point[{rpm}]", fails, "count", None, fails &lt;= 1, n=n)
+    assert fails &lt;= 1, f"{rpm} r/min：{fails}/{n} 次没剪断"      # 单点出现 2 次以上，先报警
+
+@pytest.mark.req("REQ-TRM-01")
+def test_trim_overall(report):
+    """全部转速点合计：可靠度的 95% 置信下限 ≥ 99.5%。"""
+    n = sum(v[0] for v in TRIMS.values())
+    x = sum(v[1] for v in TRIMS.values())
+    rl = r_lower(n, x, 0.95)
+    report("REQ-TRM-01", "test_trim_overall", rl, "ratio", 0.995, rl &gt;= 0.995, n=n, fails=x)
+    assert rl &gt;= 0.995, f"{x}/{n} 次失败，下限 {rl:.4f}（{n} 次最多允许 {max_fail(n)} 次）"
+
+@pytest.mark.req("REQ-XY-01")
+@pytest.mark.parametrize("pattern", ["circle_r20.wqp", "zigzag_3mm.wqp", "logo_dense.wqp"])
+def test_xy_following(dut, report, pattern):
+    r = dut.cmd("run_pattern", file=pattern, rpm=2500)        # 测试台光栅尺测实际位置
+    ok = r["follow_err_mm"] &lt;= 0.05 and r["move_in_fabric_mm"] == 0
+    report("REQ-XY-01", f"test_xy_following[{pattern}]", r["follow_err_mm"], "mm", 0.05, ok)
+    assert ok
+</code></pre>
+<p>几点说明。第一，<strong>参数化</strong>让一个用例变成一组：<code>test_trim_point</code> 按 6 个转速各跑一次，报告里分别列出，哪个转速出问题一目了然；22.1 节的回归正是靠 4750、5000 这两个点抓住的，如果只测 4000 r/min，它照样漏过去。第二，<strong>判据写在用例里</strong>，而且和需求表一致：单点出现两次以上失败先报警，合计用二项分布的置信下限判定（22.6 节）。第三，<strong>停针误差取绝对值的最大值和 Cpk 两个判据</strong>：只看一次停车的误差，v1.3.2 那次“停车更快”的改动（位置增益 200→300 s⁻¹）在 HIL 上单次约 0.91°，是通过的；50 次的统计才显出它的最大值超过 1°、Cpk 只有约 0.3（22.6 节）。第四，测试脚本只认识网关的命令和测量，不认识机型：同一个 <code>test_stop_position</code> 换个配置文件就能测包缝原型。</p>
+<p>平缝原型的单元测试是 C 写的固件函数，可以用 C 的单元测试框架在电脑上编译运行，也可以把固件编译成主机上的动态库，用 Python 调它的函数，让 pytest 统一管理全部五层的用例和报告。SIL 用例同样用 pytest 写，只是 <code>dut</code> 夹具连的不是网关，而是一个“固件 + 模型”的仿真进程，命令和返回的格式一样。这样，同一个用例可以先在 SIL 上跑，再原样拿到 HIL 和整机测试台上跑，三层的结果可以直接比较，22.9 节就用到了这一点。</p>
+<h3 id="s22-6">22.6 要测多少次才算数</h3>
+<p>剪线成功率 ≥ 99.5%，试了 200 次全部成功，够不够？不够。200 次全成功只能说明“成功率不太可能很低”，并不能说明它不低于 99.5%。要回答“够不够”，得把问题说成统计的语言：在置信度 C 下，证明可靠度不低于 R。</p>
+<h4 id="s22-6-1">22.6.1 零失效验证试验</h4>
+<p>如果真实的可靠度恰好是 R，n 次试验全部成功的概率是 Rⁿ。要求这个概率不超过 1 − C，也就是说“如果可靠度只有 R，我们几乎不可能看到 n 次全成功”，于是</p>
+<div class="math">\[ R^{\,n}\le 1-C \quad\Longrightarrow\quad n\ \ge\ \frac{\ln(1-C)}{\ln R} \]</div>
+<p>R = 99.5%、C = 95% 时，n ≥ ln 0.05 / ln 0.995 = 597.6，取 598 次。也就是说，从某个转速停车剪线 598 次一次不失败，才能以 95% 的置信度说剪线成功率不低于 99.5%。表 22-5 列出几组常用的数。有一个容易记的近似：C = 95% 时 n ≈ 3/(1 − R)，即“零失效时，要测的次数约是失效率倒数的三倍”。</p>
+<div class="tbl"><table><caption>表 22-5　验证可靠度 R 需要的试验次数（二项分布，单侧）</caption><thead><tr><th>R</th><th>C</th><th>零失效</th><th>允许 1 次失败</th><th>允许 2 次失败</th><th>允许 3 次失败</th></tr></thead><tbody>
+<tr><td>99%</td><td>95%</td><td>299</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>99.5%</td><td>90%</td><td>460</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>99.5%</td><td>95%</td><td><strong>598</strong></td><td><strong>947</strong></td><td>1258</td><td>1549</td></tr>
+<tr><td>99.9%</td><td>90%</td><td>2302</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>99.9%</td><td>95%</td><td>2995</td><td>—</td><td>—</td><td>—</td></tr>
+</tbody></table></div>
+<h4 id="s22-6-2">22.6.2 有失效时的置信下限</h4>
+<p>n 次里失败了 x 次，可靠度的点估计是 1 − x/n，但判定要用它的置信下限。设失效率为 p，失败次数服从二项分布；单侧置信上限 p<sub>U</sub> 是使“失败不超过 x 次”的概率恰好等于 1 − C 的那个 p：</p>
+<div class="math">\[ \sum_{k=0}^{x}\binom{n}{k}p_U^{\,k}(1-p_U)^{\,n-k}=1-C,\qquad R_L=1-p_U \]</div>
+<p>这就是 Clopper–Pearson 方法，p<sub>U</sub> 也可以用 β 分布的分位数直接算：p<sub>U</sub> = Beta⁻¹(C; x+1, n−x)。用 Python 两行就够了：</p>
+<pre><code class="language-python"># stats.py —— 22.6 节
+from math import ceil, log
+from scipy.stats import beta
+
+def n_zero(R, C):              # 零失效验证需要的次数
+    return ceil(log(1 - C) / log(R))
+
+def r_lower(n, x, C=0.95):     # n 次 x 次失败时可靠度的单侧置信下限
+    return 0.0 if x &gt;= n else 1 - beta.ppf(C, x + 1, n - x)
+
+def max_fail(n, R=0.995, C=0.95):   # n 次里最多允许失败几次
+    x = -1
+    while r_lower(n, x + 1, C) &gt;= R:
+        x += 1
+    return x
+
+print(n_zero(0.995, 0.95))                     # 598
+print([round(r_lower(1000, x), 4) for x in range(4)])   # [0.997, 0.9953, 0.9937, 0.9923]
+</code></pre>
+<p>1000 次剪线，0 次失败时下限 99.70%，1 次失败 99.53%，都满足 99.5%；2 次失败时点估计是 99.8%，下限却只有 99.37%，不满足（图 22-4 中）。所以表 22-2 里写“单点 1000 次最多 1 次失败”。22.5 节的转速扫描合计 1500 次，最多允许 2 次失败。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c22_stats.png"><img src="img/fig_c22_stats.png" alt="图 22-4　要测多少次才算数" loading="lazy"></a><figcaption>图 22-4　要测多少次才算数：零失效验证的试验次数（左），1000 次剪线中 x 次失败时的置信下限（中），停针误差的分布与过程能力（右，HIL 上各 50 次停车）（算例，示意值）</figcaption></figure>
+<h4 id="s22-6-3">22.6.3 测多少次才能抓住一个回归</h4>
+<p>上面问的是“证明它好要测多少次”，持续集成还要问另一个问题：“它变坏了，测多少次能发现”。如果一次改动让失效率变成 p，n 次里至少看到一次失败的概率是 1 − (1 − p)ⁿ。要有 95% 的把握抓住 p = 0.5% 的回归，也要约 598 次，和零失效验证的次数一样，这不是巧合，两个问题是同一个式子。22.1 节的回归在 4750 r/min 时 p ≈ 1.2%，250 次就有约 96% 的把握看到；在 5000 r/min 时 p ≈ 17%，几次就能看到。这说明了测试设计的一个原则：<strong>把有限的次数花在最可能出问题的工况上</strong>。同样 250 次，放在 4000 r/min 一次失败也看不到，放在最高转速就几乎必然抓住。</p>
+<h4 id="s22-6-4">22.6.4 计量型指标：均值、3σ 和 Cpk</h4>
+<p>停针误差是一个连续的量，不必只数“过没过”。设 50 次停车误差的均值为 μ、标准差为 σ，判据只有上限 USL = 1°，用单侧过程能力指数</p>
+<div class="math">\[ C_{pk}=\frac{\mathrm{USL}-\mu}{3\sigma} \]</div>
+<p>C<sub>pk</sub> ≥ 1.33 意味着上限离均值至少 4σ。算例中（图 22-4 右，HIL 惯量 6.3×10⁻⁴ kg·m²，每次停车的摩擦和定位速度有小的随机变化，另加 0.03° 的测量噪声）：位置增益 K<sub>p</sub> = 200 s⁻¹ 时，均值 0.17°、σ 0.026°、C<sub>pk</sub> ≈ 10.7，余量很大；K<sub>p</sub> = 300 s⁻¹ 时，均值 0.92°、σ 0.079°、最大 1.13°，C<sub>pk</sub> ≈ 0.34，不合格。单次停车 0.91° 看上去还“合格”，统计一下就知道它其实踩在线上。计量型判据比计数型判据省次数：50 次停车就能看清分布，而要用“过/不过”证明 99.5% 要上千次。所以能测出连续值的地方，都应该记下连续值，而不只是 ✓ 或 ✗。</p>
+<div class="callout"><p>Cpk 假定误差近似正态，而且过程是稳定的。停针误差的分布被摩擦“卡住”时并不正态（第 13 章），样本少时 σ 的估计也很粗；所以判定时同时看最大值，并且在不同的测试台、不同的样机上重复，不要只凭一个 Cpk 数字下结论。</p></div>
+<h3 id="s22-7">22.7 持续集成：每次改固件都自动测</h3>
+<p>持续集成（CI）的意思是：每一次提交都自动构建、自动测试；不通过的改动不准合并到主干。它把 22.2 节的金字塔变成一条流水线（图 22-5）。问渠仓库里数字工厂的 CI 是一个现成的样子：只要推送改动了 <code>factory/</code>，就依次“测试 → 服务器演练（装一套真的 ERPNext、走完整闭环）→ 构建镜像 → 部署到服务器”，前一步失败后一步就不跑，失败的日志自动整理成注释。缝纫机固件的 CI 结构相同，只是“演练”换成了 HIL 台架，“部署”换成了发布固件包。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c22_ci.png"><img src="img/fig_c22_ci.png" alt="图 22-5　持续集成流水线" loading="lazy"></a><figcaption>图 22-5　持续集成：每次推送、每晚、每周三条流水线，以及每晚 240 min 的分配（示意值）</figcaption></figure>
+<p><strong>三条流水线</strong>　每次推送：编译固件（交叉编译）和主机版，跑单元测试和 SIL，约 12 min，失败就不准合并；开发者喝杯水的工夫就知道结果。每晚：取主干最新版本刷进 HIL 台架的主控，跑 HIL 回归用例，预算 4 h；结果发到总线、进看板，失败自动二分。每周或每个候选版本：在整机测试台上跑约 2 天，四种原型各做 4 h 最高转速长跑、1000 次真剪线、相机看回针和线迹；全部通过才发布，固件版本号和参数版本号随原型上报数字工厂。下面是一个示意的流水线配置（GitHub Actions 的写法，HIL 任务跑在接着台架的那台电脑上）：</p>
+<pre><code class="language-yaml"># .github/workflows/firmware.yml（示意）
+name: WQ-SC firmware
+on:
+  push: {branches: [main]}
+  pull_request:
+  schedule: [{cron: "0 18 * * *"}]        # UTC 18:00 = 北京时间 02:00
+jobs:
+  quick:                                  # 每次推送：约 12 min
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make firmware host           # 交叉编译固件 + 主机版
+      - run: python -m pytest -q tests/unit tests/sil
+  nightly-hil:                            # 每晚：预算 4 h
+    if: github.event_name == 'schedule'
+    runs-on: [self-hosted, hil-01]        # 接着 HIL 台架的电脑
+    timeout-minutes: 250
+    steps:
+      - uses: actions/checkout@v4
+      - run: make firmware &amp;&amp; tools/flash.sh build/wqsc.bin
+      - run: python -m pytest tests/hil -m nightly --junitxml=hil.xml
+      - if: failure()
+        run: tools/bisect_hil.sh "$(cat .last_green)" "$GITHUB_SHA"
+</code></pre>
+<p><strong>测试时间预算</strong>　每晚只有几个小时，台架只有一两套，用例却总在增加。所以每晚的用例要按“风险 × 能抓住的缺陷 ÷ 时间”挑。表 22-6 是 WQ-SC/LS 一晚 240 min 的分配（示意）。几条原则：容易被改动碰到的功能（剪线、停针）多给时间；安全相关的（故障注入）每晚必跑；单次慢、变化少的（2 h 浸泡）挪到周末；同一个需求，宁可用一个转速扫描代替四个固定转速的长跑。</p>
+<div class="tbl"><table><caption>表 22-6　每晚 HIL 的 240 min 怎样分（WQ-SC/LS，示意值）</caption><thead><tr><th>用例</th><th>需求</th><th>时间（min）</th><th>为什么每晚跑</th></tr></thead><tbody>
+<tr><td>HIL-TRM-SW 剪线转速扫描 3000–5000，6 点 × 250</td><td>REQ-TRM-01</td><td>80</td><td>剪线时序最常被改动；高速点最敏感</td></tr>
+<tr><td>HIL-FLT 故障注入 12 种 × 5</td><td>REQ-SAFE-01</td><td>35</td><td>安全相关，必跑</td></tr>
+<tr><td>HIL-XY X–Y 跟随（PS 配置）</td><td>REQ-XY-01</td><td>45</td><td>插补和前瞻代码共用</td></tr>
+<tr><td>HIL-KN 选针时序（FK 配置）</td><td>REQ-KN-01</td><td>40</td><td>FPGA 时序和固件接口</td></tr>
+<tr><td>HIL-BT 回针 200 段</td><td>REQ-BT-01</td><td>20</td><td>送布电机代码</td></tr>
+<tr><td>HIL-SOL 电磁铁吸合/释放 100 次</td><td>REQ-SOL-01</td><td>10</td><td>驱动参数（强激磁时间）</td></tr>
+<tr><td>HIL-POS-50 停针 50 次统计</td><td>REQ-POS-01</td><td>6</td><td>便宜、敏感：位置环参数一改就看得出</td></tr>
+<tr><td>余量</td><td>—</td><td>4</td><td>刷写、重启、二分的第一轮</td></tr>
+<tr><td colspan="2"><strong>合计</strong></td><td><strong>240</strong></td><td>2 h 浸泡（HIL-SOAK）挪到周末</td></tr>
+</tbody></table></div>
+<p>一个反面的例子：如果把每晚的剪线用例定成“4000 r/min 剪 1000 次”（55 min），停针用例定成“停 1 次”（2 min），总时间还更短，可是 22.1 节和 v1.3.2 的两个回归一个也抓不住：前者只在高速出现，后者单次停车 0.91° 刚好“通过”。用例集的设计本身也要测，办法是故意往固件里放进已知的缺陷，看用例集能不能抓住它（变异测试的思路），虚拟实验 22-1 的任务 2 就是这样一个练习。</p>
+<p><strong>失败自动定位到提交：二分</strong>　HIL 失败时，上一晚全绿，这一晚变红，中间也许合并了二三十个提交。逐个试太慢；二分法每次试中间那个，好就往后找、坏就往前找，k 轮能在 2<sup>k</sup> 个提交里找到第一个坏的，23 个提交要 5 轮。git 自带这个功能：</p>
+<pre><code class="language-bash"># tools/bisect_hil.sh GOOD BAD —— 只重跑失败的那一个用例
+git bisect start "$2" "$1"
+git bisect run sh -c '
+  make firmware || exit 125                         # 编不过的提交跳过
+  tools/flash.sh build/wqsc.bin || exit 125
+  python -m pytest -q tests/hil -k "trim_point and 5000"'
+git bisect log &gt; bisect.log; git bisect reset
+</code></pre>
+<p>二分时只跑那一个失败的用例，而且要选它最敏感的工况：在 5000 r/min 剪 250 次，好的提交几乎不会失败、坏的提交平均失败 43 次，一轮就能判清；如果选 4750 r/min，坏的提交也只有约 96% 的概率露出来，二分就可能在某一轮判错，把账算到无辜的提交上。所以二分用的用例要满足两条：坏的一定失败，好的一定通过（统计上），这又回到了 22.6.3 节的算法。</p>
+<aside class="field"><p><strong>设计要点</strong></p><ul><li>测试配置（用例集、判据、测试台的版本）和固件一起放进版本库，一起评审；改判据和改代码一样要留下记录。</li><li>不稳定的测试（同一版本时过时不过）比没有测试还糟糕，它让人习惯性地忽略红灯。发现了就查清是测试台、模型还是固件的问题，修好或隔离，不能“再跑一遍试试”。</li><li>每晚的报告只看三样：哪些需求变红了、相对上一晚变化最大的指标、二分的结论。细节点进去再看。</li></ul></aside>
+<h3 id="s22-8">22.8 从原型到工业级：用测试数据推进成熟度</h3>
+<p>原型什么时候算“做好了”？靠人拍脑袋，原型会一直停在“差不多”。电子产品行业常用一串成熟度级别来管理这件事：P0、P1 的原型，然后是工程验证 EVT、设计验证 DVT、生产验证 PVT，最后量产。本章的做法是把每一级的<strong>退出条件</strong>都写成自动测试可以判定的数字（表 22-7、图 22-6），开评审会时只看数据。</p>
+<div class="tbl"><table><caption>表 22-7　成熟度级别的退出条件（WQ-SC/LS，示意值）</caption><thead><tr><th>级别</th><th>样机</th><th>退出条件（由自动测试判定）</th><th>主要测试层</th></tr></thead><tbody>
+<tr><td>P0 能动</td><td>1 台，手搭</td><td>主轴转、能停在上针位；单元和 SIL 框架跑通；网关能报固件和参数版本</td><td>单元、SIL</td></tr>
+<tr><td>P1 功能全</td><td>1–2 台</td><td>全部动作按事件表执行；追溯矩阵覆盖 100%（每条 REQ 至少 1 个用例）；SIL 100%、HIL ≥ 80% 通过</td><td>SIL、HIL</td></tr>
+<tr><td>EVT 工程验证</td><td>2–3 台</td><td>全部 REQ 在 HIL 和整机测试台上达标：停针 50 次 Cpk ≥ 1.33；剪线单点 1000 次 ≤ 1 次失败；回针 ≤ 0.3 mm；电磁铁 ≤ 20°；4 h 温升；HIL 连续 10 晚全绿</td><td>HIL、整机</td></tr>
+<tr><td>DVT 设计验证</td><td>3–5 台，固件冻结（只修缺陷）</td><td>EMC、电压 ±10%、环境 5–45 °C（第 18 章）下 REQ 仍达标；剪线 99.9%/90%：2302 次零失效；每台 4 h 长跑无故障；故障注入全过</td><td>整机、环境试验</td></tr>
+<tr><td>PVT 生产验证</td><td>20–50 台，按生产工艺装配</td><td>EOL 一次通过率 ≥ 98%；老化后无早期失效（第 18 章）；EOL 数据按序列号入库、可查</td><td>EOL、老化</td></tr>
+<tr><td>量产</td><td>每台</td><td>EOL + 老化；现场数据每月复审；任何固件修改仍走全套 CI</td><td>EOL、现场数据</td></tr>
+</tbody></table></div>
+<figure class="fig"><a class="zoom" href="img/fig_c22_maturity.png"><img src="img/fig_c22_maturity.png" alt="图 22-6　从原型到工业级" loading="lazy"></a><figcaption>图 22-6　从原型到工业级：成熟度级别与退出条件（上），出厂测试和现场数据回流（下）（示意）</figcaption></figure>
+<p>表里的数字有几处值得一说。从 EVT 到 DVT，剪线的验证从“99.5%/95%”提到“99.9%/90%”，次数从约一千次涨到 2302 次零失效，而且要在几台样机、几种电压和温度下分别做；这是因为 DVT 要回答的是“设计本身有没有余量”，样机之间、环境之间的差异都要包括进去。PVT 的重点从设计转到制造：设计已经冻结，要看的是按生产工艺装出来的一批机器是否一致，EOL 的一次通过率是最直接的指标。每一级的样机数逐级增加，因为统计要求的次数越来越多，一台样机跑不完，也因为只有多台样机才能看出台与台之间的差异。</p>
+<p><strong>出厂测试 EOL</strong>　量产以后，每台控制箱和整机下线都要过 EOL。它的项目从验收用例里挑“快、能发现装配缺陷”的：编码器读数和零位、停针 10 次、剪线 20 次（看有没有剪不断，而不是证明 99.5%，那是设计验证的事）、电磁铁线圈电流波形（线圈装错、短路一眼就看得出）、脚踏、固件版本核对和参数写入，再加上第 18 章的电气安全测试（接地连续性、绝缘电阻、耐压）和老化。每台 3–5 min（示意）。EOL 的测试脚本和研发用的是同一套框架，只是用例集不同，所以研发阶段的每一个用例都可能直接变成 EOL 项目。</p>
+<p><strong>数据随序列号进数字工厂</strong>　EOL 的每一条结果都按 22.5 节的格式发到总线，主题如 <code>wq/sewing/eol/eol-01/measurement</code>，带着序列号、固件和参数版本，进历史库和质量系统（第 27 章）。这样，任何一台机器在它的一生里都可以查到：出厂时停针误差多少、剪线测了几次、用的哪一版固件。</p>
+<p><strong>现场数据回流</strong>　机器到了用户的车间，联网以后（第 26 章）上报的状态和事件里，有剪线次数、故障码、固件和参数版本。按版本、批次、序列号把这些数据和出厂数据对起来，就能看到实验室里看不到的东西：比如某一版固件的机器在电网电压不稳的厂区“剪线不断”的报修明显多，或者某一批电磁铁的机器两年后吸合变慢。每发现这样一个问题，就在追溯矩阵里加一条 REQ（或收紧一条判据）、加一个能复现它的用例（往往是 HIL 上的一种故障注入或一种工况），下次改固件时就会自动测。第 27 章把这叫做质量闭环；对测试来说，它意味着用例集是跟着产品一起长大的。</p>
+<h3 id="s22-9">22.9 案例：一次固件优化让剪线在高转速下偶发失败</h3>
+<p><strong>技术问题</strong>　回到 22.1 节。这是一个按原理编写的案例，数字由本章的模型算出（figsrc/ch22_model.py，与虚拟实验 22-1 相同），都是示意值。v1.4.0 的“快速剪线”改动在某个周二下午合并：减速按伺服能力的 100% 规划，减速终点从剪线针的 0° 推迟到 180°。推送时的流水线约 12 min 全绿：单元测试检查了减速规划函数的计算，SIL 的剪线转速扫描（3000–5000 r/min，每点 200 次）0 次失败。</p>
+<p><strong>发现</strong>　当晚 02:00 的 HIL 回归里，剪线转速扫描报红：5000 r/min 点 250 次失败 43 次，4750 r/min 点也有失败，合计远超 1500 次最多 2 次的判据；其他用例全绿（图 22-7 左）。总线上的结果附带每次剪线的发令转速，一眼可见：失败的那些剪线，发令时转速在 700–1200 r/min，而判据要求是 300 r/min 附近。</p>
+<p><strong>定位</strong>　上一晚全绿，这一晚之间合并了 23 个提交。CI 自动二分，只重跑“5000 r/min 剪 250 次”这一个用例：第 11 个提交通过，第 17 个失败，第 14 个失败，第 12、13 个通过，第 5 轮结束，指向第 14 个提交 a3f9c1e（“trim：减速规划用满能力，终点并入剪线针”），每轮编译、刷写约 3 min，剪 250 次约 13 min，一共约 80 min。早上工程师到岗时，看到的是一份报告：哪条需求、哪个用例、哪个提交、失败时的转速记录。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c22_case.png"><img src="img/fig_c22_case.png" alt="图 22-7　案例：HIL 当晚发现、二分定位、修复、回归" loading="lazy"></a><figcaption>图 22-7　案例：每晚 HIL 的结果（左），23 个提交的二分（中），从 5000 r/min 停车时剪线针里的转速（右）（算例，示意值）</figcaption></figure>
+<p><strong>原因</strong>　图 22-7 右边是从 5000 r/min 停车时剪线针里的转速。v1.3.2 按 60% 能力减速，参考曲线在剪线针的 0° 结束，主轴跟着在约 95° 稳定在 300 r/min，离 290° 发令还有将近 200°；v1.4.0 按 100% 能力规划，终点又推迟到 180°，可主轴在恒功率区里减不了那么快，越落越后，到 290° 发令时还有约 514 r/min（电网电压正常）；电压低 5% 时约 850 r/min，低 10% 时约 1150 r/min。进刀角 290° + 6nt 在 n = 850 r/min、t = 8 ms 时已到 331°，晚过窗口。为什么 SIL 没抓住？SIL 的电机模型是第 13 章的理想电机，减速能力处处是 4400 rad/s²，在它里面 v1.4.0 的规划完全可行，失败率与改动前相同（约 0.011%）。HIL 仿真器的转矩–转速曲线来自样机实测，高于基速进入恒功率区，基速随母线电压变化，这才有了问题。</p>
+<p><strong>修复（v1.4.1）</strong>　两处改动。一是减速按电机实际的转矩–转速曲线规划，并且只用 90%，基速按电压下限（0.9 倍）取；二是加一道保险：剪线针 270° 时检查实测转速，高于 400 r/min 就把剪线推迟一针，宁可慢一针，不能剪不断。修复后从 5000 r/min 停车，无论电压高低，发令时转速都回到 300 r/min；从 4000 r/min 停车到剪断约 0.23 s，比 v1.3.2 的 0.38 s 仍快约 0.15 s，优化的好处大部分保住了。</p>
+<p><strong>回归</strong>　v1.4.1 在 HIL 上重跑全部每晚用例，剪线扫描 0/1500；再在整机测试台上从 5000 r/min 真剪 1000 次，0 次失败，可靠度下限 99.70%（C = 95%）。另外两件事同样重要：把 HIL 的转矩–转速曲线（含电压系数）移植进 SIL 模型，让 SIL 以后也能在几分钟里抓住这类问题；把“剪线发令时转速”作为一个新的计量型指标写进 REQ-TRM-01 的用例，报告里每晚画趋势，它比“剪没剪断”早得多地显出苗头。</p>
+<div class="tbl"><table><caption>表 22-8　案例的时间线（示意）</caption><thead><tr><th>时间</th><th>事件</th><th>测试层</th><th>耗时</th></tr></thead><tbody>
+<tr><td>周二 14:20</td><td>合并 v1.4.0（23 个提交中的第 14 个引入问题）</td><td>单元 + SIL 全绿</td><td>12 min</td></tr>
+<tr><td>周三 02:00</td><td>每晚 HIL：剪线扫描 5000 r/min 点 43/250 失败</td><td>HIL</td><td>约 4 h</td></tr>
+<tr><td>周三 06:00</td><td>自动二分 5 轮，指向提交 a3f9c1e</td><td>HIL（单个用例）</td><td>约 80 min</td></tr>
+<tr><td>周三 上午</td><td>看转速记录，确认原因；修复 v1.4.1；SIL 加入恒功率区模型</td><td>SIL</td><td>半天</td></tr>
+<tr><td>周四 02:00</td><td>每晚 HIL 全绿；剪线扫描 0/1500</td><td>HIL</td><td>约 4 h</td></tr>
+<tr><td>周末</td><td>整机测试台：5000 r/min 真剪 1000 次 0 失败；4 h 长跑</td><td>整机</td><td>约 2 天</td></tr>
+</tbody></table></div>
+<p><strong>讨论</strong>　这个案例里还有一个“潜伏”的问题：v1.3.2 把位置增益从 200 提到 300 s⁻¹ 时，每晚的停针用例只停 1 次（0.91°，通过），SIL 也只算了标称参数（约 0.8°，通过），于是它一路带到了 v1.4.1。等到把停针用例换成 50 次统计（HIL-POS-50，每晚只多 4 min），或在 SIL 里加上惯量 ±20% 的扫描（惯量大 20% 时超调约 1.3°），它立刻显形，v1.4.2 把 K<sub>p</sub> 改为 220 s⁻¹，50 次的 C<sub>pk</sub> 回到约 7。两个回归合起来说明：自动化测试的价值不在于跑得多，而在于用例按正确的工况、正确的次数、正确的判据，每一次都被跑到。虚拟实验 22-1 把这六个固件版本都放了进去，可以亲手找出它们。</p>
+<h3 id="s22-10">22.10 模型的边界</h3>
+<p>本章的数字都来自几个简化的模型，用途是看清测试设计里的因果和量级。剪线模型把失败只归到动刀进刀角晚过 330°（或早于 300°），没有考虑线环形状、刀刃磨损、线的种类；电磁铁延迟取正态分布 N(8, 0.667) ms，与第 14 章的 6–10 ms 对应，真实分布可能偏斜，尾部更长，而尾部恰恰决定了 99.5% 这个量级的失效率。伺服的恒功率区用“能力与 n<sub>b</sub>/n 成正比”表示，基速随电网电压按 5% 的标准差变化，速度环用 3 ms 的一阶滞后表示，都是示意；真实的转矩–转速曲线要在测功台上实测。停针模型就是第 13 章的连续时间模型，加上随机的摩擦和测量噪声；Cpk 的计算假定正态和稳定。</p>
+<p>统计方面，零失效公式和 Clopper–Pearson 下限假定每次试验独立、失效率不变。实际上，同一台样机连续剪 1000 次，线、刀、温度都在变，失败也可能成串出现；在一台样机上证明的 99.5%，不等于每台都是 99.5%，所以 DVT 要用多台样机、多种环境。测试金字塔各层的用例数、耗时和费用，表 22-6 的时间分配，成熟度的退出条件，都是为说明方法而取的示意值，具体项目要按自己的需求、台架数量和风险重新定。网关接口、主题命名（<code>lab</code>、<code>eol</code> 区域）和 <code>test.result</code> 数据类型是本章的示例，以第 19 章和数字工厂规范的实际定义为准。最后，测试只能证明“在测过的工况下没有发现问题”，不能证明没有问题；22.1 节的回归如果只在 5200 r/min 以上出现，而扫描只到 5000 r/min，它照样会漏过去。用例的工况范围要覆盖需求规定的全部范围，再留一点余量。</p>
+<aside class="field"><p><strong>现场要点</strong></p><ul><li>手工试缝“没问题”不等于没问题：问一句“试了哪些转速、多少次、什么电压”，再对照表 22-5 看够不够。</li><li>剪线时好时坏，先看是不是只在高速停车时出现；查固件版本和减速参数，再查电网电压和电磁铁电压（第 13、14 章）。</li><li>现场报修要记下序列号和固件、参数版本，和出厂测试数据对得上，问题才查得下去。</li><li>每升级一次固件，至少在一台机器上跑一遍 EOL 用例集，再大批推送。</li></ul></aside>
+<h3 id="x22-ex">第 22 章 习题</h3>
+<ol>
+<li>要以 90% 的置信度证明剪线成功率不低于 99%，零失效验证需要多少次？如果允许 1 次失败呢？<details class="ans"><summary>参考答案</summary>零失效 n ≥ ln 0.1 / ln 0.99 = 229.1，取 230 次；允许 1 次失败约需 388 次（用 22.6 节的 r_lower 逐次试算）。</details></li>
+<li>剪线测试 1500 次，失败 3 次。点估计和 95% 置信下限各是多少？是否满足 REQ-TRM-01？<details class="ans"><summary>参考答案</summary>点估计 99.80%；下限约 99.48%，略低于 99.5%，不满足。1500 次最多允许 2 次失败。</details></li>
+<li>某次改动可能让剪线失效率变成 1%。每晚想以 99% 的把握发现它，至少要剪多少次？如果每次剪线循环 3 s，要多少分钟？<details class="ans"><summary>参考答案</summary>n ≥ ln 0.01 / ln 0.99 ≈ 458.2，取 459 次；约 23 min。</details></li>
+<li>50 次停车误差的均值为 0.62°，标准差 0.09°，上限 1°。求 C<sub>pk</sub>，判断是否合格；要让 C<sub>pk</sub> 达到 1.33，在标准差不变时均值最多是多少？<details class="ans"><summary>参考答案</summary>C<sub>pk</sub> = (1 − 0.62)/(3 × 0.09) ≈ 1.41，合格；均值 ≤ 1 − 4 × 0.09 = 0.64°。</details></li>
+<li>两晚之间合并了 40 个提交，HIL 剪线用例失败。二分最多要几轮？每轮编译刷写 3 min、跑一个用例 13 min，最多要多久？如果二分用的用例对坏提交只有 90% 的检出率，会出什么问题，怎样避免？<details class="ans"><summary>参考答案</summary>⌈log₂40⌉ = 6 轮，约 96 min。检出率不够时，坏提交可能被判为“好”，二分会把问题归到后面一个无辜的提交上；办法是选最敏感的工况（如最高转速）、增加次数使检出率接近 100%，或对二分结果再复核一次。</details></li>
+<li>（讨论）22.9 节说“把 HIL 的转矩–转速曲线移植进 SIL 模型”。这样做之后，是否就可以取消每晚 HIL 的剪线扫描？结合 22.2 节各层能发现的缺陷类型说明理由。<details class="ans"><summary>参考答案</summary>不能取消。SIL 加了这条曲线后，能在几分钟里抓住同一类规划问题，这是好事；但 HIL 还测实时性（中断延迟、总线时序）、真实驱动器和真实电磁铁的延迟，这些不在 SIL 模型里。合理的做法是 SIL 先拦住大部分问题，HIL 用较少的次数做确认，把省出的时间给别的用例。</details></li>
+<li>（讨论）为 WQ-SC/OL 包缝原型列出 4 条验收需求（REQ 编号、判据），说明每条在哪一层用什么用例验证，并估计每晚 HIL 需要多少时间。</li>
+</ol>
+<h3 id="x22-ref">参考资料</h3>
+<ol class="refs">
+<li>pytest 文档：fixtures、parametrize 与 markers. https://docs.pytest.org/</li>
+<li>Git 文档：git bisect（含 bisect run）. https://git-scm.com/docs/git-bisect</li>
+<li>Clopper C J, Pearson E S. The use of confidence or fiducial limits illustrated in the case of the binomial. Biometrika, 1934, 26(4): 404–413.</li>
+<li>NIST/SEMATECH e-Handbook of Statistical Methods：过程能力指数（Cpk）一节. https://www.itl.nist.gov/div898/handbook/</li>
+<li>OASIS. MQTT Version 5.0. 2019.</li>
+<li>问渠数字工厂 README 第五节“自动测试”及 factory/digital/tests、.github/workflows/factory.yml（本书配套仓库）。</li>
+</ol>
+<h3 id="x22-res">配套资源</h3>
+<p><a href="#lab-testbench" class="labref">虚拟实验 22-1　自动化测试台</a>　内置 v1.3.0–v1.4.2 六个固件版本（其中 v1.3.2 引入停针超调，v1.4.0 引入只在 HIL 高转速下暴露的剪线回归），可选单元、SIL、HIL、整机测试台四个层级和各层的用例集，显示每层的时间预算；点“运行”后有进度动画和逐条结果（用例、REQ 编号、测量值、判据、✓/✗），版本趋势图汇总跑过的结果；右侧有“要测多少次”计算器（零失效次数、允许失败时的次数、置信下限）。模型与正文 22.6、22.9 节相同。内置 3 个自动判定的任务：找出引入剪线回归的版本和失败的 REQ；在每晚 240 min 预算内选出保留故障注入、同时抓住两个回归的 HIL 用例组合；算出验证 99.5%/95% 需要的零失效试验次数和允许 1 次失败时的次数。</p>
+<section class="lab" id="lab-testbench" data-src="labs/testbench.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 22-1　自动化测试台</h4></div><p>选固件版本和测试层级，跑用例，看哪条需求失败；在每晚的时间预算内设计用例集，再算一算要测多少次才算数。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/testbench.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<p><a href="#lab-trim" class="labref">虚拟实验 14-1　剪线时序编辑器</a>、<a href="#lab-servo" class="labref">虚拟实验 13-1　停针定位：伺服调参</a>　本章案例中的剪线进刀窗口和停针超调，可以在这两个实验里单独调一调：把剪线转速提到 700 r/min 看进刀怎样晚过窗口；把位置增益从 200 提到 300 s⁻¹、惯量加大，看超调怎样超过 1°。</p>
+<section class="lab" id="lab-trim" data-src="labs/trim.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 14-1　剪线时序编辑器</h4></div><p>在时刻表上安排剪线电磁铁发令角、松线、停针和拨线，看延迟和转速怎样决定剪断、剪不断还是起缝脱线。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/trim.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<section class="lab" id="lab-servo" data-src="labs/servo.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 13-1　停针定位：伺服调参</h4></div><p>调位置增益、速度增益和积分时间，看主轴停在上针位时的超调、停稳时间和静差；惯量加倍后重新调参。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/servo.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>

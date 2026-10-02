@@ -1,0 +1,295 @@
+<p class="eyebrow">auto</p><h1>auto</h1><div class="seam" aria-hidden="true"></div>
+<div class="chips"><span class="chips-label">本章互动资源</span><a class="chip" href="#lab-factory"><b>虚拟实验</b>数字工厂：质量闭环与追溯</a><a class="chip" href="#lab-iot"><b>虚拟实验</b>缝纫机联网：事件、指标与数据量</a></div>
+<aside class="field"><p>本章为选学章（★）。读者需要第 22 章（出厂测试数据）、第 23–25 章（关键零件的工艺与检验）和第 26 章（MQTT、统一命名空间、OEE）的知识。本章以问渠数字工厂现有的代码为底座：凡是现有系统里已经有的，照实写出它在哪个模块；凡是为缝纫机厂新设计的，一律注明“方案（待建）”。所有数字都是示意值或算例值。</p></aside>
+<p>第 26 章讲的是缝纫机怎样联网、怎样把数据送到服装厂的看板上。这一章换一个角度：站在<strong>造缝纫机的工厂</strong>里，看一家整机厂的信息化应当怎样整体搭起来。它要回答几个很实际的问题：一张订单的机型和选项怎样变成物料清单和工单；机壳、旋梭、凸轮这些关键件的工艺路线怎样进车间执行系统；调试工位上测出的梭尖间隙怎样变成控制图和报警；一台机器出了问题，怎样在几分钟内查到它用的哪批旋梭、哪一版固件；卖出去的联网机器传回来的故障码，怎样回到设计和备件计划里。</p>
+<p>本章不从零开始画一张理想蓝图，而是用本书配套的<strong>问渠数字工厂</strong>做底座。它现在是一座生产减速器 WQR-105 的教学工厂：ERPNext 管物料、BOM、工艺和工单，统一数据总线（MQTT）把设备、软件和 AI 连在一起，历史库存下总线上的每一条消息，枢纽服务（hub）在上面做看板指标、AI 工厂助手、车间执行、设计发布和教学评分。我们在它上面设计一家生产工业平缝机 WQ-LS 系列的整机厂，看哪些可以直接用，哪些要新建，分几期建、花多少钱、多久能收回。</p>
+
+<h3 id="s27-1">27.1 引子：一家缝纫机厂的一天</h3>
+<p>设想一家中等规模的缝纫机整机厂：自制机壳、旋梭、凸轮和轴，外购机针、伺服电机、电控箱和标准件，一条总装线，节拍 2.4 min，每天计划装 180 台工业平缝机。早上 8 点半，销售接到一张订单：WQ-LS-TED 型 200 台，也就是带自动剪线（T）、电子针距（E）和少油旋梭（D）三个选项，客户要求 10 天交货。</p>
+<p>如果这家工厂的信息还散在表格、纸质工票和各台测试电脑里，这张订单从接单到发货，信息至少会在七个地方断开（图 27-1）：</p>
+<ol>
+<li><strong>选项靠抄</strong>。销售把选项写在表格里发给计划员，计划员再抄进生产计划，“少油旋梭”被抄成了标准旋梭，直到装配时才发现。</li>
+<li><strong>算料不知道外协</strong>。少油旋梭要在本厂做完旋梭以后送出去镀类金刚石碳（DLC）膜（第 24 章），外协周期约 5 天；物料需求计划（MRP）里没有这道外协工序，排产按标准旋梭的交期算，交期一开始就不可能达成。</li>
+<li><strong>固件版本没人管</strong>。电控箱是按本厂规格外协制造的，出厂测试时才烧录本厂的固件。这张订单该烧哪一版，没有写在任何单据里，全凭测试工记得。</li>
+<li><strong>停机下班后才知道</strong>。机壳一次装夹镗孔用的卧式加工中心是全厂的瓶颈（27.4 节），上午停了 3 h，纸质工票下班交上来才知道，这一天的机壳少了一截。</li>
+<li><strong>测量值没有趋势</strong>。调试工位每台都测梭尖间隙，记在纸上，数字一天比一天大，可没人把它画成图，直到出现超差。</li>
+<li><strong>测试数据对不上号</strong>。出厂测试台的结果按日期存在测试电脑里，文件名里没有序列号，要查某台机器的测试记录得一个个文件打开。</li>
+<li><strong>追溯查不下去</strong>。三个月后客户反映一批机器跳针，工厂想知道这些机器装的是哪批旋梭、同批旋梭还装了哪些机器，却查不出来，只好把这段时间出厂的机器全部列为可疑。</li>
+</ol>
+<p>这七个断点有一个共同的特点：信息其实都产生过，只是没有记在一个大家都能查、能互相关联的地方。整体信息化要做的，就是让每一条信息在产生的地方被记下来、带上编号（订单号、工单号、序列号、批次号、版本号），再通过同一条通道送到需要它的地方。图 27-1 下排是数字工厂里对应的接法，后面各节逐一展开。</p>
+<figure class="fig"><a class="zoom" href="img/fig_27_day.png"><img src="img/fig_27_day.png" alt="图 27-1　一张订单的一天" loading="lazy"></a><figcaption>图 27-1　一张 200 台订单从接单到发货，信息在七个地方断开，以及数字工厂里对应的接法（示意）</figcaption></figure>
+
+<h3 id="s27-2">27.2 总体架构</h3>
+<p><strong>分层</strong>　图 27-2 把整厂的信息系统分成五层。最下面是<strong>设备与产线</strong>：机加工设备、调试工位的量仪、出厂测试台，以及卖到客户那里的联网缝纫机，它们是数据的来源。往上是<strong>统一数据总线</strong>：所有设备和软件都只往总线上发消息、从总线上订阅消息，彼此不直接调用。再往上是<strong>历史库</strong>：总线上的每一条消息原样存下，成为全厂唯一的事实来源。然后是<strong>业务系统</strong>：企业资源计划（ERP）、产品生命周期管理（PLM）、车间制造执行（MES）、质量管理（QMS）和仓储（WMS），它们管的是“记录与流程”。最上面是<strong>看板与 AI</strong>：给人看的指标和替人起草的提议。</p>
+<figure class="fig"><a class="zoom" href="img/fig_27_arch.png"><img src="img/fig_27_arch.png" alt="图 27-2　总体架构" loading="lazy"></a><figcaption>图 27-2　缝纫机厂的总体架构与问渠数字工厂的部件；实线框已有，虚线框为方案（待建）（示意）</figcaption></figure>
+<p><strong>每层用哪个部件</strong>　问渠数字工厂的仓库（factory/ 目录）里，这几层都已经有一个可以运行的实现，只是它的产品是减速器（表 27-1）。总线是 Mosquitto（MQTT），浏览器用 WebSocket 连；历史库是 PostgreSQL，由 hub/historian.py 订阅 wq/# 把每条消息写入 bus_message 表，不合规范的消息也记下并标记 valid=false，同时提取设备状态的变化点，在测量结果不合格时自动开不合格品单（NCR）；ERP 是 ERPNext v16，由 Node-RED 桥接程序在 ERPNext 和总线之间转换字段；看板指标（hub/kpi.py）、AI 工厂助手（hub/ai.py）、MES（hub/mes.py）、设计发布与审批（hub/plm.py、design.py）、参数配置器（hub/configurator.py）、AI 选型（hub/select.py）都在枢纽服务里。另有零件与机器人库（仓库顶层 library/）和有限元与疲劳计算服务（cae/）。</p>
+<div class="tbl"><table><caption>表 27-1　问渠数字工厂现有的部件，与缝纫机厂需要新建的部分</caption><thead><tr><th>层</th><th>现有部件（代码位置）</th><th>缝纫机厂可直接用的</th><th>方案（待建）</th></tr></thead><tbody>
+<tr><td>设备与产线</td><td>仿真车间 sim/：减速器厂 12 台设备、2 台 AGV、三坐标</td><td>消息格式；“仿真设备与真实设备只差 source 字段”的做法</td><td>缝纫机厂的车间布置与仿真；机加工设备网关；调试工位量仪；出厂测试台接入（第 22 章）</td></tr>
+<tr><td>总线</td><td>Mosquitto；wqbus/topics.py、envelope.py（主题、信封、校验）</td><td>主题规则、信封、消息类型 machine.status/event/cmd、quality.measurement、quality.ncr、design.release、ai.alert/briefing/proposal</td><td>根主题 wq/sewing；新区域 assembly、test、service；新消息类型 test.result（27.4 节）</td></tr>
+<tr><td>历史库</td><td>PostgreSQL；hub/historian.py</td><td>原样存档、状态变化点、不合格自动开 NCR</td><td>按序列号的整机档案视图（27.5 节）</td></tr>
+<tr><td>ERP / WMS</td><td>ERPNext v16 + bridge/（Node-RED）；factory/data.py + seed.py 导入主数据</td><td>物料、BOM、工艺路线、工作中心、工单、作业卡、采购、质量检验单、批次、序列号、成本</td><td>WQ-LS 的主数据（27.10 节）；物料模板与变型；库位与条码</td></tr>
+<tr><td>PLM / 配置器</td><td>hub/plm.py（提交—审批—发布）、design.py（网页设计台）、FreeCAD 与 SolidWorks 提交宏、configurator.py（SH-301、WQR-105 两个模板）</td><td>任何物料编号都能发布图纸和 STEP；生产模式下先审批再生效</td><td>WQ-LS 配置模板；固件、参数表、事件表作为可发布的对象（27.6 节）</td></tr>
+<tr><td>MES</td><td>hub/mes.py + 车间终端</td><td>逐工序派工、开工、暂停、复位（经 machine.cmd，不直接碰设备）</td><td>装配线按序列号报工、扫码绑定部件批次</td></tr>
+<tr><td>QMS</td><td>ERPNext 质量检验单（质检门）；historian 自动 NCR；kpi.py 的控制图与 ai.py 的“趋近上限”提醒</td><td>检验模板、质检门、NCR 记录</td><td>X̄ 控制图与判异规则、可疑批次冻结、8D 记录（27.5 节）</td></tr>
+<tr><td>看板与 AI</td><td>kpi.py、ai.py、select.py、teach.py；llm.py 模型网关</td><td>今日简报、提醒、问答、起草提议（人确认后执行）；只从库里选型</td><td>缝纫机厂指标页；服务门户（27.7 节）</td></tr>
+</tbody></table></div>
+<p><strong>两条规矩</strong>　问渠数字工厂有两条贯穿所有模块的规矩，缝纫机厂原样沿用。第一，<strong>任何组件不直接调用另一个组件</strong>，只经总线交换数据；所以把仿真机床换成真实机床、把减速器换成缝纫机，只要按同样的格式发消息，其余部分不用改。第二，<strong>写操作要人确认</strong>：AI 和规则引擎只能起草提议（ai.proposal，requires_confirm 必须为真），人在工作台上点了确认，才由桥接或 MES 执行；教学模式下 AI 只提示方向、不代做。</p>
+<p><strong>主题与信封</strong>　总线上的主题形如 wq/&lt;工厂&gt;/&lt;区域&gt;/&lt;单元&gt;/&lt;类别&gt;。减速器厂的根主题是 wq/gearbox，区域有 office、design、machining、quality、warehouse、logistics、ai；类别有 status、event、cmd、cmd/ack、measurement、ncr、release、gcode、alert、briefing、proposal、torque，其中 status 和 briefing 用保留消息。缝纫机厂的根主题用 wq/sewing（与第 19 章 PLATFORM 设定一致），按规范“只增加、不改动”的原则，增加装配（assembly）、测试（test）和服务（service）三个区域（表 27-2）。</p>
+<div class="tbl"><table><caption>表 27-2　缝纫机厂的主题命名示例</caption><thead><tr><th>主题</th><th>消息类型</th><th>谁发</th><th>谁订阅</th><th>状态</th></tr></thead><tbody>
+<tr><td>wq/sewing/machining/hmc-h03/status</td><td>machine.status</td><td>3 号卧加的网关</td><td>看板、历史库、MES</td><td>类型已有</td></tr>
+<tr><td>wq/sewing/machining/grd-h02/event</td><td>machine.event（cycle_end、tool_change）</td><td>2 号梭道磨床</td><td>历史库、AI 提醒</td><td>类型已有</td></tr>
+<tr><td>wq/sewing/quality/qc-01/measurement</td><td>quality.measurement</td><td>检验站</td><td>历史库（不合格自动开 NCR）、控制图</td><td>类型已有</td></tr>
+<tr><td>wq/sewing/assembly/adj-03/measurement</td><td>quality.measurement（附 hook_lot 字段）</td><td>3 号调试工位量仪</td><td>控制图、判异规则、追溯</td><td>区域待建</td></tr>
+<tr><td>wq/sewing/test/eol-02/measurement</td><td>test.result</td><td>2 号出厂测试台（第 22 章）</td><td>历史库、整机档案、看板</td><td>类型待建</td></tr>
+<tr><td>wq/sewing/office/erp/work_order</td><td>erp.doc</td><td>桥接</td><td>看板、AI</td><td>类型已有</td></tr>
+<tr><td>wq/sewing/design/fw-wqsc-ls/release</td><td>design.release</td><td>PLM（审批通过后）</td><td>桥接、测试台、AI</td><td>用于固件属方案</td></tr>
+<tr><td>wq/sewing/service/fleet/event</td><td>（待定）</td><td>客户厂的网关（经同意转发）</td><td>服务门户、可靠性分析</td><td>区域待建</td></tr>
+<tr><td>wq/sewing/ai/alert、ai/proposal</td><td>ai.alert、ai.proposal</td><td>AI 工厂助手</td><td>工作台</td><td>已有</td></tr>
+</tbody></table></div>
+<p>每条消息都装在同一个“信封”里：版本号 v、消息编号 id、时间 ts（UTC）、类型 type、来源 source、模式 mode（teach 或 prod）、关联号 corr（工单号或提议编号），业务内容放在 data 里。下面是调试工位发出的一条梭尖间隙测量（字段名按 envelope.py 的 quality.measurement 定义；hook_lot 是新增的字段，校验只检查“必须有”的字段，所以加字段不会让旧组件报错）：</p>
+<pre><code class="language-json">{"v": 1, "id": "5f0c…", "ts": "2026-10-12T02:48:31.204Z",
+ "type": "quality.measurement", "source": "gauge/adj-03", "mode": "prod",
+ "corr": "WO-LS-2610-12",
+ "data": {"part_serial": "LS2610-0070", "item": "WQ-LS-TED", "work_order": "WO-LS-2610-12",
+          "characteristic": "hook_clearance", "name": "梭尖间隙",
+          "nominal_mm": 0.070, "lower_tol_mm": 0.040, "upper_tol_mm": 0.100,
+          "value_mm": 0.0799, "result": "pass", "hook_lot": "H2610-07"}}</code></pre>
+<p>现有的 quality.measurement 类型规定数值以毫米计（字段名里带 _mm）。出厂测试的很多项目不是长度，例如停针定位误差（度）、剪线成功次数、温升（K），硬塞进 _mm 字段会让后面的系统误读。所以本方案新增一个 test.result 类型（方案，待建），必有字段为序列号、物料、需求编号（第 22 章的 REQ-…）、数值、单位、下限、上限、结论、固件版本和参数表版本。按信封规范，增加新类型不需要改版本号。</p>
+
+<h3 id="s27-3">27.3 产品数据：零件库、BOM 与配置</h3>
+<p><strong>机型 × 选项</strong>　工业平缝机通常以一个基本机型加若干选项的方式销售。本章的 WQ-LS 系列取三个选项：自动剪线 T（加剪线凸轮、剪线和拨线电磁铁，第 14 章）、电子针距 E（用闭环步进电机代替机械针距调节，第 14 章）、少油旋梭 D（DLC 镀膜旋梭，第 5、23、24 章）。三个选项各有、无两种，组合出 2 × 2 × 2 = 8 种变型：WQ-LS、WQ-LS-T、-E、-D、-TE、-TD、-ED、-TED。在 ERPNext 里，可以把 WQ-LS 建成物料模板（Item Template），把 T、E、D 建成属性，由模板生成 8 个变型物料，每个变型挂一张自己的 BOM。选项再多一些（例如加上自动抬压脚、针杆冷却、不同的针距范围），组合数会成倍增加，这时就不宜给每个组合都事先建好 BOM，而要由配置器按规则即时生成。</p>
+<p><strong>设计 BOM 与制造 BOM</strong>　设计部门的 BOM（EBOM）按功能组织：刺布与挑线、钩线、送布、传动、机体、电控（图 27-3 左）。车间要的 BOM（MBOM）按装配线上的部件和工序组织：机壳组件、上轴与针杆组件、下轴与旋梭组件、送布组件、剪线组件，再加上电机、电控箱、固件和机针（图 27-3 右）。两张 BOM 的零件是同一批，只是层次不同；从 EBOM 到 MBOM 的转换要加进设计里没有的东西：外协工序（DLC 镀膜）、工艺用的辅料、装配时才绑定的固件版本。问渠数字工厂的做法是 BOM 跟着设计发布走：设计台发布新版本时，桥接在 ERPNext 里把物料的设计版本加一、挂上附件，用量变了就建新版 BOM；生产模式下，发布要先经过审批（hub/plm.py）。</p>
+<figure class="fig"><a class="zoom" href="img/fig_27_bom.png"><img src="img/fig_27_bom.png" alt="图 27-3　设计 BOM、配置与制造 BOM" loading="lazy"></a><figcaption>图 27-3　WQ-LS 的设计 BOM、三个配置选项和 WQ-LS-TED 的制造 BOM（示意）</figcaption></figure>
+<div class="tbl"><table><caption>表 27-3　配置选项对 BOM、工艺和交期的影响（示意）</caption><thead><tr><th>选项</th><th>BOM 的变化</th><th>工艺与检验的变化</th><th>交期影响</th></tr></thead><tbody>
+<tr><td>T 自动剪线</td><td>加 SA-TRIM：剪线凸轮 CAM-LS02、剪线电磁铁、拨线电磁铁</td><td>凸轮磨床多一件；出厂测试加“剪线 50 次全部成功”；事件表加剪线、拨线两行（第 19 章）</td><td>无（自制件）</td></tr>
+<tr><td>E 电子针距</td><td>SA-MFEED 换成 SA-EFEED：加闭环步进电机</td><td>调试加针距标定；固件启用送布驱动</td><td>取决于步进电机采购周期</td></tr>
+<tr><td>D 少油旋梭</td><td>SA-HOOK 换成 SA-HOOK-D：旋梭 HK-LS01 换成 HK-LS01D</td><td>旋梭零件检验后加 DLC 镀膜外协工序；出厂测试加少油运转温升</td><td>外协约 5 天（示意）</td></tr>
+</tbody></table></div>
+<p><strong>零件库条目与 BOM 行</strong>　问渠零件与机器人库按四部分组织：A 标准件、B 机器人、C 机构、D 厂商器件。每个条目有一个 entry.yaml（编号、中英文名、参数定义，每个参数有 key、中英文名、角色和单位）和一张 specs.csv 规格表。减速器厂的做法是在 data.py 里用 LIBRARY_REFS 把每个标准外购件的物料代号对到库条目和规格（例如 BRG-6207 → A-BRG-DG/6207），库里的条目也反过来记着它对应的 ERPNext 物料，测试程序核对两边一致。缝纫机厂照此办理（表 27-4）：轴承、带轮、同步带、螺钉用已有的 A、C 部分条目；抬牙凸轮可以用 C-CAM-DISC（盘形凸轮机构）的参数描述它的廓线；伺服电机、步进电机、电磁铁、主控板这些电控模块目前<strong>不在库里</strong>，按第 19 章给出的建议编号，计划入库。</p>
+<div class="tbl"><table><caption>表 27-4　WQ-LS 的物料与零件库条目的对应</caption><thead><tr><th>物料代号</th><th>名称</th><th>零件库条目</th><th>说明</th></tr></thead><tbody>
+<tr><td>BRG-6000、BRG-6201</td><td>深沟球轴承</td><td>A-BRG-DG/6000、/6201</td><td>已有条目</td></tr>
+<tr><td>PUL-HTD、BELT-HTD</td><td>同步带轮、上下轴同步带</td><td>A-PUL-HTD、C-BLT-BELT</td><td>已有条目</td></tr>
+<tr><td>SCR-SET</td><td>螺钉包</td><td>A-SCR-SHC 等</td><td>已有条目</td></tr>
+<tr><td>CAM-LS01</td><td>抬牙凸轮（自制）</td><td>C-CAM-DISC</td><td>已有机构条目，用于描述廓线参数；零件本身是自制件</td></tr>
+<tr><td>MOT-LS-SV</td><td>直驱伺服电机</td><td>D-MOT-PMSM</td><td>建议编号，计划入库</td></tr>
+<tr><td>STP-FEED</td><td>闭环步进电机</td><td>D-MOT-STEP</td><td>建议编号，计划入库</td></tr>
+<tr><td>SOL-TRIM、SOL-WIPE</td><td>剪线、拨线电磁铁</td><td>D-SOL-PUSH</td><td>建议编号，计划入库</td></tr>
+<tr><td>CTL-WQSC-LS</td><td>电控箱</td><td>D-CTL-WQSC</td><td>建议编号，计划入库</td></tr>
+<tr><td>FW-WQSC-LS</td><td>主控固件</td><td>—</td><td>不是零件库的对象，是有版本的物料（27.6 节）</td></tr>
+</tbody></table></div>
+<p><strong>参数配置器</strong>　hub/configurator.py 把一个产品做成“参数模板”：参数与范围、校核规则、三维模型、图纸、报价、下单。现在有两个模板：输出轴 SH-301 和减速器 WQR-105（选传动比、输入功率与转速、工况系数，校核输出转矩、轴承寿命和平键挤压强度）；报价等于标准成本（材料加工时乘工位费率）乘以一加毛利率，下单走“提议—确认”，确认后由桥接在 ERPNext 里建销售订单。WQ-LS 的模板（方案，待建）照这个格式写：参数是三个选项和几项可选范围（最高转速档、针距范围、适用面料档），校核规则是选项之间的约束（例如电子针距必须配本厂电控箱的某一硬件版本以上）、变型存在与否，以及选项对交期的影响（D 选项加外协周期）；输出变型编码、BOM、报价单和交期估计。这样，27.1 节的断点 1 和 2 就在接单时被堵上了：销售在配置器里点选项，生成的是 WQ-LS-TED 这个编码和它的 BOM，而不是一段文字；MRP 展开这张 BOM 时，自然会遇到 DLC 外协工序和它的周期。</p>
+<p><strong>固件也是一个物料</strong>　在 BOM 里给固件留一行 FW-WQSC-LS，数量为 1，带版本。这样做有三个好处：工单一下达，就知道这批机器该烧哪一版；出厂测试台可以按工单核对“烧进去的版本是否就是 BOM 要求的版本”；序列号档案里自然记下了每台机器出厂时的固件版本。固件、参数表和事件表的版本怎样管理，见 27.6 节。</p>
+
+<h3 id="s27-4">27.4 工艺与制造执行</h3>
+<p><strong>工艺路线进 MES</strong>　减速器厂在 data.py 里用三张表描述工艺：工作中心（名称、台数、每小时的折旧、人工和能耗）、工序（工序名和默认工作中心）、工艺路线（每条路线是一串“工序, 每件分钟”）。seed.py 把它们导入 ERPNext；车间里每张工单按工艺路线生成作业卡，MES 逐工序派工。缝纫机厂的四类关键件各有一条工艺路线（图 27-4）：机壳是铣基准面、一次装夹镗孔、钻攻和孔系检验（第 25 章）；旋梭是车削、渗碳淬火、磨梭道、研磨梭尖和零件检验，少油旋梭再加一道 DLC 外协（第 24 章）；凸轮是车削、淬火、磨廓线和检验（第 25 章）；机针是外购件，路线只有来料检验和按批入库（第 24 章）。整机的路线是总装、调试、跑合和出厂测试。</p>
+<figure class="fig"><a class="zoom" href="img/fig_27_route.png"><img src="img/fig_27_route.png" alt="图 27-4　工艺路线与装配测试" loading="lazy"></a><figcaption>图 27-4　机壳、旋梭、凸轮、轴和机针的工艺路线，装配与测试工位，以及它们发到总线上的消息（示意）</figcaption></figure>
+<p><strong>找瓶颈</strong>　和减速器厂的“每台产品占用的工作中心时间”一样，把每台整机的全部自制件和总装工序时间按工作中心加总，再除以有效能力，就得到负荷率（表 27-5）。算例取每天 180 台，机加工两班、按设备综合效率（OEE）60% 折算有效时间，装配和测试一班、按节拍效率 90% 折算。负荷最满的是卧式加工中心 HMC-H：每台机壳一次装夹镗孔 16 min，5 台卧加两班，有效能力恰好每天 180 台，负荷 100%，一点余量都没有；总装线按节拍设计，也是 100%。如果卧加的 OEE 提高到 68%，它的负荷降到 88%，才有了应付停机和插单的余地。这就是 27.9 节第一期把“关键设备联网、提高 OEE”列为重点的原因。</p>
+<div class="tbl"><table><caption>表 27-5　工作中心负荷（算例：每天 180 台；机加工两班、OEE 60%；装配测试一班、效率 90%）</caption><thead><tr><th>工作中心</th><th>台数 × 班</th><th>每台整机占用（min）</th><th>日有效能力（台）</th><th>负荷</th></tr></thead><tbody>
+<tr><td>卧式加工中心 HMC-H</td><td>5 × 2</td><td>16.0</td><td>180</td><td><strong>100%</strong></td></tr>
+<tr><td>梭道磨床 GRD-H</td><td>2 × 2</td><td>6.0</td><td>192</td><td>94%</td></tr>
+<tr><td>数控车床 CNC-S</td><td>8 × 2</td><td>23.8</td><td>194</td><td>93%</td></tr>
+<tr><td>凸轮磨床 GRD-C</td><td>2 × 2</td><td>5.95</td><td>194</td><td>93%</td></tr>
+<tr><td>热处理线 HT-01</td><td>1 × 2</td><td>2.85</td><td>202</td><td>89%</td></tr>
+<tr><td>立式加工中心 VMC-H</td><td>5 × 2</td><td>14.0</td><td>206</td><td>88%</td></tr>
+<tr><td>外圆磨床 GRD-S</td><td>3 × 2</td><td>8.0</td><td>216</td><td>83%</td></tr>
+<tr><td>检验站 QC-01</td><td>2 × 2</td><td>5.2</td><td>222</td><td>81%</td></tr>
+<tr><td>梭尖研磨机 LAP-H</td><td>2 × 2</td><td>5.0</td><td>230</td><td>78%</td></tr>
+<tr><td>三坐标 CMM-01</td><td>1 × 2</td><td>2.0</td><td>288</td><td>63%</td></tr>
+<tr><td>总装线 ASM-L1</td><td>1 × 1</td><td>2.4（节拍）</td><td>180</td><td>100%</td></tr>
+<tr><td>调试工位 ADJ</td><td>5 × 1</td><td>9.6</td><td>225</td><td>80%</td></tr>
+<tr><td>跑合台 RUN</td><td>15 × 1</td><td>30</td><td>216</td><td>83%</td></tr>
+<tr><td>出厂测试台 EOL</td><td>3 × 1</td><td>4.8</td><td>270</td><td>67%</td></tr>
+</tbody></table></div>
+<p>剪线凸轮只用于带 T 选项的机器，表中按 70% 的机器带剪线折算；热处理线是连续式，按分摊到每件的炉时计。这些数字都由 figsrc/ch27_model.py 从工艺数据算出，改一个工时，表就跟着变。</p>
+<p><strong>设备状态上总线</strong>　每台加工设备经网关（或 PLC）按 machine.status 发状态：run、idle、setup、down、fault 五种，带上当前的工单号、工序和零件序列号；按 machine.event 发事件：cycle_start、cycle_end（带实际节拍 cycle_time_s）、alarm、fault、recover、tool_change。看板的 OEE 就是 kpi.py 从这些消息算出来的：时间开动率 = 运行时间 / 负荷时间（运行、调整、停机、故障之和），性能开动率 = 标准节拍之和 / 实际节拍之和，再乘以质量合格率。对梭道磨床和凸轮磨床，砂轮修整也作为 tool_change 事件记下来，后面 27.5 节追溯时要用到。</p>
+<p><strong>车间终端报工</strong>　问渠数字工厂的车间终端就是工作台里的“车间执行”页：MES 按工艺路线逐工序派工，操作工在终端上点开工、暂停、复位，这些指令以 machine.cmd 发到总线，设备回 cmd/ack，MES 不直接碰设备。机加工工序按这种方式报工即可。装配线不同：它是按节拍流动的，不必每个工位都点开工，而要在线头扫码（方案，待建）：给机壳组件贴上序列号标签，线上每个装部件的工位扫一下部件或其批次标签，就把“这台机器用了哪批旋梭、哪个炉号的机壳、哪个序列号的电控箱”记到序列号下。这一步是 27.5 节追溯的基础，做不到逐台扫码，就只能按时段粗略推断。</p>
+<p><strong>调试工位与出厂测试台</strong>　调试工位要调钩线定时、针杆高度和梭尖间隙（第 5、23 章），调完用量仪测一遍，结果以 quality.measurement 发到 wq/sewing/assembly/adj-&lt;号&gt;/measurement，一台机器一条消息，附上旋梭批次。出厂测试台（第 22 章）的测试脚本通过网关下发命令、读回测量，每个测试用例对应一条需求，结果按 test.result 随序列号发到 wq/sewing/test/eol-&lt;号&gt;/measurement；同时读出控制器上报的固件版本和参数表版本，与工单 BOM 里要求的版本核对，不一致就判不合格。出厂测试的数据怎样设计、测试台怎样搭，见第 22 章。</p>
+
+<h3 id="s27-5">27.5 质量闭环</h3>
+<p><strong>检验计划</strong>　减速器厂的检验计划写在 data.py 的 inspection_templates() 里：每个模板是一组检验参数，数值参数带上下限，文字参数带标准描述；seed.py 把它们导入 ERPNext 的质量检验模板，并挂到对应物料上。有检验模板的物料，它的“零件检验”或“出厂检验”工序是一道质检门：先提交质量检验单，作业卡才能完成。缝纫机厂的检验计划见表 27-6，来料、零件、装配调试和出厂四个关口各有一组；抽样检验的抽样方案可以按 GB/T 2828.1 的计数抽样程序确定。</p>
+<div class="tbl"><table><caption>表 27-6　WQ-LS 的检验计划（示意值；详细的检验方法见第 23–25 章）</caption><thead><tr><th>关口</th><th>模板</th><th>检验项目与判据</th><th>方式</th></tr></thead><tbody>
+<tr><td>来料</td><td>进货检验-机针</td><td>外观与针尖无毛刺；针杆直线度 ≤ 0.02 mm</td><td>按批抽样</td></tr>
+<tr><td>来料</td><td>进货检验-铸件</td><td>无砂眼、气孔、裂纹；硬度 180–240 HB；记录炉号</td><td>按炉号抽样</td></tr>
+<tr><td>零件</td><td>零件检验-机壳</td><td>上下轴孔平行度 ≤ 0.015 mm；针杆套孔位置度 ≤ 0.03 mm</td><td>三坐标，每 10 件抽 1 件</td></tr>
+<tr><td>零件</td><td>零件检验-旋梭</td><td>梭尖到安装基准 ±0.01 mm；表面硬度 58–64 HRC</td><td>梭尖尺寸逐件，硬度抽样</td></tr>
+<tr><td>零件</td><td>零件检验-凸轮</td><td>廓线误差 ≤ 0.015 mm；硬度 58–63 HRC</td><td>抽样</td></tr>
+<tr><td>装配</td><td>调试检验</td><td>梭尖间隙 0.04–0.10 mm；钩线定时偏差 ±1.5°</td><td>逐台，量仪上总线</td></tr>
+<tr><td>出厂</td><td>出厂检验-平缝机</td><td>停针定位误差 ≤ ±1°；剪线 50 次全部成功；固件版本与工单一致</td><td>逐台，测试台上总线</td></tr>
+</tbody></table></div>
+<p><strong>从测量到报警：现有的做法</strong>　问渠数字工厂现在已经有两道关。一是历史库：quality.measurement 的结论是 fail 时，historian 自动开一张 NCR（编号 NCR-0001 起），记下特性、实测值、上下限和原始消息的编号。二是 AI 提醒：kpi.py 的控制图取某一特性最近 20 个测量值，ai.py 检查最近 5 件，若均值比公差中值高出 2 µm 以上、并且最大值离上限只剩不到公差带的 25%，就发一条“测量值上移，趋近上限”的提醒，附上这 5 条测量消息的编号，并建议检查磨床砂轮磨损。这条规则是为减速器厂磨床砂轮磨损写的：那里的轴承位公差带 16 µm，测量的标准差约 1.2 µm，只有真的在漂移时最大值才会靠近上限。</p>
+<p><strong>控制图与判异规则（方案，待建）</strong>　缝纫机厂的梭尖间隙情况不同：公差带 60 µm，过程本身的标准差约 6 µm，单台测量值偶尔靠近上限是正常的波动。这时更合适的是经典的均值控制图（X̄ 图）：把连续 5 台的间隙作为一个子组，算子组均值；中心线和控制限由过程稳定时的基准算出：</p>
+<div class="math">\[ CL=\mu_0,\qquad UCL/LCL=\mu_0\pm 3\,\frac{\sigma}{\sqrt{n}} \]</div>
+<p>算例取 μ<sub>0</sub> = 0.070 mm、σ = 0.006 mm、n = 5，控制限为 0.070 ± 0.0080 mm。判异用西方电气公司（Western Electric）手册里的规则，本章用其中四条：R1，一个点在 3σ 控制限之外；R2，连续 3 点中有 2 点在同一侧的 2σ 之外；R3，连续 5 点中有 4 点在同一侧的 1σ 之外；R4，连续 8 点在中心线同一侧。规则越多，漂移被发现得越早，没有漂移时误报也越多，要权衡。报警以 ai.alert 发出，证据是触发报警的那几个子组的测量消息编号；按 ai.py 的去重办法，同一条规则 2 h 内不重复报。报警后系统起草一份“冻结可疑批次”的提议，由质检员确认后才执行。</p>
+<pre><code class="language-python">def spc_alarms(vals, mu0, sigma, rules, n=5):
+    """vals：按序列号排列的梭尖间隙（mm）；返回 [(序列号, 规则)]。"""
+    s, Z, out = sigma / n ** 0.5, [], []
+    for i in range(n, len(vals) + 1, n):
+        Z.append((sum(vals[i - n:i]) / n - mu0) / s)      # 子组均值的 z 值
+        w3, w5, w8 = Z[-3:], Z[-5:], Z[-8:]
+        if "R1" in rules and abs(Z[-1]) &gt; 3: out.append((i, "R1"))
+        if "R2" in rules and len(w3) == 3 and (sum(z &gt; 2 for z in w3) &gt;= 2 or sum(z &lt; -2 for z in w3) &gt;= 2): out.append((i, "R2"))
+        if "R3" in rules and len(w5) == 5 and (sum(z &gt; 1 for z in w5) &gt;= 4 or sum(z &lt; -1 for z in w5) &gt;= 4): out.append((i, "R3"))
+        if "R4" in rules and len(w8) == 8 and (all(z &gt; 0 for z in w8) or all(z &lt; 0 for z in w8)): out.append((i, "R4"))
+    return out</code></pre>
+<p><strong>算例：梭尖间隙漂移</strong>　总装线平均每小时装 22.5 台。第 2 h 起（第 46 台起），装配开始用新的一批旋梭 H2610-07。这批旋梭在磨梭道时，砂轮修整间隔被从 50 件改成了 150 件，梭尖到安装基准的距离随砂轮磨损逐只变大；装配按旋梭的安装基准定位，于是装出来的梭尖间隙以每小时 4 µm 的速度漂移（都是示意值）。按正态分布估算，漂移开始 4 h 后，单台超差的概率约 1%，5 h 后约 4.8%，6 h 后约 16%。</p>
+<p>用同一组随机数（种子 5）模拟 16 h、360 台，结果见图 27-5 和表 27-7。只靠逐台判超差，第一台超差出现在第 174 台（7.7 h），这时 historian 才开出第一张 NCR；0.5 h 后停用这批旋梭，已经有 140 台装了它，而且第 8 h 发运时，其中 135 台已经装箱发走。只用 R1 时，第 100 台（4.4 h）报警；四条规则全用时，第 70 台（3.1 h）由 R2 报警，比首台超差早 4.6 h，受影响的整机只有 36 台（第 46–81 台），全在厂内，没有一台超差。现有的“趋近上限”规则在这里表现不好：同一组随机数在没有漂移时 16 h 里报了 3 次，都是误报。</p>
+<div class="tbl"><table><caption>表 27-7　不同报警方式的结果（算例：种子 5；报警后 0.5 h 停用该批旋梭）</caption><thead><tr><th>报警方式</th><th>报警<br>（台 / h）</th><th>受影响 / 返工 /<br>已发货（台）</th><th>无漂移时<br>误报（16 h）</th><th>1000 组随机数：<br>检出延迟 / 误报概率</th></tr></thead><tbody>
+<tr><td>只按超差（现有自动 NCR）</td><td>#174 / 7.7 h</td><td>140 / 3 / 135</td><td>—</td><td>首台超差平均在漂移后 4.95 h</td></tr>
+<tr><td>现有“趋近上限”规则</td><td>#81 / 3.6 h</td><td>47 / 0 / 0</td><td>3 次</td><td>1.40 h / 87%</td></tr>
+<tr><td>X̄ 图，R1</td><td>#100 / 4.4 h</td><td>66 / 0 / 0</td><td>0</td><td>1.75 h / 20%</td></tr>
+<tr><td>X̄ 图，R1 + R2 + R4</td><td>#70 / 3.1 h</td><td>36 / 0 / 0</td><td>0</td><td>1.44 h / 45%</td></tr>
+<tr><td>X̄ 图，R1–R4</td><td>#70 / 3.1 h</td><td>36 / 0 / 0</td><td>0</td><td>1.35 h / 54%</td></tr>
+</tbody></table></div>
+<figure class="fig"><a class="zoom" href="img/fig_27_spc.png"><img src="img/fig_27_spc.png" alt="图 27-5　梭尖间隙漂移与报警" loading="lazy"></a><figcaption>图 27-5　梭尖间隙的逐台测量值与 X̄ 控制图（左），以及比 SPC 报警晚发现的代价（右）（算例，示意值）</figcaption></figure>
+<p><strong>晚发现的代价</strong>　图 27-5 右边从 R1–R4 的报警（第 70 台）算起：每晚发现 1 h，受影响整机就多约 22 台；晚 4 h，126 台要复检，但还没有超差；晚 5 h，开始出现超差返工（6 台），而且第 8 h 的发运已经把 135 台受影响的机器送了出去，要到客户那里去追。控制图的价值不在于少返工几台，而在于在问题还只是“趋势”的时候就停下来，把可疑的范围圈得很小。表中最后一列也提醒我们：1000 组随机数平均下来，R1–R4 在 16 h 里有一半以上的机会至少误报一次，每一次误报都意味着停下来查一遍；规则的选择要和误报的成本一起考虑。</p>
+<p><strong>NCR 与 8D</strong>　报警之后的处理分两步。<strong>围堵</strong>：冻结旋梭批次 H2610-07 在仓库里的剩余库存（算例中 300 只用掉 36 只，剩 264 只），把第 46–81 台列为可疑、复检间隙，开出 NCR（quality.ncr 的状态有 open、rework、scrap、use_as_is 四种，即待处理、返工、报废、让步接收）。<strong>根本原因与纠正</strong>：按 8D 的步骤（组成小组、描述问题、临时措施、找根本原因、选定并验证永久措施、实施、预防再发、总结）写成记录。本例的根本原因是砂轮修整间隔在没有验证的情况下被放宽了；永久措施是把修整间隔写进旋梭的工艺参数，修整作为 tool_change 事件上总线，间隔超过规定值时由规则提醒；预防再发是让工艺参数的修改也走 27.6 节的工程变更流程。8D 记录模板和“可疑批次冻结”提议都是方案（待建）；ERPNext 的质量模块里有不合格（Non Conformance）和质量措施等单据，可以作为记录的载体，具体字段待核。</p>
+<p><strong>序列号追溯</strong>　追溯要从两个方向查（图 27-6）。向后（溯源）：从报警的第 70 台出发，查到它装的旋梭批次 H2610-07，再查到这批旋梭的工单、在哪台梭道磨床上磨的、那几天的砂轮修整记录，找到原因线索。向前（追踪）：从这批旋梭出发，查出同批还装了哪些整机（第 46–81 台）、仓库里还剩多少只、有没有已经发货的。这两个方向都要靠 27.4 节的扫码绑定：序列号和批次本身是 ERPNext 的 Serial No 和 Batch 单据，而“这台机器用了哪个批次”“它的间隙测了多少”“它出厂时是哪版固件”分别是历史库里的消息。整机档案（方案，待建）就是把这些消息按序列号拼起来的一张页面，每一项都能点回原始消息。</p>
+<figure class="fig"><a class="zoom" href="img/fig_27_trace.png"><img src="img/fig_27_trace.png" alt="图 27-6　序列号—批次追溯" loading="lazy"></a><figcaption>图 27-6　从一次报警向后查原因、向前圈范围，以及一台整机的档案（算例，示意）</figcaption></figure>
+<aside class="field"><p><strong>现场要点</strong></p><ul>
+<li>追溯能查多深，取决于装配时扫没扫码。没有逐台绑定批次，只能按“这几天装的都可疑”来圈，范围会大好几倍。</li>
+<li>控制限要用过程稳定时的数据算，不要用公差限代替；公差告诉你零件能不能用，控制限告诉你过程有没有变。</li>
+<li>砂轮修整、换刀、换批次、改参数，都要作为事件记下来；出了问题，第一件事就是看报警前后发生过哪些事件。</li>
+<li>报警后先围堵、后查原因：先冻结可疑批次和整机，再慢慢分析，不要反过来。</li>
+</ul></aside>
+
+<h3 id="s27-6">27.6 电控与软件的版本管理</h3>
+<p>一台电控缝纫机的“软件”不只是固件。按第 19 章的固件框架，至少有四样东西各自有版本：<strong>固件</strong>（主控板上的程序）、<strong>参数表</strong>（针距、速度、停针位置、剪线速度等）、<strong>事件表</strong>（剪线电磁铁在 205°–330° 通电这类按主轴转角触发的动作，第 19 章）和<strong>主控板的硬件版本</strong>。它们之间有兼容关系：新固件可能要求参数表增加一项，某个事件表只适用于带 T 选项的机器，电子针距需要某一版以上的主控板。这些关系要写成一张兼容表，由出厂测试台和远程升级共同遵守（表 27-8）。</p>
+<div class="tbl"><table><caption>表 27-8　版本对象与兼容规则（示意）</caption><thead><tr><th>对象</th><th>编号与版本</th><th>谁发布</th><th>兼容规则举例</th><th>在哪里核对</th></tr></thead><tbody>
+<tr><td>固件</td><td>FW-WQSC-LS 1.5.0（主.次.修订）</td><td>电控组，经 ECO 审批</td><td>1.5.x 要求参数表 ≥ v8、主控板硬件 ≥ B 版</td><td>出厂测试台；远程升级前</td></tr>
+<tr><td>参数表</td><td>PAR-LS v8</td><td>电控组 / 工艺</td><td>v8 增加剪线电磁铁强激磁时间一项</td><td>出厂测试台</td></tr>
+<tr><td>事件表</td><td>EVT-LS-T v5</td><td>电控组</td><td>只用于带 T 选项的变型</td><td>出厂测试台按变型选择</td></tr>
+<tr><td>主控板硬件</td><td>D-CTL-WQSC 硬件 B 版</td><td>电控箱供应商</td><td>来料检验记录硬件版本</td><td>来料检验；测试台读出</td></tr>
+</tbody></table></div>
+<p><strong>工程变更（ECO）</strong>　任何一个版本对象要改，都走同一个流程：提出变更请求（为什么改，例如图 27-7 里剪线电磁铁过流的故障码偏多）；评审影响（哪些变型、哪些在制品和库存、哪些已售机器）；定生效方式（按序列号断点，例如从 LS2611-0001 起；或按日期；在制品是否返工）；审批后发布。问渠数字工厂的 PLM 已经有“提交—审批—发布”：生产模式下设计先发 design.submit 进入待审，审阅人在网页上看图、批注，批准后才发 design.release，ERPNext 和车间才跟着变；AI 收到 design.release 后会检查在制工单是否受影响，提醒工艺员决定已开工的零件按旧版继续还是返工。把固件、参数表、事件表也当作可发布的物料（发布的文件是固件镜像、签名和发布说明，而不是 STEP），就能沿用这一套（方案，待建）。</p>
+<p><strong>远程升级与回滚</strong>　已经卖出的联网机器要不要升级，是 ECO 评审的一部分。第 26 章 26.7 节讲过远程升级的做法：固件签名校验、双区升级（第 18 章），分批推送。具体到缝纫机厂，可以把联网机群分成三圈：第一圈是本厂和几家合作客户的约 1% 机器，升级后观察 72 h 的运转；按每千运转小时的故障率与旧版本比较，不升高才推第二圈（约 10%），再推全部。任何一圈出现问题，就用双区里保存的旧版本回滚。升级本身也是一条记录：哪台机器、什么时候、从哪一版升到哪一版、谁批准的，都应当上总线、进历史库，这样整机档案里的固件版本才不会停留在出厂那一天。</p>
+
+<h3 id="s27-7">27.7 服务与数据回流</h3>
+<p>卖到服装厂的联网缝纫机，数据首先属于服装厂：它们发到服装厂自己的总线上（例如 wq/garment/…，第 26 章）。整机厂能拿到什么，要在合同里写清楚，并且经客户同意；转发给整机厂的应当只是设备本身的数据（运转小时、故障码、固件版本、参数），不含操作工个人的数据。按这个前提，服务数据回流（方案，待建）可以做三件事。</p>
+<p><strong>故障码按版本比较</strong>　把故障码按“每千运转小时的次数”统计，而不是按台数或按月统计，才能在使用强度不同的机器之间比较。再按固件版本分组，就能看出一次修改有没有用。图 27-7 左是一个示意：剪线电磁铁过流（E-31）在 1.4.x 版本下每千运转小时 0.62 次，1.5.0 版本改了参数表里的强激磁时间后降到 0.18 次；6000 台机器每年约 540 万运转小时，相当于每年从约 3350 次降到约 970 次。停针超时（E-44）也明显下降，其余几项基本不变，说明这次修改没有带来副作用。</p>
+<p><strong>可靠性分析回到设计</strong>　按序列号把服务记录（换了什么件、什么故障）和出厂档案连起来，就能回答设计和工艺最关心的问题：某个失效是不是集中在某一批零件、某一版固件或某一段出厂日期。和 27.5 节的追溯是同一套关系，只是起点从车间的报警变成了客户的报修。</p>
+<p><strong>备件需求预测</strong>　旋梭是易损件。按平均寿命估算，备件需求就是机群一个季度的总运转小时除以平均寿命；可是对一个比较“年轻”的机群，这样算会偏多，因为大部分旋梭还没到磨损期。更好的办法是按每台机器自己的累计运转小时算它在下一季度失效的条件概率，再加总。设旋梭寿命服从韦布尔分布，形状参数 β、尺度参数 η，一只已经运转 a 小时的旋梭在接下来 Δ 小时内失效的概率为：</p>
+<div class="math">\[ P=1-\frac{R(a+\Delta)}{R(a)},\qquad R(t)=\exp\!\left[-\left(\frac{t}{\eta}\right)^{\beta}\right] \]</div>
+<p>算例取 β = 2.2、η = 5000 h（平均寿命 η·Γ(1+1/β) ≈ 4430 h），联网机群 6000 台，每台每年运转小时按对数正态分布、均值约 900 h，装机 0.5–3.5 年。按平均寿命算，下一季度要备约 303 只旋梭；按每台的累计运转小时算，只要约 202 只，往后随机群变老逐季上升，两年后接近 285 只（图 27-7 右）。多备的一百来只旋梭本身值不了多少钱，但对于价格高、种类多的备件，这样的差别就是实打实的库存。</p>
+<figure class="fig"><a class="zoom" href="img/fig_27_field.png"><img src="img/fig_27_field.png" alt="图 27-7　服务数据回流" loading="lazy"></a><figcaption>图 27-7　故障码按固件版本比较（左）和旋梭备件需求预测（右）（示意数据与算例值）</figcaption></figure>
+
+<h3 id="s27-8">27.8 AI 在数字工厂里的位置</h3>
+<p>问渠数字工厂里的 AI 做四件事，都有明确的边界。</p>
+<p><strong>今日简报</strong>　每天由 ai.py 从 kpi.py 的结果里挑出值得注意的事写成简报（ai.briefing，保留消息），每一条都附上证据：主题、单号或消息编号。教学模式下简报写成提问（“哪台设备是本周的瓶颈？看看排队件数”），不直接给答案。</p>
+<p><strong>主动提醒</strong>　按规则检查全厂：设备停机或故障（附排队件数，是否瓶颈）、刀具或砂轮剩余寿命低于 15%、测量值趋近上限、新开的 NCR、订单可能延期、关键物料低于安全库存；同一件事 2 h 内不重复提醒。缝纫机厂要加的规则（方案，待建）主要是 27.5 节的判异规则、砂轮修整间隔超限，以及 27.6 节的“测试台读到的固件版本与工单不符”。</p>
+<p><strong>问答与起草提议</strong>　回答“这张订单能不能按期交”“为什么这张工单的成本超了”一类问题，答案里的数字都来自历史库并注明出处；需要写入 ERPNext 的事（建订单、请购、冻结批次）只起草提议，人在工作台上确认后才由桥接执行，执行结果以 erp.doc 回到总线，提议的状态随之变成“已执行”或“执行失败”。</p>
+<p><strong>AI 选型</strong>　hub/select.py：用一句话提需求，只从零件库里挑；答案注明条目编号、规格和规格表的行，库里没有的不编造；答案里出现的每个编号都逐个核对，库里没有的编号不出现在结果里，并列在 invalid_refs 里。模型走数字工厂现有的 AI 通道（hub/llm.py）：在美国用 Claude，国内部署只配已备案的模型（例如 DeepSeek）；都没配时改用规则回答，同样只从库里挑。</p>
+<p>几个缝纫机厂里的例子（前两个是现有能力直接可做的，后两个依赖待建部分）：</p>
+<ol>
+<li>“上轴两端用什么轴承，内径 12 mm？”——AI 选型从 A-BRG-DG 的规格表里列出内径 12 mm 的 6001、6201 等候选，注明条目和规格行（例如 6201：12 × 32 × 10 mm，GB/T 276），由工程师按载荷选定。</li>
+<li>“推一个行程 8 mm 的剪线电磁铁。”——AI 选型应当回答：零件库里目前没有推拉式电磁铁条目（D-SOL-PUSH 是建议编号，计划入库），不给出型号。这正是规矩要求的行为。</li>
+<li>“WQ-LS-TED 200 台，10 天能交吗？”——AI 展开变型 BOM，发现 DLC 外协要 5 天、卧加负荷 100%，回答“按现在的排产约第 12 天完成”，列出依据，并起草两份提议供计划员选择：加一个班，或与客户商量分两批交货。</li>
+<li>“梭尖间隙为什么报警？”——AI 列出触发报警的子组、这几台用的旋梭批次、该批在 GRD-H-02 上磨削期间的砂轮修整事件，起草“冻结 H2610-07”的提议，交给质检员确认。</li>
+</ol>
+<div class="callout"><p>AI 的三条规矩：只用库里有的数据（历史库和零件库）；每个结论注明出处，能点回原始消息或条目；任何写入 ERPNext 的动作都只是提议，人确认后才执行。教学模式下 AI 只提示方向、不代做。</p></div>
+
+<h3 id="s27-9">27.9 实施路线</h3>
+<p>整体信息化不宜一次铺开。一个常见的教训是先买了一套很全的系统，主数据没理清、设备没联网，各个模块都缺数据，最后只剩 ERP 的财务和采购在用。本章建议分三期，每一期都要有能看得见的交付物和可以量化的指标（表 27-9），并且后一期建立在前一期的数据上。</p>
+<div class="tbl"><table><caption>表 27-9　三期实施：范围、交付物与 KPI（目标值为示意）</caption><thead><tr><th>期</th><th>范围</th><th>交付物</th><th>KPI（基线 → 目标）</th></tr></thead><tbody>
+<tr><td>第一期（约 6 个月）</td><td>主数据与 ERP；统一数据总线与历史库；关键设备联网（卧加、梭道磨床、凸轮磨床等瓶颈设备）</td><td>WQ-LS 主数据（data.py 式的单一数据源，导入 ERPNext）；8 个变型与配置模板；关键设备状态上看板；按工单报工</td><td>库存周转 4 → 5 次/年；关键设备 OEE 60% → 68%；交期达成率 85% → 95%</td></tr>
+<tr><td>第二期（约 9 个月）</td><td>MES 扩到装配线；QMS（检验计划、控制图与判异规则、NCR、8D）；出厂测试数据进历史库</td><td>装配线扫码与序列号档案；调试工位、测试台上总线；控制图与报警；固件版本核对</td><td>一次合格率 92% → 96%；自制件报废 2.0% → 1.2%；保修期返修率 3.0% → 2.4%</td></tr>
+<tr><td>第三期（约 9 个月）</td><td>服务数据回流；可靠性分析；备件预测；AI 简报、提醒与提议扩到全厂</td><td>服务门户；故障码按版本统计；备件预测；分圈远程升级</td><td>保修期返修率 2.4% → 1.8%；备件库存 400 → 300 万元；上门服务次数减少 30%</td></tr>
+</tbody></table></div>
+<p><strong>节省怎样估算</strong>　算例的工厂年产 5 万台，物料年用量 6000 万元，库存持有成本按每年 20% 计，关键设备每年的折旧、人工和能耗合计 800 万元，每台一次不合格的返工费 150 元，每台自制件成本 400 元，每次保修返修 600 元，每年上门服务 3000 次、每次 500 元（都是示意值）。各项节省的算法与结果见表 27-10：库存周转从 4 次提高到 5 次，平均库存从 1500 万元降到 1200 万元，少占 300 万元，每年省持有成本 60 万元；关键设备 OEE 从 60% 提高到 68%，完成同样产量需要的设备时间按 60/68 缩短，折合每年约 94 万元（加班、外协或推迟购置设备的费用）。</p>
+<div class="tbl"><table><caption>表 27-10　各期年节省的估算（算例，万元/年）</caption><thead><tr><th>期</th><th>项目</th><th>算法</th><th>年节省</th></tr></thead><tbody>
+<tr><td rowspan="2">第一期</td><td>库存周转 4 → 5 次</td><td>(6000/4 − 6000/5) × 20%</td><td>60.0</td></tr>
+<tr><td>关键设备 OEE 60% → 68%</td><td>800 × (1 − 60/68)</td><td>94.1</td></tr>
+<tr><td rowspan="3">第二期</td><td>一次合格率 92% → 96%</td><td>50000 × 4% × 150 元</td><td>30.0</td></tr>
+<tr><td>自制件报废 2.0% → 1.2%</td><td>50000 × 0.8% × 400 元</td><td>16.0</td></tr>
+<tr><td>保修期返修率 3.0% → 2.4%</td><td>50000 × 0.6% × 600 元</td><td>18.0</td></tr>
+<tr><td rowspan="3">第三期</td><td>保修期返修率 2.4% → 1.8%</td><td>50000 × 0.6% × 600 元</td><td>18.0</td></tr>
+<tr><td>备件库存 400 → 300 万元</td><td>100 × 20%</td><td>20.0</td></tr>
+<tr><td>上门服务减少 30%</td><td>3000 × 30% × 500 元</td><td>45.0</td></tr>
+<tr><td colspan="3"><strong>合计</strong>（第一 / 二 / 三期）</td><td><strong>154.1 / 64.0 / 83.0</strong></td></tr>
+</tbody></table></div>
+<p><strong>回收期</strong>　投资按三期 150、120、80 万元（软件实施、网关与网络、量仪改造、人员培训，示意值），在各期工期内均摊；上线后节省在 6 个月内线性爬升到全额；运行费按已上线投资的每年 15% 计。逐月累计现金流的计算如下：</p>
+<pre><code class="language-python">def cashflow(phases, savings, horizon=60, ramp=6, run_rate=0.15):
+    cum, c, pay = [], 0.0, None
+    for m in range(1, horizon + 1):
+        f = 0.0
+        for ph, s in zip(phases, savings):
+            st, bd = ph["start"], ph["build"]
+            if st &lt; m &lt;= st + bd:                    # 建设期：投资均摊
+                f -= ph["invest"] / bd
+            if m &gt; st + bd:                          # 上线后：节省爬升，扣运行费
+                f += s / 12 * min(1.0, (m - st - bd) / ramp)
+                f -= ph["invest"] * run_rate / 12
+        c += f; cum.append(c)
+        if pay is None and m &gt; 1 and c &gt;= 0 and cum[-2] &lt; 0:
+            pay = m
+    return cum, pay</code></pre>
+<p>结果见图 27-8：累计现金流在第 15 个月前后最低，约 −203 万元；三期全做，第 33 个月收回全部投资，5 年累计净收益约 565 万元。只做第一期，第 23 个月就能收回，但 5 年只有约 410 万元。第一期回收快，是因为它的节省主要来自瓶颈设备和库存，见效直接；第二、三期把回收期往后推了 10 个月，却让 5 年的净收益多了约 155 万元，而且它们的很多好处（追溯范围小、客户投诉少、设计改进有依据）没有计入。算例还说明一点：回收期对第一期的 OEE 目标很敏感，OEE 只提到 64% 时回收期变成 38 个月；这时把各期工期压缩一些（例如第一期先只联网瓶颈设备），又能拉回到 36 个月以内。虚拟实验 27-1 第③页可以试这些组合。</p>
+<figure class="fig"><a class="zoom" href="img/fig_27_roi.png"><img src="img/fig_27_roi.png" alt="图 27-8　分期实施的累计现金流" loading="lazy"></a><figcaption>图 27-8　三期实施与只做第一期的累计现金流（算例，示意值）</figcaption></figure>
+<aside class="field"><p><strong>现场要点</strong></p><ul>
+<li>第一期最难的不是软件，是主数据：物料编码、BOM、工艺路线和工时要先理清并有人负责维护，否则后面所有指标都不可信。</li>
+<li>先联网瓶颈设备。非瓶颈设备的 OEE 提高了，全厂产量并不增加。</li>
+<li>每一期上线前定好 KPI 的基线和口径（例如一次合格率按序列号首次检验计，不按检验单数计），上线后用历史库的数据自动算，不靠人报。</li>
+<li>节省要有财务部门认可的算法，并在上线 6 个月后复盘；达不到就找原因，而不是改口径。</li>
+</ul></aside>
+
+<h3 id="s27-10">27.10 学生项目：在问渠数字工厂里搭一家缝纫机厂</h3>
+<p>减速器厂的全部主数据都在一个文件 factory/data.py 里：物料（ITEMS）、工作中心（WORKSTATIONS）、工序（OPERATIONS）、工艺路线（ROUTINGS）、BOM（BOMS）、检验模板（inspection_templates()）、与零件库的对应（LIBRARY_REFS），以及安全库存和期初库存。seed.py 把它导入 ERPNext，make_docs 由它生成《工厂设计》文档，tests/ 检查它前后一致。改工厂就改这个文件。本章的 figsrc/ch27_sewing_data.py 按同样的结构写了缝纫机厂的草稿，可以作为项目的起点。下面是其中的工艺路线和检验模板片段：</p>
+<pre><code class="language-python">ROUTINGS = {
+    "RT-旋梭 Hook": [
+        ("车削 Turning", "数控车床 CNC-S", 7),
+        ("渗碳淬火 Carburising", "热处理线 HT-01", 1),
+        ("磨梭道 Race grinding", "梭道磨床 GRD-H", 6),
+        ("研磨梭尖 Point lapping", "梭尖研磨机 LAP-H", 5),
+        ("零件检验 Part inspection", "检验站 QC-01", 1.5)],
+    "RT-总装 Final assembly": [
+        ("总装 12 工位 Line assembly", "总装线 ASM-L1", 2.4),
+        ("调试 Adjustment", "调试工位 ADJ", 9.6),
+        ("跑合 Run-in", "跑合台 RUN", 30),
+        ("出厂测试 EOL test", "出厂测试台 EOL", 4.8)],
+}
+def inspection_templates():
+    return {"调试检验": [_num("梭尖间隙 Hook-point clearance (mm)", 0.04, 0.10),
+                         _num("钩线定时偏差 Hook-timing error (deg)", -1.5, 1.5)], ...}</code></pre>
+<p><strong>项目步骤</strong>（建议 3–4 人一组，4 周）：</p>
+<ol>
+<li><strong>定产品</strong>。选一个机型（平缝机 WQ-LS，或包缝机、花样机），定选项和变型；画出 EBOM 和 MBOM，标出自制件、外购件、外协工序和固件。</li>
+<li><strong>写主数据</strong>。仿照 data.py 写出物料、工作中心、工序、工艺路线、BOM（每个变型一张，或模板加属性）、检验模板；标准件按 LIBRARY_REFS 对到零件库条目，电控模块用第 19 章的建议编号并注明“计划入库”。供应商、客户一律用带“示例 / Demo”的虚构名称，单价用示意值。</li>
+<li><strong>算瓶颈</strong>。按每台占用的工作中心时间和台数算日产能与负荷（参照表 27-5 和《工厂设计.md》的“找瓶颈”一节），说明瓶颈在哪里、怎样扩能。</li>
+<li><strong>导入与走通</strong>。在自己电脑的 ERPNext（或问渠班级工厂）里导入主数据，从一张销售订单走到发货：MRP、采购、工单、作业卡、质量检验单、序列号，参照实验 7“数字工厂闭环”。</li>
+<li><strong>设计消息</strong>。为调试工位和出厂测试台各写一条符合信封格式的消息（主题、type、data 字段），用 wqbus 的 validate() 校验；说明你新增了哪些字段或类型，为什么不违反“只增加、不改动”的原则。</li>
+<li><strong>做一次质量闭环</strong>。用虚拟实验 27-1 或自己的脚本，生成一段带漂移的测量数据，选判异规则，算出受影响的序列号范围，写一份 NCR 和 8D 的前四步。</li>
+<li><strong>写边界</strong>。列出你的工厂和真实工厂相比省略了什么（见 27.11 节），哪些数字是你假设的。</li>
+</ol>
+<p>验收：主数据文件能被一个简单的检查脚本读通（每条 BOM 的子项都是已定义的物料，每道工序都有工作中心，每个检验模板都挂到了物料上）；ERPNext 里能走通一张订单；一份不超过 6 页的报告，含瓶颈分析和质量闭环的结果。</p>
+
+<h3 id="s27-11">27.11 模型的边界</h3>
+<p>本章的工厂是一个示意的工厂：工时、设备台数、价格、KPI 的基线和目标都是为了讲清方法而设定的，不代表任何企业。负荷计算用平均工时和一个统一的 OEE，没有考虑批量、换型时间、工序间的在制品和多品种混线的影响；真实的排产要用有限能力计划或第 29 章那样的仿真。质量闭环的算例假设过程标准差已知且不变、漂移从某一台起线性增长、旋梭按入库顺序使用、装配后 100% 测量且量仪本身没有误差；实际中要先做测量系统分析，确认量仪的重复性和再现性够用，控制限也要用实测数据定期复核。判异规则的误报概率按独立正态的子组均值估算，实际数据常有自相关，误报会更多。备件预测的韦布尔参数是假设的，真实的参数要用服务记录估计，而且要处理还没坏的样本（截尾数据）。投资回收的算法只计了能直接折成钱的几项，没有贴现，也没有计入系统更换、数据治理和人员流动的成本。最后，凡是标了“方案（待建）”的部分，都还没有写成代码、没有经过测试；问渠数字工厂现有的部件是按减速器厂开发和验收的，搬到缝纫机厂时，消息字段、规则阈值和页面都要重新验证。</p>
+
+<h3 id="x27-ex">第 27 章 习题</h3>
+<ol>
+<li>WQ-LS 若再增加两个选项：自动抬压脚（有 / 无）和最高转速档（4000、5000 r/min 两档），一共有多少种变型？如果其中 6 种组合在技术上不允许，还剩多少种？这时你会给每个变型建一张 BOM，还是用配置器即时生成？说明理由。<details class="ans"><summary>参考答案</summary>2 × 2 × 2 × 2 × 2 = 32 种，去掉 6 种剩 26 种。变型多且还会增加时，宜用物料模板加属性、由配置器按规则即时生成 BOM，只为常卖的变型预先建好 BOM；理由是维护 30 张几乎相同的 BOM 容易出错，一处改动要改很多张。</details></li>
+<li>按表 27-5 的数据，如果每天要装 200 台，卧式加工中心 HMC-H 的负荷是多少？要使负荷不超过 90%，在不增加设备的前提下，OEE 至少要达到多少？<details class="ans"><summary>参考答案</summary>负荷 = 200 × 16 / (5 × 960 × 0.60) ≈ 111%。要 ≤ 90%：OEE ≥ 200 × 16 / (5 × 960 × 0.9) ≈ 74%。</details></li>
+<li>梭尖间隙的过程标准差 σ = 6 µm，子组 n = 5，基准均值 0.070 mm。求 X̄ 图的控制限。如果把子组改成 n = 3，控制限变为多少？对发现漂移有什么影响？<details class="ans"><summary>参考答案</summary>n = 5：0.070 ± 3 × 6/√5 µm = 0.070 ± 0.0080 mm，即 0.0620–0.0780 mm。n = 3：0.070 ± 0.0104 mm，即 0.0596–0.0804 mm。子组小了，控制限变宽，同样的漂移要更久才越出 R1 的界限；但每 3 台就出一个点，点更密。总的说对缓慢漂移，n = 5 一般更灵敏。</details></li>
+<li>按 27.5 节的算例，漂移开始后 h 小时单台超差的概率是多少？算出 h = 5 时的值，并说明为什么“等到出现超差再处理”在这个例子里代价很大。<details class="ans"><summary>参考答案</summary>均值 m = 0.070 + 0.004h mm，P = 1 − Φ((0.100 − m)/0.006) + Φ((0.040 − m)/0.006)。h = 5 时 m = 0.090，P ≈ 1 − Φ(1.67) ≈ 4.8%。超差概率在后期增长很快（6 h 约 16%），而且第一台超差出现时，漂移已经持续了约 5 h，此前装上这批旋梭的一百多台都要复检，算例中还有 135 台已经发货。</details></li>
+<li>出厂测试的停针定位误差（单位：度）为什么不宜直接用现有的 quality.measurement 类型发送？请为 test.result 设计 data 的必有字段，并写出一条示例消息（JSON）。<details class="ans"><summary>参考答案</summary>quality.measurement 的数值字段规定以毫米计（nominal_mm、value_mm 等），用来装角度会被下游当作长度。test.result 的必有字段可取：part_serial、item、req（如 REQ-LS-012）、value、unit（"deg"）、lower、upper、result、fw_version、param_version；示例：{"v":1,"id":"…","ts":"…","type":"test.result","source":"eol/eol-02","mode":"prod","corr":"WO-LS-2610-12","data":{"part_serial":"LS2610-0070","item":"WQ-LS-TED","req":"REQ-LS-012","value":0.6,"unit":"deg","lower":-1,"upper":1,"result":"pass","fw_version":"1.5.0","param_version":"v8"}}。</details></li>
+<li>一个联网机群 6000 台，每年运转约 540 万小时。某故障码在旧固件下每千运转小时 0.62 次。若新固件只推送给了 600 台，三个月里这 600 台共运转约 13.5 万小时、出现该故障 30 次，能否说新固件有效？还需要什么信息？</li>
+<li>（讨论）按表 27-10 的算法，第二、三期把回收期从 23 个月推到了 33 个月。如果你是厂长，你会只做第一期吗？请列出没有计入算例、但会影响这个决定的因素。</li>
+</ol>
+
+<h3 id="x27-ref">参考资料</h3>
+<ol class="refs">
+<li>问渠数字工厂代码仓库 factory/：README.md（ERPNext 虚拟工厂）、工厂设计.md、factory/data.py；factory/digital/README.md、wqbus/topics.py、wqbus/envelope.py、hub/ 各模块，以及第 2、6、8、9 轮实施细则。</li>
+<li>问渠零件与机器人库 library/README.md；条目格式见第 2 轮实施细则附录 B。</li>
+<li>Frappe Technologies. ERPNext Documentation（物料与变型、BOM、工艺路线、工单、质量检验、批次与序列号）. https://docs.erpnext.com/</li>
+<li>OASIS. MQTT Version 5.0. OASIS Standard, 2019.</li>
+<li>IEC 62264-1: Enterprise-control system integration — Part 1: Models and terminology（即 ISA-95 的国际标准版本）.</li>
+<li>Western Electric Company. Statistical Quality Control Handbook. 1956.</li>
+<li>Montgomery D C. Introduction to Statistical Quality Control. Wiley（多个版本）.</li>
+<li>GB/T 2828.1 计数抽样检验程序 第 1 部分：按接收质量限（AQL）检索的逐批检验抽样计划.</li>
+<li>本书第 18 章（生产测试与双区升级）、第 19 章（WQ-SC 平台与建议编号）、第 22 章（自动化测试与持续迭代）、第 23 章（缝纫机的设计、制造与检测）、第 24 章（机针与旋梭的制造）、第 25 章（机壳与凸轮的制造）、第 26 章（设备联网与数字孪生）。</li>
+</ol>
+
+<h3 id="x27-res">配套资源</h3>
+<p><a href="#lab-factory" class="labref">虚拟实验 27-1　数字工厂：质量闭环与追溯</a>　第①页模拟调试工位的梭尖间隙数据逐台上总线，消息按问渠数字工厂的主题和信封格式滚动显示，逐台测量值和 X̄ 控制图实时更新；可以设置漂移开始时间、漂移速度和阶跃，勾选判异规则（R1–R4，以及问渠现有的“趋近上限”规则），看报警何时出现、何时生成 NCR，并与“只按超差”比较，同时用同一组随机数检查无漂移时的误报。第②页是序列号—批次关系图：从报警的序列号出发查到旋梭批次和原因线索，向前圈出受影响的整机、仓库剩余和已发货台数，查看任一台的整机档案，并计算晚发现 N 小时要多复检、多返工多少台。第③页是实施分期计算器：各期的投资、工期和 KPI 目标，算出年节省、累计现金流和回收期。内置 3 个自动判定的任务：选判异规则，使报警比首台超差早至少 4 h 且无漂移时不误报；从报警出发找出受影响的整机台数；在 OEE 只能提到 64% 时，只压缩工期把回收期拉回 36 个月以内。模型与正文 27.5、27.9 节的算例相同（figsrc/ch27_model.py）。</p>
+<section class="lab" id="lab-factory" data-src="labs/factory.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 27-1　数字工厂：质量闭环与追溯</h4></div><p>梭尖间隙数据上总线、控制图与判异规则、NCR 与序列号—批次追溯、晚发现的代价，以及三期实施的回收期计算器。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/factory.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<p><a href="#lab-iot" class="labref">虚拟实验 26-1　缝纫机联网：事件、指标与数据量</a>　一台缝纫机的事件怎样变成件数和 OEE，以及上报方式与数据量（第 26 章），可与本章对照：那里是服装厂里的缝纫机，这里是造缝纫机的工厂。</p>
+<section class="lab" id="lab-iot" data-src="labs/iot.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 26-1　缝纫机联网：事件、指标与数据量</h4></div><p>模拟一台缝纫机一个班次的事件，算件数、OEE 和计数误差；比较五种上报方式的消息率、存储和延迟。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/iot.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>

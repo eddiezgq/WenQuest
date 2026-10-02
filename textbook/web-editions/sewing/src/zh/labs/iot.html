@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>缝纫机联网：事件、指标与数据量</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = charts, right rail = checks and controls; tasks at bottom */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style><style>
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page[hidden]{display:none}
+</style>
+<div class="wrap">
+<header><h1>缝纫机联网：事件、指标与数据量</h1><span class="sub">《缝纫机设计与制造》第 26 章 · 虚拟实验 26-1 · 控制器知道的事，怎样变成车间看得懂的数</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tabA" aria-selected="true" type="button">① 一台机器的一个班次</button><button role="tab" id="tabB" aria-selected="false" type="button">② 全车间的数据量</button></div>
+<div class="page" id="pageA">
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>事件流：一台缝纫机的 15 分钟（随机生成的一段）</h3><canvas id="tl" width="1100" height="250" aria-label="事件流时间线"></canvas>
+      <div class="row"><button id="rerun" type="button">换一段</button><span class="note" style="margin:0">蓝条：主轴转动；橙色短线：剪线；红色：断线停机；灰色：等活；紫色：设备故障</span></div></section>
+    <section class="panel"><h3>班次时间去了哪里（OEE 分解，单位 min）</h3><canvas id="wf" width="1100" height="300" aria-label="OEE 分解"></canvas></section>
+    <section class="panel"><h3>总线上的一条消息（问渠数字工厂统一信封格式）</h3><pre id="msgjson" style="font-family:var(--f-mono);font-size:.78rem;white-space:pre-wrap;margin:0;background:var(--soft);padding:10px;border-radius:6px"></pre></section>
+    <p class="note">模型（示意，与本书 model19.py 相同）：班次 480 min、休息 30 min；断线次数 = 每小时断线次数 × 计划小时数，每次处理时间为设定值；运行时间 = 计划时间 − 等活 − 故障 − 断线处理；件数 = 运行时间 × 操作效率 / 标准工时；主轴转动时间 = 件数 × 标准工时 × 转动比例，平均 3000 针/min。按剪线数件 = 剪线次数 / 每件剪线数，多余的剪线来自返工重缝（每件概率）和断线后的重新起缝；按工票数件时每扎 20 件，漏扫概率为设定值；按吊挂衣架计数视为准确。OEE = 时间开动率 × 性能开动率 × 合格品率。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>结果</h3><div class="checks" id="checksA"></div></section>
+    <section class="panel"><h3>调整</h3>
+      <div class="prm">
+        <label for="sam">标准工时（min / 件）</label><input id="sam" type="range" min="0.2" max="2" step="0.05" value="0.6"><output id="samv"></output>
+        <label for="run_frac">主轴转动占标准工时的比例</label><input id="run_frac" type="range" min="0.1" max="0.7" step="0.05" value="0.35"><output id="run_fracv"></output>
+        <label for="seams">每件缝几段（每段末尾剪线）</label><input id="seams" type="range" min="1" max="8" step="1" value="3"><output id="seamsv"></output>
+        <label for="perf">操作效率（相对标准工时）</label><input id="perf" type="range" min="0.4" max="1.2" step="0.01" value="0.85"><output id="perfv"></output>
+        <label for="brk_per_h">每小时断线次数</label><input id="brk_per_h" type="range" min="0" max="6" step="0.1" value="1.5"><output id="brk_per_hv"></output>
+        <label for="wait_min">每班等活时间（min）</label><input id="wait_min" type="range" min="0" max="90" step="1" value="25"><output id="wait_minv"></output>
+        <label for="fault_min">每班设备故障时间（min）</label><input id="fault_min" type="range" min="0" max="60" step="1" value="12"><output id="fault_minv"></output>
+        <label for="defect">返修比例</label><input id="defect" type="range" min="0" max="0.15" step="0.005" value="0.03"><output id="defectv"></output>
+        <label for="extra_trim">每件多剪一次线的概率</label><input id="extra_trim" type="range" min="0" max="0.3" step="0.01" value="0.05"><output id="extra_trimv"></output>
+        <label for="method">件数怎样数</label><select id="method"><option value="trim" selected>按剪线次数</option><option value="ticket">扫工票（每扎 20 件）</option><option value="hanger">吊挂衣架计数</option></select><output id="methodv"></output>
+        <label for="miss">工票漏扫概率（每扎）</label><input id="miss" type="range" min="0" max="0.1" step="0.005" value="0.02"><output id="missv"></output>
+      </div>
+      <div class="row"><button id="resetA" type="button">恢复标准</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<div class="page" id="pageB" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>五种上报方式的平均消息率（对数坐标，当前台数；红线为总线预算）</h3><canvas id="rate" width="1100" height="320" aria-label="消息率对比"></canvas></section>
+    <section class="panel"><h3>各方式的四项指标</h3><div id="tbl" style="overflow-x:auto"></div></section>
+    <p class="note">模型（示意）：每台每班的消息数按第①页的标准工况计算；状态变化（每次停机的进、出）在“每件”“每分钟”两种方式里立即上报；每条消息约 250 字节（JSON 信封）；平均消息率 = 每台每班消息数 × 台数 / 班次秒数，高峰会是平均的几倍；年存储量按每天班数 × 300 天。判据：平均消息率 ≤ 500 条/s，年存储 ≤ 100 GB，状态延迟 ≤ 5 s，件数延迟 ≤ 60 s（示意值）。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>判据（当前选择的方式）</h3><div class="checks" id="checksB"></div></section>
+    <section class="panel"><h3>调整</h3>
+      <div class="prm">
+        <label for="mode">上报方式</label><select id="mode"><option value="stitch">每针上报</option><option value="segment">每次踏板启停与剪线</option><option value="piece">每件汇总 + 状态变化即报</option><option value="minute">每分钟汇总 + 状态变化即报</option><option value="tenmin">每 10 分钟汇总</option></select><output id="modev"></output>
+        <label for="n">联网缝纫机台数</label><input id="n" type="range" min="10" max="2000" step="10" value="500"><output id="nv"></output>
+        <label for="msgb">每条消息字节数</label><input id="msgb" type="range" min="50" max="1000" step="10" value="250"><output id="msgbv"></output>
+        <label for="shifts">每天班数</label><input id="shifts" type="range" min="1" max="3" step="1" value="2"><output id="shiftsv"></output>
+      </div>
+      <div class="row"><button id="resetB" type="button">恢复标准</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<section class="panel" style="margin-top:14px"><h3>任务</h3><div id="tasks"></div>
+  <div class="row" style="font-size:.84rem">任务 3：一个班次计划 450 min，等活 40 min、故障 20 min、断线处理 15 min，标准工时 0.5 min，共做 600 件，其中 18 件返修。OEE =<input id="oee" type="number" step="0.1" aria-label="OEE 百分数"> %<button id="oeeChk" type="button">核对</button></div>
+  <div class="msg" id="msg"></div></section>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+function tab(b){$('tabA').setAttribute('aria-selected',!b);$('tabB').setAttribute('aria-selected',b);$('pageA').hidden=b;$('pageB').hidden=!b;}
+$('tabA').onclick=()=>tab(false);$('tabB').onclick=()=>tab(true);
+// ---- model (model19.py) ----
+const STD={shift_min:480,break_min:30,sam:0.6,run_frac:0.35,seams:3,mid_stops:1,perf:0.85,brk_per_h:1.5,brk_min:1,wait_min:25,fault_min:12,defect:0.03,extra_trim:0.05,spm:3000};
+function shift(q){const p={...STD,...q};const planned=p.shift_min-p.break_min,nb=p.brk_per_h*planned/60,down=p.wait_min+p.fault_min+nb*p.brk_min,oper=Math.max(planned-down,0);
+  const pieces=oper*p.perf/p.sam,good=pieces*(1-p.defect),A=oper/planned,P=oper?pieces*p.sam/oper:0,Q=1-p.defect,run=pieces*p.sam*p.run_frac,trims=pieces*p.seams+pieces*p.extra_trim+nb;
+  return {p,planned,nb,down,oper,pieces,good,A,P,Q,OEE:A*P*Q,run,runRatio:run/planned,stitches:run*p.spm,trims,estTrim:trims/p.seams,segs:pieces*p.seams*(1+p.mid_stops),
+    loss:{wait:p.wait_min,fault:p.fault_min,brk:nb*p.brk_min,speed:oper*(1-P),quality:pieces*p.defect*p.sam}};}
+const SC=s=>2*(s.nb+2);
+const MODES={stitch:['每针上报',s=>s.stitches+SC(s),0.1,0.1],segment:['每次踏板启停与剪线',s=>2*s.segs+s.trims+SC(s),1,1],piece:['每件汇总 + 状态变化即报',s=>s.pieces+SC(s),1,null],minute:['每分钟汇总 + 状态变化即报',s=>s.planned+SC(s),1,60],tenmin:['每 10 分钟汇总',s=>s.planned/10,600,600]};
+const RL=500,SL=100,LS=5,LC=60;
+function traffic(m,n,b,sh){const s=shift({}),[name,f,ls,lc0]=MODES[m],per=f(s),lc=lc0===null?s.oper/Math.max(s.pieces,1e-9)*60:lc0,rate=per*n/(s.p.shift_min*60),gb=per*n*sh*300*b/1e9;
+  return {name,per,rate,kbps:rate*b*8/1e3,gb,ls,lc,ok:rate<=RL&&gb<=SL&&ls<=LS&&lc<=LC};}
+// ---- page A ----
+const STDA={sam:0.6,run_frac:0.35,seams:3,perf:0.85,brk_per_h:1.5,wait_min:25,fault_min:12,defect:0.03,extra_trim:0.05,method:'trim',miss:0.02};const A={...STDA};let RA=null;
+function counted(s){if(A.method==='trim')return {n:s.estTrim,lab:'按剪线次数'};if(A.method==='ticket')return {n:s.pieces*(1-A.miss),lab:'扫工票'};return {n:s.pieces,lab:'吊挂衣架计数'};}
+function evalA(){const s=shift(A),c=counted(s),err=c.n/s.pieces-1;const C=[
+  {n:'实际做的件数 / 合格件数',v:`${s.pieces.toFixed(0)} / ${s.good.toFixed(0)}`,ok:true},
+  {n:`统计到的件数（${c.lab}）`,v:`${c.n.toFixed(0)}（${err>=0?'+':''}${(err*100).toFixed(1)}%）`,ok:Math.abs(err)<0.01,bad:A.method==='trim'?'返工重缝、断线后重新起缝都会多剪一次线，件数被高估':'漏扫的那一扎没有记上'},
+  {n:'时间开动率 A',v:(s.A*100).toFixed(1)+'%',ok:true},{n:'性能开动率 P',v:(s.P*100).toFixed(1)+'%',ok:true},{n:'合格品率 Q',v:(s.Q*100).toFixed(1)+'%',ok:true},
+  {n:'设备综合效率 OEE = A × P × Q',v:(s.OEE*100).toFixed(1)+'%',ok:true},
+  {n:'主轴真正转动的时间 / 计划时间',v:`${s.run.toFixed(0)} min / ${(s.runRatio*100).toFixed(1)}%`,ok:true},
+  {n:'针数 / 剪线次数 / 断线次数',v:`${(s.stitches/1000).toFixed(0)} 千 / ${s.trims.toFixed(0)} / ${s.nb.toFixed(1)}`,ok:true}];return {s,c,err,C};}
+function renderChecks(id,C){$(id).innerHTML=C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${(!c.ok&&c.bad)?`<small>${c.bad}</small>`:''}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');}
+function rng(seed){let s=seed>>>0;return ()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+let SEED=3;
+function drawTL(){const [c,g]=ctx('tl'),W=c.width,H=c.height,x0=50,x1=W-16,T=15,X=t=>x0+(x1-x0)*t/T;const r=rng(SEED),s=RA.s,p=s.p;
+  const cyc=p.sam/p.perf,runSeam=p.sam*p.run_frac/p.seams,seg=runSeam/(1+p.mid_stops),hand=(cyc-p.sam*p.run_frac)/(p.seams*(1+p.mid_stops));
+  const yRun=70,yTrim=120,yEv=170;g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.fillText('主轴',6,yRun+16);g.fillText('剪线',6,yTrim+8);g.fillText('停机',6,yEv+14);
+  let t=0,pieces=0,trims=0,stops=[];const pb=p.brk_per_h/60*T/ (s.oper/s.planned) ,pw=p.wait_min/s.planned*T,pf=p.fault_min/s.planned*T;
+  // decide stoppages in window
+  if(r()<pw/5){const st=r()*T*0.8;stops.push({t:st,d:Math.min(5,p.wait_min*(0.3+0.4*r())),k:'wait'});}
+  if(r()<pf/8){const st=r()*T*0.8;stops.push({t:st,d:Math.min(6,p.fault_min*0.5),k:'fault'});}
+  let nbr=Math.floor(pb+r());for(let i=0;i<nbr;i++)stops.push({t:r()*T,d:p.brk_min,k:'brk'});stops.sort((a,b)=>a.t-b.t);
+  const col={wait:css('--muted'),fault:'#8e5ab5',brk:css('--bad')};
+  let si=0;
+  outer: while(t<T){for(let k=0;k<p.seams;k++){for(let m=0;m<1+p.mid_stops;m++){
+        while(si<stops.length&&stops[si].t<=t){const S=stops[si];g.fillStyle=col[S.k];g.globalAlpha=S.k==='wait'?.35:.7;g.fillRect(X(t),yEv,X(t+S.d)-X(t),26);g.globalAlpha=1;if(S.k==='brk'){g.fillStyle=css('--bt');g.fillRect(X(t+S.d)-1,yTrim-12,2.5,24);trims++;}t+=S.d;si++;if(t>=T)break outer;}
+        const d=seg*(0.8+0.4*r());g.fillStyle=css('--nt');g.fillRect(X(t),yRun,Math.max(1,X(Math.min(T,t+d))-X(t)),26);t+=d;if(t>=T)break outer;
+        if(m===p.mid_stops){g.fillStyle=css('--bt');g.fillRect(X(t)-1,yTrim-12,2.5,24);trims++;}
+        t+=hand*(0.6+0.8*r());if(t>=T)break outer;}}
+      pieces++;if(r()<p.extra_trim){g.fillStyle=css('--bt');g.fillRect(X(t)-1,yTrim-12,2.5,24);trims++;t+=0.05;}}
+  g.fillStyle=css('--muted');g.textAlign='center';for(let m=0;m<=15;m+=3)g.fillText(m+' min',X(m),H-12);g.textAlign='start';
+  g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.fillText(`这一段：约 ${pieces} 件，剪线 ${trims} 次（按剪线数是 ${(trims/p.seams).toFixed(1)} 件）`,x0,30);}
+function drawWF(){const [c,g]=ctx('wf'),W=c.width,H=c.height,x0=70,x1=W-20,y0=44,y1=H-50,s=RA.s;const items=[['计划时间',s.planned,'base'],['等活',-s.loss.wait],['设备故障',-s.loss.fault],['断线处理',-s.loss.brk],['运行时间',s.oper,'sub'],['速度损失',-s.loss.speed],['返修',-s.loss.quality],['合格品时间',s.good*s.p.sam,'sub']];
+  const n=items.length,bw=(x1-x0)/n*0.62,Y=v=>y1-(y1-y0)*v/s.planned;g.font='12px '+css('--f-body');
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let v=0;v<=s.planned;v+=90){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v,x0-6,Y(v)+4);}
+  let lvl=0;items.forEach(([lab,v,k],i)=>{const x=x0+(x1-x0)*(i+0.19)/n;let top,bot,col;if(k){top=v;bot=0;lvl=v;col=k==='base'?css('--nt'):css('--ok');}else{top=lvl;bot=lvl+v;lvl=bot;col=css('--bad');}
+    g.fillStyle=col;g.globalAlpha=k?.85:.6;g.fillRect(x,Y(top),bw,Y(bot)-Y(top));g.globalAlpha=1;g.fillStyle=css('--ink');g.textAlign='center';g.fillText(Math.abs(v).toFixed(0),x+bw/2,Y(top)-6);g.fillStyle=css('--muted');g.fillText(lab,x+bw/2,H-30);});
+  g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.textAlign='start';g.fillText(`OEE = ${(s.A*100).toFixed(1)}% × ${(s.P*100).toFixed(1)}% × ${(s.Q*100).toFixed(1)}% = ${(s.OEE*100).toFixed(1)}%（合格品时间 / 计划时间）`,x0,18);}
+function drawMsg(){const s=RA.s,f=0.5;const o={v:1,id:'5f1c…',ts:'2026-10-08T03:15:00.000Z',type:'machine.counter',source:'plc/l03-07',mode:'prod',corr:'WO-2026-00231',
+   data:{state:'run',interval_s:60,pieces_total:Math.round(s.pieces*f),stitches_total:Math.round(s.stitches*f),trims_total:Math.round(s.trims*f),run_time_s:Math.round(s.run*f*60),operator:'E1023',operation:'合侧缝'}};
+  $('msgjson').textContent='主题：wq/shirt/sewing/l03-07/counter（班次进行到一半时的一条；计数为本班累计值，source 以 plc/ 开头表示真实设备）\n'+JSON.stringify(o,null,2);}
+const fmtA={sam:v=>v.toFixed(2),run_frac:v=>(v*100).toFixed(0)+'%',seams:v=>v+' 段',perf:v=>(v*100).toFixed(0)+'%',brk_per_h:v=>v.toFixed(1),wait_min:v=>v+'',fault_min:v=>v+'',defect:v=>(v*100).toFixed(1)+'%',extra_trim:v=>(v*100).toFixed(0)+'%',method:v=>({trim:'剪线',ticket:'工票',hanger:'衣架'})[v],miss:v=>(v*100).toFixed(1)+'%'};
+function syncA(){for(const k in fmtA){$(k).value=A[k];$(k+'v').textContent=fmtA[k](A[k]);}}
+function changedA(){syncA();RA=evalA();renderChecks('checksA',RA.C);drawTL();drawWF();drawMsg();noteA();checkTasks();}
+for(const k in fmtA)$(k).addEventListener('input',()=>{A[k]=k==='method'?$(k).value:+$(k).value;changedA();});
+$('resetA').onclick=()=>{Object.assign(A,STDA);changedA();};$('rerun').onclick=()=>{SEED++;drawTL();};
+// ---- page B ----
+const STDB={mode:'segment',n:500,msgb:250,shifts:2};const B={...STDB};let RB=null;
+function evalB(){const t=traffic(B.mode,B.n,B.msgb,B.shifts);return {t,C:[
+  {n:'平均消息率 ≤ 500 条/s',v:t.rate<10?t.rate.toFixed(2):t.rate.toFixed(0),ok:t.rate<=RL,bad:'总线和数据库忙不过来，高峰时还要再乘几倍'},
+  {n:'年存储量 ≤ 100 GB',v:t.gb.toFixed(1)+' GB',ok:t.gb<=SL,bad:'历史库太大，查询和备份都慢'},
+  {n:'停机状态延迟 ≤ 5 s',v:t.ls+' s',ok:t.ls<=LS,bad:'看板上的停机要等很久才显示'},
+  {n:'件数延迟 ≤ 60 s',v:t.lc.toFixed(1)+' s',ok:t.lc<=LC,bad:'看板上的产量要等太久才更新'},
+  {n:'每台每班消息数 / 平均带宽',v:`${t.per.toFixed(0)} / ${t.kbps.toFixed(1)} kbit/s`,ok:true}],ok:t.ok};}
+function drawRate(){const [c,g]=ctx('rate'),W=c.width,H=c.height,x0=80,x1=W-20,y0=34,y1=H-60;const ks=Object.keys(MODES),ts=ks.map(k=>traffic(k,B.n,B.msgb,B.shifts));const l0=-2,l1=5,Y=v=>y1-(y1-y0)*(Math.log10(Math.max(v,0.01))-l0)/(l1-l0);
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let e=l0;e<=l1;e++){g.beginPath();g.moveTo(x0,Y(10**e));g.lineTo(x1,Y(10**e));g.stroke();g.textAlign='end';g.fillText(e>=0?String(10**e):(10**e).toFixed(-e),x0-6,Y(10**e)+4);}
+  const bw=(x1-x0)/ks.length*0.6;ts.forEach((t,i)=>{const x=x0+(x1-x0)*(i+0.2)/ks.length;g.fillStyle=t.ok?css('--ok'):css('--bad');g.globalAlpha=ks[i]===B.mode?.95:.45;g.fillRect(x,Y(t.rate),bw,y1-Y(t.rate));g.globalAlpha=1;
+    g.fillStyle=css('--ink');g.textAlign='center';g.fillText(t.rate<10?t.rate.toFixed(2):t.rate.toFixed(0),x+bw/2,Y(t.rate)-6);g.fillStyle=css('--muted');g.fillText(t.name.length>10?t.name.slice(0,9)+'…':t.name,x+bw/2,H-36);});
+  g.strokeStyle=css('--bad');g.setLineDash([6,4]);g.beginPath();g.moveTo(x0,Y(RL));g.lineTo(x1,Y(RL));g.stroke();g.setLineDash([]);g.fillStyle=css('--bad');g.textAlign='start';g.fillText('预算 500 条/s',x1-100,Y(RL)-6);
+  g.fillStyle=css('--muted');g.fillText('条 / s',8,14);}
+function drawTbl(){const ks=Object.keys(MODES);$('tbl').innerHTML='<table style="width:100%;border-collapse:collapse;font-size:.82rem"><tr style="text-align:left;color:var(--muted)"><th>方式</th><th>消息率（条/s）</th><th>年存储（GB）</th><th>状态延迟</th><th>件数延迟</th><th>结论</th></tr>'+ks.map(k=>{const t=traffic(k,B.n,B.msgb,B.shifts);return `<tr style="border-top:1px solid var(--rule)${k===B.mode?';font-weight:600':''}"><td>${t.name}</td><td>${t.rate<10?t.rate.toFixed(2):t.rate.toFixed(0)}</td><td>${t.gb.toFixed(1)}</td><td>${t.ls} s</td><td>${t.lc<1?t.lc.toFixed(1):t.lc.toFixed(0)} s</td><td style="color:${t.ok?'var(--ok)':'var(--bad)'}">${t.ok?'达标':'不达标'}</td></tr>`;}).join('')+'</table>';}
+const fmtB={mode:v=>'',n:v=>v+' 台',msgb:v=>v+' B',shifts:v=>v+' 班'};
+function syncB(){for(const k in fmtB){$(k).value=B[k];$(k+'v').textContent=fmtB[k](B[k]);}}
+function changedB(){syncB();RB=evalB();renderChecks('checksB',RB.C);drawRate();drawTbl();noteB();checkTasks();}
+for(const k in fmtB)$(k).addEventListener('input',()=>{B[k]=k==='mode'?$(k).value:+$(k).value;changedB();});
+$('resetB').onclick=()=>{Object.assign(B,STDB);changedB();};
+// ---- tasks ----
+const seen={m:false,c:false,o:false};
+const same=ks=>ks.every(k=>A[k]===STDA[k]);
+function noteA(){if(same(['sam','run_frac','seams','perf','brk_per_h','wait_min','fault_min','defect','extra_trim'])&&Math.abs(RA.err)<0.01)seen.c=true;}
+function noteB(){if(B.n===500&&B.msgb===250&&B.shifts===2&&RB.ok)seen.m=true;}
+const TASKS=[
+  {t:'第②页：500 台缝纫机、每条 250 字节、每天两班，选一种上报方式，使四项判据全部满足。',d:'每针上报太多，每 10 分钟汇总太慢；状态变化要不要单独立即上报？',ok:()=>seen.m},
+  {t:'第①页：不改标准工况（工时、效率、断线、返修、多剪线概率），想办法让件数统计误差小于 1%。',d:'剪线次数里混进了哪些不是“一件”的剪线？还有什么别的数法？完成后想一想：按剪线数为什么会偏高？',ok:()=>seen.c},
+  {t:'按下面给出的班次数据算 OEE，填入百分数（±0.5 个百分点）。',d:'A = 运行时间 / 计划时间；P = 件数 × 标准工时 / 运行时间；Q = 合格件 / 件数。',ok:()=>seen.o}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});$('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+$('oeeChk').onclick=()=>{const oper=450-40-20-15,A_=oper/450,P_=600*0.5/oper,Q_=582/600,o=A_*P_*Q_*100,v=+$('oee').value;
+  if($('oee').value!==''&&Math.abs(v-o)<=0.5){seen.o=true;$('msg').textContent=`正确：运行时间 ${oper} min，A = ${(A_*100).toFixed(1)}%，P = ${(P_*100).toFixed(1)}%，Q = ${(Q_*100).toFixed(1)}%，OEE ≈ ${o.toFixed(1)}%（也就是合格品时间 582 × 0.5 = 291 min 除以 450 min）。`;}
+  else $('msg').textContent='还不对：先算运行时间 = 450 − 40 − 20 − 15；OEE 也等于“合格件数 × 标准工时 / 计划时间”。';checkTasks();};
+window.__api={A,B,STDA,STDB,changedA,changedB,evalA:()=>RA,evalB:()=>RB,done,seen,shift,traffic,tab,oee:v=>{$('oee').value=v;$('oeeChk').click();}};
+changedA();changedB();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

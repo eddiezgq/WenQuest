@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Flat Knitting Programming</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: guide + tasks rail | main work area with three tabs (design / compile / run on machine) */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --bad:#d1495b; --ok:#1e8449; --warn:#b9770e;
+  --c1:#2f6fd6; --c2:#e0662f; --c3:#2e9e6b; --c4:#8e44ad; --back:#9aa4ae; --xfer:#d4a017; --cellbg:#ffffff;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--c1:#6ea8ff;--c2:#ff8c55;--c3:#58d68d;--c4:#c39bd3;--back:#6b7785;--xfer:#f4d03f;--cellbg:#1f2833;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--c1:#6ea8ff;--c2:#ff8c55;--c3:#58d68d;--c4:#c39bd3;--back:#6b7785;--xfer:#f4d03f;--cellbg:#1f2833;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)} button.primary{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button[aria-pressed="true"],button[aria-selected="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
+.pal button{min-width:3.2em}
+.pal button .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+canvas{display:block;width:100%;height:auto;touch-action:none;border-radius:6px}
+.note{font-size:.8rem;color:var(--muted);margin:6px 0 0}
+.steps{margin:0;padding-left:1.2em;font-size:.86rem}
+.steps li{margin:3px 0;cursor:pointer}
+.steps li.on{font-weight:600;color:var(--accent)}
+.lesson{font-size:.86rem;background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px}
+.lesson p{margin:0 0 6px}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--bad)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.tbl{max-height:380px;overflow:auto;border:1px solid var(--rule);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:.78rem}
+th,td{padding:3px 6px;border-bottom:1px solid var(--rule);text-align:left;white-space:nowrap}
+th{position:sticky;top:0;background:var(--sheet);color:var(--muted);font-weight:600}
+td.mono{font-family:var(--f-mono)}
+tr.cur td{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.msg{font-size:.84rem;margin:4px 0}
+.msg.err{color:var(--bad)} .msg.warn{color:var(--warn)} .msg.ok{color:var(--ok)}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1rem}
+.kpi small{color:var(--muted);font-size:.74rem;display:block}
+.panelm{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.panelm{grid-template-columns:minmax(0,1fr)}}
+.screen{background:#0e2430;color:#cfe8f1;border-radius:8px;padding:10px;font-family:var(--f-mono);font-size:.8rem;min-height:150px}
+.screen .lamp{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px;background:#566}
+.screen .lamp.run{background:#2ecc71}.screen .lamp.alarm{background:#e74c3c}.screen .lamp.ready{background:#f1c40f}
+.opbtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
+.log{font-family:var(--f-mono);font-size:.74rem;max-height:160px;overflow:auto;background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:6px;margin-top:8px}
+progress{width:100%;accent-color:var(--accent)}
+</style>
+<div class="wrap">
+<header><h1>Flat knitting: pattern programming and machine operation</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 17 · Virtual lab 17-2 · Draw the pattern chart → compile it into a course program → knit it from the operating panel</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Programming and operating guide</h3><ol class="steps" id="steps"></ol><div class="lesson" id="lesson"></div></section>
+    <section class="panel"><h3>Tasks (auto-graded)</h3><div id="tasks"></div></section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="draw" aria-selected="true">① Design (pattern chart)</button>
+        <button type="button" role="tab" data-tab="comp" aria-selected="false">② Compile and check</button>
+        <button type="button" role="tab" data-tab="run" aria-selected="false">③ Run on machine</button>
+      </div>
+      <div id="tab-draw">
+        <div class="row pal" id="pal" role="toolbar" aria-label="Symbols"></div>
+        <div class="row pal" id="cols" role="toolbar" aria-label="Yarn carriers"></div>
+        <div class="row">
+          <span class="note" style="margin:0">Tool</span>
+          <button type="button" data-mode="pen" aria-pressed="true">Pen</button>
+          <button type="button" data-mode="rect" aria-pressed="false">Rectangle fill</button>
+          <span class="note" style="margin:0">Preset</span>
+          <select id="preset"><option value="">(choose)</option><option value="rib">1×1 rib + jersey</option><option value="jac">Two-colour jacquard</option><option value="cable">2×2 cable</option><option value="shape">Narrowing on both edges</option></select>
+          <button type="button" id="clr">Clear</button>
+        </div>
+        <canvas id="cv" width="1000" height="640" aria-label="Pattern chart editor"></canvas>
+        <p class="note">Grid of 24 needles × 20 rows, knitted from bottom to top. The two columns on the right are control lines: stitch-cam step and speed step; click to cycle 1–4. Drag to paint continuously.</p>
+      </div>
+      <div id="tab-comp" hidden>
+        <div class="row"><button type="button" class="primary" id="docomp">Compile</button><span class="note" style="margin:0">The compiler orders the yarn carriers, inserts transfer courses and racking, and adds empty passes where needed.</span></div>
+        <div class="kpi" style="margin:8px 0"><div><b id="k-c">—</b><small>Courses (passes)</small></div><div><b id="k-e">—</b><small>Empty passes</small></div><div><b id="k-x">—</b><small>Transfer courses</small></div><div><b id="k-t">—</b><small>Est. time s (24 needles wide)</small></div></div>
+        <div id="msgs"></div>
+        <div class="tbl"><table><thead><tr><th>#</th><th>Chart row</th><th>Type</th><th>Dir.</th><th>Carrier</th><th>Rack</th><th>Front-bed selection</th><th>Back-bed selection</th><th>Stitch cam</th><th>Speed</th></tr></thead><tbody id="ctab"></tbody></table></div>
+        <div class="row" style="margin-top:10px">
+          <span class="note" style="margin:0">Stitch-cam table</span><span id="stab"></span>
+          <span class="note" style="margin:0">Speed table m/s</span><span id="vtab"></span>
+        </div>
+      </div>
+      <div id="tab-run" hidden>
+        <div class="panelm">
+          <div>
+            <div class="screen" id="screen"></div>
+            <div class="opbtns">
+              <button type="button" data-op="home">Home</button>
+              <button type="button" data-op="setup">Cast on</button>
+              <button type="button" data-op="start" class="primary">Start</button>
+              <button type="button" data-op="stop">Stop</button>
+              <button type="button" data-op="fix">Fix yarn/needle</button>
+              <button type="button" data-op="reset">Reset</button>
+            </div>
+            <div class="row" style="margin-top:8px"><span class="note" style="margin:0">Fault demo</span><button type="button" data-fault="yarn">Yarn break</button><button type="button" data-fault="crash">Needle crash</button></div>
+            <div class="log" id="log" aria-live="polite"></div>
+          </div>
+          <div>
+            <progress id="prog" value="0" max="1"></progress>
+            <canvas id="fab" width="900" height="560" aria-label="Fabric being knitted"></canvas>
+            <p class="note">The fabric is shown row by row as courses are completed; red boxes mark needles where a transfer went wrong.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const W = 24, H = 20;
+const SYM = [
+  { s:'K', n:'Front knit' }, { s:'P', n:'Back knit' }, { s:'T', n:'Tuck' }, { s:'>', n:'Move right (cable/widen)' }, { s:'<', n:'Move left (cable/narrow)' }, { s:'.', n:'No knit' },
+];
+let cells, ctl, sym = 'K', col = 1, mode = 'pen', dragStart = null, painting = false;
+const stitchTab = [0, 40, 46, 52, 36], speedTab = [0, 1.0, 0.7, 0.4, 1.2];
+function blank(){ cells = Array.from({length:H}, () => Array.from({length:W}, () => ({ s:'.', c:1 }))); ctl = Array.from({length:H}, () => ({ st:1, sp:1 })); }
+blank();
+
+// ---------- presets ----------
+function preset(name){
+  blank();
+  const fill = (r0, r1, f) => { for (let r = r0; r <= r1; r++) for (let i = 0; i < W; i++){ const v = f(r, i); if (v) cells[r][i] = v; } };
+  if (name === 'rib'){ fill(0, 5, (r, i) => ({ s: i % 2 ? 'P' : 'K', c:1 })); fill(6, 15, () => ({ s:'K', c:1 })); for (let r = 0; r <= 5; r++) ctl[r].st = 4; }
+  if (name === 'jac'){
+    fill(0, 3, (r, i) => ({ s: i % 2 ? 'P' : 'K', c:1 }));
+    const m = ['000000000000','000001100000','000011110000','000111111000','001111111100','000111111000','000011110000','000001100000'];
+    fill(4, 11, (r, i) => ({ s:'K', c: m[r - 4][i % 12] === '1' ? 2 : 1 }));
+    fill(12, 13, () => ({ s:'K', c:1 }));
+  }
+  if (name === 'cable'){
+    fill(0, 3, (r, i) => ({ s: (i % 8) < 2 || (i % 8) > 5 ? 'P' : 'K', c:1 }));
+    fill(4, 15, (r, i) => ({ s: (i % 8) < 2 || (i % 8) > 5 ? 'P' : 'K', c:1 }));
+    for (const r of [7, 13]) for (let i = 0; i < W; i++){ const k = i % 8; if (k === 2 || k === 3) cells[r][i] = { s:'>', c:1 }; if (k === 4 || k === 5) cells[r][i] = { s:'<', c:1 }; }
+    for (const r of [7, 13]) ctl[r].sp = 3;
+  }
+  if (name === 'shape'){
+    fill(0, 3, (r, i) => ({ s: i % 2 ? 'P' : 'K', c:1 }));
+    for (let r = 4; r < H; r++){ const cut = Math.floor((r - 4) / 3); for (let i = cut; i < W - cut; i++) cells[r][i] = { s:'K', c:1 };
+      if ((r - 4) % 3 === 2 && cut < 8){ cells[r][cut] = { s:'>', c:1 }; cells[r][W - 1 - cut] = { s:'<', c:1 }; ctl[r].sp = 3; } }
+  }
+  draw(); grade();
+}
+
+// ---------- editor canvas ----------
+const cv = $('cv'), g = cv.getContext('2d');
+const geo = () => { const fw = 2 * 34, L = 40, cs = Math.min(Math.floor((cv.width - L - fw - 20) / W), Math.floor((cv.height - 60) / H)); return { L, cs, top: cv.height - 30 - H * cs, fx: L + W * cs + 12 }; };
+const colorOf = c => css(['', '--c1', '--c2', '--c3', '--c4'][c]);
+function drawCell(x, y, cs, cell){
+  g.fillStyle = css('--cellbg'); g.fillRect(x, y, cs - 1, cs - 1);
+  const c = colorOf(cell.c);
+  g.lineWidth = 2.4; g.strokeStyle = c; g.fillStyle = c;
+  if (cell.s === 'K'){ g.globalAlpha = .18; g.fillRect(x, y, cs - 1, cs - 1); g.globalAlpha = 1; g.beginPath(); g.moveTo(x + cs * .2, y + cs * .2); g.lineTo(x + cs * .5, y + cs * .8); g.lineTo(x + cs * .8, y + cs * .2); g.stroke(); }
+  else if (cell.s === 'P'){ g.fillStyle = css('--back'); g.globalAlpha = .35; g.fillRect(x, y, cs - 1, cs - 1); g.globalAlpha = 1; g.strokeStyle = c; g.beginPath(); g.moveTo(x + cs * .2, y + cs * .5); g.lineTo(x + cs * .8, y + cs * .5); g.stroke(); }
+  else if (cell.s === 'T'){ g.beginPath(); g.moveTo(x + cs * .3, y + cs * .15); g.lineTo(x + cs * .3, y + cs * .65); g.quadraticCurveTo(x + cs * .5, y + cs * .95, x + cs * .7, y + cs * .65); g.lineTo(x + cs * .7, y + cs * .15); g.stroke(); }
+  else if (cell.s === '>' || cell.s === '<'){ g.fillStyle = css('--xfer'); g.globalAlpha = .35; g.fillRect(x, y, cs - 1, cs - 1); g.globalAlpha = 1; g.fillStyle = css('--ink'); g.font = `${Math.floor(cs * .7)}px ${css('--f-mono')}`; g.textAlign = 'center'; g.fillText(cell.s === '>' ? '→' : '←', x + cs / 2, y + cs * .72); g.textAlign = 'left'; }
+}
+function draw(){
+  const { L, cs, top, fx } = geo(); g.clearRect(0, 0, cv.width, cv.height);
+  g.fillStyle = css('--rule'); g.fillRect(L - 1, top - 1, W * cs + 1, H * cs + 1);
+  for (let r = 0; r < H; r++) for (let i = 0; i < W; i++) drawCell(L + i * cs, top + (H - 1 - r) * cs, cs, cells[r][i]);
+  g.fillStyle = css('--muted'); g.font = '15px ' + css('--f-mono'); g.textAlign = 'right';
+  for (let r = 0; r < H; r++) g.fillText(r + 1, L - 6, top + (H - 1 - r) * cs + cs * .7);
+  g.textAlign = 'center'; for (let i = 0; i < W; i += 2) g.fillText(i + 1, L + i * cs + cs / 2, top + H * cs + 18);
+  g.fillText('Cam', fx + 16, top - 8); g.fillText('Spd', fx + 50, top - 8);
+  for (let r = 0; r < H; r++){ const y = top + (H - 1 - r) * cs; [['st', 0], ['sp', 34]].forEach(([k, dx]) => { g.fillStyle = css('--cellbg'); g.fillRect(fx + dx, y, 32, cs - 1); g.fillStyle = css('--ink'); g.fillText(ctl[r][k], fx + dx + 16, y + cs * .7); }); }
+  g.textAlign = 'left';
+  if (dragStart && mode === 'rect' && dragStart.cur){ const a = dragStart, b = dragStart.cur; const r0 = Math.min(a.r, b.r), r1 = Math.max(a.r, b.r), i0 = Math.min(a.i, b.i), i1 = Math.max(a.i, b.i); g.strokeStyle = css('--accent'); g.lineWidth = 2; g.strokeRect(L + i0 * cs, top + (H - 1 - r1) * cs, (i1 - i0 + 1) * cs, (r1 - r0 + 1) * cs); }
+}
+function hit(e){ const r_ = cv.getBoundingClientRect(); const x = (e.clientX - r_.left) * cv.width / r_.width, y = (e.clientY - r_.top) * cv.height / r_.height; const { L, cs, top, fx } = geo();
+  const row = H - 1 - Math.floor((y - top) / cs); if (row < 0 || row >= H) return null;
+  if (x >= fx && x < fx + 32) return { fn:'st', r:row }; if (x >= fx + 34 && x < fx + 66) return { fn:'sp', r:row };
+  const i = Math.floor((x - L) / cs); if (i < 0 || i >= W) return null; return { r:row, i }; }
+cv.addEventListener('pointerdown', e => { const h = hit(e); if (!h) return; if (h.fn){ ctl[h.r][h.fn] = ctl[h.r][h.fn] % 4 + 1; draw(); return; }
+  if (mode === 'pen'){ painting = true; cells[h.r][h.i] = { s:sym, c:col }; draw(); } else { dragStart = { ...h, cur:h }; } cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => { const h = hit(e); if (!h || h.fn) return; if (painting){ cells[h.r][h.i] = { s:sym, c:col }; draw(); } else if (dragStart){ dragStart.cur = h; draw(); } });
+cv.addEventListener('pointerup', () => { if (dragStart && dragStart.cur){ const a = dragStart, b = dragStart.cur; for (let r = Math.min(a.r, b.r); r <= Math.max(a.r, b.r); r++) for (let i = Math.min(a.i, b.i); i <= Math.max(a.i, b.i); i++) cells[r][i] = { s:sym, c:col }; } dragStart = null; painting = false; draw(); grade(); });
+function buildPalette(){
+  $('pal').innerHTML = '<span class="note" style="margin:0">Symbol</span>' + SYM.map(x => `<button type="button" data-sym="${x.s}" aria-pressed="${x.s === sym}">${x.s === '.' ? '·' : x.s === '>' ? '→' : x.s === '<' ? '←' : x.s} ${x.n}</button>`).join('');
+  $('cols').innerHTML = '<span class="note" style="margin:0">Carrier</span>' + [1, 2, 3, 4].map(c => `<button type="button" data-col="${c}" aria-pressed="${c === col}"><span class="sw" style="background:${colorOf(c)}"></span>${c}</button>`).join('');
+  document.querySelectorAll('[data-sym]').forEach(b => b.addEventListener('click', () => { sym = b.dataset.sym; buildPalette(); }));
+  document.querySelectorAll('[data-col]').forEach(b => b.addEventListener('click', () => { col = +b.dataset.col; buildPalette(); }));
+}
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+$('preset').addEventListener('change', e => { if (e.target.value) preset(e.target.value); e.target.value = ''; compiled = null; });
+$('clr').addEventListener('click', () => { blank(); draw(); compiled = null; grade(); });
+
+// ---------- compiler ----------
+let compiled = null;
+function compile(){
+  const courses = [], msgs = []; let empties = 0, xfers = 0;
+  const front = Array.from({length:W}, () => []), back = Array.from({length:W}, () => []);
+  const carrierSide = { 1:'L', 2:'L', 3:'L', 4:'L' }; let carSide = 'L'; let loopId = 0; const moves = []; const errCells = {};
+  const bits = f => Array.from({length:W}, (_, i) => f(i) ? '1' : '0').join('');
+  const pass = (o) => { o.dir = carSide === 'L' ? '→' : '←'; carSide = carSide === 'L' ? 'R' : 'L'; courses.push(o); return o; };
+  for (let r = 0; r < H; r++){
+    const row = cells[r]; if (row.every(c => c.s === '.')) continue;
+    const st = stitchTab[ctl[r].st], sp = speedTab[ctl[r].sp];
+    // movers: runs of '>' followed by '<' are cables; lone runs move by 1
+    const disp = Array(W).fill(0);
+    for (let i = 0; i < W;){
+      if (row[i].s === '>'){ let j = i; while (j < W && row[j].s === '>') j++; let k = j; while (k < W && row[k].s === '<') k++;
+        if (k > j){ for (let a = i; a < j; a++) disp[a] = k - j; for (let a = j; a < k; a++) disp[a] = -(j - i); i = k; } else { for (let a = i; a < j; a++) disp[a] = 1; i = j; } }
+      else if (row[i].s === '<'){ let j = i; while (j < W && row[j].s === '<') j++; for (let a = i; a < j; a++) disp[a] = -1; i = j; }
+      else i++;
+    }
+    const movers = []; disp.forEach((d, i) => { if (d) movers.push(i); });
+    if (movers.length){
+      movers.forEach(i => { if (!front[i].length){ msgs.push({ t:'err', m:`Row ${r + 1}, needle ${i + 1}: transfer from a front-bed needle that holds no loop (empty-needle transfer)` }); errCells[`${r},${i}`] = 1; } });
+      pass({ row:r + 1, type:'Transfer F→B', rack:0, f:bits(i => disp[i]), b:'', st:'—', sp: speedTab[3] }); xfers++;
+      movers.forEach(i => { back[i].push(...front[i]); front[i] = []; });
+      const ds = [...new Set(movers.map(i => disp[i]))].sort((a, b) => b - a);
+      for (const d of ds){
+        if (Math.abs(d) > 4){ msgs.push({ t:'err', m:`Row ${r + 1}: needs racking by ${d} needles, beyond the ±4-needle range` }); }
+        const grp = movers.filter(i => disp[i] === d);
+        pass({ row:r + 1, type:'Transfer B→F', rack:d, f:'', b:bits(i => disp[i] === d), st:'—', sp: speedTab[3] }); xfers++;
+        grp.forEach(i => { const t = i + d; if (t < 0 || t >= W){ msgs.push({ t:'err', m:`Row ${r + 1}, needle ${i + 1}: moved off the needle bed` }); errCells[`${r},${i}`] = 1; back[i] = []; return; }
+          back[i].forEach(id => moves.push({ row:r, from:i, to:t, d })); front[t].push(...back[i]); back[i] = []; });
+      }
+    }
+    // knitting courses, one per carrier used in this row
+    const knitCell = (i) => { const s = row[i].s; return s === 'K' || s === 'P' || s === 'T' || s === '>' || s === '<' ? s : null; };
+    const colors = [...new Set(row.map((c, i) => knitCell(i) ? c.c : 0).filter(Boolean))];
+    const left = colors.slice();
+    while (left.length){
+      let k = left.findIndex(c => carrierSide[c] === carSide);
+      if (k < 0){ pass({ row:r + 1, type:'Empty pass', rack:0, f:'', b:'', st:'—', sp: speedTab[4] }); empties++; continue; }
+      const c = left.splice(k, 1)[0];
+      const isF = i => { const s = knitCell(i); if (row[i].c !== c) return false; if (s === '>' || s === '<') return front[i].length > 0; return s === 'K' || s === 'T'; };
+      const isB = i => knitCell(i) === 'P' && row[i].c === c;
+      pass({ row:r + 1, type:'Knit', carrier:c, rack:0, f:bits(isF), b:bits(isB), st, sp });
+      carrierSide[c] = carSide;
+      for (let i = 0; i < W; i++){
+        if (row[i].c !== c) continue; const s = knitCell(i); if (!s) continue; if ((s === '>' || s === '<') && !front[i].length) continue;
+        if (s === 'P'){ if (front[i].length && r > 0) { /* front loop stays */ } back[i] = [++loopId]; }
+        else if (s === 'T'){ front[i].push(++loopId); }
+        else { front[i] = [++loopId]; }
+      }
+    }
+  }
+  if (!courses.length) msgs.push({ t:'warn', m:'The pattern chart is empty' });
+  // time estimate with 24 needles E12, 17.8-style
+  const p = 25.4 / 12, w = W * p, Lk = 150, c = 72, a = 10;
+  let time = 0; courses.forEach(co => { time += (w + Lk + 2 * c) / 1000 / co.sp + co.sp / a + 0.05; });
+  if (!msgs.some(m => m.t === 'err') && courses.length) msgs.push({ t:'ok', m:`Compiled successfully: ${courses.length} courses, including ${xfers} transfer and ${empties} empty passes` });
+  compiled = { courses, msgs, empties, xfers, time, moves, errCells };
+  return compiled;
+}
+function showCompile(){
+  const c = compile();
+  $('k-c').textContent = c.courses.length; $('k-e').textContent = c.empties; $('k-x').textContent = c.xfers; $('k-t').textContent = c.time.toFixed(1);
+  $('msgs').innerHTML = c.msgs.slice(0, 12).map(m => `<p class="msg ${m.t}">${m.m}</p>`).join('') + (c.msgs.length > 12 ? `<p class="msg">… and ${c.msgs.length - 12} more</p>` : '');
+  $('ctab').innerHTML = c.courses.map((co, k) => `<tr data-k="${k}"><td>${k + 1}</td><td>${co.row}</td><td>${co.type}</td><td>${co.dir}</td><td>${co.carrier || '—'}</td><td>${co.rack || 0}</td><td class="mono">${co.f || '—'}</td><td class="mono">${co.b || '—'}</td><td>${co.st}</td><td>${co.sp}</td></tr>`).join('');
+  grade();
+}
+$('docomp').addEventListener('click', showCompile);
+function tables(){
+  $('stab').innerHTML = [1, 2, 3, 4].map(k => `<select data-st="${k}" aria-label="Stitch-cam step ${k}">${[30, 34, 36, 40, 44, 46, 50, 52, 56].map(v => `<option ${v === stitchTab[k] ? 'selected' : ''}>${v}</option>`).join('')}</select>`).join(' ');
+  $('vtab').innerHTML = [1, 2, 3, 4].map(k => `<select data-sp="${k}" aria-label="Speed step ${k}">${[0.3, 0.4, 0.5, 0.7, 0.9, 1.0, 1.2, 1.4].map(v => `<option ${v === speedTab[k] ? 'selected' : ''}>${v}</option>`).join('')}</select>`).join(' ');
+  document.querySelectorAll('[data-st]').forEach(s => s.addEventListener('change', e => { stitchTab[+s.dataset.st] = +e.target.value; showCompile(); }));
+  document.querySelectorAll('[data-sp]').forEach(s => s.addEventListener('change', e => { speedTab[+s.dataset.sp] = +e.target.value; showCompile(); }));
+}
+
+// ---------- machine operation ----------
+const M = { state:'off', k:0, t:0, homed:false, setup:false, fault:null, log:[], last:0, handled:0, done:false };
+function log(m){ const t = new Date(); M.log.push(m); const el = $('log'); el.innerHTML = M.log.slice(-60).map(x => `<div>${x}</div>`).join(''); el.scrollTop = 1e6; }
+function screen(){
+  const c = compiled; const total = c ? c.courses.length : 0; const co = c && c.courses[M.k];
+  const lamp = M.state === 'running' ? 'run' : M.state === 'alarm' ? 'alarm' : M.state === 'ready' ? 'ready' : '';
+  const stName = { off:'Not ready', homed:'Homed', ready:'Ready', running:'Knitting', alarm:'Alarm stop', stopped:'Stopped', done:'Finished' }[M.state];
+  $('screen').innerHTML = `<div><span class="lamp ${lamp}"></span>${stName}</div>
+    <div>Program: ${total ? total + ' courses' : 'not compiled'}</div>
+    <div>Current: ${co ? `${M.k + 1} / ${total} · ${co.type} · ${co.dir} · carrier ${co.carrier || '—'} · rack ${co.rack || 0}` : (M.state === 'done' ? `${total} / ${total}` : '—')}</div>
+    <div>Speed: ${co ? co.sp + ' m/s' : '—'} · Stitch cam: ${co ? co.st : '—'}</div>
+    <div style="color:${M.fault ? '#ff8f8f' : '#8fd3a8'}">${M.fault ? 'Alarm: ' + (M.fault === 'yarn' ? 'yarn break (carrier ' + (co && co.carrier || 1) + ')' : 'needle crash (needle ' + (M.crashNeedle + 1) + ')') : 'No alarm'}</div>`;
+  $('prog').max = Math.max(1, total); $('prog').value = M.k;
+}
+function op(name){
+  const c = compiled;
+  if (name === 'home'){ if (M.state === 'running'){ log('× Cannot home while knitting; stop first'); return; } M.homed = true; M.state = 'homed'; log('✓ Homed: carriage, racking and stitch-cam motors returned to origin'); }
+  else if (name === 'setup'){ if (!M.homed){ log('× Home the machine first'); return; } if (!c || !c.courses.length){ log('× Compile the program under “Compile and check” first'); return; } if (c.msgs.some(m => m.t === 'err')){ log('× The program has errors and cannot be run'); return; } M.setup = true; M.state = 'ready'; M.k = 0; M.done = false; log('✓ Cast on: the cast-on comb rises and holds the first course of loops'); }
+  else if (name === 'start'){ if (M.fault){ log('× Alarm not cleared: fix the fault, then reset'); return; } if (M.state === 'alarm'){ log('× Reset first'); return; } if (!M.setup){ log('× Cast on first'); return; } if (M.state === 'done'){ log('× Finished; cast on again to knit another panel'); return; } M.state = 'running'; log(`▶ Start (from course ${M.k + 1})`); requestAnimationFrame(runTick); }
+  else if (name === 'stop'){ if (M.state === 'running'){ M.state = 'stopped'; log('■ Stop: the carriage finishes this course and parks at one side'); } }
+  else if (name === 'fix'){ if (!M.fault){ log('(No fault to fix)'); return; } log(M.fault === 'yarn' ? '✓ Yarn tied: rethreaded and broken end joined' : `✓ Needle replaced: damaged needle ${M.crashNeedle + 1} removed and replaced, cam system checked`); M.fixed = true; }
+  else if (name === 'reset'){ if (!M.fault){ if (M.state === 'stopped'){ log('✓ Reset'); } return; } if (!M.fixed){ log('× The fault has not been fixed; resetting now would raise the alarm again'); return; } M.fault = null; M.fixed = false; M.state = 'stopped'; M.handled++; log('✓ Reset: alarm cleared; knitting can resume from the course where it stopped'); }
+  screen();
+}
+function fault(kind){ if (M.state !== 'running'){ log('(Fault demo can only be triggered while knitting)'); return; } M.fault = kind; M.state = 'alarm'; M.crashNeedle = Math.floor(Math.random() * W); log(kind === 'yarn' ? '⚠ Yarn break detected: immediate stop' : '⚠ Needle crash: carriage drive torque surged, emergency stop'); screen(); }
+document.querySelectorAll('[data-op]').forEach(b => b.addEventListener('click', () => op(b.dataset.op)));
+document.querySelectorAll('[data-fault]').forEach(b => b.addEventListener('click', () => fault(b.dataset.fault)));
+function runTick(ts){
+  if (M.state !== 'running'){ M.last = 0; return; }
+  if (!M.last) M.last = ts; M.t += (ts - M.last) / 1000; M.last = ts;
+  const co = compiled.courses[M.k]; const dur = 0.35 / co.sp;
+  if (M.t >= dur){ M.t = 0; M.k++; if (M.k >= compiled.courses.length){ M.state = 'done'; M.done = true; log('✓ Panel finished'); grade(); screen(); drawFab(); return; } }
+  screen(); drawFab(); requestAnimationFrame(runTick);
+}
+const fab = $('fab'), fg = fab.getContext('2d');
+function drawFab(){
+  const w = fab.width, h = fab.height; fg.clearRect(0, 0, w, h);
+  if (!compiled){ fg.fillStyle = css('--muted'); fg.font = '20px ' + css('--f-body'); fg.fillText('Compile the program first', 30, 40); return; }
+  const doneRows = new Set(compiled.courses.slice(0, M.k).filter(c => c.type === 'Knit').map(c => c.row - 1));
+  const cs = Math.min(Math.floor((w - 60) / W), Math.floor((h - 20) / H)), L = 40, top = h - 10 - H * cs;
+  for (let r = 0; r < H; r++){ if (!doneRows.has(r)) continue;
+    for (let i = 0; i < W; i++){ const cell = cells[r][i]; const x = L + i * cs, y = top + (H - 1 - r) * cs; const c = colorOf(cell.c);
+      fg.strokeStyle = c; fg.lineWidth = 2.2; fg.beginPath();
+      if (cell.s === 'K' || cell.s === '>' || cell.s === '<'){ fg.moveTo(x + cs * .2, y + cs * .15); fg.lineTo(x + cs * .5, y + cs * .85); fg.lineTo(x + cs * .8, y + cs * .15); }
+      else if (cell.s === 'P'){ fg.moveTo(x + cs * .15, y + cs * .5); fg.lineTo(x + cs * .85, y + cs * .5); }
+      else if (cell.s === 'T'){ fg.moveTo(x + cs * .3, y); fg.lineTo(x + cs * .3, y + cs * .7); fg.quadraticCurveTo(x + cs * .5, y + cs, x + cs * .7, y + cs * .7); fg.lineTo(x + cs * .7, y); }
+      fg.stroke();
+      if (cell.s === '>' || cell.s === '<'){ fg.fillStyle = css('--xfer'); fg.globalAlpha = .3; fg.fillRect(x, y, cs - 1, cs - 1); fg.globalAlpha = 1; }
+      if (compiled.errCells[`${r},${i}`]){ fg.strokeStyle = css('--bad'); fg.lineWidth = 2; fg.strokeRect(x + 1, y + 1, cs - 3, cs - 3); }
+    } }
+}
+
+// ---------- tabs ----------
+document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', x === b));
+  ['draw', 'comp', 'run'].forEach(t => $('tab-' + t).hidden = t !== b.dataset.tab);
+  if (b.dataset.tab === 'comp') showCompile(); if (b.dataset.tab === 'run'){ if (!compiled) compile(); screen(); drawFab(); }
+}));
+
+// ---------- guide ----------
+const LESSONS = [
+  ['Pattern chart and symbols', '<p>Each cell of the pattern chart is what one needle does in one row; knitting proceeds from bottom to top. K = knit on the front bed (face loop), P = knit on the back bed (reverse loop), T = tuck, · = no knit. The cell colour shows which yarn carrier (which yarn) is used.</p><p>Try it: choose the preset “1×1 rib + jersey” and see how a rib of alternating K and P is drawn.</p>'],
+  ['Control lines: stitch cam and speed', '<p>The two columns on the right are control lines. Stitch-cam steps 1–4 refer to the stitch-cam table at the bottom of the “Compile and check” tab; speed steps refer to the speed table. Rib must be tighter than jersey, so rib rows usually use a smaller stitch-cam value; transfer rows must run slower.</p><p>Change a value in the stitch-cam table, compile again, and watch the stitch-cam column of the course table change.</p>'],
+  ['Compiling: chart rows become courses', '<p>Click “② Compile and check”. The compiler splits each chart row into one or more courses (one carriage pass each) and gives the direction, carrier, front- and back-bed selection data (1 = selected), stitch cam and speed. A row with two colours needs two courses.</p>'],
+  ['Yarn carriers and empty passes', '<p>A yarn carrier can only start from the side where it was last parked. In two-colour jacquard, if the carrier for the next colour is parked on the other side from the carriage, the compiler has to insert a non-knitting “empty pass” to move the carriage across. The more empty passes, the lower the efficiency.</p><p>Try it: in the two-colour jacquard, make some rows use only one colour and see how the number of empty passes changes.</p>'],
+  ['Transfer, racking and cables', '<p>→ and ← are loop-transfer symbols. A group of → next to a group of ← forms a cable: the compiler first transfers the loops on these needles to the back bed, racks the back bed by a few needles, then transfers them back to the front bed, so the loops cross. A lone → or ← moves a loop by one needle onto its neighbour, which is used for narrowing (shaping).</p><p>Choose the preset “2×2 cable”, compile, and find “Transfer F→B”, “Transfer B→F” and rack ±2 in the course table.</p>'],
+  ['Checking for errors', '<p>The compiler reports: empty-needle transfer (a transfer from a needle with no loop), moving a loop off the needle bed, and racking beyond ±4 needles. On the machine these errors mean needle crashes or dropped loops, so a program with errors is not allowed to run.</p><p>Try it: draw a → in an empty area, compile, and see which error is reported.</p>'],
+  ['Machine operating sequence', '<p>“③ Run on machine”: first Home (carriage, racking and stitch-cam motors find their origin), then Cast on (the cast-on comb holds the first course), then Start knitting.</p><p>While knitting, click “Yarn break” or “Needle crash” to simulate a fault: the machine alarms and stops. The correct response is to tie the yarn or replace the needle, then Reset, then Start, continuing from the course where it stopped. If you get the order wrong, the panel tells you.</p>'],
+];
+let li = 0;
+function renderSteps(){ const ol = $('steps'); ol.innerHTML = ''; LESSONS.forEach((l, i) => { const e = document.createElement('li'); e.textContent = l[0]; e.className = i === li ? 'on' : ''; e.tabIndex = 0; e.addEventListener('click', () => { li = i; renderSteps(); }); e.addEventListener('keydown', ev => { if (ev.key === 'Enter'){ li = i; renderSteps(); } }); ol.appendChild(e); }); $('lesson').innerHTML = LESSONS[li][1]; }
+
+// ---------- tasks ----------
+const TASKS = [
+  { t:'Task 1: Rib', d:'Draw at least 4 rows of 1×1 rib (K and P alternating needle by needle) at least 16 needles wide, using stitch-cam step 4 on the rib rows.', check(){
+    let n = 0; for (let r = 0; r < H; r++){ const row = cells[r]; let run = 0, best = 0;
+      for (let i = 0; i < W; i++){ const x = row[i].s, isKP = x === 'K' || x === 'P', pv = i ? row[i - 1].s : null;
+        run = !isKP ? 0 : (pv && (pv === 'K' || pv === 'P') && pv !== x ? run + 1 : 1); best = Math.max(best, run); }
+      if (best >= 16 && ctl[r].st === 4) n++; }
+    return n >= 4 ? [true, `Done: ${n} rows`] : [false, `Rows meeting the requirement: ${n} / 4`]; } },
+  { t:'Task 2: Two-colour jacquard', d:'Draw a jacquard of at least 6 rows, each using both carrier 1 and carrier 2, that compiles without errors.', check(){
+    let n = 0; for (let r = 0; r < H; r++){ const cs = new Set(cells[r].filter(c => c.s === 'K').map(c => c.c)); if (cs.has(1) && cs.has(2)) n++; }
+    if (n < 6) return [false, `Two-colour rows: ${n} / 6`]; const c = compile(); if (c.msgs.some(m => m.t === 'err')) return [false, 'Compile errors']; return [true, `Done: ${n} rows, ${c.empties} empty pass${c.empties === 1 ? '' : 'es'}`]; } },
+  { t:'Task 3: Cable', d:'Make at least one 2×2 cable — two needles moved right by 2 and two moved left by 2 — that compiles without errors.', check(){
+    const c = compile(); if (c.msgs.some(m => m.t === 'err')) return [false, 'Compile errors'];
+    const byRow = {}; c.moves.forEach(m => { byRow[m.row] = byRow[m.row] || { p:0, n:0 }; if (m.d === 2) byRow[m.row].p++; if (m.d === -2) byRow[m.row].n++; });
+    const ok = Object.values(byRow).some(v => v.p >= 2 && v.n >= 2); return ok ? [true, 'Done: the loops cross'] : [false, 'No row yet with two needles moved right by 2 and two moved left by 2']; } },
+  { t:'Task 4: Run on machine', d:'Run the machine in the order Home → Cast on → Start, handle at least one fault (yarn break or needle crash) while knitting, and finish the panel.', check(){
+    if (!M.done) return [false, M.handled ? `${M.handled} fault(s) handled; keep knitting to the end` : 'Not finished yet']; if (M.handled < 1) return [false, 'Finished, but no fault was handled']; return [true, `Done: ${M.handled} fault(s) handled`]; } },
+];
+function grade(){ $('tasks').innerHTML = TASKS.map(t => { const [ok, msg] = t.check(); return `<div class="task"><span class="st ${ok ? 'ok' : 'no'}">${ok ? '✓' : '○'}</span> <b>${t.t}</b><small>${t.d}</small><small style="color:${ok ? 'var(--ok)' : 'var(--muted)'}">${msg}</small></div>`; }).join(''); }
+
+buildPalette(); tables(); renderSteps(); preset('rib'); screen();
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

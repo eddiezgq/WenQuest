@@ -1,0 +1,45 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.lane{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;position:relative}
+.st{min-height:92px}
+.st b{font-size:14px}
+.arrow{position:absolute;top:40px;left:0;right:0;height:2px;background:#9aa4ae;z-index:-1}
+.brk{border:1.5px dashed #c0392b;border-radius:8px;background:#fdf0ee;padding:8px 9px;font-size:12.3px;line-height:1.45;color:#1b2430;min-height:104px}
+.brk i{display:inline-block;font-style:normal;background:#c0392b;color:#fff;border-radius:50%;width:19px;height:19px;text-align:center;line-height:19px;font-size:12px;margin-right:4px}
+.clock{font-size:12px;color:#5a6570;text-align:center;margin:6px 0 4px}
+.lbl{font-size:13px;font-weight:700;color:#5a6570;margin:14px 0 6px}
+.fix{border:1.5px solid #2e9e5b;border-radius:8px;background:#eaf6ee;padding:8px 9px;font-size:12.3px;line-height:1.45;min-height:76px}
+</style>
+<div class="fig" style="--w:1060px">
+<p class="title">一张 200 台订单的一天：信息在哪里断开</p><p class="sub">示意。WQ-LS-TED（自动剪线 + 电子针距 + 少油旋梭）200 台，客户要求 10 天交货；上排是流程，中排是没有统一数据时的断点，下排是数字工厂里对应的接法</p>
+<div class="lane">
+<div class="arrow"></div>
+<div><div class="box b st"><b>销售接单</b><span>机型与选项<br>交期、价格</span></div><div class="clock">08:30</div></div>
+<div><div class="box b st"><b>计划与算料</b><span>BOM 展开<br>MRP、排产</span></div><div class="clock">10:00</div></div>
+<div><div class="box y st"><b>采购与仓库</b><span>电机、机针<br>DLC 外协</span></div><div class="clock">11:00</div></div>
+<div><div class="box o st"><b>机加工</b><span>机壳、旋梭<br>凸轮、轴</span></div><div class="clock">全天</div></div>
+<div><div class="box o st"><b>装配与调试</b><span>总装线<br>旋梭定时、间隙</span></div><div class="clock">第 3 天起</div></div>
+<div><div class="box p st"><b>出厂测试</b><span>停针、剪线<br>固件核对</span></div><div class="clock">第 3 天起</div></div>
+<div><div class="box g st"><b>发货与服务</b><span>装箱、发运<br>投诉、备件</span></div><div class="clock">第 10 天</div></div>
+</div>
+<p class="lbl">没有统一数据时</p>
+<div class="lane">
+<div class="brk"><i>1</i>选项写在表格和微信里；“少油旋梭”抄成了标准旋梭</div>
+<div class="brk"><i>2</i>MRP 不知道 DLC 镀膜要外协 5 天，排产按标准旋梭的交期</div>
+<div class="brk"><i>3</i>电控箱到货了，可没人知道该烧哪一版固件</div>
+<div class="brk"><i>4</i>卧加停了 3 h，靠纸工票下班后才知道，瓶颈的产量少了一截</div>
+<div class="brk"><i>5</i>梭尖间隙记在纸上，数据在慢慢变大，没人画成趋势</div>
+<div class="brk"><i>6</i>测试结果存在测试台电脑里，按日期存，和序列号对不上</div>
+<div class="brk"><i>7</i>三个月后客户说跳针，查不出这台机器装的是哪批旋梭</div>
+</div>
+<p class="lbl">数字工厂里的接法（27.3–27.7 节）</p>
+<div class="lane">
+<div class="fix">配置器出变型编码 WQ-LS-TED，选项直接变成 BOM</div>
+<div class="fix">变型 BOM 带外协工序和交期，MRP 自动算进去</div>
+<div class="fix">固件是 BOM 里的一行，带版本；测试台按工单核对</div>
+<div class="fix">设备状态上总线，看板实时显示停机和瓶颈</div>
+<div class="fix">测量值上总线，控制图实时更新，规则报警</div>
+<div class="fix">测试结果按序列号进历史库，随整机档案走</div>
+<div class="fix">序列号—批次关系一查到底，几分钟圈出范围</div>
+</div>
+<p class="note">注：时间与问题均为示意；断点 1–7 在正文 27.1 节逐条说明。</p></div>

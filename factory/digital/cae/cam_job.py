@@ -10,7 +10,9 @@ import re
 
 import numpy as np
 
-from cae import cam, cam_post, cam_sim
+from cae import cam, cam_post, cam_power, cam_sim
+
+MODE_CN = {"rough": "粗车", "finish": "精车"}
 
 # 工艺规程没给切削参数时用的默认值（教学示意值：45 钢调质，硬质合金车刀 / 高速钢键槽铣刀、麻花钻 / 硬质合金立铣刀）
 DEFAULTS = {
@@ -141,12 +143,13 @@ def plan_turn(plan, seq, design, revision=None, chamfer=None):
             "length": L_op, "setups": ["right", "left"],
             "cut": {"vc": float(cut.get("vc_m_min", dflt["vc"])), "f": float(cut.get("f_mm_r", dflt["f"])),
                     "ap": float(cut.get("ap_mm", dflt["ap"])), "max_rpm": MAX_RPM_DEFAULT,
-                    "axial_allow": 0.0 if is_last else AXIAL_ALLOW},
+                    "axial_allow": 0.0 if is_last else AXIAL_ALLOW, "radial_allow": 0.0},
             "tool": {"n": 2 if is_last else 1, "name": (op.get("tools") or dflt["tool"]).split("，")[0]}}
     for k, key in (("vc", "vc_m_min"), ("f", "f_mm_r"), ("ap", "ap_mm")):
         _src(spec, "cut." + k, "工艺规程 {} 工序 cut.{}".format(op["seq"], key) if key in cut else "默认（工艺规程没给）")
     _src(spec, "cut.max_rpm", "默认：卡盘夹持限速 {} r/min".format(MAX_RPM_DEFAULT))
     _src(spec, "cut.axial_allow", "精车不留" if is_last else "默认：粗车轴肩留 {} mm 给精车".format(AXIAL_ALLOW))
+    _src(spec, "cut.radial_allow", "默认 0：本工序尺寸里已经含了下一道工序的余量")
     _src(spec, "length", "工艺规程 {} 工序内容“总长”".format(op["seq"]) if re.search(r"总长", op.get("content", "")) else "设计总长")
     _src(spec, "tool", "工艺规程 {} 工序 tools".format(op["seq"]) if op.get("tools") else "默认")
     spec["profile"] = op_profile(design, sizes, extra, is_last, L_op, spec["cut"]["axial_allow"])
@@ -294,6 +297,7 @@ def _turn_setup(spec, side):
     tgt, Lreg = cam.setup_profile(spec["profile"], side)
     if not tgt:
         return None
+    ra = float(c.get("radial_allow") or 0) if spec["mode"] == "rough" else 0.0      # “再留 0.3 余量”：在本工序尺寸外再留（单边）
     st = spec["stock"]
     if st["kind"] == "bar":
         e = (st["length"] - L_op) / 2
@@ -313,11 +317,13 @@ def _turn_setup(spec, side):
     if e > 1e-3:
         mv += cam.turn_face(stock_d, e, max(min(c["ap"], 2.0), 0.2), c["f"])
     if spec["mode"] == "rough":
-        mv += cam.turn_rough(tgt, stock_d, c["ap"], c["f"], 0.0, 0.0)
+        mv += cam.turn_rough(tgt, stock_d, c["ap"], c["f"], ra, 0.0)
     else:
         mv += cam.turn_finish(tgt, stock_d, c["f"])
     side_cn = "右端（第一次装夹）" if side == "right" else "左端（调头装夹）"
     ops = [{"tool": spec["tool"], "spindle": {"css": c["vc"], "max_rpm": c["max_rpm"]}, "moves": mv, "title": side_cn}]
+    if ra > 0:
+        tgt = cam.with_allowance(tgt, ra, 0.0)
     return {"side": side, "title": side_cn, "target": tgt, "region_mm": Lreg, "face_mm": e, "stock_sim": stock_sim, "ops": ops}
 
 
@@ -372,10 +378,14 @@ def generate(spec, number=None):
             g = cam_post.post(prog)
             tools = {spec["tool"]["n"]: {"kind": "turn"}}
             r = cam_sim.run(g, spec["machine"], su["stock_sim"], tools, target=su["target"])
+            pw, pdet = cam_power.check("turn", spec.get("material"), spec["machine"], [(
+                "{} {}".format(MODE_CN[spec["mode"]], su["title"][:2]), {"vc": spec["cut"]["vc"], "f": spec["cut"]["f"],
+                                                                        "ap": max(r["sim"]["ap_max"], 1e-3)})])
+            r["checks"] += pw
             out.append({"setup": side, "title": su["title"], "number": prog["number"], "gcode": g, "time": r["time"], "path": _path(r["parsed"]),
                         "stock": su["stock_sim"],
                         "checks": r["checks"], "sim": _summ_turn(r["sim"], su["target"]), "region_mm": su["region_mm"],
-                        "face_mm": su["face_mm"], "lines": len(g.splitlines())})
+                        "face_mm": su["face_mm"], "lines": len(g.splitlines()), "power": pdet})
         c = spec["cut"]
         dmax = max(d for _, d in spec["profile"])
         st = spec["stock"]
@@ -404,9 +414,12 @@ def generate(spec, number=None):
             t[contains_xy(slot.buffer(0.05), X, Y) & ~contains_xy(slot.buffer(-0.05), X, Y)] = np.nan
             return t
         r = cam_sim.run(g, spec["machine"], spec["stock"], {1: {"kind": "endmill", "d": spec["tool"]["d"]}}, T)
+        pw, pdet = cam_power.check("slot", spec.get("material"), spec["machine"], [("铣键槽", {
+            "fz": c["fz"], "ap": max(r["sim"]["ap_max"], 1e-3), "ae": spec["width"], "D": spec["tool"]["d"], "vf": F})])
+        r["checks"] += pw
         out.append({"setup": "slot", "title": "键槽", "number": prog["number"], "gcode": g, "time": r["time"], "checks": r["checks"],
                     "path": _path(r["parsed"]), "tools": {"1": {"kind": "endmill", "d": spec["tool"]["d"]}},
-                    "sim": _summ_mill(r["sim"]), "rpm": round(rpm), "feed": F, "lines": len(g.splitlines())})
+                    "sim": _summ_mill(r["sim"]), "rpm": round(rpm), "feed": F, "lines": len(g.splitlines()), "power": pdet})
         spec["compare"] = {"plan_minutes": spec["op"].get("minutes"), "program_minutes": round(r["time"]["total_s"] / 60, 2)}
     elif spec["kind"] == "mill25":
         from shapely.geometry import shape
@@ -436,9 +449,21 @@ def generate(spec, number=None):
                 "header": {"item": spec.get("item")}, "ops": ops}
         g = cam_post.post(prog)
         r = cam_sim.run(g, spec["machine"], spec["stock"], tools, cam_geom.target_fn(feat))
+        margin = max(0.5, min(spec["stock"]["box"][2] - feat["bbox"][3], feat["bbox"][0] - spec["stock"]["box"][0]))
+        items = []
+        for o in spec["ops"]:
+            c, t = o["cut"], o["tool"]
+            nm = {"contour": "外轮廓", "pocket": "型腔", "drill": "钻孔"}[o["type"]]
+            if o["type"] == "drill":
+                items.append((nm, {"type": "drill", "vc": c["vc"], "f": c["f"], "D": t["d"]}))
+            else:
+                items.append((nm, {"fz": c["fz"], "ap": min(c["ap"], o["depth"]), "D": t["d"], "vf": o["feed"],
+                                   "ae": t["d"] if o["type"] == "pocket" else margin}))
+        pw, pdet = cam_power.check("mill", spec.get("material"), spec["machine"], items)
+        r["checks"] += pw
         out.append({"setup": "mill", "title": "铣削", "number": prog["number"], "gcode": g, "time": r["time"], "checks": r["checks"],
                     "path": _path(r["parsed"]), "tools": {str(k): v for k, v in tools.items()},
-                    "sim": _summ_mill(r["sim"]), "lines": len(g.splitlines())})
+                    "sim": _summ_mill(r["sim"]), "lines": len(g.splitlines()), "power": pdet})
         spec["compare"] = {"program_minutes": round(r["time"]["total_s"] / 60, 2)}
     else:
         raise ValueError("未知的编程单类型 {}".format(spec.get("kind")))

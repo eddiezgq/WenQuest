@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Soft fabrics and robots</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: three tabs; left = charts, right rail = results and controls; tasks at bottom */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style><style>
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page[hidden]{display:none}
+</style>
+<div class="wrap">
+<header><h1>Soft fabrics and robots</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 30 · Virtual lab 30-1 · Why fabric “can’t be pushed and won’t stand up”; reliability and economics of a robot workflow; how much energy direct drive saves</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tab0" aria-selected="true" type="button">① How soft is fabric</button><button role="tab" id="tab1" aria-selected="false" type="button">② Robot workflow reliability and payback</button><button role="tab" id="tab2" aria-selected="false" type="button">③ Direct-drive energy savings</button></div>
+<div class="page" id="page0">
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Cantilever droop: shape under its own weight of a strip of material overhanging the clamp by L (solid: current material; light grey: four common fabrics)</h3><canvas id="drape" width="1100" height="440" aria-label="Cantilever droop"></canvas></section>
+    <p class="note">Model (same as the book’s model23.py): bending rigidity by the FAST formula B (μN·m) = 9.8×10⁻⁶ × mass per area (g/m²) × bending length³ (mm), i.e. B = w c³ (w = weight per unit area); the material is treated as a horizontally clamped large-deflection cantilever under its own weight (the elastica under gravity), and its shape is found by energy minimisation. The chord angle is the angle between the horizontal and the line from the clamp to the free end; at an overhang L = 2c it is about 41.5° (the definition of bending length in the cantilever test). Pushing force: a strip 5 cm long in the pushing direction (fixed, independent of the overhang above) and b wide, clamped at one end and pushed forward, with the other end free to move sideways and self-weight neglected, buckles at F = π²Bb/(4L²) (the support case most prone to buckling, so a lower bound). The shape depends only on L/c: mass per area changes only the value of the rigidity, not the drooped shape. Fabric data are worked-example values.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results</h3><div class="checks" id="checks0"></div></section>
+    <section class="panel"><h3>Adjust</h3>
+      <div class="prm">
+        <label for="preset">Material</label><select id="preset"></select><output id="presetv"></output>
+        <label for="W">Mass per area (g/m²)</label><input id="W" type="range" min="50" max="8000" step="5" value="120"><output id="Wv"></output>
+        <label for="c">Bending length c (mm; resin-stiffening the fabric raises it)</label><input id="c" type="range" min="5" max="700" step="1" value="20"><output id="cv"></output>
+        <label for="L">Overhang L (cm)</label><input id="L" type="range" min="1" max="30" step="0.5" value="10"><output id="Lv"></output>
+        <label for="b">Width of pushed strip b (cm)</label><input id="b" type="range" min="5" max="60" step="1" value="30"><output id="bv"></output>
+      </div>
+    </section>
+  </div>
+</div>
+</div>
+<div class="page" id="page1" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Unattended completion rate of the whole workflow = per-step success rate to the power n (curves: several per-step success rates; dot: current setting)</h3><canvas id="chain" width="1100" height="330" aria-label="Workflow success rate"></canvas></section>
+    <section class="panel"><h3>Payback period vs per-step success rate (other parameters as currently set)</h3><canvas id="pay" width="1100" height="260" aria-label="Payback period"></canvas></section>
+    <p class="note">Model (same as the book’s model23.py): each garment piece goes through n actions (separating, picking up, smoothing, aligning, loading…), each with success rate p; on failure a person must intervene for t_fix seconds, then the step is redone. Expected failures per piece = n(1−p)/p; cycle time = n × t_step / p + failures × t_fix. Assuming one robot replaces one operator per shift (with comparable output), annual labour saved = shifts × wage × 8 h × 300 days, minus the labour for handling failures and annual maintenance (10% of the price). Wage and price are worked-example values.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results</h3><div class="checks" id="checks1"></div></section>
+    <section class="panel"><h3>Adjust</h3>
+      <div class="prm">
+        <label for="n">Number of actions n</label><input id="n" type="range" min="1" max="20" step="1" value="10"><output id="nv"></output>
+        <label for="p">Per-step success rate p</label><input id="p" type="range" min="0.9" max="0.999" step="0.001" value="0.97"><output id="pv"></output>
+        <label for="ts">Time per action (s)</label><input id="ts" type="range" min="2" max="20" step="1" value="8"><output id="tsv"></output>
+        <label for="tf">Time per human intervention (s)</label><input id="tf" type="range" min="5" max="120" step="5" value="30"><output id="tfv"></output>
+        <label for="price">Robot price (10⁴ yuan)</label><input id="price" type="range" min="5" max="60" step="1" value="25"><output id="pricev"></output>
+        <label for="sh">Shifts per day</label><input id="sh" type="range" min="1" max="3" step="1" value="2"><output id="shv"></output>
+        <label for="wage">Labour (yuan/min, incl. social insurance & overhead)</label><input id="wage" type="range" min="0.2" max="1" step="0.05" value="0.5"><output id="wagev"></output>
+      </div>
+      <div class="row"><button id="reset1" type="button">Reset to default</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<div class="page" id="page2" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Annual electricity use of the whole factory: clutch motors vs servo (direct drive)</h3><canvas id="kwh" width="1100" height="330" aria-label="Electricity use"></canvas></section>
+    <p class="note">Model (same as the book’s model23.py): annual consumption = number of machines × powered-on hours × average power. The default average powers are taken from a published retrofit case (20 lockstitch machines converted from clutch motors to servo motors): clutch 0.45 kW, servo 0.25 kW, i.e. about 45% saving; the emission factor 0.57 kg CO₂/kWh and electricity price 0.7 yuan/kWh are worked-example values. A clutch motor idles whenever it is powered, whereas a servo only delivers power while sewing, so the longer the powered-on time and the smaller the share of actual sewing time, the larger the saving; the default values do not distinguish the two.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results</h3><div class="checks" id="checks2"></div></section>
+    <section class="panel"><h3>Adjust</h3>
+      <div class="prm">
+        <label for="m">Number of machines</label><input id="m" type="range" min="10" max="2000" step="10" value="500"><output id="mv"></output>
+        <label for="hr">Powered-on hours per machine per year (h)</label><input id="hr" type="range" min="500" max="6000" step="50" value="3550"><output id="hrv"></output>
+        <label for="pc">Clutch motor average power (kW)</label><input id="pc" type="range" min="0.2" max="0.6" step="0.01" value="0.45"><output id="pcv"></output>
+        <label for="ps">Servo motor average power (kW)</label><input id="ps" type="range" min="0.05" max="0.4" step="0.01" value="0.25"><output id="psv"></output>
+        <label for="ef">Emission factor (kg CO₂/kWh)</label><input id="ef" type="range" min="0.1" max="1" step="0.01" value="0.57"><output id="efv"></output>
+      </div>
+      <div class="row"><button id="reset2" type="button">Reset to default</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<section class="panel" style="margin-top:14px"><h3>Tasks</h3><div id="tasks"></div><div class="msg" id="msg"></div></section>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+function tab(k){[0,1,2].forEach(i=>{$('tab'+i).setAttribute('aria-selected',i===k);$('page'+i).hidden=i!==k;});}
+[0,1,2].forEach(i=>$('tab'+i).onclick=()=>tab(i));
+function renderChecks(id,C){$(id).innerHTML=C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${(!c.ok&&c.bad)?`<small>${c.bad}</small>`:''}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');}
+// ---- model (model23.py) ----
+const G=9.81;
+const FAB=[['Single jersey',150,14],['Shirting poplin',120,20],['Suiting wool',250,25],['Denim',400,35]];
+const Bfab=(W,c)=>9.8e-6*W*c**3*1e-6;
+function plate(E,t,rho){return [E*t**3/12,rho*G*t];}
+const PRE=[...FAB.map(f=>({name:f[0],W:f[1],c:f[2]})),(()=>{const [B,w]=plate(4e9,0.4e-3,750);return {name:'Card 0.4 mm',W:w/G*1000,c:Math.cbrt(B/w)*1000};})(),(()=>{const [B,w]=plate(200e9,1e-3,7850);return {name:'Steel sheet 1 mm',W:w/G*1000,c:Math.cbrt(B/w)*1000};})()];
+function elastica(B,w,L,n=120,iters=200){const ds=L/n,kb=B/ds;let th=new Array(n).fill(0);const cnt=th.map((_,j)=>n-j);
+  const energy=t=>{let e=0,prev=0,y=0;for(let j=0;j<n;j++){e+=0.5*kb*(t[j]-prev)**2;prev=t[j];y-=Math.sin(t[j])*ds;e+=w*ds*y;}return e;};
+  for(let it=0;it<iters;it++){const g=new Array(n),d=new Array(n),o=new Array(n-1);
+    for(let j=0;j<n;j++){const left=j>0?th[j-1]:0;g[j]=kb*(th[j]-left)-w*ds*ds*cnt[j]*Math.cos(th[j]);d[j]=kb+w*ds*ds*cnt[j]*Math.sin(th[j]);
+      if(j<n-1){g[j]+=kb*(th[j]-th[j+1]);d[j]+=kb;o[j]=-kb;}}
+    for(let j=0;j<n;j++)d[j]=Math.max(d[j],1e-12*kb);
+    const cp=new Array(n).fill(0),dp=new Array(n).fill(0);cp[0]=n>1?o[0]/d[0]:0;dp[0]=-g[0]/d[0];
+    for(let j=1;j<n;j++){const den=d[j]-o[j-1]*cp[j-1];cp[j]=j<n-1?o[j]/den:0;dp[j]=(-g[j]-o[j-1]*dp[j-1])/den;}
+    let dx=new Array(n);dx[n-1]=dp[n-1];for(let j=n-2;j>=0;j--)dx[j]=dp[j]-cp[j]*dx[j+1];
+    const mx=Math.max(...dx.map(Math.abs));if(mx>0.3)dx=dx.map(v=>v*0.3/mx);
+    const e0=energy(th);let step=1,tn=th;
+    while(step>1e-6){tn=th.map((t,j)=>Math.min(Math.PI/2+0.3,Math.max(-0.3,t+step*dx[j])));if(energy(tn)<=e0)break;step/=2;}
+    th=tn;if(Math.max(...dx.map(Math.abs))*step<1e-10)break;}
+  let x=0,y=0;const pts=[[0,0]];for(const t of th){x+=Math.cos(t)*ds;y-=Math.sin(t)*ds;pts.push([x,y]);}return {pts,tip:th[n-1]*180/Math.PI};}
+const buckle=(B,L,b)=>Math.PI**2*B*b/(4*L*L);
+function workflow(p,n,ts,tf){const P=p**n,f=n*(1-p)/p,cyc=n*ts/p+f*tf;return {P,f,cyc,human:f*tf,perh:3600/cyc,intervh:3600/cyc*f};}
+function payback(price,p,n,ts,tf,sh,wage){const r=workflow(p,n,ts,tf),hours=8*sh*300,saved=sh*wage*60*8*300,hc=r.human/60*r.perh*hours*wage,net=saved-hc-0.1*price;return {...r,net,months:net>0?12*price/net:Infinity,saved,hc};}
+// ---- page 0 ----
+const S0={preset:1,W:120,c:20,L:10,b:30};const A={...S0};let R0=null;
+$('preset').innerHTML=PRE.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('')+'<option value="-1">Custom</option>';
+function changed0(){const B=Bfab(A.W,A.c),w=A.W/1000*G,L=A.L/100,e=elastica(B,w,L),[x,y]=e.pts[e.pts.length-1],chord=Math.atan2(-y,x)*180/Math.PI,F=buckle(B,0.05,A.b/100),Wt=w*0.05*A.b/100;
+  R0={B,w,e,chord,F,Wt};
+  $('preset').value=A.preset;$('presetv').textContent='';for(const k of ['W','c','L','b']){$(k).value=A[k];}
+  $('Wv').textContent=A.W.toFixed(0);$('cv').textContent=A.c.toFixed(0);$('Lv').textContent=A.L.toFixed(1);$('bv').textContent=A.b.toFixed(0);
+  const C=[{n:'Bending rigidity B (per metre width)',v:B*1e6>=1e5?(B).toFixed(2)+' N·m':(B*1e6).toFixed(1)+' μN·m',ok:true},{n:'Bending length c',v:A.c>=1000?(A.c/1000).toFixed(2)+' m':A.c.toFixed(0)+' mm',ok:true},
+   {n:`Chord angle / tip angle at ${A.L} cm overhang`,v:`${chord.toFixed(1)}° / ${e.tip.toFixed(1)}°`,ok:chord<=10,bad:'Chord angle above 10°: the material cannot hold itself up and must be supported by the table, presser foot or tension'},
+   {n:`Force to buckle a 5 cm × ${A.b} cm strip by pushing`,v:F<0.01?(F*1000).toFixed(2)+' mN':F.toFixed(3)+' N',ok:F>Wt,bad:'The pushing force is less than the strip’s own weight: it arches as soon as it is pushed, so it can only be pulled, supported or carried clamped'},
+   {n:'Weight of the strip',v:Wt<0.01?(Wt*1000).toFixed(1)+' mN':Wt.toFixed(3)+' N',ok:true}];renderChecks('checks0',C);drawDrape();note0();checkTasks();}
+function drawDrape(){const [c,g]=ctx('drape'),W=c.width,H=c.height,x0=150,y0=50,sc=(H-90)/(A.L/100);
+  g.fillStyle=css('--muted');g.fillRect(x0-80,y0-14,80,28);g.fillStyle='#fff';g.font='13px '+css('--f-body');g.textAlign='center';g.fillText('Clamp',x0-40,y0+5);
+  g.strokeStyle=css('--rule');g.setLineDash([4,4]);g.beginPath();g.moveTo(x0,y0);g.lineTo(x0+sc*A.L/100,y0);g.stroke();g.setLineDash([]);
+  const lx=W-330;g.textAlign='start';g.font='13px '+css('--f-body');
+  FAB.forEach(([nm,Wf,cf],i)=>{const e=elastica(Bfab(Wf,cf),Wf/1000*G,A.L/100,60),[xe,ye]=e.pts[e.pts.length-1],ch=Math.atan2(-ye,xe)*180/Math.PI;
+    g.strokeStyle=css('--rule');g.lineWidth=2;g.beginPath();e.pts.forEach(([x,y],j)=>{const q=[x0+x*sc,y0-y*sc];j?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+    g.beginPath();g.moveTo(lx,y0+20+i*24);g.lineTo(lx+30,y0+20+i*24);g.stroke();g.fillStyle=css('--muted');g.fillText(`${nm} (c ${cf} mm) chord ${ch.toFixed(0)}°`,lx+40,y0+25+i*24);});
+  g.strokeStyle=css('--bt');g.lineWidth=4;g.beginPath();R0.e.pts.forEach(([x,y],i)=>{const q=[x0+x*sc,y0-y*sc];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  const [xe,ye]=R0.e.pts[R0.e.pts.length-1];g.fillStyle=css('--bt');g.beginPath();g.arc(x0+xe*sc,y0-ye*sc,5,0,7);g.fill();
+  g.beginPath();g.moveTo(lx,y0+20+4*24);g.lineTo(lx+30,y0+20+4*24);g.lineWidth=4;g.strokeStyle=css('--bt');g.stroke();g.fillStyle=css('--bt');g.fillText(`Current material, chord ${R0.chord.toFixed(1)}°`,lx+40,y0+25+4*24);
+  g.fillStyle=css('--muted');g.fillText(`Dashed line = overhang ${A.L} cm (same scale both ways)`,x0,H-12);}
+$('preset').addEventListener('input',()=>{A.preset=+$('preset').value;if(A.preset>=0){A.W=Math.round(PRE[A.preset].W/5)*5;A.c=Math.min(700,Math.round(PRE[A.preset].c));}changed0();});
+for(const k of ['W','c','L','b'])$(k).addEventListener('input',()=>{A[k]=+$(k).value;if(k==='W'||k==='c')A.preset=-1;changed0();});
+// ---- page 1 ----
+const S1={n:10,p:0.97,ts:8,tf:30,price:25,sh:2,wage:0.5};const Bv={...S1};let R1=null;
+function changed1(){const r=payback(Bv.price*1e4,Bv.p,Bv.n,Bv.ts,Bv.tf,Bv.sh,Bv.wage);R1=r;
+  const fmt={n:v=>v,p:v=>v.toFixed(3),ts:v=>v,tf:v=>v,price:v=>v,sh:v=>v,wage:v=>v.toFixed(2)};for(const k in fmt){$(k).value=Bv[k];$(k+'v').textContent=fmt[k](Bv[k]);}
+  const C=[{n:'Unattended completion rate pⁿ',v:(r.P*100).toFixed(1)+'%',ok:r.P>=0.9,bad:'More than one in 10 pieces needs a person to step in'},{n:'Expected failures per piece',v:r.f.toFixed(2),ok:true},
+   {n:'Human interventions per hour',v:r.intervh.toFixed(1),ok:r.intervh<=5,bad:'A person must step in every few minutes, so someone has to stay by the robot'},{n:'Cycle time per piece / output per hour',v:`${r.cyc.toFixed(0)} s / ${r.perh.toFixed(1)} pcs`,ok:true},
+   {n:'Annual labour saved − failure handling − maintenance',v:`${(r.saved/1e4).toFixed(1)} − ${(r.hc/1e4).toFixed(1)} − ${(0.1*Bv.price).toFixed(1)} ×10⁴ yuan`,ok:r.net>0},
+   {n:'Payback period',v:isFinite(r.months)?r.months.toFixed(1)+' months':'never',ok:r.months<=24,bad:'More than 2 years'}];renderChecks('checks1',C);drawChain();drawPay();note1();checkTasks();}
+function drawChain(){const [c,g]=ctx('chain'),W=c.width,H=c.height,x0=60,x1=W-20,y0=16,y1=H-40,X=n=>x0+(x1-x0)*(n-1)/19,Y=v=>y1-(y1-y0)*v;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let v=0;v<=1.001;v+=0.2){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText((v*100).toFixed(0)+'%',x0-6,Y(v)+4);}
+  g.textAlign='center';for(let n=1;n<=20;n++)if(n%2===0||n===1)g.fillText(n,X(n),H-22);g.fillText('Number of actions n',(x0+x1)/2,H-4);
+  [[0.9,'--bad'],[0.95,'--warn'],[0.97,'--bt'],[0.99,'--nt'],[0.999,'--ok']].forEach(([p,col])=>{g.strokeStyle=css(col);g.lineWidth=1.6;g.beginPath();for(let n=1;n<=20;n++){const q=[X(n),Y(p**n)];n>1?g.lineTo(...q):g.moveTo(...q);}g.stroke();g.fillStyle=css(col);g.textAlign='start';g.fillText('p = '+p,X(20)-56,Y(p**20)-6);});
+  g.strokeStyle=css('--ink');g.lineWidth=2.4;g.beginPath();for(let n=1;n<=20;n++){const q=[X(n),Y(Bv.p**n)];n>1?g.lineTo(...q):g.moveTo(...q);}g.stroke();
+  g.fillStyle=css('--ink');g.beginPath();g.arc(X(Bv.n),Y(R1.P),6,0,7);g.fill();g.strokeStyle=css('--ok');g.setLineDash([5,4]);g.beginPath();g.moveTo(x0,Y(0.9));g.lineTo(x1,Y(0.9));g.stroke();g.setLineDash([]);}
+function drawPay(){const [c,g]=ctx('pay'),W=c.width,H=c.height,x0=60,x1=W-20,y0=16,y1=H-40,X=p=>x0+(x1-x0)*(p-0.9)/0.099;const pts=[];for(let p=0.9;p<=0.9991;p+=0.001)pts.push([p,payback(Bv.price*1e4,p,Bv.n,Bv.ts,Bv.tf,Bv.sh,Bv.wage).months]);
+  const vm=Math.min(120,Math.max(36,...pts.map(q=>isFinite(q[1])?q[1]:0))*1.1),Y=v=>y1-(y1-y0)*Math.min(v,vm)/vm;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let v=0;v<=vm;v+=12){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v+' mo',x0-6,Y(v)+4);}
+  g.textAlign='center';for(let p=0.9;p<=0.9991;p+=0.01)g.fillText(p.toFixed(2),X(p),H-22);g.fillText('Per-step success rate p',(x0+x1)/2,H-4);
+  g.strokeStyle=css('--accent');g.lineWidth=2.2;g.beginPath();pts.forEach(([p,m],i)=>{const q=[X(p),Y(isFinite(m)?m:vm)];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  g.strokeStyle=css('--bad');g.setLineDash([5,4]);g.beginPath();g.moveTo(x0,Y(24));g.lineTo(x1,Y(24));g.stroke();g.setLineDash([]);g.fillStyle=css('--bad');g.textAlign='start';g.fillText('24 months',x0+6,Y(24)-5);
+  g.fillStyle=css('--ink');g.beginPath();g.arc(X(Bv.p),Y(isFinite(R1.months)?R1.months:vm),6,0,7);g.fill();}
+for(const k in S1)$(k).addEventListener('input',()=>{Bv[k]=+$(k).value;changed1();});$('reset1').onclick=()=>{Object.assign(Bv,S1);changed1();};
+// ---- page 2 ----
+const S2={m:500,hr:3550,pc:0.45,ps:0.25,ef:0.57};const Cv={...S2};let R2=null;const PRICE=0.7;
+function changed2(){const e1=Cv.m*Cv.hr*Cv.pc,e2=Cv.m*Cv.hr*Cv.ps,sv=e1-e2;R2={e1,e2,sv,per:sv/Cv.m,co2:sv*Cv.ef/1000};
+  const fmt={m:v=>v,hr:v=>v,pc:v=>v.toFixed(2),ps:v=>v.toFixed(2),ef:v=>v.toFixed(2)};for(const k in fmt){$(k).value=Cv[k];$(k+'v').textContent=fmt[k](Cv[k]);}
+  const C=[{n:'Annual use, clutch motor / servo',v:`${(e1/1e4).toFixed(1)} / ${(e2/1e4).toFixed(1)} ×10⁴ kWh`,ok:true},{n:'Annual saving (saving rate)',v:`${(sv/1e4).toFixed(1)} ×10⁴ kWh (${(sv/e1*100).toFixed(0)}%)`,ok:sv>0},
+   {n:'Saving per machine per year',v:R2.per.toFixed(0)+' kWh',ok:true},{n:'Annual CO₂ reduction',v:R2.co2.toFixed(0)+' t',ok:true},{n:`Annual cost saving (${PRICE} yuan/kWh)`,v:(sv*PRICE/1e4).toFixed(1)+' ×10⁴ yuan',ok:true}];renderChecks('checks2',C);drawKwh();note2();checkTasks();}
+function drawKwh(){const [c,g]=ctx('kwh'),W=c.width,H=c.height,x0=200,x1=W-60,y0=30,bh=70,vm=Math.max(R2.e1,1)*1.1,X=v=>x0+(x1-x0)*v/vm;
+  g.font='14px '+css('--f-body');[[R2.e1,'Clutch motor','--bad'],[R2.e2,'Servo (direct drive)','--ok']].forEach(([v,n,col],i)=>{const y=y0+i*(bh+30);g.fillStyle=css(col);g.globalAlpha=.8;g.fillRect(x0,y,X(v)-x0,bh);g.globalAlpha=1;g.fillStyle=css('--ink');g.textAlign='end';g.fillText(n,x0-10,y+bh/2+5);g.textAlign='start';g.fillText((v/1e4).toFixed(1)+' ×10⁴ kWh',X(v)+8,y+bh/2+5);});
+  const y=y0+2*(bh+30);g.fillStyle=css('--accent');g.fillRect(x0,y,X(R2.sv)-x0,bh*0.6);g.fillStyle=css('--ink');g.textAlign='end';g.fillText('Saving',x0-10,y+bh*0.3+5);g.textAlign='start';g.fillText((R2.sv/1e4).toFixed(1)+' ×10⁴ kWh ≈ '+R2.co2.toFixed(0)+' t CO₂',X(R2.sv)+8,y+bh*0.3+5);}
+for(const k in S2)$(k).addEventListener('input',()=>{Cv[k]=+$(k).value;changed2();});$('reset2').onclick=()=>{Object.assign(Cv,S2);changed2();};
+// ---- tasks ----
+const seen={a:false,b:false,c:false,d:false,e:false};
+function note0(){if(Math.abs(A.L-10)<1e-9&&R0.chord<=10)seen.a=true;if(R0.F>R0.Wt)seen.e=true;}
+function note1(){if(Bv.n===10&&R1.P>=0.9)seen.b=true;if(Bv.n>=10&&Bv.sh===2&&Bv.p<=0.97+1e-9&&R1.months<=24)seen.c=true;}
+function note2(){if(Math.abs(Cv.pc-0.45)<1e-9&&Math.abs(Cv.ps-0.25)<1e-9&&R2.per>=500&&R2.per<520)seen.d=true;}
+const TASKS=[{t:'Page ①: make a 10 cm overhang of “fabric” droop with a chord angle of no more than 10°; see how large the bending length must be, and how many times stiffer that is than shirting poplin.',d:'Try a few fabric presets first, then adjust the bending length. Note that changing only the mass per area leaves the shape unchanged — why? How are bending rigidity and bending length related?',ok:()=>seen.a},
+ {t:'Page ①: increase the bending length until the force needed to buckle the 5 cm strip by pushing exceeds its own weight; note the bending length at that point and which material it is comparable to.',d:'First see whether changing the strip width helps. Which quantities do the pushing force and the self-weight each depend on?',ok:()=>seen.e},
+ {t:'Page ②: for a 10-step workflow, what per-step success rate is needed at least for a 90% unattended completion rate?',d:'Fix the number of steps at 10 and raise the per-step success rate slowly. Compare with the 97% in the press report.',ok:()=>seen.b},
+ {t:'Page ②: keeping two shifts, a per-step success rate of no more than 97% and at least 10 steps, adjust the price, labour cost or action time to get a payback period of no more than 2 years.',d:'Which parameter matters most? Then see what happens with three shifts, and think about what that implies.',ok:()=>seen.c},
+ {t:'Page ③: with the default average powers, find how many powered-on hours per machine per year are needed for a saving of 500 kWh (within 20 kWh).',d:'How is the annual saving per machine related to the powered-on time?',ok:()=>seen.d}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});$('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+window.__api={A,Bv,Cv,changed0,changed1,changed2,r0:()=>R0,r1:()=>R1,r2:()=>R2,done,seen,elastica,Bfab,payback,tab,PRE};
+changed0();changed1();changed2();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

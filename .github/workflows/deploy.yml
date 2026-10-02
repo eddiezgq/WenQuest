@@ -116,6 +116,28 @@ jobs:
             !textbook/build/*/figs/
             !textbook/build/*/ch*.html
 
+  # 网页版教材（第 15 轮）：整本网页书（textbook/web-editions/<书>/），构建成 <书>/webed/，随教材一起部署
+  webeditions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build the web-edition books
+        run: |
+          set -e
+          for d in textbook/web-editions/*/; do
+            b=$(basename "$d")
+            python "$d/build.py" "textbook/build/$b/webed"
+            test -f "textbook/build/$b/webed/book.json"
+          done
+      - name: Keep the web editions for the deploy
+        uses: actions/upload-artifact@v4
+        with:
+          name: textbook-web-editions
+          path: textbook/build/
+
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -211,7 +233,7 @@ jobs:
           path: aiprovider_claude.zip
 
   deploy:
-    needs: [build, textbook]
+    needs: [build, textbook, webeditions]
     runs-on: ubuntu-latest
     environment: production
     env:

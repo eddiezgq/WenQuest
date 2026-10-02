@@ -1,0 +1,393 @@
+<p class="eyebrow">auto</p><h1>auto</h1><div class="seam" aria-hidden="true"></div>
+<div class="chips"><span class="chips-label">本章互动资源</span><a class="chip" href="#lab-proto-fk"><b>虚拟实验</b>缩比横机原型：机头速度与选针时序</a><a class="chip" href="#lab-pattern"><b>虚拟实验</b>花样机仿真</a><a class="chip" href="#lab-knit"><b>虚拟实验</b>横机编织仿真</a><a class="chip" href="#lab-fpga"><b>虚拟实验</b>选针 FPGA 编程</a></div>
+<aside class="field"><p>本章是第 15 章（花样机控制）和第 17 章（电脑横机控制）的“动手版”，要先读这两章和第 11 章的花样机机构。平台、模块编号、固件框架和验收指标沿用第 19 章，平缝机原型 WQ-SC/LS 见第 20 章，测试方法见第 22 章。本章所有数值都是示意值或算例值，由 figsrc/ch21_calc.py 算出。</p></aside>
+<p>第 20 章的两台原型都还是“主轴转一圈、几个电磁铁按角度动作”的机器。本章的两台不一样，它们都要按位置连续控制：电子花样机要让模板在针离开布料的那一小段转角里走完一针，缩比横机要让选针器在机头经过每一枚针的那一小段行程里作出决定。两台机器的控制问题其实是同一个：<strong>动作必须落在一个由位置决定的窗口里</strong>，原型能不能做成，看的是这个窗口的时间预算够不够。下面先搭花样机原型 WQ-SC/PS，再搭缩比横机原型 WQ-SC/FK，每台都按“构成 → 固件 → 调试与验收”三步走，最后看它们和平缝机原型能共用多少东西。</p>
+
+<h3 id="s21-1">21.1 引子：两台“数控”缝制设备的原型</h3>
+<p>一所高校的实验室按第 20 章做出了平缝机原型，接着想做两件更难的事：一台能缝口袋盖的花样机，一台能织一小块提花样片的横机。有人提议买二手整机来改，算下来不划算：二手花样机的控制箱是封闭的，改不动；横机更贵，而且几百枚针的整机对教学来说太大。最后决定都自己搭，机械能用零件库就用零件库，电控全部用 WQ-SC 平台的模块。</p>
+<p>动手之前，指导老师让学生先回答两个问题。第一，花样机原型的 X–Y 平台要多大的电机？第 15 章说 3 mm 针距、1.5 mm 布厚时离布窗口 203.4°，那么转速、加速度、电机转矩之间是什么关系？第二，缩比横机用自制的选针器，响应慢、离散大，机头最多能跑多快？控制周期 1 ms 的 MCU 够不够，是否非上 FPGA 不可？</p>
+<p>这两个问题都不能靠试出来。电机买小了，花样机只能在 500 r/min 下缝；选针器做慢了，横机只能慢慢爬。正确的做法是先做<strong>时序预算</strong>：从窗口出发，一步步算到加速度、转矩、提前量和抖动，定下零件，再动手。本章的两台原型就是这样设计出来的。</p>
+<div class="tbl"><table><caption>表 21-1　两台原型的目标（P1 级，示意）</caption><thead><tr><th>项目</th><th>花样机原型 WQ-SC/PS</th><th>缩比横机原型 WQ-SC/FK</th></tr></thead><tbody>
+<tr><td>机械</td><td>自制 X–Y 平台，行程 300 × 200 mm；现成平缝机头</td><td>自制单针床 60 针、E5（针距 5.08 mm），单系统机头</td></tr>
+<tr><td>时间基准</td><td>主轴转角（编码器 10000 计数/转）</td><td>机头位置（0.01 mm/计数）</td></tr>
+<tr><td>窗口</td><td>针在布外的实用窗口 183.4°（布厚 1.5 mm）</td><td>选针允许窗口 ±0.25 针距；验收 ±0.1 针距</td></tr>
+<tr><td>主要指标</td><td>3 mm 针距 1600 r/min 以上；跟随误差 ≤ 0.05 mm；针在布中位移为 0</td><td>机头 ≥ 0.6 m/s；选针时序误差 ≤ 0.1 针距；织出 20 行组织样片</td></tr>
+<tr><td>复用</td><td>主轴模块、剪线电磁铁、事件表、状态机与平缝机原型相同</td><td>电磁铁驱动、位置轴接口、测试脚本与前两者相同</td></tr>
+</tbody></table></div>
+
+<h3 id="s21-2">21.2 花样机原型的机械与电气构成</h3>
+<figure class="fig"><a class="zoom" href="img/fig_c21_ps_arch.png"><img src="img/fig_c21_ps_arch.png" alt="图 21-1　花样机原型 WQ-SC/PS 的构成" loading="lazy"></a><figcaption>图 21-1　花样机原型 WQ-SC/PS 的构成（示意；带 * 的是建议编号，计划入库）</figcaption></figure>
+<p>图 21-1 是花样机原型的全貌。机头就是一台现成的平缝机头：拆掉送布牙，加上第 15 章讲过的中压脚、剪线和拨线，主轴伺服和编码器直接用平缝机原型的模块。新增的只有两样：一个自制的 X–Y 平台，以及压框。</p>
+<h4 id="s21-2-1">21.2.1 X–Y 平台：丝杠还是同步带</h4>
+<p>第 15 章讲过两种常见传动。原型选哪一种，要用零件库里实有的规格算一算。库里 A-BSC-SFU 有 16×10（公称直径 16 mm、导程 10 mm）这个规格，A-PUL-HTD 有 5M-20-15 带轮（节圆直径 31.83 mm，一转 100 mm）。两种方案的对比见表 21-2。</p>
+<div class="tbl"><table><caption>表 21-2　X–Y 传动方案比较（X 轴运动质量 4 kg，算例值）</caption><thead><tr><th>项目</th><th>A：滚珠丝杠 16×10 + 1:1 同步带</th><th>B：同步带直驱（5M-20-15 带轮）</th></tr></thead><tbody>
+<tr><td>每转行程 / 分辨率</td><td>10 mm；编码器 10000 计数/转 → 1 μm</td><td>100 mm；10 μm</td></tr>
+<tr><td>折算到电机的负载惯量</td><td>丝杠 2.5 × 10⁻⁵ + 滑座 1.0 × 10⁻⁵ kg·m²，约为电机转子的 1.2 倍</td><td>4 × 0.0159² ≈ 1.0 × 10⁻³ kg·m²，约为转子的 34 倍</td></tr>
+<tr><td>传动刚度与固有频率</td><td>丝杠轴向刚度（最不利装法）约 53 N/μm，约 580 Hz</td><td>约 0.8 N/μm，约 82 Hz（第 15 章算例）</td></tr>
+<tr><td>主要风险</td><td>临界转速、成本；电机与丝杠的联接</td><td>带的弹性振动，跟随误差大</td></tr>
+</tbody></table></div>
+<p>原型选方案 A。刚度高一个数量级，就不必为第 15 章说的 82 Hz 晃动操心；分辨率 1 μm，也便于后面验证“针在布中位移为 0”。临界转速不是问题：16 mm 丝杠、X 轴 0.5 m 长、一端固定一端支承，临界转速约 9700 r/min，而最快的一针电机只要 1900 r/min 左右（下面算）。</p>
+<p>有一处要注意：电机和丝杠之间本来该用梅花联轴器 A-CPL-JAW，但库里现有的最小规格 LM1 转动惯量 2 × 10⁻⁴ kg·m²，是 400 W 电机转子的 7 倍，用在这里会把加速能力吃掉一大半。按零件库“只从库里挑、没有就说没有”的规则，结论是：<strong>库里没有合适的小联轴器</strong>。原型改用电机与丝杠平行布置、中间一对 1:1 的 3M-20 同步带轮（A-PUL-HTD），带轮惯量只有 7 × 10⁻⁷ kg·m²，可以忽略；同时建议零件库补充小规格的梅花联轴器。</p>
+<h4 id="s21-2-2">21.2.2 BOM 与 I/O</h4>
+<div class="tbl"><table><caption>表 21-3　花样机原型 BOM（主要部分，示意）</caption><thead><tr><th>部件</th><th>条目</th><th>规格（示意）</th><th>数量</th><th>来源</th></tr></thead><tbody>
+<tr><td>滚珠丝杠</td><td>A-BSC-SFU</td><td>16×10，X 长 0.5 m、Y 长 0.4 m</td><td>2</td><td>库已有</td></tr>
+<tr><td>直线导轨</td><td>A-LGD-RAIL</td><td>15 型；X 1 条 2 块，Y 2 条 4 块</td><td>3 条</td><td>库已有</td></tr>
+<tr><td>同步带轮</td><td>A-PUL-HTD</td><td>3M-20-15，电机与丝杠 1:1</td><td>4</td><td>库已有</td></tr>
+<tr><td>丝杠支承轴承</td><td>A-BRG-DG（角接触为佳 A-BRG-AC）</td><td>按丝杠端径</td><td>4 组</td><td>库已有</td></tr>
+<tr><td>X、Y 伺服电机 + 驱动</td><td>D-MOT-PMSM*、D-DRV-SERVO*</td><td>400 W：额定 1.27 N·m、峰值 3.8 N·m、转子 0.3 × 10⁻⁴ kg·m²</td><td>2 套</td><td>建议编号</td></tr>
+<tr><td>主轴伺服 + 驱动 + 编码器</td><td>同平缝机原型</td><td>见第 20 章</td><td>1 套</td><td>复用</td></tr>
+<tr><td>电磁铁（剪线、拨线、松线）+ 驱动板</td><td>D-SOL-PUSH*、D-DRV-SOL*</td><td>同平缝机原型</td><td>3 + 1</td><td>复用</td></tr>
+<tr><td>气缸 + 电磁阀</td><td>D-PNU-CYL*、D-PNU-VLV*</td><td>缸径 32 mm（约 400 N，第 15 章）</td><td>2 + 3</td><td>建议编号</td></tr>
+<tr><td>原点与限位开关</td><td>D-SNS-PROX*</td><td>X、Y 各 1 原点、2 限位</td><td>6</td><td>建议编号</td></tr>
+<tr><td>主控、扩展 I/O、网关、电源</td><td>D-CTL-WQSC*、D-IO-EXP*、D-GW-WQSC*、D-PSU-SMPS*</td><td>平台标准件</td><td>各 1</td><td>建议编号</td></tr>
+<tr><td>压框、模板、横梁、底板</td><td>—</td><td>铝型材 + 板材，自制</td><td>—</td><td>自制</td></tr>
+</tbody></table></div>
+<div class="tbl"><table><caption>表 21-4　花样机原型 I/O 表（示意）</caption><thead><tr><th>类别</th><th>信号</th><th>接到</th><th>说明</th></tr></thead><tbody>
+<tr><td>编码器</td><td>主轴 A/B/Z（差分）</td><td>主控编码器口</td><td>角度基准，不走总线</td></tr>
+<tr><td>总线</td><td>主轴驱动、X 驱动、Y 驱动、扩展 I/O、网关</td><td>CAN FD</td><td>X、Y 位置命令每 1 ms 一帧同步</td></tr>
+<tr><td>DI（12）</td><td>X/Y 原点 2、限位 4；压框左/右到位 2；气压正常 1；断线 1；启动踏板 1；急停 1</td><td>扩展 I/O；急停另接硬件链</td><td>急停直接切断驱动使能</td></tr>
+<tr><td>DO（7）</td><td>剪线、拨线、松线 3（电磁铁驱动板）；压框左、右，中压脚抬起 3（阀）；报警灯 1</td><td>主控 PWM + 扩展 I/O</td><td>电磁铁要按角度触发，接主控</td></tr>
+<tr><td>AI（1，可选）</td><td>霍尔脚踏</td><td>主控</td><td>手动调速试缝时用</td></tr>
+</tbody></table></div>
+
+<h3 id="s21-3">21.3 花样机原型的运动控制固件</h3>
+<h4 id="s21-3-1">21.3.1 从窗口到电机转矩：一条算到底的链</h4>
+<p>第 15 章已经算出：布加下模板厚 1.5 mm 时，针在 101.7° 入布、258.3° 出布，几何窗口 W = 203.4°。原型在两端各留 10°，给伺服的整定和延迟误差，实用窗口 W<sub>u</sub> = 183.4°，从 268.3° 开始，到下一转的 91.7° 结束（图 21-2a）。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c21_ps_budget.png"><img src="img/fig_c21_ps_budget.png" alt="图 21-2　窗口、允许时间与转速上限" loading="lazy"></a><figcaption>图 21-2　(a) 模板只在实用窗口内移动；(b) 针距–转速上限（S 形加减速，X 轴 50 m/s²、Y 轴 40 m/s²，算例值）</figcaption></figure>
+<p><strong>算例</strong>　求 3 mm 针距、主轴 1600 r/min 时 X 轴电机的峰值转矩。</p>
+<p>第 1 步，求允许时间。转过 183.4° 用时</p>
+<div class="math">\[ \Delta t = \frac{W_u}{6n} = \frac{183.4}{6\times1600} = 19.1\ \text{ms} \]</div>
+<p>第 2 步，求所需加速度。原型固件用 S 形（七段式）加减速：每半程里加速度按 1/8 时间斜升、1/4 恒定、1/8 斜降，加速度连续，不激起平台振动。对这种规律数值积分，得峰值加速度系数 C = 5.33、峰值速度系数 2.0（等加速等减速为 4 和 2，第 15 章）：</p>
+<div class="math">\[ a = C\,\frac{s}{\Delta t^2} = 5.33\times\frac{0.003}{0.0191^2} = 43.9\ \text{m/s}^2, \qquad v_{pk} = 2.0\,\frac{s}{\Delta t} = 0.314\ \text{m/s} \]</div>
+<p>v<sub>pk</sub> 对应电机 0.314/0.010 × 60 ≈ 1885 r/min，低于额定 3000 r/min。</p>
+<p>第 3 步，求转矩。丝杠传动把直线加速度换成电机角加速度 α = 2πa/P<sub>h</sub>，负载惯量折算为 m(P<sub>h</sub>/2π)²。四项依次为电机转子 0.30、两只带轮 0.01、丝杠 0.25、滑座 0.10（单位 10⁻⁴ kg·m²）：</p>
+<div class="math">\[ J = J_m + 2J_p + \frac{\pi\rho L d^4}{32} + m\left(\frac{P_h}{2\pi}\right)^2 \approx 0.668\times10^{-4}\ \text{kg}\cdot\text{m}^2 \]</div>
+<div class="math">\[ T = J\,\frac{2\pi a}{P_h} + \frac{\mu m g P_h}{2\pi\eta} = 0.668\times10^{-4}\times\frac{2\pi\times43.9}{0.010} + 0.004 \approx 1.84\ \text{N}\cdot\text{m} \]</div>
+<p>Y 轴运动质量 12 kg，同样算得 2.27 N·m，都低于峰值 3.8 N·m。丝杠方案的特点在这里看得很清楚：摩擦项只有 0.004 N·m，转矩几乎全花在加速电机自己的转子和丝杠上，负载质量只占一小部分。</p>
+<p>第 4 步，用发热定设计加速度。和第 15 章一样，真正卡住的是均方根转矩。S 形规律在移动段内的 rms 形状系数为 0.816，最坏情况每针都用满窗口，移动段占 183.4/360：</p>
+<div class="math">\[ T_{rms} = T_{pk}\times0.816\times\sqrt{183.4/360} = 0.58\,T_{pk} \le 1.27\ \text{N}\cdot\text{m} \;\Rightarrow\; T_{pk} \le 2.2\ \text{N}\cdot\text{m} \]</div>
+<p>反算得 X 轴可持续的加速度约 52 m/s²，Y 轴约 42 m/s²。原型取设计值 X 50 m/s²、Y 40 m/s²（rms 分别为 1.22、1.21 N·m）；短时的峰值能力（X 72、Y 59 m/s²）留作余量，不进规划。</p>
+<p>第 5 步，反过来给每种针距定转速上限：Δt = √(C·s/a)，n<sub>cap</sub> = W<sub>u</sub>/(6Δt)，再与机头限速 2500 r/min 取小。结果见表 21-5 和图 21-2b。</p>
+<div class="tbl"><table><caption>表 21-5　原型的针距–转速上限（S 形，布厚 1.5 mm，算例值，r/min）</caption><thead><tr><th>针距 s（mm）</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead><tbody>
+<tr><td>沿 X（50 m/s²）</td><td>2500</td><td>2092</td><td>1708</td><td>1479</td><td>1323</td><td>1208</td></tr>
+<tr><td>沿 Y（40 m/s²）</td><td>2500</td><td>1871</td><td>1528</td><td>1323</td><td>1184</td><td>1080</td></tr>
+<tr><td>45° 斜向（每轴 s/√2，受 Y 限制）</td><td>2500</td><td>2225</td><td>1817</td><td>1574</td><td>1407</td><td>1285</td></tr>
+</tbody></table></div>
+<p>3 mm 针距沿 X 可达 1708 r/min，满足表 21-1 的 1600 r/min 目标；沿 Y 是 1528 r/min，略低。这张表就是固件里自动降速的依据，也是第 22 章测试用例的期望值。</p>
+<h4 id="s21-3-2">21.3.2 固件结构</h4>
+<figure class="fig"><a class="zoom" href="img/fig_c21_ps_fw.png"><img src="img/fig_c21_ps_fw.png" alt="图 21-3　花样机原型固件的数据流" loading="lazy"></a><figcaption>图 21-3　花样机原型固件的数据流：每段一次、每针一次、每 1 ms 一次（示意）</figcaption></figure>
+<p>固件沿用第 19 章的框架：时间基准是主轴转角，剪线、拨线、中压脚按事件表触发，状态机多了 CLAMP（压框）、JUMP（空走）和 HOME（回原点）三个状态。新写的是三块：花样文件解析、前瞻限速、窗口内插补（图 21-3）。X、Y 两个位置轴，不论用伺服还是闭环步进，都挂在 HAL 的 stepper_* 接口下，换电机只改驱动文件。</p>
+<h4 id="s21-3-3">21.3.3 花样文件：逐针增量格式</h4>
+<p>原型用一种自定的示意格式 .wqp，按第 15 章“命令 + ΔX + ΔY、整数增量”的思路，把每条记录压成 3 个字节：</p>
+<div class="tbl"><table><caption>表 21-6　.wqp 花样文件格式（本书示意格式）</caption><thead><tr><th>部分</th><th>字节</th><th>内容</th></tr></thead><tbody>
+<tr><td>文件头</td><td>16</td><td>"WQP1"、版本、单位（1 = 0.1 mm）、记录数（u16）、最高转速/10（u16）、起针点 X、Y（int16）、CRC-16</td></tr>
+<tr><td>记录</td><td>3</td><td>cmd（u8）、dx（int8）、dy（int8）；dx、dy 以 0.1 mm 为单位，范围 ±12.7 mm，正好是第 15 章说的最大针距</td></tr>
+<tr><td>cmd</td><td>—</td><td>0x01 SEW 缝一针；0x02 JUMP 空走（长距离拆成多条）；0x03 TRIM 剪线；0x04 SPEED 限速（dx × 100 r/min）；0x05 PRESS 中压脚高度（dx × 0.1 mm）；0x0F END</td></tr>
+</tbody></table></div>
+<p>解析时做三件事：校验 CRC；把增量累加成绝对坐标，检查是否超出 300 × 200 mm 行程；把记录放进针队列。用整数累加，几千针以后也没有舍入误差。</p>
+<pre><code class="language-c">typedef struct { int8_t dx, dy; uint8_t cmd, flags; uint16_t n; } stitch_t;
+
+int wqp_parse(const uint8_t *buf, int len, stitch_t *q, int qmax)
+{
+    if (len &lt; 16 || memcmp(buf, "WQP1", 4) != 0) return -E_FORMAT;
+    if (crc16(buf, 14) != rd_u16(buf + 14))    return -E_CRC;
+    int nrec = rd_u16(buf + 6);
+    int32_t x = (int16_t)rd_u16(buf + 10), y = (int16_t)rd_u16(buf + 12);  /* 0.1 mm */
+    const uint8_t *r = buf + 16;
+    int k = 0;
+    for (int i = 0; i &lt; nrec &amp;&amp; k &lt; qmax; i++, r += 3) {
+        uint8_t cmd = r[0]; int8_t dx = (int8_t)r[1], dy = (int8_t)r[2];
+        if (cmd == CMD_END) break;
+        if (cmd == CMD_SEW || cmd == CMD_JUMP) {
+            x += dx; y += dy;
+            if (x &lt; 0 || x &gt; 3000 || y &lt; 0 || y &gt; 2000) return -E_TRAVEL;   /* 300 × 200 mm */
+        }
+        q[k++] = (stitch_t){ dx, dy, cmd, 0, 0 };
+    }
+    return k;   /* 针队列长度，交给 plan_speed() */
+}</code></pre>
+<h4 id="s21-3-4">21.3.4 前瞻限速：主轴自动降速</h4>
+<p>表 21-5 给出每针自身的上限，但主轴不能一针就从 2092 跳到 1080 r/min。第 15 章的前瞻算法（反向一遍、正向一遍）在原型里写成下面的函数，在后台任务里对整段花样算一次。每轴分别算，取较慢的一轴；起针和剪线前各 2 针限速 400 r/min；每针允许的转速变化 Δn = 300 r/min。</p>
+<pre><code class="language-c">#define WU     183.4f           /* 实用窗口，度 */
+#define C_S    5.333f           /* S 形峰值加速度系数 */
+#define A_X    50.0f            /* m/s²，按发热定 */
+#define A_Y    40.0f
+#define N_HEAD 2500
+#define N_SLOW 400
+#define DN     300
+
+static float t_axis(float s_mm, float a)            /* 走 s 所需时间，s */
+{ return s_mm &lt;= 0.f ? 0.f : sqrtf(C_S * s_mm * 1e-3f / a); }
+
+void plan_speed(stitch_t *s, int N)
+{
+    for (int i = 0; i &lt; N; i++) {
+        float t = fmaxf(t_axis(fabsf(s[i].dx) * 0.1f, A_X),
+                        t_axis(fabsf(s[i].dy) * 0.1f, A_Y));
+        float cap = (t &gt; 0.f) ? WU / (6.f * t) : N_HEAD;
+        s[i].n = (uint16_t)fminf(cap, N_HEAD);
+        if (s[i].flags &amp; (F_START2 | F_TRIM2)) s[i].n = MIN(s[i].n, N_SLOW);
+    }
+    for (int i = N - 2; i &gt;= 0; i--)                     /* 反向：为后面的慢针提前减速 */
+        s[i].n = MIN(s[i].n, s[i + 1].n + DN);
+    uint16_t prev = N_SLOW;                               /* 正向：加速也不能太猛 */
+    for (int i = 0; i &lt; N; i++) { s[i].n = MIN(s[i].n, prev + DN); prev = s[i].n; }
+}</code></pre>
+<p><strong>算例</strong>　一串沿 X 的 2 mm 针中间夹一针沿 Y 的 6 mm 针（第 5 针）。每针上限为 2092、2092、2092、2092、1080、2092……，前瞻后的转速为 2092、1980、1680、1380、1080、1380、1680、1980 r/min：控制器提前 4 针开始降速，到长针时刚好降到 1080 r/min。</p>
+<h4 id="s21-3-5">21.3.5 窗口内的单针插补</h4>
+<p>插补中断每 1 ms 执行一次。它不看时间，只看主轴转角：先用预测角 φ<sub>p</sub> = φ + ω·T<sub>d</sub> 补偿从发命令到电机跟上的总延迟（T<sub>d</sub> = 1.5 ms，含 CAN FD 传输和驱动器内的一个插补周期；1600 r/min 时相当于 14.4°），再算 τ，查 S 形表得 f(τ)。窗口以外命令保持不变，这就是“针在布中模板不动”的软件保证。</p>
+<pre><code class="language-c">#define PHS10  2683            /* 窗口起点 268.3°（0.1° 单位）*/
+#define WU10   1834            /* 窗口宽 183.4° */
+#define TD_US  1500            /* 总延迟 */
+static int32_t x0_um, y0_um;   /* 本针起点 */
+static stitch_t cur; static uint8_t moving;
+
+void xy_tick_1ms(void)                         /* 1 kHz，最高优先级之一 */
+{
+    int32_t phi = spindle_angle_d10();         /* 0..3599 */
+    int32_t w   = spindle_speed_d10_per_ms();  /* 0.1°/ms */
+    int32_t d   = phi + w * TD_US / 1000 - PHS10;
+    d %= 3600; if (d &lt; 0) d += 3600;           /* 离窗口起点多少（0.1°）*/
+    int32_t x = x0_um, y = y0_um;
+
+    if (d &lt;= WU10) {                           /* 在实用窗口内 */
+        if (!moving) { if (!queue_peek(&amp;cur)) goto out; moving = 1; }
+        uint32_t f = scurve_q15((uint32_t)d * 32768u / WU10);   /* f(τ)，0..32768 */
+        x = x0_um + (int32_t)cur.dx * 100 * (int32_t)f / 32768;
+        y = y0_um + (int32_t)cur.dy * 100 * (int32_t)f / 32768;
+    } else if (moving) {                        /* 窗口结束：落到终点，弹出这一针 */
+        x0_um += cur.dx * 100; y0_um += cur.dy * 100;
+        x = x0_um; y = y0_um; queue_pop(); moving = 0;
+        spindle_set_speed(queue_next_speed()); /* 下一针的计划转速 */
+    }
+out:
+    stepper_set_pos(AX_X, x); stepper_set_pos(AX_Y, y);
+    stepper_sync();                             /* CAN FD 同步帧：两轴同时生效 */
+    trace_log(phi, x, y);                       /* 调试与验收记录（21.4 节） */
+}</code></pre>
+<p>这段代码有三个地方值得留意。一是 S 形表用 Q15 定点数存 1025 个点，查表加线性插值，中断里没有浮点除法。二是主轴转速命令在每针结束时下发，转速变化落在离布窗口里，不影响针在布中的那一段。三是只要窗口外命令不变，即使上位的规划算错了，模板也不会在针在布中时被命令移动；剩下的风险只来自伺服跟不上，这要靠 21.4 节的测试去查。</p>
+<p><strong>空走</strong>　JUMP 记录不在窗口里走。状态机先执行剪线（第 20 章的事件表），主轴停在上针位，中压脚抬起，然后 X、Y 按梯形速度曲线走到下一段起点：此时不受离布窗口限制，取每轴的短时能力（X 约 70 m/s²、速度 0.5 m/s，对应电机 3000 r/min）。一次 100 mm 的空走约需 0.2 s 加上剪线和起针的时间，所以花样分段越少，周期越短（第 15 章）。空走结束后中压脚放下，以 400 r/min 起针，再交还给前瞻算出的转速。</p>
+<aside class="field"><p><strong>现场要点</strong></p><ul>
+<li>φ 必须来自主控直接接的主轴编码器，不能从总线上的驱动器读，否则多出一个总线周期的延迟。</li>
+<li>T<sub>d</sub> 不要估，要测：低速时按 21.4 节的办法记录命令与实际位置，两者的相位差就是 T<sub>d</sub>。</li>
+<li>先用 300–500 r/min 和“单步”功能试缝新花样，再按前瞻结果提速。</li>
+</ul></aside>
+
+<h3 id="s21-4">21.4 花样机原型的调试与验收</h3>
+<p>调试按“由静到动、由单轴到同步”的顺序进行，每一步都有判据，结果按第 22 章的格式写成测试报告，并发到 wq/sewing/proto/ps01/measurement 主题。</p>
+<p><strong>第 1 步：回原点</strong>　每轴先慢速碰原点开关，再反向找电机编码器的 Z 相，以 Z 相为准。开关本身的重复性只有零点几毫米，Z 相是 1 μm 级。判据：连续回原点 20 次，重复性 ≤ 0.01 mm。</p>
+<p><strong>第 2 步：反向间隙与螺距误差补偿</strong>　丝杠螺母有预紧时间隙很小，但 1:1 带轮和支承轴承还会带进一点。用千分表或激光测距，在全行程上每 25 mm 一个点、正反两个方向各测一遍（做法参照 ISO 230-2 的双向定位测量）。正反向读数之差的平均值是反向间隙，写进参数表，换向时补；同一方向的误差曲线写成补偿表，固件在 stepper_set_pos() 里按位置线性插值叠加。判据（示意）：补偿后全行程定位误差 ≤ 0.02 mm，反向间隙残差 ≤ 0.005 mm。</p>
+<p><strong>第 3 步：坐标标定</strong>　模板里夹一张纸，主轴 300 r/min，在 200 × 200 mm 范围内按 50 mm 间距刺 5 × 5 个针孔，用相机或钢尺量孔的位置。整体平移就是针位相对平台原点的偏移；两个方向的比例误差修正每毫米计数；用两条对角线 d<sub>1</sub>、d<sub>2</sub> 求 X、Y 的垂直度偏差 δ ≈ (d<sub>1</sub>² − d<sub>2</sub>²)/(4ab)（a、b 为矩形边长），超过 0.1 mm/200 mm 就要调整 Y 导轨。</p>
+<p><strong>第 4 步：同步验证</strong>　这是花样机原型最关键的一项。以 1600 r/min 连续缝 3 mm 针距，插补中断里的 trace_log() 每 1 ms 记录 φ 与 X、Y 的命令值，伺服驱动器的跟踪功能同时以更高的频率记录电机编码器的实际值，统一按主轴角对齐。然后做两项统计：跟随误差（命令 − 实际）的最大值；每一针在 φ<sub>1</sub>–φ<sub>2</sub>（针在布中）期间实际位置的最大变化量。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c21_ps_sync.png"><img src="img/fig_c21_ps_sync.png" alt="图 21-4　同步验证记录" loading="lazy"></a><figcaption>图 21-4　同步验证记录（仿真示意）：初调时针在布中模板仍移动 0.18 mm；提高位置环带宽、加足加速度前馈并按 φ + ω·T<sub>d</sub> 查表后降到 0.002 mm</figcaption></figure>
+<p>图 21-4 是一次调试的对比。初调时位置环约 40 Hz、加速度前馈只开了一半、没做延迟补偿，跟随误差达 0.22 mm，模板在针入布后还在“滑”，针在布中位移 0.18 mm，这样缝出来针孔会被拉大。把位置环提到约 100 Hz（丝杠刚度允许，21.2.1 节）、加速度前馈加到 95%、按预测角查表后，跟随误差降到 0.006 mm，针在布中位移 0.002 mm，即 2 个编码器计数。</p>
+<div class="tbl"><table><caption>表 21-7　花样机原型验收测试（示意，需求编号为示例）</caption><thead><tr><th>需求编号</th><th>项目</th><th>方法</th><th>判据</th></tr></thead><tbody>
+<tr><td>REQ-PS-01</td><td>回原点重复性</td><td>20 次回原点，读编码器</td><td>≤ 0.01 mm</td></tr>
+<tr><td>REQ-PS-02</td><td>定位精度（补偿后）</td><td>每 25 mm 双向测量</td><td>≤ 0.02 mm</td></tr>
+<tr><td>REQ-PS-03</td><td>跟随误差</td><td>1600 r/min、3 mm，连续 200 针记录</td><td>≤ 0.05 mm</td></tr>
+<tr><td>REQ-PS-04</td><td>针在布中位移</td><td>同上，φ<sub>1</sub>–φ<sub>2</sub> 内实际位置变化</td><td>为 0（≤ 5 个编码器计数，0.005 mm）</td></tr>
+<tr><td>REQ-PS-05</td><td>针距–转速表</td><td>按表 21-5 每格缝 50 针</td><td>REQ-PS-03、04 全部通过；不跳针、不断针</td></tr>
+<tr><td>REQ-PS-06</td><td>停针与剪线</td><td>同第 20 章</td><td>停针 ±1°；剪线 1000 次成功率 ≥ 99.5%</td></tr>
+<tr><td>REQ-PS-07</td><td>联锁</td><td>逐一断开压框到位、气压、急停</td><td>主轴不能启动；缝纫中立即停到上针位</td></tr>
+<tr><td>REQ-PS-08</td><td>连续运转</td><td>口袋盖花样循环 4 h</td><td>电机温升、故障码记录；rms 转矩 ≤ 额定</td></tr>
+</tbody></table></div>
+<p>“针在布中位移为 0”要落成一个可测的数：编码器分辨率 1 μm，测量本身有几个计数的噪声，所以本书把“≤ 5 个计数”当作 0。这个约定要写进需求，不然不同的人测出来会争论。</p>
+<p>测试脚本按第 22 章的写法，一条需求一个用例。下面是 REQ-PS-04 的骨架：通过网关下发花样和转速，取回 trace 记录，按主轴角切出每一针的“在布中”区间，统计位移，结果同时写报告和发 MQTT。</p>
+<pre><code class="language-python">def test_req_ps_04_no_motion_in_fabric(gw):
+    gw.load_pattern("line_x_3mm_200.wqp")
+    gw.run(speed_rpm=1600, trace=True)
+    tr = gw.fetch_trace()                       # 列：phi_deg10, x_um, y_um（实际值）
+    worst = 0
+    for st in split_by_rev(tr):                 # 每转一段
+        m = (st.phi &gt;= 1017) &amp; (st.phi &lt;= 2583)   # 101.7°–258.3°：针在布中
+        worst = max(worst, st.x[m].ptp(), st.y[m].ptp())
+    gw.publish("wq/sewing/proto/ps01/measurement",
+               {"req": "REQ-PS-04", "value_um": int(worst), "limit_um": 5})
+    assert worst &lt;= 5</code></pre>
+
+<h3 id="s21-5">21.5 缩比横机原型的构成</h3>
+<figure class="fig"><a class="zoom" href="img/fig_c21_fk_arch.png"><img src="img/fig_c21_fk_arch.png" alt="图 21-5　缩比横机原型 WQ-SC/FK 的构成" loading="lazy"></a><figcaption>图 21-5　缩比横机原型 WQ-SC/FK 的构成：虚线框为自制件，实线框为零件库条目或建议入库模块（示意）</figcaption></figure>
+<p>工业横机有几百枚针、两到三个系统、两块针床。教学原型把它缩到最小而原理不丢：<strong>单系统、单针床、60 枚针、E5（针距 5.08 mm）</strong>。粗针距有两个好处：针槽、三角、选针片都大，用普通铣床和激光切割就能做；选针时间宽，自制的选针器也来得及。60 针 × 5.08 mm = 304.8 mm，一张 A4 纸宽，正好放在实验台上。P0 先只做编织和不编织（一个选针点 S1），P1 再加第二个选针点 S2 做集圈，双针床和摇床留到以后。</p>
+<p>机头由一台 200 W 伺服经 5M 同步带驱动，带轮 A-PUL-HTD 5M-20-15 一转走 100 mm，电机编码器 10000 计数/转，机头位置分辨率 0.01 mm。机头 2.5 kg，加速度 10 m/s²（与第 17 章相同）时，所需推力约为 2.5 × 10 + 摩擦 2.5 N + 针踵过三角的阻力 15 N ≈ 42.5 N，电机峰值转矩约 0.69 N·m，匀速时约 0.28 N·m；2 m/s 对应 1200 r/min，200 W 伺服都在能力之内（示意值）。机头位置可以只用电机编码器，也可以在导轨旁贴一条磁栅尺直接测；后者把带的弹性排除在外，加速时带伸长约 0.03 mm（按第 15 章的带刚度估算），对 E5 原型可以忽略，换细针距时再考虑。</p>
+<p>选针器是这台原型的核心，也最值得自己做。它由 8 个小电磁铁叠成 8 段，选针片的针踵按 8 种高度循环排列：第 i 枚针由第 k = i mod 8 段负责。这样同一段相邻两次动作隔 8 个针距，机头 0.6 m/s 时是 67.7 ms，远大于一次吸合加释放的 3 ms。自制电磁选针器的响应时间按 1.5 ms、离散 ±0.3 ms 估（示意，比第 17 章的工业选针器慢一倍多）；压电选针器响应快一个数量级、离散也小，但需要 100 V 以上的驱动，原型 P0 不用。</p>
+<p>哪些件自制、哪些用库，原则是：<strong>决定精度和寿命、又有标准规格的，用零件库；决定这台机器“是横机”的，自己做。</strong>导轨、带轮、轴承、丝杠、蜗杆属于前一类，直接按库里的规格选；针床、三角座、选针片、纱嘴属于后一类，库里不会有，也不该有，它们的图纸就是这台原型最重要的设计成果。自制件做完要测三个尺寸：针槽槽距的累积误差（60 槽累计不超过 0.1 mm）、三角座与针床面的间隙、选针片针踵的 8 种高度。</p>
+<div class="tbl"><table><caption>表 21-8　缩比横机原型 BOM（主要部分，示意）</caption><thead><tr><th>部件</th><th>条目 / 做法</th><th>规格（示意）</th><th>来源</th></tr></thead><tbody>
+<tr><td>针床</td><td>铝板铣针槽，或底板插钢片</td><td>60 槽，槽距 5.08 mm</td><td>自制</td></tr>
+<tr><td>织针、选针片</td><td>粗针距舌针外购；选针片激光切割</td><td>选针片针踵 8 种高度</td><td>自制 / 外购</td></tr>
+<tr><td>机头三角座</td><td>钢板线切割，表面淬硬</td><td>起针、弯纱三角各 1 组</td><td>自制</td></tr>
+<tr><td>机头导轨</td><td>A-LGD-RAIL</td><td>15 型，长约 900 mm</td><td>库已有</td></tr>
+<tr><td>同步带轮、带</td><td>A-PUL-HTD；C-BLT-BELT（带传动机构）</td><td>5M-20-15，带宽 15 mm</td><td>库已有</td></tr>
+<tr><td>机头伺服 + 驱动</td><td>D-MOT-PMSM*、D-DRV-SERVO*</td><td>200 W，编码器 10000 计数/转</td><td>建议编号</td></tr>
+<tr><td>选针器</td><td>8 个小电磁铁 + 衔铁片（自制）；驱动 D-DRV-SOL*</td><td>T<sub>r</sub> ≈ 1.5 ± 0.3 ms</td><td>自制 + 建议编号</td></tr>
+<tr><td>度目</td><td>闭环步进 D-MOT-STEP* + 丝杠 C-SCN-LEAD</td><td>NEMA 17 × 2（左右弯纱三角）</td><td>建议编号 + 库已有</td></tr>
+<tr><td>纱嘴</td><td>推拉电磁铁 D-SOL-PUSH*；纱嘴本体自制</td><td>2 个纱嘴，换向区接放</td><td>建议编号 + 自制</td></tr>
+<tr><td>牵拉</td><td>包胶罗拉 + 蜗杆 C-WRM-WORM + 步进 D-MOT-STEP*</td><td>张力摆杆 + 霍尔角度 D-SNS-HALL*</td><td>库已有 + 建议编号</td></tr>
+<tr><td>保护与原点</td><td>D-SNS-PE*（断纱）、探针开关、D-SNS-PROX*</td><td>—</td><td>建议编号</td></tr>
+<tr><td>主控、机头板、网关、电源</td><td>D-CTL-WQSC*；机头板用第二块主控板，可加小 FPGA</td><td>CAN FD 经拖链</td><td>建议编号</td></tr>
+</tbody></table></div>
+<div class="tbl"><table><caption>表 21-9　缩比横机原型 I/O 表（示意）</caption><thead><tr><th>位置</th><th>信号</th><th>数量</th><th>说明</th></tr></thead><tbody>
+<tr><td>机架主控</td><td>机头伺服（CAN FD）；原点 1、左右限位 2；牵拉步进 1；张力霍尔 AI 1；断纱 DI 2；急停、防护门 DI 2</td><td>—</td><td>按“行”工作</td></tr>
+<tr><td>机头板</td><td>机头位置（伺服驱动器编码器分频输出 A/B，或磁栅尺）</td><td>1 路</td><td>逐针触发的时间基准</td></tr>
+<tr><td>机头板</td><td>选针器 S1 × 8 段（P1 再加 S2 × 8）</td><td>8（16）DO</td><td>强激磁 + 维持 + 稳压管续流</td></tr>
+<tr><td>机头板</td><td>纱嘴电磁铁 2 DO；度目步进 2（脉冲/方向）+ 零位 2 DI；探针 1 DI</td><td>—</td><td>度目、纱嘴在换向区动作</td></tr>
+</tbody></table></div>
+
+<h3 id="s21-6">21.6 横机原型的固件</h3>
+<h4 id="s21-6-1">21.6.1 以机头位置为时间基准</h4>
+<p>第 19 章的固件框架在横机上只改一处：时间基准从“主轴转角”换成“机头位置”。第 i 枚针在位置 x<sub>i</sub> = c + (i + ½)p 处应当被选中（c 是换向余量，即选针点从起步处到第 0 枚针的距离）。选针器从接到命令到衔铁动作要 T<sub>r</sub>，所以命令要提前：</p>
+<div class="math">\[ x_{cmd} = x_i - v\left(T_r + \tfrac{1}{2}T_q\right) \]</div>
+<p>这里比第 17 章多了一项 T<sub>q</sub>/2，T<sub>q</sub> 是“触发量化”：MCU 每个控制周期 T<sub>c</sub> 才查一次机头位置，过了命令点也要等到下一个周期才发出，平均晚半个周期；FPGA 每个编码器计数都比较一次，T<sub>q</sub> 只是走过一个计数（0.01 mm）的时间。</p>
+<h4 id="s21-6-2">21.6.2 选针时序预算</h4>
+<p>衔铁实际动作的位置离理想位置有多远？把三个来源放在一起（图 21-6a）：</p>
+<div class="math">\[ |e|_{max} = v\left(\tfrac{1}{2}T_q + J\right) + |e_{lead}| \]</div>
+<p>其中 J 是选针器响应时间的离散（随线圈温度、电源电压变），e<sub>lead</sub> 是提前量本身算错的部分（固定提前量在加速区就会算错，第 17 章图 17-4）。判据两条：|e| ≤ 0.25p 选针片还能被正确推入（或让开），超过就错选；验收要求 ≤ 0.1p，留 2.5 倍余量。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c21_fk_timing.png"><img src="img/fig_c21_fk_timing.png" alt="图 21-6　选针时序预算" loading="lazy"></a><figcaption>图 21-6　(a) 一枚针的时序预算；(b) 一行 60 针的最坏选针误差与机头速度（T<sub>r</sub> = 1.5 ± 0.3 ms，按实时速度算提前量；算例值）</figcaption></figure>
+<p><strong>算例</strong>　E5，机头最高 0.6 m/s，加速度 10 m/s²，换向余量 40 mm，MCU 控制周期 1 ms，按实时速度算提前量。</p>
+<div class="tbl"><table><caption>表 21-10　选针时序预算（E5、0.6 m/s、MCU 1 ms，算例值）</caption><thead><tr><th>项</th><th>算式</th><th>数值</th></tr></thead><tbody>
+<tr><td>每针时间</td><td>t<sub>n</sub> = p/v</td><td>8.47 ms</td></tr>
+<tr><td>同段两次动作间隔</td><td>8p/v（须 ≥ 2T<sub>r</sub> = 3 ms）</td><td>67.7 ms</td></tr>
+<tr><td>提前量</td><td>v(T<sub>r</sub> + T<sub>c</sub>/2)</td><td>1.20 mm = 0.24p</td></tr>
+<tr><td>量化误差</td><td>±v·T<sub>c</sub>/2</td><td>±0.30 mm</td></tr>
+<tr><td>响应离散</td><td>±v·J</td><td>±0.18 mm</td></tr>
+<tr><td>合计最坏误差</td><td>v(T<sub>c</sub>/2 + J)</td><td>0.48 mm = 0.094p ≤ 0.1p ✓</td></tr>
+<tr><td>一行用时</td><td>D = 2c + 60p + L<sub>k</sub> = 464.8 mm，加减速 + 换向 0.1 s</td><td>0.935 s，约 3850 行/h</td></tr>
+</tbody></table></div>
+<p>如果不补偿，滞后就是整整 0.24p，接近错选的边界。0.6 m/s 已在验收线以内，最多能跑多快？令 v(T<sub>c</sub>/2 + J) = 0.1p，得</p>
+<div class="math">\[ v_{max} = \frac{0.1p}{T_c/2 + J} = \frac{0.508\ \text{mm}}{0.5 + 0.3\ \text{ms}} \approx 0.635\ \text{m/s} \]</div>
+<p>这时一行 0.895 s、约 4020 行/h。把控制周期缩到 0.5 ms 和 0.25 ms，上限分别升到 0.91 和 1.16 m/s。改用 FPGA 逐计数比较后，量化只剩半个计数（0.005 mm），上限由选针器自己的离散决定：</p>
+<div class="math">\[ v_{max} \approx \frac{0.1p - 0.005}{J} = \frac{0.503}{0.3} \approx 1.68\ \text{m/s} \]</div>
+<p>按完整模型（考虑加速段内速度的变化）算得 1.66 m/s，一行 0.546 s、约 6590 行/h。速度提高到 2.6 倍，产量只提高 64%，因为加减速时间 v/a 和换向停顿不随速度缩短——这和第 17 章 17.8 节的结论相同。图 21-6b 还说明两件事：一是 MCU 1 ms 方案到 1.59 m/s 就会开始错选，不只是“验收不过”；二是对 E7（p = 3.63 mm），同样的选针器和 FPGA 只能跑 1.16 m/s，MCU 1 ms 只有 0.45 m/s。</p>
+<p>结论很明确：<strong>E5 原型 P0 用 MCU、1 ms 控制周期跑 0.6 m/s 足够；要提速或换细针距，先上 FPGA，再改进选针器的离散。</strong>单纯把选针器做快（减小 T<sub>r</sub>）对上限没有帮助，因为 T<sub>r</sub> 已被提前量补偿，限制速度的是它的离散 J。</p>
+<aside class="field"><p><strong>设计要点</strong></p><ul>
+<li>先算“离散”，再算“延迟”：延迟能补偿，离散不能。选针器的线圈要用强激磁加恒流维持（第 13 章），让电流上升时间不随电源电压和温度变，这比单纯把它做快更有效。</li>
+<li>提前量用实时速度，并把量化的半个周期一起补上；固定提前量只在全速段对，原型上没有理由用它。</li>
+<li>多段选针器的段数按“同段间隔 n<sub>段</sub>·p/v ≥ 2T<sub>r</sub>，并留 2 倍以上余量”定；E5 原型 8 段绰绰有余，留给以后换细针距。</li>
+<li>速度上去以后，换向余量、制动距离和限位开关的位置要一起重算。</li>
+</ul></aside>
+<h4 id="s21-6-3">21.6.3 从花型行到选针位图</h4>
+<figure class="fig"><a class="zoom" href="img/fig_c21_fk_bitmap.png"><img src="img/fig_c21_fk_bitmap.png" alt="图 21-7　一行花型变成选针位图和目标表" loading="lazy"></a><figcaption>图 21-7　一行花型怎样变成每段的选针位图和 FPGA 目标表（示意）</figcaption></figure>
+<p>主控按“行”工作（第 17 章 17.5 节）。每到换向区，它把下一行的意匠数据（K、T、·）拆成两个选针点的位，按 k = i mod 8 分段，再按机头走向把每枚针的目标位置排成表，写进机头板的“空闲”缓冲（图 21-7）。目标位置以编码器计数表示：target<sub>i</sub> = (c + (i + ½)p)/0.01 mm，第 0 枚针是 4254，第 1 枚是 4762……提前量不写进表，由机头板在比较时按实时速度减去。</p>
+<pre><code class="language-c">typedef struct { int32_t target[60]; uint8_t s1[60], s2[60]; int n; int8_t dir; } row_t;
+
+void build_row(const char *design, int8_t dir, row_t *r)    /* design: 60 个 'K' / 'T' / '.' */
+{
+    r-&gt;n = 60; r-&gt;dir = dir;
+    for (int k = 0; k &lt; 60; k++) {
+        int i = (dir &gt; 0) ? k : 59 - k;                         /* 按经过的先后排序 */
+        int32_t x_um = C_UM + (2 * i + 1) * P_UM / 2;           /* c + (i + 1/2) p */
+        r-&gt;target[k] = (dir &gt; 0) ? x_um / 10 : (STROKE_UM - x_um) / 10;  /* 0.01 mm 计数 */
+        r-&gt;s1[k] = (design[i] != '.');                          /* 编织或集圈：S1 选 */
+        r-&gt;s2[k] = (design[i] == 'K');                          /* 只有编织：S2 选 */
+    }
+}</code></pre>
+<h4 id="s21-6-4">21.6.4 逐针触发（MCU 版）</h4>
+<p>P0 用机头板上的 MCU 做逐针触发。它在 1 ms 的控制周期里（或者用定时器比较中断，周期更短）执行下面的函数；段号就是 k &amp; 7，因为相邻的针按顺序轮流落在 8 段上。</p>
+<pre><code class="language-c">#define TR_US 1500            /* 选针器响应时间，标定得到（21.7 节）*/
+#define TC_US 1000            /* 控制周期 */
+static row_t *row; static int k;
+
+void sel_tick(void)
+{
+    int32_t pos = carriage_pos();                 /* 本方向的行程坐标，0.01 mm 计数 */
+    int32_t v   = carriage_speed();               /* 计数/ms，用最近 1 ms 的增量 */
+    int32_t lead = v * (TR_US + TC_US / 2) / 1000;
+    while (k &lt; row-&gt;n &amp;&amp; pos + lead &gt;= row-&gt;target[k]) {
+        if (row-&gt;s1[k]) sol_pulse(SEL_S1_BASE + (k &amp; 7), BOOST_US, HOLD_US);
+        k++;                                      /* 一个周期里可能连发几枚针 */
+    }
+    if (k &gt; 0 &amp;&amp; pos &lt; row-&gt;target[k - 1] - 2 * P_CNT)
+        fault(F_SEL_SEQ);                         /* 位置倒退：编码器异常，停机 */
+}</code></pre>
+<p>改用 FPGA 时，比较器和脉冲发生器的写法与第 17 章 17.5.2 节完全相同，MCU 只负责把 target、s1、s2 写进双缓冲 RAM；第 17 章的虚拟实验 17-3 可以直接拿来练这段 Verilog。</p>
+<h4 id="s21-6-5">21.6.5 行程两端：换向、度目与纱嘴</h4>
+<p>机头在换向区停 0.1 s（示意），这段时间要做完五件事，彼此并行：</p>
+<div class="tbl"><table><caption>表 21-11　换向停顿内的动作（算例值）</caption><thead><tr><th>动作</th><th>执行件</th><th>用时</th></tr></thead><tbody>
+<tr><td>交换选针表缓冲，写下一行</td><td>主控 → 机头板，CAN FD（约 400 字节）</td><td>约 2 ms</td></tr>
+<tr><td>度目换到下一行的值（如 0.5 mm）</td><td>闭环步进 + 1 mm 导程丝杠，600 r/min</td><td>约 50 ms</td></tr>
+<tr><td>放下旧纱嘴、接上新纱嘴</td><td>纱嘴电磁铁 ×2</td><td>各约 10 ms</td></tr>
+<tr><td>牵拉补一行</td><td>牵拉步进，张力摆杆闭环</td><td>与上并行</td></tr>
+<tr><td>检查断纱、探针、限位</td><td>DI</td><td>&lt; 1 ms</td></tr>
+</tbody></table></div>
+<p>换向的状态机是 RUN → DECEL → REVERSE（上表）→ ACCEL → RUN；断纱、探针碰针和编码器异常进 SAFE。急停时机头按 20 m/s² 制动，从 1.66 m/s 停下要走 69 mm，0.635 m/s 时只要 10 mm。所以提速时要同时检查限位开关外是否留够了这段距离——这是速度上去后最容易漏掉的一项。</p>
+
+<h3 id="s21-7">21.7 横机原型的调试与验收</h3>
+<p><strong>选针时序标定</strong>　T<sub>r</sub> 不能只信计算或电磁铁样本，要在整机上标。方法是“两速扫描”：固件按一个初值（如 1.2 ms）算提前量，再加一个偏置 δ；机头分别以 0.3 m/s 和 0.9 m/s 织一种“选、不选”交替的测试行，每个 δ 织 30 行，统计选针正确率（用探针或相机检查每枚针是否被推起）。正确率达到 100% 的那段 δ 是通过带，取它的中点。中点随速度移动，斜率就是 T<sub>r</sub> 的误差（图 21-8）。</p>
+<figure class="fig"><a class="zoom" href="img/fig_c21_fk_calib.png"><img src="img/fig_c21_fk_calib.png" alt="图 21-8　选针时序标定" loading="lazy"></a><figcaption>图 21-8　选针时序标定（仿真示意）：两种速度下通过带中点分别为 0.09 mm 和 0.26 mm，斜率 0.28 ms，T<sub>r</sub> 应由 1.2 ms 改为约 1.48 ms（真值 1.5 ms）</figcaption></figure>
+<p>这个方法同时给出另一个有用的数：通过带的宽度。低速时带宽约 2 mm，高速时只剩 1.2 mm，宽度缩小的速率就反映了离散 J。标定好以后，T<sub>r</sub> 写进参数表并带版本号上报；线圈换了、电源电压改了，都要重标。</p>
+<p><strong>度目零点</strong>　每个度目步进先回零位开关，再以“刚好不成圈”的深度作为机械零点，用塞尺量弯纱三角相对针床口的高度，写进参数表。一般左、右两个三角要分别标定，否则来回两行的线圈长度不一样，织物会出现横条。</p>
+<p><strong>牵拉张力</strong>　用张力摆杆的霍尔角度做闭环：设定值按组织给出（示意：平针 3 N），步进每行补走一段，使摆杆角度回到设定区间。起头几行织物够不到罗拉，先用重锤挂住。</p>
+<div class="tbl"><table><caption>表 21-12　横机原型验收测试（示意）</caption><thead><tr><th>需求编号</th><th>项目</th><th>方法</th><th>判据</th></tr></thead><tbody>
+<tr><td>REQ-FK-01</td><td>机头定位</td><td>回原点 20 次</td><td>重复性 ≤ 0.02 mm</td></tr>
+<tr><td>REQ-FK-02</td><td>选针时序误差</td><td>两速扫描后，在最高速度下测通过带，与理论带宽比较；或用高速相机记录衔铁动作时的机头位置</td><td>≤ 0.1p 对应的机头位移（E5：0.51 mm）</td></tr>
+<tr><td>REQ-FK-03</td><td>选针正确率</td><td>交替选针测试行 1000 行</td><td>60 000 次选针无错选</td></tr>
+<tr><td>REQ-FK-04</td><td>度目重复性</td><td>同一度目值来回 100 次，量三角高度</td><td>≤ 0.01 mm</td></tr>
+<tr><td>REQ-FK-05</td><td>组织样片</td><td>织 20 行：平针 10 行 + 1×1 选针（编织/不编织）10 行</td><td>无漏针、无错针；0.6 m/s 下约 19 s</td></tr>
+<tr><td>REQ-FK-06</td><td>保护</td><td>人为断纱、在针床上竖起一枚针</td><td>断纱：走完本行停；探针：立即停，制动距离在限位以内</td></tr>
+</tbody></table></div>
+<p>20 行样片是这台原型的“出师作品”：前 10 行平针看线圈是否均匀（度目和牵拉是否稳定），后 10 行隔针编织看选针是否一针不错。样片和测试记录一起归档，样片照片的文件名带固件和参数版本号。</p>
+<aside class="field"><p><strong>现场要点</strong></p><ul>
+<li>织物上某一纵行总出错，先查是哪一段：错的针号 mod 8 都相同，就是那一段的线圈或衔铁有问题，不是时序问题。</li>
+<li>错针集中在织物两侧，多半是加速区：用了固定提前量，或换向余量太短。</li>
+<li>高速时错针随机分布，是离散 J 太大：查电源电压和线圈温度，或者降速、上 FPGA。</li>
+<li>机头板的连接器和拖链电缆是最常见的故障点（第 17 章），P0 就要选带锁扣的连接器。</li>
+</ul></aside>
+
+<h3 id="s21-8">21.8 两台原型与平缝机原型的共用</h3>
+<p>本章的两台原型看起来和第 20 章的平缝机原型差别很大，但用 WQ-SC 平台搭，大部分东西是共用的。表 21-13 把三台原型放在一起比较。</p>
+<div class="tbl"><table><caption>表 21-13　模块复用表（✓ 共用，○ 同一模块不同参数，— 不用）</caption><thead><tr><th>模块 / 软件</th><th>平缝 LS（第 20 章）</th><th>花样机 PS</th><th>横机 FK</th></tr></thead><tbody>
+<tr><td>WQ-SC 主控 D-CTL-WQSC*</td><td>✓</td><td>✓</td><td>✓（机架 + 机头板两块）</td></tr>
+<tr><td>主轴伺服 + 编码器</td><td>✓</td><td>✓（同一套）</td><td>○（改作机头伺服，200 W）</td></tr>
+<tr><td>电磁铁驱动板 D-DRV-SOL*</td><td>✓（剪线、拨线、倒缝、抬压脚）</td><td>✓（剪线、拨线、松线）</td><td>○（选针 8 路、纱嘴 2 路，时间更短）</td></tr>
+<tr><td>位置轴 stepper_* 接口</td><td>○（送布电子针距时用）</td><td>✓（X、Y 伺服）</td><td>✓（度目、牵拉）</td></tr>
+<tr><td>扩展 I/O、网关、电源</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>时间基准</td><td>主轴角</td><td>主轴角</td><td>机头位置</td></tr>
+<tr><td>事件表</td><td>✓</td><td>✓（加中压脚）</td><td>○（按位置触发：度目分段、纱嘴）</td></tr>
+<tr><td>状态机框架</td><td>✓</td><td>✓（加 CLAMP、JUMP、HOME）</td><td>○（RUN/REVERSE 按行循环）</td></tr>
+<tr><td>窗口内动作的检查</td><td>电磁铁折算转角 ≤ 20°</td><td>XY 只在 183.4° 窗口内动</td><td>选针误差 ≤ 0.1p</td></tr>
+<tr><td>测试脚本（pytest + MQTT）</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>新写的代码</td><td>—</td><td>花样解析、前瞻、窗口插补</td><td>行编译、逐针触发、换向序列</td></tr>
+</tbody></table></div>
+<p>从表里可以看出一个规律：三台机器的差别集中在“窗口是什么、窗口里做什么”，而电机、驱动、电磁铁、总线、测试这些“体力活”都是共用的。这正是第 19 章把固件按 HAL 分层、把动作写成事件表的回报。一个实验室按顺序做完三台，第二台的新代码约是第一台的一半，第三台又少一些。</p>
+
+<h3 id="s21-9">21.9 模型的边界</h3>
+<p>本章的算例都建立在简化模型上，用到真实原型时要注意以下几点。</p>
+<ul>
+<li><strong>花样机的伺服模型</strong>：图 21-4 用的是二阶跟随加前馈的理想模型，没有考虑丝杠的轴向弹性、导轨摩擦的非线性和带轮的齿隙，也没有考虑横梁的扭转（Y 轴单电机驱动时，横梁两端可能不同步）。实际的跟随误差和整定时间必须在样机上测。</li>
+<li><strong>布料与模板</strong>：窗口按“针尖高于布加下模板”算，没有计入布料被针带起的高度，也没有计入中压脚抬起的时刻。厚料、弹性料要另外留余量（第 15 章）。</li>
+<li><strong>转矩和发热</strong>：rms 转矩按“每针都用满窗口”的最坏情况估算，偏保守；电机的转矩–转速曲线、驱动器的电流限制、环境温度都没有计入。</li>
+<li><strong>选针模型</strong>：把选针器当作“延迟 T<sub>r</sub>、离散 ±J、均匀分布”的理想开关，没有考虑衔铁回弹、相邻段之间的磁耦合、过压电源在连续动作时的电压跌落。±0.25p 的允许窗口是示意值，实际值取决于选针片针踵和三角的几何形状，要在样机上用两速扫描测出来。</li>
+<li><strong>机头位置</strong>：模型认为电机编码器读数就是机头位置；同步带在加速时伸长约 0.03 mm，E5 原型可以忽略，换 E12 以上的细针距时，应该改用直线编码器或者在模型里加上这一项。</li>
+<li><strong>产量</strong>：行时间只算了单系统、单针床、固定的 0.1 s 换向停顿，不包括摇床、翻针和纱嘴换色的额外趟数，不能直接拿来估计工业横机的产量（第 17 章 17.8 节）。</li>
+</ul>
+
+<h3 id="x21-ex">第 21 章 习题</h3>
+<ol>
+<li>花样机原型，布加下模板厚 3 mm（第 15 章：几何窗口 192.6°），两端仍各留 10°。沿 Y 方向缝 4 mm 针距（a = 40 m/s²，S 形，C = 5.33），主轴最高能到多少？<details class="ans"><summary>参考答案</summary>实用窗口 172.6°；Δt = √(5.33 × 0.004/40) = 23.1 ms；n = 172.6/(6 × 0.0231) ≈ 1250 r/min。</details></li>
+<li>若想让 12 kg 的 Y 轴也用 50 m/s² 的设计加速度，400 W 电机还行吗？给出两种改法。<details class="ans"><summary>参考答案</summary>峰值转矩 0.820 × 10⁻⁴ × 2π × 50/0.01 ≈ 2.58 N·m，低于峰值 3.8 N·m；但最坏 rms = 2.58 × 0.816 × √(183.4/360) ≈ 1.51 N·m &gt; 1.27 N·m，连续缝会过热。改法：换额定转矩更大的电机；或减轻 Y 轴运动质量（如压框改铝型材、X 电机移到横梁外固定，改为 H 型带传动）；也可以在固件里加 I²t 热模型，只在短时间内允许 50 m/s²。</details></li>
+<li>花样机原型主轴 2500 r/min 时，若忘了按 φ + ω·T<sub>d</sub> 查表（T<sub>d</sub> = 1.5 ms），模板动作会滞后多少度？两端各 10° 的余量够不够？</li>
+<li>横机原型 E5、MCU 控制周期改为 0.5 ms，其余按 21.6 节算例，验收允许的最高机头速度约为多少？与 FPGA 方案相比还差多少？<details class="ans"><summary>参考答案</summary>解析 0.508/(0.25 + 0.3) ≈ 0.92 m/s，完整模型约 0.91 m/s；FPGA 约 1.66 m/s。</details></li>
+<li>如果把 8 段选针器换成单段（每枚针都由同一个电磁铁选），E5、FPGA、T<sub>r</sub> = 1.5 ms 时，机头速度受哪条限制？换 E7 呢？<details class="ans"><summary>参考答案</summary>单段要求 p/v ≥ 2T<sub>r</sub>：E5 时 v ≤ 5.08/3 ≈ 1.69 m/s，与时序上限 1.66 m/s 很接近，几乎没有余量；E7 时 v ≤ 3.63/3 ≈ 1.21 m/s，时序上限 1.16 m/s。两者都卡得很紧，所以要用多段。</details></li>
+<li>横机原型急停的制动加速度为 20 m/s²。机头 1.66 m/s 时制动距离是多少？限位开关应当装在哪里？</li>
+<li>用两速扫描标定选针器：初值 T<sub>r</sub> = 1.2 ms，0.3 m/s 和 0.9 m/s 时通过带中点分别为 0.09 mm 和 0.26 mm。T<sub>r</sub> 应改为多少？为什么用两种速度而不是一种？<details class="ans"><summary>参考答案</summary>斜率 (0.26 − 0.09)/(0.9 − 0.3) ≈ 0.28 ms，T<sub>r</sub> ≈ 1.48 ms。只用一种速度时，中点偏移里混着选针点的几何偏移（与速度无关）和 T<sub>r</sub> 误差（与速度成正比），两种速度才能把两者分开：斜率是 T<sub>r</sub> 误差，截距是几何偏移。</details></li>
+<li>（讨论）用虚拟实验 21-1 完成三个任务，再结合表 21-13，说明“原型先用 MCU，量产再上 FPGA”和“原型一开始就上 FPGA”各有什么利弊。</li>
+</ol>
+
+<h3 id="x21-ref">参考资料</h3>
+<ol class="refs">
+<li>Spencer D J. Knitting Technology: A Comprehensive Handbook and Practical Guide. 3rd ed. Cambridge: Woodhead Publishing, 2001.</li>
+<li>Biagiotti L, Melchiorri C. Trajectory Planning for Automatic Machines and Robots. Berlin: Springer, 2008.</li>
+<li>Ellis G. Control System Design Guide. 4th ed. Butterworth-Heinemann, 2012.</li>
+<li>ISO 230-2. Test code for machine tools — Part 2: Determination of accuracy and repeatability of positioning of numerically controlled axes.</li>
+<li>ISO 3408-3. Ball screws — Part 3: Acceptance conditions and acceptance tests.</li>
+<li>本书第 13、15、17、19、20、22 章；问渠零件与机器人库条目 A-BSC-SFU、A-PUL-HTD、A-LGD-RAIL、A-CPL-JAW 的规格表。</li>
+</ol>
+
+<h3 id="x21-res">配套资源</h3>
+<p><a href="#lab-proto-fk" class="labref">虚拟实验 21-1　缩比横机原型：机头速度与选针时序</a>　页面上方是针床和机头的动画：机头按设定的速度曲线走过 60 枚针，每经过一枚针就画出它的选针误差；中间是全行 60 针的误差图（灰条是量化与离散最坏组合的范围，橙点是这一行的随机抽样，绿带是验收 ±0.1p，黄带是允许窗口 ±0.25p）；下方放大显示当前这枚针的命令点、触发点和衔铁动作位置。右侧可以调针距、机头最高速度、加速度、换向余量、选针器响应时间和离散、MCU 或 FPGA、控制周期、选针器段数和提前量方式，读出一行用时、每小时行数和 1000 行的错选数。内置三个自动判定的任务：找出 MCU 1 ms 下满足验收的最高速度；改用 FPGA 后再找最高速度并比较产量；换 E7 针床、用固定提前量时调提前量和换向余量。</p>
+<section class="lab" id="lab-proto-fk" data-src="labs/proto-fk.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 21-1　缩比横机原型：机头速度与选针时序</h4></div><p>调机头速度、选针器响应与离散、控制周期，看每枚针的选针时刻落不落在窗口里。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/proto-fk.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<p>下面几个第 15、17 章的实验与本章直接相关，可以对照着用：花样机仿真用来检查原型的针距–转速表；横机编织仿真和 FPGA 选针实验分别对应 21.6 节的提前量和逐针触发。</p>
+<section class="lab" id="lab-pattern" data-src="labs/pattern.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 15-1　花样机仿真</h4></div><p>画一个花样，设针距和转速，检查每一步能否在机针离布的时间内走完。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/pattern.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<section class="lab" id="lab-patprog" data-src="labs/patprog.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 15-2　花样编程</h4></div><p>画线、设针距、插入起针回针和剪线，输出花样文件；可以先在这里编好口袋盖，再换成 .wqp 格式上原型。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/patprog.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<section class="lab" id="lab-knit" data-src="labs/knit.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 17-1　横机编织仿真</h4></div><p>机头往复、按针位选针，逐行生成线圈图；比较三种提前量处理方式。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/knit.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<section class="lab" id="lab-knitprog" data-src="labs/knitprog.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 17-2　横机操作与制版</h4></div><p>用符号画意匠图，编译成逐行的机头动作；原型的 20 行样片可以先在这里画好。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/knitprog.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<section class="lab" id="lab-fpga" data-src="labs/fpga.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 17-3　选针 FPGA 编程</h4></div><p>用图形化模块和精简 Verilog 搭出选针通道：解码、测速、提前量、比较与过压驱动。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/fpga.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>

@@ -43,6 +43,16 @@
         <template v-if="spec">
           <div class="step"><b>2</b> 编程单 <span class="small muted">{{ KIND[spec.kind] }}{{ spec.mode ? '（' + MODE[spec.mode] + '）' : '' }} · {{ machines[spec.machine]?.name || spec.machine }}</span></div>
           <div v-if="spec.plan_source" class="small muted">{{ spec.plan_source }}</div>
+          <div class="ai-box">
+            <textarea v-model="aiText" rows="2" maxlength="500" :placeholder="AI_HINT[spec.kind]"></textarea>
+            <div class="line"><button class="btn" :disabled="aiBusy || !aiText.trim()" @click="aiFill">{{ aiBusy ? 'AI 正在理解…' : 'AI 改编程单' }}</button>
+              <span class="small muted">AI 只改下面的表，你看过再生成</span></div>
+            <div v-if="aiRes" class="small">
+              <div v-for="n in aiRes.notes" :key="n">✓ {{ n }}</div>
+              <div v-for="n in aiRes.unmatched" :key="n" class="warnline">？没看懂或不能改：“{{ n }}”</div>
+              <div v-if="aiRes.note" class="muted">{{ aiRes.note }}</div>
+            </div>
+          </div>
 
           <template v-if="spec.kind === 'turn'">
             <div class="kv small"><span>毛坯</span><span>{{ stockText }}</span><span class="src">{{ spec.sources?.stock }}</span></div>
@@ -52,6 +62,9 @@
               <tbody><tr v-for="s in spec.sizes" :key="s.name"><td>{{ s.name }}</td><td class="num">{{ s.design }}</td><td class="num">{{ s.op }}</td></tr>
                 <tr v-if="spec.extra"><td colspan="3" class="muted">其余直径加 {{ spec.extra }} mm（与轴承位、齿轮位同样的车削余量）</td></tr></tbody>
             </table>
+            <div class="line small"><span>装夹</span>
+              <label><input v-model="spec.setups" type="checkbox" value="right"> 右端（第一次装夹）</label>
+              <label><input v-model="spec.setups" type="checkbox" value="left"> 左端（调头）</label></div>
             <div class="small muted">编程直径取公差带中间。轮廓：{{ spec.profile.length }} 个点，<a href="#" @click.prevent="showProf = !showProf">{{ showProf ? '收起' : '展开' }}</a></div>
             <div v-if="showProf" class="mono small prof">{{ spec.profile.map((p) => `t${p[0]} Ø${p[1]}`).join('  ') }}</div>
           </template>
@@ -117,10 +130,12 @@
             <div class="kpi" :class="simTone"><div class="muted small">仿真比对</div>
               <div class="big">{{ simHead }}</div><div class="small muted">{{ simNote }}</div></div>
             <div class="kpi"><div class="muted small">程序</div><div class="big">{{ prog.lines }} 行</div>
-              <div class="small muted">实际最大切深 {{ prog.sim.ap_max }} mm<span v-if="prog.rpm"> · S{{ prog.rpm }} F{{ prog.feed }}</span></div></div>
+              <div class="small muted">实际最大切深 {{ prog.sim.ap_max }} mm<span v-if="prog.rpm"> · S{{ prog.rpm }} F{{ prog.feed }}</span></div>
+              <div v-if="prog.power" class="small muted" :title="`Kienzle：${prog.power.material_row}，kc1.1 = ${prog.power.kc11_MPa} MPa，mc = ${prog.power.mc}（${prog.power.table}）`">
+                切削功率 {{ prog.power.items.map((x) => x.name.split(' ')[0] + ' ' + x.need_kw.toFixed(1)).join('、') }} kW（含效率）/ 机床 {{ prog.power.machine_kw }} kW</div></div>
           </div>
           <div class="checks">
-            <div v-if="!prog.checks.length" class="okline small">✓ 检查通过：没有超程、超速、快移撞工件、过切</div>
+            <div v-if="!prog.checks.length" class="okline small">✓ 检查通过：没有超程、超速、功率超限、快移撞工件、过切</div>
             <div v-for="(c, i) in prog.checks" :key="i" class="small" :class="c.level === 'error' ? 'err' : 'warnline'">
               {{ c.level === 'error' ? '✗' : '!' }} <a v-if="c.line" href="#" @click.prevent="jump(c.line)">第 {{ c.line }} 行</a> {{ c.text }}</div>
           </div>
@@ -148,6 +163,17 @@
                 <router-link :to="{ path: '/3d', query: { unit: job.spec.kind === 'turn' ? 'cnc-l01-a' : 'key-01' } }">到 3D 车间回放 →</router-link></div>
               <div v-if="sub.status === 'rejected'" class="small err">退回：{{ sub.decision }}——改好后重新生成、再提交。</div>
               <div v-if="err" class="small err">{{ err }}</div>
+            </template>
+          </div>
+          <div class="explain">
+            <div class="line"><b>AI 讲解程序</b>
+              <button class="btn ghost" :disabled="expBusy" @click="explain">{{ expBusy ? 'AI 正在读程序…' : (exp ? '重新讲解' : '请 AI 逐段讲解这个程序') }}</button>
+              <span v-if="exp" class="small muted">{{ exp.engine === 'rules' ? '规则讲解（没配模型）' : '模型：' + exp.engine }}</span></div>
+            <template v-if="exp">
+              <div v-for="(b, i) in exp.blocks" :key="i" class="blk small" :class="{ on: curLine >= b.from && curLine <= b.to }">
+                <a href="#" class="mono" @click.prevent="jump(b.from)">第 {{ b.from }}{{ b.to > b.from ? '–' + b.to : '' }} 行</a> {{ b.text }}</div>
+              <div v-if="exp.risks.length" class="small"><b>上机前注意</b>
+                <div v-for="(r, i) in exp.risks" :key="i" class="warnline">! {{ r }}</div></div>
             </template>
           </div>
           <div class="gcode">
@@ -186,11 +212,16 @@ const SRC = [{ k: 'plan', label: '按工艺规程' }, { k: 'example', label: '�
 const KIND = { turn: '数控车', slot: '铣键槽', mill25: '2.5 轴铣' };
 const MODE = { rough: '粗车', finish: '精车' };
 const OPN = { contour: '外轮廓', pocket: '型腔', drill: '钻孔' };
+const AI_HINT = {
+  turn: '一句话改参数，例如“每刀 2.5，留 0.3 精车余量，限速 2500”“线速度 150，进给 0.12”“只车右端”',
+  slot: '一句话改参数，例如“分 5 层，每齿 0.04”“转速 800”',
+  mill25: '一句话改参数，例如“型腔用 Ø8 的刀，行距 40%，每层 3”“啄钻每次 5”',
+};
 const SLOT_F = [{ k: 'width', label: '槽宽' }, { k: 'length', label: '槽长' }, { k: 'depth', label: '槽深（从外圆最高点）' }];
 const CUT = {
   turn: [{ k: 'vc', label: '切削速度 vc', unit: 'm/min', step: 5 }, { k: 'f', label: '进给量 f', unit: 'mm/r', step: 0.01 },
     { k: 'ap', label: '每刀切深 ap', unit: 'mm', step: 0.1 }, { k: 'max_rpm', label: '限速 G50', unit: 'r/min', step: 100 },
-    { k: 'axial_allow', label: '轴肩留余量', unit: 'mm', step: 0.05 }],
+    { k: 'axial_allow', label: '轴肩留余量', unit: 'mm', step: 0.05 }, { k: 'radial_allow', label: '外圆再留（单边）', unit: 'mm', step: 0.05 }],
   slot: [{ k: 'vc', label: '切削速度 vc', unit: 'm/min', step: 1 }, { k: 'fz', label: '每齿进给 fz', unit: 'mm', step: 0.005 },
     { k: 'z', label: '齿数', unit: '', step: 1 }, { k: 'ap', label: '每层切深', unit: 'mm', step: 0.1 }],
 };
@@ -205,6 +236,8 @@ const busy = ref(false), generating = ref(false), err = ref('');
 const job = ref(null), jobs = ref([]), pk = ref(0), nc = ref(''), final = ref(null);
 const time = ref(0), playing = ref(false), speed = ref(20);
 const pre = ref(null);
+const aiText = ref(''), aiBusy = ref(false), aiRes = ref(null);
+const exp = ref(null), expBusy = ref(false);
 const SUB_NAME = { pending: '待审', approved: '已生效', rejected: '已退回' };
 const SUB_TONE = { pending: 'info', approved: 'good', rejected: 'bad' };
 const sub = ref(null), subNote = ref(''), subBusy = ref(false), decisionNote = ref(''), released = ref(null);
@@ -265,6 +298,7 @@ async function loadOps() {
   } catch (e) { err.value = e.message; }
 }
 function setSpec(s, name) {
+  aiRes.value = null;
   spec.value = s; orig.value = JSON.parse(JSON.stringify(s));
   title.value = name || `${s.item || ''} ${s.op ? s.op.seq + ' ' + s.op.name.split(' ')[0] : KIND[s.kind]}`.trim();
 }
@@ -292,6 +326,7 @@ async function loadUpload() {
   } catch (e) { err.value = e.message; } finally { busy.value = false; }
 }
 async function generate() {
+  if (spec.value.kind === 'turn' && !(spec.value.setups || []).length) { err.value = '至少选一次装夹（右端或左端）'; return; }
   generating.value = true; err.value = '';
   try {
     const j = await post('/cam/jobs', { spec: spec.value, title: title.value });
@@ -330,6 +365,34 @@ function download() {
   a.download = `O${prog.value.number}-${job.value.item || 'program'}.nc`;
   document.body.appendChild(a); a.click(); a.remove();
 }
+function setPath(obj, keys, v) {
+  let o = obj;
+  for (const k of keys.slice(0, -1)) { if (o[k] === undefined) return; o = o[k]; }
+  o[keys[keys.length - 1]] = v;
+}
+async function aiFill() {
+  aiBusy.value = true; err.value = '';
+  try {
+    const r = await post('/cam/ai-setup', { text: aiText.value, spec: spec.value });
+    for (const p of r.patch) {
+      if (p.path === 'setups') { spec.value.setups = p.value; continue; }
+      if (p.path.startsWith('ops.')) {
+        const [, sel, ...rest] = p.path.split('.');
+        for (const o of spec.value.ops) {
+          if (sel !== '*' && o.type !== sel) continue;
+          if (sel === '*' && o.type === 'drill' && rest[1] !== 'vc') continue;     // 钻孔没有 fz、ap
+          setPath(o, rest, p.value);
+        }
+      } else setPath(spec.value, p.path.split('.'), p.value);
+    }
+    aiRes.value = r;
+  } catch (e) { err.value = e.message; } finally { aiBusy.value = false; }
+}
+async function explain() {
+  expBusy.value = true; err.value = '';
+  try { exp.value = await post(`/cam/jobs/${job.value.id}/explain`, { k: pk.value }); } catch (e) { err.value = e.message; } finally { expBusy.value = false; }
+}
+watch([job, pk], () => { exp.value = null; });
 async function loadSub() {
   sub.value = null; released.value = null;
   if (job.value?.submission) {
@@ -409,6 +472,11 @@ select { height: 26px; border: 1px solid #C8CEC7; border-radius: 5px; }
 .checks { display: flex; flex-direction: column; gap: 2px; }
 .okline { color: var(--good, #1B5E20); }
 .warnline { color: var(--warn-ink); }
+.ai-box { display: flex; flex-direction: column; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+.ai-box textarea { border: 1px solid #C8CEC7; border-radius: 6px; padding: 6px 8px; resize: vertical; }
+.explain { border-top: 1px solid var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.blk { padding: 4px 6px; border-radius: 6px; line-height: 1.6; }
+.blk.on { background: var(--accent-bg); }
 .release { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: var(--surface-2); }
 .cmt { display: flex; gap: 8px; align-items: flex-start; }
 .cmt label { white-space: nowrap; }

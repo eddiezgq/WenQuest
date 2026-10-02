@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css"><style>
+.chip{display:inline-block;border:1.5px solid #9aa4ae;border-radius:6px;background:#fff;padding:2px 7px;margin:2px 3px;font-size:12.5px;white-space:nowrap}
+.chip.g{border-color:#2e9e5b}.chip.b{border-color:#2a6fdb}.chip.o{border-color:#e0662f}.chip.p{border-color:#8a5cc7}.chip.t{border-color:#14797f}.chip.y{border-color:#c48a17}
+.lay{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:stretch;margin-bottom:8px}
+.lab{display:flex;flex-direction:column;justify-content:center;border-radius:8px;padding:6px 10px;font-size:13px}
+.lab b{font-size:14px}
+.mono{font-family:"DejaVu Sans Mono",monospace;font-size:12px}
+.arrow{font-size:22px;color:#5a6570;text-align:center;align-self:center}
+.small{font-size:12px;color:#5a6570}
+ul.t{margin:4px 0 0;padding-left:16px;text-align:left;font-size:12.5px;color:#1b2430}
+ul.t li{margin:1px 0}
+.gantt{display:grid;grid-template-columns:150px repeat(12,1fr);gap:3px 2px;font-size:12.5px;align-items:center}
+.gantt .h{font-size:11.5px;color:#5a6570;text-align:center}
+.bar{height:18px;border-radius:4px}
+.ms{font-size:12px;font-weight:700;text-align:center}
+</style><div class="fig" style="--w:1180px"><p class="title">快速配套：从需求表到 BOM、接线表和固件配置</p><p class="sub">示意。实线是一次配套，虚线是迭代：测试结果回到需求表或判据</p><div style="display:grid;grid-template-columns:1fr 24px 1fr 24px 1fr 24px 1fr 24px 1fr;gap:4px;align-items:stretch"><div class="box b fill-b" style="text-align:left"><b>① 需求表</b><ul class="t"><li>机种、最高转速、加速时间</li><li>负载惯量、动作清单</li><li>X–Y 行程与速度、针数</li><li>I/O、电源、联网</li></ul></div><div class="arrow">→</div><div class="box p fill-p" style="text-align:left"><b>② 计算</b><ul class="t"><li>主轴转矩、惯量比、制动能量</li><li>步进转矩–转速裕量</li><li>电磁铁 6·n·t 折算转角</li><li>电源预算、I/O 计数</li></ul></div><div class="arrow">→</div><div class="box g fill-g" style="text-align:left"><b>③ 从零件库筛选</b><ul class="t"><li>按 perf 参数比判据</li><li>每类挑最便宜的合格规格</li><li>机械件引用已有条目</li><li>库里没有：如实说没有</li></ul></div><div class="arrow">→</div><div class="box o fill-o" style="text-align:left"><b>④ 自动生成</b><ul class="t"><li>BOM：编号/规格、数量、单价</li><li>接线表：端口 ↔ 器件</li><li>固件配置：HAL 驱动、事件表初值</li><li>需求 ↔ 测试用例 REQ-…</li></ul></div><div class="arrow">→</div><div class="box y fill-y" style="text-align:left"><b>⑤ 上测试台</b><ul class="t"><li>SIL、HIL、整机测试台</li><li>pytest 脚本、报告</li><li>结果发到 measurement 主题</li></ul></div></div><svg viewBox="0 0 1120 46" width="1120" height="46" style="display:block;margin-top:6px"><defs><marker id="a2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#c4531d"/></marker></defs>
+<path d="M1050,2 L1050,30 L90,30 L90,6" fill="none" stroke="#c4531d" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#a2)"/>
+<text x="570" y="24" text-anchor="middle" font-size="13" fill="#c4531d">迭代：改需求、改判据或换模块，重新配套</text></svg><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+<div class="box g" style="text-align:left"><b>零件库条目</b><span>entry.yaml：编号、名称、参数定义（key、中英文名、role、单位）、出处；specs.csv：一行一个规格</span></div>
+<div class="box k fill-k" style="text-align:left"><b>AI 选型助手的规矩</b><span>只从库里挑；答案写成“编号/规格”并列出依据的那一行参数和出处；库里没有就说没有，不编造；编号逐个核对</span></div></div></div>

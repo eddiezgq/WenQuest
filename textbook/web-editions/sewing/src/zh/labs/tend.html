@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>一人多机：自动单元该看几台</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = needle path (front view), timing chart, stitch preview; right rail = checks, controls, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style>
+<div class="wrap">
+<header><h1>一人多机：自动单元该看几台</h1><span class="sub">《缝纫机设计与制造》第 12 章 · 虚拟实验 12-1 · 一个工人轮流给几台自动缝制单元装卸，台数多了人忙不过来，台数少了机器在等人</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>车间俯视（蓝色为工人；机器上的进度条为自动缝制，橙色为等人装卸）</h3>
+      <canvas id="floor" width="1100" height="250" aria-label="工人在几台自动单元之间走动的动画"></canvas>
+      <div class="row"><button id="play" type="button">暂停</button><button id="restart" type="button">从头播放</button><span class="note" style="margin:0">动画按 1 秒仿真 = 0.1 秒播放；下方甘特图显示最近 120 秒。</span></div>
+    </section>
+    <section class="panel">
+      <h3>甘特图（工人：走动 / 装卸 / 等机器；机器：自动缝制 / 等人）</h3>
+      <canvas id="gantt" width="1100" height="300" aria-label="工人和各台机器的时间安排"></canvas>
+    </section>
+    <section class="panel">
+      <h3>产量随台数的变化（实线：没有波动的公式；点：带波动仿真 8 小时、5 次平均）</h3>
+      <canvas id="curve" width="1100" height="300" aria-label="台时产量随看机台数变化"></canvas>
+    </section>
+    <p class="note">模型：工人按固定顺序巡回，走到一台机器后若它还在缝就等着，缝完就取下成品、装上新裁片（装卸时间 a），然后机器自动缝制 m，工人走向下一台（走动 w）。没有波动时一个循环为 max(a+m, N(a+w))，看机台数的“平衡点”为 N* = (a+m)/(a+w)。波动按正态分布、变异系数为所设值，时间为示意值。</p>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>结果</h3>
+      <div class="checks" id="checks"></div>
+    </section>
+    <section class="panel">
+      <h3>调整</h3>
+      <div class="prm">
+        <label for="N">看机台数 N</label><input id="N" type="range" min="1" max="6" step="1" value="2"><output id="Nv"></output>
+        <label for="a">装卸时间 a（s）</label><input id="a" type="range" min="2" max="15" step="0.5" value="5"><output id="av"></output>
+        <label for="m">自动缝制时间 m（s）</label><input id="m" type="range" min="4" max="40" step="1" value="12"><output id="mv"></output>
+        <label for="w">两台之间走动 w（s）</label><input id="w" type="range" min="0.5" max="6" step="0.5" value="2"><output id="wv"></output>
+        <label for="cv">时间波动（变异系数）</label><input id="cv" type="range" min="0" max="0.5" step="0.05" value="0"><output id="cvv"></output>
+      </div>
+      <div class="row"><button id="reset" type="button">恢复标准</button></div>
+    </section>
+    <section class="panel">
+      <h3>任务</h3>
+      <div id="tasks"></div>
+      <div class="row" style="font-size:.84rem">N* =<input id="ns" type="number" step="0.01" aria-label="平衡点 N*"><button id="nsChk" type="button">核对</button></div>
+      <div class="msg" id="msg"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const STD={N:2,a:5,m:12,w:2,cv:0};
+const ST={...STD};
+// ---------- model (same as model12.py: tend_det / tend_sim) ----------
+function rng(seed){let s=seed>>>0;const u=()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};
+  return ()=>{let a=0,b=0;while(a===0)a=u();b=u();return Math.sqrt(-2*Math.log(a))*Math.cos(2*Math.PI*b);};}
+function det(N,a,m,w){const c=Math.max(a+m,N*(a+w));return {cycle:c,out:N*3600/c,op:N*(a+w)/c,mw:Math.max(0,c-(a+m))/c};}
+function sim(N,a,m,w,cv,T,seed,log){
+  const z=rng(seed), g=mu=>cv>0?Math.max(0.2*mu,mu*(1+cv*z())):mu;
+  const ready=new Array(N).fill(0), rel=new Array(N).fill(0);let t=0,done=0,busy=0,mwait=0,i=0;const ev=[];
+  while(t<T){const tw=g(w);busy+=tw;if(log)ev.push({who:'op',k:'walk',t0:t,t1:t+tw,from:(i-1+N)%N,to:i});t+=tw;
+    if(ready[i]>t){if(log)ev.push({who:'op',k:'wait',t0:t,t1:ready[i],at:i});t=ready[i];}
+    else{mwait+=t-ready[i];if(log&&t>ready[i])ev.push({who:i,k:'idle',t0:ready[i],t1:t});}
+    const s=g(a);if(log)ev.push({who:'op',k:'load',t0:t,t1:t+s,at:i},{who:i,k:'load',t0:t,t1:t+s});t+=s;busy+=s;
+    const mm=g(m);ready[i]=t+mm;if(log)ev.push({who:i,k:'run',t0:t,t1:t+mm});done++;i=(i+1)%N;}
+  return {out:done*3600/t,op:busy/t,mw:mwait/(N*t),ev};}
+function simAvg(N,a,m,w,cv){const r=[7,8,9,10,11].map(k=>sim(N,a,m,w,cv,8*3600,k,false));const av=f=>r.reduce((x,y)=>x+y[f],0)/r.length;return {out:av('out'),op:av('op'),mw:av('mw')};}
+let R_=null, LOG=null, curveCache=null;
+function evaluate(){
+  const d=det(ST.N,ST.a,ST.m,ST.w), s=simAvg(ST.N,ST.a,ST.m,ST.w,ST.cv), ns=(ST.a+ST.m)/(ST.a+ST.w);
+  return {d,s,ns,lim:ST.N<ns?'机器在等人':'人在等机器',C:[
+    {k:'out',n:'台时产量（件 / h）',v:ST.cv>0?s.out:d.out,sub:ST.cv>0?`没有波动时 ${d.out.toFixed(0)}`:''},
+    {k:'op',n:'工人忙碌率（装卸 + 走动）',v:(ST.cv>0?s.op:d.op)*100,u:'%'},
+    {k:'mw',n:'机器等人的时间比例',v:(ST.cv>0?s.mw:d.mw)*100,u:'%'},
+    {k:'ns',n:'平衡点 N* = (a+m)/(a+w)',v:ns,sub:ST.N<ns?'台数少于 N*：人有空闲，机器不等人':'台数不少于 N*：人一刻不停，机器排队等人'}]};}
+function render(){const R=R_;$('checks').innerHTML=R.C.map(c=>`<div><span>•</span><span>${c.n}${c.sub?`<small>${c.sub}</small>`:''}</span><b>${c.k==='ns'?c.v.toFixed(2):c.v.toFixed(c.u?0:0)}${c.u||''}</b></div>`).join('');}
+// ---------- drawing ----------
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+let tPlay=0,playing=true,last=null;
+function opAt(t){ // operator x position and state
+  for(const e of LOG){if(e.who!=='op')continue;if(t>=e.t0&&t<e.t1){if(e.k==='walk'){const u=(t-e.t0)/(e.t1-e.t0);let f=e.from,to=e.to;return {x:to===0&&f===ST.N-1&&ST.N>1?null:f+(to-f)*u,k:'walk',f,to,u};}return {x:e.at,k:e.k};}}return {x:0,k:'walk'};}
+function mAt(i,t){for(const e of LOG){if(e.who!==i)continue;if(t>=e.t0&&t<e.t1)return {k:e.k,u:(t-e.t0)/(e.t1-e.t0)};}return {k:'idle',u:0};}
+function drawFloor(){const [c,g]=ctx('floor'),W=c.width,H=c.height;const N=ST.N, gap=Math.min(170,(W-120)/Math.max(N,1)), x0=W/2-gap*(N-1)/2, MX=i=>x0+i*gap, yM=80, yO=180;
+  g.font='13px '+css('--f-body');
+  g.strokeStyle=css('--rule');g.setLineDash([6,5]);g.lineWidth=1.5;g.beginPath();g.moveTo(MX(0),yO);g.lineTo(MX(N-1),yO);if(N>1){g.moveTo(MX(N-1),yO);g.quadraticCurveTo((MX(0)+MX(N-1))/2,yO+60,MX(0),yO);}g.stroke();g.setLineDash([]);
+  for(let i=0;i<N;i++){const s=mAt(i,tPlay),x=MX(i);g.fillStyle=css('--soft');g.strokeStyle=css('--ink');g.lineWidth=1.4;g.beginPath();g.roundRect(x-55,yM-40,110,80,8);g.fill();g.stroke();
+    g.fillStyle=css('--ink');g.textAlign='center';g.fillText(`单元 ${i+1}`,x,yM-18);
+    const col=s.k==='run'?css('--nt'):s.k==='load'?css('--ok'):css('--bt');g.fillStyle=css('--rule');g.fillRect(x-42,yM,84,12);g.fillStyle=col;g.fillRect(x-42,yM,84*(s.k==='run'?s.u:1),12);
+    g.fillStyle=col;g.fillText(s.k==='run'?'自动缝制':s.k==='load'?'装卸中':'等人',x,yM+32);}
+  const o=opAt(tPlay);let ox,oy=yO;
+  if(o.x===null){const u=o.u,a=MX(N-1),b=MX(0);ox=(1-u)*(1-u)*a+2*u*(1-u)*(a+b)/2+u*u*b;oy=(1-u)*(1-u)*yO+2*u*(1-u)*(yO+60)+u*u*yO;}else ox=MX(o.x);
+  g.fillStyle=css('--nt');g.beginPath();g.arc(ox,oy-(o.k==='walk'?0:30),14,0,7);g.fill();
+  g.fillStyle=css('--ink');g.textAlign='center';g.fillText(o.k==='walk'?'走动':o.k==='load'?'装卸':'等机器',ox,oy+(o.k==='walk'?32:4));
+  g.textAlign='start';g.fillStyle=css('--muted');g.fillText(`仿真时间 ${tPlay.toFixed(1)} s`,12,H-12);g.textAlign='start';}
+function drawGantt(){const [c,g]=ctx('gantt'),W=c.width,H=c.height,N=ST.N;const x0=90,x1=W-14,t1=Math.max(120,tPlay),t0=t1-120,X=t=>x0+(x1-x0)*(t-t0)/120;
+  const rows=N+1,rh=Math.min(40,(H-50)/rows),Y=r=>18+r*rh;g.font='12px '+css('--f-body');
+  const col={walk:css('--muted'),load:css('--ok'),wait:css('--warn'),run:css('--nt'),idle:css('--bt')};
+  g.fillStyle=css('--ink');g.fillText('工人',10,Y(0)+rh/2+4);for(let i=0;i<N;i++)g.fillText(`单元 ${i+1}`,10,Y(i+1)+rh/2+4);
+  g.strokeStyle=css('--rule');for(let t=Math.ceil(t0/10)*10;t<=t1;t+=10){g.beginPath();g.moveTo(X(t),14);g.lineTo(X(t),Y(rows));g.stroke();g.fillStyle=css('--muted');g.textAlign='center';g.fillText(t+' s',X(t),Y(rows)+16);}g.textAlign='start';
+  for(const e of LOG){if(e.t1<t0||e.t0>tPlay)continue;const r=e.who==='op'?0:e.who+1;const a=Math.max(e.t0,t0),b=Math.min(e.t1,tPlay);g.fillStyle=col[e.k];g.fillRect(X(a),Y(r)+4,Math.max(0.5,X(b)-X(a)),rh-8);}
+  let lx=x0;const leg=[['走动','walk'],['装卸','load'],['工人等机器','wait'],['自动缝制','run'],['机器等人','idle']];
+  for(const [t,k] of leg){g.fillStyle=col[k];g.fillRect(lx,H-14,14,10);g.fillStyle=css('--ink');g.fillText(t,lx+18,H-5);lx+=g.measureText(t).width+40;}}
+function drawCurve(){const [c,g]=ctx('curve'),W=c.width,H=c.height;const x0=70,x1=W-20,y0=H-40,y1=20;
+  const pts=[];let ymax=0;for(let N=1;N<=6;N++){const d=det(N,ST.a,ST.m,ST.w).out,s=simAvg(N,ST.a,ST.m,ST.w,ST.cv).out;pts.push([N,d,s]);ymax=Math.max(ymax,d,s);}
+  ymax=Math.ceil(ymax*1.15/100)*100;const X=N=>x0+(x1-x0)*(N-0.5)/6,Y=v=>y0-(y0-y1)*v/ymax;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');
+  for(let v=0;v<=ymax;v+=ymax/5){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v.toFixed(0),x0-6,Y(v)+4);}
+  g.textAlign='center';for(let N=1;N<=6;N++)g.fillText('N = '+N,X(N),y0+18);g.textAlign='start';g.fillText('件 / h',8,y1-6);g.textAlign='center';
+  const ns=(ST.a+ST.m)/(ST.a+ST.w);if(ns<=6.5){g.strokeStyle=css('--warn');g.setLineDash([5,4]);g.beginPath();g.moveTo(X(ns),y1);g.lineTo(X(ns),y0);g.stroke();g.setLineDash([]);g.fillStyle=css('--warn');g.fillText(`N* = ${ns.toFixed(2)}`,X(ns),y1+12);}
+  g.strokeStyle=css('--ink');g.lineWidth=2;g.beginPath();pts.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1])));g.stroke();
+  if(ST.cv>0)for(const p of pts){g.fillStyle=css('--bt');g.beginPath();g.arc(X(p[0]),Y(p[2]),5,0,7);g.fill();}
+  const cur=pts[ST.N-1];g.strokeStyle=css('--accent');g.lineWidth=2.5;g.beginPath();g.arc(X(cur[0]),Y(ST.cv>0?cur[2]:cur[1]),9,0,7);g.stroke();
+  g.textAlign='start';g.lineWidth=1;}
+function frame(ts){if(last!==null&&playing){tPlay+=(ts-last)/100;if(tPlay>LOG_T-1)tPlay=0;}last=ts;drawFloor();drawGantt();requestAnimationFrame(frame);}
+let LOG_T=600;
+// ---------- controls ----------
+const fmt={N:v=>v+' 台',a:v=>v.toFixed(1),m:v=>v.toFixed(0),w:v=>v.toFixed(1),cv:v=>v.toFixed(2)};
+function syncUI(){for(const k in fmt){$(k).value=ST[k];$(k+'v').textContent=fmt[k](ST[k]);}}
+function changed(){syncUI();R_=evaluate();LOG=sim(ST.N,ST.a,ST.m,ST.w,ST.cv,LOG_T,3,true).ev;tPlay=Math.min(tPlay,LOG_T-1);render();drawCurve();drawFloor();drawGantt();note();checkTasks();}
+for(const k in fmt)$(k).addEventListener('input',()=>{ST[k]=+$(k).value;changed();});
+$('reset').onclick=()=>{Object.assign(ST,STD);changed();};
+$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'暂停':'播放';};
+$('restart').onclick=()=>{tPlay=0;playing=true;$('play').textContent='暂停';};
+// ---------- tasks ----------
+const seen={ns:false,cv2:null,cv3:null,cfg:new Set()};
+function note(){const key=`${ST.N}|${ST.a}|${ST.m}|${ST.w}|${ST.cv}`;
+  if(ST.m===12&&ST.w===2&&ST.cv>=0.3&&ST.a===5){if(ST.N===2)seen.cv2=R_.s.out;if(ST.N===3)seen.cv3=R_.s.out;}
+  if(ST.m===12&&ST.w===2&&ST.cv===0)seen.cfg.add(`${ST.N}|${ST.a}`);}
+const TASKS=[
+  {t:'在标准参数下（a = 5 s，m = 12 s，w = 2 s），算出平衡点 N*，并在 N = 1 到 4 之间拖动，看产量曲线在哪里变平。',d:'填写 N* 后按“核对”（±0.02）。N* 不是整数时，实际该选 2 台还是 3 台？',ok:()=>seen.ns},
+  {t:'把时间波动调到 0.30 以上，分别看 N = 2 和 N = 3 的产量比没有波动时少了多少。',d:'两种台数都要看到（a、m、w 保持标准）。为什么台数接近 N* 的一边受波动影响更大？',ok:()=>seen.cv2!==null&&seen.cv3!==null},
+  {t:'从 N = 2 出发比较两种改进：多给工人一台机器（N = 3），或者用夹具把装卸缩短到 3.5 s；再看两项一起做。',d:'没有波动、m 和 w 保持标准，三种组合都要试到。哪一项单独做更划算？一起做为什么比两者之和还多？',ok:()=>['3|5','2|3.5','3|3.5'].every(k=>seen.cfg.has(k))}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+$('nsChk').onclick=()=>{const v=+$('ns').value,ns=(STD.a+STD.m)/(STD.a+STD.w);
+  if($('ns').value!==''&&Math.abs(v-ns)<=0.02){seen.ns=true;$('msg').textContent=`正确：N* = (5+12)/(5+2) ≈ ${ns.toFixed(2)}。看 2 台时机器每循环等人 0 s、人空闲 3 s（忙碌率 82%）；看 3 台时人不停，但每台机器每循环要等人 4 s。按台时产量选 3 台（514 件对 424 件），按每台机器的利用率选 2 台。`;}
+  else $('msg').textContent='还不对：一个循环里，一台机器要“装卸 + 自动缝”，人要给 N 台各“走一段 + 装卸一次”，让两者相等。';checkTasks();};
+window.__api={ST,STD,evaluate,changed,done,seen,det,sim,ns:v=>{$('ns').value=v;$('nsChk').click();}};
+changed();requestAnimationFrame(frame);
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.col h4{margin:0 0 8px;font-size:14px;color:#5a6570;letter-spacing:.05em}
+.col .box{margin-bottom:10px;text-align:left}
+.box b{font-size:14.5px}
+.box span.id{display:inline;font-size:11.5px}
+.id{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11.5px;color:#5a6570}
+.bus{margin-top:6px;border:2px dashed #14797f;border-radius:10px;padding:8px 12px;font-size:13px;color:#0f6e74;text-align:center;background:#e6f3f3}
+.legend{display:flex;gap:18px;font-size:12.5px;color:#5a6570;margin-top:12px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+</style>
+<div class="fig" style="--w:1120px">
+<p class="title">花样机原型 WQ-SC/PS 的构成</p>
+<p class="sub">示意。左：机械（自制 X–Y 平台 + 现成平缝机头）；中：驱动与执行；右：控制与联网。编号带 * 的是建议编号、计划入库</p>
+<div class="grid">
+<div class="col"><h4>机械（行程 300 × 200 mm）</h4>
+<div class="box o fill-o"><b>X 轴：压框滑座</b><span>滚珠丝杠 16×10 <span class="id">A-BSC-SFU</span>；直线导轨 15 型 <span class="id">A-LGD-RAIL</span>；电机经 1:1 同步带 <span class="id">A-PUL-HTD 3M-20</span>；运动质量约 4 kg</span></div>
+<div class="box g fill-g"><b>Y 轴：横梁（带着整个 X 轴）</b><span>同上规格，导轨两条；运动质量约 12 kg</span></div>
+<div class="box"><b>压框与模板</b><span>上下两片模板，2 个双作用气缸 <span class="id">D-PNU-CYL*</span>，磁性开关确认压下</span></div>
+<div class="box"><b>平缝机头（现成）</b><span>去掉送布牙；加中压脚、剪线、拨线（与 WQ-SC/LS 相同）</span></div>
+</div>
+<div class="col"><h4>驱动与执行</h4>
+<div class="box b fill-b"><b>主轴伺服 + 编码器</b><span>与平缝机原型同一模块 <span class="id">D-MOT-PMSM* / D-DRV-SERVO*</span>，2500 线 Z 相</span></div>
+<div class="box o"><b>X、Y 伺服 400 W ×2</b><span><span class="id">D-MOT-PMSM* + D-DRV-SERVO*</span>，CAN FD，位置模式，编码器 10000 计数/转 → 1 μm</span></div>
+<div class="box p"><b>电磁铁 ×3</b><span>剪线、拨线、松线 <span class="id">D-SOL-PUSH*</span>；驱动板 <span class="id">D-DRV-SOL*</span>（强激磁 + 斩波维持 + 稳压管续流）</span></div>
+<div class="box y"><b>电磁阀 ×3</b><span>压框左、右，中压脚抬起 <span class="id">D-PNU-VLV*</span></span></div>
+<div class="box"><b>传感器</b><span>X、Y 原点与限位 <span class="id">D-SNS-PROX*</span>；断线光电 <span class="id">D-SNS-PE*</span>；气压开关；急停</span></div>
+</div>
+<div class="col"><h4>控制与联网</h4>
+<div class="box k fill-k"><b>WQ-SC 主控</b><span><span class="id">D-CTL-WQSC*</span>：主轴编码器接口、角度中断；1 ms X–Y 插补；花样解析与前瞻</span></div>
+<div class="box"><b>CAN FD 扩展 I/O</b><span><span class="id">D-IO-EXP*</span>：气阀、传感器、按钮</span></div>
+<div class="box t"><b>网关</b><span><span class="id">D-GW-WQSC*</span>：网页参数、花样文件下发；MQTT 上报 wq/sewing/…</span></div>
+<div class="box"><b>脚踏 / 启动按钮、触摸屏（可选）</b><span><span class="id">D-SNS-HALL* / D-HMI-PANEL*</span></span></div>
+<div class="box"><b>电源</b><span>48 V / 24 V 开关电源 <span class="id">D-PSU-SMPS*</span>；伺服用 220 V 交流</span></div>
+</div>
+</div>
+<div class="bus">CAN FD 总线：主控 ⇄ 主轴驱动 ⇄ X 驱动 ⇄ Y 驱动 ⇄ 扩展 I/O；主轴编码器 A/B/Z 差分信号另外直接接主控（角度基准不走总线）</div>
+<div class="legend"><span><i style="background:#fcefe8;border:2px solid #e0662f"></i>X 轴</span><span><i style="background:#eaf6ee;border:2px solid #2e9e5b"></i>Y 轴</span><span><i style="background:#e9f0fc;border:2px solid #2a6fdb"></i>与平缝机原型共用</span><span>* 建议编号，计划入库</span></div>
+</div>

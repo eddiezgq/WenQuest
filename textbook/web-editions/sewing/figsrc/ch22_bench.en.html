@@ -1,0 +1,47 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.g3{display:grid;grid-template-columns:250px 40px 330px 40px 1fr;align-items:stretch}
+.col{display:flex;flex-direction:column;gap:10px}
+.box{text-align:left}
+.ar{display:flex;align-items:center;justify-content:center;color:#5a6570;font-size:22px}
+.id{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11.5px;color:#7444b4}
+.kit{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.kit .box{font-size:12.5px}
+.kit .box span{text-align:left}
+.mid{justify-content:flex-start}.mid .box+.box{margin-top:22px;position:relative}.mid .box+.box:before{content:"↕";position:absolute;top:-30px;left:50%;color:#5a6570;font-size:18px}
+.lbl{font-size:12px;color:#5a6570;font-weight:700;letter-spacing:.06em;margin:0 0 6px}
+</style>
+<div class="fig" style="--w:1280px">
+<p class="title">A universal test bench: one set of instruments, four prototypes</p><p class="sub">The test PC sends commands and reads measurements through the gateway; the bench modules measure the "true" values and compare them with what the prototype reports. Changing over means changing only the head adaptor and the wiring configuration (illustrative; module IDs are proposed IDs, planned for the library)</p>
+<div class="g3">
+<div class="col"><p class="lbl">TEST PC AND DIGITAL FACTORY</p>
+<div class="box k fill-k"><b>Test PC</b><span>Python + pytest; cases, criteria, reports</span></div>
+<div class="box t fill-t"><b>Digital-factory bus</b><span class="mono" style="font-size:11.5px">wq/sewing/lab/tb-01/measurement</span><span>results → historian</span></div>
+<div class="box"><b>CI server</b><span>nightly queue, bisection, alerts</span></div>
+</div>
+<div class="ar">⇄</div>
+<div class="col mid"><p class="lbl">PROTOTYPE UNDER TEST (DUT)</p>
+<div class="box b fill-b"><b>Gateway D-GW-WQSC</b><span>MQTT / web API: commands, parameters, firmware version</span></div>
+<div class="box k fill-k"><b>WQ-SC controller D-CTL-WQSC</b><span>firmware + parameter table (the object under test)</span></div>
+<div class="box"><b>Drive layer</b><span>servo drive, stepper drives, solenoid driver board</span></div>
+<div class="box o fill-o"><b>Head / table / scaled knitter</b><span>emulated on the HIL rig, real on the machine bench</span></div>
+</div>
+<div class="ar">⇄</div>
+<div class="col"><p class="lbl">BENCH MODULES (PROPOSED IDs, PLANNED FOR THE LIBRARY)</p>
+<div class="box p"><b>Load motor and dynamometer <span class="id">D-TB-LOAD</span></b><span>coupled to the spindle by jaw coupling A-CPL-JAW: applies load torque, measures torque and speed</span></div>
+<div class="box p"><b>Encoder signal emulator <span class="id">D-TB-ENCEMU</span></b><span>generates A/B/Z (10 000 counts/rev) for HIL; can inject loss and jitter</span></div>
+<div class="box p"><b>HIL real-time simulator <span class="id">D-TB-HIL</span></b><span>spindle motion from the measured torque–speed curve, ≥ 1 kHz</span></div>
+<div class="box p"><b>Data acquisition + current probes <span class="id">D-TB-DAQ</span></b><span>coil current, DC-link voltage, encoder and commands sampled together</span></div>
+<div class="box p"><b>Stroke sensor <span class="id">D-TB-STROKE</span></b><span>solenoid plunger travel → pull-in / release instants</span></div>
+<div class="box p"><b>Stitch camera <span class="id">D-TB-CAM</span></b><span>needle-penetration positions, backtack alignment, skips, tail length</span></div>
+<div class="box p"><b>Temperature logger <span class="id">D-TB-TEMP</span></b><span>motor, heat sink, solenoid coils, ambient</span></div>
+</div>
+</div>
+<div class="kit">
+<div class="box g fill-g"><b>Lockstitch WQ-SC/LS</b><span>head adaptor plate + spindle coupling; tests: stop, trimming, backtack, solenoids, 4 h temperature rise</span></div>
+<div class="box g fill-g"><b>Overlock WQ-SC/OL</b><span>same load motor, different adaptor; tests: stop, differential ratio, knife and wiper timing</span></div>
+<div class="box g fill-g"><b>Pattern sewer WQ-SC/PS</b><span>X–Y axes with linear scales/laser displacement; tests: following error, motion while the needle is in the fabric</span></div>
+<div class="box g fill-g"><b>Scaled knitter WQ-SC/FK</b><span>carriage-position encoder emulation + selector stroke; tests: selection timing error</span></div>
+</div>
+<p class="note">How the change-over works: mechanically only the "adaptor plate + coupling" is changed; electrically the same numbered connectors are used; in software each prototype has one test configuration file (wiring table, HAL drivers, test-case set). The test scripts themselves do not change.</p>
+</div>

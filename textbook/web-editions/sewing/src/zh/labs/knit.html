@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>横机编织仿真实验</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: machine + fabric on the left, pattern editor / parameters / results on the right; stacks on phones */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --bad:#d1495b; --y1:#2f6fd6; --y2:#e0662f; --bed:#c9d0d6; --car:#4b5560; --ghost:#9aa4ae; --cell:#ffffff;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--y1:#6ea8ff;--y2:#ff8c55;--bed:#3a4652;--car:#8b97a4;--ghost:#5d6b7a;--cell:#1f2833;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--y1:#6ea8ff;--y2:#ff8c55;--bed:#3a4652;--car:#8b97a4;--ghost:#5d6b7a;--cell:#1f2833;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:16px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+canvas{display:block;width:100%;height:auto}
+.ctl{display:grid;grid-template-columns:auto minmax(0,1fr) 6em;gap:6px 10px;align-items:center}
+.ctl label{font-size:.88rem;color:var(--muted)}
+.ctl b{font-family:var(--f-mono);font-size:.9rem;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+select{font:inherit;font-size:.88rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px;max-width:100%}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)} button.primary{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;border-radius:0}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1.02rem;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted);font-size:.74rem;line-height:1.3;display:block}
+.bad{color:var(--bad)} .good{color:var(--y1)}
+.note{font-size:.78rem;color:var(--muted);margin:6px 0 0}
+.editor{display:grid;gap:2px;user-select:none;touch-action:manipulation}
+.editor button.c{padding:0;height:20px;font-size:.7rem;font-family:var(--f-mono);border-radius:3px;line-height:1}
+.editor button.rl{padding:0 4px;height:20px;font-size:.7rem;border-radius:3px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.76rem;color:var(--muted);margin-top:6px}
+.tasks{margin:6px 0 0;padding-left:1.2em;font-size:.88rem}
+.tasks li{margin:4px 0}
+</style>
+<div class="wrap">
+<header><h1>横机编织仿真实验</h1><span class="sub">《缝纫机设计与制造》第 17 章 · 虚拟实验 17-1 · 机头每经过一枚针，选针器都要在对的位置作一次决定</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>针床与机头（俯视，每格一枚针；红点为选针位置误差超限的针）</h3>
+      <canvas id="bed" width="900" height="250" aria-label="针床、机头与选针动画"></canvas>
+      <div class="row">
+        <button id="play" class="primary" type="button">开始编织</button>
+        <button id="stepc" type="button">只织一行</button>
+        <button id="reset" type="button">清空织物</button>
+        <span class="note" style="margin:0">慢放</span>
+        <span class="seg" role="group" aria-label="慢放倍数"><button type="button" data-slow="5" aria-pressed="false">5×</button><button type="button" data-slow="20" aria-pressed="true">20×</button><button type="button" data-slow="80" aria-pressed="false">80×</button></span>
+      </div>
+    </section>
+    <section class="panel">
+      <h3>织物（线圈示意，从下往上织）</h3>
+      <canvas id="fab" width="900" height="420" aria-label="生成的线圈图"></canvas>
+      <div class="legend"><span>V：前床编织（正面线圈）</span><span>—：后床编织（反面线圈）</span><span>U：集圈</span><span>虚线：不编织（浮线）</span><span style="color:var(--bad)">红框：错选</span></div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>花型（每行一个横列；点格子切换 K 前编 / P 后编 / T 集圈 / · 不织；点行号换纱嘴）</h3>
+      <div class="row" style="margin-top:0">
+        <label class="note" style="margin:0" for="preset">预设</label>
+        <select id="preset">
+          <option value="jersey">平针</option>
+          <option value="rib11">1×1 罗纹</option>
+          <option value="rib22">2×2 罗纹</option>
+          <option value="tuck">集圈（每隔一针集圈）</option>
+          <option value="jac" selected>两色提花（菱形）</option>
+        </select>
+      </div>
+      <div id="editor" class="editor" style="margin-top:8px"></div>
+    </section>
+    <section class="panel">
+      <h3>参数</h3>
+      <div class="ctl">
+        <label for="E">机号 E</label><input id="E" type="range" min="3" max="18" step="1" value="12"><b id="Ev">E12</b>
+        <label for="v">机头最高速度</label><input id="v" type="range" min="0.2" max="1.6" step="0.1" value="1.2"><b id="vv">1.2 m/s</b>
+        <label for="a">机头加速度</label><input id="a" type="range" min="2" max="30" step="1" value="10"><b id="av">10 m/s²</b>
+        <label for="c">换向余量</label><input id="c" type="range" min="10" max="200" step="10" value="40"><b id="cv">40 mm</b>
+        <label for="td">选针器延迟</label><input id="td" type="range" min="0.1" max="1.5" step="0.1" value="0.8"><b id="tdv">0.8 ms</b>
+        <label>提前量</label><span class="seg" role="group" aria-label="提前量补偿方式"><button type="button" data-comp="none" aria-pressed="false">不补偿</button><button type="button" data-comp="fixed" aria-pressed="true">固定</button><button type="button" data-comp="rt" aria-pressed="false">按实时速度</button></span><span></span>
+      </div>
+      <p class="note">换向余量：选针点越过织物边缘后到换向点的距离（实际机器还要加上三角座的长度，这里忽略）。允许误差取 0.25 个针距；“按实时速度”一项假设延迟有 10% 的不确定性。数值均为示例。</p>
+    </section>
+    <section class="panel">
+      <h3>结果</h3>
+      <div class="kpi">
+        <div><b id="k-p">2.12</b><small>针距 p mm</small></div>
+        <div><b id="k-tn">1.76</b><small>每针时间 t_n ms<br>（全速）</small></div>
+        <div><b id="k-lag">0.34</b><small>延迟走过的距离<br>v·T_d / p</small></div>
+        <div><b id="k-max">—</b><small>最大选针误差 / p</small></div>
+        <div><b id="k-err">—</b><small>每行错选针数<br>（宽 24 针）</small></div>
+        <div><b id="k-acc">—</b><small>加速距离 v²/2a mm</small></div>
+        <div><b id="k-ct">—</b><small>一行用时 s</small></div>
+        <div><b id="k-panel">—</b><small>275 针 × 760 行估算 min<br>（不含三角座长度）</small></div>
+      </div>
+      <p class="note" id="verdict"></p>
+    </section>
+    <section class="panel">
+      <h3>实验任务</h3>
+      <ol class="tasks">
+        <li>选“不补偿”，把机头速度从 0.4 m/s 逐步提高：多快开始出现错选？用 t_n = p/v 和 v·T_d 解释。</li>
+        <li>选“固定提前量”，把换向余量从 200 mm 减到 10 mm：错选出现在织物的哪一侧、哪几针？为什么？</li>
+        <li>改用“按实时速度”，把机号从 E7 调到 E16，在不出错的前提下机头最多能跑多快？</li>
+        <li>两色提花：比较换向余量 40 mm 与 150 mm 时的一行用时和整片估算时间，写下余量取多大合适。</li>
+      </ol>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const N = 24, ROWS = 12, TOL = 0.25;
+const P = { E:12, v:1.2, a:10, c:40, td:0.8, comp:'fixed', slow:20 };
+let pat = [], car = [];           // pat[r] = string of N chars; car[r] = 1 | 2
+let fabric = [];                   // completed courses: {cells:[...], car, err:[bool]}
+let playing = false, oneRow = false, lastT = 0;
+let course = 0, dir = 1, xc = 0, vc = 0, phase = 'idle'; // carriage state (mm)
+let fired = [];                    // per needle in current pass: {done, err}
+
+// ---------- presets ----------
+function preset(name){
+  pat = []; car = [];
+  for (let r = 0; r < ROWS; r++){
+    let s = '';
+    for (let i = 0; i < N; i++){
+      if (name === 'jersey') s += 'K';
+      else if (name === 'rib11') s += i % 2 ? 'P' : 'K';
+      else if (name === 'rib22') s += (i % 4) < 2 ? 'K' : 'P';
+      else if (name === 'tuck') s += (r % 2 === 1 && i % 2 === 0) ? 'T' : 'K';
+      else s += 'K';
+    }
+    pat.push(s); car.push(1);
+  }
+  if (name === 'jac'){
+    const motif = ['000001100000','000011110000','000111111000','001111111100','000111111000','000011110000'];
+    pat = []; car = [];
+    for (let r = 0; r < 2; r++){ pat.push(Array.from({length:N}, (_, i) => (i % 4) < 2 ? 'K' : 'P').join('')); car.push(1); }
+    for (let m = 0; m < 5; m++){
+      const bits = (motif[m] + motif[m]);
+      pat.push(Array.from(bits).map(b => b === '1' ? '.' : 'K').join('')); car.push(1);
+      pat.push(Array.from(bits).map(b => b === '1' ? 'K' : '.').join('')); car.push(2);
+    }
+  }
+  while (pat.length < ROWS){ pat.push('K'.repeat(N)); car.push(1); }
+  pat = pat.slice(0, ROWS); car = car.slice(0, ROWS);
+  buildEditor();
+}
+// ---------- editor ----------
+const NEXT = { K:'P', P:'T', T:'.', '.':'K' };
+function buildEditor(){
+  const ed = $('editor'); ed.innerHTML = '';
+  ed.style.gridTemplateColumns = `2.4em repeat(${N}, minmax(0,1fr))`;
+  for (let r = ROWS - 1; r >= 0; r--){
+    const rl = document.createElement('button'); rl.type = 'button'; rl.className = 'rl';
+    rl.textContent = `${r + 1}·${car[r]}`; rl.title = `第 ${r + 1} 行，纱嘴 ${car[r]}（点击切换）`;
+    rl.style.color = car[r] === 1 ? css('--y1') : css('--y2');
+    rl.addEventListener('click', () => { car[r] = car[r] === 1 ? 2 : 1; buildEditor(); });
+    ed.appendChild(rl);
+    for (let i = 0; i < N; i++){
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'c';
+      const ch = pat[r][i]; b.textContent = ch === '.' ? '·' : ch;
+      b.style.background = ch === 'K' ? 'color-mix(in srgb, ' + (car[r] === 1 ? css('--y1') : css('--y2')) + ' 30%, transparent)' : ch === 'P' ? 'color-mix(in srgb, ' + css('--ghost') + ' 35%, transparent)' : ch === 'T' ? 'color-mix(in srgb, ' + css('--accent') + ' 25%, transparent)' : 'transparent';
+      b.setAttribute('aria-label', `第 ${r + 1} 行第 ${i + 1} 针：${ch}`);
+      b.addEventListener('click', () => { pat[r] = pat[r].slice(0, i) + NEXT[ch] + pat[r].slice(i + 1); buildEditor(); });
+      ed.appendChild(b);
+    }
+  }
+}
+
+// ---------- physics ----------
+const pitch = () => 25.4 / P.E;
+const width = () => N * pitch();
+function speedAt(s){ // s = distance from the reversal point along the pass (mm); symmetric accel / decel
+  const D = width() + 2 * P.c; const vmax = P.v; const sa = vmax * vmax / (2 * P.a) * 1000; // mm
+  const d = Math.min(s, D - s);
+  return Math.min(vmax, Math.sqrt(Math.max(0, 2 * P.a * d / 1000)));
+}
+function selErr(v){
+  const tdS = P.td / 1000, p = pitch() / 1000;
+  if (P.comp === 'none') return v * tdS / p;
+  if (P.comp === 'fixed') return Math.abs(P.v - v) * tdS / p;
+  return 0.1 * v * tdS / p;
+}
+function courseTime(){
+  const D = (width() + 2 * P.c) / 1000, sa = P.v * P.v / (2 * P.a);
+  if (2 * sa >= D) return 2 * Math.sqrt(D / P.a);
+  return D / P.v + P.v / P.a;
+}
+function needleErrors(){ // error of each needle in a pass in +x direction (symmetric for -x)
+  const out = []; for (let i = 0; i < N; i++){ const s = P.c + (i + .5) * pitch(); out.push(selErr(speedAt(s))); } return out;
+}
+function report(){
+  const p = pitch(), errs = needleErrors(), mx = Math.max(...errs), nbad = errs.filter(e => e > TOL).length;
+  $('k-p').textContent = p.toFixed(2);
+  $('k-tn').textContent = (p / P.v).toFixed(2);
+  $('k-lag').textContent = (P.v * P.td / p).toFixed(2);
+  $('k-max').textContent = mx.toFixed(2); $('k-max').className = mx > TOL ? 'bad' : 'good';
+  $('k-err').textContent = nbad; $('k-err').className = nbad ? 'bad' : 'good';
+  $('k-acc').textContent = (P.v * P.v / (2 * P.a) * 1000).toFixed(0);
+  const ct = courseTime(); $('k-ct').textContent = ct.toFixed(2);
+  // estimate for a 275-needle panel, 760 passes (17.8 example)
+  const D = (275 * p + 2 * P.c) / 1000, sa = P.v * P.v / (2 * P.a);
+  const t1 = 2 * sa >= D ? 2 * Math.sqrt(D / P.a) : D / P.v + P.v / P.a;
+  $('k-panel').textContent = (t1 * 760 / 60).toFixed(1);
+  $('verdict').textContent = nbad ? `每行有 ${nbad} 枚针的选针位置误差超过 0.25 个针距，织物上会出现错针（红框）。` : '所有针的选针位置误差都在允许范围内。';
+}
+
+// ---------- drawing ----------
+const bed = $('bed'), bg = bed.getContext('2d'), fab = $('fab'), fg = fab.getContext('2d');
+function drawBed(){
+  const w = bed.width, h = bed.height; bg.clearRect(0, 0, w, h);
+  const mmToPx = (w - 120) / (width() + 2 * P.c);
+  const L = 60 + P.c * mmToPx, R = L + width() * mmToPx, cw = (R - L) / N; // needle cells on screen
+  const xs = mm => L + mm * mmToPx;
+  // reversal zones
+  const cpx = P.c * mmToPx;
+  bg.fillStyle = css('--rule'); bg.globalAlpha = .5; bg.fillRect(L - cpx, 40, cpx, 150); bg.fillRect(R, 40, cpx, 150); bg.globalAlpha = 1;
+  // beds
+  bg.fillStyle = css('--bed'); bg.fillRect(L - 4, 60, R - L + 8, 40); bg.fillRect(L - 4, 130, R - L + 8, 40);
+  bg.fillStyle = css('--muted'); bg.font = '18px ' + css('--f-body');
+  bg.fillText('后床', 8, 86); bg.fillText('前床', 8, 156);
+  const row = pat[course % ROWS] || '';
+  for (let i = 0; i < N; i++){
+    const x = L + (i + .5) * cw, ch = row[i];
+    const f = fired[i];
+    const up = f && f.done ? (ch === 'K' || ch === 'P' ? 18 : ch === 'T' ? 10 : 0) : 0;
+    // front needle
+    bg.strokeStyle = (ch === 'K' || ch === 'T') && f && f.done ? css(car[course % ROWS] === 1 ? '--y1' : '--y2') : css('--ghost');
+    bg.lineWidth = 3; bg.beginPath(); bg.moveTo(x, 168); bg.lineTo(x, 136 - (ch !== 'P' ? up : 0)); bg.stroke();
+    // back needle
+    bg.strokeStyle = ch === 'P' && f && f.done ? css(car[course % ROWS] === 1 ? '--y1' : '--y2') : css('--ghost');
+    bg.beginPath(); bg.moveTo(x, 62); bg.lineTo(x, 94 + (ch === 'P' ? up : 0)); bg.stroke();
+    if (f && f.done && f.err){ bg.fillStyle = css('--bad'); bg.beginPath(); bg.arc(x, 116, 6, 0, 7); bg.fill(); }
+  }
+  // carriage
+  if (phase !== 'idle'){
+    const cx = xs(xc), half = 46;
+    bg.fillStyle = css('--car'); bg.globalAlpha = .35; bg.fillRect(cx - half, 44, 2 * half, 142); bg.globalAlpha = 1;
+    bg.strokeStyle = css('--car'); bg.lineWidth = 2; bg.strokeRect(cx - half, 44, 2 * half, 142);
+    bg.fillStyle = css('--bad'); bg.fillRect(cx - 2, 40, 4, 150);
+    bg.fillStyle = css('--ink'); bg.font = '16px ' + css('--f-body'); bg.textAlign = 'center';
+    bg.fillText(`选针点  ${vc.toFixed(2)} m/s`, Math.min(w - 90, Math.max(90, cx)), 32); bg.textAlign = 'left';
+    // yarn carrier
+    bg.fillStyle = css(car[course % ROWS] === 1 ? '--y1' : '--y2'); bg.beginPath(); bg.arc(cx - dir * 30, 116, 7, 0, 7); bg.fill();
+  }
+  bg.fillStyle = css('--muted'); bg.font = '16px ' + css('--f-body');
+  bg.fillText(`第 ${course + 1} 行  纱嘴 ${car[course % ROWS] || 1}  方向 ${dir > 0 ? '→' : '←'}`, 60, h - 34);
+  bg.fillText('灰色区域：换向余量（机头在这里减速、换向、再加速）', 60, h - 12);
+}
+function drawFabric(){
+  const w = fab.width, h = fab.height; fg.clearRect(0, 0, w, h);
+  const L = 70, R = w - 70, cw = (R - L) / N, rh = Math.min(30, (h - 30) / Math.max(ROWS, 12));
+  fg.fillStyle = css('--muted'); fg.font = '15px ' + css('--f-mono');
+  const shown = fabric.slice(-12);
+  shown.forEach((c, k) => {
+    const y = h - 20 - (k + 1) * rh;
+    fg.fillText(String(fabric.length - shown.length + k + 1), 20, y + rh * .7);
+    const col = css(c.car === 1 ? '--y1' : '--y2');
+    for (let i = 0; i < N; i++){
+      const x = L + i * cw, ch = c.cells[i];
+      fg.strokeStyle = col; fg.lineWidth = 2.6; fg.setLineDash([]);
+      fg.beginPath();
+      if (ch === 'K'){ fg.moveTo(x + cw * .18, y + rh * .15); fg.lineTo(x + cw * .5, y + rh * .85); fg.lineTo(x + cw * .82, y + rh * .15); }
+      else if (ch === 'P'){ fg.moveTo(x + cw * .15, y + rh * .5); fg.lineTo(x + cw * .85, y + rh * .5); }
+      else if (ch === 'T'){ fg.moveTo(x + cw * .25, y - rh * .2); fg.lineTo(x + cw * .25, y + rh * .7); fg.quadraticCurveTo(x + cw * .5, y + rh * 1.0, x + cw * .75, y + rh * .7); fg.lineTo(x + cw * .75, y - rh * .2); }
+      else { fg.setLineDash([4, 3]); fg.globalAlpha = .55; fg.moveTo(x, y + rh * .3); fg.lineTo(x + cw, y + rh * .3); }
+      fg.stroke(); fg.globalAlpha = 1; fg.setLineDash([]);
+      if (c.err[i]){ fg.strokeStyle = css('--bad'); fg.lineWidth = 2; fg.strokeRect(x + 2, y + 1, cw - 4, rh - 2); }
+    }
+  });
+  if (!fabric.length){ fg.fillStyle = css('--muted'); fg.font = '18px ' + css('--f-body'); fg.fillText('点“开始编织”，机头每走一趟织一行', L, h / 2); }
+}
+
+// ---------- animation ----------
+function startPass(){
+  dir = course % 2 === 0 ? 1 : -1;
+  xc = dir > 0 ? -P.c : width() + P.c; vc = 0; phase = 'run';
+  fired = Array.from({length:N}, () => ({ done:false, err:false }));
+}
+function finishPass(){
+  const r = course % ROWS;
+  fabric.push({ cells: pat[r].split(''), car: car[r], err: fired.map(f => f.err) });
+  course++; phase = 'idle';
+  drawFabric();
+  if (oneRow){ oneRow = false; playing = false; $('play').textContent = '开始编织'; }
+}
+function tick(ts){
+  if (!playing){ lastT = 0; drawBed(); return; }
+  if (!lastT) lastT = ts; const dt = Math.min(.05, (ts - lastT) / 1000) / P.slow; lastT = ts;
+  if (phase === 'idle') startPass();
+  const D = width() + 2 * P.c;
+  const s = dir > 0 ? xc + P.c : width() + P.c - xc;           // distance travelled in this pass
+  vc = Math.max(0.02, speedAt(s));
+  xc += dir * vc * dt * 1000;
+  // fire selection for needles the selection point has passed
+  for (let i = 0; i < N; i++){
+    const xi = (i + .5) * pitch();
+    if (!fired[i].done && (dir > 0 ? xc >= xi : xc <= xi)){
+      const sNeedle = dir > 0 ? xi + P.c : width() + P.c - xi;
+      fired[i].done = true; fired[i].err = selErr(speedAt(sNeedle)) > TOL;
+    }
+  }
+  if ((dir > 0 && xc >= width() + P.c) || (dir < 0 && xc <= -P.c)) finishPass();
+  drawBed();
+  requestAnimationFrame(tick);
+}
+
+// ---------- wiring ----------
+function bind(id, key, fmt){ const el = $(id), out = $(id + 'v'); const upd = () => { P[key] = +el.value; out.textContent = fmt(P[key]); report(); drawBed(); }; el.addEventListener('input', upd); P[key] = +el.value; out.textContent = fmt(P[key]); }
+bind('E', 'E', v => 'E' + v);
+bind('v', 'v', v => v.toFixed(1) + ' m/s');
+bind('a', 'a', v => v + ' m/s²');
+bind('c', 'c', v => v + ' mm');
+bind('td', 'td', v => v.toFixed(1) + ' ms');
+document.querySelectorAll('[data-comp]').forEach(b => b.addEventListener('click', () => { P.comp = b.dataset.comp; document.querySelectorAll('[data-comp]').forEach(x => x.setAttribute('aria-pressed', x === b)); report(); }));
+document.querySelectorAll('[data-slow]').forEach(b => b.addEventListener('click', () => { P.slow = +b.dataset.slow; document.querySelectorAll('[data-slow]').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+$('preset').addEventListener('change', e => { preset(e.target.value); fabric = []; course = 0; phase = 'idle'; drawFabric(); drawBed(); });
+$('play').addEventListener('click', () => { playing = !playing; oneRow = false; $('play').textContent = playing ? '暂停' : '开始编织'; if (playing) requestAnimationFrame(tick); });
+$('stepc').addEventListener('click', () => { if (playing && !oneRow) return; oneRow = true; if (!playing){ playing = true; $('play').textContent = '暂停'; requestAnimationFrame(tick); } });
+$('reset').addEventListener('click', () => { fabric = []; course = 0; phase = 'idle'; drawFabric(); drawBed(); });
+preset('jac'); report(); drawBed(); drawFabric();
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

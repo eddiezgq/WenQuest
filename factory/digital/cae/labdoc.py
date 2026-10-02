@@ -6,7 +6,8 @@ import re
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GUIDE_MD = os.path.join(HERE, "实验8_输出轴强度与疲劳校核.md")
-GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节力矩与电机选型.md")}
+GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节力矩与电机选型.md"),
+          "lab10": os.path.join(HERE, "实验10_输出轴数控车削与键槽铣削编程.md")}
 
 
 def _doc():
@@ -90,6 +91,8 @@ def guide_docx(lab="lab8"):
 def report_template_docx(lab="lab8"):
     if lab == "lab9":
         return lab9_template()
+    if lab == "lab10":
+        return lab10_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -205,6 +208,63 @@ def lab9_template():
     d.add_paragraph("")
     d.add_heading("六、附件", 1)
     d.add_paragraph("平台生成的动力学报告、有限元报告（Word）。", style="List Bullet")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab10_template():
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 10　输出轴数控车削与键槽铣削编程　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、粗车编程单（任务 1）", 1)
+    table([["部位", "图纸尺寸", "粗车工序尺寸", "编程直径（平台）", "编程直径（手算）", "说明"],
+           ["轴承位", "Ø35 k6", "Ø36.5 0/−0.25", "", "", ""], ["齿轮位", "Ø40 k6", "Ø41.5 0/−0.25", "", "", ""],
+           ["轴伸", "Ø30", "（未列）", "", "", "其余直径加的余量 ="]])
+    table([["项目", "平台", "手算"], ["端面余量（每端）mm", "", ""], ["车端面刀数", "", ""], ["Ø50 处转速 r/min", "", ""],
+           ["Ø31.09 处转速 r/min", "", ""], ["G50 限速什么时候起作用", "", ""]])
+    hint("说明为什么编程直径取公差带中间；为什么一道粗车工序要两次装夹、两个程序。")
+    d.add_heading("二、程序读懂（任务 1、3、4）", 1)
+    table([["程序段（行号）", "在干什么", "关键指令和参数"], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""]])
+    hint("至少说明：安全行、换刀与主轴（G50、G96）、分层粗车、沿轮廓去台阶、精车轮廓、键槽斜线下刀、程序结尾。")
+    d.add_heading("三、试切检查（任务 2）", 1)
+    table([["项目", "O1201 右端", "O1202 左端", "合计"], ["仿真与本工序尺寸的差 mm", "", "", ""], ["切削时间", "", "", ""],
+           ["快移时间", "", "", ""], ["换刀时间", "", "", ""], ["程序合计", "", "", ""]])
+    table([["对比", "分钟"], ["程序合计", ""], ["基本时间公式 t_b = L·i/(n·f)", ""], ["工艺规程工时", "18"], ["差值主要来自", ""]])
+    table([["功率", "ap 2.5、f 0.3", "ap 6、f 0.5"], ["F_c = k_c1.1·a_p·f^(1−m_c)  N", "", ""], ["P_c = F_c·v_c/60000  kW", "", ""],
+           ["P_c / 0.8  kW（机床 11 kW）", "", ""], ["平台检查结果", "", ""]])
+    d.add_heading("四、精车与一句话编程（任务 3）", 1)
+    table([["项目", "结果"], ["精车毛坯从哪来", ""], ["精车编程直径", ""], ["仿真差 mm", ""], ["一句话：AI 改了哪几项", ""],
+           ["多留 0.3 后粗车目标直径", ""], ["提交审批时的提示", ""]])
+    d.add_heading("五、铣键槽（任务 4）", 1)
+    table([["项目", "平台", "手算"], ["槽深 mm", "", ""], ["主轴转速 S r/min", "", ""], ["进给 F mm/min", "", ""],
+           ["加工时间（默认参数）", "", "—"], ["加工时间（分 4 层、fz 0.04）", "", "—"], ["工艺规程工时", "10 分", "—"]])
+    hint("哪组参数更合理？为什么键槽在磨削前铣、却按磨削后的尺寸 d − t₁ 控制？斜线下刀的好处？")
+    d.add_heading("六、下发（任务 5）", 1)
+    table([["项目", "记录"], ["提交号 / 工艺规程版本", ""], ["AI 评审意见与处理", ""], ["批准人", ""], ["下发的程序号", ""],
+           ["ERPNext 附件 / 3D 回放 / 派工指令（贴图）", ""]])
+    d.add_heading("七、结论与讨论", 1)
+    d.add_paragraph("")
+    d.add_heading("八、附件", 1)
+    d.add_paragraph("平台生成的程序（.nc）、截图。", style="List Bullet")
     buf = io.BytesIO()
     d.save(buf)
     return buf.getvalue()

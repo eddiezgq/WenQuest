@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Hand Sewing vs Machine Sewing</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: mode tabs on top; a large side-section stage (fabric seen edge-on) with a face-view strip under it; right column = what is happening now + comparison table */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --cloth:#e9e2d2; --cloth2:#ded5c1; --clothline:#c9bea4;
+  --needle-thread:#2a5fb8; --bobbin-thread:#c4531d; --steel:#5c6670; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--cloth:#4a4436;--cloth2:#3f3a2e;--clothline:#6b624d;--needle-thread:#7fa9f2;--bobbin-thread:#f08c58;--steel:#b7c0c9;--accent:#4cc3c9;--ok:#58d68d;--bad:#ff6b6b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--cloth:#4a4436;--cloth2:#3f3a2e;--clothline:#6b624d;--needle-thread:#7fa9f2;--bobbin-thread:#f08c58;--steel:#b7c0c9;--accent:#4cc3c9;--ok:#58d68d;--bad:#ff6b6b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+button{font:inherit;font-size:.88rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:6px 14px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);gap:14px;align-items:start}
+@media (max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.row label{font-size:.84rem;color:var(--muted)}
+input[type=range]{accent-color:var(--accent);width:140px}
+.now{font-size:.95rem}
+.now b{display:block;font-family:var(--f-display);font-size:1.1rem;margin-bottom:4px}
+.meter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.meter div{border-top:1px solid var(--rule);padding-top:4px}
+.meter b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.meter small{color:var(--muted);font-size:.76rem}
+table{width:100%;border-collapse:collapse;font-size:.82rem;line-height:1.5}
+th,td{text-align:left;padding:5px 6px 5px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--muted);font-weight:500}
+td.on{font-weight:700}
+.msg{margin-top:8px;font-weight:700;min-height:1.6em}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:3px;background:var(--c)}
+</style>
+<div class="wrap">
+<header><h1>Hand Sewing vs Machine Sewing</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 1 · Animation 1-1 · Three ways to form a seam: hand sewing, single-thread chainstitch, two-thread lockstitch</span></header>
+<div class="tabs" role="tablist">
+  <button type="button" data-m="hand" aria-pressed="true">Hand sewing (eye at the tail)</button>
+  <button type="button" data-m="chain">Single-thread chainstitch 101</button>
+  <button type="button" data-m="lock">Two-thread lockstitch 301</button>
+</div>
+<div class="grid">
+  <div class="panel">
+    <h3>Cross-section (viewed along the seam, fabric plies cut open)</h3>
+    <canvas id="cv" width="1000" height="440" aria-label="Cross-section animation of stitch formation"></canvas>
+    <h3 style="margin-top:12px">Top and underside of the fabric (finished appearance)</h3>
+    <canvas id="face" width="1000" height="150" aria-label="Stitch appearance on top and underside of the fabric"></canvas>
+    <div class="legend"><span style="--c:var(--needle-thread)">Needle thread</span><span style="--c:var(--bobbin-thread)">Bobbin thread</span><span style="--c:var(--steel)">Needle, hook, shuttle</span></div>
+    <div class="row">
+      <button type="button" id="play" aria-pressed="true">Pause</button>
+      <button type="button" id="step">Step ⟶</button>
+      <label for="spd">Speed</label><input id="spd" type="range" min="0.2" max="2" step="0.1" value="0.8">
+      <button type="button" id="pull">Pull thread end</button>
+      <button type="button" id="reset">Restart</button>
+    </div>
+    <p class="msg" id="msg"></p>
+  </div>
+  <div class="col" style="display:flex;flex-direction:column;gap:14px;min-width:0">
+    <section class="panel"><h3>What is happening now</h3><div class="now" id="now"></div>
+      <div class="meter"><div><b id="m-st">0</b><small>Stitches sewn</small></div><div><b id="m-th">0</b><small>Thread passed through the fabric per stitch (mm)</small></div></div></section>
+    <section class="panel"><h3>Comparing the three methods</h3>
+      <table><tr><th></th><th>Hand</th><th>Chain 101</th><th>Lock 301</th></tr>
+        <tr><th>Threads</th><td data-c="hand">1</td><td data-c="chain">1</td><td data-c="lock">2</td></tr>
+        <tr><th>Eye position</th><td data-c="hand">Tail</td><td data-c="chain">Point</td><td data-c="lock">Point</td></tr>
+        <tr><th>Needle path</th><td data-c="hand">Right through</td><td data-c="chain">Halfway, then back</td><td data-c="lock">Halfway, then back</td></tr>
+        <tr><th>What holds it</th><td data-c="hand">Repeated passes</td><td data-c="chain">Next loop holds the last</td><td data-c="lock">Threads interlace between plies</td></tr>
+        <tr><th>Pull the end</th><td data-c="hand">—</td><td data-c="chain">Unravels</td><td data-c="lock">Holds</td></tr>
+        <tr><th>Mechanism (this book)</th><td data-c="hand">—</td><td data-c="chain">Hook needle or looper (Ch. 10)</td><td data-c="lock">Rotary hook (Ch. 2, 5)</td></tr>
+      </table></section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const cv=$('cv'),fc=$('face');
+const W=1000,H=440,YT=196,YB=252,YM=(YT+YB)/2,P=74,X0=640;
+let mode='hand',ph=0,stitches=3,playing=true,speed=0.8,pull=null,last=null,stepTarget=null;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduce){playing=false;}
+function fit(c,w,h){const r=window.devicePixelRatio||1;const cw=c.clientWidth||w;if(c.width!==Math.round(cw*r)){c.width=Math.round(cw*r);c.height=Math.round(cw*r*h/w);}const g=c.getContext('2d');g.setTransform(c.width/w,0,0,c.width/w,0,0);return g;}
+const ease=t=>0.5-0.5*Math.cos(Math.PI*Math.max(0,Math.min(1,t)));
+const seg=(t,a,b)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
+function cloth(g){
+  g.fillStyle=css('--cloth');g.fillRect(0,YT,W,YM-YT);g.fillStyle=css('--cloth2');g.fillRect(0,YM,W,YB-YM);
+  g.strokeStyle=css('--clothline');g.lineWidth=1;g.beginPath();g.moveTo(0,YT);g.lineTo(W,YT);g.moveTo(0,YM);g.lineTo(W,YM);g.moveTo(0,YB);g.lineTo(W,YB);g.stroke();
+  g.fillStyle=css('--muted');g.font='13px '+css('--f-body');g.textAlign='left';g.fillText('Top',12,YT-10);g.fillText('Underside',12,YB+20);g.fillText('2 plies',12,YM+4);
+}
+function machineNeedle(g,x,tip,eye=true){
+  g.fillStyle=css('--steel');g.fillRect(x-4,0,8,tip-14);g.beginPath();g.moveTo(x-4,tip-14);g.lineTo(x,tip);g.lineTo(x+4,tip-14);g.closePath();g.fill();
+  if(eye){g.fillStyle=css('--sheet');g.beginPath();g.ellipse(x,tip-22,1.8,5,0,0,7);g.fill();}
+}
+// ---- Hand sewing: one thread follows a running-stitch path, eye at the tail ----
+function handPath(){const pts=[];const x0=120;for(let k=0;k<12;k++){const x=x0+k*P;pts.push([x,YT-30]);}return pts;}
+function drawHand(g){
+  cloth(g);
+  // Running stitch: down at xa, under the fabric to xb, up, then along the top to the next xa
+  const xs=[];for(let k=0;k<14;k++)xs.push(140+k*P*0.75);
+  // path points (continuous)
+  const path=[[xs[0]-80,YT-40]];
+  for(let k=0;k<xs.length;k++){const top=k%2===0;const x=xs[k];if(top){path.push([x-10,YT-6]);path.push([x+6,YB+6]);}else{path.push([x-10,YB+6]);path.push([x+6,YT-6]);}}
+  // length table
+  const L=[0];for(let i=1;i<path.length;i++)L.push(L[i-1]+Math.hypot(path[i][0]-path[i-1][0],path[i][1]-path[i-1][1]));
+  const total=L[L.length-1];
+  const s=Math.min(total,(stitches+ph)*(total/12)*0.95+40);
+  const at=d=>{let i=1;while(i<L.length-1&&L[i]<d)i++;const f=(d-L[i-1])/(L[i]-L[i-1]||1);return [path[i-1][0]+f*(path[i][0]-path[i-1][0]),path[i-1][1]+f*(path[i][1]-path[i-1][1])];};
+  const NL=70;const tip=at(s),tail=at(Math.max(0,s-NL));
+  // thread: from start to needle tail
+  g.strokeStyle=css('--needle-thread');g.lineWidth=3;g.lineJoin='round';g.beginPath();g.moveTo(path[0][0],path[0][1]);
+  for(let i=1;i<path.length&&L[i]<s-NL;i++)g.lineTo(path[i][0],path[i][1]);g.lineTo(tail[0],tail[1]);
+  // long trailing thread (still in the hand)
+  g.stroke();
+  g.setLineDash([6,5]);g.beginPath();g.moveTo(tail[0],tail[1]);g.quadraticCurveTo(tail[0]+60,tail[1]-120,tail[0]+180,60);g.stroke();g.setLineDash([]);
+  // needle
+  g.strokeStyle=css('--steel');g.lineWidth=5;g.lineCap='round';g.beginPath();g.moveTo(tail[0],tail[1]);g.lineTo(tip[0],tip[1]);g.stroke();
+  g.fillStyle=css('--sheet');g.beginPath();g.arc(tail[0]+(tip[0]-tail[0])*0.08,tail[1]+(tip[1]-tail[1])*0.08,1.8,0,7);g.fill();
+  g.fillStyle=css('--muted');g.font='13px '+css('--f-body');g.textAlign='left';
+  g.fillText('Eye at the tail: the needle and its thread must pass right through the fabric and be pulled out the other side',tail[0]-200>20?tail[0]-200:20,40);
+  g.fillText('Dashed: unsewn thread in hand',Math.min(W-200,tail[0]+120),90);
+  return {thread:Math.round((YB-YT)/56*1.5*10)/10*1+0, text:handText()};
+}
+function handText(){const p=ph;return p<0.5?'<b>Needle goes down</b>The point enters from the top; the whole needle, with the thread in its eye, must be pulled out from underneath.':'<b>Needle comes up</b>Change hands below the fabric and pull the whole needle up through it. For every stitch, the entire thread has to pass through the fabric twice.';}
+// ---- Machine: eye at the point, needle goes only halfway ----
+function needleTip(p){ // 0 top → 0.4 bottom → 0.8 back to top
+  const d=p<0.8?0.5-0.5*Math.cos(2*Math.PI*p/0.8):0;return 70+d*250;}
+function feedOff(p){return p>0.8?ease((p-0.8)/0.2)*P:0;}
+function drawLock(g){
+  cloth(g);
+  const off=feedOff(ph);const xs=[];for(let k=1;k<12;k++)xs.push(X0-k*P-off);
+  const xn=X0-off; // current needle hole moves with the fabric
+  const nt=css('--needle-thread'),bt=css('--bobbin-thread');
+  const pulled=pull&&pull.mode==='lock'?Math.min(1,pull.t):0;
+  g.lineWidth=3;g.lineJoin='round';g.lineCap='round';
+  // finished stitches
+  g.strokeStyle=nt;g.beginPath();g.moveTo(-10,YT-2);
+  xs.slice().reverse().forEach(x=>{g.lineTo(x-4,YT-2);g.lineTo(x-1.5,YM);g.lineTo(x+1.5,YM);g.lineTo(x+4,YT-2);});
+  g.lineTo(ph>0.8||stitches>0?xn-4:xs[0]+4,YT-2);g.stroke();
+  g.strokeStyle=bt;g.beginPath();g.moveTo(-10,YB+2);
+  xs.slice().reverse().forEach(x=>{g.lineTo(x-4,YB+2);g.lineTo(x-1.5,YM+2);g.lineTo(x+1.5,YM+2);g.lineTo(x+4,YB+2);});
+  g.lineTo(X0+60,YB+2);g.stroke();
+  // rotary hook and bobbin
+  const hx=X0+40,hy=YB+95;
+  g.strokeStyle=css('--steel');g.lineWidth=2;g.beginPath();g.arc(hx,hy,48,0,7);g.stroke();
+  g.fillStyle=bt;g.globalAlpha=.25;g.beginPath();g.arc(hx,hy,22,0,7);g.fill();g.globalAlpha=1;
+  g.fillStyle=css('--muted');g.font='12px '+css('--f-body');g.textAlign='center';g.fillText('Bobbin (bobbin thread)',hx,hy+70);
+  // hook-point angle
+  const a=-Math.PI/2+2*Math.PI*ph*1.0;
+  g.strokeStyle=css('--steel');g.lineWidth=4;g.beginPath();g.arc(hx,hy,48,a-0.5,a);g.stroke();
+  // needle thread: from the take-up side to the eye
+  const tip=needleTip(ph);
+  g.strokeStyle=nt;g.lineWidth=3;
+  // loop: caught by the hook point at 0.4–0.75, carried round the bobbin
+  const loopT=seg(ph,0.38,0.72);
+  if(ph<0.8){
+    g.beginPath();g.moveTo(xs[0]+4,YT-2);g.lineTo(xn-6,YT-2);g.lineTo(xn-6,Math.max(YT,tip-22));g.stroke();
+    if(loopT>0&&loopT<1){
+      const r=22+26*Math.sin(Math.PI*loopT);
+      g.beginPath();g.ellipse(hx-6+18*loopT,hy-10,r,r*0.9,0,Math.PI*(1.1-0.2*loopT),Math.PI*(1.1-0.2*loopT)+2*Math.PI*loopT);g.stroke();
+    }
+  }else{ // tighten
+    g.beginPath();g.moveTo(xs[0]+4,YT-2);g.lineTo(xn-4,YT-2);g.lineTo(xn-1.5,YM);g.lineTo(xn+1.5,YM);g.lineTo(xn+4,YT-2);g.lineTo(xn+40,YT-60);g.stroke();
+  }
+  machineNeedle(g,xn,ph<0.8?tip:70);
+  if(pulled>0){g.strokeStyle=css('--ok');g.lineWidth=2;g.beginPath();g.moveTo(40,YT-30);g.lineTo(10,YT-30);g.stroke();g.fillStyle=css('--ok');g.fillText('pull',30,YT-38);}
+  return {text:lockText()};
+}
+function lockText(){const p=ph;
+  if(p<0.38)return '<b>Penetration</b>The eye is near the point: the needle carries the needle thread down through both plies, but only halfway — it never has to pass right through.';
+  if(p<0.55)return '<b>Loop formation, hook catches the loop</b>As the needle rises from its lowest point, the needle thread bulges out into a loop on one side; the rotating hook point passes right through the loop and catches it.';
+  if(p<0.75)return '<b>Round the bobbin</b>The hook point enlarges the loop and carries it round the bobbin that holds the bobbin thread. That is how the bobbin thread passes through the needle-thread loop.';
+  return '<b>Tighten and feed</b>The take-up lever pulls the needle thread back and the interlacing point is drawn in between the two plies; the feed dog advances the fabric by one stitch length, ready for the next stitch.';}
+function drawChain(g){
+  cloth(g);
+  const off=feedOff(ph);const xs=[];for(let k=1;k<12;k++)xs.push(X0-k*P-off);
+  const xn=X0-off,nt=css('--needle-thread');
+  let unr=pull&&pull.mode==='chain'?pull.t*13:0; // number of loops already unravelled
+  g.lineWidth=3;g.lineJoin='round';g.lineCap='round';g.strokeStyle=nt;
+  // top: straight segments
+  g.beginPath();
+  const n=xs.length;
+  for(let k=n-1;k>=0;k--){if(k<unr-1)continue;const x=xs[k];if(k===n-1)g.moveTo(x-P,YT-2);g.lineTo(x,YT-2);}
+  if(unr<1)g.lineTo(xn,YT-2);
+  g.stroke();
+  // underside: each loop runs down and back from its needle hole and holds the next loop
+  for(let k=n-1;k>=0;k--){
+    if(k<unr-1)continue;
+    const x=xs[k];const xb=x-P;
+    g.beginPath();g.moveTo(x-2,YT);g.lineTo(x-2,YB+4);
+    g.bezierCurveTo(x-6,YB+34,xb+10,YB+30,xb+4,YB+10);g.bezierCurveTo(xb-2,YB+2,x+4,YB+2,x+2,YB+4);g.lineTo(x+2,YT);g.stroke();
+  }
+  // current loop: caught by the looper
+  const tip=needleTip(ph);
+  if(unr<1){
+    if(ph<0.8){g.beginPath();g.moveTo(xn-6,YT-2);g.lineTo(xn-6,Math.max(YT,tip-22));g.stroke();
+      const lt=seg(ph,0.4,0.75);
+      if(lt>0){const lx=xn-6-30*lt,ly=YB+18+22*lt;g.beginPath();g.moveTo(xn-6,YB);g.quadraticCurveTo(lx-20,ly+20,lx,ly);g.quadraticCurveTo(lx+10,ly-14,xn+4,YB);g.stroke();}
+    }
+    // hook needle (looper)
+    const lx=X0-30+40*Math.cos(Math.PI*ph*2),ly=YB+60;
+    g.strokeStyle=css('--steel');g.lineWidth=4;g.beginPath();g.moveTo(lx+70,ly+30);g.quadraticCurveTo(lx+20,ly+10,lx-10,ly-8);g.stroke();
+    g.fillStyle=css('--muted');g.font='12px '+css('--f-body');g.textAlign='left';g.fillText('Hook needle (looper)',lx+40,ly+46);
+    machineNeedle(g,xn,ph<0.8?tip:70);
+  }else{
+    g.fillStyle=css('--bad');g.font='14px '+css('--f-body');g.textAlign='left';g.fillText('←  Pull the thread end: the loops come out one after another',Math.max(20,xs[Math.min(n-1,Math.floor(unr))]-80),YB+70);
+    const kk=Math.min(n-1,Math.max(0,Math.ceil(unr-1)));g.strokeStyle=nt;g.setLineDash([4,4]);g.beginPath();g.moveTo(xs[kk],YT-2);g.lineTo(W-40,YT-90);g.stroke();g.setLineDash([]);
+  }
+  return {text:chainText()};
+}
+function chainText(){const p=ph;if(pull&&pull.mode==='chain')return '<b>Pulling the thread end</b>A chainstitch has only one thread, and each loop is held by the next. The last loop is held by nothing, so a pull draws it out; the loops behind it release one by one and the whole seam unravels.';
+  if(p<0.38)return '<b>Penetration</b>The needle, eyed at the point, carries the thread into the fabric — only halfway.';
+  if(p<0.75)return '<b>Catching the loop</b>As the needle rises the loop stays below the fabric; the hook needle (looper) catches it and draws it backwards.';
+  return '<b>Feed; the next stitch passes through the previous loop</b>The fabric advances one stitch length, and the next needle descent passes right through the caught loop, so loop interlocks with loop and a chain forms underneath.';}
+// ---- Finished appearance (top / underside) ----
+function drawFace(){
+  const g=fit(fc,1000,150);g.clearRect(0,0,1000,150);
+  g.fillStyle=css('--cloth');g.fillRect(90,14,890,50);g.fillStyle=css('--cloth2');g.fillRect(90,84,890,50);
+  g.fillStyle=css('--muted');g.font='13px '+css('--f-body');g.textAlign='right';g.fillText('Top',80,44);g.fillText('Underside',80,114);
+  const nt=css('--needle-thread'),bt=css('--bobbin-thread');g.lineWidth=3;g.lineCap='round';
+  const step=56;
+  for(let k=0;k<15;k++){const x=110+k*step;
+    if(mode==='hand'){g.strokeStyle=nt;if(k%2===0){g.beginPath();g.moveTo(x,39);g.lineTo(x+step-10,39);g.stroke();}else{g.beginPath();g.moveTo(x,109);g.lineTo(x+step-10,109);g.stroke();}}
+    if(mode==='lock'){g.strokeStyle=nt;g.beginPath();g.moveTo(x,39);g.lineTo(x+step-6,39);g.stroke();g.strokeStyle=bt;g.beginPath();g.moveTo(x,109);g.lineTo(x+step-6,109);g.stroke();}
+    if(mode==='chain'){g.strokeStyle=nt;g.beginPath();g.moveTo(x,39);g.lineTo(x+step-6,39);g.stroke();g.beginPath();g.ellipse(x+step/2,109,step/2+4,9,0,0,7);g.stroke();}
+  }
+  g.fillStyle=css('--muted');g.textAlign='left';g.font='12px '+css('--f-body');
+  const note={hand:'Running stitch: thread alternates between top and underside; uneven stitch length, speed set by hand',chain:'Underside is a chain of loops, elastic — but pulling the final thread end unravels the whole seam',lock:'Both sides look the same, a straight line; the interlacing is hidden between the two plies'}[mode];
+  g.fillText(note,92,148);
+}
+function draw(){
+  const g=fit(cv,W,H);g.clearRect(0,0,W,H);
+  let r;if(mode==='hand')r=drawHand(g);else if(mode==='chain')r=drawChain(g);else r=drawLock(g);
+  $('now').innerHTML=r.text;$('m-st').textContent=stitches;
+  $('m-th').textContent=mode==='hand'?'all × 2':'≈ '+(2*((YB-YT)/56*1.5)).toFixed(1);
+  document.querySelectorAll('td[data-c]').forEach(td=>td.classList.toggle('on',td.dataset.c===mode));
+}
+function tick(ts){
+  const dt=last==null?0:Math.min(0.05,(ts-last)/1000);last=ts;
+  if(pull){pull.t+=dt*0.18;if(pull.t>=1.2){pull.done=true;}}
+  else if(playing||stepTarget!=null){ph+=dt*speed*0.55;
+    if(stepTarget!=null&&ph>=stepTarget){ph=stepTarget;stepTarget=null;}
+    if(ph>=1){ph-=1;stitches++;if(mode==='hand'&&stitches>=11){stitches=3;}}
+  }
+  draw();requestAnimationFrame(tick);
+}
+const STEPS={hand:[0.5,1],chain:[0.38,0.75,1],lock:[0.38,0.55,0.75,1]};
+$('step').onclick=()=>{playing=false;$('play').setAttribute('aria-pressed','false');$('play').textContent='Play';const s=STEPS[mode];let nx=s.find(v=>v>ph+1e-6);if(nx===undefined)nx=s[0]+1;stepTarget=nx>=1?Math.min(nx,0.9999):nx;if(nx>=1){stepTarget=null;ph=0;stitches++;}};
+$('play').onclick=()=>{playing=!playing;$('play').setAttribute('aria-pressed',playing);$('play').textContent=playing?'Pause':'Play';};
+$('spd').oninput=e=>speed=+e.target.value;
+$('pull').onclick=()=>{if(mode==='hand')return;playing=false;$('play').setAttribute('aria-pressed','false');$('play').textContent='Play';ph=0.95;pull={mode,t:0};
+  const m=$('msg');if(mode==='chain'){m.textContent='Chainstitch: pull the last thread end and the whole seam unravels loop by loop.';m.className='msg bad';}else{m.textContent='Lockstitch: the two threads lock each other between the plies — no amount of pulling unravels it.';m.className='msg ok';}};
+$('reset').onclick=()=>{pull=null;ph=0;stitches=mode==='hand'?3:0;$('msg').textContent='';};
+document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',x===b));pull=null;ph=0;stitches=mode==='hand'?3:0;$('msg').textContent='';$('pull').disabled=mode==='hand';drawFace();});
+$('pull').disabled=true;
+if(reduce){$('play').setAttribute('aria-pressed','false');$('play').textContent='Play';}
+drawFace();requestAnimationFrame(tick);
+window.addEventListener('resize',drawFace);
+window.__api={set:(m,p)=>{document.querySelector(`[data-m="${m}"]`).click();ph=p;playing=false;},pull:()=>$('pull').click(),adv:t=>{if(pull)pull.t=t;}};
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

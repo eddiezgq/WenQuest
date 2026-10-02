@@ -1,0 +1,49 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.cells{display:grid;grid-template-columns:70px repeat(16,1fr) 60px;gap:3px;align-items:center;font-size:12px}
+.c{height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:12px;border:1px solid #d8dde1;background:#fff}
+.K{background:#e9f0fc;border-color:#2a6fdb;color:#2a5fb8}
+.T{background:#f2ecfa;border-color:#8a5cc7;color:#7444b4}
+.N{background:#f3f5f6;color:#9aa4ae}
+.lab{font-size:12px;color:#5a6570;text-align:right;padding-right:6px}
+.s0{background:#fcefe8}.s1{background:#eaf6ee}.s2{background:#fbf4e3}.s3{background:#e6f3f3}.s4{background:#f2ecfa}.s5{background:#e9f0fc}.s6{background:#fdf0f0}.s7{background:#f3f5f6}
+.step{margin:14px 0 6px;font-size:14px;font-weight:700}
+.arrow{color:#5a6570;font-size:13px;margin:6px 0 2px 70px}
+table.ram{font-size:12px;font-family:"JetBrains Mono","DejaVu Sans Mono",monospace}
+table.ram td,table.ram th{padding:3px 9px}
+.two{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:start}
+</style>
+<div class="fig" style="--w:1180px">
+<p class="title">一行花型怎样变成选针位图和 FPGA 目标表</p>
+<p class="sub">示意。E5，针距 5.08 mm，换向余量 c = 40 mm，编码器 0.01 mm/计数；只画第 0–15 针（全行 60 针）。K = 编织（两个选针点都选），T = 集圈（只选 S1），· = 不编织</p>
+<p class="step">① 意匠行（第 7 行，机头 →，纱嘴 1，度目 42）</p>
+<div class="cells" id="r1"></div>
+<p class="step">② 拆成两个选针点的位 S1、S2，再按段号 k = i mod 8 分给 8 段选针器</p>
+<div class="cells" id="r2"></div><div class="cells" id="r3"></div><div class="cells" id="r4"></div>
+<div class="two">
+<div>
+<p class="step">③ 写入 FPGA 的目标表（双缓冲中“空闲”的那一组）</p>
+<table class="ram"><thead><tr><th>地址</th><th>针 i</th><th>段 k</th><th>target（计数）</th><th>S1</th><th>S2</th></tr></thead><tbody id="ram"></tbody></table>
+<p class="note">target = (c + (i + ½)·p) / 0.01 mm，按方向排好序；反向行由 MCU 换算成镜像表。提前量不写进表，由 FPGA 按实时速度在比较时减去（第 17 章 FPGA 实验）。</p>
+</div>
+<div>
+<p class="step">④ 每段的选针位图（本行 60 针，每段 8 位）</p>
+<table class="ram"><thead><tr><th>段</th><th>负责的针</th><th>S1 位图（低位 = 先到的针）</th></tr></thead><tbody id="seg"></tbody></table>
+<p class="note">同一段相邻两次动作相隔 8 个针距：v = 0.6 m/s 时 67.7 ms，远大于选针器一次吸合—释放 3 ms。换向区内 MCU 把下一行的表写进另一组 RAM，换向时两组对调。</p>
+</div>
+</div>
+</div>
+<script>
+const row='KK·TKK··KKKTKK·KKTKK··KKKTKK·KKTKK··KKKTKK·KKTKK··KKKTKK·KKT'.slice(0,60);
+const N=16, p=5.08, c=40;
+function cellRow(id,label,f,extra){const el=document.getElementById(id);el.innerHTML=`<span class="lab">${label}</span>`+Array.from({length:N},(_,i)=>f(i)).join('')+`<span class="lab" style="text-align:left">${extra||''}</span>`;}
+cellRow('r1','针 0–15',i=>{const ch=row[i];return `<span class="c ${ch==='K'?'K':ch==='T'?'T':'N'}">${ch}</span>`},'…→ 59');
+cellRow('r2','S1',i=>`<span class="c s${i%8}">${row[i]!=='·'?1:0}</span>`);
+cellRow('r3','S2',i=>`<span class="c s${i%8}">${row[i]==='K'?1:0}</span>`);
+cellRow('r4','段 k',i=>`<span class="c s${i%8}" style="color:#5a6570">${i%8}</span>`);
+let h='';for(let i=0;i<10;i++){h+=`<tr><td>${i}</td><td>${i}</td><td>${i%8}</td><td>${Math.round((c+(i+.5)*p)/0.01)}</td><td>${row[i]!=='·'?1:0}</td><td>${row[i]==='K'?1:0}</td></tr>`}
+h+='<tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr><tr><td>59</td><td>59</td><td>3</td><td>'+Math.round((c+59.5*p)/0.01)+'</td><td>'+(row[59]!=='·'?1:0)+'</td><td>'+(row[59]==='K'?1:0)+'</td></tr>';
+document.getElementById('ram').innerHTML=h;
+let g='';for(let k=0;k<8;k++){let bits='';const nn=[];for(let i=k;i<60;i+=8){nn.push(i);bits=(row[i]!=='·'?'1':'0')+bits;}g+=`<tr class="s${k}"><td>${k}</td><td>${nn.slice(0,3).join(', ')}, …, ${nn[nn.length-1]}</td><td>${bits.padStart(8,'0')}</td></tr>`}
+document.getElementById('seg').innerHTML=g;
+</script>

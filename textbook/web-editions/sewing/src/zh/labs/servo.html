@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>停针定位：伺服调参</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = needle path (front view), timing chart, stitch preview; right rail = checks, controls, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style>
+<div class="wrap">
+<header><h1>停针定位：伺服调参</h1><span class="sub">《缝纫机设计与制造》第 13 章 · 虚拟实验 13-1 · 主轴减速到定位速度后切入位置环，把机针停在上针位；调增益，看超调、时间和静差</span></header>
+<div class="grid">
+  <div class="col">
+    <div class="two">
+      <section class="panel">
+        <h3>手轮（红线为目标上针位，灰色扇形为 ±0.5° 的容许范围被放大 10 倍）</h3>
+        <canvas id="wheel" width="540" height="420" aria-label="主轴手轮转角动画"></canvas>
+        <div class="row"><button id="play" type="button">重放</button><span class="note" style="margin:0">动画放慢 20 倍</span></div>
+      </section>
+      <section class="panel">
+        <h3>位置误差（°，最后阶段放大）</h3>
+        <canvas id="err" width="540" height="420" aria-label="位置误差随时间变化"></canvas>
+      </section>
+    </div>
+    <section class="panel">
+      <h3>速度（实线）与速度指令（虚线），r/min；电机转矩（下），N·m</h3>
+      <canvas id="tim" width="1100" height="440" aria-label="速度和转矩随时间变化"></canvas>
+    </section>
+    <p class="note">模型：主轴折算到电机轴的转动惯量 J，库仑摩擦 T<sub>f</sub> 和黏性摩擦 2×10⁻⁴ N·m·s/rad；电流环简化为 0.5 ms 的一阶滞后，峰值转矩 2.5 N·m；速度环为 PI（积分时间设为 0 即去掉积分），带抗积分饱和；位置环为比例控制，输出的速度指令被限制在定位速度以内。仿真从主轴以定位速度转动、离目标还差一段角度时开始。参数均为示意值，与本书 model13.py 相同。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>判据</h3><div class="checks" id="checks"></div></section>
+    <section class="panel">
+      <h3>调整</h3>
+      <div class="prm">
+        <label for="Kp">位置增益 K<sub>p</sub>（1/s）</label><input id="Kp" type="range" min="10" max="600" step="5" value="200"><output id="Kpv"></output>
+        <label for="Kv">速度增益 K<sub>v</sub>（N·m·s/rad）</label><input id="Kv" type="range" min="0.02" max="0.8" step="0.01" value="0.2"><output id="Kvv"></output>
+        <label for="Ti">速度环积分时间 T<sub>i</sub>（ms，0 = 不用积分）</label><input id="Ti" type="range" min="0" max="60" step="1" value="12"><output id="Tiv"></output>
+        <label for="wp">定位速度（r/min）</label><input id="wp" type="range" min="50" max="500" step="10" value="200"><output id="wpv"></output>
+        <label for="e0">切入位置环时离目标的角度（°）</label><input id="e0" type="range" min="10" max="120" step="5" value="45"><output id="e0v"></output>
+        <label for="J">折算转动惯量 J（10⁻⁴ kg·m²）</label><input id="J" type="range" min="3" max="20" step="0.5" value="6"><output id="Jv"></output>
+        <label for="Tf">库仑摩擦 T<sub>f</sub>（N·m）</label><input id="Tf" type="range" min="0" max="0.6" step="0.01" value="0.15"><output id="Tfv"></output>
+      </div>
+      <div class="row"><button id="reset" type="button">恢复标准</button><button id="mess" type="button">打乱</button></div>
+    </section>
+    <section class="panel">
+      <h3>任务</h3><div id="tasks"></div>
+      <div class="row" style="font-size:.84rem">静差预测：<input id="se" type="number" step="0.01" aria-label="静差预测"> °<button id="seChk" type="button">核对</button></div>
+      <div class="msg" id="msg"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), D=Math.PI/180;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+const B=2e-4,TMAX=2.5,TAUI=0.5e-3,TEND=0.25,DT=2e-5;
+const STD={Kp:200,Kv:0.2,Ti:12,wp:200,e0:45,J:6,Tf:0.15};
+const ST={...STD};
+const LIM={over:0.5,settle:60,final:0.05,sat:5};
+function sim(p){const J=p.J*1e-4,Tf=p.Tf,Ti=p.Ti/1000,wpos=p.wp*2*Math.PI/60;
+  let th=-p.e0*D,w=wpos,Tm=Tf+B*w,integ=Ti>0?Tm/p.Kv:0,sat=0;const n=Math.round(TEND/DT),every=10,res=[];
+  for(let k=0;k<n;k++){const t=k*DT,e=-th;const wref=Math.max(-wpos,Math.min(wpos,p.Kp*e));const ew=wref-w;
+    if(Ti>0)integ+=ew*DT/Ti;let Tref=p.Kv*(ew+integ);
+    if(Math.abs(Tref)>TMAX){sat+=DT;Tref=Math.sign(Tref)*TMAX;if(Ti>0)integ-=ew*DT/Ti;}
+    Tm+=(Tref-Tm)*DT/TAUI;const Td=Tm-B*w;let acc;
+    if(Math.abs(w)<1e-3&&Math.abs(Td)<=Tf)acc=-w/DT;else acc=(Td-Tf*(Math.abs(w)>=1e-3?Math.sign(w):Math.sign(Td)))/J;
+    w+=acc*DT;th+=w*DT;if(k%every===0)res.push([t,th/D,w*60/2/Math.PI,Tm,wref*60/2/Math.PI]);}
+  return {res,sat};}
+function metrics(S){const r=S.res;let over=0;for(const q of r)over=Math.max(over,q[1]);let ts=0;for(const q of r)if(Math.abs(q[1])>0.5)ts=q[0];
+  return {over,settle:ts*1000,final:r[r.length-1][1],sat:S.sat*1000};}
+let S=null,M=null;
+function evaluate(){S=sim(ST);M=metrics(S);const C=[
+  {k:'over',n:'超调（越过目标的角度）',v:M.over,u:'°',ok:M.over<=LIM.over,lim:`≤ ${LIM.over}°；冲过头再退回来，停车慢，也容易来回摆`},
+  {k:'settle',n:'停稳时间（进入 ±0.5° 为止）',v:M.settle,u:' ms',ok:M.settle<=LIM.settle,lim:`≤ ${LIM.settle} ms`},
+  {k:'final',n:'静差（最后停住的位置误差）',v:Math.abs(M.final),u:'°',ok:Math.abs(M.final)<=LIM.final,lim:`≤ ${LIM.final}°`},
+  {k:'sat',n:'转矩饱和时间',v:M.sat,u:' ms',ok:M.sat<=LIM.sat,lim:`≤ ${LIM.sat} ms；长时间顶在峰值转矩，响应就不再由增益决定`}];
+  return {C,allOK:C.every(c=>c.ok),M};}
+let R_=null;
+function render(){$('checks').innerHTML=R_.C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}<small>${c.lim}</small></span><b class="${c.ok?'ok':'bad'}">${c.v.toFixed(c.k==='settle'||c.k==='sat'?0:2)}${c.u}</b></div>`).join('');}
+// ---------- drawing ----------
+let tA=0,last=null;
+function at(t){const r=S.res;const i=Math.min(r.length-1,Math.max(0,Math.round(t/(DT*10))));return r[i];}
+function drawWheel(){const [c,g]=ctx('wheel'),W=c.width,H=c.height,cx=W/2,cy=H/2+10,Rr=150;const q=at(tA);
+  // tolerance sector magnified 10x
+  g.fillStyle=css('--ok');g.globalAlpha=.15;g.beginPath();g.moveTo(cx,cy);g.arc(cx,cy,Rr+20,-Math.PI/2-5*D,-Math.PI/2+5*D);g.fill();g.globalAlpha=1;
+  g.strokeStyle=css('--bad');g.lineWidth=3;g.beginPath();g.moveTo(cx,cy-Rr-30);g.lineTo(cx,cy-Rr+10);g.stroke();
+  const a=-Math.PI/2+q[1]*D;g.strokeStyle=css('--ink');g.lineWidth=10;g.beginPath();g.arc(cx,cy,Rr,0,7);g.stroke();
+  g.lineWidth=6;for(let k=0;k<5;k++){const b=a+k*2*Math.PI/5;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Rr*Math.cos(b),cy+Rr*Math.sin(b));g.stroke();}
+  g.fillStyle=css('--nt');g.beginPath();g.arc(cx+Rr*Math.cos(a),cy+Rr*Math.sin(a),12,0,7);g.fill();
+  g.font='600 14px '+css('--f-body');g.fillStyle=css('--ink');g.fillText(`t = ${(tA*1000).toFixed(0)} ms`,14,22);g.fillText(`误差 ${q[1].toFixed(2)}°　转速 ${q[2].toFixed(0)} r/min`,14,44);
+  g.fillStyle=css('--bad');g.textAlign='center';g.fillText('目标上针位',cx,cy-Rr-36);g.textAlign='start';}
+function axes(g,x0,x1,y0,y1,ymin,ymax,ticks,lab){const Y=v=>y1-(y1-y0)*(v-ymin)/(ymax-ymin);g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.font='12px '+css('--f-body');g.lineWidth=1;
+  for(const v of ticks){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v,x0-6,Y(v)+4);}g.textAlign='start';if(lab)g.fillText(lab,x0+4,y0+12);return Y;}
+function drawErr(){const [c,g]=ctx('err'),W=c.width,H=c.height,x0=50,x1=W-12,X=t=>x0+(x1-x0)*t/TEND;const r=S.res;
+  const Y1=axes(g,x0,x1,14,180,-ST.e0,Math.max(5,M.over*1.2),[-ST.e0,-ST.e0/2,0],'误差（°），全程');
+  g.strokeStyle=css('--nt');g.lineWidth=2;g.beginPath();r.forEach((q,i)=>i?g.lineTo(X(q[0]),Y1(q[1])):g.moveTo(X(q[0]),Y1(q[1])));g.stroke();
+  const Y2=axes(g,x0,x1,210,H-30,-2,2,[-2,-1,-0.5,0,0.5,1,2],'放大：±2°');
+  g.fillStyle=css('--ok');g.globalAlpha=.12;g.fillRect(x0,Y2(0.5),x1-x0,Y2(-0.5)-Y2(0.5));g.globalAlpha=1;
+  g.save();g.beginPath();g.rect(x0,210,x1-x0,H-240);g.clip();g.strokeStyle=css('--nt');g.lineWidth=2;g.beginPath();r.forEach((q,i)=>i?g.lineTo(X(q[0]),Y2(q[1])):g.moveTo(X(q[0]),Y2(q[1])));g.stroke();g.restore();
+  g.strokeStyle=css('--warn');g.beginPath();g.moveTo(X(tA),14);g.lineTo(X(tA),H-30);g.stroke();
+  g.fillStyle=css('--muted');g.textAlign='center';for(let t=0;t<=0.25;t+=0.05)g.fillText((t*1000).toFixed(0)+' ms',X(t),H-10);g.textAlign='start';}
+function drawTim(){const [c,g]=ctx('tim'),W=c.width,H=c.height,x0=60,x1=W-14,X=t=>x0+(x1-x0)*t/TEND;const r=S.res;
+  const vmax=Math.max(ST.wp*1.3,...r.map(q=>q[2]));const Ys=axes(g,x0,x1,14,220,-ST.wp*0.3,vmax,[0,Math.round(ST.wp/2),ST.wp],'转速（r/min）');
+  g.strokeStyle=css('--muted');g.setLineDash([5,4]);g.beginPath();r.forEach((q,i)=>i?g.lineTo(X(q[0]),Ys(q[4])):g.moveTo(X(q[0]),Ys(q[4])));g.stroke();g.setLineDash([]);
+  g.strokeStyle=css('--nt');g.lineWidth=2.2;g.beginPath();r.forEach((q,i)=>i?g.lineTo(X(q[0]),Ys(q[2])):g.moveTo(X(q[0]),Ys(q[2])));g.stroke();
+  const Yt=axes(g,x0,x1,250,H-30,-TMAX*1.1,TMAX*1.1,[-2.5,-1,0,1,2.5],'转矩（N·m），虚线为峰值');
+  g.strokeStyle=css('--bad');g.setLineDash([3,3]);for(const v of[TMAX,-TMAX]){g.beginPath();g.moveTo(x0,Yt(v));g.lineTo(x1,Yt(v));g.stroke();}g.setLineDash([]);
+  g.strokeStyle=css('--bt');g.lineWidth=2;g.beginPath();r.forEach((q,i)=>i?g.lineTo(X(q[0]),Yt(q[3])):g.moveTo(X(q[0]),Yt(q[3])));g.stroke();
+  g.strokeStyle=css('--warn');g.lineWidth=1;g.beginPath();g.moveTo(X(tA),14);g.lineTo(X(tA),H-30);g.stroke();
+  g.fillStyle=css('--muted');g.textAlign='center';for(let t=0;t<=0.25;t+=0.025)g.fillText((t*1000).toFixed(0),X(t),H-10);g.textAlign='start';}
+function frame(ts){if(last!==null){tA+=(ts-last)/1000/20;if(tA>TEND)tA=TEND;}last=ts;drawWheel();if(tA<TEND)drawErrCursor();requestAnimationFrame(frame);}
+let cursorTick=0;function drawErrCursor(){if(++cursorTick%4===0){drawErr();drawTim();}}
+// ---------- controls ----------
+const fmt={Kp:v=>v.toFixed(0),Kv:v=>v.toFixed(2),Ti:v=>v?v.toFixed(0):'不用',wp:v=>v.toFixed(0),e0:v=>v.toFixed(0),J:v=>v.toFixed(1),Tf:v=>v.toFixed(2)};
+function syncUI(){for(const k in fmt){$(k).value=ST[k];$(k+'v').textContent=fmt[k](ST[k]);}}
+function changed(){syncUI();R_=evaluate();render();tA=0;drawErr();drawTim();drawWheel();checkTasks();}
+for(const k in fmt)$(k).addEventListener('input',()=>{ST[k]=+$(k).value;changed();});
+$('reset').onclick=()=>{Object.assign(ST,STD);seen.messed=false;changed();};
+$('mess').onclick=()=>{Object.assign(ST,{Kp:450,Kv:0.05,Ti:0});seen.messed=true;changed();};
+$('play').onclick=()=>{tA=0;};
+// ---------- tasks ----------
+const seen={messed:false,se:false,J:false};
+const TASKS=[
+  {t:'按“打乱”，再只调三个增益（K<sub>p</sub>、K<sub>v</sub>、T<sub>i</sub>），让四条判据全部满足。',d:'先看速度曲线：速度环太软，位置环就会冲过头。按“恢复标准”不算。',ok:()=>seen.messed&&R_.allOK&&ST.Ti>0&&ST.J===STD.J&&ST.Tf===STD.Tf&&ST.e0===STD.e0&&ST.wp===STD.wp},
+  {t:'把积分时间调到 0（去掉积分），看主轴停在哪里；再算出没有积分时可能的最大静差：停住时，位置误差产生的转矩 K<sub>v</sub>·K<sub>p</sub>·e 只要不超过摩擦 T<sub>f</sub>，主轴就推不动。',d:'在下方填写你算出的最大静差（度），按“核对”（±0.02°）。可以把摩擦调大一些再看。',ok:()=>seen.se},
+  {t:'把折算惯量加倍到 12×10⁻⁴ kg·m²（例如换了更重的手轮或机头），重新调增益让四条判据全部满足。',d:'惯量加倍而 K<sub>v</sub> 不变，速度环的带宽就减半。只调三个增益。',ok:()=>seen.J}];
+const done=new Set();
+function checkTasks(){if(ST.J>=12&&R_.allOK&&ST.Tf===STD.Tf&&ST.e0===STD.e0&&ST.wp===STD.wp)seen.J=true;
+  TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+function predSE(){return ST.Tf/(ST.Kv*ST.Kp)/D;}
+$('seChk').onclick=()=>{const v=+$('se').value;
+  if(ST.Ti!==0){$('msg').textContent='先把积分时间调到 0。';return;}
+  const p=predSE(),sim=Math.abs(R_.M.final);
+  if($('se').value!==''&&Math.abs(v-p)<=0.02){seen.se=true;$('msg').textContent=`正确：e_max = T_f /(K_v·K_p) = ${ST.Tf}/(${ST.Kv}×${ST.Kp}) rad ≈ ${p.toFixed(2)}°。主轴可能停在 ±${p.toFixed(2)}° 以内的任何位置（这次停在 ${sim.toFixed(2)}°），停在哪里取决于它是怎样冲过来的。积分项能把这一点误差慢慢“积”掉，这就是速度环要用 PI 的原因。`;}
+  else $('msg').textContent='还不对：停住时速度为 0，速度环输出的转矩 = K_v × K_p × e；它小于摩擦转矩 T_f 时主轴就推不动。别忘了把弧度换成度。';checkTasks();};
+window.__api={ST,STD,evaluate,changed,done,seen,predSE,mess:()=>$('mess').click(),se:v=>{$('se').value=v;$('seChk').click();}};
+changed();requestAnimationFrame(frame);
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

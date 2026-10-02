@@ -1,0 +1,47 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.g3{display:grid;grid-template-columns:250px 40px 330px 40px 1fr;align-items:stretch}
+.col{display:flex;flex-direction:column;gap:10px}
+.box{text-align:left}
+.ar{display:flex;align-items:center;justify-content:center;color:#5a6570;font-size:22px}
+.id{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11.5px;color:#7444b4}
+.kit{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.kit .box{font-size:12.5px}
+.kit .box span{text-align:left}
+.mid{justify-content:flex-start}.mid .box+.box{margin-top:22px;position:relative}.mid .box+.box:before{content:"↕";position:absolute;top:-30px;left:50%;color:#5a6570;font-size:18px}
+.lbl{font-size:12px;color:#5a6570;font-weight:700;letter-spacing:.06em;margin:0 0 6px}
+</style>
+<div class="fig" style="--w:1280px">
+<p class="title">通用测试台：一套测量、四种原型</p><p class="sub">测试计算机经网关下发命令、读测量；测试台模块直接测“真值”，和原型自己报的值对照。换型只换机头适配件和接线配置（示意；模块编号为建议编号，计划入库）</p>
+<div class="g3">
+<div class="col"><p class="lbl">测试计算机与数字工厂</p>
+<div class="box k fill-k"><b>测试计算机</b><span>Python + pytest；用例、判据、报告</span></div>
+<div class="box t fill-t"><b>数字工厂总线</b><span class="mono" style="font-size:11.5px">wq/sewing/lab/tb-01/measurement</span><span>结果 → 历史库</span></div>
+<div class="box"><b>CI 服务器</b><span>每晚排队、二分、报警</span></div>
+</div>
+<div class="ar">⇄</div>
+<div class="col mid"><p class="lbl">被测原型（DUT）</p>
+<div class="box b fill-b"><b>网关 D-GW-WQSC</b><span>MQTT / 网页接口：命令、参数、固件版本</span></div>
+<div class="box k fill-k"><b>WQ-SC 主控 D-CTL-WQSC</b><span>固件 + 参数表（被测对象）</span></div>
+<div class="box"><b>驱动层</b><span>伺服驱动、步进驱动、电磁铁驱动板</span></div>
+<div class="box o fill-o"><b>机头 / 平台 / 缩比横机</b><span>HIL 时换成仿真器，整机测试台时是真机</span></div>
+</div>
+<div class="ar">⇄</div>
+<div class="col"><p class="lbl">测试台模块（建议编号，计划入库）</p>
+<div class="box p"><b>负载电机与测功 <span class="id">D-TB-LOAD</span></b><span>经梅花联轴器 A-CPL-JAW 接主轴：加负载转矩、测转矩与转速</span></div>
+<div class="box p"><b>编码器信号模拟 <span class="id">D-TB-ENCEMU</span></b><span>HIL 时产生 A/B/Z（10000 计数/转），可注入断线、抖动</span></div>
+<div class="box p"><b>HIL 实时仿真器 <span class="id">D-TB-HIL</span></b><span>按实测转矩–转速曲线算主轴运动，1 kHz 以上</span></div>
+<div class="box p"><b>数据采集 + 电流探头 <span class="id">D-TB-DAQ</span></b><span>线圈电流、母线电压、编码器与指令同步采样</span></div>
+<div class="box p"><b>行程传感器 <span class="id">D-TB-STROKE</span></b><span>电磁铁衔铁位移 → 吸合/释放时刻</span></div>
+<div class="box p"><b>线迹相机 <span class="id">D-TB-CAM</span></b><span>针迹位置、回针对齐、跳针、线头长度</span></div>
+<div class="box p"><b>温度采集 <span class="id">D-TB-TEMP</span></b><span>电机、散热器、电磁铁线圈、环境</span></div>
+</div>
+</div>
+<div class="kit">
+<div class="box g fill-g"><b>平缝 WQ-SC/LS</b><span>机头适配板 + 主轴联轴器；测：停针、剪线、回针、电磁铁、4 h 温升</span></div>
+<div class="box g fill-g"><b>包缝 WQ-SC/OL</b><span>同一负载电机，换适配板；测：停针、差动比、切刀与拨线时序</span></div>
+<div class="box g fill-g"><b>花样机 WQ-SC/PS</b><span>X–Y 两轴加光栅尺/激光位移；测：跟随误差、针在布中时位移</span></div>
+<div class="box g fill-g"><b>缩比横机 WQ-SC/FK</b><span>机头位置编码器模拟 + 选针器行程；测：选针时序误差</span></div>
+</div>
+<p class="note">换型的办法：机械上只换“适配板 + 联轴器”，电气上用同一套带编号的插头，软件上每种原型一个测试配置文件（接线表、HAL 驱动、用例集）。测试脚本本身不变。</p>
+</div>

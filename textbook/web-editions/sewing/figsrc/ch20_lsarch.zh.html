@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.layer{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:stretch;margin-bottom:6px}
+.lname{font-size:13px;font-weight:700;color:#5a6570;display:flex;align-items:center;border-right:3px solid #d8dde1;padding-right:8px}
+.row{display:grid;gap:10px}
+.box b{font-size:14.5px}.box span{font-size:12px}
+.id{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11.5px;color:#14797f;display:block;margin-top:2px}
+.link{display:flex;justify-content:space-around;font-size:12px;color:#5a6570;margin:2px 0 6px 162px}
+.link i{font-style:normal;background:#eef1f2;border-radius:10px;padding:1px 9px}
+.arrow{font-size:22px;color:#5a6570;display:flex;align-items:center;justify-content:center}
+.st{border-radius:22px}
+.small{font-size:12px;color:#5a6570}
+.tag{display:inline-block;font-size:11px;border-radius:8px;padding:0 6px;background:#fcefe8;color:#c4531d;margin-left:4px}
+.tag.n{background:#e6f3f3;color:#0f6e74}
+</style>
+<div class="fig" style="--w:1150px">
+<p class="title">平缝机原型 WQ-SC/LS 的系统构成</p><p class="sub">示意。五层参考架构（第 19 章）落到一台平缝机上；编号为建议编号（计划入库），A/C 类为零件库已有条目</p><div class="layer"><div class="lname">人机与联网</div><div class="row" style="grid-template-columns:1fr 1fr 1.3fr"><div class="box t"><b>网关模块</b><span>MQTT 客户端、网页参数界面</span><span class="id">D-GW-WQSC</span></div><div class="box t"><b>触摸屏（可选）</b><span>参数、事件表、故障码</span><span class="id">D-HMI-PANEL</span></div><div class="box k fill-k"><b>问渠数字工厂</b><span>wq/sewing/…/status · event · measurement</span></div></div></div><div class="link"><i>以太网 / Wi-Fi</i><i>CAN FD（参数、日志）</i></div><div class="layer"><div class="lname">实时控制</div><div class="row" style="grid-template-columns:1fr"><div class="box k fill-y"><b>WQ-SC 主控板</b><span>Cortex-M4F 级 MCU + RTOS：状态机、事件表、脚踏、日志</span><span class="id">D-CTL-WQSC</span></div></div></div><div class="link"><i>CAN FD：速度指令、状态</i><i>SPI/IO：6 路通断 + 电流回读</i><i>AI：脚踏</i><i>DI：急停、翻倒</i></div><div class="layer"><div class="lname">驱动与电源</div><div class="row" style="grid-template-columns:1fr 1.3fr 1fr 1fr"><div class="box b"><b>伺服驱动器</b><span>电流环 + 速度环；位置环可在主控</span><span class="id">D-DRV-SERVO</span></div><div class="box o"><b>电磁铁驱动板（6 路）</b><span>24 V 强激磁 10 ms + 1 A 斩波维持，48 V 稳压管续流</span><span class="id">D-DRV-SOL</span></div><div class="box y"><b>开关电源 24 V</b><span>电磁铁、传感器、主控</span><span class="id">D-PSU-SMPS</span></div><div class="box o fill-o"><b>急停与安全回路</b><span>双触点急停、机头翻倒开关</span><span class="id">D-SNS-PROX</span></div></div></div><div class="link"><i>U V W 动力线</i><i>A/B/Z 差分（驱动器 1:1 转发）</i><i>线圈 24 V</i></div><div class="layer"><div class="lname">执行与传感</div><div class="row" style="grid-template-columns:1.2fr 1.2fr 1fr"><div class="box b fill-b"><b>主轴伺服电机 + 编码器</b><span>2500 线，四倍频 10000 计数/转，Z 相</span><span class="id">D-MOT-PMSM · D-ENC-INC</span></div><div class="box o fill-o"><b>5 个推拉式电磁铁</b><span>剪线 · 拨线 · 倒缝 · 抬压脚 · 松线</span><span class="id">D-SOL-PUSH ×5</span></div><div class="box g fill-g"><b>脚踏霍尔传感器</b><span>0.5–4.5 V</span><span class="id">D-SNS-HALL</span></div></div></div><div class="link"><i>机械连接</i></div><div class="layer"><div class="lname">机械（改装）</div><div class="row" style="grid-template-columns:1fr 1fr 1fr"><div class="box k"><b>直驱：梅花联轴器</b><span>电机与主轴同轴</span><span class="id">A-CPL-JAW</span></div><div class="box k"><b>或带传动 1:1</b><span>同步带轮 + 带</span><span class="id">A-PUL-HTD · C-BLT-BELT</span></div><div class="box k"><b>复位弹簧、螺钉</b><span>电磁铁连杆复位、支架</span><span class="id">A-SPR-CMP · A-SCR-SHC</span></div></div></div>
+</div>

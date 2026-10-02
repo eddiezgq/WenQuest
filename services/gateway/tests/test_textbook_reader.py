@@ -212,3 +212,39 @@ def test_the_english_edition(client, tmp_path):
     url = client.get("/api/v1/textbooks/robotics/pdf/4?lang=en", headers=h).json()["url"]
     r = client.get(url[url.index("/api/"):])
     assert r.content == b"%PDF-1.4 en" and "Chapter4" in r.headers["content-disposition"]
+
+
+def test_web_edition(client, tmp_path):
+    """网页版教材（第 15 轮）：listed on the shelf, read through a signed link; nothing outside the book is served."""
+    built_book(tmp_path)
+    we = tmp_path / "sewing" / "webed"
+    (we / "en" / "labs").mkdir(parents=True)
+    (we / "img").mkdir()
+    (we / "book.json").write_text(json.dumps({"title": "缝纫机设计与制造", "title_en": "Sewing Machine Design and Manufacturing",
+                                              "chapters": 31, "labs": 42}, ensure_ascii=False))
+    (we / "index.html").write_text("<a href='ch01.html'>1</a>")
+    (we / "ch01.html").write_text("<img src='img/a.webp'>")
+    (we / "img" / "a.webp").write_bytes(b"RIFF....WEBP")
+    (we / "en" / "index.html").write_text("English")
+    (we / "secret.txt").write_text("no")
+    (tmp_path / "sewing" / "outside.html").write_text("outside")
+    assert client.get("/api/v1/textbooks/sewing/webed").status_code == 401
+    hs = student(client)
+    books = client.get("/api/v1/textbooks", headers=hs).json()["books"]
+    assert {"book": "sewing", "title": "缝纫机设计与制造", "title_en": "Sewing Machine Design and Manufacturing",
+            "web": True, "chapters": 31, "labs": 42} in books and len(books) == 2
+    url = client.get("/api/v1/textbooks/sewing/webed", headers=hs).json()["url"]
+    assert url.endswith("/index.html")
+    pre = url[url.index("/api/"):-len("index.html")]
+    assert "ch01.html" in client.get(pre + "index.html").text
+    r = client.get(pre + "ch01.html")
+    assert r.status_code == 200 and "frame-ancestors" in r.headers["content-security-policy"]
+    assert client.get(pre + "img/a.webp").headers["content-type"] == "image/webp"
+    assert client.get(pre).text.startswith("<a")                                              # the book's front page
+    en = client.get("/api/v1/textbooks/sewing/webed?lang=en", headers=hs).json()["url"]
+    assert client.get(en[en.index("/api/"):]).text == "English"
+    assert client.get(pre + "secret.txt").status_code == 404                                  # only the book's page types
+    assert client.get(pre + "..%2Foutside.html").status_code == 404                           # nothing outside the book
+    assert client.get(pre + "../outside.html").status_code in (404, 410)
+    assert client.get("/api/v1/textbook-web/garbage/index.html").status_code == 410
+    assert client.get("/api/v1/textbooks/robotics/webed", headers=hs).status_code == 404      # not a web edition

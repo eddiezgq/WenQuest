@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="__HTMLLANG__">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>__TITLE__</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = requirements, BOM, I/O map, firmware config; right rail = cost, criteria, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f; --lib:#2a5fb8; --chg:#fff4d6;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--lib:#7fa9f2;--chg:#3a3320}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--lib:#7fa9f2;--chg:#3a3320}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.84rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+input[type=number]{font:inherit;font-size:.84rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:3px 6px;width:6.2em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,360px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.req{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 14px;font-size:.84rem}
+.req label{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted)}
+.acts{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.84rem;margin-top:8px}
+.tblw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.8rem}
+th,td{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:left;vertical-align:middle;white-space:nowrap}
+th{color:var(--muted);font-weight:600}
+td.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+td.id{font-family:var(--f-mono);font-size:.78rem}
+td.id.lib{color:var(--lib)}
+tr.chg td{background:var(--chg)}
+td select{font-size:.78rem;padding:2px 4px;font-family:var(--f-mono)}
+.tag{font-size:.7rem;color:var(--muted);margin-left:4px}
+pre{font-family:var(--f-mono);font-size:.74rem;background:var(--soft);border-radius:6px;padding:8px;max-height:300px;overflow:auto;margin:0}
+.cost{font-family:var(--f-mono);font-size:1.6rem;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.note{font-size:.78rem;color:var(--muted);margin:8px 0 0}
+.checks{display:flex;flex-direction:column;gap:3px;font-size:.8rem;max-height:620px;overflow:auto}
+.checks .g{font-size:.72rem;letter-spacing:.08em;color:var(--muted);margin-top:6px}
+.checks div.c{display:grid;grid-template-columns:1.2em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:2px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500;font-size:.76rem}
+.ok{color:var(--ok)} .bad{color:var(--bad)}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.diff{font-size:.8rem;margin-top:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:800px){.two{grid-template-columns:minmax(0,1fr)}}
+</style>
+<div class="wrap">
+<header><h1>__TITLE__</h1><span class="sub">__SUB__</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3 id="hReq"></h3>
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div class="req" id="req"></div>
+      <div class="acts" id="acts"></div>
+      <div class="row"><button type="button" class="primary" id="btnAuto"></button><label style="font-size:.84rem"><input type="checkbox" id="autoMode"> <span id="lAuto"></span></label><button type="button" id="btnReset"></button></div>
+      <p class="note" id="reqNote"></p>
+    </section>
+    <section class="panel"><h3 id="hBom"></h3><div class="tblw"><table id="bom"></table></div><p class="note" id="bomNote"></p></section>
+    <div class="two">
+      <section class="panel"><h3 id="hIo"></h3><div class="tblw"><table id="io"></table></div></section>
+      <section class="panel"><h3 id="hFw"></h3><pre id="fw"></pre></section>
+    </div>
+  </div>
+  <div class="col">
+    <section class="panel"><h3 id="hCost"></h3><div class="cost" id="cost"></div><div id="verdict" style="font-size:.86rem"></div><div class="diff" id="diff"></div></section>
+    <section class="panel"><h3 id="hCrit"></h3><div class="checks" id="checks"></div></section>
+    <section class="panel"><h3 id="hTask"></h3><div id="tasks"></div></section>
+  </div>
+</div>
+<p class="note" id="model"></p>
+</div>
+<script>
+(function(){
+const LANG='__LANG__';
+const DATA=__DATA__;
+const LIB=DATA.LIB, K=DATA.K, BELT_FOR=DATA.BELT_FOR;
+const zh=LANG==='zh';
+const $=id=>document.getElementById(id);
+const S=zh?{
+ hReq:'需求表',hBom:'BOM（物料清单）：蓝色编号是问渠零件库里已有的条目；D-… 为建议编号，计划入库；黄色行与默认需求的最优方案不同',hIo:'I/O 映射（接线表）',hFw:'生成的固件配置（JSON）',hCost:'示意总价',hCrit:'判据',hTask:'任务',
+ auto:'自动配套',autoMode:'需求变了自动重选',reset:'恢复默认需求',
+ bomH:['编号','规格','用途','数量','示意单价','合计'],ioH:['端口','器件','编号'],
+ all:'全部判据满足',nbad:n=>`${n} 条判据不满足`,optimal:'且是满足判据的最低成本',notopt:c=>`（最低可达 ${c}）`,
+ diff:'与默认需求的最优方案相比更换了：',nodiff:'与默认需求的最优方案相同。',
+ yuan:'元',
+ reqNote:'改需求后点“自动配套”（或勾选自动重选）；也可以在 BOM 的下拉框里手动换件，判据会立即重算。价格、规格都是示意值。',
+ bomNote:'同步带不在零件库里，按米外购（示意）。联轴器 A-CPL-JAW/LM1 是库里最小的梅花联轴器，惯量 2×10⁻⁴ kg·m²（取自库的规格表）。',
+ model:'模型（与本书 figsrc/ch19_calc.py 相同，示意）：主轴所需转矩 T = (J_load + J_rotor)·ω/t_acc + 0.15 N·m，判据 T ≤ 0.8 T_peak；间歇工况每分钟起停 30 次、缝纫占一半时间，稳速负载 0.35 N·m，等效转矩 ≤ 额定转矩；惯量比 ≤ 10；急停回馈 0.7·½Jω² ≤ 驱动器可吸收能量。电磁铁折算转角 6·n·t，剪线 ≤ 20°，倒缝 ≤ 201.6°。步进矩频示意：拐点转速以下为保持转矩，以上按 1/n 下降，开环取 0.6、闭环取 0.8 的余量；同步带轴固有频率 ≥ 80 Hz（带 EA 按宽度：9/15/25 mm 为 90/150/250 kN，滑座在中间时最软）；丝杠 d0·n ≤ 70000。24 V 电源预算 = 逻辑 8 W（+ 触摸屏 6 W）+ 全部电磁铁维持功率 + 最大强激磁功率的一半，再乘 1.2；48 V 电源 = Σ(转矩×角速度/0.6 + 5 W) × 1.2。选针器一次吸合 + 释放 ≤ 0.8 × 一针时间 p/v。',
+ m:{LS:'平缝机',OL:'包缝机',PS:'花样机',FK:'横机'},
+ f:{n_max:'最高转速（r/min）',t_acc:'0→最高转速加速时间（s）',J_load:'负载折算惯量（×10⁻⁴ kg·m²）',n_trim:'剪线转速（r/min）',n_bt:'回针转速（r/min）',
+    tx:'X 行程（mm）',ty:'Y 行程（mm）',v:'X–Y / 机头最高速度（m/s）',a:'加速度（m/s²）',mx:'X 运动质量（kg）',my:'Y 运动质量（kg）',transX:'X 传动',transY:'Y 传动',
+    needles:'针床针数',E:'机号 E（针/英寸）',mc:'机头质量（kg）',sel:'选针器数',hmi:'触摸屏'},
+ tauto:'自动',
+ g:{sp:'主轴',drv:'伺服驱动',sol:'电磁铁',soldrv:'电磁铁驱动',io:'主控与 I/O',psu:'电源',knit:'选针与机头编码器'},
+ c:{nmax:'最高转速 ≤ 电机最高转速',tacc:'加速所需转矩 ≤ 0.8 × 峰值转矩',trms:'间歇工况等效转矩 ≤ 额定转矩',ratio:'负载惯量 / 转子惯量 ≤ 10',ic:'连续电流 ≤ 驱动器额定',ip:'加速电流 ≤ 驱动器峰值',brake:'急停回馈能量 ≤ 驱动器可吸收',
+    stroke:(n,v)=>`${n}：行程 ≥ ${v} mm`,force:(n,v)=>`${n}：行程末端力 ≥ ${v} N`,trim:(n,s)=>`${n}：${s} r/min 下吸合/释放折算转角 ≤ 20°`,bt:(n,s)=>`${n}：${s} r/min 下切换转角 ≤ 201.6°`,
+    ch:'通道数 ≥ 电磁铁数',pk:'峰值电流 ≥ 24 V / R',hold:'维持电流 ≥ 电磁铁维持电流',
+    fn:'同步带轴固有频率 ≥ 80 Hz',dn:'丝杠 d0·n ≤ 70000',tq:(k,n)=>`所需转矩 ≤ ${k} × ${n} r/min 时的可用转矩`,dv:'驱动器电流 ≥ 电机额定，闭环配闭环',ftq:(T,k,n)=>`负载 ${T} N·m ≤ ${k} × ${n} r/min 时的可用转矩`,
+    di:'数字输入 DI',do:'数字输出 DO',ai:'模拟输入 AI',enc:'编码器输入',pwm:'脉冲通道',need:'需要 ≤ 可用',
+    p24:'24 V 电源 ≥ 1.2 × 预算',p48:'48 V 电源 ≥ 1.2 × 预算',selc:'选针器吸合+释放 ≤ 0.8 × 一针时间',sels:'选针器行程 ≥ 0.3 mm、力 ≥ 2 N',res:'每计数机头位移 ≤ 0.01 针距',encn:'编码器转速 ≤ 允许'},
+ use:{spindle:'主轴',cpl:'电机—主轴',soldrv:'电磁铁驱动',ctl:'主控',exp:'扩展 I/O',gw:'联网',hmi:'人机界面',p24:'24 V：逻辑与电磁铁',p48:'48 V：步进驱动',selector:'选针器',encC:'机头位置',belt:'（m）'},
+ tasks:[
+  {t:'平缝机 5000 r/min、0.15 s 加速、四个电磁铁动作：全部判据满足，而且总价是最低的。',d:'先看初始的“上一代样机”BOM 哪些判据不满足、为什么；再自动配套或手动换件。对照 19.4 节的算例。'},
+  {t:'包缝机最高转速提到 7000 r/min：全部判据满足且成本最低。',d:'先只改转速、不换件，看哪几条变成 ✗；右上角会列出与 6000 r/min 方案相比必须换掉的模块。'},
+  {t:'花样机 300 × 200 mm、0.5 m/s、25 m/s²：全部判据满足且成本最低，并至少把一根轴试成丝杠。',d:'把 X 或 Y 的传动改成丝杠，看哪几条判据失败；想一想丝杠的导程怎样把电机转速和角加速度放大。'}],
+ done:'✓ 完成',undone:'○ 未完成'
+}:{
+ hReq:'Requirements',hBom:'BOM: blue IDs are existing WenQuest library entries; D-… are proposed IDs planned for the library; yellow rows differ from the optimum for the default requirements',hIo:'I/O map (wiring table)',hFw:'Generated firmware configuration (JSON)',hCost:'Illustrative total',hCrit:'Criteria',hTask:'Tasks',
+ auto:'Configure automatically',autoMode:'re-select when requirements change',reset:'Reset requirements',
+ bomH:['ID','Size','Use','Qty','Unit price','Sum'],ioH:['Port','Device','ID'],
+ all:'All criteria met',nbad:n=>`${n} criteria not met`,optimal:' at the lowest cost that meets them',notopt:c=>` (lowest possible ${c})`,
+ diff:'Changed against the optimum for the default requirements: ',nodiff:'Same as the optimum for the default requirements.',
+ yuan:'CNY',
+ reqNote:'After changing the requirements press “Configure automatically” (or tick automatic re-selection); you can also swap parts by hand in the BOM drop-downs and the criteria are recomputed at once. Prices and specifications are illustrative.',
+ bomNote:'The timing belt is not in the library and is bought by the metre (illustrative). A-CPL-JAW/LM1 is the smallest jaw coupling in the library, with an inertia of 2×10⁻⁴ kg·m² (from the library’s specification table).',
+ model:'Model (same as the book’s figsrc/ch19_calc.py; illustrative): spindle torque T = (J_load + J_rotor)·ω/t_acc + 0.15 N·m, criterion T ≤ 0.8 T_peak; intermittent duty of 30 starts per minute with sewing half the time and 0.35 N·m running load, equivalent torque ≤ rated torque; inertia ratio ≤ 10; braking energy 0.7·½Jω² ≤ what the drive can absorb. Solenoid angle 6·n·t: trimming ≤ 20°, backtack ≤ 201.6°. Stepper torque–speed (illustrative): holding torque below the corner speed, falling as 1/n above it, with margins of 0.6 open loop and 0.8 closed loop; timing-belt axis natural frequency ≥ 80 Hz (belt EA by width: 9/15/25 mm → 90/150/250 kN, softest with the carriage mid-travel); ball screw d0·n ≤ 70 000. 24 V budget = logic 8 W (+ panel 6 W) + all solenoid hold power + half the largest boost power, times 1.2; 48 V = Σ(torque × speed / 0.6 + 5 W) × 1.2. Selector pull-in + release ≤ 0.8 × the time per needle p/v.',
+ m:{LS:'Lockstitch',OL:'Overlock',PS:'Pattern sewer',FK:'Flat knitter'},
+ f:{n_max:'Top speed (r/min)',t_acc:'Acceleration time 0→top (s)',J_load:'Reflected load inertia (×10⁻⁴ kg·m²)',n_trim:'Trim speed (r/min)',n_bt:'Backtack speed (r/min)',
+    tx:'X travel (mm)',ty:'Y travel (mm)',v:'X–Y / carriage top speed (m/s)',a:'Acceleration (m/s²)',mx:'X moving mass (kg)',my:'Y moving mass (kg)',transX:'X drive',transY:'Y drive',
+    needles:'Needles on the bed',E:'Gauge E (needles/inch)',mc:'Carriage mass (kg)',sel:'Selectors',hmi:'Touch panel'},
+ tauto:'auto',
+ g:{sp:'Spindle',drv:'Servo drive',sol:'Solenoids',soldrv:'Solenoid driver',io:'Controller and I/O',psu:'Power supplies',knit:'Selection and carriage encoder'},
+ c:{nmax:'Top speed ≤ motor maximum speed',tacc:'Acceleration torque ≤ 0.8 × peak torque',trms:'Duty-cycle equivalent torque ≤ rated torque',ratio:'Load inertia / rotor inertia ≤ 10',ic:'Continuous current ≤ drive rating',ip:'Acceleration current ≤ drive peak',brake:'Braking energy ≤ drive capacity',
+    stroke:(n,v)=>`${n}: stroke ≥ ${v} mm`,force:(n,v)=>`${n}: force at stroke ≥ ${v} N`,trim:(n,s)=>`${n}: pull-in/release angle at ${s} r/min ≤ 20°`,bt:(n,s)=>`${n}: switching angle at ${s} r/min ≤ 201.6°`,
+    ch:'Channels ≥ solenoids',pk:'Peak current ≥ 24 V / R',hold:'Hold current ≥ solenoid hold current',
+    fn:'Belt-axis natural frequency ≥ 80 Hz',dn:'Ball screw d0·n ≤ 70 000',tq:(k,n)=>`Required torque ≤ ${k} × available at ${n} r/min`,dv:'Drive current ≥ motor rating, closed loop with closed loop',ftq:(T,k,n)=>`Load ${T} N·m ≤ ${k} × available at ${n} r/min`,
+    di:'Digital inputs DI',do:'Digital outputs DO',ai:'Analogue inputs AI',enc:'Encoder inputs',pwm:'Pulse channels',need:'needed ≤ available',
+    p24:'24 V supply ≥ 1.2 × budget',p48:'48 V supply ≥ 1.2 × budget',selc:'Selector pull-in + release ≤ 0.8 × time per needle',sels:'Selector stroke ≥ 0.3 mm, force ≥ 2 N',res:'Carriage travel per count ≤ 0.01 needle pitch',encn:'Encoder speed ≤ allowed'},
+ use:{spindle:'Spindle',cpl:'Motor–spindle',soldrv:'Solenoid driver',ctl:'Controller',exp:'I/O expansion',gw:'Network',hmi:'HMI',p24:'24 V: logic and solenoids',p48:'48 V: stepper drives',selector:'Needle selectors',encC:'Carriage position',belt:' (m)'},
+ tasks:[
+  {t:'Lockstitch, 5000 r/min, 0.15 s acceleration, four solenoid actions: all criteria met at the lowest cost.',d:'First see which criteria the initial “previous prototype” BOM fails and why; then configure automatically or swap parts by hand. Compare with the worked example in Section 19.4.'},
+  {t:'Overlock with the top speed raised to 7000 r/min: all criteria met at the lowest cost.',d:'Change only the speed first, without swapping parts, and see which criteria turn ✗; the panel at the top right lists the modules that had to change against the 6000 r/min solution.'},
+  {t:'Pattern sewer 300 × 200 mm, 0.5 m/s, 25 m/s²: all criteria met at the lowest cost, after trying a ball screw on at least one axis.',d:'Set the X or Y drive to a ball screw and see which criteria fail; think about how the lead multiplies motor speed and angular acceleration.'}],
+ done:'✓ Done',undone:'○ Not done'
+};
+// ---- machine definitions (same values as REQ in ch19_calc.py)
+const T2=(a,b)=>zh?a:b;
+const MACH={
+ LS:{n_max:5000,t_acc:0.15,J_load:5.0e-4,n_trim:300,n_bt:1800,hmi:false,
+   actions:[['trim',T2('剪线','Trim'),3,12,'trim'],['wipe',T2('拨线','Wipe'),4,5,'stop'],['bt',T2('倒缝','Backtack'),8,25,'bt'],['pfl',T2('抬压脚','Foot lift'),10,50,'stop']],
+   di:T2(['急停','机头翻起安全开关','手动回针按钮','断线检测'],['E-stop','Head-tilt switch','Backtack button','Thread-break sensor']),ai:T2(['脚踏','电控箱温度'],['Pedal','Box temperature']),
+   sensors:[['D-SNS-HALL','P20',1,T2('脚踏','Pedal')],['D-SNS-PE','R30',1,T2('断线检测','Thread break')],['D-SNS-PROX','M8',1,T2('机头翻起','Head tilt')]],pneu:[],axes:[],fixed:[],knit:null},
+ OL:{n_max:6000,t_acc:0.15,J_load:3.0e-4,n_trim:300,n_bt:1800,hmi:false,
+   actions:[['cut',T2('链线切刀','Chain cutter'),3,12,'stop'],['pfl',T2('抬压脚','Foot lift'),10,50,'stop']],
+   di:T2(['急停','机头翻起安全开关','前布边光电','后布边光电'],['E-stop','Head-tilt switch','Front edge sensor','Rear edge sensor']),ai:T2(['脚踏','电控箱温度'],['Pedal','Box temperature']),
+   sensors:[['D-SNS-HALL','P20',1,T2('脚踏','Pedal')],['D-SNS-PE','R30',2,T2('前、后布边','Front/rear edge')],['D-SNS-PROX','M8',1,T2('机头翻起','Head tilt')]],
+   pneu:[['D-PNU-VLV','52-24',1,T2('吸线头气阀','Chain suction valve')]],axes:[],fixed:[],knit:null},
+ PS:{n_max:2800,t_acc:0.15,J_load:5.0e-4,n_trim:300,n_bt:1800,hmi:true,
+   actions:[['trim',T2('剪线','Trim'),3,12,'trim'],['wipe',T2('拨线','Wipe'),4,5,'stop'],['trel',T2('松线','Tension release'),3,6,'stop']],
+   di:T2(['急停','安全光幕','X 原点','Y 原点','X 正限位','X 负限位','Y 正限位','Y 负限位','左压框到位','右压框到位','气压开关','断线检测','压框脚踏','启动脚踏'],
+         ['E-stop','Light curtain','X home','Y home','X+ limit','X− limit','Y+ limit','Y− limit','Left clamp down','Right clamp down','Air pressure','Thread break','Clamp pedal','Start pedal']),
+   ai:T2(['电控箱温度'],['Box temperature']),
+   sensors:[['D-SNS-PROX','M8',6,T2('X/Y 原点与限位','X/Y home and limits')],['D-SNS-PE','R30',1,T2('断线检测','Thread break')]],
+   pneu:[['D-PNU-CYL','32x25',2,T2('左、右压框气缸','Left/right clamp cylinders')],['D-PNU-VLV','52-24',2,T2('左、右压框电磁阀','Left/right clamp valves')]],
+   axes:[{id:'X',name:T2('X 轴','X axis'),travel:300,m:2.0,F:10},{id:'Y',name:T2('Y 轴','Y axis'),travel:200,m:5.0,F:15}],v:0.5,a:25,fixed:[],knit:null},
+ FK:{n_max:null,hmi:true,
+   actions:[['car1',T2('纱嘴 1','Carrier 1'),4,5,'stop'],['car2',T2('纱嘴 2','Carrier 2'),4,5,'stop']],
+   di:T2(['急停','安全门','机头原点','左限位','右限位','断纱检测'],['E-stop','Safety door','Carriage home','Left limit','Right limit','Yarn break']),ai:T2(['电控箱温度','纱线张力'],['Box temperature','Yarn tension']),
+   sensors:[['D-SNS-PROX','M8',3,T2('机头原点与限位','Carriage home and limits')],['D-SNS-PE','R30',1,T2('断纱检测','Yarn break')]],pneu:[],
+   axes:[{id:'C',name:T2('机头','Carriage'),travel:null,m:3.0,F:20}],v:0.5,a:5,
+   fixed:[['st1',T2('度目（左）','Stitch cam (left)'),0.15,300],['st2',T2('度目（右）','Stitch cam (right)'),0.15,300],['td',T2('牵拉','Take-down'),0.6,60]],
+   knit:{needles:60,E:5,selectors:2,cam_mm:120}}
+};
+const clone=o=>JSON.parse(JSON.stringify(o));
+const item=(cat,size)=>LIB[cat].sizes.find(s=>s.size===size);
+const sizes=cat=>LIB[cat].sizes;
+const RPM=2*Math.PI/60, PI=Math.PI;
+const crit=(g,text,val,lim,ok,unit='')=>({g,text,val,lim,ok:!!ok,unit});
+// ---- spindle
+function spNeed(r,mot){const w=r.n_max*RPM,J=r.J_load+mot.rotor_inertia_kgm2,al=w/r.t_acc,Ta=J*al+K.Tf,fa=K.starts_per_min*2*r.t_acc/60,fr=K.sew_frac-fa,Tr=Math.sqrt(fa*Ta*Ta+fr*K.Trun*K.Trun),E=0.5*J*w*w;
+  return {w,J,al,Ta,Tr,E,Er:K.regen*E,ratio:r.J_load/mot.rotor_inertia_kgm2};}
+function spCheck(r,mot,drv){const s=spNeed(r,mot),c=S.c,G=S.g;const Ic=s.Tr/mot.kt_NmA,Ip=s.Ta/mot.kt_NmA;s.Ic=Ic;s.Ip=Ip;
+  return [s,[crit(G.sp,c.nmax,r.n_max,mot.max_speed_rpm,r.n_max<=mot.max_speed_rpm,'r/min'),crit(G.sp,c.tacc,s.Ta,K.kT_servo*mot.peak_torque_Nm,s.Ta<=K.kT_servo*mot.peak_torque_Nm,'N·m'),
+   crit(G.sp,c.trms,s.Tr,mot.rated_torque_Nm,s.Tr<=mot.rated_torque_Nm,'N·m'),crit(G.sp,c.ratio,s.ratio,K.Jratio_max,s.ratio<=K.Jratio_max),
+   crit(G.drv,c.ic,Ic,drv.cont_current_A,Ic<=drv.cont_current_A,'A'),crit(G.drv,c.ip,Ip,drv.peak_current_A,Ip<=drv.peak_current_A,'A'),crit(G.drv,c.brake,s.Er,drv.brake_energy_J,s.Er<=drv.brake_energy_J,'J')]];}
+// ---- solenoids
+function solAng(r,act,sol){const n=act[4]==='trim'?r.n_trim:act[4]==='bt'?r.n_bt:0;return [n,6*n*sol.t_on_ms/1000,6*n*sol.t_off_ms/1000];}
+function solCheck(r,act,sol){const [aid,nm,st,F,kind]=act,c=S.c,G=S.g,C=[crit(G.sol,c.stroke(nm,st),sol.stroke_mm,st,sol.stroke_mm>=st,'mm'),crit(G.sol,c.force(nm,F),sol.force_at_stroke_N,F,sol.force_at_stroke_N>=F,'N')];
+  const [n,a1,a2]=solAng(r,act,sol),m=Math.max(a1,a2);
+  if(kind==='trim')C.push(crit(G.sol,c.trim(nm,n),m,K.sol_ang_max,m<=K.sol_ang_max,'°'));
+  if(kind==='bt')C.push(crit(G.sol,c.bt(nm,n),m,K.bt_window,m<=K.bt_window,'°'));return C;}
+// ---- axes
+const stepT=(m,n)=>m.holding_torque_Nm*Math.min(1,m.corner_speed_rpm/Math.max(n,1e-9));
+function axTravel(r,ax){if(ax.travel!=null)return ax.travel;const k=r.knit,p=25.4/k.E;return k.needles*p+2*(k.cam_mm+r.v*r.v/(2*r.a)*1000);}
+function axEval(r,ax,t,mot,drv){const v=r.v,a=r.a,m=ax.m,F=ax.F,L=axTravel(r,ax),C=[],d={L},Jm=mot.rotor_inertia_kgm2,nm=ax.name;let n,T;
+  if(t[0]==='belt'){const pu=item('A-PUL-HTD',t[1]),rr=pu.PD_mm/2000;n=(v/rr)/RPM;const al=a/rr,Jx=2*pu.J_kgm2;T=(m*a+F)*rr/K.eta_belt+(Jm+Jx)*al;
+    const belt=item('BUY-BELT',BELT_FOR[t[1]]),Lb=(L+150)/1000,kk=belt.EA_kN*1e3*(2/(Lb/2)),fn=Math.sqrt(kk/m)/(2*PI);Object.assign(d,{r:rr,n,al,T,fn,Jx});
+    C.push(crit(nm,S.c.fn,fn,K.fn_min,fn>=K.fn_min,'Hz'));}
+  else{const sc=item('A-BSC-SFU',t[1]),lead=sc.Ph_mm/1000;n=v/lead*60;const al=2*PI*a/lead,Ls=(L+150)/1000,dr=(sc.d0_mm-sc.Dw_mm)/1000,Jsc=PI*K.rho_steel*Ls*dr**4/32,Jc=item('A-CPL-JAW','LM1').J_kgm2,Jx=Jsc+Jc;
+    T=(m*a+F)*lead/(2*PI*K.eta_screw)+(Jm+Jx)*al;const DN=sc.d0_mm*n;Object.assign(d,{n,al,T,DN,Jx});C.push(crit(nm,S.c.dn,DN,K.DN_max,DN<=K.DN_max));}
+  const kT=mot.closed_loop?K.kT_closed:K.kT_open,Tav=stepT(mot,n);d.Tav=Tav;d.kT=kT;
+  C.push(crit(nm,S.c.tq(kT,n.toFixed(0)),T,kT*Tav,T<=kT*Tav,'N·m'));
+  C.push(crit(nm,S.c.dv,drv.current_A,mot.rated_current_A,drv.current_A>=mot.rated_current_A&&drv.closed_loop===mot.closed_loop,'A'));
+  d.P=T*n*RPM/K.step_eff+K.step_idle;return [d,C];}
+function fixEval(fs,mot,drv){const [id,nm,T,n]=fs,kT=mot.closed_loop?K.kT_closed:K.kT_open,Tav=stepT(mot,n);
+  return [{T,n,P:T*n*RPM/K.step_eff+K.step_idle},[crit(nm,S.c.ftq(T,kT,n),T,kT*Tav,T<=kT*Tav,'N·m'),crit(nm,S.c.dv,drv.current_A,mot.rated_current_A,drv.current_A>=mot.rated_current_A&&drv.closed_loop===mot.closed_loop,'A')]];}
+function knitEval(r,sel,enc,pul){const k=r.knit,p=25.4/k.E,tn=p/r.v,cyc=sel.t_on_ms+sel.t_off_ms,pu=item('A-PUL-HTD',pul),res=PI*pu.PD_mm/(4*enc.ppr),n=r.v/(PI*pu.PD_mm/1000)*60,G=S.g.knit,c=S.c;
+  return [{p,tn,cyc,res,n},[crit(G,c.selc,cyc,K.sel_share*tn,cyc<=K.sel_share*tn,'ms'),crit(G,c.sels,sel.force_at_stroke_N,2,sel.stroke_mm>=0.3&&sel.force_at_stroke_N>=2,'N'),
+   crit(G,c.res,res,0.01*p,res<=0.01*p,'mm'),crit(G,c.encn,n,enc.max_rpm,n<=enc.max_rpm,'r/min')]];}
+const allok=C=>C.every(x=>x.ok);
+function cheapest(c,ok,cost){let b=null;for(const x of c)if(ok(x)&&(b===null||cost(x)<cost(b)))b=x;return b;}
+const TRANS=()=>[...sizes('A-PUL-HTD').map(s=>['belt',s.size]),...sizes('A-BSC-SFU').map(s=>['screw',s.size])];
+const beltLen=L=>Math.round((2*(L+150)/1000+0.1)*10)/10;
+function transCost(t,L){const rail=2*item('A-LGD-RAIL','HGH15CA').price;if(t[0]==='belt'){const pu=item('A-PUL-HTD',t[1]),b=item('BUY-BELT',BELT_FOR[t[1]]);return 2*pu.price+b.price_per_m*beltLen(L)+rail;}
+  return item('A-BSC-SFU',t[1]).price+item('A-CPL-JAW','LM1').price+rail;}
+// ---- auto configuration: returns a selection object
+function autoSel(r,fixT){const sel={};
+  if(r.n_max){const b=cheapest(sizes('D-MOT-PMSM').flatMap(m=>sizes('D-DRV-SERVO').map(d=>[m,d])),c=>allok(spCheck(r,c[0],c[1])[1]),c=>c[0].price+c[1].price);
+    sel.mot=b?b[0].size:'750';sel.drv=b?b[1].size:'5A';}
+  for(const act of r.actions){const b=cheapest(sizes('D-SOL-PUSH'),s=>s.size!=='SEL'&&allok(solCheck(r,act,s)),s=>s.price);sel['sol:'+act[0]]=b?b.size:'XL60';}
+  if(r.knit){const s=cheapest(sizes('D-SOL-PUSH'),s=>allok(knitEval(r,s,item('D-ENC-INC','2500'),'3M-24-15')[1].slice(0,2)),s=>s.price);sel.selector=s?s.size:'SEL';
+    const e=cheapest(sizes('D-ENC-INC'),e=>allok(knitEval(r,item('D-SOL-PUSH',sel.selector),e,'3M-24-15')[1].slice(2)),e=>e.price);sel.encC=e?e.size:'2500';}
+  for(const ax of r.axes){const forced=fixT&&fixT[ax.id];const tl=ax.id==='C'?[['belt','3M-24-15']]:(forced?[forced]:TRANS());let best=null;
+    for(const t of tl)for(const m of sizes('D-MOT-STEP'))for(const dv of sizes('D-DRV-STEP')){const [d,C]=axEval(r,ax,t,m,dv);if(!allok(C))continue;const cost=m.price+dv.price+transCost(t,d.L);if(best===null||cost<best[0])best=[cost,t,m,dv];}
+    if(best){sel['ax:'+ax.id+':t']=best[1].join(':');sel['ax:'+ax.id+':mot']=best[2].size;sel['ax:'+ax.id+':drv']=best[3].size;}
+    else{const t=tl[0];sel['ax:'+ax.id+':t']=t.join(':');sel['ax:'+ax.id+':mot']='34-85C';sel['ax:'+ax.id+':drv']='C6A';}}
+  for(const fs of r.fixed){let best=null;for(const m of sizes('D-MOT-STEP'))for(const dv of sizes('D-DRV-STEP')){const [d,C]=fixEval(fs,m,dv);if(allok(C)&&(best===null||m.price+dv.price<best[0]))best=[m.price+dv.price,m,dv];}
+    sel['fs:'+fs[0]+':mot']=best?best[1].size:'34-85C';sel['fs:'+fs[0]+':drv']=best?best[2].size:'C6A';}
+  const tmp=evaluate(r,Object.assign({},sel,{soldrv:'4CH',ctl:'S',psu24:'24V100',psu48:'48V240'}));
+  const nch=tmp.solList.length,pk=Math.max(...tmp.solList.map(x=>24/item('D-SOL-PUSH',x[1]).coil_R_ohm)),hk=Math.max(...tmp.solList.map(x=>item('D-SOL-PUSH',x[1]).hold_A));
+  const bs=cheapest(sizes('D-DRV-SOL'),b=>b.peak_A>=pk&&b.hold_A>=hk,b=>b.price*Math.ceil(nch/b.channels));sel.soldrv=bs?bs.size:'8CH';
+  const bc=cheapest(sizes('D-CTL-WQSC'),c=>expNeed(tmp.io,c)!==null,c=>c.price+expNeed(tmp.io,c)*item('D-IO-EXP','16').price);sel.ctl=bc?bc.size:'L';
+  const p24=cheapest(sizes('D-PSU-SMPS').filter(s=>s.V_out===24),s=>s.P_W>=tmp.p24.need,s=>s.price);sel.psu24=p24?p24.size:'24V240';
+  if(tmp.p48){const p=cheapest(sizes('D-PSU-SMPS').filter(s=>s.V_out===48),s=>s.P_W>=tmp.p48.need,s=>s.price);sel.psu48=p?p.size:'48V480';}
+  return sel;}
+function expNeed(io,ctl){const e=item('D-IO-EXP','16');if(io.enc>ctl.encoder_inputs||io.pwm.length>ctl.pwm_ch)return null;
+  for(let n=0;n<=2;n++)if(io.di.length<=ctl.di+n*e.di&&io.do.length<=ctl.do+n*e.do&&io.ai.length<=ctl.ai+n*e.ai)return n;return null;}
+// ---- evaluate a selection: BOM, criteria, I/O, firmware config
+function evaluate(r,sel){const bom=[],C=[],res={sel};const add=(id,size,qty,use,slot)=>{const it=item(id,size);const up=it.price!==undefined?it.price:it.price_per_m;bom.push({id,size,qty,use,unit:up,sum:Math.round(up*qty*100)/100,slot});};
+  if(r.n_max){const m=item('D-MOT-PMSM',sel.mot),d=item('D-DRV-SERVO',sel.drv),[s,Cs]=spCheck(r,m,d);res.sp=s;C.push(...Cs);add('D-MOT-PMSM',sel.mot,1,S.use.spindle,'mot');add('D-DRV-SERVO',sel.drv,1,S.use.spindle,'drv');add('A-CPL-JAW','LM1',1,S.use.cpl);}
+  const solList=[];
+  for(const act of r.actions){const s=item('D-SOL-PUSH',sel['sol:'+act[0]]);C.push(...solCheck(r,act,s));solList.push([act[1],s.size]);add('D-SOL-PUSH',s.size,1,act[1],'sol:'+act[0]);}
+  const steps=[];
+  if(r.knit){const s=item('D-SOL-PUSH',sel.selector),e=item('D-ENC-INC',sel.encC),[kd,Ck]=knitEval(r,s,e,'3M-24-15');res.knit=kd;C.push(...Ck);
+    for(let i=0;i<r.knit.selectors;i++)solList.push([S.use.selector+' '+(i+1),s.size]);add('D-SOL-PUSH',s.size,r.knit.selectors,S.use.selector,'selector');add('D-ENC-INC',e.size,1,S.use.encC,'encC');}
+  if(sel.soldrv){const b=item('D-DRV-SOL',sel.soldrv),nch=solList.length,nb=Math.max(1,Math.ceil(nch/b.channels)),pk=Math.max(...solList.map(x=>24/item('D-SOL-PUSH',x[1]).coil_R_ohm)),hk=Math.max(...solList.map(x=>item('D-SOL-PUSH',x[1]).hold_A));
+    add('D-DRV-SOL',sel.soldrv,nb,S.use.soldrv,'soldrv');C.push(crit(S.g.soldrv,S.c.ch,nb*b.channels,nch,nb*b.channels>=nch),crit(S.g.soldrv,S.c.pk,b.peak_A,pk,b.peak_A>=pk,'A'),crit(S.g.soldrv,S.c.hold,b.hold_A,hk,b.hold_A>=hk,'A'));}
+  res.axes=[];
+  for(const ax of r.axes){const t=sel['ax:'+ax.id+':t'].split(':'),m=item('D-MOT-STEP',sel['ax:'+ax.id+':mot']),dv=item('D-DRV-STEP',sel['ax:'+ax.id+':drv']),[d,Ca]=axEval(r,ax,t,m,dv);
+    res.axes.push({id:ax.id,name:ax.name,t,d,mot:m.size});C.push(...Ca);add('D-MOT-STEP',m.size,1,ax.name,'ax:'+ax.id+':mot');add('D-DRV-STEP',dv.size,1,ax.name,'ax:'+ax.id+':drv');
+    if(t[0]==='belt'){add('A-PUL-HTD',t[1],2,ax.name,'ax:'+ax.id+':t');add('BUY-BELT',BELT_FOR[t[1]],beltLen(d.L),ax.name+S.use.belt);}
+    else{add('A-BSC-SFU',t[1],1,ax.name,'ax:'+ax.id+':t');add('A-CPL-JAW','LM1',1,ax.name);}
+    add('A-LGD-RAIL','HGH15CA',2,ax.name);steps.push([ax.name,m.closed_loop]);}
+  res.fixed=[];
+  for(const fs of r.fixed){const m=item('D-MOT-STEP',sel['fs:'+fs[0]+':mot']),dv=item('D-DRV-STEP',sel['fs:'+fs[0]+':drv']),[d,Cf]=fixEval(fs,m,dv);res.fixed.push(d);C.push(...Cf);
+    add('D-MOT-STEP',m.size,1,fs[1],'fs:'+fs[0]+':mot');add('D-DRV-STEP',dv.size,1,fs[1],'fs:'+fs[0]+':drv');steps.push([fs[1],m.closed_loop]);}
+  for(const [cat,size,q,use] of [...r.sensors,...r.pneu])add(cat,size,q,use);
+  // I/O
+  const al=T2('驱动报警','alarm'),dir=T2('方向','dir'),pul=T2('脉冲','pulse'),solw=T2('电磁铁','solenoid');
+  const io={enc:(r.n_max?1:0)+(r.knit?1:0),di:[...r.di,...steps.filter(s=>s[1]).map(s=>s[0]+' '+al)],
+    do:[...solList.map(s=>s[0]+' '+solw),...steps.map(s=>s[0]+' '+dir),...r.pneu.filter(p=>p[0]==='D-PNU-VLV').flatMap(p=>Array.from({length:p[2]},(_,i)=>p[3]+(p[2]>1?' '+(i+1):'')))],
+    pwm:steps.map(s=>s[0]+' '+pul),ai:[...r.ai],can:(r.n_max?1:0)+1};
+  res.io=io;res.solList=solList;
+  if(sel.ctl){const ctl=item('D-CTL-WQSC',sel.ctl);let n=expNeed(io,ctl);const e=item('D-IO-EXP','16');const nn=n===null?2:n;
+    const tot=k=>ctl[k]+nn*e[k];
+    for(const k of ['di','do','ai'])C.push(crit(S.g.io,S.c[k]+'：'.replace('：',zh?'：':': ')+S.c.need,io[k].length,tot(k),io[k].length<=tot(k)));
+    C.push(crit(S.g.io,S.c.enc+(zh?'：':': ')+S.c.need,io.enc,ctl.encoder_inputs,io.enc<=ctl.encoder_inputs),crit(S.g.io,S.c.pwm+(zh?'：':': ')+S.c.need,io.pwm.length,ctl.pwm_ch,io.pwm.length<=ctl.pwm_ch));
+    add('D-CTL-WQSC',sel.ctl,1,S.use.ctl,'ctl');if(nn)add('D-IO-EXP','16',nn,S.use.exp);res.nexp=nn;}
+  add('D-GW-WQSC','E',1,S.use.gw);if(r.hmi)add('D-HMI-PANEL','7',1,S.use.hmi);
+  const hold=solList.reduce((a,x)=>{const s=item('D-SOL-PUSH',x[1]);return a+s.hold_A**2*s.coil_R_ohm;},0),boost=Math.max(0,...solList.map(x=>24**2/item('D-SOL-PUSH',x[1]).coil_R_ohm));
+  const P=K.P_logic+(r.hmi?K.P_hmi:0)+hold+K.boost_share*boost;res.p24={hold,boost,P,need:K.psu_margin*P};
+  if(sel.psu24){const p=item('D-PSU-SMPS',sel.psu24);add('D-PSU-SMPS',sel.psu24,1,S.use.p24,'psu24');C.push(crit(S.g.psu,S.c.p24,p.P_W,res.p24.need,p.P_W>=res.p24.need&&p.V_out===24,'W'));}
+  if(steps.length){const P48=res.axes.reduce((a,x)=>a+x.d.P,0)+res.fixed.reduce((a,x)=>a+x.P,0);res.p48={P:P48,need:K.psu_margin*P48};
+    if(sel.psu48){const p=item('D-PSU-SMPS',sel.psu48);add('D-PSU-SMPS',sel.psu48,1,S.use.p48,'psu48');C.push(crit(S.g.psu,S.c.p48,p.P_W,res.p48.need,p.P_W>=res.p48.need&&p.V_out===48,'W'));}}
+  res.bom=bom;res.C=C;res.total=Math.round(bom.reduce((a,b)=>a+b.sum,0)*100)/100;res.ok=allok(C);return res;}
+// ---- state
+const ST={key:'LS',req:clone(MACH.LS),sel:null,auto:false,fixT:{X:null,Y:null},seenScrew:false};
+const PREV={mot:'250',drv:'1A5','sol:trim':'M15','sol:wipe':'M15','sol:bt':'M15','sol:pfl':'M15',soldrv:'4CH',ctl:'S',psu24:'24V100'};
+function reqFor(key){return Object.assign(clone(MACH[key]),{actions:MACH[key].actions.map(a=>[...a])});}
+function machineDefault(key){const r=reqFor(key);return evaluate(r,autoSel(r));}
+function optimum(){return evaluate(ST.req,autoSel(ST.req,ST.fixT));}
+function optimumFree(){return evaluate(ST.req,autoSel(ST.req));}
+// ---- UI
+const fmt=(v,u)=>{if(typeof v!=='number')return v;const a=Math.abs(v);const s=a>=1000?v.toFixed(0):a>=100?v.toFixed(1):a>=10?v.toFixed(1):a>=1?v.toFixed(2):a>=0.01?v.toFixed(3):v.toPrecision(2);return s+(u?' '+u:'');};
+function buildTabs(){$('tabs').innerHTML=['LS','OL','PS','FK'].map(k=>`<button type="button" role="tab" data-k="${k}" aria-selected="${k===ST.key}">${S.m[k]}</button>`).join('');
+  $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{setMachine(b.dataset.k,true);});}
+function field(id,lab,val,step,min,max){return `<label>${lab}<input type="number" id="f_${id}" value="${val}" step="${step}" min="${min}" max="${max}"></label>`;}
+function buildReq(){const r=ST.req,f=S.f;let h='';
+  if(r.n_max){h+=field('n_max',f.n_max,r.n_max,100,1000,9000)+field('t_acc',f.t_acc,r.t_acc,0.01,0.05,1)+field('J_load',f.J_load,+(r.J_load*1e4).toFixed(2),0.1,0.5,20);
+    if(r.actions.some(a=>a[4]==='trim'))h+=field('n_trim',f.n_trim,r.n_trim,10,50,1500);if(r.actions.some(a=>a[4]==='bt'))h+=field('n_bt',f.n_bt,r.n_bt,50,200,4000);}
+  if(ST.key==='PS'){const X=r.axes[0],Y=r.axes[1];h+=field('tx',f.tx,X.travel,10,50,800)+field('ty',f.ty,Y.travel,10,50,800)+field('v',f.v,r.v,0.05,0.05,2)+field('a',f.a,r.a,1,1,80)+field('mx',f.mx,X.m,0.1,0.5,20)+field('my',f.my,Y.m,0.1,0.5,40);
+    const opts=['',...TRANS().map(t=>t.join(':'))].map(v=>`<option value="${v}">${v?v.replace('belt:',T2('同步带 ','belt ')).replace('screw:',T2('丝杠 ','screw ')):S.tauto}</option>`).join('');
+    h+=`<label>${f.transX}<select id="f_transX">${opts}</select></label><label>${f.transY}<select id="f_transY">${opts}</select></label>`;}
+  if(ST.key==='FK'){h+=field('needles',f.needles,r.knit.needles,10,20,400)+field('E',f.E,r.knit.E,1,3,18)+field('v',f.v,r.v,0.05,0.05,2)+field('a',f.a,r.a,1,1,30)+field('mc',f.mc,r.axes[0].m,0.1,0.5,20)+field('sel',f.sel,r.knit.selectors,1,1,8);}
+  h+=`<label>${f.hmi}<input type="checkbox" id="f_hmi" ${r.hmi?'checked':''}></label>`;
+  $('req').innerHTML=h;
+  const all=MACH[ST.key].actions;$('acts').innerHTML=all.map(a=>`<label><input type="checkbox" data-a="${a[0]}" ${r.actions.some(x=>x[0]===a[0])?'checked':''}> ${a[1]} <span class="tag">${a[2]} mm / ${a[3]} N</span></label>`).join('');
+  if(ST.key==='PS'){$('f_transX').value=ST.fixT.X||'';$('f_transY').value=ST.fixT.Y||'';}
+  $('req').querySelectorAll('input,select').forEach(e=>e.addEventListener('change',readReq));
+  $('acts').querySelectorAll('input').forEach(e=>e.addEventListener('change',readReq));}
+function num(id){const e=$('f_'+id);return e?+e.value:null;}
+function readReq(){const r=ST.req;
+  if(r.n_max){r.n_max=num('n_max');r.t_acc=num('t_acc');r.J_load=num('J_load')*1e-4;if($('f_n_trim'))r.n_trim=num('n_trim');if($('f_n_bt'))r.n_bt=num('n_bt');}
+  if(ST.key==='PS'){r.axes[0].travel=num('tx');r.axes[1].travel=num('ty');r.v=num('v');r.a=num('a');r.axes[0].m=num('mx');r.axes[1].m=num('my');
+    ST.fixT.X=$('f_transX').value?$('f_transX').value.split(':'):null;ST.fixT.Y=$('f_transY').value?$('f_transY').value.split(':'):null;
+    if((ST.fixT.X&&ST.fixT.X[0]==='screw')||(ST.fixT.Y&&ST.fixT.Y[0]==='screw'))ST.seenScrew=true;
+    for(const ax of ['X','Y'])if(ST.fixT[ax])ST.sel['ax:'+ax+':t']=ST.fixT[ax].join(':');}
+  if(ST.key==='FK'){r.knit.needles=num('needles');r.knit.E=num('E');r.v=num('v');r.a=num('a');r.axes[0].m=num('mc');r.knit.selectors=Math.max(1,Math.round(num('sel')));}
+  r.hmi=$('f_hmi').checked;
+  const on=[...$('acts').querySelectorAll('input')].filter(e=>e.checked).map(e=>e.dataset.a);r.actions=MACH[ST.key].actions.filter(a=>on.includes(a[0])).map(a=>[...a]);
+  for(const a of r.actions)if(!ST.sel['sol:'+a[0]])ST.sel['sol:'+a[0]]='M15';
+  if(ST.auto)ST.sel=autoSel(r,ST.fixT);
+  render();}
+function slotOptions(slot){if(slot==='mot')return sizes('D-MOT-PMSM');if(slot==='drv')return sizes('D-DRV-SERVO');if(slot.startsWith('sol:')||slot==='selector')return sizes('D-SOL-PUSH');
+  if(slot==='encC')return sizes('D-ENC-INC');if(slot==='soldrv')return sizes('D-DRV-SOL');if(slot==='ctl')return sizes('D-CTL-WQSC');
+  if(slot==='psu24')return sizes('D-PSU-SMPS').filter(s=>s.V_out===24);if(slot==='psu48')return sizes('D-PSU-SMPS').filter(s=>s.V_out===48);
+  if(slot.endsWith(':mot'))return sizes('D-MOT-STEP');if(slot.endsWith(':drv'))return sizes('D-DRV-STEP');return null;}
+let LAST=null;
+function render(){const R=evaluate(ST.req,ST.sel);LAST=R;const OPT=optimum();const base=machineDefault(ST.key);
+  const baseBy={};base.bom.forEach(b=>{baseBy[b.id+'|'+b.use]=b.size;});
+  $('bom').innerHTML=`<thead><tr>${S.bomH.map((h,i)=>`<th${i>2?' style="text-align:right"':''}>${h}</th>`).join('')}</tr></thead><tbody>`+R.bom.map(b=>{const lib=!!LIB[b.id].lib;const isT=b.slot&&b.slot.endsWith(':t');
+    let sz=b.size;if(b.slot&&!isT){const o=slotOptions(b.slot);if(o)sz=`<select data-slot="${b.slot}">${o.map(s=>`<option ${s.size===b.size?'selected':''}>${s.size}</option>`).join('')}</select>`;}
+    if(isT){const ax=b.slot.split(':')[1];if(ax!=='C')sz=`<select data-slot="${b.slot}">${TRANS().map(t=>`<option value="${t.join(':')}" ${ST.sel[b.slot]===t.join(':')?'selected':''}>${t[1]}</option>`).join('')}</select>`;}
+    const chg=baseBy[b.id+'|'+b.use]!==undefined&&baseBy[b.id+'|'+b.use]!==b.size;
+    return `<tr class="${chg?'chg':''}"><td class="id ${lib?'lib':''}">${b.id}</td><td>${sz}</td><td>${b.use}</td><td class="num">${b.qty}</td><td class="num">${b.unit}</td><td class="num">${(+b.sum).toFixed(0)}</td></tr>`;}).join('')+
+    `<tr><td colspan="5" style="text-align:right;font-weight:600">${zh?'合计':'Total'}</td><td class="num" style="font-weight:600">${R.total.toFixed(0)}</td></tr></tbody>`;
+  $('bom').querySelectorAll('select').forEach(s=>s.onchange=()=>{const sl=s.dataset.slot;ST.sel[sl]=s.value;if(sl.endsWith(':t')){const ax=sl.split(':')[1];ST.fixT[ax]=s.value.split(':');if(s.value.startsWith('screw'))ST.seenScrew=true;if($('f_trans'+ax))$('f_trans'+ax).value=s.value;}
+    ST.auto=false;$('autoMode').checked=false;render();});
+  // I/O
+  const io=R.io;let rows=[];let k=1;
+  if(ST.req.n_max)rows.push(['ENC1',T2('主轴编码器 A/B/Z（伺服驱动器分频输出）','Spindle encoder A/B/Z (drive output)'),'D-MOT-PMSM/'+ST.sel.mot]);
+  if(ST.req.knit)rows.push([ST.req.n_max?'ENC2':'ENC1',T2('机头编码器','Carriage encoder'),'D-ENC-INC/'+ST.sel.encC]);
+  io.di.forEach((d,i)=>rows.push([(i<item('D-CTL-WQSC',ST.sel.ctl).di?'DI':'EXP.DI')+(i<item('D-CTL-WQSC',ST.sel.ctl).di?i+1:i+1-item('D-CTL-WQSC',ST.sel.ctl).di),d,'']));
+  io.do.forEach((d,i)=>rows.push(['DO'+(i+1),d,i<R.solList.length?'D-DRV-SOL CH'+(i+1):'']));
+  io.pwm.forEach((d,i)=>rows.push(['PWM'+(i+1),d,'']));io.ai.forEach((d,i)=>rows.push(['AI'+(i+1),d,'']));
+  if(ST.req.n_max)rows.push(['CAN FD #1',T2('伺服驱动器','Servo drive'),'D-DRV-SERVO/'+ST.sel.drv]);rows.push(['CAN FD #'+(ST.req.n_max?2:1),T2('网关','Gateway'),'D-GW-WQSC/E']);
+  $('io').innerHTML=`<thead><tr>${S.ioH.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`+rows.map(r=>`<tr><td class="id">${r[0]}</td><td>${r[1]}</td><td class="id">${r[2]}</td></tr>`).join('')+'</tbody>';
+  // firmware config
+  const fw={machine:'WQ-SC/'+ST.key,fw_version:'0.3.0',param_version:ST.key+'-P1-001',hal:{}};
+  if(ST.req.n_max){const m=item('D-MOT-PMSM',ST.sel.mot);fw.hal.spindle={driver:'spindle_canfd',module:'D-DRV-SERVO/'+ST.sel.drv};
+    fw.spindle={n_max_rpm:ST.req.n_max,t_acc_s:ST.req.t_acc,torque_limit_Nm:Math.floor(0.8*m.peak_torque_Nm*2)/2,enc_counts_per_rev:4*m.encoder_ppr,angle_unit:'0.1deg'};
+    if(ST.req.actions.some(a=>a[4]==='trim'))Object.assign(fw.spindle,{n_trim_rpm:ST.req.n_trim,up_pos_x10:700,pos_engage_x10:250});}
+  fw.hal.sol={driver:'sol_board',module:'D-DRV-SOL/'+ST.sel.soldrv,channels:R.solList.map((s,i)=>({ch:i+1,name:s[0],part:'D-SOL-PUSH/'+s[1]}))};
+  if(R.axes.length||R.fixed.length)fw.hal.stepper={driver:'stepper_pd',axes:R.axes.map(a=>({axis:a.id,motor:'D-MOT-STEP/'+a.mot,mm_per_rev:a.t[0]==='belt'?+(PI*item('A-PUL-HTD',a.t[1]).PD_mm).toFixed(3):item('A-BSC-SFU',a.t[1]).Ph_mm,v_max_mps:ST.req.v,a_max_mps2:ST.req.a}))};
+  const ev=[];const A=id=>ST.req.actions.some(a=>a[0]===id);
+  if(A('trim'))ev.push({start_x10:2050,end_x10:3300,out:'SOL_TRIM',cond:'TRIM_REV0'});if(A('wipe')&&ST.key==='LS')ev.push({start_x10:150,end_x10:600,out:'SOL_WIPE',cond:'TRIM_REV1'});
+  if(A('bt'))ev.push({start_x10:1142,end_x10:1142,out:'SOL_BT',cond:'BT_LATCH'});if(ev.length)fw.events=ev;
+  if(ST.req.knit)fw.knit={needles:ST.req.knit.needles,pitch_mm:+(25.4/ST.req.knit.E).toFixed(3),selector_lead_ms:+item('D-SOL-PUSH',ST.sel.selector).t_on_ms,select_on:'position (FPGA)'};
+  fw.report={topic:`wq/sewing/rnd/proto-${ST.key.toLowerCase()}01/status`,fields:['state','spindle_rpm','fw_version','param_version']};
+  $('fw').textContent=JSON.stringify(fw,null,1);
+  // cost & verdict
+  const nbad=R.C.filter(c=>!c.ok).length;$('cost').textContent=R.total.toFixed(0)+' '+S.yuan;
+  const isOpt=R.ok&&Math.abs(R.total-OPT.total)<0.5;
+  $('verdict').innerHTML=R.ok?`<span class="ok">✓ ${S.all}${isOpt?S.optimal:''}</span>${isOpt?'':`<span style="color:var(--muted)">${S.notopt(OPT.total.toFixed(0))}</span>`}`:`<span class="bad">✗ ${S.nbad(nbad)}</span>`;
+  const d=[];const curBy={};R.bom.forEach(b=>{curBy[b.id+'|'+b.use]=b.size;});
+  base.bom.forEach(b=>{const c=curBy[b.id+'|'+b.use];if(c!==undefined&&c!==b.size)d.push(`${b.use} ${b.id}：${b.size} → ${c}`.replace('：',zh?'：':': '));});
+  $('diff').innerHTML=d.length?S.diff+'<br>'+d.join('<br>'):S.nodiff;
+  // criteria
+  let h='',g='';for(const c of R.C){if(c.g!==g){g=c.g;h+=`<div class="g">${g}</div>`;}h+=`<div class="c"><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.text}</span><b>${fmt(c.val)} / ${fmt(c.lim,c.unit)}</b></div>`;}
+  $('checks').innerHTML=h;
+  checkTasks(R,OPT);}
+const done=new Set();
+function checkTasks(R,OPT){const r=ST.req,opt=R.ok&&Math.abs(R.total-OPT.total)<0.5,optFree=opt&&Math.abs(R.total-optimumFree().total)<0.5;
+  if(ST.key==='LS'&&r.n_max>=5000&&r.t_acc<=0.15&&r.actions.length===4&&optFree)done.add(0);
+  if(ST.key==='OL'&&r.n_max>=7000&&optFree)done.add(1);
+  if(ST.key==='PS'&&r.axes[0].travel>=300&&r.axes[1].travel>=200&&r.v>=0.5&&r.a>=25&&ST.seenScrew&&optFree)done.add(2);
+  $('tasks').innerHTML=S.tasks.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?S.done:S.undone}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+function setMachine(key,auto){ST.key=key;ST.req=reqFor(key);ST.fixT={X:null,Y:null};ST.sel=autoSel(ST.req);if(!auto)ST.sel=Object.assign(ST.sel,PREV);
+  buildTabs();buildReq();render();}
+$('btnAuto').onclick=()=>{ST.sel=autoSel(ST.req,ST.fixT);render();};
+$('autoMode').onchange=()=>{ST.auto=$('autoMode').checked;if(ST.auto){ST.sel=autoSel(ST.req,ST.fixT);render();}};
+$('btnReset').onclick=()=>{setMachine(ST.key,true);};
+['hReq','hBom','hIo','hFw','hCost','hCrit','hTask'].forEach(k=>$(k).textContent=S[k]);$('btnAuto').textContent=S.auto;$('lAuto').textContent=S.autoMode;$('btnReset').textContent=S.reset;
+$('reqNote').textContent=S.reqNote;$('bomNote').textContent=S.bomNote;$('model').textContent=S.model;
+setMachine('LS',false);
+window.__api={ST,LIB,K,MACH,evaluate,autoSel,setMachine,render,done,last:()=>LAST,
+  configure:(key,over)=>{const r=reqFor(key);if(over)Object.assign(r,over);return evaluate(r,autoSel(r));},
+  set:(over)=>{Object.assign(ST.req,over);if(ST.auto)ST.sel=autoSel(ST.req,ST.fixT);buildReq();render();},
+  choose:(slot,size)=>{ST.sel[slot]=size;if(slot.endsWith(':t')){const ax=slot.split(':')[1];ST.fixT[ax]=size.split(':');if(size.startsWith('screw'))ST.seenScrew=true;}render();},
+  auto:()=>{ST.sel=autoSel(ST.req,ST.fixT);render();}};
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">__BACK__</a>
+</body>
+</html>

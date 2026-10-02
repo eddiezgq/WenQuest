@@ -1,0 +1,30 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.st{display:grid;grid-template-columns:repeat(6,1fr);gap:0 26px;position:relative}
+.st .box{text-align:left;font-size:12.3px;position:relative}
+.st .box b{font-size:16px;margin-bottom:4px}
+.st .box:not(:last-child):after{content:"→";position:absolute;right:-22px;top:40%;color:#5a6570;font-size:18px}
+.st ul{margin:4px 0 0;padding-left:16px;color:#1b2430}.st li{margin:2px 0}
+.st .h{color:#5a6570;font-size:12px;display:block;margin-bottom:2px}
+.loop{display:flex;align-items:stretch;margin-top:22px}
+.loop .box{flex:1;font-size:12.5px}.loop .ar{width:30px;display:flex;align-items:center;justify-content:center;color:#5a6570;font-size:20px}
+.back{margin-top:6px;border-top:2px dashed #c4531d;color:#c4531d;font-size:12.5px;padding-top:4px;text-align:center}
+</style>
+<div class="fig" style="--w:1320px">
+<p class="title">From prototype to industrial grade: test data decide whether to move up a level</p><p class="sub">Every exit condition is a number an automated test can judge (illustrative; the full version is Table 22-7 in Section 22.8). After launch, end-of-line and field data flow back into requirements and test cases</p>
+<div class="st">
+<div class="box k"><b>P0 It moves</b><span class="h">one, hand-built</span><ul><li>spindle runs, stops at needle-up</li><li>unit and SIL frameworks run</li><li>gateway reports versions</li></ul></div>
+<div class="box b fill-b"><b>P1 Feature-complete</b><span class="h">1–2 units</span><ul><li>all actions run from the event table</li><li>≥ 1 test case per REQ</li><li>SIL 100 %, HIL ≥ 80 % pass</li></ul></div>
+<div class="box p fill-p"><b>EVT</b><span class="h">engineering validation, 2–3 units</span><ul><li>stop Cpk ≥ 1.33 (50 stops)</li><li>≤ 1 failure in 1000 trims</li><li>backtack ≤ 0.3 mm, solenoid ≤ 20°</li><li>HIL green 10 nights running</li></ul></div>
+<div class="box o fill-o"><b>DVT</b><span class="h">design validation, 3–5 units, firmware frozen</span><ul><li>EMC, ±10 % supply, 5–45 °C (Ch. 18)</li><li>trim 99.9 %/90 %: 2302 trims, no failure</li><li>4 h run on every unit, no fault</li></ul></div>
+<div class="box y fill-y"><b>PVT</b><span class="h">production validation, 20–50 units</span><ul><li>EOL first-pass yield ≥ 98 %</li><li>no early failures after burn-in</li><li>test data stored by serial number</li></ul></div>
+<div class="box g fill-g"><b>Volume production</b><span class="h">every unit</span><ul><li>EOL + burn-in</li><li>monthly review of field data</li><li>firmware changes still go through full CI</li></ul></div>
+</div>
+<div class="loop">
+<div class="box y"><b>End-of-line test</b><span>every unit: stop, 20 trims, solenoids, insulation and withstand voltage</span></div><div class="ar">→</div>
+<div class="box t fill-t"><b>Digital factory</b><span class="mono" style="font-size:11.5px">wq/sewing/eol/eol-01/measurement</span><span>historian and quality system, by serial number</span></div><div class="ar">→</div>
+<div class="box b"><b>In the field (Ch. 26)</b><span>status / event: trim counts, fault codes, firmware and parameter versions</span></div><div class="ar">→</div>
+<div class="box o fill-o"><b>Quality loop (Ch. 27)</b><span>compare by version, batch, serial; anomaly → new requirement or new test case</span></div>
+</div>
+<div class="back">↺ A problem found in the field becomes a new REQ and a new test case in the traceability matrix, tested automatically at the next firmware change (Sections 22.3 and 22.8)</div>
+</div>

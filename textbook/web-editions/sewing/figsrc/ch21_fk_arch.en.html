@@ -1,0 +1,74 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.id{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11px;color:#5a6570}
+.box span.id{display:inline}
+.box{text-align:left}
+.box b{font-size:14px}
+.box span{font-size:12px}
+.mk{border-style:dashed}
+.legend{display:flex;gap:18px;font-size:12.5px;color:#5a6570;margin-top:10px}
+.legend i{display:inline-block;width:14px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+</style>
+<div class="fig" style="--w:1180px">
+<p class="title">Make-up of the scaled flat-knitting prototype WQ-SC/FK (single system, single bed, 60 needles, E5)</p>
+<p class="sub">Illustrative. Top: mechanical layout (plan view, not to scale); bottom: electrical modules. Dashed outlines are home-made parts; solid outlines are existing library entries or modules proposed for the library (* proposed ID)</p>
+<svg width="1120" height="300" viewBox="0 0 1120 300" style="display:block">
+ <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5a6570"/></marker></defs>
+ <!-- frame/rails -->
+ <rect x="40" y="40" width="1040" height="14" rx="3" fill="#e9f0fc" stroke="#2a6fdb" stroke-width="2"/>
+ <text x="50" y="34" font-size="12.5" fill="#2a5fb8">Carriage guide A-LGD-RAIL size 15 (≈ 900 mm long)</text>
+ <!-- belt -->
+ <line x1="70" y1="70" x2="1050" y2="70" stroke="#c48a17" stroke-width="3"/>
+ <line x1="70" y1="84" x2="1050" y2="84" stroke="#c48a17" stroke-width="3"/>
+ <circle cx="70" cy="77" r="12" fill="#fbf4e3" stroke="#c48a17" stroke-width="2"/>
+ <circle cx="1050" cy="77" r="12" fill="#fbf4e3" stroke="#c48a17" stroke-width="2"/>
+ <text x="720" y="104" font-size="12" fill="#a8740c">5M belt 15 mm; pulleys A-PUL-HTD 5M-20-15 (100 mm/rev)</text>
+ <rect x="1066" y="62" width="40" height="30" rx="4" fill="#fcefe8" stroke="#e0662f" stroke-width="2"/>
+ <text x="1050" y="122" font-size="12" fill="#c4531d">200 W servo</text>
+ <!-- needle bed -->
+ <rect x="180" y="190" width="640" height="50" rx="4" fill="#f3f5f6" stroke="#1b2430" stroke-width="2" stroke-dasharray="6 4"/>
+ <g stroke="#5a6570" stroke-width="1.6">
+<line x1="185.3" y1="196" x2="185.3" y2="234"/><line x1="196.0" y1="196" x2="196.0" y2="234"/><line x1="206.7" y1="196" x2="206.7" y2="234"/><line x1="217.3" y1="196" x2="217.3" y2="234"/><line x1="228.0" y1="196" x2="228.0" y2="234"/><line x1="238.7" y1="196" x2="238.7" y2="234"/><line x1="249.3" y1="196" x2="249.3" y2="234"/><line x1="260.0" y1="196" x2="260.0" y2="234"/><line x1="270.7" y1="196" x2="270.7" y2="234"/><line x1="281.3" y1="196" x2="281.3" y2="234"/><line x1="292.0" y1="196" x2="292.0" y2="234"/><line x1="302.7" y1="196" x2="302.7" y2="234"/><line x1="313.3" y1="196" x2="313.3" y2="234"/><line x1="324.0" y1="196" x2="324.0" y2="234"/><line x1="334.7" y1="196" x2="334.7" y2="234"/><line x1="345.3" y1="196" x2="345.3" y2="234"/><line x1="356.0" y1="196" x2="356.0" y2="234"/><line x1="366.7" y1="196" x2="366.7" y2="234"/><line x1="377.3" y1="196" x2="377.3" y2="234"/><line x1="388.0" y1="196" x2="388.0" y2="234"/><line x1="398.7" y1="196" x2="398.7" y2="234"/><line x1="409.3" y1="196" x2="409.3" y2="234"/><line x1="420.0" y1="196" x2="420.0" y2="234"/><line x1="430.7" y1="196" x2="430.7" y2="234"/><line x1="441.3" y1="196" x2="441.3" y2="234"/><line x1="452.0" y1="196" x2="452.0" y2="234"/><line x1="462.7" y1="196" x2="462.7" y2="234"/><line x1="473.3" y1="196" x2="473.3" y2="234"/><line x1="484.0" y1="196" x2="484.0" y2="234"/><line x1="494.7" y1="196" x2="494.7" y2="234"/><line x1="505.3" y1="196" x2="505.3" y2="234"/><line x1="516.0" y1="196" x2="516.0" y2="234"/><line x1="526.7" y1="196" x2="526.7" y2="234"/><line x1="537.3" y1="196" x2="537.3" y2="234"/><line x1="548.0" y1="196" x2="548.0" y2="234"/><line x1="558.7" y1="196" x2="558.7" y2="234"/><line x1="569.3" y1="196" x2="569.3" y2="234"/><line x1="580.0" y1="196" x2="580.0" y2="234"/><line x1="590.7" y1="196" x2="590.7" y2="234"/><line x1="601.3" y1="196" x2="601.3" y2="234"/><line x1="612.0" y1="196" x2="612.0" y2="234"/><line x1="622.7" y1="196" x2="622.7" y2="234"/><line x1="633.3" y1="196" x2="633.3" y2="234"/><line x1="644.0" y1="196" x2="644.0" y2="234"/><line x1="654.7" y1="196" x2="654.7" y2="234"/><line x1="665.3" y1="196" x2="665.3" y2="234"/><line x1="676.0" y1="196" x2="676.0" y2="234"/><line x1="686.7" y1="196" x2="686.7" y2="234"/><line x1="697.3" y1="196" x2="697.3" y2="234"/><line x1="708.0" y1="196" x2="708.0" y2="234"/><line x1="718.7" y1="196" x2="718.7" y2="234"/><line x1="729.3" y1="196" x2="729.3" y2="234"/><line x1="740.0" y1="196" x2="740.0" y2="234"/><line x1="750.7" y1="196" x2="750.7" y2="234"/><line x1="761.3" y1="196" x2="761.3" y2="234"/><line x1="772.0" y1="196" x2="772.0" y2="234"/><line x1="782.7" y1="196" x2="782.7" y2="234"/><line x1="793.3" y1="196" x2="793.3" y2="234"/><line x1="804.0" y1="196" x2="804.0" y2="234"/><line x1="814.7" y1="196" x2="814.7" y2="234"/>
+ </g>
+ <text x="190" y="262" font-size="12.5" fill="#1b2430">Needle bed (home-made): 60 tricks at 5.08 mm, 304.8 mm wide; milled plate or inserted steel walls</text>
+ <!-- carriage -->
+ <rect x="290" y="112" width="250" height="66" rx="6" fill="#fcefe8" stroke="#e0662f" stroke-width="2" stroke-dasharray="6 4"/>
+ <text x="310" y="132" font-size="13" font-weight="700" fill="#c4531d">Carriage (home-made, ≈ 2.5 kg)</text>
+ <text x="310" y="150" font-size="11" fill="#5a6570">cams, 8-step selector, 2 stitch-cam motors</text>
+ <text x="310" y="166" font-size="11.5" fill="#5a6570">2 carrier solenoids, probe, board</text>
+ <line x1="395" y1="112" x2="395" y2="86" stroke="#e0662f" stroke-width="2"/>
+ <line x1="540" y1="145" x2="590" y2="145" stroke="#5a6570" stroke-width="1.5" marker-end="url(#a)"/>
+ <text x="545" y="139" font-size="11.5" fill="#5a6570">traverse</text>
+ <!-- selection point -->
+ <line x1="528" y1="112" x2="528" y2="240" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="3 3"/>
+ <text x="510" y="284" font-size="11.5" fill="#c0392b">selection point</text>
+ <!-- yarn carriers -->
+ <rect x="620" y="122" width="26" height="20" rx="3" fill="#f2ecfa" stroke="#8a5cc7" stroke-width="2"/>
+ <rect x="660" y="122" width="26" height="20" rx="3" fill="#f2ecfa" stroke="#8a5cc7" stroke-width="2"/>
+ <text x="620" y="162" font-size="11.5" fill="#7444b4">carriers 1, 2 (home-made, on a rod)</text>
+ <!-- takedown -->
+ <rect x="840" y="190" width="260" height="50" rx="6" fill="#e6f3f3" stroke="#14797f" stroke-width="2"/>
+ <text x="850" y="210" font-size="13" font-weight="700" fill="#0f6e74">Take-down (below the bed)</text>
+ <text x="850" y="228" font-size="11.5" fill="#5a6570">rubber roller + worm C-WRM-WORM + stepper</text>
+ <!-- reversal zones -->
+ <rect x="110" y="190" width="70" height="50" fill="#d8dde1" opacity=".5"/>
+ <text x="104" y="182" font-size="11" fill="#5a6570">reversal margin c</text>
+ <!-- home/limit -->
+ <rect x="52" y="140" width="22" height="18" rx="3" fill="#fff" stroke="#9aa4ae" stroke-width="2"/>
+ <text x="40" y="176" font-size="11" fill="#5a6570">home / limit</text>
+ <!-- yarn path -->
+ <path d="M 700 14 C 680 40, 670 80, 660 122" fill="none" stroke="#8a5cc7" stroke-width="1.5" stroke-dasharray="4 3"/>
+ <text x="710" y="18" font-size="11.5" fill="#7444b4">cone → tensioner → yarn-break sensor</text>
+</svg>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px">
+<div class="box k fill-k"><b>WQ-SC controller (frame)</b><span><span class="id">D-CTL-WQSC*</span>: works per course: pattern → selection bitmaps, carriage position commands</span></div>
+<div class="box o mk"><b>Carriage board (rides along)</b><span>MCU or MCU + small FPGA: fires per needle on carriage position; 8 selector, 2 carrier, 2 stitch-cam channels; CAN FD through the cable chain</span></div>
+<div class="box b"><b>Carriage drive</b><span>200 W servo <span class="id">D-MOT-PMSM*</span> + drive <span class="id">D-DRV-SERVO*</span>; motor encoder 10 000 counts/rev → 0.01 mm</span></div>
+<div class="box p"><b>8-step selector (home-made)</b><span>8 small electromagnets, T<sub>r</sub> ≈ 1.5 ms (illustrative); driver <span class="id">D-DRV-SOL*</span> with the same boost circuit</span></div>
+<div class="box y"><b>Stitch cams</b><span>2 × closed-loop NEMA 17 steppers <span class="id">D-MOT-STEP*</span> + lead screw <span class="id">C-SCN-LEAD</span></span></div>
+<div class="box"><b>Yarn carriers</b><span>2 push-pull solenoids <span class="id">D-SOL-PUSH*</span>, picked up and dropped in the reversal zone</span></div>
+<div class="box t"><b>Take-down and tension</b><span>Stepper <span class="id">D-MOT-STEP*</span>; tension dancer + Hall angle sensor <span class="id">D-SNS-HALL*</span></span></div>
+<div class="box"><b>Protection</b><span>Yarn break <span class="id">D-SNS-PE*</span>, needle probe, home/limits <span class="id">D-SNS-PROX*</span>, E-stop, cable chain</span></div>
+</div>
+<div class="legend"><span><i style="border:2px dashed #1b2430"></i>home-made</span><span><i style="border:2px solid #1b2430"></i>library entry / proposed module</span><span>* proposed ID, planned for the library</span></div>
+</div>

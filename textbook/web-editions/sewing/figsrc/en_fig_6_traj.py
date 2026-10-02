@@ -1,0 +1,27 @@
+from en_relabel import *
+N = 'fig_6_traj'
+im = load(N)
+K = (31, 42, 54); G = (93, 107, 122); DG = (27, 94, 56); GN = (46, 158, 91); AM = (183, 121, 31); W = (255, 255, 255)
+header(im, 'Feed-dog tooth-tip trajectory: two harmonic motions combined',
+       'Worked example: stitch length 3 mm (horizontal dog stroke 3.24 mm), lift amplitude 1.1 mm, dog height 0.8 mm; horizontal axis: main-shaft angle')
+rep(im, B(156, 142, 570, 168), 'Horizontal component X(φ): from the feed eccentric via the stitch regulator', 27, DG, bold=True, mode='c', at=P(160, 155))
+rep(im, B(156, 507, 570, 533), 'Vertical component Y(φ): from the lift eccentric (0 = plate surface)', 27, AM, bold=True, mode='c', at=P(160, 520))
+erase(im, B(451, 214, 552, 237), 'c', W)
+copy_strip(im, B(430, 214, 434, 237), dy=60)
+bridge_curve(im, B(451, 200, 552, 237), DG)
+text(im, P(418, 272), 'Foremost 114.2°', 23, DG, bold=True, halo=4)
+rep(im, B(201, 558, 275, 581), 'Highest 40.0°', 23, AM, bold=True, mode='v', at=P(204, 569))
+rep(im, B(422, 627, 508, 649), 'Drops 114.2°', 23, AM, bold=True, mode='v', at=P(425, 638), halo=3)
+rep(im, B(838, 627, 924, 649), 'Emerges 325.8°', 23, AM, bold=True, mode='v', anchor='rm', at=P(921, 638), halo=3)
+rep(im, B(372, 840, 772, 865), 'Green shading: dog above the plate, gripping the fabric (148.3°)', 26, GN, mode='c', anchor='mm', at=P(572, 852))
+rep(im, B(1166, 172, 1315, 197), 'Combined path (tooth tip)', 29, K, bold=True, mode='c', ecolor=W, at=P(1170, 184))
+rep(im, B(1394, 245, 1548, 269), 'Pushes the fabric forward above the plate', 25, DG, bold=True, mode='c', ecolor=W, anchor='mm', at=P(1470, 257))
+rep(im, B(1586, 317, 1653, 340), 'Highest 40°', 25, DG, bold=True, mode='c', ecolor=W, anchor='mm', at=P(1619, 328))
+rep(im, B(1211, 465, 1289, 488), 'Emerges 326°', 25, DG, bold=True, mode='c', ecolor=W, anchor='rm', at=P(1287, 476))
+rep(im, B(1837, 465, 1915, 488), 'Drops 114°', 25, DG, bold=True, mode='c', ecolor=W, at=P(1840, 476))
+rep(im, B(1889, 503, 1944, 526), 'Plate surface', 24, G, mode='h', anchor='rm', at=P(1940, 514))
+rep(im, B(1425, 759, 1502, 782), 'Lowest 220°', 25, DG, bold=True, mode='h', anchor='rm', at=P(1500, 770))
+rep(im, B(1715, 769, 1836, 791), 'Returns below the plate', 25, G, mode='h', at=P(1718, 780))
+rep(im, B(1137, 806, 1495, 853), 'Dashed: horizontal phase advanced 30° (red, back-drag appears)\n'
+    '            horizontal phase retarded 30° (purple, still advancing as the dog drops)', 24, G, mode='h', at=P(1141, 817), spacing=1.4)
+save(im, N)

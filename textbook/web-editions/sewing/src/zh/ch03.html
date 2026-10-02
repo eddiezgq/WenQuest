@@ -1,0 +1,101 @@
+<p class="eyebrow">第二篇 · 平缝机机构</p><h1><span class="chno">第 3 章</span>刺布机构</h1><div class="seam" aria-hidden="true"></div><div class="chips"><span class="chips-label">本章互动资源</span><a class="chip" href="#lab-model-lockstitch"><b>三维模型</b>工业平缝机</a><a class="chip" href="#lab-slidercrank"><b>虚拟实验</b>针杆曲柄滑块机构</a></div><p>第 2 章说明了线迹靠四个动作配合形成。本章讨论其中第一条传动链：上轴经针杆曲柄和连杆带动针杆上下往复，叫作<strong>刺布机构</strong>。它结构最简单，却决定了整机的转速上限和振动水平，也是后面各机构定时的基准。</p>
+<h3 id="s3-1">3.1 刺布机构的任务</h3>
+<p>刺布机构要同时满足五条要求：</p>
+<p>首先是行程要够用。针杆在上止点时，针尖要高于压脚抬起后的布料，否则放不进布；在下止点时，针眼又要低于梭尖的运动轨迹，否则梭尖钩不到线环。工业平缝机的针杆行程一般在 31–35 mm（待核）。</p>
+<p>其次是定时要准确。主轴转角和针杆位置必须一一对应，下止点落在 180°，针从下止点回升约 2 mm 时正好让梭尖钩线。</p>
+<p>第三是要能跑高速。工业平缝机的主轴转速可达每分钟 4000–6000 转（待核），针杆每秒往复八九十次，机构必须经得起这样的速度。</p>
+<p>第四是振动要小。针杆的惯性力经轴套传到机壳上，是整机振动和噪声的主要来源。</p>
+<p>最后，针杆不能转，高度还要能调。机针的凹口必须始终朝向梭尖，针杆一转，凹口就偏了；针杆高度要能微调，以便和旋梭对准。</p>
+<h3 id="s3-2">3.2 结构</h3>
+<p>图 3-1 是顺着上轴看过去、拆下面板后的刺布机构。上轴前端装有<strong>针杆曲柄</strong>，曲柄上与曲柄销相对的一侧铸有平衡块；<strong>针杆连杆</strong>一端套在曲柄销上，另一端与夹在针杆上的<strong>针杆连接轴</strong>（抱箍）铰接。针杆在上、下两个轴套里滑动，连接轴另一端的<strong>导滑块</strong>嵌在机头的导槽里，保证针杆只上下动、不转动。针杆下端用针夹和针夹螺钉固定机针。</p>
+<figure class="fig"><a class="zoom" href="img/fig_needlebar_mech.png"><img src="img/fig_needlebar_mech.png" alt="图 3-1　刺布机构结构图" loading="lazy"></a><figcaption>图 3-1　刺布机构结构图（顺着上轴看，面板已拆下，φ = 60°，结构示意）</figcaption></figure>
+<p>这个结构里有两处调整：松开针杆连接轴的螺钉，可以让针杆相对连接轴上下移动，改变<strong>针杆高度</strong>，也就是钩线时梭尖与针眼的高度差；松开针夹螺钉，可以调整机针的插入深度和朝向。两者都不改变针杆的运动规律，只改变它的绝对位置。</p>
+<h3 id="s3-3">3.3 运动简图</h3>
+<p>去掉外形，只留下构件之间的连接关系，刺布机构就是一个<strong>对心曲柄滑块机构</strong>（图 3-2）：上轴是曲柄 OA，针杆连杆是连杆 AB，针杆是滑块 B。</p>
+<figure class="fig chart"><a class="zoom" href="img/w_f239087a.png"><img src="img/w_f239087a.png" alt="图 3-2　针杆机构运动简图" loading="lazy"></a></figure>
+
+<p>要特别注意滑块的位置。内燃机的活塞在曲轴上方，活塞最高时曲柄销朝向活塞，OB = r + l；针杆却<strong>悬在上轴下方</strong>，针杆最高时曲柄销朝上、背离针杆，OB = l − r。两者的上止点正好对调，直接套用发动机教材的公式会把上、下止点的加速度弄反。</p>
+<h3 id="s3-4">3.4 位移、速度与加速度</h3>
+<p>以上止点为位移零点，向下为正。由图 3-2，OB = l cosβ − r cosφ，且 r sinφ = l sinβ，得</p>
+<div class="math">\[x = r(1-\cos\varphi) - l\left(1-\sqrt{1-\lambda^{2}\sin^{2}\varphi}\right),\qquad \lambda=\frac{r}{l}\]</div>
+<p>对时间求导（主轴匀速，φ = ωt），记 S = √(1 − λ²sin²φ)：</p>
+<div class="math">\[v = r\omega\sin\varphi\left(1-\frac{\lambda\cos\varphi}{S}\right),\qquad a = r\omega^{2}\left(\cos\varphi-\lambda\,\frac{\cos2\varphi+\lambda^{2}\sin^{4}\varphi}{S^{3}}\right)\]</div>
+<p>工程上 λ 一般不超过 0.35，把根号展开到 λ² 项就得到常用的近似式：</p>
+<div class="math">\[x \approx r\left[(1-\cos\varphi)-\frac{\lambda}{4}(1-\cos2\varphi)\right],\quad v \approx r\omega\left(\sin\varphi-\frac{\lambda}{2}\sin2\varphi\right),\quad a \approx r\omega^{2}(\cos\varphi-\lambda\cos2\varphi)\]</div>
+<p>由近似式立刻看出两个结论：上止点（φ = 0）a = rω²(1 − λ)，下止点（φ = 180°）a = −rω²(1 + λ)，<strong>下止点的加速度比上止点大</strong>；加速度由一个以 ω 变化的一阶项和一个以 2ω 变化的二阶项叠加而成，二阶项的大小正比于 λ。</p>
+<h3 id="s3-5">3.5 算例</h3>
+<p>取 r = 15.5 mm，l = 55 mm（λ = 0.282），主轴转速 n = 5000 r/min，ω = 2πn/60 = 523.6 rad/s。上止点时针尖在针板上方 18 mm，布料厚 1.5 mm（均为示意取值）。精确式计算结果：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>针杆行程 2r</td>
+<td>31.0 mm</td>
+</tr>
+<tr>
+<td>最大速度</td>
+<td>8.43 m/s，在 φ ≈ 104.7° 和 255.3°</td>
+</tr>
+<tr>
+<td>上止点加速度</td>
+<td>3052 m/s²（约 311 g）</td>
+</tr>
+<tr>
+<td>下止点加速度</td>
+<td>−5447 m/s²（约 555 g）</td>
+</tr>
+<tr>
+<td>机针回升 2 mm 的转角</td>
+<td>206.1°</td>
+</tr>
+<tr>
+<td>机针在布料中的区间</td>
+<td>101.7° – 258.3°</td>
+</tr>
+</tbody>
+</table></div>
+<p>图 3-3 是一周内的位移、速度和加速度曲线。</p>
+<figure class="fig chart"><a class="zoom" href="img/w_f0f8ad0a.png"><img src="img/w_f0f8ad0a.png" alt="图 3-3　针杆位移、速度、加速度曲线（算例计算值）" loading="lazy"></a></figure>
+
+<p>读图 3-3 要抓住三点：</p>
+<p>第一点，位移曲线并不对称于 90°。主轴转到 90° 时，针杆只走了 13.3 mm，还不到行程的一半；速度最大的时刻也不在 90°，而在 104.7°。这是连杆倾斜造成的，λ 越大，偏得越多。</p>
+<p>第二点，上止点附近曲线平缓，下止点附近曲线尖锐。上止点的加速度为 3.05 km/s²，在前后 30° 的范围内几乎不变；下止点的加速度却达到 5.45 km/s²。换句话说，机针在上方“停留”得久，在下方转身得快。</p>
+<p>第三点，最大惯性力发生在下止点。而下止点前后，恰恰是机针在布料中、线环正在形成、梭尖准备钩线的时刻，针杆轴套的磨损和间隙会直接影响钩线是否稳定。</p>
+<p>动手改参数看曲线怎样变化，请用 <a href="#lab-slidercrank" class="labref">虚拟实验 3-1　针杆曲柄滑块机构实验</a>。</p><section class="lab" id="lab-slidercrank" data-src="labs/slidercrank.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4 id="x55541">虚拟实验 3-1　针杆曲柄滑块机构</h4></div><p>调曲柄半径、连杆长度和转速，看位移、速度、加速度曲线和钩线时刻怎样变化。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/slidercrank.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<h3 id="s3-6">3.6 连杆比与钩线时刻</h3>
+<p>第 2 章说过，梭尖要在机针从最低点回升约 2 mm 时钩线。把位移式在 φ = 180° + δ 处展开，得到下止点附近的回升量：</p>
+<div class="math">\[h(\delta) = x(180^{\circ}) - x(180^{\circ}+\delta) \approx \frac{r}{2}(1+\lambda)\,\delta^{2}\]</div>
+<p>代入算例，h = 2 mm 时 δ ≈ 26°，即钩线在 φ ≈ 206°。这个式子说明：行程 r 不变时，<strong>λ 越大，回升越快，钩线时刻越早</strong>（图 3-4）。</p>
+<figure class="fig chart"><a class="zoom" href="img/w_55ae5477.png"><img src="img/w_55ae5477.png" alt="图 3-4　连杆比对下止点后回升量的影响（精确式计算）" loading="lazy"></a></figure>
+
+<p>精确计算，λ = 0.20、0.282、0.40 时回升 2 mm 的转角分别是 206.9°、206.1°、204.9°，下止点加速度分别是 5099、5447、5949 m/s²。差别只有一两度，但对钩线来说已经不可忽略：第 2 章虚拟实验里不跳针的钩线时刻窗口只有十几度。所以改动连杆长度或曲柄半径以后，旋梭的安装角度和针杆高度都要重新校正。</p>
+<p>反过来看，λ 小（连杆长）的好处是下止点加速度小、运动更接近简谐，代价是机头要加高、针杆组件变长变重。工业平缝机的 λ 多在 0.25–0.32 之间（待核），是在这两者之间折中的结果。</p>
+<h3 id="s3-7">3.7 惯性力与平衡</h3>
+<p>针杆、针夹、机针以及连杆折算到针杆一端的部分合称<strong>往复质量</strong> m。它的惯性力</p>
+<div class="math">\[F = -m\,a \approx -m r\omega^{2}\cos\varphi + m r\omega^{2}\lambda\cos2\varphi\]</div>
+<p>取 m = 120 g（示意值，待按实际零件称量），算例中下止点惯性力约 0.12 × 5447 ≈ 654 N，上止点约 366 N。惯性力与转速的平方成正比：转速从 5000 提到 6000 r/min，惯性力增大到 1.44 倍，约 942 N。对针杆、针夹和机针这组一百多克重的往复部件来说，这是几百倍于自重的力，每秒来回八十多次。</p>
+<p>惯性力分为两部分：</p>
+<p>第一部分是一阶惯性力 m r ω² cosφ，它的频率等于主轴转速。在曲柄上与曲柄销相反的一侧加一块平衡块，它产生一个同频的离心力，可以抵消曲柄、曲柄销这些旋转质量的惯性力，也能抵消一部分一阶往复惯性力。但平衡块的离心力方向随曲柄一起旋转，它在抵消竖直方向往复力的同时，会在水平方向产生一个新的不平衡力，所以往复质量通常只平衡一部分。</p>
+<p>第二部分是二阶惯性力 m r ω² λ cos2φ，它的频率是主轴转速的两倍，曲柄上的平衡块对它无能为力。它的大小正比于 λ，这是又一个不宜把连杆做得太短的理由。</p>
+<p>降低振动最有效的办法仍是减小 m：针杆用空心钢管、针夹和连接轴尽量小巧。</p>
+<h3 id="s3-8">3.8 设计要点</h3>
+<p>设计一个刺布机构，参数是有先后顺序的。先由布料厚度、压脚抬高量和旋梭的位置定出行程 2r，再在 λ = 0.25–0.32（待核）之间选定连杆长度，最后按钩线时刻反推旋梭的安装角。</p>
+<p>参数定下来以后，要想办法减轻往复质量，因为惯性力和它成正比。常见的做法是把针杆做成空心，用小型针夹，连杆采用工字形或镂空截面。剩下的惯性力靠平衡块处理：曲柄和曲柄销的旋转质量要全部平衡，往复质量只平衡一部分，具体比例由整机振动实测确定。</p>
+<p>高速运转还带来润滑和磨损问题。针杆轴套、曲柄销和连杆两端都是高速、变载荷的摩擦副，需要可靠的供油；高速机型的连杆两端多用滚针轴承（待核）。最后不要忘了防转和可调：导滑块与导槽的间隙决定了针杆会不会晃动，针杆连接轴要便于调节针杆高度，针夹要保证机针的凹口始终朝向梭尖。</p>
+<h3 id="x40115">第 3 章 习题</h3>
+<ol>
+<li>推导针杆位移的精确式，并说明为什么它与内燃机教材中活塞位移式的第二项符号相反。</li>
+<li>从近似式出发，证明上、下止点加速度之比为 (1 − λ) : (1 + λ)，并用算例数据验证。</li>
+<li>某机型 r = 17 mm，l = 60 mm，n = 5500 r/min，求行程、最大速度、上下止点加速度，以及机针回升 2 mm 时的主轴转角。用虚拟实验 3-1 核对你的结果。</li>
+<li>保持行程不变，把连杆从 55 mm 缩短到 45 mm，钩线时刻大约变化几度？旋梭安装角应当怎样调整？</li>
+<li>往复质量 100 g，要求最大惯性力不超过 500 N，算例机构允许的最高转速是多少？</li>
+<li>为什么曲柄上的平衡块不能完全平衡针杆的往复惯性力？说出两条理由。</li>
+</ol>
+<h3 id="x78051">配套资源</h3>
+<p><a href="#lab-slidercrank" class="labref">虚拟实验 3-1　针杆曲柄滑块机构实验</a>　可以调 r、l、n 和往复质量，实时看位移、速度、加速度、惯性力和钩线时刻怎样变化，灰色虚线保留算例作对照，附四个实验任务。</p>
+<p><a href="#lab-model-lockstitch" class="labref">模型 2-1　工业平缝机三维结构</a>　切到“透视”、点击“刺布”链，就能在整机中看到刚才分析的曲柄滑块机构。</p><section class="lab" id="lab-model-lockstitch" data-src="labs/model-lockstitch.html"><div class="lab-head"><span class="lab-kind">三维模型</span><h4 id="x21282">模型 2-1　工业平缝机</h4></div><p>可旋转、透视、爆炸查看整机和四条传动链，点击零件看名称。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/model-lockstitch.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>

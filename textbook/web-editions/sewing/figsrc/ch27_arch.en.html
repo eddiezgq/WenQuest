@@ -1,0 +1,53 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.layer{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:stretch;margin-bottom:10px}
+.lh{border-radius:10px;padding:10px 12px;font-weight:700;font-size:15px;display:flex;flex-direction:column;justify-content:center}
+.lh small{font-weight:400;font-size:12px;color:#5a6570;margin-top:3px}
+.row{display:grid;gap:10px}
+.box{padding:8px 9px}
+.box b{font-size:14px}
+.box span{font-size:12px;line-height:1.4}
+.plan{border-style:dashed;background:#fff}
+.plan b::after{content:" (planned)";font-weight:400;font-size:11.5px;color:#c0392b}
+.bus{border:2.5px solid #14797f;background:#e6f3f3;border-radius:10px;padding:10px 14px;text-align:center}
+.bus b{color:#0f6e74;font-size:15px}
+.bus span{display:block;font-size:12.5px;color:#1b2430;font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;margin-top:3px}
+.side{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.leg{display:flex;gap:22px;font-size:12.5px;color:#5a6570;margin-top:12px;align-items:center}
+.leg span{white-space:nowrap}.leg span:last-child{white-space:normal}.leg i{display:inline-block;width:30px;height:16px;border:2px solid #9aa4ae;border-radius:4px;vertical-align:middle;margin-right:6px}
+</style>
+<div class="fig" style="--w:1080px">
+<p class="title">Overall architecture of the sewing-machine plant: which WenQuest Digital Factory part serves each layer</p><p class="sub">Illustrative. Solid boxes = parts the WenQuest Digital Factory already has; dashed boxes = new for the sewing-machine plant (planned, to be built). Every system talks only to the bus, never directly to another</p>
+<div class="layer"><div class="lh fill-p" style="color:#7444b4">Dashboards &amp; AI<small>who looks, who asks</small></div>
+<div class="row" style="grid-template-columns:repeat(5,1fr)">
+<div class="box p"><b>Home dashboard</b><span>hub/kpi.py<br>OEE, first-pass yield, delivery, control chart</span></div>
+<div class="box p"><b>AI factory assistant</b><span>hub/ai.py<br>briefing, alerts, draft proposals</span></div>
+<div class="box p"><b>AI selection</b><span>hub/select.py<br>picks only from the library</span></div>
+<div class="box p"><b>Teaching score</b><span>hub/teach.py<br>teaching mode</span></div>
+<div class="box p plan"><b>Service portal</b><span>fleet fault codes, spares forecast<br>(Section 27.7)</span></div>
+</div></div>
+<div class="layer"><div class="lh fill-b" style="color:#2a5fb8">Business systems<small>records and workflows</small></div>
+<div class="row" style="grid-template-columns:repeat(6,1fr)">
+<div class="box b"><b>ERP</b><span>ERPNext v16<br>items, BOMs, routings, work orders, purchasing, cost</span></div>
+<div class="box b"><b>PLM</b><span>hub/plm.py, design.py<br>submit–approve–release; FreeCAD / SolidWorks macros</span></div>
+<div class="box b"><b>Configurator</b><span>hub/configurator.py<br>SH-301, WQR-105 templates today; WQ-LS template to build</span></div>
+<div class="box b"><b>MES</b><span>hub/mes.py + shop-floor terminal<br>dispatch by operation, start, pause</span></div>
+<div class="box b"><b>QMS</b><span>ERPNext quality inspections + automatic NCR<br><em style="color:#c0392b;font-style:normal">SPC rules, 8D: to build</em></span></div>
+<div class="box b"><b>WMS</b><span>ERPNext warehouses, batches, serial nos.<br><em style="color:#c0392b;font-style:normal">bin locations, scanners: to build</em></span></div>
+</div></div>
+<div class="layer"><div class="lh fill-y" style="color:#a8740c">Historian<small>the single source of truth</small></div>
+<div class="box y" style="text-align:left"><b>PostgreSQL historian (hub/historian.py)</b><span>Subscribes to wq/#, stores every message as received in bus_message (invalid ones too, flagged valid=false); extracts machine state changes; opens an NCR automatically when a measurement fails. Dashboards, AI and scoring all read from here, so every number traces back to a message ID</span></div></div>
+<div class="layer"><div class="lh fill-t" style="color:#0f6e74">Unified data bus<small>MQTT + one envelope</small></div>
+<div><div class="bus"><b>Mosquitto (MQTT) · topic wq/&lt;plant&gt;/&lt;area&gt;/&lt;unit&gt;/&lt;category&gt; · envelope {v, id, ts, type, source, mode, corr, data}</b><span>wq/sewing/machining/hmc-h01/status　wq/sewing/assembly/adj-03/measurement　wq/sewing/test/eol-02/measurement　wq/sewing/ai/alert</span></div>
+<div class="side"><div class="box t"><b>Node-RED bridge</b><span>bridge/: ERPNext ↔ bus (orders, work orders, job cards, inspections, design revisions, executing proposals)</span></div>
+<div class="box t"><b>Parts library · CAE</b><span>library/: standard-part and mechanism entries (A/B/C/D); cae/: FEA and fatigue (shafts today)</span></div></div></div></div>
+<div class="layer"><div class="lh fill-o" style="color:#c4531d">Machines &amp; lines<small>where data comes from</small></div>
+<div class="row" style="grid-template-columns:repeat(5,1fr)">
+<div class="box o"><b>Simulated shop</b><span>sim/: gearbox plant, 12 machines, AGVs, CMM<br>sewing-plant layout to build</span></div>
+<div class="box o plan"><b>Machine tools</b><span>HMCs, race grinders, cam grinders<br>PLC / gateway sends status, event</span></div>
+<div class="box o plan"><b>Adjustment gauges</b><span>hook clearance, hook timing<br>send measurement</span></div>
+<div class="box o plan"><b>EOL test bench</b><span>Chapter 22; results by serial<br>flashes and checks firmware</span></div>
+<div class="box o plan"><b>Connected machines</b><span>WQ-SC gateway (Ch. 19, 26)<br>sent back with customer consent</span></div>
+</div></div>
+<div class="leg"><span><i></i>Existing part</span><span><i style="border-style:dashed"></i>Planned (to be built)</span><span>Up: states, events, measurements; down: commands (machine.cmd), releases (design.release), proposals executed after human confirmation</span></div>
+</div>

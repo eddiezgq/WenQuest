@@ -1,0 +1,74 @@
+<script>(function () {
+  var root = document.documentElement;
+  try { var t = localStorage.getItem('sm-theme'); if (t) root.setAttribute('data-theme', t); } catch (e) {}
+  var tb = document.querySelector('.theme');
+  if (tb) tb.addEventListener('click', function () {
+    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = dark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('sm-theme', next); } catch (e) {}
+    if (window.__drawSeam) window.__drawSeam();
+  });
+
+  // 公式
+  function renderMath() {
+    if (!window.katex) return;
+    document.querySelectorAll('.math').forEach(function (el) {
+      var tex = el.textContent.replace(/^\\\[|\\\]$/g, '');
+      try { katex.render(tex, el, { displayMode: true, throwOnError: false }); } catch (e) {}
+    });
+  }
+  if (document.readyState === 'complete') renderMath(); else window.addEventListener('load', renderMath);
+
+  // 互动资源：页内运行
+  document.querySelectorAll('.lab').forEach(function (card) {
+    var btn = card.querySelector('.run'), box = card.querySelector('.lab-frame');
+    btn.addEventListener('click', function () {
+      if (box.hidden) {
+        if (!box.firstChild) {
+          var f = document.createElement('iframe');
+          f.src = card.dataset.src; f.title = card.querySelector('h4').textContent; f.loading = 'lazy';
+          f.setAttribute('allow', 'fullscreen');
+          box.appendChild(f);
+        }
+        box.hidden = false; card.classList.add('running'); btn.textContent = '收起';
+      } else { box.hidden = true; card.classList.remove('running'); btn.textContent = '在本页运行'; }
+    });
+  });
+  // 正文里指向资源的链接：滚到卡片并展开
+  document.querySelectorAll('a.labref').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var card = document.querySelector(a.getAttribute('href'));
+      if (!card) return;
+      ev.preventDefault();
+      card.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      var box = card.querySelector('.lab-frame');
+      if (box && box.hidden) card.querySelector('.run').click();
+    });
+  });
+
+  // 看大图
+  var lb = document.querySelector('.lightbox');
+  if (lb) {
+    document.querySelectorAll('a.zoom').forEach(function (a) {
+      a.addEventListener('click', function (ev) { ev.preventDefault(); lb.querySelector('img').src = a.getAttribute('href'); lb.hidden = false; });
+    });
+    lb.addEventListener('click', function () { lb.hidden = true; });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') lb.hidden = true; });
+  }
+
+  // 本章目录高亮
+  var links = Array.prototype.slice.call(document.querySelectorAll('.side a'));
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) { links.forEach(function (a) { a.classList.remove('on'); }); var a = map[e.target.id]; if (a) a.classList.add('on'); }
+      });
+    }, { rootMargin: '-80px 0px -70% 0px' });
+    Object.keys(map).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+  }
+
+  })();
+</script>

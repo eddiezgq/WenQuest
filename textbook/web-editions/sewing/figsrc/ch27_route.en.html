@@ -1,0 +1,65 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.wrap2{display:grid;grid-template-columns:1fr 250px;gap:22px}
+.lane{display:grid;grid-template-columns:128px 1fr;gap:8px;align-items:center;margin-bottom:9px}
+.ln{font-weight:700;font-size:13.5px}
+.ln small{display:block;font-weight:400;font-size:11.5px;color:#5a6570}
+.ops{display:flex;align-items:center;gap:0}
+.op{border:1.8px solid #e0662f;border-radius:7px;background:#fff;padding:5px 6px;text-align:center;font-size:12px;line-height:1.3;min-width:86px}
+.op b{display:block;font-size:12.5px;color:#c4531d}
+.op.q{border-color:#14797f}.op.q b{color:#0f6e74}
+.op.x{border-style:dashed;border-color:#c48a17}.op.x b{color:#a8740c}
+.ar{color:#9aa4ae;font-size:15px;padding:0 3px}
+.mono{font-size:11px;color:#5a6570}
+.asm{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.asm .op{min-width:0;padding:7px 8px}
+.dn{text-align:center;color:#9aa4ae;font-size:15px;line-height:1.1}
+.topics{margin-top:12px;border:1.5px solid #14797f;border-radius:8px;background:#e6f3f3;padding:8px 12px;font-size:12px;line-height:1.65}
+.topics code{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11.5px;color:#0f6e74}
+.plan{color:#c0392b;font-size:11px}
+</style>
+<div class="fig" style="--w:1180px">
+<p class="title">Routings into the MES: four key part families, the assembly line and EOL test</p><p class="sub">Illustrative. Orange = machining operation (work centre); teal = inspection (quality gate: the job card cannot complete until a quality inspection is submitted); dashed = subcontracted / external. Times in Table 27-5; process details in Chapters 24 and 25</p>
+<div class="wrap2"><div>
+<div class="lane"><div class="ln" style="color:#c4531d">Housing<small>HSG-LS01 · Ch. 25</small></div><div class="ops">
+<div class="op q"><b>Incoming insp.</b>casting heat no.<br><span class="mono">QC-01</span></div><span class="ar">→</span>
+<div class="op"><b>Datum milling</b><span class="mono">VMC-H</span></div><span class="ar">→</span>
+<div class="op"><b>Single-setup boring</b><span class="mono">HMC-H ×5</span></div><span class="ar">→</span>
+<div class="op"><b>Drill &amp; tap</b><span class="mono">VMC-H</span></div><span class="ar">→</span>
+<div class="op q"><b>Bore check</b>1 in 10<br><span class="mono">CMM-01</span></div></div></div>
+<div class="lane"><div class="ln" style="color:#c4531d">Hook<small>HK-LS01 · Ch. 24</small></div><div class="ops">
+<div class="op"><b>Turning</b><span class="mono">CNC-S</span></div><span class="ar">→</span>
+<div class="op"><b>Carburising</b><span class="mono">HT-01</span></div><span class="ar">→</span>
+<div class="op"><b>Race grinding</b><span class="mono">GRD-H</span></div><span class="ar">→</span>
+<div class="op"><b>Point lapping</b><span class="mono">LAP-H</span></div><span class="ar">→</span>
+<div class="op q"><b>Part insp.</b>point to datum<br><span class="mono">QC-01</span></div><span class="ar">→</span>
+<div class="op x"><b>DLC coating</b>option D only<br><span class="mono">subcontract 5 d</span></div></div></div>
+<div class="lane"><div class="ln" style="color:#c4531d">Cam<small>CAM-LS01/02 · Ch. 25</small></div><div class="ops">
+<div class="op"><b>Turning</b><span class="mono">CNC-S</span></div><span class="ar">→</span>
+<div class="op"><b>Hardening</b><span class="mono">HT-01</span></div><span class="ar">→</span>
+<div class="op"><b>Profile grinding</b><span class="mono">GRD-C</span></div><span class="ar">→</span>
+<div class="op q"><b>Part insp.</b>profile error<br><span class="mono">QC-01</span></div></div></div>
+<div class="lane"><div class="ln" style="color:#c4531d">Shaft<small>SH-LS01/02</small></div><div class="ops">
+<div class="op"><b>Turning</b><span class="mono">CNC-S</span></div><span class="ar">→</span>
+<div class="op"><b>Hardening</b><span class="mono">HT-01</span></div><span class="ar">→</span>
+<div class="op"><b>OD grinding</b><span class="mono">GRD-S</span></div></div></div>
+<div class="lane"><div class="ln" style="color:#a8740c">Needle<small>NDL-DB1-14 · bought-in</small></div><div class="ops">
+<div class="op x"><b>Supplier lot</b>with certificate</div><span class="ar">→</span>
+<div class="op q"><b>Incoming insp.</b>sampling, straightness<br><span class="mono">QC-01</span></div><span class="ar">→</span>
+<div class="op"><b>Stock</b>by lot<br><span class="mono">purchased store</span></div></div></div>
+<div class="topics"><b>Messages on the bus (examples)</b><br>
+<code>wq/sewing/machining/hmc-h03/status</code>　machine.status: run / idle / setup / down / fault, with work order and part serial<br>
+<code>wq/sewing/machining/grd-h02/event</code>　machine.event: cycle_end, tool_change (wheel dressing is logged here too)<br>
+<code>wq/sewing/quality/qc-01/measurement</code>　quality.measurement: characteristic, nominal, limits, value, result<br>
+<code>wq/sewing/assembly/adj-03/measurement</code>　hook clearance by machine serial, with a hook_lot field<span class="plan"> (area assembly: to build)</span><br>
+<code>wq/sewing/test/eol-02/measurement</code>　EOL results with firmware and parameter versions<span class="plan"> (new type test.result: to build)</span></div>
+</div>
+<div class="asm">
+<div class="ln" style="color:#7444b4;margin-bottom:6px">Assembly and test (by serial)</div>
+<div class="op" style="border-color:#8a5cc7"><b style="color:#7444b4">Assembly line ASM-L1</b>12 stations, takt 2.4 min<br>scan to bind serial to part lots</div><div class="dn">↓</div>
+<div class="op q"><b>Adjustment ADJ ×5</b>hook timing, needle-bar height<br>hook clearance 0.04–0.10 mm</div><div class="dn">↓</div>
+<div class="op" style="border-color:#8a5cc7"><b style="color:#7444b4">Run-in RUN ×15</b>30 min no-load</div><div class="dn">↓</div>
+<div class="op q"><b>EOL test ×3</b>Ch. 22: positioning, 50 trims<br>flash firmware, check version</div><div class="dn">↓</div>
+<div class="op" style="border-color:#2e9e5b"><b style="color:#1f8a4c">Finished store · despatch</b>record follows the serial</div>
+<p class="note" style="margin-top:12px">Housings, hooks, cams, shafts and needles meet on the line; scanning records the lots used in each machine (hook lot, housing heat, control-box serial) under its serial number.</p>
+</div></div></div>

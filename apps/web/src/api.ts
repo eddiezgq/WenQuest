@@ -467,7 +467,9 @@ export const api = {
   adminSetCommittee: (members: string[], chair: string, self_review: boolean) =>
     request<{ members: { id: number; name: string; email: string; key?: string }[]; chair: number; self_review: boolean }>("PUT", "/api/v1/admin/committee", { members, chair, self_review }),
   // 问渠教材（第 7 轮）
-  textbooks: () => request<{ books: { book: string; title: string; chapters: number; sections: number; written: number }[] }>("GET", "/api/v1/textbooks"),
+  textbooks: () => request<{ books: { book: string; title: string; title_en?: string; web?: boolean; labs?: number; chapters: number; sections?: number; written?: number }[] }>("GET", "/api/v1/textbooks"),
+  textbookWeb: (book: string, lang: "zh" | "en" = "zh") =>
+    request<{ url: string; title: string; title_en: string }>("GET", `/api/v1/textbooks/${book}/webed?lang=${lang}`),
   textbook: (book: string) => request<TextbookIndex>("GET", `/api/v1/textbooks/${book}`),
   textbookSection: (book: string, sid: string, mp = false, lang: "zh" | "en" = "zh") =>
     request<TextbookSection>("GET", `/api/v1/textbooks/${book}/sections/${sid}?mp=${mp}&lang=${lang}`),

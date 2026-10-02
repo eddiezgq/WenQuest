@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>数字工厂：质量闭环与追溯</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --blue:#2a6fdb; --orange:#e0662f; --lot:#fbf4e3; --lotk:#c48a17; --purple:#8a5cc7; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--blue:#7fa9f2;--orange:#f08c58;--lot:#2c2718;--lotk:#e8b04b;--purple:#b48ef0;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--blue:#7fa9f2;--orange:#f08c58;--lot:#2c2718;--lotk:#e8b04b;--purple:#b48ef0;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,350px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.rules{display:grid;grid-template-columns:1fr;gap:3px;font-size:.84rem}
+.rules label{display:flex;gap:6px;align-items:baseline;cursor:pointer}
+.rules small{color:var(--muted)}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)} .checks .mid{color:var(--muted)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page[hidden]{display:none}
+.log{font-family:var(--f-mono);font-size:.72rem;line-height:1.45;background:var(--soft);border-radius:6px;padding:8px;max-height:330px;overflow:auto;white-space:pre-wrap;word-break:break-all;margin:0}
+.log .t{color:var(--accent);font-weight:600}
+.log .al{color:var(--orange);font-weight:600}
+.log .nc{color:var(--bad);font-weight:600}
+.log hr{border:none;border-top:1px dashed var(--rule);margin:5px 0}
+.arch{font-size:.84rem;border-collapse:collapse;width:100%}
+.arch td{border-bottom:1px solid var(--rule);padding:3px 6px 3px 0;vertical-align:top}
+.arch td:first-child{color:var(--muted);white-space:nowrap}
+.arch td.m{font-family:var(--f-mono)}
+svg text{font-family:var(--f-body)}
+table.sv{width:100%;border-collapse:collapse;font-size:.8rem}
+table.sv td,table.sv th{border-top:1px solid var(--rule);padding:3px 4px;text-align:left}
+table.sv td.n{text-align:right;font-family:var(--f-mono)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>数字工厂：质量闭环与追溯</h1><span class="sub">《缝纫机设计与制造》第 27 章 · 虚拟实验 27-1 · 测量值怎样经总线变成报警、NCR 和受影响的序列号范围</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tabA" aria-selected="true" type="button">① 质量闭环：数据流与控制图</button><button role="tab" id="tabB" aria-selected="false" type="button">② 序列号—批次追溯</button><button role="tab" id="tabC" aria-selected="false" type="button">③ 实施分期计算器</button></div>
+
+<div class="page" id="pageA">
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>逐台测量值：调试工位 ADJ 的梭尖间隙（mm）；灰点 = 若不停用该批会测到的值</h3><canvas id="cv1" width="1100" height="270" aria-label="逐台测量值"></canvas>
+      <div class="row"><button id="play" type="button">▶ 播放</button><button id="replay" type="button">重放</button><label style="font-size:.84rem;display:flex;gap:6px;align-items:center;flex:1;min-width:220px">时间 <input id="clock" type="range" min="1" max="360" step="1" value="360" style="flex:1"><output id="clockv" style="font-family:var(--f-mono);font-size:.84rem"></output></label></div></section>
+    <section class="panel"><h3>X̄ 控制图：连续 5 台一个子组</h3><canvas id="cv2" width="1100" height="250" aria-label="均值控制图"></canvas>
+      <p class="note">黄色底 = 装用旋梭批次 H2610-07 的时段（漂移只在这批里）；红线 = 控制限 μ₀ ± 3σ/√5；虚线 = ±2σ、点线 = ±1σ。橙圈 = 漂移开始后的第一次报警；灰圈 = 漂移开始前的报警（误报，调查后无发现）；红圈 = 首台超差（不停用该批时）。</p></section>
+    <section class="panel"><h3>总线上的消息（问渠数字工厂主题与信封格式，最新在上）</h3><div class="log" id="log"></div></section>
+    <p class="note">模型（示意，与本书 figsrc/ch27_model.py 相同）：平均 22.5 台/h，16 h 共 360 台；过程 μ₀ = 0.070 mm、σ = 6 µm，公差 0.04–0.10 mm；第 t₀ h 起（第 round(22.5t₀)+1 台起）装用旋梭批次 H2610-07（300 只），这批的间隙 = μ₀ + 阶跃 + 漂移速度 × 装用时间 + 随机波动；随机波动由种子决定（mulberry32 + Box–Muller），同一种子下无漂移的对照组用同一组随机数。判异规则 R1–R4 用于 X̄ 图，R0 是问渠 hub/ai.py 现有的“趋近上限”规则（最近 5 台均值高于公差中值 ≥ 2 µm 且最大值距上限 ≤ 公差带的 25%）；同一规则 2 h 内不重复报。报警后经“反应时间”停用该批旋梭，之后改用合格批次。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>16 h 全程结果</h3><div class="checks" id="checksA"></div></section>
+    <section class="panel"><h3>判异规则（X̄ 图与现有规则）</h3>
+      <div class="rules">
+        <label><input type="checkbox" id="rR1" checked> <span><b>R1</b> 1 点在 3σ 外</span></label>
+        <label><input type="checkbox" id="rR2"> <span><b>R2</b> 连续 3 点中 2 点在同侧 2σ 外</span></label>
+        <label><input type="checkbox" id="rR3"> <span><b>R3</b> 连续 5 点中 4 点在同侧 1σ 外</span></label>
+        <label><input type="checkbox" id="rR4"> <span><b>R4</b> 连续 8 点在中心线同侧</span></label>
+        <label><input type="checkbox" id="rR0"> <span><b>R0</b> 现有规则“趋近上限” <small>（hub/ai.py，逐台）</small></span></label>
+      </div>
+      <p class="note" style="margin-top:6px">无论勾选哪些规则，逐台超差都会由历史库自动开 NCR（现有功能）。</p>
+    </section>
+    <section class="panel"><h3>工况</h3>
+      <div class="prm">
+        <label for="t0">漂移开始（换批）时间 t₀（h）</label><input id="t0" type="range" min="0.5" max="10" step="0.5" value="2"><output id="t0v"></output>
+        <label for="drift">漂移速度（µm/h）</label><input id="drift" type="range" min="0" max="10" step="0.5" value="4"><output id="driftv"></output>
+        <label for="stepu">换批时的阶跃（µm）</label><input id="stepu" type="range" min="0" max="20" step="1" value="0"><output id="stepuv"></output>
+        <label for="react">报警到停用该批的反应时间（h）</label><input id="react" type="range" min="0" max="2" step="0.25" value="0.5"><output id="reactv"></output>
+        <label for="seed">随机数种子</label><input id="seed" type="range" min="1" max="200" step="1" value="5"><output id="seedv"></output>
+      </div>
+      <div class="row"><button id="resetA" type="button">恢复标准</button><button id="reseed" type="button">换一组随机数</button></div>
+    </section>
+  </div>
+</div>
+</div>
+
+<div class="page" id="pageB" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>序列号—批次关系图（当前工况与规则下的那次报警）</h3><svg id="graph" viewBox="0 0 1000 380" width="100%" role="img" aria-label="追溯关系图"></svg>
+      <p class="note">向后（橙）：报警的整机 → 装的旋梭批次 → 旋梭工单与磨床 → 砂轮修整事件；向前（红）：同批旋梭装了哪些整机、仓库还剩多少、有没有已发货的。第 8 h、16 h 各发运一次（发运时已装好的整机全部发走）。</p></section>
+    <section class="panel"><h3>晚发现的代价（以当前报警为起点）</h3><canvas id="cv3" width="1100" height="260" aria-label="晚发现的代价"></canvas>
+      <div class="prm" style="margin-top:8px"><label for="late">比报警晚发现 N 小时</label><input id="late" type="range" min="0" max="8" step="0.5" value="0"><output id="latev"></output></div>
+      <div class="checks" id="checksL" style="margin-top:8px"></div></section>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>整机档案</h3>
+      <div class="prm"><label for="sn">序列号（第几台）</label><input id="sn" type="range" min="1" max="360" step="1" value="70"><output id="snv"></output></div>
+      <table class="arch" id="arch" style="margin-top:8px"></table>
+      <p class="note">每一项都是历史库里的一条消息；批次与序列号本身在 ERPNext（Batch、Serial No）。编号为示意。</p></section>
+    <section class="panel"><h3>任务 2：圈出受影响的整机</h3>
+      <div class="row" style="font-size:.84rem;margin-top:0">受影响整机（装了该批旋梭、须复检）共 <input id="affIn" type="number" step="1" aria-label="受影响整机台数"> 台 <button id="affChk" type="button">核对</button></div>
+      <div class="msg" id="msgB"></div></section>
+  </div>
+</div>
+</div>
+
+<div class="page" id="pageC" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>累计现金流（万元，60 个月）</h3><canvas id="cv4" width="1100" height="330" aria-label="累计现金流"></canvas></section>
+    <section class="panel"><h3>各期年节省（万元/年）</h3><div id="svtbl"></div></section>
+    <p class="note">模型（示意，与正文 27.9 节相同）：年产 5 万台、物料年用量 6000 万元、库存持有成本 20%/年、关键设备年成本 800 万元、返工 150 元/台、自制件 400 元/台、保修返修 600 元/次、上门服务 3000 次/年 × 500 元。每期投资在工期内均摊；上线后节省在 6 个月内线性爬升到全额；运行费 = 已上线投资 × 15%/年。各期首尾相接：后一期在前一期上线时开工。回收月 = 累计现金流由负转为非负的第一个月。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>结果</h3><div class="checks" id="checksC"></div></section>
+    <section class="panel"><h3>投资与工期</h3>
+      <div class="prm">
+        <label for="inv1">第一期投资（万元）</label><input id="inv1" type="range" min="50" max="300" step="10" value="150"><output id="inv1v"></output>
+        <label for="bd1">第一期工期（月）</label><input id="bd1" type="range" min="4" max="12" step="1" value="6"><output id="bd1v"></output>
+        <label for="inv2">第二期投资（万元）</label><input id="inv2" type="range" min="50" max="300" step="10" value="120"><output id="inv2v"></output>
+        <label for="bd2">第二期工期（月）</label><input id="bd2" type="range" min="4" max="15" step="1" value="9"><output id="bd2v"></output>
+        <label for="inv3">第三期投资（万元）</label><input id="inv3" type="range" min="30" max="300" step="10" value="80"><output id="inv3v"></output>
+        <label for="bd3">第三期工期（月）</label><input id="bd3" type="range" min="4" max="15" step="1" value="9"><output id="bd3v"></output>
+      </div></section>
+    <section class="panel"><h3>KPI 目标</h3>
+      <div class="prm">
+        <label for="turn1">库存周转（基线 4 次/年）</label><input id="turn1" type="range" min="4" max="7" step="0.1" value="5"><output id="turn1v"></output>
+        <label for="oee1">关键设备 OEE（基线 60%）</label><input id="oee1" type="range" min="0.60" max="0.80" step="0.01" value="0.68"><output id="oee1v"></output>
+        <label for="fpy1">一次合格率（基线 92%）</label><input id="fpy1" type="range" min="0.92" max="0.99" step="0.005" value="0.96"><output id="fpy1v"></output>
+        <label for="scrap1">自制件报废（基线 2.0%）</label><input id="scrap1" type="range" min="0.004" max="0.02" step="0.001" value="0.012"><output id="scrap1v"></output>
+        <label for="war1">第二期后保修返修率（基线 3.0%）</label><input id="war1" type="range" min="0.015" max="0.03" step="0.001" value="0.024"><output id="war1v"></output>
+        <label for="war2">第三期后保修返修率</label><input id="war2" type="range" min="0.01" max="0.03" step="0.001" value="0.018"><output id="war2v"></output>
+        <label for="spare1">备件库存（基线 400 万元）</label><input id="spare1" type="range" min="200" max="400" step="10" value="300"><output id="spare1v"></output>
+        <label for="trip">上门服务减少比例</label><input id="trip" type="range" min="0" max="0.7" step="0.05" value="0.3"><output id="tripv"></output>
+      </div>
+      <div class="row"><button id="resetC" type="button">恢复标准</button></div></section>
+  </div>
+</div>
+</div>
+
+<section class="panel" style="margin-top:14px"><h3>任务</h3><div id="tasks"></div><div class="msg" id="msg"></div></section>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const L={
+  h:' h', unit:' 台', serial:n=>'#'+n, none:'无',
+  lotB:'H2610-07', lotA:'H2610-06', lotC:'H2610-08',
+  r0:'现有“趋近上限”规则', tol:'逐台超差',
+  cA:[ '漂移开始（换批）', '首台超差（自动 NCR）', '第一次报警（漂移后）', '报警比首台超差提前', '受影响整机（须复检）', '其中超差返工', '已发货的受影响整机', '仓库剩余（冻结）', '无漂移对照：16 h 内误报' ],
+  noAlarm:'16 h 内未报警', badLead:'提前不足 4 h', badFA:'没有漂移时也报警，每次都要停下来查',
+  t1:'第①页：保持标准工况（t₀ = 2 h、4 µm/h、阶跃 0、种子 5），选判异规则，使报警比首台超差早至少 4 h，并且在无漂移的对照组里 16 h 不误报。',
+  d1:'只用 R1 报得太晚；现有的“趋近上限”规则报得早但误报多。看看哪条规则对缓慢漂移更敏感。',
+  t2:'第②页：从当前报警出发，算出受影响（装了 H2610-07、须复检）的整机台数并填入。',
+  d2:'受影响整机 = 从漂移开始的那台起，到报警后经反应时间停用该批为止装配的整机。关系图和第①页的结果都能帮你核对思路。',
+  t3:'第③页：关键设备 OEE 只能提到 64%（其他 KPI 和投资不能比标准更有利），只压缩工期（每期不少于 4 个月），把回收期拉回 36 个月以内。',
+  d3:'OEE 64% 时回收期是 38 个月。第一期见效最快——它越早上线，后面越轻松。',
+  done:'✓ 完成', notdone:'○ 未完成',
+  okB:(a,f,l)=>`正确：受影响整机 ${a} 台（第 ${f}–${l} 台）。复检它们，并冻结仓库里剩余的同批旋梭。`,
+  badB:'还不对：从漂移开始的那一台数到停用该批的那一台（报警时间 + 反应时间，按 22.5 台/h 折算）。',
+  noB:'当前设置下没有报警，先在第①页选规则。',
+  cL:['晚发现 N 小时后受影响整机','其中超差返工','已发货的受影响整机','比按时发现多复检'],
+  cC:['各期年节省（万元）','回收月','累计现金流最低点（万元）','5 年累计净收益（万元）','只做第一期：回收月 / 5 年'],
+  neverPay:'60 个月内未回收', m:n=>`第 ${n} 月`,
+  phase:['第一期','第二期','第三期'], build:'建设', only1:'只做第一期', all3:'三期全做',
+  arch:['序列号','变型','工单','旋梭批次','机壳炉号','电控箱序列号','固件 / 参数表 / 事件表','梭尖间隙','钩线定时','出厂测试','状态'],
+  st:{B:'可疑：装了 H2610-07，须复检',BX:'超差：须返工',A:'正常',C:'正常（合格批次）',ship:'已发货'},
+  pass:'通过', fail:'不合格', ok:'合格',
+  g:{alarm:'报警',lot:'旋梭批次 H2610-07',lotS:'300 只；装用起点',wo:'旋梭工单 WO-HK-0931',woS:'磨梭道 GRD-H-02',cause:'原因线索',causeS:'砂轮修整间隔 50 → 150 件',built:'已装整机',stock:'仓库剩余',stockS:'冻结，NCR 评审',ship:'已发货',shipS:'要到客户处追溯',noal:'当前设置下 16 h 内没有报警（漂移开始后）',which:'装的是哪批',who:'谁、在哪做的',same:'同批还装了哪些'},
+  bars:['受影响整机','超差返工','已发货'], lateAx:'比报警晚发现的时间 (h)',
+  sav:['期','项目','年节省'], savItems:[['库存周转','关键设备 OEE'],['一次合格率','自制件报废','保修返修率'],['保修返修率','备件库存','上门服务']],
+  msgAlert:(r,n)=>`梭尖间隙判异 ${r}（第 ${n} 台）`, hint:'冻结旋梭批次 H2610-07；起草可疑批次 NCR（提议，需质检员确认）',
+  ncrNote:'historian 自动开单', propNote:'方案：确认后发出', name:'梭尖间隙'
+};
+// ================================================================ 模型（与 figsrc/ch27_model.py 相同）
+function mulberry32(a){return function(){a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),1|t)>>>0;t=((t+Math.imul(t^(t>>>7),61|t))>>>0)^t;return((t^(t>>>14))>>>0)/4294967296;};}
+function normals(seed,n){const r=mulberry32(seed>>>0),o=[];for(let i=0;i<n;i++){const u1=1-r(),u2=r();o.push(Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2));}return o;}
+const STDQ={rate:22.5,hours:16,mu0:0.070,sigma:0.006,lsl:0.04,usl:0.10,sub:5,t0:2,drift:4,step:0,react:0.5,lot:300,seed:5,ship:[8,16]};
+const Q={...STDQ};
+const pyRound=(x,d)=>{const f=10**d;return Math.round(x*f)/f;};
+function values(p,drift=true,lotBUntil=null){const N=Math.round(p.rate*p.hours),z=normals(p.seed,N),n0=Math.round(p.t0*p.rate),vals=[],lots=[];
+  for(let n=1;n<=N;n++){const inB=n>n0&&(n-n0)<=p.lot&&(lotBUntil===null||n<=lotBUntil);let off=0;if(inB&&drift)off=(p.step+p.drift*(n-n0)/p.rate)/1000;
+    vals.push(pyRound(p.mu0+off+p.sigma*z[n-1],4));lots.push(inB?'B':(n<=n0?'A':'C'));}return {vals,lots};}
+function spcAlarms(vals,p,rules,r0){const k=p.sub,s=p.sigma/Math.sqrt(k),c=p.mu0,band=(p.usl-p.lsl)*1000,center=(p.usl+p.lsl)/2,Z=[],out=[],last={};
+  const hit=(n,rule)=>{const t=n/p.rate;if(rule in last&&t-last[rule]<2.0)return;last[rule]=t;out.push([n,rule]);};
+  for(let n=1;n<=vals.length;n++){
+    if(r0&&n>=5){const l5=vals.slice(n-5,n);const shift=(l5.reduce((a,b)=>a+b,0)/5-center)*1000,margin=(p.usl-Math.max(...l5))*1000;if(shift>=2&&margin<=band*0.25)hit(n,'R0');}
+    if(n%k)continue;
+    const xb=vals.slice(n-k,n).reduce((a,b)=>a+b,0)/k;Z.push((xb-c)/s);
+    if(rules.includes('R1')&&Math.abs(Z[Z.length-1])>3)hit(n,'R1');
+    if(rules.includes('R2')&&Z.length>=3){const w=Z.slice(-3);if(w.filter(x=>x>2).length>=2||w.filter(x=>x<-2).length>=2)hit(n,'R2');}
+    if(rules.includes('R3')&&Z.length>=5){const w=Z.slice(-5);if(w.filter(x=>x>1).length>=4||w.filter(x=>x<-1).length>=4)hit(n,'R3');}
+    if(rules.includes('R4')&&Z.length>=8){const w=Z.slice(-8);if(w.every(x=>x>0)||w.every(x=>x<0))hit(n,'R4');}}
+  return out;}
+function firstFail(vals,p){for(let i=0;i<vals.length;i++)if(vals[i]<p.lsl||vals[i]>p.usl)return i+1;return null;}
+function outcome(p,rules,r0,late=0,by='spc'){
+  const {vals}=values(p),n0=Math.round(p.t0*p.rate),N=vals.length;let na=null,rule=null;
+  if(by==='spc'){for(const [n,r] of spcAlarms(vals,p,rules,r0)){if(n>n0){na=n;rule=r;break;}}}else{na=firstFail(vals,p);rule='tol';}
+  const nc=na===null?N:Math.min(N,Math.floor((na/p.rate+p.react+late)*p.rate+1e-9));
+  const v2=values(p,true,nc),aff=[];for(let n=1;n<=N;n++)if(v2.lots[n-1]==='B')aff.push(n);
+  const rw=aff.filter(n=>!(p.lsl<=v2.vals[n-1]&&v2.vals[n-1]<=p.usl));const tc=nc/p.rate;
+  const sh=aff.filter(n=>p.ship.some(h=>n<=h*p.rate&&tc>h));
+  return {na,rule,ta:na===null?null:na/p.rate,nc,tc,affected:aff.length,rework:rw.length,shipped:sh.length,left:p.lot-aff.length,first:aff[0]||null,last:aff[aff.length-1]||null,vals:v2.vals,lots:v2.lots,shipSet:new Set(sh),reworkSet:new Set(rw)};}
+function falseAlarms(p,rules,r0){const {vals}=values(p,false);return spcAlarms(vals,p,rules,r0);}
+// 分期
+const STDB={turn1:5,oee1:0.68,fpy1:0.96,scrap1:0.012,war1:0.024,war2:0.018,spare1:300,trip:0.3,inv1:150,inv2:120,inv3:80,bd1:6,bd2:9,bd3:9};
+const B={...STDB};
+const BASE={Q:50000,mat:6000,turn0:4,carry:0.2,key:800,oee0:0.6,fpy0:0.92,rwc:150,scrap0:0.02,made:400,war0:0.03,claim:600,spare0:400,trips:3000,tripc:500,run:0.15,ramp:6,H:60};
+function savings(b){const s1=[(BASE.mat/BASE.turn0-BASE.mat/b.turn1)*BASE.carry,BASE.key*(1-BASE.oee0/b.oee1)];
+  const s2=[BASE.Q*(b.fpy1-BASE.fpy0)*BASE.rwc/1e4,BASE.Q*(BASE.scrap0-b.scrap1)*BASE.made/1e4,BASE.Q*(BASE.war0-b.war1)*BASE.claim/1e4];
+  const s3=[BASE.Q*(b.war1-b.war2)*BASE.claim/1e4,(BASE.spare0-b.spare1)*BASE.carry,BASE.trips*b.trip*BASE.tripc/1e4];return [s1,s2,s3];}
+function phases(b){return [{invest:b.inv1,start:0,build:b.bd1},{invest:b.inv2,start:b.bd1,build:b.bd2},{invest:b.inv3,start:b.bd1+b.bd2,build:b.bd3}];}
+function cashflow(ph,sav){const cum=[];let c=0,pay=null;for(let m=1;m<=BASE.H;m++){let f=0;ph.forEach((p,i)=>{const st=p.start,bd=p.build;if(st<m&&m<=st+bd)f-=p.invest/bd;const live=st+bd;if(m>live){f+=sav[i]/12*Math.min(1,(m-live)/BASE.ramp);f-=p.invest*BASE.run/12;}});c+=f;cum.push(c);if(pay===null&&m>1&&c>=0&&cum[cum.length-2]<0)pay=m;}return {cum,pay};}
+// ================================================================ 状态与界面
+let RULES=['R1'],R0=false,R=null,FA=[],NOW=360,timer=null;
+function rulesFromUI(){RULES=['R1','R2','R3','R4'].filter(r=>$('r'+r).checked);R0=$('rR0').checked;}
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+function renderChecks(id,C){$(id).innerHTML=C.map(c=>`<div><span class="${c.ok===null?'mid':(c.ok?'ok':'bad')}">${c.ok===null?'·':(c.ok?'✓':'✗')}</span><span>${c.n}${(c.ok===false&&c.bad)?`<small>${c.bad}</small>`:''}</span><b class="${c.ok===null?'':(c.ok?'ok':'bad')}">${c.v}</b></div>`).join('');}
+const fh=x=>x===null?'—':x.toFixed(2)+L.h;
+function compute(){rulesFromUI();R=outcome(Q,RULES,R0);R.tol=outcome(Q,RULES,R0,0,'tol');R.ff=firstFail(values(Q).vals,Q);FA=falseAlarms(Q,RULES,R0);R.full=values(Q).vals;R.all=spcAlarms(R.vals,Q,RULES,R0);}
+function lead(){return (R.na===null||R.ff===null)?null:(R.ff-R.na)/Q.rate;}
+function checksA(){const n0=Math.round(Q.t0*Q.rate),ld=lead();
+  renderChecks('checksA',[
+   {n:L.cA[0],v:`${Q.t0.toFixed(1)} h · ${L.serial(n0+1)}`,ok:null},
+   {n:L.cA[1],v:R.ff===null?L.none:`${L.serial(R.ff)} · ${(R.ff/Q.rate).toFixed(2)} h`,ok:null},
+   {n:L.cA[2],v:R.na===null?L.noAlarm:`${R.rule} · ${L.serial(R.na)} · ${R.ta.toFixed(2)} h`,ok:R.na!==null,bad:L.noAlarm},
+   {n:L.cA[3],v:fh(ld),ok:ld!==null&&ld>=4-1e-9,bad:L.badLead},
+   {n:L.cA[4],v:R.affected+L.unit+(R.first?` (${L.serial(R.first)}–${L.serial(R.last)})`:''),ok:null},
+   {n:L.cA[5],v:R.rework+L.unit,ok:R.rework===0},
+   {n:L.cA[6],v:R.shipped+L.unit,ok:R.shipped===0},
+   {n:L.cA[7],v:R.left+' / 300',ok:null},
+   {n:L.cA[8],v:FA.length+(FA.length?` (${FA.map(a=>a[1]+L.serial(a[0])).slice(0,3).join(', ')})`:''),ok:FA.length===0,bad:L.badFA}]);}
+function drawInd(){const [c,g]=ctx('cv1'),W=c.width,H=c.height,x0=60,x1=W-14,y0=12,y1=H-30,N=R.vals.length,n0=Math.round(Q.t0*Q.rate);
+  const X=n=>x0+(x1-x0)*(n-0.5)/N,Y=v=>y1-(y1-y0)*(v-0.03)/(0.115-0.03);
+  g.font='12px '+css('--f-body');g.fillStyle=css('--lot');const b0=n0+1,b1=R.last||n0;if(R.first)g.fillRect(X(b0)-1,y0,X(b1)-X(b0)+2,y1-y0);
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.textAlign='end';for(const v of [0.04,0.06,0.08,0.10]){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.fillText(v.toFixed(2),x0-6,Y(v)+4);}
+  g.textAlign='center';for(let h=0;h<=16;h+=2){const x=X(h*Q.rate+0.5);g.fillText(h+'h',x,H-10);}
+  g.strokeStyle=css('--bad');g.setLineDash([6,4]);for(const v of [Q.lsl,Q.usl]){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();}g.setLineDash([]);
+  g.fillStyle=css('--muted');g.globalAlpha=0.35;for(let n=1;n<=Math.min(NOW,N);n++){if(R.full[n-1]!==R.vals[n-1]){g.beginPath();g.arc(X(n),Y(Math.min(0.114,Math.max(0.031,R.full[n-1]))),2.3,0,7);g.fill();}}g.globalAlpha=1;
+  for(let n=1;n<=Math.min(NOW,N);n++){const v=R.vals[n-1];g.fillStyle=(v<Q.lsl||v>Q.usl)?css('--bad'):css('--blue');g.beginPath();g.arc(X(n),Y(Math.min(0.114,Math.max(0.031,v))),2.3,0,7);g.fill();}
+  // NOW line
+  g.strokeStyle=css('--muted');g.beginPath();g.moveTo(X(NOW)+2,y0);g.lineTo(X(NOW)+2,y1);g.stroke();
+  const ffs=R.ff;if(ffs&&ffs<=NOW){g.strokeStyle=css('--bad');g.lineWidth=2;g.beginPath();g.arc(X(ffs),Y(Math.min(0.114,R.full[ffs-1])),7,0,7);g.stroke();g.lineWidth=1;}
+  if(R.na&&R.na<=NOW){g.strokeStyle=css('--orange');g.lineWidth=2;g.beginPath();g.moveTo(X(R.na),y0);g.lineTo(X(R.na),y1);g.stroke();g.lineWidth=1;g.fillStyle=css('--orange');g.textAlign='start';g.fillText(`${R.rule} ${L.serial(R.na)}`,X(R.na)+4,y0+12);}
+  g.fillStyle=css('--muted');g.textAlign='start';g.fillText('mm',6,y0+8);}
+function drawXbar(){const [c,g]=ctx('cv2'),W=c.width,H=c.height,x0=60,x1=W-40,y0=10,y1=H-28,k=Q.sub,s=Q.sigma/Math.sqrt(k),m=Q.mu0,N=R.vals.length,G=Math.floor(N/k),n0=Math.round(Q.t0*Q.rate);
+  const xb=[];for(let i=k;i<=N;i+=k)xb.push(R.vals.slice(i-k,i).reduce((a,b)=>a+b,0)/k);
+  const lo=0.055,hi=0.11,X=j=>x0+(x1-x0)*(j-0.5)/G,Y=v=>y1-(y1-y0)*(Math.min(hi,Math.max(lo,v))-lo)/(hi-lo);
+  g.font='12px '+css('--f-body');if(R.first){g.fillStyle=css('--lot');g.fillRect(X((n0+1)/k+0.5)-4,y0,X(R.last/k)-X((n0+1)/k+0.5)+8,y1-y0);}
+  [[0,css('--muted'),[]],[1,css('--rule'),[2,3]],[-1,css('--rule'),[2,3]],[2,css('--muted'),[6,4]],[-2,css('--muted'),[6,4]],[3,css('--bad'),[]],[-3,css('--bad'),[]]].forEach(([z,col,d])=>{g.strokeStyle=col;g.setLineDash(d);g.beginPath();g.moveTo(x0,Y(m+z*s));g.lineTo(x1,Y(m+z*s));g.stroke();});g.setLineDash([]);
+  g.fillStyle=css('--muted');g.textAlign='start';g.fillText('UCL',x1+4,Y(m+3*s)+4);g.fillText('CL',x1+4,Y(m)+4);g.fillText('LCL',x1+4,Y(m-3*s)+4);
+  g.textAlign='end';for(const v of [0.06,0.07,0.08,0.09,0.10]){g.fillText(v.toFixed(2),x0-6,Y(v)+4);}
+  g.textAlign='center';for(let j=0;j<=G;j+=8)g.fillText(String(j),X(j+0.5),H-8);
+  const shown=Math.floor(NOW/k);g.strokeStyle=css('--blue');g.beginPath();for(let j=1;j<=shown;j++){j===1?g.moveTo(X(j),Y(xb[j-1])):g.lineTo(X(j),Y(xb[j-1]));}g.stroke();
+  g.fillStyle=css('--blue');for(let j=1;j<=shown;j++){g.beginPath();g.arc(X(j),Y(xb[j-1]),2.6,0,7);g.fill();}
+  for(const [n,r] of R.all){if(n>NOW||r==='R0')continue;const j=n/k;g.strokeStyle=n>n0?css('--orange'):css('--muted');g.lineWidth=2;g.beginPath();g.arc(X(j),Y(xb[j-1]),8,0,7);g.stroke();g.lineWidth=1;}
+  // R0 alarms on individual basis: mark on axis
+  for(const [n,r] of R.all){if(n>NOW||r!=='R0')continue;g.fillStyle=n>n0?css('--orange'):css('--muted');g.fillRect(X(n/k)-1,y1-8,3,8);}}
+function hexid(n,salt){let h=(n*2654435761+salt*97)>>>0;return (h.toString(16).padStart(8,'0')+'-'+((h^0x5bd1e995)>>>0).toString(16).padStart(8,'0').slice(0,4));}
+function ts(n){const t=Date.UTC(2026,9,12,0,0,0)+n/Q.rate*3600e3;return new Date(t).toISOString().replace(/\.\d+Z$/,s=>s);}
+const SER=n=>'LS2610-'+String(n).padStart(4,'0');
+function lotName(l){return l==='B'?L.lotB:(l==='A'?L.lotA:L.lotC);}
+function msgMeas(n){const v=R.vals[n-1],r=(v<Q.lsl||v>Q.usl)?'fail':'pass',ad='adj-0'+(1+(n%5));
+  return `<span class="t">wq/sewing/assembly/${ad}/measurement</span>\n${JSON.stringify({v:1,id:hexid(n,1),ts:ts(n),type:'quality.measurement',source:'gauge/'+ad,mode:'prod',corr:'WO-LS-2610-12',data:{part_serial:SER(n),item:'WQ-LS-TED',characteristic:'hook_clearance',name:L.name,nominal_mm:0.07,lower_tol_mm:0.04,upper_tol_mm:0.1,value_mm:v,result:r,hook_lot:lotName(R.lots[n-1])}})}`;}
+function msgAlert(n,r){const ev=[];const k=Q.sub;for(let i=Math.max(1,n-9);i<=n;i++)ev.push({topic:'wq/sewing/assembly/adj/measurement',id:hexid(i,1)});
+  return `<span class="al">wq/sewing/ai/alert</span>\n${JSON.stringify({v:1,id:hexid(n,7),ts:ts(n),type:'ai.alert',source:'ai',mode:'prod',corr:null,data:{level:'warn',title:L.msgAlert(r,n),evidence:ev.slice(-3),action_hint:L.hint,key:'spc:hook_clearance:'+r}})}`;}
+function msgNcr(n,auto){return `<span class="nc">wq/sewing/quality/adj/ncr</span>  <i>(${auto?L.ncrNote:L.propNote})</i>\n${JSON.stringify({v:1,id:hexid(n,9),ts:ts(n),type:'quality.ncr',source:auto?'historian':'workbench/qc·a7f3',mode:'prod',corr:'WO-LS-2610-12',data:{ncr_id:auto?'NCR-0001':'NCR-0001-L',part_serial:auto?SER(n):L.lotB,status:'open'}})}`;}
+function drawLog(){const out=[];const lo=Math.max(1,NOW-4);const ffs=firstFail(R.vals,Q);
+  const ev=[];for(let n=lo;n<=NOW;n++)ev.push([n,'m']);for(const [n,r] of R.all)if(n<=NOW&&n>=NOW-40)ev.push([n,'a',r]);if(ffs&&ffs<=NOW&&ffs>=NOW-40)ev.push([ffs,'n']);if(R.na&&R.na<=NOW&&R.na>=NOW-40)ev.push([R.na+0.5,'p']);
+  ev.sort((a,b)=>b[0]-a[0]);for(const e of ev.slice(0,8)){out.push(e[1]==='m'?msgMeas(e[0]):e[1]==='a'?msgAlert(e[0],e[2]):e[1]==='n'?msgNcr(e[0],true):msgNcr(Math.floor(e[0]),false));}
+  $('log').innerHTML=out.join('<hr>');}
+function setNow(n){NOW=Math.max(1,Math.min(360,n));$('clock').value=NOW;$('clockv').textContent=(NOW/Q.rate).toFixed(2)+' h';drawInd();drawXbar();drawLog();}
+// ---- page B
+function drawGraph(){const s=$('graph'),ink=css('--ink'),mu=css('--muted'),or=css('--orange'),bad=css('--bad'),lk=css('--lotk'),sh=css('--sheet'),lot=css('--lot');
+  if(R.na===null){s.innerHTML=`<text x="500" y="190" text-anchor="middle" fill="${mu}" font-size="18">${L.g.noal}</text>`;return;}
+  const n0=Math.round(Q.t0*Q.rate);
+  const box=(x,y,w,h,col,fill,t1,t2,t3)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="${fill}" stroke="${col}" stroke-width="2"/><text x="${x+w/2}" y="${y+26}" text-anchor="middle" font-size="16" font-weight="700" fill="${col}">${t1}</text><text x="${x+w/2}" y="${y+48}" text-anchor="middle" font-size="13.5" fill="${ink}">${t2}</text>${t3?`<text x="${x+w/2}" y="${y+68}" text-anchor="middle" font-size="13.5" fill="${ink}">${t3}</text>`:''}`;
+  const ar=(d,col)=>`<path d="${d}" stroke="${col}" stroke-width="2" fill="none" marker-end="url(#m${col===bad?'r':'o'})"/>`;
+  s.innerHTML=`<defs><marker id="mo" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="${or}"/></marker><marker id="mr" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="${bad}"/></marker></defs>`+
+  ar('M200,60 L258,60',or)+ar('M460,60 L518,60',or)+ar('M720,60 L778,60',or)+ar('M360,100 L360,218',bad)+ar('M410,100 C520,150 640,190 700,218',bad)+ar('M310,100 C220,150 160,190 140,218',bad)+
+  box(0,20,200,82,or,sh,`${L.g.alarm} ${R.rule}`,`${SER(R.na)}`,`${R.ta.toFixed(2)} h`)+
+  box(260,20,200,82,lk,lot,L.g.lot,`${L.g.lotS} ${L.serial(n0+1)}`,'')+
+  box(520,20,200,82,or,sh,L.g.wo,L.g.woS,'')+
+  box(780,20,215,82,or,sh,L.g.cause,L.g.causeS,'')+
+  box(250,222,220,92,bad,sh,`${L.g.built} ${L.serial(R.first)}–${L.serial(R.last)}`,`${R.affected}${L.unit}`,`${L.bars[1]} ${R.rework}${L.unit}`)+
+  box(610,222,190,92,bad,sh,`${L.g.stock} ${R.left}`,L.g.stockS,'')+
+  box(20,222,190,92,bad,sh,`${L.g.ship} ${R.shipped}${L.unit}`,L.g.shipS,'')+
+  `<text x="372" y="170" font-size="12.5" fill="${mu}">${L.g.same}</text><text x="20" y="360" font-size="12.5" fill="${mu}">→ ${L.g.which} → ${L.g.who}</text>`;}
+function lateRows(){const rows=[];for(let h=0;h<=8;h+=1)rows.push([h,outcome(Q,RULES,R0,h)]);return rows;}
+function drawLate(){const [c,g]=ctx('cv3'),W=c.width,H=c.height,x0=60,x1=W-14,y0=14,y1=H-40;if(R.na===null){g.fillStyle=css('--muted');g.font='15px '+css('--f-body');g.fillText(L.g.noal,x0,H/2);return;}
+  const rows=lateRows(),mx=Math.max(50,...rows.map(r=>r[1].affected))*1.15,bw=(x1-x0)/rows.length;const Y=v=>y1-(y1-y0)*v/mx;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.textAlign='end';for(let v=0;v<=mx;v+=50){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.fillText(v,x0-6,Y(v)+4);}
+  const cols=[css('--lotk'),css('--bad'),css('--purple')];
+  rows.forEach(([h,o],i)=>{const x=x0+bw*i+bw*0.12,w=bw*0.25;[o.affected,o.rework,o.shipped].forEach((v,j)=>{g.fillStyle=cols[j];g.globalAlpha=Math.abs(h-B_late)<0.01||Math.abs(h-Math.floor(B_late))<0.01?1:0.55;g.fillRect(x+j*w,Y(v),w-2,y1-Y(v));g.globalAlpha=1;});
+    g.fillStyle=css('--ink');g.textAlign='center';g.fillText(o.affected,x+w/2,Y(o.affected)-4);g.fillStyle=css('--muted');g.fillText(h,x+1.5*w,H-24);});
+  g.fillText(L.lateAx,(x0+x1)/2,H-6);g.textAlign='start';L.bars.forEach((t,j)=>{g.fillStyle=cols[j];g.fillRect(x0+10+j*150,y0,12,12);g.fillStyle=css('--ink');g.fillText(t,x0+26+j*150,y0+11);});}
+let B_late=0;
+function checksL(){if(R.na===null){renderChecks('checksL',[]);return;}const o=outcome(Q,RULES,R0,B_late);
+  renderChecks('checksL',[{n:L.cL[0],v:o.affected+L.unit,ok:null},{n:L.cL[1],v:o.rework+L.unit,ok:o.rework===0},{n:L.cL[2],v:o.shipped+L.unit,ok:o.shipped===0},{n:L.cL[3],v:'+'+(o.affected-R.affected)+L.unit,ok:null}]);}
+function drawArch(){const n=+$('sn').value,v=R.vals[n-1],l=R.lots[n-1],heat='R2609-'+(30+Math.floor((n-1)/120)),cb='CB-26-'+String(8772+n).padStart(5,'0');
+  const r=mulberry32(n*31+7),tim=((r()-0.5)*1.6).toFixed(1),pos=(0.2+r()*0.6).toFixed(1),ok=v>=Q.lsl&&v<=Q.usl;
+  let st=l==='B'?(R.reworkSet.has(n)?L.st.BX:L.st.B):(l==='A'?L.st.A:L.st.C);if(R.shipSet.has(n))st+=' · '+L.st.ship;
+  const rows=[[L.arch[0],SER(n)],[L.arch[1],'WQ-LS-TED'],[L.arch[2],'WO-LS-2610-'+(12+Math.floor((n-1)/200))],[L.arch[3],lotName(l)],[L.arch[4],heat],[L.arch[5],cb],[L.arch[6],'1.5.0 / v8 / v5'],[L.arch[7],v.toFixed(4)+' mm（'+(ok?L.ok:L.fail)+'）'],[L.arch[8],(tim>0?'+':'')+tim+'°'],[L.arch[9],(ok?L.pass:'—')+(ok?`（${pos}°）`:'')],[L.arch[10],st]];
+  $('arch').innerHTML=rows.map(([a,b])=>`<tr><td>${a}</td><td class="m">${b}</td></tr>`).join('');$('snv').textContent=SER(n).slice(-4);}
+// ---- page C
+let RC=null;
+function evalC(){const sv=savings(B),tot=sv.map(a=>a.reduce((x,y)=>x+y,0)),ph=phases(B),cf=cashflow(ph,tot),c1=cashflow(ph.slice(0,1),tot.slice(0,1));
+  const mn=Math.min(...cf.cum);return {sv,tot,cf,c1,mn,im:cf.cum.indexOf(mn)+1,ph};}
+function checksC(){const r=RC;renderChecks('checksC',[{n:L.cC[0],v:r.tot.map(x=>x.toFixed(1)).join(' / '),ok:null},{n:L.cC[1],v:r.cf.pay?L.m(r.cf.pay):L.neverPay,ok:r.cf.pay!==null&&r.cf.pay<=36},{n:L.cC[2],v:r.mn.toFixed(1)+` (${L.m(r.im)})`,ok:null},{n:L.cC[3],v:r.cf.cum[59].toFixed(1),ok:r.cf.cum[59]>0},{n:L.cC[4],v:(r.c1.pay?L.m(r.c1.pay):L.neverPay)+' / '+r.c1.cum[59].toFixed(0),ok:null}]);
+  $('svtbl').innerHTML='<table class="sv"><tr><th>'+L.sav.join('</th><th>')+'</th></tr>'+r.sv.map((a,i)=>a.map((v,j)=>`<tr><td>${j===0?L.phase[i]:''}</td><td>${L.savItems[i][j]}</td><td class="n">${v.toFixed(1)}</td></tr>`).join('')).join('')+'</table>';}
+function drawCF(){const [c,g]=ctx('cv4'),W=c.width,H=c.height,x0=70,x1=W-20,y0=20,y1=H-36,r=RC;const all=r.cf.cum.concat(r.c1.cum),lo=Math.min(-100,...all)*1.1,hi=Math.max(100,...all)*1.1;
+  const X=m=>x0+(x1-x0)*m/60,Y=v=>y1-(y1-y0)*(v-lo)/(hi-lo);const cols=[css('--blue'),css('--ok'),css('--purple')];g.font='12px '+css('--f-body');
+  r.ph.forEach((p,i)=>{g.fillStyle=cols[i];g.globalAlpha=0.08;g.fillRect(X(p.start),y0,X(p.start+p.build)-X(p.start),y1-y0);g.globalAlpha=1;g.textAlign='center';g.fillText(L.phase[i]+L.build,X(p.start+p.build/2),y0+12);});
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.textAlign='end';let st=Math.pow(10,Math.floor(Math.log10(hi-lo)))/2;if((hi-lo)/st>10)st*=2;for(let v=Math.ceil(lo/st)*st;v<=hi;v+=st){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.fillText(Math.round(v),x0-6,Y(v)+4);}
+  g.strokeStyle=css('--ink');g.beginPath();g.moveTo(x0,Y(0));g.lineTo(x1,Y(0));g.stroke();g.textAlign='center';for(let m=0;m<=60;m+=6)g.fillText(m,X(m),H-16);
+  const line=(arr,col,dash,w)=>{g.strokeStyle=col;g.lineWidth=w;g.setLineDash(dash);g.beginPath();arr.forEach((v,i)=>{i?g.lineTo(X(i+1),Y(v)):g.moveTo(X(1),Y(v));});g.stroke();g.setLineDash([]);g.lineWidth=1;};
+  line(r.c1.cum,css('--muted'),[6,4],1.5);line(r.cf.cum,css('--orange'),[],2.5);
+  if(r.cf.pay){g.fillStyle=css('--orange');g.beginPath();g.arc(X(r.cf.pay),Y(r.cf.cum[r.cf.pay-1]),5,0,7);g.fill();g.textAlign='start';g.fillText(L.m(r.cf.pay),X(r.cf.pay)+8,Y(r.cf.cum[r.cf.pay-1])+16);}
+  g.textAlign='start';g.fillStyle=css('--orange');g.fillText('— '+L.all3,x1-170,y1-34);g.fillStyle=css('--muted');g.fillText('- - '+L.only1,x1-170,y1-16);}
+// ================================================================ 事件
+const fmtA={t0:v=>v.toFixed(1)+' h',drift:v=>v.toFixed(1),stepu:v=>v.toFixed(0),react:v=>v.toFixed(2)+' h',seed:v=>String(v)};
+const keyA={t0:'t0',drift:'drift',stepu:'step',react:'react',seed:'seed'};
+function syncA(){for(const k in fmtA){$(k).value=Q[keyA[k]];$(k+'v').textContent=fmtA[k](Q[keyA[k]]);}}
+function changedA(){syncA();compute();checksA();setNow(NOW);drawGraph();drawLate();checksL();drawArch();noteA();checkTasks();}
+for(const k in fmtA)$(k).addEventListener('input',()=>{Q[keyA[k]]=+$(k).value;changedA();});
+['R0','R1','R2','R3','R4'].forEach(r=>$('r'+r).addEventListener('change',changedA));
+$('resetA').onclick=()=>{Object.assign(Q,STDQ);['R2','R3','R4','R0'].forEach(r=>$('r'+r).checked=false);$('rR1').checked=true;changedA();};
+$('reseed').onclick=()=>{Q.seed=1+Math.floor(Math.random()*200);changedA();};
+$('clock').addEventListener('input',()=>{stop();setNow(+$('clock').value);});
+function stop(){if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ 播放';}}
+function play(){if(timer){stop();return;}if(NOW>=360)NOW=1;$('play').textContent='⏸ 暂停';timer=setInterval(()=>{setNow(NOW+1);if(NOW>=360)stop();},45);}
+$('play').onclick=play;$('replay').onclick=()=>{stop();NOW=1;play();};
+$('late').addEventListener('input',()=>{B_late=+$('late').value;$('latev').textContent=B_late.toFixed(1)+' h';drawLate();checksL();});
+$('sn').addEventListener('input',drawArch);
+const fmtC={inv1:v=>v,inv2:v=>v,inv3:v=>v,bd1:v=>v,bd2:v=>v,bd3:v=>v,turn1:v=>v.toFixed(1),oee1:v=>(v*100).toFixed(0)+'%',fpy1:v=>(v*100).toFixed(1)+'%',scrap1:v=>(v*100).toFixed(1)+'%',war1:v=>(v*100).toFixed(1)+'%',war2:v=>(v*100).toFixed(1)+'%',spare1:v=>v,trip:v=>(v*100).toFixed(0)+'%'};
+function syncC(){for(const k in fmtC){$(k).value=B[k];$(k+'v').textContent=fmtC[k](B[k]);}}
+function changedC(){syncC();RC=evalC();checksC();drawCF();noteC();checkTasks();}
+for(const k in fmtC)$(k).addEventListener('input',()=>{B[k]=+$(k).value;changedC();});
+$('resetC').onclick=()=>{Object.assign(B,STDB);changedC();};
+function tab(w){[['A','tabA','pageA'],['B','tabB','pageB'],['C','tabC','pageC']].forEach(([k,t,p])=>{$(t).setAttribute('aria-selected',k===w);$(p).hidden=k!==w;});if(w==='A')setNow(NOW);if(w==='B'){drawGraph();drawLate();}if(w==='C')drawCF();}
+$('tabA').onclick=()=>tab('A');$('tabB').onclick=()=>tab('B');$('tabC').onclick=()=>tab('C');
+// ================================================================ 任务
+const seen={a:false,b:false,c:false};
+function isStdQ(){return Q.t0===2&&Q.drift===4&&Q.step===0&&Q.seed===5;}
+function noteA(){const ld=lead();if(isStdQ()&&ld!==null&&ld>=4-1e-9&&FA.length===0)seen.a=true;}
+function noteC(){const b=B,s=STDB;const notBetter=b.turn1<=s.turn1&&b.fpy1<=s.fpy1+1e-9&&b.scrap1>=s.scrap1-1e-9&&b.war1>=s.war1-1e-9&&b.war2>=s.war2-1e-9&&b.spare1>=s.spare1&&b.trip<=s.trip+1e-9;
+  if(Math.abs(b.oee1-0.64)<1e-9&&notBetter&&b.inv1>=s.inv1&&b.inv2>=s.inv2&&b.inv3>=s.inv3&&RC.cf.pay!==null&&RC.cf.pay<=36)seen.c=true;}
+$('affChk').onclick=()=>{if(R.na===null){$('msgB').textContent=L.noB;return;}const v=+$('affIn').value;if($('affIn').value!==''&&v===R.affected){seen.b=true;$('msgB').textContent=L.okB(R.affected,R.first,R.last);}else $('msgB').textContent=L.badB;checkTasks();};
+const TASKS=[{t:L.t1,d:L.d1,ok:()=>seen.a},{t:L.t2,d:L.d2,ok:()=>seen.b},{t:L.t3,d:L.d3,ok:()=>seen.c}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});$('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?L.done:L.notdone}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+window.__api={Q,B,STDQ,STDB,values,spcAlarms,outcome,falseAlarms,firstFail,savings,cashflow,phases,normals,mulberry32,changedA,changedC,tab,setNow,done,seen,
+  state:()=>({R:{na:R.na,rule:R.rule,affected:R.affected,rework:R.rework,shipped:R.shipped,left:R.left,first:R.first,last:R.last,ff:R.ff,fa:FA.length},RC:{tot:RC.tot,pay:RC.cf.pay,c60:RC.cf.cum[59]}}),
+  setRules:(arr)=>{['R0','R1','R2','R3','R4'].forEach(r=>$('r'+r).checked=arr.includes(r));changedA();},
+  affected:v=>{$('affIn').value=v;$('affChk').click();}};
+changedC();changedA();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

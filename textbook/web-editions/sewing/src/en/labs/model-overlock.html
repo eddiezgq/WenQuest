@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>High-Speed Overlocker in 3D</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 3D stage with label overlay on the left, control rail on the right; stacks on phones */
+:root{
+  --bg:#eceff2; --panel:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d3d9df; --accent:#0f6e74;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--panel:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--panel:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:radial-gradient(120% 90% at 40% 30%,#ffffff 0%,#e4e8ec 70%,#d5dbe0 100%);border:1px solid var(--rule);border-radius:8px;overflow:hidden;aspect-ratio:16/10;min-width:0;touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+.stage svg.lab{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.lab text{font-family:var(--f-body);paint-order:stroke;stroke:#ffffffd0;stroke-width:4px;stroke-linejoin:round}
+.hint{position:absolute;left:12px;bottom:10px;font-size:.78rem;color:#5d6b7a;background:#ffffffb0;padding:2px 8px;border-radius:4px}
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px}
+.card h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--rule);border-radius:0;background:transparent;padding:6px 0}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--accent);color:var(--panel);font-weight:600}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.row+.row{margin-top:8px}
+input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+label{font-size:.85rem;color:var(--muted)}
+select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px}
+.read{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.read div{border-top:1px solid var(--rule);padding-top:4px}
+.read b{display:block;font-family:var(--f-mono);font-size:1rem;font-variant-numeric:tabular-nums}
+.read small{color:var(--muted);font-size:.74rem}
+.phase{font-weight:700;color:var(--accent);font-size:1rem;line-height:1.4}
+.note{font-size:.78rem;color:var(--muted)}
+.parts{display:grid;grid-template-columns:14px 1fr;gap:2px 8px;font-size:.84rem}
+.parts i{width:12px;height:12px;border-radius:3px;margin-top:5px}
+.cap{margin:0}.cap .wrap{max-width:none;padding:0}.cap header,.cap .rail,.cap .hint{display:none}.cap .grid{display:block}
+.cap .stage{width:100vw;height:100vh;aspect-ratio:auto;border:0;border-radius:0;background:#fbfaf7}
+</style>
+<div class="wrap">
+<header><h1>High-Speed Overlocker in 3D</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 9 · Model 9-1 · The three-thread overedge (504) worked-example machine; mechanism dimensions match the calculations of Chapter 9, the housing is schematic</span></header>
+<div class="grid">
+  <div class="stage" id="stage"><canvas id="cv"></canvas><svg class="lab" id="lab"></svg><div class="hint">Drag to rotate · scroll or pinch to zoom</div></div>
+  <div class="rail">
+    <section class="card">
+      <h3>Display</h3>
+      <div class="seg" id="mode"><button type="button" data-m="solid" class="on">Solid</button><button type="button" data-m="xray">X-ray</button><button type="button" data-m="explode">Exploded</button></div>
+      <div class="row"><label for="ex">Explode amount</label><input id="ex" type="range" min="0" max="1" step="0.01" value="0"></div>
+      <div class="row"><label><input type="checkbox" id="labels" checked> Labels</label><label><input type="checkbox" id="paths" checked> Point paths</label><label><input type="checkbox" id="foot" checked> Presser foot</label></div>
+      <div class="row"><span class="note">View:</span><button type="button" data-v="iso">Oblique</button><button type="button" data-v="front">Front</button><button type="button" data-v="side">Left side</button><button type="button" data-v="close">Stitch-forming close-up</button></div>
+    </section>
+    <section class="card">
+      <h3>Turn the main shaft</h3>
+      <div class="row"><button id="play" type="button">Play</button><label for="spd">Speed</label><select id="spd"><option value="30">Very slow</option><option value="90" selected>Slow</option><option value="300">Medium</option><option value="900">Fast</option></select></div>
+      <div class="row"><label for="phi">Main-shaft angle</label><input id="phi" type="range" min="0" max="359" step="1" value="0"></div>
+      <div class="read" style="margin-top:8px">
+        <div><b id="r-a">0°</b><small>Main-shaft angle φ (0° = needle point highest)</small></div>
+        <div><b id="r-n">9.5</b><small>Needle point above throat plate mm</small></div>
+        <div><b id="r-l">0.0</b><small>Lower-looper point lateral position mm</small></div>
+        <div><b id="r-u">0.0, 0.0</b><small>Upper-looper point X, Z mm</small></div>
+        <div style="grid-column:1 / -1"><span class="phase" id="r-p">—</span></div>
+      </div>
+    </section>
+    <section class="card">
+      <h3>Differential feed</h3>
+      <div class="row"><label for="dr">Differential ratio</label><input id="dr" type="range" min="0.7" max="2" step="0.05" value="1.3"><b id="r-dr" style="font-family:var(--f-mono)">1.30</b></div>
+      <p class="note">Main feed-dog stroke 2.5 mm (the stitch length); differential feed-dog stroke = differential ratio × 2.5 mm. With a ratio above 1 the front dog feeds more, pushing the fabric together, which offsets the stretching of knits.</p>
+    </section>
+    <section class="card">
+      <h3>Component groups (coloured in X-ray and exploded views)</h3>
+      <div class="parts">
+        <i style="background:#2f6fd6"></i><span>Inclined needle: needle bar, needle</span>
+        <i style="background:#e0662f"></i><span>Lower looper: looper, rocker shaft, rocker arm, ball-ended link</span>
+        <i style="background:#2e9e5b"></i><span>Upper looper: looper, guide rod, swinging guide bush, rocker, link</span>
+        <i style="background:#8e5bc4"></i><span>Feed: main feed dog, differential feed dog</span>
+        <i style="background:#c9a227"></i><span>Edge trimming: upper knife, lower knife</span>
+        <i style="background:#59636e"></i><span>Main shaft, cranks and handwheel</span>
+      </div>
+      <p class="note">Both loopers are driven from cranks on the main shaft through ball-ended links; the crank axis is not parallel to the rocker shaft, so each drive is a spatial four-bar linkage (RSSR) — see Sections 9.6 and 9.7.</p>
+    </section>
+  </div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const K={"INC":0.34907,"A_TOP":10.10969,"EYE":2.2,"NEEDLE_R":0.375,"R_N":12.25,"L_N":42.0,"UP":[-0.0,0.34202,0.93969],"EWB":[0.0,0.93969,-0.34202],"EV":[0.0,0.24243,0.97017],"NR":[0.0,-0.97017,0.24243],"R_LL":38.0,"PIVOT_LL":[0.0,33.75072,-20.78737],"A_LL":-7.99031,"L_BLADE":22.0,"LL_HALF":0.4,"Q_D":[0.0,16.64971,-67.772],"V0":[0.99226,-0.11668,0.04247],"C_LL":22.0,"B_LL":22.4789,"R_LLC":4.3619,"PH0_LL":-2.50136,"M":[22.0,1.27606,-51.53467],"XC_LL":22.0,"UL":{"Ox":35.3839,"Oz":-75.0,"cr":30.0,"p1":3.1416,"p2":2.2594,"Gx":12.5906,"Gz":-31.4934,"L":60.0576,"h":9.9617},"Y_C":-0.435,"O_UL":[35.3839,-18.61724,-72.76267],"G_UL":[12.5906,-8.06994,-30.55392],"C_UL":20.0,"DELTA_UL":0.44109,"XC_UL":15.3839,"R_ULC":7.3801,"B_UL":29.47,"PH0_UL":0.24435,"UL_BODY":[[60.0576,9.9617],[60.0529,9.8516],[60.0476,9.7421],[60.0415,9.6332],[60.0347,9.5249],[60.0272,9.4172],[60.019,9.3101],[60.0102,9.2036],[60.0006,9.0977],[59.9904,8.9924],[59.9795,8.8878],[59.9679,8.7838],[59.9557,8.6804],[59.9428,8.5776],[59.9293,8.4755],[59.9152,8.3741],[59.9004,8.2733],[59.8849,8.1731],[59.8689,8.0736],[59.8522,7.9747],[59.8349,7.8765],[59.8171,7.779],[59.7986,7.6821],[59.7795,7.5859],[59.7598,7.4903],[59.7396,7.3954],[59.7188,7.3012],[59.6974,7.2077],[59.6754,7.1148],[59.6529,7.0227],[59.6298,6.9311],[59.6062,6.8403],[59.5821,6.7502],[59.5574,6.6607],[59.5322,6.572],[59.5064,6.4839],[59.4802,6.3965],[59.4534,6.3098],[59.4261,6.2238],[59.3983,6.1384],[59.37,6.0538],[59.3413,5.9698],[59.312,5.8866],[59.2823,5.804],[59.2521,5.7221],[59.2214,5.6409],[59.1903,5.5605],[59.1587,5.4806],[59.1266,5.4015],[59.0941,5.3231],[59.0612,5.2454],[59.0278,5.1684],[58.994,5.092],[58.9598,5.0164],[58.9252,4.9414],[58.8901,4.8671],[58.8547,4.7935],[58.8188,4.7206],[58.7825,4.6484],[58.7459,4.5769],[58.7088,4.5061],[58.6714,4.4359],[58.6336,4.3664],[58.5954,4.2976],[58.5569,4.2295],[58.5179,4.1621],[58.4787,4.0953],[58.439,4.0292],[58.399,3.9638],[58.3587,3.8991],[58.318,3.835],[58.277,3.7716],[58.2357,3.7089],[58.194,3.6468],[58.152,3.5854],[58.1097,3.5247],[58.0671,3.4646],[58.0242,3.4052],[57.9809,3.3464],[57.9374,3.2883],[57.8936,3.2309],[57.8494,3.1741],[57.805,3.1179],[57.7603,3.0624],[57.7153,3.0076],[57.6701,2.9534],[57.6245,2.8998],[57.5787,2.8468],[57.5327,2.7945],[57.4863,2.7428],[57.4398,2.6918],[57.3929,2.6414],[57.3458,2.5916],[57.2985,2.5424],[57.2509,2.4938],[57.2031,2.4459],[57.155,2.3986],[57.1067,2.3519],[57.0582,2.3058],[57.0095,2.2603],[56.9605,2.2154],[56.9113,2.1711],[56.8619,2.1274],[56.8123,2.0843],[56.7625,2.0418],[56.7124,1.9999],[56.6622,1.9585],[56.6118,1.9178],[56.5612,1.8776],[56.5103,1.838],[56.4593,1.799],[56.4081,1.7606],[56.3567,1.7227],[56.3052,1.6854],[56.2534,1.6487],[56.2015,1.6125],[56.1494,1.5769],[56.0971,1.5418],[56.0447,1.5073],[55.9921,1.4733],[55.9393,1.4399],[55.8864,1.407],[55.8333,1.3747],[55.7801,1.3429],[55.7267,1.3116],[55.6731,1.2809],[55.6195,1.2507],[55.5656,1.221],[55.5116,1.1919],[55.4575,1.1632],[55.4033,1.1351],[55.3489,1.1075],[55.2943,1.0804],[55.2397,1.0538],[55.1849,1.0277],[55.1299,1.0021],[55.0749,0.977],[55.0197,0.9524],[54.9644,0.9283],[54.909,0.9046],[54.8535,0.8815],[54.7978,0.8588],[54.7421,0.8366],[54.6862,0.8149],[54.6302,0.7937],[54.5741,0.7729],[54.5179,0.7526],[54.4616,0.7328],[54.4052,0.7134],[54.3487,0.6945],[54.2921,0.6761],[54.2354,0.658],[54.1786,0.6405],[54.1217,0.6234],[54.0647,0.6067],[54.0076,0.5905],[53.9504,0.5747],[53.8932,0.5593],[53.8358,0.5444],[53.7784,0.5298],[53.7209,0.5158],[53.6633,0.5021],[53.6056,0.4888],[53.5478,0.476],[53.49,0.4636],[53.432,0.4516],[53.3741,0.44],[53.316,0.4288],[53.2578,0.418],[53.1996,0.4076],[53.1413,0.3976],[53.083,0.388],[53.0246,0.3788],[52.9661,0.3699],[52.9075,0.3615],[52.8489,0.3534],[52.7902,0.3457],[52.7314,0.3384],[52.6726,0.3314],[52.6137,0.3249],[52.5548,0.3187],[52.4958,0.3128],[52.4368,0.3073],[52.3777,0.3022],[52.3185,0.2974],[52.2593,0.293],[52.2,0.2889],[52.1407,0.2852],[52.0813,0.2818],[52.0219,0.2788],[51.9624,0.2761],[51.9029,0.2738],[51.8433,0.2717],[51.7837,0.27],[51.724,0.2687],[51.6643,0.2676],[51.6045,0.2669],[51.5447,0.2665],[51.4849,0.2665],[51.425,0.2667],[51.365,0.2673],[51.3051,0.2681],[51.2451,0.2693],[51.185,0.2708],[51.1249,0.2726],[51.0648,0.2747],[51.0046,0.277],[50.9444,0.2797],[50.8841,0.2827],[50.8238,0.286],[50.7635,0.2895],[50.7032,0.2934],[50.6428,0.2975],[50.5824,0.3019],[50.5219,0.3066],[50.4614,0.3115],[50.4009,0.3167],[50.3403,0.3223],[50.2798,0.328],[50.2191,0.3341],[50.1585,0.3404],[50.0978,0.3469],[50.0371,0.3538],[49.9764,0.3609],[49.9156,0.3682],[49.8548,0.3758],[49.794,0.3836],[49.7332,0.3917],[49.6723,0.4001],[49.6114,0.4087],[49.5505,0.4175],[49.4896,0.4266],[49.4286,0.4359],[49.3676,0.4454],[49.3066,0.4552],[49.2456,0.4652],[49.1845,0.4754],[49.1234,0.4859],[49.0623,0.4966],[49.0012,0.5075],[48.94,0.5186],[48.8788,0.53],[48.8177,0.5415],[48.7564,0.5533],[48.6952,0.5653],[48.6339,0.5775],[48.5727,0.5899],[48.5114,0.6026],[48.4501,0.6154],[48.3887,0.6284],[48.3274,0.6417],[48.266,0.6551],[48.2046,0.6687],[48.1432,0.6825],[48.0818,0.6966],[48.0204,0.7108],[47.9589,0.7252],[47.8975,0.7397],[47.836,0.7545],[47.7745,0.7695],[47.7129,0.7846],[47.6514,0.7999],[47.5899,0.8154],[47.5283,0.8311],[47.4667,0.8469],[47.4051,0.8629],[47.3435,0.8791],[47.2819,0.8955],[47.2202,0.912],[47.1586,0.9287],[47.0969,0.9456]],"FAB_EDGE_X":4.0,"KNIFE_Y":[-13.0,-5.0],"KNIFE_STROKE":6.0,"KNIFE_LOW_PHI":3.14159,"KNIFE_OVERLAP":0.8,"FEED_LIFT_TOP":1.0,"T_FAB":1.5,"rows":[{"a_tip":10.1097,"th":0.08657,"psi":2.29211},{"a_tip":10.1084,"th":0.09004,"psi":2.28914},{"a_tip":10.1044,"th":0.09351,"psi":2.28631},{"a_tip":10.0978,"th":0.097,"psi":2.28363},{"a_tip":10.0885,"th":0.1005,"psi":2.2811},{"a_tip":10.0766,"th":0.10401,"psi":2.2787},{"a_tip":10.0621,"th":0.10753,"psi":2.27645},{"a_tip":10.0449,"th":0.11106,"psi":2.27435},{"a_tip":10.0251,"th":0.11459,"psi":2.27238},{"a_tip":10.0026,"th":0.11814,"psi":2.27056},{"a_tip":9.9775,"th":0.12169,"psi":2.26888},{"a_tip":9.9497,"th":0.12525,"psi":2.26734},{"a_tip":9.9193,"th":0.12882,"psi":2.26594},{"a_tip":9.8862,"th":0.13239,"psi":2.26468},{"a_tip":9.8505,"th":0.13596,"psi":2.26356},{"a_tip":9.8121,"th":0.13954,"psi":2.26257},{"a_tip":9.7711,"th":0.14312,"psi":2.26172},{"a_tip":9.7274,"th":0.1467,"psi":2.26101},{"a_tip":9.6811,"th":0.15029,"psi":2.26042},{"a_tip":9.6321,"th":0.15387,"psi":2.25997},{"a_tip":9.5804,"th":0.15745,"psi":2.25965},{"a_tip":9.5261,"th":0.16103,"psi":2.25946},{"a_tip":9.4691,"th":0.1646,"psi":2.2594},{"a_tip":9.4095,"th":0.16818,"psi":2.25947},{"a_tip":9.3472,"th":0.17175,"psi":2.25965},{"a_tip":9.2823,"th":0.17531,"psi":2.25997},{"a_tip":9.2146,"th":0.17886,"psi":2.2604},{"a_tip":9.1443,"th":0.18241,"psi":2.26096},{"a_tip":9.0714,"th":0.18595,"psi":2.26163},{"a_tip":8.9958,"th":0.18948,"psi":2.26243},{"a_tip":8.9175,"th":0.193,"psi":2.26333},{"a_tip":8.8366,"th":0.19651,"psi":2.26436},{"a_tip":8.753,"th":0.20001,"psi":2.26549},{"a_tip":8.6667,"th":0.20349,"psi":2.26674},{"a_tip":8.5778,"th":0.20696,"psi":2.26809},{"a_tip":8.4862,"th":0.21041,"psi":2.26955},{"a_tip":8.392,"th":0.21384,"psi":2.27112},{"a_tip":8.2951,"th":0.21726,"psi":2.2728},{"a_tip":8.1955,"th":0.22066,"psi":2.27457},{"a_tip":8.0933,"th":0.22404,"psi":2.27645},{"a_tip":7.9885,"th":0.2274,"psi":2.27843},{"a_tip":7.881,"th":0.23074,"psi":2.2805},{"a_tip":7.7708,"th":0.23405,"psi":2.28267},{"a_tip":7.6581,"th":0.23734,"psi":2.28494},{"a_tip":7.5427,"th":0.2406,"psi":2.2873},{"a_tip":7.4247,"th":0.24384,"psi":2.28975},{"a_tip":7.3041,"th":0.24705,"psi":2.29229},{"a_tip":7.1808,"th":0.25023,"psi":2.29493},{"a_tip":7.055,"th":0.25339,"psi":2.29765},{"a_tip":6.9266,"th":0.25651,"psi":2.30045},{"a_tip":6.7956,"th":0.2596,"psi":2.30334},{"a_tip":6.662,"th":0.26265,"psi":2.30631},{"a_tip":6.5259,"th":0.26567,"psi":2.30937},{"a_tip":6.3872,"th":0.26866,"psi":2.3125},{"a_tip":6.2461,"th":0.27161,"psi":2.31572},{"a_tip":6.1023,"th":0.27452,"psi":2.31901},{"a_tip":5.9561,"th":0.27739,"psi":2.32238},{"a_tip":5.8074,"th":0.28023,"psi":2.32583},{"a_tip":5.6563,"th":0.28302,"psi":2.32934},{"a_tip":5.5027,"th":0.28577,"psi":2.33294},{"a_tip":5.3466,"th":0.28847,"psi":2.3366},{"a_tip":5.1882,"th":0.29113,"psi":2.34034},{"a_tip":5.0273,"th":0.29375,"psi":2.34414},{"a_tip":4.8641,"th":0.29632,"psi":2.34802},{"a_tip":4.6986,"th":0.29884,"psi":2.35195},{"a_tip":4.5307,"th":0.30131,"psi":2.35596},{"a_tip":4.3606,"th":0.30373,"psi":2.36003},{"a_tip":4.1882,"th":0.3061,"psi":2.36417},{"a_tip":4.0135,"th":0.30842,"psi":2.36837},{"a_tip":3.8367,"th":0.31068,"psi":2.37263},{"a_tip":3.6577,"th":0.31289,"psi":2.37696},{"a_tip":3.4766,"th":0.31504,"psi":2.38134},{"a_tip":3.2934,"th":0.31714,"psi":2.38578},{"a_tip":3.1081,"th":0.31918,"psi":2.39029},{"a_tip":2.9208,"th":0.32116,"psi":2.39485},{"a_tip":2.7315,"th":0.32308,"psi":2.39946},{"a_tip":2.5402,"th":0.32494,"psi":2.40414},{"a_tip":2.3471,"th":0.32674,"psi":2.40886},{"a_tip":2.1521,"th":0.32847,"psi":2.41365},{"a_tip":1.9553,"th":0.33015,"psi":2.41848},{"a_tip":1.7568,"th":0.33175,"psi":2.42337},{"a_tip":1.5565,"th":0.33329,"psi":2.42831},{"a_tip":1.3546,"th":0.33477,"psi":2.4333},{"a_tip":1.151,"th":0.33618,"psi":2.43835},{"a_tip":0.9459,"th":0.33752,"psi":2.44344},{"a_tip":0.7393,"th":0.33879,"psi":2.44858},{"a_tip":0.5313,"th":0.33999,"psi":2.45377},{"a_tip":0.3218,"th":0.34112,"psi":2.459},{"a_tip":0.1111,"th":0.34218,"psi":2.46429},{"a_tip":-0.1009,"th":0.34316,"psi":2.46962},{"a_tip":-0.3142,"th":0.34408,"psi":2.47499},{"a_tip":-0.5285,"th":0.34492,"psi":2.48041},{"a_tip":-0.7439,"th":0.34568,"psi":2.48588},{"a_tip":-0.9604,"th":0.34637,"psi":2.49139},{"a_tip":-1.1778,"th":0.34699,"psi":2.49694},{"a_tip":-1.396,"th":0.34753,"psi":2.50253},{"a_tip":-1.615,"th":0.34799,"psi":2.50816},{"a_tip":-1.8348,"th":0.34838,"psi":2.51383},{"a_tip":-2.0552,"th":0.34869,"psi":2.51955},{"a_tip":-2.2762,"th":0.34892,"psi":2.5253},{"a_tip":-2.4976,"th":0.34907,"psi":2.53109},{"a_tip":-2.7195,"th":0.34915,"psi":2.53692},{"a_tip":-2.9417,"th":0.34914,"psi":2.54279},{"a_tip":-3.1642,"th":0.34906,"psi":2.54869},{"a_tip":-3.3869,"th":0.3489,"psi":2.55463},{"a_tip":-3.6096,"th":0.34865,"psi":2.5606},{"a_tip":-3.8324,"th":0.34833,"psi":2.56661},{"a_tip":-4.055,"th":0.34792,"psi":2.57265},{"a_tip":-4.2776,"th":0.34744,"psi":2.57872},{"a_tip":-4.4998,"th":0.34687,"psi":2.58483},{"a_tip":-4.7218,"th":0.34623,"psi":2.59097},{"a_tip":-4.9433,"th":0.3455,"psi":2.59714},{"a_tip":-5.1643,"th":0.34469,"psi":2.60334},{"a_tip":-5.3847,"th":0.3438,"psi":2.60956},{"a_tip":-5.6045,"th":0.34283,"psi":2.61582},{"a_tip":-5.8234,"th":0.34178,"psi":2.6221},{"a_tip":-6.0415,"th":0.34065,"psi":2.62841},{"a_tip":-6.2586,"th":0.33944,"psi":2.63475},{"a_tip":-6.4747,"th":0.33815,"psi":2.64111},{"a_tip":-6.6897,"th":0.33679,"psi":2.64749},{"a_tip":-6.9034,"th":0.33534,"psi":2.6539},{"a_tip":-7.1158,"th":0.33381,"psi":2.66033},{"a_tip":-7.3268,"th":0.3322,"psi":2.66678},{"a_tip":-7.5362,"th":0.33052,"psi":2.67325},{"a_tip":-7.7441,"th":0.32876,"psi":2.67974},{"a_tip":-7.9503,"th":0.32692,"psi":2.68625},{"a_tip":-8.1547,"th":0.325,"psi":2.69278},{"a_tip":-8.3572,"th":0.32301,"psi":2.69932},{"a_tip":-8.5578,"th":0.32094,"psi":2.70588},{"a_tip":-8.7563,"th":0.3188,"psi":2.71245},{"a_tip":-8.9527,"th":0.31658,"psi":2.71903},{"a_tip":-9.1469,"th":0.31429,"psi":2.72563},{"a_tip":-9.3387,"th":0.31193,"psi":2.73224},{"a_tip":-9.5281,"th":0.3095,"psi":2.73885},{"a_tip":-9.7151,"th":0.30699,"psi":2.74548},{"a_tip":-9.8994,"th":0.30442,"psi":2.75211},{"a_tip":-10.0811,"th":0.30177,"psi":2.75874},{"a_tip":-10.2601,"th":0.29906,"psi":2.76539},{"a_tip":-10.4362,"th":0.29628,"psi":2.77203},{"a_tip":-10.6094,"th":0.29344,"psi":2.77868},{"a_tip":-10.7796,"th":0.29052,"psi":2.78532},{"a_tip":-10.9468,"th":0.28755,"psi":2.79197},{"a_tip":-11.1108,"th":0.28451,"psi":2.79861},{"a_tip":-11.2715,"th":0.28141,"psi":2.80525},{"a_tip":-11.429,"th":0.27825,"psi":2.81188},{"a_tip":-11.583,"th":0.27503,"psi":2.81851},{"a_tip":-11.7336,"th":0.27175,"psi":2.82512},{"a_tip":-11.8807,"th":0.26842,"psi":2.83173},{"a_tip":-12.0242,"th":0.26503,"psi":2.83833},{"a_tip":-12.164,"th":0.26159,"psi":2.8449},{"a_tip":-12.3001,"th":0.25809,"psi":2.85147},{"a_tip":-12.4324,"th":0.25454,"psi":2.85801},{"a_tip":-12.5608,"th":0.25094,"psi":2.86454},{"a_tip":-12.6853,"th":0.24729,"psi":2.87105},{"a_tip":-12.8058,"th":0.2436,"psi":2.87753},{"a_tip":-12.9223,"th":0.23986,"psi":2.88399},{"a_tip":-13.0347,"th":0.23608,"psi":2.89042},{"a_tip":-13.1429,"th":0.23225,"psi":2.89682},{"a_tip":-13.2469,"th":0.22838,"psi":2.9032},{"a_tip":-13.3466,"th":0.22447,"psi":2.90953},{"a_tip":-13.442,"th":0.22053,"psi":2.91584},{"a_tip":-13.5331,"th":0.21655,"psi":2.92211},{"a_tip":-13.6198,"th":0.21253,"psi":2.92833},{"a_tip":-13.7021,"th":0.20849,"psi":2.93452},{"a_tip":-13.7798,"th":0.20441,"psi":2.94066},{"a_tip":-13.8531,"th":0.2003,"psi":2.94676},{"a_tip":-13.9217,"th":0.19616,"psi":2.95281},{"a_tip":-13.9858,"th":0.192,"psi":2.95881},{"a_tip":-14.0453,"th":0.18781,"psi":2.96475},{"a_tip":-14.1002,"th":0.1836,"psi":2.97065},{"a_tip":-14.1503,"th":0.17937,"psi":2.97648},{"a_tip":-14.1958,"th":0.17512,"psi":2.98225},{"a_tip":-14.2365,"th":0.17085,"psi":2.98796},{"a_tip":-14.2725,"th":0.16657,"psi":2.99361},{"a_tip":-14.3037,"th":0.16227,"psi":2.99919},{"a_tip":-14.3301,"th":0.15796,"psi":3.0047},{"a_tip":-14.3518,"th":0.15364,"psi":3.01014},{"a_tip":-14.3686,"th":0.14932,"psi":3.01551},{"a_tip":-14.3807,"th":0.14498,"psi":3.02079},{"a_tip":-14.3879,"th":0.14064,"psi":3.026},{"a_tip":-14.3903,"th":0.1363,"psi":3.03113},{"a_tip":-14.3879,"th":0.13195,"psi":3.03617},{"a_tip":-14.3807,"th":0.12761,"psi":3.04113},{"a_tip":-14.3686,"th":0.12327,"psi":3.04599},{"a_tip":-14.3518,"th":0.11893,"psi":3.05076},{"a_tip":-14.3301,"th":0.1146,"psi":3.05544},{"a_tip":-14.3037,"th":0.11027,"psi":3.06002},{"a_tip":-14.2725,"th":0.10596,"psi":3.06451},{"a_tip":-14.2365,"th":0.10165,"psi":3.06889},{"a_tip":-14.1958,"th":0.09736,"psi":3.07316},{"a_tip":-14.1503,"th":0.09308,"psi":3.07733},{"a_tip":-14.1002,"th":0.08882,"psi":3.08139},{"a_tip":-14.0453,"th":0.08457,"psi":3.08534},{"a_tip":-13.9858,"th":0.08035,"psi":3.08917},{"a_tip":-13.9217,"th":0.07614,"psi":3.09289},{"a_tip":-13.8531,"th":0.07196,"psi":3.09648},{"a_tip":-13.7798,"th":0.0678,"psi":3.09996},{"a_tip":-13.7021,"th":0.06366,"psi":3.10331},{"a_tip":-13.6198,"th":0.05956,"psi":3.10653},{"a_tip":-13.5331,"th":0.05548,"psi":3.10963},{"a_tip":-13.442,"th":0.05143,"psi":3.1126},{"a_tip":-13.3466,"th":0.04742,"psi":3.11543},{"a_tip":-13.2469,"th":0.04343,"psi":3.11813},{"a_tip":-13.1429,"th":0.03949,"psi":3.12069},{"a_tip":-13.0347,"th":0.03557,"psi":3.12311},{"a_tip":-12.9223,"th":0.0317,"psi":3.1254},{"a_tip":-12.8058,"th":0.02786,"psi":3.12754},{"a_tip":-12.6853,"th":0.02406,"psi":3.12953},{"a_tip":-12.5608,"th":0.02031,"psi":3.13138},{"a_tip":-12.4324,"th":0.0166,"psi":3.13308},{"a_tip":-12.3001,"th":0.01293,"psi":3.13463},{"a_tip":-12.164,"th":0.0093,"psi":3.13603},{"a_tip":-12.0242,"th":0.00573,"psi":3.13727},{"a_tip":-11.8807,"th":0.0022,"psi":3.13836},{"a_tip":-11.7336,"th":-0.00129,"psi":3.1393},{"a_tip":-11.583,"th":-0.00472,"psi":3.14008},{"a_tip":-11.429,"th":-0.0081,"psi":3.1407},{"a_tip":-11.2715,"th":-0.01143,"psi":3.14116},{"a_tip":-11.1108,"th":-0.01471,"psi":3.14146},{"a_tip":-10.9468,"th":-0.01793,"psi":3.14159},{"a_tip":-10.7796,"th":-0.02111,"psi":3.14157},{"a_tip":-10.6094,"th":-0.02422,"psi":3.14138},{"a_tip":-10.4362,"th":-0.02728,"psi":3.14102},{"a_tip":-10.2601,"th":-0.03028,"psi":3.14051},{"a_tip":-10.0811,"th":-0.03323,"psi":3.13982},{"a_tip":-9.8994,"th":-0.03611,"psi":3.13897},{"a_tip":-9.7151,"th":-0.03894,"psi":3.13795},{"a_tip":-9.5281,"th":-0.04171,"psi":3.13677},{"a_tip":-9.3387,"th":-0.04442,"psi":3.13542},{"a_tip":-9.1469,"th":-0.04706,"psi":3.1339},{"a_tip":-8.9527,"th":-0.04965,"psi":3.13221},{"a_tip":-8.7563,"th":-0.05217,"psi":3.13036},{"a_tip":-8.5578,"th":-0.05463,"psi":3.12834},{"a_tip":-8.3572,"th":-0.05703,"psi":3.12616},{"a_tip":-8.1547,"th":-0.05937,"psi":3.1238},{"a_tip":-7.9503,"th":-0.06164,"psi":3.12128},{"a_tip":-7.7441,"th":-0.06384,"psi":3.1186},{"a_tip":-7.5362,"th":-0.06599,"psi":3.11575},{"a_tip":-7.3268,"th":-0.06806,"psi":3.11273},{"a_tip":-7.1158,"th":-0.07008,"psi":3.10956},{"a_tip":-6.9034,"th":-0.07202,"psi":3.10622},{"a_tip":-6.6897,"th":-0.07391,"psi":3.10271},{"a_tip":-6.4747,"th":-0.07572,"psi":3.09905},{"a_tip":-6.2586,"th":-0.07747,"psi":3.09523},{"a_tip":-6.0415,"th":-0.07916,"psi":3.09125},{"a_tip":-5.8234,"th":-0.08078,"psi":3.08711},{"a_tip":-5.6045,"th":-0.08233,"psi":3.08282},{"a_tip":-5.3847,"th":-0.08382,"psi":3.07837},{"a_tip":-5.1643,"th":-0.08524,"psi":3.07377},{"a_tip":-4.9433,"th":-0.0866,"psi":3.06902},{"a_tip":-4.7218,"th":-0.08789,"psi":3.06413},{"a_tip":-4.4998,"th":-0.08912,"psi":3.05908},{"a_tip":-4.2776,"th":-0.09027,"psi":3.05389},{"a_tip":-4.055,"th":-0.09137,"psi":3.04856},{"a_tip":-3.8324,"th":-0.0924,"psi":3.04308},{"a_tip":-3.6096,"th":-0.09336,"psi":3.03747},{"a_tip":-3.3869,"th":-0.09426,"psi":3.03172},{"a_tip":-3.1642,"th":-0.09509,"psi":3.02583},{"a_tip":-2.9417,"th":-0.09586,"psi":3.01982},{"a_tip":-2.7195,"th":-0.09657,"psi":3.01367},{"a_tip":-2.4976,"th":-0.09721,"psi":3.0074},{"a_tip":-2.2762,"th":-0.09778,"psi":3.001},{"a_tip":-2.0552,"th":-0.0983,"psi":2.99449},{"a_tip":-1.8348,"th":-0.09875,"psi":2.98785},{"a_tip":-1.615,"th":-0.09914,"psi":2.9811},{"a_tip":-1.396,"th":-0.09946,"psi":2.97423},{"a_tip":-1.1778,"th":-0.09972,"psi":2.96725},{"a_tip":-0.9604,"th":-0.09993,"psi":2.96017},{"a_tip":-0.7439,"th":-0.10007,"psi":2.95298},{"a_tip":-0.5285,"th":-0.10014,"psi":2.94569},{"a_tip":-0.3142,"th":-0.10016,"psi":2.9383},{"a_tip":-0.1009,"th":-0.10012,"psi":2.93082},{"a_tip":0.1111,"th":-0.10002,"psi":2.92324},{"a_tip":0.3218,"th":-0.09986,"psi":2.91558},{"a_tip":0.5313,"th":-0.09964,"psi":2.90783},{"a_tip":0.7393,"th":-0.09936,"psi":2.9},{"a_tip":0.9459,"th":-0.09902,"psi":2.89209},{"a_tip":1.151,"th":-0.09863,"psi":2.8841},{"a_tip":1.3546,"th":-0.09818,"psi":2.87604},{"a_tip":1.5565,"th":-0.09767,"psi":2.86792},{"a_tip":1.7568,"th":-0.0971,"psi":2.85973},{"a_tip":1.9553,"th":-0.09648,"psi":2.85148},{"a_tip":2.1521,"th":-0.09581,"psi":2.84316},{"a_tip":2.3471,"th":-0.09508,"psi":2.8348},{"a_tip":2.5402,"th":-0.09429,"psi":2.82638},{"a_tip":2.7315,"th":-0.09346,"psi":2.81792},{"a_tip":2.9208,"th":-0.09256,"psi":2.80941},{"a_tip":3.1081,"th":-0.09162,"psi":2.80086},{"a_tip":3.2934,"th":-0.09062,"psi":2.79228},{"a_tip":3.4766,"th":-0.08957,"psi":2.78366},{"a_tip":3.6577,"th":-0.08847,"psi":2.77501},{"a_tip":3.8367,"th":-0.08732,"psi":2.76634},{"a_tip":4.0135,"th":-0.08612,"psi":2.75764},{"a_tip":4.1882,"th":-0.08487,"psi":2.74893},{"a_tip":4.3606,"th":-0.08357,"psi":2.7402},{"a_tip":4.5307,"th":-0.08222,"psi":2.73146},{"a_tip":4.6986,"th":-0.08082,"psi":2.72271},{"a_tip":4.8641,"th":-0.07938,"psi":2.71396},{"a_tip":5.0273,"th":-0.07788,"psi":2.7052},{"a_tip":5.1882,"th":-0.07634,"psi":2.69645},{"a_tip":5.3466,"th":-0.07476,"psi":2.68771},{"a_tip":5.5027,"th":-0.07313,"psi":2.67898},{"a_tip":5.6563,"th":-0.07145,"psi":2.67026},{"a_tip":5.8074,"th":-0.06972,"psi":2.66155},{"a_tip":5.9561,"th":-0.06796,"psi":2.65287},{"a_tip":6.1023,"th":-0.06615,"psi":2.64421},{"a_tip":6.2461,"th":-0.06429,"psi":2.63558},{"a_tip":6.3872,"th":-0.06239,"psi":2.62698},{"a_tip":6.5259,"th":-0.06046,"psi":2.61842},{"a_tip":6.662,"th":-0.05847,"psi":2.60989},{"a_tip":6.7956,"th":-0.05645,"psi":2.6014},{"a_tip":6.9266,"th":-0.05439,"psi":2.59296},{"a_tip":7.055,"th":-0.05228,"psi":2.58457},{"a_tip":7.1808,"th":-0.05014,"psi":2.57622},{"a_tip":7.3041,"th":-0.04795,"psi":2.56793},{"a_tip":7.4247,"th":-0.04573,"psi":2.5597},{"a_tip":7.5427,"th":-0.04347,"psi":2.55153},{"a_tip":7.6581,"th":-0.04117,"psi":2.54343},{"a_tip":7.7708,"th":-0.03883,"psi":2.53539},{"a_tip":7.881,"th":-0.03645,"psi":2.52742},{"a_tip":7.9885,"th":-0.03404,"psi":2.51952},{"a_tip":8.0933,"th":-0.0316,"psi":2.5117},{"a_tip":8.1955,"th":-0.02911,"psi":2.50396},{"a_tip":8.2951,"th":-0.02659,"psi":2.4963},{"a_tip":8.392,"th":-0.02404,"psi":2.48873},{"a_tip":8.4862,"th":-0.02145,"psi":2.48124},{"a_tip":8.5778,"th":-0.01883,"psi":2.47384},{"a_tip":8.6667,"th":-0.01618,"psi":2.46654},{"a_tip":8.753,"th":-0.01349,"psi":2.45933},{"a_tip":8.8366,"th":-0.01077,"psi":2.45223},{"a_tip":8.9175,"th":-0.00802,"psi":2.44522},{"a_tip":8.9958,"th":-0.00524,"psi":2.43832},{"a_tip":9.0714,"th":-0.00243,"psi":2.43152},{"a_tip":9.1443,"th":0.00041,"psi":2.42483},{"a_tip":9.2146,"th":0.00328,"psi":2.41825},{"a_tip":9.2823,"th":0.00618,"psi":2.41179},{"a_tip":9.3472,"th":0.00911,"psi":2.40544},{"a_tip":9.4095,"th":0.01207,"psi":2.39921},{"a_tip":9.4691,"th":0.01506,"psi":2.39309},{"a_tip":9.5261,"th":0.01807,"psi":2.3871},{"a_tip":9.5804,"th":0.02111,"psi":2.38124},{"a_tip":9.6321,"th":0.02417,"psi":2.37549},{"a_tip":9.6811,"th":0.02726,"psi":2.36988},{"a_tip":9.7274,"th":0.03038,"psi":2.3644},{"a_tip":9.7711,"th":0.03352,"psi":2.35904},{"a_tip":9.8121,"th":0.03668,"psi":2.35382},{"a_tip":9.8505,"th":0.03987,"psi":2.34873},{"a_tip":9.8862,"th":0.04308,"psi":2.34377},{"a_tip":9.9193,"th":0.04631,"psi":2.33896},{"a_tip":9.9497,"th":0.04956,"psi":2.33427},{"a_tip":9.9775,"th":0.05283,"psi":2.32973},{"a_tip":10.0026,"th":0.05613,"psi":2.32533},{"a_tip":10.0251,"th":0.05944,"psi":2.32107},{"a_tip":10.0449,"th":0.06277,"psi":2.31695},{"a_tip":10.0621,"th":0.06612,"psi":2.31297},{"a_tip":10.0766,"th":0.06949,"psi":2.30913},{"a_tip":10.0885,"th":0.07287,"psi":2.30544},{"a_tip":10.0978,"th":0.07628,"psi":2.30189},{"a_tip":10.1044,"th":0.0797,"psi":2.29849},{"a_tip":10.1084,"th":0.08313,"psi":2.29523}]};
+const T=THREE, D2R=Math.PI/180;
+if(location.hash==='#capture')document.body.classList.add('cap');
+const stage=document.getElementById('stage'), cv=document.getElementById('cv'), lab=document.getElementById('lab');
+const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+renderer.outputEncoding=T.sRGBEncoding; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
+const scene=new T.Scene(); const cam=new T.PerspectiveCamera(28,16/10,1,6000);
+{ const env=new T.Scene(); const g=new T.SphereGeometry(500,32,16), col=[]; const p=g.attributes.position;
+  for(let i=0;i<p.count;i++){const y=p.getY(i)/500;const c=y>0?0.75+0.25*y:0.45+0.3*(1+y);col.push(c,c,c*1.02);}
+  g.setAttribute('color',new T.Float32BufferAttribute(col,3)); env.add(new T.Mesh(g,new T.MeshBasicMaterial({vertexColors:true,side:T.BackSide})));
+  const pm=(w,h,x,y,z,i)=>{const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:new T.Color(i,i,i),side:T.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);env.add(m);};
+  pm(300,120,0,420,180,3.0); pm(160,300,-420,120,120,1.6); pm(160,300,420,160,-120,1.2);
+  scene.environment=new T.PMREMGenerator(renderer).fromScene(env,0.04).texture; }
+scene.add(new T.HemisphereLight(0xffffff,0x9aa3ad,0.45));
+const sun=new T.DirectionalLight(0xffffff,1.1); sun.position.set(-260,520,420); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-260,right:260,top:260,bottom:-260,near:50,far:1600}); sun.shadow.bias=-0.0005; scene.add(sun);
+
+// ---------- coordinates: book (X right, Y back, Z up) -> three (x, y=Z, z=-Y) ----------
+const W=(p)=>new T.Vector3(p[0],p[2],-p[1]);
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]], sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]], mul=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2], cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const len=a=>Math.hypot(a[0],a[1],a[2]), unit=a=>mul(a,1/len(a));
+const EU=[1,0,0], UP=K.UP, EWB=K.EWB, EV=K.EV, NR=K.NR;
+const rotUp=(v,t)=>add(add(mul(v,Math.cos(t)),mul(cross(UP,v),Math.sin(t))),mul(UP,dot(UP,v)*(1-Math.cos(t))));
+
+// ---------- materials ----------
+const mats=[];
+const std=(c,o={})=>{const {grp,...rest}=o;const m=new T.MeshStandardMaterial(Object.assign({color:c,metalness:0.8,roughness:0.3},rest));m.userData={base:m.color.clone(),grp};mats.push(m);return m;};
+const housingMat=new T.MeshPhysicalMaterial({color:0xe6e3da,metalness:0.05,roughness:0.42,clearcoat:0.6,clearcoatRoughness:0.25});
+const coverMat=new T.MeshPhysicalMaterial({color:0xd9d5ca,metalness:0.05,roughness:0.45,clearcoat:0.5});
+const steel=std(0xc9d0d6), dark=std(0x2a3038,{metalness:0.6,roughness:0.45});
+const tableMat=new T.MeshStandardMaterial({color:0xcfc9ba,roughness:0.8});
+const plateMat=std(0xd7dde2,{metalness:0.85,roughness:0.22});
+const fabMat=new T.MeshStandardMaterial({color:0xe6c98f,roughness:0.92,transparent:true,opacity:1});
+const GC={needle:0x2f6fd6,ll:0xe0662f,ul:0x2e9e5b,feed:0x8e5bc4,knife:0xc9a227,shaft:0x59636e};
+const mNeedle=std(0xd7dde2,{grp:'needle'}), mBar=std(0xb9c3cc,{grp:'needle'});
+const mLL=std(0xcfd6dc,{grp:'ll'}), mLLd=std(0x8f99a3,{grp:'ll',metalness:0.7,roughness:0.4});
+const mUL=std(0xcfd6dc,{grp:'ul'}), mULd=std(0x8f99a3,{grp:'ul',metalness:0.7,roughness:0.4});
+const mFeed=std(0x9aa4ad,{grp:'feed'}), mKnife=std(0xbfc6cc,{grp:'knife',metalness:0.9,roughness:0.2});
+const mShaft=std(0xaeb7c0,{grp:'shaft'}), mCrank=std(0x7d8791,{grp:'shaft',metalness:0.7,roughness:0.4});
+
+// ---------- helpers ----------
+const G=()=>new T.Group();
+function mesh(geo,mat,parent,pos,rot){const m=new T.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;if(pos)m.position.copy(pos);if(rot)m.rotation.set(...rot);parent.add(m);return m;}
+const box=(x,y,z)=>new T.BoxGeometry(x,y,z);
+function rbox(w,h,d,r){const s=new T.Shape();const x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
+  const b=Math.min(r,4);const g=new T.ExtrudeGeometry(s,{depth:d-2*b,bevelEnabled:true,bevelSize:b,bevelThickness:b,bevelSegments:3,curveSegments:8});g.translate(0,0,-(d-2*b)/2);return g;}
+// a cylinder whose ends follow two book-space points (updated every frame)
+function link(r,mat,parent,seg=16){const m=mesh(new T.CylinderGeometry(r,r,1,seg),mat,parent);m.userData.r=r;return m;}
+const YAX=new T.Vector3(0,1,0);
+function setLink(m,a,b){const A=W(a),B=W(b);const d=B.clone().sub(A);const L=d.length();m.position.copy(A).add(B).multiplyScalar(0.5);m.scale.set(1,Math.max(L,1e-3),1);m.quaternion.setFromUnitVectors(YAX,d.normalize());}
+function ball(r,mat,parent){return mesh(new T.SphereGeometry(r,16,12),mat,parent);}
+// disc (crank, hub) with axis along book vector ax
+function disc(r,th,mat,parent,ax){const m=mesh(new T.CylinderGeometry(r,r,th,40),mat,parent);m.quaternion.setFromUnitVectors(YAX,W(ax).normalize());return m;}
+
+const root=G(); scene.add(root); const asm={};
+function A(name,ex){const g=G();g.userData.ex=W(ex);root.add(g);asm[name]=g;return g;}
+
+// ---------- housing (schematic) ----------
+const house=A('house',[0,0,0]);
+const table=mesh(box(700,24,520),tableMat,house,W([-20,40,-112]));
+const bed=mesh(rbox(250,96,190,10),housingMat,house,W([-45,55,-52]));           // base casting (contains loopers, shafts)
+const frontCover=mesh(rbox(160,90,4,4),coverMat,house,W([-30,-41,-50]));          // looper cover on the front
+const arm=mesh(rbox(210,74,90,16),housingMat,house,W([-80,75,72]));               // upper arm
+const headF=mesh(rbox(72,150,84,14),housingMat,house,W([-12,30,66]));            // head over the needle
+const clothPlate=mesh(box(110,4,150),housingMat,house,W([45,30,-6.0]));          // flat bed to the right
+[bed,frontCover,arm,headF,clothPlate].forEach(m=>m.userData.house=true);
+
+// ---------- needle plate with stitch tongue ----------
+const plateG=A('plate',[0,0,0]);
+{ const s=new T.Shape(); // outline in X (right) / -Y (front) plane; holes for needle and looper window
+  // shape coordinates (x, -Y); after rotateX(+90deg) shape-y becomes three z (= -Y) and the depth goes down
+  const P2=(x,Y)=>[x,-Y];
+  const poly=(path,pts)=>{path.moveTo(...P2(...pts[0]));pts.slice(1).forEach(p=>path.lineTo(...P2(...p)));};
+  poly(s,[[-28,-22],[14,-22],[14,26],[-28,26],[-28,-22]]);
+  const hole=new T.Path(); poly(hole,[[4.6,-16],[4.6,14],[11,14],[11,-16],[4.6,-16]]); s.holes.push(hole);
+  const nh=new T.Path(); nh.absarc(0,0,1.0,0,Math.PI*2,true); s.holes.push(nh);
+  const fd=new T.Path(); poly(fd,[[-7,-16],[-7,12],[-1.6,12],[-1.6,-16],[-7,-16]]); s.holes.push(fd);
+  const g=new T.ExtrudeGeometry(s,{depth:3,bevelEnabled:false}); g.rotateX(Math.PI/2);
+  const m=mesh(g,plateMat,plateG);
+  // stitch tongue: a finger to the right of the needle, running back (+Y) over the looper window
+  mesh(box(2.6,1.2,22),plateMat,plateG,W([2.4,8,-0.6]));
+}
+// ---------- fabric (two layers, edge at X=4) with the seam drawn on top ----------
+const fabG=A('fabric',[0,0,40]);
+const fabBase=G(); fabG.add(fabBase);
+const fab=mesh(box(64,1.5,170),fabMat,fabBase,W([4-32,0,0.75])); fab.castShadow=false;
+{ const lm=new T.LineBasicMaterial({color:0xb99a5c}); const pts=[]; for(let y=-80;y<=80;y+=5){pts.push(W([-59,y,1.52]),W([3.8,y,1.52]));} fabBase.add(new T.LineSegments(new T.BufferGeometry().setFromPoints(pts),lm)); }
+const seamMat=new T.LineBasicMaterial({color:0x1d4c9e});
+const seamGeo=new T.BufferGeometry(); const seam=new T.LineSegments(seamGeo,seamMat); fabG.add(seam);
+const STITCH=2.5;
+
+// ---------- presser foot (above the fabric, needle slot) ----------
+const footG=A('foot',[0,0,30]);
+const footM=std(0xc7ced5,{metalness:0.85,roughness:0.25});
+const foot=mesh(rbox(14,1.2,20,0.5),footM,footG,W([-1.5,-15,2.1]));
+mesh(box(4,2,6),footM,footG,W([-1.5,-24,3.5]));
+mesh(box(3,28,3),footM,footG,W([-7,-20,16]));
+
+// ---------- main shaft, cranks, handwheel ----------
+const shaftG=A('shaft',[0,0,-40]);
+const M=K.M;
+const shaft=mesh(new T.CylinderGeometry(5,5,240,24),mShaft,shaftG); shaft.rotation.z=Math.PI/2; shaft.position.copy(W([-20,M[1],M[2]]));
+const wheel=mesh(new T.CylinderGeometry(42,42,12,64),dark,shaftG); wheel.rotation.z=Math.PI/2; wheel.position.copy(W([104,M[1],M[2]]));
+const wheelMark=mesh(box(4,4,30),std(0xd4553a,{metalness:0.2,roughness:0.6}),shaftG);
+const crankLL=disc(9,5,mCrank,shaftG,[1,0,0]); crankLL.position.copy(W([K.XC_LL+3.5,M[1],M[2]]));
+const crankUL=disc(10,5,mCrank,shaftG,[1,0,0]); crankUL.position.copy(W([K.XC_UL-3.5,M[1],M[2]]));
+const pinLL=ball(1.8,mCrank,shaftG), pinUL=ball(1.8,mCrank,shaftG);
+// needle drive: crank on an upper shaft in the head (schematic slider-crank, axis normal to the needle plane)
+const nDrvG=A('needleDrive',[0,0,60]);
+const NAX=cross(UP,EU); // axis of the needle crank (perpendicular to needle axis and X)
+const BARLEN=60; const nCrankC=mul(UP,K.A_TOP+BARLEN+K.L_N-K.R_N); // crank above the bar: at 0 deg the pin points up
+const nCrank=disc(14,5,mCrank,nDrvG,NAX); nCrank.position.copy(W(add(nCrankC,mul(NAX,-4))));
+const nPin=ball(2.2,mCrank,nDrvG); const nRod=link(2.2,mCrank,nDrvG);
+const upShaft=mesh(new T.CylinderGeometry(4,4,60,20),mShaft,nDrvG); upShaft.quaternion.setFromUnitVectors(YAX,W(NAX).normalize()); upShaft.position.copy(W(add(nCrankC,mul(NAX,28))));
+
+// ---------- needle bar + needle ----------
+const nG=A('needle',[0,0,50]);
+const nBar=link(3.2,mBar,nG); const nClamp=mesh(box(7,7,7),mBar,nG); nClamp.quaternion.setFromUnitVectors(YAX,W(UP).normalize());
+const needle=link(0.375,mNeedle,nG,12); const nShank=link(0.85,mNeedle,nG,12);
+
+// ---------- lower looper ----------
+const llG=A('ll',[0,0,-25]);
+const llBladeGeo=new T.BufferGeometry(); const llBlade=mesh(llBladeGeo,mLL,llG);
+const llHolder=link(1.5,mLLd,llG); const llShaft=link(3.5,mLLd,llG);
+const llArm=link(2.4,mLLd,llG); const llRod=link(1.8,mLLd,llG); const llBall=ball(2.4,mLLd,llG);
+const PIV=K.PIVOT_LL;
+setLink(llShaft, add(PIV,mul(UP,3)), add(K.Q_D,mul(UP,-4)));
+const llHub=disc(4.5,6,mLLd,llG,UP); llHub.position.copy(W(K.Q_D));
+const llHub2=disc(3.2,5,mLLd,llG,UP); llHub2.position.copy(W(PIV));
+// ---------- upper looper ----------
+const ulG=A('ul',[0,0,-12]);
+const ulBodyGeo=new T.BufferGeometry(); const ulBody=mesh(ulBodyGeo,mUL,ulG);
+const ulBar=link(1.6,mULd,ulG); const ulRocker=link(2.6,mULd,ulG); const ulArmIn=link(2.6,mULd,ulG); const ulRod=link(1.8,mULd,ulG);
+const ulHub=disc(5,7,mULd,ulG,NR); ulHub.position.copy(W(K.O_UL));
+const ulBallQ=ball(2.2,mULd,ulG), ulBallB=ball(2.2,mULd,ulG);
+const ulGuide=mesh(box(7,9,7),mULd,ulG); ulGuide.position.copy(W(K.G_UL));
+const ulTrun=disc(1.8,13,mULd,ulG,NR); ulTrun.position.copy(W(K.G_UL));
+
+// ---------- knives ----------
+const kG=A('knife',[30,0,10]);
+const KY=K.KNIFE_Y; const kLen=KY[1]-KY[0], kMid=(KY[0]+KY[1])/2;
+const lowKnife=mesh(box(4,6,kLen),mKnife,kG,W([K.FAB_EDGE_X-2,kMid,-3]));
+const upKnifeG=G(); kG.add(upKnifeG);
+mesh(box(2.5,7,kLen),mKnife,upKnifeG,W([K.FAB_EDGE_X+1.25,kMid,3.5]));
+mesh(box(14,3,4),mKnife,upKnifeG,W([K.FAB_EDGE_X+8,kMid,8.5]));
+// ---------- feed dogs ----------
+const fG=A('feed',[0,0,-18]);
+function dogGeo(len){const g=new T.Group();const base=mesh(box(5,3,len),mFeed,g,new T.Vector3(0,-1.5,0));
+  for(let i=0;i<Math.floor(len/1.6);i++){const t=mesh(new T.ConeGeometry(0.9,1.2,4),mFeed,g,new T.Vector3(0,0.5,-len/2+0.8+i*1.6));t.rotation.y=Math.PI/4;} return g;}
+const mainDog=dogGeo(12); fG.add(mainDog); const diffDog=dogGeo(10); fG.add(diffDog);
+const dogBar=mesh(box(3,3,30),mFeed,fG); const dogPost=mesh(box(3,8,3),mFeed,fG); const dogPost2=mesh(box(3,8,3),mFeed,fG);
+// ---------- trajectories ----------
+const pathG=G(); root.add(pathG);
+function pathLine(pts,color){const g=new T.BufferGeometry().setFromPoints(pts.map(W));const l=new T.Line(g,new T.LineDashedMaterial({color,dashSize:0.8,gapSize:0.5}));l.computeLineDistances();pathG.add(l);return l;}
+
+// ---------- kinematics from the book's calculation (one row per degree) ----------
+const R=K.rows;
+function at(phi){const f=((phi%360)+360)%360;const i=Math.floor(f),j=(i+1)%360,t=f-i;const a=R[i],b=R[j];
+  return {a_tip:a.a_tip+(b.a_tip-a.a_tip)*t, th:a.th+(b.th-a.th)*t, psi:a.psi+(b.psi-a.psi)*t};}
+const llTip=th=>add(PIV,mul(rotUp(mul(EWB,-1),th),K.R_LL));
+function ulPose(psi){const U=K.UL;const Q=add(K.O_UL,add(mul(EU,U.cr*Math.cos(psi)),mul(EV,U.cr*Math.sin(psi))));const d=sub(K.G_UL,Q);const dn=len(d);const u=mul(d,1/dn);
+  const n=add(mul(EU,-dot(u,EV)),mul(EV,dot(u,EU)));return {Q,u,n,dn,T:add(Q,add(mul(u,U.L),mul(n,U.h)))};}
+const crankPin=(xc,r,ang)=>[xc,M[1]+r*Math.cos(ang),M[2]+r*Math.sin(ang)];
+// trajectories
+{ const n=[],l=[],u=[]; for(let d=0;d<=360;d+=2){const s=at(d); n.push(mul(UP,s.a_tip)); l.push(llTip(s.th)); u.push(ulPose(s.psi).T);}
+  pathLine(n,0x2f6fd6); pathLine(l,0xe0662f); pathLine(u,0x2e9e5b); }
+
+// blade / body geometry builders (tube along points)
+function tubeFrom(pts,r){const c=new T.CatmullRomCurve3(pts.map(W));return new T.TubeGeometry(c,Math.max(8,pts.length*2),r,8,false);}
+let diffRatio=1.3;
+function pose(phi){
+  const s=at(phi), f=((phi%360)+360)%360, pr=f*D2R;
+  // needle
+  const tip=mul(UP,s.a_tip), eye=mul(UP,s.a_tip+K.EYE);
+  setLink(needle,tip,mul(UP,s.a_tip+18)); setLink(nShank,mul(UP,s.a_tip+18),mul(UP,s.a_tip+34));
+  const barLo=mul(UP,s.a_tip+34), barHi=mul(UP,s.a_tip+BARLEN); setLink(nBar,barLo,barHi); nClamp.position.copy(W(mul(UP,s.a_tip+36)));
+  // needle crank: slider-crank in the plane of UP and NAX x UP (same sense as chapter 3)
+  const e2=cross(NAX,UP); const pin=add(nCrankC,add(mul(UP,K.R_N*Math.cos(pr)),mul(e2,K.R_N*Math.sin(pr))));
+  nPin.position.copy(W(pin)); setLink(nRod,barHi,pin); nCrank.rotation.set(0,0,0); nCrank.quaternion.setFromUnitVectors(YAX,W(NAX).normalize());
+  // lower looper
+  const th=s.th; const pts=[]; for(let k=0;k<=24;k++){pts.push(add(PIV,mul(rotUp(mul(EWB,-1),th+k*K.L_BLADE/K.R_LL/24),K.R_LL)));}
+  pts[0]=add(pts[0],mul(UP,0.0));
+  llBlade.geometry.dispose(); llBlade.geometry=tubeFrom(pts,K.LL_HALF);
+  const bEnd=pts[pts.length-1]; const hIn=add(PIV,mul(rotUp(mul(EWB,-1),th+K.L_BLADE/K.R_LL),8));
+  setLink(llHolder,bEnd,hIn);
+  const B=add(K.Q_D,mul(rotUp(K.V0,th),K.C_LL)); setLink(llArm,K.Q_D,B); llBall.position.copy(W(B));
+  const A1=crankPin(K.XC_LL,K.R_LLC,pr+K.PH0_LL); pinLL.position.copy(W(A1)); setLink(llRod,A1,B);
+  // upper looper
+  const P=ulPose(s.psi); const body=K.UL_BODY.map(q=>add(P.Q,add(mul(P.u,q[0]),mul(P.n,q[1]))));
+  ulBody.geometry.dispose(); ulBody.geometry=tubeFrom(body.slice().reverse(),0.5);
+  const sEnd=K.UL_BODY[K.UL_BODY.length-1][0]; setLink(ulBar,P.Q,add(P.Q,mul(P.u,sEnd)));
+  setLink(ulRocker,K.O_UL,P.Q); ulBallQ.position.copy(W(P.Q));
+  const ang=s.psi+K.DELTA_UL; const Bu=add(K.O_UL,add(mul(EU,K.C_UL*Math.cos(ang)),mul(EV,K.C_UL*Math.sin(ang))));
+  setLink(ulArmIn,K.O_UL,Bu); ulBallB.position.copy(W(Bu));
+  const A2=crankPin(K.XC_UL,K.R_ULC,pr+K.PH0_UL); pinUL.position.copy(W(A2)); setLink(ulRod,A2,Bu);
+  ulGuide.quaternion.setFromUnitVectors(YAX,W(P.u).normalize());
+  // shaft parts rotate
+  wheelMark.position.copy(W([111,M[1]+30*Math.cos(pr),M[2]+30*Math.sin(pr)]));
+  // knife
+  const kz=-K.KNIFE_OVERLAP+K.KNIFE_STROKE*(1-Math.cos(pr-K.KNIFE_LOW_PHI))/2;
+  upKnifeG.position.copy(W([0,0,kz]));
+  // feed dogs (main under the needle, differential in front)
+  const ym=0.5*STITCH*Math.sin(pr), zt=(K.FEED_LIFT_TOP+0.6)*Math.cos(pr)-0.6, yd=0.5*STITCH*diffRatio*Math.sin(pr);
+  mainDog.position.copy(W([-4.3,3+ym,zt])); diffDog.position.copy(W([-4.3,-10+yd,zt]));
+  dogPost.position.copy(W([-4.3,3+ym,zt-6])); dogPost2.position.copy(W([-4.3,-10+yd,zt-6])); dogBar.position.copy(W([-4.3,-4+ym,zt-11]));
+  // fabric feed: the cloth moves back (+Y) while the dogs stand above the plate (about -68 deg to +68 deg)
+  const w=68, q=phi+180, kc=Math.floor(q/360), g=q-360*kc-180; let fr=g<=-w?0:g>=w?1:(g+w)/(2*w); fr=fr-Math.sin(2*Math.PI*fr)/(2*Math.PI);
+  const fy=(kc+fr)*STITCH; fabBase.position.copy(W([0,fy%5,0]));
+  { const off=fr*STITCH, pts=[]; for(let k=0;k<26;k++){const y=off+k*STITCH; pts.push(W([0,y,1.56]),W([4.15,y+STITCH*0.5,1.56]),W([4.15,y+STITCH*0.5,1.56]),W([0,y+STITCH,1.56]));} seam.geometry.dispose(); seam.geometry=new T.BufferGeometry().setFromPoints(pts); }
+  // readouts
+  document.getElementById('r-a').textContent=Math.round(f)+'°';
+  document.getElementById('r-n').textContent=(s.a_tip*Math.cos(K.INC)).toFixed(1);
+  document.getElementById('r-l').textContent=(K.R_LL*Math.sin(th)).toFixed(1);
+  document.getElementById('r-u').textContent=`${P.T[0].toFixed(1)}, ${P.T[2].toFixed(1)}`;
+  document.getElementById('r-p').textContent=phaseText(f);
+}
+function phaseText(f){
+  if(f<44) return 'Upper looper dwells at upper left, laying its thread across the needle’s path';
+  if(f<65) return 'Needle descends, passing between the upper looper and its thread';
+  if(f<170) return 'Needle pierces the fabric; upper looper retreats down past the fabric edge';
+  if(f<224) return 'Needle passes bottom dead centre and rises; needle-thread loop forms behind it';
+  if(f<260) return 'Lower-looper point enters the needle-thread loop behind the needle';
+  if(f<279) return 'Lower looper at far left; upper looper rises from below';
+  if(f<300) return 'Upper looper enters the lower-looper thread triangle in front of the lower looper';
+  return 'Upper looper carries the lower-looper thread over the edge; feed dogs feed';
+}
+// ---------- labels ----------
+const wpb=(p)=>W(p);
+const LABELS=[
+ ['Needle','Inclined 20°',()=>W(mul(UP,at(phi).a_tip+10)),['solid','xray','explode'],[-190,-10]],
+ ['Lower looper','Swings about an axis parallel to the needle',()=>W(llTip(at(phi).th)),['xray','explode'],[-140,70]],
+ ['Upper looper','Goes round the fabric edge to the needle’s upper left',()=>W(ulPose(at(phi).psi).T),['xray','explode'],[-30,-170]],
+ ['Guide rod and swinging bush','',()=>W(K.G_UL),['xray','explode'],[110,30]],
+ ['Upper-looper rocker','',()=>W(K.O_UL),['xray','explode'],[110,40]],
+ ['Lower-looper rocker shaft','',()=>W(add(PIV,mul(UP,-20))),['xray','explode'],[-30,140],[-60,120]],
+ ['Ball-ended link','Spatial four-bar linkage',()=>W(add(K.Q_D,[0,-6,8])),['xray','explode'],[-230,130]],
+ ['Main shaft','',()=>W([-60,M[1],M[2]]),['xray','explode'],[-120,40]],
+ ['Handwheel','',()=>W([110,M[1]-30,M[2]+20]),['solid','xray'],[150,10]],
+ ['Upper / lower knife','Trims the edge, leaving 4 mm',()=>W([K.FAB_EDGE_X,kMid,4]),['solid','xray','explode'],[120,-70]],
+ ['Feed dogs (main / differential)','',()=>W([-4.3,-4,-1]),['xray','explode'],[-150,30]],
+ ['Presser foot','',()=>W([-1,-14,5]),['solid'],[-120,-90]],
+ ['Throat plate and stitch tongue','The stitch forms over the tongue',()=>W([2.4,10,0]),['xray','explode'],[120,-20]],
+];
+let mode='solid', exT=0, playing=false, speed=90, phi=0, showPaths=true, closeView=false;
+function drawLabels(){
+  lab.innerHTML=''; if(!document.getElementById('labels').checked) return;
+  const Wd=stage.clientWidth,H=stage.clientHeight; const k=document.body.classList.contains('cap')?Wd/1100:Math.min(1,Wd/900); let out='';
+  for(const [t,s,get,modes,off0,offE] of LABELS){ if(!modes.includes(mode)) continue; const off=mode==='explode'&&offE?offE:off0; const p=get().clone();
+    // follow the exploded group of the part when exploded
+    p.project(cam); if(p.z>1) continue;
+    const x=(p.x+1)/2*Wd, y=(1-p.y)/2*H, lx=x+off[0]*k, ly=y+off[1]*k; const anchor=off[0]<-20?'end':off[0]>20?'start':'middle'; const fs=Math.max(11,15*k);
+    out+=`<circle cx="${x}" cy="${y}" r="3" fill="#1d2a36"/><path d="M${x} ${y}L${lx} ${ly}" stroke="#1d2a36" stroke-width="1" fill="none"/>`;
+    let tx=lx+(anchor==='start'?4:anchor==='end'?-4:0); const ty=ly+(off[1]<0?-6:fs+2);
+    const tw=Math.max(t.length*fs*0.6,(s||'').length*fs*0.8*0.56); // keep longer English labels inside the stage
+    if(anchor==='start'&&tx+tw>W-6) tx=W-6-tw; if(anchor==='end'&&tx-tw<6) tx=6+tw; if(anchor==='middle') tx=Math.min(Math.max(tx,6+tw/2),W-6-tw/2);
+    out+=`<text x="${tx}" y="${ty}" font-size="${fs}" font-weight="700" fill="#1d2a36" text-anchor="${anchor}">${t}</text>`;
+    if(s) out+=`<text x="${tx}" y="${ty+(off[1]<0?-fs-2:fs+2)}" font-size="${fs*0.8}" fill="#4d5b6a" text-anchor="${anchor}">${s}</text>`; }
+  lab.innerHTML=out;
+}
+// ---------- modes ----------
+function applyMode(){
+  const xr=mode==='xray', ex=mode==='explode';
+  [housingMat,coverMat].forEach(m=>{m.transparent=xr;m.opacity=xr?0.12:1;m.depthWrite=!xr;m.needsUpdate=true;});
+  house.children.forEach(c=>{ if(c.userData.house) c.visible=!ex&&!closeView; });
+  table.visible=!ex; tableMat.transparent=xr; tableMat.opacity=xr?0.3:1;
+  mats.forEach(m=>{const g=m.userData.grp; if((xr||ex)&&g&&GC[g]!==undefined){m.color.set(GC[g]);} else m.color.copy(m.userData.base); m.needsUpdate=true;});
+  fabMat.opacity=xr||ex?(closeView?0.22:0.45):1; fabMat.depthWrite=!(xr||ex);
+  document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+}
+function applyExplode(){ Object.values(asm).forEach(g=>g.position.copy(g.userData.ex).multiplyScalar(exT)); pathG.visible=showPaths&&exT<0.05; }
+// ---------- camera ----------
+const target=new T.Vector3(0,-10,0); let th=-0.65, ph=0.42, dist=820;
+const VIEWS={iso:[-0.65,0.42,820,[-10,-10,0]],front:[0,0.1,700,[0,-25,0]],side:[-1.5708,0.12,700,[0,-25,-10]],close:[0.0,0.06,95,[1.5,-4,-2]]};
+function placeCam(){cam.position.set(target.x+dist*Math.cos(ph)*Math.sin(th),target.y+dist*Math.sin(ph),target.z+dist*Math.cos(ph)*Math.cos(th));cam.lookAt(target);cam.near=Math.max(0.5,dist/200);cam.updateProjectionMatrix();}
+let drag=null;
+stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,th,ph};stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{if(!drag)return;th=drag.th-(e.clientX-drag.x)*0.006;ph=Math.max(-0.6,Math.min(1.45,drag.ph+(e.clientY-drag.y)*0.005));dirty=true;});
+stage.addEventListener('pointerup',()=>drag=null);
+stage.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(40,Math.min(2500,dist*(1+e.deltaY*0.001)));dirty=true;},{passive:false});
+let pinch=null;
+stage.addEventListener('touchstart',e=>{if(e.touches.length===2)pinch={d:Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY),dist};},{passive:true});
+stage.addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dist=Math.max(40,Math.min(2500,pinch.dist*pinch.d/d));dirty=true;}},{passive:true});
+stage.addEventListener('touchend',()=>pinch=null);
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dirty=true;}
+new ResizeObserver(resize).observe(stage);
+let last=performance.now(), dirty=true;
+function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;if(playing){phi+=speed*dt;document.getElementById('phi').value=Math.round(((phi%360)+360)%360);dirty=true;}
+  if(dirty||!window.__still){pose(phi);placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}requestAnimationFrame(frame);}
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;if(mode==='explode'&&exT<0.5){exT=1;document.getElementById('ex').value=1;}if(mode!=='explode'){exT=0;document.getElementById('ex').value=0;}applyMode();applyExplode();dirty=true;});
+document.getElementById('ex').oninput=e=>{exT=+e.target.value;if(exT>0&&mode==='solid')mode='explode';applyMode();applyExplode();dirty=true;};
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const v=VIEWS[b.dataset.v];[th,ph,dist]=v;target.set(...v[3]);closeView=b.dataset.v==='close';if(closeView&&mode==='solid')mode='xray';applyMode();dirty=true;});
+document.getElementById('play').onclick=e=>{playing=!playing;e.target.textContent=playing?'Pause':'Play';};
+document.getElementById('spd').onchange=e=>speed=+e.target.value;
+document.getElementById('phi').oninput=e=>{phi=+e.target.value;dirty=true;};
+document.getElementById('paths').onchange=e=>{showPaths=e.target.checked;applyExplode();dirty=true;};
+document.getElementById('foot').onchange=e=>{footG.visible=e.target.checked;dirty=true;};
+document.getElementById('labels').onchange=()=>dirty=true;
+document.getElementById('dr').oninput=e=>{diffRatio=+e.target.value;document.getElementById('r-dr').textContent=diffRatio.toFixed(2);dirty=true;};
+window.__set=(o)=>{if('mode' in o)mode=o.mode;if('ex' in o)exT=o.ex;if('view' in o){const v=VIEWS[o.view];[th,ph,dist]=v;target.set(...v[3]);closeView=o.view==='close';}if('cam' in o){[th,ph,dist]=o.cam;}if('target' in o)target.set(...o.target);if('phi' in o)phi=o.phi;if('labels' in o)document.getElementById('labels').checked=o.labels;if('foot' in o)footG.visible=o.foot;if('paths' in o)showPaths=o.paths;applyMode();applyExplode();dirty=true;};
+window.__check=()=>{ // coupler lengths stay constant if the kinematics are consistent
+  const out=[]; for(let d=0;d<360;d+=30){const s=at(d),pr=d*D2R;const B=add(K.Q_D,mul(rotUp(K.V0,s.th),K.C_LL));const A1=crankPin(K.XC_LL,K.R_LLC,pr+K.PH0_LL);
+   const P=ulPose(s.psi);const ang=s.psi+K.DELTA_UL;const Bu=add(K.O_UL,add(mul(EU,K.C_UL*Math.cos(ang)),mul(EV,K.C_UL*Math.sin(ang))));const A2=crankPin(K.XC_UL,K.R_ULC,pr+K.PH0_UL);
+   out.push([d,len(sub(A1,B)).toFixed(3),len(sub(A2,Bu)).toFixed(3)]);} return out;};
+resize(); applyMode(); applyExplode(); requestAnimationFrame(frame);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

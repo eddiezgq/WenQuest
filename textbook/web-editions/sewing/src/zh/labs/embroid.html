@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>多头刺绣机：针长、转速与断线补绣</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = needle path (front view), timing chart, stitch preview; right rail = checks, controls, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style><style>
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page[hidden]{display:none}
+</style>
+<div class="wrap">
+<header><h1>多头刺绣机：针长、转速与断线补绣</h1><span class="sub">《缝纫机设计与制造》第 16 章 · 虚拟实验 16-1 · 绷架越重、针越长，转速越要降；头越多，停车越频繁</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tabA" aria-selected="true" type="button">① 绷架与转速</button><button role="tab" id="tabB" aria-selected="false" type="button">② 断线与补绣</button></div>
+<div class="page" id="pageA">
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>一针里绷架的运动（绿色为针在布外的窗口；实线位移，虚线加速度）</h3><canvas id="win" width="1100" height="380" aria-label="一针里绷架的位移和加速度"></canvas></section>
+    <section class="panel"><h3>转速上限随针长的变化（当前头数和驱动力；红点为当前设定）</h3><canvas id="cur" width="1100" height="330" aria-label="转速上限曲线"></canvas></section>
+    <p class="note">模型（示意）：针离布窗口 204°（借用第 15 章）；绷架按摆线规律走完一针，峰值加速度 a = 2π s /T²，T = 204° /(6n)；Y 轴折算质量 = 10 + 4 × 头数 kg（单头 6 kg），摩擦 50 N，可用加速度 = (驱动力 − 50 N) / 质量；机器最高 1100 r/min；DST 文件每条记录每个坐标方向最多 12.1 mm（这里把针长看作沿一个方向）。与本书 model16.py 相同。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>判据</h3><div class="checks" id="checksA"></div></section>
+    <section class="panel"><h3>调整</h3>
+      <div class="prm">
+        <label for="H">头数</label><input id="H" type="range" min="1" max="20" step="1" value="8"><output id="Hv"></output>
+        <label for="F">Y 轴驱动力（N）</label><input id="F" type="range" min="200" max="1500" step="10" value="800"><output id="Fv"></output>
+        <label for="s">针长（mm）</label><input id="s" type="range" min="0.5" max="13" step="0.1" value="3"><output id="sv"></output>
+        <label for="n">主轴转速（r/min）</label><input id="n" type="range" min="200" max="1100" step="10" value="800"><output id="nv"></output>
+      </div>
+      <div class="row"><button id="resetA" type="button">恢复标准</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<div class="page" id="pageB" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>绣一个花样（20000 针、800 r/min）：绿色为缝纫，红色为断线停车，紫色为换色（6 次）</h3><canvas id="tl" width="1100" height="200" aria-label="绣制时间线"></canvas>
+      <div class="row"><button id="rerun" type="button">再绣一次</button><span class="note" style="margin:0" id="runtxt"></span></div></section>
+    <section class="panel"><h3>头数与全机效率（期望值；当前断线率、处理时间）</h3><canvas id="effc" width="1100" height="300" aria-label="头数与效率"></canvas></section>
+    <p class="note">模型（示意）：每头每万针断线 λ 次，相互独立；任何一头断线全机停车；每次处理时间（走过去、穿线、确认）为设定值，再加回退和补绣（回退 b 针、补绣速度 600 r/min，来回计两次）；检测延迟 d 针：断线后还漏缝 d 针才停车，回退针数 b 小于 d 时留下 d − b 针的漏针。换色 6 次，每次 6 s。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>结果</h3><div class="checks" id="checksB"></div></section>
+    <section class="panel"><h3>调整</h3>
+      <div class="prm">
+        <label for="H2">头数</label><input id="H2" type="range" min="1" max="20" step="1" value="8"><output id="H2v"></output>
+        <label for="lam">断线率（次 / 头 / 万针）</label><input id="lam" type="range" min="0" max="2" step="0.05" value="0.5"><output id="lamv"></output>
+        <label for="Th">每次断线的处理时间（s）</label><input id="Th" type="range" min="10" max="120" step="5" value="40"><output id="Thv"></output>
+        <label for="d">检测延迟（针）</label><input id="d" type="range" min="1" max="10" step="1" value="6"><output id="dv"></output>
+        <label for="b">回退针数</label><input id="b" type="range" min="0" max="15" step="1" value="3"><output id="bv"></output>
+      </div>
+      <div class="row"><button id="resetB" type="button">恢复标准</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<section class="panel" style="margin-top:14px"><h3>任务</h3><div id="tasks"></div>
+  <div class="row" style="font-size:.84rem">15 头、800 N、7 mm 时的转速上限：<input id="nm" type="number" step="5" aria-label="转速上限"> r/min<button id="nmChk" type="button">核对</button></div>
+  <div class="msg" id="msg"></div></section>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+function tab(b){$('tabA').setAttribute('aria-selected',!b);$('tabB').setAttribute('aria-selected',b);$('pageA').hidden=b;$('pageB').hidden=!b;}
+$('tabA').onclick=()=>tab(false);$('tabB').onclick=()=>tab(true);
+// ---- model (model16.py) ----
+const WIN=204,CAP=1100,FF=50,DSTMAX=12.1;
+const mass=H=>H===1?6:10+4*H, amax=(H,F)=>Math.max(0,F-FF)/mass(H);
+const areq=(s,n)=>{const T=WIN/(6*n);return 2*Math.PI*s*1e-3/(T*T);};
+const nmax=(s,H,F)=>Math.min(CAP,WIN/6*Math.sqrt(amax(H,F)/(2*Math.PI*s*1e-3)));
+const STDA={H:8,F:800,s:3,n:800};const A={...STDA};
+function evalA(){const ar=areq(A.s,A.n),am=amax(A.H,A.F);const C=[
+  {n:'绷架加速度够不够（需要 ≤ 可用）',v:`${ar.toFixed(1)} / ${am.toFixed(1)} m/s²`,ok:ar<=am,bad:'这一针在窗口里走不完：针还在布里绷架就在动，会断针、针迹歪'},
+  {n:'这一针长的转速上限',v:`${nmax(A.s,A.H,A.F).toFixed(0)} r/min`,ok:A.n<=nmax(A.s,A.H,A.F)+1e-9,bad:'当前转速高于上限'},
+  {n:'沿一个坐标方向的针长不超过 DST 的 12.1 mm',v:`${A.s.toFixed(1)} mm`,ok:A.s<=DSTMAX,bad:'一条记录装不下（DST 每个方向最多 12.1 mm），要拆成两针'},
+  {n:'绷架折算质量',v:`${mass(A.H)} kg`,ok:true}];return {C,ok:C.every(c=>c.ok),ar,am};}
+let RA=null;
+function renderChecks(id,C){$(id).innerHTML=C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${(!c.ok&&c.bad)?`<small>${c.bad}</small>`:''}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');}
+function drawWin(){const [c,g]=ctx('win'),W=c.width,H=c.height,x0=60,x1=W-20,X=u=>x0+(x1-x0)*u/360;g.font='12px '+css('--f-body');
+  g.fillStyle=css('--ok');g.globalAlpha=.1;g.fillRect(X(0),10,X(WIN)-X(0),H-40);g.globalAlpha=1;g.fillStyle=css('--bad');g.globalAlpha=.06;g.fillRect(X(WIN),10,X(360)-X(WIN),H-40);g.globalAlpha=1;
+  g.fillStyle=css('--ok');g.fillText('针在布外：绷架可以动',X(10),24);g.fillStyle=css('--bad');g.fillText('针在布里：绷架必须停',X(WIN)+10,24);
+  const T=WIN/(6*A.n),smax=Math.max(4,A.s),Yx=v=>170-130*v/smax;const am=amax(A.H,A.F),ar=areq(A.s,A.n),Aax=Math.max(am,ar)*1.15,Ya=v=>300-60*v/Aax;
+  g.strokeStyle=css('--nt');g.lineWidth=2.6;g.beginPath();for(let i=0;i<=200;i++){const u=i/200,x=A.s*(u-Math.sin(2*Math.PI*u)/(2*Math.PI));const p=[X(u*WIN),Yx(x)];i?g.lineTo(...p):g.moveTo(...p);}g.stroke();
+  g.strokeStyle=css('--bt');g.setLineDash([6,4]);g.lineWidth=2;g.beginPath();for(let i=0;i<=200;i++){const u=i/200,a=ar*Math.sin(2*Math.PI*u);const p=[X(u*WIN),Ya(a)];i?g.lineTo(...p):g.moveTo(...p);}g.stroke();g.setLineDash([]);
+  g.strokeStyle=css('--rule');g.lineWidth=1;g.beginPath();g.moveTo(x0,Ya(0));g.lineTo(x1,Ya(0));g.stroke();
+  g.strokeStyle=css('--bad');g.setLineDash([3,3]);for(const v of [am,-am]){g.beginPath();g.moveTo(x0,Ya(v));g.lineTo(X(WIN),Ya(v));g.stroke();}g.setLineDash([]);
+  g.fillStyle=css('--bad');g.fillText(`可用加速度 ±${am.toFixed(1)} m/s²`,X(WIN)+6,Ya(am)+4);
+  g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.fillText(`针长 ${A.s.toFixed(1)} mm，${A.n} r/min：窗口 ${(T*1000).toFixed(1)} ms，峰值加速度 ${ar.toFixed(1)} m/s²`,X(WIN)+10,60);
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';for(const u of [0,90,180,270,360])g.fillText(u+'°',X(u),H-12);g.textAlign='start';g.fillText('位移',8,100);g.fillText('加速度',8,290);}
+function drawCur(){const [c,g]=ctx('cur'),W=c.width,H=c.height,x0=70,x1=W-20,y0=16,y1=H-34,X=s=>x0+(x1-x0)*s/13,Y=n=>y1-(y1-y0)*n/1200;g.font='12px '+css('--f-body');
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let n=0;n<=1200;n+=200){g.beginPath();g.moveTo(x0,Y(n));g.lineTo(x1,Y(n));g.stroke();g.textAlign='end';g.fillText(n,x0-6,Y(n)+4);}
+  g.textAlign='center';for(let s=0;s<=13;s++)g.fillText(s,X(s),H-14);g.fillText('针长（mm）',(x0+x1)/2,H-1);
+  g.fillStyle=css('--warn');g.globalAlpha=.1;g.fillRect(X(DSTMAX),y0,X(13)-X(DSTMAX),y1-y0);g.globalAlpha=1;
+  g.strokeStyle=css('--nt');g.lineWidth=2.4;g.beginPath();for(let i=0;i<=130;i++){const s=0.3+i*0.1;const p=[X(s),Y(nmax(s,A.H,A.F))];i?g.lineTo(...p):g.moveTo(...p);}g.stroke();
+  const ok=RA.ok;g.fillStyle=ok?css('--ok'):css('--bad');g.beginPath();g.arc(X(A.s),Y(A.n),7,0,7);g.fill();g.textAlign='start';g.fillStyle=css('--warn');g.fillText('单方向超过 DST 上限',X(DSTMAX)+4,y0+14);}
+const fmtA={H:v=>v+' 头',F:v=>v.toFixed(0),s:v=>v.toFixed(1),n:v=>v.toFixed(0)};
+function syncA(){for(const k in fmtA){$(k).value=A[k];$(k+'v').textContent=fmtA[k](A[k]);}}
+function changedA(){syncA();RA=evalA();renderChecks('checksA',RA.C);drawWin();drawCur();noteA();checkTasks();}
+for(const k in fmtA)$(k).addEventListener('input',()=>{A[k]=+$(k).value;changedA();});
+$('resetA').onclick=()=>{Object.assign(A,STDA);changedA();};
+// ---- page B ----
+const S=20000,NSEW=800,NRESEW=600,COL=6,TC=6;
+const STDB={H2:8,lam:0.5,Th:40,d:5,b:8};const B={...STDB};
+function expected(H,lam,Th,b){const ts=60/NSEW,Nb=H*lam*S/1e4,resew=b*60/NRESEW*2,Tsew=S*ts,Tb=Nb*(Th+resew),Tcol=COL*TC,tot=Tsew+Tb+Tcol;return {Nb,Tsew,Tb,Tcol,tot,eff:Tsew/tot,pph:H*3600/tot};}
+function rng(seed){let s=seed>>>0;return ()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+let SEED=1,RUN=null;
+function simulate(){const r=rng(SEED),p=B.H2*B.lam/1e4,ev=[];let k=0;
+  // geometric gaps between breaks
+  while(true){if(p<=0)break;const u=r();const gap=Math.ceil(Math.log(1-u)/Math.log(1-Math.min(0.5,p)));k+=gap;if(k>=S)break;ev.push({k,type:'b'});}
+  for(let c=1;c<=COL;c++)ev.push({k:Math.round(S*c/(COL+1)),type:'c'});ev.sort((a,b)=>a.k-b.k);RUN={ev,breaks:ev.filter(e=>e.type==='b').length};}
+function evalB(){const E=expected(B.H2,B.lam,B.Th,B.b),gap=Math.max(0,B.d-B.b);return {E,gap,C:[
+  {n:'期望断线次数（全机）',v:E.Nb.toFixed(1),ok:true},
+  {n:'全机效率（缝纫时间 / 总时间）',v:(E.eff*100).toFixed(1)+'%',ok:E.eff>=0.8,bad:'低于 80%'},
+  {n:'绣完一件（每头）需要',v:(E.tot/60).toFixed(1)+' min',ok:true},
+  {n:'全机每小时件数',v:E.pph.toFixed(1),ok:true},
+  {n:'每次断线留下的漏针',v:gap+' 针',ok:gap===0,bad:'回退针数少于检测延迟，补绣接不上，留下漏针（次品）'},
+  {n:'回退是否过多',v:B.b-B.d>3?'多退了 '+(B.b-B.d)+' 针':'合适',ok:B.b-B.d<=3,bad:'回退太多：浪费时间，重叠处变厚'}]};}
+let RB=null;
+function drawTL(){const [c,g]=ctx('tl'),W=c.width,H=c.height,x0=20,x1=W-20;const ts=60/NSEW,resew=B.b*60/NRESEW*2;const tot=S*ts+RUN.breaks*(B.Th+resew)+COL*TC;const X=t=>x0+(x1-x0)*t/tot;
+  let t=0,last=0;g.fillStyle=css('--ok');
+  for(const e of RUN.ev){const dt=(e.k-last)*ts;g.fillStyle=css('--ok');g.fillRect(X(t),60,X(t+dt)-X(t),60);t+=dt;last=e.k;const stop=e.type==='b'?B.Th+resew:TC;g.fillStyle=e.type==='b'?css('--bad'):'#8e5ab5';g.fillRect(X(t),60,Math.max(1.5,X(t+stop)-X(t)),60);t+=stop;}
+  g.fillStyle=css('--ok');g.fillRect(X(t),60,X(t+(S-last)*ts)-X(t),60);
+  g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.fillText(`这一次：断线 ${RUN.breaks} 次，总时间 ${(tot/60).toFixed(1)} min，效率 ${(S*ts/tot*100).toFixed(1)}%`,x0,36);
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');for(let m=0;m<=tot/60;m+=5){g.fillText(m+' min',X(m*60)-10,H-50);}
+  $('runtxt').textContent='每次的断线次数是随机的；右侧给的是期望值。';}
+function drawEff(){const [c,g]=ctx('effc'),W=c.width,H=c.height,x0=70,x1=W-20,y0=14,y1=H-34,X=h=>x0+(x1-x0)*(h-1)/19,Y=e=>y1-(y1-y0)*e;g.font='12px '+css('--f-body');
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let e=0;e<=1.001;e+=0.2){g.beginPath();g.moveTo(x0,Y(e));g.lineTo(x1,Y(e));g.stroke();g.textAlign='end';g.fillText((e*100).toFixed(0)+'%',x0-6,Y(e)+4);}
+  g.textAlign='center';for(let h=1;h<=20;h+=(h===1?3:4))g.fillText(h+' 头',X(h),H-12);
+  g.strokeStyle=css('--warn');g.setLineDash([5,4]);g.beginPath();g.moveTo(x0,Y(0.8));g.lineTo(x1,Y(0.8));g.stroke();g.setLineDash([]);
+  g.strokeStyle=css('--nt');g.lineWidth=2.4;g.beginPath();for(let h=1;h<=20;h++){const p=[X(h),Y(expected(h,B.lam,B.Th,B.b).eff)];h>1?g.lineTo(...p):g.moveTo(...p);}g.stroke();
+  g.fillStyle=css('--bt');g.beginPath();g.arc(X(B.H2),Y(RB.E.eff),7,0,7);g.fill();g.textAlign='start';}
+const fmtB={H2:v=>v+' 头',lam:v=>v.toFixed(2),Th:v=>v.toFixed(0),d:v=>v.toFixed(0),b:v=>v.toFixed(0)};
+function syncB(){for(const k in fmtB){$(k).value=B[k];$(k+'v').textContent=fmtB[k](B[k]);}}
+function changedB(){syncB();RB=evalB();renderChecks('checksB',RB.C);simulate();drawTL();drawEff();noteB();checkTasks();}
+for(const k in fmtB)$(k).addEventListener('input',()=>{B[k]=+$(k).value;changedB();});
+$('resetB').onclick=()=>{Object.assign(B,STDB);changedB();};$('rerun').onclick=()=>{SEED++;simulate();drawTL();};
+// ---- tasks ----
+const seen={nm:false,f:false,b:false,e:false};
+function noteA(){if(A.H===8&&A.s>=7&&A.n>=850&&RA.ok)seen.f=true;}
+function noteB(){if(B.d===6&&B.b>=6&&B.b<=9)seen.b=true;if(B.H2===20&&B.Th===40&&RB.E.eff>=0.8)seen.e=true;}
+const TASKS=[
+  {t:'第①页：15 头机、Y 轴驱动力 800 N，算出 7 mm 缎纹针的转速上限，填在下面。',d:'先用公式算，再拖动滑块验证（±3%）。',ok:()=>seen.nm},
+  {t:'第①页：8 头机要让 7 mm 的缎纹针转到 850 r/min 以上，驱动力至少要多大？调到判据全部满足。',d:'需要的加速度 = 2πs /T²；驱动力 = 50 N + 质量 × 加速度。',ok:()=>seen.f},
+  {t:'第②页：检测延迟为 6 针时，选一个回退针数，既不留漏针、又不多退超过 3 针。',d:'回退针数要不少于检测延迟。',ok:()=>seen.b},
+  {t:'第②页：20 头机、每次处理 40 s，断线率要降到多少，全机效率才能达到 80%？调到满足。',d:'头数加倍，断线停车也加倍。也想一想：缩短处理时间是不是更容易？',ok:()=>seen.e}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});$('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+$('nmChk').onclick=()=>{const m=nmax(7,15,800),v=+$('nm').value;
+  if($('nm').value!==''&&Math.abs(v-m)/m<=0.03){seen.nm=true;$('msg').textContent=`正确：约 ${m.toFixed(0)} r/min。质量 70 kg、可用加速度 (800 − 50)/70 ≈ 10.7 m/s²，n = 34 × √(10.7 /(2π × 0.007)) ≈ ${m.toFixed(0)}。`;}
+  else $('msg').textContent='还不对：n_max = (204/6) × √(a_max /(2π s))，s 以米计；a_max = (F − 50)/(10 + 4 × 头数)。';checkTasks();};
+window.__api={A,B,STDA,STDB,changedA,changedB,evalA:()=>RA,evalB:()=>RB,done,seen,nmax,expected,nm:v=>{$('nm').value=v;$('nmChk').click();},tab};
+changedA();changedB();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

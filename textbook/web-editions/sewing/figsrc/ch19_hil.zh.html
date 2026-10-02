@@ -1,0 +1,16 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css"><style>
+.chip{display:inline-block;border:1.5px solid #9aa4ae;border-radius:6px;background:#fff;padding:2px 7px;margin:2px 3px;font-size:12.5px;white-space:nowrap}
+.chip.g{border-color:#2e9e5b}.chip.b{border-color:#2a6fdb}.chip.o{border-color:#e0662f}.chip.p{border-color:#8a5cc7}.chip.t{border-color:#14797f}.chip.y{border-color:#c48a17}
+.lay{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:stretch;margin-bottom:8px}
+.lab{display:flex;flex-direction:column;justify-content:center;border-radius:8px;padding:6px 10px;font-size:13px}
+.lab b{font-size:14px}
+.mono{font-family:"DejaVu Sans Mono",monospace;font-size:12px}
+.arrow{font-size:22px;color:#5a6570;text-align:center;align-self:center}
+.small{font-size:12px;color:#5a6570}
+ul.t{margin:4px 0 0;padding-left:16px;text-align:left;font-size:12.5px;color:#1b2430}
+ul.t li{margin:1px 0}
+.gantt{display:grid;grid-template-columns:150px repeat(12,1fr);gap:3px 2px;font-size:12.5px;align-items:center}
+.gantt .h{font-size:11.5px;color:#5a6570;text-align:center}
+.bar{height:18px;border-radius:4px}
+.ms{font-size:12px;font-weight:700;text-align:center}
+</style><div class="fig" style="--w:1120px"><p class="title">先在电脑上“缝”：软件在环、硬件在环与整机测试台</p><p class="sub">示意。三者跑同一套 pytest 测试用例，只换“被测对象”和“对象模型”</p><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px"><div class="box p" style="text-align:left"><b>软件在环 SIL</b><span>电脑上</span><ul class="t"><li>固件（工艺层、状态机、事件表）编译成电脑程序</li><li>HAL 换成仿真驱动</li><li>机器模型：本书虚拟实验同款（伺服 13-1、电磁铁 13-2、剪线 14-1、花样 15、横机 17）</li><li>按 50 µs 步长推进，比实时快几十倍</li></ul><div class="box p fill-p" style="margin-top:8px;text-align:left;padding:5px 8px"><ul class="t" style="margin:0"><li>查：逻辑、时序表、参数边界</li><li>每次提交自动跑（持续集成）</li></ul></div></div><div class="box b" style="text-align:left"><b>硬件在环 HIL</b><span>真主控板 + 仿真台</span><ul class="t"><li>真 WQ-SC 主控板、真固件</li><li>编码器仿真：按模型角度输出 A/B/Z，5000 r/min 时每秒 83 万个计数</li><li>电磁铁负载：真线圈或 R–L 假负载，测电流波形</li><li>伺服：CAN FD 上的驱动器模型；故障注入：断编码器、过流、欠压</li></ul><div class="box b fill-b" style="margin-top:8px;text-align:left;padding:5px 8px"><ul class="t" style="margin:0"><li>查：中断时序、驱动、故障处理</li><li>夜间批量跑几千个周期</li></ul></div></div><div class="box o" style="text-align:left"><b>整机测试台</b><span>真机头</span><ul class="t"><li>真机头、真伺服、真电磁铁</li><li>转矩/转速传感器，主轴编码器记录</li><li>相机拍线迹，计数剪线成败</li><li>环境：电压 ±10%、温度</li></ul><div class="box o fill-o" style="margin-top:8px;text-align:left;padding:5px 8px"><ul class="t" style="margin:0"><li>查：机械与电控的配合、寿命</li><li>验收指标：停针 ±1°、剪线 99.5%</li></ul></div></div></div><div style="text-align:center;font-size:12.5px;color:#5a6570;margin:6px 0">越往右越真实、越慢、越贵 →</div><div class="box k fill-k">测试电脑：pytest 脚本 → 网关 API/MQTT → 结果写报告并发到 …/measurement（第 22 章）</div></div>

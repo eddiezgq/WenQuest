@@ -1,0 +1,59 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.cols{display:grid;grid-template-columns:0.95fr 230px 1.3fr;gap:16px;align-items:start}
+.hd{font-weight:700;font-size:14.5px;margin:0 0 8px}
+.tree{border:2px solid #2a6fdb;border-radius:10px;background:#fff;padding:10px 12px;font-size:12.8px;line-height:1.75}
+.tree.m{border-color:#e0662f}
+.tree div{white-space:nowrap}.tree.m div{white-space:normal}
+.ind1{padding-left:16px}.ind2{padding-left:32px}
+.code{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:12px;color:#2a5fb8}
+.tree.m .code{color:#c4531d}
+.opt{border:2px solid #8a5cc7;border-radius:10px;background:#f2ecfa;padding:10px 12px;font-size:12.8px;line-height:1.6}
+.opt .k{display:inline-block;min-width:22px;font-weight:700;color:#7444b4}
+.chk{color:#2e9e5b;font-weight:700}
+.var{margin-top:10px;border:2px solid #1b2430;border-radius:8px;background:#fff;text-align:center;padding:8px;font-weight:700}
+.var span{display:block;font-weight:400;font-size:12px;color:#5a6570}
+.tag{display:inline-block;font-size:11px;border-radius:4px;padding:0 5px;margin-left:4px}
+.lib{background:#e6f3f3;color:#0f6e74}.prop{background:#fdf0ee;color:#c0392b}.new{background:#f2ecfa;color:#7444b4}.out{background:#fbf4e3;color:#a8740c}.fw{background:#e9f0fc;color:#2a5fb8}
+.arrowr{font-size:26px;color:#9aa4ae;text-align:center;margin-top:90px}
+</style>
+<div class="fig" style="--w:1320px">
+<p class="title">Product data: engineering BOM, configuration options and manufacturing BOM</p><p class="sub">Illustrative. Left: the engineering BOM (EBOM) grouped by function; middle: three options give 8 variants, here WQ-LS-TED; right: the manufacturing BOM (MBOM) regrouped by line sub-assemblies and operations, with subcontracting and firmware</p>
+<div class="cols">
+<div><p class="hd" style="color:#2a5fb8">Engineering BOM (EBOM) · by function</p>
+<div class="tree">
+<div><b>WQ-LS industrial lockstitch (template)</b></div>
+<div class="ind1">Needle &amp; take-up <span class="code">SH-LS01 arm shaft · needle bar · take-up</span></div>
+<div class="ind1">Hook <span class="code">SH-LS02 hook shaft · HK-LS01 hook · bobbin case</span></div>
+<div class="ind1">Feed <span class="code">CAM-LS01 feed-lift cam · feed dog</span></div>
+<div class="ind1">Drive <span class="code">timing belt · pulleys · bearings</span></div>
+<div class="ind1">Frame <span class="code">HSG-LS01 housing · screws</span></div>
+<div class="ind1">Control <span class="code">servo motor · control box · firmware</span></div>
+<div class="ind1" style="color:#7444b4">Option T: <span class="code">CAM-LS02 trimmer cam · trim/wiper solenoids</span></div>
+<div class="ind1" style="color:#7444b4">Option E: <span class="code">closed-loop stepper (replaces mech. feed)</span></div>
+<div class="ind1" style="color:#7444b4">Option D: <span class="code">HK-LS01D micro-oil hook (replaces HK-LS01)</span></div>
+<div class="ind1">Accessories <span class="code">NDL-DB1-14 needle</span></div>
+</div></div>
+<div><p class="hd" style="color:#7444b4">Configuration (model × options)</p>
+<div class="opt"><div><span class="k">T</span>Auto trimming <span class="chk">✓</span></div><div><span class="k">E</span>Electronic stitch length <span class="chk">✓</span></div><div><span class="k">D</span>Micro-oil hook <span class="chk">✓</span></div>
+<div style="font-size:12px;color:#5a6570;margin-top:6px">2 × 2 × 2 = 8 variants:<br>WQ-LS, -T, -E, -D,<br>-TE, -TD, -ED, -TED</div></div>
+<div class="var">WQ-LS-TED<span>ERPNext: item template + attributes → variant items, each with its own BOM</span></div>
+</div>
+<div><p class="hd" style="color:#c4531d">Manufacturing BOM (MBOM) · by sub-assembly and operation</p>
+<div class="tree m">
+<div><b>WQ-LS-TED</b>　<span class="code">RT-Final: line → adjust → run-in → EOL</span></div>
+<div class="ind1">SA-HSG housing assy <span class="code">HSG-LS01</span><span class="tag new">made</span></div>
+<div class="ind1">SA-ARM arm-shaft &amp; needle-bar assy <span class="code">SH-LS01 · 6201×2 · pulley</span><span class="tag lib">A-BRG-DG</span><span class="tag lib">A-PUL-HTD</span></div>
+<div class="ind1">SA-HOOK-D hook shaft &amp; micro-oil hook <span class="code">HK-LS01D · 6000×2</span></div>
+<div class="ind2"><span class="code">HK-LS01D ← HK-LS01 + DLC coating</span><span class="tag out">subcontract 5 days</span></div>
+<div class="ind1">SA-EFEED electronic feed <span class="code">CAM-LS01 · STP-FEED</span><span class="tag prop">D-MOT-STEP planned</span></div>
+<div class="ind1">SA-TRIM trimmer assy <span class="code">CAM-LS02 · SOL-TRIM · SOL-WIPE</span><span class="tag prop">D-SOL-PUSH planned</span></div>
+<div class="ind1">Timing belt <span class="code">BELT-HTD</span><span class="tag lib">C-BLT-BELT</span></div>
+<div class="ind1">Servo motor <span class="code">MOT-LS-SV</span><span class="tag prop">D-MOT-PMSM planned</span></div>
+<div class="ind1">Control box <span class="code">CTL-WQSC-LS</span><span class="tag prop">D-CTL-WQSC planned</span></div>
+<div class="ind1">Firmware <span class="code">FW-WQSC-LS 1.5.0 · params v8 · events v5</span><span class="tag fw">flashed at EOL</span></div>
+<div class="ind1">Needle <span class="code">NDL-DB1-14</span><span class="tag out">bought-in · incoming insp.</span></div>
+</div></div>
+</div>
+<p class="note">Tags: <span class="tag lib">existing library entry</span> <span class="tag prop">proposed ID, planned for the library</span> <span class="tag new">made in-house</span> <span class="tag out">subcontracted / bought-in</span> <span class="tag fw">firmware version</span>. Version numbers are illustrative.</p>
+</div>

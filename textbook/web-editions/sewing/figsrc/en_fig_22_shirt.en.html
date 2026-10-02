@@ -1,0 +1,47 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.fig{padding:0;position:relative;height:1000px}
+.title{position:absolute;left:40px;top:24px;font-size:27px}
+.sub{position:absolute;left:40px;top:66px;font-size:16.5px;width:1720px}
+.pan{position:absolute;top:130px;height:700px;border-radius:8px;background:#f1f2f3;border:1.5px solid #e2e5e8;text-align:center}
+.card{position:absolute;left:300px;width:820px;height:128px;background:#fff;border:1.5px solid #e2e5e8;border-radius:8px}
+.card b{position:absolute;left:24px;top:14px;font-size:22px;color:#2a5fb8}
+.card .mn{position:absolute;left:24px;top:52px;font-size:21px;font-weight:700}
+.card .ops{position:absolute;left:24px;top:90px;font-size:14.5px;color:#5a6570}
+.card .lst{position:absolute;left:170px;top:20px;font-size:15px;line-height:1.65;width:300px}
+.card .sq{position:absolute;left:170px;top:86px;display:flex;gap:8px}
+.card .sq i{width:36px;height:24px;border-radius:4px;background:#e6e8ea;border:1px solid #c8cdd2}
+.card .sq i.on{background:#c9a227;border-color:#b08d1e}
+.card .au{position:absolute;left:480px;top:20px;font-size:15px;line-height:1.75;font-weight:700;color:#8a6a10}
+.asm{left:1200px;width:300px;background:#eef3fc;border:2.5px solid #2a6fdb}
+.asm h3{margin:20px 0 4px;font-size:23px;color:#2a5fb8}.asm p{margin:0 0 18px;font-weight:700;font-size:16.5px}
+.st{background:#fff;border:1.5px solid #e2e5e8;border-radius:6px;margin:0 30px;height:56px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15.5px;line-height:1.25;padding:0 6px}
+.dn{height:24px;position:relative}.dn:before{content:"";position:absolute;left:50%;top:3px;height:12px;border-left:1.5px solid #5a6570}.dn:after{content:"";position:absolute;left:calc(50% - 5px);top:14px;border-top:8px solid #5a6570;border-left:5px solid transparent;border-right:5px solid transparent}
+.pst{left:1540px;width:220px} .pst h3{margin:20px 0 22px;font-size:21px}
+.pst .st{margin:0 20px;height:60px} .pst .st.g{border:2.5px solid #c9a227} .pst .dn{height:36px}.pst .dn:before{top:6px;height:20px}.pst .dn:after{top:25px}
+.cut h3{margin:20px 0 14px;font-size:21px} .cut p{font-size:15px;color:#5a6570;margin:0 0 18px;line-height:1.55}
+svg{position:absolute;left:0;top:0}
+.bar{position:absolute;left:300px;top:880px;width:1198px;height:40px;display:flex;gap:2px}
+.bar div{color:#fff;font-weight:700;font-size:15.5px;display:flex;align-items:center;justify-content:center;border-radius:2px}
+</style>
+<div class="fig" style="--w:1800px">
+<p class="title">Shirt floor: five parts lines feed the assembly line</p>
+<p class="sub">Numbers in the boxes = standard minutes of that section (min/piece, summed from a public 41-operation breakdown), 22.3 min in total; coloured squares = machine positions that can use automatic units</p>
+<svg width="1800" height="1000"><defs><marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#5a6570"/></marker></defs>
+<g stroke="#5a6570" stroke-width="1.6"><line x1="1122" y1="194" x2="1197" y2="480"/><line x1="1122" y1="338" x2="1197" y2="480"/><line x1="1122" y1="481" x2="1197" y2="480"/><line x1="1122" y1="624" x2="1197" y2="480"/><line x1="1122" y1="767" x2="1197" y2="480"/></g><circle cx="1196" cy="480" r="5" fill="#5a6570"/>
+<g stroke="#5a6570" stroke-width="1.3" stroke-dasharray="4 4" marker-end="url(#m)"><line x1="262" y1="480" x2="296" y2="194"/><line x1="262" y1="480" x2="296" y2="338"/><line x1="262" y1="480" x2="296" y2="481"/><line x1="262" y1="480" x2="296" y2="624"/><line x1="262" y1="480" x2="296" y2="767"/></g>
+<line x1="1502" y1="480" x2="1536" y2="480" stroke="#5a6570" stroke-width="2" marker-end="url(#m)"/></svg>
+<div class="pan cut" style="left:40px;width:220px"><h3>Cutting, fusing</h3><p>Spreading, cutting<br>Continuous fusing press<br>(collar, cuffs, plackets<br>fused)</p><p>Panels bundled<br>and sent to<br>each parts line</p></div>
+<div class="card" style="top:130px"><b>Collar</b><div class="mn">3.62 min</div><div class="ops">10 operations</div>
+<div class="lst">Sew collar · trim · turn · press<br>Attach collar to stand</div><div class="sq"><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><div class="au"><div>■ Automatic collar sewing &amp; trimming</div><div>■ Collar press</div></div></div><div class="card" style="top:274px"><b>Cuffs</b><div class="mn">3.85 min</div><div class="ops">7 operations</div>
+<div class="lst">Binding · hemming · sew cuff<br>Trim · turn and press</div><div class="sq"><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><div class="au"><div>■ Automatic cuff unit</div><div>■ Cuff forming press</div></div></div><div class="card" style="top:417px"><b>Plackets</b><div class="mn">2.21 min</div><div class="ops">3 operations</div>
+<div class="lst">Attach placket · bartack · pleat</div><div class="sq"><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><div class="au"><div>■ Automatic placket unit</div></div></div><div class="card" style="top:560px"><b>Fronts</b><div class="mn">4.22 min</div><div class="ops">9 operations</div>
+<div class="lst">Front placket · press, attach pocket<br>Label · pleats</div><div class="sq"><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><div class="au"><div>■ Placket machine</div><div>■ Automatic pocket setter</div></div></div><div class="card" style="top:703px"><b>Back</b><div class="mn">0.84 min</div><div class="ops">2 operations</div>
+<div class="lst">Attach yoke · topstitch</div><div class="sq"><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><div class="au"></div></div>
+<div class="pan asm"><h3>Assembly line</h3><p>7.58 min · 10 operations</p><div class="st">Join shoulders, topstitch</div><div class="dn"></div><div class="st">Attach collar</div><div class="dn"></div><div class="st">Close collar (insert size label)</div><div class="dn"></div><div class="st">Set sleeves, topstitch armhole</div><div class="dn"></div><div class="st">Close side and sleeve seams</div><div class="dn"></div><div class="st">Attach cuffs, topstitch</div><div class="dn"></div><div class="st">Hem bottom</div></div>
+<div class="pan pst"><h3>Finishing</h3><div class="st g">Buttonholes (placket, cuffs)</div><div class="dn"></div><div class="st g">Buttons</div><div class="dn"></div><div class="st">Thread trimming</div><div class="dn"></div><div class="st">Pressing</div><div class="dn"></div><div class="st">Folding, packing</div><div class="dn"></div><div class="st">Inspection</div>
+<div style="font-size:13.5px;color:#8a6a10;margin-top:16px;padding:0 10px">Buttonholing and button sewing often use automatic feeders</div></div>
+<div style="position:absolute;left:300px;top:845px;font-size:18px;font-weight:700">Work content: the three small parts — collar, cuffs, plackets — take 43%, all parts 66%, assembly only 34%</div>
+<div class="bar"><div style="flex:3.62;background:#2a6fdb">Collar 16%</div><div style="flex:3.85;background:#2a6fdb">Cuffs 17%</div><div style="flex:2.21;background:#2a6fdb">Plackets 10%</div><div style="flex:4.22;background:#7ea6e8">Fronts 19%</div><div style="flex:0.84;background:#a9c3ef"></div><div style="flex:7.58;background:#1b2430">Assembly 34%</div></div>
+<div style="position:absolute;left:967px;top:928px;width:200px;text-align:center;font-size:14.5px;font-weight:700">Back 4%</div>
+</div>

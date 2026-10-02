@@ -32,6 +32,10 @@ LABBOX = re.compile(r"<div class='wq-media-box wq-labbox' data-lab='(\d+)-(\d+)'
 BOX = re.compile(r"<div class='wq-media-box' data-anim='(\w+)' data-hash='(\w+)'>(.*?)</div>", re.S)
 TASKBOX = re.compile(r"(<div class='wq-taskbox' data-task='(\d+)-(\d+)'>)")      # 工程任务单 (第 13 轮)
 TASKDOCS = ("task", "rubric", "calc")
+# 网页版教材（第 15 轮）：整本网页书放在 <dir>/<book>/webed/（book.json + 页面、实验、插图），登录后经有时效的链接阅读
+WEB_TTL = 12 * 3600
+WEB_TYPES = {".html": "text/html; charset=utf-8", ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml",
+             ".js": "text/javascript", ".css": "text/css", ".json": "application/json"}
 
 
 def media_dir(m, book: str) -> Path:
@@ -125,7 +129,22 @@ def register(app, m) -> None:
                     idx = index(d.name)
                     out.append({"book": d.name, "title": idx.get("title", d.name), "chapters": len(idx["chapters"]),
                                 "sections": sum(len(c["sections"]) for c in idx["chapters"]), "written": len(written(idx))})
+                elif (d / "webed" / "book.json").exists() and BOOK.match(d.name):      # 网页版（第 15 轮）
+                    w = json.loads((d / "webed" / "book.json").read_text(encoding="utf-8"))
+                    out.append({"book": d.name, "title": w.get("title", d.name), "title_en": w.get("title_en", ""), "web": True,
+                                "chapters": int(w.get("chapters", 0)), "labs": int(w.get("labs", 0))})
         return {"books": out}
+
+    @app.get("/api/v1/textbooks/{book}/webed")
+    async def web_edition(book: str, sess: Annotated[Session, Depends(m.current)], lang: str = "zh"):
+        """A web-edition book (第 15 轮): a signed link under which every page, lab and figure of the book opens."""
+        if not (BOOK.match(book) and (root() / book / "webed" / "book.json").exists()):
+            raise EngineError("not_found", "no such textbook", 404)
+        w = json.loads((root() / book / "webed" / "book.json").read_text(encoding="utf-8"))
+        tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "u": sess.user_id}).encode()).decode()
+        page = "en/index.html" if lang == "en" else "index.html"
+        return {"url": f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-web/{tok}/{page}",
+                "title": w.get("title", book), "title_en": w.get("title_en", "")}
 
     @app.get("/api/v1/textbooks/{book}")
     async def textbook(book: str, sess: Annotated[Session, Depends(m.current)]):
@@ -216,6 +235,26 @@ def register(app, m) -> None:
             raise EngineError("not_found", "no such lab", 404)
         return HTMLResponse(p.read_text(encoding="utf-8"), headers={"Content-Security-Policy": labkit.CSP,
                                                                      "Cache-Control": "private, max-age=3600"})
+
+    @app.get("/api/v1/textbook-web/{signed}/{path:path}")
+    async def web_file(signed: str, path: str):
+        """A file of a web-edition book. The relative links inside the book stay under this signed prefix."""
+        try:
+            d = json.loads(m.state.codec.fernet.decrypt(signed.encode(), ttl=WEB_TTL))
+        except (InvalidToken, ValueError):
+            raise EngineError("link_expired", "link expired", 410)
+        if not BOOK.match(str(d.get("b", ""))):
+            raise EngineError("not_found", "no such file", 404)
+        base = (root() / d["b"] / "webed").resolve()
+        p = (base / (path or "index.html")).resolve()
+        if p.is_dir():
+            p = p / "index.html"
+        if not (p.is_relative_to(base) and p.is_file() and p.suffix.lower() in WEB_TYPES):
+            raise EngineError("not_found", "no such file", 404)
+        html_ = p.suffix.lower() == ".html"
+        return FileResponse(p, media_type=WEB_TYPES[p.suffix.lower()],
+                            headers={"Cache-Control": f"private, max-age={600 if html_ else 86400}",
+                                     **({"Content-Security-Policy": "frame-ancestors 'self'"} if html_ else {})})
 
     @app.get("/api/v1/textbook-labdoc/{signed}")
     async def lab_doc(signed: str):

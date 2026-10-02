@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch}
+.cell{display:flex;align-items:center}
+.cell .box{flex:1}
+.arr{width:34px;flex:0 0 34px;text-align:center;color:#5a6570;font-size:22px}
+.lane{border-radius:10px;padding:10px 12px 12px;margin-bottom:12px}
+.lane h4{margin:0 0 8px;font-size:13.5px;color:#5a6570}
+.mono{font-size:12px}
+.box span{font-size:12.3px}
+</style>
+<div class="fig" style="--w:1180px">
+<p class="title">Data flow in the pattern-sewer prototype firmware (three time scales)</p>
+<p class="sub">Illustrative. Top: once per pattern segment (background task); middle: once per stitch (sewing state machine); bottom: every 1 ms and every angle tick (real-time interrupts). HAL interfaces as in Chapter 19</p>
+<div class="lane fill-k"><h4>Background: once per pattern segment (tens of milliseconds are fine)</h4>
+<div class="row">
+<div class="cell"><div class="box"><b>Pattern file .wqp</b><span>Sent by the gateway; header + 3-byte stitch records</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box"><b>Parse wqp_parse()</b><span>Check, accumulate into absolute points (integer 0.1 mm)</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box"><b>Travel and stitch checks</b><span>Reject over-travel or &gt; 12.7 mm</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box o"><b>Look-ahead plan_speed()</b><span>Per-stitch cap → backward → forward, Δn = 300 r/min</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box"><b>Stitch queue</b><span class="mono">{dx, dy, n, flags}</span><span>Ring buffer, 256 stitches</span></div></div>
+</div></div>
+<div class="lane fill-y"><h4>Per stitch: state machine IDLE → CLAMP → RUN → SLOW → TRIM → POSITION → JUMP → … → HOME</h4>
+<div class="row">
+<div class="cell"><div class="box y"><b>Fetch next stitch</b><span>Window start φ<sub>s</sub> = 268.3°</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box y"><b>Spindle speed command</b><span>spindle_set_speed(n[i])</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box y"><b>Event table</b><span>Trimmer, wiper, presser foot fired by angle (Chapter 19)</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box y"><b>Interlocks</b><span>Clamp down, air pressure, E-stop</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box"><b>FAULT → SAFE</b><span>Solenoids off, spindle stops, X–Y hold</span></div></div>
+</div></div>
+<div class="lane fill-b"><h4>Real time: every 1 ms (interpolation IRQ) and every 0.1° (angle-compare IRQ)</h4>
+<div class="row">
+<div class="cell"><div class="box b"><b>Read spindle φ, ω</b><span>Encoder 10 000 counts/rev</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box b"><b>Predicted angle</b><span>φ<sub>p</sub> = φ + ω·T<sub>d</sub>, T<sub>d</sub> = 1.5 ms</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box b"><b>τ = (φ<sub>p</sub> − φ<sub>s</sub>)/W<sub>u</sub></b><span>W<sub>u</sub> = 183.4°, 0 ≤ τ ≤ 1</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box b"><b>S-curve table f(τ)</b><span>x = x<sub>0</sub> + dx·f(τ), same for y</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box b"><b>stepper_set_pos()</b><span>CAN FD sync frame: X and Y take effect together</span></div></div>
+</div></div>
+<p class="note">Logging channel (for bring-up and acceptance): every 1 ms record φ, X/Y command and encoder actual, following error, into a ring buffer the gateway uploads on request (Section 21.4).</p>
+</div>

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Feed-Dog Trajectory and Feed Timing</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = side-view animation + dog trajectory + timing chart; right rail = readouts, adjustments, chart reading, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --cloth1:#e6d6ad; --cloth2:#bcd0ea; --plate:#aab4bd; --thread:#2a5fb8; --steel:#5c6670; --dog:#1f7a4a; --lift:#b7791f;
+  --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f; --vio:#8e44ad;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--cloth1:#6b5c3a;--cloth2:#3d5578;--plate:#56616c;--thread:#7fa9f2;--steel:#b7c0c9;--dog:#5fd08a;--lift:#e8b04b;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--vio:#c39bd3}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--cloth1:#6b5c3a;--cloth2:#3d5578;--plate:#56616c;--thread:#7fa9f2;--steel:#b7c0c9;--dog:#5fd08a;--lift:#e8b04b;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--vio:#c39bd3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{max-width:100%}
+select,input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px}
+input[type=number]{width:6.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.two{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.4em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+input[type=range]:disabled{opacity:.35}
+.meter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.meter div{border-top:3px solid var(--rule);padding-top:4px}
+.meter div.ok{border-top-color:var(--ok)} .meter div.bad{border-top-color:var(--bad)} .meter div.warn{border-top-color:var(--warn)}
+.meter b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.meter small{color:var(--muted);font-size:.74rem;line-height:1.35;display:block}
+.state{margin-top:10px;font-size:.88rem;border-left:3px solid var(--rule);padding-left:8px;min-height:3.2em}
+.state.ok{border-left-color:var(--ok)} .state.bad{border-left-color:var(--bad)} .state.warn{border-left-color:var(--warn)}
+.state b{display:block}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:5px;vertical-align:4px;background:var(--c)}
+</style>
+<div class="wrap">
+<header><h1>Feed-Dog Trajectory and Feed Timing</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 6 · Virtual lab 6-1 · When the fabric moves, how far, and whether the two plies travel together</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <div class="two">
+        <div><h3>Side view (magnified, feed to the right)</h3><canvas id="side" width="760" height="440" aria-label="Side-view animation of throat plate, feed dog, presser foot, needle and two fabric plies"></canvas></div>
+        <div><h3>Feed-dog tooth-tip path</h3><canvas id="traj" width="380" height="440" aria-label="Path of the feed-dog tooth tip"></canvas></div>
+      </div>
+      <div class="row">
+        <button type="button" id="play" aria-pressed="true">Pause</button>
+        <span class="note" style="margin:0">Main-shaft angle</span><b id="angOut" style="font-family:var(--f-mono)">0°</b>
+        <div style="flex:1;min-width:180px"><input id="ang" type="range" min="0" max="360" step="0.5" value="0" aria-label="Main-shaft angle"></div>
+      </div>
+      <p class="note" id="phase"></p>
+    </section>
+    <section class="panel">
+      <h3>Feed timing (horizontal axis: main-shaft angle, needle-bar top dead centre = 0°)</h3>
+      <canvas id="tim" width="1100" height="470" aria-label="Needle point, needle eye, feed-dog height and fabric position versus main-shaft angle"></canvas>
+      <div class="legend"><span style="--c:var(--ink)">Needle point</span><span style="--c:var(--thread)">Top of needle eye</span><span style="--c:var(--lift)">Feed-dog tooth-tip height</span><span style="--c:var(--dog)">Dog horizontal position</span><span style="--c:#a68b52">Fabric (lower ply) position</span></div>
+      <p class="note">Upper panel: heights measured from the throat-plate surface (0). Grey shading: needle in the fabric; green shading: dog above the plate, gripping the fabric. Lower panel: horizontal positions of dog and fabric. Mechanism parameters are worked-example values; fabric parameters are illustrative values.</p>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>Readouts</h3>
+      <div class="meter" id="meter"></div>
+      <div class="state" id="state"></div>
+    </section>
+    <section class="panel">
+      <h3>Adjustments</h3>
+      <div class="row" style="margin-top:0">
+        <label for="fab" class="note" style="margin:0">Fabric</label>
+        <select id="fab"><option value="lining">Slippery lining, 2 plies (0.4 mm)</option><option value="cotton" selected>Cotton, 2 plies (1.5 mm)</option><option value="denim">Denim, 4 plies (4 mm)</option></select>
+      </div>
+      <div class="row">
+        <label for="mode" class="note" style="margin:0">Feed type</label>
+        <select id="mode"><option value="drop" selected>Drop feed</option><option value="needle">Needle feed</option><option value="compound">Compound (dog + needle + walking foot)</option></select>
+      </div>
+      <div class="prm" id="prm"></div>
+      <div class="row"><button type="button" id="reset">Reset to standard</button><button type="button" id="mess">Scramble timing (simulate a badly set machine)</button></div>
+      <p class="note" id="modeNote"></p>
+    </section>
+    <section class="panel">
+      <h3>Chart reading</h3>
+      <p class="note" style="margin-top:0">Set the dog height to 1.0 mm (everything else standard) and read from the timing chart the main-shaft angles at which the feed dog rises above the throat plate and drops below it.</p>
+      <div class="row"><label class="note" style="margin:0" for="rd1">Rise</label><input id="rd1" type="number" step="0.1" placeholder="deg"><label class="note" style="margin:0" for="rd2">Drop</label><input id="rd2" type="number" step="0.1" placeholder="deg"><button type="button" id="rdChk">Check</button></div>
+      <p class="note" id="rdOut"></p>
+    </section>
+    <section class="panel">
+      <h3>Tasks (checked automatically)</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+const DEG=Math.PI/180,$=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// ---------- needle bar (chapter 3 worked example) ----------
+const RN=15.5,LN=55,TIP0=18,EYE=2;
+const xN=f=>{const a=f*DEG,l=RN/LN;return RN*(1-Math.cos(a))-LN*(1-Math.sqrt(1-(l*Math.sin(a))**2));};
+const tip=f=>TIP0-xN(f);
+const cross=(lv)=>{let a=0,b=180;for(let i=0;i<60;i++){const m=(a+b)/2;if(tip(m)>lv)a=m;else b=m;}return (a+b)/2;};
+const FE=cross(-EYE);                 // needle-eye top reaches plate: 114.2°
+// ---------- feed mechanism (worked example) ----------
+const A=1.1,H0=0.8,HALF0=Math.acos((A-H0)/A)/DEG,PHL0=FE-HALF0,EFF0=(1-Math.cos(2*HALF0*DEG))/2;
+const FAB={lining:{t:0.4,mud:0.55,muf:0.15,F0:0.32,K:10,hreq:0.7,hmax:0.85,Pmark:1.4,name:'slippery lining'},
+           cotton:{t:1.5,mud:0.80,muf:0.25,F0:0.30,K:50,hreq:0.75,hmax:1.1,Pmark:2.0,name:'cotton'},
+           denim:{t:4.0,mud:0.85,muf:0.30,F0:0.75,K:40,hreq:0.95,hmax:1.5,Pmark:2.5,name:'denim'}};
+const MODEF={drop:1.0,needle:0.3,compound:0.08};
+const STD={s:3,dT:0,dP:0,h:0.8,P:1.0};
+const ST=Object.assign({fab:'cotton',mode:'drop',phi:0,play:true},STD);
+function model(o){o=o||ST;const f=FAB[o.fab];
+  const half=Math.acos(Math.max(-1,Math.min(1,(A-o.h)/A)))/DEG;
+  let phL,phF;if(o.mode==='drop'){phL=PHL0+o.dT;phF=FE+o.dT+o.dP;}else{phL=180;phF=180+half;}
+  const rise=phL-half,drop=phL+half,S=o.s/EFF0;
+  const X=p=>(S/2)*Math.cos((p-phF)*DEG),Y=p=>(o.h-A)+A*Math.cos((p-phL)*DEG);
+  const ain=cross(f.t),aout=360-ain;
+  let drag=0,back=0;const n=720,sg=o.s>=0?1:-1;
+  for(let i=0;i<n;i++){const p0=rise+(drop-rise)*i/n,p1=rise+(drop-rise)*(i+1)/n,dx=X(p1)-X(p0),pm=(((p0+p1)/2)%360+360)%360;
+    if(o.mode==='drop'&&pm>ain&&pm<aout)drag+=Math.abs(dx);if(dx*sg<0)back+=Math.abs(dx);}
+  const net=X(drop)-X(rise);
+  const mud=f.mud*Math.min(1,o.h/f.hreq);
+  const Pmin=o.mode==='compound'?f.F0/mud:f.F0/Math.max(mud-f.muf,1e-6);
+  const eps=Math.min(1,o.P/Pmin),act=eps*net;
+  const ply=f.muf*o.P/f.K*MODEF[o.mode]*400;
+  const marks=[];if(o.h>f.hmax+1e-9)marks.push('dog');if(o.P>f.Pmark+1e-9)marks.push('foot');
+  const eyeAtDrop=tip(((drop%360)+360)%360)+EYE;
+  return {half,phL,phF,rise:((rise%360)+360)%360,drop:((drop%360)+360)%360,riseRaw:rise,dropRaw:drop,S,X,Y,ain,aout,drag,back,net,act,eps,Pmin,ply,marks,eyeAtDrop,t:f.t};
+}
+// fabric (lower ply) position within one revolution starting at phi=0: follows dog while gripped
+function fabPos(M,phi){ // displacement accumulated from 0..phi (deg), eps applied
+  let pos=0;const n=Math.max(2,Math.round(phi*2));
+  for(let i=0;i<n;i++){const p0=phi*i/n,p1=phi*(i+1)/n;if(M.Y((p0+p1)/2)>=0)pos+=M.X(p1)-M.X(p0);}return pos*M.eps;}
+// ---------- controls ----------
+const PRM=[['s','Stitch length (dial; negative = reverse)',-5,5,0.1,'mm'],['dT','Feed timing (horizontal and lift shifted together, a simplification in this lab; + = later)',-40,40,1,'°'],['dP','Phase of horizontal motion relative to lift (+ = horizontal later)',-40,40,1,'°'],['h','Dog height (tooth tip above plate)',0.5,1.5,0.05,'mm'],['P','Presser-foot pressure (relative, 1 = standard)',0.3,2.5,0.05,'']];
+$('prm').innerHTML=PRM.map(([k,l,mn,mx,st])=>`<label for="p_${k}">${l}</label><input id="p_${k}" type="range" min="${mn}" max="${mx}" step="${st}"><output id="o_${k}"></output>`).join('');
+function sync(){PRM.forEach(([k,,,,st,u])=>{$('p_'+k).value=ST[k];$('o_'+k).textContent=(+ST[k]).toFixed(st<0.1?2:(st<1?1:0))+(u?' '+u:'');});
+  $('fab').value=ST.fab;$('mode').value=ST.mode;const dis=ST.mode!=='drop';$('p_dT').disabled=dis;$('p_dP').disabled=dis;
+  $('modeNote').textContent=dis?'Needle feed and compound feed move the fabric after the needle has entered it; the dog timing is fixed at the factory standard (dog highest at 180°), so the timing and phase sliders have no effect.':'';}
+PRM.forEach(([k])=>$('p_'+k).addEventListener('input',e=>{ST[k]=+e.target.value;changed();}));
+$('fab').onchange=e=>{ST.fab=e.target.value;changed();};
+$('mode').onchange=e=>{ST.mode=e.target.value;changed();};
+$('reset').onclick=()=>{Object.assign(ST,STD);seen.messed=false;changed();};
+$('mess').onclick=()=>{Object.assign(ST,{dT:20,dP:-25});seen.messed=true;changed();};
+$('play').onclick=()=>{ST.play=!ST.play;$('play').textContent=ST.play?'Pause':'Play';$('play').setAttribute('aria-pressed',ST.play);};
+$('ang').addEventListener('input',e=>{ST.play=false;$('play').textContent='Play';$('play').setAttribute('aria-pressed',false);ST.phi=+e.target.value;draw();});
+let cyc=0;      // completed stitches since last change (for the animation)
+function changed(){sync();cyc=0;drawTim();draw();meters();checkTasks();}
+// ---------- readouts ----------
+function verdict(M){const f=FAB[ST.fab];
+  if(M.marks.includes('dog'))return ['bad','Dog too high: tooth marks on the fabric','For this fabric a dog height above '+f.hmax+' mm bites marks into the cloth. Use a low dog for light fabrics (manufacturer\'s manual: light-fabric type 0.7–0.8 mm).'];
+  if(M.marks.includes('foot'))return ['bad','Foot pressure too high: pressure marks on the fabric','The pressure exceeds what this fabric can take (illustrative value '+f.Pmark+'), and the higher the pressure, the more the upper ply is held back.'];
+  if(M.eps<0.999)return ['bad','Slipping: the dog cannot grip the fabric','Foot pressure is below the '+M.Pmin.toFixed(2)+' needed to prevent slip; the fabric travels only '+(M.eps*100).toFixed(0)+'% of the dog stroke. Increase pressure, raise the dog (deeper grip), or switch to compound feed.'];
+  if(M.drag>0.05)return ['bad','Fabric moves while the needle is in it','The fabric was pushed '+M.drag.toFixed(2)+' mm with the needle in it: the needle is deflected — at best crooked stitches and uneven stitch length, at worst the needle strikes the hook and breaks. Advance the feed timing or reduce the phase difference.'];
+  if(M.back>0.05)return ['warn','Back-drag','While above the plate the dog moves backwards for part of the stroke, pulling the fabric back '+M.back.toFixed(2)+' mm: the actual stitch is shorter and uneven. The horizontal motion is too early relative to the lift.'];
+  if(Math.abs(M.act-ST.s)>0.15)return ['warn','Actual stitch length differs from the dial','Actual '+M.act.toFixed(2)+' mm, dial '+ST.s.toFixed(1)+' mm. Changing dog height or phase changes the grip interval, and the stitch length changes with it.'];
+  if(M.ply>3)return ['warn','Upper ply creeps (ply shift)','Over a 40 cm seam the upper ply ends '+M.ply.toFixed(1)+' mm longer than the lower (limit taken as 3 mm). The dog drives the lower ply while the foot holds back the upper. Reduce pressure, or switch to needle feed or compound feed.'];
+  return ['ok',ST.s<0?'Reverse feed OK':'Feed OK','The fabric moves only while the needle is out of it; no back-drag, no slip, and ply shift is within the limit.'];}
+function meters(){const M=model();
+  const m=[[M.act.toFixed(2)+' mm','Actual stitch length (dial '+ST.s.toFixed(1)+')',Math.abs(M.act-ST.s)<=0.15?'ok':'warn'],
+    [(M.eps*100).toFixed(0)+' %','Feed efficiency (< 100% = slip)',M.eps>=0.999?'ok':'bad'],
+    [ST.mode==='drop'?M.drag.toFixed(3)+' mm':'—','Fabric travel while needle is in it (≤ 0.05)',ST.mode!=='drop'?'':M.drag<=0.05?'ok':'bad'],
+    [M.back.toFixed(3)+' mm','Back-drag (≤ 0.05)',M.back<=0.05?'ok':'warn'],
+    [ST.mode==='drop'?(M.eyeAtDrop>=0?'+':'')+M.eyeAtDrop.toFixed(2)+' mm':'—','Needle-eye top above plate when dog drops (standard 0)',ST.mode!=='drop'?'':Math.abs(M.eyeAtDrop)<=1?'ok':'warn'],
+    [M.ply.toFixed(1)+' mm','Upper-ply excess after 40 cm seam (≤ 3)',M.ply<=3?'ok':'warn']];
+  $('meter').innerHTML=m.map(([v,l,c])=>`<div class="${c}"><b>${v}</b><small>${l}</small></div>`).join('');
+  const v=verdict(M);$('state').className='state '+v[0];$('state').innerHTML='<b>'+v[1]+'</b>'+v[2];}
+// ---------- drawing helpers ----------
+function seg(g,a,b){g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();}
+const mod=a=>((a%360)+360)%360;
+const inWin=(M,p)=>{const q=mod(p-M.riseRaw);return q<=M.dropRaw-M.riseRaw;};
+// ---------- side view ----------
+function sideDraw(){
+  const cv=$('side'),g=cv.getContext('2d'),W=cv.width,H=cv.height,M=model(),f=ST.phi,F=FAB[ST.fab];
+  const sc=34,cx=W*0.5,py=H*0.62,T=(x,y)=>[cx+x*sc,py-y*sc];
+  g.clearRect(0,0,W,H);g.font='13px '+css('--f-body');
+  const dx=M.X(f),dy=M.Y(f),gr=dy>=0;
+  // fabric position: completed stitches + within-revolution
+  const per=M.act,low=cyc*per+fabPos(M,f),upLag=M.ply/400;  // upper ply moves (1-rho) of lower
+  const up=low*(1-upLag),t=M.t,tl=t/2;
+  const fy0=Math.max(dy,0);  // fabric lifted by dog when above plate
+  // plies
+  g.fillStyle=css('--cloth1');g.fillRect(0,T(0,fy0+tl)[1],W,tl*sc);
+  g.fillStyle=css('--cloth2');g.fillRect(0,T(0,fy0+t)[1],W,tl*sc);
+  // marks every 3 mm
+  g.strokeStyle=css('--ink');g.lineWidth=1.4;const pitch=3;
+  for(let k=-20;k<=20;k++){let xl=k*pitch+(low%pitch);if(xl*sc>-W/2-10&&xl*sc<W/2+10)seg(g,T(xl,fy0),T(xl,fy0+tl*0.6));
+    let xu=k*pitch+(up%pitch);if(xu*sc>-W/2-10&&xu*sc<W/2+10)seg(g,T(xu,fy0+t),T(xu,fy0+t-tl*0.6));}
+  // throat plate with slot
+  g.fillStyle=css('--plate');g.fillRect(0,T(0,0)[1],T(-4.6,0)[0],1.2*sc);g.fillRect(T(4.6,0)[0],T(0,0)[1],W,1.2*sc);
+  // feed dog: body + teeth (teeth lean toward +x)
+  g.fillStyle=css('--dog');const dw=5.2,tw=dw/6;g.beginPath();g.moveTo(...T(dx-dw/2,dy-1.6));
+  for(let i=0;i<6;i++){const x0=dx-dw/2+i*tw;g.lineTo(...T(x0,dy-0.25));g.lineTo(...T(x0+tw*0.75,dy));g.lineTo(...T(x0+tw,dy-0.25));}
+  g.lineTo(...T(dx+dw/2,dy-1.6));g.closePath();g.fill();
+  // needle (swings with the dog in needle / compound feed)
+  const nx=ST.mode==='drop'?0:dx,nt=tip(f),d=0.9;
+  g.fillStyle=css('--steel');const ntop=T(nx-d/2,12)[1],nb=T(0,nt+1.2)[1];g.fillRect(T(nx-d/2,0)[0],ntop,d*sc,nb-ntop);
+  g.beginPath();g.moveTo(T(nx-d/2,nt+1.2)[0],nb);g.lineTo(...T(nx,nt));g.lineTo(T(nx+d/2,nt+1.2)[0],nb);g.closePath();g.fill();
+  g.fillStyle=css('--sheet');const e1=T(nx-0.22,nt+EYE),e2=T(nx+0.22,nt+EYE-1.1);g.fillRect(e1[0],e1[1],e2[0]-e1[0],e2[1]-e1[1]);
+  // presser foot(s)
+  const ftop=fy0+t;g.fillStyle=css('--steel');g.globalAlpha=.55;
+  if(ST.mode==='compound'){   // inner (feeding) foot rides on the fabric while feeding; outer feet lift
+    g.fillStyle=css('--dog');g.fillRect(T(dx-1.3,0)[0],T(0,ftop+0.8+(gr?0:1.5))[1],2.6*sc,0.8*sc);
+    g.fillStyle=css('--steel');g.globalAlpha=.4;const oy=T(0,ftop+0.8+(gr?1.5:0))[1];g.fillRect(T(-6,0)[0],oy,3.8*sc,0.8*sc);g.fillRect(T(2.2,0)[0],oy,3.8*sc,0.8*sc);}
+  else{g.beginPath();g.moveTo(...T(-6,ftop+0.9));g.lineTo(...T(-5,ftop));g.lineTo(...T(6,ftop));g.lineTo(...T(6,ftop+0.9));g.closePath();g.fill();}
+  g.globalAlpha=1;
+  // labels
+  g.fillStyle=css('--muted');g.fillText('Throat plate',T(5,0)[0],T(0,-1.6)[1]);g.fillText('Feed dog',T(dx-dw/2,0)[0],T(0,dy-2.2)[1]);
+  g.fillText(ST.mode==='compound'?'Inner foot (green) walks with the dog; outer foot holds alternately':'Presser foot',T(-7,0)[0],T(0,Math.min(ftop+3.4,7.2))[1]);
+    g.fillText('Blue: upper ply; beige: lower ply; marks 3 mm apart. Upper marks lagging lower marks = ply shift ('+(M.ply/400*Math.abs(M.act)).toFixed(3)+' mm per stitch)',8,H-10);
+}
+// ---------- trajectory ----------
+function trajDraw(){
+  const cv=$('traj'),g=cv.getContext('2d'),W=cv.width,H=cv.height,M=model(),f=ST.phi;
+  const R=Math.max(2.2,Math.abs(M.S)/2+0.6),sc=(W-40)/(2*R),cx=W/2,cy=H*0.42,T=(x,y)=>[cx+x*sc,cy-y*sc];
+  g.clearRect(0,0,W,H);g.font='12px '+css('--f-body');
+  g.fillStyle=css('--soft');g.fillRect(0,cy,W,H-cy);g.strokeStyle=css('--muted');g.lineWidth=1.2;seg(g,[0,cy],[W,cy]);
+  g.fillStyle=css('--muted');g.fillText('Plate surface',W-86,cy+16);
+  g.lineWidth=2;g.strokeStyle=css('--dog');g.beginPath();for(let k=0;k<=360;k+=2){const p=T(M.X(k),M.Y(k));k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();
+  g.lineWidth=6;g.globalAlpha=.35;g.beginPath();const n=80;for(let i=0;i<=n;i++){const k=M.riseRaw+(M.dropRaw-M.riseRaw)*i/n,p=T(M.X(k),M.Y(k));i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();g.globalAlpha=1;
+  const p=T(M.X(f),M.Y(f));g.fillStyle=css('--ink');g.beginPath();g.arc(p[0],p[1],6,0,7);g.fill();
+  g.fillStyle=css('--muted');g.fillText('Thick line: dog above plate (gripping)',10,H-30);g.fillText('Scale '+sc.toFixed(0)+' px/mm, same both axes',10,H-12);
+  g.fillText('→ Feed direction',10,18);
+}
+// ---------- timing chart ----------
+function drawTim(){
+  const cv=$('tim'),g=cv.getContext('2d'),W=cv.width,H=cv.height,M=model();g.clearRect(0,0,W,H);
+  const x0=70,x1=W-16,ya=14,yb=270,yc=300,yd=H-30,vmin=-2.5,vmax=6.5;
+  const X=p=>x0+(x1-x0)*p/360,Y=v=>yb-(yb-ya)*(v-vmin)/(vmax-vmin);
+  // shading
+  g.fillStyle=css('--steel');g.globalAlpha=.10;g.fillRect(X(M.ain),ya,X(M.aout)-X(M.ain),yd-ya);
+  g.fillStyle=css('--dog');g.globalAlpha=.10;
+  const r=M.rise,d=M.drop;if(r<d)g.fillRect(X(r),ya,X(d)-X(r),yd-ya);else{g.fillRect(X(r),ya,X(360)-X(r),yd-ya);g.fillRect(X(0),ya,X(d)-X(0),yd-ya);}
+  g.globalAlpha=1;
+  g.strokeStyle=css('--rule');g.lineWidth=1;g.fillStyle=css('--muted');g.font='12px '+css('--f-mono');g.textAlign='center';
+  for(let p=0;p<=360;p+=30){seg(g,[X(p),ya],[X(p),yd]);g.fillText(p+'°',X(p),yd+16);}
+  g.textAlign='right';for(let v=-2;v<=6;v+=2)g.fillText(v,x0-6,Y(v)+4);g.fillText('mm',x0-30,Y(6)+4);
+  g.strokeStyle=css('--muted');g.lineWidth=1.4;seg(g,[x0,Y(0)],[x1,Y(0)]);
+  g.setLineDash([5,4]);g.strokeStyle='#a68b52';seg(g,[x0,Y(M.t)],[x1,Y(M.t)]);g.setLineDash([]);
+  g.textAlign='left';g.fillStyle=css('--muted');g.font='12px '+css('--f-body');g.fillText('Throat plate',x0+4,Y(0)-4);g.fillText('Fabric surface',x0+4,Y(M.t)-4);
+  const curve=(fn,col,w,dash)=>{g.save();g.beginPath();g.rect(x0,ya,x1-x0,yb-ya);g.clip();g.strokeStyle=col;g.lineWidth=w;if(dash)g.setLineDash(dash);g.beginPath();for(let p=0;p<=360;p+=0.5){const q=[X(p),Y(fn(p))];p?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);}g.stroke();g.restore();};
+  curve(tip,css('--ink'),2.2);curve(p=>tip(p)+EYE,css('--thread'),1.8,[6,4]);curve(M.Y,css('--lift'),2.6);
+  // horizontal panel
+  const S=Math.max(Math.abs(M.S)/2,1.6)*1.15,Yh=v=>(yc+yd)/2-(yd-yc)/2*v/S;
+  g.strokeStyle=css('--rule');seg(g,[x0,Yh(0)],[x1,Yh(0)]);
+  g.strokeStyle=css('--dog');g.lineWidth=2;g.setLineDash([6,4]);g.beginPath();for(let p=0;p<=360;p+=1){const q=[X(p),Yh(M.X(p))];p?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);}g.stroke();g.setLineDash([]);
+  g.strokeStyle='#a68b52';g.lineWidth=2.6;g.beginPath();const off=M.X(0);for(let p=0;p<=360;p+=2){const q=[X(p),Yh(off+fabPos(M,p))];p?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);}g.stroke();
+  timBase=g.getImageData(0,0,W,H);
+}
+let timBase=null;
+function timCursor(){const cv=$('tim'),g=cv.getContext('2d');if(timBase)g.putImageData(timBase,0,0);const x=70+(cv.width-86)*ST.phi/360;g.strokeStyle=css('--accent');g.lineWidth=2;seg(g,[x,14],[x,cv.height-30]);}
+function draw(){$('ang').value=ST.phi;$('angOut').textContent=ST.phi.toFixed(1)+'°';sideDraw();trajDraw();timCursor();
+  const M=model(),f=ST.phi,inF=f>M.ain&&f<M.aout,gr=M.Y(f)>=0;
+  $('phase').textContent=(inF?'Needle in the fabric; ':'Needle out of the fabric; ')+(gr?'dog above the plate, '+(ST.mode==='drop'&&inF?'fabric is being pushed while on the needle!':'carrying the fabric.'):'dog returning below the plate, fabric stationary.');}
+// ---------- chart reading ----------
+$('rdChk').onclick=()=>{const a=+$('rd1').value,b=+$('rd2').value,S0=model(Object.assign({},ST,STD,{mode:'drop',h:1.0}));
+  const okA=Math.abs(mod(a-S0.rise+180)-180)<=3,okB=Math.abs(mod(b-S0.drop+180)-180)<=3;
+  $('rdOut').textContent=(okA&&okB)?'Correct: rises at about '+S0.rise.toFixed(1)+'°, drops at about '+S0.drop.toFixed(1)+'°.':'Not yet: '+(okA?'':'rise angle ')+(okB?'':(okA?'':'and ')+'drop angle ')+'off by more than 3°. Hint: with dog height 1.0 mm and everything else standard, find where the yellow curve crosses the plate line.';
+  if(okA&&okB)seen.read=true;checkTasks();};
+// ---------- tasks ----------
+const seen={messed:false,read:false};
+const good=(M,tol)=>M.eps>=0.999&&M.drag<=0.05&&M.back<=0.05&&Math.abs(M.act-ST.s)<=tol&&!M.marks.length;
+const TASKS=[
+  {t:'Chart reading: set the dog height to 1.0 mm, read the main-shaft angles at which the feed dog rises above and drops below the plate (±3°), and compare with the standard 0.8 mm height.',d:'Enter them in the “Chart reading” box and press “Check”. Then look: when the dog drops, is the top of the needle eye still level with the plate?',ok:()=>seen.read},
+  {t:'Press “Scramble timing”, then set the machine right again: cotton, drop feed, stitch length 3 mm; fabric travel with needle in ≤ 0.05 mm, back-drag ≤ 0.05 mm, actual stitch within 0.1 mm of the dial, and needle-eye top within 1 mm of the plate when the dog drops (the manual\'s standard timing).',d:'First use “timing” to make the dog drop when the needle-eye top reaches the plate, then use “phase” to remove back-drag. Pressing “Reset to standard” does not count.',ok:()=>{const M=model();return seen.messed&&ST.fab==='cotton'&&ST.mode==='drop'&&Math.abs(ST.s-3)<0.05&&good(M,0.1)&&Math.abs(M.eyeAtDrop)<=1;}},
+  {t:'Denim, 4 plies (4 mm), drop feed, stitch length 3 mm: no slip, no marks, fabric travel with needle in ≤ 0.05 mm, back-drag ≤ 0.05 mm, actual stitch 3 ± 0.15 mm.',d:'On thick fabric the needle enters early, so advance the feed timing (manual: advancing prevents uneven feed); if the dog cannot grip, add pressure or raise the dog — a higher dog widens the grip interval, so the timing must be adjusted again.',ok:()=>{const M=model();return ST.fab==='denim'&&ST.mode==='drop'&&Math.abs(M.act-3)<=0.15&&M.eps>=0.999&&M.drag<=0.05&&M.back<=0.05&&!M.marks.length;}},
+  {t:'Slippery lining, 2 plies: upper-ply excess ≤ 3 mm over 40 cm, with no slip, no marks, actual stitch 3 ± 0.15 mm.',d:'Try drop feed first: too little pressure slips, too much exceeds the ply-shift limit and leaves marks. If drop feed cannot do it, change the feed type.',ok:()=>{const M=model();return ST.fab==='lining'&&M.ply<=3&&M.eps>=0.999&&!M.marks.length&&Math.abs(M.act-3)<=0.15&&M.back<=0.05&&M.drag<=0.05;}}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{try{if(k.ok())done.add(i);}catch(e){}});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+// ---------- loop ----------
+let last=performance.now();
+function loop(now){const dt=Math.min(0.1,(now-last)/1000);last=now;if(ST.play){ST.phi+=dt*60;if(ST.phi>=360){ST.phi-=360;cyc++;}draw();}requestAnimationFrame(loop);}
+changed();requestAnimationFrame(loop);
+if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{drawTim();draw();});
+window.__api={ST,STD,model,changed,FE,PHL0,EFF0,done,TASKS,seen,read:(a,b)=>{$('rd1').value=a;$('rd2').value=b;$('rdChk').click();},mess:()=>$('mess').click()};
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

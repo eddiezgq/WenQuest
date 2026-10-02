@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>电子花样机三维结构</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: full-bleed 3D stage on the left with label overlay; a control rail on the right; stacks on phones */
+:root{
+  --bg:#eceff2; --panel:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d3d9df; --accent:#0f6e74;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--panel:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--panel:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:radial-gradient(120% 90% at 40% 30%,#ffffff 0%,#e4e8ec 70%,#d5dbe0 100%);border:1px solid var(--rule);border-radius:8px;overflow:hidden;aspect-ratio:16/10;min-width:0;touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+.stage svg.lab{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.lab text{font-family:var(--f-body);paint-order:stroke;stroke:#ffffffd0;stroke-width:4px;stroke-linejoin:round}
+.hint{position:absolute;left:12px;bottom:10px;font-size:.78rem;color:#5d6b7a;background:#ffffffb0;padding:2px 8px;border-radius:4px}
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px}
+.card h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--rule);border-radius:0;background:transparent;padding:6px 0}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--accent);color:var(--panel);font-weight:600}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.row+.row{margin-top:8px}
+input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+label{font-size:.85rem;color:var(--muted)}
+select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px}
+.read{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.read div{border-top:1px solid var(--rule);padding-top:4px}
+.read b{display:block;font-family:var(--f-mono);font-size:1rem;font-variant-numeric:tabular-nums}
+.read small{color:var(--muted);font-size:.74rem}
+.phase{font-weight:700;color:var(--accent);font-size:1.05rem}
+.note{font-size:.78rem;color:var(--muted)}
+.parts{display:grid;grid-template-columns:14px 1fr;gap:2px 8px;font-size:.84rem}
+.parts i{width:12px;height:12px;border-radius:3px;margin-top:5px}
+.cap{margin:0}.cap .wrap{max-width:none;padding:0}.cap header,.cap .rail,.cap .hint{display:none}.cap .grid{display:block}
+.cap .stage{width:100vw;height:100vh;aspect-ratio:auto;border:0;border-radius:0;background:#fbfaf7}
+</style>
+<div class="wrap">
+<header><h1>电子花样机三维结构</h1><span class="sub">《缝纫机设计与制造》第 15 章 · 模型 15-1 · 模板式电子花样机（结构示意，尺寸取整）</span></header>
+<div class="grid">
+  <div class="stage" id="stage"><canvas id="cv"></canvas><svg class="lab" id="lab"></svg><div class="hint">拖动旋转 · 滚轮或双指缩放</div></div>
+  <div class="rail">
+    <section class="card">
+      <h3>显示</h3>
+      <div class="seg" id="mode"><button type="button" data-m="solid" class="on">外观</button><button type="button" data-m="xray">透视</button><button type="button" data-m="explode">爆炸</button></div>
+      <div class="row"><label for="ex">拆开程度</label><input id="ex" type="range" min="0" max="1" step="0.01" value="0"></div>
+      <div class="row"><label><input type="checkbox" id="labels" checked> 显示标注</label></div>
+      <div class="row"><span class="note">视角：</span><button type="button" data-v="iso">斜视</button><button type="button" data-v="front">正面</button><button type="button" data-v="top">俯视</button><button type="button" data-v="close">机针特写</button></div>
+    </section>
+    <section class="card">
+      <h3>缝制</h3>
+      <div class="row"><button id="play" type="button">播放</button><label for="spd">速度</label><select id="spd"><option value="60">很慢</option><option value="180" selected>慢</option><option value="600">中</option><option value="1800">快</option></select></div>
+      <div class="read" style="margin-top:8px">
+        <div><b id="r-a">0°</b><small>主轴转角 φ</small></div>
+        <div><b id="r-n">1 / —</b><small>当前针</small></div>
+        <div><b id="r-x">0.0</b><small>X 位置 mm</small></div>
+        <div><b id="r-y">0.0</b><small>Y 位置 mm</small></div>
+        <div style="grid-column:1 / -1"><span class="phase" id="r-p">—</span><small style="display:block">机针离布时 X–Y 才移动（离布窗口按第 15.3 节）</small></div>
+      </div>
+    </section>
+    <section class="card">
+      <h3>部件分组（爆炸图里分开）</h3>
+      <div class="parts">
+        <i style="background:#e9e6dd"></i><span>机头：机臂、立柱、主轴伺服电机</span>
+        <i style="background:#2f6fd6"></i><span>针杆、机针、中压脚</span>
+        <i style="background:#7fb3d5"></i><span>模板与压框（含气缸）</span>
+        <i style="background:#e0662f"></i><span>X 轴：滑座、同步带、伺服电机</span>
+        <i style="background:#2e9e5b"></i><span>Y 轴：横梁、直线导轨、伺服电机</span>
+        <i style="background:#8a949e"></i><span>底板与旋梭</span>
+      </div>
+      <p class="note">各厂结构有差别：有的用丝杠或直线电机，有的 Y 轴双电机驱动，此处取同步带单电机方案。</p>
+    </section>
+  </div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const T=THREE, D2R=Math.PI/180;
+if(location.hash==='#capture')document.body.classList.add('cap');
+const stage=document.getElementById('stage'), cv=document.getElementById('cv'), lab=document.getElementById('lab');
+const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+renderer.outputEncoding=T.sRGBEncoding; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
+const scene=new T.Scene(); const cam=new T.PerspectiveCamera(28,16/10,10,9000);
+{ const env=new T.Scene(); const g=new T.SphereGeometry(500,32,16), col=[]; const p=g.attributes.position;
+  for(let i=0;i<p.count;i++){const y=p.getY(i)/500;const c=y>0?0.75+0.25*y:0.45+0.3*(1+y);col.push(c,c,c*1.02);}
+  g.setAttribute('color',new T.Float32BufferAttribute(col,3)); env.add(new T.Mesh(g,new T.MeshBasicMaterial({vertexColors:true,side:T.BackSide})));
+  const pm=(w,h,x,y,z,i)=>{const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:new T.Color(i,i,i),side:T.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);env.add(m);};
+  pm(300,120,0,420,180,3.0); pm(160,300,-420,120,120,1.6); pm(160,300,420,160,-120,1.2);
+  scene.environment=new T.PMREMGenerator(renderer).fromScene(env,0.04).texture; }
+scene.add(new T.HemisphereLight(0xffffff,0x9aa3ad,0.45));
+const sun=new T.DirectionalLight(0xffffff,1.2); sun.position.set(-300,900,600); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-700,right:700,top:700,bottom:-700,near:100,far:2500}); sun.shadow.bias=-0.0004; scene.add(sun);
+// ---------- materials ----------
+const mats=[];
+const std=(c,o={})=>{const {grp,...rest}=o;const m=new T.MeshStandardMaterial(Object.assign({color:c,metalness:0.8,roughness:0.3},rest));m.userData={base:m.color.clone(),grp};mats.push(m);return m;};
+const housingMat=new T.MeshPhysicalMaterial({color:0xe9e6dd,metalness:0.05,roughness:0.42,clearcoat:0.6,clearcoatRoughness:0.25});
+const steel=std(0xc9d0d6), dark=std(0x2a3038,{metalness:0.6,roughness:0.45}), alu=std(0xb8c2cc,{metalness:0.7,roughness:0.35});
+const tableMat=new T.MeshStandardMaterial({color:0xcfc9ba,roughness:0.8});
+const tplMat=new T.MeshPhysicalMaterial({color:0x9fcbe3,metalness:0,roughness:0.15,transmission:0,transparent:true,opacity:0.55,depthWrite:false});
+const fabMat=new T.MeshStandardMaterial({color:0xe3cf9f,roughness:0.9});
+const beltMat=new T.MeshStandardMaterial({color:0x22262b,roughness:0.8});
+const seamMat=new T.MeshStandardMaterial({color:0x1d4c9e,roughness:0.6});
+const cyl=std(0xd6dbe0,{metalness:0.6,roughness:0.3});
+const GC={head:0xe9e6dd,needle:0x2f6fd6,tpl:0x7fb3d5,x:0xe0662f,y:0x2e9e5b,bed:0x8a949e};
+// ---------- helpers ----------
+const G=()=>new T.Group();
+function mesh(geo,mat,parent,pos,rot){const m=new T.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;if(pos)m.position.set(...pos);if(rot)m.rotation.set(...rot);parent.add(m);return m;}
+const box=(x,y,z)=>new T.BoxGeometry(x,y,z);
+const cylX=(r,l,s=32)=>{const g=new T.CylinderGeometry(r,r,l,s);g.rotateZ(Math.PI/2);return g;};
+const cylY=(r,l,s=32)=>new T.CylinderGeometry(r,r,l,s);
+const cylZ=(r,l,s=32)=>{const g=new T.CylinderGeometry(r,r,l,s);g.rotateX(Math.PI/2);return g;};
+function rbox(w,h,d,r){const s=new T.Shape();const x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
+  const b=Math.min(r,4);const g=new T.ExtrudeGeometry(s,{depth:d-2*b,bevelEnabled:true,bevelSize:b,bevelThickness:b,bevelSegments:3,curveSegments:8});g.translate(0,0,-(d-2*b)/2);return g;}
+const root=G(); scene.add(root); const asm={};
+function A(name,ex){const g=G();g.userData.ex=new T.Vector3(...ex);root.add(g);asm[name]=g;return g;}
+// ---------- pattern (pocket flap, template coordinates, mm) ----------
+const R0=15.5, LR=55, LAM=R0/LR; const xN=f=>{const p=f*D2R;return R0*(1-Math.cos(p))-LR*(1-Math.sqrt(1-LAM*LAM*Math.sin(p)**2));};
+const ENTER=101.7, LEAVE=258.3;
+function flap(){ const segs=[[[-30,20],[-30,-10]],'a1',[[-20,-20],[20,-20]],'a2',[[30,-10],[30,20]]]; const pts=[];
+  const line=(a,b)=>{const L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.ceil(L/3);for(let k=pts.length?1:0;k<=n;k++)pts.push([a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n]);};
+  const arc=(cx,cy,a0,a1)=>{const n=6;for(let k=1;k<=n;k++){const a=(a0+(a1-a0)*k/n)*D2R;pts.push([cx+10*Math.cos(a),cy+10*Math.sin(a)]);}};
+  line([-30,20],[-30,-10]); arc(-20,-10,180,270); line([-20,-20],[20,-20]); arc(20,-10,270,360); line([30,-10],[30,20]); return pts; }
+const PTS=flap();
+// ---------- table ----------
+const tableG=A('table',[0,0,0]);
+mesh(box(1000,30,760),tableMat,tableG,[120,-80,40]);
+mesh(box(260,200,200),dark,tableG,[420,-195,120]);
+// ---------- bed + hook (under the needle) ----------
+const bed=A('bed',[0,-160,-40]);
+const bedM=mesh(rbox(560,46,170,8),housingMat,bed,[200,-42,-10]);
+mesh(box(60,3,60),steel,bed,[0,-18,0]);
+const hookG=G();bed.add(hookG);hookG.position.set(0,-40,0);
+const hookDisc=mesh(new T.CylinderGeometry(26,26,10,48),std(0xc9d0d6,{grp:'bed'}),hookG,[0,0,0],[Math.PI/2,0,0]);
+mesh(cylZ(10,30),dark,hookG,[0,0,-20]);
+// ---------- Y axis: rails, beam, motors ----------
+const yA=A('y',[0,-40,330]);
+const RAILX=[-340,340];
+RAILX.forEach(x=>{mesh(box(24,16,560),std(0x8a949e,{grp:'y'}),yA,[x,-57,60]);});
+const beamG=G(); yA.add(beamG);
+const beam=mesh(box(720,26,46),std(0xb8c2cc,{grp:'y'}),beamG,[0,-36,0]);
+RAILX.forEach(x=>{mesh(box(46,20,60),std(0x5d6670,{grp:'y'}),beamG,[x,-53,0]);});
+const yMotor=mesh(rbox(70,70,90,6),dark,yA,[390,-20,380]);
+mesh(cylX(14,40),std(0x9aa4ad,{grp:'y'}),yA,[340,-30,380]);
+const yBelt=mesh(box(8,4,560),beltMat,yA,[312,-44,60]);
+// ---------- X axis: slide on the beam, belt, motor ----------
+const xA=A('x',[0,20,170]);
+const xMotor=mesh(rbox(70,70,80,6),dark,xA,[-400,-30,0]);
+mesh(cylX(14,40),std(0x9aa4ad,{grp:'x'}),xA,[-350,-30,0]);
+const xBelt=mesh(box(700,4,10),beltMat,xA,[0,-20,28]);
+const xSlideG=G(); xA.add(xSlideG);
+mesh(box(110,30,70),std(0xe0662f,{grp:'x',metalness:0.4,roughness:0.4}),xSlideG,[0,-12,0]);
+// ---------- template + clamp frame (moves with X slide) ----------
+const tA=A('tpl',[0,70,0]);
+const frameG=G(); tA.add(frameG);
+const FW=300, FD=230;
+const frameMat=std(0x5d6670,{grp:'tpl'});
+[[0,FD/2],[0,-FD/2]].forEach(([x,z])=>mesh(box(FW,10,16),frameMat,frameG,[x,6,z]));
+[[FW/2,0],[-FW/2,0]].forEach(([x,z])=>mesh(box(16,10,FD),frameMat,frameG,[x,6,z]));
+mesh(box(40,10,170),frameMat,frameG,[0,6,FD/2+85]);            // arm to the X slide (in front)
+const tplLow=mesh(box(FW-30,2,FD-30),tplMat,frameG,[0,-1,0]); tplLow.castShadow=false;
+const fab=mesh(box(FW-60,0.8,FD-60),fabMat,frameG,[0,0.6,0]);
+const tplUp=mesh(box(FW-30,2,FD-30),tplMat,frameG,[0,2.2,0]); tplUp.castShadow=false;
+// slot drawn as a dark tube on the top plate, seam drawn as it is sewn
+const slotPts=PTS.map(p=>new T.Vector3(p[0],3.5,-p[1]));
+mesh(new T.TubeGeometry(new T.CatmullRomCurve3(slotPts),200,3.2,8,false),std(0x1d4c9e,{grp:'tpl',metalness:0,roughness:0.6,transparent:true,opacity:0.35}),frameG);
+const seamGeo=new T.BufferGeometry(); const seamLine=new T.Line(seamGeo,new T.LineBasicMaterial({color:0x1d4c9e})); frameG.add(seamLine);
+// pneumatic cylinders on the frame
+[[-110,-FD/2-14],[110,-FD/2-14]].forEach(([x,z])=>{ mesh(cylY(12,60),cyl,frameG,[x,40,z]); mesh(cylY(4,30),steel,frameG,[x,82,z]); });
+// ---------- head ----------
+const head=A('head',[0,300,-80]);
+mesh(rbox(110,330,120,14),housingMat,head,[470,120,-10]);                // pillar
+mesh(rbox(560,90,110,18),housingMat,head,[220,240,-10]);                 // arm
+mesh(rbox(120,170,120,14),housingMat,head,[-10,160,-10]);                // head front
+const mainMotor=mesh(cylX(48,110),dark,head,[580,240,-10]);
+mesh(cylX(50,8),std(0x9aa4ad),head,[530,240,-10]);
+const panelM=mesh(rbox(120,80,12,4),dark,head,[240,250,52]);
+mesh(box(100,56,2),new T.MeshStandardMaterial({color:0x3d8bd0,emissive:0x1b4f7a,roughness:0.3}),head,[240,252,59]);
+// ---------- needle bar + middle presser (move with shaft angle) ----------
+const nA=A('needle',[0,170,0]);
+const nbar=mesh(cylY(6,170),std(0x2f6fd6,{grp:'needle',metalness:0.7}),nA,[0,0,0]);
+const needle=mesh(new T.CylinderGeometry(0.9,0.6,38,12),steel,nA,[0,0,0]);
+const mpBar=mesh(cylY(4,120),std(0x2f6fd6,{grp:'needle',metalness:0.7}),nA,[0,0,0]);
+const mpFoot=mesh(new T.TorusGeometry(6,2,10,28),std(0x2f6fd6,{grp:'needle',metalness:0.7}),nA,[0,0,0],[Math.PI/2,0,0]);
+// ---------- labels ----------
+const wp=(g,x,y,z)=>g.localToWorld(new T.Vector3(x,y,z));
+const LABELS=[
+ ['机头','刺布、挑线、钩线同平缝机',()=>wp(head,-10,230,40),['solid','explode'],[-150,-60]],
+ ['主轴伺服电机','直驱上轴',()=>wp(head,620,260,-10),['solid','xray','explode'],[60,-70],[60,60]],
+ ['操作面板','',()=>wp(head,240,280,58),['solid'],[40,-90]],
+ ['针杆与机针','',()=>wp(nA,0,40,0),['solid','xray','explode'],[-170,-30],[160,-60]],
+ ['中压脚','随针跳动，压住布面',()=>mpFoot.getWorldPosition(new T.Vector3()),['solid','xray','explode'],[-170,40],[-250,-20]],
+ ['模板（上下两片）','槽即缝纫路径',()=>wp(frameG,100,3,-60),['solid','xray','explode'],[200,-150]],
+ ['压框','',()=>wp(frameG,-FW/2,8,-40),['solid','xray','explode'],[-140,-20],[-150,50]],
+ ['气缸','压紧模板',()=>wp(frameG,-110,50,-FD/2-14),['solid','xray','explode'],[-150,-60],[-170,-110]],
+ ['X 滑座','带着压框左右移动',()=>wp(xSlideG,0,4,0),['solid','xray','explode'],[-140,90]],
+ ['X 轴伺服电机','',()=>xMotor.getWorldPosition(new T.Vector3()),['solid','xray','explode'],[-110,-60]],
+ ['同步带','',()=>wp(xA,200,-20,28),['xray','explode'],[60,70],[40,90]],
+ ['Y 横梁','带着 X 轴前后移动',()=>wp(beamG,240,-24,0),['solid','xray','explode'],[60,100]],
+ ['直线导轨','',()=>wp(yA,340,-50,120),['solid','xray','explode'],[110,40]],
+ ['Y 轴伺服电机','',()=>yMotor.getWorldPosition(new T.Vector3()),['solid','xray','explode'],[110,40],[-20,150]],
+ ['旋梭','在针板下方',()=>hookDisc.getWorldPosition(new T.Vector3()),['xray','explode'],[-140,80]],
+ ['底板','内装旋梭',()=>wp(bed,380,-20,70),['solid','explode'],[120,-20]],
+ ['控制箱','台板下',()=>wp(tableG,420,-200,20),['solid'],[170,150]],
+];
+let mode='solid', exT=0, playing=false, speed=180, phi=0, sIdx=0;
+function drawLabels(){
+  lab.innerHTML=''; if(!document.getElementById('labels').checked) return;
+  const W=stage.clientWidth,H=stage.clientHeight; const k=document.body.classList.contains('cap')?W/1100:Math.min(1,W/900); let out='';
+  for(const [t,s,get,modes,off0,offE] of LABELS){ if(!modes.includes(mode)) continue; const off=mode==='explode'&&offE?offE:off0; const p=get().project(cam); if(p.z>1) continue;
+    const x=(p.x+1)/2*W, y=(1-p.y)/2*H, lx=x+off[0]*k, ly=y+off[1]*k; const anchor=off[0]<-20?'end':off[0]>20?'start':'middle'; const fs=Math.max(11,15*k);
+    out+=`<circle cx="${x}" cy="${y}" r="3" fill="#1d2a36"/><path d="M${x} ${y}L${lx} ${ly}" stroke="#1d2a36" stroke-width="1" fill="none"/>`;
+    const tx=lx+(anchor==='start'?4:anchor==='end'?-4:0), ty=ly+(off[1]<0?-6:fs+2);
+    out+=`<text x="${tx}" y="${ty}" font-size="${fs}" font-weight="700" fill="#1d2a36" text-anchor="${anchor}">${t}</text>`;
+    if(s) out+=`<text x="${tx}" y="${ty+(off[1]<0?-fs-2:fs+2)}" font-size="${fs*0.8}" fill="#4d5b6a" text-anchor="${anchor}">${s}</text>`; }
+  lab.innerHTML=out;
+}
+// ---------- motion ----------
+const smooth=t=>t<=0?0:t>=1?1:t-Math.sin(2*Math.PI*t)/(2*Math.PI);
+function pose(){
+  const f=((phi%360)+360)%360; const cycle=Math.floor(phi/360);
+  // stitch index advances once per revolution; move happens in the window LEAVE..360+ENTER
+  const n=PTS.length; const base=((cycle%(n+6))+(n+6))%(n+6);
+  let i0=Math.min(base,n-1), i1=Math.min(base+1,n-1);
+  let tau=0; if(f>=LEAVE) tau=(f-LEAVE)/(360+ENTER-LEAVE); else if(f<=ENTER){ i0=Math.min(Math.max(base-1,0),n-1); i1=Math.min(base,n-1); tau=(f+360-LEAVE)/(360+ENTER-LEAVE); } else { i0=i1=Math.min(base,n-1); tau=1; }
+  if(base>=n){ i0=i1=n-1; }
+  const s=smooth(tau); const px=PTS[i0][0]+(PTS[i1][0]-PTS[i0][0])*s, py=PTS[i0][1]+(PTS[i1][1]-PTS[i0][1])*s;
+  sIdx=Math.min(i1,n-1);
+  // the needle stays at x=0,z=0; the template point (px,py) must come under it
+  const X=-px, Z=py;
+  beamG.position.z=260+Z;
+  xA.children.forEach(c=>{ c.position.z=c.userData.z0+260+Z; });
+  xSlideG.position.x=X;
+  frameG.position.set(X,0,Z);
+  // needle bar
+  const x=xN(f); const tipY=18-x;            // needle tip above the template top (mm)
+  needle.position.set(0,tipY+19,0); nbar.position.set(0,tipY+38+85,0);
+  const mpY=Math.max(4.5, tipY+6); mpBar.position.set(8,mpY+62,0); mpFoot.position.set(0,mpY,0);
+  hookDisc.rotation.z=-2*f*D2R;
+  // seam so far
+  const done=PTS.slice(0,Math.min(base+1,n)).map(p=>new T.Vector3(p[0],3.6,-p[1])); seamGeo.setFromPoints(done.length>1?done:[new T.Vector3(),new T.Vector3()]);
+  document.getElementById('r-a').textContent=Math.round(f)+'°';
+  document.getElementById('r-n').textContent=`${Math.min(base+1,n)} / ${n}`;
+  document.getElementById('r-x').textContent=px.toFixed(1); document.getElementById('r-y').textContent=py.toFixed(1);
+  document.getElementById('r-p').textContent=f>ENTER&&f<LEAVE?'机针在布中：模板静止':'机针离布：X–Y 移动';
+}
+xA.children.forEach(c=>c.userData.z0=c.position.z);
+// ---------- modes ----------
+function applyMode(){
+  const xr=mode==='xray';
+  housingMat.transparent=xr; housingMat.opacity=xr?0.15:1; housingMat.depthWrite=!xr; housingMat.needsUpdate=true;
+  mats.forEach(m=>{const g=m.userData.grp; if((xr||mode==='explode')&&g&&GC[g]!==undefined){m.color.set(GC[g]);} else m.color.copy(m.userData.base); m.needsUpdate=true;});
+  tableMat.transparent=xr; tableMat.opacity=xr?0.25:1; tableG.visible=mode!=='explode';
+  document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+}
+function applyExplode(){ Object.values(asm).forEach(g=>g.position.copy(g.userData.ex).multiplyScalar(exT)); }
+// ---------- camera ----------
+const target=new T.Vector3(60,40,-60); let th=-0.5, ph=0.55, dist=2200;
+const VIEWS={iso:[-0.5,0.55,2200,[60,40,-60]],front:[0,0.12,2000,[60,40,-40]],top:[0,1.35,2000,[60,0,-60]],close:[-0.7,0.25,520,[0,20,0]]};
+function placeCam(){cam.position.set(target.x+dist*Math.cos(ph)*Math.sin(th),target.y+dist*Math.sin(ph),target.z+dist*Math.cos(ph)*Math.cos(th));cam.lookAt(target);}
+let drag=null;
+stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,th,ph};stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{if(!drag)return;th=drag.th-(e.clientX-drag.x)*0.006;ph=Math.max(-0.2,Math.min(1.45,drag.ph+(e.clientY-drag.y)*0.005));});
+stage.addEventListener('pointerup',()=>drag=null);
+stage.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(300,Math.min(4000,dist*(1+e.deltaY*0.001)));},{passive:false});
+let pinch=null;
+stage.addEventListener('touchstart',e=>{if(e.touches.length===2)pinch={d:Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY),dist};},{passive:true});
+stage.addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dist=Math.max(300,Math.min(4000,pinch.dist*pinch.d/d));}},{passive:true});
+stage.addEventListener('touchend',()=>pinch=null);
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage); resize();
+let last=performance.now(), dirty=true;
+function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;if(playing)phi+=speed*dt;if(!window.__still||dirty){pose();placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}requestAnimationFrame(frame);}
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;if(mode==='explode'&&exT<0.5){exT=1;document.getElementById('ex').value=1;}if(mode!=='explode'){exT=0;document.getElementById('ex').value=0;}applyMode();applyExplode();});
+document.getElementById('ex').oninput=e=>{exT=+e.target.value;if(exT>0&&mode==='solid')mode='explode';applyMode();applyExplode();};
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const v=VIEWS[b.dataset.v];[th,ph,dist]=v;target.set(...v[3]);});
+document.getElementById('play').onclick=e=>{playing=!playing;e.target.textContent=playing?'暂停':'播放';};
+document.getElementById('spd').onchange=e=>speed=+e.target.value;
+window.__set=(o)=>{if('mode' in o)mode=o.mode;if('ex' in o)exT=o.ex;if('view' in o){const v=VIEWS[o.view];[th,ph,dist]=v;target.set(...v[3]);}if('cam' in o){[th,ph,dist]=o.cam;}if('target' in o)target.set(...o.target);if('phi' in o)phi=o.phi;if('labels' in o)document.getElementById('labels').checked=o.labels;applyMode();applyExplode();dirty=true;};
+applyMode(); applyExplode(); requestAnimationFrame(frame);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

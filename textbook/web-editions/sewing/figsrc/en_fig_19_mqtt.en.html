@@ -1,0 +1,83 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>.fig{background:#faf9f5}.pimg{display:block;width:100%}.card{border:1.5px solid #d8dde1;border-radius:12px;background:#fff}.note{color:#1b2430;font-size:13px;margin-top:10px}.note.m{color:#5a6570}svg text{font-family:QFix,"Noto Sans CJK SC",sans-serif;white-space:pre}</style>
+<div class="fig" style="--w:1180px">
+<p class="title">MQTT: devices publish, applications subscribe; topics named by factory hierarchy</p><p class="sub">Illustrative; topic format follows the WenQuest Digital Factory unified data bus (wq/factory/area/cell/category)</p>
+<svg viewBox="40 135 1920 765" width="1120" style="display:block">
+<rect x="47" y="142" width="1011" height="751" rx="12" fill="#fff" stroke="#d8dde1" stroke-width="1.5"/>
+<rect x="1130" y="142" width="823" height="751" rx="12" fill="#fff" stroke="#d8dde1" stroke-width="1.5"/>
+<text x="70" y="179" text-anchor="start" font-size="19" font-weight="700" fill="#1b2430" >a    Publish and subscribe</text>
+<text x="1153" y="179" text-anchor="start" font-size="19" font-weight="700" fill="#1b2430" >b    Unified namespace (topic tree)</text>
+<rect x="82" y="236" width="236" height="93" rx="10" fill="#fff" stroke="#e0662f" stroke-width="2"/>
+<text x="200.0" y="269" text-anchor="middle" font-size="17" font-weight="700" fill="#c4531d">Sewing machine l03-05</text>
+<text x="200.0" y="296.0" text-anchor="middle" font-size="13.5" fill="#5a6570">publishes status, event, counter</text>
+<path d="M318,283 L441,505" fill="none" stroke="#e0662f" stroke-width="2"/>
+<rect x="82" y="377" width="236" height="93" rx="10" fill="#fff" stroke="#e0662f" stroke-width="2"/>
+<text x="200.0" y="410" text-anchor="middle" font-size="17" font-weight="700" fill="#c4531d">Sewing machine l03-06</text>
+<text x="200.0" y="437.0" text-anchor="middle" font-size="13.5" fill="#5a6570">publishes status, event, counter</text>
+<path d="M318,424 L441,505" fill="none" stroke="#e0662f" stroke-width="2"/>
+<rect x="82" y="518" width="236" height="93" rx="10" fill="#fff" stroke="#e0662f" stroke-width="2"/>
+<text x="200.0" y="551" text-anchor="middle" font-size="17" font-weight="700" fill="#c4531d">Sewing machine l03-07</text>
+<text x="200.0" y="578.0" text-anchor="middle" font-size="13.5" fill="#5a6570">publishes status, event, counter</text>
+<path d="M318,565 L441,505" fill="none" stroke="#e0662f" stroke-width="2"/>
+<rect x="82" y="659" width="236" height="93" rx="10" fill="#fff" stroke="#e0662f" stroke-width="2"/>
+<text x="200.0" y="692" text-anchor="middle" font-size="17" font-weight="700" fill="#c4531d">Sewing machine l03-08</text>
+<text x="200.0" y="719.0" text-anchor="middle" font-size="13.5" fill="#5a6570">publishes status, event, counter</text>
+<path d="M318,706 L441,505" fill="none" stroke="#e0662f" stroke-width="2"/>
+<path d="M441,505 l-10,-12 l3,12 l-3,12z" fill="#5a6570"/>
+<rect x="447" y="423" width="235" height="165" rx="10" fill="#e9f0fc" stroke="#2a6fdb" stroke-width="2"/>
+<text x="564.5" y="461" text-anchor="middle" font-size="19" font-weight="700" fill="#2a5fb8">MQTT broker</text>
+<text x="564.5" y="488.0" text-anchor="middle" font-size="13.5" fill="#5a6570">Forwards by topic</text>
+<text x="564.5" y="507.5" text-anchor="middle" font-size="13.5" fill="#5a6570">Retained messages:</text>
+<text x="564.5" y="527.0" text-anchor="middle" font-size="13.5" fill="#5a6570">only the latest is kept</text>
+<rect x="764" y="236" width="271" height="93" rx="10" fill="#fff" stroke="#8a5cc7" stroke-width="2"/>
+<text x="899.5" y="269" text-anchor="middle" font-size="17" font-weight="700" fill="#7444b4">Shop-floor dashboard</text>
+<text x="899.5" y="296.0" text-anchor="middle" font-size="13.5" fill="#5a6570">subscribes wq/shirt/sewing/+/status</text>
+<path d="M685,505 L762,283" fill="none" stroke="#8a5cc7" stroke-width="2"/>
+<path d="M762,283 L751.3,294.1 L763.6,298.4z" fill="#8a5cc7"/>
+<rect x="764" y="377" width="271" height="93" rx="10" fill="#fff" stroke="#8a5cc7" stroke-width="2"/>
+<text x="899.5" y="410" text-anchor="middle" font-size="17" font-weight="700" fill="#7444b4">Historian</text>
+<text x="899.5" y="437.0" text-anchor="middle" font-size="13.5" fill="#5a6570">subscribes wq/shirt/#</text>
+<path d="M685,505 L762,424" fill="none" stroke="#8a5cc7" stroke-width="2"/>
+<path d="M762,424 L747.6,429.7 L757.1,438.6z" fill="#8a5cc7"/>
+<rect x="764" y="518" width="271" height="93" rx="10" fill="#fff" stroke="#8a5cc7" stroke-width="2"/>
+<text x="899.5" y="551" text-anchor="middle" font-size="17" font-weight="700" fill="#7444b4">MES bridge</text>
+<text x="899.5" y="578.0" text-anchor="middle" font-size="13.5" fill="#5a6570">subscribes …/+/counter</text>
+<path d="M685,505 L762,565" fill="none" stroke="#8a5cc7" stroke-width="2"/>
+<path d="M762,565 L755.0,551.3 L747.0,561.5z" fill="#8a5cc7"/>
+<rect x="764" y="659" width="271" height="93" rx="10" fill="#fff" stroke="#8a5cc7" stroke-width="2"/>
+<text x="899.5" y="692" text-anchor="middle" font-size="17" font-weight="700" fill="#7444b4">Remote maintenance</text>
+<text x="899.5" y="719.0" text-anchor="middle" font-size="13.5" fill="#5a6570">subscribes …/+/event (faults)</text>
+<path d="M685,505 L762,706" fill="none" stroke="#8a5cc7" stroke-width="2"/>
+<path d="M762,706 L763.1,690.6 L750.9,695.3z" fill="#8a5cc7"/>
+<text x="70" y="811" text-anchor="start" font-size="14.5" font-weight="400" fill="#1b2430" >QoS 1: at least once; the receiver de-duplicates by the id in the message</text>
+<text x="70" y="837" text-anchor="start" font-size="14.5" font-weight="400" fill="#1b2430" >Retained message: a new dashboard gets the current state of every machine as soon as it connects</text>
+<text x="70" y="863" text-anchor="start" font-size="14.5" font-weight="400" fill="#1b2430" >Last will: if a device drops off, the broker publishes “offline” for it after the heartbeat times out</text>
+<text x="1177" y="236" font-size="17" fill="#1b2430"><tspan font-weight="700">wq</tspan><tspan font-weight="700" font-size="17"></tspan></text>
+<path d="M1194,259 V277 H1216" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1224" y="283" font-size="17" fill="#1b2430"><tspan font-weight="700">shirt</tspan><tspan font-weight="700" font-size="17"> (shirt factory)</tspan></text>
+<path d="M1241,306 V324 H1263" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1271" y="330" font-size="17" fill="#5a6570"><tspan font-weight="600">cutting</tspan><tspan font-weight="600" font-size="17"> (cutting room)</tspan></text>
+<path d="M1241,353 V371 H1263" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1271" y="377" font-size="17" fill="#2a6fdb"><tspan font-weight="600">sewing</tspan><tspan font-weight="600" font-size="17"> (sewing room)</tspan></text>
+<path d="M1288,400 V418 H1310" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1318" y="424" font-size="17" fill="#e0662f"><tspan font-weight="600">l03-07</tspan><tspan font-weight="600" font-size="17"> (line 3, workstation 7)</tspan></text>
+<path d="M1335,447 V465 H1357" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1365" y="471" font-size="17" fill="#e0662f"><tspan font-weight="400">status</tspan><tspan font-weight="400" font-size="15.5">    retained; run / idle / down / fault / offline</tspan></text>
+<path d="M1335,494 V512 H1357" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1365" y="518" font-size="17" fill="#e0662f"><tspan font-weight="400">event</tspan><tspan font-weight="400" font-size="15.5">    start, stop, thread break, alarm, operator change</tspan></text>
+<path d="M1335,541 V559 H1357" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1365" y="565" font-size="17" fill="#e0662f"><tspan font-weight="400">counter</tspan><tspan font-weight="400" font-size="15.5">    shift totals every minute: pieces, stitches, trims, run seconds</tspan></text>
+<path d="M1335,588 V606 H1357" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1365" y="612" font-size="17" fill="#c4372b"><tspan font-weight="400">cmd</tspan><tspan font-weight="400" font-size="15.5">    parameters, style change (only MES may write)</tspan></text>
+<path d="M1288,635 V653 H1310" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1318" y="659" font-size="17" fill="#5a6570"><tspan font-weight="600">l03-08 …</tspan><tspan font-weight="600" font-size="17"></tspan></text>
+<path d="M1288,682 V700 H1310" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1318" y="706" font-size="17" fill="#2e9e5b"><tspan font-weight="700">hanger</tspan><tspan font-weight="700" font-size="17"> (hanger system)</tspan></text>
+<path d="M1241,729 V747 H1263" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1271" y="753" font-size="17" fill="#5a6570"><tspan font-weight="600">finishing</tspan><tspan font-weight="600" font-size="17"> (finishing)</tspan></text>
+<path d="M1241,776 V794 H1263" fill="none" stroke="#9aa4ae" stroke-width="1.3"/>
+<text x="1271" y="800" font-size="17" fill="#5a6570"><tspan font-weight="600">office/erp</tspan><tspan font-weight="600" font-size="17"> (ERP documents)</tspan></text>
+<text x="1153" y="864" text-anchor="start" font-size="17" font-weight="700" fill="#2a6fdb" >Example: wq/shirt/sewing/l03-07/status</text>
+</svg>
+
+</div>

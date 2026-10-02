@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Chainstitch Looper and 401 Stitch</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = front-view animation + top view + timeline; right rail = checks, sliders, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --lt:#d9622b; --steel:#8b96a1; --fab:#e8d9b4; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--lt:#f08c58;--steel:#9aa6b2;--fab:#5c513a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--lt:#f08c58;--steel:#9aa6b2;--fab:#5c513a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.4em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.verdict{font-weight:700;margin-top:8px;font-size:.92rem}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style>
+<div class="wrap">
+<header><h1>Chainstitch Looper and 401 Stitch Formation</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 10 · Virtual lab 10-1 · Adjust looper timing, height, needle avoidance and looper retraction, and see whether the looper catches the needle loop and whether the needle enters the thread triangle</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>Front view (from the operator side; looper drawn light when behind the needle, dark when in front)</h3>
+      <canvas id="front" width="1100" height="560" aria-label="Front-view animation of needle, looper and threads"></canvas>
+      <div class="row">
+        <button id="play" type="button">Pause</button>
+        <label for="ang" class="note" style="margin:0">Main-shaft angle</label><input id="ang" type="range" min="0" max="359" step="1" value="200" style="flex:1;min-width:160px"><b id="angv" style="font-family:var(--f-mono)">200°</b>
+        <button type="button" data-go="fc">Loop-catch moment</button><button type="button" data-go="fd">Needle at looper height</button>
+      </div>
+    </section>
+    <div class="two">
+      <section class="panel">
+        <h3>Top view: looper point path (front–back scale ×4)</h3>
+        <canvas id="top" width="540" height="420" aria-label="Top view of looper point path"></canvas>
+      </section>
+      <section class="panel">
+        <h3>Timing: looper point left–right position and needle point height</h3>
+        <canvas id="tim" width="540" height="420" aria-label="Looper point position and needle point height versus main-shaft angle"></canvas>
+      </section>
+    </div>
+    <p class="note">Model: the needle bar moves as the Chapter 3 slider-crank (stroke 31 mm); the looper's left–right and front–back motions are both approximated as simple harmonic, so its point traces a flat ellipse. Looper stroke 30 mm, needle avoidance ±1 mm and the allowable rise at loop catching (borrowed from the Chapter 5 loop model) are illustrative values; retraction 3.2 mm, point 1.5 mm above the top of the eye and point-to-needle clearance 0–0.05 mm are taken from a manufacturer's manual. This is a teaching model, not design data for any particular model.</p>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>Criteria</h3>
+      <div class="checks" id="checks"></div>
+      <div class="verdict" id="verdict"></div>
+    </section>
+    <section class="panel">
+      <h3>Adjustment</h3>
+      <div class="prm">
+        <label for="dphi">Looper timing (+ = later, relative to needle bar)</label><input id="dphi" type="range" min="-15" max="15" step="0.5" value="0"><output id="dphiv">0°</output>
+        <label for="dz">Looper height (+ = higher, same as lowering the needle bar)</label><input id="dz" type="range" min="-2" max="2" step="0.05" value="0"><output id="dzv">0 mm</output>
+        <label for="e">Needle avoidance (front–back amplitude, one side)</label><input id="e" type="range" min="0" max="2" step="0.02" value="1"><output id="ev">1.00 mm</output>
+        <label for="gap">Point-to-needle clearance on the forward stroke</label><input id="gap" type="range" min="-0.1" max="0.4" step="0.01" value="0.03"><output id="gapv">0.03 mm</output>
+        <label for="rr">Retraction (point to needle centre, looper fully right)</label><input id="rr" type="range" min="1" max="7" step="0.05" value="3.2"><output id="rrv">3.20 mm</output>
+      </div>
+      <div class="row"><button id="reset" type="button">Reset to standard</button><button id="mess" type="button">Scramble</button></div>
+    </section>
+    <section class="panel">
+      <h3>Tasks</h3>
+      <div id="tasks"></div>
+      <div class="row" style="font-size:.84rem">Looper timing window: <input id="w1" type="number" step="0.5" aria-label="Earliest"> to <input id="w2" type="number" step="0.5" aria-label="Latest"> °<button id="wChk" type="button">Check</button></div>
+      <div class="row" style="font-size:.84rem">Minimum needle avoidance: <input id="emin" type="number" step="0.02" aria-label="Minimum needle avoidance"> mm<button id="eChk" type="button">Check</button></div>
+      <div class="msg" id="msg"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), D=Math.PI/180;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// ---------------- model (same as the book's model10.py) ----------------
+const R=15.5,L=55,lam=R/L,T=1.5,RN=0.45,S=30,H0=2.2;
+const X=f=>{const a=f*D;return R*(1-Math.cos(a))-L*(1-Math.sqrt(1-(lam*Math.sin(a))**2));};
+const HT=T+X(101.7), DEYE=X(114.18)-X(101.7)-T;
+const ztip=f=>HT-X(f), rise=f=>X(180)-X(f);
+const floop=h=>{h=Math.max(h,0);return (h/H0)**2*Math.exp(2*(1-h/H0));};
+const bis=(g,a,b)=>{let ga=g(a);for(let i=0;i<60;i++){const m=(a+b)/2,gm=g(m);if((gm>0)===(ga>0)){a=m;ga=gm;}else b=m;}return (a+b)/2;};
+const RW=[bis(h=>floop(h)-0.6,0.3,H0),bis(h=>floop(h)-0.6,H0,8)];
+const STD={dphi:0,dz:0,e:1.0,gap:0.03,rr:3.2};
+const PHR0=176;
+const dcOf=rr=>Math.acos(Math.max(-1,Math.min(1,1-2*rr/S)))/D;
+const ZB0=ztip(PHR0+dcOf(3.2))+DEYE+1.5;     // blade height of the standard machine
+const ST={...STD};
+function P(){const phR=PHR0+ST.dphi, dc=dcOf(ST.rr);return {phR,dc,y0:-(RN+ST.gap)+ST.e*Math.sin(dc*D),zb:ZB0+ST.dz};}
+function looper(f,p){const d=(f-p.phR)*D;return [ST.rr-S/2*(1-Math.cos(d)), p.y0-ST.e*Math.sin(d)];}
+const m360=f=>((f%360)+360)%360;
+function evaluate(){
+  const p=P(), fc=m360(p.phR+p.dc), fr=m360(p.phR-p.dc);
+  const h=rise(fc), eye=ztip(fc)+DEYE, ds=p.zb-eye, ytop=0.5+0.9*Math.max(h,0);
+  const yc=looper(fc,p)[1], gap=-yc-RN;
+  const fd=bis(f=>ztip(f)-p.zb,60,179.9), fu=bis(f=>ztip(f)-p.zb,180.1,300);
+  const [xd,yd]=looper(fd,p);
+  let wb=9,wf=9;
+  for(let f=0;f<360;f+=0.25){if(ztip(f)>p.zb)continue;const [x,y]=looper(f,p);if(x>0)continue;
+    if(f>=180&&f<=fu)wb=Math.min(wb,-y-RN);else wf=Math.min(wf,y-RN);}
+  const tri=Math.min(-xd-RN,yd-RN);
+  const C=[
+    {k:'catch',n:'Needle rise at loop catching',v:h,u:'mm',ok:h>=RW[0]&&h<=RW[1],s:`Range where the loop is big enough: ${RW[0].toFixed(1)}–${RW[1].toFixed(1)} mm (Chapter 5 loop model)`},
+    {k:'height',n:'Point above top of eye at loop catching',v:ds,u:'mm',ok:ds>=0.2&&ds<=ytop-0.3,s:`Should be from 0.2 mm up to below the loop top (now about ${(ytop-0.3).toFixed(1)} mm)`},
+    {k:'gap',n:'Point-to-needle clearance, forward stroke',v:gap,u:'mm',ok:gap>=0&&gap<=0.10,s:'0–0.1 mm: too large and the catch is unreliable; negative means a needle strike (manual 0–0.05 mm)'},
+    {k:'triangle',n:'Margin for the needle entering the triangle',v:tri,u:'mm',ok:(-xd-RN)>=0.3&&(yd-RN)>=0.2,s:'When the needle point reaches looper height, the looper point must be ≥ 0.3 mm left of and ≥ 0.2 mm in front of the needle (from the needle surface)'},
+    {k:'nohit',n:'Min. clearance with needle below looper height',v:Math.min(wb,wf),u:'mm',ok:wb>=-0.001&&wf>=0.05,s:'Behind the needle ≥ 0; in front ≥ 0.05 mm'}];
+  return {p,fc,fr,fd,fu,h,ds,gap,xd,yd,C,allOK:C.every(c=>c.ok)};
+}
+// ---------------- UI ----------------
+let R_=evaluate(), phi=200, playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt={dphi:v=>(v>0?'+':'')+v+'°',dz:v=>(v>0?'+':'')+(+v).toFixed(2)+' mm',e:v=>(+v).toFixed(2)+' mm',gap:v=>(+v).toFixed(2)+' mm',rr:v=>(+v).toFixed(2)+' mm'};
+for(const k of Object.keys(STD)){const el=$(k);el.oninput=()=>{ST[k]=+el.value;changed();};}
+function syncInputs(){for(const k of Object.keys(STD)){$(k).value=ST[k];$(k+'v').textContent=fmt[k](ST[k]);}}
+$('reset').onclick=()=>{Object.assign(ST,STD);seen.messed=false;changed();};
+$('mess').onclick=()=>{Object.assign(ST,{dphi:-9,dz:-1.3,e:0.6,gap:0.2,rr:4.6});seen.messed=true;changed();};
+$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pause':'Play';};
+$('ang').oninput=e=>{playing=false;$('play').textContent='Play';phi=+e.target.value;draw();};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{playing=false;$('play').textContent='Play';phi=b.dataset.go==='fc'?R_.fc:R_.fd;draw();});
+function changed(){R_=evaluate();syncInputs();
+  $('checks').innerHTML=R_.C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}<small>${c.s}</small></span><b class="${c.ok?'ok':'bad'}">${c.v.toFixed(2)} ${c.u}</b></div>`).join('');
+  const bad=R_.C.filter(c=>!c.ok).map(c=>c.k);
+  let v='Stitches form normally';
+  if(bad.includes('gap')&&R_.gap<0||bad.includes('nohit'))v='Needle strike: the looper hits the needle';
+  else if(bad.includes('catch')||bad.includes('height')||bad.includes('gap'))v='Skipped stitch: the looper fails to catch the needle loop';
+  else if(bad.includes('triangle'))v='Needle misses the thread triangle: the looper thread is not caught and the chain comes apart';
+  $('verdict').textContent=v;$('verdict').className='verdict '+(R_.allOK?'ok':'bad');
+  checkTasks();draw();}
+// ---------------- drawing ----------------
+function ctx(id){const c=$(id),g=c.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,c.width,c.height);return [c,g];}
+function drawFront(){
+  const [c,g]=ctx('front'), W=c.width, H=c.height;
+  const sx=27, sz=24, ox=W-210, oz=196;            // x: mm right ; z: mm up
+  const Px=x=>ox+x*sx, Pz=z=>oz-z*sz;
+  const p=R_.p, f=phi, [xl,yl]=looper(f,p), zt=ztip(f);
+  const ink=css('--ink'),mut=css('--muted'),nt=css('--nt'),lt=css('--lt'),steel=css('--steel');
+  g.font='14px '+css('--f-body');
+  // fabric & plate
+  g.fillStyle=css('--fab');g.fillRect(20,Pz(T),W-40,T*sz);
+  g.fillStyle=steel;g.globalAlpha=.55;g.fillRect(20,Pz(0),W-40,8);g.globalAlpha=1;
+  g.fillStyle=mut;g.fillText('Fabric',28,Pz(T)-6);g.fillText('Throat plate',28,Pz(0)+24);
+  // blade level guide
+  g.strokeStyle=lt;g.setLineDash([5,5]);g.globalAlpha=.5;g.beginPath();g.moveTo(20,Pz(p.zb));g.lineTo(W-20,Pz(p.zb));g.stroke();g.setLineDash([]);g.globalAlpha=1;
+  g.fillStyle=lt;g.fillText('Looper point height',28,Pz(p.zb)-6);
+  const behind=yl<0;
+  const drawLooper=()=>{g.globalAlpha=behind?.38:1;
+    const x0=Px(xl),z0=Pz(p.zb);g.fillStyle=steel;g.strokeStyle=ink;g.lineWidth=1.2;g.beginPath();g.moveTo(x0,z0);
+    g.quadraticCurveTo(x0+120,z0-12,x0+700,z0-14);g.lineTo(x0+700,z0+16);g.quadraticCurveTo(x0+140,z0+10,x0,z0);g.fill();g.stroke();
+    g.beginPath();g.arc(x0+1.6*sx,z0-2,3.5,0,7);g.fillStyle=css('--sheet');g.fill();g.stroke();g.globalAlpha=1;};
+  const drawNeedle=()=>{const xt=Px(0),zT=Pz(zt);g.fillStyle=steel;g.strokeStyle=ink;g.lineWidth=1;
+    g.beginPath();g.moveTo(xt-7,0);g.lineTo(xt-7,zT-22);g.lineTo(xt,zT);g.lineTo(xt+7,zT-22);g.lineTo(xt+7,0);g.closePath();g.fill();g.stroke();
+    const ez=Pz(zt+DEYE);g.fillStyle=css('--sheet');g.fillRect(xt-2.5,ez,5,12);g.strokeRect(xt-2.5,ez,5,12);};
+  // looper thread: from looper eye to previous stitch (under the plate at x≈0)
+  const eyeX=Px(xl+1.6), eyeZ=Pz(p.zb)-2;
+  // cycle state
+  const inCatch=m360(f-R_.fc)<m360(R_.fr-R_.fc);     // between catch and return crossing
+  const caught=R_.C[0].ok&&R_.C[1].ok&&R_.C[2].ok;
+  if(behind)drawLooper();
+  g.lineCap='round';
+  const onNeedle=R_.allOK&&m360(f-R_.fd)<m360(R_.fc-R_.fd)&&zt<p.zb;
+  g.strokeStyle=lt;g.lineWidth=3.2;g.beginPath();g.moveTo(eyeX,eyeZ);
+  if(onNeedle){g.lineTo(Px(0)-10,Pz(p.zb)+2);g.lineTo(Px(-0.6),Pz(-0.4));}else g.quadraticCurveTo((eyeX+Px(0))/2,Pz(-1.5),Px(-0.6),Pz(-0.4));g.stroke();
+  // needle thread
+  g.strokeStyle=nt;g.lineWidth=3.2;g.beginPath();g.moveTo(Px(0)+9,0);g.lineTo(Px(0)+9,Pz(zt+DEYE)+6);g.stroke();
+  if(zt+DEYE<T){
+    g.beginPath();g.moveTo(Px(0)-9,Pz(0));g.lineTo(Px(0)-9,Pz(zt+DEYE)+6);g.stroke();
+    // loop on the rising stroke (before catch)
+    if(f>180&&m360(f-180)<m360(R_.fc-180)+1){const h=rise(f), w=floop(h)*1.3*sx;
+      g.beginPath();g.moveTo(Px(0)-3,Pz(zt+DEYE+0.3));g.bezierCurveTo(Px(0)-3-w,Pz(zt+DEYE+0.8),Px(0)-3-w,Pz(zt+DEYE+0.5+0.9*h),Px(0)-3,Pz(zt+DEYE+0.4+0.9*h));g.stroke();}
+  }
+  if(inCatch&&caught){   // needle loop carried on the blade
+    g.strokeStyle=nt;g.lineWidth=3.2;g.beginPath();g.moveTo(Px(-0.2),Pz(0));g.lineTo(Px(xl+0.8),Pz(p.zb)+4);g.lineTo(Px(xl+3.5),Pz(p.zb)+6);g.lineTo(Px(0.2),Pz(0));g.stroke();
+  }
+  // triangle highlight near fd
+  if(Math.abs(f-R_.fd)<10){g.fillStyle=R_.C[3].ok?css('--warn'):css('--bad');g.globalAlpha=.16;g.beginPath();g.moveTo(Px(xl),Pz(p.zb));g.lineTo(eyeX,eyeZ);g.lineTo(Px(-0.6),Pz(-0.4));g.closePath();g.fill();g.globalAlpha=1;}
+  drawNeedle();
+  if(!behind)drawLooper();
+  // labels
+  g.fillStyle=ink;g.font='600 15px '+css('--f-body');
+  const lab=[[R_.fc,'Loop catching'],[R_.fd,'Needle at looper height'],[R_.fr,'Point back at needle thread']];
+  let txt=`φ = ${Math.round(f)}°   point x = ${xl.toFixed(1)} mm, ${yl<0?'behind needle':'in front of needle'} ${Math.abs(yl).toFixed(2)} mm`;
+  g.fillText(txt,20,24);
+  for(const [a,t] of lab)if(Math.abs(m360(f-a+180)-180)<4){g.fillStyle=css('--accent');g.fillText('▶ '+t,20,48);}
+  // failure flags
+  const bad=R_.C.filter(c=>!c.ok).map(c=>c.k);
+  g.font='700 16px '+css('--f-body');
+  if((bad.includes('catch')||bad.includes('height')||bad.includes('gap'))&&Math.abs(m360(f-R_.fc+180)-180)<12){g.fillStyle=css('--bad');g.fillText('✗ Loop not caught (skipped stitch)',Px(-12),Pz(p.zb)+50);}
+  if(bad.includes('triangle')&&Math.abs(m360(f-R_.fd+180)-180)<12){g.fillStyle=css('--bad');g.fillText('✗ Needle missed the triangle',Px(-12),Pz(p.zb)+50);}
+  if(bad.includes('nohit')||R_.gap<0){g.fillStyle=css('--bad');g.fillText('✗ Needle strike at some angles',Px(-12),Pz(p.zb)+74);}
+  g.font='13px '+css('--f-body');g.fillStyle=mut;g.fillText('← Left (looper forward stroke)',20,H-14);
+}
+function drawTop(){
+  const [c,g]=ctx('top'),W=c.width,H=c.height,p=R_.p;
+  const sx=15,sy=60,ox=W-80,oy=H/2;
+  const ink=css('--ink'),mut=css('--muted'),lt=css('--lt');
+  g.strokeStyle=css('--rule');g.setLineDash([4,4]);g.beginPath();g.moveTo(10,oy);g.lineTo(W-10,oy);g.stroke();g.setLineDash([]);
+  g.strokeStyle=lt;g.lineWidth=2.4;g.beginPath();
+  for(let f=0;f<=360;f+=2){const [x,y]=looper(f,p);const X_=ox+x*sx,Y_=oy-y*sy;f?g.lineTo(X_,Y_):g.moveTo(X_,Y_);}g.stroke();
+  g.fillStyle=css('--steel');g.strokeStyle=ink;g.lineWidth=1;g.beginPath();g.ellipse(ox,oy,RN*sx,RN*sy,0,0,7);g.fill();g.stroke();
+  g.font='13px '+css('--f-body');
+  const mk=(f,t,dy)=>{const [x,y]=looper(f,p);const X_=ox+x*sx,Y_=oy-y*sy;g.fillStyle=lt;g.beginPath();g.arc(X_,Y_,4.5,0,7);g.fill();g.fillStyle=ink;g.textAlign='end';g.fillText(t,X_-8,Y_+dy);g.textAlign='start';};
+  mk(R_.fc,`catch ${R_.fc.toFixed(0)}°`,22);mk(R_.fd,`needle at looper ${R_.fd.toFixed(0)}°`,-12);
+  const [x,y]=looper(phi,p);g.fillStyle=css('--accent');g.beginPath();g.arc(ox+x*sx,oy-y*sy,7,0,7);g.fill();
+  g.fillStyle=mut;g.fillText('Front (operator) ↑',12,20);g.fillText('needle',ox+12,oy+5);
+}
+function drawTim(){
+  const [c,g]=ctx('tim'),W=c.width,H=c.height,p=R_.p;
+  const x0=56,x1=W-12, Xf=f=>x0+(x1-x0)*f/360;
+  const ya=[20,190],yb=[230,H-34];
+  const Ya=v=>ya[1]-(ya[1]-ya[0])*(v+28)/36, Yb=v=>yb[1]-(yb[1]-yb[0])*(v+14)/34;
+  const ink=css('--ink'),mut=css('--muted'),lt=css('--lt'),rule=css('--rule');
+  g.font='12px '+css('--f-body');g.fillStyle=mut;g.strokeStyle=rule;g.lineWidth=1;
+  for(let f=0;f<=360;f+=90){g.beginPath();g.moveTo(Xf(f),ya[0]);g.lineTo(Xf(f),yb[1]);g.stroke();g.textAlign='center';g.fillText(f+'°',Xf(f),H-14);}
+  g.textAlign='end';for(const v of [-25,-10,0,5]){g.fillText(v,x0-6,Ya(v)+4);}for(const v of [-12,0,12]){g.fillText(v,x0-6,Yb(v)+4);}g.textAlign='start';
+  g.strokeStyle=ink;g.beginPath();g.moveTo(x0,Ya(0));g.lineTo(x1,Ya(0));g.stroke();
+  g.strokeStyle=lt;g.lineWidth=2.2;g.beginPath();for(let f=0;f<=360;f+=2){const v=looper(f,p)[0];f?g.lineTo(Xf(f),Ya(v)):g.moveTo(Xf(f),Ya(v));}g.stroke();
+  g.strokeStyle=ink;g.beginPath();for(let f=0;f<=360;f+=2){const v=ztip(f);f?g.lineTo(Xf(f),Yb(v)):g.moveTo(Xf(f),Yb(v));}g.stroke();
+  g.strokeStyle=lt;g.setLineDash([5,4]);g.lineWidth=1.4;g.beginPath();g.moveTo(x0,Yb(p.zb));g.lineTo(x1,Yb(p.zb));g.stroke();g.setLineDash([]);
+  const okT=R_.C[3].ok;g.fillStyle=okT?css('--warn'):css('--bad');g.globalAlpha=.18;
+  const a=Math.min(R_.fd,R_.fr),b=Math.max(R_.fd,R_.fr);g.fillRect(Xf(a),ya[0],Xf(b)-Xf(a),yb[1]-ya[0]);g.globalAlpha=1;
+  for(const [f,col,t] of [[R_.fc,css('--nt'),'catch'],[R_.fd,css('--warn'),'needle'],[R_.fr,lt,'back']]){g.strokeStyle=col;g.setLineDash([3,3]);g.beginPath();g.moveTo(Xf(f),ya[0]);g.lineTo(Xf(f),yb[1]);g.stroke();g.setLineDash([]);}
+  g.fillStyle=mut;g.fillText('Looper point x (mm)',x0+4,ya[0]+12);g.fillText('Needle point height (mm); dashed: looper',x0+4,yb[0]+12);
+  g.strokeStyle=css('--accent');g.lineWidth=2;g.beginPath();g.moveTo(Xf(phi),ya[0]);g.lineTo(Xf(phi),yb[1]);g.stroke();
+}
+function draw(){drawFront();drawTop();drawTim();$('ang').value=Math.round(phi)%360;$('angv').textContent=Math.round(phi)%360+'°';}
+// ---------------- tasks ----------------
+const seen={messed:false,win:false,e:false,e0:false};
+function window_(){const save={...ST},ok=[];for(let d=-15;d<=15.001;d+=0.5){ST.dphi=d;if(evaluate().allOK)ok.push(d);}Object.assign(ST,save);return ok.length?[ok[0],ok[ok.length-1]]:null;}
+function emin_(){const save={...ST};let r=null;for(let e=0;e<=2.001;e+=0.02){ST.e=+e.toFixed(2);if(evaluate().allOK){r=ST.e;break;}}Object.assign(ST,save);return r;}
+const TASKS=[
+  {t:'Press “Scramble”, then bring the five settings back so that all five criteria are met.',d:'See which criterion turns red first, then adjust the matching setting; note that timing, height and retraction all change the needle rise at loop catching. Pressing “Reset to standard” does not count.',ok:()=>seen.messed&&R_.allOK},
+  {t:'With everything else at standard, move only the looper timing: find its usable window (±1°) and note which criterion fails first at each end.',d:'Enter it in the “Looper timing window” boxes below and press “Check”.',ok:()=>seen.win},
+  {t:'Set needle avoidance below 0.3 mm and watch what happens in the animation; then find (others at standard) the minimum needle avoidance required (±0.05 mm).',d:'First watch a cycle with avoidance below 0.3 mm, then enter the value in the “Minimum needle avoidance” box and press “Check”.',ok:()=>seen.e&&seen.e0}];
+const done=new Set();
+function checkTasks(){if(ST.e<0.3)seen.e0=true;TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+$('wChk').onclick=()=>{const save={...ST};Object.assign(ST,STD);const w=window_();Object.assign(ST,save);const a=+$('w1').value,b=+$('w2').value;
+  if(!w){$('msg').textContent='No usable window with the other settings as they are — press “Reset to standard” first.';return;}
+  if($('w1').value!==''&&$('w2').value!==''&&Math.abs(a-w[0])<=1&&Math.abs(b-w[1])<=1){seen.win=true;$('msg').textContent=`Correct: the window is about ${w[0]}° to +${w[1]}°. At the early end “needle entering the triangle” fails first; at the late end, “needle rise at loop catching”.`;}
+  else $('msg').textContent='Not yet: move only the looper timing, one step at a time, and watch when a criterion turns red.';checkTasks();};
+$('eChk').onclick=()=>{const save={...ST};Object.assign(ST,STD);const m=emin_();Object.assign(ST,save);const v=+$('emin').value;
+  if($('emin').value!==''&&Math.abs(v-m)<=0.05){seen.e=true;$('msg').textContent=`Correct: about ${m.toFixed(2)} mm. With too little avoidance the looper is still directly under the needle as it descends, so the needle cannot enter the thread triangle and may even strike the looper.`;}
+  else $('msg').textContent='Not yet: with the other settings at standard, reduce it from 1 mm and see at which step a criterion turns red.';checkTasks();};
+// ---------------- loop ----------------
+let last=performance.now();
+function loop(t){const dt=Math.min(.1,(t-last)/1000);last=t;if(playing){phi=(phi+40*dt)%360;draw();}requestAnimationFrame(loop);}
+window.__api={ST,STD,evaluate,changed,done,seen,window_,emin_,setPhi:v=>{phi=v;draw();},mess:()=>$('mess').click(),win:(a,b)=>{$('w1').value=a;$('w2').value=b;$('wChk').click();},em:v=>{$('emin').value=v;$('eChk').click();}};
+changed();requestAnimationFrame(loop);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

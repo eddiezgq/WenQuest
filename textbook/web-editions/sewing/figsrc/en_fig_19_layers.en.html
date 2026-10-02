@@ -1,0 +1,47 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.fig{background:#faf9f5}
+.layer{border:2px solid;border-radius:14px;background:#fff;display:grid;grid-template-columns:120px 1fr;padding:12px 18px 12px 14px;min-height:104px}
+.layer>h4{margin:2px 0 0 0;font-size:16px}
+.row{display:grid;gap:14px}
+.row .box{min-height:78px;padding:9px 10px}
+.row .box b{margin-bottom:3px}
+.arr{height:30px;position:relative}
+.arr svg{position:absolute;left:62px;top:0}
+.L-p{border-color:#8a5cc7}.L-p>h4{color:#7444b4}
+.L-b{border-color:#2a6fdb}.L-b>h4{color:#2a5fb8}
+.L-g{border-color:#2e9e5b}.L-g>h4{color:#1f8a4c}
+.L-o{border-color:#e0662f}.L-o>h4{color:#c4531d}
+</style>
+<div class="fig" style="--w:1180px">
+<p class="title">From sewing machine to dashboard: data in four layers</p>
+<p class="sub">Illustrative; data flows upwards, commands and parameters flow downwards</p>
+
+<div class="layer L-p"><h4>Application<br>layer</h4><div class="row" style="grid-template-columns:repeat(4,1fr)">
+<div class="box p"><b>Shop-floor dashboard</b><span>State, piece counts, stops</span></div>
+<div class="box p"><b>MES / piece-rate pay</b><span>Dispatching, production reporting, labour time</span></div>
+<div class="box p"><b>Remote maintenance</b><span>Fault codes, parameters, upgrades</span></div>
+<div class="box p"><b>Digital twin</b><span>Real-time mirror, simulation and prediction</span></div></div></div>
+<div class="arr"><svg width="80" height="30"><path d="M14 28V8" stroke="#5a6570" stroke-width="2.5"/><path d="M7 11l7-10 7 10z" fill="#5a6570"/><path d="M42 2v18" stroke="#5a6570" stroke-width="2.5"/><path d="M35 17l7 11 7-11z" fill="#5a6570"/><path d="M42 2v4" stroke="#c4372b" stroke-width="2.5"/></svg></div>
+
+<div class="layer L-b"><h4>Platform<br>layer</h4><div class="row" style="grid-template-columns:repeat(4,1fr)">
+<div class="box b"><b>MQTT broker</b><span>Forwards by topic<br>Retained messages, last will</span></div>
+<div class="box b"><b>Historian</b><span>Archives every message</span></div>
+<div class="box b"><b>Metrics</b><span>Piece counts, OEE, stop reasons</span></div>
+<div class="box b"><b>Interfaces / bridges</b><span>To ERP and the hanger system</span></div></div></div>
+<div class="arr"><svg width="80" height="30"><path d="M14 28V8" stroke="#5a6570" stroke-width="2.5"/><path d="M7 11l7-10 7 10z" fill="#5a6570"/><path d="M42 2v18" stroke="#5a6570" stroke-width="2.5"/><path d="M35 17l7 11 7-11z" fill="#5a6570"/><path d="M42 2v4" stroke="#c4372b" stroke-width="2.5"/></svg></div>
+
+<div class="layer L-g"><h4>Edge<br>layer</h4><div class="row" style="grid-template-columns:repeat(3,1fr)">
+<div class="box g"><b>Network module</b><span>Serial port → wireless / wired network</span></div>
+<div class="box g"><b>Gateway</b><span>Protocol conversion, aggregation<br>Buffering during network outages</span></div>
+<div class="box g"><b>Workstation terminal</b><span>Card swipe, choosing stop reasons</span></div></div></div>
+<div class="arr"><svg width="80" height="30"><path d="M14 28V8" stroke="#5a6570" stroke-width="2.5"/><path d="M7 11l7-10 7 10z" fill="#5a6570"/><path d="M42 2v18" stroke="#5a6570" stroke-width="2.5"/><path d="M35 17l7 11 7-11z" fill="#5a6570"/><path d="M42 2v4" stroke="#c4372b" stroke-width="2.5"/></svg></div>
+
+<div class="layer L-o"><h4>Device<br>layer</h4><div class="row" style="grid-template-columns:repeat(4,1fr)">
+<div class="box o"><b>Sewing-machine controller</b><span>Main-shaft start/stop, speed, stitches<br>Trims, thread breaks, fault codes</span></div>
+<div class="box o"><b>Card reader</b><span>Operator ID card</span></div>
+<div class="box o"><b>Hanger reader</b><span>Carrier ID (Chapter 12)</span></div>
+<div class="box o"><b>Work-ticket scanning</b><span>Order, operation, bundle number</span></div></div></div>
+
+<p class="note" style="color:#1b2430;margin-top:22px">Upward arrows: data (state, counts, events); downward arrows: commands (dispatching, parameters, firmware). Each layer deals only with its neighbours, so one layer can be replaced without affecting the others.</p>
+</div>
