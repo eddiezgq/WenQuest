@@ -338,10 +338,10 @@ def simulate_turn(parsed, stock, tools, target=None, h=0.02, tol=0.01):
     n = int(round((z1 - z0) / h))
     zc = z0 + (np.arange(n) + 0.5) * h
     r = np.full(n, stock["d"] / 2.0)
-    if stock.get("profile"):                     # 上一道工序留下的轮廓作毛坯（例如精车用粗车后的形状）
+    if stock.get("profile"):                     # 上一道工序留下的轮廓作毛坯（例如精车用粗车后的形状），z 超出轮廓右端是空的
         from cae.cam import d_at
-        r = np.array([d_at(stock["profile"], z) / 2 if z <= 0 else 0.0 for z in zc])
-        r = np.where(zc <= 0, r, 0.0)
+        zmax = max(z for z, _ in stock["profile"])
+        r = np.array([d_at(stock["profile"], z) / 2 if z <= zmax + 1e-9 else 0.0 for z in zc])
     issues, ap_max = [], 0.0
     for k, mv in enumerate(parsed["moves"]):
         tl = tools.get(mv["tool"], {"kind": "turn"})
@@ -370,9 +370,11 @@ def simulate_turn(parsed, stock, tools, target=None, h=0.02, tol=0.01):
                 issues.append({"line": mv["line"], "level": "error",
                                "text": "快移撞到工件：Z{:.2f} 处切进 {:.2f} mm（快移不能切削）".format(zc[i], removed[i])})
             else:
-                # 切深：纵向走刀（沿 Z）看半径方向切掉多厚；横向走刀（端面、切槽，沿 X）看轴向切掉多宽
+                # 切深：纵向走刀（沿 Z）看半径方向平均切掉多厚（车到轴肩时顺带切掉的轴肩余量不算成切深）；
+                #       横向走刀（端面、切槽，沿 X）看轴向切掉多宽
                 axial = abs(mv["b"][2] - mv["a"][2]) >= abs(mv["b"][0] - mv["a"][0]) / 2
-                ap = float(removed.max()) if axial else float((removed > 0.005).sum() * h)
+                hit = removed > 0.005
+                ap = float(removed[hit].mean()) if axial else float(hit.sum() * h)
                 ap_max = max(ap_max, ap)
                 mv["ap"] = ap
         r = new
@@ -452,8 +454,8 @@ def simulate_mill(parsed, stock, tools, target=None, h=None, tol=0.01):
     res = {"x": xs, "y": ys, "H": H, "inside": inside, "issues": issues, "ap_max": ap_max, "h": h}
     if target is not None:
         T = target(X, Y)
-        m = inside & np.isfinite(T)
-        dev = np.where(m, H - T, 0.0)
+        m = inside & ~np.isnan(T)
+        dev = np.where(m & np.isfinite(T), H - T, 0.0)
         res["dev_min"] = float(dev.min())
         res["dev_max"] = float(dev.max())
         res["over"] = int((dev < -tol).sum())

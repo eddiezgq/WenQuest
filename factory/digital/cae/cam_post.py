@@ -161,7 +161,7 @@ def post_mill(prog):
         if cyc is not None:
             lines.append("G80")
         lines += ["G00 Z{} M09".format(num(safe)), "M05"]
-    lines += ["G91 G28 Z0.", "G90", "M30", "%"]
+    lines += ["G91 G28 Z0.0", "G90", "M30", "%"]
     return "\n".join(lines) + "\n"
 
 

@@ -694,3 +694,99 @@ def geometry_step(sha: str):
     if not os.path.exists(p):
         raise HTTPException(404, "没有这个零件")
     return Response(open(p, "rb").read(), media_type="application/step")
+
+
+# ------------------------------------------------------------------ 数控编程（第 13 轮）
+CAM_LIMIT_S = 120
+
+
+def _cam_geo_child(step_path, outdir, q):
+    try:
+        from cae import cam_geom as CG
+        data = open(step_path, "rb").read()
+        out = {}
+        for k, fn in (("turn", CG.turn_profile), ("mill", CG.mill_features)):
+            try:
+                out[k] = fn(data)
+            except Exception as e:  # noqa: BLE001 —— 认不出来的写原因，另一种照样给
+                out[k] = {"error": str(e) or e.__class__.__name__}
+        _write_json(os.path.join(outdir, "cam.json"), out)
+        q.put((True, None))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+@app.post("/cam/recognize")
+def cam_recognize(body: dict = Body(...)):
+    """读入过的零件（/geometry）→ 车削轮廓、铣削特征"""
+    sha = str(body.get("sha", "")).replace("/", "")
+    d = _p("geo", sha)
+    if not os.path.exists(os.path.join(d, "part.step")):
+        raise HTTPException(400, "请先读入零件")
+    if not os.path.exists(os.path.join(d, "cam.json")):
+        ok, err = _isolated(_cam_geo_child, (os.path.join(d, "part.step"), d), GEO_LIMIT_S)
+        if not ok:
+            raise HTTPException(422, "识别不了这个零件：{}".format(err))
+    return dict(_read_json(os.path.join(d, "cam.json")), sha=sha)
+
+
+def _cam_child(spec, outdir, q):
+    try:
+        from cae import cam_job as J
+        progs = J.generate(spec)
+        for k, p in enumerate(progs):
+            with open(os.path.join(outdir, "{}.nc".format(k)), "w", encoding="utf-8") as f:
+                f.write(p.pop("gcode"))
+            H = p["sim"].pop("_H", None)
+            if H is not None:
+                open(os.path.join(outdir, "h{}.bin".format(k)), "wb").write(np.asarray(H, "<f4").tobytes())
+                p["sim"]["height"] = True
+        q.put((True, {"programs": progs, "compare": spec.get("compare")}))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+@app.post("/cam/jobs")
+def cam_submit(body: dict = Body(...)):
+    """编程单 → 生成程序、仿真、检查（不排队：一般 1–3 秒）"""
+    spec = body.get("spec") or {}
+    if spec.get("kind") not in ("turn", "slot", "mill25"):
+        raise HTTPException(400, "编程单不对")
+    if spec.get("machine") not in __import__("cae.cam_post", fromlist=["MACHINES"]).MACHINES:
+        raise HTTPException(400, "没有这台机床")
+    jid = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:6]
+    os.makedirs(_job_path(jid))
+    j = {"id": jid, "kind": "cam", "status": "running", "created": time.time(), "spec": spec,
+         "owner": body.get("owner"), "owner_name": body.get("owner_name"), "factory": body.get("factory"),
+         "title": body.get("title") or "", "item": spec.get("item")}
+    _write_json(_job_path(jid, "job.json"), j)
+    ok, res = _isolated(_cam_child, (spec, _job_path(jid)), CAM_LIMIT_S)
+    if ok:
+        j = _update(jid, status="done", finished=time.time(), programs=res["programs"], compare=res["compare"],
+                    stats={"seconds": round(time.time() - j["created"], 1),
+                           "errors": sum(c["level"] == "error" for p in res["programs"] for c in p["checks"])})
+    else:
+        j = _update(jid, status="failed", finished=time.time(), error=res)
+    return _public(j)
+
+
+@app.get("/cam/jobs/{jid}/{k}.nc")
+def cam_nc(jid: str, k: int):
+    p = _job_path(jid.replace("/", ""), "{}.nc".format(int(k)))
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个程序")
+    return Response(open(p, encoding="utf-8").read(), media_type="text/plain; charset=utf-8")
+
+
+@app.get("/cam/jobs/{jid}/h{k}.bin")
+def cam_height(jid: str, k: int):
+    p = _job_path(jid.replace("/", ""), "h{}.bin".format(int(k)))
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有高度图")
+    return FileResponse(p, media_type="application/octet-stream")
+
+
+@app.get("/cam/machines")
+def cam_machines():
+    from cae.cam_post import MACHINES
+    return {"machines": MACHINES}

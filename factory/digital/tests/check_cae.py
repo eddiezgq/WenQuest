@@ -72,3 +72,21 @@ peak = {d["joint"]: d["peak"] for d in j["stats"]["drives"]}
 assert 20 < peak["shoulder_lift_joint"] < 100, peak
 assert call("GET", "/api/mbd/jobs/{}/series.bin".format(j["id"]), token=tok, raw=True)[:4] == b"WQC1"
 print("动力学演练通过：肩部重力矩 {:.1f} N·m，用时 {} 秒".format(peak["shoulder_lift_joint"], j["stats"]["seconds"]))
+
+# 第 13 轮：数控编程——SH-301 粗车工序（工艺规程 20）→ 编程单 → 生成、仿真；示例平板铣削
+ops = call("GET", "/api/cam/ops?item=SH-301", token=tok)
+assert [o["seq"] for o in ops["ops"] if o["cam"]] == [20, 40, 50], ops
+spec = call("POST", "/api/cam/spec", {"item": "SH-301", "seq": 20}, token=tok)
+assert spec["mode"] == "rough" and spec["cut"]["ap"] == 2.5
+j = call("POST", "/api/cam/jobs", {"spec": spec, "title": "演练"}, token=tok)
+assert j["status"] == "done", j.get("error")
+for k, p in enumerate(j["programs"]):
+    assert not [c for c in p["checks"] if c["level"] == "error"], p["checks"]
+    assert abs(p["sim"]["dev_min"]) <= 0.01 and p["sim"]["dev_max"] <= 0.01
+    assert call("GET", "/api/cam/jobs/{}/{}.nc".format(j["id"], k), token=tok, raw=True).startswith(b"%\nO")
+ex = call("POST", "/api/cam/examples/WQ-PLATE", token=tok)
+spec = call("POST", "/api/cam/spec/geometry", {"sha": ex["sha"], "kind": "mill", "material": "6061", "name": "WQ-PLATE"}, token=tok)
+j = call("POST", "/api/cam/jobs", {"spec": spec, "title": "演练"}, token=tok)
+assert j["status"] == "done" and j["programs"][0]["sim"]["over"] == 0, j.get("error") or j["programs"][0]["checks"]
+assert len(call("GET", "/api/cam/jobs/{}/h0.bin".format(j["id"]), token=tok, raw=True)) == 4 * j["programs"][0]["sim"]["nx"] * j["programs"][0]["sim"]["ny"]
+print("数控编程演练通过：SH-301 粗车 {} 个程序，平板铣削 {:.1f} 分钟".format(len(j["programs"]), j["compare"]["program_minutes"]))

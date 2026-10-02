@@ -35,7 +35,7 @@ def test_shaft_profile_sides():
     assert tot == 167 and L == 115                        # 右边一次车到最大直径那段（含）
     assert pr[0] == (0.0, 27.0) and pr[1] == (-1.5, 30)  # 倒角
     pl, L2, _ = cam.shaft_profile(SEGS, 1.5, "left")
-    assert L2 == 52 and pl[-1] == (-52, 40)              # 调头：车到 Ø40 轴肩为止
+    assert L2 == 52 and pl[-2:] == [(-52, 35), (-52, 40)]      # 调头：车到 Ø40 轴肩为止
 
 
 def test_rough_turning_matches_operation_size():
@@ -239,3 +239,176 @@ def test_rpm_and_feed_formulas():
     assert cam.spindle_rpm(120, 50, 4000) == pytest.approx(763.94, rel=1e-4)
     assert cam.spindle_rpm(120, 5, 3000) == 3000
     assert cam.mill_feed(0.05, 4, 2000) == pytest.approx(400)
+
+
+# ---------------------------------------------------------------- 第 2 步：几何识别、从工艺规程编程
+gmsh = pytest.importorskip("gmsh")
+bd = pytest.importorskip("build123d")
+from cae import cam_geom as CG, cam_job as J  # noqa: E402
+
+DIG = __import__("pathlib").Path(__file__).resolve().parents[1]
+
+
+@pytest.fixture(scope="module")
+def plan():
+    import yaml
+    return yaml.safe_load(open(DIG / "std" / "SH-301_process.yaml", encoding="utf-8"))
+
+
+@pytest.fixture(scope="module")
+def shaft():
+    from hub import design as D
+    p = D.normalize(D.defaults())
+    return p, D.step_bytes(p)
+
+
+@pytest.fixture(scope="module")
+def plate_step(tmp_path_factory):
+    with bd.BuildPart() as p:
+        bd.Box(100, 80, 20, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MAX))
+        with bd.BuildSketch(bd.Plane.XY):
+            bd.RectangleRounded(60, 40, 5)
+            bd.Circle(6, mode=bd.Mode.SUBTRACT)
+        bd.extrude(amount=-8, mode=bd.Mode.SUBTRACT)
+        with bd.Locations(*[(x, y, 0) for x in (-40, 40) for y in (-30, 30)]):
+            bd.Hole(4.25)
+    f = tmp_path_factory.mktemp("cam") / "plate.step"
+    bd.export_step(p.part, str(f))
+    return f.read_bytes()
+
+
+def test_turn_profile_from_step(shaft):
+    params, step = shaft
+    r = CG.turn_profile(step)
+    want = cam.design_profile(params["segments"], params["chamfer"])
+    assert r["axis"] == "z" and r["length"] == pytest.approx(167, abs=1e-3)
+    assert len(r["profile"]) == len(want)
+    for (t, d), (tw, dw) in zip(r["profile"], want):
+        assert t == pytest.approx(tw, abs=0.01) and d == pytest.approx(dw, abs=0.01)
+    assert r["ignored_faces"]                                   # 键槽的面不算回转面
+
+
+def test_mill_features_from_step(plate_step):
+    f = CG.mill_features(plate_step)
+    assert f["top"] == pytest.approx(0, abs=1e-4) and f["bottom"] == pytest.approx(-20, abs=1e-4)
+    assert len(f["holes"]) == 4 and all(h["through"] and h["d"] == pytest.approx(8.5, abs=0.01) for h in f["holes"])
+    assert len(f["pockets"]) == 1
+    from shapely.geometry import shape
+    g = shape(f["pockets"][0]["polygon"])
+    assert f["pockets"][0]["depth"] == pytest.approx(8, abs=1e-3) and len(g.interiors) == 1      # 带一个岛
+    assert g.area == pytest.approx(60 * 40 - (4 - math.pi) * 25 - math.pi * 36, rel=2e-3)
+
+
+def test_plan_turn_from_process_plan(plan, shaft):
+    params, step = shaft
+    design = CG.turn_profile(step)["profile"]
+    rough = J.plan_turn(plan, 20, design, "A")
+    assert rough["mode"] == "rough" and rough["length"] == 168 and rough["stock"]["d"] == 50
+    assert rough["cut"]["vc"] == 120 and rough["cut"]["ap"] == 2.5 and "工艺规程" in rough["sources"]["cut.vc"]
+    assert {s["name"]: s["op"] for s in rough["sizes"]} == {"轴承位": 36.375, "齿轮位": 41.375}     # 36.5 0/−0.25 编中间
+    fin = J.plan_turn(plan, 40, design, "A")
+    assert fin["mode"] == "finish" and fin["length"] == 167 and fin["stock"]["from_seq"] == 20
+    assert {s["name"]: s["op"] for s in fin["sizes"]} == {"轴承位": 35.2805, "齿轮位": 40.2805}
+    for spec in (rough, fin):
+        progs = J.generate(spec)
+        assert [p["setup"] for p in progs] == ["right", "left"]
+        for p in progs:
+            assert not [c for c in p["checks"] if c["level"] == "error"], p["checks"]
+            assert p["sim"]["dev_min"] > -0.01 and p["sim"]["dev_max"] <= 0.01
+            assert p["sim"]["face_left"] == 0
+        assert spec["compare"]["plan_minutes"] and spec["compare"]["program_minutes"] > 0
+    assert rough["compare"]["program_minutes"] == pytest.approx(rough["compare"]["basic_minutes"], rel=0.25)
+
+
+def test_plan_slot_keyway(plan, shaft):
+    params, _ = shaft
+    s = J.plan_slot(plan, 50, params, "A")
+    assert s["depth"] == pytest.approx(40.2805 - 35.035, abs=1e-4)          # Ø40.3 0/−0.039、H 35.15 −0.03/−0.20，都取中间
+    assert s["x0_from_left"] == 82
+    p = J.generate(s)[0]
+    assert not [c for c in p["checks"] if c["level"] == "error"]
+    assert p["sim"]["over"] == 0 and p["sim"]["under"] == 0
+
+
+def test_plan_mill_plate(plate_step):
+    f = CG.mill_features(plate_step)
+    s = J.plan_mill(f, "VMC-01", "6061", 2.0, "WQ-PLATE")
+    assert [o["type"] for o in s["ops"]] == ["contour", "pocket", "drill"]
+    assert s["ops"][1]["tool"]["d"] == 10                                     # R5 转角 → Ø10 刚好铣干净
+    p = J.generate(s)[0]
+    assert not [c for c in p["checks"] if c["level"] == "error"], p["checks"][:3]
+    assert p["sim"]["over"] == 0 and p["sim"]["under"] == 0
+
+
+def test_service_cam_jobs(tmp_path, monkeypatch, plan, shaft, plate_step):
+    from fastapi.testclient import TestClient
+    from cae import service
+    monkeypatch.setattr(service, "DATA", str(tmp_path))
+    with TestClient(service.app) as c:
+        assert "CNC-L01" in c.get("/cam/machines").json()["machines"]
+        g = c.post("/geometry", content=plate_step).json()
+        r = c.post("/cam/recognize", json={"sha": g["sha"]}).json()
+        assert r["turn"].get("error") and len(r["mill"]["holes"]) == 4
+        spec = J.plan_mill(r["mill"], "VMC-01", "6061", 2.0, "WQ-PLATE")
+        j = c.post("/cam/jobs", json={"spec": spec, "owner": "7", "factory": "wq_test", "title": "平板"}).json()
+        assert j["status"] == "done" and j["kind"] == "cam" and j["stats"]["errors"] == 0, j.get("error")
+        p = j["programs"][0]
+        assert p["sim"]["over"] == 0 and p["path"][-1][5] == pytest.approx(p["time"]["cut_s"] + p["time"]["rapid_s"], rel=1e-3)
+        nc = c.get("/cam/jobs/{}/0.nc".format(j["id"])).text
+        assert nc.startswith("%\nO5001") and "G83" not in nc and "G81" in nc          # 8.5 通孔深 22.6 < 3d 不用啄钻
+        assert len(c.get("/cam/jobs/{}/h0.bin".format(j["id"])).content) == 4 * p["sim"]["nx"] * p["sim"]["ny"]
+        assert [x["id"] for x in c.get("/jobs", params={"factory": "wq_test", "kind": "cam"}).json()["jobs"]] == [j["id"]]
+        assert c.post("/cam/jobs", json={"spec": {"kind": "x"}}).status_code == 400
+        # SH-301 精车：两个程序（右端、调头左端）
+        design = cam.design_profile(shaft[0]["segments"], shaft[0]["chamfer"])
+        j = c.post("/cam/jobs", json={"spec": J.plan_turn(plan, 40, design, 1), "factory": "wq_test"}).json()
+        assert j["status"] == "done" and [p["setup"] for p in j["programs"]] == ["right", "left"]
+        assert j["compare"]["plan_minutes"] == 15
+
+
+class _NoDB:
+    """没有数据库时的枢纽：没有生效的工艺规程、没有发布记录（按教材样例工艺规程、设计台默认参数）"""
+    def one(self, *a, **k):
+        return None
+
+    def q(self, *a, **k):
+        return []
+
+    def messages(self, *a, **k):
+        return []
+
+
+def test_hub_cam_api(tmp_path, monkeypatch):
+    import importlib
+    from fastapi.testclient import TestClient
+    from cae import service
+    monkeypatch.setenv("WQ_HUB_NO_START", "1")
+    monkeypatch.setenv("WQ_SECRET", "test-secret")
+    monkeypatch.setattr(service, "DATA", str(tmp_path))
+    import hub.app as app_mod
+    app_mod = importlib.reload(app_mod)
+    from hub import cae_api
+    monkeypatch.setattr(app_mod.H, "db", _NoDB())
+    with TestClient(service.app) as svc:
+        monkeypatch.setattr(cae_api, "CLIENT", svc)
+        c = TestClient(app_mod.app)
+        tok = app_mod._sign({"name": "小李", "role": "engineer", "mode": "teach", "teacher": False, "exp": 4e9})
+        hd = {"x-wq-token": tok}
+        assert c.get("/api/cam/ops?item=SH-301").status_code == 401
+        ops = c.get("/api/cam/ops?item=SH-301", headers=hd).json()
+        assert "教材样例" in ops["plan_source"] and [o["seq"] for o in ops["ops"] if o["cam"]] == [20, 40, 50]
+        parts = c.get("/api/cam/parts", headers=hd).json()
+        assert parts["items"][0]["item"] == "SH-301" and parts["examples"][0]["id"] == "WQ-PLATE"
+        spec = c.post("/api/cam/spec", json={"item": "SH-301", "seq": 50}, headers=hd).json()
+        assert spec["kind"] == "slot" and spec["depth"] == pytest.approx(5.2455)
+        j = c.post("/api/cam/jobs", json={"spec": spec, "title": "键槽"}, headers=hd).json()
+        assert j["status"] == "done" and j["owner_name"] == "小李"
+        nc = c.get("/api/cam/jobs/{}/0.nc".format(j["id"]), headers=hd)
+        assert nc.status_code == 200 and "O1501" in nc.text and "SH-301" in nc.text
+        assert [x["id"] for x in c.get("/api/cam/jobs", headers=hd).json()["jobs"]] == [j["id"]]
+        other = app_mod._sign({"name": "小王", "role": "engineer", "mode": "teach", "teacher": False, "exp": 4e9})
+        assert c.get("/api/cam/jobs/" + j["id"], headers={"x-wq-token": other}).status_code == 403
+        ex = c.post("/api/cam/examples/WQ-PLATE", headers=hd).json()
+        sp = c.post("/api/cam/spec/geometry", json={"sha": ex["sha"]}, headers=hd).json()
+        assert sp["kind"] == "mill25" and sp["recognized"] == {"turn": False, "mill": True}
+        assert c.post("/api/cam/spec", json={"item": "SH-301", "seq": 30}, headers=hd).status_code == 400   # 调质不用编程

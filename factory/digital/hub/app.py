@@ -1294,6 +1294,10 @@ _course.mount(app, H)
 from hub import cae_api as _cae  # noqa: E402
 _cae.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
 
+# ---------------------------------------------------------------- 数控编程（第 13 轮）
+from hub import cam_api as _cam  # noqa: E402
+_cam.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")))
+
 
 # ---------------------------------------------------------------- 网页
 if os.path.isdir(WEB_DIST):

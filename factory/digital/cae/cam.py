@@ -20,32 +20,52 @@ CLEAR = 2.0            # 车削：离开工件端面 / 外圆的安全距离（m
 
 
 # ---------------------------------------------------------------- 车削轮廓
-def shaft_profile(segments, chamfer=0.0, side="right"):
-    """阶梯轴 [(直径, 长度), …]（从左到右）→ 本次装夹要加工的轮廓。
-    一次装夹只能车到最大直径那一段（含）；side="right" 车右边一段，"left" 是调头后车另一边（不含最大直径段）。
-    返回 (轮廓, 本次加工到的长度 L_reg, 总长)"""
-    segs = list(segments)
-    total = sum(l for _, l in segs)
-    imax = max(range(len(segs)), key=lambda i: segs[i][0])
-    if side == "right":
-        part = list(reversed(segs[imax:]))             # 从右端起
-    else:
-        part = segs[:imax]                             # 调头后：原左端成了右端
-        if not part:
-            return [], 0.0, total
-    pts, z = [], 0.0
-    for k, (d, l) in enumerate(part):
+def design_profile(segments, chamfer=0.0):
+    """阶梯轴 [(直径, 长度), …]（从左到右）→ 设计轮廓 [(t, d), …]，t 从左端 0 起向右；两端倒角 chamfer"""
+    pts, t = [], 0.0
+    n = len(segments)
+    for k, (d, l) in enumerate(segments):
         if k == 0 and chamfer > 0:
-            pts += [(0.0, d - 2 * chamfer), (-chamfer, d)]
-        elif k == 0:
-            pts.append((0.0, d))
+            pts += [(0.0, d - 2 * chamfer), (chamfer, d)]
         else:
-            pts.append((z, d))                         # 轴肩：同一 z 上两个直径
-        z -= l
-        pts.append((z, d))
-    if side == "left":                                 # 调头后最后一段接最大直径的轴肩：车到轴肩为止
-        pts.append((z, segs[imax][0]))
-    return pts, -z, total
+            pts.append((t, d))
+        t += l
+        if k == n - 1 and chamfer > 0:
+            pts += [(t - chamfer, d), (t, d - 2 * chamfer)]
+        else:
+            pts.append((t, d))
+    return simplify(pts)
+
+
+def plateau(prof):
+    """最大直径那一段的 [t 起, t 止]"""
+    dmax = max(d for _, d in prof)
+    ts = [t for t, d in prof if abs(d - dmax) < 1e-9]
+    return min(ts), max(ts), dmax
+
+
+def setup_profile(prof, side="right"):
+    """设计轮廓 → 一次装夹要车的轮廓 [(z, d), …]（Z0 在本次装夹的右端面，向左为负）。
+    外圆车刀只能从右往左车到最大直径段：side="right" 车右端到最大直径段（含）；
+    "left" 是调头后车原来的左边，车到最大直径的轴肩为止。返回 (轮廓, 本次车到的长度)"""
+    L = prof[-1][0]
+    tA, tB, dmax = plateau(prof)
+    if side == "right":
+        pts = [(t - L, d) for t, d in reversed(prof) if t > tA + 1e-9 or (t >= tA - 1e-9 and abs(d - dmax) < 1e-9)]
+        return simplify(pts), L - tA
+    pts = [(-t + 0.0, d) for t, d in prof if t < tA - 1e-9 or (t <= tA + 1e-9 and d < dmax - 1e-9)]
+    if not pts or tA < 1e-9:
+        return [], 0.0
+    if abs(pts[-1][1] - dmax) > 1e-9:
+        pts.append((-tA, dmax))
+    return simplify(pts), tA
+
+
+def shaft_profile(segments, chamfer=0.0, side="right"):
+    """阶梯轴一次装夹的轮廓（只在右端倒角时与旧接口一致）：返回 (轮廓, 本次车到的长度, 总长)"""
+    prof = design_profile(segments, chamfer)
+    pts, Lreg = setup_profile(prof, side)
+    return pts, Lreg, prof[-1][0]
 
 
 def d_at(profile, z):
@@ -57,8 +77,10 @@ def d_at(profile, z):
             if abs(z1 - z0) < 1e-12:
                 d = max(d0, d1)
             best = d if best is None else max(best, d)
-    if best is None:
-        return profile[-1][1] if z < profile[-1][0] else profile[0][1]
+    if best is None:                                   # 超出轮廓两端：取最近一端的直径
+        lo = min(profile, key=lambda p: p[0])
+        hi = max(profile, key=lambda p: p[0])
+        return lo[1] if z < lo[0] else hi[1]
     return best
 
 
