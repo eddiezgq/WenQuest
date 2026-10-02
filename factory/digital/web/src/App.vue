@@ -83,13 +83,14 @@ const apps = computed(() => [
   { name: 'ERPNext', role: 'ERP / MRP', href: cfg.value.erpnext_url || '#', ext: true },
   { name: '设计台', role: 'CAD / CAM', href: '/work/engineer', route: '/work/engineer' },
   { name: '仿真与分析', role: 'CAE', href: '/cae', route: '/cae' },
+  { name: '运动与动力', role: 'MBD', href: '/mbd', route: '/mbd' },
   { name: '车间终端', role: 'MES', href: '/work/operator', route: '/work/operator' },
   { name: 'Node-RED', role: '数据流', href: cfg.value.nodered_url || '#', ext: true },
 ].filter((a) => a.name !== 'Node-RED' || cfg.value.nodered_url));   // 线上 Node-RED 不对外（第 3 轮 D8）
 const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
   '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
-  '/design': '设计发布与审批', '/members': '企业成员', '/configurator': '参数配置器', '/cae': '仿真与分析',
+  '/design': '设计发布与审批', '/members': '企业成员', '/configurator': '参数配置器', '/cae': '仿真与分析', '/mbd': '运动与动力分析',
 }[route.path] || (route.path.startsWith('/design/') ? '设计审阅' : '')));
 const clock = ref('');
 let timer;

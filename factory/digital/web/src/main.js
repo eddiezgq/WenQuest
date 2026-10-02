@@ -22,6 +22,7 @@ const routes = [
   { path: '/members', component: () => import('./pages/Members.vue') },
   { path: '/configurator', component: () => import('./pages/Configurator.vue') },
   { path: '/cae', component: () => import('./pages/Cae.vue') },
+  { path: '/mbd', component: () => import('./pages/Mbd.vue') },
   { path: '/:p(.*)*', redirect: '/' },
 ];
 

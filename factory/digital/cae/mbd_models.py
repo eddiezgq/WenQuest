@@ -75,7 +75,7 @@ def model_glb(model):
     import trimesh
     scene = trimesh.Scene()
     groups = set(int(g) for g in model.geom_group)
-    vis = 2 if 2 in groups else None
+    vis = 2 if {2, 3} <= groups else None             # Menagerie 习惯：2 组可视、3 组碰撞；否则全部画
     for b in range(1, model.nbody):
         parts = []
         for g in range(model.ngeom):
@@ -96,11 +96,6 @@ def model_glb(model):
         name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_BODY, b) or "body{}".format(b)
         if parts:
             mesh = trimesh.util.concatenate(parts)
-            if len(mesh.faces) > 20000:                       # 网页里只做动画，简化一下
-                try:
-                    mesh = mesh.simplify_quadric_decimation(face_count=20000)
-                except Exception:  # noqa: BLE001
-                    pass
             scene.add_geometry(mesh, node_name=name, geom_name=name)
     return scene.export(file_type="glb")
 
