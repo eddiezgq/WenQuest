@@ -219,6 +219,14 @@ async def geometry(request: Request):
     return dict(_read_json(os.path.join(d, "faces.json")), sha=sha)
 
 
+@app.get("/geometry/{sha}/faces")
+def geometry_faces(sha: str):
+    p = _p("geo", sha.replace("/", ""), "faces.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个零件")
+    return _read_json(p)
+
+
 @app.get("/geometry/{sha}/model.glb")
 def geometry_glb(sha: str):
     p = _p("geo", sha.replace("/", ""), "model.glb")
@@ -305,6 +313,16 @@ def report(jid: str, body: dict = Body(default={})):
     name = "有限元报告-{}.docx".format(j.get("item") or jid)
     return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     headers={"Content-Disposition": "attachment; filename*=UTF-8''" + urllib.parse.quote(name)})
+
+
+@app.post("/jobs/{jid}/note")
+def note(jid: str, body: dict = Body(...)):
+    """记下 AI 解释（报告用）"""
+    p = _job_path(jid.replace("/", ""), "job.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个任务")
+    _update(jid.replace("/", ""), ai_text=str(body.get("ai_text") or "")[:4000])
+    return {"ok": True}
 
 
 @app.post("/jobs/{jid}/fatigue")

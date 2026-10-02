@@ -40,8 +40,12 @@ def call(method, path, **kw):
     return r
 
 
-def mount(app, H, user_of, who, uid_of, is_teacher):
+def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
     from hub import plm
+
+    def _ai_quota(u):                     # 只有真用到模型时才计次数（规则兜底不算）
+        if ai_quota and H.ai and H.ai.llm.available():
+            ai_quota(u)
 
     def mine(u, j):
         if j.get("factory") != FACTORY_ID:
@@ -112,6 +116,37 @@ def mount(app, H, user_of, who, uid_of, is_teacher):
         r = call("POST", "/jobs/{}/report".format(urllib.parse.quote(jid)), json=body)
         return Response(r.content, media_type=r.headers.get("content-type"),
                         headers={"Content-Disposition": r.headers.get("content-disposition", "attachment")})
+
+    @app.post("/api/cae/ai-setup")
+    def cae_ai_setup(body: dict = Body(...), u=Depends(user_of)):
+        """一句话设置：只填表，人确认后才计算。body = {text, faces, solid}（面清单就是读入零件时拿到的）"""
+        from hub import cae_ai
+        faces = body.get("faces") or []
+        if not faces:
+            raise HTTPException(400, "请先读入零件")
+        _ai_quota(u)
+        try:
+            return cae_ai.setup(H.ai.llm if H.ai else None, body.get("text"), faces, body.get("solid"))
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+
+    @app.post("/api/cae/jobs/{jid}/explain")
+    def cae_explain(jid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        """AI 解释结果 + 可执行建议（换材料重算、到设计台改尺寸）。解释记进任务，报告里带上"""
+        from hub import cae_ai
+        j = mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        if j["status"] != "done":
+            raise HTTPException(409, "结果还没出来")
+        _ai_quota(u)
+        params = None
+        if j.get("item") == "SH-301":
+            from hub import design as D
+            rel = [r for r in H.db.messages(["design.release"], mode=u["mode"], order="desc", limit=50) if r["data"]["item"] == "SH-301"]
+            params = rel[0]["data"].get("params") if rel and rel[0]["data"].get("params") else D.normalize(D.defaults())
+        faces = body.get("faces") or call("GET", "/geometry/{}/faces".format(j["step_sha"])).json()["faces"]
+        r = cae_ai.explain(H.ai.llm if H.ai else None, j, faces, params)
+        call("POST", "/jobs/{}/note".format(urllib.parse.quote(jid)), json={"ai_text": r["text"]})
+        return r
 
     @app.get("/api/cae/torque-logs")
     def cae_torque_logs(u=Depends(user_of)):

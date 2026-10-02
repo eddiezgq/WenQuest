@@ -170,3 +170,72 @@ def test_rainflow_closes_repeating_blocks():
     assert s["infinite"]
     _, s = FT.compute([100.0], 350, [350, -350], 1.0, m, haibach=True)
     assert not s["infinite"] and s["life_blocks"] > 1e9
+
+
+def test_one_sentence_setup_rules_pick_faces():
+    """一句话设置（没配模型时的规则兜底）：示范题的话能选出端面、键槽侧面；轴承、轴伸、面编号、方向、材料"""
+    from hub import cae_ai as A
+    from hub import design as D
+    step = D.step_bytes(D.normalize(D.defaults()))
+    faces, _, solid = G.faces(step)
+    tags, _, _ = A.tag_faces(faces, solid)
+    by = lambda t: sorted(i for i, v in tags.items() if t in v)  # noqa: E731
+    assert len(by("端面")) == 2 and len(by("键槽侧面")) == 2 and len(by("键槽底面")) == 1 and len(by("外圆")) == 5
+    left_end = by("左端面")[0]
+    r = A.setup(None, "左端面固定，键槽侧面加 350 N·m 扭矩，45 钢调质", faces, solid)
+    assert r["engine"] == "rules" and r["material_id"] == "45-QT" and not r["unmatched"]
+    assert r["rows"][0] == {"kind": "fixed", "faces": [left_end]}
+    assert r["rows"][1]["kind"] == "torque" and r["rows"][1]["value"] == 350 and r["rows"][1]["faces"][0] in by("键槽侧面")
+    r = A.rules_setup("两个 Ø35 轴承位支承（左边那个止推），右端 Ø30 轴伸限制转动，键槽侧面加 0.35 kN·m 扭矩，40Cr", faces, solid)
+    kinds = [(x["kind"], x.get("thrust")) for x in r["rows"]]
+    assert kinds == [("bearing", True), ("bearing", False), ("coupling", None), ("torque", None)]
+    assert r["rows"][2]["faces"] == by("右端轴伸") and r["rows"][3]["value"] == 350 and r["material_id"] == "40Cr-QT"
+    r = A.rules_setup("面 18 固定，右端面加 2 kN 向下的力，看不懂的话", faces, solid)
+    assert r["rows"][1]["faces"] == by("右端面") and r["rows"][1]["fy"] == -2000 and r["unmatched"] == ["看不懂的话"]
+
+
+def test_explain_rules_and_suggestions():
+    from hub import cae_ai as A
+    from hub import design as D
+    job = {"item": "SH-301", "setup": {"material_id": "45-QT", "loads": []},
+           "stats": {"vm_max_mpa": 260.0, "vm_peak_all_mpa": 260.0, "vm_max_faces": [9, 14], "safety_factor": 1.37}}
+    faces, _, _ = G.faces(D.step_bytes(D.normalize(D.defaults())))
+    r = A.explain(None, job, faces, D.normalize(D.defaults()))
+    assert "键槽" in r["text"] and "尖角" in r["text"]
+    kinds = {a["kind"]: a for a in r["actions"]}
+    assert kinds["material"]["material_id"] == "40Cr-QT"
+    p = kinds["design"]["params"]
+    assert p["segments"][2][0] == 44 and (p["keyway"]["b"], p["keyway"]["t"]) == (12.0, 5.0)
+    assert D.check(D.normalize(p))["ok"]
+
+
+def test_llm_paths_validate_and_fall_back():
+    """模型给的面不存在时丢掉；模型出错时退回规则"""
+    from hub import cae_ai as A
+    step = beam_step()
+    faces, _, solid = G.faces(step)
+
+    class Fake:
+        name = "fake"
+
+        def __init__(self, args=None, boom=False):
+            self.args, self.boom = args, boom
+
+        def available(self):
+            return True
+
+        def run(self, system, messages, tools, call_tool, max_turns=6):
+            if self.boom:
+                raise RuntimeError("network")
+            assert "faces" in messages[0]["content"] or "stats" in messages[0]["content"]
+            call_tool(tools[0]["name"], self.args)
+            return "", []
+    r = A.setup(Fake({"rows": [{"kind": "fixed", "faces": [1]}, {"kind": "force", "faces": [999], "fy": -5}],
+                      "material_id": "Q235"}), "随便", faces, solid)
+    assert r["engine"] == "fake" and r["rows"] == [{"kind": "fixed", "faces": [1]}] and r["material_id"] == "Q235"
+    r = A.setup(Fake(boom=True), "左端面固定，右端面加 100 N 向下的力", faces, solid)
+    assert r["engine"] == "rules" and "模型暂时不可用" in r["note"] and [x["kind"] for x in r["rows"]] == ["fixed", "force"]
+    job = {"item": None, "setup": {"material_id": "6061-T6", "loads": []},
+           "stats": {"vm_max_mpa": 300.0, "vm_peak_all_mpa": 300.0, "vm_max_faces": [1], "safety_factor": 0.92}}
+    r = A.explain(Fake({"text": "根部最危险。", "material_id": "7075-T6"}), job, faces)
+    assert r["text"] == "根部最危险。" and r["actions"][0]["material_id"] == "7075-T6" and r["engine"] == "fake"

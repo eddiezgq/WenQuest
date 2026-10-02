@@ -29,7 +29,20 @@
             <div v-if="showSrc" class="src-box">{{ mat.note }}<br><span v-for="s in mat.sources" :key="s">· {{ s }}<br></span></div>
           </div>
 
-          <div class="step"><b>3</b> 约束与载荷 <span class="muted small">先点“+”，再在右边模型上点面</span></div>
+          <div class="step"><b>3</b> 约束与载荷 <span class="muted small">一句话让 AI 填，或者点“+”再在模型上点面</span></div>
+          <div class="ai-box">
+            <textarea v-model="aiText" rows="2" maxlength="500" :placeholder="aiHint"></textarea>
+            <div class="line">
+              <button class="btn" :disabled="aiBusy || !aiText.trim()" @click="aiFill">{{ aiBusy ? 'AI 正在理解…' : 'AI 填表' }}</button>
+              <span class="small muted">AI 只填表，你确认后再点“开始计算”</span>
+            </div>
+            <div v-if="aiRes" class="small ai-notes">
+              <div v-for="n in aiRes.notes" :key="n">✓ {{ n }}</div>
+              <div v-for="n in aiRes.unmatched" :key="n" class="warnline">？没看懂或找不到面：“{{ n }}”——请手动补上</div>
+              <div v-if="aiRes.note" class="muted">{{ aiRes.note }}</div>
+              <div class="muted">{{ aiRes.engine === 'rules' ? '（规则理解：能认端面、轴肩、外圆 / 孔 Øxx、键槽侧面 / 底面、面编号、方向和材料）' : '（由 AI 模型理解）' }}</div>
+            </div>
+          </div>
           <div class="adds">
             <button v-for="(k, key) in KINDS" :key="key" type="button" class="add" :style="{ '--c': k.color }" :title="k.hint" @click="addRow(key)">+ {{ k.label }}</button>
           </div>
@@ -109,6 +122,19 @@
           <p>尖角（没有圆角的内角）处的应力理论上没有上限，网格越细数值越大——看到最大值在尖角，就要考虑加圆角，或者按规范的应力集中系数去校核。</p>
         </div>
 
+        <div v-if="result" class="ai-exp">
+          <div class="line"><h3>AI 解释与建议</h3>
+            <button class="btn" :disabled="expBusy" @click="explain">{{ expBusy ? 'AI 正在分析…' : (exp ? '重新分析' : '请 AI 解释结果') }}</button></div>
+          <div v-if="expErr" class="err small">{{ expErr }}</div>
+          <div v-if="exp" class="exp-text">
+            <p v-for="(l, i) in exp.text.split('\n')" :key="i">{{ l }}</p>
+            <div class="line">
+              <button v-for="a in exp.actions" :key="a.label" class="btn primary" :disabled="actBusy" @click="act(a)">{{ a.label }}</button>
+            </div>
+            <div class="small muted">{{ exp.engine === 'rules' ? '规则分析' : exp.engine === 'saved' ? '上次的分析' : 'AI 模型分析' }}，仅供参考；解释会写进计算报告。</div>
+          </div>
+        </div>
+
         <div v-if="result" class="fat">
           <h3>疲劳寿命 <span class="small muted">载荷反复变化时，零件能用多久（雨流计数 + S-N 曲线 + Miner 累积损伤，pyLife）</span></h3>
           <div class="fat-grid">
@@ -185,10 +211,12 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { get, post, session, ApiError } from '../lib/api';
 import { KINDS, toLoad, axesOf, faceText, fetchSurface } from '../lib/cae';
 import CaeViewer from '../components/CaeViewer.vue';
 
+const router = useRouter();
 const STATUS = { queued: '排队', running: '计算中', done: '完成', failed: '失败' };
 const TONE = { queued: 'mute', running: 'info', done: 'good', failed: 'bad' };
 const MESH = [{ k: 'coarse', label: '粗（快）', div: 20 }, { k: 'mid', label: '中', div: 32 }, { k: 'fine', label: '细（慢）', div: 48 }];
@@ -343,6 +371,7 @@ async function showResult(j) {
   const surface = await fetchSurface(j.id);
   result.value = { stats: j.stats, surface };
   field.value = 'vm';
+  exp.value = j.ai_text ? { text: j.ai_text, actions: [], engine: 'saved' } : null;
   resetFatigue(j);
 }
 async function openJob(j) {
@@ -350,6 +379,55 @@ async function openJob(j) {
   err.value = '';
   try { await showResult(j); window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { err.value = e.message; }
 }
+// ---------------------------------------------------------------- AI：一句话设置、结果解释（第 11 轮 F3、F7）
+const aiText = ref('');
+const aiBusy = ref(false);
+const aiRes = ref(null);
+const aiHint = computed(() => (geo.value?.item === 'SH-301'
+  ? '例如：两个 Ø35 轴承位支承（左边那个止推），右端 Ø30 轴伸限制转动，键槽侧面加 350 N·m 扭矩，45 钢调质'
+  : '例如：左端面固定，右端面加 1000 N 向下的力，6061 铝'));
+async function aiFill() {
+  aiBusy.value = true; err.value = '';
+  try {
+    const r = await post('/cae/ai-setup', { text: aiText.value, faces: geo.value.faces, solid: geo.value.solid });
+    aiRes.value = r;
+    const ax = axes.value[0]?.key;
+    rows.value = r.rows.map((x) => ({ key: ++keyN, fx: 0, fy: 0, fz: 0, value: 0, thrust: false, axis: ax, ...x, faces: [...x.faces] }));
+    rows.value.forEach((x) => {                                   // 圆柱支承：轴线跟着所选圆柱面
+      if (KINDS[x.kind].cyl) { const a = axes.value.find((y) => y.faces.includes(x.faces[0])); if (a) x.axis = a.key; }
+    });
+    if (r.material_id) matId.value = r.material_id;
+    active.value = -1;
+    if (!title.value) title.value = aiText.value.slice(0, 40);
+  } catch (e) { err.value = e.message; } finally { aiBusy.value = false; }
+}
+const exp = ref(null);
+const expBusy = ref(false);
+const expErr = ref('');
+const actBusy = ref(false);
+async function explain() {
+  expBusy.value = true; expErr.value = '';
+  try { exp.value = await post(`/cae/jobs/${encodeURIComponent(job.value.id)}/explain`, geo.value?.sha === job.value.step_sha ? { faces: geo.value.faces } : {}); }
+  catch (e) { expErr.value = e.message; } finally { expBusy.value = false; }
+}
+async function act(a) {
+  if (a.kind === 'design') {
+    router.push({ path: '/work/engineer', query: { suggest: JSON.stringify(a.params), note: a.note || '' } });
+    return;
+  }
+  if (a.kind === 'material') {                                    // 同一零件、同一工况，换材料重算
+    actBusy.value = true; expErr.value = '';
+    try {
+      const j0 = job.value;
+      const mname = materials.value.find((m) => m.id === a.material_id)?.name || a.material_id;
+      job.value = await post('/cae/jobs', { step_sha: j0.step_sha, item: j0.item, title: `${j0.title || j0.item || ''}（换 ${mname}）`,
+        setup: { ...j0.setup, material_id: a.material_id } });
+      result.value = null; exp.value = null;
+      poll(); loadJobs();
+    } catch (e) { expErr.value = e.message; } finally { actBusy.value = false; }
+  }
+}
+
 // ---------------------------------------------------------------- 疲劳寿命
 const SURF = { polished: '抛光（β 1.0）', ground: '磨削（β 0.92）', fine_turned: '精车（β 0.85）', rough_turned: '粗车（β 0.75）', forged: '锻造毛坯（β 0.55）' };
 const hasTorque = computed(() => (job.value?.setup?.loads || []).some((l) => l.type === 'torque'));
@@ -482,6 +560,14 @@ onUnmounted(() => { clearTimeout(pollT); clearInterval(listT); });
 .stat.bad { background: var(--bad-bg); } .stat.bad b { color: var(--bad); }
 .notes p { margin: 8px 0 0; }
 tr.cur td { background: var(--accent-bg); }
+.ai-box { display: flex; flex-direction: column; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+.ai-box textarea { border: 1px solid #C8CEC7; border-radius: 6px; padding: 6px 8px; resize: vertical; }
+.ai-notes { display: flex; flex-direction: column; gap: 2px; }
+.warnline { color: var(--warn-ink); }
+.ai-exp { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.ai-exp h3 { font-size: 15px; }
+.ai-exp .line { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.exp-text p { margin: 4px 0; line-height: 1.7; }
 .fat { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .fat h3 { font-size: 15px; }
 .fat-grid { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; }

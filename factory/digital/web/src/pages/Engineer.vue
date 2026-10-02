@@ -7,6 +7,8 @@
     <section id="design" class="card">
       <div class="card-head"><h2>在线设计 · 输出轴 SH-301</h2>
         <span class="muted small">改参数 → 看三维与校核 → 发布。服务器生成 STEP、零件图、键槽 G 代码，与 FreeCAD 发布效果相同</span></div>
+      <div v-if="suggestNote" class="sugg small">已按“{{ suggestNote }}”填好参数（还没发布）：看三维和校核，满意就发布新版本，再回“仿真与分析”重新计算对比。
+        <button class="btn ghost small" @click="suggestNote = ''; loadParams()">不用了，恢复现行版</button></div>
       <div v-if="!form" class="empty">正在读取现行设计…</div>
       <div v-else class="design">
         <div class="form">
@@ -107,11 +109,14 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { get, post, session } from '../lib/api';
 import ShaftView from '../components/ShaftView.vue';
 import { timeOf } from '../lib/fmt';
 import GcodeView from '../components/GcodeView.vue';
 import TaskBar from '../components/TaskBar.vue';
+
+const route = useRoute();
 
 const d = ref({ releases: [], gcode: [] });
 const rt = ref(null);
@@ -141,6 +146,19 @@ async function loadParams() {
   form.value = r.params;
   lastKey = r.params.keyway;
   chk.value = r.check;
+}
+// 第 11 轮：仿真与分析的建议（/work/engineer?suggest=…）先填进表单，确认后再发布
+const suggestNote = ref('');
+function applySuggest() {
+  const q = route.query;
+  if (!q.suggest) return;
+  try {
+    form.value = JSON.parse(q.suggest);
+    lastKey = form.value.keyway;
+    note.value = q.note || '按仿真建议修改';
+    suggestNote.value = q.note || '仿真与分析的建议';
+    setTimeout(() => document.getElementById('design')?.scrollIntoView({ behavior: 'smooth' }), 100);
+  } catch (e) { /* 参数不对就用现行版 */ }
 }
 function addSeg() { const l = form.value.segments[form.value.segments.length - 1]; form.value.segments.push([l[0], 20]); }
 function delSeg(i) {
@@ -189,7 +207,7 @@ async function loadDesign() {
 }
 
 onMounted(async () => {
-  loadParams();
+  loadParams().then(applySuggest);
   [d.value, rt.value] = await Promise.all([get('/design/SH-301'), get('/routing/SH-301')]);
   if (g.value) code.value = await (await fetch(g.value.gcode_ref)).text();
   const al = await get('/history?type=ai.alert&hours=72&limit=50');
@@ -207,6 +225,7 @@ onMounted(async () => {
 .drawing img { width: 100%; display: block; }
 .steps { padding-left: 18px; line-height: 1.7; margin: 0 0 8px; }
 .alert { background: var(--accent-bg); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+.sugg { background: var(--task-bg); border: 1px solid var(--task-line); color: var(--task-ink); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .design { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
 .form input[type=number] { width: 72px; }
 .segs input { text-align: right; }

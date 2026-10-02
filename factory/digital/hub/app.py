@@ -1217,7 +1217,7 @@ _course.mount(app, H)
 
 # ---------------------------------------------------------------- 仿真与分析（第 11 轮）
 from hub import cae_api as _cae  # noqa: E402
-_cae.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")))
+_cae.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
 
 
 # ---------------------------------------------------------------- 网页
