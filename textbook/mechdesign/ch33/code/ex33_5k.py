@@ -13,9 +13,9 @@ import mdstd
 d, D_ = 40.0, 48.0
 rd = [0.02, 0.04, 0.06, 0.09]          # r 不能超过台阶高 (D − d)/2 = 4 mm
 res = [_fea.stepped_bar_kt(d, D_, x * d, fine=4) for x in rd]
-fine2 = _fea.stepped_bar_kt(d, D_, rd[1] * d, fine=6)          # 网格收敛：圆角处单元 r/4 → r/6（r/8 的模型超出 8 GB 内存）
-conv_s = abs(fine2["alpha_sigma"] - res[1]["alpha_sigma"]) / res[1]["alpha_sigma"] * 100
-conv_t = abs(fine2["alpha_tau"] - res[1]["alpha_tau"]) / res[1]["alpha_tau"] * 100
+fine2 = _fea.stepped_bar_kt(d, D_, rd[3] * d, fine=6)          # 网格收敛：r/d = 0.09 时圆角处单元 r/4 → r/6（r/8 的模型超出 8 GB 内存；大圆角单元少，CI 上算得快）
+conv_s = abs(fine2["alpha_sigma"] - res[3]["alpha_sigma"]) / res[3]["alpha_sigma"] * 100
+conv_t = abs(fine2["alpha_tau"] - res[3]["alpha_tau"]) / res[3]["alpha_tau"] * 100
 a_s = [r["alpha_sigma"] for r in res]
 a_t = [r["alpha_tau"] for r in res]
 sharp, round_ = mdstd.kt_estimate("shoulder_sharp"), mdstd.kt_estimate("shoulder_round")

@@ -327,6 +327,9 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
         shared += (ROOT / "textbook" / "mechdesign" / "conventions" / "calcsheet.py").read_bytes() if (ROOT / "textbook" / "mechdesign" / "conventions" / "calcsheet.py").exists() else b""
         if (book["root"] / "conventions" / "mdstd.py").exists():       # its materials come from the digital factory's library
             shared += (ROOT / "factory" / "digital" / "cae" / "materials.py").read_bytes()
+            for rel in ("cae/solve.py", "cae/fatigue.py", "cae/geometry.py", "sim/engine.py"):   # 有限元、疲劳、试验台记录（第 33 章起）
+                p = ROOT / "factory" / "digital" / rel
+                shared += p.read_bytes() if p.exists() else b""
         for prog in sorted(p for p in code.glob("*.py") if not p.name.startswith("_")):
             where = str(prog.relative_to(book["root"].parent))
             digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes() + lang.encode()).hexdigest()[:16]
