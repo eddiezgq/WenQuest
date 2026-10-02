@@ -137,3 +137,13 @@ def test_service_queue_end_to_end(tmp_path, monkeypatch):
         assert c.get("/jobs/{}/surface.bin".format(j["id"])).content[:4] == b"WQS1"
         assert [x["id"] for x in c.get("/jobs", params={"factory": "wq_test", "owner": "7"}).json()["jobs"]] == [j["id"]]
         assert c.get("/jobs", params={"factory": "other"}).json()["jobs"] == []
+        # Word 报告：设置、结果、截图、结论都在
+        png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+        rep = c.post("/jobs/{}/report".format(j["id"]), json={"images": [{"data": png, "caption": "应力云图"}], "ai_text": "最危险在根部。"})
+        assert rep.status_code == 200 and rep.content[:2] == b"PK"
+        import docx
+        import io
+        text = "\n".join(p.text for p in docx.Document(io.BytesIO(rep.content)).paragraphs)
+        cells = " ".join(c.text for t in docx.Document(io.BytesIO(rep.content)).tables for r in t.rows for c in r.cells)
+        assert "结论" in text and "安全系数" in text and "最危险在根部" in text and "应力云图" in text
+        assert "45 钢" in cells and "固定" in cells and "C3D10" in cells

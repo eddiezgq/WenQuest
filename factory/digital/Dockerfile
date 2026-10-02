@@ -8,7 +8,8 @@ RUN npm ci --no-audit --no-fund
 COPY digital/web/ ./
 RUN npm run build
 
-FROM python:3.12-slim
+# 固定 Debian 12（bookworm）：Debian 13 的 calculix-ccx 因 openmpi 升级装不上（Debian bug #1089784）
+FROM python:3.12-slim-bookworm
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 TZ=America/New_York
 WORKDIR /app
 # build123d（网页设计台出 STEP，第 6 轮 W3）用到 OpenCASCADE，需要这几个系统库；

@@ -106,6 +106,13 @@ def mount(app, H, user_of, who, uid_of, is_teacher):
     def cae_job(jid: str, u=Depends(user_of)):
         return mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
 
+    @app.post("/api/cae/jobs/{jid}/report")
+    def cae_report(jid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        r = call("POST", "/jobs/{}/report".format(urllib.parse.quote(jid)), json=body)
+        return Response(r.content, media_type=r.headers.get("content-type"),
+                        headers={"Content-Disposition": r.headers.get("content-disposition", "attachment")})
+
     @app.get("/api/cae/jobs/{jid}/surface.bin")
     def cae_surface(jid: str, u=Depends(user_of)):
         mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())

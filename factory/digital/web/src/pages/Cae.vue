@@ -81,7 +81,8 @@
               <button type="button" :class="{ on: field === 'u' }" @click="field = 'u'">位移</button>
             </div>
             <label class="small deform">变形放大 <input v-model.number="deformK" type="range" min="0" max="1" step="0.01"> {{ deformX.toFixed(0) }}×</label>
-            <button type="button" class="btn ghost more" @click="backToSetup">回到设置</button>
+            <button type="button" class="btn more" :disabled="reporting" @click="downloadReport">{{ reporting ? '正在生成报告…' : '下载计算报告（Word）' }}</button>
+            <button type="button" class="btn ghost" @click="backToSetup">回到设置</button>
           </template>
         </div>
         <div v-if="job && job.status !== 'done'" class="jobbar" :class="job.status">
@@ -293,6 +294,29 @@ async function openJob(j) {
   job.value = j;
   err.value = '';
   try { await showResult(j); window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { err.value = e.message; }
+}
+// 报告：自动截应力、位移两张云图，连同设置和结果生成 Word
+const reporting = ref(false);
+const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+async function downloadReport() {
+  reporting.value = true; err.value = '';
+  const keep = field.value;
+  try {
+    const images = [];
+    for (const [f, cap] of [['vm', 'Von Mises 应力云图（MPa）'], ['u', '位移云图（mm）']]) {
+      field.value = f;
+      await frame(); await frame();
+      images.push({ data: viewer.value.snapshot(), caption: `${cap}，色标蓝 → 红 = 低 → 高（最高 ${f === 'vm' ? st.value.vm_peak_all_mpa.toFixed(1) + ' MPa' : st.value.u_max_mm.toPrecision(3) + ' mm'}），变形放大 ${deformX.value} 倍；粉点为最大应力位置，青点为最大位移位置` });
+    }
+    const r = await fetch(`/api/cae/jobs/${encodeURIComponent(job.value.id)}/report`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-wq-token': session.token }, body: JSON.stringify({ images }) });
+    if (!r.ok) throw new ApiError(r.status, (await r.json().catch(() => ({}))).detail || '报告生成失败');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(await r.blob());
+    a.download = `有限元报告-${job.value.item || job.value.id}.docx`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  } catch (e) { err.value = e.message; } finally { field.value = keep; reporting.value = false; }
 }
 function backToSetup() { result.value = null; job.value = null; }
 async function loadJobs() { try { jobs.value = (await get('/cae/jobs')).jobs; } catch (e) { /* 计算服务没开时不挡页面 */ } }

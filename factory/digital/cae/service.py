@@ -13,6 +13,7 @@ import queue
 import struct
 import threading
 import time
+import urllib.parse
 import uuid
 
 import numpy as np
@@ -287,6 +288,23 @@ def surface(jid: str):
     if not os.path.exists(p):
         raise HTTPException(404, "结果还没出来")
     return FileResponse(p, media_type="application/octet-stream")
+
+
+@app.post("/jobs/{jid}/report")
+def report(jid: str, body: dict = Body(default={})):
+    """Word 报告：images = [{data: dataURL, caption}]（浏览器截的云图），ai_text 可选"""
+    p = _job_path(jid.replace("/", ""), "job.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个任务")
+    j = _read_json(p)
+    if j["status"] != "done":
+        raise HTTPException(409, "结果还没出来")
+    from cae import report as R
+    imgs = (body.get("images") or [])[:4]
+    data = R.build(j, imgs, body.get("ai_text") or j.get("ai_text"))
+    name = "有限元报告-{}.docx".format(j.get("item") or jid)
+    return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    headers={"Content-Disposition": "attachment; filename*=UTF-8''" + urllib.parse.quote(name)})
 
 
 @app.get("/geometry/{sha}/step")

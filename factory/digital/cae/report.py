@@ -1,0 +1,152 @@
+# -*- coding: utf-8 -*-
+"""计算报告（第 11 轮 F4）：Word 文件，带设置、网格、结果、云图、结论。云图由浏览器截好传过来。"""
+import base64
+import datetime as dt
+import io
+
+from cae import materials as M
+
+DOF_NAME = {"radial": "径向", "tangential": "转动", "axial": "轴向"}
+SF_LINE = 1.5          # 判断线：一般机械零件静强度常用 1.3–1.5，具体以设计规范或任务书为准
+
+
+def describe_load(l):
+    f = "面 " + "、".join(str(x) for x in l["faces"])
+    t = l["type"]
+    if t == "fixed":
+        return "固定", f, "三个方向都不能动"
+    if t == "cyl_support":
+        dofs = l.get("dofs") or ["radial"]
+        kind = "限制转动（联轴器 / 键连接）" if dofs == ["tangential"] else "轴承支承"
+        return kind, f, "限制" + "、".join(DOF_NAME[d] for d in dofs)
+    if t == "force":
+        v = l["vector_n"]
+        return "力", f, "Fx {:g}，Fy {:g}，Fz {:g} N（均匀分布）".format(*v)
+    if t == "pressure":
+        return "压力", f, "{:g} MPa".format(l["value_mpa"])
+    if t == "torque":
+        return "扭矩", f, "{:g} N·m，绕轴线 {}".format(l["value_nmm"] / 1000, _vec(l["axis"]["dir"]))
+    return t, f, ""
+
+
+def _vec(v):
+    return "(" + ", ".join("{:g}".format(round(x, 3)) for x in v) + ")"
+
+
+def conclusion(stats, mat):
+    sf = stats.get("safety_factor")
+    if sf is None:
+        return "没有强度数据，无法判断。"
+    kind = "屈服强度" if mat.get("yield_mpa") else "抗拉强度"
+    s = "按{} {} MPa 计，安全系数 {:.2f}。".format(kind, mat["strength_mpa"], sf)
+    if sf < 1:
+        s += "最大应力已超过材料强度，零件在这个工况下会{}，必须修改设计（加大尺寸、加圆角、换更强的材料）或减小载荷。".format(
+            "屈服（产生永久变形）" if mat.get("yield_mpa") else "断裂")
+    elif sf < SF_LINE:
+        s += "低于常用判断线 {}，裕量不足，建议改进；若最大应力出现在尖角处，先加圆角再算，或按规范的应力集中系数校核。".format(SF_LINE)
+    else:
+        s += "高于常用判断线 {}，静强度满足要求（交变载荷下还要做疲劳校核）。".format(SF_LINE)
+    return s
+
+
+def build(job, images=(), ai_text=None):
+    from docx import Document
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml.ns import qn
+    from docx.shared import Cm, Pt
+
+    st = job["stats"]
+    setup = job["setup"]
+    mat = M.get(setup["material_id"])
+    srcs = [M.SRC[s] for s in M.BY_ID[mat["id"]]["src"]]
+    d = Document()
+    style = d.styles["Normal"]
+    style.font.name = "Times New Roman"
+    style.font.size = Pt(10.5)
+    style.element.rPr.rFonts.set(qn("w:eastAsia"), "宋体")
+    for name in ("Title", "Heading 1", "Heading 2"):
+        d.styles[name].element.get_or_add_rPr().get_or_add_rFonts().set(qn("w:eastAsia"), "黑体")
+    for sec in d.sections:
+        sec.left_margin = sec.right_margin = Cm(2.2)
+
+    def table(rows, widths=None, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for i, r in enumerate(rows):
+            for j, v in enumerate(r):
+                c = t.cell(i, j)
+                c.text = str(v)
+                if head and i == 0:
+                    for run in c.paragraphs[0].runs:
+                        run.bold = True
+                if widths:
+                    c.width = Cm(widths[j])
+        d.add_paragraph()
+        return t
+
+    d.add_heading("有限元强度计算报告", 0)
+    created = dt.datetime.fromtimestamp(job["created"]).strftime("%Y-%m-%d %H:%M")
+    table([["项目", "内容"],
+           ["计算名称", job.get("title") or "—"],
+           ["零件", job.get("item") or "上传的零件"],
+           ["计算人", job.get("owner_name") or "—"],
+           ["时间", created],
+           ["任务编号", job["id"]]], [4, 12])
+
+    d.add_heading("1  材料", 1)
+    table([["材料", "弹性模量 E", "泊松比 ν", "屈服强度", "抗拉强度", "疲劳极限 σ₋₁"],
+           [mat["name"], "{:g} MPa".format(mat["E_mpa"]), "{:g}".format(mat["nu"]),
+            "{} MPa".format(mat["yield_mpa"]) if mat["yield_mpa"] else "—（脆性）", "{} MPa".format(mat["ultimate_mpa"]),
+            "{} MPa".format(mat["sigma_1"])]])
+    p = d.add_paragraph("说明：" + mat["note"] + "。出处：" + "；".join(srcs) + "。")
+    p.runs[0].font.size = Pt(9)
+
+    d.add_heading("2  约束与载荷", 1)
+    table([["类型", "作用面", "大小 / 方式"]] + [list(describe_load(l)) for l in setup["loads"]], [5, 3.5, 7.5])
+
+    d.add_heading("3  网格与求解", 1)
+    table([["项目", "内容"],
+           ["单元", "二阶四面体（10 节点，CalculiX C3D10）"],
+           ["单元尺寸", "{} mm（载荷面附近加密到约 1/3）".format(st.get("mesh_size_mm"))],
+           ["规模", "{} 个单元，{} 个节点".format(st["elements"], st["nodes"])],
+           ["求解", "线弹性静力，CalculiX；网格 Gmsh；计算用时 {} 秒".format(st["seconds"])]], [4, 12])
+
+    d.add_heading("4  结果", 1)
+    rows = [["项目", "数值", "位置（mm）"],
+            ["最大 Von Mises 应力（评估值）", "{:.1f} MPa".format(st["vm_max_mpa"]),
+             "{}，面 {}".format(_vec(st["vm_max_at"]), "、".join(str(x) for x in st.get("vm_max_faces") or []) or "内部")],
+            ["最大位移", "{:.4g} mm".format(st["u_max_mm"]), _vec(st["u_max_at"])]]
+    if st.get("safety_factor") is not None:
+        rows.append(["安全系数（强度 ÷ 最大应力）", "{:.2f}".format(st["safety_factor"]), ""])
+    table(rows, [6, 4, 6])
+    if st.get("vm_peak_all_mpa", 0) > st["vm_max_mpa"] * 1.01:
+        d.add_paragraph("约束面附近最高 {:.1f} MPa，是约束方式造成的局部值（实际支承没有那么“死”），评估时避开了约束面 {:.1f} mm 以内的点。".format(
+            st["vm_peak_all_mpa"], 1.5 * (st.get("mesh_size_mm") or 0)))
+    d.add_paragraph("注意：没有圆角的内角（尖角）处，应力理论上没有上限，网格越细数值越大。最大值出现在尖角时，应加圆角后重算，或按规范的应力集中系数校核。")
+
+    for img in images:
+        try:
+            raw = base64.b64decode(img["data"].split(",", 1)[-1])
+        except Exception:  # noqa: BLE001
+            continue
+        d.add_picture(io.BytesIO(raw), width=Cm(15.5))
+        d.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cap = d.add_paragraph(img.get("caption") or "")
+        cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cap.runs and setattr(cap.runs[0].font, "size", Pt(9))
+
+    d.add_heading("5  结论", 1)
+    d.add_paragraph(conclusion(st, mat))
+    if ai_text:
+        d.add_heading("6  AI 分析与改进建议", 1)
+        for para in str(ai_text).split("\n"):
+            if para.strip():
+                d.add_paragraph(para.strip())
+        p = d.add_paragraph("（AI 根据上面的设置和结果写出，仅供参考，请结合手算和规范复核。）")
+        p.runs[0].font.size = Pt(9)
+
+    p = d.add_paragraph("问渠数字工厂 · 仿真与分析 生成。计算模型为线弹性小变形，没有考虑接触、塑性、残余应力和表面状态；用于教学和方案比较，正式设计请按相关标准复核。")
+    p.runs[0].font.size = Pt(8)
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
