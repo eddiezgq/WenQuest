@@ -55,14 +55,15 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
             return j
         raise HTTPException(403, "这是别人的计算任务")
 
-    @app.get("/api/cae/lab8/{kind}.docx")
-    def cae_lab8(kind: str):
-        """实验 8 指导书 / 报告模板（Word，公开，课程里直接链接）"""
+    @app.get("/api/cae/{lab}/{kind}.docx")
+    def cae_lab(lab: str, kind: str):
+        """实验 8、9 的指导书 / 报告模板（Word，公开，课程里直接链接）"""
         from cae import labdoc
-        if kind not in ("guide", "report-template"):
+        titles = {"lab8": "实验8-输出轴强度与疲劳校核", "lab9": "实验9-机械臂关节力矩与电机选型"}
+        if lab not in titles or kind not in ("guide", "report-template"):
             raise HTTPException(404, "没有这个文件")
-        data = labdoc.guide_docx() if kind == "guide" else labdoc.report_template_docx()
-        name = "实验8-输出轴强度与疲劳校核-" + ("实验指导书" if kind == "guide" else "实验报告模板") + ".docx"
+        data = labdoc.guide_docx(lab) if kind == "guide" else labdoc.report_template_docx(lab)
+        name = titles[lab] + "-" + ("实验指导书" if kind == "guide" else "实验报告模板") + ".docx"
         return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         headers={"Content-Disposition": "attachment; filename*=UTF-8''" + urllib.parse.quote(name)})
 

@@ -327,3 +327,14 @@ def test_explain_fixed_base_is_mounting_load():
                                "rf.link1.abs": {"max_abs": 200, "at_s": 1}}}}
     r = A.rules_explain(job, {}, {"base"})
     assert "base的安装处" in r["text"] and "link1与上一个构件" in r["text"] and "j6的峰值" not in r["text"]
+
+
+def test_lab9_documents():
+    import io
+    import docx
+    from cae import labdoc
+    g = docx.Document(io.BytesIO(labdoc.guide_docx("lab9")))
+    assert "实验 9" in "\n".join(p.text for p in g.paragraphs) and len(g.tables) >= 1
+    t = docx.Document(io.BytesIO(labdoc.report_template_docx("lab9")))
+    cells = " ".join(c.text for tb in t.tables for r in tb.rows for c in r.cells)
+    assert "J2 大臂" in cells and "虚功原理" in cells

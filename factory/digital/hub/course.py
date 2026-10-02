@@ -447,7 +447,13 @@ def mount(app, H):
                        "按 AI 建议换材料、改尺寸再算对比。",
             "mode": "teach", "products": ["SH-301"], "tool_url": public_base(request) + "/cae",
             "guide_url": public_base(request) + "/api/cae/lab8/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab8/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab8/report-template.docx"}, {
+            "id": "lab9", "name": {"zh": "实验 9：机械臂关节力矩与电机选型", "en": "Lab 9: joint torques and motor sizing for a robot arm"},
+            "summary": "多体动力学（MuJoCo）算 UR5e 搬运 3–4 kg 时各关节的力矩、转速、功率，手算重力矩核对，比较运动规划，"
+                       "按峰值 / 均方根力矩和转速选伺服电机与谐波减速器；生活例子曲柄滑块（虚功原理核对、连杆送有限元）。",
+            "mode": "teach", "products": ["B-ARM-UR5E", "C-LNK-SLIDER"], "tool_url": public_base(request) + "/mbd",
+            "guide_url": public_base(request) + "/api/cae/lab9/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab9/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

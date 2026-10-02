@@ -6,6 +6,7 @@ import re
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GUIDE_MD = os.path.join(HERE, "实验8_输出轴强度与疲劳校核.md")
+GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节力矩与电机选型.md")}
 
 
 def _doc():
@@ -82,11 +83,13 @@ def md_to_docx(md):
     return buf.getvalue()
 
 
-def guide_docx():
-    return md_to_docx(open(GUIDE_MD, encoding="utf-8").read())
+def guide_docx(lab="lab8"):
+    return md_to_docx(open(GUIDES[lab], encoding="utf-8").read())
 
 
-def report_template_docx():
+def report_template_docx(lab="lab8"):
+    if lab == "lab9":
+        return lab9_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -154,6 +157,54 @@ def report_template_docx():
     d.add_paragraph("")
     d.add_heading("七、附件", 1)
     d.add_paragraph("平台生成的计算报告（Word）。", style="List Bullet")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab9_template():
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 9　机械臂关节力矩与电机选型　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、静态重力矩（任务 1）", 1)
+    table([["关节", "平台 3 kg / N·m", "平台 5 kg / N·m", "手算 3 kg / N·m", "误差 %"],
+           ["J2 大臂", "", "", "", ""], ["J3 小臂", "", "", "", ""], ["J4 腕 1", "", "", "", ""]])
+    hint("手算过程：J2 之后各构件的质量、质心到 J2 轴线的水平距离，τ = Σ m·g·r = …")
+    d.add_heading("二、搬运结果（任务 2、3）", 1)
+    table([["方案", "J1 峰值 N·m", "J2 峰值 N·m", "J1 峰值功率 W", "J2 平均功率 W", "峰值时刻 s"],
+           ["1.2 秒，加速段 25%", "", "", "", "", ""],
+           ["1.8 秒（放长 1.5 倍）", "", "", "", "", ""],
+           ["1.2 秒，加速段 40%", "", "", "", "", ""]])
+    hint("贴驱动力矩、速度曲线。说明峰值出现在梯形速度的哪一段；J2 平均功率为负的原因；重力部分与惯性部分各占多少。")
+    d.add_heading("三、电机选型（任务 4）", 1)
+    table([["关节", "峰值 N·m", "均方根 N·m", "最高 r/min", "推荐（安全系数 1.2）", "最紧的一项", "安全系数 1.5 时"]] +
+          [[j, "", "", "", "", "", ""] for j in ("J1", "J2", "J3", "J4", "J5", "J6")])
+    hint("手算核对 J2：电机侧均方根力矩 τ_rms/(i·η) = ____ N·m（额定 ____）；电机转速 ω_max·i = ____ r/min（上限 ____）。")
+    d.add_heading("四、曲柄滑块（任务 5）", 1)
+    table([["项目", "600 r/min", "60 r/min"], ["驱动力矩峰值 N·m", "", ""], ["θ = 90° 时平台值 N·m", "", ""],
+           ["θ = 90° 时虚功原理手算 N·m", "", ""], ["连杆最大受力 N", "", ""], ["连杆安全系数", "", ""], ["连杆疲劳寿命", "", ""]])
+    d.add_heading("五、结论与讨论", 1)
+    d.add_paragraph("")
+    d.add_heading("六、附件", 1)
+    d.add_paragraph("平台生成的动力学报告、有限元报告（Word）。", style="List Bullet")
     buf = io.BytesIO()
     d.save(buf)
     return buf.getvalue()

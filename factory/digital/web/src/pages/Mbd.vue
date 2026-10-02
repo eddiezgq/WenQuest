@@ -1,7 +1,8 @@
 <template>
   <div class="page">
     <div class="page-title"><h1>运动与动力分析</h1>
-      <span class="muted">多体动力学（MuJoCo）：选机构或机械臂 → 加驱动和负载 → 服务器计算 → 动画、运动曲线、关节受力、驱动力矩与功率</span></div>
+      <span class="muted">多体动力学（MuJoCo）：选机构或机械臂 → 加驱动和负载 → 服务器计算 → 动画、运动曲线、关节受力、驱动力矩与功率</span>
+      <span class="labs small">实验 9：<a href="/api/cae/lab9/guide.docx">指导书</a> · <a href="/api/cae/lab9/report-template.docx">报告模板</a></span></div>
 
     <div class="row">
       <section class="card side">
@@ -51,6 +52,7 @@
               <template v-if="dv[j.name].kind === 'move'">
                 <label>到 <input v-model.number="dv[j.name].to" type="number" step="any"> {{ au(j) }}</label>
                 <label><input v-model.number="dv[j.name].t0" type="number" step="0.1" min="0"> 到 <input v-model.number="dv[j.name].t1" type="number" step="0.1"> 秒</label>
+                <label>加速段 <input v-model.number="dv[j.name].accel" type="number" step="5" min="1" max="50"> %</label>
               </template>
               <template v-if="dv[j.name].kind === 'sine'">
                 <label>幅值 <input v-model.number="dv[j.name].amp" type="number" step="any"> {{ au(j) }}</label>
@@ -266,7 +268,7 @@ function resetForm() {
   const out = {};
   for (const j of info.value.joints) {
     const v0 = home[j.name] || 0;
-    out[j.name] = { init: +(j.type === 'hinge' ? v0 / DEG : v0 * 1000).toFixed(2), kind: driver.value ? 'speed' : 'hold', speed: 60, to: 0, t0: 0.2, t1: 1.5, amp: 20, freq: 0.5, torque: 0 };
+    out[j.name] = { init: +(j.type === 'hinge' ? v0 / DEG : v0 * 1000).toFixed(2), kind: driver.value ? 'speed' : 'hold', speed: 60, to: 0, t0: 0.2, t1: 1.5, accel: 25, amp: 20, freq: 0.5, torque: 0 };
   }
   dv.value = out; loads.value = {};
   payloads.value = []; forces.value = []; points.value = [];
@@ -294,7 +296,7 @@ function buildSetup() {
     if (v.kind === 'free') continue;
     const d = { joint: j.name, kind: v.kind };
     if (v.kind === 'speed') d.value = j.type === 'hinge' ? v.speed * 2 * Math.PI / 60 : v.speed / 1000;
-    if (v.kind === 'move') Object.assign(d, { to: toSI(j, v.to), t0: v.t0, t1: v.t1 });
+    if (v.kind === 'move') Object.assign(d, { to: toSI(j, v.to), t0: v.t0, t1: v.t1, accel: (v.accel || 25) / 100 });
     if (v.kind === 'sine') Object.assign(d, { amp: toSI(j, v.amp), freq: v.freq });
     if (v.kind === 'torque') d.value = v.torque;
     drives.push(d);
@@ -534,6 +536,7 @@ onUnmounted(() => { clearTimeout(pollT); cancelAnimationFrame(raf); playing.valu
 </script>
 
 <style scoped>
+.labs { margin-left: auto; white-space: nowrap; }
 .side { width: 400px; flex-shrink: 0; display: flex; flex-direction: column; gap: 9px; align-self: flex-start; }
 .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
 .step { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-top: 6px; }
