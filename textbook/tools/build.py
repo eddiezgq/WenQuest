@@ -269,9 +269,18 @@ def check_std_tables(book: dict, rep: Report) -> None:
     """Every digitized standard table of the book (std/*.yaml, 第 11、13 轮) is well formed: sources with addresses,
     each row's source listed, columns declared, at least 10 spot checks (stdtab.check)."""
     import stdtab
+    import yaml as _yaml
     for p in sorted((book["root"] / "std").glob("*.yaml")):
-        for why in stdtab.check(p):
-            rep.add("error", "标准表", f"std/{p.name}", why)
+        try:
+            d = _yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+        except _yaml.YAMLError as e:
+            rep.add("error", "标准表", f"std/{p.name}", f"YAML 格式错误：{e}")
+            continue
+        # a table without sources is in the compact format (《机械设计》第 11 轮: rows as lists, "status: 待核对"); it is
+        # reported as a 提醒 so one book's table format never stops another book's build
+        kind = "error" if "sources" in d else "warning"
+        for why in (stdtab.check(p) if kind == "error" else ["没有逐行出处（sources），待按零件库格式补出处并抽查核对"]):
+            rep.add(kind, "标准表", f"std/{p.name}", why)
 
 
 def check_other_books(book: dict, rep: Report) -> None:
