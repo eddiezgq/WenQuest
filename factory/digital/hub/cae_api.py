@@ -54,6 +54,17 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
             return j
         raise HTTPException(403, "这是别人的计算任务")
 
+    @app.get("/api/cae/lab8/{kind}.docx")
+    def cae_lab8(kind: str):
+        """实验 8 指导书 / 报告模板（Word，公开，课程里直接链接）"""
+        from cae import labdoc
+        if kind not in ("guide", "report-template"):
+            raise HTTPException(404, "没有这个文件")
+        data = labdoc.guide_docx() if kind == "guide" else labdoc.report_template_docx()
+        name = "实验8-输出轴强度与疲劳校核-" + ("实验指导书" if kind == "guide" else "实验报告模板") + ".docx"
+        return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        headers={"Content-Disposition": "attachment; filename*=UTF-8''" + urllib.parse.quote(name)})
+
     @app.get("/api/cae/health")
     def cae_health():
         """计算服务是否在线（上线检查用，不需要登录）"""
@@ -151,9 +162,15 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
     @app.get("/api/cae/torque-logs")
     def cae_torque_logs(u=Depends(user_of)):
         """跑合试验台的转矩记录（疲劳寿命的载荷谱），最近 20 条"""
-        rows = H.db.messages(["test.torque"], mode=u["mode"], order="desc", limit=20)
-        out = []
+        rows = H.db.messages(["test.torque"], mode=u["mode"], order="desc", limit=200)
+        out, seen = [], set()
         for r in rows:
+            key = (r["data"]["part_serial"], r["data"].get("work_order"))
+            if key in seen:                      # 重置情景会重发同一件的记录
+                continue
+            seen.add(key)
+            if len(out) >= 20:
+                break
             s = r["data"]["samples_nm"]
             out.append({"id": r["id"], "ts": r["ts"], "item": r["data"]["item"], "part_serial": r["data"]["part_serial"],
                         "program": r["data"].get("program"), "duration_s": len(s) / r["data"]["rate_hz"],

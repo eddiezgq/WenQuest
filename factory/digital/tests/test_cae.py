@@ -239,3 +239,26 @@ def test_llm_paths_validate_and_fall_back():
            "stats": {"vm_max_mpa": 300.0, "vm_peak_all_mpa": 300.0, "vm_max_faces": [1], "safety_factor": 0.92}}
     r = A.explain(Fake({"text": "根部最危险。", "material_id": "7075-T6"}), job, faces)
     assert r["text"] == "根部最危险。" and r["actions"][0]["material_id"] == "7075-T6" and r["engine"] == "fake"
+
+
+def test_lab8_documents():
+    import io
+    import docx
+    from cae import labdoc
+    g = docx.Document(io.BytesIO(labdoc.guide_docx()))
+    text = "\n".join(p.text for p in g.paragraphs)
+    assert "实验 8" in text and "任务 3" in text and len(g.tables) >= 2
+    t = docx.Document(io.BytesIO(labdoc.report_template_docx()))
+    cells = " ".join(c.text for tb in t.tables for r in tb.rows for c in r.cells)
+    assert "Haibach" in cells and "方案 B" in cells and "安全系数" in cells
+
+
+def test_size_limit_gives_plain_message(monkeypatch, tmp_path):
+    """超过教学版规模：直接提示调大网格，不卡死；计算服务里同样把原因带回任务"""
+    monkeypatch.setattr(S, "MAX_ELEMENTS", 200)
+    step = beam_step()
+    faces, _, _ = G.faces(step)
+    fix, tip = face_at(faces, 0, 0.0), face_at(faces, 0, 100.0)
+    with pytest.raises(S.TooBig, match="教学版上限"):
+        S.solve(step, {"material": M.get("Q235"), "mesh": {"size_mm": 2},
+                       "loads": [{"type": "fixed", "faces": [fix]}, {"type": "force", "faces": [tip], "vector_n": [0, -1, 0]}]})

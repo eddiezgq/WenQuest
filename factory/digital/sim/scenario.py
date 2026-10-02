@@ -16,8 +16,8 @@ import datetime as dt
 from zoneinfo import ZoneInfo
 
 from factory import data as F
-from sim.engine import OP_UNITS, routing_for
-from wqbus.topics import topic
+from sim.engine import OP_UNITS, routing_for, torque_record
+from wqbus.topics import topic, unit_topic
 
 CUST = {"gv": F.CUSTOMERS[0], "summit": F.CUSTOMERS[1], "harbor": F.CUSTOMERS[2]}
 
@@ -76,12 +76,21 @@ def load(engine, publish, now=None, tz="America/New_York", fault_left_min=90):
     month0 = today.replace(day=1)
     past = [month0 + dt.timedelta(days=i) for i in range((today - month0).days)]
     past = [d for d in past if d.weekday() < 5]
-    for i, day in enumerate(past[-12:]):
+    recent = past[-12:]
+    for i, day in enumerate(recent):
         name = "SAL-ORD-2026-{:05d}".format(5 + i)
         due = day if i != 7 else day - dt.timedelta(days=1)
         erp("Sales Order", name, at_local(day, 9), "updated", status="Completed", docstatus=1,
             customer=list(CUST.values())[i % 3], delivery_date=due.isoformat(), delivered_date=day.isoformat(),
             per_delivered=100, items=[{"item_code": "WQR-105", "qty": 2 + i % 4, "delivered_qty": 2 + i % 4}])
+        # 最近 3 单的减速器出厂前做过跑合试验：留下输出轴转矩记录（第 11 轮实验 8 的疲劳载荷谱）
+        if i >= len(recent) - 3:
+            wo = "MFG-WO-2026-{:05d}".format(i - 1)
+            for k in range(2 + i % 4):
+                serial = "WQR-105-{:02d}{:02d}-{:02d}".format(day.month, day.day, k + 1)
+                publish(unit_topic("test-01", "torque"), "test.torque", "sim/test-01",
+                        torque_record(serial, wo, "WQR-105"), wo,
+                        _iso(at_local(day - dt.timedelta(days=1), 13) + dt.timedelta(minutes=40 * k)))
 
     # ---- 在手订单
     due19 = _wd_add(today, 2)

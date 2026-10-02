@@ -1,7 +1,8 @@
 <template>
   <div class="page">
     <div class="page-title"><h1>仿真与分析</h1>
-      <span class="muted">有限元强度校核：选零件 → 材料 → 在模型上点选面加约束和载荷 → 服务器计算 → 看应力、变形、安全系数</span></div>
+      <span class="muted">有限元强度校核与疲劳寿命：选零件 → 材料 → 加约束和载荷 → 服务器计算 → 看应力、变形、安全系数、寿命</span>
+      <span class="labs small">实验 8：<a href="/api/cae/lab8/guide.docx">指导书</a> · <a href="/api/cae/lab8/report-template.docx">报告模板</a></span></div>
 
     <div class="row">
       <!-- 左：设置 -->
@@ -513,6 +514,7 @@ onUnmounted(() => { clearTimeout(pollT); clearInterval(listT); });
 </script>
 
 <style scoped>
+.labs { margin-left: auto; white-space: nowrap; }
 .side { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 9px; align-self: flex-start; }
 .grow { flex: 1; min-width: 0; }
 .step { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-top: 6px; }

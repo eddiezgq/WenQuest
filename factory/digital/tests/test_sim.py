@@ -155,9 +155,11 @@ def test_scenario_builds_history_and_leaves_grinder_down_now():
 
 
 def test_run_in_rig_publishes_torque_log():
-    """第 11 轮：跑合试验台每台减速器出一条输出轴转矩记录（疲劳寿命的载荷谱），同一件每次一样"""
+    """第 11 轮：跑合试验台每台减速器出一条输出轴转矩记录（疲劳寿命的载荷谱），同一件每次一样；
+    实验 7 情景里最近交付的减速器也留有记录（实验 8 一开始就有载荷谱可用）"""
     import wqbus
     from sim.engine import Engine
+    from sim import scenario
     out = []
     eng = Engine(lambda tp, ty, src, data, corr: out.append((tp, wqbus.make(ty, src, data, corr=corr))), None, seed=1)
 
@@ -177,3 +179,11 @@ def test_run_in_rig_publishes_torque_log():
     assert tp.endswith("/test-01/torque") and m["type"] == "test.torque" and m["data"]["rate_hz"] == 10
     assert len(s) == 750 and 1.5 * 350 <= max(s) <= 1.7 * 350 and min(s) > -30
     assert s == m2["data"]["samples_nm"]
+    got = []
+    from tests_helpers import make_engine
+    e2, _, _ = make_engine(auto=False)
+    import datetime as dt
+    scenario.load(e2, lambda tp, ty, src, data, corr, ts: got.append(wqbus.make(ty, src, data, corr=corr, ts=ts)),
+                  now=dt.datetime(2026, 10, 20, 14, 30, tzinfo=dt.timezone.utc))
+    logs = [g for g in got if g["type"] == "test.torque"]
+    assert len(logs) >= 6 and len({g["data"]["part_serial"] for g in logs}) == len(logs)

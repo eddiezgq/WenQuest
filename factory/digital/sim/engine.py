@@ -399,32 +399,9 @@ class Engine:
         self._try_start(m)
 
     def _torque_log(self, p, job, corr):
-        """跑合试验台的“工况模拟”段：带式输送机 启动—运行—停机 × 3，输出轴转矩 10 Hz（第 11 轮疲劳寿命用）"""
-        import math
-        tr = RATED_TORQUE_NM.get(job.wo.item, 350.0)
-        import zlib
-        rng = random.Random(zlib.crc32((p.serial + job.wo.name).encode()))   # 同一件每次一样
-        rate, out = 10.0, []
-        for _ in range(3):
-            peak = tr * rng.uniform(1.5, 1.7)                 # 电机起动转矩冲击
-            mean = tr * rng.uniform(0.70, 0.80)               # 带上物料，稳定运行
-            for i in range(int(25 * rate)):
-                t = i / rate
-                if t < 1:
-                    v = peak * t
-                elif t < 2:
-                    v = mean + (peak - mean) * math.exp(-4 * (t - 1))
-                elif t < 22:
-                    v = mean + 0.08 * tr * math.sin(2 * math.pi * 0.5 * t) + rng.gauss(0, 0.03 * tr)
-                elif t < 23:
-                    v = mean * (23 - t)
-                else:
-                    v = rng.gauss(0, 0.005 * tr)
-                out.append(round(v, 1))
+        """跑合试验台每做完一台，发一条输出轴转矩记录（第 11 轮疲劳寿命用）"""
         self.pub(unit_topic("test-01", "torque"), "test.torque", "sim/test-01",
-                 {"item": job.wo.item, "part_serial": p.serial, "work_order": job.wo.name, "rate_hz": rate,
-                  "samples_nm": out, "duration_s": len(out) / rate, "rated_nm": tr,
-                  "program": "工况模拟：带式输送机 启动—运行—停机 × 3"}, corr)
+                 torque_record(p.serial, job.wo.name, job.wo.item), corr)
 
     def _measure(self, p, corr):
         result = "pass"
@@ -570,6 +547,33 @@ class Engine:
 
 _MACHINE_UNITS = {"saw-01", "cnc-l01-a", "cnc-l01-b", "vmc-01", "hmc-01", "key-01", "hob-01",
                   "ht-01", "grd-01", "qc-01", "asm-01", "test-01"}
+
+
+def torque_record(serial, work_order, item):
+    """跑合试验台的“工况模拟”段：带式输送机 启动—运行—停机 × 3，输出轴转矩 10 Hz、75 秒。同一件每次一样"""
+    import math
+    import zlib
+    tr = RATED_TORQUE_NM.get(item, 350.0)
+    rng = random.Random(zlib.crc32((serial + work_order).encode()))
+    rate, out = 10.0, []
+    for _ in range(3):
+        peak = tr * rng.uniform(1.5, 1.7)                 # 电机起动转矩冲击
+        mean = tr * rng.uniform(0.70, 0.80)               # 带上物料，稳定运行
+        for i in range(int(25 * rate)):
+            t = i / rate
+            if t < 1:
+                v = peak * t
+            elif t < 2:
+                v = mean + (peak - mean) * math.exp(-4 * (t - 1))
+            elif t < 22:
+                v = mean + 0.08 * tr * math.sin(2 * math.pi * 0.5 * t) + rng.gauss(0, 0.03 * tr)
+            elif t < 23:
+                v = mean * (23 - t)
+            else:
+                v = rng.gauss(0, 0.005 * tr)
+            out.append(round(v, 1))
+    return {"item": item, "part_serial": serial, "work_order": work_order, "rate_hz": rate, "samples_nm": out,
+            "duration_s": len(out) / rate, "rated_nm": tr, "program": "工况模拟：带式输送机 启动—运行—停机 × 3"}
 
 
 def routing_for(item):

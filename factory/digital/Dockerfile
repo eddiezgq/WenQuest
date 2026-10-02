@@ -27,6 +27,7 @@ COPY digital/sim/ digital/sim/
 COPY digital/hub/ digital/hub/
 COPY digital/freecad/ digital/freecad/
 COPY digital/cae/ digital/cae/
+COPY ["digital/实验8_输出轴强度与疲劳校核.md", "digital/"]
 COPY digital/mock_erpnext/ digital/mock_erpnext/
 COPY --from=web /web/dist digital/web/dist
 WORKDIR /app/digital

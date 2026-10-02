@@ -437,11 +437,17 @@ def mount(app, H):
         return designs(H.db, item, public_base(request))
 
     @app.get("/api/course/cases", dependencies=[K])
-    def course_cases():
+    def course_cases(request: Request):
         return head(["factory-data"], items=[{
             "id": "lab7", "name": {"zh": "实验 7：数字工厂闭环", "en": "Lab 7: the closed loop in a digital factory"},
             "summary": "WQR-105 减速器厂的一周：接单、算料排产、设计发布、车间加工、在线检测与不合格品处置、看板与 AI 提醒。",
-            "mode": "teach", "guide_url": GUIDE_URL, "products": ["WQR-105"]}])
+            "mode": "teach", "guide_url": GUIDE_URL, "products": ["WQR-105"]}, {
+            "id": "lab8", "name": {"zh": "实验 8：输出轴强度与疲劳校核", "en": "Lab 8: strength and fatigue check of the output shaft"},
+            "summary": "有限元（Gmsh + CalculiX）算 SH-301 在 350 N·m 下的应力与安全系数，手算核对；用跑合试验台的转矩记录做雨流计数和疲劳寿命；"
+                       "按 AI 建议换材料、改尺寸再算对比。",
+            "mode": "teach", "products": ["SH-301"], "tool_url": public_base(request) + "/cae",
+            "guide_url": public_base(request) + "/api/cae/lab8/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab8/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():
