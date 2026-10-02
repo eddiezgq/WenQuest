@@ -1215,6 +1215,11 @@ from hub import course as _course  # noqa: E402
 _course.mount(app, H)
 
 
+# ---------------------------------------------------------------- 仿真与分析（第 11 轮）
+from hub import cae_api as _cae  # noqa: E402
+_cae.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")))
+
+
 # ---------------------------------------------------------------- 网页
 if os.path.isdir(WEB_DIST):
     app.mount("/assets", StaticFiles(directory=os.path.join(WEB_DIST, "assets")), name="assets")

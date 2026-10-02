@@ -11,8 +11,10 @@ RUN npm run build
 FROM python:3.12-slim
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 TZ=America/New_York
 WORKDIR /app
-# build123d（网页设计台出 STEP，第 6 轮 W3）用到 OpenCASCADE，需要这几个系统库
+# build123d（网页设计台出 STEP，第 6 轮 W3）用到 OpenCASCADE，需要这几个系统库；
+# 有限元（第 11 轮）：CalculiX 求解器 ccx，gmsh 需要 libGLU 等
 RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 libxrender1 libx11-6 libxext6 \
+        calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 COPY digital/requirements.txt digital/requirements.txt
 RUN pip install -r digital/requirements.txt "requests>=2.31"
@@ -23,6 +25,7 @@ COPY digital/wqbus/ digital/wqbus/
 COPY digital/sim/ digital/sim/
 COPY digital/hub/ digital/hub/
 COPY digital/freecad/ digital/freecad/
+COPY digital/cae/ digital/cae/
 COPY digital/mock_erpnext/ digital/mock_erpnext/
 COPY --from=web /web/dist digital/web/dist
 WORKDIR /app/digital

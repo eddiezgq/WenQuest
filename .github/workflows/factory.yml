@@ -38,6 +38,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: 有限元求解器（第 11 轮：CalculiX、gmsh 用到的系统库）
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1
+          ccx -v | grep -q Version
       - name: 工厂数据与导入脚本
         working-directory: factory
         run: pip install -q -r digital/requirements.txt pytest "requests>=2.31" && python -m pytest -q tests
@@ -103,6 +107,9 @@ jobs:
             --erp-key "$(val WQ_ERP_API_KEY)" --erp-secret "$(val WQ_ERP_API_SECRET)" --speed 300 --timeout 900 \
             --diag /tmp/logs/erp_errors.log \
             2>&1 | tee /tmp/logs/closed_loop.log
+      - name: 有限元计算（第 11 轮）
+        working-directory: factory/digital
+        run: python tests/check_cae.py --hub http://localhost:8100
       - name: ERPNext 单点登录（第 7 轮）
         working-directory: /tmp/fac
         run: |

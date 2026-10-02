@@ -119,6 +119,25 @@ services:
       WQ_SIM_SPEED: ${WQ_SIM_SPEED:-20}
     depends_on: [bus]
 
+  # 有限元计算服务（第 11 轮 F2）：所有工厂共用，排队一次算一个；只在内部网络，枢纽转交任务
+  cae:
+    <<: *app
+    command: ["uvicorn", "cae.service:app", "--host", "0.0.0.0", "--port", "8200"]
+    environment:
+      WQ_CAE_DATA: /data
+      WQ_CAE_TIME_LIMIT_S: ${WQ_CAE_TIME_LIMIT_S:-300}
+      WQ_CAE_MAX_ELEMENTS: ${WQ_CAE_MAX_ELEMENTS:-200000}
+      WQ_CAE_THREADS: "2"
+      TZ: ${WQ_TZ:-America/New_York}
+    mem_limit: ${WQ_CAE_MEM:-2500m}       # 超了只会中止这次计算，不影响别的服务
+    volumes: [cae-data:/data]
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8200/health', timeout=5).status == 200 else 1)\""]
+      interval: 30s
+      timeout: 8s
+      retries: 5
+      start_period: 20s
+
   bridge:
     image: ${FACTORY_BRIDGE_IMAGE:?FACTORY_BRIDGE_IMAGE}
     restart: unless-stopped
@@ -350,6 +369,7 @@ services:
 
 volumes:
   bus-data:
+  cae-data:
   bus-demo-data:
   db-data:
   erp-sites:

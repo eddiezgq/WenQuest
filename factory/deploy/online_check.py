@@ -111,5 +111,15 @@ except Exception as e:  # noqa: BLE001
     say("读不到 ERPNext 登录页：{}".format(e))
     ok = False
 
+# 4. 有限元计算服务（第 11 轮）：经本厂枢纽转交
+try:
+    with urllib.request.urlopen("https://{}.{}/api/cae/health".format(FAC, domain), timeout=30) as r:
+        h = json.loads(r.read().decode())
+    say("有限元计算服务：在线（正在算 {}，排队 {}）".format(h.get("running") or "无", h.get("queued")))
+    ok = ok and bool(h.get("ok"))
+except Exception as e:  # noqa: BLE001
+    say("有限元计算服务连不上：{}".format(e))
+    ok = False
+
 msg = "%0A".join(x.replace("%", "%25") for x in lines)
 print("::{} title=线上{}检查（{}）::{}".format("notice" if ok else "warning", "演示工厂" if FAC == "demo" else ("班级工厂 " + FAC.split(".")[0] if "." in FAC else "车间"), "正常" if ok else "有问题", msg))

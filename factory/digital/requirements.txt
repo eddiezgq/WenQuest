@@ -9,3 +9,6 @@ build123d==0.13.0
 trimesh==5.1.0
 rtree==1.4.1
 scipy==1.17.1
+gmsh==4.15.2
+pylife==2.3.1
+python-docx==1.2.0

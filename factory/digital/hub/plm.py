@@ -171,6 +171,37 @@ def current_glb(db, mode, item):
     return glb, g
 
 
+def current_step(db, mode, item):
+    """现行版 STEP（有限元用，第 11 轮）：最近批准的提交 → 最近发布消息 → SH-301 第 1 版"""
+    r = db.one("select files from design_submission where mode=%s and item=%s and status='approved' order by decided_at desc limit 1",
+               (mode, item))
+    if r:
+        f = next((f for f in r["files"] if f["kind"] == "step"), None)
+        if f:
+            return load_file(db, f["url"])
+    for m in db.messages(["design.release"], mode=mode, order="desc", limit=200):
+        if m["data"]["item"] == item:
+            f = next((f for f in m["data"].get("files") or [] if f.get("kind") == "step"), None)
+            if f:
+                return load_file(db, f["url"])
+            break
+    if item == "SH-301":
+        from hub import design as D
+        return D.step_bytes(D.normalize(D.defaults()))
+    return None
+
+
+def items_with_step(db, mode):
+    """有现行 STEP 的物料（有限元选零件用）"""
+    out = {"SH-301"}
+    for r in db.q("select distinct item from design_submission where mode=%s and status='approved'", (mode,)):
+        out.add(r["item"])
+    for m in db.messages(["design.release"], mode=mode, order="desc", limit=500):
+        if any(f.get("kind") == "step" for f in m["data"].get("files") or []):
+            out.add(m["data"]["item"])
+    return sorted(out)
+
+
 # ---------------------------------------------------------------- 提交、审批
 def submit(db, emit, mode, author, author_uid, item, step=None, step_name=None, drawing=None, drawing_name=None,
            gcode=None, operation=None, note="", params=None, extra_files=None, gcode_info=None):
