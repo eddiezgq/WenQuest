@@ -23,8 +23,8 @@ operations:
     tools: 外圆车刀 CNMG 120408（涂层硬质合金），A3 中心钻
     cut: {vc_m_min: 120, f_mm_r: 0.3, ap_mm: 2.5, d_mm: 50, length_mm: 168, passes: 4}
     features:
-      - {name: 轴承位, size_mm: 36.8, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
-      - {name: 齿轮位, size_mm: 41.8, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
+      - {name: 轴承位, size_mm: 36.5, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
+      - {name: 齿轮位, size_mm: 41.5, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
     minutes: 18
   - seq: 30
     operation: 调质 Quench & temper
@@ -34,11 +34,11 @@ operations:
   - seq: 40
     operation: 精车 Finish turning
     workstation: 数控车床 CNC-L01
-    content: 修研中心孔；两顶尖装夹精车各外圆、轴肩与倒角，轴承位和齿轮位留磨量
+    content: 修研中心孔；两顶尖装夹精车各外圆、轴肩与倒角，两端面车至总长 167，轴承位和齿轮位留磨量
     datum: 两端中心孔
     clamping: 前后顶尖，鸡心夹头
     tools: 外圆车刀 DNMG 110404（涂层硬质合金）
-    cut: {vc_m_min: 150, f_mm_r: 0.15, ap_mm: 0.75, d_mm: 41.8, length_mm: 168, passes: 1}
+    cut: {vc_m_min: 150, f_mm_r: 0.15, ap_mm: 0.75, d_mm: 41.5, length_mm: 168, passes: 1}
     features:
       - {name: 轴承位, size_mm: 35.3, es_mm: 0, ei_mm: -0.039, Ra_um: 3.2}
       - {name: 齿轮位, size_mm: 40.3, es_mm: 0, ei_mm: -0.039, Ra_um: 3.2}
