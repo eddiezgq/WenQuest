@@ -1,0 +1,28 @@
+# 实验 34.3 的指导书与报告模板。目的、场景、参数、任务取自 lab34_3.js。
+原理:
+  - ["导体棒以速度 v 在垂直于磁场的导轨上运动，棒中电荷受洛伦兹力，沿棒形成动生电动势 ε = BLv（式 (34.3.2)）。电路总电阻为 R 时电流 I = BLv/R，棒受安培力 BIL，方向与运动相反。",
+     "A rod moving at v across a field B has a motional emf ε = BLv (Eq. (34.3.2)). With total resistance R the current is I = BLv/R and the rod feels an Ampère force BIL opposing the motion."]
+  - 式: "F_A = B²L²v/R        (34.3.3)"
+  - ["恒力 F 拉棒时，m dv/dt = F − B²L²v/R，速度按 v = v_t(1 − e^{−t/τ}) 趋于末速度 v_t = FR/(BL)²，τ = mR/(BL)²（式 (34.3.5)）。达到末速度后，拉力的功率 Fv 全部变成电功率 εI（式 (34.3.4)）。",
+     "Under a constant pull, m dv/dt = F − B²L²v/R, so v = v_t(1 − e^{−t/τ}) with v_t = FR/(BL)² and τ = mR/(BL)² (Eq. (34.3.5)). At terminal speed the pulling power Fv all becomes electrical power εI (Eq. (34.3.4))."]
+  - ["只受安培力时（磁力刹车），速度按 e^{−t/τ} 衰减，滑行的总距离为 v₀τ。", "With the Ampère force alone (magnetic brake) the speed decays as e^{−t/τ} and the total distance is v₀τ."]
+步骤:
+  - ["选“恒力拉动”，B = 0.8 T、R = 0.2 Ω、F = 2 N，点“开始”，运行到速度不再增加，读出末速度、电动势、电流、安培力和电功率，与手算比较（任务 1），记入表 1。", "Choose “Constant pull”, B = 0.8 T, R = 0.2 Ω, F = 2 N, press “Start” and run until the speed stops growing; read v_t, ε, I, F_A and the electrical power and compare with hand calculation (task 1); record in Table 1."]
+  - ["保持 B 和 F，由 v_t = FR/(BL)² 算出使末速度为 1.0 m/s 的 R，调好后运行验证（任务 2）。", "Keep B and F, compute R for v_t = 1.0 m/s from v_t = FR/(BL)², set it and verify (task 2)."]
+  - ["把 B 减小一半，预测末速度和时间常数怎样变化，再运行核对。", "Halve B, predict how v_t and τ change, then check."]
+  - ["切换到“磁力刹车”，调 B 和 R，使金属板在 2 m 以内停下（任务 3），记下滑行距离，与 v₀τ 比较。", "Switch to “Magnetic brake”; choose B and R so the fin stops within 2 m (task 3); compare the distance with v₀τ."]
+数据表:
+  - 标题: ["表 1  恒力拉动（L = 0.5 m，m = 0.5 kg）", "Table 1  Constant pull (L = 0.5 m, m = 0.5 kg)"]
+    表头: ["B / T", "R / Ω", "F / N", "v_t 读数 / (m/s)", "FR/(BL)² / (m/s)", "电功率 / W", "Fv_t / W"]
+    表头英文: ["B / T", "R / Ω", "F / N", "v_t read / (m/s)", "FR/(BL)² / (m/s)", "Electrical power / W", "Fv_t / W"]
+    行: [["0.8", "0.2", "2", "", "", "", ""], ["0.8", "", "2", "1.0", "", "", ""], ["0.4", "0.2", "2", "", "", "", ""]]
+  - 标题: ["表 2  磁力刹车（v₀ = 5 m/s）", "Table 2  Magnetic brake (v₀ = 5 m/s)"]
+    表头: ["B / T", "R / Ω", "τ / s", "v₀τ / m", "滑行距离读数 / m"]
+    表头英文: ["B / T", "R / Ω", "τ / s", "v₀τ / m", "Distance read / m"]
+    行: [["1.2", "0.05", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["“恒力拉动”场景每次最长运行 8 s（模拟时间）。时间常数很大时速度还没到末速度就停了，末速度以读数栏的 FR/(BL)² 为准。", "Each “Constant pull” run lasts at most 8 s of simulated time. With a large time constant the run ends before the terminal speed is reached; use the FR/(BL)² readout."]
+  - ["导轨无摩擦、导体棒和导轨的电阻计入 R、自感忽略。", "Frictionless rails; the rod's and rails' resistance are included in R; self-inductance is neglected."]
+  - ["画面慢放 2 倍，曲线横轴是实际时间。", "The picture runs twice as slow; the time axis shows real time."]
+思考题:
+  - ["若电路断开（R → ∞），恒力拉动时棒的运动怎样？此时电动势还存在吗？", "With the circuit open (R → ∞), how does the rod move under the pull? Is there still an emf?"]

@@ -1,0 +1,29 @@
+# 实验 34.7 的指导书与报告模板。目的、场景、参数、任务取自 lab34_7.js。
+原理:
+  - ["两个线圈靠互感 M = k√(L1 L2) 耦合（第 35 章）。一次侧通交流电，二次侧感应出电动势 jωM I1，向负载供电。按相量（第 36 章）写出两个回路的电压方程，就能求出两边的电流。",
+     "Two coils are coupled by the mutual inductance M = k√(L1 L2) (Chapter 35). An AC current in the primary induces jωM I1 in the secondary, which feeds the load. Writing both loop equations with phasors (Chapter 36) gives both currents."]
+  - 式: "Z1 I1 − jωM I2 = U1，−jωM I1 + Z2 I2 = 0（相量方程，第 36 章；M = k√(L1 L2)，式 (34.7.1)）"
+  - ["耦合较弱时，线圈的感抗远大于互感的感抗，大部分电压降在漏感上。串联电容 C = 1/(ω0² L) 在谐振频率 ω0 抵消感抗（式 (34.7.2)），于是谐振时的效率为 η = ω²M²R_L/[(R2 + R_L)(R1(R2 + R_L) + ω²M²)]（式 (34.7.3)）。",
+     "With weak coupling the coils' reactance far exceeds ωM and most voltage drops across leakage. A series capacitor C = 1/(ω0² L) cancels the reactance at ω0 (Eq. (34.7.2)), and at resonance η = ω²M²R_L/[(R2 + R_L)(R1(R2 + R_L) + ω²M²)] (Eq. (34.7.3))."]
+步骤:
+  - ["选“AGV 充电桩”，k = 0.30、85 kHz、有补偿，读出效率、负载功率和输出电压（任务 1），与式 (34.7.3) 手算比较。", "Choose “AGV charging pad”, k = 0.30, 85 kHz, compensated; read efficiency, load power and output voltage (task 1); compare with Eq. (34.7.3)."]
+  - ["k 依次取 0.05、0.1、0.2、0.4、0.6，记录效率和负载功率（表 1），说明功率为什么在 k 较小时出现最大值。", "Set k to 0.05, 0.1, 0.2, 0.4, 0.6; record efficiency and load power (Table 1) and explain why the power peaks at small k."]
+  - ["k = 0.30，去掉补偿，记录负载功率（任务 2）。", "With k = 0.30, remove the compensation and record the load power (task 2)."]
+  - ["恢复补偿，把频率从 85 kHz 调到 80、75、70 kHz，记录负载功率（任务 3）。", "Restore the compensation and tune to 80, 75, 70 kHz; record the load power (task 3)."]
+  - ["切换到“手机无线充电”，减小 k，观察效率、负载功率和一次侧电流的变化（任务 4）。这个场景模拟 Qi 一类充电板：发射端调节电压，负载功率最多 5 W，一次侧电流幅值最多 3 A。", "Switch to “Phone charging”, reduce k and watch the efficiency, load power and primary current (task 4). This scene models a Qi-type pad: the transmitter regulates its voltage so that the load gets at most 5 W and the primary current stays below 3 A peak."]
+数据表:
+  - 标题: ["表 1  效率与耦合系数（85 kHz，有补偿）", "Table 1  Efficiency against coupling (85 kHz, compensated)"]
+    表头: ["k", "η 读数 / %", "η 手算 / %", "负载功率 / W"]
+    表头英文: ["k", "η read / %", "η computed / %", "Load power / W"]
+    行: [["0.05", "", "", ""], ["0.1", "", "", ""], ["0.2", "", "", ""], ["0.3", "", "", ""], ["0.4", "", "", ""], ["0.6", "", "", ""]]
+  - 标题: ["表 2  补偿与频率（k = 0.30）", "Table 2  Compensation and frequency (k = 0.30)"]
+    表头: ["补偿", "f / kHz", "η / %", "负载功率 / W"]
+    表头英文: ["Compensation", "f / kHz", "η / %", "Load power / W"]
+    行: [["有", "85", "", ""], ["无", "85", "", ""], ["有", "80", "", ""], ["有", "75", "", ""], ["有", "70", "", ""]]
+    行英文: [["on", "85", "", ""], ["off", "85", "", ""], ["on", "80", "", ""], ["on", "75", "", ""], ["on", "70", "", ""]]
+注意:
+  - ["“AGV 充电桩”场景与算例 34.7.1 相同，一次侧电压只取 10 V，是按比例缩小的示例：实际 AGV 充电功率为千瓦级。功率与电压的平方成正比，效率与电压无关。", "The “AGV charging pad” scene matches Example 34.7.1 with only 10 V on the primary, a scaled-down example: real AGV chargers deliver kilowatts. Power scales with the square of the voltage; efficiency does not depend on it."]
+  - ["电压、电流都是幅值；功率按 P = |I|² R/2 计算。", "Voltages and currents are amplitudes; power is P = |I|² R/2."]
+  - ["一次侧电压固定为 10 V，实际充电器会按负载调节电压和频率。", "The primary voltage is fixed at 10 V; real chargers regulate voltage and frequency."]
+思考题:
+  - ["为什么 SAE J2954 等标准把电动汽车无线充电的频率规定在 79–90 kHz 附近，而不是用 50 Hz？", "Why do standards such as SAE J2954 put EV wireless charging near 79–90 kHz rather than at 50 Hz?"]
