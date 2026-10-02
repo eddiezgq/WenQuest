@@ -1,0 +1,33 @@
+# 实验 13.2 的指导书与报告模板。目的、场景、参数、任务取自 lab13_2.js。
+原理:
+  - ["标准 DH 的连杆坐标系 {i}：z_i 沿关节 i+1 的轴，x_i 沿轴 i 与轴 i+1 的公垂线，原点在公垂线与轴 i+1 的交点。相邻两轴相交时 a = 0、原点在交点；平行时公垂线不唯一，取 d = 0 的一条。",
+     "Standard-DH link frame {i}: z_i along the axis of joint i+1, x_i along the common normal of axes i and i+1, origin where that normal meets axis i+1. Intersecting axes: a = 0, origin at the crossing; parallel axes: the normal is not unique, take the one with d = 0."]
+  - 式: "T(i−1,i) = Rot(z, θᵢ) Trans(z, dᵢ) Trans(x, aᵢ) Rot(x, αᵢ)          (13.1.4)"
+  - ["UR5e（零件库尺寸）：d₁ = 0.163 m，a₂ = −0.425 m，a₃ = −0.392 m，d₄ = 0.134 m，d₅ = d₆ = 0.1 m；α = (90°, 0, 0, 90°, −90°, 0)；θ 偏置全为 0。",
+     "UR5e (library model): d₁ = 0.163 m, a₂ = −0.425 m, a₃ = −0.392 m, d₄ = 0.134 m, d₅ = d₆ = 0.1 m; α = (90°, 0, 0, 90°, −90°, 0); all θ offsets are 0."]
+  - ["三维模型不用 DH：三维引擎按模型文件中的连杆矩阵逐个累乘。两种算法对法兰盘中心的读数应只差舍入误差。",
+     "The 3D model does not use DH: the engine multiplies the link matrices of the model file. Both should give the flange centre up to rounding."]
+步骤:
+  - ["打开实验 13.2，场景“UR5e 连杆坐标系”，所有关节为零。把 k 从 0 逐个调到 6（任务 1），每一步记录该行 DH 参数和 {k} 的原点，填入表 1。",
+     "Open Lab 13.2, scene “UR5e link frames”, all joints at zero. Step k from 0 to 6 (task 1); for each step record the DH row and the origin of {k} in Table 1."]
+  - ["k = 6，只转动关节 2（任务 2）。观察哪些坐标系不动、哪些跟着转，写出结论。",
+     "With k = 6 turn only joint 2 (task 2). Note which frames stay and which turn; write down the conclusion."]
+  - ["设置算例 12.3.1 的关节角（任务 3），记录 DH 的 {6} 原点、三维模型的法兰盘中心和二者之差，填入表 2。",
+     "Set the joint angles of Example 12.3.1 (task 3); record the DH origin of {6}, the model's flange centre and their difference in Table 2."]
+  - ["切换到场景“台灯”，k = 3，转动关节 2、3、4 中的两个（任务 4），记录 {1}、{2}、{3} 原点的 y 坐标。",
+     "Switch to “lamp”, k = 3, turn two of joints 2, 3, 4 (task 4); record the y coordinates of the origins of {1}, {2}, {3}."]
+数据表:
+  - 标题: ["表 1  UR5e 的连杆坐标系（零位）", "Table 1  UR5e link frames (home)"]
+    表头: ["k", "a / m", "α / °", "d / m", "{k} 的原点 (x, y, z) / m", "z_k 的方向"]
+    表头英文: ["k", "a / m", "α / °", "d / m", "Origin of {k} (x, y, z) / m", "Direction of z_k"]
+    行: [["0", "—", "—", "—", "", ""], ["1", "", "", "", "", ""], ["2", "", "", "", "", ""], ["3", "", "", "", "", ""], ["4", "", "", "", "", ""], ["5", "", "", "", "", ""], ["6", "", "", "", "", ""]]
+  - 标题: ["表 2  DH 与三维模型", "Table 2  DH against the 3D model"]
+    表头: ["关节角 θ₁–θ₆ / °", "DH 的 {6} 原点 / m", "模型法兰盘中心 / m", "差值 / m"]
+    表头英文: ["Joint angles θ₁–θ₆ / °", "DH origin of {6} / m", "Model flange centre / m", "Difference / m"]
+    行: [["30, −60, 90, −120, −90, 45", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["当前的坐标系 {k} 画得比其余的大一些；x 红、y 绿、z 蓝。", "The current frame {k} is drawn larger; x red, y green, z blue."]
+  - ["场景“台灯”中关节 1、5、6 固定为零。", "In the lamp scene joints 1, 5 and 6 are held at zero."]
+  - ["可以拖动画面旋转视角，从侧面看 {1}、{2}、{3} 是否在同一平面内。", "Drag to rotate the view and check from the side whether {1}, {2}, {3} lie in one plane."]
+思考题:
+  - ["如果关节 2 的轴在制造时偏了 0.01°，不再与关节 3 的轴严格平行，按 DH 的规则 {2} 的原点会落在哪里？（13.5 节）", "If joint 2's axis were off by 0.01° and no longer exactly parallel to joint 3's, where would the DH rules put the origin of {2}? (Section 13.5)"]

@@ -26,6 +26,10 @@ chapters:
     status: ai
   9:
     status: ai
+  10:
+    status: ai
+  13:
+    status: ai
   4:
     status: first
     title_en: "Rotation of Rigid Bodies: From Euler to Quaternions"

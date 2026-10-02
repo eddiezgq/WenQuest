@@ -1,0 +1,34 @@
+# 实验 13.4 的指导书与报告模板。目的、场景、参数、任务取自 lab13_4.js。
+原理:
+  - ["DH 连乘：标准 DH 按式 (13.1.5)、改进 DH 按式 (13.1.8) 逐个连杆相乘。指数积：T = e^[S₁]θ₁ ⋯ e^[Sₙ]θₙ M。两种方法描述的是同一台机器人时，结果必须相同。",
+     "DH product: multiply link by link with Eq. (13.1.5) (standard) or (13.1.8) (modified). PoE: T = e^[S₁]θ₁ ⋯ e^[Sₙ]θₙ M. For the same robot the two must agree."]
+  - 式: "标准 DH → 指数积 / standard DH → PoE:  Sᵢ = [Ad T₀,ᵢ₋₁(0)] (0, 0, 1, 0, 0, 0),  M = T₀ₙ(0)          (定理 13.4.1)"
+  - 式: "改进 DH → 指数积 / modified DH → PoE:  Sᵢ = [Ad T₀ᵢ(0)] (0, 0, 1, 0, 0, 0)          (推论 13.4.1)"
+  - ["参数不同时，方法再一致结果也不同：UR5e 的厂商表与零件库尺寸的长度参数相差零点几毫米，由定理 13.3.1，末端相差 Σ(Δdᵢ z₍ᵢ₋₁₎ + Δaᵢ xᵢ)，不超过各项绝对值之和 2.1 mm。",
+     "With different parameters the results differ no matter how consistent the methods are: the UR5e maker's lengths differ from the library model by tenths of a millimetre; by Theorem 13.3.1 the tool moves by Σ(Δdᵢ z₍ᵢ₋₁₎ + Δaᵢ xᵢ), at most the sum of magnitudes, 2.1 mm."]
+步骤:
+  - ["打开实验 13.4，场景“UR5e”，表取 0。设置算例 12.3.1 的关节角（任务 1），记录三组末端位置和两个差值，填入表 1。",
+     "Open Lab 13.4, scene “UR5e”, table 0. Set the joint angles of Example 12.3.1 (task 1); record the three tool positions and the two differences in Table 1."]
+  - ["表改为 1（任务 2），记录 DH 与指数积之差；再任取两组关节角，各记录一次，填入表 1。",
+     "Set table 1 (task 2) and record the DH–PoE difference; repeat for two more sets of joint angles (Table 1)."]
+  - ["切换到场景“Panda”，任意转动至少三个关节（任务 3），记录三组末端位置和差值，填入表 2。",
+     "Switch to “Panda” and turn at least three joints (task 3); record the three positions and differences in Table 2."]
+  - ["切换到场景“台灯”，转动关节 2、3、4 中的至少两个（任务 4），比较 DH 与指数积的结果。",
+     "Switch to “lamp”, turn at least two of joints 2, 3, 4 (task 4), and compare DH with PoE."]
+数据表:
+  - 标题: ["表 1  UR5e：DH、指数积与三维模型", "Table 1  UR5e: DH, PoE and the 3D model"]
+    表头: ["关节角 θ₁–θ₆ / °", "DH 表", "DH 末端 / m", "指数积末端 / m", "DH − 指数积", "指数积 − 模型"]
+    表头英文: ["Joint angles θ₁–θ₆ / °", "DH table", "DH tool / m", "PoE tool / m", "DH − PoE", "PoE − model"]
+    行: [["30, −60, 90, −120, −90, 45", "零件库", "", "", "", ""], ["30, −60, 90, −120, −90, 45", "厂商", "", "", "", ""], ["", "厂商", "", "", "", ""], ["", "厂商", "", "", "", ""]]
+    行英文: [["30, −60, 90, −120, −90, 45", "library", "", "", "", ""], ["30, −60, 90, −120, −90, 45", "maker", "", "", "", ""], ["", "maker", "", "", "", ""], ["", "maker", "", "", "", ""]]
+  - 标题: ["表 2  Panda：Craig 表、指数积与三维模型", "Table 2  Panda: Craig table, PoE and the 3D model"]
+    表头: ["关节角 θ₁–θ₇ / °", "DH 末端 / m", "指数积末端 / m", "DH − 指数积", "指数积 − 模型"]
+    表头英文: ["Joint angles θ₁–θ₇ / °", "DH tool / m", "PoE tool / m", "DH − PoE", "PoE − model"]
+    行: [["", "", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["Panda 的末端取法兰盘中心（Craig 表最后一个坐标系沿 z 再走 0.107 m）；UR5e 的末端取法兰盘中心。", "The Panda tool point is the flange centre (0.107 m along z beyond the last Craig frame); the UR5e tool point is the flange centre."]
+  - ["关节 7 只对 Panda 起作用；“DH 表”只对 UR5e 场景起作用。", "Joint 7 acts only on the Panda; the DH-table switch acts only in the UR5e scene."]
+  - ["差值小于 0.1 mm 时用科学计数法显示，例如 2.2e-16 m；否则以 mm 显示。", "Differences below 0.1 mm are shown in scientific notation, e.g. 2.2e-16 m; larger ones in mm."]
+  - ["“指数积与模型之差”只是舍入误差，在 10⁻⁸ m 以下；三维模型的数据以有限位小数存放，所以它可能比“DH 与指数积之差”（10⁻¹⁶ m 量级）大一些。", "“PoE vs model” is rounding only, below 10⁻⁸ m; the model data are stored with finitely many decimals, so it may be larger than “DH vs PoE” (about 10⁻¹⁶ m)."]
+思考题:
+  - ["表 1 中“DH − 指数积”换用厂商表后变成毫米级，而“指数积 − 模型”不变。这说明误差来自方法还是来自参数？", "In Table 1, DH − PoE becomes millimetres with the maker's table while PoE − model stays tiny. Does the error come from the method or from the parameters?"]
