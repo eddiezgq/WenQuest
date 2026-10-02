@@ -1,0 +1,31 @@
+# 实验 33.5 的指导书与报告模板。目的、场景、参数、任务取自 lab33_5.js。
+原理:
+  - ["轴的外伸段只传转矩。转矩随起停变化，一次起停是一个从 0 到 T 的脉动循环：τa = τm = τ/2，τ = 16T/(πd³)。",
+     "The extension carries torque only. Torque changes with starts and stops: each start is a repeated cycle from 0 to T, τa = τm = τ/2, τ = 16T/(πd³)."]
+  - ["键槽使局部应力增大。理论应力集中系数 ατ（端铣键槽取 3.0）乘以材料的缺口敏感系数 q 修正为有效应力集中系数 kτ，再计入尺寸系数 ε 和表面系数 β，得到综合影响系数：",
+     "The keyseat raises the local stress. The theoretical factor ατ (3.0 for an end-milled keyseat) is corrected by the notch sensitivity q to the fatigue factor kτ; with the size factor ε and surface factor β this gives the combined factor:"]
+  - 式: "kτ = 1 + q(ατ − 1)，Kτ = kτ/ε + 1/β − 1"
+  - 式: "S = τ₋₁ / (Kτ τa + ψτ τm)，ψτ = τ₋₁ /(σb/√3)"
+  - ["安全系数 S 是零件的极限线到工作点“还差多远”：在 τa–τm 图上，工作点沿脉动循环线（τa = τm）向外移动，到零件极限线时 S = 1。",
+     "S measures how far the operating point is from the component limit: moving out along the repeated-cycle line τa = τm, it reaches the limit line at S = 1."]
+步骤:
+  - ["场景“WQR-105 外伸段”：45 钢、Ø30、磨削、350 N·m，按“校核”，把 q、kτ、ε、β、Kτ、S 记入表 1（任务 1）。", "Scene “WQR-105 extension”: 45 steel, Ø30, ground, 350 N·m; press Check and record q, kτ, ε, β, Kτ, S in Table 1 (task 1)."]
+  - ["只换材料为 40Cr，校核；再改回 45 钢，只加大直径，找出 S ≥ 1.5 的最小直径（任务 2）。", "Change only the material to 40Cr and check; then go back to 45 steel and increase only the diameter to find the smallest one with S ≥ 1.5 (task 2)."]
+  - ["把表面改为“精车”，对两种材料各校核一次，比较 β 和 S 的变化。", "Set the finish to “machined” and check both materials; compare β and S."]
+  - ["切换到“电钻主轴”，在 25 N·m 下找出 S ≥ 1.5 的直径（任务 3）。", "Switch to “Drill spindle” and find the diameter with S ≥ 1.5 at 25 N·m (task 3)."]
+数据表:
+  - 标题: ["表 1  外伸段疲劳校核", "Table 1  Fatigue check of the extension"]
+    表头: ["材料", "d / mm", "表面", "q", "kτ", "ε", "β", "Kτ", "S"]
+    表头英文: ["Material", "d / mm", "Finish", "q", "kτ", "ε", "β", "Kτ", "S"]
+    行: [["45 钢", "30", "磨削", "", "", "", "", "", ""], ["40Cr", "30", "磨削", "", "", "", "", "", ""], ["45 钢", "", "磨削", "", "", "", "", "", ""], ["45 钢", "30", "精车", "", "", "", "", "", ""], ["40Cr", "30", "精车", "", "", "", "", "", ""]]
+    行英文: [["45 steel", "30", "ground", "", "", "", "", "", ""], ["40Cr", "30", "ground", "", "", "", "", "", ""], ["45 steel", "", "ground", "", "", "", "", "", ""], ["45 steel", "30", "machined", "", "", "", "", "", ""], ["40Cr", "30", "machined", "", "", "", "", "", ""]]
+  - 标题: ["表 2  电钻主轴", "Table 2  Drill spindle"]
+    表头: ["T / N·m", "d / mm", "τ / MPa", "S"]
+    表头英文: ["T / N·m", "d / mm", "τ / MPa", "S"]
+    行: [["25", "10", "", ""], ["25", "", "", ""]]
+注意:
+  - ["实验中的 ατ = 3.0 是 [SHI] 的“首轮估计”，适用于设计初期；定稿时应按键槽实际的底部圆角查图或用有限元计算。", "ατ = 3.0 is the [SHI] first-iteration estimate for early design; a final design uses the real keyseat fillet from charts or finite elements."]
+  - ["这里只算“无限寿命”的安全系数。转矩的大循环次数不多时（起停不频繁），可以按有限寿命设计，见 33.8 节。", "Only the infinite-life safety factor is computed here. When large torque cycles are few (few starts), a finite-life design applies — Section 33.8."]
+  - ["电钻主轴的数值是示意：真实主轴的端部常带螺纹或六角，结构和应力集中不同。", "The drill numbers are illustrative: real spindles often end in a thread or hex, with different stress raisers."]
+思考题:
+  - ["为什么换成 40Cr 以后，强度提高了约 29%，安全系数却没有提高这么多？（提示：看 q 和 β）", "Why does 40Cr raise the strength by about 29% but the safety factor by less? (Hint: look at q and β.)"]

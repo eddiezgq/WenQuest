@@ -1,0 +1,15 @@
+# 各章状态与英文标题（第 8 轮 2.1、2.2；本书第 14 轮）。
+# status：draft 草稿 / ai AI 审稿 / first 初审 / team 团队审阅 / final 定稿。没写的章不列。
+parts_en:
+  上篇 第一部分 基础与原理: "Part One, I  Foundations and Principles"
+  上篇 第二部分 CUDA 编程: "Part One, II  CUDA Programming"
+  上篇 第三部分 CUDA 上的人工智能系统: "Part One, III  AI Systems on CUDA"
+  下篇 第一部分 感知与语言: "Part Two, I  Perception and Language"
+  下篇 第二部分 决策与生成: "Part Two, II  Decision and Generation"
+  下篇 第三部分 科学与工程: "Part Two, III  Science and Engineering"
+  下篇 第四部分 移动与具身: "Part Two, IV  Mobility and Embodiment"
+  下篇 第五部分 社会与服务: "Part Two, V  Society and Services"
+  下篇 第六部分 展望与治理: "Part Two, VI  Outlook and Governance"
+chapters:
+  1:
+    status: ai

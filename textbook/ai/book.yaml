@@ -1,0 +1,644 @@
+# 由 textbook/tools/outline.py 从提纲生成，请改提纲后重新生成，不要手改。
+book: ai
+title: 人工智能
+title_en: Artificial Intelligence
+source: docs/教材/人工智能/00_提纲.md
+parts:
+- title: 上篇 第一部分 基础与原理
+- title: 上篇 第二部分 CUDA 编程
+- title: 上篇 第三部分 CUDA 上的人工智能系统
+- title: 下篇 第一部分 感知与语言
+- title: 下篇 第二部分 决策与生成
+- title: 下篇 第三部分 科学与工程
+- title: 下篇 第四部分 移动与具身
+- title: 下篇 第五部分 社会与服务
+- title: 下篇 第六部分 展望与治理
+chapters:
+- 'no': 1
+  title: 人工智能概论
+  level: 基础
+  part: 上篇 第一部分 基础与原理
+  sections:
+  - id: '1.1'
+    title: 什么是人工智能：目标、定义与边界
+  - id: '1.2'
+    title: 三条路线：符号主义、连接主义与行为主义
+  - id: '1.3'
+    title: 历史：从达特茅斯会议到大模型
+  - id: '1.4'
+    title: 数据、算法与算力：人工智能的三要素
+  - id: '1.5'
+    title: 为什么人工智能需要 GPU：一次推理要做多少次运算
+  - id: '1.6'
+    title: CUDA 的诞生与 GPU 通用计算
+  - id: '1.7'
+    title: 本书路线图、课程路线与实验环境
+- 'no': 2
+  title: 深度学习基础
+  level: 基础
+  part: 上篇 第一部分 基础与原理
+  sections:
+  - id: '2.1'
+    title: 机器学习的基本框架：数据、模型、损失与优化
+  - id: '2.2'
+    title: 线性回归与逻辑回归
+  - id: '2.3'
+    title: 张量：形状、广播与批处理
+  - id: '2.4'
+    title: 多层感知机与万能逼近定理
+  - id: '2.5'
+    title: 计算图、反向传播与自动微分
+  - id: '2.6'
+    title: 优化算法：随机梯度下降、动量与 Adam
+  - id: '2.7'
+    title: 泛化与正则化：过拟合、权重衰减、丢弃法与归一化
+  - id: '2.8'
+    title: 卷积神经网络与循环神经网络
+  - id: '2.9'
+    title: 注意力机制与 Transformer
+  - id: '2.10'
+    title: 一切归结为矩阵乘法：各类层的运算量与访存量
+- 'no': 3
+  title: GPU 体系结构与并行计算原理
+  level: 基础
+  part: 上篇 第一部分 基础与原理
+  sections:
+  - id: '3.1'
+    title: 并行计算的基本概念：并发与并行、弗林分类、数据并行与任务并行
+  - id: '3.2'
+    title: 阿姆达尔定律与古斯塔夫森定律
+  - id: '3.3'
+    title: CPU 与 GPU 的设计哲学：面向延迟与面向吞吐
+  - id: '3.4'
+    title: GPU 的演进：从图形流水线到张量核心
+  - id: '3.5'
+    title: GPU 的硬件组成：流多处理器、线程束调度器、寄存器堆、共享内存、L2 缓存与高带宽显存
+  - id: '3.6'
+    title: SIMT 执行模型与线程束分化
+  - id: '3.7'
+    title: 延迟隐藏与占用率
+  - id: '3.8'
+    title: 计算强度与屋顶线模型
+- 'no': 4
+  title: CUDA 编程模型与内存层次
+  level: 基础
+  part: 上篇 第二部分 CUDA 编程
+  sections:
+  - id: '4.1'
+    title: 开发环境与第一个核函数
+  - id: '4.2'
+    title: 线程层次：线程、线程块、网格与索引计算
+  - id: '4.3'
+    title: 主机与设备：显存分配、数据传输与统一内存
+  - id: '4.4'
+    title: 错误处理与调试
+  - id: '4.5'
+    title: 内存层次：寄存器、本地内存、共享内存、常量内存与全局内存
+  - id: '4.6'
+    title: 全局内存的合并访问
+  - id: '4.7'
+    title: 共享内存与存储体冲突
+  - id: '4.8'
+    title: 同步与原子操作；协作组
+  - id: '4.9'
+    title: 在 Python 中写 CUDA：Numba 与 CuPy
+- 'no': 5
+  title: 并行模式与矩阵乘法优化
+  level: 基础
+  part: 上篇 第二部分 CUDA 编程
+  sections:
+  - id: '5.1'
+    title: 映射与模板计算
+  - id: '5.2'
+    title: 归约：从朴素实现到线程束洗牌
+  - id: '5.3'
+    title: 前缀和
+  - id: '5.4'
+    title: 直方图与原子操作的代价
+  - id: '5.5'
+    title: 卷积：直接卷积与 im2col
+  - id: '5.6'
+    title: 稀疏矩阵与向量相乘
+  - id: '5.7'
+    title: 矩阵乘法之一：朴素实现与性能分析
+  - id: '5.8'
+    title: 矩阵乘法之二：共享内存分块
+  - id: '5.9'
+    title: 矩阵乘法之三：寄存器分块、向量化访存与双缓冲
+  - id: '5.10'
+    title: 矩阵乘法之四：张量核心与 WMMA、MMA 指令
+  - id: '5.11'
+    title: 与 cuBLAS 对比：离峰值还有多远
+- 'no': 6
+  title: 流、多 GPU 与性能调优
+  level: 进阶
+  part: 上篇 第二部分 CUDA 编程
+  sections:
+  - id: '6.1'
+    title: CUDA 流与异步执行：计算与传输重叠
+  - id: '6.2'
+    title: 事件计时与 CUDA 图
+  - id: '6.3'
+    title: 多 GPU：点对点访问、NVLink 与互联拓扑
+  - id: '6.4'
+    title: 集合通信：全归约的算法与 NCCL
+  - id: '6.5'
+    title: 性能分析工具：Nsight Systems 与 Nsight Compute
+  - id: '6.6'
+    title: 屋顶线分析实战
+  - id: '6.7'
+    title: 调优方法论与常见瓶颈
+- 'no': 7
+  title: CUDA 库与深度学习框架内幕
+  level: 基础
+  part: 上篇 第三部分 CUDA 上的人工智能系统
+  sections:
+  - id: '7.1'
+    title: CUDA 库全景
+  - id: '7.2'
+    title: cuBLAS 与 cuBLASLt
+  - id: '7.3'
+    title: cuDNN：卷积算法的选择
+  - id: '7.4'
+    title: CUTLASS 与模板化的矩阵乘法
+  - id: '7.5'
+    title: PyTorch 的结构：张量、分派器、ATen 与显存缓存分配器
+  - id: '7.6'
+    title: 自动微分在 GPU 上怎样执行
+  - id: '7.7'
+    title: 自定义 CUDA 算子：C++ 扩展
+  - id: '7.8'
+    title: 图编译：torch.compile
+- 'no': 8
+  title: 混合精度、量化与 Triton
+  level: 进阶
+  part: 上篇 第三部分 CUDA 上的人工智能系统
+  sections:
+  - id: '8.1'
+    title: 浮点格式：FP32、TF32、FP16、BF16、FP8 与 FP4
+  - id: '8.2'
+    title: 混合精度训练与损失缩放
+  - id: '8.3'
+    title: 量化原理：对称与非对称、逐张量与逐通道、校准
+  - id: '8.4'
+    title: 训练后量化与量化感知训练
+  - id: '8.5'
+    title: 大模型的量化：仅权重量化与激活量化
+  - id: '8.6'
+    title: Triton 编程模型
+  - id: '8.7'
+    title: 算子融合：用 Triton 写融合的 softmax 与层归一化
+- 'no': 9
+  title: 大模型训练与推理
+  level: 进阶
+  part: 上篇 第三部分 CUDA 上的人工智能系统
+  sections:
+  - id: '9.1'
+    title: 大模型的运算量与显存账：参数、梯度、优化器状态与激活
+  - id: '9.2'
+    title: 数据并行与 ZeRO、FSDP
+  - id: '9.3'
+    title: 张量并行与序列并行
+  - id: '9.4'
+    title: 流水线并行
+  - id: '9.5'
+    title: 激活重计算与混合专家模型
+  - id: '9.6'
+    title: 注意力的高效计算：FlashAttention
+  - id: '9.7'
+    title: 推理的两个阶段：预填充与解码；KV 缓存与分页注意力
+  - id: '9.8'
+    title: 批处理、投机解码与推理引擎
+  - id: '9.9'
+    title: 训练集群：故障、检查点与能耗
+- 'no': 10
+  title: 异构算力与国产生态
+  level: 基础
+  part: 上篇 第三部分 CUDA 上的人工智能系统
+  sections:
+  - id: '10.1'
+    title: 人工智能加速器全景：GPU、TPU、NPU 与专用芯片
+  - id: '10.2'
+    title: AMD ROCm 与 HIP：CUDA 程序的移植
+  - id: '10.3'
+    title: 华为昇腾：达芬奇架构、CANN、Ascend C 与 MindSpore
+  - id: '10.4'
+    title: 其他国产加速器
+  - id: '10.5'
+    title: 可移植的编程方式：SYCL、OpenCL、Triton 多后端与框架层抽象
+  - id: '10.6'
+    title: 移植实践：把第 5 章的矩阵乘法移到 HIP 与 Ascend C
+  - id: '10.7'
+    title: 算力格局与供应链（截至写作时间）
+- 'no': 11
+  title: 计算机视觉
+  level: 基础
+  part: 下篇 第一部分 感知与语言
+  sections:
+  - id: '11.1'
+    title: 图像分类：ImageNet 与 AlexNet 的突破
+  - id: '11.2'
+    title: 网络结构的演进：从 VGG、ResNet 到视觉 Transformer
+  - id: '11.3'
+    title: 目标检测：两阶段与单阶段方法
+  - id: '11.4'
+    title: 图像分割：语义、实例与全景分割；通用分割模型
+  - id: '11.5'
+    title: 三维视觉：深度估计、点云、神经辐射场与三维高斯泼溅
+  - id: '11.6'
+    title: 视频理解与目标跟踪
+  - id: '11.7'
+    title: 部署：边缘推理与 TensorRT
+  - id: '11.8'
+    title: 案例：数字工厂零件表面缺陷检测
+- 'no': 12
+  title: 语音识别与合成
+  level: 专题
+  part: 下篇 第一部分 感知与语言
+  sections:
+  - id: '12.1'
+    title: 语音信号与声学特征
+  - id: '12.2'
+    title: 传统语音识别：隐马尔可夫模型与高斯混合模型
+  - id: '12.3'
+    title: 端到端语音识别：CTC、RNN-T 与注意力模型
+  - id: '12.4'
+    title: 大规模弱监督：Whisper
+  - id: '12.5'
+    title: 语音合成：从 WaveNet 到流式合成
+  - id: '12.6'
+    title: 说话人识别与语音增强
+  - id: '12.7'
+    title: 案例：用语音指令控制车间 AGV
+- 'no': 13
+  title: 自然语言处理与大语言模型
+  level: 基础
+  part: 下篇 第一部分 感知与语言
+  sections:
+  - id: '13.1'
+    title: 词的表示：从独热编码到词向量
+  - id: '13.2'
+    title: 序列到序列模型与机器翻译
+  - id: '13.3'
+    title: 预训练：BERT 与 GPT
+  - id: '13.4'
+    title: 规模定律与能力的出现
+  - id: '13.5'
+    title: 对齐：指令微调、人类反馈强化学习与直接偏好优化
+  - id: '13.6'
+    title: 检索增强生成
+  - id: '13.7'
+    title: 推理模型与思维链
+  - id: '13.8'
+    title: 大语言模型的评测
+  - id: '13.9'
+    title: 案例：为企业质量手册构建问答助手
+- 'no': 14
+  title: 多模态模型
+  level: 专题
+  part: 下篇 第一部分 感知与语言
+  sections:
+  - id: '14.1'
+    title: 视觉与语言的对齐：对比学习与 CLIP
+  - id: '14.2'
+    title: 视觉语言模型
+  - id: '14.3'
+    title: 跨模态检索与生成
+  - id: '14.4'
+    title: 视频与音频的多模态理解
+  - id: '14.5'
+    title: 视觉—语言—动作模型
+  - id: '14.6'
+    title: 案例：用多模态模型读取工程图纸与检验报告
+- 'no': 15
+  title: 博弈与强化学习
+  level: 基础
+  part: 下篇 第二部分 决策与生成
+  sections:
+  - id: '15.1'
+    title: 强化学习基础：马尔可夫决策过程、价值与策略
+  - id: '15.2'
+    title: 深度 Q 网络与 Atari 游戏
+  - id: '15.3'
+    title: AlphaGo：策略网络、价值网络与蒙特卡洛树搜索
+  - id: '15.4'
+    title: AlphaZero 与 MuZero
+  - id: '15.5'
+    title: 不完全信息博弈：德州扑克
+  - id: '15.6'
+    title: 多智能体与即时战略游戏
+  - id: '15.7'
+    title: GPU 上的大规模并行仿真
+  - id: '15.8'
+    title: 案例：用强化学习调度车间 AGV
+- 'no': 16
+  title: 生成式人工智能
+  level: 基础
+  part: 下篇 第二部分 决策与生成
+  sections:
+  - id: '16.1'
+    title: 生成模型概览：变分自编码器、生成对抗网络、自回归模型、流模型与扩散模型
+  - id: '16.2'
+    title: 生成对抗网络
+  - id: '16.3'
+    title: 扩散模型的原理
+  - id: '16.4'
+    title: 潜在扩散模型；条件控制与图像编辑
+  - id: '16.5'
+    title: 视频生成
+  - id: '16.6'
+    title: 三维、音乐与语音的生成
+  - id: '16.7'
+    title: 版权、深度伪造与内容标识
+  - id: '16.8'
+    title: 案例：生成合成缺陷图像，扩充检测训练集
+- 'no': 17
+  title: AI 编程助手与智能体
+  level: 专题
+  part: 下篇 第二部分 决策与生成
+  sections:
+  - id: '17.1'
+    title: 代码大模型及其评测
+  - id: '17.2'
+    title: AI 编程助手怎样工作
+  - id: '17.3'
+    title: 智能体：规划、工具调用与记忆
+  - id: '17.4'
+    title: 多智能体协作
+  - id: '17.5'
+    title: 工具协议与生态
+  - id: '17.6'
+    title: 智能体的评估与安全
+  - id: '17.7'
+    title: 案例：构建一个自动做数据分析的智能体
+- 'no': 18
+  title: 生命科学：蛋白质结构与药物发现
+  level: 专题
+  part: 下篇 第三部分 科学与工程
+  sections:
+  - id: '18.1'
+    title: 蛋白质结构问题与 CASP 评测
+  - id: '18.2'
+    title: AlphaFold 2 的结构与原理
+  - id: '18.3'
+    title: 生物分子相互作用的预测
+  - id: '18.4'
+    title: 蛋白质设计
+  - id: '18.5'
+    title: 人工智能药物发现：虚拟筛选与分子生成
+  - id: '18.6'
+    title: 基因组学与单细胞分析
+  - id: '18.7'
+    title: 案例：预测一个蛋白质的结构并评估可信度
+- 'no': 19
+  title: 地球科学：天气预报与气候
+  level: 专题
+  part: 下篇 第三部分 科学与工程
+  sections:
+  - id: '19.1'
+    title: 数值天气预报及其瓶颈
+  - id: '19.2'
+    title: 人工智能天气模型
+  - id: '19.3'
+    title: 概率预报与集合预报
+  - id: '19.4'
+    title: 气候模拟与降尺度
+  - id: '19.5'
+    title: 遥感与地球观测
+  - id: '19.6'
+    title: 案例：用开源人工智能气象模型做一次全球预报
+- 'no': 20
+  title: 材料与化学发现
+  level: 专题
+  part: 下篇 第三部分 科学与工程
+  sections:
+  - id: '20.1'
+    title: 材料发现为什么难
+  - id: '20.2'
+    title: 图神经网络与原子体系的表示
+  - id: '20.3'
+    title: 机器学习原子间势与分子动力学
+  - id: '20.4'
+    title: 大规模材料发现
+  - id: '20.5'
+    title: 自主实验室
+  - id: '20.6'
+    title: 案例：用机器学习势预测材料性质
+- 'no': 21
+  title: 智能制造与质量检测
+  level: 基础
+  part: 下篇 第三部分 科学与工程
+  sections:
+  - id: '21.1'
+    title: 智能制造的数据链：传感器、制造执行系统与企业资源计划
+  - id: '21.2'
+    title: 视觉检测：缺陷检测与尺寸测量
+  - id: '21.3'
+    title: 预测性维护：振动信号与剩余寿命
+  - id: '21.4'
+    title: 工艺参数优化
+  - id: '21.5'
+    title: 统计过程控制与人工智能
+  - id: '21.6'
+    title: 数字孪生
+  - id: '21.7'
+    title: 受监管行业中人工智能的验证与合规
+  - id: '21.8'
+    title: 案例：数字工厂减速器车间的预测性维护
+- 'no': 22
+  title: 能源、电网与工业控制
+  level: 专题
+  part: 下篇 第三部分 科学与工程
+  sections:
+  - id: '22.1'
+    title: 负荷与新能源功率预测
+  - id: '22.2'
+    title: 电网调度与优化
+  - id: '22.3'
+    title: 数据中心冷却的智能控制
+  - id: '22.4'
+    title: 核聚变等离子体控制
+  - id: '22.5'
+    title: 工业过程控制中的强化学习
+  - id: '22.6'
+    title: 案例：光伏功率预测与储能调度
+- 'no': 23
+  title: 自动驾驶
+  level: 基础
+  part: 下篇 第四部分 移动与具身
+  sections:
+  - id: '23.1'
+    title: 自动驾驶的分级与系统架构
+  - id: '23.2'
+    title: 感知：多传感器融合与鸟瞰图表示
+  - id: '23.3'
+    title: 预测与规划
+  - id: '23.4'
+    title: 端到端自动驾驶
+  - id: '23.5'
+    title: 仿真与数据闭环
+  - id: '23.6'
+    title: 车载计算平台
+  - id: '23.7'
+    title: 安全、法规与事故分析
+  - id: '23.8'
+    title: 案例：在仿真环境中训练车道保持与跟车
+- 'no': 24
+  title: 机器人与具身智能
+  level: 基础
+  part: 下篇 第四部分 移动与具身
+  sections:
+  - id: '24.1'
+    title: 机器人学习：模仿学习与强化学习
+  - id: '24.2'
+    title: 从仿真到现实：GPU 并行物理仿真
+  - id: '24.3'
+    title: 视觉—语言—动作模型
+  - id: '24.4'
+    title: 足式与人形机器人的运动控制
+  - id: '24.5'
+    title: 灵巧操作
+  - id: '24.6'
+    title: 案例：UR5e 学会抓取
+- 'no': 25
+  title: 无人机与智能物流
+  level: 专题
+  part: 下篇 第四部分 移动与具身
+  sections:
+  - id: '25.1'
+    title: 无人机的自主飞行
+  - id: '25.2'
+    title: 仓储机器人与多机调度
+  - id: '25.3'
+    title: 路径规划与车队调度的优化
+  - id: '25.4'
+    title: 末端配送
+  - id: '25.5'
+    title: 案例：车间多 AGV 路径规划与冲突消解
+- 'no': 26
+  title: 医疗健康
+  level: 基础
+  part: 下篇 第五部分 社会与服务
+  sections:
+  - id: '26.1'
+    title: 医学影像：分类、分割与检测
+  - id: '26.2'
+    title: 病理与眼科
+  - id: '26.3'
+    title: 临床辅助决策与医疗大模型
+  - id: '26.4'
+    title: 可穿戴设备与远程监护
+  - id: '26.5'
+    title: 医疗人工智能的审批与监管
+  - id: '26.6'
+    title: 公平、隐私与责任
+  - id: '26.7'
+    title: 案例：胸部 X 光片分类与可解释性
+- 'no': 27
+  title: 金融
+  level: 专题
+  part: 下篇 第五部分 社会与服务
+  sections:
+  - id: '27.1'
+    title: 信用评估与风险控制
+  - id: '27.2'
+    title: 反欺诈与图神经网络
+  - id: '27.3'
+    title: 量化投资与金融时间序列
+  - id: '27.4'
+    title: 智能客服与投资顾问
+  - id: '27.5'
+    title: 模型风险与监管科技
+  - id: '27.6'
+    title: 案例：信用卡欺诈检测
+- 'no': 28
+  title: 推荐系统与互联网平台
+  level: 基础
+  part: 下篇 第五部分 社会与服务
+  sections:
+  - id: '28.1'
+    title: 推荐问题与协同过滤
+  - id: '28.2'
+    title: 深度推荐模型
+  - id: '28.3'
+    title: 工业推荐架构：召回、排序与重排
+  - id: '28.4'
+    title: 嵌入表与 GPU 上的大规模训练
+  - id: '28.5'
+    title: 搜索与广告
+  - id: '28.6'
+    title: 信息茧房与算法治理
+  - id: '28.7'
+    title: 案例：为在线课程平台做课程推荐
+- 'no': 29
+  title: 智慧教育
+  level: 专题
+  part: 下篇 第五部分 社会与服务
+  sections:
+  - id: '29.1'
+    title: 智能辅导系统的历史
+  - id: '29.2'
+    title: 知识追踪
+  - id: '29.3'
+    title: 大模型助教：答疑、出题与批改
+  - id: '29.4'
+    title: 学习分析
+  - id: '29.5'
+    title: 案例：问渠——人工智能原生的学习管理系统
+  - id: '29.6'
+    title: 学术诚信与教育公平
+- 'no': 30
+  title: 智慧城市与公共服务
+  level: 专题
+  part: 下篇 第五部分 社会与服务
+  sections:
+  - id: '30.1'
+    title: 交通流预测与信号控制
+  - id: '30.2'
+    title: 城市感知与公共安全中的隐私问题
+  - id: '30.3'
+    title: 政务服务
+  - id: '30.4'
+    title: 灾害预警
+  - id: '30.5'
+    title: 智慧农业
+  - id: '30.6'
+    title: 案例：路网交通流预测
+- 'no': 31
+  title: 人工智能的安全、伦理与治理
+  level: 基础
+  part: 下篇 第六部分 展望与治理
+  sections:
+  - id: '31.1'
+    title: 人工智能风险的分类
+  - id: '31.2'
+    title: 偏见与公平
+  - id: '31.3'
+    title: 鲁棒性与对抗样本
+  - id: '31.4'
+    title: 隐私：差分隐私与联邦学习
+  - id: '31.5'
+    title: 可解释性
+  - id: '31.6'
+    title: 大模型安全：越狱、提示注入与对齐
+  - id: '31.7'
+    title: 治理与法规（截至写作时间）
+  - id: '31.8'
+    title: 案例：对抗样本的攻击与防御
+- 'no': 32
+  title: 人工智能的未来
+  level: 专题
+  part: 下篇 第六部分 展望与治理
+  sections:
+  - id: '32.1'
+    title: 规模定律还能走多远
+  - id: '32.2'
+    title: 算力、能源与新型计算
+  - id: '32.3'
+    title: 关于通用人工智能的争论
+  - id: '32.4'
+    title: 人工智能与科学研究的新范式
+  - id: '32.5'
+    title: 人工智能与就业和社会
+  - id: '32.6'
+    title: 结语

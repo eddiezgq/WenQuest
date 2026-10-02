@@ -13,8 +13,8 @@ steps = [(np.eye(2), r"$\boldsymbol{x}$", T("单位圆与 v₁、v₂", "unit ci
          (V.T, r"$V^{\mathrm{T}}\boldsymbol{x}$", T("① 转：vᵢ 转到坐标轴 eᵢ", "① rotate: vᵢ to the axes eᵢ")),
          (S @ V.T, r"$\Sigma V^{\mathrm{T}}\boldsymbol{x}$", T("② 沿坐标轴伸缩 σᵢ 倍", "② stretch the axes by σᵢ")),
          (U @ S @ V.T, r"$U\Sigma V^{\mathrm{T}}\boldsymbol{x}=A\boldsymbol{x}$", T("③ 转：eᵢ 方向转到 uᵢ", "③ rotate: eᵢ to uᵢ"))]
-fig, axs = plt.subplots(1, 4, figsize=(13.2, 3.7))
-for k, (ax, (M, name, title)) in enumerate(zip(axs, steps)):
+fig, axs = plt.subplots(2, 2, figsize=(9.0, 8.4))
+for k, (ax, (M, name, title)) in enumerate(zip(axs.flat, steps)):
     lim = 1.6 if k < 2 else 7.2
     axes_box(ax, lim, ticks=k >= 2)
     ax.plot(*circle_pts(M), color=INK, lw=1.5)

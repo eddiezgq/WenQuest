@@ -1,0 +1,35 @@
+# 实验 1.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab1_5.js。
+原理:
+  - ["一项计算的运算量为 W（FLOP），需要在显存与芯片之间搬运的数据量为 Q（字节）；硬件峰值算力为 P（FLOP/s），显存带宽为 β（B/s）。",
+     "A computation does W operations (FLOP) and moves Q bytes between memory and chip; the hardware has peak P (FLOP/s) and bandwidth β (B/s)."]
+  - 式: "T ≥ max(W/P, Q/β)          (1.5.3)；  I = W/Q          (1.5.4)"
+  - ["I > P/β 时受算力限制，I < P/β 时受显存带宽限制。图中折线是可达性能 min(P, Iβ)，即屋顶线；当前计算画成一个点，蓝色表示受算力限制，红色表示受带宽限制。",
+     "If I > P/β the computation is compute-bound, if I < P/β memory-bound. The broken line is the attainable performance min(P, Iβ), the roofline; the current computation is a dot, blue if compute-bound, red if memory-bound."]
+  - ["AlexNet 场景的数据量做了简化：权重读一遍，每张图读入输入，各层输出写一次、读一次。卷积的中间数据在芯片上复用的情况没有计入，实际的数据量取决于实现（第 5、7 章）。",
+     "The AlexNet data volume is simplified: weights read once, each image's input read and every layer output written and read once. On-chip reuse inside convolutions is ignored; the real volume depends on the implementation (Chapters 5, 7)."]
+  - ["逐词生成只计权重的读取，忽略 KV 缓存（第 9 章）；生成一个词元每个参数做一次乘加。", "Token generation counts only weight reads and ignores the KV cache (Chapter 9); each token takes one multiply–add per parameter."]
+步骤:
+  - ["AlexNet 场景：在单核、CPU、GTX 580、H100 上取批大小 1，再在 H100 上取批大小 128，记录 W/P、Q/β 和每张图的平均耗时，填入表 1（任务 1）。",
+     "AlexNet: on the core, the CPU, the GTX 580 and the H100 take batch 1, then batch 128 on the H100; record W/P, Q/β and the time per image in Table 1 (task 1)."]
+  - ["矩阵乘法场景：取 n = 512、1024、4096，在 CPU 与 H100 上读出计算强度与瓶颈，验证 I = n/(1.5 × 每个数的字节数)（任务 2）。",
+     "Matrix multiply: take n = 512, 1024, 4096; on the CPU and the H100 read the intensity and the bottleneck; check I = n/(1.5 × bytes per number) (task 2)."]
+  - ["逐词生成场景：70 亿参数、FP16、H100，从 B = 1 起增大批大小，找到转为受算力限制的 B，与 P/β 比较（任务 3）。",
+     "Token generation: 7 B, FP16, H100; increase B from 1 and find where it turns compute-bound; compare with P/β (task 3)."]
+  - ["把权重位数改为 8 和 4，记录 B = 1 时每条序列每秒的词元数，填入表 2（任务 4）。", "Set the weight bits to 8 and 4; record the tokens per second at B = 1 in Table 2 (task 4)."]
+  - ["阅卷场景：分发速度取 100 份/分钟，逐步增加老师人数，找出瓶颈由批阅变为分发的人数（任务 5），说明它与计算强度的类比。",
+     "Marking: with 100 scripts/min, add markers until the bottleneck switches from marking to hand-out (task 5); explain the analogy with intensity."]
+数据表:
+  - 标题: ["表 1  AlexNet 推理的耗时", "Table 1  Time of AlexNet inference"]
+    表头: ["硬件", "B", "W/P", "Q/β", "瓶颈", "每张图平均"]
+    表头英文: ["Hardware", "B", "W/P", "Q/β", "Bottleneck", "Per image"]
+    行: [["CPU 单核", "1", "", "", "", ""], ["CPU（64 核）", "1", "", "", "", ""], ["GTX 580", "1", "", "", "", ""], ["H100", "1", "", "", "", ""], ["H100", "128", "", "", "", ""]]
+    行英文: [["one CPU core", "1", "", "", "", ""], ["CPU (64 cores)", "1", "", "", "", ""], ["GTX 580", "1", "", "", "", ""], ["H100", "1", "", "", "", ""], ["H100", "128", "", "", "", ""]]
+  - 标题: ["表 2  70 亿参数模型逐词生成（H100，B = 1）", "Table 2  Token generation, 7 B parameters (H100, B = 1)"]
+    表头: ["权重位数", "Q", "Q/β", "每秒词元数", "转为受算力限制的 B"]
+    表头英文: ["Weight bits", "Q", "Q/β", "Tokens/s", "B at which it turns compute-bound"]
+    行: [["16", "", "", "", ""], ["8", "", "", "", ""], ["4", "", "", "", ""]]
+注意:
+  - ["计算器给出的是耗时的下限，实际耗时还要除以利用率（通常 30%～50%）。", "The calculator gives lower bounds; real times are larger by the inverse of the utilization (often 30%–50%)."]
+  - ["CPU 的参数是教学用的假设值，不对应某一型号。", "The CPU figures are assumed teaching values, not a particular product."]
+思考题:
+  - ["为什么 GTX 580 与 H100 的屋顶线拐点（P/β）相差很大？这对写程序的人意味着什么？", "Why do the roofline knees (P/β) of the GTX 580 and the H100 differ so much? What does that mean for programmers?"]

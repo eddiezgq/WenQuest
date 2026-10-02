@@ -1,0 +1,45 @@
+# 工程任务单 TS-33-1（配 33.1–33.8 节）。构建时生成《工程任务单》《评分量规》和《空白计算书》（Word，中英对照；格式见 textbook/tools/tasksheet.py）。
+编号: TS-33-1
+标题: ["WQR-105 输出轴 SH-301 改版（A 版 → B 版）", "Redesign of the WQR-105 output shaft SH-301 (rev. A → rev. B)"]
+角色: ["设计部门的设计工程师", "design engineer, design department"]
+背景:
+  - "数字工厂现行的 SH-301 A 版是 FreeCAD 入门实验的教学模型。设计评审发现：左轴承位短于轴承宽度，键与轮毂等长，外伸段的键承载不够，台阶处没有过渡圆角。客户同时要求按“频繁起停”工况保证 10 000 h 寿命。你作为设计部门的设计工程师，负责完成 B 版设计并提交评审。"
+  - "The factory's current SH-301 rev. A is a teaching model from the FreeCAD primer. A design review found that the left bearing seat is shorter than the bearing, the key is as long as the hub, the extension key cannot carry the torque, and the steps have no fillets. The customer also asks for 10 000 h of life under frequent starts. As the design engineer, you complete rev. B and submit it for review."
+输入:
+  - {名称: ["WQR-105 产品数据（输入 1450 r/min，传动比 10.5，额定输出转矩 350 N·m 含工况系数；GR-302：m = 3，z = 70，α = 20°）", "WQR-105 product data (1450 r/min in, ratio 10.5, rated output torque 350 N·m incl. application factor; GR-302: m = 3, z = 70, α = 20°)"], 来源: ["数字工厂参数配置器；工厂设计说明", "Digital factory configurator; factory design notes"]}
+  - {名称: ["SH-301 A 版模型与 SA-300 的物料、BOM、工艺路线、检验模板", "SH-301 rev. A model and SA-300 items, BOM, routing, inspection template"], 来源: ["数字工厂“设计与工艺”页；ERPNext", "Digital factory, Design & Process page; ERPNext"]}
+  - {名称: ["跑合试验台 test-01 的转矩记录（工况模拟，10 Hz，75 s）", "Torque record of run-in bench test-01 (duty simulation, 10 Hz, 75 s)"], 来源: ["数字工厂仿真车间（消息 test.torque）；教材 33.8.4 节", "Digital factory simulated shop (message test.torque); Section 33.8.4"]}
+  - {名称: ["标准：GB/T 1800.1、GB/T 1095/1096、GB/T 276、DIN 743（参考）", "Standards: GB/T 1800.1, GB/T 1095/1096, GB/T 276, DIN 743 (reference)"], 来源: ["教材附录与 textbook/mechdesign/std", "Appendix and textbook/mechdesign/std"]}
+交付物:
+  - {名称: ["结构说明与设计评审意见（A 版的问题与改法）", "Layout note and review of rev. A"], 验收: ["每段直径、长度都说明理由；A 版四个问题都有依据和改法", "Every diameter and length is justified; all four rev. A problems are documented with fixes"]}
+  - {名称: ["设计计算书（按本任务单的计算书模板）", "Design calculation sheet (from this task's template)"], 验收: ["受力、静强度、四个截面的疲劳校核、刚度、临界转速齐全；每个查表系数写出处", "Loads, static strength, fatigue at four sections, stiffness and critical speed complete; every looked-up factor cites its source"]}
+  - {名称: ["三维模型（STEP）", "3D model (STEP)"], 验收: ["尺寸与计算书一致；所有台阶有圆角；两个键槽在同一母线上", "Dimensions match the sheet; all steps filleted; both keyseats on one line"]}
+  - {名称: ["有限元与疲劳分析报告（数字工厂“仿真与分析”导出的 Word）", "FEA and fatigue report (Word from the factory's Simulation & Analysis)"], 验收: ["光滑段应力与手算误差 < 3%；寿命按转矩记录计算并与计算书对照", "Smooth-section stress within 3% of hand calculation; life from the torque record, compared with the sheet"]}
+  - {名称: ["零件图（PDF）", "Part drawing (PDF)"], 验收: ["尺寸公差、几何公差、表面粗糙度、圆角、热处理与硬度齐全，符合国标", "Size and geometric tolerances, roughness, fillets, heat treatment and hardness complete, to GB"]}
+  - {名称: ["工程更改申请（材料、齿轮毂、键、密封件与端盖、套筒、检验模板）", "Engineering change request (material, gear hub, keys, seal and cover, sleeve, inspection template)"], 验收: ["逐项列出受影响的物料和文件并说明理由，至少包括：SH-301 原材料由 RM-45 改为 40Cr 棒料（单件用量约 3.8 kg）；GR-302 改为带毂锻件（毂宽 55 mm）；齿轮键与联轴器键（8 × 7 × 63）；密封段改为 Ø35，油封 SEAL-30 和端盖相应改为 Ø35 的规格；BOM 新增套筒；轴端挡板；SH-301 检验模板（硬度、圆角、配合尺寸）", "Lists every affected item and document with reasons, at least: SH-301 raw material from RM-45 to 40Cr bar (about 3.8 kg per part); GR-302 as a hub forging (55 mm hub); gear key and coupling key (8 × 7 × 63); seal journal now Ø35, so seal SEAL-30 and the cover change to Ø35 sizes; new sleeve in the BOM; shaft-end plate; SH-301 inspection template (hardness, fillets, fit sizes)"]}
+工位: [CAD, FEA, FAT, PLM, ERP, CAM, MES, QMS]
+步骤:
+  - ["材料与工艺确认：在 ERPNext 中核对 SH-301 的材料、工艺路线、检验模板（33.1 节）", "Confirm material and process in ERPNext (Section 33.1)"]
+  - ["结构设计：排装配顺序，定 B 版各段尺寸，写 A 版评审意见（33.2 节，实验 33.2）", "Layout: assembly order, rev. B sizes, review of rev. A (Section 33.2, Lab 33.2)"]
+  - ["受力与静强度：齿轮力、两平面支反力、弯矩图、四个截面静强度（33.3、33.4 节）", "Loads and static strength (Sections 33.3, 33.4)"]
+  - ["疲劳校核：四个截面的系数与安全系数，截面 IV 的改进方案（33.5 节，实验 33.5）", "Fatigue check at four sections, options for section IV (Section 33.5, Lab 33.5)"]
+  - ["刚度与临界转速（33.6、33.7 节）", "Stiffness and critical speed (Sections 33.6, 33.7)"]
+  - ["建模与分析：FreeCAD 或 build123d 建 B 版模型；数字工厂“仿真与分析”做有限元和疲劳寿命，下载报告（33.8 节）", "Model in FreeCAD or build123d; FEA and fatigue life in the factory, download the report (Section 33.8)"]
+  - ["出图并提交：零件图、计算书、报告、工程更改申请一起提交“设计发布与审批”", "Draw and submit everything to Design Release & Approval"]
+  - ["评审与制造：按 AI 评审员和老师的意见修改；批准后跟踪仿真车间的键槽加工和三坐标检验，把检验结果和复盘写在计算书末尾", "Revise per the AI reviewer and teacher; after approval follow keyseat machining and CMM inspection, and add the results and a review at the end of the sheet"]
+评审要点:
+  - ["计算书：每个公式有单位，每个查表数值有标准号和表号，危险截面没有漏掉（特别是外伸段）", "Sheet: units on every formula, standard and table for every looked-up value, no critical section missed (the extension especially)"]
+  - ["轴承处圆角小于轴承倒角；齿轮位比轮毂短 2–3 mm；键长比轮毂短", "Fillet below the bearing chamfer; gear seat 2–3 mm shorter than the hub; keys shorter than hubs"]
+  - ["模型与计算书、图纸的尺寸一致；公差带与配合说明一致", "Model, sheet and drawing dimensions agree; tolerance zones match the fit choices"]
+  - ["有限元：边界条件说明清楚，有光滑段的手算核对，没有把约束处的应力当作结果", "FEA: boundary conditions stated, smooth-section hand check, no stresses read at constraints"]
+  - ["图纸：基准、圆跳动、对称度、粗糙度、技术要求齐全", "Drawing: datums, run-out, symmetry, roughness and notes complete"]
+  - ["工程更改：受影响的物料（原材料、GR-302、两个键、油封与端盖、套筒、轴端挡板、检验模板）都列出", "Change request lists all affected items (raw material, GR-302, both keys, seal and cover, sleeve, end plate, inspection template)"]
+评分:
+  - {项: ["结构设计与评审意见", "Layout and review"], 分: 15, 标准: ["装配顺序正确，规则逐条核对，A 版问题找全", "Correct assembly order, rules checked, all rev. A problems found"]}
+  - {项: ["计算书", "Calculation sheet"], 分: 30, 标准: ["受力、静强度、疲劳、刚度、临界转速正确；出处齐全；结论明确", "Correct loads, strength, fatigue, stiffness, critical speed; sources; clear conclusions"]}
+  - {项: ["模型与有限元报告", "Model and FEA report"], 分: 20, 标准: ["模型正确；边界条件合理；有手算核对；寿命结果有解释", "Correct model; sensible boundary conditions; hand check; life explained"]}
+  - {项: ["零件图", "Drawing"], 分: 15, 标准: ["符合国标，公差、粗糙度、技术要求合理", "To GB; sensible tolerances, roughness, notes"]}
+  - {项: ["工程更改与评审闭环", "Change request and review loop"], 分: 10, 标准: ["评审意见逐条关闭；更改单完整", "Review comments closed one by one; complete change request"]}
+  - {项: ["制造与检验复盘", "Manufacturing and inspection review"], 分: 10, 标准: ["检验数据读懂，不合格有处置，有改进建议", "Inspection data understood, nonconformities handled, improvements proposed"]}
+学时: 8
+计算书: {程序: code/_calc33.py, 函数: sheet}

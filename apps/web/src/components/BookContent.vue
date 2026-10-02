@@ -31,6 +31,7 @@ defineProps<{ html: string }>();
 .book :deep(.wq-eq svg) { max-width: 100%; }
 .book :deep(.wq-tagno) { float: right; }
 .book :deep(figure) { margin: 18px 0; }
+.book :deep(.wq-figimg) { display: block; margin: 0 auto; max-width: 100%; height: auto; }   /* wide figures shrink to the page, never overflow it */
 .book :deep(.wq-video) { display: block; width: 100%; max-height: 70vh; border-radius: 6px; background: #0f1419; }
 .book :deep(.wq-poster) { display: block; width: 100%; border-radius: 6px; }
 .book :deep(.wq-labbtn) { display: inline-block; margin: 6px 0 4px; padding: 10px 18px; border-radius: 8px; background: #b8860b; color: #fff; font-family: "Noto Sans CJK SC", sans-serif; font-size: 15px; text-decoration: none; }

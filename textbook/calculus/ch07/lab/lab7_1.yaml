@@ -1,0 +1,35 @@
+# 实验 7.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab7_1.js。
+原理:
+  - ["过曲线 y = f(x) 上两点 P(x₀, f(x₀))、Q(x₀ + h, f(x₀ + h)) 的割线斜率是差商 [f(x₀ + h) − f(x₀)]/h。h → 0 时若差商有极限，这个极限就是导数 f′(x₀)，过 P、斜率为 f′(x₀) 的直线是切线（定义 7.1.1、7.2.1）。",
+     "The secant through P(x₀, f(x₀)) and Q(x₀ + h, f(x₀ + h)) has slope [f(x₀ + h) − f(x₀)]/h. If this quotient has a limit as h → 0, the limit is the derivative f′(x₀) and the line through P with that slope is the tangent (Definitions 7.1.1, 7.2.1)."]
+  - 式: "f′(x₀) = lim (h→0) [f(x₀ + h) − f(x₀)] / h          (7.2.1)"
+  - ["可导的函数在一点附近放大后与切线几乎重合（局部线性）；角点处左、右导数不等，放大后仍是尖角；竖直切线处差商趋于无穷，函数不可导（7.2.5 节）。",
+     "A differentiable function looks like its tangent when magnified (local linearity); at a corner the one-sided derivatives differ and the corner never straightens; at a vertical tangent the quotient grows without bound (Section 7.2.5)."]
+  - ["机器人场景中，肩关节角度 θ(t) = Δ(10s³ − 15s⁴ + 6s⁵)，s = t/T，T = 2 s，Δ = 90°。角度曲线的切线斜率就是角速度。",
+     "In the robot scene the shoulder angle is θ(t) = Δ(10s³ − 15s⁴ + 6s⁵), s = t/T, T = 2 s, Δ = 90°. The tangent slope of the angle curve is the angular velocity."]
+步骤:
+  - ["在“割线与切线”场景中取 x₀ = 1，令 lg|h| 依次为 0、−1、−2、−3，记录割线斜率和相对误差，填入表 1；再把 h 的符号改为 −1 重复一次。",
+     "In 'Secant and tangent' set x₀ = 1 and lg|h| = 0, −1, −2, −3; record the secant slope and relative error in Table 1. Repeat with the sign of h set to −1."]
+  - ["找出相对误差刚好小于 1% 的步长（任务 1），说明误差与 h 大致成什么关系。",
+     "Find the step at which the relative error just drops below 1% (task 1). How does the error depend on h?"]
+  - ["切换到“放大镜”场景，选光滑曲线，把放大倍数从 1 增大到 10000，记录曲线偏离切线的像素数（任务 2），填入表 2。",
+     "In 'Magnifier' choose the smooth curve and zoom from 1× to 10000×; record how far (in pixels) the curve strays from the tangent (task 2). Fill in Table 2."]
+  - ["选 |x|，令 x₀ = 0，放大到 100 倍以上（任务 3），读出左、右割线斜率；再选 ∛x，观察原点附近曲线的样子。",
+     "Choose |x|, set x₀ = 0 and zoom beyond 100× (task 3); read the left and right secant slopes. Then choose ∛x and look at the curve near 0."]
+  - ["切换到机器人场景，令 t₀ = 0.5 s，h 从 1 s 缩小到 0.001 s，读出角速度（任务 4），与算例 7.1.2 的精确值比较。",
+     "In the robot scene set t₀ = 0.5 s and shrink h from 1 s to 0.001 s; read the angular velocity (task 4) and compare with Example 7.1.2."]
+数据表:
+  - 标题: ["表 1  割线斜率与步长（x₀ = 1）", "Table 1  Secant slope against step (x₀ = 1)"]
+    表头: ["h", "割线斜率", "f′(x₀)", "相对误差", "h < 0 时的割线斜率"]
+    表头英文: ["h", "Secant slope", "f′(x₀)", "Relative error", "Secant slope for h < 0"]
+    行: [["1", "", "", "", ""], ["0.1", "", "", "", ""], ["0.01", "", "", "", ""], ["0.001", "", "", "", ""]]
+  - 标题: ["表 2  放大与局部线性", "Table 2  Zooming and local linearity"]
+    表头: ["函数", "x₀", "放大倍数", "偏离切线（像素）", "左、右割线斜率"]
+    表头英文: ["Function", "x₀", "Zoom", "Off the tangent (px)", "Left / right secant slopes"]
+    行: [["光滑曲线", "1", "10", "", ""], ["光滑曲线", "1", "1000", "", ""], ["|x|", "0", "100", "", ""], ["∛x", "0", "100", "", ""]]
+    行英文: [["smooth curve", "1", "10", "", ""], ["smooth curve", "1", "1000", "", ""], ["|x|", "0", "100", "", ""], ["∛x", "0", "100", "", ""]]
+注意:
+  - ["步长用对数刻度调节：lg|h| = −2 表示 |h| = 0.01。", "The step is set on a log scale: lg|h| = −2 means |h| = 0.01."]
+  - ["机器人场景中角度以度计，角速度以 °/s 显示，最后一行换算为 rad/s。", "In the robot scene angles are in degrees and angular velocity in °/s; the last row converts to rad/s."]
+思考题:
+  - ["浏览器用双精度浮点数计算。若允许 h 取到 10⁻¹²，割线斜率的误差会怎样？用 7.1.4 节的结论解释。", "The browser computes in double precision. If h could go down to 10⁻¹², what would happen to the error? Explain with Section 7.1.4."]

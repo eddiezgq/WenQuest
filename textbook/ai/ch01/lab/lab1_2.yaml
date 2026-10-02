@@ -1,0 +1,33 @@
+# 实验 1.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab1_2.js。
+原理:
+  - ["感知机的输出为 ŷ = sign(w·x̃)，其中增广输入 x̃ = (x₁, x₂, 1)，增广权重 w = (w₁, w₂, b)。样本被分对当且仅当 y w·x̃ > 0（式 (1.2.1)、(1.2.2)）。",
+     "The perceptron outputs ŷ = sign(w·x̃) with augmented input x̃ = (x₁, x₂, 1) and weights w = (w₁, w₂, b). A sample is correct iff y w·x̃ > 0 (Eqs. (1.2.1), (1.2.2))."]
+  - 式: "判错时  w ← w + η y x̃          (1.2.3)"
+  - ["诺维科夫定理：若数据线性可分，间隔为 γ，R = max‖x̃ᵢ‖，则从 w = 0 出发的更新次数 k ≤ (R/γ)²（定理 1.2.1）。界与学习率 η 无关；从 w = 0 出发时，学习率只把每一步的 w 放大同一个倍数，不改变学习过程。",
+     "Novikoff's theorem: for linearly separable data with margin γ and R = max‖x̃ᵢ‖, the number of updates from w = 0 is k ≤ (R/γ)² (Theorem 1.2.1). The bound does not depend on η; starting from w = 0, η only scales every w by the same factor."]
+  - ["异或数据线性不可分（算例 1.2.2），感知机永远停不下来。", "XOR is not linearly separable (Example 1.2.2); the perceptron never stops."]
+步骤:
+  - ["在“零件检验”场景保持 η = 1，按“开始”，学到全部分对为止（任务 1）。记录更新次数、轮次和最终的 w，填入表 1；与程序 1.2.1 的结果和诺维科夫界比较。",
+     "In 'Part inspection' keep η = 1 and press Start until all parts are correct (task 1). Record the updates, epochs and final w in Table 1; compare with Program 1.2.1 and Novikoff's bound."]
+  - ["把 η 改为 0.1 和 2，各学一次（任务 2），记录更新次数与 w，说明学习率的作用。",
+     "Set η to 0.1 and to 2 and learn again (task 2); record the updates and w and explain the role of the learning rate."]
+  - ["用“单步”按钮观察一次判错时 w 与分界线的变化，在报告中画出更新前后的示意图。",
+     "Use One step to watch w and the boundary at one mistake; sketch before and after in the report."]
+  - ["切换到“异或”场景，学满 20 轮以上（任务 3），记录每轮出错数，说明为什么停不下来。",
+     "Switch to 'XOR' and run more than 20 epochs (task 3); record the mistakes per epoch and explain why it never stops."]
+  - ["切换到“垃圾邮件”场景，学到全部分对（任务 4）。", "Switch to 'Spam' and learn until all are correct (task 4)."]
+数据表:
+  - 标题: ["表 1  零件检验数据上的感知机", "Table 1  The perceptron on the part data"]
+    表头: ["η", "更新次数 k", "轮次", "w₁", "w₂", "b", "(R/γ*)²"]
+    表头英文: ["η", "Updates k", "Epochs", "w₁", "w₂", "b", "(R/γ*)²"]
+    行: [["1", "", "", "", "", "", "≈ 609"], ["0.1", "", "", "", "", "", "≈ 609"], ["2", "", "", "", "", "", "≈ 609"]]
+  - 标题: ["表 2  异或数据上每轮的出错数", "Table 2  Mistakes per epoch on XOR"]
+    表头: ["轮次", "1", "2", "3", "5", "10", "20"]
+    表头英文: ["Epoch", "1", "2", "3", "5", "10", "20"]
+    行: [["出错数", "", "", "", "", "", ""]]
+    行英文: [["Mistakes", "", "", "", "", "", ""]]
+注意:
+  - ["样本按固定顺序循环，所以结果可以与程序 1.2.1 逐项核对。", "Samples are visited in a fixed order, so the result can be checked against Program 1.2.1 item by item."]
+  - ["恰好落在分界线上（w·x̃ = 0）的样本也算判错，这保证了从 w = 0 出发时第一个样本就会引起更新。", "A sample exactly on the boundary (w·x̃ = 0) counts as a mistake, so the first sample triggers an update when w = 0."]
+思考题:
+  - ["如果把零件数据的 x₁ 换成以 μm 为单位（放大 10 倍），更新次数会怎样变化？用定理 1.2.1 解释。", "If x₁ is measured in μm (ten times larger), how does the number of updates change? Explain with Theorem 1.2.1."]
