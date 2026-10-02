@@ -12,11 +12,11 @@ parts_en:
   第七篇 切削原理与刀具: "Part VII  Metal Cutting and Cutting Tools"
   第八篇 加工方法与机床: "Part VIII  Machining Processes and Machine Tools"
   第九篇 数控技术与 CAM: "Part IX  Numerical Control and CAM"
-  第十篇 工艺规程、工装与装配: "Part X  Process Planning, Tooling and Assembly"
-  第十一篇 计量与质量: "Part XI  Metrology and Quality"
-  第十二篇 制造系统与智能制造: "Part XII  Manufacturing Systems and Smart Manufacturing"
-  第十三篇 综合项目: "Part XIII  Capstone Projects"
-chapters:
-  50:
-    status: ai
-    title_en: "Machining Process Planning"
+  第十篇 机械加工工艺: "Part X  Machining Process Engineering"
+  第十一篇 典型零件的加工工艺（项目篇）: "Part XI  Process Plans for Typical Parts (Projects)"
+  第十二篇 装配工艺: "Part XII  Assembly Processes"
+  第十三篇 计量与质量: "Part XIII  Metrology and Quality"
+  第十四篇 制造系统与智能制造: "Part XIV  Manufacturing Systems and Smart Manufacturing"
+  第十五篇 综合项目: "Part XV  Capstone Projects"
+chapters: {}
+# 第 50 章 v0.1 样章（机械加工工艺规程设计）按 Eddie 2026-10-02 的意见重排后移到 drafts/v01_ch50，作新第 56、57 章的底稿。
