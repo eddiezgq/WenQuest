@@ -60,7 +60,7 @@
             <table class="t small">
               <thead><tr><th>部位</th><th class="num">图纸 Ø</th><th class="num">本工序编程 Ø</th></tr></thead>
               <tbody><tr v-for="s in spec.sizes" :key="s.name"><td>{{ s.name }}</td><td class="num">{{ s.design }}</td><td class="num">{{ s.op }}</td></tr>
-                <tr v-if="spec.extra"><td colspan="3" class="muted">其余直径加 {{ spec.extra }} mm（与轴承位、齿轮位同样的车削余量）</td></tr></tbody>
+                <tr v-if="spec.unmapped?.length"><td colspan="3" class="muted">工序里没列出的 {{ spec.unmapped.map((d) => 'Ø' + d).join('、') }} 加 {{ spec.extra }} mm（与列出的部位同样的车削余量）</td></tr></tbody>
             </table>
             <div class="line small"><span>装夹</span>
               <label><input v-model="spec.setups" type="checkbox" value="right"> 右端（第一次装夹）</label>

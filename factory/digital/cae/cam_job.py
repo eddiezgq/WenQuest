@@ -155,6 +155,7 @@ def plan_turn(plan, seq, design, revision=None, chamfer=None):
     spec["profile"] = op_profile(design, sizes, extra, is_last, L_op, spec["cut"]["axial_allow"])
     spec["sizes"] = [{"name": n, "design": k, "op": v} for k, (v, n) in sorted(sizes.items())]
     spec["extra"] = extra
+    spec["unmapped"] = sorted({round(d, 3) for _, _, d in runs_of(design)} - set(sizes))      # 工序里没列出的直径（按 extra 加）
     _src(spec, "profile", "设计轮廓；直径按工艺规程 {} 工序尺寸（公差带中间），其余直径加 {} mm".format(op["seq"], extra))
     if prev:
         p = prev[-1]

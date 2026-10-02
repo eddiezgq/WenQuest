@@ -305,10 +305,11 @@ def test_plan_turn_from_process_plan(plan, shaft):
     rough = J.plan_turn(plan, 20, design, "A")
     assert rough["mode"] == "rough" and rough["length"] == 168 and rough["stock"]["d"] == 50
     assert rough["cut"]["vc"] == 120 and rough["cut"]["ap"] == 2.5 and "工艺规程" in rough["sources"]["cut.vc"]
-    assert {s["name"]: s["op"] for s in rough["sizes"]} == {"轴承位": 36.375, "齿轮位": 41.375}     # 36.5 0/−0.25 编中间
+    assert {s["name"]: s["op"] for s in rough["sizes"]} == {"轴承位": 36.375, "齿轮位": 41.375, "轴端": 31.375}   # 36.5 0/−0.25 编中间
+    assert rough["unmapped"] == []
     fin = J.plan_turn(plan, 40, design, "A")
     assert fin["mode"] == "finish" and fin["length"] == 167 and fin["stock"]["from_seq"] == 20
-    assert {s["name"]: s["op"] for s in fin["sizes"]} == {"轴承位": 35.2805, "齿轮位": 40.2805}
+    assert {s["name"]: s["op"] for s in fin["sizes"]} == {"轴承位": 35.2805, "齿轮位": 40.2805, "轴端": 29.9835}
     for spec in (rough, fin):
         progs = J.generate(spec)
         assert [p["setup"] for p in progs] == ["right", "left"]
@@ -492,7 +493,7 @@ def test_one_sentence_rules(plan, shaft):
     assert {(p["path"], p["value"]) for p in r["patch"]} == {("cut.ap", 2.5), ("cut.radial_allow", 0.3)}
     s["cut"]["radial_allow"] = 0.3                                  # 网页按修改清单写回后生成：粗车目标多留 0.3
     p = J.generate(s)[0]
-    assert p["sim"]["dev_max"] <= 0.01 and abs(p["sim"]["target"][0][1] - (31.0945 + 0.6)) < 1e-6
+    assert p["sim"]["dev_max"] <= 0.01 and abs(p["sim"]["target"][0][1] - (31.375 + 0.6)) < 1e-6
     r = A.setup(None, "线速度 150，进给 0.12，限速 2500，只车右端，加点冷却", s)
     assert {(p["path"], str(p["value"])) for p in r["patch"]} == {("cut.vc", "150.0"), ("cut.f", "0.12"), ("cut.max_rpm", "2500.0"),
                                                                  ("setups", "['right']")}
