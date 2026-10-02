@@ -3,7 +3,7 @@
 # 余量和中间工序尺寸按“企业工艺标准”取值：教学示意值，不是国家标准。
 #
 # 数据格式 v2（第 13 轮 7.3（4）N1）：v1 的字段（material、blank、drawing、operations 的 seq/operation/workstation/content/
-# datum/clamping/tools/cut/features/minutes）不变，AI 工艺评审员和车间执行照旧使用；v2 新增 doc（文件头与签署）、part（零件轮廓，
+# datum/clamping/tools/cut/features/minutes）不变（features 仍只列轴承位、齿轮位：数控程序生成按它编程，轴端 Ø30 h8 先只进图纸特性 C3 和工序简图），AI 工艺评审员和车间执行照旧使用；v2 新增 doc（文件头与签署）、part（零件轮廓，
 # 画工序简图用）、characteristics（图纸全部特性，检验卡逐条覆盖）、tool_list（刀具卡）、gauges（量具），以及每道工序的
 # setup_min（准备与终结时间）、shop（车间）、fixture、coolant、locate/clamp（定位与夹紧，GB/T 24740 符号）、sketch（工序简图）、
 # steps（工步）、inspect（本工序检验项目）。工艺文件生成器（hub/cards.py）由这一份数据生成过程卡、工序卡、检验卡和刀具卡。
@@ -44,7 +44,6 @@ blank: {kind: 热轧圆钢, spec: Ø50, length_mm: 182, material_item: RM-45-D50
 drawing:
   - {name: 轴承位, size_mm: 35, es_mm: 0.018, ei_mm: 0.002, Ra_um: 0.8}
   - {name: 齿轮位, size_mm: 40, es_mm: 0.018, ei_mm: 0.002, Ra_um: 0.8}
-  - {name: 轴端, size_mm: 30, es_mm: 0, ei_mm: -0.033, Ra_um: 3.2}
 characteristics:         # 图纸全部特性；key: true 为关键特性（检验卡标 ★）
   - {id: C1, name: 轴承位直径（两处）, spec: "Ø35 k6（+0.018/+0.002）", nominal: 35, es: 0.018, ei: 0.002, kind: dim, key: true, qms: 轴承位直径 Bearing seat Ø35 k6 (mm)}
   - {id: C2, name: 齿轮位直径, spec: "Ø40 k6（+0.018/+0.002）", nominal: 40, es: 0.018, ei: 0.002, kind: dim, key: true, qms: 齿轮位直径 Gear seat Ø40 k6 (mm)}
@@ -110,7 +109,6 @@ operations:
     features:
       - {name: 轴承位, size_mm: 36.5, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
       - {name: 齿轮位, size_mm: 41.5, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
-      - {name: 轴端, size_mm: 31.5, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
     minutes: 18
     setup_min: 30
     coolant: 乳化液
@@ -164,7 +162,6 @@ operations:
     features:
       - {name: 轴承位, size_mm: 35.3, es_mm: 0, ei_mm: -0.039, Ra_um: 3.2}
       - {name: 齿轮位, size_mm: 40.3, es_mm: 0, ei_mm: -0.039, Ra_um: 3.2}
-      - {name: 轴端, size_mm: 30, es_mm: 0, ei_mm: -0.033, Ra_um: 3.2}
     minutes: 15
     setup_min: 30
     coolant: 乳化液
