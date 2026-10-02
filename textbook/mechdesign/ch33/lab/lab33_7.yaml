@@ -1,0 +1,28 @@
+# 实验 33.7 的指导书与报告模板。目的、场景、参数、任务取自 lab33_7.js。
+原理:
+  - ["轴上的圆盘（齿轮、叶轮、转鼓）质心总会偏离轴线一点，偏心距为 e。旋转时离心力 m e ω² 把轴弯曲，弯曲又使离心力更大。当转速接近轴的横向固有频率时，挠度急剧增大，这个转速叫临界转速。",
+     "A disk on a shaft (gear, impeller, drum) always has its centre of mass slightly off the axis, by e. Rotation bends the shaft by centrifugal force m e ω², and the bending increases the force. Near the shaft's lateral natural frequency the bending grows sharply: the critical speed."]
+  - 式: "nc = (60/2π)·√(k/m)，简支轴跨中：k = 48EI/L³，I = πd⁴/64"
+  - 式: "y/e = r² / √((1 − r²)² + (2ζr)²)，r = n/nc"
+  - ["工作转速 n ≤ 0.7nc 的轴叫刚性轴；工作在 1.3nc 与 0.7nc2 之间的叫挠性轴，起动和停机时必须快速越过 nc。",
+     "A shaft with n ≤ 0.7nc is rigid; one running between 1.3nc and 0.7nc2 is flexible and must pass nc quickly on starting and stopping."]
+步骤:
+  - ["场景“风机轴”，保持默认参数（Ø30、800 mm、25 kg），转速设 2900 r/min，按“升速”，记下 nc、转速比和挠度最大处的转速（任务 1）。", "Scene “Fan shaft” with the defaults (Ø30, 800 mm, 25 kg), speed 2900 r/min; press Spin up and record nc, the ratio and the speed of peak whirl (task 1)."]
+  - ["只改轴径，每改一次升速一次，找出使 2900 r/min ≤ 0.7nc 的最小轴径（任务 2），记入表 1。", "Change only the diameter, spinning up each time, to find the smallest one with 2900 r/min ≤ 0.7nc (task 2); record in Table 1."]
+  - ["把跨距改为 400 mm，再找一次最小轴径，比较跨距的影响（nc ∝ d²/L^1.5）。", "Set the span to 400 mm and repeat; compare the effect of span (nc ∝ d²/L^1.5)."]
+  - ["切换到“洗衣机脱水”，升速到 1200 r/min，观察挠度最大的转速（任务 3）。", "Switch to “Washing-machine spin”, spin up to 1200 r/min and watch where the whirl peaks (task 3)."]
+数据表:
+  - 标题: ["表 1  风机轴的临界转速", "Table 1  Critical speed of the fan shaft"]
+    表头: ["L / mm", "d / mm", "m / kg", "nc / (r/min)", "2900/nc", "刚性 / 挠性"]
+    表头英文: ["L / mm", "d / mm", "m / kg", "nc / (r/min)", "2900/nc", "Rigid / flexible"]
+    行: [["800", "30", "25", "", "", ""], ["800", "", "25", "", "", ""], ["400", "30", "25", "", "", ""], ["400", "", "25", "", "", ""]]
+  - 标题: ["表 2  洗衣机脱水", "Table 2  Washing-machine spin"]
+    表头: ["nc / (r/min)", "挠度最大时的转速 / (r/min)", "1200 r/min 时 y/e"]
+    表头英文: ["nc / (r/min)", "Speed at peak whirl / (r/min)", "y/e at 1200 r/min"]
+    行: [["", "", ""]]
+注意:
+  - ["实验忽略了轴自身的质量和轴承的弹性：轴的质量使 nc 降低，轴承的弹性也使 nc 降低，正文用梁单元法计入了轴的质量。", "The lab ignores the shaft's own mass and the bearings' compliance, both of which lower nc; the text includes the shaft mass with beam elements."]
+  - ["“洗衣机脱水”场景借用同一个“简支轴＋圆盘”模型（跨距 600 mm、Ø15、30 kg）作示意。真实洗衣机是转鼓—弹簧—减振器系统，临界转速由弹簧和减振器决定，不是轴的弯曲；它的转速数值只用来体会“过临界”的现象。", "The Washing-machine scene borrows the same simply supported shaft-and-disk model (span 600 mm, Ø15, 30 kg) as an illustration. A real washer is a drum on springs and dampers whose critical speed is set by the suspension, not by shaft bending; use its numbers only to feel what passing the critical speed is like."]
+  - ["阻尼比取 0.02，真实结构的阻尼不同，峰值高低也不同，但峰值出现的转速基本不变。", "The damping ratio is 0.02; real damping changes the peak height but hardly where it occurs."]
+思考题:
+  - ["WQR-105 输出轴的一阶临界转速约为工作转速的几百倍。为什么减速器的低速轴几乎从不校核临界转速，而电机轴、风机轴、高速主轴必须校核？", "The WQR-105 output shaft's first critical speed is hundreds of times its running speed. Why are slow gearbox shafts almost never checked for it, while motor, fan and spindle shafts must be?"]

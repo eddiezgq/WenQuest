@@ -11,4 +11,7 @@ parts_en:
   第七篇 现代设计方法与数字化: "Part VII  Modern Design Methods and the Digital Thread"
   第八篇 机器人与智能装备的机械设计: "Part VIII  Mechanical Design of Robots and Intelligent Equipment"
   第九篇 综合设计: "Part IX  Integrated Design Projects"
-chapters: {}
+chapters:
+  33:
+    status: ai
+    title_en: "Shafts"

@@ -1,0 +1,30 @@
+# 实验 33.2 的指导书与报告模板。目的、场景、参数、任务取自 lab33_2.js。
+原理:
+  - ["轴的结构设计要同时满足装配、定位、受力和加工四方面的要求。每条结构规则背后都有一个具体的原因：轴环和轴肩要有足够高度，才能承受轴向力、可靠定位；轴肩又不能高过轴承内圈太多，否则拆卸工具无从下手。",
+     "A shaft layout must satisfy assembly, location, loading and manufacture at once. Each layout rule has a concrete reason: collars and shoulders must be high enough to take axial force and locate reliably, yet a shoulder must not cover too much of the bearing's inner ring, or a puller cannot reach it."]
+  - ["轴肩处的过渡圆角 r 必须小于轴承内圈的倒角 r_s,min，否则内圈的倒角压在圆角上，端面贴不到轴肩，轴承装不到位。圆角又不能太小，否则应力集中大（33.5 节）。",
+     "The fillet r at a shoulder must be smaller than the inner-ring chamfer r_s,min; otherwise the chamfer rides on the fillet and the ring cannot sit against the shoulder. Too small a fillet, on the other hand, raises the stress concentration (Section 33.5)."]
+  - 式: "h ≥ 0.07d；r < r_s,min；L_seat = L_hub − (2～3) mm"
+  - ["平键靠侧面挤压传递转矩。A 型键的工作长度 l = L − b，接触高度约为 h/2，挤压应力为"," A parallel key carries torque by bearing on its sides. For a type-A key the working length is l = L − b and the contact height about h/2, so the bearing stress is"]
+  - 式: "σp = 2T / (d · (h/2) · l) ≤ [σp]"
+步骤:
+  - ["选场景“WQR-105 输出轴”，保持默认尺寸，按“核对”，把不通过的规则和数值记入表 1。", "Choose “WQR-105 output shaft”, keep the defaults, press Check and record the failing rules and values in Table 1."]
+  - ["逐项修改：先调轴环直径，再调轴肩直径、圆角、齿轮位长度、键长，每改一项核对一次，记录变化。", "Change one item at a time — collar, shoulder, fillet, seat length, key length — and check after each change; record what changes."]
+  - ["七条规则全部通过后，把这组尺寸与本章 B 版（Ø48、Ø42、r = 1.0、53、63）比较。", "When all seven pass, compare your sizes with rev. B in this chapter (Ø48, Ø42, r = 1.0, 53, 63)."]
+  - ["只把圆角改成 1.6 mm 再核对（任务 2），观察右轴承与轴肩之间出现的间隙。", "Set only the fillet to 1.6 mm and check (task 2); look at the gap that opens between the bearing and the shoulder."]
+  - ["切换到“小型减速电机输出轴”，用同样的规则调出一组通过的尺寸（任务 3）。", "Switch to “Small gearmotor output shaft” and find a set of sizes that passes (task 3)."]
+数据表:
+  - 标题: ["表 1  WQR-105 输出轴的核对记录", "Table 1  Check record, WQR-105 output shaft"]
+    表头: ["次序", "轴环 / mm", "轴肩 / mm", "r / mm", "齿轮位 / mm", "键长 / mm", "不通过的规则"]
+    表头英文: ["Run", "Collar / mm", "Shoulder / mm", "r / mm", "Seat / mm", "Key / mm", "Failing rules"]
+    行: [["1", "44", "38", "1.6", "55", "36", ""], ["2", "", "", "", "", "", ""], ["3", "", "", "", "", "", ""], ["4", "", "", "", "", "", ""], ["5", "", "", "", "", "", ""]]
+  - 标题: ["表 2  通过的尺寸", "Table 2  A passing set of sizes"]
+    表头: ["场景", "轴环", "轴肩", "r", "齿轮位", "键长", "与 B 版的差别"]
+    表头英文: ["Scene", "Collar", "Shoulder", "r", "Seat", "Key", "Difference from rev. B"]
+    行: [["WQR-105", "", "", "", "", "", ""], ["减速电机", "", "", "", "", "", "—"]]
+    行英文: [["WQR-105", "", "", "", "", "", ""], ["Gearmotor", "", "", "", "", "", "—"]]
+注意:
+  - ["实验里轴肩的上限用 d + 0.33(D − d) 近似表示内圈挡边直径（6207 约 47 mm）；真实设计按轴承样本给出的安装尺寸 da,max 核对。", "The lab approximates the inner-ring land by d + 0.33(D − d) (about 47 mm for a 6207); a real design checks the catalogue's mounting dimension da,max."]
+  - ["键的许用挤压应力取 135 MPa（钢制轮毂、静联结的中值），与数字工厂参数配置器一致；第 25 章详细讨论。", "The allowable key bearing stress is 135 MPa (steel hub, static joint), as in the factory configurator; Chapter 25 discusses it in detail."]
+思考题:
+  - ["外伸段的联轴器键如果一定要短（例如轮毂只有 40 mm），还有哪些办法能传递 350 N·m？", "If the coupling key must stay short (a 40 mm hub, say), what else could transmit 350 N·m?"]
