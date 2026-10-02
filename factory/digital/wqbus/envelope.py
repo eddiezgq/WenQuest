@@ -59,6 +59,10 @@ DATA_SCHEMAS = {
     "design.submit": _obj(["item", "submission"], {}),                        # 企业版：提交待审（第 8 轮）
     "design.review": _obj(["item", "submission", "decision"], {"decision": {"enum": ["approved", "rejected", "withdrawn"]}}),
     "design.gcode": _obj(["item", "revision", "operation", "machine", "gcode_ref"], {"est_time_s": NUM}),
+    # 跑合试验台的输出轴转矩记录（第 11 轮：疲劳寿命用）
+    "test.torque": _obj(["item", "part_serial", "rate_hz", "samples_nm"], {
+        "rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "samples_nm": {"type": "array", "items": NUM, "minItems": 2, "maxItems": 20000}}),
     "logistics.status": _obj(["x_m", "y_m"], {"x_m": NUM, "y_m": NUM, "battery": FRAC}),
     "ai.alert": _obj(["level", "title"], {"level": {"enum": ["info", "warn", "critical"]},
                                           "evidence": EVIDENCE}),

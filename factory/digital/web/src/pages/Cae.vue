@@ -79,6 +79,7 @@
             <div class="seg">
               <button type="button" :class="{ on: field === 'vm' }" @click="field = 'vm'">Von Mises 应力</button>
               <button type="button" :class="{ on: field === 'u' }" @click="field = 'u'">位移</button>
+              <button type="button" :class="{ on: field === 'life' }" :disabled="!result.surface.lgD" title="先在下面算疲劳寿命" @click="field = 'life'">疲劳寿命</button>
             </div>
             <label class="small deform">变形放大 <input v-model.number="deformK" type="range" min="0" max="1" step="0.01"> {{ deformX.toFixed(0) }}×</label>
             <button type="button" class="btn more" :disabled="reporting" @click="downloadReport">{{ reporting ? '正在生成报告…' : '下载计算报告（Word）' }}</button>
@@ -92,7 +93,7 @@
         </div>
         <div v-if="!geo && !result" class="empty big-empty">先在左边选一个零件（例如 SH-301 输出轴）或上传 STEP。</div>
         <CaeViewer v-else ref="viewer" :glb-url="result ? '' : geo?.model_url" :faces="geo?.faces || []" :face-colors="faceColors"
-          :picking="!result && active >= 0" :surface="result?.surface" :field="field" :deform="deformX" :marks="marks" :peaks="{ vm: st.vm_peak_all_mpa, u: st.u_max_mm }" @pick="onPick" />
+          :picking="!result && active >= 0" :surface="result?.surface" :field="field" :deform="deformX" :marks="marks" :peaks="{ vm: st.vm_peak_all_mpa, u: st.u_max_mm }" :block-seconds="fat?.block_seconds || 1" @pick="onPick" />
 
         <div v-if="result" class="stats">
           <div class="stat"><span>最大应力（Von Mises）</span><b>{{ st.vm_max_mpa.toFixed(1) }} <small>MPa</small></b>
@@ -106,6 +107,59 @@
         <div v-if="result" class="small muted notes">
           <p v-if="st.vm_peak_all_mpa > st.vm_max_mpa * 1.01">约束面附近最高 {{ st.vm_peak_all_mpa.toFixed(1) }} MPa：那是约束方式造成的（实际的支承没有那么“死”），评估时避开了约束面 {{ (1.5 * st.mesh_size_mm).toFixed(1) }} mm 以内的点。</p>
           <p>尖角（没有圆角的内角）处的应力理论上没有上限，网格越细数值越大——看到最大值在尖角，就要考虑加圆角，或者按规范的应力集中系数去校核。</p>
+        </div>
+
+        <div v-if="result" class="fat">
+          <h3>疲劳寿命 <span class="small muted">载荷反复变化时，零件能用多久（雨流计数 + S-N 曲线 + Miner 累积损伤，pyLife）</span></h3>
+          <div class="fat-grid">
+            <div class="field">
+              <label>载荷谱</label>
+              <div class="seg">
+                <button type="button" :class="{ on: spec.kind === 'const' }" @click="spec.kind = 'const'">恒幅</button>
+                <button type="button" :class="{ on: spec.kind === 'log' }" :disabled="!hasTorque" :title="hasTorque ? '' : '要有扭矩载荷才能用转矩记录'" @click="spec.kind = 'log'">跑合试验台转矩记录</button>
+              </div>
+            </div>
+            <template v-if="spec.kind === 'const'">
+              <div class="field"><label>最大（{{ refUnit }}）</label><input v-model.number="spec.max" type="number"></div>
+              <div class="field"><label>最小（{{ refUnit }}）</label><input v-model.number="spec.min" type="number"></div>
+              <div class="field"><label>每秒几次（Hz）</label><input v-model.number="spec.freq" type="number" step="0.1" min="0.001"></div>
+            </template>
+            <div v-else class="field wide">
+              <label>选一台减速器的记录（仿真车间跑合试验台，输出轴转矩）</label>
+              <select v-model="spec.log">
+                <option value="" disabled>{{ logs.length ? '选择记录…' : '还没有记录：车间里有减速器做完跑合试验后才有' }}</option>
+                <option v-for="l in logs" :key="l.id" :value="l.id">{{ l.part_serial }} · {{ new Date(l.ts).toLocaleString('zh-CN', { hour12: false }) }} · 峰值 {{ l.peak_nm.toFixed(0) }} N·m · {{ l.duration_s }} 秒</option>
+              </select>
+              <svg v-if="logSeries.length" class="spark" viewBox="0 0 300 60" preserveAspectRatio="none" aria-label="转矩曲线">
+                <polyline :points="sparkPts" fill="none" stroke="var(--accent)" stroke-width="1" />
+              </svg>
+            </div>
+            <div class="field"><label>表面状态</label>
+              <select v-model="fopt.surface"><option v-for="(v, k) in SURF" :key="k" :value="k">{{ v }}</option></select></div>
+            <div class="field"><label>尺寸系数 ε <span class="muted">直径 30–50 mm 约 0.85，越粗越小</span></label><input v-model.number="fopt.size_factor" type="number" step="0.01" min="0.5" max="1"></div>
+            <div class="field"><label>附加缺口系数 Kf <span class="muted">有限元已算形状集中，一般 1</span></label><input v-model.number="fopt.kf" type="number" step="0.1" min="1"></div>
+            <label class="chk small"><input v-model="fopt.haibach" type="checkbox"> 疲劳极限以下也计损伤（Haibach，偏安全）</label>
+          </div>
+          <button class="btn primary" :disabled="fatBusy || (spec.kind === 'log' && !spec.log)" @click="runFatigue">{{ fatBusy ? '正在计算…' : '计算疲劳寿命' }}</button>
+          <div v-if="fatErr" class="err small">{{ fatErr }}</div>
+          <div v-if="fat" class="fat-res">
+            <div class="stat" :class="fat.infinite ? 'good' : fat.life_hours < 2000 ? 'bad' : fat.life_hours < 20000 ? 'warn' : 'good'">
+              <span>寿命（最危险点）</span>
+              <b>{{ fat.infinite ? '无限' : fmtHours(fat.life_hours) }}</b>
+              <small>{{ fat.infinite ? '应力幅都低于修正后的疲劳极限' : '≈ ' + (fat.life_blocks * fat.cycles_per_block).toPrecision(3) + ' 次循环' }}</small>
+            </div>
+            <div class="small fat-txt">
+              <div>{{ fat.label }}；每块 {{ fat.cycles_per_block }} 个循环。</div>
+              <div>修正后疲劳极限 S_D = σ₋₁ × β {{ fat.beta }} × ε {{ fat.size_factor }} ÷ Kf {{ fat.kf }} = <b>{{ fat.S_D }} MPa</b>（N_D = {{ fat.N_D.toExponential(0) }}，k = {{ fat.k }}）；Goodman 平均应力修正。</div>
+              <table v-if="fat.hot_cycles?.length" class="t">
+                <thead><tr><th class="num">载荷幅</th><th class="num">均值</th><th class="num">σa</th><th class="num">σm</th><th class="num">σa,eq MPa</th><th class="num">该幅值寿命 N</th></tr></thead>
+                <tbody><tr v-for="(c, i) in fat.hot_cycles" :key="i">
+                  <td class="num">{{ c.load_amp.toFixed(1) }}</td><td class="num">{{ c.load_mean.toFixed(1) }}</td><td class="num">{{ c.sigma_a.toFixed(1) }}</td>
+                  <td class="num">{{ c.sigma_m.toFixed(1) }}</td><td class="num">{{ c.sigma_a_eq.toFixed(1) }}</td><td class="num">{{ c.N == null ? '∞' : c.N.toPrecision(3) }}</td></tr></tbody>
+              </table>
+              <div class="muted">按最危险点列出幅值最大的几个循环。云图切到“疲劳寿命”看各处寿命；报告里会带上这一节。</div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -289,12 +343,56 @@ async function showResult(j) {
   const surface = await fetchSurface(j.id);
   result.value = { stats: j.stats, surface };
   field.value = 'vm';
+  resetFatigue(j);
 }
 async function openJob(j) {
   job.value = j;
   err.value = '';
   try { await showResult(j); window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { err.value = e.message; }
 }
+// ---------------------------------------------------------------- 疲劳寿命
+const SURF = { polished: '抛光（β 1.0）', ground: '磨削（β 0.92）', fine_turned: '精车（β 0.85）', rough_turned: '粗车（β 0.75）', forged: '锻造毛坯（β 0.55）' };
+const hasTorque = computed(() => (job.value?.setup?.loads || []).some((l) => l.type === 'torque'));
+const refLoad = computed(() => (job.value?.setup?.loads || []).filter((l) => l.type === 'torque').reduce((a, l) => a + l.value_nmm / 1000, 0));
+const refUnit = computed(() => (hasTorque.value ? 'N·m' : '× 计算工况'));
+const spec = ref({ kind: 'const', max: 350, min: 0, freq: 1, log: '' });
+const fopt = ref({ surface: 'ground', size_factor: 0.85, kf: 1, haibach: true });
+const fat = ref(null);
+const fatBusy = ref(false);
+const fatErr = ref('');
+const logs = ref([]);
+const logSeries = ref([]);
+const sparkPts = computed(() => {
+  const s = logSeries.value; if (!s.length) return '';
+  const hi = Math.max(...s.map(Math.abs)) || 1;
+  return s.map((v, i) => `${(i / (s.length - 1) * 300).toFixed(1)},${(58 - (v / hi) * 54).toFixed(1)}`).join(' ');
+});
+const fmtHours = (h) => (h >= 87600 ? (h / 8760).toPrecision(3) + ' 年（' + h.toExponential(2) + ' h）' : h >= 100 ? h.toFixed(0) + ' 小时' : h.toPrecision(3) + ' 小时');
+watch(() => spec.value.log, async (id) => {
+  logSeries.value = [];
+  if (id) { try { logSeries.value = (await get('/cae/torque-logs/' + id)).samples_nm; } catch (e) { /* 看不到曲线不影响计算 */ } }
+});
+watch(() => spec.value.kind, async (k) => { if (k === 'log' && !logs.value.length) { try { logs.value = (await get('/cae/torque-logs')).logs; } catch (e) { /* */ } } });
+function resetFatigue(j) {
+  fat.value = j?.fatigue || null; fatErr.value = '';
+  spec.value = { kind: 'const', max: hasTorque.value ? +refLoad.value.toFixed(1) : 1, min: hasTorque.value ? 0 : -1, freq: 1, log: '' };
+}
+async function runFatigue() {
+  fatBusy.value = true; fatErr.value = '';
+  try {
+    const sp = spec.value.kind === 'log' ? { kind: 'log', id: spec.value.log } : { kind: 'const', max: spec.value.max, min: spec.value.min, freq_hz: spec.value.freq };
+    const r = await post(`/cae/jobs/${encodeURIComponent(job.value.id)}/fatigue`, { spectrum: sp, ...fopt.value });
+    fat.value = r.summary;
+    job.value = { ...job.value, fatigue: r.summary };
+    const raw = Uint8Array.from(atob(r.damage_b64), (c) => c.charCodeAt(0));
+    const D = new Float32Array(raw.buffer);
+    const lg = new Float32Array(D.length);
+    for (let i = 0; i < D.length; i++) lg[i] = D[i] > 0 ? Math.log10(D[i]) : -30;
+    result.value.surface.lgD = lg;
+    field.value = 'life';
+  } catch (e) { fatErr.value = e.message; } finally { fatBusy.value = false; }
+}
+
 // 报告：自动截应力、位移两张云图，连同设置和结果生成 Word
 const reporting = ref(false);
 const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -303,10 +401,12 @@ async function downloadReport() {
   const keep = field.value;
   try {
     const images = [];
-    for (const [f, cap] of [['vm', 'Von Mises 应力云图（MPa）'], ['u', '位移云图（mm）']]) {
+    const shots = [['vm', 'Von Mises 应力云图（MPa）'], ['u', '位移云图（mm）']];
+    if (result.value.surface.lgD) shots.push(['life', '疲劳寿命云图（红 = 寿命最短）']);
+    for (const [f, cap] of shots) {
       field.value = f;
       await frame(); await frame();
-      images.push({ data: viewer.value.snapshot(), caption: `${cap}，色标蓝 → 红 = 低 → 高（最高 ${f === 'vm' ? st.value.vm_peak_all_mpa.toFixed(1) + ' MPa' : st.value.u_max_mm.toPrecision(3) + ' mm'}），变形放大 ${deformX.value} 倍；粉点为最大应力位置，青点为最大位移位置` });
+      images.push({ data: viewer.value.snapshot(), caption: `${cap}，色标蓝 → 红 = 低 → 高（最高 ${f === 'vm' ? st.value.vm_peak_all_mpa.toFixed(1) + ' MPa' : f === 'u' ? st.value.u_max_mm.toPrecision(3) + ' mm' : (fat.value?.infinite ? '无限寿命' : '最短 ' + fmtHours(fat.value.life_hours))}），变形放大 ${deformX.value} 倍；粉点为最大应力位置，青点为最大位移位置` });
     }
     const r = await fetch(`/api/cae/jobs/${encodeURIComponent(job.value.id)}/report`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-wq-token': session.token }, body: JSON.stringify({ images }) });
@@ -382,5 +482,16 @@ onUnmounted(() => { clearTimeout(pollT); clearInterval(listT); });
 .stat.bad { background: var(--bad-bg); } .stat.bad b { color: var(--bad); }
 .notes p { margin: 8px 0 0; }
 tr.cur td { background: var(--accent-bg); }
+.fat { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.fat h3 { font-size: 15px; }
+.fat-grid { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; }
+.fat-grid .field input { width: 120px; }
+.fat-grid .field.wide { flex-basis: 100%; }
+.fat-grid .field.wide select { max-width: 560px; }
+.spark { width: 100%; max-width: 560px; height: 60px; background: var(--surface-2); border-radius: 6px; }
+.fat .btn { align-self: flex-start; }
+.fat-res { display: flex; gap: 14px; align-items: flex-start; }
+.fat-res .stat { min-width: 200px; }
+.fat-txt { display: flex; flex-direction: column; gap: 6px; flex: 1; }
 @media (max-width: 1100px) { .side { width: 100%; } .stats { grid-template-columns: repeat(2, 1fr); } }
 </style>

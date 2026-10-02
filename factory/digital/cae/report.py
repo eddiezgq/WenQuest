@@ -135,10 +135,34 @@ def build(job, images=(), ai_text=None):
         cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
         cap.runs and setattr(cap.runs[0].font, "size", Pt(9))
 
-    d.add_heading("5  结论", 1)
+    fat = job.get("fatigue")
+    n = 5
+    if fat:
+        d.add_heading("5  疲劳寿命", 1)
+        table([["项目", "内容"],
+               ["载荷谱", fat.get("label") or "—"],
+               ["计算工况载荷", "{} {}".format(fat.get("ref_load"), fat.get("ref_unit") or "")],
+               ["每块循环数（雨流计数，pyLife 四点法）", str(fat["cycles_per_block"])],
+               ["S-N 曲线", "σ₋₁ = {} MPa × 表面 β {}（{}）× 尺寸 ε {} ÷ Kf {} = S_D {} MPa；N_D = {:g}，k = {:g}{}".format(
+                   mat["sigma_1"], fat["beta"], fat["surface"], fat["size_factor"], fat["kf"], fat["S_D"], fat["N_D"], fat["k"],
+                   "，低于 S_D 按 Haibach 斜率 {:g}".format(fat["k2"]) if fat.get("haibach") else "，低于 S_D 不计损伤")],
+               ["平均应力修正", "Goodman：σa,eq = σa / (1 − |σm| / σb)，σb = {} MPa".format(mat["ultimate_mpa"])],
+               ["累积损伤", "Miner 线性累积"],
+               ["最危险点", "{}（计算工况下 {} MPa）".format(_vec(fat["hot_at"]), fat["hot_vm_ref"])],
+               ["寿命", "无限寿命（应力幅都低于疲劳极限）" if fat.get("infinite") else "{:.3g} 块 ≈ {:.3g} 次循环 ≈ {:.3g} 小时".format(
+                   fat["life_blocks"], fat["life_blocks"] * fat["cycles_per_block"], fat["life_hours"])]], [5, 11])
+        if fat.get("hot_cycles"):
+            table([["载荷幅", "载荷均值", "σa MPa", "σm MPa", "σa,eq MPa", "该幅值下的寿命 N"]] + [
+                [c["load_amp"], c["load_mean"], c["sigma_a"], c["sigma_m"], c["sigma_a_eq"],
+                 "∞" if c["N"] is None else "{:.3g}".format(c["N"])] for c in fat["hot_cycles"]])
+        n = 6
+    d.add_heading("{}  结论".format(n), 1)
     d.add_paragraph(conclusion(st, mat))
+    if fat:
+        d.add_paragraph("疲劳：" + ("在这个载荷谱下为无限寿命。" if fat.get("infinite") else
+                                    "按这个载荷谱连续运行约 {:.3g} 小时达到疲劳损伤 1（出现裂纹）。".format(fat["life_hours"])))
     if ai_text:
-        d.add_heading("6  AI 分析与改进建议", 1)
+        d.add_heading("{}  AI 分析与改进建议".format(n + 1), 1)
         for para in str(ai_text).split("\n"):
             if para.strip():
                 d.add_paragraph(para.strip())

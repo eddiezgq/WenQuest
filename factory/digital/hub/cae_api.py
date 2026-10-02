@@ -113,6 +113,55 @@ def mount(app, H, user_of, who, uid_of, is_teacher):
         return Response(r.content, media_type=r.headers.get("content-type"),
                         headers={"Content-Disposition": r.headers.get("content-disposition", "attachment")})
 
+    @app.get("/api/cae/torque-logs")
+    def cae_torque_logs(u=Depends(user_of)):
+        """跑合试验台的转矩记录（疲劳寿命的载荷谱），最近 20 条"""
+        rows = H.db.messages(["test.torque"], mode=u["mode"], order="desc", limit=20)
+        out = []
+        for r in rows:
+            s = r["data"]["samples_nm"]
+            out.append({"id": r["id"], "ts": r["ts"], "item": r["data"]["item"], "part_serial": r["data"]["part_serial"],
+                        "program": r["data"].get("program"), "duration_s": len(s) / r["data"]["rate_hz"],
+                        "peak_nm": max(s), "mean_nm": round(sum(s) / len(s), 1), "rated_nm": r["data"].get("rated_nm")})
+        return {"logs": out}
+
+    @app.get("/api/cae/torque-logs/{mid}")
+    def cae_torque_log(mid: str, u=Depends(user_of)):
+        r = H.db.one("select payload from bus_message where id=%s and type='test.torque'", (mid,))
+        if not r:
+            raise HTTPException(404, "没有这条转矩记录")
+        return r["payload"]["data"]
+
+    @app.post("/api/cae/jobs/{jid}/fatigue")
+    def cae_fatigue(jid: str, body: dict = Body(...), u=Depends(user_of)):
+        """spectrum: {kind: const, max, min, freq_hz} 或 {kind: log, id}。
+        计算工况里有扭矩时，载荷按 N·m（扭矩总和）；没有扭矩时按“计算工况的倍数”"""
+        j = mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        torques = [l for l in j["setup"]["loads"] if l["type"] == "torque"]
+        ref, unit = (sum(l["value_nmm"] for l in torques) / 1000, "N·m") if torques else (1.0, "× 计算工况")
+        sp = body.get("spectrum") or {}
+        if sp.get("kind") == "log":
+            r = H.db.one("select payload from bus_message where id=%s and type='test.torque'", (sp.get("id"),))
+            if not r:
+                raise HTTPException(404, "没有这条转矩记录")
+            d = r["payload"]["data"]
+            if not torques:
+                raise HTTPException(400, "转矩记录只能用在有扭矩载荷的计算上")
+            series, secs = d["samples_nm"], len(d["samples_nm"]) / d["rate_hz"]
+            label = "跑合试验台转矩记录 {}（{}，{:.0f} 秒一块）".format(d["part_serial"], d.get("program") or "", secs)
+        else:
+            try:
+                hi, lo, f = float(sp.get("max")), float(sp.get("min")), float(sp.get("freq_hz") or 1)
+            except (TypeError, ValueError):
+                raise HTTPException(400, "恒幅载荷要填最大、最小值") from None
+            if f <= 0 or hi == lo:
+                raise HTTPException(400, "最大、最小值不能相同，频率要大于 0")
+            series, secs = [hi, lo], 1 / f
+            label = "恒幅：{:g} ~ {:g} {}，{:g} Hz".format(lo, hi, unit, f)
+        keys = ("surface", "size_factor", "kf", "haibach")
+        return call("POST", "/jobs/{}/fatigue".format(urllib.parse.quote(jid)), json=dict(
+            {k: body[k] for k in keys if k in body}, ref_load=ref, ref_unit=unit, series=series, block_seconds=secs, label=label)).json()
+
     @app.get("/api/cae/jobs/{jid}/surface.bin")
     def cae_surface(jid: str, u=Depends(user_of)):
         mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())

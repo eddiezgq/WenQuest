@@ -4,10 +4,10 @@
     <div ref="box" class="stage" :class="{ pick: picking }" @pointerdown="down" @pointerup="up" @pointermove="move" @pointerleave="tip = ''">
       <div v-if="tip" class="tip small" :style="{ left: tipX + 'px', top: tipY + 'px' }">{{ tip }}</div>
       <div v-if="surface" class="cbar">
-        <div class="cbar-max mono">{{ fmt(range[1]) }}</div>
+        <div class="cbar-max mono">{{ field === 'life' ? fmtH(lifeH(range[1])) : fmt(range[1]) }}</div>
         <div class="cbar-grad" :style="{ background: grad }"></div>
-        <div class="cbar-min mono">{{ fmt(range[0]) }}</div>
-        <div class="cbar-unit">{{ field === 'vm' ? 'MPa' : 'mm' }}</div>
+        <div class="cbar-min mono">{{ field === 'life' ? '≥ ' + fmtH(lifeH(range[0])) : fmt(range[0]) }}</div>
+        <div class="cbar-unit">{{ field === 'vm' ? 'MPa' : field === 'u' ? 'mm' : '疲劳寿命' }}</div>
       </div>
       <slot />
     </div>
@@ -38,7 +38,8 @@ const props = defineProps({
   field: { type: String, default: 'vm' },             // vm 应力 / u 位移
   deform: { type: Number, default: 0 },               // 变形放大倍数（0 = 不变形）
   marks: { type: Array, default: () => [] },          // [{at: [x,y,z], label, color}]
-  peaks: { type: Object, default: () => ({}) },       // {vm, u}：全部节点（含内部、边中点）的最大值，色标上限与统计一致
+  peaks: { type: Object, default: () => ({}) },
+  blockSeconds: { type: Number, default: 1 },         // 疲劳：一块载荷谱的秒数（色标换算成小时）       // {vm, u}：全部节点（含内部、边中点）的最大值，色标上限与统计一致
 });
 const emit = defineEmits(['pick']);
 const box = ref(null);
@@ -47,14 +48,19 @@ const clipPos = ref(0.5);
 const note = ref('拖动旋转 · 滚轮缩放 · 右键平移');
 const tip = ref(''), tipX = ref(0), tipY = ref(0);
 const grad = turboCss();
+// 疲劳（life）：按每块损伤的对数着色，红 = 损伤最大（寿命最短），显示 6 个数量级
+const fieldArr = () => (!props.surface ? null : props.field === 'vm' ? props.surface.vm : props.field === 'u' ? props.surface.umag : props.surface.lgD);
 const range = computed(() => {
-  const a = props.surface ? (props.field === 'vm' ? props.surface.vm : props.surface.umag) : null;
+  const a = fieldArr();
   if (!a || !a.length) return [0, 1];
   let lo = Infinity, hi = -Infinity;
   for (const v of a) { if (v < lo) lo = v; if (v > hi) hi = v; }
+  if (props.field === 'life') return [hi - 6, hi];
   hi = Math.max(hi, props.peaks[props.field] || 0);
   return [lo, hi > lo ? hi : lo + 1];
 });
+const lifeH = (lg) => (props.blockSeconds / 10 ** lg) / 3600;
+const fmtH = (h) => (h >= 1e5 ? h.toExponential(1) : h >= 10 ? h.toFixed(0) : h.toPrecision(2)) + ' h';
 const fmt = (v) => (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 1 ? v.toFixed(1) : v.toPrecision(3));
 
 let renderer, scene, camera, controls, raf, ro, root, bbox, markObjs;
@@ -125,7 +131,7 @@ function updateResult() {
   if (!s || !resultMesh) return;
   const g = resultMesh.geometry;
   const pos = g.attributes.position.array, col = g.attributes.color.array;
-  const val = props.field === 'vm' ? s.vm : s.umag;
+  const val = fieldArr();
   const [lo, hi] = range.value;
   for (let i = 0; i < s.nv; i++) {
     for (let k = 0; k < 3; k++) pos[3 * i + k] = s.positions[3 * i + k] + props.deform * s.u[3 * i + k];
@@ -220,7 +226,8 @@ function move(ev) {
   else if (resultMesh) {
     const i = nearestValue(h), s = props.surface;
     const fid = s.faceOf[h.faceIndex];
-    tip.value = `面 ${fid} · 应力 ${s.vm[i].toFixed(1)} MPa · 位移 ${s.umag[i].toPrecision(3)} mm`;
+    tip.value = `面 ${fid} · 应力 ${s.vm[i].toFixed(1)} MPa · 位移 ${s.umag[i].toPrecision(3)} mm`
+      + (s.lgD && props.field === 'life' ? ` · 寿命 ${s.lgD[i] < -29 ? '无限' : fmtH(lifeH(s.lgD[i]))}` : '');
   } else {
     id = h.object.userData.face;
     const f = faceById.value[id];
@@ -248,7 +255,7 @@ onMounted(() => {
 });
 watch(() => props.glbUrl, () => { if (!props.surface) loadGlb(); });
 watch(() => props.surface, (s) => { if (s) buildResult(); else loadGlb(); });
-watch(() => [props.field, props.deform], updateResult);
+watch(() => [props.field, props.deform, props.surface?.lgD], updateResult);
 watch(() => JSON.stringify(props.faceColors), paintFaces);
 watch(() => JSON.stringify(props.marks), drawMarks);
 watch([clipAxis, clipPos], applyClip);
@@ -262,9 +269,9 @@ defineExpose({ snapshot: () => renderer?.domElement.toDataURL('image/png') });
 .stage { position: relative; height: 520px; border-radius: 8px; background: linear-gradient(#f6f7f8, #dfe4e8); overflow: hidden; }
 .stage.pick { cursor: pointer; }
 .tip { position: absolute; background: rgba(23, 33, 43, .88); color: #fff; padding: 3px 8px; border-radius: 5px; pointer-events: none; white-space: nowrap; z-index: 2; }
-.cbar { position: absolute; right: 14px; top: 16px; bottom: 40px; width: 64px; display: flex; flex-direction: column; align-items: flex-start; pointer-events: none; }
+.cbar { position: absolute; right: 14px; top: 16px; bottom: 40px; width: 96px; display: flex; flex-direction: column; align-items: flex-start; pointer-events: none; }
 .cbar-grad { flex: 1; width: 16px; border-radius: 3px; border: 1px solid rgba(0,0,0,.2); }
-.cbar-max, .cbar-min { font-size: 11px; background: rgba(255,255,255,.8); padding: 0 3px; border-radius: 3px; margin: 2px 0; }
+.cbar-max, .cbar-min { white-space: nowrap; font-size: 11px; background: rgba(255,255,255,.8); padding: 0 3px; border-radius: 3px; margin: 2px 0; }
 .cbar-unit { font-size: 11px; color: var(--muted); }
 .tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .tools select { height: 26px; border: 1px solid var(--line); border-radius: 5px; }

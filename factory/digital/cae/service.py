@@ -307,6 +307,38 @@ def report(jid: str, body: dict = Body(default={})):
                     headers={"Content-Disposition": "attachment; filename*=UTF-8''" + urllib.parse.quote(name)})
 
 
+@app.post("/jobs/{jid}/fatigue")
+def fatigue(jid: str, body: dict = Body(...)):
+    """疲劳寿命：body = {ref_load, series, block_seconds, surface, size_factor, kf, haibach, label}。
+    返回汇总 + 每个表面点的每块损伤（float32，base64），汇总也记进任务（报告用）"""
+    import base64
+    from cae import fatigue as FT
+    p = _job_path(jid.replace("/", ""), "job.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个任务")
+    j = _read_json(p)
+    if j["status"] != "done":
+        raise HTTPException(409, "有限元结果还没出来")
+    series = body.get("series") or []
+    if len(series) < 2 or len(series) > 200000:
+        raise HTTPException(400, "载荷谱至少 2 个点")
+    if body.get("surface", "ground") not in FT.SURFACE:
+        raise HTTPException(400, "表面状态不对")
+    surf = read_surface(_job_path(j["id"], "surface.bin"))
+    try:
+        D, summ = FT.compute(surf["vm"], float(body.get("ref_load") or 0), series, float(body.get("block_seconds") or 1),
+                             M.get(j["setup"]["material_id"]), body.get("surface", "ground"),
+                             float(body.get("size_factor") or 0.85), float(body.get("kf") or 1.0), bool(body.get("haibach", True)))
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from None
+    i = summ.pop("hot_index")
+    summ["hot_at"] = [round(float(x), 3) for x in surf["positions"][i]]
+    summ.update(label=body.get("label") or "", ref_load=body.get("ref_load"), ref_unit=body.get("ref_unit") or "",
+                series_peak=float(np.max(np.abs(series))), series_points=len(series))
+    _update(j["id"], fatigue=summ)
+    return {"summary": summ, "damage_b64": base64.b64encode(np.asarray(D, "<f4").tobytes()).decode()}
+
+
 @app.get("/geometry/{sha}/step")
 def geometry_step(sha: str):
     p = _p("geo", sha.replace("/", ""), "part.step")

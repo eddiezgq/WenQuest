@@ -137,6 +137,14 @@ def test_service_queue_end_to_end(tmp_path, monkeypatch):
         assert c.get("/jobs/{}/surface.bin".format(j["id"])).content[:4] == b"WQS1"
         assert [x["id"] for x in c.get("/jobs", params={"factory": "wq_test", "owner": "7"}).json()["jobs"]] == [j["id"]]
         assert c.get("/jobs", params={"factory": "other"}).json()["jobs"] == []
+        # 疲劳：恒幅对称循环（载荷 ±1 倍计算工况）→ 最危险点寿命与手算一致
+        from cae import fatigue as FT
+        fat = c.post("/jobs/{}/fatigue".format(j["id"]), json={"ref_load": 1, "series": [5, -5], "block_seconds": 1,
+                                                               "surface": "ground", "haibach": False}).json()
+        sm = fat["summary"]
+        hand = FT.hand_check(5 * sm["hot_vm_ref"], 0, M.get("45-QT"))
+        assert sm["cycles_per_block"] == 1 and abs(sm["life_blocks"] - hand) / hand < 1e-3
+        assert c.post("/jobs/{}/fatigue".format(j["id"]), json={"ref_load": 1, "series": [1]}).status_code == 400
         # Word 报告：设置、结果、截图、结论都在
         png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
         rep = c.post("/jobs/{}/report".format(j["id"]), json={"images": [{"data": png, "caption": "应力云图"}], "ai_text": "最危险在根部。"})
@@ -145,5 +153,20 @@ def test_service_queue_end_to_end(tmp_path, monkeypatch):
         import io
         text = "\n".join(p.text for p in docx.Document(io.BytesIO(rep.content)).paragraphs)
         cells = " ".join(c.text for t in docx.Document(io.BytesIO(rep.content)).tables for r in t.rows for c in r.cells)
-        assert "结论" in text and "安全系数" in text and "最危险在根部" in text and "应力云图" in text
+        assert "结论" in text and "安全系数" in text and "最危险在根部" in text and "应力云图" in text and "疲劳寿命" in text
         assert "45 钢" in cells and "固定" in cells and "C3D10" in cells
+
+
+def test_rainflow_closes_repeating_blocks():
+    from cae import fatigue as FT
+    assert FT.rainflow([350, -350]).tolist() == [[350, 0]]
+    assert FT.rainflow([350, 0]).tolist() == [[175, 175]]
+    # 一块里一个大循环（-50..350）、一个小循环（100..300）、一个 0..350
+    assert sorted(FT.rainflow([0, 350, 100, 300, -50, 350, 0]).tolist()) == [[100, 200], [175, 175], [200, 150]]
+    m = M.get("45-QT")
+    _, s = FT.compute([300.0, 10.0], 350, [350, -350], 2.0, m, haibach=False)
+    assert abs(s["life_blocks"] - FT.hand_check(300, 0, m)) < 1 and abs(s["life_hours"] - s["life_blocks"] * 2 / 3600) < 1e-6
+    _, s = FT.compute([100.0], 350, [350, -350], 1.0, m, haibach=False)
+    assert s["infinite"]
+    _, s = FT.compute([100.0], 350, [350, -350], 1.0, m, haibach=True)
+    assert not s["infinite"] and s["life_blocks"] > 1e9

@@ -152,3 +152,28 @@ def test_scenario_builds_history_and_leaves_grinder_down_now():
     sos = {m["data"]["name"] for _, m in out if m["type"] == "erp.doc" and m["data"]["doctype"] == "Sales Order"}
     assert {"SAL-ORD-2026-00019", "SAL-ORD-2026-00020"} <= sos
     assert eng.auto_start is False and eng.clock is clock
+
+
+def test_run_in_rig_publishes_torque_log():
+    """第 11 轮：跑合试验台每台减速器出一条输出轴转矩记录（疲劳寿命的载荷谱），同一件每次一样"""
+    import wqbus
+    from sim.engine import Engine
+    out = []
+    eng = Engine(lambda tp, ty, src, data, corr: out.append((tp, wqbus.make(ty, src, data, corr=corr))), None, seed=1)
+
+    class P:
+        serial = "WQR-105-0001"
+
+    class W:
+        name = "MFG-WO-1"
+        item = "WQR-105"
+
+    class J:
+        wo = W
+    eng._torque_log(P, J, "c")
+    eng._torque_log(P, J, "c")
+    (tp, m), (_, m2) = out
+    s = m["data"]["samples_nm"]
+    assert tp.endswith("/test-01/torque") and m["type"] == "test.torque" and m["data"]["rate_hz"] == 10
+    assert len(s) == 750 and 1.5 * 350 <= max(s) <= 1.7 * 350 and min(s) > -30
+    assert s == m2["data"]["samples_nm"]

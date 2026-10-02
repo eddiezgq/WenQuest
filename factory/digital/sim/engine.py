@@ -49,7 +49,8 @@ WEAR_PER_PART = {"saw-01": 1 / 200, "cnc-l01-a": 1 / 60, "cnc-l01-b": 1 / 60, "k
                  "grd-01": 1 / 30, "hob-01": 1 / 40, "vmc-01": 1 / 80, "hmc-01": 1 / 80}
 SPINDLE = {"saw-01": (60, 40), "cnc-l01-a": (900, 180), "cnc-l01-b": (1400, 90), "key-01": (1200, 80),
            "grd-01": (1800, 400), "hob-01": (300, 60), "vmc-01": (2500, 600), "hmc-01": (2000, 400)}
-TOOL_CHANGE_MIN = {"grd-01": 8}   # 磨床“换刀”即修整或更换砂轮
+TOOL_CHANGE_MIN = {"grd-01": 8}
+RATED_TORQUE_NM = {"WQR-105": 350.0}   # 额定输出转矩（与参数配置器一致）   # 磨床“换刀”即修整或更换砂轮
 AGV_SPEED = 1.0                   # m/s（仿真）
 LOAD_UNLOAD_S = 30
 
@@ -357,6 +358,8 @@ class Engine:
         corr = job.wo.corr
         if unit == "qc-01" and job.wo.item == "SH-301":
             p.result = self._measure(p, corr)
+        if unit == "test-01":
+            self._torque_log(p, job, corr)
         good = p.result != "fail" if unit == "qc-01" else True
         if good:
             job.good += 1
@@ -394,6 +397,34 @@ class Engine:
             m.state = "setup"
             self.at(m.setup_until, "setup_done", unit=unit)
         self._try_start(m)
+
+    def _torque_log(self, p, job, corr):
+        """跑合试验台的“工况模拟”段：带式输送机 启动—运行—停机 × 3，输出轴转矩 10 Hz（第 11 轮疲劳寿命用）"""
+        import math
+        tr = RATED_TORQUE_NM.get(job.wo.item, 350.0)
+        import zlib
+        rng = random.Random(zlib.crc32((p.serial + job.wo.name).encode()))   # 同一件每次一样
+        rate, out = 10.0, []
+        for _ in range(3):
+            peak = tr * rng.uniform(1.5, 1.7)                 # 电机起动转矩冲击
+            mean = tr * rng.uniform(0.70, 0.80)               # 带上物料，稳定运行
+            for i in range(int(25 * rate)):
+                t = i / rate
+                if t < 1:
+                    v = peak * t
+                elif t < 2:
+                    v = mean + (peak - mean) * math.exp(-4 * (t - 1))
+                elif t < 22:
+                    v = mean + 0.08 * tr * math.sin(2 * math.pi * 0.5 * t) + rng.gauss(0, 0.03 * tr)
+                elif t < 23:
+                    v = mean * (23 - t)
+                else:
+                    v = rng.gauss(0, 0.005 * tr)
+                out.append(round(v, 1))
+        self.pub(unit_topic("test-01", "torque"), "test.torque", "sim/test-01",
+                 {"item": job.wo.item, "part_serial": p.serial, "work_order": job.wo.name, "rate_hz": rate,
+                  "samples_nm": out, "duration_s": len(out) / rate, "rated_nm": tr,
+                  "program": "工况模拟：带式输送机 启动—运行—停机 × 3"}, corr)
 
     def _measure(self, p, corr):
         result = "pass"
