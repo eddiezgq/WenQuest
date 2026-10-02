@@ -112,4 +112,4 @@ except Exception as e:  # noqa: BLE001
     ok = False
 
 msg = "%0A".join(x.replace("%", "%25") for x in lines)
-print("::{} title=线上{}检查（{}）::{}".format("notice" if ok else "warning", "演示工厂" if FAC == "demo" else "车间", "正常" if ok else "有问题", msg))
+print("::{} title=线上{}检查（{}）::{}".format("notice" if ok else "warning", "演示工厂" if FAC == "demo" else ("班级工厂 " + FAC.split(".")[0] if "." in FAC else "车间"), "正常" if ok else "有问题", msg))
