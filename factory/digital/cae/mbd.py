@@ -18,8 +18,7 @@
   points: [{"body": "coupler", "pos": [0.06, 0, 0], "name": "P"}]                要记录轨迹的点
   sample_hz: 记录频率（≤ 200）
 
-给定运动的驱动用“刚性伺服 + 前馈”实现：先跑一遍取得所需力矩，第二遍把它当前馈，跟踪误差一般 < 0.01°；
-记录的驱动力矩就是这次实际运动所需的力矩（与 ADAMS 的“运动副驱动”同义）。
+给定运动的驱动用单关节等式约束实现（每一步更新目标值），约束力就是所需的驱动力矩（与 ADAMS 的“运动副驱动”同义）。
 关节反力：每个构件从父构件受到的力和力矩（世界坐标，力矩对关节中心），由 MuJoCo 的 cfrc_int 换算。
 """
 import math
@@ -185,15 +184,34 @@ def build(spec, setup):
                               gaintype=mujoco.mjtGain.mjGAIN_FIXED, gainprm=[1] + [0] * 9, biastype=mujoco.mjtBias.mjBIAS_NONE)
             drives.append(dict(d, mode="torque"))
         else:
-            # 伺服（增益随后按等效惯量设）+ 前馈电机
-            spec.add_actuator(name="wq_s_" + jn, target=jn, trntype=mujoco.mjtTrn.mjTRN_JOINT,
-                              gaintype=mujoco.mjtGain.mjGAIN_FIXED, gainprm=[1] + [0] * 9,
-                              biastype=mujoco.mjtBias.mjBIAS_AFFINE, biasprm=[0, -1, -1] + [0] * 7)
-            spec.add_actuator(name="wq_f_" + jn, target=jn, trntype=mujoco.mjtTrn.mjTRN_JOINT,
-                              gaintype=mujoco.mjtGain.mjGAIN_FIXED, gainprm=[1] + [0] * 9, biastype=mujoco.mjtBias.mjBIAS_NONE)
+            # 给定运动 = 单关节等式约束 q = a0（每一步更新 a0），与 ADAMS 的“运动副驱动”同理；约束力就是所需驱动力矩
+            profile(d, 0.0)                                   # 先检查参数
+            e = spec.add_equality()
+            e.type = mujoco.mjtEq.mjEQ_JOINT
+            e.objtype = mujoco.mjtObj.mjOBJ_JOINT
+            e.name = "wq_d_" + jn
+            e.name1 = jn
+            e.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+            e.solimp = [0.99, 0.99, 0.001, 0.5, 2]
             drives.append(dict(d, mode="motion"))
+    for c in setup.get("couplings") or []:
+        # 函数耦合（凸轮、槽轮、棘轮）：用关节比例约束 q_从 = a0 + a1·q_主，每一步按当前位置重新线性化（a1 = df/dq），
+        # 由约束求解器隐式处理，稳定；从动件受的约束力即“凸轮 / 拨销 / 棘爪推它的力”
+        fj = c["follower"]
+        if fj in seen:
+            raise SetupError("关节“{}”由机构带动，不能再加驱动".format(fj))
+        seen.add(fj)
+        e = spec.add_equality()
+        e.type = mujoco.mjtEq.mjEQ_JOINT
+        e.objtype = mujoco.mjtObj.mjOBJ_JOINT
+        e.name = "wq_c_" + fj
+        e.name1, e.name2 = fj, c["driver"]
+        e.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        e.solimp = [0.99, 0.99, 0.001, 0.5, 2]
+        drives.append({"joint": fj, "kind": "coupled", "mode": "coupled", "coupling": c})
     for key in spec.keys:                    # 关键帧里的执行器控制量按新的执行器个数重置
         key.ctrl = [0.0] * len(spec.actuators)
+    spec.option.jacobian = mujoco.mjtJacobian.mjJAC_DENSE        # 机构、机械臂自由度少：稠密雅可比，便于分出每个约束的力
     try:
         model = spec.compile()
     except Exception as e:  # noqa: BLE001
@@ -217,67 +235,97 @@ def _ids(model, drives):
         j = _jid(model, d["joint"])
         if model.jnt_type[j] not in (2, 3):
             raise SetupError("关节“{}”不是转动或移动关节，不能驱动".format(d["joint"]))
-        a = {k: mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, "wq_{}_{}".format(k, d["joint"])) for k in ("m", "s", "f")}
-        out.append({"d": d, "j": j, "qadr": int(model.jnt_qposadr[j]), "dadr": int(model.jnt_dofadr[j]), "a": a})
+        x = {"d": d, "j": j, "qadr": int(model.jnt_qposadr[j]), "dadr": int(model.jnt_dofadr[j]),
+             "qpos0": float(model.qpos0[model.jnt_qposadr[j]])}
+        if d["mode"] == "torque":
+            x["act"] = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, "wq_m_" + d["joint"])
+        else:
+            x["eq"] = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_EQUALITY, ("wq_d_" if d["mode"] == "motion" else "wq_c_") + d["joint"])
+        out.append(x)
     return out
 
 
-def _tune(model, data, ids, dt):
-    """伺服增益：按关节等效惯量取固有频率 ω（≤ 0.15/dt），临界阻尼"""
+def eq_force(model, data, eid, dof):
+    """某个等式约束作用在某个自由度上的力（只算这个约束，不含闭环等其他约束）"""
     import mujoco
-    M = np.zeros((model.nv, model.nv))
-    mujoco.mj_fullM(model, data, M)
-    w = min(2 * math.pi * 60, 0.15 / dt)
-    for x in ids:
-        if x["d"]["mode"] != "motion":
-            continue
-        inertia = max(float(M[x["dadr"], x["dadr"]]), 1e-6)
-        kp, kv = inertia * w * w, 2 * inertia * w
-        s = x["a"]["s"]
-        model.actuator_gainprm[s, 0] = kp
-        model.actuator_biasprm[s, 1] = -kp
-        model.actuator_biasprm[s, 2] = -kv
-        x["kp"], x["kv"] = kp, kv
+    n = data.nefc
+    if not n:
+        return 0.0
+    J = np.asarray(data.efc_J).reshape(-1)[:n * model.nv].reshape(n, model.nv)
+    rows = np.nonzero((data.efc_type[:n] == mujoco.mjtConstraint.mjCNSTR_EQUALITY) & (data.efc_id[:n] == eid))[0]
+    return float(np.sum(J[rows, dof] * data.efc_force[rows]))
 
 
-def _run(model, setup, drives, ff=None, record=False):
-    """跑一遍。ff：上一遍每一步的驱动力矩（前馈）。返回 (每一步的驱动力矩表, 记录)"""
+def drive_force(model, data, x):
+    if x["d"]["mode"] == "torque":
+        return float(data.qfrc_actuator[x["dadr"]])
+    return eq_force(model, data, x["eq"], x["dadr"])
+
+
+def _run(model, setup, drives, record=True):
     import mujoco
     data = mujoco.MjData(model)
     _initial(model, data, setup, drives)
     ids = _ids(model, drives)
     dt = float(model.opt.timestep)
+    tau_c = max(2 * dt, 1e-3)                           # 约束的时间常数：越小越“硬”，不能小于 2 个步长
+    for name, v in (setup.get("initial_qd") or {}).items():     # 机构：闭环各关节的初速度（与主动件一致）
+        data.qvel[model.jnt_dofadr[_jid(model, name)]] = float(v)
     for x in ids:
+        if x["d"]["mode"] == "torque":
+            continue
+        model.eq_solref[x["eq"]] = [tau_c, 1]
         x["q0"] = float(data.qpos[x["qadr"]])
-        if x["d"]["mode"] == "motion":
+        if x["d"]["mode"] == "coupled":
+            from cae import mech_mjcf
+            c = x["d"]["coupling"]
+            fn = mech_mjcf.coupling_fn(c["fn"], c["params"])
+            dj = _jid(model, c["driver"])
+            x["drv"] = (int(model.jnt_qposadr[dj]), int(model.jnt_dofadr[dj]), float(model.qpos0[model.jnt_qposadr[dj]]))
+            x["fn"] = fn
+            x["dfn"] = lambda q, fn=fn: (fn(q + 1e-6) - fn(q - 1e-6)) / 2e-6
+        else:
             x["f"] = profile(x["d"], x["q0"])
             q, qd = x["f"](0.0)
             data.qpos[x["qadr"]] = q
             data.qvel[x["dadr"]] = qd
+    for x in ids:                                   # 被带动的从动件：按主动件的初始位置、速度摆好
+        if x["d"]["mode"] == "coupled":
+            qa, da, _ = x["drv"]
+            data.qpos[x["qadr"]] = x["fn"](data.qpos[qa])
+            data.qvel[x["dadr"]] = x["dfn"](data.qpos[qa]) * data.qvel[da]
     mujoco.mj_forward(model, data)
-    _tune(model, data, ids, dt)
     nsteps = int(round(min(float(setup.get("duration_s", 2)), MAX_DURATION_S) / dt))
     fbody = []
     for fdef in setup.get("forces") or []:
         fbody.append((_bid(model, fdef["body"]), np.asarray(fdef["force"], float), np.asarray(fdef.get("pos") or [0, 0, 0], float)))
-    taus = np.zeros((nsteps, len(ids)))
     rec = Recorder(model, setup, ids) if record else None
     every = max(1, int(round(1 / (min(float(setup.get("sample_hz", 100)), MAX_SAMPLE_HZ) * dt))))
     anim_every = max(1, int(round(1 / (ANIM_HZ * dt))))
     err = 0.0
-    for k in range(nsteps):
-        t = k * dt
+
+    def set_targets(t):
         for x in ids:
             if x["d"]["mode"] == "torque":
-                data.ctrl[x["a"]["m"]] = float(x["d"]["value"])
+                data.ctrl[x["act"]] = float(x["d"]["value"])
+            elif x["d"]["mode"] == "coupled":
+                # 关节比例约束 y − y0 = a0 + a1·(x − x0)，在下一步的主动件位置 xn 附近线性化：y = f(xn) + f'(xn)·(x − xn)
+                qa, da, x0 = x["drv"]
+                xn = data.qpos[qa] + data.qvel[da] * dt
+                g = x["dfn"](xn)
+                model.eq_data[x["eq"], 0] = x["fn"](xn) - g * xn - x["qpos0"] + g * x0
+                model.eq_data[x["eq"], 1] = g
             else:
+                # 软约束对运动的目标有稳态滞后 b/k·q̇ = 2τ·q̇（阻尼比 1、阻抗恒为 0.99 时），目标值超前补上
                 q, qd = x["f"](t + dt)
-                data.ctrl[x["a"]["s"]] = q + x["kv"] / x["kp"] * qd
-                data.ctrl[x["a"]["f"]] = ff[k, ids.index(x)] if ff is not None else 0.0
+                model.eq_data[x["eq"], 0] = q + 2 * tau_c * qd - x["qpos0"]
+
+    for k in range(nsteps):
+        t = k * dt
+        set_targets(t)
         data.xfrc_applied[:] = 0
         for b, F, p in fbody:
-            # 作用点在构件坐标里：转成对质心的力矩
-            pw = data.xpos[b] + data.xmat[b].reshape(3, 3) @ p
+            pw = data.xpos[b] + data.xmat[b].reshape(3, 3) @ p      # 作用点在构件坐标里：转成对质心的力矩
             data.xfrc_applied[b, :3] = F
             data.xfrc_applied[b, 3:] = np.cross(pw - data.xipos[b], F)
         if rec and k % every == 0:
@@ -285,13 +333,13 @@ def _run(model, setup, drives, ff=None, record=False):
         mujoco.mj_step(model, data)
         if not np.all(np.isfinite(data.qpos)):
             raise SetupError("计算发散（第 {:.3f} 秒）：载荷或速度太大，或者初始位置不满足约束".format(t))
-        for i, x in enumerate(ids):
-            taus[k, i] = data.qfrc_actuator[x["dadr"]]
+        for x in ids:
             if x["d"]["mode"] == "motion":
                 err = max(err, abs(data.qpos[x["qadr"]] - x["f"](t + dt)[0]))
     if rec:
+        set_targets(nsteps * dt)
         rec.sample(data, nsteps * dt, True)
-    return taus, rec, err
+    return rec, err
 
 
 def simulate(spec, setup):
@@ -304,10 +352,7 @@ def simulate(spec, setup):
         raise SetupError("教学版仿真时长最多 {:.0f} 秒".format(MAX_DURATION_S))
     model, drives = build(spec, setup)
     model.opt.timestep = float(setup.get("dt") or (2e-4 if model.nv <= 12 and model.neq else 5e-4))
-    ff = None
-    if any(d["mode"] == "motion" for d in drives):
-        ff, _, _ = _run(model, setup, drives)                # 第一遍：取得所需力矩
-    _, rec, err = _run(model, setup, drives, ff=ff, record=True)
+    rec, err = _run(model, setup, drives)
     ch = rec.channels()
     summ = {"duration_s": float(setup.get("duration_s", 2)), "timestep_s": float(model.opt.timestep),
             "samples": len(ch["t"]), "seconds": round(_t.time() - t0, 2), "tracking_error_max": err,
@@ -340,7 +385,6 @@ class Recorder:
         self.sites = [s for s in range(model.nsite) if (mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_SITE, s) or "").startswith("wq_pt_")]
         self.pnames = [(setup.get("points") or [])[int(mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_SITE, s)[6:])].get("name")
                        or "P{}".format(i + 1) for i, s in enumerate(self.sites)]
-        self.drive_j = {x["d"]["joint"]: x["dadr"] for x in ids}
         self.names = None
 
     def sample(self, data, t, anim):
@@ -352,8 +396,8 @@ class Recorder:
         for j in self.joints:
             qa, da = m.jnt_qposadr[j], m.jnt_dofadr[j]
             row += [data.qpos[qa], data.qvel[da], data.qacc[da]]
-        for jn, da in self.drive_j.items():
-            row.append(data.qfrc_actuator[da])
+        for x in self.ids:
+            row.append(drive_force(m, data, x))
         for b in self.bodies:
             # cfrc_int：父构件作用在本构件上的力，[力矩; 力]，参考点是所在树根的子树质心
             c = data.subtree_com[m.body_rootid[b]]
@@ -374,7 +418,7 @@ class Recorder:
         names = ["t"]
         for n in self.jname:
             names += ["q." + n, "qd." + n, "qdd." + n]
-        names += ["drive." + n for n in self.drive_j]
+        names += ["drive." + x["d"]["joint"] for x in self.ids]
         for n in self.bname:
             names += ["rf.{}.{}".format(n, a) for a in ("x", "y", "z", "abs")] + ["rm.{}.{}".format(n, a) for a in ("x", "y", "z", "abs")]
         for n in self.pnames:

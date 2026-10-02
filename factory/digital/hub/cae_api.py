@@ -122,6 +122,10 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
     def mbd_robots(u=Depends(user_of)):
         return call("GET", "/mbd/robots").json()
 
+    @app.get("/api/mbd/mechs")
+    def mbd_mechs(u=Depends(user_of)):
+        return call("GET", "/mbd/mechs").json()
+
     def _with_url(info):
         info["model_url"] = "/api/mbd/models/{}/model.glb".format(info["key"])
         return info

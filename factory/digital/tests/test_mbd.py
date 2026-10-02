@@ -80,7 +80,7 @@ def test_ur5e_move_torque_matches_inverse_dynamics():
              [{"joint": j, "kind": "hold"} for j in ("elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint")]
     setup = {"duration_s": 2.0, "initial": POSE, "payloads": pay, "drives": drives, "sample_hz": 200}
     s, ch, an = mbd.simulate(mbd.load_spec(path=MM.robot_path("B-ARM-UR5E")), setup)
-    model, _ = mbd.build(mbd.load_spec(path=MM.robot_path("B-ARM-UR5E")), setup)
+    model, _ = mbd.build(mbd.load_spec(path=MM.robot_path("B-ARM-UR5E")), {"payloads": pay})   # 不带驱动约束的模型
     data = mujoco.MjData(model)
     names = list(POSE)
     jid = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, j) for j in names]
@@ -128,3 +128,91 @@ def test_service_runs_dynamics_job(tmp_path, monkeypatch):
         up = c.post("/mbd/models/upload", params={"name": "pend.xml"}, content=PENDULUM.encode()).json()
         assert up["joints"][0]["name"] == "pivot"
         assert c.post("/mbd/models/upload", params={"name": "x.txt"}, content=b"hello").status_code == 422
+
+
+# ---------------------------------------------------------------- 第 2 步：零件库机构
+import sys  # noqa: E402
+
+from cae import mech_mjcf as MC  # noqa: E402
+
+sys.path.insert(0, str(REPO / "library"))
+
+
+def _mech(mid, setup, given=None):
+    s = MC.prepare_setup(mid, given or {}, setup)
+    return mbd.simulate(mbd.load_spec(xml=MC.mjcf(mid, given)), s)
+
+
+def test_mechanism_defaults_match_library():
+    import yaml
+    for mid, d in MC.DEFAULTS.items():
+        e = yaml.safe_load((REPO / "library" / "catalog" / "C" / mid / "entry.yaml").read_text(encoding="utf-8"))
+        assert {k: float(v) for k, v in e["defaults"].items()} == {k: float(v) for k, v in d.items()}, mid
+    assert set(MC.DEFAULTS) == {p.name for p in (REPO / "library" / "catalog" / "C").iterdir() if p.is_dir()}
+
+
+@pytest.mark.parametrize("mid", sorted(MC.DEFAULTS))
+def test_every_mechanism_runs_and_stays_closed(mid):
+    s, ch, an = _mech(mid, {"duration_s": 1.5, "drives": [{"joint": MC.DRIVER[mid], "kind": "speed", "value": 2 * math.pi}]})
+    assert s["tracking_error_max"] < 0.01
+    th = ch["q." + MC.DRIVER[mid]]
+    assert abs(th[-1] - th[0] - 2 * math.pi * 1.5) < 0.02
+    for k in (0, len(th) // 3, len(th) - 1):           # 各关节始终满足闭环（与按公式算的位置一致）
+        want = MC.initial(mid, {}, th[k])
+        for j, v in want.items():
+            tol = 0.02 if mid in ("C-GNV-GENEVA", "C-RAT-RATCHET") else 2e-3   # 槽轮、棘轮啮合瞬间有冲击
+            assert abs(ch["q." + j][k] - v) < tol, (mid, j, ch["q." + j][k], v)
+
+
+def test_kinematics_match_library_generators():
+    from generators import c_mech as L
+    p = MC.params("C-LNK-4BAR")
+    for th in np.linspace(0, 2 * math.pi, 37):
+        a, b = MC.four_bar_solve(p, th), L.four_bar_solve(p, th)
+        assert abs(a[2] - b[2]) < 1e-12 and abs(a[3] - b[3]) < 1e-12
+    for mid, f1, f2 in (("C-LNK-SLIDER", MC.slider_crank_x, L.slider_crank_x),):
+        p = MC.params(mid)
+        assert all(abs(f1(p, t) - f2(p, t)) < 1e-12 for t in np.linspace(0, 6.3, 50))
+    p = MC.params("C-CAM-DISC")
+    assert all(MC.cam_lift(p, d) == L.cam_lift(p, d) for d in range(0, 720, 7))
+    p = MC.params("C-GNV-GENEVA")
+    assert all(MC.geneva_wheel_angle(p, d) == L.geneva_wheel_angle(p, d) for d in range(0, 720, 7))
+    p = MC.params("C-RAT-RATCHET")
+    assert all(MC.ratchet_state(p, d) == L.ratchet_state(p, d) for d in range(0, 1440, 7))
+
+
+def test_slider_crank_torque_matches_virtual_work():
+    """准静态（慢转、不计重力），滑块受 200 N 阻力：驱动力矩 τ = F·dx/dθ"""
+    p = MC.params("C-LNK-SLIDER")
+    s, ch, _ = _mech("C-LNK-SLIDER", {"duration_s": 10, "gravity": False, "sample_hz": 50,
+                                      "drives": [{"joint": "crank", "kind": "speed", "value": 0.2 * math.pi}],
+                                      "forces": [{"body": "slider", "force": [-200, 0, 0]}]})
+    th, tau = ch["q.crank"], ch["drive.crank"]
+    ref = np.array([200 * (MC.slider_crank_x(p, t + 1e-6) - MC.slider_crank_x(p, t - 1e-6)) / 2e-6 for t in th])
+    k = slice(10, -10)
+    assert np.max(np.abs(tau[k] - ref[k])) / np.max(np.abs(ref)) < 0.01
+    # 连杆受力：两端反力大小相近（连杆质量小），约等于 200 N / cos(连杆倾角)
+    assert 190 < np.median(ch["rf.rod.abs"][k]) < 230
+
+
+def test_wqr105_input_torque_is_output_over_ratio():
+    """WQR-105 传动链：输出轴加 350 N·m 负载，慢速匀速 → 输入力矩 = 350 / 10.5（理想传动）"""
+    i = MC.ratio("C-RED-WQR105")
+    s, ch, _ = _mech("C-RED-WQR105", {"duration_s": 2, "gravity": False,
+                                      "drives": [{"joint": "shaft1", "kind": "speed", "value": 1.0},
+                                                 {"joint": "shaft3", "kind": "torque", "value": 350.0}]})
+    tau = ch["drive.shaft1"][len(ch["t"]) // 2:]
+    assert abs(i - 10.5) < 1e-12
+    assert abs(abs(np.mean(tau)) - 350 / i) / (350 / i) < 0.01
+
+
+def test_link_step_for_fea():
+    pytest.importorskip("build123d")
+    pytest.importorskip("gmsh")
+    from cae import geometry as G
+    faces, _, solid = G.faces(MC.member_step("C-LNK-SLIDER", "rod"))
+    holes = sorted(f["center"][0] for f in faces if f["kind"] == "cylinder" and abs(f["radius_mm"] - 3.0) < 1e-6)
+    assert holes == pytest.approx([0.0, 140.0], abs=1e-6)
+    assert solid["bbox_mm"][1] == pytest.approx(-3.0) and solid["bbox_mm"][4] == pytest.approx(3.0)   # 厚度沿 Y
+    with pytest.raises(ValueError, match="不是杆件"):
+        MC.member_step("C-GER-TRAIN", "shaft1")

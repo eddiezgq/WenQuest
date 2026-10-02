@@ -195,6 +195,9 @@ def write_anim(path, an):
 def _mbd_child(ref, setup, outdir, q):
     try:
         from cae import mbd
+        if ref.get("source") == "mech":
+            from cae import mech_mjcf
+            setup = mech_mjcf.prepare_setup(ref.get("id"), ref.get("params") or {}, setup)
         summ, ch, an = mbd.simulate(load_model_spec(ref), setup)
         write_series(os.path.join(outdir, "series.bin"), ch)
         write_anim(os.path.join(outdir, "anim.bin"), an)
@@ -357,6 +360,13 @@ def submit(body: dict = Body(...)):
     _write_json(_job_path(jid, "job.json"), j)
     _Q.put(jid)
     return _public(j)
+
+
+@app.get("/mbd/mechs")
+def mbd_mechs():
+    from cae import mech_mjcf as MC
+    return {"mechs": [{"id": k, "name": MC.NAMES[k], "driver": MC.DRIVER[k], "params": MC.DEFAULTS[k], "labels": MC.LABELS}
+                      for k in MC.DEFAULTS]}
 
 
 @app.get("/mbd/robots")
