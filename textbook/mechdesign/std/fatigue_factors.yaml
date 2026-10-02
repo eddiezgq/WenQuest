@@ -1,0 +1,25 @@
+title: 疲劳计算用的修正系数（公式形式）
+status: 公式与系数取自 [SHI] 疲劳一章（马林系数）与轴一章（应力集中系数首轮估计表）；写第 11、33 章时核对版本与页码
+surface_factor:
+  source: "[SHI] 疲劳一章：表面系数 k_a = a·σ_b^b（σ_b 以 MPa 计）"
+  rows:
+    ground: {a: 1.58, b: -0.085, zh: 磨削, en: ground}
+    machined: {a: 4.51, b: -0.265, zh: 机加工或冷拔, en: machined or cold-drawn}
+    hot_rolled: {a: 57.7, b: -0.718, zh: 热轧, en: hot-rolled}
+    forged: {a: 272.0, b: -0.995, zh: 锻造原表面, en: as-forged}
+size_factor:
+  source: "[SHI] 疲劳一章：旋转弯曲与扭转的尺寸系数 k_b = 1.24·d^−0.107（2.79 mm ≤ d ≤ 51 mm），k_b = 1.51·d^−0.157（51 mm < d ≤ 254 mm）；轴向载荷 k_b = 1"
+  ranges: [{d_min: 2.79, d_max: 51, c: 1.24, e: -0.107}, {d_min: 51, d_max: 254, c: 1.51, e: -0.157}]
+notch_sensitivity:
+  source: "Neuber–Kuhn 形式 q = 1/(1 + √a/√r)；钢的 √a 随 σ_b 变化，按 [SHI] 疲劳一章给出的拟合式（σ_b 以 MPa 换算为 kpsi 代入）"
+  bending_sqrt_a_inch: [0.246, -3.08e-3, 1.51e-5, -2.67e-8]
+  torsion_sqrt_a_inch: [0.190, -2.51e-3, 1.35e-5, -2.67e-8]
+  note: √a（in^0.5）= c0 + c1·S + c2·S² + c3·S³，S = σ_b 以 kpsi 计（1 kpsi = 6.894757 MPa）；适用于 50 ≤ S ≤ 250 kpsi
+kt_first_iteration:
+  source: "[SHI] 轴一章：轴的应力集中系数首轮估计表（设计初期尚不知圆角尺寸时用，算出直径后再按实际圆角查图或计算）"
+  rows:
+    shoulder_sharp: {Kt: 2.7, Kts: 2.2, zh: 轴肩尖圆角（r/d = 0.02）, en: shoulder fillet, sharp (r/d = 0.02)}
+    shoulder_round: {Kt: 1.7, Kts: 1.5, zh: 轴肩大圆角（r/d = 0.1）, en: shoulder fillet, well rounded (r/d = 0.1)}
+    keyseat_endmill: {Kt: 2.14, Kts: 3.0, zh: 端铣键槽（r/d = 0.02）, en: end-mill keyseat (r/d = 0.02)}
+    keyseat_sled: {Kt: 1.7, Kts: null, zh: 盘铣键槽（滑橇形）, en: sled-runner keyseat}
+    ring_groove: {Kt: 5.0, Kts: 3.0, zh: 挡圈槽, en: retaining ring groove}

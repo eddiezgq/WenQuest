@@ -1,0 +1,15 @@
+standard: {code: GB/T 1800.1-2020 / ISO 286-1:2010, title: 同上, table: 表 3 孔的基本偏差（本书只用 H、JS、N、P，键槽宽和轮毂孔用）}
+status: 待对照标准原文核对
+note: >-
+  H：EI = 0。JS：±IT/2。N、P 只录入 IT9（键槽宽 N9、P9 用）：N9 的 ES = 0；P9 的 ES 按下表，EI = ES − IT9。
+  IT 数值取 iso286_it.yaml。
+unit: μm
+columns: [over_mm, to_mm, P9_ES]
+rows:
+- [3, 6, -12]
+- [6, 10, -15]
+- [10, 18, -18]
+- [18, 30, -22]
+- [30, 50, -26]
+- [50, 80, -32]
+- [80, 120, -37]

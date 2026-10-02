@@ -302,6 +302,9 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
         shared = b"".join(p.read_bytes() for p in sorted(code.glob("_*.py")))   # helper modules (not run themselves)
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "models").glob("*/*")))   # library models the programs read
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "conventions").glob("*.py")))   # the book's constants (constants.py)
+        shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "std").glob("*.yaml")))   # standard tables (机械设计, 第 11 轮)
+        if (book["root"] / "conventions" / "mdstd.py").exists():       # its materials come from the digital factory's library
+            shared += (ROOT / "factory" / "digital" / "cae" / "materials.py").read_bytes()
         for prog in sorted(p for p in code.glob("*.py") if not p.name.startswith("_")):
             where = str(prog.relative_to(book["root"].parent))
             digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes() + lang.encode()).hexdigest()[:16]
