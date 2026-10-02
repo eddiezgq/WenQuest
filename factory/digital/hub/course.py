@@ -453,7 +453,13 @@ def mount(app, H):
                        "按峰值 / 均方根力矩和转速选伺服电机与谐波减速器；生活例子曲柄滑块（虚功原理核对、连杆送有限元）。",
             "mode": "teach", "products": ["B-ARM-UR5E", "C-LNK-SLIDER"], "tool_url": public_base(request) + "/mbd",
             "guide_url": public_base(request) + "/api/cae/lab9/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab9/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab9/report-template.docx"}, {
+            "id": "lab10", "name": {"zh": "实验 10：输出轴数控车削与键槽铣削编程", "en": "Lab 10: CNC programming of the output shaft"},
+            "summary": "从工艺规程的粗车、精车、铣键槽三道工序出发编 FANUC 程序：编程直径取公差带中间、余量传递、G96/G50、分层粗车、"
+                       "斜线下刀；浏览器里试切（回放、去除材料、比对、功率与超程检查），加工时间与工艺规程比，挂到工艺规程审批后下发车间。",
+            "mode": "teach", "products": ["SH-301"], "tool_url": public_base(request) + "/cam",
+            "guide_url": public_base(request) + "/api/cae/lab10/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab10/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

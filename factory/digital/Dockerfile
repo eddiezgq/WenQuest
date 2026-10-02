@@ -36,7 +36,7 @@ COPY --from=menagerie /opt/menagerie /opt/menagerie
 COPY digital/cae/ digital/cae/
 # 工艺数据表与读表模块（第 13 轮：教材原件的副本，见 digital/std/sync.py）
 COPY digital/std/ digital/std/
-COPY ["digital/实验8_输出轴强度与疲劳校核.md", "digital/实验9_机械臂关节力矩与电机选型.md", "digital/"]
+COPY ["digital/实验8_输出轴强度与疲劳校核.md", "digital/实验9_机械臂关节力矩与电机选型.md", "digital/实验10_输出轴数控车削与键槽铣削编程.md", "digital/"]
 COPY digital/mock_erpnext/ digital/mock_erpnext/
 COPY --from=web /web/dist digital/web/dist
 WORKDIR /app/digital
