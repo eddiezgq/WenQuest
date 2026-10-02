@@ -283,3 +283,58 @@ def test_motor_sizing_hand_check():
 def test_no_startup_acceleration_spike():
     s, ch, _ = _mech("C-LNK-SLIDER", {"duration_s": 0.5, "drives": [{"joint": "crank", "kind": "speed", "value": 2 * math.pi}]})
     assert np.max(np.abs(ch["qdd.crank"])) < 5          # 匀速：曲柄角加速度≈0
+
+
+# ---------------------------------------------------------------- 第 5 步：一句话设置、AI 解释
+MECH_MODEL = {"kind": "mech", "joints": ["crank", "rod", "slider"], "driver": "crank", "labels": {"crank": "曲柄", "rod": "连杆", "slider": "滑块"},
+              "followers": ["rod", "slider"], "bodies": ["crank", "rod", "slider"], "end_body": "slider"}
+ARM_MODEL = {"kind": "robot", "joints": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"],
+             "labels": {}, "end_body": "wrist_3_link", "bodies": ["wrist_3_link"]}
+
+
+def test_one_sentence_rules():
+    from hub import mbd_ai as A
+    r = A.setup(None, "曲柄 60 rpm 匀速转，滑块上有 200 N 阻力，仿真 3 秒", MECH_MODEL)
+    assert r["engine"] == "rules" and r["drives"] == {"crank": {"kind": "speed", "speed": 60.0}}
+    assert r["forces"] == [{"body": "slider", "fx": -200.0, "fz": 0}] and r["duration"] == 3 and not r["unmatched"]
+    gear = dict(MECH_MODEL, joints=["shaft1", "shaft2", "shaft3"], driver="shaft1", followers=["shaft2", "shaft3"], labels={"shaft3": "输出轴"})
+    r = A.rules_setup("输入轴 1450 rpm，输出轴负载 350 N·m", gear)
+    assert r["drives"]["shaft1"]["speed"] == 1450 and r["loads"] == {"shaft3": -350.0}
+    r = A.rules_setup("底座转 90°，大臂抬 30°，J3 不动，带 5 kg，1.5 秒", ARM_MODEL)
+    assert r["drives"]["shoulder_pan_joint"] == {"kind": "move", "rel": True, "to": 90.0}
+    assert r["drives"]["elbow_joint"] == {"kind": "hold"} and r["payloads"][0]["mass"] == 5 and r["duration"] == 1.5
+    r = A.rules_setup("UR5e 两秒内把 3 kg 工件搬过去", ARM_MODEL)
+    assert set(r["drives"]) == {"shoulder_pan_joint", "shoulder_lift_joint"} and r["duration"] == 2
+
+
+def test_explain_rules_and_retime_action():
+    from hub import mbd_ai as A
+    job = {"model": {"source": "library", "id": "B-ARM-UR5E"},
+           "setup": {"drives": [{"joint": "j1", "kind": "move", "to": 1, "t0": 0, "t1": 1}]},
+           "stats": {"drives": [{"joint": "j1", "kind": "move", "peak": 80.0, "rms": 30.0, "speed_max": 2, "power_peak": 100, "power_mean": -20}],
+                     "peaks": {"drive.j1": {"max_abs": 80, "at_s": 0.25, "rms": 30}, "rf.link1.abs": {"max_abs": 400, "at_s": 0.3, "rms": 200}}}}
+    r = A.explain(None, job)
+    assert "惯性" in r["text"] and "发电" in r["text"] and "link1" in r["text"]
+    assert r["actions"] == [{"kind": "retime", "factor": 1.5, "label": "运动时间放长到 1.5 倍重算"}]
+
+
+def test_explain_fixed_base_is_mounting_load():
+    from hub import mbd_ai as A
+    job = {"model": {"source": "library"}, "setup": {"drives": []},
+           "stats": {"drives": [{"joint": "j1", "kind": "hold", "peak": 50.0, "rms": 49.0, "speed_max": 0, "power_peak": 0, "power_mean": 0},
+                                {"joint": "j6", "kind": "hold", "peak": 1.0, "rms": 0.2, "speed_max": 0, "power_peak": 0, "power_mean": 0}],
+                     "peaks": {"rf.base.abs": {"max_abs": 270, "at_s": 1}, "rm.base.abs": {"max_abs": 60, "at_s": 1},
+                               "rf.link1.abs": {"max_abs": 200, "at_s": 1}}}}
+    r = A.rules_explain(job, {}, {"base"})
+    assert "base的安装处" in r["text"] and "link1与上一个构件" in r["text"] and "j6的峰值" not in r["text"]
+
+
+def test_lab9_documents():
+    import io
+    import docx
+    from cae import labdoc
+    g = docx.Document(io.BytesIO(labdoc.guide_docx("lab9")))
+    assert "实验 9" in "\n".join(p.text for p in g.paragraphs) and len(g.tables) >= 1
+    t = docx.Document(io.BytesIO(labdoc.report_template_docx("lab9")))
+    cells = " ".join(c.text for tb in t.tables for r in tb.rows for c in r.cells)
+    assert "J2 大臂" in cells and "虚功原理" in cells
