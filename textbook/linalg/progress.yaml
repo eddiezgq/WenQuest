@@ -10,4 +10,7 @@ parts_en:
   第六篇 数值线性代数: "Part VI  Numerical Linear Algebra"
   第七篇 推广与抽象: "Part VII  Generalizations and Abstractions"
   第八篇 应用: "Part VIII  Applications"
-chapters: {}
+chapters:
+  18:
+    status: ai
+    title_en: "The Singular Value Decomposition"

@@ -1,0 +1,27 @@
+# 实验 18.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab18_4.js。
+原理:
+  - ["图像是一个 m×n 矩阵 A。截断奇异值分解 A_k = σ₁u₁v₁ᵀ + … + σ_ku_kv_kᵀ 只需存 k(m + n + 1) 个数。",
+     "An image is an m×n matrix A. The truncated SVD A_k = σ₁u₁v₁ᵀ + … + σ_ku_kv_kᵀ needs only k(m + n + 1) numbers."]
+  - 式: "‖A − A_k‖₂ = σ_{k+1}，  ‖A − A_k‖_F = (σ²_{k+1} + … + σ²_r)^{1/2}          (18.4.5)"
+  - ["埃卡特–杨定理：在所有秩不超过 k 的矩阵中，A_k 离 A 最近（谱范数和弗罗贝尼乌斯范数）。任何其他存储 k(m + n + 1) 个数左右的低秩方案，误差都不会更小。",
+     "Eckart–Young: among matrices of rank at most k, A_k is nearest to A (spectral and Frobenius norms)."]
+步骤:
+  - ["在“截断奇异值分解”场景，k 依次取 1、2、5、10、20、40，在表 1 记录存储量、相对误差与 σ_{k+1}，观察图像的变化。",
+     "In 'Truncated SVD' set k = 1, 2, 5, 10, 20, 40; record storage, relative error and σ_{k+1} in Table 1 and watch the image."]
+  - ["找出相对误差首次低于 10% 的 k（任务 1）。", "Find the first k with relative error below 10% (task 1)."]
+  - ["k = 20 时，界面用幂法独立计算 ‖A − A_k‖₂，与 σ₂₁ 比较（任务 2）。", "At k = 20 the page computes ‖A − A_k‖₂ by the power method; compare with σ₂₁ (task 2)."]
+  - ["切换到“按行抽样”，k 取 5、10、20（存储量相同），在表 2 比较两种方法的误差（任务 3）。", "Switch to sampled rows with k = 5, 10, 20 (same storage) and compare the errors in Table 2 (task 3)."]
+数据表:
+  - 标题: ["表 1  截断奇异值分解", "Table 1  Truncated SVD"]
+    表头: ["k", "存储量 / 原图", "相对误差", "σ_{k+1}", "图像观感"]
+    表头英文: ["k", "Storage / original", "Relative error", "σ_{k+1}", "How the image looks"]
+    行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["5", "", "", "", ""], ["10", "", "", "", ""], ["20", "", "", "", ""], ["40", "", "", "", ""]]
+  - 标题: ["表 2  同样存储量下两种方法的比较", "Table 2  Two methods at equal storage"]
+    表头: ["k", "存储量", "SVD 相对误差", "按行抽样相对误差"]
+    表头英文: ["k", "Storage", "SVD relative error", "Sampled-rows relative error"]
+    行: [["5", "", "", ""], ["10", "", "", ""], ["20", "", "", ""]]
+注意:
+  - ["误差图的颜色范围固定为 ±0.3，便于不同 k 之间比较。", "The error map uses a fixed range of ±0.3 so that different k compare directly."]
+  - ["相对误差是整体（弗罗贝尼乌斯范数）的，个别像素的误差可能大得多。", "The relative error is global (Frobenius); single pixels may be much worse."]
+思考题:
+  - ["齿轮边缘处的误差为什么总是最大？", "Why is the error always largest at the gear's edge?"]

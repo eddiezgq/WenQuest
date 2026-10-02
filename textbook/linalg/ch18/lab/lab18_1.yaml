@@ -1,0 +1,35 @@
+# 实验 18.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab18_1.js。
+原理:
+  - ["单位圆上的点可写成 x = cos ψ v₁ + sin ψ v₂，其中 v₁、v₂ 是一对互相垂直的单位向量。若它们的像 Av₁、Av₂ 也互相垂直，记 σᵢ = ‖Avᵢ‖、uᵢ = Avᵢ/σᵢ，则 Ax = σ₁ cos ψ u₁ + σ₂ sin ψ u₂，是以 σ₁u₁、σ₂u₂ 为半轴的椭圆（式 (18.1.6)、(18.1.7)）。",
+     "A point of the unit circle is x = cos ψ v₁ + sin ψ v₂ with perpendicular unit vectors v₁, v₂. If Av₁ ⟂ Av₂, with σᵢ = ‖Avᵢ‖ and uᵢ = Avᵢ/σᵢ, then Ax = σ₁ cos ψ u₁ + σ₂ sin ψ u₂: an ellipse with semi-axes σ₁u₁, σ₂u₂ (Eqs. (18.1.6), (18.1.7))."]
+  - 式: "A = UΣVᵀ，  Avᵢ = σᵢuᵢ，  σ₁σ₂ = |det A|          (18.1.10)、(18.1.11)"
+  - ["两连杆机构的雅可比矩阵 J 把关节速度映为腕心速度（式 (18.1.2)）。‖θ̇‖ = 1 rad/s 的关节速度对应的腕心速度构成速度椭圆，σ₁、σ₂ 是最快和最慢的速度。σ₁σ₂ = l₁l₂|sin θ₂|，肘关节伸直时 σ₂ → 0（奇异位形）。",
+     "The Jacobian J of the two-link arm maps joint velocities to wrist velocities (Eq. (18.1.2)). Joint speeds with ‖θ̇‖ = 1 rad/s give the velocity ellipse; σ₁, σ₂ are the fastest and slowest speeds. σ₁σ₂ = l₁l₂|sin θ₂|, so σ₂ → 0 as the elbow straightens (a singularity)."]
+步骤:
+  - ["在“一般矩阵”场景保持默认值 A = [3 0; 4 5]，读出 σ₁、σ₂、v₁、u₁，与 18.1.2 节的手算结果（√45、√5）比较，填入表 1。",
+     "In 'Any matrix' keep A = [3 0; 4 5]; read σ₁, σ₂, v₁, u₁ and compare with Section 18.1.2 (√45, √5). Fill in Table 1."]
+  - ["调节四个元素，使椭圆变成圆（任务 1），记录此时的矩阵和 σ₁、σ₂；再使椭圆压成线段（任务 2），记录 det A。",
+     "Adjust the entries until the ellipse is a circle (task 1); record the matrix and σ₁, σ₂. Then flatten it to a segment (task 2) and record det A."]
+  - ["切换到“分步”场景，把步骤从 0 拖到 3（任务 3），观察小旗在每一步的变化，说明哪一步改变面积、哪一步可能翻面。",
+     "Switch to 'Steps' and drag from 0 to 3 (task 3). Watch the flag: which step changes the area, which may flip it?"]
+  - ["切换到机器人场景，θ₁ 保持 30°，让 θ₂ 取 90°、60°、30°、10°，在表 2 中记录 σ₁、σ₂、σ₁/σ₂；找出 σ₁/σ₂ 最小的肘关节角（任务 4）。",
+     "In the robot scene keep θ₁ = 30° and set θ₂ = 90°, 60°, 30°, 10°; record σ₁, σ₂, σ₁/σ₂ in Table 2. Find the elbow angle with the smallest σ₁/σ₂ (task 4)."]
+  - ["让肘关节接近伸直，使 σ₂ < 0.01 m/s（任务 5），描述速度椭圆的形状，说明腕心哪个方向动不了。",
+     "Nearly straighten the elbow so that σ₂ < 0.01 m/s (task 5); describe the ellipse and the direction the wrist can no longer move."]
+数据表:
+  - 标题: ["表 1  一般矩阵", "Table 1  Any matrix"]
+    表头: ["矩阵 A", "σ₁", "σ₂", "v₁", "u₁", "det A", "σ₁σ₂"]
+    表头英文: ["Matrix A", "σ₁", "σ₂", "v₁", "u₁", "det A", "σ₁σ₂"]
+    行: [["[3 0; 4 5]", "", "", "", "", "", ""], ["（圆）", "", "", "", "", "", ""], ["（线段）", "", "", "", "", "", ""]]
+    行英文: [["[3 0; 4 5]", "", "", "", "", "", ""], ["(circle)", "", "", "", "", "", ""], ["(segment)", "", "", "", "", "", ""]]
+  - 标题: ["表 2  UR5e 肩、肘关节的速度椭圆（θ₁ = 30°）", "Table 2  Velocity ellipse of the UR5e shoulder and elbow (θ₁ = 30°)"]
+    表头: ["θ₂", "σ₁ / (m/s)", "σ₂ / (m/s)", "σ₁/σ₂", "l₁l₂|sin θ₂| / m²"]
+    表头英文: ["θ₂", "σ₁ / (m/s)", "σ₂ / (m/s)", "σ₁/σ₂", "l₁l₂|sin θ₂| / m²"]
+    行: [["90°", "", "", "", ""], ["60°", "", "", "", ""], ["30°", "", "", "", ""], ["10°", "", "", "", ""], ["（最圆）", "", "", "", ""]]
+    行英文: [["90°", "", "", "", ""], ["60°", "", "", "", ""], ["30°", "", "", "", ""], ["10°", "", "", "", ""], ["(roundest)", "", "", "", ""]]
+注意:
+  - ["奇异向量的符号不唯一，读数与手算可能差一个负号，这不算错。", "Singular vectors are defined up to sign; a reading may differ from a hand result by a minus sign."]
+  - ["右侧的像按比例缩小，以便放进画面；比较大小请看读数。", "The image on the right is scaled to fit; compare sizes with the readings."]
+  - ["机器人场景中奇异值的单位是 m/s 每 rad/s。", "In the robot scene the singular values are in m/s per rad/s."]
+思考题:
+  - ["θ₁ 改变时 σ₁、σ₂ 会不会变？为什么？", "Do σ₁, σ₂ change with θ₁? Why?"]

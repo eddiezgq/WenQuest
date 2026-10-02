@@ -145,6 +145,165 @@ function plot(ctx, x, y, w, h, series, opt) {   // a small chart: series = [{pts
   return { X, Y };
 }
 
+// ---------- linear algebra (《线性代数》第 10 轮): small dense matrices as arrays of rows ----------
+// The lab computes with these and draws with plane / heat / image / bars, so every linear-algebra lab looks alike.
+const LA = {
+  zeros: (m, n) => Array.from({ length: m }, () => new Array(n).fill(0)),
+  eye: (n) => Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))),
+  T: (A) => A[0].map((_, j) => A.map((r) => r[j])),
+  mul: (A, B) => A.map((r) => B[0].map((_, j) => r.reduce((s, a, k) => s + a * B[k][j], 0))),
+  mv: (A, x) => A.map((r) => r.reduce((s, a, k) => s + a * x[k], 0)),
+  dot: (a, b) => a.reduce((s, x, i) => s + x * b[i], 0),
+  norm: (a) => Math.sqrt(a.reduce((s, x) => s + x * x, 0)),
+  fro: (A) => Math.sqrt(A.reduce((s, r) => s + r.reduce((t, x) => t + x * x, 0), 0)),
+  sub: (A, B) => A.map((r, i) => r.map((x, j) => x - B[i][j])),
+  det(A) {   // Gaussian elimination with partial pivoting
+    const M = A.map((r) => r.slice()), n = M.length; let d = 1;
+    for (let k = 0; k < n; k++) {
+      let p = k; for (let i = k + 1; i < n; i++) if (Math.abs(M[i][k]) > Math.abs(M[p][k])) p = i;
+      if (M[p][k] === 0) return 0;
+      if (p !== k) { [M[p], M[k]] = [M[k], M[p]]; d = -d; }
+      d *= M[k][k];
+      for (let i = k + 1; i < n; i++) { const f = M[i][k] / M[k][k]; for (let j = k; j < n; j++) M[i][j] -= f * M[k][j]; }
+    }
+    return d;
+  },
+  svd(A) {   // one-sided Jacobi (Hestenes): {U: m×p, s: [p] largest first, V: n×p}, p = min(m, n); each v_i's largest entry > 0
+    const m = A.length, n = A[0].length;
+    if (m < n) { const r = LA.svd(LA.T(A)); return { U: r.V, s: r.s, V: r.U }; }
+    const W = A.map((r) => r.slice()), V = LA.eye(n);
+    for (let sweep = 0; sweep < 60; sweep++) {
+      let off = 0;
+      for (let i = 0; i < n - 1; i++) for (let j = i + 1; j < n; j++) {
+        let a = 0, b = 0, g = 0;
+        for (let k = 0; k < m; k++) { a += W[k][i] * W[k][i]; b += W[k][j] * W[k][j]; g += W[k][i] * W[k][j]; }
+        if (Math.abs(g) <= 1e-15 * Math.sqrt(a * b) || g === 0) continue;
+        off = Math.max(off, Math.abs(g) / Math.sqrt(a * b));
+        const z = (b - a) / (2 * g), t = Math.sign(z || 1) / (Math.abs(z) + Math.sqrt(1 + z * z)), c = 1 / Math.sqrt(1 + t * t), s = c * t;
+        for (let k = 0; k < m; k++) { const x = W[k][i], y = W[k][j]; W[k][i] = c * x - s * y; W[k][j] = s * x + c * y; }
+        for (let k = 0; k < n; k++) { const x = V[k][i], y = V[k][j]; V[k][i] = c * x - s * y; V[k][j] = s * x + c * y; }
+      }
+      if (off < 1e-13) break;
+    }
+    const sv = Array.from({ length: n }, (_, j) => Math.sqrt(W.reduce((t, r) => t + r[j] * r[j], 0)));
+    const order = sv.map((_, j) => j).sort((x, y) => sv[y] - sv[x]);
+    const U = LA.zeros(m, n), Vs = LA.zeros(n, n), s = order.map((j) => sv[j]);
+    order.forEach((j, c) => {
+      let big = 0; for (let k = 0; k < n; k++) if (Math.abs(V[k][j]) > Math.abs(big) + 1e-12) big = V[k][j];
+      const f = big < 0 ? -1 : 1;
+      for (let k = 0; k < n; k++) Vs[k][c] = f * V[k][j];
+      for (let k = 0; k < m; k++) U[k][c] = sv[j] > 1e-300 ? f * W[k][j] / sv[j] : 0;
+    });
+    return { U, s, V: Vs };
+  },
+  rank(A, tol) { const s = LA.svd(A).s; const t = tol ?? Math.max(A.length, A[0].length) * 2.2e-16 * (s[0] || 0); return s.filter((x) => x > t).length; },
+  lowrank({ U, s, V }, k) {   // A_k = sum of the first k terms σ_i u_i v_iᵀ
+    return U.map((ur) => V.map((vr) => { let x = 0; for (let i = 0; i < k; i++) x += s[i] * ur[i] * vr[i]; return x; }));
+  },
+  pinv(A, tol) {   // A⁺ = V Σ⁺ Uᵀ, singular values ≤ tol treated as zero
+    const { U, s, V } = LA.svd(A), t = tol ?? Math.max(A.length, A[0].length) * 2.2e-16 * (s[0] || 0);
+    return V.map((vr) => U.map((ur) => s.reduce((x, si, i) => (si > t ? x + vr[i] * ur[i] / si : x), 0)));
+  },
+  eigSym(A) {   // symmetric matrices, cyclic Jacobi: {values ascending, vectors as columns}
+    const n = A.length, M = A.map((r) => r.slice()), Q = LA.eye(n);
+    for (let sweep = 0; sweep < 60; sweep++) {
+      let off = 0; for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) off += M[i][j] * M[i][j];
+      if (off < 1e-26) break;
+      for (let p = 0; p < n - 1; p++) for (let q = p + 1; q < n; q++) {
+        if (Math.abs(M[p][q]) < 1e-300) continue;
+        const th = (M[q][q] - M[p][p]) / (2 * M[p][q]), t = Math.sign(th || 1) / (Math.abs(th) + Math.sqrt(th * th + 1));
+        const c = 1 / Math.sqrt(t * t + 1), s = t * c;
+        for (let k = 0; k < n; k++) { const a = M[k][p], b = M[k][q]; M[k][p] = c * a - s * b; M[k][q] = s * a + c * b; }
+        for (let k = 0; k < n; k++) { const a = M[p][k], b = M[q][k]; M[p][k] = c * a - s * b; M[q][k] = s * a + c * b; }
+        for (let k = 0; k < n; k++) { const a = Q[k][p], b = Q[k][q]; Q[k][p] = c * a - s * b; Q[k][q] = s * a + c * b; }
+      }
+    }
+    const idx = M.map((_, i) => i).sort((x, y) => M[x][x] - M[y][y]);
+    return { values: idx.map((i) => M[i][i]), vectors: Q.map((r) => idx.map((i) => r[i])) };
+  },
+  str(A, d = 3) { return "[" + A.map((r) => r.map((x) => fmt(x, d)).join(", ")).join("; ") + "]"; },
+  vstr(v, d = 3) { return "(" + v.map((x) => fmt(x, d)).join(", ") + ")"; },
+};
+function plane(ctx, o) {   // a 2D coordinate plane: o = {cx, cy, s: pixels per unit, w, h}
+  const X = (x, y) => [o.cx + o.s * x, o.cy - o.s * y];
+  const P = {
+    X,
+    axes(color) { const c = color || css("--muted"); line(ctx, 0, o.cy, o.w, o.cy, c, 1); line(ctx, o.cx, 0, o.cx, o.h, c, 1); },
+    grid(M, opt) {   // images of the lines x = i and y = j (|i|, |j| ≤ n) under the 2×2 matrix M
+      const q = opt || {}, n = q.n || 6, A = M || [[1, 0], [0, 1]], col = q.color || css("--blue");
+      ctx.globalAlpha = q.alpha ?? 0.45;
+      for (let i = -n; i <= n; i++) {
+        let a = LA.mv(A, [i, -n]), b = LA.mv(A, [i, n]); line(ctx, ...X(...a), ...X(...b), i ? col : css("--ink"), i ? 1 : 1.6);
+        a = LA.mv(A, [-n, i]); b = LA.mv(A, [n, i]); line(ctx, ...X(...a), ...X(...b), i ? col : css("--ink"), i ? 1 : 1.6);
+      }
+      ctx.globalAlpha = 1;
+    },
+    vec(v, color, name, width) { const e = X(v[0], v[1]); arrow(ctx, o.cx, o.cy, e[0], e[1], color, width || 3);
+      if (name) label(ctx, name, e[0] + 8, e[1] - 10, color, 14); },
+    curve(pts, color, width, fill, dash) {
+      ctx.beginPath(); pts.forEach((p, i) => { const [x, y] = X(p[0], p[1]); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }); ctx.closePath();
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      ctx.strokeStyle = color || css("--ink"); ctx.lineWidth = width || 2; ctx.setLineDash(dash || []); ctx.stroke(); ctx.setLineDash([]);
+    },
+    circle(M, color, fill, dash, r = 1) {   // the image of the circle of radius r under M (an ellipse)
+      const A = M || [[1, 0], [0, 1]];
+      P.curve(Array.from({ length: 121 }, (_, k) => LA.mv(A, [r * Math.cos(k * Math.PI / 60), r * Math.sin(k * Math.PI / 60)])), color, 2, fill, dash);
+    },
+    point(v, color, name) { const [x, y] = X(v[0], v[1]); circle(ctx, x, y, 4.5, color, css("--ink")); if (name) label(ctx, name, x + 8, y - 9, color, 13); },
+  };
+  return P;
+}
+const _img = { c: null };
+function heat(ctx, x, y, w, h, M, opt) {   // a matrix as coloured cells: red > 0, blue < 0 (or grey 0..1 with opt.grey)
+  const q = opt || {}, m = M.length, n = M[0].length, cw = w / n, ch = h / m;
+  const big = q.max || Math.max(1e-12, ...M.map((r) => Math.max(...r.map(Math.abs))));
+  if (m * n > 900 && !q.numbers) {   // large matrices: one pixel per entry, scaled up (fast enough for every frame)
+    if (!_img.c) _img.c = document.createElement("canvas");
+    const c = _img.c; c.width = n; c.height = m;
+    const g = c.getContext("2d"), d = g.createImageData(n, m);
+    for (let i = 0; i < m; i++) for (let j = 0; j < n; j++) {
+      const v = Math.max(-1, Math.min(1, M[i][j] / big)), k = 4 * (i * n + j), a = Math.abs(v);
+      const rgb = q.grey ? [255 * (1 - Math.max(0, v)), 255 * (1 - Math.max(0, v)), 255 * (1 - Math.max(0, v))]
+        : v >= 0 ? [255 - a * (255 - 207), 255 - a * (255 - 34), 255 - a * (255 - 46)] : [255 - a * (255 - 31), 255 - a * (255 - 111), 255 - a * (255 - 235)];
+      d.data[k] = rgb[0]; d.data[k + 1] = rgb[1]; d.data[k + 2] = rgb[2]; d.data[k + 3] = 255;
+    }
+    g.putImageData(d, 0, 0);
+    ctx.save(); ctx.imageSmoothingEnabled = false; ctx.drawImage(c, x, y, w, h); ctx.restore();
+    rect(ctx, x, y, w, h, null, css("--line"));
+    return;
+  }
+  for (let i = 0; i < m; i++) for (let j = 0; j < n; j++) {
+    const v = Math.max(-1, Math.min(1, M[i][j] / big));
+    const col = q.grey ? `rgb(${Math.round(255 * (1 - Math.max(0, v)))},${Math.round(255 * (1 - Math.max(0, v)))},${Math.round(255 * (1 - Math.max(0, v)))})`
+      : v >= 0 ? `rgba(207,34,46,${Math.abs(v)})` : `rgba(31,111,235,${Math.abs(v)})`;
+    rect(ctx, x + j * cw, y + i * ch, cw + 0.5, ch + 0.5, col);
+    if (q.numbers && cw > 26) label(ctx, fmt(M[i][j], q.digits ?? 2), x + (j + 0.5) * cw, y + (i + 0.5) * ch, css("--ink"), Math.min(13, ch * 0.45), "center");
+  }
+  rect(ctx, x, y, w, h, null, css("--line"));
+}
+function image(ctx, x, y, w, h, pix) {   // a grey image: pix = rows of values, 0 black … 1 white (clipped)
+  const m = pix.length, n = pix[0].length;
+  if (!_img.c) _img.c = document.createElement("canvas");
+  const c = _img.c; c.width = n; c.height = m;
+  const g = c.getContext("2d"), d = g.createImageData(n, m);
+  for (let i = 0; i < m; i++) for (let j = 0; j < n; j++) {
+    const v = Math.round(255 * Math.max(0, Math.min(1, pix[i][j]))), k = 4 * (i * n + j);
+    d.data[k] = d.data[k + 1] = d.data[k + 2] = v; d.data[k + 3] = 255;
+  }
+  g.putImageData(d, 0, 0);
+  ctx.save(); ctx.imageSmoothingEnabled = false; ctx.drawImage(c, x, y, w, h); ctx.restore();
+  rect(ctx, x, y, w, h, null, css("--line"));
+}
+function bars(ctx, x, y, w, h, values, opt) {   // a bar chart (e.g. singular values); opt = {log, mark: k (first k bars highlighted), label}
+  const q = opt || {}, n = values.length, bw = w / n;
+  const f = q.log ? (v) => Math.log10(Math.max(v, 1e-16)) : (v) => v;
+  const vs = values.map(f), top = Math.max(...vs), bot = q.log ? Math.min(...vs) - 0.3 : 0;
+  rect(ctx, x, y, w, h, null, css("--grid"));
+  values.forEach((v, i) => { const hh = (f(v) - bot) / ((top - bot) || 1) * h;
+    rect(ctx, x + i * bw + bw * 0.12, y + h - hh, bw * 0.76, hh, q.mark != null && i < q.mark ? css("--accent") : css("--muted")); });
+  if (q.label) label(ctx, q.label, x + 4, y + 10, css("--muted"), 12);
+}
+
 // ---------- tasks & progress ----------
 function paintTasks() {
   let n = 0, k = 0;
@@ -325,6 +484,7 @@ function build(id, def) {
     grid: (...a) => grid(ctx, ...a), agv: (...a) => agv(ctx, ...a), box: (...a) => box(ctx, ...a),
     rot2, fk, frame: (...a) => frame(ctx, ...a), arm: (...a) => arm(ctx, ...a), robot: (...a) => robot(ctx, ...a),
     lidar: (...a) => lidar(ctx, ...a), plot: (...a) => plot(ctx, ...a),
+    la: LA, plane: (o) => plane(ctx, o), heat: (...a) => heat(ctx, ...a), image: (...a) => image(ctx, ...a), bars: (...a) => bars(ctx, ...a),
   };
   L.api = api;
   if (is3d) setup3d(L);
