@@ -41,7 +41,7 @@ jobs:
       - name: 有限元求解器（第 11 轮：CalculiX、gmsh 用到的系统库）
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1
-          ccx -v | grep -q Version
+          (ccx -v || true) | grep -q Version          # ccx -v 的退出码不是 0
       - name: 工厂数据与导入脚本
         working-directory: factory
         run: pip install -q -r digital/requirements.txt pytest "requests>=2.31" && python -m pytest -q tests
