@@ -10,6 +10,7 @@ trimesh==5.1.0
 rtree==1.4.1
 scipy==1.17.1
 shapely==2.1.2
+networkx==3.6.1          # trimesh 截面拼多边形要用（数控编程识别铣削特征）
 gmsh==4.15.2
 pylife==2.3.1
 python-docx==1.2.0
