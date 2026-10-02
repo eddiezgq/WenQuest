@@ -1,0 +1,32 @@
+# 实验 10.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_6.js。
+原理:
+  - ["动系以角速度 Ω 转动时，任一矢量在定系中的导数等于它在动系中的相对导数加上 Ω × q（定理 10.6.1）。由此得到速度合成定理和加速度合成定理（科氏定理）。",
+     "When the moving frame turns with angular velocity Ω, the derivative of any vector in the fixed frame equals its relative derivative in the moving frame plus Ω × q (Theorem 10.6.1). This yields the composition theorems for velocity and acceleration (Coriolis' theorem)."]
+  - 式: "a_abs = a_tr + a_rel + 2Ω × v_rel，  a_tr = a_O′ + α × r′ + Ω × (Ω × r′)          (10.6.7)、(10.6.8)"
+  - ["沿转台半径行驶的小车，车头沿 e_ρ、左侧沿 e_φ。它的加速度计读数为 a_x = v̇_rel − Ω²ρ（向心项），a_y = 2Ω v_rel + αρ（科氏项与欧拉项）（式 (10.6.12)）。",
+     "For a cart driving along a radius of the table, forward is e_ρ and left is e_φ. Its accelerometer reads a_x = v̇_rel − Ω²ρ (centripetal) and a_y = 2Ω v_rel + αρ (Coriolis and Euler) (Eq. (10.6.12))."]
+  - ["加速度计测量的是比力，即加速度减去重力加速度；在水平面内重力没有分量，所以水平读数就是水平加速度。本实验中的“读数”由小车在地面上的位置数值求导得到，与合成定理的计算互相独立。",
+     "An accelerometer measures specific force, i.e. acceleration minus gravity; gravity has no horizontal part, so the horizontal reading is the horizontal acceleration. Here the “reading” is obtained by differentiating the cart's ground position numerically, independently of the theorem."]
+步骤:
+  - ["选择“转台上沿半径行驶”，设 Ω = 0.5 rad/s、α = 0、v_rel = 0.4 m/s。先按式 (10.6.12) 手算 ρ = 0.5 m 和 1.0 m 处的两个读数，填入表 1。",
+     "Choose “Driving along a radius of the turntable” with Ω = 0.5 rad/s, α = 0, v_rel = 0.4 m/s. Compute both readings at ρ = 0.5 m and 1.0 m with Eq. (10.6.12) and enter them in Table 1."]
+  - ["按“开始”，在 ρ ≈ 0.5 m 和 1.0 m 时读出加速度计读数与计算值，填入表 1（任务 1）。观察地面上的轨迹（阿基米德螺线）。",
+     "Press Start and record the reading and the calculation at ρ ≈ 0.5 m and 1.0 m in Table 1 (task 1). Note the path on the ground (an Archimedean spiral)."]
+  - ["把 Ω 调为 0 再行驶，读数记入表 2（任务 2）；把 Ω 调为 −0.5 rad/s 再行驶（任务 3）；再设 Ω = 0.5 rad/s、α = 0.2 rad/s²，观察欧拉项。",
+     "Drive with Ω = 0 and record in Table 2 (task 2); drive with Ω = −0.5 rad/s (task 3); then set Ω = 0.5 rad/s and α = 0.2 rad/s² and watch the Euler term."]
+  - ["切换到“转盘上滚动的小球”，Ω = 0.5 rad/s，运行到小球滚出盘边，比较橙色的地面轨迹和红色的转台轨迹（任务 4）。",
+     "Switch to “A ball rolling on a turntable” with Ω = 0.5 rad/s, run until the ball leaves the rim, and compare the orange ground path with the red path on the table (task 4)."]
+数据表:
+  - 标题: ["表 1  加速度计读数与计算值（Ω = 0.5 rad/s，v_rel = 0.4 m/s）", "Table 1  Reading and calculation (Ω = 0.5 rad/s, v_rel = 0.4 m/s)"]
+    表头: ["ρ /m", "a_x 手算 /(m/s²)", "a_x 读数 /(m/s²)", "a_y 手算 /(m/s²)", "a_y 读数 /(m/s²)"]
+    表头英文: ["ρ /m", "a_x by hand /(m/s²)", "a_x read /(m/s²)", "a_y by hand /(m/s²)", "a_y read /(m/s²)"]
+    行: [["0.5", "", "", "", ""], ["1.0", "", "", "", ""]]
+  - 标题: ["表 2  改变转台的转动（ρ = 1.0 m，v_rel = 0.4 m/s）", "Table 2  Changing the table's rotation (ρ = 1.0 m, v_rel = 0.4 m/s)"]
+    表头: ["Ω /(rad/s)", "α /(rad/s²)", "a_x 读数 /(m/s²)", "a_y 读数 /(m/s²)", "哪一项变了"]
+    表头英文: ["Ω /(rad/s)", "α /(rad/s²)", "a_x read /(m/s²)", "a_y read /(m/s²)", "Which term changed"]
+    行: [["0", "0", "", "", ""], ["−0.5", "0", "", "", ""], ["0.5", "0.2", "", "", ""]]
+注意:
+  - ["Ω 以俯视逆时针为正。α 不为零时，读数表中的“此刻的 Ω”随时间增大。", "Ω is positive anticlockwise seen from above. With α ≠ 0 the “Ω now” reading grows with time."]
+  - ["读数在小车接近盘边时停止；表 1 的读数请在 ρ 刚超过所需值时记录。", "The run stops near the rim; record Table 1 just as ρ passes the required value."]
+思考题:
+  - ["若车轮与转台之间的横向摩擦因数为 0.03，小车在算例 10.6.1 的条件下会不会侧滑？", "With a sideways friction coefficient of 0.03 between wheels and table, would the cart slide in Example 10.6.1?"]

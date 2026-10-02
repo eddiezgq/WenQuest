@@ -1,0 +1,31 @@
+# 实验 10.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_3.js。
+原理:
+  - ["柱面坐标的局部基 e_ρ、e_φ 随点的方位角转动，ė_ρ = φ̇ e_φ，ė_φ = −φ̇ e_ρ（定理 10.3.1）。对 r = ρ e_ρ + z e_z 求导两次，得到速度、加速度的径向、横向分量（定理 10.3.2）。",
+     "The cylindrical local basis turns with the azimuth: ė_ρ = φ̇ e_φ, ė_φ = −φ̇ e_ρ (Theorem 10.3.1). Differentiating r = ρ e_ρ + z e_z twice gives the radial and transverse components (Theorem 10.3.2)."]
+  - 式: "v = ρ̇ e_ρ + ρφ̇ e_φ + ż e_z，  a = (ρ̈ − ρφ̇²) e_ρ + (ρφ̈ + 2ρ̇φ̇) e_φ + z̈ e_z          (10.3.8)、(10.3.9)"
+  - ["SCARA 末端到关节 1 轴的距离 ρ 只由关节 2 决定：ρ² = l1² + l2² + 2 l1 l2 cos θ2；方位角 φ = θ1 + β。即使两个关节都匀速转动，ρ̈、φ̈ 一般也不为零。",
+     "For the SCARA the distance ρ from joint-1's axis depends only on joint 2: ρ² = l1² + l2² + 2 l1 l2 cos θ2; the azimuth is φ = θ1 + β. Even with both joints at constant rates, ρ̈ and φ̈ are generally not zero."]
+  - ["横向加速度中的 2ρ̇φ̇ 由两半组成：伸出的速度随 e_ρ 转向，以及离轴越远、同样角速度下的横向速度越大。它是 10.6 节科氏加速度的特例。",
+     "The 2ρ̇φ̇ term has two halves: the outward velocity turns with e_ρ, and further out the same turn rate means a larger transverse speed. It is a special case of the Coriolis acceleration of Section 10.6."]
+步骤:
+  - ["选择场景“SCARA 边转边伸”，设 θ₂ = 90°、θ̇₁ = 1.0 rad/s、θ̇₂ = −1.5 rad/s（任务 1）。读出 ρ、φ、ρ̇、φ̇ 和加速度的各项，填入表 1，与算例 10.3.1 比较。",
+     "Choose “SCARA turning and extending”, set θ₂ = 90°, θ̇₁ = 1.0 rad/s, θ̇₂ = −1.5 rad/s (task 1). Read ρ, φ, ρ̇, φ̇ and the acceleration terms into Table 1 and compare with Example 10.3.1."]
+  - ["按“开始”，观察局部基怎样随末端转动，速度和加速度箭头怎样变化。",
+     "Press Start and watch the local basis turn with the tool and the velocity and acceleration arrows change."]
+  - ["把 θ̇₂ 调为 0（任务 2），读出 a_φ 和 a_ρ，验证此时只剩向心项。再把 θ̇₂ 调为 +1.5 rad/s，记录 2ρ̇φ̇ 的符号变化。",
+     "Set θ̇₂ = 0 (task 2), read a_φ and a_ρ and confirm only the centripetal term is left. Then set θ̇₂ = +1.5 rad/s and note how the sign of 2ρ̇φ̇ changes."]
+  - ["切换到“转盘上向外走”，设 ρ̇ = 1 m/s、φ̇ = 1 rad/s（任务 3），读出横向加速度，与 2ρ̇φ̇ 比较。",
+     "Switch to “Walking out on a turntable” with ρ̇ = 1 m/s, φ̇ = 1 rad/s (task 3); read the transverse acceleration and compare with 2ρ̇φ̇."]
+数据表:
+  - 标题: ["表 1  SCARA 末端的柱面坐标与加速度分量", "Table 1  Cylindrical coordinates and acceleration components of the SCARA tool"]
+    表头: ["θ̇₂ /(rad/s)", "ρ /m", "ρ̇ /(m/s)", "φ̇ /(rad/s)", "ρ̈ − ρφ̇² /(m/s²)", "ρφ̈ /(m/s²)", "2ρ̇φ̇ /(m/s²)", "a_φ /(m/s²)"]
+    行: [["−1.5", "", "", "", "", "", "", ""], ["0", "", "", "", "", "", "", ""], ["+1.5", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  转盘上向外走", "Table 2  Walking out on a turntable"]
+    表头: ["ρ̇ /(m/s)", "φ̇ /(rad/s)", "2ρ̇φ̇（手算）/(m/s²)", "a_φ（读数）/(m/s²)"]
+    表头英文: ["ρ̇ /(m/s)", "φ̇ /(rad/s)", "2ρ̇φ̇ (by hand) /(m/s²)", "a_φ (read) /(m/s²)"]
+    行: [["1", "1", "", ""], ["0.5", "1", "", ""], ["1", "0.5", "", ""]]
+注意:
+  - ["关节角和方位角都以俯视逆时针为正；θ̇₂ < 0 时小臂伸直、ρ 增大。", "Joint angles and the azimuth are positive anticlockwise seen from above; θ̇₂ < 0 straightens the forearm and increases ρ."]
+  - ["读数是“此刻”的值；运行后关节角在变，各项随之改变。记录表 1 时请在开始运行前读数。", "Readings are instantaneous; once running the joint angles change. Record Table 1 before pressing Start."]
+思考题:
+  - ["人在转盘上向外走时，脚对转盘的摩擦力指向哪里？为什么会觉得“被推向一侧”？", "Walking outward on the turntable, which way does the friction from the floor act on the feet? Why does one feel pushed sideways?"]

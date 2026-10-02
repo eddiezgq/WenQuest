@@ -1,0 +1,34 @@
+# 实验 10.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_7.js。
+原理:
+  - ["刚体上任意两点的距离不变。三个不共线的点 A、B、C 确定整个刚体（定理 10.7.1）：由它们按格拉姆-施密特法构造固连坐标系，其余各点在其中的坐标都是常数。",
+     "The distance between any two points of a rigid body is fixed. Three non-collinear points A, B, C fix the whole body (Theorem 10.7.1): the frame built from them by Gram–Schmidt is fixed to the body, and every other point has constant coordinates in it."]
+  - 式: "x̂ = r_AB/|r_AB|，  ŷ = (r_AC − (r_AC·x̂) x̂)/|…|，  ẑ = x̂ × ŷ          (10.7.2)"
+  - ["三点共九个坐标，受三个距离约束，剩下 9 − 3 = 6 个独立的数；也可以数成 A 三个、B 在球面上两个、C 在圆上一个，3 + 2 + 1 = 6（定理 10.7.2）。平面上的刚体只有三个自由度。",
+     "Three points have nine coordinates and three distance constraints, leaving 9 − 3 = 6 independent numbers; or count A three, B on a sphere two, C on a circle one: 3 + 2 + 1 = 6 (Theorem 10.7.2). A body in a plane has three degrees of freedom."]
+  - ["本实验用 ZYX 欧拉角表示姿态：R = Rot(ẑ, ψ) Rot(ŷ, θ) Rot(x̂, φ)；由重建的 R 按式 (4.5.4) 求回三个角。", "Orientation here uses ZYX Euler angles: R = Rot(ẑ, ψ) Rot(ŷ, θ) Rot(x̂, φ); the three angles are recovered from the rebuilt R with Eq. (4.5.4)."]
+步骤:
+  - ["选择“夹爪上的三个标记点”，按算例 10.7.1 设置位姿（任务 1），把三个标记点的九个坐标和三个距离填入表 1，与书中比较。",
+     "Choose “Three markers on a gripper”, set the pose of Example 10.7.1 (task 1), enter the nine coordinates and three distances in Table 1 and compare with the book."]
+  - ["同时改变至少四个数（任务 2），再记录一组，验证三个距离不变、重建出的位置和三个角与滑块一致。",
+     "Change at least four numbers (task 2), record another set, and check that the distances stay the same and the rebuilt position and angles match the sliders."]
+  - ["按“重置”，只改变偏航角（任务 3），观察哪些坐标改变、哪些不变，并解释原因。",
+     "Press Reset and change only the yaw (task 3); note which coordinates change and which do not, and explain why."]
+  - ["把俯仰角调到接近 ±80°，观察重建的偏航角和横滚角，联系 4.5 节的万向节锁。",
+     "Bring the pitch close to ±80° and watch the rebuilt yaw and roll; relate this to gimbal lock in Section 4.5."]
+  - ["切换到“桌上的一本书”，把书转到 90°（任务 4），在表 2 中记录确定书的位置的三个数和三个角点的坐标。",
+     "Switch to “A book on a desk”, turn the book to 90° (task 4), and record in Table 2 the three numbers and the corner coordinates."]
+数据表:
+  - 标题: ["表 1  标记点的坐标与距离", "Table 1  Marker coordinates and distances"]
+    表头: ["位姿", "A /m", "B /m", "C /m", "|AB|, |AC|, |BC| /m", "重建的 (ψ, θ, φ)"]
+    表头英文: ["Pose", "A /m", "B /m", "C /m", "|AB|, |AC|, |BC| /m", "Rebuilt (ψ, θ, φ)"]
+    行: [["算例 10.7.1", "", "", "", "", ""], ["任意改变后", "", "", "", "", ""], ["只改偏航角", "", "", "", "", ""]]
+    行英文: [["Example 10.7.1", "", "", "", "", ""], ["After changing four or more", "", "", "", "", ""], ["Yaw only", "", "", "", "", ""]]
+  - 标题: ["表 2  桌上的书", "Table 2  The book on the desk"]
+    表头: ["(x, y, ψ)", "角 A /m", "角 B /m", "角 C /m"]
+    表头英文: ["(x, y, ψ)", "Corner A /m", "Corner B /m", "Corner C /m"]
+    行: [["", "", "", ""]]
+注意:
+  - ["角度单位为度；偏航、俯仰、横滚分别绕 z、y、x 轴，按 Z、Y、X 的次序合成。", "Angles are in degrees; yaw, pitch and roll are about z, y, x, composed in the order Z, Y, X."]
+  - ["九个坐标保留 4 位小数，距离应在最后一位上完全相同。", "Keep 4 decimals for the coordinates; the distances should agree to the last digit."]
+思考题:
+  - ["只用 A、B 两个点能否确定夹爪的姿态？缺的是哪一个数？", "Can points A and B alone fix the gripper's orientation? Which number is missing?"]
