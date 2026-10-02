@@ -10,4 +10,6 @@ parts_en:
   下篇 第四部分 移动与具身: "Part Two, IV  Mobility and Embodiment"
   下篇 第五部分 社会与服务: "Part Two, V  Society and Services"
   下篇 第六部分 展望与治理: "Part Two, VI  Outlook and Governance"
-chapters: {}
+chapters:
+  1:
+    status: ai

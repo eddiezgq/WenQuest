@@ -1,1 +1,46 @@
 首次出现章,中文,English,备注
+1,人工智能,artificial intelligence (AI),
+1,智能体,agent,
+1,智能体函数,agent function,
+1,性能度量,performance measure,
+1,理性智能体,rational agent,
+1,混淆矩阵,confusion matrix,
+1,准确率,accuracy,
+1,精确率,precision,
+1,召回率,recall,
+1,机器学习,machine learning,
+1,深度学习,deep learning,
+1,弱人工智能,weak AI,
+1,强人工智能,strong AI,
+1,专用人工智能,narrow AI,
+1,通用人工智能,artificial general intelligence (AGI),
+1,符号主义,symbolism; symbolic AI,
+1,连接主义,connectionism,
+1,行为主义,behaviourism; behaviour-based AI,
+1,感知机,perceptron,
+1,线性分类器,linear classifier,
+1,学习率,learning rate,
+1,线性可分,linearly separable,
+1,间隔,margin,
+1,反向传播,backpropagation,
+1,数据,data,三要素之一
+1,算法,algorithm,三要素之一
+1,算力,compute; computing power,三要素之一；也指硬件的运算速率（FLOP/s）
+1,自监督学习,self-supervised learning,
+1,词元,token,
+1,浮点运算,floating-point operation (FLOP),
+1,浮点运算量,floating-point operation count (FLOPs),
+1,算力利用率,compute utilization,
+1,摩尔定律,Moore's law,
+1,规模定律,scaling law,
+1,数据并行,data parallelism,
+1,流多处理器,streaming multiprocessor (SM),
+1,张量核心,tensor core,
+1,计算强度,arithmetic intensity,
+1,图形处理器,graphics processing unit (GPU),
+1,GPU 通用计算,general-purpose computing on GPUs (GPGPU),
+1,核函数,kernel,CUDA 中在设备上执行的函数
+1,主机,host,CUDA 中指 CPU 及其内存
+1,设备,device,CUDA 中指 GPU 及其显存
+1,线程块,thread block,
+1,网格,grid,含义不同：CUDA 的线程网格，不是有限元网格（mesh）
