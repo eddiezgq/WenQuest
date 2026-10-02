@@ -217,7 +217,11 @@ jobs:
         if: env.SKIP != '1'
         run: |
           books=$(ls textbook-build)
-          tar czf - -C textbook-build . | ssh "deploy@$HOST" "set -e; mkdir -p /opt/wenquest/textbook; cd /opt/wenquest/textbook; for b in $books; do rm -rf \"\$b\"; done; tar xzf -"
+          du -sh textbook-build/* || true
+          if ! tar czf - -C textbook-build . | ssh "deploy@$HOST" "set -e; mkdir -p /opt/wenquest/textbook; cd /opt/wenquest/textbook; for b in $books; do rm -rf \"\$b\"; done; tar xzf - 2>&1 | tail -n 5"; then
+            ssh "deploy@$HOST" 'df -h / /opt 2>&1 | tail -n 3; ls -la /opt/wenquest/textbook 2>&1 | head -n 8' | sed 's/^/::error::/' || true
+            exit 1
+          fi
 
       - name: Update the server
         if: env.SKIP != '1'
