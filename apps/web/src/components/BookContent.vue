@@ -35,6 +35,11 @@ defineProps<{ html: string }>();
 .book :deep(.wq-poster) { display: block; width: 100%; border-radius: 6px; }
 .book :deep(.wq-labbtn) { display: inline-block; margin: 6px 0 4px; padding: 10px 18px; border-radius: 8px; background: #b8860b; color: #fff; font-family: "Noto Sans CJK SC", sans-serif; font-size: 15px; text-decoration: none; }
 .book :deep(.wq-labdoc) { display: inline-block; margin: 6px 0 4px 10px; padding: 9px 14px; border-radius: 8px; border: 1px solid #b8860b; color: #8a6508; font-family: "Noto Sans CJK SC", sans-serif; font-size: 14px; text-decoration: none; background: #fff; }
+.book :deep(.wq-taskbox) { border: 1px solid #2f6f4f; border-left: 5px solid #2f6f4f; border-radius: 8px; background: #f4faf6; padding: 12px 14px; margin: 12px 0; font-family: "Noto Sans CJK SC", sans-serif; font-size: 15px; }
+.book :deep(.wq-task-head) { color: #1f4d36; font-size: 16px; margin-bottom: 4px; }
+.book :deep(.wq-task-role) { color: #4b5b52; font-size: 14px; margin-bottom: 6px; }
+.book :deep(.wq-station) { display: inline-block; margin: 2px 6px 2px 0; padding: 2px 8px; border-radius: 10px; background: #dfeee5; color: #1f4d36; font-size: 13px; }
+.book :deep(.wq-task-dl ul) { margin: 4px 0 0 1.2em; padding: 0; }
 .book :deep(.wq-labrun) { margin: 6px 0; }
 .book :deep(.wq-labrun > summary) { display: inline-block; padding: 10px 18px; border-radius: 8px; background: #1d2327; color: #fff; font-family: "Noto Sans CJK SC", sans-serif; font-size: 15px; cursor: pointer; list-style: none; }
 .book :deep(.wq-labrun > summary::-webkit-details-marker) { display: none; }

@@ -50,3 +50,10 @@ figcaption, .wq-tabcap { font-family: "Noto Sans CJK SC", sans-serif; font-size:
   .wq-prog details { display: block; }
   .wq-prog details > pre { display: block; }
 }
+
+/* 工程任务单（第 13 轮） */
+.wq-taskbox { border: 1px solid #2f6f4f; border-left: 5px solid #2f6f4f; border-radius: 6px; background: #f4faf6; padding: 10px 12px; margin: 10px 0; }
+.wq-task-head { color: #1f4d36; }
+.wq-task-role { color: #4b5b52; font-size: 0.92em; margin: 2px 0 6px; }
+.wq-station { display: inline-block; margin: 2px 6px 2px 0; padding: 1px 7px; border-radius: 9px; background: #dfeee5; color: #1f4d36; font-size: 0.85em; }
+.wq-task-dl ul { margin: 4px 0 0 1.2em; padding: 0; }

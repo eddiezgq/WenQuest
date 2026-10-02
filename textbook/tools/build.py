@@ -43,6 +43,7 @@ from markdown_it import MarkdownIt
 
 import english
 import labdocs
+import tasksheet
 
 TOOLS = Path(__file__).resolve().parent
 ROOT = TOOLS.parents[1]
@@ -111,8 +112,8 @@ def anim_check(code: str) -> str:
         exec(compile(ast.Module(body=keep, type_ignores=[]), "animator-check", "exec"), ns)
         _ANIM_CHECK = ns["check"]
     return _ANIM_CHECK(code)
-KINDS = ("程序", "动画", "实验", "图", "表")
-REF_KINDS = ("式", "定义", "定律", "定理", "引理", "推论", "算例", "程序", "图", "表", "动画", "实验", "习题")
+KINDS = ("程序", "动画", "实验", "图", "表", "任务")          # 任务: engineering task sheets (第 11、13 轮)
+REF_KINDS = ("式", "定义", "定律", "定理", "引理", "推论", "算例", "程序", "图", "表", "动画", "实验", "任务", "习题")
 
 
 @dataclass
@@ -140,6 +141,7 @@ class Section:
     anims: list = field(default_factory=list)
     labs: list = field(default_factory=list)
     labdocs: list = field(default_factory=list)
+    tasks: list = field(default_factory=list)       # (number, yaml path, task data): 工程任务单 (第 13 轮)
     media: list = field(default_factory=list)       # (kind, number, caption) of animations and labs: the 互动资源 lists (第 9 轮 2.5)
     defines: set = field(default_factory=set)
     lang: str = "zh"                 # "en": the English edition of the section (NN-M.en.md, 第 8 轮)
@@ -503,6 +505,29 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
                 sec.labdocs.append((num, script, g))
             return (f"<figure class='wq-lab' id='{kind}-{num}'><div class='wq-media-box wq-labbox' data-lab='{num.replace('.', '-')}'>"
                     f"{box}{cap}</div>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
+    if kind == "任务":       # 工程任务单 (第 11 轮 2.7（3）5a、第 13 轮): task/NAME.yaml → task sheet, rubric, blank calculation sheet
+        name = meta.get("src", "")
+        path = sec.path.parent / "task" / f"{name}.yaml" if name else None
+        if not path:
+            rep.add("error", "任务", sec.id, f"{label}：没写 src（任务单说明文件 task/名称.yaml）")
+            return ""
+        t, bad = tasksheet.load(path)
+        for why in bad:
+            rep.add("error", "任务", sec.id, f"{label}：{why}")
+        if t is None or bad:
+            return f"<figure class='wq-task' id='{kind}-{num}'><div class='wq-media-box'>{box}{cap}</div></figure>"
+        if not en:
+            sec.tasks.append((num, path, t))
+        i = 1 if en else 0
+        st = "".join(f"<span class='wq-station'>〔{x}〕{html.escape((tasksheet.STATION_EN if en else tasksheet.STATION_ZH)[x])}</span>" for x in t["工位"])
+        dl = "".join(f"<li>{html.escape(x['名称'][i])}</li>" for x in t["交付物"])
+        head = ("Engineering task" if en else "工程任务单")
+        return (f"<figure class='wq-task' id='{kind}-{num}'><div class='wq-taskbox' data-task='{num.replace('.', '-')}'>"
+                f"<div class='wq-task-head'><b>{label}　{head} {html.escape(t['编号'])}</b>{gap}{html.escape(t['标题'][i])}</div>"
+                f"<div class='wq-task-role'>{'Role' if en else '角色'}：{html.escape(t['角色'][i])}　{'Hours' if en else '建议学时'}：{t['学时']}</div>"
+                f"<div class='wq-task-stations'>{st}</div><p>{html.escape(t['背景'][i])}</p>"
+                f"<div class='wq-task-dl'><b>{'Deliverables' if en else '交付物'}</b><ul>{dl}</ul></div></div>"
+                f"{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     cls = {"动画": "wq-anim", "实验": "wq-lab", "表": "wq-tab"}[kind]
     src = html.escape(meta.get("src", ""))
     # media are produced in later steps (animator, labkit); until then a placeholder box shows what will be there
@@ -909,6 +934,21 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 labdocs.report_en(m, g, lab_dir / f"{stem}-report.en.docx", no, where[0])
         if labs:
             trial_labs(page_html, [no.replace(".", "-") for no, _ in items], rep, f"第 {ch} 章实验页")
+    index["tasks"] = {}           # 工程任务单 (第 13 轮): task sheet, rubric and blank calculation sheet in Word
+    task_dir = out / "task"
+    for ch, secs in sorted(by_ch.items()):
+        for sec in secs:
+            for no, path, t in sec.tasks:
+                where = (f"《{book['title']}》{sec.id} 节", f"{book.get('title_en') or book['title']}, Section {sec.id}")
+                stem = f"ts{no.replace('.', '_')}"
+                try:
+                    tasksheet.task_doc(t, task_dir / f"{stem}-task.docx", no, where)
+                    tasksheet.rubric_doc(t, task_dir / f"{stem}-rubric.docx", no, where)
+                    tasksheet.blank_calc(t, path.parent.parent, task_dir / f"{stem}-calc.docx", book["root"] / "conventions")
+                except Exception as e:  # noqa: BLE001 — a broken task sheet is reported, not a crash
+                    rep.add("error", "任务", sec.id, f"任务 {no}：生成 Word 失败：{e}")
+                    continue
+                index["tasks"].setdefault(str(ch), []).append({"no": no, "id": t["编号"], "title": t["标题"], "section": sec.id})
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     for ch, secs in by_ch.items():
         body = (f"<h1>第 {ch} 章　{html.escape(titles[ch])}</h1>"
