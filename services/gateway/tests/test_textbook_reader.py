@@ -157,6 +157,25 @@ def test_virtual_labs_open_from_the_page(client, tmp_path):
     assert client.get("/api/v1/textbook-labdoc/garbage").status_code == 410
 
 
+def test_engineering_task_sheets_offer_their_word_files(client, tmp_path):
+    """第 13 轮：a task card gets links to its task sheet, rubric and blank calculation sheet once they are built."""
+    built_book(tmp_path)
+    web = tmp_path / "robotics" / "web"
+    box = "<figure class='wq-task'><div class='wq-taskbox' data-task='4-1'><b>任务 4.1</b></div></figure>"
+    (web / "4.1.html").write_text("<section>" + box + "</section>")
+    hs = student(client)
+    html = client.get("/api/v1/textbooks/robotics/sections/4.1", headers=hs).json()["html"]
+    assert "wq-taskbox" in html and "textbook-taskdoc" not in html          # nothing built yet: no links
+    (tmp_path / "robotics" / "task").mkdir()
+    for k in ("task", "rubric", "calc"):
+        (tmp_path / "robotics" / "task" / f"ts4_1-{k}.docx").write_bytes(b"PK-" + k.encode())
+    html = client.get("/api/v1/textbooks/robotics/sections/4.1", headers=hs).json()["html"]
+    assert "任务单（Word）" in html and "评分量规（Word）" in html and "空白计算书（Word）" in html
+    links = [h.split("'")[0] for h in html.split("class='wq-labdoc' href='")[1:]]
+    assert [client.get(u[u.index("/api/"):]).content for u in links] == [b"PK-task", b"PK-rubric", b"PK-calc"]
+    assert client.get("/api/v1/textbook-taskdoc/garbage").status_code == 410
+
+
 def test_the_english_edition(client, tmp_path):
     """第 8 轮：a section's English edition, its lab links and documents, the English PDF; untranslated sections say so."""
     built_book(tmp_path)

@@ -30,6 +30,8 @@ PDF_TTL = 3600
 MEDIA_TTL = 86400
 LABBOX = re.compile(r"<div class='wq-media-box wq-labbox' data-lab='(\d+)-(\d+)'>(.*?)</div>", re.S)
 BOX = re.compile(r"<div class='wq-media-box' data-anim='(\w+)' data-hash='(\w+)'>(.*?)</div>", re.S)
+TASKBOX = re.compile(r"(<div class='wq-taskbox' data-task='(\d+)-(\d+)'>)")      # 工程任务单 (第 13 轮)
+TASKDOCS = ("task", "rubric", "calc")
 
 
 def media_dir(m, book: str) -> Path:
@@ -184,7 +186,20 @@ def register(app, m) -> None:
                     out += (f" <a class='wq-labdoc' href='{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-labdoc/{t}' "
                             f"download>{text}</a>")
             return out
-        return LABBOX.sub(lab, html_)
+        html_ = LABBOX.sub(lab, html_)
+
+        def task(mt):             # 工程任务单：任务单、评分量规、空白计算书（Word）放在卡片顶端
+            ch, k = mt.group(2), mt.group(3)
+            names = (("task", "Task sheet (Word)"), ("rubric", "Rubric (Word)"), ("calc", "Blank calculation sheet (Word)")) if en else \
+                (("task", "任务单（Word）"), ("rubric", "评分量规（Word）"), ("calc", "空白计算书（Word）"))
+            links = ""
+            for kind, text in names:
+                if (root() / book / "task" / f"ts{ch}_{k}-{kind}.docx").exists():
+                    t = m.state.codec.fernet.encrypt(json.dumps({"b": book, "t": f"{ch}_{k}", "d": kind}).encode()).decode()
+                    links += (f"<a class='wq-labdoc' href='{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-taskdoc/{t}' "
+                              f"download>{text}</a> ")
+            return mt.group(1) + (f"<div class='wq-task-docs'>{links}</div>" if links and not mp else "")
+        return TASKBOX.sub(task, html_)
 
     @app.get("/api/v1/textbook-lab/{signed}")
     async def lab_page(signed: str):
@@ -220,6 +235,24 @@ def register(app, m) -> None:
             name = f"{idx.get('title_en') or d['b']}-Lab{d['l'].replace('_', '.')}-{'Guide' if d['d'] == 'guide' else 'Report'}.docx"
         else:
             name = f"{idx.get('title', '')}-实验{d['l'].replace('_', '.')}-{'实验指导书' if d['d'] == 'guide' else '实验报告模板'}.docx"
+        return FileResponse(p, filename=name,
+                            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+    @app.get("/api/v1/textbook-taskdoc/{signed}")
+    async def task_doc(signed: str):
+        """An engineering task sheet, its rubric or its blank calculation sheet (Word), built from task/NAME.yaml."""
+        try:
+            d = json.loads(m.state.codec.fernet.decrypt(signed.encode(), ttl=MEDIA_TTL))
+        except (InvalidToken, ValueError):
+            raise EngineError("link_expired", "link expired", 410)
+        if not (BOOK.match(d["b"]) and re.fullmatch(r"\d{1,3}_\d{1,3}", d["t"]) and d["d"] in TASKDOCS):
+            raise EngineError("not_found", "no such file", 404)
+        p = root() / d["b"] / "task" / f"ts{d['t']}-{d['d']}.docx"
+        if not p.exists():
+            raise EngineError("not_found", "no such file", 404)
+        idx = index(d["b"])
+        what = {"task": "工程任务单", "rubric": "评分量规", "calc": "空白计算书"}[d["d"]]
+        name = f"{idx.get('title', '')}-任务{d['t'].replace('_', '.')}-{what}.docx"
         return FileResponse(p, filename=name,
                             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 

@@ -18,7 +18,9 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-SEARCH = [*sorted((ROOT / "textbook").glob("*/std")), ROOT / "library" / "std_tables"]
+HERE = Path(__file__).resolve().parent
+# the digital factory carries a synced copy of this module and the tables it needs next to each other (factory/digital/std)
+SEARCH = [HERE, *sorted((ROOT / "textbook").glob("*/std")), ROOT / "library" / "std_tables"]
 REQUIRED = ("standard", "sources", "columns", "rows")
 
 
