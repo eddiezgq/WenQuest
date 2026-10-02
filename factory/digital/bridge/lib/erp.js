@@ -413,6 +413,27 @@ class ERP {
     return out;
   }
 
+  // 工艺规程生效（第 13 轮）：物料不变，BOM 的工序与工时换成新工艺，建新版默认 BOM——新工单的计划工时和成本随之改变
+  async onProcess(m) {
+    const d = m.data;
+    const cur = await this.get('BOM', await this.defaultBom(d.item));
+    const ops = d.operations.map((o, i) => ({ operation: o.operation, workstation: o.workstation,
+      time_in_mins: Number(o.minutes), sequence_id: i + 1 }));
+    const same = (cur.operations || []).length === ops.length && ops.every((o, i) => cur.operations[i].operation === o.operation
+      && cur.operations[i].workstation === o.workstation && Math.abs(Number(cur.operations[i].time_in_mins) - o.time_in_mins) < 1e-6);
+    if (same) return [];
+    const nb = await this.insert('BOM', {
+      item: d.item, quantity: 1, company: await this.getCompany(), is_active: 1, is_default: 1, with_operations: 1,
+      inspection_required: cur.inspection_required,
+      ...(cur.quality_inspection_template ? { quality_inspection_template: cur.quality_inspection_template } : {}),
+      items: (cur.items || []).map((b) => ({ item_code: b.item_code, qty: b.qty })),
+      operations: ops, docstatus: 1,
+    });
+    const was = (cur.operations || []).reduce((a, o) => a + Number(o.time_in_mins || 0), 0);
+    return [this.doc('BOM', nb, 'submitted', { corr: m.corr, mode: m.mode,
+      extra: { process_revision: d.revision, minutes_before: was, minutes_after: ops.reduce((a, o) => a + o.time_in_mins, 0) } })];
+  }
+
   async onGcode(m) {
     const d = m.data;
     if (!d.gcode_url) return [];

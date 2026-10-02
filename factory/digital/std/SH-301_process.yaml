@@ -1,0 +1,71 @@
+# SH-301 输出轴机械加工工艺规程（第 13 轮：《机械制造技术》第 50 章样例；数字工厂测试与 AI 工艺评审员的参照）
+# 本文件是原件（不是从教材同步来的副本）。图纸要求取自工厂数据的检验模板“零件检验-输出轴”。
+# 余量和中间工序尺寸按“企业工艺标准”取值：教学示意值，不是国家标准（见教材第 50.6 节）。
+item: SH-301
+material: "45"
+blank: {kind: 热轧圆钢, spec: Ø50, length_mm: 182, material_item: RM-45-D50}
+drawing:
+  - {name: 轴承位, size_mm: 35, es_mm: 0.018, ei_mm: 0.002, Ra_um: 0.8}
+  - {name: 齿轮位, size_mm: 40, es_mm: 0.018, ei_mm: 0.002, Ra_um: 0.8}
+operations:
+  - seq: 10
+    operation: 下料 Sawing
+    workstation: 带锯床 SAW-01
+    content: 锯 Ø50×182
+    datum: 外圆
+    minutes: 3
+  - seq: 20
+    operation: 粗车 Rough turning
+    workstation: 数控车床 CNC-L01
+    content: 夹一端车端面、钻中心孔，调头车另一端面至总长 168、钻中心孔；一夹一顶粗车各外圆，单边留余量
+    datum: 外圆（粗基准）
+    clamping: 三爪卡盘，后顶尖
+    tools: 外圆车刀 CNMG 120408（涂层硬质合金），A3 中心钻
+    cut: {vc_m_min: 120, f_mm_r: 0.3, ap_mm: 2.5, d_mm: 50, length_mm: 168, passes: 4}
+    features:
+      - {name: 轴承位, size_mm: 36.8, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
+      - {name: 齿轮位, size_mm: 41.8, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
+    minutes: 18
+  - seq: 30
+    operation: 调质 Quench & temper
+    workstation: 热处理炉 HT-01
+    content: 淬火 840 ℃ 水冷，回火 560 ℃，硬度 217–255 HB
+    minutes: 12
+  - seq: 40
+    operation: 精车 Finish turning
+    workstation: 数控车床 CNC-L01
+    content: 修研中心孔；两顶尖装夹精车各外圆、轴肩与倒角，轴承位和齿轮位留磨量
+    datum: 两端中心孔
+    clamping: 前后顶尖，鸡心夹头
+    tools: 外圆车刀 DNMG 110404（涂层硬质合金）
+    cut: {vc_m_min: 150, f_mm_r: 0.15, ap_mm: 0.75, d_mm: 41.8, length_mm: 168, passes: 1}
+    features:
+      - {name: 轴承位, size_mm: 35.3, es_mm: 0, ei_mm: -0.039, Ra_um: 3.2}
+      - {name: 齿轮位, size_mm: 40.3, es_mm: 0, ei_mm: -0.039, Ra_um: 3.2}
+    minutes: 15
+  - seq: 50
+    operation: 铣键槽 Keyway milling
+    workstation: 键槽铣床 KEY-01
+    content: 铣齿轮位键槽 12N9×45，槽深 5
+    datum: 齿轮位外圆与轴肩（V 形块）
+    clamping: V 形块，压板
+    tools: 键槽铣刀 Ø12
+    minutes: 10
+  - seq: 60
+    operation: 磨外圆 Cylindrical grinding
+    workstation: 外圆磨床 GRD-01
+    content: 两顶尖装夹，磨两处轴承位和齿轮位至图纸尺寸
+    datum: 两端中心孔
+    clamping: 前后顶尖
+    tools: 白刚玉砂轮 WA60KV
+    features:
+      - {name: 轴承位, size_mm: 35, es_mm: 0.018, ei_mm: 0.002, Ra_um: 0.8}
+      - {name: 齿轮位, size_mm: 40, es_mm: 0.018, ei_mm: 0.002, Ra_um: 0.8}
+    minutes: 12
+  - seq: 70
+    operation: 零件检验 Part inspection
+    workstation: 检验站 QC-01
+    content: 按检验模板“零件检验-输出轴”检验
+    minutes: 6
+attachments:
+  - {kind: calc, name: SH-301 工艺计算书.docx, missing: []}

@@ -59,6 +59,12 @@ DATA_SCHEMAS = {
     "design.submit": _obj(["item", "submission"], {}),                        # 企业版：提交待审（第 8 轮）
     "design.review": _obj(["item", "submission", "decision"], {"decision": {"enum": ["approved", "rejected", "withdrawn"]}}),
     "design.gcode": _obj(["item", "revision", "operation", "machine", "gcode_ref"], {"est_time_s": NUM}),
+    # 工艺规程（第 13 轮《机械制造技术》）：提交待审、生效（ERPNext 的 BOM 工序与工时、MES 派工跟着变）、退回
+    "process.submit": _obj(["item", "submission"], {}),
+    "process.release": _obj(["item", "revision", "operations"], {"revision": {"type": "integer", "minimum": 1},
+                            "operations": {"type": "array", "minItems": 1, "items": _obj(["operation", "workstation", "minutes"],
+                                                                                        {"minutes": {"type": "number", "exclusiveMinimum": 0}})}}),
+    "process.review": _obj(["item", "submission", "decision"], {"decision": {"enum": ["rejected"]}}),
     # 跑合试验台的输出轴转矩记录（第 11 轮：疲劳寿命用）
     "test.torque": _obj(["item", "part_serial", "rate_hz", "samples_nm"], {
         "rate_hz": {"type": "number", "exclusiveMinimum": 0},

@@ -24,7 +24,8 @@ class MES:
         if wo.get("docstatus", 1) != 1:
             raise ValueError("工单 {} 还没提交，不能下达".format(name))
         item = wo.get("production_item")
-        ops = routing_for(item)
+        from hub import process
+        ops = process.active_routing(self.db, item=item, mode=mode) or routing_for(item)   # 生效的工艺规程优先（第 13 轮）
         sent = []
         for op, mins in ops:
             unit = (units or {}).get(op) or OP_UNITS[op][0]

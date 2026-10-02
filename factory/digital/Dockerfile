@@ -27,6 +27,8 @@ COPY digital/sim/ digital/sim/
 COPY digital/hub/ digital/hub/
 COPY digital/freecad/ digital/freecad/
 COPY digital/cae/ digital/cae/
+# 工艺数据表与读表模块（第 13 轮：教材原件的副本，见 digital/std/sync.py）
+COPY digital/std/ digital/std/
 COPY ["digital/实验8_输出轴强度与疲劳校核.md", "digital/"]
 COPY digital/mock_erpnext/ digital/mock_erpnext/
 COPY --from=web /web/dist digital/web/dist

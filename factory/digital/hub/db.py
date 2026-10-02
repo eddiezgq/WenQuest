@@ -114,6 +114,24 @@ create table if not exists design_comment (
     resolved    boolean not null default false
 );
 create index if not exists design_comment_sub on design_comment (sub_id, id);
+-- 工艺规程（第 13 轮）：与设计提交并列；批注沿用 design_comment（sub_id 前加 P）
+create table if not exists process_submission (
+    id          text primary key,
+    mode        text not null,
+    item        text not null,
+    status      text not null,
+    author      text not null,
+    author_uid  text,
+    ts          timestamptz not null default now(),
+    note        text,
+    plan        jsonb not null,
+    review      jsonb,
+    revision    integer,
+    decided_by  text,
+    decided_at  timestamptz,
+    decision    text
+);
+create index if not exists process_submission_item on process_submission (mode, item, ts desc);
 create table if not exists known_user (
     uid         text primary key,
     name        text not null,

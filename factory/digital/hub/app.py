@@ -36,6 +36,8 @@ from hub import select as lib_select  # noqa: E402
 from hub import design as design_web  # noqa: E402
 from hub import erp_sso  # noqa: E402
 from hub import plm  # noqa: E402
+from hub import process  # noqa: E402
+from hub import spc  # noqa: E402
 from hub import configurator  # noqa: E402
 from hub.ai import Assistant, ROLE_NAMES  # noqa: E402
 from hub.db import DB  # noqa: E402
@@ -916,6 +918,79 @@ def plm_decision(sid: str, body: dict = Body(...), u=Depends(user_of)):
             raise HTTPException(403, "只有提交人能撤回")
         return _plm_call(plm.decide, H.db, _emit_as(u), sid, s["author"], "withdrawn", note)
     raise HTTPException(400, "decision 只能是 approve / reject / withdraw")
+
+
+# 工艺规程（第 13 轮《机械制造技术》2.7 节）：提交 → AI 工艺评审员预审 → 老师批准 → ERPNext BOM 工序与 MES 派工生效
+def _can_approve_process(u):
+    if u.get("teacher") or u["role"] in ("approver", "manager"):
+        return
+    raise HTTPException(403, "批准工艺规程要用老师、审批人或厂长账号")
+
+
+@app.get("/api/process/{item}")
+def process_item(item: str, u=Depends(user_of)):
+    if item not in F.ITEMS:
+        raise HTTPException(404, "没有这个零件")
+    subs = H.db.q("select id, status, author, ts, revision, review->'suggested_score' as score from process_submission "
+                  "where mode=%s and item=%s order by ts desc limit 30", (u["mode"], item))
+    return {"item": item, "revision": process.current_revision(H.db, u["mode"], item),
+            "routing": process.active_routing(H.db, u["mode"], item) or [list(x) for x in F.ROUTINGS[F.BOMS[item][0]]] if item in F.BOMS else [],
+            "factory_plan": process.factory_plan(item) if item in F.BOMS else None, "submissions": [dict(r) for r in subs]}
+
+
+@app.post("/api/process/review")
+def process_preview(plan: dict = Body(...), u=Depends(user_of)):
+    """AI 预检：不提交，只看意见（工艺员边写边查）。"""
+    f = process.review(plan)
+    return {"findings": f, "suggested_score": process.suggested_score(f)}
+
+
+@app.post("/api/process/submit")
+def process_submit(body: dict = Body(...), u=Depends(user_of)):
+    _can_submit(u)
+    return _plm_call(process.submit, H.db, _emit_as(u), u["mode"], who(u), _uid(u), body.get("plan") or {},
+                     (body.get("note") or "")[:500])
+
+
+@app.get("/api/process/submissions/{sid}")
+def process_get(sid: str, u=Depends(user_of)):
+    s = process.get(H.db, sid)
+    if not s or s["mode"] != u["mode"]:
+        raise HTTPException(404, "没有这次提交")
+    return s
+
+
+@app.post("/api/process/submissions/{sid}/comments/{cid}")
+def process_resolve(sid: str, cid: int, body: dict = Body(default={}), u=Depends(user_of)):
+    return process.resolve(H.db, sid, cid, bool(body.get("resolved", True)))
+
+
+@app.post("/api/process/submissions/{sid}/decision")
+def process_decision(sid: str, body: dict = Body(...), u=Depends(user_of)):
+    d, note = body.get("decision"), (body.get("note") or "").strip()[:500]
+    _can_approve_process(u)
+    if d == "approve":
+        return _plm_call(process.approve, H.db, _emit_as(u), sid, who(u), note, approver_uid=_uid(u))
+    if d == "reject":
+        return _plm_call(process.reject, H.db, _emit_as(u), sid, who(u), note)
+    raise HTTPException(400, "decision 只能是 approve / reject")
+
+
+# 质量统计（第 13 轮〔SPC〕）：控制图、判异、过程能力；测量系统分析
+@app.get("/api/quality/spc")
+def quality_spc(item: str = "SH-301", characteristic: str = "bearing_seat_d35", n: int = 5, u=Depends(user_of)):
+    if not 2 <= n <= 10:
+        raise HTTPException(400, "子组容量 n 取 2–10")
+    return spc.for_characteristic(H.db, u["mode"], item, characteristic, n)
+
+
+@app.post("/api/quality/msa")
+def quality_msa(body: dict = Body(...), u=Depends(user_of)):
+    """data[检验员][零件] = [各次读数]；tol 为公差带宽度（可选）"""
+    try:
+        return spc.grr_anova(body["data"], body.get("tol"))
+    except (KeyError, ValueError, ZeroDivisionError, TypeError, IndexError) as e:   # noqa: F821
+        raise HTTPException(422, "数据格式不对：{}".format(e))
 
 
 # 参数配置器（第 8 轮 Q6）
