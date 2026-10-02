@@ -22,6 +22,8 @@ from collections import deque
 from wqbus import UNITS, layout
 from wqbus.topics import unit_topic
 
+from sim import errors as ERR
+
 # 工序 → 可用设备（第一个是默认设备）
 OP_UNITS = {
     "下料 Sawing": ["saw-01"],
@@ -54,12 +56,9 @@ RATED_TORQUE_NM = {"WQR-105": 350.0}   # 额定输出转矩（与参数配置器
 AGV_SPEED = 1.0                   # m/s（仿真）
 LOAD_UNLOAD_S = 30
 
-# 输出轴检验特性：(特性代号, 中文, 名义, 下限, 上限) —— 与工厂数据“零件检验-输出轴”一致
-SH301_CHARS = [
-    ("bearing_seat_d35", "轴承位直径 Ø35 k6", 35.010, 35.002, 35.018),
-    ("gear_seat_d40", "齿轮位直径 Ø40 k6", 40.010, 40.002, 40.018),
-    ("keyway_width_12", "键槽宽 12 N9", 11.9785, 11.957, 12.000),
-]
+# 输出轴检验特性：(特性代号, 中文, 名义, 下限, 上限)。前三项与工厂数据“零件检验-输出轴”一致；
+# 第 13 轮补右轴承位、轴承位圆跳动、键槽对称度，测量值由加工误差模型合成（sim/errors.py）
+SH301_CHARS = [c for c in ERR.CHARS]
 
 
 class Clock:
@@ -157,6 +156,7 @@ class Engine:
         self._last_periodic = -1e9
         # 仿真 0 秒对应的工厂时间：默认为引擎创建时的真实时间；教学情景会改成情景开始的时刻
         self.epoch = dt.datetime.now(dt.timezone.utc) - dt.timedelta(seconds=self.clock.now())
+        self.errors = ERR.ErrorModel(seed)       # 加工误差模型与问题情景（第 13 轮）
 
     # ------------------------------------------------------------ 基础
     def now(self):
@@ -329,6 +329,7 @@ class Engine:
             m.state = "run"
             if m.unit == "grd-01":
                 p.grind_wear = wear
+            self.errors.on_process(m.unit, p, wear)
             self.at(t + dur, "cycle_end", unit=m.unit, token=tok)
             self.pub(unit_topic(m.unit, "event"), "machine.event", "sim/" + m.unit,
                      {"event": "cycle_start", "work_order": job.wo.name, "operation": job.op,
@@ -405,13 +406,8 @@ class Engine:
 
     def _measure(self, p, corr):
         result = "pass"
-        for code, name, nom, lo, hi in SH301_CHARS:
-            if code == "bearing_seat_d35":
-                mean = 35.0065 + 0.0125 * p.grind_wear
-                sd = 0.0012
-            else:
-                mean, sd = nom, (hi - lo) / 10
-            v = round(self.rng.gauss(mean, sd), 4)
+        vals = self.errors.measure(p, self.rng)
+        for code, name, nom, lo, hi, v in vals:
             r = "pass" if lo <= v <= hi else "fail"
             if r == "fail":
                 result = "fail"
@@ -419,7 +415,7 @@ class Engine:
                      {"part_serial": p.serial, "item": p.wo.item, "work_order": p.wo.name,
                       "characteristic": code, "name": name, "nominal_mm": nom,
                       "lower_tol_mm": lo, "upper_tol_mm": hi, "value_mm": v, "result": r,
-                      "n_chars": len(SH301_CHARS), "factory_ts": self.factory_ts()}, corr)
+                      "n_chars": len(vals), "factory_ts": self.factory_ts()}, corr)
         return result
 
     # ------------------------------------------------------------ 停机

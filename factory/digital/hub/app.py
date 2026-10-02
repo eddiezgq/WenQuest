@@ -38,6 +38,7 @@ from hub import erp_sso  # noqa: E402
 from hub import plm  # noqa: E402
 from hub import process  # noqa: E402
 from hub import cards as proc_cards  # noqa: E402
+from hub import qproblem  # noqa: E402
 from hub import spc  # noqa: E402
 from hub import configurator  # noqa: E402
 from hub.ai import Assistant, ROLE_NAMES  # noqa: E402
@@ -649,6 +650,85 @@ def mes_cmd(body: dict = Body(...), u=Depends(user_of)):
     except KeyError as e:
         raise HTTPException(404, str(e))
     return {"sent": True}
+
+
+# ---------------------------------------------------------------- 问题情景与 8D（第 13 轮）
+def _sim_sender(u):
+    def send(cmd, **extra):
+        H.mes.command("sim", cmd, u["mode"], who(u), **extra)
+    return send
+
+
+def _q(fn, *a, **k):
+    try:
+        return fn(*a, **k)
+    except KeyError as e:
+        raise HTTPException(404, "没有：{}".format(e))
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(409, str(e))
+
+
+@app.get("/api/quality/problems/catalog")
+def q_catalog(u=Depends(user_of)):
+    c = qproblem.catalog()
+    if not (u.get("teacher") and u["mode"] == "teach"):
+        c.pop("problems")                  # 学生看不到问题清单，只能从数据里找
+    return c
+
+
+@app.get("/api/quality/problems")
+def q_active(u=Depends(user_of)):
+    require_teacher(u)
+    return qproblem.active(H.db, u["mode"])
+
+
+@app.post("/api/quality/problems")
+def q_inject(body: dict = Body(...), u=Depends(user_of)):
+    require_teacher(u)
+    if body.get("clear"):
+        return _q(qproblem.clear, H.db, _sim_sender(u), u["mode"], who(u))
+    return _q(qproblem.inject, H.db, _sim_sender(u), u["mode"], who(u), body.get("problem"), body.get("magnitude"))
+
+
+@app.get("/api/quality/8d")
+def q8d_list(u=Depends(user_of)):
+    return qproblem.list_(H.db, u["mode"])
+
+
+@app.post("/api/quality/8d")
+def q8d_create(body: dict = Body(...), u=Depends(user_of)):
+    if not (body.get("title") or "").strip():
+        raise HTTPException(400, "写一个简短的标题（现象）")
+    return qproblem.create(H.db, u["mode"], who(u), _uid(u), body.get("item") or "SH-301", body.get("characteristic"),
+                           body["title"].strip(), body.get("d"))
+
+
+@app.get("/api/quality/8d/{sid}")
+def q8d_get(sid: str, u=Depends(user_of)):
+    s = qproblem.get(H.db, sid)
+    if not s or s["mode"] != u["mode"]:
+        raise HTTPException(404, "没有这张 8D")
+    return s
+
+
+@app.post("/api/quality/8d/{sid}")
+def q8d_update(sid: str, body: dict = Body(...), u=Depends(user_of)):
+    q8d_get(sid, u)
+    act = body.get("action", "save")
+    if act == "save":
+        return _q(qproblem.update, H.db, sid, body.get("d") or {}, body.get("fix"))
+    if act == "submit":
+        return _q(qproblem.submit_fix, H.db, sid)
+    if act in ("approve", "reject"):
+        require_teacher(u)
+        return _q(qproblem.decide_fix, H.db, _sim_sender(u), sid, who(u), act == "approve", body.get("note") or "")
+    if act == "verify":
+        return _q(qproblem.verify, H.db, sid)
+    if act == "close":
+        return _q(qproblem.close, H.db, sid, who(u))
+    raise HTTPException(400, "不支持的操作")
 
 
 @app.post("/api/ncr/{ncr_id}")
@@ -1321,6 +1401,7 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     H.hist._last_state = {k: v for k, v in H.hist._last_state.items() if k[1] != "teach"}
     H.hist._failed_parts.clear()
     H.ai._sent = {k: v for k, v in H.ai._sent.items() if k[0] != "teach"}
+    H.db.x("update quality_problem set cleared_at=now(), cleared_how='scenario' where mode='teach' and cleared_at is null")
     H.mes.command("sim", "load_scenario", "teach", who(u), speed=float(body.get("speed", 1)))
     return {"reset": True}
 

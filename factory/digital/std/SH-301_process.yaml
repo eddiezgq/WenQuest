@@ -205,6 +205,7 @@ operations:
     setup_min: 20
     coolant: 乳化液
     fixture: 键槽铣夹具 JJ-301-50（两个短 V 形块 + 轴向挡销 + 压板）
+    locate_check: {method: v_block, Td: 0.039, alpha: 90, measure: bottom, tol: 0.17, what: 槽底尺寸 H（以齿轮位外圆下母线为工序基准）}
     locate: [{surface: 齿轮位外圆, symbol: v, dof: 4}, {surface: 轴肩, symbol: plane, dof: 1}]
     clamp: [{surface: 齿轮位外圆, kind: manual}]
     sketch:
@@ -284,5 +285,12 @@ operations:
       - {char: C12, gauge: G02, freq: 抽检 5 件/批}
       - {char: C13, gauge: 目测, freq: 每件}
       - {char: C14, gauge: G10, freq: 每炉抽 3 件（查热处理记录）, record: QMS}
+chains:                  # 工艺尺寸链（AI 工艺评审员按极值法核算）
+  - name: 键槽深度 d − t（铣键槽后再磨外圆）
+    char: C5
+    links:
+      - {name: 槽底尺寸 H（工序 50）, nominal: 35.15, es: -0.03, ei: -0.20, sense: 1}
+      - {name: 精车齿轮位半径（工序 40）, nominal: 20.15, es: 0, ei: -0.0195, sense: -1}
+      - {name: 磨削齿轮位半径（工序 60）, nominal: 20, es: 0.009, ei: 0.001, sense: 1}
 attachments:
   - {kind: calc, name: SH-301 工艺计算书.docx, missing: []}

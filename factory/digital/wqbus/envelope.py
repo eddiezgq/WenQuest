@@ -42,7 +42,7 @@ DATA_SCHEMAS = {
         "cycle_time_s": NUM}),
     "machine.cmd": _obj(["command"], {
         "command": {"enum": ["dispatch", "start", "pause", "reset", "inject_fault",
-                                "load_scenario", "set_speed"]},
+                                "load_scenario", "set_speed", "set_problem", "clear_problems", "apply_fix"]},
         "qty": {"type": "integer", "minimum": 1}}),
     "machine.ack": _obj(["accepted"], {"accepted": {"type": "boolean"}}),
     "quality.measurement": _obj(

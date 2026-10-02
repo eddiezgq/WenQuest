@@ -8,6 +8,8 @@ WQ_SIM_AUTOSTART（1 = 派工即开工，不等终端点“开工”）、WQ_TZ�
 仿真器自身的指令发到 wq/gearbox/machining/sim/cmd（仅教学模式）：
   load_scenario  重新开始并载入“实验 7”教学情景（历史库应先由工作台清空）
   set_speed      改倍速，data.speed
+  set_problem    注入隐藏的加工问题（data.problem、data.magnitude，见 sim/errors.py）；clear_problems 清除
+  apply_fix      下发 8D 的纠正措施（data.fix）：对症的问题消失
 """
 import logging
 import os
@@ -64,6 +66,21 @@ class Service:
             self.speed = speed
             self.eng.publish_all_status()
             return True, "已载入实验 7 情景，倍速 {:g}".format(speed)
+        if cmd == "set_problem":            # 第 13 轮：老师注入隐藏的加工问题
+            try:
+                self.eng.errors.inject(data.get("problem"), data.get("magnitude"))
+            except KeyError:
+                return False, "没有这个问题情景：" + str(data.get("problem"))
+            return True, "已注入问题情景"
+        if cmd == "clear_problems":
+            self.eng.errors.clear()
+            return True, "已清除全部问题情景"
+        if cmd == "apply_fix":              # 8D 的纠正措施经老师批准后下发
+            try:
+                gone = self.eng.errors.apply_fix(data.get("fix"))
+            except KeyError:
+                return False, "没有这项措施：" + str(data.get("fix"))
+            return True, "措施已实施" + ("" if gone else "（数据是否改善请看后续零件）")
         return False, "仿真器不支持指令 " + str(cmd)
 
     def run(self):

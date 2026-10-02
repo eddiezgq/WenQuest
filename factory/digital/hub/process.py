@@ -241,6 +241,10 @@ def review(plan):
             if o.get("minutes") and o["minutes"] < tb:
                 say("工时", "error", "按切削用量算出的基本时间约 {:.1f} min，比填的单件工时 {} min 还长。".format(tb, o["minutes"]), o["seq"])
 
+    # 数据格式 v2 的检查（第 13 轮 N5）：检验覆盖、定位误差、尺寸链、工序简图
+    if plan.get("characteristics"):
+        _review_v2(plan, say)
+
     # 计算书
     calc = [a for a in plan.get("attachments") or [] if a.get("kind") == "calc"]
     if not calc:
@@ -249,6 +253,54 @@ def review(plan):
         if a.get("missing"):
             say("完整", "warning", "工艺计算书缺项：{}。".format("、".join(a["missing"])))
     return out
+
+
+def _review_v2(plan, say):
+    from hub import cards, tolerance as TL
+    # 1 图纸每个特性都有检验项目；刀具、量具都登记了
+    for p in cards.check(plan):
+        say("检验", "error" if "终检" in p or "没有检验项目" in p else "warning", p)
+    chars = {c["id"]: c for c in plan.get("characteristics") or []}
+    # 2 定位误差：工序登记的 locate_check（工序基准随定位面的尺寸变动而移动的量）与工序公差比较
+    for o in plan.get("operations") or []:
+        lc = o.get("locate_check")
+        if not lc:
+            continue
+        m = lc.get("method")
+        if m == "v_block":
+            e = TL.v_block(lc["Td"], lc.get("alpha", 90), lc.get("measure", "center"))
+        elif m == "pin":
+            e = TL.pin_clearance(tuple(lc["hole"]), tuple(lc["pin"]), lc.get("contact", "any"))
+        else:
+            continue
+        e += lc.get("dB", 0.0)
+        tol = lc["tol"]
+        if e > tol:
+            say("定位误差", "error", "“{}”的定位误差约 {:.4f} mm，超过工序公差 {:.3f} mm，这样定位做不出合格品。".format(lc.get("what", ""), e, tol), o["seq"])
+        elif not TL.ok_against(tol, e):
+            say("定位误差", "warning", "“{}”的定位误差约 {:.4f} mm，超过工序公差 {:.3f} mm 的三分之一，留给加工和测量的余地太小。"
+                .format(lc.get("what", ""), e, tol), o["seq"])
+    # 3 尺寸链：工艺规程里登记的尺寸链，按极值法算出的封闭环要落在图纸特性之内
+    for ch in plan.get("chains") or []:
+        links = [TL.Link(l["name"], l["nominal"], l.get("es", 0), l.get("ei", 0), l.get("sense", 1)) for l in ch["links"]]
+        r = TL.extreme(links)
+        c = chars.get(ch.get("char"))
+        if not c or "nominal" not in c:
+            say("尺寸链", "warning", "尺寸链“{}”没有对应到图纸特性（char）。".format(ch.get("name")))
+            continue
+        lo, hi = c["nominal"] + c["ei"], c["nominal"] + c["es"]
+        if abs(r.nominal - c["nominal"]) > 1e-6 or r.min < lo - 1e-9 or r.max > hi + 1e-9:
+            say("尺寸链", "error", "尺寸链“{}”算得 {}，即 {:.4f}–{:.4f}，不在图纸 {} 的 {:.4f}–{:.4f} 之内。"
+                .format(ch["name"], r.text(4), r.min, r.max, c["spec"], lo, hi))
+    # 4 工序简图上的工序尺寸与工序尺寸表一致
+    for o in plan.get("operations") or []:
+        sk = o.get("sketch") or {}
+        texts = " ".join(d.get("text", "") for d in sk.get("dims") or [])
+        if not texts:
+            continue
+        for f in o.get("features") or []:
+            if "size_mm" in f and "Ø{:g}".format(f["size_mm"]) not in texts:
+                say("工序简图", "warning", "工序简图上没有标“{}”的工序尺寸 Ø{:g}。".format(f["name"], f["size_mm"]), o["seq"])
 
 
 def suggested_score(findings):

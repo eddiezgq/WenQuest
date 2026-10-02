@@ -132,6 +132,35 @@ create table if not exists process_submission (
     decision    text
 );
 create index if not exists process_submission_item on process_submission (mode, item, ts desc);
+-- 问题情景与 8D 质量异常单（第 13 轮：hub/qproblem.py）
+create table if not exists quality_problem (
+    id          serial primary key,
+    mode        text not null,
+    problem     text not null,
+    magnitude   double precision,
+    injected_by text,
+    injected_at timestamptz not null default now(),
+    cleared_at  timestamptz,
+    cleared_how text
+);
+create table if not exists quality_8d (
+    id          text primary key,
+    mode        text not null,
+    item        text not null,
+    characteristic text,
+    title       text not null,
+    status      text not null,
+    author      text not null,
+    author_uid  text,
+    created_at  timestamptz not null default now(),
+    updated_at  timestamptz not null default now(),
+    d           jsonb not null default '{}'::jsonb,
+    fix         text,
+    fix_by      text,
+    fix_at      timestamptz,
+    verify      jsonb,
+    closed_at   timestamptz
+);
 create table if not exists known_user (
     uid         text primary key,
     name        text not null,

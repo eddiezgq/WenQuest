@@ -162,3 +162,21 @@ def test_the_factory_copy_of_the_tables_is_identical_to_the_textbook():
         if not src.exists():
             pytest.skip("不在完整的问渠仓库里")
         assert src.read_bytes() == dst.read_bytes(), "{} 与原件不同：运行 python3 factory/digital/std/sync.py".format(dst.name)
+
+
+def test_v2_checks_inspection_locating_chains_and_sketch():
+    """第 13 轮 N5：漏检验项目、定位误差过大、尺寸链算不通、工序简图与工序尺寸不一致，评审员都能查出。"""
+    from hub import process
+    p = plan()
+    fin = op(p, "零件检验")
+    fin["inspect"] = [i for i in fin["inspect"] if i["char"] != "C6"]
+    assert ("检验", None) in rules(process.review(p), "error")
+    p = plan()
+    op(p, "铣键槽")["locate_check"]["Td"] = 0.5     # 直接用毛坯外圆定位：下母线基准的误差 Td/(2 sin45°) − Td/2 ≈ 0.10 > 0.17/3
+    assert ("定位误差", 50) in rules(process.review(p))
+    p = plan()
+    p["chains"][0]["links"][0]["ei"] = -0.25                          # 槽底尺寸公差放宽：d − t 保证不了
+    assert ("尺寸链", None) in rules(process.review(p), "error")
+    p = plan()
+    op(p, "精车")["features"][0]["size_mm"] = 35.4
+    assert ("工序简图", 40) in rules(process.review(p), "warning")
