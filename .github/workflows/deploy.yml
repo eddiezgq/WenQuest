@@ -74,6 +74,8 @@ jobs:
             textbook/build/
             !textbook/build/*/values/
             !textbook/build/*/values-en/
+            !textbook/build/*/figs/
+            !textbook/build/*/ch*.html
       - name: Web app tests and builds (web + WeChat mini program)
         working-directory: apps/web
         run: npm ci --no-audit --no-fund && npm test && npm run build:h5 && npm run build:mp-weixin
