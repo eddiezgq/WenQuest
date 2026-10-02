@@ -26,7 +26,7 @@ LABEL = {v: k for k, v in KINDS.items()}
 ITEMS = {"Definition": "定义", "Law": "定律", "Theorem": "定理", "Lemma": "引理", "Corollary": "推论", "Criterion": "准则", "Example": "算例"}
 REFS = {**ITEMS, **KINDS, "Fig.": "图", "Exercise": "习题"}
 LABELS = {"robot example", "engineer's notes", "engineer’s notes", "exercises", "proof", "references", "summary", "note", "notes", "hint",
-          "historical notes", "everyday example", "chapter references", "section references", "quick reference", "worked example"}
+          "historical notes", "everyday example", "chapter references", "section references", "quick reference", "worked example", "estimate"}
 
 TAG = re.compile(r"\\tag\{([^}]+)\}")
 FENCE = re.compile(r"^```.*?^```", re.S | re.M)

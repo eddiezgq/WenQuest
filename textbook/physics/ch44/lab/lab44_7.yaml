@@ -1,0 +1,27 @@
+# 实验 44.7 的指导书与报告模板。目的、场景、参数、任务取自 lab44_7.js。
+原理:
+  - ["针尖与样品之间的真空间隙对电子是一个高约 φ（逸出功，也称功函数）、宽为间隙 d 的势垒。小偏压下隧穿电流 I ∝ U e^{−2κd}（式 (44.7.1)），κ = √(2mₑφ)/ħ（式 (44.7.2)）。所以 ln I 与 d 成线性关系，斜率 b = −2κ，φ = ħ²κ²/(2mₑ) = 0.0381 eV·nm² × κ²。",
+     "The vacuum gap between tip and sample is a barrier about φ (the work function) high and d wide. At small bias the tunnelling current is I ∝ U e^{−2κd} (Eq. (44.7.1)), κ = √(2mₑφ)/ħ (Eq. (44.7.2)). So ln I is linear in d with slope b = −2κ, and φ = ħ²κ²/(2mₑ) = 0.0381 eV·nm² × κ²."]
+  - ["用最小二乘法拟合 y = ln I 对 d 的直线，求斜率 b 及其标准不确定度 u(b)（第 1 章）。κ = −b/2，u(κ) = u(b)/2；u(φ)/φ = 2u(κ)/κ。结果写成 φ = (φ̄ ± U) eV，U = 2u（k = 2）。",
+     "Fit y = ln I against d by least squares and find the slope b with its standard uncertainty u(b) (Chapter 1). κ = −b/2, u(κ) = u(b)/2; u(φ)/φ = 2u(κ)/κ. Report φ = (φ̄ ± U) eV with U = 2u (k = 2)."]
+  - ["恒流模式：控制器按 ln(I/I_set) 调节针尖高度（积分反馈，“增益”即积分增益）。每次采样的修正为增益乘以误差：增益小，跟踪慢；增益接近 1 时一步到位；增益大于 2 时修正过头、越来越大，系统振荡发散。",
+     "Constant-current mode: the controller adjusts the tip height by ln(I/I_set) (integral feedback). Each sample corrects by the gain times the error: a small gain tracks slowly, a gain near 1 corrects in one step, and a gain above 2 overshoots more and more until the loop diverges."]
+步骤:
+  - ["选“逼近曲线”，点“清空记录”。间隙从 0.40 nm 到 0.70 nm 每隔 0.03 nm 取一次，每次点“读数并记录”，把电流读数记入表 1（也可以点“0.40–0.70 nm 依次测一遍”）。", "Choose “Approach curve” and press “Clear records”. Set the gap from 0.40 to 0.70 nm in steps of 0.03 nm, press “Read and record” each time and enter the current in Table 1 (or use “Sweep 0.40–0.70 nm”)."]
+  - ["计算 ln I，用最小二乘法拟合 ln I–d 直线，求 κ、φ 及其扩展不确定度（逸出功）；把“你算出的 φ”调到你的结果（任务 1）。", "Compute ln I, fit the ln I–d line, find κ and φ with its expanded uncertainty; set “Your φ” to your result (task 1)."]
+  - ["选“恒流扫描”，增益 0.5，点“开始扫描”。读出台阶两侧针尖高度之差，与石墨的层间距 0.335 nm 比较（任务 2）。", "Choose “Constant-current scan”, gain 0.5, press “Scan”. Read the difference in tip height across the step and compare with graphite's layer spacing, 0.335 nm (task 2)."]
+  - ["增益依次取 0.05、0.2、0.5、1.0、1.8、2.2，各扫一行，记录跟踪误差的均方根，描述针尖轨迹的样子，找出均方根小于 5 pm 的增益范围（任务 3），记入表 2。", "Scan a line at gains of 0.05, 0.2, 0.5, 1.0, 1.8 and 2.2; record the RMS tracking error, describe the trace and find the range of gains giving less than 5 pm (task 3); record in Table 2."]
+数据表:
+  - 标题: ["表 1  逼近曲线（偏压 0.1 V）", "Table 1  Approach curve (bias 0.1 V)"]
+    表头: ["d / nm", "I / nA", "ln(I / nA)", "拟合值", "残差"]
+    表头英文: ["d / nm", "I / nA", "ln(I / nA)", "Fitted", "Residual"]
+    行: [["0.40", "", "", "", ""], ["0.43", "", "", "", ""], ["0.46", "", "", "", ""], ["0.49", "", "", "", ""], ["0.52", "", "", "", ""], ["0.55", "", "", "", ""], ["0.58", "", "", "", ""], ["0.61", "", "", "", ""], ["0.64", "", "", "", ""], ["0.67", "", "", "", ""], ["0.70", "", "", "", ""]]
+  - 标题: ["表 2  反馈增益与跟踪误差", "Table 2  Feedback gain and tracking error"]
+    表头: ["增益", "跟踪误差均方根 / pm", "针尖轨迹的样子"]
+    表头英文: ["Gain", "RMS tracking error / pm", "What the trace looks like"]
+    行: [["0.05", "", ""], ["0.2", "", ""], ["0.5", "", ""], ["1.0", "", ""], ["1.8", "", ""], ["2.2", "", ""]]
+注意:
+  - ["逼近曲线的样品是未知的，它的逸出功与正文算例不同。电流读数有约 3% 的随机误差，保留三位有效数字；拟合时用全部点。", "The approach-curve sample is unknown and differs from the worked example. Current readings carry about 3% random error and are given to three significant figures; fit all the points."]
+  - ["恒流扫描中的电流读数有 1% 的噪声。针尖高度被限制在样品表面以上 0.05～1.5 nm（压电陶瓷的行程有限，针尖不能撞进样品）。", "The scan's current readings carry 1% noise. The tip height is kept 0.05–1.5 nm above the surface (the piezo has limited travel and the tip must not crash)."]
+思考题:
+  - ["实际的 STM 中，表面上不同的原子逸出功不同。恒流模式下测到的高度变化，是否一定等于表面真实的起伏？", "On a real surface different atoms have different work functions. Does the height measured in constant-current mode always equal the true topography?"]

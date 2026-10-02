@@ -1,10 +1,12 @@
 """A3 virtual labs: the lab kit page, the safety check, the lab engineer's retries, publishing one lab page per chapter."""
 import json
+import math
 import re
 from io import BytesIO
 from urllib.parse import parse_qs, urlparse
 
 import httpx
+import pytest
 from PIL import Image
 
 from app import main
@@ -193,3 +195,37 @@ def test_circuit_labs_carry_the_simulator_without_network():
     assert not re.search(r"""<script[^>]+src=|<link[^>]+href=["']?(?!data:)""", page)   # nothing is fetched
     plain = labs.page([("2.1", labs.example_code())], course=COURSE, chapter=CHAPTER)
     assert "WQ_CIRCUITJS" not in plain.split("<script>\n", 1)[0] and "window.WQ_CIRCUITJS =" not in plain
+
+
+def test_quantum_bench_finds_known_levels_and_keeps_probability():
+    """《大学物理》第 9 轮 2.6: api.qm — infinite well and oscillator levels, orthogonal degenerate states, Crank–Nicolson keeps ∫|ψ|² = 1."""
+    import shutil
+    import subprocess
+    if not shutil.which("node"):
+        pytest.skip("node is not installed")
+    kit = (labs.KIT / "kit.js").read_text(encoding="utf-8")
+    qm = kit[kit.index("const QM = {"):kit.index("function graph(ctx, o)")]
+    script = qm + """
+let N = 999, dx = 1 / (N + 1), V = new Float64Array(N);
+const w = QM.levels(V, dx, 3);
+N = 1999; const a = -5; dx = 10 / (N + 1); V = new Float64Array(N);
+for (let i = 0; i < N; i++) { const x = a + (i + 1) * dx; V[i] = 0.01 * x * x / (4 * QM.C); }
+const ho = QM.levels(V, dx, 3);
+N = 1500; dx = 75 / (N + 1); V = new Float64Array(N); const x = new Float64Array(N);
+for (let i = 0; i < N; i++) { x[i] = (i + 1) * dx; V[i] = x[i] > 40 && x[i] < 41 ? 0.3 : 0; }
+const p = QM.packet(x, 20, 3, QM.k(0.2));
+for (let k = 0; k < 500; k++) QM.step(p, V, dx, 0.5);
+const norm = QM.prob(p, dx);
+N = 240; dx = 10 / (N + 1); V = new Float64Array(N);          // two identical deep wells: degenerate levels
+for (let i = 0; i < N; i++) { const y = (i + 1) * dx; V[i] = (y > 1 && y < 3) || (y > 7 && y < 9) ? 0 : 2; }
+const dw = QM.levels(V, dx, 2);
+let ov = 0; for (let i = 0; i < N; i++) ov += dw.psi[0][i] * dw.psi[1][i] * dx;
+console.log(JSON.stringify({ well: w.E, ho: ho.E, norm, dE: dw.E[1] - dw.E[0], overlap: ov }));
+"""
+    out = json.loads(subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout)
+    for n, e in enumerate(out["well"], 1):          # E_n = (ħ²/2m)(nπ/L)², L = 1 nm
+        assert abs(e - 0.0380998212 * (n * math.pi) ** 2) < 1e-4 * e
+    for n, e in enumerate(out["ho"]):                # E_n = (n + 1/2) ħω, ħω = 0.1 eV
+        assert abs(e - (n + 0.5) * 0.1) < 1e-4
+    assert abs(out["norm"] - 1) < 1e-9
+    assert abs(out["dE"]) < 1e-9 and abs(out["overlap"]) < 1e-9   # degenerate states come out orthogonal

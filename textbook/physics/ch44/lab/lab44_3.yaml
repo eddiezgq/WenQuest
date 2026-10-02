@@ -1,0 +1,35 @@
+# 实验 44.3 的指导书与报告模板。目的、场景、参数、任务取自 lab44_3.js。
+原理:
+  - ["定态薛定谔方程 −(ħ²/2m)ψ″ + V(x)ψ = Eψ（式 (44.2.3)）。把 x 轴分成间距 Δx 的格点，二阶导数用中心差分代替，方程化为三对角对称矩阵的本征值问题（式 (44.2.4)），本征值就是能级，本征向量就是格点上的波函数。实验用的算法与书中程序相同。",
+     "The time-independent Schrödinger equation −(ħ²/2m)ψ″ + V(x)ψ = Eψ (Eq. (44.2.3)). On a grid of spacing Δx with central differences it becomes a symmetric tridiagonal eigenvalue problem (Eq. (44.2.4)): the eigenvalues are the levels and the eigenvectors the wave function on the grid. The lab uses the same algorithm as the book's programs."]
+  - 式: "E_n = n²π²ħ²/(2mL²)，ħ²/(2mₑ) ≈ 0.0381 eV·nm²        (44.3.1)"
+  - ["有限深势阱的束缚态个数为 2z₀/π 向上取整，z₀ = (L/2)√(2mV₀)/ħ（44.4 节）；谐振子的能级 E_n = (n + 1/2)ħω（式 (44.6.2)），等间距。",
+     "A finite well has ⌈2z₀/π⌉ bound states, z₀ = (L/2)√(2mV₀)/ħ (Section 44.4); the oscillator's levels E_n = (n + 1/2)ħω (Eq. (44.6.2)) are equally spaced."]
+  - ["两个相同的势阱靠近时，每个阱中的能级分裂成两个，分裂的大小随中间势垒宽度指数地减小：这是隧道效应（44.5 节），也是固体中能带的起源（第 46 章）。",
+     "When two identical wells approach, each level splits in two; the splitting falls exponentially with the barrier width. This is tunnelling (Section 44.5) and the origin of bands in solids (Chapter 46)."]
+步骤:
+  - ["选“无限深势阱”，L = 1.0 nm、m*/mₑ = 1，读出 E₁、E₂、E₃，与式 (44.3.1) 比较，记入表 1（任务 1）。", "Choose “Infinite well”, L = 1.0 nm, m*/mₑ = 1; read E₁, E₂, E₃ and compare with Eq. (44.3.1); record in Table 1 (task 1)."]
+  - ["L 依次取 0.5、1.0、2.0、3.0 nm，记录 E₁，作 E₁ 与 1/L² 的图（任务 2）。再取 L = 6 nm、m*/mₑ = 0.315（硅鳍），与算例 44.3.2 比较。", "Set L to 0.5, 1.0, 2.0, 3.0 nm and record E₁; plot E₁ against 1/L² (task 2). Then take L = 6 nm and m*/mₑ = 0.315 (a silicon fin) and compare with Example 44.3.2."]
+  - ["选“有限深势阱”，V₀ = 0.243 eV、m*/mₑ = 0.067，阱宽 L（即 44.4 节的 a）取 4、6、8、10、12 nm，记录束缚态个数和 E₁、E₂；再在 9～10 nm 之间细调，找出第三个束缚态出现的阱宽，与 2z₀/π = 2 的条件比较（任务 3），记入表 2。", "Choose “Finite well”, V₀ = 0.243 eV, m*/mₑ = 0.067; set the width L (a in Section 44.4) to 4, 6, 8, 10, 12 nm, recording the number of bound states, E₁ and E₂; then fine-tune between 9 and 10 nm to find the width at which a third state appears and compare with 2z₀/π = 2 (task 3); record in Table 2."]
+  - ["选“自己画势能”，m*/mₑ = 1，点“谐振子”（ħω = 0.291 eV，与 CO₂ 相同），读出最低五个能级，验证等间距、最低能级等于 ħω/2（读数中的 E1 对应 n = 0，任务 4）。", "Choose “Draw”, m*/mₑ = 1, press “Oscillator” (ħω = 0.291 eV, as for CO₂); read the five lowest levels and check the equal spacing and that the lowest equals ħω/2 (E1 in the readouts is n = 0; task 4)."]
+  - ["选“双势阱”，b 依次取 0.5、1、2、3、4、6 nm，记录 E₂ − E₁，在半对数坐标上作 ln(E₂ − E₁) 与 b 的图（任务 5），记入表 3。", "Choose “Double well”; set b to 0.5, 1, 2, 3, 4, 6 nm, record E₂ − E₁ and plot ln(E₂ − E₁) against b (task 5); record in Table 3."]
+  - ["在“自己画势能”中，再点“阶梯”“三角阱”看例子，然后自己画一个势能，观察能级和波函数。", "In “Draw”, try “Steps” and “Triangle”, then draw a potential of your own and look at the levels and wave functions."]
+数据表:
+  - 标题: ["表 1  无限深势阱（m*/mₑ = 1）", "Table 1  Infinite well (m*/mₑ = 1)"]
+    表头: ["L / nm", "E₁ 读数 / eV", "E₁ 公式 / eV", "E₂/E₁", "E₃/E₁"]
+    表头英文: ["L / nm", "E₁ read / eV", "E₁ formula / eV", "E₂/E₁", "E₃/E₁"]
+    行: [["0.5", "", "", "", ""], ["1.0", "", "", "", ""], ["2.0", "", "", "", ""], ["3.0", "", "", "", ""]]
+  - 标题: ["表 2  GaAs 量子阱（V₀ = 0.243 eV，m*/mₑ = 0.067）", "Table 2  GaAs quantum well (V₀ = 0.243 eV, m*/mₑ = 0.067)"]
+    表头: ["L / nm", "束缚态个数", "E₁ / meV", "E₂ / meV", "2z₀/π"]
+    表头英文: ["L / nm", "Bound states", "E₁ / meV", "E₂ / meV", "2z₀/π"]
+    行: [["4", "", "", "", ""], ["6", "", "", "", ""], ["8", "", "", "", ""], ["10", "", "", "", ""], ["12", "", "", "", ""]]
+  - 标题: ["表 3  双势阱的能级分裂", "Table 3  Splitting in the double well"]
+    表头: ["b / nm", "E₂ − E₁ / meV", "ln[(E₂ − E₁)/meV]"]
+    表头英文: ["b / nm", "E₂ − E₁ / meV", "ln[(E₂ − E₁)/meV]"]
+    行: [["0.5", "", ""], ["1", "", ""], ["2", "", ""], ["3", "", ""], ["4", "", ""], ["6", "", ""]]
+注意:
+  - ["有限深势阱和双势阱在两侧各留了 20～30 nm 的阱外区域，区间两端取 ψ = 0。能量高于阱口的“态”实际上属于连续谱，读数中不计入束缚态个数。", "The finite and double wells keep 20–30 nm of barrier on each side and set ψ = 0 at the ends. ‘States’ above the well top belong to the continuum and are not counted as bound states."]
+  - ["阱外区间有限，刚出现的束缚态（能级紧贴阱口、波函数伸得很远）会被区间两端“挤”高一点：第三个束缚态按解析式在 9.61 nm 出现，实验中要稍宽一点才出现。", "The domain outside the well is finite, so a state that has just become bound (close to the top, reaching far out) is pushed up a little by the ends: the third state appears at 9.61 nm analytically but at a slightly larger width here."]
+  - ["有效质量在阱内外取相同值，这是简化（见 44.4 节工程师笔记）。", "The effective mass is taken equal inside and outside the well, a simplification (Section 44.4, engineer's notes)."]
+思考题:
+  - ["双势阱中，最低两个态一个是偶函数、一个是奇函数。若电子开始时只在左边的阱里，它会怎样运动？来回一次要多长时间（用 E₂ − E₁ 估算）？", "In the double well the two lowest states are even and odd. An electron starting in the left well only — how does it move, and how long does a round trip take (estimate from E₂ − E₁)?"]
