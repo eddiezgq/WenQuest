@@ -41,6 +41,7 @@ from pathlib import Path
 import yaml
 from markdown_it import MarkdownIt
 
+import english
 import labdocs
 
 TOOLS = Path(__file__).resolve().parent
@@ -140,6 +141,7 @@ class Section:
     labs: list = field(default_factory=list)
     labdocs: list = field(default_factory=list)
     defines: set = field(default_factory=set)
+    lang: str = "zh"                 # "en": the English edition of the section (NN-M.en.md, 第 8 轮)
 
 
 @dataclass
@@ -182,6 +184,8 @@ def load_sections(book: dict, rep: Report, only: set | None = None) -> list[Sect
         known[f"{c['no']}.0"] = (c["no"], "本章提要")
         known[f"{c['no']}.end"] = (c["no"], "本章小结")
     for path in sorted(book["root"].glob("ch[0-9][0-9]/[0-9][0-9]-*.md"), key=lambda p: [int(x) for x in re.findall(r"\d+", p.name)]):
+        if path.name.endswith(".en.md"):
+            continue
         text = path.read_text(encoding="utf-8")
         m = FRONT.match(text)
         where = str(path.relative_to(book["root"].parent))
@@ -202,6 +206,46 @@ def load_sections(book: dict, rep: Report, only: set | None = None) -> list[Sect
     return out
 
 
+def load_sections_en(book: dict, zh: list[Section], rep: Report) -> list[Section]:
+    """The English edition: NN-M.en.md next to each Chinese section that has been translated."""
+    out = []
+    by_id = {s.id: s for s in zh}
+    for s in zh:
+        path = s.path.with_name(s.path.stem + ".en.md")
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        m = FRONT.match(text)
+        where = str(path.relative_to(book["root"].parent))
+        meta = (yaml.safe_load(m.group(1)) or {}) if m else {}
+        if not m or str(meta.get("id", "")) != s.id or not meta.get("title"):
+            rep.add("error", "结构", where, f"开头要有 --- id: \"{s.id}\" 和英文 title ---")
+            continue
+        out.append(Section(s.id, str(meta["title"]), s.chapter, path, text[m.end():], lang="en"))
+    for path in book["root"].glob("ch[0-9][0-9]/[0-9][0-9]-*.en.md"):
+        zh_path = path.with_name(path.name[:-6] + ".md")
+        if not zh_path.exists():
+            rep.add("error", "结构", str(path.relative_to(book["root"].parent)), "没有对应的中文节（英文版只能翻译已有的中文）")
+    del by_id
+    return out
+
+
+def progress(book: dict) -> dict:
+    """progress.yaml: each chapter's status (第 8 轮 2.1) and the English titles of parts and chapters."""
+    p = book["root"] / "progress.yaml"
+    data = yaml.safe_load(p.read_text(encoding="utf-8")) if p.exists() else {}
+    return data or {}
+
+
+STATUS = ("draft", "ai", "first", "team", "final")     # 草稿、AI 审稿、初审、团队审阅、定稿
+
+
+def glossary_en(book: dict) -> dict[str, str]:
+    p = book["root"] / "conventions" / "术语表.csv"
+    with p.open(encoding="utf-8") as f:
+        return {row["中文"].strip(): (row.get("English") or "").strip() for row in csv.DictReader(f)}
+
+
 def glossary(book: dict) -> set[str]:
     p = book["root"] / "conventions" / "术语表.csv"
     with p.open(encoding="utf-8") as f:
@@ -210,9 +254,11 @@ def glossary(book: dict) -> set[str]:
 
 # ---------------------------------------------------------------- programs and placeholders
 
-def run_programs(book: dict, chapters: set[int], rep: Report) -> dict[str, dict]:
+def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") -> dict[str, dict]:
+    """Runs every program of these chapters; lang "en" runs them for the English edition (English figure labels and
+    text values, figures in figs/en/)."""
     values: dict[str, dict] = {}
-    cache = book["root"].parent / "build" / book["book"] / "values"
+    cache = book["root"].parent / "build" / book["book"] / ("values" if lang == "zh" else "values-en")
     cache.mkdir(parents=True, exist_ok=True)
     for ch in sorted(chapters):
         code = book["root"] / f"ch{ch:02d}" / "code"
@@ -220,23 +266,24 @@ def run_programs(book: dict, chapters: set[int], rep: Report) -> dict[str, dict]
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "models").glob("*/*")))   # library models the programs read
         for prog in sorted(p for p in code.glob("*.py") if not p.name.startswith("_")):
             where = str(prog.relative_to(book["root"].parent))
-            digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes()).hexdigest()[:16]
+            digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes() + lang.encode()).hexdigest()[:16]
             hit = cache / f"{prog.stem}.{digest}.json"
             if hit.exists():
                 values[prog.stem] = json.loads(hit.read_text(encoding="utf-8"))
                 continue
             outp = cache / f"{prog.stem}.out.json"
             outp.unlink(missing_ok=True)
-            figs = cache.parent / "figs"
-            figs.mkdir(exist_ok=True)
-            env = {**os.environ, "WQ_BOOK_OUT": str(outp), "WQ_BOOK_FIGDIR": str(figs), "PYTHONPATH": str(TOOLS), "MPLBACKEND": "Agg"}
+            figs = cache.parent / "figs" / ("" if lang == "zh" else "en")
+            figs.mkdir(parents=True, exist_ok=True)
+            env = {**os.environ, "WQ_BOOK_OUT": str(outp), "WQ_BOOK_FIGDIR": str(figs), "PYTHONPATH": str(TOOLS), "MPLBACKEND": "Agg",
+                   "WQ_LANG": lang}
             try:
                 r = subprocess.run([sys.executable, prog.name], cwd=prog.parent, env=env, capture_output=True, text=True, timeout=300)
             except subprocess.TimeoutExpired:
                 rep.add("error", "程序", where, "运行超过 5 分钟")
                 continue
             if r.returncode != 0:
-                rep.add("error", "程序", where, "运行出错：" + (r.stderr.strip().splitlines() or ["?"])[-1])
+                rep.add("error", "程序", where + ("（英文版运行）" if lang == "en" else ""), "运行出错：" + (r.stderr.strip().splitlines() or ["?"])[-1])
                 continue
             if not outp.exists():
                 rep.add("error", "程序", where, "没有用 bookout.out(...) 交出结果")
@@ -285,6 +332,8 @@ def fill(sec: Section, values: dict, rep: Report) -> str:
             except ValueError:
                 rep.add("error", "占位符", sec.id, f"{m.group(0)}：格式 {fmt} 不对")
                 return m.group(0)
+        if sec.lang == "en" and english.CJK.search(str(v)):
+            rep.add("error", "占位符", sec.id + "（英文版）", f"{m.group(0)} 的值是中文：程序里写成 T(中文, English)")
         return str(v)
     return PLACE.sub(one, sec.source)
 
@@ -294,7 +343,7 @@ def fill(sec: Section, values: dict, rep: Report) -> str:
 DISPLAY = re.compile(r"\$\$(.+?)\$\$", re.S)
 INLINE = re.compile(r"(?<![\\$])\$(?!\$)([^$\n]+?)\$")
 FENCE = re.compile(r"^```.*?^```", re.S | re.M)
-DIRECTIVE = re.compile(r"^:::[ \t]*(" + "|".join(KINDS) + r")[ \t]+([\d.]+)[ \t]*\n(.*?)^:::[ \t]*$", re.S | re.M)
+DIRECTIVE = re.compile(r"^:::[ \t]*(" + "|".join(KINDS + tuple(english.KINDS)) + r")[ \t]+([\d.]+)[ \t]*\n(.*?)^:::[ \t]*$", re.S | re.M)
 TAG = re.compile(r"\\tag\{([^}]+)\}")
 
 
@@ -306,17 +355,21 @@ def protect(text: str, store: list, pattern: re.Pattern, make) -> str:
 
 
 def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, rep: Report) -> str:
+    kind = english.KINDS.get(kind, kind)          # English directives (::: Figure 4.1.1) mean the same things
+    en = sec.lang == "en"
     meta, rest = {}, []
     for line in body.splitlines():
-        m = re.match(r"^(src|说明|模板|模型|caption|图)\s*[:：]\s*(.*)$", line.strip())
+        m = re.match(r"^(src|说明|模板|模型|caption|图|figure)\s*[:：]\s*(.*)$", line.strip())
         if m and not rest:
-            meta[m.group(1)] = m.group(2).strip()
+            meta[{"figure": "图"}.get(m.group(1), m.group(1))] = m.group(2).strip()
         else:
             rest.append(line)
     note = "\n".join(rest).strip()
-    label = f"{kind} {num}"
-    sec.defines.add(label)
+    label = f"{english.LABEL[kind]} {num}" if en else f"{kind} {num}"
+    sec.defines.add(f"{kind} {num}")
     cap = html.escape(meta.get("说明", "") or meta.get("caption", ""))
+    box = f"[{label}] " if en else f"【{label}】"          # what shows until the media is there
+    gap = ". " if en else "　"
     if kind == "程序":
         src = meta.get("src", "")
         p = sec.path.parent / src
@@ -324,27 +377,33 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
             rep.add("error", "程序", sec.id, f"{label}：找不到 {src or '（未写 src）'}")
             code = ""
         else:
+            if en:                # the English edition lists the copy with English comments (same code, checked)
+                why = english.same_code(p, p.parent / "en" / p.name)
+                if why:
+                    rep.add("error", "程序", sec.id + "（英文版）", f"{label}：{why}")
+                else:
+                    p = p.parent / "en" / p.name
             code = p.read_text(encoding="utf-8")
         result = values.get(Path(src).stem)
         res = ""
         if result:
-            res = "<div class='wq-prog-out'><b>运行结果</b><pre>" + html.escape(
+            res = f"<div class='wq-prog-out'><b>{'Output' if en else '运行结果'}</b><pre>" + html.escape(
                 "\n".join(f"{k} = {format(v, '.6g') if isinstance(v, float) else v}" for k, v in result.items() if not k.startswith("_"))) + "</pre></div>"
-        return (f"<figure class='wq-prog' id='{kind}-{num}'><figcaption>{label}　{cap}</figcaption>"
-                f"<details><summary>程序 {html.escape(src)}</summary><pre class='wq-code'><code>{html.escape(code)}</code></pre></details>"
+        return (f"<figure class='wq-prog' id='{kind}-{num}'><figcaption>{label}{gap}{cap}</figcaption>"
+                f"<details><summary>{'Program' if en else '程序'} {html.escape(src)}</summary><pre class='wq-code'><code>{html.escape(code)}</code></pre></details>"
                 f"{res}{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     if kind == "图":
         src = meta.get("src", "")
-        p = sec.figdir / f"{src}.svg" if src else None
+        p = (sec.figdir / "en" if en else sec.figdir) / f"{src}.svg" if src else None
         if not p or not p.exists():
             rep.add("error", "图", sec.id, f"{label}：没有找到示意图 {src or '（未写 src）'}（由 code/ 里的程序用 bookout.figure 生成）")
-            return f"<figure class='wq-fig' id='{kind}-{num}'><div class='wq-media-box'>【{label}】</div></figure>"
+            return f"<figure class='wq-fig' id='{kind}-{num}'><div class='wq-media-box'>{box}</div></figure>"
         import base64
         data = base64.b64encode(p.read_bytes()).decode()
         return (f"<figure class='wq-fig' id='{kind}-{num}'><img class='wq-figimg' alt='{label}' src='data:image/svg+xml;base64,{data}'/>"
-                f"<figcaption>{label}　{cap}</figcaption>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
+                f"<figcaption>{label}{gap}{cap}</figcaption>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     if kind == "表":     # the table itself follows in Markdown; here only its numbered caption
-        return f"<div class='wq-tabcap' id='{kind}-{num}'>{label}　{cap}</div>"
+        return f"<div class='wq-tabcap' id='{kind}-{num}'>{label}{gap}{cap}</div>"
     if kind == "动画":
         fig = meta.get("图", "")
         sec.anim_figs.append((label, fig))
@@ -361,7 +420,7 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
             sec.anims.append((name, h, code))
             # the gateway puts the rendered video here once it is ready; until then this box shows
             return (f"<figure class='wq-anim' id='{kind}-{num}'><div class='wq-media-box' data-anim='{name}' data-hash='{h}'>"
-                    f"【{label}】{cap}</div><figcaption>{label}　{cap}</figcaption>"
+                    f"{box}{cap}</div><figcaption>{label}{gap}{cap}</figcaption>"
                     f"{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     if kind == "实验":
         name = meta.get("src", "")
@@ -372,19 +431,20 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
             code = script.read_text(encoding="utf-8")
             for why in labkit().static_problems(code):
                 rep.add("error", "实验", sec.id, f"{label}：{why}")
-            sec.labs.append((num, code))
+            if not en:
+                sec.labs.append((num, code))
             g, bad = labdocs.load(script.with_suffix(".yaml"))
             for why in bad:
                 rep.add("error", "实验", sec.id, f"{label}：{why}")
             if g is not None and not bad:
                 sec.labdocs.append((num, script, g))
             return (f"<figure class='wq-lab' id='{kind}-{num}'><div class='wq-media-box wq-labbox' data-lab='{num.replace('.', '-')}'>"
-                    f"【{label}】{cap}</div>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
+                    f"{box}{cap}</div>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     cls = {"动画": "wq-anim", "实验": "wq-lab", "表": "wq-tab"}[kind]
     src = html.escape(meta.get("src", ""))
     # media are produced in later steps (animator, labkit); until then a placeholder box shows what will be there
-    return (f"<figure class='{cls}' id='{kind}-{num}' data-src='{src}'><div class='wq-media-box'>【{label}】{cap}</div>"
-            f"<figcaption>{label}　{cap}</figcaption>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
+    return (f"<figure class='{cls}' id='{kind}-{num}' data-src='{src}'><div class='wq-media-box'>{box}{cap}</div>"
+            f"<figcaption>{label}{gap}{cap}</figcaption>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
 
 
 def render_section(sec: Section, text: str, values: dict, rep: Report, formulas: list) -> str:
@@ -584,20 +644,57 @@ def check_terms(sec: Section, terms: set[str], rep: Report) -> None:
 CSS = (TOOLS / "book.css")
 
 
-def page(title: str, body: str) -> str:
-    return (f"<!doctype html><html lang='zh-CN'><head><meta charset='utf-8'><title>{html.escape(title)}</title>"
+def page(title: str, body: str, lang: str = "zh") -> str:
+    return (f"<!doctype html><html lang='{'en' if lang == 'en' else 'zh-CN'}'><head><meta charset='utf-8'><title>{html.escape(title)}</title>"
             f"<meta name='viewport' content='width=device-width, initial-scale=1'><style>{CSS.read_text(encoding='utf-8')}</style>"
             f"</head><body><main class='wq-book'>{body}</main></body></html>")
 
 
-def _toc_sections(c: dict, sections: list) -> list[dict]:
+def _toc_sections(c: dict, sections: list, sections_en: list = ()) -> list[dict]:
     have = {x.id: x for x in sections}
+    en = {x.id: x for x in sections_en}
     out = [{"id": s["id"], "title": s["title"], "written": s["id"] in have} for s in c["sections"]]
     for sid, at in ((f"{c['no']}.0", 0), (f"{c['no']}.end", None)):
         if sid in have:
             item = {"id": sid, "title": have[sid].title, "written": True, "kind": "intro" if at == 0 else "summary"}
             out.insert(0, item) if at == 0 else out.append(item)
+    for item in out:
+        if item["id"] in en:
+            item["en"] = True
+            item["title_en"] = en[item["id"]].title
     return out
+
+
+def check_refs_en(sections_en: list[Section], defined: set, written: set, book: dict, rep: Report) -> None:
+    known = {s["id"] for c in book["chapters"] for s in c["sections"]}
+    nchap = len(book["chapters"])
+    for sec in sections_en:
+        where = sec.id + "（英文版）"
+        items, secs, chs = english.refs(sec.source)
+        for r in sorted(items):
+            if r in defined:
+                continue
+            target = ".".join(r.split(" ")[1].split(".")[:2])
+            if target in known and target not in written:
+                rep.add("warning", "引用", where, f"{r} 所在的 {target} 节尚未写出")
+            else:
+                rep.add("error", "引用", where, f"{r} 不存在")
+        for sid in secs:
+            if sid.count(".") == 2:
+                if f"节 {sid}" in defined:
+                    continue
+                parent = sid.rsplit(".", 1)[0]
+                if parent in known and parent not in written:
+                    rep.add("warning", "引用", where, f"Section {sid} 所在的 {parent} 节尚未写出")
+                else:
+                    rep.add("error", "引用", where, f"Section {sid} 不存在")
+            elif sid not in known:
+                rep.add("error", "引用", where, f"Section {sid} 不在提纲里")
+            elif sid not in written:
+                rep.add("warning", "引用", where, f"Section {sid} 尚未写出")
+        for n in chs:
+            if not 1 <= n <= nchap:
+                rep.add("error", "引用", where, f"Chapter {n} 不存在（全书 {nchap} 章）")
 
 
 def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: Path | None = None,
@@ -608,8 +705,15 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     if root is None:
         outline_in_sync(book_name, rep)
     sections = load_sections(book, rep, only)
+    sections_en = load_sections_en(book, sections, rep)
+    prog_meta = progress(book)
     terms = glossary(book)
     values = run_programs(book, {s.chapter for s in sections}, rep)
+    en_chapters = {s.chapter for s in sections_en}
+    values_en = run_programs(book, en_chapters, rep, "en") if en_chapters else {}
+    for prog, v in values_en.items():
+        for why in english.same_values(values.get(prog, {}), v, prog):
+            rep.add("error", "程序", "英文版", why)
     formulas: list = []
     figdir = book["root"].parent / "build" / book_name / "figs"
     for sec in sections:
@@ -619,14 +723,31 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         check_terms(sec, terms, rep)
         sec.html = render_section(sec, fill(sec, values, rep), values, rep, formulas)
     check_refs(sections, book, rep)
-    for sec in sections:      # 动画代替不了示意图 (Eddie 2026-10-01): every animation has its static figure
+    zh_of = {s.id: s for s in sections}
+    gl_en = glossary_en(book)
+    for sec in sections_en:      # 英文版 (第 8 轮): same structure as the Chinese section, English terms, own references
+        zh = zh_of[sec.id]
+        sec.figdir = figdir
+        where = sec.id + "（英文版）"
+        for why in english.parity(zh.source, sec.source):
+            rep.add("error", "英文版", where, why)
+        sec.defines = set(zh.defines)
+        left = sorted(set(re.findall(r"[\u4e00-\u9fff]+", FENCE.sub("", sec.source))))
+        if left:
+            rep.add("error", "英文版", where, "正文里还有中文：" + "、".join(left[:8]))
+        check_numbers(sec, rep)
+        for why in english.check_terms(zh.source, sec.source, gl_en):
+            rep.add("error", "术语", where, why)
+        sec.html = render_section(sec, fill(sec, values_en, rep), values_en, rep, formulas)
+    check_refs_en(sections_en, set().union(*(s.defines for s in sections)) if sections else set(), {s.id for s in sections}, book, rep)
+    for sec in [*sections, *sections_en]:      # 动画代替不了示意图 (Eddie 2026-10-01): every animation has its static figure
         for label, fig in sec.anim_figs:
             if not fig:
                 rep.add("error", "图", sec.id, f"{label} 没有配示意图（在动画里写“图: x.y.z”，并在正文放这张图）")
             elif f"图 {fig}" not in sec.defines:
                 rep.add("error", "图", sec.id, f"{label} 配的图 {fig} 不在本节")
     svgs, imgs = typeset(formulas, rep)
-    for sec in sections:
+    for sec in [*sections, *sections_en]:
         sec.html_mp = re.sub(r"WQMATH(\d+)Z", lambda m: imgs[int(m.group(1))], sec.html)
         sec.html = re.sub(r"WQMATH(\d+)Z", lambda m: svgs[int(m.group(1))], sec.html)
 
@@ -634,9 +755,19 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     web = out / "web"
     web.mkdir(parents=True, exist_ok=True)
     titles = {c["no"]: c["title"] for c in book["chapters"]}
-    index = {"book": book_name, "title": book["title"], "parts": book["parts"],
+    meta_ch = {int(k): v or {} for k, v in (prog_meta.get("chapters") or {}).items()}
+    for no, v in meta_ch.items():
+        if v.get("status") and v["status"] not in STATUS:
+            rep.add("error", "结构", "progress.yaml", f"第 {no} 章的状态 {v['status']} 应为 {'、'.join(STATUS)} 之一")
+    for no in en_chapters:
+        if not meta_ch.get(no, {}).get("title_en"):
+            rep.add("error", "英文版", "progress.yaml", f"第 {no} 章有英文版，请写出英文章名 title_en")
+    parts_en = prog_meta.get("parts_en") or {}
+    index = {"book": book_name, "title": book["title"], "title_en": book.get("title_en", ""), "parts": book["parts"],
+             "parts_en": parts_en,
              "chapters": [{"no": c["no"], "title": c["title"], "level": c["level"], "part": c["part"],
-                           "sections": _toc_sections(c, sections)} for c in book["chapters"]],
+                           "title_en": meta_ch.get(c["no"], {}).get("title_en", ""), "status": meta_ch.get(c["no"], {}).get("status", ""),
+                           "sections": _toc_sections(c, sections, sections_en)} for c in book["chapters"]],
              "errors": len(rep.errors)}
     for sec in sections:
         head = html.escape(sec.title) if sec.id.endswith((".0", ".end")) else f"{sec.id}　{html.escape(sec.title)}"
@@ -644,11 +775,20 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         (web / f"{sec.id}.html").write_text(frag, encoding="utf-8")
         (web / f"{sec.id}.mp.html").write_text(
             f"<section class='wq-sec'><h2>{head}</h2>{sec.html_mp}</section>", encoding="utf-8")
+    (web / "en").mkdir(exist_ok=True)
+    for sec in sections_en:
+        head = html.escape(sec.title) if sec.id.endswith((".0", ".end")) else f"{sec.id}&nbsp; {html.escape(sec.title)}"
+        (web / "en" / f"{sec.id}.html").write_text(f"<section class='wq-sec' id='sec-{sec.id}' lang='en'><h2>{head}</h2>{sec.html}</section>", encoding="utf-8")
+        (web / "en" / f"{sec.id}.mp.html").write_text(f"<section class='wq-sec' lang='en'><h2>{head}</h2>{sec.html_mp}</section>", encoding="utf-8")
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     by_ch: dict[int, list[Section]] = {}
     for sec in sections:
         by_ch.setdefault(sec.chapter, []).append(sec)
     index["pdf"] = sorted(by_ch) if pdf and not rep.errors else []
+    by_ch_en: dict[int, list[Section]] = {}
+    for sec in sections_en:
+        by_ch_en.setdefault(sec.chapter, []).append(sec)
+    index["pdf_en"] = sorted(by_ch_en) if pdf and not rep.errors else []
     anim_dir = out / "anim"
     anim_dir.mkdir(exist_ok=True)
     index["anims"] = {}
@@ -679,6 +819,18 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 stem = f"lab{no.replace('.', '_')}"
                 labdocs.guide(m, g, lab_dir / f"{stem}-guide.docx", no, where)
                 labdocs.report(m, g, lab_dir / f"{stem}-report.docx", no, where)
+        for sec in by_ch_en.get(ch, []):      # the English edition's lab documents (English only)
+            for no, script, g in sec.labdocs:
+                bad = labdocs.english_problems(g)
+                for why in bad:
+                    rep.add("error", "实验", sec.id + "（英文版）", f"Lab {no}：{why}")
+                if bad:
+                    continue
+                m = labdocs.meta(script)
+                where = (f"{book.get('title_en') or book['title']}, Section {sec.id}",) * 2
+                stem = f"lab{no.replace('.', '_')}"
+                labdocs.guide_en(m, g, lab_dir / f"{stem}-guide.en.docx", no, where[0])
+                labdocs.report_en(m, g, lab_dir / f"{stem}-report.en.docx", no, where[0])
         if labs:
             trial_labs(page_html, [no.replace(".", "-") for no, _ in items], rep, f"第 {ch} 章实验页")
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -686,21 +838,27 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         body = (f"<h1>第 {ch} 章　{html.escape(titles[ch])}</h1>"
                 + "".join(f"<section class='wq-sec'><h2>{html.escape(s.title) if s.id.endswith(('.0', '.end')) else s.id + '　' + html.escape(s.title)}</h2>{s.html}</section>" for s in secs))
         (out / f"ch{ch:02d}.html").write_text(page(f"第 {ch} 章 {titles[ch]}", body), encoding="utf-8")
+    for ch, secs in by_ch_en.items():
+        t_en = meta_ch.get(ch, {}).get("title_en", "")
+        body = (f"<h1>Chapter {ch}&nbsp; {html.escape(t_en)}</h1>"
+                + "".join(f"<section class='wq-sec' lang='en'><h2>{html.escape(s.title) if s.id.endswith(('.0', '.end')) else s.id + '&nbsp; ' + html.escape(s.title)}</h2>{s.html}</section>" for s in secs))
+        (out / f"ch{ch:02d}.en.html").write_text(page(f"Chapter {ch} {t_en}", body, "en"), encoding="utf-8")
     if pdf and not rep.errors:
         make_pdfs(out, sorted(by_ch), rep)
+        make_pdfs(out, sorted(by_ch_en), rep, ".en")
     (out / "report.txt").write_text("\n".join(map(str, rep.problems)) or "全部检查通过", encoding="utf-8")
     return rep
 
 
-def make_pdfs(out: Path, chapters: list[int], rep: Report) -> None:
+def make_pdfs(out: Path, chapters: list[int], rep: Report, suffix: str = "") -> None:
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         exe = os.environ.get("WQ_CHROMIUM")
         b = p.chromium.launch(**({"executable_path": exe} if exe else {}))
         pg = b.new_page()
         for ch in chapters:
-            pg.goto((out / f"ch{ch:02d}.html").as_uri())
-            pg.pdf(path=str(out / f"ch{ch:02d}.pdf"), format="A4", print_background=True,
+            pg.goto((out / f"ch{ch:02d}{suffix}.html").as_uri())
+            pg.pdf(path=str(out / f"ch{ch:02d}{suffix}.pdf"), format="A4", print_background=True,
                    margin={"top": "22mm", "bottom": "22mm", "left": "20mm", "right": "20mm"},
                    display_header_footer=True, header_template="<span></span>",
                    footer_template="<div style='font-size:8px;width:100%;text-align:center;color:#666'>"

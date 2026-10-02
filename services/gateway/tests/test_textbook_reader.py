@@ -137,7 +137,7 @@ def test_virtual_labs_open_from_the_page(client, tmp_path):
     (tmp_path / "robotics" / "lab").mkdir()
     (tmp_path / "robotics" / "lab" / "ch04.html").write_text("<!doctype html><title>第4章 虚拟实验</title>")
     html = client.get("/api/v1/textbooks/robotics/sections/4.1", headers=hs).json()["html"]
-    assert "wq-labbtn" in html and "#lab-4-1" in html and "打开【实验 4.1】" in html
+    assert "wq-labbtn" in html and "#lab-4-1" in html and "打开实验 4.1 转动零件" in html
     url = html.split("href='")[1].split("#")[0]
     r = client.get(url[url.index("/api/"):])
     assert r.status_code == 200 and "虚拟实验" in r.text and "default-src 'none'" in r.headers["content-security-policy"]
@@ -154,3 +154,41 @@ def test_virtual_labs_open_from_the_page(client, tmp_path):
     assert "filename*=utf-8''" in g.headers["content-disposition"].lower()
     assert client.get(links[1][links[1].index("/api/"):]).content == b"PK-REPORT"
     assert client.get("/api/v1/textbook-labdoc/garbage").status_code == 410
+
+
+def test_the_english_edition(client, tmp_path):
+    """第 8 轮：a section's English edition, its lab links and documents, the English PDF; untranslated sections say so."""
+    built_book(tmp_path)
+    web = tmp_path / "robotics" / "web"
+    idx = json.loads((web / "index.json").read_text())
+    idx["title_en"] = "Robotics"
+    idx["pdf_en"] = [4]
+    ch = idx["chapters"][0]
+    ch.update(title_en="Rotation of Rigid Bodies", status="first")
+    ch["sections"][0].update(en=True, title_en="Rotation in the plane")
+    (web / "index.json").write_text(json.dumps(idx, ensure_ascii=False))
+    (web / "en").mkdir()
+    box = "<figure class='wq-lab'><div class='wq-media-box wq-labbox' data-lab='4-1'>[Lab 4.1] Turning a part</div></figure>"
+    (web / "en" / "4.1.html").write_text("<section lang='en'>English text" + box + "</section>")
+    lab = tmp_path / "robotics" / "lab"
+    lab.mkdir()
+    (lab / "ch04.html").write_text("<!doctype html><title>labs</title>")
+    (lab / "lab4_1-guide.docx").write_bytes(b"PK-ZH")
+    (lab / "lab4_1-guide.en.docx").write_bytes(b"PK-EN")
+    (tmp_path / "robotics" / "ch04.en.pdf").write_bytes(b"%PDF-1.4 en")
+    hs, h = student(client), login(client)
+    s = client.get("/api/v1/textbooks/robotics/sections/4.1?lang=en", headers=hs).json()
+    assert s["lang"] == "en" and s["title"] == "Rotation in the plane" and s["chapter"]["title"] == "Rotation of Rigid Bodies"
+    assert s["chapter"]["status"] == "first" and "English text" in s["html"]
+    assert "Open Lab 4.1 Turning a part" in s["html"] and "#lab-4-1-en" in s["html"] and "Lab guide (Word)" in s["html"]
+    links = [x.split("'")[0] for x in s["html"].split("class='wq-labdoc' href='")[1:]]
+    assert len(links) == 1                                         # only the guide has an English file here
+    g = client.get(links[0][links[0].index("/api/"):])
+    assert g.content == b"PK-EN" and "Lab4.1-Guide" in g.headers["content-disposition"]
+    r = client.get("/api/v1/textbooks/robotics/sections/4.2?lang=en", headers=hs)
+    assert r.status_code == 404 and "not_translated" in r.text
+    assert client.get("/api/v1/textbooks/robotics", headers=h).json()["pdf_en"] == [4]
+    assert client.get("/api/v1/textbooks/robotics", headers=hs).json()["pdf_en"] == []
+    url = client.get("/api/v1/textbooks/robotics/pdf/4?lang=en", headers=h).json()["url"]
+    r = client.get(url[url.index("/api/"):])
+    assert r.content == b"%PDF-1.4 en" and "Chapter4" in r.headers["content-disposition"]

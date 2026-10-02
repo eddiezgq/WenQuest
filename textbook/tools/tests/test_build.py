@@ -140,3 +140,26 @@ def test_every_lab_has_a_guide_and_a_report_template(book):
     text = "\n".join(map(str, run(book).errors))
     assert "实验 4.2：没有实验说明文件 lab4_2.yaml" in text
     assert "实验 4.3：lab4_3.yaml“表 2  转了半圈”有一行 3 格，表头是 5 格" in text
+
+
+def test_the_english_edition_is_checked_against_the_chinese(book):
+    """第 8 轮：NN-M.en.md keeps the Chinese structure, uses English glossary terms, and lists a program copy that differs
+    only in comments; every figure is drawn again with English labels."""
+    rep = run(book)
+    assert not rep.errors, "\n".join(map(str, rep.errors))
+    out = book.parent / "build" / "robotics"
+    en = (out / "web" / "en" / "4.1.html").read_text(encoding="utf-8")
+    assert "lang='en'" in en and "Figure 4.1.1" in en and "{{" not in en
+    assert "x_p = 0.123205" in en and "Example 4.1.1" in en and "运行结果" not in en and "Output" in en
+    assert (out / "figs" / "en" / "fig4_1_1.svg").exists() and (out / "lab" / "lab4_1-guide.en.docx").exists()
+    idx = (out / "web" / "index.json").read_text(encoding="utf-8")
+    assert '"title_en": "Rotation in the Plane and the Rotation Matrix"' in idx and '"status": "first"' in idx
+    edit(book, "\\tag{4.1.3}", "", "ch04/04-1.en.md")                                  # an equation number lost
+    edit(book, "**passive rotation**", "passive rotation", "ch04/04-1.en.md")         # a term no longer marked
+    edit(book, "**reflection**", "**mirror flip**", "ch04/04-1.en.md")                # not a glossary term
+    edit(book, "theta = math.radians(30)", "theta = math.radians(31)", "ch04/code/en/ex4_1_1.py")   # different code
+    text = "\n".join(map(str, run(book).errors))
+    assert "公式编号与中文版不一致：英文版缺少 4.1.3" in text
+    assert "“被动转动”，英文版没有加粗对应的“passive rotation”" in text
+    assert "“mirror flip”不是术语表里的英文名" in text
+    assert "code/en/ex4_1_1.py 与中文版的代码不同" in text

@@ -17,6 +17,13 @@ import sys
 
 _values: dict = {}
 
+LANG = os.environ.get("WQ_LANG", "zh")       # the build runs every program once more with WQ_LANG=en for the English edition
+
+
+def T(zh: str, en: str) -> str:
+    """Text in the edition's language: figure labels, and words a program hands to the text (第 8 轮 2.2)."""
+    return en if LANG == "en" else zh
+
 
 def out(**values) -> None:
     for k, v in values.items():
@@ -52,6 +59,12 @@ def style():
 def figure(fig, name: str) -> None:
     """Save a static figure for the book as <name>.svg; the text shows it with ``::: 图 x.y.z`` / ``src: name``."""
     folder = os.environ.get("WQ_BOOK_FIGDIR")
+    if LANG == "en":                      # an English figure must not keep Chinese words: write them with T(zh, en)
+        import re
+        from matplotlib.text import Text
+        left = [t.get_text() for t in fig.findobj(Text) if re.search(r"[\u4e00-\u9fff]", t.get_text())]
+        if left:
+            raise SystemExit(f"figure {name}: Chinese text in the English figure, write it as T(zh, en): {left[:3]}")
     path = os.path.join(folder, f"{name}.svg") if folder else f"{name}.svg"
     fig.savefig(path, format="svg", bbox_inches="tight", pad_inches=0.05, transparent=True)
     if not folder:

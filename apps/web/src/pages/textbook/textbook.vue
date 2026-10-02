@@ -15,17 +15,23 @@
       <view v-else class="reader">
         <view class="toc-toggle narrow-only" @click="tocOpen = !tocOpen">☰ {{ t("book.toc") }}</view>
         <view class="toc" :class="{ open: tocOpen }">
-          <text class="toc-book">{{ idx?.title }}</text>
+          <text class="toc-book">{{ en ? idx?.title_en || idx?.title : idx?.title }}</text>
+          <view class="langs">
+            <text class="langs-t">{{ t("book.lang") }}</text>
+            <view class="lg" :class="{ on: !en }" @click="setLang('zh')">中文</view>
+            <view class="lg" :class="{ on: en }" @click="setLang('en')">English</view>
+          </view>
           <view v-for="part in parts" :key="part.title" class="toc-part">
-            <text class="toc-part-t">{{ part.title }}</text>
+            <text class="toc-part-t">{{ en ? idx?.parts_en?.[part.title] || part.title : part.title }}</text>
             <view v-for="c in part.chapters" :key="c.no" class="toc-ch">
               <view class="toc-ch-t" :class="{ on: cur && cur.chapter.no === c.no, empty: !hasWritten(c) }" @click="toggle(c.no)">
-                <text>{{ t("book.chapter", { n: c.no }) }} {{ c.title }}</text>
+                <text>{{ chapterLabel(c.no) }} {{ en ? c.title_en || c.title : c.title }}</text>
+                <text v-if="c.status" class="badge">{{ t("book.status." + c.status) }}</text>
               </view>
               <view v-if="expanded.has(c.no)" class="toc-secs">
                 <view v-for="s in c.sections" :key="s.id" class="toc-sec" :class="{ on: cur && cur.id === s.id, off: !s.written }"
                       @click="s.written && read(s.id)">
-                  <text>{{ s.kind ? "" : s.id }} {{ s.title }}</text>
+                  <text>{{ s.kind ? "" : s.id }} {{ en && s.title_en ? s.title_en : s.title }}</text>
                   <text v-if="!s.written" class="todo">{{ t("book.unwritten") }}</text>
                 </view>
               </view>
@@ -35,16 +41,18 @@
 
         <view class="page">
           <view v-if="cur" class="crumb">
-            <text>{{ t("book.chapter", { n: cur.chapter.no }) }} {{ cur.chapter.title }}</text>
-            <view v-if="idx && idx.pdf.includes(cur.chapter.no)" class="pdf" @click="pdf(cur.chapter.no)">⤓ {{ t("book.pdf") }}</view>
+            <text>{{ chapterLabel(cur.chapter.no) }} {{ cur.chapter.title }}
+              <text v-if="cur.chapter.status" class="badge">{{ t("book.status." + cur.chapter.status) }}</text></text>
+            <view v-if="pdfFor(cur.chapter.no)" class="pdf" @click="pdf(cur.chapter.no)">⤓ {{ t("book.pdf") }}{{ en ? " (English)" : "" }}</view>
           </view>
+          <text v-if="en && cur && cur.lang !== 'en'" class="no-en">{{ t("book.no_en") }}</text>
           <text v-if="error" class="wq-error">{{ error }}</text>
           <text v-if="!cur && loaded && !error" class="wq-empty">{{ t("book.nothing") }}</text>
           <BookContent v-if="cur" :html="cur.html" />
           <view v-if="cur" class="pager">
-            <view v-if="cur.prev" class="pg" @click="read(cur.prev.id)">‹ {{ cur.prev.kind ? "" : cur.prev.id }} {{ cur.prev.title }}</view>
+            <view v-if="cur.prev" class="pg" @click="read(cur.prev.id)">‹ {{ cur.prev.kind ? "" : cur.prev.id }} {{ refTitle(cur.prev) }}</view>
             <view class="sp" />
-            <view v-if="cur.next" class="pg" @click="read(cur.next.id)">{{ cur.next.kind ? "" : cur.next.id }} {{ cur.next.title }} ›</view>
+            <view v-if="cur.next" class="pg" @click="read(cur.next.id)">{{ cur.next.kind ? "" : cur.next.id }} {{ refTitle(cur.next) }} ›</view>
           </view>
         </view>
       </view>
@@ -58,8 +66,8 @@ import { computed, ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import BookContent from "../../components/BookContent.vue";
-import { absolute, api, ApiError, token, type TextbookChapter, type TextbookIndex, type TextbookSection } from "../../api";
-import { errorText, t } from "../../i18n";
+import { absolute, api, ApiError, token, type TextbookChapter, type TextbookIndex, type TextbookSection, type TextbookSectionRef } from "../../api";
+import { errorText, locale, t } from "../../i18n";
 
 const books = ref<{ book: string; title: string; chapters: number; sections: number; written: number }[]>([]);
 const book = ref("");
@@ -69,6 +77,10 @@ const expanded = ref(new Set<number>());
 const tocOpen = ref(false);
 const loaded = ref(false);
 const error = ref("");
+// 正文语言（第 8 轮）：读者自己选，记在本机；默认跟界面语言。没有英文版的节显示中文并说明。
+const LANG_KEY = "wq-book-lang";
+const lang = ref<"zh" | "en">((uni.getStorageSync(LANG_KEY) as "zh" | "en") || (locale.value === "en" ? "en" : "zh"));
+const en = computed(() => lang.value === "en");
 let mp = false;
 // #ifndef H5
 mp = true;
@@ -84,6 +96,17 @@ const parts = computed(() => {
   return out;
 });
 const hasWritten = (c: TextbookChapter) => c.sections.some((s) => s.written);
+const chapterLabel = (n: number) => (en.value ? `Chapter ${n}` : `第 ${n} 章`);
+const refTitle = (s: TextbookSectionRef) => (en.value && s.title_en ? s.title_en : s.title);
+const findRef = (sid: string) => idx.value?.chapters.flatMap((c) => c.sections).find((s) => s.id === sid);
+const pdfFor = (ch: number) => (en.value && idx.value?.pdf_en?.includes(ch)) || (!en.value && idx.value?.pdf.includes(ch));
+
+function setLang(l: "zh" | "en") {
+  if (lang.value === l) return;
+  lang.value = l;
+  uni.setStorageSync(LANG_KEY, l);
+  if (cur.value) read(cur.value.id);
+}
 
 function fail(e: unknown) { error.value = errorText(e instanceof ApiError ? e.code : "unknown"); }
 
@@ -108,7 +131,8 @@ async function open(b: string, sid = "") {
 async function read(sid: string) {
   error.value = "";
   try {
-    cur.value = await api.textbookSection(book.value, sid, mp);
+    const want = en.value && findRef(sid)?.en ? "en" : "zh";
+    cur.value = await api.textbookSection(book.value, sid, mp, want);
     expanded.value = new Set([...expanded.value, cur.value.chapter.no]);
     tocOpen.value = false;
     // #ifdef H5
@@ -120,7 +144,7 @@ async function read(sid: string) {
 
 async function pdf(ch: number) {
   try {
-    const r = await api.textbookPdf(book.value, ch);
+    const r = await api.textbookPdf(book.value, ch, en.value && idx.value?.pdf_en?.includes(ch) ? "en" : "zh");
     // #ifdef H5
     window.open(absolute(r.url), "_blank");
     // #endif
@@ -156,6 +180,13 @@ onLoad(async (q: any) => {
 .toc-ch-t { padding: 5px 6px; font-size: 14px; border-radius: 6px; cursor: pointer; }
 .toc-ch-t.on { font-weight: 700; }
 .toc-ch-t.empty { color: #9aa5ab; }
+.badge { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 400; color: #8a5a00; background: #fff3d6;
+  border: 1px solid #f0d9a8; border-radius: 9px; padding: 0 7px; vertical-align: 1px; }
+.langs { display: flex; align-items: center; gap: 6px; padding: 0 6px 8px; }
+.langs-t { font-size: 12px; color: var(--wq-muted); margin-right: 2px; }
+.lg { font-size: 12px; border: 1px solid var(--wq-line); border-radius: 12px; padding: 2px 10px; cursor: pointer; }
+.lg.on { background: var(--wq-ink, #1d2327); color: #fff; border-color: transparent; }
+.no-en { display: block; font-size: 13px; color: #8a5a00; background: #fff8e6; border-radius: 6px; padding: 6px 10px; margin: 6px 0; }
 .toc-secs { padding-left: 10px; }
 .toc-sec { padding: 4px 6px; font-size: 13px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; gap: 6px; }
 .toc-sec.on { background: #fff6dd; font-weight: 600; }

@@ -185,3 +185,136 @@ def report(m: dict, g: dict, out: Path, no: str, where: tuple[str, str]) -> Path
     out.parent.mkdir(parents=True, exist_ok=True)
     d.save(str(out))
     return out
+
+
+# ---------------------------------------------------------------- English edition (第 8 轮 2.2)
+
+import re as _re
+
+_CJK = _re.compile(r"[一-鿿]")
+
+
+def _en_table(t: dict) -> tuple[list[str], list[list[str]]]:
+    head = [str(h) for h in (t.get("表头英文") or t["表头"])]
+    rows = [[str(c) for c in r] for r in (t.get("行英文") or t["行"])]
+    return head, rows
+
+
+def english_problems(g: dict) -> list[str]:
+    """What the English lab documents would still show in Chinese: table headers and cells need 表头英文 / 行英文."""
+    bad = []
+    for t in g.get("数据表") or []:
+        head, rows = _en_table(t)
+        if any(_CJK.search(h) for h in head):
+            bad.append(f"“{t['标题'][0]}”的表头有中文：加上 表头英文")
+        if any(_CJK.search(c) for r in rows for c in r):
+            bad.append(f"“{t['标题'][0]}”的表格内容有中文：加上 行英文")
+        if t.get("行英文") and len(t["行英文"]) != len(t["行"]):
+            bad.append(f"“{t['标题'][0]}”的 行英文 与 行 的行数不同")
+    return bad
+
+
+def _en_tab(d, t: dict) -> None:
+    d.p(t["标题"][1], indent=False)
+    head, rows = _en_table(t)
+    n = len(head)
+    d.table(head, rows, widths=[round(16.0 / n, 2)] * n, font_size=9.5)
+
+
+def _second(items) -> list[str]:
+    return [x[1] if _pair(x) else str(x) for x in items]
+
+
+def guide_en(m: dict, g: dict, out: Path, no: str, where: str) -> Path:
+    """The lab guide in English only, for the English edition."""
+    docs, docgen = _docs()
+    d = docgen.Doc()
+    d.title(m["title"][1])
+    d.p(f"Textbook: {where}", indent=False)
+    d.h("1  Objectives")
+    d.p(m["goal"][1])
+    d.h("2  Principles")
+    for x in g["原理"]:
+        if isinstance(x, dict):
+            d.eq(x["式"])
+        else:
+            d.p(x[1])
+    d.h("3  The virtual lab")
+    d.p("How to open: read the section in WenQuest Textbooks (English) and press “Open lab”; it runs in the browser, nothing to install.")
+    for s in m.get("scenes") or []:
+        tag = "Robot scene" if s.get("robot") else "Everyday scene"
+        d.p(f"{tag} “{s['name'][1]}”: {s['problem']['text'][1]}")
+    rows = [[p["name"][1], f"{p['min']} ~ {p['max']} {p.get('unit') or ''}".strip(), f"{p.get('step', '')} {p.get('unit') or ''}".strip()]
+            for p in m.get("params") or []]
+    if rows:
+        d.table(["Control", "Range", "Step"], rows, widths=[8.0, 4.5, 3.5], font_size=9.5)
+    if m.get("buttons"):
+        d.p("Buttons: " + ", ".join(b["name"][1] for b in m["buttons"]))
+    d.h("4  Procedure")
+    d.bullets(_second(g["步骤"]), numbered=True)
+    d.p("The lab page lists these tasks and ticks them off as you complete them:")
+    d.bullets(_second([t["text"] for t in m.get("tasks") or []]), numbered=True)
+    d.h("5  Data record")
+    d.p("The same tables appear in the report template; fill them in there.")
+    for t in g["数据表"]:
+        _en_tab(d, t)
+    d.h("6  Notes")
+    d.bullets(_second(g["注意"]))
+    d.h("7  Questions")
+    d.bullets(_second(questions(m, g)), numbered=True)
+    d.h("8  Connection to real problems")
+    for s in m.get("scenes") or []:
+        p = s["problem"]
+        d.p(p["title"][1], indent=False).runs[0].bold = True
+        d.p(p["text"][1])
+    d.p("In the report section “Modelling a real problem”, take the robot problem through five steps: ① the problem ② the model "
+        "(state your assumptions) ③ the solution ④ a check with the virtual lab ⑤ where the model fails and how to improve it.")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    d.save(str(out))
+    return out
+
+
+def report_en(m: dict, g: dict, out: Path, no: str, where: str) -> Path:
+    """The lab report template in English only, for the English edition."""
+    docs, docgen = _docs()
+    d = docgen.Doc()
+    d.title(f"Lab Report  {m['title'][1]}")
+    d.table(["Name", "", "ID", "", "Date", ""], [["Class", "", "Partner", "", "Score", ""]],
+            widths=[2.4, 3.2, 2.2, 2.8, 2.2, 3.2], font_size=10)
+    d.p(f"Textbook: {where}. Submit this file in WenQuest Assignments.", indent=False)
+    robot = next((s for s in m.get("scenes") or [] if s.get("robot")), (m.get("scenes") or [{}])[0])
+    for zh, en, n in docs.REPORT_SECTIONS:
+        d.h(en)
+        if zh.startswith("四"):
+            for t in g["数据表"]:
+                _en_tab(d, t)
+            d.p("Processing: show your calculations, compare with theory, include at least one graph.")
+            d.lines(4)
+        elif zh.startswith("六") and robot.get("problem"):
+            p = robot["problem"]
+            d.p(p["title"][1], indent=False).runs[0].bold = True
+            d.p(p["text"][1])
+            for _, en_step in docs.FIVE:
+                d.p(en_step, indent=False)
+                d.lines(3)
+        elif zh.startswith("八"):
+            for _, eq in questions(m, g):
+                d.p(eq, indent=False)
+                d.lines(3)
+        else:
+            d.lines(n)
+    d.h("9  AI use statement")
+    d.p("□ No AI used   □ AI to explain concepts   □ AI to check calculations   □ Other: ____________", indent=False)
+    d.p("If you used AI, say where:", indent=False)
+    d.lines(2)
+    d.h("Rubric")
+    d.table(["Criterion", "Points", "What earns full marks"],
+            [["Principles", "20", "correct formulas with their meaning"],
+             ["Data", "25", "complete data, correct units and significant figures"],
+             ["Analysis", "25", "theory vs measurement, sources of error"],
+             ["Real problem", "20", "all five steps, clear assumptions, limits named"],
+             ["Presentation", "10", "clear writing and graphs, honest AI statement"]],
+            widths=[4.0, 2.2, 9.8], font_size=9.5)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    d.save(str(out))
+    return out

@@ -1,0 +1,21 @@
+# 各章状态与英文标题（第 8 轮 2.1、2.2）。
+# status：draft 草稿 / ai AI 审稿 / first 初审 / team 团队审阅 / final 定稿。没写的章不列。
+# title_en：有英文版的章必须写英文章名。
+parts_en:
+  导论: Introduction
+  第一篇 数学基础篇: "Part I  Mathematical Foundations"
+  第二篇 运动学篇: "Part II  Kinematics"
+  第三篇 动力学篇: "Part III  Dynamics"
+  第四篇 结构与机电设计篇: "Part IV  Mechanical and Mechatronic Design"
+  第五篇 控制篇: "Part V  Control"
+  第六篇 编程与 AI 篇: "Part VI  Programming and AI"
+chapters:
+  4:
+    status: first
+    title_en: "Rotation of Rigid Bodies: From Euler to Quaternions"
+  12:
+    status: first
+    title_en: "Forward Kinematics: The Product of Exponentials"
+  39:
+    status: first
+    title_en: "Signal Conditioning and Automatic Testing"

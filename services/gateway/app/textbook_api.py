@@ -130,6 +130,7 @@ def register(app, m) -> None:
         teacher = await m.can_create(sess.moodle_token)
         idx["teacher"] = teacher
         idx["pdf"] = [c for c in idx.get("pdf", []) if (root() / book / f"ch{int(c):02d}.pdf").exists()] if teacher else []
+        idx["pdf_en"] = [c for c in idx.get("pdf_en", []) if (root() / book / f"ch{int(c):02d}.en.pdf").exists()] if teacher else []
         anims = idx.pop("anims", {}) or {}
         idx["anims_ready"] = sum((media_dir(m, book) / f"{n}-{h}.mp4").exists() for n, h in anims.items())
         idx["anims_total"] = len(anims)
@@ -139,16 +140,19 @@ def register(app, m) -> None:
         tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "n": name, "h": h, "k": kind}).encode()).decode()
         return f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-media/{tok}"
 
-    def with_media(book: str, html_: str, mp: bool) -> str:
+    def with_media(book: str, html_: str, mp: bool, lang: str = "zh") -> str:
         """Put the rendered animations into the page; a scene not rendered yet keeps its box."""
+        en = lang == "en"
+
         def one(mt):
             name, h, label = mt.group(1), mt.group(2), mt.group(3)
             md = media_dir(m, book)
             if not (md / f"{name}-{h}.mp4").exists():
-                return mt.group(0).replace(label, label + "（动画制作中）")
+                return mt.group(0).replace(label, label + (" (animation being made)" if en else "（动画制作中）"))
             poster = media_link(book, name, h, "png")
             if mp:
-                return f"<img class='wq-poster' src='{poster}'/><p class='wq-note'>{label}：请在网页端观看动画</p>"
+                note = f"{label}: please watch it on the web" if en else f"{label}：请在网页端观看动画"
+                return f"<img class='wq-poster' src='{poster}'/><p class='wq-note'>{note}</p>"
             return (f"<video class='wq-video' controls preload='none' playsinline poster='{poster}' "
                     f"src='{media_link(book, name, h, 'mp4')}'></video>")
         html_ = BOX.sub(one, html_)
@@ -158,16 +162,22 @@ def register(app, m) -> None:
             page = root() / book / "lab" / f"ch{int(ch):02d}.html"
             if not page.exists():
                 return mt.group(0)
+            label = re.sub(r"\s+", " ", re.sub(r"[【】\[\]]", " ", label)).strip()
             if mp:
-                return f"<p class='wq-note'>{label}：请在网页端打开虚拟实验，并下载实验指导书和报告模板</p>"
+                note = (f"{label}: please open the virtual lab and download its guide and report template on the web" if en
+                        else f"{label}：请在网页端打开虚拟实验，并下载实验指导书和报告模板")
+                return f"<p class='wq-note'>{note}</p>"
             tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": int(ch)}).encode()).decode()
-            url = f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-lab/{tok}#lab-{ch}-{k}"
-            out = f"<a class='wq-labbtn' href='{url}' target='_blank' rel='noopener'>▶ 打开{label}</a>"
-            for kind, text in (("guide", "实验指导书"), ("report", "实验报告模板")):
-                if (root() / book / "lab" / f"lab{ch}_{k}-{kind}.docx").exists():
-                    t = m.state.codec.fernet.encrypt(json.dumps({"b": book, "l": f"{ch}_{k}", "d": kind}).encode()).decode()
+            url = f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-lab/{tok}#lab-{ch}-{k}{'-en' if en else ''}"
+            out = f"<a class='wq-labbtn' href='{url}' target='_blank' rel='noopener'>▶ {'Open ' + label if en else '打开' + label}</a>"
+            docs_ = (("guide", "Lab guide (Word)"), ("report", "Report template (Word)")) if en else \
+                (("guide", "实验指导书（Word）"), ("report", "实验报告模板（Word）"))
+            for kind, text in docs_:
+                if (root() / book / "lab" / f"lab{ch}_{k}-{kind}{'.en' if en else ''}.docx").exists():
+                    d = {"b": book, "l": f"{ch}_{k}", "d": kind, **({"g": "en"} if en else {})}
+                    t = m.state.codec.fernet.encrypt(json.dumps(d).encode()).decode()
                     out += (f" <a class='wq-labdoc' href='{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-labdoc/{t}' "
-                            f"download>{text}（Word）</a>")
+                            f"download>{text}</a>")
             return out
         return LABBOX.sub(lab, html_)
 
@@ -196,12 +206,16 @@ def register(app, m) -> None:
             raise EngineError("link_expired", "link expired", 410)
         if not (BOOK.match(d["b"]) and re.fullmatch(r"\d{1,3}_\d{1,3}", d["l"]) and d["d"] in ("guide", "report")):
             raise EngineError("not_found", "no such file", 404)
-        p = root() / d["b"] / "lab" / f"lab{d['l']}-{d['d']}.docx"
+        en = d.get("g") == "en"
+        p = root() / d["b"] / "lab" / f"lab{d['l']}-{d['d']}{'.en' if en else ''}.docx"
         if not p.exists():
             raise EngineError("not_found", "no such file", 404)
         idx = index(d["b"])
-        kind = "实验指导书" if d["d"] == "guide" else "实验报告模板"
-        return FileResponse(p, filename=f"{idx.get('title', '')}-实验{d['l'].replace('_', '.')}-{kind}.docx",
+        if en:
+            name = f"{idx.get('title_en') or d['b']}-Lab{d['l'].replace('_', '.')}-{'Guide' if d['d'] == 'guide' else 'Report'}.docx"
+        else:
+            name = f"{idx.get('title', '')}-实验{d['l'].replace('_', '.')}-{'实验指导书' if d['d'] == 'guide' else '实验报告模板'}.docx"
+        return FileResponse(p, filename=name,
                             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
     @app.get("/api/v1/textbook-media/{signed}")
@@ -219,7 +233,7 @@ def register(app, m) -> None:
                             headers={"Cache-Control": "private, max-age=86400"})
 
     @app.get("/api/v1/textbooks/{book}/sections/{sid}")
-    async def section(book: str, sid: str, sess: Annotated[Session, Depends(m.current)], mp: bool = False):
+    async def section(book: str, sid: str, sess: Annotated[Session, Depends(m.current)], mp: bool = False, lang: str = "zh"):
         idx = index(book)
         if not SECTION.match(sid):
             raise EngineError("not_found", "no such section", 404)
@@ -227,25 +241,33 @@ def register(app, m) -> None:
         ids = [s["id"] for s in order]
         if sid not in ids:
             raise EngineError("not_written", "this section has not been written yet", 404)
-        p = root() / book / "web" / (f"{sid}.mp.html" if mp else f"{sid}.html")
-        if not p.exists():
-            p = root() / book / "web" / f"{sid}.html"
         i = ids.index(sid)
         cur = order[i]
+        en = lang == "en"
+        if en and not cur.get("en"):
+            raise EngineError("not_translated", "the English edition of this section is not out yet", 404)
+        web = root() / book / "web" / ("en" if en else "")
+        p = web / (f"{sid}.mp.html" if mp else f"{sid}.html")
+        if not p.exists():
+            p = web / f"{sid}.html"
         chapter = next(c for c in idx["chapters"] if c["no"] == cur["chapter"])
-        return {"id": sid, "title": cur["title"], "chapter": {"no": chapter["no"], "title": chapter["title"]},
-                "html": with_media(book, p.read_text(encoding="utf-8"), mp),
+        return {"id": sid, "lang": "en" if en else "zh", "title": cur.get("title_en") if en else cur["title"],
+                "chapter": {"no": chapter["no"], "title": (chapter.get("title_en") or chapter["title"]) if en else chapter["title"],
+                            "status": chapter.get("status", "")},
+                "html": with_media(book, p.read_text(encoding="utf-8"), mp, "en" if en else "zh"),
                 "prev": order[i - 1] if i > 0 else None, "next": order[i + 1] if i + 1 < len(order) else None}
 
     @app.get("/api/v1/textbooks/{book}/pdf/{chapter}")
-    async def pdf_link(book: str, chapter: int, sess: Annotated[Session, Depends(m.current)]):
-        """A short-lived download link for a chapter's PDF (teachers only)."""
+    async def pdf_link(book: str, chapter: int, sess: Annotated[Session, Depends(m.current)], lang: str = "zh"):
+        """A short-lived download link for a chapter's PDF (teachers only); lang=en for the English edition."""
         index(book)
         if not await m.can_create(sess.moodle_token):
             raise EngineError("forbidden", "the PDF is for teachers", 403)
-        if not (root() / book / f"ch{chapter:02d}.pdf").exists():
+        en = lang == "en"
+        if not (root() / book / f"ch{chapter:02d}{'.en' if en else ''}.pdf").exists():
             raise EngineError("not_found", "no PDF for this chapter", 404)
-        tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": chapter, "u": sess.user_id, "t": time.time()}).encode()).decode()
+        tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": chapter, "u": sess.user_id, "t": time.time(),
+                                                       **({"g": "en"} if en else {})}).encode()).decode()
         return {"url": f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-pdf/{tok}"}
 
     @app.get("/api/v1/textbook-pdf/{signed}")
@@ -255,9 +277,13 @@ def register(app, m) -> None:
         except (InvalidToken, ValueError):
             raise EngineError("link_expired", "link expired", 410)
         idx = index(d["b"])
-        p = root() / d["b"] / f"ch{int(d['c']):02d}.pdf"
+        en = d.get("g") == "en"
+        p = root() / d["b"] / f"ch{int(d['c']):02d}{'.en' if en else ''}.pdf"
         if not p.exists():
             raise EngineError("not_found", "no PDF for this chapter", 404)
-        title = next((c["title"] for c in idx["chapters"] if c["no"] == int(d["c"])), "")
-        name = f"{idx.get('title', '')}-第{int(d['c'])}章-{title}.pdf"
+        ch = next((c for c in idx["chapters"] if c["no"] == int(d["c"])), {})
+        if en:
+            name = f"{idx.get('title_en') or d['b']}-Chapter{int(d['c'])}-{ch.get('title_en', '')}.pdf".replace(":", " -")
+        else:
+            name = f"{idx.get('title', '')}-第{int(d['c'])}章-{ch.get('title', '')}.pdf"
         return FileResponse(p, media_type="application/pdf", filename=name)

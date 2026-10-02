@@ -21,10 +21,13 @@
 数据表:
   - 标题: ["表 1  零件转动（主动）", "Table 1  The part turns (active)"]
     表头: ["转角 θ", "R(θ) 第 1 列", "R(θ) 第 2 列", "P′ 手算 / m", "P′ 读数 / m", "P 到 O 的距离 / m"]
+    表头英文: ["Angle θ", "R(θ) column 1", "R(θ) column 2", "P′ by hand / m", "P′ read / m", "Distance P to O / m"]
     行: [["0°", "", "", "", "", ""], ["30°", "", "", "", "", ""], ["60°", "", "", "", "", ""], ["90°", "", "", "", "", ""], ["−45°", "", "", "", "", ""]]
   - 标题: ["表 2  坐标系转动（被动），θ = 30°", "Table 2  The frame turns (passive), θ = 30°"]
     表头: ["量", "手算", "读数", "与表 1 中 30° 一行比较"]
+    表头英文: ["Quantity", "By hand", "Read", "Compared with the 30° row of Table 1"]
     行: [["P 在 {b} 中的分量 / m", "", "", ""], ["所用矩阵", "R_abᵀ", "—", ""]]
+    行英文: [["Components of P in {b} / m", "", "", ""], ["Matrix used", "R_abᵀ", "—", ""]]
 注意:
   - ["转角的正方向是逆时针（从 z 轴正向往下看）。负的转角表示顺时针转动。", "Positive angles are counter-clockwise (seen from +z); negative angles turn clockwise."]
   - ["手算时保留 4 位小数，与界面读数相差在最后一位以内即可认为一致。", "Keep 4 decimals by hand; agreement within the last digit counts as equal."]

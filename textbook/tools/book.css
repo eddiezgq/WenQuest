@@ -11,6 +11,7 @@ h1 { font-size: 26px; margin: 8px 0 28px; padding-bottom: 10px; border-bottom: 2
 h2 { font-size: 20px; margin: 36px 0 14px; }
 h3 { font-size: 16.5px; margin: 28px 0 10px; }
 p { margin: 0 0 12px; text-align: justify; }
+[lang='en'] p, [lang='en'] li { hyphens: auto; }
 blockquote { margin: 12px 0; padding: 8px 16px; background: var(--tint); border-left: 3px solid var(--accent); }
 blockquote p:last-child { margin-bottom: 0; }
 strong { font-weight: 700; }

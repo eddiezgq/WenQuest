@@ -7,7 +7,7 @@ import math
 
 import numpy as np
 
-from bookout import COLORS, figure, style
+from bookout import COLORS, T, figure, style
 
 plt = style()
 C = COLORS
@@ -57,8 +57,8 @@ ax.text(0.08, 0.016, r"$\varphi$", fontsize=12)
 mid = phi + th / 2
 ax.text(0.125 * math.cos(mid), 0.125 * math.sin(mid), r"$\theta$", fontsize=12, color=C["accent"])
 ax.text(0.5 * xp - 0.035, 0.5 * yp + 0.01, "$r$", fontsize=12)
-ax.text(-0.33, -0.165, "转动前的零件（虚线）", fontsize=9, color=C["muted"])
-ax.text(-0.24, 0.24, "转动后的零件", fontsize=9, color=C["accent"])
+ax.text(-0.33, -0.165, T("转动前的零件（虚线）", "part before turning (dashed)"), fontsize=9, color=C["muted"])
+ax.text(-0.24, 0.24, T("转动后的零件", "part after turning"), fontsize=9, color=C["accent"])
 ax.set_xlim(-0.33, 0.37)
 ax.set_ylim(-0.26, 0.32)
 figure(fig, "fig4_1_1")
@@ -87,7 +87,8 @@ ax.text(-0.17, 0.33, r"$\theta$", fontsize=12)
 ax.text(c / 2 - 0.08, -0.09, r"$\cos\theta$", fontsize=10, color=C["muted"])
 ax.text(c + 0.02, s / 2 - 0.03, r"$\sin\theta$", fontsize=10, color=C["muted"])
 ax.text(-0.15, -0.12, "O", fontsize=12)
-ax.text(-0.15, -0.32, "旋转矩阵的第 1 列 = 转动后的 x 轴，第 2 列 = 转动后的 y 轴", fontsize=9.5, color=C["ink"])
+ax.text(-0.15, -0.32, T("旋转矩阵的第 1 列 = 转动后的 x 轴，第 2 列 = 转动后的 y 轴",
+                                "column 1 of the rotation matrix = the turned x axis; column 2 = the turned y axis"), fontsize=9.5, color=C["ink"])
 ax.set_xlim(-0.75, 1.35)
 ax.set_ylim(-0.38, 1.15)
 figure(fig, "fig4_1_2")
