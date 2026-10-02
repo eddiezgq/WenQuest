@@ -65,7 +65,7 @@ jobs:
           npm ci --no-audit --no-fund
           # 《机械设计》的有限元与疲劳程序调用数字工厂的 cae、sim（第 11 轮）：CalculiX、gmsh（要 libGLU 等）、pyLife
           sudo apt-get install -y -qq --no-install-recommends calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 > /dev/null
-          pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 jsonschema pytest httpx fastapi pydantic gmsh==4.15.2 pylife==2.3.1 paho-mqtt==2.1.0 trimesh==5.1.0
+          pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 jsonschema pytest httpx fastapi pydantic gmsh==4.15.2 pylife==2.3.1 paho-mqtt==2.1.0 trimesh==5.1.0 sympy
           python -m pytest -q tests 2>&1 | tee /tmp/pytest.log || { grep -E "^(FAILED|E  )" /tmp/pytest.log | head -20 | sed 's/^/::error::/'; exit 1; }
           for b in ../*/book.yaml; do b=$(basename "$(dirname "$b")"); echo "== $b"; python build.py "$b" --pdf --labs 2>&1 | tee /tmp/build.log || { grep "✗" /tmp/build.log | head -20 | sed "s/^/::error::$b /"; exit 1; }; done
       - name: Keep the built textbooks for the deploy
