@@ -1,0 +1,19 @@
+# 各章状态与英文标题（第 8 轮 2.1、2.2；本书第 13 轮）。
+# status：draft 草稿 / ai AI 审稿 / first 初审 / team 团队审阅 / final 定稿。没写的章不列。
+# title_en：有英文版的章必须写英文章名。
+parts_en:
+  导论: Introduction
+  第一篇 制造基础: "Part I  Fundamentals of Manufacturing"
+  第二篇 铸造: "Part II  Casting"
+  第三篇 塑性成形：锻造与冲压: "Part III  Metal Forming: Forging and Stamping"
+  第四篇 焊接与连接: "Part IV  Welding and Joining"
+  第五篇 聚合物与复合材料成形: "Part V  Processing of Polymers and Composites"
+  第六篇 粉末冶金与增材制造: "Part VI  Powder Metallurgy and Additive Manufacturing"
+  第七篇 切削原理与刀具: "Part VII  Metal Cutting and Cutting Tools"
+  第八篇 加工方法与机床: "Part VIII  Machining Processes and Machine Tools"
+  第九篇 数控技术与 CAM: "Part IX  Numerical Control and CAM"
+  第十篇 工艺规程、工装与装配: "Part X  Process Planning, Tooling and Assembly"
+  第十一篇 计量与质量: "Part XI  Metrology and Quality"
+  第十二篇 制造系统与智能制造: "Part XII  Manufacturing Systems and Smart Manufacturing"
+  第十三篇 综合项目: "Part XIII  Capstone Projects"
+chapters: {}
