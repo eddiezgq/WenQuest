@@ -1,0 +1,27 @@
+# 实验 2.5 的指导书与报告模板。目的、场景、参数、任务取自 lab2_5.js。
+原理:
+  - ["工具尖端在法兰坐标系中的位置 t、顶针在基座坐标系中的位置 c 未知。第 i 次接触时，法兰位置 pᵢ、转角 φᵢ 由控制器读出，满足", "The tool-tip position t (flange frame) and the pin position c (base frame) are unknown. At touch i the controller reads the flange position pᵢ and angle φᵢ, and"]
+  - 式: "R(φᵢ) t − c = −pᵢ ，  i = 1, …, N          (2.5.1)"
+  - ["N 次接触得到 2N 个方程、4 个未知数，叠成 Ax = b。有测量误差时方程互相矛盾，取使残差平方和 ‖b − Ax‖² 最小的 x，它满足正规方程", "N touches give 2N equations in 4 unknowns, Ax = b. With measurement error they contradict each other; take the x minimising ‖b − Ax‖², which satisfies the normal equations"]
+  - 式: "AᵀA x̂ = Aᵀ b          (2.5.4)"
+  - ["几何上，A x̂ 是 b 在 A 的值域上的正交投影，残差垂直于 A 的每一列。直线拟合 y = k m + b₀ 是同一个问题：残差之和为零，且与 m 不相关。", "Geometrically A x̂ is the orthogonal projection of b onto the range of A; the residual is perpendicular to every column. Fitting a line y = k m + b₀ is the same problem: the residuals sum to zero and are uncorrelated with m."]
+步骤:
+  - ["打开实验 2.5，场景“TCP 标定”。设测量误差 0、接触 2 次、范围 120°，按“接触并求解”，确认标定结果等于真值 t = (120, 35) mm（任务 1）。", "Open Lab 2.5, scene “TCP calibration”. With error 0, 2 touches and a 120° spread, press “Touch and solve” and confirm that t = (120, 35) mm is recovered exactly (task 1)."]
+  - ["设测量误差 0.5 mm、范围 120°，接触次数依次为 2、4、6、8，每种情况按 5 次“接触并求解”，记录 t 的误差，求平均，填入表 1。", "With 0.5 mm error and a 120° spread, use 2, 4, 6, 8 touches; press “Touch and solve” five times for each, record the error of t and average it in Table 1."]
+  - ["接触 5 次、误差 0.5 mm，范围依次为 20°、60°、120°、180°，同样记录平均误差，填入表 2。找出一种设置使误差小于 0.3 mm（任务 2）。", "With 5 touches and 0.5 mm error, use spreads of 20°, 60°, 120°, 180° and fill in Table 2. Find a setting whose error is below 0.3 mm (task 2)."]
+  - ["把范围设为 0°，按“接触并求解”，记录现象并解释。", "Set the spread to 0°, press “Touch and solve”, record what happens and explain it."]
+  - ["切换到场景“弹簧秤”。先拖动斜率和截距，凭眼睛把直线调好，记下残差平方和；再细调，使它不超过最小值的 1.1 倍（任务 3）。与读数栏中的最小二乘解比较。", "Switch to “Spring scale”. Drag the slope and intercept by eye and note the sum of squares; then refine it to within 1.1 times the minimum (task 3). Compare with the least-squares values shown."]
+数据表:
+  - 标题: ["表 1  接触次数与标定误差（误差 0.5 mm，范围 120°）", "Table 1  Number of touches and calibration error (0.5 mm error, 120° spread)"]
+    表头: ["N", "第 1～5 次 t 的误差 / mm", "平均 / mm", "残差均方根 / mm"]
+    表头英文: ["N", "Error of t, runs 1–5 / mm", "Mean / mm", "RMS residual / mm"]
+    行: [["2", "", "", ""], ["4", "", "", ""], ["6", "", "", ""], ["8", "", "", ""]]
+  - 标题: ["表 2  姿态范围与标定误差（N = 5，误差 0.5 mm）", "Table 2  Spread of poses and calibration error (N = 5, 0.5 mm error)"]
+    表头: ["范围", "第 1～5 次 t 的误差 / mm", "平均 / mm"]
+    表头英文: ["Spread", "Error of t, runs 1–5 / mm", "Mean / mm"]
+    行: [["20°", "", ""], ["60°", "", ""], ["120°", "", ""], ["180°", "", ""]]
+注意:
+  - ["每按一次“接触并求解”，就模拟一组新的随机误差；改变任何参数后序列从头开始，所以结果可以重复。", "Each press simulates a new set of random errors; changing any parameter restarts the sequence, so results are repeatable."]
+  - ["N = 2 时没有多余的方程，残差均方根总是零，但这不代表标定准确。", "With N = 2 there are no spare equations, so the RMS residual is always zero; that does not mean the calibration is accurate."]
+思考题:
+  - ["残差均方根与 t 的误差是不是一回事？只看残差能否判断标定得好不好？", "Is the RMS residual the same thing as the error of t? Can the residual alone tell you whether the calibration is good?"]

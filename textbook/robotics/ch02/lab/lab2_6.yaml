@@ -1,0 +1,25 @@
+# 实验 2.6 的指导书与报告模板。目的、场景、参数、任务取自 lab2_6.js。
+原理:
+  - ["平面 3R 臂的末端位置只有两个坐标，雅可比矩阵 J 是 2×3 矩阵。使末端速度为零的关节速度组成 J 的零空间 N(J)；末端能达到的速度组成 J 的值域 R(J)。", "The tip of a planar 3R arm has two coordinates, so its Jacobian J is 2×3. Joint speeds giving zero tip speed form the null space N(J); reachable tip velocities form the range R(J)."]
+  - 式: "rank J + dim N(J) = 3          (2.6.4)"
+  - ["一般形态下 rank J = 2，零空间是一维的：三个关节按方向 n 的比例转动，末端瞬时不动。连续地这样运动，就是自运动。手臂伸直时 rank J = 1，零空间变成二维，末端不能沿手臂方向运动。", "In a general configuration rank J = 2 and the null space is one-dimensional: turning the joints in the ratio n leaves the tip momentarily still; doing so continuously is self-motion. With the arm straight, rank J = 1, the null space is two-dimensional, and the tip cannot move along the arm."]
+  - 式: "θ̇ = J⁺ v + (I − J⁺J) z          (2.6.8)"
+步骤:
+  - ["打开实验 2.6，场景“平面 3R 臂”，d = 797 mm。把 θ₁ 从 30° 逐步调到 55°，每隔 5° 记录三个关节角、末端偏差、J 的秩和零空间方向，填入表 1。完成任务 1。", "Open Lab 2.6, scene “Planar 3R arm”, d = 797 mm. Move θ₁ from 30° to 55° in 5° steps; record the joint angles, tip error, rank and null-space direction in Table 1. Complete task 1."]
+  - ["找出 θ₁ 能调的最小值和最大值（超出时显示“够不到”），记入表 2。把 d 改为 850 mm、900 mm，重复。", "Find the smallest and largest θ₁ that still reach the target (beyond them “out of reach” appears) and enter them in Table 2. Repeat with d = 850 mm and 900 mm."]
+  - ["把 d 调到 917 mm（三段连杆长度之和），找出唯一能到达的 θ₁，读出秩（任务 2），解释零空间为什么变成二维。", "Set d = 917 mm (the sum of the three link lengths), find the only θ₁ that reaches, read the rank (task 2), and explain why the null space becomes two-dimensional."]
+  - ["切换到场景“手按桌面”，转动肩部，记录肘部高度的变化范围；把肘部抬到 0.20 m 以上（任务 3）。", "Switch to “Hand on the table”; turn the shoulder and record the range of elbow heights; lift the elbow to 0.20 m or more (task 3)."]
+数据表:
+  - 标题: ["表 1  自运动（d = 797 mm）", "Table 1  Self-motion (d = 797 mm)"]
+    表头: ["θ₁", "θ₂", "θ₃", "末端偏差 / mm", "rank J", "零空间方向 n"]
+    表头英文: ["θ₁", "θ₂", "θ₃", "Tip error / mm", "rank J", "Null-space direction n"]
+    行: [["30°", "", "", "", "", ""], ["35°", "", "", "", "", ""], ["40°", "", "", "", "", ""], ["45°", "", "", "", "", ""], ["50°", "", "", "", "", ""], ["55°", "", "", "", "", ""]]
+  - 标题: ["表 2  θ₁ 的可调范围", "Table 2  Range of θ₁"]
+    表头: ["d / mm", "θ₁ 最小值", "θ₁ 最大值", "范围宽度"]
+    表头英文: ["d / mm", "Smallest θ₁", "Largest θ₁", "Width of the range"]
+    行: [["797", "", "", ""], ["850", "", "", ""], ["900", "", "", ""], ["917", "", "", ""]]
+注意:
+  - ["程序始终选取 θ₃ < 0 的那一支解；另一支（θ₃ > 0）同样能到达目标，自运动曲线是另一条。", "The program always takes the branch with θ₃ < 0; the other branch (θ₃ > 0) also reaches the target along a different self-motion curve."]
+  - ["零空间方向 n 的符号不唯一，n 与 −n 表示同一条直线。", "The sign of n is arbitrary; n and −n span the same line."]
+思考题:
+  - ["自运动时，零空间方向 n 是否一直不变？为什么不能一直沿最初的 n 转动关节？", "Does n stay the same during self-motion? Why can't the joints just keep turning along the initial n?"]

@@ -1,0 +1,42 @@
+# 实验 7.1 的指导书与报告模板。目的、场景、参数、任务取自 lab7_1.js。
+原理:
+  - ["导数是瞬时变化率：差商 [x(t+h) − x(t)]/h 在 h → 0 时的极限（式 (7.1.1)）。物理定律给出的往往是变化率与量本身的关系，即微分方程。",
+     "The derivative is the instantaneous rate of change: the limit of the difference quotient [x(t+h) − x(t)]/h as h → 0 (Eq. (7.1.1)). Physical laws usually relate a rate of change to the quantity itself: a differential equation."]
+  - ["忽略电感时，关节电机的转速满足一阶方程，阶跃电压下的解为指数曲线：", "Neglecting inductance, the motor speed obeys a first-order equation; for a step voltage the solution is an exponential:"]
+  - 式: "τ ω̇ + ω = K u,  τ = J_m R/(Rb + K_t K_e),  ω(t) = Ku (1 − e^(−t/τ))          (7.1.4), (7.1.6)"
+  - ["t = τ 时转速达到最终值的 1 − e⁻¹ ≈ 63.2%，t = 3τ 时约 95%。", "At t = τ the speed reaches 1 − e⁻¹ ≈ 63.2% of its final value, at t = 3τ about 95%."]
+  - ["连杆是二阶方程。取状态 x = (θ, θ̇)，写成一阶方程组 ẋ = f(x)（式 (7.1.11)）。状态在相平面上画出的曲线称为轨线；无摩擦时轨线就是能量 (7.1.16) 的等值线。",
+     "The link obeys a second-order equation. With the state x = (θ, θ̇) it becomes a first-order system ẋ = f(x) (Eq. (7.1.11)). The state traces a trajectory in the phase plane; without friction the trajectories are the level curves of the energy (7.1.16)."]
+  - 式: "θ̈ = −ω_n² sin θ − (b/J_o) θ̇,  ω_n² = 3𝔤/(2L)          (7.1.9), (7.1.11)"
+  - ["θ = 0 是稳定平衡点（线性化的特征值 ±iω_n），θ = π 是不稳定平衡点（特征值 ±ω_n）。小摆幅周期 T₀ = 2π/ω_n；摆幅越大周期越长，从水平位置释放时 T = 1.367 s。",
+     "θ = 0 is a stable equilibrium (linearized eigenvalues ±iω_n), θ = π an unstable one (±ω_n). The small-swing period is T₀ = 2π/ω_n; larger swings take longer, 1.367 s from the horizontal."]
+步骤:
+  - ["场景“关节电机的阶跃响应”：u = 12 V、J_m = 4×10⁻⁵ kg·m²，按“开始”。读出公式给出的 τ 和测得的 63.2% 时刻，记入表 1（任务 1）。",
+     "Scene “Step response of a joint motor”: u = 12 V, J_m = 4×10⁻⁵ kg·m², press Start. Record τ from the formula and the measured time to 63.2% in Table 1 (task 1)."]
+  - ["保持 u 不变，把 J_m 改为 8 和 16（×10⁻⁵ kg·m²），重复。再把 u 改为 24 V。说明 τ 与 J_m、u 的关系。",
+     "Keep u and set J_m to 8 and 16 (×10⁻⁵ kg·m²); repeat. Then set u to 24 V. State how τ depends on J_m and on u."]
+  - ["场景“自由摆动的连杆”：θ₀ = 90°、摩擦为 0，按“开始”，读出测得的周期（任务 2）。再取 θ₀ = 10°、45°、135°，把周期记入表 2。",
+     "Scene “A freely swinging link”: θ₀ = 90°, no friction, Start; read the measured period (task 2). Repeat with θ₀ = 10°, 45°, 135°; record in Table 2."]
+  - ["把摩擦调到 1.0 1/s，看轨线怎样盘旋进原点（任务 3）。由线性化求特征值的实部，与轨线衰减的快慢对照。",
+     "Set the friction to 1.0 1/s and watch the trajectory spiral into the origin (task 3). Compare the real part of the linearized eigenvalues with how fast it decays."]
+  - ["摩擦为 0，θ₀ 取 175° 以上（任务 4）：观察状态点在分界线附近、θ = ±π 处“停留”。",
+     "No friction, θ₀ at 175° or more (task 4): watch the state point linger near the separatrix at θ = ±π."]
+  - ["场景“荡秋千”：绳长 2.5 m，摆幅 10° 和 70° 各测一次周期（任务 5），记入表 2。",
+     "Scene “A playground swing”: rope 2.5 m; measure the period for 10° and 70° (task 5); record in Table 2."]
+数据表:
+  - 标题: ["表 1  电机的时间常数", "Table 1  Time constant of the motor"]
+    表头: ["u / V", "J_m / (10⁻⁵ kg·m²)", "τ（公式）/ ms", "63.2% 时刻（测得）/ ms", "相对差 / %"]
+    表头英文: ["u / V", "J_m / (10⁻⁵ kg·m²)", "τ (formula) / ms", "time to 63.2% (measured) / ms", "difference / %"]
+    行: [["12", "4", "", "", ""], ["12", "8", "", "", ""], ["12", "16", "", "", ""], ["24", "4", "", "", ""]]
+  - 标题: ["表 2  摆幅与周期", "Table 2  Amplitude and period"]
+    表头: ["对象", "θ₀ / (°)", "小摆幅周期 T₀ / s", "测得的周期 T / s", "T / T₀"]
+    表头英文: ["Object", "θ₀ / (°)", "small-swing period T₀ / s", "measured period T / s", "T / T₀"]
+    行: [["连杆", "10", "", "", ""], ["连杆", "45", "", "", ""], ["连杆", "90", "", "", ""], ["连杆", "135", "", "", ""], ["秋千", "10", "", "", ""], ["秋千", "70", "", "", ""]]
+    行英文: [["link", "10", "", "", ""], ["link", "45", "", "", ""], ["link", "90", "", "", ""], ["link", "135", "", "", ""], ["swing", "10", "", "", ""], ["swing", "70", "", "", ""]]
+注意:
+  - ["电机场景的时间放慢了 30 倍显示，读数按真实时间给出。", "The motor scene runs 30 times slower than real time; the readings are in real time."]
+  - ["周期按“连续两次到达左端”的时间间隔测量，第一次读数要等连杆摆完一个多周期。", "The period is measured between two successive arrivals at the left end; the first reading appears after a little more than one period."]
+  - ["相平面中角度按 (−π, π] 显示，连杆越过顶点时轨线从一边跳到另一边，这不是跳变，而是同一个角度的两种写法。", "Angles are shown in (−π, π]; when the link goes over the top the trajectory jumps from one side to the other. This is not a jump in the motion, only two names for one angle."]
+思考题:
+  - ["电压加倍，时间常数变不变？转动惯量加倍呢？用式 (7.1.4) 解释。", "Doubling the voltage: does the time constant change? Doubling the inertia? Explain with Eq. (7.1.4)."]
+  - ["从 179° 释放，周期大约是多少？摆幅趋于 180° 时周期趋于什么？", "Released from 179°, what is the period roughly? What does it tend to as the amplitude tends to 180°?"]

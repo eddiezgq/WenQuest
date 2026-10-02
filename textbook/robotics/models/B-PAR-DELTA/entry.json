@@ -1,0 +1,398 @@
+{
+ "schema": 1,
+ "id": "B-PAR-DELTA",
+ "kind": "robot",
+ "name": {
+  "zh": "Delta 并联机器人（问渠）",
+  "en": "Delta parallel robot (WenQuest)"
+ },
+ "category": "PAR",
+ "tags": [
+  "Delta",
+  "并联机器人",
+  "蜘蛛手",
+  "分拣",
+  "自建",
+  "parallel"
+ ],
+ "standards": [],
+ "params": [
+  {
+   "key": "base_radius_m",
+   "zh": "静平台半径",
+   "en": "Base radius",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "platform_radius_m",
+   "zh": "动平台半径",
+   "en": "Platform radius",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "upper_arm_m",
+   "zh": "主动臂长",
+   "en": "Upper arm length",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "lower_arm_m",
+   "zh": "从动臂长",
+   "en": "Lower arm length",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "parallelogram_width_m",
+   "zh": "平行四边形宽",
+   "en": "Parallelogram width",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "rod_radius_m",
+   "zh": "杆半径",
+   "en": "Rod radius",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "path_radius_m",
+   "zh": "演示轨迹半径",
+   "en": "Demo path radius",
+   "role": "key",
+   "unit": "m"
+  },
+  {
+   "key": "path_z_m",
+   "zh": "演示轨迹高度",
+   "en": "Demo path height",
+   "role": "key",
+   "unit": "m"
+  }
+ ],
+ "defaults": {
+  "base_radius_m": 0.15,
+  "platform_radius_m": 0.04,
+  "upper_arm_m": 0.22,
+  "lower_arm_m": 0.5,
+  "parallelogram_width_m": 0.06,
+  "rod_radius_m": 0.008,
+  "path_radius_m": 0.12,
+  "path_z_m": -0.42
+ },
+ "ranges": {
+  "upper_arm_m": [
+   0.12,
+   0.4
+  ],
+  "lower_arm_m": [
+   0.3,
+   0.9
+  ],
+  "path_z_m": [
+   -0.6,
+   -0.3
+  ]
+ },
+ "model": {
+  "engine": "wqrobot:delta",
+  "formats": [
+   "glb"
+  ],
+  "origin": "基座/车体坐标系（Z 向上）；每个连杆（构件）一个节点",
+  "note": "参数化自建模型：改参数可重新生成"
+ },
+ "robot": {
+  "type": "delta",
+  "dof": 3,
+  "links": [
+   {
+    "name": "base",
+    "node": "base",
+    "mass_kg": null
+   },
+   {
+    "name": "upper1",
+    "node": "upper1",
+    "mass_kg": null
+   },
+   {
+    "name": "upper2",
+    "node": "upper2",
+    "mass_kg": null
+   },
+   {
+    "name": "upper3",
+    "node": "upper3",
+    "mass_kg": null
+   },
+   {
+    "name": "lower1",
+    "node": "lower1",
+    "mass_kg": null
+   },
+   {
+    "name": "lower2",
+    "node": "lower2",
+    "mass_kg": null
+   },
+   {
+    "name": "lower3",
+    "node": "lower3",
+    "mass_kg": null
+   },
+   {
+    "name": "platform",
+    "node": "platform",
+    "mass_kg": null
+   }
+  ],
+  "joints": [
+   {
+    "name": "J1",
+    "type": "revolute",
+    "parent": "base",
+    "child": "upper1",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.15,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -0.698132,
+     "upper": 1.570796,
+     "velocity": 10.471976
+    }
+   },
+   {
+    "name": "J2",
+    "type": "revolute",
+    "parent": "base",
+    "child": "upper2",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.075,
+      0.129904,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      2.094395
+     ]
+    },
+    "limit": {
+     "lower": -0.698132,
+     "upper": 1.570796,
+     "velocity": 10.471976
+    }
+   },
+   {
+    "name": "J3",
+    "type": "revolute",
+    "parent": "base",
+    "child": "upper3",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.075,
+      -0.129904,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      4.18879
+     ]
+    },
+    "limit": {
+     "lower": -0.698132,
+     "upper": 1.570796,
+     "velocity": 10.471976
+    }
+   }
+  ],
+  "rest": {
+   "J1": 0.187523,
+   "J2": 0.187523,
+   "J3": 0.187523
+  },
+  "rest_source": "动平台在工作区中心（z = -0.42 m）",
+  "parallel": {
+   "type": "delta",
+   "actuated": [
+    "J1",
+    "J2",
+    "J3"
+   ],
+   "params": {
+    "base_radius_m": 0.15,
+    "platform_radius_m": 0.04,
+    "upper_arm_m": 0.22,
+    "lower_arm_m": 0.5
+   },
+   "note": "闭链：只拖主动臂不能保持闭合；看运动请用运动表（motion.csv），或按 params 自己算逆运动学"
+  }
+ },
+ "source": {
+  "origin": "wenquest",
+  "license": "Apache-2.0",
+  "attribution": "问渠零件库（参数化生成器 generators/b_wq.py）",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-09-30",
+   "note": "自建；运动学由测试核对"
+  }
+ },
+ "teaching": {
+  "principle": "三条相同的支链把动平台连到静平台，每条支链的从动臂是平行四边形，所以动平台只能平移不能转动；三个电机都装在静平台上，运动部分很轻，适合高速分拣。",
+  "uses": [
+   "食品、药品高速分拣",
+   "包装",
+   "3D 打印"
+  ],
+  "courses": [
+   {
+    "course": "机器人技术",
+    "chapter": "并联机器人与逆运动学"
+   }
+  ],
+  "labs": []
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "version": "2026.10.9",
+ "package": "https://github.com/eddiezgq/WenQuest/blob/main/library/generators/b_wq.py",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {
+    "base_radius_m": 0.15,
+    "platform_radius_m": 0.04,
+    "upper_arm_m": 0.22,
+    "lower_arm_m": 0.5,
+    "parallelogram_width_m": 0.06,
+    "rod_radius_m": 0.008,
+    "path_radius_m": 0.12,
+    "path_z_m": -0.42
+   },
+   "files": {
+    "glb": "B-PAR-DELTA/default.glb",
+    "png": "B-PAR-DELTA/default.png",
+    "motion": "B-PAR-DELTA/motion.csv"
+   }
+  }
+ ],
+ "mechanism": {
+  "dof": 3,
+  "members": [
+   {
+    "id": "base",
+    "name": {
+     "zh": "静平台（机架）",
+     "en": "Base (ground)"
+    },
+    "node": "base",
+    "ground": true
+   },
+   {
+    "id": "upper1",
+    "name": {
+     "zh": "主动臂 1",
+     "en": "Upper arm 1"
+    },
+    "node": "upper1"
+   },
+   {
+    "id": "upper2",
+    "name": {
+     "zh": "主动臂 2",
+     "en": "Upper arm 2"
+    },
+    "node": "upper2"
+   },
+   {
+    "id": "upper3",
+    "name": {
+     "zh": "主动臂 3",
+     "en": "Upper arm 3"
+    },
+    "node": "upper3"
+   },
+   {
+    "id": "lower1",
+    "name": {
+     "zh": "从动臂 1（平行四边形）",
+     "en": "Lower arm 1 (parallelogram)"
+    },
+    "node": "lower1"
+   },
+   {
+    "id": "lower2",
+    "name": {
+     "zh": "从动臂 2（平行四边形）",
+     "en": "Lower arm 2 (parallelogram)"
+    },
+    "node": "lower2"
+   },
+   {
+    "id": "lower3",
+    "name": {
+     "zh": "从动臂 3（平行四边形）",
+     "en": "Lower arm 3 (parallelogram)"
+    },
+    "node": "lower3"
+   },
+   {
+    "id": "platform",
+    "name": {
+     "zh": "动平台",
+     "en": "Moving platform"
+    },
+    "node": "platform"
+   }
+  ],
+  "input": {
+   "member": "platform",
+   "type": "path",
+   "unit": "deg",
+   "range": [
+    0,
+    355
+   ],
+   "step": 5,
+   "path": {
+    "zh": "动平台沿水平圆走一圈：半径 0.12 m，高度 z = -0.42 m",
+    "en": "Platform traces a horizontal circle, r = 0.12 m at z = -0.42 m"
+   }
+  },
+  "motion": "motion.csv"
+ }
+}

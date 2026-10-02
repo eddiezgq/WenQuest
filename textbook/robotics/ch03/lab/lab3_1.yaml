@@ -1,0 +1,34 @@
+# 实验 3.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_1.js。
+原理:
+  - ["矢量是一支箭头，有大小和方向，与坐标系无关。取定直角坐标系 {a} 以后，矢量可以唯一地分解为沿三根坐标轴的三段，三段的有向长度就是它在 {a} 中的分量，记作 d_a。",
+     "A vector is an arrow with a length and a direction; it does not depend on any frame. Once a Cartesian frame {a} is chosen, the vector splits uniquely into three pieces along the axes; their signed lengths are its components in {a}, written d_a."]
+  - 式: "d₁ = |d| cos α₁,   d₂ = |d| cos α₂,   d₃ = |d| cos α₃          (3.1.5)"
+  - ["分量是箭头在坐标轴上的投影。坐标系 {b} 相对 {a} 绕 z 轴转过 β 时，箭头与 x_b 轴的夹角是 φ − β（φ 为箭头与 x_a 轴的夹角），所以 d 在 {b} 中的分量为 (|d| cos(φ − β), |d| sin(φ − β))。",
+     "Components are projections of the arrow on the axes. If frame {b} is turned by β about z from {a}, the arrow makes the angle φ − β with x_b (φ is its angle to x_a), so its components in {b} are (|d| cos(φ − β), |d| sin(φ − β))."]
+  - 式: "|d| = √(d₁² + d₂² + d₃²)，在任何直角坐标系中算出的值都相同          (3.1.4)"
+步骤:
+  - ["打开实验 3.1，选择场景“相机与机械臂”。保持 |d| = 0.36 m、φ = 34°，把 β 调到 0°，记下两套分量，确认它们相同。",
+     "Open Lab 3.1, scene “Camera and arm”. Keep |d| = 0.36 m and φ = 34°, set β = 0°, record both sets of components and confirm they agree."]
+  - ["依次把 β 调到 30°、60°、90°、150°、−60°，把 d 在 {b} 中的分量和由它算出的长度填入表 1；先用原理中的公式手算一次，再与读数比较。",
+     "Set β to 30°, 60°, 90°, 150°, −60° in turn. Enter the components in {b} and the length computed from them in Table 1; compute them by hand first, then compare."]
+  - ["完成任务 1～3：分别找出使 {b} 的 x 轴对准箭头、两个分量相等、y 轴与箭头反向的 β，填入表 2，并写出 β 与 φ 的关系。",
+     "Do tasks 1–3: find β for which x_b points along the arrow, the two components are equal, and y_b points against the arrow. Enter them in Table 2 with the relation between β and φ."]
+  - ["切换到场景“导航地图”。先在 β = 0° 时读出目的地在 {a}（东、北）中的分量；再设汽车朝正东行驶、地图车头朝上，即 β = −90°（任务 4），读出目的地在 {b} 中的分量，说出它在车的前方和左侧各多远，比较两种读法算出的距离。",
+     "Switch to “Navigation map”. At β = 0° read the destination in {a} (east, north). Then let the car head east with a heading-up map, β = −90° (task 4); read the destination in {b}, say how far ahead and how far to the left it is, and compare the distances."]
+数据表:
+  - 标题: ["表 1  转动 {b}：分量在变，长度不变（|d| = 0.36 m，φ = 34°）", "Table 1  Turning {b}: components change, length does not (|d| = 0.36 m, φ = 34°)"]
+    表头: ["β", "d_b 手算 / m", "d_b 读数 / m", "由 d_b 算的长度 / m"]
+    表头英文: ["β", "d_b by hand / m", "d_b read / m", "Length from d_b / m"]
+    行: [["30°", "", "", ""], ["60°", "", "", ""], ["90°", "", "", ""], ["150°", "", "", ""], ["−60°", "", "", ""]]
+  - 标题: ["表 2  特殊位置", "Table 2  Special settings"]
+    表头: ["任务", "β", "d_b / m", "β 与 φ 的关系"]
+    表头英文: ["Task", "β", "d_b / m", "Relation between β and φ"]
+    行: [["1  x 轴对准箭头", "", "", ""], ["2  两分量相等", "", "", ""], ["3  y 轴与箭头反向", "", "", ""]]
+    行英文: [["1  x axis along the arrow", "", "", ""], ["2  equal components", "", "", ""], ["3  y axis against the arrow", "", "", ""]]
+注意:
+  - ["转角以逆时针为正（从 z 轴正向往下看）。", "Angles are positive counter-clockwise (seen from +z)."]
+  - ["箭头本身在转动 {b} 时始终不动；变的只是读数。记录时写清楚是哪一个坐标系中的分量。", "The arrow never moves when {b} turns; only the readings change. Always note which frame a set of components belongs to."]
+  - ["手算保留 4 位小数，与读数相差在最后一位以内即可认为一致。", "Keep 4 decimals by hand; agreement within the last digit counts as equal."]
+思考题:
+  - ["若把 φ 和 β 同时增加同一个角度，d_b 会变吗？用“箭头与坐标系一起转动”解释。", "If φ and β grow by the same angle, does d_b change? Explain with “the arrow and the frame turn together”."]
+  - ["在什么情况下，同一支箭头在两个坐标系中的分量相同？", "When does one arrow have the same components in two frames?"]

@@ -10,6 +10,22 @@ parts_en:
   第五篇 控制篇: "Part V  Control"
   第六篇 编程与 AI 篇: "Part VI  Programming and AI"
 chapters:
+  1:
+    status: ai
+  2:
+    status: ai
+  3:
+    status: ai
+  5:
+    status: ai
+  6:
+    status: ai
+  7:
+    status: ai
+  8:
+    status: ai
+  9:
+    status: ai
   4:
     status: first
     title_en: "Rotation of Rigid Bodies: From Euler to Quaternions"

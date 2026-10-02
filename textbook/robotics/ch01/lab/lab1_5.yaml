@@ -1,0 +1,36 @@
+# 实验 1.5 的指导书与报告模板。目的、场景、参数、任务取自 lab1_5.js。
+原理:
+  - ["数字工厂车间的布置、设备上下料点和 AGV 路线规则与工厂仿真相同：AGV 从起点的上下料点驶入最近的主通道，沿通道走到终点所在位置，必要时经左侧纵向通道换道，再驶入终点的上下料点。",
+     "The workshop layout, the machines' docking points and the AGV routing rule are those of the factory simulation: from the start dock into the nearest main aisle, along it (changing aisles via the left cross aisle if needed), then into the goal dock."]
+  - ["一次搬运的时间等于行驶时间加装、卸各一次：", "One move takes the driving time plus one loading and one unloading:"]
+  - 式: "t = L / v + 2 t_装卸          (1.5.1)"
+  - ["输出轴 SH-301 的七道工序在七台不同的设备上完成，最后送入成品库，共搬运七次（表 1.5.1）。", "The seven operations of output shaft SH-301 are on seven machines, then it goes to the finished store: seven moves (Table 1.5.1)."]
+  - ["实验中仿真时钟比真实时间快：单次行驶快 40 倍，“SH-301 全程”快 80 倍；界面显示的时间是仿真时间。", "The simulated clock runs faster than real time: 40 times for one move, 80 times for the whole SH-301 route; the times shown are simulated."]
+步骤:
+  - ["打开实验 1.5，场景“数字工厂车间”。三维车间中每台设备上方标有编号。起点取 1（带锯床），终点取 2（数控车床 A）（任务 1），记录路线长度和一次搬运的时间，与表 1.5.1 第 1 行比较。按“行驶”观察 AGV 的运动。",
+     "Open Lab 1.5, scene “Digital factory workshop”. Each machine has its number above it. Set From = 1 (saw) and To = 2 (lathe A) (task 1); record the route length and the time of one move and compare with row 1 of Table 1.5.1. Press Drive and watch."]
+  - ["按表 1.5.1 依次设置其余六次搬运的起点和终点（2→5，5→3，3→4，4→6，6→7，7→13），记录路线长度，填入表 1。",
+     "Set the other six moves of Table 1.5.1 (2→5, 5→3, 3→4, 4→6, 6→7, 7→13) and record their lengths in Table 1."]
+  - ["车速 1.0 m/s、装卸 30 s，按“SH-301 全程”（任务 2），记录总路程、总时间和其中的装卸时间。", "With 1.0 m/s and 30 s, press “Whole SH-301 route” (task 2); record total distance, total time and the loading part."]
+  - ["把装卸时间改为 15 s 再跑一遍（任务 3）；再把装卸时间恢复为 30 s、车速改为 1.5 m/s 跑一遍。比较两种改进的效果，填入表 2。",
+     "Set the loading time to 15 s and run again (task 3); then back to 30 s with 1.5 m/s. Compare the two improvements in Table 2."]
+  - ["切换到生活场景“医院送药”，从药房（0）送药到任一病房（任务 4），记录路线长度和时间。", "Switch to “Hospital delivery” and deliver from the pharmacy (0) to a ward (task 4); record the length and time."]
+数据表:
+  - 标题: ["表 1  SH-301 的七次搬运", "Table 1  The seven moves of SH-301"]
+    表头: ["次序", "起点 → 终点（编号）", "路线长度 L / m", "一次搬运时间 t / s", "与表 1.5.1 的差别"]
+    表头英文: ["Move", "From → to (numbers)", "Route length L / m", "Time t / s", "Difference from Table 1.5.1"]
+    行: [["1", "1 → 2", "", "", ""], ["2", "2 → 5", "", "", ""], ["3", "5 → 3", "", "", ""], ["4", "3 → 4", "", "", ""],
+         ["5", "4 → 6", "", "", ""], ["6", "6 → 7", "", "", ""], ["7", "7 → 13", "", "", ""], ["合计", "", "", "", ""]]
+    行英文: [["1", "1 → 2", "", "", ""], ["2", "2 → 5", "", "", ""], ["3", "5 → 3", "", "", ""], ["4", "3 → 4", "", "", ""],
+             ["5", "4 → 6", "", "", ""], ["6", "6 → 7", "", "", ""], ["7", "7 → 13", "", "", ""], ["Total", "", "", "", ""]]
+  - 标题: ["表 2  两种改进的比较", "Table 2  Two improvements compared"]
+    表头: ["方案", "车速 v / (m/s)", "装卸 / s", "全程时间 / min", "比原方案节省 / min"]
+    表头英文: ["Option", "Speed v / (m/s)", "Loading / s", "Whole route / min", "Saved / min"]
+    行: [["原方案", "1.0", "30", "", "—"], ["缩短装卸", "1.0", "15", "", ""], ["提高车速", "1.5", "30", "", ""]]
+    行英文: [["Baseline", "1.0", "30", "", "—"], ["Quicker hand-over", "1.0", "15", "", ""], ["Faster AGV", "1.5", "30", "", ""]]
+注意:
+  - ["起点与终点相同时不行驶。", "Nothing moves when From equals To."]
+  - ["行驶中改变滑块，本次行驶按开始时的车速和装卸时间继续；按“重置”重新开始。", "Changing sliders while driving keeps the speed and loading time of this run; press Reset to start over."]
+  - ["鼠标拖动可以旋转视角，滚轮缩放。", "Drag with the mouse to rotate the view; scroll to zoom."]
+思考题:
+  - ["一台减速器共需搬运 56 次（算例 1.5.2）。若每班生产 4 台，两台 AGV 每班有多少时间在搬运？还剩多少余量？", "One reducer needs 56 moves (Example 1.5.2). At 4 reducers per shift, how long do the two AGVs spend moving each shift, and how much margin is left?"]

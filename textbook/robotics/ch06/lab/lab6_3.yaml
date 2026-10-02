@@ -1,0 +1,31 @@
+# 实验 6.3 的指导书与报告模板。目的、场景、参数、任务取自 lab6_3.js。
+原理:
+  - ["刚体的速度由运动旋量 V = (ω, v) 完全确定：刚体上（或想象中与刚体固连的）任一点 x 的速度为 v + ω × x，v 是此刻位于原点的那一点的速度（式 (6.3.2)）。",
+     "A twist V = (ω, v) fixes the whole velocity field: a point x of the body (or rigidly attached to it) moves at v + ω × x, where v is the velocity of the body point now at the origin (Eq. (6.3.2))."]
+  - ["ω ≠ 0 时，存在一根直线，其上各点的速度都与 ω 平行，这就是瞬时螺旋轴；它过点 q = ω × v / |ω|²，节距 h = ω · v / |ω|²（式 (6.3.11)、(6.3.12)）。",
+     "If ω ≠ 0 there is a line on which every velocity is parallel to ω, the instantaneous screw axis, through q = ω × v / |ω|², with pitch h = ω · v / |ω|² (Eqs. (6.3.11), (6.3.12))."]
+  - 式: "平面情形：ω = ω ẑ，v = (v_x, v_y, 0)，h = 0，q = (−v_y/ω, v_x/ω)"
+  - ["平面运动中节距总为零，瞬时螺旋轴垂直于平面，它与平面的交点就是速度为零的瞬心。ω = 0 时是纯平移，瞬心在无穷远。",
+     "In planar motion the pitch is always zero; the axis is normal to the plane and meets it at the instantaneous centre, where the velocity vanishes. With ω = 0 the motion is a pure translation and the centre is at infinity."]
+步骤:
+  - ["打开实验 6.3，场景“差速 AGV 转弯”。改变 ω、v_x，观察橙色速度箭头和红色瞬心的位置。按“运动 3 s”，看 AGV 沿以瞬心为圆心的圆弧运动。",
+     "Open Lab 6.3, scene “Differential AGV turning”. Vary ω and v_x and watch the orange velocity arrows and the red centre. Press “Move for 3 s” and see the AGV travel on an arc about the centre."]
+  - ["用式 (6.3.12) 手算：要让瞬心在 (0, 1.0) m，v_x 与 ω 应满足什么关系？在界面中验证（任务 1），记入表 1。",
+     "Use Eq. (6.3.12): for the centre at (0, 1.0) m, how must v_x relate to ω? Check it (task 1); Table 1."]
+  - ["令 v_x = v_y = 0、ω ≠ 0（任务 2）；再令 ω = 0、v_x ≠ 0（任务 3）。记录瞬心的位置并解释。",
+     "Set v_x = v_y = 0 with ω ≠ 0 (task 2), then ω = 0 with v_x ≠ 0 (task 3). Record and explain the centre."]
+  - ["在“差速 AGV 转弯”中读出左轮的速度，与 v_x − 0.2ω 比较，说明差速 AGV 怎样用两轮的速度差实现转弯。",
+     "Read the left-wheel velocity in the AGV scene and compare with v_x − 0.2ω; explain how a differential AGV turns by the difference of its wheel speeds."]
+  - ["切换到“滚动的车轮”，找出使接触点速度为零的 ω（任务 4）。记录轮顶点 (0, 0.3) 的速度，说明它为什么是轮心速度的两倍。",
+     "Switch to “A rolling wheel” and find the ω that stops the contact point (task 4). Note the velocity of the top point (0, 0.3) and explain why it is twice the hub's."]
+数据表:
+  - 标题: ["表 1  运动旋量与瞬心", "Table 1  Twists and instantaneous centres"]
+    表头: ["场景", "ω / (rad/s)", "v_x / (m/s)", "v_y / (m/s)", "手算的瞬心 / m", "界面读出的瞬心 / m"]
+    表头英文: ["Scene", "ω / (rad/s)", "v_x / (m/s)", "v_y / (m/s)", "Centre by hand / m", "Centre read / m"]
+    行: [["AGV 转弯", "", "", "0", "(0, 1.0)", ""], ["AGV 原地转向", "", "0", "0", "", ""], ["AGV 直行", "0", "", "0", "", ""], ["车轮滚动", "", "0.6", "0", "(0, −0.3)", ""]]
+    行英文: [["AGV turning", "", "", "0", "(0, 1.0)", ""], ["AGV spinning", "", "0", "0", "", ""], ["AGV straight", "0", "", "0", "", ""], ["Rolling wheel", "", "0.6", "0", "(0, −0.3)", ""]]
+注意:
+  - ["v 是“此刻位于原点的那一点”的速度，不一定是某个看得见的部件的速度；把原点换到别处，v 就会改变，ω 不变。", "v is the velocity of the body point that is at the origin right now, not necessarily of a visible part; moving the origin changes v but not ω."]
+  - ["ω 逆时针为正。", "ω is positive anticlockwise."]
+思考题:
+  - ["在三维中，一个运动旋量的节距不为零时，还有没有速度为零的点？为什么？", "In 3D, when the pitch is not zero, is there any point with zero velocity? Why?"]

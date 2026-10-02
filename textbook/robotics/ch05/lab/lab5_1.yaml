@@ -1,0 +1,34 @@
+# 实验 5.1 的指导书与报告模板。目的、场景、参数、任务取自 lab5_1.js。
+原理:
+  - ["同一个点 Q，从地图原点量起和从 AGV 中心量起，是两支不同的箭头。它们与“地图原点到 AGV 中心”的箭头构成三角形，矢量等式与坐标系无关。",
+     "The same point Q seen from the map origin and from the AGV centre gives two different arrows; with the arrow from the map origin to the AGV they close a triangle, independent of any frame."]
+  - 式: "q_m = R_mv q_v + p_mv ，  q_v = R_mvᵀ (q_m − p_mv)          (5.1.2)、(5.1.3)"
+  - ["R_mv 是 AGV 坐标系相对地图的姿态（平面情形为转角 ψ 的 2×2 旋转矩阵），p_mv 是 AGV 中心在地图中的位置。先减去原点之间的平移，再乘以 R_mvᵀ。",
+     "R_mv is the AGV frame's orientation in the map (a 2×2 rotation by ψ), p_mv the AGV centre in the map. Subtract the offset first, then multiply by R_mvᵀ."]
+  - ["速度、方向是自由矢量，只按旋转矩阵变换：v_m = R_mv v_v，不加平移。", "Velocities and directions are free vectors: v_m = R_mv v_v, with no offset."]
+步骤:
+  - ["打开实验 5.1，场景“AGV 与货架工位”。把 AGV 调到 (12.0, 5.0) m、航向 30°（任务 1），记下 Q 在 {v} 中的坐标，与算例 5.1.2 比较，填入表 1。",
+     "Open Lab 5.1, scene “AGV and shelf station”. Set the AGV to (12.0, 5.0) m, heading 30° (task 1); record Q in {v}, compare with Example 5.1.2, and fill Table 1."]
+  - ["保持位置不变，把航向依次调到 0°、90°、−90°，记录 Q 在 {v} 中的坐标和距离。验证距离不变，并用式 (5.1.3) 手算其中一行。",
+     "Keep the position; set the heading to 0°, 90°, −90°; record Q in {v} and the distance. Check the distance stays the same and compute one row by hand with Eq. (5.1.3)."]
+  - ["调整 AGV，使 Q 恰在车头正前方 2 m（任务 2）。记录此时 AGV 的位置和航向，说明这样的停车位姿是否唯一。",
+     "Move the AGV so that Q is exactly 2 m straight ahead (task 2). Record the pose and say whether it is unique."]
+  - ["记录“1 m/s 前进”的速度在 {m} 中的分量，验证它等于 (cos ψ, sin ψ)，与 AGV 的位置无关。",
+     "Record the 1 m/s forward velocity in {m}; check it equals (cos ψ, sin ψ) whatever the position."]
+  - ["切换到场景“博物馆里的游客”，让展品恰在游客正左方（任务 3），记录游客的位置和朝向。",
+     "Switch to “A visitor in a museum” and make the exhibit lie exactly to the visitor's left (task 3); record the pose."]
+数据表:
+  - 标题: ["表 1  Q 在 AGV 坐标系中的坐标（AGV 位于 (12.0, 5.0) m）", "Table 1  Q in the AGV frame (AGV at (12.0, 5.0) m)"]
+    表头: ["航向 ψ", "q_v 手算 / m", "q_v 读数 / m", "距离 / m"]
+    表头英文: ["Heading ψ", "q_v by hand / m", "q_v read / m", "Distance / m"]
+    行: [["30°", "", "", ""], ["0°", "", "", ""], ["90°", "", "", ""], ["−90°", "", "", ""]]
+  - 标题: ["表 2  使 Q 在正前方 2 m 的停车位姿", "Table 2  A pose that puts Q 2 m straight ahead"]
+    表头: ["x / m", "y / m", "ψ / °", "q_v / m", "是否唯一"]
+    表头英文: ["x / m", "y / m", "ψ / °", "q_v / m", "Unique?"]
+    行: [["", "", "", "", ""]]
+注意:
+  - ["航向从正东（地图 x 轴）逆时针量起；负值表示顺时针。", "The heading is measured counter-clockwise from east (map x axis); negative values are clockwise."]
+  - ["手算时先减后转：先求 q_m − p_mv，再乘 R_mvᵀ。顺序颠倒会得到错误的结果。", "By hand, subtract first, then rotate: q_m − p_mv, then multiply by R_mvᵀ. The other order is wrong."]
+  - ["读数保留 3 位小数即可与手算比较。", "Three decimals are enough when comparing with hand calculations."]
+思考题:
+  - ["如果有人把速度也按式 (5.1.3) 换算（减去 p_mv），会得到什么？用一组读数说明错误有多大。", "What happens if someone converts the velocity with Eq. (5.1.3), subtracting p_mv? Show how large the error is with one reading."]

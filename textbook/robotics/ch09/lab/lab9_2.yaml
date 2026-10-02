@@ -1,0 +1,33 @@
+# 实验 9.2 的指导书与报告模板。目的、场景、参数、任务取自 lab9_2.js。
+原理:
+  - ["末端位置 p = f(θ) 在关节角均值附近线性化，协方差矩阵按雅可比矩阵传播：", "Linearize p = f(θ) about the mean joint angles; the covariance propagates through the Jacobian:"]
+  - 式: "Σp ≈ J Σθ Jᵀ          (9.2.12)"
+  - ["不确定性椭圆的主轴沿 Σp 的特征向量，半轴长为 c√λᵢ；二维时椭圆内的概率为 1 − e^(−c²/2)，95% 对应 c ≈ 2.45。", "The ellipse axes lie along the eigenvectors of Σp with semi-axes c√λᵢ; in 2-D it holds probability 1 − e^(−c²/2), and 95% needs c ≈ 2.45."]
+  - 式: "Pr(d ≤ c) = 1 − e^(−c²/2)          (9.2.10)"
+  - ["蒙特卡洛方法：按给定分布随机抽取关节角，用正运动学（不作近似）计算末端，再统计。它用来检验线性化的结果。", "Monte Carlo: draw joint angles from their distribution, compute the tip exactly by forward kinematics, and take statistics; it checks the linearized result."]
+步骤:
+  - ["场景“平面 2R 臂”，θ = (30°, 60°)，两个标准差都为 0.1°。记录线性化给出的 σx、σy、ρ 和两个半轴，按“开始蒙特卡洛”，记录蒙特卡洛的 σx、σy（任务 1，表 1）。", "Scene “Planar 2R arm”, θ = (30°, 60°), both stds 0.1°. Record σx, σy, ρ and the semi-axes from linearization, run Monte Carlo and record its σx, σy (task 1, Table 1)."]
+  - ["保持 θ₁ = 30°，把 θ₂ 依次设为 120°、90°、60°、30°、10°，记录长短轴之比，找出比值超过 20 的形态（任务 2，表 2）。", "Keep θ₁ = 30° and set θ₂ to 120°, 90°, 60°, 30°, 10°; record the axis ratio and find a pose where it exceeds 20 (task 2, Table 2)."]
+  - ["θ = (30°, 60°)，把两个标准差依次加大到 1°、4°、8°，放大倍数取 1，运行蒙特卡洛，记录均值偏离 f(μ) 的距离（任务 3，表 3）。", "θ = (30°, 60°), raise both stds to 1°, 4°, 8°, magnification 1, run Monte Carlo and record how far the mean moves from f(μ) (task 3, Table 3)."]
+  - ["切换到“手持激光笔”，手抖 0.5°、距墙 5 m、手不平移，比较公式与蒙特卡洛给出的光点标准差（任务 4）；再加 5 mm 的平移误差，看距离多大时转动的影响超过平移。", "Switch to “Laser pointer”: 0.5° tremor, 5 m, no hand shift; compare the dot std from formula and Monte Carlo (task 4). Add a 5 mm hand shift and find the distance beyond which rotation dominates."]
+数据表:
+  - 标题: ["表 1  线性化与蒙特卡洛（θ = (30°, 60°)，σ = 0.1°）", "Table 1  Linearization vs Monte Carlo (θ = (30°, 60°), σ = 0.1°)"]
+    表头: ["方法", "σx / mm", "σy / mm", "ρ", "√λ₁ / mm", "√λ₂ / mm"]
+    表头英文: ["Method", "σx / mm", "σy / mm", "ρ", "√λ₁ / mm", "√λ₂ / mm"]
+    行: [["线性化", "", "", "", "", ""], ["蒙特卡洛", "", "", "", "—", "—"]]
+    行英文: [["Linearized", "", "", "", "", ""], ["Monte Carlo", "", "", "", "—", "—"]]
+  - 标题: ["表 2  形态与椭圆形状（θ₁ = 30°）", "Table 2  Pose and ellipse shape (θ₁ = 30°)"]
+    表头: ["θ₂ / °", "√λ₁ / mm", "√λ₂ / mm", "长短轴之比"]
+    表头英文: ["θ₂ / °", "√λ₁ / mm", "√λ₂ / mm", "Axis ratio"]
+    行: [["120", "", "", ""], ["90", "", "", ""], ["60", "", "", ""], ["30", "", "", ""], ["10", "", "", ""]]
+  - 标题: ["表 3  误差加大后的均值偏移（θ = (30°, 60°)）", "Table 3  Mean shift for larger errors (θ = (30°, 60°))"]
+    表头: ["σ / °", "均值偏离 f(μ) / mm", "σx 线性化 / mm", "σx 蒙特卡洛 / mm"]
+    表头英文: ["σ / °", "Mean minus f(μ) / mm", "σx linearized / mm", "σx Monte Carlo / mm"]
+    行: [["1", "", "", ""], ["4", "", "", ""], ["8", "", "", ""]]
+注意:
+  - ["关节角的标准差在公式中要化为弧度；界面已自动换算。", "Joint-angle stds must be in radians in the formula; the lab converts them."]
+  - ["椭圆和点云都相对末端放大显示，读数栏中的数值是实际大小。", "The ellipse and cloud are drawn magnified about the tip; the readouts give true sizes."]
+  - ["蒙特卡洛用固定种子，最多 3000 次；样本标准差本身约有 ±2% 的随机波动。", "Monte Carlo uses a fixed seed and at most 3000 runs; the sample std itself fluctuates by about ±2%."]
+思考题:
+  - ["二维的 1 倍椭圆只包含约 39% 的点，为什么比一维 ±σ 的 68% 少？", "Why does the 2-D 1σ ellipse hold only about 39% of the points, fewer than the 68% of ±σ in 1-D?"]
+  - ["误差加大以后，蒙特卡洛的均值为什么总是偏向基座？", "With large errors, why does the Monte Carlo mean always move towards the base?"]

@@ -1,0 +1,27 @@
+# 实验 6.6 的指导书与报告模板。目的、场景、参数、任务取自 lab6_6.js。
+原理:
+  - ["力旋量 F = (m, f) 把力 f 和它对坐标原点的力矩 m 合成一个六维量，力矩在前（定义 6.6.1）。一个力 f 作用在点 c 上时，m = c × f。",
+     "A wrench F = (m, f) puts a force f and its moment m about the origin into one 6-vector, moment first (Definition 6.6.1). For a force f applied at a point c, m = c × f."]
+  - ["力旋量与运动旋量的点积是功率：P = Fᵀ V = m · ω + f · v（式 (6.6.3)）。它与坐标系无关。", "The dot product of a wrench and a twist is power: P = Fᵀ V = m · ω + f · v (Eq. (6.6.3)); it does not depend on the frame."]
+  - 式: "τ_i = S_iᵀ F = ω̂_i · ((c − q_i) × f)          (6.6.6)"
+  - ["静止时，关节 i 的电机做的功率 τ_i θ̇_i 必须与负载得到的功率 Fᵀ S_i θ̇_i 相等，所以关节力矩是力旋量在关节旋量轴上的“投影”。转轴为 −ŷ、f 竖直向上时，τ_i = m𝔤 (c_x − q_ix)：力乘以水平力臂。",
+     "At rest, the motor power τ_i θ̇_i must equal the power Fᵀ S_i θ̇_i given to the load, so the joint torque is the projection of the wrench on the joint screw. With axis −ŷ and f straight up, τ_i = m𝔤 (c_x − q_ix): force times horizontal lever arm."]
+  - ["若力的作用线经过关节轴（力臂为零），关节旋量轴与该力的力旋量互易（互易积为零），这个关节不需要出力矩。", "If the line of the force passes through a joint axis (zero lever arm), the joint screw and the wrench are reciprocal (zero reciprocal product) and the joint needs no torque."]
+步骤:
+  - ["打开实验 6.6，场景“UR5e 托住 5 kg 负载”。零位时读出 τ₂、τ₃、τ₄（任务 1），用 τ_i = m𝔤(c_x − q_ix) 手算核对，记入表 1。说明 τ₄ 为什么是零。",
+     "Open Lab 6.6, scene “UR5e holding 5 kg”. Read τ₂, τ₃, τ₄ at home (task 1), check them with τ_i = m𝔤(c_x − q_ix); Table 1. Why is τ₄ zero?"]
+  - ["把负载质量从 5 kg 改为 2.5 kg，验证各关节力矩都减半。", "Change the mass from 5 kg to 2.5 kg and confirm every torque halves."]
+  - ["调节 θ₂、θ₃、θ₄，找出一个使 |τ₂| < 1 N·m 的姿态（任务 2），记录姿态和三个力矩，解释为什么此时 τ₂ 很小。",
+     "Adjust θ₂, θ₃, θ₄ to find a posture with |τ₂| < 1 N·m (task 2); record it with the three torques and explain why τ₂ is small."]
+  - ["切换到“手提购物袋”，分别读出手臂伸直（任务 3）和屈肘 90°（任务 4）时的肩关节力矩，记入表 1。", "Switch to “Holding a shopping bag”; read the shoulder torque with a straight arm (task 3) and with the elbow at 90° (task 4); Table 1."]
+数据表:
+  - 标题: ["表 1  关节力矩", "Table 1  Joint torques"]
+    表头: ["场景与姿态", "m / kg", "质心 c_x / m", "读出的力矩 / (N·m)", "手算 m𝔤(c_x − q_ix) / (N·m)"]
+    表头英文: ["Scene and posture", "m / kg", "Centre c_x / m", "Torques read / (N·m)", "By hand m𝔤(c_x − q_ix) / (N·m)"]
+    行: [["UR5e 零位", "5", "", "", ""], ["UR5e 零位", "2.5", "", "", ""], ["UR5e，|τ₂| < 1", "5", "", "", ""], ["手臂伸直", "5", "", "", ""], ["屈肘 90°", "5", "", "", ""]]
+    行英文: [["UR5e home", "5", "", "", ""], ["UR5e home", "2.5", "", "", ""], ["UR5e, |τ₂| < 1", "5", "", "", ""], ["Straight arm", "5", "", "", ""], ["Elbow at 90°", "5", "", "", ""]]
+注意:
+  - ["只计负载的重力，不计手臂自身的重量；真实机器人的关节力矩还要加上连杆自重的部分（第 24 章）。", "Only the load's weight is counted, not the arm's own; real joint torques also carry the links' weight (Chapter 24)."]
+  - ["力矩的正负号按右手定则与关节轴的正方向一致；负号表示电机要向负方向出力。", "Torque signs follow the right-hand rule about the positive joint axis; a minus sign means the motor pushes in the negative direction."]
+思考题:
+  - ["UR5e 的额定负载是 5 kg，厂家还给出了“负载质心离法兰盘越远、允许的负载越小”的曲线。用本实验的结果说明原因。", "The UR5e is rated for 5 kg, and the maker also gives a curve of allowed load falling as the load centre moves away from the flange. Use this lab to explain why."]

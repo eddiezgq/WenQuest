@@ -1,0 +1,25 @@
+# 实验 9.4 的指导书与报告模板。目的、场景、参数、任务取自 lab9_4.js。
+原理:
+  - ["两个独立测量 z₁、z₂ 按权重 w、1 − w 合成，估计值的方差为 w²σ₁² + (1 − w)²σ₂²；它在下式的权重处最小，即高斯噪声下的最大似然估计：", "Combining independent z₁, z₂ with weights w and 1 − w gives variance w²σ₁² + (1 − w)²σ₂², smallest at the weight below — the maximum likelihood estimate for Gaussian noise:"]
+  - 式: "x̂ = (z₁/σ₁² + z₂/σ₂²) / (1/σ₁² + 1/σ₂²)，1/σ² = 1/σ₁² + 1/σ₂²          (9.4.11)"
+  - ["平方和对野值极敏感；中位数、截尾平均和胡伯估计等稳健估计受野值的影响小。", "Sums of squares are very sensitive to outliers; robust estimates such as the median, the trimmed mean and Huber's estimate are hardly affected."]
+步骤:
+  - ["场景“AGV 对接充电桩”，σ₁ = 3 mm，σ₂ = 10 mm。w 依次取 0、0.25、0.5、0.75、0.9、1，每次按“开始”模拟，记录误差的标准差（表 1）。w = 0.5 时完成任务 1。", "Scene “AGV docking”, σ₁ = 3 mm, σ₂ = 10 mm. Set w to 0, 0.25, 0.5, 0.75, 0.9, 1, run each time and record the error std (Table 1). w = 0.5 completes task 1."]
+  - ["由表 1 找出标准差最小的 w，与式 (9.4.11) 的 w* = σ₂²/(σ₁² + σ₂²) 比较，把 w 设到 w* 附近再模拟一次（任务 2）。", "Find the w with the smallest std in Table 1, compare with w* = σ₂²/(σ₁² + σ₂²) from Eq. (9.4.11), set w near w* and run again (task 2)."]
+  - ["把两个标准差都设为 5 mm，重复第 1 步，看最优权重变为多少。", "Set both stds to 5 mm, repeat step 1, and see where the best weight moves."]
+  - ["切换到“评委打分”，离谱分数的概率 p 依次取 0、0.05、0.1、0.2，分别记录三种方法的均方根误差（表 2）。p = 0.1、选“去掉最高最低”时完成任务 3。", "Switch to “Judges' scores”; for p = 0, 0.05, 0.1, 0.2 record the RMS errors of the three estimators (Table 2). p = 0.1 with “trimmed” completes task 3."]
+数据表:
+  - 标题: ["表 1  权重与融合误差（σ₁ = 3 mm，σ₂ = 10 mm）", "Table 1  Weight and fused error (σ₁ = 3 mm, σ₂ = 10 mm)"]
+    表头: ["w", "误差标准差（模拟）/ mm", "理论值 / mm"]
+    表头英文: ["w", "Error std (simulated) / mm", "Theory / mm"]
+    行: [["0", "", ""], ["0.25", "", ""], ["0.5", "", ""], ["0.75", "", ""], ["0.9", "", ""], ["1", "", ""]]
+  - 标题: ["表 2  离谱分数与三种估计方法的均方根误差", "Table 2  Wild scores and the RMS error of three estimators"]
+    表头: ["p", "平均分", "中位数", "去掉最高最低"]
+    表头英文: ["p", "Mean", "Median", "Trimmed mean"]
+    行: [["0", "", "", ""], ["0.05", "", "", ""], ["0.1", "", "", ""], ["0.2", "", "", ""]]
+注意:
+  - ["每次改变参数后需重新按“开始”；随机数用固定种子，同样的参数得到同样的结果。", "Press Start again after changing a parameter; the fixed seed makes runs repeatable."]
+  - ["模拟最多 3000 次，样本标准差本身约有 ±3% 的波动，比较时应留有余量。", "At most 3000 runs: the sample std fluctuates by about ±3%, so allow some margin when comparing."]
+思考题:
+  - ["没有离谱分数（p = 0）时，三种方法哪个最准？为什么稳健方法要付出这点代价？", "With no wild scores (p = 0), which estimator is best? Why do robust methods pay this small price?"]
+  - ["两个传感器精度相同时，最优权重是多少？融合后的标准差是单个的几分之几？", "With two equally precise sensors, what is the best weight, and how much smaller is the fused std?"]

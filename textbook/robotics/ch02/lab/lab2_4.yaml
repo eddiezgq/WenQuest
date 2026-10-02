@@ -1,0 +1,24 @@
+# 实验 2.4 的指导书与报告模板。目的、场景、参数、任务取自 lab2_4.js。
+原理:
+  - ["任何 m×n 矩阵都可以写成 A = UΣVᵀ，U、V 为正交矩阵，Σ 只在对角线上有非负元素 σ₁ ≥ σ₂ ≥ … ≥ 0，即奇异值（定理 2.4.1）。", "Every m×n matrix can be written A = UΣVᵀ with U, V orthogonal and Σ holding the non-negative singular values σ₁ ≥ σ₂ ≥ … on its diagonal (Theorem 2.4.1)."]
+  - 式: "A = U Σ Vᵀ = σ₁ u₁ v₁ᵀ + σ₂ u₂ v₂ᵀ          (2.4.4)、(2.4.5)"
+  - ["几何上：Vᵀ 转动，Σ 沿坐标轴伸缩，U 再转动。所以单位圆的像是椭圆，半轴长为 σ₁、σ₂，方向为 u₁、u₂；v₁、v₂ 是被变到半轴上的那两个输入方向。σᵢ² 是 AᵀA 的特征值。", "Geometrically Vᵀ rotates, Σ stretches along the axes, U rotates again. So the unit circle maps to an ellipse with semi-axes σ₁, σ₂ along u₁, u₂; v₁, v₂ are the inputs sent onto the semi-axes. σᵢ² are the eigenvalues of AᵀA."]
+  - 式: "κ = σ₁ / σ₂ ，  w = σ₁ σ₂ = |det J| = L₁ L₂ |sin θ₂|          (2.4.6)、(2.4.8)"
+  - ["条件数 κ 衡量矩阵的病态程度；可操作度 w 衡量机械臂在某个形态下的运动能力，手臂伸直或折叠时为零。", "The condition number κ measures how ill-conditioned a matrix is; the manipulability w measures how freely the arm can move, and is zero when it is straight or folded."]
+步骤:
+  - ["打开实验 2.4，场景“影子与椭圆：任意矩阵”。依次输入表 1 中的矩阵，读出 σ₁、σ₂、条件数和行列式，验证 σ₁σ₂ = |det A|。", "Open Lab 2.4, scene “Shadows and ellipses: any matrix”. Enter each matrix of Table 1 and read σ₁, σ₂, κ and det A; check σ₁σ₂ = |det A|."]
+  - ["调出一个奇异值为零的矩阵（任务 1）和一个把单位圆变成同样大小的圆的矩阵（任务 2），把它们填入表 1 的空行。", "Find a matrix with a zero singular value (task 1) and one that maps the unit circle to a circle of the same size (task 2); add them to the empty rows of Table 1."]
+  - ["切换到场景“2R 臂的可操作度”。θ₁ = 30°，θ₂ 依次取 5°、30°、60°、90°、120°、150°、175°，记录 σ₁、σ₂、条件数和 w，填入表 2，画出 w–θ₂ 曲线。完成任务 3、4。", "Switch to “Manipulability of a 2R arm”. With θ₁ = 30°, set θ₂ = 5°, 30°, 60°, 90°, 120°, 150°, 175°; record σ₁, σ₂, κ and w in Table 2 and plot w against θ₂. Complete tasks 3 and 4."]
+  - ["保持 θ₂ = 60°，改变 θ₁，观察奇异值是否变化，并解释原因。", "Keep θ₂ = 60° and change θ₁. Do the singular values change? Explain."]
+数据表:
+  - 标题: ["表 1  矩阵与它的奇异值", "Table 1  Matrices and their singular values"]
+    表头: ["A", "σ₁", "σ₂", "κ", "det A", "σ₁σ₂"]
+    行: [["[1.2, 0.6; 0.2, 0.9]", "", "", "", "", ""], ["[2, 0; 0, 0.5]", "", "", "", "", ""], ["[1, 1; 0, 1]", "", "", "", "", ""], ["", "", "", "", "", ""], ["", "", "", "", "", ""]]
+  - 标题: ["表 2  2R 臂的奇异值与可操作度（θ₁ = 30°）", "Table 2  Singular values and manipulability of the 2R arm (θ₁ = 30°)"]
+    表头: ["θ₂", "σ₁ / (m/rad)", "σ₂ / (m/rad)", "κ", "w / m²", "L₁L₂|sin θ₂| / m²"]
+    行: [["5°", "", "", "", "", ""], ["30°", "", "", "", "", ""], ["60°", "", "", "", "", ""], ["90°", "", "", "", "", ""], ["120°", "", "", "", "", ""], ["150°", "", "", "", "", ""], ["175°", "", "", "", "", ""]]
+注意:
+  - ["奇异值总是非负的；行列式可以为负。负的行列式表示变换带有反射。", "Singular values are never negative; a determinant can be. A negative determinant means the map includes a reflection."]
+  - ["机械臂场景中的椭圆按比例缩小画出（1 m/s 画成 0.4 m）。", "In the arm scene the ellipse is drawn to scale (1 m/s as 0.4 m)."]
+思考题:
+  - ["条件数最小的 θ₂ 与可操作度最大的 θ₂ 是否相同？为什么？", "Is the θ₂ with the smallest condition number the same as the one with the largest manipulability? Why?"]

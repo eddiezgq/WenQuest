@@ -1,0 +1,33 @@
+# 实验 2.1 的指导书与报告模板。目的、场景、参数、任务取自 lab2_1.js。
+原理:
+  - ["平面 2R 臂只转关节 1 时，整条手臂绕基座转动，末端速度垂直于基座到末端的连线，大小为该距离乘以关节速度；只转关节 2 时，末端绕肘部转动。两个关节同时转动时，末端速度是两部分之和。",
+     "With only joint 1 turning, the whole arm turns about the base and the tip moves perpendicular to the base-to-tip line; with only joint 2, the tip turns about the elbow. With both, the tip velocity is the sum."]
+  - 式: "v = θ̇₁ j₁ + θ̇₂ j₂ = J θ̇          (2.1.7)、(2.1.9)"
+  - ["矩阵乘向量有两种看法：按列看，Jθ̇ 是 J 的两列的线性组合，组合系数是关节速度；按行看，v 的每个分量是 J 的一行与 θ̇ 的点积。",
+     "A matrix times a vector can be read two ways: by columns, Jθ̇ is a combination of the columns of J with the joint speeds as weights; by rows, each component of v is a row of J dotted with θ̇."]
+  - 式: "det J = L₁ L₂ sin θ₂          (2.1.15)"
+  - ["手臂伸直或折叠时 det J = 0，两列平行，末端只能沿垂直于手臂的方向运动，J 不可逆。",
+     "When the arm is straight or folded, det J = 0: the two columns are parallel, the tip can only move perpendicular to the arm, and J has no inverse."]
+步骤:
+  - ["打开实验 2.1，选择场景“平面 2R 臂”。设 θ = (30°, 60°)，θ̇ = (0.5, −1.0) rad/s，读出 J 和末端速度，与算例 2.1.1 比较，填入表 1。",
+     "Open Lab 2.1, scene “Planar 2R arm”. Set θ = (30°, 60°), θ̇ = (0.5, −1.0) rad/s; read J and the tip velocity, compare with Example 2.1.1, and fill in Table 1."]
+  - ["保持 θ 不变，先令 θ̇₂ = 0，再令 θ̇₁ = 0，分别读出末端速度，验证它们等于 J 的第 1 列和第 2 列乘以相应的关节速度。完成任务 1：只转关节 2，使末端沿 +x 方向运动。",
+     "Keep θ. Set θ̇₂ = 0, then θ̇₁ = 0, and check that the tip velocity equals column 1 or column 2 of J times the joint speed. Task 1: turn only joint 2 so that the tip moves along +x."]
+  - ["把 θ₂ 依次设为 90°、45°、10°、0°，记录 det J，与式 (2.1.15) 比较，填入表 2。θ₂ = 0° 时（任务 2），任意改变两个关节速度，观察末端速度的方向。",
+     "Set θ₂ to 90°, 45°, 10°, 0° and record det J; compare with Eq. (2.1.15) in Table 2. At θ₂ = 0° (task 2) change both joint speeds and watch the direction of the tip velocity."]
+  - ["切换到场景“买水果”。先用式 (2.1.12) 手算苹果和橙子各买多少，才能使总价 40 元、维生素 C 1080 mg，再拖动滑块验证（任务 3）。",
+     "Switch to “Buying fruit”. Use Eq. (2.1.12) to compute by hand how much of each fruit gives ¥40 and 1080 mg, then check with the sliders (task 3)."]
+数据表:
+  - 标题: ["表 1  末端速度：按列与按行（θ = (30°, 60°)）", "Table 1  Tip velocity by columns and by rows (θ = (30°, 60°))"]
+    表头: ["θ̇ / (rad/s)", "θ̇₁ j₁ / (m/s)", "θ̇₂ j₂ / (m/s)", "v 读数 / (m/s)", "按行手算 v / (m/s)"]
+    表头英文: ["θ̇ / (rad/s)", "θ̇₁ j₁ / (m/s)", "θ̇₂ j₂ / (m/s)", "v read / (m/s)", "v by rows, by hand / (m/s)"]
+    行: [["(0.5, −1.0)", "", "", "", ""], ["(1.0, 0)", "", "", "", ""], ["(0, 1.0)", "", "", "", ""]]
+  - 标题: ["表 2  行列式与形态", "Table 2  Determinant and configuration"]
+    表头: ["θ₂", "det J 读数 / m²", "L₁L₂ sin θ₂ / m²", "两列夹角（目测）"]
+    表头英文: ["θ₂", "det J read / m²", "L₁L₂ sin θ₂ / m²", "Angle between the columns (by eye)"]
+    行: [["90°", "", "", ""], ["45°", "", "", ""], ["10°", "", "", ""], ["0°", "", "", ""]]
+注意:
+  - ["关节角以逆时针为正；θ₂ 从第一段连杆的延长线量起。", "Angles are counter-clockwise positive; θ₂ is measured from the extension of the first link."]
+  - ["图中速度箭头按比例放大画出，只看方向和相对大小。", "Velocity arrows are drawn to an enlarged scale; read only directions and relative sizes."]
+思考题:
+  - ["把长度单位从 m 改为 mm，det J 变为原来的多少倍？用它判断“接近奇异”有什么问题？", "If lengths are given in mm instead of m, by what factor does det J change? What is wrong with using it to judge “near singular”?"]

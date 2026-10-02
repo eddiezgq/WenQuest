@@ -1,0 +1,587 @@
+{
+ "schema": 1,
+ "id": "B-LEG-GO2",
+ "kind": "robot",
+ "name": {
+  "zh": "Unitree Go2 四足机器人",
+  "en": "Unitree Go2"
+ },
+ "category": "LEG",
+ "tags": [
+  "四足机器人",
+  "quadruped",
+  "unitree",
+  "宇树科技",
+  "Unitree Robotics",
+  "Go2 EDU"
+ ],
+ "standards": [],
+ "params": [],
+ "defaults": {},
+ "model": {
+  "engine": "menagerie:unitree_go2/go2.xml",
+  "formats": [
+   "mjcf",
+   "glb"
+  ],
+  "origin": "MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名",
+  "note": "网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取"
+ },
+ "robot": {
+  "type": "quadruped",
+  "links": [
+   {
+    "name": "base",
+    "node": "base",
+    "mass_kg": 6.921
+   },
+   {
+    "name": "FL_hip",
+    "node": "FL_hip",
+    "mass_kg": 0.678
+   },
+   {
+    "name": "FL_thigh",
+    "node": "FL_thigh",
+    "mass_kg": 1.152
+   },
+   {
+    "name": "FL_calf",
+    "node": "FL_calf",
+    "mass_kg": 0.2414
+   },
+   {
+    "name": "FR_hip",
+    "node": "FR_hip",
+    "mass_kg": 0.678
+   },
+   {
+    "name": "FR_thigh",
+    "node": "FR_thigh",
+    "mass_kg": 1.152
+   },
+   {
+    "name": "FR_calf",
+    "node": "FR_calf",
+    "mass_kg": 0.2414
+   },
+   {
+    "name": "RL_hip",
+    "node": "RL_hip",
+    "mass_kg": 0.678
+   },
+   {
+    "name": "RL_thigh",
+    "node": "RL_thigh",
+    "mass_kg": 1.152
+   },
+   {
+    "name": "RL_calf",
+    "node": "RL_calf",
+    "mass_kg": 0.2414
+   },
+   {
+    "name": "RR_hip",
+    "node": "RR_hip",
+    "mass_kg": 0.678
+   },
+   {
+    "name": "RR_thigh",
+    "node": "RR_thigh",
+    "mass_kg": 1.152
+   },
+   {
+    "name": "RR_calf",
+    "node": "RR_calf",
+    "mass_kg": 0.2414
+   }
+  ],
+  "joints": [
+   {
+    "name": "FL_hip_joint",
+    "type": "revolute",
+    "parent": "base",
+    "child": "FL_hip",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.1934,
+      0.0465,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -1.0472,
+     "upper": 1.0472
+    }
+   },
+   {
+    "name": "FL_thigh_joint",
+    "type": "revolute",
+    "parent": "FL_hip",
+    "child": "FL_thigh",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0955,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -1.5708,
+     "upper": 3.4907
+    }
+   },
+   {
+    "name": "FL_calf_joint",
+    "type": "revolute",
+    "parent": "FL_thigh",
+    "child": "FL_calf",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      -0.213
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.7227,
+     "upper": -0.83776
+    }
+   },
+   {
+    "name": "FR_hip_joint",
+    "type": "revolute",
+    "parent": "base",
+    "child": "FR_hip",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.1934,
+      -0.0465,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -1.0472,
+     "upper": 1.0472
+    }
+   },
+   {
+    "name": "FR_thigh_joint",
+    "type": "revolute",
+    "parent": "FR_hip",
+    "child": "FR_thigh",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      -0.0955,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -1.5708,
+     "upper": 3.4907
+    }
+   },
+   {
+    "name": "FR_calf_joint",
+    "type": "revolute",
+    "parent": "FR_thigh",
+    "child": "FR_calf",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      -0.213
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.7227,
+     "upper": -0.83776
+    }
+   },
+   {
+    "name": "RL_hip_joint",
+    "type": "revolute",
+    "parent": "base",
+    "child": "RL_hip",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.1934,
+      0.0465,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -1.0472,
+     "upper": 1.0472
+    }
+   },
+   {
+    "name": "RL_thigh_joint",
+    "type": "revolute",
+    "parent": "RL_hip",
+    "child": "RL_thigh",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0955,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -0.5236,
+     "upper": 4.5379
+    }
+   },
+   {
+    "name": "RL_calf_joint",
+    "type": "revolute",
+    "parent": "RL_thigh",
+    "child": "RL_calf",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      -0.213
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.7227,
+     "upper": -0.83776
+    }
+   },
+   {
+    "name": "RR_hip_joint",
+    "type": "revolute",
+    "parent": "base",
+    "child": "RR_hip",
+    "axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.1934,
+      -0.0465,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -1.0472,
+     "upper": 1.0472
+    }
+   },
+   {
+    "name": "RR_thigh_joint",
+    "type": "revolute",
+    "parent": "RR_hip",
+    "child": "RR_thigh",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      -0.0955,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -0.5236,
+     "upper": 4.5379
+    }
+   },
+   {
+    "name": "RR_calf_joint",
+    "type": "revolute",
+    "parent": "RR_thigh",
+    "child": "RR_calf",
+    "axis": [
+     0.0,
+     1.0,
+     0.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      -0.213
+     ],
+     "rpy": [
+      0.0,
+      -0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -2.7227,
+     "upper": -0.83776
+    }
+   }
+  ],
+  "dof": 12,
+  "rest": {
+   "FL_hip_joint": 0.0,
+   "FL_thigh_joint": 0.9,
+   "FL_calf_joint": -1.8,
+   "FR_hip_joint": 0.0,
+   "FR_thigh_joint": 0.9,
+   "FR_calf_joint": -1.8,
+   "RL_hip_joint": 0.0,
+   "RL_thigh_joint": 0.9,
+   "RL_calf_joint": -1.8,
+   "RR_hip_joint": 0.0,
+   "RR_thigh_joint": 0.9,
+   "RR_calf_joint": -1.8
+  },
+  "rest_source": "home"
+ },
+ "source": {
+  "origin": "menagerie",
+  "repo": "https://github.com/google-deepmind/mujoco_menagerie",
+  "commit": "4d038b3feae26ec82b46a4d586379114012a8ac7",
+  "path": "unitree_go2/",
+  "license": "BSD-3-Clause",
+  "attribution": "MuJoCo Menagerie（Google DeepMind）· unitree_go2；BSD-3-Clause；Copyright (c) 2016-2022 HangZhou YuShu TECHNOLOGY CO.,LTD. (\"Unitree Robotics\")",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-09-30",
+   "note": "按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）"
+  },
+  "data_sources": [
+   {
+    "title": "Unitree 官网 Go2 产品页规格表（AIR / PRO / X / EDU 四列；英文页与中文页 /cn/go2/ 一致）",
+    "url": "https://www.unitree.com/go2/",
+    "retrieved": "2026-10-01"
+   }
+  ]
+ },
+ "teaching": {
+  "principle": "每条腿 3 个关节，四条腿交替支撑与摆动（步态），保持机身平衡前进。",
+  "uses": [
+   "巡检",
+   "野外作业"
+  ],
+  "courses": [
+   {
+    "course": "足式机器人",
+    "chapter": "步态与平衡"
+   }
+  ],
+  "labs": [
+   "单腿关节拖动",
+   "步态动画"
+  ]
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "datasheet": {
+  "vendor": "Unitree Robotics",
+  "model": "Go2 EDU",
+  "values": {
+   "weight_kg": 15,
+   "dof": 12,
+   "payload_kg": 8,
+   "max_speed_m_s": 3.7,
+   "runtime_h": "2-4",
+   "height_mm": 400,
+   "footprint_mm": "700 x 310"
+  },
+  "labels": {
+   "weight_kg": {
+    "zh": "重量",
+    "en": "Weight",
+    "unit": "kg"
+   },
+   "dof": {
+    "zh": "自由度",
+    "en": "DOF",
+    "unit": ""
+   },
+   "payload_kg": {
+    "zh": "额定负载",
+    "en": "Payload",
+    "unit": "kg"
+   },
+   "max_speed_m_s": {
+    "zh": "最大移动速度",
+    "en": "Max speed",
+    "unit": "m/s"
+   },
+   "runtime_h": {
+    "zh": "续航",
+    "en": "Runtime",
+    "unit": "h"
+   },
+   "height_mm": {
+    "zh": "高度",
+    "en": "Height",
+    "unit": "mm"
+   },
+   "footprint_mm": {
+    "zh": "底座/机身平面尺寸",
+    "en": "Footprint",
+    "unit": "mm"
+   }
+  },
+  "src": "https://www.unitree.com/go2/",
+  "note": "取 Go2 EDU 列。重量原文 \"About 15kg\"（带电池，各版本相同）。站立尺寸 70cm x 31cm x 40cm → 高 400 mm、长宽 700 x 310；趴下 76 x 31 x 20 cm。关节电机 12 个（\"12 set\"/\"12个\"）→ dof 12。负载原文 \"≈8kg (MAX ~ 12kg)\"，收 8（极限 12）。速度原文 \"0 ~ 3.7m/s (MAX ~ 5m/s)\"，收 3.7（极限约 5）。关节范围原文 机身 -48~48°、大腿 -200°~90°、小腿 -156°~-48°（每条腿 3 轴，按 机身/髋外摆、大腿、小腿 顺序，四条腿相同）。最大关节扭矩约 45 N·m；工作最大功率约 3000 W；供电 28V~33.6V。电池：EDU 列为 \"long endurance (15000mAh)\"、续航 \"About 2-4h\"、快充 33.6V 9A。不一致与处理：英文页第一次读取把 EDU 电池读成 standard 8000mAh / 1-2h，专门按列重读英文页与中文页均为 15000mAh / 2-4h，判定第一次为串列误读，按后者收。battery_wh 留空：官方只给 15000mAh；电池配件页只给标准电池 BT2-05 \"8000mAh 236.8Wh、DC 29.6V\"，长续航电池 BT2-06 未列 Wh/电压。IP 等级页面未给，未收。",
+  "axes": [
+   {
+    "axis": 1,
+    "range_deg": [
+     -48,
+     48
+    ]
+   },
+   {
+    "axis": 2,
+    "range_deg": [
+     -200,
+     90
+    ]
+   },
+   {
+    "axis": 3,
+    "range_deg": [
+     -156,
+     -48
+    ]
+   }
+  ]
+ },
+ "vendor": {
+  "id": "UNITREE",
+  "name": {
+   "zh": "宇树科技",
+   "en": "Unitree Robotics"
+  },
+  "site": "https://www.unitree.com",
+  "model": "Go2 EDU"
+ },
+ "alt_models": [
+  {
+   "format": "urdf",
+   "url": "https://github.com/unitreerobotics/unitree_ros/blob/267182b8521c8d6a631bab1fe63836873237a525/robots/go2_description/urdf/go2_description.urdf",
+   "license": "BSD-3-Clause",
+   "via": "robot_descriptions/go2_description"
+  }
+ ],
+ "version": "2026.10.9",
+ "package": "https://github.com/google-deepmind/mujoco_menagerie/tree/4d038b3feae26ec82b46a4d586379114012a8ac7/unitree_go2",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {},
+   "files": {
+    "glb": "B-LEG-GO2/default.glb",
+    "png": "B-LEG-GO2/default.png"
+   }
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+# 实验 6.4 的指导书与报告模板。目的、场景、参数、任务取自 lab6_4.js。
+原理:
+  - ["以恒定的旋量轴 S 运动时，位姿满足 T(θ) = e^{[S]θ} T(0)（式 (6.4.1)）。矩阵指数有闭式（定理 6.4.1）：", "Moving with a constant screw axis S gives T(θ) = e^{[S]θ} T(0) (Eq. (6.4.1)). The matrix exponential has a closed form (Theorem 6.4.1):"]
+  - 式: "e^{[S]θ} = [e^{[ω]θ}  G(θ)v; 0  1]，G(θ) = Iθ + (1 − cos θ)[ω] + (θ − sin θ)[ω]²          (6.4.2)、(6.4.3)"
+  - ["几何上，e^{[S]θ} 就是沿旋量轴“拧”过 θ：绕轴转 θ，同时沿轴移 hθ（定理 6.4.2）。", "Geometrically e^{[S]θ} screws by θ along the axis: a turn θ about it and a slide hθ along it (Theorem 6.4.2)."]
+  - ["反过来，对任意位移 D = (R, p)，对数映射（定理 6.4.3）先由 R 求 ω 和 θ，再取 v = G(θ)⁻¹p（式 (6.4.9)），得到 e^{[S]θ} = D。轴上离原点最近的点 q = ω × v，节距 h = ω · v（式 (6.3.11)、(6.3.12)，|ω| = 1）。",
+     "Conversely, for any displacement D = (R, p) the log map (Theorem 6.4.3) takes ω and θ from R and v = G(θ)⁻¹p (Eq. (6.4.9)), so that e^{[S]θ} = D. The axis point nearest the origin is q = ω × v and the pitch h = ω · v (Eqs. (6.3.11), (6.3.12), |ω| = 1)."]
+  - ["本实验中 D = T(θ) M⁻¹ 是法兰盘从零位 M 到当前位姿 T(θ) 的位移，在基座坐标系 {s} 中描述。", "Here D = T(θ) M⁻¹ is the flange displacement from home M to the current pose T(θ), described in the base frame {s}."]
+步骤:
+  - ["打开实验 6.4，场景“UR5e 一次位移的螺旋轴”。所有关节为 0 时没有位移。只转动关节 1 到任意角度（任务 2），观察螺旋轴（黑色）与关节 1 的轴重合，节距为 0。",
+     "Open Lab 6.4, scene “Screw axis of a UR5e move”. With all joints at 0 there is no displacement. Turn joint 1 only (task 2): the black screw axis lies on joint 1's axis and the pitch is 0."]
+  - ["再只转动关节 2，记录螺旋轴和节距。比较：单个转动关节的位移总是节距为零、轴为关节轴的纯转动。",
+     "Now turn joint 2 only and record the axis and pitch. A single revolute joint always gives a pure rotation (zero pitch) about its own axis."]
+  - ["设置算例 6.4.2 的关节角（任务 1），读出转角、节距、ŝ 和 q，与书中比较，记入表 1。",
+     "Set the joint angles of Example 6.4.2 (task 1); read the angle, pitch, ŝ and q and compare with the book; Table 1."]
+  - ["按“沿螺旋轴演示”（任务 3）：一个坐标系从零位出发，按 e^{[S]θs}M 沿螺旋轴拧到当前位姿，红线是它的原点走过的螺旋线。读出终点与法兰盘之差。",
+     "Press “Screw it along the axis” (task 3): a frame leaves home and screws along the axis by e^{[S]θs}M to the current pose; the red line is the helix of its origin. Read the end gap."]
+  - ["切换到“旋转楼梯”，把每圈上升设为 0.5 m，转过 720°（任务 4），读出上升高度，用 hθ 手算核对。",
+     "Switch to “A spiral staircase”, set 0.5 m per turn and turn 720° (task 4); check the rise against hθ."]
+数据表:
+  - 标题: ["表 1  位移的螺旋轴", "Table 1  Screw axes of displacements"]
+    表头: ["关节角 / °", "转角 θ / °", "节距 h / (m/rad)", "方向 ŝ", "q / m", "演示终点之差 / m"]
+    表头英文: ["Joint angles / °", "Angle θ / °", "Pitch h / (m/rad)", "Direction ŝ", "q / m", "End gap / m"]
+    行: [["只转关节 1", "", "", "", "", ""], ["只转关节 2", "", "", "", "", ""], ["(30, −45, 60, −15, 90, 30)", "", "", "", "", ""], ["自选", "", "", "", "", ""]]
+    行英文: [["Joint 1 only", "", "", "", "", ""], ["Joint 2 only", "", "", "", "", ""], ["(30, −45, 60, −15, 90, 30)", "", "", "", "", ""], ["Your own", "", "", "", "", ""]]
+注意:
+  - ["沿螺旋轴拧过去只是连接两个位姿的一种路径（旋量插值），不是机械臂关节插值时真正走的路径。", "Screwing along the axis is one path between the two poses (screw interpolation), not the path the arm takes when its joints are interpolated."]
+  - ["转角接近 180° 时，螺旋轴的方向有两种选择，读数可能跳变。", "Near 180° the axis direction has two valid signs and the reading may jump."]
+思考题:
+  - ["只转关节 2 和关节 3（两轴平行）时，合成位移的节距是多少？螺旋轴的方向是什么？为什么？", "With joints 2 and 3 only (parallel axes), what is the pitch of the combined displacement and the direction of its axis? Why?"]

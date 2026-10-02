@@ -1,0 +1,31 @@
+# 实验 3.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_2.js。
+原理:
+  - ["点积 r·F = |r||F| cos θ 是一个数，等于 r 在 F 方向上的投影长度乘以 |F|；θ 为两者的夹角。两者垂直时点积为零。",
+     "The dot product r·F = |r||F| cos θ is a number: the projection of r on the direction of F times |F|; θ is the angle between them. It is zero when they are perpendicular."]
+  - ["叉积 r×F 是一个矢量：长度 |r||F| sin θ，等于以 r、F 为邻边的平行四边形的面积；方向垂直于 r 和 F，按右手定则确定。力 F 作用在 r 的终点时，它对 O 的力矩就是 m = r×F。",
+     "The cross product r×F is a vector: its length |r||F| sin θ is the area of the parallelogram on r and F; it is perpendicular to both, by the right-hand rule. A force F acting at the tip of r has the moment m = r×F about O."]
+  - 式: "r·F = r₁F₁ + r₂F₂ + r₃F₃          (3.2.3)"
+  - 式: "r×F = (r₂F₃ − r₃F₂,  r₃F₁ − r₁F₃,  r₁F₂ − r₂F₁)          (3.2.9)"
+  - ["本实验中 r 和 F 都在屏幕平面内，所以力矩只有垂直于屏幕的分量 m_z = |r||F| sin(β − α)：正值指向屏幕外（⊙），负值指向屏幕里（⊗）。",
+     "Here r and F lie in the screen plane, so the moment has only the component normal to the screen, m_z = |r||F| sin(β − α): positive out of the screen (⊙), negative into it (⊗)."]
+步骤:
+  - ["打开实验 3.2，选择场景“力传感器与零件”。保持 |r| = 0.3 m、α = 20°、|F| = 40 N，把 β 依次调到 20°、50°、110°、200°、−10°，记录点积和 m_z，填入表 1；先用原理中的公式手算。",
+     "Open Lab 3.2, scene “F/T sensor and part”. Keep |r| = 0.3 m, α = 20°, |F| = 40 N; set β to 20°, 50°, 110°, 200°, −10° in turn and record the dot product and m_z in Table 1; compute them by hand first."]
+  - ["完成任务 1～3，观察力矩为零、最大、为负的一半时，虚线平行四边形的形状和点积的值。",
+     "Do tasks 1–3 and watch the dashed parallelogram and the dot product when the moment is zero, largest, and minus one half."]
+  - ["切换到场景“扳手拧螺栓”，只用 50 N 的力拧出至少 20 N·m 的力矩（任务 4）。改变扳手长度和用力方向，找出两种可行的组合，填入表 2。",
+     "Switch to “Wrench on a bolt” and produce at least 20 N·m with 50 N (task 4). Vary the handle length and the push direction; find two combinations that work and enter them in Table 2."]
+数据表:
+  - 标题: ["表 1  力矩随力的方向变化（|r| = 0.3 m，α = 20°，|F| = 40 N）", "Table 1  The moment against the force direction (|r| = 0.3 m, α = 20°, |F| = 40 N)"]
+    表头: ["β", "β − α", "r·F 手算 / N·m", "r·F 读数 / N·m", "m_z 手算 / N·m", "m_z 读数 / N·m"]
+    表头英文: ["β", "β − α", "r·F by hand / N·m", "r·F read / N·m", "m_z by hand / N·m", "m_z read / N·m"]
+    行: [["20°", "0°", "", "", "", ""], ["50°", "30°", "", "", "", ""], ["110°", "90°", "", "", "", ""], ["200°", "180°", "", "", "", ""], ["−10°", "−30°", "", "", "", ""]]
+  - 标题: ["表 2  用 50 N 拧出 20 N·m", "Table 2  20 N·m with 50 N"]
+    表头: ["扳手长度 |r| / m", "β − α", "m_z / N·m", "是否达到"]
+    表头英文: ["Handle length |r| / m", "β − α", "m_z / N·m", "Reached?"]
+    行: [["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["角度从屏幕向右的方向量起，逆时针为正。", "Angles are measured from the rightward screen direction, counter-clockwise positive."]
+  - ["力的箭头按比例缩小画出，平行四边形的面积与 |m| 成正比，但单位不同。", "The force arrow is drawn to a reduced scale; the parallelogram's area is proportional to |m| but has other units."]
+思考题:
+  - ["若力的作用点沿力的作用线移动（r 变了，F 不变），力矩会变吗？用叉积的性质说明。", "If the point of application slides along the line of action (r changes, F does not), does the moment change? Explain with the cross product."]

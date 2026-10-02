@@ -1,0 +1,36 @@
+# 实验 3.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_6.js。
+原理:
+  - ["刚体绕定轴转动时，角速度矢量 ω = θ̇ ω̂ 沿转轴，方向按右手定则确定，长度为转速（rad/s）。刚体上任一点的速度为 v = ω × r，r 从转轴上任意一点指向该点。",
+     "For a rigid body turning about a fixed axis, the angular velocity ω = θ̇ ω̂ lies along the axis (right-hand rule) and its length is the rate in rad/s. Every point moves with v = ω × r, where r runs from any point on the axis to the point."]
+  - 式: "v = ω × r,    |v| = ρ θ̇          (3.6.4)、(3.6.1)"
+  - ["ρ 是该点到转轴的距离。参考点沿轴移动时，r 增加一个平行于 ω 的矢量，叉积不变，所以 v 不变（式 (3.6.6)）。",
+     "ρ is the point's distance to the axis. Moving the reference point along the axis adds to r a vector parallel to ω, which leaves the cross product, and so v, unchanged (Eq. (3.6.6))."]
+  - ["实验中“测量速度”用中心差分求得：取关节转角比当前多 0.2° 和少 0.2° 时法兰盘中心的两个位置，位置差除以转过这 0.4° 所用的时间，与公式速度相比较。ISO 10218-1:2025 规定手动降速模式下工具中心点的速度不超过 250 mm/s（与 2011 版相同）。",
+     "The “measured” velocity is a central difference: the flange positions at joint angles 0.2° above and 0.2° below the current one, differenced and divided by the time taken to turn through these 0.4°; it is compared with the formula. ISO 10218-1:2025 limits the tool centre point to 250 mm/s in manual reduced-speed mode (as did the 2011 edition)."]
+步骤:
+  - ["打开实验 3.6，场景“UR5e 单关节转动”。关节选 1，转速 60°/s，参考点 h = 0，按“开始”（任务 1）。记录 ω、r、公式速度、测量速度和 ρ，填入表 1。",
+     "Open Lab 3.6, scene “UR5e, one joint turning”. Joint 1, 60°/s, h = 0; press Start (task 1). Record ω, r, the formula and measured velocities and ρ in Table 1."]
+  - ["用 ρ θ̇ 手算 |v|，与读数比较。说明速度为什么没有 z 分量。",
+     "Compute |v| = ρ θ̇ by hand and compare. Explain why the velocity has no z component."]
+  - ["按“重置”使手臂回到零位。逐步减小关节 1 的转速，找出使 |v| 不超过 250 mm/s 的最大整数转速（任务 2），与算例 3.6.1 的结果比较。",
+     "Press Reset to return home. Lower the rate of joint 1 step by step and find the largest whole-degree rate with |v| ≤ 250 mm/s (task 2); compare with Example 3.6.1."]
+  - ["关节选 2，转速 30°/s，按“开始”。把 h 从 0 调到 0.3 m 再调到 −0.3 m（任务 3），观察 r 与公式速度的读数，填入表 2。",
+     "Joint 2, 30°/s, press Start. Move h from 0 to 0.3 m and then to −0.3 m (task 3); watch r and the formula velocity and fill in Table 2."]
+  - ["切换到场景“唱片机转盘”，转速 200°/s，按“开始”（任务 4），读出外缘线速度，并与 ρ θ̇ 比较。",
+     "Switch to “Record turntable”, 200°/s, press Start (task 4); read the rim speed and compare with ρ θ̇."]
+数据表:
+  - 标题: ["表 1  关节 1 以 60°/s 转动（零位）", "Table 1  Joint 1 at 60°/s (home)"]
+    表头: ["量", "读数", "手算", "相对差"]
+    表头英文: ["Quantity", "Reading", "By hand", "Relative difference"]
+    行: [["ω / (rad/s)", "", "", ""], ["ρ / m", "", "", ""], ["公式速度 |v| / (mm/s)", "", "", ""], ["测量速度 |v| / (mm/s)", "", "", ""]]
+    行英文: [["ω / (rad/s)", "", "", ""], ["ρ / m", "", "", ""], ["Formula |v| / (mm/s)", "", "", ""], ["Measured |v| / (mm/s)", "", "", ""]]
+  - 标题: ["表 2  关节 2 以 30°/s 转动：移动参考点", "Table 2  Joint 2 at 30°/s: moving the reference point"]
+    表头: ["h / m", "r / m", "ω × r / (m/s)"]
+    表头英文: ["h / m", "r / m", "ω × r / (m/s)"]
+    行: [["0", "", ""], ["0.3", "", ""], ["−0.3", "", ""]]
+注意:
+  - ["读数都在机座坐标系 {s} 中，z 轴竖直向上。图中黑色箭头为 ω，蓝色为 r，红色为法兰盘中心的速度。", "All readings are in the base frame {s}, z up. Black arrow: ω; blue: r; red: the flange velocity."]
+  - ["转动过程中改变参数会重新开始。拖动画面可以旋转视角。", "Changing a parameter while turning restarts the motion. Drag the picture to turn the view."]
+思考题:
+  - ["若把参考点取在关节 2 的轴以外（例如机座原点），ω × r 与实际速度相差多少？这个差值与第 6 章运动旋量的线速度部分有什么关系？",
+     "If the reference point is taken off the joint-2 axis (say at the base origin), how far is ω × r from the true velocity? How does the difference relate to the linear part of the twist in Chapter 6?"]

@@ -1,0 +1,48 @@
+# 实验 1.6 的指导书与报告模板。目的、场景、参数、任务取自 lab1_6.js。
+原理:
+  - ["确定一个物体或机构的位置所需的最少独立变量个数称为自由度。平面刚体有 3 个自由度，空间中自由运动的刚体有 6 个（定理 1.4.1）。",
+     "The degrees of freedom are the fewest independent variables that fix the position of a body or mechanism. A rigid body has 3 in the plane and 6 in space (Theorem 1.4.1)."]
+  - ["基座固定的开链机构，自由度等于各关节自由度之和；基座本身自由运动时，再加上基座的 3 或 6 个（定理 1.4.2）。",
+     "For a fixed-base open chain the DOF equal the sum of the joints' DOF; a base that moves freely adds 3 or 6 (Theorem 1.4.2)."]
+  - 式: "m = f₁ + f₂ + ⋯ + fₙ  （+ 3 或 6）          (1.4.3)"
+  - ["执行器少于自由度的机器人称为欠驱动机器人，如 AGV（5 个自由度、2 台电机）、Go2（18 个、12 台）、四旋翼（6 个、4 个推力）。",
+     "A robot with fewer actuators than DOF is underactuated: the AGV (5 DOF, 2 motors), Go2 (18, 12), the quadrotor (6, 4 thrusts)."]
+  - ["差速驱动的车速与角速度由两轮转速决定：", "For differential drive the speed and turning rate follow from the two wheel speeds:"]
+  - 式: "v = r(ω_R + ω_L)/2,   ω = r(ω_R − ω_L)/b          (1.6.3), (1.6.4)"
+步骤:
+  - ["打开实验 1.6，场景“机械臂”，变量 1 取 0（UR5e）。把变量 2–7（关节 1–6）全部设为 0（任务 1），记录法兰中心坐标和到基座轴线的水平距离，与算例 1.6.1 和工作半径 850 mm 比较。",
+     "Open Lab 1.6, scene “Arms”, variable 1 = 0 (UR5e). Set variables 2–7 (joints 1–6) to 0 (task 1); record the flange centre and its horizontal distance to the base axis; compare with Example 1.6.1 and the 850 mm reach."]
+  - ["只改变关节 1，观察末端画出水平圆；只改变关节 6，观察法兰中心不动而法兰转动。把变量 1 改为 1（Panda），逐个拖动 7 个关节，记录各关节的限位。",
+     "Change only joint 1: the tool moves on a horizontal circle; change only joint 6: the flange turns about its centre. Set variable 1 = 1 (Panda) and drag its 7 joints one by one; note the limits."]
+  - ["切换到“四足”。选一条腿，改变大腿和小腿关节，把足端抬高 5 cm 以上（任务 2），记录所用的关节角。",
+     "Switch to “Quadruped”. Pick a leg and change the thigh and calf joints until the foot is more than 5 cm up (task 2); record the joint angles."]
+  - ["切换到“移动与空中”。左轮 −10 rad/s、右轮 10 rad/s，按“开始”，小车原地转动（任务 3）；再试左右轮同速、不同速，记录车速和角速度，与式 (1.6.3)、(1.6.4) 的计算比较。",
+     "Switch to “Mobile and aerial”. Left wheel −10 rad/s, right 10 rad/s, press Start: the cart spins (task 3). Try equal and unequal speeds; compare v and ω with Eqs. (1.6.3), (1.6.4)."]
+  - ["用变量 3–8 把四旋翼放到 x = 0.5 m、y = 0、离地 1.0 m，偏航 90°（任务 4）。再只改横滚、俯仰，观察机体姿态。",
+     "Use variables 3–8 to put the quadrotor at x = 0.5 m, y = 0, 1.0 m up, yaw 90° (task 4). Then change roll and pitch only and watch the body."]
+  - ["切换到生活场景“人的手臂”，用 7 个关节把手举过头顶（任务 5）。在自己身上做 1.6.11 节的小实验：手掌按住桌面不动，抬放手肘。",
+     "Switch to “The human arm” and raise the hand above the head with the 7 joints (task 5). Try the experiment of Section 1.6.11 on yourself: palm flat on the table, raise and lower the elbow."]
+  - ["填写表 1，统计五台机器人和人手臂的关节数、基座自由度、总自由度和执行器数。",
+     "Fill in Table 1 with joints, base DOF, total DOF and actuators of the five robots and the human arm."]
+数据表:
+  - 标题: ["表 1  自由度统计", "Table 1  Counting degrees of freedom"]
+    表头: ["对象", "关节数", "基座自由度", "总自由度", "执行器数", "是否欠驱动"]
+    表头英文: ["Object", "Joints", "Base DOF", "Total DOF", "Actuators", "Underactuated?"]
+    行: [["UR5e", "", "", "", "", ""], ["Panda", "", "", "", "", ""], ["Go2", "", "", "", "", ""], ["AGV", "", "", "", "", ""],
+         ["四旋翼 X2", "", "", "", "", ""], ["人的手臂", "", "", "", "", ""]]
+    行英文: [["UR5e", "", "", "", "", ""], ["Panda", "", "", "", "", ""], ["Go2", "", "", "", "", ""], ["AGV", "", "", "", "", ""],
+             ["Quadrotor X2", "", "", "", "", ""], ["Human arm", "", "", "", "", ""]]
+  - 标题: ["表 2  测量记录", "Table 2  Measurements"]
+    表头: ["项目", "读数", "书中的值或计算值", "差别及原因"]
+    表头英文: ["Item", "Reading", "Book or computed value", "Difference and reason"]
+    行: [["UR5e 零位法兰中心到基座轴线的距离 / m", "", "", ""], ["Go2 抬腿时的大腿、小腿关节角 / °", "", "—", ""],
+         ["AGV 车速 v / (m/s)，ωL = ωR = 10 rad/s", "", "", ""], ["AGV 角速度 ω / (rad/s)，ωL = −10、ωR = 10 rad/s", "", "", ""]]
+    行英文: [["UR5e home: flange centre to base axis / m", "", "", ""], ["Go2 lifted leg: thigh, calf angles / °", "", "—", ""],
+             ["AGV speed v / (m/s), ωL = ωR = 10 rad/s", "", "", ""], ["AGV turning rate ω / (rad/s), ωL = −10, ωR = 10 rad/s", "", "", ""]]
+注意:
+  - ["八个滑块在不同场景中含义不同，以“测量”栏第一行的说明为准。", "The eight sliders mean different things in different scenes; the first line of MEASUREMENTS says which."]
+  - ["关节角超出模型的限位时，机器人停在限位上，读数按限位计算。", "Beyond a joint limit the robot stops at the limit and the readings use the limit."]
+  - ["AGV 行驶 8 s 或离开起点 1.6 m 后自动停止；按“重置”回到起点。", "The AGV stops after 8 s or 1.6 m from the start; Reset brings it back."]
+思考题:
+  - ["Go2 抬起一条腿时，机身的 6 个自由度由什么来维持？如果四条腿都离地会怎样？", "When Go2 lifts one leg, what holds the body's 6 DOF? What if all four feet leave the ground?"]
+  - ["为什么差速小车不能直接横向平移？要把它向左平移 0.5 m，最少需要几段运动？", "Why can't the differential cart move sideways? How many motion segments does a 0.5 m sideways shift need at least?"]

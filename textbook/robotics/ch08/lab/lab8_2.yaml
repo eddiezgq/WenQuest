@@ -1,0 +1,35 @@
+# 实验 8.2 的指导书与报告模板。目的、场景、参数、任务取自 lab8_2.js。
+原理:
+  - ["扭簧手臂的末端被固定在 p_d，手臂停在扭簧势能最小的形态：min ½(θ − θ_c)ᵀK(θ − θ_c)，约束 p(θ) = p_d。这是一个等式约束优化问题。",
+     "With the tip held at p_d, the spring arm settles at the least spring energy: min ½(θ − θ_c)ᵀK(θ − θ_c) subject to p(θ) = p_d, an equality-constrained problem."]
+  - 式: "拉格朗日条件：K(θ − θ_c) + J(θ)ᵀλ = 0，p(θ) − p_d = 0          (8.2.5)"
+  - ["拉格朗日-牛顿法用牛顿法解上面的方程组，每一步解一个 5×5 的线性方程组（式 (8.2.10)），在解附近二次收敛。",
+     "The Lagrange–Newton method solves these equations by Newton's method, one 5×5 linear system per step (Eq. (8.2.10)); it converges quadratically near the solution."]
+  - ["乘子是最优值对约束的变化率：把 p_d 挪动 δ，势能增加约 −λᵀδ。手做的功 Fᵀδ 全部变成势能，所以手的力 F = −λ，且扭簧力矩 τ = −K(θ − θ_c) 满足 τ + JᵀF = 0（式 (8.2.13)）。",
+     "A multiplier is the rate of change of the optimum with the constraint: moving p_d by δ raises the energy by about −λᵀδ. The hand's work Fᵀδ all becomes energy, so F = −λ, and the spring torques τ = −K(θ − θ_c) satisfy τ + JᵀF = 0 (Eq. (8.2.13))."]
+  - ["晾衣绳上的衣架停在绳长约束下的最低点，拉格朗日条件给出两段绳与竖直方向夹角相等、2λ cos α = G：乘子就是绳的拉力。",
+     "A hanger on a clothes line stops at the lowest point allowed by the rope length; the Lagrange conditions give equal angles to the vertical and 2λ cos α = G: the multiplier is the rope tension."]
+步骤:
+  - ["打开实验 8.2，场景“扭簧手臂”，保持默认参数，按“求解”（任务 1）。记录每一步的 KKT 残差，判断是否二次收敛；记录 θ、λ、F，填入表 1。",
+     "Open Lab 8.2, scene “Arm with joint springs”, keep the defaults and press “Solve” (task 1). Record the KKT residual at each step and judge whether it converges quadratically; record θ, λ and F in Table 1."]
+  - ["把 k₁ 改为 60 N·m/rad 再求解（任务 2），比较关节 1 的转角 θ₁ − 30° 和手的力。", "Set k₁ = 60 N·m/rad and solve (task 2); compare joint 1's rotation θ₁ − 30° and the hand force."]
+  - ["恢复刚度，把目标点改为 (0.45, 0.55) m 再求解（任务 3），读出 |τ + JᵀF|。再把 p_d 的 x 增加 0.01 m，记录势能的增量，与 −λ_x × 0.01 比较。",
+     "Restore the stiffness, set the target to (0.45, 0.55) m and solve (task 3); read |τ + JᵀF|. Then add 0.01 m to the x of p_d, record the energy increase and compare it with −λ_x × 0.01."]
+  - ["切换到“晾衣绳”。改变绳长 ℓ 和重量 G，记录夹角 α 和拉力，填入表 2；找到使拉力超过 30 N 的组合（任务 4）。",
+     "Switch to “Clothes line”. Vary ℓ and G, record α and the tension in Table 2; find a combination giving more than 30 N (task 4)."]
+数据表:
+  - 标题: ["表 1  扭簧手臂", "Table 1  The spring arm"]
+    表头: ["情形", "θ / (°)", "λ / N", "F / N", "势能 U / J", "|τ + JᵀF| / (N·m)"]
+    表头英文: ["Case", "θ / (°)", "λ / N", "F / N", "Energy U / J", "|τ + JᵀF| / (N·m)"]
+    行: [["默认（算例 8.2.2）", "", "", "", "", ""], ["k₁ = 60", "", "", "", "", ""], ["p_d = (0.45, 0.55) m", "", "", "", "", ""]]
+    行英文: [["Default (Example 8.2.2)", "", "", "", "", ""], ["k₁ = 60", "", "", "", "", ""], ["p_d = (0.45, 0.55) m", "", "", "", "", ""]]
+  - 标题: ["表 2  晾衣绳", "Table 2  The clothes line"]
+    表头: ["绳长 ℓ / m", "重量 G / N", "夹角 α / (°)", "拉力 λ / N", "G/(2 cos α) / N"]
+    表头英文: ["Length ℓ / m", "Weight G / N", "Angle α / (°)", "Tension λ / N", "G/(2 cos α) / N"]
+    行: [["2.6", "20", "", "", ""], ["3.0", "20", "", "", ""], ["2.2", "20", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["改变任一滑块都会让手臂回到自然形态，需要重新按“求解”。", "Moving any slider returns the arm to its natural posture; press “Solve” again."]
+  - ["乘子的符号取决于拉格朗日函数的写法；本实验用 L = f + λᵀh，与正文一致。", "The sign of a multiplier depends on how the Lagrangian is written; this lab uses L = f + λᵀh, as in the text."]
+  - ["目标点离工作空间边界太近时，牛顿法可能不收敛，界面会显示“未收敛”。", "If the target is too close to the edge of the workspace, Newton's method may fail; the screen then shows “not converged”."]
+思考题:
+  - ["k₁ 加大后，为什么手的力也变了？用最小势能原理解释。", "Why does the hand force change when k₁ grows? Explain with the principle of minimum potential energy."]

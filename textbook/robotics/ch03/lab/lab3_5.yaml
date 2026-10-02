@@ -1,0 +1,30 @@
+# 实验 3.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_5.js。
+原理:
+  - ["求和约定：一项中出现两次的指标（哑指标）表示从 1 到 3 求和，求和号省略；只出现一次的指标（自由指标）不求和，代表等式的个数。",
+     "Summation convention: an index appearing twice in a term (a dummy index) is summed from 1 to 3 without writing the sum sign; an index appearing once (a free index) is not summed and counts the equations."]
+  - 式: "(P_a)_ij = r_ik r_jl (P_b)_kl          (3.5.3)"
+  - ["固定 i、j 以后，右边对 k、l 求和，共九项。表面坐标系中 P_b = diag(1, 1, 0)，只有 k = l = 1、2 的项可能不为零。表面绕 x 轴倾斜 θ 时，r_ij 是方向余弦矩阵 Rot(x, θ) 的元素。",
+     "With i, j fixed, the right-hand side sums nine terms over k and l. In the surface frame P_b = diag(1, 1, 0), so only the terms k = l = 1, 2 can be non-zero. For a surface tilted by θ about x, r_ij are the entries of Rot(x, θ)."]
+  - 式: "总价 = p_i q_i = p₁q₁ + p₂q₂ + p₃q₃"
+步骤:
+  - ["打开实验 3.5，选择场景“投影张量的分量”。取 θ = 20°，依次选择 (i, j) = (1, 1)、(2, 2)、(2, 3)、(3, 3)，记录不为零的项和它们的和，填入表 1。",
+     "Open Lab 3.5, scene “Components of the projection tensor”. With θ = 20°, choose (i, j) = (1, 1), (2, 2), (2, 3), (3, 3) in turn and record the non-zero terms and their sum in Table 1."]
+  - ["用 cos θ、sin θ 写出 (P_a)₂₂、(P_a)₂₃、(P_a)₃₃ 的公式，与读数比较。",
+     "Write (P_a)₂₂, (P_a)₂₃, (P_a)₃₃ in terms of cos θ and sin θ, and compare with the readings."]
+  - ["完成任务 2、3：找出 (P_a)₃₃ = 0.5 的倾角；把表面竖起来，记录 P_a。检查迹始终为 2。",
+     "Do tasks 2 and 3: find the tilt with (P_a)₃₃ = 0.5; stand the surface up and record P_a. Check that the trace is always 2."]
+  - ["切换到场景“购物小票”，找出两组使总价恰好为 100 元的数量（任务 4），填入表 2。",
+     "Switch to “A shopping receipt” and find two sets of quantities giving exactly 100 yuan (task 4); enter them in Table 2."]
+数据表:
+  - 标题: ["表 1  逐项求和（θ = 20°）", "Table 1  Term by term (θ = 20°)"]
+    表头: ["(i, j)", "不为零的项", "和", "公式（含 θ）"]
+    表头英文: ["(i, j)", "Non-zero terms", "Sum", "Formula in θ"]
+    行: [["(1, 1)", "", "", ""], ["(2, 2)", "", "", ""], ["(2, 3)", "", "", ""], ["(3, 3)", "", "", ""]]
+  - 标题: ["表 2  总价 100 元", "Table 2  A total of 100 yuan"]
+    表头: ["q₁", "q₂", "q₃", "p_i q_i"]
+    表头英文: ["q₁", "q₂", "q₃", "p_i q_i"]
+    行: [["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["书中的指标从 1 开始；程序中的数组下标从 0 开始，换算时要减 1。", "Indices in the book start at 1; array indices in programs start at 0."]
+思考题:
+  - ["表面竖直时，哪个方向的速度被完全去掉？它对应 P_a 的哪一行哪一列？", "With the surface vertical, which velocity direction is removed completely? Which row and column of P_a show it?"]

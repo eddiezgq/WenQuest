@@ -1,0 +1,28 @@
+# 实验 9.3 的指导书与报告模板。目的、场景、参数、任务取自 lab9_3.js。
+原理:
+  - ["贝叶斯公式：后验正比于似然乘以先验，再归一化使各格概率之和为 1。", "Bayes' rule: the posterior is proportional to likelihood times prior, normalized so the cells sum to 1."]
+  - 式: "Pr(B_j | A) = Pr(A | B_j) Pr(B_j) / Σ_i Pr(A | B_i) Pr(B_i)          (9.3.5)"
+  - ["全概率公式处理运动：前进以后在第 j 格的概率，是从各格出发走到第 j 格的概率之和。", "The law of total probability handles motion: the chance of being in cell j after a move sums over every cell it could have come from."]
+  - 式: "b'_j = slip · b_j + (1 − 2 slip) · b_(j−1) + slip · b_(j−2)          (9.3.6)"
+  - ["测量使分布变尖（得到信息），运动使分布变平（损失信息）。", "Measuring sharpens the distribution (information gained); moving flattens it (information lost)."]
+步骤:
+  - ["场景“走廊里的 AGV”，取默认参数（0.9、0.1、0.1）。按“重置”，再按一次“测量”，记录四个标志格的概率之和和最可能的格（任务 1，表 1 第 1 行）。", "Scene “AGV in an aisle”, default parameters (0.9, 0.1, 0.1). Press Reset, then Measure once; record the total on the four tags and the most likely cell (task 1, Table 1 row 1)."]
+  - ["交替按“前进一格”和“测量”，每一步记录读数、最可能的格及其概率、AGV 实际所在格的概率（表 1）。", "Alternate Move and Measure; at each step record the reading, the most likely cell with its probability, and the probability of the true cell (Table 1)."]
+  - ["把参数改为 0.95、0.05、0.05，重复第 1、2 步，直到实际所在格的概率超过 0.8（任务 2），比较两组参数所需的步数。", "Set 0.95, 0.05, 0.05 and repeat steps 1–2 until the true cell exceeds 0.8 (task 2); compare the number of steps for the two settings."]
+  - ["切换到“质检报警”，按算例 9.3.1 设置缺陷率 1%、检出率 0.95、误报率 0.05，读出后验（任务 3）；再把缺陷率改为 10% 和 0.1%，填表 2。", "Switch to “Inspection alarm”, set 1%, 0.95, 0.05 as in Example 9.3.1 and read the posterior (task 3); then try 10% and 0.1% defects and fill in Table 2."]
+数据表:
+  - 标题: ["表 1  走廊定位的逐步记录", "Table 1  Step-by-step localization in the aisle"]
+    表头: ["步", "操作", "读数", "最可能的格", "其概率", "实际所在格", "其概率"]
+    表头英文: ["Step", "Action", "Reading", "Most likely cell", "Its probability", "True cell", "Its probability"]
+    行: [["1", "测量", "", "", "", "", ""], ["2", "前进", "—", "", "", "", ""], ["3", "测量", "", "", "", "", ""], ["4", "前进", "—", "", "", "", ""], ["5", "测量", "", "", "", "", ""], ["6", "前进", "—", "", "", "", ""], ["7", "测量", "", "", "", "", ""]]
+    行英文: [["1", "Measure", "", "", "", "", ""], ["2", "Move", "—", "", "", "", ""], ["3", "Measure", "", "", "", "", ""], ["4", "Move", "—", "", "", "", ""], ["5", "Measure", "", "", "", "", ""], ["6", "Move", "—", "", "", "", ""], ["7", "Measure", "", "", "", "", ""]]
+  - 标题: ["表 2  缺陷率对后验的影响（检出率 0.95，误报率 0.05）", "Table 2  Effect of the defect rate (detection 0.95, false alarm 0.05)"]
+    表头: ["缺陷率", "1000 个中报警", "其中有缺陷", "Pr(D | A) / %"]
+    表头英文: ["Defect rate", "Alarmed of 1000", "Of which defective", "Pr(D | A) / %"]
+    行: [["10%", "", "", ""], ["1%", "", "", ""], ["0.1%", "", "", ""]]
+注意:
+  - ["读数和 AGV 的实际走格由固定种子的随机数产生，按“重置”后重复相同的序列；改变参数会自动重置。", "Readings and the true moves come from fixed-seed random numbers, repeated after Reset; changing a parameter resets the lab."]
+  - ["走到第 19 格以后 AGV 停在最后一格，此后的概率分布不再有意义。", "Beyond cell 19 the AGV stays in the last cell; the distribution is no longer meaningful there."]
+思考题:
+  - ["算例 9.3.2 中第 6、7 格的标志紧挨着，这对 AGV 认出自己的位置有什么帮助？如果四个标志等间距排列，会怎样？", "The tags on cells 6 and 7 are adjacent. How does that help? What if the four tags were evenly spaced?"]
+  - ["长时间只前进不测量，各格的概率会变成什么样？为什么？", "If the AGV only moves and never measures, what happens to the distribution, and why?"]

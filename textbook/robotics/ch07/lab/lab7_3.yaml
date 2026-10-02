@@ -1,0 +1,31 @@
+# 实验 7.3 的指导书与报告模板。目的、场景、参数、任务取自 lab7_3.js。
+原理:
+  - ["一元方程 f(θ) = 0 的牛顿法：在 θ_k 处用切线近似 f，切线与横轴的交点作为下一个猜测。", "Newton's method for f(θ) = 0: approximate f by its tangent at θ_k; where the tangent meets the axis is the next guess."]
+  - 式: "θ_{k+1} = θ_k − f(θ_k)/f′(θ_k)          (7.3.3)"
+  - ["在根附近 |e_{k+1}| ≤ (M/2m) e_k²（定理 7.3.1）：误差与上一步误差的平方成正比，有效位数每步约加倍，称为二次收敛。", "Near the root |e_{k+1}| ≤ (M/2m) e_k² (Theorem 7.3.1): the error is proportional to the square of the previous one and the correct digits roughly double each step (quadratic convergence)."]
+  - ["2R 臂的逆运动学是方程组 p(θ) = p_d。用雅可比矩阵 J = ∂p/∂θ 把它线性化，每步解一个线性方程组：", "Inverse kinematics of the 2R arm is the system p(θ) = p_d. Linearize with the Jacobian J = ∂p/∂θ and solve a linear system at each step:"]
+  - 式: "θ^(k+1) = θ^(k) − J(θ^(k))⁻¹ (p(θ^(k)) − p_d),   det J = l₁ l₂ sin θ₂          (7.3.8), (7.3.10)"
+  - ["θ₂ = 0 或 π 时 J 奇异，无法迭代。初值离解太远时，迭代可能陷入来回跳动的循环；回溯线搜索（步长从 1 起减半，直到残差减小）能挽救大部分这类初值。目标够不着时方程无解。",
+     "At θ₂ = 0 or π the Jacobian is singular and no step can be taken. Far from a solution the iteration may fall into a cycle; backtracking line search (halve the step until the residual drops) rescues most such starts. An out-of-reach target has no solution."]
+步骤:
+  - ["场景“2R 臂的逆运动学”：目标 (0.45, 0.35) m，初值 (0°, 57°)，线搜索关。逐次按“迭代一步”，把每一步的残差记入表 1，观察指数如何成倍增加（任务 1）。用余弦定理手算解析解核对。",
+     "Scene “Inverse kinematics of a 2R arm”: target (0.45, 0.35) m, start (0°, 57°), line search off. Press “One step” repeatedly; record each residual in Table 1 and watch the exponent double (task 1). Check against the law-of-cosines solution."]
+  - ["把初值改为 (60°, −60°)，按“开始”，确认收敛到 θ₂ < 0 的另一组解（任务 2）。", "Set the start to (60°, −60°), press Start, and confirm convergence to the other solution with θ₂ < 0 (task 2)."]
+  - ["初值改为 (−170°, −140°)：先关线搜索，看迭代是否收敛；再打开线搜索重做（任务 3）。把两次的结果记入表 2。", "Start (−170°, −140°): first with line search off, see whether it converges; then with it on (task 3). Record both in Table 2."]
+  - ["初值取 θ₂ = 0，看读数“雅可比矩阵奇异”。", "Use a start with θ₂ = 0 and see the reading “Jacobian singular”."]
+  - ["把目标移到 (0.9, 0.3) m（够不着），迭代 10 次以上，记录残差的最小值，与“目标距离 − 0.817 m”比较（任务 4）。", "Move the target to (0.9, 0.3) m (out of reach), iterate 10 times or more, and compare the smallest residual with “distance − 0.817 m” (task 4)."]
+  - ["场景“用牛顿法开平方”：a = 10，x₀ = 3，按“开始”，记下每一步的误差（任务 5）。", "Scene “Square roots by Newton's method”: a = 10, x₀ = 3, Start; record the error at each step (task 5)."]
+数据表:
+  - 标题: ["表 1  牛顿法的残差（目标 (0.45, 0.35) m，初值 (0°, 57°)）", "Table 1  Residuals of Newton's method (target (0.45, 0.35) m, start (0°, 57°))"]
+    表头: ["k", "θ₁ / (°)", "θ₂ / (°)", "‖p − p_d‖ / m", "log₁₀ ‖p − p_d‖"]
+    行: [["0", "0", "57", "", ""], ["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""], ["5", "", "", "", ""]]
+  - 标题: ["表 2  初值与收敛", "Table 2  Starting guess and convergence"]
+    表头: ["初值 (θ₁, θ₂)", "线搜索", "是否收敛", "迭代次数", "收敛到的解"]
+    表头英文: ["Start (θ₁, θ₂)", "Line search", "Converged?", "Iterations", "Solution reached"]
+    行: [["(0°, 57°)", "关", "", "", ""], ["(60°, −60°)", "关", "", "", ""], ["(−170°, −140°)", "关", "", "", ""], ["(−170°, −140°)", "开", "", "", ""], ["(30°, 0°)", "关", "", "", ""]]
+    行英文: [["(0°, 57°)", "off", "", "", ""], ["(60°, −60°)", "off", "", "", ""], ["(−170°, −140°)", "off", "", "", ""], ["(−170°, −140°)", "on", "", "", ""], ["(30°, 0°)", "off", "", "", ""]]
+注意:
+  - ["滑块的初值以度为单位，算例 7.3.4 的初值 1 rad ≈ 57.3°，这里取 57°，迭代过程的数字与书中略有不同，收敛的结果相同。", "The slider uses degrees; Example 7.3.4 starts at 1 rad ≈ 57.3°, here 57°, so the intermediate numbers differ slightly from the book while the final answer is the same."]
+  - ["残差小于 10⁻¹⁰ m 即认为收敛；双精度下残差最小约为 10⁻¹⁶ m。", "A residual below 10⁻¹⁰ m counts as converged; in double precision the residual bottoms out near 10⁻¹⁶ m."]
+思考题:
+  - ["目标在工作空间边界附近（例如距基座 0.81 m）时，收敛变慢还是变快？与 det J 有什么关系？", "Near the edge of the workspace (e.g. 0.81 m from the base), does convergence get slower or faster? How is that related to det J?"]

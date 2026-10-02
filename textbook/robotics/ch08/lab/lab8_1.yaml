@@ -1,0 +1,37 @@
+# 实验 8.1 的指导书与报告模板。目的、场景、参数、任务取自 lab8_1.js。
+原理:
+  - ["把逆运动学写成无约束优化：f(θ) = ½‖p(θ) − p_d‖²。f 为零的点就是逆解。f 的梯度是 Jᵀr，r = p(θ) − p_d 是末端的位置误差，J 是雅可比矩阵。",
+     "Inverse kinematics as unconstrained optimisation: f(θ) = ½‖p(θ) − p_d‖². The zeros of f are the solutions. Its gradient is Jᵀr, where r = p(θ) − p_d is the tip error and J the Jacobian."]
+  - 式: "梯度下降：θ_{k+1} = θ_k − α ∇f(θ_k)          (8.1.11)"
+  - 式: "牛顿法：∇²f(θ_k) d_k = −∇f(θ_k)，θ_{k+1} = θ_k + d_k          (8.1.15)"
+  - ["在极小点附近，梯度下降的误差每步乘以 max|1 − αλ_i|，λ_i 是黑塞矩阵的特征值。步长超过 2/λ_max 就不再收敛；条件数 κ = λ_max/λ_min 越大，最好的固定步长也收敛得越慢，最好的倍数是 (κ − 1)/(κ + 1)。",
+     "Near a minimum the gradient-descent error is multiplied by max|1 − αλ_i| each step, λ_i being the Hessian eigenvalues. Above 2/λ_max it no longer converges; the larger κ = λ_max/λ_min, the slower even the best fixed step, whose factor is (κ − 1)/(κ + 1)."]
+  - ["牛顿法用二次模型代替 f，在极小点附近二次收敛：误差大约每步平方一次。但它只找梯度为零的点，可能收敛到鞍点。",
+     "Newton's method replaces f by a quadratic model and converges quadratically near a minimum: the error is roughly squared each step. But it only seeks zero gradient and may converge to a saddle point."]
+步骤:
+  - ["打开实验 8.1，场景“2R 臂的逆运动学”。方法选 0（梯度下降），α = 3，起点 (0°, 90°)，按“迭代”，记录收敛所需的迭代次数（任务 1），填入表 1。",
+     "Open Lab 8.1, scene “Inverse kinematics of a 2R arm”. Method 0 (gradient descent), α = 3, start (0°, 90°); press “Iterate” and record the number of iterations to converge (task 1) in Table 1."]
+  - ["依次取 α = 1、2、3.5、4.5，重复上一步。找出不再收敛的最小步长，与解处的上限 2/λ_max ≈ 3.9 比较（任务 2）。",
+     "Repeat with α = 1, 2, 3.5, 4.5. Find the smallest step that no longer converges and compare it with the limit 2/λ_max ≈ 3.9 at the solution (task 2)."]
+  - ["方法选 1（牛顿法），起点 (0°, 90°)，记录每一步与极小点之差，验证二次收敛（任务 3）。",
+     "Method 1 (Newton), start (0°, 90°): record the distance to the minimum at each step and check quadratic convergence (task 3)."]
+  - ["牛顿法从 (0°, 17°) 出发，观察迭代收敛到哪里，读出此时的 f，并解释原因。", "Run Newton's method from (0°, 17°); see where it converges, read f there and explain."]
+  - ["切换到“雾中下山”。κ 分别取 2、10、25，用梯度下降（最优固定步长）和牛顿法各走一次，把步数填入表 2（任务 4）。",
+     "Switch to “Downhill in fog”. For κ = 2, 10, 25 run gradient descent (best fixed step) and Newton's method; enter the step counts in Table 2 (task 4)."]
+数据表:
+  - 标题: ["表 1  2R 臂逆运动学：步长与迭代次数（起点 (0°, 90°)）", "Table 1  2R inverse kinematics: step and iterations (start (0°, 90°))"]
+    表头: ["方法", "步长 α / (rad²/m²)", "迭代次数", "是否收敛", "最终 θ / (°)"]
+    表头英文: ["Method", "Step α / (rad²/m²)", "Iterations", "Converged?", "Final θ / (°)"]
+    行: [["梯度下降", "1", "", "", ""], ["梯度下降", "2", "", "", ""], ["梯度下降", "3", "", "", ""], ["梯度下降", "3.5", "", "", ""], ["梯度下降", "4.5", "", "", ""], ["牛顿法", "—", "", "", ""]]
+    行英文: [["Gradient descent", "1", "", "", ""], ["Gradient descent", "2", "", "", ""], ["Gradient descent", "3", "", "", ""], ["Gradient descent", "3.5", "", "", ""], ["Gradient descent", "4.5", "", "", ""], ["Newton", "—", "", "", ""]]
+  - 标题: ["表 2  雾中下山：条件数与步数", "Table 2  Downhill in fog: condition number and steps"]
+    表头: ["κ", "梯度下降步数", "(κ − 1)/(κ + 1)", "牛顿法步数"]
+    表头英文: ["κ", "Gradient-descent steps", "(κ − 1)/(κ + 1)", "Newton steps"]
+    行: [["2", "", "", ""], ["10", "", "", ""], ["25", "", "", ""]]
+注意:
+  - ["关节角在等高线图上显示为 (−180°, 180°]，路径越过边界时从对边接着画。", "Joint angles are shown in (−180°, 180°]; a path crossing an edge continues from the opposite edge."]
+  - ["“与最近的极小点之差”以 rad 为单位；梯度的范数小于 10⁻⁸ 时停止（与算例 8.1.3 相同）。", "“Distance to the nearest minimum” is in rad; the iteration stops when the gradient norm falls below 10⁻⁸ (as in Example 8.1.3)."]
+  - ["改变任一滑块都会重新开始；先设好参数再按“迭代”。", "Moving any slider restarts; set the parameters first, then press “Iterate”."]
+思考题:
+  - ["表 1 中 α = 3 与 α = 1 的步数之比约为多少？用定理 8.1.6 的倍数 max|1 − αλ_i| 解释。", "What is the ratio of steps between α = 3 and α = 1 in Table 1? Explain with the factor max|1 − αλ_i| of Theorem 8.1.6."]
+  - ["表 2 中梯度下降的步数大致与 κ 成正比。为什么？（提示：当 κ 很大时，ln((κ − 1)/(κ + 1)) ≈ −2/κ。）", "Why are the gradient-descent steps in Table 2 roughly proportional to κ? (Hint: for large κ, ln((κ − 1)/(κ + 1)) ≈ −2/κ.)"]

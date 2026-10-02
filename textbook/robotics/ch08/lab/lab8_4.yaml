@@ -1,0 +1,32 @@
+# 实验 8.4 的指导书与报告模板。目的、场景、参数、任务取自 lab8_4.js。
+原理:
+  - ["凸集：任意两点之间的线段都在集合内。凸函数：弦总在图像上方（詹森不等式）。凸优化问题的每个局部极小点都是全局极小点（定理 8.4.4）。",
+     "A convex set contains the segment between any two of its points; a convex function lies below its chords (Jensen's inequality). Every local minimum of a convex problem is global (Theorem 8.4.4)."]
+  - ["L 形的可通行区域不是凸集。拆成两个凸区域 R₁、R₂，规定前一半航点在 R₁、后一半在 R₂、交界航点在两者的交集里，相邻航点间的线段就一定在可通行区域内，路径规划成为一个凸二次规划。",
+     "The L-shaped free space is not convex. Split it into convex regions R₁ and R₂, put the first waypoints in R₁, the last in R₂ and the junction waypoint in both: every segment then lies in the free space and path planning becomes a convex QP."]
+  - 式: "障碍函数法：min t·f(x) − Σ log(bᵢ − aᵢᵀx)；  f(x*(t)) − p* ≤ m/t          (8.4.8)、(8.4.9)"
+  - ["t 从 1 开始，每次乘 10，以上一次的解为初值用牛顿法定心；这些解连成中心路径，随 t 增大逼近最优解。",
+     "Start at t = 1 and multiply by 10 each time, re-centring by Newton's method from the previous solution; the centres form the central path, which approaches the optimum as t grows."]
+步骤:
+  - ["打开实验 8.4，场景“凸走廊中的 AGV”。把 lg t 从 0 逐次加到 5，记录每个 t 下的 m/t、拐角航点 x₅ 和路径长度，填入表 1；使 m/t < 0.01（任务 1）。",
+     "Open Lab 8.4, scene “AGV in convex corridors”. Raise lg t from 0 to 5; record m/t, the corner waypoint x₅ and the path length for each t in Table 1; make m/t < 0.01 (task 1)."]
+  - ["保持 t = 10⁵，改变起点和终点（终点移到右侧走廊顶部附近，任务 2），观察拐角航点是否改变，并解释原因。",
+     "Keep t = 10⁵ and move the start and the goal (goal near the top of the right corridor, task 2); does the corner waypoint move? Explain."]
+  - ["切换到“碗与蛋托”，形状选 0（碗），从三个不同位置放球，记录落点，填入表 2（任务 3）。",
+     "Switch to “Bowl and egg tray”, shape 0 (bowl); drop the ball from three positions and record where it stops in Table 2 (task 3)."]
+  - ["形状选 1（蛋托），重复上一步；找到一个使小球停在不是最低的凹坑里的放球位置（任务 4）。", "Shape 1 (egg tray): repeat; find a drop position where the ball stops in a dimple that is not the lowest (task 4)."]
+数据表:
+  - 标题: ["表 1  障碍函数法的中心路径", "Table 1  Central path of the barrier method"]
+    表头: ["t", "m/t", "拐角航点 x₅ / m", "路径长度 / m"]
+    表头英文: ["t", "m/t", "Corner waypoint x₅ / m", "Path length / m"]
+    行: [["1", "", "", ""], ["10", "", "", ""], ["100", "", "", ""], ["1000", "", "", ""], ["10⁴", "", "", ""], ["10⁵", "", "", ""]]
+  - 标题: ["表 2  小球的落点", "Table 2  Where the ball stops"]
+    表头: ["形状", "放球位置", "落点", "高度 f", "是否为全局最低"]
+    表头英文: ["Shape", "Drop position", "Final position", "Height f", "Global minimum?"]
+    行: [["碗", "", "", "", ""], ["碗", "", "", "", ""], ["碗", "", "", "", ""], ["蛋托", "", "", "", ""], ["蛋托", "", "", "", ""], ["蛋托", "", "", "", ""]]
+    行英文: [["Bowl", "", "", "", ""], ["Bowl", "", "", "", ""], ["Bowl", "", "", "", ""], ["Egg tray", "", "", "", ""], ["Egg tray", "", "", "", ""], ["Egg tray", "", "", "", ""]]
+注意:
+  - ["货架已按 AGV 的半径膨胀，所以路径可以贴着膨胀后的边界走；真实的 AGV 还要再留安全余量。", "The shelves are already inflated by the AGV radius, so the path may touch the inflated boundary; a real AGV needs an extra safety margin."]
+  - ["起点必须在 R₁ 内部、终点必须在 R₂ 内部，障碍函数法才有严格可行的初值。", "The start must lie inside R₁ and the goal inside R₂, so that the barrier method has a strictly feasible starting point."]
+思考题:
+  - ["表 1 中路径长度随 t 增大单调减少吗？它最终逼近什么值？与“起点—拐角—终点”两段直线的长度比较。", "Does the path length in Table 1 decrease monotonically with t? What does it approach? Compare it with the two straight legs start–corner–goal."]

@@ -1,0 +1,32 @@
+# 实验 6.2 的指导书与报告模板。目的、场景、参数、任务取自 lab6_2.js。
+原理:
+  - ["刚体的角速度矢量 ω 与坐标系无关；它在空间坐标系 {s} 中的分量记作 ω_s，在物体坐标系 {b} 中的分量记作 ω_b，两者满足 ω_s = R ω_b，R = R_sb。",
+     "The angular velocity ω does not depend on any frame; its components in the space frame {s} are ω_s, in the body frame {b} ω_b, and ω_s = R ω_b with R = R_sb."]
+  - 式: "Ṙ = [ω_s] R = R [ω_b]          (6.2.3)、(6.2.5)"
+  - ["陀螺仪固定在物体上，测得的是 ω_b。若一个控制周期 Δt 内 ω_b 不变，则 R(t + Δt) = R(t) e^{[ω_b]Δt}：右乘（式 (6.2.7)）。若误把 ω_b 当作 ω_s 左乘，相当于把每一小步都绕 {s} 的固定轴转动。",
+     "A gyroscope rides on the body and measures ω_b. If ω_b is constant over a cycle Δt, R(t + Δt) = R(t) e^{[ω_b]Δt}: multiply on the right (Eq. (6.2.7)). Treating ω_b as ω_s and multiplying on the left turns each small step about the fixed axes of {s} instead."]
+  - ["只绕一根轴转动时，e^{[ω_b]Δt} 与 R 可交换，两种做法结果相同；绕两根不同的轴先后转动时，结果不同。",
+     "For rotation about a single axis e^{[ω_b]Δt} commutes with R and both ways agree; for turns about two different axes in sequence they differ."]
+步骤:
+  - ["打开实验 6.2，场景“四旋翼的姿态解算”。保持 a₁ = a₂ = 90°，按“开始：右乘”。观察机体先横滚、再俯仰，最终与虚线（真实姿态）重合（任务 1）。记录误差角，记入表 1。",
+     "Open Lab 6.2, scene “Quadrotor attitude estimation”. With a₁ = a₂ = 90° press “Start: right”. The body rolls, then pitches, and ends on the dashed true attitude (task 1). Record the error; Table 1."]
+  - ["第二段运行时，读出陀螺仪读数 ω_b 和空间角速度 ω_s，说明为什么 ω_b 只有 y 分量，而 ω_s 不是。",
+     "During stage 2 read ω_b and ω_s; explain why ω_b has only a y component while ω_s does not."]
+  - ["按“开始：左乘”重做（任务 2），记录误差角。用定理 4.2.2 说明左乘的结果相当于绕哪两根轴依次转动。",
+     "Repeat with “Start: left” (task 2) and record the error. Use Theorem 4.2.2 to say which axes the left product actually turns about."]
+  - ["令 a₂ = 0，再按“开始：左乘”（任务 3），记录误差角，解释原因。",
+     "Set a₂ = 0 and press “Start: left” (task 3); record the error and explain it."]
+  - ["切换到场景“转动手机”，用右乘完成任务 4。用式 (4.4.5) 手算最终的 R，读出屏幕法线（R 的第三列）指向哪里。",
+     "Switch to “Turning a phone” and do task 4 by right multiplication. Compute the final R with Eq. (4.4.5) by hand and say where the screen normal (third column of R) points."]
+数据表:
+  - 标题: ["表 1  两种积分方法的误差", "Table 1  Errors of the two integration rules"]
+    表头: ["场景", "a₁ / °", "a₂ / °", "方法", "误差角 / °", "说明"]
+    表头英文: ["Scene", "a₁ / °", "a₂ / °", "Rule", "Error / °", "Remark"]
+    行: [["四旋翼", "90", "90", "右乘", "", ""], ["四旋翼", "90", "90", "左乘", "", ""], ["四旋翼", "90", "0", "左乘", "", ""], ["手机", "90", "90", "右乘", "", ""]]
+    行英文: [["Quadrotor", "90", "90", "Right", "", ""], ["Quadrotor", "90", "90", "Left", "", ""], ["Quadrotor", "90", "0", "Left", "", ""], ["Phone", "90", "90", "Right", "", ""]]
+注意:
+  - ["本实验中每段转动持续 1 s，角速度在段内不变，所以右乘积分没有截断误差；真实陀螺仪的读数随时间变化，还有噪声和零偏，误差会随时间累积。",
+     "Each stage lasts 1 s at constant rate, so right multiplication has no truncation error here; a real gyroscope's reading varies, with noise and bias, and errors accumulate."]
+  - ["误差角按式 (4.8.2) 计算：两个姿态之间最小的转角。", "The error angle is Eq. (4.8.2): the smallest turn between the two attitudes."]
+思考题:
+  - ["如果陀螺仪安装时相对机体坐标系歪了一个固定的角度 R_bg，ω_b 应怎样由陀螺仪读数换算？", "If the gyroscope is mounted with a fixed misalignment R_bg relative to the body frame, how is ω_b obtained from its reading?"]

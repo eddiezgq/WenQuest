@@ -1,0 +1,33 @@
+# 实验 8.5 的指导书与报告模板。目的、场景、参数、任务取自 lab8_5.js。
+原理:
+  - ["UR5e 法兰盘中心的位置由表 12.1.1 的旋量轴按指数积公式算出。手腕关节固定，求关节 1～3，使残差 r(θ) = p(θ) − p_d 为零：这是非线性最小二乘问题 min ½‖r(θ)‖²。",
+     "The UR5e flange position follows from the screw axes of Table 12.1.1 by the product of exponentials. With the wrist fixed, find joints 1–3 so that r(θ) = p(θ) − p_d vanishes: the nonlinear least-squares problem min ½‖r(θ)‖²."]
+  - 式: "梯度 ∇F = Jᵀr；高斯-牛顿：JᵀJ Δ = −Jᵀr          (8.5.2)、(8.5.4)"
+  - 式: "LM：(JᵀJ + μI) Δ = −Jᵀr，阻尼系数 μ 由增益比 ρ 调整          (8.5.5)、(8.5.9)"
+  - ["梯度下降只用一阶信息，线性收敛；牛顿法用完整的黑塞矩阵，二次收敛但要二阶导数；高斯-牛顿法用 JᵀJ 代替黑塞矩阵，零残差问题中几乎与牛顿法一样快；LM 法加阻尼，在 J 接近奇异时仍然稳健。",
+     "Gradient descent uses first-order information and converges linearly; Newton uses the full Hessian and converges quadratically but needs second derivatives; Gauss-Newton replaces the Hessian by JᵀJ and is almost as fast on zero-residual problems; LM adds damping and stays robust when J is nearly singular."]
+  - ["室内定位：残差为 ‖x − aᵢ‖ − ρᵢ，雅可比矩阵的第 i 行是从基站 i 指向 x 的单位向量。四个方程、三个未知数，解处残差不为零，高斯-牛顿法线性收敛。",
+     "Indoor positioning: residuals ‖x − aᵢ‖ − ρᵢ; row i of the Jacobian is the unit vector from anchor i to x. Four equations, three unknowns, non-zero residual at the solution: Gauss-Newton converges linearly."]
+步骤:
+  - ["打开实验 8.5，场景“UR5e 位置逆解”。目标关节角保持 (40°, −70°, 100°)，起始形态 0，方法依次取 0、1、2、3，每次按“求解”，记录迭代次数，填入表 1（任务 1、2）。",
+     "Open Lab 8.5, scene “UR5e position IK”. Keep the target joint angles (40°, −70°, 100°) and start 0; for methods 0, 1, 2, 3 press “Solve” and record the iterations in Table 1 (tasks 1, 2)."]
+  - ["起始形态改为 1（伸直），重复上一步。注意 JᵀJ 的最小特征值，观察高斯-牛顿法关节角是否绕圈，记录最终关节角（任务 3）。",
+     "Change the start to 1 (stretched) and repeat. Note the smallest eigenvalue of JᵀJ; see whether Gauss-Newton winds the joints round; record the final joint angles (task 3)."]
+  - ["自选一组目标关节角（例如 (−30°, −120°, 60°)），用四种方法各求一次，比较结果是否为同一组关节角，并解释。", "Choose your own target joint angles (e.g. (−30°, −120°, 60°)), solve with all four methods and compare whether they find the same joint angles; explain."]
+  - ["切换到“室内定位”，按“求解”（任务 4），记录迭代次数和定位误差；再把手机移到房间一角，重复，填入表 2。", "Switch to “Indoor positioning” and press “Solve” (task 4); record the iterations and the error; move the phone to a corner and repeat (Table 2)."]
+数据表:
+  - 标题: ["表 1  UR5e 位置逆解：方法与迭代次数", "Table 1  UR5e position IK: methods and iterations"]
+    表头: ["方法", "起始形态 0 的迭代次数", "起始形态 1 的迭代次数", "起始形态 1 的最终关节角 / (°)"]
+    表头英文: ["Method", "Iterations from start 0", "Iterations from start 1", "Final angles from start 1 / (°)"]
+    行: [["梯度下降", "", "", ""], ["牛顿法", "", "", ""], ["高斯-牛顿法", "", "", ""], ["LM 法", "", "", ""]]
+    行英文: [["Gradient descent", "", "", ""], ["Newton", "", "", ""], ["Gauss-Newton", "", "", ""], ["Levenberg-Marquardt", "", "", ""]]
+  - 标题: ["表 2  室内定位", "Table 2  Indoor positioning"]
+    表头: ["手机实际位置 / m", "估计位置 / m", "误差 / cm", "迭代次数"]
+    表头英文: ["True position / m", "Estimate / m", "Error / cm", "Iterations"]
+    行: [["(3.6, 1.2, 1.0)", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["每次改变参数后手臂回到起始形态，再按“求解”。迭代过程中不要拖动滑块。", "After any change the arm returns to the start posture; press “Solve” again. Do not move sliders during the iteration."]
+  - ["关节角可能超过 ±180°：这对应同一个形态，但真实机器人的关节转不了那么多圈，控制器必须处理。", "Joint angles may exceed ±180°: it is the same posture, but a real joint cannot wind that far and the controller must handle it."]
+  - ["室内定位场景中房间按约 1:5.5 缩小显示；测距误差取算例 8.5.3 的同一组随机值。", "The room in “Indoor positioning” is drawn at about 1:5.5; the ranging errors are the same random values as in Example 8.5.3."]
+思考题:
+  - ["为什么梯度下降从伸直的形态出发反而只多用了十几步？（提示：看梯度下降每步的长度受什么限制。）", "Why does gradient descent need only a dozen or so more steps from the stretched posture? (Hint: what limits the length of its steps?)"]

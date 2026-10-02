@@ -1,0 +1,27 @@
+# 实验 9.1 的指导书与报告模板。目的、场景、参数、任务取自 lab9_1.js。
+原理:
+  - ["n 个读数的样本均值和样本标准差（分母为 n − 1，使 s² 的期望等于 σ²）：", "Sample mean and sample standard deviation of n readings (divisor n − 1 makes the expected s² equal σ²):"]
+  - 式: "x̄ = (1/n) Σ x_i，s² = (1/(n − 1)) Σ (x_i − x̄)²          (9.1.16)"
+  - ["高斯分布落在 μ ± σ、μ ± 2σ、μ ± 3σ 内的概率约为 68%、95%、99.7%（式 (9.1.15)）。", "A Gaussian lies within μ ± σ, μ ± 2σ, μ ± 3σ with probability about 68%, 95%, 99.7% (Eq. (9.1.15))."]
+  - ["N 个独立读数的平均值，方差缩小为 1/N，标准差缩小为 1/√N：", "The average of N independent readings has 1/N the variance and 1/√N the standard deviation:"]
+  - 式: "σ_x̄ = σ / √N          (9.1.19)"
+步骤:
+  - ["打开实验 9.1，场景“夹爪测力传感器”，σ = 0.08 N，N = 1。按“开始”收集读数，记录 n = 2000 时的 x̄、s 和落在 x̄ ± s 内的比例（任务 1，表 1）。", "Open Lab 9.1, scene “Gripper force sensor”, σ = 0.08 N, N = 1. Press Start; at n = 2000 record x̄, s and the share within x̄ ± s (task 1, Table 1)."]
+  - ["把 N 依次设为 4、16、64，每次重新收集，记录平均值的样本标准差，与 σ/√N 比较（任务 2，表 2）。", "Set N to 4, 16, 64 in turn, collect again, and record the sample std of the averages; compare with σ/√N (task 2, Table 2)."]
+  - ["切换到“厨房秤”，σ = 0.5 g。先由式 (9.1.19) 算出使 σ/√N ≤ 0.1 g 的最小 N，再在实验中验证（任务 3）。", "Switch to “Kitchen scale”, σ = 0.5 g. Work out from Eq. (9.1.19) the smallest N with σ/√N ≤ 0.1 g, then check it in the lab (task 3)."]
+  - ["把 σ 加倍，重复第 1 步，观察 s 和直方图的宽度怎样变化。", "Double σ and repeat step 1; see how s and the histogram width change."]
+数据表:
+  - 标题: ["表 1  单个读数的统计（N = 1）", "Table 1  Statistics of single readings (N = 1)"]
+    表头: ["σ / N", "n", "x̄ / N", "s / N", "x̄ ± s 内 / %", "x̄ ± 2s 内（目测）"]
+    表头英文: ["σ / N", "n", "x̄ / N", "s / N", "Within x̄ ± s / %", "Within x̄ ± 2s (by eye)"]
+    行: [["0.08", "2000", "", "", "", ""], ["0.16", "2000", "", "", "", ""]]
+  - 标题: ["表 2  平均值的标准差", "Table 2  Spread of the averages"]
+    表头: ["N", "平均值个数", "平均值的样本标准差 / N", "σ/√N / N", "相对差 / %"]
+    表头英文: ["N", "Number of averages", "Sample std of averages / N", "σ/√N / N", "Relative difference / %"]
+    行: [["1", "", "", "", ""], ["4", "", "", "", ""], ["16", "", "", "", ""], ["64", "", "", "", ""]]
+注意:
+  - ["噪声用固定种子生成，按“重置”后序列相同，便于比较；改变参数后需重新收集。", "The noise uses a fixed seed: after Reset the sequence repeats, so runs can be compared; collect again after changing a parameter."]
+  - ["平均值的个数较少时，它们的样本标准差本身也有较大的随机波动，与 σ/√N 相差 10% 以内都属正常。", "With few averages their sample std itself fluctuates; agreement with σ/√N within 10% is normal."]
+思考题:
+  - ["为什么要把标准差减小到 1/10，需要平均 100 个读数，而不是 10 个？", "Why does cutting the spread to 1/10 need 100 readings rather than 10?"]
+  - ["若传感器有 0.1 N 的零点偏移（系统误差），平均能否消除它？实验中哪个读数会反映出这个偏移？", "If the sensor had a 0.1 N zero offset (systematic error), could averaging remove it? Which reading would show it?"]

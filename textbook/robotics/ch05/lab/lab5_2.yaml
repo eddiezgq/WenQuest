@@ -1,0 +1,34 @@
+# 实验 5.2 的指导书与报告模板。目的、场景、参数、任务取自 lab5_2.js。
+原理:
+  - ["平面中的刚体位移写成 3×3 齐次矩阵 D = [R(θ) p; 0 1]。点的齐次坐标末位为 1，方向的末位为 0。",
+     "A planar rigid displacement is the 3×3 homogeneous matrix D = [R(θ) p; 0 1]. A point ends in 1, a direction in 0."]
+  - 式: "D (P, 1) = (R P + p, 1) ，  D (v, 0) = (R v, 0)          (5.2.4)、(5.2.5)"
+  - ["矩阵的前两列是转动后的两根坐标轴，第三列是原点被送到的位置。若物体中心不在原点，要绕自身中心 c 转动，先平移 −c、转动、再平移回去，第三列变为 c − R c + p。",
+     "The first two columns are the turned axes; column 3 is where the origin goes. To turn about the body's own centre c: shift by −c, turn, shift back; column 3 becomes c − R c + p."]
+  - 式: "Trans(c) [R 0; 0 1] Trans(−c) = [R  c − R c; 0  1]          (5.2.10)"
+步骤:
+  - ["打开实验 5.2，场景“垫块放进夹具”。转角保持 0，只拖动平移（任务 1），记录点 P 和方向 v 的读数，填入表 1。",
+     "Open Lab 5.2, scene “Block into the fixture”. Keep θ = 0 and drag only the shift (task 1); record P and v in Table 1."]
+  - ["把平移调回 0，只转动 90°，再记录一次。比较两次中方向 v 的变化。",
+     "Set the shift back to 0, turn 90° only, and record again. Compare how v changes in the two cases."]
+  - ["把垫块放进夹具（任务 2）。先手算矩阵 D 和点 P 的新位置，再与读数比较；说明第三列是什么。",
+     "Put the block into the fixture (task 2). First compute D and P by hand, then compare; say what column 3 is."]
+  - ["切换到“沙发挪进凹位”。沙发绕自身中心转 90° 后平移进凹位（任务 3）。用式 (5.2.10) 手算第三列，与读数比较。",
+     "Switch to “Sofa into the alcove”. Turn the sofa 90° about its centre and shift it in (task 3). Compute column 3 with Eq. (5.2.10) and compare."]
+数据表:
+  - 标题: ["表 1  点与方向的变换", "Table 1  Transforming a point and a direction"]
+    表头: ["θ / °", "平移 / m", "(P′, 1)", "(v′, 0)", "说明"]
+    表头英文: ["θ / °", "Shift / m", "(P′, 1)", "(v′, 0)", "Remark"]
+    行: [["0", "(0.5, 0.3)", "", "", ""], ["90", "(0, 0)", "", "", ""], ["90", "(0.8, 0.5)", "", "", "放进夹具"]]
+    行英文: [["0", "(0.5, 0.3)", "", "", ""], ["90", "(0, 0)", "", "", ""], ["90", "(0.8, 0.5)", "", "", "into the fixture"]]
+  - 标题: ["表 2  沙发的齐次矩阵", "Table 2  The sofa's homogeneous matrix"]
+    表头: ["量", "手算", "读数"]
+    表头英文: ["Quantity", "By hand", "Read"]
+    行: [["第三列 c − R c + p", "", ""], ["沙发中心的新位置", "", ""]]
+    行英文: [["Column 3, c − R c + p", "", ""], ["New sofa centre", "", ""]]
+注意:
+  - ["转角逆时针为正。", "Angles are positive counter-clockwise."]
+  - ["本实验的 D 是位移算子：坐标系 {a} 不动，物体移动。", "Here D is a displacement operator: frame {a} stays, the body moves."]
+  - ["读数保留 3 位小数。", "Keep three decimals."]
+思考题:
+  - ["把垫块先平移再转动，与先转动再平移，结果相同吗？写出两个矩阵乘积验证。", "Is shifting then turning the same as turning then shifting? Check with the two products."]

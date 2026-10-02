@@ -1,0 +1,47 @@
+# 实验 7.2 的指导书与报告模板。目的、场景、参数、任务取自 lab7_2.js。
+原理:
+  - ["数值积分把时间切成长 h 的小段，从初始状态出发一步一步地推进。欧拉法沿起点的切线走一步：", "Numerical integration cuts time into steps of length h and advances step by step. Euler's method walks along the tangent at the start of each step:"]
+  - 式: "x_{k+1} = x_k + h f(t_k, x_k)          (7.2.2)"
+  - ["p 阶方法的全局误差与 h^p 成正比：步长减半，误差缩小 2^p 倍。欧拉法、辛欧拉法是一阶，中点法、施特默-韦莱法是二阶，经典 RK4 是四阶。",
+     "The global error of a p-th order method is proportional to h^p: halving the step divides the error by 2^p. Euler and symplectic Euler are first order, midpoint and Störmer–Verlet second order, classical RK4 fourth order."]
+  - ["对试验方程 ẋ = λx，欧拉法每步乘以放大因子 1 + hλ；λ 为负实数时，h ≤ 2/|λ| 才稳定（定理 7.2.2）。电机 λ = −1/τ，所以 h ≤ 2τ。",
+     "For the test equation ẋ = λx Euler multiplies by 1 + hλ per step; for negative real λ it is stable only if h ≤ 2/|λ| (Theorem 7.2.2). For the motor λ = −1/τ, so h ≤ 2τ."]
+  - ["无摩擦的连杆、行星轨道是哈密顿系统，精确的运动保持相空间面积和能量。辛方法（辛欧拉、施特默-韦莱）保持面积，能量误差有界、不漂移；欧拉法使面积变大，能量持续增长；RK4 的能量误差很小，但持续累积。",
+     "A frictionless link and a planetary orbit are Hamiltonian systems: the exact motion keeps phase-space area and energy. Symplectic methods (symplectic Euler, Störmer–Verlet) keep the area, so their energy error stays bounded; Euler enlarges the area and the energy keeps growing; RK4's energy error is small but accumulates."]
+  - 式: "θ̇_{k+1} = θ̇_k + h a(θ_k),  θ_{k+1} = θ_k + h θ̇_{k+1}          (7.2.9)"
+  - ["姿态满足 Ṙ = R[ω_b]。直接积分矩阵元素会让 R 离开 SO(3)（欧拉法每步 det 乘以 1 + h²|ω|²）；用指数映射更新 R_{k+1} = R_k exp(h[ω_b]) 永远得到旋转矩阵（式 (7.2.14)）。",
+     "The attitude obeys Ṙ = R[ω_b]. Integrating the matrix entries lets R leave SO(3) (each Euler step multiplies det by 1 + h²|ω|²); updating with the exponential map R_{k+1} = R_k exp(h[ω_b]) always gives a rotation matrix (Eq. (7.2.14))."]
+步骤:
+  - ["场景“连杆的长时间仿真”：方法 0（欧拉）、h = 0.02 s、时长 20 s，按“回放”，读出结束时的 E/E(0)（任务 1）。再取 h = 0.01 s、0.005 s，记入表 1。",
+     "Scene “A long simulation of the link”: method 0 (Euler), h = 0.02 s, 20 s, press Play; read E/E(0) at the end (task 1). Repeat with h = 0.01 s and 0.005 s; record in Table 1."]
+  - ["方法依次换成 1（RK4）、2（辛欧拉）、3（韦莱），h = 0.02 s，时长 100 s 和 200 s，记下最大能量误差（任务 2）。再把 RK4 的步长改为 0.08 s（与韦莱法 0.02 s 的计算量相同），比较。",
+     "Switch to methods 1 (RK4), 2 (symplectic Euler), 3 (Verlet), h = 0.02 s, durations 100 s and 200 s; record the largest energy error (task 2). Then set RK4's step to 0.08 s (same cost as Verlet at 0.02 s) and compare."]
+  - ["场景“电机起动”：方法 0，步长从 5 ms 起逐渐加大，找出刚好发散的步长（任务 3），与 2τ 比较。换成方法 1（RK4），再找一次，与 2.785τ 比较。记入表 2。",
+     "Scene “Motor start-up”: method 0, increase the step from 5 ms until it just diverges (task 3); compare with 2τ. Repeat with method 1 (RK4) and compare with 2.785τ. Record in Table 2."]
+  - ["场景“由陀螺仪积分姿态”：方法 0、h = 0.02 s，读出 10 s 后的 det R 和 ‖RᵀR − I‖（任务 4）；换成方法 1、2，对比。",
+     "Scene “Attitude from a gyroscope”: method 0, h = 0.02 s; read det R and ‖RᵀR − I‖ after 10 s (task 4); compare with methods 1 and 2."]
+  - ["场景“地球绕太阳”：h = 10 d，分别用四种方法仿真 20 年（任务 5），观察轨道的形状，记入表 3。",
+     "Scene “The Earth around the Sun”: h = 10 d; simulate 20 years with each of the four methods (task 5); look at the orbit; record in Table 3."]
+数据表:
+  - 标题: ["表 1  连杆的能量误差", "Table 1  Energy error of the link"]
+    表头: ["方法", "h / s", "时长 / s", "结束时 E/E(0)", "最大能量误差 / %"]
+    表头英文: ["Method", "h / s", "Duration / s", "E/E(0) at the end", "Largest energy error / %"]
+    行: [["欧拉", "0.02", "20", "", ""], ["欧拉", "0.01", "20", "", ""], ["欧拉", "0.005", "20", "", ""], ["RK4", "0.02", "200", "", ""], ["RK4", "0.08", "200", "", ""], ["辛欧拉", "0.02", "200", "", ""], ["韦莱", "0.02", "200", "", ""]]
+    行英文: [["Euler", "0.02", "20", "", ""], ["Euler", "0.01", "20", "", ""], ["Euler", "0.005", "20", "", ""], ["RK4", "0.02", "200", "", ""], ["RK4", "0.08", "200", "", ""], ["symplectic Euler", "0.02", "200", "", ""], ["Verlet", "0.02", "200", "", ""]]
+  - 标题: ["表 2  电机仿真的稳定步长", "Table 2  Stable step size for the motor"]
+    表头: ["方法", "收敛的最大步长 / ms", "发散的最小步长 / ms", "理论上限 / ms"]
+    表头英文: ["Method", "Largest converging step / ms", "Smallest diverging step / ms", "Theoretical limit / ms"]
+    行: [["欧拉", "", "", "2τ = 38.0"], ["RK4", "", "", "2.785τ = 53.0"]]
+    行英文: [["Euler", "", "", "2τ = 38.0"], ["RK4", "", "", "2.785τ = 53.0"]]
+  - 标题: ["表 3  轨道 20 年后的能量误差", "Table 3  Orbit energy error after 20 years"]
+    表头: ["方法", "能量误差 / %", "到太阳的距离 / AU", "轨道是否闭合"]
+    表头英文: ["Method", "Energy error / %", "Distance to the Sun / AU", "Orbit closed?"]
+    行: [["欧拉", "", "", ""], ["RK4", "", "", ""], ["辛欧拉", "", "", ""], ["韦莱", "", "", ""]]
+    行英文: [["Euler", "", "", ""], ["RK4", "", "", ""], ["symplectic Euler", "", "", ""], ["Verlet", "", "", ""]]
+注意:
+  - ["参数一改，程序立即把整段过程算完，“回放”只是把结果按时间顺序画出来；任务在回放结束时检查。", "Changing a parameter recomputes the whole run at once; Play only redraws it in time order. Tasks are checked when the playback ends."]
+  - ["比较不同方法时要看计算量：RK4 每步计算 4 次加速度，其余方法 1 次。", "Compare methods at equal cost: RK4 evaluates the acceleration 4 times per step, the others once."]
+  - ["电机场景中，发散的曲线超出画面的部分被截掉了，读数“结果”给出是否发散。", "In the motor scene a diverging curve is clipped at the edge of the plot; the reading “result” says whether it diverges."]
+思考题:
+  - ["辛欧拉法的能量误差比 RK4 大，为什么仍说它更适合长时间仿真？", "Symplectic Euler has a larger energy error than RK4. Why is it still the better choice for long simulations?"]
+  - ["陀螺仪场景中，欧拉法的姿态误差角与李-欧拉法相近，但 det R 差别很大。这说明了什么？", "In the gyro scene Euler's attitude error is close to Lie–Euler's, yet det R differs a lot. What does this show?"]

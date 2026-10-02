@@ -1,0 +1,27 @@
+# 实验 9.5 的指导书与报告模板。目的、场景、参数、任务取自 lab9_5.js。
+原理:
+  - ["预测：按里程计把估计向前推，方差加上一步的过程噪声。", "Predict: push the estimate forward by odometry and add one step of process noise to the variance."]
+  - 式: "x̂ₖ⁻ = x̂ₖ₋₁ + uΔt，Pₖ⁻ = Pₖ₋₁ + σ_w²          (9.5.3)、(9.5.4)"
+  - ["更新：按卡尔曼增益把预测向测量拉过去，方差减小。", "Update: pull the prediction towards the measurement by the Kalman gain; the variance shrinks."]
+  - 式: "Kₖ = Pₖ⁻/(Pₖ⁻ + σ_v²)，x̂ₖ = x̂ₖ⁻ + Kₖ (zₖ − x̂ₖ⁻)，Pₖ = (1 − Kₖ) Pₖ⁻          (9.5.5)～(9.5.7)"
+  - ["模型不随时间变化时，增益收敛到只取决于 σ_w/σ_v 的稳态值 K∞（式 (9.5.8)、(9.5.9)）。", "For a time-invariant model the gain converges to a steady value K∞ that depends only on σ_w/σ_v (Eqs. (9.5.8), (9.5.9))."]
+步骤:
+  - ["场景“AGV 沿通道行驶”，σ_w = 0.01 m，σ_v = 0.05 m，√P₀ = 0.2 m。按“开始”运行 100 步，记录三种做法后 50 步的均方根误差、最后的增益和 √P（任务 1，表 1 第 1 行）。", "Scene “AGV along an aisle”, σ_w = 0.01 m, σ_v = 0.05 m, √P₀ = 0.2 m. Run 100 steps and record the three RMS errors, the final gain and √P (task 1, Table 1 row 1)."]
+  - ["σ_v 依次取 0.02、0.1、0.2、1 m，各运行一次，记录最后的增益，与读数栏中的 K∞ 比较（任务 2、3，表 1）。", "Set σ_v to 0.02, 0.1, 0.2 and 1 m in turn, run, and compare the final gain with K∞ shown in the readouts (tasks 2 and 3, Table 1)."]
+  - ["保持 σ_v/σ_w = 5，把两者同时放大或缩小（如 0.002 与 0.01，0.02 与 0.1），验证 K∞ 不变。", "Keep σ_v/σ_w = 5 while scaling both (e.g. 0.002 and 0.01, 0.02 and 0.1) and check that K∞ is unchanged."]
+  - ["切换到“手机步行导航”，运行到底，记录进隧道前（第 39 步）和出隧道前（第 59 步）的 √P，并观察出隧道后增益的变化（任务 4）。", "Switch to “Phone navigation on foot”, run to the end, record √P at step 39 and step 59, and watch the gain after the tunnel (task 4)."]
+数据表:
+  - 标题: ["表 1  测量误差与卡尔曼滤波（AGV，σ_w = 0.01 m）", "Table 1  Fix error and the Kalman filter (AGV, σ_w = 0.01 m)"]
+    表头: ["σ_v / m", "最后的增益", "K∞", "√P / m", "均方根误差 测量 / 里程计 / 滤波 / m"]
+    表头英文: ["σ_v / m", "Final gain", "K∞", "√P / m", "RMS error fix / odometry / filter / m"]
+    行: [["0.05", "", "", "", ""], ["0.02", "", "", "", ""], ["0.1", "", "", "", ""], ["0.2", "", "", "", ""], ["1", "", "", "", ""]]
+  - 标题: ["表 2  隧道前后（步行，σ_w = 0.3 m，σ_v = 5 m）", "Table 2  Before and after the tunnel (walking, σ_w = 0.3 m, σ_v = 5 m)"]
+    表头: ["步", "√P / m", "增益 K"]
+    表头英文: ["Step", "√P / m", "Gain K"]
+    行: [["39", "", ""], ["59", "", ""], ["61", "", ""], ["70", "", ""]]
+注意:
+  - ["仿真用固定种子，同样的参数得到同样的曲线；改变参数后需重新按“开始”。", "The simulation uses a fixed seed; press Start again after changing a parameter."]
+  - ["误差图的纵轴范围随场景不同（AGV ±0.2 m，步行 ±20 m），超出的部分画在边缘。", "The error axis differs by scene (AGV ±0.2 m, walking ±20 m); values beyond it are drawn at the edge."]
+思考题:
+  - ["稳态增益只取决于 σ_w 与 σ_v 之比。为什么？里程计越可靠，增益越大还是越小？", "Why does the steady gain depend only on σ_w/σ_v? Does more reliable odometry raise or lower it?"]
+  - ["出隧道后的第一次 GPS 测量，增益为什么比平时大得多？", "Why is the gain at the first GPS fix after the tunnel much larger than usual?"]

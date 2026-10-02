@@ -1,0 +1,26 @@
+# 实验 6.5 的指导书与报告模板。目的、场景、参数、任务取自 lab6_5.js。
+原理:
+  - ["同一个刚体运动，在 {s} 中写成空间运动旋量 V_s，在 {b} 中写成物体运动旋量 V_b。两者由 {b} 相对 {s} 的位姿 T_sb = (R, p) 的伴随矩阵联系（式 (6.5.4)、(6.5.6)）：",
+     "One rigid motion is the spatial twist V_s in {s} and the body twist V_b in {b}; they are related by the adjoint of the pose T_sb = (R, p) of {b} in {s} (Eqs. (6.5.4), (6.5.6)):"]
+  - 式: "V_s = [Ad_Tsb] V_b，[Ad_T] = [R  0; [p]R  R]，即 ω_s = R ω_b，v_s = R v_b + p × (R ω_b)"
+  - ["平面情形：ω_s = ω，v_s = R(φ) v_b + ω (p_y, −p_x)。第二项来自“{s} 原点处那一点”与“{b} 原点”不是同一点。",
+     "In the plane: ω_s = ω and v_s = R(φ) v_b + ω (p_y, −p_x). The second term appears because the point at {s}'s origin is not {b}'s origin."]
+  - ["换坐标系不改变运动本身：角速度的大小、瞬心（三维中为螺旋轴）和节距都不变。", "Changing frames does not change the motion: the rate, the instantaneous centre (the screw axis in 3D) and the pitch stay the same."]
+步骤:
+  - ["打开实验 6.5，场景“工具坐标系与基座坐标系”。把 {b} 放到 (0.6, 0.2) m、朝向 90°，取 V_b = (0.5, 0, 0)（任务 1）。用式 (6.5.4) 手算 V_s，与读数比较，记入表 1。观察瞬心与 {b} 原点重合。",
+     "Open Lab 6.5, scene “Tool frame and base frame”. Put {b} at (0.6, 0.2) m, heading 90°, with V_b = (0.5, 0, 0) (task 1). Compute V_s by Eq. (6.5.4) and compare; Table 1. The centre sits on {b}'s origin."]
+  - ["保持 {b} 和 ω 不变，调节 v_bx、v_by，使 V_s 的线速度部分为零（任务 2）。此时瞬心在哪里？用 V_b = [Ad_Tsb]⁻¹ V_s 手算核对。",
+     "Keep {b} and ω; adjust v_bx, v_by until V_s has no linear part (task 2). Where is the centre now? Check with V_b = [Ad_Tsb]⁻¹ V_s by hand."]
+  - ["任选一组 V_b，改变 {b} 的朝向 φ（不改变位置），观察 V_s 怎样变化、瞬心是否随之移动，并解释。",
+     "Pick any V_b and change only the heading φ of {b}; watch how V_s changes and whether the centre moves; explain."]
+  - ["切换到“转盘上的人”，完成任务 3，记入表 1。", "Switch to “On a merry-go-round” and do task 3; Table 1."]
+数据表:
+  - 标题: ["表 1  物体运动旋量与空间运动旋量", "Table 1  Body and spatial twists"]
+    表头: ["{b} 的位姿 (p_x, p_y, φ)", "V_b", "手算 V_s", "读出 V_s", "瞬心 / m"]
+    表头英文: ["Pose of {b} (p_x, p_y, φ)", "V_b", "V_s by hand", "V_s read", "Centre / m"]
+    行: [["(0.6, 0.2, 90°)", "(0.5, 0, 0)", "", "", ""], ["(0.6, 0.2, 90°)", "", "(0.5, 0, 0)", "", ""], ["(1.0, 0, 90°)", "", "(1, 0, 0)", "", ""]]
+注意:
+  - ["V_s 的线速度是“此刻位于 {s} 原点的那一点”的速度（紫色箭头），不是 {b} 原点的速度。", "The linear part of V_s is the velocity of the point now at {s}'s origin (violet arrow), not of {b}'s origin."]
+  - ["角速度逆时针为正，角度单位为弧度。", "Angular velocity is positive anticlockwise, in rad/s."]
+思考题:
+  - ["在三维中，[Ad_T] 是 6×6 矩阵。为什么它的右上角 3×3 块总是零？", "In 3D [Ad_T] is 6×6. Why is its upper-right 3×3 block always zero?"]

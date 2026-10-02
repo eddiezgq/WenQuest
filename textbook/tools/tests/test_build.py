@@ -20,7 +20,11 @@ def book(tmp_path):
     return root
 
 
+CH4 = {"4.0", "4.end", *(f"4.{k}" for k in range(1, 9))}
+
+
 def run(root, **kw):
+    kw.setdefault("only", CH4)          # the tests break chapter 4 on purpose; building it alone keeps them quick
     return build.build("robotics", root=root, **kw)
 
 
@@ -86,7 +90,7 @@ def test_a_failing_program_stops_the_build(book):
 
 def test_section_files_must_match_the_outline(book):
     (book / "ch04" / "04-9.md").write_text("---\nid: \"4.99\"\ntitle: 不存在的节\n---\n正文\n", encoding="utf-8")
-    rep = run(book)
+    rep = run(book, only=CH4 | {"4.99"})
     assert any("4.99 不在提纲里" in p.text for p in rep.errors)
 
 

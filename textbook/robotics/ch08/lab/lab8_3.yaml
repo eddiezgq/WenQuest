@@ -1,0 +1,32 @@
+# 实验 8.3 的指导书与报告模板。目的、场景、参数、任务取自 lab8_3.js。
+原理:
+  - ["一个控制周期内的关节增量 Δ 要使末端尽量接近目标，又不能超过每步的上限 d：min ½‖JΔ − e‖²，|Δᵢ| ≤ d。目标函数是二次的，约束是线性不等式，这是一个二次规划。",
+     "The joint step Δ in one control cycle should bring the tip as close to the target as possible without exceeding the limit d: min ½‖JΔ − e‖², |Δᵢ| ≤ d. A quadratic objective with linear inequalities: a quadratic program."]
+  - 式: "KKT：∇q(Δ*) + Σ μᵢ aᵢ = 0，μᵢ ≥ 0，μᵢ (aᵢᵀΔ* − d) = 0          (8.3.3)"
+  - ["在最优点，−∇q 只能沿起作用约束的外法向（乘子非负）；不起作用的约束乘子为零（互补松弛）。乘子是放宽这个约束时目标函数的下降率。",
+     "At the optimum −∇q can only point along outward normals of active constraints (non-negative multipliers); inactive constraints have zero multipliers (complementary slackness). A multiplier is the rate at which the objective falls when that constraint is relaxed."]
+  - ["电梯在 T 内上升 H、起止静止，使 ∫a²dt 最小：不限速时速度是抛物线；限速 v_max 时，加速段长 t₁ = 3(v_max T − H)/(2 v_max)，中段匀速，代价为 8 v_max²/(3 t₁)（式 (8.3.10)）。",
+     "A lift rising H in time T from rest to rest with least ∫a²dt: without a limit the speed is a parabola; with a limit v_max the ramp lasts t₁ = 3(v_max T − H)/(2 v_max), the middle cruises, and the cost is 8 v_max²/(3 t₁) (Eq. (8.3.10))."]
+步骤:
+  - ["打开实验 8.3，场景“受限的一步”，保持默认参数（任务 1）。记录 Δ_free、Δ*、起作用的约束和乘子，以及二次规划与截断两种做法的末端误差，填入表 1。",
+     "Open Lab 8.3, scene “A limited step”, keep the defaults (task 1). Record Δ_free, Δ*, the active constraints and multipliers, and the tip errors of the QP and the clipped step in Table 1."]
+  - ["用记下的 Δ* 和 μ 手算驻点条件 ∇q + μ₄a₄ = 0 的两个分量（∇q = JᵀJΔ − Jᵀe），确认残差接近零。", "With Δ* and μ, check by hand both components of ∇q + μ₄a₄ = 0 (∇q = JᵀJΔ − Jᵀe)."]
+  - ["把 d 逐步加大，直到不加限制的解本身可行（任务 2），记录此时的 d 和乘子。", "Raise d step by step until the unconstrained step is feasible (task 2); record d and the multipliers."]
+  - ["把 d 减小到 0.05 rad，观察解落到正方形的角上（任务 3），记录两个乘子。", "Lower d to 0.05 rad and see the solution move to a corner (task 3); record the two multipliers."]
+  - ["切换到“电梯”，把额定速度从 2.25 m/s 逐步降到 1.6 m/s，记录加速段时长、匀速段时长和代价，填入表 2；使匀速段超过 6 s（任务 4）。",
+     "Switch to “A lift” and lower the rated speed from 2.25 m/s to 1.6 m/s; record the ramp time, cruise time and cost in Table 2; make the cruise exceed 6 s (task 4)."]
+数据表:
+  - 标题: ["表 1  受限的一步", "Table 1  A limited step"]
+    表头: ["d / rad", "Δ* / rad", "起作用的约束", "乘子", "误差（二次规划）/ m", "误差（截断）/ m"]
+    表头英文: ["d / rad", "Δ* / rad", "Active constraints", "Multipliers", "Error (QP) / m", "Error (clipped) / m"]
+    行: [["0.10", "", "", "", "", ""], ["", "", "", "", "", ""], ["0.05", "", "", "", "", ""]]
+  - 标题: ["表 2  电梯的最小能量速度曲线（T = 20 s，H = 30 m）", "Table 2  Minimum-energy lift profile (T = 20 s, H = 30 m)"]
+    表头: ["v_max / (m/s)", "t₁ / s", "匀速段 / s", "代价 / (m²/s³)", "8v_max²/(3t₁) 手算"]
+    表头英文: ["v_max / (m/s)", "t₁ / s", "Cruise / s", "Cost / (m²/s³)", "8v_max²/(3t₁) by hand"]
+    行: [["2.25", "", "", "", ""], ["2.00", "", "", "", ""], ["1.80", "", "", "", ""], ["1.60", "", "", "", ""]]
+注意:
+  - ["“受限的一步”中手臂固定在 (0°, 90°)；左图的红点和橙块是按线性化 p + JΔ 预计的末端位置。", "In “A limited step” the arm stays at (0°, 90°); the red dot and orange square on the left are the tip positions predicted by the linearisation p + JΔ."]
+  - ["乘子的编号：μ₁ 对应 Δ₁ ≤ d，μ₂ 对应 Δ₂ ≤ d，μ₃ 对应 −Δ₁ ≤ d，μ₄ 对应 −Δ₂ ≤ d。", "Multiplier numbering: μ₁ for Δ₁ ≤ d, μ₂ for Δ₂ ≤ d, μ₃ for −Δ₁ ≤ d, μ₄ for −Δ₂ ≤ d."]
+  - ["额定速度低于平均速度 H/T = 1.5 m/s 时任务无法完成，所以滑块从 1.55 m/s 起。", "Below the mean speed H/T = 1.5 m/s the trip is impossible, so the slider starts at 1.55 m/s."]
+思考题:
+  - ["表 2 中代价随额定速度降低而增大。当 v_max 接近 1.5 m/s 时，代价趋于多少？这在物理上意味着什么？", "In Table 2 the cost grows as the rated speed falls. What does it tend to as v_max approaches 1.5 m/s, and what does that mean physically?"]

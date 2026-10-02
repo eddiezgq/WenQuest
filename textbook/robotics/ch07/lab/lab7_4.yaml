@@ -1,0 +1,39 @@
+# 实验 7.4 的指导书与报告模板。目的、场景、参数、任务取自 lab7_4.js。
+原理:
+  - ["用差商近似导数：后向差商 [x(t) − x(t−h)]/h 的截断误差不超过 M₂h/2；中心差商 [x(t+h) − x(t−h)]/(2h) 的截断误差不超过 M₃h²/6（定理 7.4.1）。",
+     "Difference quotients approximate derivatives: the backward difference [x(t) − x(t−h)]/h has truncation error at most M₂h/2; the central difference [x(t+h) − x(t−h)]/(2h) at most M₃h²/6 (Theorem 7.4.1)."]
+  - ["读数本身有误差（舍入、量化、噪声）时，误差被除以 h 放大。总误差在某个跨度处最小：", "When the readings carry errors (round-off, quantization, noise), dividing by h amplifies them. The total error is smallest at some span:"]
+  - 式: "E(h) ≈ M₂h/2 + q/h,   E_rms(h) ≈ √[(hAΩ²/(2√2))² + (q/(√6 h))²]          (7.4.6), (7.4.7)"
+  - ["特征值的 |Re λ| 相差悬殊的方程称为刚性方程。显式欧拉法要求 h ≤ 2/|λ|_max，步长被最快的模态卡住；隐式欧拉法 (I − hA)x_{k+1} = x_k + hB 的放大因子 1/(1 − hλ) 在整个左半平面上模不大于 1，任何步长都稳定（定理 7.4.2）。",
+     "An equation whose eigenvalues have widely different |Re λ| is stiff. Explicit Euler needs h ≤ 2/|λ|_max, so the fastest mode sets the step; implicit Euler (I − hA)x_{k+1} = x_k + hB has factor 1/(1 − hλ), of modulus at most 1 on the whole left half-plane, so any step is stable (Theorem 7.4.2)."]
+  - 式: "(I − hA) x_{k+1} = x_k + hB          (7.4.10)"
+步骤:
+  - ["场景“编码器测速”：14 bit、后向差商，跨度从 1 ms 逐渐加到 20 ms，把均方根误差记入表 1，找到最小值（任务 1），与式 (7.4.7) 的估计比较。",
+     "Scene “Speed from an encoder”: 14 bit, backward difference; increase the span from 1 ms to 20 ms, record the RMS error in Table 1 and find the minimum (task 1); compare with Eq. (7.4.7)."]
+  - ["换成中心差商，重复，找到它的最佳跨度（任务 2）。说明中心差商在控制回路中的缺点。", "Switch to the central difference, repeat, and find its best span (task 2). Explain its drawback inside a control loop."]
+  - ["把分辨率改为 20 bit，重复第一步，比较最佳跨度和最小误差的变化。", "Set the resolution to 20 bit and repeat the first step; compare the best span and the smallest error."]
+  - ["场景“电流环的刚性”：显式欧拉法，步长 50 µs，按“回放”；逐渐加大步长，找出刚好发散的步长（任务 3），与 56.7 µs 比较，记入表 2。",
+     "Scene “A stiff current loop”: explicit Euler, 50 µs, Play; increase the step until it just diverges (task 3); compare with 56.7 µs; record in Table 2."]
+  - ["换成隐式欧拉法，步长取 0.1 ms、1 ms、2 ms，记录 0.1 s 时的转速和误差（任务 4），并比较步数。", "Switch to implicit Euler with 0.1 ms, 1 ms and 2 ms; record the speed at 0.1 s and its error (task 4); compare the number of steps."]
+  - ["场景“跑步手表测配速”：定位误差 2 m，跨度从 1 s 加到 60 s，找出速度误差最小的跨度（任务 5），记入表 3。", "Scene “Pace on a running watch”: position error 2 m; increase the span from 1 s to 60 s and find the span with the smallest speed error (task 5); record in Table 3."]
+数据表:
+  - 标题: ["表 1  编码器测速的均方根误差（14 bit）", "Table 1  RMS error of encoder speed (14 bit)"]
+    表头: ["跨度 h / ms", "后向差商 / (rad/s)", "中心差商 / (rad/s)", "式 (7.4.7) 的估计 / (rad/s)"]
+    表头英文: ["Span h / ms", "Backward / (rad/s)", "Central / (rad/s)", "Estimate from Eq. (7.4.7) / (rad/s)"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""], ["5", "", "", ""], ["10", "", "", ""], ["20", "", "", ""]]
+  - 标题: ["表 2  刚性电机的仿真", "Table 2  Simulating the stiff motor"]
+    表头: ["方法", "h / µs", "是否发散", "0.1 s 时转速 / (rad/s)", "误差 / (rad/s)", "步数"]
+    表头英文: ["Method", "h / µs", "Diverges?", "Speed at 0.1 s / (rad/s)", "Error / (rad/s)", "Steps"]
+    行: [["显式欧拉", "50", "", "", "", ""], ["显式欧拉", "", "", "", "", ""], ["隐式欧拉", "100", "", "", "", ""], ["隐式欧拉", "1000", "", "", "", ""], ["隐式欧拉", "2000", "", "", "", ""]]
+    行英文: [["explicit Euler", "50", "", "", "", ""], ["explicit Euler", "", "", "", "", ""], ["implicit Euler", "100", "", "", "", ""], ["implicit Euler", "1000", "", "", "", ""], ["implicit Euler", "2000", "", "", "", ""]]
+  - 标题: ["表 3  跑步手表的跨度", "Table 3  Span on the running watch"]
+    表头: ["跨度 S / s", "1", "5", "10", "15", "30", "60"]
+    表头英文: ["Span S / s", "1", "5", "10", "15", "30", "60"]
+    行: [["速度均方根误差 / (m/s)", "", "", "", "", "", ""]]
+    行英文: [["RMS speed error / (m/s)", "", "", "", "", "", ""]]
+注意:
+  - ["编码器读数按向下取整到整数个计数模拟；均方根误差从 0.1 s 起统计到 2.2 s。", "Encoder readings are rounded down to whole counts; the RMS error is taken from 0.1 s to 2.2 s."]
+  - ["电机场景的转速曲线在 −50 到 150 rad/s 之外被截掉，发散时读数显示“发散”。", "The speed curve is clipped outside −50 to 150 rad/s; a diverging run shows “diverged”."]
+  - ["跑步手表的定位噪声由固定的随机数序列产生，同样的参数每次结果相同。", "The position noise on the watch comes from a fixed random sequence, so the same settings always give the same result."]
+思考题:
+  - ["隐式欧拉法在 h = 2 ms 时仍然稳定，但电流的尖峰在结果里还看得到吗？如果要检查驱动器是否过流，步长应怎样选？", "Implicit Euler is still stable at h = 2 ms, but is the current spike still visible? To check the drive for over-current, how should the step be chosen?"]

@@ -1,0 +1,33 @@
+# 实验 3.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_4.js。
+原理:
+  - ["二阶张量把一个矢量线性地变成另一个矢量，例如惯量张量把角速度变成角动量（L = I ω）。张量与坐标系无关；它在坐标系 {a} 中的分量矩阵 A_a 的第 j 列，是第 j 根坐标轴经张量作用后的矢量在 {a} 中的分量。",
+     "A second-order tensor turns one vector linearly into another; the inertia tensor, for example, turns the angular velocity into the angular momentum (L = I ω). The tensor does not depend on any frame; column j of its component matrix A_a is the image of axis j, written in {a}."]
+  - 式: "A_a = R_ab A_b R_abᵀ,    A_b = R_abᵀ A_a R_ab          (3.4.4)"
+  - ["矢量换坐标系时乘一次方向余弦矩阵（u_b = R_abᵀ u_a），张量的分量矩阵则左右各乘一次。迹、行列式和特征值在换坐标系时不变。对称张量存在主轴：在主轴坐标系中分量矩阵为对角矩阵，沿主轴方向输入的矢量，输出与它平行。",
+     "A vector's components are multiplied once by the direction cosine matrix (u_b = R_abᵀ u_a); a tensor's component matrix is multiplied on both sides. Trace, determinant and eigenvalues do not change. A symmetric tensor has principal axes: in the principal frame its matrix is diagonal, and an input along a principal axis gives a parallel output."]
+  - ["图中的黄色椭圆是单位圆经张量作用后的像，是张量本身的几何形象：椭圆的对称轴是主轴，半轴长与主值成正比。",
+     "The yellow ellipse is the image of the unit circle under the tensor: a picture of the tensor itself. Its axes are the principal axes; its semi-axes are proportional to the principal values."]
+步骤:
+  - ["打开实验 3.4，选择场景“夹爪中的板状零件”。保持 γ = 25°、φ = 70°，把 β 依次调到 0°、25°、45°、70°、115°，记录 I_b、ω_b、L_b、迹和行列式，填入表 1。",
+     "Open Lab 3.4, scene “A plate in the gripper”. Keep γ = 25°, φ = 70°; set β to 0°, 25°, 45°, 70°, 115° in turn and record I_b, ω_b, L_b, the trace and the determinant in Table 1."]
+  - ["用 β = 0° 一行的 I_a 和式 (3.4.4) 手算 β = 45° 时的 I_b，与读数比较。",
+     "From I_a (row β = 0°) compute I_b for β = 45° by hand with Eq. (3.4.4) and compare."]
+  - ["完成任务 1～3：找出使 I_b 为对角矩阵的 β、使 L 与 ω 平行的 φ、使 I_b 两个对角元素相等的 β，填入表 2。",
+     "Do tasks 1–3: find β that makes I_b diagonal, φ that makes L parallel to ω, and β that makes the two diagonal entries equal; enter them in Table 2."]
+  - ["切换到场景“雪地上的滑雪板”。保持 γ = 25°，把推力方向 φ 从 25° 调到 115°，记录推力与速度的夹角怎样变化，完成任务 4。",
+     "Switch to “A ski on snow”. Keep γ = 25° and turn the push φ from 25° to 115°; record how the angle between push and velocity changes; do task 4."]
+数据表:
+  - 标题: ["表 1  转动坐标系 {b}（γ = 25°，φ = 70°）", "Table 1  Turning frame {b} (γ = 25°, φ = 70°)"]
+    表头: ["β", "I_b / 10⁻³ kg·m²", "ω_b / (rad/s)", "L_b / 10⁻³ kg·m²/s", "tr I_b", "det I_b"]
+    表头英文: ["β", "I_b / 10⁻³ kg·m²", "ω_b / (rad/s)", "L_b / 10⁻³ kg·m²/s", "tr I_b", "det I_b"]
+    行: [["0°", "", "", "", "", ""], ["25°", "", "", "", "", ""], ["45°", "", "", "", "", ""], ["70°", "", "", "", "", ""], ["115°", "", "", "", "", ""]]
+  - 标题: ["表 2  主轴与特殊位置", "Table 2  Principal axes and special settings"]
+    表头: ["任务", "参数", "读数", "解释"]
+    表头英文: ["Task", "Setting", "Reading", "Explanation"]
+    行: [["1  I_b 为对角矩阵", "β =", "", ""], ["2  L 平行于 ω", "φ =", "", ""], ["3  对角元素相等", "β =", "", ""], ["4  横推滑雪板", "φ =", "", ""]]
+    行英文: [["1  I_b diagonal", "β =", "", ""], ["2  L parallel to ω", "φ =", "", ""], ["3  equal diagonal entries", "β =", "", ""], ["4  ski pushed sideways", "φ =", "", ""]]
+注意:
+  - ["图中箭头只表示方向，长度没有按比例画；数值以读数为准。", "The arrows show directions only, not lengths; use the readings for values."]
+  - ["这里只看板面内的两个方向，所以惯量张量是 2×2 的。对薄板，板面内的角速度产生的角动量也在板面内。", "Only the two in-plane directions are shown, so the inertia tensor is 2×2. For a thin plate, an in-plane angular velocity gives an in-plane angular momentum."]
+思考题:
+  - ["任务 1 有几个解？它们之间相差多少度？为什么？", "How many solutions does task 1 have, and how far apart are they? Why?"]

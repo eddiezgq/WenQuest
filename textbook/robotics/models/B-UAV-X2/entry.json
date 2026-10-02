@@ -1,0 +1,92 @@
+{
+ "schema": 1,
+ "id": "B-UAV-X2",
+ "kind": "robot",
+ "name": {
+  "zh": "Skydio X2 无人机",
+  "en": "Skydio X2"
+ },
+ "category": "UAV",
+ "tags": [
+  "无人机",
+  "drone",
+  "skydio"
+ ],
+ "standards": [],
+ "params": [],
+ "defaults": {},
+ "model": {
+  "engine": "menagerie:skydio_x2/x2.xml",
+  "formats": [
+   "mjcf",
+   "glb"
+  ],
+  "origin": "MJCF 的世界坐标系（Z 向上）；glTF 里每个连杆一个节点，节点名 = MJCF 的 body 名",
+  "note": "网页模型按 MJCF 的可视几何生成并简化网格；关节表由构建时从 MJCF 提取"
+ },
+ "robot": {
+  "type": "drone",
+  "links": [
+   {
+    "name": "x2",
+    "node": "x2",
+    "mass_kg": 1.325
+   }
+  ],
+  "joints": [],
+  "dof": 0
+ },
+ "source": {
+  "origin": "menagerie",
+  "repo": "https://github.com/google-deepmind/mujoco_menagerie",
+  "commit": "4d038b3feae26ec82b46a4d586379114012a8ac7",
+  "path": "skydio_x2/",
+  "license": "Apache-2.0",
+  "attribution": "MuJoCo Menagerie（Google DeepMind）· skydio_x2；Apache-2.0；Apache License",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-09-30",
+   "note": "按该模型文件夹的 LICENSE 自动识别（Menagerie catalog.detect_license）"
+  }
+ },
+ "teaching": {
+  "principle": "多个旋翼转速不同产生升力差和反扭矩，从而控制姿态和位置。",
+  "uses": [
+   "航拍",
+   "巡检"
+  ],
+  "courses": [
+   {
+    "course": "无人机",
+    "chapter": "多旋翼动力学"
+   }
+  ],
+  "labs": [
+   "姿态控制演示"
+  ]
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "alt_models": [
+  {
+   "format": "urdf",
+   "url": "https://github.com/lvjonok/skydio_x2_description/blob/9a6a057a055babaf47119fac42c361fffc189128/urdf/skydio_x2.urdf",
+   "license": "Apache-2.0",
+   "via": "robot_descriptions/skydio_x2_description"
+  }
+ ],
+ "version": "2026.10.9",
+ "package": "https://github.com/google-deepmind/mujoco_menagerie/tree/4d038b3feae26ec82b46a4d586379114012a8ac7/skydio_x2",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {},
+   "files": {
+    "glb": "B-UAV-X2/default.glb",
+    "png": "B-UAV-X2/default.png"
+   }
+  }
+ ]
+}

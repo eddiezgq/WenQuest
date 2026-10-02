@@ -1,0 +1,27 @@
+# 实验 2.3 的指导书与报告模板。目的、场景、参数、任务取自 lab2_3.js。
+原理:
+  - ["线性变换一般把向量既伸缩又转向。若非零向量 v 经变换后只伸缩、不转向，即", "A linear map usually both stretches and turns a vector. If a non-zero v is only stretched,"]
+  - 式: "A v = λ v          (2.3.1)"
+  - ["则 v 是 A 的特征向量，λ 是特征值。特征值是特征方程 det(λI − A) = 0 的根；2×2 矩阵的特征方程为 λ² − (tr A)λ + det A = 0。", "then v is an eigenvector and λ the eigenvalue. Eigenvalues solve det(λI − A) = 0; for a 2×2 matrix, λ² − (tr A)λ + det A = 0."]
+  - 式: "λ₁,₂ = tr A / 2 ± √((tr A / 2)² − det A)          (2.3.4)"
+  - ["对称矩阵（如刚度矩阵）的特征值都是实数，特征方向互相垂直（谱定理）。不对称的矩阵可能没有实特征向量（转动），可能特征向量不够（剪切），也可能特征方向不垂直（橡皮膜）。", "A symmetric matrix (such as a stiffness matrix) has real eigenvalues and perpendicular eigen-directions (spectral theorem). A non-symmetric one may have no real eigenvectors (rotation), too few (shear), or non-perpendicular ones (rubber sheet)."]
+步骤:
+  - ["打开实验 2.3，选择场景“柔顺手腕的实测刚度”。先用式 (2.3.4) 手算 K 的两个特征值，用式 (2.3.6) 算出主方向，填入表 1。", "Open Lab 2.3, scene “Measured wrist stiffness”. Compute the two eigenvalues of K with Eq. (2.3.4) and the principal direction with Eq. (2.3.6); enter them in Table 1."]
+  - ["从 α = 0° 开始，每隔 15° 读一次 x 与 Ax 的夹角和长度之比，填入表 2。夹角在哪两个方向附近变为零？", "From α = 0° in steps of 15°, read the angle between x and Ax and the length ratio into Table 2. Near which two directions does the angle vanish?"]
+  - ["细调 α，找到硬方向（任务 1）和软方向（任务 2），读出主刚度，与手算结果比较，并计算两个方向的夹角。", "Fine-tune α to find the stiff direction (task 1) and the soft one (task 2); read the principal stiffnesses, compare with your hand calculation, and find the angle between the two directions."]
+  - ["切换到场景“拉伸橡皮膜”。先手算 A 的特征值和特征向量，再找出不在 x 轴上的特征方向（任务 3），测出两个特征方向的夹角。", "Switch to “Stretching a rubber sheet”. Compute the eigenvalues and eigenvectors of A by hand, find the eigen-direction off the x axis (task 3), and measure the angle between the two eigen-directions."]
+数据表:
+  - 标题: ["表 1  实测刚度的特征值与主方向", "Table 1  Eigenvalues and principal directions of the measured stiffness"]
+    表头: ["量", "手算", "实验读数", "手册值"]
+    表头英文: ["Quantity", "By hand", "Read in the lab", "Datasheet"]
+    行: [["λ₁ / (N/m)", "", "", "2000"], ["λ₂ / (N/m)", "", "", "500"], ["主方向 φ₁", "", "", "30°"], ["λ₁ + λ₂ 与 tr K", "", "", "2500"]]
+    行英文: [["λ₁ / (N/m)", "", "", "2000"], ["λ₂ / (N/m)", "", "", "500"], ["Principal direction φ₁", "", "", "30°"], ["λ₁ + λ₂ vs tr K", "", "", "2500"]]
+  - 标题: ["表 2  x 与 Ax 的夹角随 α 的变化（刚度矩阵）", "Table 2  Angle between x and Ax against α (stiffness)"]
+    表头: ["α", "x 与 Ax 的夹角", "|Ax| / |x|"]
+    表头英文: ["α", "Angle between x and Ax", "|Ax| / |x|"]
+    行: [["0°", "", ""], ["15°", "", ""], ["30°", "", ""], ["45°", "", ""], ["60°", "", ""], ["90°", "", ""], ["120°", "", ""], ["150°", "", ""]]
+注意:
+  - ["α 只取 0°～179°：x 与 −x 是同一个特征方向。", "α runs over 0°–179° only: x and −x give the same eigen-direction."]
+  - ["刚度场景中 Ax 以 1000 N/m 为单位画出，读数栏中已换算为 N/m。", "In the stiffness scene Ax is drawn in units of 1000 N/m; the readout is already in N/m."]
+思考题:
+  - ["若手腕两个方向的刚度相等，表 2 会是什么样子？此时“主方向”还有意义吗？", "If the wrist were equally stiff in both directions, what would Table 2 look like? Would “principal direction” still mean anything?"]

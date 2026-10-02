@@ -1,0 +1,32 @@
+# 实验 5.4 的指导书与报告模板。目的、场景、参数、任务取自 lab5_4.js。
+原理:
+  - ["坐标系树中每个坐标系只记录相对父坐标系的位姿 T_父,子。本实验的树：{w} 为根；{s}、{c} 挂在 {w} 下；{b} 挂在 {s} 下（由关节角决定）；{t} 挂在 {b} 下；{o} 挂在 {c} 下（相机的测量）。",
+     "Each frame stores only its pose relative to its parent. Here {w} is the root; {s} and {c} hang under {w}; {b} under {s} (set by the joint angles); {t} under {b}; {o} under {c} (the camera's measurement)."]
+  - ["任意两个坐标系之间只有一条路径：先向上走到最近公共祖先，再向下走到终点。向上一步乘这条边的逆，向下一步乘这条边本身（定理 5.4.1）。",
+     "Between any two frames there is one path: up to the lowest common ancestor, then down. Going up multiplies by the inverse of the edge, going down by the edge itself (Theorem 5.4.1)."]
+  - 式: "T_ab = T_ra⁻¹ T_rb （r 为根）          (5.4.2)"
+  - ["改变一条边，只有这条边以下的子树移动；树的其他部分不受影响。", "Changing one edge moves only the subtree below it; the rest of the tree is unaffected."]
+步骤:
+  - ["打开实验 5.4，场景“UR5e 工作站”。按算例 5.1.1 安装底座（任务 1），选择 {w} → {s}，记录 T_ws，与算例 5.2.1 比较。",
+     "Open Lab 5.4, scene “UR5e workcell”. Mount the base as in Example 5.1.1 (task 1), pick {w} → {s}, record T_ws and compare with Example 5.2.1."]
+  - ["保持 θ₁ = 0、θ₂ = −90°，选择 {c} → {t}（任务 2）。记录路径和 T_ct，与算例 5.4.2 比较，并记录回路检查的数值。",
+     "Keep θ₁ = 0, θ₂ = −90°, pick {c} → {t} (task 2). Record the path and T_ct, compare with Example 5.4.2, and record the loop check."]
+  - ["把关节 1 转到 30°（任务 3）。分别选择 {w} → {c} 和 {c} → {t}，记录哪些位姿变了、哪些没变。",
+     "Turn joint 1 to 30° (task 3). Pick {w} → {c} and {c} → {t}; record which poses change and which do not."]
+  - ["选择 {o} → {t}，写出路径；说明这条路径为什么经过 {c} 和 {w}。", "Pick {o} → {t} and write the path; explain why it passes {c} and {w}."]
+  - ["切换到“餐桌转盘”，把鱼转到你面前（任务 4），记录转盘转角和鱼在 {d} 中的坐标。", "Switch to “Lazy Susan”, bring the fish in front of you (task 4); record the angle and the fish in {d}."]
+数据表:
+  - 标题: ["表 1  坐标系之间的位姿", "Table 1  Poses between frames"]
+    表头: ["起点 → 终点", "θ₁ / °", "路径", "位姿第 4 列 / m", "回路检查"]
+    表头英文: ["From → to", "θ₁ / °", "Path", "Column 4 / m", "Loop check"]
+    行: [["{w} → {s}", "0", "", "", ""], ["{c} → {t}", "0", "", "", ""], ["{w} → {c}", "30", "", "", ""], ["{c} → {t}", "30", "", "", ""], ["{o} → {t}", "0", "", "", ""]]
+  - 标题: ["表 2  餐桌转盘", "Table 2  Lazy Susan"]
+    表头: ["转盘转角 / °", "鱼在 {p} 中 / m", "鱼在 {d} 中 / m"]
+    表头英文: ["Turntable angle / °", "Fish in {p} / m", "Fish in {d} / m"]
+    行: [["0", "", ""], ["", "", ""]]
+注意:
+  - ["坐标系编号：0 {w}，1 {s}，2 {b}，3 {t}，4 {c}，5 {o}。", "Frame numbers: 0 {w}, 1 {s}, 2 {b}, 3 {t}, 4 {c}, 5 {o}."]
+  - ["本实验中 {s} 到 {b} 的六个连杆合成一条边，由第 12 章的指数积公式计算；表 5.4.1 把它们拆成八条边，结果相同。", "Here the six links from {s} to {b} form one edge computed with the PoE formula of Chapter 12; Table 5.4.1 splits them into eight edges with the same result."]
+  - ["三维视图中三色坐标轴为 x 红、y 绿、z 蓝；用鼠标拖动可以旋转视角。", "Axes: x red, y green, z blue; drag with the mouse to turn the view."]
+思考题:
+  - ["若相机被碰歪，树中哪一条边需要更新？哪些坐标系之间的位姿会受影响？", "If the camera is knocked askew, which edge needs updating? Which poses are affected?"]

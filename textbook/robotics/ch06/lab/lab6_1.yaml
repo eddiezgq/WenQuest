@@ -1,0 +1,31 @@
+# 实验 6.1 的指导书与报告模板。目的、场景、参数、任务取自 lab6_1.js。
+原理:
+  - ["平面上的刚体位移写成 x′ = R x + p，R 是转角为 φ 的平面旋转矩阵。若 φ ≠ 0，存在唯一的不动点 c（极点），它满足 (I − R)c = p（式 (6.1.2)）。",
+     "A planar rigid displacement is x′ = R x + p with R the rotation by φ. If φ ≠ 0 there is exactly one fixed point c, the pole, with (I − R)c = p (Eq. (6.1.2))."]
+  - 式: "x′ = c + R (x − c)          (6.1.3)"
+  - ["式 (6.1.3) 说明：整个位移就是绕极点 c 转过 φ。零件上每一点到 c 的距离在位移前后相同，所以 c 在每一点与其新位置连线的中垂线上；两条中垂线的交点就是极点。",
+     "Eq. (6.1.3) says the whole displacement is a turn by φ about c. Every point keeps its distance to c, so c lies on the perpendicular bisector of each point and its new position; two bisectors meet at the pole."]
+  - ["在空间中，同样的推理给出沙勒定理（定理 6.1.2）：任何刚体位移都是绕某根轴的螺旋运动。平面位移是节距为零、轴垂直于平面的特例。",
+     "In space the same reasoning gives Chasles' theorem (Theorem 6.1.2): every rigid displacement is a screw motion; a planar displacement is the special case of zero pitch with the axis normal to the plane."]
+步骤:
+  - ["打开实验 6.1，场景“SCARA 搬运零件”。灰色为位姿 A，金色虚线为位姿 B，蓝色为“影子”（A 绕候选中心转过 φ 的结果）。先把转角调到 60°（目标的转角）。",
+     "Open Lab 6.1, scene “SCARA moves a part”. Grey is pose A, dashed gold is pose B, blue is the shadow (A turned by φ about the centre). First set the turn to 60°, the target's turn."]
+  - ["移动候选中心，观察影子随之移动。让候选中心落在两条蓝色虚线（中垂线）的交点上，直到“影子与 B 的位置差”小于 3 mm（任务 1）。记录中心坐标，与算例 6.1.1 的 c 比较，记入表 1。",
+     "Move the centre and watch the shadow. Put the centre on the crossing of the two blue dashed lines (the bisectors) until the shadow–B gap is under 3 mm (task 1). Record the centre and compare with c in Example 6.1.1; Table 1."]
+  - ["保持中心不变，把转角改为 30°（任务 2）。读出参考点到中心的距离，确认它与 A、B 处相同。",
+     "Keep the centre, set the turn to 30° (task 2). Read the distance from the reference point to the centre and confirm it equals the values at A and B."]
+  - ["把中心故意偏离极点 1 cm，再把转角调回 60°，记录位置差。说明为什么转角对了、中心不对，零件仍到不了 B。",
+     "Move the centre 1 cm off the pole, set 60° again and record the gap. Explain why the right turn about the wrong centre misses B."]
+  - ["切换到场景“挪动书桌”，用式 (6.1.2) 手算极点，再在界面中验证（任务 3），记入表 1。",
+     "Switch to “Moving a desk”, compute the pole with Eq. (6.1.2) by hand, then check it in the lab (task 3); Table 1."]
+数据表:
+  - 标题: ["表 1  极点与转角", "Table 1  Pole and turn"]
+    表头: ["场景", "φ / °", "手算的极点 c / m", "界面找到的中心 / m", "位置差 / mm", "到中心的距离 A / B / m"]
+    表头英文: ["Scene", "φ / °", "Pole c by hand / m", "Centre found / m", "Gap / mm", "Distance to centre A / B / m"]
+    行: [["SCARA 搬运", "60", "", "", "", ""], ["SCARA，转一半", "30", "", "", "", ""], ["中心偏 1 cm", "60", "", "", "", ""], ["挪书桌", "90", "", "", "", ""]]
+    行英文: [["SCARA move", "60", "", "", "", ""], ["SCARA, half turn", "30", "", "", "", ""], ["Centre 1 cm off", "60", "", "", "", ""], ["Desk", "90", "", "", "", ""]]
+注意:
+  - ["转角逆时针为正；位姿 B 的转角是相对 A 而言的。", "Turns are positive anticlockwise; the turn of B is measured from A."]
+  - ["极点可以在零件之外，甚至在机器人够不到的地方；它只是位移的一种等价描述，不是机器人实际走的路径。", "The pole may lie outside the part, even out of the robot's reach; it describes the displacement, not the path the robot takes."]
+思考题:
+  - ["转角越小，两条中垂线越接近平行。转角趋于零时，极点会跑到哪里？这与式 (6.1.2) 的行列式 2 − 2cos φ 有什么关系？", "The smaller the turn, the closer the bisectors are to parallel. Where does the pole go as the turn tends to zero, and how does that relate to the determinant 2 − 2cos φ of Eq. (6.1.2)?"]

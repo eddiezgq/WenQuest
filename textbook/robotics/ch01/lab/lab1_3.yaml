@@ -1,0 +1,33 @@
+# 实验 1.3 的指导书与报告模板。目的、场景、参数、任务取自 lab1_3.js。
+原理:
+  - ["按用途，机器人分为工业机器人、服务机器人和医疗机器人（ISO 8373:2021，定义 1.1.3、1.1.4）。",
+     "By use, robots are industrial, service or medical (ISO 8373:2021, Definitions 1.1.3, 1.1.4)."]
+  - ["按结构与移动方式，固定基座的操作臂分为串联（关节型、SCARA、直角坐标）和并联；移动机器人分为轮式、足式、仿人、空中和水下。",
+     "By structure and mobility, fixed-base arms are serial (articulated, SCARA, Cartesian) or parallel; mobile robots are wheeled, legged, humanoid, aerial or underwater."]
+  - ["关节表列出模型中能动的关节：转动关节绕一根轴转动，移动关节沿一条直线滑动。移动机器人的基座本身还有 3 个（地面上）或 6 个（空中、足式机身）自由度。",
+     "The joint table lists the model's movable joints: a revolute joint turns about an axis, a prismatic joint slides along a line. A mobile robot's base adds 3 (on the floor) or 6 (in the air, a legged body) DOF."]
+  - ["Delta 的模型只列出 3 个主动关节，其余被动关节由闭链约束决定，所以只拖动主动臂不能保持闭合（第 18 章）。",
+     "The Delta model lists only its 3 driven joints; the passive ones follow from the closed chain, so dragging the driven arms alone breaks the loop (Chapter 18)."]
+步骤:
+  - ["打开实验 1.3，场景“工业臂”。把“选择模型”依次设为 0–3，按“摆动 / 行驶”看每台的关节怎样运动，在表 1 中记下用途、结构、关节数和厂家参数。找出手臂本身（不算手爪的手指）带有移动关节的模型（任务 1）。",
+     "Open Lab 1.3, scene “Industrial arms”. Set Select model to 0–3 in turn, press Swing / Drive to watch the joints, and record use, structure, joints and datasheet values in Table 1. Find the one whose arm itself (not counting gripper fingers) has a prismatic joint (task 1)."]
+  - ["切换到“足式与仿人”，查看 Go2 和 G1，找出关节数最多的模型（任务 2）。比较 G1 的模型关节数与厂家参数表中的自由度，说明差别。",
+     "Switch to “Legged and humanoid”, look at Go2 and G1, and find the model with the most joints (task 2). Compare G1's joint count with the datasheet DOF and explain the difference."]
+  - ["切换到“轮式与空中”，查看差速小车和四旋翼，找出没有关节的模型并按“摆动 / 行驶”看它怎样运动（任务 3）。",
+     "Switch to “Wheeled and aerial”, look at the cart and the quadrotor; find the model without joints and press Swing / Drive to see how it moves (task 3)."]
+  - ["切换到生活场景“家里的扫地机器人”，左轮 −10 rad/s、右轮 10 rad/s，按“摆动 / 行驶”，让它原地转一圈（任务 4）。再试两轮同速和不同速。",
+     "Switch to “The robot vacuum at home”, left wheel −10 rad/s, right 10 rad/s, press Swing / Drive so it spins once (task 4). Then try equal and unequal speeds."]
+数据表:
+  - 标题: ["表 1  零件库八个模型的分类", "Table 1  Classifying the eight library models"]
+    表头: ["模型", "用途", "基座", "结构", "关节数（转动 / 移动）", "厂家参数（负载、工作半径或重量）"]
+    表头英文: ["Model", "Use", "Base", "Structure", "Joints (revolute / prismatic)", "Datasheet (payload, reach or weight)"]
+    行: [["UR5e", "", "", "", "", ""], ["Panda", "", "", "", "", ""], ["SCARA", "", "", "", "", ""], ["Delta", "", "", "", "", ""],
+         ["Go2", "", "", "", "", ""], ["G1", "", "", "", "", ""], ["差速小车", "", "", "", "", ""], ["四旋翼 X2", "", "", "", "", ""]]
+    行英文: [["UR5e", "", "", "", "", ""], ["Panda", "", "", "", "", ""], ["SCARA", "", "", "", "", ""], ["Delta", "", "", "", "", ""],
+             ["Go2", "", "", "", "", ""], ["G1", "", "", "", "", ""], ["Differential cart", "", "", "", "", ""], ["Quadrotor X2", "", "", "", "", ""]]
+注意:
+  - ["“选择模型”的范围随场景变化；未选中的模型变淡显示。", "The range of Select model depends on the scene; unselected models are shown faded."]
+  - ["Delta 不随“摆动”运动：闭链机构不能只转动主动关节。", "Delta does not swing: a closed chain cannot move by its driven joints alone."]
+  - ["鼠标拖动可以旋转视角，滚轮缩放。", "Drag with the mouse to rotate the view; scroll to zoom."]
+思考题:
+  - ["如果给差速小车装上一台 UR5e，组成移动操作机器人，它的自由度是多少？执行器有几个？", "If a UR5e is mounted on the differential cart to make a mobile manipulator, how many DOF and how many actuators does it have?"]

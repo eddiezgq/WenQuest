@@ -1,0 +1,27 @@
+# 实验 2.2 的指导书与报告模板。目的、场景、参数、任务取自 lab2_2.js。
+原理:
+  - ["同一个线性变换，在不同的坐标系（基）中写出的矩阵不同。若新坐标系 {b} 的两根轴在 {s} 中的分量组成矩阵 R，则变换在 {b} 中的矩阵为", "One linear map has different matrices in different frames (bases). If the axes of the new frame {b}, written in {s}, form the matrix R, the map's matrix in {b} is"]
+  - 式: "A_b = Rᵀ A_s R          (2.2.7)"
+  - ["一般的基变换 P（各列为新的基向量）给出 A′ = P⁻¹AP，称为相似变换。相似的矩阵描述同一个几何操作，它们的行列式、迹和特征多项式都相同（定理 2.2.4）。",
+     "A general change of basis P (new basis vectors as columns) gives A′ = P⁻¹AP, a similarity transformation. Similar matrices describe the same map and share determinant, trace and characteristic polynomial (Theorem 2.2.4)."]
+  - ["矩阵 A_b 的 (i, j) 元素等于 {b} 的第 i 根轴与“第 j 根轴的像”的点积。所以，当 {b} 的轴恰好是变换只伸缩、不转向的方向时，非对角元为零。",
+     "Entry (i, j) of A_b is axis i of {b} dotted with the image of axis j. When the axes of {b} are directions the map only stretches, the off-diagonal entries vanish."]
+步骤:
+  - ["打开实验 2.2，选择场景“柔顺手腕的刚度”，φ = 0°。读出刚度矩阵、迹和行列式，与算例 2.2.1 的 K_s 比较。", "Open Lab 2.2, scene “Stiffness of a compliant wrist”, φ = 0°. Read the matrix, trace and determinant; compare with K_s of Example 2.2.1."]
+  - ["把 φ 依次设为 15°、30°、45°、60°、90°，把矩阵、迹、行列式填入表 1。找出使矩阵成为对角矩阵的 φ（任务 1）。", "Set φ = 15°, 30°, 45°, 60°, 90°; enter the matrix, trace and determinant in Table 1. Find the φ that makes the matrix diagonal (task 1)."]
+  - ["找出使两个对角元相等的 φ（任务 2），写出此时的矩阵，并说明为什么这样的 φ 有两个，相差 90°。", "Find a φ that makes the diagonal entries equal (task 2); write the matrix and explain why there are two such φ, 90° apart."]
+  - ["切换到场景“窗棂的影子”。φ = 0° 和 φ = 90°（任务 3）时各读一次矩阵，填入表 2，验证迹和行列式不变，并说明矩阵为什么从“上三角”变成了“下三角”。", "Switch to “A window's shadow”. Read the matrix at φ = 0° and φ = 90° (task 3) into Table 2; check that trace and determinant agree and explain why the matrix turns from upper to lower triangular."]
+数据表:
+  - 标题: ["表 1  柔顺手腕的刚度矩阵（N/m）", "Table 1  Stiffness matrix of the wrist (N/m)"]
+    表头: ["φ", "k₁₁", "k₁₂ = k₂₁", "k₂₂", "迹", "行列式"]
+    表头英文: ["φ", "k₁₁", "k₁₂ = k₂₁", "k₂₂", "Trace", "Determinant"]
+    行: [["0°", "", "", "", "", ""], ["15°", "", "", "", "", ""], ["30°", "", "", "", "", ""], ["45°", "", "", "", "", ""], ["60°", "", "", "", "", ""], ["90°", "", "", "", "", ""]]
+  - 标题: ["表 2  影子的剪切", "Table 2  The shadow's shear"]
+    表头: ["φ", "矩阵", "迹", "行列式"]
+    表头英文: ["φ", "Matrix", "Trace", "Determinant"]
+    行: [["0°", "", "", ""], ["90°", "", "", ""], ["45°", "", "", ""]]
+注意:
+  - ["φ 是观察用的坐标系的转角，不是手腕的转角：金色椭圆（变换本身）始终不动。", "φ turns the frame you look from, not the wrist: the gold ellipse (the map itself) never moves."]
+  - ["刚度的数值较大，比较迹和行列式时注意单位：迹为 N/m，行列式为 N²/m²。", "Stiffness values are large; mind the units: trace in N/m, determinant in N²/m²."]
+思考题:
+  - ["影子的矩阵在任何 φ 下都不对称吗？对称性为什么不是相似不变量？", "Is the shadow's matrix non-symmetric for every φ? Why is symmetry not a similarity invariant?"]

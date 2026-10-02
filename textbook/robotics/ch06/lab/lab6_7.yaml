@@ -1,0 +1,27 @@
+# 实验 6.7 的指导书与报告模板。目的、场景、参数、任务取自 lab6_7.js。
+原理:
+  - ["两个运动旋量 A、B 的李括号 [A, B] = [A][B] − [B][A]（定义 6.7.1），对 se(3) 写成六维矢量为 (ω_A × ω_B, ω_A × v_B − ω_B × v_A)（式 (6.7.4)）。",
+     "The Lie bracket of twists A and B is [A, B] = [A][B] − [B][A] (Definition 6.7.1); as a 6-vector in se(3) it is (ω_A × ω_B, ω_A × v_B − ω_B × v_A) (Eq. (6.7.4))."]
+  - 式: "e^{εA} e^{εB} e^{−εA} e^{−εB} = I + ε²[A, B] + O(ε³)          (6.7.8)"
+  - ["差速 AGV 的两种基本运动：前进 V_f = (0,0,0, 1,0,0)，原地左转 V_r = (0,0,1, 0,0,0)。两者的李括号 [V_f, V_r] = (0,0,0, 0,−1,0) 是向右的平移——AGV 不能直接做的运动。",
+     "A differential AGV has two basic motions: forward V_f = (0,0,0, 1,0,0) and spin left V_r = (0,0,1, 0,0,0). Their bracket [V_f, V_r] = (0,0,0, 0,−1,0) is a translation to the right, a motion the AGV cannot make directly."]
+  - ["前进 d、左转 a、后退 d、右转 a 之后，朝向复原，位置向右移了 d sin a ≈ d·a。前进距离与转角取不同的值 d、a 时，式 (6.7.8) 中的 ε² 换成 d·a。",
+     "After forward d, left a, back d, right a, the heading is restored and the position has moved d sin a ≈ d·a to the right. With different sizes d and a, ε² in Eq. (6.7.8) becomes d·a."]
+步骤:
+  - ["打开实验 6.7，场景“差速 AGV 横向靠站”。取 d = 0.2 m、a = 0.2 rad、n = 1，按“开始”（任务 1）。记录净位移和朝向，与 −d sin a 和李括号的预测 −d·a 比较，记入表 1。",
+     "Open Lab 6.7, scene “Differential AGV docking sideways”. With d = 0.2 m, a = 0.2 rad, n = 1 press Start (task 1). Record the net displacement and heading and compare with −d sin a and the bracket's −d·a; Table 1."]
+  - ["把 d、a 都减半（任务 2），记录侧移，计算它与上一次之比。", "Halve d and a (task 2); record the shift and its ratio to the previous one."]
+  - ["取 d = 0.4 m、a = 0.4 rad，再做一次，比较精确值与预测值的相对误差，说明误差为什么随 d、a 增大而变大（O(ε³) 项）。", "Try d = 0.4 m, a = 0.4 rad; compare the relative error between exact and predicted shifts and explain why it grows with d and a (the O(ε³) term)."]
+  - ["取 d = a = 0.2，重复 5 组（任务 3），验证侧移约为 5 × 0.04 m，朝向始终不变。", "With d = a = 0.2, repeat five sets (task 3): about 5 × 0.04 m sideways, heading unchanged."]
+  - ["切换到“轮椅靠近桌边”，自选 d、a、n，使轮椅向右靠近桌边至少 0.1 m（任务 4），记入表 1。", "Switch to “A wheelchair edging to a desk” and choose d, a, n to move at least 0.1 m right (task 4); Table 1."]
+数据表:
+  - 标题: ["表 1  交替运动的净位移", "Table 1  Net displacement of alternating motions"]
+    表头: ["场景", "d / m", "a / rad", "n", "读出的 y / m", "−n·d·sin a / m", "−n·d·a / m"]
+    表头英文: ["Scene", "d / m", "a / rad", "n", "y read / m", "−n·d·sin a / m", "−n·d·a / m"]
+    行: [["AGV", "0.2", "0.2", "1", "", "", ""], ["AGV", "0.1", "0.1", "1", "", "", ""], ["AGV", "0.4", "0.4", "1", "", "", ""], ["AGV", "0.2", "0.2", "5", "", "", ""], ["轮椅", "", "", "", "", "", ""]]
+    行英文: [["AGV", "0.2", "0.2", "1", "", "", ""], ["AGV", "0.1", "0.1", "1", "", "", ""], ["AGV", "0.4", "0.4", "1", "", "", ""], ["AGV", "0.2", "0.2", "5", "", "", ""], ["Wheelchair", "", "", "", "", "", ""]]
+注意:
+  - ["本实验中“前进”“转向”分开进行；真实 AGV 可以边走边转，但净效果的分析方法相同。", "Here driving and turning are done separately; a real AGV can do both at once, but the net-effect analysis is the same."]
+  - ["侧移的大小与 d·a 成正比，所以小幅度的来回动作需要重复很多次；实际中常改用较大的 d、a，或者先转向再斜着开过去。", "The shift scales with d·a, so small manoeuvres must be repeated many times; in practice larger d, a are used, or the vehicle turns and drives across at an angle."]
+思考题:
+  - ["汽车不能原地转向，只能“前进/后退”和“转方向盘”。侧方停车时，车身的侧移来自哪两个运动的李括号的李括号？", "A car cannot spin on the spot; it can only drive and steer. In parallel parking, the sideways shift comes from the bracket of which bracket?"]
