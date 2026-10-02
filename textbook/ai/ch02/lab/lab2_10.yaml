@@ -1,0 +1,24 @@
+# 实验 2.10 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab2_10.js。
+原理:
+  - ["矩阵乘法 (M×K)(K×N) 的运算量为 2MNK FLOP，至少读写 M·K + K·N + M·N 个数。一批 B 条、每条 T 个词元时，线性层的 M = BT，计算强度约随 BT 与 d 增大。",
+     "A matrix product (M×K)(K×N) costs 2MNK FLOP and reads/writes at least M·K + K·N + M·N numbers. With B sequences of T tokens, M = BT for the linear layers, and their intensity grows with BT and d."]
+  - 式: "每层线性层 24BTd²；注意力矩阵乘 4BT²d；二者相等时 T = 6d"
+  - ["逐元素运算（softmax、层归一化、GELU、残差加法）每个元素只做几次运算，却要读写一遍，计算强度只有 0.2～2.5 FLOP/B，远低于 H100 的 P/β ≈ 295 FLOP/B，总是受显存带宽限制（式 (1.5.3)）。",
+     "Element-wise ops (softmax, LayerNorm, GELU, residual add) do a few operations per element but read and write it, an intensity of only 0.2–2.5 FLOP/B, far below the H100's P/β ≈ 295 FLOP/B: always bandwidth-bound (Eq. (1.5.3))."]
+  - ["耗时下限按每个运算单独执行、取 max(W/P, Q/β) 再相加估计，没有考虑运算之间的融合与缓存复用，也没有考虑启动开销。", "The time bound adds max(W/P, Q/β) over the operations run one by one, ignoring fusion, cache reuse and launch overhead."]
+步骤:
+  - ["小型 Transformer 场景保持默认设置（任务 1），记录参数量、运算量、矩阵乘法所占比例，与程序 2.10.1 的结果比较，填入表 1 第一行。",
+     "Tiny Transformer at the defaults (task 1): record parameters, FLOPs and the matrix-product share; compare with Program 2.10.1 and fill in row 1 of Table 1."]
+  - ["只增大 T，找出注意力矩阵乘的运算量超过线性层时的 T（任务 2），与 6d 比较。", "Increase only T; find where attention matmuls exceed the linear layers (task 2) and compare with 6d."]
+  - ["切换到大模型场景，d = 4096、L = 32（任务 3），记录各项，填入表 1 第二行；再把 B、T 调到最小（任务 4），填入第三行。", "In the large-model scene with d = 4096, L = 32 (task 3) fill in row 2; then minimize B and T (task 4) for row 3."]
+  - ["比较三行中逐元素运算的耗时占比，说明“算子融合”在小模型和大模型中哪个更重要。", "Compare the time share of element-wise ops across the rows and explain where operator fusion matters more."]
+数据表:
+  - 标题: ["表 1  三种设置下一次前向计算的统计", "Table 1  One forward pass in three settings"]
+    表头: ["设置", "参数量", "运算量", "矩阵乘法占运算", "线性层计算强度", "线性层瓶颈", "逐元素运算占耗时"]
+    表头英文: ["Setting", "Parameters", "FLOPs", "Matmul share of FLOPs", "Linear intensity", "Linear bottleneck", "Element-wise share of time"]
+    行: [["d=384, L=6, T=256, B=32", "", "", "", "", "", ""], ["d=4096, L=32, T=2048, B=8", "", "", "", "", "", ""], ["d=4096, L=32, T=64, B=1", "", "", "", "", "", ""]]
+注意:
+  - ["这里的 h 取 d/64，d_ff 取 4d；真实模型的设置可能不同。", "Here h = d/64 and d_ff = 4d; real models may differ."]
+  - ["没有利用因果掩码省掉一半的注意力计算。", "The causal mask's halving of attention work is not used."]
+思考题:
+  - ["为什么大模型批大小为 1 逐词生成时（T 也很小），线性层会变成受带宽限制？与算例 1.5.5 联系起来。", "Why do the linear layers become bandwidth-bound when a large model generates with B = 1 and small T? Relate this to Example 1.5.5."]

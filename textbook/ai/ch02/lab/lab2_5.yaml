@@ -1,0 +1,24 @@
+# 实验 2.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab2_5.js。
+原理:
+  - ["两层网络：h = φ(W⁽¹⁾x + b⁽¹⁾)，z = w⁽²⁾·h + b⁽²⁾，合格（类别 1）的概率 p = σ(z)；隐藏单元数为 0 时退化为逻辑回归，分界线只能是直线（式 (2.4.1)）。",
+     "Two-layer network: h = φ(W⁽¹⁾x + b⁽¹⁾), z = w⁽²⁾·h + b⁽²⁾, probability of class 1 p = σ(z); with 0 hidden units it is logistic regression and the boundary is a straight line (Eq. (2.4.1))."]
+  - 式: "∂L/∂z = (p − y)/n，  ∂L/∂W⁽¹⁾ = Xᵀ[(∂L/∂z) w⁽²⁾ᵀ ⊙ φ′(Z⁽¹⁾)]          (2.5.6)"
+  - ["每一步对全部训练点算一次前向和反向，再按 θ ← θ − η∇L 更新（全批梯度下降）。学习率太大时损失会剧烈振荡甚至变成 NaN（2.1.5 节）。",
+     "Each step runs one forward and one backward pass over all points and updates θ ← θ − η∇L (full-batch gradient descent). Too large a learning rate makes the loss oscillate or turn NaN (Section 2.1.5)."]
+  - ["ReLU 网络的分界线由若干段直线组成；tanh 网络的分界线是光滑曲线。", "A ReLU network's boundary is made of straight pieces; a tanh network's boundary is smooth."]
+步骤:
+  - ["“月牙”场景：隐藏单元数取 0，学习率 0.5，训练 1000 步以上，记录训练准确率和损失（任务 1）。", "Moons: 0 hidden units, η = 0.5, train at least 1000 steps; record the accuracy and the loss (task 1)."]
+  - ["隐藏单元数依次取 2、4、8、16，各训练到损失不再下降，填入表 1；找到准确率超过 99% 的设置（任务 2）。", "Set 2, 4, 8, 16 hidden units, train until the loss stops falling and fill in Table 1; find a setting above 99% (task 2)."]
+  - ["“异或”场景：从 1 个隐藏单元开始逐个增加，找到准确率达到 100% 的最少单元数（任务 3）。与算例 2.4.1 比较。", "XOR: start from 1 hidden unit and add one at a time; find the fewest units reaching 100% (task 3). Compare with Example 2.4.1."]
+  - ["回到“月牙”，16 个单元，学习率取 3（任务 4），描述损失曲线，并与学习率 0.5 比较。", "Back to moons, 16 units, η = 3 (task 4); describe the loss curve and compare with η = 0.5."]
+  - ["“靶心”场景：分别用 ReLU 和 tanh 训练（任务 5），比较分界线的形状。", "Target: train with ReLU and with tanh (task 5) and compare the shapes of the boundary."]
+数据表:
+  - 标题: ["表 1  “月牙”数据上隐藏单元数的影响（ReLU，η = 0.5）", "Table 1  Effect of the hidden units on the moons (ReLU, η = 0.5)"]
+    表头: ["隐藏单元数 m", "参数个数", "训练步数", "损失", "训练准确率"]
+    表头英文: ["Hidden units m", "Parameters", "Steps", "Loss", "Training accuracy"]
+    行: [["0", "3", "", "", ""], ["2", "9", "", "", ""], ["4", "17", "", "", ""], ["8", "33", "", "", ""], ["16", "65", "", "", ""]]
+注意:
+  - ["本实验只看训练准确率；单元太多时可能过拟合，判断泛化能力要用另外的测试数据（2.7 节）。", "This lab reports training accuracy only; with many units the network may overfit, which needs separate test data to judge (Section 2.7)."]
+  - ["初始权重由固定的随机种子产生，同一设置重复训练结果相同。", "Initial weights come from a fixed seed, so the same setting gives the same result."]
+思考题:
+  - ["为什么隐藏单元数为 0 时参数是 3 个，为 m 时是 4m + 1 个？", "Why are there 3 parameters with 0 hidden units and 4m + 1 with m?"]
