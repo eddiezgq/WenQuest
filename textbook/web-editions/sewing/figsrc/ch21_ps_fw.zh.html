@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch}
+.cell{display:flex;align-items:center}
+.cell .box{flex:1}
+.arr{width:34px;flex:0 0 34px;text-align:center;color:#5a6570;font-size:22px}
+.lane{border-radius:10px;padding:10px 12px 12px;margin-bottom:12px}
+.lane h4{margin:0 0 8px;font-size:13.5px;color:#5a6570}
+.mono{font-size:12px}
+.box span{font-size:12.3px}
+</style>
+<div class="fig" style="--w:1180px">
+<p class="title">花样机原型固件的数据流（三条时间尺度）</p>
+<p class="sub">示意。上：每段花样一次（后台任务）；中：每针一次（缝纫顺序状态机）；下：每 1 ms 和每个角度刻度（实时中断）。HAL 接口沿用第 19 章</p>
+<div class="lane fill-k"><h4>后台：每段花样一次（几十毫秒内完成即可）</h4>
+<div class="row">
+<div class="cell"><div class="box"><b>花样文件 .wqp</b><span>网关下发；头 + 3 字节逐针记录</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box"><b>解析 wqp_parse()</b><span>校验、累加成绝对针点（整数 0.1 mm）</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box"><b>行程与针距检查</b><span>超行程、超 12.7 mm 拒收</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box o"><b>前瞻限速 plan_speed()</b><span>每针 cap → 反向 → 正向，Δn = 300 r/min</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box"><b>针队列</b><span class="mono">{dx, dy, n, flags}</span><span>环形缓冲 256 针</span></div></div>
+</div></div>
+<div class="lane fill-y"><h4>每针：状态机 IDLE → CLAMP → RUN → SLOW → TRIM → POSITION → JUMP → … → HOME</h4>
+<div class="row">
+<div class="cell"><div class="box y"><b>取下一针</b><span>窗口起点 φ<sub>s</sub> = 268.3°</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box y"><b>主轴速度命令</b><span>spindle_set_speed(n[i])</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box y"><b>事件表</b><span>剪线、拨线、中压脚按角度触发（第 19 章）</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box y"><b>联锁</b><span>压框到位、气压、急停</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box"><b>FAULT → SAFE</b><span>断电磁铁、主轴停、XY 保持</span></div></div>
+</div></div>
+<div class="lane fill-b"><h4>实时：每 1 ms（插补中断）与每 0.1°（角度比较中断）</h4>
+<div class="row">
+<div class="cell"><div class="box b"><b>读主轴角 φ、ω</b><span>编码器 10000 计数/转</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box b"><b>预测角</b><span>φ<sub>p</sub> = φ + ω·T<sub>d</sub>，T<sub>d</sub> = 1.5 ms</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box b"><b>τ = (φ<sub>p</sub> − φ<sub>s</sub>)/W<sub>u</sub></b><span>W<sub>u</sub> = 183.4°，0 ≤ τ ≤ 1</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box b"><b>S 形表 f(τ)</b><span>x = x<sub>0</sub> + dx·f(τ)，y 同理</span></div><span class="arr">→</span></div>
+<div class="cell"><div class="box b"><b>stepper_set_pos()</b><span>CAN FD 同步帧，X、Y 同一时刻生效</span></div></div>
+</div></div>
+<p class="note">记录通道（调试与验收用）：每 1 ms 记 φ、X/Y 命令与编码器实际值、跟随误差，存环形缓冲，网关按需上传（21.4 节）。</p>
+</div>

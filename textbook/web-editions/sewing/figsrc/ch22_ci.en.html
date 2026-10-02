@@ -1,0 +1,41 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.lane{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center;margin-bottom:14px}
+.lane>.tag{font-weight:700;font-size:14px}.lane>.tag small{display:block;font-weight:400;color:#5a6570;font-size:12px}
+.flow{display:flex;align-items:stretch;gap:0}
+.flow .box{flex:1;font-size:12.5px;padding:8px 8px}
+.flow .ar{width:28px;display:flex;align-items:center;justify-content:center;color:#5a6570;font-size:20px;flex:none}
+.bud{display:flex;height:34px;border-radius:6px;overflow:hidden;font-size:11.5px;color:#fff;font-weight:700}
+.bud div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;border-right:1px solid #faf9f5}
+.bl{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center;margin-top:8px;font-size:12.5px}
+</style>
+<div class="fig" style="--w:1300px">
+<p class="title">Continuous integration: every firmware change is tested automatically</p><p class="sub">The faster a test, the more often it runs; slow tests go to the night and the weekend. If any level fails, the later levels do not run and the version cannot be merged or released (illustrative)</p>
+<div class="lane"><div class="tag">Every push<small>about 12 min; no merge on failure</small></div><div class="flow">
+<div class="box k fill-k"><b>Commit</b><span>code + parameter table + tests</span></div><div class="ar">→</div>
+<div class="box"><b>Build</b><span>cross-compiled firmware + host build, 2 min</span></div><div class="ar">→</div>
+<div class="box g fill-g"><b>Unit tests</b><span>≈400, 1 min</span></div><div class="ar">→</div>
+<div class="box b fill-b"><b>SIL</b><span>≈60, 8 min; includes parameter sweeps</span></div><div class="ar">→</div>
+<div class="box k"><b>Merge to main</b><span>firmware package with version number</span></div></div></div>
+<div class="lane"><div class="tag">Nightly 02:00<small>4 h budget, 2 HIL rigs</small></div><div class="flow">
+<div class="box"><b>Take latest main</b><span>flash it to the HIL rig controller</span></div><div class="ar">→</div>
+<div class="box p fill-p" style="flex:1.6"><b>HIL regression cases</b><span>trim speed sweep, stop statistics, solenoids, fault injection, backtack, X–Y, selection … ≤ 4 h</span></div><div class="ar">→</div>
+<div class="box t fill-t"><b>Report to the bus</b><span>…/measurement → historian, dashboard</span></div><div class="ar">→</div>
+<div class="box o fill-o" style="flex:1.3"><b>Failure → automatic bisection</b><span>re-run only the failing case, find the first bad commit of the day, notify its author</span></div></div></div>
+<div class="lane"><div class="tag">Weekly / candidate<small>about 2 days, machine bench</small></div><div class="flow">
+<div class="box"><b>Release candidate</b><span>HIL all green for 5 nights</span></div><div class="ar">→</div>
+<div class="box y fill-y" style="flex:1.6"><b>Machine test bench</b><span>each of the 4 prototypes: 4 h run at top speed, 1000 real trims, camera on backtack and stitches</span></div><div class="ar">→</div>
+<div class="box k fill-k" style="flex:1.3"><b>Release</b><span>firmware + parameter version numbers, signed; reported to the digital factory with each prototype</span></div></div></div>
+<div class="bl"><div class="tag" style="font-weight:700">Splitting 240 nightly minutes<br><small style="font-weight:400;color:#5a6570">(Section 22.7, illustrative)</small></div>
+<div class="bud">
+<div style="width:33.3%;background:#c4531d">trim speed sweep 80</div>
+<div style="width:14.6%;background:#7444b4">fault injection 35</div>
+<div style="width:18.8%;background:#2a5fb8">X–Y following 45</div>
+<div style="width:16.7%;background:#0f6e74">selection timing 40</div>
+<div style="width:8.3%;background:#1f8a4c">backtack 20</div>
+<div style="width:4.2%;background:#a8740c">sol.</div>
+<div style="width:2.5%;background:#1b2430">stop</div>
+<div style="width:1.6%;background:#9aa4ae"></div>
+</div></div>
+<p class="note">Note: the last two cells are stop statistics (6 min) and spare (4 min). Nightly cases are chosen by "risk × defects caught ÷ time"; whatever does not fit (such as a 2 h soak) moves to the weekend. Bisection re-runs only the one failing case: about 5 rounds for 23 commits.</p>
+</div>

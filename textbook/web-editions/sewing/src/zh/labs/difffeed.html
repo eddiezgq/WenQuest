@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>差动送布实验</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: guide + tasks rail | work area (mechanism side view, sewn-edge view, strain curve) */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --bad:#d1495b; --ok:#1e8449; --warn:#b9770e;
+  --main:#2f6fd6; --diff:#e0662f; --fab:#e6c98f; --fabd:#b99a5c; --thread:#1d4c9e; --steel:#8b959f; --band:#1e84491f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--main:#6ea8ff;--diff:#ff8c55;--fab:#8a7448;--fabd:#c9ab6c;--thread:#8fb4ff;--steel:#7d8792;--band:#58d68d22;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--main:#6ea8ff;--diff:#ff8c55;--fab:#8a7448;--fabd:#c9ab6c;--thread:#8fb4ff;--steel:#7d8792;--band:#58d68d22;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,310px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px;max-width:100%}
+input[type=range]{flex:1;min-width:140px;accent-color:var(--accent)}
+label{font-size:.85rem;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+.val{font-family:var(--f-mono);font-weight:600;min-width:3.6em;font-variant-numeric:tabular-nums}
+canvas{display:block;width:100%;height:auto;border-radius:6px;background:var(--sheet)}
+.note{font-size:.8rem;color:var(--muted);margin:6px 0 0}
+.steps{margin:0;padding-left:1.3em;font-size:.86rem}
+.steps li{margin:3px 0;cursor:pointer}
+.steps li.on{font-weight:600;color:var(--accent)}
+.lesson{font-size:.88rem;background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px}
+.lesson p{margin:0 0 6px}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px;min-width:0}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted);font-size:.74rem;display:block}
+.verdict{font-weight:700;font-size:1.02rem;margin:8px 0 0}
+.verdict.ok{color:var(--ok)} .verdict.warn{color:var(--warn)} .verdict.bad{color:var(--bad)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:1100px){.two{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion: reduce){.anim-note{display:none}}
+</style>
+<div class="wrap">
+<header><h1>差动送布实验</h1><span class="sub">《缝纫机设计与制造》第 9 章 · 虚拟实验 9-1 · 调差动比，看布边是平整、起波浪还是缩褶</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>实验指导</h3>
+      <ol class="steps" id="steps"></ol>
+      <div class="lesson" id="lesson"></div>
+      <div class="row"><button type="button" id="prev">上一步</button><button type="button" id="next">下一步</button></div>
+    </section>
+    <section class="panel">
+      <h3>任务（自动判定）</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>调整</h3>
+      <div class="row"><label for="fab">面料</label><select id="fab"></select></div>
+      <div class="row"><label for="dr">差动比 D</label><input id="dr" type="range" min="0.6" max="2" step="0.05" value="1"><span class="val" id="v-dr">1.00</span></div>
+      <div class="row"><label for="sl">针距 s</label><input id="sl" type="range" min="1" max="4" step="0.1" value="2.5"><span class="val" id="v-sl">2.5 mm</span></div>
+      <div class="row"><label for="pf">压脚压力</label><input id="pf" type="range" min="0.6" max="1.4" step="0.1" value="1"><span class="val" id="v-pf">标准</span></div>
+      <div class="row"><button type="button" id="play" aria-pressed="true">暂停动画</button><span class="note anim-note">动画里两只送布牙的行程按真实比例绘制。</span></div>
+      <div class="kpi" style="margin-top:8px">
+        <div><b id="k-sd">2.50 mm</b><small>差动牙行程 s_d = D·s</small></div>
+        <div><b id="k-deff">1.00</b><small>实际传到布上的差动比 D_e</small></div>
+        <div><b id="k-eps">+0.0 %</b><small>布边应变 ε（缝线长/布长 − 1）</small></div>
+        <div><b id="k-amp">0.0 mm</b><small>波浪或缩褶的高度</small></div>
+      </div>
+      <p class="verdict" id="verdict">—</p>
+    </section>
+    <section class="panel">
+      <h3>送布区侧视（沿布边看，布从左向右送）</h3>
+      <canvas id="cvMech" width="1100" height="300" aria-label="两只送布牙与布料的侧视动画"></canvas>
+      <p class="note">蓝色是主送布牙（在针后，决定针距），橙色是差动送布牙（在针前）。布上的小竖线原来间隔 2 mm；差动牙走得比主送布牙多，两牙之间的布就被推挤，竖线变密；走得少，布被拉开，竖线变疏。</p>
+    </section>
+    <div class="two">
+      <section class="panel">
+        <h3>缝好的布边（俯视）</h3>
+        <canvas id="cvEdge" width="700" height="360" aria-label="缝好后布边的样子"></canvas>
+        <p class="note">ε 大于 0：缝线比布长，松开后布边多出的长度鼓成波浪（针织物常见的“荷叶边”）。ε 小于 0：布比缝线长，被收拢成细褶。</p>
+      </section>
+      <section class="panel">
+        <h3>布边应变与差动比</h3>
+        <canvas id="cvCurve" width="700" height="360" aria-label="当前面料的应变随差动比变化的曲线"></canvas>
+        <p class="note">绿色带是 |ε| ≤ 2% 的平整区，圆点是当前设定。曲线两端变平，是因为推挤或拉伸超出面料能承受的程度后开始打滑。</p>
+      </section>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+// ---------- fabric model (same as section 9.10 of the book) ----------
+// e0: stretch the fabric picks up at D = 1 (presser-foot drag on the top layer, pull of the main dog)
+// eta: share of the differential motion that actually reaches the fabric (grip)
+// gmax: largest compression the fabric can take between the dogs; emax: largest stretch before the dogs slip
+const FAB=[
+ {id:'jersey',name:'汗布（单面针织，T 恤）',e0:0.18,eta:0.85,gmax:0.35,emax:0.6,lam:30},
+ {id:'rib',name:'罗纹（领口、袖口）',e0:0.30,eta:0.80,gmax:0.30,emax:0.8,lam:26},
+ {id:'fleece',name:'卫衣布（毛圈针织）',e0:0.10,eta:0.90,gmax:0.25,emax:0.4,lam:36},
+ {id:'chiffon',name:'雪纺（薄梭织）',e0:-0.06,eta:0.95,gmax:0.55,emax:0.08,lam:30},
+ {id:'twill',name:'斜纹布（中厚梭织）',e0:0.01,eta:0.90,gmax:0.12,emax:0.02,lam:40},
+];
+const $=id=>document.getElementById(id);
+const st={fab:FAB[0],D:1,s:2.5,pf:1,play:true,t:0};
+function model(f=st.fab,D=st.D,pf=st.pf){
+  const e0=f.e0*pf;
+  let De=1+f.eta*(D-1), slip='';
+  const Dmax=1/(1-f.gmax), Dmin=1/(1+f.emax);
+  if(De>Dmax){De=Dmax;slip='push';} if(De<Dmin){De=Dmin;slip='pull';}
+  const eps=(1+e0)/De-1;
+  const lamG=4+2*st.s;
+  const amp=eps>=0? f.lam*Math.sqrt(eps)/Math.PI : lamG*Math.sqrt(-eps)/Math.PI;
+  return {e0,De,eps,amp,slip,lamG};
+}
+// ---------- guide ----------
+const LESSONS=[
+ ['两只送布牙',`<p>包缝机针板下面并排装着两只送布牙。针后面的叫<b>主送布牙</b>，它每针把布向后送一个针距 s；针前面的叫<b>差动送布牙</b>，它的行程 s_d 可以单独调。</p><p>差动比 D = s_d / s。先把 D 放在 1.00，看动画里两只牙走得一样远，布上的竖线间距不变。</p>`],
+ ['针织布为什么起波浪',`<p>选“汗布”，D = 1.00。压脚压着上层布，主送布牙在下面拉，针织线圈很容易被拉长，于是缝的时候布边已经被拉伸了约 18%。</p><p>线迹把这段被拉长的布边“定型”，松开后布要缩回去，缝线却不缩，多出来的长度只能鼓成波浪。右边的读数 ε 就是这个多出来的比例。</p>`],
+ ['用差动抵消拉伸',`<p>把 D 往上调。差动牙每针多送一点布，两牙之间的布被推挤，正好抵消前面那份拉伸。</p><p>当 ε 落进 ±2% 的绿色带，布边就平了。注意送布牙并不能把多走的距离全部传给布（打滑），所以需要的 D 比 1 + 18% 还要大一点。</p>`],
+ ['薄梭织反过来',`<p>换成“雪纺”。薄而滑的梭织布在压脚下容易被推挤，D = 1 时缝出来反而起皱（ε 为负）。</p><p>这时要把 D 调到 1 以下，让差动牙少送一点，把布轻轻拉开。梭织布几乎不能伸长，拉过头送布牙就打滑，曲线左端变平说明的正是这一点。</p>`],
+ ['把缺陷变成工艺',`<p>差动也可以故意“调过头”。汗布用很小的 D 把布边拉长后缝住，得到装饰性的荷叶边（俗称生菜边）；薄料用很大的 D，缝一道就收成碎褶。</p><p>最后看针距和压脚压力：针距越长，同样的 D 推挤出的褶越大；压脚越重，针织布被拉得越厉害。</p>`],
+];
+let li=0;
+function showLesson(){ $('steps').innerHTML=LESSONS.map((l,i)=>`<li class="${i===li?'on':''}" data-i="${i}">${l[0]}</li>`).join(''); $('lesson').innerHTML=LESSONS[li][1];
+  document.querySelectorAll('#steps li').forEach(e=>e.onclick=()=>{li=+e.dataset.i;showLesson();}); $('prev').disabled=li===0; $('next').disabled=li===LESSONS.length-1; }
+$('prev').onclick=()=>{li=Math.max(0,li-1);showLesson();}; $('next').onclick=()=>{li=Math.min(LESSONS.length-1,li+1);showLesson();};
+// ---------- tasks ----------
+const TASKS=[
+ {t:'汗布 T 恤侧缝缝平',d:'面料：汗布，压脚标准；要求 |ε| ≤ 2%',ok:()=>st.fab.id==='jersey'&&Math.abs(st.pf-1)<0.01&&Math.abs(model().eps)<=0.02},
+ {t:'罗纹领口缝平',d:'面料：罗纹，压脚标准；要求 |ε| ≤ 2%',ok:()=>st.fab.id==='rib'&&Math.abs(st.pf-1)<0.01&&Math.abs(model().eps)<=0.02},
+ {t:'雪纺衬衫下摆不起皱',d:'面料：雪纺；要求 |ε| ≤ 1.5%',ok:()=>st.fab.id==='chiffon'&&Math.abs(model().eps)<=0.015},
+ {t:'汗布荷叶边（生菜边）',d:'面料：汗布；要求 ε 在 +30% 到 +45% 之间，且送布牙不打滑',ok:()=>{const m=model();return st.fab.id==='jersey'&&m.eps>=0.30&&m.eps<=0.45&&!m.slip;}},
+ {t:'雪纺缝一道收碎褶',d:'面料：雪纺；要求 ε ≤ −35%，且布不在两牙间堵塞',ok:()=>{const m=model();return st.fab.id==='chiffon'&&m.eps<=-0.35&&!m.slip;}},
+];
+const done=new Set();
+function checkTasks(){ TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('')+`<p class="note">完成后会保持打勾；换面料不会清除。</p>`; }
+// ---------- controls ----------
+$('fab').innerHTML=FAB.map((f,i)=>`<option value="${i}">${f.name}</option>`).join('');
+$('fab').onchange=e=>{st.fab=FAB[+e.target.value];update();};
+$('dr').oninput=e=>{st.D=+e.target.value;update();};
+$('sl').oninput=e=>{st.s=+e.target.value;update();};
+$('pf').oninput=e=>{st.pf=+e.target.value;update();};
+$('play').onclick=e=>{st.play=!st.play;e.target.setAttribute('aria-pressed',st.play);e.target.textContent=st.play?'暂停动画':'播放动画';};
+if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){st.play=false;$('play').setAttribute('aria-pressed','false');$('play').textContent='播放动画';}
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function update(){
+  const m=model(), f=st.fab;
+  $('v-dr').textContent=st.D.toFixed(2); $('v-sl').textContent=st.s.toFixed(1)+' mm';
+  $('v-pf').textContent=st.pf<0.95?'轻':st.pf>1.05?'重':'标准';
+  $('k-sd').textContent=(st.D*st.s).toFixed(2)+' mm'; $('k-deff').textContent=m.De.toFixed(3);
+  $('k-eps').textContent=(m.eps>=0?'+':'')+(m.eps*100).toFixed(1)+' %'; $('k-amp').textContent=(Math.abs(m.eps)<0.02?0:m.amp).toFixed(1)+' mm';
+  const v=$('verdict');
+  if(m.slip==='push'){v.className='verdict bad';v.textContent='推挤过度：布在两只牙之间拱起，差动牙打滑，再加大 D 也送不进去。';}
+  else if(m.slip==='pull'){v.className='verdict bad';v.textContent='拉伸过度：这种面料伸不长，差动牙在布下打滑。';}
+  else if(Math.abs(m.eps)<=0.02){v.className='verdict ok';v.textContent='布边平整（|ε| ≤ 2%）。';}
+  else if(m.eps>0){v.className='verdict warn';v.textContent=m.eps>0.25?'布边强烈起波浪：可以作荷叶边装饰，作普通缝合就是次品。':'布边起波浪：缝线比布长，需要加大 D。';}
+  else {v.className='verdict warn';v.textContent=m.eps<-0.25?'布边收成碎褶：可以作抽褶装饰。':'布边起皱：布比缝线长，需要减小 D。';}
+  checkTasks(); drawEdge(m); drawCurve(m);
+}
+// ---------- canvases ----------
+function prep(c){const ctx=c.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle=css('--sheet');ctx.fillRect(0,0,c.width,c.height);return ctx;}
+const font=(px,w=400)=>`${w} ${px}px "Noto Sans SC","PingFang SC",sans-serif`;
+// side view of the feed zone, x = distance along the feed direction (mm), fabric moves +x
+function drawMech(){
+  const c=$('cvMech'), ctx=prep(c), m=model();
+  const k=11, x0=110, yP=170; // 11 px per mm, plate surface at y=170
+  const X=mm=>x0+mm*k;
+  const ink=css('--ink'), mut=css('--muted');
+  // needle plate
+  ctx.fillStyle=css('--steel'); ctx.globalAlpha=.35; ctx.fillRect(20,yP,c.width-40,26); ctx.globalAlpha=1;
+  ctx.strokeStyle=css('--steel'); ctx.beginPath(); ctx.moveTo(20,yP); ctx.lineTo(c.width-20,yP); ctx.stroke();
+  // shaft angle
+  const ph=(st.t%1)*2*Math.PI; const lift=1.6*Math.cos(ph)-0.6; const up=lift>0;
+  const ym=0.5*st.s*Math.sin(ph), yd=0.5*st.s*st.D*Math.sin(ph);
+  // dogs: main centred at 52 mm, differential centred at 22 mm (needle at 40 mm)
+  const dog=(cx,dx,len,col,lab)=>{const L=X(cx+dx-len/2),R=X(cx+dx+len/2),top=yP-lift*k;
+    ctx.fillStyle=col; ctx.globalAlpha=.85; ctx.fillRect(L,top,R-L,30); ctx.globalAlpha=1;
+    ctx.fillStyle=col; for(let x=L+6;x<R-4;x+=13){ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x+6,top-6);ctx.lineTo(x+12,top);ctx.fill();}
+    // elliptical path of one tooth
+    ctx.strokeStyle=col; ctx.setLineDash([4,4]); ctx.beginPath(); for(let a=0;a<=64;a++){const p=a/64*2*Math.PI; const s=col===css('--main')?st.s:st.s*st.D; const xx=X(cx+0.5*s*Math.sin(p)), yy=yP-(1.6*Math.cos(p)-0.6)*k-2; a?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy);} ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=col; ctx.font=font(19,600); ctx.textAlign='center'; ctx.fillText(lab,X(cx),yP+58);};
+  dog(52,ym,14,css('--main'),`主送布牙  s = ${st.s.toFixed(1)} mm`); dog(22,yd,12,css('--diff'),`差动送布牙  s_d = ${(st.s*st.D).toFixed(2)} mm`);
+  // fabric strip with marks; marks between the dogs are spaced by the local strain
+  const top=yP-(up?lift*k:0)-24;
+  ctx.fillStyle=css('--fab'); ctx.fillRect(20,top,c.width-40,22);
+  // feed: marks drift with the fabric while the dogs are up
+  const prog=up? (ph<Math.PI? ph : ph-2*Math.PI) : 0;
+  st.feed=(st.feed||0);
+  const ratio=1/m.De; // spacing factor after the differential dog
+  ctx.strokeStyle=css('--fabd'); ctx.lineWidth=2;
+  const base=(st.feedPos||0)%2;
+  for(let i=-2;i<60;i++){ let u=i*2+base; // relaxed position (mm) measured from the left edge of the view (x = -8 mm)
+    let x=u-8; if(x>22){ x=22+(x-22)*ratio; } if(x>52) x=x;
+    const px=X(x); if(px<22||px>c.width-22) continue; ctx.beginPath(); ctx.moveTo(px,top+3); ctx.lineTo(px,top+19); ctx.stroke(); }
+  ctx.lineWidth=1;
+  // presser foot
+  ctx.fillStyle=css('--steel'); ctx.fillRect(X(4),top-12,X(64)-X(4),10);
+  ctx.fillStyle=mut; ctx.font=font(18); ctx.textAlign='left'; ctx.fillText('压脚',X(4)+6,top-20);
+  // needle at 40 mm
+  ctx.strokeStyle=ink; ctx.lineWidth=3; const nY=up? top-60 : yP+20; ctx.beginPath(); ctx.moveTo(X(40),20); ctx.lineTo(X(40),nY); ctx.stroke(); ctx.lineWidth=1;
+  ctx.fillStyle=ink; ctx.font=font(18,600); ctx.textAlign='left'; ctx.fillText('机针',X(40)+10,44);
+  ctx.fillStyle=mut; ctx.font=font(18); ctx.fillText('布料前进方向 →',X(66),top-20);
+  ctx.textAlign='right'; ctx.fillText(up?'送布牙露出针板：送布':'送布牙在针板下：机针穿布',c.width-30,40);
+  // advance fabric marks when dogs are up
+  if(st.play&&up){ st.feedPos=(st.feedPos||0)+st.s*0.03*Math.cos(ph)*0.6; }
+}
+function drawEdge(m){
+  const c=$('cvEdge'), ctx=prep(c); const W=c.width,H=c.height; const ink=css('--ink'),mut=css('--muted');
+  const k=5.2, x0=30, x1=W-30, yEdge=130; // 5.2 px per mm
+  const eps=m.eps, flat=Math.abs(eps)<=0.02, wave=!flat&&eps>0, gath=!flat&&eps<0;
+  const A=Math.min(m.amp,10)*k*0.5, lam=st.fab.lam;
+  const edgeY=x=>wave? yEdge+Math.sin((x-x0)/k/lam*2*Math.PI)*A : yEdge;
+  // fabric body
+  ctx.fillStyle=css('--fab'); ctx.beginPath(); ctx.moveTo(x0,H-24);
+  for(let x=x0;x<=x1;x+=2) ctx.lineTo(x,edgeY(x)); ctx.lineTo(x1,H-24); ctx.closePath(); ctx.fill();
+  // ruffle: crests lit, troughs shaded, fading away from the edge
+  if(wave){ for(let x=x0;x<x1;x+=2){ const c2=Math.cos((x-x0)/k/lam*2*Math.PI); const g=ctx.createLinearGradient(0,edgeY(x),0,edgeY(x)+16*k);
+      g.addColorStop(0,c2>0?`rgba(255,255,255,${0.35*c2})`:`rgba(0,0,0,${-0.22*c2})`); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(x,edgeY(x),2,16*k);} }
+  // gathers: soft folds running away from the seam
+  if(gath){ ctx.save(); ctx.beginPath(); ctx.rect(x0,0,x1-x0,H); ctx.clip(); const sp=m.lamG*k; for(let x=x0+sp/2;x<x1;x+=sp){ const g=ctx.createLinearGradient(x-sp/2,0,x+sp/2,0); const d=Math.min(0.35,0.08+m.amp*0.06);
+      g.addColorStop(0,`rgba(0,0,0,${d})`); g.addColorStop(0.5,'rgba(255,255,255,0.25)'); g.addColorStop(1,`rgba(0,0,0,${d})`);
+      ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(x-sp/2,yEdge); ctx.lineTo(x+sp/2,yEdge); ctx.lineTo(x+sp*0.9,H-24); ctx.lineTo(x-sp*0.1,H-24); ctx.closePath(); ctx.fill(); } ctx.restore(); }
+  // overedge stitch: needle line 4 mm inside the edge, threads wrapping to the edge
+  const s=st.s*k; ctx.strokeStyle=css('--thread'); ctx.lineWidth=2; ctx.beginPath();
+  for(let x=x0;x+s<=x1;x+=s){ ctx.moveTo(x,edgeY(x)+4*k); ctx.lineTo(x+s/2,edgeY(x+s/2)); ctx.lineTo(x+s,edgeY(x+s)+4*k); } ctx.stroke(); ctx.lineWidth=1;
+  ctx.strokeStyle=css('--fabd'); ctx.setLineDash([6,5]); ctx.beginPath(); for(let x=x0;x<=x1;x+=2){const y=edgeY(x)+4*k; x===x0?ctx.moveTo(x,y):ctx.lineTo(x,y);} ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=ink; ctx.font=font(22,600); ctx.textAlign='left';
+  ctx.fillText(flat?'平整':wave?`波浪：高约 ${m.amp.toFixed(1)} mm，波长约 ${lam} mm`:`细褶：每 ${m.lamG.toFixed(0)} mm 一褶，高约 ${m.amp.toFixed(1)} mm`,x0,42);
+  ctx.fillStyle=mut; ctx.font=font(18); ctx.fillText(`${st.fab.name} · 线迹宽 4 mm · 针距 ${st.s.toFixed(1)} mm`,x0,72);
+  ctx.textAlign='right'; ctx.fillText('布边 ↑',x1,yEdge-A-14);
+}
+function drawCurve(m){
+  const c=$('cvCurve'), ctx=prep(c); const W=c.width,H=c.height; const ink=css('--ink'),mut=css('--muted');
+  const L=84,R=W-24,T=26,B=H-62; const Dmin=0.6,Dmax=2.0,Emin=-0.6,Emax=0.6;
+  const X=d=>L+(d-Dmin)/(Dmax-Dmin)*(R-L), Y=e=>T+(Emax-Math.max(Emin,Math.min(Emax,e)))/(Emax-Emin)*(B-T);
+  ctx.fillStyle=css('--band'); ctx.fillRect(L,Y(0.02),R-L,Y(-0.02)-Y(0.02));
+  ctx.strokeStyle=css('--rule'); ctx.fillStyle=mut; ctx.font=font(18); ctx.textAlign='right';
+  for(let e=-0.6;e<=0.601;e+=0.2){ctx.beginPath();ctx.moveTo(L,Y(e));ctx.lineTo(R,Y(e));ctx.stroke();ctx.fillText((e>0?'+':'')+Math.round(e*100)+'%',L-8,Y(e)+4);}
+  ctx.textAlign='center'; for(let d=0.6;d<=2.001;d+=0.2){ctx.beginPath();ctx.moveTo(X(d),B);ctx.lineTo(X(d),B+5);ctx.stroke();ctx.fillText(d.toFixed(1),X(d),B+24);}
+  ctx.fillText('差动比 D',(L+R)/2,H-8);
+  ctx.save(); ctx.translate(20,(T+B)/2); ctx.rotate(-Math.PI/2); ctx.fillText('布边应变 ε',0,0); ctx.restore();
+  ctx.strokeStyle=ink; ctx.lineWidth=2; ctx.beginPath(); for(let i=0;i<=140;i++){const d=Dmin+(Dmax-Dmin)*i/140; const e=model(st.fab,d,st.pf).eps; i?ctx.lineTo(X(d),Y(e)):ctx.moveTo(X(d),Y(e));} ctx.stroke(); ctx.lineWidth=1;
+  ctx.fillStyle=css('--accent'); ctx.beginPath(); ctx.arc(X(st.D),Y(m.eps),7,0,2*Math.PI); ctx.fill();
+  ctx.fillStyle=ink; ctx.font=font(20,600); ctx.textAlign='left'; ctx.fillText(`D = ${st.D.toFixed(2)}，ε = ${(m.eps*100).toFixed(1)}%`,Math.min(X(st.D)+14,R-230),Y(m.eps)+(m.eps>0.4?30:-14));
+  ctx.fillStyle=mut; ctx.font=font(18); ctx.fillText('平整区 ±2%',L+8,Y(0.02)-8);
+}
+let last=performance.now();
+function loop(t){const dt=Math.min(0.05,(t-last)/1000);last=t; if(st.play) st.t+=dt*0.5; drawMech(); requestAnimationFrame(loop);}
+showLesson(); update(); requestAnimationFrame(loop);
+window.__set=o=>{if('fab' in o){st.fab=FAB[o.fab];$('fab').value=o.fab;}if('D' in o){st.D=o.D;$('dr').value=o.D;}if('s' in o){st.s=o.s;$('sl').value=o.s;}if('pf' in o){st.pf=o.pf;$('pf').value=o.pf;}if('t' in o)st.t=o.t;if('play' in o)st.play=o.play;update();drawMech();};
+window.__model=(i,D,pf=1)=>model(FAB[i],D,pf);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

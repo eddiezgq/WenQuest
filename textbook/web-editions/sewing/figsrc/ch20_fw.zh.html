@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.layer{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:stretch;margin-bottom:6px}
+.lname{font-size:13px;font-weight:700;color:#5a6570;display:flex;align-items:center;border-right:3px solid #d8dde1;padding-right:8px}
+.row{display:grid;gap:10px}
+.box b{font-size:14.5px}.box span{font-size:12px}
+.id{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11.5px;color:#14797f;display:block;margin-top:2px}
+.link{display:flex;justify-content:space-around;font-size:12px;color:#5a6570;margin:2px 0 6px 162px}
+.link i{font-style:normal;background:#eef1f2;border-radius:10px;padding:1px 9px}
+.arrow{font-size:22px;color:#5a6570;display:flex;align-items:center;justify-content:center}
+.st{border-radius:22px}
+.small{font-size:12px;color:#5a6570}
+.tag{display:inline-block;font-size:11px;border-radius:8px;padding:0 6px;background:#fcefe8;color:#c4531d;margin-left:4px}
+.tag.n{background:#e6f3f3;color:#0f6e74}
+</style>
+<div class="fig" style="--w:1250px">
+<p class="title">平缝机原型的固件：状态机、角度中断里的事件表、HAL</p><p class="sub">示意。时间基准是主轴转角；事件表在参数里，改表不改代码</p><div style="display:grid;grid-template-columns:1fr 70px 1fr 70px 1fr 70px 1fr 70px 1fr 70px 1fr;gap:4px;align-items:center"><div class="box st k fill-k"><b>IDLE</b><span>压脚落下，等脚踏</span></div><div class="arrow" style="flex-direction:column"><span style="font-size:11px;color:#5a6570;line-height:1.1;text-align:center">前掌踩下</span>→</div><div class="box st b fill-b"><b>RUN</b><span>脚踏调速；起缝回针、慢起针</span></div><div class="arrow" style="flex-direction:column"><span style="font-size:11px;color:#5a6570;line-height:1.1;text-align:center">后跟踩到底</span>→</div><div class="box st b fill-b"><b>SLOW</b><span>减速到剪线转速</span></div><div class="arrow" style="flex-direction:column"><span style="font-size:11px;color:#5a6570;line-height:1.1;text-align:center">到剪线转速</span>→</div><div class="box st y fill-y"><b>TRIM</b><span>剪线事件表生效</span></div><div class="arrow" style="flex-direction:column"><span style="font-size:11px;color:#5a6570;line-height:1.1;text-align:center">到切入角 25°</span>→</div><div class="box st b fill-b"><b>POSITION</b><span>位置环停到上针位</span></div><div class="arrow" style="flex-direction:column"><span style="font-size:11px;color:#5a6570;line-height:1.1;text-align:center">停稳标志</span>→</div><div class="box st k fill-k"><b>IDLE</b><span>拨线 → 抬压脚</span></div></div><div class="box o fill-o" style="margin:12px 0 18px;display:flex;gap:14px;align-items:center;text-align:left"><b style="display:inline">SAFE</b><span style="display:inline">任一状态：过流、编码器丢失、超时、急停 → 断全部电磁铁，主轴自由停或制动</span></div><div class="box o" style="display:grid;grid-template-columns:200px 1fr;text-align:left;margin-bottom:8px;align-items:center"><b>角度中断 10 kHz</b><span style="color:#1b2430;font-size:13px">读编码器计数 → ψ（0.1°）；扫描事件表，跨过起/止角就开/关对应通道；回针针数计数</span></div><div class="box b" style="display:grid;grid-template-columns:200px 1fr;text-align:left;margin-bottom:8px;align-items:center"><b>控制任务 1 kHz</b><span style="color:#1b2430;font-size:13px">状态机、速度曲线（慢起针、加减速限幅）、位置环（K<sub>p</sub> = 200 s⁻¹）、超时</span></div><div class="box t" style="display:grid;grid-template-columns:200px 1fr;text-align:left;margin-bottom:8px;align-items:center"><b>后台任务</b><span style="color:#1b2430;font-size:13px">脚踏滤波、参数表与版本号、故障码、日志、网关通信（MQTT）</span></div><div class="box k" style="display:grid;grid-template-columns:200px 1fr;text-align:left;margin-bottom:8px;align-items:center"><b>HAL</b><span style="color:#1b2430;font-size:13px">spindle_* · sol_* · io_* · enc_*；换模块只换驱动文件</span></div>
+</div>

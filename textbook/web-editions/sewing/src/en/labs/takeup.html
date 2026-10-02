@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Take-up Mechanism and Thread Supply</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = mechanism (face-plate view) + hook inset, then the supply/demand curves; right rail = indicators, parameters, guided tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --plate:#eef1f2; --plate2:#dfe4e6; --cloth:#e9e2d2; --clothline:#c9bea4;
+  --needle-thread:#2a5fb8; --demand:#c4531d; --steel:#5c6670; --link:#7b4bc4; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f; --spring:#1e8449;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--plate:#1e2731;--plate2:#26313c;--cloth:#4a4436;--clothline:#6b624d;--needle-thread:#7fa9f2;--demand:#f08c58;--steel:#b7c0c9;--link:#b190f0;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--spring:#5fd08a}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--plate:#1e2731;--plate2:#26313c;--cloth:#4a4436;--clothline:#6b624d;--needle-thread:#7fa9f2;--demand:#f08c58;--steel:#b7c0c9;--link:#b190f0;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--spring:#5fd08a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.two{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.row label{font-size:.84rem;color:var(--muted)}
+input[type=range]{accent-color:var(--accent);width:100%}
+.ang{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:1rem;min-width:4.5em}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 4.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.meter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.meter div{border-top:3px solid var(--rule);padding-top:4px}
+.meter div.ok{border-top-color:var(--ok)} .meter div.bad{border-top-color:var(--bad)} .meter div.warn{border-top-color:var(--warn)}
+.meter b{display:block;font-family:var(--f-mono);font-size:1.08rem;font-variant-numeric:tabular-nums}
+.meter small{color:var(--muted);font-size:.74rem;line-height:1.35;display:block}
+.state{margin-top:10px;font-size:.88rem;min-height:4.2em;border-left:3px solid var(--rule);padding-left:8px}
+.state.ok{border-left-color:var(--ok)} .state.bad{border-left-color:var(--bad)} .state.warn{border-left-color:var(--warn)}
+.state b{display:block}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+details summary{cursor:pointer;font-size:.84rem;color:var(--muted);margin-top:10px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:3px;background:var(--c)}
+.hide{display:none!important}
+</style>
+<div class="wrap">
+<header><h1>Take-up Mechanism and Thread Supply</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 4 · Virtual lab 4-1 · How much thread the take-up lever pays out, when, and whether it is enough for the rotary hook</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <div class="row" style="margin-top:0;justify-content:space-between">
+        <div class="row" style="margin-top:0" id="modes">
+          <button type="button" data-m="link" aria-pressed="true">Link type (four-bar)</button>
+          <button type="button" data-m="cam">Cam type (design your own supply curve)</button>
+        </div>
+        <span class="note" style="margin:0" id="viewNote">Face-plate view: looking along the main shaft from the left end, face plate removed (worked-example dimensions, illustrative)</span>
+      </div>
+      <div class="two" style="margin-top:8px">
+        <div><canvas id="mech" width="900" height="680" aria-label="Animation of take-up mechanism and needle-thread path"></canvas></div>
+        <div>
+          <h3 style="margin-top:4px">At the hook (viewed along the hook axis; needle passes in front of the bobbin case)</h3>
+          <canvas id="hook" width="480" height="560" aria-label="Diagram of needle, rotary hook and loop"></canvas>
+          <p class="note" id="hookNote"></p>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" id="play" aria-pressed="true">Pause</button>
+        <button type="button" id="step">Step +5°</button>
+        <span class="note" style="margin:0">Main-shaft angle</span><span class="ang" id="angOut">0°</span>
+        <div style="flex:1;min-width:180px"><input id="ang" type="range" min="0" max="359" step="1" value="0" aria-label="Main-shaft angle"></div>
+        <label for="spd">Speed</label><input id="spd" type="range" min="0.2" max="3" step="0.1" value="1" style="width:110px">
+      </div>
+      <div class="legend"><span style="--c:var(--needle-thread)">Needle thread</span><span style="--c:var(--link)">Take-up link and rocker</span><span style="--c:var(--steel)">Crank, needle bar, hook</span><span style="--c:var(--spring)">Check spring</span></div>
+    </section>
+    <section class="panel">
+      <h3>Thread supply, demand and slack (one stitch = one main-shaft revolution)</h3>
+      <canvas id="cv" width="1200" height="560" aria-label="Thread supply and demand curves"></canvas>
+      <div class="legend"><span style="--c:var(--needle-thread)">Supply S: thread paid out by the take-up since its tightest point</span><span style="--c:var(--demand)">Demand D: thread needed by needle and loop</span><span style="--c:var(--ink)">Slack S − D</span><span style="--c:var(--spring)">Range the check spring can absorb</span></div>
+      <p class="note" id="camHint">Demand is computed from a simplified geometric model (see Section 4.5) and supply from the take-up mechanism geometry; the numbers are a worked example, for comparing trends.</p>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>Indicators</h3>
+      <div class="meter" id="meter"></div>
+      <div class="state" id="state"></div>
+    </section>
+    <section class="panel">
+      <h3>Parameters</h3>
+      <div class="prm" id="prm"></div>
+      <div id="linkMore">
+        <details><summary>Link dimensions (changing them may make the mechanism impossible to assemble)</summary><div class="prm" id="prmLink"></div>
+          <div class="row"><button type="button" id="lkReset">Reset to worked-example dimensions</button></div></details>
+      </div>
+      <div id="camMore" class="hide">
+        <p class="note">Drag the blue dots on the chart below to change the supply at every 30°; the cam profile is redrawn to match.</p>
+        <div class="row"><button type="button" id="camFromLink">Start from the link-type curve</button><button type="button" id="camSmooth">Smooth once</button></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Tasks (checked automatically)</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+const DEG=Math.PI/180, $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// ---------- needle bar (chapter 3 worked example) ----------
+const RN=15.5, LN=55;
+const xN=f=>{const a=f*DEG,l=RN/LN;return RN*(1-Math.cos(a))-LN*(1-Math.sqrt(1-(l*Math.sin(a))**2));};
+// ---------- hook & loop geometry (axial view of the hook, origin = hook centre) ----------
+const RH=13.5, RC=11.0, EYE_TDC=20, TIP_TDC=18;
+const YP=xN(206)-8;                       // needle-plate top above hook centre: beak passes 1.5 mm above the eye at a 206° catch
+function hullPerim(pts){
+  const p=pts.map(q=>[q[0],q[1]]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+  if(p.length<2)return 0;
+  const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+  const lo=[],up=[];
+  for(const q of p){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q);}
+  for(let i=p.length-1;i>=0;i--){const q=p[i];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q);}
+  const h=lo.slice(0,-1).concat(up.slice(0,-1));let s=0;
+  for(let i=0;i<h.length;i++){const a=h[i],b=h[(i+1)%h.length];s+=Math.hypot(b[0]-a[0],b[1]-a[1]);}
+  return s;
+}
+const smooth=u=>{u=Math.min(1,Math.max(0,u));return u*u*(3-2*u);};
+function loopPts(f,t,phc){
+  const x=xN(f),e=EYE_TDC-t-x,F=[0,YP+t],th=(90-2*(f-phc))*DEG,H=[RH*Math.cos(th),RH*Math.sin(th)];
+  const pts=[F,H],sw=2*(f-phc);
+  for(let a=0;a<sw;a+=1){const q=(90-a)*DEG;pts.push([RC*Math.cos(q),RC*Math.sin(q)]);}
+  if(e<0)pts.push([0,YP+t+e]);
+  return {pts,e,x,H,F};
+}
+function demandRaw(f,t,phc){
+  const x=xN(f),e=EYE_TDC-t-x;
+  if(f<phc)return 2*Math.max(0,-e);
+  const L=loopPts(f,t,phc),P=hullPerim(L.pts),tail=e<0?P+e:e+P;
+  return x+tail-(EYE_TDC-t);
+}
+function demand(f,t,s,phc){
+  const bot=phc+90,off=phc+135,c=s+t;
+  if(f<=bot)return demandRaw(f,t,phc);
+  if(f<=off){const Lb=demandRaw(bot,t,phc),u=smooth((f-bot)/(off-bot));return Lb*(1-u)+c*u;}
+  return c;
+}
+// ---------- take-up four-bar (worked example; coordinates in mm, origin = upper shaft centre, z to the right, y up) ----------
+const LK0={r:20.7,d:-6.8,Qz:21.5,Qy:-45.5,a:43.4,b:40.9,c:65.7,al:2.8};
+const AC=[122.2,-45.7], ADIR=[Math.cos(285.2*DEG),Math.sin(285.2*DEG)], B=[66.4,-117.7];
+const T_DISC=[178,-60], K_PIV=[158,-88], K_ARM=24;
+function linkPose(f,lk){
+  const q=(f+lk.d)*DEG,P=[-lk.r*Math.sin(q),-lk.r*Math.cos(q)],Q=[lk.Qz,lk.Qy];
+  const dz=Q[0]-P[0],dy=Q[1]-P[1],D=Math.hypot(dz,dy),tt=(lk.a*lk.a-lk.b*lk.b+D*D)/(2*D),h2=lk.a*lk.a-tt*tt;
+  if(!(h2>0))return null;
+  const h=Math.sqrt(h2),mz=P[0]+tt*dz/D,my=P[1]+tt*dy/D,M=[mz-h*dy/D,my+h*dz/D];
+  const uz=(M[0]-P[0])/lk.a,uy=(M[1]-P[1])/lk.a,ca=Math.cos(lk.al*DEG),sa=Math.sin(lk.al*DEG);
+  const E=[P[0]+lk.c*(uz*ca-uy*sa),P[1]+lk.c*(uz*sa+uy*ca)];
+  const w1=[P[0]-M[0],P[1]-M[1]],w2=[Q[0]-M[0],Q[1]-M[1]];
+  const mu=Math.acos(Math.max(-1,Math.min(1,(w1[0]*w2[0]+w1[1]*w2[1])/lk.a/lk.b)))/DEG;
+  return {P,M,E,Q,mu};
+}
+// ---------- cam mode: supply defined at 12 points (every 30°), periodic monotone cubic ----------
+let camPts=null;
+function pchipPeriodic(ys){
+  const n=ys.length,h=30,dl=[];for(let i=0;i<n;i++)dl.push((ys[(i+1)%n]-ys[i])/h);
+  const m=[];for(let i=0;i<n;i++){const a=dl[(i-1+n)%n],b=dl[i];m.push(a*b<=0?0:2/(1/a+1/b));}
+  return f=>{f=((f%360)+360)%360;const i=Math.floor(f/h)%n,u=(f-i*h)/h,y0=ys[i],y1=ys[(i+1)%n],m0=m[i]*h,m1=m[(i+1)%n]*h;
+    const u2=u*u,u3=u2*u;return (2*u3-3*u2+1)*y0+(u3-2*u2+u)*m0+(-2*u3+3*u2)*y1+(u3-u2)*m1;};
+}
+// ---------- state ----------
+const ST={mode:'link',phi:0,play:true,spd:1,u:0,t:1.5,s:3,phc:206,stroke:10,rpm:5000,lk:Object.assign({},LK0)};
+const seen={early:false,late:false,bLo:false,bHi:false};
+let R=null;   // computed results
+function compute(){
+  const N=360,ph=[],S=new Array(N),D=new Array(N),E=[],mu=[];
+  let ok=true;
+  const A=[AC[0]+ST.u*ADIR[0],AC[1]+ST.u*ADIR[1]];
+  if(ST.mode==='link'){
+    const Lp=[];
+    for(let i=0;i<N;i++){const p=linkPose(i,ST.lk);if(!p){ok=false;break;}E.push(p.E);mu.push(p.mu);
+      Lp.push(Math.hypot(p.E[0]-A[0],p.E[1]-A[1])+Math.hypot(p.E[0]-B[0],p.E[1]-B[1]));}
+    if(!ok)return {ok:false};
+    const mx=Math.max(...Lp);for(let i=0;i<N;i++)S[i]=mx-Lp[i];
+  }else{
+    const fn=pchipPeriodic(camPts);for(let i=0;i<N;i++)S[i]=Math.max(0,fn(i));
+    const mn=Math.min(...S);for(let i=0;i<N;i++)S[i]-=mn;
+  }
+  let top=0;for(let i=1;i<N;i++)if(S[i]<S[top])top=i;
+  let bot=0;for(let i=1;i<N;i++)if(S[i]>S[bot])bot=i;
+  const c=ST.s+ST.t;
+  for(let i=0;i<N;i++)D[i]=i<top?c:demand(i,ST.t,ST.s,ST.phc);
+  const sl=S.map((v,i)=>v-D[i]);
+  let fin=0;while(fin<180&&xN(fin)<EYE_TDC-ST.t)fin++;   // needle eye enters the fabric
+  let margin=1e9,at=0;for(let i=ST.phc;i<=Math.min(359,ST.phc+135);i++)if(sl[i]<margin){margin=sl[i];at=i;}
+  let waste=-1e9;for(let i=ST.phc;i<=Math.min(359,ST.phc+90);i++)waste=Math.max(waste,sl[i]);
+  let pre=-1e9;for(let i=top;i<=fin;i++)pre=Math.max(pre,sl[i]);
+  let neg=0;for(let i=fin;i<ST.phc;i++)neg=Math.max(neg,-sl[i]);
+  // thread acceleration at ST.rpm: second difference of S
+  const w=ST.rpm*2*Math.PI/60;let acc=0;
+  for(let i=0;i<N;i++){const d2=(S[(i+1)%N]-2*S[i]+S[(i-1+N)%N])/(DEG*DEG);acc=Math.max(acc,Math.abs(d2));}
+  R={ok:true,S,D,sl,top,bot,fin,margin,at,waste,pre,neg,entry:sl[fin],c,Smax:S[bot],acc:acc*w*w/1000,
+     mu:mu.length?[Math.min(...mu),Math.max(...mu)]:null,E,A};
+  return R;
+}
+// ---------- UI: parameters ----------
+const PRM=[
+  ['u','Thread-guide position (+ more thread, − less)',-12,24,1,'mm','link'],
+  ['t','Fabric thickness',0.5,5,0.1,'mm'],
+  ['s','Stitch length',1,5,0.1,'mm'],
+  ['phc','Hook timing (hook point reaches needle)',190,222,1,'°'],
+  ['stroke','Check-spring stroke',4,16,0.5,'mm'],
+  ['rpm','Speed (for thread acceleration)',1000,6000,100,'r/min']];
+const PRML=[['a','Link length (crank pin – rocker joint)',38,48,0.1,'mm'],['b','Rocker length',36,46,0.1,'mm'],['c','Thread eye to crank pin',58,74,0.1,'mm'],['d','Take-up crank phase (vs opposite of needle crank)',-30,15,0.1,'°']];
+function buildPrm(host,list,obj){
+  host.innerHTML=list.map(([k,l,mn,mx,st,u,only])=>`<label for="p_${k}" ${only?`data-only="${only}"`:''}>${l}</label><input id="p_${k}" type="range" min="${mn}" max="${mx}" step="${st}" ${only?`data-only="${only}"`:''}><output id="o_${k}" ${only?`data-only="${only}"`:''}></output>`).join('');
+  list.forEach(([k,,,,st,u])=>{const el=$('p_'+k);el.value=obj[k];const show=()=>{$('o_'+k).textContent=(+obj[k]).toFixed(st<1?1:0)+' '+u;};show();
+    el.addEventListener('input',()=>{obj[k]=+el.value;show();changed();});});
+}
+function syncPrm(){[...PRM.map(p=>[p,ST]),...PRML.map(p=>[p,ST.lk])].forEach(([[k,,,,st,u],o])=>{const el=$('p_'+k);if(el){el.value=o[k];$('o_'+k).textContent=(+o[k]).toFixed(st<1?1:0)+' '+u;}});}
+buildPrm($('prm'),PRM,ST);buildPrm($('prmLink'),PRML,ST.lk);
+function changed(){compute();if(std()&&R.ok&&ST.phc<=198&&R.waste<=18.5)seen.early=true;if(std()&&R.ok&&ST.phc>=214&&R.margin<1)seen.late=true;
+  if(ST.mode==='link'&&R.ok){if(ST.lk.b<=38.5)seen.bLo=true;if(ST.lk.b>=43.5)seen.bHi=true;}
+  draw();checkTasks();}
+$('lkReset').onclick=()=>{ST.lk=Object.assign({},LK0);syncPrm();changed();};
+function setMode(m){ST.mode=m;document.querySelectorAll('#modes button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));
+  $('linkMore').classList.toggle('hide',m!=='link');$('camMore').classList.toggle('hide',m!=='cam');
+  document.querySelectorAll('[data-only]').forEach(el=>el.classList.toggle('hide',m!==el.dataset.only));
+  if(m==='cam'&&!camPts)camFromLink();
+  $('viewNote').textContent=m==='link'?'Face-plate view: looking along the main shaft from the left end, face plate removed (worked-example dimensions, illustrative)':'Cam type: a take-up cam on the main shaft drives a swing lever; the thread eye moves up and down along an arc (illustrative)';
+  changed();}
+document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+function camFromLink(){const keep=ST.mode;ST.mode='link';const r=compute();ST.mode=keep;
+  camPts=r.ok?[...Array(12)].map((_,i)=>+r.S[i*30].toFixed(1)):[0,2,6,10,20,40,60,80,70,30,8,1];}
+$('camFromLink').onclick=()=>{camFromLink();changed();};
+$('camSmooth').onclick=()=>{const p=camPts.slice();camPts=p.map((v,i)=>Math.max(0,(p[(i+11)%12]+2*v+p[(i+1)%12])/4));changed();};
+// ---------- animation controls ----------
+$('play').onclick=()=>{ST.play=!ST.play;$('play').textContent=ST.play?'Pause':'Play';$('play').setAttribute('aria-pressed',ST.play);};
+$('step').onclick=()=>{ST.play=false;$('play').textContent='Play';$('play').setAttribute('aria-pressed',false);ST.phi=(ST.phi+5)%360;draw();checkTasks();};
+$('ang').addEventListener('input',e=>{ST.play=false;$('play').textContent='Play';$('play').setAttribute('aria-pressed',false);ST.phi=+e.target.value;draw();checkTasks();});
+$('spd').addEventListener('input',e=>ST.spd=+e.target.value);
+// ---------- drawing helpers ----------
+function line(g,a,b){g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();}
+function dot(g,p,r,fill){g.beginPath();g.arc(p[0],p[1],r,0,2*Math.PI);if(fill){g.fillStyle=fill;g.fill();}g.stroke();}
+function bar(g,a,b,w,col){g.save();g.strokeStyle=col;g.lineWidth=w;g.lineCap='round';line(g,a,b);g.restore();}
+function label(g,txt,p,anchor,col){g.fillStyle=col||css('--muted');g.textAlign=anchor||'left';g.fillText(txt,p[0],p[1]);}
+// ---------- mechanism view ----------
+const MV={z0:-38,z1:198,y0:-140,y1:38};
+function mechDraw(){
+  const cv=$('mech'),g=cv.getContext('2d'),W=cv.width,H=cv.height;
+  const sc=Math.min(W/(MV.z1-MV.z0),H/(MV.y1-MV.y0)),T=p=>[(p[0]-MV.z0)*sc,(MV.y1-p[1])*sc];
+  g.clearRect(0,0,W,H);g.font='15px '+css('--f-body');g.lineJoin='round';
+  const ink=css('--ink'),mut=css('--muted'),st=css('--steel'),lk=css('--link'),th=css('--needle-thread'),sp=css('--spring');
+  // housing face
+  g.fillStyle=css('--plate');g.strokeStyle=css('--rule');g.lineWidth=1.5;
+  const fr=[T([-32,32]),T([194,-136])];g.beginPath();g.roundRect(fr[0][0],fr[0][1],fr[1][0]-fr[0][0],fr[1][1]-fr[0][1],18);g.fill();g.stroke();
+  const f=ST.phi;
+  // needle bar (z = 0) with crank
+  const qn=f*DEG,pinN=[RN*Math.sin(qn),RN*Math.cos(qn)],yj=pinN[1]-Math.sqrt(LN*LN-pinN[0]*pinN[0]);
+  g.strokeStyle=st;g.lineWidth=1.2;
+  bar(g,T([0,yj+34]),T([0,-140]),9*sc/3.2,css('--plate2'));g.strokeStyle=st;g.lineWidth=1.2;
+  line(g,T([-1.6,yj+34]),T([-1.6,-140]));line(g,T([1.6,yj+34]),T([1.6,-140]));
+  // break mark on needle bar
+  g.strokeStyle=mut;g.beginPath();const bk=T([0,-131]);g.moveTo(bk[0]-14,bk[1]+6);g.lineTo(bk[0]-4,bk[1]-6);g.lineTo(bk[0]+4,bk[1]+6);g.lineTo(bk[0]+14,bk[1]-6);g.stroke();
+  bar(g,T(pinN),T([0,yj]),5,st);
+  // crank disc
+  g.strokeStyle=st;g.lineWidth=1.5;g.fillStyle=css('--plate2');dot(g,T([0,0]),24*sc,css('--plate2'));dot(g,T([0,0]),6*sc,css('--sheet'));
+  dot(g,T(pinN),3*sc,st);
+  if(ST.mode==='link'&&R.ok){
+    const p=linkPose(f,ST.lk);
+    // coupler curve
+    g.save();g.setLineDash([4,4]);g.strokeStyle=mut;g.lineWidth=1;g.beginPath();
+    R.E.forEach((e,i)=>{const q=T(e);i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);});g.closePath();g.stroke();g.restore();
+    g.fillStyle=mut;g.font='12px '+css('--f-mono');
+    for(let k=0;k<360;k+=30){const q=T(R.E[k]);g.beginPath();g.arc(q[0],q[1],2.2,0,7);g.fill();g.fillText(k+'°',q[0]+(R.E[k][0]>62?6:-30),q[1]+4);}
+    g.font='15px '+css('--f-body');
+    // ground pivot hatch
+    const Qs=T(p.Q);g.strokeStyle=mut;g.lineWidth=1;for(let k=-2;k<=2;k++)line(g,[Qs[0]+k*6-4,Qs[1]+14],[Qs[0]+k*6+4,Qs[1]+6]);line(g,[Qs[0]-16,Qs[1]+6],[Qs[0]+16,Qs[1]+6]);
+    bar(g,T(p.Q),T(p.M),7,lk);
+    bar(g,T(p.P),T(p.E),9,lk);
+    g.strokeStyle=st;g.lineWidth=1.5;dot(g,T(p.P),4,css('--sheet'));dot(g,T(p.M),3.5,css('--sheet'));dot(g,T(p.Q),4,css('--sheet'));
+    g.strokeStyle=lk;g.lineWidth=3;dot(g,T(p.E),6,css('--sheet'));
+    // crank arm to pin
+    bar(g,T([0,0]),T(p.P),6,st);
+    R._E=p.E;R._mu=p.mu;
+    
+  }else if(ST.mode==='cam'){
+    // cam on the upper shaft; a roller lever pivoted on the housing carries the eye (schematic proportions)
+    const fn=pchipPeriodic(camPts),mx=Math.max(...R.S)||1,KL=14/mx;
+    g.beginPath();for(let k=0;k<=360;k+=2){const ang=(k)*DEG,lift=Math.max(0,fn(((f-k)%360+360)%360))*KL,r=24+lift;const pt=T([r*Math.cos(ang),r*Math.sin(ang)]);k?g.lineTo(pt[0],pt[1]):g.moveTo(pt[0],pt[1]);}
+    g.closePath();g.fillStyle=css('--plate2');g.fill();g.strokeStyle=lk;g.lineWidth=2;g.stroke();
+    g.strokeStyle=st;dot(g,T([0,0]),6*sc,css('--sheet'));
+    const lift0=Math.max(0,fn(f))*KL, Rr=[24+lift0+4,0], O=[58,-34];
+    const psi=Math.atan2(Rr[1]-O[1],Rr[0]-O[0]), E2=[O[0]+64*Math.cos(psi-1.25),O[1]+64*Math.sin(psi-1.25)];
+    bar(g,T(O),T(Rr),7,lk);bar(g,T(O),T(E2),8,lk);
+    g.strokeStyle=st;g.lineWidth=1.5;dot(g,T(Rr),4,css('--sheet'));dot(g,T(O),4,css('--sheet'));
+    const Os=T(O);g.strokeStyle=mut;g.lineWidth=1;for(let k=-2;k<=2;k++)line(g,[Os[0]+k*6-4,Os[1]+14],[Os[0]+k*6+4,Os[1]+6]);line(g,[Os[0]-16,Os[1]+6],[Os[0]+16,Os[1]+6]);
+    g.strokeStyle=lk;g.lineWidth=3;dot(g,T(E2),6,css('--sheet'));R._E=E2;R._mu=null;
+    // eye path trace
+    g.save();g.setLineDash([4,4]);g.strokeStyle=mut;g.lineWidth=1;g.beginPath();
+    for(let k=0;k<=360;k+=4){const l=Math.max(0,fn(k%360))*KL,rr=[24+l+4,0],ps=Math.atan2(rr[1]-O[1],rr[0]-O[0]),e=T([O[0]+64*Math.cos(ps-1.25),O[1]+64*Math.sin(ps-1.25)]);k?g.lineTo(e[0],e[1]):g.moveTo(e[0],e[1]);}g.stroke();g.restore();
+    label(g,'Take-up cam',[T([0,-30])[0]-34,T([0,-30])[1]+18],'left',mut);label(g,'Swing lever',[T(O)[0]+12,T(O)[1]+26],'left',lk);
+  }
+  // thread path: tension disc → check spring → guide A → eye → guide B → face-plate guide → needle-bar guide → needle
+  const slack=R.ok?R.sl[Math.round(f)%360]:0, defl=Math.max(0,Math.min(ST.stroke,slack));
+  const springAng=(200-defl/ST.stroke*55)*DEG, K=[K_PIV[0]+K_ARM*Math.cos(springAng),K_PIV[1]+K_ARM*Math.sin(springAng)];
+  const A=ST.mode==='link'?R.A:[150,-40], Bp=ST.mode==='link'?B:[96,-112];
+  const G1=[30,-128],NBG=[3,yj-50];
+  // guides and slot
+  if(ST.mode==='link'){g.strokeStyle=mut;g.lineWidth=7;g.lineCap='round';g.globalAlpha=.35;line(g,T([AC[0]-12*ADIR[0],AC[1]-12*ADIR[1]]),T([AC[0]+12*ADIR[0],AC[1]+12*ADIR[1]]));g.globalAlpha=1;g.lineCap='butt';}
+  g.strokeStyle=st;g.lineWidth=2;[A,Bp,G1].forEach(q=>dot(g,T(q),4,css('--sheet')));
+  // tension disc
+  g.fillStyle=css('--plate2');g.strokeStyle=st;dot(g,T(T_DISC),11*sc/3,css('--plate2'));dot(g,T(T_DISC),3,st);
+  // check spring arm
+  g.strokeStyle=sp;g.lineWidth=2.5;line(g,T(K_PIV),T(K));g.lineWidth=1.5;dot(g,T(K_PIV),3,css('--sheet'));
+  g.save();g.strokeStyle=sp;g.lineWidth=1;g.beginPath();for(let k=0;k<=40;k++){const a=k/40*4*2*Math.PI,r=5+k*0.04;const q=T([K_PIV[0]+r*Math.cos(a)/sc*3,K_PIV[1]+r*Math.sin(a)/sc*3]);k?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);}g.stroke();g.restore();
+  // thread
+  const E=R._E||[60,0];
+  const loose=R.ok&&slack>ST.stroke+0.5&&f>=R.top&&f<=R.fin;
+  g.strokeStyle=th;g.lineWidth=2.4;g.beginPath();
+  const pts=[[T_DISC[0]+12,T_DISC[1]+40],[T_DISC[0],T_DISC[1]-4],K,A,E,Bp,G1,NBG,[2,-140]].map(T);
+  pts.forEach((q,i)=>{if(!i)g.moveTo(q[0],q[1]);else if(loose&&i===4){const m=[(pts[3][0]+q[0])/2+18,(pts[3][1]+q[1])/2+26];g.quadraticCurveTo(m[0],m[1],q[0],q[1]);}else g.lineTo(q[0],q[1]);});g.stroke();
+  // labels
+  g.font='15px '+css('--f-body');
+  label(g,'Main shaft & crank disc',[T([-30,30])[0],T([-30,30])[1]],'left',mut);
+  if(ST.mode==='link'){const p=linkPose(f,ST.lk);label(g,'Frame pivot',[T(p.Q)[0]-80,T(p.Q)[1]+30],'left',mut);label(g,'Rocker',[(T(p.Q)[0]+T(p.M)[0])/2-38,(T(p.Q)[1]+T(p.M)[1])/2],'left',lk);
+    label(g,'Thread guide (adj.)',[T(A)[0]-50,T(A)[1]+34],'left',mut);label(g,'Guide point',[T(Bp)[0]+10,T(Bp)[1]+20],'left',mut);}
+  label(g,'Take-up eye',[T(E)[0]+12,T(E)[1]-10],'left',ink);
+  label(g,'Tension',[T(T_DISC)[0]-58,T(T_DISC)[1]-16],'left',mut);
+  label(g,'Check spring',[T(K_PIV)[0]-14,T(K_PIV)[1]+34],'left',sp);
+  label(g,'Needle bar',[T([0,-118])[0]+12,T([0,-118])[1]],'left',mut);
+  label(g,'Face-plate guide',[T(G1)[0]+10,T(G1)[1]+6],'left',mut);
+  if(loose){g.fillStyle=css('--bad');g.font='bold 15px '+css('--f-body');g.fillText('Slack exceeds check-spring stroke: thread goes slack',T(A)[0]-150,T(A)[1]+64);}
+}
+// ---------- hook inset ----------
+function hookDraw(){
+  const cv=$('hook'),g=cv.getContext('2d'),W=cv.width,H=cv.height,f=ST.phi;
+  const span=48,sc=W/span,T=p=>[W/2+p[0]*sc,H*0.62-p[1]*sc];
+  g.clearRect(0,0,W,H);g.lineJoin='round';
+  const st=css('--steel'),th=css('--needle-thread'),mut=css('--muted');
+  // fabric & plate
+  const yTop=YP+ST.t;g.fillStyle=css('--cloth');g.fillRect(0,T([0,yTop])[1],W,ST.t*sc);
+  g.strokeStyle=css('--clothline');g.lineWidth=1;line(g,[0,T([0,YP])[1]],[W,T([0,YP])[1]]);
+  g.fillStyle=css('--plate2');g.fillRect(0,T([0,YP])[1],W,2.5*sc);
+  // hook body (circle) and bobbin case
+  g.strokeStyle=st;g.lineWidth=2;dot(g,T([0,0]),(RH+2.5)*sc,null);
+  g.fillStyle=css('--plate2');dot(g,T([0,0]),RC*sc,css('--plate2'));g.fillStyle=mut;g.font='13px '+css('--f-body');g.textAlign='center';g.fillText('Bobbin case',T([0,0])[0],T([0,0])[1]+5);
+  // beak (2 turns per stitch)
+  const hb=(90-2*(f-ST.phc))*DEG,Hb=[RH*Math.cos(hb),RH*Math.sin(hb)];
+  g.strokeStyle=st;g.lineWidth=4;g.beginPath();g.arc(T([0,0])[0],T([0,0])[1],RH*sc,-hb-40*DEG,-hb);g.stroke();
+  g.fillStyle=st;g.beginPath();const bp=T(Hb);g.arc(bp[0],bp[1],4,0,7);g.fill();
+  // needle
+  const x=xN(f),tip=YP+TIP_TDC-x,eyeY=YP+EYE_TDC-x;
+  g.fillStyle=st;const nt=T([0,tip]),ntop=T([0,YP+24]);g.beginPath();g.moveTo(nt[0],nt[1]);g.lineTo(nt[0]-0.5*sc,nt[1]-2*sc);g.lineTo(ntop[0]-0.5*sc,ntop[1]);g.lineTo(ntop[0]+0.5*sc,ntop[1]);g.lineTo(nt[0]+0.5*sc,nt[1]-2*sc);g.closePath();g.fill();
+  g.fillStyle=css('--sheet');g.beginPath();const ey=T([0,eyeY]);g.ellipse(ey[0],ey[1],1.6,0.6*sc,0,0,7);g.fill();
+  // thread / loop
+  g.strokeStyle=th;g.lineWidth=2.2;
+  const bot=ST.phc+90,off=ST.phc+135,F=[0,yTop];
+  let mode='';
+  if(f>=ST.phc&&f<=bot){
+    const L=loopPts(f,ST.t,ST.phc);
+    // draw the hull polygon (loop)
+    const p=L.pts.map(q=>[q[0],q[1]]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]),cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]),lo=[],up=[];
+    for(const q of p){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q);}
+    for(let i=p.length-1;i>=0;i--){const q=p[i];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q);}
+    const h=lo.slice(0,-1).concat(up.slice(0,-1));g.beginPath();h.forEach((q,i)=>{const s=T(q);i?g.lineTo(s[0],s[1]):g.moveTo(s[0],s[1]);});g.closePath();g.stroke();
+    mode='Hook point has caught the loop and turned '+Math.round(2*(f-ST.phc))+'°; the loop is enlarged and drawn round the bobbin case (largest when the point is at the bottom)';
+  }else if(f>bot&&f<=off){
+    // loop lies around the case and is being drawn off it: F -> right tangent -> arc under the case -> left tangent -> F
+    const u=smooth((f-bot)/(off-bot)),r=RC+1.2,dF=Math.hypot(F[0],F[1]),aF=Math.atan2(F[1],F[0]),dA=Math.acos(r/dF);
+    g.save();g.globalAlpha=1-0.6*u;g.beginPath();const tf=T(F);g.moveTo(tf[0],tf[1]);
+    for(let a=aF-dA;a>=aF+dA-2*Math.PI;a-=0.05){const q=T([r*Math.cos(a),r*Math.sin(a)]);g.lineTo(q[0],q[1]);}
+    g.closePath();g.stroke();g.restore();
+    mode='Loop slides over the bobbin case and the take-up starts drawing in thread; the loop leaves the case at about '+off+'°';
+  }else{
+    const tf=T(F);
+    if(eyeY<yTop){line(g,[tf[0]-1.5,tf[1]],[ey[0]-1.5,ey[1]]);line(g,[tf[0]+2.5,tf[1]],[ey[0]+2.5,ey[1]]);mode='Needle carries the thread through the fabric; below the fabric the thread runs in two strands, down and back';}
+    else {line(g,tf,[ey[0],ey[1]]);mode=f<ST.phc?'Needle still above the fabric: no thread needed on the needle side yet':'Loop released; the take-up tightens the stitch';}
+  }
+  // labels
+  g.fillStyle=mut;g.font='13px '+css('--f-body');g.textAlign='left';
+  g.fillText('Fabric',6,T([0,yTop])[1]-4);g.fillText('Throat plate',6,T([0,YP])[1]+16);g.fillText('Hook point',bp[0]+8,bp[1]+4);
+  $('hookNote').textContent=mode;
+}
+// ---------- curves ----------
+const CV={x0:70,x1:1180,yA0:28,yA1:330,yB0:370,yB1:540};
+let drag=-1;
+function curvesDraw(){
+  const cv=$('cv'),g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);
+  const ink=css('--ink'),mut=css('--muted'),rule=css('--rule'),th=css('--needle-thread'),dm=css('--demand'),sp=css('--spring'),bad=css('--bad');
+  const X=f=>CV.x0+(CV.x1-CV.x0)*f/360;
+  if(!R.ok){g.fillStyle=bad;g.font='18px '+css('--f-body');g.fillText('The mechanism cannot be assembled at some angles: link and rocker cannot reach. Restore the link dimensions.',CV.x0,120);return;}
+  const top=Math.max(90,Math.ceil(Math.max(...R.S,...R.D)/10)*10+10);
+  const YA=v=>CV.yA1-(CV.yA1-CV.yA0)*v/top;
+  const lo=-15,hi=Math.max(35,Math.ceil(Math.max(...R.sl)/10)*10);
+  const YB=v=>CV.yB1-(CV.yB1-CV.yB0)*(v-lo)/(hi-lo);
+  g.font='13px '+css('--f-mono');g.strokeStyle=rule;g.lineWidth=1;g.fillStyle=mut;g.textAlign='right';
+  for(let v=0;v<=top;v+=20){line(g,[CV.x0,YA(v)],[CV.x1,YA(v)]);g.fillText(v,CV.x0-8,YA(v)+4);}
+  for(let v=-10;v<=hi;v+=10){line(g,[CV.x0,YB(v)],[CV.x1,YB(v)]);g.fillText(v,CV.x0-8,YB(v)+4);}
+  g.textAlign='center';for(let f=0;f<=360;f+=30){line(g,[X(f),CV.yA0],[X(f),CV.yA1]);line(g,[X(f),CV.yB0],[X(f),CV.yB1]);g.fillText(f+'°',X(f),CV.yB1+18);}
+  g.save();g.translate(18,(CV.yA0+CV.yA1)/2);g.rotate(-Math.PI/2);g.fillText('Thread, mm',0,0);g.restore();
+  g.save();g.translate(18,(CV.yB0+CV.yB1)/2);g.rotate(-Math.PI/2);g.fillText('Slack, mm',0,0);g.restore();
+  // phase bands on top plot
+  const band=(a,b,txt,col)=>{g.fillStyle=col;g.globalAlpha=.08;g.fillRect(X(a),CV.yA0,X(b)-X(a),CV.yB1-CV.yA0);g.globalAlpha=1;g.fillStyle=mut;g.font='13px '+css('--f-body');g.textAlign='center';g.fillText(txt,(X(a)+X(b))/2,CV.yA0+14);};
+  band(ST.phc,Math.min(360,ST.phc+135),'catch → round bobbin → release',dm);
+  band(0,R.top,'take-up (prev. stitch)',ink);
+  // spring band on slack plot
+  g.fillStyle=sp;g.globalAlpha=.13;g.fillRect(CV.x0,YB(ST.stroke),CV.x1-CV.x0,YB(0)-YB(ST.stroke));g.globalAlpha=1;
+  g.strokeStyle=ink;g.lineWidth=1.2;line(g,[CV.x0,YB(0)],[CV.x1,YB(0)]);
+  // S and D
+  const plot=(arr,col,Y,wid,dash)=>{g.save();g.strokeStyle=col;g.lineWidth=wid;if(dash)g.setLineDash(dash);g.beginPath();arr.forEach((v,i)=>{const p=[X(i),Y(v)];i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);});g.stroke();g.restore();};
+  plot(R.S,th,YA,3);
+  // D with a jump at take-up top
+  g.save();g.strokeStyle=dm;g.lineWidth=3;g.beginPath();for(let i=0;i<R.top;i++){const p=[X(i),YA(R.D[i])];i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();
+  g.beginPath();for(let i=R.top;i<360;i++){const p=[X(i),YA(R.D[i])];i>R.top?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();
+  g.setLineDash([3,3]);g.lineWidth=1.5;line(g,[X(R.top),YA(R.c)],[X(R.top),YA(0)]);g.restore();
+  g.fillStyle=dm;g.font='13px '+css('--f-body');g.textAlign='left';g.fillText('draw-off '+R.c.toFixed(1)+' mm',X(R.top)+6,YA(R.c)-6);
+  // slack: colour segments
+  for(let i=0;i<359;i++){const a=R.sl[i],b=R.sl[i+1];let col=ink;
+    const inHook=i>=ST.phc&&i<=ST.phc+135;
+    if(inHook&&a<0)col=bad;else if(i>=R.top&&i<=R.fin&&a>ST.stroke)col=bad;else if(i>=R.fin&&i<ST.phc&&a<-1)col=bad;
+    g.strokeStyle=col;g.lineWidth=col===bad?3.2:2;line(g,[X(i),YB(a)],[X(i+1),YB(b)]);}
+  // markers
+  const mk=(f,txt,y)=>{g.save();g.strokeStyle=mut;g.setLineDash([2,4]);line(g,[X(f),CV.yA0+20],[X(f),CV.yB1]);g.restore();g.fillStyle=mut;g.font='12px '+css('--f-body');g.textAlign='left';g.fillText(txt,X(f)+4,y);};
+  mk(R.top,'tightest '+R.top+'°',CV.yA1-6);mk(R.bot,'max. payout '+R.bot+'°',CV.yA0+34);mk(R.fin,'eye enters fabric '+R.fin+'°',CV.yB0+14);mk(ST.phc,'catch '+ST.phc+'°',CV.yA1-24);
+  // minimum margin marker
+  g.fillStyle=R.margin<1?bad:css('--ok');g.beginPath();g.arc(X(R.at),YB(R.margin),5,0,7);g.fill();
+  g.font='13px '+css('--f-body');g.textAlign='left';g.fillText('min. margin '+R.margin.toFixed(1),X(R.at)+8,YB(R.margin)+16);
+  g.fillStyle=sp;g.fillText('check-spring stroke '+ST.stroke+' mm',CV.x0+6,YB(ST.stroke)-4);
+  // cam handles
+  if(ST.mode==='cam'){g.fillStyle=th;g.strokeStyle=css('--sheet');g.lineWidth=2;camPts.forEach((v,i)=>{g.beginPath();g.arc(X(i*30),YA(v-Math.min(...camPts)),7,0,7);g.fill();g.stroke();});}
+  // cursor
+  g.strokeStyle=ink;g.lineWidth=1.5;line(g,[X(ST.phi),CV.yA0],[X(ST.phi),CV.yB1]);
+  const i=Math.round(ST.phi)%360;g.fillStyle=th;g.beginPath();g.arc(X(i),YA(R.S[i]),5,0,7);g.fill();g.fillStyle=dm;g.beginPath();g.arc(X(i),YA(R.D[i]),5,0,7);g.fill();
+  CV._YA=YA;CV._top=top;
+}
+// cam point dragging
+(function(){const cv=$('cv');
+  const pos=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height];};
+  cv.addEventListener('pointerdown',e=>{if(ST.mode!=='cam')return;const [x,y]=pos(e);const mn=Math.min(...camPts);
+    camPts.forEach((v,i)=>{const X=CV.x0+(CV.x1-CV.x0)*i*30/360;if(Math.hypot(X-x,CV._YA(v-mn)-y)<18)drag=i;});if(drag>=0)cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',e=>{if(drag<0)return;const [,y]=pos(e);const v=(CV.yA1-y)/(CV.yA1-CV.yA0)*CV._top;camPts[drag]=Math.max(0,Math.min(CV._top,+v.toFixed(1)));changed();});
+  cv.addEventListener('pointerup',()=>drag=-1);
+})();
+// ---------- indicators & state ----------
+function meters(){
+  if(!R.ok){$('meter').innerHTML='<div class="bad"><b>—</b><small>Mechanism cannot be assembled</small></div>';$('state').textContent='';return;}
+  const m=[
+    [R.margin.toFixed(1)+' mm','Min. margin (catch to release, should be ≥ 1 mm)',R.margin>=1?'ok':R.margin>=0?'warn':'bad'],
+    [R.pre.toFixed(1)+' / '+ST.stroke+' mm','Max. slack before eye enters fabric / check-spring stroke (spring must absorb it)',R.pre<=ST.stroke?'ok':'bad'],
+    [R.neg.toFixed(1)+' mm','Shortfall from eye entry to catch (should be ≤ 1 mm)',R.neg<=1?'ok':'bad'],
+    [R.waste.toFixed(1)+' mm','Max. slack round the bobbin (excess thread)',R.waste<=26?'ok':'warn'],
+    [R.top+'° / '+R.bot+'°','Main-shaft angle at tightest (S = 0) / max. payout',''],
+    [R.mu?Math.round(R.mu[0])+'°–'+Math.round(R.mu[1])+'°':'—','Transmission angle (minimum should not fall much below 40°)',R.mu?(R.mu[0]>=39.5&&R.mu[1]<=140.5?'ok':'warn'):''],
+    [(R.acc/1000).toFixed(1)+' km/s²','Max. needle-thread acceleration ('+ST.rpm+' r/min)',''],
+    [R.Smax.toFixed(1)+' mm','Max. supply','']];
+  $('meter').innerHTML=m.map(([v,l,c])=>`<div class="${c}"><b>${v}</b><small>${l}</small></div>`).join('');
+  const f=Math.round(ST.phi)%360,sl=R.sl[f];let cls='ok',t='',d='';
+  if(f<R.top||f>ST.phc+135){t='Take-up and draw-off';d='The loop has been released; the take-up lever rises, drawing back the surplus and pulling the interlacing point into the middle of the fabric. At its tightest ('+R.top+'°) it draws about '+R.c.toFixed(1)+' mm from the spool through the tension assembly for the next stitch.';}
+  else if(f<=R.fin){if(sl>ST.stroke+0.05){cls='bad';t='Too much slack';d='The take-up has paid out '+R.S[f].toFixed(1)+' mm, but the eye has not yet entered the fabric and the needle side has used none of it. The excess '+sl.toFixed(1)+' mm exceeds the check-spring stroke; the thread goes slack and may be pierced by the needle or tangle round it.';}
+    else {t='Check spring holds the slack';d='The eye is still above the fabric. The take-up has paid out '+R.S[f].toFixed(1)+' mm and the check spring keeps it taut, so the thread does not go slack.';}}
+  else if(f<ST.phc){if(sl<-0.05){cls=sl<-1?'bad':'warn';t='Needle is pulling thread';d='The needle needs '+(-sl).toFixed(1)+' mm more thread than the take-up has paid out. Up to 1 mm can be absorbed by the thread stretching; beyond that, thread is forced through the tension assembly, tension jumps and the loop has trouble opening.';}
+    else {t=f<180?'Needle descending, using thread':'Needle rising, loop forming';d='Take-up has paid out '+R.S[f].toFixed(1)+' mm, the needle side needs '+R.D[f].toFixed(1)+' mm, slack '+sl.toFixed(1)+' mm.'+(f>=180?' The thread returned by the rising needle, together with the thread paid out by the take-up, bulges into a loop above the eye.':'');}}
+  else {if(sl<0){cls='bad';t='Not enough thread: the hook is forcing it';d='The loop needs '+R.D[f].toFixed(1)+' mm but the take-up has paid out only '+R.S[f].toFixed(1)+' mm. The hook will force thread out of the tension assembly or tighten the previous stitch, causing breakage and uneven stitches.';}
+    else if(sl<1){cls='warn';t='Very small margin';d='Only '+sl.toFixed(1)+' mm of margin left; the loop barely gets round the bobbin case.';}
+    else {t='Loop growing';d='The loop needs '+R.D[f].toFixed(1)+' mm, the take-up has paid out '+R.S[f].toFixed(1)+' mm, margin '+sl.toFixed(1)+' mm.';}}
+  $('state').className='state '+cls;$('state').innerHTML='<b>'+f+'°  '+t+'</b>'+d;
+}
+// ---------- tasks ----------
+const std=()=>ST.mode==='link'&&ST.lk.a===LK0.a&&ST.lk.b===LK0.b&&ST.lk.c===LK0.c&&ST.lk.d===LK0.d;
+const good=()=>R.ok&&R.margin>=1&&R.pre<=ST.stroke&&R.neg<=1;
+const TASKS=[
+  {t:'Reading the chart: turn the main shaft to where the take-up is tightest (supply = 0, ±3°).',d:'Pause, then drag the angle slider. At this moment the take-up holds the thread tightest, and it is also when thread for the next stitch is drawn through the tension assembly; it is not exactly the geometrically highest point of the eye.',ok:()=>ST.mode==='link'&&R.ok&&!ST.play&&Math.abs(ST.phi-R.top)<=3},
+  {t:'Heavy fabric: set thickness to 3 mm or more and adjust only the thread guide so that min. margin ≥ 1 mm, slack before eye entry does not exceed the check-spring stroke, and shortfall after entry ≤ 1 mm.',d:'Heavy fabric takes more thread for both the needle hole and the loop. Keep the check-spring stroke at 10 mm or less, the link dimensions at the worked-example values, and the hook timing at 206°.',ok:()=>std()&&ST.phc===206&&ST.t>=3&&ST.stroke<=10&&good()},
+  {t:'Hook timing: first advance it to before 198° and watch the excess thread round the bobbin drop below 18 mm; then retard it to after 214° and watch the min. margin fall below 1 mm.',d:'If the hook point arrives early, the thread paid out is used by the loop straight away; if it arrives late, the take-up is already drawing in when the loop is largest. Chapter 5 covers how to set hook timing.',ok:()=>seen.early&&seen.late},
+  {t:'Cam type: with 1.5 mm fabric and a 206° catch, bring the max. slack round the bobbin below 8 mm while meeting the other three conditions (margin ≥ 1, slack before entry within the stroke, shortfall ≤ 1). Then see how many times higher the max. thread acceleration is than for the link type.',d:'A cam lets the supply curve follow the demand curve closely, but the closer it follows, the steeper the curve and the higher the thread acceleration.',ok:()=>ST.mode==='cam'&&Math.abs(ST.t-1.5)<0.05&&ST.phc===206&&good()&&R.waste<=8},
+  {t:'Link dimensions: set the rocker length below 38.5 mm and then above 43.5 mm, and compare the eye path, the moment of tightest take-up, the supply and the transmission angle.',d:'See why the rocker length cannot be changed freely: it changes how much thread is paid out, when, and the forces involved, all at once.',ok:()=>seen.bLo&&seen.bHi}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{try{if(k.ok())done.add(i);}catch(e){}});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+// ---------- main loop ----------
+function draw(){if(!R)compute();$('ang').value=Math.round(ST.phi)%360;$('angOut').textContent=Math.round(ST.phi)%360+'°';
+  if(R.ok){mechDraw();hookDraw();}else{const g=$('mech').getContext('2d');g.clearRect(0,0,9999,9999);}
+  curvesDraw();meters();}
+let last=performance.now();
+function loop(now){const dt=Math.min(0.1,(now-last)/1000);last=now;
+  if(ST.play){ST.phi=(ST.phi+dt*60*ST.spd)%360;draw();}
+  requestAnimationFrame(loop);}
+setMode('link');checkTasks();requestAnimationFrame(loop);
+if(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').addEventListener)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+window.__api={ST,compute,changed,setMode,R:()=>R,TASKS,done,checkTasks,seen,set:(o)=>{Object.assign(ST,o);if(o.lk)ST.lk=Object.assign({},LK0,o.lk);syncPrm();changed();},
+  cam:(p)=>{camPts=p.slice();changed();},camPts:()=>camPts.slice(),demand,xN,linkPose,LK0};
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

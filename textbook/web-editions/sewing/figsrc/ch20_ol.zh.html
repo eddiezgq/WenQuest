@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.layer{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:stretch;margin-bottom:6px}
+.lname{font-size:13px;font-weight:700;color:#5a6570;display:flex;align-items:center;border-right:3px solid #d8dde1;padding-right:8px}
+.row{display:grid;gap:10px}
+.box b{font-size:14.5px}.box span{font-size:12px}
+.id{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11.5px;color:#14797f;display:block;margin-top:2px}
+.link{display:flex;justify-content:space-around;font-size:12px;color:#5a6570;margin:2px 0 6px 162px}
+.link i{font-style:normal;background:#eef1f2;border-radius:10px;padding:1px 9px}
+.arrow{font-size:22px;color:#5a6570;display:flex;align-items:center;justify-content:center}
+.st{border-radius:22px}
+.small{font-size:12px;color:#5a6570}
+.tag{display:inline-block;font-size:11px;border-radius:8px;padding:0 6px;background:#fcefe8;color:#c4531d;margin-left:4px}
+.tag.n{background:#e6f3f3;color:#0f6e74}
+</style>
+<div class="fig" style="--w:1250px">
+<p class="title">包缝机原型 WQ-SC/OL：同一块主控，换掉的是执行器、传感器和事件表</p><p class="sub">示意。灰色为与平缝机原型完全相同的模块；橙色为改动或新增</p><div class="box k fill-k" style="margin-bottom:12px">相同：WQ-SC 主控、HAL、伺服驱动器、电磁铁驱动板、24 V 电源、网关、脚踏、急停回路、测试脚本框架</div><div class="row" style="grid-template-columns:repeat(5,1fr);display:grid;gap:10px"><div class="box o fill-o"><b>主轴伺服 + 同步带 1:1.25</b><span>电机 5600 r/min → 主轴 7000 r/min；8000 计数/主轴转</span><span class="id">D-MOT-PMSM · A-PUL-HTD · C-BLT-BELT</span></div><div class="box o"><b>主轴上针位传感器</b><span>手轮处霍尔/接近开关，核对跳齿</span><span class="id">D-SNS-PROX</span></div><div class="box o fill-o"><b>布边光电传感器</b><span>针前 25 mm，响应 ≤ 1 ms</span><span class="id">D-SNS-PE</span></div><div class="box o fill-o"><b>链线切刀气缸 + 吸风阀</b><span>停车后切链、吸走线头</span><span class="id">D-PNU-CYL · D-PNU-VLV ×2</span></div><div class="box o fill-o"><b>差动比步进电机（可选）</b><span>丝杠推差动滑块，D = 0.7–2.0</span><span class="id">D-MOT-STEP · D-DRV-STEP · C-SCN-LEAD</span></div></div><div style="display:grid;grid-template-columns:1fr 84px 1fr 84px 1fr 84px 1fr 84px 1fr;gap:4px;align-items:center;margin-top:20px"><div class="box st b fill-b"><b>WAIT</b><span>无布</span></div><div class="arrow" style="flex-direction:column"><span style="font-size:11px;color:#5a6570;line-height:1.1;text-align:center">布遮住传感器</span>→</div><div class="box st b fill-b"><b>RUN</b><span>布到即起（去抖 2 针）</span></div><div class="arrow" style="flex-direction:column"><span style="font-size:11px;color:#5a6570;line-height:1.1;text-align:center">布离开传感器</span>→</div><div class="box st y fill-y"><b>TAIL</b><span>布走后再缝 N₁ + N₂ 针</span></div><div class="arrow" style="flex-direction:column"><span style="font-size:11px;color:#5a6570;line-height:1.1;text-align:center">剩余针数 ≤ N_b</span>→</div><div class="box st b fill-b"><b>STOP</b><span>提前 N_b 针开始减速，停上针位</span></div><div class="arrow" style="flex-direction:column"><span style="font-size:11px;color:#5a6570;line-height:1.1;text-align:center">停稳</span>→</div><div class="box st y fill-y"><b>CUT</b><span>切链 60 ms + 吸风 300 ms</span></div></div><p class="note">N₁ = 传感器到针的距离 / 针距；N₂ = 链线长度 / 针距；N_b = 从当前转速减速到停所需的转数（按惯量算，随转速平方变化）</p>
+</div>

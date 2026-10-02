@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>AI 质检与预测维护</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: two tabs; left = charts, right rail = results and controls; tasks at bottom */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style><style>
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tabs button[aria-selected="true"]{color:#0b1a1c}}
+:root[data-theme="dark"] .tabs button[aria-selected="true"]{color:#0b1a1c}
+.page[hidden]{display:none}
+.cm{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px;font-size:.84rem;margin-top:6px}
+.cm div{padding:6px 8px;border-radius:6px;background:var(--soft);text-align:center;font-family:var(--f-mono)}
+.cm .h{background:none;color:var(--muted);font-family:var(--f-body)}
+</style>
+<div class="wrap">
+<header><h1>AI 质检与预测维护</h1><span class="sub">《缝纫机设计与制造》第 31 章 · 虚拟实验 31-1 · 报警的阈值怎么定；次品很少时，报警为什么大多是误报；预测维护的提前量和误报</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tab0" aria-selected="true" type="button">① 视觉质检的阈值</button><button role="tab" id="tab1" aria-selected="false" type="button">② 预测性维护</button></div>
+<div class="page" id="page0">
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>检测器给每件衣片打的“像次品”得分：蓝 = 合格品，橙色实线 = 次品（面积按实际比例），橙色虚线 = 次品分布的形状；竖线为报警阈值</h3><canvas id="dist" width="1100" height="300" aria-label="得分分布"></canvas></section>
+    <div class="two">
+      <section class="panel"><h3>ROC 曲线（圆点为当前阈值）</h3><canvas id="roc" width="540" height="380" aria-label="ROC 曲线"></canvas></section>
+      <section class="panel"><h3>每 1000 件的成本随阈值的变化（圆点为当前）</h3><canvas id="cost" width="540" height="380" aria-label="成本曲线"></canvas></section>
+    </div>
+    <p class="note">模型（与本书 model24.py 相同）：合格品的得分服从 N(0,1)，次品服从 N(d′,1)，d′ 表示检测器的区分能力；得分超过阈值 t 就报警。召回率 = 次品中被报警的比例，误报率 = 合格品中被报警的比例，精确率 = 报警中真是次品的比例。每 1000 件的成本 = 漏检件数 × 漏检代价 + 误报件数 × 复检代价。默认 d′ = 3.53（阈值 1.88 时召回率 95%、误报率 3%）；代价为算例值。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>结果</h3><div class="checks" id="checks0"></div>
+      <div class="cm"><div class="h"></div><div class="h">实际次品</div><div class="h">实际合格</div><div class="h">报警</div><div id="tp"></div><div id="fp"></div><div class="h">放行</div><div id="fn"></div><div id="tn"></div></div>
+      <p class="note">混淆矩阵：每 1000 件中的件数。</p></section>
+    <section class="panel"><h3>调整</h3>
+      <div class="prm">
+        <label for="prev">次品率</label><input id="prev" type="range" min="0.005" max="0.2" step="0.005" value="0.02"><output id="prevv"></output>
+        <label for="dp">区分能力 d′（模型越好越大）</label><input id="dp" type="range" min="1" max="5" step="0.01" value="3.53"><output id="dpv"></output>
+        <label for="t">报警阈值 t</label><input id="t" type="range" min="-1" max="6" step="0.01" value="1.88"><output id="tv"></output>
+        <label for="cm">漏检一件的代价（元，流到客户或下道）</label><input id="cm" type="range" min="1" max="100" step="1" value="20"><output id="cmv"></output>
+        <label for="cf">误报一件的代价（元，人工复检）</label><input id="cf" type="range" min="0.1" max="5" step="0.1" value="0.5"><output id="cfv"></output>
+      </div>
+      <div class="row"><button id="reset0" type="button">恢复默认</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<div class="page" id="page1" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>三台机器的日信号（细线）与滑动平均（粗线）；红线为报警阈值，竖虚线为故障日，▲ 为报警</h3><canvas id="sig" width="1100" height="380" aria-label="设备信号"></canvas></section>
+    <section class="panel"><h3>200 台机器、180 天的统计：不同阈值下的平均提前量和误报（当前平滑窗口）</h3><canvas id="trade" width="1100" height="280" aria-label="提前量与误报"></canvas></section>
+    <p class="note">模型（与本书 model24.py 相同）：每台机器每天一个指标（如振动或电机电流的有效值，正常值归一化为 1），叠加噪声（标准差 0.08）；约一半的机器（本算例 89 台）在第 30–150 天之间的某天开始退化，退化量按指数增长，30 天后达到 1 时故障。滑动平均超过阈值就报警（回落到阈值以下后可再次报警）。健康期间的报警算误报；退化开始后、故障前的第一次报警算检出，提前量 = 故障日 − 报警日。随机数种子固定，数据为算例。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>结果</h3><div class="checks" id="checks1"></div></section>
+    <section class="panel"><h3>调整</h3>
+      <div class="prm">
+        <label for="thr">报警阈值</label><input id="thr" type="range" min="1.02" max="1.8" step="0.01" value="1.15"><output id="thrv"></output>
+        <label for="w">滑动平均窗口（天）</label><input id="w" type="range" min="1" max="14" step="1" value="1"><output id="wv"></output>
+        <label for="sg">噪声标准差</label><input id="sg" type="range" min="0.02" max="0.2" step="0.01" value="0.08"><output id="sgv"></output>
+      </div>
+      <div class="row"><button id="reset1" type="button">恢复默认</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<section class="panel" style="margin-top:14px"><h3>任务</h3><div id="tasks"></div><div class="msg" id="msg"></div></section>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+function tab(k){[0,1].forEach(i=>{$('tab'+i).setAttribute('aria-selected',i===k);$('page'+i).hidden=i!==k;});}
+[0,1].forEach(i=>$('tab'+i).onclick=()=>tab(i));
+function renderChecks(id,C){$(id).innerHTML=C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${(!c.ok&&c.bad)?`<small>${c.bad}</small>`:''}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');}
+// ---- model (model24.py) ----
+function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=x=>0.5*(1+erf(x/Math.SQRT2));
+function inspect(prev,dp,t,cm,cf,n=1000){const tpr=1-Phi(t-dp),fpr=1-Phi(t),tp=prev*tpr,fp=(1-prev)*fpr,fn=prev*(1-tpr),tn=(1-prev)*(1-fpr);return {tpr,fpr,prec:tp+fp>0?tp/(tp+fp):NaN,tp:tp*n,fp:fp*n,fn:fn*n,tn:tn*n,cost:n*(fn*cm+fp*cf),alarms:(tp+fp)*n};}
+function bestT(prev,dp,cm,cf){let bt=0,bc=1e18;for(let i=-100;i<=600;i++){const t=i/100,c=inspect(prev,dp,t,cm,cf).cost;if(c<bc-1e-12){bc=c;bt=t;}}return bt;}
+function rng(seed){let s=seed>>>0;return ()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(r){let u=r();while(u===0)u=r();const v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function fleet(sigma,n=200,days=180,frac=0.5,T=30,k=0.1,seed=11){const r=rng(seed),M=[];for(let i=0;i<n;i++){const deg=r()<frac,t0=deg?30+Math.floor(r()*121):null,sig=new Float64Array(days);
+  for(let d=0;d<days;d++){let x=1+sigma*gauss(r);if(deg&&d>=t0)x+=(Math.exp(k*(d-t0))-1)/(Math.exp(k*T)-1);sig[d]=x;}M.push({deg,t0,fail:deg?t0+T:null,sig});}return M;}
+function alarms(M,thr,w,days=180){let det=0,lead=0,fal=0,ndeg=0,hd=0;const marks=[];for(const m of M){const s=m.sig;let armed=true,caught=false,sum=0;const end=m.deg&&m.fail<days?m.fail:days;if(m.deg)ndeg++;const mk=[];
+  for(let d=0;d<end;d++){sum+=s[d];if(d>=w)sum-=s[d-w];if(d<w-1)continue;const ma=sum/w,healthy=!m.deg||d<m.t0;if(healthy)hd++;
+    if(ma>thr&&armed){armed=false;mk.push(d);if(healthy)fal++;else if(!caught){caught=true;det++;lead+=m.fail-d;}}else if(ma<=thr)armed=true;}marks.push(mk);}
+  return {det:det/Math.max(ndeg,1),lead:lead/Math.max(det,1),fpm:fal/Math.max(hd,1)*30,ndeg,marks};}
+// ---- page 0 ----
+const S0={prev:0.02,dp:3.53,t:1.88,cm:20,cf:0.5};const A={...S0};let R0=null;
+function changed0(){const r=inspect(A.prev,A.dp,A.t,A.cm,A.cf),bt=bestT(A.prev,A.dp,A.cm,A.cf),rb=inspect(A.prev,A.dp,bt,A.cm,A.cf);R0={...r,bt,bc:rb.cost};
+  const f={prev:v=>(v*100).toFixed(1)+'%',dp:v=>v.toFixed(2),t:v=>v.toFixed(2),cm:v=>v.toFixed(0),cf:v=>v.toFixed(1)};for(const k in f){$(k).value=A[k];$(k+'v').textContent=f[k](A[k]);}
+  const C=[{n:'召回率（次品中被抓住的）',v:(r.tpr*100).toFixed(1)+'%',ok:r.tpr>=0.9,bad:'漏检多'},{n:'误报率（合格品中被报警的）',v:(r.fpr*100).toFixed(1)+'%',ok:r.fpr<=0.05,bad:'复检工作量大'},
+   {n:'精确率（报警中真是次品的）',v:(r.prec*100).toFixed(1)+'%',ok:r.prec>=0.5,bad:'报警里一半以上是误报：工人会渐渐不信它'},{n:'每 1000 件报警',v:r.alarms.toFixed(1)+' 件',ok:true},
+   {n:'每 1000 件成本 / 最低可达',v:`${r.cost.toFixed(1)} / ${rb.cost.toFixed(1)} 元（t = ${bt.toFixed(2)}）`,ok:Math.abs(A.t-bt)<=0.02,bad:'还没调到最省的阈值'}];renderChecks('checks0',C);
+  $('tp').textContent=r.tp.toFixed(1);$('fp').textContent=r.fp.toFixed(1);$('fn').textContent=r.fn.toFixed(1);$('tn').textContent=r.tn.toFixed(1);
+  drawDist();drawRoc();drawCost();note0();checkTasks();}
+function drawDist(){const [c,g]=ctx('dist'),W=c.width,H=c.height,x0=50,x1=W-20,y0=16,y1=H-40,lo=-4,hi=8,X=v=>x0+(x1-x0)*(v-lo)/(hi-lo);const pdf=(x,m)=>Math.exp(-0.5*(x-m)**2)/Math.sqrt(2*Math.PI);
+  const ym=Math.max((1-A.prev),A.prev)*0.42*1.1,Y=v=>y1-(y1-y0)*v/ym;g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';for(let v=-4;v<=8;v+=2)g.fillText(v,X(v),H-22);g.fillText('得分',(x0+x1)/2,H-4);
+  const curve=(m,wgt,col)=>{g.fillStyle=col;g.globalAlpha=.25;g.beginPath();g.moveTo(X(lo),y1);for(let x=lo;x<=hi;x+=0.05)g.lineTo(X(x),Y(wgt*pdf(x,m)));g.lineTo(X(hi),y1);g.closePath();g.fill();g.globalAlpha=1;g.strokeStyle=col;g.lineWidth=2;g.beginPath();for(let x=lo;x<=hi;x+=0.05){const q=[X(x),Y(wgt*pdf(x,m))];x>lo?g.lineTo(...q):g.moveTo(...q);}g.stroke();};
+  curve(0,1-A.prev,css('--nt'));curve(A.dp,A.prev,css('--bt'));
+  g.strokeStyle=css('--bt');g.setLineDash([5,4]);g.lineWidth=1.6;g.beginPath();for(let x=lo;x<=hi;x+=0.05){const q=[X(x),Y((1-A.prev)*pdf(x,A.dp))];x>lo?g.lineTo(...q):g.moveTo(...q);}g.stroke();g.setLineDash([]);
+  g.strokeStyle=css('--bad');g.lineWidth=2;g.setLineDash([6,4]);g.beginPath();g.moveTo(X(A.t),y0);g.lineTo(X(A.t),y1);g.stroke();g.setLineDash([]);g.fillStyle=css('--bad');g.textAlign='start';g.fillText('阈值 → 右边报警',X(A.t)+6,y0+12);
+  g.fillStyle=css('--bt');g.textAlign='center';g.fillText('橙色虚线：次品的分布形状（放大到与合格品同高）',X(A.dp)+40,Y((1-A.prev)*0.4)-10);}
+function drawRoc(){const [c,g]=ctx('roc'),W=c.width,H=c.height,x0=50,x1=W-16,y0=16,y1=H-40,X=v=>x0+(x1-x0)*v,Y=v=>y1-(y1-y0)*v;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let v=0;v<=1.001;v+=0.2){g.beginPath();g.moveTo(X(v),y0);g.lineTo(X(v),y1);g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='center';g.fillText(v.toFixed(1),X(v),H-24);g.textAlign='end';g.fillText(v.toFixed(1),x0-6,Y(v)+4);}
+  g.textAlign='center';g.fillText('误报率',(x0+x1)/2,H-6);g.save();g.translate(14,(y0+y1)/2);g.rotate(-Math.PI/2);g.fillText('召回率',0,0);g.restore();
+  g.strokeStyle=css('--accent');g.lineWidth=2.2;g.beginPath();for(let t=-4;t<=8;t+=0.05){const q=[X(1-Phi(t)),Y(1-Phi(t-A.dp))];t>-4?g.lineTo(...q):g.moveTo(...q);}g.stroke();
+  g.strokeStyle=css('--rule');g.setLineDash([4,4]);g.beginPath();g.moveTo(X(0),Y(0));g.lineTo(X(1),Y(1));g.stroke();g.setLineDash([]);
+  g.fillStyle=css('--bad');g.beginPath();g.arc(X(R0.fpr),Y(R0.tpr),6,0,7);g.fill();}
+function drawCost(){const [c,g]=ctx('cost'),W=c.width,H=c.height,x0=56,x1=W-16,y0=16,y1=H-40,lo=-1,hi=6,X=v=>x0+(x1-x0)*(v-lo)/(hi-lo);const pts=[];for(let t=lo;t<=hi;t+=0.02)pts.push([t,inspect(A.prev,A.dp,t,A.cm,A.cf).cost]);
+  const vm=Math.min(Math.max(...pts.map(p=>p[1])),R0.cost*4+50)*1.05,Y=v=>y1-(y1-y0)*Math.min(v,vm)/vm;
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';for(let v=lo;v<=hi;v+=1)g.fillText(v,X(v),H-24);g.fillText('阈值 t',(x0+x1)/2,H-6);g.textAlign='end';for(let k=0;k<=4;k++){g.fillText((vm*k/4).toFixed(0),x0-6,Y(vm*k/4)+4);}
+  g.strokeStyle=css('--accent');g.lineWidth=2.2;g.beginPath();pts.forEach(([t,v],i)=>{const q=[X(t),Y(v)];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  g.strokeStyle=css('--ok');g.setLineDash([4,4]);g.beginPath();g.moveTo(X(R0.bt),y0);g.lineTo(X(R0.bt),y1);g.stroke();g.setLineDash([]);
+  g.fillStyle=css('--bad');g.beginPath();g.arc(X(A.t),Y(R0.cost),6,0,7);g.fill();}
+for(const k in S0)$(k).addEventListener('input',()=>{A[k]=+$(k).value;changed0();});$('reset0').onclick=()=>{Object.assign(A,S0);changed0();};
+// ---- page 1 ----
+const S1={thr:1.15,w:1,sg:0.08};const B={...S1};let R1=null,MF=null,MFs=null;
+function changed1(){if(MFs!==B.sg){MF=fleet(B.sg);MFs=B.sg;}const r=alarms(MF,B.thr,B.w);R1=r;
+  const f={thr:v=>v.toFixed(2),w:v=>v,sg:v=>v.toFixed(2)};for(const k in f){$(k).value=B[k];$(k+'v').textContent=f[k](B[k]);}
+  const C=[{n:'检出率（故障前报警的比例）',v:(r.det*100).toFixed(0)+'%',ok:r.det>=0.95,bad:'有机器到坏都没报警'},{n:'平均提前量',v:r.lead.toFixed(1)+' 天',ok:r.lead>=10,bad:'提前量太短，来不及备件和安排停机'},
+   {n:'误报（每台每月）',v:r.fpm.toFixed(2)+' 次',ok:r.fpm<=0.1,bad:'200 台的车间每月约 '+(r.fpm*200).toFixed(0)+' 次误报'},{n:'退化的机器 / 总数',v:`${r.ndeg} / 200`,ok:true}];renderChecks('checks1',C);drawSig();drawTrade();note1();checkTasks();}
+function drawSig(){const [c,g]=ctx('sig'),W=c.width,H=c.height,x0=50,x1=W-20,y0=16,y1=H-40,X=d=>x0+(x1-x0)*d/180,lo=0.6,hi=2.2,Y=v=>y1-(y1-y0)*(Math.min(hi,Math.max(lo,v))-lo)/(hi-lo);
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let v=0.6;v<=2.21;v+=0.4){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v.toFixed(1),x0-6,Y(v)+4);}
+  g.textAlign='center';for(let d=0;d<=180;d+=30)g.fillText(d,X(d),H-22);g.fillText('天',(x0+x1)/2,H-4);
+  const pick=[MF.findIndex(m=>!m.deg),MF.findIndex(m=>m.deg&&m.t0<80),MF.findIndex(m=>m.deg&&m.t0>=110)],cols=['--ok','--bt','--nt'];
+  pick.forEach((i,k)=>{const m=MF[i],col=css(cols[k]),end=m.deg?Math.min(m.fail,180):180;g.strokeStyle=col;g.globalAlpha=.35;g.lineWidth=1;g.beginPath();for(let d=0;d<end;d++){const q=[X(d),Y(m.sig[d])];d?g.lineTo(...q):g.moveTo(...q);}g.stroke();g.globalAlpha=1;
+    g.lineWidth=2.4;g.beginPath();let sum=0;for(let d=0;d<end;d++){sum+=m.sig[d];if(d>=B.w)sum-=m.sig[d-B.w];if(d<B.w-1)continue;const q=[X(d),Y(sum/B.w)];d===B.w-1?g.moveTo(...q):g.lineTo(...q);}g.stroke();
+    if(m.deg){g.setLineDash([4,4]);g.beginPath();g.moveTo(X(m.fail),y0);g.lineTo(X(m.fail),y1);g.stroke();g.setLineDash([]);}
+    R1.marks[i].forEach(d=>{g.fillStyle=col;g.beginPath();g.moveTo(X(d),y1-4);g.lineTo(X(d)-6,y1+8);g.lineTo(X(d)+6,y1+8);g.fill();});
+    g.fillStyle=col;g.textAlign='start';g.fillText(m.deg?`退化机器（第 ${m.t0} 天开始）`:'健康机器',x0+8+k*230,y0+12);});
+  g.strokeStyle=css('--bad');g.setLineDash([6,4]);g.lineWidth=1.5;g.beginPath();g.moveTo(x0,Y(B.thr));g.lineTo(x1,Y(B.thr));g.stroke();g.setLineDash([]);}
+function drawTrade(){const [c,g]=ctx('trade'),W=c.width,H=c.height,x0=56,x1=W-60,y0=20,y1=H-40,X=t=>x0+(x1-x0)*(t-1.02)/0.78;const pts=[];for(let t=1.02;t<=1.801;t+=0.02){const r=alarms(MF,t,B.w);pts.push([t,r.lead,r.fpm,r.det]);}
+  const lm=30,fm=Math.max(1,...pts.map(p=>p[2])),YL=v=>y1-(y1-y0)*v/lm,YF=v=>y1-(y1-y0)*Math.min(v,fm)/fm;
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';for(let t=1.1;t<=1.81;t+=0.1)g.fillText(t.toFixed(1),X(t),H-22);g.fillText('报警阈值',(x0+x1)/2,H-4);
+  g.textAlign='end';g.fillStyle=css('--accent');for(let v=0;v<=lm;v+=10)g.fillText(v+' 天',x0-6,YL(v)+4);g.textAlign='start';g.fillStyle=css('--bad');for(let k=0;k<=4;k++)g.fillText((fm*k/4).toFixed(2),x1+6,YF(fm*k/4)+4);
+  g.strokeStyle=css('--accent');g.lineWidth=2.2;g.beginPath();pts.forEach((p,i)=>{const q=[X(p[0]),YL(p[1])];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  g.strokeStyle=css('--bad');g.beginPath();pts.forEach((p,i)=>{const q=[X(p[0]),YF(p[2])];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  g.fillStyle=css('--accent');g.textAlign='start';g.fillText('平均提前量（左轴）',x0+8,y0+4);g.fillStyle=css('--bad');g.fillText('每台每月误报（右轴）',x0+160,y0+4);
+  g.strokeStyle=css('--ink');g.setLineDash([3,3]);g.beginPath();g.moveTo(X(B.thr),y0);g.lineTo(X(B.thr),y1);g.stroke();g.setLineDash([]);}
+for(const k in S1)$(k).addEventListener('input',()=>{B[k]=+$(k).value;changed1();});$('reset1').onclick=()=>{Object.assign(B,S1);changed1();};
+// ---- tasks ----
+const seen={a:false,b10:false,b1:false,c:false,d:false};
+function note0(){if(Math.abs(A.prev-0.02)<1e-9&&Math.abs(A.dp-3.53)<1e-9&&Math.abs(A.cm-20)<1e-9&&Math.abs(A.cf-0.5)<1e-9&&Math.abs(A.t-R0.bt)<=0.02)seen.a=true;
+  if(Math.abs(A.prev-0.1)<1e-9&&Math.abs(A.t-1.88)<1e-9&&Math.abs(A.dp-3.53)<1e-9)seen.b10=true;if(Math.abs(A.prev-0.01)<1e-9&&Math.abs(A.t-1.88)<1e-9&&Math.abs(A.dp-3.53)<1e-9)seen.b1=true;
+  if(Math.abs(A.prev-0.02)<1e-9&&R0.prec>=0.8&&R0.tpr>=0.9)seen.d=true;}
+function note1(){if(Math.abs(B.sg-0.08)<1e-9&&R1.fpm<=0.1&&R1.det>=0.95&&R1.lead>=17)seen.c=true;}
+const TASKS=[{t:'第①页：在默认的次品率和代价下，把阈值调到每 1000 件成本最低（误差 0.02 以内）。',d:'最省的阈值和“召回率 95%”的阈值一样吗？代价比变了，最省的阈值往哪边移？',ok:()=>seen.a},
+ {t:'第①页：保持阈值 1.88 不变，分别把次品率设为 10% 和 1%，比较精确率。',d:'检测器本身一点没变，为什么报警的可信度差这么多？',ok:()=>seen.b10&&seen.b1},
+ {t:'第①页：次品率 2% 时，要让精确率达到 80%、召回率仍不低于 90%，检测器的区分能力 d′ 至少要多大？',d:'只调阈值做得到吗？提示：召回率 90% 时 t ≈ d′ − 1.28。',ok:()=>seen.d},
+ {t:'第②页：噪声 0.08 时，在检出率不低于 95%、每台每月误报不超过 0.1 次的前提下，让平均提前量达到 17 天以上。',d:'平滑窗口加大，误报少了，但报警会晚几天；阈值降低，报警早了，但误报多。两者怎样搭配？',ok:()=>seen.c}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});$('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+window.__api={A,B,changed0,changed1,r0:()=>R0,r1:()=>R1,done,seen,inspect,bestT,fleet,alarms,tab};
+changed0();changed1();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

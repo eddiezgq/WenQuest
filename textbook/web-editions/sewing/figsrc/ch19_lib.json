@@ -1,0 +1,938 @@
+{
+"LIB": {
+"D-MOT-PMSM": {
+"zh": "交流永磁同步伺服电机",
+"en": "AC PMSM servo motor",
+"sizes": [
+{
+"size": "250",
+"rated_power_W": 250,
+"rated_speed_rpm": 3000,
+"max_speed_rpm": 5000,
+"rated_torque_Nm": 0.8,
+"peak_torque_Nm": 2.0,
+"rotor_inertia_kgm2": 6e-05,
+"encoder_ppr": 2500,
+"kt_NmA": 0.45,
+"price": 520
+},
+{
+"size": "400",
+"rated_power_W": 400,
+"rated_speed_rpm": 3000,
+"max_speed_rpm": 6000,
+"rated_torque_Nm": 1.27,
+"peak_torque_Nm": 3.2,
+"rotor_inertia_kgm2": 0.0001,
+"encoder_ppr": 2500,
+"kt_NmA": 0.5,
+"price": 680
+},
+{
+"size": "550",
+"rated_power_W": 550,
+"rated_speed_rpm": 3500,
+"max_speed_rpm": 7500,
+"rated_torque_Nm": 1.5,
+"peak_torque_Nm": 4.5,
+"rotor_inertia_kgm2": 0.00014,
+"encoder_ppr": 2500,
+"kt_NmA": 0.5,
+"price": 860
+},
+{
+"size": "750",
+"rated_power_W": 750,
+"rated_speed_rpm": 3000,
+"max_speed_rpm": 6000,
+"rated_torque_Nm": 2.39,
+"peak_torque_Nm": 7.2,
+"rotor_inertia_kgm2": 0.00026,
+"encoder_ppr": 2500,
+"kt_NmA": 0.55,
+"price": 1050
+}
+]
+},
+"D-DRV-SERVO": {
+"zh": "伺服驱动器",
+"en": "Servo drive",
+"sizes": [
+{
+"size": "1A5",
+"supply_V": 220,
+"cont_current_A": 1.5,
+"peak_current_A": 4.5,
+"brake_energy_J": 30,
+"bus": "CAN FD",
+"modes": "速度/转矩",
+"price": 380
+},
+{
+"size": "3A",
+"supply_V": 220,
+"cont_current_A": 3.0,
+"peak_current_A": 9.0,
+"brake_energy_J": 70,
+"bus": "CAN FD",
+"modes": "速度/转矩",
+"price": 480
+},
+{
+"size": "5A",
+"supply_V": 220,
+"cont_current_A": 5.0,
+"peak_current_A": 15.0,
+"brake_energy_J": 150,
+"bus": "CAN FD",
+"modes": "速度/转矩/位置",
+"price": 620
+}
+]
+},
+"D-MOT-STEP": {
+"zh": "混合式步进电机",
+"en": "Hybrid stepper motor",
+"sizes": [
+{
+"size": "17-045",
+"frame": "NEMA 17",
+"holding_torque_Nm": 0.45,
+"rotor_inertia_kgm2": 6.8e-06,
+"rated_current_A": 1.7,
+"closed_loop": false,
+"corner_speed_rpm": 600,
+"price": 70
+},
+{
+"size": "23-12",
+"frame": "NEMA 23",
+"holding_torque_Nm": 1.2,
+"rotor_inertia_kgm2": 3e-05,
+"rated_current_A": 3.0,
+"closed_loop": false,
+"corner_speed_rpm": 500,
+"price": 120
+},
+{
+"size": "23-22C",
+"frame": "NEMA 23",
+"holding_torque_Nm": 2.2,
+"rotor_inertia_kgm2": 4.8e-05,
+"rated_current_A": 4.2,
+"closed_loop": true,
+"corner_speed_rpm": 450,
+"price": 260
+},
+{
+"size": "34-45C",
+"frame": "NEMA 34",
+"holding_torque_Nm": 4.5,
+"rotor_inertia_kgm2": 0.00014,
+"rated_current_A": 6.0,
+"closed_loop": true,
+"corner_speed_rpm": 350,
+"price": 420
+},
+{
+"size": "34-85C",
+"frame": "NEMA 34",
+"holding_torque_Nm": 8.5,
+"rotor_inertia_kgm2": 0.00027,
+"rated_current_A": 6.0,
+"closed_loop": true,
+"corner_speed_rpm": 250,
+"price": 560
+}
+]
+},
+"D-DRV-STEP": {
+"zh": "步进驱动器",
+"en": "Stepper drive",
+"sizes": [
+{
+"size": "2A",
+"supply_V": 48,
+"current_A": 2.2,
+"microstep": 16,
+"interface": "脉冲/方向",
+"closed_loop": false,
+"price": 60
+},
+{
+"size": "4A",
+"supply_V": 48,
+"current_A": 4.2,
+"microstep": 16,
+"interface": "脉冲/方向",
+"closed_loop": false,
+"price": 95
+},
+{
+"size": "C4A",
+"supply_V": 48,
+"current_A": 4.5,
+"microstep": 16,
+"interface": "脉冲/方向",
+"closed_loop": true,
+"price": 180
+},
+{
+"size": "C6A",
+"supply_V": 48,
+"current_A": 6.0,
+"microstep": 16,
+"interface": "脉冲/方向",
+"closed_loop": true,
+"price": 240
+}
+]
+},
+"D-SOL-PUSH": {
+"zh": "推拉式电磁铁",
+"en": "Push-pull solenoid",
+"sizes": [
+{
+"size": "SEL",
+"stroke_mm": 0.3,
+"force_at_stroke_N": 2.5,
+"coil_R_ohm": 6,
+"duty_pct": 50,
+"hold_A": 0.3,
+"t_on_ms": 0.6,
+"t_off_ms": 0.5,
+"price": 55
+},
+{
+"size": "S8",
+"stroke_mm": 4,
+"force_at_stroke_N": 8,
+"coil_R_ohm": 12,
+"duty_pct": 25,
+"hold_A": 0.6,
+"t_on_ms": 5.5,
+"t_off_ms": 4.0,
+"price": 45
+},
+{
+"size": "M15",
+"stroke_mm": 6,
+"force_at_stroke_N": 15,
+"coil_R_ohm": 8,
+"duty_pct": 25,
+"hold_A": 1.0,
+"t_on_ms": 6.9,
+"t_off_ms": 5.1,
+"price": 60
+},
+{
+"size": "L30",
+"stroke_mm": 10,
+"force_at_stroke_N": 30,
+"coil_R_ohm": 6,
+"duty_pct": 25,
+"hold_A": 1.2,
+"t_on_ms": 11.0,
+"t_off_ms": 7.0,
+"price": 85
+},
+{
+"size": "XL60",
+"stroke_mm": 12,
+"force_at_stroke_N": 60,
+"coil_R_ohm": 4,
+"duty_pct": 15,
+"hold_A": 1.5,
+"t_on_ms": 16.0,
+"t_off_ms": 9.0,
+"price": 130
+}
+]
+},
+"D-DRV-SOL": {
+"zh": "电磁铁驱动板",
+"en": "Solenoid driver board",
+"sizes": [
+{
+"size": "4CH",
+"channels": 4,
+"boost_V": 24,
+"hold_A": 2.0,
+"peak_A": 6.0,
+"clamp_V": 48,
+"price": 150
+},
+{
+"size": "8CH",
+"channels": 8,
+"boost_V": 24,
+"hold_A": 2.0,
+"peak_A": 8.0,
+"clamp_V": 48,
+"price": 240
+}
+]
+},
+"D-ENC-INC": {
+"zh": "增量编码器",
+"en": "Incremental encoder",
+"sizes": [
+{
+"size": "500",
+"ppr": 500,
+"index": true,
+"max_rpm": 6000,
+"output": "差分",
+"price": 60
+},
+{
+"size": "1000",
+"ppr": 1000,
+"index": true,
+"max_rpm": 6000,
+"output": "差分",
+"price": 80
+},
+{
+"size": "2500",
+"ppr": 2500,
+"index": true,
+"max_rpm": 6000,
+"output": "差分",
+"price": 120
+}
+]
+},
+"D-SNS-HALL": {
+"zh": "霍尔脚踏传感器",
+"en": "Hall pedal sensor",
+"sizes": [
+{
+"size": "P20",
+"range_mm": 20,
+"output_V": "0.5–4.5",
+"price": 40
+}
+]
+},
+"D-SNS-PE": {
+"zh": "光电传感器",
+"en": "Photoelectric sensor",
+"sizes": [
+{
+"size": "R30",
+"range_mm": 30,
+"response_ms": 0.5,
+"price": 35
+}
+]
+},
+"D-SNS-PROX": {
+"zh": "接近开关",
+"en": "Proximity switch",
+"sizes": [
+{
+"size": "M8",
+"range_mm": 2,
+"type": "电感式 PNP",
+"price": 25
+}
+]
+},
+"D-CTL-WQSC": {
+"zh": "WQ-SC 主控板",
+"en": "WQ-SC controller board",
+"sizes": [
+{
+"size": "S",
+"cpu": "Cortex-M4F 170 MHz",
+"encoder_inputs": 2,
+"pwm_ch": 8,
+"can_fd": 1,
+"di": 12,
+"do": 8,
+"ai": 4,
+"price": 420
+},
+{
+"size": "L",
+"cpu": "Cortex-M4F 170 MHz + FPGA",
+"encoder_inputs": 4,
+"pwm_ch": 16,
+"can_fd": 2,
+"di": 24,
+"do": 16,
+"ai": 8,
+"price": 680
+}
+]
+},
+"D-IO-EXP": {
+"zh": "CAN FD 扩展 I/O 板",
+"en": "CAN FD I/O expansion board",
+"sizes": [
+{
+"size": "16",
+"di": 16,
+"do": 16,
+"ai": 4,
+"price": 180
+}
+]
+},
+"D-GW-WQSC": {
+"zh": "网关模块",
+"en": "Gateway module",
+"sizes": [
+{
+"size": "E",
+"net": "以太网 + Wi-Fi",
+"protocols": "MQTT、HTTP",
+"price": 150
+}
+]
+},
+"D-PSU-SMPS": {
+"zh": "开关电源",
+"en": "Switch-mode power supply",
+"sizes": [
+{
+"size": "24V100",
+"V_out": 24,
+"P_W": 100,
+"price": 90
+},
+{
+"size": "24V150",
+"V_out": 24,
+"P_W": 150,
+"price": 120
+},
+{
+"size": "24V240",
+"V_out": 24,
+"P_W": 240,
+"price": 160
+},
+{
+"size": "48V240",
+"V_out": 48,
+"P_W": 240,
+"price": 150
+},
+{
+"size": "48V350",
+"V_out": 48,
+"P_W": 350,
+"price": 210
+},
+{
+"size": "48V480",
+"V_out": 48,
+"P_W": 480,
+"price": 270
+}
+]
+},
+"D-PNU-CYL": {
+"zh": "气缸",
+"en": "Pneumatic cylinder",
+"sizes": [
+{
+"size": "32x25",
+"bore_mm": 32,
+"stroke_mm": 25,
+"price": 65
+}
+]
+},
+"D-PNU-VLV": {
+"zh": "电磁阀",
+"en": "Solenoid valve",
+"sizes": [
+{
+"size": "52-24",
+"ports": "5/2",
+"V": 24,
+"price": 55
+}
+]
+},
+"D-HMI-PANEL": {
+"zh": "触摸屏",
+"en": "Touch panel",
+"sizes": [
+{
+"size": "7",
+"size_in": 7,
+"interface": "RS-485",
+"price": 260
+}
+]
+},
+"A-PUL-HTD": {
+"zh": "同步带轮",
+"en": "Timing pulley",
+"lib": true,
+"sizes": [
+{
+"size": "GT2-20-9",
+"PD_mm": 12.732,
+"b_mm": 9,
+"J_kgm2": 6e-07,
+"price": 25
+},
+{
+"size": "3M-24-15",
+"PD_mm": 22.918,
+"b_mm": 15,
+"J_kgm2": 2.5e-06,
+"price": 35
+},
+{
+"size": "5M-20-25",
+"PD_mm": 31.831,
+"b_mm": 25,
+"J_kgm2": 9e-06,
+"price": 55
+}
+]
+},
+"A-BSC-SFU": {
+"zh": "滚珠丝杠副",
+"en": "Ball screw (SFU)",
+"lib": true,
+"sizes": [
+{
+"size": "16x5",
+"d0_mm": 16,
+"Ph_mm": 5,
+"Dw_mm": 3.175,
+"price": 160
+},
+{
+"size": "16x10",
+"d0_mm": 16,
+"Ph_mm": 10,
+"Dw_mm": 3.175,
+"price": 180
+},
+{
+"size": "25x10",
+"d0_mm": 25,
+"Ph_mm": 10,
+"Dw_mm": 4.762,
+"price": 260
+}
+]
+},
+"A-LGD-RAIL": {
+"zh": "直线导轨副",
+"en": "Linear guideway",
+"lib": true,
+"sizes": [
+{
+"size": "HGH15CA",
+"rail_W_mm": 15,
+"C_N": 14700,
+"price": 140
+}
+]
+},
+"A-CPL-JAW": {
+"zh": "梅花形弹性联轴器",
+"en": "Jaw coupling",
+"lib": true,
+"sizes": [
+{
+"size": "LM1",
+"d_min_mm": 12,
+"d_max_mm": 25,
+"J_kgm2": 0.0002,
+"price": 35
+}
+]
+},
+"BUY-BELT": {
+"zh": "同步带（库里没有，外购）",
+"en": "Timing belt (not in library, bought out)",
+"sizes": [
+{
+"size": "GT2-9",
+"b_mm": 9,
+"EA_kN": 90,
+"price_per_m": 20
+},
+{
+"size": "3M-15",
+"b_mm": 15,
+"EA_kN": 150,
+"price_per_m": 30
+},
+{
+"size": "5M-25",
+"b_mm": 25,
+"EA_kN": 250,
+"price_per_m": 45
+}
+]
+}
+},
+"K": {
+"Tf": 0.15,
+"Trun": 0.35,
+"starts_per_min": 30,
+"sew_frac": 0.5,
+"kT_servo": 0.8,
+"Jratio_max": 10,
+"regen": 0.7,
+"kT_open": 0.6,
+"kT_closed": 0.8,
+"DN_max": 70000,
+"fn_min": 80,
+"sol_ang_max": 20,
+"bt_window": 201.6,
+"eta_belt": 0.95,
+"eta_screw": 0.9,
+"rho_steel": 7850,
+"P_logic": 8,
+"P_hmi": 6,
+"boost_share": 0.5,
+"psu_margin": 1.2,
+"step_eff": 0.6,
+"step_idle": 5,
+"sel_share": 0.8
+},
+"REQ": {
+"LS": {
+"name": "平缝机 WQ-SC/LS",
+"n_max": 5000,
+"t_acc": 0.15,
+"J_load": 0.0005,
+"n_trim": 300,
+"n_bt": 1800,
+"hmi": false,
+"actions": [
+[
+"trim",
+"剪线",
+3,
+12,
+"trim"
+],
+[
+"wipe",
+"拨线",
+4,
+5,
+"stop"
+],
+[
+"bt",
+"倒缝",
+8,
+25,
+"bt"
+],
+[
+"pfl",
+"抬压脚",
+10,
+50,
+"stop"
+]
+],
+"di": [
+"急停",
+"机头翻起安全开关",
+"手动回针按钮",
+"断线检测"
+],
+"ai": [
+"脚踏",
+"电控箱温度"
+],
+"sensors": [
+[
+"D-SNS-HALL",
+"P20",
+1,
+"脚踏"
+],
+[
+"D-SNS-PE",
+"R30",
+1,
+"断线检测"
+],
+[
+"D-SNS-PROX",
+"M8",
+1,
+"机头翻起"
+]
+],
+"pneu": [],
+"axes": [],
+"fixed_steps": [],
+"knit": null
+},
+"OL": {
+"name": "包缝机 WQ-SC/OL",
+"n_max": 6000,
+"t_acc": 0.15,
+"J_load": 0.0003,
+"n_trim": 300,
+"n_bt": 1800,
+"hmi": false,
+"actions": [
+[
+"cut",
+"链线切刀",
+3,
+12,
+"stop"
+],
+[
+"pfl",
+"抬压脚",
+10,
+50,
+"stop"
+]
+],
+"di": [
+"急停",
+"机头翻起安全开关",
+"前布边光电",
+"后布边光电"
+],
+"ai": [
+"脚踏",
+"电控箱温度"
+],
+"sensors": [
+[
+"D-SNS-HALL",
+"P20",
+1,
+"脚踏"
+],
+[
+"D-SNS-PE",
+"R30",
+2,
+"前、后布边"
+],
+[
+"D-SNS-PROX",
+"M8",
+1,
+"机头翻起"
+]
+],
+"pneu": [
+[
+"D-PNU-VLV",
+"52-24",
+1,
+"吸线头气阀"
+]
+],
+"axes": [],
+"fixed_steps": [],
+"knit": null
+},
+"PS": {
+"name": "电子花样机 WQ-SC/PS",
+"n_max": 2800,
+"t_acc": 0.15,
+"J_load": 0.0005,
+"n_trim": 300,
+"n_bt": 1800,
+"hmi": true,
+"actions": [
+[
+"trim",
+"剪线",
+3,
+12,
+"trim"
+],
+[
+"wipe",
+"拨线",
+4,
+5,
+"stop"
+],
+[
+"trel",
+"松线",
+3,
+6,
+"stop"
+]
+],
+"di": [
+"急停",
+"安全光幕",
+"X 原点",
+"Y 原点",
+"X 正限位",
+"X 负限位",
+"Y 正限位",
+"Y 负限位",
+"左压框到位",
+"右压框到位",
+"气压开关",
+"断线检测"
+],
+"ai": [
+"电控箱温度"
+],
+"di_pedal": [
+"压框脚踏",
+"启动脚踏"
+],
+"sensors": [
+[
+"D-SNS-PROX",
+"M8",
+6,
+"X/Y 原点与限位"
+],
+[
+"D-SNS-PE",
+"R30",
+1,
+"断线检测"
+]
+],
+"pneu": [
+[
+"D-PNU-CYL",
+"32x25",
+2,
+"左、右压框气缸"
+],
+[
+"D-PNU-VLV",
+"52-24",
+2,
+"左、右压框电磁阀"
+]
+],
+"axes": [
+{
+"id": "X",
+"name": "X 轴",
+"travel": 300,
+"m": 2.0,
+"F": 10.0
+},
+{
+"id": "Y",
+"name": "Y 轴",
+"travel": 200,
+"m": 5.0,
+"F": 15.0
+}
+],
+"v": 0.5,
+"a": 25.0,
+"fixed_steps": [],
+"knit": null
+},
+"FK": {
+"name": "缩比横机 WQ-SC/FK",
+"n_max": null,
+"hmi": true,
+"actions": [
+[
+"car1",
+"纱嘴 1",
+4,
+5,
+"stop"
+],
+[
+"car2",
+"纱嘴 2",
+4,
+5,
+"stop"
+]
+],
+"di": [
+"急停",
+"安全门",
+"机头原点",
+"左限位",
+"右限位",
+"断纱检测"
+],
+"ai": [
+"电控箱温度",
+"纱线张力"
+],
+"sensors": [
+[
+"D-SNS-PROX",
+"M8",
+3,
+"机头原点与限位"
+],
+[
+"D-SNS-PE",
+"R30",
+1,
+"断纱检测"
+]
+],
+"pneu": [],
+"axes": [
+{
+"id": "C",
+"name": "机头",
+"travel": null,
+"m": 3.0,
+"F": 20.0
+}
+],
+"v": 0.5,
+"a": 5.0,
+"fixed_steps": [
+[
+"st1",
+"度目（左）",
+0.15,
+300
+],
+[
+"st2",
+"度目（右）",
+0.15,
+300
+],
+[
+"td",
+"牵拉",
+0.6,
+60
+]
+],
+"knit": {
+"needles": 60,
+"E": 5,
+"selectors": 2,
+"cam_mm": 120
+}
+}
+},
+"BELT_FOR": {
+"GT2-20-9": "GT2-9",
+"3M-24-15": "3M-15",
+"5M-20-25": "5M-25"
+}
+}

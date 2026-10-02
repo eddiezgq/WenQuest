@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>301 锁式线迹形成动画</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: drafting-sheet — mechanism drawing on the left, phase card + timing chart + controls on the right; stacks on phones */
+:root{
+  --bg:#eef1f4; --sheet:#f8fafb; --ink:#1d2a3a; --muted:#5b6b7d; --rule:#cfd7df;
+  --metal:#c3ccd5; --metal2:#e1e6eb; --fabric:#e8d9b8; --fabric-edge:#b9a57c;
+  --upper:#2f6fd6; --bobbin:#e0662f; --upper-d:#1d4c9e; --bobbin-d:#a8461b; --accent:#0f6e74; --warn:#b5481f;
+  --f-display:"Noto Serif SC","Songti SC",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161d; --sheet:#171e27; --ink:#dbe3ec; --muted:#93a2b3; --rule:#2c3744;
+  --metal:#4a5665; --metal2:#2f3a47; --fabric:#6b5a3a; --fabric-edge:#9c875d;
+  --upper:#6ea8ff; --bobbin:#ff8c55; --upper-d:#2b5fb8; --bobbin-d:#b8521f; --accent:#4cc3c9; --warn:#ff9a6b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161d; --sheet:#171e27; --ink:#dbe3ec; --muted:#93a2b3; --rule:#2c3744;
+  --metal:#4a5665; --metal2:#2f3a47; --fabric:#6b5a3a; --fabric-edge:#9c875d;
+  --upper:#6ea8ff; --bobbin:#ff8c55; --upper-d:#2b5fb8; --bobbin-d:#b8521f; --accent:#4cc3c9; --warn:#ff9a6b; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 40px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-bottom:14px}
+h1{font-family:var(--f-display);font-size:1.55rem;margin:0;text-wrap:balance}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:12px;min-width:0}
+.mech svg{width:100%;height:auto;display:block;touch-action:none}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.82rem;color:var(--muted);margin-top:6px}
+.sw{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:6px;border-radius:2px}
+.right{display:flex;flex-direction:column;gap:14px;min-width:0}
+.phase-tag{font-size:.75rem;letter-spacing:.12em;color:var(--muted)}
+.phase h2{font-family:var(--f-display);font-size:1.3rem;margin:2px 0 6px;color:var(--accent)}
+.phase h2.bad{color:var(--warn)}
+.phase p{margin:0;max-width:62ch}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.steps span{font-size:.78rem;padding:2px 8px;border:1px solid var(--rule);border-radius:99px;color:var(--muted)}
+.steps span.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+.readout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+@media (max-width:480px){.readout{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.readout div{border-top:1px solid var(--rule);padding-top:4px}
+.readout b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums;font-weight:600}
+.readout small{color:var(--muted);font-size:.75rem}
+.timing svg{width:100%;height:auto;display:block;cursor:pointer;touch-action:none}
+.ctl{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--sheet);border-color:var(--accent);min-width:72px}
+select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px}
+input[type=range]{flex:1;min-width:140px;accent-color:var(--accent)}
+label{font-size:.86rem;color:var(--muted)}
+.lab{border:1px dashed var(--rule);border-radius:6px;padding:10px}
+.lab h3{margin:0 0 4px;font-size:.95rem}
+.verdict{font-weight:600;font-family:var(--f-mono);font-size:.9rem}
+.verdict.ok{color:var(--accent)} .verdict.bad{color:var(--warn)}
+.note{font-size:.78rem;color:var(--muted);margin-top:4px}
+svg text{font-family:var(--f-body)}
+.t-ink{fill:var(--ink)} .t-mut{fill:var(--muted)}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>301 锁式线迹形成动画</h1>
+  <span class="sub">《缝纫机设计与制造》第 2 章 · 动画 2-1 与虚拟实验 2-1 · 主轴转一圈缝一针</span>
+</header>
+
+<div class="grid">
+  <section class="panel mech" aria-label="机构示意图">
+    <svg id="mech" viewBox="-30 -58 64 90" role="img" aria-label="机针、旋梭、挑线杆、送布牙的示意图，随主轴转角运动"></svg>
+    <div class="row" style="margin-top:6px">
+      <button id="zoom" type="button">放大钩线区</button>
+      <span class="note">虚线：线环从梭壳背面绕过的一段。视向：顺着旋梭轴看（布料向左送进）。尺寸为示意，非按比例。</span>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--upper)"></i>面线（针线）</span>
+      <span><i class="sw" style="background:var(--bobbin)"></i>底线（梭芯线）</span>
+      <span>● 交织点</span>
+    </div>
+  </section>
+
+  <div class="right">
+    <section class="panel phase" aria-live="polite">
+      <div class="phase-tag">当前阶段</div>
+      <h2 id="ph-title">刺布</h2>
+      <p id="ph-text"></p>
+      <div class="steps" id="steps">
+        <span data-k="down">机针下行</span><span data-k="pierce">刺布</span><span data-k="loop">形成线环</span><span data-k="catch">钩线</span><span data-k="wrap">绕梭</span><span data-k="tight">收紧与送布</span>
+      </div>
+      <div class="readout">
+        <div><b id="r-th">0°</b><small>主轴转角 φ（针杆最高点为 0°）</small></div>
+        <div><b id="r-x">0.0 mm</b><small>针杆位移 x（向下为正）</small></div>
+        <div><b id="r-rise">—</b><small>机针离最低点的回升量</small></div>
+        <div><b id="r-hook">0°</b><small>旋梭转角（2 倍于主轴）</small></div>
+        <div><b id="r-loop">—</b><small>线环大小（相对最大值）</small></div>
+        <div><b id="r-n">0</b><small>已缝针数</small></div>
+      </div>
+    </section>
+
+    <section class="panel timing">
+      <div class="phase-tag" style="margin-bottom:4px">运动时序图（点击或拖动可跳到该转角）</div>
+      <svg id="timing" viewBox="0 0 620 250" role="img" aria-label="针杆位移、挑线杆、旋梭钩线、送布、机针在布中的时序"></svg>
+      <div class="note">针杆位移按第 3 章算例（r = 15.5 mm，l = 55 mm）计算；挑线杆与送布曲线为示意，待按实际机型校核。</div>
+    </section>
+
+    <section class="panel ctl">
+      <div class="row">
+        <button id="play" class="primary" type="button">暂停</button>
+        <button id="back" type="button" aria-label="后退 2 度">◀ 2°</button>
+        <button id="fwd" type="button" aria-label="前进 2 度">2° ▶</button>
+        <label for="speed">速度</label>
+        <select id="speed"><option value="15">很慢</option><option value="40" selected>慢</option><option value="90">中</option><option value="200">快</option></select>
+      </div>
+      <div class="row">
+        <label for="theta">主轴转角</label>
+        <input id="theta" type="range" min="0" max="359" step="1" value="100">
+      </div>
+      <div class="row">
+        <span class="note" style="margin:0">跳到：</span>
+        <button type="button" data-go="180">针最低点</button>
+        <button type="button" data-go="meet">钩线</button>
+        <button type="button" data-go="wrap">绕梭</button>
+        <button type="button" data-go="off">脱环</button>
+        <button type="button" data-go="380">收紧</button>
+      </div>
+      <div class="lab">
+        <h3>虚拟实验 2-1　钩线时刻与跳针</h3>
+        <div class="row">
+          <label for="delta">钩线时刻偏差 Δ</label>
+          <input id="delta" type="range" min="-30" max="30" step="1" value="0">
+          <b id="d-val" style="font-family:var(--f-mono);min-width:4.5em">+0°</b>
+        </div>
+        <div id="verdict" class="verdict ok"></div>
+        <div class="note">Δ &gt; 0 表示梭尖到得晚。拖动 Δ 后让动画走过钩线时刻，观察线环有没有被钩住，再找出不跳针的 Δ 范围。线环大小随回升量变化的规律为示意模型。</div>
+      </div>
+    </section>
+  </div>
+</div>
+</div>
+
+<script>
+(()=>{
+const NS='http://www.w3.org/2000/svg';
+const R=15.5, Lr=55, LAM=R/Lr, STROKE=31.0;
+const L=3.0;                // stitch length mm (示意)
+const FT=-1.5;              // fabric top (fabric bottom = 0, plate 0..2)
+const XH=0, YH=17.7, RP=11; // hook centre, hook-point radius
+const RB=8.5;               // bobbin case radius
+const rad=d=>d*Math.PI/180;
+const xN=th=>{const p=rad(th),s=Math.sqrt(1-LAM*LAM*Math.sin(p)**2);return R*(1-Math.cos(p))-Lr*(1-s);};
+const tipY=th=>-18+xN(th);
+const eyeY=th=>tipY(th)-2.5;
+const rise=th=>th>180?STROKE-xN(th):0;
+const loopW=th=>{const r=rise(th);return r<=0?0:Math.exp(-(((r-2.2)/1.0)**2));};
+const sstep=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
+const tu=th=>{const top=-50,low=-40,d=((th-20)%360+360)%360;
+  return d<=285? top+(low-top)*(1-Math.cos(Math.PI*d/285))/2 : low+(top-low)*(1-Math.cos(Math.PI*(d-285)/75))/2;};
+const P=(r,a)=>[XH+r*Math.cos(rad(a)),YH-r*Math.sin(rad(a))];
+const arc=(r,a0,a1,step=3)=>{const pts=[],n=Math.max(1,Math.ceil(Math.abs(a1-a0)/step));for(let i=0;i<=n;i++)pts.push(P(r,a0+(a1-a0)*i/n));return pts;};
+const pl=pts=>pts.map(p=>p[0].toFixed(3)+','+p[1].toFixed(3)).join(' ');
+
+// ---------- state ----------
+let A=100+360*8;      // accumulated main-shaft angle (8 stitches already sewn)
+let playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+let speed=40, delta=0, zoom=false;
+const frozen=new Map(); // stitch index -> caught?
+const MEET0=206;
+const meetOf=()=>MEET0+delta;
+const caughtAt=d=>loopW(MEET0+d)>=0.5;
+const stitchIdx=a=>Math.floor((a-60)/360);
+function stitchOK(n,cur){ if(n<0)return true; if(frozen.has(n))return frozen.get(n); if(n<cur)return true; return caughtAt(delta);}
+
+// ---------- mechanism svg ----------
+const svg=document.getElementById('mech');
+const el=(tag,attrs,parent=svg)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent.appendChild(e);return e;};
+svg.innerHTML='';
+const defs=el('defs',{});
+defs.innerHTML=`
+<linearGradient id="ringG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".45" stop-color="#b8c0c7"/><stop offset="1" stop-color="#5b646d"/></linearGradient>
+<radialGradient id="faceG" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#dfe4e8"/><stop offset="1" stop-color="#9ea8b1"/></radialGradient>
+<radialGradient id="bobG" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#ffab7a"/><stop offset="1" stop-color="#c2531f"/></radialGradient>
+<linearGradient id="needleG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b747d"/><stop offset=".35" stop-color="#f6f8f9"/><stop offset=".6" stop-color="#c3cad0"/><stop offset="1" stop-color="#57606a"/></linearGradient>
+<linearGradient id="plateG2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9edf0"/><stop offset=".3" stop-color="#c3cbd2"/><stop offset="1" stop-color="#8b959f"/></linearGradient>
+<linearGradient id="darkG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c3238"/><stop offset=".3" stop-color="#8a949e"/><stop offset="1" stop-color="#262b31"/></linearGradient>
+<linearGradient id="fabG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efe2c4"/><stop offset="1" stop-color="#d9c79f"/></linearGradient>
+<pattern id="yarn" width=".7" height="1.5" patternUnits="userSpaceOnUse" y="-1.5"><ellipse cx=".35" cy=".38" rx=".31" ry=".24" fill="#e3cf9f" stroke="#b39d6d" stroke-width=".05"/><ellipse cx=".0" cy="1.12" rx=".31" ry=".24" fill="#e3cf9f" stroke="#b39d6d" stroke-width=".05"/><ellipse cx=".7" cy="1.12" rx=".31" ry=".24" fill="#e3cf9f" stroke="#b39d6d" stroke-width=".05"/></pattern>`;
+const pat=el('pattern',{id:'hatch',width:'1.2',height:'1.2',patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},defs);
+el('line',{x1:0,y1:0,x2:0,y2:1.2,stroke:'var(--fabric-edge)','stroke-width':'.25'},pat);
+// hook group
+const gHook=el('g',{});
+const hookBody=el('path',{fill:'url(#ringG)',stroke:'#1f2a36','stroke-width':'.15'},gHook);
+const hookTip=el('polygon',{fill:'url(#ringG)',stroke:'#1f2a36','stroke-width':'.15'},gHook);
+el('circle',{cx:XH,cy:YH,r:RB,fill:'url(#faceG)',stroke:'#1f2a36','stroke-width':'.15'});
+el('circle',{cx:XH,cy:YH,r:5.8,fill:'url(#bobG)',stroke:'#a8461b','stroke-width':'.12'});
+for(let r=2.6;r<5.6;r+=.8)el('circle',{cx:XH,cy:YH,r:r,fill:'none',stroke:'#7a2e0e','stroke-width':'.08','stroke-opacity':'.35'});
+el('circle',{cx:XH,cy:YH,r:1.8,fill:'var(--metal2)',stroke:'var(--muted)','stroke-width':'.2'});
+el('rect',{x:-1.2,y:YH-RB-1.4,width:2.4,height:1.6,fill:'var(--metal2)',stroke:'var(--muted)','stroke-width':'.18'}); // positioning notch
+el('path',{d:`M${XH+1.5} ${YH-RB+.4} q2 -.2 3.2 1.4`,fill:'none',stroke:'var(--muted)','stroke-width':'.3'}); // tension spring
+// feed dog
+const gFeed=el('g',{});
+const feedL=el('path',{fill:'url(#darkG)',stroke:'var(--muted)','stroke-width':'.18'},gFeed);
+const feedR=el('path',{fill:'url(#darkG)',stroke:'var(--muted)','stroke-width':'.18'},gFeed);
+// needle plate with slots
+const slots=[[-30,-8.2],[-1.6,-1.1],[1.1,1.6],[9,34]];
+slots.forEach(([a,b])=>el('rect',{x:a,y:0,width:b-a,height:2,fill:'url(#plateG2)',stroke:'var(--muted)','stroke-width':'.15'}));
+// fabric
+el('rect',{x:-30,y:FT,width:64,height:-FT,fill:'url(#fabG)',stroke:'var(--fabric-edge)','stroke-width':'.15'});
+el('rect',{x:-30,y:FT,width:64,height:-FT,fill:'url(#yarn)'});
+// presser foot
+el('path',{d:`M-7 ${FT} h5.8 v-2.4 h-5 q-.8 0 -.8 .8z M1.2 ${FT} h6.6 q.8 0 .8 -.8 v-1.6 h-7.4z M4.5 -3.9 v-10 h3.4 v10`,fill:'var(--metal2)',stroke:'var(--muted)','stroke-width':'.18'});
+// threads layer
+const gDone=el('g',{fill:'none','stroke-linecap':'round','stroke-linejoin':'round'});
+const tube=(c,d,w,dash)=>{const g=el('g',{fill:'none','stroke-linejoin':'round','stroke-linecap':'round',opacity:dash?'.72':'1'});
+  const mk=(st,sw,extra)=>el('polyline',Object.assign({stroke:st,'stroke-width':sw},dash?{'stroke-dasharray':dash}:{},extra||{}),g);
+  const a=mk(d,w),b=mk(c,w*.62),h=mk('#ffffff',w*.18,{'stroke-opacity':'.55',transform:`translate(${-w*.1} ${-w*.1})`});
+  return {setAttribute:(k,v)=>{a.setAttribute(k,v);b.setAttribute(k,v);h.setAttribute(k,v);}};};
+const bob=tube('var(--bobbin)','var(--bobbin-d)',.46);
+const up1=tube('var(--upper)','var(--upper-d)',.46);
+const up2=tube('var(--upper)','var(--upper-d)',.46);
+const up3=tube('var(--upper)','var(--upper-d)',.4,'.8 .5');
+const up4=tube('var(--upper)','var(--upper-d)',.46);
+// needle + bar
+const gNeedle=el('g',{});
+const needle=el('path',{fill:'url(#needleG)',stroke:'#1f2a36','stroke-width':'.12'},gNeedle);
+const groove=el('line',{stroke:'var(--muted)','stroke-width':'.1'},gNeedle);
+const eye=el('rect',{width:.36,height:1.2,rx:.18,fill:'var(--sheet)',stroke:'var(--ink)','stroke-width':'.1'},gNeedle);
+const bar=el('rect',{x:-1.7,width:3.4,height:14,fill:'var(--metal)',stroke:'var(--muted)','stroke-width':'.18'},gNeedle);
+const clamp=el('rect',{x:-2.4,width:4.8,height:2.4,rx:.4,fill:'var(--metal)',stroke:'var(--muted)','stroke-width':'.18'},gNeedle);
+// take-up lever + tension
+el('circle',{cx:30,cy:-52,r:1.6,fill:'var(--metal2)',stroke:'var(--muted)','stroke-width':'.2'});
+el('circle',{cx:30,cy:-52,r:.5,fill:'var(--muted)'});
+const lever=el('line',{x1:27,y1:-37,stroke:'var(--muted)','stroke-width':'1.1','stroke-linecap':'round'});
+el('circle',{cx:27,cy:-37,r:1,fill:'var(--metal2)',stroke:'var(--muted)','stroke-width':'.2'});
+const tuEye=el('circle',{r:.8,fill:'var(--sheet)',stroke:'var(--ink)','stroke-width':'.25'});
+// cursor marker for hook point
+const tipDot=el('circle',{r:.35,fill:'var(--accent)'});
+// labels
+const lab=(x,y,t,anchor='start',cls='t-mut')=>{const e=el('text',{x,y,'font-size':'1.9','text-anchor':anchor,class:cls});e.textContent=t;return e;};
+lab(31.5,-55,'夹线器','end');
+lab(31.5,-33,'挑线杆','end');
+lab(-3,-44,'针杆','end');
+lab(-29,FT-0.8,'布料');
+lab(-29,4.6,'针板');
+lab(-12.5,10,'送布牙','middle');
+lab(13.5,27,'旋梭','start');
+lab(XH,YH+.7,'梭芯','middle','t-ink');
+lab(-17,31,'梭壳（静止）· 旋梭（转动）','start');
+lab(9.5,-7,'压脚');
+const needleLab=lab(-2,-30,'机针','end');
+const flash=el('text',{x:2,y:-20,'font-size':'2.6','font-weight':'600',fill:'var(--warn)'});
+
+// ---------- timing svg ----------
+const tsv=document.getElementById('timing');
+const T0=78,T1=604,TX=th=>T0+(T1-T0)*th/360;
+const tel=(tag,attrs)=>el(tag,attrs,tsv);
+const rows=[['针杆位移',20,70],['挑线杆（示意）',104,36],['旋梭',158,16],['送布（示意）',190,14],['机针在布中',218,14]];
+rows.forEach(([n,y,h])=>{const t=tel('text',{x:4,y:y+h/2+4,'font-size':'11.5',class:'t-mut'});t.textContent=n;tel('line',{x1:T0,x2:T1,y1:y+h,y2:y+h,stroke:'var(--rule)','stroke-width':'1'});});
+for(let th=0;th<=360;th+=45){tel('line',{x1:TX(th),x2:TX(th),y1:14,y2:236,stroke:'var(--rule)','stroke-width':'.6','stroke-dasharray':'2 3'});const t=tel('text',{x:TX(th),y:248,'font-size':'10.5','text-anchor':'middle',class:'t-mut'});t.textContent=th+'°';}
+{const pts=[];for(let th=0;th<=360;th+=2)pts.push([TX(th),20+70*xN(th)/STROKE]);tel('polyline',{points:pl(pts),fill:'none',stroke:'var(--ink)','stroke-width':'1.6'});
+ const t=tel('text',{x:TX(180),y:100,'font-size':'10.5','text-anchor':'middle',class:'t-mut'});t.textContent='最低点 180°';}
+{const pts=[];for(let th=0;th<=360;th+=2)pts.push([TX(th),104+36*(tu(th)+50)/10]);tel('polyline',{points:pl(pts),fill:'none',stroke:'var(--upper)','stroke-width':'1.6'});}
+const tHookBar=tel('rect',{y:160,height:12,rx:3,fill:'var(--accent)','fill-opacity':'.25',stroke:'var(--accent)'});
+const tMeet=tel('line',{y1:150,y2:178,stroke:'var(--accent)','stroke-width':'2'});
+const tMeetT=tel('text',{y:156,'font-size':'10.5',fill:'var(--accent)'});
+tel('rect',{x:TX(290),y:191,width:TX(360)-TX(290),height:12,rx:3,fill:'var(--muted)','fill-opacity':'.3'});
+tel('rect',{x:TX(0),y:191,width:TX(60)-TX(0),height:12,rx:3,fill:'var(--muted)','fill-opacity':'.3'});
+tel('rect',{x:TX(102),y:219,width:TX(258)-TX(102),height:12,rx:3,fill:'var(--ink)','fill-opacity':'.18'});
+const cur=tel('line',{y1:12,y2:238,stroke:'var(--warn)','stroke-width':'1.6'});
+
+function tSet(ev){const r=tsv.getBoundingClientRect();const vx=(ev.clientX-r.left)/r.width*620;let th=(vx-T0)/(T1-T0)*360;th=Math.max(0,Math.min(359,th));setTheta(th);}
+let drag=false;
+tsv.addEventListener('pointerdown',e=>{drag=true;playing=false;syncPlay();tsv.setPointerCapture(e.pointerId);tSet(e);});
+tsv.addEventListener('pointermove',e=>{if(drag)tSet(e);});
+tsv.addEventListener('pointerup',()=>drag=false);
+
+// ---------- phase text ----------
+const PH={
+ down:['机针下行','上一针的送布已经结束，送布牙降到针板以下。机针带着面线向布面下行，挑线杆也在下降，为这一针放出线来。'],
+ pierce:['刺布','机针穿过布料和针板孔。面线藏在机针的长槽里随针下行，不被布料磨损。主轴转到 180° 时机针到达最低点。'],
+ loop:['形成线环','机针开始回升。短槽一侧的面线被布料夹住、跟不上机针，于是在针眼上方、凹口一侧鼓出一个线环。回升约 2 mm 时线环最大、最稳定。'],
+ catch:['钩线','梭尖从机针凹口处掠过，钻进线环和机针之间，把线环钩住。这一刻决定成败：早了线环还没张开，晚了线环已经收缩。'],
+ wrap:['绕梭','旋梭带着线环转动，线环被拉大，绕过装着底线的梭壳。挑线杆下降放线，供给线环所需的线量。机针随后离开布料（约 258°），送布牙开始上升推布。'],
+ tight:['收紧与送布','线环从梭壳上脱出，底线已经套在线环里。挑线杆快速上升，把多余的面线收回，交织点被拉进布料厚度中间。送布牙把布料向前推进一个针距。'],
+ miss:['跳针','梭尖经过时线环太小（钩得太早）或已经收缩（钩得太晚），没能钩住。面线随机针退回，这一针没有和底线交织，布面上留下一段两倍长的线迹。']
+};
+
+// ---------- render ----------
+function render(){
+  const th=((A%360)+360)%360;
+  const u=th<60?th+360:th;
+  const n=stitchIdx(A);
+  const meet=meetOf();
+  const off=meet+135, tEnd=Math.min(off+60,418);
+  // freeze/unfreeze current stitch's catch result
+  if(u>=meet){ if(!frozen.has(n)) frozen.set(n,caughtAt(delta)); } else frozen.delete(n);
+  const ok=stitchOK(n,n);
+  const f=u>=290?sstep((u-290)/130):0;
+  const x0=-f*L;
+  const tY=tipY(th), eY=eyeY(th);
+  // hook
+  const a=90-2*(th-meet);
+  const b0=a+25,b1=a+330;
+  const o=arc(11.6,b0,b1,6), i=arc(9.0,b1,b0,6);
+  hookBody.setAttribute('d','M'+pl(o).replace(/ /g,' L')+' L'+pl(i).replace(/ /g,' L')+'Z');
+  hookTip.setAttribute('points',pl([P(11.25,a),P(11.6,a+25),P(10.0,a+25)]));
+  const tp=P(11.25,a); tipDot.setAttribute('cx',tp[0]);tipDot.setAttribute('cy',tp[1]);
+  // feed dog: raised during u 285..425 (wrap)
+  let fdx,fdy;
+  const uu=u<285?u+360:u; // 285..645
+  if(uu<=425){const t=(uu-285)/140;fdx=L/2-sstep(t)*L;fdy=2-1.9*Math.sin(Math.PI*Math.min(1,Math.max(0,t)))**.5;}
+  else{const t=(uu-425)/220;fdx=-L/2+sstep(t)*L;fdy=2+1.2*Math.sin(Math.PI*t);}
+  const teeth=(xa,xb)=>{let d=`M${xa+fdx} ${fdy+1.8}V${fdy+.6}`;for(let x=xa;x<xb-.1;x+=.9)d+=`L${x+fdx+.45} ${fdy-.15}L${x+fdx+.9} ${fdy+.6}`;return d+`V${fdy+1.8}Z`;};
+  feedL.setAttribute('d',teeth(-6.6,-3.0)); feedR.setAttribute('d',teeth(3.2,7.7));
+  // needle
+  const top=tY-34;
+  needle.setAttribute('d',`M0 ${tY} L.45 ${tY-1.6} V${eY-1.0} L.45 ${tY-26} H.8 V${top} H-.8 V${tY-26} H-.45 V${eY-3.4} L-.22 ${eY-2.6} V${eY-1.0} L-.45 ${eY-.6} V${tY-1.6} Z`);
+  groove.setAttribute('x1',.28);groove.setAttribute('x2',.28);groove.setAttribute('y1',eY);groove.setAttribute('y2',tY-26);
+  eye.setAttribute('x',-.18);eye.setAttribute('y',eY-.6);
+  clamp.setAttribute('y',top-2.4); bar.setAttribute('y',top-2.4-14);
+  needleLab.setAttribute('y',tY-14);
+  // take-up
+  const ty=tu(th), tx=15+1.2*Math.sin(rad(th));
+  lever.setAttribute('x2',tx);lever.setAttribute('y2',ty);
+  tuEye.setAttribute('cx',tx);tuEye.setAttribute('cy',ty);
+  const G=[.95,top+1];
+  up1.setAttribute('points',pl([[30,-52],[tx,ty],G,[.32,top+3],[.32,eY]]));
+  // previous ok hole
+  let k=1; while(k<20 && !stitchOK(n-k,n)) k++;
+  const xa=x0-k*L;
+  // state of current stitch
+  let cs; // 'pre','in','caught','shrink','done','miss'
+  const inFab=eY>FT;
+  if(u<102) cs='pre';
+  else if(ok && u>=meet && u<off) cs='caught';
+  else if(ok && u>=off && u<tEnd) cs='shrink';
+  else if(ok && u>=tEnd) cs='done';
+  else cs=inFab?'in':'pre';
+  // completed stitches
+  gDone.innerHTML='';
+  const dt=(d,k)=>{el('path',{d,stroke:`var(--${k}-d)`,'stroke-width':.42},gDone);el('path',{d,stroke:`var(--${k})`,'stroke-width':.26},gDone);};
+  const holes=[];
+  if(cs==='done') holes.push(x0);
+  for(let j=1;j<14;j++){ if(stitchOK(n-j,n)) holes.push(x0-j*L); }
+  for(let j=0;j<holes.length;j++){
+    const x=holes[j];
+    dt(`M${x} ${FT-.12}V-.75`,'upper'); dt(`M${x} .12V-.75`,'bobbin');
+    if(j+1<holes.length){const x2=holes[j+1];
+      dt(`M${x} ${FT-.12}H${x2}`,'upper'); dt(`M${x} .12H${x2}`,'bobbin');}
+    el('circle',{cx:x,cy:-.75,r:.28,fill:'var(--ink)'},gDone);
+  }
+  // upper thread below the eye
+  let p2=[],p3=[],p4=[];
+  const E=[0,eY];
+  const topSeg=(xh)=>[[xh,FT],[xh,FT-.12],[xa,FT-.12]];
+  if(cs==='pre'){
+    p2=[E,[xa,FT-.12]];
+  } else if(cs==='in'){
+    const w=loopW(th)*2.4;
+    if(eY>2){const pts=[];for(let t=0;t<=1.0001;t+=.1){const y=eY+(2-eY)*t;const x=-.4-w*Math.sin(Math.PI*t)*1.0-w*.15;pts.push([t<1?x:-.5,y]);}
+      p2=[[-.2,eY],...pts,[-.5,FT],...topSeg(-.5).slice(1)];}
+    else p2=[[-.2,eY],[-.5,Math.max(eY,FT)],...topSeg(-.5).slice(1)];
+  } else if(cs==='caught'||cs==='shrink'){
+    const beta=cs==='caught'?2*(th-meet):270;
+    const aa=90-beta;
+    let outer=[],apex=P(10.9,aa+2);
+    if(beta>10){outer=arc(10.4,90,aa+10);}
+    const Hc=[x0,2];
+    const Hin=[x0-.35,2];
+    // back leg: from the apex straight back to the hole, passing behind the bobbin case
+    const mid=[ (apex[0]+Hin[0])/2*0.6+XH*0.4, (apex[1]+Hin[1])/2*0.6+YH*0.4 ];
+    let front=[...outer,apex], back=[apex,mid,Hin];
+    if(cs==='shrink'){const s=sstep((u-off)/(tEnd-off));const sc=p=>[Hc[0]+(p[0]-Hc[0])*(1-s),Hc[1]+(p[1]-Hc[1])*(1-s)];front=front.map(sc);back=back.map(sc);}
+    const legA = eY>2 ? [[-.1,eY]] : (eY>FT ? [[.1,eY],[x0+.35,2]] : [E,[x0+.35,FT],[x0+.35,2]]);
+    p2=[...legA,...front];
+    p3=back;
+    p4=[Hin,[x0-.35,FT],[x0-.35,FT-.12],[xa,FT-.12]];
+  } else if(cs==='done'){
+    p2=[E,[x0,FT-.12]];
+  }
+  up2.setAttribute('points',pl(p2)); up3.setAttribute('points',pl(p3)); up4.setAttribute('points',pl(p4));
+  // bobbin thread
+  const Bx=[XH+3.4,YH-RB+1.1];
+  let tgt=xa;
+  if(cs==='shrink'){const s=sstep((u-off)/(tEnd-off));tgt=xa+(x0-xa)*s;}
+  if(cs==='done') tgt=x0;
+  bob.setAttribute('points',pl([Bx,[XH+1.5,YH-RB-.2],[-.3,2],[-.3,.12],[tgt,.12]]));
+  // flash for skip
+  flash.textContent=(!ok && u>=meet && u<meet+150)?'跳针！':'';
+  // phase
+  let key;
+  if(u<102) key='down'; else if(u<180) key='pierce'; else if(u<meet-3) key='loop';
+  else if(!ok) key='miss';
+  else if(u<meet+12) key='catch'; else if(u<off) key='wrap'; else key='tight';
+  const [t1,t2]=PH[key];
+  const h=document.getElementById('ph-title'); h.textContent=t1; h.classList.toggle('bad',key==='miss');
+  document.getElementById('ph-text').textContent=t2;
+  document.querySelectorAll('#steps span').forEach(s=>s.classList.toggle('on',s.dataset.k===key));
+  document.getElementById('r-th').textContent=Math.round(th)+'°';
+  document.getElementById('r-x').textContent=xN(th).toFixed(1)+' mm';
+  document.getElementById('r-rise').textContent=th>180?rise(th).toFixed(2)+' mm':'—';
+  document.getElementById('r-hook').textContent=Math.round(((2*th)%360+360)%360)+'°';
+  const lw=(cs==='in')?loopW(th):(cs==='caught'?1:null);
+  document.getElementById('r-loop').textContent=lw===null?'—':(cs==='caught'?'已钩住':Math.round(lw*100)+'%');
+  let sewn=0; for(let j=0;j<=n;j++) if(j<n||cs==='done') sewn++;
+  document.getElementById('r-n').textContent=n+(cs==='done'?1:0);
+  // timing
+  cur.setAttribute('x1',TX(th));cur.setAttribute('x2',TX(th));
+  tMeet.setAttribute('x1',TX(meet));tMeet.setAttribute('x2',TX(meet));
+  tMeetT.setAttribute('x',TX(meet)+4);tMeetT.textContent='钩线 '+meet+'°';
+  const offT=Math.min(off,360);
+  tHookBar.setAttribute('x',TX(meet));tHookBar.setAttribute('width',Math.max(0,TX(offT)-TX(meet)));
+  document.getElementById('theta').value=Math.round(th);
+}
+
+// ---------- controls ----------
+function setTheta(th){const base=A-((A%360)+360)%360;A=base+th;render();}
+function syncPlay(){document.getElementById('play').textContent=playing?'暂停':'播放';}
+document.getElementById('play').onclick=()=>{playing=!playing;syncPlay();};
+document.getElementById('back').onclick=()=>{playing=false;syncPlay();A-=2;render();};
+document.getElementById('fwd').onclick=()=>{playing=false;syncPlay();A+=2;render();};
+document.getElementById('speed').onchange=e=>speed=+e.target.value;
+document.getElementById('theta').oninput=e=>{playing=false;syncPlay();setTheta(+e.target.value);};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{playing=false;syncPlay();const g=b.dataset.go;
+  const m=meetOf();const v=g==='meet'?m:g==='wrap'?m+60:g==='off'?m+135:+g; setTheta(v);});
+function verdict(){const ok=caughtAt(delta);const r=rise(MEET0+delta);const v=document.getElementById('verdict');
+  v.className='verdict '+(ok?'ok':'bad');
+  v.textContent=`梭尖到达时机针已回升 ${r.toFixed(2)} mm → ${ok?'能钩住线环':(r<2.2?'钩得太早，线环还没张开 → 跳针':'钩得太晚，线环已收缩 → 跳针')}`;
+  document.getElementById('d-val').textContent=(delta>0?'+':'')+delta+'°';}
+document.getElementById('delta').oninput=e=>{delta=+e.target.value;verdict();render();};
+document.getElementById('zoom').onclick=e=>{zoom=!zoom;svg.setAttribute('viewBox',zoom?'-13 -6 26 36':'-30 -58 64 90');e.target.textContent=zoom?'看全图':'放大钩线区';};
+
+let last=performance.now();
+function loop(t){const dt=Math.min(.1,(t-last)/1000);last=t;if(playing){A+=speed*dt;render();}requestAnimationFrame(loop);}
+syncPlay();verdict();render();requestAnimationFrame(loop);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

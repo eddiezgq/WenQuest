@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Thread-trimming timing editor</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = needle path (front view), timing chart, stitch preview; right rail = checks, controls, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style>
+<div class="wrap">
+<header><h1>Thread-trimming timing editor</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 14 · Virtual lab 14-1 · Place the trimming solenoid, tension release, needle stop and thread wiping on the timing chart of Chapter 8, and see whether the thread is cut, missed, or pulls out at the next seam start</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>Timing chart (horizontal axis from 180° of the last stitch to 120° of the next revolution; green: permitted window for the moving knife to enter; red: actual entry range allowing for the delay)</h3>
+      <canvas id="tl" width="1100" height="560" aria-label="Thread-trimming timing chart"></canvas>
+    </section>
+    <section class="panel">
+      <h3>50 trial trims (each with a random delay within the set range)</h3>
+      <canvas id="trials" width="1100" height="150" aria-label="Results of 50 trial trims"></canvas>
+      <div class="row"><button id="try" type="button">Another 50 trials</button><span class="note" style="margin:0" id="trialtxt"></span></div>
+    </section>
+    <p class="note">Model (illustrative): needle-bar motion and the timing chart are taken from the worked examples of Chapters 3 and 8; the moving knife is driven directly by the solenoid through a linkage; knife entry angle = command angle + 6 × speed × delay, and the knife must enter the loop between 300° and 330° (the patent energises the solenoid when the needle point is about 10 mm above the throat plate, about 291° in this model); the moving knife cuts against the fixed knife at the take-up lever’s top position (55° of the next revolution); after the cut the servo stops at maximum deceleration (about 4400 rad/s², Chapter 13) and must stop 5° before the needle point enters the fabric (101.7°); the tension assembly must be released at least from 335° to 55° of the next revolution, otherwise the needle-thread tail is too short. The solenoid delay varies between the set minimum and maximum.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Verdict</h3><div class="checks" id="checks"></div><div class="msg" id="verdict" style="font-weight:600"></div></section>
+    <section class="panel">
+      <h3>Adjust</h3>
+      <div class="prm">
+        <label for="n">Trimming speed (r/min)</label><input id="n" type="range" min="100" max="1200" step="10" value="300"><output id="nv"></output>
+        <label for="pc">Trimming-solenoid command angle (°)</label><input id="pc" type="range" min="200" max="359" step="1" value="290"><output id="pcv"></output>
+        <label for="t1">Solenoid delay: minimum (ms)</label><input id="t1" type="range" min="2" max="20" step="0.5" value="6"><output id="t1v"></output>
+        <label for="t2">Solenoid delay: maximum (ms)</label><input id="t2" type="range" min="2" max="20" step="0.5" value="10"><output id="t2v"></output>
+        <label for="r1">Tension release starts (°)</label><input id="r1" type="range" min="280" max="400" step="1" value="330"><output id="r1v"></output>
+        <label for="r2">Tension release ends (°; above 360 = next revolution)</label><input id="r2" type="range" min="340" max="460" step="1" value="420"><output id="r2v"></output>
+        <label for="wp">Thread wiping after trimming</label><select id="wp"><option value="1">Wipe</option><option value="0">No wiping</option></select><span></span>
+      </div>
+      <div class="row"><button id="reset" type="button">Reset to standard</button><button id="mess" type="button">Scramble</button></div>
+    </section>
+    <section class="panel">
+      <h3>Tasks</h3><div id="tasks"></div>
+      <div class="row" style="font-size:.84rem">Max. trimming speed: <input id="nm" type="number" step="10" aria-label="Maximum trimming speed"> r/min<button id="nmChk" type="button">Check</button></div>
+      <div class="msg" id="msg"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), D=Math.PI/180;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+// ---------- model (model14.py) ----------
+const Rr=15.5,Ll=55,T=1.5,lam=Rr/Ll;
+const X=f=>{const a=f*D;return Rr*(1-Math.cos(a))-Ll*(1-Math.sqrt(1-(lam*Math.sin(a))**2));};
+const HT=T+X(101.7), ztip=f=>HT-X(((f%360)+360)%360);
+const KN=[300,330], CUT=415, REL=[335,415], STOPMAX=360+101.7-5, ALPHA=(2.5+0.15)/6e-4;
+const STD={n:300,pc:290,t1:6,t2:10,r1:330,r2:420,wp:1};
+const ST={...STD};
+const stopAngle=n=>{const w=n*2*Math.PI/60;return CUT+w*w/(2*ALPHA)/D;};
+function judgeOne(p,td){const e=p.pc+6*p.n*td;const f=[];if(e<KN[0])f.push('early');if(e>KN[1])f.push('late');return {e,f};}
+function evaluate(){const p=ST,lo=Math.min(p.t1,p.t2)/1000,hi=Math.max(p.t1,p.t2)/1000;
+  const e1=p.pc+6*p.n*lo,e2=p.pc+6*p.n*hi,st=stopAngle(p.n);
+  const C=[
+    {k:'early',n:'Moving knife enters no earlier than 300°',ok:e1>=KN[0],v:`${e1.toFixed(0)}°`,bad:'Too early: the hook has not yet carried the loop past the bobbin case into the knife path, so the knife cannot catch the needle-thread leg running to the fabric; the needle thread is not cut (only the bobbin thread is)'},
+    {k:'late',n:'Moving knife enters no later than 330°',ok:e2<=KN[1],v:`${e2.toFixed(0)}°`,bad:'Too late: the loop has already cast off and been drawn up by the take-up lever; the needle thread is not cut'},
+    {k:'stop',n:'Stops after the cut before needle enters fabric (≤ 96.7°)',ok:st<=STOPMAX,v:`${(st-360).toFixed(0)}°`,bad:'Trimming speed too high: the shaft cannot stop after the cut and the needle pierces the fabric'},
+    {k:'rel',n:'Tension release covers 335° to 55° (next rev.)',ok:p.r1<=REL[0]&&p.r2>=REL[1],v:`${p.r1}°–${p.r2>=360?(p.r2-360)+'° (next)':p.r2+'°'}`,bad:'No or too short tension release: when the take-up lever pulls up thread it draws it from the tail beyond the needle eye; the tail is too short and the thread pulls out at the next seam start'},
+    {k:'wipe',n:'Thread wiping after trimming',ok:p.wp===1,v:p.wp?'yes':'no',bad:'The needle-thread tail stays under the presser foot and tends to form a bird’s nest under the fabric at the next seam start'}];
+  const allOK=C.every(c=>c.ok);return {C,allOK,e1,e2,st};}
+let R_=null,TR=[];
+function render(){$('checks').innerHTML=R_.C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${c.ok?'':`<small>${c.bad}</small>`}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');
+  $('verdict').innerHTML=R_.allOK?'<span class="ok" style="color:var(--ok)">Result: thread cut, needle stopped up, next seam starts cleanly</span>':'<span style="color:var(--bad)">Result: problem; see the items marked ✗ above</span>';}
+// ---------- drawing ----------
+function draw(){const [c,g]=ctx('tl'),W=c.width,H=c.height,x0=110,x1=W-16,Xf=f=>x0+(x1-x0)*(f-180)/300;const mut=css('--muted');g.font='12px '+css('--f-body');
+  for(let f=180;f<=480;f+=30){g.strokeStyle=css('--rule');g.beginPath();g.moveTo(Xf(f),10);g.lineTo(Xf(f),H-24);g.stroke();g.fillStyle=mut;g.textAlign='center';g.fillText((f%360)+'°',Xf(f),H-8);}
+  // needle
+  const Yn=z=>130-100*(z+2)/34;g.strokeStyle=css('--ink');g.lineWidth=2;g.beginPath();for(let f=180;f<=480;f+=2){const p=[Xf(f),Yn(ztip(f))];f>180?g.lineTo(...p):g.moveTo(...p);}g.stroke();
+  g.setLineDash([4,4]);g.strokeStyle=mut;g.lineWidth=1;g.beginPath();g.moveTo(x0,Yn(0));g.lineTo(x1,Yn(0));g.stroke();g.setLineDash([]);
+  g.textAlign='start';g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.fillText('Needle point',10,60);
+  const ev=[[206,'Hook catches'],[258.3,'Needle out'],[293,'Max. thread out'],[341,'Loop casts off'],[415,'Take-up top'],[461.7,'Needle in']];
+  g.font='12px '+css('--f-body');for(const [f,l] of ev){g.fillStyle=css('--ink');g.fillRect(Xf(f)-1,140,2,14);g.textAlign='center';g.fillText(l,Xf(f),168);}
+  const rows={knife:200,cut:270,rel:340,stop:410,wipe:480};g.textAlign='start';g.font='600 13px '+css('--f-body');g.fillStyle=css('--ink');
+  g.fillText('Knife entry',10,rows.knife+18);g.fillText('Cut',10,rows.cut+18);g.fillText('Tension off',10,rows.rel+18);g.fillText('Needle stop',10,rows.stop+18);g.fillText('Wiping',10,rows.wipe+18);
+  g.font='12px '+css('--f-body');
+  g.fillStyle=css('--ok');g.globalAlpha=.2;g.fillRect(Xf(KN[0]),rows.knife,Xf(KN[1])-Xf(KN[0]),28);g.globalAlpha=1;
+  g.fillStyle=css('--bad');g.beginPath();g.arc(Xf(ST.pc),rows.knife+14,6,0,7);g.fill();g.textAlign='end';g.fillText(`Signal ${ST.pc}°`,Xf(ST.pc)-10,rows.knife+18);g.textAlign='start';
+  const a=Math.max(180,R_.e1),b=Math.min(480,R_.e2);g.globalAlpha=.75;g.fillRect(Xf(a),rows.knife+6,Math.max(2,Xf(b)-Xf(a)),16);g.globalAlpha=1;
+  g.strokeStyle=css('--bad');g.setLineDash([3,3]);g.beginPath();g.moveTo(Xf(ST.pc),rows.knife+14);g.lineTo(Xf(a),rows.knife+14);g.stroke();g.setLineDash([]);
+  // trial dots
+  for(const t of TR){g.fillStyle=t.ok?css('--ok'):css('--bad');g.beginPath();g.arc(Xf(Math.min(480,t.e)),rows.knife+36,2.5,0,7);g.fill();}
+  // knife motion & cut
+  g.strokeStyle=css('--bad');g.lineWidth=3;g.beginPath();g.moveTo(Xf(Math.min(480,R_.e2)),rows.cut+18);g.lineTo(Xf(340),rows.cut+18);g.lineTo(Xf(CUT),rows.cut+4);g.stroke();g.lineWidth=1;
+  g.fillStyle=css('--warn');g.beginPath();g.arc(Xf(CUT),rows.cut+4,6,0,7);g.fill();g.fillText('Cut on fixed knife (55°, next)',Xf(CUT)+10,rows.cut+8);
+  // release
+  g.fillStyle=css('--bt');g.globalAlpha=.25;g.fillRect(Xf(REL[0]),rows.rel-6,Xf(REL[1])-Xf(REL[0]),4);g.globalAlpha=1;g.fillStyle=css('--muted');g.fillText('Required: 335°–55°',Xf(REL[0]),rows.rel-10);
+  g.fillStyle=css('--bt');g.globalAlpha=.55;g.fillRect(Xf(Math.max(180,ST.r1)),rows.rel,Xf(Math.min(480,ST.r2))-Xf(Math.max(180,ST.r1)),28);g.globalAlpha=1;
+  // stop
+  g.fillStyle=css('--nt');g.globalAlpha=.15;g.fillRect(Xf(420),rows.stop,Xf(STOPMAX)-Xf(420),28);g.globalAlpha=1;
+  const st=Math.min(480,R_.st);g.fillStyle=R_.C[2].ok?css('--nt'):css('--bad');g.beginPath();g.arc(Xf(st),rows.stop+14,7,0,7);g.fill();g.fillText(`Stops at ${(R_.st-360).toFixed(0)}°`,Xf(st)+10,rows.stop+18);
+  if(ST.wp){g.fillStyle=css('--muted');g.beginPath();g.arc(Xf(st),rows.wipe+14,7,0,7);g.fill();g.fillText('Wiper sweeps after stop',Xf(st)+12,rows.wipe+18);}
+  else{g.fillStyle=css('--bad');g.fillText('No wiping',Xf(420),rows.wipe+18);}}
+function trials(){TR=[];const lo=Math.min(ST.t1,ST.t2)/1000,hi=Math.max(ST.t1,ST.t2)/1000;let ok=0;
+  for(let k=0;k<50;k++){const td=lo+(hi-lo)*Math.random();const j=judgeOne(ST,td);const good=j.f.length===0&&R_.C[2].ok&&R_.C[3].ok&&R_.C[4].ok;if(good)ok++;TR.push({e:j.e,ok:good});}
+  const [c,g]=ctx('trials'),W=c.width;const w=(W-40)/50;TR.forEach((t,i)=>{g.fillStyle=t.ok?css('--ok'):css('--bad');g.fillRect(20+i*w,30,w-3,70);});
+  g.fillStyle=css('--ink');g.font='600 14px '+css('--f-body');g.fillText(`Success ${ok} / 50`,20,20);$('trialtxt').textContent=ok===50?'Cut every time.':`${50-ok} failures: the delay scatter pushed the entry angle out of the window, or another condition is not met.`;return ok;}
+// ---------- controls ----------
+const fmt={n:v=>v.toFixed(0),pc:v=>v.toFixed(0),t1:v=>v.toFixed(1),t2:v=>v.toFixed(1),r1:v=>v.toFixed(0),r2:v=>v>=360?`${v-360} next`:v.toFixed(0)};
+function syncUI(){for(const k in fmt){$(k).value=ST[k];$(k+'v').textContent=fmt[k](ST[k]);}$('wp').value=String(ST.wp);}
+function changed(){syncUI();R_=evaluate();render();trials();draw();note();checkTasks();}
+for(const k in fmt)$(k).addEventListener('input',()=>{ST[k]=+$(k).value;changed();});
+$('wp').onchange=()=>{ST.wp=+$('wp').value;changed();};
+$('reset').onclick=()=>{Object.assign(ST,STD);seen.messed=false;changed();};
+$('mess').onclick=()=>{Object.assign(ST,{pc:250,r1:350,r2:380,wp:0});seen.messed=true;changed();};
+$('try').onclick=()=>{trials();draw();};
+// ---------- tasks ----------
+const seen={messed:false,fast:false,nm:false};
+function note(){if(ST.n>=700&&ST.t1===STD.t1&&ST.t2===STD.t2&&R_.allOK)seen.fast=true;}
+const TASKS=[
+  {t:'Press “Scramble”, then set the command angle, tension release and wiping so that all five checks pass (keep speed and delay at standard).',d:'First see where the red actual entry range falls, then which interval the tension release covers. Pressing “Reset to standard” does not count.',ok:()=>seen.messed&&R_.allOK&&ST.n===STD.n&&ST.t1===STD.t1&&ST.t2===STD.t2},
+  {t:'Raise the trimming speed above 700 r/min (delay still 6–10 ms) and choose a new command angle so that every check passes and all 50 trial trims succeed.',d:'Doubling the speed doubles the degrees that the same milliseconds amount to, so the signal must come earlier; the red range also gets wider.',ok:()=>seen.fast},
+  {t:'With a low supply voltage and a worn spring the delay becomes 5–15 ms. Work out the highest trimming speed that still guarantees a cut every time, and enter it below.',d:'The width of the red range is 6n(t_max − t_min), and it must fit into the 30° window; do not forget the stopping limit. ±5% is accepted.',ok:()=>seen.nm}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+function nmax(lo,hi){const a=hi>lo?30/(6*(hi-lo)):1e9;const w=Math.sqrt((STOPMAX-CUT)*D*2*ALPHA);return Math.min(a,w*60/(2*Math.PI));}
+$('nmChk').onclick=()=>{const m=nmax(0.005,0.015),v=+$('nm').value;
+  if($('nm').value!==''&&Math.abs(v-m)/m<=0.05){seen.nm=true;$('msg').textContent=`Correct: about ${m.toFixed(0)} r/min. With a 10 ms spread in delay, the 30° window only accommodates n = 30 /(6 × 0.010) = 500 r/min; the stopping limit, about 770 r/min, does not govern. Set the delay to 5–15 ms, the speed to 500 and the command angle to 285° (entry exactly 300°–330°), and see whether all 50 trials succeed.`;}
+  else $('msg').textContent='Not yet: solve 6 × n × (0.015 − 0.005) ≤ 30 for n, then compare with the stopping limit and take the smaller.';checkTasks();};
+window.__api={ST,STD,evaluate,changed,done,seen,nmax,trials,mess:()=>$('mess').click(),nm:v=>{$('nm').value=v;$('nmChk').click();}};
+changed();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Needle-Selection FPGA Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: guide rail | work area with two tabs (A blocks / B Verilog). Results (waveform + per-needle error) shared below. */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --bad:#d1495b; --ok:#1e8449; --warn:#b9770e; --w1:#2f6fd6; --w2:#e0662f; --w3:#2e9e6b; --w4:#8e44ad; --block:#ffffff; --code:#fbfcfd;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--w1:#6ea8ff;--w2:#ff8c55;--w3:#58d68d;--w4:#c39bd3;--block:#1f2833;--code:#141b23;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--w1:#6ea8ff;--w2:#ff8c55;--w3:#58d68d;--w4:#c39bd3;--block:#1f2833;--code:#141b23;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)} button.primary{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button[aria-pressed="true"],button[aria-selected="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px;max-width:100%}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+.note{font-size:.8rem;color:var(--muted);margin:6px 0 0}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--f-body)}
+.blk rect{fill:var(--block);stroke:var(--rule);stroke-width:1.5}
+.blk.on rect{stroke:var(--accent);stroke-width:2.5}
+.blk{cursor:pointer}
+.blk text{fill:var(--ink)}
+.blk text.s{fill:var(--muted)}
+.wire{stroke:var(--muted);stroke-width:1.5;fill:none}
+.cfg{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;align-items:center;font-size:.86rem;margin-top:8px}
+.cfg label{color:var(--muted)}
+.cfgbox{background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px;font-size:.86rem}
+.cfgbox p{margin:0 0 6px}
+textarea{width:100%;min-height:360px;font-family:var(--f-mono);font-size:.8rem;line-height:1.45;background:var(--code);color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:8px;resize:vertical;tab-size:2}
+.out{font-family:var(--f-mono);font-size:.78rem;white-space:pre-wrap;background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:8px;margin-top:6px;max-height:160px;overflow:auto}
+.out.err{color:var(--bad)}
+canvas{display:block;width:100%;height:auto}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1rem}
+.kpi small{color:var(--muted);font-size:.74rem;display:block}
+.bad{color:var(--bad)} .good{color:var(--ok)}
+.steps{margin:0;padding-left:1.2em;font-size:.86rem}
+.steps li{margin:3px 0;cursor:pointer}
+.steps li.on{font-weight:600;color:var(--accent)}
+.lesson{font-size:.86rem;background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px}
+.lesson p{margin:0 0 6px}
+.lesson code{font-family:var(--f-mono);font-size:.8rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--bad)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+</style>
+<div class="wrap">
+<header><h1>Programming the needle-selection FPGA</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 17 · Virtual lab 17-3 · First build the selection logic from blocks, then write it yourself in Verilog; check the waveforms and how accurately each needle is selected</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Lab guide</h3><ol class="steps" id="steps"></ol><div class="lesson" id="lesson"></div></section>
+    <section class="panel"><h3>Tasks (auto-graded)</h3><div id="tasks"></div></section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="a" aria-selected="true">A Build with blocks</button>
+        <button type="button" role="tab" data-tab="b" aria-selected="false">B Verilog programming</button>
+      </div>
+      <div id="tab-a">
+        <svg id="diag" viewBox="0 0 980 250" role="img" aria-label="Block diagram of the needle-selection logic"></svg>
+        <div class="cfgbox" id="cfg"></div>
+        <div class="row"><button type="button" class="primary" id="runA">Run simulation</button><span class="note" style="margin:0">Click a block in the diagram to see how it works and change its settings.</span></div>
+      </div>
+      <div id="tab-b" hidden>
+        <div class="row">
+          <label class="note" style="margin:0" for="level">Level</label>
+          <select id="level"><option value="1">Level 1: quadrature decoding counter</option><option value="2">Level 2: position-compare trigger</option><option value="3">Level 3: lead compensation</option></select>
+          <button type="button" class="primary" id="runB">Compile and simulate</button>
+          <button type="button" id="resetB">Restore skeleton code</button>
+          <button type="button" id="ansB">Show answer</button>
+        </div>
+        <textarea id="code" spellcheck="false" aria-label="Verilog code"></textarea>
+        <div class="out" id="cons">(Compiler and simulation messages appear here)</div>
+        <p class="note">Supported Verilog subset: module / input / output / reg / wire / parameter, assign, and inside always @(posedge clk): begin…end, if…else, &lt;= and =; operators + − * / % comparison, logical, bitwise, shift, ?:, concatenation {…}, bit select a[i], part select a[m:n]; constants such as 8'd12, 2'b01.</p>
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Simulation results: 12 needles, E12, carriage accelerating from 0.2 m/s to 1.2 m/s (acceleration set to 40 m/s² so that both the acceleration zone and the full-speed zone fit within 12 needles), encoder 0.05 mm/count (after ×4 decoding), clock 1 MHz</h3>
+      <div class="kpi">
+        <div><b id="k-hit">—</b><small>Needles selected correctly / 12</small></div>
+        <div><b id="k-max">—</b><small>Max. position error / pitch</small></div>
+        <div><b id="k-td">—</b><small>Selector delay ms</small></div>
+        <div><b id="k-pw">—</b><small>Average coil power W</small></div>
+      </div>
+      <canvas id="err" width="1000" height="230" aria-label="Selection-position error of each needle"></canvas>
+      <div class="row"><label class="note" style="margin:0" for="zoom">Waveforms around needle</label><select id="zoom"></select><span class="note" style="margin:0">±1.5 ms</span></div>
+      <canvas id="wave" width="1000" height="360" aria-label="Waveforms"></canvas>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// ---------- physical testbench ----------
+const CLK = 1e6, RES = 0.05, P = 25.4 / 12, NNEED = 12, TOL = 0.25, V0 = 0.2, VMAX = 1.2, ACC = 40, X0 = 2.0;
+function carriage(t){ // position mm and speed m/s at time t (s)
+  const ta = (VMAX - V0) / ACC; if (t <= ta) return { x: (V0 * t + .5 * ACC * t * t) * 1000, v: V0 + ACC * t };
+  const xa = (V0 * ta + .5 * ACC * ta * ta) * 1000; return { x: xa + VMAX * (t - ta) * 1000, v: VMAX };
+}
+const needleX = i => X0 + i * P;             // mm, where the selector armature must act for needle i
+function simulate(impl, opt){
+  const tdUs = opt.tdUs, holdOk = opt.holdOk !== false;
+  const T = 0.040; const N = Math.round(T * CLK);
+  let cnt = 0, lastCntClk = -1, period = 0xffff, quadPhase = 0, i = 0;
+  const target = k => Math.round(needleX(k) / RES);
+  const res = Array.from({length:NNEED}, () => ({ fireT:null, actT:null, err:null, ok:false }));
+  const tr = { t:[], a:[], b:[], pos:[], fire:[], coil:[], arm:[], tgt:[] };
+  let pending = [], coilOnUntil = -1, armUntil = -1, energy = 0, busy = -1;
+  const seq = [[0,0],[1,0],[1,1],[0,1]];
+  let prev = { pos:0, fire:0 };
+  for (let n = 0; n < N; n++){
+    const t = n / CLK; const c = carriage(t);
+    const trueCnt = Math.floor(c.x / RES);
+    while (cnt < trueCnt){ cnt++; quadPhase = (quadPhase + 1) % 4; if (lastCntClk >= 0) period = Math.min(0xffff, n - lastCntClk); lastCntClk = n; }
+    const [A, B] = seq[quadPhase];
+    const inp = { rst: n < 5 ? 1 : 0, enc_a:A, enc_b:B, target: i < NNEED ? target(i) : 0xffff, sel:1, period, TD: tdUs };
+    const out = impl.step(inp, n);
+    if (out.error) return { error: out.error };
+    // fire: one-clock pulse (rising edge) for the current needle
+    if (out.fire && !prev.fire && i < NNEED && res[i].fireT === null){ res[i].fireT = t; const hold = 500e-6, td = tdUs / 1e6; if (t < busy) res[i].busy = true; else { pending.push({ k:i, at: t + td }); busy = t + td + hold + 0.5 * td; coilOnUntil = t + td + hold; } i++; }
+    // missed needle: carriage already 0.5 pitch past without a fire
+    if (i < NNEED && c.x > needleX(i) + 0.5 * P){ i++; }
+    pending = pending.filter(p => { if (t >= p.at){ const cx = carriage(p.at).x; res[p.k].actT = p.at; res[p.k].err = (cx - needleX(p.k)) / P; res[p.k].ok = holdOk && Math.abs(res[p.k].err) <= TOL; armUntil = p.at + 0.0005; return false; } return true; });
+    const coil = t < coilOnUntil ? 1 : 0; if (coil) energy += 1 / CLK;
+    if (n % 5 === 0 || out.fire !== prev.fire){ tr.t.push(t); tr.a.push(A); tr.b.push(B); tr.pos.push(out.pos === undefined ? NaN : out.pos); tr.fire.push(out.fire ? 1 : 0); tr.coil.push(coil); tr.arm.push(t < armUntil ? 1 : 0); tr.tgt.push(inp.target); }
+    prev = out;
+  }
+  // decoder check: did pos follow the true count?
+  let posErr = 0, posN = 0; for (let k = 0; k < tr.t.length; k += 50){ const tc = Math.floor(carriage(tr.t[k]).x / RES); if (!isNaN(tr.pos[k])){ posErr = Math.max(posErr, Math.abs(tr.pos[k] - tc)); posN++; } }
+  return { res, tr, energy, posErr: posN ? posErr : Infinity };
+}
+
+// ---------- A: graphical modules ----------
+const CFG = { dec:4, speed:'last', comp:'none', drive:3, hold:100 };
+const BLOCKS = [
+  { id:'enc', x:10, t:'Encoder', s:'A/B square waves' },
+  { id:'dec', x:170, t:'Quad decoder', s:'count pos' },
+  { id:'speed', x:330, t:'Speed estimate', s:'clocks per count' },
+  { id:'comp', x:490, t:'Lead comp.', s:'lead = TD / period' },
+  { id:'cmp', x:650, t:'Compare', s:'pos + lead ≥ target' },
+  { id:'drive', x:810, t:'Pulse driver', s:'boost + PWM hold' },
+];
+const INFO = {
+  enc:'<p>The encoder sits on the carriage drive motor or on a linear scale and outputs two square waves, A and B, 90° apart. For every 0.2 mm of carriage travel, A and B each go through one cycle; with ×4 decoding that is one count every 0.05 mm. This block is supplied by the testbench and cannot be changed.</p>',
+  dec:'<p>Quadrature decoding looks at the edges of A and B and their order: count up when A leads B, count down when B leads A. Counting only the rising edges of A is ×1 decoding, counting both edges of A is ×2, and counting all four edges of A and B is ×4. The higher the multiplication, the finer the position resolution.</p>',
+  speed:'<p>The lead needs the real-time speed. In an FPGA the simplest way is not to compute mm/s but to measure “how many clocks lie between two successive counts” (period): the smaller the period, the higher the speed. Using only the latest interval responds quickly but is noisy; averaging several intervals is smoother but lags during acceleration.</p>',
+  comp:'<p>The selector has a delay TD. During the delay the carriage moves TD / period counts (both in clocks). Adding this lead to the current position in the comparison makes the armature act at the right position. “Fixed” computes the lead once for top speed, so it acts too early in the acceleration zone.</p>',
+  cmp:'<p>The selection-data RAM supplies the target position of the next needle. When pos + lead ≥ target, a one-clock-wide fire pulse is issued and the target moves on to the next needle. This is a pure hardware comparison made on every clock, so the latency is only one clock (1 μs).</p>',
+  drive:'<p>fire triggers the coil driver. To shorten the delay, 2–3 times the rated voltage is applied first (boost) so the current rises quickly; once the armature has pulled in, PWM reduces the current to a hold level. The higher the boost factor, the shorter the delay; if the hold duty cycle is too low the armature drops out early and the needle is missed, if too high the coil overheats.</p>',
+};
+let selBlk = 'comp';
+function drawDiag(){
+  const s = $('diag'); let h = '';
+  BLOCKS.forEach((b, k) => { if (k) h += `<path class="wire" d="M${BLOCKS[k - 1].x + 140} 95 H${b.x}" marker-end="url(#ar)"/>`; });
+  h += `<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${css('--muted')}"/></marker></defs>`;
+  BLOCKS.forEach(b => { const val = { enc:'fixed', dec:`×${CFG.dec}`, speed:{ last:'last interval', avg4:'avg. of 4', none:'not measured' }[CFG.speed], comp:{ none:'none', fixed:'fixed (1.2 m/s)', rt:'real-time speed' }[CFG.comp], cmp:'≥ compare', drive:`boost ${CFG.drive}× · hold ${CFG.hold}%` }[b.id];
+    h += `<g class="blk ${b.id === selBlk ? 'on' : ''}" data-b="${b.id}" tabindex="0" role="button" aria-label="${b.t}"><rect x="${b.x}" y="55" width="140" height="80" rx="10"/><text x="${b.x + 70}" y="85" text-anchor="middle" font-weight="600" font-size="16">${b.t}</text><text class="s" x="${b.x + 70}" y="107" text-anchor="middle" font-size="12">${b.s}</text><text x="${b.x + 70}" y="125" text-anchor="middle" font-size="12" fill="${css('--accent')}">${val}</text></g>`; });
+  h += `<text x="490" y="30" text-anchor="middle" font-size="13" fill="${css('--muted')}">target (from selection-data RAM)</text><path class="wire" d="M720 36 V55" marker-end="url(#ar)"/><path class="wire" d="M560 36 H720"/>`;
+  h += `<text x="950" y="180" text-anchor="end" font-size="13" fill="${css('--muted')}">→ selector coil</text><text x="10" y="200" font-size="12" fill="${css('--muted')}">Inside the FPGA (encoder and coil are external)</text><rect x="160" y="45" width="800" height="100" rx="12" fill="none" stroke="${css('--rule')}" stroke-dasharray="6 4"/>`;
+  s.innerHTML = h;
+  s.querySelectorAll('[data-b]').forEach(g => { const f = () => { selBlk = g.dataset.b; drawDiag(); drawCfg(); }; g.addEventListener('click', f); g.addEventListener('keydown', e => { if (e.key === 'Enter') f(); }); });
+}
+function drawCfg(){
+  const b = selBlk; let ctl = '';
+  if (b === 'dec') ctl = `<label for="c-dec">Decoding</label><select id="c-dec"><option value="1">×1 (0.2 mm/count)</option><option value="2">×2 (0.1 mm/count)</option><option value="4">×4 (0.05 mm/count)</option></select>`;
+  if (b === 'speed') ctl = `<label for="c-sp">Speed estimate</label><select id="c-sp"><option value="last">Latest interval</option><option value="avg4">Average of 4 intervals</option><option value="none">No speed measurement</option></select>`;
+  if (b === 'comp') ctl = `<label for="c-cp">Lead</label><select id="c-cp"><option value="none">No compensation</option><option value="fixed">Fixed (tuned for 1.2 m/s)</option><option value="rt">Real-time speed</option></select>`;
+  if (b === 'drive') ctl = `<label for="c-dr">Boost factor</label><select id="c-dr"><option value="1">1× (no boost)</option><option value="2">2×</option><option value="3">3×</option></select><label for="c-ho">Hold duty cycle</label><select id="c-ho">${[15, 25, 40, 60, 100].map(v => `<option value="${v}">${v}%</option>`).join('')}</select>`;
+  $('cfg').innerHTML = INFO[b] + (ctl ? `<div class="cfg">${ctl}</div>` : '');
+  const bind = (id, key, num) => { const el = $(id); if (!el) return; el.value = CFG[key]; el.addEventListener('change', () => { CFG[key] = num ? +el.value : el.value; drawDiag(); runA(); }); };
+  bind('c-dec', 'dec', true); bind('c-sp', 'speed'); bind('c-cp', 'comp'); bind('c-dr', 'drive', true); bind('c-ho', 'hold', true);
+}
+const tdOf = d => ({ 1:1200, 2:600, 3:420 })[d];
+function implA(){
+  const step = 4 / CFG.dec; // counts per decoded tick (in 0.05 mm units)
+  let pos = 0, lastA = 0, lastB = 0, raw = 0, hist = [], lastP = 0xffff;
+  const TD = tdOf(CFG.drive), fixedLead = TD / (RES / 1000 / VMAX * CLK);
+  return { step(inp){
+    if (inp.rst){ pos = 0; raw = 0; return { pos:0, fire:0 }; }
+    const A = inp.enc_a, B = inp.enc_b;
+    const edgeA = A !== lastA, edgeB = B !== lastB;
+    if (CFG.dec === 4 && (edgeA || edgeB)) raw += 1;
+    if (CFG.dec === 2 && edgeA) raw += 2;
+    if (CFG.dec === 1 && edgeA && A === 1) raw += 4;
+    lastA = A; lastB = B; pos = raw;
+    if (inp.period !== lastP){ hist.push(inp.period); if (hist.length > 4) hist.shift(); lastP = inp.period; }
+    const per = CFG.speed === 'last' ? inp.period : CFG.speed === 'avg4' ? hist.reduce((s, x) => s + x, 0) / Math.max(1, hist.length) : null;
+    let lead = 0;
+    if (CFG.comp === 'fixed') lead = fixedLead;
+    if (CFG.comp === 'rt') lead = per ? TD / per : 0;
+    const fire = pos + lead >= inp.target ? 1 : 0;
+    return { pos, fire };
+  } };
+}
+function runA(){
+  const td = tdOf(CFG.drive);
+  const r = simulate(implA(), { tdUs: td, holdOk: CFG.hold >= 25 });
+  const power = (VMAX / (P / 1000)) * 4e-3 * (CFG.drive ** 2 * 0.25 + CFG.hold / 100 * 0.5); // illustrative: pulse rate at full speed × energy per pulse (4 W coil, 0.25 ms overdrive, 0.5 ms hold)
+  show(r, td, power);
+  last.A = { r, cfg:{ ...CFG }, power };
+  grade();
+}
+
+// ---------- B: tiny Verilog interpreter ----------
+function tokenize(src){
+  src = src.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  const re = /\s*(?:(\d+'[bdhBDH][0-9a-fA-F_xXzZ]+)|(\d+)|([A-Za-z_$][A-Za-z0-9_$]*)|(<=|>=|==|!=|&&|\|\||<<|>>|[-+*/%<>!~&|^?:;,()[\]{}=@.#]))/y;
+  const out = []; let m; re.lastIndex = 0; let line = 1, pos = 0;
+  while (re.lastIndex < src.length){
+    const start = re.lastIndex; m = re.exec(src);
+    if (!m){ const rest = src.slice(start).trim(); if (!rest) break; const ln = src.slice(0, start).split('\n').length; throw new Error(`unrecognised characters near line ${ln}: ${rest.slice(0, 12)}`); }
+    const ln = src.slice(0, start + (m[0].length - m[0].trimStart().length)).split('\n').length;
+    if (m[1]){ const [w, rest] = m[1].split("'"); const base = { b:2, d:10, h:16 }[rest[0].toLowerCase()]; out.push({ k:'num', v: parseInt(rest.slice(1).replace(/_/g, ''), base), w:+w, ln }); }
+    else if (m[2]) out.push({ k:'num', v:+m[2], w:32, ln });
+    else if (m[3]) out.push({ k:'id', v:m[3], ln });
+    else if (m[4]) out.push({ k:'op', v:m[4], ln });
+  }
+  return out;
+}
+function parse(src){
+  const T = tokenize(src); let p = 0;
+  const peek = (o = 0) => T[p + o] || { k:'eof', v:'', ln: T.length ? T[T.length - 1].ln : 1 };
+  const err = (msg) => { throw new Error(`line ${peek().ln}: ${msg}`); };
+  const eat = (v) => { const t = peek(); if (t.v !== v) err(`expected “${v}” but found “${t.v || 'end of file'}”`); p++; return t; };
+  const isv = v => peek().v === v;
+  const LV = [['||'], ['&&'], ['|'], ['^'], ['&'], ['==','!='], ['<','<=','>','>='], ['<<','>>'], ['+','-'], ['*','/','%']];
+  const decl = {}; const assigns = []; const always = []; const params = {};
+  const range = () => { if (!isv('[')) return 1; eat('['); const a = expr(); eat(':'); const b = expr(); eat(']'); return Math.abs(evalConst(a) - evalConst(b)) + 1; };
+  const evalConst = e => evalE(e, Object.assign({}, params), decl);
+  eat('module'); p++;
+  if (isv('#')){ eat('#'); eat('('); while (!isv(')')) p++; eat(')'); }
+  if (isv('(')){ eat('('); let depth = 1; while (depth){ const t = peek(); if (t.v === '(') depth++; if (t.v === ')') depth--; if (depth) p++; } eat(')'); }
+  eat(';');
+  while (!isv('endmodule')){
+    const t = peek(); if (t.k === 'eof') err('missing endmodule');
+    if (['input','output','reg','wire','parameter','localparam'].includes(t.v)){
+      p++; const kind = t.v;
+      if (kind === 'parameter' || kind === 'localparam'){ do { const n = peek().v; p++; eat('='); params[n] = evalConst(expr()); decl[n] = { w:32, param:true }; } while (isv(',') && eat(',')); eat(';'); continue; }
+      if (isv('reg') || isv('wire')) p++;
+      const w = range();
+      do { const n = peek(); if (n.k !== 'id') err('a signal name is expected here'); p++; decl[n.v] = { w, kind }; } while (isv(',') && eat(','));
+      eat(';'); continue;
+    }
+    if (t.v === 'assign'){ p++; const lhs = peek().v; p++; eat('='); assigns.push({ lhs, e: expr(), ln:t.ln }); eat(';'); continue; }
+    if (t.v === 'always'){ p++; eat('@'); eat('('); if (isv('posedge')) p++; p++; while (isv('or') || isv(',')){ p++; if (isv('posedge') || isv('negedge')) p++; p++; } eat(')'); always.push(stmt()); continue; }
+    err(`cannot understand “${t.v}”`);
+  }
+  function stmt(){
+    const t = peek();
+    if (t.v === 'begin'){ p++; const body = []; while (!isv('end')){ if (peek().k === 'eof') err('begin without a matching end'); body.push(stmt()); } eat('end'); return { k:'blk', body }; }
+    if (t.v === 'if'){ p++; eat('('); const c = expr(); eat(')'); const a = stmt(); let b = null; if (isv('else')){ p++; b = stmt(); } return { k:'if', c, a, b }; }
+    if (t.k === 'id'){ p++; let bit = null; if (isv('[')){ eat('['); bit = expr(); eat(']'); } if (!decl[t.v]) err(`signal “${t.v}” is not declared`); const op = peek().v; if (op !== '<=' && op !== '=') err('assignment must use <= or ='); p++; const e = expr(); eat(';'); return { k:'as', lhs:t.v, bit, nb: op === '<=', e, ln:t.ln }; }
+    if (t.v === ';'){ p++; return { k:'blk', body:[] }; }
+    err(`a statement cannot begin with “${t.v}”`);
+  }
+  function expr(){ return tern(); }
+  function tern(){ const c = bin(0); if (isv('?')){ p++; const a = tern(); eat(':'); const b = tern(); return { k:'?', c, a, b }; } return c; }
+  function bin(l){ if (l >= LV.length) return un(); let a = bin(l + 1); while (LV[l].includes(peek().v)){ const op = peek().v; p++; const b = bin(l + 1); a = { k:'b', op, a, b }; } return a; }
+  function un(){ const t = peek(); if (['!','~','-'].includes(t.v)){ p++; return { k:'u', op:t.v, a:un() }; } return prim(); }
+  function prim(){
+    const t = peek();
+    if (t.k === 'num'){ p++; return { k:'n', v:t.v, w:t.w }; }
+    if (t.v === '('){ p++; const e = expr(); eat(')'); return e; }
+    if (t.v === '{'){ p++; const parts = [expr()]; while (isv(',')){ p++; parts.push(expr()); } eat('}'); return { k:'cat', parts }; }
+    if (t.v === '$signed' || t.v === '$unsigned'){ p++; eat('('); const e = expr(); eat(')'); return e; }
+    if (t.k === 'id'){ p++; if (!decl[t.v] && !(t.v in params)) err(`signal “${t.v}” is not declared`); if (isv('[')){ eat('['); const a = expr(); if (isv(':')){ p++; const b = expr(); eat(']'); return { k:'sl', id:t.v, a, b }; } eat(']'); return { k:'bit', id:t.v, a }; } return { k:'id', id:t.v }; }
+    err(`“${t.v || 'end of file'}” cannot appear in an expression`);
+  }
+  eat('endmodule');
+  return { decl, assigns, always, params };
+}
+const mask = (v, w) => w >= 32 ? (v >>> 0) : (v & ((1 << w) - 1)) >>> 0;
+function widthOf(e, decl){ if (e.k === 'n') return e.w; if (e.k === 'id') return decl[e.id] ? decl[e.id].w : 32; if (e.k === 'bit') return 1; if (e.k === 'sl') return 0; if (e.k === 'cat') return e.parts.reduce((s, x) => s + widthOf(x, decl), 0); return 32; }
+function evalE(e, env, decl){
+  switch (e.k){
+    case 'n': return e.v;
+    case 'id': return env[e.id] || 0;
+    case 'bit': return ((env[e.id] || 0) >>> evalE(e.a, env, decl)) & 1;
+    case 'sl': { const a = evalE(e.a, env, decl), b = evalE(e.b, env, decl), lo = Math.min(a, b), w = Math.abs(a - b) + 1; return mask((env[e.id] || 0) >>> lo, w); }
+    case 'cat': { let v = 0; for (const x of e.parts){ const w = widthOf(x, decl) || 1; v = (v * 2 ** w) + mask(evalE(x, env, decl), w); } return v; }
+    case 'u': { const a = evalE(e.a, env, decl); return e.op === '!' ? (a ? 0 : 1) : e.op === '~' ? (~a >>> 0) : -a; }
+    case '?': return evalE(e.c, env, decl) ? evalE(e.a, env, decl) : evalE(e.b, env, decl);
+    case 'b': { const a = evalE(e.a, env, decl), b = evalE(e.b, env, decl);
+      switch (e.op){ case '+': return a + b; case '-': return a - b; case '*': return a * b; case '/': return b ? Math.floor(a / b) : 0; case '%': return b ? a % b : 0;
+        case '<': return +(a < b); case '<=': return +(a <= b); case '>': return +(a > b); case '>=': return +(a >= b); case '==': return +(a === b); case '!=': return +(a !== b);
+        case '&&': return +(!!a && !!b); case '||': return +(!!a || !!b); case '&': return (a & b) >>> 0; case '|': return (a | b) >>> 0; case '^': return (a ^ b) >>> 0; case '<<': return a * 2 ** b; case '>>': return Math.floor(a / 2 ** b); }
+    } }
+  return 0;
+}
+function implV(mod){
+  const env = Object.assign({}, mod.params);
+  Object.keys(mod.decl).forEach(k => { if (!(k in env)) env[k] = 0; });
+  const settle = () => { for (let it = 0; it < 4; it++) mod.assigns.forEach(a => { env[a.lhs] = mask(evalE(a.e, env, mod.decl), mod.decl[a.lhs] ? mod.decl[a.lhs].w : 32); }); };
+  const exec = (s, local, nb) => {
+    if (s.k === 'blk') s.body.forEach(x => exec(x, local, nb));
+    else if (s.k === 'if'){ if (evalE(s.c, local, mod.decl)) exec(s.a, local, nb); else if (s.b) exec(s.b, local, nb); }
+    else if (s.k === 'as'){ const w = mod.decl[s.lhs].w; let v = evalE(s.e, local, mod.decl);
+      if (s.bit){ const b = evalE(s.bit, local, mod.decl); const base = (s.nb && s.lhs in nb) ? nb[s.lhs] : local[s.lhs]; v = (base & ~(1 << b)) | ((v & 1) << b); }
+      v = mask(v, w); if (s.nb) nb[s.lhs] = v; else local[s.lhs] = v; }
+  };
+  return { step(inp){
+    ['rst','enc_a','enc_b','target','sel','period','TD'].forEach(k => { if (k in mod.decl) env[k] = mask(inp[k], mod.decl[k].w); });
+    settle();
+    const nb = {}; const local = Object.assign({}, env);
+    try { mod.always.forEach(a => exec(a, local, nb)); } catch (e){ return { error: e.message }; }
+    Object.keys(local).forEach(k => { env[k] = local[k]; }); Object.assign(env, nb);
+    settle();
+    return { pos: 'pos' in mod.decl ? env.pos : undefined, fire: 'fire' in mod.decl ? env.fire : 0 };
+  } };
+}
+const SKEL = {
+1: `// Level 1: quadrature decoding counter
+// Encoder outputs A and B are square waves 90° apart. When the carriage moves forward, A leads B.
+// Task: count every edge of A and B (x4 decoding), +1 forward and -1 backward, output pos.
+// Hint: store A and B from the previous clock and use the 4-bit value {a_d, b_d, enc_a, enc_b} to find the direction.
+module quad_decoder(clk, rst, enc_a, enc_b, pos);
+  input clk, rst, enc_a, enc_b;
+  output reg [15:0] pos;
+  reg a_d, b_d;                 // A and B from the previous clock
+
+  always @(posedge clk) begin
+    if (rst) begin
+      pos <= 0; a_d <= 0; b_d <= 0;
+    end else begin
+      a_d <= enc_a;
+      b_d <= enc_b;
+      // TODO: decide forward/reverse from {a_d, b_d, enc_a, enc_b} and update pos
+    end
+  end
+endmodule`,
+2: `// Level 2: position-compare trigger
+// Add a comparator to the Level 1 counter: when pos >= target, fire outputs a one-clock-wide pulse.
+// Each time the testbench sees a rising edge on fire, it changes target to the next needle's position.
+// This level ignores the selector delay (there will be errors; Level 3 fixes that).
+module selector(clk, rst, enc_a, enc_b, target, pos, fire);
+  input clk, rst, enc_a, enc_b;
+  input [15:0] target;
+  output reg [15:0] pos;
+  output reg fire;
+  reg a_d, b_d;
+  reg [15:0] last_t;            // target already fired, so the same needle is not fired twice
+
+  always @(posedge clk) begin
+    if (rst) begin
+      pos <= 0; a_d <= 0; b_d <= 0; fire <= 0; last_t <= 16'hffff;
+    end else begin
+      a_d <= enc_a; b_d <= enc_b;
+      // TODO 1: put your decoding logic from Level 1 here
+      // TODO 2: if pos >= target and target has not fired yet, fire <= 1 and record last_t; otherwise fire <= 0
+    end
+  end
+endmodule`,
+3: `// Level 3: lead compensation
+// The selector has a delay TD from fire to armature action (in clocks; 600 in this lab).
+// The testbench supplies period: the number of clocks between two successive counts (smaller = faster).
+// During the delay the carriage moves lead = TD / period counts, so fire when pos + lead >= target.
+module selector_lead(clk, rst, enc_a, enc_b, target, period, TD, pos, fire);
+  input clk, rst, enc_a, enc_b;
+  input [15:0] target, period, TD;
+  output reg [15:0] pos;
+  output reg fire;
+  reg a_d, b_d;
+  reg [15:0] last_t;
+  wire [15:0] lead;
+
+  // TODO 1: compute lead with an assign
+  assign lead = 0;
+
+  always @(posedge clk) begin
+    if (rst) begin
+      pos <= 0; a_d <= 0; b_d <= 0; fire <= 0; last_t <= 16'hffff;
+    end else begin
+      a_d <= enc_a; b_d <= enc_b;
+      // TODO 2: decoding (same as Level 1)
+      // TODO 3: add lead in the comparison
+    end
+  end
+endmodule`,
+};
+const ANS = {
+1: SKEL[1].replace('      // TODO: decide forward/reverse from {a_d, b_d, enc_a, enc_b} and update pos', `      // forward sequence 00→10→11→01→00 (A leads B)
+      if ({a_d,b_d,enc_a,enc_b} == 4'b0010 || {a_d,b_d,enc_a,enc_b} == 4'b1011 ||
+          {a_d,b_d,enc_a,enc_b} == 4'b1101 || {a_d,b_d,enc_a,enc_b} == 4'b0100)
+        pos <= pos + 1;
+      else if ({a_d,b_d,enc_a,enc_b} == 4'b0001 || {a_d,b_d,enc_a,enc_b} == 4'b0111 ||
+               {a_d,b_d,enc_a,enc_b} == 4'b1110 || {a_d,b_d,enc_a,enc_b} == 4'b1000)
+        pos <= pos - 1;`),
+2: SKEL[2].replace(`      // TODO 1: put your decoding logic from Level 1 here
+      // TODO 2: if pos >= target and target has not fired yet, fire <= 1 and record last_t; otherwise fire <= 0`, `      if ({a_d,b_d,enc_a,enc_b} == 4'b0010 || {a_d,b_d,enc_a,enc_b} == 4'b1011 ||
+          {a_d,b_d,enc_a,enc_b} == 4'b1101 || {a_d,b_d,enc_a,enc_b} == 4'b0100)
+        pos <= pos + 1;
+      else if ({a_d,b_d,enc_a,enc_b} == 4'b0001 || {a_d,b_d,enc_a,enc_b} == 4'b0111 ||
+               {a_d,b_d,enc_a,enc_b} == 4'b1110 || {a_d,b_d,enc_a,enc_b} == 4'b1000)
+        pos <= pos - 1;
+      if (pos >= target && target != last_t) begin
+        fire <= 1; last_t <= target;
+      end else
+        fire <= 0;`),
+3: SKEL[3].replace('  assign lead = 0;', '  assign lead = (period == 0) ? 0 : TD / period;').replace(`      // TODO 2: decoding (same as Level 1)
+      // TODO 3: add lead in the comparison`, `      if ({a_d,b_d,enc_a,enc_b} == 4'b0010 || {a_d,b_d,enc_a,enc_b} == 4'b1011 ||
+          {a_d,b_d,enc_a,enc_b} == 4'b1101 || {a_d,b_d,enc_a,enc_b} == 4'b0100)
+        pos <= pos + 1;
+      else if ({a_d,b_d,enc_a,enc_b} == 4'b0001 || {a_d,b_d,enc_a,enc_b} == 4'b0111 ||
+               {a_d,b_d,enc_a,enc_b} == 4'b1110 || {a_d,b_d,enc_a,enc_b} == 4'b1000)
+        pos <= pos - 1;
+      if (pos + lead >= target && target != last_t) begin
+        fire <= 1; last_t <= target;
+      end else
+        fire <= 0;`),
+};
+const codes = { 1:SKEL[1], 2:SKEL[2], 3:SKEL[3] };
+let level = 1;
+$('code').value = codes[1];
+$('code').addEventListener('input', () => { codes[level] = $('code').value; });
+$('code').addEventListener('keydown', e => { if (e.key === 'Tab'){ e.preventDefault(); const t = e.target, s = t.selectionStart; t.value = t.value.slice(0, s) + '  ' + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s + 2; codes[level] = t.value; } });
+$('level').addEventListener('change', e => { level = +e.target.value; $('code').value = codes[level]; });
+$('resetB').addEventListener('click', () => { codes[level] = SKEL[level]; $('code').value = codes[level]; });
+$('ansB').addEventListener('click', () => { if (!confirm('Show the answer? Try writing it yourself first.')) return; codes[level] = ANS[level]; $('code').value = codes[level]; });
+function runB(){
+  const cons = $('cons'); cons.className = 'out';
+  let mod; try { mod = parse($('code').value); } catch (e){ cons.className = 'out err'; cons.textContent = 'Compile error: ' + e.message; return; }
+  const missing = (level === 1 ? ['pos'] : ['pos', 'fire']).filter(s => !mod.decl[s]);
+  if (missing.length){ cons.className = 'out err'; cons.textContent = 'Missing output signal(s): ' + missing.join(', '); return; }
+  const r = simulate(implV(mod), { tdUs: 600 });
+  if (r.error){ cons.className = 'out err'; cons.textContent = 'Simulation error: ' + r.error; return; }
+  const hits = r.res.filter(x => x.ok).length;
+  let msg = `Compiled: ${Object.keys(mod.decl).length} signals, ${mod.assigns.length} assign statement(s), ${mod.always.length} always block(s).\n`;
+  msg += `Count check: pos differs from the true position by at most ${isFinite(r.posErr) ? r.posErr : '—'} counts${r.posErr <= 1 ? ' (correct)' : ' (wrong: check the decoding logic)'}\n`;
+  if (level > 1) msg += `Selection: ${hits} / 12 needles within tolerance; max. error ${Math.max(...r.res.map(x => x.err === null ? 9 : Math.abs(x.err))).toFixed(2)} pitch`;
+  cons.textContent = msg;
+  show(r, 0.6 * 1000, NaN);
+  last.B[level] = { posErr: r.posErr, hits };
+  grade();
+}
+$('runB').addEventListener('click', runB);
+$('runA').addEventListener('click', runA);
+
+// ---------- results drawing ----------
+let lastR = null;
+function show(r, td, power){
+  lastR = r; const hits = r.res.filter(x => x.ok).length;
+  const errs = r.res.map(x => x.err === null ? NaN : x.err), mx = Math.max(...errs.map(e => isNaN(e) ? 9 : Math.abs(e)));
+  $('k-hit').textContent = hits; $('k-hit').className = hits === 12 ? 'good' : 'bad';
+  $('k-max').textContent = mx >= 9 ? 'missed' : mx.toFixed(2); $('k-max').className = mx <= TOL ? 'good' : 'bad';
+  $('k-td').textContent = (td / 1000).toFixed(2); $('k-pw').textContent = isNaN(power) ? '—' : power.toFixed(1);
+  drawErr(); fillZoom(); drawWave();
+}
+function drawErr(){
+  const c = $('err'), g = c.getContext('2d'), w = c.width, h = c.height; g.clearRect(0, 0, w, h); if (!lastR) return;
+  const L = 70, R = w - 20, T = 20, B = h - 40, Y = e => T + (B - T) / 2 - e / 0.6 * (B - T) / 2, X = k => L + (k + .5) * (R - L) / NNEED;
+  g.fillStyle = css('--ok'); g.globalAlpha = .08; g.fillRect(L, Y(TOL), R - L, Y(-TOL) - Y(TOL)); g.globalAlpha = 1;
+  g.font = '16px ' + css('--f-mono'); g.fillStyle = css('--muted'); g.textAlign = 'right';
+  [-0.5, -0.25, 0, 0.25, 0.5].forEach(v => { g.strokeStyle = v === 0 ? css('--muted') : css('--rule'); g.setLineDash(Math.abs(v) === TOL ? [4, 3] : []); g.beginPath(); g.moveTo(L, Y(v)); g.lineTo(R, Y(v)); g.stroke(); g.setLineDash([]); g.fillText(v.toFixed(2), L - 6, Y(v) + 5); });
+  g.textAlign = 'center';
+  lastR.res.forEach((x, k) => { g.fillStyle = css('--muted'); g.fillText(k + 1, X(k), h - 18);
+    if (x.busy){ g.fillStyle = css('--bad'); g.fillText('busy', X(k), Y(0) + 5); return; }
+    if (x.err === null){ g.fillStyle = css('--bad'); g.fillText('miss', X(k), Y(0) + 5); return; }
+    const e = Math.max(-0.6, Math.min(0.6, x.err)); g.fillStyle = x.ok ? css('--w1') : css('--bad'); g.fillRect(X(k) - 12, Math.min(Y(0), Y(e)), 24, Math.abs(Y(e) - Y(0)) || 2); });
+  g.textAlign = 'left'; g.fillStyle = css('--muted'); g.fillText('Error/pitch (+ = late, − = early; busy = previous actuation unfinished; miss = no fire)', L, 14); g.fillText('Needle', L, h - 2);
+}
+function fillZoom(){ const z = $('zoom'); const v = z.value || '6'; z.innerHTML = Array.from({length:NNEED}, (_, k) => `<option value="${k + 1}">${k + 1}</option>`).join(''); z.value = v; }
+$('zoom').addEventListener('change', drawWave);
+function drawWave(){
+  const c = $('wave'), g = c.getContext('2d'), w = c.width, h = c.height; g.clearRect(0, 0, w, h); if (!lastR) return;
+  const k = (+$('zoom').value || 6) - 1, tr = lastR.tr;
+  // centre on the ideal time of needle k
+  let tc = 0; for (let i = 0; i < tr.t.length; i++){ if (carriage(tr.t[i]).x >= needleX(k)){ tc = tr.t[i]; break; } }
+  const t0 = tc - 0.0015, t1 = tc + 0.0015; const L = 110, R = w - 20;
+  const X = t => L + (t - t0) / (t1 - t0) * (R - L);
+  const rows = [['A', 'a', css('--w1')], ['B', 'b', css('--w1')], ['pos', 'pos', css('--w3')], ['fire', 'fire', css('--w2')], ['coil', 'coil', css('--w4')], ['armature', 'arm', css('--bad')]];
+  const rh = (h - 40) / rows.length;
+  g.font = '16px ' + css('--f-body');
+  const idx = []; for (let i = 0; i < tr.t.length; i++) if (tr.t[i] >= t0 && tr.t[i] <= t1) idx.push(i);
+  rows.forEach(([name, key, col], r) => {
+    const y0 = 10 + r * rh, yb = y0 + rh * .8, yt = y0 + rh * .15;
+    g.fillStyle = css('--muted'); g.fillText(name, 12, y0 + rh * .6);
+    g.strokeStyle = css('--rule'); g.beginPath(); g.moveTo(L, yb); g.lineTo(R, yb); g.stroke();
+    g.strokeStyle = col; g.lineWidth = 2; g.beginPath();
+    if (key === 'pos'){ const vals = idx.map(i => tr.pos[i]).filter(v => !isNaN(v)); const lo = Math.min(...vals, ...idx.map(i => tr.tgt[i])), hi = Math.max(...vals, ...idx.map(i => Math.min(tr.tgt[i], 60000))); const Yv = v => yb - (v - lo) / Math.max(1, hi - lo) * (yb - yt);
+      idx.forEach((i, j) => { const v = tr.pos[i]; if (isNaN(v)) return; j ? g.lineTo(X(tr.t[i]), Yv(v)) : g.moveTo(X(tr.t[i]), Yv(v)); }); g.stroke();
+      g.strokeStyle = css('--muted'); g.setLineDash([4, 3]); g.beginPath(); idx.forEach((i, j) => { const v = Math.min(tr.tgt[i], hi); j ? g.lineTo(X(tr.t[i]), Yv(v)) : g.moveTo(X(tr.t[i]), Yv(v)); }); g.stroke(); g.setLineDash([]);
+      g.fillStyle = css('--muted'); g.font = '13px ' + css('--f-body'); g.fillText('dashed = target', R - 105, yt + 4); g.font = '16px ' + css('--f-body'); }
+    else { idx.forEach((i, j) => { const y = tr[key][i] ? yt : yb; if (!j) g.moveTo(X(tr.t[i]), y); else { g.lineTo(X(tr.t[i]), j && tr[key][idx[j - 1]] !== tr[key][i] ? (tr[key][idx[j - 1]] ? yt : yb) : y); g.lineTo(X(tr.t[i]), y); } }); g.stroke(); }
+  });
+  // ideal actuation line
+  g.strokeStyle = css('--ok'); g.setLineDash([6, 4]); g.lineWidth = 1.5; g.beginPath(); g.moveTo(X(tc), 6); g.lineTo(X(tc), h - 30); g.stroke(); g.setLineDash([]);
+  g.fillStyle = css('--ok'); g.fillText(`Ideal time, needle ${k + 1}`, Math.min(X(tc) + 6, R - 170), h - 12);
+  g.fillStyle = css('--muted'); g.fillText('−1.5 ms', L, h - 12); g.textAlign = 'right'; g.fillText('+1.5 ms', R, h - 12); g.textAlign = 'left';
+}
+
+// ---------- guide + tasks ----------
+const last = { A:null, B:{} };
+const LESSONS = [
+  ['What the FPGA does in needle selection', '<p>On every clock (1 μs in this lab) the FPGA on the carriage board does the same thing: read the encoder, update the position, compare it with the target position of the next needle, and when it is reached send a pulse to the selector. Software only has to load the selection data into RAM before each course starts.</p><p>This chain is the six blocks shown above.</p>'],
+  ['A1 Quadrature decoding', '<p>Click the “Quad decoder” block, change the decoding from ×4 to ×1 and run the simulation. The resolution drops from 0.05 mm to 0.2 mm and the error “steps” get larger. At E12 the needle pitch is 2.12 mm, so 0.2 mm is about 0.1 pitch.</p>'],
+  ['A2 Lead and speed estimate', '<p>Set “Lead comp.” to none, fixed and real-time speed in turn and watch the error chart: with no compensation every needle is late; fixed is early on the first few needles (acceleration zone); real-time speed is the most accurate. Then change “Speed estimate” to the average of 4 intervals and see why lag reappears in the acceleration zone.</p>'],
+  ['A3 Coil drive', '<p>“Pulse driver” block: each selector actuation goes through “pull-in delay + 0.5 ms hold + release (about half the pull-in delay)”, and this cycle must be shorter than the time between two needles, t_n. With 1× boost the pull-in takes 1.2 ms and one cycle takes 2.3 ms, longer than t_n = 1.76 ms at full speed, so later needles find the selector “busy” and are not selected; 3× is fastest but uses the most power. With a hold duty cycle below 25% the armature drops out and every needle is missed. Find settings that select accurately without too much power.</p>'],
+  ['B1 Write the decoder', '<p>Switch to “B Verilog programming”, Level 1. The key is to concatenate the previous and current A, B into 4 bits: <code>{a_d, b_d, enc_a, enc_b}</code>. Going forward, AB runs 00→10→11→01→00, so 0010, 1011, 1101 and 0100 count up by 1; the four reversed patterns count down by 1.</p><p>Click “Compile and simulate”; the level is passed only when the “Count check” says correct.</p>'],
+  ['B2 Write the comparator', '<p>Level 2 puts the decoder and the comparator together. Note that <code>&lt;=</code> is a non-blocking assignment: all <code>&lt;=</code> in the same always block take effect together at the clock edge, so reading <code>pos</code> gives the previous clock’s value. Use <code>last_t</code> to stop the same needle from firing twice.</p><p>This level does not compensate for the delay, so the errors will be large — exactly what Level 3 fixes.</p>'],
+  ['B3 Add the lead', '<p>Level 3 computes the lead with <code>assign lead = TD / period;</code> (guard against period = 0) and changes the comparison to <code>pos + lead &gt;= target</code>. Division is expensive in an FPGA, and real designs often use a lookup table or a shift approximation; here a plain division is used to keep the principle clear.</p>'],
+];
+let li = 0;
+function renderSteps(){ const ol = $('steps'); ol.innerHTML = ''; LESSONS.forEach((l, i) => { const e = document.createElement('li'); e.textContent = l[0]; e.className = i === li ? 'on' : ''; e.tabIndex = 0; e.addEventListener('click', () => { li = i; renderSteps(); }); e.addEventListener('keydown', ev => { if (ev.key === 'Enter'){ li = i; renderSteps(); } }); ol.appendChild(e); }); $('lesson').innerHTML = LESSONS[li][1]; }
+const TASKS = [
+  { t:'Task 1: Build a working selection chain', d:'In block mode, select all 12 needles correctly with an average coil power of no more than 3 W.', check(){ const a = last.A; if (!a) return [false, 'Not run yet']; const h = a.r.res.filter(x => x.ok).length; if (h < 12) return [false, `${h} / 12 correct`]; if (a.power > 3) return [false, `Power ${a.power.toFixed(1)} W, too high`]; return [true, `Done: power ${a.power.toFixed(1)} W`]; } },
+  { t:'Task 2: Decoder', d:'Verilog Level 1: pos within 1 count of the true position.', check(){ const b = last.B[1]; if (!b) return [false, 'Level 1 not simulated yet']; return b.posErr <= 1 ? [true, 'Done'] : [false, `Off by ${b.posErr} counts`]; } },
+  { t:'Task 3: Comparator', d:'Verilog Level 2: correct count, and fire is issued for every needle (errors allowed).', check(){ const b = last.B[2]; if (!b) return [false, 'Level 2 not simulated yet']; if (b.posErr > 1) return [false, 'Count is wrong']; return lastR && last.B[2] && lastR.res.every(x => x.fireT !== null) ? [true, `Done: ${b.hits} / 12 within tolerance`] : [false, 'Some needles did not fire']; } },
+  { t:'Task 4: Lead compensation', d:'Verilog Level 3: all 12 needles within 0.25 pitch.', check(){ const b = last.B[3]; if (!b) return [false, 'Level 3 not simulated yet']; return b.hits === 12 ? [true, 'Done'] : [false, `${b.hits} / 12`]; } },
+];
+function grade(){ $('tasks').innerHTML = TASKS.map(t => { const [ok, msg] = t.check(); return `<div class="task"><span class="st ${ok ? 'ok' : 'no'}">${ok ? '✓' : '○'}</span> <b>${t.t}</b><small>${t.d}</small><small style="color:${ok ? 'var(--ok)' : 'var(--muted)'}">${msg}</small></div>`; }).join(''); }
+document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', x === b)); $('tab-a').hidden = b.dataset.tab !== 'a'; $('tab-b').hidden = b.dataset.tab !== 'b'; }));
+renderSteps(); drawDiag(); drawCfg(); runA();
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

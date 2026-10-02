@@ -1,0 +1,391 @@
+<p class="eyebrow">auto</p><h1>auto</h1><div class="seam" aria-hidden="true"></div>
+<div class="chips"><span class="chips-label">Interactive resources in this chapter</span><a class="chip" href="#lab-proto-ls"><b>Virtual lab</b>Lockstitch prototype bring-up bench</a><a class="chip" href="#lab-servo"><b>Virtual lab</b>Needle positioning: servo tuning</a><a class="chip" href="#lab-solenoid"><b>Virtual lab</b>Solenoid drive: pull-in and release</a><a class="chip" href="#lab-trim"><b>Virtual lab</b>Trim timing editor</a></div>
+<aside class="field"><p>Prerequisites: Chapter 13 (servos, needle positioning, encoders, solenoids, power circuits), Chapter 14 (speed profiles, automatic backtack, trim timing), Chapter 9 (overlock mechanisms) and Chapter 18 (the control box). The WQ-SC reference architecture, proposed module IDs, firmware framework and acceptance metrics are defined in Chapter 19 and used here as they stand; Chapter 22 covers the test bench and test scripts.</p></aside>
+<p>Chapters 13 and 14 explained <em>why</em> an electronic lockstitch machine is controlled the way it is, and Chapter 19 laid out a platform for building prototypes. This chapter puts the two together and answers a more concrete question: given one mechanical lockstitch head and one mechanical overlock head, how do you turn them into control prototypes that trim, stop needle-up, backtack and start and stop on their own, and how do you show with test data that they meet the targets? The aim is a build you can follow step by step. Every section hands you something usable: a BOM, a wiring table, an event table, code, bring-up steps with pass criteria, a test record.</p>
+<p>All numbers in the chapter come from one model. The servo uses the Chapter 13 parameters (reflected inertia J = 6×10⁻⁴ kg·m², K<sub>p</sub> = 200 s⁻¹, K<sub>v</sub> = 0.2 N·m·s/rad, T<sub>i</sub> = 12 ms), the solenoids use the Chapter 13 coil (8 Ω, 20→80 mH, 24 V), and the trim windows are those of Chapter 14. The script is figsrc/ch20_model.py, and Virtual lab 20-1 runs the same model. All values are illustrative or worked-example values.</p>
+
+<h3 id="s20-1">20.1 Opening: turning a mechanical lockstitch head into a control prototype</h3>
+<p>Picture a small lab. On the bench sit a lockstitch head with a trimming mechanism (it was sold for an electronic machine, but you bought only the mechanical part), an old clutch motor, and a box of the Chapter 19 modules: the WQ-SC main controller, a servo drive and motor, a solenoid driver board, a handful of push-pull solenoids, a pedal and a power supply. The job: within two weeks, sew the first seam, trim it, stop needle-up, and send the data from every trim to a dashboard in the digital factory.</p>
+<p>Three things need thinking through before anyone picks up a screwdriver. First, the mechanics: what comes off, how the motor couples to the spindle, where the five solenoids go and which lever each one pushes. Second, the control: which actions are timed by angle and which by time, and where the first values of the event table come from. Third, how you will know it is done: when it counts as working, and when it counts as meeting spec. Plenty of prototypes stall not because someone cannot draw a circuit but because these three questions were never settled, so every change sends the team back to the start. The chapter follows that order: system and hardware in 20.2, firmware in 20.3, step-by-step bring-up in 20.4, acceptance in 20.5. Sections 20.6–20.7 switch to the overlock machine, and 20.8 looks back at how much the two prototypes share.</p>
+
+<h3 id="s20-2">20.2 System build-up of the lockstitch prototype</h3>
+<h4 id="s20-2-1">20.2.1 Block diagram</h4>
+<p>Fig. 20-1 applies the five-layer reference architecture of Chapter 19 to this lockstitch machine. At the bottom is the retrofitted mechanics: the motor drives the spindle directly through a jaw coupling (direct drive), or sits under the table with a 1:1 timing belt. Above that come the actuators and sensors. The spindle servo motor carries a 2500-line incremental encoder, which gives 10 000 counts per revolution after ×4 decoding, a resolution of 0.036°. Five push-pull solenoids handle trimming, wiping, backtack, foot lift and tension release, and the pedal holds a Hall sensor. The drive layer has the servo drive, a 6-channel solenoid driver, a 24 V switch-mode supply and the E-stop chain. The real-time layer is a single WQ-SC controller board. At the top, the gateway publishes status and the measurements from each trim on topics such as <code>wq/sewing/&lt;area&gt;/&lt;cell&gt;/measurement</code>.</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c20_lsarch.png"><img src="img/en/fig_c20_lsarch.png" alt="Fig. 20-1 System build-up of the lockstitch prototype WQ-SC/LS" loading="lazy"></a><figcaption>Fig. 20-1　System build-up of the lockstitch prototype WQ-SC/LS (illustrative; IDs starting with D- are proposed IDs, planned for the library)</figcaption></figure>
+<p>One connection deserves its own paragraph. The encoder plugs into the servo drive, which needs it for field-oriented control, and the drive repeats A, B and Z 1:1 to the controller. The encoder timer on the controller counts them itself, so the controller holds the spindle angle and can fire solenoids by angle without going through a bus. If the drive instead reported the angle over CAN FD, each frame could carry a few hundred microseconds of delay and jitter. At a trim speed of 300 r/min, 0.5 ms is 0.9°. That sounds small, but it is random, and it adds straight onto the spread of the knife-entry angle. Speed commands, status and parameters are not that sensitive to time, so CAN FD suits them fine.</p>
+
+<h4 id="s20-2-2">20.2.2 Mechanical retrofit</h4>
+<p>Fig. 20-2 shows where everything goes. Off come the clutch motor, the V-belt and its guard, and the mechanical positioner (the synchroniser that older machines carry on the handwheel). On go the following, by number:</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c20_mount.png"><img src="img/en/fig_c20_mount.png" alt="Fig. 20-2 Retrofit positions" loading="lazy"></a><figcaption>Fig. 20-2　Retrofitting a mechanical lockstitch head: what comes off, what goes on, and where (illustrative, not to scale)</figcaption></figure>
+<p><strong>Spindle motor</strong>　Direct drive is the first choice. The motor mounts on a flange at the back of the housing, a jaw coupling (A-CPL-JAW) joins motor shaft and spindle, and the handwheel moves to the motor's rear end. The coupling tolerates a little misalignment, but not much: its elastomer is squeezed on every revolution and heats up. Check the alignment of motor shaft and spindle with a dial indicator against the limits in the coupling's specification table. The under-table belt drive is the gentler retrofit if you would rather not touch the housing. It must be a timing belt (A-PUL-HTD pulleys + C-BLT-BELT) at a 1:1 ratio, and section 20.6 shows why: with a ratio that is not a whole number, the encoder index stops lining up with the same spindle angle on every revolution.</p>
+<p><strong>Five solenoids</strong>　The trimmer solenoid goes under the bed beside the hook and swings the moving knife through a link (the "direct drive" type of Chapter 14). The wiper solenoid sits at the front of the arm, so the wiper sweeps under the needle. The backtack solenoid sits inside the arm and pulls the reverse lever of the stitch regulator. The foot-lift solenoid goes under the bed and pushes the lever that the knee lifter used to work. The tension-release solenoid sits on the arm and pushes the release pin of the tension assembly. A head built for trimming usually has these mounting holes and levers already. Where it does not, you make brackets and use library screws and return springs (A-SCR-SHC, A-SPR-CMP). Match the solenoid stroke to the useful travel of the lever with 0.3–0.5 mm to spare, so the lever is in position by the time the armature seats. It must not be the other way round, with the lever bottoming out while the armature is still short of its stop. In that case the hold current cannot keep the armature in, the coil keeps toggling between boost and hold, and you get heat and noise.</p>
+<p><strong>Two switches</strong>　A head-tilt switch (proximity switch, D-SNS-PROX) between bed and table opens when the head is tilted back for service, and the firmware then refuses to start. The pedal Hall sensor (D-SNS-HALL) is fitted to the pedal linkage under the table.</p>
+
+<h4 id="s20-2-3">20.2.3 Bill of materials</h4>
+<p>Table 20-1 is the prototype's BOM. Following the Chapter 19 convention, sewing-control modules starting with D are proposed IDs, planned for the library and not yet in it; entries starting with A or C already exist in the parts library. The specification column gives only the parameters that drive the selection, with the illustrative values used in this book.</p>
+<div class="tbl"><table><caption>Table 20-1　Bill of materials of the lockstitch prototype WQ-SC/LS (illustrative)</caption><thead><tr><th>Fig. 20-2</th><th>ID</th><th>Item</th><th>Qty</th><th>Key parameters (illustrative)</th><th>Basis</th></tr></thead><tbody>
+<tr><td>—</td><td>D-CTL-WQSC</td><td>WQ-SC main controller</td><td>1</td><td>Cortex-M4F class, ≥ 1 encoder input, CAN FD, DI 8, DO 8, AI 4</td><td>I/O count, 20.2.4</td></tr>
+<tr><td>①</td><td>D-MOT-PMSM</td><td>AC permanent-magnet servo motor</td><td>1</td><td>peak torque 2.5 N·m, max speed ≥ 6000 r/min, encoder_ppr 2500</td><td>Chapter 13 inertia and acceleration; max speed set by the overlocker, shared by both</td></tr>
+<tr><td>①</td><td>D-ENC-INC</td><td>Incremental encoder (on the motor)</td><td>1</td><td>2500 lines, index, differential output</td><td>0.036° per count</td></tr>
+<tr><td>—</td><td>D-DRV-SERVO</td><td>Servo drive</td><td>1</td><td>single-phase 220 V, CAN FD, speed/torque modes, 1:1 encoder repeat, braking resistor</td><td>Chapter 13 stopping energy</td></tr>
+<tr><td>②–⑥</td><td>D-SOL-PUSH</td><td>Push-pull solenoid</td><td>5</td><td>stroke 3 mm, spring preload 7 N, coil_R 8 Ω</td><td>Chapter 13 solenoid model</td></tr>
+<tr><td>—</td><td>D-DRV-SOL</td><td>Solenoid driver board</td><td>1</td><td>6 channels, 24 V boost, 1 A chopped hold, 48 V Zener clamp, current read-back</td><td>Chapter 13; one spare channel</td></tr>
+<tr><td>—</td><td>D-PSU-SMPS</td><td>Switch-mode supply</td><td>1</td><td>24 V, 200 W</td><td>Power budget, 20.2.5</td></tr>
+<tr><td>⑧</td><td>D-SNS-HALL</td><td>Pedal Hall sensor</td><td>1</td><td>output 0.5–4.5 V</td><td>20.3.5</td></tr>
+<tr><td>⑦</td><td>D-SNS-PROX</td><td>Proximity switch (head tilt)</td><td>1</td><td>sensing distance around 4 mm</td><td>Safety interlock</td></tr>
+<tr><td>—</td><td>D-GW-WQSC</td><td>Gateway module</td><td>1</td><td>Ethernet/Wi-Fi, MQTT, web parameter page</td><td>Chapters 26, 27</td></tr>
+<tr><td>—</td><td>D-HMI-PANEL</td><td>Touch panel (optional)</td><td>0–1</td><td>7 inch</td><td>The web page can stand in during prototyping</td></tr>
+<tr><td>①</td><td>A-CPL-JAW</td><td>Jaw coupling</td><td>1</td><td>bores to suit motor shaft and spindle</td><td>Direct-drive option</td></tr>
+<tr><td>①′</td><td>A-PUL-HTD, C-BLT-BELT</td><td>Timing pulleys, timing belt</td><td>2, 1</td><td>equal tooth counts (1:1)</td><td>Under-table belt option (either/or)</td></tr>
+<tr><td>②–⑥</td><td>A-SPR-CMP, A-SCR-SHC</td><td>Return springs, socket-head screws</td><td>as needed</td><td>per bracket design</td><td>Solenoid linkage return</td></tr>
+<tr><td>—</td><td>(not in library)</td><td>E-stop button, safety relay, breaker, residual-current device, terminals, cables</td><td>—</td><td>per electrical practice</td><td>20.2.5</td></tr>
+</tbody></table></div>
+
+<h4 id="s20-2-4">20.2.4 Wiring table and I/O map</h4>
+<p>The wiring table is what makes the prototype buildable from the book, and later it is the basis for fault-finding. Table 20-2 ties every wire to a port on the controller and to a name in the firmware. The HAL channel names are the third column; moving a wire means editing the matching configuration entry, not the code.</p>
+<div class="tbl"><table><caption>Table 20-2　Wiring table and I/O map of the lockstitch prototype (illustrative)</caption><thead><tr><th>Controller port</th><th>Signal</th><th>Firmware name</th><th>Other end</th><th>Electrical</th><th>Notes</th></tr></thead><tbody>
+<tr><td>ENC1 A/B/Z</td><td>Spindle encoder</td><td><code>enc_spindle</code></td><td>Servo drive encoder output</td><td>RS-422 differential, twisted shielded pair</td><td>Shield earthed at the control-box end</td></tr>
+<tr><td>CAN FD 1</td><td>Speed command, status, parameters</td><td><code>spindle_*</code></td><td>Servo drive</td><td>120 Ω termination at each end</td><td>10 ms heartbeat; 3 missed frames → SAFE</td></tr>
+<tr><td>SPI1</td><td>6 solenoid channels</td><td><code>sol_*</code></td><td>Solenoid driver</td><td>isolated on the board</td><td>Per-channel current read-back, used for calibration in 20.4.4</td></tr>
+<tr><td>SOL1</td><td>Trim</td><td><code>SOL_TRIM</code></td><td>Solenoid ②</td><td>24 V, 8 Ω</td><td>Driven by the event table</td></tr>
+<tr><td>SOL2</td><td>Wipe</td><td><code>SOL_WIPE</code></td><td>Solenoid ③</td><td>24 V</td><td>Timed after "stopped"</td></tr>
+<tr><td>SOL3</td><td>Backtack</td><td><code>SOL_BT</code></td><td>Solenoid ④</td><td>24 V</td><td>Switched by angle (20.3.4)</td></tr>
+<tr><td>SOL4</td><td>Foot lift</td><td><code>SOL_PFL</code></td><td>Solenoid ⑤</td><td>24 V, long hold after boost</td><td>Check hold-current heating</td></tr>
+<tr><td>SOL5</td><td>Tension release</td><td><code>SOL_TREL</code></td><td>Solenoid ⑥</td><td>24 V</td><td>Driven by the event table</td></tr>
+<tr><td>SOL6</td><td>Spare</td><td>—</td><td>—</td><td>—</td><td>e.g. a blow-off valve later</td></tr>
+<tr><td>AI1</td><td>Pedal</td><td><code>io_pedal</code></td><td>Hall sensor ⑧</td><td>0.5–4.5 V, RC filter</td><td>Outside 0.3–4.7 V = broken wire</td></tr>
+<tr><td>DI1</td><td>E-stop (monitor)</td><td><code>io_estop</code></td><td>Second contact of the E-stop button</td><td>24 V, opto-isolated</td><td>First contact hard-wired to cut enable and 24 V</td></tr>
+<tr><td>DI2</td><td>Head tilt</td><td><code>io_tilt</code></td><td>Proximity switch ⑦</td><td>24 V, opto-isolated</td><td>Open → start inhibited</td></tr>
+<tr><td>DI3</td><td>Thread break (optional)</td><td><code>io_thread</code></td><td>Photoelectric sensor</td><td>24 V</td><td>Chapter 13</td></tr>
+<tr><td>CAN FD 2</td><td>Gateway</td><td><code>gw_*</code></td><td>Gateway module</td><td>—</td><td>MQTT topics in 20.5</td></tr>
+</tbody></table></div>
+
+<h4 id="s20-2-5">20.2.5 Power and safety</h4>
+<p><strong>Power budget</strong>　What the 24 V supply must cope with is solenoid boost current. During boost each coil draws up to 24/8 = 3 A. In the standard event table, trim and tension release switch on at 300° and 310°, and each boost lasts 10 ms. At 300 r/min those two switch-ons are only 5.6 ms apart, so the boosts overlap and the peak is about 6 A. The foot lift acts only after the wiper has returned, so it never overlaps with them. With about 0.5 A for the controller and sensors, the peak is about 6.5 A, or 156 W, so a 24 V, 200 W supply leaves some margin. The average is tiny: one trim uses roughly 0.9 J in the solenoids (rough estimate), well under 0.5 W at 30 trims a minute. The coil that does need checking is the foot lift. It stays held while the operator handles the work, and holding at 1 A is 8 W, so check it against the coil's permitted duty cycle.</p>
+<p><strong>E-stop and interlocks</strong>　Chapter 18 cited the IEC 60204-31 rule that machines started by a hold-to-run device such as a pedal may omit an emergency-stop button. A prototype is a different case: the guards may not be on yet and the firmware is unproven. This book therefore recommends a two-contact E-stop on every prototype. One contact is hard-wired: through a safety relay it removes the servo drive's enable input and the solenoids' 24 V. The other goes to DI1 so the firmware knows about it and logs it. Never rely on firmware alone to stop the machine, because if the firmware fails the E-stop fails with it. With the head-tilt switch open, starting is inhibited. Starting is also inhibited if the pedal is not in neutral at power-up, since ISO 10821 requires protection against unexpected start-up (Chapter 18).</p>
+<p><strong>Earthing and guarding</strong>　The head, the motor frame and the control-box enclosure are all bonded to protective earth (PE) with green-yellow wire, each run separately to the earth terminal and not through signal ground. Fit a residual-current device ahead of the supply. Route the encoder cable apart from the motor power cable, and where they must cross, cross them at right angles. The belt option needs a belt guard; on the direct-drive option the coupling needs a cover. Fingers must not be able to reach anything that turns.</p>
+
+<h3 id="s20-3">20.3 Firmware of the lockstitch prototype</h3>
+<h4 id="s20-3-1">20.3.1 Structure: state machine + angle interrupt + HAL</h4>
+<p>Fig. 20-3 shows the firmware structure, which follows the Chapter 19 framework. The top row is the state machine. IDLE (foot down, waiting for the pedal) leads to RUN (pedal speed control, including the start backtack and soft start), then SLOW (decelerate to trim speed), TRIM (trim event table active), POSITION (position loop to needle-up) and back to IDLE (wipe, lift foot). A fault in any state leads to SAFE. Below are three task layers. A 10 kHz angle interrupt reads the encoder, scans the event table and counts backtack stitches. A 1 kHz control task runs the state machine, the speed profile and the position loop. Background tasks handle pedal filtering, parameters, fault codes, logging and the gateway. At the bottom is the HAL, with one set of interfaces per module type.</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c20_fw.png"><img src="img/en/fig_c20_fw.png" alt="Fig. 20-3 Firmware of the lockstitch prototype" loading="lazy"></a><figcaption>Fig. 20-3　Firmware of the lockstitch prototype: state machine, event table in the angle interrupt, HAL (illustrative)</figcaption></figure>
+<p>Why put the events in a 10 kHz angle interrupt? As Chapter 13 said, actions fired by angle must sit close to the hardware. At 10 kHz the table is checked every 0.1 ms. In that time the spindle turns 0.18° at a trim speed of 300 r/min and 0.42° at 700 r/min, and that is the worst-case firing error, an order of magnitude below the spread of the solenoid delay. For more precision you can fire straight from a timer compare at a set count. At the prototype stage, though, a 10 kHz scan is enough, and the code is simpler and easier to debug.</p>
+<p>The chapter writes event-table angles as the <strong>trim-cycle angle</strong> ψ. The trim stitch (the last stitch) runs from 0° to 360°, and the next revolution is counted as 360–720°. So 408° in the table means 48° of the next revolution. Throughout the book, zero is needle-bar top dead centre (Chapters 3 and 8), so the encoder reading must first be calibrated to that zero (20.4.2).</p>
+
+<h4 id="s20-3-2">20.3.2 The trim event table</h4>
+<p>Each row of the event table is (start angle, end angle, action, condition). Table 20-3 is the prototype's standard table for a trim speed of 300 r/min, and the last two columns show how it meets the Chapter 14 constraints. The wipe and foot-lift rows are conditioned on "stopped": once the spindle has stopped, the angle no longer changes, so these actions cannot be ordered by angle and are ordered by time instead.</p>
+<div class="tbl"><table><caption>Table 20-3　Trim event table (trim speed 300 r/min, worked example)</caption><thead><tr><th>Row</th><th>Start</th><th>End</th><th>Action</th><th>Condition</th><th>Chapter 14 constraint</th><th>Worked result</th></tr></thead><tbody>
+<tr><td>1</td><td>300°</td><td>408° (48° next rev)</td><td>SOL_TRIM</td><td>TRIM state</td><td>Knife enters at 300°–330°; cut near the take-up top at 55° (45°–65° in this chapter)</td><td>Entry 311°–317°; cut at about 54°</td></tr>
+<tr><td>2</td><td>310°</td><td>≥ 430° (held until stopped)</td><td>SOL_TREL</td><td>TRIM state</td><td>Tension released over at least 335° to 55° next rev</td><td>Opens at 321°–327°, closes when stopped</td></tr>
+<tr><td>3</td><td>385° (25° next rev)</td><td>—</td><td>Engage position loop</td><td>TRIM → POSITION</td><td>Stop after the cut and before 96.7° (5° before the needle enters)</td><td>Stops at 70°, error −0.4°</td></tr>
+<tr><td>4</td><td>stopped + 0 ms</td><td>+ 40 ms</td><td>SOL_WIPE</td><td>Stopped flag</td><td>Wipe after the spindle has stopped</td><td>Pull-in 12 ms, held 40 ms</td></tr>
+<tr><td>5</td><td>stopped + 80 ms</td><td>next pedal press</td><td>SOL_PFL</td><td>Stopped flag</td><td>Lift the foot only after the wiper has returned (≥ 55 ms)</td><td>—</td></tr>
+</tbody></table></div>
+<p><strong>Where the first values come from</strong>　The switch-on angle in row 1 follows the Chapter 14 relation: actual knife-entry angle = command angle + 6nt. The solenoid pull-in delay t comes from the Chapter 13 model under different conditions. At 24 V and 8 Ω (cold) it is 6.9 ms. With the supply at ±10% and the coil warming from 8 Ω to 9.5 Ω (a rise of about 48 K), pull-in varies between 6.2 and 9.4 ms. At 300 r/min the spindle turns 1.8° per millisecond, so the pull-in is worth 11.2°–17.0°, a spread of 5.7°. The window centre of 315° minus the mean lead of 14.1° gives a switch-on angle of 301°, rounded to 300°. Knife entry then falls at 311°–317°, with more than ten degrees to spare at each side. Release depends on the hold current and the Zener and hardly moves with voltage or temperature, staying at about 5.1 ms. A switch-off angle of 408° puts the cut near 54°. Row 2 must open the tension before 335°. The slowest pull-in of 9.4 ms is worth 17°, so the switch-on angle can be no later than 318°; the table uses 310°.</p>
+<p>Fig. 20-4 plots this table against 400 random simulation runs. Look at the spindle-speed line. Once the position loop engages at 25°, the speed is first pulled to the 200 r/min positioning speed and then brought down to stop at 70°. The cut happens during that deceleration, so the switch-off angle cannot simply be converted at 300 r/min; it has to follow the real speed curve. That is why these values are worked out with the model rather than with a single formula.</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c20_events.png"><img src="img/en/fig_c20_events.png" alt="Fig. 20-4 Trim event table vs. actual motion" loading="lazy"></a><figcaption>Fig. 20-4　Trim event table vs. actual motion: commands (top), knife entry and cut, tension release and spindle speed; wipe and foot lift after the stop on the right (worked example, 400 random runs)</figcaption></figure>
+<p>When the trim speed changes, the table has to change with it. At 700 r/min the spindle turns 4.2° per millisecond, so the pull-in is worth 26°–40° with a spread of 13.4°. The trim switch-on angle moves forward to about 285° and the tension release to about 290°; see the worked results in 20.5 and Task 3 of Virtual lab 20-1. The firmware could also advance the angles automatically with speed: add a column "delay compensation, ms" to the table and fire at table angle − 6n·t̄. For the prototype, leave this out at first. Automatic compensation hides calibration errors, so get the machine working with fixed angles before adding it.</p>
+
+<h4 id="s20-3-3">20.3.3 Key code: event table and trim sequence</h4>
+<p>The code below shows the event-table data structure and the scan in the angle interrupt. Angles are integers in units of 0.1°, to avoid floating point, and the trim-cycle angle ψ runs from 0 to 7199. Each row acts only at the moment the angle crosses from below its start angle to at or above it, so nothing fires again once the spindle has stopped.</p>
+<pre><code class="language-c">/* event.h — trim event table (parameter area, editable from the web page, versioned) */
+typedef struct {
+    uint16_t on_x10;     /* start angle, 0.1°, trim-cycle angle 0..7199 */
+    uint16_t off_x10;    /* end angle; 0xFFFF = hold until "stopped" */
+    uint8_t  ch;         /* SOL_TRIM, SOL_TREL, ... */
+    uint8_t  cond;       /* COND_TRIM: active only in TRIM/POSITION */
+} evt_t;
+
+#define EVT_MAX 8
+extern evt_t    evt_tab[EVT_MAX];
+extern uint8_t  evt_n;
+extern uint16_t evt_ver;             /* parameter version, reported with the log */
+
+/* angle_isr.c — 10 kHz, called from a timer interrupt */
+static int32_t psi_prev;             /* previous trim-cycle angle, 0.1° */
+
+void angle_isr(void)
+{
+    int32_t cnt = enc_read(&amp;enc_spindle);        /* accumulated count (direction and offset calibrated) */
+    int32_t psi = enc_to_psi_x10(cnt);            /* 0.1°, zeroed to 0..3599 when the trim starts */
+    if (sm_state == ST_TRIM || sm_state == ST_POSITION) {
+        for (uint8_t i = 0; i &lt; evt_n; i++) {
+            const evt_t *e = &amp;evt_tab[i];
+            if (psi_prev &lt; e-&gt;on_x10 &amp;&amp; psi &gt;= e-&gt;on_x10)  sol_on(e-&gt;ch);
+            if (e-&gt;off_x10 != 0xFFFF &amp;&amp;
+                psi_prev &lt; e-&gt;off_x10 &amp;&amp; psi &gt;= e-&gt;off_x10) sol_off(e-&gt;ch);
+        }
+    }
+    bt_count_isr(psi_prev, psi);                  /* backtack stitch counter, 20.3.4 */
+    psi_prev = psi;
+}</code></pre>
+<p>The trim sequence lives in the 1 kHz control task. It never switches solenoids directly. It changes state, sets speeds, schedules the wiper and foot lift by time once the spindle has stopped, and puts a time-out on every step:</p>
+<pre><code class="language-c">/* sm_trim.c — trim sequence in the 1 kHz control task (excerpt) */
+case ST_SLOW:                                     /* decelerate to trim speed */
+    spindle_set_speed(P.trim_rpm);                /* 300 r/min */
+    if (spindle_rpm() &lt;= P.trim_rpm + 10 &amp;&amp; psi_in(1700, 1800)) {
+        enc_psi_zero_at(1800);                    /* the trim stitch counts ψ from 180° */
+        sm_enter(ST_TRIM, /*timeout ms*/ 400);
+    }
+    break;
+case ST_TRIM:                                     /* the event table runs in the angle ISR */
+    if (psi_now() &gt;= P.engage_x10) {              /* 3850 = 25° next rev */
+        spindle_position(P.target_x10);           /* 4300 = 70° next rev, positioning speed 200 r/min */
+        sm_enter(ST_POSITION, 300);
+    }
+    break;
+case ST_POSITION:
+    if (spindle_stopped(5 /*ms*/, 5 /*0.1°*/, 10 /*r/min*/)) {
+        evt_flush_until_stop();                   /* switch off "hold until stopped" rows, e.g. release */
+        log_trim(psi_now(), sm_elapsed_ms());     /* stop angle, trim-cycle time → measurement */
+        timer_after(P.wipe_on_ms,  sol_on,  SOL_WIPE);
+        timer_after(P.wipe_on_ms + P.wipe_len_ms, sol_off, SOL_WIPE);
+        timer_after(P.pfl_on_ms,   sol_on,  SOL_PFL);
+        sm_enter(ST_IDLE, 0);
+    }
+    break;
+/* any state on time-out, over-current, encoder loss or E-stop: sm_enter(ST_SAFE) → sol_all_off(), spindle coasts or brakes */</code></pre>
+<p>Two details. First, the test in <code>spindle_stopped()</code> (error ≤ 0.5°, speed &lt; 10 r/min, held for 5 ms) is the "stopped flag". The wiper and foot lift count from it, so if it is too loose the wiper sweeps a needle that is still creeping, and if it is too strict the trim cycle drags on. Second, <code>evt_flush_until_stop()</code> deals with rows whose end angle lies beyond the stop angle, such as tension release. The spindle stops at 70° and never reaches an end angle past 430°, so those rows are all switched off at the stop.</p>
+
+<h4 id="s20-3-4">20.3.4 Automatic backtack: stitch counting and switching angle</h4>
+<p>The key to backtacking is to reverse the feed while the feed dog is below the throat plate (Chapter 14: 114.2°–325.8°, an idle angle of 211.6°). The firmware issues the command at 114.2° on every stitch. Take the backtack solenoid delay as 18–22 ms (illustrative; it moves a linkage and spring and is slower than the trimmer). The change-over must be finished by 325.8° with 10° to spare, so the speed limit is n = 201.6 / (6t): 1870 r/min at 18 ms and 1530 r/min at 22 ms. The prototype therefore backtacks at 1500 r/min, where even the slowest 22 ms is worth 198°, still inside 201.6°. Stitches are counted in the angle interrupt, one for each pass through 114.2°:</p>
+<pre><code class="language-c">/* bt.c — start backtack: bt_n reverse stitches, then forward; switch inside the idle angle */
+#define BT_SWITCH_X10  1142                       /* 114.2°: feed dog just below the plate */
+static volatile uint8_t bt_left;                  /* reverse stitches still to go */
+
+void bt_start(uint8_t n) { bt_left = n; sol_on(SOL_BT); spindle_limit(P.bt_rpm); }
+
+void bt_count_isr(int32_t prev, int32_t now)      /* now, prev: single-turn angle 0..3599 */
+{
+    if (bt_left == 0) return;
+    if (prev &lt; BT_SWITCH_X10 &amp;&amp; now &gt;= BT_SWITCH_X10) {
+        if (--bt_left == 0) { sol_off(SOL_BT); spindle_limit(P.max_rpm); }
+    }
+}</code></pre>
+<p>Watch the starting point. Before the pedal is pressed the spindle sits needle-up at 70°. <code>bt_start()</code> energises the backtack solenoid before the spindle moves, and with the spindle at rest the change-over has no timing problem, so the very first feed is already in reverse. After that each pass through 114.2° takes one off the count, and when it reaches zero the solenoid drops out, so the return to forward feed starts right at the beginning of the idle angle. Chapter 14 covered the mechanical reasons why reverse stitches fail to line up (backlash, fabric elasticity). On the prototype, a "backtack compensation" parameter trims the change-over angle separately on the first and last stitches, and the alignment is measured with a camera at acceptance (20.5).</p>
+
+<h4 id="s20-3-5">20.3.5 Pedal map and speed profile</h4>
+<p>The pedal is an analogue signal of 0.5–4.5 V. The prototype maps it in bands: toe down (2.1–4.3 V) controls speed, neutral (1.5–2.1 V) stops, heel lightly back (0.9–1.5 V) lifts the foot, heel fully back (&lt; 0.9 V) trims. Each band edge has 0.1 V of hysteresis so the command does not chatter at a boundary, and anything outside 0.3–4.7 V is treated as a broken sensor wire. The speed band follows a square law, so the speed changes slowly just as the toe goes down, which makes it easier to line up the work:</p>
+<pre><code class="language-c">/* pedal.c — pedal voltage → command (background task, 1 kHz, 8-point moving average applied) */
+pedal_cmd_t pedal_map(float v)
+{
+    static pedal_cmd_t last = PED_NEUTRAL;
+    const float h = (last == PED_RUN) ? 0.1f : 0.0f;          /* hysteresis */
+    if (v &lt; 0.3f || v &gt; 4.7f)        return fault(F_PEDAL_WIRE), PED_FAULT;
+    if (v &lt; 0.9f)                     return last = PED_TRIM;
+    if (v &lt; 1.5f)                     return last = PED_LIFT;
+    if (v &lt; 2.1f - h)                 return last = PED_NEUTRAL;
+    float u = (v - 2.1f) / 2.2f; if (u &gt; 1.0f) u = 1.0f;
+    g_rpm_cmd = P.min_rpm + (P.max_rpm - P.min_rpm) * u * u;   /* 200..4000 r/min */
+    return last = PED_RUN;
+}</code></pre>
+<p>The pedal gives only the speed the operator asks for. The speed profile then applies the Chapter 14 limits: a soft start (the first 3 stitches after the start backtack are held to 400 r/min) and acceleration and deceleration capped at 60% of the servo's capability, about 2650 rad/s². At that rate, 400→4000 r/min takes 0.14 s and 5.2 revolutions, and 4000→300 r/min takes 0.15 s and also 5.2 revolutions. The limiting is a ramp on the pedal command inside the control task, not the servo drive's own acceleration parameters, because the deceleration before a trim has to be planned in stitches, not in time.</p>
+
+<h3 id="s20-4">20.4 Step-by-step bring-up</h3>
+<p>The worst thing to do at first power-up is to connect everything, press start and see whether it sews. When something goes wrong, dozens of possible causes are tangled together and cannot be separated. Go one step at a time instead. Each step adds one new thing and has a clear pass criterion, and you move on only when it passes (Table 20-4). Write every result into the bring-up log; that log later becomes the source of the Chapter 22 test cases.</p>
+<div class="tbl"><table><caption>Table 20-4　Bring-up steps and pass criteria for the lockstitch prototype (illustrative)</caption><thead><tr><th>Step</th><th>What to do</th><th>Pass criterion</th><th>If it fails, check first</th></tr></thead><tbody>
+<tr><td>0</td><td>Unpowered checks: PE continuity, insulation, wiring against the table</td><td>Low PE loop resistance, insulation good, wiring matches Table 20-2</td><td>Loose terminals, wrong ports</td></tr>
+<tr><td>1</td><td>24 V only: controller, sensors, E-stop chain; jog each solenoid (spindle still)</td><td>E-stop really removes the 24 V; every solenoid moves, current read-back normal; pedal reads 0.5–4.5 V</td><td>E-stop wiring, reversed solenoid, pedal wiring</td></tr>
+<tr><td>2</td><td>Turn the handwheel by hand; calibrate encoder direction and index offset</td><td>Reading increases on forward rotation; symmetric two-point residual ≤ 0.3°</td><td>A/B swapped, index wire</td></tr>
+<tr><td>3</td><td>Servo on: identify inertia, tune the velocity loop, then the position loop</td><td>Steady 200 r/min; positioning overshoot ≤ 0.5°, settling ≤ 60 ms, steady-state error ≤ 0.05° (Chapter 13 criteria)</td><td>Inertia setting, gains</td></tr>
+<tr><td>4</td><td>Calibrate solenoid delays by angle (no thread, no fabric)</td><td>Measured pull-in angles agree with the model (±2°); command angles worked out</td><td>Supply voltage, coil temperature, sticking linkage</td></tr>
+<tr><td>5</td><td>Trial sewing: thread up, sew slowly, then backtack and trim</td><td>Trims succeed run after run, stop is needle-up, no unthreading at restart</td><td>Table 20-5</td></tr>
+</tbody></table></div>
+
+<h4 id="s20-4-1">20.4.1 Power-up checks</h4>
+<p>In steps 0 and 1 the spindle does not turn. First prove that the E-stop really cuts power. Press it and measure the 24 V at the solenoid driver and the enable input of the servo drive with a multimeter: both must be off. Then jog the solenoids one by one from the web parameter page, and check three things on each: is it moving the right part (which lever does it push), in the right direction (push or pull), and does the current read-back show the "notch" described in Chapter 13? A notch means the armature really moved during pull-in. No notch may mean the armature is stuck or the linkage is bottoming out.</p>
+
+<h4 id="s20-4-2">20.4.2 Encoder direction and index alignment</h4>
+<p>The encoder is on the motor, and where its index mark sits on the disc has nothing to do with the spindle's top dead centre. If the motor is mounted the other way round, or the drive swaps A and B when it repeats them, the count direction can also be reversed. So the first job is to make the firmware angle match the book's convention: increasing on forward rotation, with 0° exactly at needle-bar top dead centre.</p>
+<p><strong>Direction</strong>　Turn the handwheel forward (towards you, looking at the handwheel) and see whether the reading goes up or down. If it goes down, set the count direction to inverted in the parameters. Do not skip this step on a real machine. With the direction wrong, the servo velocity loop becomes positive feedback, the motor runs away the moment it starts, and the drive trips on "overspeed" or "encoder fault".</p>
+<p><strong>Index offset: why not just find TDC?</strong>　The obvious idea is to turn the handwheel, find the highest point of the needle bar with a dial gauge and note the reading there. The problem is that a slider-crank barely moves near top dead centre. With the needle-bar dimensions of Chapters 3 and 8 (r = 15.5 mm, l = 55 mm), the bar has dropped only 0.01 mm at 1.8° from TDC, which the gauge cannot show. "Finding the top" therefore carries an uncertainty of ±1.8° (Fig. 20-5, right).</p>
+<p><strong>Symmetric two-point method</strong>　Measure where the needle bar moves fastest instead. The displacement curve of a centred slider-crank is symmetric about both dead centres. Pick a gauge reading, say 12.00 mm below TDC. Turn the handwheel forward, note the encoder reading r<sub>1</sub> as the bar passes that height on the way down, keep turning, and note r<sub>2</sub> as it passes on the way up. The mean of the two readings is bottom dead centre:</p>
+<div class="math">\[ \varphi_{BDC} = \frac{r_1 + r_2}{2}, \qquad \Delta = 180^\circ - \varphi_{BDC} \]</div>
+<p>Add Δ to the offset parameter and write it (if r<sub>2</sub> has wrapped past 360°, add 360° before averaging). At 12 mm the needle bar moves 0.26 mm per degree, so the gauge's 0.01 mm resolution corresponds to only 0.04°. After averaging the two readings, the calibration uncertainty is within 0.05°, more than forty times better than looking for the top (Fig. 20-5).</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c20_zcal.png"><img src="img/en/fig_c20_zcal.png" alt="Fig. 20-5 Symmetric two-point calibration" loading="lazy"></a><figcaption>Fig. 20-5　Finding top dead centre: needle-bar displacement and the symmetric two-point method (left); the band near TDC where the gauge shows no change (right) (worked example)</figcaption></figure>
+<p><strong>Worked example</strong>　In the prototype of Virtual lab 20-1, the count direction is reversed and the index mark sits at spindle angle 137.6°. With the direction inverted and the offset at 0, the readings at 12.00 mm are r<sub>1</sub> = 307.6° and r<sub>2</sub> = 137.2°. Since r<sub>2</sub> has wrapped past 360°, the mean is (307.6 + 137.2 + 360)/2 = 402.4°, i.e. 42.4°, and Δ = 180° − 42.4° = 137.6°. Once that is written, the reading matches the spindle angle. With direct drive or a 1:1 belt the offset holds at every power-up; with a ratio that is not a whole number it does not, as section 20.6 shows.</p>
+
+<h4 id="s20-4-3">20.4.3 Tuning the velocity and position loops</h4>
+<p>Start by identifying the inertia. In torque mode, apply 1.0 N·m and time the run from rest to 1000 r/min. With the Chapter 13 values, J = 6×10⁻⁴ kg·m² and friction 0.15 N·m, this takes about 75 ms. A longer time means more inertia (a heavier handwheel, say), and the drive's inertia parameter is corrected in proportion. Then tune in the Chapter 13 order. Stiffen the velocity loop first; its bandwidth K<sub>v</sub>/J = 0.2 / 6×10⁻⁴ ≈ 333 rad/s. Set the position gain to a quarter to a half of that bandwidth. The standard 200 s⁻¹ is already 0.6 times the bandwidth, near the upper limit, so do not go higher. An integral time of 12 ms removes the steady-state error that friction would leave. Judge the result with the four Chapter 13 criteria: overshoot ≤ 0.5°, settling ≤ 60 ms, steady-state error ≤ 0.05°, torque saturation ≤ 5 ms. You can rehearse this on the model first in Virtual lab 13-1.</p>
+<section class="lab" id="lab-servo" data-src="labs/servo.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 13-1　Needle positioning: servo tuning</h4></div><p>Adjust position gain, velocity gain and integral time and watch overshoot, settling time and steady-state error as the spindle stops needle-up; retune after doubling the inertia.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/servo.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<p>Stopping after a trim differs slightly from the Chapter 13 stop: the position loop engages with the spindle at the trim speed (300 r/min), not at the positioning speed. The position loop's output is clamped at 200 r/min, so the spindle is first pulled down to 200 r/min and then decelerated by the position loop. In the worked example it takes 62 ms from engaging at 25° to the stopped flag, with 0.08° of overshoot; engaging at 700 r/min, it takes 50 ms.</p>
+
+<h4 id="s20-4-4">20.4.4 Solenoid timing: calibrate in angle, not in time</h4>
+<p>Solenoid delays end up as spindle angles, so calibrate them directly in angle. With no thread and no fabric, run the spindle steadily at trim speed. The firmware energises the trimmer solenoid at a fixed angle φ<sub>c</sub> and logs the coil current at 10 kHz. The bottom of the notch in the current trace marks the moment the armature seats (Chapter 13). Note the spindle angle φ<sub>p</sub> at that moment; the pull-in angle is Δφ = φ<sub>p</sub> − φ<sub>c</sub>. Repeat 20 times each at 200, 300 and 500 r/min. Plotted against speed, Δφ should fall on a straight line through the origin with slope 6t. A t measured this way already includes the driver, the cabling and the real mechanical load, so it is closer to reality than a bench measurement of the solenoid alone on an oscilloscope.</p>
+<p>Release is calibrated the same way: the time for the current to fall to zero plus the mechanical return time of the armature. The return has no electrical signature, so stick a small piece of reflective tape on the moving knife and use a photoelectric sensor to catch the moment it is back home. Also compare cold and hot: trim continuously for 10 minutes to warm the coil, measure again, and see how far the pull-in angle has moved. In the worked model, going from 8 Ω to 9.5 Ω at 24 V stretches pull-in from 6.9 ms to 8.0 ms, a 2° shift at 300 r/min. That is one reason the event table needs margin.</p>
+<section class="lab" id="lab-solenoid" data-src="labs/solenoid.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 13-2　Solenoid drive: pull-in and release</h4></div><p>Adjust drive voltage, boost, hold current and freewheeling and see how the pull-in and release delays convert into spindle angle.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/solenoid.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+
+<h4 id="s20-4-5">20.4.5 Trial sewing and common faults</h4>
+<p>Only when the first four steps pass do you thread up and put fabric in. First, sew a few seams slowly on the pedal without trimming and look at the stitches. Then switch on the start backtack. Finally switch on trimming, starting at a trim speed of 200 r/min and working up to 300 r/min. Log the stop angle, the knife-entry angle (if the knife has reflective tape) and the trim-cycle time for every trim; these records are the first draft of the acceptance in 20.5. Table 20-5 lists the faults met most often during prototype bring-up.</p>
+<div class="tbl"><table><caption>Table 20-5　Common faults during lockstitch prototype bring-up (illustrative)</caption><thead><tr><th>Symptom</th><th>Likely cause</th><th>Check first</th></tr></thead><tbody>
+<tr><td>Overspeed or encoder fault the moment it starts</td><td>Encoder count direction reversed</td><td>Direction check, 20.4.2</td></tr>
+<tr><td>Stop is off by a few degrees, always the same way</td><td>Index offset not calibrated; coupling slipping; belt jumped a tooth</td><td>Turn to needle-up by hand and read the angle; coupling set screws</td></tr>
+<tr><td>Stop hunts back and forth, settles slowly</td><td>Wrong inertia parameter or position gain too high</td><td>Identify inertia again (Chapter 13)</td></tr>
+<tr><td>Bobbin thread cut, needle thread not</td><td>Knife enters too early or too late</td><td>Re-measure pull-in by angle; has the trim speed been raised?</td></tr>
+<tr><td>Trimming is erratic and gets worse when warm</td><td>Hot coil resistance slows pull-in; supply sag</td><td>Re-measure hot; measure supply voltage during boost</td></tr>
+<tr><td>Needle unthreads at restart after trimming</td><td>Tension released late or closed early; stop before the take-up top</td><td>Event-table row 2; stop angle</td></tr>
+<tr><td>Wiper trapped by the presser foot</td><td>Foot lifted before the wiper returned</td><td>Times in event-table rows 4 and 5</td></tr>
+<tr><td>Reverse stitches do not line up</td><td>Backtack speed too high, slow backtack solenoid; mechanism backlash</td><td>Backtack speed; backtack compensation parameter</td></tr>
+<tr><td>Occasional SAFE, log shows CAN heartbeat time-out</td><td>CAN termination, shielding, grounding</td><td>120 Ω at both ends; shield connection</td></tr>
+</tbody></table></div>
+<p>Virtual lab 20-1 runs steps 2, 4 and 5 on a simulated prototype: calibrate the encoder, edit the event table, then run 100 trial trims and look at the spread of trim success and stop error.</p>
+<section class="lab" id="lab-proto-ls" data-src="labs/proto-ls.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 20-1　Lockstitch prototype bring-up bench</h4></div><p>A freshly built lockstitch prototype: calibrate encoder direction and index offset, drag-edit the trim event table, and run 100 trial trims for success rate and stop error.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/proto-ls.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+
+<h3 id="s20-5">20.5 Acceptance testing of the lockstitch prototype</h3>
+<p>Working is not the same as meeting spec. Acceptance uses the metrics set in Chapter 19 and runs automatically on the Chapter 22 test bench. A test script sends commands through the gateway ("trim 1000 times at 300 r/min", for example), reads back the measurements from each run, checks them against the requirement IDs one by one, and writes a report. At the same time it publishes the results in digital-factory format on a topic such as <code>wq/sewing/lab/ls-p0/measurement</code>, where they go into the historian. Here is what one test case looks like (Chapter 22 covers the whole framework; this is just the shape):</p>
+<pre><code class="language-python"># test_ls_trim.py — REQ-LS-01 stop error, REQ-LS-02 trim success (excerpt)
+import statistics as st
+
+def test_trim_1000(bench):                       # bench: the Chapter 22 test-bench fixture
+    bench.set_params(trim_rpm=300, evt_ver="LS-EVT-3")
+    rec = [bench.sew_and_trim(stitches=8) for _ in range(1000)]
+    stop = [r.stop_deg - 70.0 for r in rec]      # spindle angle at the stopped flag (external measurement)
+    ok = sum(r.cut_ok and r.restart_ok for r in rec)   # camera: cut, and next seam starts without unthreading
+    bench.publish("measurement", {"req": "REQ-LS-01", "max_abs_deg": max(map(abs, stop)),
+                                  "mean_deg": st.mean(stop), "n": len(stop)})
+    assert max(map(abs, stop)) &lt;= 1.0            # needle-positioning error ≤ ±1°
+    assert ok / len(rec) &gt;= 0.995                # trim success ≥ 99.5%</code></pre>
+<p>Before the bench is built, the same script can run software-in-the-loop (SIL): the firmware's event table and state machine are connected to this chapter's machine model, and each run draws a random supply voltage (24 V ± 10%), coil temperature (8–9.5 Ω), speed ripple (±2%), friction and load. Fig. 20-6 shows a set of worked results produced that way.</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c20_accept.png"><img src="img/en/fig_c20_accept.png" alt="Fig. 20-6 Worked acceptance results" loading="lazy"></a><figcaption>Fig. 20-6　A set of worked acceptance results: knife-entry angle (left), stop error (centre), trim-cycle pass rate in five cases (right) (software-in-the-loop, worked example)</figcaption></figure>
+<p>With the standard event table, a trim speed of 300 r/min and a calibration residual of 0.1°, all 1000 runs pass. Knife entry falls at 310.4°–316.7°, more than ten degrees from each edge of the window. The stop error runs from −0.60° to −0.44°, with a mean of −0.51° and a standard deviation of 0.06°. It is negative every time because it is recorded when the stopped flag is set. The position loop approaches from below, the stop counts as settled once the error has been inside ±0.5° for 5 ms, and the integral then keeps nudging it towards zero. That moment is also when the wiper starts, so acceptance records the error there.</p>
+<p>The five cases on the right of Fig. 20-6 are more revealing. With the supply sagging to 20 V, pull-in slows and knife entry moves to 313°–320°. It still passes, which shows the margin is adequate. Raising the trim speed to 700 r/min without touching the event table pushes entry to 326°–336°, and only 0.3% pass. Advancing the trim switch-on to 285° and the tension release to 290° brings it back to 100%. The last case has a calibration residual of 0.7°. Trimming itself is fine, but the stop error moves to between −1.20° and −1.04° and every run fails ±1°. The calibration residual adds directly to the stop error, which is why 20.4.2 asks for no more than 0.3°. That is not over-strict.</p>
+<p>The 700 r/min case deserves a second look. It satisfies the windows, but pull-in is now worth 26°–40°, which breaks the Chapter 19 platform metric that solenoid pull-in and release must convert to no more than 20°. Taking the slowest 9.4 ms, the metric allows a trim speed of only 20/(6×0.0094) ≈ 355 r/min. So 700 r/min is an exercise, and acceptance stays at 300 r/min. To trim faster, first make the solenoid quicker and more consistent (a higher boost voltage, Chapter 13), and only then change the event table.</p>
+<p>Table 20-6 is an illustrative test record. Where software-in-the-loop can supply a number, the worked value is entered. Backtack alignment and temperature rise depend on the real mechanism and coils, which the model does not contain, so those rows read "to be measured on the full test bench"; nothing is made up.</p>
+<div class="tbl"><table><caption>Table 20-6　Acceptance test record, lockstitch prototype P1 (illustrative)</caption><thead><tr><th>Requirement</th><th>Item</th><th>Method</th><th>Criterion</th><th>Worked result</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>REQ-LS-01</td><td>Needle-positioning error</td><td>1000 trims, spindle angle at the stopped flag</td><td>≤ ±1°</td><td>−0.60° to −0.44° (SIL)</td><td>Pass (SIL)</td></tr>
+<tr><td>REQ-LS-02</td><td>Trim success</td><td>1000 runs; camera checks the cut and an unthread-free restart</td><td>≥ 99.5%</td><td>1000/1000 (SIL)</td><td>Pass (SIL); machine test pending</td></tr>
+<tr><td>REQ-LS-03</td><td>Backtack alignment</td><td>4-stitch start backtack; camera measures offset between reverse and forward stitches</td><td>≤ 0.3 mm</td><td>—</td><td>To be measured on the full test bench</td></tr>
+<tr><td>REQ-LS-04</td><td>Solenoid pull-in/release as spindle angle</td><td>Angle calibration of 20.4.4 at 300 r/min, cold/hot</td><td>≤ 20°</td><td>Pull-in 11–17°, release about 9° (model)</td><td>Pass (model); confirm by measurement</td></tr>
+<tr><td>REQ-LS-05</td><td>Trim-cycle time</td><td>From 180° of the trim stitch to the stopped flag</td><td>Record</td><td>About 0.18 s (300 r/min)</td><td>Recorded</td></tr>
+<tr><td>REQ-LS-06</td><td>Change-over at backtack speed</td><td>1500 r/min, backtack delay 18–22 ms</td><td>Change-over complete before 325.8°</td><td>Worst case 198° of 201.6°</td><td>Pass (calculation)</td></tr>
+<tr><td>REQ-LS-07</td><td>4 h continuous at top speed</td><td>4000 r/min sewing-and-trim cycle; log coil, motor and drive temperatures and fault codes</td><td>Temperature rises within component ratings, no faults</td><td>—</td><td>To be measured on the full test bench</td></tr>
+</tbody></table></div>
+<p>Every row of the report carries the firmware version and the event-table version (LS-EVT-3, for example). As Chapter 22 explains, the point is that every number can be traced to which firmware, which table and which prototype it was measured on. Only then can you tell, from one iteration to the next, which change made a metric better or worse.</p>
+
+<h3 id="s20-6">20.6 The overlock prototype: what is different</h3>
+<p>With the lockstitch prototype in hand, most of the overlock prototype WQ-SC/OL can be carried straight across: the same controller, servo drive, solenoid driver, power supply and gateway. Four things change. The speed is higher, so the spindle drive and inertia must be worked out again. There is no trimmer solenoid; a chain cutter and suction take its place. A fabric-edge photo sensor provides "start when the fabric arrives, stop when it leaves". And the differential feed can optionally be made electronic. Fig. 20-7 shows the build-up and the state machine.</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c20_ol.png"><img src="img/en/fig_c20_ol.png" alt="Fig. 20-7 Overlock prototype WQ-SC/OL" loading="lazy"></a><figcaption>Fig. 20-7　Overlock prototype WQ-SC/OL: modules identical to the lockstitch prototype (top), changed or added modules (middle), automatic start/stop state machine (bottom) (illustrative)</figcaption></figure>
+
+<h4 id="s20-6-1">20.6.1 Speed, inertia and belt drive</h4>
+<p>The Chapter 9 example machine runs at up to 7000 stitches per minute. Take the spindle-side inertia (spindle, handwheel and the reflected needle-bar and looper mechanisms) as 4×10⁻⁴ kg·m² and the motor rotor as 1.2×10⁻⁴ kg·m² (illustrative). The same motor can drive the spindle directly or step up the speed through a timing belt. If the ratio of spindle speed to motor speed is i, the spindle inertia reflected to the motor shaft is multiplied by i². Table 20-7 compares three ratios, with acceleration times at 60% of peak torque, as in Chapter 14.</p>
+<div class="tbl"><table><caption>Table 20-7　Three spindle-drive options for the overlock prototype (spindle 7000 r/min, worked example)</caption><thead><tr><th>i<br>(spindle/motor)</th><th>Inertia at motor<br>(10⁻⁴ kg·m²)</th><th>Motor top<br>speed (r/min)</th><th>0→7000<br>r/min (s)</th><th>Revs<br>to stop</th><th>Counts per<br>spindle rev</th></tr></thead><tbody>
+<tr><td>1.0 (direct)</td><td>5.2</td><td>7000</td><td>0.25</td><td>14.0</td><td>10 000</td></tr>
+<tr><td>1.25 (belt, 30-tooth motor / 24-tooth spindle pulley)</td><td>7.45</td><td>5600</td><td>0.29</td><td>15.8</td><td>8000</td></tr>
+<tr><td>1.4</td><td>9.0</td><td>5000</td><td>0.32</td><td>17.0</td><td>7142.857…</td></tr>
+</tbody></table></div>
+<p>Direct drive is fastest, but the motor must reach 7000 r/min. The platform motor is specified at 6000 r/min or more (Table 20-1) and is shared by both prototypes, so the overlock prototype uses a 1:1.25 timing belt. The last column is the one people tend to overlook when choosing a ratio. At i = 1.4 a spindle revolution is 7142.857 counts, not a whole number. The motor index lands at a different spindle angle on every turn, so the firmware can no longer use it to correct the spindle angle, and rounding error builds up turn after turn. With i = 1.25 (30-tooth motor pulley, 24-tooth spindle pulley) a spindle revolution is exactly 8000 counts, the spindle angle is (count mod 8000) × 0.045°, and the index lines up every 5 motor revolutions (4 spindle revolutions). Even so, a timing belt can jump a tooth. The overlock prototype therefore adds a needle-up sensor at the handwheel (D-SNS-PROX) that checks the angle every revolution and raises an alarm if it is more than 1° off.</p>
+
+<h4 id="s20-6-2">20.6.2 No trimmer solenoid: chain cutter and suction</h4>
+<p>An overlocker has no bobbin. When a seam ends, the needle and loopers keep forming loops and leave a thread chain behind the fabric (Chapter 9). So there is no need for a lockstitch-style trim that must be completed accurately within one revolution. It is enough to sew a few more stitches after the fabric has gone, until the chain is 30–40 mm long, stop, cut the chain with a pneumatically driven knife and open the suction to carry the tail away. None of this is time-critical. A solenoid valve switching in a dozen or so milliseconds and a cylinder taking a few tens of milliseconds (Chapter 13) are quite fast enough; the worked example energises the cutter valve for 60 ms and the suction for 300 ms. Valve coils are also 24 V inductive loads, so they run from the same solenoid driver board, just without boost.</p>
+
+<h4 id="s20-6-3">20.6.3 Fabric-edge sensor: start when fabric arrives, stop when it leaves</h4>
+<p>The photo sensor sits d<sub>s</sub> = 25 mm ahead of the needle. Fabric covering it means "fabric arrived"; fabric clearing it means "fabric gone". What needs working out is distances and stitch counts. At 7000 r/min and a 3 mm stitch, the fabric moves at 350 mm/s. The sensor's 1 ms response is then 0.35 mm, which is negligible. A 20 ms debounce, however, would be 7 mm, and at 3000 r/min it would be 3 mm instead. So the debounce is counted in stitches, not time: fabric counts as arrived only when it is seen for 2 consecutive stitches, which is 6 mm at any speed. This is the same reasoning as firing trim events by angle rather than by time.</p>
+<p>Once the fabric has gone, another N<sub>1</sub> = d<sub>s</sub>/s = 25/3 ≈ 9 stitches bring the tail of the fabric to the needle, and N<sub>2</sub> = L<sub>c</sub>/s = 40/3 ≈ 14 more make the chain, 23 stitches in all before the stop. The difficulty is that at high speed the machine cannot stop quickly. With the 1:1.25 option of Table 20-7, braking from 7000 r/min at 60% of capability takes 15.8 revolutions, i.e. 15.8 stitches. If braking waited until all 23 stitches were done, the chain would come out almost 16 stitches, about 47 mm, too long. The firmware must therefore brake early: it starts decelerating when the stitches left are ≤ N<sub>b</sub>, and N<sub>b</sub> grows with the square of the speed:</p>
+<div class="math">\[ N_b = \frac{\omega_s^2}{2\,\alpha_s}\cdot\frac{1}{2\pi}, \qquad \alpha_s = i\,\alpha_m \]</div>
+<p>At 7000 r/min, N<sub>b</sub> = 15.8, so braking starts at stitch 7.2 after the fabric leaves the sensor, before the fabric tail has even reached the needle. At 4000 r/min, N<sub>b</sub> = 5.2 and braking starts at stitch 17.8 (Fig. 20-8).</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c20_oltail.png"><img src="img/en/fig_c20_oltail.png" alt="Fig. 20-8 Early braking for stop-when-the-fabric-leaves" loading="lazy"></a><figcaption>Fig. 20-8　"Stop when the fabric leaves" on the overlock prototype: stitches needed to stop versus speed (left); speed versus stitch count after the fabric leaves, with braking left until the end shown dotted (right) (worked example)</figcaption></figure>
+<p>The state machine is the bottom row of Fig. 20-7: WAIT → RUN → TAIL → STOP → CUT → WAIT. The core code follows. Stitches are counted in the angle interrupt (one per pass through needle-up), and the braking decision is made in the 1 kHz task:</p>
+<pre><code class="language-c">/* ol_sm.c — overlock prototype: start on fabric, stop when it leaves, delayed chain cut (1 kHz, excerpt) */
+case OL_WAIT:
+    if (pe_cover_stitches() &gt;= 2 || pedal_run())  { spindle_set_speed(P.run_rpm); sm_enter(OL_RUN, 0); }
+    break;
+case OL_RUN:
+    if (pe_clear_stitches() &gt;= 1) {                /* fabric has left the sensor */
+        tail_left = P.n1 + P.n2;                   /* 9 + 14 = 23 stitches */
+        sm_enter(OL_TAIL, 0);
+    }
+    break;
+case OL_TAIL: {                                     /* tail_left is decremented per stitch in the angle ISR */
+    float nb = brake_revs(spindle_rpm());           /* ω²/(2α)/(2π), α at 60% of capability */
+    if (pe_cover_stitches() &gt;= 2) { sm_enter(OL_RUN, 0); break; }   /* next piece has arrived */
+    if (tail_left &lt;= nb + 0.5f) { spindle_position_next(P.needle_up_x10); sm_enter(OL_STOP, 800); }
+    break; }
+case OL_STOP:
+    if (spindle_stopped(5, 10, 10)) {
+        valve_pulse(VLV_CUT, 60);                   /* cut the chain, 60 ms */
+        valve_pulse(VLV_SUCK, 300);                 /* suction, 300 ms */
+        log_chain(tail_left_at_stop(), sm_elapsed_ms());
+        sm_enter(OL_WAIT, 0);
+    }
+    break;</code></pre>
+<p>One line in TAIL is easy to forget. If the next piece arrives right behind the last one, which is common on a production line, the machine goes back to RUN and keeps sewing instead of stopping to cut. The chain then links the two pieces, and the next operation cuts them apart.</p>
+
+<h4 id="s20-6-4">20.6.4 Electronic differential feed (optional)</h4>
+<p>As Chapter 9 showed, the differential ratio is set by the position of the slider on the differential arm, D ≈ l<sub>d</sub>/l<sub>m</sub>. The simplest way to make it electronic is a closed-loop stepper pushing the slider through a lead screw (C-SCN-LEAD). In the worked example l<sub>m</sub> = 20 mm and D runs from 0.7 to 2.0, a slider travel of 26 mm. With a 1 mm lead and a 200-step motor at 8 microsteps, each microstep is 0.000625 mm, far finer than needed. At 10 mm/s the full travel takes 2.6 s, so this is a per-segment setting, not a per-stitch one. The slider carries load from the feed mechanism on every stitch, so adjust it while stopped or running slowly. The closed loop is there to prevent lost steps (Chapter 13): if the differential ratio drifts unnoticed, the edge goes from flat to wavy, and the operator may not spot it for a while.</p>
+<h4 id="s20-6-5">20.6.5 BOM and I/O changes for the overlock prototype</h4>
+<p>Table 20-8 lists only the differences from the lockstitch prototype; everything else is as in Tables 20-1 and 20-2.</p>
+<div class="tbl"><table><caption>Table 20-8　BOM and I/O of the overlock prototype relative to the lockstitch prototype (illustrative)</caption><thead><tr><th>ID</th><th>Item</th><th>Qty</th><th>Controller port / firmware name</th><th>Notes</th></tr></thead><tbody>
+<tr><td>A-PUL-HTD, C-BLT-BELT</td><td>Timing pulleys (spindle 24 teeth, motor 30 teeth), timing belt</td><td>2, 1</td><td>—</td><td>i = 1.25, replaces the coupling</td></tr>
+<tr><td>D-SNS-PE</td><td>Fabric-edge photo sensor</td><td>1</td><td>DI4 / <code>io_edge</code></td><td>25 mm ahead of the needle, response ≤ 1 ms</td></tr>
+<tr><td>D-SNS-PROX</td><td>Spindle needle-up sensor</td><td>1</td><td>DI5 / <code>io_nup</code></td><td>Checked every revolution; alarm on tooth jump</td></tr>
+<tr><td>D-PNU-CYL</td><td>Chain-cutter cylinder</td><td>1</td><td>—</td><td>Driven by the cutter valve</td></tr>
+<tr><td>D-PNU-VLV</td><td>Solenoid valves (cutter, suction)</td><td>2</td><td>SOL1, SOL2 / <code>VLV_CUT</code>, <code>VLV_SUCK</code></td><td>Same solenoid driver board, no boost</td></tr>
+<tr><td>D-MOT-STEP, D-DRV-STEP, C-SCN-LEAD</td><td>Closed-loop stepper, drive, lead screw (optional)</td><td>1 each</td><td>CAN FD or pulse / <code>stepper_diff</code></td><td>Electronic differential</td></tr>
+<tr><td>— (removed)</td><td>Trim, wipe, backtack and release solenoids; coupling</td><td>−4, −1</td><td>SOL1–SOL5 reassigned</td><td>Not needed on an overlocker</td></tr>
+</tbody></table></div>
+
+<h3 id="s20-7">20.7 Bring-up and acceptance of the overlock prototype</h3>
+<p>Bring-up follows Table 20-4, with two steps changed. Step 2 becomes "direction and offset through a belt". Calibrate the direction on the motor side, then use the edge of the needle-up sensor as the spindle reference. The offset is still found by the symmetric two-point method: the overlock needle bar is inclined at 20°, so mount the dial gauge along the needle bar and the symmetry still holds. Step 4 becomes "sensor and valve calibration". Run a strip of fabric of known length through at low speed, note the stitch counts at the sensor edges and check N<sub>1</sub>. For the cutter valve, use the current read-back to see when it switches, then check that the knife reaches its end position with a high-speed camera or by turning slowly by hand.</p>
+<p>Acceptance uses the same test scripts with a few different requirements: stop error ≤ ±1° (the same metric); chain length 40 mm ± 5 mm (100 runs each at 3000, 5000 and 7000 r/min, chain measured); chain-cut success ≥ 99.5%; needle-up check deviation of the belt drive no more than 1° over 4 h of continuous running (tooth-jump check); and the start-position error for start-on-fabric (distance from the first stitch to the fabric edge). Chain length and early braking can be run in SIL first. By the model of Fig. 20-8, firmware without early braking would leave about 16 extra stitches of chain at 7000 r/min, so that test case is bound to fail. That is exactly what SIL is for: the problem shows up before the code ever reaches the machine.</p>
+
+<h3 id="s20-8">20.8 How much the two prototypes share</h3>
+<p>Put the two prototypes side by side and go through them layer by layer (Table 20-9).</p>
+<div class="tbl"><table><caption>Table 20-9　Module reuse between the lockstitch and overlock prototypes</caption><thead><tr><th>Layer</th><th>Lockstitch WQ-SC/LS</th><th>Overlock WQ-SC/OL</th><th>Same?</th></tr></thead><tbody>
+<tr><td>HMI & network</td><td>D-GW-WQSC, D-HMI-PANEL</td><td>as left</td><td>Same</td></tr>
+<tr><td>Real-time control</td><td>D-CTL-WQSC</td><td>as left</td><td>Same (same board, same bootloader)</td></tr>
+<tr><td>Drives & power</td><td>D-DRV-SERVO, D-DRV-SOL, D-PSU-SMPS, E-stop chain</td><td>as left, plus D-DRV-STEP (optional)</td><td>Same</td></tr>
+<tr><td>Actuators & sensors</td><td>D-MOT-PMSM, D-ENC-INC, D-SOL-PUSH ×5, D-SNS-HALL, D-SNS-PROX</td><td>D-MOT-PMSM, D-ENC-INC, D-PNU-VLV ×2, D-PNU-CYL, D-SNS-PE, D-SNS-HALL, D-SNS-PROX ×2, D-MOT-STEP</td><td>Motor, encoder, pedal, proximity switch same; actuators and edge sensor differ</td></tr>
+<tr><td>Mechanical interface</td><td>A-CPL-JAW or 1:1 timing belt</td><td>1:1.25 timing belt, C-SCN-LEAD</td><td>Different</td></tr>
+<tr><td>Firmware: HAL</td><td>spindle_*, sol_*, io_*, enc_*</td><td>as left, plus stepper_*</td><td>Same</td></tr>
+<tr><td>Firmware: framework</td><td>State-machine engine, angle interrupt, event-table engine, parameters, log, gateway</td><td>as left</td><td>Same</td></tr>
+<tr><td>Firmware: machine-specific</td><td>Trim event table, backtack, pedal bands</td><td>Auto start/stop state machine, early braking, chain cut</td><td>Different</td></tr>
+<tr><td>Testing</td><td>Bench fixtures, stop-error cases, reporting and publishing</td><td>as left, plus chain-length and chain-cut cases</td><td>Same framework, different cases</td></tr>
+</tbody></table></div>
+<p>Counting item types, the lockstitch prototype has 14 and the overlock prototype 19. Eleven are identical, so 58% of the overlock prototype's items are reused unchanged. What matters more is <em>where</em> the shared parts are. The control, drive, power and network layers are entirely the same, as are the firmware HAL and framework and the test framework. The changes are concentrated in two places: the actuators and sensors, and the event table and machine-specific state machine. This is what Chapter 19 means by rapid configuration from the parts library. The effort for the second prototype goes mostly into the small machine-specific part, and everything already worked out on the lockstitch prototype (the encoder calibration method, servo tuning, solenoid drive, test scripts) carries straight over. The pattern-sewer and flat-knitting prototypes of Chapter 21 use this controller board and framework once again.</p>
+
+<h3 id="s20-9">20.9 Limits of the model</h3>
+<p>The prototypes in this chapter are proof-of-principle machines. They go from P0 (it moves) to P1 (all functions work), and there is a definite gap between them and an industrial product.</p>
+<p><strong>EMC</strong>　The prototype control box is open and its cables are routed temporarily. It has had no conducted or radiated emission tests and no immunity tests for electrostatic discharge, fast transients or surges (Chapter 18). A single high-frequency pressing machine nearby could add stray counts to the encoder, and the prototype has no protection against that. Closing this gap is one of the main tasks of the DVT (design verification) stage.</p>
+<p><strong>Life</strong>　Push-pull solenoids, coupling elastomers, timing belts and cylinder seals all wear out. An industrial lockstitch machine trims several thousand times a day, more than a million times a year. Four hours of continuous running on a prototype can only reveal early failures; it says nothing about life. That needs accelerated life tests and wear data.</p>
+<p><strong>Cost</strong>　The prototype uses general-purpose modules: a controller that can run four kinds of machine and a 6-channel solenoid driver are both more than a lockstitch machine needs. An industrial product combines the controller, servo drive and solenoid drivers on one board, with far fewer parts and far lower cost, as the Chapter 18 control box does. A prototype earns its keep by checking principles and parameters quickly; the production design is a separate job.</p>
+<p><strong>Safety certification</strong>　The prototype has an E-stop and interlocks, but it has not been assessed against ISO 10821 or IEC 60204-31 and must not be handed to an operator as a product.</p>
+<p><strong>The model itself</strong>　The chapter's numbers come from a simplified model. The servo is modelled in continuous time, with the current loop reduced to a first-order lag and no encoder quantisation or speed-measurement delay. The solenoid model ignores core saturation, eddy currents and the effect of temperature on the spring. The 45°–65° cut window, the wiper and foot-lift times, the overlock inertia and the chain length are all illustrative. The random disturbances in SIL cover only voltage, coil temperature, speed, friction and load, not mechanism wear or backlash. A result of "1000/1000" says that under these assumptions the event table has enough margin. Acceptance rests on the numbers from the full test bench.</p>
+<aside class="field">
+<p><strong>Shop-floor notes</strong></p>
+<ul>
+<li>Bring it up in steps: 24 V first, then turning by hand, then the servo, and thread last. Each step has a criterion; pass it before going on.</li>
+<li>Check encoder direction first, then calibrate the offset. Use the symmetric two-point method, not "find the top" near TDC.</li>
+<li>Calibrate solenoid delays in spindle angle, once cold and once hot. The event table needs enough margin for voltage and temperature changes.</li>
+<li>Change the trim speed and you must change the event table. Make the solenoids quicker and more consistent before raising the trim speed.</li>
+<li>On a belt-driven overlocker, choose a ratio that gives a whole number of counts per spindle revolution, and fit a spindle needle-up sensor.</li>
+<li>Count debounce, backtack and chain length in stitches, not in time, so that they do not depend on speed.</li>
+<li>Tag every test result with the firmware version and the event-table version.</li>
+</ul>
+</aside>
+
+<h3 id="x20-ex">Chapter 20 exercises</h3>
+<ol>
+<li>The trim speed is 400 r/min, the trimmer solenoid's pull-in delay varies between 6.2 and 9.4 ms, and the knife must enter between 300° and 330°. Find the range of pull-in angles, their spread, and the switch-on angle that centres the entry range.<details class="ans"><summary>Answer</summary>2.4° per ms; pull-in is worth 14.9°–22.6°, a spread of 7.7°. The mean lead is 18.7°, so switch on at about 315° − 18.7° ≈ 296°, giving entry at 311°–319°.</details></li>
+<li>The platform metric limits solenoid pull-in to 20° of spindle angle. Taking the slowest pull-in of 9.4 ms, what is the highest trim speed? What if a higher boost voltage cut the slowest pull-in to 6.0 ms?<details class="ans"><summary>Answer</summary>20 /(6 × 0.0094) ≈ 355 r/min; 20 /(6 × 0.006) ≈ 556 r/min.</details></li>
+<li>During encoder calibration, with the count direction already corrected and the offset at 0, the readings at 12.00 mm below TDC are 307.6° on the way down and 137.2° on the way up. What offset should be written? Why not simply look for the highest point of the needle bar near TDC?<details class="ans"><summary>Answer</summary>The upward reading has wrapped past 360°, so the mean is (307.6 + 137.2 + 360)/2 = 402.4°, i.e. 42.4°, and the offset is 180° − 42.4° = 137.6°. Near TDC the needle bar barely moves: 1.8° from TDC it has dropped only 0.01 mm, which the gauge cannot resolve, an uncertainty of ±1.8°. At 12 mm, 0.01 mm corresponds to only 0.04°.</details></li>
+<li>The overlock prototype uses a timing belt and a motor encoder with 10 000 counts per revolution. How many counts are there per spindle revolution for ratios (spindle/motor) of 1.25 and 1.4? Which one causes trouble, and why?<details class="ans"><summary>Answer</summary>8000 and 7142.857…. The second is not a whole number, so the index lands at a different spindle angle on every revolution and cannot be used to correct the spindle angle, and rounding errors accumulate. Choose a ratio that gives whole counts, and fit a spindle needle-up sensor.</details></li>
+<li>With the overlock prototype's 1:1.25 drive, stopping from 7000 r/min takes 15.8 revolutions, and the braking revolutions scale with speed squared. At 5000 r/min, with a 3 mm stitch, the sensor 25 mm ahead of the needle and a 40 mm chain, at which stitch after the fabric leaves should braking begin? If braking waited until stitch 23, how much extra chain would there be?<details class="ans"><summary>Answer</summary>N<sub>b</sub> = 15.8 × (5000/7000)² ≈ 8.1 stitches, so braking starts at stitch 23 − 8.1 ≈ 14.9. Without early braking there are about 8 extra stitches, about 24 mm.</details></li>
+<li>The edge sensor is debounced for 20 ms. At 6000 r/min with a 2.5 mm stitch, how far does the fabric travel during the debounce? What about a debounce of "2 consecutive stitches"? Which is better, and why?</li>
+<li>(Discussion) In 20.5, with a calibration residual of 0.7°, every trim succeeded but every stop was out of tolerance. Using 20.4.2 and Table 20-6, explain why acceptance treats "stop error" and "trim success" as two separate requirements instead of only checking that trims succeed. Then consider: to take this prototype into EVT, which three tests would you add first?</li>
+</ol>
+
+<h3 id="x20-ref">References</h3>
+<ol class="refs">
+<li>This book, Chapters 3 and 8 (needle-bar mechanism and timing), Chapter 9 (overlock machine), Chapter 13 (servos, encoders, solenoids, power circuits), Chapter 14 (lockstitch control), Chapter 18 (control box, EMC and standards), Chapter 19 (the WQ-SC platform), Chapter 22 (test bench and test scripts).</li>
+<li>ISO 10821. Industrial sewing machines — Safety requirements for sewing machines, units and systems. ISO. (Cited in Chapter 18; clauses to be verified against the latest edition.)</li>
+<li>IEC 60204-31. Safety of machinery — Electrical equipment of machines — Part 31: Particular safety and EMC requirements for sewing machines, units and systems. IEC; adopted identically as GB/T 5226.31-2017.</li>
+<li>Thread-trimming device patent US4589362A (cited in Chapter 14 for its qualitative account of the trimming process).</li>
+<li>Ellis, G. Control System Design Guide. Elsevier/Academic Press (several editions). Tuning servo velocity and position loops; inertia identification.</li>
+<li>Franklin, G. F., Powell, J. D., Emami-Naeini, A. Feedback Control of Dynamic Systems. Pearson (several editions).</li>
+<li>pytest documentation (docs.pytest.org). Writing test cases and fixtures.</li>
+</ol>
+
+<h3 id="x20-res">Companion resources</h3>
+<p><a href="#lab-proto-ls" class="labref">Virtual lab 20-1　Lockstitch prototype bring-up bench</a>　A freshly built lockstitch prototype whose encoder is mounted reversed and whose index is not at TDC. (1) Turn the handwheel, watch the dial gauge and the encoder reading, and set the count direction and index offset. (2) On the timing chart, drag the on/off angles of trim and tension release and the after-stop times of wipe and foot lift. Seven checks are judged live against the Chapter 14 windows and the Chapter 13 solenoid delays, converted to angle at the chosen trim speed. (3) Sew N stitches and trim, with a slow-motion view of spindle angle, each actuator's command and armature motion, and the stop position. Then run 100 random trial trims for the trim-cycle pass rate and the spread of knife entry and stop error. Three tasks are checked automatically: calibrate the encoder to a residual of ≤ 0.3°; repair a scrambled event table so that at least 99 of 100 runs pass; retune the event table for a trim speed of 700 r/min or more.</p>
+<p><a href="#lab-servo" class="labref">Virtual lab 13-1　Needle positioning: servo tuning</a>, <a href="#lab-solenoid" class="labref">Virtual lab 13-2　Solenoid drive: pull-in and release</a>, <a href="#lab-trim" class="labref">Virtual lab 14-1　Trim timing editor</a>　The servo tuning, solenoid delays and trim windows of this chapter all come from these three labs. Practise each piece there, then put them together in Lab 20-1.</p>
+<section class="lab" id="lab-trim" data-src="labs/trim.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 14-1　Trim timing editor</h4></div><p>Place the trimmer command angle, tension release, stop and wipe on the timing chart and see how delay and speed decide between a clean cut, a missed cut and unthreading at restart.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/trim.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>

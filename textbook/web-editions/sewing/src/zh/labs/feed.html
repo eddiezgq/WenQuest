@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>送布牙轨迹与送布时序</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = side-view animation + dog trajectory + timing chart; right rail = readouts, adjustments, chart reading, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --cloth1:#e6d6ad; --cloth2:#bcd0ea; --plate:#aab4bd; --thread:#2a5fb8; --steel:#5c6670; --dog:#1f7a4a; --lift:#b7791f;
+  --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f; --vio:#8e44ad;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--cloth1:#6b5c3a;--cloth2:#3d5578;--plate:#56616c;--thread:#7fa9f2;--steel:#b7c0c9;--dog:#5fd08a;--lift:#e8b04b;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--vio:#c39bd3}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--cloth1:#6b5c3a;--cloth2:#3d5578;--plate:#56616c;--thread:#7fa9f2;--steel:#b7c0c9;--dog:#5fd08a;--lift:#e8b04b;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--vio:#c39bd3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select,input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px}
+input[type=number]{width:6.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.two{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.4em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+input[type=range]:disabled{opacity:.35}
+.meter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.meter div{border-top:3px solid var(--rule);padding-top:4px}
+.meter div.ok{border-top-color:var(--ok)} .meter div.bad{border-top-color:var(--bad)} .meter div.warn{border-top-color:var(--warn)}
+.meter b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.meter small{color:var(--muted);font-size:.74rem;line-height:1.35;display:block}
+.state{margin-top:10px;font-size:.88rem;border-left:3px solid var(--rule);padding-left:8px;min-height:3.2em}
+.state.ok{border-left-color:var(--ok)} .state.bad{border-left-color:var(--bad)} .state.warn{border-left-color:var(--warn)}
+.state b{display:block}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:5px;vertical-align:4px;background:var(--c)}
+</style>
+<div class="wrap">
+<header><h1>送布牙轨迹与送布时序</h1><span class="sub">《缝纫机设计与制造》第 6 章 · 虚拟实验 6-1 · 布在什么时候动、动多少、上下两层走得一样不一样</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <div class="two">
+        <div><h3>侧视（放大，布向右送）</h3><canvas id="side" width="760" height="440" aria-label="针板、送布牙、压脚、机针和两层布的侧视动画"></canvas></div>
+        <div><h3>送布牙齿尖轨迹</h3><canvas id="traj" width="380" height="440" aria-label="送布牙齿尖的轨迹"></canvas></div>
+      </div>
+      <div class="row">
+        <button type="button" id="play" aria-pressed="true">暂停</button>
+        <span class="note" style="margin:0">主轴转角</span><b id="angOut" style="font-family:var(--f-mono)">0°</b>
+        <div style="flex:1;min-width:180px"><input id="ang" type="range" min="0" max="360" step="0.5" value="0" aria-label="主轴转角"></div>
+      </div>
+      <p class="note" id="phase"></p>
+    </section>
+    <section class="panel">
+      <h3>送布时序（横轴主轴转角，针杆上止点为 0°）</h3>
+      <canvas id="tim" width="1100" height="470" aria-label="针尖、针眼、送布牙高度和布的位置随主轴转角变化"></canvas>
+      <div class="legend"><span style="--c:var(--ink)">针尖</span><span style="--c:var(--thread)">针眼上沿</span><span style="--c:var(--lift)">送布牙齿尖高度</span><span style="--c:var(--dog)">牙的水平位置</span><span style="--c:#a68b52">布（下层）的位置</span></div>
+      <p class="note">上半部分高度以针板面为 0；灰色底纹为机针在布中，绿色底纹为牙露出针板、抓住布。下半部分为牙和布的水平位置。机构参数为算例值，面料参数为示意值。</p>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>读数</h3>
+      <div class="meter" id="meter"></div>
+      <div class="state" id="state"></div>
+    </section>
+    <section class="panel">
+      <h3>调整</h3>
+      <div class="row" style="margin-top:0">
+        <label for="fab" class="note" style="margin:0">面料</label>
+        <select id="fab"><option value="lining">衬里滑料两层（0.4 mm）</option><option value="cotton" selected>棉布两层（1.5 mm）</option><option value="denim">牛仔四层（4 mm）</option></select>
+      </div>
+      <div class="row">
+        <label for="mode" class="note" style="margin:0">送布方式</label>
+        <select id="mode"><option value="drop" selected>下送布</option><option value="needle">针送布</option><option value="compound">综合送布（牙＋针＋交替压脚）</option></select>
+      </div>
+      <div class="prm" id="prm"></div>
+      <div class="row"><button type="button" id="reset">恢复标准</button><button type="button" id="mess">打乱定时（模拟没调好的机器）</button></div>
+      <p class="note" id="modeNote"></p>
+    </section>
+    <section class="panel">
+      <h3>读图</h3>
+      <p class="note" style="margin-top:0">把牙高调到 1.0 mm（其余保持标准），从时序图读出送布牙升出针板和落到针板以下的主轴转角。</p>
+      <div class="row"><label class="note" style="margin:0" for="rd1">升出</label><input id="rd1" type="number" step="0.1" placeholder="度"><label class="note" style="margin:0" for="rd2">落下</label><input id="rd2" type="number" step="0.1" placeholder="度"><button type="button" id="rdChk">核对</button></div>
+      <p class="note" id="rdOut"></p>
+    </section>
+    <section class="panel">
+      <h3>任务（自动判定）</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+const DEG=Math.PI/180,$=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// ---------- needle bar (chapter 3 worked example) ----------
+const RN=15.5,LN=55,TIP0=18,EYE=2;
+const xN=f=>{const a=f*DEG,l=RN/LN;return RN*(1-Math.cos(a))-LN*(1-Math.sqrt(1-(l*Math.sin(a))**2));};
+const tip=f=>TIP0-xN(f);
+const cross=(lv)=>{let a=0,b=180;for(let i=0;i<60;i++){const m=(a+b)/2;if(tip(m)>lv)a=m;else b=m;}return (a+b)/2;};
+const FE=cross(-EYE);                 // needle-eye top reaches plate: 114.2°
+// ---------- feed mechanism (worked example) ----------
+const A=1.1,H0=0.8,HALF0=Math.acos((A-H0)/A)/DEG,PHL0=FE-HALF0,EFF0=(1-Math.cos(2*HALF0*DEG))/2;
+const FAB={lining:{t:0.4,mud:0.55,muf:0.15,F0:0.32,K:10,hreq:0.7,hmax:0.85,Pmark:1.4,name:'衬里滑料'},
+           cotton:{t:1.5,mud:0.80,muf:0.25,F0:0.30,K:50,hreq:0.75,hmax:1.1,Pmark:2.0,name:'棉布'},
+           denim:{t:4.0,mud:0.85,muf:0.30,F0:0.75,K:40,hreq:0.95,hmax:1.5,Pmark:2.5,name:'牛仔布'}};
+const MODEF={drop:1.0,needle:0.3,compound:0.08};
+const STD={s:3,dT:0,dP:0,h:0.8,P:1.0};
+const ST=Object.assign({fab:'cotton',mode:'drop',phi:0,play:true},STD);
+function model(o){o=o||ST;const f=FAB[o.fab];
+  const half=Math.acos(Math.max(-1,Math.min(1,(A-o.h)/A)))/DEG;
+  let phL,phF;if(o.mode==='drop'){phL=PHL0+o.dT;phF=FE+o.dT+o.dP;}else{phL=180;phF=180+half;}
+  const rise=phL-half,drop=phL+half,S=o.s/EFF0;
+  const X=p=>(S/2)*Math.cos((p-phF)*DEG),Y=p=>(o.h-A)+A*Math.cos((p-phL)*DEG);
+  const ain=cross(f.t),aout=360-ain;
+  let drag=0,back=0;const n=720,sg=o.s>=0?1:-1;
+  for(let i=0;i<n;i++){const p0=rise+(drop-rise)*i/n,p1=rise+(drop-rise)*(i+1)/n,dx=X(p1)-X(p0),pm=(((p0+p1)/2)%360+360)%360;
+    if(o.mode==='drop'&&pm>ain&&pm<aout)drag+=Math.abs(dx);if(dx*sg<0)back+=Math.abs(dx);}
+  const net=X(drop)-X(rise);
+  const mud=f.mud*Math.min(1,o.h/f.hreq);
+  const Pmin=o.mode==='compound'?f.F0/mud:f.F0/Math.max(mud-f.muf,1e-6);
+  const eps=Math.min(1,o.P/Pmin),act=eps*net;
+  const ply=f.muf*o.P/f.K*MODEF[o.mode]*400;
+  const marks=[];if(o.h>f.hmax+1e-9)marks.push('dog');if(o.P>f.Pmark+1e-9)marks.push('foot');
+  const eyeAtDrop=tip(((drop%360)+360)%360)+EYE;
+  return {half,phL,phF,rise:((rise%360)+360)%360,drop:((drop%360)+360)%360,riseRaw:rise,dropRaw:drop,S,X,Y,ain,aout,drag,back,net,act,eps,Pmin,ply,marks,eyeAtDrop,t:f.t};
+}
+// fabric (lower ply) position within one revolution starting at phi=0: follows dog while gripped
+function fabPos(M,phi){ // displacement accumulated from 0..phi (deg), eps applied
+  let pos=0;const n=Math.max(2,Math.round(phi*2));
+  for(let i=0;i<n;i++){const p0=phi*i/n,p1=phi*(i+1)/n;if(M.Y((p0+p1)/2)>=0)pos+=M.X(p1)-M.X(p0);}return pos*M.eps;}
+// ---------- controls ----------
+const PRM=[['s','针距（刻度，负值为倒缝）',-5,5,0.1,'mm'],['dT','送布定时（水平和抬牙一起移动，本实验的简化；+ 为推迟）',-40,40,1,'°'],['dP','水平相对抬牙的相位差（+ 为水平推迟）',-40,40,1,'°'],['h','牙高（齿尖高出针板）',0.5,1.5,0.05,'mm'],['P','压脚压力（相对值，1 = 标准）',0.3,2.5,0.05,'']];
+$('prm').innerHTML=PRM.map(([k,l,mn,mx,st])=>`<label for="p_${k}">${l}</label><input id="p_${k}" type="range" min="${mn}" max="${mx}" step="${st}"><output id="o_${k}"></output>`).join('');
+function sync(){PRM.forEach(([k,,,,st,u])=>{$('p_'+k).value=ST[k];$('o_'+k).textContent=(+ST[k]).toFixed(st<0.1?2:(st<1?1:0))+(u?' '+u:'');});
+  $('fab').value=ST.fab;$('mode').value=ST.mode;const dis=ST.mode!=='drop';$('p_dT').disabled=dis;$('p_dP').disabled=dis;
+  $('modeNote').textContent=dis?'针送布、综合送布在机针刺入布料以后送布，牙的定时按出厂标准固定（牙在 180° 最高），定时和相位差两个滑杆不起作用。':'';}
+PRM.forEach(([k])=>$('p_'+k).addEventListener('input',e=>{ST[k]=+e.target.value;changed();}));
+$('fab').onchange=e=>{ST.fab=e.target.value;changed();};
+$('mode').onchange=e=>{ST.mode=e.target.value;changed();};
+$('reset').onclick=()=>{Object.assign(ST,STD);seen.messed=false;changed();};
+$('mess').onclick=()=>{Object.assign(ST,{dT:20,dP:-25});seen.messed=true;changed();};
+$('play').onclick=()=>{ST.play=!ST.play;$('play').textContent=ST.play?'暂停':'播放';$('play').setAttribute('aria-pressed',ST.play);};
+$('ang').addEventListener('input',e=>{ST.play=false;$('play').textContent='播放';$('play').setAttribute('aria-pressed',false);ST.phi=+e.target.value;draw();});
+let cyc=0;      // completed stitches since last change (for the animation)
+function changed(){sync();cyc=0;drawTim();draw();meters();checkTasks();}
+// ---------- readouts ----------
+function verdict(M){const f=FAB[ST.fab];
+  if(M.marks.includes('dog'))return ['bad','牙太高，布上留下牙痕','对这种面料，牙高超过 '+f.hmax+' mm 会在布上咬出痕迹。薄料用低牙（使用说明书：薄料型 0.7–0.8 mm）。'];
+  if(M.marks.includes('foot'))return ['bad','压脚压力太大，布上留下压痕','压力超过这种面料能承受的程度（示意值 '+f.Pmark+'），而且压力越大，上层布被拖得越多。'];
+  if(M.eps<0.999)return ['bad','打滑：牙抓不住布','压脚压力低于不打滑所需的 '+M.Pmin.toFixed(2)+'，布只走了牙行程的 '+(M.eps*100).toFixed(0)+'%。加大压力，或把牙调高（抓得更深），或改用综合送布。'];
+  if(M.drag>0.05)return ['bad','机针在布中时布还在动','布在针里被推着走了 '+M.drag.toFixed(2)+' mm：针被带弯，轻则线迹歪、针距不匀，重则针撞上旋梭而断针。把送布定时提前，或减小相位差。'];
+  if(M.back>0.05)return ['warn','回拖','牙露出针板时有一段在往回走，把布往回带了 '+M.back.toFixed(2)+' mm，实际针距变短、针距不匀。水平运动相对抬牙太早了。'];
+  if(Math.abs(M.act-ST.s)>0.15)return ['warn','实际针距与刻度不符','实际 '+M.act.toFixed(2)+' mm，刻度 '+ST.s.toFixed(1)+' mm。牙高或相位变了以后，抓布区间变了，针距跟着变。'];
+  if(M.ply>3)return ['warn','上层布越缝越长','缝 40 cm，上层布比下层多出 '+M.ply.toFixed(1)+' mm（允许值取 3 mm）。下层由牙带着走，上层被压脚拖住。减小压力、或改用针送布、综合送布。'];
+  return ['ok',ST.s<0?'倒缝正常':'送布正常','布只在机针离开布料的时候移动，没有回拖、没有打滑，上下层错位在允许范围内。'];}
+function meters(){const M=model();
+  const m=[[M.act.toFixed(2)+' mm','实际针距（刻度 '+ST.s.toFixed(1)+'）',Math.abs(M.act-ST.s)<=0.15?'ok':'warn'],
+    [(M.eps*100).toFixed(0)+' %','送布效率（< 100% 为打滑）',M.eps>=0.999?'ok':'bad'],
+    [ST.mode==='drop'?M.drag.toFixed(3)+' mm':'—','机针在布中时布的移动量（≤ 0.05）',ST.mode!=='drop'?'':M.drag<=0.05?'ok':'bad'],
+    [M.back.toFixed(3)+' mm','回拖量（≤ 0.05）',M.back<=0.05?'ok':'warn'],
+    [ST.mode==='drop'?(M.eyeAtDrop>=0?'+':'')+M.eyeAtDrop.toFixed(2)+' mm':'—','牙落下时针眼上沿高出针板（标准为 0）',ST.mode!=='drop'?'':Math.abs(M.eyeAtDrop)<=1?'ok':'warn'],
+    [M.ply.toFixed(1)+' mm','缝 40 cm 后上层多出的长度（≤ 3）',M.ply<=3?'ok':'warn']];
+  $('meter').innerHTML=m.map(([v,l,c])=>`<div class="${c}"><b>${v}</b><small>${l}</small></div>`).join('');
+  const v=verdict(M);$('state').className='state '+v[0];$('state').innerHTML='<b>'+v[1]+'</b>'+v[2];}
+// ---------- drawing helpers ----------
+function seg(g,a,b){g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();}
+const mod=a=>((a%360)+360)%360;
+const inWin=(M,p)=>{const q=mod(p-M.riseRaw);return q<=M.dropRaw-M.riseRaw;};
+// ---------- side view ----------
+function sideDraw(){
+  const cv=$('side'),g=cv.getContext('2d'),W=cv.width,H=cv.height,M=model(),f=ST.phi,F=FAB[ST.fab];
+  const sc=34,cx=W*0.5,py=H*0.62,T=(x,y)=>[cx+x*sc,py-y*sc];
+  g.clearRect(0,0,W,H);g.font='13px '+css('--f-body');
+  const dx=M.X(f),dy=M.Y(f),gr=dy>=0;
+  // fabric position: completed stitches + within-revolution
+  const per=M.act,low=cyc*per+fabPos(M,f),upLag=M.ply/400;  // upper ply moves (1-rho) of lower
+  const up=low*(1-upLag),t=M.t,tl=t/2;
+  const fy0=Math.max(dy,0);  // fabric lifted by dog when above plate
+  // plies
+  g.fillStyle=css('--cloth1');g.fillRect(0,T(0,fy0+tl)[1],W,tl*sc);
+  g.fillStyle=css('--cloth2');g.fillRect(0,T(0,fy0+t)[1],W,tl*sc);
+  // marks every 3 mm
+  g.strokeStyle=css('--ink');g.lineWidth=1.4;const pitch=3;
+  for(let k=-20;k<=20;k++){let xl=k*pitch+(low%pitch);if(xl*sc>-W/2-10&&xl*sc<W/2+10)seg(g,T(xl,fy0),T(xl,fy0+tl*0.6));
+    let xu=k*pitch+(up%pitch);if(xu*sc>-W/2-10&&xu*sc<W/2+10)seg(g,T(xu,fy0+t),T(xu,fy0+t-tl*0.6));}
+  // throat plate with slot
+  g.fillStyle=css('--plate');g.fillRect(0,T(0,0)[1],T(-4.6,0)[0],1.2*sc);g.fillRect(T(4.6,0)[0],T(0,0)[1],W,1.2*sc);
+  // feed dog: body + teeth (teeth lean toward +x)
+  g.fillStyle=css('--dog');const dw=5.2,tw=dw/6;g.beginPath();g.moveTo(...T(dx-dw/2,dy-1.6));
+  for(let i=0;i<6;i++){const x0=dx-dw/2+i*tw;g.lineTo(...T(x0,dy-0.25));g.lineTo(...T(x0+tw*0.75,dy));g.lineTo(...T(x0+tw,dy-0.25));}
+  g.lineTo(...T(dx+dw/2,dy-1.6));g.closePath();g.fill();
+  // needle (swings with the dog in needle / compound feed)
+  const nx=ST.mode==='drop'?0:dx,nt=tip(f),d=0.9;
+  g.fillStyle=css('--steel');const ntop=T(nx-d/2,12)[1],nb=T(0,nt+1.2)[1];g.fillRect(T(nx-d/2,0)[0],ntop,d*sc,nb-ntop);
+  g.beginPath();g.moveTo(T(nx-d/2,nt+1.2)[0],nb);g.lineTo(...T(nx,nt));g.lineTo(T(nx+d/2,nt+1.2)[0],nb);g.closePath();g.fill();
+  g.fillStyle=css('--sheet');const e1=T(nx-0.22,nt+EYE),e2=T(nx+0.22,nt+EYE-1.1);g.fillRect(e1[0],e1[1],e2[0]-e1[0],e2[1]-e1[1]);
+  // presser foot(s)
+  const ftop=fy0+t;g.fillStyle=css('--steel');g.globalAlpha=.55;
+  if(ST.mode==='compound'){   // inner (feeding) foot rides on the fabric while feeding; outer feet lift
+    g.fillStyle=css('--dog');g.fillRect(T(dx-1.3,0)[0],T(0,ftop+0.8+(gr?0:1.5))[1],2.6*sc,0.8*sc);
+    g.fillStyle=css('--steel');g.globalAlpha=.4;const oy=T(0,ftop+0.8+(gr?1.5:0))[1];g.fillRect(T(-6,0)[0],oy,3.8*sc,0.8*sc);g.fillRect(T(2.2,0)[0],oy,3.8*sc,0.8*sc);}
+  else{g.beginPath();g.moveTo(...T(-6,ftop+0.9));g.lineTo(...T(-5,ftop));g.lineTo(...T(6,ftop));g.lineTo(...T(6,ftop+0.9));g.closePath();g.fill();}
+  g.globalAlpha=1;
+  // labels
+  g.fillStyle=css('--muted');g.fillText('针板',T(5,0)[0],T(0,-1.6)[1]);g.fillText('送布牙',T(dx-dw/2,0)[0],T(0,dy-2.2)[1]);
+  g.fillText(ST.mode==='compound'?'内压脚（绿）随牙前移，外压脚交替压住':'压脚',T(-7,0)[0],T(0,Math.min(ftop+3.4,7.2))[1]);
+    g.fillText('蓝色上层、米色下层；记号间距 3 mm，上层记号落后于下层记号的距离就是错位（每针 '+(M.ply/400*Math.abs(M.act)).toFixed(3)+' mm）',8,H-10);
+}
+// ---------- trajectory ----------
+function trajDraw(){
+  const cv=$('traj'),g=cv.getContext('2d'),W=cv.width,H=cv.height,M=model(),f=ST.phi;
+  const R=Math.max(2.2,Math.abs(M.S)/2+0.6),sc=(W-40)/(2*R),cx=W/2,cy=H*0.42,T=(x,y)=>[cx+x*sc,cy-y*sc];
+  g.clearRect(0,0,W,H);g.font='12px '+css('--f-body');
+  g.fillStyle=css('--soft');g.fillRect(0,cy,W,H-cy);g.strokeStyle=css('--muted');g.lineWidth=1.2;seg(g,[0,cy],[W,cy]);
+  g.fillStyle=css('--muted');g.fillText('针板面',W-52,cy+16);
+  g.lineWidth=2;g.strokeStyle=css('--dog');g.beginPath();for(let k=0;k<=360;k+=2){const p=T(M.X(k),M.Y(k));k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();
+  g.lineWidth=6;g.globalAlpha=.35;g.beginPath();const n=80;for(let i=0;i<=n;i++){const k=M.riseRaw+(M.dropRaw-M.riseRaw)*i/n,p=T(M.X(k),M.Y(k));i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();g.globalAlpha=1;
+  const p=T(M.X(f),M.Y(f));g.fillStyle=css('--ink');g.beginPath();g.arc(p[0],p[1],6,0,7);g.fill();
+  g.fillStyle=css('--muted');g.fillText('粗线：牙在针板以上（抓布）',10,H-30);g.fillText('横向放大 '+sc.toFixed(0)+' 像素/mm，纵向相同',10,H-12);
+  g.fillText('→ 送布方向',10,18);
+}
+// ---------- timing chart ----------
+function drawTim(){
+  const cv=$('tim'),g=cv.getContext('2d'),W=cv.width,H=cv.height,M=model();g.clearRect(0,0,W,H);
+  const x0=70,x1=W-16,ya=14,yb=270,yc=300,yd=H-30,vmin=-2.5,vmax=6.5;
+  const X=p=>x0+(x1-x0)*p/360,Y=v=>yb-(yb-ya)*(v-vmin)/(vmax-vmin);
+  // shading
+  g.fillStyle=css('--steel');g.globalAlpha=.10;g.fillRect(X(M.ain),ya,X(M.aout)-X(M.ain),yd-ya);
+  g.fillStyle=css('--dog');g.globalAlpha=.10;
+  const r=M.rise,d=M.drop;if(r<d)g.fillRect(X(r),ya,X(d)-X(r),yd-ya);else{g.fillRect(X(r),ya,X(360)-X(r),yd-ya);g.fillRect(X(0),ya,X(d)-X(0),yd-ya);}
+  g.globalAlpha=1;
+  g.strokeStyle=css('--rule');g.lineWidth=1;g.fillStyle=css('--muted');g.font='12px '+css('--f-mono');g.textAlign='center';
+  for(let p=0;p<=360;p+=30){seg(g,[X(p),ya],[X(p),yd]);g.fillText(p+'°',X(p),yd+16);}
+  g.textAlign='right';for(let v=-2;v<=6;v+=2)g.fillText(v,x0-6,Y(v)+4);g.fillText('mm',x0-30,Y(6)+4);
+  g.strokeStyle=css('--muted');g.lineWidth=1.4;seg(g,[x0,Y(0)],[x1,Y(0)]);
+  g.setLineDash([5,4]);g.strokeStyle='#a68b52';seg(g,[x0,Y(M.t)],[x1,Y(M.t)]);g.setLineDash([]);
+  g.textAlign='left';g.fillStyle=css('--muted');g.font='12px '+css('--f-body');g.fillText('针板',x0+4,Y(0)-4);g.fillText('布面',x0+4,Y(M.t)-4);
+  const curve=(fn,col,w,dash)=>{g.save();g.beginPath();g.rect(x0,ya,x1-x0,yb-ya);g.clip();g.strokeStyle=col;g.lineWidth=w;if(dash)g.setLineDash(dash);g.beginPath();for(let p=0;p<=360;p+=0.5){const q=[X(p),Y(fn(p))];p?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);}g.stroke();g.restore();};
+  curve(tip,css('--ink'),2.2);curve(p=>tip(p)+EYE,css('--thread'),1.8,[6,4]);curve(M.Y,css('--lift'),2.6);
+  // horizontal panel
+  const S=Math.max(Math.abs(M.S)/2,1.6)*1.15,Yh=v=>(yc+yd)/2-(yd-yc)/2*v/S;
+  g.strokeStyle=css('--rule');seg(g,[x0,Yh(0)],[x1,Yh(0)]);
+  g.strokeStyle=css('--dog');g.lineWidth=2;g.setLineDash([6,4]);g.beginPath();for(let p=0;p<=360;p+=1){const q=[X(p),Yh(M.X(p))];p?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);}g.stroke();g.setLineDash([]);
+  g.strokeStyle='#a68b52';g.lineWidth=2.6;g.beginPath();const off=M.X(0);for(let p=0;p<=360;p+=2){const q=[X(p),Yh(off+fabPos(M,p))];p?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);}g.stroke();
+  timBase=g.getImageData(0,0,W,H);
+}
+let timBase=null;
+function timCursor(){const cv=$('tim'),g=cv.getContext('2d');if(timBase)g.putImageData(timBase,0,0);const x=70+(cv.width-86)*ST.phi/360;g.strokeStyle=css('--accent');g.lineWidth=2;seg(g,[x,14],[x,cv.height-30]);}
+function draw(){$('ang').value=ST.phi;$('angOut').textContent=ST.phi.toFixed(1)+'°';sideDraw();trajDraw();timCursor();
+  const M=model(),f=ST.phi,inF=f>M.ain&&f<M.aout,gr=M.Y(f)>=0;
+  $('phase').textContent=(inF?'机针在布中；':'机针在布外；')+(gr?'牙露出针板，'+(ST.mode==='drop'&&inF?'布在针中被推动！':'带着布走。'):'牙在针板下面退回，布不动。');}
+// ---------- chart reading ----------
+$('rdChk').onclick=()=>{const a=+$('rd1').value,b=+$('rd2').value,S0=model(Object.assign({},ST,STD,{mode:'drop',h:1.0}));
+  const okA=Math.abs(mod(a-S0.rise+180)-180)<=3,okB=Math.abs(mod(b-S0.drop+180)-180)<=3;
+  $('rdOut').textContent=(okA&&okB)?'正确：升出约 '+S0.rise.toFixed(1)+'°，落下约 '+S0.drop.toFixed(1)+'°。':'还不对：'+(okA?'':'升出角 ')+(okB?'':'落下角 ')+'差得超过 3°。提示：牙高 1.0 mm、其余为标准时，看黄色曲线穿过针板线的两处。';
+  if(okA&&okB)seen.read=true;checkTasks();};
+// ---------- tasks ----------
+const seen={messed:false,read:false};
+const good=(M,tol)=>M.eps>=0.999&&M.drag<=0.05&&M.back<=0.05&&Math.abs(M.act-ST.s)<=tol&&!M.marks.length;
+const TASKS=[
+  {t:'读图：牙高调到 1.0 mm，读出送布牙升出针板和落下的主轴转角（误差 ±3°），并与标准牙高 0.8 mm 时比较。',d:'在“读图”框里填写后按“核对”。再看看：牙落下的时刻，针眼上沿还和针板齐平吗？',ok:()=>seen.read},
+  {t:'按“打乱定时”，再把机器调回来：棉布、下送布、针距 3 mm，布在针中移动 ≤ 0.05 mm、回拖 ≤ 0.05 mm、实际针距与刻度差 ≤ 0.1 mm，并且牙落下时针眼上沿与针板的高差 ≤ 1 mm（使用说明书的标准定时）。',d:'先用“定时”把落牙时刻对到针眼上沿到达针板的时刻，再用“相位差”消除回拖。按“恢复标准”不算。',ok:()=>{const M=model();return seen.messed&&ST.fab==='cotton'&&ST.mode==='drop'&&Math.abs(ST.s-3)<0.05&&good(M,0.1)&&Math.abs(M.eyeAtDrop)<=1;}},
+  {t:'牛仔四层（4 mm）、下送布、针距 3 mm：不打滑、不留痕，布在针中移动 ≤ 0.05 mm、回拖 ≤ 0.05 mm，实际针距 3 ± 0.15 mm。',d:'厚料上机针入布早，要把送布定时提前（使用说明书：提前可防送布不匀）；牙抓不住布时加压力或把牙调高——牙调高以后抓布区间变宽，定时还得再调。',ok:()=>{const M=model();return ST.fab==='denim'&&ST.mode==='drop'&&Math.abs(M.act-3)<=0.15&&M.eps>=0.999&&M.drag<=0.05&&M.back<=0.05&&!M.marks.length;}},
+  {t:'衬里滑料两层：缝 40 cm 上层多出 ≤ 3 mm，同时不打滑、不留痕，实际针距 3 ± 0.15 mm。',d:'先在下送布上试：压力小了打滑，大了错位超标、还留压痕。下送布做不到，就换送布方式。',ok:()=>{const M=model();return ST.fab==='lining'&&M.ply<=3&&M.eps>=0.999&&!M.marks.length&&Math.abs(M.act-3)<=0.15&&M.back<=0.05&&M.drag<=0.05;}}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{try{if(k.ok())done.add(i);}catch(e){}});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+// ---------- loop ----------
+let last=performance.now();
+function loop(now){const dt=Math.min(0.1,(now-last)/1000);last=now;if(ST.play){ST.phi+=dt*60;if(ST.phi>=360){ST.phi-=360;cyc++;}draw();}requestAnimationFrame(loop);}
+changed();requestAnimationFrame(loop);
+if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{drawTim();draw();});
+window.__api={ST,STD,model,changed,FE,PHL0,EFF0,done,TASKS,seen,read:(a,b)=>{$('rd1').value=a;$('rd2').value=b;$('rdChk').click();},mess:()=>$('mess').click()};
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

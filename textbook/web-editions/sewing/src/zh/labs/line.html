@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>缝制车间产线仿真</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: guide + tasks rail | organisation & parameters, animated floor plan, KPIs, charts */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0; --floor:#f2f4f6;
+  --accent:#0f6e74; --bad:#d1495b; --ok:#1e8449; --warn:#b9770e;
+  --snl:#2f6fd6; --ol:#e0662f; --fl:#2e9e5b; --mnl:#7b8794; --piece:#c9a227; --rail:#9aa5b1;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--floor:#151c24;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--snl:#6ea8ff;--ol:#ff8c55;--fl:#58d68d;--mnl:#93a2b3;--piece:#e8c547;--rail:#4a5866;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--floor:#151c24;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--snl:#6ea8ff;--ol:#ff8c55;--fl:#58d68d;--mnl:#93a2b3;--piece:#e8c547;--rail:#4a5866;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1480px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,310px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:1180px){.two{grid-template-columns:minmax(0,1fr)}}
+.cfg{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px}
+@media (max-width:1180px){.cfg{grid-template-columns:minmax(0,1fr)}}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.sm{padding:0 7px;font-size:.8rem;line-height:1.6}
+input[type=range]{flex:1;min-width:100px;accent-color:var(--accent)}
+.prm{display:grid;grid-template-columns:8.2em minmax(0,1fr) 5.6em;gap:4px 8px;align-items:center;font-size:.86rem}
+.prm label{color:var(--muted)}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+.note{font-size:.8rem;color:var(--muted);margin:6px 0 0}
+.steps{margin:0;padding-left:1.3em;font-size:.86rem}
+.steps li{margin:3px 0;cursor:pointer}
+.steps li.on{font-weight:600;color:var(--accent)}
+.lesson{font-size:.88rem;background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px}
+.lesson p{margin:0 0 6px}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.kpi{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+@media (max-width:900px){.kpi{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:520px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px;min-width:0}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted);font-size:.74rem;display:block}
+.stage{position:relative;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--floor)}
+.stage canvas{display:block;width:100%;height:auto}
+canvas.chart{display:block;width:100%;height:auto;border-radius:6px;background:var(--sheet)}
+table.al{width:100%;border-collapse:collapse;font-size:.8rem}
+table.al th{color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--rule);padding:2px 4px}
+table.al td{border-bottom:1px solid var(--rule);padding:2px 4px;white-space:nowrap}
+table.al td.n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;font-family:var(--f-mono);font-size:.72rem;border-radius:3px;padding:0 4px;color:#fff}
+.bar{height:6px;border-radius:3px;background:var(--rule);position:relative;min-width:50px}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.bar em{position:absolute;top:-2px;bottom:-2px;width:1.5px;background:var(--ink)}
+.ops{display:flex;flex-wrap:wrap;gap:6px}
+.opr{border:1px solid var(--rule);border-radius:6px;padding:4px 6px;font-size:.8rem;text-align:center;min-width:64px;background:var(--bg)}
+.opr b{display:block;font-family:var(--f-mono)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px;background:var(--c)}
+.clock{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.86rem;color:var(--muted)}
+.hide{display:none!important}
+</style>
+<div class="wrap">
+<header><h1>缝制车间产线仿真</h1><span class="sub">《缝纫机设计与制造》第 29 章 · 虚拟实验 29-1 · 同一件 T 恤在捆扎流水、吊挂单件流和 U 型单元里的产量、在制品与生产周期</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>实验指导</h3>
+      <ol class="steps" id="steps"></ol>
+      <div class="lesson" id="lesson"></div>
+      <div class="row"><button type="button" id="prev">上一步</button><button type="button" id="next">下一步</button></div>
+    </section>
+    <section class="panel">
+      <h3>任务（自动判定）</h3>
+      <div id="tasks"></div>
+      <p class="note">产线任务在仿真时钟走过 4 小时后判定；仿真前产线已按当前设置连续运行了一个班，所以开工时线上已有在制品。</p>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>生产组织</h3>
+      <div class="row" id="modes">
+        <button type="button" data-m="pbs" aria-pressed="true">捆扎流水</button>
+        <button type="button" data-m="ups">吊挂单件流</button>
+        <button type="button" data-m="cell">U 型单元</button>
+        <button type="button" data-m="batch">批量与换款</button>
+      </div>
+      <div class="cfg" id="cfgLine">
+        <div>
+          <div class="row"><span class="note" style="margin:0">人员分配：</span><button type="button" data-a="op" aria-pressed="true">一人一道工序</button><button type="button" data-a="group">按机种合并</button></div>
+          <div class="row" id="presets"><button type="button" class="sm" id="pSrc">资料原配置（22 人）</button><button type="button" class="sm" id="pTakt">按节拍逐道配置</button></div>
+          <div id="alloc"></div>
+        </div>
+        <div>
+          <div class="prm" id="prmLine"></div>
+          <p class="note" id="lineNote"></p>
+        </div>
+      </div>
+      <div id="cfgCell" class="hide">
+        <p class="note" style="margin-top:0">7 名多能工从 U 型单元的入口到出口依次排开，数字是熟练度（1.0 = 标准速度）。用 ← → 调换顺序。</p>
+        <div class="ops" id="cellOps"></div>
+        <div class="prm" id="prmCell" style="margin-top:8px"></div>
+      </div>
+      <div id="cfgBatch" class="hide">
+        <div class="cfg"><div class="prm" id="prmBatchL"></div><div class="prm" id="prmBatchC"></div></div>
+        <div class="prm" id="prmBatch" style="margin-top:6px"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="kpi" id="kpi"></div>
+    </section>
+    <section class="panel" id="floorPanel">
+      <div class="row" style="margin-top:0;justify-content:space-between">
+        <h3 style="margin:0">车间平面（俯视）</h3>
+        <span class="clock" id="clock">08:00</span>
+      </div>
+      <div class="stage"><canvas id="cv" width="1100" height="430" aria-label="车间平面动画"></canvas></div>
+      <div class="row">
+        <button type="button" id="play" aria-pressed="true">暂停</button>
+        <span class="note" style="margin:0">速度</span>
+        <button type="button" data-s="1">1 分/秒</button><button type="button" data-s="5" aria-pressed="true">5 分/秒</button><button type="button" data-s="20">20 分/秒</button>
+        <button type="button" id="ff">跳到下班</button><button type="button" id="restart">重新开工</button>
+      </div>
+      <div class="legend"><span style="--c:var(--snl)">平缝 SNL</span><span style="--c:var(--ol)">包缝 4OL</span><span style="--c:var(--fl)">绷缝 FL</span><span style="--c:var(--mnl)">手工台 MNL</span><span style="--c:var(--piece)">衣片（捆或衣架）</span></div>
+    </section>
+    <div class="two" id="chartsLine">
+      <section class="panel"><h3 id="balTitle">平衡图：每人负荷与节拍</h3><canvas class="chart" id="cBal" width="640" height="300"></canvas></section>
+      <section class="panel"><h3>本班产量与在制品</h3><canvas class="chart" id="cTs" width="640" height="300"></canvas></section>
+    </div>
+    <section class="panel hide" id="batchPanel"><h3>批量与每件人工</h3><canvas class="chart" id="cBatch" width="1100" height="420"></canvas><p class="note" id="batchNote"></p></section>
+  </div>
+</div>
+</div>
+<script>
+// 第 29 章 虚拟实验 29-1 的仿真内核（浏览器与 node 共用）
+(function(G){
+const OPS=[["钉洗水标","SNL",0.23],["前后片配对","MNL",0.207],["合肩缝","4OL",0.38],["领罗纹量裁","MNL",0.287],
+ ["领罗纹接头","SNL",0.299],["绱领罗纹","4OL",0.345],["压领绷缝","FL",0.287],["钉主唛","SNL",0.38],
+ ["袖口绷缝","FL",0.345],["袖片配对","MNL",0.253],["绱袖","4OL",0.483],["袖窿绷缝","FL",0.345],
+ ["合侧缝","4OL",0.655],["袖口封结","SNL",0.425],["下摆绷缝","FL",0.529],["剪线头","MNL",0.391]].map((o,i)=>({i,name:o[0],m:o[1],smv:o[2]}));
+const SMV=OPS.reduce((a,o)=>a+o.smv,0);
+const MT=["SNL","4OL","FL","MNL"];
+function rng(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=0;return s/4294967296;};}
+function gauss(r){let u=0,v=0;while(u===0)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+// 分配：kind 'op' => cnt[16]（每道工序人数）；'group' => cnt by machine type {SNL:..}
+function makeOperators(alloc){
+  const ops=[];
+  if(alloc.kind==='op'){OPS.forEach(o=>{for(let k=0;k<alloc.cnt[o.i];k++)ops.push({ops:[o.i],m:o.m});});}
+  else{MT.forEach(m=>{const list=OPS.filter(o=>o.m===m).map(o=>o.i);for(let k=0;k<(alloc.cnt[m]||0);k++)ops.push({ops:list,m});});}
+  return ops.map((o,id)=>({id,ops:o.ops,m:o.m,skill:1,busy:0,state:'idle',cur:null,left:0,blocked:null,work:0}));
+}
+function balance(alloc){ // 静态平衡：瓶颈负荷与平衡率
+  let N=0,loads=[];
+  if(alloc.kind==='op'){OPS.forEach(o=>{const k=alloc.cnt[o.i];N+=k;loads.push({name:o.name,m:o.m,k,load:k?o.smv/k:Infinity});});}
+  else{MT.forEach(m=>{const s=OPS.filter(o=>o.m===m).reduce((a,o)=>a+o.smv,0);const k=alloc.cnt[m]||0;N+=k;loads.push({name:m,m,k,load:k?s/k:Infinity});});}
+  const b=Math.max(...loads.map(l=>l.load));
+  return {N,loads,bott:b,eff:SMV/(N*b),cap:60/b};
+}
+// ---------------- 流水线（捆扎 / 吊挂） ----------------
+function Line(p){
+  // p: {mode:'pbs'|'ups', alloc, bundle, cap, transport, skillSpread, cv, seed}
+  const r=rng(p.seed||7);
+  const S={t:0,p,r,ops:makeOperators(p.alloc),q:OPS.map(()=>[]),transit:[],loop:[],done:0,released:0,tp:[],tpSum:0,nextId:1,doneLog:[],relT:0};
+  S.ops.forEach((o,i)=>{o.skill=p.skillSpread?Math.max(0.6,1+p.skillSpread*gauss(r)):1;o.buf=[];});
+  return S;
+}
+function pieceTime(S,op,j){const c=S.p.cv==null?0.12:S.p.cv;return Math.max(0.2,1+c*gauss(S.r))*OPS[j].smv/op.skill;}
+function canDo(op,j){return op.ops.indexOf(j)>=0;}
+function lineStep(S,dt){
+  const p=S.p; S.t+=dt; const t=S.t;
+  const pbs=p.mode==='pbs';
+  const B=pbs?p.bundle:1;
+  // 投料：首道工序待加工少于阈值时放料
+  const wipMax=pbs?(p.wipMax||600):Math.min(p.wipMax||1e9,S.ops.length*(p.cap+1));
+  if(pbs){ // 按投产节拍放料（件/时）
+    S.relT-=dt;
+    if(S.relT<=0&&S.released-S.done+B<=wipMax){S.q[0].push({id:S.nextId++,n:B,rel:t,arr:t});S.released+=B;S.relT+=B*60/(p.rate||200);}
+  }else{
+    // 主轨上未分配的衣架重新寻找工位
+    for(let k=S.loop.length-1;k>=0;k--){const x=S.loop[k];if(x.retry<=t){if(route(S,x,null))S.loop.splice(k,1);else x.retry=t+(p.loopT||1);}}
+    S.relT-=dt;
+    if(S.relT<=0){ // 上挂站每 p.load 分钟上一件
+      const cand=(S.released-S.done<wipMax&&S.loop.length<3)?S.ops.filter(o=>canDo(o,0)&&o.buf.length<p.cap):[];
+      if(cand.length){cand.sort((a,b)=>(a.buf.length+(a.cur?1:0))-(b.buf.length+(b.cur?1:0)));cand[0].buf.push({id:S.nextId++,n:1,rel:t,j:0});S.released++;S.relT=p.load||0.1;}
+    }
+  }
+  // 在途到达
+  for(let k=S.transit.length-1;k>=0;k--){const x=S.transit[k];if(x.at<=t){S.transit.splice(k,1);if(x.j>=OPS.length){finish(S,x);}else if(pbs){S.q[x.j].push(x);}else{x.to.buf.push(x);}}}
+  // 作业
+  for(const o of S.ops){
+    if(!o.cur){
+      let pick=-1,bi=-1,best=Infinity;
+      if(pbs){for(let u=o.ops.length-1;u>=0;u--){const j=o.ops[u];if(S.q[j].length){pick=j;break;}}
+        if(pick>=0){o.cur=S.q[pick].shift();o.cur.j=pick;o.cnt=o.cur.n;o.left=pieceTime(S,o,pick)+(p.bundleT==null?0.2:p.bundleT);}}
+      else{if(o.buf.length){let bi=0;for(let u=1;u<o.buf.length;u++)if(o.buf[u].j>o.buf[bi].j)bi=u;o.cur=o.buf.splice(bi,1)[0];o.left=pieceTime(S,o,o.cur.j);}}
+      if(!o.cur){o.state='idle';continue;}
+    }
+    o.state='work';o.busy+=dt;o.left-=dt;
+    if(o.left<=0){
+      if(pbs){o.cnt--;o.work+=OPS[o.cur.j].smv;
+        if(o.cnt>0){o.left+=pieceTime(S,o,o.cur.j);}else{const b=o.cur;o.cur=null;b.j++;b.arr=t+p.transport;S.transit.push({...b,at:t+p.transport});}}
+      else{o.work+=OPS[o.cur.j].smv;const x=o.cur;o.cur=null;x.j++;if(x.j>=OPS.length){S.transit.push({...x,at:t+p.transport});}else if(!route(S,x,o)){x.retry=t+(p.loopT||1);S.loop.push(x);}}
+    }
+  }
+}
+function route(S,x,from){ // 吊挂：选下游缓冲最少的工位
+  const cand=S.ops.filter(o=>canDo(o,x.j)&&o.buf.length+S.transit.filter(y=>y.to===o).length<S.p.cap);
+  if(!cand.length)return false;
+  cand.sort((a,b)=>(a.buf.length+(a.cur?1:0)+S.transit.filter(y=>y.to===a).length)-(b.buf.length+(b.cur?1:0)+S.transit.filter(y=>y.to===b).length));
+  S.transit.push({...x,to:cand[0],at:S.t+S.p.transport});return true;
+}
+function finish(S,b){S.done+=b.n;const d=S.t-b.rel;S.tpSum+=d*b.n;S.tp.push(d);S.doneLog.push([S.t,b.n]);}
+function lineWip(S){return S.released-S.done;}
+function resetCounters(S){const w=S.released-S.done;S.t0=S.t;S.doneLog=[];S.tp=[];S.tpSum=0;S.done=0;S.released=w;(S.ops||S.ws).forEach(o=>{o.busy=0;o.work=0;});}
+// ---------------- U 型单元（接力式，bucket brigade） ----------------
+function Cell(p){ // p:{skills:[...], walk, overhead, cv, seed}
+  const r=rng(p.seed||11);const W=SMV*(1+(p.overhead==null?0.08:p.overhead));
+  const K=p.skills.length;
+  const ws=p.skills.map((s,i)=>({id:i,skill:s,x:W*i/K,state:'work',wait:0,busy:0,g:null}));
+  let nid=1; ws.forEach(w=>{w.g={id:nid++,rel:0};});
+  return {t:0,p,r,W,ws,done:0,released:K,tp:[],tpSum:0,nextId:nid,doneLog:[],K};
+}
+function cellStep(S,dt){
+  const p=S.p;S.t+=dt;const ws=S.ws,K=ws.length,c=p.cv==null?0.12:p.cv;
+  for(let i=K-1;i>=0;i--){const w=ws[i];
+    if(w.wait>0){w.wait-=dt;w.state='walk';continue;}
+    let v=w.skill*Math.max(0.3,1+c*gauss(S.r)*0.5);
+    let nx=w.x+v*dt;
+    if(i<K-1){const ahead=ws[i+1];if(ahead.wait<=0&&nx>ahead.x-0.02){nx=Math.max(w.x,ahead.x-0.02);w.state='block';}else w.state='work';}
+    else w.state='work';
+    if(w.state==='work')w.busy+=dt;
+    w.x=Math.min(nx,S.W);
+  }
+  const last=ws[K-1];
+  if(last.x>=S.W-1e-9&&last.wait<=0){ // 完成一件，依次向后交接
+    S.done++;const d=S.t-last.g.rel;S.tpSum+=d;S.tp.push(d);S.doneLog.push([S.t,1]);
+    for(let i=K-1;i>0;i--){ws[i].x=ws[i-1].x;ws[i].g=ws[i-1].g;ws[i].wait=p.walk==null?0.08:p.walk;}
+    ws[0].x=0;ws[0].g={id:S.nextId++,rel:S.t};ws[0].wait=p.walk==null?0.08:p.walk;S.released++;
+  }
+}
+// ---------------- 统计 ----------------
+function stats(S,N){
+  const T=S.t-(S.t0||0);const h=T/60;const out=h>0?S.done/h:0;
+  const rate=out;
+  const tpAvg=S.tp.length?S.tp.slice(-Math.min(S.tp.length,200)).reduce((a,b)=>a+b,0)/Math.min(S.tp.length,200):0;
+  const eff=T>0?(S.done*SMV)/(N*T):0;
+  return {out,rate,wip:S.released-S.done,tp:tpAvg,eff,perOp:rate/N};
+}
+// ---------------- 批量与换款（解析模型，29.5 节） ----------------
+const R0=30.1/47.6;
+function batchHours(Q,SAM,N,E,C,tau){const k=N*60/SAM*E;let lo=0,hi=1e5;for(let i=0;i<90;i++){const m=(lo+hi)/2;const Y=k*(m-(1-R0)*tau*(1-Math.exp(-m/tau)));if(Y<Q)lo=m;else hi=m;}return C+hi;}
+function laborPerPc(Q,SAM,c){return batchHours(Q,SAM,c.N,c.E,c.C,c.tau)*c.N*60/Q;}
+function crossover(SAM,L,Ce){let lo=10,hi=1e6;if(laborPerPc(hi,SAM,L)>laborPerPc(hi,SAM,Ce))return Infinity;for(let i=0;i<80;i++){const m=(lo+hi)/2;if(laborPerPc(m,SAM,L)>laborPerPc(m,SAM,Ce))lo=m;else hi=m;}return hi;}
+G.SIM={OPS,SMV,MT,Line,lineStep,Cell,cellStep,stats,balance,lineWip,resetCounters,laborPerPc,batchHours,crossover,R0};
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
+<script>
+(()=>{
+const S=window.SIM, OPS=S.OPS, MT=S.MT;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const MC={SNL:'--snl','4OL':'--ol',FL:'--fl',MNL:'--mnl'};
+const MNAME={SNL:'平缝',['4OL']:'包缝',FL:'绷缝',MNL:'手工'};
+const TARGET=200, TAKT=60/TARGET;
+const SRC=[1,1,2,1,1,1,1,2,1,1,2,1,2,2,2,1];
+const SKILLS0=[1.2,1.1,1.05,1.0,0.9,0.85,0.8];
+const ST={mode:'pbs',akind:'op',cnt:SRC.slice(),grp:{SNL:4,'4OL':6,FL:5,MNL:4},bundle:20,wipMax:600,rate:200,cap:3,
+  skills:SKILLS0.slice(),walk:0.08,
+  bat:{SAM:12,Q:150,LN:30,LE:0.70,LC:4,Ltau:12,CN:8,CE:0.58,CC:0.5,Ctau:6},
+  speed:5,playing:true};
+let SIMS=null, shiftT=0, ts=[], last=null;
+// ---------- 参数控件 ----------
+function slider(host,key,label,min,max,step,fmt,obj){
+  const o=obj||ST;const id='s_'+key;
+  host.insertAdjacentHTML('beforeend',`<label for="${id}">${label}</label><input id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${o[key]}"><output id="o_${key}">${fmt(o[key])}</output>`);
+  const el=$(id);el.addEventListener('input',()=>{o[key]=+el.value;$('o_'+key).textContent=fmt(o[key]);(obj?onBatch:rebuild)();});
+}
+function buildPrm(){
+  const h=$('prmLine');h.innerHTML='';
+  if(ST.mode==='pbs'){
+    slider(h,'bundle','捆的大小',1,40,1,v=>v+' 件');
+    slider(h,'wipMax','在制品上限',100,1000,50,v=>v+' 件');
+    slider(h,'rate','投产速度',120,240,10,v=>v+' 件/时');
+    $('lineNote').textContent='一捆衣片做完一道工序才整捆送往下一道，搬运 1 分钟，每捆解捆、扎捆 0.2 分钟。裁剪按投产速度放料，线上的在制品达到上限就暂停放料。';
+  }else{
+    slider(h,'cap','每人挂位',1,6,1,v=>v+' 个');
+    $('lineNote').textContent='衣片一件一个衣架，做完一道由吊挂轨道送到下一道工序里排队最短的工位，输送 15 秒。下游挂位全满时衣架留在主轨上循环，1 分钟后再找工位。';
+  }
+  const c=$('prmCell');c.innerHTML='';slider(c,'walk','交接走动时间',0,0.3,0.02,v=>(v*60).toFixed(0)+' 秒');
+  const b=ST.bat, bl=$('prmBatchL'), bc=$('prmBatchC'), bb=$('prmBatch');bl.innerHTML='<span style="grid-column:1/-1;font-weight:600;font-size:.84rem">长流水线</span>';bc.innerHTML='<span style="grid-column:1/-1;font-weight:600;font-size:.84rem">U 型单元</span>';bb.innerHTML='';
+  slider(bl,'LN','人数',15,50,1,v=>v+' 人',b);slider(bl,'LE','稳态效率',0.4,0.9,0.01,v=>(v*100).toFixed(0)+'%',b);slider(bl,'LC','换款停线',0,8,0.25,v=>v.toFixed(2)+' h',b);slider(bl,'Ltau','学习时间常数',1,24,1,v=>v+' h',b);
+  slider(bc,'CN','人数',4,15,1,v=>v+' 人',b);slider(bc,'CE','稳态效率',0.4,0.9,0.01,v=>(v*100).toFixed(0)+'%',b);slider(bc,'CC','换款停线',0,4,0.25,v=>v.toFixed(2)+' h',b);slider(bc,'Ctau','学习时间常数',1,24,1,v=>v+' h',b);
+  slider(bb,'SAM','款式工时 SAM',4,40,0.5,v=>v.toFixed(1)+' 分',b);slider(bb,'Q','订单批量',50,5000,50,v=>v+' 件',b);
+}
+function allocObj(){return ST.akind==='op'?{kind:'op',cnt:ST.cnt.slice()}:{kind:'group',cnt:{...ST.grp}};}
+function buildAlloc(){
+  const bal=S.balance(allocObj()), h=$('alloc');
+  const bar=(load)=>{const f=Math.min(1,load/(TAKT*1.6));const over=load>TAKT*1.0001;return `<div class="bar"><i style="width:${(f*100).toFixed(1)}%;background:${over?css('--bad'):css('--accent')}"></i><em style="left:${(100/1.6).toFixed(1)}%"></em></div>`;};
+  if(ST.akind==='op'){
+    h.innerHTML=`<table class="al"><tr><th>工序</th><th>机种</th><th>SMV/分</th><th>人数</th><th>每人负荷（竖线 = 节拍 ${(TAKT*60).toFixed(0)} 秒）</th></tr>`+
+    OPS.map(o=>{const k=ST.cnt[o.i];const load=k?o.smv/k:Infinity;return `<tr><td>${o.i+1} ${o.name}</td><td><span class="chip" style="background:${css(MC[o.m])}">${o.m}</span></td><td class="n">${o.smv.toFixed(3)}</td><td class="n"><button type="button" class="sm" data-d="-1" data-j="${o.i}" aria-label="减少一人">−</button> ${k} <button type="button" class="sm" data-d="1" data-j="${o.i}" aria-label="增加一人">+</button></td><td>${bar(load)}</td></tr>`;}).join('')+`</table>`;
+  }else{
+    h.innerHTML=`<table class="al"><tr><th>机种</th><th>包含工序</th><th>ΣSMV/分</th><th>人数</th><th>每人负荷</th></tr>`+
+    MT.map(m=>{const os=OPS.filter(o=>o.m===m);const s=os.reduce((a,o)=>a+o.smv,0);const k=ST.grp[m];return `<tr><td><span class="chip" style="background:${css(MC[m])}">${m}</span> ${MNAME[m]}</td><td>${os.length} 道</td><td class="n">${s.toFixed(3)}</td><td class="n"><button type="button" class="sm" data-d="-1" data-g="${m}" aria-label="减少一人">−</button> ${k} <button type="button" class="sm" data-d="1" data-g="${m}" aria-label="增加一人">+</button></td><td>${bar(k?s/k:Infinity)}</td></tr>`;}).join('')+`</table><p class="note">同一机种的人共用这几道工序的活，谁空下来就先做最靠后的那道。</p>`;
+  }
+  h.insertAdjacentHTML('beforeend',`<p class="note">共 ${bal.N} 人；瓶颈每人负荷 ${(bal.bott*60).toFixed(1)} 秒，产能上限 ${isFinite(bal.cap)?bal.cap.toFixed(0):0} 件/时；平衡率 ${isFinite(bal.eff)?(bal.eff*100).toFixed(1):0}%。</p>`);
+  $('presets').classList.toggle('hide',ST.akind!=='op');
+}
+$('alloc').addEventListener('click',e=>{const b=e.target.closest('button[data-d]');if(!b)return;const d=+b.dataset.d;
+  if(b.dataset.j!=null){const j=+b.dataset.j;ST.cnt[j]=Math.max(0,Math.min(6,ST.cnt[j]+d));}else{const g=b.dataset.g;ST.grp[g]=Math.max(0,Math.min(15,ST.grp[g]+d));}
+  rebuild();});
+$('pSrc').onclick=()=>{ST.cnt=SRC.slice();rebuild();};
+$('pTakt').onclick=()=>{ST.cnt=OPS.map(o=>Math.max(1,Math.ceil(o.smv/TAKT-0.05)));rebuild();};
+document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ST.akind=b.dataset.a;document.querySelectorAll('[data-a]').forEach(x=>x.setAttribute('aria-pressed',x===b));rebuild();});
+document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+function setMode(m){ST.mode=m;document.querySelectorAll('#modes button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===m));
+  $('cfgLine').classList.toggle('hide',m==='cell'||m==='batch');$('cfgCell').classList.toggle('hide',m!=='cell');$('cfgBatch').classList.toggle('hide',m!=='batch');
+  $('floorPanel').classList.toggle('hide',m==='batch');$('chartsLine').classList.toggle('hide',m==='batch');$('batchPanel').classList.toggle('hide',m!=='batch');
+  $('balTitle').textContent=m==='cell'?'每人的工作、等待与走动时间':'平衡图：每人负荷与节拍';
+  buildPrm();if(m==='batch'){onBatch();renderKpi();}else rebuild();}
+function buildCell(){
+  $('cellOps').innerHTML=ST.skills.map((s,i)=>`<div class="opr"><small>${i===0?'入口':i===ST.skills.length-1?'出口':'第 '+(i+1)+' 位'}</small><b>${s.toFixed(2)}</b><button type="button" class="sm" data-c="${i}" data-d="-1" aria-label="左移">←</button> <button type="button" class="sm" data-c="${i}" data-d="1" aria-label="右移">→</button></div>`).join('');
+}
+$('cellOps').addEventListener('click',e=>{const b=e.target.closest('button[data-c]');if(!b)return;const i=+b.dataset.c,j=i+(+b.dataset.d);if(j<0||j>=ST.skills.length)return;const t=ST.skills[i];ST.skills[i]=ST.skills[j];ST.skills[j]=t;rebuild();});
+// ---------- 仿真 ----------
+function rebuild(){
+  if(ST.mode==='batch')return;
+  if(ST.mode==='cell'){buildCell();SIMS=S.Cell({skills:ST.skills.slice(),walk:ST.walk,seed:5});for(let t=0;t<30;t+=1/60)S.cellStep(SIMS,1/60);}
+  else{document.querySelectorAll('[data-a]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.a===ST.akind));buildAlloc();
+    const p=ST.mode==='pbs'?{mode:'pbs',alloc:allocObj(),bundle:ST.bundle,wipMax:ST.wipMax,transport:1,rate:ST.rate,seed:3}:{mode:'ups',alloc:allocObj(),cap:ST.cap,transport:0.25,load:0.1,seed:3};
+    SIMS=S.Line(p);if(SIMS.ops.length)for(let t=0;t<480;t+=1/60)S.lineStep(SIMS,1/60);}
+  S.resetCounters(SIMS);shiftT=0;ts=[[0,0,wipNow()]];last=null;renderKpi();drawBal();drawTs();draw();
+}
+const nPeople=()=>ST.mode==='cell'?ST.skills.length:(SIMS?SIMS.ops.length:0);
+const wipNow=()=>SIMS?(ST.mode==='cell'?SIMS.K:SIMS.released-SIMS.done):0;
+function advance(minutes){
+  if(!SIMS||ST.mode==='batch')return;const dt=1/60;let n=Math.round(minutes/dt);
+  if(ST.mode!=='cell'&&!SIMS.ops.length){shiftT=Math.min(480,shiftT+minutes);return;}
+  while(n-->0&&shiftT<480){if(ST.mode==='cell')S.cellStep(SIMS,dt);else S.lineStep(SIMS,dt);shiftT+=dt;
+    if(shiftT-ts[ts.length-1][0]>=5)ts.push([shiftT,SIMS.done,wipNow()]);}
+}
+function cur(){if(!SIMS||shiftT<1e-6)return null;const st=S.stats(SIMS,nPeople());return st;}
+// ---------- KPI ----------
+function renderKpi(){
+  const k=$('kpi');
+  if(ST.mode==='batch'){const b=ST.bat,L={N:b.LN,E:b.LE,C:b.LC,tau:b.Ltau},C={N:b.CN,E:b.CE,C:b.CC,tau:b.Ctau};
+    const lL=S.laborPerPc(b.Q,b.SAM,L),lC=S.laborPerPc(b.Q,b.SAM,C),x=S.crossover(b.SAM,L,C);
+    k.innerHTML=kp(b.Q+' 件','订单批量')+kp(lL.toFixed(1),'长线 每件人工（分）')+kp(lC.toFixed(1),'单元 每件人工（分）')+kp(S.batchHours(b.Q,b.SAM,b.LN,b.LE,b.LC,b.Ltau).toFixed(1),'长线 交货用时（h）')+kp(S.batchHours(b.Q,b.SAM,b.CN,b.CE,b.CC,b.Ctau).toFixed(1),'单元 交货用时（h）')+kp(isFinite(x)?Math.round(x)+' 件':'—','分界批量')+kp((b.SAM/b.LE).toFixed(1)+' / '+(b.SAM/b.CE).toFixed(1),'稳态每件人工 长线 / 单元');
+    return;}
+  const st=cur();const bal=ST.mode==='cell'?null:S.balance(allocObj());
+  const f=(v,d=1)=>st?v.toFixed(d):'—';
+  k.innerHTML=kp(nPeople(),'人数')+kp(f(st?st.rate:0,0),'产量 件/时')+kp(f(st?st.perOp:0,2),'人均 件/人·时')+kp(st?(st.eff*100).toFixed(1)+'%':'—','线效率')+kp(wipNow(),'在制品 件')+kp(st&&st.tp?st.tp.toFixed(1):'—','平均生产周期 分')+kp(bal?(isFinite(bal.eff)?(bal.eff*100).toFixed(1)+'%':'—'):'—','平衡率');
+  const hh=8+Math.floor(shiftT/60),mm=Math.floor(shiftT%60);$('clock').textContent=`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}　本班已过 ${(shiftT/60).toFixed(1)} 小时${shiftT>=480?'（下班）':''}`;
+}
+const kp=(v,l)=>`<div><b>${v}</b><small>${l}</small></div>`;
+// ---------- 车间平面 ----------
+const cv=$('cv'),ctx=cv.getContext('2d');
+function fit(c,h){const w=c.clientWidth||c.width;const r=window.devicePixelRatio||1;const H=Math.round(w*h);if(c.width!==Math.round(w*r)){c.width=Math.round(w*r);c.height=Math.round(H*r);}const g=c.getContext('2d');g.setTransform(c.width/w,0,0,c.width/w,0,0);return {g,w,h:H};}
+function opPos(j,W,H){ // 16 道工序排成蛇形两排
+  const n=8,mx=96,gap=(W-2*mx)/(n-1);const row=j<n?0:1;const col=row?n-1-(j-n):j;return {x:mx+col*gap,y:row?H*0.72:H*0.30,row};}
+function draw(){
+  const {g,w,h}=fit(cv,0.39);g.clearRect(0,0,w,h);
+  g.font=`12px ${css('--f-body')}`;g.textBaseline='middle';
+  if(!SIMS)return;
+  if(ST.mode==='batch')return;if(ST.mode==='cell')return drawCell(g,w,h);
+  // 轨道 / 通道
+  g.strokeStyle=css('--rail');g.lineWidth=ST.mode==='ups'?3:1;g.setLineDash(ST.mode==='ups'?[]:[6,6]);
+  const a=opPos(0,w,h),b=opPos(7,w,h),c2=opPos(8,w,h);
+  g.beginPath();g.roundRect(a.x-40,a.y-58,(b.x-a.x)+80,(c2.y-a.y)+116,40);g.stroke();g.setLineDash([]);
+  g.fillStyle=css('--muted');g.textAlign='left';g.fillText(ST.mode==='ups'?'吊挂主轨（衣架顺时针运行）':'车间通道（整捆衣片由搬运工推车送往下道）',a.x-36,a.y-70);
+  g.textAlign='center';g.fillStyle=css('--ink');g.font=`600 12px ${css('--f-body')}`;g.fillText('裁片',22,a.y-8);g.fillText('投入 →',22,a.y+8);g.fillText('← 成品',22,opPos(15,w,h).y);g.font=`12px ${css('--f-body')}`;
+  const ops=SIMS.ops;const qn=j=>ST.mode==='pbs'?SIMS.q[j].reduce((s,b)=>s+b.n,0):ops.filter(o=>o.ops.indexOf(j)>=0).reduce((s,o)=>s+o.buf.filter(x=>x.j===j).length,0);
+  // 工序位
+  OPS.forEach(o=>{const p=opPos(o.i,w,h);const col=css(MC[o.m]);
+    g.fillStyle=css('--sheet');g.strokeStyle=col;g.lineWidth=1.5;g.beginPath();g.roundRect(p.x-34,p.y-22,68,44,6);g.fill();g.stroke();
+    g.fillStyle=css('--ink');g.textAlign='center';g.font=`600 11px ${css('--f-body')}`;g.fillText((o.i+1)+' '+o.name,p.x,p.y+(p.row?32:-32));
+    g.font=`11px ${css('--f-mono')}`;g.fillStyle=col;g.textAlign='left';g.fillText(o.m,p.x-30,p.y-12);g.textAlign='center';
+    // 排队：堆叠方块，每块 = 10 件
+    const n=qn(o.i);g.fillStyle=css('--piece');
+    if(ST.mode==='pbs'){const blocks=Math.min(12,Math.ceil(n/10));for(let k=0;k<blocks;k++){const bx=p.x-30+(k%6)*10,by=p.y+2+Math.floor(k/6)*8;g.fillRect(bx,by,8,6);}}
+    else{for(let k=0;k<Math.min(n,12);k++){g.beginPath();g.arc(p.x-27+(k%6)*10,p.y+6+Math.floor(k/6)*8,3,0,7);g.fill();}}
+    if(n>0){g.fillStyle=n>120?css('--bad'):css('--muted');g.font=`600 10px ${css('--f-mono')}`;g.textAlign='right';g.fillText(n+' 件',p.x+32,p.y-12);g.textAlign='center';}
+  });
+  // 在途
+  const t=SIMS.t;
+  for(const x of SIMS.transit){const to=x.to?homeOf(x.to,x.j):x.j;const j0=Math.max(0,x.j-1);const p0=opPos(j0,w,h),p1=x.j>=16?{x:w-20,y:opPos(15,w,h).y}:opPos(typeof to==='number'?to:x.j,w,h);
+    const T=ST.mode==='pbs'?1:0.25;const f=Math.max(0,Math.min(1,1-(x.at-t)/T));const X=p0.x+(p1.x-p0.x)*f,Y=(p0.y-34)+(p1.y-p0.y)*f;
+    g.fillStyle=css('--piece');if(ST.mode==='pbs'){g.fillRect(X-6,Y-4,12,8);}else{g.beginPath();g.arc(X,Y,3,0,7);g.fill();}}
+  if(ST.mode==='ups'){g.fillStyle=css('--piece');const L=SIMS.loop.length;for(let k=0;k<Math.min(L,30);k++){const xx=a.x-30+((t*40+k*25)%((b.x-a.x)+60));g.beginPath();g.arc(xx,a.y-58,3,0,7);g.fill();}}
+  // 操作工
+  const seen={};
+  ops.forEach(o=>{const j=o.cur?o.cur.j:(o.lastJ!=null?o.lastJ:o.ops[0]);o.lastJ=j;const p=opPos(j,w,h);const k=(seen[j]=(seen[j]||0)+1)-1;
+    const ox=p.x-24+(k%4)*16,oy=p.y+(p.row?-36:36)+Math.floor(k/4)*14*(p.row?-1:1);
+    g.fillStyle=o.state==='work'?css(MC[o.m]):css('--sheet');g.strokeStyle=css(MC[o.m]);g.lineWidth=2;g.beginPath();g.arc(ox,oy,6,0,7);g.fill();g.stroke();
+    if(o.cur){g.fillStyle=css('--piece');if(ST.mode==='pbs')g.fillRect(ox+5,oy-9,7,5);else{g.beginPath();g.arc(ox+7,oy-7,2.5,0,7);g.fill();}}});
+  g.textAlign='left';g.fillStyle=css('--muted');g.font=`11px ${css('--f-body')}`;g.fillText(ST.mode==='pbs'?'圆点 = 操作工（实心在做活，空心在等活），身旁小块是手上那一捆；工位里的黄色小块 = 排队的捆，每块约 10 件':'圆点 = 操作工（实心在做活，空心在等活）；黄点 = 衣架，工位里的是排队的衣架，主轨上的是在途或循环的衣架',8,h-10);
+}
+function homeOf(o,j){return j;}
+function drawCell(g,w,h){
+  const n=16,cx=w/2;const left=w*0.12,right=w*0.88,top=h*0.2,bot=h*0.8;
+  // U 形：入口在左下，沿左边向上、顶边向右、右边向下到出口
+  const per=[];const L1=bot-top,L2=right-left,L3=bot-top,LT=L1+L2+L3;
+  const at=s=>{let d=s*LT;if(d<=L1)return{x:left,y:bot-d};d-=L1;if(d<=L2)return{x:left+d,y:top};d-=L2;return{x:right,y:top+d};};
+  const cum=[0];OPS.forEach(o=>cum.push(cum[cum.length-1]+o.smv));
+  g.strokeStyle=css('--rule');g.lineWidth=26;g.lineJoin='round';g.beginPath();g.moveTo(left,bot);g.lineTo(left,top);g.lineTo(right,top);g.lineTo(right,bot);g.stroke();
+  OPS.forEach((o,i)=>{const s=(cum[i]+cum[i+1])/2/S.SMV;const p=at(s);const col=css(MC[o.m]);
+    g.fillStyle=css('--sheet');g.strokeStyle=col;g.lineWidth=1.5;g.beginPath();g.roundRect(p.x-15,p.y-11,30,22,4);g.fill();g.stroke();
+    g.fillStyle=col;g.font=`10px ${css('--f-mono')}`;g.textAlign='center';g.fillText(i+1,p.x,p.y);
+    g.fillStyle=css('--muted');g.font=`10px ${css('--f-body')}`;
+    const off=p.x===left?-48:p.x===right?48:0,offy=p.y===top?-22:0;g.fillText(o.name,p.x+off,p.y+offy);});
+  g.fillStyle=css('--muted');g.font=`12px ${css('--f-body')}`;g.textAlign='center';g.fillText('入口（裁片）',left,bot+26);g.fillText('出口（成品）',right,bot+26);
+  SIMS.ws.forEach((wk,i)=>{const s=Math.min(1,wk.x/SIMS.W);const p=at(s);const inside=p.x===left?36:p.x===right?-36:0,iy=p.y===top?36:0;
+    const X=p.x+inside,Y=p.y+iy;g.fillStyle=css('--piece');g.fillRect(X+10,Y-16,10,8);
+    g.fillStyle=wk.state==='work'?css('--accent'):css('--sheet');g.strokeStyle=css('--accent');g.lineWidth=2;g.beginPath();g.arc(X,Y,14,0,7);g.fill();g.stroke();
+    g.fillStyle=wk.state==='work'?css('--sheet'):css('--ink');g.font=`600 10px ${css('--f-mono')}`;g.textAlign='center';g.fillText(wk.skill.toFixed(2),X,Y);});
+  g.textAlign='center';g.fillStyle=css('--muted');g.font=`11px ${css('--f-body')}`;
+  g.fillText('每人拿着一件衣服沿 U 形往前做，追上前面的人就等；最后一人做完一件，回头接过前一人手里的衣服，依次向前交接，第一人回到入口取新裁片',cx,h-10);
+}
+// ---------- 图表 ----------
+function axes(g,w,h,pad,xl,yl,ymax,yfmt){
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.lineWidth=1;g.font=`11px ${css('--f-body')}`;
+  const ny=4;for(let i=0;i<=ny;i++){const y=h-pad.b-(h-pad.t-pad.b)*i/ny;g.beginPath();g.moveTo(pad.l,y);g.lineTo(w-pad.r,y);g.stroke();g.textAlign='right';g.fillText(yfmt(ymax*i/ny),pad.l-6,y);}
+  g.save();g.translate(14,(h-pad.b+pad.t)/2);g.rotate(-Math.PI/2);g.textAlign='center';g.fillText(yl,0,0);g.restore();
+  g.textAlign='center';g.fillText(xl,(w+pad.l-pad.r)/2,h-6);
+}
+function drawBal(){
+  const c=$('cBal');const {g,w,h}=fit(c,0.47);g.clearRect(0,0,w,h);if(!SIMS)return;
+  const pad={l:48,r:12,t:14,b:40};g.textBaseline='middle';
+  if(ST.mode==='cell'){
+    const ws=SIMS.ws,T=Math.max(1e-6,SIMS.t-(SIMS.t0||0));const ymax=100;axes(g,w,h,pad,'操作工（按 U 型单元中的位置）','占本班时间 %',ymax,v=>v.toFixed(0));
+    const bw=(w-pad.l-pad.r)/ws.length;
+    ws.forEach((k,i)=>{const busy=Math.min(1,k.busy/T);const x=pad.l+i*bw+bw*0.2,bh=(h-pad.t-pad.b)*busy;g.fillStyle=css('--accent');g.fillRect(x,h-pad.b-bh,bw*0.6,bh);
+      g.fillStyle=css('--muted');g.textAlign='center';g.fillText(k.skill.toFixed(2),x+bw*0.3,h-pad.b+12);});
+    g.fillStyle=css('--muted');g.textAlign='left';g.fillText('柱高 = 做活时间占比，其余为等待和交接走动',pad.l+4,pad.t+6);return;}
+  const ops=SIMS.ops;if(!ops.length)return;
+  const bal=S.balance(allocObj());const items=bal.loads;const ymax=Math.max(TAKT*1.5,...items.filter(l=>isFinite(l.load)).map(l=>l.load))*60;
+  axes(g,w,h,pad,ST.akind==='op'?'工序':'机种组','每人负荷（秒/件）',ymax,v=>v.toFixed(0));
+  const bw=(w-pad.l-pad.r)/items.length;
+  items.forEach((l,i)=>{const v=isFinite(l.load)?l.load*60:ymax;const bh=(h-pad.t-pad.b)*Math.min(1,v/ymax);const x=pad.l+i*bw+bw*0.15;
+    g.fillStyle=l.load>=bal.bott-1e-9?css('--bad'):css(MC[l.m]);g.fillRect(x,h-pad.b-bh,bw*0.7,bh);
+    g.fillStyle=css('--muted');g.textAlign='center';g.font=`10px ${css('--f-body')}`;g.fillText(ST.akind==='op'?String(i+1):l.name,x+bw*0.35,h-pad.b+12);});
+  const yT=h-pad.b-(h-pad.t-pad.b)*(TAKT*60/ymax);g.strokeStyle=css('--ink');g.setLineDash([5,4]);g.beginPath();g.moveTo(pad.l,yT);g.lineTo(w-pad.r,yT);g.stroke();g.setLineDash([]);
+  g.font=`11px ${css('--f-body')}`;const lab=`节拍 ${(TAKT*60).toFixed(0)} 秒（目标 ${TARGET} 件/时）`;const lw=g.measureText(lab).width;g.fillStyle=css('--sheet');g.fillRect(w-pad.r-lw-10,pad.t-2,lw+8,16);g.fillStyle=css('--ink');g.textAlign='right';g.fillText(lab,w-pad.r-6,pad.t+6);
+  g.textAlign='left';g.fillStyle=css('--bad');g.fillText('红色 = 瓶颈；虚线 = 节拍',pad.l+4,pad.t+6);
+}
+function drawTs(){
+  const c=$('cTs');const {g,w,h}=fit(c,0.47);g.clearRect(0,0,w,h);if(!SIMS)return;
+  const pad={l:48,r:48,t:14,b:40};g.textBaseline='middle';
+  const omax=Math.max(100,...ts.map(r=>r[1]))*1.1,wmax=Math.max(20,...ts.map(r=>r[2]))*1.2;
+  axes(g,w,h,pad,'本班时间（小时）','累计产量（件）',omax,v=>v.toFixed(0));
+  const X=t=>pad.l+(w-pad.l-pad.r)*t/480,Y1=v=>h-pad.b-(h-pad.t-pad.b)*v/omax,Y2=v=>h-pad.b-(h-pad.t-pad.b)*v/wmax;
+  g.fillStyle=css('--muted');g.textAlign='center';for(let k=0;k<=8;k+=2)g.fillText(k,X(k*60),h-pad.b+12);
+  g.textAlign='left';for(let i=0;i<=4;i++){g.fillText((wmax*i/4).toFixed(0),w-pad.r+6,h-pad.b-(h-pad.t-pad.b)*i/4);}
+  g.lineWidth=2;g.strokeStyle=css('--accent');g.beginPath();ts.forEach((r,i)=>{i?g.lineTo(X(r[0]),Y1(r[1])):g.moveTo(X(r[0]),Y1(r[1]));});g.stroke();
+  g.strokeStyle=css('--piece');g.beginPath();ts.forEach((r,i)=>{i?g.lineTo(X(r[0]),Y2(r[2])):g.moveTo(X(r[0]),Y2(r[2]));});g.stroke();
+  const lr=ts[ts.length-1];g.font=`600 11px ${css('--f-body')}`;g.fillStyle=css('--accent');g.fillText('累计产量',Math.min(X(lr[0])+4,w-pad.r-60),Y1(lr[1])-10);
+  g.fillStyle=css('--warn');g.fillText('在制品（右轴，件）',Math.min(X(lr[0])+4,w-pad.r-110),Y2(lr[2])+12);
+}
+function onBatch(){renderKpi();drawBatch();checkTasks();}
+function drawBatch(){
+  const c=$('cBatch');const {g,w,h}=fit(c,0.38);g.clearRect(0,0,w,h);const b=ST.bat;
+  const L={N:b.LN,E:b.LE,C:b.LC,tau:b.Ltau},C={N:b.CN,E:b.CE,C:b.CC,tau:b.Ctau};
+  const pad={l:56,r:16,t:16,b:44};g.textBaseline='middle';
+  const qs=[];for(let e=Math.log10(50);e<=Math.log10(10000)+1e-9;e+=0.02)qs.push(10**e);
+  const yL=qs.map(q=>S.laborPerPc(q,b.SAM,L)),yC=qs.map(q=>S.laborPerPc(q,b.SAM,C));
+  const ymax=Math.min(Math.max(...yL,...yC),b.SAM*12);
+  axes(g,w,h,pad,'订单批量（件，对数坐标）','每件人工（分）',ymax,v=>v.toFixed(0));
+  const X=q=>pad.l+(w-pad.l-pad.r)*(Math.log10(q)-Math.log10(50))/(Math.log10(10000)-Math.log10(50)),Y=v=>h-pad.b-(h-pad.t-pad.b)*Math.min(v,ymax)/ymax;
+  g.fillStyle=css('--muted');g.textAlign='center';[50,100,200,500,1000,2000,5000,10000].forEach(q=>g.fillText(q,X(q),h-pad.b+12));
+  const line=(ys,col)=>{g.strokeStyle=col;g.lineWidth=2.2;g.beginPath();qs.forEach((q,i)=>{i?g.lineTo(X(q),Y(ys[i])):g.moveTo(X(q),Y(ys[i]));});g.stroke();};
+  line(yL,css('--ol'));line(yC,css('--accent'));
+  const x=S.crossover(b.SAM,L,C);
+  if(isFinite(x)&&x>=50&&x<=10000){g.strokeStyle=css('--muted');g.setLineDash([4,4]);g.beginPath();g.moveTo(X(x),pad.t);g.lineTo(X(x),h-pad.b);g.stroke();g.setLineDash([]);g.fillStyle=css('--ink');g.textAlign='left';g.fillText(`分界批量 ${Math.round(x)} 件`,X(x)+6,pad.t+10);}
+  const q=b.Q;g.fillStyle=css('--ol');g.beginPath();g.arc(X(q),Y(S.laborPerPc(q,b.SAM,L)),5,0,7);g.fill();g.fillStyle=css('--accent');g.beginPath();g.arc(X(q),Y(S.laborPerPc(q,b.SAM,C)),5,0,7);g.fill();
+  g.font=`600 12px ${css('--f-body')}`;g.textAlign='left';const i0=12;g.fillStyle=css('--ol');g.fillText(`长流水线（${b.LN} 人）`,X(qs[i0])+8,Y(yL[i0])-12);g.fillStyle=css('--accent');g.fillText(`U 型单元（${b.CN} 人）`,X(qs[i0])+8,Y(yC[i0])+16);
+  $('batchNote').textContent=`每件人工 = 这批货占用的全部工时 ÷ 件数。批量小时，换款停线和换款后几天的学习爬坡摊到每件上，长线人多，摊得也多。稳态（批量无限大）时长线每件 ${(b.SAM/b.LE).toFixed(1)} 分、单元 ${(b.SAM/b.CE).toFixed(1)} 分。学习曲线按换款第一天效率约为稳态的 ${(S.R0*100).toFixed(0)}% 设定。`;
+}
+// ---------- 动画循环 ----------
+function frame(ts_){
+  if(ST.mode!=='batch'&&ST.playing&&SIMS&&shiftT<480){const dtr=last==null?0:Math.min(0.1,(ts_-last)/1000);advance(dtr*ST.speed);}
+  last=ts_;if(ST.mode!=='batch'){draw();if(Math.floor(ts_/250)!==Math.floor((ts_-16)/250)){renderKpi();drawTs();drawBal();checkTasks();}}
+  requestAnimationFrame(frame);
+}
+$('play').onclick=()=>{ST.playing=!ST.playing;$('play').setAttribute('aria-pressed',ST.playing);$('play').textContent=ST.playing?'暂停':'继续';};
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ST.speed=+b.dataset.s;document.querySelectorAll('[data-s]').forEach(x=>x.setAttribute('aria-pressed',x===b));});
+$('ff').onclick=()=>{advance(480-shiftT);renderKpi();drawTs();drawBal();draw();checkTasks();};
+$('restart').onclick=()=>rebuild();
+// ---------- 指导与任务 ----------
+const LESSONS=[
+ ['认识这条线',`<p>一件基本款圆领短袖 T 恤分成 16 道工序，左表列出每道的机种和标准工时 SMV（分钟），合计 ${S.SMV.toFixed(2)} 分。包缝（橙色）和绷缝（绿色）占了一半以上的工时，这就是第 9、10 章那两类机器。</p><p>目标产量 200 件/时，节拍 = 3600 ÷ 200 = 18 秒：每个工位平均每 18 秒必须交出一件。表里每行的横条是“这道工序每人摊到的时间”，竖线就是节拍。</p>`],
+ ['找瓶颈',`<p>“资料原配置”是一份公开工序表里的 22 人配置。看平衡图：哪根柱最高、高出节拍多少？整条线的产量由它决定，别的工位再快也只能等它。</p><p>只加 1 个人，加在哪里产量涨得最多？试几处，对比 KPI 里的“产量”。（任务 1）</p>`],
+ ['工序合并',`<p>一人一道工序时，人数必须是整数，所以 0.3 个人的活也要占 1 个人，平衡率上不去。按节拍逐道配置要 27 人，平衡率只有 72%。</p><p>切到“按机种合并”：同一机种的几道工序由一组人共同承担，谁空下来就去做最靠后的那道。用 21 人能否做到 182 件/时以上？（任务 2）</p>`],
+ ['捆的大小与在制品',`<p>捆扎流水一次搬一捆，一捆不做完不往下走。在制品、产量和生产周期满足利特尔法则：在制品 = 产量 × 生产周期。在制品 600 件、产量 150 件/时，一件衣服平均要在线上待 4 小时。</p><p>把捆改小、在制品上限压低，生产周期能缩短多少？产量会不会掉？（任务 3）</p>`],
+ ['吊挂单件流',`<p>吊挂系统一件一个衣架，做完一道马上送走，下游工位有空位才送，所以线上的衣服数大约就是“人数 × 挂位”。看看在制品和生产周期变成多少。</p><p>再把人员分配切到“按机种合并”，吊挂按工位空闲自动派活，合并的好处更明显。（任务 4）</p>`],
+ ['U 型单元与接力',`<p>U 型单元里 7 名多能工每人会做多道工序，沿 U 形接力：最后一人做完一件就回头接前一人的活，依次交接。这种“接力区”会自动平衡：快的人自然多做一段。</p><p>但顺序有讲究。试试把熟练度最低的人放在入口、最高的放在出口，产量怎样变？为什么？（任务 5）</p>`],
+ ['批量与换款',`<p>小单快反的问题不在一天里，而在换款上。切到“批量与换款”：长线 30 人，单元 8 人，每换一款都要停线调机，换款后几天效率逐步爬升（第一天约为稳态的 63%）。</p><p>曲线交点是分界批量。只调长线的“换款停线”和“学习时间常数”，能把分界批量压到 1000 件以下吗？只压一项够不够？（任务 6）</p>`],
+];
+let step=0;
+function renderSteps(){$('steps').innerHTML=LESSONS.map((l,i)=>`<li class="${i===step?'on':''}" data-i="${i}">${l[0]}</li>`).join('');$('lesson').innerHTML=LESSONS[step][1];}
+$('steps').addEventListener('click',e=>{const li=e.target.closest('li');if(li){step=+li.dataset.i;renderSteps();goStep();}});
+$('prev').onclick=()=>{step=Math.max(0,step-1);renderSteps();goStep();};$('next').onclick=()=>{step=Math.min(LESSONS.length-1,step+1);renderSteps();goStep();};
+function goStep(){const m=['pbs','pbs','pbs','pbs','ups','cell','batch'][step];if(ST.mode!==m)setMode(m);
+  if(step===2&&ST.akind!=='group'){ST.akind='group';document.querySelectorAll('[data-a]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.a==='group'));rebuild();}}
+const BAT0={...ST.bat};
+const TASKS=[
+ {t:'只加一个人',d:'捆扎流水、一人一道工序，总人数 ≤ 23，产量 ≥ 165 件/时',ok:()=>ST.mode==='pbs'&&ST.akind==='op'&&shiftT>=240&&nPeople()<=23&&cur().rate>=165},
+ {t:'21 人做到 182 件/时',d:'任一流水方式，总人数 ≤ 21，产量 ≥ 182 件/时',ok:()=>(ST.mode==='pbs'||ST.mode==='ups')&&shiftT>=240&&nPeople()<=21&&nPeople()>0&&cur().rate>=182},
+ {t:'缩短生产周期',d:'捆扎流水，平均生产周期 ≤ 80 分，产量 ≥ 150 件/时',ok:()=>ST.mode==='pbs'&&shiftT>=240&&cur().tp>0&&cur().tp<=80&&cur().rate>=150},
+ {t:'吊挂：高产量、低在制',d:'吊挂单件流，产量 ≥ 185 件/时，在制品 ≤ 60 件',ok:()=>ST.mode==='ups'&&shiftT>=240&&cur().rate>=185&&wipNow()<=60},
+ {t:'排好接力顺序',d:'U 型单元 7 人，产量 ≥ 59 件/时',ok:()=>ST.mode==='cell'&&shiftT>=240&&cur().rate>=59},
+ {t:'压低分界批量',d:'批量与换款，只改长线的换款停线和学习时间常数，使分界批量 ≤ 1000 件',ok:()=>{if(ST.mode!=='batch')return false;const b=ST.bat;const same=['SAM','LN','LE','CN','CE','CC','Ctau'].every(k=>b[k]===BAT0[k]);return same&&S.crossover(b.SAM,{N:b.LN,E:b.LE,C:b.LC,tau:b.Ltau},{N:b.CN,E:b.CE,C:b.CC,tau:b.Ctau})<=1000;}},
+];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{try{if(k.ok())done.add(i);}catch(e){}});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+// ---------- 启动 ----------
+buildPrm();renderSteps();rebuild();checkTasks();requestAnimationFrame(frame);
+window.addEventListener('resize',()=>{draw();drawBal();drawTs();if(ST.mode==='batch')drawBatch();});
+window.__api={ST,setMode,rebuild,advance:(m)=>{advance(m);renderKpi();checkTasks();},cur,wipNow,done,TASKS,checkTasks,onBatch,
+  setAlloc:(k,v)=>{ST.akind=k;if(k==='op')ST.cnt=v.slice();else ST.grp={...v};rebuild();}};
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

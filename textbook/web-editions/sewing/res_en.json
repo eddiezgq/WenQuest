@@ -1,0 +1,296 @@
+[
+{
+"ch": 1,
+"href": "labs/stitch.html",
+"kind": "Animation",
+"title": "Hand sewing and machine sewing",
+"desc": "Cross-section animations of hand sewing, single-thread chainstitch 101 and two-thread lockstitch 301 side by side, with single-step playback; pull the thread end and watch the chainstitch unravel while the lockstitch holds."
+},
+{
+"ch": 2,
+"href": "labs/lockstitch.html",
+"kind": "Animation",
+"title": "Forming lockstitch 301",
+"desc": "Needle, rotary hook, take-up lever and feed dog move in step with the main-shaft angle; pause and drag degree by degree to see how the loop is caught, carried round the bobbin case and pulled tight."
+},
+{
+"ch": 2,
+"href": "labs/model-lockstitch.html",
+"kind": "3D model",
+"title": "Industrial lockstitch machine",
+"desc": "Rotate, X-ray and explode the whole machine and its four drive trains; click a part to see its name."
+},
+{
+"ch": 3,
+"href": "labs/slidercrank.html",
+"kind": "Virtual lab",
+"title": "Needle-bar slider-crank mechanism",
+"desc": "Adjust crank radius, link length and speed and see how the displacement, velocity and acceleration curves and the loop-catching moment change."
+},
+{
+"ch": 4,
+"href": "labs/takeup.html",
+"kind": "Virtual lab",
+"title": "Take-up mechanism and thread supply",
+"desc": "Animation of a four-bar take-up mechanism and the needle-thread path, with supply, demand and surplus plotted in sync; adjust the thread guide, check spring, fabric thickness and loop-catch timing, or design your own cam supply curve."
+},
+{
+"ch": 5,
+"href": "labs/hook.html",
+"kind": "Virtual lab",
+"title": "Joint adjustment of hook timing and needle-bar height",
+"desc": "Adjust the hook installation angle, needle-bar height and hook clearance and see whether the loop is caught; click the loop-catch window chart to set values, and sew 30 test stitches to count skipped stitches."
+},
+{
+"ch": 6,
+"href": "labs/feed.html",
+"kind": "Virtual lab",
+"title": "Feed-dog trajectory and feed timing",
+"desc": "Side-view animation, feed-dog trajectory and feed timing diagram, all synchronised. Adjust stitch length, feed timing, feed-dog height, presser-foot pressure and feed system, and see whether the fabric is pushed while the needle is in it, whether it is dragged back or slips, and how much the plies shift."
+},
+{
+"ch": 7,
+"href": "labs/tension.html",
+"kind": "Virtual lab",
+"title": "Tension balance and stitch cross-section",
+"desc": "Adjust the tension assembly and bobbin tension, change thread and fabric, and see where the interlacing point lands, whether the stitch is loose, and whether the seam puckers or the thread breaks; click on the tension plane to set values."
+},
+{
+"ch": 8,
+"href": "labs/timing.html",
+"kind": "Virtual lab",
+"title": "Whole-machine timing editor",
+"desc": "Move the hook timing, take-up phase and feed timing and check six cross-mechanism criteria live; adjust the speed and balance ratio to see the locus and maximum of the machine’s resultant inertia force."
+},
+{
+"ch": 9,
+"href": "labs/model-overlock.html",
+"kind": "3D model",
+"title": "High-speed overlock machine",
+"desc": "X-ray view of the head and animated paths of the needle and the upper and lower loopers, driven by the Chapter 9 calculation program."
+},
+{
+"ch": 9,
+"href": "labs/difffeed.html",
+"kind": "Virtual lab",
+"title": "Differential feed",
+"desc": "Choose a fabric and adjust the differential ratio to see whether the edge is gathered, flat or wavy."
+},
+{
+"ch": 9,
+"href": "labs/rssr.html",
+"kind": "Virtual lab",
+"title": "RSSR spatial four-bar linkage",
+"desc": "3D mechanism animation, four kinematic curves and step-by-step calculation, with three built-in presets: lower looper, upper looper and planar mechanism."
+},
+{
+"ch": 10,
+"href": "labs/looper.html",
+"kind": "Virtual lab",
+"title": "Chainstitch looper and 401 stitch formation",
+"desc": "Adjust the looper timing, height, needle-avoiding amplitude, forward-stroke clearance and retraction, and see whether the looper catches the needle-thread loop and whether the needle enters the thread triangle; front-view animation, top-view elliptical path and timing chart are shown in sync."
+},
+{
+"ch": 10,
+"href": "labs/coverstitch.html",
+"kind": "Virtual lab",
+"title": "Covering stitches and thread consumption",
+"desc": "Choose 401, 406, 407, 602 or 605 to see face and back sketches and the consumption ratio of each thread, then work out how many cones a batch needs from the number of garments and the cone length."
+},
+{
+"ch": 11,
+"href": "labs/zigzag.html",
+"kind": "Virtual lab",
+"title": "Zigzag: needle-swing timing and loop catching",
+"desc": "Adjust the bight, swing interval, motion law, speed and hook timing, and see whether the swing is completed while the needle is out of the fabric, whether the sideways inertia force exceeds the limit, and whether the needle is caught at both ends."
+},
+{
+"ch": 12,
+"href": "labs/hang.html",
+"kind": "Virtual lab",
+"title": "Hanger dispatching and bucket-brigade cells",
+"desc": "Compare dispatching rules and WIP limits for a hanger system, then see how a bucket-brigade cell ordered from slowest to fastest balances its own work."
+},
+{
+"ch": 12,
+"href": "labs/tend.html",
+"kind": "Virtual lab",
+"title": "Multi-machine tending: how many automatic units per operator",
+"desc": "Adjust the number of machines tended, the loading, automatic-sewing and walking times and the time variation; watch the operator circulate among the automatic units and find the balance point for the number of machines."
+},
+{
+"ch": 13,
+"href": "labs/solenoid.html",
+"kind": "Virtual lab",
+"title": "Solenoid drive: pull-in and release",
+"desc": "Adjust the drive voltage, boost, hold current and freewheeling method, and see how many degrees of main-shaft rotation the solenoid’s pull-in and release delays correspond to."
+},
+{
+"ch": 13,
+"href": "labs/servo.html",
+"kind": "Virtual lab",
+"title": "Needle positioning: servo tuning",
+"desc": "Adjust the position gain, velocity gain and integral time and observe overshoot, settling time and steady-state error as the main shaft stops at needle-up; retune after the inertia is doubled."
+},
+{
+"ch": 14,
+"href": "labs/trim.html",
+"kind": "Virtual lab",
+"title": "Trimming sequence editor",
+"desc": "Arrange the trimming-solenoid command angle, tension release, needle positioning and thread wiping on the timing chart, and see how delay and speed decide between a clean cut, a missed cut and the thread unthreading at the next start."
+},
+{
+"ch": 15,
+"href": "labs/pattern.html",
+"kind": "Virtual lab",
+"title": "Pattern sewer simulation",
+"desc": "Draw a pattern, set the stitch length and speed, and check whether each step can be completed in the time the needle is out of the fabric."
+},
+{
+"ch": 15,
+"href": "labs/patprog.html",
+"kind": "Virtual lab",
+"title": "Pattern programming",
+"desc": "Imitates pattern-programming software: draw lines, set the stitch length, insert start and end backtacks and thread trimming, and output a pattern file."
+},
+{
+"ch": 15,
+"href": "labs/model-pattern.html",
+"kind": "3D model",
+"title": "Programmable pattern sewer",
+"desc": "X–Y table, intermediate presser foot and machine head; can be rotated, viewed in cut-away and exploded."
+},
+{
+"ch": 16,
+"href": "labs/embroid.html",
+"kind": "Virtual lab",
+"title": "Multi-head embroidery machine: stitch length, speed and thread-break mending",
+"desc": "Adjust the number of heads, drive force and stitch length to see the frame-limited speed; simulate thread breaks, backup mending and overall efficiency on a multi-head machine."
+},
+{
+"ch": 17,
+"href": "labs/knit.html",
+"kind": "Virtual lab",
+"title": "Flat knitting simulation",
+"desc": "The carriage traverses and selects needles by position, building the loop diagram course by course and estimating the time per course and per panel."
+},
+{
+"ch": 17,
+"href": "labs/knitprog.html",
+"kind": "Virtual lab",
+"title": "Flat knitting machine operation and programming",
+"desc": "Draw a pattern chart with symbols, compile it into course-by-course carriage actions, then run it on the operating panel."
+},
+{
+"ch": 17,
+"href": "labs/fpga.html",
+"kind": "Virtual lab",
+"title": "FPGA programming for needle selection",
+"desc": "First build a selection channel from graphical blocks, then write simplified Verilog and inspect the waveforms."
+},
+{
+"ch": 17,
+"href": "labs/model-flatknit.html",
+"kind": "3D model",
+"title": "Computerised flat knitting machine",
+"desc": "V-shaped needle beds, carriage cams and needles, demonstrating knitting, tucking and racking."
+},
+{
+"ch": 18,
+"href": "labs/ebox.html",
+"kind": "Virtual lab",
+"title": "Control box: thermal design, interference and burn-in",
+"desc": "Adjust current, switching time, cooling and lint blockage and watch the junction temperature, capacitor life and common-mode current; choose burn-in conditions that bring down the first-year return rate."
+},
+{
+"ch": 19,
+"href": "labs/config.html",
+"kind": "Virtual lab",
+"title": "Parts-library configurator",
+"desc": "Pick a machine and enter the requirements; the cheapest set of modules that meets every criterion is picked from an illustrative library, with BOM, I/O map and firmware configuration; parts can also be swapped by hand."
+},
+{
+"ch": 20,
+"href": "labs/proto-ls.html",
+"kind": "Virtual lab",
+"title": "Lockstitch prototype bring-up bench",
+"desc": "Calibrate encoder direction and index offset, drag-edit the trim event table, and run 100 trial trims for success rate and stop-error spread"
+},
+{
+"ch": 21,
+"href": "labs/proto-fk.html",
+"kind": "Virtual lab",
+"title": "Scaled flat-knitting prototype: carriage speed and selection timing",
+"desc": "Set carriage speed and acceleration, gauge, selector response and scatter, MCU control period or FPGA, and the selection lead; the animation shows each needle's selection point against its window and counts mis-selections in a 60-needle course, course time and courses per hour; three auto-checked tasks."
+},
+{
+"ch": 22,
+"href": "labs/testbench.html",
+"kind": "Virtual lab",
+"title": "Automated test bench",
+"desc": "Six firmware versions, four test levels: run cases to find the trimming and stopping regressions, design a case set within the nightly budget, and work out how many tests are enough."
+},
+{
+"ch": 23,
+"href": "labs/tol.html",
+"kind": "Virtual lab",
+"title": "Tolerance chains and resonance",
+"desc": "Monte Carlo simulation of the hook-point clearance chain, and resonance analysis by speed sweep"
+},
+{
+"ch": 24,
+"href": "labs/hookfit.html",
+"kind": "Virtual lab",
+"title": "Rotary-hook selective assembly and process capability",
+"desc": "Monte Carlo simulation of grouped race–basket fitting (clearance distribution, leftovers, cost per set); Cpk and X̄–R control charts with drift alarms for the needle eye-punching operation."
+},
+{
+"ch": 25,
+"href": "labs/cam.html",
+"kind": "Virtual lab",
+"title": "Cam profile error and grinding compensation",
+"desc": "Choose a cam and motion law, set heat treatment, finish passes, a machine-error harmonic and the wheel radius; see lift error, harmonics, acceleration error versus speed and contact stress; run a compensation-grinding round and check size, shape and acceleration error at maximum speed. Three built-in tasks."
+},
+{
+"ch": 26,
+"href": "labs/iot.html",
+"kind": "Virtual lab",
+"title": "Connected sewing machines: events, metrics and data volume",
+"desc": "Simulates the events of one sewing machine over a shift and computes the piece count, OEE and counting error; compares the message rate, storage and latency of five reporting methods."
+},
+{
+"ch": 27,
+"href": "labs/factory.html",
+"kind": "Virtual lab",
+"title": "Digital factory: quality loop and traceability",
+"desc": "Hook-clearance data on the bus in the WenQuest Digital Factory topic and envelope format, control charts and run rules that raise alarms and NCRs, serial-to-lot traceability and the cost of late detection, and a payback calculator for a three-phase roll-out."
+},
+{
+"ch": 28,
+"href": "labs/line21.html",
+"kind": "Virtual lab",
+"title": "Line balancing",
+"desc": "Grouping and line balancing of the 23 casual-trousers operations; multi-machine tending and the effect of sewing-machine speed on operation time"
+},
+{
+"ch": 29,
+"href": "labs/line.html",
+"kind": "Virtual lab",
+"title": "Sewing-room line simulation",
+"desc": "Output, work in progress and throughput time for the same T-shirt on a progressive bundle line, a single-piece hanger line and a U-shaped cell, plus the effects of batch size and style changes."
+},
+{
+"ch": 30,
+"href": "labs/soft.html",
+"kind": "Virtual lab",
+"title": "Soft fabric and robots",
+"desc": "Fabric bending rigidity and droop, the reliability and payback of robot flows, and the energy account of direct-drive servos"
+},
+{
+"ch": 31,
+"href": "labs/aiqc.html",
+"kind": "Virtual lab",
+"title": "AI quality inspection and predictive maintenance",
+"desc": "Thresholds and base rates in vision inspection; lead time and false alarms in predictive maintenance"
+}
+]

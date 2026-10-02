@@ -1,0 +1,18 @@
+import sys; sys.path.insert(0, 'figsrc')
+from en_labelfix import Fixer
+D=(31,42,54); G=(91,105,120)
+f=Fixer('/home/claude/book/img/fig_hook_exploded.png')
+B=24; s=17
+f.erase(45,52,800,84); f.text(50,67,'Arranged left to right in order of disassembly: bobbin case and bobbin first, then the gib, and finally the bobbin-case holder',s,False,G,'lm')
+f.erase(260,108,540,168); f.text(400,110,'Tension spring',B,True,D,'mm'); f.text(400,128,'Presses on bobbin thread;\nscrew sets bobbin tension',s,False,G,'mm')
+f.erase(640,248,712,282); f.text(675,265,'Bobbin thread',B,True,D,'mm')
+f.erase(740,108,1010,168); f.text(875,110,'Gib',B,True,D,'mm'); f.text(875,128,'Screwed to front of hook body;\nretains the holder',s,False,G,'mm')
+f.erase(1470,70,1590,130); f.text(1475,88,'Positioning finger',B,True,D,'lm'); f.text(1475,117,'Fixed to the housing',s,False,G,'lm')
+f.erase(1658,190,1795,250); f.text(1663,207,'Hook point',B,True,D,'lm'); f.text(1663,236,'Catches the needle-thread loop',s,False,G,'lm')
+f.erase(78,525,132,550); f.text(130,537,'Axis',s,False,G,'rm')
+f.erase(165,880,460,948); f.text(312,897,'Bobbin case',B,True,D,'mm'); f.text(312,932,'Holds the bobbin; fits on the holder’s centre post',s,False,G,'mm')
+f.erase(585,955,665,1020); f.text(625,972,'Bobbin',B,True,D,'mm'); f.text(625,1007,'Wound with bobbin thread',s,False,G,'mm')
+f.erase(1090,880,1420,948); f.text(1255,897,'Bobbin-case holder',B,True,D,'mm'); f.text(1255,932,'Slides in the race; held still by the positioning finger',s,False,G,'mm')
+f.erase(1430,955,1805,1022); f.text(1618,972,'Hook body',B,True,D,'mm'); f.text(1618,1007,'Turns with the hook shaft: two turns per main-shaft turn',s,False,G,'mm')
+f.erase(1855,805,1945,840); f.text(1900,822,'Hook shaft',B,True,D,'mm')
+f.save('img/en/fig_hook_exploded.png')

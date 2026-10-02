@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Hanger dispatching and bucket brigades</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = needle path (front view), timing chart, stitch preview; right rail = checks, controls, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style><style>
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page[hidden]{display:none}
+</style>
+<div class="wrap">
+<header><h1>Hanger-system dispatching and bucket-brigade cells</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 12 · Virtual lab 12-2 · Who receives each hanger, how many pieces hang on the line, and how a few people share out the work themselves without a schedule</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tabA" aria-selected="true" type="button">① Hanger-system dispatching</button><button role="tab" id="tabB" aria-selected="false" type="button">② Bucket-brigade cell</button></div>
+<div class="page" id="pageA">
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>Hanger line, top view (squares beside each work station are queued hangers, the dark one is being sewn; a grey station is absent)</h3>
+      <canvas id="rail" width="1100" height="360" aria-label="Animation of the queues at each station on the hanger line"></canvas>
+      <div class="row"><button id="playA" type="button">Pause</button><span class="note" style="margin:0">Animation runs at 1 min of simulation = 1 s of playback, looping over 4 hours.</span></div>
+    </section>
+    <section class="panel">
+      <h3>Output vs WIP limit (current rule; dashed line = current limit)</h3>
+      <canvas id="capc" width="1100" height="300" aria-label="Output and average throughput time vs WIP limit"></canvas>
+    </section>
+    <p class="note">Model: a T-shirt with 6 operations (join shoulders 30 s, set collar 45 s, set sleeves 60 s, close side seams 50 s, hem sleeves 35 s, hem bottom 40 s); 10 operators, each skilled in 1–2 operations, efficiency 0.8–1.1; one hanger is launched every 5 s, and launching stops when the number of hangers on the line reaches the limit; a hanger takes 15 s from the main rail to a station, and if all stations are full it goes round the main rail once more (60 s) to be reassigned. “Fixed stations” sends work only to operators whose main operation it is; “Shortest queue” sends it to the operator with the fewest hangers queued; “Earliest finish” sends it to the operator estimated (from efficiency) to finish soonest. Times, skills and efficiencies are illustrative; results are the mean of 3 simulation runs.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results (4 hours)</h3><div class="checks" id="checksA"></div></section>
+    <section class="panel">
+      <h3>Adjust</h3>
+      <div class="prm">
+        <label for="rule">Dispatching rule</label><select id="rule"><option value="固定工位">Fixed stations</option><option value="最短队列">Shortest queue</option><option value="最早完工">Earliest finish</option></select><span></span>
+        <label for="cap">WIP limit (hangers on the line)</label><input id="cap" type="range" min="8" max="60" step="1" value="40"><output id="capv"></output>
+        <label for="buf">Max hangers queued per station</label><input id="buf" type="range" min="1" max="5" step="1" value="3"><output id="bufv"></output>
+        <label for="cv">Work-time variation (coefficient of variation)</label><input id="cv" type="range" min="0" max="0.4" step="0.05" value="0.15"><output id="cvv"></output>
+        <label for="abs">Operator 5 absent during hour 2</label><select id="abs"><option value="0">No</option><option value="1">Yes</option></select><span></span>
+      </div>
+      <div class="row"><button id="resetA" type="button">Reset to standard</button></div>
+    </section>
+    <section class="panel">
+      <h3>Tasks</h3><div id="tasksA"></div>
+      <div class="row" style="font-size:.84rem">Minimum limit: <input id="cm" type="number" step="1" aria-label="Smallest WIP limit that loses no output"> hangers<button id="cmChk" type="button">Check</button></div>
+      <div class="msg" id="msgA"></div>
+    </section>
+  </div>
+</div>
+</div>
+<div class="page" id="pageB" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>The total work content of one garment laid out as a line from 0 to 1 (dots: operators, moving in the direction work progresses)</h3>
+      <canvas id="bb" width="1100" height="200" aria-label="Animation of operator positions in the bucket-brigade cell"></canvas>
+      <div class="row"><button id="playB" type="button">Pause</button><button id="restartB" type="button">Restart</button></div>
+    </section>
+    <section class="panel">
+      <h3>Hand-off position for each garment (solid) and the theoretical balance position (dashed)</h3>
+      <canvas id="hand" width="1100" height="300" aria-label="Hand-off positions by garment number"></canvas>
+    </section>
+    <p class="note">Bucket-brigade rule: when the last operator finishes a garment, they walk back and take over the garment from the operator before them; that operator in turn walks back and takes over from the one before; the first operator returns to the start and begins a new garment. An operator who catches up with the one ahead can only follow and wait (no overtaking). Walking-back time is neglected. Speed is work content completed per unit time (illustrative values). With “fixed segments” each operator always does 1/3, and output is set by the slowest operator.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results</h3><div class="checks" id="checksB"></div></section>
+    <section class="panel">
+      <h3>Adjust (upstream to downstream)</h3>
+      <div class="prm">
+        <label for="v1">Operator 1 (upstream) speed</label><input id="v1" type="range" min="0.2" max="2" step="0.1" value="0.5"><output id="v1v"></output>
+        <label for="v2">Operator 2 speed</label><input id="v2" type="range" min="0.2" max="2" step="0.1" value="1"><output id="v2v"></output>
+        <label for="v3">Operator 3 (downstream) speed</label><input id="v3" type="range" min="0.2" max="2" step="0.1" value="1.5"><output id="v3v"></output>
+      </div>
+      <div class="row"><button id="s2f" type="button">Slow to fast</button><button id="f2s" type="button">Fast to slow</button></div>
+    </section>
+    <section class="panel"><h3>Tasks</h3><div id="tasksB"></div></section>
+  </div>
+</div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+const TASKHTML=(T,done)=>T.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');
+// tabs
+function tab(b){$('tabA').setAttribute('aria-selected',!b);$('tabB').setAttribute('aria-selected',b);$('pageA').hidden=b;$('pageB').hidden=!b;}
+$('tabA').onclick=()=>tab(false);$('tabB').onclick=()=>tab(true);
+// ================= page A: hanging system (same as model12.py hang_sim) =================
+const OPS=[['Shoulder',30],['Collar',45],['Sleeve',60],['Side',50],['Cuff',35],['Hem',40]];
+const SKILL=[[1.1,0,0,0,0,0],[0.9,1.0,0,0,0,0],[0,1.1,0,0,0,0],[0,0.8,1.0,0,0,0],[0,0,1.1,0,0,0],[0,0,0.9,1.0,0,0],[0,0,0,1.0,0.9,0],[0,0,0,0,1.1,0.8],[0,0,0,0,0,1.0],[0,0,0.8,0,0,1.1]];
+const nW=10,nO=6,T=4*3600,PRIM=SKILL.map(r=>r.indexOf(Math.max(...r)));
+function gauss(seed){let s=seed>>>0;const u=()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};return ()=>{let a=0;while(a===0)a=u();return Math.sqrt(-2*Math.log(a))*Math.cos(2*Math.PI*u());};}
+class Heap{constructor(){this.a=[];}push(x){const a=this.a;a.push(x);let i=a.length-1;while(i>0){const p=(i-1)>>1;if(a[p][0]<x[0]||(a[p][0]===x[0]&&a[p][1]<x[1]))break;a[i]=a[p];i=p;}a[i]=x;}
+  pop(){const a=this.a,top=a[0],x=a.pop();if(a.length){let i=0;for(;;){let l=2*i+1,r=l+1,m=i;const lt=(p,q)=>p[0]<q[0]||(p[0]===q[0]&&p[1]<q[1]);let best=x;if(l<a.length&&lt(a[l],best)){m=l;best=a[l];}if(r<a.length&&lt(a[r],best)){m=r;}if(m===i)break;a[i]=a[m];i=m;}a[i]=x;}return top;}get size(){return this.a.length;}}
+function hang(P,seed,log){
+  const z=gauss(seed),absent=P.abs?[4,3600,7200]:null,buf=P.buf,rule=P.rule;
+  const q=Array.from({length:nW},()=>[]),busyU=new Array(nW).fill(0),working=new Array(nW).fill(null),busyT=new Array(nW).fill(0),inb=new Array(nW).fill(0);
+  const ev=new Heap();let seq=0;const push=(t,k,d)=>ev.push([t,seq++,k,d]);
+  let wip=0,done=0,flow=[],start={},gid=0,rr=new Array(nO).fill(0),tnow=0,snaps=[],nextSnap=0,onRail=0;
+  const avail=(w,t)=>!(absent&&absent[0]===w&&absent[1]<=t&&t<absent[2]);
+  const qwork=w=>{let s=0;for(const [,o] of q[w])s+=OPS[o][1]/SKILL[w][o];if(working[w]!==null)s+=Math.max(0,busyU[w]-tnow);return s;};
+  function choose(o,t){let c=[];for(let w=0;w<nW;w++)if(SKILL[w][o]>0&&avail(w,t))c.push(w);
+    if(rule==='固定工位'){let fc=c.filter(w=>PRIM[w]===o);if(!fc.length)fc=c;fc=fc.filter(w=>q[w].length+inb[w]<buf);if(!fc.length)return null;rr[o]=(rr[o]+1)%fc.length;return fc[rr[o]];}
+    c=c.filter(w=>q[w].length+inb[w]<buf);if(!c.length)return null;
+    const key=rule==='最短队列'?(w=>(q[w].length+inb[w]+(working[w]!==null?1:0))*10-SKILL[w][o]):(w=>qwork(w)+OPS[o][1]/SKILL[w][o]);
+    let b=c[0];for(const w of c)if(key(w)<key(b))b=w;return b;}
+  function route(g,o,t){const w=choose(o,t);if(w===null)push(t+60,'retry',[g,o]);else{inb[w]++;push(t+15,'arrive',[g,o,w]);}}
+  function startwork(w,t){if(working[w]===null&&q[w].length&&avail(w,t)){const [g,o]=q[w].shift();const d=OPS[o][1]/SKILL[w][o]*Math.max(0.3,1+P.cv*z());working[w]=[g,o];busyU[w]=t+d;busyT[w]+=d;push(t+d,'finish',w);}}
+  push(0,'launch',null);for(let w=0;w<nW;w++)push(0,'tick',w);if(absent)push(absent[2],'back',absent[0]);
+  while(ev.size){const [t,,k,d]=ev.pop();tnow=t;if(t>T)break;
+    if(log)while(nextSnap<=t){snaps.push({t:nextSnap,q:q.map(x=>x.length),wk:working.map(x=>x!==null),wip,done});nextSnap+=10;}
+    if(k==='launch'){if(wip<P.cap){gid++;wip++;start[gid]=t;route(gid,0,t);}push(t+5,'launch',null);}
+    else if(k==='retry')route(d[0],d[1],t);
+    else if(k==='arrive'){const [g,o,w]=d;inb[w]--;q[w].push([g,o]);startwork(w,t);}
+    else if(k==='finish'){const w=d,[g,o]=working[w];working[w]=null;if(o+1<nO)route(g,o+1,t);else{done++;wip--;flow.push(t-start[g]);}startwork(w,t);}
+    else startwork(d,t);}
+  return {out:done*3600/T,flow:flow.length?flow.reduce((a,b)=>a+b,0)/flow.length:0,util:busyT.map(b=>b/T),snaps};}
+function hangAvg(P){const r=[1,2,3].map(s=>hang(P,s,false));const av=f=>r.reduce((a,b)=>a+b[f],0)/3;return {out:av('out'),flow:av('flow'),util:r[0].util.map((_,i)=>r.reduce((a,b)=>a+b.util[i],0)/3)};}
+const STDA={rule:'固定工位',cap:40,buf:3,cv:0.15,abs:0};const PA={...STDA};
+let RA=null,SNAP=null,tA=0,playA=true,capCurve=null,capKey='';
+const CAPS=[8,10,12,14,16,18,20,22,25,28,30,35,40,50,60];
+function capSweep(){const key=`${PA.rule}|${PA.buf}|${PA.cv}|${PA.abs}`;if(key===capKey)return capCurve;capKey=key;capCurve=CAPS.map(c=>{const r=hangAvg({...PA,cap:c});return [c,r.out,r.flow];});return capCurve;}
+function minCap(curve){const mx=Math.max(...curve.map(p=>p[1]));return curve.find(p=>p[1]>=0.98*mx)[0];}
+function evalA(){RA=hangAvg(PA);const cur=capSweep();
+  RA.C=[{n:'Output (pcs / h)',v:RA.out.toFixed(1)},{n:'Average throughput time: time a garment spends on the line',v:(RA.flow/60).toFixed(1)+' min',sub:'Little’s law: WIP ≈ output × throughput time'},
+    {n:'Average operator utilisation',v:(RA.util.reduce((a,b)=>a+b,0)/nW*100).toFixed(0)+'%'},{n:'Busiest / least busy operator',v:(Math.max(...RA.util)*100).toFixed(0)+'% / '+(Math.min(...RA.util)*100).toFixed(0)+'%'}];return RA;}
+function renderA(){$('checksA').innerHTML=RA.C.map(c=>`<div><span>•</span><span>${c.n}${c.sub?`<small>${c.sub}</small>`:''}</span><b>${c.v}</b></div>`).join('');}
+function drawRail(){const [c,g]=ctx('rail'),W=c.width,H=c.height;if(!SNAP)return;const s=SNAP[Math.min(SNAP.length-1,Math.floor(tA/10))];
+  const xl=120,xr=W-60,yt=70,yb=270;g.strokeStyle=css('--muted');g.lineWidth=3;g.beginPath();g.roundRect(xl,yt,xr-xl,yb-yt,60);g.stroke();
+  g.font='12px '+css('--f-body');
+  g.fillStyle=css('--ok');g.fillText('Loading',20,H/2-6);g.fillText('station',20,H/2+12);g.fillStyle=css('--ok');g.beginPath();g.moveTo(xl-14,H/2-10);g.lineTo(xl,H/2);g.lineTo(xl-14,H/2+10);g.fill();
+  for(let w=0;w<nW;w++){const top=w<5,i=top?w:9-w,x=xl+90+i*((xr-xl-180)/4),y=top?yt:yb,dy=top?-1:1;const away=PA.abs&&w===4&&s.t>=3600&&s.t<7200;
+    g.strokeStyle=css('--rule');g.lineWidth=1.5;g.beginPath();g.moveTo(x,y);g.lineTo(x,y+dy*24);g.stroke();
+    const ops=SKILL[w].map((e,j)=>e>0?OPS[j][0]:null).filter(Boolean).join('/');
+    g.fillStyle=away?css('--rule'):css('--soft');g.strokeStyle=css('--ink');g.lineWidth=1;g.beginPath();g.roundRect(x-66,top?y-62:y+24,132,38,6);g.fill();g.stroke();
+    g.fillStyle=css('--ink');g.textAlign='center';g.fillText(`#${w+1} ${ops}`,x,top?y-38:y+48);
+    const n=s.q[w]+(s.wk[w]?1:0);for(let k=0;k<n;k++){g.fillStyle=k===0&&s.wk[w]?css('--nt'):css('--bt');g.fillRect(x-40+k*16,top?y+10:y-22,12,12);}
+    g.textAlign='start';}
+  g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.fillText(`Simulation time ${(s.t/60).toFixed(0)} min   Hangers on line ${s.wip}   Finished ${s.done} pcs`,xl+40,H/2+5);
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.fillText('Blue: being sewn   Orange: queued',xl+40,H/2+26);}
+function drawCap(){const [c,g]=ctx('capc'),W=c.width,H=c.height;const cur=capCurve,x0=70,x1=W-80,y0=H-40,y1=24,X=v=>x0+(x1-x0)*v/60,Y=v=>y0-(y0-y1)*v/140,Y2=v=>y0-(y0-y1)*v/2000;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');
+  for(let v=0;v<=140;v+=20){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v,x0-6,Y(v)+4);}
+  g.textAlign='start';g.fillStyle=css('--bt');for(let v=0;v<=2000;v+=500)g.fillText(v,x1+6,Y2(v)+4);
+  g.fillStyle=css('--muted');g.textAlign='center';for(let v=0;v<=60;v+=10)g.fillText(v,X(v),y0+18);g.fillText('WIP limit (hangers)',(x0+x1)/2,H-4);
+  g.textAlign='start';g.fillStyle=css('--nt');g.fillText('Output (pcs / h, left axis)',x0+8,y1-8);g.fillStyle=css('--bt');g.textAlign='end';g.fillText('Average throughput time (s, right axis)',x1,y1-8);
+  g.strokeStyle=css('--nt');g.lineWidth=2.4;g.beginPath();cur.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1])));g.stroke();
+  g.strokeStyle=css('--bt');g.setLineDash([6,4]);g.beginPath();cur.forEach((p,i)=>i?g.lineTo(X(p[0]),Y2(p[2])):g.moveTo(X(p[0]),Y2(p[2])));g.stroke();
+  g.strokeStyle=css('--accent');g.beginPath();g.moveTo(X(PA.cap),y1);g.lineTo(X(PA.cap),y0);g.stroke();g.setLineDash([]);g.lineWidth=1;g.textAlign='start';}
+const fmtA={cap:v=>v+'',buf:v=>v+'',cv:v=>v.toFixed(2)};
+function syncA(){for(const k in fmtA){$(k).value=PA[k];$(k+'v').textContent=fmtA[k](PA[k]);}$('rule').value=PA.rule;$('abs').value=String(PA.abs);}
+function changedA(){syncA();evalA();SNAP=hang(PA,1,true).snaps;renderA();drawCap();drawRail();noteA();checkA();}
+for(const k in fmtA)$(k).addEventListener('input',()=>{PA[k]=+$(k).value;changedA();});
+$('rule').onchange=()=>{PA.rule=$('rule').value;changedA();};$('abs').onchange=()=>{PA.abs=+$('abs').value;changedA();};
+$('resetA').onclick=()=>{Object.assign(PA,STDA);changedA();};$('playA').onclick=()=>{playA=!playA;$('playA').textContent=playA?'Pause':'Play';};
+const seenA={cfg:new Set(),cm:false};
+function noteA(){if(PA.buf===3&&PA.cv===0.15)seenA.cfg.add(PA.rule+'|'+PA.abs);}
+const TA=[{t:'With the standard parameters, try the three dispatching rules in turn; then set “Operator 5 absent” to “Yes” and try each rule again.',d:'All six combinations must be seen. How much more does dynamic dispatching produce than fixed stations? Why is the gap larger when someone is absent? Look at the busiest and least busy operators.',ok:()=>seenA.cfg.size>=6},
+  {t:'Choose “Earliest finish” and find the smallest WIP limit that gives at least 98% of the maximum output.',d:'Use the curve, enter the value below and press “Check” (±3). Beyond that, a higher limit adds no output but makes throughput time ever longer.',ok:()=>seenA.cm}];
+const doneA=new Set();function checkA(){TA.forEach((k,i)=>{if(k.ok())doneA.add(i);});$('tasksA').innerHTML=TASKHTML(TA,doneA);}
+$('cmChk').onclick=()=>{if(PA.rule!=='最早完工'){$('msgA').textContent='First set the dispatching rule to “Earliest finish”.';return;}const m=minCap(capCurve),v=+$('cm').value;
+  if($('cm').value!==''&&Math.abs(v-m)<=3){seenA.cm=true;$('msgA').textContent=`Correct: with this lab’s data, about ${m} hangers (a little over two per station on average). Above that, the extra hangers just queue, and throughput time grows in proportion, as Little’s law says.`;}
+  else $('msgA').textContent='Not yet: follow the output curve from left to right and find where it just levels off.';checkA();};
+// ================= page B: bucket brigade (same as model12.py bucket_ts) =================
+const VB=[0.5,1,1.5];
+function bucketTS(v,Tm,dt){const n=v.length;let p=v.map((_,i)=>i/n),t=0;const done=[],hand=[];
+  while(t<Tm){for(let i=n-1;i>=0;i--){const lim=i+1<n?p[i+1]:1;p[i]=Math.min(p[i]+v[i]*dt,lim);}t+=dt;
+    if(p[n-1]>=1){done.push(t);hand.push(p.slice(0,n-1));for(let i=n-1;i>0;i--)p[i]=p[i-1];p[0]=0;}}
+  const rate=done.length>2?(done.length-1)/(done[done.length-1]-done[0]):0;return {rate,hand};}
+let RB=null,pos=null,tB=0,playB=true,lastB=null;
+function evalB(){const r=bucketTS(VB,40,0.0005),S=VB.reduce((a,b)=>a+b,0);RB={...r,sum:S,fixed:3*Math.min(...VB)};
+  const fix=[VB[0]/S,(VB[0]+VB[1])/S];const lastH=r.hand.slice(-3);const conv=lastH.length===3&&lastH.every(h=>Math.abs(h[0]-fix[0])<0.01&&Math.abs(h[1]-fix[1])<0.01);
+  RB.conv=conv;RB.fix=fix;
+  RB.C=[{n:'Bucket-brigade output (pcs / unit time)',v:r.rate.toFixed(2)},{n:'Sum of the three speeds (upper limit of output)',v:S.toFixed(2)},{n:'Output with fixed segments, 1/3 each',v:RB.fixed.toFixed(2),sub:'= 3 × speed of the slowest operator'},
+    {n:'Hand-off positions converge to balance points?',v:conv?'Yes':'No',sub:`Balance points ${fix[0].toFixed(2)} and ${fix[1].toFixed(2)} (split in proportion to speed)`}];}
+function renderB(){$('checksB').innerHTML=RB.C.map(c=>`<div><span>•</span><span>${c.n}${c.sub?`<small>${c.sub}</small>`:''}</span><b>${c.v}</b></div>`).join('');}
+function drawBB(){const [c,g]=ctx('bb'),W=c.width,H=c.height,x0=80,x1=W-80,X=v=>x0+(x1-x0)*v,y=H/2;
+  g.strokeStyle=css('--rule');g.lineWidth=10;g.lineCap='round';g.beginPath();g.moveTo(X(0),y);g.lineTo(X(1),y);g.stroke();g.lineCap='butt';
+  g.font='13px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';g.fillText('0: cut parts',X(0),y+40);g.fillText('1: finished garment',X(1),y+40);
+  for(let k=1;k<10;k++){g.fillRect(X(k/10)-0.5,y+8,1,8);}
+  g.strokeStyle=css('--warn');g.setLineDash([4,4]);g.lineWidth=1.5;for(const f of RB.fix){g.beginPath();g.moveTo(X(f),y-70);g.lineTo(X(f),y+60);g.stroke();}g.setLineDash([]);
+  const cols=[css('--nt'),css('--ok'),css('--bt')];
+  pos.forEach((p,i)=>{g.fillStyle=cols[i];g.beginPath();g.arc(X(p),y-(i%2?30:-0)-20,14,0,7);g.fill();g.fillStyle=css('--ink');g.fillText(`Op ${i+1} v=${VB[i].toFixed(1)}`,X(p),y-(i%2?30:0)-44);});
+  g.textAlign='start';g.fillStyle=css('--ink');g.fillText(`Finished ${doneB} pcs`,12,22);}
+let doneB=0;
+function stepB(dt){const n=3;for(let i=n-1;i>=0;i--){const lim=i+1<n?pos[i+1]:1;pos[i]=Math.min(pos[i]+VB[i]*dt,lim);}if(pos[n-1]>=1){doneB++;for(let i=n-1;i>0;i--)pos[i]=pos[i-1];pos[0]=0;}}
+function drawHand(){const [c,g]=ctx('hand'),W=c.width,H=c.height,x0=70,x1=W-20,y0=H-36,y1=16,N=15,X=k=>x0+(x1-x0)*k/(N-1),Y=v=>y0-(y0-y1)*v;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');
+  for(let v=0;v<=1;v+=0.25){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v.toFixed(2),x0-6,Y(v)+4);}
+  g.textAlign='center';for(let k=0;k<N;k+=2)g.fillText(k,X(k),y0+16);g.fillText('Garment number',(x0+x1)/2,H-2);
+  const h=RB.hand.slice(0,N),cols=[css('--nt'),css('--bt')];
+  for(let j=0;j<2;j++){g.strokeStyle=cols[j];g.setLineDash([5,4]);g.lineWidth=1.2;g.beginPath();g.moveTo(x0,Y(RB.fix[j]));g.lineTo(x1,Y(RB.fix[j]));g.stroke();g.setLineDash([]);
+    g.lineWidth=2.4;g.beginPath();h.forEach((p,k)=>k?g.lineTo(X(k),Y(p[j])):g.moveTo(X(k),Y(p[j])));g.stroke();
+    g.fillStyle=cols[j];g.textAlign='end';g.fillText(j?'Hand-off 2→3':'Hand-off 1→2',x1-4,Y(RB.fix[j])-6);}
+  g.lineWidth=1;g.textAlign='start';}
+function syncB(){for(let i=0;i<3;i++){$('v'+(i+1)).value=VB[i];$('v'+(i+1)+'v').textContent=VB[i].toFixed(1);}}
+function changedB(){syncB();evalB();pos=[0,1/3,2/3];doneB=0;renderB();drawHand();drawBB();noteB();checkB();}
+for(let i=0;i<3;i++)$('v'+(i+1)).addEventListener('input',()=>{VB[i]=+$('v'+(i+1)).value;changedB();});
+$('s2f').onclick=()=>{VB.sort((a,b)=>a-b);changedB();};$('f2s').onclick=()=>{VB.sort((a,b)=>b-a);changedB();};
+$('playB').onclick=()=>{playB=!playB;$('playB').textContent=playB?'Pause':'Play';};$('restartB').onclick=()=>{pos=[0,1/3,2/3];doneB=0;};
+const seenB={s2f:false,f2s:false,new:false};
+function noteB(){const d=new Set(VB).size===3;const inc=VB[0]<VB[1]&&VB[1]<VB[2],dec=VB[0]>VB[1]&&VB[1]>VB[2];
+  if(d&&inc&&RB.conv)seenB.s2f=true;if(d&&dec)seenB.f2s=true;if(inc&&RB.conv&&!(VB[0]===0.5&&VB[1]===1&&VB[2]===1.5))seenB.new=true;}
+const TB=[{t:'Arrange “Slow to fast”, watch how the hand-off positions converge, and confirm that output equals the sum of the three speeds.',d:'The three speeds must all differ. Why are the balance points exactly 1/6 and 1/2?',ok:()=>seenB.s2f},
+  {t:'Arrange “Fast to slow” and compare the output of the bucket brigade with fixed segments.',d:'The three speeds must all differ. What happens once a fast operator catches up with a slow one?',ok:()=>seenB.f2s},
+  {t:'Choose your own set of speeds (still slow to fast) and check that the hand-off positions are still split in proportion to speed.',d:'You may not use the set 0.5, 1.0, 1.5. This shows that a team leader does not need to know everyone’s speed to balance the work.',ok:()=>seenB.new}];
+const doneB_=new Set();function checkB(){TB.forEach((k,i)=>{if(k.ok())doneB_.add(i);});$('tasksB').innerHTML=TASKHTML(TB,doneB_);}
+// animation
+let lastT=null;function frame(ts){if(lastT!==null){const dt=(ts-lastT)/1000;if(playA){tA+=dt*60;if(tA>=T)tA=0;}if(playB&&!$('pageB').hidden){for(let k=0;k<20;k++)stepB(dt*0.6/20);}}lastT=ts;
+  if(!$('pageA').hidden)drawRail();else drawBB();requestAnimationFrame(frame);}
+window.__api={PA,STDA,VB,changedA,changedB,evalA:()=>RA,evalB:()=>RB,doneA,doneB:doneB_,seenA,seenB,capCurve:()=>capCurve,minCap:()=>minCap(capCurve),hang,hangAvg,bucketTS,
+  cm:v=>{$('cm').value=v;$('cmChk').click();},tab};
+changedA();changedB();requestAnimationFrame(frame);
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

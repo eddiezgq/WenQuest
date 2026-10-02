@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Industrial Lockstitch Machine in 3D</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: full-bleed 3D stage on the left with label overlay; a control rail on the right; stacks on phones */
+:root{
+  --bg:#eceff2; --panel:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d3d9df; --accent:#0f6e74;
+  --c-needle:#2f6fd6; --c-take:#8a4fd0; --c-hook:#e0662f; --c-feed:#2e9e5b; --c-shaft:#6b7682;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--panel:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--panel:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:radial-gradient(120% 90% at 40% 30%,#ffffff 0%,#e4e8ec 70%,#d5dbe0 100%);border:1px solid var(--rule);border-radius:8px;overflow:hidden;aspect-ratio:16/10;min-width:0;touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+.stage svg.lab{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.lab text{font-family:var(--f-body);paint-order:stroke;stroke:#ffffffd0;stroke-width:4px;stroke-linejoin:round}
+.hint{position:absolute;left:12px;bottom:10px;font-size:.78rem;color:#5d6b7a;background:#ffffffb0;padding:2px 8px;border-radius:4px}
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px}
+.card h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--rule);border-radius:0;background:transparent;padding:6px 0}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--accent);color:var(--panel);font-weight:600}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.row+.row{margin-top:8px}
+input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+label{font-size:.85rem;color:var(--muted)}
+select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px}
+.chain{display:grid;grid-template-columns:14px 1fr;gap:2px 8px;align-items:start;padding:6px 4px;border-radius:6px;cursor:pointer;border:1px solid transparent}
+.chain:hover{border-color:var(--rule)}
+.chain.on{border-color:var(--accent)}
+.chain i{width:12px;height:12px;border-radius:3px;margin-top:5px}
+.chain b{font-size:.92rem}
+.chain span{grid-column:2;font-size:.8rem;color:var(--muted)}
+.read{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.read div{border-top:1px solid var(--rule);padding-top:4px}
+.read b{display:block;font-family:var(--f-mono);font-size:1rem;font-variant-numeric:tabular-nums}
+.read small{color:var(--muted);font-size:.74rem}
+.phase{font-weight:700;color:var(--accent);font-size:1.05rem}
+.note{font-size:.78rem;color:var(--muted)}
+.cap{margin:0}.cap .wrap{max-width:none;padding:0}.cap header,.cap .rail,.cap .hint{display:none}.cap .grid{display:block}
+.cap .stage{width:100vw;height:100vh;aspect-ratio:auto;border:0;border-radius:0;background:#fbfaf7}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>Industrial Lockstitch Machine in 3D</h1>
+  <span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 2 · Model 2-1 · A typical link-type industrial lockstitch machine (structure illustrative, dimensions rounded)</span>
+</header>
+<div class="grid">
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+    <svg class="lab" id="lab"></svg>
+    <div class="hint">Drag to rotate · scroll or pinch to zoom</div>
+  </div>
+  <div class="rail">
+    <section class="card">
+      <h3>Display</h3>
+      <div class="seg" id="mode">
+        <button type="button" data-m="solid" class="on">Exterior</button>
+        <button type="button" data-m="xray">X-ray</button>
+        <button type="button" data-m="explode">Exploded</button>
+      </div>
+      <div class="row"><label for="ex">Explode amount</label><input id="ex" type="range" min="0" max="1" step="0.01" value="0"></div>
+      <div class="row"><label><input type="checkbox" id="labels" checked> Show labels</label>
+        <label><input type="checkbox" id="table" checked> Show table</label></div>
+      <div class="row">
+        <span class="note">View:</span>
+        <button type="button" data-v="iso">Isometric</button><button type="button" data-v="front">Front</button><button type="button" data-v="left">Left</button><button type="button" data-v="back">Back</button>
+      </div>
+    </section>
+    <section class="card">
+      <h3>Running</h3>
+      <div class="row">
+        <button id="play" type="button">Play</button>
+        <label for="spd">Speed</label>
+        <select id="spd"><option value="20">Very slow</option><option value="60" selected>Slow</option><option value="180">Medium</option><option value="720">Fast</option></select>
+      </div>
+      <div class="row"><label for="ang">Main-shaft angle</label><input id="ang" type="range" min="0" max="359" value="100"></div>
+      <div class="read" style="margin-top:8px">
+        <div><b id="r-a">100°</b><small>Main-shaft angle φ</small></div>
+        <div><b id="r-h">200°</b><small>Hook angle (2φ)</small></div>
+        <div><b id="r-x">—</b><small>Needle-bar displacement x</small></div>
+        <div><span class="phase" id="r-p">Penetration</span><small style="display:block">Current phase</small></div>
+      </div>
+    </section>
+    <section class="card">
+      <h3>Four drive trains (click to highlight)</h3>
+      <div class="chain" data-c="needle"><i style="background:var(--c-needle)"></i><b>Needle</b><span>Main shaft → needle-bar crank → needle-bar link → needle bar (slider-crank)</span></div>
+      <div class="chain" data-c="take"><i style="background:var(--c-take)"></i><b>Take-up</b><span>Main shaft → take-up crank pin → take-up lever (four-bar)</span></div>
+      <div class="chain" data-c="hook"><i style="background:var(--c-hook)"></i><b>Hook</b><span>Main shaft → timing belt 1:1 → hook shaft → gears 1:2 → rotary hook</span></div>
+      <div class="chain" data-c="feed"><i style="background:var(--c-feed)"></i><b>Feed</b><span>Main-shaft feed eccentric → stitch regulator → feed rock shaft (horizontal); hook-shaft lift eccentric → lift rock shaft (vertical)</span></div>
+      <p class="note">The stitch regulator and feed-lift mechanism are simplified from common link-type lockstitch machines; designs differ between manufacturers.</p>
+    </section>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const T=THREE, D2R=Math.PI/180;
+if(location.hash==='#capture')document.body.classList.add('cap');
+const stage=document.getElementById('stage'), cv=document.getElementById('cv'), lab=document.getElementById('lab');
+const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+renderer.outputEncoding=T.sRGBEncoding; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
+const scene=new T.Scene();
+const cam=new T.PerspectiveCamera(28,16/10,10,8000);
+
+// ---------- environment for metal reflections ----------
+{
+  const env=new T.Scene();
+  const g=new T.SphereGeometry(500,32,16), col=[];
+  const p=g.attributes.position;
+  for(let i=0;i<p.count;i++){const y=p.getY(i)/500;const c=y>0?0.75+0.25*y:0.45+0.3*(1+y);col.push(c,c,c*1.02);}
+  g.setAttribute('color',new T.Float32BufferAttribute(col,3));
+  env.add(new T.Mesh(g,new T.MeshBasicMaterial({vertexColors:true,side:T.BackSide})));
+  const pm=(w,h,x,y,z,i)=>{const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:new T.Color(i,i,i),side:T.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);env.add(m);};
+  pm(300,120,0,420,180,3.0); pm(160,300,-420,120,120,1.6); pm(160,300,420,160,-120,1.2);
+  const gen=new T.PMREMGenerator(renderer); scene.environment=gen.fromScene(env,0.04).texture;
+}
+scene.add(new T.HemisphereLight(0xffffff,0x9aa3ad,0.45));
+const sun=new T.DirectionalLight(0xffffff,1.25); sun.position.set(-300,700,500); sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048); Object.assign(sun.shadow.camera,{left:-500,right:600,top:500,bottom:-400,near:100,far:1800}); sun.shadow.bias=-0.0004;
+scene.add(sun);
+
+// ---------- materials ----------
+const CH={needle:0x2f6fd6,take:0x8a4fd0,hook:0xe0662f,feed:0x2e9e5b};
+const mats=[];
+function steel(chain,opt={}){const m=new T.MeshStandardMaterial(Object.assign({color:0xc9d0d6,metalness:0.85,roughness:0.28},opt));m.userData={chain,base:m.color.clone()};mats.push(m);return m;}
+const housingMat=new T.MeshPhysicalMaterial({color:0xe9e6dd,metalness:0.05,roughness:0.42,clearcoat:0.6,clearcoatRoughness:0.25});
+const coverMat=new T.MeshPhysicalMaterial({color:0xdcd8cc,metalness:0.05,roughness:0.45,clearcoat:0.5});
+const darkMat=new T.MeshStandardMaterial({color:0x2a3038,metalness:0.6,roughness:0.45});
+const tableMat=new T.MeshStandardMaterial({color:0xcdb48e,metalness:0,roughness:0.75});
+const threadMatU=new T.MeshStandardMaterial({color:0x2f6fd6,roughness:0.6});
+const threadMatB=new T.MeshStandardMaterial({color:0xe0662f,roughness:0.6});
+const beltMat=new T.MeshStandardMaterial({color:0x22262b,roughness:0.8});
+
+// ---------- helpers ----------
+const G=()=>new T.Group();
+function mesh(geo,mat,parent,pos,rot){const m=new T.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;if(pos)m.position.set(...pos);if(rot)m.rotation.set(...rot);parent.add(m);return m;}
+const cylX=(r,len,seg=40)=>{const g=new T.CylinderGeometry(r,r,len,seg);g.rotateZ(Math.PI/2);return g;};   // axis along x
+const cylY=(r,len,seg=32)=>new T.CylinderGeometry(r,r,len,seg);
+const box=(x,y,z)=>new T.BoxGeometry(x,y,z);
+function rbox(w,h,d,r){const s=new T.Shape();const x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
+  const g=new T.ExtrudeGeometry(s,{depth:d-2*Math.min(r,4),bevelEnabled:true,bevelSize:Math.min(r,4),bevelThickness:Math.min(r,4),bevelSegments:3,curveSegments:8});g.translate(0,0,-(d-2*Math.min(r,4))/2);return g;}
+function gear(r,w,teeth){const s=new T.Shape();const n=teeth*2;for(let i=0;i<=n;i++){const a=i/n*Math.PI*2;const rr=i%2?r:r-2.2;const a2=a+Math.PI/n*0.5;if(i===0)s.moveTo(rr*Math.cos(a),rr*Math.sin(a));else s.lineTo(rr*Math.cos(a),rr*Math.sin(a));s.lineTo(rr*Math.cos(a2),rr*Math.sin(a2));}
+  const g=new T.ExtrudeGeometry(s,{depth:w,bevelEnabled:false});g.translate(0,0,-w/2);g.rotateY(Math.PI/2);return g;}
+
+// ---------- key dimensions (mm) ----------
+const YU=190, YL=-52, YHK=-17.7, R=15.5, LR=55, LAM=R/LR;
+const xN=f=>{const p=f*D2R;return R*(1-Math.cos(p))-LR*(1-Math.sqrt(1-LAM*LAM*Math.sin(p)**2));};
+const sstep=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
+
+const root=G(); scene.add(root);
+const asm={}; // assemblies with explode vectors
+function A(name,ex){const g=G();g.userData.ex=new T.Vector3(...ex);root.add(g);asm[name]=g;return g;}
+
+// ===== bed =====
+const bed=A('bed',[0,0,0]);
+mesh(rbox(575,70,180,8),housingMat,bed,[157,-35,0]);
+// ===== table =====
+const table=A('table',[0,0,0]);
+{const t=mesh(box(900,30,560),tableMat,table,[160,-17-30,40]);t.material=tableMat;
+ // cut-out illusion: table top is flush with bed top; place slightly lower around
+ t.position.y=-16;}
+// ===== housing (arm + pillar + head) =====
+const housing=A('housing',[0,390,0]);
+{const s=new T.Shape();
+ s.moveTo(-58,62); s.lineTo(-58,205); s.quadraticCurveTo(-58,228,-34,228); s.lineTo(300,228);
+ s.quadraticCurveTo(432,232,434,180); s.lineTo(440,0); s.lineTo(300,0); s.quadraticCurveTo(318,4,320,40);
+ s.lineTo(320,140); s.quadraticCurveTo(320,152,306,152); s.lineTo(58,152); s.quadraticCurveTo(42,152,42,136);
+ s.lineTo(42,62); s.quadraticCurveTo(42,52,30,52); s.lineTo(-46,52); s.quadraticCurveTo(-58,52,-58,62);
+ const g=new T.ExtrudeGeometry(s,{depth:88,bevelEnabled:true,bevelSize:7,bevelThickness:7,bevelSegments:4,curveSegments:24});g.translate(0,0,-44);
+ mesh(g,housingMat,housing);}
+mesh(rbox(120,4,50,2),coverMat,housing,[160,236,0]);
+mesh(cylX(9,3),new T.MeshPhysicalMaterial({color:0x9fb8c8,roughness:.2,transmission:0,clearcoat:1}),housing,[300,120,47]);
+// face plate (left end cover of the head)
+const face=A('face',[-180,390,0]);
+mesh(rbox(6,150,96,3),coverMat,face,[-68,140,0]);
+// ===== upper shaft assembly =====
+const upper=A('upper',[0,175,0]);
+const rotU=G(); rotU.position.set(0,YU,0); upper.add(rotU);
+mesh(cylX(7,450),steel('shaft'),rotU,[255,0,0]);
+// needle-bar crank (disc) with crank pin
+mesh(cylX(22,9),steel('needle'),rotU,[22,0,0]);
+const npin=mesh(cylX(4.2,14),steel('needle'),rotU,[12,R,0]);           // pin (needle side)
+mesh(cylX(4.2,14),steel('take'),rotU,[33,-R,0]);            // take-up crank pin (180° opposite)
+mesh(box(9,R+8,16),steel('take'),rotU,[30,-R/2,0]);
+// upper timing pulley & feed eccentric & hand wheel
+mesh(cylX(22,22),steel('hook'),rotU,[392,0,0]);
+const ecc=mesh(cylX(17,14),steel('feed'),rotU,[352,4,0]);
+mesh(cylX(64,24),darkMat,rotU,[462,0,0]);
+mesh(new T.TorusGeometry(56,5,12,48).rotateY(Math.PI/2),steel('shaft',{roughness:0.35}),rotU,[476,0,0]);
+// ===== needle bar assembly =====
+const nb=A('needlebar',[-130,70,0]);
+const nbar=mesh(cylY(4,160),steel('needle'),nb,[0,0,0]);
+const nclamp=mesh(box(10,10,10),steel('needle'),nb,[0,0,0]);
+const needle=mesh(new T.CylinderGeometry(0.55,0.15,38,10),steel('needle',{color:0xe8edf1}),nb,[0,0,0]);
+const nstud=mesh(cylX(3,12),steel('needle'),nb,[4,0,0]);
+const nrod=mesh(box(5,LR,8),steel('needle'),nb,[-22,0,0]);
+// needle-bar bushings (fixed, part of housing)
+mesh(cylY(7,14),darkMat,housing,[0,62,0]); mesh(cylY(7,14),darkMat,housing,[0,170,0]);
+// ===== take-up lever assembly =====
+const tk=A('takeup',[-220,120,0]);
+const tkLever=mesh(box(6,1,6),steel('take'),tk,[0,0,0]);
+const tkLink=mesh(box(6,1,6),steel('take'),tk,[0,0,0]);
+const tkEye=mesh(new T.TorusGeometry(3,1.2,10,20).rotateX(Math.PI/2),steel('take'),tk,[0,0,0]);
+const TKQ={z:20.69,y:163.42},TKa=34.05,TKb=19.24,TKc=63.55,TKal=0.2025;
+// ===== presser assembly =====
+const pr=A('presser',[-230,-10,0]);
+mesh(cylY(4.5,170),steel('shaft'),pr,[-16,92,-14]);
+mesh(box(26,8,30),steel('shaft'),pr,[-8,6,-2]);
+mesh(rbox(30,5,22,2),steel('shaft'),pr,[-2,1.5,6]);
+mesh(new T.CylinderGeometry(6,6,40,16),darkMat,pr,[-16,190,-14]);               // pressure regulating screw
+// presser lifter lever (behind)
+mesh(box(10,8,60),darkMat,pr,[40,110,-60]);
+// ===== timing belt =====
+const belt=A('belt',[150,0,0]);
+{const s=new T.Shape();const r1=24,r2=24,yA=YU,yB=YL;
+ s.absarc(0,yA,r1+3,0,Math.PI,false);s.absarc(0,yB,r2+3,Math.PI,Math.PI*2,false);s.lineTo(r1+3,yA);
+ const h=new T.Path();h.absarc(0,yA,r1,0,Math.PI,false);h.absarc(0,yB,r2,Math.PI,Math.PI*2,false);h.lineTo(r1,yA);s.holes.push(h);
+ const g=new T.ExtrudeGeometry(s,{depth:16,bevelEnabled:false,curveSegments:32});g.translate(0,0,-8);g.rotateY(Math.PI/2);
+ mesh(g,beltMat,belt,[392,0,0]);}
+// ===== lower shaft assembly =====
+const lower=A('lower',[0,-210,0]);
+const rotL=G(); rotL.position.set(0,YL,0); lower.add(rotL);
+mesh(cylX(7,360),steel('shaft'),rotL,[225,0,0]);
+mesh(cylX(22,22),steel('hook'),rotL,[392,0,0]);
+mesh(gear(21.5,10,32),steel('hook'),rotL,[60,0,0]);
+const liftEcc=mesh(cylX(12,10),steel('feed'),rotL,[120,3,0]);
+// ===== hook assembly =====
+const hook=A('hook',[-170,-120,0]);
+const rotH=G(); rotH.position.set(0,YHK,0); hook.add(rotH);
+mesh(cylX(5,56),steel('shaft'),rotH,[42,0,0]);
+mesh(gear(10.8,10,16),steel('hook'),rotH,[60,0,0]);
+{// hook body: cup with point
+ const s=new T.Shape(); s.absarc(0,0,11.6,0,Math.PI*2,false); const h=new T.Path(); h.absarc(0,0,9.2,0,Math.PI*2,true); s.holes.push(h);
+ const g=new T.ExtrudeGeometry(s,{depth:9,bevelEnabled:true,bevelSize:.6,bevelThickness:.6,curveSegments:40}); g.rotateY(Math.PI/2); g.translate(3,0,0);
+ mesh(g,steel('hook',{color:0xdfe4e8}),rotH);
+ mesh(cylX(11.6,2),steel('hook'),rotH,[13,0,0]);
+ const ps=new T.Shape(); const pts=[]; for(let i=0;i<=12;i++){const a=(20+i*6)*D2R, r=11.6+i*0.12; pts.push([r*Math.cos(a),r*Math.sin(a)]);}
+ ps.moveTo(...pts[0]); pts.forEach(p=>ps.lineTo(...p)); ps.lineTo(9.6*Math.cos(30*D2R),9.6*Math.sin(30*D2R)); ps.lineTo(9.6*Math.cos(20*D2R),9.6*Math.sin(20*D2R));
+ const pg=new T.ExtrudeGeometry(ps,{depth:3,bevelEnabled:false}); pg.rotateY(Math.PI/2); pg.translate(0.4,0,0);
+ mesh(pg,steel('hook',{color:0xf2f4f6}),rotH);}
+// bobbin case + bobbin (stationary)
+mesh(cylX(8.5,9),steel('shaft',{color:0xb8c0c7}),hook,[8,YHK,0]);
+mesh(cylX(5.8,7),new T.MeshStandardMaterial({color:0xe0662f,roughness:0.7}),hook,[7.5,YHK,0]);
+// ===== feed assembly =====
+const feed=A('feed',[40,-140,0]);
+const feedMov=G(); feed.add(feedMov);
+mesh(box(130,7,10),steel('feed'),feedMov,[55,-12,-22]);                  // feed bar
+const dog=G(); feedMov.add(dog);
+mesh(box(16,4,26),steel('feed'),dog,[0,-3,-4]);
+for(let i=0;i<5;i++){mesh(box(1.6,1.6,20).translate(0,0,0),steel('feed',{color:0xd7dde2}),dog,[-6+i*3,-0.3,-4]);}
+mesh(box(8,24,8),steel('feed'),feedMov,[2,-12,-18]);
+const rockF=G(); rockF.position.set(0,-40,-32); feed.add(rockF);                 // feed rock shaft
+mesh(cylX(5,370),steel('feed'),rockF,[180,0,0]);
+mesh(box(8,26,8),steel('feed'),rockF,[12,12,0]); mesh(box(8,26,8),steel('feed'),rockF,[360,12,0]);
+const rockL=G(); rockL.position.set(0,-40,30); feed.add(rockL);                  // lift rock shaft
+mesh(cylX(5,140),steel('feed'),rockL,[70,0,0]);
+mesh(box(8,8,40),steel('feed'),rockL,[10,4,-20]); mesh(box(8,26,8),steel('feed'),rockL,[120,-12,0]);
+const feedRod=mesh(box(6,1,6),steel('feed'),feed,[0,0,0]);
+const liftRod=mesh(box(5,1,5),steel('feed'),feed,[0,0,0]);
+// stitch regulator (dial + reverse lever on pillar front)
+const reg=A('regulator',[150,0,40]);
+mesh(cylY(18,10).rotateX(Math.PI/2),darkMat,reg,[372,108,52]);
+mesh(cylY(14,4).rotateX(Math.PI/2),steel('feed',{color:0xe8ecef}),reg,[372,108,58]);
+mesh(box(70,10,8),darkMat,reg,[372,70,52]).rotation.z=-0.35;
+// ===== needle plate =====
+const plate=A('plate',[0,80,0]);
+mesh(rbox(90,2,70,1),steel('plate',{color:0xdfe4e8}),plate,[0,0.4,0]);
+mesh(rbox(70,1.6,60,1),steel('plate',{color:0xc7ced4}),plate,[0,0.2,64]);    // slide plate
+// ===== thread stand, tension =====
+const stand=A('stand',[0,450,0]);
+mesh(cylY(2.5,170),steel('shaft'),stand,[380,315,-40]);
+mesh(box(180,4,10),steel('shaft'),stand,[380,400,-40]);
+mesh(new T.CylinderGeometry(18,22,60,32),new T.MeshStandardMaterial({color:0x2f6fd6,roughness:0.7}),stand,[300,266,-40]);
+mesh(new T.CylinderGeometry(18,22,60,32),new T.MeshStandardMaterial({color:0xd7d2c4,roughness:0.7}),stand,[460,266,-40]);
+mesh(cylY(2,40),steel('shaft'),stand,[300,316,-40]);
+const ten=A('tension',[-190,290,30]);
+mesh(cylY(8,6).rotateX(Math.PI/2),steel('shaft'),ten,[18,176,50]);
+mesh(cylY(11,3).rotateX(Math.PI/2),steel('shaft',{color:0xe9edf0}),ten,[18,176,55]);
+mesh(cylY(11,3).rotateX(Math.PI/2),steel('shaft',{color:0xe9edf0}),ten,[18,176,59]);
+mesh(cylY(4,16).rotateX(Math.PI/2),darkMat,ten,[18,176,66]);
+// ===== threads =====
+let threadU=null;
+function threadPath(eye,needleTop,needleEye){
+  return [new T.Vector3(300,300,-40),new T.Vector3(300,392,-40),new T.Vector3(330,400,-40),new T.Vector3(330,390,-40),new T.Vector3(150,236,-20),new T.Vector3(10,236,30),
+    new T.Vector3(18,184,62),new T.Vector3(18,168,62),eye.clone().add(new T.Vector3(0,0,0)),new T.Vector3(8,70,52),
+    new T.Vector3(-1,needleTop.y+8,6),needleTop,needleEye];
+}
+// ---------- motion ----------
+let phi=100, playing=false, speed=60, exT=0, mode='solid', focus=null;
+function pose(){
+  const f=((phi%360)+360)%360;
+  rotU.rotation.x=-f*D2R;
+  rotL.rotation.x=-f*D2R;
+  rotH.rotation.x=(2*(f-206))*D2R;   // hook turns twice per stitch
+  // crank pin (needle side) position in y-z (world, assembled)
+  const pz=-R*Math.sin(-f*D2R)*1, py=YU+R*Math.cos(f*D2R);
+  const pinZ=R*Math.sin(f*D2R)*-1;
+  const pin=new T.Vector3(-22,YU+R*Math.cos(f*D2R),-R*Math.sin(f*D2R)*-1*-1);
+  // derive pin from rotation (rotation.x = -f): local (0,R,0) -> world
+  const pv=new T.Vector3(0,R,0).applyAxisAngle(new T.Vector3(1,0,0),-f*D2R).add(new T.Vector3(8,YU,0));
+  const jointY=pv.y-Math.sqrt(LR*LR-pv.z*pv.z);
+  const clampY=jointY-94.5;
+  nbar.position.set(0,clampY+80,0);
+  nclamp.position.set(0,clampY+4,0);
+  needle.position.set(0,clampY-19,0);
+  nstud.position.set(4,jointY,0);
+  // connecting rod from pin to joint
+  const a=new T.Vector3(8,pv.y,pv.z), b=new T.Vector3(8,jointY,0);
+  setBar(nrod,a,b,5,8);
+  // take-up lever four-bar (plane y-z at x=-40), pin 180° opposite
+  const P=new T.Vector3(0,-R,0).applyAxisAngle(new T.Vector3(1,0,0),-f*D2R).add(new T.Vector3(38,YU,0));
+  const Pz=P.z, Py=P.y, dz=TKQ.z-Pz, dy=TKQ.y-Py, Dd=Math.hypot(dz,dy);
+  const t=(TKa*TKa-TKb*TKb+Dd*Dd)/(2*Dd), h=Math.sqrt(Math.max(0,TKa*TKa-t*t));
+  const mz=Pz+t*dz/Dd, my=Py+t*dy/Dd;
+  const Mz=mz-h*dy/Dd, My=my+h*dz/Dd;
+  let uz=(Mz-Pz)/TKa, uy=(My-Py)/TKa; const ca=Math.cos(TKal), sa=Math.sin(TKal);
+  const vz=uz*ca-uy*sa, vy=uz*sa+uy*ca;
+  const E=new T.Vector3(38,Py+vy*TKc,Pz+vz*TKc);
+  const Pp=new T.Vector3(38,Py,Pz);
+  setBar(tkLever,Pp,E,6,5); setBar(tkLink,new T.Vector3(38,TKQ.y,TKQ.z),new T.Vector3(38,My,Mz),5,4);
+  tkEye.position.copy(E);
+  // feed: horizontal from upper shaft eccentric, lift from lower shaft eccentric (same timing as Animation 2-1)
+  const u=f<60?f+360:f; const uu=u<285?u+360:u; let fdz,fdy;
+  if(uu<=425){const tt=(uu-285)/140;fdz=1.5-sstep(tt)*3;fdy=2-1.9*Math.sqrt(Math.sin(Math.PI*Math.min(1,Math.max(0,tt))));}
+  else{const tt=(uu-425)/220;fdz=-1.5+sstep(tt)*3;fdy=2+1.2*Math.sin(Math.PI*tt);}
+  feedMov.position.set(0,1.6-fdy,-fdz*2.2);            // motion exaggerated ×2.2 so it reads at this scale
+  rockF.rotation.x=fdz*0.05; rockL.rotation.x=(2-fdy)*0.06;
+  setBar(feedRod,new T.Vector3(352,YU-16*Math.cos(f*D2R)*0+ -14,0),new T.Vector3(360,-28,-32),6,5);
+  setBar(liftRod,new T.Vector3(120,YL+8,0),new T.Vector3(120,-52,30),5,4);
+  // threads
+  const nTop=new T.Vector3(0.5,clampY-2,1.2), nEye=new T.Vector3(0,clampY-38+2.5,0);
+  const pts=threadPath(E,nTop,nEye).map(v=>v.clone());
+  // thread follows exploded offsets roughly: keep assembled positions (thread hidden while exploded)
+  if(threadU){threadU.geometry.dispose();}
+  const curve=new T.CatmullRomCurve3(pts,false,'catmullrom',0.15);
+  const tg=new T.TubeGeometry(curve,160,0.9,6,false);
+  if(!threadU){threadU=mesh(tg,threadMatU,root);} else threadU.geometry=tg;
+  threadU.visible=exT<0.02&&!window.__noThread;
+  // readouts
+  document.getElementById('r-a').textContent=Math.round(f)+'°';
+  document.getElementById('r-h').textContent=Math.round((2*f)%360)+'°';
+  document.getElementById('r-x').textContent=xN(f).toFixed(1)+' mm';
+  document.getElementById('r-p').textContent=f<102&&f>=60?'Needle descends':f>=102&&f<180?'Penetration':f>=180&&f<203?'Loop formation':f>=203&&f<218?'Loop catching':f>=218&&f<341?'Round the bobbin':'Tighten & feed';
+  document.getElementById('ang').value=Math.round(f);
+}
+function setBar(m,a,b,w,d){const L=a.distanceTo(b);m.scale.set(w/6,L,d/6);m.position.copy(a.clone().add(b).multiplyScalar(.5));m.lookAt(b);m.rotateX(Math.PI/2);}
+// rod geometry is a unit-height box; rebuild the needle rod the same way
+nrod.geometry=box(5,1,8); tkLever.geometry=box(6,1,6); tkLink.geometry=box(6,1,6); feedRod.geometry=box(6,1,6); liftRod.geometry=box(6,1,6);
+const _setBarRod=(a,b)=>setBar(nrod,a,b,5,8);
+
+// ---------- modes ----------
+function applyMode(){
+  const xr=mode==='xray';
+  housingMat.transparent=xr; housingMat.opacity=xr?0.16:1; housingMat.depthWrite=!xr;
+  coverMat.transparent=xr; coverMat.opacity=xr?0.16:1; coverMat.depthWrite=!xr;
+  mats.forEach(m=>{const c=m.userData.chain; if(xr&&CH[c]!==undefined){const col=new T.Color(CH[c]); if(focus&&focus!==c){m.color.copy(m.userData.base);m.opacity=0.35;m.transparent=true;} else {m.color.copy(col).lerp(new T.Color(0xffffff),0.05);m.opacity=1;m.transparent=false;} m.metalness=0.2;m.roughness=0.5;}
+    else if(xr&&c==='plate'){m.color.copy(m.userData.base);m.transparent=true;m.opacity=0.28;m.depthWrite=false;}
+    else {m.color.copy(m.userData.base);m.metalness=0.85;m.roughness=0.28;m.transparent=false;m.opacity=1;m.depthWrite=true;} m.needsUpdate=true;});
+  document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+  table.visible=document.getElementById('table').checked && mode==='solid';
+}
+function applyExplode(){
+  Object.values(asm).forEach(g=>{g.position.copy(g.userData.ex).multiplyScalar(exT);});
+}
+// ---------- camera orbit ----------
+const target=new T.Vector3(170,90,0);
+let th=-0.62, ph=0.32, dist=1500;
+const VIEWS={iso:[-0.62,0.32,1500],front:[0,0.06,1450],left:[-1.5708,0.08,1300],back:[3.1416,0.18,1500]};
+function placeCam(){cam.position.set(target.x+dist*Math.cos(ph)*Math.sin(th),target.y+dist*Math.sin(ph),target.z+dist*Math.cos(ph)*Math.cos(th));cam.lookAt(target);}
+let drag=null;
+stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,th,ph};stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{if(!drag)return;th=drag.th-(e.clientX-drag.x)*0.006;ph=Math.max(-0.2,Math.min(1.3,drag.ph+(e.clientY-drag.y)*0.005));});
+stage.addEventListener('pointerup',()=>drag=null);
+stage.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(500,Math.min(3000,dist*(1+e.deltaY*0.001)));},{passive:false});
+let pinch=null;
+stage.addEventListener('touchstart',e=>{if(e.touches.length===2)pinch={d:Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY),dist};},{passive:true});
+stage.addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dist=Math.max(500,Math.min(3000,pinch.dist*pinch.d/d));}},{passive:true});
+stage.addEventListener('touchend',()=>pinch=null);
+
+// ---------- labels ----------
+// [text, sub, world-anchor getter, modes, preferred direction (screen px offset)]
+const LABELS=[
+ ['Machine head','houses main shaft, needle bar, take-up',()=>wp(housing,-10,215,44),['solid'],[-40,-110]],
+ ['Arm','',()=>wp(housing,180,228,30),['solid'],[0,-80]],
+ ['Handwheel','turns main shaft by hand',()=>wp(upper,476,YU+40,0),['solid','xray','explode'],[110,-60]],
+ ['Bed','',()=>wp(bed,250,-30,90),['solid'],[60,90]],
+ ['Table','',()=>new T.Vector3(560,-16,250),['solid'],[60,40]],
+ ['Needle bar','',()=>nbar.getWorldPosition(new T.Vector3()).add(new T.Vector3(0,-60,0)),['solid','xray','explode'],[-150,10]],
+ ['Presser foot','',()=>wp(pr,-2,4,16),['solid','xray','explode'],[-80,75]],
+ ['Throat plate','',()=>wp(plate,30,1,30),['solid','xray','explode'],[110,80]],
+ ['Take-up lever','',()=>tkEye.getWorldPosition(new T.Vector3()),['solid','xray','explode'],[-110,-45]],
+ ['Tension assembly','sets needle-thread tension',()=>wp(ten,18,176,66),['solid','explode'],[-150,-50]],
+ ['Thread stand','',()=>wp(stand,380,400,-40),['solid','explode'],[90,-20]],
+ ['Stitch regulator','',()=>wp(reg,372,108,58),['solid','xray','explode'],[90,20]],
+ ['Reverse lever','',()=>wp(reg,400,62,56),['solid'],[120,60]],
+ ['Main shaft','spindle',()=>wp(upper,150,YU,0),['xray','explode'],[0,-90]],
+ ['Needle-bar crank','',()=>wp(upper,22,YU+20,0),['xray','explode'],[-140,-90]],
+ ['Timing belt','1 : 1',()=>wp(belt,392,70,0),['xray','explode'],[120,-10]],
+ ['Feed eccentric','',()=>wp(upper,352,YU-18,0),['xray'],[60,-110]],
+ ['Hook shaft','',()=>wp(lower,240,YL,0),['xray','explode'],[120,100]],
+ ['Gears 2 : 1','hook turns twice',()=>wp(lower,60,YL-20,0),['xray','explode'],[-40,110]],
+ ['Rotary hook','',()=>wp(hook,8,YHK-12,10),['xray','explode'],[-180,25]],
+ ['Lift eccentric','',()=>wp(lower,120,YL-12,0),['xray'],[30,120]],
+ ['Feed rock shaft','',()=>wp(feed,250,-40,-32),['xray','explode'],[40,150]],
+ ['Feed bar & feed dog','',()=>wp(feed,40,-12,-22),['xray','explode'],[-110,130]],
+ ['Face plate','',()=>wp(face,-71,150,0),['explode'],[-90,-60]],
+ ['Housing','',()=>wp(housing,150,228,40),['explode'],[0,-70]],
+ ['Bed','',()=>wp(bed,250,-30,90),['explode','xray'],[140,60]],
+ ['Needle','',()=>needle.getWorldPosition(new T.Vector3()),[],[-120,-40]],
+ ['Crank pin','',()=>npin.getWorldPosition(new T.Vector3()).add(new T.Vector3(-10,0,0)),[],[-120,-40]],
+ ['Needle-bar link','',()=>nrod.getWorldPosition(new T.Vector3()),[],[-120,0]],
+ ['Needle-bar stud','',()=>nstud.getWorldPosition(new T.Vector3()),[],[-120,30]],
+ ['Main-shaft bushing','',()=>wp(housing,0,170,6),[],[120,-20]],
+ ['Hook-shaft bushing','',()=>wp(housing,0,62,6),[],[120,20]],
+ ['Needle clamp','',()=>nclamp.getWorldPosition(new T.Vector3()),[],[120,30]],
+ ['Hook body','',()=>wp(hook,10,YHK+12,0),[],[90,-60]],
+ ['Bobbin (bobbin thread)','',()=>wp(hook,4,YHK,0),[],[-130,60]],
+ ['Feed dog','',()=>dog.getWorldPosition(new T.Vector3()),[],[110,-70]],
+ ['Hook-shaft end','',()=>wp(hook,40,YHK,0),[],[90,50]],
+ ['Lift rock shaft','',()=>wp(feed,60,-40,30),[],[60,90]],
+ ['Needle thread','',()=>new T.Vector3(8,70,52),[],[-110,-50]],
+];
+function wp(g,x,y,z){return g.localToWorld(new T.Vector3(x,y,z));}
+let OVR={}, HIDE=new Set(), ONLY=null;
+function drawLabels(){
+  lab.innerHTML='';
+  if(!document.getElementById('labels').checked) return;
+  const W=stage.clientWidth,H=stage.clientHeight; const k=document.body.classList.contains('cap')?W/1100:Math.min(1,W/900);
+  let out='';
+  for(let [t,s,get,modes,off] of LABELS){
+    if(ONLY? !ONLY.has(t) : !modes.includes(mode)) continue; if(HIDE.has(t)) continue; if(OVR[t]) off=OVR[t];
+    if(t==='Table'&&!table.visible) continue;
+    const p=get().project(cam); if(p.z>1) continue;
+    const x=(p.x+1)/2*W, y=(1-p.y)/2*H;
+    const lx=x+off[0]*k, ly=y+off[1]*k;
+    const anchor=off[0]<-20?'end':off[0]>20?'start':'middle';
+    const fs=Math.max(11,15*k);
+    out+=`<circle cx="${x}" cy="${y}" r="3" fill="#1d2a36"/><path d="M${x} ${y}L${lx} ${ly}" stroke="#1d2a36" stroke-width="1" fill="none"/>`;
+    const tx=lx+(anchor==='start'?4:anchor==='end'?-4:0), ty=ly+(off[1]<0?-6:fs+2);
+    out+=`<text x="${tx}" y="${ty}" font-size="${fs}" font-weight="700" fill="#1d2a36" text-anchor="${anchor}">${t}</text>`;
+    if(s) out+=`<text x="${tx}" y="${ty+(off[1]<0?-fs-2:fs+2)}" font-size="${fs*0.8}" fill="#4d5b6a" text-anchor="${anchor}">${s}</text>`;
+  }
+  lab.innerHTML=out;
+}
+// ---------- loop ----------
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage); resize();
+let last=performance.now();
+let dirty=true;
+function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;if(playing){phi+=speed*dt;}if(!window.__still||dirty){pose();placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}requestAnimationFrame(frame);}
+// ---------- controls ----------
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m; if(mode==='explode'&&exT<0.5){exT=1;document.getElementById('ex').value=1;} if(mode!=='explode'){exT=0;document.getElementById('ex').value=0;} applyMode();applyExplode();});
+document.getElementById('ex').oninput=e=>{exT=+e.target.value; if(exT>0&&mode==='solid'){mode='explode';} applyMode(); applyExplode();};
+document.getElementById('table').onchange=applyMode;
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{[th,ph,dist]=VIEWS[b.dataset.v];});
+document.getElementById('play').onclick=e=>{playing=!playing;e.target.textContent=playing?'Pause':'Play';};
+document.getElementById('spd').onchange=e=>speed=+e.target.value;
+document.getElementById('ang').oninput=e=>{playing=false;document.getElementById('play').textContent='Play';phi=+e.target.value;};
+document.querySelectorAll('.chain').forEach(c=>c.onclick=()=>{focus=focus===c.dataset.c?null:c.dataset.c;document.querySelectorAll('.chain').forEach(x=>x.classList.toggle('on',x.dataset.c===focus));if(mode==='solid')mode='xray';applyMode();});
+// deep link / capture hooks
+window.__set=(o)=>{if('mode' in o)mode=o.mode;if('ex' in o){exT=o.ex;}if('view' in o){[th,ph,dist]=o.view;}if('phi' in o)phi=o.phi;if('table' in o)document.getElementById('table').checked=o.table;if('focus' in o)focus=o.focus;if('ovr' in o)OVR=o.ovr;if('hide' in o)HIDE=new Set(o.hide);if('only' in o)ONLY=o.only?new Set(o.only):null;if('target' in o)target.set(...o.target);if('hideAsm' in o){Object.entries(asm).forEach(([k,g])=>g.visible=!o.hideAsm.includes(k));}applyMode();applyExplode();dirty=true;};
+applyMode(); applyExplode(); requestAnimationFrame(frame);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

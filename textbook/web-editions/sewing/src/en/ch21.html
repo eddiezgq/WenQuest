@@ -1,0 +1,393 @@
+<p class="eyebrow">auto</p><h1>auto</h1><div class="seam" aria-hidden="true"></div>
+<div class="chips"><span class="chips-label">Interactive resources in this chapter</span><a class="chip" href="#lab-proto-fk"><b>Virtual lab</b>Scaled flat-knitting prototype: carriage speed and selection timing</a><a class="chip" href="#lab-pattern"><b>Virtual lab</b>Pattern-sewer simulator</a><a class="chip" href="#lab-knit"><b>Virtual lab</b>Flat-knitting simulator</a><a class="chip" href="#lab-fpga"><b>Virtual lab</b>FPGA needle selection</a></div>
+<aside class="field"><p>This chapter is the hands-on companion to Chapter 15 (pattern-sewer control) and Chapter 17 (flat-knitting control); read those two and the pattern-sewer mechanisms in Chapter 11 first. The platform, module IDs, firmware framework and acceptance criteria are those of Chapter 19; the lockstitch prototype WQ-SC/LS is in Chapter 20 and the test methods in Chapter 22. Every number here is an illustrative or worked-example value computed by figsrc/ch21_calc.py.</p></aside>
+<p>Both prototypes in Chapter 20 are still machines in which the spindle turns once and a few solenoids act at set angles. The two in this chapter are different: both need continuous position control. A pattern sewer must move the clamp a whole stitch within the short arc of spindle angle when the needle is out of the fabric; a scaled flat-knitting machine must make its selector decide within the short stretch of carriage travel past each needle. The two control problems are really one: <strong>an action has to land inside a window defined by position</strong>, and whether the prototype can be built depends on whether the time budget of that window is large enough. We first build the pattern-sewer prototype WQ-SC/PS, then the scaled flat-knitting prototype WQ-SC/FK, each in three steps — make-up, firmware, bring-up and acceptance — and finally see how much they share with the lockstitch prototype.</p>
+
+<h3 id="s21-1">21.1 Opening: prototypes of two “numerically controlled” machines</h3>
+<p>A university lab has built the lockstitch prototype of Chapter 20 and now wants to do two harder things: a pattern sewer that can stitch a pocket flap, and a knitting machine that can knit a small jacquard swatch. Someone proposes buying used machines and converting them; the sums do not work. The control box of a used pattern sewer is closed and cannot be modified; a flat-knitting machine costs more, and a machine with hundreds of needles is too big for teaching. The decision is to build both: library parts wherever the mechanics allow, and WQ-SC platform modules for all the controls.</p>
+<p>Before any work starts the supervisor asks the students two questions. First, how big must the X–Y table motors be? Chapter 15 says that with 3 mm stitches and 1.5 mm material the needle-out window is 203.4°; how are spindle speed, acceleration and motor torque related? Second, with a home-made selector that is slow and scattered, how fast can the carriage go? Is an MCU with a 1 ms control period good enough, or is an FPGA unavoidable?</p>
+<p>Neither question can be settled by trial and error. Buy motors that are too small and the pattern sewer can only stitch at 500 r/min; make the selector too slow and the knitting machine crawls. The right way is to draw up a <strong>timing budget</strong> first: start from the window and work step by step to acceleration, torque, lead and jitter, choose the parts, and only then build. Both prototypes in this chapter were designed that way.</p>
+<div class="tbl"><table><caption>Table 21-1　Targets for the two prototypes (P1 level, illustrative)</caption><thead><tr><th>Item</th><th>Pattern-sewer prototype WQ-SC/PS</th><th>Scaled flat-knitting prototype WQ-SC/FK</th></tr></thead><tbody>
+<tr><td>Mechanics</td><td>Home-built X–Y table, 300 × 200 mm travel; existing lockstitch head</td><td>Home-built single bed, 60 needles, E5 (5.08 mm pitch), single-system carriage</td></tr>
+<tr><td>Time base</td><td>Spindle angle (encoder 10 000 counts/rev)</td><td>Carriage position (0.01 mm/count)</td></tr>
+<tr><td>Window</td><td>Usable needle-out window 183.4° (1.5 mm material)</td><td>Selection window ±0.25 pitch; acceptance ±0.1 pitch</td></tr>
+<tr><td>Key targets</td><td>3 mm stitches at ≥ 1600 r/min; following error ≤ 0.05 mm; zero motion while the needle is in the fabric</td><td>Carriage ≥ 0.6 m/s; selection timing error ≤ 0.1 pitch; knit a 20-course swatch</td></tr>
+<tr><td>Reuse</td><td>Spindle module, trimmer solenoids, event table, state machine as on the lockstitch prototype</td><td>Solenoid drivers, position-axis interface and test scripts as on the other two</td></tr>
+</tbody></table></div>
+
+<h3 id="s21-2">21.2 Mechanics and electrics of the pattern-sewer prototype</h3>
+<figure class="fig"><a class="zoom" href="img/en/fig_c21_ps_arch.png"><img src="img/en/fig_c21_ps_arch.png" alt="Fig. 21-1　Make-up of the pattern-sewer prototype WQ-SC/PS" loading="lazy"></a><figcaption>Fig. 21-1　Make-up of the pattern-sewer prototype WQ-SC/PS (illustrative; IDs marked * are proposed IDs, planned for the library)</figcaption></figure>
+<p>Fig. 21-1 shows the whole prototype. The head is an existing lockstitch head with the feed dog removed and the intermediate presser foot, trimmer and wiper of Chapter 15 added; the spindle servo and encoder are the lockstitch prototype's module. Only two things are new: a home-built X–Y table and the clamp.</p>
+<h4 id="s21-2-1">21.2.1 X–Y table: ball screw or timing belt</h4>
+<p>Chapter 15 described the two usual drives. Which one the prototype uses should be decided with the sizes actually in the parts library. A-BSC-SFU has a 16×10 screw (16 mm nominal diameter, 10 mm lead); A-PUL-HTD has a 5M-20-15 pulley (31.83 mm pitch diameter, 100 mm per revolution). Table 21-2 compares the two.</p>
+<div class="tbl"><table><caption>Table 21-2　X–Y drive options (X-axis moving mass 4 kg, worked-example values)</caption><thead><tr><th>Item</th><th>A: ball screw 16×10 + 1:1 timing belt</th><th>B: direct belt drive (5M-20-15 pulley)</th></tr></thead><tbody>
+<tr><td>Travel per rev / resolution</td><td>10 mm; 10 000 counts/rev → 1 μm</td><td>100 mm; 10 μm</td></tr>
+<tr><td>Load inertia referred to the motor</td><td>screw 2.5 × 10⁻⁵ + carriage 1.0 × 10⁻⁵ kg·m², about 1.2 × the rotor</td><td>4 × 0.0159² ≈ 1.0 × 10⁻³ kg·m², about 34 × the rotor</td></tr>
+<tr><td>Stiffness and natural frequency</td><td>Screw axial stiffness (worst mounting) ≈ 53 N/μm, ≈ 580 Hz</td><td>≈ 0.8 N/μm, ≈ 82 Hz (Chapter 15 example)</td></tr>
+<tr><td>Main risks</td><td>Critical speed, cost; motor-to-screw connection</td><td>Belt elasticity and vibration, large following error</td></tr>
+</tbody></table></div>
+<p>The prototype uses option A. With an order of magnitude more stiffness there is no need to worry about the 82 Hz ringing of Chapter 15, and the 1 μm resolution makes it easy to verify later that the clamp does not move while the needle is in the fabric. Critical speed is no issue: a 16 mm screw, 0.5 m long on the X axis, fixed at one end and supported at the other, has a critical speed of about 9700 r/min, whereas the fastest stitch needs only about 1900 r/min at the motor (computed below).</p>
+<p>One point needs care. Motor and screw would normally be joined by a jaw coupling, A-CPL-JAW, but the smallest size in the library, LM1, has an inertia of 2 × 10⁻⁴ kg·m² — seven times the rotor of a 400 W motor — and would eat most of the acceleration capability. Under the library rule of “select only from the library and say so when it has nothing suitable”, the answer is: <strong>the library has no suitable small coupling</strong>. The prototype therefore mounts the motor parallel to the screw and connects them by a pair of 1:1 3M-20 pulleys (A-PUL-HTD), whose inertia, 7 × 10⁻⁷ kg·m², is negligible; and it recommends adding small jaw couplings to the library.</p>
+<h4 id="s21-2-2">21.2.2 BOM and I/O</h4>
+<div class="tbl"><table><caption>Table 21-3　Pattern-sewer prototype BOM (main items, illustrative)</caption><thead><tr><th>Part</th><th>Entry</th><th>Spec (illustrative)</th><th>Qty</th><th>Source</th></tr></thead><tbody>
+<tr><td>Ball screw</td><td>A-BSC-SFU</td><td>16×10; X 0.5 m long, Y 0.4 m</td><td>2</td><td>in library</td></tr>
+<tr><td>Linear guide</td><td>A-LGD-RAIL</td><td>Size 15; X 1 rail 2 blocks, Y 2 rails 4 blocks</td><td>3 rails</td><td>in library</td></tr>
+<tr><td>Timing pulleys</td><td>A-PUL-HTD</td><td>3M-20-15, motor to screw 1:1</td><td>4</td><td>in library</td></tr>
+<tr><td>Screw support bearings</td><td>A-BRG-DG (angular contact A-BRG-AC preferred)</td><td>to suit screw ends</td><td>4 sets</td><td>in library</td></tr>
+<tr><td>X, Y servo motors + drives</td><td>D-MOT-PMSM*, D-DRV-SERVO*</td><td>400 W: rated 1.27 N·m, peak 3.8 N·m, rotor 0.3 × 10⁻⁴ kg·m²</td><td>2 sets</td><td>proposed ID</td></tr>
+<tr><td>Spindle servo + drive + encoder</td><td>as lockstitch prototype</td><td>see Chapter 20</td><td>1 set</td><td>reused</td></tr>
+<tr><td>Solenoids (trimmer, wiper, tension release) + driver</td><td>D-SOL-PUSH*, D-DRV-SOL*</td><td>as lockstitch prototype</td><td>3 + 1</td><td>reused</td></tr>
+<tr><td>Cylinders + valves</td><td>D-PNU-CYL*, D-PNU-VLV*</td><td>32 mm bore (≈ 400 N, Chapter 15)</td><td>2 + 3</td><td>proposed ID</td></tr>
+<tr><td>Home and limit switches</td><td>D-SNS-PROX*</td><td>X, Y: 1 home and 2 limits each</td><td>6</td><td>proposed ID</td></tr>
+<tr><td>Controller, I/O expander, gateway, power</td><td>D-CTL-WQSC*, D-IO-EXP*, D-GW-WQSC*, D-PSU-SMPS*</td><td>platform standard</td><td>1 each</td><td>proposed ID</td></tr>
+<tr><td>Clamp, templates, beam, base</td><td>—</td><td>aluminium extrusion and plate, home-made</td><td>—</td><td>home-made</td></tr>
+</tbody></table></div>
+<div class="tbl"><table><caption>Table 21-4　Pattern-sewer prototype I/O map (illustrative)</caption><thead><tr><th>Type</th><th>Signals</th><th>Connected to</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Encoder</td><td>Spindle A/B/Z (differential)</td><td>Controller encoder input</td><td>Angle reference, not via the bus</td></tr>
+<tr><td>Bus</td><td>Spindle drive, X drive, Y drive, I/O expander, gateway</td><td>CAN FD</td><td>X, Y position commands in one sync frame every 1 ms</td></tr>
+<tr><td>DI (12)</td><td>X/Y home 2, limits 4; clamp left/right down 2; air pressure OK 1; thread break 1; start pedal 1; E-stop 1</td><td>I/O expander; E-stop also hard-wired</td><td>E-stop removes drive enable directly</td></tr>
+<tr><td>DO (7)</td><td>Trimmer, wiper, tension release 3 (solenoid driver); clamp left, clamp right, presser-foot lift 3 (valves); alarm lamp 1</td><td>Controller PWM + I/O expander</td><td>Solenoids fire by angle, so they sit on the controller</td></tr>
+<tr><td>AI (1, optional)</td><td>Hall pedal</td><td>Controller</td><td>For manual speed during trial sewing</td></tr>
+</tbody></table></div>
+
+<h3 id="s21-3">21.3 Motion-control firmware of the pattern-sewer prototype</h3>
+<h4 id="s21-3-1">21.3.1 From window to motor torque: one chain of calculation</h4>
+<p>Chapter 15 showed that with 1.5 mm of fabric plus lower template the needle enters at 101.7° and leaves at 258.3°, giving a geometric window W = 203.4°. The prototype reserves 10° at each end for servo settling and delay errors, so the usable window is W<sub>u</sub> = 183.4°, starting at 268.3° and ending at 91.7° of the next revolution (Fig. 21-2a).</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c21_ps_budget.png"><img src="img/en/fig_c21_ps_budget.png" alt="Fig. 21-2　Window, available time and speed limit" loading="lazy"></a><figcaption>Fig. 21-2　(a) The clamp moves only inside the usable window; (b) stitch length vs spindle speed limit (S-curve, X axis 50 m/s², Y axis 40 m/s², worked-example values)</figcaption></figure>
+<p><strong>Worked example</strong>　Find the peak torque of the X motor for 3 mm stitches at 1600 r/min.</p>
+<p>Step 1, the available time. Turning through 183.4° takes</p>
+<div class="math">\[ \Delta t = \frac{W_u}{6n} = \frac{183.4}{6\times1600} = 19.1\ \text{ms} \]</div>
+<p>Step 2, the acceleration needed. The prototype firmware uses an S-curve (seven-segment) profile: within each half of the move the acceleration ramps up for 1/8 of the time, stays constant for 1/4 and ramps down for 1/8. The acceleration is continuous and does not excite the table. Integrating this law numerically gives a peak-acceleration coefficient C = 5.33 and a peak-velocity coefficient of 2.0 (4 and 2 for constant acceleration, Chapter 15):</p>
+<div class="math">\[ a = C\,\frac{s}{\Delta t^2} = 5.33\times\frac{0.003}{0.0191^2} = 43.9\ \text{m/s}^2, \qquad v_{pk} = 2.0\,\frac{s}{\Delta t} = 0.314\ \text{m/s} \]</div>
+<p>v<sub>pk</sub> corresponds to 0.314/0.010 × 60 ≈ 1885 r/min at the motor, below the rated 3000 r/min.</p>
+<p>Step 3, the torque. The screw turns linear acceleration into motor angular acceleration α = 2πa/P<sub>h</sub> and refers the load inertia as m(P<sub>h</sub>/2π)². The four terms are rotor 0.30, two pulleys 0.01, screw 0.25 and carriage 0.10 (units of 10⁻⁴ kg·m²):</p>
+<div class="math">\[ J = J_m + 2J_p + \frac{\pi\rho L d^4}{32} + m\left(\frac{P_h}{2\pi}\right)^2 \approx 0.668\times10^{-4}\ \text{kg}\cdot\text{m}^2 \]</div>
+<div class="math">\[ T = J\,\frac{2\pi a}{P_h} + \frac{\mu m g P_h}{2\pi\eta} = 0.668\times10^{-4}\times\frac{2\pi\times43.9}{0.010} + 0.004 \approx 1.84\ \text{N}\cdot\text{m} \]</div>
+<p>The Y axis, with 12 kg moving, needs 2.27 N·m by the same method; both are below the 3.8 N·m peak. The character of a screw drive shows clearly here: friction costs only 0.004 N·m, and nearly all the torque goes into accelerating the motor's own rotor and the screw, the load mass being a minor share.</p>
+<p>Step 4, set the design acceleration by heating. As in Chapter 15, the real limit is the RMS torque. The S-curve has an RMS shape factor of 0.816 over the move, and in the worst case every stitch uses the full window, so the move occupies 183.4/360 of the time:</p>
+<div class="math">\[ T_{rms} = T_{pk}\times0.816\times\sqrt{183.4/360} = 0.58\,T_{pk} \le 1.27\ \text{N}\cdot\text{m} \;\Rightarrow\; T_{pk} \le 2.2\ \text{N}\cdot\text{m} \]</div>
+<p>Working back, the sustainable acceleration is about 52 m/s² for X and about 42 m/s² for Y. The prototype uses design values of 50 m/s² (X) and 40 m/s² (Y), with RMS torques of 1.22 and 1.21 N·m; the short-time peak capability (72 and 59 m/s²) is kept as margin and not used in planning.</p>
+<p>Step 5, turn it round and set a speed limit for each stitch length: Δt = √(C·s/a), n<sub>cap</sub> = W<sub>u</sub>/(6Δt), and take the smaller of that and the 2500 r/min head limit. The results are in Table 21-5 and Fig. 21-2b.</p>
+<div class="tbl"><table><caption>Table 21-5　Prototype stitch length vs speed limit (S-curve, 1.5 mm material, worked-example values, r/min)</caption><thead><tr><th>Stitch length s (mm)</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead><tbody>
+<tr><td>Along X (50 m/s²)</td><td>2500</td><td>2092</td><td>1708</td><td>1479</td><td>1323</td><td>1208</td></tr>
+<tr><td>Along Y (40 m/s²)</td><td>2500</td><td>1871</td><td>1528</td><td>1323</td><td>1184</td><td>1080</td></tr>
+<tr><td>45° diagonal (s/√2 per axis, Y-limited)</td><td>2500</td><td>2225</td><td>1817</td><td>1574</td><td>1407</td><td>1285</td></tr>
+</tbody></table></div>
+<p>A 3 mm stitch along X reaches 1708 r/min, meeting the 1600 r/min target of Table 21-1; along Y it is 1528 r/min, slightly below. This table is the basis of the firmware's automatic slow-down and the expected values for the Chapter 22 test cases.</p>
+<h4 id="s21-3-2">21.3.2 Firmware structure</h4>
+<figure class="fig"><a class="zoom" href="img/en/fig_c21_ps_fw.png"><img src="img/en/fig_c21_ps_fw.png" alt="Fig. 21-3　Data flow in the pattern-sewer prototype firmware" loading="lazy"></a><figcaption>Fig. 21-3　Data flow in the pattern-sewer prototype firmware: once per segment, once per stitch, once per millisecond (illustrative)</figcaption></figure>
+<p>The firmware follows the Chapter 19 framework: the time base is spindle angle; trimmer, wiper and intermediate presser foot are fired from the event table; the state machine gains three states, CLAMP, JUMP and HOME. Three blocks are new: pattern-file parsing, look-ahead speed planning and in-window interpolation (Fig. 21-3). The X and Y position axes, whether servo or closed-loop stepper, both sit under the HAL's stepper_* interface, so changing a motor means changing only a driver file.</p>
+<h4 id="s21-3-3">21.3.3 Pattern file: an incremental per-stitch format</h4>
+<p>The prototype uses an illustrative format of its own, .wqp. Following Chapter 15's idea of “command + ΔX + ΔY as integer increments”, each record is packed into 3 bytes:</p>
+<div class="tbl"><table><caption>Table 21-6　The .wqp pattern-file format (an illustrative format for this book)</caption><thead><tr><th>Part</th><th>Bytes</th><th>Content</th></tr></thead><tbody>
+<tr><td>Header</td><td>16</td><td>"WQP1", version, unit (1 = 0.1 mm), record count (u16), top speed/10 (u16), start point X, Y (int16), CRC-16</td></tr>
+<tr><td>Record</td><td>3</td><td>cmd (u8), dx (int8), dy (int8); dx, dy in 0.1 mm, range ±12.7 mm — exactly the maximum stitch length of Chapter 15</td></tr>
+<tr><td>cmd</td><td>—</td><td>0x01 SEW one stitch; 0x02 JUMP (long jumps split into several records); 0x03 TRIM; 0x04 SPEED limit (dx × 100 r/min); 0x05 PRESS presser height (dx × 0.1 mm); 0x0F END</td></tr>
+</tbody></table></div>
+<p>The parser does three things: checks the CRC; accumulates the increments into absolute coordinates and checks they stay inside the 300 × 200 mm travel; and puts the records into the stitch queue. Integer accumulation means no rounding error even after thousands of stitches.</p>
+<pre><code class="language-c">typedef struct { int8_t dx, dy; uint8_t cmd, flags; uint16_t n; } stitch_t;
+
+int wqp_parse(const uint8_t *buf, int len, stitch_t *q, int qmax)
+{
+    if (len &lt; 16 || memcmp(buf, "WQP1", 4) != 0) return -E_FORMAT;
+    if (crc16(buf, 14) != rd_u16(buf + 14))    return -E_CRC;
+    int nrec = rd_u16(buf + 6);
+    int32_t x = (int16_t)rd_u16(buf + 10), y = (int16_t)rd_u16(buf + 12);  /* 0.1 mm */
+    const uint8_t *r = buf + 16;
+    int k = 0;
+    for (int i = 0; i &lt; nrec &amp;&amp; k &lt; qmax; i++, r += 3) {
+        uint8_t cmd = r[0]; int8_t dx = (int8_t)r[1], dy = (int8_t)r[2];
+        if (cmd == CMD_END) break;
+        if (cmd == CMD_SEW || cmd == CMD_JUMP) {
+            x += dx; y += dy;
+            if (x &lt; 0 || x &gt; 3000 || y &lt; 0 || y &gt; 2000) return -E_TRAVEL;   /* 300 × 200 mm */
+        }
+        q[k++] = (stitch_t){ dx, dy, cmd, 0, 0 };
+    }
+    return k;   /* queue length, handed to plan_speed() */
+}</code></pre>
+<h4 id="s21-3-4">21.3.4 Look-ahead: automatic spindle slow-down</h4>
+<p>Table 21-5 gives each stitch's own limit, but the spindle cannot jump from 2092 to 1080 r/min in one stitch. Chapter 15's look-ahead (one backward pass, one forward pass) becomes the function below, run once per segment in a background task. Each axis is evaluated separately and the slower one governs; the first two stitches after starting and the two before a trim are limited to 400 r/min; the allowed speed change per stitch is Δn = 300 r/min.</p>
+<pre><code class="language-c">#define WU     183.4f           /* usable window, degrees */
+#define C_S    5.333f           /* S-curve peak-acceleration coefficient */
+#define A_X    50.0f            /* m/s², set by heating */
+#define A_Y    40.0f
+#define N_HEAD 2500
+#define N_SLOW 400
+#define DN     300
+
+static float t_axis(float s_mm, float a)            /* time to travel s, seconds */
+{ return s_mm &lt;= 0.f ? 0.f : sqrtf(C_S * s_mm * 1e-3f / a); }
+
+void plan_speed(stitch_t *s, int N)
+{
+    for (int i = 0; i &lt; N; i++) {
+        float t = fmaxf(t_axis(fabsf(s[i].dx) * 0.1f, A_X),
+                        t_axis(fabsf(s[i].dy) * 0.1f, A_Y));
+        float cap = (t &gt; 0.f) ? WU / (6.f * t) : N_HEAD;
+        s[i].n = (uint16_t)fminf(cap, N_HEAD);
+        if (s[i].flags &amp; (F_START2 | F_TRIM2)) s[i].n = MIN(s[i].n, N_SLOW);
+    }
+    for (int i = N - 2; i &gt;= 0; i--)                     /* backward: slow down early for slow stitches ahead */
+        s[i].n = MIN(s[i].n, s[i + 1].n + DN);
+    uint16_t prev = N_SLOW;                               /* forward: do not accelerate too hard either */
+    for (int i = 0; i &lt; N; i++) { s[i].n = MIN(s[i].n, prev + DN); prev = s[i].n; }
+}</code></pre>
+<p><strong>Worked example</strong>　A run of 2 mm stitches along X with one 6 mm stitch along Y in the middle (stitch 5). The per-stitch limits are 2092, 2092, 2092, 2092, 1080, 2092, …; after look-ahead the speeds are 2092, 1980, 1680, 1380, 1080, 1380, 1680, 1980 r/min. The controller starts slowing four stitches early and reaches exactly 1080 r/min at the long stitch.</p>
+<h4 id="s21-3-5">21.3.5 Single-stitch interpolation inside the window</h4>
+<p>The interpolation interrupt runs every 1 ms. It looks not at time but at spindle angle: first it uses the predicted angle φ<sub>p</sub> = φ + ω·T<sub>d</sub> to compensate the total delay from issuing a command to the motor following it (T<sub>d</sub> = 1.5 ms, including CAN FD transfer and one interpolation period inside the drive; 14.4° at 1600 r/min); then it computes τ and looks up f(τ) in the S-curve table. Outside the window the command does not change — that is the software guarantee that the clamp stays still while the needle is in the fabric.</p>
+<pre><code class="language-c">#define PHS10  2683            /* window start 268.3° (0.1° units) */
+#define WU10   1834            /* window width 183.4° */
+#define TD_US  1500            /* total delay */
+static int32_t x0_um, y0_um;   /* start point of this stitch */
+static stitch_t cur; static uint8_t moving;
+
+void xy_tick_1ms(void)                         /* 1 kHz, among the highest priorities */
+{
+    int32_t phi = spindle_angle_d10();         /* 0..3599 */
+    int32_t w   = spindle_speed_d10_per_ms();  /* 0.1°/ms */
+    int32_t d   = phi + w * TD_US / 1000 - PHS10;
+    d %= 3600; if (d &lt; 0) d += 3600;           /* distance past window start (0.1°) */
+    int32_t x = x0_um, y = y0_um;
+
+    if (d &lt;= WU10) {                           /* inside the usable window */
+        if (!moving) { if (!queue_peek(&amp;cur)) goto out; moving = 1; }
+        uint32_t f = scurve_q15((uint32_t)d * 32768u / WU10);   /* f(τ), 0..32768 */
+        x = x0_um + (int32_t)cur.dx * 100 * (int32_t)f / 32768;
+        y = y0_um + (int32_t)cur.dy * 100 * (int32_t)f / 32768;
+    } else if (moving) {                        /* window over: land on the end point, pop the stitch */
+        x0_um += cur.dx * 100; y0_um += cur.dy * 100;
+        x = x0_um; y = y0_um; queue_pop(); moving = 0;
+        spindle_set_speed(queue_next_speed()); /* planned speed of the next stitch */
+    }
+out:
+    stepper_set_pos(AX_X, x); stepper_set_pos(AX_Y, y);
+    stepper_sync();                             /* CAN FD sync frame: both axes act together */
+    trace_log(phi, x, y);                       /* bring-up and acceptance log (Section 21.4) */
+}</code></pre>
+<p>Three points in this code deserve attention. First, the S-curve table holds 1025 points in Q15 fixed point, read with linear interpolation, so there is no floating-point division in the interrupt. Second, the spindle speed command is issued at the end of each stitch, so the speed change falls in the needle-out window and does not disturb the needle-in-fabric part. Third, because the command never changes outside the window, even a planning error higher up cannot command the clamp to move while the needle is in the fabric; the remaining risk is that the servo fails to keep up, and that is what the tests of Section 21.4 look for.</p>
+<p><strong>Jumps</strong>　JUMP records are not moved inside the window. The state machine first trims (the Chapter 20 event table), the spindle stops at needle-up, the presser foot lifts, and X and Y run a trapezoidal profile to the start of the next segment. There is no window limit now, so each axis uses its short-time capability (X about 70 m/s² and 0.5 m/s, i.e. 3000 r/min at the motor). A 100 mm jump takes about 0.2 s plus the trimming and restart time, which is why fewer segments mean a shorter cycle (Chapter 15). After the jump the presser foot comes down, the head starts at 400 r/min and then hands over to the look-ahead speeds.</p>
+<aside class="field"><p><strong>Shop-floor notes</strong></p><ul>
+<li>φ must come from the spindle encoder wired straight to the controller, never read back from a drive over the bus; that would add a bus period of delay.</li>
+<li>Do not guess T<sub>d</sub>, measure it: at low speed record command and actual position as in Section 21.4; the phase difference between them is T<sub>d</sub>.</li>
+<li>Try each new pattern at 300–500 r/min with single-stepping first, then raise the speed to the look-ahead values.</li>
+</ul></aside>
+
+<h3 id="s21-4">21.4 Bring-up and acceptance of the pattern-sewer prototype</h3>
+<p>Bring-up goes from static to dynamic and from single axes to synchronisation. Every step has a criterion, and the results are written as a test report in the Chapter 22 format and published to the topic wq/sewing/proto/ps01/measurement.</p>
+<p><strong>Step 1: homing</strong>　Each axis first approaches the home switch slowly, then reverses to find the index pulse of the motor encoder and takes the index as the reference. The switch alone repeats only to a few tenths of a millimetre; the index repeats to about 1 μm. Criterion: 20 consecutive homings repeat within 0.01 mm.</p>
+<p><strong>Step 2: backlash and pitch-error compensation</strong>　A preloaded ball nut has very little backlash, but the 1:1 pulleys and support bearings add a little. Measure with a dial indicator or laser every 25 mm over the full travel in both directions (a bidirectional positioning test after ISO 230-2). The mean difference between the two directions is the backlash; it goes into the parameter table and is added on reversal. The one-direction error curve becomes a compensation table that the firmware interpolates linearly inside stepper_set_pos(). Criteria (illustrative): after compensation, positioning error ≤ 0.02 mm over the travel and residual backlash ≤ 0.005 mm.</p>
+<p><strong>Step 3: coordinate calibration</strong>　Clamp a sheet of paper in the template and, at 300 r/min, pierce a 5 × 5 grid of holes at 50 mm spacing over 200 × 200 mm; measure the holes with a camera or a steel rule. The overall shift is the offset of the needle relative to the table origin; the scale error in each direction corrects counts per millimetre; and the two diagonals d<sub>1</sub>, d<sub>2</sub> give the squareness error of X to Y, δ ≈ (d<sub>1</sub>² − d<sub>2</sub>²)/(4ab) (a, b the rectangle sides). Beyond 0.1 mm per 200 mm the Y rails must be adjusted.</p>
+<p><strong>Step 4: synchronisation check</strong>　This is the most important test of the pattern-sewer prototype. Sew 3 mm stitches continuously at 1600 r/min. trace_log() in the interpolation interrupt records φ and the X, Y commands every millisecond, while the trace function of the servo drives records the motor-encoder actual positions at a higher rate; everything is aligned by spindle angle. Two statistics follow: the maximum following error (command − actual), and, for every stitch, the largest change of actual position between φ<sub>1</sub> and φ<sub>2</sub> (needle in fabric).</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c21_ps_sync.png"><img src="img/en/fig_c21_ps_sync.png" alt="Fig. 21-4　Synchronisation-check record" loading="lazy"></a><figcaption>Fig. 21-4　Synchronisation-check record (simulated): at first tune the clamp still moves 0.18 mm with the needle in the fabric; with a faster position loop, full acceleration feed-forward and the table read at φ + ω·T<sub>d</sub>, this falls to 0.002 mm</figcaption></figure>
+<p>Fig. 21-4 compares two tunings. At first tune the position loop is about 40 Hz, acceleration feed-forward is only half on and there is no delay compensation: the following error reaches 0.22 mm and the clamp is still “sliding” after the needle enters, moving 0.18 mm while the needle is in the fabric — enough to tear the needle holes. With the position loop raised to about 100 Hz (which the screw's stiffness allows, Section 21.2.1), acceleration feed-forward at 95 % and the predicted-angle table look-up, the following error drops to 0.006 mm and the in-fabric motion to 0.002 mm, i.e. two encoder counts.</p>
+<div class="tbl"><table><caption>Table 21-7　Acceptance tests for the pattern-sewer prototype (illustrative; requirement IDs are examples)</caption><thead><tr><th>Requirement</th><th>Item</th><th>Method</th><th>Criterion</th></tr></thead><tbody>
+<tr><td>REQ-PS-01</td><td>Homing repeatability</td><td>20 homings, read encoder</td><td>≤ 0.01 mm</td></tr>
+<tr><td>REQ-PS-02</td><td>Positioning accuracy (compensated)</td><td>Bidirectional measurement every 25 mm</td><td>≤ 0.02 mm</td></tr>
+<tr><td>REQ-PS-03</td><td>Following error</td><td>1600 r/min, 3 mm, log 200 stitches</td><td>≤ 0.05 mm</td></tr>
+<tr><td>REQ-PS-04</td><td>Motion with needle in fabric</td><td>As above, change of actual position within φ<sub>1</sub>–φ<sub>2</sub></td><td>Zero (≤ 5 encoder counts, 0.005 mm)</td></tr>
+<tr><td>REQ-PS-05</td><td>Stitch-length/speed table</td><td>50 stitches at every cell of Table 21-5</td><td>REQ-PS-03 and 04 pass; no skipped or broken needles</td></tr>
+<tr><td>REQ-PS-06</td><td>Needle positioning and trimming</td><td>As Chapter 20</td><td>Positioning ±1°; trimming ≥ 99.5 % in 1000 cycles</td></tr>
+<tr><td>REQ-PS-07</td><td>Interlocks</td><td>Break clamp-down, air pressure and E-stop one by one</td><td>Spindle cannot start; when sewing, stops at once at needle-up</td></tr>
+<tr><td>REQ-PS-08</td><td>Endurance</td><td>Pocket-flap pattern looped for 4 h</td><td>Motor temperature rise and fault log; RMS torque ≤ rated</td></tr>
+</tbody></table></div>
+<p>“Zero motion while the needle is in the fabric” has to become a measurable number. The encoder resolves 1 μm and the measurement itself has a few counts of noise, so this book treats “≤ 5 counts” as zero. Write that convention into the requirement, or different people will argue over their results.</p>
+<p>The test scripts follow Chapter 22: one test case per requirement. Below is the skeleton of REQ-PS-04: download the pattern and speed through the gateway, fetch the trace, cut out the needle-in-fabric interval of each stitch by spindle angle, measure the motion, and both write the report and publish over MQTT.</p>
+<pre><code class="language-python">def test_req_ps_04_no_motion_in_fabric(gw):
+    gw.load_pattern("line_x_3mm_200.wqp")
+    gw.run(speed_rpm=1600, trace=True)
+    tr = gw.fetch_trace()                       # columns: phi_deg10, x_um, y_um (actual)
+    worst = 0
+    for st in split_by_rev(tr):                 # one slice per revolution
+        m = (st.phi &gt;= 1017) &amp; (st.phi &lt;= 2583)   # 101.7°–258.3°: needle in fabric
+        worst = max(worst, st.x[m].ptp(), st.y[m].ptp())
+    gw.publish("wq/sewing/proto/ps01/measurement",
+               {"req": "REQ-PS-04", "value_um": int(worst), "limit_um": 5})
+    assert worst &lt;= 5</code></pre>
+
+<h3 id="s21-5">21.5 Make-up of the scaled flat-knitting prototype</h3>
+<figure class="fig"><a class="zoom" href="img/en/fig_c21_fk_arch.png"><img src="img/en/fig_c21_fk_arch.png" alt="Fig. 21-5　Make-up of the scaled flat-knitting prototype WQ-SC/FK" loading="lazy"></a><figcaption>Fig. 21-5　Make-up of the scaled flat-knitting prototype WQ-SC/FK: dashed outlines are home-made parts, solid outlines library entries or proposed modules (illustrative)</figcaption></figure>
+<p>An industrial flat-knitting machine has hundreds of needles, two or three systems and two beds. The teaching prototype shrinks it to the minimum without losing the principle: <strong>one system, one bed, 60 needles, E5 (5.08 mm pitch)</strong>. A coarse gauge helps twice: tricks, cams and selector jacks are large enough to make on an ordinary mill and a laser cutter, and the selection time is long enough for a home-made selector. 60 × 5.08 mm = 304.8 mm, the width of an A4 sheet, fits on a bench. P0 knits and misses only (one selection point S1); P1 adds a second point S2 for tuck stitches; a second bed and racking come later.</p>
+<p>The carriage is driven by a 200 W servo through a 5M timing belt. The A-PUL-HTD 5M-20-15 pulley moves 100 mm per revolution and the motor encoder has 10 000 counts per revolution, so carriage position is resolved to 0.01 mm. With a 2.5 kg carriage and 10 m/s² (as in Chapter 17), the force needed is about 2.5 × 10 + 2.5 N friction + 15 N of butt drag through the cams ≈ 42.5 N, giving about 0.69 N·m peak and 0.28 N·m at constant speed; 2 m/s corresponds to 1200 r/min. All of this is within a 200 W servo (illustrative values). Carriage position may come from the motor encoder alone or from a magnetic scale along the guide; the latter excludes belt elasticity. During acceleration the belt stretches about 0.03 mm (estimated with the Chapter 15 belt stiffness), negligible on an E5 prototype but worth revisiting for finer gauges.</p>
+<p>The selector is the heart of this prototype and the part most worth making yourself. It is a stack of eight small electromagnets forming eight steps, and the selector-jack butts repeat through eight heights: needle i is served by step k = i mod 8. Successive actions of one step are thus eight pitches apart — 67.7 ms at 0.6 m/s — far longer than the 3 ms of one pull and release. The response time of the home-made electromagnetic selector is taken as 1.5 ms with ±0.3 ms scatter (illustrative, more than twice as slow as the industrial selector of Chapter 17). A piezo selector would respond ten times faster with less scatter but needs a drive of over 100 V, so P0 does without it.</p>
+<p>The rule for what to make and what to take from the library is: <strong>parts that set accuracy and life and come in standard sizes are taken from the library; parts that make this machine a knitting machine are made in-house.</strong> Guides, pulleys, bearings, screws and worms belong to the first group and are chosen straight from the library sizes. The needle bed, cam plate, selector jacks and yarn carriers belong to the second; the library does not hold them and should not, and their drawings are the most important design output of this prototype. Three dimensions of the home-made parts must be checked: the cumulative pitch error of the tricks (no more than 0.1 mm over 60), the clearance between cam plate and bed, and the eight butt heights of the selector jacks.</p>
+<div class="tbl"><table><caption>Table 21-8　Scaled flat-knitting prototype BOM (main items, illustrative)</caption><thead><tr><th>Part</th><th>Entry / method</th><th>Spec (illustrative)</th><th>Source</th></tr></thead><tbody>
+<tr><td>Needle bed</td><td>Milled aluminium plate, or inserted steel walls</td><td>60 tricks at 5.08 mm</td><td>home-made</td></tr>
+<tr><td>Needles, selector jacks</td><td>Coarse-gauge latch needles bought in; jacks laser-cut</td><td>Jack butts at 8 heights</td><td>home-made / bought</td></tr>
+<tr><td>Cam plate</td><td>Wire-cut steel plate, surface-hardened</td><td>One raising cam and one stitch cam set</td><td>home-made</td></tr>
+<tr><td>Carriage guide</td><td>A-LGD-RAIL</td><td>Size 15, ≈ 900 mm long</td><td>in library</td></tr>
+<tr><td>Pulleys, belt</td><td>A-PUL-HTD; C-BLT-BELT (belt-drive mechanism)</td><td>5M-20-15, 15 mm belt</td><td>in library</td></tr>
+<tr><td>Carriage servo + drive</td><td>D-MOT-PMSM*, D-DRV-SERVO*</td><td>200 W, encoder 10 000 counts/rev</td><td>proposed ID</td></tr>
+<tr><td>Selector</td><td>8 small electromagnets + armatures (home-made); driver D-DRV-SOL*</td><td>T<sub>r</sub> ≈ 1.5 ± 0.3 ms</td><td>home-made + proposed ID</td></tr>
+<tr><td>Stitch cams</td><td>Closed-loop stepper D-MOT-STEP* + lead screw C-SCN-LEAD</td><td>2 × NEMA 17 (left and right stitch cams)</td><td>proposed ID + in library</td></tr>
+<tr><td>Yarn carriers</td><td>Push-pull solenoid D-SOL-PUSH*; carriers home-made</td><td>2 carriers, picked up in the reversal zone</td><td>proposed ID + home-made</td></tr>
+<tr><td>Take-down</td><td>Rubber roller + worm C-WRM-WORM + stepper D-MOT-STEP*</td><td>Tension dancer + Hall angle sensor D-SNS-HALL*</td><td>in library + proposed ID</td></tr>
+<tr><td>Protection and home</td><td>D-SNS-PE* (yarn break), needle probe switch, D-SNS-PROX*</td><td>—</td><td>proposed ID</td></tr>
+<tr><td>Controller, carriage board, gateway, power</td><td>D-CTL-WQSC*; the carriage board is a second controller board, optionally with a small FPGA</td><td>CAN FD through the cable chain</td><td>proposed ID</td></tr>
+</tbody></table></div>
+<div class="tbl"><table><caption>Table 21-9　Scaled flat-knitting prototype I/O map (illustrative)</caption><thead><tr><th>Where</th><th>Signals</th><th>Count</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Frame controller</td><td>Carriage servo (CAN FD); home 1, left/right limits 2; take-down stepper 1; tension Hall AI 1; yarn break DI 2; E-stop, guard door DI 2</td><td>—</td><td>Works per course</td></tr>
+<tr><td>Carriage board</td><td>Carriage position (A/B from the servo drive's encoder output, or a magnetic scale)</td><td>1</td><td>Time base for per-needle firing</td></tr>
+<tr><td>Carriage board</td><td>Selector S1 × 8 steps (P1 adds S2 × 8)</td><td>8 (16) DO</td><td>Boost + hold + Zener clamp</td></tr>
+<tr><td>Carriage board</td><td>Carrier solenoids 2 DO; stitch-cam steppers 2 (step/dir) + zero switches 2 DI; needle probe 1 DI</td><td>—</td><td>Stitch cams and carriers act in the reversal zone</td></tr>
+</tbody></table></div>
+
+<h3 id="s21-6">21.6 Firmware of the knitting prototype</h3>
+<h4 id="s21-6-1">21.6.1 Carriage position as the time base</h4>
+<p>On the knitting machine the Chapter 19 firmware framework changes in one place only: the time base becomes carriage position instead of spindle angle. Needle i should be selected at x<sub>i</sub> = c + (i + ½)p, where c is the reversal margin, the run-up from the start of travel to needle 0. The selector needs T<sub>r</sub> from command to armature action, so the command must be early:</p>
+<div class="math">\[ x_{cmd} = x_i - v\left(T_r + \tfrac{1}{2}T_q\right) \]</div>
+<p>Compared with Chapter 17 there is an extra term T<sub>q</sub>/2, where T<sub>q</sub> is the firing quantisation. An MCU checks carriage position only once per control period T<sub>c</sub>; once the command point is passed it still waits until the next period, half a period late on average. An FPGA compares at every encoder count, so T<sub>q</sub> is only the time to travel one count (0.01 mm).</p>
+<h4 id="s21-6-2">21.6.2 Selection timing budget</h4>
+<p>How far from the ideal position does the armature actually act? Putting the three sources together (Fig. 21-6a):</p>
+<div class="math">\[ |e|_{max} = v\left(\tfrac{1}{2}T_q + J\right) + |e_{lead}| \]</div>
+<p>J is the scatter of the selector response (it varies with coil temperature and supply voltage), and e<sub>lead</sub> is the part of the lead that is simply wrong (a fixed lead is wrong in the acceleration zone, Fig. 17-4). There are two criteria: with |e| ≤ 0.25p the jack is still pushed in (or left alone) correctly, beyond that it is a mis-selection; acceptance requires ≤ 0.1p, a 2.5-fold margin.</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c21_fk_timing.png"><img src="img/en/fig_c21_fk_timing.png" alt="Fig. 21-6　Selection timing budget" loading="lazy"></a><figcaption>Fig. 21-6　(a) Timing budget of one needle; (b) worst selection error over a 60-needle course vs carriage speed (T<sub>r</sub> = 1.5 ± 0.3 ms, lead from live speed; worked-example values)</figcaption></figure>
+<p><strong>Worked example</strong>　E5, carriage top speed 0.6 m/s, acceleration 10 m/s², reversal margin 40 mm, MCU control period 1 ms, lead from live speed.</p>
+<div class="tbl"><table><caption>Table 21-10　Selection timing budget (E5, 0.6 m/s, MCU 1 ms, worked-example values)</caption><thead><tr><th>Item</th><th>Expression</th><th>Value</th></tr></thead><tbody>
+<tr><td>Time per needle</td><td>t<sub>n</sub> = p/v</td><td>8.47 ms</td></tr>
+<tr><td>Interval between actions of one step</td><td>8p/v (must be ≥ 2T<sub>r</sub> = 3 ms)</td><td>67.7 ms</td></tr>
+<tr><td>Lead</td><td>v(T<sub>r</sub> + T<sub>c</sub>/2)</td><td>1.20 mm = 0.24p</td></tr>
+<tr><td>Quantisation error</td><td>±v·T<sub>c</sub>/2</td><td>±0.30 mm</td></tr>
+<tr><td>Response scatter</td><td>±v·J</td><td>±0.18 mm</td></tr>
+<tr><td>Total worst error</td><td>v(T<sub>c</sub>/2 + J)</td><td>0.48 mm = 0.094p ≤ 0.1p ✓</td></tr>
+<tr><td>Course time</td><td>D = 2c + 60p + L<sub>k</sub> = 464.8 mm, acceleration + 0.1 s reversal</td><td>0.935 s, ≈ 3850 courses/h</td></tr>
+</tbody></table></div>
+<p>Without compensation the lag would be a full 0.24p, close to the mis-selection limit. 0.6 m/s is inside the acceptance line; how fast could it go? Setting v(T<sub>c</sub>/2 + J) = 0.1p gives</p>
+<div class="math">\[ v_{max} = \frac{0.1p}{T_c/2 + J} = \frac{0.508\ \text{mm}}{0.5 + 0.3\ \text{ms}} \approx 0.635\ \text{m/s} \]</div>
+<p>A course then takes 0.895 s, about 4020 courses per hour. Shortening the control period to 0.5 ms and 0.25 ms raises the limit to 0.91 and 1.16 m/s. With FPGA per-count comparison only half a count (0.005 mm) of quantisation is left, and the limit is set by the selector's own scatter:</p>
+<div class="math">\[ v_{max} \approx \frac{0.1p - 0.005}{J} = \frac{0.503}{0.3} \approx 1.68\ \text{m/s} \]</div>
+<p>The full model (which accounts for speed changing within the acceleration zone) gives 1.66 m/s, 0.546 s per course and about 6590 courses per hour. Speed rises 2.6-fold but output only 64 %, because the acceleration time v/a and the reversal dwell do not shrink with speed — the same conclusion as Section 17.8. Fig. 21-6b shows two more things: the MCU 1 ms scheme starts actually mis-selecting at 1.59 m/s, not merely failing acceptance; and for E7 (p = 3.63 mm) the same selector reaches only 1.16 m/s with an FPGA and 0.45 m/s with a 1 ms MCU.</p>
+<p>The conclusion is clear: <strong>for an E5 P0 prototype an MCU with a 1 ms control period at 0.6 m/s is enough; to go faster or finer, add the FPGA first, then reduce the selector's scatter.</strong> Making the selector merely faster (smaller T<sub>r</sub>) does not raise the limit, because T<sub>r</sub> is already compensated by the lead; what limits speed is its scatter J.</p>
+<aside class="field"><p><strong>Design notes</strong></p><ul>
+<li>Work out the scatter before the delay: delay can be compensated, scatter cannot. Drive the selector coils with boost and constant-current hold (Chapter 13) so that the current rise time does not change with supply voltage and temperature; that does more than simply making the selector faster.</li>
+<li>Compute the lead from live speed and include half the quantisation period; a fixed lead is right only at full speed, and a prototype has no reason to use one.</li>
+<li>Choose the number of selector steps so that the step interval n<sub>steps</sub>·p/v ≥ 2T<sub>r</sub> with at least a two-fold margin; eight steps are ample for an E5 prototype and leave room for finer gauges later.</li>
+<li>Once the speed goes up, recompute the reversal margin, the braking distance and the limit-switch positions together.</li>
+</ul></aside>
+<h4 id="s21-6-3">21.6.3 From a pattern course to selection bitmaps</h4>
+<figure class="fig"><a class="zoom" href="img/en/fig_c21_fk_bitmap.png"><img src="img/en/fig_c21_fk_bitmap.png" alt="Fig. 21-7　A pattern course becomes selection bitmaps and a target table" loading="lazy"></a><figcaption>Fig. 21-7　How one course of a pattern becomes per-step selection bitmaps and an FPGA target table (illustrative)</figcaption></figure>
+<p>The main controller works per course (Section 17.5). At each reversal it splits the next design row (K, T, ·) into bits for the two selection points, deals them to the steps by k = i mod 8, sorts each needle's target position in the direction of travel and writes the table into the idle buffer of the carriage board (Fig. 21-7). Targets are in encoder counts: target<sub>i</sub> = (c + (i + ½)p)/0.01 mm, so needle 0 is 4254, needle 1 is 4762, and so on. The lead is not stored in the table; the carriage board subtracts it at compare time from the live speed.</p>
+<pre><code class="language-c">typedef struct { int32_t target[60]; uint8_t s1[60], s2[60]; int n; int8_t dir; } row_t;
+
+void build_row(const char *design, int8_t dir, row_t *r)    /* design: 60 × 'K' / 'T' / '.' */
+{
+    r-&gt;n = 60; r-&gt;dir = dir;
+    for (int k = 0; k &lt; 60; k++) {
+        int i = (dir &gt; 0) ? k : 59 - k;                         /* sorted in order of passing */
+        int32_t x_um = C_UM + (2 * i + 1) * P_UM / 2;           /* c + (i + 1/2) p */
+        r-&gt;target[k] = (dir &gt; 0) ? x_um / 10 : (STROKE_UM - x_um) / 10;  /* 0.01 mm counts */
+        r-&gt;s1[k] = (design[i] != '.');                          /* knit or tuck: select at S1 */
+        r-&gt;s2[k] = (design[i] == 'K');                          /* knit only: select at S2 */
+    }
+}</code></pre>
+<h4 id="s21-6-4">21.6.4 Per-needle firing (MCU version)</h4>
+<p>On P0 the MCU of the carriage board does the per-needle firing. It runs the function below every 1 ms control period (or from a timer-compare interrupt for a shorter period). The step number is simply k &amp; 7, because successive needles fall on the eight steps in turn.</p>
+<pre><code class="language-c">#define TR_US 1500            /* selector response, from calibration (Section 21.7) */
+#define TC_US 1000            /* control period */
+static row_t *row; static int k;
+
+void sel_tick(void)
+{
+    int32_t pos = carriage_pos();                 /* stroke coordinate in this direction, 0.01 mm counts */
+    int32_t v   = carriage_speed();               /* counts/ms, from the last 1 ms increment */
+    int32_t lead = v * (TR_US + TC_US / 2) / 1000;
+    while (k &lt; row-&gt;n &amp;&amp; pos + lead &gt;= row-&gt;target[k]) {
+        if (row-&gt;s1[k]) sol_pulse(SEL_S1_BASE + (k &amp; 7), BOOST_US, HOLD_US);
+        k++;                                      /* several needles may fire in one period */
+    }
+    if (k &gt; 0 &amp;&amp; pos &lt; row-&gt;target[k - 1] - 2 * P_CNT)
+        fault(F_SEL_SEQ);                         /* position went backwards: encoder fault, stop */
+}</code></pre>
+<p>With an FPGA, the comparator and pulse generator are written exactly as in Section 17.5.2 and the MCU only writes target, s1 and s2 into the double-buffered RAM; virtual lab 17-3 of Chapter 17 can be used directly to practise that Verilog.</p>
+<h4 id="s21-6-5">21.6.5 The ends of the stroke: reversal, stitch cams and carriers</h4>
+<p>The carriage dwells 0.1 s (illustrative) in the reversal zone, and five things must be finished in that time, in parallel:</p>
+<div class="tbl"><table><caption>Table 21-11　Actions during the reversal dwell (worked-example values)</caption><thead><tr><th>Action</th><th>Actuator</th><th>Time</th></tr></thead><tbody>
+<tr><td>Swap selection buffers, write next course</td><td>Controller → carriage board, CAN FD (≈ 400 bytes)</td><td>≈ 2 ms</td></tr>
+<tr><td>Move stitch cams to next course's value (e.g. 0.5 mm)</td><td>Closed-loop stepper + 1 mm lead screw, 600 r/min</td><td>≈ 50 ms</td></tr>
+<tr><td>Drop old carrier, pick up new carrier</td><td>2 carrier solenoids</td><td>≈ 10 ms each</td></tr>
+<tr><td>Take-down advances one course</td><td>Take-down stepper, tension-dancer loop</td><td>in parallel</td></tr>
+<tr><td>Check yarn break, probe, limits</td><td>DI</td><td>&lt; 1 ms</td></tr>
+</tbody></table></div>
+<p>The reversal state machine is RUN → DECEL → REVERSE (the table above) → ACCEL → RUN; yarn break, probe contact and encoder faults go to SAFE. In an emergency stop the carriage brakes at 20 m/s²: from 1.66 m/s it needs 69 mm to stop, from 0.635 m/s only 10 mm. So whenever speed is raised, check that this distance is available beyond the limit switches — the item most easily forgotten once the machine gets faster.</p>
+
+<h3 id="s21-7">21.7 Bring-up and acceptance of the knitting prototype</h3>
+<p><strong>Selection-timing calibration</strong>　T<sub>r</sub> must not be taken on trust from calculation or a data sheet; calibrate it on the machine. The method is a two-speed sweep. The firmware computes the lead from an initial value (e.g. 1.2 ms) plus an offset δ; the carriage knits a test course of alternating select/miss at 0.3 m/s and at 0.9 m/s, 30 courses for each δ, and the proportion of correct selections is counted (a probe or camera checks whether each needle was raised). The range of δ with 100 % correct is the pass band; take its centre. The centre moves with speed, and its slope is the error in T<sub>r</sub> (Fig. 21-8).</p>
+<figure class="fig"><a class="zoom" href="img/en/fig_c21_fk_calib.png"><img src="img/en/fig_c21_fk_calib.png" alt="Fig. 21-8　Selection-timing calibration" loading="lazy"></a><figcaption>Fig. 21-8　Selection-timing calibration (simulated): the pass-band centres at the two speeds are 0.09 mm and 0.26 mm, a slope of 0.28 ms, so T<sub>r</sub> should change from 1.2 ms to about 1.48 ms (true value 1.5 ms)</figcaption></figure>
+<p>The same sweep yields another useful number: the width of the pass band. It is about 2 mm at low speed and only 1.2 mm at high speed; how fast it narrows reflects the scatter J. Once calibrated, T<sub>r</sub> goes into the parameter table and is reported with its version number; a new coil or a changed supply voltage means recalibrating.</p>
+<p><strong>Stitch-cam zero</strong>　Each stitch-cam stepper first finds its zero switch, then takes as mechanical zero the depth at which a loop is just not formed; measure the stitch-cam height relative to the trick edge with feeler gauges and enter it in the parameter table. Calibrate the left and right cams separately, or the loops of alternate courses will differ in length and the fabric will show bars.</p>
+<p><strong>Take-down tension</strong>　Close the loop on the Hall angle of the tension dancer: the set-point depends on the structure (illustrative: 3 N for plain), and each course the stepper advances enough to bring the dancer back into its band. The first few courses cannot reach the roller and are held by a weight.</p>
+<div class="tbl"><table><caption>Table 21-12　Acceptance tests for the knitting prototype (illustrative)</caption><thead><tr><th>Requirement</th><th>Item</th><th>Method</th><th>Criterion</th></tr></thead><tbody>
+<tr><td>REQ-FK-01</td><td>Carriage positioning</td><td>20 homings</td><td>Repeatability ≤ 0.02 mm</td></tr>
+<tr><td>REQ-FK-02</td><td>Selection timing error</td><td>After the two-speed sweep, measure the pass band at top speed and compare with the theoretical width; or film the armature with a high-speed camera and read carriage position</td><td>≤ carriage travel for 0.1 pitch (E5: 0.51 mm)</td></tr>
+<tr><td>REQ-FK-03</td><td>Selection reliability</td><td>1000 courses of alternating select/miss</td><td>No mis-selection in 60 000 selections</td></tr>
+<tr><td>REQ-FK-04</td><td>Stitch-cam repeatability</td><td>Same setting approached 100 times, measure cam height</td><td>≤ 0.01 mm</td></tr>
+<tr><td>REQ-FK-05</td><td>Structure swatch</td><td>20 courses: 10 plain + 10 of 1×1 selection (knit/miss)</td><td>No dropped or wrong stitches; ≈ 19 s at 0.6 m/s</td></tr>
+<tr><td>REQ-FK-06</td><td>Protection</td><td>Break the yarn; raise one needle on the bed</td><td>Yarn break: finish the course and stop; probe: stop at once, braking distance inside the limits</td></tr>
+</tbody></table></div>
+<p>The 20-course swatch is this prototype's graduation piece: the first 10 plain courses show whether the loops are even (stable stitch cams and take-down), the last 10 alternate-needle courses show whether selection never misses. The swatch is archived with the test record, and the photo file name carries the firmware and parameter versions.</p>
+<aside class="field"><p><strong>Shop-floor notes</strong></p><ul>
+<li>If one wale keeps going wrong, find the step first: if the faulty needle numbers all have the same value mod 8, that step's coil or armature is at fault, not the timing.</li>
+<li>Wrong stitches clustered at the fabric edges usually come from the acceleration zone: a fixed lead, or too short a reversal margin.</li>
+<li>Wrong stitches scattered at random at high speed mean too much scatter J: check supply voltage and coil temperature, or slow down, or add the FPGA.</li>
+<li>Carriage-board connectors and cable-chain wiring are the commonest faults (Chapter 17); use latching connectors even on P0.</li>
+</ul></aside>
+
+<h3 id="s21-8">21.8 What the two prototypes share with the lockstitch prototype</h3>
+<p>The two prototypes in this chapter look very different from the lockstitch prototype of Chapter 20, but built on the WQ-SC platform they share most things. Table 21-13 compares all three.</p>
+<div class="tbl"><table><caption>Table 21-13　Module reuse (✓ shared, ○ same module with different parameters, — not used)</caption><thead><tr><th>Module / software</th><th>Lockstitch LS (Chapter 20)</th><th>Pattern sewer PS</th><th>Knitting FK</th></tr></thead><tbody>
+<tr><td>WQ-SC controller D-CTL-WQSC*</td><td>✓</td><td>✓</td><td>✓ (frame + carriage board)</td></tr>
+<tr><td>Spindle servo + encoder</td><td>✓</td><td>✓ (same set)</td><td>○ (as carriage servo, 200 W)</td></tr>
+<tr><td>Solenoid driver D-DRV-SOL*</td><td>✓ (trimmer, wiper, backtack, foot lift)</td><td>✓ (trimmer, wiper, tension release)</td><td>○ (8 selector + 2 carrier channels, shorter times)</td></tr>
+<tr><td>Position-axis stepper_* interface</td><td>○ (electronic stitch length)</td><td>✓ (X, Y servos)</td><td>✓ (stitch cams, take-down)</td></tr>
+<tr><td>I/O expander, gateway, power</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>Time base</td><td>spindle angle</td><td>spindle angle</td><td>carriage position</td></tr>
+<tr><td>Event table</td><td>✓</td><td>✓ (plus presser foot)</td><td>○ (by position: stitch-cam zones, carriers)</td></tr>
+<tr><td>State-machine framework</td><td>✓</td><td>✓ (plus CLAMP, JUMP, HOME)</td><td>○ (RUN/REVERSE per course)</td></tr>
+<tr><td>Check on actions in the window</td><td>Solenoid delay ≤ 20° of spindle angle</td><td>X–Y moves only inside 183.4°</td><td>Selection error ≤ 0.1p</td></tr>
+<tr><td>Test scripts (pytest + MQTT)</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>New code</td><td>—</td><td>Pattern parsing, look-ahead, window interpolation</td><td>Course compiling, per-needle firing, reversal sequence</td></tr>
+</tbody></table></div>
+<p>A pattern emerges: the three machines differ in what the window is and what happens inside it, while the heavy lifting — motors, drives, solenoids, bus, tests — is shared. That is the pay-off of layering the firmware with a HAL and writing actions as an event table in Chapter 19. A lab that builds all three in order writes about half as much new code for the second as for the first, and less again for the third.</p>
+
+<h3 id="s21-9">21.9 Limits of the model</h3>
+<p>The worked examples rest on simplified models. Keep the following in mind on a real prototype.</p>
+<ul>
+<li><strong>Pattern-sewer servo model</strong>: Fig. 21-4 uses an ideal second-order follower with feed-forward. It ignores the axial elasticity of the screw, non-linear guide friction and pulley tooth play, and also beam twist (with a single Y motor the two ends of the beam may not move together). Real following error and settling time must be measured on the machine.</li>
+<li><strong>Fabric and template</strong>: the window assumes the needle tip is clear once above fabric plus lower template; it ignores fabric lifted by the needle and the timing of the presser-foot lift. Thick or elastic materials need extra margin (Chapter 15).</li>
+<li><strong>Torque and heating</strong>: RMS torque is estimated for the worst case of every stitch using the whole window, which is conservative; the motor's torque–speed curve, drive current limits and ambient temperature are not included.</li>
+<li><strong>Selection model</strong>: the selector is treated as an ideal switch with delay T<sub>r</sub> and uniformly distributed scatter ±J; armature bounce, magnetic coupling between neighbouring steps and sag of the boost supply under continuous firing are ignored. The ±0.25p window is illustrative; the real value depends on the geometry of jack butt and cam and must be measured on the machine with the two-speed sweep.</li>
+<li><strong>Carriage position</strong>: the model takes the motor-encoder reading as carriage position. The belt stretches about 0.03 mm while accelerating, negligible on an E5 prototype; at E12 or finer, use a linear encoder or add this term to the model.</li>
+<li><strong>Output</strong>: course time covers only one system, one bed and a fixed 0.1 s reversal, without the extra passes for racking, transfer and carrier changes, so it cannot be used directly to estimate the output of an industrial machine (Section 17.8).</li>
+</ul>
+
+<h3 id="x21-ex">Chapter 21 exercises</h3>
+<ol>
+<li>On the pattern-sewer prototype, fabric plus lower template is 3 mm thick (Chapter 15: geometric window 192.6°), still with 10° reserved at each end. For 4 mm stitches along Y (a = 40 m/s², S-curve, C = 5.33), what is the highest spindle speed?<details class="ans"><summary>Answer</summary>Usable window 172.6°; Δt = √(5.33 × 0.004/40) = 23.1 ms; n = 172.6/(6 × 0.0231) ≈ 1250 r/min.</details></li>
+<li>Could the 12 kg Y axis also use a design acceleration of 50 m/s² with the 400 W motor? Give two remedies.<details class="ans"><summary>Answer</summary>Peak torque 0.820 × 10⁻⁴ × 2π × 50/0.01 ≈ 2.58 N·m, below the 3.8 N·m peak; but the worst-case RMS = 2.58 × 0.816 × √(183.4/360) ≈ 1.51 N·m &gt; 1.27 N·m, so continuous sewing would overheat it. Remedies: a motor with higher rated torque; or a lighter Y axis (aluminium clamp frame, X motor fixed off the beam with an H-belt drive); or an I²t thermal model in the firmware that allows 50 m/s² only for short periods.</details></li>
+<li>At 2500 r/min, if the pattern-sewer firmware forgot to read the table at φ + ω·T<sub>d</sub> (T<sub>d</sub> = 1.5 ms), how many degrees late would the clamp move? Is the 10° reserve at each end enough?</li>
+<li>For the E5 knitting prototype with an MCU control period of 0.5 ms and everything else as in the Section 21.6 example, what is the highest carriage speed that passes acceptance? How far short of the FPGA scheme is it?<details class="ans"><summary>Answer</summary>Analytically 0.508/(0.25 + 0.3) ≈ 0.92 m/s; the full model gives about 0.91 m/s; the FPGA scheme about 1.66 m/s.</details></li>
+<li>If the eight-step selector were replaced by a single step (one electromagnet selects every needle), which limit governs carriage speed for E5, FPGA, T<sub>r</sub> = 1.5 ms? And for E7?<details class="ans"><summary>Answer</summary>A single step needs p/v ≥ 2T<sub>r</sub>: for E5, v ≤ 5.08/3 ≈ 1.69 m/s, very close to the timing limit of 1.66 m/s with almost no margin; for E7, v ≤ 3.63/3 ≈ 1.21 m/s against a timing limit of 1.16 m/s. Both are tight, which is why several steps are used.</details></li>
+<li>The knitting prototype brakes at 20 m/s² in an emergency stop. What is the braking distance from 1.66 m/s? Where should the limit switches be placed?</li>
+<li>A two-speed sweep is used to calibrate the selector: initial T<sub>r</sub> = 1.2 ms, pass-band centres 0.09 mm at 0.3 m/s and 0.26 mm at 0.9 m/s. What should T<sub>r</sub> become? Why two speeds rather than one?<details class="ans"><summary>Answer</summary>Slope (0.26 − 0.09)/(0.9 − 0.3) ≈ 0.28 ms, so T<sub>r</sub> ≈ 1.48 ms. At a single speed the centre shift mixes the geometric offset of the selection point (independent of speed) with the T<sub>r</sub> error (proportional to speed); two speeds separate them: the slope is the T<sub>r</sub> error and the intercept the geometric offset.</details></li>
+<li>(Discussion) Complete the three tasks of virtual lab 21-1 and, using Table 21-13, discuss the pros and cons of “MCU on the prototype, FPGA for production” versus “FPGA from the first prototype”.</li>
+</ol>
+
+<h3 id="x21-ref">References</h3>
+<ol class="refs">
+<li>Spencer D J. Knitting Technology: A Comprehensive Handbook and Practical Guide. 3rd ed. Cambridge: Woodhead Publishing, 2001.</li>
+<li>Biagiotti L, Melchiorri C. Trajectory Planning for Automatic Machines and Robots. Berlin: Springer, 2008.</li>
+<li>Ellis G. Control System Design Guide. 4th ed. Butterworth-Heinemann, 2012.</li>
+<li>ISO 230-2. Test code for machine tools — Part 2: Determination of accuracy and repeatability of positioning of numerically controlled axes.</li>
+<li>ISO 3408-3. Ball screws — Part 3: Acceptance conditions and acceptance tests.</li>
+<li>Chapters 13, 15, 17, 19, 20 and 22 of this book; specification tables of the WenQuest Parts and Robot Library entries A-BSC-SFU, A-PUL-HTD, A-LGD-RAIL and A-CPL-JAW.</li>
+</ol>
+
+<h3 id="x21-res">Companion resources</h3>
+<p><a href="#lab-proto-fk" class="labref">Virtual lab 21-1　Scaled flat-knitting prototype: carriage speed and selection timing</a>　At the top is an animation of bed and carriage: the carriage runs past 60 needles along the set speed profile and plots each needle's selection error as it passes. In the middle is the error chart for the whole course (grey bars are the worst-case range of quantisation and scatter, orange dots this course's random sample, the green band the ±0.1p acceptance, the yellow band the ±0.25p window). Below, a zoom shows the command point, firing point and armature action of the current needle. On the right you can set gauge, carriage top speed, acceleration, reversal margin, selector response and scatter, MCU or FPGA, control period, number of selector steps and lead method, and read course time, courses per hour and mis-selections in 1000 courses. Three auto-checked tasks: find the highest speed that passes acceptance with a 1 ms MCU; switch to FPGA, find the highest speed again and compare output; change to an E7 bed with a fixed lead and tune the lead and reversal margin.</p>
+<section class="lab" id="lab-proto-fk" data-src="labs/proto-fk.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 21-1　Scaled flat-knitting prototype: carriage speed and selection timing</h4></div><p>Set carriage speed, selector response and scatter and control period, and see whether each needle's selection lands inside its window.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/proto-fk.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<p>The following labs from Chapters 15 and 17 bear directly on this chapter: the pattern-sewer simulator checks the prototype's stitch-length/speed table; the flat-knitting simulator and the FPGA selection lab correspond to the lead and per-needle firing of Section 21.6.</p>
+<section class="lab" id="lab-pattern" data-src="labs/pattern.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 15-1　Pattern-sewer simulator</h4></div><p>Draw a pattern, set stitch length and speed, and check whether every move fits in the needle-out time.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/pattern.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<section class="lab" id="lab-patprog" data-src="labs/patprog.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 15-2　Pattern programming</h4></div><p>Draw lines, set stitch lengths, add backtacks and trims, and export a pattern file; program a pocket flap here before converting it to .wqp for the prototype.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/patprog.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<section class="lab" id="lab-knit" data-src="labs/knit.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 17-1　Flat-knitting simulator</h4></div><p>The carriage traverses and selects by needle position, building the loop diagram course by course; compare three ways of handling the lead.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/knit.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<section class="lab" id="lab-knitprog" data-src="labs/knitprog.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 17-2　Flat-knitting operation and programming</h4></div><p>Draw a design with symbols and compile it into per-course carriage actions; draw the prototype's 20-course swatch here first.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/knitprog.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<section class="lab" id="lab-fpga" data-src="labs/fpga.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4>Virtual lab 17-3　FPGA needle selection</h4></div><p>Build a selection channel from graphical blocks and compact Verilog: decoding, speed measurement, lead, comparison and boost drive.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/fpga.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>

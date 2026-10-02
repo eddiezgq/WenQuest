@@ -1,0 +1,20 @@
+import sys; sys.path.insert(0, '/home/claude/sm/figsrc'); from en_relabel_lib import Fig
+f = Fig('/home/claude/book/img/fig_11_mech.png')
+f.label((45, 30, 395, 72), 'Needle-swing mechanism and the 304 zigzag stitch', bold=True)
+f.label((45, 78, 842, 106), 'Left: mechanical needle-swing mechanism (schematic, not to scale); right: face of the zigzag stitch — the needle bar changes side at every stitch')
+f.label((588, 204, 717, 230), 'Pivot of the needle-bar gate', bold=True)
+f.label((688, 354, 759, 378), 'Swing link', bold=True, anchor='c')
+f.label((468, 452, 509, 476), 'Needle bar', bold=True, anchor='r')
+f.label((381, 480, 509, 503), 'moves up and down in the gate', anchor='r', size=13.5)
+f.label((938, 487, 1018, 511), 'Bight adjustment:', bold=True)
+f.label((938, 514, 1082, 562), ['shifts the link’s', 'working radius', 'on the rocker'], size=13.5, lh=22, ytop=True)
+f.label((716, 747, 790, 771), 'Zigzag cam', bold=True, anchor='r', dy=-8)
+f.label((583, 774, 790, 821), ['2:1 reduction, one turn', 'per two stitches; driven', 'by a stepper if electronic'], anchor='r', size=12.5, lh=17.5, ytop=True, dy=-6)
+f.label((483, 852, 647, 876), 'Needle point swings left–right = bight', bold=True, anchor='c', size=15)
+f.label((66, 900, 745, 923), ['The cam’s rise can only be placed within the shaft angle while the needle is out of the fabric (Fig. 11-3);', 'the cam profile sets the law of the swing motion.'], size=14.5, lh=26, ytop=True)
+f.label((1216, 554, 1325, 574), 'Two stitches = 2 stitch lengths', size=13)
+f.label((1905, 496, 1942, 516), 'Bight', anchor='c', size=13)
+f.label((1186, 639, 1600, 760), [
+    '304 zigzag lockstitch: the needle thread (blue) and bobbin thread interlace in the fabric, the interlacing points alternating left and right. The stitch length is set by the feed, the bight by the needle-swing mechanism. A manufacturer’s zigzag machine: factory maximum bight 8 mm, adjustable up to 10 mm; up to 5000 sti/min.'],
+    size=15, lh=30.4, wrap=730, ytop=True)
+f.save('/home/claude/sm/img/en/fig_11_mech.png')

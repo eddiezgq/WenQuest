@@ -1,0 +1,65 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.wrap2{display:grid;grid-template-columns:1fr 250px;gap:22px}
+.lane{display:grid;grid-template-columns:128px 1fr;gap:8px;align-items:center;margin-bottom:9px}
+.ln{font-weight:700;font-size:13.5px}
+.ln small{display:block;font-weight:400;font-size:11.5px;color:#5a6570}
+.ops{display:flex;align-items:center;gap:0}
+.op{border:1.8px solid #e0662f;border-radius:7px;background:#fff;padding:5px 6px;text-align:center;font-size:12px;line-height:1.3;min-width:86px}
+.op b{display:block;font-size:12.5px;color:#c4531d}
+.op.q{border-color:#14797f}.op.q b{color:#0f6e74}
+.op.x{border-style:dashed;border-color:#c48a17}.op.x b{color:#a8740c}
+.ar{color:#9aa4ae;font-size:15px;padding:0 3px}
+.mono{font-size:11px;color:#5a6570}
+.asm{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.asm .op{min-width:0;padding:7px 8px}
+.dn{text-align:center;color:#9aa4ae;font-size:15px;line-height:1.1}
+.topics{margin-top:12px;border:1.5px solid #14797f;border-radius:8px;background:#e6f3f3;padding:8px 12px;font-size:12px;line-height:1.65}
+.topics code{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11.5px;color:#0f6e74}
+.plan{color:#c0392b;font-size:11px}
+</style>
+<div class="fig" style="--w:1120px">
+<p class="title">工艺路线进 MES：四类关键件、装配线和出厂测试</p><p class="sub">示意。橙框 = 加工工序（工作中心）；青框 = 检验工序（质检门：先提交质量检验单，工序才能完成）；虚线框 = 外协。工序与时间见表 27-5，详细工艺见第 24、25 章</p>
+<div class="wrap2"><div>
+<div class="lane"><div class="ln" style="color:#c4531d">机壳<small>HSG-LS01 · 第 25 章</small></div><div class="ops">
+<div class="op q"><b>来料检验</b>铸件炉号<br><span class="mono">QC-01</span></div><span class="ar">→</span>
+<div class="op"><b>铣基准面</b><span class="mono">VMC-H</span></div><span class="ar">→</span>
+<div class="op"><b>一次装夹镗孔</b><span class="mono">HMC-H ×5</span></div><span class="ar">→</span>
+<div class="op"><b>钻攻</b><span class="mono">VMC-H</span></div><span class="ar">→</span>
+<div class="op q"><b>孔系检验</b>每 10 件抽 1<br><span class="mono">CMM-01</span></div></div></div>
+<div class="lane"><div class="ln" style="color:#c4531d">旋梭<small>HK-LS01 · 第 24 章</small></div><div class="ops">
+<div class="op"><b>车削</b><span class="mono">CNC-S</span></div><span class="ar">→</span>
+<div class="op"><b>渗碳淬火</b><span class="mono">HT-01</span></div><span class="ar">→</span>
+<div class="op"><b>磨梭道</b><span class="mono">GRD-H</span></div><span class="ar">→</span>
+<div class="op"><b>研磨梭尖</b><span class="mono">LAP-H</span></div><span class="ar">→</span>
+<div class="op q"><b>零件检验</b>梭尖到基准<br><span class="mono">QC-01</span></div><span class="ar">→</span>
+<div class="op x"><b>DLC 镀膜</b>只 D 选项<br><span class="mono">外协 5 天</span></div></div></div>
+<div class="lane"><div class="ln" style="color:#c4531d">凸轮<small>CAM-LS01/02 · 第 25 章</small></div><div class="ops">
+<div class="op"><b>车削</b><span class="mono">CNC-S</span></div><span class="ar">→</span>
+<div class="op"><b>淬火</b><span class="mono">HT-01</span></div><span class="ar">→</span>
+<div class="op"><b>磨廓线</b><span class="mono">GRD-C</span></div><span class="ar">→</span>
+<div class="op q"><b>零件检验</b>廓线误差<br><span class="mono">QC-01</span></div></div></div>
+<div class="lane"><div class="ln" style="color:#c4531d">轴<small>SH-LS01/02</small></div><div class="ops">
+<div class="op"><b>车削</b><span class="mono">CNC-S</span></div><span class="ar">→</span>
+<div class="op"><b>淬火</b><span class="mono">HT-01</span></div><span class="ar">→</span>
+<div class="op"><b>磨外圆</b><span class="mono">GRD-S</span></div></div></div>
+<div class="lane"><div class="ln" style="color:#a8740c">机针<small>NDL-DB1-14 · 外购</small></div><div class="ops">
+<div class="op x"><b>供应商批次</b>随货质保书</div><span class="ar">→</span>
+<div class="op q"><b>来料检验</b>抽样、直线度<br><span class="mono">QC-01</span></div><span class="ar">→</span>
+<div class="op"><b>入库</b>按批次<br><span class="mono">外购件库</span></div></div></div>
+<div class="topics"><b>上总线的消息（示例）</b><br>
+<code>wq/sewing/machining/hmc-h03/status</code>　machine.status：run / idle / setup / down / fault，带工单号、零件序列号<br>
+<code>wq/sewing/machining/grd-h02/event</code>　machine.event：cycle_end、tool_change（砂轮修整也记在这里）<br>
+<code>wq/sewing/quality/qc-01/measurement</code>　quality.measurement：零件特性、名义值、上下限、实测、结论<br>
+<code>wq/sewing/assembly/adj-03/measurement</code>　梭尖间隙，按整机序列号；附 hook_lot 字段<span class="plan">（区域 assembly 待建）</span><br>
+<code>wq/sewing/test/eol-02/measurement</code>　出厂测试结果，带固件与参数版本<span class="plan">（新消息类型 test.result，待建）</span></div>
+</div>
+<div class="asm">
+<div class="ln" style="color:#7444b4;margin-bottom:6px">装配与测试（按序列号）</div>
+<div class="op" style="border-color:#8a5cc7"><b style="color:#7444b4">总装线 ASM-L1</b>12 工位，节拍 2.4 min<br>扫码绑定序列号与部件批次</div><div class="dn">↓</div>
+<div class="op q"><b>调试 ADJ ×5</b>钩线定时、针杆高度<br>梭尖间隙 0.04–0.10 mm</div><div class="dn">↓</div>
+<div class="op" style="border-color:#8a5cc7"><b style="color:#7444b4">跑合 RUN ×15</b>30 min 空运转</div><div class="dn">↓</div>
+<div class="op q"><b>出厂测试 EOL ×3</b>第 22 章：停针、剪线 50 次<br>烧录固件、核对版本</div><div class="dn">↓</div>
+<div class="op" style="border-color:#2e9e5b"><b style="color:#1f8a4c">成品库 · 发运</b>整机档案随序列号</div>
+<p class="note" style="margin-top:12px">机壳、旋梭、凸轮、轴、机针在总装线汇合；扫码时把这台机器用到的批次（旋梭批次、机壳炉号、电控箱序列号）记到序列号下。</p>
+</div></div></div>

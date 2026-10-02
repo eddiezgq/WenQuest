@@ -1,0 +1,27 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.pr{display:grid;grid-template-columns:430px 1fr;gap:10px 22px;align-items:center}
+.lay{margin:0 auto;height:66px;display:flex;flex-direction:column;justify-content:center;border-radius:8px}
+.hd{display:grid;grid-template-columns:90px 110px 120px 1fr;gap:10px;font-size:12.5px;color:#5a6570;font-weight:700;border-bottom:1.5px solid #1b2430;padding-bottom:4px}
+.rw{display:grid;grid-template-columns:90px 110px 120px 1fr;gap:10px;font-size:13px;align-items:center;border-bottom:1px solid #d8dde1;padding:8px 0;min-height:66px}
+.rw .n{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-weight:700}
+.arrow{font-size:12.5px;color:#5a6570;writing-mode:vertical-rl;text-align:center}
+</style>
+<div class="fig" style="--w:1240px">
+<p class="title">测试金字塔：五层测试各测什么、多快、多贵</p><p class="sub">WQ-SC 平缝原型一个固件版本的测试量（示意值）。越往下越快、越便宜、跑得越勤；越往上越接近真实，但越慢、越贵</p>
+<div class="pr">
+<div></div>
+<div class="hd"><span>用例数</span><span>跑一遍</span><span>什么时候跑</span><span>主要能发现的缺陷</span></div>
+<div class="lay box y fill-y" style="width:34%"><b>出厂测试 EOL</b><span>每台产品</span></div>
+<div class="rw"><span class="n">≈12 项</span><span>3–5 min/台</span><span>每台下线</span><span>装配、元件和接线缺陷（不是设计缺陷）；数据随序列号进数字工厂</span></div>
+<div class="lay box o fill-o" style="width:50%"><b>整机测试台</b><span>真机头 + 测功 + 相机</span></div>
+<div class="rw"><span class="n">≈15</span><span>约 2 天</span><span>每周、候选版本</span><span>线迹质量、回针对齐、机械与热（4 h 长跑温升）、噪声；模型里没有的东西</span></div>
+<div class="lay box p fill-p" style="width:66%"><b>硬件在环 HIL</b><span>真主控板 + 仿真电机/编码器 + 真电磁铁</span></div>
+<div class="rw"><span class="n">≈40</span><span>3–4 h</span><span>每晚</span><span>实时性、中断延迟、驱动器与电机的真实特性、电磁铁延迟、故障注入（编码器断线、过流、电压跌落）</span></div>
+<div class="lay box b fill-b" style="width:83%"><b>软件在环 SIL</b><span>固件 + 虚拟实验同款的机器模型</span></div>
+<div class="rw"><span class="n">≈60</span><span>5–10 min</span><span>每次提交</span><span>状态机与时序配合、控制参数、参数扫描下的统计（停针、剪线窗口）——限于模型能表达的</span></div>
+<div class="lay box g fill-g" style="width:100%"><b>单元测试</b><span>固件函数，在电脑上编译运行</span></div>
+<div class="rw"><span class="n">≈400</span><span>&lt; 1 min</span><span>每次提交</span><span>换算、边界、事件表解析、状态转移、故障码——逻辑错误</span></div>
+</div>
+<p class="note">注：用例数、时间都是本章 WQ-SC/LS 原型的示意值。一条经验：缺陷在哪一层被发现，修它的代价就大约差一个数量级；所以每发现一个高层缺陷，都要问“能不能在低一层加一个用例把它抓住”（22.9 节）。</p>
+</div>

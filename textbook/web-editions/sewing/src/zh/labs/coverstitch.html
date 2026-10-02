@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>绷缝线迹与耗线量</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = stitch drawings (face / back / section) + consumption bars; right rail = stitch choice, parameters, order calculator, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --lt:#d9622b; --ct:#1f8a4c; --fab:#ead9b2; --fab2:#d8c597; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --gray:#9aa4ae;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--lt:#f08c58;--ct:#5fd08a;--fab:#5c513a;--fab2:#4a4130;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--gray:#6c7783}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--lt:#f08c58;--ct:#5fd08a;--fab:#5c513a;--fab2:#4a4130;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--gray:#6c7783}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)} button[aria-pressed=true]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number],select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:6em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--f-body)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.4em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th,td{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:right;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+td{font-family:var(--f-mono)} td:first-child{font-family:var(--f-body)}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+.big{font-family:var(--f-mono);font-size:1.15rem;font-weight:600}
+</style>
+<div class="wrap">
+<header><h1>绷缝线迹与耗线量</h1><span class="sub">《缝纫机设计与制造》第 10 章 · 虚拟实验 10-2 · 选一种链式线迹，看它的正面和反面，算每根线用多少、一批货要几个线团</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>线迹（示意，针距放大；蓝：针线　橙：弯针线　绿：装饰线）</h3>
+      <svg id="draw" viewBox="0 0 1000 420" role="img" aria-label="线迹正面、反面示意"></svg>
+    </section>
+    <section class="panel">
+      <h3>每缝 1 cm 用多少线（cm / cm）</h3>
+      <svg id="bars" viewBox="0 0 1000 300" role="img" aria-label="各根线的耗线比"></svg>
+      <p class="note">模型：每根针线每针 = 针距 + 2 × 布厚 + 2 × 0.5 mm（线环）；弯针线每针 = 针数 × (2 × 针距 + 1 mm) + 针距 + 2 × 针距宽度；装饰线每针 = 2 × 针距宽度 + 针数 × 0.6 mm。灰色竖线为某线企业耗线量指南的数值（7 针/cm）。这是示意几何模型，与资料的差别在 ±12% 以内；实际耗线还随线张力、线的弹性和面料变化，大批量前应试缝实测。</p>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>线迹与参数</h3>
+      <div class="row" id="types"></div>
+      <div class="prm" style="margin-top:6px">
+        <label for="spc">针密（针 / cm）</label><input id="spc" type="range" min="3" max="9" step="0.5" value="7"><output id="spcv">7</output>
+        <label for="t">布厚（缝合处，mm）</label><input id="t" type="range" min="0.2" max="3" step="0.1" value="0.5"><output id="tv">0.5</output>
+        <label for="g">针距宽度（最外两针之间，mm；列出的规格包括不同机型）</label><select id="g"></select><span></span>
+        <label for="nr">并排数（多针 401 是几条独立的链）</label><input id="nr" type="range" min="1" max="4" step="1" value="1"><output id="nrv">1</output>
+      </div>
+    </section>
+    <section class="panel">
+      <h3>一批货要多少线</h3>
+      <div class="row"><button type="button" id="pT">T 恤下摆 + 袖口</button><button type="button" id="pJ">牛仔裤后裆</button></div>
+      <div class="prm" style="margin-top:6px">
+        <label for="len">每件的缝线长度（cm）</label><input id="len" type="number" value="172" min="1" step="1"><span></span>
+        <label for="qty">件数</label><input id="qty" type="number" value="1000" min="1" step="1"><span></span>
+        <label for="waste">损耗（%）</label><input id="waste" type="number" value="12" min="0" max="40" step="1"><span></span>
+        <label for="cone">每个线团的长度（m）</label><input id="cone" type="number" value="5000" min="100" step="100"><span></span>
+      </div>
+      <table id="tbl" style="margin-top:8px"></table>
+      <div class="row">共需 <span class="big" id="cones">–</span> 个线团</div>
+    </section>
+    <section class="panel">
+      <h3>任务</h3>
+      <div id="tasks"></div>
+      <div class="row" style="font-size:.84rem">任务 1 线团数：<input id="a1" type="number" step="1"><button id="c1" type="button">核对</button></div>
+      <div class="row" style="font-size:.84rem">任务 2 多用（%）：<input id="a2" type="number" step="1"><button id="c2" type="button">核对</button></div>
+      <div class="msg" id="msg"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const A_LOOP=0.5, A_COV=0.3;
+const TYPES={'401':{n:1,cover:false,name:'401 双线链式',g:[0]},'406':{n:2,cover:false,name:'406 两针三线',g:[3.2,4.0,4.8,5.6,6.4]},
+ '407':{n:3,cover:false,name:'407 三针四线',g:[4.8,5.6,6.4]},'602':{n:2,cover:true,name:'602 两针四线',g:[3.2,4.0,4.8,5.6,6.4]},'605':{n:3,cover:true,name:'605 三针五线',g:[4.8,5.6,6.4]}};
+const COATS={'401':5.5,'406':18,'602':25,'605':28};
+const ST={type:'406',spc:7,t:0.5,g:4.0,nr:1};
+function consumption(type=ST.type,spc=ST.spc,t=ST.t,g=ST.g,nr=ST.nr){
+  const s=10/spc,d=TYPES[type],n=d.n,o=[];
+  const reps=type==='401'?nr:1;
+  for(let r=0;r<reps;r++){
+    for(let i=0;i<n;i++)o.push({k:`针线${type==='401'&&reps>1?(r+1):(i+1)}`,c:'nt',v:(s+2*t+2*A_LOOP)/s});
+    o.push({k:`弯针线${reps>1?(r+1):''}`,c:'lt',v:(n*(2*s+2*A_LOOP)+s+2*(type==='401'?0:g))/s});
+  }
+  if(d.cover)o.push({k:'装饰线',c:'ct',v:(2*g+n*2*A_COV)/s});
+  return o;}
+// ---------- UI ----------
+$('types').innerHTML=Object.entries(TYPES).map(([k,v])=>`<button type="button" data-t="${k}" aria-pressed="${k===ST.type}">${v.name}</button>`).join('');
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ST.type=b.dataset.t;ST.g={'401':0,'406':4.0,'602':4.0,'407':4.8,'605':4.8}[ST.type];if(ST.type!=='401')ST.nr=1;changed();});
+for(const k of ['spc','t','nr'])$(k).oninput=()=>{ST[k]=+$(k).value;changed();};
+$('g').onchange=()=>{ST.g=+$('g').value;changed();};
+for(const k of ['len','qty','waste','cone'])$(k).oninput=()=>changed();
+$('pT').onclick=()=>{Object.assign(ST,{type:'406',spc:7,t:0.5,g:4.0,nr:1});$('len').value=172;changed();};
+$('pJ').onclick=()=>{Object.assign(ST,{type:'401',spc:4,t:2.4,g:0,nr:2});$('len').value=60;changed();};
+function order(){const c=consumption(),L=+$('len').value||0,Q=+$('qty').value||0,W=(+$('waste').value||0)/100,C=+$('cone').value||1;
+  return c.map(x=>{const m=x.v*L/100*Q*(1+W);return {...x,m,cones:Math.ceil(m/C-1e-9)};});}
+function changed(){
+  document.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===ST.type));
+  $('g').innerHTML=TYPES[ST.type].g.map(v=>`<option value="${v}" ${v===ST.g?'selected':''}>${v===0?'—（单针）':v.toFixed(1)}</option>`).join('');
+  $('g').disabled=ST.type==='401';$('nr').disabled=ST.type!=='401';
+  for(const k of ['spc','t','nr']){$(k).value=ST[k];$(k+'v').textContent=ST[k];}
+  drawStitch();drawBars();
+  const o=order();$('tbl').innerHTML='<tr><th>线</th><th>cm/cm</th><th>每件 m</th><th>整批 m</th><th>线团</th></tr>'+
+    o.map(x=>`<tr><td>${x.k}</td><td>${x.v.toFixed(2)}</td><td>${(x.v*(+$('len').value||0)/100).toFixed(2)}</td><td>${Math.round(x.m).toLocaleString()}</td><td>${x.cones}</td></tr>`).join('');
+  $('cones').textContent=o.reduce((a,x)=>a+x.cones,0);checkTasks();}
+// ---------- drawing ----------
+const NS='http://www.w3.org/2000/svg';
+function el(tag,at,par){const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);par.appendChild(e);return e;}
+function smooth(q){let d=`M${q[0][0]} ${q[0][1]}`;for(let i=0;i<q.length-1;i++){const p0=q[i-1]||q[i],p1=q[i],p2=q[i+1],p3=q[i+2]||p2;
+  d+=` C${p1[0]+(p2[0]-p0[0])/6} ${p1[1]+(p2[1]-p0[1])/6} ${p2[0]-(p3[0]-p1[0])/6} ${p2[1]-(p3[1]-p1[1])/6} ${p2[0]} ${p2[1]}`;}return d;}
+function th(par,d,col,w=6){el('path',{d,fill:'none',stroke:col,'stroke-width':w,'stroke-linecap':'round','stroke-linejoin':'round'},par);}
+function drawStitch(){
+  const s=$('draw');s.innerHTML='';const d=TYPES[ST.type],n=d.n,reps=ST.type==='401'?ST.nr:1;
+  const nt=css('--nt'),lt=css('--lt'),ct=css('--ct'),ink=css('--ink'),mut=css('--muted');
+  const step=10/ST.spc*22, cnt=Math.max(4,Math.min(12,Math.floor(380/step)));
+  const panes=[[20,'正面（布面）',css('--fab')],[510,'反面（布底）',css('--fab2')]];
+  for(const [x0,t,fill] of panes){
+    el('rect',{x:x0,y:40,width:470,height:340,rx:8,fill,stroke:css('--rule')},s);
+    const tx=el('text',{x:x0+12,y:30,'font-size':16,'font-weight':700,fill:ink},s);tx.textContent=t;
+    const lines=[];const gap=d.n>1?Math.min(ST.g*22,220/(n-1)):0;
+    for(let r=0;r<reps;r++)for(let i=0;i<n;i++)lines.push(210+(reps>1?(r-(reps-1)/2)*60:0)+(i-(n-1)/2)*gap);
+    const xs=[...Array(cnt+1).keys()].map(i=>x0+40+i*step);
+    const back=x0>100;
+    if(!back){for(const y of lines)for(let i=0;i<cnt;i++)th(s,`M${xs[i]+3} ${y} L${xs[i+1]-3} ${y}`,nt,6);
+      if(d.cover){const yt=lines[0],yb=lines[lines.length-1],q=[];xs.forEach((x,i)=>{q.push(`${x} ${yt}`);if(i<cnt)q.push(`${x+step*.25} ${yb}`);});th(s,'M'+q.join(' L'),ct,5);}}
+    else{
+      for(const y of lines)for(let i=0;i<=cnt;i++){const a=xs[i];
+        if(ST.type==='401'){if(i<cnt)th(s,smooth([[a,y],[a+step*.3,y-9],[xs[i+1]+step*.15,y-7],[xs[i+1]+step*.25,y],[xs[i+1]+step*.15,y+7],[a+step*.3,y+9],[a,y]]),nt,5);}
+        else th(s,smooth([[a,y],[a+10,y-6],[a+20,y],[a+10,y+6],[a,y]]),nt,4);}
+      if(ST.type==='401'){for(const y of lines){const q=[];for(let i=0;i<cnt;i++)q.push([xs[i]+10,i%2?y+20:y-20],[xs[i]+step/2+10,y]);th(s,smooth(q),lt,5);}}
+      else{const yt=lines[0],yb=lines[lines.length-1],q=[];for(let i=0;i<=cnt;i++)q.push([xs[i]+10,yt-4],[xs[i]+14,yb+4]);th(s,smooth(q),lt,5);}
+    }
+    for(const y of lines)for(const x of xs)el('circle',{cx:x,cy:y,r:3,fill:ink},s);
+  }
+  const t2=el('text',{x:20,y:408,'font-size':13,fill:mut},s);
+  t2.textContent=`${d.name}${reps>1?` × ${reps} 条`:''}：${consumption().length} 根线，针密 ${ST.spc} 针/cm，针距 ${(10/ST.spc).toFixed(2)} mm${n>1?`，针距宽度 ${ST.g} mm`:''}`;
+}
+function drawBars(){
+  const s=$('bars');s.innerHTML='';const c=consumption(),tot=c.reduce((a,x)=>a+x.v,0);
+  const x0=150,x1=960,max=Math.max(36,tot*1.1),X=v=>x0+(x1-x0)*v/max,mut=css('--muted'),ink=css('--ink');
+  for(let v=0;v<=max;v+=5){el('line',{x1:X(v),x2:X(v),y1:20,y2:240,stroke:css('--rule')},s);const t=el('text',{x:X(v),y:262,'font-size':12,'text-anchor':'middle',fill:mut},s);t.textContent=v;}
+  let acc=0;const y=40;
+  const lab=el('text',{x:x0-10,y:y+26,'font-size':15,'font-weight':700,'text-anchor':'end',fill:ink},s);lab.textContent='合计';
+  for(const x of c){el('rect',{x:X(acc),y,width:X(acc+x.v)-X(acc)-1,height:36,fill:css('--'+x.c),rx:2},s);acc+=x.v;}
+  const tt=el('text',{x:X(tot)+8,y:y+24,'font-size':15,'font-weight':700,fill:ink},s);tt.textContent=tot.toFixed(1);
+  c.forEach((x,i)=>{const yy=100+i*22;const t=el('text',{x:x0-10,y:yy+12,'font-size':13,'text-anchor':'end',fill:mut},s);t.textContent=x.k;
+    el('rect',{x:x0,y:yy,width:X(x.v)-x0,height:14,fill:css('--'+x.c),rx:2},s);const v=el('text',{x:X(x.v)+6,y:yy+12,'font-size':12,fill:ink},s);v.textContent=x.v.toFixed(2);});
+  const cv=COATS[ST.type];
+  if(cv&&ST.nr===1){el('line',{x1:X(cv),x2:X(cv),y1:30,y2:84,stroke:css('--gray'),'stroke-width':3},s);const t=el('text',{x:X(cv),y:24,'font-size':12,'text-anchor':'middle',fill:mut},s);t.textContent=`资料 ${cv}（7 针/cm）`;}
+  const t3=el('text',{x:x0,y:290,'font-size':12,fill:mut},s);t3.textContent='横轴：耗线比（cm 线 / cm 缝）';
+}
+// ---------- tasks ----------
+const seen={t1:false,t2:false,t3:false};
+const ans1=()=>{const save={...ST};Object.assign(ST,{type:'406',spc:7,t:0.5,g:4.0,nr:1});const c=consumption();Object.assign(ST,save);
+  return c.reduce((a,x)=>a+Math.ceil(x.v*172/100*1000*1.12/5000-1e-9),0);};
+const ans2=()=>{const a=consumption('406',7,0.5,4.0,1).reduce((s,x)=>s+x.v,0),b=consumption('602',7,0.5,4.0,1).reduce((s,x)=>s+x.v,0);return (b/a-1)*100;};
+const TASKS=[
+ {t:'一批 1000 件 T 恤，下摆加袖口每件 172 cm，用 406（针密 7、布厚 0.5 mm、针距宽度 4 mm），损耗 12%，线团每个 5000 m。每根线各要几个线团？一共几个？',d:'按“T 恤下摆 + 袖口”预设，看表格；注意每根线单独算线团，不能把长度加起来再除。',ok:()=>seen.t1},
+ {t:'同样的下摆改用 602（多一根装饰线），每件多用百分之几的线？（±2%）',d:'先记下 406 的合计，再切换到 602。',ok:()=>seen.t2},
+ {t:'把针密从 7 降到 4，406 的耗线比降低了多少？为什么针越稀，每厘米缝用的线越少？',d:'把针密滑到 4 再滑回 7 即算完成；原因写在实验报告里（提示：每一针里“穿过布厚”“线环”“横跨针距宽度”这几段与针距无关）。',ok:()=>seen.t3}];
+const done=new Set();let lowSeen=false;
+function checkTasks(){if(ST.type==='406'&&ST.spc<=4)lowSeen=true;if(lowSeen&&ST.type==='406'&&ST.spc>=7)seen.t3=true;
+  TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+$('c1').onclick=()=>{const a=ans1();if(+$('a1').value===a){seen.t1=true;$('msg').textContent=`正确：一共 ${a} 个（每根针线各 1 个，弯针线 ${a-2} 个）。弯针线用掉了绝大部分。`;}else $('msg').textContent='还不对：每根线分别算“整批长度 ÷ 5000 m”再向上取整。';checkTasks();};
+$('c2').onclick=()=>{const a=ans2();if(Math.abs(+$('a2').value-a)<=2){seen.t2=true;$('msg').textContent=`正确：约多 ${a.toFixed(0)}%，多出来的就是装饰线。`;}else $('msg').textContent='还不对：(602 合计 ÷ 406 合计 − 1) × 100%。';checkTasks();};
+window.__api={ST,consumption,changed,order,done,seen,ans1,ans2};
+changed();
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

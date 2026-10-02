@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css"><style>
+.chip{display:inline-block;border:1.5px solid #9aa4ae;border-radius:6px;background:#fff;padding:2px 7px;margin:2px 3px;font-size:12.5px;white-space:nowrap}
+.chip.g{border-color:#2e9e5b}.chip.b{border-color:#2a6fdb}.chip.o{border-color:#e0662f}.chip.p{border-color:#8a5cc7}.chip.t{border-color:#14797f}.chip.y{border-color:#c48a17}
+.lay{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:stretch;margin-bottom:8px}
+.lab{display:flex;flex-direction:column;justify-content:center;border-radius:8px;padding:6px 10px;font-size:13px}
+.lab b{font-size:14px}
+.mono{font-family:"DejaVu Sans Mono",monospace;font-size:12px}
+.arrow{font-size:22px;color:#5a6570;text-align:center;align-self:center}
+.small{font-size:12px;color:#5a6570}
+ul.t{margin:4px 0 0;padding-left:16px;text-align:left;font-size:12.5px;color:#1b2430}
+ul.t li{margin:1px 0}
+.gantt{display:grid;grid-template-columns:150px repeat(12,1fr);gap:3px 2px;font-size:12.5px;align-items:center}
+.gantt .h{font-size:11.5px;color:#5a6570;text-align:center}
+.bar{height:18px;border-radius:4px}
+.ms{font-size:12px;font-weight:700;text-align:center}
+</style><div class="fig" style="--w:1180px"><p class="title">Rapid configuration: from requirements to BOM, I/O map and firmware configuration</p><p class="sub">Illustrative. Solid arrows: one pass; dashed: iteration — test results go back to the requirements or the criteria</p><div style="display:grid;grid-template-columns:1fr 24px 1fr 24px 1fr 24px 1fr 24px 1fr;gap:4px;align-items:stretch"><div class="box b fill-b" style="text-align:left"><b>① Requirements</b><ul class="t"><li>machine type, top speed, accel time</li><li>load inertia, list of actions</li><li>X–Y travel and speed, needle count</li><li>I/O, power, network</li></ul></div><div class="arrow">→</div><div class="box p fill-p" style="text-align:left"><b>② Calculation</b><ul class="t"><li>spindle torque, inertia ratio, braking energy</li><li>stepper torque–speed margin</li><li>solenoid angle 6·n·t</li><li>power budget, I/O count</li></ul></div><div class="arrow">→</div><div class="box g fill-g" style="text-align:left"><b>③ Filter the library</b><ul class="t"><li>compare perf parameters with criteria</li><li>cheapest passing size in each class</li><li>mechanical parts: existing entries</li><li>nothing suitable: say so</li></ul></div><div class="arrow">→</div><div class="box o fill-o" style="text-align:left"><b>④ Generate</b><ul class="t"><li>BOM: ID/size, quantity, unit price</li><li>I/O map: port ↔ device</li><li>firmware config: HAL drivers, event table</li><li>requirement ↔ test case REQ-…</li></ul></div><div class="arrow">→</div><div class="box y fill-y" style="text-align:left"><b>⑤ On the bench</b><ul class="t"><li>SIL, HIL, machine test bench</li><li>pytest scripts, reports</li><li>results to the measurement topic</li></ul></div></div><svg viewBox="0 0 1120 46" width="1120" height="46" style="display:block;margin-top:6px"><defs><marker id="a2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#c4531d"/></marker></defs>
+<path d="M1050,2 L1050,30 L90,30 L90,6" fill="none" stroke="#c4531d" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#a2)"/>
+<text x="570" y="24" text-anchor="middle" font-size="13" fill="#c4531d">Iterate: change requirements, criteria or modules, and configure again</text></svg><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+<div class="box g" style="text-align:left"><b>Library entry</b><span>entry.yaml: ID, name, parameter definitions (key, zh/en names, role, unit), sources; specs.csv: one row per size</span></div>
+<div class="box k fill-k" style="text-align:left"><b>Rules of the AI selection assistant</b><span>pick only from the library; write answers as “ID/size” with the row of parameters and the source; if nothing fits, say so and invent nothing; every ID is checked</span></div></div></div>

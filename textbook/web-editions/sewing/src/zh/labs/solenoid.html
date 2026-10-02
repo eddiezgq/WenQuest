@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>电磁铁驱动：吸合与释放</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = needle path (front view), timing chart, stitch preview; right rail = checks, controls, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style>
+<div class="wrap">
+<header><h1>电磁铁驱动：吸合与释放</h1><span class="sub">《缝纫机设计与制造》第 13 章 · 虚拟实验 13-2 · 剪线、倒缝、抬压脚的电磁铁有多快？延迟折算成主轴转角是多少度</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>线圈电流（A）、电磁力与弹簧力（N）、衔铁行程（mm）；横轴为时间，竖线为通电和断电时刻</h3>
+      <canvas id="plot" width="1100" height="620" aria-label="电磁铁电流、力和行程随时间变化"></canvas>
+    </section>
+    <section class="panel">
+      <h3>折算到主轴转角（当前转速下，一个剪线动作占去的转角）</h3>
+      <canvas id="deg" width="1100" height="160" aria-label="延迟折算成主轴转角"></canvas>
+    </section>
+    <p class="note">模型：线圈电阻 8 Ω；电感随气隙变化，衔铁吸合时 80 mH、完全打开时 20 mH（磁路等效气隙 1 mm、行程 3 mm）；电磁力 F = ½ i² dL/dx；衔铁和所带连杆折算质量 20 g，复位弹簧力 = 预紧力 + 1 N/mm × 行程。驱动：先加全电压（强激磁），到时间后改为斩波维持电流，断电时电流经续流回路衰减，续流两端的电压为二极管 0.7 V 或稳压管电压。功率管耐压按 100 V 计。参数为示意值，与本书 model13.py 相同。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>判据</h3><div class="checks" id="checks"></div></section>
+    <section class="panel">
+      <h3>调整</h3>
+      <div class="prm">
+        <label for="V">驱动电压（V）</label><input id="V" type="range" min="12" max="48" step="1" value="24"><output id="Vv"></output>
+        <label for="tb">强激磁时间（ms，0 = 不强激磁）</label><input id="tb" type="range" min="0" max="30" step="1" value="20"><output id="tbv"></output>
+        <label for="Ih">维持电流（A）</label><input id="Ih" type="range" min="0.3" max="3" step="0.05" value="1"><output id="Ihv"></output>
+        <label for="Vz">续流电压（V；0.7 = 二极管，更大 = 稳压管）</label><input id="Vz" type="range" min="0.7" max="90" step="0.1" value="0.7"><output id="Vzv"></output>
+        <label for="F0">复位弹簧预紧力（N）</label><input id="F0" type="range" min="3" max="12" step="0.5" value="7"><output id="F0v"></output>
+        <label for="n">剪线时的主轴转速（r/min）</label><input id="n" type="range" min="100" max="1000" step="10" value="400"><output id="nv"></output>
+      </div>
+      <div class="row"><button id="reset" type="button">恢复标准</button><button id="zen" type="button">换稳压管 48 V</button></div>
+    </section>
+    <section class="panel">
+      <h3>任务</h3><div id="tasks"></div>
+      <div class="row" style="font-size:.84rem">最高转速：<input id="nm" type="number" step="10" aria-label="最高剪线转速"> r/min<button id="nmChk" type="button">核对</button></div>
+      <div class="msg" id="msg"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+const P={R:8,L1:0.08,ga:1e-3,xmax:3e-3,m:0.02,k:1000,c:4};
+const TON=0.06,TEND=0.1,DT=2e-6,WIN=20,PMAX=10,VCE=100;
+const STD={V:24,tb:20,Ih:1,Vz:0.7,F0:7,n:400};
+const ST={...STD};
+const Lx=x=>P.L1*P.ga/(P.ga+P.xmax-x), dLx=x=>P.L1*P.ga/(P.ga+P.xmax-x)**2;
+function sim(p){const tb=p.tb/1000;let lam=0,x=0,v=0;const n=Math.round(TEND/DT),res=[];
+  for(let k=0;k<n;k++){const t=k*DT,L=Lx(x);let i=lam/L,u;
+    if(t<TON){u=(t<tb||i<p.Ih)?p.V:-0.7;}else{if(i>1e-4)u=-p.Vz;else{u=0;lam=0;i=0;}}
+    lam+=(u-i*P.R)*DT;const F=0.5*i*i*dLx(x),Fs=p.F0+P.k*x;let a=(F-Fs-P.c*v)/P.m;
+    if(x<=0&&a<0){a=0;v=0;}if(x>=P.xmax&&a>0){a=0;v=0;}v+=a*DT;x=Math.min(P.xmax,Math.max(0,x+v*DT));
+    if((x===0&&v<0)||(x===P.xmax&&v>0))v=0;if(k%25===0)res.push([t,i,x*1e3,F,Fs]);}
+  return res;}
+function metrics(r){let pull=null,rel=null,ipk=0;for(const q of r){ipk=Math.max(ipk,q[1]);if(pull===null&&q[2]>=0.999*P.xmax*1e3)pull=q[0];if(rel===null&&q[0]>TON&&q[2]<=0.001*P.xmax*1e3)rel=q[0]-TON;}
+  let s=0,c=0;for(const q of r)if(q[0]>TON-0.005&&q[0]<TON){s+=q[1];c++;}const ih=s/c;return {pull,rel,Ph:ih*ih*P.R,ipk};}
+let S=null,M=null,R_=null;
+const deg=(tsec,n)=>tsec*6*n;
+function evaluate(){S=sim(ST);M=metrics(S);const dp=M.pull===null?Infinity:deg(M.pull,ST.n),dr=(M.rel===null||M.pull===null)?Infinity:deg(M.rel,ST.n);
+  const C=[
+  {k:'pull',n:'吸合延迟（通电到衔铁吸到底）',v:M.pull===null?'吸不动':`${(M.pull*1000).toFixed(1)} ms = ${dp.toFixed(0)}°`,ok:dp<=WIN,lim:`折算主轴转角 ≤ ${WIN}°`},
+  {k:'rel',n:'释放延迟（断电到衔铁回到原位）',v:(M.rel===null||M.pull===null)?'—':`${(M.rel*1000).toFixed(1)} ms = ${dr.toFixed(0)}°`,ok:dr<=WIN,lim:`折算主轴转角 ≤ ${WIN}°`},
+  {k:'heat',n:'维持阶段线圈发热',v:`${M.Ph.toFixed(1)} W`,ok:M.Ph<=PMAX,lim:`≤ ${PMAX} W，否则线圈过热`},
+  {k:'vce',n:'断电瞬间功率管承受的电压',v:`${(ST.V+ST.Vz).toFixed(0)} V`,ok:ST.V+ST.Vz<=VCE,lim:`驱动电压 + 续流电压 ≤ ${VCE} V`}];
+  return {C,allOK:C.every(c=>c.ok),dp,dr,M};}
+function render(){$('checks').innerHTML=R_.C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}<small>${c.lim}</small></span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');}
+function axes(g,x0,x1,y0,y1,ymax,step,lab,col){const Y=v=>y1-(y1-y0)*v/ymax;g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.font='12px '+css('--f-body');g.lineWidth=1;
+  for(let v=0;v<=ymax+1e-9;v+=step){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(+v.toFixed(2),x0-6,Y(v)+4);}g.textAlign='start';g.fillStyle=col||css('--ink');g.fillText(lab,x0+6,y0+12);return Y;}
+function draw(){const [c,g]=ctx('plot'),W=c.width,H=c.height,x0=60,x1=W-14,X=t=>x0+(x1-x0)*t/TEND;const r=S;
+  const imax=Math.max(1,Math.ceil(M.ipk+0.5));
+  const Yi=axes(g,x0,x1,10,190,imax,imax>4?1:0.5,'电流（A）',css('--nt'));
+  g.strokeStyle=css('--nt');g.lineWidth=2;g.beginPath();r.forEach((q,i)=>i?g.lineTo(X(q[0]),Yi(q[1])):g.moveTo(X(q[0]),Yi(q[1])));g.stroke();
+  const fmax=Math.max(20,Math.ceil(Math.max(...r.map(q=>Math.min(q[3],80)))/10)*10);
+  const Yf=axes(g,x0,x1,215,400,fmax,fmax/4,'电磁力（实线）与弹簧力（虚线），N',css('--bt'));
+  g.save();g.beginPath();g.rect(x0,215,x1-x0,185);g.clip();g.strokeStyle=css('--bt');g.lineWidth=2;g.beginPath();r.forEach((q,i)=>i?g.lineTo(X(q[0]),Yf(q[3])):g.moveTo(X(q[0]),Yf(q[3])));g.stroke();
+  g.setLineDash([5,4]);g.strokeStyle=css('--muted');g.beginPath();r.forEach((q,i)=>i?g.lineTo(X(q[0]),Yf(q[4])):g.moveTo(X(q[0]),Yf(q[4])));g.stroke();g.setLineDash([]);g.restore();
+  const Yx=axes(g,x0,x1,425,H-30,3,1,'衔铁行程（mm），3 mm 为吸到底',css('--ok'));
+  g.strokeStyle=css('--ok');g.lineWidth=2.4;g.beginPath();r.forEach((q,i)=>i?g.lineTo(X(q[0]),Yx(q[2])):g.moveTo(X(q[0]),Yx(q[2])));g.stroke();
+  g.strokeStyle=css('--warn');g.setLineDash([4,4]);for(const t of [0,TON]){g.beginPath();g.moveTo(X(t),10);g.lineTo(X(t),H-30);g.stroke();}
+  if(ST.tb>0){g.beginPath();g.moveTo(X(ST.tb/1000),10);g.lineTo(X(ST.tb/1000),190);g.stroke();}g.setLineDash([]);
+  g.fillStyle=css('--warn');g.font='12px '+css('--f-body');g.fillText('通电',X(0)+4,H-36);g.fillText('断电',X(TON)+4,H-36);if(ST.tb>0)g.fillText('强激磁结束',X(ST.tb/1000)+4,180);
+  g.fillStyle=css('--muted');g.textAlign='center';for(let t=0;t<=TEND+1e-9;t+=0.01)g.fillText((t*1000).toFixed(0)+' ms',X(t),H-10);g.textAlign='start';}
+function drawDeg(){const [c,g]=ctx('deg'),W=c.width,H=c.height,x0=60,x1=W-14,X=d=>x0+(x1-x0)*d/90;g.font='13px '+css('--f-body');
+  const rows=[['吸合',R_.dp,css('--nt')],['释放',R_.dr,css('--bt')]];
+  rows.forEach(([lab,d,col],i)=>{const y=20+i*55;g.fillStyle=css('--soft');g.fillRect(x0,y,x1-x0,30);g.fillStyle=css('--ok');g.globalAlpha=.18;g.fillRect(x0,y,X(WIN)-x0,30);g.globalAlpha=1;
+    g.fillStyle=col;g.fillRect(x0,y+6,Math.min(x1,X(isFinite(d)?d:90))-x0,18);g.fillStyle=css('--ink');g.fillText(lab,8,y+20);g.fillText(isFinite(d)?d.toFixed(0)+'°':'吸不动',Math.min(x1-50,X(isFinite(d)?d:90)+6),y+20);});
+  g.fillStyle=css('--muted');g.textAlign='center';for(let d=0;d<=90;d+=10)g.fillText(d+'°',X(d),H-6);g.textAlign='start';g.fillStyle=css('--ok');g.fillText(`绿色：容许 ${WIN}°`,X(WIN)+6,14);}
+const fmt={V:v=>v.toFixed(0),tb:v=>v?v.toFixed(0):'不用',Ih:v=>v.toFixed(2),Vz:v=>v<1?'二极管':v.toFixed(0)+' V',F0:v=>v.toFixed(1),n:v=>v.toFixed(0)};
+function syncUI(){for(const k in fmt){$(k).value=ST[k];$(k+'v').textContent=fmt[k](ST[k]);}}
+function changed(){syncUI();R_=evaluate();render();draw();drawDeg();note();checkTasks();}
+for(const k in fmt)$(k).addEventListener('input',()=>{ST[k]=+$(k).value;changed();});
+$('reset').onclick=()=>{Object.assign(ST,STD);changed();};$('zen').onclick=()=>{ST.Vz=48;changed();};
+// tasks
+const seen={zen:false,boost:false,nm:false};
+function note(){const others=ST.V===STD.V&&ST.F0===STD.F0&&ST.n===STD.n;
+  if(others&&ST.tb===STD.tb&&ST.Ih===STD.Ih&&ST.Vz>1&&R_.allOK)seen.zen=true;
+  if(ST.F0===STD.F0&&ST.n>=600&&ST.Ih<=1.1&&R_.allOK)seen.boost=true;}
+const TASKS=[
+  {t:'标准参数下释放太慢。只换续流元件（调续流电压），让四条判据全部满足。',d:'二极管续流时电流按 L/R 慢慢衰减；稳压管把一个反向电压加在线圈上，电流很快降下来。电压也不能无限加大，看第四条。',ok:()=>seen.zen},
+  {t:'把剪线转速提到 600 r/min，在维持电流不超过 1.1 A 的条件下，调驱动电压、强激磁时间和续流电压，让四条判据全部满足。',d:'先试一试：强激磁时间调到 0，衔铁还吸得动吗？靠加大维持电流把它吸动，发热会怎样？',ok:()=>seen.boost},
+  {t:'在四条判据都满足的参数下，算出吸合和释放都不超过 20° 时允许的最高剪线转速，填在下面。',d:'两种延迟中较长的那个决定上限；转角 = 6 × 转速（r/min）× 时间（s）。允许 ±5%。',ok:()=>seen.nm}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+function nmax(){const tmax=Math.max(M.pull??Infinity,M.rel??Infinity);return WIN/(6*tmax);}
+$('nmChk').onclick=()=>{if(!(R_.C[2].ok&&R_.C[3].ok)||M.pull===null){$('msg').textContent='先让发热和耐压两条判据满足，衔铁也要能吸动。';return;}
+  const m=nmax(),v=+$('nm').value;
+  if($('nm').value!==''&&Math.abs(v-m)/m<=0.05){seen.nm=true;$('msg').textContent=`正确：约 ${m.toFixed(0)} r/min。吸合 ${(M.pull*1000).toFixed(1)} ms、释放 ${(M.rel*1000).toFixed(1)} ms，较长的一个决定上限。所以剪线前主轴要先降到很低的转速，这是第 14 章剪线时序的出发点。`;}
+  else $('msg').textContent='还不对：取两种延迟里较长的 t（秒），n = 20 /(6 t)。';checkTasks();};
+window.__api={ST,STD,evaluate,changed,done,seen,nmax,nm:v=>{$('nm').value=v;$('nmChk').click();}};
+changed();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

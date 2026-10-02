@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hook Fitting and Capability</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)} .checks .neu{color:var(--muted)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page[hidden]{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Rotary-hook selective assembly and process capability</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 24 · Virtual lab 24-1 · A tiny clearance from economical accuracy; a control chart on the eye-punching operation</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tabA" aria-selected="true" type="button">① Grouped race–basket fitting</button><button role="tab" id="tabB" aria-selected="false" type="button">② Eye punching: Cpk and control charts</button></div>
+<div class="page" id="pageA">
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Diametral clearance of a batch of 2000 sets (green band: allowed 10–30 μm; red: out of tolerance)</h3><canvas id="hist" width="1100" height="330" aria-label="Clearance histogram"></canvas>
+      <div class="row"><button id="resim" type="button">New batch</button><span class="note" style="margin:0" id="simtxt"></span></div></section>
+    <section class="panel"><h3>Parts per group: blue hook bodies (race), orange baskets (rib); the difference is the leftover in that group</h3><canvas id="groups" width="1100" height="270" aria-label="Parts per group"></canvas></section>
+    <p class="note">Model (illustrative; identical to the book’s figsrc/ch24_model.py, so the same seed gives the same numbers): race-diameter deviation x and basket-rib diameter deviation y are normally distributed; diametral clearance c = 20 + x − y (μm), allowed 10–30 μm. Every part is measured (measurement error σ<sub>m</sub>); parts measured outside the drawing tolerance ±15 μm are scrapped; the rest are sorted by measured value into k equal groups over −15…+15 μm and paired only within a group; the surplus is left over. Cost: machining 10 yuan per part × (5 μm / σ) (halving σ doubles cost), measurement 0.5 yuan per part, group management 0.4 yuan per set × (k − 1); total cost divided by the number of good sets gives the cost per set.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results</h3><div class="checks" id="checksA"></div></section>
+    <section class="panel"><h3>Settings</h3>
+      <div class="prm">
+        <label for="k">Number of groups k (1 = full interchangeability)</label><input id="k" type="range" min="1" max="6" step="1" value="1"><output id="kv"></output>
+        <label for="sD">Race diameter σ (μm)</label><input id="sD" type="range" min="1.5" max="8" step="0.1" value="5"><output id="sDv"></output>
+        <label for="muD">Race diameter mean deviation (μm)</label><input id="muD" type="range" min="-8" max="8" step="0.5" value="0"><output id="muDv"></output>
+        <label for="sd">Basket rib diameter σ (μm)</label><input id="sd" type="range" min="1.5" max="8" step="0.1" value="5"><output id="sdv"></output>
+        <label for="mud">Basket rib mean deviation (μm)</label><input id="mud" type="range" min="-8" max="8" step="0.5" value="0"><output id="mudv"></output>
+        <label for="sm">Measurement error σ<sub>m</sub> (μm)</label><input id="sm" type="range" min="0" max="3" step="0.25" value="1"><output id="smv"></output>
+      </div>
+      <div class="row"><button id="shift" type="button">Inject: race grinding mean +4 μm</button><button id="resetA" type="button">Reset to standard</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<div class="page" id="pageB" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>X̄ chart: n needles per subgroup; limits from the first 25 subgroups, drift added from subgroup 26 (orange zone)</h3><canvas id="xbar" width="1100" height="300" aria-label="X-bar chart"></canvas>
+      <div class="row"><button id="resimB" type="button">Resample</button><span class="note" style="margin:0" id="simtxtB"></span></div></section>
+    <section class="panel"><h3>R chart</h3><canvas id="rchart" width="1100" height="170" aria-label="R chart"></canvas></section>
+    <section class="panel"><h3>Eye width of the first 25 subgroups and specification limits (0.340–0.380 mm)</h3><canvas id="histB" width="1100" height="220" aria-label="Eye-width distribution"></canvas></section>
+    <p class="note">Model (illustrative; identical to figsrc/ch24_model.py): Nm 90 eye-width specification 0.360 ± 0.020 mm (illustrative). Process mean μ, standard deviation σ; n needles per subgroup. Limits X̿ ± A<sub>2</sub>R̄, range limit D<sub>4</sub>R̄; σ̂ = R̄/d<sub>2</sub>, Cp = (USL − LSL)/6σ̂, Cpk = min(USL − X̿, X̿ − LSL)/3σ̂. Drift is in units of σ and mimics punch wear or a die change moving the mean up. Only the “point outside limits” rule is used; ARL₁ is the theoretical average number of subgroups after the drift until an alarm.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results</h3><div class="checks" id="checksB"></div></section>
+    <section class="panel"><h3>Settings</h3>
+      <div class="prm">
+        <label for="mu">Process mean μ (mm)</label><input id="mu" type="range" min="0.350" max="0.370" step="0.0005" value="0.362"><output id="muv"></output>
+        <label for="sig">Process standard deviation σ (mm)</label><input id="sig" type="range" min="0.002" max="0.008" step="0.0002" value="0.004"><output id="sigv"></output>
+        <label for="n">Subgroup size n</label><input id="n" type="range" min="2" max="10" step="1" value="5"><output id="nv"></output>
+        <label for="drift">Mean drift from subgroup 26 (multiples of σ)</label><input id="drift" type="range" min="0" max="2" step="0.1" value="0"><output id="driftv"></output>
+      </div>
+      <div class="row"><button id="resetB" type="button">Reset to standard</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<section class="panel" style="margin-top:14px"><h3>Tasks</h3><div id="tasks"></div></section>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+function tab(b){$('tabA').setAttribute('aria-selected',!b);$('tabB').setAttribute('aria-selected',b);$('pageA').hidden=b;$('pageB').hidden=!b;}
+$('tabA').onclick=()=>tab(false);$('tabB').onclick=()=>tab(true);
+// ---------- RNG: mulberry32 + Box–Muller (bit-identical to ch24_model.py)
+function rng(seed){let s=seed>>>0;return ()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+function gauss(r){let u=0;while(u===0)u=r();const v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+// ---------- page A: selective-fit model
+const C0=20,CMIN=10,CMAX=30,TOL=15,N=2000,COST_REF=10,COST_SIG=5,COST_MEAS=0.5,COST_GROUP=0.4;
+const partCost=s=>COST_REF*COST_SIG/s;
+function simulate(p){const r=rng(p.seed),n=N,k=p.k;const xs=[],ys=[],mx=[],my=[];
+  for(let i=0;i<n;i++)xs.push(p.muD+p.sD*gauss(r));for(let i=0;i<n;i++)ys.push(p.mud+p.sd*gauss(r));
+  for(let i=0;i<n;i++)mx.push(xs[i]+p.sm*gauss(r));for(let i=0;i<n;i++)my.push(ys[i]+p.sm*gauss(r));
+  const w=2*TOL/k,grp=m=>(m<-TOL||m>TOL)?-1:Math.min(k-1,Math.floor((m+TOL)/w));
+  const gD=Array.from({length:k},()=>[]),gd=Array.from({length:k},()=>[]);let scrap=0;
+  for(let i=0;i<n;i++){const a=grp(mx[i]);if(a<0)scrap++;else gD[a].push(xs[i]);const b=grp(my[i]);if(b<0)scrap++;else gd[b].push(ys[i]);}
+  const cs=[],per=[];let left=0;
+  for(let j=0;j<k;j++){const m=Math.min(gD[j].length,gd[j].length);per.push([gD[j].length,gd[j].length]);for(let i=0;i<m;i++)cs.push(C0+gD[j][i]-gd[j][i]);left+=Math.abs(gD[j].length-gd[j].length);}
+  const sets=cs.length,good=cs.filter(c=>c>=CMIN&&c<=CMAX).length;
+  const total=n*(partCost(p.sD)+partCost(p.sd)+2*COST_MEAS)+sets*COST_GROUP*(k-1);
+  const mean=cs.reduce((a,b)=>a+b,0)/Math.max(sets,1),sdv=Math.sqrt(cs.reduce((a,c)=>a+(c-mean)**2,0)/Math.max(sets,1));
+  return {cs,per,sets,good,pass:good/Math.max(sets,1),left,leftRate:left/(2*n),scrap,cost:total/Math.max(good,1),mean,sd:sdv};}
+const STDA={muD:0,sD:5,mud:0,sd:5,k:1,sm:1,seed:24};const A={...STDA};let RA=null;
+const fmtA={k:v=>v===1?'interch.':v+' groups',sD:v=>v.toFixed(1),muD:v=>(v>0?'+':'')+v.toFixed(1),sd:v=>v.toFixed(1),mud:v=>(v>0?'+':'')+v.toFixed(1),sm:v=>v.toFixed(2)};
+function renderChecks(id,C){$(id).innerHTML=C.map(c=>{const cl=c.ok===null?'neu':(c.ok?'ok':'bad');return `<div><span class="${cl}">${c.ok===null?'·':(c.ok?'✓':'✗')}</span><span>${c.n}${(c.ok===false&&c.bad)?`<small>${c.bad}</small>`:''}</span><b class="${cl}">${c.v}</b></div>`;}).join('');}
+function evalA(){const s=simulate(A);const C=[
+  {n:'In tolerance (10–30 μm)',v:(s.pass*100).toFixed(2)+'%',ok:s.pass>=0.99,bad:'Too small: heat and binding; too large: basket rattles, noise (illustrative)'},
+  {n:'Good sets / sets assembled',v:`${s.good} / ${s.sets}`,ok:null},
+  {n:'Leftover parts (share of all parts)',v:`${s.left} · ${(s.leftRate*100).toFixed(1)}%`,ok:s.leftRate<=0.03,bad:'The two parts’ distributions differ, so group counts are unequal'},
+  {n:'Scrapped after measurement (outside ±15 μm)',v:s.scrap+'',ok:null},
+  {n:'Cost per set (illustrative)',v:s.cost.toFixed(2)+' yuan',ok:s.cost<=25,bad:'Target ≤ 25 yuan (illustrative)'},
+  {n:'Clearance mean / std. dev.',v:`${s.mean.toFixed(2)} / ${s.sd.toFixed(2)} μm`,ok:null},
+  {n:'Group width (max. deviation within a group)',v:(30/A.k).toFixed(1)+' μm',ok:null}];return {s,C};}
+function drawHist(){const [c,g]=ctx('hist'),W=c.width,H=c.height,x0=60,x1=W-20,y0=20,y1=H-40,lo=-6,hi=46,X=v=>x0+(x1-x0)*(v-lo)/(hi-lo);const bw=2,nb=(hi-lo)/bw,cnt=new Array(nb).fill(0);
+  for(const v of RA.s.cs){const k=Math.floor((v-lo)/bw);if(k>=0&&k<nb)cnt[k]++;}const mx=Math.max(640,...cnt),Y=v=>y1-(y1-y0)*v/mx;
+  g.fillStyle=css('--ok');g.globalAlpha=.1;g.fillRect(X(CMIN),y0,X(CMAX)-X(CMIN),y1-y0);g.globalAlpha=1;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.textAlign='end';
+  for(let v=0;v<=mx;v+=200){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.fillText(v,x0-6,Y(v)+4);}
+  cnt.forEach((v,k)=>{const xv=lo+k*bw+bw/2;g.fillStyle=(xv>=CMIN&&xv<=CMAX)?css('--nt'):css('--bad');g.fillRect(X(lo+k*bw)+1,Y(v),X(bw)-X(0)-2,y1-Y(v));});
+  g.fillStyle=css('--muted');g.textAlign='center';for(let v=0;v<=40;v+=10)g.fillText(v,X(v),H-22);g.fillText('Diametral clearance (μm)',(x0+x1)/2,H-4);
+  g.fillStyle=css('--ok');g.fillText('allowed 10–30 μm',X(20),y0+14);
+  $('simtxt').textContent=`Batch ${A.seed-23}: ${RA.s.good} of 2000 sets good, ${RA.s.cost.toFixed(2)} yuan per set`;}
+function drawGroups(){const [c,g]=ctx('groups'),W=c.width,H=c.height,x0=60,x1=W-20,y0=16,y1=H-44;const per=RA.s.per,k=per.length,mx=Math.max(400,...per.flat())*1.1,Y=v=>y1-(y1-y0)*v/mx,cw=(x1-x0)/k,bw=Math.min(70,cw*0.3);
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.textAlign='end';const st=mx>1500?500:(mx>600?200:100);
+  for(let v=0;v<=mx;v+=st){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.fillText(v,x0-6,Y(v)+4);}
+  per.forEach(([a,b],j)=>{const cx=x0+cw*(j+0.5);g.fillStyle=css('--nt');g.fillRect(cx-bw-2,Y(a),bw,y1-Y(a));g.fillStyle=css('--bt');g.fillRect(cx+2,Y(b),bw,y1-Y(b));
+    g.fillStyle=css('--ink');g.textAlign='center';g.fillText(a,cx-bw/2-2,Y(a)-4);g.fillText(b,cx+bw/2+2,Y(b)-4);
+    const lo=-TOL+j*30/k,hi=lo+30/k;g.fillStyle=css('--muted');g.fillText(`Group ${j+1}: ${lo.toFixed(1)}…${hi.toFixed(1)} μm`,cx,H-26);
+    const d=Math.abs(a-b);g.fillStyle=d>0.03*N/k*2?css('--bad'):css('--muted');g.fillText('left '+d,cx,H-8);});}
+function syncA(){for(const k in fmtA){$(k).value=A[k];$(k+'v').textContent=fmtA[k](A[k]);}}
+function changedA(){syncA();RA=evalA();renderChecks('checksA',RA.C);drawHist();drawGroups();noteA();checkTasks();}
+for(const k in fmtA)$(k).addEventListener('input',()=>{A[k]=+$(k).value;changedA();});
+$('resetA').onclick=()=>{Object.assign(A,STDA);changedA();};$('resim').onclick=()=>{A.seed++;changedA();};$('shift').onclick=()=>{A.muD=4;changedA();};
+// ---------- page B: eye-width SPC
+const LSL=0.340,USL=0.380,NBASE=25,NTOT=50;
+const A2={2:1.880,3:1.023,4:0.729,5:0.577,6:0.483,7:0.419,8:0.373,9:0.337,10:0.308},D2={2:1.128,3:1.693,4:2.059,5:2.326,6:2.534,7:2.704,8:2.847,9:2.970,10:3.078},D4={2:3.267,3:2.574,4:2.282,5:2.114,6:2.004,7:1.924,8:1.864,9:1.816,10:1.777};
+function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+function arl(d,n){return 1/(Phi(-3+d*Math.sqrt(n))+Phi(-3-d*Math.sqrt(n)));}
+function spc(p){const r=rng(p.seed),n=p.n,xb=[],rg=[],raw=[];
+  for(let gI=0;gI<NTOT;gI++){const m=p.mu+(gI>=NBASE?p.drift*p.sig:0);const s=[];for(let i=0;i<n;i++)s.push(m+p.sig*gauss(r));raw.push(s);xb.push(s.reduce((a,b)=>a+b,0)/n);rg.push(Math.max(...s)-Math.min(...s));}
+  const xbb=xb.slice(0,NBASE).reduce((a,b)=>a+b,0)/NBASE,rb=rg.slice(0,NBASE).reduce((a,b)=>a+b,0)/NBASE;
+  const ucl=xbb+A2[n]*rb,lcl=xbb-A2[n]*rb,uclr=D4[n]*rb,sh=rb/D2[n],cp=(USL-LSL)/(6*sh),cpk=Math.min(USL-xbb,xbb-LSL)/(3*sh);
+  let alarm=null;for(let gI=NBASE;gI<NTOT;gI++){if(xb[gI]>ucl||xb[gI]<lcl||rg[gI]>uclr){alarm=gI+1;break;}}
+  const cpkT=Math.min(USL-p.mu,p.mu-LSL)/(3*p.sig),ppm=(Phi((LSL-p.mu)/p.sig)+1-Phi((USL-p.mu)/p.sig))*1e6;
+  return {xb,rg,raw,xbb,rb,ucl,lcl,uclr,sh,cp,cpk,alarm,cpkT,ppm,arl1:arl(p.drift,n),arl0:arl(0,n)};}
+const STDB={mu:0.362,sig:0.004,n:5,drift:0,seed:7};const B={...STDB};let RB=null;
+const fmtB={mu:v=>v.toFixed(4),sig:v=>v.toFixed(4),n:v=>v+'',drift:v=>v.toFixed(1)+'σ'};
+function evalB(){const s=spc(B);const C=[
+  {n:'Cp (estimated from first 25 subgroups)',v:s.cp.toFixed(2),ok:null},
+  {n:'Cpk (estimated from first 25 subgroups)',v:s.cpk.toFixed(2),ok:s.cpk>=1.33,bad:'Commonly required ≥ 1.33 (illustrative)'},
+  {n:'True Cpk / out of spec',v:`${s.cpkT.toFixed(2)} / ${s.ppm<0.1?'<0.1':s.ppm.toFixed(1)} ppm`,ok:null},
+  {n:'Control limits LCL / UCL (mm)',v:`${s.lcl.toFixed(4)} / ${s.ucl.toFixed(4)}`,ok:null},
+  {n:'Subgroups per false alarm, no drift (ARL₀)',v:s.arl0.toFixed(0),ok:null},
+  {n:'Subgroups to alarm after drift (ARL₁)',v:B.drift>0?s.arl1.toFixed(1):'—',ok:B.drift>0?s.arl1<=5:null,bad:'Detect drift quickly: target ≤ 5 subgroups (illustrative)'},
+  {n:'This run: alarm at subgroup',v:s.alarm?(''+s.alarm):(B.drift>0?'none in 50':'—'),ok:B.drift>0?!!s.alarm:null,bad:'Small drifts and small subgroups make the chart slow'}];return {s,C};}
+function axes(g,W,H,x0,x1,y0,y1,lo,hi,step,fmt){g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.textAlign='end';const Y=v=>y1-(y1-y0)*(v-lo)/(hi-lo);
+  for(let v=Math.ceil(lo/step)*step;v<=hi+1e-12;v+=step){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.fillText(fmt(v),x0-6,Y(v)+4);}return Y;}
+function hline(g,x0,x1,y,col,dash,lab){g.strokeStyle=col;g.setLineDash(dash);g.lineWidth=1.4;g.beginPath();g.moveTo(x0,y);g.lineTo(x1,y);g.stroke();g.setLineDash([]);g.fillStyle=col;g.textAlign='start';g.fillText(lab,x1+4,y+4);}
+function drawChart(id,vals,cl,ucl,lcl,lo,hi,step,fmt){const [c,g]=ctx(id),W=c.width,H=c.height,x0=70,x1=W-110,y0=12,y1=H-30,X=i=>x0+(x1-x0)*(i+0.5)/NTOT;
+  const Y=axes(g,W,H,x0,x1,y0,y1,lo,hi,step,fmt);
+  if(B.drift>0){g.fillStyle=css('--bt');g.globalAlpha=.08;g.fillRect(X(NBASE-0.5),y0,X(NTOT-0.5)-X(NBASE-0.5),y1-y0);g.globalAlpha=1;}
+  hline(g,x0,x1,Y(ucl),css('--bad'),[6,4],'UCL');if(lcl!==null)hline(g,x0,x1,Y(lcl),css('--bad'),[6,4],'LCL');hline(g,x0,x1,Y(cl),css('--muted'),[],'CL');
+  g.strokeStyle=css('--ink');g.lineWidth=1.6;g.beginPath();vals.forEach((v,i)=>{const q=[X(i),Y(Math.max(lo,Math.min(hi,v)))];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  vals.forEach((v,i)=>{const out=v>ucl||(lcl!==null&&v<lcl);g.fillStyle=out?css('--bad'):css('--nt');g.beginPath();g.arc(X(i),Y(Math.max(lo,Math.min(hi,v))),out?5.5:3.5,0,7);g.fill();});
+  g.fillStyle=css('--muted');g.textAlign='center';for(let i=0;i<NTOT;i+=5)g.fillText(i+1,X(i),H-12);
+  if(RB.s.alarm&&id==='xbar'){const i=RB.s.alarm-1;g.strokeStyle=css('--bad');g.lineWidth=2;g.beginPath();g.arc(X(i),Y(Math.max(lo,Math.min(hi,vals[i]))),11,0,7);g.stroke();}}
+function drawB(){const s=RB.s;const sp=Math.max(s.ucl-s.xbb,0.002);const lo=s.lcl-sp*0.6,hi=Math.max(s.ucl+sp*0.6,Math.max(...s.xb)+sp*0.1);
+  const step=(hi-lo)>0.02?0.005:((hi-lo)>0.008?0.002:0.001);
+  drawChart('xbar',s.xb,s.xbb,s.ucl,s.lcl,lo,hi,step,v=>v.toFixed(3));
+  const rh=Math.max(s.uclr*1.3,Math.max(...s.rg)*1.05);drawChart('rchart',s.rg,s.rb,s.uclr,null,0,rh,rh>0.03?0.01:0.005,v=>v.toFixed(3));
+  const [c,g]=ctx('histB'),W=c.width,H=c.height,x0=60,x1=W-20,y0=12,y1=H-36,l=0.330,h=0.390,X=v=>x0+(x1-x0)*(v-l)/(h-l);const bw=0.002,nb=Math.round((h-l)/bw),cnt=new Array(nb).fill(0);
+  s.raw.slice(0,NBASE).flat().forEach(v=>{const k=Math.floor((v-l)/bw);if(k>=0&&k<nb)cnt[k]++;});const mx=Math.max(...cnt,5)*1.1,Y=v=>y1-(y1-y0)*v/mx;
+  cnt.forEach((v,k)=>{g.fillStyle=css('--nt');g.fillRect(X(l+k*bw)+1,Y(v),X(bw)-X(0)-2,y1-Y(v));});
+  g.font='12px '+css('--f-body');[[LSL,'LSL'],[USL,'USL']].forEach(([v,t])=>{g.strokeStyle=css('--bad');g.setLineDash([5,4]);g.beginPath();g.moveTo(X(v),y0);g.lineTo(X(v),y1);g.stroke();g.setLineDash([]);g.fillStyle=css('--bad');g.textAlign='center';g.fillText(t,X(v)+18,y0+10);});
+  g.fillStyle=css('--muted');g.textAlign='center';for(let v=0.330;v<=0.3901;v+=0.01)g.fillText(v.toFixed(2),X(v),H-18);g.fillText('Eye width (mm)',(x0+x1)/2,H-2);
+  $('simtxtB').textContent=`Sample ${B.seed-6}: Cpk ≈ ${s.cpk.toFixed(2)}; ${B.drift>0?(s.alarm?'alarm at subgroup '+(s.alarm-NBASE)+' after the drift':'no alarm within 50 subgroups'):'no drift injected'}`;}
+function syncB(){for(const k in fmtB){$(k).value=B[k];$(k+'v').textContent=fmtB[k](B[k]);}}
+function changedB(){syncB();RB=evalB();renderChecks('checksB',RB.C);drawB();noteB();checkTasks();}
+for(const k in fmtB)$(k).addEventListener('input',()=>{B[k]=+$(k).value;changedB();});
+$('resetB').onclick=()=>{Object.assign(B,STDB);changedB();};$('resimB').onclick=()=>{B.seed++;changedB();};
+// ---------- tasks
+const seen={a:false,b:false,c:false};
+function noteA(){const s=RA.s;if(A.k===1&&s.pass>=0.99)seen.a=true;if(A.k>=2&&s.pass>=0.99&&s.leftRate<=0.03&&s.cost<=25)seen.b=true;}
+function noteB(){const s=RB.s;if(s.cpk>=1.33&&B.drift>=1&&s.arl1<=5&&s.alarm)seen.c=true;}
+const TASKS=[
+ {t:'Page ①: without grouping (k = 1, full interchangeability), reach a 99% in-tolerance rate by improving the accuracy of both parts alone. Note the cost per set.',d:'How small must each part’s σ be? Halving σ doubles the machining cost.',ok:()=>seen.a},
+ {t:'Page ①: with economical accuracy (≤ 25 yuan per set), use grouped selective fitting to reach ≥ 99% in tolerance with ≤ 3% leftover parts.',d:'How many groups are enough? Are more groups always better? Then try “Inject: race grinding mean +4 μm” and see how the leftovers change and how to recover.',ok:()=>seen.b},
+ {t:'Page ②: with estimated Cpk ≥ 1.33, inject a mean drift of at least 1σ and choose the subgroup size n so that ARL₁ ≤ 5 and this run actually raises an alarm.',d:'A larger n makes the subgroup mean steadier and the limits narrower, so small drifts show sooner; the price is measuring more needles per subgroup.',ok:()=>seen.c}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});$('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+window.__api={A,B,STDA,STDB,changedA,changedB,evalA:()=>RA,evalB:()=>RB,simulate,spc,arl,done,seen,tab};
+changedA();changedB();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

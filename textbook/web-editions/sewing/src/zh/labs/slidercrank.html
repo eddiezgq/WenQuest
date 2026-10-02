@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>针杆曲柄滑块机构实验</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: mechanism on the left, three motion curves + parameter sliders on the right; stacks on phones */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --cur:#d1495b; --ghost:#9aa4ae; --x:#1d2a36; --v:#2f6fd6; --a:#e0662f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--ghost:#5d6b7a;--x:#dde5ee;--v:#6ea8ff;--a:#ff8c55;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--ghost:#5d6b7a;--x:#dde5ee;--v:#6ea8ff;--a:#ff8c55;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:16px}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--f-body)}
+.t-ink{fill:var(--ink)} .t-mut{fill:var(--muted)}
+.right{display:flex;flex-direction:column;gap:14px;min-width:0}
+.ctl{display:grid;grid-template-columns:auto minmax(0,1fr) 5.5em;gap:6px 10px;align-items:center}
+.ctl label{font-size:.88rem;color:var(--muted)}
+.ctl b{font-family:var(--f-mono);font-size:.9rem;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)} button.primary{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1.02rem;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted);font-size:.74rem;line-height:1.3;display:block}
+.kpi .d{font-size:.74rem;font-family:var(--f-mono)}
+.up{color:#c0392b}.down{color:#1e8449}
+.note{font-size:.78rem;color:var(--muted)}
+.tasks{margin:6px 0 0;padding-left:1.2em;font-size:.88rem}
+.tasks li{margin:3px 0}
+</style>
+<div class="wrap">
+<header><h1>针杆曲柄滑块机构实验</h1><span class="sub">《缝纫机设计与制造》第 3 章 · 虚拟实验 3-1 · 改参数，看位移、速度、加速度和惯性力怎么变</span></header>
+<div class="grid">
+  <section class="panel">
+    <h3>机构（顺着上轴看）</h3>
+    <svg id="mech" viewBox="-130 -150 260 420" role="img" aria-label="针杆曲柄滑块机构动画"></svg>
+    <div class="row">
+      <button id="play" class="primary" type="button">暂停</button>
+      <button type="button" data-go="0">上止点</button><button type="button" data-go="180">下止点</button><button type="button" data-go="hook">钩线时刻</button>
+    </div>
+    <div class="row"><label for="ang" class="note" style="margin:0">主轴转角</label><input id="ang" type="range" min="0" max="359" value="60" style="flex:1"><b id="angv" style="font-family:var(--f-mono)">60°</b></div>
+  </section>
+  <div class="right">
+    <section class="panel">
+      <h3>参数（灰色虚线为第 3 章算例：r = 15.5 mm，l = 55 mm，n = 5000 r/min）</h3>
+      <div class="ctl">
+        <label for="r">曲柄半径 r</label><input id="r" type="range" min="10" max="20" step="0.5" value="15.5"><b id="rv">15.5 mm</b>
+        <label for="l">连杆长度 l</label><input id="l" type="range" min="35" max="90" step="1" value="55"><b id="lv">55 mm</b>
+        <label for="n">主轴转速 n</label><input id="n" type="range" min="1000" max="6000" step="100" value="5000"><b id="nv">5000</b>
+        <label for="m">往复质量 m</label><input id="m" type="range" min="40" max="200" step="5" value="120"><b id="mv">120 g</b>
+      </div>
+      <p class="note" style="margin:6px 0 0">往复质量指针杆、针夹、机针和连杆折算到针杆一端的质量之和，默认值 120 g 为示意，待按实际零件称量。</p>
+    </section>
+    <section class="panel">
+      <h3>结果</h3>
+      <div class="kpi">
+        <div><b id="k-lam">0.282</b><small>连杆比 λ = r / l</small></div>
+        <div><b id="k-s">31.0 mm</b><small>针杆行程 2r</small></div>
+        <div><b id="k-v">8.43 m/s</b><small>最大速度<br><span id="k-va">在 φ ≈ 104.7°</span></small></div>
+        <div><b id="k-at">3052</b><small>上止点加速度 m/s²<br><span id="k-atg">≈ 311 g</span></small></div>
+        <div><b id="k-ab">5447</b><small>下止点加速度 m/s²<br><span id="k-abg">≈ 555 g</span></small></div>
+        <div><b id="k-f">654 N</b><small>最大惯性力 m·a<br>（下止点）</small></div>
+        <div><b id="k-h">215°</b><small>机针回升 2 mm 的转角<br>（钩线时刻）</small></div>
+        <div><b id="k-dw">45°</b><small>下止点附近 ±2 mm 内<br>停留的转角宽度</small></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h3>运动曲线（红线为当前转角）</h3>
+      <svg id="plot" viewBox="0 0 640 430" role="img" aria-label="针杆位移、速度、加速度随主轴转角变化"></svg>
+    </section>
+    <section class="panel">
+      <h3>实验任务</h3>
+      <ol class="tasks">
+        <li>只改连杆长度 l（r 不变）：行程变不变？上、下止点加速度谁变大谁变小？</li>
+        <li>把 l 从 55 mm 改到 40 mm，钩线时刻（回升 2 mm 的转角）变了几度，是提前还是推后？这对旋梭的安装角度意味着什么？</li>
+        <li>转速从 3000 提到 6000 r/min，最大惯性力变为原来的几倍？用公式解释。</li>
+        <li>要把最大惯性力控制在 400 N 以内，在 n = 5000 r/min 时往复质量最多允许多少克？</li>
+      </ol>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const NS='http://www.w3.org/2000/svg', D=Math.PI/180;
+let r=15.5,l=55,n=5000,m=120,phi=60,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const X=(f,r_=r,l_=l)=>{const p=f*D,la=r_/l_;return r_*(1-Math.cos(p))-l_*(1-Math.sqrt(1-la*la*Math.sin(p)**2));};
+const V=(f,r_=r,l_=l,n_=n)=>{const w=n_*Math.PI/30,p=f*D,la=r_/l_,S=Math.sqrt(1-la*la*Math.sin(p)**2);return w*r_*Math.sin(p)*(1-la*Math.cos(p)/S)/1000;};
+const A=(f,r_=r,l_=l,n_=n)=>{const w=n_*Math.PI/30,p=f*D,la=r_/l_,S=Math.sqrt(1-la*la*Math.sin(p)**2);return w*w*r_*(Math.cos(p)-la*(Math.cos(2*p)+la*la*Math.sin(p)**4)/S**3)/1000;};
+const el=(tag,at,par)=>{const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);par.appendChild(e);return e;};
+// ---------- mechanism drawing (units: mm, y down, shaft at 0,0) ----------
+const mech=document.getElementById('mech');
+mech.innerHTML=`<defs>
+<radialGradient id="faceG" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#dfe4e8"/><stop offset="1" stop-color="#9ea8b1"/></radialGradient>
+<linearGradient id="sideG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b747d"/><stop offset=".35" stop-color="#f6f8f9"/><stop offset=".6" stop-color="#c3cad0"/><stop offset="1" stop-color="#57606a"/></linearGradient>
+<linearGradient id="darkG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6c7680"/><stop offset="1" stop-color="#262b31"/></linearGradient>
+<linearGradient id="brassG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6d5a2e"/><stop offset=".35" stop-color="#f1dd9a"/><stop offset="1" stop-color="#5f4c22"/></linearGradient>
+<linearGradient id="plateG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9edf0"/><stop offset="1" stop-color="#8b959f"/></linearGradient>
+<marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5d6b7a"/></marker></defs>`;
+const gStatic=el('g',{},mech), gDyn=el('g',{},mech);
+const fixedY=s=>s;
+function drawMech(){
+  gDyn.innerHTML='';
+  const la=r/l, f=phi*D;
+  const Ax=r*Math.sin(f), Ay=-r*Math.cos(f);
+  const By=Ay+Math.sqrt(l*l-Ax*Ax);
+  const clampY=By+70, tipY=clampY+38;
+  const x0=X(0), plateTop=-r+l + 70 + 38 + 18;      // needle tip is 18 mm above plate at TDC
+  const g=gDyn;
+  // bushings + guide (static parts drawn relative to current geometry range)
+  el('rect',{x:-9,y:l-r-34,width:18,height:12,rx:2,fill:'url(#brassG)',stroke:'#1d2a36','stroke-width':.4},g);
+  el('rect',{x:-9,y:l+r+40,width:18,height:12,rx:2,fill:'url(#brassG)',stroke:'#1d2a36','stroke-width':.4},g);
+  el('rect',{x:9,y:l-r-14,width:7,height:2*r+28,rx:1.5,fill:'url(#darkG)',stroke:'#1d2a36','stroke-width':.4},g);
+  // needle bar
+  el('rect',{x:-4.5,y:By-60,width:9,height:clampY-By+60,fill:'url(#sideG)',stroke:'#1d2a36','stroke-width':.45},g);
+  el('rect',{x:-9,y:By-8,width:18,height:16,rx:2.5,fill:'url(#sideG)',stroke:'#1d2a36','stroke-width':.45},g);
+  el('rect',{x:9,y:By-6,width:8,height:12,rx:1.5,fill:'url(#sideG)',stroke:'#1d2a36','stroke-width':.4},g);
+  el('rect',{x:-6,y:clampY-2,width:12,height:10,rx:1.5,fill:'url(#sideG)',stroke:'#1d2a36','stroke-width':.45},g);
+  el('path',{d:`M-1.4 ${clampY+8} V${tipY-7} L0 ${tipY} L1.4 ${tipY-7} V${clampY+8} Z`,fill:'url(#sideG)',stroke:'#1d2a36','stroke-width':.35},g);
+  // plate & fabric
+  el('rect',{x:-60,y:plateTop,width:120,height:5,fill:'url(#plateG)',stroke:'#1d2a36','stroke-width':.4},g);
+  el('rect',{x:-60,y:plateTop-3,width:120,height:3,fill:'#e8d9b8',stroke:'#b39d6d','stroke-width':.3},g);
+  // crank disc + counterweight
+  const R0=Math.max(26,r+10);
+  el('circle',{cx:0,cy:0,r:R0,fill:'url(#faceG)',stroke:'#1d2a36','stroke-width':.5},g);
+  const a0=f+Math.PI-1.1,a1=f+Math.PI+1.1,pc=(rr,a)=>[rr*Math.sin(a),-rr*Math.cos(a)];
+  const p1=pc(R0-1,a0),p2=pc(R0-1,a1),q1=pc(R0*0.5,a1),q2=pc(R0*0.5,a0);
+  el('path',{d:`M${p1} A${R0-1} ${R0-1} 0 0 1 ${p2} L${q1} A${R0*.5} ${R0*.5} 0 0 0 ${q2} Z`,fill:'url(#darkG)',stroke:'#1d2a36','stroke-width':.4},g);
+  el('circle',{cx:0,cy:0,r:8,fill:'url(#sideG)',stroke:'#1d2a36','stroke-width':.45},g);
+  el('circle',{cx:0,cy:0,r:2.2,fill:'#20252b'},g);
+  // connecting rod
+  const ang=Math.atan2(By-Ay,-Ax)*180/Math.PI, L=Math.hypot(Ax,By-Ay);
+  const rg=el('g',{transform:`translate(${Ax} ${Ay}) rotate(${ang})`},g);
+  el('path',{d:`M0 -7 C10 -7 10 -3.5 18 -3.2 H${L-14} C${L-9} -3.2 ${L-8} -5.5 ${L} -5.5 A5.5 5.5 0 0 1 ${L} 5.5 C${L-8} 5.5 ${L-9} 3.2 ${L-14} 3.2 H18 C10 3.5 10 7 0 7 A7 7 0 0 1 0 -7 Z`,fill:'url(#sideG)',stroke:'#1d2a36','stroke-width':.45},rg);
+  el('circle',{cx:0,cy:0,r:4,fill:'url(#faceG)',stroke:'#1d2a36','stroke-width':.4},rg);
+  el('circle',{cx:L,cy:0,r:2.6,fill:'url(#faceG)',stroke:'#1d2a36','stroke-width':.4},rg);
+  // dimension annotations
+  el('line',{x1:0,y1:0,x2:Ax,y2:Ay,stroke:'#d1495b','stroke-width':.6,'stroke-dasharray':'2 1.2'},g);
+  const tr=el('text',{x:Ax/2+3,y:Ay/2-2,'font-size':6,fill:'#d1495b','font-style':'italic'},g);tr.textContent='r';
+  const tl=el('text',{x:Ax/2+6,y:(Ay+By)/2,'font-size':6,fill:'#d1495b','font-style':'italic'},g);tl.textContent='l';
+  // φ arc
+  el('path',{d:`M0 -${R0+6} A${R0+6} ${R0+6} 0 ${phi>180?1:0} 1 ${(R0+6)*Math.sin(f)} ${-(R0+6)*Math.cos(f)}`,fill:'none',stroke:'#0f6e74','stroke-width':.7,'marker-end':'url(#ar)'},g);
+  const tp=el('text',{x:-8,y:-R0-10,'font-size':7,fill:'#0f6e74','font-style':'italic'},g);tp.textContent='φ';
+  // x dimension (from TDC position of clamp)
+  const cTDC=(l-r)+70;
+  el('line',{x1:-38,y1:cTDC,x2:-14,y2:cTDC,stroke:'#5d6b7a','stroke-width':.4,'stroke-dasharray':'1.5 1'},g);
+  el('line',{x1:-34,y1:cTDC,x2:-34,y2:clampY,stroke:'#5d6b7a','stroke-width':.5,'marker-end':'url(#ar)'},g);
+  const tx=el('text',{x:-58,y:(cTDC+clampY)/2+2,'font-size':6,fill:'#5d6b7a'},g);tx.textContent=`x = ${X(phi).toFixed(1)}`;
+  const t1=el('text',{x:-58,y:cTDC-3,'font-size':5,fill:'#5d6b7a'},g);t1.textContent='上止点位置';
+  mech.setAttribute('viewBox',`-80 ${-R0-22} 170 ${plateTop+R0+34}`);
+}
+// ---------- plots ----------
+const plot=document.getElementById('plot');
+const PX=f=>60+f/360*560;
+const rows=[{key:'x',name:'位移 x (mm)',y0:16,h:120,col:'var(--x)'},{key:'v',name:'速度 v (m/s)',y0:156,h:120,col:'var(--v)'},{key:'a',name:'加速度 a (km/s²)',y0:296,h:120,col:'var(--a)'}];
+function nice(lo,hi){const span=hi-lo;const st=Math.pow(10,Math.floor(Math.log10(span/3)));const step=[1,2,5,10].map(k=>k*st).find(s=>span/s<=5);return {lo:Math.floor(lo/step)*step,hi:Math.ceil(hi/step)*step,step};}
+function drawPlot(){
+  plot.innerHTML='';
+  const fns={x:f=>X(f),v:f=>V(f),a:f=>A(f)/1000}, ghost={x:f=>X(f,15.5,55),v:f=>V(f,15.5,55,5000),a:f=>A(f,15.5,55,5000)/1000};
+  for(const rw of rows){
+    const vals=[],gv=[];for(let f=0;f<=360;f+=2){vals.push(fns[rw.key](f));gv.push(ghost[rw.key](f));}
+    let lo=Math.min(...vals,...gv),hi=Math.max(...vals,...gv); if(rw.key==='x')lo=0;
+    const sc=nice(lo,hi), Y=v=>rw.y0+rw.h-(v-sc.lo)/(sc.hi-sc.lo)*rw.h;
+    for(let t=sc.lo;t<=sc.hi+1e-9;t+=sc.step){el('line',{x1:60,x2:620,y1:Y(t),y2:Y(t),stroke:'var(--rule)','stroke-width':Math.abs(t)<1e-9?1.2:.6},plot);const tt=el('text',{x:54,y:Y(t)+4,'font-size':11,'text-anchor':'end',class:'t-mut'},plot);tt.textContent=+t.toFixed(2);}
+    const tn=el('text',{x:64,y:rw.y0+12,'font-size':12,'font-weight':600,fill:rw.col},plot);tn.textContent=rw.name;
+    const pts=vals.map((v,i)=>`${PX(i*2)},${Y(v)}`).join(' '), gp=gv.map((v,i)=>`${PX(i*2)},${Y(v)}`).join(' ');
+    el('polyline',{points:gp,fill:'none',stroke:'var(--ghost)','stroke-width':1.3,'stroke-dasharray':'5 4'},plot);
+    el('polyline',{points:pts,fill:'none',stroke:rw.col,'stroke-width':2.2},plot);
+    const cv=fns[rw.key](phi);
+    el('circle',{cx:PX(phi),cy:Y(cv),r:4,fill:'var(--cur)'},plot);
+    const ct=el('text',{x:PX(phi)+(phi>300?-8:8),y:Y(cv)-8,'font-size':11.5,'font-weight':600,fill:'var(--cur)','text-anchor':phi>300?'end':'start'},plot);ct.textContent=cv.toFixed(2);
+  }
+  for(let f=0;f<=360;f+=45){el('line',{x1:PX(f),x2:PX(f),y1:16,y2:416,stroke:'var(--rule)','stroke-width':.5,'stroke-dasharray':'2 3'},plot);const t=el('text',{x:PX(f),y:430,'font-size':11,'text-anchor':'middle',class:'t-mut'},plot);t.textContent=f+'°';}
+  el('line',{x1:PX(phi),x2:PX(phi),y1:16,y2:416,stroke:'var(--cur)','stroke-width':1.4},plot);
+  const hk=hookAngle(); el('line',{x1:PX(hk),x2:PX(hk),y1:16,y2:136,stroke:'var(--accent)','stroke-width':1.4,'stroke-dasharray':'4 3'},plot);
+  const ht=el('text',{x:PX(hk)+4,y:130,'font-size':11,fill:'var(--accent)'},plot);ht.textContent=`回升 2 mm：${hk.toFixed(1)}°`;
+}
+function hookAngle(rise=2){const S=X(180);for(let f=180;f<=300;f+=0.1){if(S-X(f)>=rise)return f;}return 300;}
+function dwell(band=2){const S=X(180);let f=180;while(f<300&&S-X(f)<band)f+=0.1;return 2*(f-180);}
+function kpis(){
+  const la=r/l;
+  let vm=0,fa=0;for(let f=0;f<=180;f+=0.1){const v=V(f);if(v>vm){vm=v;fa=f;}}
+  const at=A(0),ab=-A(180);
+  const set=(id,t)=>document.getElementById(id).textContent=t;
+  set('k-lam',la.toFixed(3)); set('k-s',(2*r).toFixed(1)+' mm'); set('k-v',vm.toFixed(2)+' m/s'); set('k-va',`在 φ ≈ ${fa.toFixed(1)}°`);
+  set('k-at',Math.round(at)); set('k-atg',`≈ ${Math.round(at/9.81)} g`); set('k-ab',Math.round(ab)); set('k-abg',`≈ ${Math.round(ab/9.81)} g`);
+  set('k-f',Math.round(m/1000*Math.max(at,ab))+' N'); set('k-h',hookAngle().toFixed(1)+'°'); set('k-dw',dwell().toFixed(1)+'°');
+}
+function render(){drawMech();drawPlot();document.getElementById('ang').value=Math.round(phi)%360;document.getElementById('angv').textContent=Math.round(phi)%360+'°';}
+function all(){kpis();render();}
+const bind=(id,fmt,set)=>{const e=document.getElementById(id);e.oninput=()=>{set(+e.value);document.getElementById(id+'v').textContent=fmt(+e.value);all();};};
+bind('r',v=>v+' mm',v=>r=v); bind('l',v=>v+' mm',v=>l=v); bind('n',v=>v,v=>n=v); bind('m',v=>v+' g',v=>m=v);
+document.getElementById('ang').oninput=e=>{playing=false;sync();phi=+e.target.value;render();};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{playing=false;sync();phi=b.dataset.go==='hook'?hookAngle():+b.dataset.go;render();});
+function sync(){document.getElementById('play').textContent=playing?'暂停':'播放';}
+document.getElementById('play').onclick=()=>{playing=!playing;sync();};
+let last=performance.now(),acc=0;
+function loop(t){const dt=Math.min(.1,(t-last)/1000);last=t;if(playing){phi=(phi+50*dt)%360;acc+=dt;if(acc>1/30){render();acc=0;}}requestAnimationFrame(loop);}
+sync();all();requestAnimationFrame(loop);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

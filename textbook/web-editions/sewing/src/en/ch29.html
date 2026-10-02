@@ -1,0 +1,374 @@
+<p class="eyebrow">Part VIII · Factories and the Future</p><h1><span class="chno">Chapter 29</span>Typical Garment Factories</h1><div class="seam" aria-hidden="true"></div><div class="chips"><span class="chips-label">Interactive resources in this chapter</span><a class="chip" href="#lab-line"><b>Virtual lab</b>Sewing-line simulation</a></div><p>The preceding chapters dealt with machines one at a time: how a stitch is formed, how a mechanism is designed, how a control system makes the machine do what it is told. This chapter pulls the camera back and walks into the five most typical kinds of garment factory to see how those machines are organised on the shop floor. We do not profile any particular company; we use public sources only to explain the technical logic: the product determines the operations, the operations determine the equipment, and the batch size determines how the line is organised. Each section follows the same order — product → process flow → key equipment → floor layout → digitalisation → data and worked examples — and wherever a mechanism from an earlier chapter appears, the chapter is cited so you can turn back and compare.</p>
+<h3 id="s29-0">29.0 Opening: they all make clothes</h3>
+<p>Imagine visiting five factories in the same industrial park. The first makes made-to-measure suits: the air above the floor is full of hangers, every garment on them is a different size, and each operator has a small screen in front of her. The second makes shirts, and the most striking things on its floor are rows of “automatic machines” that feed themselves, sew by themselves and stack their own work — dedicated to collars, cuffs and pockets. The third makes T-shirts: dozens of overlock and coverstitch machines stand in long rows, their noise merging into one roar. The fourth makes sweaters: the front half of the floor is humming computerised flat knitting machines, while the back half is filled with women bent over linking machines. The fifth takes orders of 100 or 200 pieces: a dozen people stand in a U shape and change styles several times a day.</p>
+<p>All of them turn fabric into clothes, so why do they look so different? There are three basic reasons. The first is product structure: a suit has more than 300 operations, a T-shirt only a dozen or so, and the panels of a sweater are knitted, never cut at all. The second is the fabric: knit fabric stretches and its edges curl, so T-shirts cannot do without the overlock machine of Chapter 9 and the coverstitch machine of Chapter 10, whereas suit cloth has to be “shaped” by fusing and pressing. The third is batch size: whether a style is made 50 000 at a time or 100 at a time decides whether it is worth setting up a long line for it, or buying a machine that does nothing but pockets. Fig. 29-1 places the process flows of the five factory types side by side, with coloured frames marking each one’s most characteristic steps; the next five sections take them one by one.</p>
+<figure class="fig"><a class="zoom" href="img/fig_22_flows.png"><img src="img/fig_22_flows.png" alt="Fig. 29-1 Process flows of five types of garment factory compared" loading="lazy"></a><figcaption>Fig. 29-1 Process flows of five types of garment factory compared (key equipment under each box, book chapters in parentheses). Rows from top: made-to-measure suits, shirts, T-shirts and knits, sweaters, small-batch quick response; boxes with coloured frames are each factory’s most characteristic operations.</figcaption></figure>
+<h3 id="s29-1">29.1 Suits: one-piece flow for mass customisation</h3>
+<p><strong>Product</strong> A man’s suit is one of the garments with the most operations. The jacket has three layers — shell, lining and interlining; the front gets its shape from fusible interlining and a chest canvas; the collar and lapels must roll naturally; the sleeves must be set in round and full; pockets and vents must be symmetrical; and striped or checked cloth must be matched. According to a press report, a made-to-measure suit factory needs more than 300 operations per suit (<a href="https://news.sina.cn/2015-03-25/detail-icczmvun7093794.d.html">Sina, 2015</a>, in Chinese); an operation list for a man’s suit jacket compiled by a practitioner contains 118 sewing operations, and an ordinary fully lined jacket with three pockets takes about 2 hours from cutting to packing (<a href="https://blog.sina.com.cn/s/blog_03205df40100n30t.html">practitioner’s blog</a>, in Chinese; useful as an order of magnitude). Compare it with the T-shirt in Section 29.3: a T-shirt needs less than 6 minutes of sewing, while a suit jacket takes about 2 hours from cutting to packing — even counting sewing alone, an order of magnitude more than a T-shirt.</p>
+<p>Made-to-measure adds another layer of difficulty: every piece may differ in size, style, fabric, buttons and thread colour. The traditional “progressive bundle system” ties 10–30 sets of panels of the same size into a bundle; the whole bundle goes through one operation at one work centre and then moves on to the next. As soon as the panels in a bundle are all different, this method collapses. A made-to-measure suit can only flow one piece at a time, and every work centre has to know what “this particular piece” requires. That is the technical question of case T1: if every piece has a different size, how can the line stay efficient?</p>
+<p><strong>Process flow and data flow</strong> Fig. 29-2 divides the flow of a made-to-measure suit factory into two rows. The upper row is data. The customer is measured in the shop; according to press reports, the 3D laser body scanner captures 22 measurements at 19 body locations in about 7 seconds, and the system can handle 113 special body shapes. The measurements, together with the style options, go into the pattern, style, process and bill-of-materials databases, and a single order drives nearly ten thousand data items in the system to change in step (<a href="https://www.qingdaonews.com/app/content/2020-11/30/content_22464727.htm">Qingdao News, 2020</a>, in Chinese). Three things come out at the end: a marker file for the cutter, an operation route for the hanger system, and process instructions for every work centre.</p>
+<p>The lower row is material. Fabric is cut to length automatically per order and fed to an automatic cutter that cuts one ply at a time (bulk cutting stacks dozens of plies and cuts them in one pass; made-to-measure can only be “one measurement, one cut”). The cut panels are hung on a hanger together with a radio-frequency identification (RFID) tag card, which is the garment’s “ID card”. The hanger system delivers the hanger to the right work centres along the operation route; the operator swipes the card and the small screen shows this piece’s custom requirements — sleeves lengthened by 1.5 cm, embroidered initials on the left chest, buttonholes in a special thread colour (<a href="https://www.tmtpost.com/2600049.html">TMTPost</a>, <a href="https://dzsws.mofcom.gov.cn/cms_files/filemanager/dzsws/anli15/detal_12.html">Ministry of Commerce e-commerce case</a>, both in Chinese). Press reports give 7 working days from measurement to dispatch, and a more recent report gives 6 working days (<a href="https://www.jiemian.com/article/3877779.html">Jiemian</a>, in Chinese).</p>
+<figure class="fig"><a class="zoom" href="img/fig_22_mtm.png"><img src="img/fig_22_mtm.png" alt="Fig. 29-2 Data flow and one-piece flow in a made-to-measure suit factory" loading="lazy"></a><figcaption>Fig. 29-2 Made-to-measure suit factory: data goes first (upper row), the material flows one piece at a time (lower row)</figcaption></figure>
+<p>How does the hanger system “find its way”? In front of each work centre is a branch rail with a reader and an entry gate at its mouth. Hangers run on the main rail; as one passes a work centre, the reader reads its number and the control system looks up its next operation. If this work centre does that operation and there is still room on the branch rail, the gate opens and the hanger is switched in; when the operator has finished, she presses a button and a lift returns the hanger to the main rail. Because the system knows how many pieces are queued at each work centre and how fast each one works, it can also give priority to idle work centres — the dynamic balancing of case T11 (<a href="https://www.cnblogs.com/qingyangxin/p/15711469.html">introduction to hanger-system principles</a>, in Chinese). The mechanics and control of hanger systems are covered in detail in Chapter 12.</p>
+<p><strong>Key equipment</strong> The equipment in a suit factory is easiest to remember in two groups: “shaping” and “imitating handwork”.</p>
+<p>Shaping relies on heat and pressure. A fusing press presses interlining coated with hot-melt adhesive onto the back of the cloth so that the adhesive melts, penetrates the yarns and then cools. One review gives typical parameters: the adhesive melts at 130–160 °C, the optimum window is only ±7 °C, and 174 °C is rarely exceeded; flat-bed fusing presses usually work at 0.2–3.0 kg/cm² (<a href="https://www.mdpi.com/2073-4360/10/11/1230">Polymers, 2018</a>). Too cold and the bond is weak and blisters after a few washes; too hot and the adhesive strikes through to the face, leaving the cloth stiff and shiny. After fusing comes “shrinking and stretching”: an iron or pressing machine shrinks some areas and stretches others so that the flat panel becomes a surface that follows the body. Final pressing is done on a form press: the jacket is put on an air bag in the shape of a torso, steamed from inside and then dried by suction to set the shape.</p>
+<p>Imitating handwork is what the special machines for suits have in common. The lapel edges of a high-end suit carry a line of “pick stitching”, originally done by hand one stitch at a time; a pick-stitch machine imitates the hand-sewing motion at up to 400 stitches per minute, and the manufacturer claims about ten times the speed of hand work (<a href="https://www.yamato-sewing.com/en/product/amf_reece/amfreece-deco2000y/">product literature</a>). A blindstitch machine’s looper picks up only half the thickness of the cloth, so the thread is invisible from the face; it is used for under-collars and hems. The buttonholes on a suit front are “keyhole buttonholes” with a round eye at one end, sewn with a two-thread chainstitch over a gimp cord; an eyelet buttonholer runs at up to 2700 stitches per minute (<a href="https://www.yamato-sewing.com/en/product/amf_reece/amfreece-es-505/">product literature</a>). Its stitch positions and knife action are the “fixed pattern + X–Y feed” of Chapters 11 and 15.</p>
+<p>Setting sleeves is the most skill-demanding operation on a suit, and also the one most closely tied to the mechanisms in this book. The sleeve-cap seam is longer than the armhole, and the extra length has to be eased in evenly as it is sewn for the sleeve to hang round. Worked example: if the cap is 3 cm longer than the armhole and the armhole is 47 cm (worked-example values), the average ease is 3 ÷ 47 ≈ 6.4%, and the top of the cap must take far more ease than the underarm, which takes almost none. A dedicated sleeve-setting machine uses independently driven upper feed belts on the left and right; the feed amounts for the upper and lower plies can be set separately, and one machine can store 99 programs of 30 steps each (<a href="https://juki.com/dp-2100">product literature</a>) — that is, the armhole is divided into several segments, each with its own ease ratio. This is the same principle as the differential feed of Section 9.10, except that in the overlock machine two feed dogs, front and rear, push the same ply, whereas the sleeve setter has upper and lower feed mechanisms each pushing one ply. Because each made-to-measure suit has a different sleeve cap, the program number is sent to the work centre together with the RFID tag.</p>
+<p><strong>Worked example: why one-piece flow has a short throughput time</strong> Work in progress, output and throughput time on the floor obey a simple and universal relationship called Little’s law:</p>
+<div class="math">\[\text{average throughput time} = \frac{\text{work in progress}}{\text{output rate}}\]</div>
+<p>On a suit line making 30 suits per hour, if 1500 suits are in progress on the line, a suit spends 50 hours on the line on average; cut the work in progress to 300 suits and it spends only 10 hours (worked-example values). The bundle system inherently carries a lot of work in progress: at least one or two bundles wait at every work centre, and each bundle is dozens of pieces. A study of a shirt line found that when the bundle size grew from 10 to 70 pieces, work in progress rose from 1995 to 13 560 pieces and the throughput time from 0.61 days to 4.16 days (<a href="https://www.revistaindustriatextila.ro/images/2018/02/009_GORAN%20DEMBOSKI_IndustriaTextila_02_2018.pdf">Demboski et al., 2018</a>). One-piece flow turns “a bundle” into “a piece”, and the hanger system also limits how many pieces can hang at each work centre, so work in progress is pushed down to the order of “number of operators × hanger places” — the key to delivering a made-to-measure suit within a week. Virtual lab 29-1 lets you verify the law for yourself.</p><section class="lab" id="lab-line" data-src="labs/line.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4 id="x92689">Virtual lab 29-1 Sewing-line simulation</h4></div><p>Output, work in progress and throughput time for the same T-shirt in a bundle line, a hanger one-piece flow and a U-shaped cell, plus batch size and style changes.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/line.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<p>One-piece flow has its costs. The hangers, tags, work-centre terminals and data systems are all investments, and operators have to understand a different set of requirements on the screen for every piece rather than relying only on fast, repetitive hands. It therefore suits best the products for which “every piece is different” and “short delivery time” both hold — and made-to-measure suits satisfy both.</p>
+<h3 id="s29-2">29.2 Shirts: automatic units for small parts</h3>
+<p><strong>Product</strong> A long-sleeved dress shirt looks simple, but take it apart and you find a pile of small parts: top collar, under-collar and collar stand; two cuffs; two sleeve plackets; the front placket and pocket; and the yoke on the back. These parts are made separately first and then attached to the body. A public operation breakdown for a men’s shirt lists 41 sewing operations totalling 22.3 standard minutes (<a href="https://www.onlineclothingstudy.com/2011/12/operation-break-down-and-sam-of-full.html">Online Clothing Study</a>, excluding buttonholing and button sewing); another breakdown that also lists machine types totals 23.15 minutes (<a href="https://ordnur.com/apparel/operation-breakdown-and-smv-of-mens-long-sleeve-shirt/">ORDNUR</a>), so the two agree closely. The standard minute value (SAM or SMV) is the time a trained operator needs to complete an operation by the standard method at normal pace, plus the necessary allowances; it is the common yardstick the factory uses to calculate output, set staffing and price piecework, and Chapter 28 showed how it is measured.</p>
+<p>Grouping these 41 operations by part gives an interesting result: collar 3.62 min, cuffs 3.85 min, sleeve plackets 2.21 min, fronts 4.22 min, back 0.84 min, while the assembly operations that turn these parts into a shirt take only 7.58 min. In other words, <strong>the three small parts — collar, cuffs and plackets — account for 43% of the total work content; all parts together account for 66%, and assembly for only 34%</strong>. A shirt factory’s efficiency is largely won on the parts.</p>
+<p><strong>Floor layout</strong> Fig. 29-3 is a floor plan drawn on this structure. On the left are cutting and fusing; the cut panels split into five streams — collar line, cuff line, placket line, front line and back line — each of which finishes its parts and feeds the assembly line on the right. The assembly line joins the shoulder seams, attaches the collar, closes the collar, sets the sleeves, closes the side seams, attaches the cuffs and hems the bottom, and the shirt then goes through buttonholing, button sewing, pressing, folding and packing. One published floor set-up gives the scale of such a layout: 19 operators in the parts section and 27 in assembly, making about 140 shirts per hour on that source’s own operation times (about 17 minutes in total, simpler than the breakdown above) (<a href="https://textilenotes.com/setup-machine-layout-for-basic-woven-shirt-in-garments/">Textilenotes</a>).</p>
+<figure class="fig"><a class="zoom" href="img/fig_22_shirt.png"><img src="img/fig_22_shirt.png" alt="Fig. 29-3 Parts lines and assembly line in a shirt factory" loading="lazy"></a><figcaption>Fig. 29-3 Shirt floor: five parts lines (collar, cuff, placket, front, back) feed the assembly line (work content summed from public operation breakdowns)</figcaption></figure>
+<p><strong>Why automation starts with small parts</strong> Small parts share three features that suit machines. First, they are small and flat, so they can be located as a whole in a clamp (template), unlike the body panels, which deform as soon as they are picked up. Second, their shapes are fixed and they repeat endlessly: a line makes several thousand collars a day, repeating the same motion thousands of times. Third, they are the most quality-sensitive: an asymmetric collar point, a cuff corner that is not round, a crooked pocket — the customer sees it at a glance, and human hands find it hard to make every piece the same. Assembly operations are the opposite: two large, limp panels must be aligned and sewn while being turned, and to this day they are done mainly by people.</p>
+<p>So the most common automatic units in shirt factories are all built around small parts. A pocket setter first folds and presses the pocket edges into shape, then automatically transfers it to the front panel, sews it in position and stacks the result; one manufacturer claims about 2400 pockets per 8 hours, or about 1800 for striped or checked fabric (<a href="https://www.duerkopp-adler.com/products/industrial-sewing-machines/clothing-applications-apparel/pocket-setter/806n/">product literature</a>). A cuff unit is a rotary-table unit whose four stations perform loading, sewing, trimming and stacking in turn (<a href="https://partner.duerkopp-adler.com/en/main/products/GA_42/971-01.html">product literature</a>). A buttonholer fitted with an automatic feeder can sew 1 to 20 buttonholes in succession along a front placket, and the operator loads the next piece while the machine is sewing, so that loading time overlaps sewing time (<a href="https://www.juki.co.jp/industrial_e/products_e/apparel_e/automatic_e/detail.php?cd=AC-172N-1790AN_E">product literature</a>). The sewing heads of these units are still the lockstitch mechanisms of Chapters 2–7; the feed is replaced by the clamp and X–Y table of Chapters 11 and 15.</p>
+<p><strong>Worked example: how many people does a pocket setter replace?</strong> Making a pocket by hand takes two operations: pressing the pocket, 0.542 min, and attaching it, 0.861 min — about 1.40 min in total. At the manufacturer’s claimed rate above, the pocket setter takes about 480 × 60 ÷ 2400 = 12 seconds, i.e. 0.20 min, per pocket. If the line makes 140 shirts per hour, hand work needs 140 × 1.40 ≈ 196 minutes of pocket work per hour, or 3.3 operators; the pocket setter needs only 140 × 0.20 = 28 minutes, so one machine is less than half loaded and could serve another line too. In a real factory the machine also loses time to changeovers, clamp adjustment and breakdowns, so the claimed figure must be discounted, but the order of magnitude will not change. This also explains why the pocket setter is often the first automatic machine a shirt factory buys.</p>
+<h3 id="s29-3">29.3 T-shirts and knits: the world of overlock and coverstitch</h3>
+<p><strong>Product and operations</strong> T-shirts are made of circular-knit fabric that stretches a lot, curls at the edges and ravels at cut edges. As the opening of Chapter 9 explained, these three properties make overlock and coverstitch the dominant stitches: shoulders, neck rib, sleeves and side seams are joined with a four-thread overedge stitch (seaming and edge finishing in one pass, with a stitch that stretches with the fabric); neckline, sleeve hems and bottom hem use a covering stitch (holding the curled edge down, with two or three parallel lines on the face and a cover thread on the back); the lockstitch machine is used only for labels, joining rib and tacking. The table below lists the 16 operations of a basic crew-neck short-sleeved T-shirt. Operations, machine types and observed cycle times come from a public operation bulletin (<a href="https://textilesscholars.blogspot.com/2019/08/operation-bulletin-of-basic-t-shirt.html">Textiles Scholars</a>); the standard minute values are worked-example values obtained in this book by adding a 15% allowance to the observed cycle times. Machine codes: SNL single-needle lockstitch, <strong>4OL four-thread overlock</strong>, <strong>FL flatlock (coverstitch)</strong>, MNL manual.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>No.</th>
+<th>Operation</th>
+<th>Machine</th>
+<th>Observed cycle (min)</th>
+<th>Standard minutes SMV (min)</th>
+<th>Operators, one per operation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Attach care label</td>
+<td>SNL</td>
+<td>0.20</td>
+<td>0.230</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Match front and back</td>
+<td>MNL</td>
+<td>0.18</td>
+<td>0.207</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Join shoulders</td>
+<td>4OL</td>
+<td>0.33</td>
+<td>0.380</td>
+<td>2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Measure and cut neck rib</td>
+<td>MNL</td>
+<td>0.25</td>
+<td>0.287</td>
+<td>1</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Join neck rib</td>
+<td>SNL</td>
+<td>0.26</td>
+<td>0.299</td>
+<td>1</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Attach neck rib</td>
+<td>4OL</td>
+<td>0.30</td>
+<td>0.345</td>
+<td>2</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Neck topstitch (coverstitch)</td>
+<td>FL</td>
+<td>0.25</td>
+<td>0.287</td>
+<td>1</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Attach main label</td>
+<td>SNL</td>
+<td>0.33</td>
+<td>0.380</td>
+<td>2</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Sleeve hem (coverstitch)</td>
+<td>FL</td>
+<td>0.30</td>
+<td>0.345</td>
+<td>2</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Match sleeves</td>
+<td>MNL</td>
+<td>0.22</td>
+<td>0.253</td>
+<td>1</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Set sleeves</td>
+<td>4OL</td>
+<td>0.42</td>
+<td>0.483</td>
+<td>2</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Armhole topstitch (coverstitch)</td>
+<td>FL</td>
+<td>0.30</td>
+<td>0.345</td>
+<td>2</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Close side seams</td>
+<td>4OL</td>
+<td>0.57</td>
+<td>0.655</td>
+<td>3</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Tack sleeve hems</td>
+<td>SNL</td>
+<td>0.37</td>
+<td>0.425</td>
+<td>2</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Bottom hem (coverstitch)</td>
+<td>FL</td>
+<td>0.46</td>
+<td>0.529</td>
+<td>2</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Trim threads</td>
+<td>MNL</td>
+<td>0.34</td>
+<td>0.391</td>
+<td>2</td>
+</tr>
+<tr>
+<td></td>
+<td>Total</td>
+<td></td>
+<td>5.08</td>
+<td>5.841</td>
+<td>27</td>
+</tr>
+</tbody>
+</table></div>
+<p>Summed by machine type: overlock 1.863 min, coverstitch 1.506 min, lockstitch 1.334 min, manual 1.138 min — the overlock and coverstitch machines carry 58% of the work content. If a T-shirt factory’s overlock machines break down often or their differential feed is poorly set, the whole line is held back; that is the weight the clearances and timings of Chapter 9 carry in a factory.</p>
+<p><strong>Worked example: how many operators does a T-shirt line need?</strong> Let the target output be 200 pieces per hour. Step one is the <strong>takt time</strong>, i.e. how often, on average, the line must deliver one piece:</p>
+<div class="math">\[T_{\text{takt}} = \frac{60}{200} = 0.30\ \text{min} = 18\ \text{s}\]</div>
+<p>Step two is the theoretical number of operators: total work content divided by takt time, 5.841 ÷ 0.30 = 19.5, so at least 20 people. Step three is allocation. The most obvious approach is “one operator per operation”: staff each operation with SMV ÷ takt rounded up, which gives the last column of the table, 27 people in total. Where do the extra 7 come from? Headcounts must be whole numbers: closing the side seams takes 0.655 min and theoretically needs 2.18 people, so it gets 3; attaching the main label takes 0.380 min and needs 1.27 people, so it gets 2. Every fraction becomes waiting time. The measure of this waste is the <strong>balance efficiency</strong>:</p>
+<div class="math">\[\text{balance efficiency} = \frac{\sum \text{SMV}}{\text{operators} \times \text{load per operator at the bottleneck}}\]</div>
+<p>With one operator per operation the bottleneck is joining the neck rib (1 person, 0.299 min per person), and the balance efficiency is 5.841 ÷ (27 × 0.299) = 72%. The remedy is <strong>combining operations</strong>: several operations on the same machine type are given to one group that shares them, each person taking whichever operation is waiting when she becomes free. Overlock group 1.863 ÷ 0.30 = 6.2, staff 7; coverstitch group 1.506 ÷ 0.30 = 5.02, staff 5 (0.301 min each, only 0.4% over takt, which a skilled operator can absorb); lockstitch group 4.45, staff 5; manual group 3.8, staff 4 — 21 people in total, and the balance efficiency rises to 92%. The same output with 6 fewer people; in equipment terms, 7 overlock machines, 5 coverstitch machines, 5 lockstitch machines and 4 manual tables. Fig. 29-4 plots the load per operator for both allocations next to the takt line: the further a bar is below the takt line, the more time that person spends waiting for work.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_24804990.png"><img src="img/w_24804990.png" alt="Worked example: operations and observed cycle times from the Textiles Scholars public operation bulletin, SMV with a 15% allowance" loading="lazy"></a><figcaption>Fig. 29-4 Balance chart of the T-shirt line: one operator per operation versus grouping by machine type</figcaption></figure>
+<p>The 92% on paper shrinks on the floor. Operators work at different speeds and the time for each piece fluctuates; someone is absent, a machine has a thread break; when an upstream operation stops for a moment, the downstream ones run out of work. In published line-improvement cases, actual line efficiencies for T-shirt lines and similar products are often only 40%–60%: one T-shirt line, after rebalancing, went from 37 to 32 operators and from 44% to 53% efficiency (<a href="https://irispublishers.com/jtsft/fulltext/improvement-of-efficiency-and-productivity-through-machine-balancing-in-a-sewing-line.ID.000541.php">JTSFT</a>); another undershirt line rose from 54% to 60% (<a href="http://article.sapub.org/10.5923.j.textile.20150401.01.html">IJTS, 2015</a>). Balancing is the first step towards higher efficiency — but only the first.</p>
+<p><strong>Bundle line or hanger system?</strong> With the same people and the same machines, the way the work is organised makes a large difference. Virtual lab 29-1 uses discrete-event simulation to “run” the T-shirt line in the table above, with the processing time of each piece fluctuating randomly with a 12% coefficient of variation. Starting from the 22-person configuration in the public bulletin, the bottleneck is thread trimming, staffed by only 1 person, which caps capacity at 153 pieces/h; add 1 person to trimming and the bottleneck moves to neck-rib attachment at 0.345 min per person and to the two single-operator coverstitch operations, and output rises to about 170 pieces/h — whereas adding the person anywhere else hardly helps. Then compare forms of organisation: with a bundle line of 20 pieces per bundle and 600 pieces in progress, a garment takes on average three and a half hours from launch to completion; cut the bundle to 5 pieces and the work in progress to 150, and the throughput time falls to about 1 hour, but bundles have to be untied and tied more often and output drops slightly. Switching to a hanger one-piece flow with 21 people grouped by machine type gives about 190 pieces/h with only fifty-odd garments on the line and a throughput time under 20 minutes. All of these figures satisfy Little’s law from Section 29.1. Published comparative studies point the same way: the hanger system gives slightly higher line efficiency and markedly less work in progress (<a href="https://ieomsociety.org/proceedings/2023dhaka/76.pdf">IEOM, 2023</a>).</p>
+<p>Then why don’t all T-shirt factories use hanger systems? Because a T-shirt’s work content is short, its style simple and its price low; in mass production, the bundle line’s somewhat higher work in progress and longer throughput time are not fatal, whereas the hanger investment has to be spread over very cheap garments. When orders get smaller and lead times shorter, the arithmetic reverses — the subject of Section 29.5.</p>
+<h3 id="s29-4">29.4 Sweaters: knitting, linking and whole-garment</h3>
+<p><strong>Product and process</strong> Sweaters differ fundamentally from the three garments above: their panels are not cut from fabric but knitted to shape directly on a computerised flat knitting machine. As Chapter 17 explained, the flat knitting machine knits the front, back, sleeves and neck rib one panel at a time by narrowing and widening, and the edges consist of complete loops that do not ravel. Joining these panels into a garment is done not with an ordinary sewing machine but with a linking machine. A linking machine has a ring of needle points of the same gauge as the knitting machine; the operator must push the edge loops of two panels onto the points one by one so that the loops of the two panels correspond one-to-one, and the machine then locks them together with a chainstitch. A seam joined this way is as elastic as the panels themselves, flat and thin, and is key to sweater quality; but “matching the loops” depends entirely on eyesight and skill, making it the most labour-intensive operation in a sweater factory. A paper costing a fully fashioned sweater reports that a linker can link only 15 pieces a day, about 32 minutes per piece on average, and that processing charges including linking make up 65% of the cost of a sweater (<a href="https://www.scirp.org/html/1-2160154_103297.htm">Mohibullah et al., 2020</a>; the example uses semi-automatic flat machines). After linking come hand-sewing of yarn ends and mending, then milling or washing to soften the hand, and finally steaming on a pressing board to set the shape.</p>
+<p><strong>Floor layout</strong> A sweater factory’s floor is easy to recognise. In the knitting hall, dozens or hundreds of flat knitting machines stand in rows, and one machine minder tends several of them, changing yarn, tying in ends and dealing with stop alarms; the linking hall, by contrast, is labour-dense, one person per linking machine. A flat knitting machine can knit day and night, but linking can only follow people’s shifts, so large stocks of panels waiting to be linked often pile up between the two halls.</p>
+<p><strong>Whole-garment knitting</strong> Case T5 asks: can a sweater do without linking? The whole-garment flat knitting machine’s answer is to join the panels while knitting. It uses four needle beds, knitting the body and both sleeves as tubes; below the armpits the sleeve tubes are merged with the body tube, and the shoulders are then closed while narrowing, so that a complete sweater comes off the machine with only a few yarn ends to finish. Press reports say a pullover can be knitted in about 30 minutes; conventional methods waste about 25% of the fabric in cutting and seam allowances, whereas whole-garment wastes almost none; about 13 000 such machines were produced between 1998 and 2022, and garments made on them account for only about 1% of all apparel (<a href="https://www.nippon.com/en/japan-topics/g02281/">nippon.com</a>). Another report says one worker can tend 10 such machines (<a href="https://phys.org/news/2016-03-japan-apparel-industry-hi-tech-future.html">Phys.org, 2016</a>).</p>
+<p><strong>Worked example: the labour account of two processes</strong> Take a 12-gauge plain-knit crew-neck pullover and assume the following data for the two processes (all are worked-example values except the linking time and the whole-garment knitting time, which come from the sources above). Fully fashioned panels plus linking: a two-system flat machine knits a set of panels in about 17 minutes (cf. the worked example in Section 17.8; plain knit is faster than jacquard), and one minder tends 8 machines, equivalent to about 2.1 minutes of labour per piece; linking 32 minutes; hand-sewing and mending 10 minutes; washing, pressing and inspection 8 minutes. Whole-garment: 30 minutes of machine time, again one person tending 8 machines, equivalent to 3.75 minutes per piece; no linking; finishing yarn ends 5 minutes; washing, pressing and inspection also 8 minutes. Fig. 29-5 draws this account.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_7d16e7c0.png"><img src="img/w_7d16e7c0.png" alt="Worked example: linking time converted from Mohibullah et al. (2020) at 15 pieces per person per day, whole-garment machine time of 30 min from nippon.com, other values illustrative" loading="lazy"></a><figcaption>Fig. 29-5 Labour and machine time per piece for two sweater processes (worked example)</figcaption></figure>
+<p>The account is clear. The fully fashioned process needs about 52 minutes of labour per piece, linking alone accounting for about 60% of it; whole-garment eliminates linking and most of the hand-sewing, bringing labour per piece down to about 17 minutes. But look at the machines instead: for the same sweater, whole-garment occupies a flat machine for 30 minutes, nearly twice as long as an ordinary two-system machine, and the four-bed machine itself is much more expensive. To make 1000 pieces a day, with machines running 22 hours a day, the conventional process needs about 13 flat machines and 67 linkers, whole-garment about 23 machines and no linkers. Which is cheaper depends on local wages, machine prices and depreciation periods — and on the style: for complex styles, whole-garment programs are hard to write and machine times longer, and some designs still need local seaming. This also explains why, more than twenty years after its introduction, whole-garment knitting supplies only about 1% of apparel. In practice factories often run both processes side by side: high-priced, small-batch styles that call for seamlessness go whole-garment, while bulk orders stay with fully fashioned panels and linking.</p>
+<h3 id="s29-5">29.5 Small-batch quick response: when batches shrink</h3>
+<p><strong>Where the problem comes from</strong> In the past a style often ran to thousands or tens of thousands of pieces, and a 30-person long line could run it for weeks. Online retail changed this: brands first test-sell in small batches, reorder if a style sells and stop if it doesn’t. In its public description, one apparel manufacturing platform states the goal bluntly: cut the industry average of a 1000-piece minimum order and 15-day delivery to a 100-piece minimum and 7-day delivery (<a href="https://news.qq.com/rain/a/20200917A02CPE00">Tencent News, 2020</a>, in Chinese). With batches down to 100–200 pieces the factory has to change styles several times a day — the problem of case T2: how should the line be reorganised?</p>
+<p>A style change costs in two ways. The first is downtime: machines must be rearranged and rethreaded, feet and edge guides changed, stitch length and differential reset, and test seams sewn. The second is less visible — learning: when operators get a new style, their speed falls short of their trained level for the first few days. An experimental study in Bangladeshi garment factories found that on the first day of a new style the line efficiency averaged only 30.1%, against a long-run average of 47.6%, and that it took four or five production days to return to the long-run level (<a href="https://www.cerge.cuni.cz/pdf/events/papers/160129_t.pdf">Menzel, 2015</a>). With large batches these two losses are negligible when spread over tens of thousands of pieces; with a batch of only one or two hundred, the order is sometimes finished before the operators have got up to speed.</p>
+<p><strong>Model</strong> Let us write both losses as formulas. Let a line have N operators, the style’s standard minutes be SAM (min/piece), and the steady-state line efficiency after learning be E∞. In hour t after the style change, efficiency climbs exponentially:</p>
+<div class="math">\[E(t) = E_\infty\left[1-(1-r_0)\,e^{-t/\tau}\right]\]</div>
+<p>r₀ is the ratio of the efficiency just after the change to the steady-state efficiency, taken from the study above as 30.1 ÷ 47.6 ≈ 0.63; τ is the learning time constant, and after about three τ the line has essentially recovered. Counting from the end of the changeover, cumulative output is the integral of efficiency over time:</p>
+<div class="math">\[Y(t) = \frac{60N}{\text{SAM}}\,E_\infty\left[t-(1-r_0)\,\tau\left(1-e^{-t/\tau}\right)\right]\]</div>
+<p>The time T_Q needed to finish Q pieces is found by solving Y(T_Q) = Q; adding the changeover downtime C, all the labour time occupied by this batch is spread over its pieces:</p>
+<div class="math">\[\text{labour per piece} = \frac{60N\,(C+T_Q)}{Q}\quad\text{(min/piece)}\]</div>
+<p><strong>Worked example: the break-even batch between a long line and a cell</strong> Take a style with SAM = 12 min and compare two forms of organisation (all values except r₀ are worked-example values). A long line of 30 people, one operation each: the division of labour is fine and motions highly repetitive, so the steady-state efficiency is taken as 70%; but each style change means rearranging and adjusting dozens of machines, a downtime of C = 4 hours, and all 30 people have to relearn, τ = 12 hours. A U-shaped cell of 8 people: each operator can do several operations and has to walk between several machines, so the steady-state efficiency is taken lower, at 58%; but with few machines a style change costs only 0.5 hours, and multi-skilled operators who see the whole garment learn faster, τ = 6 hours. Fig. 29-6 shows how labour per piece varies with batch size for the two lines.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_b27b372e.png"><img src="img/w_b27b372e.png" alt="Worked example: computed with the model of Section 29.5, r₀ = 0.63 from Menzel (2015), other parameters are worked-example values" loading="lazy"></a><figcaption>Fig. 29-6 Order batch size and labour per piece: long line versus U-shaped cell (worked example)</figcaption></figure>
+<p>The curves show three things. First, for infinitely large batches the long line is cheaper: at steady state it needs 12 ÷ 0.70 = 17.1 min per piece and the cell 12 ÷ 0.58 = 20.7 min — the benefit of the division of labour, and the reason long lines dominated the era of large batches. Second, the smaller the batch, the more heavily the long line’s changeover losses weigh: at 150 pieces the long line needs 74 min per piece, more than four times its steady-state value, while the cell needs only 28 min. The two curves cross at about 3800 pieces, the break-even batch for this set of parameters: traditional bulk orders of several thousand pieces or more suit the long line, while the 100–200 pieces of small-batch quick response lie far to the left of the break-even point. Third, because the cell has few people, its delivery time for one batch is not shorter than the long line’s (at 150 pieces the long line needs 6.2 hours and the cell 8.6 hours), but a 30-person floor can form three or four cells working on three or four styles at once, so the overall delivery capacity is actually greater.</p>
+<p>For a long line to take small orders too, its changeover losses must be cut, and with small batches the biggest of these is downtime. At 150 pieces, cutting the long line’s changeover downtime C from 4 hours to 0 lowers labour per piece from 74 min to about 26 min, on a par with the cell (28 min); between 300 and 1200 pieces the difference between the two is only about a minute. The remaining gap comes from learning: 30 people learning a new style at once ramp up more slowly than an 8-person cell. Cut C to 1 hour and the learning time constant to 4 hours, and the long line regains the advantage above 800 pieces. Downtime is cut by quick changeover: machines on castors, quick couplings, electronic stitch length and electronic differential feed that can be recalled from programs (Chapter 14), and pattern sewers where changing the clamp changes the pattern (Chapter 15); learning is cut by standardised methods, illustrated instructions on work-centre terminals and multi-skill training. The “Batch size and style changes” page of Virtual lab 29-1 lets you adjust these parameters and watch how the two curves move.</p>
+<p><strong>How cells are organised</strong> Modular production (also called cellular production or the Toyota Sewing System) usually works in teams of 4–17 people, each responsible for 2–4 operations, with machines arranged in a U shape; operators stand or sit on movable stools and move among several machines (<a href="https://textilestudycenter.com/modular-production-system-cellular-garment-manufacturing-toyota-sewing-system/">Textile Study Center</a>). The only garments on the line are the few in the operators’ hands, and throughput time is measured in minutes. A frequently quoted set of figures: after converting to modular production, the throughput time of knit shirts fell from 4 days to 10 minutes and of dress shirts from 3 days to 1 hour (<a href="https://vidyamitra.inflibnet.ac.in/data-server/eacharya-documents/56b0853a8ae36ca7bfe81449_INFIEP_79/31/ET/79-31-ET-V1-S1__new_unit_3.pdf">INFLIBNET course material</a>, citing an early US survey).</p>
+<p>U-shaped cells often use a very clever way of sharing work called the “bucket brigade”. Operators are not tied to particular operations; each carries one garment forward. When the last operator finishes a garment, she walks back and takes over the garment from the person before her and continues it; that person in turn walks back and takes over from the one before, and so on, while the first operator returns to the entrance for new cut pieces. As long as the operators are sequenced from slowest to fastest, the faster ones naturally do longer stretches and the whole cell balances itself, with no engineer needed to calculate the operation allocation; in the reverse order, the fast workers catch up with the slower ones ahead of them and have to wait. In Virtual lab 29-1, the same 7 people make about 50 pieces per hour when sequenced fastest to slowest and about 60 when sequenced slowest to fastest — about 8.6 pieces per person-hour, comparable with the simulated line of Section 29.3 (about 7–9 per person), but with only 7 pieces in progress.</p>
+<h3 id="s29-6">29.6 Comparing the five factories: points for equipment selection</h3>
+<p>Putting the five sections together yields a very practical line of reasoning: when designing or upgrading a garment factory, first ask about the product’s operation structure (where the work content goes), then about the fabric (which stitches, which machines), and finally about batch size and lead time (how the line is organised). The table below lines up the five factories’ answers. The work-content column uses public data or worked examples cited in this chapter and indicates only the order of magnitude.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Factory</th>
+<th>Typical batch</th>
+<th>Work content per piece (order of magnitude)</th>
+<th>Production organisation</th>
+<th>Key equipment (book chapters)</th>
+<th>Digitalisation focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Made-to-measure suits</td>
+<td>1 piece</td>
+<td>About 300 operations; jacket about 2 hours</td>
+<td>Hanger one-piece flow</td>
+<td>Single-ply cutter, fusing press, sleeve-setting machine (6), eyelet buttonholer (11, 15), form press</td>
+<td>Continuous data from measurement to work centre; an RFID tag on every piece</td>
+</tr>
+<tr>
+<td>Shirts</td>
+<td>Thousands</td>
+<td>About 22 minutes</td>
+<td>Parts lines + assembly line</td>
+<td>Automatic units for collars, cuffs and plackets; pocket setter; buttonholers and button sewers (11, 12, 15)</td>
+<td>Automating small parts and managing programs</td>
+</tr>
+<tr>
+<td>T-shirts and knits</td>
+<td>Thousands to tens of thousands</td>
+<td>About 6 minutes</td>
+<td>Bundle line or hanger system</td>
+<td>Four-thread overlock machine (9), coverstitch machine (10)</td>
+<td>Line balancing; connected machines with downtime statistics (26)</td>
+</tr>
+<tr>
+<td>Sweaters</td>
+<td>Hundreds to thousands</td>
+<td>Linking about 30 minutes; whole-garment machine time about 30 minutes</td>
+<td>Knitting hall + linking hall</td>
+<td>Computerised flat knitting machine, whole-garment flat knitting machine (17), linking machine</td>
+<td>Pattern programs and networked flat knitting machines</td>
+</tr>
+<tr>
+<td>Small-batch quick response</td>
+<td>100–200 pieces</td>
+<td>Depends on style</td>
+<td>U-shaped cells, hanger system</td>
+<td>General-purpose machines with electronic stitch length and electronic differential (14); quick changeover</td>
+<td>Programmed style selection, scheduling and changeover</td>
+</tr>
+</tbody>
+</table></div>
+<p>For a designer of sewing equipment this table can be read another way: each type of factory makes different demands on the equipment. Made-to-measure suits need machines that can receive the parameters of “this piece” — the electronic control and networking of Chapters 14 and 26. Shirt factories want dedicated, reliable automatic units with quick clamp changes. T-shirt factories want overlock and coverstitch machines that are fast, durable and easy to adjust; the clearances and timings of Chapter 9 show up here as downtime. Sweater factories want whole-garment machines with shorter knitting times; the needle-selection and carriage speeds of Chapter 17 end up as the “30 minutes on the machine” in this account. Small-batch quick response wants fast style changes: a machine that needs a spanner to change the stitch length is a nuisance on a floor that changes styles several times a day. How good a piece of equipment is must ultimately be measured in the factory, with accounts like these.</p>
+<aside class="field">
+<p><strong>Shop-floor notes</strong></p>
+<ul>
+<li>Before launching a new style, do an operation breakdown: list each operation’s SMV and machine type, calculate the takt time and theoretical headcount, combine small operations on the same machine type first, then set staffing.</li>
+<li>When output will not rise, look for the work centre with the biggest pile in front of it: that is the bottleneck. Add people at the bottleneck; adding them anywhere else does nothing.</li>
+<li>Work in progress, output and throughput time obey “work in progress = output × throughput time”; to shorten delivery, first cut work in progress and bundle size.</li>
+<li>For style changes, keep a checklist of machine settings to adjust (stitch length, differential ratio, looper-thread tension, knife width), and store electronic settings as program numbers to recall next time.</li>
+<li>Skill-dependent operations such as linking, setting sleeves and collar points are the priorities for training new operators and for quality checks — and the first places to consider for automation investment.</li>
+</ul>
+</aside>
+<h3 id="x50169">Chapter 29 exercises</h3>
+<ol>
+<li>The target output of the T-shirt line is raised to 250 pieces per hour. Using the SMVs of Section 29.3, calculate the takt time and theoretical headcount. When grouping by machine type, how many people should each group have?<details class="ans"><summary>Answer</summary>Takt 14.4 s, theoretical 24.3 people; overlock 8, coverstitch 7, lockstitch 6, manual 5 — 26 people in total</details></li>
+<li>A bundle line has 600 pieces in progress and an output of 175 pieces/h; after converting to a hanger system it has 55 pieces in progress and an output of 191 pieces/h. Find the average throughput time in each case.<details class="ans"><summary>Answer</summary>About 206 minutes; about 17 minutes</details></li>
+<li>A shirt line makes 140 pieces per hour; a hand-made pocket takes 1.40 min and the pocket setter 12 s per piece. If the pocket setter’s actual availability is only 70%, can one machine serve this line? How many manual operators does it replace?<details class="ans"><summary>Answer</summary>The pocket setter needs 28 ÷ 0.7 = 40 minutes per hour, so one machine is enough; it replaces about 3 manual operators</details></li>
+<li>A suit sleeve cap measures 50 cm and the armhole 47 cm. What is the average ease? If the 12 cm of armhole at the top of the cap must take in half of the total ease, what ratio of upper-ply to lower-ply feed should be set for that segment? How is this similar to and different from the differential ratio of Section 9.10?<details class="ans"><summary>Answer</summary>6.4%; 1.5 ÷ 12 gives a local ease of 12.5%, so the ratio of upper to lower feed is about 1.125</details></li>
+<li>A sweater factory makes 1000 pieces a day. Using the worked example of Section 29.4, with flat machines running 22 hours a day and linkers working 8-hour shifts, find the number of flat machines and linkers for each process. If a whole-garment machine costs 2.5 times as much as an ordinary flat machine, list the other data you would need to decide which process is cheaper.<details class="ans"><summary>Answer</summary>Fully fashioned: 13 flat machines and 67 linkers; whole-garment: 23 machines; you also need wages, depreciation period, energy consumption, yarn waste and style structure</details></li>
+<li>Using the model and worked-example parameters of Section 29.5, calculate the labour per piece for both forms of organisation at a batch of 300 pieces; then recalculate with the long line’s changeover downtime C set to 0, and explain where most of the long line’s extra labour comes from.<details class="ans"><summary>Answer</summary>Long line about 49 min/piece, cell about 25 min/piece; with C = 0 the long line needs about 25 min/piece, level with the cell — the extra 24 min or so is 30 people × 4 hours of downtime spread over 300 pieces</details></li>
+<li>On the U-shaped-cell page of Virtual lab 29-1, sequence the 7 operators “fastest to slowest” and then “slowest to fastest”; record the output and each operator’s share of time spent working, and explain why a bucket brigade should put the fastest person at the exit.</li>
+</ol>
+<h3 id="x78051">Companion resources</h3>
+<p><a href="#lab-line" class="labref">Virtual lab 29-1 Sewing-line simulation</a> Takes the T-shirt line of Section 29.3 and switches between three forms of organisation: bundle line, hanger one-piece flow and U-shaped cell. You can staff one operator per operation or group by machine type, and adjust bundle size, work-in-progress cap, number of hanger places and the bucket-brigade order; an animated floor plan shows panels flowing and each person busy or idle, with live statistics for output, line efficiency, work in progress, throughput time and balance efficiency. The “Batch size and style changes” page plots the break-even batch with the model of Section 29.5. Includes a 7-step guided tour and 6 automatically checked tasks.</p>
+<p><strong>Companion videos</strong> The table below lists public videos for each section, mostly from the official channels of equipment makers or industry bodies. They are for seeing how the processes and equipment move, not as an introduction to any company. All the videos are on YouTube; for classroom use in mainland China, download them beforehand or substitute similar videos from domestic platforms.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Video</th>
+<th>What to watch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>29.1 Suits</td>
+<td><a href="https://www.youtube.com/watch?v=ZJ1Gctf_Bco">Production in a made-to-measure suit factory</a></td>
+<td>Measurement data, single-ply cutting, RFID tags and hanger one-piece flow</td>
+</tr>
+<tr>
+<td>29.1 Suits</td>
+<td><a href="https://www.lectra.com/en/fashion/products/virga-fashion">Single-ply on-demand cutting system</a></td>
+<td>The cutter that cuts “one suit at a time” in a made-to-measure factory</td>
+</tr>
+<tr>
+<td>29.1 Suits</td>
+<td><a href="https://www.youtube.com/watch?v=r6jRks5N8xE">Sleeve-setting workstation</a></td>
+<td>Machine sleeve setting with segment-by-segment easing</td>
+</tr>
+<tr>
+<td>29.2 Shirts</td>
+<td><a href="https://www.youtube.com/watch?v=NDAGUz1Cmmw">Template machine sewing a shirt collar</a></td>
+<td>The collar is held in a clamp and sewn automatically by the X–Y mechanism</td>
+</tr>
+<tr>
+<td>29.2 Shirts</td>
+<td><a href="https://www.youtube.com/watch?v=oaOtX1btpUM">Automatic pocket setter</a></td>
+<td>Folding, positioning and sewing at one station</td>
+</tr>
+<tr>
+<td>29.2 Shirts</td>
+<td><a href="https://www.youtube.com/watch?v=6D5-zVjt27w">Buttonholer with automatic feeder</a>, <a href="https://www.youtube.com/watch?v=TBYfQr6P5QA">button sewer</a></td>
+<td>Continuous buttonholing and button sewing on the front placket</td>
+</tr>
+<tr>
+<td>29.3 T-shirts</td>
+<td><a href="https://www.youtube.com/watch?v=OwQDteiCpEs">Basic T-shirt from cutting to packing</a></td>
+<td>The operations of a whole T-shirt line; compare with the operation table in Section 29.3</td>
+</tr>
+<tr>
+<td>29.3 T-shirts</td>
+<td><a href="https://www.youtube.com/watch?v=oYpdMhUZjWw">Cylinder-bed coverstitch machine hemming</a></td>
+<td>The covering stitch and the cylinder bed</td>
+</tr>
+<tr>
+<td>29.3 T-shirts</td>
+<td><a href="https://www.youtube.com/watch?v=yOcr_b3SP6U">Automatic neck-rib attaching unit</a></td>
+<td>An overlock machine with automatic feed attaching the neck rib</td>
+</tr>
+<tr>
+<td>29.4 Sweaters</td>
+<td><a href="https://www.youtube.com/watch?v=9ioOcoMmkkA">Computerised flat knitting machine</a></td>
+<td>Carriage traversing and panels being shaped (compare Chapter 17)</td>
+</tr>
+<tr>
+<td>29.4 Sweaters</td>
+<td><a href="https://www.youtube.com/watch?v=2yOxTy7Vrtg">Linking</a></td>
+<td>Loops pushed onto the points one by one, then chain-stitched</td>
+</tr>
+<tr>
+<td>29.4 Sweaters</td>
+<td><a href="https://www.youtube.com/watch?v=CyJQ2ZkRFIM">Whole-garment knitting</a>, <a href="https://www.youtube.com/watch?v=ArIXJp-uIAw">installing and test-knitting a whole-garment machine</a></td>
+<td>A complete garment comes off the machine, with no linking</td>
+</tr>
+<tr>
+<td>29.5 Small-batch quick response</td>
+<td><a href="https://www.youtube.com/watch?v=OxliQo7evFY">Garment hanger system</a></td>
+<td>Hangers routed automatically between the main rail and work centres</td>
+</tr>
+<tr>
+<td>29.5 Small-batch quick response</td>
+<td><a href="https://www.youtube.com/watch?v=os054n8NRI0">Single-piece hanger production system</a></td>
+<td>Single pieces flowing between work centres; compare with Virtual lab 29-1</td>
+</tr>
+</tbody>
+</table></div>
+<p>All public sources cited in this chapter are linked in the text and are used only to illustrate technical principles; output and efficiency figures from manufacturers’ product literature are the manufacturers’ claimed values.</p>

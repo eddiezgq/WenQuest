@@ -1,0 +1,314 @@
+<p class="eyebrow">auto</p><h1>auto</h1><div class="seam" aria-hidden="true"></div>
+<div class="chips"><span class="chips-label">本章互动资源</span><a class="chip" href="#lab-config"><b>虚拟实验</b>零件库快速配套器</a><a class="chip" href="#lab-servo"><b>虚拟实验</b>停针定位：伺服调参</a><a class="chip" href="#lab-solenoid"><b>虚拟实验</b>电磁铁驱动：吸合与释放</a></div>
+<aside class="field"><p>本章是第六篇（第 19–22 章）的总纲。读者需要第 13 章（电机、驱动、传感、停针、电磁铁）、第 14 章（平缝机电控时序）和第 18 章（电控箱的设计、制造与测试）。本章的模块参数、价格和判据都是示意值；缝制电控模块在问渠零件库里用的是建议编号，计划入库，目前还不在库里。</p></aside>
+<p>第五篇讲了电控的原理：伺服怎样停针，电磁铁要多久吸合，剪线为什么要降速，电控箱怎样散热、抗干扰和老化。读到这里，一个自然的问题是：能不能依照这些原理，自己动手做出一台能缝的电控样机？不是在纸上画框图，而是真的接线、写固件、上机缝布，再一轮轮测试、改进，直到它像一台工业产品那样可靠。</p>
+<p>第六篇回答这个问题。本章先搭好共同的底座：一套参考架构，用同一块主控板、同一类模块和同一套固件框架，做平缝机、包缝机、电子花样机和缩比横机四种原型（统称问渠缝制电控原型平台 WQ-SC）；把这些模块按问渠零件库的条目格式整理出来，从需求表出发算出该选哪些模块、生成物料清单、接线表和固件配置；再讲固件怎样以主轴转角为时间基准调度动作，样机怎样先在电脑上“缝”，怎样接入数字工厂，以及从实验室原型走到工业级要过哪些关。第 20 章做平缝机和包缝机，第 21 章做花样机和横机，第 22 章专讲自动化测试，都建立在本章的定义上。</p>
+<h3 id="s19-1">19.1 引子：从教材到一台能缝的样机</h3>
+<p>设想一个三四人的学生小组，一个学期约 12 周，任务是做出一台电控平缝机原型：买一台拆掉离合器电机的平缝机机头，配上伺服电机、电磁铁和一块主控板，要求能按脚踏调速，松开脚踏能自动剪线、拨线、停在上针位、抬压脚，起缝和结束能自动回针，最高 5000 r/min。第 13、14 章已经讲清楚这些动作“应该”怎样做，难处在别处：选哪个电机、哪个电磁铁，多大的电源，主控板的输入输出够不够；固件从哪里写起；样机做出来以后，怎样知道它“好了”，又怎样知道下一次修改有没有把别的功能改坏。</p>
+<p>有经验的工程团队对付这类问题，靠的是一个短而快的循环：搭—测—改（图 19-1 左）。“搭”是按物料清单和接线表把系统装起来，把固件配置和事件表的初值写进去；“测”是从电脑上的单元测试、软件在环，到接上真主控板的硬件在环，再到真机头的测试台，让脚本自动跑，每一条结果都对应需求表里的一条需求；“改”的顺序是先改参数，再换模块，最后才改机械。每一轮都留下数据：测试报告、固件版本、参数版本。没有这些数据，循环就退化成“试试看”，改了三轮还说不清哪一处改动起了作用。</p>
+<figure class="fig"><a class="zoom" href="img/fig_19_iterate.png"><img src="img/fig_19_iterate.png" alt="图 19-1　搭—测—改与三个月计划" loading="lazy"></a><figcaption>图 19-1　一个学生小组的三个月：搭—测—改的循环（左）和 12 周计划（右）（示意）</figcaption></figure>
+<p>图 19-1 右边是一个 12 周的计划。前两周写需求表、做快速配套（19.4 节），模块下单；第二到第五周一边等模块、装机接线，一边在电脑上把固件框架和软件在环跑起来；第六周达到 P0“能动”：主轴能调速、能停针，事件表能驱动电磁铁；第九周达到 P1“功能全”；最后几周在测试台上自动测试、迭代、写报告。这个节奏能成立，前提是模块不用自己设计：零件库里有现成的、参数清楚的模块，接口统一，固件框架也是现成的。这正是本章要准备的东西。</p>
+<p>实验室原型和工业产品差在哪里？表 19-1 列了几项。差距主要不在“功能”，而在“确定性”：同样的动作，在电压波动、温度变化、零件公差和十年的磨损下，是否每一次都对；以及这件事能不能被测出来、被证明。第 18 章讲的热设计、EMC、老化和生产测试，就是补这些差距的工作，19.8 节会把它们排进一条路线。</p>
+<div class="tbl"><table><caption>表 19-1　实验室原型与工业产品的差别（示意）</caption><thead><tr><th>方面</th><th>实验室原型（P0/P1）</th><th>工业产品</th></tr></thead><tbody>
+<tr><td>硬件形态</td><td>现成模块用线缆连起来，开放式安装</td><td>集成电路板、密封机箱，按成本优化</td></tr>
+<tr><td>验证范围</td><td>额定电压、室温、一台样机</td><td>电压 ±10%、5–45 °C、批量的零件公差（第 18 章）</td></tr>
+<tr><td>可靠性</td><td>能连续缝几小时</td><td>两班制十年；有老化筛选和返修数据</td></tr>
+<tr><td>EMC 与安全</td><td>不出明显故障即可</td><td>按 IEC 60204-31 等标准试验并认证</td></tr>
+<tr><td>测试</td><td>手动 + 部分脚本</td><td>全部需求有自动用例，出厂测试 EOL 每台都跑</td></tr>
+<tr><td>版本管理</td><td>常常只有“最新版”</td><td>固件、参数、BOM 都有版本，随设备上报，可追溯</td></tr>
+</tbody></table></div>
+<h3 id="s19-2">19.2 参考架构：一套平台，四种机器</h3>
+<p>平缝机、包缝机、花样机和横机看起来差别很大，电控的骨架却相同：一根“主令”（主轴或机头）决定时间，若干执行器按主令的位置动作，传感器把状态报回来，控制器在中间调度，再把数据送到车间系统。WQ-SC 把这个共同的骨架固定下来，分成五层，加上最下面的机械（图 19-2）。</p>
+<figure class="fig"><a class="zoom" href="img/fig_19_platform.png"><img src="img/fig_19_platform.png" alt="图 19-2　WQ-SC 参考架构" loading="lazy"></a><figcaption>图 19-2　WQ-SC 参考架构：五层加机械，四种原型共用（示意；括号内为零件库建议编号，计划入库）</figcaption></figure>
+<p><strong>执行与传感层</strong>　主轴用交流永磁同步伺服电机，带 2500 线增量编码器，四倍频后每转 10000 个计数，带 Z 相零位；送布、X–Y、度目、牵拉用闭环步进电机；剪线、拨线、倒缝、抬压脚、选针器用推拉式电磁铁；压框、压脚、吹气用气缸和电磁阀；脚踏用霍尔传感器，布边和断线用光电传感器，原点和限位用接近开关，此外还有电流和温度检测。<strong>驱动层</strong>是伺服驱动器（速度或转矩模式，经 CAN FD 或 RS-485 接主控）、步进驱动器（脉冲/方向或总线）、电磁铁驱动板（低边 MOSFET，强激磁加斩波维持，稳压管续流，第 13 章）和气阀驱动。<strong>实时控制层</strong>是 WQ-SC 主控板：一颗 170 MHz 量级的 Cortex-M4F 级微控制器，带编码器接口定时器、高分辨率 PWM 和 CAN FD，跑实时操作系统；横机的逐针选针可以加一块小 FPGA（第 17 章）。<strong>人机与联网层</strong>是网关模块（以太网或 Wi-Fi，跑 MQTT 客户端和网页参数界面）和可选的 7 英寸触摸屏。最上面是<strong>数字工厂接口</strong>：设备消息按问渠数字工厂的主题和信封格式上总线（19.7 节）。</p>
+<p>表 19-2 是四种原型各用哪些模块。可以看到，主控、网关、电磁铁驱动、电源和固件框架完全共用；差别集中在“主令”是什么、有几根位置轴、电磁铁做哪些动作。这就是“一套平台，四种机器”的含义：做完平缝机，包缝机只是换一张需求表、少几个电磁铁、多一个气阀；花样机多两根步进轴；横机把主令从主轴换成机头。</p>
+<div class="tbl"><table><caption>表 19-2　四种原型用到的模块（按 19.4 节的默认需求自动配套的结果，示意）</caption><thead><tr><th>模块</th><th>平缝机 WQ-SC/LS</th><th>包缝机 WQ-SC/OL</th><th>花样机 WQ-SC/PS</th><th>缩比横机 WQ-SC/FK</th></tr></thead><tbody>
+<tr><td>主令 / 时间基准</td><td>主轴转角</td><td>主轴转角</td><td>主轴转角</td><td>机头位置</td></tr>
+<tr><td>主轴伺服 + 驱动</td><td>400 W，3 A</td><td>400 W，3 A</td><td>250 W，1.5 A</td><td>—</td></tr>
+<tr><td>步进轴</td><td>—</td><td>—</td><td>X、Y（闭环）</td><td>机头、度目 ×2、牵拉</td></tr>
+<tr><td>电磁铁动作</td><td>剪线、拨线、倒缝、抬压脚</td><td>链线切刀、抬压脚</td><td>剪线、拨线、松线</td><td>纱嘴 ×2、选针器 ×2</td></tr>
+<tr><td>气动</td><td>—</td><td>吸线头气阀</td><td>压框气缸、电磁阀各 2</td><td>—</td></tr>
+<tr><td>主控 + 扩展 I/O</td><td>主控 S</td><td>主控 S</td><td>主控 S + 扩展板</td><td>主控 S（可加 FPGA）</td></tr>
+<tr><td>网关、触摸屏</td><td>网关</td><td>网关</td><td>网关 + 触摸屏</td><td>网关 + 触摸屏</td></tr>
+<tr><td>机械</td><td>现成平缝机头</td><td>现成包缝机头</td><td>自制 X–Y 平台 + 平缝机头</td><td>自制 60 针缩比样机（E5）</td></tr>
+</tbody></table></div>
+<p><strong>为什么用主轴转角做时间基准</strong>　第 15 章已经讲过一次：主轴转速并不恒定，起缝慢、中间快、剪线前又慢，负载变化也会让它一转之内忽快忽慢。剪线电磁铁、倒缝切换、X–Y 的移动都要对准机构的位置（针在不在布里、送布牙在不在针板下面），而不是对准某个时刻。如果固件写成“上止点后 8 ms 通电”，主轴一变速，动作就错位了；写成“主轴转到 205° 时通电”，不管转速如何，动作总是对准机构。时间只在一个地方进来：执行器有延迟，延迟折算成转角是 6·n·t 度（第 13 章），所以凡是在转动中动作的执行器，都要按动作时的转速检查这个折算角。横机没有主轴，主令是机头的位置，道理完全相同：选针器按针位而不按时刻触发（第 17 章）。</p>
+<h3 id="s19-3">19.3 零件库里的电控模块</h3>
+<p>“快速配套”能成立，要有一个参数清楚、可以按参数检索的零件库。问渠零件与机器人库是课程和数字工厂共用的库，目前分四部分：A 标准件（如 A-BRG-DG 深沟球轴承、A-BSC-SFU 滚珠丝杠、A-LGD-RAIL 直线导轨、A-PUL-HTD 同步带轮、A-CPL-JAW 梅花联轴器、A-SPR-CMP 压缩弹簧）；B 机器人整机；C 机构（如 C-CAM-DISC 盘形凸轮、C-LNK-SLIDER 曲柄滑块、C-BLT-BELT 带传动、C-SCN-LEAD 丝杠）；D 厂商器件（目前是机器人用的执行器、传感器，如 D-ACT-ROBOTIS-X、D-LDR-SICK-TIM）。</p>
+<p><strong>条目格式</strong>　每个条目是一个目录：<code>entry.yaml</code> 写身份（编号、种类、中英文名、类别、标签、标准）、参数定义、出处与许可、教学说明和工厂对应；<code>specs.csv</code> 是规格表，一行一个规格。参数定义是关键：每个参数有一个 <code>key</code>、中文名、英文名、单位和角色 <code>role</code>。角色有四种：<code>key</code> 是区分规格的关键参数（丝杠的公称直径和导程），<code>dim</code> 是外形与安装尺寸（造三维模型、画安装图用），<code>perf</code> 是性能参数（额定动载荷、转矩、转速，选型判据比的就是它），<code>info</code> 是说明性信息（样本型号）。例如库里的 A-BSC-SFU，<code>d0_mm</code>、<code>Ph_mm</code> 是 key，螺母外径、法兰尺寸是 dim，<code>Ca_N</code>、<code>C0a_N</code> 是 perf；规格 16x10 那一行写着公称直径 16 mm、导程 10 mm、钢球直径 3.175 mm、额定动载荷 10817 N，并注明数据出自哪份样本。条目要通过库的格式校验（<code>schema/entry.v1.json</code>）才能发布。</p>
+<p><strong>建议入库的缝制电控模块</strong>　缝制电控模块目前还不在库里。表 19-3 是本书给出的建议编号和关键参数，一律是“建议编号，计划入库”。编号按库的规则写成“部分-类别-名称”，规格用后缀区分，如 D-MOT-PMSM/400 表示 400 W 那一档；本书的算例和虚拟实验 19-1 用的规格后缀和参数都是示意值，不对应任何厂商的型号。</p>
+<div class="tbl"><table><caption>表 19-3　缝制电控模块的建议编号（计划入库）与参数定义（示意）</caption><thead><tr><th>建议编号</th><th>中文名 / 英文名</th><th>perf 参数（key）</th><th>其他参数（key，role）</th></tr></thead><tbody>
+<tr><td>D-MOT-PMSM</td><td>交流永磁同步伺服电机 / AC PMSM servo motor</td><td>rated_power_W, rated_speed_rpm, max_speed_rpm, rated_torque_Nm, peak_torque_Nm, rotor_inertia_kgm2, kt_NmA</td><td>encoder_ppr（perf）；法兰、轴径（dim）</td></tr>
+<tr><td>D-DRV-SERVO</td><td>伺服驱动器 / Servo drive</td><td>supply_V, cont_current_A, peak_current_A, brake_energy_J</td><td>bus：CAN FD / RS-485，modes（info）</td></tr>
+<tr><td>D-MOT-STEP</td><td>混合式步进电机 / Hybrid stepper motor</td><td>holding_torque_Nm, rotor_inertia_kgm2, rated_current_A, corner_speed_rpm</td><td>frame：NEMA 17/23/34（key）；closed_loop（key）</td></tr>
+<tr><td>D-DRV-STEP</td><td>步进驱动器 / Stepper drive</td><td>supply_V, current_A, microstep</td><td>interface（info）；closed_loop（key）</td></tr>
+<tr><td>D-SOL-PUSH</td><td>推拉式电磁铁 / Push-pull solenoid</td><td>stroke_mm, force_at_stroke_N, coil_R_ohm, duty_pct, hold_A, t_on_ms, t_off_ms</td><td>外形、安装孔（dim）</td></tr>
+<tr><td>D-DRV-SOL</td><td>电磁铁驱动板 / Solenoid driver board</td><td>channels, boost_V, hold_A, peak_A, clamp_V</td><td>—</td></tr>
+<tr><td>D-ENC-INC</td><td>增量编码器 / Incremental encoder</td><td>ppr, max_rpm</td><td>index（key）；output：TTL/差分（info）</td></tr>
+<tr><td>D-SNS-HALL</td><td>霍尔脚踏传感器 / Hall pedal sensor</td><td>range_mm, output_V</td><td>—</td></tr>
+<tr><td>D-SNS-PE</td><td>光电传感器（布边/断线）/ Photoelectric sensor</td><td>range_mm, response_ms</td><td>—</td></tr>
+<tr><td>D-SNS-PROX</td><td>接近开关 / Proximity switch</td><td>range_mm</td><td>type（info）</td></tr>
+<tr><td>D-CTL-WQSC</td><td>WQ-SC 主控板 / WQ-SC controller board</td><td>encoder_inputs, pwm_ch, can_fd, di, do, ai</td><td>cpu（info）</td></tr>
+<tr><td>D-IO-EXP</td><td>CAN FD 扩展 I/O 板 / CAN FD I/O expansion</td><td>di, do, ai</td><td>—</td></tr>
+<tr><td>D-GW-WQSC</td><td>网关模块（MQTT/网页）/ Gateway module</td><td>—</td><td>net, protocols（info）</td></tr>
+<tr><td>D-PSU-SMPS</td><td>开关电源 / Switch-mode power supply</td><td>V_out, P_W</td><td>—</td></tr>
+<tr><td>D-PNU-CYL / D-PNU-VLV</td><td>气缸 / 电磁阀 / Cylinder / Solenoid valve</td><td>bore_mm, stroke_mm / V</td><td>ports（info）</td></tr>
+<tr><td>D-HMI-PANEL</td><td>触摸屏 / Touch panel</td><td>size_in</td><td>interface（info）</td></tr>
+</tbody></table></div>
+<p>表中有几项是在常见样本参数之外补充的，都是选型计算离不开的：电机的转矩常数 <code>kt_NmA</code>（由转矩求电流），驱动器的制动可吸收能量 <code>brake_energy_J</code>（急停时母线能吸收多少，第 13 章），步进电机的拐点转速 <code>corner_speed_rpm</code>（矩频曲线开始下降的转速，第 13 章），电磁铁的维持电流 <code>hold_A</code> 和在标准驱动方式下（24 V 强激磁、48 V 稳压管续流）实测的吸合、释放时间 <code>t_on_ms</code>、<code>t_off_ms</code>。后几项不是元件本身的固有参数，而是“模块 + 本平台驱动板”的组合参数，入库时要在条目里写明测试条件。</p>
+<p><strong>机械件引用已有条目</strong>　原型的机械部分尽量用库里已经有的条目：X–Y 平台和横机机头用 A-LGD-RAIL（如 HGH15CA）、A-PUL-HTD（如 3M-24-15，节圆直径 22.918 mm）或 A-BSC-SFU（如 16x10），电机和主轴之间用 A-CPL-JAW，支承用 A-BRG-DG，凸轮机构的分析用 C-CAM-DISC。它们的尺寸和载荷来自库的规格表，选型时直接引用。库里没有的也要如实写：同步带本身目前不在库里，要外购；库里最小的梅花联轴器 A-CPL-JAW/LM1 适用轴径 12–25 mm，转动惯量 2×10⁻⁴ kg·m²，用在小丝杠轴上偏大（19.4 节会看到它的后果）。</p>
+<h3 id="s19-4">19.4 快速配套：从需求到 BOM</h3>
+<p>快速配套是一条固定的流水线（图 19-3）：写需求表；按第 13–17 章的公式算出每类模块要满足的判据；到零件库里按 perf 参数筛选，每类挑满足判据的最便宜规格；自动生成物料清单（BOM）、接线表（I/O 映射）和固件配置；上测试台验证；测试结果再回到需求表或判据。下面用平缝机原型走一遍，所有数字都由 <code>figsrc/ch19_calc.py</code> 算出，虚拟实验 19-1 用的是同一个模型、同一组数据。</p>
+<figure class="fig"><a class="zoom" href="img/fig_19_matching.png"><img src="img/fig_19_matching.png" alt="图 19-3　快速配套流程" loading="lazy"></a><figcaption>图 19-3　快速配套：从需求表到 BOM、接线表和固件配置（示意）</figcaption></figure>
+<h4 id="s19-4-1">19.4.1 需求表</h4>
+<p>需求表的每一行都要能被计算或测试，所以写数字，不写“高速”“可靠”。表 19-4 是平缝机原型的需求表。负载折算惯量 5×10⁻⁴ kg·m² 是主轴、手轮和折算过来的针杆、挑线机构的总和，加上 400 W 电机转子的 1×10⁻⁴，总惯量 6×10⁻⁴ kg·m²，与第 13 章的算例一致。四个电磁铁动作的行程和力是按机头的连杆估计的示意值；“何时动作”决定要不要折算转角。</p>
+<div class="tbl"><table><caption>表 19-4　平缝机原型 WQ-SC/LS 的需求表（算例值）</caption><thead><tr><th>编号</th><th>需求</th><th>数值</th><th>来源</th></tr></thead><tbody>
+<tr><td>REQ-SP-01</td><td>最高转速</td><td>5000 r/min</td><td>任务</td></tr>
+<tr><td>REQ-SP-02</td><td>0 → 5000 r/min 加速时间</td><td>≤ 0.15 s</td><td>第 14 章速度曲线</td></tr>
+<tr><td>REQ-SP-03</td><td>负载折算惯量</td><td>5×10⁻⁴ kg·m²</td><td>机头估算（示意）</td></tr>
+<tr><td>REQ-SP-04</td><td>停针定位误差（上针位 70°）</td><td>≤ ±1°</td><td>第 13 章；第 22 章验收指标</td></tr>
+<tr><td>REQ-SOL-01</td><td>剪线：行程 3 mm、力 12 N，300 r/min 下动作</td><td>折算转角 ≤ 20°</td><td>第 13、14 章</td></tr>
+<tr><td>REQ-SOL-02</td><td>拨线：行程 4 mm、力 5 N，停车后动作</td><td>—</td><td>第 14 章</td></tr>
+<tr><td>REQ-SOL-03</td><td>倒缝：行程 8 mm、力 25 N，回针 1800 r/min</td><td>切换 ≤ 空闲角 201.6°</td><td>第 14 章</td></tr>
+<tr><td>REQ-SOL-04</td><td>抬压脚：行程 10 mm、力 50 N，停车后动作</td><td>—</td><td>机头估算（示意）</td></tr>
+<tr><td>REQ-IO-01</td><td>输入：急停、机头翻起、手动回针、断线；脚踏、温度</td><td>DI 4、AI 2</td><td>第 13、18 章</td></tr>
+<tr><td>REQ-NET-01</td><td>按数字工厂格式上报状态、事件、版本</td><td>—</td><td>19.7 节</td></tr>
+</tbody></table></div>
+<h4 id="s19-4-2">19.4.2 计算</h4>
+<p><strong>主轴转矩</strong>　从静止加速到 n<sub>max</sub>，所需转矩等于总惯量乘角加速度，再加上库仑摩擦 T<sub>f</sub> = 0.15 N·m（第 13 章）：</p>
+<div class="math">\[ T_{acc}=\left(J_{load}+J_{rotor}\right)\frac{2\pi n_{max}/60}{t_{acc}}+T_f=6\times10^{-4}\times\frac{523.6}{0.15}+0.15\approx 2.24\ \mathrm{N\cdot m} \]</div>
+<p>角加速度约 3491 rad/s²。判据是 T<sub>acc</sub> ≤ 0.8 T<sub>peak</sub>，留 20% 给电压偏低和第 8 章讲的随转角周期变化的惯性力矩。另外三条：最高转速不超过电机的最高转速；负载惯量与转子惯量之比不超过 10（直驱、刚性连接时的示意值，比值太大，速度环难调，第 13 章惯量加倍的教训）；间歇工况下的等效转矩不超过额定转矩。最后一条按第 18 章的工况算：每分钟起停 30 次，每次加速、减速各 t<sub>acc</sub>，加减速占时间的 30 × 2 × 0.15 / 60 = 15%，稳速缝纫占 35%，稳速负载取 0.35 N·m（示意），</p>
+<div class="math">\[ T_{rms}=\sqrt{0.15\times2.24^2+0.35\times0.35^2}\approx0.89\ \mathrm{N\cdot m} \]</div>
+<p><strong>驱动器</strong>　电流等于转矩除以转矩常数：连续电流 0.89 / 0.5 ≈ 1.79 A，加速电流 2.24 / 0.5 ≈ 4.49 A。急停时 5000 r/min 的动能 ½Jω² ≈ 82.2 J，按第 13 章取 70% 回馈到母线，约 57.6 J，驱动器的母线电容加制动电阻必须吸收得下。表 19-5 是三档电机的计算结果：250 W 那档的峰值转矩不够，等效转矩也超了；550 W 那档全部满足，但更贵；400 W 满足全部判据，是最便宜的合格者。它的峰值转矩 3.2 N·m，而第 13 章整定伺服时用的转矩限幅是 2.5 N·m，加速只要 2.24 N·m，所以固件配置里沿用 2.5 N·m 的限幅，第 13 章、第 20 章的停针参数不必改动；在这个限幅下，最快的加速时间是 6×10⁻⁴ × 523.6 / (2.5 − 0.15) ≈ 0.134 s，与第 13 章相同。</p>
+<div class="tbl"><table><caption>表 19-5　主轴电机与驱动器的选型计算（算例值；判据见正文）</caption><thead><tr><th>项目</th><th>D-MOT-PMSM/250</th><th>D-MOT-PMSM/400</th><th>D-MOT-PMSM/550</th></tr></thead><tbody>
+<tr><td>转子惯量（10⁻⁴ kg·m²）/ 惯量比</td><td>0.6 / 8.3 ✓</td><td>1.0 / 5.0 ✓</td><td>1.4 / 3.6 ✓</td></tr>
+<tr><td>最高转速（r/min）</td><td>5000 ✓</td><td>6000 ✓</td><td>7500 ✓</td></tr>
+<tr><td>加速所需转矩 / 0.8 × 峰值（N·m）</td><td>2.10 / 1.60 ✗</td><td>2.24 / 2.56 ✓</td><td>2.38 / 3.60 ✓</td></tr>
+<tr><td>等效转矩 / 额定转矩（N·m）</td><td>0.84 / 0.80 ✗</td><td>0.89 / 1.27 ✓</td><td>0.95 / 1.50 ✓</td></tr>
+<tr><td>急停回馈能量（J）</td><td>53.7</td><td>57.6</td><td>61.4</td></tr>
+<tr><td>配套驱动器</td><td>—</td><td>D-DRV-SERVO/3A：连续 1.79 ≤ 3 A，峰值 4.49 ≤ 9 A，57.6 ≤ 70 J</td><td>—</td></tr>
+<tr><td>示意单价（元）</td><td>520</td><td>680</td><td>860</td></tr>
+</tbody></table></div>
+<p>更便宜的 1.5 A 驱动器为什么不行？连续电流 1.79 A 超过了它的 1.5 A，急停回馈的 57.6 J 也远超它能吸收的 30 J。后一条常被忽略：样机在台上空转时一切正常，装上手轮、提到最高转速，第一次急停就报“过压”（第 13 章）。</p>
+<p><strong>电磁铁</strong>　每个动作有三条判据：行程够、行程末端的力够、在转动中动作的要检查折算转角（图 19-4 右）。剪线在 300 r/min 下动作，库里 M15 那档吸合 6.9 ms、释放 5.1 ms（就是第 13 章算例的电磁铁），折算 6 × 300 × 0.0069 ≈ 12.4° 和 9.2°，都在 20° 以内；S8 的行程和力够，但只有 8 N，力不够 12 N；L30 力够，吸合 11 ms 折算 19.8°，贴着上限。倒缝在 1800 r/min 下切换，L30 折算 6 × 1800 × 0.011 ≈ 118.8°，装进 201.6° 的空闲角（第 14 章）；M15 的行程不够 8 mm。拨线、抬压脚在停车后动作，只看行程和力。表 19-6 是结果。</p>
+<figure class="fig"><a class="zoom" href="img/fig_19_sizing.png"><img src="img/fig_19_sizing.png" alt="图 19-4　主轴与电磁铁选型" loading="lazy"></a><figcaption>图 19-4　快速配套的两张计算图：三档电机的加速所需转矩与 0.8 倍峰值（左）；四档电磁铁的吸合折算转角随转速的变化（右）（算例值）</figcaption></figure>
+<div class="tbl"><table><caption>表 19-6　电磁铁的选型（算例值；角度为吸合/释放折算的主轴转角）</caption><thead><tr><th>动作与需求</th><th>S8<br>4 mm, 8 N</th><th>M15<br>6 mm, 15 N</th><th>L30<br>10 mm, 30 N</th><th>XL60<br>12 mm, 60 N</th><th>选</th></tr></thead><tbody>
+<tr><td>剪线：3 mm、12 N；300 r/min，≤ 20°</td><td>力 ✗</td><td>12.4°/9.2° ✓</td><td>19.8°/12.6° ✓</td><td>28.8° ✗</td><td>M15</td></tr>
+<tr><td>拨线：4 mm、5 N；停车后</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>S8</td></tr>
+<tr><td>倒缝：8 mm、25 N；1800 r/min，≤ 201.6°</td><td>行程 ✗</td><td>行程 ✗</td><td>118.8°/75.6° ✓</td><td>172.8°/97.2° ✓</td><td>L30</td></tr>
+<tr><td>抬压脚：10 mm、50 N；停车后</td><td>✗</td><td>✗</td><td>力 ✗</td><td>✓</td><td>XL60</td></tr>
+</tbody></table></div>
+<p>M15 用在剪线上，剪线转速最高可以到 20 / (6 × 0.0069) ≈ 483 r/min，与第 13 章的结论相同。电磁铁驱动板要有 4 个通道，峰值电流不低于最大强激磁电流 24 V / 4 Ω = 6 A（XL60），维持电流不低于 1.5 A，D-DRV-SOL/4CH 正好满足。</p>
+<p><strong>电源</strong>　24 V 电源给主控、网关、传感器和电磁铁供电。预算按最坏情况：逻辑部分 8 W；四个电磁铁同时处于维持状态，维持功率 I<sub>h</sub>²R 合计约 30.0 W；强激磁只持续十毫秒左右，电流峰值一部分由电源后面的电容提供，按最大的一个（XL60，24²/4 = 144 W）的一半计，72 W。合计约 110 W，乘 1.2 的余量得 132 W，选 150 W 那档。主轴伺服驱动器直接接 220 V 电网，不在这个预算里。</p>
+<p><strong>I/O 计数</strong>　主轴编码器 1 路（伺服驱动器的分频输出 A/B/Z 接到主控的编码器接口，固件靠它得到转角），数字输入 4 路（急停、机头翻起安全开关、手动回针按钮、断线检测），数字输出 4 路（四个电磁铁，经驱动板），模拟输入 2 路（脚踏、电控箱温度），CAN FD 上两个节点（伺服驱动器、网关）。主控板 S 档有 2 路编码器、12 路 DI、8 路 DO、4 路 AI，够用。</p>
+<h4 id="s19-4-3">19.4.3 生成 BOM、接线表和固件配置</h4>
+<p>筛选的规则很简单：每一类模块在库里逐个规格检查判据，挑出全部满足的里面最便宜的；有依赖关系的一起挑（电机和驱动器成对挑，步进电机、驱动器和传动方式成组挑，主控和扩展 I/O 板成组挑），电源最后挑。表 19-7 是结果，示意总价 2455 元；机头本身是现成的，不计在内。</p>
+<div class="tbl"><table><caption>表 19-7　平缝机原型的 BOM（自动配套结果；D-… 为建议编号，计划入库；单价为示意值）</caption><thead><tr><th>编号/规格</th><th>名称</th><th>用途</th><th>数量</th><th>示意单价（元）</th><th>合计（元）</th></tr></thead><tbody>
+<tr><td>D-MOT-PMSM/400</td><td>交流永磁同步伺服电机（2500 线编码器）</td><td>主轴</td><td>1</td><td>680</td><td>680</td></tr>
+<tr><td>D-DRV-SERVO/3A</td><td>伺服驱动器</td><td>主轴</td><td>1</td><td>480</td><td>480</td></tr>
+<tr><td>A-CPL-JAW/LM1</td><td>梅花形弹性联轴器（库内已有）</td><td>电机—主轴</td><td>1</td><td>35</td><td>35</td></tr>
+<tr><td>D-SOL-PUSH/M15</td><td>推拉式电磁铁</td><td>剪线</td><td>1</td><td>60</td><td>60</td></tr>
+<tr><td>D-SOL-PUSH/S8</td><td>推拉式电磁铁</td><td>拨线</td><td>1</td><td>45</td><td>45</td></tr>
+<tr><td>D-SOL-PUSH/L30</td><td>推拉式电磁铁</td><td>倒缝</td><td>1</td><td>85</td><td>85</td></tr>
+<tr><td>D-SOL-PUSH/XL60</td><td>推拉式电磁铁</td><td>抬压脚</td><td>1</td><td>130</td><td>130</td></tr>
+<tr><td>D-DRV-SOL/4CH</td><td>电磁铁驱动板</td><td>四个电磁铁</td><td>1</td><td>150</td><td>150</td></tr>
+<tr><td>D-SNS-HALL/P20</td><td>霍尔脚踏传感器</td><td>脚踏</td><td>1</td><td>40</td><td>40</td></tr>
+<tr><td>D-SNS-PE/R30</td><td>光电传感器</td><td>断线检测</td><td>1</td><td>35</td><td>35</td></tr>
+<tr><td>D-SNS-PROX/M8</td><td>接近开关</td><td>机头翻起</td><td>1</td><td>25</td><td>25</td></tr>
+<tr><td>D-CTL-WQSC/S</td><td>WQ-SC 主控板</td><td>主控</td><td>1</td><td>420</td><td>420</td></tr>
+<tr><td>D-GW-WQSC/E</td><td>网关模块</td><td>联网</td><td>1</td><td>150</td><td>150</td></tr>
+<tr><td>D-PSU-SMPS/24V150</td><td>开关电源 24 V 150 W</td><td>逻辑与电磁铁</td><td>1</td><td>120</td><td>120</td></tr>
+<tr><td colspan="5" style="text-align:right">合计</td><td>2455</td></tr>
+</tbody></table></div>
+<p>接线表由 I/O 计数直接排出（表 19-8）。它同时是固件 HAL 的引脚配置和第 22 章测试台接线的依据，所以必须由同一份数据生成，而不是三处各写一份。</p>
+<div class="tbl"><table><caption>表 19-8　平缝机原型的接线表（I/O 映射，自动生成）</caption><thead><tr><th>主控端口</th><th>器件</th><th>编号/规格</th><th>说明</th></tr></thead><tbody>
+<tr><td>ENC1</td><td>主轴编码器 A/B/Z</td><td>D-MOT-PMSM/400（经驱动器分频输出）</td><td>10000 计数/转，0.036°/计数</td></tr>
+<tr><td>DI1–DI4</td><td>急停、机头翻起、手动回针、断线</td><td>—、D-SNS-PROX/M8、—、D-SNS-PE/R30</td><td>急停同时硬件切断电磁铁电源</td></tr>
+<tr><td>DO1–DO4</td><td>剪线、拨线、倒缝、抬压脚</td><td>D-DRV-SOL/4CH 通道 1–4</td><td>强激磁、维持、续流在驱动板上完成</td></tr>
+<tr><td>AI1、AI2</td><td>脚踏、电控箱温度</td><td>D-SNS-HALL/P20、NTC</td><td>脚踏 0.5–4.5 V</td></tr>
+<tr><td>CAN FD #1、#2</td><td>伺服驱动器、网关</td><td>D-DRV-SERVO/3A、D-GW-WQSC/E</td><td>速度/位置指令、状态；上报与参数下载</td></tr>
+</tbody></table></div>
+<p>固件配置也是生成的。下面是虚拟实验 19-1 对这组需求生成的配置的主要部分：选哪个 HAL 驱动、主轴参数、事件表初值（19.5 节）和上报主题。参数版本号写进配置，随设备上报（19.7 节）。</p>
+<pre><code class="language-json">{
+ "machine": "WQ-SC/LS", "fw_version": "0.3.0", "param_version": "LS-P1-001",
+ "hal": { "spindle": {"driver": "spindle_canfd", "module": "D-DRV-SERVO/3A"},
+          "sol": {"driver": "sol_board", "module": "D-DRV-SOL/4CH"} },
+ "spindle": { "n_max_rpm": 5000, "t_acc_s": 0.15, "torque_limit_Nm": 2.5,
+              "enc_counts_per_rev": 10000, "angle_unit": "0.1deg",
+              "n_trim_rpm": 300, "up_pos_x10": 700, "pos_engage_x10": 250 },
+ "events": [ {"start_x10": 2050, "end_x10": 3300, "out": "SOL_TRIM", "cond": "TRIM_REV0"},
+             {"start_x10": 150,  "end_x10": 600,  "out": "SOL_WIPE", "cond": "TRIM_REV1"},
+             {"start_x10": 1142, "end_x10": 1142, "out": "SOL_BT",   "cond": "BT_LATCH"} ],
+ "report": { "topic": "wq/sewing/rnd/proto-ls01/status" }
+}</code></pre>
+<p>换一个机种，流水线不变，只换需求表。包缝机原型（最高 6000 r/min，负载惯量 3×10⁻⁴ kg·m²）同样选到 400 W 电机和 3 A 驱动器，示意总价 2415 元。把它提到 7000 r/min，有两条判据变成 ✗：400 W 电机的最高转速只有 6000 r/min；急停回馈能量 0.7 × ½ × 4×10⁻⁴ × 733² ≈ 75.2 J 超过了 3 A 驱动器的 70 J。换成 550 W 电机（总惯量 4.4×10⁻⁴，回馈约 82.8 J）后，驱动器还得换成 5 A 那档，示意总价升到 2735 元。这正是虚拟实验 19-1 的任务 2。</p>
+<p>花样机原型（X–Y 行程 300 × 200 mm，最高速度 0.5 m/s，加速度 25 m/s²，X、Y 运动质量 2 kg 和 5 kg）的结果更有意思。两根轴都选了同步带：X 轴用 GT2-20-9 带轮配 NEMA 23 闭环步进，Y 轴用 3M-24-15 带轮配 NEMA 34 闭环步进，Y 轴所需转矩约 2.01 N·m，电机转速 417 r/min，同步带轴的最低固有频率约 93 Hz。如果把 Y 轴换成 16x10 滚珠丝杠，0.5 m/s 要求电机转 3000 r/min，角加速度 2π × 25 / 0.01 ≈ 15708 rad/s²，是同步带方案（约 2182 rad/s²）的 7 倍多；电机转子、丝杠和联轴器的惯量乘上这个角加速度，所需转矩超过 4 N·m，而步进电机在 3000 r/min 只剩零点几牛·米。花样机的一针只有几毫米，要的是短距离、高加速度，同步带正合适；丝杠的长处是刚度和定位精度，适合小行程、慢而准的轴（第 15 章）。这是任务 3。</p>
+<section class="lab" id="lab-config" data-src="labs/config.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 19-1　零件库快速配套器</h4></div><p>选机种、填需求，从示意零件库里自动挑出满足全部判据的最便宜组合，显示 BOM、接线表、固件配置和每条判据；也可以手动换件。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/config.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<h4 id="s19-4-4">19.4.4 AI 选型助手怎样用、它的规矩</h4>
+<p>问渠数字工厂里有一个“AI 选型”功能（仓库 <code>factory/digital/hub/select.py</code>）：用户用一句话提需求，例如“X 轴同步带，24 齿 3M 带轮”，它先按关键词找条目，再按句子里的数字筛规格。它有三条硬规矩：只从零件库里挑；答案里每个推荐都写成“编号/规格”，并列出依据的规格表那一行参数和出处；库里没有合适的就说没有，不编造编号或参数。答案生成以后还要逐个核对其中出现的编号，不在库里的编号会从结果里去掉并单独列出。没有配置大模型时，它用规则回答，同样只从库里挑。</p>
+<p>在快速配套里，AI 助手适合做两件事：一是把口头需求整理成需求表里的数字（“缝牛仔裤”要问清最高转速、布厚和针距）；二是在规则筛选的结果之外解释为什么这么选、还有什么替代。判据计算和最终选择由确定的程序完成，AI 的回答要能回溯到库里的某一行。它最有价值的一句话往往是“零件库里没有”：比如问“给 16 mm 丝杠配一个转动惯量小于 3×10⁻⁵ kg·m² 的联轴器”，正确的回答是库里只有 A-CPL-JAW 梅花联轴器，最小的 LM1 惯量 2×10⁻⁴ kg·m²，不满足；这条回答本身就是一条入库需求。</p>
+<h3 id="s19-5">19.5 固件框架：角度驱动的事件调度</h3>
+<p>固件分层与第 18 章相同：驱动层、运动控制层、工艺层、界面与通信层。WQ-SC 的工艺层围绕三样东西组织：把编码器计数变成角度，按角度查事件表，用状态机管住整个工作周期。三样都是数据驱动的：动作的角度在参数表里，换一台机头只改参数，不改代码。</p>
+<p><strong>计数变角度</strong>　主轴编码器每转 10000 个计数，固件里角度的单位取 0.1°，一转 0–3599，换算是 角度 = 计数 × 3600 / 10000 = 计数 × 9 / 25，用整数运算。0.1° 在 300 r/min 时约 56 μs，在 5000 r/min 时约 3.3 μs，所以事件不能靠任务轮询去“看”角度到了没有，而要用编码器定时器的比较功能：固件预先算好下一个事件角对应的计数，写进比较寄存器，计数一到就进中断。</p>
+<p><strong>事件表</strong>　一行一个动作：起始角、结束角、输出、条件（表 19-9，图 19-5）。条件让同一张表能表达“只在剪线那一针”“只在回针针内”这类逻辑。剪线电磁铁在 205.0°–330.0° 通电：原型用的机头是凸轮式剪线，电磁铁只负责把滚子推进凸轮槽，进刀时刻由凸轮决定，所以通电要早，300 r/min 下吸合 6.9 ms 折算 12.4°，217° 以前到位，赶在凸轮槽入口之前；如果改用直接驱动动刀的机头，按第 14 章的算法把起始角改到 290°–300°，代码不动。拨线在剪线后的下一转 15°–60° 通电；倒缝在 114.2°（送布牙沉到针板以下，第 6、14 章）按“回针针数是否未完”置位或复位。表中的角度都是初值，以所用机头的时刻表为准，第 20 章在样机上标定。</p>
+<div class="tbl"><table><caption>表 19-9　平缝机原型的事件表（参数表 LS-P1-001 的初值，示意）</caption><thead><tr><th>#</th><th>起始角</th><th>结束角</th><th>输出</th><th>条件</th><th>依据</th></tr></thead><tbody>
+<tr><td>1</td><td>205.0°</td><td>330.0°</td><td>SOL_TRIM（DO1）</td><td>TRIM_REV0：剪线那一针</td><td>凸轮式剪线；吸合 12.4°（第 13 章）</td></tr>
+<tr><td>2</td><td>15.0°</td><td>60.0°</td><td>SOL_WIPE（DO2）</td><td>TRIM_REV1：剪线后的下一转</td><td>针尖入布（101.7°）以前完成</td></tr>
+<tr><td>3</td><td>114.2°</td><td>（置位/复位）</td><td>SOL_BT（DO3）</td><td>BT_LATCH：回针针数未完</td><td>送布牙在针板下（第 14 章）</td></tr>
+<tr><td>—</td><td>25.0°</td><td>70.0°</td><td>主轴切入位置环，停在 70°</td><td>POSITION 状态</td><td>第 13 章停针，第 20 章同值</td></tr>
+</tbody></table></div>
+<figure class="fig"><a class="zoom" href="img/fig_19_evtable.png"><img src="img/fig_19_evtable.png" alt="图 19-5　事件表与时刻表" loading="lazy"></a><figcaption>图 19-5　平缝机原型的事件表对准第 8、14 章的时刻表（初值，示意）</figcaption></figure>
+<p>下面是事件表的数据结构和角度中断里的调度。中断里只做比较和置位，不调用任何会阻塞的函数；条件只读状态机维护的变量。</p>
+<pre><code class="language-c">/* ---- 事件表：一行一个动作，角度单位 0.1°（0–3599）---- */
+typedef enum { EV_WINDOW, EV_LATCH } ev_type_t;
+typedef struct {
+    uint16_t start;      /* 起始角 */
+    uint16_t end;        /* 结束角；end &lt; start 表示跨过 0° */
+    uint8_t  out;        /* 输出：SOL_TRIM、SOL_WIPE、SOL_BT …… */
+    uint8_t  cond;       /* 条件：TRIM_REV0、TRIM_REV1、BT_LATCH …… */
+    uint8_t  type;       /* EV_WINDOW：区间内通电；EV_LATCH：到 start 时按条件置位/复位 */
+} evt_t;
+
+/* a 是否落在 (from, to] 内（正转方向，可跨 0°） */
+static int crossed(uint16_t from, uint16_t to, uint16_t a)
+{
+    return (from &lt;= to) ? (a &gt; from &amp;&amp; a &lt;= to) : (a &gt; from || a &lt;= to);
+}
+
+/* ---- 编码器比较中断：计数到达下一个事件角时进入 ---- */
+static uint16_t last;                         /* 上次处理到的角度 */
+void ENC_CMP_IRQHandler(void)
+{
+    uint16_t now = enc_angle_x10();           /* 计数 × 9 / 25 */
+    if (now &lt; last) rev_count++;              /* 过 0°：转数加一 */
+    for (unsigned i = 0; i &lt; P.n_evt; i++) {
+        const evt_t *e = &amp;P.evt[i];
+        int c = cond_true(e-&gt;cond);           /* 只读状态变量 */
+        if (e-&gt;type == EV_LATCH) {
+            if (crossed(last, now, e-&gt;start)) sol_set(e-&gt;out, c);
+        } else {
+            if (c &amp;&amp; crossed(last, now, e-&gt;start)) sol_set(e-&gt;out, 1);
+            if (!c || crossed(last, now, e-&gt;end)) sol_set(e-&gt;out, 0);
+        }
+    }
+    last = now;
+    enc_set_compare(next_event_count(now));   /* 排好下一个事件角对应的计数 */
+}</code></pre>
+<p><strong>状态机</strong>　工作周期由状态机管理（图 19-6）：IDLE（停在上针位）→ RUN（脚踏调速）→ SLOW（减速到剪线转速）→ TRIM（剪线那一针，事件表执行剪线、拨线）→ POSITION（位置环停到上针位）→ IDLE。任一状态检测到故障（过流、编码器丢失、超时、急停、机头翻起）都进 SAFE：断开所有电磁铁，主轴自由停或制动，记录故障码；只有故障清除、脚踏回到中位，才回到 IDLE，防止一复位机器就转起来（第 18 章）。</p>
+<figure class="fig"><a class="zoom" href="img/fig_19_states.png"><img src="img/fig_19_states.png" alt="图 19-6　平缝机原型的状态机" loading="lazy"></a><figcaption>图 19-6　平缝机原型的状态机：正常周期与故障进入 SAFE（示意）</figcaption></figure>
+<pre><code class="language-c">void sew_task(void)                           /* RTOS 任务，每 1 ms 一次 */
+{
+    if (fault_pending() &amp;&amp; state != SAFE) enter_safe();
+    switch (state) {
+    case IDLE:
+        if (pedal() &gt;= P.pedal_run) { pfl_down(); bt_start(P.bt_start_n); state = RUN; }
+        break;
+    case RUN:                                 /* 事件表在角度中断里逐针执行 */
+        spindle_speed(pedal_to_rpm(pedal()));
+        if (pedal() &lt;= P.pedal_trim) { spindle_speed(P.n_trim); state = SLOW; }
+        break;
+    case SLOW:
+        if (spindle_rpm() &lt;= P.n_trim + 20 &amp;&amp; enc_angle_x10() &gt;= 1800) {
+            rev_count = 0; state = TRIM;      /* 从这一针起 TRIM_REV0 为真 */
+        }
+        break;
+    case TRIM:
+        if (rev_count &gt;= 1 &amp;&amp; enc_angle_x10() &gt;= P.pos_engage_x10) {   /* 第 1 转 25° */
+            spindle_position(P.up_pos_x10); t0 = now_ms(); state = POSITION;
+        }
+        break;
+    case POSITION:
+        if (spindle_settled(5, 5)) { pfl_up_after(P.t_wipe_ms); state = IDLE; } /* ±0.5°，5 ms */
+        else if (now_ms() - t0 &gt; P.t_pos_max_ms) fault_raise(F_POS_TIMEOUT);
+        break;
+    case SAFE:
+        if (fault_cleared() &amp;&amp; pedal_neutral()) state = IDLE;
+        break;
+    }
+}
+static void enter_safe(void) { sol_all_off(); spindle_free(); log_fault(); state = SAFE; }</code></pre>
+<p><strong>硬件抽象层</strong>　工艺层只通过 HAL 访问硬件。每类模块一个接口，换一个模块只换对应的驱动文件；这正是快速配套能落地的前提，配置里的 <code>"driver": "spindle_canfd"</code> 就是选哪个实现文件。</p>
+<pre><code class="language-c">/* hal.h：每类模块一个接口；实现文件按配置选择，如 hal_spindle_canfd.c、hal_sol_board.c */
+int      spindle_init(const spindle_cfg_t *c);
+void     spindle_speed(int16_t rpm);           /* 速度模式 */
+void     spindle_position(uint16_t ang_x10);   /* 位置模式：停到指定角 */
+void     spindle_free(void);                   /* 断开转矩，自由停 */
+int16_t  spindle_rpm(void);
+uint16_t enc_angle_x10(void);                  /* 0–3599 */
+void     sol_set(uint8_t ch, uint8_t on);      /* 强激磁、维持、续流在驱动板上 */
+void     sol_all_off(void);
+void     stepper_move(uint8_t ax, int32_t steps, uint16_t v, uint16_t a);
+uint8_t  io_di(uint8_t ch);
+uint16_t io_ai(uint8_t ch);</code></pre>
+<p><strong>参数表与版本</strong>　事件表、转速、停针角、超时都在参数表里，参数表有版本号（如 LS-P1-001）和校验码，存在掉电不丢失的存储器里，上电校验，损坏就恢复默认并报警（第 18 章）。固件有自己的版本号（如 0.3.0），参数表的格式变了要升格式号，老参数要能迁移。故障码表也有版本。三个版本号随设备上报到数字工厂：第 22 章的每一份测试报告都要写明是哪个固件、哪组参数测的，否则测试结果无从比较。</p>
+<h3 id="s19-6">19.6 先在电脑上“缝”：软件在环与硬件在环</h3>
+<p>样机装好以前，固件的大部分逻辑已经可以测试了。测试分三级，跑同一套测试用例，只换“被测对象”和“对象模型”（图 19-7）。</p>
+<figure class="fig"><a class="zoom" href="img/fig_19_hil.png"><img src="img/fig_19_hil.png" alt="图 19-7　SIL、HIL 与整机测试台" loading="lazy"></a><figcaption>图 19-7　软件在环、硬件在环与整机测试台（示意）</figcaption></figure>
+<p><strong>软件在环（SIL）</strong>　把工艺层、状态机和事件表编译成电脑上的程序，HAL 换成仿真驱动，接上机器模型。模型不必另写：本书的虚拟实验已经有了伺服停针（虚拟实验 13-1）、电磁铁吸合释放（13-2）、剪线时序（14-1）、花样机的 X–Y 与离布窗口（第 15 章）和横机选针（第 17 章）的模型，第 20 章的原型模型就是把这几个模型按同一组参数接起来。仿真按 50 μs 的步长推进，比实时快几十倍，每次提交代码都能自动跑一遍（持续集成），专查逻辑错误、时序表写错、参数越界。</p>
+<p><strong>硬件在环（HIL）</strong>　换上真的主控板和真的固件，对象仍是模型，但模型跑在一台实时仿真台上，用真实的电信号和主控板打交道。编码器仿真最考验功夫：5000 r/min 时主轴每秒 83.3 万个计数（A、B 两路方波各约 208 kHz），而模型 50 μs 走一步时主轴转过 1.5°、约 42 个计数；如果每一步一次性吐出 42 个脉冲，主控板看到的就是锯齿状的转角，事件会集中在某些时刻触发。所以仿真台要按模型给出的转速把计数均匀地插在两步之间，像数字频率合成那样输出，并在每转的固定计数处输出 Z 相。电磁铁可以接真线圈，也可以接 R–L 假负载（如 8 Ω、20–80 mH，第 13 章），仿真台测电流波形，由模型算出衔铁什么时候到位。伺服驱动器在 CAN FD 上用一个驱动器模型代替。HIL 最大的用处是故障注入：断编码器、过流、欠压、急停，这些在真机上很难复现或有危险，在台上可以每晚跑几千次，检查固件是否每次都进 SAFE、故障码是否正确。</p>
+<p><strong>整机测试台</strong>　最后是真机头、真伺服、真电磁铁，加转矩转速传感器、编码器记录和拍线迹的相机，验证机械和电控的配合：停针误差 ≤ ±1°、剪线 1000 次成功率 ≥ 99.5%、电磁铁折算转角 ≤ 20° 这些验收指标在这里测。三级测试的脚本都用 Python 和 pytest 写，通过网关的接口下发命令、读测量，每个用例对应一条需求（REQ-…），结果自动写成报告；第 22 章专讲这套测试体系。</p>
+<h3 id="s19-7">19.7 联网：原型机是数字工厂的一台设备</h3>
+<p>原型机从第一天起就按数字工厂的格式联网，理由很实际：测试数据、版本和故障要集中存起来，才能在几十轮迭代之后说清楚“哪一版改好了什么”；原型将来变成产品，出厂测试和现场数据也走同一条路（第 26、27 章）。</p>
+<p><strong>主题</strong>　问渠数字工厂的主题格式是 <code>wq/&lt;工厂&gt;/&lt;区域&gt;/&lt;单元&gt;/&lt;类别&gt;</code>，类别沿用 status、event、cmd、cmd/ack、measurement、alert 等（仓库 <code>factory/digital/wqbus/topics.py</code>）。缝纫机厂的根主题取 <code>wq/sewing</code>，研发试制区记作 rnd（示意），平缝机原型 1 号的单元名取 proto-ls01；同一台原型拿到服装厂试用时，按服装厂的根主题 <code>wq/garment</code> 重新登记。表 19-10 是原型上报的内容。</p>
+<div class="tbl"><table><caption>表 19-10　原型机上报的数据（示意）</caption><thead><tr><th>主题</th><th>消息类型</th><th>什么时候发</th><th>主要字段</th></tr></thead><tbody>
+<tr><td>wq/sewing/rnd/proto-ls01/status</td><td>machine.status（保留消息）</td><td>状态变化时，另每 10 s 一次</td><td>state（run/idle/fault）、spindle_rpm、fw_version、param_version、bom_rev</td></tr>
+<tr><td>…/proto-ls01/event</td><td>machine.event</td><td>每道缝结束、故障、恢复</td><td>event（cycle_end、fault、recover）、针数、剪线结果、故障码</td></tr>
+<tr><td>…/proto-ls01/measurement</td><td>测试结果</td><td>每个测试用例结束</td><td>需求编号 REQ-…、测量值、判定、固件与参数版本（第 22 章）</td></tr>
+<tr><td>…/proto-ls01/alert</td><td>告警</td><td>过热、反复故障</td><td>级别、标题、证据</td></tr>
+<tr><td>…/proto-ls01/cmd、cmd/ack</td><td>指令与应答</td><td>测试脚本或看板下发</td><td>reset、set_speed、下载参数（带参数版本号）</td></tr>
+</tbody></table></div>
+<p><strong>信封</strong>　每条消息是统一格式的 JSON：外层信封有规范版本 v、消息编号 id、UTC 时间 ts、类型 type、来源 source、教学或生产模式 mode、关联号 corr，业务内容放在 data 里，数值用国际单位并在字段名里注明单位。规范允许只增加字段而不改版本，所以原型在 machine.status 里加上固件、参数和 BOM 版本，老的看板照样能读。固件的状态映射成规范的取值：RUN、SLOW、TRIM、POSITION 都报 run，IDLE 报 idle，SAFE 报 fault。</p>
+<pre><code class="language-json">{"v": 1, "id": "5b0d…", "ts": "2026-10-02T08:15:30.120Z",
+ "type": "machine.status", "source": "proto-ls01", "mode": "teach", "corr": null,
+ "data": {"state": "run", "spindle_rpm": 4200,
+          "fw_version": "0.3.0", "param_version": "LS-P1-001", "bom_rev": "LS-BOM-02"}}</code></pre>
+<p>网关负责打包和发送，主控板只把状态和事件经 CAN FD 交给网关，不在实时的固件里做网络和 JSON。网关掉线时在本地缓存，恢复后补发；遗嘱消息让看板在设备断电时显示“离线”（第 26 章）。</p>
+<h3 id="s19-8">19.8 从原型到工业级的路线</h3>
+<p>一台原型变成工业产品，一般要过五级：P0、P1、EVT、DVT、PVT，然后量产（图 19-8）。每一级的目标不同，退出条件都写成自动测试的通过率和测得的指标，而不是“大家觉得差不多了”。</p>
+<figure class="fig"><a class="zoom" href="img/fig_19_gates.png"><img src="img/fig_19_gates.png" alt="图 19-8　从原型到工业级" loading="lazy"></a><figcaption>图 19-8　从原型到工业级：每一级的目标、数量与退出条件（示意）</figcaption></figure>
+<p><strong>P0 能动</strong>：一台样机，主轴能调速、停针，事件表能驱动电磁铁，软件在环全部通过；退出条件可以放宽，例如停针误差 ≤ ±3°、HIL 冒烟测试通过。<strong>P1 功能全</strong>：全部动作和联网都有了，每条需求都有测试用例，测试台能无人值守地跑；退出条件是用例通过率 ≥ 95%、停针 ≤ ±1°、剪线 1000 次成功率 ≥ 99.5%。实验室原型做到 P1 为止，第 20、21 章的两台原型都以 P1 为目标。</p>
+<p><strong>EVT 工程验证</strong>：把模块合成一块电控板、装进机箱，做 3–5 台，测热、电源和初步的 EMC，最高转速连续运转 4 h；退出条件是全部需求用例通过、温升合格。<strong>DVT 设计验证</strong>：设计冻结，做 10–20 台，做 EMC、电气安全、环境和寿命试验，送认证样机；退出条件是标准试验通过、寿命试验无关键故障。<strong>PVT 小批验证</strong>：用量产工装在产线上装几十到几百台，每台跑出厂测试 EOL 和老化，数据回流数字工厂；退出条件是 EOL 一次通过率达标（如 ≥ 98%，示意）、返修原因都已闭环。</p>
+<p>从模块化的原型到产品，要补的工作主要有四类（表 19-11），大多在第 18 章讲过。要注意的是，这些工作不是到了 DVT 才开始：电源、接地和电缆屏蔽从 P1 起就要按产品的做法接，否则 EVT 的 EMC 预测试会推翻很多设计；需求表和测试用例从 P0 起就要有编号，否则到了 PVT 无法证明“全部需求都测过”。</p>
+<div class="tbl"><table><caption>表 19-11　样机改成产品时要补的工作</caption><thead><tr><th>方面</th><th>原型的做法</th><th>产品要补的</th><th>参见</th></tr></thead><tbody>
+<tr><td>EMC</td><td>模块间用普通线缆</td><td>电源入口滤波、电机电缆屏蔽、强弱电分区、静电防护，按标准试验</td><td>第 18 章</td></tr>
+<tr><td>热</td><td>开放安装，室温</td><td>热阻网络与间歇工况核算，45 °C 环境、飞絮堵塞工况，过热降额</td><td>第 18 章</td></tr>
+<tr><td>成本</td><td>模块单价相加（算例约 2455 元）</td><td>合成一块板、去掉重复的电源和连接器、按批量采购重新选型</td><td>第 27 章</td></tr>
+<tr><td>安全与认证</td><td>急停可用即可</td><td>按 IEC 60204-31、ISO 10821 等做安全设计和试验，防止意外启动</td><td>第 18、23 章</td></tr>
+<tr><td>生产测试</td><td>手动 + 测试台脚本</td><td>ICT、FCT、老化、EOL，测试数据按条码存档并回流</td><td>第 18、22 章</td></tr>
+<tr><td>版本与追溯</td><td>原型的固件、参数版本</td><td>固件签名与双区升级，参数、BOM 受控发布，现场版本可查</td><td>第 18、27 章</td></tr>
+</tbody></table></div>
+<h3 id="s19-9">19.9 设计要点与模型的边界</h3>
+<p>本章的要点是：四种原型共用一套五层架构，差别在主令和执行器的组合；动作以主轴转角（横机以机头位置）为时间基准，执行器的延迟按 6·n·t 折算成转角来检查；选型从写数字的需求表出发，按判据从零件库里挑最便宜的合格规格，BOM、接线表和固件配置由同一份数据生成；固件以事件表加状态机加 HAL 组织，换机头改参数、换模块换驱动文件；固件、参数、BOM 都有版本并随设备上报；测试按单元、SIL、HIL、测试台逐级做，每个用例对应一条需求；原型到产品分级推进，每级的退出条件写成指标。</p>
+<p>本章的模型有明确的边界。主轴选型只算了从静止到最高转速的一次加速，没有算第 8 章讲的随转角周期变化的负载转矩，用 0.8 倍峰值的余量笼统地覆盖；间歇工况的起停次数和稳速负载是示意值，实际要用测功数据。步进电机的矩频曲线用“拐点以下恒转矩、以上按 1/n 下降”的折线近似，真实曲线与驱动电压、细分和共振有关，要查厂商的曲线；同步带的刚度按宽度比例取 EA，只检查了滑座在中间时的固有频率。电磁铁的吸合、释放时间是“模块 + 本平台驱动板”在额定电压下的值，电压偏低、线圈发热时会变长（第 13、14 章），选型时要用最坏情况。电源预算把强激磁按一半计入，是对电容分担的粗略估计。全部模块参数和价格都是示意值，建议编号尚未入库，入库时要按库的规则写明数据出处。</p>
+<aside class="field"><p><strong>现场要点</strong></p><ul>
+<li>样机第一次急停就报过压，先核急停回馈能量和驱动器的制动能力，再看是否装了更重的手轮。</li>
+<li>剪线时好时坏，先查事件表的版本是不是改过、剪线转速是不是被调高，再查电磁铁电源电压；参数和固件版本要和测试报告对得上。</li>
+<li>换了机头，先改参数表里的事件角和停针角，在测试台上重新标定，不要改代码。</li>
+<li>主控 I/O 刚好用满时，留一两路备用或直接加扩展板；样机迭代总会多出一个传感器。</li>
+<li>选型助手说“库里没有”，不要自己编一个型号塞进 BOM；把它记成入库需求，按样本补全条目。</li>
+</ul></aside>
+<h3 id="x19-ex">第 19 章 习题</h3>
+<ol>
+<li>平缝机原型换了一个更轻的手轮，负载折算惯量降到 4×10⁻⁴ kg·m²，同时要求 0.12 s 内从 0 加速到 5000 r/min。仍用 D-MOT-PMSM/400（转子 1×10⁻⁴ kg·m²、峰值 3.2 N·m），所需转矩、惯量比和急停回馈能量各是多少？是否满足 19.4 节的判据？<details class="ans"><summary>参考答案</summary>所需转矩约 2.33 N·m ≤ 0.8 × 3.2 = 2.56 N·m，满足；惯量比 4；回馈能量 0.7 × ½ × 5×10⁻⁴ × 523.6² ≈ 48.0 J。</details></li>
+<li>用 D-SOL-PUSH/L30（吸合 11 ms、释放 7 ms）做剪线电磁铁，剪线转速 300 r/min 时折算转角是多少？要满足 20° 的判据，剪线转速最高多少？换成 M15（吸合 6.9 ms）呢？<details class="ans"><summary>参考答案</summary>吸合折算 19.8°，释放 12.6°，刚好满足；最高约 303 r/min。M15 最高约 483 r/min。</details></li>
+<li>包缝机原型提速到 7000 r/min，主轴编码器每转 10000 个计数。每秒有多少个计数？0.1° 对应多少微秒？为什么事件调度要用编码器定时器的比较中断，而不是在 1 ms 的任务里检查角度？<details class="ans"><summary>参考答案</summary>约 116.7 万个/秒；约 2.38 μs。1 ms 里主轴转过 42°，任务轮询的误差可达几十度，比较中断的误差只有一两个计数。</details></li>
+<li>花样机原型的 Y 轴（运动质量 5 kg、阻力 15 N、加速度 25 m/s²、最高 0.5 m/s）改用 5M-20-25 带轮（节圆直径 31.831 mm），电机转速和所需转矩各是多少？配 D-MOT-STEP/34-45C（闭环，余量 0.8）是否满足？和 3M-24-15 方案比，为什么大带轮反而要更大的转矩？<details class="ans"><summary>参考答案</summary>约 300 r/min；约 2.59 N·m（3M-24-15 方案约 2.01 N·m）。300 r/min 低于拐点，可用 0.8 × 4.5 = 3.6 N·m，满足。带轮半径大，同样的力需要的转矩与半径成正比；转速降低的好处只在高速段才体现。</details></li>
+<li>给花样机原型加一根闭环步进驱动的电子中压脚轴。数字输入、输出和脉冲通道各增加几路？主控 S 加一块扩展板还够不够？<details class="ans"><summary>参考答案</summary>DI 加 1（驱动报警），共 17 路；DO 加 1（方向），共 8 路；脉冲通道加 1，共 3 路。主控 S 有 12 路 DI、8 路 DO、8 路脉冲，加扩展板后 DI 28 路，够用，但 DO 已用满，没有余量。</details></li>
+<li>（讨论）有同学主张把剪线写成“松开脚踏后延时 180 ms 给剪线电磁铁通电”，理由是“测过几次都能剪断”。用本章和第 14 章的道理说明这样做的问题，并说明在事件表里应该怎样写。</li>
+<li>（讨论）你的原型在 P1 阶段剪线成功率 99.7%，固件 0.3.0、参数 LS-P1-001。同学改了拨线角度以后成功率降到 98%，却说不清改了什么。按 19.5、19.7 节的做法，你会怎样安排版本、测试和上报，使这类问题能被定位？</li>
+</ol>
+<h3 id="x19-ref">参考资料</h3>
+<ol class="refs">
+<li>问渠零件与机器人库：README、条目格式 schema/entry.v1.json、A-BSC-SFU、A-PUL-HTD、A-LGD-RAIL、A-CPL-JAW 等条目的 entry.yaml 与 specs.csv（问渠 WenQuest 仓库 library/）。</li>
+<li>问渠数字工厂：AI 选型 factory/digital/hub/select.py；主题命名 factory/digital/wqbus/topics.py；消息信封 factory/digital/wqbus/envelope.py（问渠 WenQuest 仓库）。</li>
+<li>OASIS. MQTT Version 5.0. OASIS Standard, 2019.</li>
+<li>IEC 60204-31. Safety of machinery — Electrical equipment of machines — Part 31: Particular safety and EMC requirements for sewing machines, units and systems.</li>
+<li>ISO 10821. Industrial sewing machines — Safety requirements for sewing machines, units and systems.</li>
+<li>ISO 3408-2. Ball screws — Part 2: Nominal diameters and nominal leads — Metric series.</li>
+<li>Ulrich K T, Eppinger S D. Product Design and Development. McGraw-Hill.</li>
+<li>Samek M. Practical UML Statecharts in C/C++: Event-Driven Programming for Embedded Systems. 2nd ed. Newnes, 2009.</li>
+<li>Grenning J W. Test-Driven Development for Embedded C. Pragmatic Bookshelf, 2011.</li>
+</ol>
+<h3 id="x19-res">配套资源</h3>
+<p><a href="#lab-config" class="labref">虚拟实验 19-1　零件库快速配套器</a>　页面内置一个小型示意零件库（伺服电机、伺服驱动器、步进电机与驱动器、电磁铁、电磁铁驱动板、编码器、主控板、扩展 I/O、电源等，每类 1–6 个规格，用建议编号加规格后缀；带轮、丝杠、导轨、联轴器引用库里已有条目的真实尺寸）。选机种（平缝机、包缝机、花样机、横机），填最高转速、加速时间、负载惯量、剪线和回针转速、电磁铁动作、X–Y 行程、速度、加速度和运动质量、针数、机号和选针器数；页面算出每类判据，从库里挑满足全部判据的最便宜组合，显示 BOM（编号、规格、数量、示意单价、合计）、I/O 映射表、生成的固件配置 JSON 和每条判据的 ✓/✗；BOM 里可以手动换件，黄色行标出与默认需求最优方案的差别。内置 3 个自动判定的任务：平缝机 5000 r/min 全部判据满足且成本最低；包缝机提到 7000 r/min 后找出必须换的模块；花样机 300 × 200 mm 行程试过丝杠以后，选出全部满足且成本最低的方案。模型与 19.4 节的算例相同。</p>
+<p><a href="#lab-servo" class="labref">虚拟实验 13-1　停针定位：伺服调参</a>、<a href="#lab-solenoid" class="labref">虚拟实验 13-2　电磁铁驱动：吸合与释放</a>　本章的转矩限幅、停针角和电磁铁吸合时间来自这两个实验，它们也是软件在环里用的模型。</p><section class="lab" id="lab-servo" data-src="labs/servo.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 13-1　停针定位：伺服调参</h4></div><p>调位置增益、速度增益和积分时间，看主轴停在上针位时的超调、停稳时间和静差；惯量加倍后重新调参。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/servo.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section><section class="lab" id="lab-solenoid" data-src="labs/solenoid.html"><div class="lab-head"><span class="lab-kind">虚拟实验</span><h4>虚拟实验 13-2　电磁铁驱动：吸合与释放</h4></div><p>调驱动电压、强激磁、维持电流和续流方式，看电磁铁吸合与释放的延迟折算成多少主轴转角。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/solenoid.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>

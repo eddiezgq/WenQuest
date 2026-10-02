@@ -1,0 +1,268 @@
+<p class="eyebrow">Part V · Electrical Control</p><h1><span class="chno">Chapter 17</span>Control of Computerised Flat Knitting Machines</h1><div class="seam" aria-hidden="true"></div><div class="chips"><span class="chips-label">Interactive resources in this chapter</span><a class="chip" href="#lab-knit"><b>Virtual lab</b>Flat knitting simulation</a><a class="chip" href="#lab-knitprog"><b>Virtual lab</b>Flat knitting machine operation and programming</a><a class="chip" href="#lab-fpga"><b>Virtual lab</b>FPGA programming for needle selection</a><a class="chip" href="#lab-model-flatknit"><b>3D model</b>Computerised flat knitting machine</a></div><aside class="field">
+<p>Strictly speaking, a flat knitting machine is knitting machinery rather than sewing machinery. This book devotes a chapter to it because it is the clearest example of “position-triggered, needle-by-needle control”: a programmable pattern sewer is one needle plus a moving template, whereas a flat knitting machine is several hundred needles plus a moving carriage, and every needle must decide individually what to do. Read Chapter 15 before this chapter.</p>
+</aside>
+<p><strong>Opening</strong>　The front panel of a jacquard sweater is 50 cm wide and occupies about 240 needles on a 12-gauge flat knitting machine. The carriage sweeps back and forth across the needle bed at about one metre per second, knitting one course per pass. During that pass every needle must decide for itself whether to knit, tuck, miss, or transfer its loop to the opposite needle bed; the loop length, which yarn to use, and whether the back bed should rack must be decided at the same time. A sweater has several hundred courses, each with several hundred decisions. That is where the flat knitting machine’s reputation for being “very complicated” comes from. This chapter starts from how a single needle forms a loop and ends with how a design becomes machine instructions.</p>
+<h3 id="s17-1">17.1 Knitting principles</h3>
+<figure class="fig"><a class="zoom" href="img/fig_vbed.png"><img src="img/fig_vbed.png" alt="Fig. 17-1 Cross-section of the needle beds of a computerised flat knitting machine" loading="lazy"></a><figcaption>Fig. 17-1　Cross-section of the needle beds of a computerised flat knitting machine (viewed along the length of the bed; schematic)</figcaption></figure>
+<p>A flat knitting machine has a front and a back needle bed, forming an inverted V in cross-section with an included angle of about 100°. Several hundred needle tricks (slots) are milled into each bed, and each trick holds one <strong>latch needle</strong>, with a selector jack beneath it. The gap at the top of the beds is called the <strong>trick gap</strong> (needle-bed gap); this is where the loops are formed, and the finished fabric hangs down from the gap and is pulled downward by the take-down rollers.</p>
+<p>The <strong>carriage</strong> straddles the two beds and moves back and forth along their length. Its cam plate lies against the face of the bed and carries a set of fixed or movable <strong>cams</strong>. As the carriage passes, the needle butts that protrude above the bed face enter the track formed by the cams and are pushed first up and then down, completing one loop-forming cycle. The carriage also carries the yarn carrier with it, feeding yarn into the needle hooks. This is exactly the opposite of a sewing machine: on a sewing machine the needle moves up and down at one spot and the fabric moves; on a flat knitting machine the fabric and needle beds stay put and the carriage moves, so hundreds of needles form loops <strong>one after another in space</strong>, rather than one needle forming loops <strong>periodically in time</strong>.</p>
+<p>Needle density is expressed by the <strong>gauge</strong> E, the number of needles per inch of needle bed; E3–E18 are common. The spacing between adjacent needles (needle pitch) is</p>
+<div class="math">\[p = \frac{25.4}{E}\ \text{mm}, \qquad E12:\ p = 2.12\ \text{mm}; \quad E7:\ p = 3.63\ \text{mm}\]</div>
+<p>The higher the gauge, the finer and denser the needles, the finer the yarn, and the thinner the fabric. In Section 17.3 this p becomes the key number for needle-selection control.</p>
+<p><strong>How a needle forms a loop</strong>　Fig. 17-2 shows the five stages of loop formation on a latch needle. The beauty of the latch needle is that no mechanism is needed to open and close the latch: as the needle rises, the old loop pushes the latch open; as the needle descends, the old loop pushes the latch up to close the hook and then slips off over the needle head. The depth d to which the needle descends below the knock-over line (the stitch depth, or sinking depth) determines how long a new loop is drawn; this depth is set by the position of the stitch cam on the carriage (conventionally called the “stitch-length cam”).</p>
+<figure class="fig"><a class="zoom" href="img/fig_knit_stages.png"><img src="img/fig_knit_stages.png" alt="Fig. 17-2 Five stages of loop formation on a latch needle" loading="lazy"></a><figcaption>Fig. 17-2　Five stages of loop formation on a latch needle (schematic)</figcaption></figure>
+<p><strong>Four needle actions</strong>　As the carriage passes, each needle may be pushed to a different height, with different results:</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Height the needle is pushed to</th>
+<th>Result</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Knit</td>
+<td>Clearing height: the old loop slides below the latch</td>
+<td>The old loop is knocked over and a new loop is formed</td>
+<td>Plain, rib and other basic structures</td>
+</tr>
+<tr>
+<td>Tuck</td>
+<td>Tuck height: the old loop remains on the latch</td>
+<td>The old loop is not knocked over; the new yarn also stays in the hook, and the two lie together</td>
+<td>Tuck structures, relief patterns</td>
+</tr>
+<tr>
+<td>Miss</td>
+<td>Does not rise</td>
+<td>The yarn floats past in front of the needle</td>
+<td>Jacquard, colour changes</td>
+</tr>
+<tr>
+<td>Transfer</td>
+<td>Transfer height (higher)</td>
+<td>The loop is handed to a needle on the opposite bed</td>
+<td>Cables, pointelle (eyelets), narrowing/widening for shaping</td>
+</tr>
+</tbody>
+</table></div>
+<p>For a transfer, the needles of the two beds must be aligned. The back bed can shift along its length by a number of needle pitches (<strong>racking</strong>): a loop is transferred from needle i on the front bed to needle i + k on the back bed and then transferred back, so the loop has moved k needle positions. Cables and narrowing (laying the edge loop onto the next needle inward) are all made this way. A computerised flat knitting machine must therefore control: which needle performs which action in which course, how deep the stitch is, which yarn is used, how far the bed racks, and how hard the fabric is pulled down.</p>
+<h3 id="s17-2">17.2 The carriage, the cam system and key components</h3>
+<p>Unrolling the carriage’s cam plate onto a plane gives Fig. 17-3. As the carriage travels in one direction, each needle butt passes through the cam track in the opposite direction relative to the carriage. A cam here is a “cam fixed to the carriage”: the feed cam of Chapter 6 rotates, whereas this cam translates, and its followers are hundreds of needles that run along the same profile one after another.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_1a5faa91.png"><img src="img/w_1a5faa91.png" alt="Chart" loading="lazy"></a><figcaption>Fig. 17-3　Cam track and the three actions (unrolled, schematic). Horizontal axis: position along the carriage; vertical axis: needle height. Blue: knit (S1 selected, S2 selected); orange: tuck (S1 selected, S2 not selected); green dashed: miss (S1 not selected). The grey blocks are the raising cam and the stitch cam, whose depth d is adjusted by a stepper motor.</figcaption></figure>
+<p>The <strong>raising cam</strong> pushes the needle up and the <strong>stitch cam</strong> pulls it down. There is only one set of cams, yet different needles must follow different paths; this is achieved by <strong>needle selection</strong>: before the selector jack under a needle reaches the raising cam, an electromagnetic selector either “selects” or “does not select” it. The butt of a selected needle enters the slope of the raising cam and is pushed up; the butt of an unselected needle is kept out of the track and slides past beside the cam, so the needle does not move. With two selection points working together, three actions can be distinguished:</p>
+<p>If both selection points S1 and S2 select the needle, it rises to clearing height and is then pulled down by the stitch cam to depth d, completing a knit. If S1 selects and S2 does not, the needle rises only to tuck height and the old loop stays on the latch; this is a tuck. If S1 does not select, the needle stays still throughout and misses in this course.</p>
+<p>Transfer uses another set of cams and another selection point on the same principle.</p>
+<p><strong>The stitch cam position is adjustable</strong>　Moving the stitch cam up or down along the needle direction changes d and hence the loop length. On mechanical flat knitting machines this is adjusted with a handwheel and a scale, which is where the Chinese term for “stitch-length setting” comes from; on computerised machines it is adjusted by a stepper motor and can differ from course to course. There is one stitch cam for each direction of carriage travel, and the roles of the two cams swap when the carriage reverses.</p>
+<p><strong>Number of systems</strong>　Several such cam sets can be mounted side by side in one carriage; each is called a <strong>system</strong>. A three-system carriage can knit three courses in one pass (each with its own yarn), or have one system knit and another transfer. The more systems, the more is done per pass, but the longer and heavier the carriage.</p>
+<p>From a control point of view, the cams greatly simplify the problem: how the needle rises and falls is fixed mechanically, and the electronics need only make one or two yes/no decisions for each needle and set the stitch depth. The difficulty is that these decisions must be made at <strong>the right position</strong>—the subject of the next section.</p>
+<h4 id="s17-2-1">17.2.1 Key components</h4>
+<figure class="fig"><a class="zoom" href="img/ps_iso.png"><img src="img/ps_iso.png" alt="Fig. 17-3b 3D model of a computerised flat knitting machine (perspective)" loading="lazy"></a><figcaption>Fig. 17-3b　Model 17-1: a two-bed computerised flat knitting machine (perspective, needle pitch enlarged about 6 times; <a href="#lab-model-flatknit" class="labref">open the 3D model</a> to rotate, explode and play the carriage traverse, needle selection and racking)</figcaption></figure><section class="lab" id="lab-model-flatknit" data-src="labs/model-flatknit.html"><div class="lab-head"><span class="lab-kind">3D model</span><h4 id="x17835">Model 17-1　Computerised flat knitting machine</h4></div><p>V-shaped needle beds, carriage cams and needles, demonstrating knitting, tucking and racking.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/model-flatknit.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<figure class="fig"><a class="zoom" href="img/fk_exp.png"><img src="img/fk_exp.png" alt="Fig. 17-3c Exploded view of a computerised flat knitting machine" loading="lazy"></a><figcaption>Fig. 17-3c　Exploded view: carriage cam plate, back needle bed (green), front needle bed and needle sets (blue), yarn carriers and rails, take-down, carriage drive</figcaption></figure>
+<p><strong>Needle beds</strong>　The tricks in the bed fix the position of each needle; the trick spacing is the needle pitch p. There are two ways of making them: milling tricks into a solid steel plate, or inserting individual hardened trick plates (wales) into a base plate (insert type), so that worn plates can be replaced one at a time. The beds need very high straightness and flatness, because the carriage cams must keep the same clearance to hundreds of needle butts; the tricks of the front and back beds must also be precisely aligned, otherwise transfers will not line up.</p>
+<p><strong>Needle sets</strong>　Each trick holds not just one latch needle but a set of steel elements in series: the latch needle, an intermediate jack (which transmits the push to the needle), the selector jack (the element the selector acts on) and a spring element. The selector does not move the latch needle directly; it decides whether the selector jack’s butt enters the cam track, and the cam then pushes the needle up through the intermediate jack. The selector therefore needs only a very small force and stroke. Latch needles are stamped from high-carbon steel wire and heat-treated, with the latch riveted onto the needle; a sticky latch or a deformed hook leaves a vertical defect line in the fabric.</p>
+<p><strong>Cams</strong>　The cams are a set of steel blocks with specific profiles—translating cams: the slope angle determines how fast the needle rises and falls and the impact on the needle butt. For a given carriage speed, the steeper the slope, the faster the needle reaches position and the shorter the cam, but the greater the impact between butt and cam. This is exactly the cam pressure-angle problem of the theory of machines. Cams are made of hardened tool steel, and the stitch cam is positioned by a stepper motor through a lead screw or eccentric.</p>
+<p><strong>Electromagnetic selectors</strong>　A selector consists of several stacked layers of electromagnets and armature plates, each layer acting on selector-jack butts at one height. The common type is multi-stage: adjacent needles are assigned to different stages, so the time available to each stage is several times longer than t_n (Section 17.3). Its response time can be estimated roughly: the magnetic force is F = B²A / (2μ₀); taking an air-gap flux density B = 0.8 T and a pole area A = 10 mm² gives F ≈ 2.5 N; with an armature mass m = 0.5 g and a stroke s = 0.3 mm, the time to complete the stroke under full force is</p>
+<div class="math">\[t = \sqrt{\frac{2sm}{F}} = \sqrt{\frac{2 \times 0.0003 \times 0.0005}{2.5}} \approx 0.35\ \text{ms}\]</div>
+<p>Adding the current rise time (about 0.2 ms with over-voltage drive) gives the roughly 0.6 ms used in Section 17.3 (all of the above are example values). This estimate shows the direction for selector design: <strong>reducing the stroke and armature mass is more effective than increasing the current</strong>. Many selectors also include a permanent magnet, so the electromagnet only has to “push off” or “release” the armature, which lowers power consumption.</p>
+<p><strong>Yarn carriers, racking and take-down</strong>　The yarn carriers hang on rails and are picked up and dropped by carrier drivers on the carriage (solenoid-driven pins). Racking is done by a servo motor pushing the back bed through a ball screw; positioning must be accurate to a few hundredths of a millimetre, and a brake prevents the bed from being pushed by the carriage. The main take-down roller is rubber-covered and driven by a torque-controlled motor; at the start of a piece, when the fabric cannot yet reach the roller, a comb (set-up comb) holds it first. On the yarn-supply side there are also yarn storage feeders, tensioners, yarn-break and knot detectors, and the yarn-measuring wheel used for closed-loop loop-length control in Section 17.7.</p>
+<h3 id="s17-3">17.3 Needle selection by position</h3>
+<p><strong>The time available for each needle</strong>　When the carriage passes the bed at speed v, the time between two adjacent needles is</p>
+<div class="math">\[t_n = \frac{p}{v}, \qquad E12,\ v = 1.2\ \text{m/s}:\ t_n = \frac{2.12\ \text{mm}}{1.2\ \text{m/s}} = 1.76\ \text{ms}\]</div>
+<p>In other words, every selection point must make a select/do-not-select decision for the next needle every 1.76 ms, and the action must happen within the short stretch of travel in which the selector jack is exactly opposite the selector. This is the same kind of problem as the needle-out-of-fabric window in Chapter 15: the timing of the action is determined not by a clock but by position.</p>
+<p><strong>Position triggering</strong>　The controller always knows the carriage position x from the encoder of the carriage drive motor (or a linear scale). Needle i sits on the bed at x_i = x_0 + i·p, and a given selection point sits at a fixed offset c on the carriage, so the ideal position for that point to act on needle i is x = x_i − c. In practice, before each course starts, the selection data for that course (one bit per needle per selection point) are loaded into an FPGA, which compares the position on every encoder pulse and outputs when the target is reached. This is a hardware comparison with microsecond-level latency and does not depend on software interrupt response.</p>
+<p><strong>Lead compensation</strong>　An electromagnetic selector has a delay T_d between receiving a command and actually moving (coil current rise plus armature travel). During this time the carriage travels a further v·T_d. With T_d = 0.6 ms (example value) and v = 1.2 m/s, that is 0.72 mm, or 0.34 needle pitch. The command must therefore be issued early:</p>
+<div class="math">\[x_{cmd} = x_i - c - v(t)\,T_d\]</div>
+<p>The key is that v(t) must be the <strong>real-time speed</strong>. The carriage reverses at the end of every pass, and after reversing there is an acceleration zone; if the fabric is narrow or near the edge of the bed, some needles are selected while the carriage is still accelerating. Fig. 17-4 compares three approaches.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_f92b9197.png"><img src="img/w_f92b9197.png" alt="Chart" loading="lazy"></a><figcaption>Fig. 17-4　Three ways of handling selection lead (E12, T_d = 0.6 ms). Top: carriage speed through the acceleration zone after reversal (full speed reached at position 0). Bottom: selection position error in needle pitches; green dashed: no compensation (0.34 p at full speed); orange: fixed lead (up to 0.283 p early at the start); blue: real-time speed compensation (0.034 p); dotted line: allowable error 0.25 p (example value).</figcaption></figure>
+<p>With no compensation at all, selection lags by 0.34 p at full speed, outside the allowable range, so such a machine can only run slowly. With a fixed lead tuned for full speed, the error in the full-speed zone is zero; but in the acceleration zone, the slower the carriage, the further ahead the selection fires, and the error in the first stretch after reversal can reach 0.28 p. Only with real-time speed compensation is the error reduced to the uncertain part of T_d itself. T_d varies with coil temperature and supply voltage, so the machine must be calibrated periodically, or T_d must be shortened with over-voltage fast excitation.</p>
+<p><strong>Where the speed limit comes from</strong>　From t_n = p/v, for the same selector response, the higher the gauge (the smaller p), the lower the allowable carriage speed. If the selector must complete one engage–release cycle, of cycle time T_c, within the time of one needle pitch, then v_max = p / T_c. This is why high-gauge flat knitting machines demand faster selectors, and also why the common multi-stage selectors assign adjacent needles to different stages: each stage handles only one needle in every few, so the time available to it is multiplied several times.</p>
+<p><strong>Reversal zone</strong>　The carriage must travel some distance beyond each end of the fabric before it can reverse: first, the whole cam plate must completely clear the last working needle; second, decelerating takes a distance of v²/(2a). This travel knits nothing but costs time, which is especially noticeable with narrow fabrics (calculated in Section 17.8). The controller generally sets the reversal points automatically from the actual fabric width rather than running the full length of the bed every time.</p>
+<h3 id="s17-4">17.4 Stitch length, yarn carriers, racking, take-down and protection</h3>
+<p>Needle selection decides “which needle does what”; five other kinds of actuators decide “how it turns out”.</p>
+<p><strong>Stitch length (loop length)</strong>　Each system has a left and a right stitch cam for both the front and the back bed, each with its depth adjusted by a stepper motor through a cam or lead screw. The “stitch value” given in the knitting program is the position of that stepper motor. Changing the stitch value between courses is easy; changing it by needle position within one course (for example, different tightness at the sides and centre of a panel) requires the stepper motor to move according to position while the carriage is moving—the same kind of problem as needle selection.</p>
+<p><strong>Yarn carriers</strong>　Above the carriage are several rails, each carrying one or two yarn carriers. A carrier has no drive of its own: as the carriage passes, a solenoid extends a pin to “pick up” the carrier and take it along, and drops it at the specified position. The controller must remember where each carrier is parked. A carrier must be dropped just slightly outside the fabric edge: too far out and the edge yarn is drawn too long, leaving a loose edge; too close and the edge needles may not receive yarn. In multi-colour jacquard several carriers are used in one course, and the order in which they are picked up and dropped is arranged by the pattern compiler.</p>
+<p><strong>Racking</strong>　The back bed is shifted by a servo motor through a lead screw or belt drive. During knitting the needles of the front and back beds are offset from each other; before a transfer the back bed moves to the needle-opposite-needle position, and after the transfer it moves back or on to the next position. Racking must be completed in the short time while the carriage is reversing and the cam plate is clear of the bed, and it must stop accurately and firmly: in a transfer the two needles have only a few tenths of a millimetre of alignment margin, and any offset will cause a needle crash. Racking is therefore a “short-stroke, high-precision, time-limited” positioning problem, very similar to the X–Y table of Chapter 15 completing a stitch within the needle-out-of-fabric window.</p>
+<p><strong>Take-down</strong>　The take-down rollers must continuously apply a downward pull to the fabric; otherwise the old loops will not leave the needle heads and loops pile up higher and higher (the fabric floats up); too much pull stretches the loops, causing holes or even yarn breaks. Different structures produce different lengths of fabric per course, so take-down is generally <strong>torque (tension) controlled</strong> rather than speed controlled, with the tension value set course by course in the knitting program. For the first few courses, before the fabric reaches the rollers, a set-up comb or auxiliary roller holds it.</p>
+<p><strong>Protection</strong>　One operator usually tends several flat knitting machines, so faults must be detected by the machine itself. Common protections include yarn-break and knot detection (on the yarn path), needle-crash detection (a sudden rise in carriage-drive torque, or a dedicated probe), fabric float-up detection, fabric wrap-up detection and safety doors. There are two kinds of stop: for ordinary faults the carriage finishes the current course and then stops, so knitting can continue; for dangerous faults such as a needle crash or an opened door it stops immediately, with a braking distance of v²/(2a), about 36 mm at 1.2 m/s and a braking deceleration of 20 m/s².</p>
+<h3 id="s17-5">17.5 Structure of the control system</h3>
+<figure class="fig chart"><a class="zoom" href="img/w_9028f6e2.png"><img src="img/w_9028f6e2.png" alt="Chart" loading="lazy"></a><figcaption>Fig. 17-5　Block diagram of the control system of a computerised flat knitting machine</figcaption></figure>
+<p>Compared with a programmable pattern sewer (Fig. 15-2), the biggest difference is that control is split into two levels with very different time scales.</p>
+<p>The main controller works “per course”. It parses the knitting program and, before each reversal, prepares the next course’s direction, speed, selection data for each selection point, stitch values, carrier pick-up and drop, racking amount and take-down tension, and sends them to the actuator units. A course usually takes several hundred milliseconds to knit, so there is ample time.</p>
+<p>The carriage control board works “per needle”. Mounted on the carriage, its FPGA triggers the selectors needle by needle according to carriage position, and changes stitch values and picks up or drops carriers at specified needle positions. Each needle position allows only one or two milliseconds, and the position comparison must be completed within microseconds.</p>
+<p>The carriage board is mounted on the carriage rather than in the frame so that the wiring of dozens of selectors and solenoids can be connected close by, and only power and one bus need pass through the cable chain. The price is that the carriage board must work under continuous vibration and acceleration, placing high demands on the reliability of its structure and connectors (Chapter 18).</p>
+<h4 id="s17-5-1">17.5.1 Structure of the carriage board</h4>
+<figure class="fig chart"><a class="zoom" href="img/w_d151b592.png"><img src="img/w_d151b592.png" alt="Chart" loading="lazy"></a><figcaption>Fig. 17-5b　Hardware composition of the carriage control board (one typical partitioning)</figcaption></figure>
+<p>The carriage board has three functional areas:</p>
+<p>The first is the MCU. It communicates with the main controller over the bus in the cable chain and, before each reversal, writes the next course’s selection data into the FPGA’s RAM and sets the stitch values and carrier pick-up/drop; it also runs self-tests and reports faults. The MCU’s time scale is the course.</p>
+<p>The second is the FPGA. Encoder decoding, position counting, selection comparison and pulse generation are all done in hardware at a clock of 50–100 MHz; only a few clock cycles pass between the carriage reaching position and the pulse being issued. The FPGA’s time scale is the needle.</p>
+<p>The third is the driver stage. The selectors are driven with over-voltage drive using a MOSFET array plus high-voltage storage capacitors, with fast freewheeling through TVS diodes—the same method as for the trimming solenoid in Section 15.9.2, only an order of magnitude faster; current sensing is used to detect open and short-circuited coils.</p>
+<p>Because the carriage board rides on the carriage and moves back and forth with it, a good deal of mechanical work is needed besides the electrical design: large components are glued down, connectors have latches, power devices are mounted on a heat-sink plate, and cable-chain cables are chosen for flex life. In actual maintenance, the common carriage-board faults are often not the chips but loose connectors and broken conductors in the cable-chain cables.</p>
+<h4 id="s17-5-2">17.5.2 FPGA needle-selection logic</h4>
+<figure class="fig chart"><a class="zoom" href="img/w_9b71bb64.png"><img src="img/w_9b71bb64.png" alt="Chart" loading="lazy"></a><figcaption>Fig. 17-5c　Logic block diagram of an FPGA needle-selection channel</figcaption></figure>
+<p>A selection channel consists of six modules. <strong>Quadrature decoding</strong> turns the A and B square waves into up/down pulses and direction; the <strong>position counter</strong> accumulates them into the carriage position pos; the <strong>speed measurement</strong> module counts how many clock cycles pass between two counts (period); the <strong>lead</strong> module computes lead = TD/period; the <strong>selection-data RAM</strong> gives, by needle number, the target position target of the next needle and whether it is selected; the <strong>comparator</strong> issues fire when pos + lead ≥ target, increments the needle number, and at the same time triggers the <strong>pulse generator</strong>. The core code of the comparator and pulse generator follows (detailed decoding code is in Virtual lab 17-3).</p><section class="lab" id="lab-fpga" data-src="labs/fpga.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4 id="x35503">Virtual lab 17-3　FPGA programming for needle selection</h4></div><p>First build a selection channel from graphical blocks, then write simplified Verilog and inspect the waveforms.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/fpga.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<pre><code class="language-verilog">// Comparator: in forward motion, fire lead counts before reaching the target
+assign lead = (period == 0) ? 0 : TD / period;   // real designs usually use a lookup table instead of division
+always @(posedge clk) begin
+  if (pos + lead &gt;= target &amp;&amp; target != last_t &amp;&amp; sel) begin
+    fire &lt;= 1;  last_t &lt;= target;  idx &lt;= idx + 1;   // next needle
+  end else
+    fire &lt;= 0;
+end
+
+// Pulse generator: over-voltage for T1 clocks, then PWM hold for T2 clocks (duty DUTY/16)
+always @(posedge clk) begin
+  if (fire) cnt &lt;= T1 + T2;
+  else if (cnt != 0) cnt &lt;= cnt - 1;
+  pwm   &lt;= pwm + 1;                       // 4-bit free-running counter, PWM carrier
+  hv_on &lt;= (cnt &gt; T2);                    // over-voltage switch: on only for the first T1 clocks
+  lv_on &lt;= (cnt != 0) &amp;&amp; (cnt &lt;= T2) &amp;&amp; (pwm &lt; DUTY);  // hold switch: PWM
+end
+</code></pre>
+<p>Some engineering details:</p>
+<p>First, the cost of division. TD/period needs a divider in the FPGA, which uses many resources and adds latency. Fortunately period has a limited range, so a lead table (say 256 entries) can be computed in advance and simply looked up at run time.</p>
+<p>Second, reversal. When the carriage reverses, the needle number must count down, the comparison condition becomes pos − lead ≤ target, and the offset of the selection point on the carriage must also be mirrored. A common approach is for the MCU to write, at reversal, a target table already converted for the new direction, so the FPGA only has to compare.</p>
+<p>Third, double buffering. The RAM is split into two banks: while the carriage is using one, the MCU writes into the other, and the banks swap at reversal, avoiding errors from reading and writing at the same time.</p>
+<p>Finally, safety. If the encoder signal is lost (A and B do not change for a long time while the carriage drive is still turning), or the count suddenly jumps, all selection outputs must be switched off immediately and an alarm raised; otherwise a whole course may be selected wrongly, or needles may even crash.</p>
+<h3 id="s17-6">17.6 Pattern programming: from garment style to machine instructions</h3>
+<p>Between the design sketch and the machine, a sweater goes through three levels of conversion.</p>
+<p>Step 1 is from style to knitting specification: the numbers of needles and courses are calculated from the finished dimensions and the fabric density. Horizontal density is the number of loops (needles) per centimetre and vertical density the number of courses per centimetre; both must first be measured on a small swatch. For example, a front panel 50 cm wide at a horizontal density of 5.5 needles/cm is 275 needles; a body length of 60 cm at a vertical density of 7 courses/cm is 420 courses (example values). The shapes of the armholes and neckline are converted into “narrow or widen so many needles every so many courses”.</p>
+<p>Step 2 is from knitting specification to pattern chart: on squared paper, each square represents the action of one needle in one row, marked with colours or symbols for front-bed knit, back-bed knit, tuck, transfer, colour change and so on (Fig. 17-6). The main work of the pattern-design software is editing this chart.</p>
+<p>Step 3 is from pattern chart to machine program: a compiler splits each chart row into one or more courses, each course being one pass of the carriage.</p>
+<figure class="fig chart"><a class="zoom" href="img/w_b834f1c3.png"><img src="img/w_b834f1c3.png" alt="Chart" loading="lazy"></a><figcaption>Fig. 17-6　Pattern chart and the compiled selection data (12 needles × 8 rows example)</figcaption></figure>
+<p>The compiled program is a table arranged by course, each line corresponding to one carriage pass. Taking the 4th chart row of Fig. 17-6 as an example (example values):</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Course</th>
+<th>Direction</th>
+<th>Yarn carrier</th>
+<th>Front-bed selection (1 = knit)</th>
+<th>Back bed</th>
+<th>Stitch value</th>
+<th>Racking</th>
+<th>Carriage speed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4a</td>
+<td>→</td>
+<td>1 (ground colour)</td>
+<td>111110011111</td>
+<td>Backing structure</td>
+<td>42</td>
+<td>0</td>
+<td>0.9 m/s</td>
+</tr>
+<tr>
+<td>4b</td>
+<td>←</td>
+<td>2 (pattern colour)</td>
+<td>000001100000</td>
+<td>Backing structure</td>
+<td>42</td>
+<td>0</td>
+<td>0.9 m/s</td>
+</tr>
+</tbody>
+</table></div>
+<p>The compiler does more than translate; it must also resolve many constraints:</p>
+<p>First it must assign systems and directions. A multi-system carriage can do several things in one pass, so the compiler merges courses into as few passes as possible to reduce empty travel.</p>
+<p>Next it must sequence the yarn carriers. Each carrier can only start from the end where it was last parked, so the order of colour changes determines which courses must be knitted in which direction; two carriers must also not collide.</p>
+<p>For narrowing and cables it must also insert transfers and racking: transfer the loops to the opposite bed, rack, then transfer back, so one chart row may become several passes. Carriage speed must also be reduced on transfer courses.</p>
+<p>Then come the parameter assignments. Stitch value, take-down tension and carriage speed for each course all depend on the structure; they are usually referenced through “parameter indices” into a parameter table, which makes it easy to adjust them all together on the machine.</p>
+<p>Finally there is checking. Before going to the machine, the program is simulated in software to catch errors such as “transfer from a needle that has no loop”, “too many consecutive tucks” and “carrier collision”. If such errors are found only on the machine, the price is needle crashes and scrapped panels.</p>
+<h3 id="s17-7">17.7 Closed-loop loop-length control and whole-garment knitting</h3>
+<h4 id="s17-7-1">17.7.1 Closed-loop loop-length control</h4>
+<p><strong>Problem</strong>　The same stitch value does not necessarily produce the same loop length. Yarn tension, the yarn’s friction coefficient, humidity and cam wear all shift the actual loop length. For a garment, a 1% difference in length between front and back panels means 6 mm on a 60 cm body length, so they will not line up when seamed; if sizes differ between batches of an order, the customer will reject the goods. The stitch value is only an open-loop setting; to hold loop length within ±1%, it must be measured and fed back.</p>
+<p><strong>Method</strong>　A measuring wheel with an encoder is fitted in the yarn path to measure the yarn actually consumed by each course, L_m. The number of needles N knitting in this course is known; with a target loop length l*, the deviation per loop is</p>
+<div class="math">\[\Delta l = \frac{L_m}{N} - l^*, \qquad \Delta d = -k\,\frac{\Delta l}{\partial l / \partial d}, \quad 0 &lt; k &lt; 1\]</div>
+<p>The stitch depth of the next course of the same type is corrected by Δd. The gain k is less than 1 so that the correction is spread over several courses and measurement noise does not cause oscillation. A loop has two legs, so roughly speaking each 1 mm increase in stitch depth increases loop length by about 2 mm, i.e. ∂l/∂d ≈ 2.</p>
+<p><strong>Worked example</strong>　N = 275, l* = 5.0 mm, so the target yarn per course is 1375 mm; the measured L_m = 1400 mm, 1.8% long. Δl = 0.091 mm; taking k = 0.5, Δd = −0.5 × 0.091 / 2 ≈ −0.023 mm. If one step of the stitch stepper motor corresponds to 0.01 mm (example value), that is 2 steps shallower. This example shows that closed-loop control requires a length-measurement accuracy better than 0.5% and a stitch-value resolution on the order of a hundredth of a millimetre.</p>
+<h4 id="s17-7-2">17.7.2 Whole-garment knitting</h4>
+<p><strong>Problem</strong>　A traditional sweater is made by first knitting the front, back and two sleeve panels on a flat knitting machine, then linking them loop by loop on a linking machine and seaming them into a garment. Linking relies entirely on manual loop-by-loop alignment and is one of the most labour-intensive operations in a knitwear factory (Chapter 29). Could the garment come off the machine already finished?</p>
+<p><strong>Principle</strong>　The front bed knits the front of the body and the back bed knits the back, joined at both ends of the bed, forming a tube (the body tube); each sleeve forms its own tube alongside. At the armholes, transfers and racking gradually merge the three tubes into one, and then the shoulders and neck are knitted. The difficulty is that for a loop on one needle to be transferred across, there must be an empty needle opposite to receive it. An ordinary two-bed machine therefore has to use <strong>alternate-needle knitting</strong>, using only half the needles and leaving the other half empty as transit space, which effectively halves the gauge. Adding two auxiliary beds above the two main beds (four beds) allows loops to be parked temporarily on the auxiliary beds, so knitting can use the full gauge.</p>
+<p><strong>Costs and discussion</strong>　Linking and seaming operations are eliminated, and there is no cutting waste. But the number of transfers increases sharply, the carriage must make many more passes, and the machine time per garment is long; programming and machine setup are difficult; and there are restrictions on yarns and structures. Whether whole-garment knitting pays off requires weighing “linking labour saved” against “machine time added”; the knitwear-factory section of Chapter 29 makes this comparison.</p>
+<h3 id="s17-8">17.8 Design example: carriage speed, needle selection and output</h3>
+<p>How long does a flat knitting machine take to knit one panel? Is a faster carriage always better? The following example ties together Sections 17.3–17.6. All numbers are example values.</p>
+<p><strong>Given</strong>　E12 (p = 2.12 mm); front panel 275 needles, width w = 582 mm; single-system carriage, with a span from the first to the last selection point of the cam plate L_k = 150 mm; maximum carriage speed v = 1.2 m/s, acceleration a = 10 m/s²; selector delay T_d = 0.6 ms, one engage–release cycle T_c = 1.2 ms; a 0.05 s dwell at each reversal (racking, carrier change); the panel has 760 courses in total (120 rib courses; 300 two-colour jacquard chart rows making 600 courses; 40 narrowing/transfer courses).</p>
+<p><strong>Step 1: can the selectors keep up?</strong>　t_n = p/v = 2.12 / 1.2 = 1.76 ms &gt; T_c = 1.2 ms, so yes. For E18 (p = 1.41 mm), t_n = 1.18 ms &lt; T_c, so v must be reduced below 1.41 / 1.2 ≈ 1.17 m/s, or a multi-stage selector must be used to select adjacent needles separately.</p>
+<p><strong>Step 2: reversal margin</strong>　With a fixed lead, the carriage must reach full speed before passing the first needle, i.e. the margin c ≥ v²/(2a) = 72 mm. The travel and time of one pass are</p>
+<div class="math">\[D = w + L_k + 2c = 582 + 150 + 144 = 876\ \text{mm}, \qquad t = \frac{D}{v} + \frac{v}{a} + 0.05 = 0.73 + 0.12 + 0.05 = 0.90\ \text{s}\]</div>
+<p>760 courses take about 684 s in total, i.e. <strong>11.4 min</strong> per panel.</p>
+<p><strong>Step 3: three directions for improvement</strong></p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Approach</th>
+<th>Time per pass</th>
+<th>Passes</th>
+<th>Time per panel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baseline</td>
+<td>Fixed lead, c = 72 mm</td>
+<td>0.90 s</td>
+<td>760</td>
+<td>11.4 min</td>
+</tr>
+<tr>
+<td>A</td>
+<td>Real-time speed compensation, c reduced to 20 mm</td>
+<td>0.81 s</td>
+<td>760</td>
+<td>10.3 min</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Two-system carriage (L_k = 300 mm), both colours knitted in the same pass</td>
+<td>1.03 s</td>
+<td>460</td>
+<td>7.9 min</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Baseline with v raised to 1.6 m/s</td>
+<td>0.83 s</td>
+<td>760</td>
+<td>10.5 min</td>
+</tr>
+</tbody>
+</table></div>
+<p>Option C gains less than one might expect: a 33% increase in v makes a panel only 8% faster. The reason is that both the acceleration/deceleration time v/a and the reversal margin v²/(2a) grow with v—the required margin rises from 72 mm to 128 mm; moreover, at 1.6 m/s t_n = 1.33 ms, already close to the selector’s cycle time. Option B gains the most because it reduces the number of passes; the price is a longer, heavier carriage, and its advantage also shrinks for narrow fabrics. This is the same lesson as the conclusion in Chapter 15 that a pattern sewer’s capacity is limited by loading and unloading: what makes a system slow is often not the most conspicuous speed.</p>
+<h3 id="s17-9">17.9 Virtual labs and 3D model</h3>
+<p><a href="#lab-knit" class="labref">Open Virtual lab 17-1: Flat knitting simulation</a></p><section class="lab" id="lab-knit" data-src="labs/knit.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4 id="x45972">Virtual lab 17-1　Flat knitting simulation</h4></div><p>The carriage traverses and selects needles by position, building the loop diagram course by course and estimating the time per course and per panel.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/knit.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<p>In the simulator you can choose plain, rib, tuck, two-colour jacquard and other patterns, or click squares to make your own. Once knitting starts, the carriage traverses the bed, and each time a selection point (red line) passes a needle, that needle rises or stays still according to the pattern; the loop diagram builds up course by course below. Adjust the gauge, carriage speed, acceleration, reversal margin, selector delay and lead-compensation method; the program calculates each needle’s selection position error using the formulas of Section 17.3, marks needles with errors above 0.25 needle pitch in red on the fabric, and estimates the time per course and per panel. The lab tasks are given in the lower right of the page.</p>
+<p><strong>Virtual lab 17-2　Flat knitting machine operation and programming</strong>　<a href="#lab-knitprog" class="labref">Open the lab</a></p><section class="lab" id="lab-knitprog" data-src="labs/knitprog.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4 id="x79106">Virtual lab 17-2　Flat knitting machine operation and programming</h4></div><p>Draw a pattern chart with symbols, compile it into course-by-course carriage actions, then run it on the operating panel.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/knitprog.html" target="_blank" rel="noopener">Open in new window ↗</a></div><div class="lab-frame" hidden></div></section>
+<p>Draw the pattern on the chart grid with symbols (K front knit, P back knit, T tuck, &gt; &lt; transfer, . miss), set stitch values and speed with function lines, and compile it into course-by-course carriage actions (including transfer courses, racking and empty passes); then, on the operating panel, home the machine, set it up, start it, and handle injected faults such as yarn breaks and needle crashes. 7 guided lessons and 4 automatically graded tasks.</p>
+<p><strong>Virtual lab 17-3　FPGA needle-selection logic</strong>　<a href="#lab-fpga" class="labref">Open the lab</a></p>
+<p>Part A builds a selection channel from graphical blocks: choose the decoding multiplication, speed-measurement method, lead compensation and over-voltage drive parameters, and observe missed selections, false selections and power consumption at different carriage speeds. Part B completes three pieces of code—the decoder, the comparator and the pulse generator—in a built-in simplified Verilog simulator and checks the waveforms with a testbench. 4 tasks.</p>
+<p><strong>3D model 17-1　Carriage and needle beds of a computerised flat knitting machine</strong>　<a href="#lab-model-flatknit" class="labref">Open the model</a></p>
+<p>The V-shaped front and back needle beds, carriage cams and needles can be rotated, viewed in perspective and exploded; the needles rise and fall along the cam track, you can switch between rib, plain and tuck, and racking is demonstrated.</p>
+<aside class="field">
+<p><strong>Shop-floor notes</strong></p>
+<ul>
+<li>Needle crashes occur mostly on transfer courses and at the reversal ends: first check racking positioning and the carriage speed on transfer courses, then check whether the pattern contains “transfers from empty needles”.</li>
+<li>Knit the first panel of a new pattern at low speed (e.g. 0.3–0.5 m/s), and increase speed only after confirming it is correct.</li>
+<li>Loose or broken edges on panels: check the carrier parking positions, the reversal margin and the stitch value of the edge needles.</li>
+<li>Panels in the same batch differ in length: check whether closed-loop loop-length control is enabled, whether the feed tension from each yarn package is consistent, and whether the take-down value has been changed.</li>
+<li>A vertical line of dropped stitches in the fabric: most likely a latch needle with a sticky latch or a deformed hook; locate that needle by position and replace it.</li>
+</ul>
+</aside>
+<h3 id="x95699">Chapter 17 exercises</h3>
+<ol>
+<li>For an E7 flat knitting machine with a carriage speed of 1.0 m/s, what is the selection time per needle t_n? And for E16?<details class="ans"><summary>Answer</summary>3.63 ms; 1.59 ms</details></li>
+<li>E14, v = 1.2 m/s, selector delay 0.5 ms. Without compensation, by how many needle pitches does selection lag?<details class="ans"><summary>Answer</summary>About 0.33</details></li>
+<li>With a fixed lead tuned for 1.2 m/s, how far ahead does selection fire when the carriage passes a needle at 0.5 m/s? Calculate for E12 and T_d = 0.6 ms, and explain why it is early rather than late.</li>
+<li>Why are two selection points needed to distinguish knit from tuck? Can a tuck be made with only one selection point?</li>
+<li>Why is take-down usually torque controlled rather than speed controlled? Give an example of a structure for which speed control would cause problems.</li>
+<li>Closed-loop loop length: N = 200, l* = 6.0 mm, and the measured yarn per course is 1176 mm. With k = 0.5 and ∂l/∂d = 2, should the stitch be made deeper or shallower, and by how much?</li>
+<li>Using the parameters of Section 17.8, if only a cuff 100 needles wide is knitted, what percentage of one pass’s travel is taken up by the reversal margin and the cam-plate span? Use this to explain why factories often knit several pieces side by side on one needle bed.</li>
+<li>(Discussion) Whole-garment knitting eliminates linking but increases machine time. List the data needed to compare the costs of the two processes, and use Virtual lab 17-1 to estimate the machine time for one panel.</li>
+</ol>

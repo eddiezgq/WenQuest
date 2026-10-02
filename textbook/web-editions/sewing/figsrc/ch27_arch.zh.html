@@ -1,0 +1,53 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.layer{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:stretch;margin-bottom:10px}
+.lh{border-radius:10px;padding:10px 12px;font-weight:700;font-size:15px;display:flex;flex-direction:column;justify-content:center}
+.lh small{font-weight:400;font-size:12px;color:#5a6570;margin-top:3px}
+.row{display:grid;gap:10px}
+.box{padding:8px 9px}
+.box b{font-size:14px}
+.box span{font-size:12px;line-height:1.4}
+.plan{border-style:dashed;background:#fff}
+.plan b::after{content:"（方案）";font-weight:400;font-size:11.5px;color:#c0392b}
+.bus{border:2.5px solid #14797f;background:#e6f3f3;border-radius:10px;padding:10px 14px;text-align:center}
+.bus b{color:#0f6e74;font-size:15px}
+.bus span{display:block;font-size:12.5px;color:#1b2430;font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;margin-top:3px}
+.side{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.leg{display:flex;gap:22px;font-size:12.5px;color:#5a6570;margin-top:12px;align-items:center}
+.leg i{display:inline-block;width:30px;height:16px;border:2px solid #9aa4ae;border-radius:4px;vertical-align:middle;margin-right:6px}
+</style>
+<div class="fig" style="--w:1080px">
+<p class="title">缝纫机厂的总体架构：每一层用问渠数字工厂的哪个部件</p><p class="sub">示意。实线框 = 问渠数字工厂已有的部件；虚线框 = 为缝纫机厂新设计的部分（方案，待建）。所有系统只和总线打交道，彼此不直接调用</p>
+<div class="layer"><div class="lh fill-p" style="color:#7444b4">看板与 AI<small>谁在看、谁在问</small></div>
+<div class="row" style="grid-template-columns:repeat(5,1fr)">
+<div class="box p"><b>首页看板</b><span>hub/kpi.py<br>OEE、一次合格率、交期、控制图</span></div>
+<div class="box p"><b>AI 工厂助手</b><span>hub/ai.py<br>简报、提醒、起草提议</span></div>
+<div class="box p"><b>AI 选型</b><span>hub/select.py<br>只从零件库挑</span></div>
+<div class="box p"><b>教学评分</b><span>hub/teach.py<br>教学模式</span></div>
+<div class="box p plan"><b>服务门户</b><span>机群故障码、备件预测<br>（27.7 节）</span></div>
+</div></div>
+<div class="layer"><div class="lh fill-b" style="color:#2a5fb8">业务系统<small>记录与流程</small></div>
+<div class="row" style="grid-template-columns:repeat(6,1fr)">
+<div class="box b"><b>ERP</b><span>ERPNext v16<br>物料、BOM、工艺、工单、采购、成本</span></div>
+<div class="box b"><b>PLM</b><span>hub/plm.py、design.py<br>提交—审批—发布；FreeCAD / SolidWorks 宏</span></div>
+<div class="box b"><b>配置器</b><span>hub/configurator.py<br>现有 SH-301、WQR-105 模板；WQ-LS 模板待建</span></div>
+<div class="box b"><b>MES</b><span>hub/mes.py + 车间终端<br>逐工序派工、开工、暂停</span></div>
+<div class="box b"><b>QMS</b><span>ERPNext 质量检验单 + 自动 NCR<br><em style="color:#c0392b;font-style:normal">SPC 规则、8D：待建</em></span></div>
+<div class="box b"><b>WMS</b><span>ERPNext 仓库、批次、序列号<br><em style="color:#c0392b;font-style:normal">库位、条码枪：待建</em></span></div>
+</div></div>
+<div class="layer"><div class="lh fill-y" style="color:#a8740c">历史库<small>唯一的事实来源</small></div>
+<div class="box y" style="text-align:left"><b>PostgreSQL 历史库（hub/historian.py）</b><span>订阅 wq/#，每条消息原样存入 bus_message（不合规范的也记下、标 valid=false）；提取设备状态变化点；测量不合格时自动开 NCR。看板、AI、评分都从这里取数，每个数字都能追到消息编号</span></div></div>
+<div class="layer"><div class="lh fill-t" style="color:#0f6e74">统一数据总线<small>MQTT + 统一信封</small></div>
+<div><div class="bus"><b>Mosquitto（MQTT）· 主题 wq/&lt;工厂&gt;/&lt;区域&gt;/&lt;单元&gt;/&lt;类别&gt; · 信封 {v, id, ts, type, source, mode, corr, data}</b><span>wq/sewing/machining/hmc-h01/status　wq/sewing/assembly/adj-03/measurement　wq/sewing/test/eol-02/measurement　wq/sewing/ai/alert</span></div>
+<div class="side"><div class="box t"><b>Node-RED 桥接</b><span>bridge/：ERPNext ↔ 总线（订单、工单、作业卡、检验单、设计版本、提议执行）</span></div>
+<div class="box t"><b>零件库 · CAE</b><span>library/：标准件与机构条目（A/B/C/D）；cae/：有限元与疲劳（现有对象是轴）</span></div></div></div></div>
+<div class="layer"><div class="lh fill-o" style="color:#c4531d">设备与产线<small>数据的来源</small></div>
+<div class="row" style="grid-template-columns:repeat(5,1fr)">
+<div class="box o"><b>仿真车间</b><span>sim/：减速器厂 12 台设备、AGV、三坐标<br>缝纫机厂布置待建</span></div>
+<div class="box o plan"><b>机加工设备</b><span>卧加、梭道磨床、凸轮磨床<br>PLC / 网关发 status、event</span></div>
+<div class="box o plan"><b>调试工位量仪</b><span>梭尖间隙、钩线定时<br>发 measurement</span></div>
+<div class="box o plan"><b>出厂测试台</b><span>第 22 章；按序列号发结果<br>烧录并核对固件</span></div>
+<div class="box o plan"><b>联网缝纫机</b><span>WQ-SC 网关（第 19、26 章）<br>经客户同意回传</span></div>
+</div></div>
+<div class="leg"><span><i></i>已有部件</span><span><i style="border-style:dashed"></i>方案（待建）</span><span>向上：状态、事件、测量；向下：指令（machine.cmd）、发布（design.release）、提议执行（经人确认）</span></div>
+</div>

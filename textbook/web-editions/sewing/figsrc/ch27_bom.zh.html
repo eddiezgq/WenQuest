@@ -1,0 +1,59 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.cols{display:grid;grid-template-columns:0.95fr 230px 1.3fr;gap:16px;align-items:start}
+.hd{font-weight:700;font-size:14.5px;margin:0 0 8px}
+.tree{border:2px solid #2a6fdb;border-radius:10px;background:#fff;padding:10px 12px;font-size:12.8px;line-height:1.75}
+.tree.m{border-color:#e0662f}
+.tree div{white-space:nowrap}
+.ind1{padding-left:16px}.ind2{padding-left:32px}
+.code{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:12px;color:#2a5fb8}
+.tree.m .code{color:#c4531d}
+.opt{border:2px solid #8a5cc7;border-radius:10px;background:#f2ecfa;padding:10px 12px;font-size:12.8px;line-height:1.6}
+.opt .k{display:inline-block;min-width:22px;font-weight:700;color:#7444b4}
+.chk{color:#2e9e5b;font-weight:700}
+.var{margin-top:10px;border:2px solid #1b2430;border-radius:8px;background:#fff;text-align:center;padding:8px;font-weight:700}
+.var span{display:block;font-weight:400;font-size:12px;color:#5a6570}
+.tag{display:inline-block;font-size:11px;border-radius:4px;padding:0 5px;margin-left:4px}
+.lib{background:#e6f3f3;color:#0f6e74}.prop{background:#fdf0ee;color:#c0392b}.new{background:#f2ecfa;color:#7444b4}.out{background:#fbf4e3;color:#a8740c}.fw{background:#e9f0fc;color:#2a5fb8}
+.arrowr{font-size:26px;color:#9aa4ae;text-align:center;margin-top:90px}
+</style>
+<div class="fig" style="--w:1200px">
+<p class="title">产品数据：设计 BOM、配置选项和制造 BOM</p><p class="sub">示意。左：设计 BOM（EBOM）按功能分组；中：三个选项组合出 8 种变型，这里选 WQ-LS-TED；右：制造 BOM（MBOM）按装配线的部件和工序重排，带外协和固件</p>
+<div class="cols">
+<div><p class="hd" style="color:#2a5fb8">设计 BOM（EBOM）· 按功能</p>
+<div class="tree">
+<div><b>WQ-LS 工业平缝机（模板）</b></div>
+<div class="ind1">刺布与挑线 <span class="code">SH-LS01 上轴 · 针杆 · 挑线杆</span></div>
+<div class="ind1">钩线 <span class="code">SH-LS02 下轴 · HK-LS01 旋梭 · 梭壳</span></div>
+<div class="ind1">送布 <span class="code">CAM-LS01 抬牙凸轮 · 送布牙</span></div>
+<div class="ind1">传动 <span class="code">同步带 · 带轮 · 轴承</span></div>
+<div class="ind1">机体 <span class="code">HSG-LS01 机壳 · 螺钉</span></div>
+<div class="ind1">电控 <span class="code">伺服电机 · 电控箱 · 固件</span></div>
+<div class="ind1" style="color:#7444b4">选项 T：<span class="code">CAM-LS02 剪线凸轮 · 剪线/拨线电磁铁</span></div>
+<div class="ind1" style="color:#7444b4">选项 E：<span class="code">闭环步进电机（替代机械针距）</span></div>
+<div class="ind1" style="color:#7444b4">选项 D：<span class="code">HK-LS01D 少油旋梭（替代 HK-LS01）</span></div>
+<div class="ind1">随机附件 <span class="code">NDL-DB1-14 机针</span></div>
+</div></div>
+<div><p class="hd" style="color:#7444b4">配置选项（机型 × 选项）</p>
+<div class="opt"><div><span class="k">T</span>自动剪线 <span class="chk">✓</span></div><div><span class="k">E</span>电子针距 <span class="chk">✓</span></div><div><span class="k">D</span>少油旋梭 <span class="chk">✓</span></div>
+<div style="font-size:12px;color:#5a6570;margin-top:6px">2 × 2 × 2 = 8 种变型：<br>WQ-LS、-T、-E、-D、<br>-TE、-TD、-ED、-TED</div></div>
+<div class="var">WQ-LS-TED<span>ERPNext：物料模板 + 属性 → 变型物料，各带一张 BOM</span></div>
+</div>
+<div><p class="hd" style="color:#c4531d">制造 BOM（MBOM）· 按部件与工序</p>
+<div class="tree m">
+<div><b>WQ-LS-TED</b>　<span class="code">RT-总装：总装线 → 调试 → 跑合 → 出厂测试</span></div>
+<div class="ind1">SA-HSG 机壳组件 <span class="code">HSG-LS01</span><span class="tag new">自制</span></div>
+<div class="ind1">SA-ARM 上轴与针杆组件 <span class="code">SH-LS01 · 6201×2 · 带轮</span><span class="tag lib">A-BRG-DG</span><span class="tag lib">A-PUL-HTD</span></div>
+<div class="ind1">SA-HOOK-D 下轴与少油旋梭 <span class="code">HK-LS01D · 6000×2</span></div>
+<div class="ind2"><span class="code">HK-LS01D ← HK-LS01 + DLC 镀膜</span><span class="tag out">外协 5 天</span></div>
+<div class="ind1">SA-EFEED 电子送布 <span class="code">CAM-LS01 · STP-FEED</span><span class="tag prop">D-MOT-STEP 计划入库</span></div>
+<div class="ind1">SA-TRIM 剪线组件 <span class="code">CAM-LS02 · SOL-TRIM · SOL-WIPE</span><span class="tag prop">D-SOL-PUSH 计划入库</span></div>
+<div class="ind1">同步带 <span class="code">BELT-HTD</span><span class="tag lib">C-BLT-BELT</span></div>
+<div class="ind1">伺服电机 <span class="code">MOT-LS-SV</span><span class="tag prop">D-MOT-PMSM 计划入库</span></div>
+<div class="ind1">电控箱 <span class="code">CTL-WQSC-LS</span><span class="tag prop">D-CTL-WQSC 计划入库</span></div>
+<div class="ind1">固件 <span class="code">FW-WQSC-LS 1.5.0 · 参数表 v8 · 事件表 v5</span><span class="tag fw">出厂测试时烧录</span></div>
+<div class="ind1">机针 <span class="code">NDL-DB1-14</span><span class="tag out">外购·来料检验</span></div>
+</div></div>
+</div>
+<p class="note">标签：<span class="tag lib">零件库已有条目</span> <span class="tag prop">建议编号，计划入库</span> <span class="tag new">自制件</span> <span class="tag out">外协 / 外购</span> <span class="tag fw">固件版本</span>。版本号为示意。</p>
+</div>

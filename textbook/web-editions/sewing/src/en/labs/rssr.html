@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Spatial Four-Bar Linkage</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: guide + tasks rail | parameters, 3D view, four curves, step-by-step calculation */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --bad:#d1495b; --ok:#1e8449; --warn:#b9770e;
+  --crank:#59636e; --coupler:#e0662f; --rocker:#2f6fd6; --band:#d1495b22; --gridc:#d2d9e0;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--crank:#9aa4ae;--coupler:#ff8c55;--rocker:#6ea8ff;--band:#ff6b7d22;--gridc:#2b3643;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--crank:#9aa4ae;--coupler:#ff8c55;--rocker:#6ea8ff;--band:#ff6b7d22;--gridc:#2b3643;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1440px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.two{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
+@media (max-width:1180px){.two{grid-template-columns:minmax(0,1fr)}}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=range]{flex:1;min-width:110px;accent-color:var(--accent)}
+.prm{display:grid;grid-template-columns:7.5em minmax(0,1fr) 5.8em;gap:4px 8px;align-items:center;font-size:.86rem}
+.prm label{color:var(--muted)}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+.note{font-size:.8rem;color:var(--muted);margin:6px 0 0}
+.steps{margin:0;padding-left:1.3em;font-size:.86rem}
+.steps li{margin:3px 0;cursor:pointer}
+.steps li.on{font-weight:600;color:var(--accent)}
+.lesson{font-size:.88rem;background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px}
+.lesson p{margin:0 0 6px}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.kpi{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:8px}
+@media (max-width:640px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px;min-width:0}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1.02rem;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted);font-size:.74rem;display:block}
+.status{font-weight:700;margin:8px 0 0}
+.status.ok{color:var(--ok)} .status.bad{color:var(--bad)}
+.stage{position:relative;border:1px solid var(--rule);border-radius:6px;overflow:hidden;aspect-ratio:4/3;background:var(--sheet);touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+canvas.chart{display:block;width:100%;height:auto;border-radius:6px;background:var(--sheet)}
+.calc{font-family:var(--f-mono);font-size:.8rem;line-height:1.7;overflow-x:auto;white-space:pre;background:var(--bg);border-radius:6px;padding:8px 10px;margin:0}
+</style>
+<div class="wrap">
+<header><h1>Spatial Four-Bar Linkage</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 9 · Virtual lab 9-2 · Position, velocity, acceleration and transmission angle of the RSSR linkage</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>Lab guide</h3>
+      <ol class="steps" id="steps"></ol>
+      <div class="lesson" id="lesson"></div>
+      <div class="row"><button type="button" id="prev">Previous</button><button type="button" id="next">Next</button></div>
+    </section>
+    <section class="panel">
+      <h3>Tasks (checked automatically)</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>Linkage parameters</h3>
+      <div class="row"><span class="note" style="margin:0">Presets:</span><button type="button" data-p="LL" aria-pressed="true">Lower looper</button><button type="button" data-p="UL">Upper looper</button><button type="button" data-p="PL">Planar crank-rocker</button></div>
+      <div class="prm" id="prm"></div>
+      <div class="kpi">
+        <div><b id="k-sw">—</b><small>Rocker swing angle</small></div>
+        <div><b id="k-tr">—</b><small>Return / working stroke (crank angle)</small></div>
+        <div><b id="k-g">—</b><small>Min. transmission angle</small></div>
+        <div><b id="k-w">—</b><small>Max. angular velocity rad/s</small></div>
+        <div><b id="k-a">—</b><small>Max. angular accel. rad/s²</small></div>
+      </div>
+      <p class="status" id="status">—</p>
+    </section>
+    <div class="two">
+      <section class="panel">
+        <h3>3D view (drag to rotate, scroll to zoom)</h3>
+        <div class="stage" id="stage"><canvas id="cv"></canvas></div>
+        <div class="row"><button type="button" id="play" aria-pressed="true">Pause</button><label for="phi" class="note" style="margin:0">Main-shaft angle φ</label><input id="phi" type="range" min="0" max="359" step="1" value="0"><output id="o-phi" style="font-family:var(--f-mono)">0°</output></div>
+        <p class="note">Grey: crank (revolute joint R, axis along X); orange: ball-ended coupler (spherical joints S at both ends); blue: rocker (revolute joint R). The thin lines are the two revolute axes; the dashed circles are the paths of the two ball centres.</p>
+      </section>
+      <section class="panel">
+        <h3>Step-by-step calculation with the formulas of Section 9.6 (current φ)</h3>
+        <pre class="calc" id="calc"></pre>
+      </section>
+    </div>
+    <section class="panel">
+      <h3>Four curves over one revolution (main shaft 7000 r/min)</h3>
+      <canvas class="chart" id="ch" width="1400" height="560" aria-label="Swing angle, angular velocity, angular acceleration and transmission angle versus main-shaft angle"></canvas>
+      <p class="note">The vertical line marks the current angle. Regions where the transmission angle drops below 40° are shown in red: there the coupler pushes the rocker more and more “obliquely”, the useful force component shrinks, and joint loads and wear increase.</p>
+    </section>
+  </div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const D2R=Math.PI/180, OMEGA=2*Math.PI*7000/60;
+const M0=[22.0,1.27606,-51.53467];
+// ---------- vector helpers ----------
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]], sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]], mul=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2], cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const len=a=>Math.hypot(a[0],a[1],a[2]), unit=a=>mul(a,1/len(a));
+const rot=(v,e,t)=>add(add(mul(v,Math.cos(t)),mul(cross(e,v),Math.sin(t))),mul(e,dot(e,v)*(1-Math.cos(t))));
+// ---------- presets (book coordinates, from the chapter's calculation) ----------
+const PRE={
+ LL:{name:'Lower looper',r:4.3619,b:22.4789,c:22,gam:90,bet:20,del:-7.133,s:0,dy:0,dz:0,xq:0,Q:[0,16.6497,-67.772],xc:22,ph0:-2.50136},
+ UL:{name:'Upper looper',r:7.3801,b:29.47,c:20,gam:90,bet:-75.97,del:0,s:0,dy:0,dz:0,xq:0,Q:[35.3839,-18.6172,-72.7627],xc:15.3839,ph0:0.244346},
+ PL:{name:'Planar crank-rocker',r:10,b:40,c:25,gam:0,bet:0,del:0,s:0,dy:0,dz:0,xq:0,Q:[22,41.276,-51.535],xc:22,ph0:0},
+};
+const PRM=[
+ ['r','Crank radius r',1,20,0.01,'mm'],['b','Coupler length b',5,70,0.01,'mm'],['c','Rocker length c',5,50,0.1,'mm'],
+ ['gam','Angle between axes γ',0,90,1,'°'],['bet','Rocker-axis azimuth β',-90,90,1,'°'],['del','Rocker zero position δ',-180,180,0.5,'°'],
+ ['s','Rocker shift along axis s',-15,15,0.5,'mm'],['dy','Rocker-axis Y offset',-15,15,0.5,'mm'],['dz','Rocker-axis Z offset',-15,15,0.5,'mm'],
+];
+let P={}, preset='LL';
+function loadPreset(k){preset=k;P=JSON.parse(JSON.stringify(PRE[k]));buildPrm();document.querySelectorAll('[data-p]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===k));recalc();}
+function buildPrm(){ const box=document.getElementById('prm'); box.innerHTML='';
+  PRM.forEach(([k,l,mi,ma,st,u])=>{ box.insertAdjacentHTML('beforeend',`<label for="p-${k}">${l}</label><input id="p-${k}" type="range" min="${mi}" max="${ma}" step="${st}" value="${P[k]}"><output id="o-${k}">${(+P[k]).toFixed(st<0.1?2:1)} ${u}</output>`);
+    document.getElementById('p-'+k).oninput=e=>{P[k]=+e.target.value;document.getElementById('o-'+k).textContent=`${P[k].toFixed(st<0.1?2:1)} ${u}`;recalc();}; }); }
+// ---------- geometry ----------
+function geom(){
+  const ex=[1,0,0];
+  const e=unit([Math.cos(P.gam*D2R), Math.sin(P.gam*D2R)*Math.sin(P.bet*D2R), Math.sin(P.gam*D2R)*Math.cos(P.bet*D2R)]);
+  let ref=sub(ex,mul(e,dot(ex,e))); if(len(ref)<1e-6){const ez=[0,0,1];ref=sub(ez,mul(e,dot(ez,e)));} ref=unit(ref);
+  const v0=rot(ref,e,P.del*D2R), v1=cross(e,v0);
+  const Q=add(add(PRE[preset].Q,mul(e,P.s)),[0,P.dy,P.dz]);
+  const C=[PRE[preset].xc,M0[1],M0[2]];
+  return {e,v0,v1,Q,C};
+}
+// one position: returns everything the step-by-step panel shows
+function solve(G,phi,br){
+  const ang=phi+PRE[preset].ph0, u1=[0,1,0], u2=[0,0,1];
+  const A=add(G.C,mul(add(mul(u1,Math.cos(ang)),mul(u2,Math.sin(ang))),P.r));
+  const Ad=mul(cross([1,0,0],sub(A,G.C)),OMEGA), Add=mul(sub(A,G.C),-OMEGA*OMEGA);
+  const K=sub(A,G.Q), Pp=dot(K,G.v0), Kk=dot(K,G.v1), Mm=(dot(K,K)+P.c*P.c-P.b*P.b)/(2*P.c), rho=Math.hypot(Pp,Kk);
+  if(Math.abs(Mm)>rho) return {ok:false,A,Pp,Kk,Mm,rho};
+  const th=Math.atan2(Kk,Pp)+br*Math.acos(Mm/rho);
+  const rr=mul(add(mul(G.v0,Math.cos(th)),mul(G.v1,Math.sin(th))),P.c), B=add(G.Q,rr);
+  const d=sub(A,B), t=cross(G.e,rr), den=dot(d,t);
+  const thd=dot(d,Ad)/den, dd=sub(Ad,mul(t,thd));
+  const thdd=(dot(dd,dd)+dot(d,Add)+thd*thd*dot(d,rr))/den;
+  const gam=Math.asin(Math.min(1,Math.abs(den)/(len(d)*len(t))))/D2R;
+  return {ok:true,A,B,Pp,Kk,Mm,rho,th,thd,thdd,gam};
+}
+let G=null, CY=[], BR=1, STAT={};
+function recalc(){
+  G=geom();
+  // choose the assembly branch that matches the preset at phi=0 (keep continuity)
+  const s0=solve(G,0,BR); if(!s0.ok){}
+  CY=[]; let prev=null, fail=[];
+  for(let k=0;k<360;k++){ const s=solve(G,k*D2R,BR); if(!s.ok){fail.push(k);CY.push(null);prev=null;continue;}
+    if(prev!==null){ while(s.th-prev>Math.PI)s.th-=2*Math.PI; while(s.th-prev<-Math.PI)s.th+=2*Math.PI; } prev=s.th; CY.push(s); }
+  const okc=CY.filter(x=>x);
+  STAT={fail};
+  if(okc.length){ const ths=okc.map(x=>x.th); const mx=Math.max(...ths), mn=Math.min(...ths);
+    STAT.sw=(mx-mn)/D2R; STAT.g=Math.min(...okc.map(x=>x.gam)); STAT.w=Math.max(...okc.map(x=>Math.abs(x.thd))); STAT.a=Math.max(...okc.map(x=>Math.abs(x.thdd)));
+    if(!fail.length){ const imx=CY.indexOf(okc.find(x=>x.th===mx)), imn=CY.indexOf(okc.find(x=>x.th===mn)); STAT.back=((imn-imx)%360+360)%360; STAT.fwd=360-STAT.back; } }
+  showStats(); drawChart(); buildScene(); checkTasks();
+}
+function showStats(){
+  const f=STAT.fail.length;
+  document.getElementById('k-sw').textContent=STAT.sw!==undefined?STAT.sw.toFixed(2)+'°':'—';
+  document.getElementById('k-tr').textContent=STAT.back!==undefined?`${STAT.back}° / ${STAT.fwd}°`:'—';
+  document.getElementById('k-g').textContent=STAT.g!==undefined?STAT.g.toFixed(1)+'°':'—';
+  document.getElementById('k-w').textContent=STAT.w!==undefined?STAT.w.toFixed(0):'—';
+  document.getElementById('k-a').textContent=STAT.a!==undefined?STAT.a.toExponential(2):'—';
+  const st=document.getElementById('status');
+  if(f){st.className='status bad';const a=STAT.fail[0],b=STAT.fail[STAT.fail.length-1];st.textContent=`Cannot be assembled: for φ ≈ ${a}°–${b}°, |M| > √(P²+K²); the coupler cannot reach the rocker and the crank cannot make a full turn (it locks).`;}
+  else {st.className='status ok';st.textContent=`The crank can make full turns.${STAT.g<40?' But the minimum transmission angle is below 40°, which is unfavourable for the forces.':''}`;}
+}
+// ---------- chart: four stacked panels ----------
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function drawChart(){
+  const c=document.getElementById('ch'), x=c.getContext('2d'); x.clearRect(0,0,c.width,c.height); x.fillStyle=css('--sheet'); x.fillRect(0,0,c.width,c.height);
+  const L=150,R=c.width-20, H=118, gap=18, top=12;
+  const X=p=>L+p/360*(R-L);
+  const series=[['Swing angle θ','°',s=>s.th/D2R,css('--rocker')],['Angular velocity ω','rad/s',s=>s.thd,css('--coupler')],['Angular accel. α','10³ rad/s²',s=>s.thdd/1000,css('--crank')],['Transmission angle γ','°',s=>s.gam,css('--ok')]];
+  const ink=css('--ink'),mut=css('--muted'),grid=css('--gridc');
+  series.forEach(([nm,u,f,col],i)=>{ const y0=top+i*(H+gap); const vals=CY.filter(s=>s).map(f); if(!vals.length) return;
+    let lo=Math.min(...vals), hi=Math.max(...vals); if(i===3){lo=Math.min(lo,30);hi=Math.max(hi,90);} if(hi-lo<1e-6){hi+=1;lo-=1;} const pad=(hi-lo)*0.08; lo-=pad; hi+=pad;
+    const Y=v=>y0+H-(v-lo)/(hi-lo)*H;
+    x.strokeStyle=grid; x.lineWidth=1; x.strokeRect(L,y0,R-L,H);
+    if(i===3){ x.fillStyle=css('--band'); x.fillRect(L,Y(40),R-L,y0+H-Y(40)); }
+    if(lo<0&&hi>0){x.beginPath();x.moveTo(L,Y(0));x.lineTo(R,Y(0));x.stroke();}
+    x.fillStyle=mut; x.font='22px "Noto Sans SC",sans-serif'; x.textAlign='right';
+    [hi-pad,lo+pad].forEach(v=>x.fillText((Math.abs(v)>=100?v.toFixed(0):v.toFixed(1)),L-10,Y(v)+7));
+    x.textAlign='left'; x.fillStyle=ink; x.font='600 24px "Noto Sans SC",sans-serif'; x.fillText(nm,8,y0+40); x.fillStyle=mut; x.font='20px "Noto Sans SC",sans-serif'; x.fillText(u,8,y0+68);
+    x.strokeStyle=col; x.lineWidth=3; x.beginPath(); let pen=false; CY.forEach((s,k)=>{ if(!s){pen=false;return;} const px=X(k),py=Y(f(s)); pen?x.lineTo(px,py):x.moveTo(px,py); pen=true; }); x.stroke();
+    STAT.fail.forEach(k=>{x.fillStyle=css('--band');x.fillRect(X(k),y0,(R-L)/360+1,H);});
+  });
+  x.fillStyle=mut; x.font='20px "Noto Sans SC",sans-serif'; x.textAlign='center';
+  for(let t=0;t<=360;t+=30) x.fillText(t+'°',X(t),c.height-6);
+  x.strokeStyle=css('--accent'); x.lineWidth=2; x.beginPath(); x.moveTo(X(phiDeg),top); x.lineTo(X(phiDeg),c.height-28); x.stroke();
+}
+// ---------- step-by-step panel ----------
+const f3=v=>v.map(a=>a.toFixed(2)).join(', ');
+function showCalc(){
+  const s=CY[Math.round(phiDeg)%360], el=document.getElementById('calc');
+  const q=G.Q;
+  if(!s){ const t=solve(G,phiDeg*D2R,BR); el.textContent=`φ = ${Math.round(phiDeg)}°\nA = (${f3(t.A)})\nP = ${t.Pp.toFixed(3)}   K = ${t.Kk.toFixed(3)}\nM = ${t.Mm.toFixed(3)}   √(P²+K²) = ${t.rho.toFixed(3)}\n|M| > √(P²+K²): no solution — the linkage cannot be assembled at this angle.`; return; }
+  el.textContent=
+`φ = ${Math.round(phiDeg)}°   (ω = ${OMEGA.toFixed(1)} rad/s)
+① Crank ball  A = (${f3(s.A)}) mm
+② Rocker ctr  Q = (${f3(q)}) mm, axis e = (${f3(G.e)})
+③ Components of A−Q along v₀ and v₁
+     P = (A−Q)·v₀ = ${s.Pp.toFixed(3)}
+     K = (A−Q)·v₁ = ${s.Kk.toFixed(3)}
+④ M = (|A−Q|² + c² − b²)/(2c) = ${s.Mm.toFixed(3)}
+   √(P²+K²) = ${s.rho.toFixed(3)}  (assembly requires |M| ≤ this)
+⑤ θ = atan2(K,P) ${BR>0?'+':'−'} arccos(M/√(P²+K²)) = ${(s.th/D2R).toFixed(3)}°
+⑥ Rocker ball B = (${f3(s.B)}) mm
+   d = A−B, |d| = ${len(sub(s.A,s.B)).toFixed(3)} (= b)  r = B−Q, t = e×r
+⑦ dθ/dt = (d·dA/dt)/(d·t) = ${s.thd.toFixed(2)} rad/s
+⑧ d²θ/dt² = (|dd/dt|² + d·d²A/dt² + (dθ/dt)² d·r)/(d·t)
+            = ${s.thdd.toFixed(0)} rad/s²
+⑨ Transmission angle γ = arcsin(|d·t|/(|d||t|)) = ${s.gam.toFixed(2)}°`;
+}
+// ---------- 3D scene ----------
+const T=THREE, stage=document.getElementById('stage'), cv=document.getElementById('cv');
+const ren=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true}); ren.setPixelRatio(Math.min(2,devicePixelRatio||1));
+const scene=new T.Scene(), cam=new T.PerspectiveCamera(35,4/3,1,3000);
+scene.add(new T.HemisphereLight(0xffffff,0x8899aa,0.9)); const sun=new T.DirectionalLight(0xffffff,0.8); sun.position.set(-200,300,250); scene.add(sun);
+const W=p=>new T.Vector3(p[0],p[2],-p[1]);
+const grp=new T.Group(); scene.add(grp);
+const mat=c=>new T.MeshStandardMaterial({color:c,metalness:0.4,roughness:0.45});
+const YAX=new T.Vector3(0,1,0);
+function link(r,m){const o=new T.Mesh(new T.CylinderGeometry(r,r,1,18),m);grp.add(o);return o;}
+function setLink(o,a,b){const A=W(a),B=W(b),d=B.clone().sub(A);o.position.copy(A).add(B).multiplyScalar(0.5);o.scale.set(1,Math.max(d.length(),1e-3),1);o.quaternion.setFromUnitVectors(YAX,d.normalize());}
+function line(pts,color,dash){const g=new T.BufferGeometry().setFromPoints(pts.map(W));const m=dash?new T.LineDashedMaterial({color,dashSize:2,gapSize:1.5}):new T.LineBasicMaterial({color});const l=new T.Line(g,m);if(dash)l.computeLineDistances();grp.add(l);return l;}
+let parts={}, center=[0,0,0];
+function buildScene(){
+  while(grp.children.length){const o=grp.children.pop();o.geometry&&o.geometry.dispose();}
+  const cCr=new T.Color(css('--crank')||'#59636e'), cCo=new T.Color(css('--coupler')||'#e0662f'), cRo=new T.Color(css('--rocker')||'#2f6fd6');
+  line([add(G.C,[-25,0,0]),add(G.C,[25,0,0])],0x777777);
+  line([add(G.Q,mul(G.e,-20)),add(G.Q,mul(G.e,20))],0x777777);
+  const ringA=[],ringB=[]; for(let k=0;k<=72;k++){const a=k*5*D2R+PRE[preset].ph0; ringA.push(add(G.C,[0,P.r*Math.cos(a),P.r*Math.sin(a)]));}
+  CY.forEach(s=>{if(s)ringB.push(s.B);}); line(ringA,0x888888,true); if(ringB.length>2) line(ringB,cRo.getHex(),true);
+  const disc=new T.Mesh(new T.CylinderGeometry(Math.max(P.r+2,4),Math.max(P.r+2,4),3,40),mat(cCr)); disc.rotation.z=Math.PI/2; disc.position.copy(W(G.C)); grp.add(disc);
+  parts={crank:link(1.6,mat(cCr)),cpl:link(1.4,mat(cCo)),rk:link(1.8,mat(cRo)),
+    a:new T.Mesh(new T.SphereGeometry(2.2,16,12),mat(cCo)),b:new T.Mesh(new T.SphereGeometry(2.2,16,12),mat(cCo)),q:new T.Mesh(new T.CylinderGeometry(3,3,6,24),mat(cRo))};
+  grp.add(parts.a,parts.b,parts.q); parts.q.position.copy(W(G.Q)); parts.q.quaternion.setFromUnitVectors(YAX,W(G.e).normalize());
+  center=mul(add(G.C,G.Q),0.5);
+  pose();
+}
+function pose(){
+  const k=Math.round(phiDeg)%360, s=CY[k]; const t=solve(G,phiDeg*D2R,BR);
+  setLink(parts.crank,G.C,t.A); parts.a.position.copy(W(t.A));
+  const ok=s&&t.ok; parts.cpl.visible=parts.b.visible=parts.rk.visible=!!ok;
+  if(ok){ setLink(parts.cpl,t.A,t.B); setLink(parts.rk,G.Q,t.B); parts.b.position.copy(W(t.B)); }
+  document.getElementById('o-phi').textContent=Math.round(phiDeg)+'°'; document.getElementById('phi').value=Math.round(phiDeg)%360;
+  showCalc();
+}
+let th=-0.9, ph=0.35, dist=95, drag=null;
+stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,th,ph};stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{if(!drag)return;th=drag.th-(e.clientX-drag.x)*0.008;ph=Math.max(-1.4,Math.min(1.45,drag.ph+(e.clientY-drag.y)*0.006));});
+stage.addEventListener('pointerup',()=>drag=null);
+stage.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(50,Math.min(600,dist*(1+e.deltaY*0.001)));},{passive:false});
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;ren.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage);
+let phiDeg=0, playing=true, last=performance.now();
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){playing=false;}
+function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t; if(playing){phiDeg=(phiDeg+60*dt)%360; pose(); if(Math.floor(t/120)%2===0) drawChart();}
+  const c=W(center); cam.position.set(c.x+dist*Math.cos(ph)*Math.sin(th),c.y+dist*Math.sin(ph),c.z+dist*Math.cos(ph)*Math.cos(th)); cam.lookAt(c); ren.render(scene,cam); requestAnimationFrame(frame);}
+document.getElementById('play').onclick=e=>{playing=!playing;e.target.setAttribute('aria-pressed',playing);e.target.textContent=playing?'Pause':'Play';};
+document.getElementById('phi').oninput=e=>{phiDeg=+e.target.value;pose();drawChart();};
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>loadPreset(b.dataset.p));
+// ---------- guide ----------
+const LESSONS=[
+ ['Meet the RSSR',`<p>This is the drive of the overlocker’s lower looper. The grey crank turns about the X axis (revolute joint R), the orange coupler has a spherical joint (S) at each end, and the blue rocker swings about its own axis (R). The two revolute axes are neither parallel nor intersecting, so this is not a planar mechanism.</p><p>Drag the view around and look at how the two axes lie in space.</p>`],
+ ['Computing the position',`<p>Steps ① to ⑤ in the “step-by-step calculation” box on the right are the derivation of Section 9.6.2: first find the crank ball centre A, then resolve A−Q along two directions in the rocker plane to get P and K, compute M, and finally θ = atan2(K,P) ± arccos(M/√(P²+K²)).</p><p>Drag the “Main-shaft angle” slider, watch how each number changes, and check that |A−B| in ⑥ always equals the coupler length b.</p>`],
+ ['Velocity, acceleration and transmission angle',`<p>⑦ and ⑧ are the angular velocity and angular acceleration obtained by differentiating “the coupler length is constant” once and twice; ⑨ is the transmission angle, the complement of the angle between the direction in which the coupler pushes the rocker and the direction of motion of the rocker ball centre. The closer it is to 90°, the more “squarely” the coupler pushes.</p><p>Look at the four curves below: the largest accelerations usually occur at the two ends where the rocker reverses.</p>`],
+ ['When it cannot be assembled',`<p>Slowly increase the crank radius r. Beyond a certain value there is a range of angles in which |M| exceeds √(P²+K²) and the equation has no real solution: the coupler cannot reach the rocker, the crank cannot get past, and the linkage locks.</p><p>For a planar four-bar, the Grashof condition tells whether the crank can make full turns; a spatial linkage has no such simple formula, so we use this “check every angle for a solution” method.</p>`],
+ ['Reducing to a planar linkage',`<p>Choose the “Planar crank-rocker” preset: the angle between the axes γ = 0, the two revolute axes are parallel, and the RSSR becomes the familiar planar crank-rocker. Then gradually increase γ and watch how the swing angle, time ratio and transmission angle change.</p><p>Finally go back to “Lower looper” and try shifting the rocker along its axis (s), to see what the book means: the timing margin gained through asymmetry is paid for with transmission angle.</p>`],
+];
+let li=0;
+function showLesson(){document.getElementById('steps').innerHTML=LESSONS.map((l,i)=>`<li class="${i===li?'on':''}" data-i="${i}">${l[0]}</li>`).join('');document.getElementById('lesson').innerHTML=LESSONS[li][1];
+  document.querySelectorAll('#steps li').forEach(e=>e.onclick=()=>{li=+e.dataset.i;showLesson();});document.getElementById('prev').disabled=li===0;document.getElementById('next').disabled=li===LESSONS.length-1;}
+document.getElementById('prev').onclick=()=>{li=Math.max(0,li-1);showLesson();}; document.getElementById('next').onclick=()=>{li=Math.min(LESSONS.length-1,li+1);showLesson();};
+// ---------- tasks ----------
+const same=(k)=>Math.abs(P[k]-PRE[preset][k])<1e-6;
+const only=(...ks)=>['r','b','c','gam','bet','del','s','dy','dz'].every(k=>ks.includes(k)||same(k));
+const full=()=>!STAT.fail.length;
+const TASKS=[
+ {t:'Increase the lower-looper swing angle to 30°',d:'“Lower looper” preset; change only the crank radius r so that the swing angle is 30.0° ± 0.3° (see Exercise 3)',ok:()=>preset==='LL'&&only('r')&&full()&&Math.abs(STAT.sw-30)<=0.3},
+ {t:'Improve the lower-looper transmission angle',d:'“Lower looper” preset; you may change s and r; keep the swing angle at 25.7° ± 0.5° and make the minimum transmission angle ≥ 60°; afterwards note how the return-stroke angle has changed',ok:()=>preset==='LL'&&only('r','s')&&full()&&Math.abs(STAT.sw-25.74)<=0.5&&STAT.g>=60},
+ {t:'Improve the upper-looper transmission angle',d:'“Upper looper” preset; you may change r, b and the three rocker-axis position parameters; keep the swing angle at 50.5° ± 1° and make the minimum transmission angle ≥ 50°',ok:()=>preset==='UL'&&only('r','b','s','dy','dz')&&full()&&Math.abs(STAT.sw-50.55)<=1&&STAT.g>=50},
+ {t:'Find the lock-up',d:'With any preset, increase r until the crank can no longer make a full turn',ok:()=>STAT.fail.length>0&&!only()},
+ {t:'Planar crank-rocker',d:'“Planar crank-rocker” preset (γ = 0); adjust r, b and c to get a swing angle of 40° ± 1° with the crank still making full turns',ok:()=>preset==='PL'&&P.gam===0&&full()&&Math.abs(STAT.sw-40)<=1},
+];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{try{if(k.ok())done.add(i);}catch(e){}});
+  document.getElementById('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+window.__api={set:(o)=>{Object.assign(P,o);buildPrm();recalc();},preset:loadPreset,stat:()=>STAT,phi:(v)=>{phiDeg=v;pose();drawChart();},play:(v)=>{playing=v;}};
+showLesson(); loadPreset('LL'); resize(); requestAnimationFrame(frame);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

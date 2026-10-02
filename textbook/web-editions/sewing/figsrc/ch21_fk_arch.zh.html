@@ -1,0 +1,74 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.id{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11px;color:#5a6570}
+.box span.id{display:inline}
+.box{text-align:left}
+.box b{font-size:14px}
+.box span{font-size:12px}
+.mk{border-style:dashed}
+.legend{display:flex;gap:18px;font-size:12.5px;color:#5a6570;margin-top:10px}
+.legend i{display:inline-block;width:14px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+</style>
+<div class="fig" style="--w:1180px">
+<p class="title">缩比横机原型 WQ-SC/FK 的构成（单系统、单针床 60 针、E5）</p>
+<p class="sub">示意。上：机械布置（俯视展开，不按比例）；下：电气模块。虚线框为自制件，实线框为零件库已有条目或建议入库模块（* 建议编号）</p>
+<svg width="1120" height="300" viewBox="0 0 1120 300" style="display:block">
+ <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5a6570"/></marker></defs>
+ <!-- frame/rails -->
+ <rect x="40" y="40" width="1040" height="14" rx="3" fill="#e9f0fc" stroke="#2a6fdb" stroke-width="2"/>
+ <text x="50" y="34" font-size="12.5" fill="#2a5fb8">机头导轨 A-LGD-RAIL 15 型（长约 900 mm）</text>
+ <!-- belt -->
+ <line x1="70" y1="70" x2="1050" y2="70" stroke="#c48a17" stroke-width="3"/>
+ <line x1="70" y1="84" x2="1050" y2="84" stroke="#c48a17" stroke-width="3"/>
+ <circle cx="70" cy="77" r="12" fill="#fbf4e3" stroke="#c48a17" stroke-width="2"/>
+ <circle cx="1050" cy="77" r="12" fill="#fbf4e3" stroke="#c48a17" stroke-width="2"/>
+ <text x="720" y="104" font-size="12" fill="#a8740c">5M 同步带 15 mm，带轮 A-PUL-HTD 5M-20-15（100 mm/转）</text>
+ <rect x="1066" y="62" width="40" height="30" rx="4" fill="#fcefe8" stroke="#e0662f" stroke-width="2"/>
+ <text x="1050" y="122" font-size="12" fill="#c4531d">伺服 200 W</text>
+ <!-- needle bed -->
+ <rect x="180" y="190" width="640" height="50" rx="4" fill="#f3f5f6" stroke="#1b2430" stroke-width="2" stroke-dasharray="6 4"/>
+ <g stroke="#5a6570" stroke-width="1.6">
+<line x1="185.3" y1="196" x2="185.3" y2="234"/><line x1="196.0" y1="196" x2="196.0" y2="234"/><line x1="206.7" y1="196" x2="206.7" y2="234"/><line x1="217.3" y1="196" x2="217.3" y2="234"/><line x1="228.0" y1="196" x2="228.0" y2="234"/><line x1="238.7" y1="196" x2="238.7" y2="234"/><line x1="249.3" y1="196" x2="249.3" y2="234"/><line x1="260.0" y1="196" x2="260.0" y2="234"/><line x1="270.7" y1="196" x2="270.7" y2="234"/><line x1="281.3" y1="196" x2="281.3" y2="234"/><line x1="292.0" y1="196" x2="292.0" y2="234"/><line x1="302.7" y1="196" x2="302.7" y2="234"/><line x1="313.3" y1="196" x2="313.3" y2="234"/><line x1="324.0" y1="196" x2="324.0" y2="234"/><line x1="334.7" y1="196" x2="334.7" y2="234"/><line x1="345.3" y1="196" x2="345.3" y2="234"/><line x1="356.0" y1="196" x2="356.0" y2="234"/><line x1="366.7" y1="196" x2="366.7" y2="234"/><line x1="377.3" y1="196" x2="377.3" y2="234"/><line x1="388.0" y1="196" x2="388.0" y2="234"/><line x1="398.7" y1="196" x2="398.7" y2="234"/><line x1="409.3" y1="196" x2="409.3" y2="234"/><line x1="420.0" y1="196" x2="420.0" y2="234"/><line x1="430.7" y1="196" x2="430.7" y2="234"/><line x1="441.3" y1="196" x2="441.3" y2="234"/><line x1="452.0" y1="196" x2="452.0" y2="234"/><line x1="462.7" y1="196" x2="462.7" y2="234"/><line x1="473.3" y1="196" x2="473.3" y2="234"/><line x1="484.0" y1="196" x2="484.0" y2="234"/><line x1="494.7" y1="196" x2="494.7" y2="234"/><line x1="505.3" y1="196" x2="505.3" y2="234"/><line x1="516.0" y1="196" x2="516.0" y2="234"/><line x1="526.7" y1="196" x2="526.7" y2="234"/><line x1="537.3" y1="196" x2="537.3" y2="234"/><line x1="548.0" y1="196" x2="548.0" y2="234"/><line x1="558.7" y1="196" x2="558.7" y2="234"/><line x1="569.3" y1="196" x2="569.3" y2="234"/><line x1="580.0" y1="196" x2="580.0" y2="234"/><line x1="590.7" y1="196" x2="590.7" y2="234"/><line x1="601.3" y1="196" x2="601.3" y2="234"/><line x1="612.0" y1="196" x2="612.0" y2="234"/><line x1="622.7" y1="196" x2="622.7" y2="234"/><line x1="633.3" y1="196" x2="633.3" y2="234"/><line x1="644.0" y1="196" x2="644.0" y2="234"/><line x1="654.7" y1="196" x2="654.7" y2="234"/><line x1="665.3" y1="196" x2="665.3" y2="234"/><line x1="676.0" y1="196" x2="676.0" y2="234"/><line x1="686.7" y1="196" x2="686.7" y2="234"/><line x1="697.3" y1="196" x2="697.3" y2="234"/><line x1="708.0" y1="196" x2="708.0" y2="234"/><line x1="718.7" y1="196" x2="718.7" y2="234"/><line x1="729.3" y1="196" x2="729.3" y2="234"/><line x1="740.0" y1="196" x2="740.0" y2="234"/><line x1="750.7" y1="196" x2="750.7" y2="234"/><line x1="761.3" y1="196" x2="761.3" y2="234"/><line x1="772.0" y1="196" x2="772.0" y2="234"/><line x1="782.7" y1="196" x2="782.7" y2="234"/><line x1="793.3" y1="196" x2="793.3" y2="234"/><line x1="804.0" y1="196" x2="804.0" y2="234"/><line x1="814.7" y1="196" x2="814.7" y2="234"/>
+ </g>
+ <text x="190" y="262" font-size="12.5" fill="#1b2430">针床（自制）：60 个针槽，针距 5.08 mm，宽 304.8 mm；铝板铣槽或钢片插片</text>
+ <!-- carriage -->
+ <rect x="290" y="112" width="250" height="66" rx="6" fill="#fcefe8" stroke="#e0662f" stroke-width="2" stroke-dasharray="6 4"/>
+ <text x="310" y="132" font-size="13" font-weight="700" fill="#c4531d">机头（自制，约 2.5 kg）</text>
+ <text x="310" y="150" font-size="11.5" fill="#5a6570">三角座、8 段选针器、度目步进 ×2</text>
+ <text x="310" y="166" font-size="11.5" fill="#5a6570">纱嘴电磁铁 ×2、探针、机头板</text>
+ <line x1="395" y1="112" x2="395" y2="86" stroke="#e0662f" stroke-width="2"/>
+ <line x1="540" y1="145" x2="590" y2="145" stroke="#5a6570" stroke-width="1.5" marker-end="url(#a)"/>
+ <text x="545" y="139" font-size="11.5" fill="#5a6570">往复</text>
+ <!-- selection point -->
+ <line x1="528" y1="112" x2="528" y2="240" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="3 3"/>
+ <text x="510" y="284" font-size="11.5" fill="#c0392b">选针点</text>
+ <!-- yarn carriers -->
+ <rect x="620" y="122" width="26" height="20" rx="3" fill="#f2ecfa" stroke="#8a5cc7" stroke-width="2"/>
+ <rect x="660" y="122" width="26" height="20" rx="3" fill="#f2ecfa" stroke="#8a5cc7" stroke-width="2"/>
+ <text x="620" y="162" font-size="11.5" fill="#7444b4">纱嘴 1、2（自制，挂在导杆上）</text>
+ <!-- takedown -->
+ <rect x="840" y="190" width="260" height="50" rx="6" fill="#e6f3f3" stroke="#14797f" stroke-width="2"/>
+ <text x="850" y="210" font-size="13" font-weight="700" fill="#0f6e74">牵拉（针床下方）</text>
+ <text x="850" y="228" font-size="11.5" fill="#5a6570">包胶罗拉 + 蜗杆 C-WRM-WORM + 步进</text>
+ <!-- reversal zones -->
+ <rect x="110" y="190" width="70" height="50" fill="#d8dde1" opacity=".5"/>
+ <text x="104" y="182" font-size="11" fill="#5a6570">换向余量 c</text>
+ <!-- home/limit -->
+ <rect x="52" y="140" width="22" height="18" rx="3" fill="#fff" stroke="#9aa4ae" stroke-width="2"/>
+ <text x="40" y="176" font-size="11" fill="#5a6570">原点/限位</text>
+ <!-- yarn path -->
+ <path d="M 700 14 C 680 40, 670 80, 660 122" fill="none" stroke="#8a5cc7" stroke-width="1.5" stroke-dasharray="4 3"/>
+ <text x="710" y="18" font-size="11.5" fill="#7444b4">筒子 → 张力器 → 断纱检测</text>
+</svg>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px">
+<div class="box k fill-k"><b>WQ-SC 主控（机架）</b><span><span class="id">D-CTL-WQSC*</span>：按“行”工作，花型 → 选针位图，机头伺服位置命令</span></div>
+<div class="box o mk"><b>机头板（随机头）</b><span>MCU 或 MCU + 小 FPGA：按机头位置逐针触发；8 路选针驱动、2 路纱嘴、2 路度目步进；CAN FD 经拖链</span></div>
+<div class="box b"><b>机头驱动</b><span>伺服 200 W <span class="id">D-MOT-PMSM*</span> + 驱动 <span class="id">D-DRV-SERVO*</span>；电机编码器 10000 计数/转 → 0.01 mm</span></div>
+<div class="box p"><b>选针器 8 段（自制）</b><span>8 个小电磁铁，T<sub>r</sub> ≈ 1.5 ms（示意）；驱动 <span class="id">D-DRV-SOL*</span> 同一套强激磁电路</span></div>
+<div class="box y"><b>度目</b><span>闭环步进 NEMA 17 ×2 <span class="id">D-MOT-STEP*</span> + 丝杠 <span class="id">C-SCN-LEAD</span></span></div>
+<div class="box"><b>纱嘴</b><span>推拉电磁铁 ×2 <span class="id">D-SOL-PUSH*</span>，在换向区接放</span></div>
+<div class="box t"><b>牵拉与张力</b><span>步进 <span class="id">D-MOT-STEP*</span>；张力摆杆 + 霍尔角度 <span class="id">D-SNS-HALL*</span></span></div>
+<div class="box"><b>保护</b><span>断纱 <span class="id">D-SNS-PE*</span>、探针开关、原点/限位 <span class="id">D-SNS-PROX*</span>、急停、拖链</span></div>
+</div>
+<div class="legend"><span><i style="border:2px dashed #1b2430"></i>自制件</span><span><i style="border:2px solid #1b2430"></i>零件库条目 / 建议入库模块</span><span>* 建议编号，计划入库</span></div>
+</div>

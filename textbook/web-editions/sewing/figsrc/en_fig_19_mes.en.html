@@ -1,0 +1,75 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>.fig{background:#faf9f5}.pimg{display:block;width:100%}.card{border:1.5px solid #d8dde1;border-radius:12px;background:#fff}.note{color:#1b2430;font-size:13px;margin-top:10px}.note.m{color:#5a6570}svg text{font-family:QFix,"Noto Sans CJK SC",sans-serif;white-space:pre}</style>
+<div class="fig" style="--w:1180px">
+<p class="title">How orders, operations, machine data and the digital twin are connected</p><p class="sub">Illustrative; every system talks only to the unified data bus (the WenQuest Digital Factory approach)</p>
+<svg viewBox="25 155 1940 735" width="1120" style="display:block">
+<rect x="70" y="165" width="307" height="118" rx="10" fill="#fff" stroke="#1b2430" stroke-width="2"/>
+<text x="223.5" y="195" text-anchor="middle" font-size="17" font-weight="700" fill="#1b2430">ERP</text>
+<text x="223.5" y="222" text-anchor="middle" font-size="14" fill="#5a6570">Orders, materials, costs</text>
+<text x="223.5" y="242" text-anchor="middle" font-size="14" fill="#5a6570">Piece-rate pay</text>
+<rect x="70" y="388" width="307" height="130" rx="10" fill="#fff" stroke="#2a6fdb" stroke-width="2"/>
+<text x="223.5" y="418" text-anchor="middle" font-size="17" font-weight="700" fill="#2a5fb8">MES</text>
+<text x="223.5" y="445" text-anchor="middle" font-size="14" fill="#5a6570">Splits work orders into operations</text>
+<text x="223.5" y="465" text-anchor="middle" font-size="14" fill="#5a6570">Dispatches to lines and workstations</text>
+<text x="223.5" y="485" text-anchor="middle" font-size="14" fill="#5a6570">Collects production reports</text>
+<rect x="70" y="635" width="307" height="130" rx="10" fill="#fff" stroke="#2e9e5b" stroke-width="2"/>
+<text x="223.5" y="665" text-anchor="middle" font-size="17" font-weight="700" fill="#1f8a4c">Hanger system / work tickets</text>
+<text x="223.5" y="692" text-anchor="middle" font-size="14" fill="#5a6570">Carrier IDs, bundle numbers</text>
+<text x="223.5" y="712" text-anchor="middle" font-size="14" fill="#5a6570">Which operation each piece has reached</text>
+<rect x="553" y="165" width="142" height="658" rx="12" fill="#e9f0fc" stroke="#2a6fdb" stroke-width="2"/>
+<text x="624" y="494" text-anchor="middle" font-size="20" font-weight="700" fill="#2a5fb8" transform="rotate(-90 624 494)" dominant-baseline="middle">Unified data bus</text>
+<rect x="823" y="165" width="307" height="118" rx="10" fill="#fff" stroke="#8a5cc7" stroke-width="2"/>
+<text x="976.5" y="195" text-anchor="middle" font-size="17" font-weight="700" fill="#7444b4">Dashboard</text>
+<text x="976.5" y="222" text-anchor="middle" font-size="14" fill="#5a6570">State and piece count of every machine</text>
+<text x="976.5" y="242" text-anchor="middle" font-size="14" fill="#5a6570">Stop reasons</text>
+<rect x="823" y="388" width="307" height="130" rx="10" fill="#fff" stroke="#5a6570" stroke-width="2"/>
+<text x="976.5" y="418" text-anchor="middle" font-size="17" font-weight="700" fill="#1b2430">Historian</text>
+<text x="976.5" y="445" text-anchor="middle" font-size="14" fill="#5a6570">Archives every message</text>
+<text x="976.5" y="465" text-anchor="middle" font-size="14" fill="#5a6570">Metrics are computed here</text>
+<rect x="823" y="635" width="307" height="130" rx="10" fill="#fff" stroke="#e0662f" stroke-width="2"/>
+<text x="976.5" y="665" text-anchor="middle" font-size="17" font-weight="700" fill="#c4531d">Sewing machines (hundreds)</text>
+<text x="976.5" y="692" text-anchor="middle" font-size="14" fill="#5a6570">State, counts, events</text>
+<text x="976.5" y="712" text-anchor="middle" font-size="14" fill="#5a6570">Per-minute summary + immediate state</text>
+<rect x="1247" y="165" width="706" height="600" rx="10" fill="#fff" stroke="#8a5cc7" stroke-width="2"/>
+<text x="1270" y="203" text-anchor="start" font-size="20" font-weight="700" fill="#7444b4">Digital twin</text>
+<rect x="1282" y="236" width="635" height="141" rx="10" fill="#fff" stroke="#8a5cc7" stroke-width="2"/>
+<text x="1599.5" y="266" text-anchor="middle" font-size="17" font-weight="700" fill="#7444b4">① Real-time mirror</text>
+<text x="1599.5" y="293" text-anchor="middle" font-size="14" fill="#5a6570">Every sewing machine, workstation and hanger carrier has a virtual counterpart</text>
+<text x="1599.5" y="313" text-anchor="middle" font-size="14" fill="#5a6570">whose state follows the bus messages (dashboard, 3D shop floor)</text>
+<rect x="1282" y="412" width="635" height="141" rx="10" fill="#fff" stroke="#8a5cc7" stroke-width="2"/>
+<text x="1599.5" y="442" text-anchor="middle" font-size="17" font-weight="700" fill="#7444b4">② Simulation and prediction</text>
+<text x="1599.5" y="469" text-anchor="middle" font-size="14" fill="#5a6570">Starting from the current state, “fast-forward” a few hours: which operation will</text>
+<text x="1599.5" y="489" text-anchor="middle" font-size="14" fill="#5a6570">block, which order will be late; models from the simulations of Chapters 12 and 29,</text>
+<text x="1599.5" y="509" text-anchor="middle" font-size="14" fill="#5a6570">with parameters from measured times and efficiencies</text>
+<rect x="1282" y="588" width="635" height="142" rx="10" fill="#fff" stroke="#8a5cc7" stroke-width="2"/>
+<text x="1599.5" y="618" text-anchor="middle" font-size="17" font-weight="700" fill="#7444b4">③ Try options, then release</text>
+<text x="1599.5" y="645" text-anchor="middle" font-size="14" fill="#5a6570">Add a person, change the dispatching rule, re-sequence operations, compare results</text>
+<text x="1599.5" y="665" text-anchor="middle" font-size="14" fill="#5a6570">The chosen option is released to the shop floor through MES</text>
+<path d="M380,223 L551,223" fill="none" stroke="#3d4752" stroke-width="2"/>
+<path d="M551,223 L537.0,216.5 L537.0,229.5z" fill="#3d4752"/>
+<path d="M551,240 L380,240" fill="none" stroke="#3d4752" stroke-width="2"/>
+<path d="M380,240 L394.0,246.5 L394.0,233.5z" fill="#3d4752"/>
+<path d="M380,453 L551,453" fill="none" stroke="#3d4752" stroke-width="2"/>
+<path d="M551,453 L537.0,446.5 L537.0,459.5z" fill="#3d4752"/>
+<path d="M551,470 L380,470" fill="none" stroke="#3d4752" stroke-width="2"/>
+<path d="M380,470 L394.0,476.5 L394.0,463.5z" fill="#3d4752"/>
+<path d="M380,700 L551,700" fill="none" stroke="#3d4752" stroke-width="2"/>
+<path d="M551,700 L537.0,693.5 L537.0,706.5z" fill="#3d4752"/>
+<path d="M551,717 L380,717" fill="none" stroke="#3d4752" stroke-width="2"/>
+<path d="M380,717 L394.0,723.5 L394.0,710.5z" fill="#3d4752"/>
+<path d="M697,223 L821,223" fill="none" stroke="#3d4752" stroke-width="2"/>
+<path d="M821,223 L807.0,216.5 L807.0,229.5z" fill="#3d4752"/>
+<path d="M697,453 L821,453" fill="none" stroke="#3d4752" stroke-width="2"/>
+<path d="M821,453 L807.0,446.5 L807.0,459.5z" fill="#3d4752"/>
+<path d="M821,700 L697,700" fill="none" stroke="#e0662f" stroke-width="2.5"/>
+<path d="M697,700 L711.0,706.5 L711.0,693.5z" fill="#e0662f"/>
+<path d="M1132,223 L1280,305" fill="none" stroke="#8a5cc7" stroke-width="2"/>
+<path d="M1280,305 L1270.9,292.5 L1264.6,303.9z" fill="#8a5cc7"/>
+<path d="M1132,453 L1280,482" fill="none" stroke="#5a6570" stroke-width="2"/>
+<path d="M1280,482 L1267.5,472.9 L1265.0,485.7z" fill="#5a6570"/>
+<path d="M1600,732 L1600,847 L35,847 L35,453 L68,453" fill="none" stroke="#8a5cc7" stroke-width="2" stroke-dasharray="7 5"/>
+<path d="M68,453 L54.0,446.5 L54.0,459.5z" fill="#8a5cc7"/>
+<text x="913" y="873" text-anchor="middle" font-size="15" font-weight="700" fill="#7444b4" >Adjusted plan goes back to MES (released after human confirmation)</text>
+</svg>
+<p class="note">A simulated sewing machine and a real one send messages in the same format; only the source field differs. To replace the simulation with real equipment, just connect it to the bus — nothing else has to change.</p>
+</div>

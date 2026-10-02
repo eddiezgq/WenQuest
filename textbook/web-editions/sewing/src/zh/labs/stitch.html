@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>手缝与机缝</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: mode tabs on top; a large side-section stage (fabric seen edge-on) with a face-view strip under it; right column = what is happening now + comparison table */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --cloth:#e9e2d2; --cloth2:#ded5c1; --clothline:#c9bea4;
+  --needle-thread:#2a5fb8; --bobbin-thread:#c4531d; --steel:#5c6670; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--cloth:#4a4436;--cloth2:#3f3a2e;--clothline:#6b624d;--needle-thread:#7fa9f2;--bobbin-thread:#f08c58;--steel:#b7c0c9;--accent:#4cc3c9;--ok:#58d68d;--bad:#ff6b6b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--cloth:#4a4436;--cloth2:#3f3a2e;--clothline:#6b624d;--needle-thread:#7fa9f2;--bobbin-thread:#f08c58;--steel:#b7c0c9;--accent:#4cc3c9;--ok:#58d68d;--bad:#ff6b6b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+button{font:inherit;font-size:.88rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:6px 14px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);gap:14px;align-items:start}
+@media (max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.row label{font-size:.84rem;color:var(--muted)}
+input[type=range]{accent-color:var(--accent);width:140px}
+.now{font-size:.95rem}
+.now b{display:block;font-family:var(--f-display);font-size:1.1rem;margin-bottom:4px}
+.meter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.meter div{border-top:1px solid var(--rule);padding-top:4px}
+.meter b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.meter small{color:var(--muted);font-size:.76rem}
+table{width:100%;border-collapse:collapse;font-size:.82rem;line-height:1.5}
+th,td{text-align:left;padding:5px 6px 5px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--muted);font-weight:500}
+td.on{font-weight:700}
+.msg{margin-top:8px;font-weight:700;min-height:1.6em}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:3px;background:var(--c)}
+</style>
+<div class="wrap">
+<header><h1>手缝与机缝</h1><span class="sub">《缝纫机设计与制造》第 1 章 · 动画 1-1 · 三种成缝方式：手缝、单线链式线迹、双线锁式线迹</span></header>
+<div class="tabs" role="tablist">
+  <button type="button" data-m="hand" aria-pressed="true">手缝（针眼在尾部）</button>
+  <button type="button" data-m="chain">单线链式线迹 101</button>
+  <button type="button" data-m="lock">双线锁式线迹 301</button>
+</div>
+<div class="grid">
+  <div class="panel">
+    <h3>剖面（顺着缝线方向看，布层被剖开）</h3>
+    <canvas id="cv" width="1000" height="440" aria-label="成缝过程剖面动画"></canvas>
+    <h3 style="margin-top:12px">布面与布底（成品外观）</h3>
+    <canvas id="face" width="1000" height="150" aria-label="布面与布底的线迹外观"></canvas>
+    <div class="legend"><span style="--c:var(--needle-thread)">针线（面线）</span><span style="--c:var(--bobbin-thread)">底线</span><span style="--c:var(--steel)">针、钩、梭</span></div>
+    <div class="row">
+      <button type="button" id="play" aria-pressed="true">暂停</button>
+      <button type="button" id="step">单步 ⟶</button>
+      <label for="spd">速度</label><input id="spd" type="range" min="0.2" max="2" step="0.1" value="0.8">
+      <button type="button" id="pull">拉线头</button>
+      <button type="button" id="reset">重新开始</button>
+    </div>
+    <p class="msg" id="msg"></p>
+  </div>
+  <div class="col" style="display:flex;flex-direction:column;gap:14px;min-width:0">
+    <section class="panel"><h3>现在发生什么</h3><div class="now" id="now"></div>
+      <div class="meter"><div><b id="m-st">0</b><small>已缝针数</small></div><div><b id="m-th">0</b><small>每针穿过布层的线长（mm）</small></div></div></section>
+    <section class="panel"><h3>三种方式比较</h3>
+      <table><tr><th></th><th>手缝</th><th>链式 101</th><th>锁式 301</th></tr>
+        <tr><th>线的根数</th><td data-c="hand">1</td><td data-c="chain">1</td><td data-c="lock">2</td></tr>
+        <tr><th>针眼位置</th><td data-c="hand">尾部</td><td data-c="chain">尖端</td><td data-c="lock">尖端</td></tr>
+        <tr><th>针穿过布</th><td data-c="hand">整根穿过</td><td data-c="chain">只穿一半就退回</td><td data-c="lock">只穿一半就退回</td></tr>
+        <tr><th>线怎样留在布里</th><td data-c="hand">靠针来回穿</td><td data-c="chain">下一个线环套住上一个</td><td data-c="lock">两线在布层中间交织</td></tr>
+        <tr><th>拉线头</th><td data-c="hand">—</td><td data-c="chain">整条散开</td><td data-c="lock">不散</td></tr>
+        <tr><th>机构（本书）</th><td data-c="hand">—</td><td data-c="chain">钩针或弯针（第 10 章）</td><td data-c="lock">旋梭（第 2、5 章）</td></tr>
+      </table></section>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const cv=$('cv'),fc=$('face');
+const W=1000,H=440,YT=196,YB=252,YM=(YT+YB)/2,P=74,X0=640;
+let mode='hand',ph=0,stitches=3,playing=true,speed=0.8,pull=null,last=null,stepTarget=null;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduce){playing=false;}
+function fit(c,w,h){const r=window.devicePixelRatio||1;const cw=c.clientWidth||w;if(c.width!==Math.round(cw*r)){c.width=Math.round(cw*r);c.height=Math.round(cw*r*h/w);}const g=c.getContext('2d');g.setTransform(c.width/w,0,0,c.width/w,0,0);return g;}
+const ease=t=>0.5-0.5*Math.cos(Math.PI*Math.max(0,Math.min(1,t)));
+const seg=(t,a,b)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
+function cloth(g){
+  g.fillStyle=css('--cloth');g.fillRect(0,YT,W,YM-YT);g.fillStyle=css('--cloth2');g.fillRect(0,YM,W,YB-YM);
+  g.strokeStyle=css('--clothline');g.lineWidth=1;g.beginPath();g.moveTo(0,YT);g.lineTo(W,YT);g.moveTo(0,YM);g.lineTo(W,YM);g.moveTo(0,YB);g.lineTo(W,YB);g.stroke();
+  g.fillStyle=css('--muted');g.font='13px '+css('--f-body');g.textAlign='left';g.fillText('布面',12,YT-10);g.fillText('布底',12,YB+20);g.fillText('两层布',12,YM+4);
+}
+function machineNeedle(g,x,tip,eye=true){
+  g.fillStyle=css('--steel');g.fillRect(x-4,0,8,tip-14);g.beginPath();g.moveTo(x-4,tip-14);g.lineTo(x,tip);g.lineTo(x+4,tip-14);g.closePath();g.fill();
+  if(eye){g.fillStyle=css('--sheet');g.beginPath();g.ellipse(x,tip-22,1.8,5,0,0,7);g.fill();}
+}
+// ---- 手缝：一根线沿平针路径走，针眼在尾部 ----
+function handPath(){const pts=[];const x0=120;for(let k=0;k<12;k++){const x=x0+k*P;pts.push([x,YT-30]);}return pts;}
+function drawHand(g){
+  cloth(g);
+  // 平针：在 xa 处向下穿过，在布下走到 xb 再向上，布面走到下一个 xa
+  const xs=[];for(let k=0;k<14;k++)xs.push(140+k*P*0.75);
+  // 路径点（连续）
+  const path=[[xs[0]-80,YT-40]];
+  for(let k=0;k<xs.length;k++){const top=k%2===0;const x=xs[k];if(top){path.push([x-10,YT-6]);path.push([x+6,YB+6]);}else{path.push([x-10,YB+6]);path.push([x+6,YT-6]);}}
+  // 长度表
+  const L=[0];for(let i=1;i<path.length;i++)L.push(L[i-1]+Math.hypot(path[i][0]-path[i-1][0],path[i][1]-path[i-1][1]));
+  const total=L[L.length-1];
+  const s=Math.min(total,(stitches+ph)*(total/12)*0.95+40);
+  const at=d=>{let i=1;while(i<L.length-1&&L[i]<d)i++;const f=(d-L[i-1])/(L[i]-L[i-1]||1);return [path[i-1][0]+f*(path[i][0]-path[i-1][0]),path[i-1][1]+f*(path[i][1]-path[i-1][1])];};
+  const NL=70;const tip=at(s),tail=at(Math.max(0,s-NL));
+  // 线：从起点到针尾
+  g.strokeStyle=css('--needle-thread');g.lineWidth=3;g.lineJoin='round';g.beginPath();g.moveTo(path[0][0],path[0][1]);
+  for(let i=1;i<path.length&&L[i]<s-NL;i++)g.lineTo(path[i][0],path[i][1]);g.lineTo(tail[0],tail[1]);
+  // 线尾还拖着一大段（手里的线）
+  g.stroke();
+  g.setLineDash([6,5]);g.beginPath();g.moveTo(tail[0],tail[1]);g.quadraticCurveTo(tail[0]+60,tail[1]-120,tail[0]+180,60);g.stroke();g.setLineDash([]);
+  // 针
+  g.strokeStyle=css('--steel');g.lineWidth=5;g.lineCap='round';g.beginPath();g.moveTo(tail[0],tail[1]);g.lineTo(tip[0],tip[1]);g.stroke();
+  g.fillStyle=css('--sheet');g.beginPath();g.arc(tail[0]+(tip[0]-tail[0])*0.08,tail[1]+(tip[1]-tail[1])*0.08,1.8,0,7);g.fill();
+  g.fillStyle=css('--muted');g.font='13px '+css('--f-body');g.textAlign='left';
+  g.fillText('针眼在尾部：针和穿在上面的线必须整根穿过布，再从另一面拔出来',tail[0]-200>20?tail[0]-200:20,40);
+  g.fillText('虚线：手里还没缝进去的线',Math.min(W-200,tail[0]+120),90);
+  return {thread:Math.round((YB-YT)/56*1.5*10)/10*1+0, text:handText()};
+}
+function handText(){const p=ph;return p<0.5?'<b>针向下穿</b>针尖从布面扎进去，整根针连同针眼里的线都要从布底拔出来。':'<b>针向上穿</b>在布底换手，再把针从下往上整根拔出。缝一针，全部的线都要跟着穿过布两次。';}
+// ---- 机器：针尖开眼，只穿一半 ----
+function needleTip(p){ // 0 最高 → 0.4 最低 → 0.8 回到最高
+  const d=p<0.8?0.5-0.5*Math.cos(2*Math.PI*p/0.8):0;return 70+d*250;}
+function feedOff(p){return p>0.8?ease((p-0.8)/0.2)*P:0;}
+function drawLock(g){
+  cloth(g);
+  const off=feedOff(ph);const xs=[];for(let k=1;k<12;k++)xs.push(X0-k*P-off);
+  const xn=X0-off; // 当前针孔随布移动
+  const nt=css('--needle-thread'),bt=css('--bobbin-thread');
+  const pulled=pull&&pull.mode==='lock'?Math.min(1,pull.t):0;
+  g.lineWidth=3;g.lineJoin='round';g.lineCap='round';
+  // 已成线迹
+  g.strokeStyle=nt;g.beginPath();g.moveTo(-10,YT-2);
+  xs.slice().reverse().forEach(x=>{g.lineTo(x-4,YT-2);g.lineTo(x-1.5,YM);g.lineTo(x+1.5,YM);g.lineTo(x+4,YT-2);});
+  g.lineTo(ph>0.8||stitches>0?xn-4:xs[0]+4,YT-2);g.stroke();
+  g.strokeStyle=bt;g.beginPath();g.moveTo(-10,YB+2);
+  xs.slice().reverse().forEach(x=>{g.lineTo(x-4,YB+2);g.lineTo(x-1.5,YM+2);g.lineTo(x+1.5,YM+2);g.lineTo(x+4,YB+2);});
+  g.lineTo(X0+60,YB+2);g.stroke();
+  // 旋梭与梭芯
+  const hx=X0+40,hy=YB+95;
+  g.strokeStyle=css('--steel');g.lineWidth=2;g.beginPath();g.arc(hx,hy,48,0,7);g.stroke();
+  g.fillStyle=bt;g.globalAlpha=.25;g.beginPath();g.arc(hx,hy,22,0,7);g.fill();g.globalAlpha=1;
+  g.fillStyle=css('--muted');g.font='12px '+css('--f-body');g.textAlign='center';g.fillText('梭芯（底线）',hx,hy+70);
+  // 梭尖转角
+  const a=-Math.PI/2+2*Math.PI*ph*1.0;
+  g.strokeStyle=css('--steel');g.lineWidth=4;g.beginPath();g.arc(hx,hy,48,a-0.5,a);g.stroke();
+  // 针线：从挑线杆方向到针眼
+  const tip=needleTip(ph);
+  g.strokeStyle=nt;g.lineWidth=3;
+  // 线环：0.4–0.75 被梭尖钩住，绕过梭芯
+  const loopT=seg(ph,0.38,0.72);
+  if(ph<0.8){
+    g.beginPath();g.moveTo(xs[0]+4,YT-2);g.lineTo(xn-6,YT-2);g.lineTo(xn-6,Math.max(YT,tip-22));g.stroke();
+    if(loopT>0&&loopT<1){
+      const r=22+26*Math.sin(Math.PI*loopT);
+      g.beginPath();g.ellipse(hx-6+18*loopT,hy-10,r,r*0.9,0,Math.PI*(1.1-0.2*loopT),Math.PI*(1.1-0.2*loopT)+2*Math.PI*loopT);g.stroke();
+    }
+  }else{ // 收紧
+    g.beginPath();g.moveTo(xs[0]+4,YT-2);g.lineTo(xn-4,YT-2);g.lineTo(xn-1.5,YM);g.lineTo(xn+1.5,YM);g.lineTo(xn+4,YT-2);g.lineTo(xn+40,YT-60);g.stroke();
+  }
+  machineNeedle(g,xn,ph<0.8?tip:70);
+  if(pulled>0){g.strokeStyle=css('--ok');g.lineWidth=2;g.beginPath();g.moveTo(40,YT-30);g.lineTo(10,YT-30);g.stroke();g.fillStyle=css('--ok');g.fillText('拉',30,YT-38);}
+  return {text:lockText()};
+}
+function lockText(){const p=ph;
+  if(p<0.38)return '<b>刺布</b>针眼开在针尖附近，针带着针线向下穿过两层布，但只穿到一半，不用整根穿过。';
+  if(p<0.55)return '<b>形成线环、梭尖钩线</b>针从最低点开始回升，针线在针的一侧鼓出一个线环；旋转的梭尖正好从线环里穿过，把它钩住。';
+  if(p<0.75)return '<b>绕梭</b>梭尖把线环撑大，绕过装着底线的梭芯。底线就这样穿过了针线的线环。';
+  return '<b>收紧、送布</b>挑线杆把针线拉回，两根线的交点被拉进两层布中间；送布牙把布向前送一个针距，准备下一针。';}
+function drawChain(g){
+  cloth(g);
+  const off=feedOff(ph);const xs=[];for(let k=1;k<12;k++)xs.push(X0-k*P-off);
+  const xn=X0-off,nt=css('--needle-thread');
+  let unr=pull&&pull.mode==='chain'?pull.t*13:0; // 已散开的线环数
+  g.lineWidth=3;g.lineJoin='round';g.lineCap='round';g.strokeStyle=nt;
+  // 布面：直线段
+  g.beginPath();
+  const n=xs.length;
+  for(let k=n-1;k>=0;k--){if(k<unr-1)continue;const x=xs[k];if(k===n-1)g.moveTo(x-P,YT-2);g.lineTo(x,YT-2);}
+  if(unr<1)g.lineTo(xn,YT-2);
+  g.stroke();
+  // 布底：每个线环从针孔向下、向后，套住后一个线环
+  for(let k=n-1;k>=0;k--){
+    if(k<unr-1)continue;
+    const x=xs[k];const xb=x-P;
+    g.beginPath();g.moveTo(x-2,YT);g.lineTo(x-2,YB+4);
+    g.bezierCurveTo(x-6,YB+34,xb+10,YB+30,xb+4,YB+10);g.bezierCurveTo(xb-2,YB+2,x+4,YB+2,x+2,YB+4);g.lineTo(x+2,YT);g.stroke();
+  }
+  // 当前线环：被弯针勾住
+  const tip=needleTip(ph);
+  if(unr<1){
+    if(ph<0.8){g.beginPath();g.moveTo(xn-6,YT-2);g.lineTo(xn-6,Math.max(YT,tip-22));g.stroke();
+      const lt=seg(ph,0.4,0.75);
+      if(lt>0){const lx=xn-6-30*lt,ly=YB+18+22*lt;g.beginPath();g.moveTo(xn-6,YB);g.quadraticCurveTo(lx-20,ly+20,lx,ly);g.quadraticCurveTo(lx+10,ly-14,xn+4,YB);g.stroke();}
+    }
+    // 钩针（弯针）
+    const lx=X0-30+40*Math.cos(Math.PI*ph*2),ly=YB+60;
+    g.strokeStyle=css('--steel');g.lineWidth=4;g.beginPath();g.moveTo(lx+70,ly+30);g.quadraticCurveTo(lx+20,ly+10,lx-10,ly-8);g.stroke();
+    g.fillStyle=css('--muted');g.font='12px '+css('--f-body');g.textAlign='left';g.fillText('钩针（弯针）',lx+40,ly+46);
+    machineNeedle(g,xn,ph<0.8?tip:70);
+  }else{
+    g.fillStyle=css('--bad');g.font='14px '+css('--f-body');g.textAlign='left';g.fillText('←  拉住线头，线环一个接一个地退出',Math.max(20,xs[Math.min(n-1,Math.floor(unr))]-80),YB+70);
+    const kk=Math.min(n-1,Math.max(0,Math.ceil(unr-1)));g.strokeStyle=nt;g.setLineDash([4,4]);g.beginPath();g.moveTo(xs[kk],YT-2);g.lineTo(W-40,YT-90);g.stroke();g.setLineDash([]);
+  }
+  return {text:chainText()};
+}
+function chainText(){const p=ph;if(pull&&pull.mode==='chain')return '<b>拉线头</b>链式线迹只有一根线，每个线环靠下一个线环套住。最后一个线环没人套住，一拉它就退出来，后面的线环跟着一个个松开，整条缝线散开。';
+  if(p<0.38)return '<b>刺布</b>针尖开眼的针带着线穿过布层，只穿一半。';
+  if(p<0.75)return '<b>钩住线环</b>针回升时线环留在布底，钩针（弯针）把它勾住并拉向后方。';
+  return '<b>送布，下一针穿过上一个线环</b>布向前送一个针距，下一针刺下时正好穿过被勾住的线环，于是线环一环套一环，在布底形成链条。';}
+// ---- 成品外观（布面 / 布底） ----
+function drawFace(){
+  const g=fit(fc,1000,150);g.clearRect(0,0,1000,150);
+  g.fillStyle=css('--cloth');g.fillRect(90,14,890,50);g.fillStyle=css('--cloth2');g.fillRect(90,84,890,50);
+  g.fillStyle=css('--muted');g.font='13px '+css('--f-body');g.textAlign='right';g.fillText('布面',80,44);g.fillText('布底',80,114);
+  const nt=css('--needle-thread'),bt=css('--bobbin-thread');g.lineWidth=3;g.lineCap='round';
+  const step=56;
+  for(let k=0;k<15;k++){const x=110+k*step;
+    if(mode==='hand'){g.strokeStyle=nt;if(k%2===0){g.beginPath();g.moveTo(x,39);g.lineTo(x+step-10,39);g.stroke();}else{g.beginPath();g.moveTo(x,109);g.lineTo(x+step-10,109);g.stroke();}}
+    if(mode==='lock'){g.strokeStyle=nt;g.beginPath();g.moveTo(x,39);g.lineTo(x+step-6,39);g.stroke();g.strokeStyle=bt;g.beginPath();g.moveTo(x,109);g.lineTo(x+step-6,109);g.stroke();}
+    if(mode==='chain'){g.strokeStyle=nt;g.beginPath();g.moveTo(x,39);g.lineTo(x+step-6,39);g.stroke();g.beginPath();g.ellipse(x+step/2,109,step/2+4,9,0,0,7);g.stroke();}
+  }
+  g.fillStyle=css('--muted');g.textAlign='left';g.font='12px '+css('--f-body');
+  const note={hand:'平针：线在布面、布底交替出现，针距不均匀，速度靠手',chain:'布底是一串线环组成的链条，有弹性；但拉住末端线头整条会散开',lock:'两面看起来一样，都是一条直线；交织点藏在两层布中间'}[mode];
+  g.fillText(note,92,148);
+}
+function draw(){
+  const g=fit(cv,W,H);g.clearRect(0,0,W,H);
+  let r;if(mode==='hand')r=drawHand(g);else if(mode==='chain')r=drawChain(g);else r=drawLock(g);
+  $('now').innerHTML=r.text;$('m-st').textContent=stitches;
+  $('m-th').textContent=mode==='hand'?'全部线长 × 2':'约 '+(2*((YB-YT)/56*1.5)).toFixed(1);
+  document.querySelectorAll('td[data-c]').forEach(td=>td.classList.toggle('on',td.dataset.c===mode));
+}
+function tick(ts){
+  const dt=last==null?0:Math.min(0.05,(ts-last)/1000);last=ts;
+  if(pull){pull.t+=dt*0.18;if(pull.t>=1.2){pull.done=true;}}
+  else if(playing||stepTarget!=null){ph+=dt*speed*0.55;
+    if(stepTarget!=null&&ph>=stepTarget){ph=stepTarget;stepTarget=null;}
+    if(ph>=1){ph-=1;stitches++;if(mode==='hand'&&stitches>=11){stitches=3;}}
+  }
+  draw();requestAnimationFrame(tick);
+}
+const STEPS={hand:[0.5,1],chain:[0.38,0.75,1],lock:[0.38,0.55,0.75,1]};
+$('step').onclick=()=>{playing=false;$('play').setAttribute('aria-pressed','false');$('play').textContent='播放';const s=STEPS[mode];let nx=s.find(v=>v>ph+1e-6);if(nx===undefined)nx=s[0]+1;stepTarget=nx>=1?Math.min(nx,0.9999):nx;if(nx>=1){stepTarget=null;ph=0;stitches++;}};
+$('play').onclick=()=>{playing=!playing;$('play').setAttribute('aria-pressed',playing);$('play').textContent=playing?'暂停':'播放';};
+$('spd').oninput=e=>speed=+e.target.value;
+$('pull').onclick=()=>{if(mode==='hand')return;playing=false;$('play').setAttribute('aria-pressed','false');$('play').textContent='播放';ph=0.95;pull={mode,t:0};
+  const m=$('msg');if(mode==='chain'){m.textContent='链式线迹：拉住最后一个线头，整条缝线一环接一环地散开。';m.className='msg bad';}else{m.textContent='锁式线迹：两根线在布层中间互相锁住，怎么拉也不散。';m.className='msg ok';}};
+$('reset').onclick=()=>{pull=null;ph=0;stitches=mode==='hand'?3:0;$('msg').textContent='';};
+document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',x===b));pull=null;ph=0;stitches=mode==='hand'?3:0;$('msg').textContent='';$('pull').disabled=mode==='hand';drawFace();});
+$('pull').disabled=true;
+if(reduce){$('play').setAttribute('aria-pressed','false');$('play').textContent='播放';}
+drawFace();requestAnimationFrame(tick);
+window.addEventListener('resize',drawFace);
+window.__api={set:(m,p)=>{document.querySelector(`[data-m="${m}"]`).click();ph=p;playing=false;},pull:()=>$('pull').click(),adv:t=>{if(pull)pull.t=t;}};
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

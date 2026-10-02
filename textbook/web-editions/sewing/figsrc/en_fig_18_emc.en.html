@@ -1,0 +1,47 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>.fig{background:#faf9f5}.pimg{display:block;width:100%}.card{border:1.5px solid #d8dde1;border-radius:12px;background:#fff}@font-face{font-family:QFix2;src:local("DejaVu Sans");unicode-range:U+00B1,U+00D7,U+2192,U+2212}@font-face{font-family:QFix2;src:local("DejaVu Sans Bold");font-weight:700;unicode-range:U+00B1,U+00D7,U+2192,U+2212}.fig *,.fig svg text{font-family:QFix2,QFix,"Noto Sans CJK SC",sans-serif}</style>
+<div class="fig" style="--w:1700px">
+<p class="title">Faster switching: less heat, more interference</p>
+<p class="sub">Left: path of the common-mode current (illustrative); right: effect of switching time in a 45 °C shop under this chapter’s standard operating conditions (worked example, illustrative values)</p>
+<div style="display:grid;grid-template-columns:760px 1fr;gap:20px;align-items:start">
+<div class="card" style="padding:4px 0 18px;height:600px"><svg viewBox="0 0 893 465" width="100%" style="display:block">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5a6570"/></marker>
+<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5a6570"/></marker></defs>
+<text x="24" y="38" font-size="20" font-weight="700" fill="#1b2430">a</text><text x="52" y="38" font-size="20" font-weight="700" fill="#1b2430">Common-mode current i = C dv/dt: the path it takes</text>
+<rect x="35" y="93" width="177" height="107" rx="9" fill="#fff" stroke="#1b2430" stroke-width="2.4"/>
+<text x="123" y="127" text-anchor="middle" font-size="17" font-weight="700" fill="#1b2430">Mains</text>
+<text x="123" y="152" text-anchor="middle" font-size="13.5" fill="#5a6570">L, N, PE</text>
+<rect x="258" y="93" width="177" height="107" rx="9" fill="#fff" stroke="#2e9e5b" stroke-width="2.4"/>
+<text x="347" y="127" text-anchor="middle" font-size="17" font-weight="700" fill="#1f8a4c">EMI filter</text>
+<text x="347" y="152" text-anchor="middle" font-size="13.5" fill="#5a6570">common-mode choke</text>
+<text x="347" y="171" text-anchor="middle" font-size="13.5" fill="#5a6570">Y capacitors to earth</text>
+<rect x="482" y="93" width="177" height="107" rx="9" fill="#fff" stroke="#c4372b" stroke-width="2.4"/>
+<text x="570" y="127" text-anchor="middle" font-size="17" font-weight="700" fill="#c4372b">Inverter bridge</text>
+<text x="570" y="152" text-anchor="middle" font-size="13.5" fill="#5a6570">310 V transitions</text>
+<text x="570" y="171" text-anchor="middle" font-size="13.5" fill="#5a6570">in 0.15 µs inside</text>
+<rect x="705" y="82" width="153" height="128" rx="56" fill="#eef1f4" stroke="#5a6570" stroke-width="2.4"/>
+<text x="782" y="140" text-anchor="middle" font-size="17" font-weight="700" fill="#1b2430">Motor</text>
+<text x="782" y="165" text-anchor="middle" font-size="13.5" fill="#5a6570">windings</text>
+<g stroke="#5a6570" stroke-width="2.4" marker-end="url(#ah)"><line x1="214" y1="146" x2="256" y2="146"/><line x1="437" y1="146" x2="480" y2="146"/><line x1="661" y1="146" x2="703" y2="146"/></g>
+<text x="690" y="234" text-anchor="end" font-size="13" fill="#5a6570">Motor cable</text>
+<line x1="123" y1="200" x2="123" y2="375" stroke="#c4372b" stroke-width="1.8" stroke-dasharray="5 4"/>
+<line x1="347" y1="200" x2="347" y2="375" stroke="#2e9e5b" stroke-width="1.8" stroke-dasharray="5 4"/>
+<text x="358" y="305" font-size="14" font-weight="700" fill="#1f8a4c">Y capacitors return it locally</text>
+<line x1="782" y1="210" x2="782" y2="281" stroke="#c4372b" stroke-width="2.4"/>
+<line x1="755" y1="281" x2="812" y2="281" stroke="#c4372b" stroke-width="4"/><line x1="755" y1="295" x2="812" y2="295" stroke="#c4372b" stroke-width="4"/>
+<line x1="782" y1="295" x2="782" y2="375" stroke="#c4372b" stroke-width="2.4"/>
+<text x="745" y="294" text-anchor="end" font-size="15" font-weight="700" fill="#c4372b">Parasitic capacitance C</text>
+<line x1="45" y1="375" x2="848" y2="375" stroke="#5a6570" stroke-width="3.2"/>
+<g stroke="#c4372b" stroke-width="2.4"><line x1="540" y1="390" x2="382" y2="390"/><line x1="765" y1="390" x2="567" y2="390"/></g>
+<path d="M372,390 l20,-9 v18 z" fill="#5a6570"/><path d="M557,390 l20,-9 v18 z" fill="#5a6570"/>
+<text x="60" y="406" font-size="14.5" font-weight="700" fill="#5a6570">Protective earth / housing</text>
+<text x="455" y="436" text-anchor="middle" font-size="14.5" font-weight="700" fill="#c4372b">Common-mode current → (through the earth wire and the mains back to the inverter bridge)</text>
+</svg>
+<ul style="margin:6px 0 0;padding:0 24px 0 40px;font-size:13.5px;line-height:1.85;color:#1b2430">
+<li>Worked example: C = 300 pF, 310 V rising in 150 ns, peak about 0.6 A</li>
+<li>Long path, large loop area: it radiates like an antenna</li>
+<li>Flowing through the earth conductors, it makes the low-voltage “ground” bounce, disturbing the encoder and communications</li>
+<li>Countermeasures: filter, shielded cable (shield earthed over a large area), small loop areas, slower switching (lower dv/dt)</li></ul></div>
+<img class="pimg" src="en_panels/fig_18_emc_b.png"></div>
+<p class="note" style="color:#1b2430;font-size:13.5px">Doubling the switching time halves the peak common-mode current (low-frequency conducted interference improves little and still relies on the filter) but doubles the switching loss; lowering the switching frequency also cuts losses, but the motor noise becomes more shrill. Thermal design and EMC must be considered together.</p>
+</div>

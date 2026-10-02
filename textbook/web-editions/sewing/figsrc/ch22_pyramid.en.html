@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.pr{display:grid;grid-template-columns:430px 1fr;gap:10px 22px;align-items:center}
+.lay{margin:0 auto;height:66px;display:flex;flex-direction:column;justify-content:center;border-radius:8px}
+.hd{display:grid;grid-template-columns:90px 110px 130px 1fr;gap:10px;font-size:12.5px;color:#5a6570;font-weight:700;border-bottom:1.5px solid #1b2430;padding-bottom:4px}
+.rw{display:grid;grid-template-columns:90px 110px 130px 1fr;gap:10px;font-size:13px;align-items:center;border-bottom:1px solid #d8dde1;padding:8px 0;min-height:66px}
+.rw .n{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-weight:700}
+</style>
+<div class="fig" style="--w:1240px">
+<p class="title">The test pyramid: what each of the five levels tests, how fast, how costly</p><p class="sub">Test volume for one firmware version of the WQ-SC lockstitch prototype (illustrative). Lower levels are faster, cheaper and run more often; higher levels are closer to reality but slower and dearer</p>
+<div class="pr">
+<div></div>
+<div class="hd"><span>Test cases</span><span>One run</span><span>When it runs</span><span>Defects it mainly finds</span></div>
+<div class="lay box y fill-y" style="width:34%"><b>End-of-line (EOL) test</b><span>every unit built</span></div>
+<div class="rw"><span class="n">≈12 items</span><span>3–5 min/unit</span><span>every unit</span><span>Assembly, component and wiring defects (not design defects); results go to the digital factory under the serial number</span></div>
+<div class="lay box o fill-o" style="width:50%"><b>Machine test bench</b><span>real head + dynamometer + camera</span></div>
+<div class="rw"><span class="n">≈15</span><span>about 2 days</span><span>weekly, release candidates</span><span>Stitch quality, backtack alignment, mechanics and heat (4 h run), noise — what the models do not contain</span></div>
+<div class="lay box p fill-p" style="width:66%"><b>Hardware-in-the-loop (HIL)</b><span>real controller + emulated motor/encoder + real solenoids</span></div>
+<div class="rw"><span class="n">≈40</span><span>3–4 h</span><span>nightly</span><span>Real-time behaviour, interrupt latency, real drive and motor characteristics, solenoid delay, fault injection (encoder loss, overcurrent, voltage dips)</span></div>
+<div class="lay box b fill-b" style="width:83%"><b>Software-in-the-loop (SIL)</b><span>firmware + the machine models of the virtual labs</span></div>
+<div class="rw"><span class="n">≈60</span><span>5–10 min</span><span>every commit</span><span>State-machine and timing interplay, control parameters, statistics under parameter sweeps (stop, trim window) — within what the model can express</span></div>
+<div class="lay box g fill-g" style="width:100%"><b>Unit tests</b><span>firmware functions compiled and run on a PC</span></div>
+<div class="rw"><span class="n">≈400</span><span>&lt; 1 min</span><span>every commit</span><span>Conversions, boundaries, event-table parsing, state transitions, fault codes — logic errors</span></div>
+</div>
+<p class="note">Note: counts and times are illustrative values for the WQ-SC/LS prototype of this chapter. A rule of thumb: each level higher at which a defect is found costs roughly ten times more to fix, so for every defect found high up, ask "can a test one level lower catch it?" (Section 22.9).</p>
+</div>

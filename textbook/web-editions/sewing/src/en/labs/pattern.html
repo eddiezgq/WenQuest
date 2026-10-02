@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Pattern Sewer Simulation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: pattern view + shaft dial on the left, parameters / results / speed chart on the right; stacks on phones */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --bad:#d1495b; --ok:#2f6fd6; --cap:#e0662f; --tpl:#cfe5f2; --fab:#e7d3a3; --ghost:#9aa4ae;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#6ea8ff;--cap:#ff8c55;--tpl:#22384a;--fab:#4a4030;--ghost:#5d6b7a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#6ea8ff;--cap:#ff8c55;--tpl:#22384a;--fab:#4a4030;--ghost:#5d6b7a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+canvas{display:block;width:100%;height:auto;touch-action:none}
+.viewrow{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:10px;align-items:start}
+@media (max-width:520px){.viewrow{grid-template-columns:minmax(0,1fr)}}
+.dialbox{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dialbox small{color:var(--muted);font-size:.74rem;text-align:center;line-height:1.35}
+.ctl{display:grid;grid-template-columns:auto minmax(0,1fr) 6em;gap:6px 10px;align-items:center}
+.ctl label{font-size:.88rem;color:var(--muted)}
+.ctl b{font-family:var(--f-mono);font-size:.9rem;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+select{font:inherit;font-size:.88rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px;max-width:100%}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)} button.primary{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1.02rem;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted);font-size:.74rem;line-height:1.3;display:block}
+.bad{color:var(--bad)} .good{color:var(--ok)}
+.note{font-size:.78rem;color:var(--muted);margin:6px 0 0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.76rem;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.tasks{margin:6px 0 0;padding-left:1.2em;font-size:.88rem}
+.tasks li{margin:4px 0}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0}
+</style>
+<div class="wrap">
+<header><h1>Pattern Sewer Simulation</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 15 · Virtual lab 15-1 · Can every stitch move be completed within the window while the needle is out of the fabric?</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>Pattern (clamp coordinates, mm)</h3>
+      <div class="viewrow">
+        <canvas id="cv" width="720" height="560" aria-label="Pattern stitch points; red = stitches that cannot be completed"></canvas>
+        <div class="dialbox">
+          <canvas id="dial" width="300" height="300" style="max-width:150px" aria-label="Main-shaft angle and out-of-fabric window"></canvas>
+          <small id="dialtxt">Main-shaft angle 0°</small>
+          <small>Blue arc: clamp may move<br>Grey arc: needle in fabric</small>
+        </div>
+      </div>
+      <div class="legend"><span><i style="background:var(--ok)"></i>Completed in time</span><span><i style="background:var(--bad)"></i>Not completed (needle breaks)</span><span><i style="background:var(--cap)"></i>Needle position</span></div>
+      <div class="row">
+        <label class="note" style="margin:0" for="preset">Pattern</label>
+        <select id="preset">
+          <option value="flap">Pocket flap (60 × 40 mm, R10 corners)</option>
+          <option value="circle">Circle (50 mm diameter)</option>
+          <option value="star">Five-pointed star (60 mm outer diameter)</option>
+          <option value="bartack">Bartack (10 × 2 mm)</option>
+          <option value="zig">Wide zigzag (12 mm wide)</option>
+          <option value="draw">Draw your own (click on the plot to add points)</option>
+        </select>
+        <button id="clear" type="button" hidden>Clear</button>
+      </div>
+      <div class="row">
+        <button id="play" class="primary" type="button">Play</button>
+        <button id="stepb" type="button">Next stitch</button>
+        <button id="reset" type="button">Back to start</button>
+        <span class="note" style="margin:0">Slow motion</span>
+        <span class="seg" role="group" aria-label="Slow-motion factor"><button type="button" data-slow="20" aria-pressed="false">20×</button><button type="button" data-slow="60" aria-pressed="true">60×</button><button type="button" data-slow="200" aria-pressed="false">200×</button></span>
+      </div>
+      <p class="note" id="drawhint" hidden>Click on the plot to add outline points; the program divides the outline evenly by the stitch length, and closes it automatically when the first and last points are very close.</p>
+    </section>
+    <section class="panel">
+      <h3>Speed per stitch (blue: actual speed; orange: speed limit for that stitch)</h3>
+      <canvas id="sp" width="720" height="240" aria-label="Speed per stitch and its limit"></canvas>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>Parameters (defaults = Chapter 15 worked example)</h3>
+      <div class="ctl">
+        <label for="s">Target stitch length s</label><input id="s" type="range" min="0.5" max="12" step="0.5" value="3"><b id="sv">3.0 mm</b>
+        <label for="t">Fabric + lower clamp thickness t</label><input id="t" type="range" min="0.5" max="8" step="0.5" value="1.5"><b id="tv">1.5 mm</b>
+        <label for="a">Acceleration per axis a</label><input id="a" type="range" min="10" max="120" step="5" value="50"><b id="av">50 m/s²</b>
+        <label for="v">Max. velocity per axis v</label><input id="v" type="range" min="0.3" max="2" step="0.1" value="1"><b id="vv">1.0 m/s</b>
+        <label for="mg">Margin at each end of window</label><input id="mg" type="range" min="0" max="30" step="1" value="0"><b id="mgv">0°</b>
+        <label for="n">Set speed n</label><input id="n" type="range" min="200" max="3500" step="50" value="2000"><b id="nv">2000</b>
+        <label for="dn">Max. speed change per stitch Δn</label><input id="dn" type="range" min="50" max="800" step="50" value="300"><b id="dnv">300</b>
+        <label for="law">Motion law</label><select id="law"><option value="4">Constant accel./decel. (C = 4)</option><option value="4.888">Modified trapezoid (C = 4.89)</option><option value="6.283">Cycloidal (C = 6.28)</option></select><span></span>
+        <label>Speed control</label><span class="seg" role="group" aria-label="Speed control"><button type="button" data-mode="fixed" aria-pressed="true">Fixed speed</button><button type="button" data-mode="auto" aria-pressed="false">Auto look-ahead</button></span><span></span>
+      </div>
+      <p class="note">Machine-head parameters from the Chapter 3 worked example: r = 15.5 mm, l = 55 mm, needle point 18 mm above the throat plate at top dead centre; maximum head speed taken as 2800 r/min (example value). Under “Auto look-ahead”, the first 3 stitches and the 2 stitches before trimming are limited to 400 r/min.</p>
+    </section>
+    <section class="panel">
+      <h3>Results</h3>
+      <div class="kpi">
+        <div><b id="k-w">203.4°</b><small>Out-of-fabric window W<br>(after margins)</small></div>
+        <div><b id="k-n">0</b><small>Stitches</small></div>
+        <div><b id="k-bad">0</b><small>Stitches not completed</small></div>
+        <div><b id="k-min">—</b><small>Limit of slowest stitch<br>r/min</small></div>
+        <div><b id="k-time">—</b><small>Sewing time s<br>(excl. trimming, jumps)</small></div>
+        <div><b id="k-avg">—</b><small>Average speed r/min</small></div>
+        <div><b id="k-cur">—</b><small>Current stitch: length / time</small></div>
+        <div><b id="k-curw">—</b><small>Current stitch: time available</small></div>
+      </div>
+      <p class="note" id="verdict"></p>
+    </section>
+    <section class="panel">
+      <h3>Tasks</h3>
+      <ol class="tasks">
+        <li>Pocket flap, fixed 2000 r/min: change the stitch length from 3 mm to 6 mm and count the stitches that cannot be completed; then, to what speed must you lower it before they all turn blue? Compare with Fig. 15-4.</li>
+        <li>Change the fabric thickness from 1.5 mm to 6 mm. How many degrees is the window now? Why must thick material be sewn more slowly?</li>
+        <li>Choose “Five-pointed star”, stitch length 6 mm, and raise the speed step by step from 1200 r/min: which stitches turn red first — those close to horizontal or vertical, or the diagonal ones? Explain with point 3 of Section 15.3.</li>
+        <li>Switch to “Auto look-ahead” and compare the sewing times of the three motion laws; then set the margin to 15° — how much longer does it take? Write down which law you would choose for thin material and for thick material.</li>
+      </ol>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const R = 15.5, Lc = 55, TIP = 18, NHEAD = 2800, NSLOW = 400;
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const P = { s:3, t:1.5, a:50, v:1, mg:0, n:2000, dn:300, C:4, mode:'fixed', slow:60, preset:'flap' };
+let contour = [], closed = true, drawPts = [], stitches = [], caps = [], speeds = [], ok = [], W = 203.4;
+let cur = 0, phi = 0, playing = false, lastT = 0;
+
+// ---------- kinematics ----------
+const lam = R / Lc;
+const xN = p => R * (1 - Math.cos(p)) - Lc * (1 - Math.sqrt(1 - lam * lam * Math.sin(p) ** 2));
+const winCache = {};
+function windowFor(t){
+  if (winCache[t]) return winCache[t];
+  let e = 0, l = 360;
+  for (let d = 0; d <= 180; d += 0.05){ if (TIP - xN(d * Math.PI / 180) < t){ e = d; break; } }
+  for (let d = 180; d <= 360; d += 0.05){ if (TIP - xN(d * Math.PI / 180) >= t){ l = d; break; } }
+  return (winCache[t] = { enter: e, leave: l, W: 360 - (l - e) });
+}
+// time for one axis to travel s mm with law coefficient C, accel a, vmax v (peak velocity = 2 s / dt for all three laws)
+const tAxis = s => s <= 0 ? 0 : Math.max(Math.sqrt(P.C * s / 1000 / P.a), 2 * s / 1000 / P.v);
+
+// ---------- patterns (mm, origin at centre) ----------
+function arcPts(cx, cy, r, a0, a1){ return { k:'A', cx, cy, r, a0, a1 }; }
+function presetContour(name){
+  if (name === 'flap') return { closed:false, segs:[
+    { k:'L', a:[-30, 20], b:[-30, -10] }, arcPts(-20, -10, 10, 180, 270), { k:'L', a:[-20, -20], b:[20, -20] },
+    arcPts(20, -10, 10, 270, 360), { k:'L', a:[30, -10], b:[30, 20] } ] };
+  if (name === 'circle') return { closed:true, segs:[ arcPts(0, 0, 25, 90, 450) ] };
+  if (name === 'star'){ const pts = []; for (let i = 0; i < 10; i++){ const r = i % 2 ? 12 : 30, a = Math.PI / 2 + i * Math.PI / 5; pts.push([r * Math.cos(a), r * Math.sin(a)]); }
+    const segs = []; for (let i = 0; i < 10; i++) segs.push({ k:'L', a:pts[i], b:pts[(i + 1) % 10] }); return { closed:true, segs }; }
+  if (name === 'bartack') return { closed:false, raw:bartack() };
+  if (name === 'zig'){ const pts = []; for (let i = 0; i <= 10; i++) pts.push([-25 + i * 5, i % 2 ? 6 : -6]); return { closed:false, raw:pts }; }
+  return { closed:false, segs:[] };
+}
+function bartack(){ const pts = []; const L = 10, Wd = 2;
+  for (let j = 0; j <= 6; j++) pts.push([-L / 2 + j * L / 6, (j % 2 ? 1 : -1) * 0.3 * Wd]);
+  for (let k = 1; k <= 28; k++) pts.push([L / 2 - k * L / 28, (k % 2 ? 1 : -1) * Wd / 2]);
+  return pts; }
+function sampleSegs(segs, s){
+  const out = [];
+  segs.forEach((g, gi) => {
+    if (g.k === 'L'){ const dx = g.b[0] - g.a[0], dy = g.b[1] - g.a[1], L = Math.hypot(dx, dy), n = Math.max(1, Math.ceil(L / s - 1e-9));
+      for (let j = gi === 0 ? 0 : 1; j <= n; j++) out.push([g.a[0] + dx * j / n, g.a[1] + dy * j / n]); }
+    else { const L = Math.abs(g.a1 - g.a0) * Math.PI / 180 * g.r, n = Math.max(2, Math.ceil(L / s - 1e-9));
+      for (let j = gi === 0 ? 0 : 1; j <= n; j++){ const a = (g.a0 + (g.a1 - g.a0) * j / n) * Math.PI / 180; out.push([g.cx + g.r * Math.cos(a), g.cy + g.r * Math.sin(a)]); } }
+  });
+  return out;
+}
+function build(){
+  if (P.preset === 'draw'){
+    const segs = []; for (let i = 0; i + 1 < drawPts.length; i++) segs.push({ k:'L', a:drawPts[i], b:drawPts[i + 1] });
+    stitches = drawPts.length > 1 ? sampleSegs(segs, P.s) : drawPts.slice();
+  } else {
+    const c = presetContour(P.preset);
+    stitches = c.raw ? c.raw.map(p => p.slice()) : sampleSegs(c.segs, P.s);
+  }
+  // start backtack: two stitches back and forth along the first segment
+  if (stitches.length > 2 && P.preset !== 'bartack'){
+    const p0 = stitches[0], p1 = stitches[1]; stitches = [p0, p1, p0].concat(stitches.slice(1));
+  }
+  plan();
+}
+function plan(){
+  const win = windowFor(P.t); W = Math.max(10, win.W - 2 * P.mg);
+  caps = []; speeds = []; ok = [];
+  const N = stitches.length;
+  for (let i = 0; i < N; i++){
+    if (i === 0){ caps.push(NHEAD); continue; }
+    const sx = Math.abs(stitches[i][0] - stitches[i - 1][0]), sy = Math.abs(stitches[i][1] - stitches[i - 1][1]);
+    const tm = Math.max(tAxis(sx), tAxis(sy));
+    caps.push(tm > 0 ? Math.min(NHEAD, W / (6 * tm)) : NHEAD);
+  }
+  if (P.mode === 'fixed'){ for (let i = 0; i < N; i++) speeds.push(P.n); }
+  else {
+    const c = caps.slice();
+    for (let i = 0; i < N; i++){ if (i < 3 || i >= N - 2) c[i] = Math.min(c[i], NSLOW); c[i] = Math.min(c[i], P.n); }
+    for (let i = N - 2; i >= 0; i--) c[i] = Math.min(c[i], c[i + 1] + P.dn);
+    for (let i = 0; i < N; i++) speeds.push(i === 0 ? Math.min(c[0], NSLOW) : Math.min(c[i], speeds[i - 1] + P.dn));
+  }
+  for (let i = 0; i < N; i++) ok.push(speeds[i] <= caps[i] + 0.5);
+  cur = Math.min(cur, Math.max(0, N - 1));
+  report(); drawAll();
+}
+
+// ---------- view ----------
+const cv = $('cv'), g = cv.getContext('2d'); const dial = $('dial'), dg = dial.getContext('2d'); const sp = $('sp'), sg = sp.getContext('2d');
+const scale = () => Math.min((cv.width / 2 - 16) / 36, (cv.height / 2 - 40) / 30);
+function fromPx(x, y){ const k = scale(); return [(x - cv.width / 2) / k, -(y - cv.height / 2) / k]; }
+function templateOffset(){
+  // the template moves so that the current needle point sits under the needle (fixed at centre)
+  if (!stitches.length) return [0, 0];
+  const i = cur, a = stitches[Math.max(0, i - 1)], b = stitches[i];
+  let f = 1;
+  if (i > 0){ const m = moveFrac(phi); f = m; }
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+}
+// fraction of the move towards stitch `cur` completed at shaft angle phi, using the law shape; move spans the window [leave+mg, 360+enter-mg]
+function moveFrac(ph){
+  const win = windowFor(P.t); const s0 = win.leave + P.mg, s1 = 360 + win.enter - P.mg;
+  const d = ((ph % 360) + 360) % 360;
+  if (d > win.enter && d < win.leave) return 1;          // needle in fabric: template parked at the current stitch
+  const u = d >= win.leave ? d : d + 360;
+  const tau = Math.min(1, Math.max(0, (u - s0) / (s1 - s0)));
+  if (P.C < 4.5){ return tau < .5 ? 2 * tau * tau : 1 - 2 * (1 - tau) ** 2; }
+  return tau - Math.sin(2 * Math.PI * tau) / (2 * Math.PI);
+}
+function drawAll(){ drawPattern(); drawDial(); drawSpeed(); }
+function drawPattern(){
+  const k = scale(), w = cv.width, h = cv.height; g.clearRect(0, 0, w, h);
+  const T = p => [w / 2 + p[0] * k, h / 2 - p[1] * k];
+  // template plate
+  const pl = T([-36, 30]), pr = T([36, -30]);
+  g.fillStyle = css('--tpl'); g.fillRect(pl[0], pl[1], pr[0] - pl[0], pr[1] - pl[1]);
+  g.strokeStyle = css('--rule'); g.lineWidth = 1; g.strokeRect(pl[0], pl[1], pr[0] - pl[0], pr[1] - pl[1]);
+  g.globalAlpha = .6;
+  for (let x = -30; x <= 30; x += 10){ const a = T([x, 30]), b = T([x, -30]); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); }
+  for (let y = -30; y <= 30; y += 10){ const a = T([-36, y]), b = T([36, y]); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); }
+  g.globalAlpha = 1;
+  if (stitches.length){
+    g.lineWidth = 2; g.strokeStyle = css('--ghost'); g.beginPath();
+    stitches.forEach((p, i) => { const q = T(p); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }); g.stroke();
+    g.lineWidth = 2.6; g.strokeStyle = css('--ink'); g.beginPath();
+    for (let i = 0; i <= cur; i++){ const q = T(stitches[i]); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); } g.stroke();
+    stitches.forEach((p, i) => { const q = T(p); g.beginPath(); g.arc(q[0], q[1], 4, 0, 7);
+      g.fillStyle = ok[i] ? css('--ok') : css('--bad'); g.fill(); });
+  }
+  if (P.preset === 'draw' && drawPts.length){ g.setLineDash([5, 4]); g.strokeStyle = css('--muted'); g.lineWidth = 1; g.beginPath();
+    drawPts.forEach((p, i) => { const q = T(p); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }); g.stroke(); g.setLineDash([]); }
+  // needle position relative to the template (in reality the template moves under a fixed needle)
+  const nd = T(templateOffset()); const inFab = !inWindow(phi);
+  g.strokeStyle = css('--cap'); g.lineWidth = 2; g.beginPath(); g.arc(nd[0], nd[1], 11, 0, 7); g.stroke();
+  g.beginPath(); g.moveTo(nd[0] - 18, nd[1]); g.lineTo(nd[0] + 18, nd[1]); g.moveTo(nd[0], nd[1] - 18); g.lineTo(nd[0], nd[1] + 18); g.stroke();
+  if (inFab){ g.fillStyle = css('--cap'); g.beginPath(); g.arc(nd[0], nd[1], 5, 0, 7); g.fill(); }
+  g.fillStyle = css('--muted'); g.font = '20px ' + css('--f-body');
+  g.fillText(inFab ? 'Needle in fabric, clamp stationary' : 'Needle out of fabric, clamp moving', 14, 28);
+  g.fillText('The plot shows the needle position relative to the clamp; 10 mm grid', 14, h - 12);
+}
+function inWindow(ph){ const win = windowFor(P.t); const d = ((ph % 360) + 360) % 360; return d >= win.leave || d <= win.enter; }
+function drawDial(){
+  const w = dial.width, c = w / 2, r = w / 2 - 40; dg.clearRect(0, 0, w, w);
+  const win = windowFor(P.t);
+  const ang = d => (d - 90) * Math.PI / 180; // 0° at top, clockwise
+  dg.lineWidth = 18;
+  dg.strokeStyle = css('--rule'); dg.beginPath(); dg.arc(c, c, r, ang(win.enter), ang(win.leave)); dg.stroke();
+  dg.strokeStyle = css('--ok'); dg.globalAlpha = .35; dg.beginPath(); dg.arc(c, c, r, ang(win.leave), ang(win.enter + 360)); dg.stroke(); dg.globalAlpha = 1;
+  dg.strokeStyle = css('--ok'); dg.beginPath(); dg.arc(c, c, r, ang(win.leave + P.mg), ang(win.enter + 360 - P.mg)); dg.stroke();
+  dg.fillStyle = css('--muted'); dg.font = '20px ' + css('--f-mono'); dg.textAlign = 'center';
+  dg.fillText('0°', c, 18); dg.fillText('180°', c, w - 4);
+  const a = ang(phi); dg.strokeStyle = css('--cap'); dg.lineWidth = 5; dg.beginPath(); dg.moveTo(c, c); dg.lineTo(c + (r + 8) * Math.cos(a), c + (r + 8) * Math.sin(a)); dg.stroke();
+  dg.fillStyle = css('--ink'); dg.beginPath(); dg.arc(c, c, 8, 0, 7); dg.fill();
+  $('dialtxt').textContent = `Main-shaft angle ${Math.round(((phi % 360) + 360) % 360)}°`;
+}
+function drawSpeed(){
+  const w = sp.width, h = sp.height; sg.clearRect(0, 0, w, h);
+  const N = stitches.length; if (!N) return;
+  const L = 64, Rr = 12, T = 14, B = 34, ymax = 3600;
+  const X = i => L + (N === 1 ? 0 : i / (N - 1)) * (w - L - Rr), Y = n => T + (1 - Math.min(n, ymax) / ymax) * (h - T - B);
+  sg.font = '18px ' + css('--f-mono'); sg.fillStyle = css('--muted'); sg.strokeStyle = css('--rule'); sg.lineWidth = 1; sg.textAlign = 'right';
+  for (let v = 0; v <= 3000; v += 1000){ sg.beginPath(); sg.moveTo(L, Y(v)); sg.lineTo(w - Rr, Y(v)); sg.stroke(); sg.fillText(v, L - 6, Y(v) + 6); }
+  sg.textAlign = 'left'; sg.fillText('Stitch no. →', L, h - 8);
+  for (let i = 0; i < N; i++) if (!ok[i]){ sg.fillStyle = css('--bad'); sg.globalAlpha = .18; sg.fillRect(X(i) - 3, T, 6, h - T - B); sg.globalAlpha = 1; }
+  const line = (arr, col, wd) => { sg.strokeStyle = col; sg.lineWidth = wd; sg.beginPath(); arr.forEach((n, i) => i ? sg.lineTo(X(i), Y(n)) : sg.moveTo(X(i), Y(n))); sg.stroke(); };
+  line(caps, css('--cap'), 2); line(speeds, css('--ok'), 2.6);
+  sg.strokeStyle = css('--ink'); sg.lineWidth = 1; sg.beginPath(); sg.moveTo(X(cur), T); sg.lineTo(X(cur), h - B); sg.stroke();
+}
+function report(){
+  const N = stitches.length, bad = ok.filter(x => !x).length;
+  let time = 0; for (let i = 1; i < N; i++) time += 60 / speeds[i];
+  const minCap = N > 1 ? Math.min(...caps.slice(1)) : NaN;
+  $('k-w').textContent = W.toFixed(1) + '°';
+  $('k-n').textContent = N;
+  $('k-bad').textContent = bad; $('k-bad').className = bad ? 'bad' : 'good';
+  $('k-min').textContent = isFinite(minCap) ? Math.round(minCap) : '—';
+  $('k-time').textContent = N > 1 ? time.toFixed(2) : '—';
+  $('k-avg').textContent = N > 1 ? Math.round((N - 1) / time * 60) : '—';
+  curInfo();
+  $('verdict').textContent = !N ? '' : bad ? `${bad} stitch(es) exceed the speed limit: the clamp would still be moving after the needle enters the fabric. Lower the speed, shorten the stitch, or switch to “Auto look-ahead”.` : (P.mode === 'fixed' ? 'Every stitch move is completed within the out-of-fabric window.' : 'With look-ahead speed control every stitch is completed; check the speed-per-stitch chart to see how many stitches ahead the controller starts slowing down.');
+}
+function curInfo(){
+  if (cur < 1 || !stitches.length){ $('k-cur').textContent = '—'; $('k-curw').textContent = '—'; return; }
+  const a = stitches[cur - 1], b = stitches[cur]; const s = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const tm = Math.max(tAxis(Math.abs(b[0] - a[0])), tAxis(Math.abs(b[1] - a[1])));
+  const tw = W / 360 * 60 / speeds[cur];
+  $('k-cur').textContent = `${s.toFixed(1)} mm / ${(tm * 1000).toFixed(1)} ms`;
+  $('k-curw').textContent = `${(tw * 1000).toFixed(1)} ms`; $('k-curw').className = tw + 1e-6 >= tm ? 'good' : 'bad';
+}
+
+// ---------- animation ----------
+function tick(ts){
+  if (!playing){ lastT = 0; return; }
+  if (!lastT) lastT = ts; const dt = Math.min(0.05, (ts - lastT) / 1000); lastT = ts;
+  const n = speeds[cur] || P.n;
+  phi += n * 6 * dt / P.slow; // degrees advanced in slowed-down time
+  const win = windowFor(P.t);
+  if (phi >= 360) phi -= 360;
+  // advance to next stitch when needle reaches the end of the window (entering fabric)
+  const d = phi;
+  if (stepState.waiting && d > win.enter && d < 180){ stepState.waiting = false; }
+  if (!stepState.waiting && d >= win.leave){ stepState.waiting = true; if (cur < stitches.length - 1){ cur++; curInfo(); } else { playing = false; $('play').textContent = 'Play'; } }
+  drawAll(); requestAnimationFrame(tick);
+}
+const stepState = { waiting: true };
+
+// ---------- wiring ----------
+function bindRange(id, key, fmt){ const el = $(id), out = $(id + 'v'); const upd = () => { P[key] = +el.value; out.textContent = fmt(P[key]); }; el.addEventListener('input', () => { upd(); key === 's' ? build() : plan(); }); upd(); }
+bindRange('s', 's', v => v.toFixed(1) + ' mm');
+bindRange('t', 't', v => v.toFixed(1) + ' mm');
+bindRange('a', 'a', v => v + ' m/s²');
+bindRange('v', 'v', v => v.toFixed(1) + ' m/s');
+bindRange('mg', 'mg', v => v + '°');
+bindRange('n', 'n', v => v + '');
+bindRange('dn', 'dn', v => v + '');
+$('law').addEventListener('change', e => { P.C = +e.target.value; plan(); });
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { P.mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); plan(); }));
+document.querySelectorAll('[data-slow]').forEach(b => b.addEventListener('click', () => { P.slow = +b.dataset.slow; document.querySelectorAll('[data-slow]').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+$('preset').addEventListener('change', e => { P.preset = e.target.value; cur = 0; phi = 0; const d = P.preset === 'draw'; $('clear').hidden = !d; $('drawhint').hidden = !d; build(); });
+$('clear').addEventListener('click', () => { drawPts = []; cur = 0; build(); });
+cv.addEventListener('pointerdown', e => {
+  if (P.preset !== 'draw') return;
+  const r = cv.getBoundingClientRect(); const x = (e.clientX - r.left) * cv.width / r.width, y = (e.clientY - r.top) * cv.height / r.height;
+  const p = fromPx(x, y);
+  if (Math.abs(p[0]) > 34 || Math.abs(p[1]) > 28) return;
+  if (drawPts.length > 2 && Math.hypot(p[0] - drawPts[0][0], p[1] - drawPts[0][1]) < 3) drawPts.push(drawPts[0].slice()); else drawPts.push(p);
+  cur = 0; build();
+});
+$('play').addEventListener('click', () => { playing = !playing; $('play').textContent = playing ? 'Pause' : 'Play'; if (playing){ if (cur >= stitches.length - 1){ cur = 0; phi = 0; } requestAnimationFrame(tick); } });
+$('stepb').addEventListener('click', () => { if (cur < stitches.length - 1){ cur++; phi = windowFor(P.t).enter + 5; stepState.waiting = false; curInfo(); drawAll(); } });
+$('reset').addEventListener('click', () => { cur = 0; phi = 0; stepState.waiting = true; curInfo(); drawAll(); });
+if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', drawAll);
+build();
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

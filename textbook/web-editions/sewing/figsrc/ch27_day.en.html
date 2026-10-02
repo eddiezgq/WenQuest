@@ -1,0 +1,45 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.lane{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;position:relative}
+.st{min-height:124px}
+.st b{font-size:14px}
+.arrow{position:absolute;top:40px;left:0;right:0;height:2px;background:#9aa4ae;z-index:-1}
+.brk{border:1.5px dashed #c0392b;border-radius:8px;background:#fdf0ee;padding:8px 9px;font-size:12.3px;line-height:1.45;color:#1b2430;min-height:104px}
+.brk i{display:inline-block;font-style:normal;background:#c0392b;color:#fff;border-radius:50%;width:19px;height:19px;text-align:center;line-height:19px;font-size:12px;margin-right:4px}
+.clock{font-size:12px;color:#5a6570;text-align:center;margin:6px 0 4px}
+.lbl{font-size:13px;font-weight:700;color:#5a6570;margin:14px 0 6px}
+.fix{border:1.5px solid #2e9e5b;border-radius:8px;background:#eaf6ee;padding:8px 9px;font-size:12.3px;line-height:1.45;min-height:76px}
+</style>
+<div class="fig" style="--w:1120px">
+<p class="title">A day in the life of a 200-machine order: where the information breaks</p><p class="sub">Illustrative. 200 × WQ-LS-TED (auto trimming + electronic stitch length + micro-oil hook), due in 10 days. Top: the flow; middle: breaks without shared data; bottom: how the digital factory closes each one</p>
+<div class="lane">
+<div class="arrow"></div>
+<div><div class="box b st"><b>Sales order</b><span>Model and options<br>due date, price</span></div><div class="clock">08:30</div></div>
+<div><div class="box b st"><b>Planning</b><span>BOM explosion<br>MRP, scheduling</span></div><div class="clock">10:00</div></div>
+<div><div class="box y st"><b>Purchasing &amp; stores</b><span>Motors, needles<br>DLC subcontract</span></div><div class="clock">11:00</div></div>
+<div><div class="box o st"><b>Machining</b><span>Housings, hooks<br>cams, shafts</span></div><div class="clock">all day</div></div>
+<div><div class="box o st"><b>Assembly &amp; adjustment</b><span>Assembly line<br>hook timing, clearance</span></div><div class="clock">from day 3</div></div>
+<div><div class="box p st"><b>EOL test</b><span>Positioning, trimming<br>firmware check</span></div><div class="clock">from day 3</div></div>
+<div><div class="box g st"><b>Shipping &amp; service</b><span>Packing, despatch<br>complaints, spares</span></div><div class="clock">day 10</div></div>
+</div>
+<p class="lbl">Without shared data</p>
+<div class="lane">
+<div class="brk"><i>1</i>Options live in spreadsheets and chat messages; "micro-oil hook" is copied as a standard hook</div>
+<div class="brk"><i>2</i>MRP does not know DLC coating is a 5-day subcontract; the schedule uses the standard hook lead time</div>
+<div class="brk"><i>3</i>Control boxes arrive, but nobody knows which firmware version to flash</div>
+<div class="brk"><i>4</i>The HMC stops for 3 h; paper job tickets reveal it after the shift, and the bottleneck output is short</div>
+<div class="brk"><i>5</i>Hook clearance is written on paper; it creeps up and nobody plots the trend</div>
+<div class="brk"><i>6</i>Test results sit on the test-bench PC, filed by date, not matched to serial numbers</div>
+<div class="brk"><i>7</i>Three months later a customer reports skipped stitches; nobody can tell which hook lot is in the machine</div>
+</div>
+<p class="lbl">How the digital factory closes the gap (Sections 27.3–27.7)</p>
+<div class="lane">
+<div class="fix">The configurator issues variant code WQ-LS-TED; options become the BOM</div>
+<div class="fix">The variant BOM carries the subcontract step and its lead time; MRP includes it</div>
+<div class="fix">Firmware is a BOM line with a version; the test bench checks it against the work order</div>
+<div class="fix">Machine states go on the bus; the dashboard shows stoppages and the bottleneck live</div>
+<div class="fix">Measurements go on the bus; control chart updates live, rules raise alarms</div>
+<div class="fix">Test results go to the historian by serial number and stay with the machine record</div>
+<div class="fix">Serial-to-lot links trace it in minutes and fence the scope</div>
+</div>
+<p class="note">Note: times and problems are illustrative; breaks 1–7 are explained in Section 27.1.</p></div>

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Control box: thermal design, EMI and burn-in</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = charts, right rail = checks and controls; tasks at bottom */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style><style>
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page[hidden]{display:none}
+</style>
+<div class="wrap">
+<header><h1>Control box: thermal design, EMI and burn-in</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 18 · Virtual lab 18-1 · Faster switching means less heat but more interference; longer burn-in means fewer returns but higher cost</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tabA" aria-selected="true" type="button">① Thermal design and EMI</button><button role="tab" id="tabB" aria-selected="false" type="button">② Burn-in and returns</button></div>
+<div class="page" id="pageA">
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Current and temperature over two sewing cycles (grey: phase current; red: junction temperature; blue: heat sink)</h3><canvas id="cyc" width="1100" height="360" aria-label="Current and temperature over the sewing cycle"></canvas></section>
+    <section class="panel"><h3>Switching-time trade-off (other parameters as currently set; green region: both limits met; dots: current setting)</h3><canvas id="trade" width="1100" height="320" aria-label="Effect of switching time on junction temperature and common-mode current"></canvas></section>
+    <p class="note">Model (illustrative, the same as the book’s model18.py): DC link 310 V; switch on-state drop 1.0 V + 0.1 Ω, diode 0.9 V + 0.08 Ω, modulation index × power factor 0.6; switching loss per device = ½ × 310 V × (I<sub>pk</sub>/π) × t<sub>sw</sub> × f<sub>sw</sub>, diode reverse recovery taken as 30% of that; rectifier bridge 2 × 0.9 V × 0.6 I. Each start–stop uses the start–stop current for 0.15 s of acceleration and 0.15 s of deceleration, the sewing current for the rest of the sewing time, and zero otherwise. Junction to heat sink per device 3.5 K/W, time constant 0.05 s; heat-sink thermal resistance × (1 + 1.5 × clogging); temperature rise inside the box 0.6 K/W × (1 + clogging) × (average power-stage loss + 8 W other). Capacitor core 5 °C above the box interior, life by the ten-degree rule, rated at 105 °C; 4800 h powered per year. Peak common-mode current = 300 pF × 310 V /(t<sub>sw</sub>/2).</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Criteria</h3><div class="checks" id="checksA"></div></section>
+    <section class="panel"><h3>Adjust</h3>
+      <div class="prm">
+        <label for="Ta">Shop-floor temperature (°C)</label><input id="Ta" type="range" min="5" max="45" step="1" value="40"><output id="Tav"></output>
+        <label for="starts">Start–stops per minute</label><input id="starts" type="range" min="5" max="60" step="1" value="30"><output id="startsv"></output>
+        <label for="duty">Sewing time fraction</label><input id="duty" type="range" min="0.1" max="0.95" step="0.05" value="0.5"><output id="dutyv"></output>
+        <label for="Irun">Sewing current (A, RMS)</label><input id="Irun" type="range" min="1" max="5" step="0.1" value="3"><output id="Irunv"></output>
+        <label for="Ipk">Start–stop current (A, RMS)</label><input id="Ipk" type="range" min="3" max="12" step="0.5" value="9"><output id="Ipkv"></output>
+        <label for="fsw">Switching frequency (kHz)</label><input id="fsw" type="range" min="4" max="20" step="1" value="12"><output id="fswv"></output>
+        <label for="tsw">Switching time t<sub>sw</sub> (ns, turn-on + turn-off)</label><input id="tsw" type="range" min="50" max="1200" step="5" value="300"><output id="tswv"></output>
+        <label for="rhs">Heat-sink thermal resistance (K/W, when clean)</label><input id="rhs" type="range" min="0.6" max="2.5" step="0.05" value="1.5"><output id="rhsv"></output>
+        <label for="clog">Lint clogging (0 clean – 1 severe)</label><input id="clog" type="range" min="0" max="1" step="0.05" value="0"><output id="clogv"></output>
+        <label for="L0">DC-link capacitor rated life (h @ 105 °C)</label><select id="L0"><option value="2000" selected>2000</option><option value="5000">5000</option><option value="10000">10000</option></select><output id="L0v"></output>
+      </div>
+      <div class="row"><button id="resetA" type="button">Reset to standard</button><button id="summer" type="button">Summer + clogging (case)</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<div class="page" id="pageB" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>Failure rate versus time (first half of the bathtub curve, log scales); grey region: equivalent time “used up” by burn-in</h3><canvas id="haz" width="1100" height="320" aria-label="Failure-rate curve"></canvas></section>
+    <section class="panel"><h3>Effect of burn-in time on first-year return rate (blue) and total cost per unit (orange) at the current burn-in temperature</h3><canvas id="cost" width="1100" height="300" aria-label="Burn-in time versus return rate and cost"></canvas></section>
+    <p class="note">Model (illustrative, the same as the book’s model18.py): a fraction p of units has early defects, whose failure times follow a Weibull distribution (shape 0.5, scale 100 h, under use conditions); random failure rate of sound units 1×10⁻⁶ /h; the first year is taken as 4800 h. Acceleration factor from the Arrhenius relation, activation energy 0.7 eV, components at 55 °C in use and 15 °C above the burn-in chamber during burn-in; components must not exceed 85 °C, so the chamber is limited to 70 °C. Cost = burn-in CNY 0.3 per unit·h + return CNY 600 per unit × return rate + CNY 50 for handling each unit that fails during burn-in.</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>Results</h3><div class="checks" id="checksB"></div></section>
+    <section class="panel"><h3>Adjust</h3>
+      <div class="prm">
+        <label for="p">Fraction with early defects (%)</label><input id="p" type="range" min="0" max="5" step="0.1" value="1"><output id="pv"></output>
+        <label for="Tbi">Burn-in chamber temperature (°C)</label><input id="Tbi" type="range" min="25" max="70" step="1" value="55"><output id="Tbiv"></output>
+        <label for="tbi">Burn-in time (h)</label><input id="tbi" type="range" min="0" max="48" step="1" value="0"><output id="tbiv"></output>
+      </div>
+      <div class="row"><button id="resetB" type="button">Reset to standard</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<section class="panel" style="margin-top:14px"><h3>Tasks</h3><div id="tasks"></div><div class="msg" id="msg"></div></section>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+function tab(b){$('tabA').setAttribute('aria-selected',!b);$('tabB').setAttribute('aria-selected',b);$('pageA').hidden=b;$('pageB').hidden=!b;}
+$('tabA').onclick=()=>tab(false);$('tabB').onclick=()=>tab(true);
+// ---- model (model18.py) ----
+const VDC=310,VCE0=1.0,RCE=0.10,VF0=0.9,RF=0.08,MCOS=0.6,RRF=0.3,RTH=3.5,TAU=0.05,RBOX=0.6,PAUX=8,TACC=0.15,TJL=125,THSA=100,CDT=5,HY=4800,CPAR=300e-12,ICML=0.8,LIFEMIN=5,FSWMIN=8;
+function sw(I,f,t){const Ip=Math.SQRT2*I,PI=Math.PI;const pc=VCE0*Ip*(1/(2*PI)+MCOS/8)+RCE*Ip*Ip*(1/8+MCOS/(3*PI));let pd=VF0*Ip*(1/(2*PI)-MCOS/8)+RF*Ip*Ip*(1/8-MCOS/(3*PI));const ps=0.5*VDC*(Ip/PI)*t*f;pd+=RRF*ps;return {pc,ps,pd};}
+function inv(I,f,t){const s=sw(I,f,t);return 6*(s.pc+s.ps+s.pd)+2*0.9*0.6*I;}
+function thermal(P){const f=P.fsw*1e3,t=P.tsw*1e-9,tc=60/P.starts,facc=Math.min(TACC*2/tc,P.duty),frun=Math.max(P.duty-facc,0);
+  const Pk=inv(P.Ipk,f,t),Pr=inv(P.Irun,f,t),Pavg=facc*Pk+frun*Pr,rhs=P.rhs*(1+1.5*P.clog),Tin=P.Ta+RBOX*(1+P.clog)*(Pavg+PAUX),Ths=Tin+rhs*Pavg;
+  const sk=sw(P.Ipk,f,t),sr=sw(P.Irun,f,t),Tjpk=Ths+(sk.pc+sk.ps)*RTH*(1-Math.exp(-TACC/TAU)),Tjrun=Ths+(sr.pc+sr.ps)*RTH,Tcap=Tin+CDT,life=P.L0*Math.pow(2,(105-Tcap)/10);
+  return {Pavg,Pk,Pr,facc,frun,rhs,Tin,Ths,Tjpk,Tjrun,Tcap,life,lifeY:life/HY,icm:CPAR*VDC/(t/2),sk,sr};}
+const STDA={Ta:40,starts:30,duty:0.5,Irun:3,Ipk:9,fsw:12,tsw:300,rhs:1.5,clog:0,L0:2000};const A={...STDA};
+let RA=null;
+function evalA(){const r=thermal(A);const C=[
+  {n:'Heat sink at or below the 100 °C overheat alarm',v:r.Ths.toFixed(1)+' °C',ok:r.Ths<=THSA,bad:'The heat-sink sensor trips the overheat alarm and the machine stops'},
+  {n:'Peak junction temperature during start–stop ≤ 125 °C design limit',v:r.Tjpk.toFixed(1)+' °C',ok:r.Tjpk<=TJL,bad:'Insufficient derating margin; switch life and reliability suffer'},
+  {n:'DC-link capacitor life at least 5 years (4800 h/year)',v:r.lifeY.toFixed(1)+' yr',ok:r.lifeY>=LIFEMIN,bad:'The capacitor will dry out and bulge early'},
+  {n:'Peak common-mode current ≤ 0.8 A',v:r.icm.toFixed(2)+' A',ok:r.icm<=ICML,bad:'dv/dt too high for the filter; conducted and radiated emissions may exceed limits'},
+  {n:'Switching frequency at least 8 kHz',v:A.fsw+' kHz',ok:A.fsw>=FSWMIN,bad:'Frequency too low: audible motor whine and large current ripple (illustrative criterion)'},
+  {n:'Average power-stage loss (start–stop / sewing)',v:`${r.Pavg.toFixed(1)} W (${r.Pk.toFixed(0)} / ${r.Pr.toFixed(0)})`,ok:true},
+  {n:'Start–stop share of time / of heat',v:`${(r.facc*100).toFixed(0)}% / ${(r.facc*r.Pk/Math.max(r.Pavg,1e-9)*100).toFixed(0)}%`,ok:true},
+  {n:'Box air / capacitor core',v:`${r.Tin.toFixed(1)} / ${r.Tcap.toFixed(1)} °C`,ok:true}];
+  return {r,C,ok:C.every(c=>c.ok)};}
+function renderChecks(id,C){$(id).innerHTML=C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${(!c.ok&&c.bad)?`<small>${c.bad}</small>`:''}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');}
+function drawCyc(){const [c,g]=ctx('cyc'),W=c.width,H=c.height,x0=64,x1=W-60,y0=20,y1=H-40;const r=RA.r,tc=60/A.starts,T=2*tc,X=t=>x0+(x1-x0)*t/T;
+  const f=A.fsw*1e3,t=A.tsw*1e-9,ta=Math.min(TACC,A.duty*tc/2),tr=Math.max(A.duty*tc-2*ta,0);
+  const Iof=u=>{const k=u%tc;if(k<ta)return A.Ipk;if(k<ta+tr)return A.Irun;if(k<2*ta+tr)return A.Ipk;return 0;};
+  const pof=I=>{if(I<=0)return 0;const s=sw(I,f,t);return s.pc+s.ps;};
+  // junction: first-order response, start from periodic steady state by running 3 cycles
+  const dt=T/2000;let z=0,pts=[];for(let pass=0;pass<3;pass++){pts=[];for(let i=0;i<=2000;i++){const u=i*dt,p=pof(Iof(u));z+= (p*RTH-z)*(1-Math.exp(-dt/TAU));pts.push([u,r.Ths+z,Iof(u)]);}}
+  const Tmin=Math.min(r.Ths,...pts.map(p=>p[1]))-10,Tmax=Math.max(130,...pts.map(p=>p[1]))+5,Y=v=>y1-(y1-y0)*(v-Tmin)/(Tmax-Tmin),YI=i=>y1-(y1-y0)*i/14;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.lineWidth=1;
+  for(let v=Math.ceil(Tmin/10)*10;v<=Tmax;v+=10){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v+' °C',x0-6,Y(v)+4);}
+  g.textAlign='start';for(let i=0;i<=12;i+=3)g.fillText(i+' A',x1+6,YI(i)+4);
+  g.fillStyle=css('--muted');g.globalAlpha=.22;g.beginPath();g.moveTo(X(0),YI(0));for(const p of pts)g.lineTo(X(p[0]),YI(p[2]));g.lineTo(X(T),YI(0));g.fill();g.globalAlpha=1;
+  for(const [v,col,lab] of [[TJL,css('--bad'),'Junction design limit 125 °C'],[THSA,css('--warn'),'Overheat alarm 100 °C']]){if(v>Tmin&&v<Tmax){g.strokeStyle=col;g.setLineDash([5,4]);g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.setLineDash([]);g.fillStyle=col;g.fillText(lab,x0+6,Y(v)-4);}}
+  g.strokeStyle=css('--nt');g.lineWidth=2.4;g.beginPath();g.moveTo(X(0),Y(r.Ths));g.lineTo(X(T),Y(r.Ths));g.stroke();
+  g.strokeStyle=css('--bad');g.lineWidth=2;g.beginPath();pts.forEach((p,i)=>{const q=[X(p[0]),Y(p[1])];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.fillText(`Heat sink ${r.Ths.toFixed(1)} °C (set by average loss); peak junction ${r.Tjpk.toFixed(1)} °C`,x0+6,y0+14);
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';for(let k=0;k<=4;k++)g.fillText((k*T/4).toFixed(1)+' s',X(k*T/4),H-16);g.textAlign='start';}
+function drawTrade(){const [c,g]=ctx('trade'),W=c.width,H=c.height,x0=64,x1=W-64,y0=16,y1=H-40,X=t=>x0+(x1-x0)*(t-50)/1150;
+  const ts=[];for(let t=50;t<=1200;t+=10)ts.push(t);const rs=ts.map(t=>thermal({...A,tsw:t}));const Tlo=Math.min(...rs.map(r=>r.Tjpk))-10,Thi=Math.max(TJL+10,...rs.map(r=>r.Tjpk));
+  const Y=v=>y1-(y1-y0)*(v-Tlo)/(Thi-Tlo),Ymax=3,YI=i=>y1-(y1-y0)*Math.min(i,Ymax)/Ymax;
+  g.font='12px '+css('--f-body');
+  // ok region
+  g.fillStyle=css('--ok');g.globalAlpha=.12;ts.forEach((t,i)=>{const r=rs[i];if(r.Tjpk<=TJL&&r.icm<=ICML&&r.Ths<=THSA)g.fillRect(X(t)-((x1-x0)/115)/2,y0,(x1-x0)/115+0.5,y1-y0);});g.globalAlpha=1;
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let v=Math.ceil(Tlo/10)*10;v<=Thi;v+=10){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v+' °C',x0-6,Y(v)+4);}
+  g.textAlign='start';for(let i=0;i<=3;i+=0.5)g.fillText(i.toFixed(1)+' A',x1+6,YI(i)+4);
+  g.textAlign='center';for(let t=100;t<=1200;t+=100)g.fillText(t,X(t),H-22);g.fillText('Switching time t_sw (ns)',(x0+x1)/2,H-4);g.textAlign='start';
+  g.strokeStyle=css('--bad');g.lineWidth=2.4;g.beginPath();ts.forEach((t,i)=>{const q=[X(t),Y(rs[i].Tjpk)];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  g.strokeStyle=css('--nt');g.beginPath();ts.forEach((t,i)=>{const q=[X(t),YI(rs[i].icm)];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  g.setLineDash([5,4]);g.lineWidth=1.2;g.strokeStyle=css('--bad');g.beginPath();g.moveTo(x0,Y(TJL));g.lineTo(x1,Y(TJL));g.stroke();g.strokeStyle=css('--nt');g.beginPath();g.moveTo(x0,YI(ICML));g.lineTo(x1,YI(ICML));g.stroke();g.setLineDash([]);
+  g.fillStyle=css('--bad');g.fillText('Peak junction temperature (left axis)',X(900),Y(thermal({...A,tsw:900}).Tjpk)-8);g.fillStyle=css('--nt');g.fillText('Peak common-mode current (right axis)',X(160)+8,YI(Math.min(2.8,thermal({...A,tsw:160}).icm))-6);
+  const r=RA.r;g.fillStyle=RA.ok?css('--ok'):css('--bad');g.beginPath();g.arc(X(A.tsw),Y(r.Tjpk),6,0,7);g.fill();g.beginPath();g.arc(X(A.tsw),YI(r.icm),6,0,7);g.fill();}
+const fmtA={Ta:v=>v+' °C',starts:v=>v+'/min',duty:v=>(v*100).toFixed(0)+'%',Irun:v=>v.toFixed(1),Ipk:v=>v.toFixed(1),fsw:v=>v+' kHz',tsw:v=>v+' ns',rhs:v=>v.toFixed(2),clog:v=>v.toFixed(2),L0:v=>v+' h'};
+function syncA(){for(const k in fmtA){$(k).value=A[k];$(k+'v').textContent=fmtA[k](A[k]);}}
+function changedA(){syncA();RA=evalA();renderChecks('checksA',RA.C);drawCyc();drawTrade();noteA();checkTasks();}
+for(const k in fmtA)$(k).addEventListener('input',()=>{A[k]=+$(k).value;changedA();});
+$('resetA').onclick=()=>{Object.assign(A,STDA);changedA();};
+$('summer').onclick=()=>{Object.assign(A,STDA,{Ta:38,clog:0.5});changedA();};
+// ---- page B ----
+const EA=0.7,KB=8.617e-5,BETA=0.5,ETA=100,LAM=1e-6,TUSE=55,RISE=15,CH=0.3,CR=600,CS=50;
+const af=T=>Math.exp(EA/KB*(1/(TUSE+273.15)-1/(T+RISE+273.15)));
+const Fw=t=>t>0?1-Math.exp(-Math.pow(t/ETA,BETA)):0;
+function burn(p,T,h){const te=af(T)*h,sc=p*Fw(te),esc=p*(Fw(te+HY)-Fw(te)),rand=(1-p)*(1-Math.exp(-LAM*HY)),ret=esc+rand;return {AF:af(T),te,sc,esc,rand,ret,cost:CH*h+CR*ret+CS*sc};}
+const STDB={p:1,Tbi:55,tbi:0};const B={...STDB};let RB=null;
+function evalB(){const b=burn(B.p/100,B.Tbi,B.tbi);return {b,C:[
+  {n:'Acceleration factor / equivalent use time',v:`${b.AF.toFixed(2)} / ${b.te.toFixed(0)} h`,ok:true},
+  {n:'Fraction failing (screened out) in burn-in',v:(b.sc*100).toFixed(2)+'%',ok:true},
+  {n:'First-year returns: escaped early defects',v:(b.esc*100).toFixed(2)+'%',ok:true},
+  {n:'First-year returns: random failures of sound units',v:(b.rand*100).toFixed(2)+'%',ok:true},
+  {n:'First-year return rate below 1%',v:(b.ret*100).toFixed(2)+'%',ok:b.ret<0.01,bad:'Too many early defects reach customers'},
+  {n:'Total cost per unit ≤ CNY 9',v:'CNY '+b.cost.toFixed(2),ok:b.cost<=9,bad:'Burn-in too long, or too many returns'}]};}
+function drawHaz(){const [c,g]=ctx('haz'),W=c.width,H=c.height,x0=70,x1=W-20,y0=16,y1=H-40;const p=B.p/100,lt0=-1,lt1=Math.log10(5e4),X=t=>x0+(x1-x0)*(Math.log10(t)-lt0)/(lt1-lt0);
+  const hz=t=>{const S=p*Math.exp(-Math.pow(t/ETA,BETA))+(1-p);const fe=p*BETA/ETA*Math.pow(t/ETA,BETA-1)*Math.exp(-Math.pow(t/ETA,BETA));return fe/S+LAM;};
+  const ly0=-7,ly1=-2,Y=h=>y1-(y1-y0)*(Math.log10(Math.max(h,1e-7))-ly0)/(ly1-ly0);g.font='12px '+css('--f-body');
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let e=ly0;e<=ly1;e++){g.beginPath();g.moveTo(x0,Y(10**e));g.lineTo(x1,Y(10**e));g.stroke();g.textAlign='end';g.fillText('1e'+e+' /h',x0-6,Y(10**e)+4);}
+  g.textAlign='center';for(const t of [0.1,1,10,100,1000,10000])g.fillText(t+' h',X(t),H-22);g.fillText('Operating time (log scale)',(x0+x1)/2,H-4);
+  const te=RB.b.te;if(te>0.1){g.fillStyle=css('--muted');g.globalAlpha=.18;g.fillRect(x0,y0,X(Math.min(te,5e4))-x0,y1-y0);g.globalAlpha=1;g.fillStyle=css('--muted');g.textAlign='start';g.fillText(`Burn-in ≈ ${te.toFixed(0)} h`,Math.min(X(te),x1-120)-110,y0+16);}
+  g.strokeStyle=css('--warn');g.setLineDash([5,4]);g.beginPath();g.moveTo(X(HY),y0);g.lineTo(X(HY),y1);g.stroke();g.setLineDash([]);g.fillStyle=css('--warn');g.textAlign='start';g.fillText('First year (4800 h)',X(HY)-118,y1-8);
+  g.strokeStyle=css('--nt');g.lineWidth=2.4;g.beginPath();for(let i=0;i<=300;i++){const t=10**(lt0+(lt1-lt0)*i/300),q=[X(t),Y(hz(t))];i?g.lineTo(...q):g.moveTo(...q);}g.stroke();
+  g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.fillText('Early failures (falling rate)',X(0.3),Y(hz(0.3))-10);g.fillText('Random failures (≈ flat)',X(8000)-60,Y(LAM)-10);}
+function drawCost(){const [c,g]=ctx('cost'),W=c.width,H=c.height,x0=70,x1=W-70,y0=16,y1=H-40,X=h=>x0+(x1-x0)*h/48;const p=B.p/100;
+  const hs=[];for(let h=0;h<=48;h+=1)hs.push(h);const bs=hs.map(h=>burn(p,B.Tbi,h));const rmax=Math.max(2,...bs.map(b=>b.ret*100))*1.1,cmax=Math.max(20,...bs.map(b=>b.cost))*1.1;
+  const Y=v=>y1-(y1-y0)*v/rmax,Yc=v=>y1-(y1-y0)*v/cmax;g.font='12px '+css('--f-body');
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let v=0;v<=rmax;v+=0.5){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v.toFixed(1)+'%',x0-6,Y(v)+4);}
+  g.textAlign='start';for(let v=0;v<=cmax;v+=5)g.fillText(v+' CNY',x1+6,Yc(v)+4);
+  g.textAlign='center';for(let h=0;h<=48;h+=8)g.fillText(h+' h',X(h),H-22);g.fillText('Burn-in time',(x0+x1)/2,H-4);
+  g.setLineDash([5,4]);g.strokeStyle=css('--nt');g.beginPath();g.moveTo(x0,Y(1));g.lineTo(x1,Y(1));g.stroke();g.strokeStyle=css('--bt');g.beginPath();g.moveTo(x0,Yc(9));g.lineTo(x1,Yc(9));g.stroke();g.setLineDash([]);
+  g.lineWidth=2.4;g.strokeStyle=css('--nt');g.beginPath();bs.forEach((b,i)=>{const q=[X(hs[i]),Y(b.ret*100)];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  g.strokeStyle=css('--bt');g.beginPath();bs.forEach((b,i)=>{const q=[X(hs[i]),Yc(b.cost)];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  const b=RB.b;g.fillStyle=css('--nt');g.beginPath();g.arc(X(B.tbi),Y(b.ret*100),6,0,7);g.fill();g.fillStyle=css('--bt');g.beginPath();g.arc(X(B.tbi),Yc(b.cost),6,0,7);g.fill();
+  g.fillStyle=css('--ink');g.font='600 13px '+css('--f-body');g.textAlign='start';g.fillText(`${B.Tbi} °C: return rate (left axis) and cost (right axis)`,x0+8,y0+14);}
+const fmtB={p:v=>v.toFixed(1)+'%',Tbi:v=>v+' °C',tbi:v=>v+' h'};
+function syncB(){for(const k in fmtB){$(k).value=B[k];$(k+'v').textContent=fmtB[k](B[k]);}}
+function changedB(){syncB();RB=evalB();renderChecks('checksB',RB.C);drawHaz();drawCost();noteB();checkTasks();}
+for(const k in fmtB)$(k).addEventListener('input',()=>{B[k]=+$(k).value;changedB();});
+$('resetB').onclick=()=>{Object.assign(B,STDB);changedB();};
+// ---- tasks ----
+const seen={s:false,t:false,b:false};
+const same=(o,ks)=>ks.every(k=>Math.abs(A[k]-STDA[k])<1e-9);
+function noteA(){if(A.Ta===38&&A.clog>=0.5&&same(A,['starts','duty','Irun','Ipk'])&&RA.ok)seen.s=true;
+  if(A.Ta===45&&A.fsw===20&&A.clog===0&&same(A,['starts','duty','Irun','Ipk','rhs','L0'])&&RA.ok)seen.t=true;}
+function noteB(){if(B.p===1&&RB.C[4].ok&&RB.C[5].ok)seen.b=true;}
+const TASKS=[
+  {t:'Page ①: press “Summer + clogging” (38 °C, clogging 0.5). Without changing the duty (start–stops, sewing fraction, currents), change the design so that all criteria are met.',d:'You could fit a larger heat sink, lower the switching frequency, use a long-life capacitor… which helps most?',ok:()=>seen.s},
+  {t:'Page ①: raise the switching frequency to 20 kHz (less current ripple and noise), with the shop at 45 °C, no clogging and other parameters at standard; choose a new switching time so that all criteria are met.',d:'Look at the trade-off chart below: how wide is the green region now?',ok:()=>seen.t},
+  {t:'Page ②: with 1% early defects, choose a burn-in temperature and time that bring the first-year return rate below 1% at a total cost of no more than CNY 9 per unit.',d:'Higher temperature accelerates more; longer time screens more thoroughly but costs money.',ok:()=>seen.b}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});$('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+window.__api={A,B,STDA,STDB,changedA,changedB,evalA:()=>RA,evalB:()=>RB,done,seen,thermal,burn,tab};
+changedA();changedB();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

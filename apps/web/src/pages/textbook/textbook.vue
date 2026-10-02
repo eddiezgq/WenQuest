@@ -5,10 +5,26 @@
       <view v-if="!book" class="shelf">
         <text class="wq-h1">{{ t("book.nav") }}</text>
         <text v-if="loaded && !books.length" class="wq-empty">{{ t("book.none") }}</text>
-        <view v-for="b in books" :key="b.book" class="cover" @click="open(b.book)">
-          <text class="c-title">{{ b.title }}</text>
-          <text class="c-meta">{{ t("book.meta", { c: b.chapters, s: b.sections, w: b.written }) }}</text>
+        <view v-for="b in books" :key="b.book" class="cover" :class="{ web: b.web }" @click="open(b.book)">
+          <text class="c-title">{{ en && b.title_en ? b.title_en : b.title }}<text v-if="b.web" class="c-web">{{ t("book.web") }}</text></text>
+          <text v-if="b.web" class="c-meta">{{ t("book.web_meta", { c: b.chapters, l: b.labs || 0 }) }}</text>
+          <text v-else class="c-meta">{{ t("book.meta", { c: b.chapters, s: b.sections, w: b.written }) }}</text>
         </view>
+      </view>
+
+      <!-- 网页版教材（第 15 轮）：整本书嵌在平台页面里，书内自带目录、中英切换和虚拟实验 -->
+      <view v-else-if="webBook" class="webed">
+        <view class="web-bar">
+          <view class="web-back" @click="shelf">‹ {{ t("book.shelf") }}</view>
+          <text class="web-title">{{ webTitle }}</text>
+          <view class="sp" />
+          <view v-if="webUrl" class="web-new" @click="openNew">{{ t("book.open_new") }} ↗</view>
+        </view>
+        <text v-if="error" class="wq-error">{{ error }}</text>
+        <text v-if="mp" class="wq-empty">{{ t("book.web_mp") }}</text>
+        <!-- #ifdef H5 -->
+        <iframe v-if="webUrl" class="web-frame" :src="webUrl" :title="webTitle" allow="fullscreen"></iframe>
+        <!-- #endif -->
       </view>
 
       <!-- reader -->
@@ -92,7 +108,11 @@ import BookContent from "../../components/BookContent.vue";
 import { absolute, api, ApiError, token, type TextbookChapter, type TextbookIndex, type TextbookResource, type TextbookSection, type TextbookSectionRef } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
-const books = ref<{ book: string; title: string; chapters: number; sections: number; written: number }[]>([]);
+const books = ref<{ book: string; title: string; title_en?: string; web?: boolean; labs?: number; chapters: number; sections?: number; written?: number }[]>([]);
+// 网页版教材（第 15 轮）
+const webBook = ref(false);
+const webUrl = ref("");
+const webTitle = ref("");
 const book = ref("");
 const idx = ref<TextbookIndex | null>(null);
 const cur = ref<TextbookSection | null>(null);
@@ -165,6 +185,21 @@ function toggle(no: number) {
 async function open(b: string, sid = "") {
   book.value = b;
   error.value = "";
+  const info = books.value.find((x) => x.book === b);
+  if (info?.web) {
+    webBook.value = true;
+    webTitle.value = en.value && info.title_en ? info.title_en : info.title;
+    if (!mp) {
+      try {
+        webUrl.value = absolute((await api.textbookWeb(b, en.value ? "en" : "zh")).url);
+        // #ifdef H5
+        history.replaceState(null, "", `#/pages/textbook/textbook?book=${b}`);
+        // #endif
+      } catch (e) { fail(e); }
+    }
+    loaded.value = true;
+    return;
+  }
   try {
     idx.value = await api.textbook(b);
     const first = idx.value.chapters.flatMap((c) => c.sections).find((s) => s.written);
@@ -172,6 +207,19 @@ async function open(b: string, sid = "") {
     if (target) await read(target);
   } catch (e) { fail(e); }
   loaded.value = true;
+}
+
+function shelf() {
+  book.value = ""; webBook.value = false; webUrl.value = ""; idx.value = null; cur.value = null; error.value = "";
+  // #ifdef H5
+  history.replaceState(null, "", "#/pages/textbook/textbook");
+  // #endif
+}
+
+function openNew() {
+  // #ifdef H5
+  window.open(webUrl.value, "_blank", "noopener");
+  // #endif
 }
 
 async function read(sid: string) {
@@ -219,6 +267,12 @@ onLoad(async (q: any) => {
   display: flex; flex-direction: column; gap: 4px; }
 .c-title { font-size: 20px; font-weight: 700; }
 .c-meta { font-size: 13px; color: var(--wq-muted); }
+.c-web { font-size: 12px; font-weight: 500; color: #8a5a00; background: #fff3d6; border: 1px solid #f0d9a8; border-radius: 9px; padding: 0 8px; margin-left: 8px; vertical-align: 3px; }
+.webed { display: flex; flex-direction: column; gap: 8px; }
+.web-bar { display: flex; align-items: center; gap: 12px; }
+.web-back, .web-new { font-size: 14px; color: var(--wq-link); cursor: pointer; flex-shrink: 0; }
+.web-title { font-weight: 700; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.web-frame { width: 100%; height: calc(100vh - 130px); min-height: 480px; border: 1px solid var(--wq-line); border-radius: 10px; background: #fff; }
 .reader { display: flex; gap: 20px; align-items: flex-start; }
 .toc { width: 290px; flex-shrink: 0; background: #fff; border: 1px solid var(--wq-line); border-radius: 10px; padding: 12px 10px;
   max-height: calc(100vh - 110px); overflow-y: auto; position: sticky; top: 16px; }

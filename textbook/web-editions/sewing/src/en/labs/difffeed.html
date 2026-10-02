@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Differential Feed Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: guide + tasks rail | work area (mechanism side view, sewn-edge view, strain curve) */
+:root{
+  --bg:#eef1f4; --sheet:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d2d9e0;
+  --accent:#0f6e74; --bad:#d1495b; --ok:#1e8449; --warn:#b9770e;
+  --main:#2f6fd6; --diff:#e0662f; --fab:#e6c98f; --fabd:#b99a5c; --thread:#1d4c9e; --steel:#8b959f; --band:#1e84491f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--main:#6ea8ff;--diff:#ff8c55;--fab:#8a7448;--fabd:#c9ab6c;--thread:#8fb4ff;--steel:#7d8792;--band:#58d68d22;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--sheet:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;--bad:#ff6b7d;--ok:#58d68d;--warn:#f5b041;--main:#6ea8ff;--diff:#ff8c55;--fab:#8a7448;--fabd:#c9ab6c;--thread:#8fb4ff;--steel:#7d8792;--band:#58d68d22;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,310px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px;max-width:100%}
+input[type=range]{flex:1;min-width:140px;accent-color:var(--accent)}
+label{font-size:.85rem;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+.val{font-family:var(--f-mono);font-weight:600;min-width:3.6em;font-variant-numeric:tabular-nums}
+canvas{display:block;width:100%;height:auto;border-radius:6px;background:var(--sheet)}
+.note{font-size:.8rem;color:var(--muted);margin:6px 0 0}
+.steps{margin:0;padding-left:1.3em;font-size:.86rem}
+.steps li{margin:3px 0;cursor:pointer}
+.steps li.on{font-weight:600;color:var(--accent)}
+.lesson{font-size:.88rem;background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:8px}
+.lesson p{margin:0 0 6px}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi div{border-top:1px solid var(--rule);padding-top:4px;min-width:0}
+.kpi b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted);font-size:.74rem;display:block}
+.verdict{font-weight:700;font-size:1.02rem;margin:8px 0 0}
+.verdict.ok{color:var(--ok)} .verdict.warn{color:var(--warn)} .verdict.bad{color:var(--bad)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:1100px){.two{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion: reduce){.anim-note{display:none}}
+</style>
+<div class="wrap">
+<header><h1>Differential Feed Lab</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 9 · Virtual lab 9-1 · Adjust the differential ratio and see whether the seam edge lies flat, waves or gathers</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>Guided walkthrough</h3>
+      <ol class="steps" id="steps"></ol>
+      <div class="lesson" id="lesson"></div>
+      <div class="row"><button type="button" id="prev">Previous</button><button type="button" id="next">Next</button></div>
+    </section>
+    <section class="panel">
+      <h3>Tasks (checked automatically)</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>Adjustments</h3>
+      <div class="row"><label for="fab">Fabric</label><select id="fab"></select></div>
+      <div class="row"><label for="dr">Differential ratio D</label><input id="dr" type="range" min="0.6" max="2" step="0.05" value="1"><span class="val" id="v-dr">1.00</span></div>
+      <div class="row"><label for="sl">Stitch length s</label><input id="sl" type="range" min="1" max="4" step="0.1" value="2.5"><span class="val" id="v-sl">2.5 mm</span></div>
+      <div class="row"><label for="pf">Foot pressure</label><input id="pf" type="range" min="0.6" max="1.4" step="0.1" value="1"><span class="val" id="v-pf">standard</span></div>
+      <div class="row"><button type="button" id="play" aria-pressed="true">Pause animation</button><span class="note anim-note">The strokes of the two feed dogs in the animation are drawn to true proportion.</span></div>
+      <div class="kpi" style="margin-top:8px">
+        <div><b id="k-sd">2.50 mm</b><small>Differential-dog stroke s_d = D·s</small></div>
+        <div><b id="k-deff">1.00</b><small>Effective ratio reaching the fabric D_e</small></div>
+        <div><b id="k-eps">+0.0 %</b><small>Edge strain ε (seam length / fabric length − 1)</small></div>
+        <div><b id="k-amp">0.0 mm</b><small>Height of waves or gathers</small></div>
+      </div>
+      <p class="verdict" id="verdict">—</p>
+    </section>
+    <section class="panel">
+      <h3>Feed zone, side view (looking along the edge, feed left to right)</h3>
+      <canvas id="cvMech" width="1100" height="300" aria-label="Side-view animation of the two feed dogs and the fabric"></canvas>
+      <p class="note">Blue is the main feed dog (behind the needle; sets the stitch length); orange is the differential feed dog (in front of the needle). The small ticks on the fabric start 2 mm apart. When the differential dog travels farther than the main dog, the fabric between them is pushed together and the ticks crowd; when it travels less, the fabric is stretched and the ticks spread out.</p>
+    </section>
+    <div class="two">
+      <section class="panel">
+        <h3>Finished seam edge (top view)</h3>
+        <canvas id="cvEdge" width="700" height="360" aria-label="Appearance of the seam edge after sewing"></canvas>
+        <p class="note">ε &gt; 0: the seam is longer than the fabric; when released, the extra edge length buckles into waves (the familiar “fluted edge” on knits). ε &lt; 0: the fabric is longer than the seam and is gathered into fine pleats.</p>
+      </section>
+      <section class="panel">
+        <h3>Edge strain vs differential ratio</h3>
+        <canvas id="cvCurve" width="700" height="360" aria-label="Strain versus differential ratio for the current fabric"></canvas>
+        <p class="note">The green band is the flat zone |ε| ≤ 2%; the dot is the current setting. The curve levels off at both ends because once pushing or stretching exceeds what the fabric can take, the dogs start to slip.</p>
+      </section>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+(()=>{
+// ---------- fabric model (same as section 9.10 of the book) ----------
+// e0: stretch the fabric picks up at D = 1 (presser-foot drag on the top layer, pull of the main dog)
+// eta: share of the differential motion that actually reaches the fabric (grip)
+// gmax: largest compression the fabric can take between the dogs; emax: largest stretch before the dogs slip
+const FAB=[
+ {id:'jersey',name:'Single jersey (T-shirt knit)',e0:0.18,eta:0.85,gmax:0.35,emax:0.6,lam:30},
+ {id:'rib',name:'Rib knit (necklines, cuffs)',e0:0.30,eta:0.80,gmax:0.30,emax:0.8,lam:26},
+ {id:'fleece',name:'Sweatshirt fleece (loop-back knit)',e0:0.10,eta:0.90,gmax:0.25,emax:0.4,lam:36},
+ {id:'chiffon',name:'Chiffon (light woven)',e0:-0.06,eta:0.95,gmax:0.55,emax:0.08,lam:30},
+ {id:'twill',name:'Twill (medium-weight woven)',e0:0.01,eta:0.90,gmax:0.12,emax:0.02,lam:40},
+];
+const $=id=>document.getElementById(id);
+const st={fab:FAB[0],D:1,s:2.5,pf:1,play:true,t:0};
+function model(f=st.fab,D=st.D,pf=st.pf){
+  const e0=f.e0*pf;
+  let De=1+f.eta*(D-1), slip='';
+  const Dmax=1/(1-f.gmax), Dmin=1/(1+f.emax);
+  if(De>Dmax){De=Dmax;slip='push';} if(De<Dmin){De=Dmin;slip='pull';}
+  const eps=(1+e0)/De-1;
+  const lamG=4+2*st.s;
+  const amp=eps>=0? f.lam*Math.sqrt(eps)/Math.PI : lamG*Math.sqrt(-eps)/Math.PI;
+  return {e0,De,eps,amp,slip,lamG};
+}
+// ---------- guide ----------
+const LESSONS=[
+ ['Two feed dogs',`<p>An overlock machine has two feed dogs side by side under the throat plate. The one behind the needle is the <b>main feed dog</b>; each stitch it feeds the fabric back by one stitch length s. The one in front of the needle is the <b>differential feed dog</b>, whose stroke s_d can be set independently.</p><p>Differential ratio D = s_d / s. Start with D at 1.00: in the animation both dogs travel the same distance and the tick spacing on the fabric does not change.</p>`],
+ ['Why knits go wavy',`<p>Choose “Single jersey”, D = 1.00. The presser foot holds the top of the fabric while the main dog pulls from below; knitted loops stretch easily, so the edge is already stretched by about 18% as it is sewn.</p><p>The stitch “sets” this stretched edge. When released the fabric tries to recover but the thread does not, so the extra length can only buckle into waves. The readout ε is exactly this excess fraction.</p>`],
+ ['Cancel the stretch with differential',`<p>Raise D. The differential dog feeds a little more fabric each stitch, pushing the fabric together between the dogs and cancelling that stretch.</p><p>When ε falls into the green ±2% band the edge is flat. Note that the dog cannot pass all of its extra travel to the fabric (slip), so the D needed is a little more than 1 + 18%.</p>`],
+ ['Light wovens are the reverse',`<p>Switch to “Chiffon”. A light, slippery woven is easily pushed together under the foot, so at D = 1 the seam puckers instead (ε negative).</p><p>Now set D below 1 so the differential dog feeds a little less and gently stretches the fabric. Wovens hardly stretch at all; pull too far and the dog slips — that is what the flat left end of the curve shows.</p>`],
+ ['Turn the defect into a technique',`<p>The differential can also be “overdone” on purpose. On jersey, a very small D stretches the edge before it is sewn, giving a decorative fluted edge (the “lettuce edge”); on light fabric, a very large D gathers it into fine pleats in a single pass.</p><p>Finally look at stitch length and foot pressure: the longer the stitch, the bigger the gathers pushed up by the same D; the heavier the foot, the more a knit is stretched.</p>`],
+];
+let li=0;
+function showLesson(){ $('steps').innerHTML=LESSONS.map((l,i)=>`<li class="${i===li?'on':''}" data-i="${i}">${l[0]}</li>`).join(''); $('lesson').innerHTML=LESSONS[li][1];
+  document.querySelectorAll('#steps li').forEach(e=>e.onclick=()=>{li=+e.dataset.i;showLesson();}); $('prev').disabled=li===0; $('next').disabled=li===LESSONS.length-1; }
+$('prev').onclick=()=>{li=Math.max(0,li-1);showLesson();}; $('next').onclick=()=>{li=Math.min(LESSONS.length-1,li+1);showLesson();};
+// ---------- tasks ----------
+const TASKS=[
+ {t:'Flat side seam on a jersey T-shirt',d:'Fabric: single jersey, standard foot pressure; require |ε| ≤ 2%',ok:()=>st.fab.id==='jersey'&&Math.abs(st.pf-1)<0.01&&Math.abs(model().eps)<=0.02},
+ {t:'Flat rib-knit neckline',d:'Fabric: rib knit, standard foot pressure; require |ε| ≤ 2%',ok:()=>st.fab.id==='rib'&&Math.abs(st.pf-1)<0.01&&Math.abs(model().eps)<=0.02},
+ {t:'Pucker-free chiffon blouse hem',d:'Fabric: chiffon; require |ε| ≤ 1.5%',ok:()=>st.fab.id==='chiffon'&&Math.abs(model().eps)<=0.015},
+ {t:'Jersey fluted (lettuce) edge',d:'Fabric: single jersey; require ε between +30% and +45% with no feed-dog slip',ok:()=>{const m=model();return st.fab.id==='jersey'&&m.eps>=0.30&&m.eps<=0.45&&!m.slip;}},
+ {t:'Gather chiffon in one pass',d:'Fabric: chiffon; require ε ≤ −35% without the fabric jamming between the dogs',ok:()=>{const m=model();return st.fab.id==='chiffon'&&m.eps<=-0.35&&!m.slip;}},
+];
+const done=new Set();
+function checkTasks(){ TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ Done':'○ Not done'}</span> ${k.t}<small>${k.d}</small></div>`).join('')+`<p class="note">Completed tasks stay ticked; changing the fabric does not clear them.</p>`; }
+// ---------- controls ----------
+$('fab').innerHTML=FAB.map((f,i)=>`<option value="${i}">${f.name}</option>`).join('');
+$('fab').onchange=e=>{st.fab=FAB[+e.target.value];update();};
+$('dr').oninput=e=>{st.D=+e.target.value;update();};
+$('sl').oninput=e=>{st.s=+e.target.value;update();};
+$('pf').oninput=e=>{st.pf=+e.target.value;update();};
+$('play').onclick=e=>{st.play=!st.play;e.target.setAttribute('aria-pressed',st.play);e.target.textContent=st.play?'Pause animation':'Play animation';};
+if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){st.play=false;$('play').setAttribute('aria-pressed','false');$('play').textContent='Play animation';}
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function update(){
+  const m=model(), f=st.fab;
+  $('v-dr').textContent=st.D.toFixed(2); $('v-sl').textContent=st.s.toFixed(1)+' mm';
+  $('v-pf').textContent=st.pf<0.95?'light':st.pf>1.05?'heavy':'standard';
+  $('k-sd').textContent=(st.D*st.s).toFixed(2)+' mm'; $('k-deff').textContent=m.De.toFixed(3);
+  $('k-eps').textContent=(m.eps>=0?'+':'')+(m.eps*100).toFixed(1)+' %'; $('k-amp').textContent=(Math.abs(m.eps)<0.02?0:m.amp).toFixed(1)+' mm';
+  const v=$('verdict');
+  if(m.slip==='push'){v.className='verdict bad';v.textContent='Over-pushed: the fabric humps up between the dogs and the differential dog slips; raising D further feeds no more.';}
+  else if(m.slip==='pull'){v.className='verdict bad';v.textContent='Over-stretched: this fabric cannot stretch that far, and the differential dog slips under it.';}
+  else if(Math.abs(m.eps)<=0.02){v.className='verdict ok';v.textContent='Edge lies flat (|ε| ≤ 2%).';}
+  else if(m.eps>0){v.className='verdict warn';v.textContent=m.eps>0.25?'Strongly fluted edge: fine as a decorative lettuce edge, a reject as an ordinary seam.':'Wavy edge: the seam is longer than the fabric — increase D.';}
+  else {v.className='verdict warn';v.textContent=m.eps<-0.25?'Edge gathered into fine pleats: usable as decorative gathering.':'Puckered edge: the fabric is longer than the seam — decrease D.';}
+  checkTasks(); drawEdge(m); drawCurve(m);
+}
+// ---------- canvases ----------
+function prep(c){const ctx=c.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle=css('--sheet');ctx.fillRect(0,0,c.width,c.height);return ctx;}
+const font=(px,w=400)=>`${w} ${px}px "Noto Sans SC","PingFang SC",sans-serif`;
+// side view of the feed zone, x = distance along the feed direction (mm), fabric moves +x
+function drawMech(){
+  const c=$('cvMech'), ctx=prep(c), m=model();
+  const k=11, x0=110, yP=170; // 11 px per mm, plate surface at y=170
+  const X=mm=>x0+mm*k;
+  const ink=css('--ink'), mut=css('--muted');
+  // needle plate
+  ctx.fillStyle=css('--steel'); ctx.globalAlpha=.35; ctx.fillRect(20,yP,c.width-40,26); ctx.globalAlpha=1;
+  ctx.strokeStyle=css('--steel'); ctx.beginPath(); ctx.moveTo(20,yP); ctx.lineTo(c.width-20,yP); ctx.stroke();
+  // shaft angle
+  const ph=(st.t%1)*2*Math.PI; const lift=1.6*Math.cos(ph)-0.6; const up=lift>0;
+  const ym=0.5*st.s*Math.sin(ph), yd=0.5*st.s*st.D*Math.sin(ph);
+  // dogs: main centred at 52 mm, differential centred at 22 mm (needle at 40 mm)
+  const dog=(cx,dx,len,col,lab)=>{const L=X(cx+dx-len/2),R=X(cx+dx+len/2),top=yP-lift*k;
+    ctx.fillStyle=col; ctx.globalAlpha=.85; ctx.fillRect(L,top,R-L,30); ctx.globalAlpha=1;
+    ctx.fillStyle=col; for(let x=L+6;x<R-4;x+=13){ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x+6,top-6);ctx.lineTo(x+12,top);ctx.fill();}
+    // elliptical path of one tooth
+    ctx.strokeStyle=col; ctx.setLineDash([4,4]); ctx.beginPath(); for(let a=0;a<=64;a++){const p=a/64*2*Math.PI; const s=col===css('--main')?st.s:st.s*st.D; const xx=X(cx+0.5*s*Math.sin(p)), yy=yP-(1.6*Math.cos(p)-0.6)*k-2; a?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy);} ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=col; ctx.font=font(19,600); ctx.textAlign='center'; ctx.fillText(lab,X(cx),yP+58);};
+  dog(52,ym,14,css('--main'),`Main feed dog  s = ${st.s.toFixed(1)} mm`); dog(22,yd,12,css('--diff'),`Differential feed dog  s_d = ${(st.s*st.D).toFixed(2)} mm`);
+  // fabric strip with marks; marks between the dogs are spaced by the local strain
+  const top=yP-(up?lift*k:0)-24;
+  ctx.fillStyle=css('--fab'); ctx.fillRect(20,top,c.width-40,22);
+  // feed: marks drift with the fabric while the dogs are up
+  const prog=up? (ph<Math.PI? ph : ph-2*Math.PI) : 0;
+  st.feed=(st.feed||0);
+  const ratio=1/m.De; // spacing factor after the differential dog
+  ctx.strokeStyle=css('--fabd'); ctx.lineWidth=2;
+  const base=(st.feedPos||0)%2;
+  for(let i=-2;i<60;i++){ let u=i*2+base; // relaxed position (mm) measured from the left edge of the view (x = -8 mm)
+    let x=u-8; if(x>22){ x=22+(x-22)*ratio; } if(x>52) x=x;
+    const px=X(x); if(px<22||px>c.width-22) continue; ctx.beginPath(); ctx.moveTo(px,top+3); ctx.lineTo(px,top+19); ctx.stroke(); }
+  ctx.lineWidth=1;
+  // presser foot
+  ctx.fillStyle=css('--steel'); ctx.fillRect(X(4),top-12,X(64)-X(4),10);
+  ctx.fillStyle=mut; ctx.font=font(18); ctx.textAlign='left'; ctx.fillText('Presser foot',X(4)+6,top-20);
+  // needle at 40 mm
+  ctx.strokeStyle=ink; ctx.lineWidth=3; const nY=up? top-60 : yP+20; ctx.beginPath(); ctx.moveTo(X(40),20); ctx.lineTo(X(40),nY); ctx.stroke(); ctx.lineWidth=1;
+  ctx.fillStyle=ink; ctx.font=font(18,600); ctx.textAlign='left'; ctx.fillText('Needle',X(40)+10,44);
+  ctx.fillStyle=mut; ctx.font=font(18); ctx.fillText('Feed direction →',X(66),top-20);
+  ctx.textAlign='right'; ctx.fillText(up?'Dogs above the plate: feeding':'Dogs below the plate: needle through fabric',c.width-30,40);
+  // advance fabric marks when dogs are up
+  if(st.play&&up){ st.feedPos=(st.feedPos||0)+st.s*0.03*Math.cos(ph)*0.6; }
+}
+function drawEdge(m){
+  const c=$('cvEdge'), ctx=prep(c); const W=c.width,H=c.height; const ink=css('--ink'),mut=css('--muted');
+  const k=5.2, x0=30, x1=W-30, yEdge=130; // 5.2 px per mm
+  const eps=m.eps, flat=Math.abs(eps)<=0.02, wave=!flat&&eps>0, gath=!flat&&eps<0;
+  const A=Math.min(m.amp,10)*k*0.5, lam=st.fab.lam;
+  const edgeY=x=>wave? yEdge+Math.sin((x-x0)/k/lam*2*Math.PI)*A : yEdge;
+  // fabric body
+  ctx.fillStyle=css('--fab'); ctx.beginPath(); ctx.moveTo(x0,H-24);
+  for(let x=x0;x<=x1;x+=2) ctx.lineTo(x,edgeY(x)); ctx.lineTo(x1,H-24); ctx.closePath(); ctx.fill();
+  // ruffle: crests lit, troughs shaded, fading away from the edge
+  if(wave){ for(let x=x0;x<x1;x+=2){ const c2=Math.cos((x-x0)/k/lam*2*Math.PI); const g=ctx.createLinearGradient(0,edgeY(x),0,edgeY(x)+16*k);
+      g.addColorStop(0,c2>0?`rgba(255,255,255,${0.35*c2})`:`rgba(0,0,0,${-0.22*c2})`); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(x,edgeY(x),2,16*k);} }
+  // gathers: soft folds running away from the seam
+  if(gath){ ctx.save(); ctx.beginPath(); ctx.rect(x0,0,x1-x0,H); ctx.clip(); const sp=m.lamG*k; for(let x=x0+sp/2;x<x1;x+=sp){ const g=ctx.createLinearGradient(x-sp/2,0,x+sp/2,0); const d=Math.min(0.35,0.08+m.amp*0.06);
+      g.addColorStop(0,`rgba(0,0,0,${d})`); g.addColorStop(0.5,'rgba(255,255,255,0.25)'); g.addColorStop(1,`rgba(0,0,0,${d})`);
+      ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(x-sp/2,yEdge); ctx.lineTo(x+sp/2,yEdge); ctx.lineTo(x+sp*0.9,H-24); ctx.lineTo(x-sp*0.1,H-24); ctx.closePath(); ctx.fill(); } ctx.restore(); }
+  // overedge stitch: needle line 4 mm inside the edge, threads wrapping to the edge
+  const s=st.s*k; ctx.strokeStyle=css('--thread'); ctx.lineWidth=2; ctx.beginPath();
+  for(let x=x0;x+s<=x1;x+=s){ ctx.moveTo(x,edgeY(x)+4*k); ctx.lineTo(x+s/2,edgeY(x+s/2)); ctx.lineTo(x+s,edgeY(x+s)+4*k); } ctx.stroke(); ctx.lineWidth=1;
+  ctx.strokeStyle=css('--fabd'); ctx.setLineDash([6,5]); ctx.beginPath(); for(let x=x0;x<=x1;x+=2){const y=edgeY(x)+4*k; x===x0?ctx.moveTo(x,y):ctx.lineTo(x,y);} ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=ink; ctx.font=font(22,600); ctx.textAlign='left';
+  ctx.fillText(flat?'Flat':wave?`Waves: about ${m.amp.toFixed(1)} mm high, wavelength about ${lam} mm`:`Gathers: one every ${m.lamG.toFixed(0)} mm, about ${m.amp.toFixed(1)} mm high`,x0,42);
+  ctx.fillStyle=mut; ctx.font=font(18); ctx.fillText(`${st.fab.name} · stitch width 4 mm · stitch length ${st.s.toFixed(1)} mm`,x0,72);
+  ctx.textAlign='right'; ctx.fillText('Edge ↑',x1,yEdge-A-14);
+}
+function drawCurve(m){
+  const c=$('cvCurve'), ctx=prep(c); const W=c.width,H=c.height; const ink=css('--ink'),mut=css('--muted');
+  const L=84,R=W-24,T=26,B=H-62; const Dmin=0.6,Dmax=2.0,Emin=-0.6,Emax=0.6;
+  const X=d=>L+(d-Dmin)/(Dmax-Dmin)*(R-L), Y=e=>T+(Emax-Math.max(Emin,Math.min(Emax,e)))/(Emax-Emin)*(B-T);
+  ctx.fillStyle=css('--band'); ctx.fillRect(L,Y(0.02),R-L,Y(-0.02)-Y(0.02));
+  ctx.strokeStyle=css('--rule'); ctx.fillStyle=mut; ctx.font=font(18); ctx.textAlign='right';
+  for(let e=-0.6;e<=0.601;e+=0.2){ctx.beginPath();ctx.moveTo(L,Y(e));ctx.lineTo(R,Y(e));ctx.stroke();ctx.fillText((e>0?'+':'')+Math.round(e*100)+'%',L-8,Y(e)+4);}
+  ctx.textAlign='center'; for(let d=0.6;d<=2.001;d+=0.2){ctx.beginPath();ctx.moveTo(X(d),B);ctx.lineTo(X(d),B+5);ctx.stroke();ctx.fillText(d.toFixed(1),X(d),B+24);}
+  ctx.fillText('Differential ratio D',(L+R)/2,H-8);
+  ctx.save(); ctx.translate(20,(T+B)/2); ctx.rotate(-Math.PI/2); ctx.fillText('Edge strain ε',0,0); ctx.restore();
+  ctx.strokeStyle=ink; ctx.lineWidth=2; ctx.beginPath(); for(let i=0;i<=140;i++){const d=Dmin+(Dmax-Dmin)*i/140; const e=model(st.fab,d,st.pf).eps; i?ctx.lineTo(X(d),Y(e)):ctx.moveTo(X(d),Y(e));} ctx.stroke(); ctx.lineWidth=1;
+  ctx.fillStyle=css('--accent'); ctx.beginPath(); ctx.arc(X(st.D),Y(m.eps),7,0,2*Math.PI); ctx.fill();
+  ctx.fillStyle=ink; ctx.font=font(20,600); ctx.textAlign='left'; ctx.fillText(`D = ${st.D.toFixed(2)}, ε = ${(m.eps*100).toFixed(1)}%`,Math.min(X(st.D)+14,R-230),Y(m.eps)+(m.eps>0.4?30:-14));
+  ctx.fillStyle=mut; ctx.font=font(18); ctx.fillText('Flat zone ±2%',L+8,Y(0.02)-8);
+}
+let last=performance.now();
+function loop(t){const dt=Math.min(0.05,(t-last)/1000);last=t; if(st.play) st.t+=dt*0.5; drawMech(); requestAnimationFrame(loop);}
+showLesson(); update(); requestAnimationFrame(loop);
+window.__set=o=>{if('fab' in o){st.fab=FAB[o.fab];$('fab').value=o.fab;}if('D' in o){st.D=o.D;$('dr').value=o.D;}if('s' in o){st.s=o.s;$('sl').value=o.s;}if('pf' in o){st.pf=o.pf;$('pf').value=o.pf;}if('t' in o)st.t=o.t;if('play' in o)st.play=o.play;update();drawMech();};
+window.__model=(i,D,pf=1)=>model(FAB[i],D,pf);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Back to the book</a>
+</body>
+</html>

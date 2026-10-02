@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>张力平衡与线迹截面</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = stitch cross-section + tension map; right rail = readouts, adjustments, scenarios, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --cloth:#e6d6ad; --clothEdge:#a68b52; --nt:#2a5fb8; --bt:#d9622b; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f; --vio:#8e44ad; --loose:#9aa4ad;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--cloth:#6b5c3a;--clothEdge:#b89a5a;--nt:#7fa9f2;--bt:#f08c58;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--vio:#c39bd3;--loose:#6b7682}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--cloth:#6b5c3a;--clothEdge:#b89a5a;--nt:#7fa9f2;--bt:#f08c58;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--vio:#c39bd3;--loose:#6b7682}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.4em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.meter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.meter div{border-top:3px solid var(--rule);padding-top:4px}
+.meter div.ok{border-top-color:var(--ok)} .meter div.bad{border-top-color:var(--bad)} .meter div.warn{border-top-color:var(--warn)}
+.meter b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.meter small{color:var(--muted);font-size:.74rem;line-height:1.35;display:block}
+.state{margin-top:10px;font-size:.88rem;border-left:3px solid var(--rule);padding-left:8px;min-height:3.2em}
+.state.ok{border-left-color:var(--ok)} .state.bad{border-left-color:var(--bad)} .state.warn{border-left-color:var(--warn)}
+.state b{display:block}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+</style>
+<div class="wrap">
+<header><h1>张力平衡与线迹截面</h1><span class="sub">《缝纫机设计与制造》第 7 章 · 虚拟实验 7-1 · 两根线的张力怎样决定交织点的位置、线迹松紧、缝皱和断线</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <h3>线迹截面（放大，蓝为面线、橙为底线）与布的正面、反面</h3>
+      <canvas id="sec" width="1100" height="420" aria-label="线迹截面与正反面外观"></canvas>
+      <p class="note" id="secNote"></p>
+    </section>
+    <section class="panel">
+      <h3>张力平面：横轴夹线器张力，纵轴底线张力（当前线、面料、针距、转速下）</h3>
+      <canvas id="map" width="1100" height="500" aria-label="张力平面图，可点击设置"></canvas>
+      <div class="legend"><span style="--c:var(--ok)">可用：平衡、不松、不皱、不断</span><span style="--c:var(--warn)">不平衡（交织点偏上或偏下）</span><span style="--c:var(--loose)">线迹太松</span><span style="--c:var(--bad)">起皱</span><span style="--c:var(--vio)">断线风险</span></div>
+      <p class="note">点击图中任一点即可设定两根线的张力。模型为示意：交织点处的面线张力约为夹线器张力的 0.41 倍（过线件放大、针眼削减）；面料和线的参数为示意值。</p>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>读数</h3>
+      <div class="meter" id="meter"></div>
+      <div class="state" id="state"></div>
+    </section>
+    <section class="panel">
+      <h3>调整</h3>
+      <div class="row" style="margin-top:0">
+        <label for="fab" class="note" style="margin:0">面料</label>
+        <select id="fab"><option value="lining">衬里两层（0.4 mm）</option><option value="cotton" selected>衬衫棉布两层（1.0 mm）</option><option value="denim">牛仔布四层（4 mm）</option></select>
+      </div>
+      <div class="row">
+        <label for="th" class="note" style="margin:0">缝线</label>
+        <select id="th"><option value="t18">Tex 18（细）</option><option value="t24" selected>Tex 24（中）</option><option value="t40">Tex 40（粗）</option></select>
+      </div>
+      <div class="prm" id="prm"></div>
+      <div class="row"><button type="button" id="reset">恢复默认</button><button type="button" id="mess">打乱张力</button><button type="button" id="lowb">底线太松的机器</button></div>
+    </section>
+    <section class="panel">
+      <h3>任务（自动判定）</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// ---------- model (schematic, see chapter 7) ----------
+const GUIDE=Math.exp(0.2*1.0), EYEK=Math.exp(-0.35*Math.PI), KN=GUIDE*EYEK;
+const THREAD={t18:{name:'Tex 18',F:700,el:0.14},t24:{name:'Tex 24',F:1000,el:0.15},t40:{name:'Tex 40',F:1700,el:0.16}};
+const FAB={lining:{name:'衬里两层',t:0.4,Tmin:20,pf:0.30,B:1.8,jam:'t24',plim:0.15},
+           cotton:{name:'衬衫棉布两层',t:1.0,Tmin:35,pf:0.60,B:2.2,jam:'t40',plim:0.3},
+           denim:{name:'牛仔布四层',t:4.0,Tmin:100,pf:4.0,B:3.0,jam:'t40',plim:0.3}};
+const ORDER=['t18','t24','t40'];
+const DEF={Td:100,Tb:40,s:3,n:5000};
+const ST=Object.assign({fab:'cotton',th:'t24'},DEF);
+function ev(o){o=o||ST;const f=FAB[o.fab],T=THREAD[o.th];
+  const Tn=KN*o.Td,r=Tn/o.Tb,z=0.5+0.5*Math.max(-1,Math.min(1,Math.log(r)/Math.log(f.B)));
+  const EA=T.F/T.el,lam=(o.s+f.t)/o.s,shrink=100*(Tn+o.Tb)/2/EA*lam,pucker=Math.max(0,shrink-f.pf);
+  const peak=o.Td*GUIDE*(1+0.15*(o.n/5000)**2),sf=0.5*T.F/peak,loose=Math.min(Tn,o.Tb)<f.Tmin,jam=ORDER.indexOf(o.th)>ORDER.indexOf(f.jam);
+  const bal=z>=0.4&&z<=0.6,brk=sf<1.5,pk=pucker>f.plim;
+  return {Tn,r,z,shrink,pucker,peak,sf,loose,jam,bal,brk,pk,good:bal&&!loose&&!brk&&!pk&&!jam,f};}
+// ---------- controls ----------
+const PRM=[['Td','夹线器张力（面线预张力）',20,400,1,'cN'],['Tb','底线张力（梭壳弹簧）',10,150,1,'cN'],['s','针距',1.5,5,0.1,'mm'],['n','主轴转速',2000,6000,100,'r/min']];
+$('prm').innerHTML=PRM.map(([k,l,mn,mx,st])=>`<label for="p_${k}">${l}</label><input id="p_${k}" type="range" min="${mn}" max="${mx}" step="${st}"><output id="o_${k}"></output>`).join('');
+function sync(){PRM.forEach(([k,,,,st,u])=>{$('p_'+k).value=ST[k];$('o_'+k).textContent=(+ST[k]).toFixed(st<1?1:0)+' '+u;});$('fab').value=ST.fab;$('th').value=ST.th;}
+PRM.forEach(([k])=>$('p_'+k).addEventListener('input',e=>{ST[k]=+e.target.value;if(k!=='Tb')seen.onlyB=false;changed();}));
+$('fab').onchange=e=>{ST.fab=e.target.value;seen.onlyB=false;changed();};
+$('th').onchange=e=>{ST.th=e.target.value;seen.onlyB=false;changed();};
+$('reset').onclick=()=>{Object.assign(ST,DEF);seen.messed=false;seen.onlyB=false;changed();};
+$('mess').onclick=()=>{Object.assign(ST,{fab:'cotton',th:'t24',Td:230,Tb:28,s:3,n:5000});seen.messed=true;seen.onlyB=false;changed();};
+$('lowb').onclick=()=>{Object.assign(ST,{fab:'cotton',th:'t24',Td:100,Tb:15,s:3,n:5000});seen.onlyB=true;seen.messed=false;changed();};
+function changed(){sync();drawMap();drawSec();meters();checkTasks();}
+// ---------- readouts ----------
+function meters(){const E=ev(),f=E.f;
+  const m=[[E.Tn.toFixed(0)+' cN','交织点处的面线张力（≈ 0.41 × 夹线器）',''],[E.r.toFixed(2),'张力比 r = 面线 ÷ 底线（平衡所需 '+(1/Math.pow(f.B,0.2)).toFixed(2)+'–'+Math.pow(f.B,0.2).toFixed(2)+'；平衡带 B = '+f.B+'）',E.bal?'ok':'warn'],
+    [E.z.toFixed(2),'交织点位置（0 布底，1 布面；平衡区 0.4–0.6）',E.bal?'ok':'warn'],[E.pucker.toFixed(2)+' %','起皱：缝线回缩超出面料能吸收的部分（≤ '+f.plim+'）',E.pk?'bad':'ok'],
+    [E.peak.toFixed(0)+' cN','收紧峰值张力（挑线杆处，≈1.22 T_d (1+0.15(n/5000)²)）',''],[(100*E.peak/THREAD[ST.th].F).toFixed(0)+' %','收紧峰占名义强力（≤ 33%）',E.brk?'bad':'ok']];
+  $('meter').innerHTML=m.map(([v,l,c])=>`<div class="${c}"><b>${v}</b><small>${l}</small></div>`).join('');
+  let v;
+  if(E.jam)v=['bad','线太粗：结构性起皱','这种布织得密，'+THREAD[ST.th].name+' 的线和相应的粗针会把纱线挤开、把布撑皱。换细一号的线和针。'];
+  else if(E.brk)v=['bad','断线风险','收紧时挑线杆处的峰值张力 '+E.peak.toFixed(0)+' cN，超过这种线名义强力的三分之一（考虑高速、针热和磨损的示意判据）。换粗线，或降低张力和转速。'];
+  else if(E.z>0.6)v=['warn','底线被拉到正面','面线相对太紧（或底线太松），交织点被拉向布面'+(E.z>=0.99?'，正面能看到一个个橙色的小点':'')+'。'+(E.loose?'同时线迹太松。':'')];
+  else if(E.z<0.4)v=['warn','面线被拉到反面','底线相对太紧（或面线太松），交织点被拉向布底'+(E.z<=0.01?'，反面露出一圈圈面线（浮线）':'')+'。'+(E.loose?'同时线迹太松。':'')];
+  else if(E.loose)v=['warn','线迹太松','两根线中较小的张力只有 '+Math.min(E.Tn,ST.Tb).toFixed(0)+' cN，不足以把线迹收进这种布（示意要求 '+f.Tmin+' cN）。线迹松垮、容易被勾起。'];
+  else if(E.pk)v=['bad','起皱','线迹平衡，但两根线的张力都偏高：缝线被拉长 '+E.shrink.toFixed(2)+'%，缝好后回缩，把布拉皱。在保持平衡的前提下把两根线一起调松。'];
+  else v=['ok','线迹良好','交织点在布的中间，线迹收紧，不皱、不断。'];
+  $('state').className='state '+v[0];$('state').innerHTML='<b>'+v[1]+'</b>'+v[2];}
+// ---------- section drawing ----------
+function seg(g,a,b){g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();}
+function drawSec(){const cv=$('sec'),g=cv.getContext('2d'),W=cv.width,H=cv.height,E=ev(),f=E.f;g.clearRect(0,0,W,H);
+  const nt=css('--nt'),bt=css('--bt'),mut=css('--muted');g.font='13px '+css('--f-body');
+  // cross-section
+  const x0=70,x1=W-30,th=Math.max(26,Math.min(110,f.t*36)),yc=150,yT=yc-th/2,yB=yc+th/2,N=6,pitch=(x1-x0)/N;
+  const amp=Math.min(14,E.pucker*14);  // pucker waviness (exaggerated)
+  const wy=x=>amp*Math.sin((x-x0)/pitch*Math.PI*1.0);
+  g.fillStyle=css('--cloth');g.strokeStyle=css('--clothEdge');g.lineWidth=1.2;g.beginPath();
+  for(let x=x0;x<=x1;x+=4)(x===x0?g.moveTo(x,yT+wy(x)):g.lineTo(x,yT+wy(x)));for(let x=x1;x>=x0;x-=4)g.lineTo(x,yB+wy(x));g.closePath();g.fill();g.stroke();
+  const zi=x=>yB+wy(x)-(yB-yT)*E.z, sag=E.loose?Math.min(16,(f.Tmin-Math.min(E.Tn,ST.Tb))*0.6):0;
+  // needle thread
+  g.lineWidth=4;g.strokeStyle=nt;g.beginPath();g.moveTo(x0,yT-3+wy(x0));
+  for(let k=0;k<N;k++){const hx=x0+pitch*(k+0.5);const xa=hx-pitch/2+6,xb=hx-6;
+    g.quadraticCurveTo((xa+xb)/2,yT-3-sag+wy((xa+xb)/2),xb,yT-3+wy(xb));g.lineTo(hx,zi(hx));g.lineTo(hx+6,yT-3+wy(hx+6));}
+  g.lineTo(x1,yT-3+wy(x1));g.stroke();
+  g.strokeStyle=bt;g.beginPath();g.moveTo(x0,yB+3+wy(x0));
+  for(let k=0;k<N;k++){const hx=x0+pitch*(k+0.5);const xa=hx-pitch/2+6,xb=hx-6;
+    g.quadraticCurveTo((xa+xb)/2,yB+3+sag+wy((xa+xb)/2),xb,yB+3+wy(xb));g.lineTo(hx,zi(hx));g.lineTo(hx+6,yB+3+wy(hx+6));}
+  g.lineTo(x1,yB+3+wy(x1));g.stroke();
+  g.fillStyle=css('--sheet');g.strokeStyle=css('--ink');g.lineWidth=1.5;
+  for(let k=0;k<N;k++){const hx=x0+pitch*(k+0.5);g.beginPath();g.arc(hx,zi(hx),5,0,7);g.fill();g.stroke();}
+  g.fillStyle=mut;g.fillText('布面',12,yT+4);g.fillText('布底',12,yB+4);g.fillText('截面（布厚 '+f.t+' mm，放大；白点为交织点'+(amp>0.5?'，起皱程度放大显示':'')+'）',x0,24);
+  // face views
+  const fy=[300,375],lab=['正面（面线一侧）','反面（底线一侧）'];
+  for(let s=0;s<2;s++){const y=fy[s];g.fillStyle=css('--cloth');g.fillRect(x0,y-18,x1-x0,36);g.fillStyle=mut;g.fillText(lab[s],x0,y-24);
+    const main=s?bt:nt,other=s?nt:bt,show=s?(1-E.z):E.z;g.lineWidth=4;
+    for(let k=0;k<N;k++){const hx=x0+pitch*(k+0.5);g.strokeStyle=main;seg(g,[hx+6,y],[Math.min(hx+pitch-6,x1-4),y]);if(k===0)seg(g,[x0+4,y],[hx-6,y]);
+      if(show>0.85){g.fillStyle=other;g.beginPath();g.arc(hx,y,4+6*(show-0.85)/0.15,0,7);g.fill();}}
+    if(E.loose){g.strokeStyle=main;g.lineWidth=1.5;for(let k=0;k<N-1;k++){const hx=x0+pitch*(k+1);g.beginPath();g.arc(hx,y-(s?-1:1)*6,6,0,Math.PI*(s?1:-1),s===1);g.stroke();}}}
+  $('secNote').textContent=E.z>=0.85?'正面能看到底线的小点：底线被拉了上来。':E.z<=0.15?'反面露出面线：面线被拉了下去（严重时成为浮线）。':'交织点藏在布的厚度里，正反两面都只看到自己的线。';}
+// ---------- tension map ----------
+const RX=[20,400],RY=[10,150];
+let mapBase=null;
+function drawMap(){const cv=$('map'),g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);
+  const x0=70,x1=W-20,y0=16,y1=H-46,X=v=>x0+(x1-x0)*(v-RX[0])/(RX[1]-RX[0]),Y=v=>y1-(y1-y0)*(v-RY[0])/(RY[1]-RY[0]);
+  const col={ok:css('--ok'),warn:css('--warn'),loose:css('--loose'),bad:css('--bad'),vio:css('--vio')};
+  const nx=120,ny=56;
+  for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const Td=RX[0]+(i+.5)*(RX[1]-RX[0])/nx,Tb=RY[0]+(j+.5)*(RY[1]-RY[0])/ny;const E=ev(Object.assign({},ST,{Td,Tb}));
+    const k=E.brk?'vio':E.loose?'loose':!E.bal?'warn':E.pk?'bad':'ok';g.fillStyle=col[k];g.globalAlpha=k==='ok'?.75:.3;
+    g.fillRect(X(Td)-(x1-x0)/nx/2,Y(Tb)-(y1-y0)/ny/2,(x1-x0)/nx+0.6,(y1-y0)/ny+0.6);}
+  g.globalAlpha=1;g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.font='12px '+css('--f-mono');g.lineWidth=1;g.textAlign='center';
+  for(let v=50;v<=400;v+=50){seg(g,[X(v),y1],[X(v),y1+5]);g.fillText(v,X(v),y1+18);}
+  g.textAlign='right';for(let v=20;v<=150;v+=20){seg(g,[x0-5,Y(v)],[x0,Y(v)]);g.fillText(v,x0-8,Y(v)+4);}
+  g.textAlign='center';g.font='13px '+css('--f-body');g.fillText('夹线器张力 cN',(x0+x1)/2,H-10);
+  g.save();g.translate(18,(y0+y1)/2);g.rotate(-Math.PI/2);g.fillText('底线张力 cN',0,0);g.restore();g.textAlign='left';
+  if(ev().jam){g.fillStyle=col.bad;g.font='bold 15px '+css('--f-body');g.fillText('这种线对这种布太粗：整张图都有结构性起皱',x0+12,y0+22);}
+  mapBase=g.getImageData(0,0,W,H);
+  g.strokeStyle=css('--ink');g.lineWidth=2.5;g.fillStyle=css('--sheet');g.beginPath();g.arc(X(ST.Td),Y(ST.Tb),8,0,7);g.fill();g.stroke();
+  cv._inv=(px,py)=>[RX[0]+(px-x0)/(x1-x0)*(RX[1]-RX[0]),RY[0]+(y1-py)/(y1-y0)*(RY[1]-RY[0])];}
+$('map').addEventListener('click',e=>{const cv=$('map'),r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*cv.width/r.width,py=(e.clientY-r.top)*cv.height/r.height;
+  const [a,b]=cv._inv(px,py);const nTd=Math.max(20,Math.min(400,Math.round(a))),nTb=Math.max(10,Math.min(150,Math.round(b)));if(nTd!==ST.Td)seen.onlyB=false;ST.Td=nTd;ST.Tb=nTb;changed();});
+// ---------- tasks ----------
+const seen={messed:false,onlyB:false};
+const TASKS=[
+  {t:'按“打乱张力”，再把衬衫棉布、Tex 24 线的线迹调好：交织点在 0.4–0.6、不松、不皱、不断。',d:'先看交织点偏向哪一面，判断哪根线相对太紧；再看是不是两根线都太紧（起皱）。可以直接点张力平面上的绿色区域。',ok:()=>seen.messed&&ST.fab==='cotton'&&ST.th==='t24'&&ev().good},
+  {t:'按“底线太松的机器”：正面看得到底线。只调底线张力（不动夹线器、线和面料），把线迹调好。',d:'底线翻上来，不一定是面线太紧；这台机器的夹线器是按标准调的，问题出在梭壳弹簧上。',ok:()=>seen.onlyB&&ST.Td===100&&ST.fab==='cotton'&&ST.th==='t24'&&ev().good},
+  {t:'牛仔布四层：线迹平衡、不松、不断（转速 5000 r/min 以上）。',d:'厚料要把线迹收进四层布，两根线的张力都要高；张力高了，细线会断。',ok:()=>ST.fab==='denim'&&ST.n>=5000&&ev().good},
+  {t:'衬里两层：线迹平衡、不松，起皱 ≤ 0.15%。',d:'薄而滑的布最容易张力起皱。粗线伸长小，但对这种布太粗；只能把两根线的张力一起降到“刚好不松”的程度。',ok:()=>ST.fab==='lining'&&ev().good}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{try{if(k.ok())done.add(i);}catch(e){}});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+changed();
+if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{drawMap();drawSec();});
+window.__api={ST,DEF,ev,changed,done,TASKS,seen,mess:()=>$('mess').click(),lowb:()=>$('lowb').click(),setB:v=>{$('p_Tb').value=v;$('p_Tb').dispatchEvent(new Event('input'));}};
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

@@ -1,0 +1,23 @@
+import sys, os; sys.path.insert(0, os.path.dirname(__file__))
+from en_textswap import Fig
+f = Fig('/home/claude/book/img/fig_ol_diff.png', S=1.5)
+f.swap((45, 35, 1000, 75), 'Differential feed: two feed dogs with different strokes push together or stretch the fabric between them', bold=True, size=24)
+f.swap((672, 78, 730, 108), 'Needle', bold=True, k=0.85)
+f.swap((280, 255, 342, 287), 'Presser foot', bold=True, k=0.85)
+f.swap((1140, 262, 1325, 295), 'Fabric feed direction →', anchor='r', k=0.85)
+OR, BL, GR = (224, 102, 48), (47, 112, 214), (85, 94, 107)
+for reg in [(80, 458, 310, 494), (115, 494, 285, 522), (810, 458, 1012, 494), (850, 494, 985, 522), (140, 666, 332, 700), (148, 702, 345, 730)]:
+    bb, bg, c = f.ink(reg); f.clear(bb, scaled=False)
+f.text(193, 466, 'Differential feed dog', 20, OR, True, 'mm'); f.text(193, 494, '(in front of the needle)', 20, OR, True, 'mm'); f.text(193, 522, 'stroke s_d = D · s', 18, GR, False, 'mm')
+f.text(910, 466, 'Main feed dog', 20, BL, True, 'mm'); f.text(910, 494, '(behind the needle)', 20, BL, True, 'mm'); f.text(910, 522, 'stroke s = stitch length', 18, GR, False, 'mm')
+f.text(30, 683, 'Slider (differential setting)', 20, OR, True, 'lm'); f.text(30, 715, 'moves along the slot, changing l_d', 18, GR, False, 'lm')
+f.swap((390, 833, 735, 868), 'Feed rocker shaft (same swing angle α at every stitch)', anchor='m', bold=True, k=0.85)
+for reg in [(1410, 605, 1730, 638), (1410, 643, 1750, 676), (1410, 760, 1780, 793), (1410, 796, 1700, 828)]:
+    bb, bg, c = f.ink(reg); f.clear(bb, scaled=False)
+INK = (38, 46, 56)
+f.text(1418, 598, 'Both dogs are driven by one rocker shaft, so', 18, INK)
+f.text(1418, 628, 'they swing through the same angle and their', 18, INK)
+f.text(1418, 658, 'strokes are proportional to the arm lengths:', 18, INK)
+f.text(1418, 777, 'Slider out → D larger → pushes together (gathers)', 17.5, GR)
+f.text(1418, 812, 'Slider in → D smaller → stretches', 17.5, GR)
+f.save(sys.argv[1] if len(sys.argv) > 1 else 'img/en/fig_ol_diff.png')

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>旋梭定时与针杆高度联调</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = magnified needle/hook views + catch-window map; right rail = readouts, adjustments, trial sewing, tasks */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2; --cloth:#e9e2d2;
+  --thread:#2a5fb8; --steel:#5c6670; --beak:#c4531d; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f; --cut:#8e44ad;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--cloth:#4a4436;--thread:#7fa9f2;--steel:#b7c0c9;--beak:#f08c58;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--cut:#c39bd3}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--cloth:#4a4436;--thread:#7fa9f2;--steel:#b7c0c9;--beak:#f08c58;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--cut:#c39bd3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.2em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.meter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.meter div{border-top:3px solid var(--rule);padding-top:4px}
+.meter div.ok{border-top-color:var(--ok)} .meter div.bad{border-top-color:var(--bad)} .meter div.warn{border-top-color:var(--warn)}
+.meter b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.meter small{color:var(--muted);font-size:.74rem;line-height:1.35;display:block}
+.state{margin-top:10px;font-size:.88rem;border-left:3px solid var(--rule);padding-left:8px;min-height:3.2em}
+.state.ok{border-left-color:var(--ok)} .state.bad{border-left-color:var(--bad)} .state.warn{border-left-color:var(--warn)}
+.state b{display:block}
+.stitches{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:3px;margin-top:8px}
+.stitches i{display:block;aspect-ratio:1;border-radius:3px;background:var(--rule)}
+.stitches i.ok{background:var(--ok)} .stitches i.skip{background:var(--bad)} .stitches i.hit{background:var(--warn)} .stitches i.cut{background:var(--cut)}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+</style>
+<div class="wrap">
+<header><h1>旋梭定时与针杆高度联调</h1><span class="sub">《缝纫机设计与制造》第 5 章 · 虚拟实验 5-1 · 梭尖什么时候、在什么高度、离机针多近，才能钩住线环</span></header>
+<div class="grid">
+  <div class="col">
+    <section class="panel">
+      <div class="two">
+        <div><h3>正视：对着机针凹口看（放大）</h3><canvas id="front" width="560" height="520" aria-label="机针、针眼、线环和梭尖的正视放大图"></canvas></div>
+        <div><h3>俯视：梭尖所在高度的截面（放大）</h3><canvas id="top" width="560" height="520" aria-label="梭尖高度处机针、线环与梭尖的截面"></canvas></div>
+      </div>
+      <div class="row">
+        <button type="button" id="play" aria-pressed="true">暂停</button>
+        <span class="note" style="margin:0">主轴转角</span><b id="angOut" style="font-family:var(--f-mono)">180°</b>
+        <div style="flex:1;min-width:180px"><input id="ang" type="range" min="170" max="240" step="0.5" value="180" aria-label="主轴转角"></div>
+      </div>
+      <p class="note" id="phase"></p>
+    </section>
+    <section class="panel">
+      <h3>钩线窗口：横轴旋梭安装角，纵轴针杆高度（当前间隙、针号、面料下）</h3>
+      <canvas id="map" width="1100" height="520" aria-label="钩线窗口图，可点击设置"></canvas>
+      <div class="legend"><span style="--c:var(--ok)">能钩住</span><span style="--c:var(--bad)">跳针（梭尖从线环外面滑过）</span><span style="--c:var(--cut)">梭尖太贴近针眼，易劈线、断线</span><span style="--c:var(--warn)">梭尖碰针</span></div>
+      <p class="note">点击图中任一点即可把旋梭安装角和针杆高度设到那里。虚线框是手册推荐的范围（回升 1.6–2.5 mm，梭尖高于针眼上沿 0.8–1.5 mm）。线环模型为示意，用来理解趋势。</p>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3>读数</h3>
+      <div class="meter" id="meter"></div>
+      <div class="state" id="state"></div>
+    </section>
+    <section class="panel">
+      <h3>调整</h3>
+      <div class="prm" id="prm"></div>
+      <div class="row">
+        <label for="nm" class="note" style="margin:0">机针</label>
+        <select id="nm"><option value="0.65">Nm 65</option><option value="0.75">Nm 75</option><option value="0.8">Nm 80</option><option value="0.9" selected>Nm 90</option><option value="1.0">Nm 100</option><option value="1.1">Nm 110</option><option value="1.2">Nm 120</option></select>
+        <label for="fab" class="note" style="margin:0">面料</label>
+        <select id="fab"><option value="woven" selected>梭织</option><option value="knit">针织（有弹性）</option></select>
+      </div>
+      <div class="row"><button type="button" id="reset">恢复手册标准</button><button type="button" id="mess">打乱（模拟没调好的机器）</button></div>
+    </section>
+    <section class="panel">
+      <h3>试缝</h3>
+      <div class="row" style="margin-top:0"><button type="button" id="sew">试缝 30 针</button><span class="note" id="sewOut" style="margin:0"></span></div>
+      <div class="stitches" id="stitches"></div>
+      <p class="note">每一针的线环大小、机针摆动和间隙都有小的随机波动；绿色为正常，红色跳针，紫色劈线，黄色碰针。</p>
+    </section>
+    <section class="panel">
+      <h3>任务（自动判定）</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+</div>
+</div>
+<script>
+(function(){
+const DEG=Math.PI/180,$=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+// ---------- needle bar (chapter 3 worked example) ----------
+const RN=15.5,LN=55;
+const xN=f=>{const a=f*DEG,l=RN/LN;return RN*(1-Math.cos(a))-LN*(1-Math.sqrt(1-(l*Math.sin(a))**2));};
+const rise=f=>xN(180)-xN(f);
+let PHC0=206;{let a=181,b=240;for(let i=0;i<60;i++){const m=(a+b)/2;if(rise(m)<2)a=m;else b=m;}PHC0=(a+b)/2;}
+// ---------- loop model (schematic) ----------
+const H0=2.2, TB=0.15, D_REF=0.9, RH=13.5;
+const fLoop=h=>{h=Math.max(h,0);return (h/H0)**2*Math.exp(2*(1-h/H0));};
+const yTop=h=>0.5+0.9*Math.max(h,0);
+const FAB={woven:{W:0.75,sd:0.10},knit:{W:0.5,sd:0.15}};
+const ST={psi:0,dz:0,g:0.08,d:0.9,fab:'woven',phi:180,play:true};
+function geom(o){o=o||ST;
+  const fc=PHC0+o.psi/2, h=rise(fc), D=1.0-o.dz-(h-2.0), g=o.g-(o.d-D_REF)/2, W=FAB[o.fab].W;
+  const yt=yTop(h), y=D+0.15, wAt=(y>0&&y<yt)?W*fLoop(h)*Math.sin(Math.PI*y/yt):0;
+  let res;
+  if(g<=0.02)res='hit';else if(D<0.2)res='cut';else res=(wAt-(g+TB)>=0)?'ok':'skip';
+  return {fc,h,D,g,W,yt,wAt,margin:wAt-(g+TB),res};
+}
+// ---------- controls ----------
+const PRM=[['psi','旋梭安装角（相对标准，梭尖转角；+ 为钩线推迟）',-30,30,0.5,'°'],['dz','针杆高度（相对标准，+ 为升高）',-1,1,0.05,'mm'],['g','梭尖与机针间隙（以 Nm 90 针调定）',0,0.4,0.01,'mm']];
+$('prm').innerHTML=PRM.map(([k,l,mn,mx,st])=>`<label for="p_${k}">${l}</label><input id="p_${k}" type="range" min="${mn}" max="${mx}" step="${st}"><output id="o_${k}"></output>`).join('');
+function sync(){PRM.forEach(([k,,,,st,u])=>{$('p_'+k).value=ST[k];$('o_'+k).textContent=(+ST[k]).toFixed(st<0.1?2:1)+' '+u;});$('nm').value=String(ST.d);$('fab').value=ST.fab;}
+PRM.forEach(([k])=>$('p_'+k).addEventListener('input',e=>{ST[k]=+e.target.value;changed();}));
+$('nm').onchange=e=>{ST.d=+e.target.value;changed();};
+$('fab').onchange=e=>{ST.fab=e.target.value;changed();};
+$('reset').onclick=()=>{Object.assign(ST,{psi:0,dz:0,g:0.08});changed();};
+$('mess').onclick=()=>{Object.assign(ST,{psi:14,dz:0.4,g:0.26});seen.messed=true;changed();};
+$('play').onclick=()=>{ST.play=!ST.play;$('play').textContent=ST.play?'暂停':'播放';$('play').setAttribute('aria-pressed',ST.play);};
+$('ang').addEventListener('input',e=>{ST.play=false;$('play').textContent='播放';$('play').setAttribute('aria-pressed',false);ST.phi=+e.target.value;draw();});
+let lastTrial=null;
+function changed(){sync();lastTrial=null;$('stitches').innerHTML='';$('sewOut').textContent='';drawMap();draw();meters();checkTasks();}
+// ---------- trial sewing ----------
+let seed=7;const rnd=()=>{seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;};
+const gauss=()=>{let u=0,v=0;while(!u)u=rnd();while(!v)v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+$('sew').onclick=()=>{
+  const g0=geom(),sd=FAB[ST.fab].sd,out=[];
+  for(let i=0;i<30;i++){
+    const dh=0.08*gauss(),dg=0.015*gauss(),kW=1+sd*gauss();
+    const h=g0.h+dh,D=1.0-ST.dz-(h-2.0),g=g0.g+dg,yt=yTop(h),y=D+0.15;
+    const w=(y>0&&y<yt)?g0.W*kW*fLoop(h)*Math.sin(Math.PI*y/yt):0;
+    out.push(g<=0.02?'hit':D<0.2?'cut':(w-(g+TB)>=0?'ok':'skip'));
+  }
+  lastTrial={cfg:Object.assign({},ST),res:out};
+  $('stitches').innerHTML=out.map(r=>`<i class="${r}" title="${{ok:'正常',skip:'跳针',hit:'碰针',cut:'劈线'}[r]}"></i>`).join('');
+  const n=k=>out.filter(r=>r===k).length;
+  $('sewOut').textContent=`正常 ${n('ok')}，跳针 ${n('skip')}，劈线 ${n('cut')}，碰针 ${n('hit')}`;
+  checkTasks();
+};
+// ---------- readouts ----------
+function meters(){
+  const G=geom(),inH=G.h>=1.6&&G.h<=2.5,inD=G.D>=0.8&&G.D<=1.5,inG=G.g>=0.04&&G.g<=0.1;
+  const m=[[G.fc.toFixed(1)+'°','钩线时主轴转角（梭尖到达机针中心）',''],[G.h.toFixed(2)+' mm','此时机针从最低点回升（手册 1.6–2.5）',inH?'ok':'warn'],
+    [G.D.toFixed(2)+' mm','梭尖高于针眼上沿（手册约 1.0）',inD?'ok':(G.D<0.2?'bad':'warn')],[G.g.toFixed(2)+' mm','梭尖与机针实际间隙（手册 0.04–0.1）',inG?'ok':(G.g<=0.02?'bad':'warn')],
+    [G.wAt.toFixed(2)+' mm','梭尖高度处线环离开机针的距离',''],[(G.margin>=0?'+':'')+G.margin.toFixed(2)+' mm','钩线余量 = 线环距离 − 间隙 − 梭尖厚',G.margin>=0.15?'ok':G.margin>=0?'warn':'bad']];
+  $('meter').innerHTML=m.map(([v,l,c])=>`<div class="${c}"><b>${v}</b><small>${l}</small></div>`).join('');
+  const T={ok:['能钩住','梭尖从机针和线环之间穿过，线环挂在梭尖上被带走。'],skip:['跳针','梭尖到达时线环离机针不够远（或梭尖高度不在线环里），梭尖从线环外面滑过去，这一针没有和底线交织。'],
+    cut:['梭尖太贴近针眼','梭尖从针眼附近划过，容易劈开面线或把线割断。针杆太高，或者钩线太晚、针眼已经升到梭尖跟前。'],hit:['梭尖碰针','间隙为零，梭尖撞在机针上：响声、针尖起毛刺、断针。换粗针以后没有重调间隙最常见。']};
+  const t=T[G.res];$('state').className='state '+(G.res==='ok'?(G.margin<0.15?'warn':'ok'):'bad');$('state').innerHTML='<b>'+t[0]+'</b>'+t[1];
+}
+// ---------- drawing ----------
+function seg(g,a,b){g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();}
+function frontDraw(){
+  const cv=$('front'),g=cv.getContext('2d'),W=cv.width,H=cv.height,G=geom(),f=ST.phi;
+  const sc=48,cx=W/2,cy=H*0.42,T=(x,y)=>[cx+x*sc,cy-y*sc];
+  g.clearRect(0,0,W,H);g.lineJoin='round';
+  const h=rise(f), eyeTop=-G.D+(h-G.h);   // eye top relative to the beak path (y=0) at this crank angle
+  const steel=css('--steel'),th=css('--thread'),bk=css('--beak'),mut=css('--muted');
+  // loop lens behind needle (only after BDC)
+  if(f>180){const yt=yTop(h),Wl=G.W*fLoop(h);g.fillStyle=th;g.globalAlpha=.18;g.beginPath();
+    for(let k=0;k<=40;k++){const y=eyeTop+yt*k/40,w=Wl*Math.sin(Math.PI*k/40);const p=T(-ST.d/2-w,y);k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}
+    for(let k=40;k>=0;k--){const y=eyeTop+yt*k/40,w=Wl*Math.sin(Math.PI*k/40)*0.5;const p=T(ST.d/2+w,y);g.lineTo(p[0],p[1]);}
+    g.closePath();g.fill();g.globalAlpha=1;g.strokeStyle=th;g.lineWidth=2.2;g.beginPath();
+    for(let k=0;k<=40;k++){const y=eyeTop+yt*k/40,w=Wl*Math.sin(Math.PI*k/40);const p=T(-ST.d/2-w,y);k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();}
+  // needle
+  const top=T(-ST.d/2,6),bot=T(ST.d/2,eyeTop-2.2);g.fillStyle=steel;g.globalAlpha=.85;g.fillRect(top[0],top[1],ST.d*sc,bot[1]-top[1]);g.globalAlpha=1;
+  const tip=T(0,eyeTop-2.9);g.beginPath();g.moveTo(bot[0]-ST.d*sc,bot[1]);g.lineTo(tip[0],tip[1]);g.lineTo(bot[0],bot[1]);g.closePath();g.fill();
+  // scarf
+  g.fillStyle=css('--soft');const s1=T(-ST.d/2,eyeTop+2.2),s2=T(-ST.d/2+ST.d*0.35,eyeTop);g.fillRect(s1[0],s1[1],s2[0]-s1[0],s2[1]-s1[1]);
+  // eye
+  const e1=T(-ST.d*0.28,eyeTop),e2=T(ST.d*0.28,eyeTop-1.2);g.fillStyle=css('--sheet');g.beginPath();g.roundRect(e1[0],e1[1],e2[0]-e1[0],e2[1]-e1[1],8);g.fill();
+  g.strokeStyle=th;g.lineWidth=2.4;seg(g,T(0,eyeTop-0.6),T(0,6));
+  // beak path & beak
+  g.save();g.setLineDash([5,5]);g.strokeStyle=bk;g.lineWidth=1;seg(g,T(-5,0),T(5,0));g.restore();
+  const bx=RH*Math.sin(2*(f-G.fc)*DEG);if(Math.abs(bx)<5.5){const p=T(bx,0);g.fillStyle=bk;g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(p[0]-70,p[1]-10);g.lineTo(p[0]-70,p[1]+16);g.closePath();g.fill();}
+  // dimensions
+  g.strokeStyle=mut;g.fillStyle=mut;g.lineWidth=1;g.font='13px '+css('--f-body');
+  const dx=T(1.6,0)[0];seg(g,[dx,T(0,0)[1]],[dx,T(0,eyeTop)[1]]);seg(g,[dx-5,T(0,eyeTop)[1]],[dx+5,T(0,eyeTop)[1]]);seg(g,[dx-5,T(0,0)[1]],[dx+5,T(0,0)[1]]);
+  g.fillText('梭尖高于针眼 '+(-eyeTop).toFixed(2)+' mm',dx+8,(T(0,0)[1]+T(0,eyeTop)[1])/2+4);
+  g.fillText('梭尖轨迹',T(-5,0)[0],T(0,0)[1]-8);g.fillText('针眼',T(ST.d/2,0)[0]+6,T(0,eyeTop-0.7)[1]);
+  if(f>180)g.fillText('线环（在凹口一侧鼓出）',T(-4.9,0)[0],T(0,eyeTop-0.5)[1]);
+}
+function topDraw(){
+  const cv=$('top'),g=cv.getContext('2d'),W=cv.width,H=cv.height,G=geom(),f=ST.phi;
+  const sc=150,cx=W*0.6,cy=H*0.5,T=(x,y)=>[cx+x*sc,cy-y*sc];
+  g.clearRect(0,0,W,H);
+  const steel=css('--steel'),th=css('--thread'),bk=css('--beak'),mut=css('--muted');
+  const h=rise(f),D=-(-G.D+(h-G.h)),yt=yTop(h),y=D+0.15,w=(f>180&&y>0&&y<yt)?G.W*fLoop(h)*Math.sin(Math.PI*y/yt):0;
+  const r=ST.d/2;
+  // needle section (scarf flattened on the left)
+  g.fillStyle=steel;g.beginPath();g.arc(T(0,0)[0],T(0,0)[1],r*sc,0,2*Math.PI);g.fill();
+  // loop thread: arc on the left (scarf side) offset w from the needle surface
+  if(w>0.005){g.strokeStyle=th;g.lineWidth=3;g.beginPath();
+    for(let k=0;k<=40;k++){const a=Math.PI/2+Math.PI*k/40,rr=r+w*Math.sin(Math.PI*k/40);const p=T(rr*Math.cos(a),rr*Math.sin(a)*0.9);k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.stroke();}
+  // beak line at clearance g from the needle surface (beak moves bottom -> top in this view)
+  const bxl=-(r+G.g);g.save();g.setLineDash([5,5]);g.strokeStyle=bk;g.lineWidth=1;seg(g,T(bxl,-1.6),T(bxl,1.6));g.restore();
+  const by=RH*Math.sin(2*(f-G.fc)*DEG);if(Math.abs(by)<1.7){const p=T(bxl,by);g.fillStyle=bk;g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(p[0]-TB*sc*2.2,p[1]+60);g.lineTo(p[0]+2,p[1]+60);g.closePath();g.fill();}
+  // dimension: gap and loop distance
+  g.strokeStyle=mut;g.fillStyle=mut;g.lineWidth=1;g.font='13px '+css('--f-body');
+  const yy=T(0,-1.3)[1];seg(g,[T(-r,0)[0],yy],[T(bxl,0)[0],yy]);g.fillText('间隙 '+G.g.toFixed(2),T(bxl,0)[0]-80,yy+18);
+  if(w>0.005){const y2=T(0,1.3)[1];seg(g,[T(-r,0)[0],y2],[T(-r-w,0)[0],y2]);g.fillText('线环 '+w.toFixed(2),T(-r-w,0)[0]-60,y2-8);}
+  g.fillText('机针（Nm '+Math.round(ST.d*100)+'）',T(r,0)[0]+10,T(0,0)[1]+4);g.fillText('梭尖',T(bxl,1.6)[0]-36,T(0,1.6)[1]+4);
+  g.fillText('机针以外的线环要比 间隙 + 梭尖厚 '+TB+' 更远，梭尖才能钻进去',12,H-14);
+}
+function drawMap(){
+  const cv=$('map'),g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);
+  const x0=80,x1=W-20,y0=20,y1=H-50,P=[-30,30],Z=[-1,1];
+  const X=p=>x0+(x1-x0)*(p-P[0])/(P[1]-P[0]),Y=z=>y1-(y1-y0)*(z-Z[0])/(Z[1]-Z[0]);
+  const col={ok:css('--ok'),skip:css('--bad'),cut:css('--cut'),hit:css('--warn')};
+  const nx=120,ny=60;
+  for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const p=P[0]+(i+.5)*(P[1]-P[0])/nx,z=Z[0]+(j+.5)*(Z[1]-Z[0])/ny;const r=geom(Object.assign({},ST,{psi:p,dz:z}));
+    g.fillStyle=col[r.res];g.globalAlpha=r.res==='ok'?(r.margin<0.15?.45:.75):.28;g.fillRect(X(p-(P[1]-P[0])/nx/2),Y(z+(Z[1]-Z[0])/ny/2),(x1-x0)/nx+0.6,(y1-y0)/ny+0.6);}
+  g.globalAlpha=1;
+  // manual box: rise 1.6-2.5 and D 0.8-1.5 -> map to psi/dz
+  const psiOf=h=>{let a=181,b=240;for(let i=0;i<50;i++){const m=(a+b)/2;if(rise(m)<h)a=m;else b=m;}return 2*((a+b)/2-PHC0);};
+  g.save();g.setLineDash([6,5]);g.strokeStyle=css('--ink');g.lineWidth=1.4;g.beginPath();
+  const pts=[[1.6,0.8],[2.5,0.8],[2.5,1.5],[1.6,1.5]].map(([h,D])=>[X(psiOf(h)),Y(1-D-(h-2))]);pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();g.stroke();g.restore();
+  // axes
+  g.strokeStyle=css('--rule');g.fillStyle=css('--muted');g.font='13px '+css('--f-mono');g.lineWidth=1;g.textAlign='center';
+  for(let p=-30;p<=30;p+=10){seg(g,[X(p),y1],[X(p),y1+5]);g.fillText((p>0?'+':'')+p+'°',X(p),y1+20);}
+  g.textAlign='right';for(let z=-1;z<=1;z+=0.5){seg(g,[x0-5,Y(z)],[x0,Y(z)]);g.fillText((z>0?'+':'')+z.toFixed(1),x0-8,Y(z)+4);}
+  g.textAlign='center';g.font='13px '+css('--f-body');g.fillText('旋梭安装角（梭尖转角，+ 为钩线推迟）',(x0+x1)/2,H-8);
+  g.save();g.translate(16,(y0+y1)/2);g.rotate(-Math.PI/2);g.fillText('针杆高度 mm（+ 为升高）',0,0);g.restore();
+  // current point
+  g.strokeStyle=css('--ink');g.lineWidth=2.5;g.fillStyle=css('--sheet');g.beginPath();g.arc(X(ST.psi),Y(ST.dz),8,0,7);g.fill();g.stroke();
+  cv._inv=(px,py)=>[P[0]+(px-x0)/(x1-x0)*(P[1]-P[0]),Z[0]+(y1-py)/(y1-y0)*(Z[1]-Z[0])];
+}
+$('map').addEventListener('click',e=>{const cv=$('map'),r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*cv.width/r.width,py=(e.clientY-r.top)*cv.height/r.height;
+  const [p,z]=cv._inv(px,py);ST.psi=Math.max(-30,Math.min(30,Math.round(p*2)/2));ST.dz=Math.max(-1,Math.min(1,Math.round(z*20)/20));changed();});
+function draw(){$('ang').value=ST.phi;$('angOut').textContent=ST.phi.toFixed(1)+'°';frontDraw();topDraw();
+  const G=geom(),f=ST.phi;
+  $('phase').textContent=f<180?'机针下行，接近最低点。':f<G.fc-3?'机针从最低点回升，面线在凹口一侧鼓出线环（回升 '+rise(f).toFixed(2)+' mm）。':f<G.fc+3?'梭尖到达机针中心：钩线的一瞬间。':G.res==='ok'?'梭尖已钩住线环，带着它转走。':'梭尖已经过去，'+({skip:'没有钩住线环——跳针。',cut:'从针眼附近划过——可能劈线。',hit:'撞上了机针。'})[G.res];}
+// ---------- tasks ----------
+const tr=()=>!!lastTrial&&lastTrial.res.every(r=>r==='ok');   // lastTrial is cleared whenever a setting changes
+const inManual=()=>{const G=geom();return G.h>=1.6&&G.h<=2.5&&G.D>=0.8&&G.D<=1.5&&G.g>=0.04&&G.g<=0.1;};
+const seen={hitThick:false,messed:false};
+const TASKS=[
+  {t:'把“打乱”后的机器调好：试缝 30 针全部正常，并且回升量、梭尖高度、间隙都在手册范围内。',d:'先按“打乱”，再调三个量。提示：先对钩线时刻，再对针杆高度，最后调间隙。',ok:()=>seen.messed&&ST.fab==='woven'&&tr()&&inManual()},
+  {t:'换 Nm 110 粗针，先不动间隙试缝一次，看会发生什么；再把间隙重新调到 0.04–0.1 mm，使试缝 30 针全部正常。',d:'粗针更“胖”，针的表面离梭尖更近。',ok:()=>{if(lastTrial&&lastTrial.cfg.d>=1.1&&lastTrial.res.includes('hit'))seen.hitThick=true;return seen.hitThick&&ST.d>=1.1&&tr()&&inManual();}},
+  {t:'针织面料：试缝 30 针全部正常。',d:'针织物线环小、波动大，钩线窗口变窄。要把梭尖更贴近机针，并让工作点落在窗口中间。',ok:()=>ST.fab==='knit'&&tr()},
+  {t:'旋梭安装角推迟到 +10° 以上，不再动旋梭，只调针杆高度，使试缝 30 针全部正常。',d:'钩线推迟，针眼已经升高，梭尖相对针眼就低了。这正是“旋梭定时和针杆高度要联调”的原因。',ok:()=>ST.fab==='woven'&&ST.psi>=10&&ST.g>=0.04&&ST.g<=0.1&&tr()}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{try{if(k.ok())done.add(i);}catch(e){}});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+// ---------- loop ----------
+let last=performance.now();
+function loop(now){const dt=Math.min(0.1,(now-last)/1000);last=now;if(ST.play){ST.phi+=dt*14;if(ST.phi>240)ST.phi=170;draw();}requestAnimationFrame(loop);}
+changed();requestAnimationFrame(loop);
+if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{drawMap();draw();});
+window.__api={ST,geom,changed,PHC0,rise,sew:()=>$('sew').click(),trial:()=>lastTrial,done,TASKS};
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

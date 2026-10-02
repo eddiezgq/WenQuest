@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>生产线平衡</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: left = charts and operation list, right rail = results and controls; tasks at bottom */
+:root{
+  --bg:#f3f5f4; --sheet:#ffffff; --ink:#1b2430; --muted:#5a6570; --rule:#d7dde1; --soft:#eef1f2;
+  --nt:#2a5fb8; --bt:#d9622b; --fab:#e8d9b4; --win:#1e8449; --accent:#0f6e74; --ok:#1e8449; --bad:#c0392b; --warn:#b7791f;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#11161b;--sheet:#182029;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--soft:#1e2731;--nt:#7fa9f2;--bt:#f08c58;--fab:#5c513a;--win:#5fd08a;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+button,select{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number]{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 8px;width:5.5em;font-family:var(--f-mono)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:var(--muted);font-weight:600}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:700px){.two{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.6em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.task{border-top:1px solid var(--rule);padding:8px 0 4px;font-size:.86rem}
+.task .st{font-family:var(--f-mono);font-weight:600}
+.task .st.ok{color:var(--ok)} .task .st.no{color:var(--muted)}
+.task small{display:block;color:var(--muted);font-size:.78rem}
+.msg{font-size:.82rem;margin-top:6px;min-height:1.3em}
+</style><style>
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page[hidden]{display:none}
+.oplist{width:100%;border-collapse:collapse;font-size:.84rem}
+.oplist td,.oplist th{padding:3px 6px;border-bottom:1px solid var(--rule);text-align:left;white-space:nowrap}
+.oplist th{color:var(--muted);font-weight:500;font-size:.76rem}
+.oplist td.num{font-family:var(--f-mono);text-align:right}
+.oplist tr.gh td{background:var(--soft);font-weight:600;font-size:.8rem}
+.oplist tr.gh td .bad{color:var(--bad)}
+.oplist button{padding:1px 7px;font-size:.76rem}
+.oplist .cut{color:var(--accent)}
+.tblwrap{overflow-x:auto}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+</style>
+<div class="wrap">
+<header><h1>生产线平衡</h1><span class="sub">《缝纫机设计与制造》第 28 章 · 虚拟实验 28-1 · 把一条休闲裤的 23 道工序分给工人；一个人该看几台自动机</span></header>
+<div class="tabs" role="tablist"><button role="tab" id="tabA" aria-selected="true" type="button">① 工序分组与平衡</button><button role="tab" id="tabB" aria-selected="false" type="button">② 一人多机与机器时间</button></div>
+<div class="page" id="pageA">
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>平衡图：每组的人均负荷（分/件），红虚线为节拍，黑线为实际周期（最高的那组）</h3><canvas id="bal" width="1100" height="320" aria-label="生产线平衡图"></canvas></section>
+    <section class="panel"><h3>工序顺序与分组（点“在此分组”在该工序后面切开；↑↓ 调整顺序，不能违反先后关系）</h3><div class="tblwrap"><table class="oplist" id="oplist"></table></div></section>
+    <p class="note">模型（与本书 model21.py 相同）：工序和标准工时为算例值（单位：分/件，已含宽放）。相邻的几道工序组成一组，由 k 人共同承担，k = ⌈组内工时 ÷ 节拍⌉，组内工序可按件数拆给不同的人，人均负荷 = 组内工时 ÷ k。一组最多 4 人、4 道工序、2 种机器（手工不计）；自动分组按位置权重排定的顺序用动态规划切分，换专机后仍沿用原设备的顺序。实际周期 = 最大人均负荷，产量 = 60 ÷ 周期；平衡率 = 总工时 ÷（人数 × 周期）。各机种台数 = 每组 ⌈该机种工时 ÷ 周期⌉（不超过该组人数）之和。产量是按标准工时算的理论值，实际还要乘车间效率。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>结果</h3><div class="checks" id="checksA"></div></section>
+    <section class="panel"><h3>调整</h3>
+      <div class="prm">
+        <label for="tgt">目标产量（件/时）</label><input id="tgt" type="range" min="60" max="180" step="1" value="120"><output id="tgtv"></output>
+        <label for="imp">设备</label><select id="imp"><option value="0" selected>原设备</option><option value="1">开后袋用自动开袋机、绱腰头用绱腰机</option></select><output id="impv"></output>
+      </div>
+      <div class="row"><button id="one" type="button">一道工序一组</button><button id="auto" type="button">自动分组（动态规划）</button><button id="order" type="button">恢复默认顺序</button></div>
+    </section>
+    <section class="panel"><h3>各机种台数（不含备用机）</h3><div class="checks" id="machA"></div></section>
+  </div>
+</div>
+</div>
+<div class="page" id="pageB" hidden>
+<div class="grid">
+  <div class="col">
+    <section class="panel"><h3>人机作业图（画两个稳定循环；蓝 = 人在装卸，浅灰 = 人走动，橙 = 机器自动缝制，空白 = 等待）</h3><canvas id="gantt" width="1100" height="240" aria-label="人机作业图"></canvas></section>
+    <section class="panel"><h3>看机台数与每件成本（圆点为当前台数）</h3><canvas id="costc" width="1100" height="250" aria-label="每件成本"></canvas></section>
+    <section class="panel"><h3>一道缝的机器时间：从起针到剪线停稳（慢起针 3 针 400 r/min，剪线 300 r/min，加减速按第 14 章）</h3><canvas id="seam" width="1100" height="260" aria-label="缝纫时间"></canvas>
+      <div class="prm" style="margin-top:8px"><label for="stn">针数（针距 3 mm 时 100 cm 约 333 针）</label><input id="stn" type="range" min="10" max="600" step="1" value="333"><output id="stnv"></output>
+      <label for="nmx">最高转速（r/min）</label><input id="nmx" type="range" min="2500" max="6000" step="100" value="5000"><output id="nmxv"></output></div>
+      <div class="msg" id="seamtxt"></div></section>
+    <p class="note">模型（与本书 model21.py 相同）：一人看 n 台自动机（花样机、模板机等），每台每个循环要人装卸 a 分、走动 w 分，机器自动缝 t 分。周期 C = max(n(a+w), a+t)；人的利用率 = n(a+w)/C，机器利用率 = (a+t)/C；每件成本 =（人工 + n × 设备费率）× C ÷ n。工资 0.5 元/分、设备 0.08 元/分·台为算例值。一道缝的速度曲线与第 14 章 model14.py 相同。</p>
+  </div>
+  <div class="col">
+    <section class="panel"><h3>结果</h3><div class="checks" id="checksB"></div></section>
+    <section class="panel"><h3>调整</h3>
+      <div class="prm">
+        <label for="n">看机台数 n</label><input id="n" type="range" min="1" max="6" step="1" value="2"><output id="nv"></output>
+        <label for="a">每台装卸时间 a（分）</label><input id="a" type="range" min="0.1" max="0.8" step="0.05" value="0.3"><output id="av"></output>
+        <label for="t">自动缝制时间 t（分）</label><input id="t" type="range" min="0.2" max="2" step="0.05" value="0.9"><output id="tv"></output>
+        <label for="w">每台走动时间 w（分）</label><input id="w" type="range" min="0" max="0.3" step="0.01" value="0.05"><output id="wv"></output>
+        <label for="mr">设备费率（元/分·台）</label><input id="mr" type="range" min="0.02" max="0.3" step="0.01" value="0.08"><output id="mrv"></output>
+      </div>
+      <div class="row"><button id="resetB" type="button">恢复默认</button></div>
+    </section>
+  </div>
+</div>
+</div>
+<section class="panel" style="margin-top:14px"><h3>任务</h3><div id="tasks"></div><div class="msg" id="msg"></div></section>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function ctx(id){const c=$(id),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);return [c,g];}
+function tab(b){$('tabA').setAttribute('aria-selected',!b);$('tabB').setAttribute('aria-selected',b);$('pageA').hidden=b;$('pageB').hidden=!b;}
+$('tabA').onclick=()=>tab(false);$('tabB').onclick=()=>tab(true);
+// ---- model (model21.py) ----
+const OPS=[[1,'后片锁边','OL',0.45,[]],[2,'收后省','SN',0.40,[1]],[3,'开后袋','SN',1.20,[2]],[4,'后袋袋布缉合','SN',0.60,[3]],[5,'后袋口套结','BT',0.25,[4]],
+[6,'前片锁边','OL',0.45,[]],[7,'做斜插袋','SN',0.90,[6]],[8,'袋口压明线','SN',0.50,[7]],[9,'门襟里襟锁边','OL',0.35,[]],[10,'绱拉链','SN',0.70,[6,9]],[11,'门襟压明线','SN',0.55,[10]],
+[12,'合前后裆','OL',0.50,[5,11]],[13,'合侧缝','OL',0.80,[8,12]],[14,'侧缝压明线','SN',0.60,[13]],[15,'合下裆','OL',0.70,[14]],[16,'做串带','CS',0.25,[]],[17,'绱腰头','SN',1.30,[15,16]],
+[18,'做腰头两端','SN',0.60,[17]],[19,'钉串带','BT',0.55,[18]],[20,'卷裤脚','SN',0.55,[15]],[21,'锁眼','BH',0.20,[18]],[22,'钉扣','BS',0.20,[21]],[23,'剪线头检验','HD',0.60,[19,20,22]]];
+const MN={SN:'平缝机',OL:'包缝机',CS:'链缝机',BT:'套结机',BH:'锁眼机',BS:'钉扣机',HD:'手工',AP:'自动开袋机',WB:'绱腰机'};
+const IMP={3:['开后袋（自动开袋机）','AP',0.45],17:['绱腰头（绱腰机）','WB',0.80]};
+const MCOL={SN:'--nt',OL:'--bt',CS:'--win',BT:'--warn',BH:'--accent',BS:'--accent',HD:'--muted',AP:'--bad',WB:'--bad'};
+function ops(imp){const o={};OPS.forEach(([i,n,m,s,p])=>{if(imp&&IMP[i])[n,m,s]=IMP[i];o[i]={id:i,name:n,m,sam:s,pre:p};});return o;}
+function succW(by){const S={};for(const i in by)S[i]=new Set();for(const i in by)by[i].pre.forEach(p=>S[p].add(+i));const memo={};
+  const all=i=>{if(memo[i])return memo[i];let r=new Set();S[i].forEach(j=>{r.add(j);all(j).forEach(x=>r.add(x));});return memo[i]=r;};const W={};for(const i in by){let s=by[i].sam;all(+i).forEach(j=>s+=by[j].sam);W[i]=s;}return W;}
+function topo(by){const W=succW(by),done=[],s=new Set();const ids=Object.keys(by).map(Number);while(done.length<ids.length){const av=ids.filter(i=>!s.has(i)&&by[i].pre.every(p=>s.has(p)));
+  av.sort((a,b)=>(W[b]-W[a])||(a-b));done.push(av[0]);s.add(av[0]);}return done;}
+const types=(by,g)=>new Set(g.map(i=>by[i].m).filter(m=>m!=='HD'));
+function groups(by,seq,cuts,takt){const gs=[];let cur=[];seq.forEach((i,k)=>{cur.push(i);if(cuts.has(i)||k===seq.length-1){gs.push(cur);cur=[];}});
+  return gs.map(g=>{const ld=g.reduce((a,i)=>a+by[i].sam,0);return {ops:g,ld,k:Math.max(1,Math.ceil(ld/takt-1e-9))};});}
+function metrics(by,gs){const loads=gs.map(g=>g.ld/g.k),N=gs.reduce((a,g)=>a+g.k,0),mx=Math.max(...loads),T=Object.values(by).reduce((a,o)=>a+o.sam,0),mach={};
+  gs.forEach(g=>{const sm={};g.ops.forEach(i=>{const m=by[i].m;if(m!=='HD')sm[m]=(sm[m]||0)+by[i].sam;});for(const m in sm)mach[m]=(mach[m]||0)+Math.min(g.k,Math.ceil(sm[m]/mx-1e-9));});
+  return {N,mx,out:60/mx,bal:T/(N*mx),T,loads,mach};}
+function dp(by,seq,takt){const n=seq.length,best=new Array(n+1).fill(null),arg=new Array(n+1);best[0]=[0,0];
+  for(let j=1;j<=n;j++)for(let i=Math.max(0,j-4);i<j;i++){const g=seq.slice(i,j),ld=g.reduce((a,x)=>a+by[x].sam,0);if(types(by,g).size>2)continue;const k=Math.max(1,Math.ceil(ld/takt-1e-9));if(k>4||!best[i])continue;
+    const c=[best[i][0]+k,Math.max(best[i][1],ld/k)];if(!best[j]||c[0]<best[j][0]||(c[0]===best[j][0]&&c[1]<best[j][1]-1e-12)){best[j]=c;arg[j]=i;}}
+  const cuts=new Set();let j=n;while(j>0){cuts.add(seq[j-1]);j=arg[j];}return cuts;}
+// ---- page A ----
+const A={tgt:120,imp:0,seq:null,cuts:new Set()};let RA=null;
+function by(){return ops(A.imp);}
+function reset1(){A.cuts=new Set(A.seq);}
+function changedA(){const b=by(),takt=60/A.tgt,gs=groups(b,A.seq,A.cuts,takt),m=metrics(b,gs);
+  const badT=gs.filter(g=>types(b,g.ops).size>2).length,badK=gs.filter(g=>g.k>4||g.ops.length>4).length;RA={b,takt,gs,m,ok:!badT&&!badK};
+  $('tgt').value=A.tgt;$('tgtv').textContent=A.tgt;$('imp').value=A.imp;$('impv').textContent=A.imp?'专机':'原设备';
+  const th=Math.ceil(m.T/takt-1e-9);
+  const C=[{n:'节拍 = 60 ÷ 目标产量',v:takt.toFixed(3)+' 分',ok:true},{n:'总工时 / 理论最少人数',v:`${m.T.toFixed(2)} 分 / ${th} 人`,ok:true},
+   {n:'人数（组数）',v:`${m.N} 人（${gs.length} 组）`,ok:true},{n:'实际周期（最高人均负荷）',v:m.mx.toFixed(3)+' 分',ok:m.mx<=takt+1e-9},
+   {n:'产量',v:m.out.toFixed(1)+' 件/时',ok:m.out>=A.tgt-1e-6,bad:'人均负荷最高的组限制了产量'},{n:'平衡率',v:(m.bal*100).toFixed(1)+'%',ok:m.bal>=0.85,bad:'平衡损失 = 1 − 平衡率：大家在等最慢的组'},
+   {n:'人均产量',v:(m.out/m.N).toFixed(2)+' 件/人·时',ok:true},{n:'分组规则（≤ 4 人、≤ 4 道工序、≤ 2 种机器）',v:RA.ok?'符合':`${badT+badK} 组不符合`,ok:RA.ok,bad:'组内机器种类太多，或一组人太多'}];
+  renderChecks('checksA',C);const tm=Object.values(m.mach).reduce((a,b)=>a+b,0);
+  $('machA').innerHTML=Object.entries(m.mach).map(([k,v])=>`<div><span class="sw" style="background:${css(MCOL[k])}"></span><span>${MN[k]}</span><b>${v} 台</b></div>`).join('')+`<div><span></span><span>合计 / 人机比（台数 ÷ 人数）</span><b>${tm} 台 / ${(tm/m.N).toFixed(2)}</b></div>`;
+  drawBal();list();noteA();checkTasks();}
+function renderChecks(id,C){$(id).innerHTML=C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${c.n}${(!c.ok&&c.bad)?`<small>${c.bad}</small>`:''}</span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');}
+function drawBal(){const [c,g]=ctx('bal'),W=c.width,H=c.height,x0=56,x1=W-16,y0=16,y1=H-46,{gs,m,takt,b}=RA;const vm=Math.max(takt,m.mx)*1.25,Y=v=>y1-(y1-y0)*v/vm;
+  g.font='12px '+css('--f-body');g.strokeStyle=css('--rule');g.fillStyle=css('--muted');for(let v=0;v<=vm;v+=0.1){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.textAlign='end';g.fillText(v.toFixed(1),x0-6,Y(v)+4);}
+  const tot=m.N,pw=(x1-x0)/tot;let x=x0;gs.forEach((gr,gi)=>{const w=pw*gr.k;let y=y1;gr.ops.forEach(i=>{const h=(y1-y0)*b[i].sam/gr.k/vm;g.fillStyle=css(MCOL[b[i].m]);g.globalAlpha=.85;g.fillRect(x+2,y-h,w-4,h-1);g.globalAlpha=1;
+      if(h>13&&w>34){g.fillStyle='#fff';g.textAlign='center';g.font='11px '+css('--f-body');g.fillText(b[i].name.slice(0,Math.max(2,Math.floor(w/12))),x+w/2,y-h/2+4);}y-=h;});
+    g.fillStyle=css('--muted');g.textAlign='center';g.font='11px '+css('--f-body');g.fillText(`组${gi+1}`,x+w/2,y1+14);g.fillText(`${gr.k}人`,x+w/2,y1+28);x+=w;});
+  g.strokeStyle=css('--bad');g.setLineDash([6,4]);g.lineWidth=1.5;g.beginPath();g.moveTo(x0,Y(takt));g.lineTo(x1,Y(takt));g.stroke();g.setLineDash([]);
+  g.strokeStyle=css('--ink');g.beginPath();g.moveTo(x0,Y(m.mx));g.lineTo(x1,Y(m.mx));g.stroke();g.font='12px '+css('--f-body');g.textAlign='start';g.fillStyle=css('--bad');g.fillText(`节拍 ${takt.toFixed(3)}`,x0+4,Y(takt)-5);
+  g.fillStyle=css('--ink');g.textAlign='end';g.fillText(`周期 ${m.mx.toFixed(3)}`,x1-4,Y(m.mx)-5);g.textAlign='start';g.fillStyle=css('--muted');g.fillText('人均负荷（分/件）；横向宽度按人数',x0+4,y0+2);}
+function canUp(k){if(k<=0)return false;const b=by(),i=A.seq[k],j=A.seq[k-1];return !b[i].pre.includes(j);}
+function list(){const {b,gs}=RA;let h='<tr><th>序</th><th>工序</th><th>机种</th><th>工时</th><th>前道</th><th></th></tr>';let k=0;
+  gs.forEach((gr,gi)=>{const ty=types(b,gr.ops).size;h+=`<tr class="gh"><td colspan="6">组 ${gi+1}：${gr.k} 人，组内工时 ${gr.ld.toFixed(2)} 分，人均 ${(gr.ld/gr.k).toFixed(3)} 分${ty>2?' <span class="bad">机器种类超过 2</span>':''}${gr.k>4?' <span class="bad">超过 4 人</span>':''}${gr.ops.length>4?' <span class="bad">超过 4 道工序</span>':''}</td></tr>`;
+    gr.ops.forEach(i=>{const o=b[i],last=k===A.seq.length-1;h+=`<tr><td class="num">${o.id}</td><td>${o.name}</td><td><span class="sw" style="background:${css(MCOL[o.m])}"></span>${MN[o.m]}</td><td class="num">${o.sam.toFixed(2)}</td><td>${o.pre.join('、')||'—'}</td><td><button data-up="${k}" ${canUp(k)?'':'disabled'} type="button" aria-label="上移">↑</button> <button data-up="${k+1}" ${(k<A.seq.length-1&&canUp(k+1))?'':'disabled'} type="button" aria-label="下移">↓</button> ${last?'':`<button data-cut="${i}" type="button" class="${A.cuts.has(i)?'cut':''}">${A.cuts.has(i)?'合并到下一组':'在此分组'}</button>`}</td></tr>`;k++;});});
+  $('oplist').innerHTML=h;
+  $('oplist').querySelectorAll('[data-up]').forEach(e=>e.onclick=()=>{const k=+e.dataset.up;[A.seq[k-1],A.seq[k]]=[A.seq[k],A.seq[k-1]];changedA();});
+  $('oplist').querySelectorAll('[data-cut]').forEach(e=>e.onclick=()=>{const i=+e.dataset.cut;A.cuts.has(i)?A.cuts.delete(i):A.cuts.add(i);changedA();});}
+$('tgt').addEventListener('input',()=>{A.tgt=+$('tgt').value;changedA();});
+$('imp').addEventListener('input',()=>{A.imp=+$('imp').value;changedA();});
+$('one').onclick=()=>{reset1();changedA();};
+$('auto').onclick=()=>{A.cuts=dp(by(),A.seq,60/A.tgt);changedA();};
+$('order').onclick=()=>{A.seq=topo(ops(0));reset1();changedA();};
+// ---- page B ----
+const WAGE=0.5;const STDB={n:2,a:0.3,t:0.9,w:0.05,mr:0.08,stn:333,nmx:5000};const B={...STDB};let RB=null;
+function mm(n,a,t,w,mr){const C=Math.max(n*(a+w),a+t);return {C,out:60*n/C,uo:n*(a+w)/C,um:(a+t)/C,cost:(WAGE+n*mr)*C/n};}
+const ALPHA=(2.5+0.15)/6e-4;
+function seamTime(st,nmax,nsoft=400,ks=3,ntrim=300){const al=ALPHA*0.6,dt=2e-4;let th=0,w=nsoft*2*Math.PI/60,t=0;const wm=nmax*2*Math.PI/60,wt=ntrim*2*Math.PI/60;let ph='soft';
+  for(let it=0;it<1e6;it++){const s=th/(2*Math.PI);if(ph==='soft'&&s>=ks)ph='run';
+    if(ph==='run'){const rem=(st-1)*2*Math.PI-th;if((w*w-wt*wt)/(2*al)>=rem)ph='dec';else w=Math.min(wm,w+al*dt);}
+    if(ph==='dec'){w=Math.max(wt,w-al*dt);if(th>=(st-1)*2*Math.PI)ph='trim';}
+    if(ph==='trim'&&th>=st*2*Math.PI+55*Math.PI/180)ph='stop';
+    if(ph==='stop'){w=Math.max(0,w-ALPHA*dt);if(w===0)return t;}th+=w*dt;t+=dt;}return t;}
+function changedB(){const r=mm(B.n,B.a,B.t,B.w,B.mr);let bn=1,bc=1e9;for(let n=1;n<=6;n++){const c=mm(n,B.a,B.t,B.w,B.mr).cost;if(c<bc-1e-12){bc=c;bn=n;}}
+  const nid=(B.a+B.t)/(B.a+B.w);const t4=seamTime(B.stn,4000),tx=seamTime(B.stn,B.nmx);RB={r,bn,bc,nid,t4,tx};
+  const C=[{n:'周期 C',v:r.C.toFixed(2)+' 分',ok:true},{n:'产量（n 台合计）',v:r.out.toFixed(1)+' 件/时',ok:true},{n:'人的利用率 / 机器利用率',v:`${(r.uo*100).toFixed(0)}% / ${(r.um*100).toFixed(0)}%`,ok:true},
+   {n:'每件成本',v:r.cost.toFixed(3)+' 元',ok:B.n===bn,bad:`当前参数下 ${bn} 台最省（${bc.toFixed(3)} 元）`},{n:'人和机器都不等待的台数 (a+t)/(a+w)',v:nid.toFixed(2),ok:true},
+   {n:'一道缝：4000 r/min / 当前转速',v:`${t4.toFixed(2)} / ${tx.toFixed(2)} s`,ok:true}];renderChecks('checksB',C);
+  for(const k of ['n','a','t','w','mr','stn','nmx']){$(k).value=B[k];$(k+'v').textContent=(k==='n'||k==='stn'||k==='nmx')?B[k]:B[k].toFixed(2);}
+  const save=t4-tx;$('seamtxt').textContent=`${B.stn} 针的一道缝，最高转速从 4000 提到 ${B.nmx} r/min 节省 ${save.toFixed(2)} s（${(save/t4*100).toFixed(0)}%）；若这道工序的标准工时是 36 s，只占 ${(save/36*100).toFixed(1)}%。`;
+  drawGantt();drawCost();drawSeam();noteB();checkTasks();}
+function drawGantt(){const [c,g]=ctx('gantt'),W=c.width,H=c.height,x0=90,x1=W-16,y0=14,{r}=RB;const span=Math.max(r.C*2,0.5),X=t=>x0+(x1-x0)*t/span;const rows=B.n+1,rh=Math.min(36,(H-50)/rows);
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';for(let t=0;t<=span+1e-9;t+=span>3?0.5:0.2)g.fillText(t.toFixed(1),X(t),H-14);g.fillText('时间（分），画两个循环',(x0+x1)/2,H-1);
+  const bar=(row,t0,t1,col)=>{t0=Math.max(0,t0);t1=Math.min(span,t1);if(t1<=t0)return;g.fillStyle=css(col);g.fillRect(X(t0),y0+row*rh+4,X(t1)-X(t0),rh-8);};
+  g.textAlign='end';g.fillStyle=css('--ink');g.fillText('操作工',x0-8,y0+rh/2+4);for(let i=0;i<B.n;i++)g.fillText(`机器 ${i+1}`,x0-8,y0+(i+1)*rh+rh/2+4);
+  for(let cy=-1;cy<3;cy++){const base=cy*r.C;for(let i=0;i<B.n;i++){const s=base+i*(B.a+B.w);bar(0,s,s+B.a,'--nt');g.globalAlpha=.5;bar(0,s+B.a,s+B.a+B.w,'--rule');g.globalAlpha=1;bar(i+1,s,s+B.a,'--nt');bar(i+1,s+B.a,s+B.a+B.t,'--bt');}}
+  g.strokeStyle=css('--rule');for(let k=0;k<=2;k++){g.beginPath();g.moveTo(X(k*r.C),y0);g.lineTo(X(k*r.C),y0+rows*rh);g.stroke();}}
+function drawCost(){const [c,g]=ctx('costc'),W=c.width,H=c.height,x0=60,x1=W-16,y0=14,y1=H-36;const v=[];for(let n=1;n<=6;n++)v.push(mm(n,B.a,B.t,B.w,B.mr).cost);const vm=Math.max(...v)*1.15,X=n=>x0+(x1-x0)*(n-0.5)/6,Y=y=>y1-(y1-y0)*y/vm;
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.textAlign='center';for(let n=1;n<=6;n++){g.fillText(n+' 台',X(n),H-16);}g.fillText('看机台数',(x0+x1)/2,H-1);
+  g.textAlign='end';for(let k=0;k<=4;k++){const y=vm*k/4;g.fillText(y.toFixed(2),x0-6,Y(y)+4);}
+  g.strokeStyle=css('--accent');g.lineWidth=2;g.beginPath();v.forEach((y,i)=>{const q=[X(i+1),Y(y)];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();
+  v.forEach((y,i)=>{g.fillStyle=(i+1===B.n)?css('--bad'):css('--accent');g.beginPath();g.arc(X(i+1),Y(y),(i+1===B.n)?7:4,0,7);g.fill();g.fillStyle=css('--ink');g.textAlign='center';g.fillText(y.toFixed(3),X(i+1),Y(y)-10);});
+  g.textAlign='start';g.fillStyle=css('--muted');g.fillText('每件成本（元）',x0+4,y0+4);}
+function drawSeam(){const [c,g]=ctx('seam'),W=c.width,H=c.height,x0=60,x1=W-16,y0=14,y1=H-36,smax=600;const P=[];for(let s=10;s<=smax;s+=20)P.push([s,seamTime(s,4000),seamTime(s,B.nmx)]);const vm=Math.max(...P.map(p=>p[1]))*1.1,X=s=>x0+(x1-x0)*s/smax,Y=t=>y1-(y1-y0)*t/vm;
+  g.font='12px '+css('--f-body');g.fillStyle=css('--muted');g.strokeStyle=css('--rule');for(let t=0;t<=vm;t+=2){g.beginPath();g.moveTo(x0,Y(t));g.lineTo(x1,Y(t));g.stroke();g.textAlign='end';g.fillText(t+' s',x0-6,Y(t)+4);}
+  g.textAlign='center';for(let s=0;s<=smax;s+=100)g.fillText(s,X(s),H-16);g.fillText('针数',(x0+x1)/2,H-1);
+  const line=(k,col,dash)=>{g.strokeStyle=css(col);g.setLineDash(dash);g.lineWidth=2;g.beginPath();P.forEach((p,i)=>{const q=[X(p[0]),Y(p[k])];i?g.lineTo(...q):g.moveTo(...q);});g.stroke();g.setLineDash([]);};
+  line(1,'--muted',[6,4]);line(2,'--accent',[]);g.textAlign='start';g.fillStyle=css('--muted');g.fillText('虚线 4000 r/min',x0+8,y0+6);g.fillStyle=css('--accent');g.fillText(`实线 ${B.nmx} r/min`,x0+130,y0+6);
+  g.fillStyle=css('--bad');g.beginPath();g.arc(X(B.stn),Y(RB.tx),6,0,7);g.fill();}
+for(const k of ['n','a','t','w','mr','stn','nmx'])$(k).addEventListener('input',()=>{B[k]=+$(k).value;changedB();});$('resetB').onclick=()=>{Object.assign(B,STDB);changedB();};
+// ---- tasks ----
+const seen={a:false,b:false,c:false,d:false,e:false};
+function noteA(){const {m}=RA;if(!RA.ok)return;
+  if(!A.imp&&m.out>=120-1e-6&&m.N<=28)seen.a=true;
+  if(!A.imp&&m.out>=100-1e-6&&m.N<=24)seen.b=true;
+  if(A.imp&&m.out>=120-1e-6&&m.N<=25)seen.c=true;}
+function noteB(){if(Math.abs(B.a-0.3)<1e-9&&Math.abs(B.t-0.9)<1e-9&&Math.abs(B.w-0.05)<1e-9&&Math.abs(B.mr-0.08)<1e-9&&B.n===RB.bn)seen.d=true;
+  if(Math.abs(B.a-0.3)<1e-9&&Math.abs(B.t-0.6)<1e-9&&Math.abs(B.w-0.05)<1e-9&&Math.abs(B.mr-0.08)<1e-9&&B.n===RB.bn)seen.e=true;}
+const TASKS=[{t:'第①页：原设备，产量达到 120 件/时，人数不超过 28 人，分组符合规则。',d:'先点“一道工序一组”看看要多少人，再点“自动分组”：29 人。自动分组只切分、不改顺序；在不违反前道关系的前提下用 ↑↓ 调换工序，比如把不受约束的“做串带”移到几道锁边旁边。',ok:()=>seen.a},
+ {t:'第①页：原设备，产量达到 100 件/时，人数不超过 24 人。',d:'节拍变成 0.6 分以后，原来合适的分组还合适吗？自动分组要 25 人，再调整顺序试试。',ok:()=>seen.b},
+ {t:'第①页：换上自动开袋机和绱腰机，用不超过 25 人做到 120 件/时。',d:'28.8 节案例用 26 人做到 120 件/时；调整工序顺序还能再省一人。',ok:()=>seen.c},
+ {t:'第②页：在默认参数下（a = 0.3、t = 0.9、w = 0.05、设备 0.08 元/分），选出每件成本最低的看机台数。',d:'比较人和机器的利用率：台数多了，谁在等谁？',ok:()=>seen.d},
+ {t:'第②页：把自动缝制时间缩短到 0.6 分（例如提高花样机转速），重新找出每件成本最低的台数。',d:'机器变快了，一个人能看的台数反而变少，为什么？',ok:()=>seen.e}];
+const done=new Set();
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});$('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?'✓ 完成':'○ 未完成'}</span> ${k.t}<small>${k.d}</small></div>`).join('');}
+A.seq=topo(ops(0));reset1();
+window.__api={A,B,changedA,changedB,evalA:()=>RA,evalB:()=>RB,done,seen,dp,topo,ops,metrics,groups,seamTime,mm,tab};
+changedA();changedB();
+})();
+</script><a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

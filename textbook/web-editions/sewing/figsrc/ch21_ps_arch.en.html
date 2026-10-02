@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.col h4{margin:0 0 8px;font-size:14px;color:#5a6570;letter-spacing:.05em}
+.col .box{margin-bottom:10px;text-align:left}
+.box b{font-size:14.5px}
+.box span.id{display:inline;font-size:11.5px}
+.id{font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:11.5px;color:#5a6570}
+.bus{margin-top:6px;border:2px dashed #14797f;border-radius:10px;padding:8px 12px;font-size:13px;color:#0f6e74;text-align:center;background:#e6f3f3}
+.legend{display:flex;gap:18px;font-size:12.5px;color:#5a6570;margin-top:12px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+</style>
+<div class="fig" style="--w:1120px">
+<p class="title">Make-up of the pattern-sewer prototype WQ-SC/PS</p>
+<p class="sub">Illustrative. Left: mechanics (home-built X–Y table + an existing lockstitch head); centre: drives and actuators; right: control and networking. IDs marked * are proposed IDs, planned for the library</p>
+<div class="grid">
+<div class="col"><h4>Mechanics (travel 300 × 200 mm)</h4>
+<div class="box o fill-o"><b>X axis: clamp carriage</b><span>Ball screw 16×10 <span class="id">A-BSC-SFU</span>; size-15 linear guide <span class="id">A-LGD-RAIL</span>; motor via 1:1 timing belt <span class="id">A-PUL-HTD 3M-20</span>; moving mass ≈ 4 kg</span></div>
+<div class="box g fill-g"><b>Y axis: beam (carries the whole X axis)</b><span>Same sizes, two guide rails; moving mass ≈ 12 kg</span></div>
+<div class="box"><b>Clamp and template</b><span>Upper and lower template plates, 2 double-acting cylinders <span class="id">D-PNU-CYL*</span>, reed switches confirm clamping</span></div>
+<div class="box"><b>Lockstitch head (existing)</b><span>Feed dog removed; intermediate presser foot, trimmer and wiper added (as on WQ-SC/LS)</span></div>
+</div>
+<div class="col"><h4>Drives and actuators</h4>
+<div class="box b fill-b"><b>Spindle servo + encoder</b><span>Same module as the lockstitch prototype <span class="id">D-MOT-PMSM* / D-DRV-SERVO*</span>, 2500 lines with index</span></div>
+<div class="box o"><b>X, Y servos 400 W ×2</b><span><span class="id">D-MOT-PMSM* + D-DRV-SERVO*</span>, CAN FD, position mode, 10 000 counts/rev → 1 μm</span></div>
+<div class="box p"><b>Solenoids ×3</b><span>Trimmer, wiper, tension release <span class="id">D-SOL-PUSH*</span>; driver <span class="id">D-DRV-SOL*</span> (boost + chopped hold + Zener clamp)</span></div>
+<div class="box y"><b>Solenoid valves ×3</b><span>Clamp left, clamp right, presser-foot lift <span class="id">D-PNU-VLV*</span></span></div>
+<div class="box"><b>Sensors</b><span>X, Y home and limits <span class="id">D-SNS-PROX*</span>; thread-break photocell <span class="id">D-SNS-PE*</span>; air-pressure switch; E-stop</span></div>
+</div>
+<div class="col"><h4>Control and networking</h4>
+<div class="box k fill-k"><b>WQ-SC main controller</b><span><span class="id">D-CTL-WQSC*</span>: spindle-encoder input and angle interrupts; 1 ms X–Y interpolation; pattern parsing and look-ahead</span></div>
+<div class="box"><b>CAN FD I/O expander</b><span><span class="id">D-IO-EXP*</span>: valves, sensors, buttons</span></div>
+<div class="box t"><b>Gateway</b><span><span class="id">D-GW-WQSC*</span>: web parameters, pattern download; MQTT to wq/sewing/…</span></div>
+<div class="box"><b>Pedal / start button, touch panel (optional)</b><span><span class="id">D-SNS-HALL* / D-HMI-PANEL*</span></span></div>
+<div class="box"><b>Power</b><span>48 V / 24 V switch-mode supplies <span class="id">D-PSU-SMPS*</span>; 220 V AC for the servos</span></div>
+</div>
+</div>
+<div class="bus">CAN FD bus: controller ⇄ spindle drive ⇄ X drive ⇄ Y drive ⇄ I/O expander; the spindle encoder's differential A/B/Z goes straight to the controller (the angle reference never travels over the bus)</div>
+<div class="legend"><span><i style="background:#fcefe8;border:2px solid #e0662f"></i>X axis</span><span><i style="background:#eaf6ee;border:2px solid #2e9e5b"></i>Y axis</span><span><i style="background:#e9f0fc;border:2px solid #2a6fdb"></i>shared with the lockstitch prototype</span><span>* proposed ID, planned for the library</span></div>
+</div>

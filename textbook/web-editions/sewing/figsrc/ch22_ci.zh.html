@@ -1,0 +1,41 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="../fig_base.css">
+<style>
+.lane{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center;margin-bottom:14px}
+.lane>.tag{font-weight:700;font-size:14px}.lane>.tag small{display:block;font-weight:400;color:#5a6570;font-size:12px}
+.flow{display:flex;align-items:stretch;gap:0}
+.flow .box{flex:1;font-size:12.5px;padding:8px 8px}
+.flow .ar{width:28px;display:flex;align-items:center;justify-content:center;color:#5a6570;font-size:20px;flex:none}
+.bud{display:flex;height:34px;border-radius:6px;overflow:hidden;font-size:11.5px;color:#fff;font-weight:700}
+.bud div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;border-right:1px solid #faf9f5}
+.bl{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center;margin-top:8px;font-size:12.5px}
+</style>
+<div class="fig" style="--w:1300px">
+<p class="title">持续集成：每一次改固件都自动测</p><p class="sub">越快的测试跑得越勤；越慢的测试放到晚上和周末。任何一层失败，后面的层都不跑，版本不能合并或发布（示意值）</p>
+<div class="lane"><div class="tag">每次推送<small>约 12 min，失败不准合并</small></div><div class="flow">
+<div class="box k fill-k"><b>提交</b><span>代码 + 参数表 + 用例</span></div><div class="ar">→</div>
+<div class="box"><b>编译</b><span>交叉编译固件 + 主机版，2 min</span></div><div class="ar">→</div>
+<div class="box g fill-g"><b>单元测试</b><span>≈400 个，1 min</span></div><div class="ar">→</div>
+<div class="box b fill-b"><b>SIL</b><span>≈60 个，8 min；含参数扫描</span></div><div class="ar">→</div>
+<div class="box k"><b>合并到主干</b><span>固件包带版本号</span></div></div></div>
+<div class="lane"><div class="tag">每晚 02:00<small>预算 4 h，2 套 HIL 台架</small></div><div class="flow">
+<div class="box"><b>取主干最新版</b><span>刷写到 HIL 台架主控</span></div><div class="ar">→</div>
+<div class="box p fill-p" style="flex:1.6"><b>HIL 回归用例</b><span>剪线扫描、停针统计、电磁铁、故障注入、回针、X–Y、选针……≤ 4 h</span></div><div class="ar">→</div>
+<div class="box t fill-t"><b>报告上总线</b><span>…/measurement → 历史库、看板</span></div><div class="ar">→</div>
+<div class="box o fill-o" style="flex:1.3"><b>失败 → 自动二分</b><span>只重跑失败用例，在当天的提交里找出第一个坏提交，通知作者</span></div></div></div>
+<div class="lane"><div class="tag">每周 / 候选版本<small>约 2 天，整机测试台</small></div><div class="flow">
+<div class="box"><b>候选版本</b><span>连续 5 晚 HIL 全绿</span></div><div class="ar">→</div>
+<div class="box y fill-y" style="flex:1.6"><b>整机测试台</b><span>4 种原型各跑：4 h 最高转速长跑、1000 次真剪线、相机看回针与线迹</span></div><div class="ar">→</div>
+<div class="box k fill-k" style="flex:1.3"><b>发布</b><span>固件版本号 + 参数版本号、签名；随原型上报数字工厂</span></div></div></div>
+<div class="bl"><div class="tag" style="font-weight:700">每晚 240 min 怎么分<br><small style="font-weight:400;color:#5a6570">（22.7 节，示意）</small></div>
+<div class="bud">
+<div style="width:33.3%;background:#c4531d">剪线转速扫描 80</div>
+<div style="width:14.6%;background:#7444b4">故障注入 35</div>
+<div style="width:18.8%;background:#2a5fb8">X–Y 跟随 45</div>
+<div style="width:16.7%;background:#0f6e74">选针时序 40</div>
+<div style="width:8.3%;background:#1f8a4c">回针 20</div>
+<div style="width:4.2%;background:#a8740c">电磁铁</div>
+<div style="width:2.5%;background:#1b2430">停</div>
+<div style="width:1.6%;background:#9aa4ae"></div>
+</div></div>
+<p class="note">注：最后两格为停针统计 6 min 和余量 4 min。每晚的用例按“风险 × 能抓住的缺陷 ÷ 时间”排序挑选；超出预算的（如 2 h 浸泡试验）放到周末。二分时只跑那一个失败的用例，23 个提交约 5 轮。</p>
+</div>
