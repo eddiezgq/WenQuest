@@ -2,7 +2,7 @@
 
 2026-10-01 · 承接：第 9 轮（演示工厂的做法）、第 8 轮（企业版）
 
-> 状态：**草稿，待 Eddie 确认**
+> 状态：**已确认（2026-10-01，Eddie：“确认，开始”）；施工中**
 
 ## 一、Eddie 的要求（2026-10-01）
 
@@ -41,7 +41,12 @@
 
 ## 五、实施记录
 
-（待确认后开工）
+- 第 1 步（班级工厂）：`factory/deploy/classes.yaml`（先写一个 `pilot` 试点班）；`deploy/classes.py` 按它生成 `docker-compose.classes.yml`（每班 bus/hub/sim/bridge/erp-frontend 五个服务，历史库 `wq_c_<编号>`，ERPNext 站点 `c-<编号>`）和编号表 `classes.ids`，部署时生成并随部署文件拷到服务器；`deploy/lib.sh` 把第 9 轮演示工厂的建站步骤整理成通用的 `site_setup`，演示工厂和班级工厂共用（演示工厂的 .env 名字不变）；`update.sh` 先补各班工作台密钥，再逐班 `class_setup`（新建要可用内存 ≥ 0.9 GB，失败不影响其他工厂）；服务器上 `dc` 自动带上 `docker-compose.classes.yml`。删掉一行时 `--remove-orphans` 只停掉这班的容器，数据（历史库、ERPNext 站点）保留。
+- 枢纽：`/api/caddy/ask`（公共工厂回答 Caddy 某个 `<编号>.factory/erp` 是否已建）、`WQ_CLASS_TEACHERS`（班级任课老师按老师对待）、`WQ_FACTORY_NAME`（顶栏显示“问渠减速器厂（试点班）”）。学习平台 Caddy：`*.factory`、`*.erp` 两个通配网址，按需申请证书（先问枢纽），按网址第一段转到这班的服务。
+- “服务器演练”加“班级工厂”：生成 pilot 的配置（端口开到本机）→ `class_setup pilot` → 对 pilot 跑完整实验 7 闭环（真 ERPNext 的 c-pilot 站点）。演练时限 75 → 110 分钟。
+- 第 3 步（SolidWorks）：`freecad/wq_submit_solidworks.swb`（文本宏，“工具 → 宏 → 运行”）：导出 STEP、同名工程图已打开时导出 PDF、问物料编号和改动说明、上传到 `/api/plm/submit`；物料编号记在文件属性 `WQ_Item` 里。**宏里的提示用英文**（只用 ASCII 字符，在任何语言的 Windows 上都不乱码）——与细则的偏差。宏包改名“我的 CAD 宏包”，多一个 `SolidWorks/` 文件夹，使用说明加 SolidWorks 三步。
+- 测试：`test_class_factory_bits`；宏包测试加 SolidWorks 宏（地址、凭证已填）。全部 71 项通过。
+
 
 ## 六、需要 Eddie 做的
 

@@ -36,7 +36,7 @@
     <main class="main">
       <header class="top">
         <div class="title">
-          <b>问渠减速器厂 · {{ pageName }}</b>
+          <b>问渠减速器厂{{ cfg.factory_name ? "（" + cfg.factory_name + "）" : "" }} · {{ pageName }}</b>
           <small>{{ clock }} · 第 1 班（08:00–17:00）· 数据实时刷新</small>
         </div>
         <div class="modes" role="group" aria-label="模式">

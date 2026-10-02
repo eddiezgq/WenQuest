@@ -15,6 +15,10 @@ APP="${1:-}"; BRIDGE="${2:-}"
 [ -n "$(envval WQ_ERP_OAUTH_SECRET)" ] || envset WQ_ERP_OAUTH_SECRET "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # 企业版演示工厂（第 9 轮）的工作台密钥：启动前要有
 [ -n "$(envval WQ_DEMO_SECRET)" ] || envset WQ_DEMO_SECRET "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 || true)"
+for id in $(class_ids); do                 # 班级工厂（第 10 轮）的工作台密钥
+    k="WQ_C_$(printf '%s' "$id" | tr '[:lower:]' '[:upper:]')_SECRET"
+    [ -n "$(envval "$k")" ] || envset "$k" "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 || true)"
+done
 
 if [ "$(envval FACTORY_INSTALLED)" != 1 ]; then
     # D1：ERPNext 加数字工厂约需 3 GB 内存。不够就停下，提示升级服务器，免得拖垮学习平台
@@ -68,6 +72,17 @@ for _ in $(seq 1 40); do
             else
                 log "警告：演示工厂没有配置完成（不影响教学工厂，下次部署再试）"
             fi
+            # 班级（小组）工厂（第 10 轮）：按 classes.yaml 逐个建好；新建的要可用内存够
+            for id in $(class_ids); do
+                avail=$(awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo)
+                if [ "$avail" -lt "${CLASS_MIN_MEM_MB:-900}" ] && ! dc exec -T erp-backend test -d "sites/c-$id"; then
+                    log "警告：可用内存只有 ${avail} MB，班级工厂 $id 暂不建（需要约 0.9 GB）。请把服务器升到 16 GB 后重新部署。"
+                elif bash -c ". '$(dirname "$0")/lib.sh'; class_setup '$id'"; then
+                    log "班级工厂 $id 已就绪：https://$id.factory.$(envval SITE_DOMAIN)"
+                else
+                    log "警告：班级工厂 $id 没有配置完成（不影响其他工厂，下次部署再试）"
+                fi
+            done
         fi
         docker image prune -f >/dev/null
         "$(dirname "$0")/status.sh" || true

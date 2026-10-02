@@ -64,11 +64,11 @@
         <div v-if="drawing" class="drawing"><img :src="drawing" alt="最新版零件图"></div>
       </section>
       <section class="card side">
-        <div class="card-head"><h2>进阶：用桌面 FreeCAD 发布（选做）</h2></div>
-        <p class="small muted">上面的“在线设计”不用装任何软件。想学真 CAD 的同学，可以装 FreeCAD 1.1 后用宏包发布，效果相同：</p>
+        <div class="card-head"><h2>进阶：用桌面 CAD 发布（选做）</h2></div>
+        <p class="small muted">上面的“在线设计”不用装任何软件。想学真 CAD 的同学，可以用 FreeCAD 1.1 或 SolidWorks 的宏发布，效果相同（SolidWorks 步骤见宏包里的使用说明）：</p>
         <ol class="small steps">
           <li>安装 <a href="https://www.freecad.org/downloads.php" target="_blank" rel="noopener">FreeCAD 1.1</a>。</li>
-          <li><button class="btn ghost small" :disabled="packBusy" @click="downloadPack">{{ packBusy ? '正在打包…' : '下载我的 FreeCAD 宏包' }}</button>
+          <li><button class="btn ghost small" :disabled="packBusy" @click="downloadPack">{{ packBusy ? '正在打包…' : '下载我的 CAD 宏包' }}</button>
             解压到任意文件夹（工作台地址和你的登录凭证已填好，7 天有效）。</li>
           <li>FreeCAD：宏 → 宏…，把“用户宏的位置”设为这个文件夹。</li>
           <li>编辑 <span class="mono">wq_shaft.py</span> 的 <span class="mono">PARAMS</span>（例如键槽长 45 → 42）并保存，再执行 <span class="mono">wq_publish.py</span>。</li>

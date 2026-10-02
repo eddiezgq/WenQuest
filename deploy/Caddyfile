@@ -1,6 +1,10 @@
 # Caddy obtains and renews HTTPS certificates automatically once DNS points at this server.
 {
 	email {$ACME_EMAIL}
+	# 数字工厂班级工厂（第 10 轮）：<编号>.factory / <编号>.erp 按需申请证书，先问数字工厂枢纽这个编号是否已建
+	on_demand_tls {
+		ask http://wqf-hub:8100/api/caddy/ask
+	}
 }
 
 (security_headers) {
@@ -108,6 +112,40 @@ demo-erp.{$SITE_DOMAIN} {
 		max_size 60MB
 	}
 	reverse_proxy wqf-erp-demo:8080 {
+		transport http {
+			read_timeout 300s
+		}
+	}
+}
+
+# 数字工厂班级（小组）工厂（第 10 轮）：每个班一座独立的教学工厂，编号在 factory/deploy/classes.yaml
+*.factory.{$SITE_DOMAIN} {
+	tls {
+		on_demand
+	}
+	import security_headers
+	encode zstd gzip
+	request_body {
+		max_size 60MB
+	}
+	handle /mqtt* {
+		reverse_proxy wqf-bus-c-{labels.3}:9001
+	}
+	handle {
+		reverse_proxy wqf-hub-c-{labels.3}:8100
+	}
+}
+
+*.erp.{$SITE_DOMAIN} {
+	tls {
+		on_demand
+	}
+	import security_headers
+	encode zstd gzip
+	request_body {
+		max_size 60MB
+	}
+	reverse_proxy wqf-erp-c-{labels.3}:8080 {
 		transport http {
 			read_timeout 300s
 		}

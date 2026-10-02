@@ -60,7 +60,7 @@ jobs:
     name: 服务器演练（真 ERPNext）
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 110
     env:
       FACTORY_DIR: /tmp/fac
       LEARN_DIR: /tmp/nolearn
@@ -140,6 +140,34 @@ jobs:
             { tail -n 60 /tmp/logs/demo_setup.log; echo "---- 演练 ----"; cat /tmp/logs/demo.log 2>/dev/null;
               echo "---- 枢纽 ----"; dc logs --no-color --tail 40 hub-demo; echo "---- 桥接 ----"; dc logs --no-color --tail 40 bridge-demo | grep -v "^$"; } > /tmp/logs/demo_diag.log 2>&1
             python3 factory/deploy/ci_annotate.py 演示工厂诊断 /tmp/logs/demo_diag.log 200
+          fi
+          exit "$st"
+      - name: 班级工厂（第 10 轮）
+        run: |
+          set +e
+          val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
+          pip install -q pyyaml
+          python3 factory/deploy/classes.py factory/deploy/classes.yaml "$FACTORY_DIR/docker-compose.classes.yml" --ci-ports
+          python3 factory/deploy/classes.py factory/deploy/classes.yaml --ids > "$FACTORY_DIR/classes.ids"
+          id=$(cut -d' ' -f1 "$FACTORY_DIR/classes.ids")
+          up=$(echo "$id" | tr '[:lower:]' '[:upper:]')
+          export FACTORY_COMPOSE="docker-compose.yml ci.yml docker-compose.classes.yml"
+          bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$id'" 2>&1 | tee /tmp/logs/class_setup.log
+          st=${PIPESTATUS[0]}
+          if [ "$st" = 0 ]; then
+            for i in $(seq 1 40); do curl -fsS localhost:8102/api/health && break; sleep 5; done
+            cd factory/digital
+            python tests/closed_loop.py --hub http://localhost:8102 --erp http://localhost:8093 --erp-kind real \
+              --erp-key "$(val WQ_C_${up}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${up}_ERP_API_SECRET)" --speed 300 --timeout 900 \
+              2>&1 | tee /tmp/logs/class_loop.log
+            st=${PIPESTATUS[0]}
+            cd -
+          fi
+          if [ "$st" != 0 ]; then
+            dc() { docker compose -p wq-factory -f /tmp/fac/docker-compose.yml -f /tmp/fac/ci.yml -f /tmp/fac/docker-compose.classes.yml "$@"; }
+            { tail -n 60 /tmp/logs/class_setup.log; echo "---- 闭环 ----"; grep -v "ERPNext 进度" /tmp/logs/class_loop.log 2>/dev/null | tail -n 60;
+              echo "---- 枢纽 ----"; dc logs --no-color --tail 40 hub-c-$id; echo "---- 桥接 ----"; dc logs --no-color --tail 40 bridge-c-$id; } > /tmp/logs/class_diag.log 2>&1
+            python3 factory/deploy/ci_annotate.py 班级工厂诊断 /tmp/logs/class_diag.log 200
           fi
           exit "$st"
       - name: 出错时的日志
@@ -243,6 +271,10 @@ jobs:
           cp factory/deploy/docker-compose.server.yml stage/docker-compose.yml
           cp factory/deploy/*.sh stage/deploy/
           cp factory/digital/mosquitto/server/* stage/mosquitto/
+          # 班级工厂（第 10 轮）：按 classes.yaml 生成服务配置和编号表
+          pip install -q pyyaml
+          python3 factory/deploy/classes.py factory/deploy/classes.yaml stage/docker-compose.classes.yml
+          python3 factory/deploy/classes.py factory/deploy/classes.yaml --ids > stage/classes.ids
           tar czf - -C stage . | ssh "deploy@$HOST" \
             'mkdir -p /opt/wenquest/factory && tar xzf - -C /opt/wenquest/factory && chmod +x /opt/wenquest/factory/deploy/*.sh'
       - name: 更新数字工厂

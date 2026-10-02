@@ -127,3 +127,23 @@ def test_role_rules(monkeypatch):
                  (False, "manager", "prod", ["manager"]) if False else (False, "manager", "teach")):
         with pytest.raises(HTTPException):
             A.check_allowed(*args)
+
+
+def test_class_factory_bits(monkeypatch):
+    """第 10 轮：Caddy 只给已建的班级工厂发证书；班级任课老师按老师对待"""
+    import importlib
+    from fastapi.testclient import TestClient
+    monkeypatch.setenv("WQ_HUB_NO_START", "1")
+    monkeypatch.setenv("WQ_CLASS_IDS", "pilot g2")
+    monkeypatch.setenv("WQ_FACTORY_NAME", "试点班")
+    import hub.app as A
+    A = importlib.reload(A)
+    c = TestClient(A.app)
+    assert c.get("/api/caddy/ask", params={"domain": "pilot.factory.example.com"}).status_code == 200
+    assert c.get("/api/caddy/ask", params={"domain": "g2.erp.example.com"}).status_code == 200
+    for d in ("evil.factory.example.com", "pilot.example.com", "pilot.learn.example.com"):
+        assert c.get("/api/caddy/ask", params={"domain": d}).status_code == 404
+    assert c.get("/api/config").json()["factory_name"] == "试点班"
+    for k in ("WQ_CLASS_IDS", "WQ_FACTORY_NAME"):
+        monkeypatch.delenv(k)
+    importlib.reload(A)

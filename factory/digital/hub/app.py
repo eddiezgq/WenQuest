@@ -59,6 +59,9 @@ TOKEN_DAYS = float(os.environ.get("WQ_TOKEN_DAYS", "7"))
 # AI 工厂助手每人每小时提问上限（D7）；0 = 不限。线上默认 30，自己电脑上默认不限
 AI_PER_HOUR = int(os.environ.get("WQ_AI_PER_HOUR", "30" if AUTH == "wenquest" else "0"))
 DEFAULT_MODE = os.environ.get("WQ_MODE", "teach")
+FACTORY_NAME = os.environ.get("WQ_FACTORY_NAME", "")                       # 班级工厂的显示名（第 10 轮）
+CLASS_TEACHERS = {x for x in os.environ.get("WQ_CLASS_TEACHERS", "").split(",") if x}
+CLASS_IDS = set(os.environ.get("WQ_CLASS_IDS", "").split())                # 公共工厂：有哪些班级工厂（给 Caddy 按需发证书）
 WEB_DIST = os.environ.get("WQ_WEB_DIST", os.path.join(os.path.dirname(HERE), "web", "dist"))
 PUBLISH_ALLOW = ("wq/gearbox/design/",)       # HTTP → 总线网关只放行这些主题（FreeCAD 宏用）
 
@@ -282,7 +285,7 @@ def login(request: Request, body: dict = Body(...)):
         w = wenquest_user(request.cookies.get(SSO_COOKIE, ""))
         if not w:
             raise HTTPException(401, "请先用问渠账号登录")
-        teacher = w["teacher"]
+        teacher = w["teacher"] or str(w["id"]) in CLASS_TEACHERS          # 班级工厂的任课老师（第 10 轮）
         member = None if teacher else _member_roles(w["id"])
         role = body.get("role") or ("manager" if teacher else (member[0] if member and mode == "prod" else "planner"))
         if not teacher and not member:
@@ -339,6 +342,15 @@ def ai_quota(u):
         _ai_calls[key] = recent
 
 
+@app.get("/api/caddy/ask")
+def caddy_ask(domain: str = ""):
+    """学习平台的 Caddy 按需申请证书前来问：<编号>.factory.<域名>、<编号>.erp.<域名> 是不是已建的班级工厂（第 10 轮）"""
+    parts = domain.lower().split(".")
+    if len(parts) >= 4 and parts[1] in ("factory", "erp") and parts[0] in CLASS_IDS:
+        return {"ok": True}
+    raise HTTPException(404, "不是班级工厂")
+
+
 @app.get("/api/config")
 def config():
     return {
@@ -347,7 +359,7 @@ def config():
                         else os.environ.get("WQ_ERPNEXT_URL", "http://localhost:8090")),   # 线上：经单点登录入口（第 7 轮）
         "nodered_url": os.environ.get("WQ_NODERED_URL", "http://localhost:1880"),   # 线上设为空：不对外（D8）
         "auth": AUTH, "login_url": LOGIN_URL,
-        "default_mode": DEFAULT_MODE, "roles": ROLE_NAMES, "ai_engine": H.ai.llm.name if H.ai else "rules",
+        "default_mode": DEFAULT_MODE, "roles": ROLE_NAMES, "factory_name": FACTORY_NAME, "ai_engine": H.ai.llm.name if H.ai else "rules",
         "tz": str(kpi.TZ), "customers": F.CUSTOMERS, "fg": [{"item_code": "WQR-105", "name": F.ITEMS["WQR-105"][0],
                                                                "price": F.FG_SELLING_PRICE}],
     }
@@ -1117,6 +1129,9 @@ def freecad_pack(request: Request, x_wq_token: str = Header(default=""), u=Depen
                 text = text.replace('"https://factory.wenquestrobotics.com"', repr(base))
             z.writestr("wenquest-freecad/" + name, text)
             z.writestr("wenquest-freecad/Mod/WenQuest/" + name, text)      # 第 8 轮：“问渠”工作台（工具栏按钮）
+        sw = open(os.path.join(design_web.FREECAD_DIR, "wq_submit_solidworks.swb"), encoding="ascii").read()     # 第 10 轮 S1
+        z.writestr("wenquest-freecad/SolidWorks/wq_submit_solidworks.swb",
+                   sw.replace("__WQ_HUB__", base).replace("__WQ_TOKEN__", x_wq_token))
         z.writestr("wenquest-freecad/Mod/WenQuest/InitGui.py",
                    open(os.path.join(design_web.FREECAD_DIR, "Mod", "WenQuest", "InitGui.py"), encoding="utf-8").read())
         z.writestr("wenquest-freecad/使用说明.txt", FREECAD_README.format(base=base, mode="教学" if u["mode"] == "teach" else "生产"))
@@ -1124,7 +1139,7 @@ def freecad_pack(request: Request, x_wq_token: str = Header(default=""), u=Depen
                     headers={"Content-Disposition": "attachment; filename=wenquest-freecad.zip"})
 
 
-FREECAD_README = """问渠数字工厂 · 桌面 FreeCAD 宏包（进阶，选做）
+FREECAD_README = """问渠数字工厂 · 我的 CAD 宏包（FreeCAD、SolidWorks；进阶，选做）
 
 不想装软件的话，直接用“设计与工艺”页上的“在线设计”即可，效果相同。
 
@@ -1142,6 +1157,11 @@ FREECAD_README = """问渠数字工厂 · 桌面 FreeCAD 宏包（进阶，选�
 9. 在模型树里选中零件 → 点“提交到问渠工厂” → 填物料编号和改动说明 → 提交。文档里有 TechDraw 图纸页的会一并导出 PDF。
    企业（生产）模式进“设计发布与审批”待审，审批人批准后才进 ERPNext 和车间。
    不装工作台也行：选中零件后执行 wq_submit.py 宏。
+
+SolidWorks（第 10 轮）：
+10. 在 SolidWorks 里打开要提交的零件或装配体（同名工程图也打开的话会一并导出 PDF）。
+11. 菜单“工具 → 宏 → 运行”，文件类型选 *.swb，打开压缩包里的 SolidWorks\\wq_submit_solidworks.swb。
+12. 按提示填物料编号和改动说明，提交。宏的提示是英文的（这样在任何语言的 Windows 上都不乱码）。
 
 说明：wq_publish.py 里已经填好了工作台地址和你的登录凭证（{mode}模式，7 天内有效）。
 发布时提示“请先登录”，说明凭证过期了：回到“设计与工艺”页重新下载宏包即可。

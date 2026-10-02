@@ -102,3 +102,5 @@ def test_freecad_pack(monkeypatch):
     assert "addWorkbench" in z.read("wenquest-freecad/Mod/WenQuest/InitGui.py").decode("utf-8")       # 第 8 轮工作台
     assert repr(tok) in z.read("wenquest-freecad/Mod/WenQuest/wq_publish.py").decode("utf-8")
     assert "def submit" in z.read("wenquest-freecad/wq_submit.py").decode("utf-8")
+    swb = z.read("wenquest-freecad/SolidWorks/wq_submit_solidworks.swb").decode("ascii")             # 第 10 轮
+    assert 'Const WQ_HUB = "https://factory.example.com"' in swb and tok in swb and "__WQ_" not in swb
