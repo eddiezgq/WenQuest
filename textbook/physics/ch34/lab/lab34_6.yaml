@@ -1,0 +1,38 @@
+# 实验 34.6 的指导书与报告模板。目的、场景、参数、任务取自 lab34_6.js。
+原理:
+  - ["直流电机转动时，电枢线圈切割磁感线产生反电动势 Kω，方向与电源电压相反。忽略电感时，电压方程为 U = IR + Kω（式 (34.6.2)），电磁转矩为 M_e = KI（式 (34.6.3)），国际单位制中反电动势常数与转矩常数相等。",
+     "A turning DC motor generates a back emf Kω opposing the supply. Neglecting inductance, U = IR + Kω (Eq. (34.6.2)) and the torque is M_e = KI (Eq. (34.6.3)); in SI units the back-emf and torque constants are equal."]
+  - 式: "ω_nl = U/K，I_stall = U/R        (34.6.4)"
+  - ["起动瞬间 ω = 0，没有反电动势，电流最大，等于堵转电流；转速升高，反电动势增大，电流减小。负载转矩 M_L 使稳态电流 I = M_L/K，转速 ω = (U − IR)/K。",
+     "At start ω = 0, there is no back emf and the current is the stall current; as the speed rises the back emf grows and the current falls. A load torque M_L gives a steady current I = M_L/K and speed ω = (U − IR)/K."]
+  - ["断电后用手转动电机，它就是发电机：端子开路时测到电压 Kω；端子短路时电流 Kω/R 产生制动转矩 K²ω/R，经减速器放大到关节上。",
+     "Turned by hand while unpowered the motor is a generator: open terminals show Kω; shorted terminals carry Kω/R, giving a braking torque K²ω/R, magnified at the joint by the gearbox."]
+  - ["测量电机参数：稳态时 I = (M_L + M_f)/K（M_f 是摩擦转矩），ω = U/K − (R/K²)(M_L + M_f)。用最小二乘拟合 I–M_L 直线，斜率的倒数就是 K；再拟合 ω–M_L 直线，斜率 b_ω = −R/K²，得 R = −b_ω K²。不确定度由斜率的标准不确定度传递：u(K) = K·u(b_I)/b_I，u(R)/R 的平方等于 (u(b_ω)/b_ω)² + (2u(K)/K)²（第 1 章）。",
+     "Measuring the motor: in steady state I = (M_L + M_f)/K (M_f is the friction torque) and ω = U/K − (R/K²)(M_L + M_f). A least-squares fit of I against M_L gives a slope whose inverse is K; a fit of ω against M_L gives the slope b_ω = −R/K², so R = −b_ω K². Propagate the slopes' standard uncertainties: u(K) = K·u(b_I)/b_I and (u(R)/R)² = (u(b_ω)/b_ω)² + (2u(K)/K)² (Chapter 1)."]
+步骤:
+  - ["选“电机起动与带载”，U = 24 V、M = 0，点“开始”。记录起动瞬间的电流和稳定转速，与 U/R、U/K 比较（任务 1）。", "Choose “Starting and loading”, U = 24 V, M = 0, press “Start”. Record the starting current and the steady speed; compare with U/R and U/K (task 1)."]
+  - ["M_L 依次取 0.5、1.0、1.5、2.0 N·m，记录稳态转速和电流，画出机械特性（转速—转矩）曲线。", "Set M_L to 0.5, 1.0, 1.5, 2.0 N·m; record the steady speed and current and draw the speed–torque curve."]
+  - ["继续加大 M_L，找到电机转不动的转矩，读出堵转电流（任务 2）。", "Increase M_L until the motor no longer turns; read the stall current (task 2)."]
+  - ["切换到“拖动示教”，关节转速 10 r/min，分别在端子开路和短路时读出电压、电流和关节上的阻力矩（任务 3），记入表 2。", "Switch to “Hand guiding”, 10 r/min at the joint; read the voltage, current and resisting torque with open and with shorted terminals (task 3); record in Table 2."]
+  - ["切换到“测电机参数”，点“清空记录”。负载转矩从 0 到 2.0 N·m 每隔 0.25 N·m 取一次，每次点“读数并记录”，把转速和电流读数记入表 3（也可以点“0–2 N·m 依次测一遍”）。拟合求出 K、R 及其不确定度，把“你算出的 K”“你算出的 R”调到你的结果（任务 4）。",
+     "Switch to “Measure a motor” and press “Clear records”. Set the load torque from 0 to 2.0 N·m in steps of 0.25 N·m and press “Read and record” each time; enter the speed and current readings in Table 3 (or use “Sweep 0–2 N·m”). Fit K and R with their uncertainties and set “Your K” and “Your R” to your results (task 4)."]
+数据表:
+  - 标题: ["表 1  机械特性（U = 24 V）", "Table 1  Speed–torque characteristic (U = 24 V)"]
+    表头: ["M_L / (N·m)", "转速读数 / (r/min)", "电流读数 / A", "(U − IR)/K 换算 / (r/min)"]
+    表头英文: ["M_L / (N·m)", "Speed read / (r/min)", "Current read / A", "(U − IR)/K / (r/min)"]
+    行: [["0", "", "", ""], ["0.5", "", "", ""], ["1.0", "", "", ""], ["1.5", "", "", ""], ["2.0", "", "", ""]]
+  - 标题: ["表 2  拖动示教（减速比 100）", "Table 2  Hand guiding (gear ratio 100)"]
+    表头: ["端子", "关节转速 / (r/min)", "电压 / V", "电流 / A", "关节阻力矩 / (N·m)"]
+    表头英文: ["Terminals", "Joint speed / (r/min)", "Voltage / V", "Current / A", "Joint torque / (N·m)"]
+    行: [["开路", "10", "", "", ""], ["短路", "10", "", "", ""]]
+    行英文: [["open", "10", "", "", ""], ["shorted", "10", "", "", ""]]
+  - 标题: ["表 3  未知电机的机械特性（U = 24 V）", "Table 3  Characteristic of the unknown motor (U = 24 V)"]
+    表头: ["M_L / (N·m)", "转速读数 n / (r/min)", "ω = 2πn/60 / (rad/s)", "电流读数 I / A"]
+    表头英文: ["M_L / (N·m)", "Speed n / (r/min)", "ω = 2πn/60 / (rad/s)", "Current I / A"]
+    行: [["0", "", "", ""], ["0.25", "", "", ""], ["0.50", "", "", ""], ["0.75", "", "", ""], ["1.00", "", "", ""], ["1.25", "", "", ""], ["1.50", "", "", ""], ["1.75", "", "", ""], ["2.00", "", "", ""]]
+注意:
+  - ["前两个场景的电机参数是示例值（K = 0.05 V·s/rad，R = 0.5 Ω），不是某一型号机器人的实际参数。", "The motor in the first two scenes is illustrative (K = 0.05 V·s/rad, R = 0.5 Ω), not those of a particular robot."]
+  - ["画面慢放 4 倍。", "The picture runs four times slower."]
+  - ["“测电机参数”场景的读数有随机误差：转速约 ±0.3%，电流约 ±0.03 A。拟合时用全部点，不要只取两个点相除。", "Readings in “Measure a motor” carry random errors of about ±0.3% in speed and ±0.03 A in current. Fit all points instead of dividing two."]
+思考题:
+  - ["协作机器人的“拖动示教”通常不是把端子短路，而是让驱动器主动补偿摩擦和重力。为什么？", "Cobots usually do not short the terminals for hand guiding; the drive actively compensates friction and gravity instead. Why?"]

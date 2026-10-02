@@ -1,0 +1,28 @@
+# 实验 34.1 的指导书与报告模板。目的、场景、参数、任务取自 lab34_1.js。
+原理:
+  - ["法拉第电磁感应定律：线圈中的感应电动势等于穿过线圈的磁通匝链数对时间的变化率的负值。电动势取决于磁通量变化的快慢，而不是磁通量本身的大小。",
+     "Faraday's law: the induced emf equals minus the rate of change of the flux linkage. It depends on how fast the flux changes, not on how large it is."]
+  - 式: "ε = −N dΦ/dt        (34.1.2)"
+  - ["把磁铁近似为磁矩为 m 的磁偶极子，它在轴线上距离 z 处通过半径 a 的圆线圈的磁通量为 Φ = μ₀ m a²/[2(a² + z²)^{3/2}]（式 (34.1.3)）。磁铁以速度 v 运动时 dz/dt = v，于是电动势与 v 成正比；穿过线圈的时间与 v 成反比。",
+     "Treat the magnet as a dipole of moment m; on the axis at distance z the flux through a coil of radius a is Φ = μ₀ m a²/[2(a² + z²)^{3/2}] (Eq. (34.1.3)). With dz/dt = v the emf is proportional to v and the pass time inversely proportional to v."]
+  - ["电动势对整个过程的积分等于 −N(Φ末 − Φ初)，磁铁从远处来、到远处去，Φ初 = Φ末 = 0，所以积分为零，与速度无关。",
+     "The time integral of the emf over the pass is −N(Φ_end − Φ_start); the magnet comes from and goes to far away, so it is zero whatever the speed."]
+步骤:
+  - ["选场景“磁铁穿过线圈”，N = 200、v = 0.5 m/s，点“开始”。读出峰值电动势，观察靠近与离开时电动势的正负（任务 1），记入表 1。", "Choose “Magnet through a coil”, N = 200, v = 0.5 m/s, press “Start”. Read the peak emf and its sign while approaching and leaving (task 1); record in Table 1."]
+  - ["依次取 v = 0.25、1.0、1.5 m/s（N = 200），再取 N = 100、400（v = 0.5 m/s），记录峰值电动势和脉冲宽度，检验 ε 与 v、N 的关系（任务 2）。", "Repeat with v = 0.25, 1.0, 1.5 m/s (N = 200), then N = 100 and 400 (v = 0.5 m/s); record the peak and pulse width and check how ε depends on v and N (task 2)."]
+  - ["记下每次的 ∫ε dt 读数，说明它为什么接近零。", "Note the ∫ε dt reading each time and explain why it is close to zero."]
+  - ["切换到“AGV 车轮转速传感器”，点“开始”，记下脉冲计数和计时，算出脉冲频率 f；也可以从图上读出相邻脉冲的间隔。调车轮转速使 f = 5 Hz，用 v = 2πR f（R = 0.05 m）算出车速（任务 3），记入表 2。", "Switch to “AGV wheel-speed sensor”, press “Start”, note the pulse count and the elapsed time and work out the pulse rate f (or read the pulse spacing on the graph). Set the wheel speed for f = 5 Hz and compute the speed v = 2πR f with R = 0.05 m (task 3); record in Table 2."]
+数据表:
+  - 标题: ["表 1  峰值电动势与速度、匝数的关系", "Table 1  Peak emf against speed and turns"]
+    表头: ["N", "v / (m/s)", "峰值 ε / V", "脉冲宽度 / ms", "∫ε dt / mWb"]
+    表头英文: ["N", "v / (m/s)", "Peak ε / V", "Pulse width / ms", "∫ε dt / mWb"]
+    行: [["200", "0.25", "", "", ""], ["200", "0.5", "", "", ""], ["200", "1.0", "", "", ""], ["200", "1.5", "", "", ""], ["100", "0.5", "", "", ""], ["400", "0.5", "", "", ""]]
+  - 标题: ["表 2  车轮转速传感器", "Table 2  Wheel-speed sensor"]
+    表头: ["转速设定 / (r/min)", "脉冲计数", "计时 / s", "脉冲频率 f / Hz", "车速 v = 2πRf / (m/s)"]
+    表头英文: ["Wheel speed set / (r/min)", "Pulses", "Time / s", "Pulse rate f / Hz", "Speed v = 2πRf / (m/s)"]
+    行: [["", "", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["实验画面慢放了 4 倍，横轴的时间是实际时间。", "The picture runs four times slower; the time axis shows real time."]
+  - ["磁偶极子近似在磁铁比线圈小、距离较远时最好；本实验只用来比较规律。", "The dipole approximation is best for a magnet small compared with the coil; here it serves to compare trends."]
+思考题:
+  - ["若线圈接上负载、有电流通过，磁铁穿过时会感到阻力吗？它的方向怎样？（参看 34.2 节）", "With a load across the coil, does the magnet feel a drag while passing? Which way? (See Section 34.2.)"]
