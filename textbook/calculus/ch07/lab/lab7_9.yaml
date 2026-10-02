@@ -1,0 +1,27 @@
+# 实验 7.9 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab7_9.js。
+原理:
+  - ["相机在路线旁距离 d 处，AGV 位置为 x，视线与垂线的夹角 θ = arctan(x/d)。对时间求导，得所需的转动角速度。",
+     "With the camera a distance d from the route and the AGV at x, the line of sight makes θ = arctan(x/d) with the perpendicular. Differentiating in time gives the required turning rate."]
+  - 式: "dθ/dt = v d / (d² + x²)，最大值 v/d（x = 0）          (7.9.1)"
+  - ["路灯高 H，人高 h，人离灯杆 x：由相似三角形，影长 s = hx/(H − h)，影子顶端离灯杆 Hx/(H − h)，顶端的速度为 Hu/(H − h)，u 为步速。",
+     "Lamp height H, person height h, distance x: similar triangles give the shadow length s = hx/(H − h); the tip is Hx/(H − h) from the lamp and moves at Hu/(H − h), u the walking speed."]
+步骤:
+  - ["按默认参数运行一次（任务 1），记录最大偏差，说明 AGV 在哪一段跟丢，与算例 7.9.2 比较。",
+     "Run once with the defaults (task 1); record the largest lag and where tracking is lost; compare with Example 7.9.2."]
+  - ["保持 v = 1.5 m/s、限速 0.5 rad/s，把 d 依次取 2、2.5、3、3.5 m，各运行一次，记录最大偏差，填入表 1；找出全程跟住的最小距离（任务 2）。",
+     "Keep v = 1.5 m/s and 0.5 rad/s; run with d = 2, 2.5, 3, 3.5 m, record the largest lag in Table 1, and find the smallest d that tracks all the way (task 2)."]
+  - ["切换到影子场景，取 H = 6 m、h = 1.8 m、u = 1.4 m/s 走一趟（任务 3），记录不同位置的影长和顶端速度，填入表 2。",
+     "In the shadow scene take H = 6 m, h = 1.8 m, u = 1.4 m/s and walk once (task 3); record shadow length and tip speed at several places in Table 2."]
+数据表:
+  - 标题: ["表 1  相机距离与跟踪偏差（v = 1.5 m/s，限速 0.5 rad/s）", "Table 1  Camera distance and tracking lag (v = 1.5 m/s, limit 0.5 rad/s)"]
+    表头: ["d / m", "v/d / (rad/s)", "最大偏差 / (°)", "能否全程跟住"]
+    表头英文: ["d / m", "v/d / (rad/s)", "Largest lag / (°)", "Tracks all the way?"]
+    行: [["2", "", "", ""], ["2.5", "", "", ""], ["3", "", "", ""], ["3.5", "", "", ""]]
+  - 标题: ["表 2  影长与影子顶端的速度", "Table 2  Shadow length and tip speed"]
+    表头: ["x / m", "影长 / m", "顶端速度 / (m/s)"]
+    表头英文: ["x / m", "Shadow / m", "Tip speed / (m/s)"]
+    行: [["2", "", ""], ["4", "", ""], ["6", "", ""], ["8", "", ""]]
+注意:
+  - ["云台以不超过限速的转速转向 AGV；偏差是视线方向与云台方向之差。", "The camera turns towards the AGV no faster than its limit; the lag is the angle between the line of sight and the camera."]
+思考题:
+  - ["若相机装在 AGV 的行驶方向上（例如通道尽头），AGV 正对相机驶来，云台还需要转动吗？", "If the camera is placed on the AGV's line of travel (at the end of the aisle) and the AGV drives straight at it, does the camera need to turn at all?"]

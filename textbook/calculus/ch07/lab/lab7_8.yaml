@@ -1,0 +1,37 @@
+# 实验 7.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab7_8.js。
+原理:
+  - ["位置、速度、加速度、加加速度依次是前一个量的导数：ω = θ′，α = ω′ = θ″，j = α′ = θ‴。加速度与驱动力矩成正比，加速度的跳跃意味着力矩突变（加加速度为冲激）。",
+     "Position, velocity, acceleration and jerk are successive derivatives: ω = θ′, α = θ″, j = θ‴. Acceleration is proportional to drive torque; a jump in acceleration is a sudden torque step (an impulse of jerk)."]
+  - 式: "三次：θ = Δ(3s² − 2s³)；五次：θ = Δ(10s³ − 15s⁴ + 6s⁵)；s = t/T          (7.8.1)、(7.1.9)"
+  - 式: "五次多项式：ω_max = 15Δ/(8T)，α_max = 10Δ/(√3 T²)          (7.8.5)"
+  - ["由编码器读数估计角加速度用二阶差商 [θ(t + h) − 2θ(t) + θ(t − h)]/h²。每个读数四舍五入的误差不超过 q/2，二阶差商的误差量级为 q/h²（最坏约 2q/h²，7.8.5 节）。",
+     "From encoder counts the acceleration is estimated by the second difference [θ(t + h) − 2θ(t) + θ(t − h)]/h². Each count is rounded to within q/2, so the error of the second difference is of order q/h² (at worst about 2q/h², Section 7.8.5)."]
+步骤:
+  - ["取 T = 2 s、Δ = 90°，依次运行三种规律，记录峰值角速度、峰值角加速度、加加速度，填入表 1；找出角加速度在两端不跳跃的规律（任务 1）。",
+     "With T = 2 s and Δ = 90°, run the three laws and record peak velocity, peak acceleration and jerk in Table 1. Find the law whose acceleration does not jump at the ends (task 1)."]
+  - ["选五次多项式，把 T 依次取 2 s、1 s、0.5 s，记录峰值，验证 ω ∝ 1/T、α ∝ 1/T²、j ∝ 1/T³，填入表 2。",
+     "Choose the quintic and set T = 2, 1, 0.5 s; record the peaks and check ω ∝ 1/T, α ∝ 1/T², j ∝ 1/T³ in Table 2."]
+  - ["限速 180°/s、限角加速度 5 rad/s²：Δ = 90° 时调节 T，找出满足两个限制的最短时间（任务 2），与算例 7.8.2 比较。",
+     "With 180°/s and 5 rad/s² limits and Δ = 90°, find the shortest T that satisfies both (task 2) and compare with Example 7.8.2."]
+  - ["切换到“编码器数据”场景，令 k = 1、5、10、20、50，记录均方根误差，填入表 3；找出误差小于 0.1 rad/s² 的步长（任务 3）。",
+     "In 'Encoder data' set k = 1, 5, 10, 20, 50 and record the RMS error in Table 3; find a step with error below 0.1 rad/s² (task 3)."]
+数据表:
+  - 标题: ["表 1  三种运动规律的峰值（T = 2 s，Δ = 90°）", "Table 1  Peaks of the three laws (T = 2 s, Δ = 90°)"]
+    表头: ["运动规律", "ω_max / (rad/s)", "α_max / (rad/s²)", "加加速度", "α 是否连续"]
+    表头英文: ["Law", "ω_max / (rad/s)", "α_max / (rad/s²)", "Jerk", "α continuous?"]
+    行: [["三次多项式", "", "", "", ""], ["五次多项式", "", "", "", ""], ["梯形速度", "", "", "", ""]]
+    行英文: [["cubic", "", "", "", ""], ["quintic", "", "", "", ""], ["trapezoidal", "", "", "", ""]]
+  - 标题: ["表 2  运动时间与峰值（五次多项式，Δ = 90°）", "Table 2  Move time and peaks (quintic, Δ = 90°)"]
+    表头: ["T / s", "ω_max / (rad/s)", "α_max / (rad/s²)", "j_max / (rad/s³)"]
+    表头英文: ["T / s", "ω_max / (rad/s)", "α_max / (rad/s²)", "j_max / (rad/s³)"]
+    行: [["2", "", "", ""], ["1", "", "", ""], ["0.5", "", "", ""]]
+  - 标题: ["表 3  二阶差商的误差", "Table 3  Error of the second difference"]
+    表头: ["k", "1", "5", "10", "20", "50"]
+    表头英文: ["k", "1", "5", "10", "20", "50"]
+    行: [["均方根误差 / (rad/s²)", "", "", "", "", ""]]
+    行英文: [["RMS error / (rad/s²)", "", "", "", "", ""]]
+注意:
+  - ["梯形速度规律中匀加速时间取 t_a = T/4。", "The trapezoidal law uses an acceleration time t_a = T/4."]
+  - ["加加速度一栏中的“无穷大”表示冲激，图中用竖直箭头画出。", "'Infinite' in the jerk column means an impulse, drawn as a vertical arrow."]
+思考题:
+  - ["步长 k 一直增大，误差会一直减小吗？对变化更快的运动呢？", "Does the error keep falling as k grows? What about a faster-changing motion?"]

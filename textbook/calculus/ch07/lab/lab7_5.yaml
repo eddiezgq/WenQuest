@@ -1,0 +1,30 @@
+# 实验 7.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab7_5.js。
+原理:
+  - ["肘关节中心比肩关节高 y = l₁ sin θ，θ 是上臂与水平面的夹角，l₁ = 0.425 m（UR5e 上臂长）。关节角 θ = θ_m/N，θ_m 是电机转角，N 是减速比。",
+     "The elbow is y = l₁ sin θ above the shoulder, θ the elevation of the upper arm, l₁ = 0.425 m (UR5e upper arm). The joint angle is θ = θ_m/N with motor angle θ_m and reduction ratio N."]
+  - 式: "dy/dt = (dy/dθ)·(dθ/dθ_m)·(dθ_m/dt) = l₁ cos θ · (1/N) · ω_m          (7.5.2)、(7.5.7)"
+  - ["实验中的“测得”速度由三维模型计算：在 θ 两侧各取一个很近的角度，读出肘关节中心的高度，用中心差商得到 dy/dθ，再乘以关节角速度。",
+     "The 'measured' speed comes from the 3D model: the elbow height is read at two angles close to θ, a central quotient gives dy/dθ, which is multiplied by the joint speed."]
+步骤:
+  - ["取电机转速 1500 r/min、减速比 60、θ = 30°，读出各级变化率，验证三级变化率之积与测得的速度一致，填入表 1。",
+     "Set 1500 r/min, ratio 60, θ = 30°; read the rates of each stage and check that their product matches the measured speed. Fill in Table 1."]
+  - ["把电机转速调到 3000 r/min，改变减速比，使关节角速度不超过 180°/s（任务 1）。记下满足要求的最小减速比。",
+     "Set 3000 r/min and change the ratio until the joint stays within 180°/s (task 1). Record the smallest ratio that works."]
+  - ["保持电机转速和减速比不变，把 θ 依次调到 0°、30°、60°、85°、90°，记录上升速度，找出上升速度为零的角度（任务 2），填入表 2。",
+     "Keep motor speed and ratio; set θ to 0°, 30°, 60°, 85°, 90° and record the rising speed. Find the angle where it is zero (task 2). Fill in Table 2."]
+  - ["调节三个参数，使上升速度达到 1 m/s（任务 3）。按“转动”观察肘关节中心的轨迹。",
+     "Adjust the three parameters until the elbow rises at 1 m/s (task 3). Press 'Turn' and watch the path of the elbow."]
+数据表:
+  - 标题: ["表 1  三级变化率", "Table 1  The three rates"]
+    表头: ["n / (r/min)", "N", "θ / (°)", "ω_m / (rad/s)", "ω_m/N / (rad/s)", "l₁cos θ / (m/rad)", "乘积 / (m/s)", "测得 / (m/s)"]
+    表头英文: ["n / (r/min)", "N", "θ / (°)", "ω_m / (rad/s)", "ω_m/N / (rad/s)", "l₁cos θ / (m/rad)", "Product / (m/s)", "Measured / (m/s)"]
+    行: [["1500", "60", "30", "", "", "", "", ""], ["3000", "", "30", "", "", "", "", ""]]
+  - 标题: ["表 2  上升速度与上臂角度", "Table 2  Rising speed against arm angle"]
+    表头: ["θ / (°)", "0", "30", "60", "85", "90"]
+    表头英文: ["θ / (°)", "0", "30", "60", "85", "90"]
+    行: [["dy/dt / (m/s)", "", "", "", "", ""]]
+注意:
+  - ["电机转速以 r/min 给出，换算为 rad/s 要乘 2π/60。", "Motor speed is in r/min; multiply by 2π/60 for rad/s."]
+  - ["“转动”按钮以 1/5 的实际速度播放，便于观察。", "The 'Turn' button plays at one fifth of real speed so you can follow it."]
+思考题:
+  - ["为什么上臂竖直时，关节转得再快，肘关节中心在那一瞬间也不上升？它这时朝哪个方向运动？", "Why does the elbow not rise at all, however fast the joint turns, when the upper arm is vertical? Which way is it moving then?"]

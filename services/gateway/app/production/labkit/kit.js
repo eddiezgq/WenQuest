@@ -304,6 +304,127 @@ function bars(ctx, x, y, w, h, values, opt) {   // a bar chart (e.g. singular va
   if (q.label) label(ctx, q.label, x + 4, y + 10, css("--muted"), 12);
 }
 
+// ---------- calculus (《微积分》第 12 轮): the one-variable bench ----------
+// CALC computes (difference quotients, dual numbers, quadrature, root finding, seeded noise);
+// graph() draws in world coordinates (axes with ticks, function curves, tangents, secants, Riemann boxes).
+function Dual(a, b) { this.a = a; this.b = b; }   // a + b·ε with ε² = 0: value and derivative together (forward-mode AD)
+const D = (x) => (x instanceof Dual ? x : new Dual(+x, 0));
+const CALC = {
+  diff(f, x, h = 1e-5, kind = "central") {   // difference quotients D⁺, D⁻, D⁰ (符号约定 五)
+    if (kind === "forward") return (f(x + h) - f(x)) / h;
+    if (kind === "backward") return (f(x) - f(x - h)) / h;
+    return (f(x + h) - f(x - h)) / (2 * h);
+  },
+  diff2(f, x, h = 1e-4) { return (f(x + h) - 2 * f(x) + f(x - h)) / (h * h); },
+  // forward-mode automatic differentiation: CALC.ad(x => CALC.d.sin(CALC.d.mul(x, x)), 1.2) → [value, derivative]
+  ad(f, x) { const r = D(f(new Dual(x, 1))); return [r.a, r.b]; },
+  d: {
+    v: (x) => new Dual(x, 1), c: (x) => new Dual(x, 0),
+    add: (x, y) => { x = D(x); y = D(y); return new Dual(x.a + y.a, x.b + y.b); },
+    sub: (x, y) => { x = D(x); y = D(y); return new Dual(x.a - y.a, x.b - y.b); },
+    mul: (x, y) => { x = D(x); y = D(y); return new Dual(x.a * y.a, x.b * y.a + x.a * y.b); },
+    div: (x, y) => { x = D(x); y = D(y); return new Dual(x.a / y.a, (x.b * y.a - x.a * y.b) / (y.a * y.a)); },
+    pow: (x, n) => { x = D(x); return new Dual(Math.pow(x.a, n), n * Math.pow(x.a, n - 1) * x.b); },
+    sin: (x) => { x = D(x); return new Dual(Math.sin(x.a), Math.cos(x.a) * x.b); },
+    cos: (x) => { x = D(x); return new Dual(Math.cos(x.a), -Math.sin(x.a) * x.b); },
+    exp: (x) => { x = D(x); const e = Math.exp(x.a); return new Dual(e, e * x.b); },
+    log: (x) => { x = D(x); return new Dual(Math.log(x.a), x.b / x.a); },
+    sqrt: (x) => { x = D(x); const r = Math.sqrt(x.a); return new Dual(r, x.b / (2 * r)); },
+  },
+  simpson(f, a, b, n = 200) { if (n % 2) n++; const h = (b - a) / n; let s = f(a) + f(b);
+    for (let i = 1; i < n; i++) s += (i % 2 ? 4 : 2) * f(a + i * h); return s * h / 3; },
+  riemann(f, a, b, n, rule = "mid") {   // left / right / mid
+    const h = (b - a) / n, off = rule === "left" ? 0 : rule === "right" ? 1 : 0.5; let s = 0;
+    for (let i = 0; i < n; i++) s += f(a + (i + off) * h); return s * h;
+  },
+  bisect(f, a, b, tol = 1e-10, max = 200) { let fa = f(a); const steps = [];
+    for (let k = 0; k < max && b - a > tol; k++) { const m = (a + b) / 2, fm = f(m); steps.push([a, b]);
+      if (fa * fm <= 0) b = m; else { a = m; fa = fm; } }
+    return { x: (a + b) / 2, steps }; },
+  newton(f, x, df, tol = 1e-12, max = 50) { const steps = [x];
+    for (let k = 0; k < max; k++) { const d = df ? df(x) : CALC.diff(f, x), dx = f(x) / d; x -= dx; steps.push(x); if (Math.abs(dx) < tol) break; }
+    return { x, steps }; },
+  rng(seed = 1) {   // mulberry32: the same seed gives the same numbers in every browser (and in the book's programs)
+    let s = seed >>> 0;
+    const u = () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    return { u, gauss: () => { let a = 0; while (a === 0) a = u(); return Math.sqrt(-2 * Math.log(a)) * Math.cos(2 * Math.PI * u()); } };
+  },
+  ticks(lo, hi, n = 6) {   // "nice" tick values (1, 2, 5 × 10ᵏ)
+    const raw = (hi - lo) / Math.max(1, n), p = Math.pow(10, Math.floor(Math.log10(raw || 1))), m = raw / p;
+    const step = (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p, out = [];
+    for (let v = Math.ceil(lo / step) * step; v <= hi + step * 1e-9; v += step) out.push(Math.abs(v) < step * 1e-9 ? 0 : v);
+    return out;
+  },
+};
+function graph(ctx, o) {   // o = {x, y, w, h (pixels), xmin, xmax, ymin, ymax, xlabel, ylabel, ticks: true}
+  const X = (v) => o.x + (v - o.xmin) / (o.xmax - o.xmin) * o.w, Y = (v) => o.y + o.h - (v - o.ymin) / (o.ymax - o.ymin) * o.h;
+  const clip = (fn) => { ctx.save(); ctx.beginPath(); ctx.rect(o.x, o.y, o.w, o.h); ctx.clip(); fn(); ctx.restore(); };
+  const tickTxt = (v) => { const a = Math.abs(v); return a === 0 ? "0" : a >= 1e4 || a < 1e-3 ? v.toExponential(0) : String(+v.toPrecision(4)); };
+  const G = {
+    X, Y, o,
+    axes() {
+      rect(ctx, o.x, o.y, o.w, o.h, null, css("--grid"));
+      const mu = css("--muted");
+      if (o.ticks !== false) {
+        CALC.ticks(o.xmin, o.xmax, Math.max(3, Math.round(o.w / 90))).forEach((v) => { line(ctx, X(v), o.y + o.h, X(v), o.y + o.h + 4, mu, 1);
+          label(ctx, tickTxt(v), X(v), o.y + o.h + 15, mu, 11, "center"); });
+        CALC.ticks(o.ymin, o.ymax, Math.max(3, Math.round(o.h / 60))).forEach((v) => { line(ctx, o.x - 4, Y(v), o.x, Y(v), mu, 1);
+          label(ctx, tickTxt(v), o.x - 6, Y(v) + 4, mu, 11, "right"); });
+      }
+      if (o.ymin < 0 && o.ymax > 0) line(ctx, o.x, Y(0), o.x + o.w, Y(0), mu, 1);
+      if (o.xmin < 0 && o.xmax > 0) line(ctx, X(0), o.y, X(0), o.y + o.h, mu, 1);
+      if (o.xlabel) label(ctx, o.xlabel, o.x + o.w, o.y + o.h + 28, mu, 12, "right");
+      if (o.ylabel) label(ctx, o.ylabel, o.x + 4, o.y - 6, mu, 12, "left");
+      return G;
+    },
+    fn(f, color, width = 2, dash, a = o.xmin, b = o.xmax) {   // one sample per pixel; breaks the line at jumps and non-finite values
+      clip(() => {
+        ctx.strokeStyle = color || css("--accent"); ctx.lineWidth = width; ctx.setLineDash(dash || []); ctx.beginPath();
+        const n = Math.max(2, Math.ceil((X(b) - X(a)) * 1.5)); let pen = false, lastY = 0;
+        for (let i = 0; i <= n; i++) {
+          const x = a + (b - a) * i / n, y = f(x), py = Y(y);
+          if (!isFinite(y) || (pen && Math.abs(py - lastY) > o.h * 0.9)) { pen = false; if (!isFinite(y)) continue; }
+          if (pen) ctx.lineTo(X(x), py); else ctx.moveTo(X(x), py);
+          pen = true; lastY = py;
+        }
+        ctx.stroke(); ctx.setLineDash([]);
+      });
+      return G;
+    },
+    pts(points, color, width = 2, dash) {
+      clip(() => { ctx.strokeStyle = color || css("--ink"); ctx.lineWidth = width; ctx.setLineDash(dash || []); ctx.beginPath();
+        points.forEach((p, i) => (i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1])))); ctx.stroke(); ctx.setLineDash([]); });
+      return G;
+    },
+    dots(points, color, r = 2.5) { clip(() => points.forEach((p) => circle(ctx, X(p[0]), Y(p[1]), r, color || css("--ink")))); return G; },
+    line(x0, y0, m, color, width = 2, dash) {   // the whole line through (x0, y0) with slope m, clipped to the box
+      return G.pts([[o.xmin, y0 + m * (o.xmin - x0)], [o.xmax, y0 + m * (o.xmax - x0)]], color, width, dash);
+    },
+    seg(x0, y0, x1, y1, color, width = 2, dash) { return G.pts([[x0, y0], [x1, y1]], color, width, dash); },
+    vline(x, color, dash = [4, 4]) { line(ctx, X(x), o.y, X(x), o.y + o.h, color || css("--muted"), 1, dash); return G; },
+    hline(y, color, dash = [4, 4]) { line(ctx, o.x, Y(y), o.x + o.w, Y(y), color || css("--muted"), 1, dash); return G; },
+    point(x, y, color, name, dx = 8, dy = -9) {
+      if (x < o.xmin || x > o.xmax || y < o.ymin || y > o.ymax) return G;
+      circle(ctx, X(x), Y(y), 4.5, color || css("--accent"), css("--ink")); if (name) label(ctx, name, X(x) + dx, Y(y) + dy, color || css("--ink"), 13);
+      return G;
+    },
+    riemann(f, a, b, n, rule = "mid", fill = "rgba(31,119,180,0.18)", stroke) {
+      const h = (b - a) / n, off = rule === "left" ? 0 : rule === "right" ? 1 : 0.5;
+      clip(() => { for (let i = 0; i < n; i++) { const xa = a + i * h, v = f(xa + off * h);
+        rect(ctx, X(xa), Math.min(Y(0), Y(v)), X(xa + h) - X(xa), Math.abs(Y(v) - Y(0)), fill, stroke || css("--blue")); } });
+      return G;
+    },
+    area(f, a, b, fill = "rgba(201,143,0,0.18)") {
+      clip(() => { const n = Math.max(2, Math.ceil(X(b) - X(a))); ctx.beginPath(); ctx.moveTo(X(a), Y(0));
+        for (let i = 0; i <= n; i++) { const x = a + (b - a) * i / n; ctx.lineTo(X(x), Y(f(x))); }
+        ctx.lineTo(X(b), Y(0)); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); });
+      return G;
+    },
+    text(s, x, y, color, size = 12, align = "left") { label(ctx, s, X(x), Y(y), color || css("--ink"), size, align); return G; },
+  };
+  return G;
+}
+
 // ---------- tasks & progress ----------
 function paintTasks() {
   let n = 0, k = 0;
@@ -485,6 +606,7 @@ function build(id, def) {
     rot2, fk, frame: (...a) => frame(ctx, ...a), arm: (...a) => arm(ctx, ...a), robot: (...a) => robot(ctx, ...a),
     lidar: (...a) => lidar(ctx, ...a), plot: (...a) => plot(ctx, ...a),
     la: LA, plane: (o) => plane(ctx, o), heat: (...a) => heat(ctx, ...a), image: (...a) => image(ctx, ...a), bars: (...a) => bars(ctx, ...a),
+    calc: CALC, graph: (o) => graph(ctx, o),
   };
   L.api = api;
   if (is3d) setup3d(L);

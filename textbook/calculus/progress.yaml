@@ -1,0 +1,17 @@
+# 各章状态与英文标题（第 8 轮 2.1、2.2；本书第 12 轮）。
+# status：draft 草稿 / ai AI 审稿 / first 初审 / team 团队审阅 / final 定稿。没写的章不列。
+parts_en:
+  导论: Introduction
+  第一篇 函数、极限与连续: "Part I  Functions, Limits and Continuity"
+  第二篇 一元微分学: "Part II  Differential Calculus of One Variable"
+  第三篇 一元积分学: "Part III  Integral Calculus of One Variable"
+  第四篇 常微分方程: "Part IV  Ordinary Differential Equations"
+  第五篇 无穷级数: "Part V  Infinite Series"
+  第六篇 向量与曲线: "Part VI  Vectors and Curves"
+  第七篇 多元微分学: "Part VII  Differential Calculus of Several Variables"
+  第八篇 多元积分学与向量分析: "Part VIII  Multiple Integrals and Vector Analysis"
+  第九篇 拓展与应用: "Part IX  Further Topics and Applications"
+chapters:
+  7:
+    status: draft
+    title_en: "The Derivative"
