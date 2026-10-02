@@ -10,10 +10,10 @@ from _img import gear_image
 G = gear_image()
 m, n = G.shape
 U, s, Vt = np.linalg.svd(G, full_matrices=False)
-fig, axs = plt.subplots(1, 4, figsize=(13.5, 2.9))
-for ax, k in zip(axs, (1, 5, 20, None)):
+fig, axs = plt.subplots(2, 2, figsize=(9.0, 7.2))
+for ax, k in zip(axs.flat, (1, 5, 20, None)):
     M = G if k is None else (U[:, :k] * s[:k]) @ Vt[:k]
-    ax.imshow(M, cmap="gray", vmin=0, vmax=1, interpolation="nearest")
+    ax.imshow(np.kron(M, np.ones((4, 4))), cmap="gray", vmin=0, vmax=1, interpolation="nearest")   # 像素放大 4 倍，缩放显示时保持清楚
     ax.set_xticks([])
     ax.set_yticks([])
     if k is None:

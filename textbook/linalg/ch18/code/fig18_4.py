@@ -27,19 +27,24 @@ figure(fig, "fig18_4_1")
 G = gear_image()
 Ug, sg, Vgt = np.linalg.svd(G, full_matrices=False)
 layers = [sg[i] * np.outer(Ug[:, i], Vgt[i]) for i in range(3)]
-fig, axs = plt.subplots(1, 5, figsize=(13.5, 2.6))
-items = [(layers[0], r"$\sigma_1\boldsymbol{u}_1\boldsymbol{v}_1^{\mathrm{T}}$"), (layers[1], r"$\sigma_2\boldsymbol{u}_2\boldsymbol{v}_2^{\mathrm{T}}$"),
-         (layers[2], r"$\sigma_3\boldsymbol{u}_3\boldsymbol{v}_3^{\mathrm{T}}$"), (sum(layers), r"$A_3$"), (G, r"$A$")]
-for ax, (M, name) in zip(axs, items):
-    if name.startswith(r"$\sigma_1") or name in (r"$A_3$", r"$A$"):
-        ax.imshow(M, cmap="gray", vmin=0, vmax=1, interpolation="nearest")
-    else:
-        m = np.abs(M).max()
-        ax.imshow(M, cmap="RdBu_r", vmin=-m, vmax=m, interpolation="nearest")
-    ax.set_title(name, fontsize=12)
+up = lambda M: np.kron(M, np.ones((4, 4)))           # 每个像素放大成 4×4，缩放显示时边缘保持清楚
+fig, axs = plt.subplots(2, 3, figsize=(9.6, 5.6))
+items = [(layers[0], r"$\sigma_1\boldsymbol{u}_1\boldsymbol{v}_1^{\mathrm{T}}$", "grey"), (layers[1], r"$\sigma_2\boldsymbol{u}_2\boldsymbol{v}_2^{\mathrm{T}}$", "sign"),
+         (layers[2], r"$\sigma_3\boldsymbol{u}_3\boldsymbol{v}_3^{\mathrm{T}}$", "sign"), (sum(layers), T(r"$A_3$（前三层之和）", r"$A_3$ (sum of the first three)"), "grey"),
+         (G, T(r"$A$（原图）", r"$A$ (the image)"), "grey"), (None, "", "")]
+for ax, (M, name, kind) in zip(axs.flat, items):
     ax.set_xticks([])
     ax.set_yticks([])
-fig.text(0.5, -0.04, T("第 2、3 层有正有负（红正蓝负），只能叠加在前面的层上使用", "Layers 2 and 3 have both signs (red +, blue −): they only correct the layers before them"),
-         ha="center", fontsize=10.5, color=MUTED)
+    if M is None:
+        ax.axis("off")
+        ax.text(0.02, 0.5, T("第 2、3 层有正有负（红正蓝负），\n单独看不像图像，\n只能叠加在前面的层上使用", "Layers 2 and 3 have both signs\n(red +, blue −): they only\ncorrect the layers before them"),
+                transform=ax.transAxes, fontsize=11, color=MUTED, va="center")
+        continue
+    if kind == "grey":
+        ax.imshow(up(M), cmap="gray", vmin=0, vmax=1, interpolation="nearest")
+    else:
+        m = np.abs(M).max()
+        ax.imshow(up(M), cmap="RdBu_r", vmin=-m, vmax=m, interpolation="nearest")
+    ax.set_title(name, fontsize=12)
 fig.tight_layout()
 figure(fig, "fig18_4_2")
