@@ -12,3 +12,4 @@ scipy==1.17.1
 gmsh==4.15.2
 pylife==2.3.1
 python-docx==1.2.0
+pyyaml>=6.0
