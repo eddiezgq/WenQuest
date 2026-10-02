@@ -265,6 +265,15 @@ def _names(en: str) -> set[str]:
     return out
 
 
+def check_std_tables(book: dict, rep: Report) -> None:
+    """Every digitized standard table of the book (std/*.yaml, 第 11、13 轮) is well formed: sources with addresses,
+    each row's source listed, columns declared, at least 10 spot checks (stdtab.check)."""
+    import stdtab
+    for p in sorted((book["root"] / "std").glob("*.yaml")):
+        for why in stdtab.check(p):
+            rep.add("error", "标准表", f"std/{p.name}", why)
+
+
 def check_other_books(book: dict, rep: Report) -> None:
     """The same Chinese term should have the same English name in every book (第 9 轮 2.3): two entries agree when
     they share at least one English name (brackets, dashes and apostrophes ignored). A difference is a 提醒, not an
@@ -749,6 +758,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     prog_meta = progress(book)
     terms = glossary(book)
     check_other_books(book, rep)
+    check_std_tables(book, rep)
     values = run_programs(book, {s.chapter for s in sections}, rep)
     en_chapters = {s.chapter for s in sections_en}
     values_en = run_programs(book, en_chapters, rep, "en") if en_chapters else {}

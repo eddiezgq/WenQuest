@@ -1,0 +1,55 @@
+# Taylor 刀具寿命公式常数：v · T^m = C（v 切削速度 m/min，T 刀具寿命 min，C = T=1 min 时的切削速度）
+standard: {code: "无正式标准；试验方法见 ISO 3685（本表未引用其数值）", title: "Taylor 刀具寿命公式 v·T^m = C 的典型常数（英文教材写作 v·T^n = C，本表指数统一记作 m）"}
+sources:
+  - {key: t1, title: "Michigan State University ME 478《Cutting Tool Technology: 1. Tool life 2. Tool Materials 3. Tool Geometry》讲义 PDF（Groover《Fundamentals of Modern Manufacturing》配套讲义的版式）", url: "https://www.egr.msu.edu/~pkwon/me478/cuttingtool.pdf", note: "p.7 Taylor 参数表（Tool material / Work material / n / C m/min / C ft/min）5 行；讲义本身未印出处"}
+  - {key: t2, title: "IIT Kanpur（N. Sinha）《Machining II》讲义 PDF", url: "https://home.iitk.ac.in/~nsinha/Machining%20II.pdf", note: "同一张表“Typical values of n and C”，5 行逐格与 t1 一致"}
+  - {key: t3, title: "NC State University MSE 440/540（Yuntian Zhu）讲义幻灯片，slideserve 转载", url: "https://www.slideserve.com/leopoldom/mse-440-540-processing-of-metallic-materials-powerpoint-ppt-presentation", note: "第 9 页同一张表，5 行逐格与 t1 一致"}
+  - {key: k1, title: "Kalpakjian–Schmid《Manufacturing Engineering and Technology》(Prentice-Hall 2001) 第 20 章 Fundamentals of Cutting 讲义，pdfcoffee 转载", url: "https://pdfcoffee.com/fundamentals-of-cutting-kalpakjian-schmid-manufacturing-engineering-and-technology-2001-prentice-hall-page-20-1-pdf-free.html", note: "Table 20.3“Range of n Values for Eq. (20.20) for Various Tool Materials”，p.20-17，4 行；读两遍一致，表中没有 coated carbides 行"}
+  - {key: k2, title: "ResearchGate 问答《Is anyone familiar with the cutting tool life equation?》中 Eric Dimla 的回答（引 Kalpakjian 一书）", url: "https://www.researchgate.net/post/Is_anyone_familiar_with_the_cutting_tool_life_equation", note: "“HSS 0.08-0.2; Cast alloys 0.1-0.15; Carbides 0.2-0.5; Coated carbides 0.4-0.6; Ceramics 0.5-0.7”——用于互核 k1 四行，coated carbides 一行只有这一个出处（可能是 Kalpakjian 较新版本的表）"}
+columns:
+  - [tool, 刀具材料（出处原文）, tool material, "-"]
+  - [tool_cn, 刀具材料, tool material (Chinese), "-"]
+  - [work, 工件材料（出处原文）, work material, "-"]
+  - [work_cn, 工件材料, work material (Chinese), "-"]
+  - [m, Taylor 指数（英文教材记作 n），单值, Taylor exponent n (single value), "-"]
+  - [m_min, Taylor 指数范围下限, Taylor exponent n, lower bound, "-"]
+  - [m_max, Taylor 指数范围上限, Taylor exponent n, upper bound, "-"]
+  - [C_m_per_min, Taylor 常数 C（T=1 min 时的切削速度）, Taylor constant C, m/min]
+  - [C_ft_per_min, Taylor 常数 C（出处同列给出的英制值）, Taylor constant C, ft/min]
+rows:
+  # —— Groover 式典型值表（t1/t2/t3 三处逐格一致）
+  - {key: hss_nonsteel, src: t1+t2+t3, tool: "High speed steel", tool_cn: 高速钢, work: "Non-steel work", work_cn: "非钢材料（铸铁、有色金属等）", m: 0.125, C_m_per_min: 120, C_ft_per_min: 350}
+  - {key: hss_steel, src: t1+t2+t3, tool: "High speed steel", tool_cn: 高速钢, work: "Steel work", work_cn: 钢, m: 0.125, C_m_per_min: 70, C_ft_per_min: 200}
+  - {key: carbide_nonsteel, src: t1+t2+t3, tool: "Cemented carbide", tool_cn: "硬质合金（表中未分涂层/无涂层）", work: "Non-steel work", work_cn: "非钢材料", m: 0.25, C_m_per_min: 900, C_ft_per_min: 2700}
+  - {key: carbide_steel, src: t1+t2+t3, tool: "Cemented carbide", tool_cn: "硬质合金（表中未分涂层/无涂层）", work: "Steel work", work_cn: 钢, m: 0.25, C_m_per_min: 500, C_ft_per_min: 1500}
+  - {key: ceramic_steel, src: t1+t2+t3, tool: "Ceramic", tool_cn: 陶瓷, work: "Steel work", work_cn: 钢, m: 0.6, C_m_per_min: 3000, C_ft_per_min: 10000}
+  # —— Kalpakjian 指数范围（不分工件材料，无 C 值）
+  - {key: range_hss, src: k1+k2, tool: "High-speed steels", tool_cn: 高速钢, work: "（未分）", work_cn: "不分工件材料", m_min: 0.08, m_max: 0.2}
+  - {key: range_cast_alloys, src: k1+k2, tool: "Cast alloys", tool_cn: "铸造钴基合金（司太立类）", work: "（未分）", work_cn: "不分工件材料", m_min: 0.1, m_max: 0.15}
+  - {key: range_carbides, src: k1+k2, tool: "Carbides", tool_cn: "硬质合金（无涂层）", work: "（未分）", work_cn: "不分工件材料", m_min: 0.2, m_max: 0.5}
+  - {key: range_coated_carbides, src: k2, tool: "Coated carbides", tool_cn: 涂层硬质合金, work: "（未分）", work_cn: "不分工件材料", m_min: 0.4, m_max: 0.6}
+  - {key: range_ceramics, src: k1+k2, tool: "Ceramics", tool_cn: 陶瓷, work: "（未分）", work_cn: "不分工件材料", m_min: 0.5, m_max: 0.7}
+checked:
+  - {row: hss_steel, col: C_m_per_min, value: 70, against: t2, where: "Typical values of n and C 表", ok: true}
+  - {row: hss_steel, col: m, value: 0.125, against: t3, where: "slide 9", ok: true}
+  - {row: hss_nonsteel, col: C_m_per_min, value: 120, against: t2, where: "同表", ok: true}
+  - {row: carbide_steel, col: C_m_per_min, value: 500, against: t3, where: "slide 9", ok: true}
+  - {row: carbide_steel, col: m, value: 0.25, against: t2, where: "同表", ok: true}
+  - {row: carbide_nonsteel, col: C_m_per_min, value: 900, against: t2, where: "同表", ok: true}
+  - {row: ceramic_steel, col: m, value: 0.6, against: t3, where: "slide 9", ok: true}
+  - {row: ceramic_steel, col: C_ft_per_min, value: 10000, against: t2, where: "同表", ok: true}
+  - {row: range_hss, col: m_max, value: 0.2, against: k2, where: "Dimla 回答", ok: true}
+  - {row: range_carbides, col: m_min, value: 0.2, against: k2, where: "Dimla 回答", ok: true}
+  - {row: range_ceramics, col: m_max, value: 0.7, against: k2, where: "Dimla 回答", ok: true}
+  - {row: range_cast_alloys, col: m_max, value: 0.15, against: k2, where: "Dimla 回答", ok: true}
+excluded:
+  - "CBN（立方氮化硼）：没找到可读出处给出 CBN 的 n 或 C，不收。"
+  - "涂层硬质合金的 C 值、陶瓷加工铸铁、任何刀具加工铝合金的单独 C 值：t1–t3 只分“钢 / 非钢”，没有更细的工况，不收。"
+  - "ResearchGate 同帖中 D. Martinez Krahmer 给的单值（HSS 0.16，无涂层硬质合金 0.30，涂层 0.35，陶瓷 0.40）：个人回答、未注明出处和工件材料，不收。"
+  - "Groover 原书（《Fundamentals of Modern Manufacturing》）原文未能读到；t1–t3 三份讲义的表与该书 Taylor 参数表同一版式，但讲义本身都没印出处，所以 source 标题不写成“Groover 原书”。"
+notes:
+  - "符号：本表把指数记作 m（v·T^m = C），英文教材（Groover、Kalpakjian）写作 n（v·T^n = C）；C 的单位与 v 相同，即 T = 1 min 时的切削速度。"
+  - "英制列与公制列不是精确换算：70 m/min ≈ 230 ft/min（表给 200），500 m/min ≈ 1640 ft/min（表给 1500），3000 m/min ≈ 9840 ft/min（表给 10000），是原表各自取整的“典型值”。计算时只用 C_m_per_min。"
+  - "这些是教学用的典型值（Groover 式表只分“钢 / 非钢”），没有进给、切深、磨钝标准（VB）等条件，只能用于例题和量级估算，不能代替刀具厂的寿命数据或 ISO 3685 试验。"
+  - "Kalpakjian 的范围行只有指数、没有 C；需要 C 时用 Groover 式行，或自己由两组 (v, T) 试验数据求：m = ln(v1/v2)/ln(T2/T1)，C = v1·T1^m。"
+  - "规律：指数 m 越大，寿命对速度越不敏感——高速钢 0.08–0.2、硬质合金 0.2–0.5、涂层硬质合金 0.4–0.6、陶瓷 0.5–0.7。"

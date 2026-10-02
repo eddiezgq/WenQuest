@@ -1,0 +1,52 @@
+standard: {code: "ISO 8062-3:2007 / ISO 8062:1994 要求的机械加工余量表（GB/T 6414-2017 修改采用 ISO 8062-3:2007）", title: "铸件 要求的机械加工余量 RMA（RMAG E–K，按铸件最大尺寸）"}
+sources:
+  - {key: "r1", title: "SFSA Steel Founders' Society of America, Steel Castings Handbook Supplement 3 “Dimensional Capabilities of Steel Castings”, Table 2.2 Required machining allowances (RMA) in millimeters for steel castings based on ISO 8062", url: "https://www.stainlessfoundry.com/uploads/files/SFSA_Handbook_Supplement_3_Dimensional_Tolerances.pdf", note: "p.5；E–K 六级、13 个尺寸段的主出处，读两次（整理式一次、原始文本一次）逐格一致；依据 ISO 8062:1994"}
+  - {key: "r2", title: "SizeMarker《Casting Tolerance Grades: The ISO 8062-3 Chart Explained》RMA Machining Allowance 表（标注 DIN EN ISO 8062-3）", url: "https://www.sizemarker.com/blog/casting-tolerance-grades-iso-8062", note: "E、F、G、H 四级 13 个尺寸段逐格互核，与 r1 全部一致"}
+columns:
+  - [size_over_mm, 铸件最大尺寸 大于, largest dimension above, mm]
+  - [size_to_mm, 铸件最大尺寸 至, largest dimension up to and including, mm]
+  - [RMA_E_mm, 要求的机械加工余量 RMAG E（单侧）, "required machining allowance, grade E", mm]
+  - [RMA_F_mm, 要求的机械加工余量 RMAG F（单侧）, "required machining allowance, grade F", mm]
+  - [RMA_G_mm, 要求的机械加工余量 RMAG G（单侧）, "required machining allowance, grade G", mm]
+  - [RMA_H_mm, 要求的机械加工余量 RMAG H（单侧）, "required machining allowance, grade H", mm]
+  - [RMA_J_mm, 要求的机械加工余量 RMAG J（单侧）, "required machining allowance, grade J", mm]
+  - [RMA_K_mm, 要求的机械加工余量 RMAG K（单侧）, "required machining allowance, grade K", mm]
+rows:
+  - {key: "0-40", src: "r1+r2", size_over_mm: 0, size_to_mm: 40, RMA_E_mm: 0.4, RMA_F_mm: 0.5, RMA_G_mm: 0.5, RMA_H_mm: 0.7, RMA_J_mm: 1, RMA_K_mm: 1.4}
+  - {key: "40-63", src: "r1+r2", size_over_mm: 40, size_to_mm: 63, RMA_E_mm: 0.4, RMA_F_mm: 0.5, RMA_G_mm: 0.7, RMA_H_mm: 1, RMA_J_mm: 1.4, RMA_K_mm: 2}
+  - {key: "63-100", src: "r1+r2", size_over_mm: 63, size_to_mm: 100, RMA_E_mm: 0.7, RMA_F_mm: 1, RMA_G_mm: 1.4, RMA_H_mm: 2, RMA_J_mm: 2.8, RMA_K_mm: 4}
+  - {key: "100-160", src: "r1+r2", size_over_mm: 100, size_to_mm: 160, RMA_E_mm: 1.1, RMA_F_mm: 1.5, RMA_G_mm: 2.2, RMA_H_mm: 3, RMA_J_mm: 4, RMA_K_mm: 6}
+  - {key: "160-250", src: "r1+r2", size_over_mm: 160, size_to_mm: 250, RMA_E_mm: 1.4, RMA_F_mm: 2, RMA_G_mm: 2.8, RMA_H_mm: 4, RMA_J_mm: 5.5, RMA_K_mm: 8}
+  - {key: "250-400", src: "r1+r2", size_over_mm: 250, size_to_mm: 400, RMA_E_mm: 1.8, RMA_F_mm: 2.5, RMA_G_mm: 3.5, RMA_H_mm: 5, RMA_J_mm: 7, RMA_K_mm: 10}
+  - {key: "400-630", src: "r1+r2", size_over_mm: 400, size_to_mm: 630, RMA_E_mm: 2.2, RMA_F_mm: 3, RMA_G_mm: 4, RMA_H_mm: 6, RMA_J_mm: 9, RMA_K_mm: 12}
+  - {key: "630-1000", src: "r1+r2", size_over_mm: 630, size_to_mm: 1000, RMA_E_mm: 2.5, RMA_F_mm: 3.5, RMA_G_mm: 5, RMA_H_mm: 7, RMA_J_mm: 10, RMA_K_mm: 14}
+  - {key: "1000-1600", src: "r1+r2", size_over_mm: 1000, size_to_mm: 1600, RMA_E_mm: 2.8, RMA_F_mm: 4, RMA_G_mm: 5.5, RMA_H_mm: 8, RMA_J_mm: 11, RMA_K_mm: 16}
+  - {key: "1600-2500", src: "r1+r2", size_over_mm: 1600, size_to_mm: 2500, RMA_E_mm: 3.2, RMA_F_mm: 4.5, RMA_G_mm: 6, RMA_H_mm: 9, RMA_J_mm: 13, RMA_K_mm: 18}
+  - {key: "2500-4000", src: "r1+r2", size_over_mm: 2500, size_to_mm: 4000, RMA_E_mm: 3.5, RMA_F_mm: 5, RMA_G_mm: 7, RMA_H_mm: 10, RMA_J_mm: 14, RMA_K_mm: 20}
+  - {key: "4000-6300", src: "r1+r2", size_over_mm: 4000, size_to_mm: 6300, RMA_E_mm: 4, RMA_F_mm: 5.5, RMA_G_mm: 8, RMA_H_mm: 11, RMA_J_mm: 16, RMA_K_mm: 22}
+  - {key: "6300-10000", src: "r1+r2", size_over_mm: 6300, size_to_mm: 10000, RMA_E_mm: 4.5, RMA_F_mm: 6, RMA_G_mm: 9, RMA_H_mm: 12, RMA_J_mm: 17, RMA_K_mm: 24}
+checked:
+  - {row: "0-40", col: "RMA_H_mm", value: 0.7, against: "r2", where: "up to 40 行", ok: True}
+  - {row: "40-63", col: "RMA_G_mm", value: 0.7, against: "r2", where: "63 行", ok: True}
+  - {row: "63-100", col: "RMA_F_mm", value: 1, against: "r2", where: "100 行", ok: True}
+  - {row: "100-160", col: "RMA_G_mm", value: 2.2, against: "r2", where: "160 行", ok: True}
+  - {row: "160-250", col: "RMA_E_mm", value: 1.4, against: "r2", where: "250 行", ok: True}
+  - {row: "250-400", col: "RMA_E_mm", value: 1.8, against: "r2", where: "400 行", ok: True}
+  - {row: "250-400", col: "RMA_F_mm", value: 2.5, against: "r2", where: "400 行", ok: True}
+  - {row: "250-400", col: "RMA_G_mm", value: 3.5, against: "r2", where: "400 行", ok: True}
+  - {row: "250-400", col: "RMA_H_mm", value: 5, against: "r2", where: "400 行", ok: True}
+  - {row: "400-630", col: "RMA_H_mm", value: 6, against: "r2", where: "630 行", ok: True}
+  - {row: "630-1000", col: "RMA_G_mm", value: 5, against: "r2", where: "1000 行", ok: True}
+  - {row: "6300-10000", col: "RMA_H_mm", value: 12, against: "r2", where: "10000 行", ok: True}
+  - {row: "250-400", col: "RMA_K_mm", value: 10, against: "r1", where: "Table 2.2 第二次读取（原始文本）", ok: True}
+excluded:
+  - "RMAG A、B、C、D 四级：只在 renrendoc 的 ISO 8062-3 中文译本里见到，OCR 错乱（如 ≤40 行“0.1, 0.1, 0.2, 0.3 …”后续列错位），没有第二个可读出处，不收。灰铸铁砂型铸造用不到这四级。"
+  - "J、K 两级只有 r1（读两次一致），r2 不含；r1 依据的是 ISO 8062:1994。E–H 四级 1994 版（r1）与 ISO 8062-3（r2）13 行全同，说明该表在 2007 版未变，但 J、K 未能用 2007 版出处直接核对。"
+  - "bessercast.com 的 RMA 表（250–400 mm E 级写作 2.2）与 r1、r2 都不符，未采用。"
+  - "kikakurui.com 的 JIS B 0403 页面数值表是图片，网页工具返回的“数值”与原文无关（疑为臆造），已弃用。"
+  - "毛坯尺寸计算公式（如 R = F + 2·RMA + DCT/2）：所读 ISO 8062-3:2007 样本中没有该条文原文，本表不收；教材如要写，需用 GB/T 6414-2017 原文核对。"
+notes:
+  - "RMA 是单侧余量：同一铸件所有加工面按铸件（加工后）最大尺寸选同一个 RMA 值（JIS B 0403:1995 第 11.1 条原文，kikakurui.com/b0/B0403-1995-01.html 文字部分；该页表格为图片，数值未取；ISO 8062-3:2007 第 8 章为 RMA）。"
+  - "查表规则：按铸件最大尺寸取段，“大于 size_over_mm，至 size_to_mm（含）”，段内不插值。"
+  - "r1 表下注：钢铸件上型（cope）表面最少 6 mm RMA——这是 SFSA 对钢铸件的要求，不属于 ISO 表值，灰铸铁不套用。"
+  - "本书用例（HT200 箱体，最大尺寸约 350 mm）：250–400 mm 段；机器造型灰铸铁 RMAG E–G → 1.8 / 2.5 / 3.5 mm；手工造型 F–H → 2.5 / 3.5 / 5 mm（等级见 casting_typical.yaml）。"

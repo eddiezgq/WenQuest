@@ -1,0 +1,75 @@
+standard: {code: "ISO 8062-3:2007 Table 2（GB/T 6414-2017 修改采用）", title: "铸件 尺寸公差、几何公差与机械加工余量 —— 线性尺寸铸件公差 DCT（DCTG 1–16，公称尺寸至 10000 mm）"}
+sources:
+  - {key: "c1", title: "ISO 8062-3:2007 iTeh 公开样本 PDF，Table 2 — Linear dimensional casting tolerances (DCT)", url: "https://cdn.standards.iteh.ai/samples/40495/29fba0fd844d421d80b957ce1a1a5899/ISO-8062-3-2007.pdf", note: "主出处、标准原文。PDF 文本按“三行一组、逐列”排列；整表原始记号读取一次，100–1600 mm 两组再读一次，逐格一致；另有一次整理式读取（有 3 处与原始文本不符，以原始文本为准，见 check）。表注 a、b 与 5.2 条（公差对称分布）也取自此"}
+  - {key: "c2", title: "Studocu《ISO 8062-3 2007 (E) - Dimensional Tolerances for Casting DCTG》文本", url: "https://www.studocu.com/in/document/srm-university/formal-language-aand-automata/iso-8062-3-2007-e-dimensional-tolerances-for-casting-dctg/149695667", note: "≤10 至 4000–6300 mm 各行的数值序列（读两次；第二次行标签错位一行，按序列内容对位），用于互核；没有 6300–10000 行"}
+  - {key: "c3", title: "Modulus Metal《ISO 8062-3 Sand Casting Linear Dimensional Tolerances》", url: "https://www.modulusmetal.com/iso-8062-3-sand-casting-linear-dimensional-tolerances/", note: "DCT8–DCT15 及 DCT15wtb（=原 DCTG16）的 ± 半值；≤630 mm 各行 ×2 后与 c1 全部一致，用于互核；630 mm 以上该页把半值取整（如 ±6、±13），不作核对依据"}
+  - {key: "c4", title: "SizeMarker《Casting Tolerance Grades: The ISO 8062-3 Chart Explained》", url: "https://www.sizemarker.com/blog/casting-tolerance-grades-iso-8062", note: "DCTG6、8、10、12、14 五列（至 4000 mm）抽查"}
+  - {key: "c5", title: "Castings PLC《Casting Tolerances》（ISO 8062 CT8、CT9 表）", url: "https://castings.plc.uk/company/technical-assistance/casting-tolerances/", note: "CT8、CT9 至 630 mm 抽查（与 DCTG8、DCTG9 相同）"}
+  - {key: "c6", title: "Code of China《GB/T 6414-2017 Castings — Dimensional tolerances and geometrical tolerances and machining allowances》英文版简介", url: "https://www.codeofchina.com/standard/GBT6414-2017.html", note: "GB/T 6414-2017 与 ISO 8062-3:2007 的关系（重新起草、修改采用；代替 GB/T 6414-1999）及主要技术变化，不取数"}
+  - {key: "c7", title: "ISO 8062-3:2023 iTeh 公开样本（前言）", url: "https://cdn.standards.iteh.ai/samples/77952/dfc94491c8324e58b3a7890f41a5fab3/ISO-8062-3-2023.pdf", note: "前言：2023 版 Table 7 把 DCTG 16 改称 DCTG 15wt；不取数"}
+columns:
+  - [size_over_mm, 铸件公称尺寸 大于, nominal dimension above, mm]
+  - [size_to_mm, 铸件公称尺寸 至, nominal dimension up to and including, mm]
+  - [DCTG1_mm, DCTG1 线性尺寸公差（全值）, total linear casting tolerance DCTG 1, mm]
+  - [DCTG2_mm, DCTG2 线性尺寸公差（全值）, total linear casting tolerance DCTG 2, mm]
+  - [DCTG3_mm, DCTG3 线性尺寸公差（全值）, total linear casting tolerance DCTG 3, mm]
+  - [DCTG4_mm, DCTG4 线性尺寸公差（全值）, total linear casting tolerance DCTG 4, mm]
+  - [DCTG5_mm, DCTG5 线性尺寸公差（全值）, total linear casting tolerance DCTG 5, mm]
+  - [DCTG6_mm, DCTG6 线性尺寸公差（全值）, total linear casting tolerance DCTG 6, mm]
+  - [DCTG7_mm, DCTG7 线性尺寸公差（全值）, total linear casting tolerance DCTG 7, mm]
+  - [DCTG8_mm, DCTG8 线性尺寸公差（全值）, total linear casting tolerance DCTG 8, mm]
+  - [DCTG9_mm, DCTG9 线性尺寸公差（全值）, total linear casting tolerance DCTG 9, mm]
+  - [DCTG10_mm, DCTG10 线性尺寸公差（全值）, total linear casting tolerance DCTG 10, mm]
+  - [DCTG11_mm, DCTG11 线性尺寸公差（全值）, total linear casting tolerance DCTG 11, mm]
+  - [DCTG12_mm, DCTG12 线性尺寸公差（全值）, total linear casting tolerance DCTG 12, mm]
+  - [DCTG13_mm, DCTG13 线性尺寸公差（全值）, total linear casting tolerance DCTG 13, mm]
+  - [DCTG14_mm, DCTG14 线性尺寸公差（全值）, total linear casting tolerance DCTG 14, mm]
+  - [DCTG15_mm, DCTG15 线性尺寸公差（全值）, total linear casting tolerance DCTG 15, mm]
+  - [DCTG16_mm, DCTG16 线性尺寸公差（全值）, total linear casting tolerance DCTG 16, mm]
+  - [check, 核对备注（只在有分歧的行出现）, cross-check remark, -]
+rows:
+  - {key: "0-10", src: "c1+c2+c3", size_over_mm: 0, size_to_mm: 10, DCTG1_mm: 0.09, DCTG2_mm: 0.13, DCTG3_mm: 0.18, DCTG4_mm: 0.26, DCTG5_mm: 0.36, DCTG6_mm: 0.52, DCTG7_mm: 0.74, DCTG8_mm: 1, DCTG9_mm: 1.5, DCTG10_mm: 2, DCTG11_mm: 2.8, DCTG12_mm: 4.2, DCTG13_mm: null, DCTG14_mm: null, DCTG15_mm: null, DCTG16_mm: null}
+  - {key: "10-16", src: "c1+c2+c3", size_over_mm: 10, size_to_mm: 16, DCTG1_mm: 0.1, DCTG2_mm: 0.14, DCTG3_mm: 0.2, DCTG4_mm: 0.28, DCTG5_mm: 0.38, DCTG6_mm: 0.54, DCTG7_mm: 0.78, DCTG8_mm: 1.1, DCTG9_mm: 1.6, DCTG10_mm: 2.2, DCTG11_mm: 3, DCTG12_mm: 4.4, DCTG13_mm: null, DCTG14_mm: null, DCTG15_mm: null, DCTG16_mm: null}
+  - {key: "16-25", src: "c1+c2+c3", size_over_mm: 16, size_to_mm: 25, DCTG1_mm: 0.11, DCTG2_mm: 0.15, DCTG3_mm: 0.22, DCTG4_mm: 0.3, DCTG5_mm: 0.42, DCTG6_mm: 0.58, DCTG7_mm: 0.82, DCTG8_mm: 1.2, DCTG9_mm: 1.7, DCTG10_mm: 2.4, DCTG11_mm: 3.2, DCTG12_mm: 4.6, DCTG13_mm: 6, DCTG14_mm: 8, DCTG15_mm: 10, DCTG16_mm: 12}
+  - {key: "25-40", src: "c1+c2+c3", size_over_mm: 25, size_to_mm: 40, DCTG1_mm: 0.12, DCTG2_mm: 0.17, DCTG3_mm: 0.24, DCTG4_mm: 0.32, DCTG5_mm: 0.46, DCTG6_mm: 0.64, DCTG7_mm: 0.9, DCTG8_mm: 1.3, DCTG9_mm: 1.8, DCTG10_mm: 2.6, DCTG11_mm: 3.6, DCTG12_mm: 5, DCTG13_mm: 7, DCTG14_mm: 9, DCTG15_mm: 11, DCTG16_mm: 14, check: "c1 原始文本此组（25–100 mm）DCTG13–16 列多出一个记号“9”，这四列按 c2 行序列定值，并与 c3（±值×2）、c4（DCTG14）一致"}
+  - {key: "40-63", src: "c1+c2+c3", size_over_mm: 40, size_to_mm: 63, DCTG1_mm: 0.13, DCTG2_mm: 0.18, DCTG3_mm: 0.26, DCTG4_mm: 0.36, DCTG5_mm: 0.5, DCTG6_mm: 0.7, DCTG7_mm: 1, DCTG8_mm: 1.4, DCTG9_mm: 2, DCTG10_mm: 2.8, DCTG11_mm: 4, DCTG12_mm: 5.6, DCTG13_mm: 8, DCTG14_mm: 10, DCTG15_mm: 12, DCTG16_mm: 16, check: "c1 原始文本此组（25–100 mm）DCTG13–16 列多出一个记号“9”，这四列按 c2 行序列定值，并与 c3（±值×2）、c4（DCTG14）一致"}
+  - {key: "63-100", src: "c1+c2+c3", size_over_mm: 63, size_to_mm: 100, DCTG1_mm: 0.14, DCTG2_mm: 0.2, DCTG3_mm: 0.28, DCTG4_mm: 0.4, DCTG5_mm: 0.56, DCTG6_mm: 0.78, DCTG7_mm: 1.1, DCTG8_mm: 1.6, DCTG9_mm: 2.2, DCTG10_mm: 3.2, DCTG11_mm: 4.4, DCTG12_mm: 6, DCTG13_mm: 9, DCTG14_mm: 11, DCTG15_mm: 14, DCTG16_mm: 18, check: "c1 原始文本此组（25–100 mm）DCTG13–16 列多出一个记号“9”，这四列按 c2 行序列定值，并与 c3（±值×2）、c4（DCTG14）一致"}
+  - {key: "100-160", src: "c1+c2+c3", size_over_mm: 100, size_to_mm: 160, DCTG1_mm: 0.15, DCTG2_mm: 0.22, DCTG3_mm: 0.3, DCTG4_mm: 0.44, DCTG5_mm: 0.62, DCTG6_mm: 0.88, DCTG7_mm: 1.2, DCTG8_mm: 1.8, DCTG9_mm: 2.5, DCTG10_mm: 3.6, DCTG11_mm: 5, DCTG12_mm: 7, DCTG13_mm: 10, DCTG14_mm: 12, DCTG15_mm: 16, DCTG16_mm: 20}
+  - {key: "160-250", src: "c1+c2+c3", size_over_mm: 160, size_to_mm: 250, DCTG1_mm: null, DCTG2_mm: 0.24, DCTG3_mm: 0.34, DCTG4_mm: 0.5, DCTG5_mm: 0.7, DCTG6_mm: 1, DCTG7_mm: 1.4, DCTG8_mm: 2, DCTG9_mm: 2.8, DCTG10_mm: 4, DCTG11_mm: 5.6, DCTG12_mm: 8, DCTG13_mm: 11, DCTG14_mm: 14, DCTG15_mm: 18, DCTG16_mm: 22}
+  - {key: "250-400", src: "c1+c2+c3", size_over_mm: 250, size_to_mm: 400, DCTG1_mm: null, DCTG2_mm: null, DCTG3_mm: 0.4, DCTG4_mm: 0.56, DCTG5_mm: 0.78, DCTG6_mm: 1.1, DCTG7_mm: 1.6, DCTG8_mm: 2.2, DCTG9_mm: 3.2, DCTG10_mm: 4.4, DCTG11_mm: 6.2, DCTG12_mm: 9, DCTG13_mm: 12, DCTG14_mm: 16, DCTG15_mm: 20, DCTG16_mm: 25, check: "c1 第一次读取 DCTG11 给 6，c1 原始文本两次读取均为 6,2，c2、c3（±3.1）也为 6.2，取 6.2"}
+  - {key: "400-630", src: "c1+c2+c3", size_over_mm: 400, size_to_mm: 630, DCTG1_mm: null, DCTG2_mm: null, DCTG3_mm: null, DCTG4_mm: 0.64, DCTG5_mm: 0.9, DCTG6_mm: 1.2, DCTG7_mm: 1.8, DCTG8_mm: 2.6, DCTG9_mm: 3.6, DCTG10_mm: 5, DCTG11_mm: 7, DCTG12_mm: 10, DCTG13_mm: 14, DCTG14_mm: 18, DCTG15_mm: 22, DCTG16_mm: 28}
+  - {key: "630-1000", src: "c1+c2", size_over_mm: 630, size_to_mm: 1000, DCTG1_mm: null, DCTG2_mm: null, DCTG3_mm: null, DCTG4_mm: null, DCTG5_mm: 1, DCTG6_mm: 1.4, DCTG7_mm: 2, DCTG8_mm: 2.8, DCTG9_mm: 4, DCTG10_mm: 6, DCTG11_mm: 8, DCTG12_mm: 11, DCTG13_mm: 16, DCTG14_mm: 20, DCTG15_mm: 25, DCTG16_mm: 32}
+  - {key: "1000-1600", src: "c1+c2", size_over_mm: 1000, size_to_mm: 1600, DCTG1_mm: null, DCTG2_mm: null, DCTG3_mm: null, DCTG4_mm: null, DCTG5_mm: null, DCTG6_mm: 1.6, DCTG7_mm: 2.2, DCTG8_mm: 3.2, DCTG9_mm: 4.6, DCTG10_mm: 7, DCTG11_mm: 9, DCTG12_mm: 13, DCTG13_mm: 18, DCTG14_mm: 23, DCTG15_mm: 29, DCTG16_mm: 37, check: "c1 第一次（整理式）读取 DCTG11=10、DCTG15=28，c1 原始文本两次读取为 9、29，c2 也为 9、29，取 9、29（不在本次使用范围内）"}
+  - {key: "1600-2500", src: "c1+c2", size_over_mm: 1600, size_to_mm: 2500, DCTG1_mm: null, DCTG2_mm: null, DCTG3_mm: null, DCTG4_mm: null, DCTG5_mm: null, DCTG6_mm: null, DCTG7_mm: 2.6, DCTG8_mm: 3.8, DCTG9_mm: 5.4, DCTG10_mm: 8, DCTG11_mm: 10, DCTG12_mm: 15, DCTG13_mm: 21, DCTG14_mm: 26, DCTG15_mm: 33, DCTG16_mm: 42}
+  - {key: "2500-4000", src: "c1+c2", size_over_mm: 2500, size_to_mm: 4000, DCTG1_mm: null, DCTG2_mm: null, DCTG3_mm: null, DCTG4_mm: null, DCTG5_mm: null, DCTG6_mm: null, DCTG7_mm: null, DCTG8_mm: 4.4, DCTG9_mm: 6.2, DCTG10_mm: 9, DCTG11_mm: 12, DCTG12_mm: 17, DCTG13_mm: 24, DCTG14_mm: 30, DCTG15_mm: 38, DCTG16_mm: 49}
+  - {key: "4000-6300", src: "c1+c2", size_over_mm: 4000, size_to_mm: 6300, DCTG1_mm: null, DCTG2_mm: null, DCTG3_mm: null, DCTG4_mm: null, DCTG5_mm: null, DCTG6_mm: null, DCTG7_mm: null, DCTG8_mm: null, DCTG9_mm: 7, DCTG10_mm: 10, DCTG11_mm: 14, DCTG12_mm: 20, DCTG13_mm: 28, DCTG14_mm: 35, DCTG15_mm: 44, DCTG16_mm: 56}
+  - {key: "6300-10000", src: "c1", size_over_mm: 6300, size_to_mm: 10000, DCTG1_mm: null, DCTG2_mm: null, DCTG3_mm: null, DCTG4_mm: null, DCTG5_mm: null, DCTG6_mm: null, DCTG7_mm: null, DCTG8_mm: null, DCTG9_mm: null, DCTG10_mm: 11, DCTG11_mm: 16, DCTG12_mm: 23, DCTG13_mm: 32, DCTG14_mm: 40, DCTG15_mm: 50, DCTG16_mm: 64}
+checked:
+  - {row: "0-10", col: "DCTG8_mm", value: 1, against: "c3", where: "≤10 行 DCT8 ±0.5", ok: True}
+  - {row: "16-25", col: "DCTG16_mm", value: 12, against: "c3", where: ">16–25 行 DCT15wtb ±6", ok: True}
+  - {row: "63-100", col: "DCTG13_mm", value: 9, against: "c3", where: ">63–100 行 DCT13 ±4.5", ok: True}
+  - {row: "100-160", col: "DCTG9_mm", value: 2.5, against: "c5", where: "CT9 100–160 行", ok: True}
+  - {row: "160-250", col: "DCTG12_mm", value: 8, against: "c4", where: "over 160 to 250 行 DCTG 12", ok: True}
+  - {row: "250-400", col: "DCTG10_mm", value: 4.4, against: "c4", where: "over 250 to 400 行 DCTG 10", ok: True}
+  - {row: "250-400", col: "DCTG11_mm", value: 6.2, against: "c3", where: ">250–400 行 DCT11 ±3.1", ok: True}
+  - {row: "250-400", col: "DCTG8_mm", value: 2.2, against: "c5", where: "CT8 250–400 行", ok: True}
+  - {row: "250-400", col: "DCTG13_mm", value: 12, against: "c2", where: "250–400 序列第 11 个值", ok: True}
+  - {row: "400-630", col: "DCTG9_mm", value: 3.6, against: "c5", where: "CT9 400–630 行", ok: True}
+  - {row: "400-630", col: "DCTG6_mm", value: 1.2, against: "c4", where: "over 400 to 630 行 DCTG 6", ok: True}
+  - {row: "630-1000", col: "DCTG12_mm", value: 11, against: "c4", where: "over 630 to 1000 行 DCTG 12（c3 给 ±6，系取整，不采用）", ok: True}
+  - {row: "630-1000", col: "DCTG14_mm", value: 20, against: "c4", where: "over 630 to 1000 行 DCTG 14", ok: True}
+  - {row: "1600-2500", col: "DCTG12_mm", value: 15, against: "c4", where: "over 1600 to 2500 行 DCTG 12", ok: True}
+  - {row: "2500-4000", col: "DCTG14_mm", value: 30, against: "c4", where: "over 2500 to 4000 行 DCTG 14", ok: True}
+excluded:
+  - "GB/T 6414-2017 标准原文：openstd 只提供在线阅读（图像），各转载站（renrendoc 的 ISO 8062-3 中文译本、casting-china.org、iron-foundry.com）表格错位或数值有误（如 casting-china.org 把 ≤10 行 DCTG8 写成 1.1），未用作数值出处。表值按 ISO 8062-3:2007 原文收录。"
+  - "ISO/DIS 8062-3:2019 样本的表格文本按列混排，无法对行，未用。"
+  - "壁厚公差：表注 a 规定 DCTG1–15 的壁厚取大一级，表中不单列；DCTG16 只用于一般按 DCTG15 规定的铸件的壁厚（表注 b）。"
+  - "错型（SMI）、几何公差（GCTG）表：本轮未读，未收。"
+notes:
+  - "表值是总公差（全值），默认对称分布：上、下偏差各为一半（ISO 8062-3:2007 第 5.2 条）。例：公称尺寸 350 mm、DCTG10 → 4.4 mm，即 ±2.2 mm。"
+  - "null 表示该等级在此尺寸段标准未规定数值（表中为“—”）。"
+  - "查表规则：公称尺寸指与铸型有关的铸件尺寸（含加工余量的毛坯尺寸），按“大于 size_over_mm，至 size_to_mm（含）”取段，段内不插值；第一段为 ≤10 mm。"
+  - "src=c1+c2+c3：标准原文与两处转载互核一致（c3 只覆盖 DCTG8–16）；630 mm 以上行为 c1+c2；6300–10000 mm 行只有 c1（两次读取一致）。"
+  - "与 GB/T 6414-2017 的关系：GB/T 6414-2017 重新起草、修改采用 ISO 8062-3:2007，代替 GB/T 6414-1999（c6）。c6 列出的技术变化包括“修改了铸件尺寸公差”“修改了大批量生产合金铸件的公差等级”（附录 A 表 A.1、A.3），但没有说明表 2 数值与 ISO 是否有差异；本轮没拿到 GB/T 原文核对。教材引用时写“GB/T 6414-2017（数值同 ISO 8062-3:2007 表 2）”之前，建议用标准原文再核一次。"
+  - "ISO 8062-3:2023 把 DCTG16 改称 DCTG15wt（c7），c3 网页的“DCT15wtb”列即此列。"
+  - "本书用例（HT200 灰铸铁变速箱箱体，砂型，最大尺寸约 350 mm）：落在 250–400 mm 段；按 casting_typical.yaml，机器造型灰铸铁 DCTG 8–12 → 2.2 / 3.2 / 4.4 / 6.2 / 9 mm，手工造型 DCTG 11–14 → 6.2 / 9 / 12 / 16 mm。箱体上较小的尺寸（如 120 mm 轴承座孔距）要按各自的尺寸段另查。"

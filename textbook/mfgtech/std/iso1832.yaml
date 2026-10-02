@@ -1,0 +1,146 @@
+# 可转位刀片型号表示规则（ISO 1832；国内对应 GB/T 2076）
+standard: {code: "ISO 1832（国内对应 GB/T 2076；本表未读到 GB/T 2076 原文）", title: "切削刀具用可转位刀片 型号表示规则 —— 各位代号含义（第 1–3、6、7 位给出代号值）"}
+sources:
+  - {key: md, title: "Machining Doctor《ISO Inserts - Nomenclature, Dimensions & Tolerances》", url: "https://www.machiningdoctor.com/isoturn/", note: "第 1、2、4、6、7 位全表，第 3 位主表与 M 级补充表（按形状和内切圆分档）；主出处"}
+  - {key: w, title: "Walter《Turning designation key for Walter Turn cutting inserts》(en-GB) PDF；同一内容见 Walter 2016 总样本（rubix 托管 general_catalogue_2016_en_50.pdf）", url: "https://cdn.walter-tools.com/files/sitecollectiondocuments/technicalinformation/en-gb/turning-designation-key-walter-turn-cutting-inserts-en-gb.pdf", note: "第 1、2 位互核；第 3 位全部 12 个等级的 d、m、s 允许偏差（J、K、L、N、U 的 d/m 范围只有这里有）；第 6、7 位；第 8、9 位字母；第 10 位起 F/M/R/H 为 Walter 自定断屑槽"}
+  - {key: kn, title: "Kennametal《Milling Insert Identification System》（MSC Direct 托管 PDF）", url: "https://www1.mscdirect.com/images/solutions/kennametal/millingInsertIdSystem.pdf", note: "第 1、2 位互核；第 4 位 15 个字母（网页抽取时列有错位，按字母顺序与 md 对照后一致）；第 3 位为英制（inch）表，用来核对 A/C/E/F/G/H 的数值；第 7 位 01–32 与 M0"}
+  - {key: pt, title: "Protool《ISO Turning Insert Nomenclature Explained》", url: "https://www.protool-ltd.co.uk/blogs/blog/iso-turning-insert-nomenclature", note: "只用 CNMG 120408 示例：12 = 内切圆 12.7 mm、04 = 厚 4.76 mm、08 = rε 0.8 mm"}
+  - {key: dn, title: "Denitool《Insert Designation》", url: "https://www.denitool.com/en/insert-designation.html", note: "只用第 8 位（F 锋利、E 倒圆、T 倒棱、S 倒棱+倒圆）与第 9 位（R/N/L）含义；该页第 1 位 G=45° 不是 ISO 代号，未采用"}
+columns:
+  - [position, 代号位置（1–10+；3-M 为 M 级补充表）, designation position, "-"]
+  - [code, 代号, symbol, "-"]
+  - [meaning_cn, 含义, meaning (Chinese), "-"]
+  - [meaning_en, 含义（英文）, meaning (English), "-"]
+  - [angle_deg, 刀尖角（第 1 位）或法后角（第 2 位）, nose angle / normal clearance angle, °]
+  - [d_tol_min_mm, 内切圆 d 允许偏差 ±（下限；定值时与上限相同）, IC tolerance ± (low end), mm]
+  - [d_tol_max_mm, 内切圆 d 允许偏差 ±（上限）, IC tolerance ± (high end), mm]
+  - [m_tol_min_mm, 刀尖位置尺寸 m 允许偏差 ±（下限）, corner height m tolerance ± (low end), mm]
+  - [m_tol_max_mm, 刀尖位置尺寸 m 允许偏差 ±（上限）, corner height m tolerance ± (high end), mm]
+  - [s_tol_mm, 厚度 s 允许偏差 ±, thickness tolerance ±, mm]
+  - [value_mm, 代号对应尺寸（第 6 位厚度 s、第 7 位刀尖圆角 rε）, thickness / corner radius, mm]
+rows:
+  - {key: "1-A", src: "md+w", position: 1, code: "A", meaning_cn: "刀片形状：平行四边形 85°", meaning_en: "insert shape: parallelogram 85°", angle_deg: 85}
+  - {key: "1-B", src: "md+w", position: 1, code: "B", meaning_cn: "刀片形状：平行四边形 82°", meaning_en: "insert shape: parallelogram 82°", angle_deg: 82}
+  - {key: "1-C", src: "md+w+kn", position: 1, code: "C", meaning_cn: "刀片形状：菱形 80°", meaning_en: "insert shape: rhombic 80°", angle_deg: 80}
+  - {key: "1-D", src: "md+w", position: 1, code: "D", meaning_cn: "刀片形状：菱形 55°", meaning_en: "insert shape: rhombic 55°", angle_deg: 55}
+  - {key: "1-E", src: "md+w+kn", position: 1, code: "E", meaning_cn: "刀片形状：菱形 75°", meaning_en: "insert shape: rhombic 75°", angle_deg: 75}
+  - {key: "1-H", src: "md+kn", position: 1, code: "H", meaning_cn: "刀片形状：正六边形", meaning_en: "insert shape: hexagonal", angle_deg: 120}
+  - {key: "1-K", src: "md+w", position: 1, code: "K", meaning_cn: "刀片形状：平行四边形 55°", meaning_en: "insert shape: parallelogram 55°", angle_deg: 55}
+  - {key: "1-L", src: "md+kn", position: 1, code: "L", meaning_cn: "刀片形状：矩形", meaning_en: "insert shape: rectangular", angle_deg: 90}
+  - {key: "1-M", src: "md+w", position: 1, code: "M", meaning_cn: "刀片形状：菱形 86°", meaning_en: "insert shape: rhombic 86°", angle_deg: 86}
+  - {key: "1-O", src: "md+kn", position: 1, code: "O", meaning_cn: "刀片形状：正八边形", meaning_en: "insert shape: octagonal", angle_deg: 135}
+  - {key: "1-P", src: "md", position: 1, code: "P", meaning_cn: "刀片形状：正五边形", meaning_en: "insert shape: pentagonal", angle_deg: 108}
+  - {key: "1-R", src: "md+kn", position: 1, code: "R", meaning_cn: "刀片形状：圆形", meaning_en: "insert shape: round"}
+  - {key: "1-S", src: "md+w+kn", position: 1, code: "S", meaning_cn: "刀片形状：正方形", meaning_en: "insert shape: square", angle_deg: 90}
+  - {key: "1-T", src: "md+w+kn", position: 1, code: "T", meaning_cn: "刀片形状：正三角形", meaning_en: "insert shape: triangular", angle_deg: 60}
+  - {key: "1-V", src: "md+w", position: 1, code: "V", meaning_cn: "刀片形状：菱形 35°", meaning_en: "insert shape: rhombic 35°", angle_deg: 35}
+  - {key: "1-W", src: "md+w", position: 1, code: "W", meaning_cn: "刀片形状：等边不等角六边形（凸三角，trigon）80°", meaning_en: "insert shape: trigon 80°", angle_deg: 80}
+  - {key: "2-A", src: "md+w+kn", position: 2, code: "A", meaning_cn: "法后角 3°", meaning_en: "normal clearance 3°", angle_deg: 3}
+  - {key: "2-B", src: "md+w+kn", position: 2, code: "B", meaning_cn: "法后角 5°", meaning_en: "normal clearance 5°", angle_deg: 5}
+  - {key: "2-C", src: "md+w+kn", position: 2, code: "C", meaning_cn: "法后角 7°", meaning_en: "normal clearance 7°", angle_deg: 7}
+  - {key: "2-D", src: "md+w+kn", position: 2, code: "D", meaning_cn: "法后角 15°", meaning_en: "normal clearance 15°", angle_deg: 15}
+  - {key: "2-E", src: "md+w+kn", position: 2, code: "E", meaning_cn: "法后角 20°", meaning_en: "normal clearance 20°", angle_deg: 20}
+  - {key: "2-F", src: "md+w+kn", position: 2, code: "F", meaning_cn: "法后角 25°", meaning_en: "normal clearance 25°", angle_deg: 25}
+  - {key: "2-G", src: "md+w+kn", position: 2, code: "G", meaning_cn: "法后角 30°", meaning_en: "normal clearance 30°", angle_deg: 30}
+  - {key: "2-N", src: "md+w+kn", position: 2, code: "N", meaning_cn: "法后角 0°", meaning_en: "normal clearance 0°", angle_deg: 0}
+  - {key: "2-P", src: "md+w+kn", position: 2, code: "P", meaning_cn: "法后角 11°", meaning_en: "normal clearance 11°", angle_deg: 11}
+  - {key: "2-X", src: "md", position: 2, code: "X", meaning_cn: "其他后角（需另附说明）", meaning_en: "any other angle"}
+  - {key: "3-A", src: "w+md+kn", position: 3, code: "A", meaning_cn: "公差等级 A", meaning_en: "tolerance class A", d_tol_min_mm: 0.025, d_tol_max_mm: 0.025, m_tol_min_mm: 0.005, m_tol_max_mm: 0.005, s_tol_mm: 0.025}
+  - {key: "3-C", src: "w+md+kn", position: 3, code: "C", meaning_cn: "公差等级 C", meaning_en: "tolerance class C", d_tol_min_mm: 0.025, d_tol_max_mm: 0.025, m_tol_min_mm: 0.013, m_tol_max_mm: 0.013, s_tol_mm: 0.025}
+  - {key: "3-E", src: "w+md+kn", position: 3, code: "E", meaning_cn: "公差等级 E", meaning_en: "tolerance class E", d_tol_min_mm: 0.025, d_tol_max_mm: 0.025, m_tol_min_mm: 0.025, m_tol_max_mm: 0.025, s_tol_mm: 0.025}
+  - {key: "3-F", src: "w+md+kn", position: 3, code: "F", meaning_cn: "公差等级 F", meaning_en: "tolerance class F", d_tol_min_mm: 0.013, d_tol_max_mm: 0.013, m_tol_min_mm: 0.005, m_tol_max_mm: 0.005, s_tol_mm: 0.025}
+  - {key: "3-G", src: "w+md+kn", position: 3, code: "G", meaning_cn: "公差等级 G", meaning_en: "tolerance class G", d_tol_min_mm: 0.025, d_tol_max_mm: 0.025, m_tol_min_mm: 0.025, m_tol_max_mm: 0.025, s_tol_mm: 0.13}
+  - {key: "3-H", src: "w+md+kn", position: 3, code: "H", meaning_cn: "公差等级 H", meaning_en: "tolerance class H", d_tol_min_mm: 0.013, d_tol_max_mm: 0.013, m_tol_min_mm: 0.013, m_tol_max_mm: 0.013, s_tol_mm: 0.025}
+  - {key: "3-J", src: "w+md", position: 3, code: "J", meaning_cn: "公差等级 J", meaning_en: "tolerance class J", d_tol_min_mm: 0.05, d_tol_max_mm: 0.15, m_tol_min_mm: 0.005, m_tol_max_mm: 0.005, s_tol_mm: 0.025}
+  - {key: "3-K", src: "w+md", position: 3, code: "K", meaning_cn: "公差等级 K", meaning_en: "tolerance class K", d_tol_min_mm: 0.05, d_tol_max_mm: 0.15, m_tol_min_mm: 0.013, m_tol_max_mm: 0.013, s_tol_mm: 0.025}
+  - {key: "3-L", src: "w+md", position: 3, code: "L", meaning_cn: "公差等级 L", meaning_en: "tolerance class L", d_tol_min_mm: 0.05, d_tol_max_mm: 0.15, m_tol_min_mm: 0.025, m_tol_max_mm: 0.025, s_tol_mm: 0.025}
+  - {key: "3-M", src: "w+md", position: 3, code: "M", meaning_cn: "公差等级 M", meaning_en: "tolerance class M", d_tol_min_mm: 0.05, d_tol_max_mm: 0.15, m_tol_min_mm: 0.08, m_tol_max_mm: 0.2, s_tol_mm: 0.13}
+  - {key: "3-N", src: "w", position: 3, code: "N", meaning_cn: "公差等级 N", meaning_en: "tolerance class N", d_tol_min_mm: 0.05, d_tol_max_mm: 0.15, m_tol_min_mm: 0.08, m_tol_max_mm: 0.2, s_tol_mm: 0.025}
+  - {key: "3-U", src: "w", position: 3, code: "U", meaning_cn: "公差等级 U", meaning_en: "tolerance class U", d_tol_min_mm: 0.08, d_tol_max_mm: 0.25, m_tol_min_mm: 0.13, m_tol_max_mm: 0.38, s_tol_mm: 0.13}
+  - {key: "3M-1", src: "md", position: "3-M", code: "M", meaning_cn: "M 级补充表：形状 D，内切圆 d = 4–10 mm", meaning_en: "class M complementary: shape D, IC 4–10 mm", d_tol_min_mm: 0.05, d_tol_max_mm: 0.05, m_tol_min_mm: 0.11, m_tol_max_mm: 0.11, s_tol_mm: 0.13}
+  - {key: "3M-2", src: "md", position: "3-M", code: "M", meaning_cn: "M 级补充表：形状 D，内切圆 d = 12.7 mm", meaning_en: "class M complementary: shape D, IC 12.7 mm", d_tol_min_mm: 0.08, d_tol_max_mm: 0.08, m_tol_min_mm: 0.15, m_tol_max_mm: 0.15, s_tol_mm: 0.13}
+  - {key: "3M-3", src: "md", position: "3-M", code: "M", meaning_cn: "M 级补充表：形状 D，内切圆 d = 15.87–19.05 mm", meaning_en: "class M complementary: shape D, IC 15.87–19.05 mm", d_tol_min_mm: 0.1, d_tol_max_mm: 0.1, m_tol_min_mm: 0.18, m_tol_max_mm: 0.18, s_tol_mm: 0.13}
+  - {key: "3M-4", src: "md", position: "3-M", code: "M", meaning_cn: "M 级补充表：形状 V，内切圆 d = 任意 any mm", meaning_en: "class M complementary: shape V, IC 任意 any mm", d_tol_min_mm: 0.05, d_tol_max_mm: 0.05, m_tol_min_mm: 0.16, m_tol_max_mm: 0.16, s_tol_mm: 0.13}
+  - {key: "3M-5", src: "md", position: "3-M", code: "M", meaning_cn: "M 级补充表：形状 其他形状 others，内切圆 d = 4–10 mm", meaning_en: "class M complementary: shape 其他形状 others, IC 4–10 mm", d_tol_min_mm: 0.05, d_tol_max_mm: 0.05, m_tol_min_mm: 0.08, m_tol_max_mm: 0.08, s_tol_mm: 0.13}
+  - {key: "3M-6", src: "md", position: "3-M", code: "M", meaning_cn: "M 级补充表：形状 其他形状 others，内切圆 d = 12.0–12.7 mm", meaning_en: "class M complementary: shape 其他形状 others, IC 12.0–12.7 mm", d_tol_min_mm: 0.08, d_tol_max_mm: 0.08, m_tol_min_mm: 0.13, m_tol_max_mm: 0.13, s_tol_mm: 0.13}
+  - {key: "3M-7", src: "md", position: "3-M", code: "M", meaning_cn: "M 级补充表：形状 其他形状 others，内切圆 d = 15.87–20 mm", meaning_en: "class M complementary: shape 其他形状 others, IC 15.87–20 mm", d_tol_min_mm: 0.1, d_tol_max_mm: 0.1, m_tol_min_mm: 0.15, m_tol_max_mm: 0.15, s_tol_mm: 0.13}
+  - {key: "3M-8", src: "md", position: "3-M", code: "M", meaning_cn: "M 级补充表：形状 其他形状 others，内切圆 d = 25.0–25.4 mm", meaning_en: "class M complementary: shape 其他形状 others, IC 25.0–25.4 mm", d_tol_min_mm: 0.13, d_tol_max_mm: 0.13, m_tol_min_mm: 0.18, m_tol_max_mm: 0.18, s_tol_mm: 0.13}
+  - {key: "3M-9", src: "md", position: "3-M", code: "M", meaning_cn: "M 级补充表：形状 其他形状 others，内切圆 d = 31.75–32 mm", meaning_en: "class M complementary: shape 其他形状 others, IC 31.75–32 mm", d_tol_min_mm: 0.15, d_tol_max_mm: 0.15, m_tol_min_mm: 0.2, m_tol_max_mm: 0.2, s_tol_mm: 0.13}
+  - {key: "4-A", src: "md+kn", position: 4, code: "A", meaning_cn: "固定方式：有圆柱孔；断屑槽：无断屑槽", meaning_en: "fixing: cylindrical hole; chipbreaker: none"}
+  - {key: "4-M", src: "md+kn", position: 4, code: "M", meaning_cn: "固定方式：有圆柱孔；断屑槽：单面断屑槽", meaning_en: "fixing: cylindrical hole; chipbreaker: one face"}
+  - {key: "4-G", src: "md+kn", position: 4, code: "G", meaning_cn: "固定方式：有圆柱孔；断屑槽：双面断屑槽", meaning_en: "fixing: cylindrical hole; chipbreaker: both faces"}
+  - {key: "4-N", src: "md+kn", position: 4, code: "N", meaning_cn: "固定方式：无孔；断屑槽：无断屑槽", meaning_en: "fixing: no hole; chipbreaker: none"}
+  - {key: "4-R", src: "md+kn", position: 4, code: "R", meaning_cn: "固定方式：无孔；断屑槽：单面断屑槽", meaning_en: "fixing: no hole; chipbreaker: one face"}
+  - {key: "4-F", src: "md+kn", position: 4, code: "F", meaning_cn: "固定方式：无孔；断屑槽：双面断屑槽", meaning_en: "fixing: no hole; chipbreaker: both faces"}
+  - {key: "4-W", src: "md+kn", position: 4, code: "W", meaning_cn: "固定方式：圆柱孔 + 单面 40°–60° 沉孔；断屑槽：无断屑槽", meaning_en: "fixing: hole + 40–60° countersink one side; chipbreaker: none"}
+  - {key: "4-T", src: "md+kn", position: 4, code: "T", meaning_cn: "固定方式：圆柱孔 + 单面 40°–60° 沉孔；断屑槽：单面断屑槽", meaning_en: "fixing: hole + 40–60° countersink one side; chipbreaker: one face"}
+  - {key: "4-Q", src: "md+kn", position: 4, code: "Q", meaning_cn: "固定方式：圆柱孔 + 双面 40°–60° 沉孔；断屑槽：无断屑槽", meaning_en: "fixing: hole + 40–60° countersink both sides; chipbreaker: none"}
+  - {key: "4-U", src: "md+kn", position: 4, code: "U", meaning_cn: "固定方式：圆柱孔 + 双面 40°–60° 沉孔；断屑槽：双面断屑槽", meaning_en: "fixing: hole + 40–60° countersink both sides; chipbreaker: both faces"}
+  - {key: "4-B", src: "md+kn", position: 4, code: "B", meaning_cn: "固定方式：圆柱孔 + 单面 70°–90° 沉孔；断屑槽：无断屑槽", meaning_en: "fixing: hole + 70–90° countersink one side; chipbreaker: none"}
+  - {key: "4-H", src: "md+kn", position: 4, code: "H", meaning_cn: "固定方式：圆柱孔 + 单面 70°–90° 沉孔；断屑槽：单面断屑槽", meaning_en: "fixing: hole + 70–90° countersink one side; chipbreaker: one face"}
+  - {key: "4-C", src: "md+kn", position: 4, code: "C", meaning_cn: "固定方式：圆柱孔 + 双面 70°–90° 沉孔；断屑槽：无断屑槽", meaning_en: "fixing: hole + 70–90° countersink both sides; chipbreaker: none"}
+  - {key: "4-J", src: "md+kn", position: 4, code: "J", meaning_cn: "固定方式：圆柱孔 + 双面 70°–90° 沉孔；断屑槽：双面断屑槽", meaning_en: "fixing: hole + 70–90° countersink both sides; chipbreaker: both faces"}
+  - {key: "4-X", src: "md+kn", position: 4, code: "X", meaning_cn: "固定方式：特殊设计（需图纸或说明）；断屑槽：—", meaning_en: "fixing: special design; chipbreaker: special"}
+  - {key: "5-xx", src: "w+pt", position: 5, code: "两位数字", meaning_cn: "切削刃长度（公制，取整到 mm，舍去小数）；与形状和内切圆对应，如 CNMG 12… 的 12 对应内切圆 12.7 mm", meaning_en: "cutting edge length, metric, truncated mm (e.g. CNMG 12 = IC 12.7 mm)"}
+  - {key: "6-01", src: "md+w", position: 6, code: "01", meaning_cn: "刀片厚度 s = 1.59 mm", meaning_en: "thickness s = 1.59 mm", value_mm: 1.59}
+  - {key: "6-T1", src: "md+w", position: 6, code: "T1", meaning_cn: "刀片厚度 s = 1.98 mm", meaning_en: "thickness s = 1.98 mm", value_mm: 1.98}
+  - {key: "6-02", src: "md+w", position: 6, code: "02", meaning_cn: "刀片厚度 s = 2.38 mm", meaning_en: "thickness s = 2.38 mm", value_mm: 2.38}
+  - {key: "6-T2", src: "w", position: 6, code: "T2", meaning_cn: "刀片厚度 s = 2.78 mm", meaning_en: "thickness s = 2.78 mm", value_mm: 2.78}
+  - {key: "6-03", src: "md+w", position: 6, code: "03", meaning_cn: "刀片厚度 s = 3.18 mm", meaning_en: "thickness s = 3.18 mm", value_mm: 3.18}
+  - {key: "6-T3", src: "md+w", position: 6, code: "T3", meaning_cn: "刀片厚度 s = 3.97 mm", meaning_en: "thickness s = 3.97 mm", value_mm: 3.97}
+  - {key: "6-04", src: "md+w+pt", position: 6, code: "04", meaning_cn: "刀片厚度 s = 4.76 mm", meaning_en: "thickness s = 4.76 mm", value_mm: 4.76}
+  - {key: "6-05", src: "md+w", position: 6, code: "05", meaning_cn: "刀片厚度 s = 5.56 mm", meaning_en: "thickness s = 5.56 mm", value_mm: 5.56}
+  - {key: "6-06", src: "md+w", position: 6, code: "06", meaning_cn: "刀片厚度 s = 6.35 mm", meaning_en: "thickness s = 6.35 mm", value_mm: 6.35}
+  - {key: "6-07", src: "md+w", position: 6, code: "07", meaning_cn: "刀片厚度 s = 7.94 mm", meaning_en: "thickness s = 7.94 mm", value_mm: 7.94}
+  - {key: "6-09", src: "md+w", position: 6, code: "09", meaning_cn: "刀片厚度 s = 9.52 mm", meaning_en: "thickness s = 9.52 mm", value_mm: 9.52}
+  - {key: "6-12", src: "md", position: 6, code: "12", meaning_cn: "刀片厚度 s = 12.7 mm", meaning_en: "thickness s = 12.7 mm", value_mm: 12.7}
+  - {key: "7-00", src: "md", position: 7, code: "00", meaning_cn: "刀尖圆角半径 rε = 0.0 mm（尖角）", meaning_en: "corner radius r = 0.0 mm", value_mm: 0.0}
+  - {key: "7-01", src: "md+w+kn", position: 7, code: "01", meaning_cn: "刀尖圆角半径 rε = 0.1 mm", meaning_en: "corner radius r = 0.1 mm", value_mm: 0.1}
+  - {key: "7-02", src: "md+w+kn", position: 7, code: "02", meaning_cn: "刀尖圆角半径 rε = 0.2 mm", meaning_en: "corner radius r = 0.2 mm", value_mm: 0.2}
+  - {key: "7-04", src: "md+w+kn", position: 7, code: "04", meaning_cn: "刀尖圆角半径 rε = 0.4 mm", meaning_en: "corner radius r = 0.4 mm", value_mm: 0.4}
+  - {key: "7-08", src: "md+w+kn+pt", position: 7, code: "08", meaning_cn: "刀尖圆角半径 rε = 0.8 mm", meaning_en: "corner radius r = 0.8 mm", value_mm: 0.8}
+  - {key: "7-12", src: "md+w+kn", position: 7, code: "12", meaning_cn: "刀尖圆角半径 rε = 1.2 mm", meaning_en: "corner radius r = 1.2 mm", value_mm: 1.2}
+  - {key: "7-16", src: "md+w+kn", position: 7, code: "16", meaning_cn: "刀尖圆角半径 rε = 1.6 mm", meaning_en: "corner radius r = 1.6 mm", value_mm: 1.6}
+  - {key: "7-24", src: "md+w+kn", position: 7, code: "24", meaning_cn: "刀尖圆角半径 rε = 2.4 mm", meaning_en: "corner radius r = 2.4 mm", value_mm: 2.4}
+  - {key: "7-32", src: "md+kn", position: 7, code: "32", meaning_cn: "刀尖圆角半径 rε = 3.2 mm", meaning_en: "corner radius r = 3.2 mm", value_mm: 3.2}
+  - {key: "7-M0", src: "kn", position: 7, code: "M0", meaning_cn: "圆刀片（公制）", meaning_en: "round insert (metric)"}
+  - {key: "8-F", src: "w+dn", position: 8, code: "F", meaning_cn: "刃口形式（可选）：锋利刃口", meaning_en: "edge condition (optional): sharp edge"}
+  - {key: "8-E", src: "w+dn", position: 8, code: "E", meaning_cn: "刃口形式（可选）：倒圆刃口（钝化）", meaning_en: "edge condition (optional): rounded / honed edge"}
+  - {key: "8-T", src: "w+dn", position: 8, code: "T", meaning_cn: "刃口形式（可选）：负倒棱刃口", meaning_en: "edge condition (optional): chamfered edge"}
+  - {key: "8-S", src: "w+dn", position: 8, code: "S", meaning_cn: "刃口形式（可选）：负倒棱 + 倒圆", meaning_en: "edge condition (optional): chamfered and rounded"}
+  - {key: "9-R", src: "w+dn", position: 9, code: "R", meaning_cn: "切削方向（可选）：右切", meaning_en: "cutting direction (optional): right hand"}
+  - {key: "9-L", src: "w+dn", position: 9, code: "L", meaning_cn: "切削方向（可选）：左切", meaning_en: "cutting direction (optional): left hand"}
+  - {key: "9-N", src: "w+dn", position: 9, code: "N", meaning_cn: "切削方向（可选）：左右通用", meaning_en: "cutting direction (optional): neutral"}
+  - {key: "10-mfr", src: "w+pt", position: "10+", code: "厂家自定", meaning_cn: "制造商代号：断屑槽型（如 Walter 的 F/M/R/H 精/半精/粗/重切削）、牌号等，不属 ISO 统一含义", meaning_en: "manufacturer option: chipbreaker / grade"}
+checked:
+  - {row: 1-C, col: angle_deg, value: 80, against: w, where: "Position 1 Insert shape：C 80°", ok: true}
+  - {row: 1-V, col: angle_deg, value: 35, against: w, where: "Position 1：V 35°", ok: true}
+  - {row: 1-H, col: angle_deg, value: 120, against: kn, where: "Insert shape：hexagon 120°", ok: true}
+  - {row: 2-N, col: angle_deg, value: 0, against: w, where: "Position 2：0° N", ok: true}
+  - {row: 2-P, col: angle_deg, value: 11, against: kn, where: "Clearance angles：P 11°", ok: true}
+  - {row: 3-G, col: s_tol_mm, value: 0.13, against: w, where: "Position 3：G ±0.130", ok: true}
+  - {row: 3-G, col: s_tol_mm, value: 0.13, against: kn, where: "英制表 G s .005 in = 0.127 mm", ok: true}
+  - {row: 3-M, col: d_tol_max_mm, value: 0.15, against: md, where: "M 级补充表最大 d 偏差 ±0.15（31.75–32 档）", ok: true}
+  - {row: 3-M, col: m_tol_max_mm, value: 0.2, against: md, where: "M 级补充表最大 m 偏差 ±0.2", ok: true}
+  - {row: 3-F, col: d_tol_min_mm, value: 0.013, against: md, where: "主表 F ±0.013", ok: true}
+  - {row: 3-A, col: m_tol_min_mm, value: 0.005, against: kn, where: "英制表 A m .0002 in = 0.005 mm", ok: true}
+  - {row: 4-T, col: meaning_cn, value: "圆柱孔+单面40–60°沉孔，单面断屑槽", against: kn, where: "Insert type 表 T", ok: true}
+  - {row: 6-04, col: value_mm, value: 4.76, against: pt, where: "CNMG 120408 示例", ok: true}
+  - {row: 7-04, col: value_mm, value: 0.4, against: w, where: "Position 7：04 r = 0.4", ok: true}
+  - {row: 7-08, col: value_mm, value: 0.8, against: pt, where: "CNMG 120408 示例", ok: true}
+  - {row: 7-32, col: value_mm, value: 3.2, against: kn, where: "Corner radius 32 = 3.2 mm", ok: true}
+excluded:
+  - "第 7 位带 M 的代号（005M=0.03、01M=0.07、02M=0.17、04M=0.37、08M=0.77 mm）：只在 Walter 一处出现，看起来是 Walter 的修光刃 / 特殊刀尖代号，不确定是否属 ISO 1832 统一代号，不收。"
+  - "第 8 位字母 R（Walter 列出 F、E、T、S、R）：只有一处、含义未读到，不收；另有 ISO 双倒棱等代号（K、P 等）未读到出处，不收。"
+  - "第 5 位各形状、各内切圆对应的切削刃长度数值表：未完整读到，只收第 5 位含义行。"
+  - "英制（ANSI）代号：本表只收公制 ISO 代号；kn 的英制公差表只用于核对。"
+  - "Kennametal 英制表中的 B、D、P 级：ISO 公制表（md、w）中没有，不收。"
+  - "aimsindustrial.com.au《Indexable Insert Guide》：把第 4 位 M、G 的单/双面断屑槽写反，与 md、kn 冲突，未采用。"
+  - "GB/T 2076 原文：未找到可读全文，无法核对国标与 ISO 1832 是否逐字一致。"
+notes:
+  - "读法示例 CNMG 120408：C 菱形 80°；N 法后角 0°（负型，可双面用）；M 公差等级；G 有孔、双面断屑槽；12 刃长 12（内切圆 12.7 mm）；04 厚 4.76 mm；08 刀尖圆角 0.8 mm。"
+  - "公差等级的 d、m 范围（J、K、L、M、N、U）：允许偏差随内切圆大小变，表中存的是该等级的最小～最大值；M 级的具体分档见 position = 3-M 的 9 行（md 补充表，D 形、V 形单列，其余形状一组；s 恒为 ±0.13）。Walter 表中这些范围的末位带脚注上标（如“0.152”= 0.15 加脚注 2，“0.382”= 0.38 加脚注 2），已按脚注理解去掉。"
+  - "md 主表中 J、K、L 的 d 列、N 与 U 的 d 和 m 列为空（写“见补充表”），这些数只来自 w；s 列两处一致。"
+  - "第 4 位：md 与 kn 两处给出同一套 15 个字母（A/M/G 有孔，N/R/F 无孔，W/T/Q/U 带 40°–60° 沉孔，B/H/C/J 带 70°–90° 沉孔，X 特殊）。"
+  - "第 8、9 位为可选项；第 10 位起由刀具厂自定（断屑槽型、牌号），不同厂家不通用。"
+  - "第 2 位 X（其他后角）只在 md 出现；第 1 位 P（108°）只在 md 出现，kn、w 抽取中未见该角度。"

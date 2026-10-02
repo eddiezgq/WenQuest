@@ -1,0 +1,36 @@
+standard: {code: "ISO 8062-3:2007 附录 A 表 A.1、附录 B 表 B.1（GB/T 6414-2017 对应附录）", title: "铸件 典型尺寸公差等级 DCTG 与机械加工余量等级 RMAG —— 灰铸铁砂型铸造"}
+sources:
+  - {key: "t1", title: "人人文档《铸件尺寸公差-ISO-8062-3(2007)-中文》，表 A.1（大批量生产铸件的 DCTG）与表 B.1（RMAG）", url: "https://www.renrendoc.com/paper/211435739.html", note: "灰铁一列：手工造型 DCTG 11至14、RMAG F至H；机器造型与壳型 DCTG 8至12、RMAG E至G。该文档的尺寸公差主表 OCR 错乱，只用这两张附录表（读两次：整理式一次、原始文本一次，一致）"}
+  - {key: "t2", title: "NBK 鍋屋バイテック《鋳造品の寸法公差 JIS B 0403:1995より抜粋》“長期間製造する鋳放し鋳造品に対する公差等級”表", url: "https://www.nbk1560.com/resources/other/article/technical-dimensional-tolerances-of-castings/", note: "ねずみ鋳鉄：砂型鋳造手込め CT 11-14；砂型鋳造機械込め及びシェルモールド CT 8-12（JIS B 0403:1995 对应 ISO 8062:1994）"}
+  - {key: "t3", title: "《铸造实用技术问答（第2版）》2-26 节（QQ 阅读）", url: "https://m.on.qq.com/read/1031251747/88", note: "按 GB/T 6414—1999：砂型手工造型铸铁 F–H 级；机器造型/壳型铸铁 E–G 级（只用于 RMAG 互核）"}
+  - {key: "t4", title: "Code of China《GB/T 6414-2017》英文版简介", url: "https://www.codeofchina.com/standard/GBT6414-2017.html", note: "指出 2017 版修改了附录 A 表 A.1、A.3 的公差等级；本表未能与 2017 版原文核对"}
+columns:
+  - [process, 铸造方法, casting process, -]
+  - [alloy, 合金, alloy, -]
+  - [DCTG_min, 典型尺寸公差等级 下限, "typical DCTG, finest", 级]
+  - [DCTG_max, 典型尺寸公差等级 上限, "typical DCTG, coarsest", 级]
+  - [RMAG_min, 典型机械加工余量等级 下限, "typical RMAG, finest", 级]
+  - [RMAG_max, 典型机械加工余量等级 上限, "typical RMAG, coarsest", 级]
+rows:
+  - {key: "grey_iron_sand_hand", src: "t1+t2+t3", src_detail: "DCTG 出自 t1+t2；RMAG 出自 t1+t3", process: "砂型铸造 手工造型（大批量/长期生产）", alloy: "灰铸铁", DCTG_min: 11, DCTG_max: 14, RMAG_min: "F", RMAG_max: "H"}
+  - {key: "grey_iron_sand_machine", src: "t1+t2+t3", src_detail: "DCTG 出自 t1+t2；RMAG 出自 t1+t3", process: "砂型铸造 机器造型和壳型（大批量/长期生产）", alloy: "灰铸铁", DCTG_min: 8, DCTG_max: 12, RMAG_min: "E", RMAG_max: "G"}
+checked:
+  - {row: "grey_iron_sand_hand", col: "DCTG_min", value: 11, against: "t2", where: "長期間製造 表，砂型鋳造手込め × ねずみ鋳鉄", ok: True}
+  - {row: "grey_iron_sand_hand", col: "DCTG_max", value: 14, against: "t2", where: "同上", ok: True}
+  - {row: "grey_iron_sand_machine", col: "DCTG_min", value: 8, against: "t2", where: "砂型鋳造機械込め及びシェルモールド × ねずみ鋳鉄", ok: True}
+  - {row: "grey_iron_sand_machine", col: "DCTG_max", value: 12, against: "t2", where: "同上", ok: True}
+  - {row: "grey_iron_sand_hand", col: "RMAG_min", value: "F", against: "t3", where: "2-26 节 手工造型 铸铁", ok: True}
+  - {row: "grey_iron_sand_hand", col: "RMAG_max", value: "H", against: "t3", where: "同上", ok: True}
+  - {row: "grey_iron_sand_machine", col: "RMAG_min", value: "E", against: "t3", where: "2-26 节 机器造型和壳型 铸铁", ok: True}
+  - {row: "grey_iron_sand_machine", col: "RMAG_max", value: "G", against: "t3", where: "同上", ok: True}
+  - {row: "grey_iron_sand_hand", col: "DCTG_max", value: 14, against: "t1", where: "表 A.1 第二次读取", ok: True}
+  - {row: "grey_iron_sand_machine", col: "RMAG_max", value: "G", against: "t1", where: "表 B.1 第二次读取", ok: True}
+excluded:
+  - "小批量/单件生产（短期间）灰铸铁砂型的公差等级（t2：生型 CT13-15、自硬砂 CT11-13）：只有 t2 一个出处，不收。"
+  - "其他合金（钢、球铁、铜合金、轻合金等）的典型等级：本书用例只需灰铸铁，未逐格互核，不收（t1 与 t2 在铜合金、手工造型一格就不一致：11至13 对 10-13）。"
+  - "SFSA 手册给出的“砂型手工 G–K、机器 F–H”是钢铸件的推荐，不适用于灰铸铁，未收。"
+  - "nbk1560 网页的概括文字（“手工造型 CT11–CT14，机器造型 CT8–CT12”）与表格一致，但 kikakurui.com 返回的同类表是臆造内容，已弃用。"
+notes:
+  - "这些是“典型/推荐”等级，不是强制值：选用时由供需双方按批量、工艺能力商定，在图样或技术要求中写明，例如“GB/T 6414-2017 DCTG10 RMAG F（RMA 2.5）”。"
+  - "t1 是 ISO 8062-3:2007 的中文本，t2 是 JIS B 0403:1995（= ISO 8062:1994），两版灰铸铁这两格相同；t4 说 GB/T 6414-2017 修改了表 A.1、A.3，所以国标 2017 版的数可能不同，进教材前应以 GB/T 6414-2017 原文为准再核。"
+  - "本书用例（HT200 变速箱箱体，砂型，最大约 350 mm）：机器造型可取 DCTG10、RMAG F → 250–400 mm 段 DCT 4.4 mm（±2.2），RMA 2.5 mm；手工造型可取 DCTG12、RMAG G → DCT 9 mm（±4.5），RMA 3.5 mm。数值见 casting_dctg.yaml、casting_rma.yaml。等级的具体取法是本工作的示例选择，不是标准规定。"
