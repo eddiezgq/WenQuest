@@ -424,7 +424,12 @@ class Recorder:
         for n in self.pnames:
             names += ["pt.{}.{}".format(n, a) for a in ("x", "y", "z")]
         arr = np.array(self.rows, float)
-        return {n: arr[:, i] for i, n in enumerate(names)}
+        out = {n: arr[:, i] for i, n in enumerate(names)}
+        if len(arr) > 1:                                  # t = 0 那一刻的加速度是约束建立时的值，不是运动的加速度：用下一点代替
+            for n in out:
+                if n.startswith("qdd."):
+                    out[n][0] = out[n][1]
+        return out
 
     def animation(self):
         return {"bodies": self.bname, "t": np.array(self.anim_t, float), "pos": np.array(self.anim_pos, float),

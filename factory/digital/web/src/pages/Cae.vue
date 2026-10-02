@@ -17,6 +17,7 @@
         </div>
         <label class="small upload">或者上传 STEP（任何 CAD 导出）
           <input type="file" accept=".step,.stp,.STEP,.STP" :disabled="busy" @change="upload"></label>
+        <div v-if="mbdNote" class="small sugg">来自运动与动力分析：{{ mbdNote }}</div>
         <div v-if="geo" class="small ok">{{ geo.name }} · {{ geo.solid.faces }} 个面 · 体积 {{ (geo.solid.volume_mm3 / 1000).toFixed(1) }} cm³</div>
 
         <template v-if="geo">
@@ -144,6 +145,7 @@
               <div class="seg">
                 <button type="button" :class="{ on: spec.kind === 'const' }" @click="spec.kind = 'const'">恒幅</button>
                 <button type="button" :class="{ on: spec.kind === 'log' }" :disabled="!hasTorque" :title="hasTorque ? '' : '要有扭矩载荷才能用转矩记录'" @click="spec.kind = 'log'">跑合试验台转矩记录</button>
+                <button v-if="job?.setup?.source" type="button" :class="{ on: spec.kind === 'mbd' }" @click="spec.kind = 'mbd'">动力学受力记录</button>
               </div>
             </div>
             <template v-if="spec.kind === 'const'">
@@ -151,6 +153,7 @@
               <div class="field"><label>最小（{{ refUnit }}）</label><input v-model.number="spec.min" type="number"></div>
               <div class="field"><label>每秒几次（Hz）</label><input v-model.number="spec.freq" type="number" step="0.1" min="0.001"></div>
             </template>
+            <div v-else-if="spec.kind === 'mbd'" class="field wide small muted">用这根杆件在动力学计算中、沿所加力方向的受力随时间的变化作为载荷谱（整段运动当作一块，不断重复）。</div>
             <div v-else class="field wide">
               <label>选一台减速器的记录（仿真车间跑合试验台，输出轴转矩）</label>
               <select v-model="spec.log">
@@ -212,12 +215,15 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { get, post, session, ApiError } from '../lib/api';
 import { KINDS, toLoad, axesOf, faceText, fetchSurface } from '../lib/cae';
 import CaeViewer from '../components/CaeViewer.vue';
 
 const router = useRouter();
+const route = useRoute();
+const mbdSource = ref(null);              // 从运动与动力分析送来的杆件（第 12 轮）
+const mbdNote = ref('');
 const STATUS = { queued: '排队', running: '计算中', done: '完成', failed: '失败' };
 const TONE = { queued: 'mute', running: 'info', done: 'good', failed: 'bad' };
 const MESH = [{ k: 'coarse', label: '粗（快）', div: 20 }, { k: 'mid', label: '中', div: 32 }, { k: 'fine', label: '细（慢）', div: 48 }];
@@ -349,6 +355,7 @@ async function submit() {
   submitting.value = true; err.value = '';
   try {
     const setup = { material_id: matId.value, mesh: { size_mm: +meshSize.value.toFixed(2) }, loads: rows.value.map((r) => toLoad(r, axes.value)) };
+    if (mbdSource.value && geo.value?.sha === mbdSource.value.sha) setup.source = { job: mbdSource.value.job, member: mbdSource.value.member };
     job.value = await post('/cae/jobs', { step_sha: geo.value.sha, setup, item: geo.value.item, title: title.value || geo.value.name });
     result.value = null;
     poll();
@@ -446,7 +453,7 @@ const sparkPts = computed(() => {
   const hi = Math.max(...s.map(Math.abs)) || 1;
   return s.map((v, i) => `${(i / (s.length - 1) * 300).toFixed(1)},${(58 - (v / hi) * 54).toFixed(1)}`).join(' ');
 });
-const fmtHours = (h) => (h >= 87600 ? (h / 8760).toPrecision(3) + ' 年（' + h.toExponential(2) + ' h）' : h >= 100 ? h.toFixed(0) + ' 小时' : h.toPrecision(3) + ' 小时');
+const fmtHours = (h) => (h >= 8.76e9 ? '超过 100 万年（实际上无限）' : h >= 87600 ? (h / 8760).toPrecision(3) + ' 年（' + h.toExponential(2) + ' h）' : h >= 100 ? h.toFixed(0) + ' 小时' : h.toPrecision(3) + ' 小时');
 watch(() => spec.value.log, async (id) => {
   logSeries.value = [];
   if (id) { try { logSeries.value = (await get('/cae/torque-logs/' + id)).samples_nm; } catch (e) { /* 看不到曲线不影响计算 */ } }
@@ -459,7 +466,8 @@ function resetFatigue(j) {
 async function runFatigue() {
   fatBusy.value = true; fatErr.value = '';
   try {
-    const sp = spec.value.kind === 'log' ? { kind: 'log', id: spec.value.log } : { kind: 'const', max: spec.value.max, min: spec.value.min, freq_hz: spec.value.freq };
+    const sp = spec.value.kind === 'log' ? { kind: 'log', id: spec.value.log } : spec.value.kind === 'mbd' ? { kind: 'mbd' }
+      : { kind: 'const', max: spec.value.max, min: spec.value.min, freq_hz: spec.value.freq };
     const r = await post(`/cae/jobs/${encodeURIComponent(job.value.id)}/fatigue`, { spectrum: sp, ...fopt.value });
     fat.value = r.summary;
     job.value = { ...job.value, fatigue: r.summary };
@@ -507,6 +515,17 @@ onMounted(async () => {
     const [p, m] = await Promise.all([get('/cae/parts'), get('/cae/materials')]);
     parts.value = p.items; materials.value = m.materials;
   } catch (e) { err.value = e.status === 503 ? '计算服务暂时连不上，请稍后再试' : e.message; }
+  if (route.query.mbd && route.query.member) {                     // 第 12 轮：动力学 → 有限元
+    busy.value = true;
+    try {
+      const r = await post(`/mbd/jobs/${encodeURIComponent(route.query.mbd)}/to-fea`, { member: route.query.member });
+      geo.value = r.geometry;
+      rows.value = r.rows.map((x) => ({ key: ++keyN, fx: 0, fy: 0, fz: 0, value: 0, thrust: false, axis: null, ...x }));
+      title.value = r.title; matId.value = '45-QT'; active.value = -1;
+      mbdSource.value = { ...r.source, sha: r.geometry.sha };
+      mbdNote.value = r.note + `；最大受力 ${r.peak_N.toFixed(0)} N，出现在 t = ${r.peak_t.toFixed(3)} s。`;
+    } catch (e) { err.value = e.message; } finally { busy.value = false; }
+  }
   loadJobs();
   listT = setInterval(() => { if (jobs.value.some((j) => ['queued', 'running'].includes(j.status))) loadJobs(); }, 5000);
 });
@@ -562,6 +581,7 @@ onUnmounted(() => { clearTimeout(pollT); clearInterval(listT); });
 .stat.bad { background: var(--bad-bg); } .stat.bad b { color: var(--bad); }
 .notes p { margin: 8px 0 0; }
 tr.cur td { background: var(--accent-bg); }
+.sugg { background: var(--task-bg); border: 1px solid var(--task-line); color: var(--task-ink); border-radius: 6px; padding: 6px 8px; }
 .ai-box { display: flex; flex-direction: column; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
 .ai-box textarea { border: 1px solid #C8CEC7; border-radius: 6px; padding: 6px 8px; resize: vertical; }
 .ai-notes { display: flex; flex-direction: column; gap: 2px; }

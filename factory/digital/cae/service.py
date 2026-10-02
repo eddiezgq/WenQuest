@@ -365,7 +365,8 @@ def submit(body: dict = Body(...)):
 @app.get("/mbd/mechs")
 def mbd_mechs():
     from cae import mech_mjcf as MC
-    return {"mechs": [{"id": k, "name": MC.NAMES[k], "driver": MC.DRIVER[k], "params": MC.DEFAULTS[k], "labels": MC.LABELS}
+    return {"mechs": [{"id": k, "name": MC.NAMES[k], "driver": MC.DRIVER[k], "params": MC.DEFAULTS[k], "labels": MC.LABELS,
+                       "fea_members": list(MC.STEP_MEMBERS.get(k, {}))}
                       for k in MC.DEFAULTS]}
 
 
@@ -452,6 +453,116 @@ def mbd_submit(body: dict = Body(...)):
     return _public(j)
 
 
+def _quat_mat(q):
+    w, x, y, z = q
+    return np.array([[1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+                     [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+                     [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)]])
+
+
+def _read_anim(path):
+    raw = open(path, "rb").read()
+    _, hl = struct.unpack_from("<4sI", raw)
+    head = json.loads(raw[8:8 + hl])
+    f, nb = head["frames"], len(head["bodies"])
+    arr = np.frombuffer(raw, "<f4", offset=8 + hl)
+    return head["bodies"], arr[:f], arr[f:f + f * nb * 3].reshape(f, nb, 3), arr[f + f * nb * 3:].reshape(f, nb, 4)
+
+
+def member_load(jid, member):
+    """动力学结果里一根杆件的受力（第 12 轮 D6）：B 端受力的时间序列（构件坐标）、最大时刻"""
+    from cae import mech_mjcf as MC
+    j = _read_json(_job_path(jid, "job.json"))
+    if j.get("kind") != "mbd" or j["status"] != "done":
+        raise HTTPException(409, "动力学结果还没出来")
+    ref = j["model"]
+    if ref.get("source") != "mech":
+        raise HTTPException(400, "目前只有零件库的连杆机构能把杆件送去有限元")
+    try:
+        ch_body = MC.member_force_channel(ref["id"], member)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from None
+    ser = read_series(_job_path(jid, "series.bin"))
+    bodies, at, apos, aquat = _read_anim(_job_path(jid, "anim.bin"))
+    F = -np.stack([ser["rf.{}.{}".format(ch_body, a)] for a in "xyz"], 1)        # 世界坐标，B 端受力
+    bi = bodies.index(member)
+    idx = np.clip(np.searchsorted(at, ser["t"]), 0, len(at) - 1)                  # 每个采样时刻的构件姿态（取最近的动画帧）
+    Floc = np.stack([_quat_mat(aquat[k, bi]).T @ F[i] for i, k in enumerate(idx)])
+    mag = np.linalg.norm(Floc, axis=1)
+    k = int(np.argmax(mag))
+    return {"job": j, "member": member, "t": ser["t"], "F_local": Floc, "peak_index": k, "peak_t": float(ser["t"][k]),
+            "peak_local": Floc[k], "peak_N": float(mag[k]), "duration_s": float(ser["t"][-1] - ser["t"][0])}
+
+
+@app.post("/mbd/jobs/{jid}/to-fea")
+def mbd_to_fea(jid: str, body: dict = Body(...)):
+    """把杆件和它受力最大时刻的力交给有限元：返回零件（同 /geometry）和建议的约束、载荷"""
+    from cae import mech_mjcf as MC
+    member = str(body.get("member") or "")
+    ml = member_load(jid.replace("/", ""), member)
+    ref = ml["job"]["model"]
+    step = MC.member_step(ref["id"], member, ref.get("params") or {})
+    sha = hashlib.sha256(step).hexdigest()
+    d = _p("geo", sha)
+    if not os.path.exists(os.path.join(d, "faces.json")):
+        os.makedirs(d, exist_ok=True)
+        open(os.path.join(d, "part.step"), "wb").write(step)
+        ok, err = _isolated(_geo_child, (os.path.join(d, "part.step"), d), GEO_LIMIT_S)
+        if not ok:
+            raise HTTPException(422, "杆件模型生成失败：{}".format(err))
+    geo = dict(_read_json(os.path.join(d, "faces.json")), sha=sha)
+    holes = sorted([f for f in geo["faces"] if f["kind"] == "cylinder" and f.get("radius_mm") and
+                    abs(f["center"][1]) < 1e-3 and abs(f["center"][2]) < 1e-3 and
+                    f["radius_mm"] < 0.4 * MC.params(ref["id"], ref.get("params"))["link_width_m"] * 1000],
+                   key=lambda f: f["center"][0])
+    if len(holes) != 2:
+        raise HTTPException(500, "没找到杆件两端的销孔")
+    Fv = [round(float(x), 3) for x in ml["peak_local"]]
+    name = MC.LABELS.get(member, member)
+    return {"geometry": geo, "member": member, "member_name": name, "peak_t": ml["peak_t"], "peak_N": ml["peak_N"],
+            "force_local_N": Fv,
+            "rows": [{"kind": "fixed", "faces": [holes[0]["id"]]},
+                     {"kind": "force", "faces": [holes[1]["id"]], "fx": Fv[0], "fy": Fv[1], "fz": Fv[2]}],
+            "title": "{} 的{}（t = {:.3f} s，{:.0f} N）".format(MC.NAMES[ref["id"]], name, ml["peak_t"], ml["peak_N"]),
+            "note": "A 端销孔固定、B 端销孔受动力学算出的最大力（构件坐标）；二力杆近似，略去惯性力和自重",
+            "source": {"job": ml["job"]["id"], "member": member}}
+
+
+@app.get("/mbd/jobs/{jid}/motors")
+def mbd_motors(jid: str, safety: float = 1.2):
+    """电机选型助手：每个转动关节的驱动（给定运动 / 力矩）"""
+    from cae import motors as MT
+    j = _read_json(_job_path(jid.replace("/", ""), "job.json"))
+    if j.get("kind") != "mbd" or j["status"] != "done":
+        raise HTTPException(409, "动力学结果还没出来")
+    if not 1.0 <= safety <= 3.0:
+        raise HTTPException(400, "安全系数要在 1–3 之间")
+    ser = read_series(_job_path(j["id"], "series.bin"))
+    out = []
+    only = None
+    if (j.get("model") or {}).get("source") == "mech":            # 机构：只有主动件装电机，从动件上的是工作阻力
+        from cae import mech_mjcf as MC
+        only = MC.DRIVER.get(j["model"]["id"])
+    for d in j["stats"]["drives"]:
+        jn = d["joint"]
+        if d["kind"] == "coupled" or ("drive." + jn) not in ser or (only and jn != only):
+            continue
+        if not np.any(np.abs(ser["qd." + jn]) > 0) and not np.any(np.abs(ser["drive." + jn]) > 0):
+            continue
+        out.append(dict(MT.select(ser["drive." + jn], ser["qd." + jn], ser["qdd." + jn], safety), joint=jn))
+    return {"joints": out, "table": MT.table()}
+
+
+@app.get("/mbd/jobs/{jid}/member-series")
+def mbd_member_series(jid: str, member: str, direction: str = ""):
+    """疲劳用：杆件 B 端受力在指定方向（构件坐标，默认最大力的方向）上的分量随时间的变化"""
+    ml = member_load(jid.replace("/", ""), member)
+    u = np.array([float(x) for x in direction.split(",")]) if direction else ml["peak_local"]
+    u = u / max(np.linalg.norm(u), 1e-12)
+    return {"values": [round(float(x), 4) for x in ml["F_local"] @ u], "duration_s": ml["duration_s"],
+            "peak_N": ml["peak_N"], "direction": [float(x) for x in u]}
+
+
 @app.get("/jobs/{jid}/series.bin")
 def job_series(jid: str):
     p = _job_path(jid.replace("/", ""), "series.bin")
@@ -513,6 +624,20 @@ def report(jid: str, body: dict = Body(default={})):
     j = _read_json(p)
     if j["status"] != "done":
         raise HTTPException(409, "结果还没出来")
+    if j.get("kind") == "mbd":
+        from cae import mbd_report as MR
+        ser = read_series(_job_path(j["id"], "series.bin"))
+        peaks = []
+        for n in ser:
+            if n.startswith("rf.") and n.endswith(".abs") and "wq_payload" not in n:
+                b = n[3:-4]
+                fm, mm = ser[n], ser["rm.{}.abs".format(b)]
+                i, k = int(np.argmax(fm)), int(np.argmax(mm))
+                peaks.append((b, float(fm[i]), float(ser["t"][i]), float(mm[k]), float(ser["t"][k])))
+        data = MR.build(j, peaks, (body.get("images") or [])[:6], body.get("motors"), body.get("ai_text") or j.get("ai_text"))
+        name = "动力学报告-{}.docx".format(j.get("item") or jid)
+        return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        headers={"Content-Disposition": "attachment; filename*=UTF-8''" + urllib.parse.quote(name)})
     from cae import report as R
     imgs = (body.get("images") or [])[:4]
     data = R.build(j, imgs, body.get("ai_text") or j.get("ai_text"))

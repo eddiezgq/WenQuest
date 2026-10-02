@@ -96,7 +96,8 @@
       <section class="card grow">
         <div class="card-head"><h2>{{ result ? '结果' : '模型' }}{{ job ? ' · ' + (job.title || '') : '' }}</h2>
           <template v-if="result">
-            <button class="btn ghost more" @click="downloadCsv">导出曲线（CSV）</button>
+            <button class="btn more" :disabled="reporting" @click="downloadReport">{{ reporting ? '正在生成报告…' : '下载报告（Word）' }}</button>
+            <button class="btn ghost" @click="downloadCsv">导出曲线（CSV）</button>
             <button class="btn ghost" @click="backToSetup">回到设置</button>
           </template></div>
         <div v-if="job && job.status !== 'done'" class="jobbar" :class="job.status">
@@ -106,7 +107,7 @@
         </div>
         <div v-if="!info && !result" class="empty big-empty">先在左边选一个机构或机械臂，点“读入”。</div>
         <template v-else>
-          <MbdViewer :model-url="modelUrl" :anim="result?.anim" :time="time" :trails="trails" />
+          <MbdViewer ref="viewer" :model-url="modelUrl" :anim="result?.anim" :time="time" :trails="trails" />
           <div v-if="result" class="player">
             <button class="btn ghost" @click="toggle">{{ playing ? '暂停' : '播放' }}</button>
             <input v-model.number="time" type="range" :min="0" :max="tmax" step="0.001" aria-label="时间">
@@ -123,6 +124,25 @@
               <td class="num">{{ d.peak.toFixed(2) }} {{ tu(d.joint) }}</td><td class="num">{{ d.rms.toFixed(2) }}</td>
               <td class="num">{{ spd(d) }}</td><td class="num">{{ d.power_peak.toFixed(1) }}</td><td class="num">{{ d.power_mean.toFixed(1) }}</td></tr></tbody>
           </table>
+          <div v-if="feaMembers.length" class="line small">
+            <span class="muted">把杆件受力最大的时刻送去有限元：</span>
+            <router-link v-for="m in feaMembers" :key="m" class="btn ghost small-btn" :to="{ path: '/cae', query: { mbd: job.id, member: m } }">{{ jlabel(m) }} →</router-link>
+          </div>
+          <div class="motor">
+            <div class="line"><b>电机选型</b>
+              <label class="small">安全系数 <select v-model.number="safety"><option :value="1.0">1.0</option><option :value="1.2">1.2</option><option :value="1.5">1.5</option><option :value="2.0">2.0</option></select></label>
+              <button class="btn ghost small-btn" :disabled="motorBusy" @click="loadMotors">{{ motorBusy ? '正在选…' : (motors ? '重新选' : '按这次的力矩、转速选电机和减速器') }}</button></div>
+            <table v-if="motors" class="t">
+              <thead><tr><th>关节</th><th class="num">峰值 N·m</th><th class="num">均方根 N·m</th><th class="num">最高 r/min</th><th>推荐</th><th class="num">裕量</th><th>说明</th></tr></thead>
+              <tbody><tr v-for="m in motors.joints" :key="m.joint">
+                <td>{{ jlabel(m.joint) }}</td><td class="num">{{ m.need.peak_Nm.toFixed(1) }}</td><td class="num">{{ m.need.rms_Nm.toFixed(1) }}</td>
+                <td class="num">{{ m.need.speed_rpm.toFixed(1) }}</td>
+                <td><span class="pill" :class="m.ok ? 'good' : 'bad'">{{ m.ok ? '够用' : '不够' }}</span> {{ m.best.motor }} + {{ m.best.gear }}，i = {{ m.best.ratio }}</td>
+                <td class="num">{{ m.best.margin_pct == null ? '很大' : m.best.margin_pct + '%' }}</td>
+                <td class="small muted">{{ m.note }}</td></tr></tbody>
+            </table>
+            <div v-if="motors" class="small muted">参数：{{ motors.table.source }}。减速器效率取 {{ motors.table.eta }}；电机侧力矩含转子惯量的加速项。</div>
+          </div>
           <div class="chips">
             <span class="small muted">曲线：</span>
             <button v-for="(lab, g) in GROUPS" v-show="groupHas(g)" :key="g" type="button" class="chip" :class="{ on: shown.includes(g) }" @click="toggleGroup(g)">{{ lab }}</button>
@@ -295,7 +315,7 @@ async function showResult(j) {
     for (let i = 0; i < p.length; i++) p[i] = tau[i] * w[i];
     s['power.' + d.joint] = p;
   }
-  series.value = s; result.value = { stats: j.stats, anim: a }; time.value = 0;
+  series.value = s; result.value = { stats: j.stats, anim: a }; time.value = 0; motors.value = null;
 }
 async function openJob(j) {
   err.value = '';
@@ -317,6 +337,15 @@ async function openJob(j) {
   } catch (e) { err.value = e.message; }
 }
 function backToSetup() { result.value = null; job.value = null; playing.value = false; }
+
+// ---- 送去有限元、电机选型（第 4 步）
+const feaMembers = computed(() => (ref_.value?.source === 'mech' ? mechs.value.find((m) => m.id === ref_.value.id)?.fea_members || [] : []));
+const motors = ref(null), motorBusy = ref(false), safety = ref(1.2);
+async function loadMotors() {
+  motorBusy.value = true; err.value = '';
+  try { motors.value = await get(`/mbd/jobs/${encodeURIComponent(job.value.id)}/motors?safety=${safety.value}`); }
+  catch (e) { err.value = e.message; } finally { motorBusy.value = false; }
+}
 
 // ---- 播放
 const tmax = computed(() => (result.value ? result.value.anim.t[result.value.anim.frames - 1] : 0));
@@ -373,6 +402,46 @@ function downloadCsv() {
   a.download = `动力学-${job.value?.title || job.value?.id}.csv`;
   document.body.appendChild(a); a.click(); a.remove();
 }
+// ---- 报告：动画截图 + 当前显示的曲线（SVG 转 PNG）+ 电机选型
+const viewer = ref(null), reporting = ref(false);
+function svgPng(svg) {
+  return new Promise((res) => {
+    const c = svg.cloneNode(true);
+    c.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    c.querySelectorAll('.grid line').forEach((l) => l.setAttribute('stroke', '#e3e6e2'));
+    c.querySelectorAll('text').forEach((t) => { t.setAttribute('fill', '#5D6873'); t.setAttribute('font-size', '11'); t.setAttribute('font-family', 'sans-serif'); });
+    c.querySelectorAll('.cursor, .cross').forEach((l) => l.remove());
+    const vb = svg.viewBox.baseVal, k = 2;
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas'); cv.width = vb.width * k; cv.height = vb.height * k;
+      const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(img, 0, 0, cv.width, cv.height);
+      res(cv.toDataURL('image/png'));
+    };
+    img.onerror = () => res(null);
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(c));
+  });
+}
+async function downloadReport() {
+  reporting.value = true; err.value = '';
+  try {
+    const images = [];
+    const shot = viewer.value?.snapshot();
+    if (shot) images.push({ data: shot, caption: `模型与运动轨迹（t = ${time.value.toFixed(2)} s）` });
+    const svgs = [...document.querySelectorAll('.charts .tc')];
+    for (const [i, el] of svgs.slice(0, 5).entries()) {
+      const png = await svgPng(el.querySelector('svg'));
+      if (png) images.push({ data: png, caption: `${charts.value[i]?.title || ''}（${charts.value[i]?.unit || ''}），横轴时间 s；` + (charts.value[i]?.series || []).map((x) => x.label).join('、') });
+    }
+    const r = await fetch(`/api/mbd/jobs/${encodeURIComponent(job.value.id)}/report`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-wq-token': session.token }, body: JSON.stringify({ images, motors: motors.value }) });
+    if (!r.ok) throw new ApiError(r.status, (await r.json().catch(() => ({}))).detail || '报告生成失败');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(await r.blob());
+    a.download = `动力学报告-${job.value.title || job.value.id}.docx`;
+    document.body.appendChild(a); a.click(); a.remove();
+  } catch (e) { err.value = e.message; } finally { reporting.value = false; }
+}
 async function loadJobs() { try { jobs.value = (await get('/mbd/jobs')).jobs; } catch (e) { /* */ } }
 
 onMounted(async () => {
@@ -417,6 +486,8 @@ select { height: 26px; border: 1px solid #C8CEC7; border-radius: 5px; }
 .player { display: flex; align-items: center; gap: 10px; }
 .player input[type=range] { flex: 1; }
 .sum { margin-top: 4px; }
+.motor { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.motor .line { align-items: center; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .chip { border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 3px 10px; cursor: pointer; font-size: 12px; }
 .chip.on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); font-weight: 600; }

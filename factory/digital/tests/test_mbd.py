@@ -216,3 +216,70 @@ def test_link_step_for_fea():
     assert solid["bbox_mm"][1] == pytest.approx(-3.0) and solid["bbox_mm"][4] == pytest.approx(3.0)   # 厚度沿 Y
     with pytest.raises(ValueError, match="不是杆件"):
         MC.member_step("C-GER-TRAIN", "shaft1")
+
+
+# ---------------------------------------------------------------- 第 4 步：送到有限元、疲劳；电机选型
+def test_slider_crank_rod_to_fea_and_fatigue(tmp_path, monkeypatch):
+    pytest.importorskip("gmsh")
+    import shutil
+    if not shutil.which(os.environ.get("WQ_CCX", "ccx")):
+        pytest.skip("没有 CalculiX")
+    from fastapi.testclient import TestClient
+    from cae import service
+    monkeypatch.setattr(service, "DATA", str(tmp_path))
+    with TestClient(service.app) as c:
+        ref = {"source": "mech", "id": "C-LNK-SLIDER", "params": {}}
+        j = c.post("/mbd/jobs", json={"model": ref, "factory": "t", "setup": {
+            "duration_s": 1.0, "gravity": False, "drives": [{"joint": "crank", "kind": "speed", "value": 2 * math.pi}],
+            "forces": [{"body": "slider", "force": [-2000, 0, 0]}]}}).json()
+        for _ in range(200):
+            j = c.get("/jobs/" + j["id"]).json()
+            if j["status"] in ("done", "failed"):
+                break
+            time.sleep(0.3)
+        assert j["status"] == "done", j.get("error")
+        assert c.post("/mbd/jobs/{}/to-fea".format(j["id"]), json={"member": "slider"}).status_code == 400
+        r = c.post("/mbd/jobs/{}/to-fea".format(j["id"]), json={"member": "rod"}).json()
+        F = r["force_local_N"]
+        # 二力杆：力基本沿杆长方向（构件 X），大小 ≈ 阻力 / cos(连杆倾角)，在 2000–2200 N 之间
+        assert abs(F[0]) / math.hypot(*F) > 0.95 and 1990 < r["peak_N"] < 2250
+        assert [x["kind"] for x in r["rows"]] == ["fixed", "force"]
+        loads = [{"type": "fixed", "faces": r["rows"][0]["faces"]},
+                 {"type": "force", "faces": r["rows"][1]["faces"], "vector_n": [r["rows"][1][k] for k in ("fx", "fy", "fz")]}]
+        fj = c.post("/jobs", json={"step_sha": r["geometry"]["sha"], "factory": "t",
+                                   "setup": {"material_id": "45-QT", "mesh": {"size_mm": 3}, "loads": loads, "source": r["source"]}}).json()
+        for _ in range(300):
+            fj = c.get("/jobs/" + fj["id"]).json()
+            if fj["status"] in ("done", "failed"):
+                break
+            time.sleep(0.5)
+        assert fj["status"] == "done", fj.get("error")
+        # 杆身名义应力 F/A（12×6 截面，扣孔前）≈ 29 MPa；评估最大值在孔边，应大于名义值
+        nominal = r["peak_N"] / (12 * 6)
+        assert fj["stats"]["vm_max_mpa"] > nominal
+        ms = c.get("/mbd/jobs/{}/member-series".format(j["id"]), params={"member": "rod",
+                   "direction": ",".join(str(x) for x in loads[1]["vector_n"])}).json()
+        assert abs(max(abs(x) for x in ms["values"]) - r["peak_N"]) / r["peak_N"] < 0.01
+        fat = c.post("/jobs/{}/fatigue".format(fj["id"]), json={"ref_load": r["peak_N"], "series": ms["values"],
+                                                                "block_seconds": ms["duration_s"]}).json()
+        assert fat["summary"]["cycles_per_block"] >= 1
+
+
+def test_motor_sizing_hand_check():
+    from cae import motors as MT
+    t = np.linspace(0, 1, 101)
+    tau, w, a = np.full_like(t, 30.0), np.full_like(t, 1.0), np.zeros_like(t)     # 恒定 30 N·m、1 rad/s
+    r = MT.check(tau, w, a, MT.MOTORS[1], MT.HARMONIC[2], 100)
+    assert r["motor_peak"] == pytest.approx(30 / (100 * MT.ETA)) and r["motor_rms"] == pytest.approx(0.4)
+    assert r["motor_speed_rpm"] == pytest.approx(100 * 60 / (2 * math.pi))
+    # 200 W 电机连续 0.4 / 0.637；20 号谐波额定 30 / 34 —— 都够，最紧的是减速器额定力矩
+    assert r["ok"] is True and r["worst"] == "gear_rms" and r["utilization"]["gear_rms"] == pytest.approx(30 / 34, abs=1e-3)
+    s = MT.select(tau, w, a, safety=1.2)
+    assert s["ok"] and s["best"]["utilization"][s["best"]["worst"]] <= 1
+    big = MT.select(np.full_like(t, 2000.0), w, a)                  # 2000 N·m：表里没有够用的
+    assert not big["ok"] and "没有够用的组合" in big["note"]
+
+
+def test_no_startup_acceleration_spike():
+    s, ch, _ = _mech("C-LNK-SLIDER", {"duration_s": 0.5, "drives": [{"joint": "crank", "kind": "speed", "value": 2 * math.pi}]})
+    assert np.max(np.abs(ch["qdd.crank"])) < 5          # 匀速：曲柄角加速度≈0

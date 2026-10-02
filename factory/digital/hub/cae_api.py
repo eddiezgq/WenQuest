@@ -4,6 +4,7 @@
 所有工厂共用一个 cae 服务，任务上带工厂编号（历史库名，如 wq_factory / wq_demo / wq_c_pilot）和提交人。
 学生看自己的任务；老师（厂长角色、班级任课老师）看本厂全部任务。
 """
+import math
 import os
 import urllib.parse
 
@@ -165,6 +166,26 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
     def mbd_job(jid: str, u=Depends(user_of)):
         return mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
 
+    @app.post("/api/mbd/jobs/{jid}/to-fea")
+    def mbd_to_fea(jid: str, body: dict = Body(...), u=Depends(user_of)):
+        mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        r = call("POST", "/mbd/jobs/{}/to-fea".format(urllib.parse.quote(jid)), json=body).json()
+        r["geometry"]["model_url"] = "/api/cae/geometry/{}/model.glb".format(r["geometry"]["sha"])
+        r["geometry"]["name"] = r["title"]
+        return r
+
+    @app.get("/api/mbd/jobs/{jid}/motors")
+    def mbd_motors(jid: str, safety: float = 1.2, u=Depends(user_of)):
+        mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        return call("GET", "/mbd/jobs/{}/motors".format(urllib.parse.quote(jid)), params={"safety": safety}).json()
+
+    @app.post("/api/mbd/jobs/{jid}/report")
+    def mbd_report(jid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        r = call("POST", "/jobs/{}/report".format(urllib.parse.quote(jid)), json=body)
+        return Response(r.content, media_type=r.headers.get("content-type"),
+                        headers={"Content-Disposition": r.headers.get("content-disposition", "attachment")})
+
     @app.get("/api/mbd/jobs/{jid}/{part}.bin")
     def mbd_bin(jid: str, part: str, u=Depends(user_of)):
         if part not in ("series", "anim"):
@@ -248,6 +269,22 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
         torques = [l for l in j["setup"]["loads"] if l["type"] == "torque"]
         ref, unit = (sum(l["value_nmm"] for l in torques) / 1000, "N·m") if torques else (1.0, "× 计算工况")
         sp = body.get("spectrum") or {}
+        if sp.get("kind") == "mbd":
+            # 第 12 轮：载荷谱 = 动力学算出的这根杆件受力（沿有限元所加力的方向）随时间的变化
+            src = j["setup"].get("source") or {}
+            fl = [l for l in j["setup"]["loads"] if l["type"] == "force"]
+            if not src.get("job") or len(fl) != 1:
+                raise HTTPException(400, "这次有限元不是从动力学送来的，不能用动力学受力记录")
+            mbd = mine(u, call("GET", "/jobs/" + urllib.parse.quote(src["job"])).json())
+            v = fl[0]["vector_n"]
+            ref, unit = math.sqrt(sum(x * x for x in v)), "N（沿所加力的方向）"
+            r = call("GET", "/mbd/jobs/{}/member-series".format(urllib.parse.quote(mbd["id"])),
+                     params={"member": src["member"], "direction": ",".join(str(x) for x in v)}).json()
+            series, secs = r["values"], r["duration_s"]
+            label = "动力学受力记录：{}（{:.2f} 秒一块，重复）".format(mbd.get("title") or mbd["id"], secs)
+            keys = ("surface", "size_factor", "kf", "haibach")
+            return call("POST", "/jobs/{}/fatigue".format(urllib.parse.quote(jid)), json=dict(
+                {k: body[k] for k in keys if k in body}, ref_load=ref, ref_unit=unit, series=series, block_seconds=secs, label=label)).json()
         if sp.get("kind") == "log":
             r = H.db.one("select payload from bus_message where id=%s and type='test.torque'", (sp.get("id"),))
             if not r:

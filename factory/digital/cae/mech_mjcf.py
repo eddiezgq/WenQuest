@@ -326,3 +326,13 @@ def member_step(mid, member, given=None):
         f = os.path.join(tmp, "m.step")
         bd.export_step(shape, f)
         return open(f, "rb").read()
+
+
+def member_force_channel(mid, member):
+    """杆件 B 端（远端销孔）受的力取自哪个反力通道、取正还是取反：
+    主动的曲柄 B 端带着下一根杆，受力 = −（下一根杆从曲柄受的力）；其他杆 B 端受力 ≈ −A 端受力（二力杆，略去惯性和自重）"""
+    if member not in STEP_MEMBERS.get(mid, {}):
+        raise ValueError("“{}”的“{}”不是杆件，不能送去有限元".format(NAMES.get(mid, mid), member))
+    if member == "crank":
+        return {"C-LNK-4BAR": "coupler", "C-LNK-SLIDER": "rod"}[mid]
+    return member
