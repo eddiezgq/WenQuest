@@ -16,6 +16,16 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCES = {"robotics": ROOT / "docs" / "教材" / "机器人学" / "00_提纲.md"}
+TITLES = {"robotics": ("机器人学", "Robotics")}
+
+
+def meta(book: str) -> tuple[Path, str, str]:
+    """(outline, title, title_en). A new book needs no change here: it writes textbook/<book>/meta.yaml with
+    outline (path in the repository), title and title_en (第 10 轮)."""
+    if book in SOURCES:
+        return SOURCES[book], *TITLES[book]
+    m = yaml.safe_load((ROOT / "textbook" / book / "meta.yaml").read_text(encoding="utf-8"))
+    return ROOT / m["outline"], m["title"], m["title_en"]
 
 PART = re.compile(r"^###\s+(.+?)\s*$")
 CHAPTER = re.compile(r"^\*\*第\s*(\d+)\s*章\s+(.+?)\*\*\s*(?:【([^】]+)】)?")
@@ -48,8 +58,9 @@ def parse(text: str) -> dict:
 
 
 def generate(book: str) -> dict:
-    data = parse(SOURCES[book].read_text(encoding="utf-8"))
-    return {"book": book, "title": "机器人学", "title_en": "Robotics", "source": str(SOURCES[book].relative_to(ROOT)), **data}
+    src, title, title_en = meta(book)
+    data = parse(src.read_text(encoding="utf-8"))
+    return {"book": book, "title": title, "title_en": title_en, "source": str(src.relative_to(ROOT)), **data}
 
 
 def write(book: str) -> Path:

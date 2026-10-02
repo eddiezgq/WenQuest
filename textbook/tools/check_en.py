@@ -24,7 +24,8 @@ def main(path: str) -> int:
     problems = []
     a, b = zh.read_text(encoding="utf-8"), en.read_text(encoding="utf-8")
     problems += english.parity(a, b)
-    with (TOOLS.parent / "robotics" / "conventions" / "术语表.csv").open(encoding="utf-8") as f:
+    book_dir = next(p for p in en.resolve().parents if p.parent == TOOLS.parent)      # textbook/<book>/
+    with (book_dir / "conventions" / "术语表.csv").open(encoding="utf-8") as f:
         gl = {r["中文"].strip(): (r.get("English") or "").strip() for r in csv.DictReader(f)}
     problems += english.check_terms(a, b, gl)
     for src in re.findall(r"^src:\s*(code/\S+\.py)", b, re.M):

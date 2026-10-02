@@ -1,0 +1,740 @@
+# 由 textbook/tools/outline.py 从提纲生成，请改提纲后重新生成，不要手改。
+book: linalg
+title: 线性代数
+title_en: Linear Algebra
+source: docs/教材/线性代数/00_提纲.md
+parts:
+- title: 导论
+- title: 第一篇 向量与线性方程组
+- title: 第二篇 向量空间与线性映射
+- title: 第三篇 正交性
+- title: 第四篇 特征值
+- title: 第五篇 奇异值分解与矩阵分析
+- title: 第六篇 数值线性代数
+- title: 第七篇 推广与抽象
+- title: 第八篇 应用
+chapters:
+- 'no': 1
+  title: 线性代数是什么
+  level: 基础
+  part: 导论
+  sections:
+  - id: '1.1'
+    title: “线性”的意思：比例与叠加
+  - id: '1.2'
+    title: 同一件事的三种看法：方程组、几何变换、数据表
+  - id: '1.3'
+    title: 线性代数为什么无处不在：机器人、图像、搜索引擎、神经网络
+  - id: '1.4'
+    title: 历史：从《九章算术》方程术到 GPU 上的矩阵乘法
+  - id: '1.5'
+    title: 怎样读和写证明：命题、反例、直接证明、反证法、数学归纳法
+  - id: '1.6'
+    title: 计算工具：从第一行 Python 到 NumPy 数组
+  - id: '1.7'
+    title: 本书路线图、课程路线与贯穿全书的机器人
+- 'no': 2
+  title: 向量
+  level: 基础
+  part: 第一篇 向量与线性方程组
+  sections:
+  - id: '2.1'
+    title: 向量：箭头与数组
+  - id: '2.2'
+    title: 加法与数乘；线性组合
+  - id: '2.3'
+    title: 点积、长度与夹角；柯西–施瓦茨不等式与三角不等式
+  - id: '2.4'
+    title: 向一条直线投影
+  - id: '2.5'
+    title: 叉积与混合积（三维）
+  - id: '2.6'
+    title: 直线与平面的向量方程；点到平面的距离
+  - id: '2.7'
+    title: n 维向量：信号、图像、文档、质量检测记录都是向量
+- 'no': 3
+  title: 线性方程组与消元法
+  level: 基础
+  part: 第一篇 向量与线性方程组
+  sections:
+  - id: '3.1'
+    title: 方程组的两种图：行图（平面相交）与列图（列向量组合）
+  - id: '3.2'
+    title: 《九章算术》方程术与高斯消元法
+  - id: '3.3'
+    title: 增广矩阵与初等行变换
+  - id: '3.4'
+    title: 行阶梯形与简化行阶梯形；主元与自由变量
+  - id: '3.5'
+    title: 解的三种情形：无解、唯一解、无穷多解
+  - id: '3.6'
+    title: 齐次方程组
+  - id: '3.7'
+    title: 应用：电路的节点方程、桁架的静力平衡、化学方程式配平、交通流量、投入产出模型（列昂惕夫）
+  - id: '3.8'
+    title: 消元需要多少次运算：$n^3/3$ 从哪里来
+- 'no': 4
+  title: 矩阵与矩阵乘法
+  level: 基础
+  part: 第一篇 向量与线性方程组
+  sections:
+  - id: '4.1'
+    title: 矩阵乘向量：列的线性组合
+  - id: '4.2'
+    title: 矩阵乘法的四种看法：行乘列、列的组合、行的组合、列乘行（外积之和）
+  - id: '4.3'
+    title: 运算律；乘法不可交换
+  - id: '4.4'
+    title: 分块矩阵
+  - id: '4.5'
+    title: 转置与对称矩阵
+  - id: '4.6'
+    title: 特殊矩阵：对角、三角、置换、稀疏
+  - id: '4.7'
+    title: 矩阵乘法怎样算得快：分块、缓存、GPU、施特拉森算法
+- 'no': 5
+  title: 逆矩阵与 LU 分解
+  level: 基础
+  part: 第一篇 向量与线性方程组
+  sections:
+  - id: '5.1'
+    title: 逆矩阵：定义与存在条件
+  - id: '5.2'
+    title: 初等矩阵；高斯–若尔当法求逆
+  - id: '5.3'
+    title: 消元就是分解：$A = LU$
+  - id: '5.4'
+    title: 行交换与 $PA = LU$；部分主元
+  - id: '5.5'
+    title: 对称矩阵的 $LDL^{\mathsf T}$
+  - id: '5.6'
+    title: 三对角与带状矩阵：追赶法
+  - id: '5.7'
+    title: 为什么几乎从不真的去求逆
+- 'no': 6
+  title: 行列式
+  level: 基础
+  part: 第一篇 向量与线性方程组
+  sections:
+  - id: '6.1'
+    title: 行列式的几何意义：有向面积与有向体积，变换的伸缩倍数
+  - id: '6.2'
+    title: 三条性质决定行列式
+  - id: '6.3'
+    title: 排列公式与按行（列）展开；余子式与代数余子式
+  - id: '6.4'
+    title: 用消元法计算行列式
+  - id: '6.5'
+    title: 克拉默法则与伴随矩阵
+  - id: '6.6'
+    title: 行列式与可逆性；$\det(AB) = \det A \det B$
+  - id: '6.7'
+    title: 范德蒙德行列式与几类特殊行列式【进阶】
+  - id: '6.8'
+    title: 应用：三角形面积、四面体体积、雅可比行列式与换元积分、机械臂奇异位形的初步判断
+- 'no': 7
+  title: 向量空间与子空间
+  level: 基础
+  part: 第二篇 向量空间与线性映射
+  sections:
+  - id: '7.1'
+    title: 数域；从 $\mathbb R^n$ 到一般向量空间的公理
+  - id: '7.2'
+    title: 例子：多项式、函数、矩阵、离散信号
+  - id: '7.3'
+    title: 子空间
+  - id: '7.4'
+    title: 张成
+  - id: '7.5'
+    title: 线性相关与线性无关；向量组的秩与极大无关组
+  - id: '7.6'
+    title: 基与维数
+  - id: '7.7'
+    title: 坐标
+  - id: '7.8'
+    title: 子空间的和与直和；维数公式
+- 'no': 8
+  title: 矩阵的四个基本子空间
+  level: 基础
+  part: 第二篇 向量空间与线性映射
+  sections:
+  - id: '8.1'
+    title: 列空间与零空间
+  - id: '8.2'
+    title: 矩阵的秩
+  - id: '8.3'
+    title: $Ax = b$ 的完整解：特解加零空间
+  - id: '8.4'
+    title: 行空间与左零空间
+  - id: '8.5'
+    title: 线性代数基本定理（一）：四个子空间的维数
+  - id: '8.6'
+    title: 秩的性质与秩不等式
+  - id: '8.7'
+    title: 应用：图的关联矩阵与基尔霍夫定律；冗余机械臂的“自运动”预告
+- 'no': 9
+  title: 线性映射
+  level: 基础
+  part: 第二篇 向量空间与线性映射
+  sections:
+  - id: '9.1'
+    title: 线性映射的定义与例子：求导、积分、旋转、投影、反射
+  - id: '9.2'
+    title: 核与像；秩–零化度定理
+  - id: '9.3'
+    title: 线性映射在一组基下的矩阵
+  - id: '9.4'
+    title: 复合与矩阵乘法
+  - id: '9.5'
+    title: 同构：维数相同的空间“长得一样”
+  - id: '9.6'
+    title: 基变换与相似矩阵
+  - id: '9.7'
+    title: 对偶空间与对偶映射【进阶】
+  - id: '9.8'
+    title: 商空间【进阶】
+- 'no': 10
+  title: 正交性、投影与最小二乘
+  level: 基础
+  part: 第三篇 正交性
+  sections:
+  - id: '10.1'
+    title: 正交向量与正交子空间；正交补
+  - id: '10.2'
+    title: 线性代数基本定理（二）：四个子空间的正交关系
+  - id: '10.3'
+    title: 向子空间投影；投影矩阵
+  - id: '10.4'
+    title: 最小二乘：正规方程
+  - id: '10.5'
+    title: 直线拟合、多项式拟合与多元回归
+  - id: '10.6'
+    title: 加权最小二乘
+  - id: '10.7'
+    title: 应用：传感器标定——由多次测量求标定参数
+- 'no': 11
+  title: 正交基与 QR 分解
+  level: 基础
+  part: 第三篇 正交性
+  sections:
+  - id: '11.1'
+    title: 标准正交基与正交矩阵
+  - id: '11.2'
+    title: 格拉姆–施密特正交化
+  - id: '11.3'
+    title: $A = QR$
+  - id: '11.4'
+    title: 豪斯霍尔德反射与吉文斯旋转
+  - id: '11.5'
+    title: 用 QR 解最小二乘
+  - id: '11.6'
+    title: 函数的正交：傅里叶级数与勒让德多项式
+- 'no': 12
+  title: 内积空间
+  level: 进阶
+  part: 第三篇 正交性
+  sections:
+  - id: '12.1'
+    title: 一般内积与范数
+  - id: '12.2'
+    title: 复向量与埃尔米特内积
+  - id: '12.3'
+    title: 正交分解定理与最佳逼近
+  - id: '12.4'
+    title: 里斯表示定理；伴随算子
+  - id: '12.5'
+    title: 自伴算子、正规算子、酉算子
+  - id: '12.6'
+    title: 无穷维的预告：希尔伯特空间
+- 'no': 13
+  title: 特征值与特征向量
+  level: 基础
+  part: 第四篇 特征值
+  sections:
+  - id: '13.1'
+    title: 变换下不改变方向的向量
+  - id: '13.2'
+    title: 特征多项式；求特征值与特征向量
+  - id: '13.3'
+    title: 迹、行列式与特征值的关系
+  - id: '13.4'
+    title: 对角化：$A = X \Lambda X^{-1}$
+  - id: '13.5'
+    title: 矩阵的幂与差分方程：斐波那契数列、人口模型
+  - id: '13.6'
+    title: 复特征值与旋转
+  - id: '13.7'
+    title: 代数重数与几何重数；相似矩阵的性质
+- 'no': 14
+  title: 对称矩阵与谱定理
+  level: 基础
+  part: 第四篇 特征值
+  sections:
+  - id: '14.1'
+    title: 实对称矩阵：特征值为实数，特征向量正交
+  - id: '14.2'
+    title: 谱定理：$A = Q \Lambda Q^{\mathsf T}$
+  - id: '14.3'
+    title: 埃尔米特矩阵、酉矩阵与正规矩阵
+  - id: '14.4'
+    title: 瑞利商；库朗–费希尔极小极大原理
+  - id: '14.5'
+    title: 主轴定理：椭圆与椭球
+  - id: '14.6'
+    title: 应用：刚体惯量张量的主轴、应力张量的主应力
+- 'no': 15
+  title: 二次型与正定矩阵
+  level: 基础
+  part: 第四篇 特征值
+  sections:
+  - id: '15.1'
+    title: 二次型与它的矩阵
+  - id: '15.2'
+    title: 化标准形：正交变换法与配方法
+  - id: '15.3'
+    title: 合同变换；西尔维斯特惯性定理
+  - id: '15.4'
+    title: 正定矩阵的五种判据
+  - id: '15.5'
+    title: 乔列斯基分解
+  - id: '15.6'
+    title: 多元函数的极值与黑塞矩阵
+  - id: '15.7'
+    title: 半正定矩阵与协方差矩阵
+  - id: '15.8'
+    title: 应用：机械臂的质量矩阵为什么一定正定；可操作度椭球
+- 'no': 16
+  title: 线性微分方程组与矩阵指数
+  level: 基础
+  part: 第四篇 特征值
+  sections:
+  - id: '16.1'
+    title: $\dfrac{\mathrm d\boldsymbol u}{\mathrm dt} = A\boldsymbol u$：用特征向量解耦
+  - id: '16.2'
+    title: 矩阵指数 $e^{At}$
+  - id: '16.3'
+    title: 稳定性：特征值的实部
+  - id: '16.4'
+    title: 二阶系统与振动模态：质量–弹簧链
+  - id: '16.5'
+    title: 反对称矩阵的指数是旋转：$e^{[\boldsymbol\omega]\theta}$
+  - id: '16.6'
+    title: 状态空间预告
+- 'no': 17
+  title: 若尔当标准形与矩阵的结构
+  level: 进阶
+  part: 第四篇 特征值
+  sections:
+  - id: '17.1'
+    title: 不能对角化的矩阵
+  - id: '17.2'
+    title: 不变子空间；凯莱–哈密顿定理与最小多项式
+  - id: '17.3'
+    title: 根子空间分解
+  - id: '17.4'
+    title: 若尔当标准形及其证明
+  - id: '17.5'
+    title: λ-矩阵、不变因子与初等因子
+  - id: '17.6'
+    title: 有理标准形【专题】
+  - id: '17.7'
+    title: 舒尔分解：数值计算为什么用它而不用若尔当形
+- 'no': 18
+  title: 奇异值分解
+  level: 基础
+  part: 第五篇 奇异值分解与矩阵分析
+  sections:
+  - id: '18.1'
+    title: 任何矩阵都把单位圆变成椭圆
+  - id: '18.2'
+    title: $A = U \Sigma V^{\mathsf T}$：存在性的证明
+  - id: '18.3'
+    title: SVD 给出四个基本子空间的标准正交基
+  - id: '18.4'
+    title: 低秩逼近：埃卡特–杨定理
+  - id: '18.5'
+    title: 极分解
+  - id: '18.6'
+    title: 伪逆与最小范数解
+  - id: '18.7'
+    title: 应用：图像压缩；机械臂雅可比的奇异值与奇异位形
+- 'no': 19
+  title: 主成分分析与数据
+  level: 基础
+  part: 第五篇 奇异值分解与矩阵分析
+  sections:
+  - id: '19.1'
+    title: 数据矩阵、中心化与协方差矩阵
+  - id: '19.2'
+    title: 主成分分析
+  - id: '19.3'
+    title: 主成分分析与 SVD 的关系
+  - id: '19.4'
+    title: 降维与可视化
+  - id: '19.5'
+    title: 应用：点云法向估计、人脸的特征脸
+  - id: '19.6'
+    title: 应用：多元统计过程控制——霍特林 $T^2$ 图（数字工厂检测数据）
+  - id: '19.7'
+    title: 鲁棒主成分分析【专题】
+- 'no': 20
+  title: 范数、条件数与舍入误差
+  level: 基础
+  part: 第五篇 奇异值分解与矩阵分析
+  sections:
+  - id: '20.1'
+    title: 向量范数
+  - id: '20.2'
+    title: 矩阵范数：算子范数、弗罗贝尼乌斯范数、核范数
+  - id: '20.3'
+    title: 条件数：输入误差被放大多少倍
+  - id: '20.4'
+    title: 浮点数与舍入误差（IEEE 754）
+  - id: '20.5'
+    title: 前向误差与后向误差；后向稳定性
+  - id: '20.6'
+    title: 病态问题：希尔伯特矩阵
+- 'no': 21
+  title: 矩阵分析专题
+  level: 进阶
+  part: 第五篇 奇异值分解与矩阵分析
+  sections:
+  - id: '21.1'
+    title: 谱半径、矩阵序列与矩阵级数；诺伊曼级数
+  - id: '21.2'
+    title: 矩阵函数 $f(A)$
+  - id: '21.3'
+    title: 格什戈林圆盘定理
+  - id: '21.4'
+    title: 特征值与奇异值的扰动（外尔不等式、鲍尔–费克定理）
+  - id: '21.5'
+    title: 非负矩阵与佩龙–弗罗贝尼乌斯定理
+  - id: '21.6'
+    title: 克罗内克积与矩阵的向量化
+  - id: '21.7'
+    title: 矩阵微积分：对向量和矩阵求导
+- 'no': 22
+  title: 线性方程组的直接解法
+  level: 进阶
+  part: 第六篇 数值线性代数
+  sections:
+  - id: '22.1'
+    title: 高斯消元的稳定性：主元选取与增长因子
+  - id: '22.2'
+    title: 乔列斯基分解与对称不定分解
+  - id: '22.3'
+    title: 稀疏矩阵：存储格式、填充与重排序
+  - id: '22.4'
+    title: BLAS、LAPACK 与分块算法
+  - id: '22.5'
+    title: GPU 与混合精度计算
+- 'no': 23
+  title: 最小二乘的数值方法
+  level: 进阶
+  part: 第六篇 数值线性代数
+  sections:
+  - id: '23.1'
+    title: 正规方程、QR、SVD 三种解法的精度与代价
+  - id: '23.2'
+    title: 秩亏与截断 SVD
+  - id: '23.3'
+    title: 正则化：岭回归与吉洪诺夫正则化；L 曲线
+  - id: '23.4'
+    title: 约束最小二乘
+  - id: '23.5'
+    title: 非线性最小二乘：高斯–牛顿法与列文伯格–马夸特法
+  - id: '23.6'
+    title: 应用：机械臂运动学标定
+- 'no': 24
+  title: 特征值与奇异值的计算
+  level: 进阶
+  part: 第六篇 数值线性代数
+  sections:
+  - id: '24.1'
+    title: 幂法与 PageRank
+  - id: '24.2'
+    title: 反幂法与瑞利商迭代
+  - id: '24.3'
+    title: QR 算法：海森伯格化与位移
+  - id: '24.4'
+    title: 对称矩阵：三对角化与分治法
+  - id: '24.5'
+    title: SVD 的计算：戈卢布–卡汉双对角化
+  - id: '24.6'
+    title: 大规模问题：兰乔斯与阿诺尔迪方法
+- 'no': 25
+  title: 迭代法与克雷洛夫子空间
+  level: 进阶
+  part: 第六篇 数值线性代数
+  sections:
+  - id: '25.1'
+    title: 雅可比、高斯–赛德尔与 SOR 迭代
+  - id: '25.2'
+    title: 收敛性与谱半径
+  - id: '25.3'
+    title: 最速下降与共轭梯度法
+  - id: '25.4'
+    title: GMRES 与其他克雷洛夫方法
+  - id: '25.5'
+    title: 预条件
+  - id: '25.6'
+    title: 应用：泊松方程、有限元刚度方程（与数字工厂有限元服务共用模型）
+- 'no': 26
+  title: 随机化数值线性代数
+  level: 专题
+  part: 第六篇 数值线性代数
+  sections:
+  - id: '26.1'
+    title: 随机投影与约翰逊–林登施特劳斯引理
+  - id: '26.2'
+    title: 随机化 SVD
+  - id: '26.3'
+    title: 矩阵草图与随机化最小二乘
+  - id: '26.4'
+    title: 大模型时代的低秩近似
+- 'no': 27
+  title: 多重线性代数与张量
+  level: 进阶
+  part: 第七篇 推广与抽象
+  sections:
+  - id: '27.1'
+    title: 双线性型与多重线性映射
+  - id: '27.2'
+    title: 张量积
+  - id: '27.3'
+    title: 对称张量与反对称张量
+  - id: '27.4'
+    title: 外代数与楔积：行列式的本质
+  - id: '27.5'
+    title: 张量的坐标变换：惯量张量与应力张量
+  - id: '27.6'
+    title: 张量分解：CP 与塔克分解；深度学习中的张量
+- 'no': 28
+  title: 有限域上的线性代数
+  level: 专题
+  part: 第七篇 推广与抽象
+  sections:
+  - id: '28.1'
+    title: 有限域 $\mathbb F_2$ 与 $\mathbb F_p$
+  - id: '28.2'
+    title: 线性码：生成矩阵与校验矩阵
+  - id: '28.3'
+    title: 汉明码与纠错
+  - id: '28.4'
+    title: 里德–所罗门码与二维码
+  - id: '28.5'
+    title: 密码学中的线性代数
+- 'no': 29
+  title: 线性不等式与凸性
+  level: 专题
+  part: 第七篇 推广与抽象
+  sections:
+  - id: '29.1'
+    title: 凸集、超平面与分离定理
+  - id: '29.2'
+    title: 法卡斯引理
+  - id: '29.3'
+    title: 线性规划与单纯形法
+  - id: '29.4'
+    title: 对偶
+  - id: '29.5'
+    title: 应用：车间排产、机器人抓取的力闭合
+- 'no': 30
+  title: 计算机图形学与几何
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '30.1'
+    title: 二维与三维变换；齐次坐标
+  - id: '30.2'
+    title: 视图变换与透视投影
+  - id: '30.3'
+    title: 贝塞尔曲线与 B 样条的矩阵形式
+  - id: '30.4'
+    title: 网格变形与蒙皮
+- 'no': 31
+  title: 旋转、刚体运动与矩阵李群
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '31.1'
+    title: 正交群与特殊正交群 SO(3)
+  - id: '31.2'
+    title: 轴角、四元数与旋转矩阵的换算
+  - id: '31.3'
+    title: 刚体运动群 SE(3)
+  - id: '31.4'
+    title: 矩阵李群与李代数：指数映射与对数映射
+  - id: '31.5'
+    title: 正交普罗克拉斯忒斯问题：用 SVD 求最佳旋转（卡布施算法）
+  - id: '31.6'
+    title: 点云配准：ICP
+  - id: '31.7'
+    title: 手眼标定 $AX = XB$
+- 'no': 32
+  title: 机器人运动学中的线性代数
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '32.1'
+    title: 雅可比：关节速度到末端速度的线性映射
+  - id: '32.2'
+    title: 力雅可比与对偶：$\boldsymbol\tau = J^{\mathsf T}\boldsymbol F$
+  - id: '32.3'
+    title: 奇异性、可操作度与条件数
+  - id: '32.4'
+    title: 逆运动学：伪逆、阻尼最小二乘
+  - id: '32.5'
+    title: 冗余与零空间：同时完成主任务和次任务
+  - id: '32.6'
+    title: 多任务的优先级
+- 'no': 33
+  title: 计算机视觉中的线性代数
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '33.1'
+    title: 相机模型：$P = K[R \mid \boldsymbol t]$
+  - id: '33.2'
+    title: 相机标定：直接线性变换
+  - id: '33.3'
+    title: 单应矩阵
+  - id: '33.4'
+    title: 对极几何：本质矩阵与基础矩阵；八点法
+  - id: '33.5'
+    title: 三角测量与光束法平差的稀疏结构
+- 'no': 34
+  title: 状态估计与卡尔曼滤波
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '34.1'
+    title: 多元高斯分布与协方差
+  - id: '34.2'
+    title: 线性卡尔曼滤波的推导
+  - id: '34.3'
+    title: 信息形式与舒尔补
+  - id: '34.4'
+    title: SLAM 中的稀疏矩阵与因子图
+- 'no': 35
+  title: 控制中的线性代数
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '35.1'
+    title: 状态空间模型
+  - id: '35.2'
+    title: 能控性与能观性的秩判据
+  - id: '35.3'
+    title: 极点配置
+  - id: '35.4'
+    title: 李雅普诺夫方程与稳定性
+  - id: '35.5'
+    title: 线性二次型调节器与里卡蒂方程
+- 'no': 36
+  title: 信号处理与傅里叶变换
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '36.1'
+    title: 离散傅里叶变换就是一个矩阵
+  - id: '36.2'
+    title: 快速傅里叶变换：把这个矩阵分解
+  - id: '36.3'
+    title: 循环矩阵与卷积
+  - id: '36.4'
+    title: 滤波器与卷积神经网络的线性部分
+  - id: '36.5'
+    title: 小波预告
+- 'no': 37
+  title: 图与网络
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '37.1'
+    title: 邻接矩阵、关联矩阵、拉普拉斯矩阵
+  - id: '37.2'
+    title: 拉普拉斯矩阵的特征值与连通性
+  - id: '37.3'
+    title: 谱聚类
+  - id: '37.4'
+    title: PageRank 与马尔可夫链
+  - id: '37.5'
+    title: 多机器人一致性
+- 'no': 38
+  title: 机器学习与深度学习中的线性代数
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '38.1'
+    title: 线性回归与梯度下降；条件数决定收敛快慢
+  - id: '38.2'
+    title: 核方法与支持向量机的对偶
+  - id: '38.3'
+    title: 神经网络：矩阵乘法与非线性的复合
+  - id: '38.4'
+    title: 反向传播的矩阵形式
+  - id: '38.5'
+    title: 嵌入与余弦相似度
+  - id: '38.6'
+    title: 注意力机制：$\operatorname{softmax}(QK^{\mathsf T}/\sqrt d)\,V$
+  - id: '38.7'
+    title: 低秩适配（LoRA）与模型压缩
+- 'no': 39
+  title: 优化中的线性代数
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '39.1'
+    title: 二次函数的极小与正定性
+  - id: '39.2'
+    title: 牛顿法与拟牛顿法
+  - id: '39.3'
+    title: 等式约束与 KKT 矩阵
+  - id: '39.4'
+    title: 二次规划
+  - id: '39.5'
+    title: 应用：机器人的全身控制
+- 'no': 40
+  title: 有限元与结构振动
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '40.1'
+    title: 弹簧系统与刚度矩阵
+  - id: '40.2'
+    title: 单元刚度矩阵的组装
+  - id: '40.3'
+    title: 边界条件与求解
+  - id: '40.4'
+    title: 模态分析：广义特征值问题 $K\boldsymbol x = \lambda M\boldsymbol x$
+  - id: '40.5'
+    title: 与数字工厂有限元服务对照
+- 'no': 41
+  title: 马尔可夫链与随机矩阵
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '41.1'
+    title: 转移矩阵与平稳分布
+  - id: '41.2'
+    title: 佩龙–弗罗贝尼乌斯定理的应用
+  - id: '41.3'
+    title: 吸收链与平均首达时间
+  - id: '41.4'
+    title: 应用：设备状态与维修策略、网页排序
+- 'no': 42
+  title: 量子计算中的线性代数
+  level: 专题
+  part: 第八篇 应用
+  sections:
+  - id: '42.1'
+    title: 量子比特：$\mathbb C^2$ 中的单位向量
+  - id: '42.2'
+    title: 量子门是酉矩阵
+  - id: '42.3'
+    title: 多量子比特与张量积；纠缠
+  - id: '42.4'
+    title: 测量与投影
+  - id: '42.5'
+    title: 两个算法：多伊奇–约萨与格罗弗

@@ -1,0 +1,13 @@
+# 各章状态与英文标题（第 8 轮 2.1、2.2；本书第 10 轮）。
+# status：draft 草稿 / ai AI 审稿 / first 初审 / team 团队审阅 / final 定稿。没写的章不列。
+parts_en:
+  导论: Introduction
+  第一篇 向量与线性方程组: "Part I  Vectors and Linear Systems"
+  第二篇 向量空间与线性映射: "Part II  Vector Spaces and Linear Maps"
+  第三篇 正交性: "Part III  Orthogonality"
+  第四篇 特征值: "Part IV  Eigenvalues"
+  第五篇 奇异值分解与矩阵分析: "Part V  The Singular Value Decomposition and Matrix Analysis"
+  第六篇 数值线性代数: "Part VI  Numerical Linear Algebra"
+  第七篇 推广与抽象: "Part VII  Generalizations and Abstractions"
+  第八篇 应用: "Part VIII  Applications"
+chapters: {}
