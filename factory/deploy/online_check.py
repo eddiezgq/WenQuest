@@ -16,6 +16,10 @@ import paho.mqtt.client as mqtt
 
 domain = sys.argv[1]
 secs = int(sys.argv[2]) if len(sys.argv) > 2 else 30
+# 第 9 轮：演示工厂用 `online_check.py <域名> 30 demo demo-erp prod`
+FAC = sys.argv[3] if len(sys.argv) > 3 else "factory"
+ERP = sys.argv[4] if len(sys.argv) > 4 else "erp"
+MODE = sys.argv[5] if len(sys.argv) > 5 else "teach"
 lines, ok = [], True
 
 
@@ -26,7 +30,7 @@ def say(text):
 
 # 1. 网关配置：浏览器拿到的总线地址
 try:
-    with urllib.request.urlopen("https://factory.{}/api/config".format(domain), timeout=20) as r:
+    with urllib.request.urlopen("https://{}.{}/api/config".format(FAC, domain), timeout=20) as r:
         cfg = json.loads(r.read().decode("utf-8"))
     say("网关配置 mqtt_ws = {}，default_mode = {}".format(cfg.get("mqtt_ws"), cfg.get("default_mode")))
 except Exception as e:  # noqa: BLE001
@@ -34,7 +38,7 @@ except Exception as e:  # noqa: BLE001
     say("读不到 /api/config：{}".format(e))
 
 # 2. 连接总线（WebSocket，匿名只读，同浏览器）
-url = cfg.get("mqtt_ws") or "wss://factory.{}/mqtt".format(domain)
+url = cfg.get("mqtt_ws") or "wss://{}.{}/mqtt".format(FAC, domain)
 u = urllib.parse.urlsplit(url)
 host, path = u.hostname, u.path or "/"
 port = u.port or (443 if u.scheme == "wss" else 80)
@@ -77,14 +81,14 @@ say("总线连接结果：{}；{} 秒收到 {} 条消息".format(state["connecte
 for mode, units in sorted(state["units"].items()):
     say("  {} 模式设备 {} 台：{}".format(mode, len(units), "，".join("{}={}".format(k, v) for k, v in sorted(units.items()))))
 say("  消息种类：" + "，".join("{} {}".format(k, v) for k, v in sorted(state["types"].items())))
-if state["connected"] != "Success" or not state["units"].get("teach"):
+if state["connected"] != "Success" or not state["units"].get(MODE):
     ok = False
 
 # 3. ERPNext 登录页：问渠单点登录按钮和自动跳转脚本（第 7 轮）
 try:
-    with urllib.request.urlopen("https://erp.{}/login".format(domain), timeout=30) as r:
+    with urllib.request.urlopen("https://{}.{}/login".format(ERP, domain), timeout=30) as r:
         page = r.read().decode("utf-8", "replace")
-    with urllib.request.urlopen("https://erp.{}/website_script.js".format(domain), timeout=30) as r:
+    with urllib.request.urlopen("https://{}.{}/website_script.js".format(ERP, domain), timeout=30) as r:
         js = r.read().decode("utf-8", "replace")
     btn, auto = "btn-wenquest" in page, "wenquest-sso" in js
     import re
@@ -108,4 +112,4 @@ except Exception as e:  # noqa: BLE001
     ok = False
 
 msg = "%0A".join(x.replace("%", "%25") for x in lines)
-print("::{} title=线上车间检查（{}）::{}".format("notice" if ok else "warning", "正常" if ok else "有问题", msg))
+print("::{} title=线上{}检查（{}）::{}".format("notice" if ok else "warning", "演示工厂" if FAC == "demo" else "车间", "正常" if ok else "有问题", msg))

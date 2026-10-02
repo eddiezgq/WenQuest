@@ -278,5 +278,6 @@ jobs:
           pip install -q "paho-mqtt==2.1.0"
           sleep 20
           python3 factory/deploy/online_check.py "$domain" 30 || true
+          python3 factory/deploy/online_check.py "$domain" 30 demo demo-erp prod || true      # 第 9 轮：演示工厂
           ssh "deploy@$HOST" "cd /opt/wenquest/factory && docker compose -p wq-factory ps --format 'table {{.Service}}\t{{.State}}\t{{.Status}}' && echo && docker compose -p wq-factory logs --no-color --tail 25 sim bus && echo '---- 单点登录（枢纽）----' && docker compose -p wq-factory logs --no-color --since 6h hub 2>&1 | grep -iE 'oauth|ERPNext|Traceback|Error' | tail -n 30 && echo '---- 单点登录（ERPNext）----' && docker compose -p wq-factory exec -T erp-backend bash -c 'grep -ihE \"oauth|social|login\" logs/*.log | tail -n 30'; cat /tmp/wq-sso.log 2>/dev/null | tail -5" > /tmp/workshop.log 2>&1 || true
           python3 factory/deploy/ci_annotate.py 服务器车间状态 /tmp/workshop.log 150 | sed 's/^::error /::notice /'
