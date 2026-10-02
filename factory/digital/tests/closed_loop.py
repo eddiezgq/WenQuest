@@ -107,7 +107,14 @@ def login(name, role):
 def wait(fn, what, timeout=None, every=2):
     t0 = time.time()
     while time.time() - t0 < (timeout or A.timeout):
-        v = fn()
+        try:
+            v = fn()
+        except RuntimeError as e:
+            # 桥接第一次写设计版本时才给 ERPNext 物料加自定义字段：字段定义已有、数据库列还没加好的那一刻，
+            # 读物料会报 “Unknown column”。这是正在建字段，不是失败——稍后再读
+            if "Unknown column" not in str(e):
+                raise
+            v = None
         if v:
             return v
         time.sleep(every)
