@@ -1,0 +1,26 @@
+# 实验 44.5 的指导书与报告模板。目的、场景、参数、任务取自 lab44_5.js。
+原理:
+  - ["粒子遇到高 V₀、宽 a 的矩形势垒，能量 E < V₀ 时按经典力学一定被反弹，量子力学中却有一定概率透过（隧道效应）。平面波的透射系数由式 (44.5.1) 给出，κa ≫ 1 时近似为 T ≈ 16E(V₀ − E)/V₀² · e^{−2κa}（式 (44.5.2)），κ = √(2m(V₀ − E))/ħ。",
+     "A particle meeting a rectangular barrier of height V₀ and width a is always turned back classically when E < V₀; quantum-mechanically it gets through with some probability (tunnelling). The plane-wave transmission is Eq. (44.5.1); for κa ≫ 1, T ≈ 16E(V₀ − E)/V₀² · e^{−2κa} (Eq. (44.5.2)), κ = √(2m(V₀ − E))/ħ."]
+  - 式: "iħ ∂Ψ/∂t = −(ħ²/2m) ∂²Ψ/∂x² + VΨ        (44.2.1)"
+  - ["实验用克兰克–尼科尔森法求解含时薛定谔方程：(1 + iHΔt/2ħ)Ψ′ = (1 − iHΔt/2ħ)Ψ，每步解一个三对角方程组，∫|Ψ|²dx 始终等于 1。波包由一系列能量的平面波叠加而成，透射概率约等于按波包的波数分布平均的 T。",
+     "The lab solves the time-dependent equation by Crank–Nicolson, (1 + iHΔt/2ħ)Ψ′ = (1 − iHΔt/2ħ)Ψ, one tridiagonal solve per step; ∫|Ψ|²dx stays 1. The packet is a superposition of plane waves of different energies, so its transmitted probability is about T averaged over the packet's spread of wavenumbers."]
+步骤:
+  - ["选“波包与势垒”，E = 0.20 eV、V₀ = 0.30 eV、a = 1.0 nm，点“发射波包”。读出结束时的透射与反射概率，检查两者之和；与平面波 T 和按波包平均的 T 比较（任务 1），记入表 1。", "Choose “Packet and barrier”, E = 0.20 eV, V₀ = 0.30 eV, a = 1.0 nm, press “Launch”. Read the transmitted and reflected probabilities at the end and check their sum; compare with the plane-wave T and the packet-averaged T (task 1); record in Table 1."]
+  - ["E = 0.15 eV、V₀ = 0.30 eV，a 依次取 1.0、1.5、2.0、2.5 nm，记录透射概率，作 ln T 与 a 的图。κa ≫ 1 时 ln T ≈ 常数 − 2κa，斜率为 −2κ，由此求 κ，与 √((V₀ − E)/0.0381) nm⁻¹ 比较（任务 2）。", "With E = 0.15 eV and V₀ = 0.30 eV, set a to 1.0, 1.5, 2.0, 2.5 nm; record the transmission and plot ln T against a. For κa ≫ 1, ln T ≈ const − 2κa, so the slope is −2κ; find κ compare with √((V₀ − E)/0.0381) (task 2)."]
+  - ["V₀ = 0.30 eV、a = 1.0 nm，E 取 0.35、0.45、0.55 eV，记录反射概率（任务 3）。", "With V₀ = 0.30 eV and a = 1.0 nm, set E to 0.35, 0.45, 0.55 eV and record the reflection (task 3)."]
+  - ["切换到“栅氧化层的漏电”，厚度从 3 nm 逐步减到 1 nm，读出透射系数，记下 2 nm 与 1.2 nm 之比（任务 4），记入表 2。", "Switch to “Gate-oxide leakage”, thin the oxide from 3 nm to 1 nm, read the transmission and note the ratio between 1.2 nm and 2 nm (task 4); record in Table 2."]
+数据表:
+  - 标题: ["表 1  波包的透射与反射", "Table 1  Transmission and reflection of the packet"]
+    表头: ["E / eV", "V₀ / eV", "a / nm", "透射概率", "反射概率", "平面波 T", "按波包平均的 T"]
+    表头英文: ["E / eV", "V₀ / eV", "a / nm", "Transmitted", "Reflected", "Plane-wave T", "Packet-averaged T"]
+    行: [["0.20", "0.30", "1.0", "", "", "", ""], ["0.15", "0.30", "1.0", "", "", "", ""], ["0.15", "0.30", "1.5", "", "", "", ""], ["0.15", "0.30", "2.0", "", "", "", ""], ["0.15", "0.30", "2.5", "", "", "", ""], ["0.35", "0.30", "1.0", "", "", "", ""], ["0.45", "0.30", "1.0", "", "", "", ""]]
+  - 标题: ["表 2  栅氧化层（SiO₂，3.1 eV，0.5mₑ，电子 0.1 eV）", "Table 2  Gate oxide (SiO₂, 3.1 eV, 0.5 mₑ, electron at 0.1 eV)"]
+    表头: ["厚度 / nm", "透射系数 T", "与 2 nm 之比"]
+    表头英文: ["Thickness / nm", "Transmission T", "Ratio to 2 nm"]
+    行: [["3.0", "", ""], ["2.0", "", "1"], ["1.5", "", ""], ["1.2", "", ""], ["1.0", "", ""]]
+注意:
+  - ["计算区间为 0–200 nm，格点间距 0.05 nm，两端 ψ = 0；运行在波包被分开后自动停止，再久一点反射波会碰到左端。", "The domain is 0–200 nm with ψ = 0 at both ends; the run stops once the packet has split, before the reflected part reaches the left end."]
+  - ["透射概率很小时（10⁻³ 以下），数值误差的影响变大，读数只看数量级。", "When the transmission is very small (below 10⁻³) numerical error matters more; read only its order of magnitude."]
+思考题:
+  - ["碰到势垒时，势垒左边为什么出现密集的条纹？条纹的间距与波长有什么关系？", "Why do dense fringes appear to the left of the barrier on impact? How is their spacing related to the wavelength?"]

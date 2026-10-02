@@ -437,7 +437,9 @@ class ERP {
   async onGcode(m) {
     const d = m.data;
     if (!d.gcode_url) return [];
-    return this.attach(d.item, { name: `${d.item}-rev${d.revision}-${d.operation}.nc`, url: d.gcode_url }, m);
+    // 第 13 轮：数控编程随工艺规程下发的程序带程序号（一道工序两次装夹就有两个程序）
+    const prog = d.program ? `-O${String(d.program).padStart(4, '0')}` : '';
+    return this.attach(d.item, { name: `${d.item}-rev${d.revision}-${d.operation}${prog}.nc`, url: d.gcode_url }, m);
   }
 
   async attach(item, f, m) {

@@ -1012,7 +1012,9 @@ def process_decision(sid: str, body: dict = Body(...), u=Depends(user_of)):
     d, note = body.get("decision"), (body.get("note") or "").strip()[:500]
     _can_approve_process(u)
     if d == "approve":
-        return _plm_call(process.approve, H.db, _emit_as(u), sid, who(u), note, approver_uid=_uid(u))
+        s = _plm_call(process.approve, H.db, _emit_as(u), sid, who(u), note, approver_uid=_uid(u))
+        s["programs_released"] = _cam.release_programs(H.db, _emit_as(u, "cam"), s)      # 第 13 轮：挂在工序上的数控程序随之下发
+        return s
     if d == "reject":
         return _plm_call(process.reject, H.db, _emit_as(u), sid, who(u), note)
     raise HTTPException(400, "decision 只能是 approve / reject")
@@ -1335,6 +1337,11 @@ _course.mount(app, H)
 # ---------------------------------------------------------------- 仿真与分析（第 11 轮）
 from hub import cae_api as _cae  # noqa: E402
 _cae.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
+
+# ---------------------------------------------------------------- 数控编程（第 13 轮）
+from hub import cam_api as _cam  # noqa: E402
+_cam.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")))
+_cam.mount_release(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), _emit_as, _can_submit)
 
 
 # ---------------------------------------------------------------- 网页

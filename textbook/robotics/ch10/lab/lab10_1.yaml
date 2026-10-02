@@ -1,0 +1,36 @@
+# 实验 10.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_1.js。
+原理:
+  - ["参考系是约定为静止、用来描述运动的物体；坐标系是在参考系中给点编号的规则。固连于同一参考系的坐标系给出相同的速度和加速度，只是分量不同；固连于有相对运动的两个参考系的坐标系，给出不同的速度和加速度（定理 10.1.1）。",
+     "A reference frame is a body taken to be at rest; a coordinate system is a rule for numbering its points. Coordinate systems fixed to the same reference frame give the same velocity and acceleration, only with different components; those fixed to frames in relative motion give different ones (Theorem 10.1.1)."]
+  - 式: "p_b(t) = R_sb(t)ᵀ (p_s − p_sb(t))          (10.1.6)"
+  - ["AGV 以车速 v、转弯角速度 Ω 沿半径 R0 = v/Ω 的圆转弯时，圆心 C 在 AGV 坐标系 {b} 中是固定的点 (0, R0)。地面上静止的零件在 {b} 中绕 C 作圆周运动，半径 d = |CP|，速率 Ωd（式 (10.1.7)）。Ω = 0 时，零件在 {b} 中沿直线以车速 v 后退。",
+     "When the AGV turns with speed v and turn rate Ω on a circle of radius R0 = v/Ω, the centre C is a fixed point (0, R0) in the AGV frame {b}. A part at rest on the floor circles C in {b} with radius d = |CP| and speed Ωd (Eq. (10.1.7)). With Ω = 0 the part moves straight back at speed v."]
+  - ["雨滴相对汽车的速度等于雨滴相对地面的速度减去汽车相对地面的速度。雨滴竖直下落速度 6 m/s、汽车速度 v 时，车上看到的雨丝与竖直方向的夹角为 arctan(v/6)。",
+     "The drops' velocity relative to the car is their velocity relative to the ground minus the car's. With drops falling at 6 m/s and the car at v, the rain seen from the car is slanted by arctan(v/6) from the vertical."]
+步骤:
+  - ["打开实验 10.1，选择场景“转弯的 AGV”。设 v = 0.5 m/s、Ω = 0.25 rad/s，先按式 (10.1.7) 手算零件在 {b} 中的速率，填入表 1。",
+     "Open Lab 10.1, choose “A turning AGV”. With v = 0.5 m/s and Ω = 0.25 rad/s, first compute the part's speed in {b} with Eq. (10.1.7) and enter it in Table 1."]
+  - ["按“开始”，观察左右两个画面：左边 AGV 走圆、零件不动；右边 AGV 不动、零件绕 C 转圈。读出零件在 {b} 中的速率，与手算值比较（任务 1）。",
+     "Press Start and watch both views: on the left the AGV circles and the part stays; on the right the AGV stays and the part circles C. Read the part's speed in {b} and compare (task 1)."]
+  - ["把 Ω 改为 0.5 rad/s 和 −0.25 rad/s，重复上一步，记入表 1，说明 Ω 为负时零件在 {b} 中的转向。",
+     "Repeat with Ω = 0.5 rad/s and −0.25 rad/s, record in Table 1, and explain the sense of rotation in {b} when Ω is negative."]
+  - ["把 Ω 调为 0，运行，观察零件在 {b} 中的轨迹和速率（任务 2）。",
+     "Set Ω = 0, run, and observe the part's path and speed in {b} (task 2)."]
+  - ["切换到场景“雨中行车”，依次把车速调到 0、10、20、30 m/s，读出雨丝的倾角和相对速率，填入表 2（任务 3）。",
+     "Switch to “Driving in the rain”; set the car speed to 0, 10, 20, 30 m/s, read the slant and the relative speed, and fill Table 2 (task 3)."]
+数据表:
+  - 标题: ["表 1  零件在 AGV 参考系中的运动（v = 0.5 m/s）", "Table 1  The part's motion in the AGV frame (v = 0.5 m/s)"]
+    表头: ["Ω /(rad/s)", "R0 = v/Ω /m", "d = |CP| /m", "速率 Ωd（手算）/(m/s)", "速率（读数）/(m/s)", "在 {b} 中的转向"]
+    表头英文: ["Ω /(rad/s)", "R0 = v/Ω /m", "d = |CP| /m", "speed Ωd (by hand) /(m/s)", "speed (read) /(m/s)", "sense in {b}"]
+    行: [["0.25", "", "", "", "", ""], ["0.5", "", "", "", "", ""], ["−0.25", "", "", "", "", ""], ["0", "—", "—", "—", "", ""]]
+  - 标题: ["表 2  雨中行车", "Table 2  Driving in the rain"]
+    表头: ["车速 /(m/s)", "倾角（手算）/(°)", "倾角（读数）/(°)", "相对速率 /(m/s)"]
+    表头英文: ["Car speed /(m/s)", "Slant (by hand) /(°)", "Slant (read) /(°)", "Relative speed /(m/s)"]
+    行: [["0", "", "", ""], ["10", "", "", ""], ["20", "", "", ""], ["30", "", "", ""]]
+注意:
+  - ["Ω 以俯视逆时针为正（AGV 左转）。Ω 为负时圆心在车的右侧。", "Ω is positive anticlockwise seen from above (left turn); for negative Ω the centre is on the right."]
+  - ["右边画面中的速度箭头是零件相对 AGV 的速度，不是相对地面的速度（相对地面它是零）。", "The arrow on the right is the part's velocity relative to the AGV, not relative to the ground (which is zero)."]
+  - ["读数保留 3 位小数，与手算值相差在最后一位以内即可。", "Keep 3 decimals; agreement within the last digit counts as equal."]
+思考题:
+  - ["若零件放在圆心 C 处，它在 AGV 看来怎样运动？若放在 AGV 行驶的圆周上呢？", "If the part sits at the centre C, how does it move as seen from the AGV? And if it sits on the AGV's own circle?"]
+  - ["“换坐标系只换读数，换参考系才换运动”：用本实验的两个画面各举一例说明。", "“Changing coordinates changes only the numbers; changing the reference frame changes the motion”: give an example of each from this lab."]

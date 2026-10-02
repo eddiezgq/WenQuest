@@ -1,0 +1,29 @@
+# 实验 13.5 的指导书与报告模板。目的、场景、参数、任务取自 lab13_5.js。
+原理:
+  - ["DH 用公垂线确定连杆坐标系。两轴平行时公垂线不唯一，规定取 d = 0 的一条；两轴只要在它们所在的平面内偏转一点，就在远处相交，公垂线退化为交点，a 由名义值突变为 0，d 变为 −a cot ε。",
+     "DH fixes link frames by common normals. For parallel axes the normal is not unique and d = 0 is chosen; tilt one axis slightly within their common plane and the axes meet far away: the normal collapses to the crossing, a jumps to 0 and d becomes −a cot ε."]
+  - 式: "d = −a cot ε ≈ −a / ε          (13.5.1)"
+  - ["哈亚蒂参数 Rot(z, θ) Trans(x, a) Rot(x, α) Rot(y, β)：用轴 i+1 与 {i−1} 的 xy 平面的交点代替公垂线，a 不变，偏转由 β 表示，随 ε 连续变化。",
+     "Hayati parameters Rot(z, θ) Trans(x, a) Rot(x, α) Rot(y, β): the crossing of axis i+1 with the xy plane of {i−1} replaces the normal; a is unchanged and the tilt appears as β, continuous in ε."]
+  - ["旋量轴 S = (u, −u × p) 直接由轴的方向和轴上一点给出，变化量与 ε 成正比。", "The screw axis S = (u, −u × p) comes straight from the axis direction and a point on it; its change is proportional to ε."]
+步骤:
+  - ["打开实验 13.5，场景“UR5e 关节 2、3 的轴”。ε = 0（任务 1），记录三种参数。", "Open Lab 13.5, scene “UR5e axes 2 and 3”. With ε = 0 (task 1), record the three parameter sets."]
+  - ["φ = 0°，ε 依次取 0.01°（任务 2）、0.1°、1°，记录 DH 的 a、d，哈亚蒂的 β 和 |S − S₀|，填入表 1。", "With φ = 0°, set ε to 0.01° (task 2), 0.1°, 1°; record DH a, d, Hayati β and |S − S₀| in Table 1."]
+  - ["ε = −0.01°（任务 3），比较 d 与 ε = 0.01° 时的符号。", "Set ε = −0.01° (task 3) and compare the sign of d with ε = 0.01°."]
+  - ["φ = 90°，ε = 0.5°（任务 4），记录 DH 的 a、α、d，说明面外偏转为什么不引起突变。", "Set φ = 90°, ε = 0.5° (task 4); record DH a, α, d and explain why an out-of-plane tilt causes no jump."]
+  - ["切换到“两支筷子”，调节 ε 使交点在约 1 m 处（任务 5），记录 ε，并用 d = a cot ε 验证。", "Switch to “chopsticks”, adjust ε so that they meet about 1 m away (task 5); record ε and check with d = a cot ε."]
+数据表:
+  - 标题: ["表 1  偏转角与三种参数（a = 0.425 m，φ = 0°）", "Table 1  Tilt and the three parameterisations (a = 0.425 m, φ = 0°)"]
+    表头: ["ε / °", "DH a / m", "DH d / m", "哈亚蒂 β / °", "|S − S₀|"]
+    表头英文: ["ε / °", "DH a / m", "DH d / m", "Hayati β / °", "|S − S₀|"]
+    行: [["0", "", "", "", ""], ["0.01", "", "", "", ""], ["−0.01", "", "", "", ""], ["0.1", "", "", "", ""], ["1", "", "", "", ""]]
+  - 标题: ["表 2  两支筷子", "Table 2  Two chopsticks"]
+    表头: ["ε / °", "交点距离（读数）/ m", "a cot ε / m"]
+    表头英文: ["ε / °", "Crossing distance (reading) / m", "a cot ε / m"]
+    行: [["", "", ""]]
+注意:
+  - ["画面是侧视图，只画两轴所在的竖直平面；φ ≠ 0 时轴 i+1 还有垂直于画面的偏转，画面上看不出来。", "The view is from the side, showing only the vertical plane of the two axes; for φ ≠ 0 axis i+1 also tilts out of the picture, which is not visible."]
+  - ["d 很大时，{i} 的原点在画面以外，用箭头指示方向并标出 d。", "When d is large the origin of {i} is off the picture; an arrow points to it and gives d."]
+  - ["筷子场景的水平方向放大了，以便看清 3 cm 的间距。", "In the chopsticks scene the horizontal direction is magnified to make the 3 cm gap visible."]
+思考题:
+  - ["一台真实的 UR 机器人的出厂标定数据中 d₂ ≈ 439 m、α₂ ≈ 0.08°。用 d ≈ a/α 估算它的大臂长度，并与厂商的名义值比较。", "A real UR robot's factory calibration has d₂ ≈ 439 m and α₂ ≈ 0.08°. Estimate its upper-arm length from d ≈ a/α and compare with the nominal value."]

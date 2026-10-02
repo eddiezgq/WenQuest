@@ -356,6 +356,100 @@ const CALC = {
     return out;
   },
 };
+// ---------- quantum mechanics (《大学物理》第 9 轮 2.6): the one-dimensional Schrödinger bench ----------
+// Lengths in nm, energies in eV, times in fs; the mass is the electron mass times mr (effective mass).
+// levels(): finite differences turn −(ħ²/2m)ψ'' + Vψ = Eψ into a symmetric tridiagonal matrix (ψ = 0 at both ends);
+// eigenvalues by Sturm-sequence bisection, eigenvectors by inverse iteration. step(): Crank–Nicolson (unitary).
+const QM = {
+  C: 0.0380998212,                        // ħ²/(2 mₑ) in eV·nm²
+  HBAR: 0.6582119569,                     // ħ in eV·fs
+  c(mr = 1) { return QM.C / mr; },
+  k(E, mr = 1) { return Math.sqrt(Math.max(0, E) / QM.c(mr)); },   // wavenumber in 1/nm
+  _count(d, e2, lam) {                    // how many eigenvalues are below lam (Sturm sequence)
+    let q = d[0] - lam, n = q < 0 ? 1 : 0;
+    for (let i = 1; i < d.length; i++) { q = d[i] - lam - e2 / (q === 0 ? 1e-300 : q); if (q < 0) n++; }
+    return n;
+  },
+  _solve(d, e, lam, b) {                  // (H − lam) x = b for the tridiagonal H (Thomas algorithm)
+    const n = d.length, c = new Float64Array(n), x = new Float64Array(n);
+    let m = d[0] - lam; if (m === 0) m = 1e-300;
+    c[0] = e / m; x[0] = b[0] / m;
+    for (let i = 1; i < n; i++) { m = d[i] - lam - e * c[i - 1]; if (m === 0) m = 1e-300; c[i] = e / m; x[i] = (b[i] - e * x[i - 1]) / m; }
+    for (let i = n - 2; i >= 0; i--) x[i] -= c[i] * x[i + 1];
+    return x;
+  },
+  // V: potential (eV) at the grid points x_i = x0 + i·dx; returns {E: [...], psi: [Float64Array...]} with ∫ψ² dx = 1
+  levels(V, dx, n = 5, mr = 1) {
+    const N = V.length, c = QM.c(mr), off = -c / (dx * dx), d = new Float64Array(N);
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < N; i++) { d[i] = 2 * c / (dx * dx) + V[i]; lo = Math.min(lo, d[i] - 2 * Math.abs(off)); hi = Math.max(hi, d[i] + 2 * Math.abs(off)); }
+    const e2 = off * off, E = [], psi = [];
+    n = Math.min(n, N);
+    for (let k = 0; k < n; k++) {
+      let a = lo, b = hi;
+      for (let it = 0; it < 200 && b - a > 1e-12 * Math.max(1, Math.abs(b)); it++) { const m = (a + b) / 2; if (QM._count(d, e2, m) > k) b = m; else a = m; }
+      const lam = (a + b) / 2;
+      // 反迭代：起始向量取固定种子的伪随机数（对称势能中奇、偶宇称的态都能求到）；本征值相同或极近（简并、
+      // 近简并）的已求本征矢，每一步都从 v 中减去，保证相互正交（与 LAPACK 的 stein 同一思路）
+      let seed = 12345 + 977 * k, v = new Float64Array(N);
+      for (let i = 0; i < N; i++) { seed = (seed * 1103515245 + 12345) % 2147483648; v[i] = seed / 2147483648 - 0.5; }
+      const near = [];
+      for (let j = 0; j < k; j++) if (Math.abs(E[j] - lam) < 1e-7 * Math.max(1, Math.abs(lam)) + 1e-9 * (hi - lo)) near.push(psi[j]);
+      for (let it = 0; it < 4; it++) {
+        v = QM._solve(d, off, lam + 1e-10 * Math.max(1, Math.abs(lam)), v);
+        for (const u of near) { let c = 0; for (let i = 0; i < N; i++) c += u[i] * v[i] * dx; for (let i = 0; i < N; i++) v[i] -= c * u[i]; }
+        let s = 0; for (let i = 0; i < N; i++) s += v[i] * v[i];
+        s = Math.sqrt(s * dx); for (let i = 0; i < N; i++) v[i] /= s;
+      }
+      let mx = 0; for (let i = 0; i < N; i++) mx = Math.max(mx, Math.abs(v[i]));
+      for (let i = 0; i < N; i++) if (Math.abs(v[i]) > 0.01 * mx) { if (v[i] < 0) for (let j = 0; j < N; j++) v[j] = -v[j]; break; }
+      E.push(lam); psi.push(v);
+    }
+    return { E, psi };
+  },
+  // a normalised Gaussian wave packet: centre x0, width sigma (nm), mean wavenumber k0 (1/nm)
+  packet(x, x0, sigma, k0) {
+    const N = x.length, re = new Float64Array(N), im = new Float64Array(N);
+    const a = Math.pow(2 * Math.PI * sigma * sigma, -0.25);
+    for (let i = 0; i < N; i++) { const g = a * Math.exp(-Math.pow((x[i] - x0) / (2 * sigma), 2)); re[i] = g * Math.cos(k0 * x[i]); im[i] = g * Math.sin(k0 * x[i]); }
+    return { re, im };
+  },
+  // one Crank–Nicolson step of length dt (fs): (1 + iHdt/2ħ) ψ' = (1 − iHdt/2ħ) ψ, ψ = 0 at both ends
+  step(psi, V, dx, dt, mr = 1) {
+    const N = V.length, c = QM.c(mr), r = dt / (2 * QM.HBAR), off = -c / (dx * dx);
+    const re = psi.re, im = psi.im, br = new Float64Array(N), bi = new Float64Array(N);
+    for (let i = 0; i < N; i++) {   // b = (1 − i r H) ψ
+      const dd = 2 * c / (dx * dx) + V[i];
+      const hr = dd * re[i] + off * ((i > 0 ? re[i - 1] : 0) + (i < N - 1 ? re[i + 1] : 0));
+      const hi = dd * im[i] + off * ((i > 0 ? im[i - 1] : 0) + (i < N - 1 ? im[i + 1] : 0));
+      br[i] = re[i] + r * hi; bi[i] = im[i] - r * hr;
+    }
+    // (1 + i r H) ψ' = b: complex Thomas algorithm; diagonal 1 + i r d_i, off-diagonal i r off
+    const cr = new Float64Array(N), ci = new Float64Array(N), xr = new Float64Array(N), xi = new Float64Array(N);
+    const or_ = 0, oi = r * off;
+    for (let i = 0; i < N; i++) {
+      let mr_ = 1, mi = r * (2 * c / (dx * dx) + V[i]);
+      let yr = br[i], yi = bi[i];
+      if (i > 0) {            // m = diag − o·c[i−1], y = b − o·x[i−1]
+        mr_ -= or_ * cr[i - 1] - oi * ci[i - 1]; mi -= or_ * ci[i - 1] + oi * cr[i - 1];
+        yr -= or_ * xr[i - 1] - oi * xi[i - 1]; yi -= or_ * xi[i - 1] + oi * xr[i - 1];
+      }
+      const q = mr_ * mr_ + mi * mi;
+      cr[i] = (or_ * mr_ + oi * mi) / q; ci[i] = (oi * mr_ - or_ * mi) / q;
+      xr[i] = (yr * mr_ + yi * mi) / q; xi[i] = (yi * mr_ - yr * mi) / q;
+    }
+    for (let i = N - 2; i >= 0; i--) {
+      xr[i] -= cr[i] * xr[i + 1] - ci[i] * xi[i + 1]; xi[i] -= cr[i] * xi[i + 1] + ci[i] * xr[i + 1];
+    }
+    psi.re = xr; psi.im = xi;
+    return psi;
+  },
+  prob(psi, dx, i0 = 0, i1) {             // ∫|ψ|² dx over grid points i0 … i1 − 1
+    const re = psi.re || psi, im = psi.im; i1 = i1 == null ? re.length : i1; let s = 0;
+    for (let i = i0; i < i1; i++) s += re[i] * re[i] + (im ? im[i] * im[i] : 0);
+    return s * dx;
+  },
+};
 function graph(ctx, o) {   // o = {x, y, w, h (pixels), xmin, xmax, ymin, ymax, xlabel, ylabel, ticks: true}
   const X = (v) => o.x + (v - o.xmin) / (o.xmax - o.xmin) * o.w, Y = (v) => o.y + o.h - (v - o.ymin) / (o.ymax - o.ymin) * o.h;
   const clip = (fn) => { ctx.save(); ctx.beginPath(); ctx.rect(o.x, o.y, o.w, o.h); ctx.clip(); fn(); ctx.restore(); };
@@ -606,7 +700,7 @@ function build(id, def) {
     rot2, fk, frame: (...a) => frame(ctx, ...a), arm: (...a) => arm(ctx, ...a), robot: (...a) => robot(ctx, ...a),
     lidar: (...a) => lidar(ctx, ...a), plot: (...a) => plot(ctx, ...a),
     la: LA, plane: (o) => plane(ctx, o), heat: (...a) => heat(ctx, ...a), image: (...a) => image(ctx, ...a), bars: (...a) => bars(ctx, ...a),
-    calc: CALC, graph: (o) => graph(ctx, o),
+    calc: CALC, graph: (o) => graph(ctx, o), qm: QM,
   };
   L.api = api;
   if (is3d) setup3d(L);
@@ -620,6 +714,17 @@ function build(id, def) {
     safe(L, () => def.change && def.change(api, L.state, pid));
     if (!api.running) reset(L); else readouts(L);
   }));
+  // pointer on the 2D canvas (第 9 轮 2.6): def.pointer("down" | "move" | "up", x, y, api, state), x and y in canvas pixels
+  if (!is3d && def.pointer) {
+    canvas.style.touchAction = "none";
+    let downId = null;
+    const at = (ev) => { const r = canvas.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; };
+    const send = (kind, ev) => { const [x, y] = at(ev); safe(L, () => def.pointer(kind, x, y, api, L.state)); readouts(L); };
+    canvas.addEventListener("pointerdown", (ev) => { downId = ev.pointerId; try { canvas.setPointerCapture(ev.pointerId); } catch (e) { /* old browser */ } send("down", ev); });
+    canvas.addEventListener("pointermove", (ev) => { if (downId === ev.pointerId) send("move", ev); });
+    const up = (ev) => { if (downId === ev.pointerId) { downId = null; send("up", ev); } };
+    canvas.addEventListener("pointerup", up); canvas.addEventListener("pointercancel", up);
+  }
   // "start" and "reset" are built in; any other button calls def.action(id, api, state).
   bar.querySelectorAll("[data-action]").forEach((b) => b.addEventListener("click", () => {
     const a = b.dataset.action;

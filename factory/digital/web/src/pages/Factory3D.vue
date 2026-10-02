@@ -16,11 +16,11 @@
         <router-link :to="{ path: '/work/operator', query: { unit: sel } }" class="small">打开车间终端 →</router-link>
       </template>
       <p v-else class="small muted">这个单元没有状态消息。</p>
-      <template v-if="sel === 'key-01'">
+      <template v-if="sel === 'key-01' || isLathe">
         <hr>
-        <h3>键槽刀路回放</h3>
+        <h3>{{ sel === 'key-01' ? '键槽刀路回放' : '车削刀路回放' }}<span v-if="gcInfo" class="small muted"> {{ gcInfo }}</span></h3>
         <div ref="gcHost" class="gchost"></div>
-        <p v-if="!gcode" class="small muted">还没有 G 代码：工艺员在 FreeCAD 发布后生成。</p>
+        <p v-if="!gcode" class="small muted">{{ sel === 'key-01' ? '还没有 G 代码：工艺员在 FreeCAD 或网页设计台发布后生成。' : '还没有车削程序：在“数控编程”里给粗车或精车工序编程，挂到工艺规程上审批生效后才有。' }}</p>
         <button v-else class="btn" @click="playGcode">{{ gcPlaying ? '重新播放' : '播放刀路' }}</button>
       </template>
     </aside>
@@ -47,6 +47,7 @@ const err = ref('');
 const gcode = ref('');
 const gcPlaying = ref(false);
 const m = computed(() => bus.machines[sel.value] || {});
+const isLathe = computed(() => (sel.value || '').startsWith('cnc-l01'));
 let ws, downAt;
 let gc = null;             // 刀路小窗
 
@@ -59,17 +60,25 @@ function up(e) {
 }
 
 // ---------------------------------------------------------------- 刀路小窗
-async function loadGcode() {
-  const q = route.query.gcode;
-  let ref_ = q;
+let design = null;
+const gcInfo = ref('');
+// 键槽：设计发布带的或数控编程下发的“铣键槽”程序；车削：数控编程随工艺规程下发到 CNC-L01 的最新程序（第 13 轮）
+async function loadGcode(unit) {
+  gcode.value = ''; gcInfo.value = '';
+  let ref_ = unit === 'key-01' ? route.query.gcode : null;
   if (!ref_) {
-    const d = await get('/design/SH-301');
-    ref_ = d.gcode[0]?.gcode_ref;
+    design = design || await get('/design/SH-301');
+    const g = unit === 'key-01' ? design.gcode.find((x) => (x.operation || '').startsWith('铣键槽'))
+      : design.gcode.filter((x) => (x.machine || '').startsWith('cnc-l01'))
+        .sort((a, b) => (b.process_revision || 0) - (a.process_revision || 0) || (a.program || 0) - (b.program || 0))[0];
+    ref_ = g?.gcode_ref;
+    if (g && g.program) gcInfo.value = `O${String(g.program).padStart(4, '0')} · ${(g.operation || '').split(' ')[0]}`;
   }
   if (ref_) gcode.value = await (await fetch(ref_)).text();
 }
 function initGc() {
   if (!gcHost.value || gc) return;
+  if (isLathe.value) { initLathe(); return; }
   const w = gcHost.value.clientWidth, h = 200;
   const s = new THREE.Scene();
   s.background = new THREE.Color('#F6F7F4');
@@ -106,6 +115,48 @@ function initGc() {
   } };
   gc.tool.position.set(pts[0][0], pts[0][2] + 15, 0);
 }
+function initLathe() {
+  // 车床：程序的 X 是直径、Z 沿轴线；场景里 x = Z，y = X/2（只画上半边刀路），毛坯是半透明圆柱
+  const w = gcHost.value.clientWidth, h = 200;
+  const s = new THREE.Scene();
+  s.background = new THREE.Color('#F6F7F4');
+  const cam = new THREE.PerspectiveCamera(40, w / h, 0.1, 3000);
+  const r = new THREE.WebGLRenderer({ antialias: true });
+  r.setSize(w, h);
+  gcHost.value.appendChild(r.domElement);
+  s.add(new THREE.HemisphereLight(0xffffff, 0x888888, 2));
+  const pts = parseGcode(gcode.value).filter((p) => Math.abs(p[0]) < 150 && p[2] < 50);      // 去掉换刀点
+  const zs = pts.map((p) => p[2]), rmax = Math.max(...pts.map((p) => p[0] / 2));
+  const zmin = Math.min(...zs), zmax = Math.max(...zs), zmid = (zmin + zmax) / 2;
+  // 只画后半个毛坯圆柱（剖开看），刀路画在剖面上
+  const stock = new THREE.Mesh(new THREE.CylinderGeometry(rmax - 2, rmax - 2, zmax - zmin, 48, 1, false, Math.PI / 2, Math.PI),
+    new THREE.MeshLambertMaterial({ color: '#C7CDD1', side: THREE.DoubleSide }));
+  stock.rotation.z = Math.PI / 2; stock.position.set(zmid, 0, 0);
+  s.add(stock);
+  const tool = new THREE.Mesh(new THREE.ConeGeometry(3, 12, 16), new THREE.MeshLambertMaterial({ color: '#F2B705' }));
+  tool.rotation.x = Math.PI;                         // 刀尖朝下，正好落在刀位点上
+  s.add(tool);
+  const trail = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: '#C62828' }));
+  s.add(trail);
+  cam.position.set(zmid, 40, (zmax - zmin) * 0.9 + 60);
+  cam.lookAt(zmid, 5, 0);
+  const P = pts.map((p) => [p[2], p[0] / 2, 0, p[3]]);
+  gc = { s, cam, r, pts: P, tool, trail, i: 0, f: 0, done: [], render() {
+    if (gcPlaying.value) {
+      const a = this.pts[this.i], b = this.pts[this.i + 1];
+      if (!b) { gcPlaying.value = false; } else {
+        const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+        this.f += (b[3] ? 6 : 1.2) / L;
+        const p = [a[0] + (b[0] - a[0]) * Math.min(1, this.f), a[1] + (b[1] - a[1]) * Math.min(1, this.f)];
+        this.tool.position.set(p[0], p[1] + 6, 0);
+        if (!b[3]) { this.done.push(new THREE.Vector3(p[0], p[1], 0)); this.trail.geometry.setFromPoints(this.done); }
+        if (this.f >= 1) { this.f = 0; this.i += 1; }
+      }
+    }
+    this.r.render(this.s, this.cam);
+  } };
+  if (P.length) gc.tool.position.set(P[0][0], P[0][1] + 6, 0);
+}
 function playGcode() {
   initGc();
   if (!gc) return;
@@ -114,7 +165,11 @@ function playGcode() {
 }
 watch(sel, async (u) => {
   if (gc) { gc.r.dispose(); gc = null; }
-  if (u === 'key-01') { await nextTick(); if (gcode.value) initGc(); }
+  gcPlaying.value = false;
+  if (u === 'key-01' || (u || '').startsWith('cnc-l01')) {
+    try { await loadGcode(u); } catch (e) { gcode.value = ''; }
+    await nextTick(); if (gcode.value) initGc();
+  }
 });
 
 let off;
@@ -124,8 +179,8 @@ onMounted(async () => {
     ws = createWorkshop(host.value, layout.value, { onFrame: () => { if (gc) gc.render(); } });
     applyStatus();
     off = watch(() => [bus.machines, bus.agvs], applyStatus, { deep: true });
-    await loadGcode();
     if (route.query.gcode) sel.value = 'key-01';
+    else if (route.query.unit) sel.value = String(route.query.unit);           // 数控编程页“到 3D 车间回放”带过来
   } catch (e) { err.value = '3D 车间载入失败：' + e.message; }
 });
 onUnmounted(() => {

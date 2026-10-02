@@ -58,29 +58,63 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Textbook build and checks (programs, numbers, formulas, references, terms)
+      - name: Web app tests and builds (web + WeChat mini program)
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund && npm test && npm run build:h5 && npm run build:mp-weixin
+
+  # 教材：每本书一个并行任务（第 10 轮）。书越来越多，串行构建超过 40 分钟的限制，所以按书拆开。
+  books:
+    runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.list.outputs.list }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        name: The books in textbook/
+        run: echo "list=$(ls textbook/*/book.yaml | xargs -n1 dirname | xargs -n1 basename | python3 -c 'import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))')" >> "$GITHUB_OUTPUT"
+
+  textbook:
+    needs: books
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        book: ${{ fromJson(needs.books.outputs.list) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Textbook build and checks (programs, numbers, formulas, references, terms) — ${{ matrix.book }}
         working-directory: textbook/tools
         run: |
           set -o pipefail
-          npm ci --no-audit --no-fund
+          sudo apt-get update -qq
           # 《机械设计》的有限元与疲劳程序调用数字工厂的 cae、sim（第 11 轮）：CalculiX、gmsh（要 libGLU 等）、pyLife
-          sudo apt-get install -y -qq --no-install-recommends calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 > /dev/null
+          sudo apt-get install -y -qq --no-install-recommends fonts-noto-cjk ffmpeg calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 > /dev/null
+          npm ci --no-audit --no-fund
+          pip install -q -r ../../services/labcheck/requirements.txt trimesh
+          python -m playwright install --with-deps --only-shell chromium > /dev/null
           pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 jsonschema pytest httpx fastapi pydantic gmsh==4.15.2 pylife==2.3.1 paho-mqtt==2.1.0 trimesh==5.1.0 sympy
-          python -m pytest -q tests 2>&1 | tee /tmp/pytest.log || { grep -E "^(FAILED|E  )" /tmp/pytest.log | head -20 | sed 's/^/::error::/'; exit 1; }
-          for b in ../*/book.yaml; do b=$(basename "$(dirname "$b")"); echo "== $b"; python build.py "$b" --pdf --labs 2>&1 | tee /tmp/build.log || { grep "✗" /tmp/build.log | head -20 | sed "s/^/::error::$b /"; exit 1; }; done
-      - name: Keep the built textbooks for the deploy
+          if [ "${{ matrix.book }}" = robotics ]; then   # the tools' own tests run once, with the book they use
+            python -m pytest -q tests 2>&1 | tee /tmp/pytest.log || { grep -E "^(FAILED|E  )" /tmp/pytest.log | head -20 | sed 's/^/::error::/'; exit 1; }
+          fi
+          b="${{ matrix.book }}"
+          python build.py "$b" --pdf --labs 2>&1 | tee /tmp/build.log || { grep "✗" /tmp/build.log | head -20 | sed "s/^/::error::$b /"; exit 1; }
+      - name: Keep the built textbook for the deploy
         uses: actions/upload-artifact@v4
         with:
-          name: textbook
+          name: textbook-${{ matrix.book }}
           path: |
             textbook/build/
             !textbook/build/*/values/
             !textbook/build/*/values-en/
             !textbook/build/*/figs/
             !textbook/build/*/ch*.html
-      - name: Web app tests and builds (web + WeChat mini program)
-        working-directory: apps/web
-        run: npm ci --no-audit --no-fund && npm test && npm run build:h5 && npm run build:mp-weixin
 
   build:
     needs: test
@@ -177,7 +211,7 @@ jobs:
           path: aiprovider_claude.zip
 
   deploy:
-    needs: build
+    needs: [build, textbook]
     runs-on: ubuntu-latest
     environment: production
     env:
@@ -214,7 +248,8 @@ jobs:
         if: env.SKIP != '1'
         uses: actions/download-artifact@v4
         with:
-          name: textbook
+          pattern: textbook-*
+          merge-multiple: true
           path: textbook-build
 
       - name: Copy the textbooks (read by the gateway from /opt/wenquest/textbook)

@@ -47,6 +47,13 @@ jobs:
       - name: 工厂数据与导入脚本
         working-directory: factory
         run: pip install -q -r digital/requirements.txt pytest "requests>=2.31" && python -m pytest -q tests
+      - name: 独立的 G 代码解析器（第 13 轮验收用，只装在测试环境；euclid3 的 setup.py 在新版 setuptools 下装不上，直接放模块文件）
+        run: |
+          pip install -q --no-deps pygcode==0.2.1 six
+          pip download -q --no-deps --no-binary :all: euclid3==0.01 -d "$RUNNER_TEMP/eu"
+          tar -xzf "$RUNNER_TEMP/eu/euclid3-0.01.tar.gz" -C "$RUNNER_TEMP/eu"
+          cp "$RUNNER_TEMP/eu/euclid3-0.01/euclid3.py" "$(python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')/"
+          python -c "import pygcode"
       - name: 总线、仿真、枢纽、登录与权限
         working-directory: factory/digital
         run: |
@@ -109,9 +116,12 @@ jobs:
             --erp-key "$(val WQ_ERP_API_KEY)" --erp-secret "$(val WQ_ERP_API_SECRET)" --speed 300 --timeout 900 \
             --diag /tmp/logs/erp_errors.log \
             2>&1 | tee /tmp/logs/closed_loop.log
-      - name: 有限元计算（第 11 轮）
+      - name: 有限元、动力学、数控编程（第 11–13 轮）
         working-directory: factory/digital
-        run: python tests/check_cae.py --hub http://localhost:8100
+        run: |
+          val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
+          python tests/check_cae.py --hub http://localhost:8100 --erp http://localhost:8090 \
+            --erp-key "$(val WQ_ERP_API_KEY)" --erp-secret "$(val WQ_ERP_API_SECRET)"
       - name: ERPNext 单点登录（第 7 轮）
         working-directory: /tmp/fac
         run: |

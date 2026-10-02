@@ -327,6 +327,9 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
         shared += (ROOT / "textbook" / "mechdesign" / "conventions" / "calcsheet.py").read_bytes() if (ROOT / "textbook" / "mechdesign" / "conventions" / "calcsheet.py").exists() else b""
         if (book["root"] / "conventions" / "mdstd.py").exists():       # its materials come from the digital factory's library
             shared += (ROOT / "factory" / "digital" / "cae" / "materials.py").read_bytes()
+            for rel in ("cae/solve.py", "cae/fatigue.py", "cae/geometry.py", "sim/engine.py"):   # 有限元、疲劳、试验台记录（第 33 章起）
+                p = ROOT / "factory" / "digital" / rel
+                shared += p.read_bytes() if p.exists() else b""
         for prog in sorted(p for p in code.glob("*.py") if not p.name.startswith("_")):
             where = str(prog.relative_to(book["root"].parent))
             digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes() + lang.encode()).hexdigest()[:16]
@@ -713,7 +716,7 @@ def check_numbers(sec: Section, rep: Report) -> None:
 TERM = re.compile(r"\*\*([\u4e00-\u9fff][\u4e00-\u9fff·\-–]{1,11})\*\*(?![：:])")   # "**小标题**：" is a lead-in, not a term
 
 
-LABELS = {"工程师笔记", "生活中的例子", "机器人的例子", "习题", "证明", "参考文献", "本节参考文献", "本章参考文献", "章首提要", "本章小结", "注意", "提示", "历史注记"}
+LABELS = {"工程师笔记", "生活中的例子", "机器人的例子", "习题", "证明", "参考文献", "本节参考文献", "本章参考文献", "章首提要", "本章小结", "注意", "提示", "历史注记", "估一估"}
 
 
 def _norm_term(t: str) -> str:

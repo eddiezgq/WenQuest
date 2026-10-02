@@ -1,0 +1,36 @@
+# 实验 10.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_2.js。
+原理:
+  - ["在固连于参考系的直角坐标系中，坐标轴不动，速度和加速度的分量就是坐标对时间的一阶、二阶导数（定理 10.2.2，式 (10.2.5)、(10.2.7)）。",
+     "In a Cartesian frame fixed to the reference frame the axes do not move, so the components of velocity and acceleration are the first and second time derivatives of the coordinates (Theorem 10.2.2, Eqs. (10.2.5), (10.2.7))."]
+  - 式: "x = xc + a cos ωt，y = yc + b sin ωt；  v = (−aω sin ωt, bω cos ωt)，  a = −ω² (r − r_c)          (10.2.9)、(10.2.10)"
+  - ["速率的变化率等于加速度在速度方向上的投影：dv/dt = v·a / v（式 (10.2.8)）。v 与 a 的夹角小于 90° 时速率增大，大于 90° 时减小。",
+     "The rate of change of speed is the projection of the acceleration on the velocity: dv/dt = v·a / v (Eq. (10.2.8)). The speed grows when the angle between v and a is below 90° and falls when it is above."]
+  - ["把各时刻的速度矢量平移到同一起点，端点画出的曲线叫速度图；加速度就是速度图上动点的速度，沿速度图的切线。",
+     "Moving all velocity vectors to one origin, their tips trace the hodograph; the acceleration is the velocity of that tip, tangent to the hodograph."]
+步骤:
+  - ["选择场景“SCARA 涂胶椭圆”，设 a = 0.12 m、b = 0.08 m、T = 4 s。先按式 (10.2.10) 手算 t = 0.5 s 时的速度和加速度，填入表 1。",
+     "Choose “SCARA glue ellipse” with a = 0.12 m, b = 0.08 m, T = 4 s. Compute the velocity and acceleration at t = 0.5 s with Eq. (10.2.10) and enter them in Table 1."]
+  - ["按“开始”运行一整圈，读出速率的最大值和最小值，与 aω、bω 比较（任务 1）。注意速率最大处和最小处分别在椭圆的哪里。",
+     "Press Start for one full loop, read the largest and smallest speed and compare with aω, bω (task 1). Note where on the ellipse they occur."]
+  - ["观察速度图：它也是一个椭圆，半轴为 aω、bω；加速度箭头始终沿速度图的切线。",
+     "Watch the hodograph: it is also an ellipse with semi-axes aω, bω; the acceleration arrow is always tangent to it."]
+  - ["把 a、b 都调为 0.10 m，运行，验证速率恒定、加速度指向中心（任务 2）；记入表 2。",
+     "Set a and b to 0.10 m, run, and check that the speed is constant and the acceleration points to the centre (task 2); record in Table 2."]
+  - ["切换到“投篮”，用默认参数运行，观察速度图是一条竖直线，读出到达最高点的时间，与 v₀ sin α / g 比较（任务 3）。",
+     "Switch to “Shooting a basketball”, run with the defaults, see that the hodograph is a vertical line, and compare the time to the top with v₀ sin α / g (task 3)."]
+数据表:
+  - 标题: ["表 1  算例 10.2.1（t = 0.5 s）与一圈中的速率", "Table 1  Example 10.2.1 (t = 0.5 s) and the speed over one loop"]
+    表头: ["量", "手算", "读数"]
+    表头英文: ["Quantity", "By hand", "Read"]
+    行: [["速度 /(m/s)", "", ""], ["加速度 /(m/s²)", "", ""], ["v 与 a 的夹角 /(°)", "", ""], ["最大速率 aω /(m/s)", "", ""], ["最小速率 bω /(m/s)", "", ""]]
+    行英文: [["Velocity /(m/s)", "", ""], ["Acceleration /(m/s²)", "", ""], ["Angle between v and a /(°)", "", ""], ["Largest speed aω /(m/s)", "", ""], ["Smallest speed bω /(m/s)", "", ""]]
+  - 标题: ["表 2  圆与投篮", "Table 2  Circle and basketball"]
+    表头: ["情形", "速率是否恒定", "加速度方向", "到最高点的时间 /s"]
+    表头英文: ["Case", "Constant speed?", "Direction of acceleration", "Time to the top /s"]
+    行: [["圆 a = b = 0.10 m", "", "", "—"], ["投篮 v₀ = 8 m/s，α = 52°", "", "", ""]]
+    行英文: [["Circle a = b = 0.10 m", "", "", "—"], ["Basketball v₀ = 8 m/s, α = 52°", "", "", ""]]
+注意:
+  - ["速度图的单位是 m/s，与轨迹图的比例不同，两者的箭头长度不能直接比较。", "The hodograph is in m/s with its own scale; arrow lengths cannot be compared with the path view."]
+  - ["速率是速度的大小，没有方向；速率恒定时加速度不一定为零。", "Speed is the size of the velocity; a constant speed does not mean zero acceleration."]
+思考题:
+  - ["为什么椭圆参数化 (10.2.9) 的加速度总指向中心？若中心不在 SCARA 基座附近，这对机器人意味着什么？", "Why does the acceleration of parametrisation (10.2.9) always point to the centre? What does that mean for the robot?"]

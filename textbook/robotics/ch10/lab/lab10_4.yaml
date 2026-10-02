@@ -1,0 +1,35 @@
+# 实验 10.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_4.js。
+原理:
+  - ["球面坐标 (r, θ, φ)：r 为到原点的距离，θ 为从 +z 轴量起的极角，φ 为方位角（ISO 80000-2）。两轴云台转到 (θ, φ) 时，相机坐标系的姿态是 Rot(ẑ, φ) Rot(ŷ, θ)，光轴沿 e_r 指向目标（式 (10.4.5)）。",
+     "Spherical coordinates (r, θ, φ): r the distance, θ the polar angle from +z, φ the azimuth (ISO 80000-2). A two-axis gimbal at (θ, φ) has the camera orientation Rot(ẑ, φ) Rot(ŷ, θ), with the optical axis along e_r towards the target (Eq. (10.4.5))."]
+  - 式: "ṙ = e_r·v，  θ̇ = e_θ·v / r，  φ̇ = e_φ·v / (r sin θ)          (10.4.12)"
+  - ["小车沿直线 y = d 以速度 v 驶过时，方位角 φ = atan2(d, vt)，φ̇ = −v d / (v²t² + d²)，最大值 |φ̇|max = v/d 出现在离正下方最近处，与相机高度 H 无关（式 (10.4.13)、(10.4.14)）。",
+     "For a cart passing along y = d at speed v, φ = atan2(d, vt) and φ̇ = −v d / (v²t² + d²); the largest |φ̇| = v/d occurs at closest approach and does not depend on the height H (Eqs. (10.4.13), (10.4.14))."]
+  - ["d → 0 时 |φ̇|max → ∞：目标经过正下方附近时，方位-俯仰结构的云台必须急转，这就是锁孔问题，原因是式 (10.4.12) 的分母 r sin θ 趋于零。",
+     "As d → 0, |φ̇|max → ∞: a target passing almost beneath forces an azimuth-elevation gimbal to whip round. This is the keyhole problem, caused by the denominator r sin θ in Eq. (10.4.12)."]
+步骤:
+  - ["打开实验 10.4，选择“车间顶部的云台”，设 v = 1 m/s、d = 0.5 m、H = 3 m。先按式 (10.4.14) 手算最大水平转动角速度，填入表 1。",
+     "Open Lab 10.4, choose “Gimbal on the workshop ceiling”, set v = 1 m/s, d = 0.5 m, H = 3 m. Compute the largest pan rate with Eq. (10.4.14) and enter it in Table 1."]
+  - ["按“行驶”，观察视线（黄线）和云台的转动，记录本次最大 |φ̇| 和最大 |θ̇|（任务 1）。",
+     "Press Drive, watch the line of sight (yellow) and the gimbal, and record the largest |φ̇| and |θ̇| (task 1)."]
+  - ["依次把 d 改为 1.0、0.65、0.25、0.1 m，各行驶一次，填入表 1。找出满足 90°/s 限速的最小偏距（任务 2），观察 d = 0.1 m 时的锁孔现象（任务 3）。",
+     "Repeat with d = 1.0, 0.65, 0.25, 0.1 m and fill Table 1. Find the smallest offset meeting the 90°/s limit (task 2) and watch the keyhole at d = 0.1 m (task 3)."]
+  - ["d = 0.5 m 不变，把 H 改为 1.5 m 和 4 m 各行驶一次，填入表 2，验证最大 |φ̇| 与高度无关，而最大 |θ̇| 随高度变化（任务 4）。",
+     "Keep d = 0.5 m, set H to 1.5 m and 4 m and drive each time; fill Table 2 and confirm that the largest |φ̇| does not depend on the height while the largest |θ̇| does (task 4)."]
+  - ["切换到“吸顶摄像头看扫地机器人”，用默认参数行驶一次，再把偏距调小，观察同样的现象。",
+     "Switch to “Ceiling camera and a robot vacuum”, drive with the defaults, then reduce the offset and watch the same effect."]
+数据表:
+  - 标题: ["表 1  偏距对水平转动角速度的影响（v = 1 m/s，H = 3 m）", "Table 1  Effect of the offset on the pan rate (v = 1 m/s, H = 3 m)"]
+    表头: ["d /m", "v/d（手算）/(°/s)", "最大 |φ̇|（读数）/(°/s)", "最大 |θ̇| /(°/s)", "是否满足 90°/s"]
+    表头英文: ["d /m", "v/d (by hand) /(°/s)", "largest |φ̇| (read) /(°/s)", "largest |θ̇| /(°/s)", "Within 90°/s?"]
+    行: [["1.0", "", "", "", ""], ["0.65", "", "", "", ""], ["0.5", "", "", "", ""], ["0.25", "", "", "", ""], ["0.1", "", "", "", ""]]
+  - 标题: ["表 2  相机高度的影响（v = 1 m/s，d = 0.5 m）", "Table 2  Effect of the camera height (v = 1 m/s, d = 0.5 m)"]
+    表头: ["H /m", "最大 |φ̇| /(°/s)", "最大 |θ̇| /(°/s)"]
+    表头英文: ["H /m", "largest |φ̇| /(°/s)", "largest |θ̇| /(°/s)"]
+    行: [["1.5", "", ""], ["3", "", ""], ["4", "", ""]]
+注意:
+  - ["φ̇ 为负表示俯视顺时针转动。比较限速时用绝对值。", "A negative φ̇ means clockwise seen from above; compare absolute values with the limit."]
+  - ["目标在相机下方，极角 θ 大于 90°；云台说明书常用俯角 θ − 90° 或仰角 90° − θ，注意换算。", "The target is below the camera, so θ exceeds 90°; gimbal manuals often use the depression θ − 90° or the elevation 90° − θ."]
+  - ["读数中的“本次最大”在每次按“重置”或改变参数后清零。", "The “largest this run” readings are cleared on Reset or when a parameter changes."]
+思考题:
+  - ["把云台的竖直轴倾斜 30° 安装，锁孔会移到哪里？这对跟踪车间地面上的 AGV 有什么好处？", "If the gimbal's vertical axis is tilted by 30°, where does the keyhole move? How does that help in tracking AGVs on the floor?"]

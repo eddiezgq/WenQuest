@@ -1,0 +1,32 @@
+# 实验 10.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_5.js。
+原理:
+  - ["自然坐标沿轨迹本身的切线 e_t、主法线 e_n 分解运动。速度只有切向分量 v = ṡ e_t；加速度 a = s̈ e_t + κ ṡ² e_n，切向部分改变速率，法向部分改变方向（定理 10.5.1）。",
+     "Natural coordinates use the tangent e_t and principal normal e_n of the path. The velocity is v = ṡ e_t; the acceleration is a = s̈ e_t + κ ṡ² e_n: the tangential part changes the speed, the normal part the direction (Theorem 10.5.1)."]
+  - 式: "a_t = s̈，  a_n = κ v²，  |a| = √(a_t² + a_n²)；  圆：κ = 1/R          (10.5.6)"
+  - ["椭圆 x = a cos u、y = b sin u 的曲率 κ = ab / (a² sin²u + b² cos²u)^{3/2}，在长轴端点最大（a/b²），在短轴端点最小（b/a²）（式 (10.5.10)）。匀速运动时最大加速度出现在曲率最大处。",
+     "The ellipse x = a cos u, y = b sin u has curvature κ = ab / (a² sin²u + b² cos²u)^{3/2}, largest at the ends of the major axis (a/b²) and smallest at the ends of the minor axis (b/a²) (Eq. (10.5.10)). At constant speed the largest acceleration is where the curvature is largest."]
+步骤:
+  - ["选择“UR5e 去毛刺（圆）”，设 R = 0.1 m、a_t = 0.5 m/s²、v_max = 0.25 m/s。先手算加速结束时的 a_n 和 |a|，填入表 1。",
+     "Choose “UR5e deburring (circle)” with R = 0.1 m, a_t = 0.5 m/s², v_max = 0.25 m/s. Compute a_n and |a| at the end of the speed-up by hand and enter them in Table 1."]
+  - ["按“开始”，观察下方曲线：a_n 随速率平方增长，加速结束时 |a| 突然下降。读出加速结束时的 |a|（任务 1）。",
+     "Press Start; in the plot a_n grows with the square of the speed and |a| drops suddenly when the speed-up ends. Read |a| at that moment (task 1)."]
+  - ["保持 R = 0.1 m，调节 v_max，找出使匀速段 a_n 不超过 0.5 m/s² 的最高速率（不低于 0.2 m/s），记入表 1（任务 2）。",
+     "Keep R = 0.1 m and adjust v_max to find the highest speed (at least 0.2 m/s) whose steady a_n stays within 0.5 m/s²; record in Table 1 (task 2)."]
+  - ["切换到“匀速涂胶（椭圆）”，从 0.20 m/s 起逐步提高速率，每次走完一圈读出最大加速度，填入表 2，找出不超过 1.0 m/s² 的最高速率（任务 3）。",
+     "Switch to “Constant-speed gluing (ellipse)”; raise the speed from 0.20 m/s, read the largest acceleration after each loop into Table 2, and find the highest speed within 1.0 m/s² (task 3)."]
+  - ["切换到“汽车过弯”，设弯道半径 500 m、车速 30 m/s，读出法向加速度（任务 4）；再把半径减半，观察法向加速度的变化。",
+     "Switch to “A car on a bend”, set a 500 m bend and 30 m/s and read the normal acceleration (task 4); then halve the radius and compare."]
+数据表:
+  - 标题: ["表 1  圆弧加速（R = 0.1 m）", "Table 1  Speeding up on a circle (R = 0.1 m)"]
+    表头: ["a_t /(m/s²)", "v_max /(m/s)", "加速结束时 a_n /(m/s²)", "加速结束时 |a|（手算）/(m/s²)", "加速结束时 |a|（读数）/(m/s²)", "匀速段 |a| /(m/s²)"]
+    表头英文: ["a_t /(m/s²)", "v_max /(m/s)", "a_n at the end of speed-up /(m/s²)", "|a| at the end (by hand) /(m/s²)", "|a| at the end (read) /(m/s²)", "|a| when steady /(m/s²)"]
+    行: [["0.5", "0.25", "", "", "", ""], ["0.5", "", "", "", "", ""]]
+  - 标题: ["表 2  匀速涂胶的速率与最大加速度", "Table 2  Gluing speed and largest acceleration"]
+    表头: ["v₀ /(m/s)", "κ_max v₀²（手算）/(m/s²)", "最大加速度（读数）/(m/s²)", "是否不超过 1.0 m/s²"]
+    表头英文: ["v₀ /(m/s)", "κ_max v₀² (by hand) /(m/s²)", "largest acceleration (read) /(m/s²)", "Within 1.0 m/s²?"]
+    行: [["0.20", "", "", ""], ["0.22", "", "", ""], ["0.23", "", "", ""], ["0.24", "", "", ""]]
+注意:
+  - ["法向加速度总指向轨迹弯曲的内侧；在本实验中工具尖和汽车都向左转弯。", "The normal acceleration always points to the inside of the bend; in this lab the tool and the car both turn left."]
+  - ["“本圈最大加速度”由按弧长推进时逐点计算的 κv₀² 取最大得到，与手算值可能有末位差别。", "“Largest acceleration this loop” is the maximum of κv₀² sampled along the loop and may differ from the hand value in the last digit."]
+思考题:
+  - ["速率提高 20%，法向加速度提高多少？为什么机器人和车辆在急弯处都要减速？", "If the speed rises by 20%, by how much does the normal acceleration rise? Why must robots and vehicles slow down on tight bends?"]

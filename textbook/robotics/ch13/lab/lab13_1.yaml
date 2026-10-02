@@ -1,0 +1,34 @@
+# 实验 13.1 的指导书与报告模板。目的、场景、参数、任务取自 lab13_1.js。
+原理:
+  - ["两条关节轴之间的相对位置由公垂线确定：公垂线的长度 a 和两轴的夹角 α 属于连杆，沿轴的距离 d 和转角 θ 属于关节。一个连杆加一个关节，正好四个数。",
+     "The relative position of two joint axes is fixed by their common normal: its length a and the twist α belong to the link; the offset d and the angle θ along the axis belong to the joint. One link plus one joint: four numbers."]
+  - 式: "标准 DH / standard DH:  T(i−1,i) = Rot(z, θᵢ) Trans(z, dᵢ) Trans(x, aᵢ) Rot(x, αᵢ)          (13.1.4)"
+  - 式: "改进 DH / modified DH:  T(i−1,i) = Rot(x, αᵢ₋₁) Trans(x, aᵢ₋₁) Rot(z, θᵢ) Trans(z, dᵢ)          (13.1.7)"
+  - ["标准 DH 把 {i} 放在关节 i+1 的轴上，改进 DH（Craig）放在关节 i 的轴上。同一台机器人的 a、α 数值相同，在改进 DH 的表中下移一行；整条链满足 T^S = T^M X_n（定理 13.1.2）。",
+     "Standard DH puts {i} on the axis of joint i+1, modified DH (Craig) on the axis of joint i. For one robot the a and α values are the same but sit one row lower in the modified table; the whole chain obeys T^S = T^M X_n (Theorem 13.1.2)."]
+  - ["平面 3R 臂：L₁ = 0.425 m，L₂ = 0.392 m，L₃ = 0.1 m。几何解法：末端 = 三段连杆矢量之和，每段的方向角为它以内各关节角之和。",
+     "Planar 3R arm: L₁ = 0.425 m, L₂ = 0.392 m, L₃ = 0.1 m. Geometric check: the tip is the sum of the three link vectors, each at the sum of the joint angles inside it."]
+步骤:
+  - ["打开实验 13.1，场景“标准 DH”。设置 θ = (30°, 45°, −90°)（任务 1），记录 DH 表、末端位置和与几何解法之差，填入表 1。",
+     "Open Lab 13.1, scene “standard DH”. Set θ = (30°, 45°, −90°) (task 1); record the DH table, the tip and the difference from geometry in Table 1."]
+  - ["换到场景“改进 DH”，关节角不变（任务 2）。记录同样的量，并在图上对照两组坐标系 {0}～{3} 的位置。",
+     "Switch to “modified DH” with the same angles (task 2). Record the same quantities and compare where frames {0}–{3} sit."]
+  - ["回到“标准 DH”，把“表套错公式”设为 1（任务 3），记录错误的末端位置和误差，与算例 13.1.3 比较。",
+     "Back in “standard DH”, set “wrong formula” to 1 (task 3); record the wrong tip and the error, and compare with Example 13.1.3."]
+  - ["场景“台灯”：调出灯罩竖直朝下、高度 0.2～0.4 m 的姿势（任务 4），记录三个关节角，填入表 2。",
+     "Scene “desk lamp”: find a pose with the shade straight down at a height of 0.2–0.4 m (task 4); record the three angles in Table 2."]
+数据表:
+  - 标题: ["表 1  两种约定与套错公式", "Table 1  The two conventions and the wrong formula"]
+    表头: ["场景", "DH 表的 a 列 / m", "末端 (x, y) / m", "与几何解法之差 / m"]
+    表头英文: ["Scene", "a column of the DH table / m", "Tip (x, y) / m", "Difference from geometry / m"]
+    行: [["标准 DH", "", "", ""], ["改进 DH", "", "", ""], ["标准 DH，表套错公式", "", "", ""]]
+    行英文: [["Standard DH", "", "", ""], ["Modified DH", "", "", ""], ["Standard DH, wrong formula", "", "", ""]]
+  - 标题: ["表 2  台灯姿势", "Table 2  Desk-lamp pose"]
+    表头: ["θ₁ / °", "θ₂ / °", "θ₃ / °", "θ₁ + θ₂ + θ₃ / °", "灯罩高度 / m"]
+    表头英文: ["θ₁ / °", "θ₂ / °", "θ₃ / °", "θ₁ + θ₂ + θ₃ / °", "Shade height / m"]
+    行: [["", "", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["改进 DH 的 {3} 在关节 3 的中心，不在末端；读末端位置时程序已经乘上了 X₃ = Trans(x, L₃)。", "In modified DH, {3} is at the centre of joint 3, not at the tip; the program already multiplies by X₃ = Trans(x, L₃) for the tip."]
+  - ["关节角以度输入，程序内部换算为弧度。", "Joint angles are entered in degrees and converted to radians inside the program."]
+思考题:
+  - ["在台灯场景中，满足“灯罩竖直朝下、高度 0.3 m”的姿势有几种？用 θ₁ + θ₂ + θ₃ = −90° 说明为什么不止一种。", "In the lamp scene, how many poses put the shade straight down at 0.3 m? Use θ₁ + θ₂ + θ₃ = −90° to explain why there is more than one."]
