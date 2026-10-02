@@ -42,6 +42,8 @@ jobs:
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1
           (ccx -v || true) | grep -q Version          # ccx -v 的退出码不是 0
+      - name: 动力学用的机器人模型（第 12 轮：Menagerie 固定提交）
+        run: sh factory/deploy/fetch_menagerie.sh "$RUNNER_TEMP/menagerie" && echo "WQ_MENAGERIE=$RUNNER_TEMP/menagerie" >> "$GITHUB_ENV"
       - name: 工厂数据与导入脚本
         working-directory: factory
         run: pip install -q -r digital/requirements.txt pytest "requests>=2.31" && python -m pytest -q tests

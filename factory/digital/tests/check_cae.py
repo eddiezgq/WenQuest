@@ -55,3 +55,20 @@ assert j["id"] in [x["id"] for x in call("GET", "/api/cae/jobs", token=tok)["job
 # 本地登录方式下人人都按老师算，“只能看自己的任务”在线上（问渠账号）才生效
 print("有限元演练通过：{} 个单元，{} 秒，最大应力 {} MPa，安全系数 {}".format(
     st["elements"], st["seconds"], st["vm_max_mpa"], st["safety_factor"]))
+
+# 第 12 轮：运动与动力分析——UR5e 保持一个姿态，驱动力矩等于重力矩
+info = call("POST", "/api/mbd/models/load", {"source": "library", "id": "B-ARM-UR5E"}, token=tok)
+assert call("GET", info["model_url"], raw=True)[:4] == b"glTF" and len(info["joints"]) == 6
+pose = {"shoulder_lift_joint": -1.2, "elbow_joint": 1.0}
+j = call("POST", "/api/mbd/jobs", {"model": {"source": "library", "id": "B-ARM-UR5E"}, "title": "演练",
+                                   "setup": {"duration_s": 0.5, "initial": pose,
+                                             "drives": [{"joint": x["name"], "kind": "hold"} for x in info["joints"]]}}, token=tok)
+t0 = time.time()
+while j["status"] not in ("done", "failed") and time.time() - t0 < 300:
+    time.sleep(2)
+    j = call("GET", "/api/mbd/jobs/" + j["id"], token=tok)
+assert j["status"] == "done", j.get("error")
+peak = {d["joint"]: d["peak"] for d in j["stats"]["drives"]}
+assert 20 < peak["shoulder_lift_joint"] < 100, peak
+assert call("GET", "/api/mbd/jobs/{}/series.bin".format(j["id"]), token=tok, raw=True)[:4] == b"WQC1"
+print("动力学演练通过：肩部重力矩 {:.1f} N·m，用时 {} 秒".format(peak["shoulder_lift_joint"], j["stats"]["seconds"]))

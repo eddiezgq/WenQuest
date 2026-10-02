@@ -15,6 +15,7 @@ import threading
 import time
 import urllib.parse
 import uuid
+import zipfile
 
 import numpy as np
 from fastapi import Body, FastAPI, HTTPException, Request
@@ -112,6 +113,96 @@ def _solve_child(step_path, setup, outdir, q):
         q.put((False, str(e) or e.__class__.__name__))
 
 
+# ------------------------------------------------------------------ 运动与动力分析（第 12 轮）
+def model_key(ref):
+    src = (ref or {}).get("source")
+    if src == "library":
+        return str(ref.get("id", "")).replace("/", "")
+    if src == "upload":
+        return "u-" + str(ref.get("sha", "")).replace("/", "")[:64]
+    if src == "mech":
+        import json as _j
+        return "m-" + hashlib.sha256(_j.dumps([ref.get("id"), ref.get("params") or {}], sort_keys=True).encode()).hexdigest()[:24]
+    raise ValueError("模型来源不对")
+
+
+def load_model_spec(ref):
+    """模型引用 → MjSpec"""
+    from cae import mbd, mbd_models as MM
+    src = ref.get("source")
+    if src == "library":
+        return mbd.load_spec(path=MM.robot_path(ref.get("id")))
+    if src == "upload":
+        if ref.get("_main"):                      # 子进程里：主进程已经找好了文件
+            return mbd.load_spec(path=ref["_main"])
+        meta = _p("mbd", "uploads", model_key(ref)[2:], "meta.json")
+        if not os.path.exists(meta):
+            raise ValueError("没有这个上传的模型")
+        return mbd.load_spec(path=_read_json(meta)["main"])
+    if src == "mech":
+        from cae import mech_mjcf
+        return mbd.load_spec(xml=mech_mjcf.mjcf(ref.get("id"), ref.get("params") or {}))
+    raise ValueError("模型来源不对")
+
+
+def _resolved(ref):
+    """交给子进程前把上传模型的文件路径找好（子进程不一定知道数据目录）"""
+    if ref.get("source") == "upload":
+        meta = _p("mbd", "uploads", model_key(ref)[2:], "meta.json")
+        if not os.path.exists(meta):
+            raise HTTPException(404, "没有这个上传的模型")
+        return dict(ref, _main=_read_json(meta)["main"])
+    return ref
+
+
+def _model_child(ref, outdir, q):
+    try:
+        from cae import mbd, mbd_models as MM
+        model, _ = mbd.build(load_model_spec(ref), {})
+        open(os.path.join(outdir, "model.glb"), "wb").write(MM.model_glb(model))
+        _write_json(os.path.join(outdir, "info.json"), mbd.info(model))
+        q.put((True, None))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+def write_series(path, ch):
+    names = list(ch)
+    head = json.dumps({"names": names, "n": int(len(ch["t"]))}).encode()
+    with open(path, "wb") as f:
+        f.write(struct.pack("<4sI", b"WQC1", len(head)))
+        f.write(head)
+        f.write(np.ascontiguousarray(np.stack([ch[n] for n in names], 1), dtype="<f4").tobytes())
+
+
+def read_series(path):
+    raw = open(path, "rb").read()
+    _, hl = struct.unpack_from("<4sI", raw)
+    head = json.loads(raw[8:8 + hl])
+    arr = np.frombuffer(raw, "<f4", offset=8 + hl).reshape(head["n"], len(head["names"]))
+    return {n: arr[:, i] for i, n in enumerate(head["names"])}
+
+
+def write_anim(path, an):
+    head = json.dumps({"bodies": an["bodies"], "frames": int(len(an["t"]))}).encode()
+    with open(path, "wb") as f:
+        f.write(struct.pack("<4sI", b"WQA1", len(head)))
+        f.write(head)
+        for a in (an["t"], an["pos"], an["quat"]):
+            f.write(np.ascontiguousarray(a, dtype="<f4").tobytes())
+
+
+def _mbd_child(ref, setup, outdir, q):
+    try:
+        from cae import mbd
+        summ, ch, an = mbd.simulate(load_model_spec(ref), setup)
+        write_series(os.path.join(outdir, "series.bin"), ch)
+        write_anim(os.path.join(outdir, "anim.bin"), an)
+        q.put((True, summ))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
 # ------------------------------------------------------------------ 队列
 def _job_path(jid, *a):
     return _p("jobs", jid, *a)
@@ -134,9 +225,12 @@ def _worker():
                 continue
             _RUNNING["id"] = jid
             _update(jid, status="running", started=time.time())
-            setup = dict(j["setup"])
-            setup["material"] = M.get(setup["material_id"])
-            ok, res = _isolated(_solve_child, (_p("geo", j["step_sha"], "part.step"), setup, _job_path(jid)), TIME_LIMIT_S + 60)
+            if j.get("kind") == "mbd":
+                ok, res = _isolated(_mbd_child, (_resolved(j["model"]), j["setup"], _job_path(jid)), TIME_LIMIT_S + 60)
+            else:
+                setup = dict(j["setup"])
+                setup["material"] = M.get(setup["material_id"])
+                ok, res = _isolated(_solve_child, (_p("geo", j["step_sha"], "part.step"), setup, _job_path(jid)), TIME_LIMIT_S + 60)
             if ok:
                 _update(jid, status="done", finished=time.time(), stats=res)
             else:
@@ -154,6 +248,7 @@ def _worker():
 def _start():
     os.makedirs(_p("geo"), exist_ok=True)
     os.makedirs(_p("jobs"), exist_ok=True)
+    os.makedirs(_p("mbd", "models"), exist_ok=True)
     pending = []
     for jid in os.listdir(_p("jobs")):
         try:
@@ -264,8 +359,107 @@ def submit(body: dict = Body(...)):
     return _public(j)
 
 
+@app.get("/mbd/robots")
+def mbd_robots():
+    from cae import mbd_models as MM
+    return {"robots": [{"id": k, "name": v[1], "end_body": v[2]} for k, v in MM.ROBOTS.items()]}
+
+
+def _model_ready(ref):
+    key = model_key(ref)
+    d = _p("mbd", "models", key)
+    if not os.path.exists(os.path.join(d, "info.json")):
+        os.makedirs(d, exist_ok=True)
+        ok, err = _isolated(_model_child, (_resolved(ref), d), GEO_LIMIT_S)
+        if not ok:
+            raise HTTPException(422, "读不了这个模型：{}".format(err))
+    return dict(_read_json(os.path.join(d, "info.json")), key=key, ref=ref)
+
+
+@app.post("/mbd/models/load")
+def mbd_model_load(body: dict = Body(...)):
+    try:
+        model_key(body)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from None
+    return _model_ready(body)
+
+
+@app.post("/mbd/models/upload")
+async def mbd_model_upload(request: Request, name: str = "model.xml"):
+    from cae import mbd_models as MM
+    data = await request.body()
+    if not data:
+        raise HTTPException(400, "没有收到文件")
+    if len(data) > 100 * 1024 * 1024:
+        raise HTTPException(413, "文件超过 100 MB")
+    sha = hashlib.sha256(data).hexdigest()
+    d = _p("mbd", "uploads", sha)
+    if not os.path.exists(os.path.join(d, "meta.json")):
+        try:
+            main = MM.unpack_upload(data, name, os.path.join(d, "files"))
+        except (ValueError, zipfile.BadZipFile) as e:
+            raise HTTPException(422, str(e)) from None
+        _write_json(os.path.join(d, "meta.json"), {"main": main, "name": name})
+    return _model_ready({"source": "upload", "sha": sha})
+
+
+@app.get("/mbd/models/{key}/model.glb")
+def mbd_model_glb(key: str):
+    p = _p("mbd", "models", key.replace("/", ""), "model.glb")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个模型")
+    return FileResponse(p, media_type="model/gltf-binary")
+
+
+@app.post("/mbd/jobs")
+def mbd_submit(body: dict = Body(...)):
+    from cae import mbd
+    ref = body.get("model") or {}
+    info = _model_ready(ref)
+    setup = body.get("setup") or {}
+    try:
+        dur = float(setup.get("duration_s", 2))
+    except (TypeError, ValueError):
+        raise HTTPException(400, "仿真时长不对") from None
+    if not 0 < dur <= mbd.MAX_DURATION_S:
+        raise HTTPException(400, "仿真时长要在 0–{:.0f} 秒之间".format(mbd.MAX_DURATION_S))
+    names = {j["name"] for j in info["joints"]}
+    bodies = {b["name"] for b in info["bodies"]}
+    for d in setup.get("drives") or []:
+        if d.get("joint") not in names:
+            raise HTTPException(400, "模型里没有关节“{}”".format(d.get("joint")))
+    for x in (setup.get("payloads") or []) + (setup.get("forces") or []) + (setup.get("points") or []):
+        if x.get("body") not in bodies:
+            raise HTTPException(400, "模型里没有构件“{}”".format(x.get("body")))
+    jid = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:6]
+    os.makedirs(_job_path(jid))
+    j = {"id": jid, "kind": "mbd", "status": "queued", "created": time.time(), "model": ref, "model_key": info["key"],
+         "setup": setup, "owner": body.get("owner"), "owner_name": body.get("owner_name"), "factory": body.get("factory"),
+         "title": body.get("title") or "", "item": body.get("item")}
+    _write_json(_job_path(jid, "job.json"), j)
+    _Q.put(jid)
+    return _public(j)
+
+
+@app.get("/jobs/{jid}/series.bin")
+def job_series(jid: str):
+    p = _job_path(jid.replace("/", ""), "series.bin")
+    if not os.path.exists(p):
+        raise HTTPException(404, "结果还没出来")
+    return FileResponse(p, media_type="application/octet-stream")
+
+
+@app.get("/jobs/{jid}/anim.bin")
+def job_anim(jid: str):
+    p = _job_path(jid.replace("/", ""), "anim.bin")
+    if not os.path.exists(p):
+        raise HTTPException(404, "结果还没出来")
+    return FileResponse(p, media_type="application/octet-stream")
+
+
 @app.get("/jobs")
-def jobs(factory: str = "", owner: str = "", limit: int = 50):
+def jobs(factory: str = "", owner: str = "", limit: int = 50, kind: str = ""):
     out = []
     for jid in sorted(os.listdir(_p("jobs")), reverse=True):
         try:
@@ -275,6 +469,8 @@ def jobs(factory: str = "", owner: str = "", limit: int = 50):
         if factory and j.get("factory") != factory:
             continue
         if owner and str(j.get("owner")) != owner:
+            continue
+        if kind and j.get("kind", "fea") != kind:
             continue
         out.append(_public(j))
         if len(out) >= limit:

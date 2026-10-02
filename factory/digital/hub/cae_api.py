@@ -112,10 +112,62 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
 
     @app.get("/api/cae/jobs")
     def cae_jobs(u=Depends(user_of)):
-        params = {"factory": FACTORY_ID, "limit": 100}
+        params = {"factory": FACTORY_ID, "limit": 100, "kind": "fea"}
         if not is_teacher(u):
             params["owner"] = uid_of(u)
         return call("GET", "/jobs", params=params).json()
+
+    # ------------------------------------------------------------ 运动与动力分析（第 12 轮）
+    @app.get("/api/mbd/robots")
+    def mbd_robots(u=Depends(user_of)):
+        return call("GET", "/mbd/robots").json()
+
+    def _with_url(info):
+        info["model_url"] = "/api/mbd/models/{}/model.glb".format(info["key"])
+        return info
+
+    @app.post("/api/mbd/models/load")
+    def mbd_load(body: dict = Body(...), u=Depends(user_of)):
+        if body.get("source") not in ("library", "mech"):
+            raise HTTPException(400, "模型来源不对")
+        return _with_url(call("POST", "/mbd/models/load", json=body).json())
+
+    @app.post("/api/mbd/models/upload")
+    async def mbd_upload(file: UploadFile = File(...), u=Depends(user_of)):
+        data = await file.read()
+        if len(data) > 100 * 1024 * 1024:
+            raise HTTPException(413, "文件超过 100 MB")
+        return _with_url(call("POST", "/mbd/models/upload", params={"name": file.filename or "model.xml"}, content=data).json())
+
+    @app.get("/api/mbd/models/{key}/model.glb")
+    def mbd_glb(key: str):
+        r = call("GET", "/mbd/models/{}/model.glb".format(urllib.parse.quote(key)))
+        return Response(r.content, media_type="model/gltf-binary", headers={"Cache-Control": "max-age=86400"})
+
+    @app.post("/api/mbd/jobs")
+    def mbd_submit(body: dict = Body(...), u=Depends(user_of)):
+        return call("POST", "/mbd/jobs", json={
+            "model": body.get("model") or {}, "setup": body.get("setup") or {}, "title": (body.get("title") or "")[:80],
+            "item": body.get("item"), "owner": uid_of(u), "owner_name": who(u), "factory": FACTORY_ID}).json()
+
+    @app.get("/api/mbd/jobs")
+    def mbd_jobs(u=Depends(user_of)):
+        params = {"factory": FACTORY_ID, "limit": 100, "kind": "mbd"}
+        if not is_teacher(u):
+            params["owner"] = uid_of(u)
+        return call("GET", "/jobs", params=params).json()
+
+    @app.get("/api/mbd/jobs/{jid}")
+    def mbd_job(jid: str, u=Depends(user_of)):
+        return mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+
+    @app.get("/api/mbd/jobs/{jid}/{part}.bin")
+    def mbd_bin(jid: str, part: str, u=Depends(user_of)):
+        if part not in ("series", "anim"):
+            raise HTTPException(404, "没有这个文件")
+        mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        r = call("GET", "/jobs/{}/{}.bin".format(urllib.parse.quote(jid), part))
+        return Response(r.content, media_type="application/octet-stream", headers={"Cache-Control": "max-age=86400"})
 
     @app.get("/api/cae/jobs/{jid}")
     def cae_job(jid: str, u=Depends(user_of)):

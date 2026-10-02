@@ -8,6 +8,12 @@ RUN npm ci --no-audit --no-fund
 COPY digital/web/ ./
 RUN npm run build
 
+# 动力学用的机器人模型（第 12 轮）：MuJoCo Menagerie 固定提交里的几台机械臂
+FROM alpine:3.20 AS menagerie
+RUN apk add --no-cache git
+COPY deploy/fetch_menagerie.sh /fetch_menagerie.sh
+RUN sh /fetch_menagerie.sh /opt/menagerie
+
 # 固定 Debian 12（bookworm）：Debian 13 的 calculix-ccx 因 openmpi 升级装不上（Debian bug #1089784）
 FROM python:3.12-slim-bookworm
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 TZ=America/New_York
@@ -26,6 +32,7 @@ COPY digital/wqbus/ digital/wqbus/
 COPY digital/sim/ digital/sim/
 COPY digital/hub/ digital/hub/
 COPY digital/freecad/ digital/freecad/
+COPY --from=menagerie /opt/menagerie /opt/menagerie
 COPY digital/cae/ digital/cae/
 # 工艺数据表与读表模块（第 13 轮：教材原件的副本，见 digital/std/sync.py）
 COPY digital/std/ digital/std/
