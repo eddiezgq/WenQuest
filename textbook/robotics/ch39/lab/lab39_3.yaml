@@ -12,9 +12,11 @@
 数据表:
   - 标题: ["表 1  表观频率（f_s = 1000 Hz）", "Table 1  Apparent frequency (f_s = 1000 Hz)"]
     表头: ["f / Hz", "f_a（读数）/ Hz", "f_a（式 (39.3.5)）/ Hz", "是否混叠"]
+    表头英文: ["f / Hz", "f_a (read) / Hz", "f_a (Eq. (39.3.5)) / Hz", "Aliased?"]
     行: [["100", "", "", ""], ["400", "", "", ""], ["600", "", "", ""], ["950", "", "", ""], ["1050", "", "", ""], ["1900", "", "", ""]]
   - 标题: ["表 2  消除混叠所需的采样频率", "Table 2  Sampling rate needed to avoid aliasing"]
     表头: ["f / Hz", "最低 f_s / Hz", "2f / Hz"]
+    表头英文: ["f / Hz", "Lowest f_s / Hz", "2f / Hz"]
     行: [["950", "", ""], ["", "", ""]]
 注意:
   - ["界面中的时间轴已放慢，便于观察；表观频率按式 (39.3.5) 计算。", "The time axis is slowed down for viewing; f_a follows Eq. (39.3.5)."]

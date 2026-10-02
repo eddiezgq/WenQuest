@@ -8,7 +8,7 @@ import math
 import numpy as np
 
 from _rot import C, axes3d, circle_arc, rot_axis, skew
-from bookout import figure, style
+from bookout import T, figure, style
 
 plt = style()
 
@@ -63,8 +63,8 @@ n = np.arange(1, 31)
 ax.semilogy(n, np.maximum(errs, 1e-17), "o-", color=C["z"], ms=3.5, lw=1.2)
 ax.axhline(1e-12, color=C["muted"], lw=0.8, ls="--")
 ax.text(29.6, 2.5e-12, "$10^{-12}$", ha="right", fontsize=10, color=C["muted"])
-ax.set_xlabel("所取的项数 n")
-ax.set_ylabel("最大误差")
+ax.set_xlabel(T("所取的项数 n", "number of terms n"))
+ax.set_ylabel(T("最大误差", "largest error"))
 ax.grid(True, which="major", lw=0.3, alpha=0.5)
 for s in ("top", "right"):
     ax.spines[s].set_visible(False)

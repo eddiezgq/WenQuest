@@ -16,10 +16,13 @@
 数据表:
   - 标题: ["表 1  一阶近似：步长与漂移（不正交化，运行 20 s）", "Table 1  First-order step: drift vs step size (no fix, 20 s)"]
     表头: ["Δt / ms", "更新次数", "RᵀR 偏离 I 的最大值", "三根轴的长度"]
+    表头英文: ["Δt / ms", "Number of updates", "Largest deviation of RᵀR from I", "Lengths of the three axes"]
     行: [["20", "", "", ""], ["10", "", "", ""], ["5", "", "", ""], ["2", "", "", ""], ["1", "", "", ""]]
   - 标题: ["表 2  更新方法与正交化周期（Δt = 10 ms，运行 20 s）", "Table 2  Method and re-orthonormalization (Δt = 10 ms, 20 s)"]
     表头: ["更新方法", "正交化周期 / 步", "RᵀR 偏离 I 的最大值", "是否小于 0.5%"]
+    表头英文: ["Update method", "Orthonormalization period / steps", "Largest deviation of RᵀR from I", "Below 0.5%?"]
     行: [["罗德里格斯", "0", "", ""], ["一阶近似", "200", "", ""], ["一阶近似", "100", "", ""], ["一阶近似", "50", "", ""], ["一阶近似", "20", "", ""]]
+    行英文: [["Rodrigues", "0", "", ""], ["First-order", "200", "", ""], ["First-order", "100", "", ""], ["First-order", "50", "", ""], ["First-order", "20", "", ""]]
 注意:
   - ["“偏离 I 的最大值”指 RᵀR − I 各元素绝对值的最大值，0.01 即 1%。", "“Maximum deviation” is the largest |entry| of RᵀR − I; 0.01 means 1%."]
   - ["步长很小时运行会慢一些，等“模拟时间”到 20 s 再读数。", "Small steps run slower; wait until simulated time reaches 20 s before reading."]

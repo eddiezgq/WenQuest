@@ -21,7 +21,9 @@
 数据表:
   - 标题: ["表 1  只转动一个关节时的法兰盘中心", "Table 1  Flange centre when one joint turns"]
     表头: ["转动的关节与角度", "x / m", "y / m", "z / m", "到关节 1 轴的距离 / m", "手算值或说明"]
+    表头英文: ["Joint turned and angle", "x / m", "y / m", "z / m", "Distance from joint-1 axis / m", "By hand or remark"]
     行: [["零位", "", "", "", "", "M 的第四列"], ["关节 1 = 90°", "", "", "", "", ""], ["关节 6 = 60°", "", "", "", "", ""], ["关节 2 = −90°", "", "", "", "", "z = H₁ + L₁ + L₂"]]
+    行英文: [["Home", "", "", "", "", "Fourth column of M"], ["Joint 1 = 90°", "", "", "", "", ""], ["Joint 6 = 60°", "", "", "", "", ""], ["Joint 2 = −90°", "", "", "", "", "z = H₁ + L₁ + L₂"]]
 注意:
   - ["界面读数以机器人基座坐标系 {s} 表示，与表 12.1.1 相同；三维视图中的坐标轴（红 x、绿 y、蓝 z）画的就是 {s}。", "Readings are in the base frame {s}, as in Table 12.1.1; the axes drawn in the view (red x, green y, blue z) are {s}."]
   - ["关节角的正方向按右手定则与图中金色箭头（关节轴正方向）一致。", "Positive joint angles follow the right-hand rule about the gold arrows (positive axis directions)."]

@@ -13,9 +13,11 @@
 数据表:
   - 标题: ["表 1  全桥（R_g = 500 Ω）", "Table 1  Full bridge (R_g = 500 Ω)"]
     表头: ["F / N", "Vp − Vm / mV", "Vout / V", "增益 Vout/(Vp − Vm)"]
+    表头英文: ["F / N", "Vp − Vm / mV", "Vout / V", "Gain Vout/(Vp − Vm)"]
     行: [["0", "", "", "—"], ["20", "", "", ""], ["40", "", "", ""], ["60", "", "", ""], ["80", "", "", ""], ["100", "", "", ""]]
   - 标题: ["表 2  单臂电桥与全桥的比较（R_g 取任务 2 的值）", "Table 2  Quarter vs full bridge (R_g from task 2)"]
     表头: ["F / N", "全桥 Vp − Vm / mV", "单臂 Vp − Vm / mV", "单臂 / 全桥"]
+    表头英文: ["F / N", "Full bridge Vp − Vm / mV", "Quarter bridge Vp − Vm / mV", "Quarter / full"]
     行: [["20", "", "", ""], ["60", "", "", ""], ["100", "", "", ""]]
 注意:
   - ["仿真器中运算放大器的开环增益为 10⁵，所以实测增益比式 (39.2.5) 小约 0.25%。实际器件还有失调电压、偏置电流和有限的共模抑制比。", "The simulator's op-amps have an open-loop gain of 10⁵, so the measured gain is about 0.25% below Eq. (39.2.5). Real parts also have offset, bias current and finite CMRR."]

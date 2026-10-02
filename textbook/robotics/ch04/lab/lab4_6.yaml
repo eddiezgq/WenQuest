@@ -17,10 +17,13 @@
 数据表:
   - 标题: ["表 1  转角从 0° 到 720°（竖直轴）", "Table 1  Angle from 0° to 720° (vertical axis)"]
     表头: ["转角 θ / °", "q₀ 预测", "q = (q₀, q₁, q₂, q₃) 读数", "R 第 1 行", "姿态是否与 0° 相同"]
+    表头英文: ["Angle θ / °", "q₀ predicted", "q = (q₀, q₁, q₂, q₃) read", "Row 1 of R", "Same orientation as at 0°?"]
     行: [["0", "", "", "", "—"], ["90", "", "", "", ""], ["180", "", "", "", ""], ["270", "", "", "", ""], ["360", "", "", "", ""], ["450", "", "", "", ""], ["540", "", "", "", ""], ["630", "", "", "", ""], ["720", "", "", "", ""]]
   - 标题: ["表 2  q 与 −q；手算与读数", "Table 2  q and −q; by hand and on screen"]
     表头: ["情形", "转轴与转角", "q", "R 第 1 行", "与读数是否一致"]
+    表头英文: ["Case", "Axis and angle", "q", "Row 1 of R", "Agrees with reading?"]
     行: [["用 q", "", "", "", ""], ["用 −q", "", "", "", ""], ["自选（手算）", "", "", "", ""]]
+    行英文: [["Using q", "", "", "", ""], ["Using −q", "", "", "", ""], ["Own choice (by hand)", "", "", "", ""]]
 注意:
   - ["本书四元数的实部写在最前面：q = (q₀, q₁, q₂, q₃)。有些软件（如部分图形库）把实部放在最后，换算时要注意。", "This book puts the real part first: q = (q₀, q₁, q₂, q₃). Some software puts it last; take care when converting."]
   - ["读数保留 4 位小数；cos 90° 等值可能显示为极小的数（如 1e-16），按 0 处理。", "Keep 4 decimals; values like cos 90° may show as tiny numbers (e.g. 1e-16) — treat them as 0."]

@@ -38,7 +38,7 @@ EN_ITEM = re.compile(r"\*\*(" + "|".join(ITEMS) + r") (\d+\.\d+\.\d+)")
 EXERCISE = re.compile(r"(?m)^(\d+\.\d+\.\d+)\s")
 SUBSEC = re.compile(r"(?m)^#{3,4}\s+(\d+\.\d+\.\d+)\s")
 ZH_TERM = re.compile(r"\*\*([\u4e00-\u9fff][\u4e00-\u9fff·\-–]{1,11})\*\*(?![：:])")
-EN_TERM = re.compile(r"\*\*([A-Za-z][A-Za-z'’\- ]{0,48}[A-Za-z])\*\*(?![:：])")
+EN_TERM = re.compile(r"\*\*([A-Za-z][A-Za-z'’\-– ]{0,48}[A-Za-z])\*\*(?![:：])")
 CJK = re.compile(r"[\u4e00-\u9fff]")
 
 
@@ -81,7 +81,7 @@ def _show(x) -> str:
 
 def _norm(t: str) -> str:
     t = re.sub(r"\([^)]*\)", "", t.lower().replace("’", "'"))
-    t = re.sub(r"[\s\-]+", " ", t).strip()
+    t = re.sub(r"[\s\-–]+", " ", t).strip()
     return re.sub(r"^(the|a|an) ", "", t)
 
 

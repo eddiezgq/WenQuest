@@ -8,7 +8,7 @@ import math
 import numpy as np
 
 from _rot import C, axes3d, circle_arc, rot_axis, rot_x, rot_z
-from bookout import figure, style
+from bookout import T, figure, style
 
 plt = style()
 d = math.radians
@@ -25,7 +25,7 @@ fig, ax = axes3d(plt, size=(4.6, 3.8), elev=14, azim=-35, lim=0.5, zoom=1.35, ce
 # 为了看清，把转轴画在图中央：取一个观察角度使轴斜向上
 ax.plot(*np.array([-0.15 * w, 1.0 * w]).T, color=C["ink"], lw=1.6)
 ax.quiver(*(0.85 * w), *(0.15 * w), color=C["ink"], lw=1.6, arrow_length_ratio=0.6)
-ax.text(*(1.04 * w), r"转轴 $\hat\omega$", fontsize=11, color=C["ink"])
+ax.text(*(1.04 * w), T(r"转轴 $\hat\omega$", r"axis $\hat\omega$"), fontsize=11, color=C["ink"])
 u = np.cross(w, [0, 0, 1.0])
 u /= np.linalg.norm(u)
 v = np.cross(w, u)
@@ -42,6 +42,8 @@ for h, r in ((0.2, 0.42), (0.62, 0.26)):
     ax.scatter(*c, color=C["ink"], s=8)
     m = c + 0.55 * r * (math.cos(theta / 2) * u + math.sin(theta / 2) * v)
     ax.text(*m, r"$\theta$", fontsize=12, color=C["accent"])
-ax.text2D(0.02, 0.01, "各点沿垂直于轴的圆周转过同一个角度 θ；轴上的点不动", transform=ax.transAxes, fontsize=9.5)
+ax.text2D(0.02, 0.01, T("各点沿垂直于轴的圆周转过同一个角度 θ；轴上的点不动",
+                        "Every point turns through the same angle θ on a circle\nperpendicular to the axis; points on the axis stay put"),
+          transform=ax.transAxes, fontsize=9.5)
 figure(fig, "fig4_3_1")
 plt.close(fig)

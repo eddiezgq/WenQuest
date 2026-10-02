@@ -12,10 +12,14 @@
 数据表:
   - 标题: ["表 1  修整间隔的影响（磨削单元，补偿关）", "Table 1  Effect of the dressing interval (grinding, no compensation)"]
     表头: ["修整间隔 / 件", "超差件数", "首次判异（组）", "C_p", "P_pk", "100 件中的修整次数"]
+    表头英文: ["Dressing interval / parts", "Out-of-tolerance parts", "First signal (subgroup)", "C_p", "P_pk", "Dressings in 100 parts"]
     行: [["按寿命", "", "", "", "", ""], ["10", "", "", "", "", "10"], ["14", "", "", "", "", "7"], ["20", "", "", "", "", "5"], ["25", "", "", "", "", "4"]]
+    行英文: [["By wheel life", "", "", "", "", ""], ["10", "", "", "", "", "10"], ["14", "", "", "", "", "7"], ["20", "", "", "", "", "5"], ["25", "", "", "", "", "4"]]
   - 标题: ["表 2  灌装线：补偿的效果（清洗按寿命）", "Table 2  Filling line: effect of compensation"]
     表头: ["补偿", "不合格瓶数", "首次判异（组）", "C_p", "P_pk"]
+    表头英文: ["Compensation", "Rejected bottles", "First signal (subgroup)", "C_p", "P_pk"]
     行: [["关", "", "", "", ""], ["开", "", "", "", ""]]
+    行英文: [["Off", "", "", "", ""], ["On", "", "", "", ""]]
 注意:
   - ["判异按实时使用的方式：每完成一组，用到此为止的各组计算控制限，从第 4 组开始检查。实际工厂用稳定时期的数据算出控制限后固定下来。", "Signals are judged as in real time: after each subgroup the limits use only the subgroups so far, from subgroup 4 on. A real plant fixes them from a stable period."]
   - ["模型与正文算例 39.6.2 相同，但随机数不同，具体件数会有差别。灌装线把同一过程换算成灌装量，结垢使灌装量逐渐变少。", "Same model as Example 39.6.2 but different random numbers, so counts differ. The filling line maps the same process to fill volume; scale makes the fill shrink."]

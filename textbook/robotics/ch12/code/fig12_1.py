@@ -9,7 +9,7 @@ import numpy as np
 
 from _fig12 import C, L, arc_arrow, arm_points, axes3d, draw_arm, equal3d, frame2d, frame3d, plane
 from _poe import Model
-from bookout import figure, style
+from bookout import T, figure, style
 
 plt = style()
 
@@ -36,7 +36,8 @@ ax.text(zero[1][0] + 0.17, zero[1][1] + 0.03, r"$\theta_2$", fontsize=12, color=
 r = L[1] + L[2]
 tt = np.linspace(0, t2, 40)
 ax.plot(zero[1][0] + r * np.cos(tt), zero[1][1] + r * np.sin(tt), color=C["accent"], lw=0.9, ls=":")
-ax.text(0.0, 0.33, "只转动关节 2：关节 2 以外的部分绕 $q_2$ 整体转动，关节 2 以内不动", fontsize=9.5, color=C["ink"])
+ax.text(0.0, 0.33, T("只转动关节 2：关节 2 以外的部分绕 $q_2$ 整体转动，关节 2 以内不动",
+                     "Only joint 2 turns: everything beyond joint 2 turns as one body about $q_2$; the rest stays put"), fontsize=9.5, color=C["ink"])
 figure(fig, "fig12_1_1")
 plt.close(fig)
 
@@ -55,15 +56,16 @@ for i, (name, kind, w, q, S) in enumerate(sc):
     ax.quiver(*(q - 0.08 * w), *(0.2 * w), color=cols[i], lw=2.2, arrow_length_ratio=0.25)
     ax.scatter(*q, color=C["ink"], s=14)
     tip = q + 0.14 * w
-    lab = {0: (0.02, 0.0, 0.0), 3: (0.0, 0.03, 0.06), 4: (0.02, 0.0, -0.03)}.get(i, (0.0, 0.0, 0.035))
-    ax.text(*(tip + np.array(lab)), f"轴{i + 1}", fontsize=10, color=cols[i], weight="bold")
-    qoff = {4: (0.03, 0.04, 0.02), 5: (0.03, 0.05, -0.05)}.get(i, (0.02, 0.05, -0.05))
+    lab = {0: (0.02, 0.0, 0.0), 3: (0.0, 0.03, 0.06), 4: (0.02, 0.0, -0.03), 5: (0.0, -0.07, 0.06)}.get(i, (0.0, 0.0, 0.035))
+    ax.text(*(tip + np.array(lab)), T(f"轴{i + 1}", f"axis {i + 1}"), fontsize=10, color=cols[i], weight="bold")
+    qoff = {4: (0.03, 0.04, 0.02), 5: (0.0, 0.09, 0.02)}.get(i, (0.02, 0.05, -0.05))
     ax.text(*(q + np.array(qoff)), f"$q_{i + 1}$", fontsize=10, color=C["ink"])
 frame3d(ax, np.eye(4), 0.15, "{s}")
 frame3d(ax, M, 0.1, "")
 ax.text(*(M[:3, 3] + np.array([0.0, -0.04, -0.09])), "{b}", fontsize=10)
 equal3d(ax, np.r_[P, [[0.1, 0.1, -0.02]]], pad=0.0)
 ax.set_box_aspect((1, 1, 1), zoom=1.35)
-ax.text2D(0.0, 0.02, "关节 2、3、4 的轴互相平行（沿 −y）；关节 1、5 的轴竖直；箭头为转轴正方向", transform=ax.transAxes, fontsize=9)
+ax.text2D(0.0, 0.02, T("关节 2、3、4 的轴互相平行（沿 −y）；关节 1、5 的轴竖直；箭头为转轴正方向",
+                        "Axes 2, 3, 4 are parallel (along −y); axes 1 and 5 are vertical; arrows show positive directions"), transform=ax.transAxes, fontsize=9)
 figure(fig, "fig12_1_2")
 plt.close(fig)

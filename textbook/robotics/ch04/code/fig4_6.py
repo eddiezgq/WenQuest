@@ -7,7 +7,7 @@ import math
 import numpy as np
 
 from _rot import C, rot_axis
-from bookout import figure, style
+from bookout import T, figure, style
 
 plt = style()
 w = np.ones(3) / math.sqrt(3)
@@ -16,20 +16,20 @@ r11 = [rot_axis(w, x)[0, 0] for x in t]
 q0 = np.cos(t / 2)
 
 fig, ax = plt.subplots(figsize=(6.0, 3.2))
-ax.plot(t / math.pi, r11, color=C["z"], lw=1.8, label=r"旋转矩阵元素 $r_{11}$")
-ax.plot(t / math.pi, q0, color=C["accent"], lw=1.8, label=r"四元数实部 $q_0=\cos(\theta/2)$")
+ax.plot(t / math.pi, r11, color=C["z"], lw=1.8, label=T(r"旋转矩阵元素 $r_{11}$", r"Rotation matrix entry $r_{11}$"))
+ax.plot(t / math.pi, q0, color=C["accent"], lw=1.8, label=T(r"四元数实部 $q_0=\cos(\theta/2)$", r"Real part of the quaternion $q_0=\cos(\theta/2)$"))
 ax.axhline(0, color=C["muted"], lw=0.6)
 for k in (2, 4):
     ax.axvline(k, color=C["muted"], lw=0.6, ls="--")
-ax.annotate("转一圈：R 复原，\nq 变为 −q", xy=(2, -1), xytext=(2.25, -0.6), fontsize=9,
+ax.annotate(T("转一圈：R 复原，\nq 变为 −q", "One turn: R is restored,\nq becomes −q"), xy=(2, -1), xytext=(0.3, -0.9), fontsize=9,
             arrowprops=dict(arrowstyle="->", color=C["muted"], lw=0.8))
-ax.annotate("转两圈：q 才复原", xy=(4, 1), xytext=(2.55, 0.72), fontsize=9,
+ax.annotate(T("转两圈：q 才复原", "After two turns q is restored"), xy=(4, 1), xytext=(2.3, 1.13), fontsize=9,
             arrowprops=dict(arrowstyle="->", color=C["muted"], lw=0.8))
 ax.set_xticks([0, 1, 2, 3, 4])
 ax.set_xticklabels(["0", "π", "2π", "3π", "4π"])
-ax.set_xlabel("转角 θ")
-ax.set_ylim(-1.15, 1.25)
-ax.legend(loc="lower left", fontsize=9, frameon=False)
+ax.set_xlabel(T("转角 θ", "Angle of rotation θ"))
+ax.set_ylim(-1.15, 1.35)
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2, fontsize=9, frameon=False)   # 图例放在图外下方，不挡注释箭头
 for s in ("top", "right"):
     ax.spines[s].set_visible(False)
 figure(fig, "fig4_6_1")

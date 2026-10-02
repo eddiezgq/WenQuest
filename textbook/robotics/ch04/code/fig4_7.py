@@ -8,7 +8,7 @@ import math
 import numpy as np
 
 from _rot import C, axes3d, rot_x, rot_y, rot_z
-from bookout import figure, style
+from bookout import T, figure, style
 
 plt = style()
 d = math.radians
@@ -44,27 +44,28 @@ E1 = np.array([d(90), d(45), d(90)])
 q0, q1 = q_from_R(np.eye(3)), q_from_R(zyx(*E1))
 N = 400
 ts = np.linspace(0, 1, N + 1)
-paths = {"欧拉角插值": [zyx(*(t * E1)) for t in ts],
-         "归一化线性插值": [R_from_q((1 - t) * q0 + t * q1) for t in ts],
-         "球面线性插值（Slerp）": [R_from_q(slerp(q0, q1, t)) for t in ts]}
-colors = {"欧拉角插值": C["x"], "归一化线性插值": C["z"], "球面线性插值（Slerp）": C["accent"]}
+paths = {T("欧拉角插值", "Euler-angle interpolation"): [zyx(*(t * E1)) for t in ts],
+         T("归一化线性插值", "Normalized linear interpolation (nlerp)"): [R_from_q((1 - t) * q0 + t * q1) for t in ts],
+         T("球面线性插值（Slerp）", "Spherical linear interpolation (Slerp)"): [R_from_q(slerp(q0, q1, t)) for t in ts]}
+colors = {T("欧拉角插值", "Euler-angle interpolation"): C["x"], T("归一化线性插值", "Normalized linear interpolation (nlerp)"): C["z"], T("球面线性插值（Slerp）", "Spherical linear interpolation (Slerp)"): C["accent"]}
 
 # ---------------------------------------------------------------- 图 4.7.1
 fig, ax = axes3d(plt, size=(5.0, 4.4), elev=24, azim=-40, lim=0.85, zoom=1.15, center=(0.2, 0.2, 0.3))
 u, v = np.mgrid[0:2 * np.pi:40j, 0:np.pi:20j]
 ax.plot_wireframe(np.cos(u) * np.sin(v), np.sin(u) * np.sin(v), np.cos(v), color="#c9d1d6", lw=0.3)
-for name in ("欧拉角插值", "球面线性插值（Slerp）"):
+for name in (T("欧拉角插值", "Euler-angle interpolation"), T("球面线性插值（Slerp）", "Spherical linear interpolation (Slerp)")):
     tip = np.array([R[:, 2] for R in paths[name]])
-    ax.plot(*tip.T, color=colors[name], lw=2.4, label=name)
+    shown = T("球面线性插值（Slerp）", "Geodesic (Slerp)") if name == T("球面线性插值（Slerp）", "Spherical linear interpolation (Slerp)") else name
+    ax.plot(*tip.T, color=colors[name], lw=2.4, label=shown)
     ticks = tip[::40]
     ax.scatter(*ticks.T, color=colors[name], s=10)
-a, b = paths["欧拉角插值"][0][:, 2], paths["欧拉角插值"][-1][:, 2]
+a, b = paths[T("欧拉角插值", "Euler-angle interpolation")][0][:, 2], paths[T("欧拉角插值", "Euler-angle interpolation")][-1][:, 2]
 ax.scatter(*a, color=C["ink"], s=30)
 ax.scatter(*b, color=C["ink"], s=30)
-ax.text(*(a * 1.12), "起点", fontsize=10)
-ax.text(*(b * 1.12), "终点", fontsize=10)
+ax.text(*(a * 1.12), T("起点", "Start"), fontsize=10)
+ax.text(*(b * 1.12), T("终点", "End"), fontsize=10)
 ax.legend(loc="upper left", fontsize=9, frameon=False)
-ax.text2D(0.02, 0.02, "圆点为等时间间隔的位置", transform=ax.transAxes, fontsize=9, color=C["muted"])
+ax.text2D(0.02, 0.02, T("圆点为等时间间隔的位置", "Dots mark positions at equal time intervals"), transform=ax.transAxes, fontsize=9, color=C["muted"])
 figure(fig, "fig4_7_1")
 plt.close(fig)
 
@@ -74,8 +75,8 @@ fig, ax = plt.subplots(figsize=(5.6, 3.2))
 for name, Rs in paths.items():
     sp = [angle_between(Rs[i], Rs[i + 1]) * N / theta for i in range(N)]
     ax.plot(ts[:-1] + 0.5 / N, sp, color=colors[name], lw=1.8, label=name)
-ax.set_xlabel("进程 t")
-ax.set_ylabel("角速度（以最短转法为 1）")
+ax.set_xlabel(T("进程 t", "Progress t"))
+ax.set_ylabel(T("角速度（以最短转法为 1）", "Angular velocity\n(mean on shortest path = 1)"))
 ax.set_ylim(0.7, 1.45)
 ax.legend(fontsize=9, frameon=False, loc="upper right")
 ax.grid(True, lw=0.3, alpha=0.5)

@@ -8,7 +8,7 @@
 import numpy as np
 
 from _meas import A2, D2, D3, D4, NOMINAL, SPEC_HI, SPEC_LO, bearing_seat
-from bookout import out
+from bookout import T, out
 
 # 39.6.1 保护带
 U = 0.0012
@@ -27,11 +27,11 @@ def signals(xbar, xbb, ucl, lcl):
     out = []
     for i in range(len(xbar)):
         if xbar[i] > ucl or xbar[i] < lcl:
-            out.append((i + 1, "一点越出控制限"))
+            out.append((i + 1, T("一点越出控制限", "one point beyond a control limit")))
         elif i >= 5 and (all(xbar[j] > xbar[j - 1] for j in range(i - 4, i + 1)) or all(xbar[j] < xbar[j - 1] for j in range(i - 4, i + 1))):
-            out.append((i + 1, "连续 6 点递增或递减"))
+            out.append((i + 1, T("连续 6 点递增或递减", "6 points in a row rising or falling")))
         elif i >= 8 and (all(v > xbb for v in xbar[i - 8:i + 1]) or all(v < xbb for v in xbar[i - 8:i + 1])):
-            out.append((i + 1, "连续 9 点在中心线同侧"))
+            out.append((i + 1, T("连续 9 点在中心线同侧", "9 points in a row on one side of the centre line")))
     return out
 
 
@@ -75,9 +75,9 @@ xbar2, R2, xbb2, Rbar2, ucl2, lcl2, _, _ = chart(x2)
 sig_w2, s_all2, cp2, ppk2, n_out2 = perf(x2, Rbar2)
 assert n_out2 < n_out and ppk2 > ppk
 
-out(on_g=on_g, on_part=on_g * 5, on_rule=on_rule, sig_w_clean_um=sig_w_clean * 1000, U=U, u_ratio=U / (SPEC_HI - SPEC_LO) * 100, n_guard=n_guard, rules="；".join(f"{g}:{r}" for g, r in sig), acc_lo=acc_lo, acc_hi=acc_hi, lo=SPEC_LO, hi=SPEC_HI, nominal=NOMINAL, xbb=xbb, Rbar_um=Rbar * 1000,
+out(on_g=on_g, on_part=on_g * 5, on_rule=on_rule, sig_w_clean_um=sig_w_clean * 1000, U=U, u_ratio=U / (SPEC_HI - SPEC_LO) * 100, n_guard=n_guard, rules=T("；", "; ").join(f"{g}:{r}" for g, r in sig), acc_lo=acc_lo, acc_hi=acc_hi, lo=SPEC_LO, hi=SPEC_HI, nominal=NOMINAL, xbb=xbb, Rbar_um=Rbar * 1000,
     ucl=ucl, lcl=lcl, r_ucl_um=r_ucl * 1000, sig_w_um=sig_w * 1000, s_all_um=s_all * 1000, cp=cp, ppk=ppk, n_out=n_out,
-    first_sig=sig[0][0], first_rule=sig[0][1], n_sig=len(sig), sig_groups="、".join(str(g) for g, _ in sig),
-    first_out=outs[0], outs="、".join(map(str, outs)), r_out=len(r_out),
+    first_sig=sig[0][0], first_rule=sig[0][1], n_sig=len(sig), sig_groups=T("、", ", ").join(str(g) for g, _ in sig),
+    first_out=outs[0], outs=T("、", ", ").join(map(str, outs)), r_out=len(r_out),
     n_out2=n_out2, ppk2=ppk2, s_all2_um=s_all2 * 1000, A2=A2, D4=D4, D2=D2,
     _xbar=xbar.tolist(), _R=R.tolist(), _x=x.tolist(), _xbar2=xbar2.tolist(), _lim=[xbb, ucl, lcl])

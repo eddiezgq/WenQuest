@@ -23,9 +23,12 @@
 数据表:
   - 标题: ["表 1  两次 90° 转动", "Table 1  Two 90° turns"]
     表头: ["做法", "按钮次序", "书脊方向（观察）", "旋转矩阵（读数）", "手算的乘积", "是否一致"]
+    表头英文: ["Method", "Button order", "Spine direction (observed)", "Rotation matrix (read)", "Product by hand", "Agree?"]
     行: [["A", "x_s → z_s", "", "", "", ""], ["B", "z_s → x_s", "", "", "", ""], ["自身轴", "z_b → x_b", "", "", "", ""]]
+    行英文: [["A", "x_s → z_s", "", "", "", ""], ["B", "z_s → x_s", "", "", "", ""], ["Body axes", "z_b → x_b", "", "", "", ""]]
   - 标题: ["表 2  自选的三次转动", "Table 2  Three turns of your choice"]
     表头: ["次序", "转动（轴与角）", "左乘还是右乘", "手算结果", "界面读数"]
+    表头英文: ["Order", "Turn (axis and angle)", "Left or right multiplication", "Result by hand", "Screen reading"]
     行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""]]
 注意:
   - ["每做一组之前先按“回到起始”，否则转动会叠加在上一次的结果上。", "Press “Back to start” before each run, or the turns pile up."]

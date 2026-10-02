@@ -17,9 +17,11 @@
 数据表:
   - 标题: ["表 1  逐步演示（θ = 30°, 45°, −90°）", "Table 1  Step by step (θ = 30°, 45°, −90°)"]
     表头: ["步", "空间形式：作用的指数", "空间形式：末端 / m", "物体形式：作用的指数", "物体形式：末端 / m"]
+    表头英文: ["Step", "Space form: exponential applied", "Space form: tool / m", "Body form: exponential applied", "Body form: tool / m"]
     行: [["1", "e^[S₃]θ₃", "", "e^[B₁]θ₁", ""], ["2", "e^[S₂]θ₂", "", "e^[B₂]θ₂", ""], ["3", "e^[S₁]θ₁", "", "e^[B₃]θ₃", ""]]
   - 标题: ["表 2  指数积与几何方法", "Table 2  PoE vs geometry"]
     表头: ["θ₁, θ₂, θ₃ / °", "指数积：x, y / m", "几何：x, y / m", "末端朝向 / °"]
+    表头英文: ["θ₁, θ₂, θ₃ / °", "PoE: x, y / m", "Geometry: x, y / m", "Tool heading / °"]
     行: [["30, 45, −90", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
 注意:
   - ["空间形式的中间步骤并不是机器人真实运动的过程，只是计算的次序；最终形态才有物理意义。", "The intermediate steps are an order of calculation, not the robot's real motion; only the final configuration is physical."]

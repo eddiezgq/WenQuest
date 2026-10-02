@@ -16,9 +16,12 @@
 数据表:
   - 标题: ["表 1  两种正确读法（θ = 30°, 45°, −90°）", "Table 1  The two correct readings (θ = 30°, 45°, −90°)"]
     表头: ["读法", "第 1 步绕的点", "第 1 步后关节 2 的中心 / m", "最终末端 / m"]
+    表头英文: ["Reading", "Point turned about in step 1", "Centre of joint 2 after step 1 / m", "Final tool position / m"]
     行: [["从外往里（0）", "q₃（零位）", "", ""], ["从里往外（1）", "q₁", "", ""]]
+    行英文: [["Outside in (0)", "q₃ (home)", "", ""], ["Inside out (1)", "q₁", "", ""]]
   - 标题: ["表 2  写反次序（读法 2）", "Table 2  Reversed order (reading 2)"]
     表头: ["θ₁, θ₂, θ₃ / °", "算出的末端 / m", "到原点的距离 / m", "正确的末端 / m"]
+    表头英文: ["θ₁, θ₂, θ₃ / °", "Computed tool position / m", "Distance from origin / m", "Correct tool position / m"]
     行: [["30, 45, −90", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
 注意:
   - ["写反次序时界面只画末端一段：错误公式只给出 M 被搬到哪里，手臂其余部分没有意义。", "In the reversed reading only the last link is drawn: the wrong formula only says where M goes."]

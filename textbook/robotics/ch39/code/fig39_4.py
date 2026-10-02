@@ -3,7 +3,7 @@ import math
 
 import numpy as np
 
-from bookout import COLORS as C, figure, style
+from bookout import COLORS as C, T, figure, style
 
 plt = style()
 fs = 1000.0
@@ -20,28 +20,28 @@ for k in range(1, x.size):
     y[k] = y[k - 1] + alpha * (x[k] - y[k - 1])
 
 fig, (a, b) = plt.subplots(1, 2, figsize=(10, 3.4), gridspec_kw={"width_ratios": [1.35, 1]})
-a.plot(t * 1e3, x, color=C["muted"], lw=0.6, label="原始读数")
-a.plot(t * 1e3, clean, color=C["ink"], lw=1, ls="--", label="真实的力")
-a.plot(t * 1e3, ma, color=C["z"], lw=1.8, label="滑动平均 N = 20")
-a.plot(t * 1e3, y, color=C["x"], lw=1.8, label="一阶低通 $f_c$ = 10 Hz")
-a.set_xlabel("时间 / ms")
-a.set_ylabel("力 / N")
+a.plot(t * 1e3, x, color=C["muted"], lw=0.6, label=T("原始读数", "Raw reading"))
+a.plot(t * 1e3, clean, color=C["ink"], lw=1, ls="--", label=T("真实的力", "True force"))
+a.plot(t * 1e3, ma, color=C["z"], lw=1.8, label=T("滑动平均 N = 20", "Moving average N = 20"))
+a.plot(t * 1e3, y, color=C["x"], lw=1.8, label=T("一阶低通 $f_c$ = 10 Hz", "First-order low-pass $f_c$ = 10 Hz"))
+a.set_xlabel(T("时间 / ms", "Time / ms"))
+a.set_ylabel(T("力 / N", "Force / N"))
 a.legend(fontsize=8.5, frameon=False, loc="lower right")
-a.set_title("(a) 滤波前后", fontsize=10.5)
+a.set_title(T("(a) 滤波前后", "(a) Before and after filtering"), fontsize=10.5)
 f = np.linspace(0.5, 200, 2000)
 w = np.pi * f / fs
 Hma = np.abs(np.sin(N * w) / (N * np.sin(w)))
 z = np.exp(1j * 2 * np.pi * f / fs)
 Hlp = np.abs(alpha / (1 - (1 - alpha) / z))
-b.semilogy(f, Hma, color=C["z"], lw=1.6, label="滑动平均 N = 20")
-b.semilogy(f, Hlp, color=C["x"], lw=1.6, label="一阶低通 $f_c$ = 10 Hz")
+b.semilogy(f, Hma, color=C["z"], lw=1.6, label=T("滑动平均 N = 20", "Moving average N = 20"))
+b.semilogy(f, Hlp, color=C["x"], lw=1.6, label=T("一阶低通 $f_c$ = 10 Hz", "First-order low-pass $f_c$ = 10 Hz"))
 b.axvline(50, color=C["accent"], lw=1, ls=":")
 b.text(52, 0.4, "50 Hz", color=C["accent"], fontsize=9)
 b.set_ylim(1e-3, 1.5)
-b.set_xlabel("频率 / Hz")
+b.set_xlabel(T("频率 / Hz", "Frequency / Hz"))
 b.set_ylabel("|H(f)|")
 b.legend(fontsize=8.5, frameon=False)
-b.set_title("(b) 幅频响应", fontsize=10.5)
+b.set_title(T("(b) 幅频响应", "(b) Magnitude response"), fontsize=10.5)
 for ax in (a, b):
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)

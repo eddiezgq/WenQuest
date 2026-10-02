@@ -17,10 +17,13 @@
 数据表:
   - 标题: ["表 1  UR5e：指数积与三维模型", "Table 1  UR5e: PoE vs 3D model"]
     表头: ["关节角 θ₁–θ₆ / °", "指数积 (x, y, z) / m", "模型 (x, y, z) / m", "差值 / m"]
+    表头英文: ["Joint angles θ₁–θ₆ / °", "PoE (x, y, z) / m", "Model (x, y, z) / m", "Difference / m"]
     行: [["30, −60, 90, −120, −90, 45", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
   - 标题: ["表 2  SCARA：手算与读数", "Table 2  SCARA: by hand and on screen"]
     表头: ["量", "手算", "指数积读数", "模型读数"]
+    表头英文: ["Quantity", "By hand", "PoE reading", "Model reading"]
     行: [["高度 z / m", "", "", ""], ["水平位置 (x, y) / m", "", "", ""], ["工具转向 / °", "", "", "—"]]
+    行英文: [["Height z / m", "", "", ""], ["Horizontal position (x, y) / m", "", "", ""], ["Tool heading / °", "", "", "—"]]
 注意:
   - ["UR5e 场景中“关节 3 下降量 d₃”不起作用；SCARA 场景中只用到关节 1、2、4 和 d₃。", "In the UR5e scene the SCARA drop d₃ has no effect; the SCARA scene uses joints 1, 2, 4 and d₃ only."]
   - ["差值以科学计数法显示，例如 4.4e-16 m 表示 4.4 × 10⁻¹⁶ m。", "The difference is shown in scientific notation: 4.4e-16 m means 4.4 × 10⁻¹⁶ m."]

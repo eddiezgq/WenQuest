@@ -8,7 +8,7 @@ SCARA：三个转动关节加一个移动关节。
 import numpy as np
 
 from _poe import Model, adjoint, clean, exp6, fk_body, fk_space, inv, screw_prismatic, screw_revolute
-from bookout import out, tex, vec
+from bookout import T as tr, out, tex, vec
 
 rng = np.random.default_rng(12)
 
@@ -89,7 +89,8 @@ for _ in range(N):
 assert err_sc < 1e-6
 qs = np.array([np.radians(40), np.radians(-70), 0.12, np.radians(90)])
 Tsc = fk_space(Ss, Ms, qs)
-sc_rows = r" \\ ".join(f"{i} & {'移动' if k == 'prismatic' else '转动'} & {vec(clean(w), 3)} & {vec(clean(qq), 3)} & {vec(clean(s), 3)}"
+word_p, word_r = tr("移动", r"\text{prismatic}"), tr("转动", r"\text{revolute}")
+sc_rows = r" \\ ".join(f"{i} & {word_p if k == 'prismatic' else word_r} & {vec(clean(w), 3)} & {vec(clean(qq), 3)} & {vec(clean(s), 3)}"
                        for i, (_, k, w, qq, s) in enumerate(sc.screws(), 1))
 
 out(N=N, err_p=err_p, err_R=err_R, T=tex(clean(T, 1e-9), 4), px=T[0, 3], py=T[1, 3], pz=T[2, 3],

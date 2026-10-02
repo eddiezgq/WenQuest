@@ -8,7 +8,7 @@ import math
 import numpy as np
 
 from _rot import C, rot_axis, rot_x, rot_y, rot_z
-from bookout import figure, style
+from bookout import T, figure, style
 
 plt = style()
 d = math.radians
@@ -21,10 +21,10 @@ def ring(ax, a, b, radius, color, lw=3.0):
     ax.plot(*P, color=color, lw=lw)
 
 
-def axis_line(ax, v, length, color, label, at=1.08):
+def axis_line(ax, v, length, color, label, at=1.08, shift=(0, 0, 0)):
     v = np.asarray(v, float)
     ax.plot(*np.array([-length * v, length * v]).T, color=color, lw=1.2, ls="--")
-    ax.text(*(v * length * at), label, color=color, fontsize=10)
+    ax.text(*(v * length * at + np.asarray(shift, float)), label, color=color, fontsize=10)
 
 
 def gimbal(ax, psi, theta, phi, title):
@@ -39,14 +39,17 @@ def gimbal(ax, psi, theta, phi, title):
     ring(ax, y_o, z, 1.0, C["z"], 3.2)          # 外环：在 y_o–z 平面内（含外环轴 z）
     ring(ax, x_m, y_o, 0.8, C["y"], 3.0)        # 中环：在 x_m–y_o 平面内（含中环轴 y_o）
     ring(ax, x_m, z_i, 0.6, C["x"], 3.0)      # 内环：在 x_m–z_i 平面内（含内环轴 x_m）
-    axis_line(ax, z, 1.25, C["z"], "外环轴")
-    axis_line(ax, y_o, 1.18, C["y"], "中环轴")
-    axis_line(ax, x_m, 0.95, C["x"], "内环轴", at=1.2)
+    axis_line(ax, z, 1.25, C["z"], T("外环轴", "outer ring axis"))
+    axis_line(ax, y_o, 1.18, C["y"], T("中环轴", "middle ring axis"))
+    if abs(x_m @ z) > 0.99:                     # 万向节锁：内环轴与外环轴共线，标签移到下端，免得与外环轴标签重叠
+        axis_line(ax, x_m, 0.95, C["x"], T("内环轴", "inner ring axis"), at=-1.25 * np.sign(x_m @ z), shift=0.08 * y_o)
+    else:
+        axis_line(ax, x_m, 0.95, C["x"], T("内环轴", "inner ring axis"), at=1.2)
     ax.set_title(title, fontsize=10.5)
 
 
 fig = plt.figure(figsize=(8.4, 4.2))
-for k, (mid, title) in enumerate(((d(-30), "正常：三根转轴各不相同"), (d(-90), "万向节锁：内环轴转到与外环轴重合"))):
+for k, (mid, title) in enumerate(((d(-30), T("正常：三根转轴各不相同", "Normal: three distinct axes")), (d(-90), T("万向节锁：内环轴转到与外环轴重合", "Gimbal lock: inner and outer ring axes line up")))):
     ax = fig.add_subplot(1, 2, k + 1, projection="3d")
     ax.set_proj_type("ortho")
     ax.view_init(elev=32, azim=-30)
@@ -75,9 +78,9 @@ jumps = [abs(math.degrees(yaw_of(rot_axis([1, 0, 0], d(0.1)) @ zyx(d(10), d(p), 
 fig, ax = plt.subplots(figsize=(5.2, 3.2))
 ax.semilogy(pitches, jumps, color=C["x"], lw=1.6)
 ax.axhline(0.1, color=C["muted"], lw=0.8, ls="--")
-ax.text(80.2, 0.13, "姿态本身只变了 0.1°", fontsize=9.5, color=C["muted"])
-ax.set_xlabel("俯仰角 θ（°）")
-ax.set_ylabel("偏航角的跳变（°）")
+ax.text(80.2, 0.13, T("姿态本身只变了 0.1°", "The orientation itself changes by only 0.1°"), fontsize=9.5, color=C["muted"])
+ax.set_xlabel(T("俯仰角 θ（°）", "Pitch angle θ (°)"))
+ax.set_ylabel(T("偏航角的跳变（°）", "Jump in yaw angle (°)"))
 ax.grid(True, lw=0.3, alpha=0.5)
 for s in ("top", "right"):
     ax.spines[s].set_visible(False)

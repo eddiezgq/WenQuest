@@ -13,9 +13,11 @@
 数据表:
   - 标题: ["表 1  滑动平均", "Table 1  Moving average"]
     表头: ["N", "残余波动 / N", "延迟 / ms"]
+    表头英文: ["N", "Residual ripple / N", "Delay / ms"]
     行: [["5", "", ""], ["10", "", ""], ["15", "", ""], ["20", "", ""], ["25", "", ""], ["40", "", ""]]
   - 标题: ["表 2  一阶低通", "Table 2  First-order low-pass"]
     表头: ["f_c / Hz", "α", "残余波动 / N", "延迟 / ms"]
+    表头英文: ["f_c / Hz", "α", "Residual ripple / N", "Delay / ms"]
     行: [["50", "", "", ""], ["30", "", "", ""], ["15", "", "", ""], ["10", "", "", ""], ["5", "", "", ""], ["2", "", "", ""]]
 注意:
   - ["残余波动取 0.35 s 以后（力已稳定）滤波输出与真实值之差的标准差；延迟取上升段到达 15 N 的时间差。", "Ripple is the standard deviation of output minus true force after 0.35 s; delay is the time lag at 15 N on the rise."]

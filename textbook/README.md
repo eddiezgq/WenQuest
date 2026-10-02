@@ -85,3 +85,13 @@ python3 textbook/tools/build.py robotics --only 4.1
 **任何错误都会让构建失败，推送后 CI 也会跑同样的检查。**
 
 **提纲改了以后**，运行 `python3 textbook/tools/outline.py robotics` 重新生成 `book.yaml`。
+
+## 英文版（第 8 轮）
+
+- 每节的英文版写在中文旁边：`NN-M.en.md`，开头 `id` 与中文相同、`title` 为英文。一章的英文章名、各章状态写在 `robotics/progress.yaml`。
+- 结构与中文一一对应（构建检查）：公式编号、`::: Figure / Program / Animation / Lab / Table`（键名 `caption:`、`figure:`、`src:`）、`**Definition / Theorem / Lemma / Corollary / Example x.y.z**`、习题编号、小节编号、占位符。引用写 Eq. (x.y.z)、Figure、Example、Section x.y、Chapter n。
+- 加粗术语必须是术语表 English 列里的名称；中文加粗的术语，英文也要加粗对应的名称。英文正文里不能留中文。
+- 示意图和程序交给正文的文字用 `bookout.T("中文", "English")`；构建时每个程序再以英文运行一次（`WQ_LANG=en`），图存到 `figs/en/`，数字必须与中文运行相同。
+- 正文列出的程序要有英文注释的副本 `code/en/同名.py`，只许改注释和文档字符串。
+- 实验说明 yaml 的数据表有中文时，加 `表头英文`、`行英文`，用来生成英文的实验指导书和报告模板。
+- 翻译时可先用 `python3 tools/check_en.py robotics/chNN/NN-M.en.md` 快速检查一节。

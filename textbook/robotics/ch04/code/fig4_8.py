@@ -8,7 +8,7 @@ import math
 import numpy as np
 
 from _rot import C, rot_axis, skew
-from bookout import figure, style
+from bookout import T, figure, style
 
 plt = style()
 
@@ -36,11 +36,11 @@ for k in range(1, steps + 1):
         b.append(np.abs(R2.T @ R2 - np.eye(3)).max())
         c.append(np.abs(R3.T @ R3 - np.eye(3)).max())
 fig, ax = plt.subplots(figsize=(5.8, 3.3))
-ax.semilogy(ts, a, color=C["x"], lw=1.8, label="一阶近似更新，式 (4.8.6)")
-ax.semilogy(ts, np.maximum(b, 1e-17), color=C["z"], lw=1.8, label="罗德里格斯公式精确更新")
-ax.semilogy(ts, np.maximum(c, 1e-17), color=C["accent"], lw=1.8, label="一阶更新 + 每 0.1 s 正交化")
-ax.set_xlabel("时间（s），每 1 ms 更新一次")
-ax.set_ylabel(r"$R^{\mathsf{T}}R$ 偏离 $I$ 的最大值")
+ax.semilogy(ts, a, color=C["x"], lw=1.8, label=T("一阶近似更新，式 (4.8.6)", "First-order update, Eq. (4.8.6)"))
+ax.semilogy(ts, np.maximum(b, 1e-17), color=C["z"], lw=1.8, label=T("罗德里格斯公式精确更新", "Exact update by Rodrigues' formula"))
+ax.semilogy(ts, np.maximum(c, 1e-17), color=C["accent"], lw=1.8, label=T("一阶更新 + 每 0.1 s 正交化", "First-order update + orthonormalization every 0.1 s"))
+ax.set_xlabel(T("时间（s），每 1 ms 更新一次", "Time (s), updated every 1 ms"))
+ax.set_ylabel(T(r"$R^{\mathsf{T}}R$ 偏离 $I$ 的最大值", r"Largest deviation of $R^{\mathsf{T}}R$ from $I$"))
 ax.legend(fontsize=8.5, frameon=False, loc="center right")
 ax.grid(True, lw=0.3, alpha=0.5)
 for s in ("top", "right"):
@@ -61,8 +61,8 @@ S = np.array([x[k], y[k]])
 G = np.array([0.95, -0.35 * 0.95 ** 2])
 ax.plot(*np.array([M, S]).T, color=C["accent"], lw=1.4)
 ax.plot(*np.array([M, G]).T, color=C["muted"], lw=1.2, ls="--")
-for p, label, col, dx, dy in ((M, "M（带误差）", C["ink"], 0.06, 0.03), (S, "奇异值分解法", C["accent"], -0.95, -0.2),
-                              (G, "格拉姆-施密特法", C["muted"], 0.08, 0.06)):
+for p, label, col, dx, dy in ((M, T("M（带误差）", "M (with error)"), C["ink"], 0.06, 0.03), (S, T("奇异值分解法", "SVD method"), C["accent"], -0.95, -0.2),
+                              (G, T("格拉姆-施密特法", "Gram–Schmidt process"), C["muted"], 0.08, 0.06)):
     ax.plot(*p, "o", color=col, ms=6)
     ax.text(p[0] + dx, p[1] + dy, label, fontsize=10, color=col)
 ax.set_xlim(-1.7, 1.9)

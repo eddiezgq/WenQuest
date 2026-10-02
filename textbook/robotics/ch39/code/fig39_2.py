@@ -11,7 +11,7 @@ import schemdraw
 import schemdraw.elements as elm
 
 from _meas import V_EX, bridge_full, bridge_half, bridge_quarter
-from bookout import COLORS as C, figure, style
+from bookout import COLORS as C, T, figure, style
 
 plt = style()
 schemdraw.config(fontsize=12, lw=1.4, font="Noto Sans CJK SC")
@@ -42,24 +42,24 @@ with schemdraw.Drawing(show=False) as d:
     d.add(elm.Dot().at((W, H / 2)).label("$V_p$", loc="right"))
     d.add(elm.Gap().at((2, H / 2)).to((W, H / 2)).label(["−", "$V_o$", "+"]))
     schem_to_ax(d, a1)
-a1.set_title("(a) 惠斯通电桥", fontsize=11)
+a1.set_title(T("(a) 惠斯通电桥", "(a) Wheatstone bridge"), fontsize=11)
 
 eps = np.linspace(0, 1500e-6, 200)
-a2.plot(eps * 1e6, bridge_full(eps) * 1e3, color=C["z"], lw=2, label="全桥 $V_{ex}K\\varepsilon$")
-a2.plot(eps * 1e6, bridge_half(eps) * 1e3, color=C["y"], lw=2, label="半桥 $V_{ex}K\\varepsilon/2$")
-a2.plot(eps * 1e6, bridge_quarter(eps) * 1e3, color=C["x"], lw=2, label="单臂电桥（精确）")
-a2.plot(eps * 1e6, V_EX * 2 * eps / 4 * 1e3, color=C["x"], lw=1, ls="--", label="单臂电桥（线性近似）")
-a2.set_xlabel("应变 ε / µε")
-a2.set_ylabel("电桥输出 $V_o$ / mV")
+a2.plot(eps * 1e6, bridge_full(eps) * 1e3, color=C["z"], lw=2, label=T("全桥 $V_{ex}K\\varepsilon$", "Full bridge $V_{ex}K\\varepsilon$"))
+a2.plot(eps * 1e6, bridge_half(eps) * 1e3, color=C["y"], lw=2, label=T("半桥 $V_{ex}K\\varepsilon/2$", "Half bridge $V_{ex}K\\varepsilon/2$"))
+a2.plot(eps * 1e6, bridge_quarter(eps) * 1e3, color=C["x"], lw=2, label=T("单臂电桥（精确）", "Quarter bridge (exact)"))
+a2.plot(eps * 1e6, V_EX * 2 * eps / 4 * 1e3, color=C["x"], lw=1, ls="--", label=T("单臂电桥（线性近似）", "Quarter bridge (linear approx.)"))
+a2.set_xlabel(T("应变 ε / µε", "Strain ε / µε"))
+a2.set_ylabel(T("电桥输出 $V_o$ / mV", "Bridge output $V_o$ / mV"))
 a2.legend(fontsize=8.5, frameon=False)
 for s in ("top", "right"):
     a2.spines[s].set_visible(False)
 ins = a2.inset_axes([0.62, 0.12, 0.34, 0.3])
 e2 = np.linspace(0, 1500e-6, 50)
 ins.plot(e2 * 1e6, (V_EX * 2 * e2 / 4 - bridge_quarter(e2)) * 1e6, color=C["x"], lw=1.2)
-ins.set_title("单臂：近似 − 精确 / µV", fontsize=7.5)
+ins.set_title(T("单臂：近似 − 精确 / µV", "Quarter: approx. − exact / µV"), fontsize=7.5)
 ins.tick_params(labelsize=7)
-a2.set_title("(b) 三种接法的输出（5 V 激励，K = 2）", fontsize=11)
+a2.set_title(T("(b) 三种接法的输出（5 V 激励，K = 2）", "(b) Output of the three configurations (5 V excitation, K = 2)"), fontsize=11)
 fig.tight_layout()
 figure(fig, "fig39_2_1")
 plt.close(fig)
@@ -85,10 +85,10 @@ with schemdraw.Drawing(show=False) as d:
     d.add(elm.Resistor().at((xr, n1[1])).to((xr, n2[1])).label("$R_g$", loc="bot"))
     y1, y2 = n1[1] - 0.7, n2[1] + 0.7
     d.add(elm.Line().at((xr, n1[1])).to((xr, y1)))
-    d.add(elm.Resistor().at((xr, y1)).to((q1[0], y1)).label("R", loc="bot"))
+    d.add(elm.Resistor().at((xr, y1)).to((q1[0], y1)).label("$R$", loc="bot"))
     d.add(elm.Line().at((q1[0], y1)).to(q1))
     d.add(elm.Line().at((xr, n2[1])).to((xr, y2)))
-    d.add(elm.Resistor().at((xr, y2)).to((q2[0], y2)).label("R"))
+    d.add(elm.Resistor().at((xr, y2)).to((q2[0], y2)).label("$R$"))
     d.add(elm.Line().at((q2[0], y2)).to(q2))
     o3 = d.add(elm.Opamp(leads=True).right().at((q1[0] + 5.2, (q1[1] + q2[1]) / 2)).anchor("out").label("$A_3$", loc="center", ofst=(-0.35, 0)))
     m3, p3, q3 = P(o3.in1), P(o3.in2), P(o3.out)
@@ -96,7 +96,7 @@ with schemdraw.Drawing(show=False) as d:
     d.add(elm.Resistor().at(q1).to((xa, q1[1])).label("$R_1$"))
     d.add(elm.Line().at((xa, q1[1])).to((xa, m3[1])))
     d.add(elm.Line().at((xa, m3[1])).to(m3))
-    d.add(elm.Resistor().at(q2).to((xa, q2[1])).label("$R_1$", loc="bot"))
+    d.add(elm.Resistor().at(q2).to((xa, q2[1])).label("$R_1$"))
     d.add(elm.Line().at((xa, q2[1])).to((xa, p3[1])))
     d.add(elm.Line().at((xa, p3[1])).to(p3))
     d.add(elm.Resistor().at((xa, q2[1])).to((xa, q2[1] - 1.6)).label("$R_1$", loc="bot"))
@@ -108,6 +108,6 @@ with schemdraw.Drawing(show=False) as d:
     for q in ((xr, n1[1]), (xr, n2[1]), (xa, q2[1])):
         d.add(elm.Dot().at(q))
     schem_to_ax(d, ax)
-ax.text(0.0, -0.06, "输入级：$V_{o2} - V_{o1} = (V_p - V_m)(1 + 2R/R_g)$，共模电压不被放大；差分级：输出两个输入之差", transform=ax.transAxes, fontsize=9)
+ax.text(0.0, -0.06, T("输入级：$V_{o2} - V_{o1} = (V_p - V_m)(1 + 2R/R_g)$，共模电压不被放大；差分级：输出两个输入之差", "Input stage: $V_{o2} - V_{o1} = (V_p - V_m)(1 + 2R/R_g)$, common-mode voltage not amplified; difference stage: outputs the difference of its two inputs"), transform=ax.transAxes, fontsize=9)
 figure(fig, "fig39_2_2")
 plt.close(fig)

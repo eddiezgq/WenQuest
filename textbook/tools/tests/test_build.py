@@ -71,7 +71,8 @@ def test_placeholders_programs_formulas_numbering_references_terms(book):
 
 def test_a_failing_program_stops_the_build(book):
     p = book / "ch04" / "code" / "ex4_1_1.py"
-    p.write_text(p.read_text(encoding="utf-8").replace("theta = math.radians(30)", "theta = math.radians(31)"), encoding="utf-8")
+    for q in (p, p.parent / "en" / p.name):          # the English copy must stay the same code
+        q.write_text(q.read_text(encoding="utf-8").replace("theta = math.radians(30)", "theta = math.radians(31)"), encoding="utf-8")
     edit(book, "R(30^\\circ) = \\begin{pmatrix}", "R(30^\\circ) = \\begin{pmatrix}")   # text unchanged
     rep = run(book)
     # the program's own checks still hold at 31°, so it runs; the numbers in the book follow it automatically

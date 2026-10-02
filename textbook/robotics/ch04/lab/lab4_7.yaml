@@ -20,10 +20,13 @@
 数据表:
   - 标题: ["表 1  路径长度比较", "Table 1  Path lengths"]
     表头: ["终止姿态 (ψ, θ, φ) / °", "最短转角 / °", "欧拉角插值路径 / °", "Slerp 路径 / °", "欧拉角路径 ÷ 最短"]
+    表头英文: ["End orientation (ψ, θ, φ) / °", "Shortest angle / °", "Euler-angle interpolation path / °", "Slerp path / °", "Euler-angle path ÷ shortest"]
     行: [["(90, 45, 90)", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]]
   - 标题: ["表 2  q 与 −q 的选择（相机云台）", "Table 2  Choosing q or −q (camera gimbal)"]
     表头: ["是否做最短路径处理", "q_A·q_B", "Slerp 转过的角度 / °", "最短转角 / °"]
+    表头英文: ["Shortest-path handling?", "q_A·q_B", "Angle turned by Slerp / °", "Shortest angle / °"]
     行: [["做", "", "", ""], ["不做", "", "", ""]]
+    行英文: [["Yes", "", "", ""], ["No", "", "", ""]]
 注意:
   - ["“路径长度”指末端姿态实际转过的总角度，不是三个欧拉角变化量之和。", "“Path length” is the total angle the tool actually turns, not the sum of the three Euler-angle changes."]
   - ["每次改变终止姿态后，先按“重置”再“播放”。", "After changing the end attitude, press “Reset” before “Play”."]

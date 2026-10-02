@@ -826,7 +826,11 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                     rep.add("error", "实验", sec.id + "（英文版）", f"Lab {no}：{why}")
                 if bad:
                     continue
-                m = labdocs.meta(script)
+                try:
+                    m = labdocs.meta(script)
+                except ValueError as e:
+                    rep.add("error", "实验", sec.id + "（英文版）", f"Lab {no}：{e}")
+                    continue
                 where = (f"{book.get('title_en') or book['title']}, Section {sec.id}",) * 2
                 stem = f"lab{no.replace('.', '_')}"
                 labdocs.guide_en(m, g, lab_dir / f"{stem}-guide.en.docx", no, where[0])

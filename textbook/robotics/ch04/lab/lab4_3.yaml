@@ -22,9 +22,12 @@
 数据表:
   - 标题: ["表 1  两步转动的结果", "Table 1  Result of two turns"]
     表头: ["量", "凭观察找到", "按式 (4.3.2) 计算", "算例 4.3.1", "差值"]
+    表头英文: ["Quantity", "Found by eye", "Computed with Eq. (4.3.2)", "Example 4.3.1", "Difference"]
     行: [["转角 θ / °", "", "", "", ""], ["转轴方位角 / °", "", "—", "", ""], ["转轴仰角 / °", "", "—", "", ""], ["目标 R 的迹", "—", "", "", ""]]
+    行英文: [["Angle θ / °", "", "", "", ""], ["Axis azimuth / °", "", "—", "", ""], ["Axis elevation / °", "", "—", "", ""], ["Trace of target R", "—", "", "", ""]]
   - 标题: ["表 2  转了半圈", "Table 2  Half a turn"]
     表头: ["转轴", "方位角 / °", "仰角 / °", "转角 / °", "与目标相差 / °"]
+    表头英文: ["Axis", "Azimuth / °", "Elevation / °", "Angle / °", "Off the target / °"]
     行: [["(0.6, 0.8, 0)", "", "", "", ""], ["(−0.6, −0.8, 0)", "", "", "", ""]]
 注意:
   - ["计算 arccos 前，先确认 (tr R − 1)/2 在 [−1, 1] 内；数值误差可能使它略超出。", "Before arccos, make sure (tr R − 1)/2 lies in [−1, 1]; rounding can push it outside."]
