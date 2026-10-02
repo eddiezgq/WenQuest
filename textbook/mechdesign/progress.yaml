@@ -1,0 +1,14 @@
+# 各章状态与英文标题（第 8 轮 2.1、2.2；本书第 11 轮）。
+# status：draft 草稿 / ai AI 审稿 / first 初审 / team 团队审阅 / final 定稿。没写的章不列。
+parts_en:
+  导论: Introduction
+  第一篇 设计方法与工程表达: "Part I  Design Methods and Engineering Communication"
+  第二篇 强度、刚度与失效: "Part II  Strength, Stiffness and Failure"
+  第三篇 机构分析与设计: "Part III  Analysis and Design of Mechanisms"
+  第四篇 连接与弹性元件: "Part IV  Joints and Elastic Elements"
+  第五篇 机械传动: "Part V  Mechanical Drives"
+  第六篇 轴系、支承与运动部件: "Part VI  Shafts, Bearings and Motion Components"
+  第七篇 现代设计方法与数字化: "Part VII  Modern Design Methods and the Digital Thread"
+  第八篇 机器人与智能装备的机械设计: "Part VIII  Mechanical Design of Robots and Intelligent Equipment"
+  第九篇 综合设计: "Part IX  Integrated Design Projects"
+chapters: {}
