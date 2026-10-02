@@ -61,10 +61,11 @@ jobs:
       - name: Textbook build and checks (programs, numbers, formulas, references, terms)
         working-directory: textbook/tools
         run: |
+          set -o pipefail
           npm ci --no-audit --no-fund
-          pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 pytest httpx fastapi pydantic
-          python -m pytest -q tests
-          for b in ../*/book.yaml; do b=$(basename "$(dirname "$b")"); echo "== $b"; python build.py "$b" --pdf --labs; done
+          pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 jsonschema pytest httpx fastapi pydantic
+          python -m pytest -q tests 2>&1 | tee /tmp/pytest.log || { grep -E "^(FAILED|E  )" /tmp/pytest.log | head -20 | sed 's/^/::error::/'; exit 1; }
+          for b in ../*/book.yaml; do b=$(basename "$(dirname "$b")"); echo "== $b"; python build.py "$b" --pdf --labs 2>&1 | tee /tmp/build.log || { grep "✗" /tmp/build.log | head -20 | sed "s/^/::error::$b /"; exit 1; }; done
       - name: Keep the built textbooks for the deploy
         uses: actions/upload-artifact@v4
         with:
