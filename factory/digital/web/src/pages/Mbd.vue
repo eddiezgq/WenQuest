@@ -29,6 +29,16 @@
         <div v-if="info" class="small ok">{{ info.bodies.length }} 个构件 · {{ info.joints.length }} 个可驱动关节 · 总质量 {{ info.total_mass_kg.toFixed(2) }} kg</div>
 
         <template v-if="info">
+          <div class="ai-box">
+            <textarea v-model="aiText" rows="2" maxlength="500" :placeholder="aiHint"></textarea>
+            <div class="line"><button class="btn" :disabled="aiBusy || !aiText.trim()" @click="aiFill">{{ aiBusy ? 'AI 正在理解…' : 'AI 填表' }}</button>
+              <span class="small muted">AI 只填下面的表，你确认后再计算</span></div>
+            <div v-if="aiRes" class="small">
+              <div v-for="n in aiRes.notes" :key="n">✓ {{ n }}</div>
+              <div v-for="n in aiRes.unmatched" :key="n" class="warnline">？没看懂：“{{ n }}”——请手动补上</div>
+              <div v-if="aiRes.note" class="muted">{{ aiRes.note }}</div>
+            </div>
+          </div>
           <div class="step"><b>2</b> 驱动 <span class="muted small">{{ src === 'mech' ? '主动件：' + jlabel(driver) : '每个关节一行；“自由”= 不驱动' }}</span></div>
           <div v-for="j in driveJoints" :key="j.name" class="jrow">
             <div class="jname">{{ jlabel(j.name) }}<span class="muted small"> {{ j.type === 'hinge' ? '转动' : '移动' }}</span></div>
@@ -124,6 +134,15 @@
               <td class="num">{{ d.peak.toFixed(2) }} {{ tu(d.joint) }}</td><td class="num">{{ d.rms.toFixed(2) }}</td>
               <td class="num">{{ spd(d) }}</td><td class="num">{{ d.power_peak.toFixed(1) }}</td><td class="num">{{ d.power_mean.toFixed(1) }}</td></tr></tbody>
           </table>
+          <div class="ai-exp">
+            <div class="line"><b>AI 解释与建议</b>
+              <button class="btn ghost small-btn" :disabled="expBusy" @click="explain">{{ expBusy ? 'AI 正在分析…' : (exp ? '重新分析' : '请 AI 解释结果') }}</button></div>
+            <template v-if="exp">
+              <p v-for="(l, i) in exp.text.split('\n')" :key="i" class="exp-p">{{ l }}</p>
+              <div class="line"><button v-for="a in exp.actions" :key="a.label" class="btn primary small-btn" @click="act(a)">{{ a.label }}</button></div>
+              <div class="small muted">{{ exp.engine === 'rules' ? '规则分析' : exp.engine === 'saved' ? '上次的分析' : 'AI 模型分析' }}，仅供参考；会写进报告。</div>
+            </template>
+          </div>
           <div v-if="feaMembers.length" class="line small">
             <span class="muted">把杆件受力最大的时刻送去有限元：</span>
             <router-link v-for="m in feaMembers" :key="m" class="btn ghost small-btn" :to="{ path: '/cae', query: { mbd: job.id, member: m } }">{{ jlabel(m) }} →</router-link>
@@ -316,6 +335,7 @@ async function showResult(j) {
     s['power.' + d.joint] = p;
   }
   series.value = s; result.value = { stats: j.stats, anim: a }; time.value = 0; motors.value = null;
+  exp.value = j.ai_text ? { text: j.ai_text, actions: [], engine: 'saved' } : null;
 }
 async function openJob(j) {
   err.value = '';
@@ -337,6 +357,64 @@ async function openJob(j) {
   } catch (e) { err.value = e.message; }
 }
 function backToSetup() { result.value = null; job.value = null; playing.value = false; }
+
+// ---- AI（第 5 步）
+const aiText = ref(''), aiBusy = ref(false), aiRes = ref(null);
+const aiHint = computed(() => (driver.value
+  ? '例如：曲柄 60 rpm 匀速转，滑块上有 200 N 阻力，仿真 3 秒'
+  : '例如：底座转 90°，大臂抬 30°，1.5 秒，末端带 3 kg'));
+function aiModel() {
+  const m = mechs.value.find((x) => x.id === ref_.value?.id);
+  return { kind: ref_.value?.source === 'mech' ? 'mech' : ref_.value?.source === 'library' ? 'robot' : 'upload',
+    joints: info.value.joints.map((j) => j.name), driver: driver.value, labels: labels.value,
+    followers: driver.value ? info.value.joints.map((j) => j.name).filter((n) => n !== driver.value) : [],
+    bodies: info.value.bodies.map((b) => b.name), end_body: endBody.value, mech: m?.name };
+}
+async function aiFill() {
+  aiBusy.value = true; err.value = '';
+  try {
+    const r = await post('/mbd/ai-setup', { text: aiText.value, model: aiModel() });
+    aiRes.value = r;
+    for (const [jn, d] of Object.entries(r.drives || {})) {
+      const row = dv.value[jn]; if (!row) continue;
+      row.kind = d.kind || row.kind;
+      if (d.speed != null) row.speed = d.speed;
+      if (d.to != null) row.to = d.rel ? +(row.init + d.to).toFixed(2) : d.to;
+      if (d.t0 != null) row.t0 = d.t0;
+      if (d.t1 != null) row.t1 = d.t1;
+      if (d.amp != null) row.amp = d.amp;
+      if (d.freq != null) row.freq = d.freq;
+      if (d.torque != null) row.torque = d.torque;
+    }
+    if (r.duration) {
+      duration.value = r.duration;
+      for (const [jn, row] of Object.entries(dv.value)) if (row.kind === 'move' && !(r.drives || {})[jn]?.t1) { row.t0 = 0.1; row.t1 = Math.max(0.2, r.duration - 0.2); }
+    }
+    if (r.gravity != null) gravity.value = r.gravity;
+    if (r.payloads?.length) payloads.value = r.payloads.map((p) => ({ body: p.body, mass: p.mass, y: p.y || 0 }));
+    if (r.forces?.length) forces.value = r.forces.map((f) => ({ body: f.body, fx: f.fx || 0, fz: f.fz || 0 }));
+    for (const [jn, v] of Object.entries(r.loads || {})) loads.value[jn] = v;
+  } catch (e) { err.value = e.message; } finally { aiBusy.value = false; }
+}
+const exp = ref(null), expBusy = ref(false);
+async function explain() {
+  expBusy.value = true; err.value = '';
+  const jb = new Set((info.value?.joints || []).map((j) => j.body));
+  const fixed = (info.value?.bodies || []).filter((b) => b.parent === 'world' && !jb.has(b.name)).map((b) => b.name);
+  try { exp.value = await post(`/mbd/jobs/${encodeURIComponent(job.value.id)}/explain`, { labels: labels.value, fixed_bodies: fixed }); }
+  catch (e) { err.value = e.message; } finally { expBusy.value = false; }
+}
+async function act(a) {
+  if (a.kind !== 'retime') return;
+  const s = JSON.parse(JSON.stringify(job.value.setup));
+  let end = s.duration_s;
+  for (const d of s.drives) if (d.kind === 'move') { d.t1 = d.t0 + (d.t1 - d.t0) * a.factor; end = Math.max(end, d.t1 + 0.3); }
+  s.duration_s = +end.toFixed(2);
+  try {
+    job.value = await post('/mbd/jobs', { model: job.value.model, setup: s, title: `${job.value.title}（运动时间 ×${a.factor}）`, item: job.value.item });
+    result.value = null; exp.value = null; poll(); loadJobs();
+  } catch (e) { err.value = e.message; }
+}
 
 // ---- 送去有限元、电机选型（第 4 步）
 const feaMembers = computed(() => (ref_.value?.source === 'mech' ? mechs.value.find((m) => m.id === ref_.value.id)?.fea_members || [] : []));
@@ -486,6 +564,11 @@ select { height: 26px; border: 1px solid #C8CEC7; border-radius: 5px; }
 .player { display: flex; align-items: center; gap: 10px; }
 .player input[type=range] { flex: 1; }
 .sum { margin-top: 4px; }
+.ai-box { display: flex; flex-direction: column; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+.ai-box textarea { border: 1px solid #C8CEC7; border-radius: 6px; padding: 6px 8px; resize: vertical; }
+.warnline { color: var(--warn-ink); }
+.ai-exp { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.exp-p { margin: 2px 0; line-height: 1.7; }
 .motor { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 .motor .line { align-items: center; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }

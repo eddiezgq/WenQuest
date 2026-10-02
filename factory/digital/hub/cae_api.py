@@ -179,6 +179,30 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
         mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
         return call("GET", "/mbd/jobs/{}/motors".format(urllib.parse.quote(jid)), params={"safety": safety}).json()
 
+    @app.post("/api/mbd/ai-setup")
+    def mbd_ai_setup(body: dict = Body(...), u=Depends(user_of)):
+        """一句话设置（动力学）：只填表。body = {text, model: {kind, joints, driver, labels, followers, bodies, end_body}}"""
+        from hub import mbd_ai
+        model = body.get("model") or {}
+        if not model.get("joints"):
+            raise HTTPException(400, "请先读入模型")
+        _ai_quota(u)
+        try:
+            return mbd_ai.setup(H.ai.llm if H.ai else None, body.get("text"), model)
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+
+    @app.post("/api/mbd/jobs/{jid}/explain")
+    def mbd_explain(jid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        from hub import mbd_ai
+        j = mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        if j["status"] != "done":
+            raise HTTPException(409, "结果还没出来")
+        _ai_quota(u)
+        r = mbd_ai.explain(H.ai.llm if H.ai else None, j, body.get("labels") or {}, set(body.get("fixed_bodies") or []))
+        call("POST", "/jobs/{}/note".format(urllib.parse.quote(jid)), json={"ai_text": r["text"]})
+        return r
+
     @app.post("/api/mbd/jobs/{jid}/report")
     def mbd_report(jid: str, body: dict = Body(default={}), u=Depends(user_of)):
         mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
