@@ -37,6 +37,7 @@ from hub import design as design_web  # noqa: E402
 from hub import erp_sso  # noqa: E402
 from hub import plm  # noqa: E402
 from hub import process  # noqa: E402
+from hub import cards as proc_cards  # noqa: E402
 from hub import spc  # noqa: E402
 from hub import configurator  # noqa: E402
 from hub.ai import Assistant, ROLE_NAMES  # noqa: E402
@@ -958,6 +959,47 @@ def process_get(sid: str, u=Depends(user_of)):
     if not s or s["mode"] != u["mode"]:
         raise HTTPException(404, "没有这次提交")
     return s
+
+
+def _cards_response(plan: dict, fmt: str):
+    """全套工艺文件（第 13 轮 N2）：HTML 直接看、用浏览器打印成 PDF；fmt=docx 下载可编辑的 Word。"""
+    if not plan.get("operations") or not plan.get("doc"):
+        raise HTTPException(400, "这份工艺规程还不是数据格式 v2（缺 doc 或 operations），生成不了卡片")
+    try:
+        if fmt == "docx":
+            import tempfile
+            with tempfile.TemporaryDirectory() as d:
+                path = proc_cards.docx(plan, os.path.join(d, "cards.docx"))
+                data = path.read_bytes()
+            name = urllib.parse.quote(f"{plan.get('item', 'part')}_工艺文件.docx")
+            return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                            headers={"Content-Disposition": f"attachment; filename*=UTF-8''{name}"})
+        return Response(proc_cards.html(plan), media_type="text/html; charset=utf-8")
+    except (KeyError, TypeError, ValueError, StopIteration) as e:
+        raise HTTPException(400, f"工艺规程数据不完整，生成卡片失败：{e!r}")
+
+
+@app.get("/api/process/cards/reference/{item}")
+def process_cards_reference(item: str, fmt: str = "html", u=Depends(user_of)):
+    """参照工艺规程（std/<零件>_process.yaml）的全套卡片：教材第 50 章的样例就是它。"""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "std", f"{item}_process.yaml")
+    if item not in F.ITEMS or not os.path.exists(path):
+        raise HTTPException(404, "这个零件没有参照工艺规程")
+    return _cards_response(proc_cards.load(path), fmt)
+
+
+@app.post("/api/process/cards")
+def process_cards_preview(plan: dict = Body(...), fmt: str = "html", u=Depends(user_of)):
+    """工艺员边写边看卡片（不提交）。"""
+    return _cards_response(plan, fmt)
+
+
+@app.get("/api/process/submissions/{sid}/cards")
+def process_cards_submission(sid: str, fmt: str = "html", u=Depends(user_of)):
+    s = process.get(H.db, sid)
+    if not s or s["mode"] != u["mode"]:
+        raise HTTPException(404, "没有这次提交")
+    return _cards_response(s["plan"], fmt)
 
 
 @app.post("/api/process/submissions/{sid}/comments/{cid}")
