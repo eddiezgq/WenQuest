@@ -218,7 +218,7 @@ jobs:
       - name: Copy the textbooks (read by the gateway from /opt/wenquest/textbook)
         if: env.SKIP != '1'
         run: |
-          books=$(ls textbook-build)
+          books=$(ls textbook-build | tr "\n" " ")   # one line: the list goes into the remote command (several books since 第 10 轮)
           du -sh textbook-build/* || true
           if ! tar czf - -C textbook-build . | ssh "deploy@$HOST" "set -e; mkdir -p /opt/wenquest/textbook; cd /opt/wenquest/textbook; for b in $books; do rm -rf \"\$b\"; done; tar xzf -"; then
             ssh "deploy@$HOST" 'df -h / /opt 2>&1 | tail -n 3; ls -la /opt/wenquest/textbook 2>&1 | head -n 8' | sed 's/^/::error::/' || true
