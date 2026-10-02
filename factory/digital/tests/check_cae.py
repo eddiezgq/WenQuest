@@ -7,10 +7,14 @@ import math
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--hub", default="http://localhost:8100")
+ap.add_argument("--erp", default="", help="给了就核对 ERPNext 物料上附了数控程序（第 13 轮）")
+ap.add_argument("--erp-key", default="")
+ap.add_argument("--erp-secret", default="")
 A = ap.parse_args()
 
 
@@ -80,13 +84,39 @@ spec = call("POST", "/api/cam/spec", {"item": "SH-301", "seq": 20}, token=tok)
 assert spec["mode"] == "rough" and spec["cut"]["ap"] == 2.5
 j = call("POST", "/api/cam/jobs", {"spec": spec, "title": "演练"}, token=tok)
 assert j["status"] == "done", j.get("error")
+n_rough = len(j["programs"])
 for k, p in enumerate(j["programs"]):
     assert not [c for c in p["checks"] if c["level"] == "error"], p["checks"]
     assert abs(p["sim"]["dev_min"]) <= 0.01 and p["sim"]["dev_max"] <= 0.01
     assert call("GET", "/api/cam/jobs/{}/{}.nc".format(j["id"], k), token=tok, raw=True).startswith(b"%\nO")
+# 下发：挂到工艺规程粗车工序 → 提交 → 另一个人批准 → 程序随工艺规程生效下发（design.gcode → ERPNext 附件、派工、3D 回放）
+r = call("POST", "/api/cam/jobs/{}/submit".format(j["id"]), {"note": "演练"}, token=tok)
+assert r["status"] == "pending", r
+boss = call("POST", "/api/login", {"name": "演练老师", "role": "manager", "mode": "teach"})["token"]
+for c in r["comments"]:
+    call("POST", "/api/process/submissions/{}/comments/{}".format(r["submission"], c["id"]), {"resolved": True}, token=boss)
+a = call("POST", "/api/process/submissions/{}/decision".format(r["submission"]), {"decision": "approve", "note": "演练"}, token=boss)
+assert a["status"] == "approved" and a["programs_released"] == 2, a
+gc = [g for g in call("GET", "/api/design/SH-301", token=tok)["gcode"] if g.get("process_revision") == a["revision"]]
+assert sorted(g["program"] for g in gc) == [1201, 1202] and all(g["machine"] == "cnc-l01-a" for g in gc), gc
+if A.erp:
+    import base64
+    hdr = {"Authorization": "token {}:{}".format(A.erp_key, A.erp_secret)}
+    t0 = time.time()
+    names = []
+    while time.time() - t0 < 60:
+        q = urllib.request.Request(A.erp + "/api/resource/File?fields=" + urllib.parse.quote('["file_name"]') + "&filters="
+                                   + urllib.parse.quote('[["attached_to_name","=","SH-301"]]') + "&limit_page_length=500", headers=hdr)
+        names = [f["file_name"] for f in json.loads(urllib.request.urlopen(q, timeout=30).read().decode())["data"]]
+        if any("O1201" in n for n in names) and any("O1202" in n for n in names):
+            break
+        time.sleep(2)
+    assert any("O1201" in n for n in names) and any("O1202" in n for n in names), names[-6:]
+    print("ERPNext：SH-301 附上了粗车程序 O1201、O1202")
+print("数控程序随工艺规程第 {} 版生效下发：{} 个".format(a["revision"], a["programs_released"]))
 ex = call("POST", "/api/cam/examples/WQ-PLATE", token=tok)
 spec = call("POST", "/api/cam/spec/geometry", {"sha": ex["sha"], "kind": "mill", "material": "6061", "name": "WQ-PLATE"}, token=tok)
 j = call("POST", "/api/cam/jobs", {"spec": spec, "title": "演练"}, token=tok)
 assert j["status"] == "done" and j["programs"][0]["sim"]["over"] == 0, j.get("error") or j["programs"][0]["checks"]
 assert len(call("GET", "/api/cam/jobs/{}/h0.bin".format(j["id"]), token=tok, raw=True)) == 4 * j["programs"][0]["sim"]["nx"] * j["programs"][0]["sim"]["ny"]
-print("数控编程演练通过：SH-301 粗车 {} 个程序，平板铣削 {:.1f} 分钟".format(len(j["programs"]), j["compare"]["program_minutes"]))
+print("数控编程演练通过：SH-301 粗车 {} 个程序，平板铣削 {:.1f} 分钟".format(n_rough, j["compare"]["program_minutes"]))

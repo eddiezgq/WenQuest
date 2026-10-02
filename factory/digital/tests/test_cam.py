@@ -412,3 +412,67 @@ def test_hub_cam_api(tmp_path, monkeypatch):
         sp = c.post("/api/cam/spec/geometry", json={"sha": ex["sha"]}, headers=hd).json()
         assert sp["kind"] == "mill25" and sp["recognized"] == {"turn": False, "mill": True}
         assert c.post("/api/cam/spec", json={"item": "SH-301", "seq": 30}, headers=hd).status_code == 400   # 调质不用编程
+
+
+# ---------------------------------------------------------------- 第 4 步：挂到工艺规程、审批生效、下发
+@pytest.fixture()
+def camdb():
+    import os
+    psycopg = pytest.importorskip("psycopg")
+    dsn = os.environ.get("WQ_TEST_DB", "postgresql://postgres@localhost:5433/wq_test").rsplit("/", 1)[0] + "/wq_cam_test"
+    try:
+        with psycopg.connect(dsn.rsplit("/", 1)[0] + "/postgres", autocommit=True) as c:
+            c.execute("drop database if exists wq_cam_test with (force)")
+            c.execute("create database wq_cam_test")
+    except psycopg.OperationalError:
+        pytest.skip("没有可用的 PostgreSQL")
+    from hub.db import DB
+    d = DB(dsn)
+    d.init()
+    return d
+
+
+def test_programs_ride_on_process_approval(camdb, plan, shaft):
+    import wqbus
+    from hub import cam_api, plm, process
+    from hub.mes import MES
+    db = camdb
+    out = []
+
+    def emit(tp, type_, data):
+        msg = wqbus.make(type_, "plm", data, mode="teach")            # 按总线规范校验
+        db.insert_message(tp, msg)
+        out.append(msg)
+
+    design = cam.design_profile(shaft[0]["segments"], shaft[0]["chamfer"])
+    spec = J.plan_turn(plan, 20, design, 1)
+    spec["cut"]["vc"] = 130.0                                          # 编程时把切削速度从 120 改成 130
+    progs = J.generate(spec)
+    texts = [p.pop("gcode") for p in progs]
+    for p in progs:
+        p["sim"].pop("_H", None)
+    job = {"id": "20261002-cam-test", "spec": spec, "programs": progs, "compare": spec["compare"]}
+    newplan, note = cam_api.attach_to_plan(db, plm.store, "teach", job, texts)
+    rough = next(o for o in newplan["operations"] if o["seq"] == 20)
+    assert [p["number"] for p in rough["programs"]] == [1201, 1202] and rough["cut"]["vc_m_min"] == 130
+    assert "vc_m_min 120 → 130" in note and "O1201、O1202" in note
+    assert plm.load_file(db, rough["programs"][0]["url"]).decode("utf-8") == texts[0]
+    s = process.submit(db, emit, "teach", "学生甲", "u1", newplan, note)
+    assert s["status"] == "pending"
+    assert cam_api.release_programs(db, emit, s) == 0                  # 没批准不下发
+    for c in s["comments"]:
+        process.resolve(db, s["id"], c["id"])
+    a = process.approve(db, emit, s["id"], "老师", "同意", approver_uid="t1")
+    assert cam_api.release_programs(db, emit, a) == 2
+    g = [m["data"] for m in out if m["type"] == "design.gcode"]
+    assert [x["program"] for x in g] == [1201, 1202] and g[0]["machine"] == "cnc-l01-a" and g[0]["process_revision"] == 1
+    # MES 派工：粗车两个程序随工序发给机床；铣键槽没有程序
+    sent = []
+    mes = MES(db, lambda tp, t, src, data, corr, mode: sent.append(data))
+    db.insert_message("wq/gearbox/office/erp/doc", wqbus.make("erp.doc", "bridge", {
+        "doctype": "Work Order", "name": "MFG-WO-C1", "action": "submitted", "production_item": "SH-301", "qty": 5,
+        "docstatus": 1, "status": "Not Started"}, mode="teach"))
+    mes.release("MFG-WO-C1", "teach", "老师")
+    d20 = next(d for d in sent if d["operation"].startswith("粗车"))
+    assert d20["gcode_ref"] == g[0]["gcode_ref"] and d20["gcode_refs"] == [x["gcode_ref"] for x in g]
+    assert next(d for d in sent if d["operation"].startswith("铣键槽"))["gcode_ref"] is None

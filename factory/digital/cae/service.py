@@ -790,3 +790,12 @@ def cam_height(jid: str, k: int):
 def cam_machines():
     from cae.cam_post import MACHINES
     return {"machines": MACHINES}
+
+
+@app.post("/cam/jobs/{jid}/submission")
+def cam_submission(jid: str, body: dict = Body(...)):
+    """记下这次编程挂到了哪次工艺规程提交（网页再打开时接着看审批）"""
+    p = _job_path(jid.replace("/", ""), "job.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个任务")
+    return _public(_update(jid.replace("/", ""), submission=str(body.get("submission") or "")[:40]))

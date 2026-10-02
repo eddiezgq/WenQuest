@@ -123,7 +123,7 @@ const rt = ref(null);
 const code = ref('');
 const alerts = ref([]);
 const teachStatus = ref(null);
-const g = computed(() => d.value.gcode[0]);
+const g = computed(() => d.value.gcode.find((x) => (x.operation || '').startsWith('铣键槽')) || null);   // 第 13 轮起还有车削等工序的程序
 const drawing = computed(() => {
   const f = d.value.releases[0]?.files?.find((x) => x.kind === 'drawing');
   return f ? f.url : null;

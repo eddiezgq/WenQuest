@@ -227,3 +227,96 @@ def mount(app, H, user_of, who, uid_of, is_teacher):
     def cam_height(jid: str, k: int, u=Depends(user_of)):
         mine(u, call("GET", "/jobs/{}".format(jid)).json())
         return Response(call("GET", "/cam/jobs/{}/h{}.bin".format(jid, k)).content, media_type="application/octet-stream")
+
+
+# ---------------------------------------------------------------- 下发（C8）：程序挂到工艺规程的工序上，走工艺规程审批
+CUT_KEYS = {"vc": "vc_m_min", "f": "f_mm_r", "ap": "ap_mm"}
+
+
+def attach_to_plan(db, store, mode, job, nc_texts):
+    """把一次编程的程序挂到工艺规程这道工序上，返回 (新的工艺规程, 提交说明)。
+    切削参数改过的，写回这道工序的 cut（程序和工艺规程保持一致），说明里列出改了什么。"""
+    spec = job["spec"]
+    op_ref = spec.get("op") or {}
+    item = spec.get("item")
+    plan, src, prev = plan_for(db, mode, item)
+    if not plan:
+        raise ValueError("{} 没有工艺规程".format(item))
+    plan = __import__("copy").deepcopy(plan)
+    op = next((o for o in plan.get("operations", []) if int(o["seq"]) == int(op_ref.get("seq", -1))), None)
+    if not op:
+        raise ValueError("工艺规程里没有工序 {}".format(op_ref.get("seq")))
+    from cae import cam_post
+    m = cam_post.machine_of(op.get("workstation")) or spec["machine"]
+    progs = []
+    for k, (p, text) in enumerate(zip(job["programs"], nc_texts)):
+        f = store(db, "{}-OP{}-O{:04d}.nc".format(item, op["seq"], int(p["number"])), "text/plain", text.encode("utf-8"))
+        progs.append({"number": int(p["number"]), "setup": p.get("setup"), "title": p.get("title"), "url": f["url"], "sha256": f["sha256"],
+                      "machine": m, "est_time_s": round(p["time"]["total_s"], 1), "lines": p.get("lines"), "cam_job": job["id"],
+                      "design_revision": spec.get("revision")})
+    op["programs"] = progs
+    notes = ["数控程序：工序 {} {}，{} 个程序（{}），合计 {} 分（工艺规程工时 {} 分）".format(
+        op["seq"], op["operation"], len(progs), "、".join("O{:04d}".format(p["number"]) for p in progs),
+        (job.get("compare") or {}).get("program_minutes"), op.get("minutes"))]
+    cut = op.get("cut")
+    if spec.get("kind") == "turn" and cut:
+        diff = []
+        for k, key in CUT_KEYS.items():
+            v = spec["cut"].get(k)
+            if key in cut and v is not None and abs(float(cut[key]) - float(v)) > 1e-9:
+                diff.append("{} {} → {}".format(key, cut[key], v))
+                cut[key] = v
+        if diff:
+            notes.append("编程时改了切削参数，已写回工序：" + "，".join(diff))
+    if src.startswith("教材样例"):
+        notes.append("以教材样例工艺规程为底稿（本厂还没有生效的工艺规程）")
+    return plan, "；".join(notes)
+
+
+def release_programs(db, emit, sub):
+    """工艺规程批准生效后：每个挂了程序的工序，每个程序发一条 design.gcode（ERPNext 附到物料上；MES 派工时随工序发给机床；3D 车间回放）"""
+    from hub import plm
+    if sub.get("status") != "approved":
+        return 0
+    n = 0
+    item = sub["item"]
+    for o in sub["plan"].get("operations", []):
+        for p in o.get("programs") or []:
+            emit("wq/gearbox/design/{}/gcode".format(item.lower()), "design.gcode", {
+                "item": item, "revision": int(p.get("design_revision") or 1), "operation": o["operation"],
+                "machine": plm.machine_for(o["operation"]) or str(p["machine"]).lower(), "gcode_ref": p["url"], "gcode_url": p["url"], "sha256": p.get("sha256"),
+                "est_time_s": p.get("est_time_s"), "program": p["number"], "setup": p.get("setup"),
+                "process_revision": sub.get("revision"), "source": "数控编程"})
+            n += 1
+    return n
+
+
+def mount_release(app, H, user_of, who, uid_of, is_teacher, emit_as, can_submit):
+    from hub import plm, process
+
+    @app.post("/api/cam/jobs/{jid}/submit")
+    def cam_submit_plan(jid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        """程序挂到工艺规程工序上，提交工艺规程审批（教学、生产模式都进待审）"""
+        can_submit(u)
+        j = call("GET", "/jobs/{}".format(jid)).json()
+        if j.get("factory") != FACTORY_ID or j.get("kind") != "cam":
+            raise HTTPException(404, "没有这个编程记录")
+        if not is_teacher(u) and str(j.get("owner")) != uid_of(u):
+            raise HTTPException(403, "只能提交自己的程序")
+        if j["status"] != "done":
+            raise HTTPException(409, "程序没有生成成功")
+        if not (j.get("spec") or {}).get("op"):
+            raise HTTPException(400, "这次编程不是从工艺规程的工序出发的（示例或上传的零件），不能挂到工艺规程上")
+        errs = [c for p in j["programs"] for c in p["checks"] if c["level"] == "error"]
+        if errs:
+            raise HTTPException(409, "检查还有 {} 个错误（{}），改好再提交".format(len(errs), errs[0]["text"]))
+        texts = [call("GET", "/cam/jobs/{}/{}.nc".format(jid, k)).text for k in range(len(j["programs"]))]
+        try:
+            plan, note = attach_to_plan(H.db, plm.store, u["mode"], j, texts)
+            extra = (body.get("note") or "").strip()[:200]
+            s = process.submit(H.db, emit_as(u), u["mode"], who(u), uid_of(u), plan, (note + ("；" + extra if extra else ""))[:500])
+        except (ValueError, KeyError) as e:
+            raise HTTPException(400, str(e)) from None
+        call("POST", "/cam/jobs/{}/submission".format(jid), json={"submission": s["id"]})
+        return {"submission": s["id"], "status": s["status"], "note": s["note"],
+                "comments": s["comments"], "review": s.get("review")}

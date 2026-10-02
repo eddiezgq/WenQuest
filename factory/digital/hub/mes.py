@@ -32,16 +32,34 @@ class MES:
             self.publish(unit_topic(unit, "cmd"), "machine.cmd", "mes/" + user,
                          {"command": "dispatch", "work_order": name, "operation": op, "qty": int(float(wo["qty"])),
                           "item": item, "routing": [list(x) for x in ops], "std_min": mins,
-                          "gcode_ref": self.gcode_ref(item, op)}, name, mode)
+                          "gcode_ref": self.gcode_ref(item, op), **self._more_programs(item, op)}, name, mode)
             sent.append({"operation": op, "unit": unit, "name": UNITS[unit][1]})
         return sent
 
     def gcode_ref(self, item, op):
+        """这道工序的数控程序：数控编程随工艺规程下发的（第 13 轮，按工序名找；一道工序两次装夹就有两个程序），
+        没有时铣键槽沿用设计发布带的键槽程序"""
+        refs = self.gcode_refs(item, op)
+        return refs[0] if refs else None
+
+    def _more_programs(self, item, op):
+        refs = self.gcode_refs(item, op)
+        return {"gcode_refs": refs} if len(refs) > 1 else {}
+
+    def gcode_refs(self, item, op):
+        rows = self.db.q("select payload from bus_message where type='design.gcode' and payload->'data'->>'item'=%s "
+                         "and payload->'data'->>'operation'=%s order by ts desc limit 20", (item, op))
+        if rows:
+            d0 = rows[0]["payload"]["data"]
+            if d0.get("process_revision") is not None:
+                same = [r["payload"]["data"] for r in rows if r["payload"]["data"].get("process_revision") == d0["process_revision"]]
+                return [d["gcode_ref"] for d in sorted(same, key=lambda d: d.get("program") or 0)]
+            return [d0["gcode_ref"]]
         if not op.startswith("铣键槽"):
-            return None
+            return []
         r = self.db.one("select payload from bus_message where type='design.gcode' and payload->'data'->>'item'=%s "
-                        "order by ts desc limit 1", (item,))
-        return r["payload"]["data"]["gcode_ref"] if r else None
+                        "and coalesce(payload->'data'->>'operation', '铣键槽') like '铣键槽%%' order by ts desc limit 1", (item,))
+        return [r["payload"]["data"]["gcode_ref"]] if r else []
 
     def command(self, unit, command, mode, user, work_order=None, operation=None, **extra):
         if unit == "sim":

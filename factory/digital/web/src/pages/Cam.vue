@@ -124,6 +124,32 @@
             <div v-for="(c, i) in prog.checks" :key="i" class="small" :class="c.level === 'error' ? 'err' : 'warnline'">
               {{ c.level === 'error' ? '✗' : '!' }} <a v-if="c.line" href="#" @click.prevent="jump(c.line)">第 {{ c.line }} 行</a> {{ c.text }}</div>
           </div>
+          <div v-if="job.spec?.op" class="release">
+            <div><b>下发</b> <span class="small muted">程序挂到工艺规程工序 {{ job.spec.op.seq }} 上，走工艺规程的“提交 → 审批 → 生效”；生效后 ERPNext 物料附上程序，车间派工时随这道工序发给机床，3D 车间可以回放。</span></div>
+            <template v-if="!sub">
+              <div class="line"><input v-model.trim="subNote" class="full grow1" maxlength="200" placeholder="提交说明（可不填）">
+                <button class="btn primary" :disabled="subBusy || hasErrors" @click="submitPlan">{{ subBusy ? '正在提交…' : '挂到工艺规程并提交审批' }}</button></div>
+              <div v-if="hasErrors" class="small err">检查还有错误，改好再提交。</div>
+              <div v-if="err" class="small err">{{ err }}</div>
+            </template>
+            <template v-else>
+              <div class="line small"><span class="pill" :class="SUB_TONE[sub.status]">{{ SUB_NAME[sub.status] }}</span>
+                <span>{{ sub.note }}</span></div>
+              <div v-for="c in sub.comments" :key="c.id" class="cmt small">
+                <label><input type="checkbox" :checked="c.resolved" :disabled="sub.status !== 'pending'" @change="resolve(c, $event.target.checked)"> 已处理</label>
+                <span><b>{{ c.author }}</b>：{{ c.body }}</span></div>
+              <template v-if="sub.status === 'pending' && canApprove">
+                <div class="line"><input v-model.trim="decisionNote" class="full grow1" maxlength="200" placeholder="审批意见（退回时必填）">
+                  <button class="btn primary" :disabled="subBusy" @click="decide('approve')">批准生效</button>
+                  <button class="btn ghost" :disabled="subBusy" @click="decide('reject')">退回</button></div>
+              </template>
+              <div v-else-if="sub.status === 'pending'" class="small muted">等老师或审批人批准（不能批准自己的提交）。</div>
+              <div v-if="sub.status === 'approved'" class="okline small">✓ 已生效：工艺规程第 {{ sub.revision }} 版{{ released !== null ? '，这一版挂着的 ' + released + ' 个程序已下发' : '' }}。
+                <router-link :to="{ path: '/3d', query: { unit: job.spec.kind === 'turn' ? 'cnc-l01-a' : 'key-01' } }">到 3D 车间回放 →</router-link></div>
+              <div v-if="sub.status === 'rejected'" class="small err">退回：{{ sub.decision }}——改好后重新生成、再提交。</div>
+              <div v-if="err" class="small err">{{ err }}</div>
+            </template>
+          </div>
           <div class="gcode">
             <div class="small muted">G 代码（回放时高亮当前行；点一行跳到那里）</div>
             <pre ref="pre" class="mono small"><span v-for="(l, i) in ncLines" :key="i" :class="{ cur: i + 1 === curLine }" @click="jump(i + 1)">{{ String(i + 1).padStart(4, ' ') }}  {{ l }}</span></pre>
@@ -179,6 +205,11 @@ const busy = ref(false), generating = ref(false), err = ref('');
 const job = ref(null), jobs = ref([]), pk = ref(0), nc = ref(''), final = ref(null);
 const time = ref(0), playing = ref(false), speed = ref(20);
 const pre = ref(null);
+const SUB_NAME = { pending: '待审', approved: '已生效', rejected: '已退回' };
+const SUB_TONE = { pending: 'info', approved: 'good', rejected: 'bad' };
+const sub = ref(null), subNote = ref(''), subBusy = ref(false), decisionNote = ref(''), released = ref(null);
+const canApprove = computed(() => !!session.user?.teacher || ['approver', 'manager'].includes(session.user?.role));
+const hasErrors = computed(() => (job.value?.programs || []).some((p) => p.checks.some((c) => c.level === 'error')));
 let raf = 0;
 
 const prog = computed(() => job.value?.programs?.[pk.value] || null);
@@ -299,6 +330,30 @@ function download() {
   a.download = `O${prog.value.number}-${job.value.item || 'program'}.nc`;
   document.body.appendChild(a); a.click(); a.remove();
 }
+async function loadSub() {
+  sub.value = null; released.value = null;
+  if (job.value?.submission) {
+    try { sub.value = await get('/process/submissions/' + job.value.submission); } catch (e) { /* 别的模式的提交 */ }
+  }
+}
+watch(job, loadSub);
+async function submitPlan() {
+  subBusy.value = true; err.value = '';
+  try {
+    const r = await post(`/cam/jobs/${job.value.id}/submit`, { note: subNote.value });
+    job.value = { ...job.value, submission: r.submission };
+  } catch (e) { err.value = e.message; } finally { subBusy.value = false; }
+}
+async function resolve(c, v) {
+  try { sub.value = await post(`/process/submissions/${sub.value.id}/comments/${c.id}`, { resolved: v }); } catch (e) { err.value = e.message; }
+}
+async function decide(d) {
+  subBusy.value = true; err.value = '';
+  try {
+    const r = await post(`/process/submissions/${sub.value.id}/decision`, { decision: d, note: decisionNote.value });
+    sub.value = r; released.value = r.programs_released ?? null;
+  } catch (e) { err.value = e.message; } finally { subBusy.value = false; }
+}
 async function loadJobs() { try { jobs.value = (await get('/cam/jobs')).jobs; } catch (e) { /* */ } }
 
 onMounted(async () => {
@@ -354,6 +409,9 @@ select { height: 26px; border: 1px solid #C8CEC7; border-radius: 5px; }
 .checks { display: flex; flex-direction: column; gap: 2px; }
 .okline { color: var(--good, #1B5E20); }
 .warnline { color: var(--warn-ink); }
+.release { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: var(--surface-2); }
+.cmt { display: flex; gap: 8px; align-items: flex-start; }
+.cmt label { white-space: nowrap; }
 .gcode pre { max-height: 300px; overflow: auto; background: #1E2420; color: #D8E0D8; border-radius: 8px; padding: 8px; margin: 4px 0 0; line-height: 1.45; }
 .gcode pre span { cursor: pointer; display: block; white-space: pre; }
 .gcode pre span.cur { background: #3D5A40; color: #fff; }
