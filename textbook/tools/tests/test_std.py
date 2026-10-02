@@ -1,12 +1,15 @@
 """第 13 轮第 4 步：数字化工艺数据表（自洽、公式、抽查值）与工艺计算书（完整、出处、Word）。"""
 import math
+import sys
 from pathlib import Path
 
 import pytest
 import yaml
 
-import calcsheet
 import stdtab
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "mfgtech" / "conventions"))
+import mfgcalc  # noqa: E402
 
 STD = Path(__file__).resolve().parents[2] / "mfgtech" / "std"
 
@@ -83,20 +86,22 @@ def test_insert_designation_covers_the_common_codes():
 
 
 def test_a_calculation_sheet_cites_its_tables_and_exports_to_word(tmp_path):
-    s = calcsheet.Sheet("SH-301 轴承位精车工序公差", part="SH-301", author="测试")
-    s.given("d", "轴承位直径", 35, "mm")
-    s.find("精车工序尺寸公差")
-    it7 = s.lookup("IT7", "it_grades", dict(size_over_mm__lt=35, size_to_mm__ge=35), "IT7_um", "μm")
-    s.step("精车工序公差取 IT7", "T_3", it7 / 1000, "mm")
-    s.check("磨削余量大于精车公差", 0.3 > it7 / 1000, "0.3 > 0.025")
-    s.conclude("精车工序尺寸公差 0.025 mm")
-    assert it7 == 25 and s.missing() == [] and s.failed == []
-    assert any("GB/T 1800.1-2020" in c for c in s.citations)
-    p = s.docx(tmp_path / "c.docx")
+    """The process calculation sheet is the shared CalcSheet (《机械设计》); a value looked up in a table carries its
+    standard and data source into the sheet, and missing() lists what an incomplete sheet lacks."""
+    cs = mfgcalc.CalcSheet("SH-301 轴承位精车工序公差", item="SH-301", author="测试")
+    cs.given("d", 35, "mm", "轴承位直径")
+    cs.find("T_3", "精车工序尺寸公差")
+    it7 = mfgcalc.lookup(cs, "IT7", "it_grades", dict(size_over_mm__lt=35, size_to_mm__ge=35), "IT7_um", "μm", "精车公差等级 IT7")
+    cs.step("T_3", "T_3 = IT7", it7 / 1000, "mm", "精车工序公差")
+    cs.check("Z_4", 0.3, ">", it7 / 1000, "磨削余量大于精车公差")
+    assert it7 == 25 and mfgcalc.missing(cs) == [] and cs.ok
+    assert any("GB/T 1800.1-2020" in s for s in cs.sources)
+    p = cs.docx(str(tmp_path / "c.docx"))
     from docx import Document
-    text = "\n".join(x.text for x in Document(p).paragraphs)
-    for w in ("工艺计算书", "已知", "计算", "校核", "结论", "数据出处", "GB/T 1800.1-2020"):
+    d = Document(p)
+    text = "\n".join([x.text for x in d.paragraphs] + [c.text for t in d.tables for r in t.rows for c in r.cells])
+    for w in ("已知", "计算", "校核", "GB/T 1800.1-2020", "IT7"):
         assert w in text, w
-    bad = calcsheet.Sheet("缺项的计算书")
-    bad.given("d", "直径", 35, "mm")
-    assert set(bad.missing()) == {"缺少“求”", "缺少计算步骤", "缺少“结论”"}
+    bad = mfgcalc.CalcSheet("缺项的计算书")
+    bad.given("d", 35, "mm", "直径")
+    assert set(mfgcalc.missing(bad)) == {"缺少“求”", "缺少计算步骤", "缺少校核"}

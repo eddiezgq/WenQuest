@@ -321,6 +321,8 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "models").glob("*/*")))   # library models the programs read
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "conventions").glob("*.py")))   # the book's constants (constants.py)
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "std").glob("*.yaml")))   # standard tables (机械设计, 第 11 轮)
+        shared += (TOOLS / "stdtab.py").read_bytes()                     # table reader and the shared calculation sheet (第 13 轮)
+        shared += (ROOT / "textbook" / "mechdesign" / "conventions" / "calcsheet.py").read_bytes() if (ROOT / "textbook" / "mechdesign" / "conventions" / "calcsheet.py").exists() else b""
         if (book["root"] / "conventions" / "mdstd.py").exists():       # its materials come from the digital factory's library
             shared += (ROOT / "factory" / "digital" / "cae" / "materials.py").read_bytes()
         for prog in sorted(p for p in code.glob("*.py") if not p.name.startswith("_")):
