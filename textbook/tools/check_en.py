@@ -41,7 +41,7 @@ def main(path: str) -> int:
             if prog.name.startswith("_"):
                 continue
             env = {**os.environ, "WQ_LANG": "en", "WQ_BOOK_FIGDIR": tmp, "WQ_BOOK_OUT": os.path.join(tmp, "out.json"),
-                   "PYTHONPATH": str(TOOLS), "MPLBACKEND": "Agg"}
+                   "PYTHONPATH": os.pathsep.join([str(TOOLS), str(book_dir / "conventions")]), "MPLBACKEND": "Agg"}
             r = subprocess.run([sys.executable, prog.name], cwd=code, env=env, capture_output=True, text=True, timeout=300)
             if r.returncode:
                 problems.append(f"{prog.name}（英文运行）：" + (r.stderr.strip().splitlines() or ["?"])[-1])

@@ -1,0 +1,871 @@
+# 由 textbook/tools/outline.py 从提纲生成，请改提纲后重新生成，不要手改。
+book: physics
+title: 大学物理
+title_en: University Physics
+source: docs/教材/大学物理/00_提纲.md
+parts:
+- title: 导论
+- title: 第一篇 力学
+- title: 第二篇 振动与波
+- title: 第三篇 热学
+- title: 第四篇 电磁学
+- title: 第五篇 光学
+- title: 第六篇 近代物理
+chapters:
+- 'no': 1
+  title: 物理学与测量
+  level: 基础
+  part: 导论
+  sections:
+  - id: '1.1'
+    title: 物理学研究什么：从现象到定律，模型与近似
+  - id: '1.2'
+    title: 国际单位制：七个基本单位与 2019 年的新定义（用常数定义单位）
+  - id: '1.3'
+    title: 量纲与量纲分析：用量纲猜出单摆周期
+  - id: '1.4'
+    title: 数量级估算：费米问题
+  - id: '1.5'
+    title: 测量与不确定度：有效数字、A 类与 B 类不确定度、合成与传递
+  - id: '1.6'
+    title: 数据处理：作图、线性化、最小二乘拟合
+  - id: '1.7'
+    title: 本书的路线图与贯穿全书的机器人
+- 'no': 2
+  title: 矢量
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '2.1'
+    title: 标量与矢量：与坐标系无关的箭头
+  - id: '2.2'
+    title: 矢量的加减与数乘；分解
+  - id: '2.3'
+    title: 直角坐标中的分量；单位矢量；坐标系旋转时分量怎样变
+  - id: '2.4'
+    title: 点积：投影与功的预告
+  - id: '2.5'
+    title: 叉积：右手定则、力矩与角动量的预告
+  - id: '2.6'
+    title: 极坐标、柱坐标、球坐标中的位置矢量
+- 'no': 3
+  title: 变化与累积：物理学中的微积分
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '3.1'
+    title: 平均变化率与瞬时变化率：导数的物理意义
+  - id: '3.2'
+    title: 求导法则与常用函数的导数；矢量函数的导数
+  - id: '3.3'
+    title: 累积：从求和到定积分；微积分基本定理
+  - id: '3.4'
+    title: 常用积分方法；矢量函数的积分
+  - id: '3.5'
+    title: 最简单的微分方程：dv/dt = a、dx/dt = −kx
+  - id: '3.6'
+    title: 泰勒展开与小量近似：sin θ ≈ θ 从哪里来
+  - id: '3.7'
+    title: 偏导数与梯度初步（为势能、场的章节准备）
+- 'no': 4
+  title: 直线运动
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '4.1'
+    title: 参考系、质点、位置与位移
+  - id: '4.2'
+    title: 速度：平均速度与瞬时速度
+  - id: '4.3'
+    title: 加速度
+  - id: '4.4'
+    title: 匀加速直线运动的公式与图像
+  - id: '4.5'
+    title: 自由落体
+  - id: '4.6'
+    title: 由加速度求速度和位置：积分法
+  - id: '4.7'
+    title: 实际运动规划：梯形与 S 形速度曲线（加加速度）
+- 'no': 5
+  title: 平面运动与空间运动
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '5.1'
+    title: 位置矢量、速度矢量、加速度矢量
+  - id: '5.2'
+    title: 抛体运动
+  - id: '5.3'
+    title: 圆周运动：角量与线量、向心加速度
+  - id: '5.4'
+    title: 一般曲线运动：自然坐标、切向与法向加速度、曲率半径
+  - id: '5.5'
+    title: 极坐标中的速度与加速度
+  - id: '5.6'
+    title: 相对运动：伽利略变换
+- 'no': 6
+  title: 牛顿运动定律
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '6.1'
+    title: 力与相互作用：四种基本相互作用、接触力
+  - id: '6.2'
+    title: 牛顿第一定律与惯性参考系
+  - id: '6.3'
+    title: 质量与牛顿第二定律
+  - id: '6.4'
+    title: 牛顿第三定律
+  - id: '6.5'
+    title: 常见的力：重力、支持力、张力、弹簧力
+  - id: '6.6'
+    title: 受力分析与隔离法：画受力图的规矩
+  - id: '6.7'
+    title: 牛顿定律的适用范围
+- 'no': 7
+  title: 牛顿定律的应用
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '7.1'
+    title: 摩擦：静摩擦、动摩擦与摩擦系数的测量
+  - id: '7.2'
+    title: 流体阻力与终端速度
+  - id: '7.3'
+    title: 圆周运动的动力学
+  - id: '7.4'
+    title: 非惯性参考系与惯性力：加速车厢、转台、离心力
+  - id: '7.5'
+    title: 科里奥利力初步
+- 'no': 8
+  title: 用计算机解运动方程
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '8.1'
+    title: 从牛顿第二定律到微分方程
+  - id: '8.2'
+    title: 欧拉法与它的误差
+  - id: '8.3'
+    title: 半隐式欧拉法与能量守恒
+  - id: '8.4'
+    title: 龙格–库塔法
+  - id: '8.5'
+    title: 步长、稳定性与刚性问题
+  - id: '8.6'
+    title: 物理引擎是怎样工作的：MuJoCo 与游戏引擎
+- 'no': 9
+  title: 功与动能
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '9.1'
+    title: 功：恒力的功与变力的功（线积分）
+  - id: '9.2'
+    title: 动能与动能定理
+  - id: '9.3'
+    title: 弹簧力的功
+  - id: '9.4'
+    title: 功率
+  - id: '9.5'
+    title: 机器的功率与效率：电机、减速器
+- 'no': 10
+  title: 势能与能量守恒
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '10.1'
+    title: 保守力与非保守力
+  - id: '10.2'
+    title: 势能：重力势能、弹性势能
+  - id: '10.3'
+    title: 由势能求力：F = −∇U；势能曲线与平衡
+  - id: '10.4'
+    title: 机械能守恒
+  - id: '10.5'
+    title: 能量守恒定律（含摩擦生热）
+  - id: '10.6'
+    title: 能量回收：电机回馈制动
+- 'no': 11
+  title: 动量与碰撞
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '11.1'
+    title: 动量与冲量
+  - id: '11.2'
+    title: 动量守恒
+  - id: '11.3'
+    title: 碰撞：弹性、非弹性、完全非弹性；恢复系数
+  - id: '11.4'
+    title: 二维碰撞
+  - id: '11.5'
+    title: 质心与质心运动定理
+  - id: '11.6'
+    title: 变质量系统：火箭方程
+- 'no': 12
+  title: 刚体定轴转动
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '12.1'
+    title: 角位置、角速度、角加速度
+  - id: '12.2'
+    title: 转动动能与转动惯量
+  - id: '12.3'
+    title: 转动惯量的计算；平行轴定理
+  - id: '12.4'
+    title: 力矩
+  - id: '12.5'
+    title: 定轴转动定律 M = Jα
+  - id: '12.6'
+    title: 转动中的功和功率
+  - id: '12.7'
+    title: 滚动
+  - id: '12.8'
+    title: 电机—减速器—负载的惯量匹配
+- 'no': 13
+  title: 角动量
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '13.1'
+    title: 质点的角动量
+  - id: '13.2'
+    title: 质点系与刚体的角动量
+  - id: '13.3'
+    title: 角动量守恒
+  - id: '13.4'
+    title: 陀螺的进动
+  - id: '13.5'
+    title: 角动量矢量与惯量张量初步（详见《机器人学》第 4、24 章）
+- 'no': 14
+  title: 静力平衡与弹性
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '14.1'
+    title: 刚体平衡的条件
+  - id: '14.2'
+    title: 重心
+  - id: '14.3'
+    title: 静力平衡问题的解法
+  - id: '14.4'
+    title: 应力、应变与弹性模量
+  - id: '14.5'
+    title: 剪切与体积形变；材料的应力—应变曲线
+- 'no': 15
+  title: 万有引力
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '15.1'
+    title: 万有引力定律；卡文迪什实验
+  - id: '15.2'
+    title: 地球表面附近的重力；g 随纬度和高度的变化
+  - id: '15.3'
+    title: 引力势能与逃逸速度
+  - id: '15.4'
+    title: 开普勒定律与行星轨道
+  - id: '15.5'
+    title: 卫星与航天器的轨道
+  - id: '15.6'
+    title: 潮汐；广义相对论预告
+- 'no': 16
+  title: 流体力学
+  level: 基础
+  part: 第一篇 力学
+  sections:
+  - id: '16.1'
+    title: 流体与压强；帕斯卡原理
+  - id: '16.2'
+    title: 静止流体中的压强；测量压强
+  - id: '16.3'
+    title: 浮力与阿基米德原理
+  - id: '16.4'
+    title: 流体运动的描述；连续性方程
+  - id: '16.5'
+    title: 伯努利方程
+  - id: '16.6'
+    title: 黏性与泊肃叶定律；雷诺数
+- 'no': 17
+  title: 拉格朗日力学初步
+  level: 进阶
+  part: 第一篇 力学
+  sections:
+  - id: '17.1'
+    title: 约束与广义坐标
+  - id: '17.2'
+    title: 虚功原理
+  - id: '17.3'
+    title: 拉格朗日方程
+  - id: '17.4'
+    title: 哈密顿原理（最小作用量原理）
+  - id: '17.5'
+    title: 应用：二连杆机械臂的动力学方程（为《机器人学》第三篇铺垫）
+- 'no': 18
+  title: 振动
+  level: 基础
+  part: 第二篇 振动与波
+  sections:
+  - id: '18.1'
+    title: 简谐运动
+  - id: '18.2'
+    title: 弹簧振子与单摆、复摆
+  - id: '18.3'
+    title: 简谐运动的能量
+  - id: '18.4'
+    title: 简谐运动与匀速圆周运动；旋转矢量
+  - id: '18.5'
+    title: 阻尼振动
+  - id: '18.6'
+    title: 受迫振动与共振
+  - id: '18.7'
+    title: 振动的合成；拍
+- 'no': 19
+  title: 机械波
+  level: 基础
+  part: 第二篇 振动与波
+  sections:
+  - id: '19.1'
+    title: 波的形成与传播；横波与纵波
+  - id: '19.2'
+    title: 简谐波的表达式
+  - id: '19.3'
+    title: 弦上的波速
+  - id: '19.4'
+    title: 波的能量与功率
+  - id: '19.5'
+    title: 波动方程
+  - id: '19.6'
+    title: 反射与透射
+- 'no': 20
+  title: 声
+  level: 基础
+  part: 第二篇 振动与波
+  sections:
+  - id: '20.1'
+    title: 声波：压强波与位移波
+  - id: '20.2'
+    title: 声速
+  - id: '20.3'
+    title: 声强与分贝
+  - id: '20.4'
+    title: 多普勒效应
+  - id: '20.5'
+    title: 冲击波
+  - id: '20.6'
+    title: 超声测距与超声检测
+- 'no': 21
+  title: 波的叠加与驻波
+  level: 基础
+  part: 第二篇 振动与波
+  sections:
+  - id: '21.1'
+    title: 叠加原理与干涉
+  - id: '21.2'
+    title: 驻波
+  - id: '21.3'
+    title: 弦上的驻波与简正模式
+  - id: '21.4'
+    title: 管中的驻波
+  - id: '21.5'
+    title: 拍与频率测量
+  - id: '21.6'
+    title: 非正弦波与傅里叶分析
+- 'no': 22
+  title: 温度与热
+  level: 基础
+  part: 第三篇 热学
+  sections:
+  - id: '22.1'
+    title: 温度与热力学第零定律
+  - id: '22.2'
+    title: 温度计与温标
+  - id: '22.3'
+    title: 热膨胀
+  - id: '22.4'
+    title: 热量、比热容与相变
+  - id: '22.5'
+    title: 热传递：传导、对流、辐射
+  - id: '22.6'
+    title: 电机与电子器件的散热
+- 'no': 23
+  title: 气体动理论
+  level: 基础
+  part: 第三篇 热学
+  sections:
+  - id: '23.1'
+    title: 理想气体状态方程
+  - id: '23.2'
+    title: 压强的微观解释
+  - id: '23.3'
+    title: 温度的微观解释；方均根速率
+  - id: '23.4'
+    title: 能量均分与理想气体的内能
+  - id: '23.5'
+    title: 麦克斯韦速率分布
+  - id: '23.6'
+    title: 平均自由程
+  - id: '23.7'
+    title: 实际气体：范德瓦耳斯方程
+- 'no': 24
+  title: 热力学第一定律
+  level: 基础
+  part: 第三篇 热学
+  sections:
+  - id: '24.1'
+    title: 热力学系统与过程
+  - id: '24.2'
+    title: 功、热量与内能
+  - id: '24.3'
+    title: 热力学第一定律
+  - id: '24.4'
+    title: 理想气体的等容、等压、等温过程
+  - id: '24.5'
+    title: 绝热过程
+  - id: '24.6'
+    title: 热容与摩尔热容
+- 'no': 25
+  title: 热力学第二定律与熵
+  level: 基础
+  part: 第三篇 热学
+  sections:
+  - id: '25.1'
+    title: 热机与效率
+  - id: '25.2'
+    title: 制冷机与热泵
+  - id: '25.3'
+    title: 第二定律的两种表述
+  - id: '25.4'
+    title: 卡诺循环与卡诺定理
+  - id: '25.5'
+    title: 熵
+  - id: '25.6'
+    title: 熵的微观意义：玻尔兹曼公式
+  - id: '25.7'
+    title: 实际循环：奥托、狄塞尔、斯特林
+- 'no': 26
+  title: 电荷与电场
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '26.1'
+    title: 电荷及其守恒；导体与绝缘体
+  - id: '26.2'
+    title: 库仑定律
+  - id: '26.3'
+    title: 电场与电场强度
+  - id: '26.4'
+    title: 连续分布电荷的电场
+  - id: '26.5'
+    title: 电场线
+  - id: '26.6'
+    title: 电偶极子
+  - id: '26.7'
+    title: 带电粒子在电场中的运动
+- 'no': 27
+  title: 高斯定律
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '27.1'
+    title: 电通量
+  - id: '27.2'
+    title: 高斯定律
+  - id: '27.3'
+    title: 高斯定律的应用：球、线、面对称
+  - id: '27.4'
+    title: 静电平衡中的导体
+  - id: '27.5'
+    title: 屏蔽
+- 'no': 28
+  title: 电势
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '28.1'
+    title: 电势能与电势
+  - id: '28.2'
+    title: 电势差与电压
+  - id: '28.3'
+    title: 点电荷和连续分布电荷的电势
+  - id: '28.4'
+    title: 等势面；由电势求电场
+  - id: '28.5'
+    title: 导体的电势；尖端放电
+  - id: '28.6'
+    title: 静电放电（ESD）与电子器件的防护
+- 'no': 29
+  title: 电容与电介质
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '29.1'
+    title: 电容器与电容
+  - id: '29.2'
+    title: 电容的计算
+  - id: '29.3'
+    title: 电容器的串联与并联
+  - id: '29.4'
+    title: 电场能量
+  - id: '29.5'
+    title: 电介质
+  - id: '29.6'
+    title: 电容式传感器：触觉、接近、位移
+- 'no': 30
+  title: 电流与电阻
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '30.1'
+    title: 电流与电流密度
+  - id: '30.2'
+    title: 电阻、电阻率与欧姆定律
+  - id: '30.3'
+    title: 导电的微观模型
+  - id: '30.4'
+    title: 电阻与温度；超导
+  - id: '30.5'
+    title: 电功率与焦耳热
+  - id: '30.6'
+    title: 应变片：电阻随形变变化
+- 'no': 31
+  title: 直流电路
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '31.1'
+    title: 电动势与内阻
+  - id: '31.2'
+    title: 电阻的串并联
+  - id: '31.3'
+    title: 基尔霍夫定律
+  - id: '31.4'
+    title: RC 电路的充放电
+  - id: '31.5'
+    title: 电学仪表与测量
+  - id: '31.6'
+    title: 电池组与机器人的供电
+- 'no': 32
+  title: 磁场与磁力
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '32.1'
+    title: 磁场与磁感应强度
+  - id: '32.2'
+    title: 运动电荷受的力：洛伦兹力
+  - id: '32.3'
+    title: 带电粒子在磁场中的运动；质谱仪、回旋加速器
+  - id: '32.4'
+    title: 载流导线受的力
+  - id: '32.5'
+    title: 载流线圈受的力矩：直流电机的原理
+  - id: '32.6'
+    title: 霍尔效应
+- 'no': 33
+  title: 磁场的源
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '33.1'
+    title: 毕奥–萨伐尔定律
+  - id: '33.2'
+    title: 两根平行导线间的力
+  - id: '33.3'
+    title: 安培环路定理
+  - id: '33.4'
+    title: 螺线管与环形线圈
+  - id: '33.5'
+    title: 磁通量与磁场的高斯定理
+  - id: '33.6'
+    title: 磁介质；铁磁性与永磁体
+- 'no': 34
+  title: 电磁感应
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '34.1'
+    title: 法拉第电磁感应定律
+  - id: '34.2'
+    title: 楞次定律
+  - id: '34.3'
+    title: 动生电动势
+  - id: '34.4'
+    title: 感生电动势与感生电场
+  - id: '34.5'
+    title: 涡流
+  - id: '34.6'
+    title: 发电机与电机的反电动势
+  - id: '34.7'
+    title: 感应式传感器与无线充电
+- 'no': 35
+  title: 电感
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '35.1'
+    title: 自感
+  - id: '35.2'
+    title: RL 电路
+  - id: '35.3'
+    title: 磁场能量
+  - id: '35.4'
+    title: 互感与变压器
+  - id: '35.5'
+    title: LC 振荡与 RLC 电路
+  - id: '35.6'
+    title: 电机绕组：PWM 驱动下的电流纹波
+- 'no': 36
+  title: 交流电路
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '36.1'
+    title: 交流电与有效值
+  - id: '36.2'
+    title: 电阻、电感、电容中的交流电
+  - id: '36.3'
+    title: 相量与复数阻抗
+  - id: '36.4'
+    title: RLC 串联电路与谐振
+  - id: '36.5'
+    title: 交流电的功率与功率因数
+  - id: '36.6'
+    title: 变压器与输电
+  - id: '36.7'
+    title: 滤波器初步
+- 'no': 37
+  title: 麦克斯韦方程组与电磁波
+  level: 基础
+  part: 第四篇 电磁学
+  sections:
+  - id: '37.1'
+    title: 位移电流
+  - id: '37.2'
+    title: 麦克斯韦方程组
+  - id: '37.3'
+    title: 平面电磁波
+  - id: '37.4'
+    title: 电磁波的能量与动量；坡印亭矢量；辐射压
+  - id: '37.5'
+    title: 电磁波谱
+  - id: '37.6'
+    title: 天线与无线通信：机器人的遥控与 Wi-Fi
+- 'no': 38
+  title: 光的本性与几何光学定律
+  level: 基础
+  part: 第五篇 光学
+  sections:
+  - id: '38.1'
+    title: 光是什么：从微粒到波到光子
+  - id: '38.2'
+    title: 光速的测量
+  - id: '38.3'
+    title: 反射定律
+  - id: '38.4'
+    title: 折射定律与折射率
+  - id: '38.5'
+    title: 惠更斯原理
+  - id: '38.6'
+    title: 色散
+  - id: '38.7'
+    title: 全反射与光纤
+- 'no': 39
+  title: 成像
+  level: 基础
+  part: 第五篇 光学
+  sections:
+  - id: '39.1'
+    title: 平面镜与球面镜
+  - id: '39.2'
+    title: 球面折射成像
+  - id: '39.3'
+    title: 薄透镜
+  - id: '39.4'
+    title: 像差
+  - id: '39.5'
+    title: 眼睛、放大镜、显微镜、望远镜
+  - id: '39.6'
+    title: 相机：小孔模型、焦距、景深、视场角（机器人视觉的光学基础）
+- 'no': 40
+  title: 光的干涉
+  level: 基础
+  part: 第五篇 光学
+  sections:
+  - id: '40.1'
+    title: 相干光
+  - id: '40.2'
+    title: 杨氏双缝干涉
+  - id: '40.3'
+    title: 光程与光程差
+  - id: '40.4'
+    title: 薄膜干涉
+  - id: '40.5'
+    title: 迈克耳孙干涉仪
+  - id: '40.6'
+    title: 激光干涉仪：机床与机器人的精密测距
+- 'no': 41
+  title: 光的衍射与偏振
+  level: 基础
+  part: 第五篇 光学
+  sections:
+  - id: '41.1'
+    title: 单缝衍射
+  - id: '41.2'
+    title: 圆孔衍射与分辨本领
+  - id: '41.3'
+    title: 衍射光栅与光谱
+  - id: '41.4'
+    title: X 射线衍射
+  - id: '41.5'
+    title: 偏振与马吕斯定律
+  - id: '41.6'
+    title: 布儒斯特角；偏振在视觉检测中的应用
+- 'no': 42
+  title: 狭义相对论
+  level: 基础
+  part: 第六篇 近代物理
+  sections:
+  - id: '42.1'
+    title: 伽利略相对性与以太问题
+  - id: '42.2'
+    title: 爱因斯坦的两条假设
+  - id: '42.3'
+    title: 同时的相对性；时间延缓；长度收缩
+  - id: '42.4'
+    title: 洛伦兹变换
+  - id: '42.5'
+    title: 速度变换
+  - id: '42.6'
+    title: 相对论动量与能量；E = mc²
+  - id: '42.7'
+    title: 广义相对论简介；GPS 的相对论修正
+- 'no': 43
+  title: 光子与物质波
+  level: 基础
+  part: 第六篇 近代物理
+  sections:
+  - id: '43.1'
+    title: 黑体辐射与普朗克假设
+  - id: '43.2'
+    title: 光电效应
+  - id: '43.3'
+    title: 康普顿效应
+  - id: '43.4'
+    title: 光子
+  - id: '43.5'
+    title: 德布罗意波
+  - id: '43.6'
+    title: 电子衍射与波粒二象性
+  - id: '43.7'
+    title: 不确定关系
+  - id: '43.8'
+    title: 光电探测器：光电二极管、激光雷达的接收端
+- 'no': 44
+  title: 量子力学
+  level: 基础
+  part: 第六篇 近代物理
+  sections:
+  - id: '44.1'
+    title: 波函数及其统计诠释
+  - id: '44.2'
+    title: 薛定谔方程
+  - id: '44.3'
+    title: 无限深势阱
+  - id: '44.4'
+    title: 有限深势阱
+  - id: '44.5'
+    title: 势垒与隧道效应
+  - id: '44.6'
+    title: 量子谐振子
+  - id: '44.7'
+    title: 扫描隧道显微镜
+- 'no': 45
+  title: 原子物理
+  level: 基础
+  part: 第六篇 近代物理
+  sections:
+  - id: '45.1'
+    title: 原子光谱与玻尔模型
+  - id: '45.2'
+    title: 氢原子的量子力学解
+  - id: '45.3'
+    title: 角动量与量子数
+  - id: '45.4'
+    title: 电子自旋；施特恩–格拉赫实验
+  - id: '45.5'
+    title: 泡利不相容原理与元素周期表
+  - id: '45.6'
+    title: X 射线
+  - id: '45.7'
+    title: 激光原理
+- 'no': 46
+  title: 分子与凝聚态物理
+  level: 进阶
+  part: 第六篇 近代物理
+  sections:
+  - id: '46.1'
+    title: 分子键
+  - id: '46.2'
+    title: 分子的转动与振动光谱
+  - id: '46.3'
+    title: 固体的结合与晶体结构
+  - id: '46.4'
+    title: 金属的自由电子模型
+  - id: '46.5'
+    title: 能带理论
+  - id: '46.6'
+    title: 半导体与 PN 结；二极管、LED、晶体管
+  - id: '46.7'
+    title: 超导
+- 'no': 47
+  title: 原子核物理
+  level: 基础
+  part: 第六篇 近代物理
+  sections:
+  - id: '47.1'
+    title: 原子核的组成与大小
+  - id: '47.2'
+    title: 结合能
+  - id: '47.3'
+    title: 放射性衰变：α、β、γ
+  - id: '47.4'
+    title: 衰变定律与半衰期
+  - id: '47.5'
+    title: 核反应
+- 'no': 48
+  title: 核能与辐射的应用
+  level: 进阶
+  part: 第六篇 近代物理
+  sections:
+  - id: '48.1'
+    title: 核裂变与反应堆
+  - id: '48.2'
+    title: 核聚变
+  - id: '48.3'
+    title: 辐射与物质的相互作用；剂量
+  - id: '48.4'
+    title: 辐射探测
+  - id: '48.5'
+    title: 医学与工业应用：放射治疗、无损探伤
+  - id: '48.6'
+    title: 核环境中的机器人（福岛核电站救援机器人与抗辐射设计）
+- 'no': 49
+  title: 粒子物理与宇宙学
+  level: 专题
+  part: 第六篇 近代物理
+  sections:
+  - id: '49.1'
+    title: 基本粒子与基本相互作用
+  - id: '49.2'
+    title: 守恒律
+  - id: '49.3'
+    title: 夸克
+  - id: '49.4'
+    title: 标准模型与希格斯玻色子
+  - id: '49.5'
+    title: 宇宙的膨胀与大爆炸
+  - id: '49.6'
+    title: 暗物质与暗能量；开放问题

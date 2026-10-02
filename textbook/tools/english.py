@@ -23,17 +23,17 @@ from pathlib import Path
 
 KINDS = {"Program": "程序", "Animation": "动画", "Lab": "实验", "Figure": "图", "Table": "表"}
 LABEL = {v: k for k, v in KINDS.items()}
-ITEMS = {"Definition": "定义", "Theorem": "定理", "Lemma": "引理", "Corollary": "推论", "Example": "算例"}
+ITEMS = {"Definition": "定义", "Law": "定律", "Theorem": "定理", "Lemma": "引理", "Corollary": "推论", "Example": "算例"}
 REFS = {**ITEMS, **KINDS, "Fig.": "图", "Exercise": "习题"}
 LABELS = {"engineer's notes", "engineer’s notes", "exercises", "proof", "references", "summary", "note", "notes", "hint",
-          "historical notes", "chapter references", "section references", "quick reference", "worked example"}
+          "historical notes", "everyday example", "chapter references", "section references", "quick reference", "worked example"}
 
 TAG = re.compile(r"\\tag\{([^}]+)\}")
 FENCE = re.compile(r"^```.*?^```", re.S | re.M)
 PLACE = re.compile(r"\{\{\s*(\w+)\.(\w+)\s*(?::[^}]+)?\}\}")
 ZH_DIR = re.compile(r"^:::[ \t]*(程序|动画|实验|图|表)[ \t]+([\d.]+)", re.M)
 EN_DIR = re.compile(r"^:::[ \t]*(" + "|".join(KINDS) + r")[ \t]+([\d.]+)", re.M)
-ZH_ITEM = re.compile(r"\*\*(定义|定理|引理|推论|算例) (\d+\.\d+\.\d+)")
+ZH_ITEM = re.compile(r"\*\*(定义|定律|定理|引理|推论|算例) (\d+\.\d+\.\d+)")
 EN_ITEM = re.compile(r"\*\*(" + "|".join(ITEMS) + r") (\d+\.\d+\.\d+)")
 EXERCISE = re.compile(r"(?m)^(\d+\.\d+\.\d+)\s")
 SUBSEC = re.compile(r"(?m)^#{3,4}\s+(\d+\.\d+\.\d+)\s")

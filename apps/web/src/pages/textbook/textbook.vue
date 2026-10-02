@@ -16,6 +16,7 @@
         <view class="toc-toggle narrow-only" @click="tocOpen = !tocOpen">☰ {{ t("book.toc") }}</view>
         <view class="toc" :class="{ open: tocOpen }">
           <text class="toc-book">{{ en ? idx?.title_en || idx?.title : idx?.title }}</text>
+          <view v-if="hasRes" class="res-link" :class="{ on: view === 'res' }" @click="showRes">◆ {{ t("book.res_all") }}</view>
           <view class="langs">
             <text class="langs-t">{{ t("book.lang") }}</text>
             <view class="lg" :class="{ on: !en }" @click="setLang('zh')">中文</view>
@@ -39,13 +40,35 @@
           </view>
         </view>
 
-        <view class="page">
+        <!-- 全书互动资源（第 9 轮 2.5）：按章列出全部动画和虚拟实验，点一下到正文中的位置 -->
+        <view v-if="view === 'res'" class="page">
+          <text class="res-h">{{ t("book.res_all") }}</text>
+          <text class="res-lead">{{ t("book.res_lead") }}</text>
+          <view v-for="c in resChapters" :key="c.no" class="res-ch">
+            <text class="res-ch-t">{{ chapterLabel(c.no) }} {{ en ? c.title_en || c.title : c.title }}</text>
+            <view class="res-grid">
+              <view v-for="r in c.items" :key="r.kind + r.num" class="res-card" @click="go(r)">
+                <text class="res-kind">{{ t("book.kind." + r.kind) }} {{ r.num }}</text>
+                <text class="res-title">{{ resTitle(r) }}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view v-else class="page">
           <view v-if="cur" class="crumb">
             <text>{{ chapterLabel(cur.chapter.no) }} {{ cur.chapter.title }}
               <text v-if="cur.chapter.status" class="badge">{{ t("book.status." + cur.chapter.status) }}</text></text>
             <view v-if="pdfFor(cur.chapter.no)" class="pdf" @click="pdf(cur.chapter.no)">⤓ {{ t("book.pdf") }}{{ en ? " (English)" : "" }}</view>
           </view>
           <text v-if="en && cur && cur.lang !== 'en'" class="no-en">{{ t("book.no_en") }}</text>
+          <!-- 本章互动资源（第 9 轮 2.5）：章的第一页上列出本章的动画和实验 -->
+          <view v-if="cur && atChapterTop && chapterRes.length" class="chips">
+            <text class="chips-t">{{ t("book.res") }}</text>
+            <view v-for="r in chapterRes" :key="r.kind + r.num" class="chip" @click="go(r)">
+              <text class="chip-k">{{ t("book.kind." + r.kind) }} {{ r.num }}</text> {{ resTitle(r) }}
+            </view>
+          </view>
           <text v-if="error" class="wq-error">{{ error }}</text>
           <text v-if="!cur && loaded && !error" class="wq-empty">{{ t("book.nothing") }}</text>
           <BookContent v-if="cur" :html="cur.html" />
@@ -62,11 +85,11 @@
 
 <script setup lang="ts">
 // 问渠教材阅读（第 7 轮）：目录按篇、章、节；正文是构建好的网页（公式已在服务器排好）；PDF 只给老师。
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import BookContent from "../../components/BookContent.vue";
-import { absolute, api, ApiError, token, type TextbookChapter, type TextbookIndex, type TextbookSection, type TextbookSectionRef } from "../../api";
+import { absolute, api, ApiError, token, type TextbookChapter, type TextbookIndex, type TextbookResource, type TextbookSection, type TextbookSectionRef } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
 const books = ref<{ book: string; title: string; chapters: number; sections: number; written: number }[]>([]);
@@ -99,6 +122,29 @@ const hasWritten = (c: TextbookChapter) => c.sections.some((s) => s.written);
 const chapterLabel = (n: number) => (en.value ? `Chapter ${n}` : `第 ${n} 章`);
 const refTitle = (s: TextbookSectionRef) => (en.value && s.title_en ? s.title_en : s.title);
 const findRef = (sid: string) => idx.value?.chapters.flatMap((c) => c.sections).find((s) => s.id === sid);
+// 互动资源（第 9 轮 2.5）
+const view = ref<"read" | "res">("read");
+const hasRes = computed(() => Object.keys(idx.value?.resources || {}).length > 0);
+const resTitle = (r: TextbookResource) => (en.value && r.title_en ? r.title_en : r.title);
+const chapterRes = computed(() => (cur.value && idx.value?.resources?.[String(cur.value.chapter.no)]) || []);
+const atChapterTop = computed(() => {
+  if (!cur.value) return false;
+  const ch = idx.value?.chapters.find((c) => c.no === cur.value!.chapter.no);
+  return cur.value.id === ch?.sections.find((s) => s.written)?.id;      // 章首提要，没有提要时是本章第一节
+});
+const resChapters = computed(() => (idx.value?.chapters || [])
+  .filter((c) => idx.value?.resources?.[String(c.no)]?.length)
+  .map((c) => ({ ...c, items: idx.value!.resources![String(c.no)] })));
+function showRes() { view.value = "res"; tocOpen.value = false; }
+async function go(r: TextbookResource) {
+  view.value = "read";
+  if (!cur.value || cur.value.id !== r.sec) await read(r.sec);
+  await nextTick();
+  // #ifdef H5
+  const el = document.getElementById(`${r.kind === "anim" ? "动画" : "实验"}-${r.num}`);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  // #endif
+}
 const pdfFor = (ch: number) => (en.value && idx.value?.pdf_en?.includes(ch)) || (!en.value && idx.value?.pdf.includes(ch));
 
 function setLang(l: "zh" | "en") {
@@ -130,6 +176,7 @@ async function open(b: string, sid = "") {
 
 async function read(sid: string) {
   error.value = "";
+  view.value = "read";
   try {
     const want = en.value && findRef(sid)?.en ? "en" : "zh";
     cur.value = await api.textbookSection(book.value, sid, mp, want);
@@ -199,6 +246,21 @@ onLoad(async (q: any) => {
 .pg { font-size: 14px; color: var(--wq-link); cursor: pointer; }
 .sp { flex: 1; }
 .toc-toggle { display: none; }
+.res-link { margin: 0 6px 8px; padding: 5px 8px; font-size: 13px; border-radius: 6px; cursor: pointer; color: #8a5a00; background: #fff8e6; }
+.res-link.on { font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; margin: 8px 0 14px; padding: 10px 12px; background: #fbf8f0; border-radius: 8px; }
+.chips-t { font-size: 12px; color: var(--wq-muted); margin-right: 4px; }
+.chip { font-size: 13px; border: 1px solid #ead9b0; background: #fff; border-radius: 14px; padding: 3px 11px; cursor: pointer; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
+.chip-k { color: #8a5a00; font-size: 12px; }
+.res-h { display: block; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.res-lead { display: block; font-size: 13px; color: var(--wq-muted); margin-bottom: 8px; }
+.res-ch { margin-top: 18px; }
+.res-ch-t { display: block; font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+.res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.res-card { border: 1px solid var(--wq-line); border-radius: 8px; padding: 10px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+.res-card:hover { border-color: #d4a24c; }
+.res-kind { font-size: 12px; color: #8a5a00; }
+.res-title { font-size: 13.5px; line-height: 1.55; }
 @media (max-width: 860px) {
   .reader { flex-direction: column; }
   .toc-toggle { display: block; border: 1px solid var(--wq-line); border-radius: 8px; padding: 8px 12px; background: #fff; cursor: pointer; }

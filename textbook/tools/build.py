@@ -112,7 +112,7 @@ def anim_check(code: str) -> str:
         _ANIM_CHECK = ns["check"]
     return _ANIM_CHECK(code)
 KINDS = ("程序", "动画", "实验", "图", "表")
-REF_KINDS = ("式", "定义", "定理", "引理", "推论", "算例", "程序", "图", "表", "动画", "实验", "习题")
+REF_KINDS = ("式", "定义", "定律", "定理", "引理", "推论", "算例", "程序", "图", "表", "动画", "实验", "习题")
 
 
 @dataclass
@@ -140,6 +140,7 @@ class Section:
     anims: list = field(default_factory=list)
     labs: list = field(default_factory=list)
     labdocs: list = field(default_factory=list)
+    media: list = field(default_factory=list)       # (kind, number, caption) of animations and labs: the 互动资源 lists (第 9 轮 2.5)
     defines: set = field(default_factory=set)
     lang: str = "zh"                 # "en": the English edition of the section (NN-M.en.md, 第 8 轮)
 
@@ -252,6 +253,42 @@ def glossary(book: dict) -> set[str]:
         return {row["中文"].strip() for row in csv.DictReader(f)}
 
 
+def _names(en: str) -> set[str]:
+    """The English names of a glossary entry ("a; b (c)" → {"a", "b"}): alternatives, without notes in brackets."""
+    out = set()
+    for x in en.split(";"):
+        while re.search(r"\([^()]*\)", x):           # brackets may nest: "(SO(3))"
+            x = re.sub(r"\s*\([^()]*\)", "", x)
+        x = re.sub(r"[–—]", "-", x).replace("’", "'").replace("'s ", " ").replace("' ", " ")   # hand–eye = hand-eye, Farkas' = Farkas
+        if x.strip():
+            out.add(x.strip().lower())
+    return out
+
+
+def check_other_books(book: dict, rep: Report) -> None:
+    """The same Chinese term should have the same English name in every book (第 9 轮 2.3): two entries agree when
+    they share at least one English name (brackets, dashes and apostrophes ignored). A difference is a 提醒, not an
+    error, so one book never stops another book's build; a term that really means something else in a book (e.g.
+    线性代数's 位移 = shift) says so in its 备注 column ("含义不同") and is skipped."""
+    mine = glossary_en(book)
+    with (book["root"] / "conventions" / "术语表.csv").open(encoding="utf-8") as f:
+        mine_note = {row["中文"].strip(): row.get("备注") or "" for row in csv.DictReader(f)}
+    for other in sorted(book["root"].parent.glob("*/conventions/术语表.csv")):
+        if other.parents[1] == book["root"]:
+            continue
+        with other.open(encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        theirs = {row["中文"].strip(): (row.get("English") or "").strip() for row in rows}
+        their_note = {row["中文"].strip(): row.get("备注") or "" for row in rows}
+        name = other.parents[1].name
+        for zh, en in mine.items():
+            if "含义不同" in mine_note.get(zh, "") + their_note.get(zh, ""):
+                continue
+            if zh in theirs and en and theirs[zh] and not (_names(en) & _names(theirs[zh])):
+                rep.add("warning", "术语", "conventions/术语表.csv",
+                        f"“{zh}”的英文名与《{name}》不一致：本书 {en}，{name} 为 {theirs[zh]}")
+
+
 # ---------------------------------------------------------------- programs and placeholders
 
 def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") -> dict[str, dict]:
@@ -264,6 +301,7 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
         code = book["root"] / f"ch{ch:02d}" / "code"
         shared = b"".join(p.read_bytes() for p in sorted(code.glob("_*.py")))   # helper modules (not run themselves)
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "models").glob("*/*")))   # library models the programs read
+        shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "conventions").glob("*.py")))   # the book's constants (constants.py)
         for prog in sorted(p for p in code.glob("*.py") if not p.name.startswith("_")):
             where = str(prog.relative_to(book["root"].parent))
             digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes() + lang.encode()).hexdigest()[:16]
@@ -275,7 +313,7 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
             outp.unlink(missing_ok=True)
             figs = cache.parent / "figs" / ("" if lang == "zh" else "en")
             figs.mkdir(parents=True, exist_ok=True)
-            env = {**os.environ, "WQ_BOOK_OUT": str(outp), "WQ_BOOK_FIGDIR": str(figs), "PYTHONPATH": str(TOOLS), "MPLBACKEND": "Agg",
+            env = {**os.environ, "WQ_BOOK_OUT": str(outp), "WQ_BOOK_FIGDIR": str(figs), "PYTHONPATH": os.pathsep.join([str(TOOLS), str(book["root"] / "conventions")]), "MPLBACKEND": "Agg",
                    "WQ_LANG": lang}
             try:
                 r = subprocess.run([sys.executable, prog.name], cwd=prog.parent, env=env, capture_output=True, text=True, timeout=300)
@@ -407,6 +445,7 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
     if kind == "动画":
         fig = meta.get("图", "")
         sec.anim_figs.append((label, fig))
+        sec.media.append(("anim", num, meta.get("说明", "") or meta.get("caption", "")))
         name = meta.get("src", "")
         script = sec.path.parent / "anim" / f"{name}.py" if name else None
         if not script or not script.exists():
@@ -423,6 +462,7 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
                     f"{box}{cap}</div><figcaption>{label}{gap}{cap}</figcaption>"
                     f"{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     if kind == "实验":
+        sec.media.append(("lab", num, meta.get("说明", "") or meta.get("caption", "")))
         name = meta.get("src", "")
         script = sec.path.parent / "lab" / f"{name}.js" if name else None
         if not script or not script.exists():
@@ -541,7 +581,7 @@ def check_tags(sec: Section, rep: Report) -> None:
     nums = [int(t.rsplit(".", 1)[1]) for t in seen]
     if nums and nums != list(range(1, len(nums) + 1)):
         rep.add("error", "编号", sec.id, f"公式编号应从 1 起连续：{nums}")
-    for kind in ("定义", "定理", "引理", "推论", "算例"):
+    for kind in ("定义", "定律", "定理", "引理", "推论", "算例"):     # 定律: laws of physics (第 9 轮)
         found = re.findall(r"\*\*" + kind + r" (" + re.escape(sec.id) + r"\.\d+)", sec.source)
         for n in found:
             sec.defines.add(f"{kind} {n}")
@@ -625,7 +665,7 @@ def check_numbers(sec: Section, rep: Report) -> None:
 TERM = re.compile(r"\*\*([\u4e00-\u9fff][\u4e00-\u9fff·\-–]{1,11})\*\*(?![：:])")   # "**小标题**：" is a lead-in, not a term
 
 
-LABELS = {"工程师笔记", "习题", "证明", "参考文献", "本节参考文献", "本章参考文献", "章首提要", "本章小结", "注意", "提示", "历史注记"}
+LABELS = {"工程师笔记", "生活中的例子", "习题", "证明", "参考文献", "本节参考文献", "本章参考文献", "章首提要", "本章小结", "注意", "提示", "历史注记"}
 
 
 def _norm_term(t: str) -> str:
@@ -708,6 +748,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     sections_en = load_sections_en(book, sections, rep)
     prog_meta = progress(book)
     terms = glossary(book)
+    check_other_books(book, rep)
     values = run_programs(book, {s.chapter for s in sections}, rep)
     en_chapters = {s.chapter for s in sections_en}
     values_en = run_programs(book, en_chapters, rep, "en") if en_chapters else {}
@@ -769,6 +810,13 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                            "title_en": meta_ch.get(c["no"], {}).get("title_en", ""), "status": meta_ch.get(c["no"], {}).get("status", ""),
                            "sections": _toc_sections(c, sections, sections_en)} for c in book["chapters"]],
              "errors": len(rep.errors)}
+    # 互动资源 (第 9 轮 2.5): every chapter's animations and labs, in reading order, for the reader's lists
+    en_cap = {(s.id, k, n): c for s in sections_en for k, n, c in s.media}
+    index["resources"] = {}
+    for sec in sections:
+        for k, n, c in sec.media:
+            index["resources"].setdefault(str(sec.chapter), []).append(
+                {"kind": k, "num": n, "title": c, "title_en": en_cap.get((sec.id, k, n), ""), "sec": sec.id})
     for sec in sections:
         head = html.escape(sec.title) if sec.id.endswith((".0", ".end")) else f"{sec.id}　{html.escape(sec.title)}"
         frag = f"<section class='wq-sec' id='sec-{sec.id}'><h2>{head}</h2>{sec.html}</section>"

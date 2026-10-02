@@ -1,0 +1,33 @@
+# 实验 6.6 的指导书与报告模板。目的、场景、参数、任务取自 lab6_6.js。
+原理:
+  - ["整体法：把 AGV 和料车看成一个系统，挂钩的拉力是内力，两两抵消，所以 a = F/(m₀ + m₁ + m₂ + …)。",
+     "Whole system: treat the AGV and carts as one system; coupler forces are internal and cancel in pairs, so a = F/(m₀ + m₁ + m₂ + …)."]
+  - ["隔离法：把挂钩后面的所有车隔离出来，水平方向只受这个挂钩的拉力，所以第 k 个挂钩的拉力等于它后面所有车的质量之和乘以 a。最靠近 AGV 的挂钩拉的车最多，拉力最大。",
+     "Isolation: cut the train at a coupler; everything behind it is pulled only by that coupler, so the k-th coupler carries the total mass behind it times a. The coupler next to the AGV pulls the most and carries the most."]
+  - 式: "F_T1 = (m₁ + m₂ + …) a,   F_T2 = (m₂ + …) a        (6.6.2)"
+  - ["阿特伍德机（阿特伍德 1784 年用来演示匀加速运动，这里用来测 g）：绳和滑轮都是理想的（无质量、无摩擦），计时误差约 ±0.01 s。对 m₁、m₂ 分别列牛顿第二定律，得 a = (m₂ − m₁) g/(m₁ + m₂)。由下落高度 h 和时间 t，a = 2h/t²，从而 g = a (m₁ + m₂)/(m₂ − m₁)。",
+     "Atwood machine (used by Atwood in 1784 to demonstrate uniform acceleration; here to measure g): ideal string and pulley (massless, frictionless), timing error about ±0.01 s. Newton's second law for m₁ and m₂ gives a = (m₂ − m₁) g/(m₁ + m₂). From the fall h and time t, a = 2h/t², hence g = a (m₁ + m₂)/(m₂ − m₁)."]
+  - 式: "a = (m₂ − m₁) g/(m₁ + m₂),   F_T = 2 m₁ m₂ g/(m₁ + m₂)        (6.6.4)"
+步骤:
+  - ["选“AGV 牵引料车”，料车数 2，驱动力 200 N，点“开始”。读出加速度和两个挂钩的拉力，与式 (6.6.2) 的手算比较，记入表 1（任务 1）。",
+     "Choose “AGV tows carts”, 2 carts, 200 N, press “Start”. Read the acceleration and both tensions, compare with Eq. (6.6.2) and record in Table 1 (task 1)."]
+  - ["逐步加大驱动力，找出不脱钩的最大驱动力，并与 F_max = 150 N × (总质量)/(m₁ + m₂) 的手算比较（任务 2）。",
+     "Increase the force step by step, find the largest one that does not break a coupler, and compare with F_max = 150 N × (total mass)/(m₁ + m₂) (task 2)."]
+  - ["料车数改为 3，求不脱钩的最大驱动力；再故意超过它，看哪一个挂钩先脱开，解释原因（任务 3）。",
+     "With 3 carts, find the largest safe force; then exceed it on purpose, see which coupler breaks first, and explain (task 3)."]
+  - ["切换到“阿特伍德机”，取 m₁ = 1.00 kg，m₂ 依次为 1.05、1.10、1.20 kg，读出下落 1 m 的时间 t，算出 a 和 g，记入表 2（任务 4）。",
+     "Switch to “Atwood machine”; with m₁ = 1.00 kg and m₂ = 1.05, 1.10, 1.20 kg, read the time to fall 1 m, compute a and g, and record in Table 2 (task 4)."]
+数据表:
+  - 标题: ["表 1  AGV 牵引料车（挂钩额定拉力 150 N）", "Table 1  AGV tows carts (couplers rated 150 N)"]
+    表头: ["料车数", "F / N", "a 读数 / (m/s²)", "F_T1 读数 / N", "F_T1 手算 / N", "F_T2 读数 / N", "F_T2 手算 / N", "是否脱钩"]
+    表头英文: ["Carts", "F / N", "a read / (m/s²)", "F_T1 read / N", "F_T1 computed / N", "F_T2 read / N", "F_T2 computed / N", "Broken?"]
+    行: [["2", "200", "", "", "", "", "", ""], ["2", "280", "", "", "", "", "", ""], ["2", "310", "", "", "", "", "", ""], ["3", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  阿特伍德机测 g（h = 1 m）", "Table 2  Measuring g with an Atwood machine (h = 1 m)"]
+    表头: ["m₁ / kg", "m₂ / kg", "t / s", "a = 2h/t² / (m/s²)", "g / (m/s²)"]
+    表头英文: ["m₁ / kg", "m₂ / kg", "t / s", "a = 2h/t² / (m/s²)", "g / (m/s²)"]
+    行: [["1.00", "1.05", "", "", ""], ["1.00", "1.10", "", "", ""], ["1.00", "1.20", "", "", ""]]
+注意:
+  - ["本实验不计滚动阻力和滑轮的质量与摩擦，第 7 章和第 12 章再计入。", "Rolling resistance and the pulley's mass and friction are neglected; Chapters 7 and 12 include them."]
+  - ["脱开的料车在本实验中靠惯性匀速滑行；实际中它会在滚动阻力作用下慢慢停下。", "A broken-off cart coasts at constant speed here; in reality rolling resistance slowly stops it."]
+思考题:
+  - ["阿特伍德机里两边质量越接近，下落越慢、计时越准，但 m₂ − m₁ 的相对误差会变大。怎样选两边的质量最合适？", "In the Atwood machine nearly equal masses make the fall slow and easy to time, but make the relative error of m₂ − m₁ larger. How would you choose the masses?"]

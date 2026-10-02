@@ -138,6 +138,7 @@ def test_virtual_labs_open_from_the_page(client, tmp_path):
     (tmp_path / "robotics" / "lab" / "ch04.html").write_text("<!doctype html><title>第4章 虚拟实验</title>")
     html = client.get("/api/v1/textbooks/robotics/sections/4.1", headers=hs).json()["html"]
     assert "wq-labbtn" in html and "#lab-4-1" in html and "打开实验 4.1 转动零件" in html
+    assert "<details class='wq-labrun'>" in html and "在本页运行" in html and "<iframe class='wq-labframe'" in html   # 第 9 轮 2.5
     url = html.split("href='")[1].split("#")[0]
     r = client.get(url[url.index("/api/"):])
     assert r.status_code == 200 and "虚拟实验" in r.text and "default-src 'none'" in r.headers["content-security-policy"]

@@ -1,0 +1,37 @@
+# 实验 6.3 的指导书与报告模板。目的、场景、参数、任务取自 lab6_3.js。
+原理:
+  - ["牛顿第二定律：物体的加速度与所受合力成正比，与质量成反比，方向与合力相同。本实验不计滚动阻力，驱动力就是合力。",
+     "Newton's second law: acceleration is proportional to the net force, inversely proportional to the mass, and along the force. Rolling resistance is neglected here, so the driving force is the net force."]
+  - 式: "F = m a        (6.3.2)"
+  - ["AGV 由静止起步做匀加速直线运动，x = a t²/2，t 从起步时刻算起。光电门 1、2 在 x₁ = 0.5 m、x₂ = 1.5 m 处，记下通过时刻 t₁、t₂，两式相减得到加速度。用两道门而不只用一道，可以利用较长的时间间隔，减小计时误差的影响。",
+     "Starting from rest with constant acceleration, x = a t²/2 with t counted from the start. Gates at x₁ = 0.5 m and x₂ = 1.5 m record t₁ and t₂; subtracting the two equations gives the acceleration. Using two gates instead of one makes use of a longer time interval and reduces the effect of timing errors."]
+  - 式: "a = 2(x₂ − x₁)/(t₂² − t₁²)"
+  - ["在质量一定时作 a–F 图应为过原点的直线，斜率为 1/m；在力一定时作 a–1/m 图，斜率为 F。反过来，已知力和测得的加速度，就能“称”出质量：m = F/a（惯性质量）。",
+     "At fixed mass the a–F graph is a line through the origin with slope 1/m; at fixed force the a–1/m graph has slope F. Conversely, a known force and a measured acceleration weigh the body: m = F/a (inertial mass)."]
+步骤:
+  - ["选场景“AGV 测试道”，载货 40 kg（总质量 120 kg），驱动力依次取 40、60、80、100、120、160 N，各点“起步”跑一次，把 t₁、t₂ 和测得的 a 记入表 1。",
+     "Choose “AGV test track”, load 40 kg (total 120 kg); run once at each of 40, 60, 80, 100, 120, 160 N and record t₁, t₂ and the measured a in Table 1."]
+  - ["驱动力固定为 120 N，载货依次取 0、20、40、60、80 kg，记入表 2。", "Keep 120 N and set the load to 0, 20, 40, 60, 80 kg; record in Table 2."]
+  - ["用表 1 作 a–F 图并作最小二乘直线（第 1 章 1.6 节），求斜率和 m；用表 2 作 a–1/m 图，求斜率 F，与设定值比较。",
+     "Plot a against F from Table 1 and fit a least-squares line (Section 1.6) to get the slope and m; plot a against 1/m from Table 2 and get the slope F; compare with the settings."]
+  - ["切换到“称未知货箱”，在 120 N 和 200 N 下各跑两次，由 m = F/a 求总质量，减去 AGV 的 80 kg 得到货箱质量，把“质量估计”调到你的结果后再跑一次（任务 2）。",
+     "Switch to “Weigh an unknown crate”; run twice at 120 N and twice at 200 N, find the total mass from m = F/a, subtract the AGV's 80 kg, set “mass estimate” to your result and run once more (task 2)."]
+  - ["切换到“推购物车”，用 30 N 分别推空车和装 30 kg 的车，比较加速度（装 30 kg 的一次完成任务 3）。", "Switch to “Pushing a shopping cart”: push it empty and with 30 kg at 30 N and compare the accelerations (the run with 30 kg completes task 3)."]
+数据表:
+  - 标题: ["表 1  质量一定（m = 120 kg），改变驱动力", "Table 1  Fixed mass (m = 120 kg), varying force"]
+    表头: ["F / N", "t₁ / s", "t₂ / s", "a 测得 / (m/s²)", "F/m / (m/s²)", "相对偏差"]
+    表头英文: ["F / N", "t₁ / s", "t₂ / s", "a measured / (m/s²)", "F/m / (m/s²)", "Relative deviation"]
+    行: [["40", "", "", "", "", ""], ["60", "", "", "", "", ""], ["80", "", "", "", "", ""], ["100", "", "", "", "", ""], ["120", "", "", "", "", ""], ["160", "", "", "", "", ""]]
+  - 标题: ["表 2  驱动力一定（F = 120 N），改变载货", "Table 2  Fixed force (F = 120 N), varying load"]
+    表头: ["载货 / kg", "总质量 m / kg", "1/m / kg⁻¹", "a 测得 / (m/s²)"]
+    表头英文: ["Load / kg", "Total mass m / kg", "1/m / kg⁻¹", "a measured / (m/s²)"]
+    行: [["0", "80", "", ""], ["20", "100", "", ""], ["40", "120", "", ""], ["60", "140", "", ""], ["80", "160", "", ""]]
+  - 标题: ["表 3  称未知货箱", "Table 3  Weighing the unknown crate"]
+    表头: ["F / N", "a 测得 / (m/s²)", "总质量 F/a / kg", "货箱质量 / kg"]
+    表头英文: ["F / N", "a measured / (m/s²)", "Total mass F/a / kg", "Crate mass / kg"]
+    行: [["120", "", "", ""], ["120", "", "", ""], ["200", "", "", ""], ["200", "", "", ""]]
+注意:
+  - ["光电门的计时误差约 ±2 ms，同一条件下跑两次，读数会略有不同，这是测量的随机误差。", "The gates time to about ±2 ms, so two runs under the same conditions differ slightly: random measurement error."]
+  - ["只有在“AGV 测试道”场景记录的数据才会画在该场景的 a–F 图上；“清空记录”只清除记录，不改变参数。", "Only runs in a scene are plotted in that scene's a–F graph; “Clear records” clears data, not settings."]
+思考题:
+  - ["如果测试道上有滚动阻力（第 7 章），a–F 图还是过原点的直线吗？截距表示什么？", "With rolling resistance (Chapter 7), is the a–F graph still a line through the origin? What does the intercept mean?"]

@@ -1,0 +1,36 @@
+# 实验 6.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab6_2.js。
+原理:
+  - ["牛顿第一定律：物体不受外力（或合力为零）时，保持静止或匀速直线运动。AGV 刹车时，货箱如果不受向后的力，就会以原来的速度继续前进；在地面参考系里，货箱并没有“被推向前”，而是车板从它下面减速了。",
+     "Newton's first law: with no net force, a body stays at rest or keeps moving uniformly in a straight line. When the AGV brakes, the crate keeps its speed unless something pushes it backwards; in the ground frame it is not pushed forward — the deck slows down underneath it."]
+  - ["能让货箱随车一起减速的，只有车板对它的静摩擦力，其最大值为 μ_s m g（第 7 章）。所以货箱不滑的条件是刹车减速度不超过 μ_s g。",
+     "Only static friction from the deck can slow the crate with the AGV; its largest value is μ_s m g (Chapter 7). So the crate does not slide as long as the deceleration does not exceed μ_s g."]
+  - 式: "a ≤ μ_s g ⇒ 不滑；a > μ_s g ⇒ 滑动，相对车板滑过 Δx = v₀²/(2μg) − v₀²/(2a)        (6.2.2)"
+  - ["公交车里的吊环：刹车时在车厢里看，吊环稳定在 tan θ = a/g 的倾角上。这一倾角在地面参考系里同样能由牛顿第二定律求出（第 7 章非惯性系一节再讨论车厢里的看法）。",
+     "The bus hand strap: seen in the bus while braking, it settles at tan θ = a/g. The same angle follows from Newton's second law in the ground frame (Chapter 7 discusses the view from inside the bus)."]
+步骤:
+  - ["打开实验 6.2，选“AGV 急停”。保持 v₀ = 1.5 m/s、μ = 0.30，先把刹车减速度设为 1.0 m/s²，点“开始刹车”，观察货箱是否滑动，记入表 1。",
+     "Open Lab 6.2, choose “AGV emergency stop”. With v₀ = 1.5 m/s and μ = 0.30, set the deceleration to 1.0 m/s², press “Brake now”, see whether the crate slides and enter it in Table 1."]
+  - ["依次把减速度设为 2.0、2.8、2.9、3.0、4.0、5.0 m/s²，每次记录是否滑动和滑过的距离。找出刚开始滑动的减速度，与 μg 比较（任务 2）。",
+     "Repeat with 2.0, 2.8, 2.9, 3.0, 4.0, 5.0 m/s²; record each time whether it slides and how far. Find the deceleration where sliding begins and compare it with μg (task 2)."]
+  - ["对 a = 5.0 m/s² 一次，用式 (6.2.2) 手算滑过的距离，与读数比较；对照右侧两条速度—时间曲线，说明两条曲线之间的面积表示什么（参看正文图 6.2.2）。",
+     "For a = 5.0 m/s², compute the slide with Eq. (6.2.2) and compare with the reading; using the two velocity–time curves, explain what the area between them represents (see Figure 6.2.2 in the text)."]
+  - ["改 μ = 0.50，重复第 2 步的几个关键值，验证临界减速度随 μ 成正比。",
+     "Set μ = 0.50 and repeat the key values of step 2 to confirm that the critical deceleration is proportional to μ."]
+  - ["切换到“公交车急刹”，把减速度从 1 m/s² 逐步加大，记录吊环的最大前倾角，与 arctan(a/g) 比较（任务 3）。",
+     "Switch to “A bus brakes”, increase the deceleration from 1 m/s² step by step, record the largest strap angle and compare it with arctan(a/g) (task 3)."]
+数据表:
+  - 标题: ["表 1  AGV 急停（v₀ = 1.5 m/s）", "Table 1  AGV emergency stop (v₀ = 1.5 m/s)"]
+    表头: ["μ", "刹车减速度 a / (m/s²)", "μg / (m/s²)", "是否滑动", "滑过距离读数 / cm", "滑过距离手算 / cm"]
+    表头英文: ["μ", "Deceleration a / (m/s²)", "μg / (m/s²)", "Slides?", "Slide read / cm", "Slide computed / cm"]
+    行: [["0.30", "1.0", "", "", "", ""], ["0.30", "2.0", "", "", "", ""], ["0.30", "2.8", "", "", "", ""], ["0.30", "2.9", "", "", "", ""],
+         ["0.30", "3.0", "", "", "", ""], ["0.30", "4.0", "", "", "", ""], ["0.30", "5.0", "", "", "", ""], ["0.50", "4.8", "", "", "", ""], ["0.50", "5.0", "", "", "", ""]]
+  - 标题: ["表 2  公交车吊环", "Table 2  Bus hand strap"]
+    表头: ["减速度 a / (m/s²)", "最大前倾角读数 / (°)", "arctan(a/g) / (°)"]
+    表头英文: ["Deceleration a / (m/s²)", "Largest angle read / (°)", "arctan(a/g) / (°)"]
+    行: [["1.0", "", ""], ["2.0", "", ""], ["3.0", "", ""], ["4.0", "", ""]]
+注意:
+  - ["本实验取静摩擦因数与动摩擦因数相等（μ_s = μ_k = μ），第 7 章再区分两者。", "This lab takes the static and kinetic coefficients equal (μ_s = μ_k = μ); Chapter 7 separates them."]
+  - ["实验左侧画面的镜头跟随 AGV，地面的纹路向后移动表示车在前进。", "The camera on the left follows the AGV; the floor pattern moving back shows the AGV moving forward."]
+  - ["吊环的摆动有阻尼，读最大前倾角时要等它稳定后再读一次稳定角，二者都记下。", "The strap swing is damped; note both the largest angle and the steady angle."]
+思考题:
+  - ["实际的 AGV 会把正常刹车的减速度设得远小于 μg，只在急停时才用大减速度。为什么还要给货箱加挡板或绑带？", "Real AGVs brake far below μg except in an emergency stop. Why are crates still fenced or strapped?"]

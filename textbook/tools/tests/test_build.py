@@ -168,3 +168,37 @@ def test_the_english_edition_is_checked_against_the_chinese(book):
     assert "“被动转动”，英文版没有加粗对应的“passive rotation”" in text
     assert "“mirror flip”不是术语表里的英文名" in text
     assert "code/en/ex4_1_1.py 与中文版的代码不同" in text
+
+
+def test_the_same_term_has_the_same_english_name_in_every_book(book):
+    """第 9 轮 2.3: a Chinese term shared by two books should share an English name (brackets, dashes ignored);
+    a difference is a 提醒 (one book never stops another's build); "含义不同" in 备注 marks a deliberate one."""
+    other = book.parent / "physics" / "conventions"
+    other.mkdir(parents=True)
+    (other / "术语表.csv").write_text("首次出现章,中文,English,备注\n1,旋转矩阵,rotation matrix (SO(3)),\n1,四元数,hypercomplex number,\n"
+                                    "1,右手定则,right–hand rule,\n1,刚体运动,shift,含义不同\n", encoding="utf-8")
+    rep = run(book, only={"4.1"})
+    bad = [p.text for p in rep.problems if p.kind == "术语" and "不一致" in p.text]
+    assert len(bad) == 1 and "四元数" in bad[0], bad
+    assert not [p for p in rep.errors if "不一致" in p.text]
+
+
+def test_the_index_lists_each_chapters_animations_and_labs(book, tmp_path):
+    """第 9 轮 2.5: index.json carries the 互动资源 of every chapter, in reading order, with the section they are in."""
+    out = tmp_path / "out"
+    rep = build.build("robotics", root=book, out_dir=out, only={"4.1"})
+    assert not rep.errors, "\n".join(map(str, rep.errors))
+    import json
+    res = json.loads((out / "web" / "index.json").read_text(encoding="utf-8"))["resources"]["4"]
+    kinds_nums = [(r["kind"], r["num"]) for r in res]
+    assert ("anim", "4.1.1") in kinds_nums and ("lab", "4.1") in kinds_nums
+    assert all(r["sec"] == "4.1" and r["title"] for r in res)
+
+
+def test_a_law_is_a_numbered_item(book):
+    """第 9 轮: **定律 x.y.z** is numbered like definitions and theorems, and can be referred to."""
+    edit(book, "**定义 4.1.1（平面旋转矩阵）**", "**定律 4.1.1（试验）** 一条定律。\n\n**定义 4.1.1（平面旋转矩阵）**")
+    edit(book, "### 4.1.4 旋转矩阵", "### 4.1.4 旋转矩阵\n\n由定律 4.1.1 与定律 4.1.2 可知。")
+    rep = run(book, only={"4.1"})
+    bad = [p.text for p in rep.errors if p.kind == "引用"]
+    assert bad == ["定律 4.1.2 不存在"], bad

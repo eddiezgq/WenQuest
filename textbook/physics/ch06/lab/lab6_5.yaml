@@ -1,0 +1,35 @@
+# 实验 6.5 的指导书与报告模板。目的、场景、参数、任务取自 lab6_5.js。
+原理:
+  - ["胡克定律：在弹性限度内，弹簧的伸长 x 与拉力 F 成正比，F = k x，k 为劲度系数。挂质量为 m 的砝码静止时，弹簧拉力等于砝码重力 m g。",
+     "Hooke's law: within the elastic limit the extension x is proportional to the force, F = k x, with stiffness k. A hanging mass m at rest pulls with its weight m g."]
+  - 式: "x = F/k + x₀（式 (6.5.5)），用最小二乘求斜率 1/k 及其标准不确定度（式 (6.5.6)）"
+  - ["力传感器夹着零件竖直运动时，零件受重力 m g 和夹爪的力 F。由牛顿第二定律 F − m g = m a，传感器读数 F = m (g + a)：向上加速时大于 m g，向上减速（加速度向下）时小于 m g。",
+     "When the sensor holds a part moving vertically, the part feels its weight m g and the gripper force F. From F − m g = m a, the reading is F = m (g + a): above m g when speeding up upwards, below when slowing down."]
+  - 式: "F = m (g + a)        (6.5.3)"
+  - ["体重秤测的是支持力，再除以 g 显示成“千克”。电梯加速上升时支持力大于 m g，所以秤显示的数大于人的质量（视重）。",
+     "A bathroom scale measures the normal force and divides by g to show “kilograms”. While the lift speeds up upwards the normal force exceeds m g, so the scale shows more than the person's mass (apparent weight)."]
+步骤:
+  - ["选场景“标定弹簧”，点“清空记录”。砝码质量从 0 到 1.0 kg 每隔 0.1 kg 取一次，每次点“读数并记录”，把 F = m g 和读出的伸长 x 记入表 1。也可以点“0–1 kg 依次挂一遍”。",
+     "Choose “Calibrate a spring” and press “Clear records”. Set the mass from 0 to 1.0 kg in steps of 0.1 kg, press “Read and record” each time, and enter F = m g and the extension x in Table 1 (or use “Hang 0–1 kg in turn”)."]
+  - ["用最小二乘法拟合 x–F 直线，求斜率 b、截距 x₀ 和斜率的标准不确定度 u(b)；k = 1/b，u(k) = k·u(b)/b。把“你算出的 k”调到你的结果（任务 1）。",
+     "Fit a least-squares line to x against F to get slope b, intercept x₀ and u(b); then k = 1/b and u(k) = k·u(b)/b. Set “your k” to your result (task 1)."]
+  - ["切换到“机械臂提零件”，零件 2 kg，加速度依次取 1、3、5 m/s²，各跑一次，读出最大、最小读数，与 m (g ± a) 比较，记入表 2（任务 2、3）。",
+     "Switch to “Arm lifts a part”; with 2 kg, run at a = 1, 3, 5 m/s², read the largest and smallest readings, compare with m (g ± a) and record in Table 2 (tasks 2, 3)."]
+  - ["切换到“电梯里的体重秤”，质量 60 kg，加速度取 1 m/s² 和 −1 m/s²，读出起动时秤显示的千克数（任务 4）。",
+     "Switch to “A scale in a lift”; with 60 kg, use a = 1 m/s² and −1 m/s² and read what the scale shows while starting (task 4)."]
+数据表:
+  - 标题: ["表 1  弹簧标定", "Table 1  Spring calibration"]
+    表头: ["砝码 m / kg", "拉力 F = m g / N", "伸长 x / mm", "拟合值 / mm", "残差 / mm"]
+    表头英文: ["Mass m / kg", "Force F = m g / N", "Extension x / mm", "Fitted / mm", "Residual / mm"]
+    行: [["0", "", "", "", ""], ["0.1", "", "", "", ""], ["0.2", "", "", "", ""], ["0.3", "", "", "", ""], ["0.4", "", "", "", ""], ["0.5", "", "", "", ""],
+         ["0.6", "", "", "", ""], ["0.7", "", "", "", ""], ["0.8", "", "", "", ""], ["0.9", "", "", "", ""], ["1.0", "", "", "", ""]]
+  - 标题: ["表 2  机械臂提零件（m = 2 kg）", "Table 2  Arm lifts a part (m = 2 kg)"]
+    表头: ["a / (m/s²)", "最大读数 / N", "m (g + a) / N", "最小读数 / N", "m (g − a) / N"]
+    表头英文: ["a / (m/s²)", "Largest reading / N", "m (g + a) / N", "Smallest reading / N", "m (g − a) / N"]
+    行: [["1", "", "", "", ""], ["3", "", "", "", ""], ["5", "", "", "", ""]]
+注意:
+  - ["伸长的读数精确到 0.01 mm，读数有随机误差；拟合时用全部点，不要只取两个点相除。", "Extensions are read to 0.01 mm with random error; fit all points instead of dividing two."]
+  - ["重力加速度取 g = 9.81 m/s²。", "Use g = 9.81 m/s²."]
+  - ["力传感器的读数是夹爪与零件之间的力，不是零件的重力；两者只在零件静止或匀速时相等。", "The sensor reads the force between gripper and part, not the part's weight; they are equal only at rest or at constant velocity."]
+思考题:
+  - ["UR5e 的额定负载是 5 kg。如果用 5 m/s² 的加速度向上提 5 kg 的零件，腕部要承受多大的力？这对选择负载余量有什么启示？", "The UR5e is rated for 5 kg. Lifting 5 kg upwards at 5 m/s², what force does the wrist carry? What does that say about payload margins?"]

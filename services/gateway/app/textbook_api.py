@@ -6,6 +6,7 @@ the gateway serves the built pages from WQ_TEXTBOOK_DIR (<dir>/<book>/web/index.
 """
 
 import asyncio
+import html
 import json
 import logging
 import re
@@ -169,7 +170,11 @@ def register(app, m) -> None:
                 return f"<p class='wq-note'>{note}</p>"
             tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": int(ch)}).encode()).decode()
             url = f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-lab/{tok}#lab-{ch}-{k}{'-en' if en else ''}"
-            out = f"<a class='wq-labbtn' href='{url}' target='_blank' rel='noopener'>▶ {'Open ' + label if en else '打开' + label}</a>"
+            # 在本页运行（第 9 轮 2.5）: the lab page opens inside the text; a closed <details> does not load its frame
+            run = "Run it here" if en else "在本页运行"
+            out = (f"<details class='wq-labrun'><summary>▶ {run}</summary>"
+                   f"<iframe class='wq-labframe' loading='lazy' src='{url}' title='{html.escape(label)}'></iframe></details>"
+                   f"<a class='wq-labbtn' href='{url}' target='_blank' rel='noopener'>↗ {'Open ' + label if en else '打开' + label}</a>")
             docs_ = (("guide", "Lab guide (Word)"), ("report", "Report template (Word)")) if en else \
                 (("guide", "实验指导书（Word）"), ("report", "实验报告模板（Word）"))
             for kind, text in docs_:

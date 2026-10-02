@@ -1,0 +1,15 @@
+# 各章状态与英文标题（第 8 轮 2.1、2.2；《大学物理》第 9 轮）。
+# status：draft 草稿 / ai AI 审稿 / first 初审 / team 团队审阅 / final 定稿。没写的章不列。
+# title_en：有英文版的章必须写英文章名。
+parts_en:
+  导论: Introduction
+  第一篇 力学: "Part I  Mechanics"
+  第二篇 振动与波: "Part II  Oscillations and Waves"
+  第三篇 热学: "Part III  Thermodynamics"
+  第四篇 电磁学: "Part IV  Electricity and Magnetism"
+  第五篇 光学: "Part V  Optics"
+  第六篇 近代物理: "Part VI  Modern Physics"
+chapters:
+  6:
+    status: ai
+    title_en: "Newton's Laws of Motion"
