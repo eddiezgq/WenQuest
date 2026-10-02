@@ -1,0 +1,33 @@
+# 实验 50.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab50_8.js。
+原理:
+  - ["比较工艺方案时只比与方案有关的费用，叫工艺成本。它分两部分：随产量变化的可变费用（每件的工时费、刀具费），和不随产量变化的年固定费用（专用设备、工装、测头的折旧与维护）。",
+     "When comparing alternatives, only the costs that differ count: the process cost. It has a variable part that grows with volume (labour and machine time, tooling per piece) and a fixed yearly part (special equipment, fixtures, probes: depreciation and upkeep)."]
+  - 式: "年度工艺成本 E = V·N + F；单件工艺成本 c = V + F/N        (50.8.1)、(50.8.2)"
+  - ["两方案的年度工艺成本相等时的产量叫临界产量。产量大于临界产量时，固定费用高、可变费用低的方案便宜。",
+     "The volume at which the two yearly costs are equal is the break-even volume. Above it, the alternative with the higher fixed and lower variable cost is cheaper."]
+  - 式: "N_c = (F_B − F_A) / (V_A − V_B)        (50.8.3)"
+  - ["成本之外还要看产能：每班产能由瓶颈工作中心决定，等于一班的可用时间除以该工作中心每件占用的时间（工时 ÷ 台数）。",
+     "Besides cost, check capacity: output per shift is set by the bottleneck work centre — the shift time divided by the time each piece takes there (minutes ÷ number of machines)."]
+步骤:
+  - ["打开实验 50.8，选“SH-301 输出轴”。保持默认参数，读两个方案的单件工艺成本和临界产量，用式 (50.8.3) 手算核对，记入表 1。",
+     "Open Lab 50.8 and choose “SH-301 output shaft”. With the defaults, read both costs per piece and the break-even volume, check them by Eq. (50.8.3) and enter them in Table 1."]
+  - ["调年产量，找到两条曲线的交点（任务 1）。", "Adjust the volume to find where the curves cross (task 1)."]
+  - ["切换到“关节输出轴”，把年产量调到 600 件以下，说明哪个方案便宜（任务 2）；回到 SH-301，把年产量调到 3500 件以上（任务 3）。",
+     "Switch to “joint output shaft”, set the volume below 600 and state which is cheaper (task 2); back on SH-301, go above 3500 (task 3)."]
+  - ["保持 4000 件/年，把每班需求从 20 逐步提高，记录方案 B 开始做不出来、方案 A 还能做出来的需求（任务 4）。指出这时的瓶颈工作中心。",
+     "Keep 4000 pieces a year and raise the demand per shift from 20; record when B can no longer keep up but A still can (task 4). Name the bottleneck."]
+  - ["改变方案 B 的年固定费用和精细车工时，各做两组，记录临界产量怎样变。", "Change B's fixed cost and fine-turning time, two values each, and record how the break-even volume moves."]
+数据表:
+  - 标题: ["表 1  两方案的工艺成本", "Table 1  Process cost of the two alternatives"]
+    表头: ["年产量 N", "A 单件成本 / USD", "B 单件成本 / USD", "临界产量（读数）", "临界产量（手算）", "较便宜的方案"]
+    表头英文: ["Volume N", "A cost / USD", "B cost / USD", "Break-even (read)", "Break-even (computed)", "Cheaper"]
+    行: [["1000", "", "", "", "", ""], ["300", "", "", "", "", ""], ["4000", "", "", "", "", ""]]
+  - 标题: ["表 2  产能与需求（N = 4000）", "Table 2  Capacity and demand (N = 4000)"]
+    表头: ["每班需求", "A 每班产能", "B 每班产能", "A 能否满足", "B 能否满足", "瓶颈"]
+    表头英文: ["Demand per shift", "A capacity", "B capacity", "A meets it?", "B meets it?", "Bottleneck"]
+    行: [["20", "", "", "", "", ""], ["24", "", "", "", "", ""], ["26", "", "", "", "", ""], ["30", "", "", "", "", ""]]
+注意:
+  - ["费率、方案 B 的固定费用和刀片费都是教学示意值；分析方法与真实工厂相同。", "Rates, B's fixed cost and insert cost are teaching values; the method is the same as in a real plant."]
+  - ["材料费两方案相同，不计入工艺成本。", "Material cost is the same for both alternatives and is left out of the process cost."]
+思考题:
+  - ["如果数控车床再添一台，方案 B 的产能和工艺成本会怎样变？什么情况下值得添？", "If a third CNC lathe were added, how would B's capacity and process cost change? When would it be worth it?"]

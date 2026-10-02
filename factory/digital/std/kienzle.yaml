@@ -1,5 +1,5 @@
 # Kienzle 单位切削力常数 kc1.1 / mc（kc = kc1.1 · h^-mc，h 单位 mm，kc 单位 N/mm² = MPa）
-standard: {code: "无正式标准；Kienzle–Victor 公式（DIN 6584 术语）", title: "常用工件材料的单位切削力 kc1.1 与指数 mc（Kienzle 常数）—— 按出处分组，不同出处的参考条件不同，不可混用"}
+standard: {short: "Kienzle 单位切削力表，Westermann《Fertigen mit Werkzeugmaschinen》等", code: "无正式标准；Kienzle–Victor 公式（DIN 6584 术语）", title: "常用工件材料的单位切削力 kc1.1 与指数 mc（Kienzle 常数）—— 按出处分组，不同出处的参考条件不同，不可混用"}
 sources:
   - {key: s1, title: "Westermann《Fertigen mit Werkzeugmaschinen》（ISBN 978-3-14-235025-7）第 143 页“Spezifische Schnittkraft”样章 PDF", url: "https://c.wgr.de/f/pdf/978-3-14-235025-7-1-l.pdf", note: "表头：Werkstoff | mc | 各 Spanungsdicke h=0.05…2.5 mm 下的 kc。本表 kc11_MPa 取 h=1.0 mm 一列（即 kc1.1），另录 h=0.1、0.4 两列；参考条件与切削速度修正系数 K 也出自本页。读了三遍（整表、按行全列、按 h=1.0/0.1/0.4 列），一致处才收"}
   - {key: s2, title: "Gewerbeschule Lörrach（Ulrich Rapp）《Übungsaufgaben zu Schnittkraft und Schnittleistung》（数值注明取自 Europa《Tabellenbuch Metall》第 46 版）", url: "https://ulrich-rapp.de/stoff/fertigung/Schnittkraftberechnung_Ub.pdf", note: "只用来互核 s1：16MnCr5 2100/0.26、C60 2130/0.18、E295 1990/0.26，以及 C60 在 h=0.4 的 kc=2512；该文件写明“别的版本或书数值可能差很多”"}

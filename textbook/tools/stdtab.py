@@ -79,6 +79,10 @@ class Table:
             return code
         return f"{code}［{'数据出处' if lang == 'zh' else 'data from'} {row.get('src', '')}］"
 
+    def label(self) -> str:
+        """A short name for messages (standard.short when the full code is long)."""
+        return self.standard.get("short") or self.standard.get("code", self.name)
+
     def source_list(self) -> list[str]:
         return [f"{k}: {s['title']} {s.get('url', '')}".strip() for k, s in self.sources.items()]
 

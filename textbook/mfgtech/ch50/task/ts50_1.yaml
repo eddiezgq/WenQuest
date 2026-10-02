@@ -1,0 +1,44 @@
+# 工程任务单 TS-50-1（配 50.5–50.9 节）。生成《工程任务单》《评分量规》和《空白计算书》（Word）。
+编号: TS-50-1
+标题: [SH-301 输出轴工艺规程改版：单件工时降到 70 分钟以内, "SH-301 output shaft process plan revision: under 70 minutes per piece"]
+角色: [工艺员（工艺工程师）, process engineer]
+背景:
+  - "客户把 WQR-105 减速器的年订量从 1000 台提高到 3000 台。厂长要求输出轴 SH-301 的单件工时从现在的 76 分钟降到 70 分钟以内，图纸不改，设备只能用工厂现有的 11 个工作中心，产品质量不能降。你负责提出新版工艺规程，经评审批准后，在仿真车间做出 5 件首批零件，三坐标检验全部合格，并说明新工艺的成本和产能。"
+  - "A customer raises the yearly order for the WQR-105 reducer from 1000 to 3000 units. The plant manager wants the time per SH-301 output shaft cut from 76 to under 70 minutes — same drawing, only the plant's existing 11 work centers, no loss of quality. You propose the revised process plan; once it is reviewed and approved, make a first batch of 5 parts in the simulated shop, pass CMM inspection on all of them, and report the new plan's cost and capacity."
+输入:
+  - {名称: [SH-301 零件图与三维模型, SH-301 drawing and 3D model], 来源: [数字工厂“设计与工艺”页；教材图 50.2.1, "Digital factory, Design & Process page; Figure 50.2.1"]}
+  - {名称: [现行工艺规程（第 0 版）, Current process plan (rev 0)], 来源: [数字工厂“设计与工艺 → 工艺规程”；教材 50.5 节, "Digital factory, Design & Process → Process plans; Section 50.5"]}
+  - {名称: [工作中心、台数与费率, "Work centers, counts and rates"], 来源: [ERPNext“工作中心”；工厂设计说明, "ERPNext Workstations; factory design notes"]}
+  - {名称: [检验模板“零件检验-输出轴”, Inspection template for the output shaft], 来源: [ERPNext“质量检验模板”, "ERPNext Quality Inspection Template"]}
+  - {名称: [工艺数据表（标准公差、经济精度、单位切削力）, "Process data tables (IT grades, economic accuracy, specific cutting force)"], 来源: [教材附录与 textbook/mfgtech/std, "Appendix and textbook/mfgtech/std"]}
+交付物:
+  - {名称: [新版工艺规程（数字工厂里提交）, Revised process plan (submitted in the digital factory)], 验收: [AI 工艺评审员没有“必须改”意见；所有“建议”已改正或写明理由；老师批准, "No must-fix comments from the AI reviewer; every suggestion fixed or answered; approved by the teacher"]}
+  - {名称: [工艺计算书（Word）, Process calculation sheet (Word)], 验收: [用空白计算书填写：工序尺寸、余量、切削功率、基本时间、单件时间，每个查表值注明出处, "Filled in on the blank sheet: operational dimensions, allowances, cutting power, machining time, time per piece; every looked-up value cites its source"]}
+  - {名称: [机械加工工艺过程卡与关键工序卡, Process route sheet and key operation sheets], 验收: [格式符合 JB/T 9165；工序卡有工序简图、定位夹紧符号、刀具与切削用量, "JB/T 9165 layout; operation sheets show a sketch, locating and clamping symbols, tools and cutting data"]}
+  - {名称: [首批 5 件的检验记录, Inspection records of the first 5 parts], 验收: [三坐标检验全部合格；附控制图与过程能力的初步估计, "All pass CMM inspection; control chart and a first capability estimate attached"]}
+  - {名称: [成本与产能说明（一页）, Cost and capacity note (one page)], 验收: [新旧方案的单件工艺成本、瓶颈工作中心与每班产能对比，结论明确, "Compares process cost per piece, bottleneck and output per shift for old and new plans, with a clear conclusion"]}
+工位: [PY, PLM, ERP, MES, QMS, SPC]
+步骤:
+  - ["读图与现行工艺：在数字工厂里打开 SH-301 的现行工艺规程，用 50.7 节的方法找出工时的大头在哪里（基本时间还是辅助时间）、瓶颈工作中心是哪一个。", "Read the drawing and current plan: open SH-301's current plan, use Section 50.7 to see where the time goes (machining or handling) and which work center is the bottleneck."]
+  - ["提出至少两个改进方案（例如工序集中、减少装夹和调头、缩短对刀与测量时间、优化切削用量；工厂的工序表里没有的工序，不能写进工艺规程），用 50.8 节的方法比较单件工艺成本和产能，选定一个。", "Propose at least two improvements (e.g. operation concentration, fewer setups and turn-overs, shorter tool setting and measuring, better cutting data; an operation missing from the plant's list cannot go into the plan), compare cost and capacity with Section 50.8, and choose one."]
+  - ["按选定的方案重写工艺规程：定位基准、工序顺序、工序尺寸与余量、刀具与切削用量、单件工时。在空白计算书里写出全部计算。", "Rewrite the plan: datums, order, operational dimensions and allowances, tools and cutting data, time per piece. Write every calculation on the blank calculation sheet."]
+  - ["先点“AI 预检”自查，再提交审批；逐条处理评审意见。", "Run the AI pre-check, then submit for approval; address every comment."]
+  - ["批准后，到 ERPNext 查看 SH-301 的新版 BOM：工序和工时是否已变成新工艺，单件成本变了多少。", "After approval, open SH-301's new BOM in ERPNext: are the operations and times the new ones, and how much did the cost change?"]
+  - ["在“订单与计划”下 5 件的工单，车间执行下达；仿真车间加工完后，在“质量”页查看三坐标检验结果和控制图。", "Raise a 5-piece work order and release it; after the simulated shop finishes, check the CMM results and control chart on the Quality page."]
+  - ["写一页成本与产能说明，连同计算书、工艺卡一起提交。", "Write the one-page cost and capacity note and submit it with the calculation sheet and route sheets."]
+评审要点:
+  - ["〔AI 检查〕工序顺序：先粗后精，调质在粗车与精车之间，铣键槽在精车之后、磨削之前（若保留磨削），检验在最后。", "[AI] Order: roughing before finishing, Q&T between rough and finish turning, keyway after finish turning and before grinding (if kept), inspection last."]
+  - ["〔AI 检查〕基准：第一道机加工工序写明粗基准；精加工基准统一（两端中心孔）。〔老师检查〕换基准时有尺寸链计算。", "[AI] Datums: the first machining operation names its rough datum; one finish datum (the centre holes). [Teacher] Any change of datum is backed by a dimension chain."]
+  - ["〔AI 检查〕精度：粗车、精车的工序公差在经济精度之内；末道尺寸和粗糙度满足图纸。〔老师检查〕其他方法的经济精度。", "[AI] Accuracy: rough- and finish-turning tolerances within economic accuracy; final sizes and roughness meet the drawing. [Teacher] Economic accuracy of other methods."]
+  - ["〔AI 检查〕余量：每道工序余量的最小值大于零。〔老师检查〕最小余量按式 (50.6.3) 核算，能切掉上道的缺陷层与变形。", "[AI] Allowances: every minimum stock is positive. [Teacher] The minimum stock is checked by Eq. (50.6.3) against the previous damaged layer and distortion."]
+  - ["〔AI 检查〕切削用量与工时：切削功率不超过机床功率；单件工时不小于基本时间；工时合计低于 70 分钟。", "[AI] Cutting data and time: cutting power within the machine's; time per piece not below machining time; total under 70 minutes."]
+  - ["〔AI 检查〕是否附计算书；〔老师检查〕计算书的已知、求、计算、校核齐全，查表值注明出处。", "[AI] Is a calculation sheet attached; [Teacher] Calculation sheet: givens, unknowns, steps and checks complete, every looked-up value cited."]
+评分:
+  - {项: [工艺方案, Process plan], 分: 30, 标准: [顺序、基准、精度、余量全部合理；AI 评审没有“必须改”意见, "Order, datums, accuracy and allowances all sound; no must-fix comments"]}
+  - {项: [工艺计算书, Calculation sheet], 分: 20, 标准: [计算正确完整，出处齐全, "Correct, complete, every source cited"]}
+  - {项: [工艺文件, Process documents], 分: 15, 标准: [过程卡与工序卡格式规范、内容与工艺规程一致, "Route and operation sheets tidy and consistent with the plan"]}
+  - {项: [目标达成, Target met], 分: 15, 标准: [单件工时 < 70 min，质量与产能满足要求, "Under 70 minutes per piece; quality and capacity requirements met"]}
+  - {项: [首批零件, First parts], 分: 10, 标准: [5 件三坐标检验全部合格, "All 5 parts pass CMM inspection"]}
+  - {项: [评审意见处理与说明, Review responses and note], 分: 10, 标准: [每条意见都有回应；成本与产能说明结论清楚, "Every comment answered; the cost and capacity note is clear"]}
+学时: 6
+计算书: {程序: code/_calc50.py, 函数: sheet}

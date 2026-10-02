@@ -88,7 +88,7 @@ def cutting_power_kw(material, cut):
     k = st.table("kienzle")
     row = k.row(MATERIAL_KIENZLE.get(str(material), "C45E"))
     Fc = row["kc11_MPa"] * cut["ap_mm"] * cut["f_mm_r"] ** (1 - row["mc"])
-    return Fc * cut["vc_m_min"] / 60000.0, Fc, k.cite(row)
+    return Fc * cut["vc_m_min"] / 60000.0, Fc, "按{}，{}：k_c1.1 = {} MPa、m_c = {}".format(k.label(), row["material"], row["kc11_MPa"], row["mc"])
 
 
 def basic_time_min(cut):
@@ -193,9 +193,9 @@ def review(plan):
             if econ and m and g is not None:
                 row = econ.row(m)
                 if g < row["IT_min"]:
-                    say("精度", "error", "“{}”{} 的工序公差 {:.3f} mm 约为 IT{}，超出{}的经济精度 IT{}–IT{}（{}）。"
+                    say("精度", "error", "“{}”在{}工序的公差 {:.3f} mm 约为 IT{}，超出{}的经济精度 IT{}–IT{}（见{}）。"
                         .format(f["name"], o["operation"].split(" ")[0], T, g, row["method_zh"], row["IT_min"], row["IT_max"],
-                                econ.cite(row)), o["seq"])
+                                econ.label()), o["seq"])
             prev = seen.get(f["name"])
             if prev:
                 po, pf = prev
@@ -234,7 +234,7 @@ def review(plan):
             continue
         pw = WORKCENTER_POWER.get(o.get("workstation"))
         if pw and P / pw[1] > pw[0]:
-            say("切削用量", "error", "切削功率约 {:.1f} kW（F_c ≈ {:.0f} N，按 {}），除以传动效率 {} 后超过 {} 的主电机功率 {} kW。"
+            say("切削用量", "error", "切削功率约 {:.1f} kW（F_c ≈ {:.0f} N；{}），除以传动效率 {} 后超过{}的主电机功率 {} kW（教学示意值）。"
                 "减小背吃刀量或进给量，或分两刀。".format(P, Fc, cite, pw[1], o["workstation"], pw[0]), o["seq"])
         if "d_mm" in c and "length_mm" in c:
             tb = basic_time_min(c)

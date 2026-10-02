@@ -1,0 +1,38 @@
+# 实验 50.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab50_6.js。
+原理:
+  - ["工序尺寸要从最后一道工序往前推。最后一道（磨削）的尺寸就是图纸尺寸；前一道（精车）的尺寸等于后一道的最大尺寸，加上后一道所需的最小余量，再加上前一道自己的公差，按入体原则标注（轴取上偏差为 0）。",
+     "Operational dimensions are worked out backwards from the last operation. The last (grinding) size is the drawing size; the previous (finish-turning) size is the next operation's largest size plus the minimum stock it needs plus the previous operation's own tolerance, toleranced into the material (upper deviation 0 for a shaft)."]
+  - 式: "A₂ ≥ d_max + 2Z₃,min + T₂，A₁ ≥ A₂ + 2Z₂,min + T₁（往大取整）        (50.6.4)"
+  - ["一道工序的余量不是一个数，而是一个范围：上道工序尺寸最小、本道尺寸最大时余量最小；反过来余量最大。余量的变动量等于上下两道工序的公差之和。",
+     "An operation's stock is a range, not one number: it is smallest when the previous size is at its minimum and this size at its maximum, and largest the other way round. Its spread equals the sum of the two operations' tolerances."]
+  - 式: "2Z_min = (A_前 − T_前) − A_本,max，2Z_max = A_前 − A_本,min        (50.6.2)"
+  - ["余量的最小值要能切掉上道工序留下的表面粗糙度 Rz、缺陷层 H_a 和空间偏差 ρ（弯曲、偏心），再加上本道的装夹误差 ε。",
+     "The minimum stock must remove the roughness Rz, the defect layer H_a and the spatial deviation ρ (bending, eccentricity) left by the previous operation, plus this operation's setting error ε."]
+  - 式: "2Z_min = 2(Rz + H_a) + 2√(ρ² + ε²)        (50.6.3)"
+步骤:
+  - ["打开实验 50.6，选“SH-301 输出轴”。保持默认参数，点“核算”，读出磨削余量和精车余量的最小、最大值，判断哪一项不够，记入表 1。",
+     "Open Lab 50.6 and choose “SH-301 output shaft”. Keep the default values, press “Check”, read the minimum and maximum grinding and finish-turning stock, decide which is too small, and enter them in Table 1."]
+  - ["把“精车尺寸高出图纸”调到 0.10 mm，观察磨削余量的最小值变成多少、图上哪一段变红（任务 1）。",
+     "Set “Finish size above nominal” to 0.10 mm; see what the minimum grinding stock becomes and which part turns red (task 1)."]
+  - ["把精车公差等级调到 IT6，读核算结论（任务 2）；再调回 IT8。",
+     "Set the finish-turning grade to IT6 and read the result (task 2); set it back to IT8."]
+  - ["精车 IT8、粗车 IT12、ρ = 0.25 mm 时，按式 (50.6.4) 手算 A₂、A₁，在实验里设好，使全部核算通过（任务 3），与正文算例 50.6.1 比较。",
+     "With IT8 finish, IT12 rough and ρ = 0.25 mm, compute A₂ and A₁ by Eq. (50.6.4), set them in the lab so every check passes (task 3), and compare with Example 50.6.1."]
+  - ["切换到“关节输出轴”，ρ 取 0.40 mm，重新定粗车尺寸使全部通过（任务 4）；记录 ρ 每增大 0.1 mm 粗车尺寸要加大多少。",
+     "Switch to “joint output shaft”, take ρ = 0.40 mm and choose a new rough size so every check passes (task 4); record how much the rough size grows for each 0.1 mm of ρ."]
+数据表:
+  - 标题: ["表 1  SH-301 轴承位的工序尺寸与余量", "Table 1  SH-301 bearing seat: operational dimensions and stock"]
+    表头: ["方案", "A₂ / mm", "精车 IT", "A₁ / mm", "粗车 IT", "磨削余量 最小 / 最大 / mm", "精车余量 最小 / 最大 / mm", "结论"]
+    表头英文: ["Case", "A₂ / mm", "Finish IT", "A₁ / mm", "Rough IT", "Grinding stock min / max / mm", "Finish stock min / max / mm", "Result"]
+    行: [["默认", "", "", "", "", "", "", ""], ["A₂ − d = 0.10", "", "", "", "", "", "", ""], ["精车 IT6", "", "", "", "", "", "", ""], ["手算方案", "", "", "", "", "", "", ""]]
+    行英文: [["Default", "", "", "", "", "", "", ""], ["A₂ − d = 0.10", "", "", "", "", "", "", ""], ["Finish IT6", "", "", "", "", "", "", ""], ["Hand-computed", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  调质弯曲 ρ 与粗车尺寸（关节输出轴）", "Table 2  Q&T bending ρ and the rough size (joint shaft)"]
+    表头: ["ρ / mm", "精车所需最小余量 / mm", "最小的 A₁ / mm", "粗车余量（从 Ø30 棒料）/ mm"]
+    表头英文: ["ρ / mm", "Finish stock needed / mm", "Smallest A₁ / mm", "Rough stock (from a Ø30 bar) / mm"]
+    行: [["0.20", "", "", ""], ["0.30", "", "", ""], ["0.40", "", "", ""], ["0.50", "", "", ""]]
+注意:
+  - ["余量都按直径计（双边）。工艺卡上常写单边余量，换算时除以 2。", "All stock is on the diameter (both sides). Route sheets often give it per side; divide by 2."]
+  - ["Rz、H_a、ρ 的数值是数字工厂企业工艺标准的教学示意值，实际取值查工艺手册的余量表。", "The Rz, H_a and ρ values are the digital factory's teaching values; real values come from the allowance tables of a process handbook."]
+  - ["工序尺寸往大取整到 0.1 mm，是为了车间好测量；取整多出来的部分就是额外的余量。", "Rounding a size up to 0.1 mm makes it easy to measure on the shop floor; what rounding adds is extra stock."]
+思考题:
+  - ["为什么磨削余量也不能留得太大？从磨削工时、磨削烧伤（第 39 章）两方面说明。", "Why must the grinding stock not be too large either? Consider grinding time and grinding burn (Chapter 39)."]

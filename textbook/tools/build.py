@@ -113,7 +113,7 @@ def anim_check(code: str) -> str:
         _ANIM_CHECK = ns["check"]
     return _ANIM_CHECK(code)
 KINDS = ("程序", "动画", "实验", "图", "表", "任务")          # 任务: engineering task sheets (第 11、13 轮)
-REF_KINDS = ("式", "定义", "定律", "定理", "引理", "推论", "算例", "程序", "图", "表", "动画", "实验", "任务", "习题")
+REF_KINDS = ("式", "定义", "定律", "定理", "引理", "推论", "准则", "算例", "程序", "图", "表", "动画", "实验", "任务", "习题")
 
 
 @dataclass
@@ -629,7 +629,7 @@ def check_tags(sec: Section, rep: Report) -> None:
     nums = [int(t.rsplit(".", 1)[1]) for t in seen]
     if nums and nums != list(range(1, len(nums) + 1)):
         rep.add("error", "编号", sec.id, f"公式编号应从 1 起连续：{nums}")
-    for kind in ("定义", "定律", "定理", "引理", "推论", "算例"):     # 定律: laws of physics (第 9 轮)
+    for kind in ("定义", "定律", "定理", "引理", "推论", "准则", "算例"):     # 定律: laws of physics (第 9 轮); 准则: design and process criteria (第 11、13 轮)
         found = re.findall(r"\*\*" + kind + r" (" + re.escape(sec.id) + r"\.\d+)", sec.source)
         for n in found:
             sec.defines.add(f"{kind} {n}")
@@ -701,7 +701,7 @@ def check_numbers(sec: Section, rep: Report) -> None:
     text = FENCE.sub("", sec.source)
     text = PLACE.sub("", text)
     text = re.sub(r"https?://\S+", "", text)
-    text = re.sub(r"\b(?:JJF|JJG|GB(?:/T)?|ISO|IEC|IEEE)\s*[\d.]+", "", text)     # standard numbers, e.g. JJF 1059.1
+    text = re.sub(r"\b(?:JJF|JJG|GB(?:/T)?|JB(?:/T)?|ISO|IEC|IEEE|DIN|VDI|EN|ASTM|ASME|AWS|SAE)\s*[A-Z]?[\d.]+", "", text)     # standard numbers, e.g. JJF 1059.1, JB/T 9165.2
     text = re.split(r"\*\*本节参考文献\*\*|#+\s*(?:本章)?参考文献", text)[0]
     for line_no, line in enumerate(text.splitlines(), 1):
         for m in NUMBER.finditer(line):
@@ -713,7 +713,7 @@ def check_numbers(sec: Section, rep: Report) -> None:
 TERM = re.compile(r"\*\*([\u4e00-\u9fff][\u4e00-\u9fff·\-–]{1,11})\*\*(?![：:])")   # "**小标题**：" is a lead-in, not a term
 
 
-LABELS = {"工程师笔记", "生活中的例子", "习题", "证明", "参考文献", "本节参考文献", "本章参考文献", "章首提要", "本章小结", "注意", "提示", "历史注记"}
+LABELS = {"工程师笔记", "生活中的例子", "机器人的例子", "习题", "证明", "参考文献", "本节参考文献", "本章参考文献", "章首提要", "本章小结", "注意", "提示", "历史注记"}
 
 
 def _norm_term(t: str) -> str:

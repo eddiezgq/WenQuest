@@ -21,7 +21,7 @@ operations:
     datum: 外圆（粗基准）
     clamping: 三爪卡盘，后顶尖
     tools: 外圆车刀 CNMG 120408（涂层硬质合金），A3 中心钻
-    cut: {vc_m_min: 120, f_mm_r: 0.3, ap_mm: 2.5, d_mm: 50, length_mm: 168, passes: 4}
+    cut: {vc_m_min: 120, f_mm_r: 0.3, ap_mm: 2.5, d_mm: 50, length_mm: 172, passes: 4}    # 走刀长度含切入、切出各 2 mm
     features:
       - {name: 轴承位, size_mm: 36.5, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
       - {name: 齿轮位, size_mm: 41.5, es_mm: 0, ei_mm: -0.25, Ra_um: 12.5}
@@ -38,7 +38,7 @@ operations:
     datum: 两端中心孔
     clamping: 前后顶尖，鸡心夹头
     tools: 外圆车刀 DNMG 110404（涂层硬质合金）
-    cut: {vc_m_min: 150, f_mm_r: 0.15, ap_mm: 0.75, d_mm: 41.5, length_mm: 168, passes: 1}
+    cut: {vc_m_min: 150, f_mm_r: 0.15, ap_mm: 0.6, d_mm: 41.5, length_mm: 172, passes: 1}
     features:
       - {name: 轴承位, size_mm: 35.3, es_mm: 0, ei_mm: -0.039, Ra_um: 3.2}
       - {name: 齿轮位, size_mm: 40.3, es_mm: 0, ei_mm: -0.039, Ra_um: 3.2}
@@ -46,7 +46,7 @@ operations:
   - seq: 50
     operation: 铣键槽 Keyway milling
     workstation: 键槽铣床 KEY-01
-    content: 铣齿轮位键槽 12N9×45，槽深 5
+    content: 铣齿轮位键槽 12N9×45，控制槽底到精车外圆下母线的尺寸 H = 35.15（−0.03/−0.20），磨削后得 d − t₁ = 35（0/−0.2）
     datum: 齿轮位外圆与轴肩（V 形块）
     clamping: V 形块，压板
     tools: 键槽铣刀 Ø12
@@ -54,7 +54,7 @@ operations:
   - seq: 60
     operation: 磨外圆 Cylindrical grinding
     workstation: 外圆磨床 GRD-01
-    content: 两顶尖装夹，磨两处轴承位和齿轮位至图纸尺寸
+    content: 修研中心孔；两顶尖装夹，粗磨、精磨两处轴承位和齿轮位至图纸尺寸
     datum: 两端中心孔
     clamping: 前后顶尖
     tools: 白刚玉砂轮 WA60KV

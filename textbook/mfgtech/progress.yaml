@@ -16,4 +16,7 @@ parts_en:
   第十一篇 计量与质量: "Part XI  Metrology and Quality"
   第十二篇 制造系统与智能制造: "Part XII  Manufacturing Systems and Smart Manufacturing"
   第十三篇 综合项目: "Part XIII  Capstone Projects"
-chapters: {}
+chapters:
+  50:
+    status: ai
+    title_en: "Machining Process Planning"

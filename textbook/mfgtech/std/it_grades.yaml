@@ -1,4 +1,4 @@
-standard: {code: "GB/T 1800.1-2020（修改采用 ISO 286-1:2010）表1", title: "产品几何技术规范(GPS) 线性尺寸公差ISO代号体系 第1部分：公差、偏差和配合的基础 —— 标准公差数值（公称尺寸至 500 mm，IT1–IT18）"}
+standard: {short: "GB/T 1800.1-2020 表 1", code: "GB/T 1800.1-2020（修改采用 ISO 286-1:2010）表1", title: "产品几何技术规范(GPS) 线性尺寸公差ISO代号体系 第1部分：公差、偏差和配合的基础 —— 标准公差数值（公称尺寸至 500 mm，IT1–IT18）"}
 sources:
   - {key: "s1", title: "易紧通 164580.com《GB/T 1800.1-2020 产品几何技术规范(GPS) 线性尺寸公差ISO代号体系 第1部分（ISO 286-1:2010, MOD）》转载，表1 公称尺寸至3150mm的标准公差数值", url: "https://www.164580.com/info_415140.html?pc=1", note: "全部 13 行 IT1–IT18 的主出处（原表 IT1–IT11 单位 μm，IT12–IT18 单位 mm，本表换成 μm）"}
   - {key: "s2", title: "jxsk.ren《公差等级表 IT01-IT18 完整对照（GB/T 1800.1国标）》", url: "https://www.jxsk.ren/%E5%85%AC%E5%B7%AE%E7%AD%89%E7%BA%A7%E8%A1%A8-it01-it18-%E5%AE%8C%E6%95%B4%E5%AF%B9%E7%85%A7%EF%BC%88gb-t-1800-1%E5%9B%BD%E6%A0%87%EF%BC%89/", note: "全部 13 行 IT1–IT18 逐格互核（分 IT01–IT8、IT9–IT18 两张表）"}
