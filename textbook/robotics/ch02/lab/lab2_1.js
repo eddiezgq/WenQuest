@@ -2,12 +2,12 @@
 WQ.lab({
   title: ["实验 2.1 雅可比矩阵：列的线性组合", "Lab 2.1 The Jacobian: a combination of columns"],
   goal: ["拖动关节角和关节速度，看末端速度怎样由雅可比矩阵的两列组合而成，以及 det J = 0 时发生了什么。",
-         "Drag the joint angles and speeds; see the tip velocity built from the two columns of J, and what happens when det J = 0."],
+         "Drag the joint angles and speeds; see the end-effector velocity built from the two columns of J, and what happens when det J = 0."],
   scenes: [
     { id: "arm", robot: true, name: ["平面 2R 臂", "Planar 2R arm"], hide: ["x1", "x2"],
-      problem: { title: ["机器人问题：末端往哪里走", "Robot problem: where does the tip go?"],
+      problem: { title: ["机器人问题：末端往哪里走", "Robot problem: where does the end-effector go?"],
                  text: ["v = θ̇₁ j₁ + θ̇₂ j₂：j₁ 垂直于基座到末端的连线，j₂ 垂直于肘部到末端的连线。",
-                        "v = θ̇₁ j₁ + θ̇₂ j₂: j₁ is perpendicular to base→tip, j₂ to elbow→tip."] } },
+                        "v = θ̇₁ j₁ + θ̇₂ j₂: j₁ is perpendicular to base→end-effector, j₂ to elbow→end-effector."] } },
     { id: "fruit", name: ["买水果", "Buying fruit"], hide: ["th1", "th2", "w1", "w2"],
       problem: { title: ["生活中的例子：凑出总价和维生素 C", "Everyday example: hit a price and a vitamin C total"],
                  text: ["苹果 12 元/kg、维生素 C 40 mg/kg；橙子 8 元/kg、500 mg/kg。目标：总价 40 元，维生素 C 1080 mg。",
@@ -23,7 +23,7 @@ WQ.lab({
   ],
   buttons: [{ id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "xonly", robot: true, text: ["θ = (30°, 60°) 时只转关节 2，让末端沿 +x 方向运动。", "At θ = (30°, 60°) turn only joint 2 so that the tip moves along +x."],
+    { id: "xonly", robot: true, text: ["θ = (30°, 60°) 时只转关节 2，让末端沿 +x 方向运动。", "At θ = (30°, 60°) turn only joint 2 so that the end-effector moves along +x."],
       demo: { scene: "arm", set: { th1: 30, th2: 60, w1: 0, w2: -1 }, press: [] } },
     { id: "straight", robot: true, text: ["把手臂伸直（θ₂ = 0°），看 det J = 0 时两列变得平行。", "Straighten the arm (θ₂ = 0°): det J = 0 and the two columns become parallel."],
       demo: { scene: "arm", set: { th1: 30, th2: 0, w1: 0.5, w2: 0.5 }, press: [] } },
@@ -31,7 +31,7 @@ WQ.lab({
       demo: { scene: "fruit", set: { x1: 2, x2: 2 }, press: [] } },
   ],
   think: ["手臂伸直时，无论关节速度取什么值，末端速度都朝哪个方向？这与 det J = 0 有什么关系？",
-          "With the arm straight, which way does the tip move whatever the joint speeds are? How is that related to det J = 0?"],
+          "With the arm straight, which way does the end-effector move whatever the joint speeds are? How is that related to det J = 0?"],
 
   L: [0.425, 0.392],
   J(api) {
@@ -49,7 +49,7 @@ WQ.lab({
       if (Math.abs(det) < 1e-9 && Math.abs(api.p.th2) < 0.5) api.done("straight");
       return [[["雅可比矩阵 J / m", "Jacobian J / m"], `[${f(J[0][0], 4)}, ${f(J[0][1], 4)}; ${f(J[1][0], 4)}, ${f(J[1][1], 4)}]`],
               [["det J / m²", "det J / m²"], f(det, 5)],
-              [["末端速度 v", "tip velocity v"], `(${f(v[0], 4)}, ${f(v[1], 4)}) m/s`],
+              [["末端速度 v", "end-effector velocity v"], `(${f(v[0], 4)}, ${f(v[1], 4)}) m/s`],
               [["速度大小 |v|", "speed |v|"], f(Math.hypot(v[0], v[1]), 4) + " m/s"]];
     }
     const price = 12 * api.p.x1 + 8 * api.p.x2, vc = 40 * api.p.x1 + 500 * api.p.x2;

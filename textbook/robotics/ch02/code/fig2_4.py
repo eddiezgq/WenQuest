@@ -75,7 +75,7 @@ for n, (t2, col, lab) in enumerate(((5, C["x"], "θ₂ = 5°"), (60, C["accent"]
     ax.text(0.68, 0.9 - 0.07 * n, lab, fontsize=10.5, color=col)
 ax.set_xlim(-0.15, 1.0)
 ax.set_ylim(-0.08, 0.95)
-ax.text(-0.15, -0.07, T(r"椭圆：$|\dot\theta|$ = 1 rad/s 时末端速度的端点（1 m/s 画成 0.25 m）", r"ellipses: tip velocities for $|\dot\theta|$ = 1 rad/s (1 m/s drawn as 0.25 m)"),
+ax.text(-0.15, -0.07, T(r"椭圆：$|\dot\theta|$ = 1 rad/s 时末端速度的端点（1 m/s 画成 0.25 m）", r"ellipses: end-effector velocities for $|\dot\theta|$ = 1 rad/s (1 m/s drawn as 0.25 m)"),
         fontsize=9, color=C["ink"])
 ax2 = fig.add_axes([0.58, 0.17, 0.4, 0.75])
 t2 = np.arange(0, 181)

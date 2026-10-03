@@ -3,10 +3,10 @@
 WQ.lab({
   title: ["实验 2.6 自运动与零空间", "Lab 2.6 Self-motion and the null space"],
   goal: ["在末端不动的前提下改变手臂的形态，读出雅可比矩阵的秩和零空间方向；看手臂伸直时秩怎样下降。",
-         "Change the arm's shape while the tip stays put; read the rank of the Jacobian and the null-space direction; see the rank drop when the arm is straight."],
+         "Change the arm's configuration while the end-effector stays put; read the rank of the Jacobian and the null-space direction; see the rank drop when the arm is straight."],
   scenes: [
     { id: "arm", robot: true, name: ["平面 3R 臂", "Planar 3R arm"], hide: ["sh"],
-      problem: { title: ["机器人问题：末端不动，手臂还能动吗", "Robot problem: can the arm move while the tip stays?"],
+      problem: { title: ["机器人问题：末端不动，手臂还能动吗", "Robot problem: can the arm move while the end-effector stays still?"],
                  text: ["三个关节，任务只要求末端的两个坐标：多出一个自由度。目标点在 55° 方向上，距基座 d。",
                         "Three joints, a task of two coordinates: one joint to spare. The target lies in the 55° direction at distance d from the base."] } },
     { id: "human", name: ["手按桌面", "Hand on the table"], hide: ["th1", "d"],
@@ -21,7 +21,7 @@ WQ.lab({
   ],
   buttons: [{ id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "self", robot: true, text: ["把 θ₁ 调到 50°，确认末端偏差小于 0.1 mm。", "Set θ₁ to 50° and check that the tip error is below 0.1 mm."],
+    { id: "self", robot: true, text: ["把 θ₁ 调到 50°，确认末端偏差小于 0.1 mm。", "Set θ₁ to 50° and check that the end-effector error is below 0.1 mm."],
       demo: { scene: "arm", set: { d: 797, th1: 50 }, press: [] } },
     { id: "rank1", robot: true, text: ["把目标点移到手臂刚好伸直的位置，读出秩降为 1。", "Move the target to where the arm is just straight; the rank drops to 1."],
       demo: { scene: "arm", set: { d: 917, th1: 55 }, press: [] } },
@@ -70,7 +70,7 @@ WQ.lab({
     if (api.scene === "arm" && a.r.reach && api.p.d >= 917 && a.rank === 1 && a.err < 1e-4) api.done("rank1");
     if (api.scene === "human" && a.r.reach && a.err < 1e-4 && a.pts[1][1] >= 0.2 - 1e-9) api.done("elbow");
     const rows = [[["关节角 θ", "joint angles θ"], a.r.reach ? `(${deg(a.r.th[0])}°, ${deg(a.r.th[1])}°, ${deg(a.r.th[2])}°)` : api.T("够不到", "out of reach")],
-                  [["末端偏差", "tip error"], a.r.reach ? f(a.err * 1000, 4) + " mm" : "—"],
+                  [["末端偏差", "end-effector error"], a.r.reach ? f(a.err * 1000, 4) + " mm" : "—"],
                   [["J 的秩", "rank of J"], String(a.rank)],
                   [["零空间方向 n", "null-space direction n"], a.rank === 2 && a.n ? `(${f(a.n[0], 3)}, ${f(a.n[1], 3)}, ${f(a.n[2], 3)})` : api.T("二维（秩为 1）", "two-dimensional (rank 1)")]];
     if (api.scene === "human") rows.push([["肘部离桌面的高度", "elbow height above the table"], f(a.pts[1][1], 3) + " m"]);

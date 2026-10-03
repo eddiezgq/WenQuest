@@ -22,8 +22,8 @@ pr = (e1 @ a2) * e1
 w2 = a2 - pr
 e2 = w2 / np.linalg.norm(w2)
 fig, axs = plt.subplots(1, 3, figsize=(10.2, 3.4))
-titles = [T("① 归一化第一个向量", "① normalise the first vector"), T("② 减去投影：w₂ = a₂ − (q₁·a₂) q₁", "② w₂ = a₂ − (q₁·a₂) q₁"),
-          T("③ 归一化 w₂：q₁ ⟂ q₂，长度都是 1", "③ normalise w₂: q₁ ⟂ q₂")]
+titles = [T("① 归一化第一个向量", "① normalize the first vector"), T("② 减去投影：w₂ = a₂ − (q₁·a₂) q₁", "② w₂ = a₂ − (q₁·a₂) q₁"),
+          T("③ 归一化 w₂：q₁ ⟂ q₂，长度都是 1", "③ normalize w₂: q₁ ⟂ q₂")]
 for k, ax in enumerate(axs):
     ax.set_aspect("equal")
     ax.axis("off")
@@ -37,7 +37,7 @@ for k, ax in enumerate(axs):
         arrow(ax, (0, 0), a2, C["muted"], 1.6)
         arrow(ax, (0, 0), e1, C["x"], 2.4)
         ax.text(a1[0] - 0.1, a1[1] + 0.1, "$a_1$", fontsize=12, color=C["muted"])
-        ax.text(a2[0] + 0.05, a2[1] + 0.02, "$a_2$", fontsize=12, color=C["muted"])
+        ax.text(a2[0] - 0.02, a2[1] + 0.13, "$a_2$", fontsize=12, color=C["muted"])
         ax.text(e1[0] - 0.05, e1[1] - 0.25, "$q_1$", fontsize=12, color=C["x"])
     if k == 1:
         ax.plot([-0.2 * e1[0], 2.4 * e1[0]], [-0.2 * e1[1], 2.4 * e1[1]], color="#e4b9b9", lw=0.8)
@@ -47,7 +47,7 @@ for k, ax in enumerate(axs):
         arrow(ax, pr, a2, C["y"], 2.0)
         arrow(ax, (0, 0), w2, C["y"], 1.0)
         ax.plot([w2[0], a2[0]], [w2[1], a2[1]], color=C["muted"], lw=0.8, ls=":")
-        ax.text(a2[0] + 0.05, a2[1] + 0.02, "$a_2$", fontsize=12, color=C["muted"])
+        ax.text(a2[0] - 0.02, a2[1] + 0.13, "$a_2$", fontsize=12, color=C["muted"])
         ax.text(pr[0] - 0.05, pr[1] - 0.3, r"$(q_1\!\cdot a_2)\,q_1$", fontsize=11, color=C["accent"])
         ax.text((pr[0] + a2[0]) / 2 + 0.08, (pr[1] + a2[1]) / 2, "$w_2$", fontsize=12, color=C["y"])
         ax.text(e1[0] - 0.1, e1[1] - 0.28, "$q_1$", fontsize=12, color=C["x"])
@@ -85,7 +85,7 @@ for p, lab, off in ((p0, "$p_0$", (-0.18, -0.1)), (p1, "$p_1$", (0.05, -0.12)), 
     ax.text(*(P3(p) + np.array(off)), lab, fontsize=12)
 ax.plot(*np.array([P3(p0), P3(p1)]).T, color=C["muted"], lw=1.0, ls="--")
 ax.plot(*np.array([P3(p0), P3(p2)]).T, color=C["muted"], lw=1.0, ls="--")
-ax.text(*(P3((p0 + p1) / 2) + np.array([-0.1, -0.15])), "$a_1$", fontsize=11, color=C["muted"])
+ax.text(*(P3(0.8 * p1) + np.array([-0.03, 0.035])), "$a_1$", fontsize=11, color=C["muted"])
 ax.text(*(P3((p0 + p2) / 2) + np.array([0.12, -0.08])), "$a_2$", fontsize=11, color=C["muted"])
 a1, a2 = p1 - p0, p2 - p0
 e1 = a1 / np.linalg.norm(a1)
@@ -95,9 +95,10 @@ e3 = np.cross(e1, e2)
 L = 0.75
 for e, col, lab in ((e1, C["x"], "$x_u$"), (e2, C["y"], "$y_u$"), (e3, C["z"], "$z_u$")):
     arrow(ax, P3(p0), P3(L * e), col, 2.2, z=7)
-    ax.text(*(P3(1.08 * L * e) + np.array([-0.05, 0.07])), lab, fontsize=12, color=col)
+    off = np.array([0.05, -0.06]) if lab == "$z_u$" else np.array([-0.05, 0.07])      # z_u 写在箭头旁边
+    ax.text(*(P3(1.08 * L * e) + off), lab, fontsize=12, color=col)
 ax.text(-0.35, -0.42, T("虚线：示教出的两个方向（误差放大画出）；彩色：正交化后的工件坐标系 {u}",
-                        "dashed: the two taught directions (errors exaggerated); colour: the work frame {u} after orthonormalisation"),
+                        "dashed: the two taught directions (errors exaggerated); colour: the workpiece frame {u} after orthonormalization"),
         fontsize=9, color=C["ink"])
 ax.set_xlim(-0.4, 2.3)
 ax.set_ylim(-0.48, 1.1)

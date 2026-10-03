@@ -53,9 +53,10 @@ ax.axis("off")
 # 手腕（圆盘）与两个主方向
 t = np.linspace(0, 2 * math.pi, 100)
 ax.fill(0.55 * np.cos(t), 0.55 * np.sin(t), color="#e8ecef", zorder=0)
-for k, (col, lab) in enumerate(((C["x"], r"$x_b$:  $k_1$ = 2000 N/m"), (C["y"], r"$y_b$:  $k_2$ = 500 N/m"))):
+for k, (col, lab) in enumerate(((C["x"], T(r"$x_b$:  $k_1$ = 2000 N/m", r"$x_b$:  $k_1$ = 2,000 N/m")), (C["y"], r"$y_b$:  $k_2$ = 500 N/m"))):
     u = R[:, k]
-    ax.plot([-1.25 * u[0], 1.25 * u[0]], [-1.25 * u[1], 1.25 * u[1]], color=col, lw=0.9, ls="-.", zorder=1)
+    neg = 1.25 if k == 0 else 0.9                 # y_b 轴的下端收短，不穿过图下方的说明文字
+    ax.plot([-neg * u[0], 1.25 * u[0]], [-neg * u[1], 1.25 * u[1]], color=col, lw=0.9, ls="-.", zorder=1)
     ax.text(1.3 * u[0] - (0.15 if k == 0 else 0.55), 1.3 * u[1] + 0.05, lab, color=col, fontsize=11)
 arrow(ax, (0, 0), (1.25, 0), C["x"], 1.1)
 arrow(ax, (0, 0), (0, 1.25), C["y"], 1.1)
@@ -69,9 +70,9 @@ f = Ks @ (delta * 0.001) * 0.5
 arrow(ax, (0, 0), delta * 0.5, C["ink"], 2.0)
 arrow(ax, (0, 0), f, C["accent"], 2.2)
 ax.text(0.24, -0.19, r"$\delta$ = 1 mm", fontsize=10.5, color=C["ink"])
-ax.text(f[0] + 0.03, f[1] + 0.03, r"$f = K_s\,\delta$", fontsize=11, color=C["accent"])
+ax.text(f[0] + 0.1, f[1] - 0.08, r"$f = K_s\,\delta$", fontsize=11, color=C["accent"])     # 放在椭圆外，不压虚线
 ax.text(0.62, 0.05, f"{math.degrees(math.atan2(f[1], f[0])):.1f}°", fontsize=9, color=C["accent"])
-ax.text(-1.45, -1.05, T("虚线椭圆：沿各个方向推 1 mm 时回复力的端点", "dashed ellipse: tips of the force for a 1 mm push in every direction"),
+ax.text(-1.45, -1.05, T("虚线椭圆：沿各个方向推 1 mm 时回复力的端点", "dashed ellipse: tip of the restoring force for a 1 mm push in every direction"),
         fontsize=9, color=C["accent"])
 ax.text(-1.45, -1.23, T("同一刚度：在 {b} 中 diag(2000, 500)，在 {s} 中不是对角阵；迹与行列式相同",
                         "same stiffness: diag(2000, 500) in {b}, not diagonal in {s}; same trace and determinant"),

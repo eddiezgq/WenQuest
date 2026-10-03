@@ -1,10 +1,12 @@
-"""2.1 节的算例：平面 2R 臂的雅可比矩阵、矩阵乘法、逆矩阵、行列式与迹。
+"""Examples of Section 2.1: the Jacobian matrix of a planar 2R arm, matrix multiplication, the inverse matrix, the determinant and the trace.
 
-算例 2.1.1：θ = (30°, 60°)，关节速度 θ̇ = (0.5, −1.0) rad/s，求末端速度；按“列的线性组合”和“行与向量的点积”两种看法各算一次。
-算例 2.1.2：平行四边形连杆驱动，θ̇ = C φ̇；求 J C，并验证 J C ≠ C J。
-算例 2.1.3：要末端以 0.1 m/s 竖直向上（沿 y 方向）运动，求关节速度（2×2 逆矩阵公式与通用解法核对）。
-另外核对：det J = L1 L2 sin θ2；det(AB) = det A det B；tr(AB) = tr(BA)（含非方阵）；tr(ABC) 与 tr(ACB) 一般不等；
-‖A‖_F² = tr(AᵀA)；3×3 行列式按第一行展开。
+Example 2.1.1: θ = (30°, 60°), joint velocities θ̇ = (0.5, −1.0) rad/s; find the velocity of the end-effector, once as "a linear combination
+of the columns" and once as "rows dotted with the vector".
+Example 2.1.2: parallelogram-linkage drive, θ̇ = C φ̇; find J C and check that J C ≠ C J.
+Example 2.1.3: the end-effector is to move straight up (along y) at 0.1 m/s; find the joint velocities (the 2×2 inverse formula checked
+against a general solver).
+Also checked: det J = L1 L2 sin θ2; det(AB) = det A det B; tr(AB) = tr(BA) (including non-square matrices); tr(ABC) and tr(ACB) are
+in general not equal; ‖A‖_F² = tr(AᵀA); a 3×3 determinant expanded along the first row.
 """
 import math
 
@@ -18,39 +20,39 @@ th = np.array([d(30), d(60)])
 pts = arm_points(th, L2R)
 elbow, tip = pts[1], pts[2]
 J = jac(th, L2R)
-assert np.allclose(J, jac_formula_2r(th))                       # 几何作图与式 (2.1.9) 一致
+assert np.allclose(J, jac_formula_2r(th))                       # geometric construction agrees with Eq. (2.1.9)
 
-# ---------------------------------------------------------------- 算例 2.1.1
+# ---------------------------------------------------------------- Example 2.1.1
 thd = np.array([0.5, -1.0])                                      # rad/s
-v_cols = thd[0] * J[:, 0] + thd[1] * J[:, 1]                     # 列的线性组合
-v_rows = np.array([J[0] @ thd, J[1] @ thd])                      # 行与向量的点积
+v_cols = thd[0] * J[:, 0] + thd[1] * J[:, 1]                     # linear combination of the columns
+v_rows = np.array([J[0] @ thd, J[1] @ thd])                      # rows dotted with the vector
 assert np.allclose(v_cols, v_rows) and np.allclose(v_cols, J @ thd)
 speed = float(np.linalg.norm(v_cols))
 j1, j2 = J[:, 0], J[:, 1]
 cos12 = float(j1 @ j2 / (np.linalg.norm(j1) * np.linalg.norm(j2)))
-assert abs(cos12) <= 1                                           # 柯西-施瓦茨不等式
+assert abs(cos12) <= 1                                           # Cauchy–Schwarz inequality
 
-# ---------------------------------------------------------------- 算例 2.1.2
-Cm = np.array([[1.0, 0.0], [-1.0, 1.0]])                          # θ = C φ：θ1 = φ1，θ2 = φ2 − φ1
-phid = np.array([0.5, -0.5])                                     # 两个电机侧的绝对角速度，rad/s
+# ---------------------------------------------------------------- Example 2.1.2
+Cm = np.array([[1.0, 0.0], [-1.0, 1.0]])                          # θ = C φ: θ1 = φ1, θ2 = φ2 − φ1
+phid = np.array([0.5, -0.5])                                     # absolute angular velocities on the two motor sides, rad/s
 assert np.allclose(Cm @ phid, thd)
 JC, CJ = J @ Cm, Cm @ J
-assert np.allclose(JC @ phid, J @ (Cm @ phid))                   # 结合律
-assert not np.allclose(JC, CJ)                                   # 不可交换
+assert np.allclose(JC @ phid, J @ (Cm @ phid))                   # associative law
+assert not np.allclose(JC, CJ)                                   # not commutative
 assert np.allclose(JC.T, Cm.T @ J.T)                             # (AB)ᵀ = BᵀAᵀ
 
-# ---------------------------------------------------------------- 算例 2.1.3
+# ---------------------------------------------------------------- Example 2.1.3
 detJ = float(J[0, 0] * J[1, 1] - J[0, 1] * J[1, 0])
 assert abs(detJ - L1 * L2 * math.sin(th[1])) < 1e-12              # det J = L1 L2 sin θ2
 assert abs(detJ - np.linalg.det(J)) < 1e-12
-Jinv = np.array([[J[1, 1], -J[0, 1]], [-J[1, 0], J[0, 0]]]) / detJ   # 2×2 逆矩阵公式
+Jinv = np.array([[J[1, 1], -J[0, 1]], [-J[1, 0], J[0, 0]]]) / detJ   # 2×2 inverse formula
 assert np.allclose(Jinv, np.linalg.inv(J)) and np.allclose(J @ Jinv, np.eye(2))
 v_des = np.array([0.0, 0.1])
 thd_need = Jinv @ v_des
 assert np.allclose(J @ thd_need, v_des) and np.allclose(thd_need, np.linalg.solve(J, v_des))
 assert np.allclose(np.linalg.inv(J @ Cm), np.linalg.inv(Cm) @ Jinv)  # (AB)⁻¹ = B⁻¹A⁻¹
 
-# ---------------------------------------------------------------- 行列式
+# ---------------------------------------------------------------- determinant
 detC = float(np.linalg.det(Cm))
 assert abs(np.linalg.det(JC) - detJ * detC) < 1e-12              # det(AB) = det A det B
 assert abs(np.linalg.det(J.T) - detJ) < 1e-12                    # det Aᵀ = det A
@@ -60,15 +62,15 @@ cof = [A3[0, 0] * (A3[1, 1] * A3[2, 2] - A3[1, 2] * A3[2, 1]),
        A3[0, 2] * (A3[1, 0] * A3[2, 1] - A3[1, 1] * A3[2, 0])]
 det3 = sum(cof)
 assert abs(det3 - np.linalg.det(A3)) < 1e-12
-# 按第二列展开，结果相同
+# expansion along the second column gives the same result
 col2 = (-A3[0, 1] * (A3[1, 0] * A3[2, 2] - A3[1, 2] * A3[2, 0]) + A3[1, 1] * (A3[0, 0] * A3[2, 2] - A3[0, 2] * A3[2, 0])
         - A3[2, 1] * (A3[0, 0] * A3[1, 2] - A3[0, 2] * A3[1, 0]))
 assert abs(col2 - det3) < 1e-12
-# 伸直与折叠时 det J = 0
+# det J = 0 when the arm is straight or folded
 for t2 in (0.0, math.pi):
     assert abs(np.linalg.det(jac([d(30), t2], L2R))) < 1e-12
 
-# ---------------------------------------------------------------- 迹
+# ---------------------------------------------------------------- trace
 trJC, trCJ = float(np.trace(JC)), float(np.trace(CJ))
 assert abs(trJC - trCJ) < 1e-12
 A = np.array([[1.0, 2.0, 0.0], [0.0, 1.0, 3.0]])                  # 2×3
@@ -79,7 +81,7 @@ P = np.array([[1.0, 1.0], [0.0, 1.0]])
 Q = np.array([[1.0, 0.0], [1.0, 1.0]])
 S = np.array([[1.0, 0.0], [0.0, 0.0]])
 trPQS, trSPQ, trPSQ = (float(np.trace(P @ Q @ S)), float(np.trace(S @ P @ Q)), float(np.trace(P @ S @ Q)))
-assert trPQS == trSPQ and trPQS != trPSQ                         # 轮换可以，任意对换不行
+assert trPQS == trSPQ and trPQS != trPSQ                         # cyclic moves are allowed, arbitrary swaps are not
 froJ = float(np.linalg.norm(J, "fro"))
 assert abs(froJ ** 2 - np.trace(J.T @ J)) < 1e-12
 

@@ -5,7 +5,7 @@ WQ.lab({
          "Change the teaching errors and the order of processing; see how Gram–Schmidt turns two non-perpendicular directions into perpendicular axes, and which axis absorbs the error."],
   scenes: [
     { id: "teach", robot: true, name: ["三点法示教", "Three-point teaching"], hide: ["err"],
-      problem: { title: ["机器人问题：示教三个点，建一个工件坐标系", "Robot problem: teach three points, build a work frame"],
+      problem: { title: ["机器人问题：示教三个点，建一个工件坐标系", "Robot problem: teach three points, build a workpiece frame"],
                  text: ["p₀ 为原点，p₁ 定 x 方向，p₂ 定 xy 平面。示教误差使 p₀→p₁ 与 p₀→p₂ 不垂直。",
                         "p₀ is the origin, p₁ fixes the x direction, p₂ the xy plane. Teaching errors make p₀→p₁ and p₀→p₂ non-perpendicular."] } },
     { id: "wood", name: ["木工画直角", "A carpenter's right angle"], hide: ["e1", "e2", "order"],

@@ -21,13 +21,13 @@ c = np.array([0.650, 0.150])
 fig, ax = plt.subplots(figsize=(6.4, 4.4))
 ax.set_aspect("equal")
 ax.axis("off")
-arrow(ax, (0.36, -0.02), (0.82, -0.02), C["x"], 1.0)
-arrow(ax, (0.38, -0.04), (0.38, 0.3), C["y"], 1.0)
-ax.text(0.825, -0.03, r"$x_s$", color=C["x"], fontsize=11)
+arrow(ax, (0.36, -0.05), (0.82, -0.05), C["x"], 1.0)           # x_s 轴放低一些，不压 φ = 80° 的标注
+arrow(ax, (0.38, -0.07), (0.38, 0.3), C["y"], 1.0)
+ax.text(0.825, -0.06, r"$x_s$", color=C["x"], fontsize=11)
 ax.text(0.385, 0.29, r"$y_s$", color=C["y"], fontsize=11)
 ax.plot(*c, "o", color=C["ink"], ms=7, zorder=6)
 ax.plot([c[0], c[0]], [c[1] - 0.06, c[1]], color=C["ink"], lw=3)
-ax.text(c[0] + 0.012, c[1] - 0.05, T("顶针 c", "pin c"), fontsize=10)
+ax.text(c[0] + 0.012, c[1] + 0.016, T("顶针 c", "pin c"), fontsize=10)      # 放在顶针右上方，不被工具线穿过
 for k, deg in enumerate((-40, 20, 80)):
     f = math.radians(deg)
     R = rot2(f)
@@ -43,11 +43,11 @@ for k, deg in enumerate((-40, 20, 80)):
     off = {0: (-0.075, -0.005), 1: (-0.07, -0.02), 2: (0.03, -0.02)}[k]
     ax.text(p[0] + off[0], p[1] + off[1], rf"$p_{k + 1}$", fontsize=11)
     ax.text(p[0] + off[0] - 0.01, p[1] + off[1] - 0.025, f"φ = {deg}°".replace("-", "−"), fontsize=8.5, color=C["muted"])
-ax.text(0.36, 0.33, T("金色：工具；t = 尖端在法兰坐标系中的位置（未知）", "gold: the tool; t = tip position in the flange frame (unknown)"),
+ax.text(0.36, 0.33, T("金色：工具；t = 尖端在法兰坐标系中的位置（未知）", "gold: the tool; t = position of the tool tip in the flange frame (unknown)"),
         fontsize=9, color=C["ink"])
 ax.text(0.36, 0.305, T("每次接触：R(φᵢ) t + pᵢ = c，两个方程", "each touch: R(φᵢ) t + pᵢ = c, two equations"), fontsize=9, color=C["ink"])
 ax.set_xlim(0.34, 0.86)
-ax.set_ylim(-0.06, 0.35)
+ax.set_ylim(-0.09, 0.35)
 figure(fig, "fig2_5_1")
 plt.close(fig)
 
@@ -98,7 +98,7 @@ Pb = np.array([1.0, 1.6, 0.0])
 arrow(a2, P3((0, 0, 0)), P3(c1 * 0.7), C["z"], 1.8)
 arrow(a2, P3((0, 0, 0)), P3(c2 * 0.5), C["z"], 1.8)
 a2.text(*(P3(c1 * 0.7) + np.array([-0.25, -0.15])), r"$a_1$", color=C["z"], fontsize=12)
-a2.text(*(P3(c2 * 0.5) + np.array([-0.15, 0.08])), r"$a_2$", color=C["z"], fontsize=12)
+a2.text(*(P3(c2 * 0.5) + np.array([0.08, 0.06])), r"$a_2$", color=C["z"], fontsize=12)
 arrow(a2, P3((0, 0, 0)), P3(B), C["ink"], 2.0)
 a2.text(*(P3(B) + np.array([-0.2, 0.08])), "$b$", fontsize=12)
 arrow(a2, P3((0, 0, 0)), P3(Pb), C["accent"], 2.4)
