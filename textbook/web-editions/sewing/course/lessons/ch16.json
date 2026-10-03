@@ -1,0 +1,1106 @@
+{
+ "no": 16,
+ "title": [
+  "电脑刺绣机控制",
+  "Control of Computerised Embroidery Machines"
+ ],
+ "hours": 3,
+ "goals": [
+  [
+   "能说明多头刺绣机共用上轴、下轴和绷架的结构，以及头板上针杆跳跃、剪线和断线检测的作用。",
+   "Describe how a multi-head embroidery machine shares one main shaft, hook shaft and frame, and the role of needle-bar jump, trimming and thread-break detection on each head board."
+  ],
+  [
+   "能用 a = 2πs/T²（T = 204°/6n）和 a_max = (F − 摩擦)/m 算出绷架的转速上限，说明它为什么随针长和头数下降。",
+   "Calculate the frame speed limit from a = 2πs/T² (T = 204°/6n) and a_max = (F − friction)/m, and explain why it falls with stitch length and number of heads."
+  ],
+  [
+   "能说明换色、剪线和跳步的动作顺序，以及 DST 文件的记录方式和每条记录 12.1 mm 的限制。",
+   "Explain the sequences for colour change, trimming and jump stitches, and how DST files store records with the 12.1 mm limit per record."
+  ],
+  [
+   "能按检测延迟选回退针数，并估算断线率、处理时间和头数对全机效率与每小时件数的影响。",
+   "Choose the number of backup stitches from the detection delay, and estimate how break rate, handling time and head count affect machine efficiency and pieces per hour."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "八头机绣夹克后背：7 mm 缎纹段能不能跑 800 r/min？",
+   "An 8-head machine embroidering jacket backs: can the 7 mm satin section run at 800 r/min?"
+  ],
+  "text": [
+   "某绣花厂用一台八头刺绣机绣夹克后背图案，其中有一段 7 mm 宽的缎纹。按第 16 章算例：针离布窗口 204°，绷架按摆线规律走一针；Y 轴折算质量 10 + 4 × 头数 kg，驱动力 800 N，摩擦 50 N；机器最高 1100 r/min。全图 20000 针、800 r/min，断线率 0.5 次 / 头 / 万针，每次断线处理 40 s、回退补绣约 1.6 s，换色 6 次、每次 6 s。",
+   "An embroidery shop uses an 8-head machine for a jacket-back design that includes a 7 mm-wide satin section. Per the Chapter 16 example: needle-out-of-fabric window 204°, cycloidal frame motion; Y-axis referred mass 10 + 4 × heads kg, drive force 800 N, friction 50 N; machine maximum 1100 r/min. The design has 20000 stitches at 800 r/min; break rate 0.5 per head per ten thousand stitches, 40 s handling plus about 1.6 s backup and mending per break, 6 colour changes of 6 s each."
+  ],
+  "question": [
+   "7 mm 的缎纹针在 800 r/min 下需要多大加速度？绷架能给多少？这一段应降到多少转？若要 850 r/min，驱动力要加到多少？这台八头机全机效率和每小时件数各约多少？",
+   "What acceleration does a 7 mm satin stitch need at 800 r/min, and how much can the frame give? To what speed must this section drop? What drive force would 850 r/min require? What are the machine's overall efficiency and pieces per hour?"
+  ],
+  "answer": [
+   "T = 204/(6 × 800) = 42.5 ms，需要 a = 2π × 0.007/0.0425² ≈ 24.4 m/s²；八头机质量 42 kg，可用 (800 − 50)/42 ≈ 17.9 m/s²，不够。转速上限 n_max = 34 × √(17.9/(2π × 0.007)) ≈ 685 r/min，控制器应在这段自动降到约 690 r/min 以下。要到 850 r/min 需 a ≈ 27.5 m/s²，驱动力约 50 + 42 × 27.5 ≈ 1200 N。效率：期望断线 8 × 0.5 × 2 = 8 次，缝纫 1500 s，断线 8 × 41.6 ≈ 333 s，换色 36 s，效率 1500/1869 ≈ 80%，每小时约 15.4 件。",
+   "T = 204/(6 × 800) = 42.5 ms, so a = 2π × 0.007/0.0425² ≈ 24.4 m/s² is needed; an 8-head frame of 42 kg can give (800 − 50)/42 ≈ 17.9 m/s², not enough. The limit is n_max = 34 × √(17.9/(2π × 0.007)) ≈ 685 r/min, so the controller should drop this section to below about 690 r/min. Reaching 850 r/min needs a ≈ 27.5 m/s² and a drive force of about 50 + 42 × 27.5 ≈ 1200 N. Efficiency: expected breaks 8 × 0.5 × 2 = 8; sewing 1500 s, breaks 8 × 41.6 ≈ 333 s, colour changes 36 s; efficiency 1500/1869 ≈ 80%, about 15.4 pieces per hour."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人上的回退续作与“串联停机”",
+   "Back-up-and-resume and series stoppages in robotics"
+  ],
+  "text": [
+   "弧焊机器人焊接中途断弧后，控制器让焊枪沿已走过的轨迹倒退一小段，重新起弧并与原焊缝搭接，这和刺绣机断线后绷架沿已缝针迹回退、补绣到断点是同一个思路：回退量必须不少于“检测延迟”期间走过的距离，否则留下缺口。多台机器人串在一条节拍线上，任何一台停下全线都要等，停线次数随工位数线性增加，和多头机“任何一头断线全机停”的效率模型一样，所以要么提高单机可靠性、要么缩短每次恢复时间。龙门机器人带的末端负载越重，可用加速度越低，节拍越慢，这也正是绷架随头数变重、转速上限下降的道理。",
+   "When an arc-welding robot loses its arc mid-seam, the controller backs the torch a short way along the path it has travelled, re-strikes the arc and overlaps the existing weld — the same idea as an embroidery frame backing up along sewn stitches and mending up to the break point: the back-up must be at least the distance covered during the detection delay, or a gap remains. Several robots on one paced line all wait when any one stops, so stoppages grow linearly with the number of stations, exactly like the multi-head rule that any broken head stops the machine; the remedies are the same — more reliable units or faster recovery. And the heavier the payload of a gantry robot, the lower its usable acceleration and the slower its cycle, just as the frame's speed limit falls as heads are added."
+  ]
+ },
+ "life": {
+  "title": [
+   "一列地铁的车门",
+   "The doors of a metro train"
+  ],
+  "text": [
+   "一列车有很多节车厢，任何一扇门被卡住，整列车都要等；车厢越多，被耽误的次数越多——多头刺绣机“任何一头断线全机停”就是这个道理。",
+   "A train has many cars, and if any one door is blocked the whole train waits; the more cars, the more often it is held up — just as any broken head stops a multi-head embroidery machine."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：一台八头刺绣机",
+    "Opening: an eight-head embroidery machine"
+   ],
+   "points": [
+    [
+     "某系列：2–8 头，每头 9/12/15 针，最高 1100 r/min，头距 360 或 500 mm",
+     "One series: 2–8 heads, 9/12/15 needles each, up to 1100 r/min, 360 or 500 mm head pitch"
+    ],
+    [
+     "一件夹克后背：两三万针、十来种颜色、八片布同时绣",
+     "A jacket back: twenty to thirty thousand stitches, about ten colours, eight pieces at once"
+    ],
+    [
+     "产量取决于：转速、换色和剪线次数、断线停车、上下绷架",
+     "Output depends on speed, colour changes and trims, thread-break stops, and frame loading"
+    ],
+    [
+     "本讲三件事：大绷架的转速上限；换色剪线跳步；一头断线怎么办",
+     "Three topics: frame speed limit; colour change, trimming, jumps; one head breaking its thread"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "这一讲是选学章，要用到第 11 章的刺绣机头和第 15 章的 X–Y 运动规划。某企业的多头刺绣机有 2 到 8 头，每头 9、12 或 15 根针，最高 1100 转。绣一件夹克后背，可能有两三万针、十来种颜色，操作工把八片布绷好，八个机头同时开始绣。整个过程操作工主要做三件事：换色时看一眼，某个头断线时去穿线，绣完换下一批。所以产量取决于转速、换色剪线的次数、断线停车的次数和时间，还有上下绷架。今天就讲前三项：大绷架的转速、换色跳步、断线补绣。",
+    "This optional lesson builds on the embroidery head of Chapter 11 and the X–Y planning of Chapter 15. One maker's multi-head machines have 2 to 8 heads, each with 9, 12 or 15 needles, running up to 1100 r/min. A jacket back may have twenty to thirty thousand stitches and about ten colours; the operator hoops eight pieces and all eight heads start together. During the run the operator mainly does three things: glance at colour changes, rethread a head when it breaks, and change to the next batch. So output depends on speed, the number of colour changes and trims, how often and how long thread breaks stop the machine, and frame loading. Today we cover the first three."
+   ]
+  },
+  {
+   "title": [
+    "多头机的结构与控制系统",
+    "Structure and control system of a multi-head machine"
+   ],
+   "points": [
+    [
+     "一根上轴贯穿所有机头，一根下轴带所有旋梭，一个绷架跨过所有机头",
+     "One main shaft through all heads, one hook shaft for all hooks, one frame across all heads"
+    ],
+    [
+     "每头 9–15 根针杆，上轴只经针杆驱动器带动对准的那一根",
+     "9–15 needle bars per head; the shaft drives only the one aligned with the driver"
+    ],
+    [
+     "分层同花样机：主控读文件、调速；运动控制按转角插补 X、Y",
+     "Layers as on a pattern sewer: main controller reads files and plans speed; motion control interpolates X, Y by angle"
+    ],
+    [
+     "每头一块头板：针杆跳跃电磁铁、剪线、断线检测、指示灯",
+     "A head board per head: needle-bar jump solenoid, trimming, thread-break detection, lamp"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_16_struct.png",
+   "narration": [
+    "看结构图。一根横梁上排着一列机头，一根上轴贯穿所有机头，由主伺服驱动，带动各头的针杆和挑线杆；台面下一根下轴带各头的旋梭。每个机头的针杆箱里有 9 到 15 根针杆，可上轴只通过针杆驱动器带动对准它的那一根。绷架是一个跨过所有机头的大框，由 X、Y 伺服带着走同一个图案。控制系统和花样机的分层相似，不同的是每个头多一块头板，管针杆跳跃电磁铁、剪线、断线检测和指示灯。关键在于：轴是共用的，可每个头又必须能单独“不缝”。",
+    "Look at the structure. A row of heads sits on a beam; one main shaft runs through all of them, driven by the main servo, working each head's needle bar and take-up lever; one hook shaft under the table drives every rotary hook. Each head's needle-bar case holds 9 to 15 bars, but the shaft drives only the one aligned with the needle-bar driver. The frame is one large frame spanning all heads, moved by X and Y servos through the same design. The control layers resemble the pattern sewer's; the difference is a head board on every head for the needle-bar jump solenoid, trimming, thread-break detection and indicator lamp. The key point: the shafts are shared, yet each head must be able to “not sew” on its own."
+   ]
+  },
+  {
+   "title": [
+    "一针里绷架怎样走",
+    "How the frame moves within one stitch"
+   ],
+   "points": [
+    [
+     "和花样机一样，绷架只能在针离布的窗口里走完一针（约 204°）",
+     "As on a pattern sewer, the frame must finish each move within the needle-out window (about 204°)"
+    ],
+    [
+     "800 r/min 一转 75 ms，窗口只有 42.5 ms",
+     "At 800 r/min one revolution is 75 ms, the window only 42.5 ms"
+    ],
+    [
+     "摆线规律：a = 2πs/T²，与针长成正比、与转速平方成正比",
+     "Cycloidal law: a = 2πs/T², proportional to stitch length and to speed squared"
+    ],
+    [
+     "800 r/min：3 mm 要 10.4 m/s²，7 mm 要 24.4 m/s²",
+     "At 800 r/min: 3 mm needs 10.4 m/s², 7 mm needs 24.4 m/s²"
+    ]
+   ],
+   "formula": "a=\\frac{2\\pi s}{T^{2}},\\qquad T=\\frac{204^\\circ}{6n}",
+   "figure": "fig_16_window.png",
+   "narration": [
+    "和花样机一样，刺绣机每一针的绷架移动都得在机针离开布料的那段转角里完成，本章借用第 15 章的窗口，约 204°。800 转时一转 75 毫秒，窗口只有 42.5 毫秒。绷架按摆线规律走完一针 s，峰值加速度是 2π 乘 s 除以 T 平方，T 就是窗口时间。注意两个比例关系：加速度和针长成正比，和转速的平方成正比。800 转时，3 毫米的一针要 10.4 米每秒平方，7 毫米的一针要 24.4。转速提高一成，要求的加速度就要提高两成多，这是刺绣机提速难的根本原因。",
+    "As on a pattern sewer, each frame move must finish within the shaft-angle window in which the needle is out of the fabric; this chapter borrows the Chapter 15 window, about 204°. At 800 r/min one revolution takes 75 ms, so the window is only 42.5 ms. Moving a stitch s with the cycloidal law, the peak acceleration is 2π s over T squared, T being the window time. Note the two proportions: acceleration goes with stitch length and with the square of speed. At 800 r/min a 3 mm stitch needs 10.4 m/s², a 7 mm stitch 24.4. Ten percent more speed demands over twenty percent more acceleration — the root of why embroidery machines are hard to speed up."
+   ]
+  },
+  {
+   "title": [
+    "绷架越重，可用加速度越小",
+    "The heavier the frame, the less acceleration"
+   ],
+   "points": [
+    [
+     "可用加速度 = (驱动力 − 摩擦) / 运动质量",
+     "Available acceleration = (drive force − friction) / moving mass"
+    ],
+    [
+     "算例：Y 轴折算质量 10 + 4 × 头数 kg，驱动力 800 N，摩擦 50 N",
+     "Example: Y-axis referred mass 10 + 4 × heads kg, drive force 800 N, friction 50 N"
+    ],
+    [
+     "8 头约 42 kg → 约 17.9 m/s²；15 头约 70 kg → 约 10.7 m/s²",
+     "8 heads about 42 kg → about 17.9 m/s²; 15 heads about 70 kg → about 10.7 m/s²"
+    ],
+    [
+     "只按较重的 Y 轴估算",
+     "Estimated for the heavier Y axis only"
+    ]
+   ],
+   "formula": "a_{max} = \\frac{F - F_f}{m},\\qquad m = 10 + 4H\\ \\text{kg}",
+   "figure": "",
+   "narration": [
+    "需要的加速度有了，再看绷架能给多少。可用加速度等于驱动力减去摩擦，再除以运动部分的质量。多头机的绷架跨过所有机头，头越多越长越重。本章算例取 Y 轴，也就是较重那一轴，折算质量按 10 加 4 乘头数公斤计，驱动力 800 牛，摩擦 50 牛，这些都是示意值。8 头机约 42 公斤，可用加速度 750 除以 42，约 17.9；15 头机约 70 公斤，只剩约 10.7。所以同样的电机和传动，头数翻倍，可用加速度差不多减半。下一页把需要和可用放在一起，就得到转速上限。",
+    "We know what acceleration is needed; now what can the frame deliver? Available acceleration is drive force minus friction, divided by the moving mass. A multi-head frame spans every head, so more heads mean a longer, heavier frame. The example takes the Y axis, the heavier one, with referred mass 10 plus 4 times the head count in kilograms, 800 N drive force and 50 N friction, all illustrative. An 8-head machine is about 42 kg: 750 over 42, about 17.9 m/s². A 15-head machine is about 70 kg: only about 10.7. So with the same motors and drive, doubling the heads roughly halves the available acceleration. Next we put need and supply together to get the speed limit."
+   ]
+  },
+  {
+   "title": [
+    "转速上限：针越长、头越多，转得越慢",
+    "Speed limit: longer stitches and more heads mean lower speed"
+   ],
+   "points": [
+    [
+     "令需要 = 可用：n_max = (204/6)√(a_max/2πs)，与 √s 成反比",
+     "Set need = supply: n_max = (204/6)√(a_max/2πs), inversely proportional to √s"
+    ],
+    [
+     "8 头机：3 / 5 / 7 mm → 约 1050 / 810 / 690 r/min",
+     "8 heads: 3 / 5 / 7 mm → about 1050 / 810 / 690 r/min"
+    ],
+    [
+     "7 mm 缎纹：4 头约 870、15 头约 530、20 头约 470 r/min",
+     "7 mm satin: 4 heads about 870, 15 heads about 530, 20 heads about 470 r/min"
+    ],
+    [
+     "短针、头少时由机头最高转速（1100 r/min）限制",
+     "Short stitches with few heads are limited by the head maximum (1100 r/min)"
+    ]
+   ],
+   "formula": "n_{max}=\\frac{204}{6}\\sqrt{\\frac{a_{max}}{2\\pi s}}",
+   "figure": "fig_16_nmax.png",
+   "narration": [
+    "令需要等于可用，解出转速：n_max 等于 204 除以 6，乘根号下 a_max 除以 2π s。转速上限和针长的平方根成反比，和第 15 章花样机的结论一样。看图 16-3：头少、针短时，这条限制不起作用，转速由机头本身决定，算例取 1100 转。针一长、头一多就得降速。8 头机 3 毫米约 1050，已经略受限制；5 毫米约 810；7 毫米约 690。同样 7 毫米的缎纹针，4 头机约 870，15 头机约 530，20 头机只剩约 470。头数和针长都在吃转速。",
+    "Setting required equal to available acceleration and solving for speed gives this formula: n_max equals 204 over 6 times the square root of a_max over 2π s. The limit is inversely proportional to the square root of stitch length — the same conclusion as for the Chapter 15 pattern sewer. In Fig. 16-3, with few heads and short stitches the limit does not bite and the head's own maximum, 1100 r/min here, governs. With longer stitches and more heads the machine must slow. An 8-head machine: about 1050 at 3 mm, already slightly limited; about 810 at 5 mm; about 690 at 7 mm. For the same 7 mm satin, 4 heads allow about 870, 15 heads about 530, 20 heads only about 470. Both head count and stitch length eat into speed."
+   ]
+  },
+  {
+   "title": [
+    "前瞻调速与加强驱动",
+    "Look-ahead speed control and a stronger drive"
+   ],
+   "points": [
+    [
+     "按每针长度预先算好转速：长缎纹段降速、短针段升速",
+     "Plan speed from each stitch's length: slow on long satin, fast on short stitches"
+    ],
+    [
+     "绷架的间歇运动是刺绣机转速只有平缝机四分之一左右的原因之一",
+     "Intermittent frame motion is one reason embroidery runs at about a quarter of lockstitch speed"
+    ],
+    [
+     "8 头机 7 mm 跑 850 r/min：需 a ≈ 27.5 m/s²，驱动力约 1200 N",
+     "8 heads, 7 mm at 850 r/min: a ≈ 27.5 m/s², drive force about 1200 N"
+    ],
+    [
+     "单头机绷架轻，转速还受针杆、挑线机构和绣品质量限制",
+     "A single head has a light frame; its speed is limited by needle bar, take-up and embroidery quality"
+    ]
+   ],
+   "formula": "F = F_f + m\\,\\frac{2\\pi s}{T^2}",
+   "figure": "",
+   "narration": [
+    "所以刺绣机的控制器和花样机一样，要按每针的长度预先算好转速，这就是第 15 章的前瞻调速：长缎纹段自动降速，短针段再升上来。第 11 章说刺绣机转速只有平缝机的四分之一左右，绷架的间歇运动就是原因之一：每一针都要在几十毫秒里把几十公斤的绷架推几毫米，再停稳。想让 8 头机的 7 毫米缎纹跑到 850 转，需要的加速度约 27.5，驱动力就得加到 50 加 42 乘 27.5，约 1200 牛，电机、减速传动和绷架结构都要加强。单头机绷架轻，转速主要受针杆、挑线机构的动力学和绣品质量限制。",
+    "So, like a pattern sewer, an embroidery controller must plan speed from each stitch's length in advance — the look-ahead of Chapter 15: slow down automatically on long satin, speed up again on short stitches. Chapter 11 said embroidery runs at about a quarter of lockstitch speed, and intermittent frame motion is one reason: every stitch, tens of kilograms of frame must be pushed a few millimetres in tens of milliseconds and brought to rest. To run the 8-head machine's 7 mm satin at 850 r/min needs about 27.5 m/s², so the drive force must rise to 50 plus 42 times 27.5, about 1200 N, with stronger motors, reduction drives and frame. A single-head frame is light; its speed is limited mainly by needle-bar and take-up dynamics and embroidery quality."
+   ]
+  },
+  {
+   "title": [
+    "换色、剪线与跳步",
+    "Colour change, trimming and jump stitches"
+   ],
+   "points": [
+    [
+     "换色顺序：减速 → 最后一针剪线、拨线 → 停针 → 针杆箱横移 → 慢起针 → 加速",
+     "Colour-change sequence: slow down → trim and wipe → needle stop → needle-bar case shift → slow start → accelerate"
+    ],
+    [
+     "换色期间绷架不动；一次约四五秒到六秒（算例按 6 s）",
+     "The frame is still during the change; about four to six seconds each (6 s in the example)"
+    ],
+    [
+     "跳步：针杆跳跃电磁铁让针杆停在上面，绷架走到下一块起点；不同于跳针故障",
+     "Jump stitch: the jump solenoid holds the bar up while the frame moves on; not the same as a skipped stitch"
+    ],
+    [
+     "长跳步前先剪线；制版时同色块连绣，减少换色、剪线、跳步",
+     "Trim before a long jump; digitise same-colour areas together to cut changes, trims and jumps"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_16_color.png",
+   "narration": [
+    "一种颜色绣完，所有机头同时换到下一种颜色。顺序看图 16-4：主轴减速，最后一针剪线、拨线，主轴停在规定的停针角；针杆箱横移，把下一种颜色的针杆对准驱动器；然后慢起针，再加速。换色期间绷架不动。一次换色四五秒到六秒，十种颜色要换九次。再说跳步：同一种颜色两块图案离得远，绷架走一段长距离不落针，针杆跳跃电磁铁让针杆脱开驱动器停在上面。注意，跳步和前面各章的跳针故障不是一回事。距离长还要先剪线，免得拖出长线。",
+    "When one colour is finished, every head changes to the next colour together. The sequence in Fig. 16-4: the shaft slows, the last stitch is trimmed and wiped, the shaft stops at the set stop angle; the needle-bar case shifts to align the next colour's bar with the driver; then a slow start and acceleration. The frame stays still meanwhile. A change takes four or five to six seconds, and a ten-colour design needs nine of them. Jump stitches: when two areas of one colour are far apart, the frame travels without stitching, the jump solenoid disengaging the needle bar and holding it up. Do not confuse a jump stitch with the skipped-stitch fault of earlier chapters. For a long jump the threads are trimmed first so no long thread is dragged."
+   ]
+  },
+  {
+   "title": [
+    "三种基本针迹与制版",
+    "Three basic stitch types and digitising"
+   ],
+   "points": [
+    [
+     "平针（走线）：一针两三毫米，勾轮廓、绣细线",
+     "Running stitch: two or three millimetres, for outlines and fine lines"
+    ],
+    [
+     "缎纹：针长就是柱子宽度，约 1 mm 到七八毫米，有光泽；太宽易勾起",
+     "Satin: stitch length equals column width, about 1 to 7–8 mm, glossy; too wide and it snags"
+    ],
+    [
+     "填充（塔塔米）：平行短针交错，填满大面积",
+     "Fill (tatami): staggered parallel short stitches covering large areas"
+    ],
+    [
+     "垫底针稳布托缎纹；拉力补偿把图形画宽一点",
+     "Underlay stabilises fabric and lifts satin; pull compensation draws shapes slightly wider"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_16_dst.png",
+   "narration": [
+    "看图 16-5 左边，刺绣有三种基本针迹。平针也叫走线，一针两三毫米，勾轮廓、绣细线。缎纹的针在一根柱子两边来回，针长就是柱子宽度，从 1 毫米到七八毫米，表面有光泽，可太宽了线容易被勾起，所以更宽的部分改用填充，或者中间加分割针。填充常叫塔塔米，一行行平行短针交错排列，填满大面积。缎纹下面常先缝一层垫底针，把布稳住、把缎纹托起来；针迹会把布横向拉、沿针迹方向推，图形要画宽一点，这叫拉力补偿。注意缎纹的针长正是前面转速上限里的 s。",
+    "On the left of Fig. 16-5 are the three basic stitch types. A running stitch is two or three millimetres, used for outlines and fine lines. Satin stitches go back and forth across a column, so the stitch length is the column width, from 1 mm up to seven or eight, giving a glossy surface; too wide and the thread snags, so wider parts become fill or get split stitches. Fill, often called tatami, staggers rows of parallel short stitches to cover large areas. Satin is usually laid over an underlay that stabilises the fabric and lifts the satin; stitches pull the fabric sideways and push it along the stitch, so shapes are drawn slightly wider — pull compensation. Note that satin width is exactly the s in our speed-limit formula."
+   ]
+  },
+  {
+   "title": [
+    "DST 绣花文件",
+    "The DST embroidery file"
+   ],
+   "points": [
+    [
+     "512 字节文件头 + 每条记录 3 字节：Δx、Δy，单位 0.1 mm",
+     "512-byte header + 3-byte records: Δx, Δy in 0.1 mm"
+    ],
+    [
+     "每个方向最大 ±121，即 12.1 mm；斜走一条最多约 17 mm",
+     "Up to ±121 per axis, i.e. 12.1 mm; about 17 mm diagonally per record"
+    ],
+    [
+     "标志位区分普通针、跳步、换色；没有颜色值，也没有单独的剪线命令",
+     "Flag bits mark normal, jump and colour-change records; no colour values and no separate trim command"
+    ],
+    [
+     "连续几条跳步机器自动剪线；超过 12.1 mm 的移动拆成几条",
+     "Several consecutive jumps trigger an automatic trim; moves over 12.1 mm are split"
+    ]
+   ],
+   "formula": "N_{rec} = \\left\\lceil \\frac{\\max(|\\Delta x|,|\\Delta y|)}{12.1\\ \\text{mm}} \\right\\rceil",
+   "figure": "",
+   "narration": [
+    "制版软件最后输出给机器的是一串针迹命令。行业里通用的一种格式是 DST：512 字节的文件头之后，每条记录 3 个字节，记一针相对上一针的位移 Δx、Δy，单位 0.1 毫米，每个方向最大正负 121，就是 12.1 毫米，斜着走一条最多约 17 毫米。标志位区分普通针、跳步和换色。文件里没有颜色值，只有换色命令，哪根针杆用哪种颜色在机器上设定；也没有单独的剪线命令，常见做法是遇到连续几条跳步就自动剪线。任一方向超过 12.1 毫米的移动要拆成几条记录，这就是这条取整公式。",
+    "What digitising software finally hands the machine is a string of stitch commands. One industry-wide format is DST: after a 512-byte header, each 3-byte record stores the displacement Δx, Δy from the previous stitch in 0.1 mm, up to ±121 per axis, that is 12.1 mm, or about 17 mm diagonally. Flag bits distinguish normal stitches, jumps and colour changes. The file holds no colour values, only colour-change commands; which needle bar carries which colour is set on the machine. Nor is there a separate trim command: commonly the machine trims automatically after several consecutive jumps. Any move longer than 12.1 mm in either axis must be split into several records — hence this rounding-up formula."
+   ]
+  },
+  {
+   "title": [
+    "案例：一头断线，全机怎么办",
+    "Case study: one head breaks its thread"
+   ],
+   "points": [
+    [
+     "① 检测：面线带小码盘转动，光电读脉冲；连续几针无脉冲判断线（只看面线）",
+     "① Detect: the needle thread turns a small code wheel read optically; no pulses for several stitches means a break (needle thread only)"
+    ],
+    [
+     "② 全机停车、亮灯；③ 回退距离长时，未断线各头先剪线",
+     "② Stop all, light the lamp; ③ for long back-ups, the other heads trim first"
+    ],
+    [
+     "④ 绷架沿已缝针迹倒走，退过漏缝；⑤ 穿线",
+     "④ Frame backs up along sewn stitches past the gap; ⑤ rethread"
+    ],
+    [
+     "⑥ 只有断线头落针补绣，其他头针杆跳跃不动；⑦ 回到断点全机继续",
+     "⑥ Only the broken head mends, others held up by jump solenoids; ⑦ back at the break, all resume"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_16_mend.png",
+   "narration": [
+    "多头机一个头断了面线，其他头还在正常绣。不管它，这个头一直空绣，图案缺一块；全机停下等，其他头又都陪着停。更麻烦的是断线不是一发生就能发现的。按两份专利的描述，处理分七步。第一步检测：让面线带着一个小码盘转，光电开关读脉冲，连续几针没有脉冲就判断线，它只看得到面线。第二步全机停车，断线头亮灯。第三步，回退距离长时，没断线的头先剪线。第四步绷架沿缝过的针迹倒着走。第五步穿线。第六步只有断线头落针补绣，其他头针杆跳跃不动。第七步回到断点，全机继续。",
+    "On a multi-head machine one head breaks its needle thread while the others carry on. Ignore it and that head sews empty, leaving a hole in the design; stop everything to rethread and all the other heads wait too. Worse, a break is not noticed the moment it happens. Per two patents, handling has seven steps. One, detect: the needle thread turns a small code wheel read by a photoelectric switch; no pulses for several stitches means a break — needle thread only. Two, stop the machine and light that head's lamp. Three, for a long back-up the other heads trim first. Four, the frame runs backwards along the sewn stitches. Five, rethread. Six, only the broken head stitches to mend, the others' bars held up by their jump solenoids. Seven, back at the break point, all heads resume."
+   ]
+  },
+  {
+   "title": [
+    "检测延迟与回退针数",
+    "Detection delay and backup stitches"
+   ],
+   "points": [
+    [
+     "从断线到停车已漏缝 d 针（判断 + 停车）；专利例子合计约 10 针",
+     "From break to stop, d stitches are missed (confirmation + stopping); about 10 in the patent example"
+    ],
+    [
+     "回退针数 b ≥ d，最好再多两三针，让补绣与原针迹重叠",
+     "Backup b ≥ d, preferably two or three more, so mending overlaps the original"
+    ],
+    [
+     "b < d：留下 d − b 针漏针，是次品；b 太大：浪费时间、重叠处变厚",
+     "b < d leaves d − b missed stitches, a reject; b too large wastes time and thickens the overlap"
+    ],
+    [
+     "检测越快，d 越小，需要回退的越少",
+     "Faster detection, smaller d, less back-up needed"
+    ]
+   ],
+   "formula": "d \\le b \\le d+3",
+   "figure": "",
+   "narration": [
+    "图 16-6 下方沿针迹画出了这个过程。从实际断线到停车，已经漏缝了 d 针，这叫检测延迟，里面包括判断断线要等的几针和停车要转的几针，专利举的例子合计约 10 针。回退针数 b 必须不少于 d，最好再多两三针，让补绣和原来的针迹重叠一点。b 小于 d，补绣接不上，留下 d 减 b 针的漏针，就是次品；b 太大，又浪费时间，重叠处变厚。所以现场看到补绣后图案有缺口，说明退少了；有凸起的重叠，说明退多了。检测越快，d 越小，需要回退的针数也越少。",
+    "The lower part of Fig. 16-6 traces this along the stitch path. From the actual break to standstill, d stitches have already been missed — the detection delay — made up of the stitches needed to confirm the break and those turned while stopping; the patent's example totals about 10. The backup count b must be at least d, preferably two or three more, so the mending overlaps the original stitches slightly. If b is less than d, mending does not join up and d minus b stitches are missing — a reject; if b is too large, time is wasted and the overlap gets thick. So on the floor, a gap after mending means too little back-up, a raised overlap too much. The faster the detection, the smaller d and the fewer backup stitches needed."
+   ]
+  },
+  {
+   "title": [
+    "头数与全机效率",
+    "Number of heads and machine efficiency"
+   ],
+   "points": [
+    [
+     "任何一头断线全机停：H 头机停车次数是单头的 H 倍",
+     "Any break stops all: an H-head machine stops H times as often as one head"
+    ],
+    [
+     "算例：20000 针、800 r/min（纯缝 25 min），每次 40 s + 1.6 s，换色 6 × 6 s，λ = 0.5",
+     "Example: 20000 stitches at 800 r/min (25 min sewing), 40 s + 1.6 s per break, 6 × 6 s colour changes, λ = 0.5"
+    ],
+    [
+     "效率：4 头约 88%、8 头约 80%、15 头约 69%、20 头约 63%；4 → 20 头件数只增约 3.6 倍",
+     "Efficiency: about 88% at 4 heads, 80% at 8, 69% at 15, 63% at 20; 4 → 20 heads gives only about 3.6× the pieces"
+    ],
+    [
+     "20 头机要 80%：λ 降到约 0.2，或每次处理缩短到约 15 s",
+     "For 80% at 20 heads: λ about 0.2, or handling cut to about 15 s"
+    ]
+   ],
+   "formula": "\\eta = \\frac{T_{sew}}{T_{sew} + H\\lambda\\frac{S}{10^4}(T_h+T_r) + N_c T_c}",
+   "figure": "fig_16_eff.png",
+   "narration": [
+    "头数多是双刃剑。设每头每万针断线 λ 次，任何一头断线全机都停，H 头机停车次数就是单头的 H 倍。看算例：20000 针、800 转，纯缝 25 分钟；每次断线处理 40 秒，加回退补绣约 1.6 秒；换色 6 次每次 6 秒。断线率 0.5 时，4 头机效率约 88%，8 头约 80%，15 头约 69%，20 头约 63%。头数增加到 5 倍，每小时件数只从约 8.5 涨到约 30 件。20 头机要达到 80%，断线率得降到 0.2 左右，或者每次处理缩短到 15 秒左右。",
+    "Many heads cut both ways. If each head breaks on average λ times per ten thousand stitches and any break stops the machine, an H-head machine stops H times as often as a single head. The example: 20000 stitches at 800 r/min, 25 minutes of pure sewing; 40 s to handle each break plus about 1.6 s of back-up and mending; 6 colour changes of 6 s. At a break rate of 0.5, efficiency is about 88% with 4 heads, 80% with 8, 69% with 15 and 63% with 20. Five times the heads raises pieces per hour only from about 8.5 to about 30, some 3.6 times. To reach 80% a 20-head machine needs the break rate down to about 0.2, or handling cut to about 15 seconds."
+   ]
+  },
+  {
+   "title": [
+    "其他装置、模型边界与现场要点",
+    "Other devices, model limits and shop-floor notes"
+   ],
+   "points": [
+    [
+     "亮片、毛巾绣、绳绣、珠绣：都是加一套与主轴转角同步的电磁铁或步进机构",
+     "Sequins, chenille, cording, beads: each adds a solenoid or stepper mechanism synchronised to shaft angle"
+    ],
+    [
+     "模型边界：窗口借用 204°，质量、驱动力、摩擦为示意值；未计带弹性、振动；效率模型假设断线独立",
+     "Limits: 204° borrowed, mass, force and friction illustrative; belt elasticity and vibration ignored; breaks assumed independent"
+    ],
+    [
+     "长缎纹针迹歪、断针：看是否自动降速，必要时拆窄或改填充",
+     "Crooked satin or broken needles: check auto slow-down; split or change to fill if needed"
+    ],
+    [
+     "补绣有缺口→退少了；有凸起→退多了；同色块连绣比提转速更省时间",
+     "Gap after mending → too little back-up; bump → too much; grouping colours saves more time than more speed"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "刺绣机还有许多特殊装置：亮片装置送出一片亮片，针从中心孔穿过把它钉住；毛巾绣用带钩的针做链式线迹绣出毛圈；还有绳绣、珠绣。它们都是在机头上加一套由电磁铁或步进电机驱动、与主轴转角同步的机构，控制原理和前面各章相同。再说模型的边界：针离布窗口借用第 15 章的 204°，绷架质量、驱动力、摩擦都是示意值，没算传动带弹性和振动；效率模型假设各头断线独立、处理时间固定。最后几条现场要点，大家对照前面的公式想一想为什么。",
+    "Embroidery machines carry many special devices: a sequin feeder presents a sequin and the needle passes through its centre hole to tack it down; chenille uses a hooked needle making a chain stitch to raise loops; there are also cording and bead devices. Each adds to the head a mechanism driven by a solenoid or stepper and synchronised to shaft angle, with the same control principles as before. As for the model's limits: the needle-out window borrows Chapter 15's 204°; frame mass, drive force and friction are illustrative, and belt elasticity and vibration are ignored; the efficiency model assumes independent breaks and fixed handling time. Finally, a few shop-floor notes — think about why each follows from the formulas we have used."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "多头机共用上轴、下轴和绷架，每头靠头板上的针杆跳跃、剪线和断线检测单独“不缝”。",
+   "A multi-head machine shares the main shaft, hook shaft and frame; each head can “not sew” on its own via the needle-bar jump, trimming and thread-break detection on its head board."
+  ],
+  [
+   "绷架要在约 204° 的窗口里走完一针：a = 2πs/T²；可用加速度 (F − 摩擦)/m 随头数增加而下降，所以 n_max ∝ √(a_max/s)。",
+   "The frame must finish each move in the ~204° window: a = 2πs/T²; available acceleration (F − friction)/m falls with head count, so n_max ∝ √(a_max/s)."
+  ],
+  [
+   "换色按“减速—剪线拨线—停针—横移—慢起针”进行；跳步不落针，长跳步先剪线；同色块连绣最省时间。",
+   "Colour change runs slow-down, trim and wipe, stop, case shift, slow start; jumps do not stitch, long ones are trimmed first; grouping same-colour areas saves most time."
+  ],
+  [
+   "DST 每条记录 3 字节、每方向最大 12.1 mm，没有颜色值和单独剪线命令。",
+   "DST records are 3 bytes, up to 12.1 mm per axis, with no colour values and no separate trim command."
+  ],
+  [
+   "断线后回退针数 b 要不少于检测延迟 d、最多再多两三针；头数越多停车越频繁，效率靠低断线率和短处理时间。",
+   "After a break the backup b must be at least the detection delay d and at most two or three more; more heads mean more stops, and efficiency depends on low break rates and quick handling."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "embroid",
+   "no": "16-1",
+   "title": [
+    "多头刺绣机：针长、转速与断线补绣",
+    "Multi-head embroidery machine: stitch length, speed and thread-break mending"
+   ],
+   "goal": [
+    [
+     "验证绷架所需加速度、可用加速度和转速上限随头数、驱动力、针长的变化。",
+     "Verify how required acceleration, available acceleration and the speed limit vary with head count, drive force and stitch length."
+    ],
+    [
+     "通过随机模拟理解断线率、处理时间、检测延迟和回退针数对全机效率和漏针的影响。",
+     "Use random simulation to see how break rate, handling time, detection delay and backup count affect efficiency and missed stitches."
+    ]
+   ],
+   "theory": [
+    [
+     "针离布窗口 204°；摆线规律峰值加速度 a = 2πs/T²，T = 204°/(6n)。",
+     "Needle-out window 204°; cycloidal peak acceleration a = 2πs/T², T = 204°/(6n)."
+    ],
+    [
+     "Y 轴折算质量 = 10 + 4 × 头数 kg（单头 6 kg），摩擦 50 N，可用加速度 = (驱动力 − 50 N)/质量；机器最高 1100 r/min；DST 每方向最多 12.1 mm。",
+     "Y-axis mass = 10 + 4 × heads kg (6 kg for one head), friction 50 N, available acceleration = (drive force − 50 N)/mass; machine maximum 1100 r/min; DST up to 12.1 mm per axis."
+    ],
+    [
+     "效率模型：花样 20000 针、800 r/min；全机期望断线 H·λ·2 次；每次处理时间加回退补绣（回退 b 针、600 r/min、来回两次）；换色 6 次、每次 6 s。",
+     "Efficiency model: 20000 stitches at 800 r/min; expected breaks H·λ·2; each costs the handling time plus back-up and mending (b stitches at 600 r/min, twice); 6 colour changes of 6 s."
+    ],
+    [
+     "检测延迟 d 针：回退 b < d 时每次留下 d − b 针漏针；b − d 超过 3 针算回退过多。",
+     "Detection delay d: b < d leaves d − b missed stitches per break; b − d over 3 counts as too much back-up."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页第①页“绷架与转速”，按“恢复标准”（8 头、800 N、针长 3 mm、800 r/min），读判据中的需要/可用加速度、转速上限和绷架质量，填入表格。",
+     "Open page ① “Frame and speed” and press “Reset to standard” (8 heads, 800 N, 3 mm, 800 r/min); read required/available acceleration, speed limit and frame mass from the criteria and record them."
+    ],
+    [
+     "把针长依次调到 5 mm、7 mm，记录转速上限；对照下方曲线上的红点，看当前设定在曲线哪一侧。",
+     "Set the stitch length to 5 mm and then 7 mm, recording the limit each time; check which side of the curve the red dot falls on."
+    ],
+    [
+     "任务 1：头数调到 15、驱动力 800 N，先用公式算出 7 mm 针的转速上限，填入并按“核对”（±3%），再拖动滑块验证。",
+     "Task 1: set 15 heads and 800 N, compute the 7 mm speed limit by formula, enter it and press “Check” (±3%), then verify with the sliders."
+    ],
+    [
+     "任务 2：8 头、针长 7 mm、转速 850 r/min，算出所需驱动力，再把驱动力调到判据全部满足，记录最小驱动力。",
+     "Task 2: with 8 heads, 7 mm and 850 r/min, compute the drive force needed, then raise the force until all criteria pass and record the minimum."
+    ],
+    [
+     "把针长调到 12.5 mm，看 DST 判据的提示，说明这一针应怎样处理。",
+     "Set the stitch length to 12.5 mm, read the DST criterion's message, and explain how such a stitch must be handled."
+    ],
+    [
+     "切换到第②页“断线与补绣”，按“恢复标准”，记录期望断线次数、全机效率、每小时件数；按几次“再绣一次”，观察时间线上红色断线停车的随机分布。",
+     "Switch to page ② “Breaks and mending”, reset, and record expected breaks, efficiency and pieces per hour; press “Embroider again” a few times and watch the random red stops on the timeline."
+    ],
+    [
+     "任务 3：把检测延迟设为 6 针，选一个回退针数，使每次断线不留漏针、又不多退超过 3 针。",
+     "Task 3: set the detection delay to 6 stitches and choose a backup count that leaves no missed stitches and backs up no more than 3 extra."
+    ],
+    [
+     "任务 4：头数 20、每次处理 40 s，逐步降低断线率，直到全机效率达到 80%，记录断线率；再恢复断线率 0.5，改为缩短处理时间达到 80%，比较两种办法。",
+     "Task 4: with 20 heads and 40 s handling, lower the break rate until efficiency reaches 80% and record it; then restore 0.5 and reach 80% by shortening handling time instead, and compare the two."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 16-1　多头刺绣机实验记录",
+     "Table 16-1 Multi-head embroidery lab record"
+    ],
+    "headers": [
+     [
+      "头数",
+      "Heads"
+     ],
+     [
+      "驱动力（N）",
+      "Drive force (N)"
+     ],
+     [
+      "针长（mm）",
+      "Stitch (mm)"
+     ],
+     [
+      "需要 / 可用加速度（m/s²）",
+      "Required / available accel. (m/s²)"
+     ],
+     [
+      "转速上限（r/min）",
+      "Speed limit (r/min)"
+     ],
+     [
+      "断线率 / 处理时间",
+      "Break rate / handling time"
+     ],
+     [
+      "全机效率（%）",
+      "Efficiency (%)"
+     ],
+     [
+      "每小时件数",
+      "Pieces per hour"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "头数从 8 增加到 15，7 mm 缎纹的转速上限降低了多少？用质量和加速度的关系解释。",
+     "Going from 8 to 15 heads, how much does the 7 mm satin speed limit fall? Explain with mass and acceleration."
+    ],
+    [
+     "任务 4 中，降低断线率和缩短处理时间，哪一种在现场更容易做到？各需要哪些技术或管理措施？",
+     "In Task 4, which is easier on the floor — lowering the break rate or shortening handling time? What technical or management measures does each need?"
+    ],
+    [
+     "为什么回退针数既不能少于检测延迟，又不宜多出太多？",
+     "Why must the backup count be no less than the detection delay, yet not much more?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 16：多头刺绣机的转速、文件与效率核算",
+   "Assignment 16: speed, files and efficiency of a multi-head embroidery machine"
+  ],
+  "tasks": [
+   [
+    "一台 12 头机，Y 轴折算质量按 10 + 4 × 头数 kg，驱动力 1000 N，摩擦 50 N，针离布窗口 204°，机器最高 1100 r/min。求 3、5、7 mm 针长的转速上限；若要求 7 mm 缎纹段也能跑 800 r/min，驱动力至少多大？",
+    "A 12-head machine has Y-axis mass 10 + 4 × heads kg, drive force 1000 N, friction 50 N, a 204° window and a 1100 r/min maximum. Find the speed limits for 3, 5 and 7 mm stitches; what minimum drive force would let the 7 mm satin section also run at 800 r/min?"
+   ],
+   [
+    "DST 文件每条记录每个方向最多 12.1 mm。沿 X 方向 45 mm 的跳步至少要几条记录？沿 45° 方向走 40 mm 呢？机器怎样从 DST 文件判断何时剪线？",
+    "A DST record allows at most 12.1 mm per axis. How many records does a 45 mm jump along X need at least? And a 40 mm move at 45°? How does the machine decide from a DST file when to trim?"
+   ],
+   [
+    "一个花样 15000 针、平均 750 r/min；12 头机，每头每万针断线 0.4 次，每次处理 45 s，另加回退补绣（回退 8 针、600 r/min、来回两次），换色 5 次、每次 6 s。估算全机效率和每小时件数；再分别估算把处理时间缩短到 20 s、或把断线率降到 0.2 时的效率，说明哪种改进更值得投入。",
+    "A design has 15000 stitches at an average 750 r/min; a 12-head machine breaks 0.4 times per head per ten thousand stitches, 45 s handling per break plus back-up and mending (8 stitches at 600 r/min, twice), and 5 colour changes of 6 s. Estimate efficiency and pieces per hour; then estimate efficiency with handling cut to 20 s, or with the break rate halved to 0.2, and say which improvement is more worth investing in."
+   ],
+   [
+    "（讨论）检测延迟 d 从 6 针降到 2 针，对断线处理有哪些好处？结合 16.6 节，说明断线检测器可以怎样设计才能更快发现断线。",
+    "(Discussion) What does cutting the detection delay d from 6 stitches to 2 bring to thread-break handling? With reference to Section 16.6, explain how a thread-break detector could be designed to detect breaks faster."
+   ]
+  ],
+  "deliverable": [
+   "2–3 页计算报告（PDF），含公式、代入与结果（可附 Python 脚本），附虚拟实验 16-1 四个任务完成状态的截图。",
+   "A 2–3 page calculation report (PDF) with formulas, substitutions and results (optionally a Python script), plus screenshots of the four task states in Virtual lab 16-1."
+  ],
+  "rubric": [
+   [
+    "转速上限和驱动力计算正确（30 分）",
+    "Speed limits and drive force correct (30 points)"
+   ],
+   [
+    "DST 记录数正确，剪线判断说明清楚（15 分）",
+    "DST record counts correct and trimming logic explained (15 points)"
+   ],
+   [
+    "效率与件数估算正确，改进方案比较有依据（30 分）",
+    "Efficiency and pieces per hour correct, improvements compared with evidence (30 points)"
+   ],
+   [
+    "讨论题论点清楚（20 分）",
+    "Discussion clear (20 points)"
+   ],
+   [
+    "报告规范、单位齐全（5 分）",
+    "Report tidy, units complete (5 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "numerical",
+   "text": [
+    "刺绣机针离布窗口 204°，主轴 900 r/min，绷架按摆线规律走一针 4 mm。所需峰值加速度约为多少 m/s²？",
+    "The needle-out window is 204°, the shaft runs at 900 r/min, and the frame moves 4 mm per stitch with a cycloidal law. What peak acceleration is required, in m/s²?"
+   ],
+   "answer": 17.6,
+   "tolerance": 0.3,
+   "unit": "m/s²",
+   "feedback": [
+    "窗口时间 T = 204/(6 × 900) ≈ 0.0378 s；a = 2π × 0.004/0.0378² ≈ 17.6 m/s²。",
+    "Window time T = 204/(6 × 900) ≈ 0.0378 s; a = 2π × 0.004/0.0378² ≈ 17.6 m/s²."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一台 10 头机，Y 轴折算质量按 10 + 4 × 头数 kg，驱动力 900 N，摩擦 50 N，窗口 204°。6 mm 一针的转速上限约为多少 r/min？",
+    "A 10-head machine has Y-axis mass 10 + 4 × heads kg, drive force 900 N, friction 50 N, window 204°. What is the speed limit for a 6 mm stitch, in r/min?"
+   ],
+   "answer": 722,
+   "tolerance": 8,
+   "unit": "r/min",
+   "feedback": [
+    "质量 50 kg，可用加速度 850/50 = 17 m/s²；n_max = 34 × √(17/(2π × 0.006)) ≈ 722 r/min。",
+    "Mass 50 kg, available acceleration 850/50 = 17 m/s²; n_max = 34 × √(17/(2π × 0.006)) ≈ 722 r/min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "DST 文件每条记录每个方向最多 12.1 mm。沿 Y 方向 40 mm 的跳步至少需要几条记录？",
+    "A DST record allows at most 12.1 mm per axis. How many records does a 40 mm jump along Y need at least?"
+   ],
+   "answer": 4,
+   "tolerance": 0,
+   "unit": "",
+   "feedback": [
+    "40 ÷ 12.1 ≈ 3.3，向上取整为 4 条。",
+    "40 ÷ 12.1 ≈ 3.3, rounded up to 4 records."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "多头机的每个机头都要有自己的针杆跳跃电磁铁，最主要的原因是：",
+    "Each head of a multi-head machine needs its own needle-bar jump solenoid mainly because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "各头共用上轴，必须能让某一个头单独不缝（如断线补绣时只让断线头落针）",
+      "The heads share the main shaft, so a single head must be able to stop sewing on its own (e.g. only the broken head stitches while mending)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "用来代替针杆箱横移换色",
+      "It replaces the needle-bar case shift for colour changes"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "用来检测面线是否断了",
+      "It detects whether the needle thread has broken"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "用来提高主轴转速",
+      "It raises the main-shaft speed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "轴是共用的，可每个头又必须能单独“不缝”；跳步和断线补绣都靠它让针杆脱开驱动器、停在上面。",
+    "The shafts are shared, yet each head must be able to “not sew”; jumps and mending both rely on it to disengage the bar and hold it up."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "断线检测延迟为 d 针，回退针数 b 小于 d。结果是：",
+    "The detection delay is d stitches and the backup count b is less than d. The result is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "补绣接不上，每次断线留下 d − b 针漏针，成为次品",
+      "Mending does not join up; each break leaves d − b missed stitches, a reject"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "补绣处重叠变厚",
+      "The mended area overlaps and thickens"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "全机效率提高，没有副作用",
+      "Efficiency rises with no side effects"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "其他机头也会跟着漏针",
+      "The other heads also miss stitches"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "回退要退过漏缝的那几针才能补上；退多了才会重叠变厚。",
+    "The back-up must pass the missed stitches to fill them; over-backing is what causes thick overlaps."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "DST 文件里记录了每种颜色的颜色值，机器据此自动选择针杆。",
+    "A DST file stores a colour value for each colour, which the machine uses to choose needle bars automatically."
+   ],
+   "correct": false,
+   "feedback": [
+    "DST 只有“换色”命令，没有颜色值；每种颜色用哪根针杆在机器上设定。也没有单独的剪线命令。",
+    "DST has only colour-change commands, no colour values; the needle bar for each colour is set on the machine. Nor is there a separate trim command."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "要提高一台 20 头刺绣机的全机效率，下列哪些措施有效？",
+    "Which measures raise the overall efficiency of a 20-head embroidery machine?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "用更好的线、针和张力调整降低断线率",
+      "Lower the break rate with better thread, needles and tension"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "自动回退补绣，缩短每次断线的处理时间",
+      "Automatic back-up and mending to shorten handling per break"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "制版时把同色块连起来绣，减少换色和跳步",
+      "Digitise same-colour areas together to reduce colour changes and jumps"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "把回退针数调得远大于检测延迟",
+      "Set the backup count far above the detection delay"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "停车时间 = 断线次数 × 每次处理 + 换色时间；前三项分别减少断线次数、每次处理时间和换色时间。回退过多只会浪费时间、让重叠处变厚。",
+    "Stop time = breaks × handling + colour-change time; the first three cut each term. Excess back-up only wastes time and thickens overlaps."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一台 10 头机绣 20000 针、800 r/min（纯缝纫 1500 s）；每头每万针断线 0.3 次，每次处理 30 s（忽略回退补绣时间）；换色 8 次、每次 6 s。全机效率约为百分之几？",
+    "A 10-head machine sews 20000 stitches at 800 r/min (1500 s of sewing); 0.3 breaks per head per ten thousand stitches, 30 s handling each (ignore back-up and mending); 8 colour changes of 6 s. What is the overall efficiency in percent?"
+   ],
+   "answer": 86.8,
+   "tolerance": 0.5,
+   "unit": "%",
+   "feedback": [
+    "断线 10 × 0.3 × 2 = 6 次，停车 180 s；换色 48 s；效率 = 1500/(1500 + 180 + 48) ≈ 86.8%。",
+    "Breaks 10 × 0.3 × 2 = 6, 180 s; colour changes 48 s; efficiency = 1500/(1500 + 180 + 48) ≈ 86.8%."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "刺绣里说的“跳步”是指：",
+    "In embroidery, a “jump stitch” means:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "同色两块图案之间绷架走一段距离而不落针",
+      "The frame travels between two same-colour areas without stitching"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "旋梭没钩住线环造成的线迹缺陷",
+      "A stitch defect caused by the hook missing the loop"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "换色时针杆箱的横移",
+      "The needle-bar case shift during a colour change"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "断线后绷架的回退",
+      "The frame backing up after a thread break"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "跳步由针杆跳跃电磁铁让针杆停在上面，绷架移到下一块起点；它和前面各章的“跳针”故障不是一回事。",
+    "During a jump the jump solenoid holds the bar up while the frame moves to the next area; it is not the skipped-stitch fault of earlier chapters."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "8 头机（Y 轴折算质量 10 + 4 × 头数 kg，摩擦 50 N，窗口 204°）要让 6 mm 的一针跑到 900 r/min，所需驱动力约为多少 N？",
+    "An 8-head machine (Y-axis mass 10 + 4 × heads kg, friction 50 N, window 204°) must run a 6 mm stitch at 900 r/min. About what drive force is needed, in N?"
+   ],
+   "answer": 1159,
+   "tolerance": 15,
+   "unit": "N",
+   "feedback": [
+    "窗口时间 T = 204/5400 ≈ 0.0378 s，所需加速度 a = 2π × 0.006/0.0378² ≈ 26.4 m/s²；8 头质量 42 kg，F = 50 + 42 × 26.4 ≈ 1159 N。",
+    "T = 204/5400 ≈ 0.0378 s, a = 2π × 0.006/0.0378² ≈ 26.4 m/s²; F = 50 + 42 × 26.4 ≈ 1159 N."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "12 头机绣 20000 针、800 r/min；每头每万针断线 0.5 次，每次处理 40 s，另加回退补绣 1.6 s；换色 6 次、每次 6 s。全机每小时约绣多少件（每个机头一件）？",
+    "A 12-head machine sews 20000 stitches at 800 r/min; 0.5 breaks per head per ten thousand stitches, 40 s handling plus 1.6 s back-up and mending each; 6 colour changes of 6 s. About how many pieces per hour does the machine produce (one per head)?"
+   ],
+   "answer": 21.2,
+   "tolerance": 0.4,
+   "unit": "",
+   "feedback": [
+    "断线 12 次，停车 12 × 41.6 = 499.2 s；总时间 1500 + 499.2 + 36 = 2035.2 s；件数 12 × 3600/2035.2 ≈ 21.2。",
+    "12 breaks, 12 × 41.6 = 499.2 s; total 1500 + 499.2 + 36 = 2035.2 s; pieces 12 × 3600/2035.2 ≈ 21.2."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "头数和驱动力不变，针长从 3 mm 增加到 12 mm（且都受绷架限制），转速上限约变为原来的：",
+    "With heads and drive force unchanged, the stitch length goes from 3 mm to 12 mm (both limited by the frame). The speed limit becomes about:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "1/2",
+      "1/2"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "1/4",
+      "1/4"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "1/16",
+      "1/16"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "不变",
+      "Unchanged"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "n_max ∝ √(1/s)，针长变为 4 倍，转速上限变为 1/√4 = 1/2。",
+    "n_max ∝ √(1/s): four times the length gives 1/√4 = 1/2 the limit."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "让面线带动小码盘、用光电开关读脉冲的断线检测器，也能发现底线断了或用完。",
+    "A thread-break detector in which the needle thread turns a small code wheel read by a photoelectric switch also detects bobbin-thread breaks or run-out."
+   ],
+   "correct": false,
+   "feedback": [
+    "它只看得到面线；底线断了或用完要另外检测。",
+    "It sees only the needle thread; bobbin breaks or run-out need separate detection."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于多头刺绣机换色，下列说法正确的是：",
+    "Which statements about colour changes on a multi-head embroidery machine are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "换色前主轴减速，最后一针剪线、拨线，停在规定的停针角",
+      "Before the change the shaft slows, the last stitch is trimmed and wiped, and it stops at the set angle"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "针杆箱横移，把下一种颜色的针杆对准针杆驱动器",
+      "The needle-bar case shifts to align the next colour's bar with the driver"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "换色期间绷架不动，换色后慢起针再加速",
+      "The frame is still during the change, followed by a slow start and acceleration"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "各机头可以各自换成不同的颜色，互不影响",
+      "Each head can change to a different colour independently"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "所有机头同时换到同一种颜色；顺序是减速、剪线拨线、停针、横移、慢起针、加速。",
+    "All heads change to the same colour together, in the order slow down, trim and wipe, stop, shift, slow start, accelerate."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "大绷架的转速上限（需要与可用加速度）；换色、跳步与 DST 文件；断线回退补绣与全机效率。",
+   "Frame speed limit (required versus available acceleration); colour change, jumps and DST files; thread-break back-up, mending and machine efficiency."
+  ],
+  "difficult": [
+   "把针长、转速、头数、驱动力联系成一个转速上限；理解“任何一头断线全机停”对效率的放大作用。",
+   "Linking stitch length, speed, head count and drive force into one speed limit; understanding how “any break stops all” amplifies losses."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入与结构",
+     "Introduction and structure"
+    ],
+    "minutes": 15,
+    "content": [
+     "提出八头机 7 mm 缎纹问题；讲多头机结构和头板功能。",
+     "Pose the 8-head 7 mm satin problem; explain the structure and head boards."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：绷架与转速",
+     "Lecture: frame and speed"
+    ],
+    "minutes": 30,
+    "content": [
+     "窗口与摆线加速度、绷架质量与可用加速度、转速上限、前瞻调速与加强驱动。",
+     "Window and cycloidal acceleration, frame mass and available acceleration, speed limit, look-ahead and stronger drives."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 16-1 第①页",
+     "Virtual lab 16-1 page ①"
+    ],
+    "minutes": 20,
+    "content": [
+     "完成任务 1、2，回到导入问题核对答案。",
+     "Complete Tasks 1 and 2 and check the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：换色、跳步与文件",
+     "Lecture: colour change, jumps, files"
+    ],
+    "minutes": 20,
+    "content": [
+     "换色顺序、跳步、三种针迹与制版、DST 文件。",
+     "Colour-change sequence, jumps, three stitch types and digitising, DST files."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：断线案例",
+     "Lecture: thread-break case"
+    ],
+    "minutes": 20,
+    "content": [
+     "七步处理、检测延迟与回退针数、头数与效率。",
+     "Seven-step handling, detection delay and backup count, heads and efficiency."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 16-1 第②页",
+     "Virtual lab 16-1 page ②"
+    ],
+    "minutes": 15,
+    "content": [
+     "完成任务 3、4，比较降低断线率与缩短处理时间。",
+     "Complete Tasks 3 and 4, comparing lower break rate with shorter handling."
+    ]
+   },
+   {
+    "phase": [
+     "测验与小结",
+     "Quiz and summary"
+    ],
+    "minutes": 15,
+    "content": [
+     "课堂测验、讲评、小结，布置作业。",
+     "Quiz, review, summary and assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业 16；预习第 17 章电脑横机的选针与度目控制。",
+   "Complete Assignment 16; preview needle selection and stitch-cam control in Chapter 17."
+  ]
+ }
+}

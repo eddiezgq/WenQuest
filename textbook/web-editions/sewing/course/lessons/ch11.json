@@ -1,0 +1,1208 @@
+{
+ "no": 11,
+ "title": [
+  "典型特种机的机构",
+  "Mechanisms of Typical Special Machines"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能说明特种机“一个缝纫头 + 一套平面运动 + 附加动作”的共同结构，以及“横向运动只能在针离开布料时进行”这条硬约束。",
+   "Describe the common structure of special machines — a sewing head, a planar motion and additional actions — and the hard rule that sideways motion may happen only while the needle is out of the fabric."
+  ],
+  [
+   "能用曲柄滑块公式求针在布外的窗口，并说明布厚、余量对窗口的影响。",
+   "Use the slider-crank formula to find the out-of-fabric window and explain how fabric thickness and margin affect it."
+  ],
+  [
+   "能比较简谐、摆线、修正梯形三种运动规律，用 a_max = C·w·ω²/β² 算出横摆的峰值加速度和惯性力。",
+   "Compare simple harmonic, cycloidal and modified-trapezoid motion laws and compute the peak sideways acceleration and inertia force with a_max = C·w·ω²/β²."
+  ],
+  [
+   "能用 Δφ = w/(2R) 算出针在两端钩线的时刻差，说明摆宽为什么受旋梭钩线窗口限制。",
+   "Use Δφ = w/(2R) to find the catching-time difference between the two ends and explain why the bight is limited by the hook’s loop window."
+  ],
+  [
+   "能说出锁眼机、钉扣机、套结机、绗缝机和刺绣机的机构要点，并解释它们为什么要在宽摆宽、大针距时降速。",
+   "State the key mechanisms of buttonholers, button sewers, bartackers, quilters and embroidery machines, and explain why they slow down for wide bights and long stitches."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "松紧带之字缝：区间能不能再压缩",
+   "Zigzagging elastic: can the swing interval be squeezed"
+  ],
+  "text": [
+   "某内衣厂用电子之字缝机上松紧带，摆宽 8 mm，转速 5000 r/min，摆针区间为主轴转角 275° 到 85°（170°），运动规律为修正梯形。针杆摆架折算到针尖的质量约 150 g，摆架和驱动能承受的横向惯性力按 250 N 计（示意值）。工艺员提出两点改动：一是改用“更平稳”的摆线规律；二是把摆动区间缩到 120°，“给送布多留点时间”。旋梭半径 13.5 mm。",
+   "An underwear factory attaches elastic with an electronic zigzag machine: bight 8 mm, 5000 r/min, needle swing from 275° to 85° of shaft angle (170°), modified-trapezoid motion law. The swing frame’s mass referred to the needle point is about 150 g, and the sideways inertia force the frame and drive can take is taken as 250 N (illustrative). The process engineer proposes two changes: switch to the “smoother” cycloidal law, and squeeze the swing interval to 120° “to give the feed more time”. The hook radius is 13.5 mm."
+  ],
+  "question": [
+   "两种运动规律下的峰值加速度和惯性力各是多少？压缩到 120° 可行吗？针在左右两端被钩住的时刻相差多少度？",
+   "What are the peak acceleration and inertia force under each motion law? Is squeezing to 120° feasible? By how many degrees do the catching moments at the two ends differ?"
+  ],
+  "answer": [
+   "按 a_max = C·w·ω²/β²（ω = 524 rad/s，β = 170° = 2.97 rad）：修正梯形约 1220 m/s²、惯性力约 183 N；摆线约 1570 m/s²、约 235 N，都在 250 N 以内，换摆线可以但余量变小。区间压到 120°，加速度变为 (170/120)² ≈ 2.0 倍，摆线约 471 N、修正梯形约 367 N，都超限；而且送布和摆针本来就在同一个针在布外的窗口里同时进行，压缩摆针区间并不能给送布多出时间。两端钩线时刻差 Δφ = w/(2R) = 8/27 rad ≈ 17°，右端先被钩。",
+   "With a_max = C·w·ω²/β² (ω = 524 rad/s, β = 170° = 2.97 rad): modified trapezoid about 1220 m/s² and 183 N; cycloidal about 1570 m/s² and 235 N. Both are under 250 N, so cycloidal is possible but with less margin. Squeezing to 120° multiplies the acceleration by (170/120)² ≈ 2.0: about 471 N cycloidal and 367 N modified trapezoid, both over the limit. Besides, feed and swing already share the same out-of-fabric window simultaneously, so a shorter swing interval does not give the feed any more time. The catching moments differ by Δφ = w/(2R) = 8/27 rad ≈ 17°, the right end being caught first."
+  ]
+ },
+ "robot": {
+  "title": [
+   "摆针规律 ↔ 机器人轨迹的时间标定与 S 形加减速",
+   "Swing laws ↔ time scaling and S-curve profiles in robot motion"
+  ],
+  "text": [
+   "摆针规律的选择就是机器人轨迹规划中的“时间标定”：同样走 w 的距离、限定在时间 T 内完成，峰值加速度与 w/T² 成正比，时间压缩一半，加速度和电机力矩就变成 4 倍。伺服驱动器常用的 S 形加减速（限制加加速度）与修正梯形是同一类思路：加速度连续、不激起冲击，峰值又不太高。之字缝机从机械凸轮换成步进电机，就是“电子凸轮”：控制器按主轴编码器的角度查位移表给出摆架位置，和六轴机器人按位置–速度–时间表插补是一个道理。点胶、焊接机器人只能在工具离开工件的时段里大幅横移，与机针在布外才能摆是同一条约束。",
+   "Choosing a swing law is the “time scaling” step of robot trajectory planning: to cover a distance w in a time T, the peak acceleration goes as w/T², so halving the time quadruples the acceleration and the motor torque. The S-curve (jerk-limited) acceleration profiles of servo drives follow the same idea as the modified trapezoid: continuous acceleration with no shock and a moderate peak. Replacing the zigzag cam by a stepper motor is an “electronic cam”: the controller reads the spindle encoder angle, looks up a displacement table and commands the swing-frame position, just as a six-axis robot interpolates a position–velocity–time table. A dispensing or welding robot may make large sideways moves only while its tool is off the workpiece — the same constraint as a needle that may swing only when out of the fabric."
+  ]
+ },
+ "life": {
+  "title": [
+   "订书机抬起时才能挪纸",
+   "Move the paper only when the stapler is up"
+  ],
+  "text": [
+   "用订书机沿纸边钉一排钉子，只有在订书机抬起时才能把纸挪到下一个位置；压下的时候一挪，钉子就歪了。之字缝的摆针、钉扣机的扣夹、刺绣机的绣框，都只能在针离开布料的那一小段时间里移动。",
+   "Stapling a row along the edge of a sheet, you can only slide the paper to the next spot while the stapler is up; move it while pressing down and the staple goes in crooked. The zigzag needle, the button clamp and the embroidery frame likewise may move only in the short time the needle is out of the fabric."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：一个缝纫头加一套平面运动",
+    "Opening: a sewing head plus a planar motion"
+   ],
+   "points": [
+    [
+     "锁眼、钉扣、套结、之字缝、绗缝、刺绣都是特种机",
+     "Buttonholers, button sewers, bartackers, zigzag, quilting and embroidery machines are special machines"
+    ],
+    [
+     "共同结构：缝纫头 + 针或布的平面运动 + 附加动作（切刀、换色）",
+     "Common structure: sewing head + planar motion of needle or fabric + extra actions (knife, colour change)"
+    ],
+    [
+     "硬约束：针在布中时，针和布不能有水平相对运动",
+     "Hard constraint: no horizontal relative motion while the needle is in the fabric"
+    ],
+    [
+     "违反则针被拉弯、针迹偏位，甚至撞针板断针",
+     "Break it and the needle bends, stitches shift, or the needle hits the plate and snaps"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_11_family.png",
+   "narration": [
+    "一件衬衫上有七八个扣眼、七八粒纽扣、几处套结，可能还有一道之字装饰线，每样活都有一台专用机器，统称特种机。把它们拆开看，结构惊人地相似：一个缝纫头，它的针杆、挑线、旋梭或弯针和平缝机、链缝机没有本质区别；一套让针或布在平面里移动的机构；再加一些附加动作，比如锁眼的切刀、刺绣的换色。这一讲只讲机构，控制放到第 15 章。整讲抓住一条硬约束：针在布里的时候，针和布在水平方向不能有相对运动，否则针被拉弯，轻则针迹偏，重则撞针板断针。",
+    "A shirt has seven or eight buttonholes, as many buttons, a few bartacks and maybe a decorative zigzag. Each job has its own machine; together they are special machines. Take them apart and they look remarkably alike: a sewing head whose needle bar, take-up and hook or looper are essentially those of a lockstitch or chainstitch machine; a mechanism that moves the needle or the fabric in a plane; and some extra actions, such as the buttonhole knife or a colour change. This lesson covers mechanisms only; control is in Chapter 15. One hard constraint runs through it: while the needle is in the fabric there must be no horizontal relative motion between needle and fabric, or the needle bends, the stitch shifts, or worse, the needle hits the plate and breaks."
+   ]
+  },
+  {
+   "title": [
+    "之字线迹 304 与摆针机构",
+    "The 304 zigzag stitch and the needle-swing mechanism"
+   ],
+   "points": [
+    [
+     "304 是锁式线迹，交织点交替落在左右两侧；比 301 有弹性",
+     "304 is a lockstitch whose interlacings alternate left and right; more elastic than 301"
+    ],
+    [
+     "针杆装在摆架里，摆架绕上端支点左右摆；之字凸轮经摆杆、连杆推动",
+     "The needle bar sits in a swing frame pivoted at the top; a zigzag cam drives it through a rocker and link"
+    ],
+    [
+     "2 步之字：凸轮 2 : 1 减速；改连杆作用半径即改摆宽",
+     "2-step zigzag: cam at 2 : 1 reduction; changing the link radius changes the bight"
+    ],
+    [
+     "电子式：步进电机直驱；某型最大摆宽 8 mm（可改 10 mm），5000 sti/min，针杆行程 33.4 mm",
+     "Electronic: direct stepper drive; one model 8 mm bight (10 mm with gauge parts), 5000 sti/min, 33.4 mm stroke"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_11_mech.png",
+   "narration": [
+    "先看之字缝。之字线迹编号 304，属于锁式线迹，面线底线照样在布中交织，只是交织点交替落在左右两侧，正面看是一条之字线。针距由送布决定，摆宽由针杆左右摆动决定。它比 301 有弹性，还能把两块布边对接，常用于松紧带、内衣和装饰缝。机械式之字缝机把针杆装在一个摆架里，摆架绕上端支点左右摆，由之字凸轮经摆杆和连杆推动；两步之字每针换一次边，凸轮 2 比 1 减速。电子式用步进电机直接驱动摆架，某企业的机器最大摆宽 8 毫米，最高 5000 针每分。",
+    "Start with zigzag. The zigzag stitch is 304, a lockstitch: needle and bobbin threads still interlace in the fabric, but the interlacings alternate left and right, so the face shows a zigzag. Stitch length comes from the feed, bight from the needle bar’s sideways swing. It stretches more than 301 and can butt two edges together, so it is used for elastic, underwear and decoration. A mechanical machine mounts the needle bar in a swing frame pivoted at its top, pushed by a zigzag cam through a rocker and link; a 2-step zigzag changes sides every stitch, so the cam runs at 2 to 1. An electronic machine drives the frame with a stepper; one manufacturer’s model has an 8 mm bight and runs at up to 5000 stitches a minute."
+   ]
+  },
+  {
+   "title": [
+    "针在布外的窗口",
+    "The out-of-fabric window"
+   ],
+   "points": [
+    [
+     "算例：针杆行程 31 mm、布厚 1.5 mm：258.3° 离开布面，101.7° 再碰布面",
+     "Example: 31 mm stroke, 1.5 mm fabric: point leaves at 258.3°, touches again at 101.7°"
+    ],
+    [
+     "要求摆动时针尖高出布面至少 0.5 mm：可用 260°–100°，约 200°",
+     "Require the point at least 0.5 mm above the fabric while swinging: 260°–100°, about 200°"
+    ],
+    [
+     "送布也在这个窗口里完成，与摆针共用",
+     "Feeding must also happen in this window, shared with the swing"
+    ],
+    [
+     "布越厚，窗口越窄",
+     "The thicker the fabric, the narrower the window"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_11_timing.png",
+   "narration": [
+    "摆针只能在针尖离开布料时进行。用第 3、8 章的算例，针杆行程 31 毫米，布厚 1.5 毫米：针尖在 258.3 度离开布面，在 101.7 度再次碰到布面。为了留点余量，本讲要求摆动时针尖至少高出布面 0.5 毫米，可用的转角就缩到 260 度到 100 度，大约 200 度。注意送布也要在这段时间里完成，所以之字缝机的送布和摆针分享同一个窗口，两者的起止都要落在窗口里。布越厚，针尖越早进布、越晚出布，这个窗口就越窄；比如布厚 4 毫米，窗口只剩约 182 度。",
+    "The needle may swing only while its point is out of the fabric. Take the worked example of Chapters 3 and 8: 31 mm stroke, 1.5 mm fabric. The point leaves the fabric surface at 258.3 degrees and touches it again at 101.7. To leave some margin we require the point to be at least 0.5 mm above the fabric while swinging, which shrinks the usable range to 260 through 100 degrees, about 200. Remember the feed must also happen in this time, so on a zigzag machine feed and swing share one window, and both must start and finish inside it. The thicker the fabric, the earlier the point enters and the later it leaves, so the window narrows; with 4 mm fabric only about 182 degrees remain."
+   ]
+  },
+  {
+   "title": [
+    "三种运动规律",
+    "Three motion laws"
+   ],
+   "points": [
+    [
+     "简谐（余弦加速度）：两端加速度突变，激起冲击和振动",
+     "Simple harmonic (cosine acceleration): acceleration jumps at both ends, exciting shock and vibration"
+    ],
+    [
+     "摆线（正弦加速度）：两端加速度为零，平稳但峰值最大",
+     "Cycloidal (sine acceleration): zero acceleration at both ends, smooth but the highest peak"
+    ],
+    [
+     "修正梯形：加速度平顶、两端连续，峰值与简谐相当",
+     "Modified trapezoid: flat-topped, continuous acceleration, peak like the harmonic"
+    ],
+    [
+     "修正梯形比摆线峰值低约 22%，兼有两者长处",
+     "Modified trapezoid peaks about 22% below cycloidal, combining both strengths"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "摆架在窗口里从一端走到另一端，用什么运动规律？凸轮设计里常用三种。简谐运动，加速度按余弦变化，起点和终点加速度会突然跳变，激起冲击和振动。摆线运动，加速度按正弦变化，两端为零，最平稳，可峰值最大。修正梯形，加速度是平顶的，两端也连续，峰值和简谐差不多，比摆线低约 22%。三条位移曲线看上去差别不大，大家看图的下半部分，加速度就很不一样了。所以修正梯形兼有两者的长处，是凸轮和电子凸轮里很常用的规律。",
+    "How should the swing frame move from one end to the other inside the window? Cam designers commonly use three laws. Simple harmonic: cosine acceleration, which jumps suddenly at the start and end, exciting shock and vibration. Cycloidal: sine acceleration, zero at both ends, the smoothest, but with the highest peak. Modified trapezoid: a flat-topped acceleration that is also continuous at both ends, peaking about as high as the harmonic and about 22% below the cycloidal. The three displacement curves look much alike, but look at the bottom of the figure: the accelerations differ a lot. So the modified trapezoid combines the strengths of both, and it is a favourite for cams and electronic cams alike."
+   ]
+  },
+  {
+   "title": [
+    "峰值加速度公式",
+    "The peak-acceleration formula"
+   ],
+   "points": [
+    [
+     "w 摆宽，ω 主轴角速度，β 摆动所占转角（弧度）",
+     "w bight, ω shaft angular velocity, β swing angle in radians"
+    ],
+    [
+     "C：简谐约 4.93，摆线 2π ≈ 6.28，修正梯形约 4.89",
+     "C: about 4.93 harmonic, 2π ≈ 6.28 cycloidal, about 4.89 modified trapezoid"
+    ],
+    [
+     "与摆宽成正比，与转速平方成正比，与摆动转角平方成反比",
+     "Proportional to bight, to speed squared, inversely to swing angle squared"
+    ],
+    [
+     "转速 5000 → 6000 r/min，加速度变为 1.44 倍",
+     "Speed 5000 → 6000 r/min multiplies acceleration by 1.44"
+    ]
+   ],
+   "formula": "a_{\\max} = C \\, \\frac{w \\, \\omega^{2}}{\\beta^{2}}",
+   "figure": "",
+   "narration": [
+    "峰值加速度可以写成这个式子：C 乘摆宽乘主轴角速度平方，再除以摆动所占转角的平方，转角要用弧度。C 是运动规律系数，简谐约 4.93，摆线是 2π 约 6.28，修正梯形约 4.89。这个式子告诉我们三件事。第一，加速度和摆宽成正比，摆宽加倍、力加倍。第二，和转速的平方成正比，转速从 5000 提到 6000，加速度变成 1.2 的平方，1.44 倍。第三，和摆动转角的平方成反比，区间压缩一点，加速度涨得很快。所以设计时摆宽、转速、区间三者要一起定。",
+    "The peak acceleration can be written like this: C times the bight times the shaft angular velocity squared, divided by the square of the shaft angle used for the swing, in radians. C depends on the motion law: about 4.93 for harmonic, 2π, about 6.28, for cycloidal, and about 4.89 for modified trapezoid. Three lessons follow. First, acceleration is proportional to bight: double the bight, double the force. Second, it goes with speed squared: from 5000 to 6000 r/min it rises by 1.2 squared, 1.44 times. Third, it goes inversely with the swing angle squared: squeeze the interval a little and the acceleration climbs fast. So bight, speed and interval must be decided together."
+   ]
+  },
+  {
+   "title": [
+    "算例：8 mm、5000 r/min、170°",
+    "Worked example: 8 mm, 5000 r/min, 170°"
+   ],
+   "points": [
+    [
+     "摆动区间 275°–85°（170°）：修正梯形约 1220 m/s²，摆线约 1570 m/s²",
+     "Swing 275°–85° (170°): modified trapezoid about 1220 m/s², cycloidal about 1570 m/s²"
+    ],
+    [
+     "摆架折算质量 150 g：惯性力约 183 N 和 235 N，限值 250 N（示意）",
+     "Swing-frame mass 150 g: about 183 N and 235 N, limit 250 N (illustrative)"
+    ],
+    [
+     "压到 120°：加速度约 2 倍，摆线规律超限",
+     "Squeezed to 120°: acceleration about doubles and the cycloidal law exceeds the limit"
+    ],
+    [
+     "区间尽量用满窗口，给提速、粗针、厚布留余量；宽摆宽要限速",
+     "Use as much of the window as possible, leave margin for speed, heavy needles and thick fabric; limit speed at wide bights"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "代数字算一下。摆宽 8 毫米，5000 转每分，角速度约 524 弧度每秒，摆动区间 275 到 85 度，共 170 度。修正梯形峰值约 1220 米每二次方秒，摆线约 1570。设摆架折算到针尖的质量 150 克，惯性力分别约 183 牛和 235 牛。本讲取 250 牛作示意限值，两者都没超。如果把区间压到 120 度，加速度大约翻一倍，摆线规律就超限了。所以摆动区间要尽量用满针在布外的窗口，同时给提速、粗针、厚布留余量。这也是之字缝机宽摆宽时要限速的原因之一。",
+    "Put numbers in. Bight 8 mm, 5000 r/min, an angular velocity of about 524 radians per second, and a swing from 275 to 85 degrees, 170 in all. The modified trapezoid peaks at about 1220 metres per second squared, the cycloidal at about 1570. With a swing-frame mass of 150 grams referred to the needle point, the inertia forces are about 183 and 235 newtons. Taking 250 newtons as an illustrative limit, both pass. Squeeze the interval to 120 degrees and the acceleration roughly doubles, and the cycloidal law is over the limit. So the swing should use as much of the out-of-fabric window as possible, while leaving margin for higher speed, heavier needles and thicker fabric. That is one reason zigzag machines are speed-limited at wide bights."
+   ]
+  },
+  {
+   "title": [
+    "针在两端的钩线",
+    "Loop catching at both ends"
+   ],
+   "points": [
+    [
+     "旋梭轴前后布置，梭尖经过针时沿左右方向运动",
+     "The hook shaft runs front to back, so the hook point moves sideways as it passes the needle"
+    ],
+    [
+     "旋梭转速为主轴 2 倍：两端钩线时刻差 Δφ = w/(2R)",
+     "The hook turns at twice shaft speed: catching moments differ by Δφ = w/(2R)"
+    ],
+    [
+     "R = 13.5 mm、摆宽 8 mm：Δφ ≈ 17°",
+     "R = 13.5 mm, bight 8 mm: Δφ ≈ 17°"
+    ],
+    [
+     "梭尖从右向左：右端先钩、左端后钩，两端回升量差近 3 mm",
+     "Point moving right to left: right end first, left end later; needle rise differs by nearly 3 mm"
+    ]
+   ],
+   "formula": "\\Delta\\varphi = \\frac{w}{2R}",
+   "figure": "fig_11_hook.png",
+   "narration": [
+    "之字缝机还有一个平缝机没有的问题：针在左右两个位置，旋梭都得钩到线环。工业之字缝机的旋梭轴通常前后布置，梭尖在下方经过针时是左右方向运动的，正好和针摆的方向一致。于是针在两端时，梭尖到达的时刻不同。摆宽 w 对应梭尖转过 w 除以 R 的弧度，旋梭转速是主轴的 2 倍，换成主轴转角就是 w 除以 2R。旋梭半径 13.5 毫米、摆宽 8 毫米，相差约 17 度。梭尖从右向左走，右端先被钩住、左端后被钩住，两端钩线时针的回升量差了将近 3 毫米。",
+    "A zigzag machine has a problem a lockstitch machine does not: the hook must catch the loop with the needle at either end of its swing. On industrial zigzag machines the hook shaft usually runs front to back, so as the hook point passes under the needle it moves sideways, in the same direction as the swing. The point therefore reaches the two needle positions at different times. A bight w corresponds to w over R radians of hook rotation, and since the hook turns twice per stitch, that is w over 2R in shaft angle. With a 13.5 mm hook and an 8 mm bight that is about 17 degrees. The point travels right to left, so the right end is caught first and the left end later, and the needle rise at the two catches differs by nearly 3 mm."
+   ]
+  },
+  {
+   "title": [
+    "摆宽受钩线窗口限制",
+    "The bight is limited by the loop window"
+   ],
+   "points": [
+    [
+     "两端都要在线环够大时被钩住",
+     "Both ends must be caught while the loop is large enough"
+    ],
+    [
+     "用第 5 章旋梭窗口（回升约 1.5–2.8 mm）：摆宽上限只有约 4 mm",
+     "With the Chapter 5 hook window (rise about 1.5–2.8 mm): maximum bight only about 4 mm"
+    ],
+    [
+     "用第 10 章示意判据（1.0–4.2 mm）：Δφ 最多约 20°，摆宽上限约 9.5 mm",
+     "With the Chapter 10 criterion (1.0–4.2 mm): Δφ at most about 20°, maximum bight about 9.5 mm"
+    ],
+    [
+     "说明书最大 10 mm：真实窗口比第 5 章宽得多，需实测",
+     "Manual maximum 10 mm: the real window is much wider than Chapter 5’s and must be measured"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "两端都要在线环够大的时候被钩住，所以摆宽受旋梭钩线窗口限制，而结论很依赖窗口有多宽。如果用第 5 章平缝机旋梭那个保守的窗口，回升约 1.5 到 2.8 毫米，摆宽上限只有约 4 毫米，远小于实际机器的 8 到 10 毫米。如果用第 10 章的示意判据，回升 1.0 到 4.2 毫米，右端最早在 1.0 毫米时钩，左端最晚在 4.2 毫米时钩，两者最多差约 20 度，摆宽上限约 9.5 毫米，和说明书的 10 毫米相近。可见之字缝机实际能钩线的范围比第 5 章宽得多，这里只是粗略的合理性检验。",
+    "Both ends must be caught while the loop is big enough, so the bight is limited by the hook’s catching window, and the answer depends heavily on how wide that window is. With the conservative lockstitch-hook window of Chapter 5, a rise of about 1.5 to 2.8 mm, the maximum bight would be only about 4 mm, far below the 8 to 10 mm of real machines. With the illustrative Chapter 10 criterion of 1.0 to 4.2 mm, the right end is caught at the earliest at 1.0 mm and the left at the latest at 4.2 mm; they can be at most about 20 degrees apart, giving a maximum bight of about 9.5 mm, close to the manual’s 10 mm. So real zigzag machines catch over a much wider range than Chapter 5 suggests; this is only a rough plausibility check."
+   ]
+  },
+  {
+   "title": [
+    "两端的高度与间隙怎样调",
+    "Setting height and clearance at the two ends"
+   ],
+   "points": [
+    [
+     "说明书：最左端调针眼上沿到梭尖 0.2–0.5 mm；最右端调梭尖与针间隙 0–0.05 mm",
+     "Manual: at the left end set eye top to hook point 0.2–0.5 mm; at the right end set clearance 0–0.05 mm"
+    ],
+    [
+     "左端后钩、针回升多，针眼离梭尖最近：在这端定高度",
+     "The left end is caught later with more rise, eye closest to the point: set height there"
+    ],
+    [
+     "右端针回升少，梭尖若水平经过会高出针眼约 3 mm；针身全直径处最近：在这端查间隙",
+     "At the right end, little rise; a level hook path would be about 3 mm above the eye; full blade diameter is closest: check clearance there"
+    ],
+    [
+     "说明书定时规抬针 3.4 mm；本讲模型左端 3.8 mm、右端约 1.1 mm，有待核对",
+     "Manual timing gauge lifts 3.4 mm; this model uses 3.8 mm left and about 1.1 mm right, to be verified"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "两端回升量不同，还带来高度问题。说明书规定：针在摆幅最左端时，针眼上沿到梭尖调成 0.2 到 0.5 毫米；针在最右端时，梭尖与针的间隙调成 0 到 0.05 毫米。为什么这样分？左端后被钩，针已经回升得多，针眼离梭尖最近，在这里定高度，保证梭尖不会从针眼下面穿过。右端针还没回升多少，如果梭尖仍按水平路线经过，会比针眼上沿高出约 3 毫米，有从线环顶上滑过的危险；而梭尖在那里经过针身全直径的部位、离针最近，所以在右端查间隙。说明书的定时数值和本讲模型并不完全吻合，已列入核对清单。",
+    "The different rise at the two ends also raises a height issue. The manual says: with the needle at the left end of its swing, set the distance from the top of the eye to the hook point to 0.2 to 0.5 mm; at the right end, set the clearance between point and needle to 0 to 0.05 mm. Why split it this way? The left end is caught later, when the needle has risen more and the eye is closest to the point, so the height is set there to keep the point from passing under the eye. At the right end the needle has risen little; a level hook path would be about 3 mm above the eye and could slide over the loop, and there the point passes the full-diameter blade and comes closest, so clearance is checked at that end. The manual’s timing and this model do not match exactly; that is on the list to verify."
+   ]
+  },
+  {
+   "title": [
+    "锁眼机：平头与圆头",
+    "Buttonholers: straight and eyelet"
+   ],
+   "points": [
+    [
+     "平头（衬衫）：304 之字；两排之字 + 两端套结 + 切刀，共五步",
+     "Straight (shirts): 304 zigzag; two zigzag rows + two bartacks + knife, five steps"
+    ],
+    [
+     "先缝后切边缘整齐，先切后缝不易脱纱；某型 3600/4200 sti/min，眼长 ≤ 41 mm",
+     "Sew-then-cut is neater, cut-then-sew frays less; one model 3600/4200 sti/min, up to 41 mm"
+    ],
+    [
+     "圆头（西服、大衣、牛仔）：404 单针双线之字链式，内包衬线",
+     "Eyelet (suits, coats, denim): 404 single-needle two-thread zigzag chainstitch with a gimp"
+    ],
+    [
+     "缝圆头时针和弯针绕圆心转；某型 400–2200 sti/min，眼长 10–38 mm",
+     "Round the eyelet, needle and looper rotate about its centre; one model 400–2200 sti/min, 10–38 mm"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_11_bh.png",
+   "narration": [
+    "锁眼机分平头和圆头两类。平头锁眼机用 304 之字线迹，多见于衬衫，一个扣眼分五步：第一排之字，针杆横摆、布料纵向送；一端套结，摆宽加大、送料停；第二排之字，送料反向、摆动中心移到另一侧；另一端套结；最后切刀落下。机构上它就是一台加了纵向送料和切刀的之字缝机，前面的分析全都适用。圆头锁眼机用于西服、大衣和牛仔，扣眼一端是个小圆孔，给纽扣的线脚留位置，线迹是 404 单针双线之字链式，里面包一根衬线。缝圆头时针和弯针要绕圆心转，所以转速比平头低得多。",
+    "Buttonholers come in two kinds, straight and eyelet. The straight buttonholer uses the 304 zigzag and is common on shirts. One buttonhole takes five steps: a first row of zigzag with the needle swinging and the fabric fed lengthwise; a bartack at one end with the bight widened and the feed stopped; a second row with the feed reversed and the swing centre shifted across; a bartack at the other end; and finally the knife drops. Mechanically it is a zigzag machine with lengthwise feed and a knife, so everything so far applies. The eyelet buttonholer is for suits, coats and denim; one end has a small round eyelet for the button shank, and the stitch is the 404 single-needle two-thread zigzag chainstitch with a gimp inside. Round the eyelet the needle and looper rotate about its centre, so it runs much slower."
+   ]
+  },
+  {
+   "title": [
+    "钉扣机与套结机",
+    "Button sewers and bartackers"
+   ],
+   "points": [
+    [
+     "机械式：蜗杆蜗轮大减速，一个花样凸轮转一圈；两条槽经 X、Y 杠杆推扣夹或压框",
+     "Mechanical: worm-gear reduction, one pattern-cam turn per pattern; two grooves move the clamp via X and Y levers"
+    ],
+    [
+     "凸轮每转一个台阶移动一针，升程段要与针在布外的转角对齐",
+     "Each cam step moves one stitch; rise portions must align with the out-of-fabric angle"
+    ],
+    [
+     "钉扣机常用 101 单线链式，须有防脱装置；某型 1500 sti/min，8/16/32 针",
+     "Button sewers often use 101 single-thread chainstitch with an anti-unravel device; one model 1500 sti/min, 8/16/32 stitches"
+    ],
+    [
+     "套结机：锁式先打底再覆盖；电子式两台步进电机，某型 40 × 30 mm，3200 sti/min",
+     "Bartackers: lockstitch underlay then cover; electronic versions use two steppers, one model 40 × 30 mm, 3200 sti/min"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_11_cam.png",
+   "narration": [
+    "机械式钉扣机和套结机的核心是一块花样凸轮。主轴经蜗杆蜗轮大减速，缝完一个花样凸轮正好转一圈；凸轮上两条槽经过 X、Y 两根杠杆推动扣夹或压框。凸轮每转过一个台阶，夹具移动一个针距，这一步同样只能放在针离开布料的那段转角里，所以凸轮槽的升程段要和主轴转角对齐。钉扣机常用 101 单线链式，一根线、没梭芯，但末端一拉会脱开，所以要有防脱装置。套结机用在裤袢、袋口这些受力处，先打底、再用之字覆盖。电子套结机换成两台步进电机，针距大时转速要降低，道理和摆针一样。",
+    "At the heart of the mechanical button sewer and bartacker is a pattern cam. The main shaft drives it through a high-ratio worm gear so that it turns exactly once per pattern, and its two grooves push the button clamp or work clamp through X and Y levers. Each step of the cam moves the clamp one stitch, and that move, too, must fit in the angle when the needle is out of the fabric, so the rise portions of the grooves must be aligned with the shaft angle. Button sewers often use the 101 single-thread chainstitch: one thread, no bobbin, but it unravels when pulled, so an anti-unravelling device is needed. Bartackers reinforce belt loops and pocket corners, laying an underlay and then covering it with zigzag. Electronic bartackers use two steppers and must slow down for long stitches, for the same reason as the needle swing."
+   ]
+  },
+  {
+   "title": [
+    "从机械凸轮到电子凸轮",
+    "From mechanical cam to electronic cam"
+   ],
+   "points": [
+    [
+     "钢制凸轮的廓线换成程序里的位移表",
+     "The steel cam profile becomes a displacement table in software"
+    ],
+    [
+     "台阶对齐、运动规律、加速度等设计问题原样转移到步进电机的运动规划",
+     "Step alignment, motion law and acceleration carry over unchanged to stepper motion planning"
+    ],
+    [
+     "电子化后约束不变：移动仍只能在针在布外的转角里完成",
+     "The constraint remains: moves still happen only in the out-of-fabric angle"
+    ],
+    [
+     "针距大、摆宽大时仍要降速（套结机：X < 5 mm、Y < 3.5 mm 时才可 3200 sti/min）",
+     "Long stitches and wide bights still need lower speed (bartacker: 3200 sti/min only for X < 5 mm, Y < 3.5 mm)"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "从机械凸轮到步进电机，就是第 15 章所说“电子凸轮”的字面意思：钢制凸轮的廓线换成了程序里的位移表，主轴每转到一个角度，控制器查表给出夹具或摆架该在的位置。好处是花样随时可以改，不用换凸轮。但要注意，机构上的设计问题一个也没少：台阶怎样和主轴转角对齐、用什么运动规律、加速度多大，都原样转移到了步进电机的运动规划里。电子化以后约束也没变，移动仍然只能在针在布外的转角里完成。所以某企业的电子套结机只有在 X 方向针距小于 5 毫米、Y 方向小于 3.5 毫米时才能开到 3200 针每分。",
+    "Moving from a mechanical cam to a stepper motor is literally the “electronic cam” of Chapter 15: the steel profile becomes a displacement table, and at each shaft angle the controller looks up where the clamp or swing frame should be. The benefit is that patterns can be changed at will without cutting a new cam. But note that none of the mechanical design problems has gone away: how steps align with the shaft angle, which motion law to use and how large the acceleration is all carry straight over into stepper motion planning. Nor has the constraint changed: moves still have to fit into the out-of-fabric angle. That is why one manufacturer’s electronic bartacker reaches 3200 stitches a minute only when the stitch is under 5 mm in X and 3.5 mm in Y."
+   ]
+  },
+  {
+   "title": [
+    "绗缝机与电脑刺绣机",
+    "Quilting and computerised embroidery machines"
+   ],
+   "points": [
+    [
+     "多针绗缝机：一根横梁上几十根针，每针一根弯针，缝多道平行 401",
+     "Multi-needle quilter: dozens of needles on a beam, a looper under each, many parallel rows of 401"
+    ],
+    [
+     "刺绣机头：9–15 根针杆，一个驱动器只带动对准的那根；换色时针杆箱横移",
+     "Embroidery head: 9–15 needle bars, one driver moves only the aligned bar; the case shifts sideways for a colour change"
+    ],
+    [
+     "多头机共用上轴、下轴；断线时有的机型可单头停针",
+     "Multi-head machines share upper and lower shafts; some can stop a single head on thread break"
+    ],
+    [
+     "转速约为平缝机 1/4（某型 1200 r/min）：绣框重、每针几毫米都要在针在布外时走完",
+     "About a quarter of lockstitch speed (one model 1200 r/min): a heavy frame must travel several mm per stitch while the needle is out"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_11_emb.png",
+   "narration": [
+    "绗缝机把面料、填充物和里料缝在一起，比如羽绒服和被子。多针绗缝机在一根横梁上装几十根针，每根针下一根弯针，缝多道平行的 401，它的机构就是第 10 章链缝机的多路并联。电脑刺绣机的机头是一箱针杆，9 到 15 根，每根穿一种颜色；机头只有一个驱动器，只抓对准它的那根上下动，换色时整个针杆箱横移。多头机几个到几十个头共用一根上轴、一根下轴。刺绣机转速只有平缝机的四分之一左右，原因还是本讲的主题：绣框连布很重，每一针都要在针在布外的那段转角里走完好几毫米。",
+    "A quilting machine sews face fabric, filling and lining together, for down jackets and quilts. A multi-needle quilter has dozens of needles on one beam, a looper under each, sewing many parallel rows of 401: the Chapter 10 chainstitch machine multiplied in parallel. A computerised embroidery head is a case of needle bars, 9 to 15 of them, each with its own colour; there is a single driver, which moves only the bar aligned with it, and for a colour change the whole case slides sideways. Multi-head machines line up a few to dozens of heads on one upper and one lower shaft. Embroidery runs at only about a quarter of lockstitch speed, for this lesson’s reason: the frame and fabric are heavy, and every stitch must travel several millimetres while the needle is out of the fabric."
+   ]
+  },
+  {
+   "title": [
+    "设计要点与模型的边界",
+    "Design notes and limits of the model"
+   ],
+   "points": [
+    [
+     "一切横向运动都挤在针离开布料的那段转角里",
+     "Every sideways motion is squeezed into the out-of-fabric angle"
+    ],
+    [
+     "区间用满窗口并与送布分配好；加速度连续、峰值低；运动件要轻",
+     "Use the full window and share it with the feed; continuous, low-peak acceleration; light moving parts"
+    ],
+    [
+     "摆宽、针距、转速一起定；之字缝还受两端钩线限制",
+     "Decide bight, stitch length and speed together; zigzag is also limited by catching at both ends"
+    ],
+    [
+     "边界：借用 31 mm 行程、150 g 与 250 N 示意、线环窗口借用第 10 章、未计针弯曲与间隙",
+     "Limits: borrowed 31 mm stroke, illustrative 150 g and 250 N, Chapter 10 loop window, no needle bending or backlash"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "这一讲可以归结成一句话：特种机的平面运动和刺布共用一根主轴的转角，凡是横向运动，都要挤在针离开布料的那段转角里。由此得到几条设计原则：横向运动的区间要尽量用满窗口，并和送布分配好；运动规律选加速度连续、峰值低的；运动件要轻；摆宽、针距、转速三者一起定，宽摆宽、大针距就降速。之字缝机还多一条，两端都要钩住，摆宽受旋梭窗口限制。模型的边界也要记住：针杆运动借用了 31 毫米行程的算例，而实际之字缝机是 33.4 毫米；摆架质量和惯性力限值是示意值；线环窗口借用了第 10 章，真实窗口需要实测。",
+    "This lesson fits in one sentence: the planar motion and the needle penetration of a special machine share one shaft’s angle, and every sideways motion must squeeze into the angle when the needle is out of the fabric. Several principles follow: use as much of that window as possible and share it sensibly with the feed; choose motion laws with continuous, low-peak acceleration; keep moving parts light; and decide bight, stitch length and speed together, slowing down for wide bights and long stitches. Zigzag adds one more: both ends must be caught, so the bight is limited by the hook window. Remember the model’s limits too: the needle motion borrows a 31 mm stroke whereas the real zigzag machine has 33.4 mm; the frame mass and force limit are illustrative; and the loop window is borrowed from Chapter 10 and must be measured."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "特种机 = 缝纫头 + 针或布的平面运动 + 附加动作；硬约束是针在布中时针和布不能有水平相对运动。",
+   "A special machine = sewing head + planar motion of needle or fabric + extra actions; the hard constraint is no horizontal relative motion while the needle is in the fabric."
+  ],
+  [
+   "算例（行程 31 mm、布厚 1.5 mm、余量 0.5 mm）的针在布外窗口为 260°–100°，约 200°，送布与摆针共用；布越厚窗口越窄。",
+   "In the worked example (31 mm stroke, 1.5 mm fabric, 0.5 mm margin) the out-of-fabric window is 260°–100°, about 200°, shared by feed and swing; thicker fabric narrows it."
+  ],
+  [
+   "峰值加速度 a_max = C·w·ω²/β²：修正梯形 C ≈ 4.89、摆线 2π、简谐约 4.93；8 mm、5000 r/min、170° 时修正梯形约 1220 m/s²、摆线约 1570 m/s²。",
+   "Peak acceleration a_max = C·w·ω²/β²: C ≈ 4.89 modified trapezoid, 2π cycloidal, about 4.93 harmonic; at 8 mm, 5000 r/min and 170° about 1220 m/s² and 1570 m/s²."
+  ],
+  [
+   "两端钩线时刻差 Δφ = w/(2R)，8 mm 时约 17°，右端先钩；按 1.0–4.2 mm 窗口摆宽上限约 9.5 mm；最左端定梭尖高度，最右端查间隙。",
+   "Catching moments at the two ends differ by Δφ = w/(2R), about 17° at 8 mm, right end first; with a 1.0–4.2 mm window the maximum bight is about 9.5 mm; set hook height at the left end and check clearance at the right."
+  ],
+  [
+   "锁眼、钉扣、套结、绗缝、刺绣机都受同一约束；机械凸轮换成步进电机（电子凸轮）后，台阶对齐、运动规律和加速度问题原样转到运动规划里。",
+   "Buttonholers, button sewers, bartackers, quilters and embroidery machines obey the same constraint; replacing cams with steppers (electronic cams) carries step alignment, motion law and acceleration straight into motion planning."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "zigzag",
+   "no": "11-1",
+   "title": [
+    "之字缝：摆针定时与钩线",
+    "Zigzag: needle-swing timing and loop catching"
+   ],
+   "goal": [
+    [
+     "把针杆横摆安排在针离开布料的窗口里，并满足横向惯性力限值。",
+     "Fit the needle-bar swing into the out-of-fabric window while meeting the sideways inertia-force limit."
+    ],
+    [
+     "比较三种运动规律的峰值加速度和惯性力。",
+     "Compare the peak acceleration and inertia force of three motion laws."
+    ],
+    [
+     "找出两端都能钩住时的最大摆宽，理解旋梭定时对两端钩线的影响。",
+     "Find the maximum bight at which both ends are caught, and see how hook timing affects catching at both ends."
+    ]
+   ],
+   "theory": [
+    [
+     "针杆按第 3 章曲柄滑块运动（行程 31 mm），布厚 1.5 mm；横摆时针尖须高出布面 0.5 mm 以上，允许区间约 260°→100°。",
+     "The needle bar follows the Chapter 3 slider-crank (31 mm stroke), fabric 1.5 mm; while swinging the point must be at least 0.5 mm above the fabric, allowing about 260°→100°."
+    ],
+    [
+     "峰值加速度 a_max = C·w·ω²/β²，横向惯性力 = 0.15 kg × a_max，限值 250 N（示意）。",
+     "Peak acceleration a_max = C·w·ω²/β², sideways inertia force = 0.15 kg × a_max, limit 250 N (illustrative)."
+    ],
+    [
+     "旋梭半径 13.5 mm、转速为主轴 2 倍，梭尖从右向左经过两端，Δφ = w/(2R)；两端钩线时针的回升量都须在 1.0–4.2 mm（借用第 10 章示意窗口）。",
+     "Hook radius 13.5 mm at twice shaft speed, point passing the ends right to left, Δφ = w/(2R); the needle rise at both catches must be within 1.0–4.2 mm (the Chapter 10 illustrative window)."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 11-1，按“恢复标准”（摆宽 8 mm、摆动 275°–85°、修正梯形、5000 r/min、左端钩线回升 3.8 mm），观察针尖正视路径、缝出的线迹和时序图，记录右侧四条判据的读数。",
+     "Open Virtual lab 11-1 and press Reset to standard (bight 8 mm, swing 275°–85°, modified trapezoid, 5000 r/min, left-end rise 3.8 mm); look at the needle-point path, the stitches and the timing chart, and record the four criterion readings."
+    ],
+    [
+     "把“摆动开始”改到 250°、“摆动结束”改到 110°，看正视路径上出现红色段、第一条判据变红；再调回标准。",
+     "Set swing start to 250° and swing end to 110°, see the red segment appear on the path and the first criterion turn red; then restore the standard."
+    ],
+    [
+     "任务 1：按“打乱”，先调摆动开始和结束，让横摆离开红色区段，再调“旋梭定时”，使四条判据全部满足（摆宽 8 mm、5000 r/min 不变）。",
+     "Task 1: press Scramble; first adjust swing start and end to move the swing out of the red zone, then adjust hook timing until all four criteria are met (keeping 8 mm and 5000 r/min)."
+    ],
+    [
+     "恢复标准，依次选“修正梯形”“摆线”“简谐”，记录横向惯性力，并换算峰值加速度（惯性力 ÷ 0.15 kg），与教材图 11-3 的数值对照。",
+     "Reset and choose modified trapezoid, cycloidal and harmonic in turn; record the inertia force, convert to peak acceleration (force ÷ 0.15 kg) and compare with Fig. 11-3."
+    ],
+    [
+     "任务 2：选“摆线”，摆宽 8 mm、5000 r/min，调整摆动开始和结束，使惯性力不超过 250 N 且横摆全在布外；记下可行的最窄区间。",
+     "Task 2: with cycloidal, 8 mm and 5000 r/min, adjust swing start and end so the force is at most 250 N and the swing stays out of the fabric; note the narrowest feasible interval."
+    ],
+    [
+     "回到修正梯形，把转速从 5000 提到 6000 r/min，记录惯性力的倍数，验证与转速平方成正比。",
+     "Back on modified trapezoid, raise the speed from 5000 to 6000 r/min and record the factor by which the force rises, confirming it goes with speed squared."
+    ],
+    [
+     "任务 3：只调摆宽和旋梭定时：先把左端回升量调到窗口上边（约 4.2 mm），再加大摆宽直到右端判据变红；在“最大摆宽”框填写并按“核对”。",
+     "Task 3: adjust only bight and hook timing: first set the left-end rise near the top of the window (about 4.2 mm), then widen the bight until the right-end criterion turns red; enter the value in the maximum-bight box and press Check."
+    ],
+    [
+     "在摆宽 6 mm 和 8 mm 下，记录右端比左端早钩的度数和右端“梭尖比针眼上沿高”的读数，与 Δφ = w/(2R) 对照。",
+     "At bights of 6 mm and 8 mm, record how many degrees earlier the right end is caught and the right-end “hook point above eye” reading, and compare with Δφ = w/(2R)."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "摆针设定与四条判据",
+     "Swing settings and the four criteria"
+    ],
+    "headers": [
+     [
+      "摆宽（mm）",
+      "Bight (mm)"
+     ],
+     [
+      "摆动区间（°）",
+      "Swing interval (°)"
+     ],
+     [
+      "运动规律",
+      "Motion law"
+     ],
+     [
+      "转速（r/min）",
+      "Speed (r/min)"
+     ],
+     [
+      "横向惯性力（N）",
+      "Sideways force (N)"
+     ],
+     [
+      "右端回升（mm）",
+      "Right-end rise (mm)"
+     ],
+     [
+      "左端回升（mm）",
+      "Left-end rise (mm)"
+     ],
+     [
+      "判据是否全满足",
+      "All criteria met?"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "摆线规律最平稳，为什么在同样的限值下它需要更宽的摆动区间？还装得进针在布外的窗口吗？",
+     "The cycloidal law is the smoothest; why does it need a wider swing interval under the same limit, and does it still fit the out-of-fabric window?"
+    ],
+    [
+     "布厚从 1.5 mm 增加到 4 mm，窗口怎样变？对最大摆宽和最高转速有什么影响？",
+     "If the fabric thickens from 1.5 mm to 4 mm, how does the window change, and what does that mean for maximum bight and top speed?"
+    ],
+    [
+     "结合两端的回升量和“梭尖比针眼上沿高”的读数，解释说明书为什么在最左端调高度、在最右端调间隙。",
+     "Using the rise at each end and the “point above eye” reading, explain why the manual sets height at the left end and clearance at the right."
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "之字缝机加大摆宽的可行性核算",
+   "Feasibility check for a wider zigzag bight"
+  ],
+  "tasks": [
+   [
+    "计算题：某电子之字缝机换规格件后摆宽 10 mm，摆动区间 170°，针杆摆架折算质量 150 g，惯性力限值 250 N（示意）。分别按修正梯形和摆线规律求 5000 r/min 时的横向惯性力，以及满足限值的最高转速。",
+    "Calculation: an electronic zigzag machine with gauge parts changed has a 10 mm bight, a 170° swing interval, a swing-frame mass of 150 g and an illustrative 250 N force limit. For the modified-trapezoid and cycloidal laws, find the sideways inertia force at 5000 r/min and the highest speed that meets the limit."
+   ],
+   [
+    "计算题：旋梭半径 13.5 mm。求摆宽 6 mm 和 10 mm 时两端钩线的时刻差；按本讲借用的线环窗口（右端最早约 198°、左端最晚约 218°）判断 10 mm 摆宽能否两端都钩住，并与说明书的最大摆宽比较，说明为什么需要实测。",
+    "Calculation: the hook radius is 13.5 mm. Find the catching-time difference for bights of 6 mm and 10 mm; using this lesson’s borrowed loop window (right end at the earliest about 198°, left end at the latest about 218°), decide whether a 10 mm bight can be caught at both ends, compare with the manual’s maximum bight, and explain why measurement is needed."
+   ],
+   [
+    "计算题：电子套结机压框每步 5 mm，设可用移动区间为 170°、运动规律为修正梯形，求 3200 sti/min 时的峰值加速度；若步距加大到 8 mm 而峰值加速度不能超过此值，转速应降到多少？",
+    "Calculation: an electronic bartacker’s clamp moves 5 mm per step; assume a 170° move interval and the modified-trapezoid law. Find the peak acceleration at 3200 sti/min; if the step grows to 8 mm with the same peak acceleration allowed, to what speed must it slow?"
+   ],
+   [
+    "讨论题：刺绣机转速只有平缝机的四分之一左右。从本讲原理出发提出两条提速措施，并说明各自的代价。",
+    "Discussion: an embroidery machine runs at about a quarter of lockstitch speed. From this lesson’s principles, propose two measures to raise its speed and state the cost of each."
+   ]
+  ],
+  "deliverable": [
+   "计算过程与结果表（可附 Python 脚本），虚拟实验 11-1 任务 2、任务 3 完成状态截图，以及不超过 2 页的讨论。",
+   "Working and a results table (Python script optional), screenshots of Tasks 2 and 3 completed in Virtual lab 11-1, and a discussion of up to 2 pages."
+  ],
+  "rubric": [
+   [
+    "10 mm 摆宽的惯性力与最高转速计算正确：30 分",
+    "Inertia force and top speed for 10 mm bight correct: 30 points"
+   ],
+   [
+    "两端钩线时刻差与可行性判断正确，能说明实测的必要：25 分",
+    "Catching difference and feasibility correct, need for measurement explained: 25 points"
+   ],
+   [
+    "套结机加速度与降速计算正确：20 分",
+    "Bartacker acceleration and speed reduction correct: 20 points"
+   ],
+   [
+    "刺绣机提速措施合理、代价分析到位：15 分",
+    "Sound speed-up measures for embroidery with costs analysed: 15 points"
+   ],
+   [
+    "书写规范、单位正确、截图完整：10 分",
+    "Neat work, correct units, complete screenshots: 10 points"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "锁眼、钉扣、套结、刺绣等特种机在机构上共有的硬约束是什么？",
+    "What hard constraint do buttonholers, button sewers, bartackers and embroidery machines share mechanically?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "机针在布中时，针和布在水平方向上不能有相对运动",
+      "While the needle is in the fabric there must be no horizontal relative motion between needle and fabric"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "所有特种机都必须用锁式线迹",
+      "All special machines must use lockstitch"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "主轴转速不得超过 3000 r/min",
+      "The main shaft must not exceed 3000 r/min"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "送布必须用差动送布牙",
+      "Feed must use a differential feed dog"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "针在布里时横向移动会把针拉弯，轻则针迹偏位，重则撞针板断针；所以横向运动只能在针离开布料时进行。",
+    "Sideways motion with the needle in the fabric bends it, misplacing stitches or breaking it on the plate; so sideways motion happens only when the needle is out."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "算例针杆运动（行程 31 mm，布厚 1.5 mm），要求横摆时针尖至少高出布面 0.5 mm。针在布外的可用窗口约为多少度主轴转角？",
+    "For the worked-example needle motion (31 mm stroke, 1.5 mm fabric), with the point at least 0.5 mm above the fabric while swinging, about how many degrees of shaft angle does the usable out-of-fabric window span?"
+   ],
+   "answer": 200,
+   "tolerance": 3,
+   "unit": "°",
+   "feedback": [
+    "针尖约 260° 升到布面以上 0.5 mm，约 100° 再降到这个高度，窗口约 200°。",
+    "The point rises 0.5 mm clear of the fabric at about 260° and comes back down at about 100°, a window of about 200°."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "哪种运动规律的加速度在起点和终点突变，会激起冲击和振动？",
+    "Which motion law has an acceleration jump at the start and end, exciting shock and vibration?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "简谐运动（余弦加速度）",
+      "Simple harmonic (cosine acceleration)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "摆线运动（正弦加速度）",
+      "Cycloidal (sine acceleration)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "修正梯形",
+      "Modified trapezoid"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "三种都不会",
+      "None of them"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "简谐运动加速度在两端不为零而突变；摆线两端为零，修正梯形两端也连续。",
+    "Harmonic acceleration is non-zero and jumps at both ends; cycloidal is zero at both ends and the modified trapezoid is continuous there too."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "摆宽 8 mm、5000 r/min、摆动区间 170°，修正梯形（C ≈ 4.89）的横摆峰值加速度约为多少 m/s²？",
+    "Bight 8 mm, 5000 r/min, swing interval 170°, modified trapezoid (C ≈ 4.89): about what is the peak sideways acceleration in m/s²?"
+   ],
+   "answer": 1218,
+   "tolerance": 20,
+   "unit": "m/s²",
+   "feedback": [
+    "ω = 523.6 rad/s，β = 2.967 rad，a = 4.888 × 0.008 × 523.6² / 2.967² ≈ 1218 m/s²，约 1220。",
+    "ω = 523.6 rad/s, β = 2.967 rad, a = 4.888 × 0.008 × 523.6² / 2.967² ≈ 1218 m/s², about 1220."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "其他条件不变，之字缝机转速从 5000 r/min 提高到 6000 r/min，横摆峰值加速度变为原来的多少倍？",
+    "All else equal, if a zigzag machine goes from 5000 to 6000 r/min, by what factor does the peak sideways acceleration change?"
+   ],
+   "answer": 1.44,
+   "tolerance": 0.01,
+   "unit": "",
+   "feedback": [
+    "加速度与转速平方成正比：(6000/5000)² = 1.44。",
+    "Acceleration goes with speed squared: (6000/5000)² = 1.44."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "旋梭半径 13.5 mm、转速为主轴 2 倍，摆宽 6 mm。针在两端钩线的时刻相差多少度主轴转角？",
+    "Hook radius 13.5 mm turning at twice shaft speed, bight 6 mm: by how many degrees of shaft angle do the catches at the two ends differ?"
+   ],
+   "answer": 12.73,
+   "tolerance": 0.2,
+   "unit": "°",
+   "feedback": [
+    "Δφ = w/(2R) = 6/27 rad = 0.222 rad，约 12.7°；梭尖从右向左走，右端先被钩住。",
+    "Δφ = w/(2R) = 6/27 rad = 0.222 rad, about 12.7°; with the point moving right to left, the right end is caught first."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "工业之字缝机的梭尖从右向左经过针的两个位置时，左端先被钩住。",
+    "When the hook point of an industrial zigzag machine passes the two needle positions from right to left, the left end is caught first."
+   ],
+   "correct": false,
+   "feedback": [
+    "梭尖从右向左走，先到右端，所以右端先被钩、左端后被钩，左端钩线时针回升得更多。",
+    "Moving right to left, the point reaches the right end first, so the right end is caught first and the left end later, with more needle rise."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于平头锁眼机，下列哪些说法正确？",
+    "Which statements about the straight buttonholer are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "用 304 之字锁式线迹，多用于衬衫",
+      "It uses the 304 zigzag lockstitch and is common on shirts"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "一个扣眼分五步：两排之字、两端套结、最后切刀",
+      "A buttonhole takes five steps: two zigzag rows, two bartacks and finally the knife"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "机构上相当于加了纵向送料和切刀的之字缝机",
+      "Mechanically it is a zigzag machine with lengthwise feed and a knife added"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "用 404 单针双线之字链式线迹，内包衬线",
+      "It uses the 404 single-needle two-thread zigzag chainstitch with a gimp"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "缝到圆头时整个成缝机构要绕圆心转动",
+      "The whole stitch-forming mechanism rotates about the eyelet centre"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "404 线迹、衬线和绕圆心转动都是圆头锁眼机的特点。",
+    "The 404 stitch, the gimp and rotation round the eyelet belong to the eyelet buttonholer."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "机械式单线链式钉扣机为什么需要专门的防脱装置？",
+    "Why does a mechanical single-thread chainstitch button sewer need a dedicated anti-unravelling device?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "101 单线链式线迹拉住末端会一环接一环脱开，必须锁住最后一个线环",
+      "A 101 single-thread chainstitch unravels loop by loop when its end is pulled, so the last loop must be locked"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "钉扣机转速太高，线容易断",
+      "The button sewer runs so fast the thread breaks"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "扣夹会把纽扣夹碎",
+      "The clamp would crush the button"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "没有梭芯，底线不够用",
+      "Without a bobbin the under thread runs short"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "单线链式结构简单、只用一根线，但末端没锁住就会脱散（第 10 章）。",
+    "Single-thread chainstitch is simple with one thread, but an unsecured end unravels (Chapter 10)."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "电脑刺绣机转速只有平缝机的四分之一左右，最根本的原因是什么？",
+    "What is the fundamental reason an embroidery machine runs at only about a quarter of lockstitch speed?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "绣框连布质量大，每一针几毫米的移动都要在针离开布料的转角里完成",
+      "The heavy frame and fabric must travel several millimetres per stitch within the out-of-fabric angle"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "刺绣线比缝纫线粗",
+      "Embroidery thread is thicker than sewing thread"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "针杆箱有 15 根针杆一起上下运动",
+      "All 15 needle bars move up and down together"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "刺绣用链式线迹，耗线多",
+      "Embroidery uses chainstitch, which consumes more thread"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "由 a_max = C·w·ω²/β²，质量大、位移大而窗口有限，只能降低 ω；刺绣用锁式线迹，且一次只驱动一根针杆。",
+    "From a_max = C·w·ω²/β², with a heavy mass, long moves and a limited window, ω must come down; embroidery uses lockstitch and drives only one needle bar at a time."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "摆宽 8 mm、5000 r/min、摆动区间 170°，采用摆线规律（C = 2π），针杆摆架折算到针尖的质量 150 g。横向惯性力约为多少 N？",
+    "Bight 8 mm, 5000 r/min, swing interval 170°, cycloidal law (C = 2π), swing-frame mass referred to the point 150 g. About what is the sideways inertia force in N?"
+   ],
+   "answer": 235,
+   "tolerance": 3,
+   "unit": "N",
+   "feedback": [
+    "a = 2π × 0.008 × 523.6² / 2.967² ≈ 1565 m/s²，F = 0.15 × 1565 ≈ 235 N，低于 250 N 的示意限值。",
+    "a = 2π × 0.008 × 523.6² / 2.967² ≈ 1565 m/s², F = 0.15 × 1565 ≈ 235 N, under the illustrative 250 N."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "条件同上（8 mm、5000 r/min、摆线、150 g），要使横向惯性力不超过 250 N，摆动区间至少要多少度主轴转角？",
+    "Same conditions (8 mm, 5000 r/min, cycloidal, 150 g): for an inertia force of at most 250 N, at least how many degrees of shaft angle must the swing interval span?"
+   ],
+   "answer": 164.8,
+   "tolerance": 2,
+   "unit": "°",
+   "feedback": [
+    "由 F = m·C·w·ω²/β² 解 β = √(m·C·w·ω²/F) ≈ 2.876 rad ≈ 164.8°，仍装得进约 200° 的窗口。",
+    "Solving F = m·C·w·ω²/β² gives β = √(m·C·w·ω²/F) ≈ 2.876 rad ≈ 164.8°, which still fits the window of about 200°."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "按本讲借用的线环窗口（钩线回升 1.0–4.2 mm，对应右端最早约 198.1°、左端最晚约 218.2°），旋梭半径 13.5 mm，最大摆宽约为多少 mm？",
+    "With the borrowed loop window (rise 1.0–4.2 mm, i.e. right end at the earliest about 198.1° and left end at the latest about 218.2°) and a 13.5 mm hook, about what is the maximum bight in mm?"
+   ],
+   "answer": 9.5,
+   "tolerance": 0.3,
+   "unit": "mm",
+   "feedback": [
+    "Δφ 最多约 20.1° = 0.351 rad，w = 2RΔφ ≈ 9.5 mm，接近说明书的 10 mm。",
+    "Δφ at most about 20.1° = 0.351 rad, w = 2RΔφ ≈ 9.5 mm, close to the manual’s 10 mm."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "之字缝机说明书为什么在摆幅最左端调整针眼上沿到梭尖的高度？",
+    "Why does the zigzag manual set the eye-to-hook-point height with the needle at the leftmost end of its swing?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "左端后被钩，此时针已回升较多、针眼离梭尖最近，在这里定高度可保证梭尖不从针眼下面穿过",
+      "The left end is caught later, when the needle has risen more and the eye is closest to the point, so setting height there ensures the point does not pass under the eye"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "左端先被钩，线环最大",
+      "The left end is caught first, with the largest loop"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "左端针身最粗，间隙最小",
+      "The needle blade is thickest at the left end, so the clearance is smallest"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "左端与送布牙距离最近",
+      "The left end is closest to the feed dog"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "右端先钩、针回升少，在那里查梭尖与针的间隙；左端后钩，在那里定高度。",
+    "The right end is caught first with little rise, so clearance is checked there; the left end is caught later, so height is set there."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于从机械花样凸轮改为步进电机驱动（电子凸轮），下列哪些说法正确？",
+    "Which statements about replacing the mechanical pattern cam with stepper drives (electronic cam) are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "钢制凸轮的廓线换成了程序里的位移表",
+      "The steel cam profile is replaced by a displacement table in the program"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "台阶对齐、运动规律和加速度问题原样转移到步进电机的运动规划里",
+      "Step alignment, motion law and acceleration issues carry straight over into stepper motion planning"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "针距大时仍要降速，原因与摆针相同",
+      "Long stitches still require lower speed, for the same reason as the needle swing"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "电子化后夹具可以在针在布中时移动",
+      "Once electronic, the clamp may move while the needle is in the fabric"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "步进电机驱动没有弹性和间隙，模型不需修正",
+      "Stepper drives have no elasticity or backlash, so the model needs no correction"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "约束不因电子化而改变；教材指出实际的之字凸轮和步进电机驱动都有弹性和间隙。",
+    "The constraint is unchanged by going electronic; the text notes that real cams and stepper drives both have elasticity and backlash."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "针在布外窗口的计算；三种运动规律与峰值加速度公式；两端钩线时刻差与摆宽上限。",
+   "Calculating the out-of-fabric window; the three motion laws and the peak-acceleration formula; catching-time difference at the two ends and the bight limit."
+  ],
+  "difficult": [
+   "把摆宽、转速、摆动区间放在 a_max = C·w·ω²/β² 里统一考虑，以及两端钩线时高度与间隙为何在不同端调整；建议用虚拟实验 11-1 现场演示压缩区间和加大摆宽两种情况。",
+   "Treating bight, speed and swing interval together through a_max = C·w·ω²/β², and why height and clearance are set at different ends; demonstrate squeezing the interval and widening the bight live in Virtual lab 11-1."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Opening"
+    ],
+    "minutes": 10,
+    "content": [
+     "展示衬衫上的扣眼、纽扣、套结和之字线，提出松紧带之字缝的车间问题。",
+     "Show buttonholes, buttons, bartacks and zigzag on a shirt and pose the elastic-zigzag shop-floor problem."
+    ]
+   },
+   {
+    "phase": [
+     "之字线迹与摆针机构",
+     "Zigzag stitch and swing mechanism"
+    ],
+    "minutes": 15,
+    "content": [
+     "304 线迹；机械式摆架与凸轮；电子式步进驱动。",
+     "The 304 stitch; mechanical swing frame and cam; electronic stepper drive."
+    ]
+   },
+   {
+    "phase": [
+     "窗口与运动规律",
+     "Window and motion laws"
+    ],
+    "minutes": 35,
+    "content": [
+     "计算针在布外窗口；比较三种运动规律；推导并应用峰值加速度公式，完成算例。",
+     "Compute the out-of-fabric window; compare three motion laws; apply the peak-acceleration formula to the worked example."
+    ]
+   },
+   {
+    "phase": [
+     "两端钩线与摆宽上限",
+     "Catching at both ends and the bight limit"
+    ],
+    "minutes": 30,
+    "content": [
+     "推导 Δφ = w/(2R)；比较两种线环窗口下的摆宽上限；讲两端高度与间隙的调法，回答导入问题。",
+     "Derive Δφ = w/(2R); compare bight limits under two loop windows; explain height and clearance settings; answer the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "锁眼、钉扣、套结",
+     "Buttonholers, button sewers, bartackers"
+    ],
+    "minutes": 30,
+    "content": [
+     "平头与圆头锁眼；花样凸轮；从机械凸轮到电子凸轮。",
+     "Straight and eyelet buttonholes; the pattern cam; from mechanical to electronic cam."
+    ]
+   },
+   {
+    "phase": [
+     "绗缝机与刺绣机",
+     "Quilting and embroidery machines"
+    ],
+    "minutes": 15,
+    "content": [
+     "多针绗缝；刺绣针杆箱与换色；刺绣机为何转速低。",
+     "Multi-needle quilting; the embroidery needle-bar case and colour change; why embroidery is slow."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验实操",
+     "Virtual lab session"
+    ],
+    "minutes": 35,
+    "content": [
+     "分组完成虚拟实验 11-1 的三个任务，记录数据。",
+     "Groups complete the three tasks of Virtual lab 11-1 and record data."
+    ]
+   },
+   {
+    "phase": [
+     "小结与测验",
+     "Summary and quiz"
+    ],
+    "minutes": 10,
+    "content": [
+     "回顾小结，布置作业，开放测验。",
+     "Review the summary, set the assignment and open the quiz."
+    ]
+   }
+  ],
+  "homework": [
+   "完成本讲作业；预习第 15 章花样机控制，并试用虚拟实验 15-1 体会“机针在布中时模板不能动”在控制系统里的实现。",
+   "Complete the assignment; preview Chapter 15 on pattern-sewer control and try Virtual lab 15-1 to see how “the clamp must not move while the needle is in the fabric” is implemented in control."
+  ]
+ }
+}

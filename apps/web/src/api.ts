@@ -344,6 +344,12 @@ export function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", path: stri
   });
 }
 
+export interface CoursePack {
+  book: string; title: string; version: string; courseid: number; status: "idle" | "running" | "done" | "failed"; error: string;
+  progress: { done: number; total: number; current: string }; updated: number;
+  batches: { no: number; name: string; lessons: number; published: number; exams: number; exams_published: number; done: boolean }[];
+}
+
 export const api = {
   async login(username: string, password: string): Promise<User> {
     const r = await request<{ token: string; user: User }>("POST", "/api/v1/auth/login", {
@@ -466,6 +472,9 @@ export const api = {
   adminCommittee: () => request<{ members: { id: number; name: string; email: string; key?: string }[]; chair: number; self_review: boolean }>("GET", "/api/v1/admin/committee"),
   adminSetCommittee: (members: string[], chair: string, self_review: boolean) =>
     request<{ members: { id: number; name: string; email: string; key?: string }[]; chair: number; self_review: boolean }>("PUT", "/api/v1/admin/committee", { members, chair, self_review }),
+  // 课程包（第 16 轮）：管理员一键建课、分批发布
+  coursePacks: () => request<{ packs: CoursePack[] }>("GET", "/api/v1/admin/course-packs"),
+  publishCoursePack: (book: string, batch: number) => request<CoursePack>("POST", `/api/v1/admin/course-packs/${book}/publish`, { batch }),
   // 问渠教材（第 7 轮）
   textbooks: () => request<{ books: { book: string; title: string; title_en?: string; web?: boolean; labs?: number; chapters: number; sections?: number; written?: number }[] }>("GET", "/api/v1/textbooks"),
   textbookWeb: (book: string, lang: "zh" | "en" = "zh") =>

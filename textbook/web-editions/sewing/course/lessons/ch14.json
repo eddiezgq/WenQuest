@@ -1,0 +1,1150 @@
+{
+ "no": 14,
+ "title": [
+  "工业平缝机电控",
+  "Control of the Industrial Lockstitch Machine"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能画出电控平缝机一个工作周期的状态机，并算出从高速停车剪线所需的时间。",
+   "Draw the state machine of one working cycle of an electronically controlled lockstitch machine and calculate the time needed to stop and trim from high speed."
+  ],
+  [
+   "能根据送布牙的空闲角和执行器延迟算出自动回针的转速上限。",
+   "Calculate the maximum backtack speed from the feed dog's idle angle and the actuator delay."
+  ],
+  [
+   "能把剪线动刀的进刀、剪断、松线、停针、拨线对准第 8 章时刻表，算出发令角范围。",
+   "Line up knife entry, cut, tension release, needle stop and wiping with the Chapter 8 timing chart, and calculate the range of command angles."
+  ],
+  [
+   "能用进刀窗口和停车两条限制求出剪线转速上限，并解释为什么延迟稳定比延迟短更重要。",
+   "Find the trimming-speed limit from the knife-entry window and the stopping limit, and explain why a stable delay matters more than a short one."
+  ],
+  [
+   "能算出电子夹线器的电流–张力关系，说明电子送布、电子张力和压脚压力怎样随布料自动调整。",
+   "Calculate the current–tension relation of an electronic tension assembly and explain how electronic feed, tension and presser-foot pressure can adapt automatically to the fabric."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "剪线转速从 300 提到 500 r/min，值不值？",
+   "Raising the trimming speed from 300 to 500 r/min: is it worth it?"
+  ],
+  "text": [
+   "某衬衫车间的电控平缝机以 4000 r/min 缝纫，每个操作工一天大约剪 3000 次线。工程师想把剪线转速从 300 r/min 提到 500 r/min。按第 14 章算例：减速按伺服能力的 60%（约 2650 rad/s²），剪线那一针从 0° 到剪断（下一转 55°）转过 415°，剪断后以最大减速度约 4400 rad/s² 停车，须在 96.7° 前停住；剪线电磁铁直接驱动动刀，延迟 6–10 ms，动刀须在 300°–330° 之间进刀。",
+   "On a shirt floor, electronically controlled lockstitch machines sew at 4000 r/min and each operator trims about 3000 times a day. The engineer wants to raise the trimming speed from 300 to 500 r/min. Per the Chapter 14 example: deceleration uses 60% of the servo's capability (about 2650 rad/s²); the trimming stitch turns 415° from 0° to the cut (55° of the next revolution); after the cut the shaft stops at the maximum deceleration of about 4400 rad/s² and must stop before 96.7°; the trimming solenoid drives the moving knife directly with a 6–10 ms delay, and the knife must enter between 300° and 330°."
+  ],
+  "question": [
+   "两种剪线转速下，一次停车剪线各要多少时间？一天能省多少？500 r/min 是否仍在两条转速上限之内？发令角应取多少？",
+   "How long does one stop-and-trim take at each trimming speed? How much is saved per day? Is 500 r/min still within both speed limits? What command angle should be used?"
+  ],
+  "answer": [
+   "停车剪线时间 = 减速 + 剪线一针 + 停车：300 r/min 时约 0.146 + 0.231 + 0.007 ≈ 0.38 s，500 r/min 时约 0.138 + 0.138 + 0.012 ≈ 0.29 s，每次省约 0.095 s，一天 3000 次约省 4.8 min。延迟 6–10 ms 时进刀窗口限制为 30 ÷ (6 × 0.004) = 1250 r/min，停车限制约 770 r/min，500 r/min 都满足。发令角要满足 φ + 6 × 500 × 0.006 ≥ 300° 且 φ + 6 × 500 × 0.010 ≤ 330°，即 282°–300°，取中间约 291°。但若电压偏低、延迟变成 5–15 ms，窗口限制降到 500 r/min，已无余量，所以提速前要先让电磁铁延迟稳定。",
+   "Stop-and-trim time = deceleration + trimming stitch + stop: at 300 r/min about 0.146 + 0.231 + 0.007 ≈ 0.38 s; at 500 r/min about 0.138 + 0.138 + 0.012 ≈ 0.29 s, saving about 0.095 s per trim, about 4.8 min a day for 3000 trims. With a 6–10 ms delay the entry-window limit is 30 ÷ (6 × 0.004) = 1250 r/min and the stopping limit about 770 r/min, so 500 r/min satisfies both. The command angle must satisfy φ + 6 × 500 × 0.006 ≥ 300° and φ + 6 × 500 × 0.010 ≤ 330°, i.e. 282°–300°; take the middle, about 291°. But if low voltage makes the delay 5–15 ms, the window limit drops to 500 r/min with no margin left, so the solenoid delay must be stabilised before speeding up."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人工作站：状态机、提前发令与力感知",
+   "A robot cell: state machines, early commands and force sensing"
+  ],
+  "text": [
+   "机器人从传送带上抓取工件，与平缝机剪线是同一类问题：夹爪的电磁阀有延迟，控制器要按传送带速度提前发令，就像按主轴转速提前剪线发令角。延迟的平均值可以补偿，延迟的波动 Δt 却会让抓取位置在 v·Δt 的范围内散开，它必须装进夹爪允许的位置窗口，所以传送带速度的上限由延迟的波动决定，这正是 n ≤ 30/[6(t_max − t_min)] 的对应。整个工作站的“取料—搬运—放料—回位”同样用状态机编排，哪一步卡住就报哪一步的故障。14.7 节用主轴电流感知布料变厚，机器人则用关节电流或力传感器感知接触力，碰撞检测和打磨时的恒力控制都基于这一点。",
+   "A robot picking parts from a conveyor faces the same problem as trimming on a lockstitch machine: the gripper's solenoid valve has a delay, so the controller must issue the command early according to belt speed, just as the trimming command angle is advanced with shaft speed. The mean delay can be compensated, but its spread Δt scatters the grip position over v·Δt, which must fit within the gripper's position window; the maximum belt speed is therefore set by the delay spread, the counterpart of n ≤ 30/[6(t_max − t_min)]. The whole cell — pick, carry, place, return — is also sequenced by a state machine that reports exactly which step hung. Section 14.7 senses thicker fabric through the spindle current; a robot senses contact force through joint current or a force sensor, the basis of collision detection and constant-force grinding."
+  ]
+ },
+ "life": {
+  "title": [
+   "接力赛交棒",
+   "The baton change in a relay race"
+  ],
+  "text": [
+   "接棒的人要在交接区里接到棒，所以在队友跑到某个标记时就提前起跑——这就是提前发令角；队友跑得越快，标记要画得越远；而接棒人起跑反应的快慢不稳定，才是交棒失误的主要原因。",
+   "The receiving runner must take the baton inside the changeover zone, so they start running when their teammate passes a mark — that is the early command angle; the faster the teammate, the further back the mark; and it is the inconsistency of the receiver's reaction, not its average, that causes most failed changes."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "松开脚踏的半秒钟",
+    "The half-second after the pedal is released"
+   ],
+   "points": [
+    [
+     "后跟一踩：减速、剪线一针、停针、拨线、抬压脚",
+     "Heel press: slow down, trimming stitch, needle stop, wipe, lift the foot"
+    ],
+    [
+     "前掌一踩：落压脚、起缝回针、慢起针、加速",
+     "Ball of the foot: foot down, start backtack, soft start, accelerate"
+    ],
+    [
+     "状态机：方框是状态，箭头是触发条件（脚踏、针数、转角、到位信号）",
+     "State machine: boxes are states, arrows are triggers (pedal, stitch count, angle, in-position signals)"
+    ],
+    [
+     "哪一步卡住，控制器就知道停在哪里、报什么故障",
+     "If a step hangs, the controller knows where it stopped and what to report"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_14_cycle.png",
+   "narration": [
+    "缝完一道线，操作工后跟一踩，机器在半秒钟里做完一串动作：主轴从几千转降到几百转，再转一针，针板下面咔嗒一声把线剪断，主轴停在上针位，拨线杆一扫，压脚抬起。前掌一踩，压脚落下，先回几针，再慢缝几针，然后加速。这串动作由控制器里的状态机按顺序执行。看上面这张图，方框是状态，箭头是触发条件，比如脚踏位置、针数、主轴转角、执行器到位信号。状态机的好处是每一步写得清清楚楚，卡在哪一步，控制器就报哪一步的故障。",
+    "At the end of a seam the operator presses back with the heel, and within half a second the machine runs a whole sequence: the shaft drops from thousands of r/min to a few hundred, turns one more stitch, a click under the throat plate cuts the threads, the shaft stops at needle-up, the wiper sweeps, and the foot lifts. A forward press drops the foot, sews a few backtack stitches, a few slow stitches, then accelerates. A state machine in the controller runs this sequence. In the upper figure, boxes are states and arrows are triggers: pedal position, stitch count, shaft angle, an actuator's in-position signal. Each step is written down explicitly, so if it hangs, the controller reports exactly which step."
+   ]
+  },
+  {
+   "title": [
+    "停车剪线的时间账",
+    "The time budget of stop-and-trim"
+   ],
+   "points": [
+    [
+     "从 4000 r/min：减速约 146 ms + 剪线一针约 231 ms + 停针几 ms ≈ 0.38 s",
+     "From 4000 r/min: about 146 ms decel + 231 ms trimming stitch + a few ms stop ≈ 0.38 s"
+    ],
+    [
+     "剪线一针从 0° 到剪断（下一转 55°）转 415°",
+     "The trimming stitch turns 415° from 0° to the cut at 55° of the next revolution"
+    ],
+    [
+     "加减速按伺服能力的 60%（约 2650 rad/s²）计",
+     "Acceleration and deceleration use 60% of servo capability (about 2650 rad/s²)"
+    ],
+    [
+     "一天剪几千次，半秒钟乘起来就是几十分钟",
+     "Thousands of trims a day turn half a second into tens of minutes"
+    ]
+   ],
+   "formula": "t = \\frac{\\omega_0-\\omega_{tr}}{\\alpha} + \\frac{415^\\circ}{6\\,n_{tr}} + \\frac{\\omega_{tr}}{\\alpha_{max}}",
+   "figure": "",
+   "narration": [
+    "我们来算算这半秒钟。从 4000 r/min 停车剪线，分三段。第一段减速到剪线转速，按伺服能力的六成，约 2650 rad/s²，降到 300 r/min 要 146 毫秒。第二段是剪线那一针，从 0° 一直转到下一转的 55° 剪断，共 415°，300 r/min 下要 231 毫秒，这是大头。第三段以最大减速度停车，只要几毫秒。合起来约 0.38 秒，再加拨线和抬压脚，约半秒。别小看这半秒，一个操作工一天剪几千次线，乘起来就是几十分钟，所以剪线快慢本身就是电控的设计指标。",
+    "Let us account for that half-second. Stopping and trimming from 4000 r/min has three parts. First, deceleration to trimming speed at 60% of the servo's capability, about 2650 rad/s²: down to 300 r/min takes 146 ms. Second, the trimming stitch, turning from 0° all the way to the cut at 55° of the next revolution, 415° in all — 231 ms at 300 r/min, the biggest share. Third, stopping at maximum deceleration, only a few milliseconds. About 0.38 s altogether; add wiping and foot lift and it is roughly half a second. Do not underestimate it: thousands of trims a day add up to tens of minutes, so trimming speed is a design target in its own right."
+   ]
+  },
+  {
+   "title": [
+    "主轴速度曲线：慢起针、加减速与短缝",
+    "Main-shaft speed profile: soft start, acceleration and short seams"
+   ],
+   "points": [
+    [
+     "慢起针：防止线头被挑线杆抽出、底线绕成线团；例：前 3 针 400 sti/min",
+     "Soft start keeps the thread end in the eye and avoids bird's nests; e.g. first 3 stitches at 400 sti/min"
+    ],
+    [
+     "400 → 4000 r/min 约 0.14 s，四五针",
+     "400 → 4000 r/min takes about 0.14 s, four or five stitches"
+    ],
+    [
+     "剪线转速 200 / 300 / 500 r/min：停车剪线约 0.50 / 0.38 / 0.29 s",
+     "Trimming at 200 / 300 / 500 r/min: stop-and-trim about 0.50 / 0.38 / 0.29 s"
+    ],
+    [
+     "40 针的一道缝约 1.36 s，最高转速时间不到三成",
+     "A 40-stitch seam takes about 1.36 s; less than 30% is at top speed"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_14_speed.png",
+   "narration": [
+    "主轴转速跟着脚踏走，但控制器加了几条限制。第一是慢起针：剪线后针眼里只留几厘米线头，起缝太快挑线杆一拉就把线头抽出来，底线也容易在布底绕成线团，所以前几针低速，某说明书里是前 3 针 400 针每分。第二是加减速受伺服能力限制，从 400 到 4000 转约 0.14 秒。第三是剪线前要降到剪线转速。看右图，剪线转速越低越稳，但越慢。左图 40 针的一道缝约 1.36 秒，最高转速只占不到三成。所以短缝多时，提最高转速几乎没用，缩短加减速和剪线才有用。",
+    "Shaft speed follows the pedal, but the controller adds limits. First, soft start: after trimming only a few centimetres of thread remain in the eye; start too fast and one pull of the take-up lever draws the end out, and the bobbin thread tangles under the fabric — so the first few stitches are slow; one manual uses 400 sti/min for the first 3. Second, acceleration and deceleration are limited by the servo: 400 to 4000 r/min takes about 0.14 s. Third, the shaft must drop to trimming speed before trimming. On the right, the lower the trimming speed, the steadier but slower. The 40-stitch seam on the left takes about 1.36 s, under 30% of it at top speed. With many short seams, raising top speed hardly helps; shortening acceleration and trimming does."
+   ]
+  },
+  {
+   "title": [
+    "自动回针：在送布牙的空闲角里切换",
+    "Automatic backtack: switch inside the feed dog's idle angle"
+   ],
+   "points": [
+    [
+     "送布牙 114.2° 沉到针板下，325.8° 升出：空闲角 211.6°",
+     "Feed dog drops below the plate at 114.2°, rises at 325.8°: idle angle 211.6°"
+    ],
+    [
+     "114.2° 发令，延迟 t 内主轴转 6nt 度，留 10° 余量",
+     "Command at 114.2°; the shaft turns 6nt during delay t; keep 10° margin"
+    ],
+    [
+     "倒缝电磁铁 18 ms → 约 1870 r/min；20 ms → 约 1680 r/min",
+     "Reverse-feed solenoid 18 ms → about 1870 r/min; 20 ms → about 1680 r/min"
+    ],
+    [
+     "步进电机 5 ms → 6000 r/min 以上，延迟不再是限制",
+     "Stepper at 5 ms → over 6000 r/min; delay no longer limits"
+    ]
+   ],
+   "formula": "n_{max}=\\frac{211.6-10}{6\\,t}",
+   "figure": "fig_14_bt.png",
+   "narration": [
+    "起缝和结束各回几针锁住线迹，叫回针。机械送布靠倒缝电磁铁拨动针距调节机构，电子送布由步进电机直接换向。关键是时机：送布牙在针板上面时正在推布，这时换向，这一针既不是正向也不是反向，回针就对不齐。第 6 章算例里，送布牙 114.2° 沉下去，325.8° 升上来，中间 211.6° 叫空闲角，换向必须在这里完成。控制器在 114.2° 发令，延迟 t，主轴转过 6nt 度，留 10° 余量，就得到这个转速上限。倒缝电磁铁 18 毫秒时约 1870 转，步进电机 5 毫秒就超过 6000 转了。",
+    "A few reverse stitches at the start and end lock the seam: backtacking. Mechanical feed uses a reverse-feed solenoid to move the stitch regulator; electronic feed reverses the stepper directly. Timing is the key: while the feed dog is above the plate it is pushing the fabric, and switching then gives a stitch that is neither forward nor reverse, so the backtack does not line up. In the Chapter 6 example the feed dog drops at 114.2° and rises at 325.8°; the 211.6° between is the idle angle, and the switch must finish there. Command at 114.2°, delay t, the shaft turns 6nt degrees; keep 10° margin and you get this limit. At 18 ms for the solenoid, about 1870 r/min; a stepper at 5 ms exceeds 6000 r/min."
+   ]
+  },
+  {
+   "title": [
+    "回针为什么还会对不齐",
+    "Why backtacks may still not line up"
+   ],
+   "points": [
+    [
+     "电子送布机型默认起缝回针仍是 1800 sti/min：还有别的限制",
+     "An electronic-feed model still defaults to 1800 sti/min for start backtack: other limits apply"
+    ],
+    [
+     "回针要和正缝重合、线迹要收紧、布要被压脚和送布牙带住",
+     "Backtack must coincide with forward stitches, tighten, and the fabric must be gripped"
+    ],
+    [
+     "机构间隙换边，第一针回针偏短；布料有弹性",
+     "Clearance changes sides, so the first reverse stitch is short; fabric is elastic"
+    ],
+    [
+     "回针补偿：单独调第一针和最后一针的针距或切换时刻",
+     "Backtack compensation: adjust the length or switching moment of the first and last backtack stitch"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "既然步进电机换向这么快，回针是不是就可以随便快？不是。前面那份说明书里的机型就是电子送布，可起缝回针默认还是每分钟 1800 针。说明还有别的限制：回针的针迹要和正缝重合，线迹要收紧，布也要来得及被压脚和送布牙带住。即使在空闲角里换向，也可能对不齐。原因一是机构间隙，换向时间隙从一边换到另一边，第一针回针短一点；原因二是布料有弹性。电控的办法叫回针补偿，单独调整回针第一针和最后一针的针距或切换时刻，电子送布上做起来尤其方便。",
+    "If a stepper reverses so quickly, can backtacking be as fast as we like? No. The machine in that manual has electronic feed, yet its default start backtack is still 1800 sti/min, which shows other limits apply: backtack stitches must coincide with the forward ones, the stitches must tighten, and the fabric must be gripped by the foot and feed dog in time. Even when switched within the idle angle, stitches may not line up. One reason is mechanical clearance: on reversal it moves to the other side, so the first reverse stitch is a little short; another is fabric elasticity. The control remedy is backtack compensation, adjusting the length or switching moment of the first and last reverse stitches — especially easy with electronic feed."
+   ]
+  },
+  {
+   "title": [
+    "剪线器的结构与两种驱动",
+    "Trimmer construction and two drive types"
+   ],
+   "points": [
+    [
+     "针板下、旋梭旁：定刀不动，动刀在摆轴上摆动",
+     "Under the throat plate beside the hook: a fixed knife and a moving knife on an oscillating shaft"
+    ],
+    [
+     "凸轮驱动：电磁铁把滚子推进剪线凸轮槽，进刀时刻由凸轮决定",
+     "Cam drive: a solenoid pushes the roller into the trimming cam; the cam sets the entry moment"
+    ],
+    [
+     "直接驱动：电磁铁经连杆推动刀，进刀时刻 = 发令时刻 + 延迟",
+     "Direct drive: a solenoid moves the knife via links; entry = command + delay"
+    ],
+    [
+     "本讲的时序模型针对直接驱动",
+     "This lesson's timing model is for direct drive"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_14_trim.png",
+   "narration": [
+    "剪线器装在针板下面、旋梭旁边。常见结构是一把定刀不动，一把动刀装在摆轴上来回摆。动刀的驱动有两种。一种是凸轮驱动：主轴上有剪线凸轮，平时滚子和凸轮槽脱开，剪线时电磁铁把滚子推进槽里，动刀就跟着主轴走一个来回，第 15 章的花样机就是这样，进刀时刻由凸轮形状定，电磁铁只要赶在槽口转到之前推进去。另一种是电磁铁经连杆直接推动刀，这时进刀时刻就是发令时刻加上延迟，延迟直接影响时序。本讲后面的时序分析针对的是这一种。",
+    "The trimmer sits under the throat plate beside the rotary hook. A common design has a stationary fixed knife and a moving knife swinging on an oscillating shaft. There are two drives. With cam drive, a trimming cam turns on the shaft; normally the roller is clear of the groove, and for trimming a solenoid pushes it in so the knife makes one stroke out and back with the shaft — the pattern sewers of Chapter 15 work this way. The cam shape sets the entry moment; the solenoid just has to get the roller in before the groove entrance arrives. With direct drive, a solenoid pushes the knife through links, so entry is command plus delay, and the delay directly affects timing. The timing analysis that follows is for this second type."
+   ]
+  },
+  {
+   "title": [
+    "一次剪线的过程",
+    "The course of one trim"
+   ],
+   "points": [
+    [
+     "最后一针照常：梭尖 206° 钩住线环，线环越张越大",
+     "Last stitch as usual: hook point catches the loop at 206°, the loop grows"
+    ],
+    [
+     "针升到针板上方约 10 mm（约 291°）时给电磁铁通电",
+     "Energise the solenoid when the needle is about 10 mm above the plate (about 291°)"
+    ],
+    [
+     "动刀从供线侧那根线下面穿过，连布的面线和底线落进钩槽",
+     "The knife passes under the supply-side thread; the fabric-side needle thread and bobbin thread fall into its notch"
+    ],
+    [
+     "341° 线环脱出，夹线器松开；挑线杆最高点 55° 剪断",
+     "Loop slips off at 341° with tension released; cut at the lever's top, 55°"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "按剪线装置专利的描述，一次剪线是这样的。最后一针照常缝，梭尖在 206° 钩住面线线环，带着它绕过梭壳，线环越来越大。机针升到针板上方约 10 毫米，本书模型里约 291°，控制器给剪线电磁铁通电。经过吸合延迟，动刀转进来，刀尖越过底线，从线环供线一侧那根线下面穿过，连着布的那根面线和底线就落进刀的钩槽。线环在 341° 从梭上脱出，挑线杆收线，这时夹线器松开，线从线团那边抽。动刀回程，在挑线杆最高点、下一转 55° 把两根线剪断。供线侧那根留在针眼里，做下一道的线头。",
+    "Following the trimming-device patent, a trim goes like this. The last stitch is sewn as usual: the hook point catches the needle-thread loop at 206° and carries it round the bobbin case, and the loop grows. When the needle has risen about 10 mm above the plate — about 291° in this book's model — the controller energises the trimming solenoid. After the pull-in delay the knife swings in, its tip over the bobbin thread and under the supply side of the loop, so the fabric-side needle thread and the bobbin thread drop into its notch. The loop slips off the hook at 341°, the lever takes up thread, the tension assembly opens so thread comes from the spool side. On the return stroke the knife cuts both at the lever's highest point, 55° of the next revolution. The supply-side thread stays in the eye as next seam's thread end."
+   ]
+  },
+  {
+   "title": [
+    "四条时序判据",
+    "Four timing criteria"
+   ],
+   "points": [
+    [
+     "动刀在 300°–330° 进刀：早了只剪断底线，晚了线环已被拉走",
+     "Knife enters at 300°–330°: too early cuts only the bobbin thread, too late the loop is gone"
+    ],
+    [
+     "55° 剪断，96.7° 前停住（针尖 101.7° 入布，留 5°）",
+     "Cut at 55°, stop before 96.7° (needle enters at 101.7°, 5° margin)"
+    ],
+    [
+     "夹线器至少在 335°–下一转 55° 松开，否则留头太短、起缝脱线",
+     "Tension released at least 335° to 55°; otherwise the end is too short and unthreads"
+    ],
+    [
+     "停稳后拨线，否则线头留在压脚下、起缝绕线团",
+     "Wipe after stopping, or the end stays under the foot and nests"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_14_tseq.png",
+   "narration": [
+    "把剪线过程画到第 8 章的时刻表上，就得到四条判据，数值是本书取的示意值。第一，动刀要在 300° 到 330° 之间进刀：早了线环还没被梭带到刀的路径上，挂不住连布的面线，只剪断底线；晚了线环已经脱出被拉走，同样剪不断。第二，55° 剪断，要在针尖 101.7° 入布前留 5° 停住，就是 55° 到 96.7°。第三，夹线器至少在 335° 到下一转 55° 松开，不然挑线杆只能从线头那边抽线，留头太短，下一道起缝脱线。第四，停稳后拨线，把线头拨到压脚上面。",
+    "Draw the trim on the Chapter 8 timing chart and four criteria emerge; the values are this book's illustrative ones. One: the knife must enter between 300° and 330°. Too early and the loop has not been carried into the knife's path, so the fabric-side needle thread is missed and only the bobbin thread is cut; too late and the loop has slipped off and been pulled away. Two: cut at 55°, stop 5° before needle entry at 101.7°, i.e. between 55° and 96.7°. Three: the tension assembly must be open from at least 335° to 55° of the next revolution, or the lever draws thread from the end side, leaving too short an end that unthreads at the next start. Four: after stopping, wipe the end up onto the presser foot."
+   ]
+  },
+  {
+   "title": [
+    "发令要提前多少",
+    "How far ahead to issue the command"
+   ],
+   "points": [
+    [
+     "实际进刀角 = 发令角 + 6nt",
+     "Actual entry angle = command angle + 6nt"
+    ],
+    [
+     "300 r/min、6–10 ms、290° 发令：进刀 301°–308°，在窗口内",
+     "300 r/min, 6–10 ms, command at 290°: entry 301°–308°, inside the window"
+    ],
+    [
+     "700 r/min 同样发令：315°–332°，超出；要提前到 288° 以前",
+     "700 r/min, same command: 315°–332°, outside; advance to before 288°"
+    ],
+    [
+     "进刀范围宽度 6n(t_max − t_min)：从 7° 变宽到 17°",
+     "Entry range width 6n(t_max − t_min): widens from 7° to 17°"
+    ]
+   ],
+   "formula": "\\varphi_{entry} = \\varphi_c + 6\\,n\\,t",
+   "figure": "",
+   "narration": [
+    "动刀直接驱动时，控制器在转角 φc 发令，经过吸合延迟 t，实际进刀角就是 φc 加 6nt。算例里剪线转速 300、延迟 6 到 10 毫秒，在 290° 发令，最早 290 加 10.8 是 300.8°，最晚 290 加 18 是 308°，落在窗口里。转速提到 700 呢？同样在 290° 发令，进刀推迟到 315° 到 332°，晚了。要让最晚的也不超过 330°，发令角得提前到 288° 以前。还要注意，进刀范围从 7° 变宽到 17°，转速越高，延迟波动占的角度越大。",
+    "The trimming solenoid has a pull-in delay. With direct drive, if the controller commands at angle φc and the delay is t, the actual entry is φc plus 6nt. In the example, trimming at 300 r/min with a 6–10 ms delay and a command at 290°, the earliest entry is 290 plus 10.8, 300.8°, and the latest 290 plus 18, 308° — inside the window. At 700 r/min? The same 290° command gives 315° to 332° — too late. For the latest entry to stay within 330°, the command must move before 288°. Note also that the entry range widens from 7° to 17°: the higher the speed, the more degrees the delay spread occupies."
+   ]
+  },
+  {
+   "title": [
+    "剪线转速的两条上限",
+    "The two limits on trimming speed"
+   ],
+   "points": [
+    [
+     "可怕的不是延迟的平均值，而是延迟的变化",
+     "The danger is not the mean delay but its variation"
+    ],
+    [
+     "窗口限制：6n(t_max − t_min) ≤ 30°；6–10 ms → 1250 r/min，5–15 ms → 500 r/min",
+     "Window limit: 6n(t_max − t_min) ≤ 30°; 6–10 ms → 1250 r/min, 5–15 ms → 500 r/min"
+    ],
+    [
+     "停车限制：41.7° 内以约 4400 rad/s² 停住 → 约 770 r/min",
+     "Stopping limit: stop within 41.7° at about 4400 rad/s² → about 770 r/min"
+    ],
+    [
+     "稳压电源、强激磁、稳压管续流：让延迟一致比让它快更重要",
+     "Regulated supply, boost, Zener freewheeling: consistency matters more than speed"
+    ]
+   ],
+   "formula": "n \\le \\frac{30}{6\\,(t_{max}-t_{min})},\\qquad n \\le \\frac{60}{2\\pi}\\sqrt{2\\,\\alpha_{max}\\,\\Delta\\varphi}",
+   "figure": "fig_14_nmax.png",
+   "narration": [
+    "发令角可以按转速和平均延迟自动提前，所以平均值不可怕，可怕的是延迟的变化。延迟在 t_min 到 t_max 之间变，进刀角就在宽 6n 乘差值的范围里变，这个范围必须装进 30° 的窗口，这是第一条上限。6 到 10 毫秒时是 1250 转；电压偏低、弹簧磨损，变成 5 到 15 毫秒，就只剩 500 转。第二条来自停车：剪断后要在 41.7° 之内停住，按最大减速度 4400，剪线转速不能超过约 770 转。图里两条线取较低的那条。所以稳压电源、强激磁、稳压管续流，最大的价值是让延迟更一致。",
+    "The command angle can be advanced automatically from speed and mean delay, so the mean is harmless; the variation is the danger. If the delay ranges from t_min to t_max, the entry angle spreads over 6n times that difference, which must fit into the 30° window — the first limit. At 6–10 ms that is 1250 r/min; with low voltage and a worn spring at 5–15 ms, only 500 r/min. The second limit is stopping: after the cut the shaft must stop within 41.7°, and at the maximum deceleration of 4400 rad/s² the trimming speed cannot exceed about 770 r/min. Take the lower of the two lines. So the main value of a regulated supply, boost and Zener freewheeling is a more consistent delay."
+   ]
+  },
+  {
+   "title": [
+    "电子针距与电子送布",
+    "Electronic stitch length and electronic feed"
+   ],
+   "points": [
+    [
+     "针距调节摆杆交给步进电机，针距在面板上输入",
+     "The stitch-regulator rocker is driven by a stepper; stitch length is entered on the panel"
+    ],
+    [
+     "改针距和换向一样在空闲角里完成，下一针生效",
+     "Changing length, like reversing, happens in the idle angle and applies from the next stitch"
+    ],
+    [
+     "可做：逐段改针距、起缝和转角加密、对条对格、快速回针与补偿",
+     "Enables: per-section lengths, denser starts and corners, stripe matching, fast backtack with compensation"
+    ],
+    [
+     "“数字送布”：送布牙水平和升降都由电机驱动，送布牙高度、定时变成参数",
+     "“Digital feed”: horizontal and vertical feed-dog motion by motors; height and timing become parameters"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_14_efeed.png",
+   "narration": [
+    "机械送布的平缝机，针距靠一个可以转动的摆杆或偏心机构，操作工拧旋钮、按倒缝扳手。电子送布把这个摆杆交给步进电机：电机转个角度，送布量和方向就变了，针距在面板上直接输入。改针距和换向一样，要在送布牙沉在针板下面的空闲角里完成，下一针生效。这带来了机械送布做不到的事：一道缝里逐段改针距，起缝和转角处加密，按条格间距设针数对条对格，回针由步进电机完成。有的机型连送布牙升降也交给电机，叫数字送布，原来要拆机调整的送布牙高度、送布定时就变成了参数。",
+    "On a mechanical-feed lockstitch machine, stitch length is set by a rotatable rocker or eccentric; the operator turns a dial and presses a reverse lever. Electronic feed hands that rocker to a stepper: the motor turns, and feed amount and direction change; stitch length is typed on the panel. Changing length, like reversing, must happen in the idle angle while the feed dog is below the plate, taking effect from the next stitch. This allows things mechanical feed cannot do: changing length section by section within a seam, denser stitches at starts and corners, stitch counts set to the stripe repeat for matching, and backtacking by the stepper. Some machines also motorise the feed-dog lift — digital feed — so feed-dog height and timing, once adjusted by taking the machine apart, become parameters."
+   ]
+  },
+  {
+   "title": [
+    "电子夹线器与压脚压力",
+    "Electronic tension assembly and presser-foot pressure"
+   ],
+   "points": [
+    [
+     "张力 = 预张力 + 2μ × 夹紧力；夹紧力由比例电磁铁或音圈电机产生",
+     "Tension = pretension + 2μ × clamping force; clamping by proportional solenoid or voice coil"
+    ],
+    [
+     "算例：20 cN、μ = 0.2、4 N/A，0 → 1 A 时 20 → 180 cN",
+     "Example: 20 cN, μ = 0.2, 4 N/A; 0 → 1 A gives 20 → 180 cN"
+    ],
+    [
+     "音圈力 ∝ 电流、线性好；普通电磁铁力 ∝ i²，要标定",
+     "Voice-coil force ∝ current, linear; ordinary solenoid force ∝ i², needs calibration"
+    ],
+    [
+     "张力、压脚压力可按缝纫段设定，剪线时自动松线",
+     "Tension and foot pressure can be set per seam section; tension released for trimming"
+    ]
+   ],
+   "formula": "T = T_0 + 2\\mu F,\\qquad F = k_F\\, i",
+   "figure": "",
+   "narration": [
+    "第 7 章讲过，面线张力等于预张力加上 2μ 乘夹紧力。电子夹线器用比例电磁铁或音圈电机产生夹紧力，电流越大夹得越紧。音圈电机的力和电流成正比，线性好，但行程小、贵；普通电磁铁的力大致和电流平方成正比，还和间隙有关，要按电流–张力曲线标定。算例预张力 20 厘牛，摩擦系数 0.2，每安培夹紧力 4 牛，电流从 0 加到 1 安，张力从 20 升到 180 厘牛。张力变成程序里的数，就可以按缝纫段切换：明线大、暗线小，剪线时自动松开。压脚压力同样可以由步进电机或电磁执行器按段调整。",
+    "As Chapter 7 showed, needle-thread tension equals pretension plus 2μ times the clamping force. An electronic tension assembly produces the clamping force with a proportional solenoid or a voice-coil motor: more current, tighter grip. A voice coil's force is proportional to current and very linear, but its stroke is small and it is expensive; an ordinary solenoid's force goes roughly as current squared and depends on the gap, so it must be calibrated against a current–tension curve. In the example, 20 cN pretension, μ = 0.2 and 4 N per ampere: from 0 to 1 A the tension rises from 20 to 180 cN. Once tension is a number in the program it can switch by section — higher for topstitching, lower for concealed seams — and open automatically for trimming. Presser-foot pressure can likewise be set per section by a stepper or electromagnetic actuator."
+   ]
+  },
+  {
+   "title": [
+    "案例：过梗时自动适应布料",
+    "Case study: adapting automatically at a cross seam"
+   ],
+   "points": [
+    [
+     "过梗：两层突然变四到六层，易断针、断线、跳针",
+     "Cross seam: two plies suddenly become four to six; needles break, threads break, stitches skip"
+    ],
+    [
+     "感知：压脚高度传感器；主轴伺服电流（T = k_t i_q）",
+     "Sensing: presser-foot height sensor; spindle servo current (T = k_t i_q)"
+    ],
+    [
+     "调整：降转速、加压脚压力、改面线张力，必要时调送布量",
+     "Adjust: lower speed, raise foot pressure, change tension, and feed amount if needed"
+    ],
+    [
+     "“设定”变成“控制量”，难点在调整规律，需要大量试验数据",
+     "Settings become control variables; the hard part is the adjustment law, which needs much test data"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "一道缝上布料厚度并不均匀，最典型的是过梗：缝到另一道缝好的接缝处，两层一下子变成四层甚至六层。厚度一变，好几个参数都该跟着变：刺穿厚层要更大的力，转速太高容易断针；摩擦大，线环形成不好，容易跳针；压脚被顶高，压力变了，送布容易打滑。电控机有两类信号可以感知：一是压脚杆上的位移传感器，二是主轴伺服的电流，阻力矩一大电流就大。控制器据此降转速、加压脚压力、改张力。注意，企业宣传的具体检测方法和调整规律并没有公开，这里讲的是可能的做法。",
+    "Fabric thickness along a seam is not uniform; the classic case is a cross seam, where two plies suddenly become four or even six at an existing seam. When thickness changes, several parameters should follow: piercing thick plies needs more force and high speed breaks needles; friction rises, loops form poorly, stitches skip; the foot is pushed up, pressure changes, feeding slips. An electronic machine has two signals to sense this: a displacement sensor on the presser bar, and the spindle servo current, which rises with the resisting torque. The controller can then lower speed, raise foot pressure and change tension. Note that the detection methods and adjustment laws advertised by manufacturers have not been published; what we describe is how it could be done."
+   ]
+  },
+  {
+   "title": [
+    "设计要点与模型的边界",
+    "Design notes and the limits of the model"
+   ],
+   "points": [
+    [
+     "每个动作对准机械时刻表；执行器延迟使每个动作都有转速上限",
+     "Every action lines up with the timing chart; actuator delay gives every action a speed limit"
+    ],
+    [
+     "平均延迟靠提前发令补偿，延迟的波动只能靠降速容纳",
+     "Mean delay is compensated by early commands; delay spread only by lower speed"
+    ],
+    [
+     "慢起针、松线、拨线都为了下一道顺利起缝",
+     "Soft start, tension release and wiping all serve a clean next start"
+    ],
+    [
+     "窗口 300°–330°、松线范围、加减速 60% 都是示意值，要按机型核对",
+     "Window 300°–330°, release range and 60% accel are illustrative; check against the actual machine"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "把本讲收一收。电控平缝机的每一个动作都要对准机械时刻表：回针换向装进送布牙的空闲角，剪线进刀装进线环张大的窗口。执行器有延迟，所以每个动作都有转速上限。平均延迟可以靠提前发令补偿，延迟的波动只能靠降低转速来容纳，所以让延迟稳定比让它更快更重要。慢起针、剪线时松线、剪线后拨线，目的都是让下一道顺利起缝。最后提醒模型的边界：进刀窗口、松线范围、停车余量都是示意值，实际要按维修手册核对；回针只考虑了延迟，没算间隙和弹性。",
+    "Let us wrap up. Every action of an electronic lockstitch machine must line up with the mechanical timing chart: backtack reversal inside the feed dog's idle angle, knife entry inside the window when the loop is spread. Actuators have delay, so every action has a speed limit. The mean delay can be compensated by issuing commands early; the spread can only be absorbed by running slower — so a stable delay matters more than a fast one. Soft start, tension release during trimming and wiping afterwards all exist so the next seam starts cleanly. Finally, the model's limits: the entry window, release range and stopping margin are illustrative and must be checked against the service manual; backtack timing considered only delay, not clearance or elasticity."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "电控平缝机的工作周期由状态机编排；从 4000 r/min 停车剪线约 0.38 s，剪线那一针占大头。",
+   "The working cycle is sequenced by a state machine; stop-and-trim from 4000 r/min takes about 0.38 s, most of it the trimming stitch."
+  ],
+  [
+   "回针换向必须在送布牙空闲角 211.6° 内完成：n_max = (211.6 − 10)/(6t)。",
+   "Backtack reversal must finish within the 211.6° idle angle: n_max = (211.6 − 10)/(6t)."
+  ],
+  [
+   "剪线四条判据：300°–330° 进刀、55° 剪断后 96.7° 前停住、335°–55° 松线、停稳后拨线。",
+   "Four trimming criteria: entry at 300°–330°, cut at 55° and stop before 96.7°, tension released 335°–55°, wipe after stopping."
+  ],
+  [
+   "进刀角 = 发令角 + 6nt；剪线转速受 30/[6(t_max − t_min)] 和停车限制约 770 r/min 两条约束，延迟稳定最重要。",
+   "Entry = command + 6nt; trimming speed is bounded by 30/[6(t_max − t_min)] and the stopping limit of about 770 r/min; delay consistency matters most."
+  ],
+  [
+   "电子送布、电子夹线器（T = T₀ + 2μF）和压脚压力把设定变成程序里的控制量，可按缝纫段或传感器信号调整。",
+   "Electronic feed, electronic tension (T = T₀ + 2μF) and foot pressure turn settings into program variables adjustable by section or by sensor signals."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "trim",
+   "no": "14-1",
+   "title": [
+    "剪线时序编辑器",
+    "Trimming sequence editor"
+   ],
+   "goal": [
+    [
+     "在第 8 章时刻表上安排剪线电磁铁发令角、松线和拨线，理解每条判据的物理意义。",
+     "Arrange the trimming command angle, tension release and wiping on the Chapter 8 timing chart, and understand the physics behind each criterion."
+    ],
+    [
+     "观察剪线转速和延迟范围怎样决定实际进刀范围，以及剪断、剪不断和起缝脱线。",
+     "See how trimming speed and delay range set the actual entry range, and decide between a clean cut, a missed cut and unthreading."
+    ],
+    [
+     "算出给定延迟范围下能保证每次剪断的最高剪线转速。",
+     "Calculate the highest trimming speed that guarantees a cut for a given delay range."
+    ]
+   ],
+   "theory": [
+    [
+     "动刀由电磁铁经连杆直接驱动：进刀角 = 发令角 + 6 × 转速 × 延迟，必须落在 300°–330°。",
+     "The knife is driven directly by a solenoid through links: entry = command + 6 × speed × delay, which must fall in 300°–330°."
+    ],
+    [
+     "动刀在挑线杆最高点（下一转 55°）剪断；剪断后伺服以约 4400 rad/s² 停车，必须在 96.7° 前停住。",
+     "The knife cuts at the lever's top (55° of the next revolution); the servo then stops at about 4400 rad/s² and must stop before 96.7°."
+    ],
+    [
+     "夹线器至少在 335°–下一转 55° 松开；剪线后要拨线。",
+     "The tension assembly must be open at least from 335° to 55° of the next revolution; the thread must be wiped after trimming."
+    ],
+    [
+     "进刀范围宽 6n(t_max − t_min)，要装进 30° 窗口；与停车限制一起决定剪线转速上限。",
+     "The entry range is 6n(t_max − t_min) wide and must fit the 30° window; with the stopping limit it sets the trimming-speed limit."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，按“恢复标准”（剪线转速 300 r/min，发令角 290°，延迟 6–10 ms，松线 330°–420°，拨线），在时刻表上找出绿色窗口和红色实际进刀范围，记录右侧五项判定。",
+     "Open the lab and press “Reset to standard” (300 r/min, command 290°, delay 6–10 ms, release 330°–420°, wipe on); find the green window and the red actual entry range on the chart and record the five verdicts."
+    ],
+    [
+     "按“再试 50 次”，记录试剪成功次数；然后把发令角拖到 270° 和 320°，各看判定和试剪结果，说明早了、晚了分别是什么失败。",
+     "Press “Run 50 more trials” and record the successes; then move the command angle to 270° and 320°, check the verdicts and trials, and state what failure early and late entry each cause."
+    ],
+    [
+     "把“剪线后拨线”改为“不拨线”，再把松线结束角调到 380°，分别读判定给出的后果。恢复标准。",
+     "Switch wiping to “No wipe”, then set the release end to 380°, and read the consequence each verdict gives. Reset."
+    ],
+    [
+     "任务 1：按“打乱”（发令角 250°、松线 350°–380°、不拨线），只调发令角、松线起止和拨线，让五项判定全部通过（转速和延迟保持标准）。",
+     "Task 1: press “Scramble” (command 250°, release 350°–380°, no wipe) and adjust only the command angle, release start/end and wiping until all five verdicts pass (keep speed and delay standard)."
+    ],
+    [
+     "任务 2：把剪线转速提到 700 r/min 以上（延迟仍为 6–10 ms），先算出发令角的允许范围，再拖滑块验证：全部判定通过、50 次试剪都成功。",
+     "Task 2: raise the trimming speed to 700 r/min or more (delay still 6–10 ms), first compute the allowed command-angle range, then verify with the slider: all verdicts pass and all 50 trials succeed."
+    ],
+    [
+     "把剪线转速提到 800 r/min，观察哪条判定先失败，记录停针位置。",
+     "Raise the trimming speed to 800 r/min, see which verdict fails first, and record the stop position."
+    ],
+    [
+     "任务 3：把延迟改为 5–15 ms，用 30 ÷ [6 × (t_max − t_min)] 与停车限制算出最高剪线转速，填入“最高剪线转速”，按“核对”（允许 ±5%），再用滑块和试剪验证。",
+     "Task 3: set the delay to 5–15 ms, compute the maximum trimming speed from 30 ÷ [6 × (t_max − t_min)] and the stopping limit, enter it and press “Check” (±5%), then verify with the slider and trials."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 14-1　剪线时序试验记录",
+     "Table 14-1 Trimming-sequence trials"
+    ],
+    "headers": [
+     [
+      "剪线转速（r/min）",
+      "Trimming speed (r/min)"
+     ],
+     [
+      "延迟（ms）",
+      "Delay (ms)"
+     ],
+     [
+      "发令角（°）",
+      "Command angle (°)"
+     ],
+     [
+      "实际进刀范围（°）",
+      "Actual entry range (°)"
+     ],
+     [
+      "停针位置（°）",
+      "Stop position (°)"
+     ],
+     [
+      "50 次成功数",
+      "Successes of 50"
+     ],
+     [
+      "判定结论",
+      "Verdict"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "转速从 300 提到 700 r/min，红色进刀范围为什么同时“右移”和“变宽”？分别靠什么办法应对？",
+     "Going from 300 to 700 r/min, why does the red entry range both shift right and widen? How is each dealt with?"
+    ],
+    [
+     "延迟 6–10 ms 时，剪线转速上限由哪条限制决定？延迟变成 5–15 ms 时呢？",
+     "With a 6–10 ms delay, which limit sets the trimming-speed maximum? And with 5–15 ms?"
+    ],
+    [
+     "不松线时为什么剪线能剪断，下一道却起缝脱线？",
+     "Without tension release, why does the trim still cut but the next seam unthread at the start?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 14：停车剪线时间、发令角与回针转速的设计",
+   "Assignment 14: designing stop-and-trim time, command angle and backtack speed"
+  ],
+  "tasks": [
+   [
+    "平缝机以 3500 r/min 缝纫，停车剪线时以 2650 rad/s² 减速到剪线转速，剪线那一针从 0° 到剪断转过 415°，剪断后以 4400 rad/s² 停车。分别算出剪线转速为 250 r/min 和 400 r/min 时一次停车剪线的时间；每个操作工每天剪线 2500 次，两者一天相差多少分钟？",
+    "A lockstitch machine sews at 3500 r/min; to stop and trim it decelerates at 2650 rad/s² to trimming speed, the trimming stitch turns 415° from 0° to the cut, and after the cut it stops at 4400 rad/s². Calculate the stop-and-trim time for trimming speeds of 250 and 400 r/min; with 2500 trims per operator per day, how many minutes per day separate them?"
+   ],
+   [
+    "剪线转速 450 r/min，直接驱动动刀，电磁铁延迟 6–9 ms，进刀窗口 300°–330°。求发令角的允许范围并选定一个值。若使用一段时间后电压偏低、延迟变成 5–13 ms，你选的发令角还能保证每次进刀都在窗口内吗？如不能，应改成多少？说明理由。",
+    "Trimming at 450 r/min with a directly driven knife, solenoid delay 6–9 ms, entry window 300°–330°. Find the allowed range of command angles and choose a value. If after some time a low voltage makes the delay 5–13 ms, does your chosen angle still keep every entry inside the window? If not, what should it become? Explain."
+   ],
+   [
+    "送布牙空闲角 211.6°，留 10° 余量。分别求倒缝电磁铁延迟 16 ms 和送布步进电机延迟 5 ms 时的回针转速上限；说明为什么电子送布机型的起缝回针默认转速仍可能只有 1800 sti/min。",
+    "The feed dog's idle angle is 211.6° with a 10° margin. Find the backtack speed limits for a reverse-feed solenoid with a 16 ms delay and a feed stepper with a 5 ms delay; explain why an electronic-feed machine may still default to only 1800 sti/min for start backtack."
+   ],
+   [
+    "（讨论）14.7 节说过梗时“降低转速、加大压脚压力、改变面线张力”。结合第 3、5、6、7 章，分别说明这三项调整针对哪一种故障、调整方向和可能的副作用。",
+    "(Discussion) Section 14.7 says that at a cross seam the machine should lower speed, raise presser-foot pressure and change needle-thread tension. Drawing on Chapters 3, 5, 6 and 7, state which fault each adjustment addresses, its direction and possible side effects."
+   ]
+  ],
+  "deliverable": [
+   "2–4 页计算报告（PDF），含公式、代入过程和结果（可附 Python 脚本），以及虚拟实验 14-1 三个任务完成状态和任务 2 时刻表的截图。",
+   "A 2–4 page calculation report (PDF) with formulas, substitutions and results (optionally a Python script), plus screenshots of the three task states and the Task 2 timing chart in Virtual lab 14-1."
+  ],
+  "rubric": [
+   [
+    "停车剪线时间分段计算正确（25 分）",
+    "Stop-and-trim time computed correctly by stage (25 points)"
+   ],
+   [
+    "发令角范围、选值和延迟漂移后的判断正确、理由充分（30 分）",
+    "Command-angle range, choice and drift check correct and well argued (30 points)"
+   ],
+   [
+    "回针转速上限正确，能说出延迟以外的限制（20 分）",
+    "Backtack limits correct, with limits beyond delay identified (20 points)"
+   ],
+   [
+    "讨论题与相关章节原理一致（20 分）",
+    "Discussion consistent with the related chapters (20 points)"
+   ],
+   [
+    "报告规范、单位齐全（5 分）",
+    "Report tidy, units complete (5 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "numerical",
+   "text": [
+    "送布牙空闲角 211.6°，留 10° 余量。倒缝执行器延迟 12 ms 时，回针转速最高是多少 r/min？",
+    "The feed dog's idle angle is 211.6° with a 10° margin. With a reverse-feed actuator delay of 12 ms, what is the maximum backtack speed in r/min?"
+   ],
+   "answer": 2800,
+   "tolerance": 30,
+   "unit": "r/min",
+   "feedback": [
+    "回针转速上限 n_max = (211.6 − 10)/(6 × 0.012) = 201.6 ÷ 0.072 = 2800 r/min。",
+    "n_max = (211.6 − 10)/(6 × 0.012) = 201.6 ÷ 0.072 = 2800 r/min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "剪线转速 500 r/min，在 285° 给剪线电磁铁发令，延迟 6–10 ms。动刀最晚在多少度进刀？",
+    "Trimming at 500 r/min, the solenoid is commanded at 285° with a 6–10 ms delay. At what angle does the knife enter at the latest?"
+   ],
+   "answer": 315,
+   "tolerance": 1,
+   "unit": "°",
+   "feedback": [
+    "最晚进刀角 = 285 + 6 × 500 × 0.010 = 315°，在 300°–330° 窗口内；最早为 303°。",
+    "Latest entry = 285 + 6 × 500 × 0.010 = 315°, inside 300°–330°; the earliest is 303°."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "剪线电磁铁的延迟在 7–12 ms 之间变化，进刀窗口宽 30°。只看进刀窗口这一条限制，剪线转速最高是多少 r/min？",
+    "The trimming solenoid's delay varies between 7 and 12 ms, and the entry window is 30° wide. Considering only the window limit, what is the maximum trimming speed in r/min?"
+   ],
+   "answer": 1000,
+   "tolerance": 10,
+   "unit": "r/min",
+   "feedback": [
+    "n ≤ 30/[6 × (0.012 − 0.007)] = 1000 r/min。决定上限的是延迟的波动 5 ms，而不是延迟本身。",
+    "n ≤ 30/[6 × (0.012 − 0.007)] = 1000 r/min. It is the 5 ms spread, not the delay itself, that sets the limit."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "剪断发生在 55°，主轴必须在 96.7° 前停住。若伺服的最大减速度为 3500 rad/s²，剪线转速最高是多少 r/min？",
+    "The cut happens at 55° and the shaft must stop before 96.7°. If the servo's maximum deceleration is 3500 rad/s², what is the maximum trimming speed in r/min?"
+   ],
+   "answer": 682,
+   "tolerance": 8,
+   "unit": "r/min",
+   "feedback": [
+    "停车所需转角 Δφ = 41.7° = 0.728 rad，ω² = 2αΔφ = 2 × 3500 × 0.728，ω ≈ 71.4 rad/s ≈ 682 r/min。",
+    "ω² = 2αΔφ = 2 × 3500 × 0.728 rad, ω ≈ 71.4 rad/s ≈ 682 r/min."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "剪线时面线没剪断、底线剪断了。对直接驱动动刀的机器，最可能的原因是：",
+    "After trimming the needle thread is uncut but the bobbin thread is cut. On a machine with a directly driven knife, the most likely cause is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "动刀进刀太早，线环还没被梭带到刀的路径上",
+      "The knife entered too early, before the loop reached its path"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "夹线器没有松开",
+      "The tension assembly did not open"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "拨线器没有动作",
+      "The wiper did not act"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "主轴停在上针位停早了",
+      "The shaft stopped too early at needle-up"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "进刀早了，挂不住连布的那根面线，只剪断底线；进刀太晚则线环已被拉走，同样剪不断。松线和拨线影响的是下一道起缝。",
+    "Too early, the knife misses the fabric-side needle thread and cuts only the bobbin thread; too late, the loop is gone. Release and wiping affect the next start."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "剪线时要让夹线器在 335°–下一转 55° 松开，主要是为了：",
+    "The tension assembly is opened from 335° to 55° of the next revolution during trimming mainly so that:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "挑线杆收的线从线团一侧抽出，针眼外的线头留得够长",
+      "The thread taken up comes from the spool side, leaving a long enough end beyond the eye"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "让动刀更容易剪断面线",
+      "The knife can cut the needle thread more easily"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "减小主轴停车时的负载",
+      "The load on the shaft during stopping is reduced"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "让底线在布底收紧",
+      "The bobbin thread tightens under the fabric"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "不松线，挑线杆只能从线头那边抽线，留头太短，下一道起缝时容易脱线。",
+    "Without release, the lever draws from the end side, leaving too short an end, and the next seam tends to unthread."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "剪线发令角可以按转速和延迟的平均值自动提前，所以真正限制剪线转速的是延迟的波动范围，而不是延迟的平均值。",
+    "The trimming command angle can be advanced automatically from speed and mean delay, so what really limits trimming speed is the spread of the delay, not its mean."
+   ],
+   "correct": true,
+   "feedback": [
+    "平均延迟可以提前补偿，波动只能装进 30° 窗口：6n(t_max − t_min) ≤ 30°。所以让延迟稳定比让它更短更重要。",
+    "The mean is compensated by advancing the command; the spread must fit the 30° window: 6n(t_max − t_min) ≤ 30°. Consistency matters more than speed."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "电子送布（步进电机驱动针距调节）能做到而机械送布做不到的是：",
+    "Which of these can electronic feed (stepper-driven stitch regulation) do that mechanical feed cannot?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "一道缝里按程序逐段改变针距",
+      "Change stitch length section by section within a seam under program control"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "按条格间距设定针数，对条对格",
+      "Set stitch counts to the stripe repeat to match stripes and checks"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "在送布牙推布的过程中随时改变针距",
+      "Change stitch length at any moment while the feed dog is pushing"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "单独调整回针第一针和最后一针，做回针补偿",
+      "Adjust the first and last backtack stitches separately for compensation"
+     ],
+     "correct": true
+    }
+   ],
+   "feedback": [
+    "改针距和换向一样必须在送布牙沉到针板下的空闲角里完成，不能在推布时改；其余三项都是电子送布带来的。",
+    "Changing length, like reversing, must occur in the idle angle with the feed dog below the plate, never while pushing; the other three are enabled by electronic feed."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "电子夹线器预张力 15 cN，夹线盘摩擦系数 0.25，每安培夹紧力 3 N（线性）。电流 0.8 A 时面线张力是多少 cN？",
+    "An electronic tension assembly has a pretension of 15 cN, disc friction coefficient 0.25 and a clamping force of 3 N per ampere (linear). What is the needle-thread tension at 0.8 A, in cN?"
+   ],
+   "answer": 135,
+   "tolerance": 2,
+   "unit": "cN",
+   "feedback": [
+    "T = 15 cN + 2 × 0.25 × (3 × 0.8) N = 15 cN + 1.2 N = 135 cN。注意 1 N = 100 cN。",
+    "T = 15 cN + 2 × 0.25 × (3 × 0.8) N = 15 cN + 1.2 N = 135 cN; note 1 N = 100 cN."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "回针时送布方向必须在送布牙沉到针板以下的空闲角里切换，否则：",
+    "The feed direction for backtacking must be switched in the idle angle with the feed dog below the plate, because otherwise:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "这一针既不是正向也不是反向，回针针迹对不齐",
+      "That stitch is neither forward nor reverse, and the backtack does not line up"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "送布牙会撞到机针",
+      "The feed dog hits the needle"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "剪线电磁铁会提前动作",
+      "The trimming solenoid fires early"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "主轴必须停车",
+      "The shaft must stop"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "送布牙在针板上面时正在推布，此时换向会得到一个不确定的针距。",
+    "Above the plate the feed dog is pushing the fabric; reversing then yields an undefined stitch length."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "平缝机从 3000 r/min 停车剪线：以 2500 rad/s² 减速到 250 r/min，剪线那一针从 0° 到剪断转 415°，剪断后以 4400 rad/s² 停车。整个过程约多少秒？",
+    "A lockstitch machine stops and trims from 3000 r/min: it decelerates at 2500 rad/s² to 250 r/min, the trimming stitch turns 415° to the cut, and it then stops at 4400 rad/s². About how many seconds does the whole process take?"
+   ],
+   "answer": 0.398,
+   "tolerance": 0.01,
+   "unit": "s",
+   "feedback": [
+    "减速 (314.2 − 26.2)/2500 ≈ 0.115 s；剪线一针 415/(6 × 250) ≈ 0.277 s；停车 26.2/4400 ≈ 0.006 s；合计约 0.40 s。",
+    "Deceleration (314.2 − 26.2)/2500 ≈ 0.115 s; trimming stitch 415/(6 × 250) ≈ 0.277 s; stop 26.2/4400 ≈ 0.006 s; total about 0.40 s."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "剪线转速 350 r/min，电磁铁延迟 6–9 ms，进刀窗口 300°–330°。取允许发令角范围的中点作为发令角，应为多少度？",
+    "Trimming at 350 r/min, solenoid delay 6–9 ms, entry window 300°–330°. Taking the midpoint of the allowed command range, what command angle should be used?"
+   ],
+   "answer": 299.3,
+   "tolerance": 1,
+   "unit": "°",
+   "feedback": [
+    "最早条件 φ ≥ 300 − 6 × 350 × 0.006 = 287.4°；最晚条件 φ ≤ 330 − 6 × 350 × 0.009 = 311.1°；中点约 299.3°。",
+    "Earliest: φ ≥ 300 − 6 × 350 × 0.006 = 287.4°; latest: φ ≤ 330 − 6 × 350 × 0.009 = 311.1°; midpoint about 299.3°."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "一个车间有很多短缝（每道 20–40 针）。想提高产量，最有效的电控改进是：",
+    "A floor sews many short seams (20–40 stitches each). The most effective control improvement for output is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "缩短加减速和停车剪线时间",
+      "Shorten acceleration, deceleration and stop-and-trim time"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "把最高缝纫转速从 4000 提到 5000 r/min",
+      "Raise top speed from 4000 to 5000 r/min"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "取消慢起针以外的所有限制",
+      "Remove every limit other than soft start"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "把剪线转速降到 200 r/min",
+      "Lower trimming speed to 200 r/min"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "40 针的一道缝约 1.36 s，以最高转速缝纫的时间不到三成；短缝越多，慢起针和停车剪线的占比越大，提高最高转速几乎没有意义。",
+    "A 40-stitch seam takes about 1.36 s, under 30% at top speed; with short seams, soft start and stop-and-trim dominate, so a higher top speed barely helps."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "慢起针的主要目的是防止起缝时挑线杆把针眼里很短的面线头抽出来，并避免底线在布底绕成线团。",
+    "Soft start mainly prevents the take-up lever from pulling the short needle-thread end out of the eye at the start of a seam, and avoids bobbin thread tangling under the fabric."
+   ],
+   "correct": true,
+   "feedback": [
+    "剪线后针眼里只留几厘米线头，底线也刚剪断；前几针转速太高，挑线杆一拉就可能脱线。",
+    "After trimming only a few centimetres remain in the eye and the bobbin thread was just cut; if the first stitches are too fast the lever can unthread the needle."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "过梗时一台电控平缝机可以利用哪些信号感知布料变厚？",
+    "At a cross seam, which signals can an electronic lockstitch machine use to sense that the fabric has become thicker?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "压脚杆上的位移传感器",
+      "A displacement sensor on the presser bar"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "主轴伺服电机的电流",
+      "The spindle servo motor's current"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "断线检测器的脉冲",
+      "Pulses from the thread-break detector"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "底线余量检测的反光信号",
+      "The reflective signal of bobbin-thread detection"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "布变厚把压脚顶高，位移传感器立即反映；刺穿厚层阻力矩增大，由 T = k_t·i_q 可知电流增大。断线和底线检测与厚度无关。",
+    "Thicker fabric lifts the foot, seen at once by the displacement sensor; piercing more plies raises resisting torque and, by T = k_t·i_q, the current. Thread-break and bobbin detection do not measure thickness."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "停车剪线的时间构成；回针空闲角与转速上限；剪线四条判据与发令角计算；剪线转速的两条上限。",
+   "Components of stop-and-trim time; backtack idle angle and speed limit; the four trimming criteria and command-angle calculation; the two limits on trimming speed."
+  ],
+  "difficult": [
+   "理解“平均延迟可补偿、延迟波动只能降速容纳”；把剪线过程中线环、动刀、挑线杆、夹线器的动作对应到同一张时刻表上。",
+   "Understanding that mean delay can be compensated while delay spread can only be absorbed by lower speed; mapping loop, knife, take-up lever and tension assembly onto one timing chart."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Introduction"
+    ],
+    "minutes": 15,
+    "content": [
+     "播放或描述松开脚踏的半秒钟，提出车间问题：剪线转速提到 500 r/min 值不值。",
+     "Describe the half-second after the pedal is released; pose the floor problem of raising trimming speed to 500 r/min."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：工作周期与速度曲线",
+     "Lecture: cycle and speed profile"
+    ],
+    "minutes": 30,
+    "content": [
+     "状态机、时间账、慢起针与加减速、短缝的时间构成。",
+     "State machine, time budget, soft start and acceleration, time composition of short seams."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：自动回针",
+     "Lecture: automatic backtack"
+    ],
+    "minutes": 20,
+    "content": [
+     "空闲角、回针转速上限、回针补偿。",
+     "Idle angle, backtack speed limit, backtack compensation."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：剪线时序",
+     "Lecture: trimming sequence"
+    ],
+    "minutes": 40,
+    "content": [
+     "剪线器结构与过程、四条判据、发令提前、两条转速上限；课堂算例。",
+     "Trimmer construction and process, four criteria, early command, two speed limits; worked examples."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 14-1",
+     "Virtual lab 14-1"
+    ],
+    "minutes": 35,
+    "content": [
+     "完成三个任务并填写表 14-1，回到导入问题核对答案。",
+     "Complete the three tasks and Table 14-1; check the opening problem's answer."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：电子送布、电子张力与案例",
+     "Lecture: electronic feed, tension and case"
+    ],
+    "minutes": 25,
+    "content": [
+     "电子针距、电子夹线器算例、压脚压力、过梗自动适应。",
+     "Electronic stitch length, tension-assembly example, foot pressure, adapting at cross seams."
+    ]
+   },
+   {
+    "phase": [
+     "测验与小结",
+     "Quiz and summary"
+    ],
+    "minutes": 15,
+    "content": [
+     "课堂测验、讲评、小结与布置作业。",
+     "Quiz, review, summary and assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业 14；预习第 15 章“机针在布中时模板不能动”。",
+   "Complete Assignment 14; preview Chapter 15, “the template must not move while the needle is in the fabric”."
+  ]
+ }
+}

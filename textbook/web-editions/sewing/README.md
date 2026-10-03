@@ -29,3 +29,7 @@ CI（`.github/workflows/deploy.yml` 的 `webeditions` 任务）构建到 `textbo
 - 改正文：改 `src/zh/chNN.html`（英文同步改 `src/en/chNN.html`），推送 main 即上线。
 - 加插图：图片转成 WebP 放 `img/`（英文版放 `img/en/`，同名），正文里照旧写 `img/名字.png`，构建时自动换成 `.webp`；英文页有英文图时自动用英文图。
 - 章节编号、篇名：改 `book.py`。
+
+## 课程包（第 16 轮）
+
+`course/`：由本书开成的问渠机器人学院课程（31 讲）。`course/lessons/chNN.json` 是每讲内容（格式 `course/FORMAT.md`），`course/tools/check.py all` 检查，`course/tools/build_course.py <输出目录>` 生成讲义、课件、实验指导书、测验与发布清单。CI 生成到 `textbook/build/sewing/course/`，管理员在平台“管理 → 课程包”发布。说明见 `docs/帮助/从课程包建课.md`。

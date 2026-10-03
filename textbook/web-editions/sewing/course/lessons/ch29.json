@@ -1,0 +1,1153 @@
+{
+ "no": 29,
+ "title": [
+  "典型服装工厂",
+  "Typical Garment Factories"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能用“产品结构—面料—批量”三个问题解释西服、衬衫、T 恤、毛衫和小单快反五类工厂为什么组织方式不同。",
+   "Explain, using the three questions of product structure, fabric and batch size, why suit, shirt, T-shirt, sweater and small-batch quick-response factories are organised differently."
+  ],
+  [
+   "能由标准工时和目标产量算出节拍、理论人数，并比较逐道配置与按机种合并的人数和平衡率。",
+   "Calculate takt time and the theoretical number of operators from standard minutes and target output, and compare headcount and balance efficiency for one-operator-per-operation versus grouping by machine type."
+  ],
+  [
+   "能用利特尔法则由在制品和产量算出平均生产周期，说明单件流和吊挂为什么交期短。",
+   "Use Little's law to calculate average throughput time from work in progress and output, and explain why one-piece flow and hanger systems give short lead times."
+  ],
+  [
+   "能用换款学习曲线模型算出某一批量下长流水线和 U 型单元的每件人工，并找出分界批量的影响因素。",
+   "Use the style-change learning-curve model to calculate labour per piece for a long line and a U-shaped cell at a given batch size, and identify what moves the break-even batch."
+  ],
+  [
+   "能算出口袋机、全成型横机等设备替代人工的工时账，并说明设备选型要看哪些数据。",
+   "Work out the labour account for equipment such as a pocket setter or whole-garment flat knitting machine, and state which data equipment selection depends on."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "一条 T 恤线要配几个人？",
+   "How many operators does a T-shirt line need?"
+  ],
+  "text": [
+   "一家 T 恤厂接到一张基本款圆领短袖 T 恤的大单，目标产量每小时 200 件。工艺员列出了 16 道工序，标准工时合计 5.841 分：包缝 1.863 分、绷缝 1.506 分、平缝 1.334 分、手工 1.138 分，最长的一道是合侧缝 0.655 分，最短的平缝工序领罗纹接头 0.299 分。车间主任想按“一人一道工序、每道按 SMV ÷ 节拍向上取整”配人。",
+   "A T-shirt factory has a large order for a basic crew-neck short-sleeved T-shirt, with a target output of 200 pieces per hour. The process engineer has listed 16 operations totalling 5.841 standard minutes: overlock 1.863 min, coverstitch 1.506 min, lockstitch 1.334 min, manual 1.138 min; the longest single operation is closing the side seams at 0.655 min, and joining the neck rib on the lockstitch takes 0.299 min. The floor manager wants to staff it one operator per operation, rounding SMV ÷ takt up for each operation."
+  ],
+  "question": [
+   "节拍是多少？理论上至少要几个人？逐道配置要几个人、平衡率多少？如果把同机种的工序合并给一组人，各组配几人、总人数和平衡率是多少？",
+   "What is the takt time? What is the theoretical minimum headcount? How many operators and what balance efficiency does one-per-operation give? If operations on the same machine type are pooled in groups, how many go in each group, and what are the total headcount and balance efficiency?"
+  ],
+  "answer": [
+   "节拍 = 60 ÷ 200 = 0.30 分 = 18 秒；理论人数 5.841 ÷ 0.30 = 19.5，至少 20 人。逐道配置共 27 人，瓶颈是 1 人做的领罗纹接头（0.299 分），平衡率 = 5.841 ÷ (27 × 0.299) ≈ 72%。按机种合并：包缝 6.2 → 7 人、绷缝 5.02 → 5 人、平缝 4.45 → 5 人、手工 3.8 → 4 人，共 21 人，平衡率约 92%，同样产量少用 6 人。",
+   "Takt = 60 ÷ 200 = 0.30 min = 18 s; theoretical headcount 5.841 ÷ 0.30 = 19.5, so at least 20. One operator per operation needs 27 people; the bottleneck is neck-rib joining with 1 person (0.299 min), balance efficiency = 5.841 ÷ (27 × 0.299) ≈ 72%. Grouping by machine type: overlock 6.2 → 7, coverstitch 5.02 → 5, lockstitch 4.45 → 5, manual 3.8 → 4, total 21, balance efficiency about 92% — the same output with 6 fewer people."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人工作站的节拍与派工",
+   "Takt and dispatching in robot work cells"
+  ],
+  "text": [
+   "汽车焊装线上几台机器人串成一条线，每个机器人工位的循环时间都必须不超过节拍，超出的那一台就是瓶颈，这和 T 恤线的平衡图是同一张图。工位循环时间不能是“半台机器人”，所以机器人线同样有取整损失，常用的办法也是把相近的作业合并给一台机器人。仓库里的移动机器人（AMR）车队按“队列最短的工位”派单，正是吊挂系统按工位空闲派衣架的规则；料箱缓冲区里的在制品、产量和停留时间同样满足利特尔法则。多机器人协作里的“接力区”思想也被用来让快慢不同的机器人自动分配任务段。",
+   "On a car body-welding line several robots work in series, and the cycle time of every robot station must not exceed takt; the one that does is the bottleneck — the same picture as the T-shirt balance chart. A station cannot have 'half a robot', so robot lines suffer the same rounding loss, and the usual remedy is again to combine similar tasks on one robot. A fleet of autonomous mobile robots (AMRs) in a warehouse dispatches each job to the station with the shortest queue, exactly the hanger system's rule of sending hangers to idle work centres; the work in progress, throughput and dwell time in a tote buffer obey Little's law too. The bucket-brigade idea is also used to let robots of different speeds share task segments automatically."
+  ]
+ },
+ "life": {
+  "title": [
+   "食堂排队里的利特尔法则",
+   "Little's law in the canteen queue"
+  ],
+  "text": [
+   "食堂窗口前排着 30 个人，打饭速度每分钟 2 人，你大约要等 30 ÷ 2 = 15 分钟。想少等，要么加窗口（提高产量），要么少排人（压低在制品），这和车间压捆、压在制品缩短交期是同一个道理。",
+   "Thirty people are queuing at a canteen counter that serves 2 people per minute, so you will wait about 30 ÷ 2 = 15 minutes. To wait less, either open another counter (raise output) or shorten the queue (cut work in progress) — the same logic as cutting bundle size and work in progress on the shop floor to shorten lead time."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "同样做衣服，工厂为什么不一样",
+    "They all make clothes — why do the factories differ?"
+   ],
+   "points": [
+    [
+     "产品结构：西服 300 多道工序，T 恤十几道，毛衫衣片是织出来的",
+     "Product structure: a suit has 300+ operations, a T-shirt a dozen or so, sweater panels are knitted"
+    ],
+    [
+     "面料：针织布弹、卷边，离不开包缝和绷缝；西服靠粘衬和熨烫塑形",
+     "Fabric: stretchy, curling knits need overlock and coverstitch; suits are shaped by fusing and pressing"
+    ],
+    [
+     "批量：五万件还是一百件，决定排长线还是 U 型单元、买不买专用自动机",
+     "Batch size: 50 000 or 100 pieces decides long line or U-cell, and whether a dedicated automatic machine pays"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_22_flows.png",
+   "narration": [
+    "前面二十八章我们一直在看一台台机器，这一讲把镜头拉远，走进五类工厂。大家看这张图，五行分别是定制西服、衬衫、T 恤、毛衫和小单快反，彩色框是各自最有特点的环节。为什么它们长得不一样？就三个原因：产品结构决定有多少道工序，面料决定用什么线迹、什么机器，批量决定产线怎么组织。记住这条主线：产品决定工序，工序决定设备，批量决定组织。后面每一节都按这个顺序讲。",
+    "For twenty-eight chapters we have looked at machines one at a time; in this lecture we pull the camera back and walk into five kinds of factory. In this figure the five rows are made-to-measure suits, shirts, T-shirts, sweaters and small-batch quick response, and the coloured boxes are each one's most characteristic step. Why do they look so different? Three reasons only: the product structure decides how many operations there are, the fabric decides which stitches and machines are used, and the batch size decides how the line is organised. Remember the thread: the product determines the operations, the operations determine the equipment, the batch size determines the organisation. Every section follows that order."
+   ]
+  },
+  {
+   "title": [
+    "定制西服：数据先行，实物单件流",
+    "Made-to-measure suits: data first, one-piece material flow"
+   ],
+   "points": [
+    [
+     "3D 量体约 7 秒采集 19 个部位 22 项尺寸，一张订单驱动近一万个数据变化",
+     "A 3D scanner captures 22 measurements at 19 body locations in about 7 s; one order changes nearly 10 000 data items"
+    ],
+    [
+     "输出三样：排料文件、吊挂工序路线、每个工位的工艺说明",
+     "Three outputs: a marker file, a hanger operation route, and instructions for every work centre"
+    ],
+    [
+     "单量单裁，衣片挂上吊挂并配 RFID 标签，工人刷卡看到这一件的要求",
+     "One measurement, one cut; panels hang on a hanger with an RFID tag, and the operator swipes it to see this piece's requirements"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_22_mtm.png",
+   "narration": [
+    "西服最难的不是工序多，而是每一件都不一样。传统的捆扎流水把十到三十件同尺寸的衣片扎成一捆，捆里各不相同，这套办法就崩了。所以定制工厂把流程分成两排：上排是数据，量体数据进入版型、工艺、物料数据库，生成排料文件、工序路线和工艺说明；下排是实物，单层裁剪，挂上吊挂，配一张电子标签。工人刷一下卡，屏幕上就显示这件要加长 1.5 厘米的袖子还是绣字。公开报道的交期是 6 到 7 个工作日。",
+    "The hard thing about suits is not the number of operations but that every piece is different. The bundle system ties ten to thirty same-size sets into a bundle; once the pieces in a bundle all differ, it collapses. So a made-to-measure factory splits the flow into two rows. The upper row is data: measurements go into the pattern, process and materials databases, which produce the marker file, the operation route and the instructions. The lower row is material: single-ply cutting, then onto a hanger with an RFID tag. The operator swipes the card and the screen says whether this one needs a sleeve 1.5 cm longer or embroidered initials. Press reports give 6 to 7 working days from measurement to dispatch."
+   ]
+  },
+  {
+   "title": [
+    "吊挂认路与绱袖分段缩缝",
+    "How the hanger finds its way, and segmented sleeve easing"
+   ],
+   "points": [
+    [
+     "支轨入口读卡：本工位做下一道且有空位才拨入，还能优先派给空闲工位",
+     "A reader at each branch rail: the hanger is switched in only if this station does the next operation and has room; idle stations get priority"
+    ],
+    [
+     "袖山比袖窿长，多出的长度要“吃”进去，顶部多、袖底几乎不缩",
+     "The sleeve cap is longer than the armhole; the extra is eased in, mostly at the top, almost none at the underarm"
+    ],
+    [
+     "绱袖机上下两套送布分别设定，99 个程序 × 30 段，和差动送布同一道理",
+     "The sleeve setter sets upper and lower feed separately, 99 programs × 30 steps — the same idea as differential feed"
+    ]
+   ],
+   "formula": "\\text{平均缩缝率}=\\frac{3\\ \\text{cm}}{47\\ \\text{cm}}\\approx 6.4\\%",
+   "figure": "",
+   "narration": [
+    "吊挂系统怎么认路？每个工位前有一段支轨，入口装读卡器。衣架经过时读出编号，系统查它的下一道工序，这个工位做这道、支轨上还有空位，就打开进站阀拨进来。系统知道每个工位排了几件，所以能优先派给空闲的人，这就是动态平衡。再看绱袖：袖山比袖窿长 3 厘米、袖窿 47 厘米，平均缩缝率约 6.4%，而且要分段，顶部多吃，袖底几乎不吃。绱袖机用上下两套送布分别设定送布量，和第 9 章差动送布是一个道理，只是推的是上下两层。",
+    "How does a hanger system find its way? In front of each station is a branch rail with a reader at its mouth. As a hanger passes, its number is read and the system looks up its next operation; if this station does that operation and the branch has room, the gate opens and pulls it in. Because the system knows the queue at every station, it can favour idle operators — that is dynamic balancing. Now sleeves: if the cap is 3 cm longer than a 47 cm armhole, the average ease is about 6.4%, and it must be segmented — lots at the top, almost none at the underarm. The sleeve setter sets upper and lower feed amounts separately; it is the differential feed of Chapter 9, except that it pushes two plies, upper and lower."
+   ]
+  },
+  {
+   "title": [
+    "利特尔法则：为什么单件流交期短",
+    "Little's law: why one-piece flow is fast"
+   ],
+   "points": [
+    [
+     "平均生产周期 = 在制品 ÷ 产量，适用于任何稳定运行的系统",
+     "Average throughput time = WIP ÷ output, for any system in steady operation"
+    ],
+    [
+     "西服线 30 套/时：在制品 1500 套 → 50 小时；300 套 → 10 小时",
+     "Suit line at 30 suits/h: WIP 1500 → 50 h; WIP 300 → 10 h"
+    ],
+    [
+     "衬衫线捆从 10 件增到 70 件，在制品 1995 → 13560 件，周期 0.61 → 4.16 天",
+     "Shirt line, bundle 10 → 70 pieces: WIP 1995 → 13 560, throughput time 0.61 → 4.16 days"
+    ]
+   ],
+   "formula": "\\text{平均生产周期}=\\frac{\\text{在制品数量}}{\\text{产量}}",
+   "figure": "",
+   "narration": [
+    "这一页的公式很简单，却特别有用，叫利特尔法则：平均生产周期等于在制品除以产量。一条西服线每小时做 30 套，线上压着 1500 套，一套衣服平均要在线上待 50 个小时；把在制品压到 300 套，只要 10 个小时。捆扎流水的在制品天生多，每个工位前至少压一两捆，一捆几十件。有研究发现，捆从 10 件加到 70 件，周期从 0.61 天变成 4.16 天。单件流加吊挂限制挂位，把在制品压到“人数乘挂位”的量级，交期自然就短了。",
+    "The formula on this slide is simple but extremely useful: Little's law, average throughput time equals work in progress divided by output. A suit line makes 30 suits an hour; with 1500 suits on the line, a suit spends 50 hours there on average; cut WIP to 300 and it is only 10 hours. A bundle line naturally carries a lot of WIP — at least a bundle or two in front of every station, dozens of pieces each. One study found that growing the bundle from 10 to 70 pieces stretched throughput time from 0.61 to 4.16 days. One-piece flow plus limited hanger places pushes WIP down to 'operators times places', so lead time falls automatically."
+   ]
+  },
+  {
+   "title": [
+    "衬衫：工时花在小部件上",
+    "Shirts: the work content is in the small parts"
+   ],
+   "points": [
+    [
+     "41 道缝制工序合计约 22.3 分（未含锁眼钉扣）",
+     "41 sewing operations, about 22.3 standard minutes in total (excluding buttonholing and button sewing)"
+    ],
+    [
+     "领 3.62、袖头 3.85、袖衩 2.21 分：三种小部件占 43%，全部部件占 66%，组装只占 34%",
+     "Collar 3.62, cuffs 3.85, plackets 2.21 min: these three take 43%, all parts 66%, assembly only 34%"
+    ],
+    [
+     "布局：五条部件线汇入组装线",
+     "Layout: five parts lines feed one assembly line"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_22_shirt.png",
+   "narration": [
+    "衬衫看上去简单，拆开是一堆小部件：领面、领底、领座、两只袖头、两条袖衩、门襟、口袋、过肩。一份公开工序表列了 41 道缝制工序，合计约 22.3 分。按部件一归类就很有意思：领子、袖头、袖衩三样就占了 43%，所有部件加起来占 66%，真正组装成一件衣服只占 34%。所以车间平面是这样的：五条部件线各自做完，再汇进组装线。衬衫厂的效率，很大程度上是在部件上做出来的，这也决定了自动化从哪里下手。",
+    "A shirt looks simple, but take it apart and it is a pile of small parts: top collar, under-collar, stand, two cuffs, two plackets, front placket, pocket and yoke. One public breakdown lists 41 sewing operations totalling about 22.3 minutes. Group them by part and it gets interesting: collar, cuffs and plackets alone take 43%, all the parts together 66%, and actually assembling the shirt only 34%. So the floor looks like this: five parts lines each finish their parts and feed the assembly line. A shirt factory's efficiency is largely won on the parts, and that also decides where automation starts."
+   ]
+  },
+  {
+   "title": [
+    "小部件自动单元：一台口袋机顶几个人",
+    "Automatic units for small parts: how many people does a pocket setter replace?"
+   ],
+   "points": [
+    [
+     "小部件小而平、形状固定、重复多、对质量最敏感，最适合模板 + X–Y",
+     "Small parts are small, flat, fixed in shape, highly repetitive and quality-sensitive — ideal for clamp + X–Y table"
+    ],
+    [
+     "手工：扣烫 0.542 + 贴袋 0.861 ≈ 1.40 分；口袋机 8 小时 2400 个 → 每个 0.20 分",
+     "By hand: press 0.542 + attach 0.861 ≈ 1.40 min; setter 2400 per 8 h → 0.20 min each"
+    ],
+    [
+     "140 件/时：手工 196 分钟/时 ≈ 3.3 人；机器 28 分钟/时，一台不到半负荷",
+     "At 140 shirts/h: hand work 196 min/h ≈ 3.3 people; machine 28 min/h, under half loaded"
+    ]
+   ],
+   "formula": "t_{\\text{机}}=\\frac{480\\times 60}{2400}=12\\ \\text{s}=0.20\\ \\text{min}",
+   "figure": "",
+   "narration": [
+    "为什么自动化先从小部件做起？小部件小而平，能整块放进模板定位；形状固定，一天重复几千次；而且领尖不对称、口袋歪了，顾客一眼就看出来。组装正相反，两片大而软的衣片边缝边转，至今主要靠人。我们算一笔账：手工做口袋扣烫加贴袋约 1.40 分；口袋机标称 8 小时 2400 个，每个 12 秒，也就是 0.20 分。线速 140 件每小时，手工要 196 分钟工时，约 3.3 个人；机器只要 28 分钟，一台不到半负荷。标称值要打折，但数量级不变。",
+    "Why does automation start with small parts? They are small and flat, so they can be located whole in a clamp; their shapes are fixed and repeated thousands of times a day; and a lopsided collar point or crooked pocket is seen at a glance. Assembly is the opposite: two large, limp panels turned while sewing, still done mainly by people. Let's do the sums. By hand, pressing plus attaching a pocket is about 1.40 minutes. The pocket setter is rated at 2400 per 8 hours — 12 seconds or 0.20 minutes each. At 140 shirts an hour, hand work needs 196 minutes of labour, about 3.3 people; the machine needs only 28 minutes, under half its capacity. The rating must be discounted, but the order of magnitude stands."
+   ]
+  },
+  {
+   "title": [
+    "T 恤：包缝与绷缝的世界",
+    "T-shirts: the world of overlock and coverstitch"
+   ],
+   "points": [
+    [
+     "针织布弹、卷边、切口脱散：合缝用四线包缝，卷边用绷缝，平缝只钉标和封结",
+     "Knit stretches, curls and ravels: seams in four-thread overlock, hems in coverstitch, lockstitch only for labels and tacks"
+    ],
+    [
+     "16 道工序，SMV = 观测周期 × 1.15，合计 5.841 分",
+     "16 operations; SMV = observed cycle × 1.15, total 5.841 min"
+    ],
+    [
+     "包缝 1.863 + 绷缝 1.506 分，两类机器承担 58% 工时",
+     "Overlock 1.863 + coverstitch 1.506 min: these two machine types carry 58% of the work"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "T 恤用的是圆机针织布，弹性大、布边会卷、切口会脱散，所以合肩、绱领、绱袖、合侧缝都用四线包缝，领口、袖口、下摆用绷缝，平缝机只钉商标、接罗纹、封结。教材的工序表有 16 道，标准工时是在公开的观测周期上加 15% 宽放得到的，合计 5.841 分。按机种一加：包缝 1.863 分，绷缝 1.506 分，两类机器占了 58% 的工时。所以包缝机故障多、差动调不好，整条线就被拖住，第 9 章那些间隙和定时在工厂里就是这个分量。",
+    "T-shirts use circular-knit fabric that stretches, curls at the edges and ravels at cut edges, so shoulders, neck rib, sleeves and side seams are four-thread overlock; neckline, sleeve hems and bottom hem are coverstitch; the lockstitch only attaches labels, joins rib and tacks. The book's table has 16 operations; standard minutes are the published observed cycles plus a 15% allowance, 5.841 minutes in total. Sum by machine type: overlock 1.863, coverstitch 1.506 — these two machine types carry 58% of the work. So if the overlockers break down or the differential is badly set, the whole line drags; that is the weight the clearances and timings of Chapter 9 carry in a factory."
+   ]
+  },
+  {
+   "title": [
+    "节拍与理论人数",
+    "Takt time and theoretical headcount"
+   ],
+   "points": [
+    [
+     "节拍：整条线平均多久必须交出一件",
+     "Takt: how often, on average, the line must deliver one piece"
+    ],
+    [
+     "200 件/时 → 0.30 分 = 18 秒",
+     "200 pieces/h → 0.30 min = 18 s"
+    ],
+    [
+     "理论人数 = ΣSMV ÷ 节拍 = 5.841 ÷ 0.30 = 19.5，至少 20 人",
+     "Theoretical headcount = ΣSMV ÷ takt = 5.841 ÷ 0.30 = 19.5, at least 20"
+    ]
+   ],
+   "formula": "T_{\\text{节拍}}=\\frac{60}{200}=0.30\\ \\text{min}=18\\ \\text{s},\\qquad N_{\\min}=\\frac{\\sum \\text{SMV}}{T_{\\text{节拍}}}",
+   "figure": "",
+   "narration": [
+    "排一条线，第一步算节拍。目标每小时 200 件，60 分钟除以 200，就是 0.30 分钟，也就是 18 秒，整条线平均每 18 秒必须交出一件。第二步算理论人数：全部工时 5.841 分除以节拍 0.30 分，等于 19.5，人不能是半个，所以至少 20 个人。注意，这是下限，前提是活能像水一样在人之间随便分。实际上每个人只能做某几道工序、只会用某种机器，所以真实人数总比它多。多多少，下一页看。",
+    "Step one in laying out a line is the takt time. The target is 200 pieces an hour; 60 minutes divided by 200 is 0.30 minutes, or 18 seconds — on average the line must hand over one piece every 18 seconds. Step two is the theoretical headcount: total work 5.841 minutes divided by 0.30 is 19.5; you cannot hire half a person, so at least 20. Note that this is a lower bound that assumes work can flow between people like water. In reality each person can only do certain operations on a certain machine, so the real number is always higher. How much higher, we see on the next slide."
+   ]
+  },
+  {
+   "title": [
+    "平衡率：逐道配置与按机种合并",
+    "Balance efficiency: one per operation versus grouping by machine"
+   ],
+   "points": [
+    [
+     "逐道向上取整：27 人，瓶颈领罗纹接头 0.299 分，平衡率 72%",
+     "Rounding each operation up: 27 people, bottleneck neck-rib joining at 0.299 min, 72% balance"
+    ],
+    [
+     "零头变成等活：合侧缝 2.18 人配 3 人，钉主唛 1.27 人配 2 人",
+     "Fractions become waiting: side seams need 2.18 people but get 3; main label 1.27 but gets 2"
+    ],
+    [
+     "按机种合并：包缝 7、绷缝 5、平缝 5、手工 4，共 21 人，平衡率 92%",
+     "Grouped by machine: overlock 7, coverstitch 5, lockstitch 5, manual 4 — 21 people, 92% balance"
+    ]
+   ],
+   "formula": "\\text{平衡率}=\\frac{\\sum \\text{SMV}}{\\text{人数}\\times\\text{瓶颈工位每人负荷}}",
+   "figure": "w_24804990.png",
+   "narration": [
+    "最直观的配人办法是一人一道工序，每道按 SMV 除以节拍向上取整，一共 27 人，比理论多 7 个。多在哪？合侧缝理论 2.18 个人，只能配 3 个；钉主唛 1.27 个人，只能配 2 个，每个零头都变成了等活。衡量这种浪费的指标叫平衡率：总工时除以人数乘瓶颈每人负荷。逐道配置时瓶颈是领罗纹接头 0.299 分，平衡率 72%。改成按机种合并，同一机种的几道工序一组人共担，21 人就够，平衡率 92%。看图，柱子离节拍线越远，等活越多。",
+    "The most obvious staffing is one operator per operation, rounding SMV over takt up for each: 27 people, 7 more than theory. Where do they come from? Side seams need 2.18 people and get 3; the main label needs 1.27 and gets 2; every fraction turns into waiting. The measure is balance efficiency: total work over headcount times the bottleneck load per person. One per operation, the bottleneck is neck-rib joining at 0.299 minutes, so 72%. Group by machine type — several operations on the same machine shared by one team — and 21 people suffice, at 92%. In the chart, the further a bar sits below the takt line, the more that person waits."
+   ]
+  },
+  {
+   "title": [
+    "仿真：找瓶颈、捆扎与吊挂",
+    "Simulation: finding the bottleneck, bundles versus hangers"
+   ],
+   "points": [
+    [
+     "资料原配置 22 人：瓶颈是 1 人的剪线头，产能上限 153 件/时；加 1 人升到约 170",
+     "Published 22-person set-up: bottleneck is thread trimming with 1 person, cap 153/h; one more person there gives about 170"
+    ],
+    [
+     "捆扎 20 件/捆、在制品 600 件：周期约 3.5 小时；捆 5 件、在制品 150：约 1 小时",
+     "Bundle line, 20 per bundle, WIP 600: about 3.5 h; bundle 5, WIP 150: about 1 h"
+    ],
+    [
+     "吊挂 + 按机种合并 21 人：约 190 件/时，在制品五十来件，周期不到 20 分钟",
+     "Hanger system, 21 grouped: about 190/h, fifty-odd pieces in progress, under 20 min"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "纸面上的 92% 到车间要打折扣，公开案例里 T 恤线的实际效率常常只有 40% 到 60%。虚拟实验 29-1 把这条线真的“开”起来，每件加工时间按 12% 的变异系数波动。公开资料的 22 人配置，瓶颈是只有一个人的剪线头，上限 153 件每小时；在那里加一个人，产量升到约 170，加在别处几乎没用。再比组织方式：捆扎流水在制品 600 件，一件衣服要走三个半小时；换成吊挂、按机种合并 21 人，约 190 件每小时，线上五十来件，周期不到 20 分钟。",
+    "The 92% on paper shrinks on the floor; in published cases real T-shirt lines often run at only 40 to 60%. Virtual lab 29-1 actually runs this line, with each piece's time varying with a 12% coefficient of variation. In the published 22-person set-up the bottleneck is thread trimming, staffed by one person, capping output at 153 an hour; add one person there and output rises to about 170, while adding elsewhere barely helps. Then compare organisation: a bundle line with 600 pieces in progress takes three and a half hours per garment; switch to hangers with 21 people grouped by machine and you get about 190 an hour, fifty-odd pieces on the line, under 20 minutes."
+   ]
+  },
+  {
+   "title": [
+    "毛衫：套口与全成型的工时账",
+    "Sweaters: the labour account of linking versus whole-garment"
+   ],
+   "points": [
+    [
+     "衣片在横机上织成形，靠套口机逐个对线圈连接：一人一天约 15 件，每件约 32 分",
+     "Panels are knitted to shape and linked loop by loop: about 15 pieces per linker per day, about 32 min each"
+    ],
+    [
+     "成型衣片：每件人工约 52 分，套口占六成；全成型：约 17 分，但占横机 30 分钟",
+     "Fully fashioned: about 52 min labour per piece, 60% of it linking; whole-garment: about 17 min, but 30 min of machine time"
+    ],
+    [
+     "日产 1000 件、开机 22 h：传统约 13 台横机 + 67 名套口工；全成型约 23 台",
+     "1000 pieces/day, 22 h running: conventional ≈ 13 machines + 67 linkers; whole-garment ≈ 23 machines"
+    ]
+   ],
+   "formula": "",
+   "figure": "w_7d16e7c0.png",
+   "narration": [
+    "毛衫和前面三类衣服根本不同：衣片不是裁的，是在横机上直接织成形的。连起来靠套口机，工人要把两片边缘的线圈一个一个套上针尖，一人一天只能套 15 件左右，平均每件约 32 分钟，是毛衫厂最费人的工序。全成型横机用四块针床直接织出整件，不用套口。算一笔账：成型衣片工艺每件人工约 52 分，全成型约 17 分；可是全成型一件要占横机 30 分钟，将近普通横机的两倍，机器还贵得多。哪个划算，要看工资、机价和款式，所以两种工艺常常并存。",
+    "Sweaters differ fundamentally from the other three: the panels are not cut but knitted to shape on the flat machine. Joining them takes a linking machine; the operator pushes the edge loops of two panels onto the points one by one, managing only about 15 pieces a day, around 32 minutes each — the most labour-hungry step in the factory. A whole-garment machine knits the complete sweater on four needle beds, no linking. The account: fully fashioned needs about 52 minutes of labour per piece, whole-garment about 17; but whole-garment occupies the machine for 30 minutes, nearly twice an ordinary machine, and the machine costs far more. Which pays depends on wages, machine prices and style — so factories often run both."
+   ]
+  },
+  {
+   "title": [
+    "换款的代价：停线与学习曲线",
+    "The cost of a style change: downtime and the learning curve"
+   ],
+   "points": [
+    [
+     "停线 C：重排机器、换线、换压脚、调针距和差动、试缝",
+     "Downtime C: rearranging machines, rethreading, changing feet, resetting stitch length and differential, test sewing"
+    ],
+    [
+     "学习：新款第一天效率 30.1%，长期 47.6%，r₀ ≈ 0.63，约 3τ 基本恢复",
+     "Learning: first-day efficiency 30.1% vs long-run 47.6%, r₀ ≈ 0.63; essentially recovered after about 3τ"
+    ],
+    [
+     "每件人工 = 60N(C + T_Q) ÷ Q，T_Q 由 Y(T_Q) = Q 解出",
+     "Labour per piece = 60N(C + T_Q) ÷ Q, with T_Q solved from Y(T_Q) = Q"
+    ]
+   ],
+   "formula": "E(t)=E_\\infty\\left[1-(1-r_0)\\,e^{-t/\\tau}\\right],\\quad Y(t)=\\frac{60N}{\\text{SAM}}E_\\infty\\left[t-(1-r_0)\\tau\\left(1-e^{-t/\\tau}\\right)\\right]",
+   "figure": "",
+   "narration": [
+    "小单快反的麻烦不在一天之内，而在换款上。换款有两块代价：一块是停线，机器要重排、换线、换压脚、调针距和差动、试缝，记作 C；另一块更隐蔽，是学习。孟加拉国的一项研究发现，新款上线第一天效率只有 30.1%，长期平均 47.6%，比值 r₀ 约 0.63。我们把效率写成指数爬坡，时间常数 τ，约三个 τ 基本恢复。对效率积分得累计产量，解出做完 Q 件要多久，加上停线 C，乘人数，再除以 Q，就是每件人工。批量越小，这两块摊得越重。",
+    "The trouble with small-batch quick response is not within a day but at the style change. There are two costs. One is downtime — machines rearranged, rethreaded, feet changed, stitch length and differential reset, test seams — which we call C. The other is subtler: learning. A Bangladeshi study found first-day efficiency on a new style was only 30.1% against a long-run 47.6%, a ratio r-zero of about 0.63. We write efficiency as an exponential ramp with time constant tau; after about three tau it has essentially recovered. Integrate efficiency for cumulative output, solve for the time to finish Q pieces, add C, multiply by headcount and divide by Q: labour per piece. The smaller the batch, the heavier both costs weigh."
+   ]
+  },
+  {
+   "title": [
+    "长线与 U 型单元的分界批量",
+    "The break-even batch between a long line and a U-cell"
+   ],
+   "points": [
+    [
+     "长线 30 人、E∞ 70%、C 4 h、τ 12 h；单元 8 人、58%、0.5 h、6 h；SAM 12 分",
+     "Long line 30 people, E∞ 70%, C 4 h, τ 12 h; cell 8 people, 58%, 0.5 h, 6 h; SAM 12 min"
+    ],
+    [
+     "稳态长线 17.1、单元 20.7 分/件；150 件时长线 74、单元 28 分/件",
+     "Steady state: line 17.1, cell 20.7 min/piece; at 150 pieces: line 74, cell 28"
+    ],
+    [
+     "两线交于约 3800 件；把长线 C 压到 1 h、τ 压到 4 h，分界降到约 800 件",
+     "Curves cross at about 3800 pieces; cut the line's C to 1 h and τ to 4 h and the break-even falls to about 800"
+    ]
+   ],
+   "formula": "\\text{每件人工}=\\frac{60N\\,(C+T_Q)}{Q}",
+   "figure": "w_b27b372e.png",
+   "narration": [
+    "代进数字看。批量无限大时长线更省：12 除以 0.70 是 17.1 分，单元 12 除以 0.58 是 20.7 分，这是分工的好处。可批量一小就反过来了：150 件时长线每件要 74 分，是稳态的四倍多，单元只要 28 分。两条曲线在约 3800 件相交，这就是分界批量。小单快反的一两百件远在左边。想让长线也接小单，先压停线：C 压到 0，150 件时长线降到约 26 分；再把学习时间常数压到 4 小时、C 压到 1 小时，长线在 800 件以上又占优。",
+    "Put the numbers in. With infinite batches the long line is cheaper: 12 over 0.70 is 17.1 minutes; the cell, 12 over 0.58, is 20.7 — the benefit of division of labour. But with small batches it reverses: at 150 pieces the long line needs 74 minutes per piece, over four times steady state, while the cell needs 28. The curves cross at about 3800 pieces — the break-even batch. Quick-response orders of one or two hundred lie far to the left. To let a long line take small orders, cut downtime first: with C at zero, the long line at 150 pieces drops to about 26 minutes; cut C to 1 hour and the learning constant to 4 hours, and the long line wins again above 800 pieces."
+   ]
+  },
+  {
+   "title": [
+    "U 型单元与接力区",
+    "U-shaped cells and the bucket brigade"
+   ],
+   "points": [
+    [
+     "模块化生产：4–17 人一组，每人 2–4 道工序，机器排成 U 形，在制品只有手里那几件",
+     "Modular production: teams of 4–17, each person 2–4 operations, machines in a U, WIP only what is in hand"
+    ],
+    [
+     "接力区：最后一人做完就回头接前一人的活，依次交接，第一人回入口取料",
+     "Bucket brigade: the last person finishes, walks back and takes over from the one before, and so on; the first fetches new pieces"
+    ],
+    [
+     "按从慢到快排列会自己平衡：7 人从快到慢约 50 件/时，从慢到快约 60 件/时",
+     "Sequenced slowest to fastest it balances itself: 7 people fast-to-slow ≈ 50/h, slow-to-fast ≈ 60/h"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "单元生产也叫丰田式缝制系统，通常 4 到 17 人一组，每人会两到四道工序，机器排成 U 形，线上只有工人手里那几件，周期以分钟计。U 型单元里有个很巧的分工办法，叫接力区：工人不固定工序，各拿一件往前做；最后一人做完，回头接过前一人手里的衣服，前一人再回头接他前面的人，第一人回入口取新裁片。只要从慢到快排，快的人自然多做一段，单元自己就平衡了。实验里同样 7 个人，从快到慢约 50 件，从慢到快升到约 60 件，人均约 8.6 件。",
+    "Cellular production, also called the Toyota Sewing System, uses teams of 4 to 17, each person doing two to four operations, machines in a U, with only the garments in people's hands on the line, so throughput time is in minutes. U-cells often use a clever scheme called the bucket brigade: nobody owns fixed operations; each carries one garment forward. When the last person finishes, she walks back and takes over the garment of the person before her, who walks back in turn, and the first returns to the entrance for new pieces. Sequence them slowest to fastest and the fast ones naturally do more; the cell balances itself. In the lab the same 7 people make about 50 an hour fast-to-slow and about 60 slow-to-fast, about 8.6 per person."
+   ]
+  },
+  {
+   "title": [
+    "五类工厂比较与设备选型要点",
+    "Comparing the five factories: points for equipment selection"
+   ],
+   "points": [
+    [
+     "先问工序结构（工时花在哪），再问面料（什么线迹和机器），最后问批量和交期（怎样组织）",
+     "Ask first about operation structure, then fabric (stitches and machines), then batch and lead time (organisation)"
+    ],
+    [
+     "西服要能接收“这一件”的参数；衬衫要专用可靠、换模板快的自动单元",
+     "Suits need machines that accept 'this piece's' parameters; shirts need dedicated, reliable units with quick clamp changes"
+    ],
+    [
+     "T 恤要高速耐用的包缝和绷缝；毛衫要上机时间短的全成型；小单快反要换款快",
+     "T-shirts need fast, durable overlock and coverstitch; sweaters, shorter whole-garment times; quick response, fast changeovers"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "把五节放在一起，设计或改造一家服装厂的思路就清楚了：先问产品工时花在哪，再问面料用什么线迹、什么机器，最后问批量和交期决定怎样组织。对设备设计者来说，每类工厂都在向设备提不同的要求：西服定制要机器能接收这一件的参数，这是第 14、26 章的电子化和联网；衬衫厂要专用、可靠、换模板快；T 恤厂要高速耐用、调机简单；毛衫厂要更短的上机时间；小单快反要换款快，换个针距还要拿扳手，就是给车间添麻烦。设备好不好，最终要放到工厂里用这些账来衡量。",
+    "Put the five sections together and the method for designing or upgrading a garment factory is clear: first ask where the product's work content goes, then which stitches and machines the fabric needs, and finally how batch size and lead time decide the organisation. For equipment designers, each factory asks something different: made-to-measure needs machines that accept this piece's parameters — the electronics and networking of Chapters 14 and 26; shirt factories want dedicated, reliable units with quick clamp changes; T-shirt plants want fast, durable, easily set machines; sweater plants want shorter knitting times; quick response wants fast changeovers — a machine that needs a spanner to change stitch length is a nuisance. Equipment is finally judged by these accounts on the floor."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "产品决定工序，工序决定设备，批量决定产线组织：五类工厂的差别都可以从这三点推出来。",
+   "The product determines the operations, the operations the equipment, and the batch size the organisation; all five factory types follow from these three points."
+  ],
+  [
+   "利特尔法则：平均生产周期 = 在制品 ÷ 产量；单件流和吊挂靠压低在制品缩短交期。",
+   "Little's law: average throughput time = WIP ÷ output; one-piece flow and hanger systems shorten lead time by cutting WIP."
+  ],
+  [
+   "节拍 = 60 ÷ 目标产量；理论人数 = ΣSMV ÷ 节拍；取整损失用平衡率衡量，合并同机种工序可从 72% 提到 92%。",
+   "Takt = 60 ÷ target output; theoretical headcount = ΣSMV ÷ takt; rounding loss is measured by balance efficiency, and pooling same-machine operations raises it from 72% to 92%."
+  ],
+  [
+   "自动化先从小而平、重复多、质量敏感的小部件做起；毛衫的全成型省套口人工但多占机器时间。",
+   "Automation starts with small, flat, repetitive, quality-sensitive parts; whole-garment knitting saves linking labour but uses more machine time."
+  ],
+  [
+   "换款代价 = 停线 + 学习爬坡；批量小于分界批量时 U 型单元更省，压低停线和学习时间常数可让长线也接小单。",
+   "Style-change cost = downtime + learning ramp; below the break-even batch the U-cell is cheaper, and cutting downtime and the learning constant lets a long line take small orders too."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "line",
+   "no": "29-1",
+   "title": [
+    "缝制车间产线仿真",
+    "Sewing-line simulation"
+   ],
+   "goal": [
+    [
+     "在捆扎流水、吊挂单件流和 U 型单元三种组织方式下，观察同一条 T 恤线的产量、在制品和生产周期。",
+     "Observe output, WIP and throughput time of the same T-shirt line under a bundle line, a hanger one-piece flow and a U-shaped cell."
+    ],
+    [
+     "用平衡图找瓶颈，比较逐道配置与按机种合并的人数和平衡率。",
+     "Find the bottleneck on the balance chart and compare headcount and balance efficiency for one-per-operation and grouping by machine type."
+    ],
+    [
+     "用“批量与换款”页验证 29.5 节的分界批量，并找出压低它的办法。",
+     "Use the 'Batch size and style changes' page to verify the break-even batch of Section 29.5 and find ways to lower it."
+    ]
+   ],
+   "theory": [
+    [
+     "节拍 = 3600 ÷ 目标产量（秒）；每人负荷 = 工序 SMV ÷ 人数；整条线产能 = 60 ÷ 瓶颈每人负荷（件/时）。",
+     "Takt = 3600 ÷ target output (s); load per person = operation SMV ÷ headcount; line capacity = 60 ÷ bottleneck load per person (pieces/h)."
+    ],
+    [
+     "平衡率 = ΣSMV ÷（人数 × 瓶颈每人负荷）。",
+     "Balance efficiency = ΣSMV ÷ (headcount × bottleneck load per person)."
+    ],
+    [
+     "利特尔法则：在制品 = 产量 × 平均生产周期，对捆扎、吊挂和单元都成立。",
+     "Little's law: WIP = output × average throughput time, for bundle, hanger and cell alike."
+    ],
+    [
+     "换款模型：E(t) = E∞[1 − (1 − r₀)e^(−t/τ)]，r₀ = 30.1 ÷ 47.6；每件人工 = 60N(C + T_Q) ÷ Q。",
+     "Style-change model: E(t) = E∞[1 − (1 − r₀)e^(−t/τ)], r₀ = 30.1 ÷ 47.6; labour per piece = 60N(C + T_Q) ÷ Q."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，读左侧“实验指导”第 1 步“认识这条线”：16 道工序、合计 5.84 分，目标 200 件/时，节拍 18 秒；看人员分配表中每行横条与节拍竖线的关系。",
+     "Open the lab page and read step 1 of the guide, 'Know the line': 16 operations, 5.84 min in total, target 200/h, takt 18 s; note how each row's bar relates to the takt line in the staffing table."
+    ],
+    [
+     "生产组织选“捆扎流水”，人员分配选“一人一道工序”，点“资料原配置（22 人）”；看平衡图中红色瓶颈柱和 KPI 中的“产能上限”“平衡率”，点“跳到下班”记录产量。",
+     "Choose 'Bundle line' and 'One operator per operation', click 'Published set-up (22 people)'; read the red bottleneck bar and the capacity and balance efficiency, then click 'Jump to end of shift' and record output."
+    ],
+    [
+     "任务 1：用表中“+”“−”按钮只加 1 个人（总数 ≤ 23），分别试加在剪线头和其他工序上，每次点“重新开工”后跳到下班，找出使产量 ≥ 165 件/时的位置。",
+     "Task 1: use the + and − buttons to add just one person (total ≤ 23), trying thread trimming and other operations; after each 'Restart', jump to end of shift and find where output reaches ≥ 165/h."
+    ],
+    [
+     "点“按节拍逐道配置”，记录人数（27）和平衡率；再切到“按机种合并”，把四组调成包缝 7、绷缝 5、平缝 5、手工 4，完成任务 2（21 人、≥ 182 件/时）。",
+     "Click 'Staff each operation to takt' and record headcount (27) and balance efficiency; then switch to 'Group by machine type', set overlock 7, coverstitch 5, lockstitch 5, manual 4, and complete Task 2 (21 people, ≥ 182/h)."
+    ],
+    [
+     "仍在捆扎流水，拖动“捆的大小”“在制品上限”和“投产速度”滑块，完成任务 3（平均生产周期 ≤ 80 分且产量 ≥ 150 件/时），用 KPI 数据核对在制品 ≈ 产量 × 周期。",
+     "Still on the bundle line, move the bundle size, WIP cap and launch rate sliders to complete Task 3 (average throughput time ≤ 80 min with output ≥ 150/h); check WIP ≈ output × throughput time with the KPIs."
+    ],
+    [
+     "切到“吊挂单件流”，人员按机种合并 21 人，调“每人挂位”，完成任务 4（产量 ≥ 185 件/时、在制品 ≤ 60 件），记录生产周期。",
+     "Switch to 'Hanger one-piece flow' with 21 people grouped by machine, adjust 'Hanger places per person', complete Task 4 (output ≥ 185/h, WIP ≤ 60) and record throughput time."
+    ],
+    [
+     "切到“U 型单元”，用 ← → 把 7 名多能工按熟练度从快到慢、再从慢到快排列，各跳到下班，记录产量和每人做活时间占比，完成任务 5（≥ 59 件/时）。",
+     "Switch to 'U-shaped cell', use ← → to order the 7 multi-skilled operators fastest-to-slowest and then slowest-to-fastest, jump to end of shift each time, record output and each person's working-time share, and complete Task 5 (≥ 59/h)."
+    ],
+    [
+     "切到“批量与换款”，在默认参数下读出 150 件时两种组织的每件人工和分界批量；只调长线的“换款停线”和“学习时间常数”，完成任务 6（分界批量 ≤ 1000 件）。",
+     "Switch to 'Batch size and style changes', read labour per piece for both at 150 pieces and the break-even batch with default settings; adjust only the long line's changeover downtime and learning constant to complete Task 6 (break-even ≤ 1000 pieces)."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "各组织方式下的产线指标（每次跳到下班后记录）",
+     "Line indicators under each organisation (record after jumping to end of shift)"
+    ],
+    "headers": [
+     [
+      "组织方式与配置",
+      "Organisation and set-up"
+     ],
+     [
+      "人数",
+      "Operators"
+     ],
+     [
+      "产量（件/时）",
+      "Output (pieces/h)"
+     ],
+     [
+      "在制品（件）",
+      "WIP (pieces)"
+     ],
+     [
+      "平均生产周期（分）",
+      "Avg throughput time (min)"
+     ],
+     [
+      "平衡率",
+      "Balance efficiency"
+     ],
+     [
+      "在制品 ÷ 产量（分，核对）",
+      "WIP ÷ output (min, check)"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "任务 1 中，为什么把人加在剪线头上产量明显上升，而加在其他工序几乎没有用？加完以后新的瓶颈在哪里？",
+     "In Task 1, why does adding the person to thread trimming raise output clearly, while adding elsewhere hardly helps? Where is the new bottleneck?"
+    ],
+    [
+     "把捆从 20 件改成 5 件，生产周期缩短了，但产量略有下降，原因是什么？",
+     "Cutting the bundle from 20 to 5 pieces shortens throughput time but output drops slightly; why?"
+    ],
+    [
+     "接力区为什么要把最快的人放在出口？从你记录的每人做活时间占比说明。",
+     "Why should the fastest person be placed at the exit in a bucket brigade? Explain using the working-time shares you recorded."
+    ],
+    [
+     "任务 6 中只压换款停线或只压学习时间常数，分界批量各能降到多少？哪一项对小批量更关键？",
+     "In Task 6, how far does the break-even batch fall if you cut only downtime or only the learning constant? Which matters more for small batches?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "T 恤线提速与换款方案",
+   "Speeding up a T-shirt line and planning for style changes"
+  ],
+  "tasks": [
+   [
+    "（计算）用教材 29.3 节的 16 道工序 SMV，把目标产量提高到 250 件/时：求节拍和理论人数；分别按逐道配置和按机种合并配人，算出两种方案的人数和平衡率，并说明多出来的人从哪里来。",
+    "(Calculation) Using the 16 SMVs of Section 29.3, raise the target to 250 pieces/h: find takt and theoretical headcount; staff the line one-per-operation and grouped by machine type, give headcount and balance efficiency for each, and explain where the extra people come from."
+   ],
+   [
+    "（计算）这条线改造前是捆扎流水，在制品 600 件、产量 175 件/时；改成吊挂后在制品 55 件、产量 191 件/时。用利特尔法则求两种情况的平均生产周期，并说明吊挂为什么能把在制品压下来。",
+    "(Calculation) Before the upgrade the line was a bundle line with 600 pieces in progress and 175 pieces/h; with hangers, WIP is 55 and output 191/h. Use Little's law to find both average throughput times, and explain why hangers keep WIP down."
+   ],
+   [
+    "（设计）工厂开始接 300 件的小单。用 29.5 节模型和算例参数（SAM 12 分；长线 30 人、70%、C 4 h、τ 12 h；单元 8 人、58%、C 0.5 h、τ 6 h）算出两种组织的每件人工；再把长线 C 改为 0 重算。提出你的组织方案和需要的设备改造（至少两条，注明对应章节），并说明理由。",
+    "(Design) The factory starts taking 300-piece orders. With the Section 29.5 model and example values (SAM 12 min; long line 30 people, 70%, C 4 h, τ 12 h; cell 8 people, 58%, C 0.5 h, τ 6 h), compute labour per piece for both; then recompute the long line with C = 0. Propose your organisation and at least two equipment changes (citing chapters), with reasons."
+   ]
+  ],
+  "deliverable": [
+   "计算过程（可附 Python 脚本或表格）、虚拟实验 29-1 中对应配置的截图各一张，以及 2–3 页的方案说明。",
+   "Calculations (a Python script or spreadsheet may be attached), one screenshot of each corresponding configuration in Virtual lab 29-1, and a 2–3 page proposal."
+  ],
+  "rubric": [
+   [
+    "节拍、理论人数、两种配置的人数和平衡率计算正确（35 分）",
+    "Takt, theoretical headcount, and headcount and balance efficiency of both allocations correct (35 points)"
+   ],
+   [
+    "利特尔法则应用正确，单位换算无误（15 分）",
+    "Little's law applied correctly with correct unit conversion (15 points)"
+   ],
+   [
+    "换款模型计算正确，能指出长线多出的人工主要来自停线（25 分）",
+    "Style-change model computed correctly, identifying downtime as the main source of the long line's extra labour (25 points)"
+   ],
+   [
+    "组织方案与设备改造有依据、与计算结果一致（15 分）",
+    "Organisation and equipment proposals are justified and consistent with the calculations (15 points)"
+   ],
+   [
+    "截图与报告规范、清楚（10 分）",
+    "Screenshots and report clear and well presented (10 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "决定一家服装厂产线怎样组织（长流水线、吊挂单件流还是 U 型单元）的首要因素是什么？",
+    "What primarily determines how a garment factory organises its line (long line, hanger one-piece flow or U-cell)?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "批量和交期",
+      "Batch size and lead time"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "面料的弹性",
+      "The stretch of the fabric"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "缝纫机的转速",
+      "The sewing-machine speed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "线迹的种类",
+      "The stitch type"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "教材的主线是：产品决定工序，工序（面料）决定设备，批量决定产线怎样组织。面料决定的是用包缝、绷缝还是平缝。",
+    "The book's thread: product determines operations, operations (and fabric) determine equipment, and batch size determines organisation. Fabric decides overlock, coverstitch or lockstitch."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "定制西服之所以采用单件流，是因为捆扎流水要求一捆里的衣片尺寸相同，而定制西服每件都不同。",
+    "Made-to-measure suits use one-piece flow because the bundle system needs the pieces in a bundle to be the same size, while every made-to-measure suit is different."
+   ],
+   "correct": true,
+   "feedback": [
+    "捆扎流水是整捆做完同一道工序再往下走；每件不同时只能一件一件流转，并让工位知道这一件的要求。",
+    "A bundle goes through one operation as a whole; when every piece differs, garments must flow one at a time and each station must know this piece's requirements."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一条西服线每小时做 25 套，线上在制品 400 套。按利特尔法则，一套衣服平均在线上待多少小时？",
+    "A suit line makes 25 suits per hour with 400 suits in progress. By Little's law, how many hours does a suit spend on the line on average?"
+   ],
+   "answer": 16,
+   "tolerance": 0.2,
+   "unit": "h",
+   "feedback": [
+    "平均生产周期 = 在制品 ÷ 产量 = 400 ÷ 25 = 16 小时。",
+    "Average throughput time = WIP ÷ output = 400 ÷ 25 = 16 h."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "衬衫工厂的自动化为什么先从领子、袖头、口袋这些小部件做起？",
+    "Why does automation in shirt factories start with small parts such as collars, cuffs and pockets?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "它们小而平、形状固定、重复多、质量敏感，能整块放在模板里定位",
+      "They are small, flat, fixed in shape, highly repetitive and quality-sensitive, and can be located whole in a clamp"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "它们的工序最少，买机器最便宜",
+      "They have the fewest operations, so the machines are cheapest"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "组装工序已经完全由机器人完成，只剩小部件靠人",
+      "Assembly is already fully robotic, so only small parts are left to people"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "小部件用的面料比衣身更硬，不会变形",
+      "Small parts use stiffer fabric than the body and do not deform"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "教材给出三个特点：小而平可模板定位、形状固定重复多、对质量最敏感；组装要对齐两片大而软的衣片，至今主要靠人。",
+    "The book names three features: small and flat (clamp-locatable), fixed and repetitive, and most quality-sensitive; assembly of large limp panels is still mainly manual."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "T 恤线 16 道工序 SMV 合计 5.841 分，目标产量 180 件/时。理论上至少需要多少人（给出未取整的数值）？",
+    "A T-shirt line's 16 operations total 5.841 SMV and the target is 180 pieces/h. What is the theoretical number of operators (unrounded)?"
+   ],
+   "answer": 17.52,
+   "tolerance": 0.05,
+   "unit": "人",
+   "feedback": [
+    "节拍 = 60 ÷ 180 = 0.333 分；理论人数 = 5.841 ÷ 0.333 ≈ 17.52，取整至少 18 人。",
+    "Takt = 60 ÷ 180 = 0.333 min; theoretical headcount = 5.841 ÷ 0.333 ≈ 17.52, so at least 18."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "同一条 T 恤线目标 200 件/时，按机种合并后 21 人，各组每人负荷中最大的是绷缝组 1.506 ÷ 5 = 0.3012 分。求平衡率（%）。",
+    "The same line at 200/h is grouped into 21 people; the largest load per person is the coverstitch group, 1.506 ÷ 5 = 0.3012 min. Find the balance efficiency (%)."
+   ],
+   "answer": 92.3,
+   "tolerance": 0.5,
+   "unit": "%",
+   "feedback": [
+    "平衡率 = ΣSMV ÷（人数 × 瓶颈每人负荷）= 5.841 ÷ (21 × 0.3012) ≈ 92.3%。",
+    "Balance efficiency = ΣSMV ÷ (headcount × bottleneck load) = 5.841 ÷ (21 × 0.3012) ≈ 92.3%."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于毛衫的两种工艺（成型衣片 + 套口、全成型编织），按教材算例，下列哪些说法正确？",
+    "For the two sweater processes in the book's worked example (fully fashioned + linking, whole-garment), which statements are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "成型衣片工艺每件人工约 52 分，其中套口约占六成",
+      "Fully fashioned needs about 52 min of labour per piece, linking about 60% of it"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "全成型每件人工约 17 分，但占用横机的时间约为普通双系统横机的两倍",
+      "Whole-garment needs about 17 min of labour, but occupies the flat machine nearly twice as long as a two-system machine"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "日产 1000 件时，全成型需要的横机台数比传统工艺少",
+      "At 1000 pieces/day, whole-garment needs fewer knitting machines than the conventional process"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "全成型省掉了套口，所以在任何工资水平下都更划算",
+      "Since it eliminates linking, whole-garment is cheaper at any wage level"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "52 分与 17 分、30 分钟上机均为教材算例；全成型约需 23 台，传统约 13 台；哪个划算取决于工资、机价、折旧和款式。",
+    "52 vs 17 min and 30 min machine time are from the example; whole-garment needs about 23 machines versus about 13; which pays depends on wages, prices, depreciation and style."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "按 29.5 节算例，SAM = 12 分、U 型单元 8 人、稳态效率 58%。批量无限大时单元的每件人工是多少分？",
+    "In the Section 29.5 example, SAM = 12 min, a U-cell of 8 people, steady-state efficiency 58%. What is the cell's labour per piece for an infinitely large batch?"
+   ],
+   "answer": 20.7,
+   "tolerance": 0.1,
+   "unit": "min",
+   "feedback": [
+    "批量无限大时换款和学习的损失摊薄为零，每件人工 = SAM ÷ E∞ = 12 ÷ 0.58 ≈ 20.7 分。",
+    "With an infinite batch the changeover and learning losses vanish per piece: labour = SAM ÷ E∞ = 12 ÷ 0.58 ≈ 20.7 min."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "用 29.5 节算例参数，150 件的小单时长流水线每件人工约 74 分，是稳态的四倍多。把长线换款停线 C 从 4 小时压到 0，每件人工约变为多少？",
+    "With the Section 29.5 parameters, the long line needs about 74 min per piece at 150 pieces, over four times steady state. If its changeover downtime C is cut from 4 h to 0, what does labour per piece become?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "约 26 分，与单元的 28 分不相上下",
+      "About 26 min, on a par with the cell's 28"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "约 17 分，回到稳态",
+      "About 17 min, back to steady state"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "约 64 分，只省 10 分",
+      "About 64 min, saving only 10"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "约 48 分",
+      "About 48 min"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "停线摊到 150 件上是 30 人 × 4 h × 60 ÷ 150 = 48 分，去掉后约 26 分；剩下比稳态多出的部分来自 30 人同时学习的爬坡。",
+    "Downtime spread over 150 pieces is 30 × 4 h × 60 ÷ 150 = 48 min; removing it gives about 26; what remains above steady state is the learning ramp of 30 people."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "在 U 型单元的接力区（bucket brigade）里，工人应该怎样排列，单元才能自己平衡？",
+    "In a bucket-brigade U-cell, how should operators be sequenced so that the cell balances itself?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "从入口到出口按从慢到快排列",
+      "From slowest at the entrance to fastest at the exit"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "从入口到出口按从快到慢排列",
+      "From fastest at the entrance to slowest at the exit"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "最快的人放在中间",
+      "Fastest in the middle"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "顺序无关，接力区总会平衡",
+      "Order does not matter; a bucket brigade always balances"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "从慢到快时快的人自然多做一段；顺序反了，快的人追上前面的慢人只好等。实验中 7 人从快到慢约 50 件/时，从慢到快约 60 件/时。",
+    "Slow-to-fast lets faster people do longer stretches; in reverse, fast workers catch up and wait. In the lab 7 people make about 50/h fast-to-slow and 60/h slow-to-fast."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "某衬衫线每小时 120 件。手工做口袋每件 1.40 分；口袋机每 8 小时可做 2400 个，实际可用率 70%。口袋机每小时实际需要占用多少分钟才能满足这条线？",
+    "A shirt line makes 120 shirts per hour. A hand-made pocket takes 1.40 min; a pocket setter is rated 2400 per 8 h with 70% actual availability. How many minutes per hour must the setter run to supply this line?"
+   ],
+   "answer": 34.3,
+   "tolerance": 0.3,
+   "unit": "min",
+   "feedback": [
+    "每个口袋 480 × 60 ÷ 2400 = 12 秒 = 0.20 分；120 × 0.20 = 24 分，按 70% 可用率折算 24 ÷ 0.7 ≈ 34.3 分，一台够用。",
+    "12 s = 0.20 min per pocket; 120 × 0.20 = 24 min, divided by 0.7 availability ≈ 34.3 min, so one machine suffices."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "西服袖山弧长 50 cm、袖窿 47 cm。若袖山顶部 12 cm 的袖窿要吃进全部吃势的一半，这一段上下两层送布量之比应设为多少？",
+    "A sleeve cap is 50 cm and the armhole 47 cm. If the top 12 cm of the armhole must take half of the total ease, what ratio of upper to lower feed should be set over this segment?"
+   ],
+   "answer": 1.125,
+   "tolerance": 0.005,
+   "unit": "",
+   "feedback": [
+    "吃势 3 cm，一半 1.5 cm 吃在 12 cm 上，局部缩缝率 1.5 ÷ 12 = 12.5%，上下层送布量之比 = 1 + 0.125 = 1.125。",
+    "Total ease 3 cm; half, 1.5 cm, over 12 cm gives 12.5% local ease, so the upper:lower feed ratio = 1.125."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "毛衫厂日产 1000 件，套口每件 32 分，套口工每班 8 小时。需要多少名套口工？",
+    "A sweater factory makes 1000 pieces a day; linking takes 32 min per piece and linkers work 8-hour shifts. How many linkers are needed?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "约 67 人",
+      "About 67"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "约 13 人",
+      "About 13"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "约 24 人",
+      "About 24"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "约 133 人",
+      "About 133"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "1000 × 32 ÷ 60 ÷ 8 ≈ 66.7，约 67 人。13 是横机台数（17 分 × 1000 ÷ 60 ÷ 22），24 是误用 22 h 开机时间。",
+    "1000 × 32 ÷ 60 ÷ 8 ≈ 66.7, about 67. 13 is the number of knitting machines; 24 comes from wrongly using the 22 h machine running time."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "用 29.5 节模型和算例参数（SAM 12 分；长线 30 人、70%、C = 4 h、τ = 12 h），批量 300 件时，长线换款停线摊到每件上的人工是多少分？",
+    "With the Section 29.5 model and example values (SAM 12 min; long line 30 people, 70%, C = 4 h, τ = 12 h), how much of the labour per piece at a batch of 300 comes from changeover downtime alone?"
+   ],
+   "answer": 24,
+   "tolerance": 0.3,
+   "unit": "min",
+   "feedback": [
+    "停线人工 = 60N·C ÷ Q = 60 × 30 × 4 ÷ 300 = 24 分；长线 300 件时每件约 49 分，C = 0 时约 25 分，差的正是这 24 分。",
+    "Downtime labour = 60N·C ÷ Q = 60 × 30 × 4 ÷ 300 = 24 min; the long line needs about 49 min per piece at 300 and about 25 with C = 0 — exactly this difference."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "一家工厂从大货转向 100–200 件的小单快反。下列哪些措施能直接压低换款损失？",
+    "A factory moves from bulk orders to 100–200-piece quick-response orders. Which measures directly cut style-change losses?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "电子针距和电子差动存成程序号，换款时直接调用",
+      "Store electronic stitch length and differential as program numbers and recall them at a change"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "工位终端显示图文工艺说明，并培养多能工",
+      "Show illustrated instructions on station terminals and train multi-skilled operators"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "机器装脚轮和快速接头，花样机换模板即换花样",
+      "Machines on castors with quick couplings; pattern sewers change pattern by changing clamp"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "加长流水线、细分工序以提高稳态效率",
+      "Lengthen the line and subdivide operations to raise steady-state efficiency"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "停线靠快速换型压，学习靠标准化说明和多能工压；加长流水线只提高稳态效率，反而让换款停线和学习人数更多。",
+    "Downtime is cut by quick changeover, learning by standard instructions and multi-skilling; a longer line only raises steady-state efficiency and increases downtime and the number of people learning."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "节拍、理论人数与平衡率的计算；利特尔法则；换款模型与分界批量；“产品—面料—批量”决定工厂组织的思路。",
+   "Calculating takt, theoretical headcount and balance efficiency; Little's law; the style-change model and break-even batch; the product–fabric–batch logic of factory organisation."
+  ],
+  "difficult": [
+   "理解取整损失与工序合并的关系；把学习曲线积分成累计产量并解出 T_Q；理解为什么批量小时 U 型单元比长线省。",
+   "Understanding rounding loss and operation pooling; integrating the learning curve into cumulative output and solving for T_Q; seeing why U-cells beat long lines at small batches."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：同样做衣服",
+     "Opening: they all make clothes"
+    ],
+    "minutes": 15,
+    "content": [
+     "展示五类工厂流程图，提出车间问题：T 恤线每小时 200 件要配几个人？引出“产品—面料—批量”三问。",
+     "Show the five-factory flow chart and pose the shop-floor question of staffing a 200/h T-shirt line; introduce the product–fabric–batch questions."
+    ]
+   },
+   {
+    "phase": [
+     "西服与利特尔法则",
+     "Suits and Little's law"
+    ],
+    "minutes": 25,
+    "content": [
+     "讲数据先行的单件流、吊挂认路、绱袖分段缩缝；推导并练习利特尔法则（西服线、捆大小研究）。",
+     "Cover data-first one-piece flow, hanger routing and segmented sleeve easing; derive and practise Little's law (suit line, bundle-size study)."
+    ]
+   },
+   {
+    "phase": [
+     "衬衫小部件自动化",
+     "Automating shirt parts"
+    ],
+    "minutes": 20,
+    "content": [
+     "部件工时占比、五线汇一的布局；口袋机工时账课堂计算。",
+     "Share of work content in parts, the five-into-one layout; in-class pocket-setter calculation."
+    ]
+   },
+   {
+    "phase": [
+     "T 恤线平衡",
+     "Balancing the T-shirt line"
+    ],
+    "minutes": 35,
+    "content": [
+     "工序表与机种；节拍、理论人数；逐道配置与按机种合并的平衡率；学生分组手算 250 件/时方案。",
+     "Operation table and machine types; takt and theoretical headcount; balance efficiency of the two allocations; groups compute the 250/h case by hand."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 29-1 演示与操作",
+     "Virtual lab 29-1 demonstration and practice"
+    ],
+    "minutes": 35,
+    "content": [
+     "演示找瓶颈、捆扎与吊挂对比、U 型单元接力顺序；学生完成任务 1–5。",
+     "Demonstrate bottleneck finding, bundle versus hanger and bucket-brigade order; students complete Tasks 1–5."
+    ]
+   },
+   {
+    "phase": [
+     "毛衫与小单快反",
+     "Sweaters and quick response"
+    ],
+    "minutes": 35,
+    "content": [
+     "套口与全成型工时账；换款模型推导、分界批量曲线；实验页“批量与换款”完成任务 6。",
+     "Linking versus whole-garment labour account; derive the style-change model and break-even curve; Task 6 on the batch page."
+    ]
+   },
+   {
+    "phase": [
+     "比较与小结",
+     "Comparison and summary"
+    ],
+    "minutes": 15,
+    "content": [
+     "五类工厂比较表、对设备设计的要求；回到导入问题给出答案；布置作业。",
+     "Five-factory comparison and what it asks of equipment; answer the opening question; set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“T 恤线提速与换款方案”，并完成教材第 29 章习题 1、2、6。",
+   "Complete the assignment 'Speeding up a T-shirt line and planning for style changes', plus Chapter 29 exercises 1, 2 and 6."
+  ]
+ }
+}

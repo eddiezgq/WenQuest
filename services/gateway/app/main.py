@@ -23,6 +23,7 @@ from pydantic import BaseModel, Field
 
 from . import accounts
 from . import catalog_api
+from . import course_pack
 from . import content
 from . import course_api
 from . import edit_api
@@ -117,6 +118,7 @@ def create_app() -> FastAPI:
     edit_api.register(app, sys.modules[__name__])
     life_api.register(app, sys.modules[__name__])
     textbook_api.register(app, sys.modules[__name__])
+    course_pack.register(app, sys.modules[__name__])
     return app
 
 

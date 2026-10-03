@@ -1,0 +1,1162 @@
+{
+ "no": 1,
+ "title": [
+  "缝制设备与服装产业",
+  "Sewing Equipment and the Apparel Industry"
+ ],
+ "hours": 2,
+ "goals": [
+  [
+   "能解释手缝为什么难以机械化，以及“针尖开眼、只穿一半、在布底锁住线环”这条共同的解决思路。",
+   "Explain why hand sewing is hard to mechanise, and the common solution: an eye near the point, a needle that goes only half way through, and a loop locked below the fabric."
+  ],
+  [
+   "能说出发明时代的五个关键想法，以及每个想法解决了前一代机器的什么问题。",
+   "Name the five key ideas of the age of invention and the specific problem of the previous machine that each one solved."
+  ],
+  [
+   "能用“惯性力与转速平方成正比”算出转速变化后针杆惯性力的变化，并解释它为什么成为高速化的核心问题。",
+   "Use the rule that inertia force grows with the square of speed to calculate how the needle-bar inertia force changes with speed, and explain why this became the central problem of the high-speed stage."
+  ],
+  [
+   "能按 ISO 4915 的六类线迹判断一件衣服各部位的线迹类别，并说出对应的机种。",
+   "Classify the stitches on a garment by the six ISO 4915 classes and name the machine that makes each."
+  ],
+  [
+   "能说明缝制设备在服装产业链中的位置，并用教材数据做简单的产业测算。",
+   "Describe where sewing equipment sits in the apparel supply chain, and make simple industry estimates from the data in the book."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "车间问题：平缝机能不能再开快一点？",
+   "Shop-floor problem: can the lockstitch machines run faster?"
+  ],
+  "text": [
+   "一家衬衫厂把老式平缝机（最高每分钟 4000 针）换成了新机型，标称每分钟 5000 针。班长想再把转速开到每分钟 6000 针，设备员担心针杆和轴套受不了。新机的针杆机构按教材第 3 章算例：往复质量 m = 120 g，曲柄半径 r = 15.5 mm，连杆长 l = 55 mm；每分钟 5000 针时，针杆在下止点的惯性力约 654 N。",
+   "A shirt factory has replaced its old lockstitch machines (maximum 4000 stitches per minute) with a new model rated at 5000 stitches per minute. The line leader wants to run them at 6000 stitches per minute; the maintenance technician is worried about the needle bar and its bushings. The needle-bar mechanism of the new machine follows the Chapter 3 worked example: reciprocating mass m = 120 g, crank radius r = 15.5 mm, link length l = 55 mm; at 5000 stitches per minute the inertia force of the needle bar at bottom dead centre is about 654 N."
+  ],
+  "question": [
+   "每分钟 4000、5000、6000 针时，针杆下止点的惯性力各约多少？从 5000 提到 6000 增大了百分之几？和蒂莫尼耶那台每分钟 200 针的机器相比，每分钟 5000 针时的惯性力大多少倍？",
+   "What is the inertia force of the needle bar at bottom dead centre at 4000, 5000 and 6000 stitches per minute? By what percentage does it rise from 5000 to 6000? Compared with Thimonnier's machine at 200 stitches per minute, how many times larger is the force at 5000?"
+  ],
+  "answer": [
+   "惯性力与转速的平方成正比。4000 针时约 654 × (4000/5000)² ≈ 419 N；5000 针时 654 N；6000 针时约 654 × 1.2² ≈ 942 N，增大 44%。每分钟 200 针时加速度只有约 8.7 m/s²，惯性力约 1 N，比每分钟 5000 针时小 (5000/200)² = 625 倍。所以提速不是“拧一下旋钮”的事：每分钟 6000 针时针杆每秒要承受 100 次、每次近千牛的冲击，平衡、材料和润滑都要重新核算（第 3、8 章）。",
+   "Inertia force is proportional to the square of speed. At 4000 it is about 654 × (4000/5000)² ≈ 419 N; at 5000 it is 654 N; at 6000 it is about 654 × 1.2² ≈ 942 N, an increase of 44%. At 200 stitches per minute the acceleration is only about 8.7 m/s² and the force about 1 N, (5000/200)² = 625 times smaller than at 5000. So raising the speed is not just a matter of turning a knob: at 6000 stitches per minute the needle bar takes a load of nearly a kilonewton 100 times a second, and balancing, materials and lubrication all have to be re-checked (Chapters 3 and 8)."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人联系：从凸轮时序到编码器时序，速度翻倍惯性力翻四倍",
+   "Robot link: from cam timing to encoder timing; double the speed, four times the inertia force"
+  ],
+  "text": [
+   "缝纫机电控化的核心，是把凸轮和连杆保证的机械时序，换成“编码器读出主轴角度、软件按角度发指令”的电子时序；工业机器人的控制器做的是同一件事：每个控制周期读一次各关节编码器，按规划好的轨迹给伺服驱动器发出下一个位置指令。高速化遇到的惯性力问题在机器人上也一样：同一条轨迹，节拍时间缩短一半，各处加速度变成 4 倍，电机要提供的惯性力矩也随之变成 4 倍。所以高速并联（Delta）分拣机器人的手臂用碳纤维管做得很轻，这和缝纫机把针杆做成空心钢管是同一个道理：惯性力 = 质量 × 加速度，先减质量。",
+   "The heart of electronic control in sewing machines is to replace the mechanical timing guaranteed by cams and links with electronic timing: an encoder reads the main-shaft angle and software issues commands by angle. An industrial robot controller does the same thing: every control cycle it reads each joint encoder and sends the servo drive the next position command along a planned trajectory. The inertia problem of the high-speed stage is the same too: run the same path in half the cycle time and every acceleration becomes four times larger, and so does the inertia torque the motors must supply. That is why the arms of high-speed parallel (Delta) picking robots are made of light carbon-fibre tube, for the same reason a sewing machine uses a hollow steel needle bar: inertia force = mass × acceleration, so cut the mass first."
+  ]
+ },
+ "life": {
+  "title": [
+   "生活例子：一拉就开的米袋封口",
+   "Everyday example: the rice-sack seam that opens with one pull"
+  ],
+  "text": [
+   "米袋、面粉袋的封口常用单线链式线迹缝成：找对线头一拉，整条缝线一环接一环地松开，袋口就打开了，这正是动画 1-1 里“拉线头”演示的 101 线迹的弱点，在这里被当成了优点。翻过衬衫看接缝，两面都是一条直线、怎么拉都不散，那是 301 锁式线迹。",
+   "The mouths of rice and flour sacks are often closed with a single-thread chainstitch: pull the right thread end and the whole seam unravels loop by loop and the sack opens. This is the very weakness of stitch 101 shown by “pull the thread end” in Animation 1-1, used here as a feature. Turn a shirt inside out and the seam is a straight line on both faces that will not unravel however you pull: that is lockstitch 301."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：手缝一针，机器为什么学不会",
+    "Opening: why a machine cannot copy a hand stitch"
+   ],
+   "points": [
+    [
+     "手缝针的针眼在尾部，每缝一针，整根针连同后面的线都要从布的一面穿到另一面。",
+     "A hand needle has its eye at the tail: every stitch, the whole needle and all the thread behind it must pass from one side of the cloth to the other."
+    ],
+    [
+     "人的两只手能在布的两面交替接针，机器却没法在布底“接住”一根针再拉过去。",
+     "Two hands can pass the needle back and forth across the cloth; a machine cannot catch a needle below the cloth and pull it through."
+    ],
+    [
+     "缝纫机的全部基本问题都在这里：针怎样动、线环怎样形成和被钩住、线怎样拉紧、布怎样前进。",
+     "All the basic problems of the sewing machine are already here: how the needle moves, how the loop forms and is caught, how the thread is tightened, how the cloth advances."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "我们先拿一根手缝针缝两块布，看看动作有多简单：扎下去、拔出来、再扎回来。可是仔细一想，问题就在“拔出来”这一步。手缝针的针眼在尾部，线穿在尾部，所以每缝一针，整根针连同后面拖着的线都要从布的一面完整地穿到另一面。人有两只手，可以在布的两面交替接针；机器在布底可没有一只手。两百年前的发明家就卡在这里。这一讲我们就看看他们是怎样绕开这个难题的。",
+    "Let's start by sewing two pieces of cloth with a hand needle. It looks simple: push it in, pull it out, push it back. But think about the pulling out. The eye of a hand needle is at the tail, so on every stitch the whole needle and all the thread trailing behind it must go right through the cloth. We have two hands to pass the needle from one side to the other; a machine has no hand under the cloth. That is exactly where inventors were stuck two hundred years ago. In this lesson we see how they got around it."
+   ]
+  },
+  {
+   "title": [
+    "绕开难题：针只穿一半，在布底锁住线环",
+    "The way round: the needle goes half way, the loop is locked below"
+   ],
+   "points": [
+    [
+     "针眼挪到针尖附近，针扎进去一半就退回，把线带到布底留下一个线环。",
+     "Move the eye to near the point: the needle goes in only half way and comes back, leaving a loop of thread below the cloth."
+    ],
+    [
+     "用钩子把一个线环套进下一个线环：链式线迹（如 101）。",
+     "Hook one loop through the next: chainstitch (e.g. 101)."
+    ],
+    [
+     "用另一根线穿过线环：锁式线迹（如 301），两根线在布层中间交织。",
+     "Pass a second thread through the loop: lockstitch (e.g. 301), with the two threads interlaced in the middle of the fabric."
+    ],
+    [
+     "动画 1-1 把手缝、101、301 并排演示，可单步、可拉线头。",
+     "Animation 1-1 shows hand sewing, 101 and 301 side by side, with single-step and a thread-pull test."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "成功的路线都绕开了“整根针穿过布”这个动作。针不再整根穿过去，只扎进去一半就退回来；针眼也从尾部挪到了针尖附近。这样针扎下去时把线带到布底，退回来时线留在下面，形成一个线环。接下来的问题就是怎样把这个线环锁住。用钩子把一个线环套进下一个线环，就是链式线迹；用另一根线从线环里穿过去，就是锁式线迹。怎样锁，决定了线迹的种类，也决定了后面要设计什么样的机构。",
+    "Every successful design avoided pushing the whole needle through. The needle goes in only half way and comes back, and the eye moves from the tail to near the point. Going down, the needle carries thread below the cloth; coming back, it leaves that thread behind as a loop. The question then is how to lock the loop. Hook one loop through the next and you get a chainstitch; pass a second thread through the loop and you get a lockstitch. How the loop is locked decides the class of stitch, and with it the mechanisms we have to design."
+   ]
+  },
+  {
+   "title": [
+    "五个关键想法（一）：钩针链式与针尖开眼",
+    "Five key ideas (1): the hooked needle and the eye at the point"
+   ],
+   "points": [
+    [
+     "蒂莫尼耶（1830 年法国专利）：带钩的针把线从布底钩上来，形成单线链式线迹，后来做到每分钟 200 针。",
+     "Thimonnier (French patent, 1830): a hooked needle pulls the thread up from below, forming a single-thread chainstitch; he later reached 200 stitches per minute."
+    ],
+    [
+     "链式线迹只有一根线，最后一个线环没被套住，一拉线头整条散开。",
+     "A chainstitch has only one thread and the last loop is not held, so pulling the end unravels the whole seam."
+    ],
+    [
+     "亨特（约 1833—1834 年）与豪（1846 年美国专利 4,750 号）：针尖开眼 + 第二根线，得到锁式线迹。",
+     "Hunt (about 1833–1834) and Howe (US patent 4,750, 1846): an eye at the point plus a second thread gives the lockstitch."
+    ],
+    [
+     "豪的机器布竖挂在带针的金属板上，板走到头就要重挂，只能缝直线和短缝。",
+     "On Howe's machine the cloth hung on a pinned metal plate; when the plate reached its end the cloth had to be re-hung, so only short straight seams were possible."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_1_early.png",
+   "narration": [
+    "按技术思路，发明时代可以归纳成五个关键想法。第一个是法国裁缝蒂莫尼耶的钩针：针把线从布底钩上来，一个线环套住下一个，得到单线链式线迹。它的毛病在动画里一拉就看得见：只有一根线，最后一个线环没人套住，整条缝一拉就散。第二个想法是针尖开眼、再加一根线：亨特先做出来，豪在 1846 年取得专利，从此“针尖开眼的针加第二根线”成了绝大多数缝纫机的基本形式。可豪的布是竖着挂的，板走到头就得重挂，只能缝直的短缝。",
+    "By technical approach, the age of invention comes down to five key ideas. The first is Thimonnier's hooked needle: it pulls thread up from below the cloth, one loop through the next, giving a single-thread chainstitch. Its weakness shows at once in the animation: with only one thread and nothing holding the last loop, one pull unravels the seam. The second idea is an eye at the point plus a second thread: Hunt made it first, Howe patented it in 1846, and from then on this became the basic form of almost every sewing machine. But Howe's cloth hung on a plate, which had to be re-hung at the end of its travel, so only short straight seams were possible."
+   ]
+  },
+  {
+   "title": [
+    "五个关键想法（二）：直针、旋转钩、四动作送布",
+    "Five key ideas (2): straight needle, rotary hook, four-motion feed"
+   ],
+   "points": [
+    [
+     "胜家（1851 年）：直针上下运动，悬臂结构，布平放在台面上被压住、连续送进，可缝长缝和曲线。",
+     "Singer (1851): a straight needle moving up and down in an overhanging arm; the cloth lies flat, held down and fed continuously, so long seams and curves are possible."
+    ],
+    [
+     "威尔逊（1851、1852 年）：连续旋转的钩子代替往复梭子，没有换向冲击，是高速旋梭的原理。",
+     "Wilson (1851, 1852): a continuously rotating hook replaces the reciprocating shuttle; with no reversal shocks it is the principle of the high-speed rotary hook."
+    ],
+    [
+     "威尔逊（1854 年）：四动作送布——升、进、降、退，至今几乎每台缝纫机都在用。",
+     "Wilson (1854): the four-motion feed — rise, advance, drop, return — still used on almost every sewing machine."
+    ],
+    [
+     "吉布斯（1857 年）：旋转钩做单线链式线迹，后来发展为多线链式、包缝、绷缝。",
+     "Gibbs (1857): a rotary hook for single-thread chainstitch, later developed into multi-thread chainstitch, overlock and coverstitch."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_1_timeline.png",
+   "narration": [
+    "第三个想法来自胜家：针改成上下运动的直针，装在伸到台面上方的悬臂里，布平放在台面上，被压板压住、连续向前送。布不再受板长限制，可以缝长缝，也可以边缝边转布缝曲线。今天的平缝机外形还是这个格局。第四个想法是威尔逊的：用连续旋转的钩子代替往复梭子，没有加速、减速、换向的冲击，这就是高速旋梭的原理；他还发明了升、进、降、退四动作送布。第五个想法是吉布斯的旋转钩单线链式，后来发展成链缝、包缝和绷缝。",
+    "The third idea is Singer's: a straight needle moving up and down, carried in an arm reaching over the table, with the cloth lying flat, held down and fed forward continuously. The cloth is no longer limited by a plate, so long seams and curves are possible, and today's lockstitch machine still has this layout. The fourth idea is Wilson's: a continuously rotating hook instead of a reciprocating shuttle, with no speeding up, slowing down and reversing, which is the principle of the high-speed rotary hook; he also invented the four-motion feed. The fifth is Gibbs's rotary-hook chainstitch, which grew into chainstitch, overlock and coverstitch machines."
+   ]
+  },
+  {
+   "title": [
+    "缝纫机战争与专利池",
+    "The sewing-machine war and the patent pool"
+   ],
+   "points": [
+    [
+     "各家专利互相交叉，谁造机器都可能侵权，官司不断，史称“缝纫机战争”。",
+     "The patents overlapped, anyone building a machine risked infringement, and lawsuits followed: the “sewing-machine war”."
+    ],
+    [
+     "1856 年，豪、胜家和两家制造商把九项专利合成“专利池”统一许可，一直运作到 1877 年。",
+     "In 1856 Howe, Singer and two manufacturers pooled nine patents and licensed them together; the pool ran until 1877."
+    ],
+    [
+     "许可费大幅降低，缝纫机开始大量生产，进入家庭和工厂。",
+     "Licence fees fell sharply, and sewing machines went into mass production and into homes and factories."
+    ],
+    [
+     "启示：一台机器往往是若干关键机构的组合，设计时要考虑知识产权（第 23 章）。",
+     "Lesson: a machine is usually a combination of several key mechanisms, and design must consider intellectual property (Chapter 23)."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "这五个想法出自不同的人，专利互相交叉。你要造一台好用的缝纫机，针、钩、送布可能分别踩到三个人的专利，于是官司打个不停，史称缝纫机战争。1856 年，豪、胜家和两家制造商把九项专利放进一个专利池统一对外许可，每台机器的许可费一下子降了下来，缝纫机这才大量生产、进入家庭和工厂。这个专利池一直运作到 1877 年最后一项专利到期，前后二十一年。对工程师来说，这段历史提醒我们：机器是机构的组合，知识产权也是设计的一部分。",
+    "These five ideas came from different people and their patents overlapped. To build a usable machine, your needle, hook and feed might infringe three different people's patents, so the lawsuits never stopped: the sewing-machine war. In 1856 Howe, Singer and two manufacturers put nine patents into a pool and licensed them together. The fee per machine dropped sharply, and only then did sewing machines go into mass production and into homes and factories. The pool lasted until the last patent expired in 1877, twenty-one years in all. For engineers the lesson is that a machine is a combination of mechanisms, and intellectual property is part of design."
+   ]
+  },
+  {
+   "title": [
+    "工业缝纫机的五个阶段：一层一层叠加",
+    "Five stages of the industrial sewing machine: layered, not replaced"
+   ],
+   "points": [
+    [
+     "机械化：把机构做对——铸铁机壳、淬火零件、可互换零件；1884 年已有实用的缝纫机电动机。",
+     "Mechanisation: get the mechanisms right — cast-iron housings, hardened parts, interchangeable parts; practical sewing-machine motors existed by 1884."
+    ],
+    [
+     "高速化：把机构做快——平衡惯性力、旋转代替往复、封闭式自动润滑。",
+     "High speed: make them fast — balance inertia forces, replace reciprocation by rotation, enclosed automatic lubrication."
+    ],
+    [
+     "电控化、自动化、智能化：电子接管时序，机器自己走花样、拿放料，再联网、会看、会学。",
+     "Electronic control, automation, intelligence: electronics take over timing, machines follow patterns and handle parts, then connect, see and learn."
+    ],
+    [
+     "今天的智能平缝机里，仍然是 19 世纪定型的刺布、挑线、钩线、送布机构。",
+     "Inside today's smart lockstitch machine are still the needle, take-up, hook and feed mechanisms settled in the 19th century."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_1_timeline.png",
+   "narration": [
+    "机构定型以后，工业缝纫机又走了一百多年，可以按每个时期主要解决的问题分成五个阶段：机械化、高速化、电控化、自动化、智能化。请注意，这五个阶段不是一个替换一个，而是一层一层往上叠。机械化把机构做对，高速化把机构做快，电控化让电子接管时序，自动化让机器自己走花样、拿取放料，智能化让机器联网、会看、会学。拆开今天一台智能平缝机，里面仍然是 19 世纪定型的四套机构，这也是我们要从机构学起的原因。",
+    "Once the mechanisms were settled, the industrial sewing machine went on for more than a century, and we can divide that time into five stages by the main problem of each: mechanisation, high speed, electronic control, automation and intelligence. Note that the stages do not replace one another; they are layered on top of each other. Mechanisation got the mechanisms right, high speed made them fast, electronic control handed timing to electronics, automation let machines follow patterns and handle parts, and intelligence connects them and lets them see and learn. Open up a smart lockstitch machine today and you still find the four 19th-century mechanisms, which is why we start with mechanisms."
+   ]
+  },
+  {
+   "title": [
+    "高速化算例：惯性力与转速的平方成正比",
+    "High-speed example: inertia force grows with the square of speed"
+   ],
+   "points": [
+    [
+     "第 3 章算例：m = 120 g，r = 15.5 mm，l = 55 mm；5000 r/min 时下止点加速度约 5.45 km/s²，惯性力约 654 N。",
+     "Chapter 3 example: m = 120 g, r = 15.5 mm, l = 55 mm; at 5000 r/min the acceleration at bottom dead centre is about 5.45 km/s² and the inertia force about 654 N."
+    ],
+    [
+     "加速度与转速平方成正比：每分钟 200 针时只有约 8.7 m/s²，惯性力约 1 N，差 625 倍。",
+     "Acceleration scales with speed squared: at 200 stitches per minute it is only about 8.7 m/s², a force of about 1 N, 625 times smaller."
+    ],
+    [
+     "每分钟 5000 针时，针杆每秒要承受八十多次、每次几百牛的冲击。",
+     "At 5000 stitches per minute the needle bar takes a load of several hundred newtons more than eighty times a second."
+    ],
+    [
+     "平衡、材料、润滑因此成为设计核心（第 3、8 章）。",
+     "Balancing, materials and lubrication therefore become central to design (Chapters 3 and 8)."
+    ]
+   ],
+   "formula": "a_{200} = 5450 \\times \\left(\\frac{200}{5000}\\right)^2 \\approx 8.7\\ \\mathrm{m/s^2}",
+   "figure": "",
+   "narration": [
+    "我们用一个算例感受一下“高速”意味着什么。第 3 章的针杆机构，往复质量 120 克，每分钟 5000 转时，针杆在下止点的加速度约 5450 米每二次方秒，惯性力约 654 牛。加速度和转速的平方成正比，所以回到蒂莫尼耶每分钟 200 针的年代，加速度只有 5450 乘以 200 比 5000 的平方，约 8.7，惯性力大约 1 牛，差了 625 倍。手摇脚踏的年代，机构能动就行；到了每分钟几千针，平衡、材料和润滑就成了设计的核心。",
+    "Let's get a feel for what high speed means with an example. In the Chapter 3 needle-bar mechanism, with a reciprocating mass of 120 grams at 5000 r/min, the acceleration at bottom dead centre is about 5450 metres per second squared and the inertia force about 654 newtons. Acceleration goes with the square of speed, so back at Thimonnier's 200 stitches a minute it was 5450 times 200 over 5000, squared, about 8.7, and the force about 1 newton: 625 times smaller. In the days of hand cranks and treadles a mechanism only had to move; at thousands of stitches a minute, balancing, materials and lubrication become the heart of design."
+   ]
+  },
+  {
+   "title": [
+    "电控化：机械时序变成电子时序",
+    "Electronic control: mechanical timing becomes electronic timing"
+   ],
+   "points": [
+    [
+     "过去剪线、倒缝、抬压脚靠人手和脚踩拉杆；电控以后由伺服电机、电磁铁、气缸在指定主轴角度自动完成。",
+     "Trimming, backtacking and presser-foot lift were once done by hand and foot levers; with electronic control, servo motors, solenoids and cylinders do them automatically at set main-shaft angles."
+    ],
+    [
+     "核心思想：编码器读出主轴角度，软件按角度发出指令。",
+     "The core idea: an encoder reads the main-shaft angle and software issues commands by angle."
+    ],
+    [
+     "企业年表举例：1969 年自动剪线平缝机，1999 年电机直接装在主轴上的直驱式自动剪线平缝机（该企业自己的记载，不代表行业首创）。",
+     "One company's product chronology: an automatic-trimming lockstitch machine in 1969 and a direct-drive one with the motor on the main shaft in 1999 (its own record, not a claim of an industry first)."
+    ],
+    [
+     "这是第五篇（第 13—19 章）的主线。",
+     "This is the main thread of Part V (Chapters 13–19)."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "第三个阶段是电控化。过去剪线、倒缝、抬压脚这些动作，要靠工人用手扳、用脚踩拉杆；电控以后，它们由伺服电机、电磁铁和气缸在主轴转到某个角度时自动完成。这里有一个贯穿全书的思想：第 2 章我们会看到，四个动作的配合原来是靠凸轮和连杆保证的，是机械时序；电控化就是让编码器读出主轴转到了多少度，软件按这个角度发指令，变成电子时序。以一家企业的产品年表为例，1969 年出了自动剪线平缝机，1999 年出了直驱式。",
+    "The third stage is electronic control. Trimming, backtacking and lifting the presser foot used to need the operator's hand on a lever or foot on a pedal; with electronic control, servo motors, solenoids and cylinders do them automatically when the main shaft reaches a given angle. Here is an idea that runs through the whole book: in Chapter 2 we will see that the four motions were coordinated by cams and links, which is mechanical timing. Electronic control lets an encoder read the main-shaft angle and software act on that angle, which is electronic timing. One company's chronology lists automatic trimming in 1969 and a direct-drive model in 1999."
+   ]
+  },
+  {
+   "title": [
+    "自动化与智能化",
+    "Automation and intelligence"
+   ],
+   "points": [
+    [
+     "自动化：X–Y 工作台按程序走花样，出现花样机、模板机，以及锁眼、钉扣、套结等特种机（第 11、15 章）。",
+     "Automation: an X–Y table follows a program, giving pattern sewers, template machines and special machines such as buttonholers, button sewers and bartackers (Chapters 11, 15)."
+    ],
+    [
+     "上料、定位、缝制、堆叠组合起来，就是自动开袋、自动贴袋等自动单元；吊挂系统把工位连成单件流（第 12 章）。",
+     "Combine loading, positioning, sewing and stacking and you get automatic units such as pocket welting and patch-pocket setting; a hanger system links stations into single-piece flow (Chapter 12)."
+    ],
+    [
+     "智能化：联网上传产量、停机、断线数据（第 26 章），视觉识别布边，AI 调针距、张力、压脚压力（第 14、31 章）。",
+     "Intelligence: networking uploads output, downtime and thread-break data (Chapter 26), vision detects fabric edges, and AI adjusts stitch length, tension and presser-foot pressure (Chapters 14, 31)."
+    ],
+    [
+     "缝制机器人仍在攻克“柔软的布很难被机器抓取”这个老问题（第 30 章）。",
+     "Sewing robots are still tackling the old problem that soft fabric is hard for machines to grip (Chapter 30)."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "有了电子时序，就可以让布料由 X–Y 工作台带着按程序走，于是有了花样机、模板机，以及锁眼、钉扣、套结这些按固定花样工作的特种机。再往前一步，把上料、定位、缝制、堆叠合在一起，就是自动开袋机、自动贴袋机这样的自动单元，再用吊挂系统把工位连成单件流水线。最近十几年进入智能化：机器联网上传产量、停机、断线数据，视觉系统识别布边，人工智能按布料调整针距、张力和压脚压力。缝制机器人还在攻克布太软、难抓取这个老难题。",
+    "With electronic timing, an X–Y table can carry the fabric along a program, which gives pattern sewers, template machines and special machines such as buttonholers, button sewers and bartackers that work to fixed patterns. One step further, combine loading, positioning, sewing and stacking and you get automatic units such as pocket-welting and patch-pocket machines, and a hanger system links the stations into a single-piece flow line. In the last decade or so came intelligence: machines upload output, downtime and thread-break data, vision systems find fabric edges, and AI adjusts stitch length, tension and presser-foot pressure to the fabric. Sewing robots are still working on the old problem that cloth is too soft to grip easily."
+   ]
+  },
+  {
+   "title": [
+    "缝制设备的分类：先看线迹",
+    "Classifying sewing equipment: look at the stitch first"
+   ],
+   "points": [
+    [
+     "ISO 4915 把线迹分为六类，用百位数编号：100 单线链式、200 手缝、300 锁式、400 多线链式、500 包缝、600 覆盖。",
+     "ISO 4915 divides stitches into six classes numbered in hundreds: 100 single-thread chainstitch, 200 hand stitch, 300 lockstitch, 400 multi-thread chainstitch, 500 overedge, 600 covering stitch."
+    ],
+    [
+     "线迹决定成缝机构；同一类线迹的机器结构大同小异。",
+     "The stitch decides the stitch-forming mechanism; machines for the same stitch class are broadly alike."
+    ],
+    [
+     "300 类：平缝机、花样机、套结机、钉扣机，衬衫、西服、牛仔布的大部分接缝。",
+     "Class 300: lockstitch, pattern sewers, bartackers, button sewers; most seams of shirts, suits and denim."
+    ],
+    [
+     "400 类牛仔裤后裆、腰头；500 类针织物合缝与锁边；600 类 T 恤下摆、袖口、领口。",
+     "Class 400 for jeans back rise and waistband; 500 for joining and edging knits; 600 for T-shirt hems, cuffs and necklines."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "缝制设备种类很多，最有用的分类方法是先看线迹，再看机器。为什么？因为线迹决定了需要什么样的成缝机构，而同一类线迹的机器结构大同小异。国际标准 ISO 4915 把线迹分成六类，用百位数编号：100 类单线链式，200 类手缝，300 类锁式，400 类多线链式，500 类包缝，600 类覆盖线迹。用量最大的是 300 类，衬衫、西服、牛仔布的大部分接缝都是它；针织厂里用量最大的则是 500 类包缝。大家记住这六类，后面各篇都按这个顺序展开。",
+    "There are many kinds of sewing equipment, and the most useful way to classify them is by stitch first, then by machine. Why? Because the stitch decides what stitch-forming mechanism is needed, and machines for the same stitch class are broadly alike. The international standard ISO 4915 divides stitches into six classes numbered in hundreds: 100 single-thread chainstitch, 200 hand stitch, 300 lockstitch, 400 multi-thread chainstitch, 500 overedge and 600 covering stitch. The most widely used is class 300, found in most seams of shirts, suits and denim; in knitwear factories the most used is class 500 overedge. Keep these six classes in mind; later parts follow this order."
+   ]
+  },
+  {
+   "title": [
+    "按机器分，以及现场怎样认线迹",
+    "Classifying by machine, and reading a stitch on the shop floor"
+   ],
+   "points": [
+    [
+     "平缝机（300 类，用量最大）、包缝机（500 类，针织厂用量最大）、绷缝机与链缝机（600、400 类）。",
+     "Lockstitch machines (class 300, the most used), overlockers (class 500, the most used in knitwear), coverstitch and chainstitch machines (classes 600, 400)."
+    ],
+    [
+     "特种机、花样机与模板机、自动单元与吊挂系统、电脑刺绣机；电脑横机在毛衫厂是缝制前的主要设备（第 17 章）。",
+     "Special machines, pattern and template sewers, automatic units and hanger systems, embroidery machines; in sweater factories the computerised flat knitting machine is the main equipment before sewing (Chapter 17)."
+    ],
+    [
+     "翻过布看：两面直线是锁式；布底一串线环是链式；包住布边是包缝；正面两三道平行线、反面网状是绷缝。",
+     "Turn the cloth over: straight lines on both faces is lockstitch; a chain of loops underneath is chainstitch; thread wrapping the edge is overedge; two or three parallel lines on top with a net underneath is coverstitch."
+    ],
+    [
+     "链式线迹缝完要打结或回缝，否则一拉就散。",
+     "A chainstitch seam must be knotted or back-sewn at the end, or it will pull apart."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "按机器分，服装厂里大体有这些：平缝机用量最大；包缝机在针织厂用量最大；绷缝机和链缝机；锁眼、钉扣、套结这些只做一道工序的特种机；按程序缝任意轮廓的花样机和模板机；自动单元和吊挂系统；多头刺绣机。电脑横机严格说是针织机械，但在毛衫厂里它就是缝制前的主要设备。到了车间怎么快速判断？翻过布看线迹：两面都是直线的是锁式，布底一串线环的是链式，包住布边的是包缝，正面几道平行线、反面一片网的是绷缝。",
+    "By machine, a garment factory has roughly these: lockstitch machines, the most numerous; overlockers, the most numerous in knitwear; coverstitch and chainstitch machines; special machines such as buttonholers, button sewers and bartackers that each do one operation; pattern and template sewers that sew any outline by program; automatic units and hanger systems; and multi-head embroidery machines. Strictly the computerised flat knitting machine is knitting machinery, but in a sweater factory it is the main equipment before sewing. On the shop floor, how do you tell quickly? Turn the cloth over: straight lines both sides is lockstitch, loops underneath is chainstitch, thread around the edge is overedge, parallel lines on top with a net below is coverstitch."
+   ]
+  },
+  {
+   "title": [
+    "服装产业链与缝制设备产业",
+    "The apparel supply chain and the sewing-equipment industry"
+   ],
+   "points": [
+    [
+     "纤维→纺纱→织造或针织→染整→设计打版→裁剪→缝制→整烫包装→物流零售；缝制设备处在“裁”与“缝”。",
+     "Fibre → spinning → weaving or knitting → finishing → design and patterns → cutting → sewing → pressing and packing → logistics and retail; sewing equipment serves cutting and sewing."
+    ],
+    [
+     "缝制是劳动力最集中的环节：一个挡车工能看几十台织机，缝制却仍是一人一机。",
+     "Sewing is the most labour-intensive stage: one weaver can tend dozens of looms, but sewing is still one operator per machine."
+    ],
+    [
+     "2019 年全球纺织服装就业约 9100 万人；2024 年中国工业缝纫机产量约 685 万台，出口 469 万台、15.22 亿美元。",
+     "About 91 million people worked in textiles and apparel worldwide in 2019; in 2024 China produced about 6.85 million industrial sewing machines and exported 4.69 million worth 1.522 billion US dollars."
+    ],
+    [
+     "用户劳动密集、利润薄、对价格敏感：设备的价值最终体现在产量、质量和成本上。",
+     "The users are labour-intensive, low-margin and price-sensitive: a machine's value shows in output, quality and cost."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_1_chain.png",
+   "narration": [
+    "一件衣服从纤维到消费者手里，要经过纺纱、织造、染整、设计打版、裁剪、缝制、整烫包装、物流零售一长串环节。缝制设备处在裁和缝这两个环节，恰恰是劳动力最集中的地方：一个挡车工可以看管几十台织机，缝制却还是一个人守一台机器。几个数字：2024 年中国工业缝纫机产量约 685 万台，出口 469 万台，出口额 15.22 亿美元，算下来每台出口均价只有三百多美元。这说明用户对价格非常敏感，设备好不好，最终要看它能不能让工人多缝几件合格的衣服。",
+    "A garment goes through a long chain from fibre to consumer: spinning, weaving, finishing, design and patterns, cutting, sewing, pressing and packing, logistics and retail. Sewing equipment serves cutting and sewing, which is exactly where labour is most concentrated: one weaver can tend dozens of looms, but sewing is still one person per machine. Some numbers: in 2024 China produced about 6.85 million industrial sewing machines and exported 4.69 million, worth 1.522 billion US dollars, which works out at just over three hundred dollars per machine. Users are very price-sensitive, and a machine is judged by whether it lets an operator sew more good garments."
+   ]
+  },
+  {
+   "title": [
+    "全书路线图",
+    "A roadmap of the book"
+   ],
+   "points": [
+    [
+     "一针 → 一台机器 → 一类机器 → 机器怎样被控制 → 控制怎样做成样机并测出来 → 机器怎样被制造 → 一座工厂 → 未来。",
+     "One stitch → one machine → classes of machine → how machines are controlled → how control becomes a tested prototype → how machines are made → a factory → the future."
+    ],
+    [
+     "第一、二篇：线迹拆成四个动作，再逐一讲平缝机机构；第三、四篇推广到包缝、绷缝、特种机和自动单元。",
+     "Parts I–II: the stitch broken into four motions, then each lockstitch mechanism; Parts III–IV extend this to overlock, coverstitch, special machines and automatic units."
+    ],
+    [
+     "第五、六篇：电控与电控原型；第七篇：关键零件制造与数字工厂；第八篇：服装工厂与未来。",
+     "Parts V–VI: control and control prototypes; Part VII: key-part manufacturing and the digital factory; Part VIII: garment factories and the future."
+    ],
+    [
+     "每章：车间问题 → 结构、建模、算例 → 动画或虚拟实验 → 设计要点、现场要点、习题。",
+     "Each chapter: a shop-floor problem → structure, modelling, worked examples → an animation or virtual lab → design notes, shop-floor notes, exercises."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_1_road2.png",
+   "narration": [
+    "最后看一下全书的路线。八篇沿着这样的顺序展开：先讲一针，再讲一台机器，再推广到一类机器；然后看机器怎样被控制，控制怎样做成样机并用自动化测试一轮轮迭代；再看关键零件怎样制造、整台机器怎样检测，以及怎样用数字工厂把设计、制造、质量、服务连起来；最后走进服装工厂，看看未来。每一章的结构都一样：从车间里一个真实问题开始，再看结构、建模和算例，然后用动画或虚拟实验动手验证。标“算例值”的数字是教学设定的，标“待核”的要对照具体机型核实。",
+    "Finally, the route through the book. The eight parts go in this order: first one stitch, then one machine, then classes of machine; then how machines are controlled and how the control becomes a prototype improved round after round with automated testing; then how the key parts are made, how a machine is tested, and how a digital factory links design, manufacturing, quality and service; and finally the garment factory and the future. Every chapter has the same structure: a real shop-floor problem, then structure, modelling and worked examples, then hands-on checking with an animation or virtual lab. Numbers marked as worked-example values are set for teaching; those marked to be verified must be checked against a real machine."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "机器缝纫的共同思路：针尖开眼、只穿一半，把线环留在布底再锁住；用钩子套线环得链式线迹，用第二根线穿线环得锁式线迹。",
+   "The common idea of machine sewing: an eye near the point, a needle that goes half way, and a loop left below the fabric and then locked; hooking loops together gives chainstitch, passing a second thread through gives lockstitch."
+  ],
+  [
+   "五个关键想法：钩针链式、针尖开眼加第二根线、直针加平放连续送布、旋转钩与四动作送布、旋转钩单线链式；1856 年的专利池让缝纫机得以普及。",
+   "Five key ideas: the hooked-needle chainstitch, the eye at the point plus a second thread, the straight needle with flat continuous feed, the rotary hook and four-motion feed, and the rotary-hook single-thread chainstitch; the 1856 patent pool let the machine spread."
+  ],
+  [
+   "工业缝纫机的五个阶段——机械化、高速化、电控化、自动化、智能化——是一层层叠加的，而不是相互替换。",
+   "The five stages of the industrial sewing machine — mechanisation, high speed, electronic control, automation and intelligence — are layered, not replaced."
+  ],
+  [
+   "惯性力与转速平方成正比：算例针杆 5000 r/min 时约 654 N，6000 r/min 时约 942 N（+44%）；这使平衡、材料、润滑成为高速化的核心。",
+   "Inertia force is proportional to speed squared: about 654 N at 5000 r/min for the example needle bar, about 942 N at 6000 r/min (+44%); this makes balancing, materials and lubrication central to high speed."
+  ],
+  [
+   "分类先看线迹：ISO 4915 六类（100—600）；缝制设备服务于产业链中劳动力最集中的“裁”与“缝”，价值要在产量、质量、成本上体现。",
+   "Classify by stitch first: the six ISO 4915 classes (100–600); sewing equipment serves cutting and sewing, the most labour-intensive part of the chain, and its value shows in output, quality and cost."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "stitch",
+   "no": "1-1",
+   "title": [
+    "手缝与机缝",
+    "Hand sewing and machine sewing"
+   ],
+   "goal": [
+    [
+     "对比手缝、单线链式 101、双线锁式 301 三种成缝方式，说出每针线怎样穿过布层、怎样留在布里。",
+     "Compare hand sewing, single-thread chainstitch 101 and two-thread lockstitch 301, and describe how the thread passes through and stays in the fabric for each."
+    ],
+    [
+     "用“拉线头”验证链式线迹会散开、锁式线迹不散，并解释原因。",
+     "Use the thread-pull test to confirm that chainstitch unravels and lockstitch does not, and explain why."
+    ],
+    [
+     "从布面、布底外观辨认三种线迹。",
+     "Recognise the three stitches from their appearance on the face and back of the fabric."
+    ]
+   ],
+   "theory": [
+    [
+     "手缝针的针眼在尾部，针和线必须整根穿过布再从另一面拔出，每针穿过布层的线是全部线长的两倍。",
+     "A hand needle has its eye at the tail, so needle and thread must pass right through and be pulled out the other side; every stitch passes twice the whole thread length through the fabric."
+    ],
+    [
+     "机针的针眼在针尖附近，只穿一半就退回，在布底留下线环；每针穿过布层的只是很短的一段。",
+     "A machine needle has its eye near the point, goes only half way and leaves a loop below; only a short length passes through the fabric each stitch."
+    ],
+    [
+     "链式 101：钩针或弯针钩住线环，下一针穿过上一个线环，一环套一环；最后一个线环没人套住，所以一拉就散。",
+     "Chainstitch 101: a hook or looper holds the loop and the next stitch passes through it, loop within loop; the last loop is held by nothing, so a pull unravels the seam."
+    ],
+    [
+     "锁式 301：梭尖钩住线环绕过装底线的梭芯，两根线在布层中间交织，拉线头不散。",
+     "Lockstitch 301: the hook point catches the loop and carries it around the bobbin, the two threads interlace in the middle of the fabric, and pulling an end does not unravel it."
+    ]
+   ],
+   "steps": [
+    [
+     "打开动画 1-1，先选“手缝（针眼在尾部）”，点“播放”，看针怎样整根穿过两层布；读出右侧“每针穿过布层的线长”。",
+     "Open Animation 1-1, choose “Hand sewing (eye at the tail)” and press Play; watch the needle pass right through both layers, and read “Thread passed through the fabric per stitch (mm)” on the right."
+    ],
+    [
+     "点“暂停”，再反复点“单步 ⟶”，对照“现在发生什么”记下手缝一针的各个动作。",
+     "Press Pause, then press “Step ⟶” repeatedly, and note each action of a hand stitch from the “What is happening now” panel."
+    ],
+    [
+     "切换到“单线链式线迹 101”，单步走完一针，记下“刺布、钩住线环、送布并穿过上一个线环”几步；读出已缝针数和每针穿过布层的线长。",
+     "Switch to “Single-thread chainstitch 101”, step through one stitch and note the steps: piercing, catching the loop, feeding and passing through the previous loop; read “Stitches sewn” and the thread length per stitch."
+    ],
+    [
+     "让链式线迹缝几针后点“拉线头”，观察线环一个接一个退出，记下提示信息。",
+     "Let the chainstitch sew a few stitches, then press “Pull thread end”; watch the loops come out one after another and note the message."
+    ],
+    [
+     "切换到“双线锁式线迹 301”，单步看刺布、形成线环与钩线、绕梭、收紧与送布四步。",
+     "Switch to “Two-thread lockstitch 301” and step through piercing, loop forming and catching, passing around the bobbin, and tightening and feeding."
+    ],
+    [
+     "缝几针后点“拉线头”，观察锁式线迹是否散开；点“重新开始”复位。",
+     "After a few stitches press “Pull thread end” and see whether the lockstitch unravels; press “Restart” to reset."
+    ],
+    [
+     "每种方式下观察下方“布面与布底”外观条和右侧比较表，填写记录表；可用“速度”滑块放慢动画。",
+     "For each mode, look at the “Top and underside of the fabric” strip below and the comparison table on the right, and fill in the record table; use the Speed slider to slow the animation."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "三种成缝方式观察记录",
+     "Observations of the three ways of sewing"
+    ],
+    "headers": [
+     [
+      "方式",
+      "Method"
+     ],
+     [
+      "线的根数",
+      "Number of threads"
+     ],
+     [
+      "针眼位置",
+      "Eye position"
+     ],
+     [
+      "每针穿过布层的线长",
+      "Thread through fabric per stitch"
+     ],
+     [
+      "布面外观",
+      "Face appearance"
+     ],
+     [
+      "布底外观",
+      "Back appearance"
+     ],
+     [
+      "拉线头结果",
+      "Thread-pull result"
+     ]
+    ],
+    "rows": 3
+   },
+   "questions": [
+    [
+     "为什么手缝每针穿过布层的线是“全部线长 × 2”，而机缝只有几毫米？这对机器意味着什么？",
+     "Why is the thread through the fabric per stitch “whole length × 2” for hand sewing but only a few millimetres for machine sewing? What does this mean for a machine?"
+    ],
+    [
+     "链式线迹为什么一拉就散？在生产中怎样防止？锁式线迹为什么不散？",
+     "Why does a chainstitch pull apart, and how is this prevented in production? Why does a lockstitch not?"
+    ],
+    [
+     "链式线迹不需要底线、可以连续缝很长，又有弹性。举一个你认为应该用链式而不是锁式的部位，说明理由。",
+     "A chainstitch needs no bobbin thread, can run continuously for a long time and is elastic. Name a place on a garment where you would use chainstitch rather than lockstitch, and explain why."
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 1：从一针到一个产业",
+   "Assignment 1: from one stitch to an industry"
+  ],
+  "tasks": [
+   [
+    "计算题。按第 3 章算例，平缝机针杆往复质量 m = 120 g，每分钟 5000 针时下止点惯性力约 654 N。（1）分别求每分钟 3000、4500、6000 针时的惯性力；（2）从 5000 提到 6000 针，惯性力增大百分之几？（3）说明为什么惯性力和转速的平方成正比，并据此说明高速化阶段为什么要平衡惯性力、改用旋转运动、封闭润滑。",
+    "Calculation. In the Chapter 3 example the needle bar has a reciprocating mass m = 120 g and an inertia force of about 654 N at bottom dead centre at 5000 stitches per minute. (1) Find the inertia force at 3000, 4500 and 6000 stitches per minute. (2) By what percentage does it rise from 5000 to 6000? (3) Explain why inertia force is proportional to speed squared, and use this to explain why the high-speed stage needed balancing, rotary motion and enclosed lubrication."
+   ],
+   [
+    "观察题。翻看你身边的一件 T 恤和一条牛仔裤，找出 300、400、500、600 类线迹各在什么部位，拍照标注，并说明为什么那个部位要用那一类线迹。",
+    "Observation. Examine a T-shirt and a pair of jeans, find where class 300, 400, 500 and 600 stitches are used, photograph and label them, and explain why each place uses that class."
+   ],
+   [
+    "分析题。四动作送布中，送布牙为什么必须先降到针板以下再退回原位？如果不降就退，会发生什么？豪的机器为什么只能缝直线，胜家做了哪几处改变？",
+    "Analysis. In the four-motion feed, why must the feed dog drop below the throat plate before it returns? What happens if it returns without dropping? Why could Howe's machine sew only straight seams, and what did Singer change?"
+   ],
+   [
+    "产业测算。2024 年中国工业缝纫机产量约 685 万台，出口 469 万台、出口额 15.22 亿美元。求出口占产量的比例和每台平均出口额，并就“用户对价格敏感”谈谈它对设备设计的要求（200 字以内）。",
+    "Industry estimate. In 2024 China produced about 6.85 million industrial sewing machines and exported 4.69 million worth 1.522 billion US dollars. Find the export share of output and the average export value per machine, and in under 150 words discuss what price-sensitive users mean for machine design."
+   ]
+  ],
+  "deliverable": [
+   "一份 PDF（不超过 4 页）：计算题写出公式和每一步；观察题附标注照片；分析题和测算题文字说明。",
+   "One PDF of at most 4 pages: formulas and every step for the calculation, labelled photos for the observation task, and written answers for the analysis and estimate."
+  ],
+  "rubric": [
+   [
+    "计算正确，过程清楚，单位完整（35 分）",
+    "Correct calculations with clear steps and units (35 points)"
+   ],
+   [
+    "线迹类别判断正确，部位与用途理由充分（25 分）",
+    "Stitch classes identified correctly, with sound reasons for each location (25 points)"
+   ],
+   [
+    "送布与发明史分析抓住机构原理（20 分）",
+    "Feed and history analysis grounded in mechanism principles (20 points)"
+   ],
+   [
+    "产业测算正确，对设计要求的讨论有工程依据（20 分）",
+    "Correct industry estimate and an engineering-based discussion of design needs (20 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "手缝难以直接机械化，最根本的原因是什么？",
+    "What is the fundamental reason hand sewing is hard to mechanise directly?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "针眼在尾部，整根针连同后面的线每针都要穿过布，机器在布底无法“接住”针",
+      "The eye is at the tail, so the whole needle and its thread must pass through every stitch, and a machine cannot catch the needle below the cloth"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "手缝针太细，机器无法夹持",
+      "The hand needle is too thin for a machine to hold"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "手缝只能用一根线，强度不够",
+      "Hand sewing can use only one thread, which is too weak"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "布料太软，机器无法送布",
+      "Cloth is too soft for a machine to feed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "关键在针眼的位置：针眼在尾部，针就必须整根穿过布。机缝把针眼挪到针尖附近，只穿一半就退回。",
+    "The key is the eye position: with the eye at the tail the needle must go right through. Machine sewing moves the eye near the point so the needle goes only half way."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "单线链式线迹缝完后，如果拉住最后的线头，整条缝线会一环接一环地散开。",
+    "If you pull the last thread end of a single-thread chainstitch, the whole seam unravels loop by loop."
+   ],
+   "correct": true,
+   "feedback": [
+    "链式线迹只有一根线，每个线环靠下一个线环套住，最后一个线环没人套住，所以一拉就散；缝完要打结或回缝。",
+    "A chainstitch has one thread and each loop is held by the next; the last loop is held by nothing, so it unravels. The end must be knotted or back-sewn."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "豪 1846 年的缝纫机为什么只能缝直线和短缝？",
+    "Why could Howe's 1846 machine sew only short straight seams?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "布竖挂在带针的金属板上由齿轮间歇移动，板走到头就要停机重挂",
+      "The cloth hung on a pinned metal plate moved step by step by gears, and had to be re-hung when the plate reached its end"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "它只有一根线，缝长了会散开",
+      "It had only one thread, so long seams would unravel"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "它用往复梭子，转速太低",
+      "It used a reciprocating shuttle, so it was too slow"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "它的针是直针，无法转弯",
+      "Its needle was straight and could not turn"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "豪已经得到了锁式线迹，问题出在送布：布挂在一块板上，行程受板长限制。胜家改成布平放、连续送进，才能缝长缝和曲线。",
+    "Howe already had the lockstitch; the problem was feeding: the cloth hung on a plate whose travel was limited. Singer laid the cloth flat and fed it continuously, allowing long seams and curves."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "胜家 1851 年的机器做了哪些改变？（选出所有正确项）",
+    "Which changes did Singer's 1851 machine make? (Select all that apply)"
+   ],
+   "answers": [
+    {
+     "text": [
+      "横向的弯针改为上下运动的直针，针杆装在伸到台面上方的悬臂里",
+      "The sideways curved needle became a straight needle moving up and down, in an arm reaching over the table"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "布平放在台面上，由弹簧压板压住、连续送进",
+      "The cloth lay flat on the table, held by a spring presser and fed continuously"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "用连续旋转的钩子代替往复梭子",
+      "A continuously rotating hook replaced the reciprocating shuttle"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "采用升、进、降、退的四动作送布",
+      "A four-motion feed of rise, advance, drop and return"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "直针、悬臂、平放与连续送布是胜家的改变；旋转钩和四动作送布是威尔逊的专利。",
+    "The straight needle, overhanging arm and flat continuous feed were Singer's; the rotary hook and four-motion feed were Wilson's patents."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "威尔逊四动作送布中，送布牙的动作顺序是：",
+    "In Wilson's four-motion feed, the feed dog moves in this order:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "升起顶住布 → 前进带布 → 降到针板以下 → 退回原位",
+      "Rise against the cloth → advance with it → drop below the throat plate → return"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "前进带布 → 升起 → 退回 → 降下",
+      "Advance with the cloth → rise → return → drop"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "升起 → 退回 → 降下 → 前进",
+      "Rise → return → drop → advance"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "降下 → 前进 → 升起 → 退回",
+      "Drop → advance → rise → return"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "必须先在布下升起才能带布前进，退回时必须已降到针板以下，否则会把布往回带，前进的距离被抵消。",
+    "It must rise under the cloth before it can carry it forward, and must be below the plate when it returns, or it drags the cloth back and cancels the advance."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某平缝机转速从每分钟 4000 针提高到 6000 针，针杆在下止点的惯性力变为原来的多少倍？",
+    "A lockstitch machine is speeded up from 4000 to 6000 stitches per minute. By what factor does the needle-bar inertia force at bottom dead centre change?"
+   ],
+   "answer": 2.25,
+   "tolerance": 0.02,
+   "unit": "",
+   "feedback": [
+    "惯性力与转速的平方成正比：(6000/4000)² = 1.5² = 2.25。",
+    "Inertia force is proportional to speed squared: (6000/4000)² = 1.5² = 2.25."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "第 3 章算例针杆在每分钟 5000 针时下止点惯性力约 654 N。同一机构每分钟 3000 针时，下止点惯性力约多少牛？",
+    "The Chapter 3 example needle bar has an inertia force of about 654 N at bottom dead centre at 5000 stitches per minute. What is it at 3000 stitches per minute?"
+   ],
+   "answer": 235,
+   "tolerance": 3,
+   "unit": "N",
+   "feedback": [
+    "惯性力按转速平方缩小：654 × (3000/5000)² = 654 × 0.36 ≈ 235 N。",
+    "654 × (3000/5000)² = 654 × 0.36 ≈ 235 N."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "一件 T 恤的下摆，正面是两道平行直线，反面是一片网状线。这是哪一类线迹、通常用什么机器缝？",
+    "A T-shirt hem shows two parallel straight lines on the face and a net of thread on the back. Which stitch class is it, and which machine usually sews it?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "600 类覆盖线迹，绷缝机",
+      "Class 600 covering stitch, coverstitch machine"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "500 类包缝线迹，包缝机",
+      "Class 500 overedge stitch, overlocker"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "400 类多线链式线迹，双针链缝机",
+      "Class 400 multi-thread chainstitch, twin-needle chainstitch machine"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "300 类锁式线迹，双针平缝机",
+      "Class 300 lockstitch, twin-needle lockstitch machine"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "正面几道平行线、反面网状覆盖线是 600 类的特征；包缝线迹包住布边，链式线迹布底是一串线环。",
+    "Parallel lines on top and a covering net underneath are the mark of class 600; overedge stitches wrap the edge, and chainstitch shows a chain of loops underneath."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "工业缝纫机的五个阶段是一个替换一个的：进入电控化以后，19 世纪的刺布、钩线、送布机构就被淘汰了。",
+    "The five stages of the industrial sewing machine replaced each other: once electronic control arrived, the 19th-century needle, hook and feed mechanisms were discarded."
+   ],
+   "correct": false,
+   "feedback": [
+    "五个阶段是一层层叠加的。今天的智能平缝机里，仍然是 19 世纪定型的刺布、挑线、钩线和送布机构。",
+    "The stages are layered. Today's smart lockstitch machine still contains the needle, take-up, hook and feed mechanisms settled in the 19th century."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "2024 年中国工业缝纫机产量约 685 万台，出口 469 万台。出口量约占产量的百分之几？",
+    "In 2024 China produced about 6.85 million industrial sewing machines and exported 4.69 million. What percentage of output was exported?"
+   ],
+   "answer": 68.5,
+   "tolerance": 0.5,
+   "unit": "%",
+   "feedback": [
+    "469 / 685 ≈ 0.685，即约 68.5%，三分之二以上的产量出口。",
+    "469 / 685 ≈ 0.685, about 68.5%: more than two thirds of output was exported."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "用第 3 章算例数据（5000 r/min 时下止点惯性力约 654 N），平缝机从每分钟 5000 针提高到 5500 针，针杆下止点惯性力增大百分之几？",
+    "Using the Chapter 3 example (about 654 N at bottom dead centre at 5000 r/min), by what percentage does the needle-bar inertia force rise when the speed goes from 5000 to 5500 stitches per minute?"
+   ],
+   "answer": 21,
+   "tolerance": 0.5,
+   "unit": "%",
+   "feedback": [
+    "(5500/5000)² = 1.1² = 1.21，增大 21%，约 791 N。",
+    "(5500/5000)² = 1.1² = 1.21, an increase of 21%, to about 791 N."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "缝纫机电控化的核心思想是什么？",
+    "What is the core idea of electronic control in sewing machines?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "用编码器读出主轴角度，由软件按角度发出指令，把机械时序变成电子时序",
+      "An encoder reads the main-shaft angle and software issues commands by angle, turning mechanical timing into electronic timing"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "用电动机代替脚踏驱动主轴",
+      "Use an electric motor instead of a treadle to drive the main shaft"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "用 X–Y 工作台按程序移动布料",
+      "Use an X–Y table to move the fabric by program"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "把缝纫机联网，上传产量和停机数据",
+      "Connect the machine to a network to upload output and downtime data"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "电动机驱动在机械化阶段已有（1884 年）；X–Y 工作台属于自动化，联网属于智能化。电控化的本质是时序由角度和软件决定。",
+    "Motor drive came in the mechanisation stage (1884); X–Y tables belong to automation and networking to intelligence. The essence of electronic control is timing set by angle and software."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "下列哪些是高速化阶段的主要工作？",
+    "Which of these were the main work of the high-speed stage?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "平衡惯性力",
+      "Balancing inertia forces"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "用旋转运动代替往复运动（旋梭、旋转式挑线）",
+      "Replacing reciprocating motion with rotary motion (rotary hook, rotary take-up)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "封闭式自动润滑",
+      "Enclosed automatic lubrication"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "用吊挂系统把工位连成单件流",
+      "Linking stations into single-piece flow with a hanger system"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "用视觉系统识别布边",
+      "Using vision to detect fabric edges"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "转速提高后惯性力按平方增长，振动、磨损、发热跟着上来，所以要平衡、改旋转、封闭润滑；吊挂属于自动化，视觉属于智能化。",
+    "As speed rises, inertia forces grow with its square and bring vibration, wear and heat, hence balancing, rotation and enclosed lubrication; hangers belong to automation and vision to intelligence."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "2024 年中国出口工业缝纫机 469 万台，出口额 15.22 亿美元。平均每台出口额约多少美元？",
+    "In 2024 China exported 4.69 million industrial sewing machines worth 1.522 billion US dollars. What was the average export value per machine?"
+   ],
+   "answer": 324.5,
+   "tolerance": 1.5,
+   "unit": "USD",
+   "feedback": [
+    "15.22 × 10⁸ / (469 × 10⁴) ≈ 324.5 美元/台，说明用户对价格非常敏感。",
+    "1.522 × 10⁹ / (4.69 × 10⁶) ≈ 324.5 dollars per machine, showing how price-sensitive the users are."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "针织厂里用量最大的缝制设备通常是哪一种？",
+    "Which sewing machine is usually the most numerous in a knitwear factory?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "包缝机（500 类线迹）",
+      "The overlocker (class 500 stitch)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "平缝机（300 类线迹）",
+      "The lockstitch machine (class 300 stitch)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "套结机（300 类线迹）",
+      "The bartacker (class 300 stitch)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "单线链缝机（100 类线迹）",
+      "The single-thread chainstitch machine (class 100 stitch)"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "针织物需要包住布边防止脱散、合缝要有弹性，所以针织厂用量最大的是包缝机；全服装业用量最大的是平缝机。",
+    "Knits need the edge wrapped against laddering and elastic seams, so overlockers dominate in knitwear; across all apparel the lockstitch machine is the most numerous."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "机器缝纫的共同思路与两种锁线方式；五个关键想法；五个阶段的叠加关系；惯性力与转速平方的关系；ISO 4915 六类线迹。",
+   "The common idea of machine sewing and the two ways of locking the loop; the five key ideas; the layering of the five stages; inertia force versus speed squared; the six ISO 4915 stitch classes."
+  ],
+  "difficult": [
+   "理解“针只穿一半、在布底锁住线环”为什么绕开了手缝的难题；把惯性力与转速平方的关系和设计后果联系起来（学生还没学第 3 章，只用比例关系）。",
+   "Understanding why going half way and locking a loop below avoids the hand-sewing problem; linking the speed-squared law to its design consequences (students have not yet studied Chapter 3, so use proportion only)."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Introduction"
+    ],
+    "minutes": 10,
+    "content": [
+     "车间问题：平缝机能不能开到每分钟 6000 针？现场用手缝针缝两针，引出“机器为什么学不会”。",
+     "Shop-floor problem: can the machines run at 6000 stitches per minute? Sew two stitches by hand in class to raise the question of why a machine cannot copy this."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：发明时代",
+     "Lecture: the age of invention"
+    ],
+    "minutes": 20,
+    "content": [
+     "五个关键想法与各自解决的问题；缝纫机战争与专利池。",
+     "The five key ideas and the problem each solved; the sewing-machine war and the patent pool."
+    ]
+   },
+   {
+    "phase": [
+     "动画演示与课堂实验",
+     "Animation and in-class lab"
+    ],
+    "minutes": 15,
+    "content": [
+     "动画 1-1：手缝、101、301 单步对比，拉线头演示；学生填写记录表。",
+     "Animation 1-1: step through hand sewing, 101 and 301, and the thread-pull test; students fill in the record table."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：五个阶段与算例",
+     "Lecture: five stages and the example"
+    ],
+    "minutes": 15,
+    "content": [
+     "五个阶段的叠加；惯性力与转速平方的算例，求解导入问题。",
+     "The layering of the five stages; the speed-squared example, solving the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：分类、产业与路线图",
+     "Lecture: classification, industry and roadmap"
+    ],
+    "minutes": 20,
+    "content": [
+     "ISO 4915 六类线迹与机种；拿实物衣服现场认线迹；产业链与产业数据；全书路线图。",
+     "The six ISO 4915 classes and machines; identify stitches on real garments; the supply chain and industry data; the roadmap of the book."
+    ]
+   },
+   {
+    "phase": [
+     "小结与测验",
+     "Summary and quiz"
+    ],
+    "minutes": 10,
+    "content": [
+     "回顾五条小结，完成本讲测验。",
+     "Review the five summary points and take the lesson quiz."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业 1；预习第 2 章，在家里或车间看一台平缝机，找出夹线器、挑线杆、压脚、针板和送布牙。",
+   "Complete Assignment 1; preview Chapter 2, and look at a lockstitch machine at home or in the shop to find the tension assembly, take-up lever, presser foot, throat plate and feed dog."
+  ]
+ }
+}

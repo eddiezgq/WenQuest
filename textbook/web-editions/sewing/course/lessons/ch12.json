@@ -1,0 +1,1294 @@
+{
+ "no": 12,
+ "title": [
+  "自动缝制单元与柔性制衣单元",
+  "Automatic Sewing Units and Flexible Cells"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能把自动缝制单元拆成取料、定位、缝制、切割、堆叠五步，说明它的价值在夹具和程序而不在缝速。",
+   "Break an automatic sewing unit into pick-up, locating, sewing, cutting and stacking, and explain that its value lies in fixtures and program rather than sewing speed."
+  ],
+  [
+   "能用 T_c = max(a+m, N(a+w)) 和 N* = (a+m)/(a+w) 算出一人看几台的产量、空等和平衡点，并比较改进方案。",
+   "Use T_c = max(a+m, N(a+w)) and N* = (a+m)/(a+w) to compute output, idle time and the balance point for multi-machine tending, and compare improvements."
+  ],
+  [
+   "能说明吊挂系统的机械结构，算出主轨的输送能力和利用率。",
+   "Describe the mechanical structure of a hanger system and compute the main rail’s conveying capacity and utilisation."
+  ],
+  [
+   "能比较固定工位、最短队列、最早完工三种派工规则，用利特尔法则确定在制品上限与周期。",
+   "Compare fixed-work-centre, shortest-queue and earliest-finish dispatching, and use Little’s law to set the WIP limit and throughput time."
+  ],
+  [
+   "能用接力式规则算出交接位置和产量，解释为什么要按从慢到快排列。",
+   "Use the bucket-brigade rule to compute hand-off positions and throughput, and explain why operators are ordered from slowest to fastest."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "开袋工段：一个人看几台自动开袋机",
+   "Pocket welting: how many automatic welters per operator"
+  ],
+  "text": [
+   "某西裤厂开袋工段新上了几台自动开袋机，排成 U 形。用秒表测得：工人取下成品并放好裤片、嵌线布和袋盖约 5 s（a），机器自动定位、缝制、切角和堆叠约 12 s（m），相邻两台之间走动约 2 s（w）。车间主任想知道一个人看几台最合适；另外有两个提产方案：再给工人加一台机器，或者花钱改进上料夹具，把上料缩短到 3.5 s。",
+   "A trouser factory has installed several automatic pocket welters in a U. Stopwatch timing gives: unloading the finished part and loading the panel, welt strip and flap about 5 s (a); automatic locating, sewing, corner cutting and stacking about 12 s (m); walking between adjacent machines about 2 s (w). The supervisor wants to know how many machines one operator should tend, and is weighing two ways to raise output: give the operator one more machine, or invest in a loading fixture that cuts loading to 3.5 s."
+  ],
+  "question": [
+   "平衡点是多少？看 1、2、3、4 台时每小时各产多少件？两个提产方案各增产多少，一起做呢？",
+   "What is the balance point? What is the hourly output when tending 1, 2, 3 and 4 machines? How much does each improvement add, and both together?"
+  ],
+  "answer": [
+   "N* = (5+12)/(5+2) ≈ 2.43。看 1 台每小时约 212 件；2 台时循环由机器决定（17 s > 14 s），约 424 件，人每循环空闲 3 s；3 台时由人决定（21 s），约 514 件，每台每循环等人 4 s；4 台仍为 514 件。按每台机器算，2 台时每台 212 件、3 台时 171 件，机器贵就看 2 台、人工贵就看 3 台。从 2 台出发：加一台机器增产约 90 件；只改夹具（a = 3.5 s，N* ≈ 2.8）约 465 件，增 41 件；两者一起做（3 台、a = 3.5 s）约 655 件，增 231 件，比两项之和还多，因为平衡点被推到 3 台附近，第三台每循环只等 1 s。",
+   "N* = (5+12)/(5+2) ≈ 2.43. With 1 machine about 212 pieces/h; with 2 the cycle is set by the machines (17 s > 14 s), about 424 pieces, the operator idle 3 s per round; with 3 it is set by the operator (21 s), about 514 pieces, each machine waiting 4 s per round; with 4 still 514. Per machine, 2 machines give 212 each and 3 give 171, so tend 2 if machines are dear and 3 if labour is dear. From 2 machines: one more machine adds about 90 pieces; the fixture alone (a = 3.5 s, N* ≈ 2.8) gives about 465, +41; both together (3 machines, a = 3.5 s) give about 655, +231, more than the two gains combined, because the balance point moves close to 3 and the third machine waits only 1 s per round."
+  ]
+ },
+ "robot": {
+  "title": [
+   "一人多机 ↔ 机器人上下料与 AGV 车队调度",
+   "Multi-machine tending ↔ robot machine tending and AGV fleet dispatching"
+  ],
+  "text": [
+   "一台协作机器人给几台数控机床或自动缝制单元上下料，就是“一人多机”：机器人的巡回时间 N(a + w) 与机床周期 a + m 比大小，平衡点 N* = (a+m)/(a+w) 照样适用；机器人的装卸和移动时间波动小，所以能比工人更贴近平衡点工作。吊挂的派工规则在 AGV、AMR 车队调度里几乎原样出现：任务派给队列最短或预计最早完成的小车，在途托盘数相当于在制品上限，利特尔法则同样决定周期。接力式规则也适用于速度不同的几台机器人或人机混编：按从慢到快排列，不必事先知道各自的速度，交接点就会收敛到按速度比例分配的位置。",
+   "A cobot loading several CNC machines or automatic sewing units is multi-machine tending: its round time N(a + w) is compared with the machine cycle a + m, and the balance point N* = (a+m)/(a+w) applies unchanged; because a robot’s loading and travel times vary little, it can work closer to the balance point than a person. Hanger dispatching rules reappear almost unchanged in AGV and AMR fleet dispatching: a job goes to the vehicle with the shortest queue or the earliest predicted finish, the number of pallets in transit plays the role of the WIP limit, and Little’s law sets the throughput time. The bucket-brigade rule also works for robots of different speeds or mixed human–robot teams: ordered slowest to fastest, with no need to know the speeds in advance, the hand-off points converge to shares proportional to speed."
+  ]
+ },
+ "life": {
+  "title": [
+   "咖啡店门口的利特尔法则",
+   "Little’s law at the coffee shop"
+  ],
+  "text": [
+   "咖啡店里排着 10 个人，店员每分钟做出 2 杯，你大约要等 10 ÷ 2 = 5 分钟——这就是利特尔法则：在制品 = 产量 × 周期。店员不变时，排队的人越多，等得越久，出杯速度却不会更快。",
+   "Ten people are queuing in a coffee shop and the baristas turn out 2 cups a minute, so you will wait about 10 ÷ 2 = 5 minutes. That is Little’s law: WIP = throughput × throughput time. With the same staff, a longer queue means a longer wait but not faster coffee."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：三个车间三个问题",
+    "Opening: three sewing rooms, three questions"
+   ],
+   "points": [
+    [
+     "开袋工段：一个工人在几台自动开袋机间走动——看几台最合适？",
+     "Pocket welting: one operator walks between automatic welters — how many should she tend?"
+    ],
+    [
+     "吊挂车间：衣架做完一道工序送给谁？线上挂多少个衣架？",
+     "Hanger room: who gets a carrier after each operation, and how many carriers belong on the line?"
+    ],
+    [
+     "7 人 U 型单元：不排班，每人分到的活为何恰与速度相称？",
+     "Seven-person U-cell: with no scheduling, why does each person’s share match her speed?"
+    ],
+    [
+     "机器怎样摆、活怎样分，决定产量和在制品",
+     "How machines are placed and work is shared decides output and WIP"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "前面十一讲讲的都是一台缝纫机。可一件衣服要经过十几到几百道工序，车间里几十上百台机器、同样多的人，机器怎样摆、活怎样分、衣片怎样流，决定了一小时出多少件，也决定了线上压着多少半成品。先看三个场景。开袋工段，一个工人在几台自动开袋机之间走，放料、踩踏板、去下一台，问题是看几台最合适。吊挂车间，头顶一圈轨道，衣架滑进工位、做完送回，问题是该送给谁、挂多少个。U 型单元，七个人接力做衣服，没人排班却分得很匀，问题是为什么。",
+    "The last eleven lessons were about one sewing machine. But a garment passes through a dozen to hundreds of operations, and a sewing room holds dozens of machines and as many people. How machines are placed, how work is shared and how parts flow decide how many garments come out per hour and how much is sitting half-finished on the line. Three scenes. In a pocket-welting section one operator walks between automatic welters, loading, pressing the pedal and moving on: how many should she tend? In a hanger room carriers circle overhead, slide into work centres and go back: who should get each one, and how many should hang? In a U-shaped cell seven people relay garments with no schedule yet share the work evenly: why?"
+   ]
+  },
+  {
+   "title": [
+    "自动缝制单元的共同结构",
+    "Common structure of automatic sewing units"
+   ],
+   "points": [
+    [
+     "取料/上料：从一叠软布里准确拿一片仍是最难的一步，多由人放",
+     "Pick-up/loading: taking exactly one ply from a stack is still the hardest step; mostly done by hand"
+    ],
+    [
+     "定位/折边：定位针、挡块、光电传感器，气缸推折边板——“诀窍”所在",
+     "Locating/folding: pins, stops, photo sensors, cylinder-driven folding plates — where the know-how lives"
+    ],
+    [
+     "缝制（压框按程序走）→ 切割（刀、角刀或剪线）→ 堆叠",
+     "Sewing (clamp follows a program) → cutting (knife, corner knives or trimming) → stacking"
+    ],
+    [
+     "顺序控制写成状态机：传感器到位才发下一步，否则停机报警",
+     "Sequence control as a state machine: next step only on sensor confirmation, else stop and alarm"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_12_unit.png",
+   "narration": [
+    "自动单元种类很多：开袋、贴袋、上袖、门襟、卷下摆，还有第 15 章的模板机。活不同，结构却大同小异，都能拆成五步。第一步取料，大多数还是人放，因为从一叠软布里准确拿起一片，到今天仍是自动化最难的一步。第二步定位和折边，定位针、挡块、光电传感器找布边，气缸推折边板折好压住，单元的诀窍大多藏在这里。然后是缝制、切割、堆叠。五步之间由控制器按顺序编排，每一步完成、传感器给信号，才发下一步指令；哪个传感器没到位就停机报警，这就是状态机。",
+    "There are many kinds of automatic unit: pocket welters and setters, sleeve setters, placket units, hemmers and the template machines of Chapter 15. They do different jobs but are built alike, and all break into five steps. Step one is loading, still mostly by hand, because picking exactly one ply off a stack of limp fabric remains the hardest step to automate. Step two is locating and folding: pins, stops and photo sensors find the edge, and cylinder-driven plates fold and hold it; most of a unit’s know-how hides here. Then come sewing, cutting and stacking. The controller sequences the steps: only when a sensor confirms one action does it command the next, and if any sensor fails to report the machine stops and alarms. That is a state machine."
+   ]
+  },
+  {
+   "title": [
+    "例：自动开袋机",
+    "Example: the automatic pocket welter"
+   ],
+   "points": [
+    [
+     "放大身、袋盖、嵌线布 → 压框落下 → 传感器读袋盖位置算缝线与角刀位置",
+     "Place panel, flap and welt → clamp drops → sensors read the flap to place seams and corner knives"
+    ],
+    [
+     "折边板折嵌线，两针同时缝两道，中刀切开，角刀切 Y 形口，翻到堆垛架",
+     "Plates fold the welts, twin needles sew both rows, centre knife slits, corner knives cut Y notches, stacker flips"
+    ],
+    [
+     "某型 3000 sti/min，袋长 18–220 mm，两针间距 8–20 mm，需 0.5 MPa 气源",
+     "One model: 3000 sti/min, pockets 18–220 mm, needle gauge 8–20 mm, 0.5 MPa air"
+    ],
+    [
+     "样本产量 1600–2300 件/8 h，即每件约 12.5–18 s；价值在夹具和程序，不在缝速",
+     "Catalogue output 1600–2300 pieces/8 h, about 12.5–18 s each; value is in fixtures and program, not speed"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_12_welt.png",
+   "narration": [
+    "看一个具体的：自动开袋机。嵌线口袋是西裤、西服上最费工的部件，熟练工几分钟才缝一个。自动开袋机上，工人把大身、袋盖、嵌线布放到位，踩踏板，压框落下；传感器读出袋盖两端的位置和角度，程序算出缝线起止和角刀位置；折边板折出两道嵌线，两针同时缝，中刀同时切开，角刀从下面升起切出 Y 形口，最后堆叠。样本产量每 8 小时 1600 到 2300 件，每件约 12.5 到 18 秒。它的价值不是缝得快，3000 针每分甚至比平缝机低，而是把几年的经验变成了夹具和程序。",
+    "Take a concrete case, the automatic pocket welter. The welt pocket is the most labour-intensive part of trousers and jackets; a skilled operator needs minutes per pocket. On the welter the operator places panel, flap and welt strip and presses the pedal; the clamp drops, sensors read the flap ends, and the program places the seams and corner knives. Plates fold the two welts, twin needles sew both rows while the centre knife slits, the corner knives rise to cut Y notches, and the part is stacked. The catalogue gives 1600 to 2300 pieces per 8 hours, about 12.5 to 18 seconds each. Its value is not speed, 3000 stitches a minute is slower than a lockstitch, but years of skill turned into fixtures and a program."
+   ]
+  },
+  {
+   "title": [
+    "一人多机：循环时间与平衡点",
+    "Multi-machine tending: cycle time and balance point"
+   ],
+   "points": [
+    [
+     "一台单元的周期 a + m：人上料 a，机器自动 m",
+     "One unit’s cycle is a + m: operator loads for a, machine runs for m"
+    ],
+    [
+     "看 N 台：人一圈 N(a + w)；机器至少 a + m；大者决定循环",
+     "Tending N: operator round N(a + w); machine at least a + m; the larger sets the cycle"
+    ],
+    [
+     "平衡点 N* = (a+m)/(a+w)：N < N* 人空闲，N > N* 机器等人",
+     "Balance point N* = (a+m)/(a+w): below it the operator idles, above it machines wait"
+    ],
+    [
+     "假设机器排成环形或 U 形；排成一排回程更长要另算",
+     "Assumes a ring or U layout; a straight row has a longer return walk"
+    ]
+   ],
+   "formula": "T_c=\\max\\big(a+m,\\;N(a+w)\\big),\\quad \\text{output}=\\frac{3600N}{T_c},\\quad N^*=\\frac{a+m}{a+w}",
+   "figure": "",
+   "narration": [
+    "周期分两段：人上料 a，机器自动 m，m 这段人空着，所以能看几台。设他看 N 台，轮流走，每到一台取成品、放新料，再走 w 到下一台。一圈下来，人要花 N 乘 (a + w)；而每台机器的周期至少是 a + m，因为缝完了才能上下一次料。两者谁大，谁决定循环时间，产量就是 3600 N 除以循环时间。两者相等时的台数叫平衡点 N*。N 小于 N*，机器不等人，人有空闲；N 大于 N*，人一刻不停，机器缝完了只能等人。这里假设机器排成环形或 U 形，从最后一台走回第一台也只要 w。",
+    "The cycle has two parts: loading a and automatic running m, and during m the operator is free, so she can tend several. Say she tends N machines in turn: at each she unloads, loads and walks w to the next. A round costs her N times a plus w, while each machine needs at least a plus m, since it can only be loaded once it has finished. Whichever is larger sets the cycle, and output is 3600 N over the cycle time. The number of machines at which the two are equal is the balance point N star. Below it the machines never wait and the operator has idle time; above it the operator never stops and the machines stand waiting. We assume a ring or U, so walking back to the first machine also takes only w."
+   ]
+  },
+  {
+   "title": [
+    "算例：a = 5 s、m = 12 s、w = 2 s",
+    "Worked example: a = 5 s, m = 12 s, w = 2 s"
+   ],
+   "points": [
+    [
+     "平衡点 N* = 17/7 ≈ 2.43",
+     "Balance point N* = 17/7 ≈ 2.43"
+    ],
+    [
+     "1 台约 212 件/h；2 台约 424 件/h（人空 3 s，忙碌率约 82%）",
+     "1 machine about 212/h; 2 about 424/h (operator idle 3 s, busy about 82%)"
+    ],
+    [
+     "3 台约 514 件/h（每台每循环等人 4 s）；4 台以上不再增加",
+     "3 machines about 514/h (each waits 4 s per round); no gain beyond"
+    ],
+    [
+     "每台机器产量：2 台时 212，3 台时 171——机器贵少看，人工贵多看",
+     "Per machine: 212 with 2, 171 with 3 — tend fewer if machines are dear, more if labour is dear"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_12_tend.png",
+   "narration": [
+    "代数字：上料 5 秒、自动 12 秒、走动 2 秒，平衡点 17 除以 7，约 2.43。看 1 台每小时约 212 件。看 2 台，人一圈 14 秒，机器 17 秒，循环由机器决定，每小时约 424 件，人每循环空 3 秒，忙碌率约 82%。看 3 台，人一圈 21 秒，由人决定，约 514 件，每台机器每循环等人 4 秒。看 4 台以上，产量不再增加，人已经满负荷。N* 不是整数时选 2 台还是 3 台？按每小时产量 3 台多 21%；按每台机器产量 2 台更好。机器贵就少看，人工贵就多看。",
+    "Put numbers in: loading 5 s, automatic 12 s, walking 2 s, a balance point of 17 over 7, about 2.43. With one machine, about 212 pieces an hour. With two, the operator’s round is 14 s and the machine’s 17, so the machines set the pace: about 424 an hour, the operator idle 3 s per round, about 82% busy. With three, her round is 21 s and she sets the pace: about 514 an hour, each machine waiting 4 s per round. Beyond that output stops rising, because she is fully loaded. Two or three, then? Per hour, three gives 21% more; per machine, two is better. Expensive machines, tend fewer; expensive labour, tend more."
+   ]
+  },
+  {
+   "title": [
+    "时间有波动时：机器干涉",
+    "When times vary: machine interference"
+   ],
+   "points": [
+    [
+     "三个时间都有 30% 波动（变异系数 0.3），仿真 8 小时",
+     "All three times varying 30% (CV 0.3), 8-hour simulation"
+    ],
+    [
+     "2 台约 388 件/h（少 8%），3 台约 494 件/h（少 4%），4 台几乎不受影响",
+     "2 machines about 388/h (−8%), 3 about 494/h (−4%), 4 hardly affected"
+    ],
+    [
+     "台数接近 N* 时损失最大：人和机器都没有余量",
+     "Losses peak near N*: neither operator nor machines have slack"
+    ],
+    [
+     "要在平衡点附近工作，先减小波动：固定上料台、预先整理袋盖",
+     "To work near the balance point, cut variation first: fix the loading table, prepare flaps in advance"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "实际的上料有快有慢，缝制时间也随袋长、面料变。图里的虚线是上料、缝制、走动都有 30% 波动时仿真 8 小时的结果：看 2 台每小时约 388 件，比没有波动少约 8%；看 3 台约 494 件，少约 4%；看 4 台几乎不受影响。为什么台数接近 N* 时损失最大？因为这时人和机器的余量都小：某台缝慢一点，人就站着等；人上料慢一点，下一台缝完又等人。机器因为人在忙别的机器而停下等待，叫机器干涉。台数远离 N*，总有一方有富余，能把波动吸收掉。所以要在平衡点附近工作，先要把时间的波动降下来。",
+    "In reality loading is sometimes quick, sometimes slow, and sewing time changes with pocket length and fabric. The dashed line is an 8-hour simulation with 30% variation in loading, sewing and walking: two machines give about 388 an hour, about 8% less than without variation; three give about 494, about 4% less; four are hardly affected. Why is the loss largest near N star? Because there neither side has slack: if a machine sews a little slowly the operator stands and waits, and if she loads a little slowly the next machine has finished and waits for her. A machine stopped because the operator is busy elsewhere is called machine interference. Far from N star one side always has spare time to absorb the variation. So before working near the balance point, reduce the variation."
+   ]
+  },
+  {
+   "title": [
+    "两种改进哪个划算",
+    "Which improvement pays off"
+   ],
+   "points": [
+    [
+     "从看 2 台出发：加一台机器 → 约 514 件/h（+90）",
+     "From 2 machines: add a machine → about 514/h (+90)"
+    ],
+    [
+     "改夹具 a = 5 → 3.5 s：N* ≈ 2.8，看 2 台约 465 件/h（+41）",
+     "Fixture cuts a from 5 to 3.5 s: N* ≈ 2.8, 2 machines about 465/h (+41)"
+    ],
+    [
+     "两者一起：3 台、a = 3.5 s，约 655 件/h（+231），大于两者之和",
+     "Both: 3 machines with a = 3.5 s, about 655/h (+231), more than the sum"
+    ],
+    [
+     "缩短上料同时缩短机器周期和人的循环，第三台每循环只等 1 s",
+     "Shorter loading shortens both the machine cycle and the operator round; the third machine waits only 1 s"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "从看 2 台出发，两个提产办法：加一台机器，或改夹具把上料从 5 秒缩到 3.5 秒。按公式算，加一台机器，产量从 424 升到 514，多 90 件。只改夹具，平衡点变成 15.5 除以 5.5，约 2.8，看 2 台时产量约 465 件，多 41 件。两者一起做，看 3 台、上料 3.5 秒，产量约 655 件，多了 231 件，比两项单独增加之和还多。为什么？因为缩短上料同时减少了机器的周期和人的循环，把平衡点推到了 3 台附近，第三台机器几乎不再等人，每循环只等 1 秒。",
+    "From two machines there are two options: add a third machine, or a fixture that cuts loading from 5 to 3.5 seconds. By the formula, an extra machine lifts output from 424 to 514, 90 more. The fixture alone moves the balance point to 15.5 over 5.5, about 2.8, and two machines then give about 465, 41 more. Do both, three machines with 3.5 s loading, and you get about 655, 231 more, more than the two gains added together. Why? Shorter loading cuts both the machine cycle and the operator’s round, pushing the balance point close to three, so the third machine hardly waits, only 1 second per round."
+   ]
+  },
+  {
+   "title": [
+    "吊挂系统的机械结构",
+    "Mechanical structure of a hanger system"
+   ],
+   "points": [
+    [
+     "单位从“一捆”换成“一件”：每件衣片挂一个衣架",
+     "The unit changes from a bundle to a garment: one carrier per garment"
+    ],
+    [
+     "主轨链条带衣架循环；读卡器读编号（条码或 RFID），系统决定是否开进站道岔",
+     "A chain moves carriers round the main rail; a reader reads the number (barcode or RFID) and the system decides on the entry switch"
+    ],
+    [
+     "支轨是工位缓冲；做完按钮，提升机送回主轨并记录谁、何时完成",
+     "The spur is the work-centre buffer; a button sends the carrier back by lift and records who finished it and when"
+    ],
+    [
+     "主轨能力 = 链速 ÷ 衣架间距：12 m/min、0.3 m 时每小时 2400 个",
+     "Main-rail capacity = chain speed ÷ spacing: 12 m/min and 0.3 m give 2400 per hour"
+    ]
+   ],
+   "formula": "\\text{capacity} = \\frac{v_{\\text{chain}}}{\\text{spacing}}",
+   "figure": "fig_12_rail.png",
+   "narration": [
+    "捆扎式流水线整捆流转，一件衣服在车间里要待好几天，大部分时间在捆里等。吊挂系统把单位从一捆换成一件。车间上方一条闭合主轨，链条推着衣架循环；衣架接近道岔前经过读卡器，系统查出这件下一道该去哪个工位，再决定开不开道岔；滑进支轨的衣架排队到工人手边，这段就是缓冲；做完按一下按钮，提升机送回主轨，系统同时记下谁在什么时候做完。主轨能力等于链速除以衣架间距，12 米每分、间距 0.3 米，每小时 2400 个，绰绰有余。",
+    "On a bundle line a garment spends days in the room, mostly waiting in a bundle. A hanger system changes the unit from a bundle to a single garment. A closed main rail runs overhead and a chain pushes the carriers round it. Before each switch a carrier passes a reader, the system looks up its next operation and work centre, and decides whether to open the switch. In the spur, carriers queue up to the operator’s hand; that is the buffer. When she finishes she presses a button, a lift returns the carrier to the main rail, and the system records who finished it and when. Capacity is chain speed over carrier spacing: 12 metres a minute at 0.3 m gives 2400 an hour, plenty."
+   ]
+  },
+  {
+   "title": [
+    "派工规则与算例",
+    "Dispatching rules and a worked example"
+   ],
+   "points": [
+    [
+     "T 恤 6 道工序，标准工时合计 260 s；10 名工人各会 1–2 道，效率 0.8–1.1",
+     "T-shirt with 6 operations, 260 s standard time; 10 operators each with 1–2 skills, efficiency 0.8–1.1"
+    ],
+    [
+     "固定工位：只送给以该工序为主业的人",
+     "Fixed work centre: only to operators whose main job it is"
+    ],
+    [
+     "最短队列：送给会做且排队最少的人；最早完工：按效率估算最早做完的人",
+     "Shortest queue: to the qualified operator with fewest waiting; earliest finish: to whoever would finish first by efficiency"
+    ],
+    [
+     "仿真 4 h：约 111、126、124 件/h，动态派工多 12%–13%",
+     "4 h simulation: about 111, 126 and 124 per hour; dynamic dispatching gives 12%–13% more"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_12_dispatch.png",
+   "narration": [
+    "派工规则是吊挂的大脑：下一道几个人都会做，送给谁？看算例。一件 T 恤 6 道工序：合肩 30 秒、上领 45、上袖 60、合侧缝 50、卷袖口 35、卷下摆 40，合计 260 秒。车间 10 名工人，每人会一到两道，效率 0.8 到 1.1。比较三种规则：固定工位，只送给以这道为主业的人；最短队列，送给会做、排队最少的人；最早完工，按效率估算谁最早做完就送谁。仿真 4 小时，固定工位每小时约 111 件，最短队列约 126，最早完工约 124，动态派工多出 12% 到 13%。",
+    "Dispatching is the brain of a hanger system: when several people can do the next operation, who gets the carrier? An example. A T-shirt has six operations: shoulders 30 s, collar 45, sleeves 60, side seams 50, sleeve hems 35, bottom hem 40, 260 s in all. Ten operators can each do one or two, at efficiencies from 0.8 to 1.1. Compare three rules. Fixed work centre: only to those whose main job it is. Shortest queue: to the qualified operator with the fewest carriers waiting. Earliest finish: estimate from each person’s efficiency who would finish soonest and send it there. Over a 4-hour simulation the fixed rule gives about 111 pieces an hour, shortest queue about 126 and earliest finish about 124: dynamic dispatching yields 12 to 13 per cent more."
+   ]
+  },
+  {
+   "title": [
+    "瓶颈与动态平衡",
+    "Bottlenecks and dynamic balancing"
+   ],
+   "points": [
+    [
+     "固定工位：卷袖口只有 8 号一人（效率 1.1），上限 3600 ÷ (35 ÷ 1.1) ≈ 113 件/h",
+     "Fixed rule: only operator 8 hems sleeves (efficiency 1.1), limit 3600 ÷ (35 ÷ 1.1) ≈ 113/h"
+    ],
+    [
+     "动态派工让 7 号在空闲时分担卷袖口；线性规划理论上限约 130 件/h",
+     "Dynamic dispatching lets operator 7 share sleeve hemming; the LP limit is about 130/h"
+    ],
+    [
+     "5 号离岗 1 h：固定工位降到约 100 件/h，动态派工约 120 件/h",
+     "Operator 5 away for 1 h: fixed falls to about 100/h, dynamic to about 120/h"
+    ],
+    [
+     "“动态平衡”：系统按各人队列自动调整，不用班组长排班",
+     "“Dynamic balancing”: the system adjusts to each queue with no supervisor rescheduling"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "固定工位为什么少？看各道工序的能力。按主业分，卷袖口只有 8 号一个人，效率 1.1，他每小时最多做 3600 除以 35 除以 1.1，约 113 件，这就是整条线的瓶颈，固定工位的 111 件正贴着它。动态派工时，7 号在合侧缝不忙的时候被派去卷袖口，瓶颈就被分担了。线性规划算出的理论上限约 130 件，动态派工已很接近。有人离岗差别更大：让上袖的 5 号离开一小时，固定工位平均降到约 100 件，动态派工只降到约 120 件，因为 6 号、10 号也会上袖。这就是吊挂常说的动态平衡。",
+    "Why does the fixed rule produce less? Look at each operation’s capacity. By main job, only operator 8, efficiency 1.1, hems sleeves; she can do at most 3600 divided by 35 over 1.1, about 113 an hour. That is the line’s bottleneck, and the fixed rule’s 111 sits right against it. With dynamic dispatching, operator 7 is sent to hem sleeves whenever side seams are quiet, and the bottleneck is shared. Linear programming gives a theoretical limit of about 130, and dynamic dispatching is close. The gap widens when someone is away: take operator 5, a sleeve setter, off for an hour, and the fixed rule averages about 100 while dynamic dispatching only drops to about 120, because operators 6 and 10 can also set sleeves. That is dynamic balancing."
+   ]
+  },
+  {
+   "title": [
+    "在制品上限与利特尔法则",
+    "WIP limit and Little’s law"
+   ],
+   "points": [
+    [
+     "上限太小工人没活干；到约 20–25 个衣架产量不再增加",
+     "Too small a limit starves operators; output stops rising at about 20–25 carriers"
+    ],
+    [
+     "在制品 = 产量 × 平均周期：124 件/h × 0.31 h ≈ 38，与线上 40 个吻合",
+     "WIP = throughput × throughput time: 124/h × 0.31 h ≈ 38, matching the 40 carriers"
+    ],
+    [
+     "上限降到 20：产量几乎不变，周期缩短一半",
+     "Limit lowered to 20: output nearly unchanged, throughput time halved"
+    ],
+    [
+     "孟加拉对比研究：单件流人均产量高约 7%，在制品 21.72% 对 32.40%",
+     "Bangladesh study: single-piece flow about 7% more output per operator, WIP 21.72% vs 32.40%"
+    ]
+   ],
+   "formula": "\\text{WIP} = \\text{throughput} \\times \\text{average throughput time}",
+   "figure": "",
+   "narration": [
+    "线上挂多少个衣架合适？右图是最早完工规则下产量和周期随在制品上限的变化。上限很小，工人常没活干，产量低；加到约 20 到 25 个，产量就不再增加；再加，多出来的衣架只是在支轨和主轨上排队，产量不变，周期越来越长。这就是利特尔法则：稳定时，在制品等于产量乘平均周期。核对一下：上限 40，产量约 124 件每小时，周期约 1100 秒即 0.31 小时，相乘约 38，和 40 个衣架基本一致。上限降到 20，产量几乎不变，周期缩短一半。所以上限要定在产量曲线刚刚变平的地方，相当于每个工位两个多衣架。",
+    "How many carriers should hang on the line? The right-hand chart shows output and throughput time against the WIP limit under earliest finish. With a tiny limit operators often have nothing to do and output is low; by about 20 to 25 carriers output stops rising; beyond that the extra carriers just queue on spurs and the main rail, output stays flat and throughput time keeps growing. This is Little’s law: in steady state, WIP equals throughput times average throughput time. Check it: at a limit of 40, about 124 pieces an hour and about 1100 seconds, 0.31 hours, multiply to about 38, close to the 40 carriers. Cut the limit to 20 and output barely changes while throughput time halves. So set the limit where the output curve has just flattened, a little over two carriers per work centre."
+   ]
+  },
+  {
+   "title": [
+    "U 型柔性单元",
+    "The U-shaped flexible cell"
+   ],
+   "points": [
+    [
+     "十几道工序的机器紧挨着排成 U 形，入口和出口在同一侧",
+     "Machines for a dozen operations packed into a U, entrance and exit on the same side"
+    ],
+    [
+     "衣片直接递给下一台，在制品只有手上和机台上几件",
+     "Parts pass directly to the next machine; WIP is just a few pieces in hand and on machines"
+    ],
+    [
+     "多能工：谁空了就帮下一道；一人可兼管首尾工序",
+     "Multi-skilled operators help wherever free; one person can cover first and last operations"
+    ],
+    [
+     "换款只需重排几台机器，适合几百件一单的小批量",
+     "A style change only rearranges a few machines; suits orders of a few hundred"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_12_cell.png",
+   "narration": [
+    "柔性制衣单元把十几道工序需要的机器紧挨着排成 U 形，入口和出口放在同一侧。衣片从一台直接递给下一台，在制品只有工人手里和机台上的几件。每个工人会几道工序，是多能工，谁空了就去帮下一道。入口出口靠在一起，一个人可以同时管第一道和最后一道，走动最短。换款时只要重新安排这几台机器，所以它适合几百件一单的小批量，和长流水线的分界批量在第 29 章再讲。问题来了：几个多能工怎样分活？最直接的办法是工程师按标准工时切段，每人一段。可人的速度各不相同，上午下午也不一样，切好的段做起来总有人忙、有人等。",
+    "A flexible cell packs the machines for a dozen operations into a U with entrance and exit on the same side. Parts pass straight from one machine to the next, so WIP is just a few garments in hands and on machines. Each operator can do several operations, a multi-skilled operator, and whoever is free helps the next step. With entrance and exit side by side, one person can handle the first and last operations with the shortest walk. A style change just means rearranging a few machines, so the cell suits orders of a few hundred; Chapter 29 discusses where it beats a long line. But how should a few multi-skilled operators share the work? The obvious way is for an engineer to cut segments by standard time. People differ in speed, though, and change between morning and afternoon, so fixed segments always leave someone busy and someone waiting."
+   ]
+  },
+  {
+   "title": [
+    "接力式生产：自己把活分匀",
+    "Bucket-brigade production: the work balances itself"
+   ],
+   "points": [
+    [
+     "规则：最后一人做完就往回接前一人手里的那件，依次类推；不能超越",
+     "Rule: the last operator, on finishing, walks back and takes over from the one before, and so on; no overtaking"
+    ],
+    [
+     "按从慢到快排列，交接位置收敛：xᵢ = (v₁+…+vᵢ)/(v₁+…+vₙ)，产量 = 各人速度之和",
+     "Ordered slowest to fastest, hand-offs converge: xᵢ = (v₁+…+vᵢ)/(v₁+…+vₙ), throughput = sum of speeds"
+    ],
+    [
+     "例：0.5、1.0、1.5 → 交接 1/6 和 1/2，产量 3.00；反过来约 1.57；固定 1/3 分段 1.50",
+     "Example: 0.5, 1.0, 1.5 → hand-offs at 1/6 and 1/2, throughput 3.00; reversed about 1.57; fixed thirds 1.50"
+    ],
+    [
+     "简化：忽略回走、速度处处相同、交接点只能落在工序之间；7 人单元约 60 对 50 件/h",
+     "Simplifications: no walk-back, uniform speed, hand-offs only between operations; a 7-person cell about 60 vs 50/h"
+    ]
+   ],
+   "formula": "x_i=\\frac{v_1+v_2+\\cdots+v_i}{v_1+v_2+\\cdots+v_n},\\qquad \\text{throughput}=v_1+v_2+\\cdots+v_n",
+   "figure": "fig_12_bucket.png",
+   "narration": [
+    "接力式生产的规则很简单：每人拿一件往前做，最后一个人做完，就往回走、接过前一个人手里的那件；前一个人再往回接他前面那人的；第一个人回到入口拿新裁片。后面的人赶上前面的人只能等，不能超越。Bartholdi 和 Eisenstein 证明：按从慢到快排列，交接位置就收敛到这个式子，每人的工作量和速度成正比，产量等于速度之和。三个人速度 0.5、1.0、1.5，交接位置收敛到 1/6 和 1/2，产量 3.00；顺序反过来只有约 1.57，和固定分段的 1.50 差不多。好处是不需要知道每个人的速度。",
+    "The bucket-brigade rule is simple. Each person carries one garment forward. When the last person finishes, she walks back and takes over the garment from the one before her; that person walks back and takes over from the one before, and the first returns to the entrance for new parts. Anyone who catches up with the person ahead must wait and may not overtake. Bartholdi and Eisenstein proved that, ordered slowest to fastest, the hand-offs converge to this formula: each share is proportional to speed and throughput is the sum of the speeds. With speeds 0.5, 1.0 and 1.5 the hand-offs settle at one sixth and one half and throughput is 3.00; reverse the order and it drops to about 1.57, about the same as fixed thirds at 1.50. And nobody needs to know anyone’s speed."
+   ]
+  },
+  {
+   "title": [
+    "设计要点与模型的边界",
+    "Design notes and limits of the model"
+   ],
+   "points": [
+    [
+     "共同线索：人和机器的时间要错开，又不能留太多空等",
+     "Common thread: stagger people’s and machines’ time without leaving too much idle waiting"
+    ],
+    [
+     "一人多机先算 N*，再看人和机器哪个贵；近平衡点先减波动",
+     "For tending, compute N* first, then weigh labour against machine cost; near N*, reduce variation first"
+    ],
+    [
+     "吊挂用动态派工，在制品上限定在产量刚变平处；U 型单元按从慢到快接力",
+     "Use dynamic dispatching and set the WIP limit where output just levels off; order U-cells slowest to fastest"
+    ],
+    [
+     "模型均为示意：忽略故障、断线、换梭芯；工时、技能、效率为示意值；用前以实测重算",
+     "All models are illustrative: no breakdowns, thread breaks or bobbin changes; times, skills and efficiencies illustrative; recalculate with real data"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "这三件事有一条共同的线索：人和机器的时间要互相错开，又不能留下太多空等。由此得到几条要点。自动单元的价值在夹具和程序，不在缝速。一个人看几台，先算平衡点 N*，再看人和机器哪个更贵；在平衡点附近工作，先要减小时间波动。吊挂系统用动态派工，让会做同一道工序的人互相补位；在制品上限定在产量刚刚不再增加的地方，多挂的衣架只会让周期变长。多能工组成的单元可以用接力式规则自己平衡，前提是按从慢到快排好。模型都是示意性的，用的时候要拿实际产品的工时和车间数据重新算。",
+    "These three topics share one thread: the time of people and machines must be staggered without leaving too much idle waiting. A few key points follow. An automatic unit’s value lies in its fixtures and program, not in sewing speed. To decide how many units one person tends, compute the balance point first, then ask whether labour or machines cost more, and reduce time variation before working near the balance point. Hanger systems should dispatch dynamically so operators who share a skill cover for each other, and the WIP limit belongs where output has just stopped rising; extra carriers only lengthen throughput time. A cell of multi-skilled operators can balance itself by bucket brigade, provided they are ordered slowest to fastest. All the models are illustrative: recalculate with your own product times and sewing-room data."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "自动缝制单元 = 取料 → 定位折边 → 缝制 → 切割 → 堆叠，由状态机按传感器信号顺序控制；它的价值在夹具和程序，不在缝速。",
+   "An automatic unit = pick-up → locating/folding → sewing → cutting → stacking, sequenced by a state machine on sensor signals; its value lies in fixtures and program, not sewing speed."
+  ],
+  [
+   "一人多机：T_c = max(a+m, N(a+w))，N* = (a+m)/(a+w)；算例 a = 5、m = 12、w = 2 s 时 N* ≈ 2.43，2 台约 424 件/h，3 台约 514 件/h；平衡点附近波动损失最大。",
+   "Multi-machine tending: T_c = max(a+m, N(a+w)), N* = (a+m)/(a+w); with a = 5, m = 12, w = 2 s, N* ≈ 2.43, 2 machines about 424/h, 3 about 514/h; variation hurts most near the balance point."
+  ],
+  [
+   "吊挂系统：主轨、衣架、读卡器、道岔、支轨、提升机；主轨能力 = 链速 ÷ 衣架间距，真正要算的是支轨长度和衣架总数。",
+   "Hanger system: main rail, carriers, reader, switch, spur, lift; main-rail capacity = chain speed ÷ spacing, while the real design numbers are spur length and carrier count."
+  ],
+  [
+   "动态派工（最短队列、最早完工）比固定工位多产 12%–13%，并能在有人离岗时自动补位；在制品上限定在产量刚变平处，利特尔法则：在制品 = 产量 × 周期。",
+   "Dynamic dispatching (shortest queue, earliest finish) yields 12%–13% more than fixed work centres and covers absences automatically; set the WIP limit where output just levels off, by Little’s law WIP = throughput × throughput time."
+  ],
+  [
+   "接力式单元按从慢到快排列时，交接位置收敛到 xᵢ = (v₁+…+vᵢ)/Σv，产量等于各人速度之和；不需要事先知道每个人的速度。",
+   "A bucket-brigade cell ordered slowest to fastest converges to hand-offs xᵢ = (v₁+…+vᵢ)/Σv with throughput equal to the sum of speeds, without anyone knowing the speeds in advance."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "tend",
+   "no": "12-1",
+   "title": [
+    "一人多机：自动单元该看几台",
+    "Multi-machine tending: how many units per operator"
+   ],
+   "goal": [
+    [
+     "验证 T_c = max(a+m, N(a+w)) 和平衡点 N* = (a+m)/(a+w)。",
+     "Verify T_c = max(a+m, N(a+w)) and the balance point N* = (a+m)/(a+w)."
+    ],
+    [
+     "观察时间波动对不同台数产量的影响，理解机器干涉。",
+     "Observe how time variation affects output at different machine counts and understand machine interference."
+    ],
+    [
+     "比较“多一台机器”和“缩短上料”两种改进。",
+     "Compare “one more machine” with “shorter loading”."
+    ]
+   ],
+   "theory": [
+    [
+     "工人按固定顺序巡回：到一台若还在缝就等，缝完就装卸（a），机器自动缝制（m），工人走向下一台（w）。",
+     "The operator circulates in a fixed order: if a machine is still sewing she waits; otherwise she unloads and loads (a), the machine runs (m), and she walks on (w)."
+    ],
+    [
+     "无波动时循环 T_c = max(a+m, N(a+w))，产量 3600N/T_c；N < N* 时人空闲，N > N* 时机器等人。",
+     "Without variation T_c = max(a+m, N(a+w)) and output 3600N/T_c; below N* the operator idles, above it machines wait."
+    ],
+    [
+     "有波动时（正态分布、给定变异系数），台数接近 N* 时人和机器的余量都小，损失最大。",
+     "With variation (normal, given coefficient of variation), losses peak near N*, where neither side has slack."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 12-1，按“恢复标准”（N = 2、a = 5 s、m = 12 s、w = 2 s、波动 0），观看车间俯视动画和甘特图，读出台时产量、工人忙碌率、机器等人的时间比例和 N*。",
+     "Open Virtual lab 12-1 and press Reset to standard (N = 2, a = 5 s, m = 12 s, w = 2 s, no variation); watch the top-view animation and Gantt chart and read output per hour, operator busy rate, machine waiting share and N*."
+    ],
+    [
+     "任务 1：按公式算出 N*，在框中填写并按“核对”；再把看机台数 N 从 1 拖到 4，记录各台数的产量，看产量曲线在哪里变平。",
+     "Task 1: compute N*, enter it and press Check; then drag N from 1 to 4, record output at each, and see where the output curve levels off."
+    ],
+    [
+     "分别在 N = 2 和 N = 3 时看甘特图，记录每循环是人在等机器还是机器在等人、等多少秒。",
+     "At N = 2 and N = 3 study the Gantt chart and record whether the operator waits for machines or machines wait for her, and for how many seconds per round."
+    ],
+    [
+     "任务 2：把时间波动调到 0.30，a、m、w 保持标准，分别看 N = 2 和 N = 3 的产量，算出比无波动时少了百分之几。",
+     "Task 2: set the variation to 0.30 with standard a, m and w; read output at N = 2 and N = 3 and work out the percentage loss against no variation."
+    ],
+    [
+     "任务 3：波动调回 0，依次试 N = 3、a = 5 s；N = 2、a = 3.5 s；N = 3、a = 3.5 s，记录三种组合的产量和机器等人时间。",
+     "Task 3: set variation back to 0 and try N = 3 with a = 5 s; N = 2 with a = 3.5 s; and N = 3 with a = 3.5 s, recording output and machine waiting for each."
+    ],
+    [
+     "自选一组参数（例如 a = 6 s、m = 15 s、w = 1.5 s），先手算 N* 和 2、3 台的产量，再用实验核对。",
+     "Choose your own parameters (e.g. a = 6 s, m = 15 s, w = 1.5 s), compute N* and output for 2 and 3 machines by hand, then check in the lab."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "看机台数与产量",
+     "Machines tended and output"
+    ],
+    "headers": [
+     [
+      "N",
+      "N"
+     ],
+     [
+      "a（s）",
+      "a (s)"
+     ],
+     [
+      "m（s）",
+      "m (s)"
+     ],
+     [
+      "w（s）",
+      "w (s)"
+     ],
+     [
+      "时间波动",
+      "Variation"
+     ],
+     [
+      "台时产量（件/h）",
+      "Output (pieces/h)"
+     ],
+     [
+      "工人忙碌率（%）",
+      "Operator busy (%)"
+     ],
+     [
+      "机器等人（%）",
+      "Machine waiting (%)"
+     ]
+    ],
+    "rows": 10
+   },
+   "questions": [
+    [
+     "为什么时间有波动时，台数接近 N* 的情况损失最大？请提出两条现场措施。",
+     "Why is the loss largest near N* when times vary? Propose two shop-floor measures."
+    ],
+    [
+     "为什么“加机器”和“缩短上料”一起做的增产比两者单独增产之和还多？",
+     "Why does doing both “one more machine” and “shorter loading” gain more than the sum of the two separate gains?"
+    ],
+    [
+     "N* = 2.43 时，什么情况下应选 2 台，什么情况下应选 3 台？",
+     "With N* = 2.43, when should you choose 2 machines and when 3?"
+    ]
+   ]
+  },
+  {
+   "id": "hang",
+   "no": "12-2",
+   "title": [
+    "吊挂派工与接力单元",
+    "Hanger dispatching and bucket-brigade cells"
+   ],
+   "goal": [
+    [
+     "比较三种派工规则在正常和有人离岗时的产量。",
+     "Compare the output of three dispatching rules with and without an absent operator."
+    ],
+    [
+     "用产量曲线和利特尔法则找出合适的在制品上限。",
+     "Use the output curve and Little’s law to find a suitable WIP limit."
+    ],
+    [
+     "验证接力式单元按从慢到快排列时交接位置收敛、产量等于速度之和。",
+     "Verify that a bucket-brigade cell ordered slowest to fastest converges and produces the sum of the speeds."
+    ]
+   ],
+   "theory": [
+    [
+     "模型：T 恤 6 道工序（合计 260 s），10 名工人各会 1–2 道、效率 0.8–1.1；每 5 s 投一个衣架，达到在制品上限停投；主轨到工位 15 s，工位都满时绕一圈 60 s 再分配（示意值）。",
+     "Model: a T-shirt with 6 operations (260 s), 10 operators with 1–2 skills each at 0.8–1.1 efficiency; one carrier launched every 5 s until the WIP limit; 15 s from rail to work centre, 60 s round trip when all are full (illustrative)."
+    ],
+    [
+     "利特尔法则：在制品 ≈ 产量 × 平均周期；上限超过产量变平的点后，只会延长周期。",
+     "Little’s law: WIP ≈ throughput × average throughput time; a limit beyond the levelling point only lengthens throughput time."
+    ],
+    [
+     "接力式：按从慢到快排列，交接位置收敛到 xᵢ = (v₁+…+vᵢ)/Σv，产量 = Σv；固定分段各做 1/3 时产量 = 3 × 最慢者速度。",
+     "Bucket brigade: ordered slowest to fastest, hand-offs converge to xᵢ = (v₁+…+vᵢ)/Σv and throughput = Σv; fixed thirds give 3 × the slowest speed."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 12-2 第①页，按“恢复标准”（在制品上限 40、每工位最多 3 个衣架、工时波动 0.15、无人离岗），派工规则选“固定工位”，记录产量、平均周期、工人平均忙碌率和最忙/最闲的工人。",
+     "Open page ① of Virtual lab 12-2 and press Reset (WIP limit 40, 3 carriers per work centre, variation 0.15, nobody absent); choose fixed work centre and record output, average throughput time, mean operator utilisation and the busiest/idlest operators."
+    ],
+    [
+     "任务 1：依次改用“最短队列”和“最早完工”；再把“第 5 号工人第 2 个小时离岗”改为“是”，三种规则各试一次，把六种组合的结果填入记录表。",
+     "Task 1: switch to shortest queue and earliest finish; then set “operator 5 absent in hour 2” to yes and run all three rules again, entering all six combinations in the table."
+    ],
+    [
+     "对每一行用利特尔法则核对：产量 × 平均周期是否约等于线上的衣架数。",
+     "For each row, check Little’s law: is throughput × throughput time roughly the number of carriers on the line?"
+    ],
+    [
+     "任务 2：选“最早完工”，看“产量随在制品上限的变化”曲线，找出产量不低于最高产量 98% 的最小上限，填写并按“核对”。",
+     "Task 2: with earliest finish, read the output-versus-WIP-limit curve, find the smallest limit giving at least 98% of maximum output, enter it and press Check."
+    ],
+    [
+     "把“每个工位最多排几个衣架”从 3 改为 1 和 5，观察产量和周期的变化。",
+     "Change the carriers per work centre from 3 to 1 and then 5, and observe output and throughput time."
+    ],
+    [
+     "切到第②页“接力式单元”，按“从慢到快”（0.5、1.0、1.5），观察交接位置收敛到 1/6 和 1/2，确认接力式产量等于三人速度之和。",
+     "Switch to page ② and press “slowest to fastest” (0.5, 1.0, 1.5); watch the hand-offs converge to 1/6 and 1/2 and confirm throughput equals the sum of the speeds."
+    ],
+    [
+     "按“从快到慢”，比较接力式与固定分段的产量，观察快的人追上慢的人后发生了什么。",
+     "Press “fastest to slowest”, compare bucket brigade with fixed segments, and watch what happens when the fast operator catches up with the slow ones."
+    ],
+    [
+     "用三个滑杆换一组自己的速度（仍从慢到快、不能用 0.5、1.0、1.5），检验交接位置仍按速度比例分配。",
+     "Set your own three speeds with the sliders (still slowest to fastest, not 0.5, 1.0, 1.5) and check that hand-offs still divide the work in proportion to speed."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "派工规则与在制品",
+     "Dispatching rules and WIP"
+    ],
+    "headers": [
+     [
+      "派工规则",
+      "Rule"
+     ],
+     [
+      "5 号离岗",
+      "Operator 5 absent"
+     ],
+     [
+      "在制品上限",
+      "WIP limit"
+     ],
+     [
+      "产量（件/h）",
+      "Output (pieces/h)"
+     ],
+     [
+      "平均周期（min）",
+      "Throughput time (min)"
+     ],
+     [
+      "最忙/最闲（%）",
+      "Busiest/idlest (%)"
+     ],
+     [
+      "产量 × 周期",
+      "Output × time"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "固定工位时谁最忙？为什么它的产量贴着某道工序的能力上限？",
+     "Under fixed work centres, who is busiest, and why does output sit against one operation’s capacity?"
+    ],
+    [
+     "在制品上限定在多少合适？上限从 40 降到 20，周期和产量分别怎样变？",
+     "What WIP limit is appropriate? When the limit drops from 40 to 20, what happens to throughput time and output?"
+    ],
+    [
+     "为什么接力式必须按从慢到快排列？从快到慢时产量为什么接近 3 × 最慢者的速度？",
+     "Why must a bucket brigade be ordered slowest to fastest, and why does fastest-to-slowest give close to 3 × the slowest speed?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "开袋工段与吊挂线的产能核算",
+   "Capacity check for a welting section and a hanger line"
+  ],
+  "tasks": [
+   [
+    "计算题：一台自动贴袋机上料 4 s、自动 20 s，相邻两台走动 1 s（U 形布局）。求平衡点 N*；看 4 台和 5 台时的循环时间、每小时产量、每台机器的产量，以及人和机器每循环的空等时间。若机器贵、人工便宜，你建议看几台？",
+    "Calculation: an automatic pocket setter has 4 s loading, 20 s automatic time and 1 s walking between adjacent machines (U layout). Find N*; for 4 and 5 machines give the cycle time, hourly output, output per machine, and idle time per round for operator and machines. If machines are expensive and labour cheap, how many would you recommend?"
+   ],
+   [
+    "计算题：某吊挂线主轨链速 10 m/min、衣架间距 0.4 m，产品有 8 道工序（加上片、下片共走 9 段）。求主轨每小时最多能支持多少件；若计划产量 150 件/h，主轨利用率是多少？这个利用率是否合适，为什么？",
+    "Calculation: a hanger line’s main rail runs at 10 m/min with 0.4 m carrier spacing, and the product has 8 operations (9 legs including loading and unloading). How many garments per hour can the rail support? At a planned 150 per hour, what is the rail utilisation? Is that acceptable, and why?"
+   ],
+   [
+    "计算题：一条吊挂线每小时产 126 件，线上平均挂 30 个衣架，一件衣服平均在线多久？若把在制品上限降到 20 个而产量不变，周期变成多少？结合小单快反说明意义。",
+    "Calculation: a hanger line makes 126 pieces an hour with an average of 30 carriers on it. How long does a garment spend on the line? If the WIP limit is cut to 20 with unchanged output, what is the new throughput time? Explain what this means for small-batch quick response."
+   ],
+   [
+    "计算题：接力式单元 3 人，速度 0.7、0.9、1.4。按从慢到快排列时交接位置和各人工作量是多少？产量是多少？若固定各做 1/3，产量是多少？用虚拟实验 12-2 第②页核对。",
+    "Calculation: a bucket-brigade cell has 3 operators with speeds 0.7, 0.9 and 1.4. Ordered slowest to fastest, what are the hand-off positions and work shares, and the throughput? With fixed thirds, what is the throughput? Check on page ② of Virtual lab 12-2."
+   ]
+  ],
+  "deliverable": [
+   "计算过程与结论（可附 Python 脚本），虚拟实验 12-1 与 12-2 的核对截图各一张，1–2 页说明。",
+   "Working and conclusions (Python script optional), one screenshot each from Virtual labs 12-1 and 12-2 confirming the results, and a 1–2 page explanation."
+  ],
+  "rubric": [
+   [
+    "一人多机计算正确、建议有依据：30 分",
+    "Multi-machine tending correct with a justified recommendation: 30 points"
+   ],
+   [
+    "主轨能力与利用率计算正确、判断合理：20 分",
+    "Rail capacity and utilisation correct with a sound judgement: 20 points"
+   ],
+   [
+    "利特尔法则计算正确、小单快反意义说清：20 分",
+    "Little’s law correct and its meaning for quick response explained: 20 points"
+   ],
+   [
+    "接力式交接位置、工作量和产量正确：20 分",
+    "Bucket-brigade hand-offs, shares and throughput correct: 20 points"
+   ],
+   [
+    "书写规范、截图完整：10 分",
+    "Neat presentation and complete screenshots: 10 points"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "按教材的分析，自动开袋机这类自动单元的主要价值在哪里？",
+    "According to the text, where does the main value of an automatic unit such as the pocket welter lie?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "把熟练工的经验变成了夹具和程序，新手放好料就能做出一致的质量",
+      "It turns skilled operators’ experience into fixtures and a program, so a newcomer can produce consistent quality"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "缝速远高于普通平缝机",
+      "It sews far faster than an ordinary lockstitch machine"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "完全不需要人工上料",
+      "It needs no manual loading at all"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "不需要压缩空气和传感器",
+      "It needs no compressed air or sensors"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "开袋机 3000 sti/min 并不比平缝机快，样本产量里也包括人工上料时间；价值在夹具和程序。",
+    "At 3000 sti/min the welter is no faster than a lockstitch machine, and catalogue output includes manual loading; the value is in fixtures and program."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "自动贴袋机上料 a = 6 s、自动 m = 15 s、相邻两台走动 w = 1.5 s。平衡点 N* 是多少？",
+    "A pocket setter has a = 6 s, m = 15 s and w = 1.5 s. What is the balance point N*?"
+   ],
+   "answer": 2.8,
+   "tolerance": 0.02,
+   "unit": "",
+   "feedback": [
+    "平衡点 N* = (a+m)/(a+w) = 21/7.5 = 2.8。",
+    "N* = (a+m)/(a+w) = 21/7.5 = 2.8."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "同上（a = 6 s、m = 15 s、w = 1.5 s），一人看 3 台时每小时产量是多少件？",
+    "Same machine (a = 6 s, m = 15 s, w = 1.5 s): what is the hourly output when tending 3 machines?"
+   ],
+   "answer": 480,
+   "tolerance": 2,
+   "unit": "pcs/h",
+   "feedback": [
+    "人一圈 3 × 7.5 = 22.5 s > 21 s，循环由人决定，产量 3600 × 3 / 22.5 = 480 件/h；每台每循环等人 1.5 s。",
+    "The operator’s round 3 × 7.5 = 22.5 s exceeds 21 s, so she sets the pace: 3600 × 3 / 22.5 = 480 pieces/h, each machine waiting 1.5 s per round."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "看机台数 N 大于平衡点 N* 时，工人每循环都有空闲时间。",
+    "When the number of machines N exceeds the balance point N*, the operator has idle time every round."
+   ],
+   "correct": false,
+   "feedback": [
+    "N > N* 时人一刻不停，是机器缝完了在等人；N < N* 时才是人有空闲。",
+    "Above N* the operator never stops and the machines wait for her; idle operator time occurs below N*."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "时间有波动时，为什么看机台数接近 N* 时产量损失最大？",
+    "With variable times, why is output loss largest when N is close to N*?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "此时人和机器的余量都小，一方稍慢另一方就得等，机器干涉和人的空闲同时增加",
+      "Both operator and machines have little slack, so any delay on one side makes the other wait, increasing both interference and idle time"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "此时机器最容易出故障",
+      "Machines break down most often there"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "此时工人走动距离最长",
+      "The walking distance is longest there"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "波动只在 N = N* 时才出现",
+      "Variation only occurs at N = N*"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "远离 N* 时总有一方有富余，能吸收波动；所以要在平衡点附近工作，先要减小时间的波动。",
+    "Far from N* one side always has slack to absorb variation; to work near the balance point, first reduce variation."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "吊挂主轨链速 15 m/min、衣架间距 0.25 m，一件衣服 12 道工序（加上片、下片共走 13 段）。主轨每小时最多能支持多少件衣服？",
+    "A hanger main rail runs at 15 m/min with 0.25 m spacing; a garment has 12 operations (13 legs with loading and unloading). How many garments per hour can the rail support at most?"
+   ],
+   "answer": 277,
+   "tolerance": 2,
+   "unit": "pcs/h",
+   "feedback": [
+    "每小时可过 15/0.25 × 60 = 3600 个衣架，3600/13 ≈ 277 件；若只需 150 件/h，利用率约 54%。",
+    "3600 carriers pass per hour (15/0.25 × 60), and 3600/13 ≈ 277 garments; at 150 per hour the utilisation is about 54%."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一条吊挂线每小时产 120 件，线上平均挂着 50 个衣架。按利特尔法则，一件衣服平均在线上待多少分钟？",
+    "A hanger line produces 120 pieces an hour with an average of 50 carriers on it. By Little’s law, how many minutes does a garment spend on the line on average?"
+   ],
+   "answer": 25,
+   "tolerance": 0.5,
+   "unit": "min",
+   "feedback": [
+    "周期 = 在制品 ÷ 产量 = 50 ÷ 120 h = 25 min；降到 25 个而产量不变，周期变为 12.5 min。",
+    "Throughput time = WIP ÷ throughput = 50 ÷ 120 h = 25 min; with 25 carriers and the same output it becomes 12.5 min."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于吊挂系统的结构与运行，下列哪些说法正确？",
+    "Which statements about the structure and operation of a hanger system are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "衣架经过读卡器时，系统按它的下一道工序决定是否打开某工位的进站道岔",
+      "As a carrier passes the reader, the system decides from its next operation whether to open a work centre’s switch"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "工位支轨排满时，衣架不进站，在主轨上再绕一圈后重新分配",
+      "When a spur is full, the carrier stays on the main rail and is reassigned after another lap"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "工人做完按钮后，提升机把衣架送回主轨，同时记录谁在何时完成",
+      "When the operator presses the button, a lift returns the carrier and the system records who finished and when"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "主轨输送能力等于链速乘以衣架间距",
+      "Main-rail capacity equals chain speed times carrier spacing"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "单件流转的主要好处是大幅提高了缝纫机的缝速",
+      "The main benefit of single-piece flow is a large increase in sewing speed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "能力等于链速除以衣架间距；单件流的好处是在制品少、周期短、实时记录和衣片不落地，而不是缝速。",
+    "Capacity is chain speed divided by spacing; the benefits of single-piece flow are less WIP, shorter throughput time, real-time records and parts off the floor, not sewing speed."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "吊挂算例中，固定工位规则每小时只有约 111 件，主要原因是什么？",
+    "In the hanger example, why does the fixed-work-centre rule give only about 111 pieces an hour?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "卷袖口只有 8 号一人做，能力约 3600 ÷ (35 ÷ 1.1) ≈ 113 件/h，成为整条线的瓶颈",
+      "Only operator 8 hems sleeves, with a capacity of about 3600 ÷ (35 ÷ 1.1) ≈ 113 pieces/h, the bottleneck of the line"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "上片站投放太慢",
+      "The loading station launches too slowly"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "主轨输送能力不足",
+      "The main rail lacks conveying capacity"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "在制品上限太小",
+      "The WIP limit is too small"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "动态派工让 7 号在空闲时分担卷袖口，瓶颈被分担，产量升到 124–126 件/h，接近线性规划上限约 130 件/h。",
+    "Dynamic dispatching lets operator 7 share sleeve hemming, raising output to 124–126 pieces/h, close to the LP limit of about 130."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "接力式单元 4 人，速度为 0.6、0.8、1.0、1.6。若不用接力规则，而按标准工时固定每人做 1/4，产量是多少（件/单位时间）？",
+    "A cell has 4 operators with speeds 0.6, 0.8, 1.0 and 1.6. If instead of bucket brigade each does a fixed quarter, what is the throughput (garments per unit time)?"
+   ],
+   "answer": 2.4,
+   "tolerance": 0.01,
+   "unit": "",
+   "feedback": [
+    "固定分段时产量由最慢的人决定：4 × 0.6 = 2.4；接力式从慢到快可达 0.6+0.8+1.0+1.6 = 4.0。",
+    "With fixed segments the slowest sets the pace: 4 × 0.6 = 2.4; bucket brigade ordered slowest to fastest reaches 0.6+0.8+1.0+1.6 = 4.0."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "接力式单元 4 人，速度依次为 0.6、0.8、1.0、1.6（从慢到快）。收敛后第 2 人交给第 3 人的位置（占全部工作量的比例）是多少？",
+    "A bucket-brigade cell has speeds 0.6, 0.8, 1.0 and 1.6 (slowest to fastest). After convergence, at what fraction of the total work does operator 2 hand off to operator 3?"
+   ],
+   "answer": 0.35,
+   "tolerance": 0.01,
+   "unit": "",
+   "feedback": [
+    "x₂ = (0.6 + 0.8)/4.0 = 0.35；三个交接位置为 0.15、0.35、0.60。",
+    "x₂ = (0.6 + 0.8)/4.0 = 0.35; the three hand-offs are 0.15, 0.35 and 0.60."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "开袋算例 m = 12 s、w = 2 s，上料夹具把 a 缩短到 3.5 s，并让工人看 3 台。每小时产量约为多少件？",
+    "In the welting example (m = 12 s, w = 2 s), the loading fixture cuts a to 3.5 s and the operator tends 3 machines. About what is the hourly output?"
+   ],
+   "answer": 654.5,
+   "tolerance": 3,
+   "unit": "pcs/h",
+   "feedback": [
+    "机器周期 15.5 s，人一圈 3 × 5.5 = 16.5 s，循环 16.5 s，产量 3600 × 3 / 16.5 ≈ 655 件/h，每台每循环只等 1 s。",
+    "Machine cycle 15.5 s, operator round 3 × 5.5 = 16.5 s, so T_c = 16.5 s and output 3600 × 3 / 16.5 ≈ 655 pieces/h; each machine waits only 1 s per round."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "卷袖口标准工时 35 s，只有一名效率 1.1 的工人会做。这道工序每小时最多能做多少件？",
+    "Sleeve hemming has a standard time of 35 s and only one operator, at efficiency 1.1, can do it. At most how many pieces per hour can this operation produce?"
+   ],
+   "answer": 113.1,
+   "tolerance": 1,
+   "unit": "pcs/h",
+   "feedback": [
+    "实际工时 35/1.1 = 31.8 s，3600 ÷ 31.8 ≈ 113 件/h，这就是固定工位时整条线的瓶颈。",
+    "Actual time 35/1.1 = 31.8 s, 3600 ÷ 31.8 ≈ 113 pieces/h, the line’s bottleneck under fixed work centres."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "三人速度 0.5、1.0、1.5，若按“从快到慢”排列做接力式生产，产量大约是多少？",
+    "With speeds 0.5, 1.0 and 1.5 ordered fastest to slowest in a bucket brigade, roughly what is the throughput?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "约 1.5–1.6，接近 3 × 最慢者速度，与固定分段差不多",
+      "About 1.5–1.6, close to 3 × the slowest speed and similar to fixed segments"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "3.00，仍等于速度之和",
+      "3.00, still the sum of the speeds"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "约 4.5，因为快的人在上游",
+      "About 4.5, because the fast operator is upstream"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "0，交接永远不能完成",
+      "0, because hand-offs never complete"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "快的人很快追上前面慢的人，只能跟着等，最终几个人挤在最慢者身后；从慢到快才是收敛的充分条件。",
+    "The fast operator soon catches the slower ones and must wait behind them, so people bunch behind the slowest; slowest-to-fastest is the sufficient condition for convergence."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于吊挂线的在制品上限，下列哪些说法正确？",
+    "Which statements about the WIP limit of a hanger line are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "应定在产量曲线刚刚变平的地方",
+      "It should be set where the output curve has just levelled off"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "超过这一点再增加衣架，产量不变而平均周期变长",
+      "Adding carriers beyond that point leaves output unchanged and lengthens throughput time"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "稳定时在制品约等于产量乘平均周期",
+      "In steady state WIP is about throughput times average throughput time"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "上限越大越好，工人永远不会断活",
+      "The larger the limit the better, so operators never run out of work"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "上限减半，产量也随之减半",
+      "Halving the limit halves the output"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "算例中上限从 40 降到 20，产量几乎不变而周期缩短一半，这正是利特尔法则的含义。",
+    "In the example, cutting the limit from 40 to 20 barely changes output and halves throughput time, exactly as Little’s law implies."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "一人多机的循环时间与平衡点；吊挂系统的派工规则与在制品上限（利特尔法则）；接力式规则与从慢到快排列。",
+   "Cycle time and balance point in multi-machine tending; hanger dispatching rules and the WIP limit (Little’s law); the bucket-brigade rule and slowest-to-fastest ordering."
+  ],
+  "difficult": [
+   "理解 max(a+m, N(a+w)) 中谁决定循环、波动为何在平衡点附近损失最大，以及接力式为何会收敛；建议先用虚拟实验 12-1 的甘特图和 12-2 第②页的收敛曲线直观演示，再推公式。",
+   "Seeing which term of max(a+m, N(a+w)) sets the cycle, why variation hurts most near the balance point, and why the bucket brigade converges; show the Gantt chart of Virtual lab 12-1 and the convergence plot on page ② of 12-2 before deriving the formulas."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Opening"
+    ],
+    "minutes": 10,
+    "content": [
+     "三个车间场景，提出开袋工段看几台的问题。",
+     "Three sewing-room scenes; pose the question of how many welters to tend."
+    ]
+   },
+   {
+    "phase": [
+     "自动缝制单元",
+     "Automatic sewing units"
+    ],
+    "minutes": 20,
+    "content": [
+     "五步结构、状态机顺序控制、自动开袋机实例与样本产量。",
+     "Five-step structure, state-machine sequencing, the pocket welter and its catalogue output."
+    ]
+   },
+   {
+    "phase": [
+     "一人多机",
+     "Multi-machine tending"
+    ],
+    "minutes": 35,
+    "content": [
+     "推导循环时间与平衡点，完成算例，讨论波动、机器干涉和两种改进，回答导入问题。",
+     "Derive cycle time and balance point, work the example, discuss variation, interference and two improvements; answer the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "吊挂系统结构",
+     "Hanger-system structure"
+    ],
+    "minutes": 15,
+    "content": [
+     "主轨、读卡器、道岔、支轨、提升机；主轨能力计算。",
+     "Main rail, reader, switch, spur and lift; main-rail capacity calculation."
+    ]
+   },
+   {
+    "phase": [
+     "派工与在制品",
+     "Dispatching and WIP"
+    ],
+    "minutes": 30,
+    "content": [
+     "三种派工规则、瓶颈分析、有人离岗；在制品上限与利特尔法则；实证研究。",
+     "Three dispatching rules, bottleneck analysis, absences; WIP limit and Little’s law; the field study."
+    ]
+   },
+   {
+    "phase": [
+     "U 型单元与接力式",
+     "U-cells and bucket brigades"
+    ],
+    "minutes": 25,
+    "content": [
+     "U 型布局；接力规则、收敛公式与算例；模型的简化。",
+     "U layout; the bucket-brigade rule, convergence formula and example; model simplifications."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验实操",
+     "Virtual lab session"
+    ],
+    "minutes": 35,
+    "content": [
+     "分组完成虚拟实验 12-1 的三个任务和虚拟实验 12-2 的任务 1、接力式“从慢到快”任务。",
+     "Groups complete the three tasks of Virtual lab 12-1 and, in 12-2, Task 1 and the slowest-to-fastest bucket-brigade task."
+    ]
+   },
+   {
+    "phase": [
+     "小结与测验",
+     "Summary and quiz"
+    ],
+    "minutes": 10,
+    "content": [
+     "回顾小结，布置作业，开放测验。",
+     "Review the summary, set the assignment and open the quiz."
+    ]
+   }
+  ],
+  "homework": [
+   "完成本讲作业，并完成虚拟实验 12-2 的其余任务（最小在制品上限、从快到慢、自选速度）。",
+   "Complete the assignment and the remaining tasks of Virtual lab 12-2 (minimum WIP limit, fastest to slowest, your own speeds)."
+  ]
+ }
+}

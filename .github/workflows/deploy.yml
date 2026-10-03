@@ -124,13 +124,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Build the web-edition books
+      - name: Tools for the course packs (slides, Word files, formulas with Chinese)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk >/dev/null
+          pip install -q python-pptx==1.0.2 python-docx==1.2.0 Pillow matplotlib
+      - name: Build the web-edition books and their course packs
         run: |
           set -e
           for d in textbook/web-editions/*/; do
             b=$(basename "$d")
             python "$d/build.py" "textbook/build/$b/webed"
             test -f "textbook/build/$b/webed/book.json"
+            # 课程包（第 16 轮）：先检查每讲文件，再生成讲义、课件、实验、测验与发布清单
+            if [ -f "$d/course/tools/build_course.py" ]; then
+              python "$d/course/tools/check.py" all
+              python "$d/course/tools/build_course.py" "textbook/build/$b/course"
+              test -f "textbook/build/$b/course/manifest.json"
+            fi
           done
       - name: Keep the web editions for the deploy
         uses: actions/upload-artifact@v4

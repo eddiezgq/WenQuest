@@ -1,0 +1,1311 @@
+{
+ "no": 2,
+ "title": [
+  "线迹的形成",
+  "How a Stitch Is Formed"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能在工业平缝机上指出三类外部零件和两根轴，并画出“一根上轴、四条传动链”的框图。",
+   "Identify the three groups of external parts and the two shafts of an industrial lockstitch machine, and draw the block diagram of one main shaft driving four drive trains."
+  ],
+  [
+   "能说明 301 锁式线迹的结构，以及面线、底线张力不平衡时交织点的位置和布面外观。",
+   "Describe the structure of lockstitch 301, and where the interlacing point goes and what the fabric shows when needle- and bobbin-thread tensions are unbalanced."
+  ],
+  [
+   "能按主轴转角说出一针的五个阶段，解释机针不对称、旋梭 2:1 转速和梭床静止各起什么作用。",
+   "Describe the five phases of a stitch by main-shaft angle, and explain the roles of the asymmetric needle, the 2:1 hook speed and the stationary bobbin-case holder."
+  ],
+  [
+   "能读运动时序图，用 180°、约 206°、约 258° 三个时刻解释跳针和送布时机。",
+   "Read the timing diagram and use the three moments 180°, about 206° and about 258° to explain skipped stitches and when feeding may happen."
+  ],
+  [
+   "能用虚拟实验 2-1 找出不跳针的钩线时刻范围，并把转角偏差换算成时间。",
+   "Use Virtual lab 2-1 to find the range of hook timing without skipped stitches, and convert an angle error into time."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "车间问题：换了旋梭以后频繁跳针",
+   "Shop-floor problem: frequent skipped stitches after a hook change"
+  ],
+  "text": [
+   "一台工业平缝机（针杆机构同第 3 章算例，r = 15.5 mm，l = 55 mm）以每分钟 5000 针缝衬衫，换装旋梭后布面频繁缺针。修机工拆下针板，用手转动手轮检查：标准状态下梭尖应在主轴 206° 左右到达机针中心线，这台机器实测却在 216°。",
+   "An industrial lockstitch machine (needle-bar mechanism as in the Chapter 3 example, r = 15.5 mm, l = 55 mm) sews shirts at 5000 stitches per minute. After a rotary hook was replaced, stitches are frequently missing. The mechanic removes the throat plate and turns the handwheel by hand: normally the hook point should reach the needle centre line at about 206° of main-shaft angle, but on this machine it arrives at 216°."
+  ],
+  "question": [
+   "216° 时机针已从最低点回升了多少毫米？按虚拟实验 2-1 的线环模型，梭尖还能不能钩住线环？10° 的偏差在每分钟 5000 针时相当于多少毫秒？应把钩线时刻调回到什么范围？",
+   "How far has the needle risen from its lowest point at 216°? By the loop model of Virtual lab 2-1, can the hook point still catch the loop? What time does a 10° error correspond to at 5000 stitches per minute? To what range should the hook timing be reset?"
+  ],
+  "answer": [
+   "按第 3 章针杆运动，206° 时回升约 2.0 mm，216° 时已回升约 3.7 mm，线环已经开始收缩；虚拟实验 2-1 的模型中，只有回升量约 1.4–3.0 mm（钩线约在 202°–212°，Δ 约 −4°～+6°）时才能钩住，所以 216° 钩得太晚，必然跳针。每分钟 5000 针时一针 12 ms，主轴每毫秒转 30°，10° 的偏差只有约 0.33 ms。应重新安装旋梭，使梭尖在约 206°（回升约 2 mm）到达机针中心线，并同时复核针杆高度。",
+   "From the Chapter 3 needle-bar motion, the rise is about 2.0 mm at 206° and already about 3.7 mm at 216°, when the loop is shrinking. In the model of Virtual lab 2-1 the loop is caught only for a rise of about 1.4–3.0 mm (catching at about 202°–212°, Δ about −4° to +6°), so catching at 216° is too late and stitches will be skipped. At 5000 stitches per minute one stitch takes 12 ms and the shaft turns 30° per millisecond, so a 10° error is only about 0.33 ms. The hook must be re-set so that its point reaches the needle centre line at about 206° (about 2 mm rise), and the needle-bar height re-checked."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人联系：一根主轴的时序图 ↔ 传送带跟踪抓取的电子凸轮",
+   "Robot link: one shaft's timing diagram ↔ the electronic cam of conveyor-tracking picking"
+  ],
+  "text": [
+   "缝纫机四个动作都挂在同一根主轴上，所以每个机构的位置都可以写成主轴转角的函数，画在一张时序图上。机器人在运动的传送带上抓取工件时也是这样做的：传送带上装一个编码器当作“主轴”，机器人控制器把手爪的位置写成传送带编码器计数的函数（电子凸轮），工件走到哪里，手爪就跟到哪里。梭尖必须在机针回升约 2 mm 的那十度左右里钩住线环，否则跳针；手爪也必须在工件进入抓取窗口时合上，错过了就是机器人的“跳针”。每分钟 5000 针时 10° 只有约 0.33 ms，这正是为什么这类同步必须靠编码器反馈，而不能靠定时器“估计”时间。",
+   "All four motions of a sewing machine hang on one main shaft, so the position of every mechanism can be written as a function of shaft angle and drawn on one timing diagram. A robot picking parts from a moving conveyor does the same: an encoder on the conveyor acts as the “main shaft”, and the controller writes the gripper position as a function of conveyor encoder counts (an electronic cam), so the gripper follows the part wherever it goes. The hook point must catch the loop within roughly ten degrees around 2 mm of needle rise or a stitch is skipped; the gripper must close while the part is inside its pick window, and missing it is the robot's “skipped stitch”. At 5000 stitches per minute 10° is only about 0.33 ms, which is why such synchronisation must use encoder feedback rather than a timer that estimates time."
+  ]
+ },
+ "life": {
+  "title": [
+   "生活例子：跳大绳",
+   "Everyday example: jumping into a long rope"
+  ],
+  "text": [
+   "两人摇大绳，第三个人要冲进去，必须在绳子刚扫过地面、向上甩起的那一小段时间里起跳：早了绳子还没过来，晚了绳子已经落下来绊脚。梭尖钩线也是这样，线环只在机针回升约 2 mm 前后张得最大，梭尖必须正好在那一刻到达。",
+   "When two people turn a long rope, a third person running in has to jump in the short moment just after the rope sweeps the ground and swings up: too early and the rope has not passed, too late and it comes down on their feet. The hook point is the same: the loop is fullest only around 2 mm of needle rise, and the hook point must arrive at exactly that moment."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "先看整机：工业平缝机的外形",
+    "The whole machine first: what you can see"
+   ],
+   "points": [
+    [
+     "“凹”字形铸件：右边立柱、上面机臂、左端机头、下面嵌在台板里的底板。",
+     "A C-shaped casting: the pillar on the right, the arm on top, the head at the left end and the bed set into the table below."
+    ],
+    [
+     "带线的零件：夹线器 → 挑线杆 → 机针，线按这个顺序被引导和控制。",
+     "Thread-carrying parts: tension assembly → take-up lever → needle, guiding and controlling the thread in that order."
+    ],
+    [
+     "接触布料的零件：针杆与机针、压脚、针板、送布牙。",
+     "Parts touching the fabric: needle bar and needle, presser foot, throat plate, feed dog."
+    ],
+    [
+     "给人操作的零件：手轮、针距调节器、倒缝扳手。",
+     "Parts for the operator: handwheel, stitch-length regulator, reverse lever."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_whole.png",
+   "narration": [
+    "讨论线迹之前，我们先认识一台完整的机器。最常见的单针工业平缝机，外壳是一个凹字形的铸件：右边立柱，上面机臂，左端下垂的是机头，下面是嵌在台板里的底板。操作工面对机器坐着，布从面前往里送，在压脚和针板之间被缝合。外面能看到的零件分三类：一类带线，面线经过夹线器加张力、经过挑线杆、最后到针眼；一类直接碰布，就是针、压脚、针板和送布牙；还有一类给人操作，比如手轮、针距调节器和倒缝扳手。",
+    "Before discussing stitches, let's get to know a complete machine. The common single-needle industrial lockstitch machine has a C-shaped cast housing: the pillar on the right, the arm across the top, the head hanging down at the left end, and the bed set into the table below. The operator sits facing the machine, the fabric is fed away from them, and it is sewn between the presser foot and the throat plate. The visible parts fall into three groups: parts that carry thread, from the tension assembly through the take-up lever to the needle eye; parts that touch the fabric, namely needle, presser foot, throat plate and feed dog; and parts for the operator, such as the handwheel, stitch regulator and reverse lever."
+   ]
+  },
+  {
+   "title": [
+    "里面只有两根轴",
+    "Inside there are only two shafts"
+   ],
+   "points": [
+    [
+     "机臂里的上轴（主轴）和底板里的下轴，由立柱里的同步带 1:1 连接，转速相同。",
+     "The main (arm) shaft in the arm and the hook (bed) shaft in the bed, joined 1:1 by a timing belt in the pillar, turn at the same speed."
+    ],
+    [
+     "其余所有机构都挂在这两根轴上。",
+     "Every other mechanism hangs on these two shafts."
+    ],
+    [
+     "电机装在手轮一侧带动上轴；手轮可以手动转主轴，调机时常用。",
+     "The motor drives the main shaft from the handwheel end; the handwheel turns the shaft by hand, which is used constantly for setting up."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_xray.png",
+   "narration": [
+    "把机壳变成半透明，你会发现机器里面其实很简单：只有两根贯通的轴。机臂里是上轴，也叫主轴；底板里是下轴。两根轴由立柱里的一条同步带连起来，传动比 1 比 1，转速相同。其余所有机构，刺布的、挑线的、钩线的、送布的，都挂在这两根轴上。图里蓝色是刺布链，紫色是挑线链，橙色是钩线链，绿色是送布链。调机的时候，师傅用手转手轮，其实就是在慢慢转这根主轴，看每个机构走到了哪里。",
+    "Make the housing transparent and you find the inside is surprisingly simple: just two shafts running through it. In the arm is the main shaft, or arm shaft; in the bed is the hook shaft. They are linked by a timing belt in the pillar at a ratio of one to one, so they turn at the same speed. Every other mechanism, for the needle, the take-up, the hook and the feed, hangs on these two shafts. In the figure blue is the needle train, purple the take-up train, orange the hook train and green the feed train. When a mechanic turns the handwheel during set-up, he is slowly turning this main shaft to see where each mechanism has got to."
+   ]
+  },
+  {
+   "title": [
+    "一根上轴、四条传动链",
+    "One main shaft, four drive trains"
+   ],
+   "points": [
+    [
+     "四个动作永远同步：同一根上轴经固定传动比驱动，没有离合器、没有会打滑的环节。",
+     "The four motions are always in step: one main shaft drives them through fixed ratios, with no clutch and nothing that can slip."
+    ],
+    [
+     "旋梭转速是主轴的两倍：同步带 1:1，下轴到旋梭轴齿轮 1:2，主轴一圈、缝一针，旋梭两圈。",
+     "The hook turns at twice main-shaft speed: belt 1:1, gears 1:2 from hook shaft to hook, so one shaft revolution, one stitch, two hook turns."
+    ],
+    [
+     "送布是两个运动合成：水平运动来自上轴送布偏心轮（经针距调节器），上下运动来自下轴抬牙偏心轮。",
+     "Feed combines two motions: horizontal from the feed eccentric on the main shaft (via the stitch regulator), vertical from the lift eccentric on the hook shaft."
+    ],
+    [
+     "合成后送布牙齿尖走近似椭圆：在上面推布，落到针板下退回。",
+     "Combined, the feed-dog teeth trace a rough ellipse: pushing the fabric when up, returning below the throat plate."
+    ]
+   ],
+   "formula": "",
+   "figure": "w_423def1c.png",
+   "narration": [
+    "这张框图是读懂本章的钥匙，请记住三点。第一，四个动作永远同步。它们都由同一根上轴经过固定传动比驱动，中间没有离合器，也没有会打滑的环节，所以只要知道主轴转到多少度，就知道每个机构此刻在哪里。第二，旋梭的转速是主轴的两倍：主轴转一圈缝一针，旋梭转两圈，为什么必须两圈，留作习题。第三，送布是两个运动合成的：水平运动来自上轴，经过针距调节器，所以针距能调、能倒缝；上下运动来自下轴。合起来，送布牙齿尖画出一个近似椭圆。",
+    "This block diagram is the key to the chapter, so remember three points. First, the four motions are always in step. They are all driven by one main shaft through fixed ratios, with no clutch and nothing that can slip, so if you know the shaft angle you know where every mechanism is. Second, the hook turns twice as fast as the main shaft: one shaft revolution sews one stitch while the hook turns twice; why it must be twice is an exercise. Third, the feed combines two motions: the horizontal one comes from the main shaft through the stitch regulator, so stitch length can be set and reversed; the vertical one comes from the hook shaft. Together the feed-dog teeth trace a rough ellipse."
+   ]
+  },
+  {
+   "title": [
+    "整机爆炸图与三维模型",
+    "Exploded view and the 3D model"
+   ],
+   "points": [
+    [
+     "部件大致按拆装方向展开：面板、附件 → 上轴组件、针杆、挑线组件 → 底板下的下轴、旋梭、送布组件。",
+     "Parts are spread roughly in disassembly order: face plate and fittings → main-shaft assembly, needle bar, take-up → hook shaft, hook and feed under the bed."
+    ],
+    [
+     "读图时把每个组件对应到框图上的某一条链。",
+     "When reading it, map each assembly to one of the trains in the block diagram."
+    ],
+    [
+     "模型 2-1：外观、透视、爆炸三种显示；点击传动链单独高亮；播放后整机按真实运动关系转起来。",
+     "Model 2-1: exterior, X-ray and exploded displays; click a train to highlight it; press Play and the whole machine runs with its true motion relations."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_explode.png",
+   "narration": [
+    "这张爆炸图把整机部件大致按拆装的方向展开：先卸面板和机壳上的附件，再抽出上轴组件、针杆和挑线组件；底板下面是下轴、旋梭和送布组件。读图的方法是把每个组件对应到刚才框图的某一条链上。静态图只能看一个角度，所以请大家打开模型 2-1：可以拖动旋转，在外观、透视、爆炸之间切换，点一条传动链让它单独高亮；点播放，整台机器按真实运动关系转起来，面线还会随挑线杆收放。建议四条链各看一遍，再往下学。",
+    "This exploded view spreads the parts out roughly in the direction you would take them apart: first the face plate and fittings, then the main-shaft assembly, needle bar and take-up; under the bed are the hook shaft, rotary hook and feed assembly. The way to read it is to map each assembly to one of the trains in the block diagram. A static picture shows only one angle, so please open Model 2-1: you can drag to rotate, switch between exterior, X-ray and exploded, and click a drive train to highlight it; press Play and the whole machine runs with its true motion, the needle thread even paying out and taking up with the lever. Look at each of the four trains before going on."
+   ]
+  },
+  {
+   "title": [
+    "引子：为什么会“跳针”",
+    "Opening: why do skipped stitches happen?"
+   ],
+   "points": [
+    [
+     "跳针：布面上本该连续的线迹缺了一针；机器照常运转，针照常上下，线却没有交织上。",
+     "A skipped stitch: a stitch is missing from the seam; the machine runs and the needle moves, but the threads did not interlace."
+    ],
+    [
+     "原因几乎总是同一个：梭尖没有在正确的时刻、正确的位置钩住线环。",
+     "The cause is almost always the same: the hook point did not catch the loop at the right moment and place."
+    ],
+    [
+     "要理解跳针，先要知道线环怎样产生、只存在多长时间。",
+     "To understand it, we need to know how the loop forms and how long it lasts."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "车间里最常见的投诉之一是跳针：布面上本该连续的线迹缺了一针。怪就怪在，机器照常运转，针照常上下，线却没有交织上，留下一段两倍长的线迹。原因几乎总是同一个：旋梭的梭尖没有在正确的时刻、正确的位置钩住针线形成的线环。所以要理解跳针，我们必须先搞清楚两件事：线环是怎样产生的，它又只存在多长时间。本讲的车间问题就是一个跳针的例子，修机工发现梭尖晚到了十度，学完这一讲，大家就能算出这十度意味着什么。",
+    "One of the most common complaints on the shop floor is skipped stitches: a stitch is missing from a seam that should be continuous. The strange thing is that the machine keeps running and the needle keeps going up and down, but the threads did not interlace, leaving one stitch twice as long. The cause is almost always the same: the hook point did not catch the needle-thread loop at the right moment and in the right place. So to understand skipping we must first work out two things: how the loop forms, and how long it lasts. Our shop-floor problem is a case of skipping where the hook arrives ten degrees late; by the end of this lesson you will be able to say what those ten degrees mean."
+   ]
+  },
+  {
+   "title": [
+    "线迹的分类与 301 锁式线迹",
+    "Stitch classes and lockstitch 301"
+   ],
+   "points": [
+    [
+     "ISO 4915 按线的交织方式分六类：100 单线链式、200 仿手工、300 锁式、400 多线链式、500 包缝、600 覆盖。",
+     "ISO 4915 groups stitches into six classes by how the threads interlace: 100 single-thread chain, 200 hand-like, 300 lock, 400 multi-thread chain, 500 overedge, 600 covering."
+    ],
+    [
+     "本书以最基本、应用最广的 301 为主线：家用缝纫机和工业平缝机缝的都是它。",
+     "The book follows 301, the most basic and widely used: both household and industrial lockstitch machines sew it."
+    ],
+    [
+     "301 由面线（针线）和底线组成：针线带线环到布下，底线穿过线环，交织点被拉进布厚中间。",
+     "301 uses a needle thread and a bobbin thread: the needle carries a loop below, the bobbin thread passes through it, and the interlacing point is pulled into the middle of the fabric."
+    ],
+    [
+     "交织点合适时，正反两面都只看到一段段直线，强度也最好。",
+     "With the interlacing point in place, both faces show only straight segments and the seam is strongest."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "国际标准 ISO 4915 按线的交织方式把线迹分成六类，第 1 章已经见过。本书以 301 锁式线迹为主线，因为它最基本、用得最广，家用缝纫机和工业平缝机缝出的都是它。301 只有两根线：从机针穿过的面线，也叫针线，和绕在梭芯上的底线。每一针，针线带着一个线环穿到布下，底线从线环里穿过去，然后针线被拉紧，把两根线的交织点拉进布料厚度的中间。交织点位置合适的时候，布的正反两面都只看到一段段直线，强度也最好。",
+    "The international standard ISO 4915 divides stitches into six classes by how the threads interlace, as we saw in Chapter 1. The book follows lockstitch 301 because it is the most basic and the most widely used: household and industrial lockstitch machines both sew it. 301 has just two threads: the needle thread passing through the needle, and the bobbin thread wound on the bobbin. On each stitch the needle thread carries a loop below the fabric, the bobbin thread passes through the loop, and then the needle thread is pulled tight, drawing the interlacing point into the middle of the fabric thickness. When the interlacing point is in the right place, both faces show only straight segments and the seam is at its strongest."
+   ]
+  },
+  {
+   "title": [
+    "张力平衡：车间判断张力最快的办法",
+    "Tension balance: the quickest check on the shop floor"
+   ],
+   "points": [
+    [
+     "交织点的位置由针线张力与底线张力的平衡决定。",
+     "Where the interlacing point sits depends on the balance between needle- and bobbin-thread tension."
+    ],
+    [
+     "正面看到底线的小点：面线相对太紧，或底线太松。",
+     "Bobbin thread showing as dots on the face: needle thread relatively too tight, or bobbin thread too loose."
+    ],
+    [
+     "反面看到面线的小点：底线相对太紧，或面线太松。",
+     "Needle thread showing as dots on the back: bobbin thread relatively too tight, or needle thread too loose."
+    ],
+    [
+     "这是第 4 章挑线机构和第 7 章线张力要解决的问题。",
+     "This is what the take-up (Chapter 4) and thread tension (Chapter 7) must get right."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_section.png",
+   "narration": [
+    "交织点在哪里，由两根线的张力平衡决定，就像拔河：面线张力大，交织点就被拉到布料上面，正面能看到底线的小点；底线张力大，交织点被拉到下面，反面能看到面线的小点。这张图是沿缝线方向剖开的截面，中间那个是理想状态，交织点藏在布厚中间。到车间拿起一块缝好的布，翻过来看两面，这是判断张力最快的办法。注意说的是相对太紧，正面露底线，可能是面线紧了，也可能是底线松了，具体怎么调，第 7 章再讲。",
+    "Where the interlacing point sits is decided by the balance of the two tensions, like a tug of war: if the needle thread is tighter, the point is pulled up and the bobbin thread shows as small dots on the face; if the bobbin thread is tighter, the point is pulled down and the needle thread shows as dots on the back. The figure is a section cut along the seam, and the middle one is the ideal, with the interlacing point hidden in the middle of the fabric. On the shop floor, pick up a sewn piece and look at both sides: it is the quickest tension check there is. Note that we mean relatively too tight: bobbin thread on the face may mean a tight needle thread or a loose bobbin thread; Chapter 7 covers how to adjust."
+   ]
+  },
+  {
+   "title": [
+    "机针为什么两侧不对称",
+    "Why the needle is asymmetric"
+   ],
+   "points": [
+    [
+     "一侧是贯通针身的长槽：下行时针线藏在槽里，不被布料磨损。",
+     "One side has a long groove the full length of the blade: going down, the thread lies in it, protected from the fabric."
+    ],
+    [
+     "另一侧在针眼附近只有短槽，上方磨出凹口（让位）。",
+     "The other side has only a short groove near the eye, with a scarf ground above it."
+    ],
+    [
+     "回升时短槽一侧的线被布料夹住、跟不上针，在凹口一侧鼓出线环。",
+     "Rising, the thread on the short-groove side is gripped by the fabric and cannot follow, so a loop bulges out on the scarf side."
+    ],
+    [
+     "线环能不能形成、梭尖能不能钩到，都取决于这个不对称；凹口必须朝向梭尖。",
+     "Whether the loop forms and whether the hook can reach it both depend on this asymmetry; the scarf must face the hook point."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_needle.png",
+   "narration": [
+    "要理解线环，先认识机针。仔细看，机针两侧是不对称的：一侧有一条贯通针身的长槽，另一侧只在针眼附近有一段短槽，短槽上方还磨出一个凹口。针往下扎的时候，针线藏在长槽里，不会被布磨损。针到最低点开始回升，短槽这一侧的线没有槽保护，被布料夹住，跟不上针，于是就在凹口这一侧鼓出一个线环。梭尖正是从凹口那里掠过去钩线的。所以机针装反了、或者转了一个角度，线环就会偏到别处，梭尖钩不到，这就是跳针的一个常见原因。",
+    "To understand the loop, first meet the needle. Look closely and the two sides are different: one has a long groove running the length of the blade, the other has only a short groove near the eye with a scarf ground above it. Going down, the thread lies in the long groove and is not worn by the fabric. When the needle passes its lowest point and starts to rise, the thread on the short-groove side has no groove to protect it, is gripped by the fabric and cannot keep up, so it bulges out as a loop on the scarf side. The hook point sweeps past the scarf to catch it. So if the needle is put in the wrong way round or turned, the loop forms elsewhere and the hook misses: a common cause of skipped stitches."
+   ]
+  },
+  {
+   "title": [
+    "旋梭：转的是梭体，梭壳不动",
+    "The rotary hook: the body turns, the bobbin case does not"
+   ],
+   "points": [
+    [
+     "旋梭体装在旋梭轴上转动，梭尖长在它的边缘上。",
+     "The hook body turns on the hook shaft, with the hook point on its rim."
+    ],
+    [
+     "梭床坐在梭道里，被机壳上的定位钩挡住，不随旋梭转动；梭床压圈防止它脱出。",
+     "The bobbin-case holder sits in the race and is stopped by a positioner on the housing, so it does not turn; a gib keeps it in place."
+    ],
+    [
+     "梭壳连同绕满底线的梭芯插在梭床中心柱上，底线留在梭壳里不动。",
+     "The bobbin case with its full bobbin fits on the holder's centre post, so the bobbin thread stays put."
+    ],
+    [
+     "梭尖带着线环绕过的是一个静止的梭壳，线环才能把底线“套”进去。",
+     "The hook point carries the loop around a stationary bobbin case, which is how the loop can enclose the bobbin thread."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_hook_exploded.png",
+   "narration": [
+    "再认识旋梭。旋梭不是一个整体零件，这张分解图从左到右是拆卸的顺序。旋梭体装在旋梭轴上转动，梭尖就长在它的边缘上。梭床坐在旋梭体的梭道里，但它被机壳上的定位钩挡住，不跟着转。梭壳连同绕满底线的梭芯插在梭床的中心柱上，梭床压圈拧在前面防止梭床脱出。这样一来，旋梭转的时候，梭尖带着线环绕过去的是一个静止的梭壳，底线一直留在里面不动，线环绕一圈，就把底线套进去了。一个转、一个不转，这是旋梭的巧妙之处。",
+    "Now the rotary hook. It is not one piece; this exploded view runs left to right in the order you take it apart. The hook body turns on the hook shaft, with the hook point on its rim. The bobbin-case holder sits in the race of the hook body, but a positioner on the housing stops it from turning. The bobbin case with its full bobbin fits on the holder's centre post, and a gib screwed on the front keeps the holder in. So as the hook turns, its point carries the loop around a bobbin case that stays still, with the bobbin thread inside it; one trip around and the bobbin thread is enclosed in the loop. One part turns and one does not: that is the clever thing about the rotary hook."
+   ]
+  },
+  {
+   "title": [
+    "一针的五个阶段（一）：刺布与形成线环",
+    "Five phases of a stitch (1): piercing and loop forming"
+   ],
+   "points": [
+    [
+     "刺布：机针带针线下行刺穿布料，针线藏在长槽里。",
+     "Piercing: the needle carries the thread down through the fabric, the thread lying in the long groove."
+    ],
+    [
+     "主轴转一圈完成一针，旋梭转两圈（2:1）；机针在 180° 到达最低点。",
+     "One shaft revolution makes one stitch while the hook turns twice (2:1); the needle reaches its lowest point at 180°."
+    ],
+    [
+     "形成线环：机针开始回升，凹口一侧鼓出线环。",
+     "Loop forming: the needle starts to rise and a loop bulges on the scarf side."
+    ],
+    [
+     "针回升约 2 mm 时，线环张开得最大、也最稳定。",
+     "At about 2 mm of rise the loop is fullest and steadiest."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_stages.png",
+   "narration": [
+    "现在把一针分成五个阶段，以工业平缝机常用的水平全回转旋梭为例，主轴转一圈完成一针，旋梭转两圈。第一个阶段是刺布：机针带着针线下行，刺穿布料，线藏在长槽里。主轴转到 180 度，机针到达最低点。第二个阶段是形成线环：机针开始回升，短槽一侧的线被布夹住、跟不上，在凹口一侧鼓出线环。请记住一个数字：针回升约 2 毫米的时候，线环张得最大、也最稳定。图里每一格都是顺着旋梭轴看过去的样子，圆圈里是局部放大。",
+    "Now divide one stitch into five phases, using the horizontal full rotary hook common on industrial machines: one revolution of the main shaft makes one stitch while the hook turns twice. Phase one is piercing: the needle carries the thread down through the fabric, the thread lying in the long groove. At 180° of shaft angle the needle reaches its lowest point. Phase two is loop forming: the needle starts to rise, the thread on the short-groove side is held by the fabric and lags behind, and a loop bulges out on the scarf side. Remember one number: at about 2 millimetres of rise the loop is fullest and steadiest. Each panel is the view along the hook axis, with a close-up in the circle."
+   ]
+  },
+  {
+   "title": [
+    "一针的五个阶段（二）：钩线、绕梭、收紧与送布",
+    "Five phases (2): catching, passing round the bobbin, tightening and feeding"
+   ],
+   "points": [
+    [
+     "钩线：恰在线环最大时，梭尖从凹口处掠过钩住线环——早了线环没张开，晚了已收缩，都会跳针。",
+     "Catching: just as the loop is fullest, the hook point sweeps past the scarf and catches it — too early and it is not open, too late and it has shrunk; both skip."
+    ],
+    [
+     "绕梭：旋梭把线环越拉越大，绕过装底线的梭壳；挑线杆下行放线。",
+     "Round the bobbin: the hook draws the loop larger and around the bobbin case; the take-up lever descends to pay out thread."
+    ],
+    [
+     "收紧：线环从梭上脱出，挑线杆快速上升收回余线，交织点收进布厚中间。",
+     "Tightening: the loop slips off the hook, the take-up lever rises fast to recover the slack, and the interlacing point is drawn into the fabric."
+    ],
+    [
+     "送布：机针离开布料以后，送布牙把布推进一个针距。",
+     "Feeding: once the needle has left the fabric, the feed dog moves it forward one stitch length."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_stages.png",
+   "narration": [
+    "第三个阶段是钩线，这一刻决定成败。恰在线环张得最大的时候，梭尖从机针凹口处掠过，钻进线环和机针之间把它钩住。早了，线环还没张开；晚了，线环已经收缩，两种情况都会跳针。第四个阶段是绕梭：旋梭继续转，把线环越拉越大，绕过装着底线的梭壳，这时挑线杆往下走，把线环需要的线放下来。第五个阶段是收紧与送布：线环从梭上脱出，挑线杆快速上升收回多余的线，交织点被拉进布中间；机针离开布料以后，送布牙把布向前推一个针距。",
+    "Phase three is catching, and this is the moment of truth. Just as the loop is fullest, the hook point sweeps past the scarf and slips between the loop and the needle to catch it. Too early and the loop has not opened; too late and it has shrunk; either way the stitch is skipped. Phase four is passing round the bobbin: the hook keeps turning and draws the loop larger and larger around the bobbin case, while the take-up lever comes down to let out the thread the loop needs. Phase five is tightening and feeding: the loop slips off the hook, the take-up lever rises quickly to pull back the surplus, and the interlacing point is drawn into the fabric; once the needle is out of the fabric, the feed dog pushes it forward one stitch length."
+   ]
+  },
+  {
+   "title": [
+    "四个动作及其配合",
+    "The four motions and how they fit together"
+   ],
+   "points": [
+    [
+     "刺布（针杆与机针）：最低点 180°，回升约 2 mm 时为钩线时刻。",
+     "Needle (needle bar and needle): lowest at 180°; loop catching at about 2 mm of rise."
+    ],
+    [
+     "钩线（旋梭）：梭尖到达机针中心线的时刻须与线环最大时刻重合。",
+     "Hook (rotary hook): the hook point must reach the needle centre line exactly when the loop is fullest."
+    ],
+    [
+     "挑线（挑线杆）：绕梭期间下行放线，脱环后快速上升收线。",
+     "Take-up (take-up lever): descends to pay out while the loop passes round the bobbin, rises fast after cast-off."
+    ],
+    [
+     "送布（送布牙）：机针在布面以上时完成送布；压脚一般不随主轴运动，不计入。",
+     "Feed (feed dog): feeding is completed while the needle is above the fabric; the presser foot does not normally move with the shaft and is not counted."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "把刚才的过程按执行件归纳一下，就是四个动作：刺布、钩线、挑线、送布。压脚始终压着布，一般不随主轴运动，所以不算在里面。刺布的关键时刻是最低点 180 度和回升约 2 毫米的钩线时刻；钩线要求梭尖到达机针中心线的时刻，和线环最大的时刻重合；挑线要在绕梭时放线、脱环后收线；送布必须在机针离开布料以后进行，否则针还扎在布里，布却要往前走，针会被拉弯甚至折断。四个动作由同一根主轴驱动，相位关系是固定的，设计缝纫机，本质上就是让它们在每个关键时刻都对得上。",
+    "Grouping the process by the parts that do the work gives four motions: needle, hook, take-up and feed. The presser foot holds the fabric all the time and does not normally move with the main shaft, so it is not counted. The key moments for the needle are its lowest point at 180° and catching at about 2 millimetres of rise; the hook must reach the needle centre line exactly when the loop is fullest; the take-up pays out while the loop goes round the bobbin and takes up after cast-off; and feeding must happen after the needle has left the fabric, or the fabric would move while the needle is still in it, bending or even breaking the needle. All four are driven by one shaft with fixed phase, so designing a sewing machine really means making them meet at every key moment."
+   ]
+  },
+  {
+   "title": [
+    "运动时序图：抓住三个时刻",
+    "The timing diagram: three moments to remember"
+   ],
+   "points": [
+    [
+     "以主轴转角为横坐标，把四个机构画在同一张图上（第 8 章详讲）。",
+     "Plot all four mechanisms against main-shaft angle on one diagram (Chapter 8 goes further)."
+    ],
+    [
+     "180°：机针到达最低点。",
+     "180°: the needle reaches its lowest point."
+    ],
+    [
+     "约 206°：机针回升约 2 mm，梭尖钩线。",
+     "About 206°: the needle has risen about 2 mm and the hook point catches."
+    ],
+    [
+     "约 258°：机针离开布料，此后送布牙才开始推布。",
+     "About 258°: the needle leaves the fabric; only then does the feed dog start to push."
+    ]
+   ],
+   "formula": "h(\\varphi)=x(180^{\\circ})-x(\\varphi),\\qquad h(206^{\\circ})\\approx 2\\ \\mathrm{mm}",
+   "figure": "w_2a86e05b.png",
+   "narration": [
+    "把四个动作画在同一张以主轴转角为横坐标的图上，就是缝纫机的运动时序图。读这张图抓住三个时刻：180 度，机针到最低点；206 度左右，机针回升约 2 毫米，梭尖钩线；258 度左右，机针离开布料，之后送布牙才开始推布。公式里的 h 就是机针离最低点的回升量。钩线时刻提前或推后十几度，回升量就离开了线环最大的区间，这就是跳针的来源。针杆位移是按第 3 章的算例算出来的，下一讲我们就推导它。",
+    "Draw all four motions on one diagram with main-shaft angle along the bottom and you have the machine's timing diagram. Hold on to three moments: at 180° the needle is at its lowest; at about 206° it has risen about 2 millimetres and the hook point catches; at about 258° the needle leaves the fabric, and only after that does the feed dog start pushing. The h in the formula is the needle's rise from its lowest point. Move the catching moment ten or more degrees earlier or later and the rise falls outside the range where the loop is fullest: that is where skipped stitches come from. The needle-bar motion here comes from the Chapter 3 worked example, which we derive in the next lesson."
+   ]
+  },
+  {
+   "title": [
+    "虚拟实验 2-1：钩线时刻与跳针",
+    "Virtual lab 2-1: hook timing and skipped stitches"
+   ],
+   "points": [
+    [
+     "拖动“钩线时刻偏差 Δ”（−30°～+30°），让动画走过钩线时刻，看线环有没有被钩住。",
+     "Drag the hook-timing error Δ (−30° to +30°), let the animation run through catching and see whether the loop is caught."
+    ],
+    [
+     "实验的线环模型（示意）：回升约 1.4–3.0 mm 时能钩住，对应钩线约 202°–212°，窗口约 11°。",
+     "In the lab's (illustrative) loop model the loop is caught for a rise of about 1.4–3.0 mm, i.e. catching at about 202°–212°, a window of about 11°."
+    ],
+    [
+     "每分钟 5000 针时一针 12 ms，主轴每毫秒转 30°：10° 只有约 0.33 ms。",
+     "At 5000 stitches per minute one stitch takes 12 ms and the shaft turns 30° per millisecond: 10° is only about 0.33 ms."
+    ],
+    [
+     "所以换旋梭、改针杆机构以后，都要重新校正钩线时刻和针杆高度。",
+     "So after changing a hook or the needle-bar mechanism, hook timing and needle-bar height must be re-set."
+    ]
+   ],
+   "formula": "t_{\\Delta}=\\frac{\\Delta}{360^{\\circ}}\\cdot\\frac{60}{n}",
+   "figure": "",
+   "narration": [
+    "现在动手做虚拟实验 2-1。拖动钩线时刻偏差 Δ，Δ 大于零表示梭尖到得晚。让动画走过钩线那一刻，看线环有没有被钩住，右边会告诉你梭尖到达时机针回升了多少。实验里线环大小随回升量变化的规律是示意模型，按这个模型，回升在 1.4 到 3.0 毫米之间能钩住，钩线大约在 202 到 212 度，窗口只有十度出头。十度是多长时间？每分钟 5000 针，一针 12 毫秒，主轴每毫秒转 30 度，十度只有三分之一毫秒。这就是为什么钩线定时要那么精确。",
+    "Now try Virtual lab 2-1. Drag the hook-timing error Δ; Δ greater than zero means the hook point arrives late. Let the animation run through the catching moment and see whether the loop is caught; the panel tells you how far the needle had risen when the hook arrived. How loop size depends on rise is an illustrative model in this lab; in that model the loop is caught for a rise between 1.4 and 3.0 millimetres, i.e. catching between about 202 and 212 degrees, a window of just over ten degrees. How long are ten degrees? At 5000 stitches a minute one stitch takes 12 milliseconds and the shaft turns 30 degrees per millisecond, so ten degrees is a third of a millisecond. That is why hook timing has to be so precise."
+   ]
+  },
+  {
+   "title": [
+    "模型的边界",
+    "Limits of the model"
+   ],
+   "points": [
+    [
+     "本章把线看成不可伸长、把布料看成刚性夹持，足以说明线迹怎样形成。",
+     "This chapter treats thread as inextensible and fabric as rigidly held, which is enough to explain how the stitch forms."
+    ],
+    [
+     "实际中线的弹性、捻向，布料的厚度和弹性，针的粗细都会改变线环大小和形成时刻。",
+     "In practice thread elasticity and twist, fabric thickness and elasticity, and needle size all change the size and timing of the loop."
+    ],
+    [
+     "厚料需要更大的针和更大的线环；弹性针织物容易使线环不稳定而跳针（第 7 章）。",
+     "Thick fabric needs a bigger needle and a bigger loop; elastic knits tend to make the loop unstable and skip (Chapter 7)."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后说一下模型的边界。这一讲我们把线看成不能伸长的，把布料看成被刚性夹住的，这样足以说明线迹是怎样形成的。可是实际上，线有弹性、有捻向，布料有厚度、有弹性，针有粗有细，它们都会改变线环的大小和形成时刻。厚料需要更大的针、更大的线环；弹性针织物容易让线环不稳定，也就容易跳针。所以车间里换了面料，薄料缝得好好的，换厚牛仔布就跳针，并不奇怪。这些因素放到第 7 章线张力与线迹质量里再讨论，作业里的厚料跳针题，大家可以先从线环的角度想一想。",
+    "Finally, the limits of the model. In this lesson we treated the thread as inextensible and the fabric as rigidly held, which is enough to explain how the stitch forms. In reality thread is elastic and has a twist direction, fabric has thickness and stretch, and needles come in different sizes, and all of these change the size of the loop and when it forms. Thick fabric needs a bigger needle and a bigger loop; elastic knits make the loop unstable and so skip more easily. So it is no surprise when a machine that sews thin fabric perfectly starts skipping on heavy denim. We return to these factors in Chapter 7 on tension and stitch quality; for the thick-fabric question in the assignment, start by thinking about the loop."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "工业平缝机里只有上轴和下轴两根轴，同步带 1:1 相连；一根上轴分出刺布、挑线、钩线、送布四条传动链，四个动作永远同步。",
+   "An industrial lockstitch machine has just two shafts, the main shaft and the hook shaft, joined 1:1 by a belt; the main shaft drives four trains — needle, take-up, hook and feed — so the four motions are always in step."
+  ],
+  [
+   "301 由面线和底线在布厚中间交织而成；正面露底线说明面线相对太紧，反面露面线说明底线相对太紧。",
+   "Stitch 301 is two threads interlaced in the middle of the fabric; bobbin thread on the face means the needle thread is relatively too tight, needle thread on the back means the bobbin thread is relatively too tight."
+  ],
+  [
+   "一针五个阶段：刺布、形成线环、钩线、绕梭、收紧与送布；机针的长槽、短槽和凹口决定线环在哪一侧形成，旋梭 2:1 转速、梭壳静止使线环能套住底线。",
+   "Five phases: piercing, loop forming, catching, round the bobbin, tightening and feeding; the needle's long groove, short groove and scarf decide where the loop forms, and the 2:1 hook speed and stationary bobbin case let the loop enclose the bobbin thread."
+  ],
+  [
+   "时序图三个时刻：180° 最低点、约 206°（回升约 2 mm）钩线、约 258° 机针出布后才送布。",
+   "Three moments on the timing diagram: lowest point at 180°, catching at about 206° (about 2 mm rise), and feeding only after the needle leaves the fabric at about 258°."
+  ],
+  [
+   "跳针的根源是钩线时刻偏离线环最大的区间；实验模型中窗口约 11°，每分钟 5000 针时 10° 仅约 0.33 ms。",
+   "Skipped stitches come from hook timing outside the fullest-loop range; in the lab model the window is about 11°, and at 5000 stitches per minute 10° is only about 0.33 ms."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "lockstitch",
+   "no": "2-1",
+   "title": [
+    "301 锁式线迹形成与钩线时刻",
+    "Lockstitch 301 formation and hook timing"
+   ],
+   "goal": [
+    [
+     "按主轴转角观察一针的六个阶段（机针下行、刺布、形成线环、钩线、绕梭、收紧与送布），把机构位置和时序图对应起来。",
+     "Follow the six phases of one stitch (needle descends, piercing, loop forming, catching, round the bobbin, tightening and feeding) by shaft angle, and match mechanism positions to the timing diagram."
+    ],
+    [
+     "改变钩线时刻偏差 Δ，找出不跳针的 Δ 范围，并与“回升约 2 mm”对照。",
+     "Vary the hook-timing error Δ, find the range of Δ without skipped stitches, and compare it with the “about 2 mm rise” rule."
+    ],
+    [
+     "把转角偏差换算成时间，体会钩线定时的精度要求。",
+     "Convert an angle error into time and appreciate how precise hook timing must be."
+    ]
+   ],
+   "theory": [
+    [
+     "主轴转一圈缝一针，旋梭转角是主轴转角的 2 倍；针杆位移按第 3 章算例（r = 15.5 mm，l = 55 mm）计算。",
+     "One shaft revolution sews one stitch, and the hook angle is twice the shaft angle; needle-bar displacement follows the Chapter 3 example (r = 15.5 mm, l = 55 mm)."
+    ],
+    [
+     "机针在 180° 到达最低点；回升量 h = x(180°) − x(φ)，回升约 2 mm（约 206°）时线环最大。",
+     "The needle is lowest at 180°; rise h = x(180°) − x(φ), and the loop is fullest at about 2 mm of rise (about 206°)."
+    ],
+    [
+     "实验中线环大小随回升量变化是示意模型：线环大小 = exp(−((h − 2.2)/1.0)²)，大于最大值的一半才算钩住。",
+     "The lab's loop size versus rise is an illustrative model: loop size = exp(−((h − 2.2)/1.0)²), and the loop counts as caught only above half its maximum."
+    ],
+    [
+     "转角偏差 Δ 对应的时间 t = (Δ/360°) × (60/n)。",
+     "The time for an angle error Δ is t = (Δ/360°) × (60/n)."
+    ]
+   ],
+   "steps": [
+    [
+     "打开动画 2-1，速度选“慢”，点“暂停”，拖动“主轴转角”滑块从 0° 走到 359°，对照“当前阶段”和阶段条记下每个阶段开始的转角。",
+     "Open Animation 2-1, set Speed to Slow, press Pause, and drag the Main-shaft angle slider from 0° to 359°; using “Current phase” and the phase bar, note the angle at which each phase begins."
+    ],
+    [
+     "依次点“跳到：针最低点、钩线、绕梭、脱环、收紧”，读出主轴转角 φ、针杆位移 x、回升量、旋梭转角和线环大小，填入记录表。",
+     "Press “Jump to: Needle lowest, Loop catch, Round bobbin, Loop release, Tighten” in turn and read the shaft angle φ, needle-bar displacement x, needle rise, hook angle and loop size into the record table."
+    ],
+    [
+     "点“放大钩线区”，用“◀ 2°”“2° ▶”在钩线时刻前后逐 2° 移动，观察梭尖怎样钻进线环和机针之间。",
+     "Press “Zoom to loop catching” and use “◀ 2°” and “2° ▶” to step 2° at a time around catching, watching the hook point slip between loop and needle."
+    ],
+    [
+     "在时序图上点击或拖动，确认 180°、约 206°、约 258° 三个时刻各对应哪个机构的动作。",
+     "Click or drag on the timing diagram to confirm which mechanism event corresponds to 180°, about 206° and about 258°."
+    ],
+    [
+     "在“虚拟实验 2-1”中把“钩线时刻偏差 Δ”设为 +10°，让动画走过钩线时刻，看是否跳针，并读出判定文字中的回升量。",
+     "In Virtual lab 2-1 set the hook-timing error Δ to +10°, let the animation pass the catching moment, see whether the stitch is skipped, and read the rise given in the verdict."
+    ],
+    [
+     "把 Δ 从 −30° 到 +30° 每隔 2° 试一次（边界附近每 1°），记下能钩住的最小和最大 Δ，算出窗口宽度。",
+     "Try Δ from −30° to +30° every 2° (every 1° near the edges), note the smallest and largest Δ that still catch, and work out the window width."
+    ],
+    [
+     "把 Δ 设为 −10°，观察“钩得太早，线环还没张开”的情况，再把 Δ 调回 +0°，点“播放”确认恢复正常缝制。",
+     "Set Δ to −10° to see “caught too early, loop not open yet”, then return Δ to +0° and press Play to confirm normal sewing resumes."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "钩线时刻偏差与钩线结果",
+     "Hook-timing error and catching result"
+    ],
+    "headers": [
+     [
+      "Δ（°）",
+      "Δ (°)"
+     ],
+     [
+      "钩线转角（°）",
+      "Catching angle (°)"
+     ],
+     [
+      "机针回升量（mm）",
+      "Needle rise (mm)"
+     ],
+     [
+      "能否钩住",
+      "Caught?"
+     ],
+     [
+      "对应时间偏差（ms，5000 r/min）",
+      "Time error (ms, 5000 r/min)"
+     ]
+    ],
+    "rows": 9
+   },
+   "questions": [
+    [
+     "你测得的不跳针 Δ 范围是多少？对应的回升量范围和本章“回升约 2 mm”的说法是否一致？",
+     "What range of Δ without skipping did you find? Does the matching range of rise agree with the chapter's “about 2 mm rise”?"
+    ],
+    [
+     "为什么梭尖晚到 10° 比早到 10° 时机针回升量的变化更大？（提示：看下止点附近位移曲线的形状。）",
+     "Why does arriving 10° late change the needle rise more than arriving 10° early? (Hint: look at the shape of the displacement curve near bottom dead centre.)"
+    ],
+    [
+     "每分钟 4000 针和 6000 针时，同样 10° 的偏差各是多少毫秒？转速越高，对定时的要求怎样变化？",
+     "At 4000 and 6000 stitches per minute, how many milliseconds is the same 10° error? How does the timing requirement change with speed?"
+    ]
+   ]
+  },
+  {
+   "id": "model-lockstitch",
+   "no": "M2-1",
+   "title": [
+    "工业平缝机三维结构",
+    "3D structure of an industrial lockstitch machine"
+   ],
+   "goal": [
+    [
+     "在三维模型中找出机臂、立柱、机头、底板和上轴、下轴，以及四条传动链。",
+     "Find the arm, pillar, head and bed, the main and hook shafts, and the four drive trains in the 3D model."
+    ],
+    [
+     "运转模型，验证旋梭转角始终是主轴转角的 2 倍，以及主轴转角与当前阶段的对应关系。",
+     "Run the model to confirm that the hook angle is always twice the shaft angle, and how shaft angle maps to the current phase."
+    ],
+    [
+     "把爆炸视图中的组件对应到框图中的传动链。",
+     "Map the assemblies in the exploded view to the drive trains in the block diagram."
+    ]
+   ],
+   "theory": [
+    [
+     "刺布：上轴 → 针杆曲柄 → 针杆连杆 → 针杆（曲柄滑块）。挑线：上轴 → 挑线曲柄销 → 挑线杆（四连杆）。",
+     "Needle: main shaft → needle-bar crank → needle-bar link → needle bar (slider-crank). Take-up: main shaft → take-up crank pin → take-up lever (four-bar)."
+    ],
+    [
+     "钩线：上轴 → 同步带 1:1 → 下轴 → 齿轮 1:2 → 旋梭，所以旋梭转角 = 2φ。",
+     "Hook: main shaft → timing belt 1:1 → hook shaft → gears 1:2 → rotary hook, so hook angle = 2φ."
+    ],
+    [
+     "送布：上轴送布偏心轮 → 针距调节器 → 送布摆轴（水平）；下轴抬牙偏心轮 → 抬牙摆轴（上下）。",
+     "Feed: feed eccentric on the main shaft → stitch regulator → feed rock shaft (horizontal); lift eccentric on the hook shaft → lift rock shaft (vertical)."
+    ]
+   ],
+   "steps": [
+    [
+     "打开模型 2-1，在“显示”中选“外观”，用视角按钮“斜视、正面、左侧、背面”各看一遍，拖动旋转、滚轮缩放，找出机臂、立柱、机头、底板、手轮、线架。",
+     "Open Model 2-1, choose “Exterior” under Display, look from each view button (Isometric, Front, Left, Back), drag to rotate and scroll to zoom, and find the arm, pillar, head, bed, handwheel and thread stand."
+    ],
+    [
+     "切换到“透视”，勾选“显示标注”，找到上轴、下轴和立柱里的同步带。",
+     "Switch to “X-ray”, tick “Show labels”, and find the main shaft, hook shaft and the timing belt in the pillar."
+    ],
+    [
+     "在“四条传动链”中依次点击刺布、挑线、钩线、送布，让每条链单独高亮，按传动顺序写下经过的零件。",
+     "Under “Four drive trains”, click Needle, Take-up, Hook and Feed in turn to highlight each, and write down the parts in drive order."
+    ],
+    [
+     "点“播放”，速度选“很慢”，观察四条链同时运动；再暂停，拖动“主轴转角”滑块到 0°、90°、180°、206°、270°、340°，记下旋梭转角、针杆位移和当前阶段。",
+     "Press Play at Very slow and watch all four trains move together; then pause and drag the Main-shaft angle slider to 0°, 90°, 180°, 206°, 270° and 340°, recording hook angle, needle-bar displacement and current phase."
+    ],
+    [
+     "切换到“爆炸”，拖动“拆开程度”滑块从 0 到 1，看部件怎样展开，点击零件查看名称。",
+     "Switch to “Exploded” and drag the Explode amount slider from 0 to 1 to see how the parts separate; click parts to see their names."
+    ],
+    [
+     "取消“显示台板”，从“背面”视角看底板下的下轴、旋梭和送布组件。",
+     "Untick “Show table” and look from the Back view at the hook shaft, rotary hook and feed assembly under the bed."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "主轴转角与各机构状态",
+     "Shaft angle and mechanism states"
+    ],
+    "headers": [
+     [
+      "主轴转角 φ（°）",
+      "Shaft angle φ (°)"
+     ],
+     [
+      "旋梭转角（°）",
+      "Hook angle (°)"
+     ],
+     [
+      "针杆位移 x（mm）",
+      "Needle-bar displacement x (mm)"
+     ],
+     [
+      "当前阶段",
+      "Current phase"
+     ],
+     [
+      "挑线杆、送布牙在做什么",
+      "What the take-up lever and feed dog are doing"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "旋梭转角为什么始终是主轴转角的 2 倍？如果改成 1:1，线环还能绕过梭壳吗？",
+     "Why is the hook angle always twice the shaft angle? With 1:1, could the loop still pass around the bobbin case?"
+    ],
+    [
+     "送布牙的水平运动和上下运动分别来自哪根轴？为什么针距调节器只装在水平运动这一路上？",
+     "Which shaft gives the feed dog its horizontal motion and which its vertical motion? Why is the stitch regulator only in the horizontal path?"
+    ],
+    [
+     "模型中“机针下行”“刺布”“形成线环”“钩线”“绕梭”“收紧与送布”各从多少度开始？和时序图的三个关键时刻怎样对应？",
+     "At what angles do the model's phases (needle descends, piercing, loop forming, catching, round the bobbin, tightening and feeding) begin, and how do they match the three key moments of the timing diagram?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 2：跳针诊断与时序分析",
+   "Assignment 2: diagnosing skipped stitches and timing"
+  ],
+  "tasks": [
+   [
+    "计算与诊断题。一台平缝机（针杆机构同第 3 章算例）以每分钟 4000 针缝制，修机工测得梭尖在主轴 198° 到达机针中心线。（1）用虚拟实验 2-1 读出此时机针回升量，判断是否跳针；（2）相对标准 206°，偏差是多少度、多少毫秒？（3）若转速提高到每分钟 6000 针，同样的角度偏差是多少毫秒？（4）写出调整方向和调整后应复核的项目。",
+    "Calculation and diagnosis. A lockstitch machine (needle-bar mechanism as in the Chapter 3 example) sews at 4000 stitches per minute, and the hook point is found to reach the needle centre line at 198°. (1) Use Virtual lab 2-1 to read the needle rise at that moment and decide whether stitches will be skipped. (2) Relative to the standard 206°, what is the error in degrees and milliseconds? (3) At 6000 stitches per minute, how many milliseconds is the same angle error? (4) State the direction of adjustment and what must be re-checked afterwards."
+   ],
+   [
+    "分析题。旋梭与主轴的转速比为什么是 2:1？如果改为 1:1，线环还能绕过梭壳吗？结合“梭床静止”说明理由。",
+    "Analysis. Why is the hook-to-shaft speed ratio 2:1? With 1:1, could the loop still pass around the bobbin case? Explain with reference to the stationary bobbin-case holder."
+   ],
+   [
+    "时序题。列出一针中四个动作的先后次序，并说明送布为什么必须在机针离开布料（约 258°）以后进行；如果送布提前到机针还在布料中，会发生什么？",
+    "Timing. List the order of the four motions in one stitch and explain why feeding must happen after the needle has left the fabric (about 258°). What happens if feeding starts while the needle is still in the fabric?"
+   ],
+   [
+    "现场题。一台平缝机缝薄料正常，换缝厚牛仔布后频繁跳针。从线环形成的角度给出至少三个可能原因及相应的调整方法。",
+    "Shop-floor case. A machine sews thin fabric well but skips frequently on heavy denim. From the point of view of loop formation, give at least three possible causes and the matching adjustments."
+   ]
+  ],
+  "deliverable": [
+   "一份 PDF（不超过 5 页）：计算过程、虚拟实验 2-1 的截图（含 Δ 设置和判定文字）、各题的文字说明。",
+   "One PDF of at most 5 pages: calculations, screenshots of Virtual lab 2-1 (showing the Δ setting and verdict), and written answers."
+  ],
+  "rubric": [
+   [
+    "回升量读数、角度与时间换算正确，跳针判断有依据（35 分）",
+    "Correct rise reading, angle and time conversions, and a justified skip verdict (35 points)"
+   ],
+   [
+    "2:1 转速比的分析抓住梭壳静止、线环需绕过梭壳的要点（20 分）",
+    "The 2:1 analysis captures the stationary bobbin case and the loop's need to pass around it (20 points)"
+   ],
+   [
+    "四个动作次序与送布时机分析正确（20 分）",
+    "Correct order of the four motions and feed timing (20 points)"
+   ],
+   [
+    "厚料跳针的原因和调整方法合理、可操作（25 分）",
+    "Reasonable, practical causes and adjustments for skipping on thick fabric (25 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "工业平缝机里，上轴与下轴之间、下轴与旋梭之间的传动比分别是：",
+    "In an industrial lockstitch machine, the ratios between main shaft and hook shaft, and between hook shaft and rotary hook, are:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "同步带 1:1；齿轮 1:2，主轴一圈旋梭两圈",
+      "Belt 1:1; gears 1:2, so the hook turns twice per shaft revolution"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "同步带 1:2；齿轮 1:1",
+      "Belt 1:2; gears 1:1"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "同步带 1:1；齿轮 1:1，旋梭与主轴同速",
+      "Belt 1:1; gears 1:1, hook at shaft speed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "同步带 2:1；齿轮 1:2，旋梭与主轴同速",
+      "Belt 2:1; gears 1:2, hook at shaft speed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "同步带让两根轴同速，齿轮再让旋梭加倍，所以缝一针旋梭转两圈。",
+    "The belt keeps the two shafts at the same speed and the gears double the hook speed, so the hook turns twice per stitch."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "因为四条传动链都由同一根上轴经固定传动比驱动，只要知道主轴转角，就能知道每个机构此刻的位置。",
+    "Because all four trains are driven by one main shaft through fixed ratios, knowing the shaft angle tells you where every mechanism is."
+   ],
+   "correct": true,
+   "feedback": [
+    "中间没有离合器，也没有会打滑的环节，所以可以用一张以主轴转角为横坐标的时序图描述整机。",
+    "There is no clutch or slipping element, so one timing diagram against shaft angle describes the whole machine."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "一块缝好的布，正面出现底线的小点，最可能的原因是：",
+    "On a sewn piece, bobbin thread shows as small dots on the face. The most likely cause is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "面线相对太紧（或底线太松），交织点被拉到布料上面",
+      "The needle thread is relatively too tight (or the bobbin thread too loose), pulling the interlacing point to the top"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "底线相对太紧，交织点被拉到布料下面",
+      "The bobbin thread is relatively too tight, pulling the interlacing point to the bottom"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "钩线时刻太晚，发生跳针",
+      "The hook is late and stitches are skipped"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "送布牙送布太早",
+      "The feed dog feeds too early"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "交织点被哪根线拉过去，取决于张力平衡：面线相对紧，交织点上移，正面就看到底线。",
+    "Which way the interlacing point goes depends on the tension balance: a relatively tight needle thread pulls it up, so the bobbin thread appears on the face."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "机针回升时，线环为什么只在凹口一侧形成？",
+    "Why does the loop form only on the scarf side when the needle rises?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "凹口一侧只有短槽，线被布料夹住跟不上针；长槽一侧的线藏在槽里随针回升",
+      "The scarf side has only a short groove, so the thread there is held by the fabric and lags; on the long-groove side the thread lies in the groove and rises with the needle"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "凹口一侧的线张力更大",
+      "The thread on the scarf side is under higher tension"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "梭尖把线从凹口一侧拉出来",
+      "The hook point pulls the thread out on the scarf side"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "挑线杆从凹口一侧放线",
+      "The take-up lever pays out thread on the scarf side"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "线环是机针不对称的结果：长槽保护的线跟着针走，短槽一侧的线被布夹住，于是在凹口一侧鼓出来。",
+    "The loop results from the needle's asymmetry: thread in the long groove follows the needle, thread on the short-groove side is held by the fabric and bulges out at the scarf."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于水平全回转旋梭，下列哪些说法正确？",
+    "Which statements about the horizontal full rotary hook are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "梭尖长在转动的旋梭体边缘上",
+      "The hook point is on the rim of the turning hook body"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "梭床被机壳上的定位钩挡住，不随旋梭转动",
+      "The bobbin-case holder is stopped by a positioner on the housing and does not turn"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "梭壳和梭芯随旋梭体一起高速旋转",
+      "The bobbin case and bobbin turn at high speed with the hook body"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "梭尖带着线环绕过的是一个静止的梭壳，所以线环能把底线套进去",
+      "The hook point carries the loop around a stationary bobbin case, so the loop can enclose the bobbin thread"
+     ],
+     "correct": true
+    }
+   ],
+   "feedback": [
+    "一个转、一个不转：旋梭体转，梭床和梭壳静止，底线留在梭壳里，线环才能绕过它把底线套住。",
+    "One part turns and one does not: the hook body turns while the holder and bobbin case stay still, so the loop can pass around and enclose the bobbin thread."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "钩线时刻提前了十几度（梭尖早到），会发生什么？",
+    "What happens if the hook point arrives ten-odd degrees early?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "线环还没张开，梭尖钩不住，跳针",
+      "The loop has not opened yet, the hook misses, and the stitch is skipped"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "线环已经收缩，梭尖钩不住，跳针",
+      "The loop has already shrunk, the hook misses, and the stitch is skipped"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "线环更大，钩线更可靠",
+      "The loop is bigger, so catching is more reliable"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "不影响钩线，只影响送布",
+      "It does not affect catching, only feeding"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "早到时机针回升量太小，线环还没张开；晚到时线环已经收缩。两种情况都会跳针。",
+    "Early, the needle has not risen enough and the loop is not open; late, the loop has shrunk. Both skip."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "平缝机以每分钟 5000 针运转。缝一针需要多少毫秒？",
+    "A lockstitch machine runs at 5000 stitches per minute. How many milliseconds does one stitch take?"
+   ],
+   "answer": 12,
+   "tolerance": 0.1,
+   "unit": "ms",
+   "feedback": [
+    "一针就是主轴一圈：60 s / 5000 = 0.012 s = 12 ms。",
+    "One stitch is one shaft revolution: 60 s / 5000 = 0.012 s = 12 ms."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "平缝机以每分钟 4500 针运转，旋梭的转速是每分钟多少转？",
+    "A lockstitch machine runs at 4500 stitches per minute. What is the speed of the rotary hook in r/min?"
+   ],
+   "answer": 9000,
+   "tolerance": 1,
+   "unit": "r/min",
+   "feedback": [
+    "主轴一圈缝一针，旋梭转两圈：4500 × 2 = 9000 r/min。",
+    "One shaft revolution per stitch, two hook turns: 4500 × 2 = 9000 r/min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "针距 3 mm，每分钟 5000 针，布料的平均送进速度是每分钟多少米？",
+    "With a 3 mm stitch length at 5000 stitches per minute, what is the average fabric speed in metres per minute?"
+   ],
+   "answer": 15,
+   "tolerance": 0.1,
+   "unit": "m/min",
+   "feedback": [
+    "每针送一个针距：3 mm × 5000 = 15000 mm/min = 15 m/min。",
+    "Each stitch feeds one stitch length: 3 mm × 5000 = 15000 mm/min = 15 m/min."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "按时序图，送布牙开始推布最早应在什么时候？",
+    "According to the timing diagram, when is the earliest the feed dog may start pushing the fabric?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "机针离开布料（约 258°）以后",
+      "After the needle leaves the fabric (about 258°)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "机针到达最低点（180°）时",
+      "When the needle reaches its lowest point (180°)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "梭尖钩线（约 206°）时",
+      "When the hook catches (about 206°)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "针尖刚刺入布料时",
+      "As soon as the needle point enters the fabric"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "机针还在布里时送布，布会带着针走，针被拉弯甚至折断，针距也不准。",
+    "Feeding while the needle is in the fabric drags the needle, bending or breaking it and spoiling the stitch length."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "平缝机以每分钟 4000 针运转，钩线时刻偏差 12°，相当于多少毫秒？",
+    "A lockstitch machine runs at 4000 stitches per minute. What time in milliseconds does a hook-timing error of 12° correspond to?"
+   ],
+   "answer": 0.5,
+   "tolerance": 0.01,
+   "unit": "ms",
+   "feedback": [
+    "一针 60/4000 = 15 ms，12° 占 12/360，t = 15 × 12/360 = 0.5 ms。",
+    "One stitch is 60/4000 = 15 ms; 12° is 12/360 of it, so t = 15 × 12/360 = 0.5 ms."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "送布牙齿尖走近似椭圆轨迹，是因为：",
+    "The feed-dog teeth trace a rough ellipse because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "水平运动来自上轴送布偏心轮，上下运动来自下轴抬牙偏心轮，两者合成",
+      "The horizontal motion from the feed eccentric on the main shaft and the vertical motion from the lift eccentric on the hook shaft combine"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "送布牙装在一个旋转的圆盘上",
+      "The feed dog is mounted on a rotating disc"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "针距调节器让送布牙同时上下和前后运动",
+      "The stitch regulator moves the feed dog both up-down and back-forth"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "压脚压力使送布牙走成椭圆",
+      "Presser-foot pressure forces the feed dog into an ellipse"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "送布是两个运动合成的；针距调节器只在水平这一路上，所以针距能调、能倒缝。",
+    "Feeding combines two motions; the stitch regulator is only in the horizontal path, which is why stitch length can be set and reversed."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "把机针装反（长槽朝向旋梭），梭尖仍能可靠地钩住线环。",
+    "If the needle is fitted the wrong way round (long groove facing the hook), the hook point can still catch the loop reliably."
+   ],
+   "correct": false,
+   "feedback": [
+    "线环在短槽和凹口一侧形成；装反后线环出现在背离梭尖的一侧，梭尖钩不到，会跳针。",
+    "The loop forms on the short-groove, scarf side; reversed, it appears away from the hook point, which misses it, so stitches are skipped."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "下列哪些情况会使钩线可靠性下降、容易跳针？",
+    "Which of these make catching less reliable and skipping more likely?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "更换旋梭后安装角度偏了十几度",
+      "After a hook change, its mounting angle is off by ten-odd degrees"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "改用更长的针距",
+      "Using a longer stitch length"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "缝弹性针织物，线环不稳定",
+      "Sewing elastic knits, which makes the loop unstable"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "改了针杆连杆长度后没有重新校正钩线时刻和针杆高度",
+      "Changing the needle-bar link length without re-setting hook timing and needle-bar height"
+     ],
+     "correct": true
+    }
+   ],
+   "feedback": [
+    "钩线可靠与否取决于梭尖到达时线环是否最大、是否稳定；针距由送布决定，与钩线时刻无直接关系。",
+    "Reliable catching depends on the loop being fullest and stable when the hook arrives; stitch length is set by the feed and has no direct bearing on hook timing."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一条衬衫侧缝长 50 cm，针距 2.5 mm，平缝机以每分钟 4000 针缝制（忽略起止和加减速）。缝完这条缝需要多少秒？",
+    "A shirt side seam is 50 cm long, stitch length 2.5 mm, sewn at 4000 stitches per minute (ignore starting, stopping and speed changes). How many seconds does it take?"
+   ],
+   "answer": 3,
+   "tolerance": 0.05,
+   "unit": "s",
+   "feedback": [
+    "500 / 2.5 = 200 针；200 / 4000 min = 0.05 min = 3 s。",
+    "500 / 2.5 = 200 stitches; 200 / 4000 min = 0.05 min = 3 s."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "一轴四链与 2:1 转速比；301 结构与张力平衡；机针不对称与旋梭结构；一针五个阶段；时序图三个时刻。",
+   "One shaft and four trains, the 2:1 hook ratio; the structure of 301 and tension balance; needle asymmetry and hook construction; the five phases of a stitch; three moments on the timing diagram."
+  ],
+  "difficult": [
+   "线环为什么只在凹口一侧形成、为什么只在回升约 2 mm 时最大；梭壳静止而旋梭转动怎样让线环套住底线；把空间过程对应到以主轴转角为横坐标的时序图。",
+   "Why the loop forms only on the scarf side and is fullest only at about 2 mm of rise; how a turning hook and stationary bobbin case let the loop enclose the bobbin thread; mapping a spatial process onto a timing diagram against shaft angle."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Introduction"
+    ],
+    "minutes": 15,
+    "content": [
+     "展示跳针布样，提出车间问题：梭尖晚到 10° 会怎样。",
+     "Show a sample with skipped stitches and pose the problem: what happens if the hook arrives 10° late?"
+    ]
+   },
+   {
+    "phase": [
+     "讲授：整机结构与一轴四链",
+     "Lecture: the machine and one shaft, four trains"
+    ],
+    "minutes": 30,
+    "content": [
+     "外部三类零件、两根轴、框图三要点、爆炸图。",
+     "Three groups of external parts, two shafts, three points of the block diagram, exploded view."
+    ]
+   },
+   {
+    "phase": [
+     "实验：模型 2-1",
+     "Lab: Model 2-1"
+    ],
+    "minutes": 25,
+    "content": [
+     "学生在三维模型中找零件、高亮四条链、记录各转角下的状态。",
+     "Students find parts in the 3D model, highlight the four trains and record states at several angles."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：301 结构、机针与旋梭",
+     "Lecture: 301, needle and hook"
+    ],
+    "minutes": 30,
+    "content": [
+     "线迹分类、张力平衡、机针不对称、旋梭组件。",
+     "Stitch classes, tension balance, needle asymmetry, hook assembly."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：一针五个阶段与时序图",
+     "Lecture: five phases and the timing diagram"
+    ],
+    "minutes": 25,
+    "content": [
+     "五个阶段、四个动作的配合、时序图三个时刻。",
+     "Five phases, coordination of the four motions, three moments of the timing diagram."
+    ]
+   },
+   {
+    "phase": [
+     "实验：动画与虚拟实验 2-1",
+     "Lab: Animation and Virtual lab 2-1"
+    ],
+    "minutes": 35,
+    "content": [
+     "逐度观察一针；扫描 Δ 找不跳针窗口；换算时间，求解导入问题。",
+     "Follow a stitch degree by degree; sweep Δ to find the no-skip window; convert to time and solve the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "小结与测验",
+     "Summary and quiz"
+    ],
+    "minutes": 20,
+    "content": [
+     "回顾小结，完成本讲测验，布置作业。",
+     "Review the summary, take the quiz, set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业 2；预习第 3 章，复习曲柄滑块机构的运动分析。",
+   "Complete Assignment 2; preview Chapter 3 and review slider-crank kinematics."
+  ]
+ }
+}

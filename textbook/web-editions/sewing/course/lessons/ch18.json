@@ -1,0 +1,1158 @@
+{
+ "no": 18,
+ "title": [
+  "电控系统的设计、制造与测试",
+  "Designing, Building and Testing the Control Box"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能用开关损耗公式和热阻网络，按间歇缝纫工况算出电控箱的平均损耗、散热器温度和结温峰值。",
+   "Calculate average loss, heat-sink temperature and peak junction temperature of a control box under intermittent sewing, using the switching-loss formula and the thermal-resistance network."
+  ],
+  [
+   "能用 i_cm ≈ C_p·dv/dt 估算共模电流，说明开关时间在发热和干扰之间的折中，并列出源头、路径、受害者三类抑制措施。",
+   "Estimate common-mode current with i_cm ≈ C_p·dv/dt, explain the switching-time trade-off between heat and interference, and list countermeasures at the source, along the path and at the victim."
+  ],
+  [
+   "能解释电控软件的四层结构、保护与故障码、参数存储和双区固件升级的设计理由。",
+   "Explain the reasons behind the four-layer software structure, protection and fault codes, parameter storage and dual-bank firmware update."
+  ],
+  [
+   "能用阿伦尼乌斯加速因子和浴盆曲线选择老化条件，估算第一年返修率；能用十度法则估算电解电容寿命。",
+   "Choose burn-in conditions with the Arrhenius acceleration factor and the bathtub curve and estimate the first-year return rate; estimate electrolytic-capacitor life with the ten-degree rule."
+  ],
+  [
+   "能对“夏天频繁报过热”这类现场问题做定量分析，提出并校核改进方案。",
+   "Analyse a field problem such as 'frequent overtemperature in summer' quantitatively, and propose and check improvements."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "缝制车间：一到夏天电控箱就报过热",
+   "Sewing room: control boxes report overtemperature every summer"
+  ],
+  "text": [
+   "某型平缝机伺服电控箱用了几年，春秋很少出问题，一到夏天几家工厂都反映频繁显示过热故障码，停一会儿又能用；返修件里还有母线电容鼓包。这些车间没有空调，夏天午后约 38 °C。电控箱参数（示意值）：每分钟起停 30 次，缝纫时间占一半，起停各 0.15 s 用 9 A，其余缝纫时间 3 A；结到散热器 3.5 K/W，散热器到箱内空气 1.5 K/W，箱内空气温升 0.6 K/W × 总发热，其他电路 8 W；散热器 100 °C 报警，结温设计上限 125 °C；母线电容 105 °C、2000 h，芯部比箱内空气高 5 °C。拆开返修件，散热片和通风孔糊着飞絮（按堵塞程度 0.5 计：散热器热阻 × 1.75，箱内温升 × 1.5）。",
+   "A lockstitch servo control box has been in service for several years. It rarely fails in spring and autumn, but every summer several factories report frequent overtemperature fault codes, with the machine working again after a short rest; some returned units also have bulging DC-link capacitors. These workshops have no air-conditioning and reach about 38 °C on summer afternoons. Box parameters (illustrative): 30 starts and stops per minute, sewing half the time, 0.15 s at 9 A for each start and stop and 3 A for the rest of the sewing; 3.5 K/W junction to heat sink, 1.5 K/W heat sink to box air, box air rise 0.6 K/W × total heat, 8 W from other circuits; heat-sink alarm at 100 °C, junction design limit 125 °C; DC-link capacitor rated 105 °C, 2000 h, with its core 5 °C above the box air. The returned units have lint caked on the fins and vents (taken as blockage 0.5: heat-sink resistance × 1.75, box air rise × 1.5)."
+  ],
+  "question": [
+   "干净的电控箱在 38 °C 下会报警吗？堵塞 0.5 时散热器、结温和电容寿命各是多少？把散热器热阻改到 1.0 K/W 能解决吗？",
+   "Does a clean box alarm at 38 °C? With blockage 0.5, what are the heat-sink temperature, junction temperature and capacitor life? Does a 1.0 K/W heat sink solve the problem?"
+  ],
+  "answer": [
+   "平均损耗约 18.0 W（起停只占 15% 时间却贡献约 62% 热量）。干净时箱内 53.6 °C、散热器 80.5 °C、结温峰值 108.1 °C，不报警，设计本身没问题。堵塞 0.5 时箱内 61.4 °C、散热器 108.5 °C（超过 100 °C 报警）、结温峰值 136.1 °C（超过 125 °C）；电容 66.4 °C，寿命约 29095 h，约 6.1 年（干净时约 10.4 年）。散热器热阻改为 1.0 K/W 后，散热器降到 92.8 °C、结温峰值 120.4 °C，不再报警；再配合定期清理飞絮、过热降额和长寿命电容。",
+   "The average loss is about 18.0 W (starts and stops take 15% of the time but contribute about 62% of the heat). Clean: box air 53.6 °C, heat sink 80.5 °C, peak junction 108.1 °C—no alarm; the design itself is sound. At blockage 0.5: box air 61.4 °C, heat sink 108.5 °C (above the 100 °C alarm), peak junction 136.1 °C (above 125 °C); capacitor 66.4 °C, life about 29095 h, about 6.1 years (about 10.4 years when clean). With a 1.0 K/W heat sink, the heat sink drops to 92.8 °C and the peak junction to 120.4 °C—no more alarms; combine with regular lint cleaning, thermal derating and longer-life capacitors."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人关节驱动器：按节拍算发热",
+   "Robot joint drives: sizing heat by the duty cycle"
+  ],
+  "text": [
+   "协作机器人和搬运机械臂的伺服驱动器，热设计和本章完全同一套方法。机械臂搬运一个零件的节拍里，每个关节都是“加速—匀速—减速—停”，加减速时电流最大，正像缝纫机的起停。驱动器散热器的温度由一个节拍里的平均损耗决定，功率管结温则由加速时的峰值电流决定，所以选型时要按实际节拍算平均损耗，再校核峰值结温。很多协作机器人把驱动器装进关节模组内部，散热只能靠关节外壳，这时热阻网络里“散热器到空气”那一段就是关节外壳，余量更紧，驱动器同样要在过热前限制加速度和速度。电机电缆穿过多个关节，共模电流和编码器干扰的问题也和电控箱一样，要用屏蔽、滤波和差分编码器信号来解决。",
+   "The servo drives of collaborative robots and handling arms use exactly the thermal method of this chapter. In each handling cycle every joint goes 'accelerate—cruise—decelerate—stop', with the highest current during acceleration and deceleration, just like a sewing machine's starts and stops. The drive heat-sink temperature is set by the average loss over the cycle, while the power-device junction temperature is set by the peak current during acceleration, so drives are sized by computing average loss over the real cycle and then checking peak junction temperature. Many cobots put the drive inside the joint module, where the joint housing is the only heat sink; that housing is the 'heat sink to air' element of the thermal network, the margin is tighter, and the drive likewise limits acceleration and speed before it overheats. Motor cables run through several joints, so common-mode current and encoder interference are the same problems as in the control box, solved with shielding, filtering and differential encoder signals."
+  ]
+ },
+ "life": {
+  "title": [
+   "笔记本电脑的风扇口积灰",
+   "A laptop with dusty vents"
+  ],
+  "text": [
+   "笔记本电脑用了两三年，风扇口积满灰，跑大程序时风扇狂转、机器发烫，速度还会变慢——这就是热阻变大以后，处理器为了不过热自动降频，和电控箱的过热降额是一回事。清一下灰，温度和速度就都回来了。",
+   "After two or three years a laptop's vents are clogged with dust; under heavy load the fan roars, the case gets hot and the machine slows down—higher thermal resistance makes the processor throttle itself to avoid overheating, exactly like a control box's thermal derating. Clean out the dust and both temperature and speed return."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：一只电控箱的使用条件",
+    "Opening: the operating conditions of a control box"
+   ],
+   "points": [
+    [
+     "说明书：单相 200–240 V（±10% 或 ±20%），5–45 °C，30%–95% 不结露，可靠接地，远离高频设备",
+     "Manuals: single-phase 200–240 V (±10% or ±20%), 5–45 °C, 30%–95% non-condensing, reliable earthing, away from HF equipment"
+    ],
+    [
+     "背后要求：180 V 仍有转矩、265 V 不击穿、飞絮不堵、静电不死机",
+     "Behind them: torque at 180 V, no breakdown at 265 V, lint must not block, ESD must not crash"
+    ],
+    [
+     "故障码表就是控制器自我保护的方式：过压、欠压、过流、堵转、编码器、电磁铁过流",
+     "The fault-code table is how the controller protects itself: over/undervoltage, overcurrent, stall, encoder, solenoid overcurrent"
+    ],
+    [
+     "开发按 V 模型：左边逐层设计，右边逐层验证，一一对应",
+     "Development follows the V-model: design down the left, verify up the right, level by level"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "前面几讲我们一直默认电控箱是可靠的，通电就工作、十年不坏。可它实际放在台板底下：夏天车间三四十度，周围飘着飞絮，旁边可能有高频熨烫设备，主轴一天起停上千次。翻开一份伺服电控说明书，电压 200 到 240 伏、环境 5 到 45 度、湿度不结露、必须可靠接地、远离高频设备。每个数字背后都是设计要求：电压低到 180 伏还要有转矩，高到 265 伏不能击穿；冬天操作工带着几千伏静电碰一下面板，控制器不能死机。说明书最后的故障码表，就是控制器在这些条件下保护自己的方式。开发这样一只箱子一般按 V 模型走：左边从需求一路往下设计，右边从电路板测试一路往上验证。",
+    "So far we have assumed the control box is reliable: it works when powered and lasts ten years. In reality it sits under the table: 30 to 40 degrees in summer, lint in the air, perhaps high-frequency pressing equipment next to it, and the main shaft starting and stopping a thousand times a day. Open a servo manual: 200 to 240 volts, 5 to 45 degrees, non-condensing humidity, reliable earthing, keep away from high-frequency equipment. Behind every number is a design requirement: torque at 180 volts, no breakdown at 265; when an operator charged to several thousand volts touches the panel in winter, the controller must not crash. The fault-code table at the end is how the controller protects itself. Such a box is developed along a V-model: design down the left from requirements, verify up the right from board tests."
+   ]
+  },
+  {
+   "title": [
+    "需求、标准与架构",
+    "Requirements, standards and architecture"
+   ],
+   "points": [
+    [
+     "需求三类：功能、性能、环境与寿命（算例每年通电约 4800 h）",
+     "Three kinds of requirement: functional, performance, environment and life (example: about 4800 h powered per year)"
+    ],
+    [
+     "ISO 10821 → IEC 60204-1 与 IEC 60204-31（国内 GB/T 5226.31-2017）",
+     "ISO 10821 → IEC 60204-1 and IEC 60204-31 (GB/T 5226.31-2017 in China)"
+    ],
+    [
+     "控制电路用安全特低电压（9.1.1 条）；脚踏保持运行、自动短循环机器可不设急停（10.7.4 条）",
+     "Control circuits at SELV/PELV (clause 9.1.1); hold-to-run pedal and short-cycle automatic machines may omit E-stop (clause 10.7.4)"
+    ],
+    [
+     "强电区（滤波、整流、310 V 母线、IPM、制动）与弱电区之间用爬电距离、光耦和变压器隔离",
+     "Power section (filter, rectifier, 310 V DC link, IPM, braking) and low-voltage section separated by creepage, optocouplers and the transformer"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_18_struct.png",
+   "narration": [
+    "需求分三类：功能需求说清楚做什么，性能需求说清楚做到什么程度，环境和寿命需求说清楚在什么条件下做到，我们的算例按两班制、每年通电约 4800 小时。标准方面，工业缝纫机安全标准 ISO 10821 把电气要求交给 IEC 60204-1 和专门针对缝纫机的 IEC 60204-31，国内等同转化为 GB/T 5226.31-2017。几条和设计直接相关：控制电路要用安全特低电压；用脚踏这种松开即停的装置启动的机器，以及套结、锁眼这类自动短循环的机器，可以不设急停；还要防止脚踏被误踩导致意外启动。架构上看图：左边强电区，滤波、整流成约 310 伏母线、IPM 逆变驱动电机；中间开关电源；右边弱电区。两区之间留够爬电距离，信号经光耦隔离，操作工碰得到的都是安全特低电压。",
+    "Requirements come in three kinds: functional—what it does; performance—how well; environment and life—under what conditions. Our example assumes two shifts, about 4800 powered hours a year. On standards, the sewing-machine safety standard ISO 10821 hands the electrical part to IEC 60204-1 and the sewing-specific IEC 60204-31, adopted in China as GB/T 5226.31-2017. Several clauses bear directly on design: control circuits use safety extra-low voltage; machines started by a release-to-stop pedal, and short-cycle machines like bartackers and buttonholers, may omit the emergency stop; and an accidental pedal press must not start the machine. The architecture: on the left the power section—filter, rectifier to a 310 volt DC link, IPM inverter driving the motor; a switch-mode supply in the middle; the low-voltage section on the right. Creepage distance and optocouplers separate them, so everything the operator can touch is at SELV."
+   ]
+  },
+  {
+   "title": [
+    "损耗从哪里来",
+    "Where the losses come from"
+   ],
+   "points": [
+    [
+     "导通损耗：约 1 V 压降 + 电阻压降，含电流平方项",
+     "Conduction loss: about 1 V drop plus a resistive drop, with a current-squared term"
+    ],
+    [
+     "开关损耗：P_sw ≈ ½·V_dc·Ī·t_sw·f_sw，Ī = √2·I/π",
+     "Switching loss: P_sw ≈ ½·V_dc·Ī·t_sw·f_sw, with Ī = √2·I/π"
+    ],
+    [
+     "算例（1.0 V、0.1 Ω、300 ns、12 kHz）：3 A 时功率级约 20 W，9 A 时约 74 W",
+     "Example (1.0 V, 0.1 Ω, 300 ns, 12 kHz): about 20 W at 3 A, about 74 W at 9 A"
+    ],
+    [
+     "损耗增长比电流快，因为导通损耗有 I² 项",
+     "Loss grows faster than current because conduction loss has an I² term"
+    ]
+   ],
+   "formula": "P_{sw}\\approx\\frac{1}{2}\\,V_{dc}\\,\\bar I\\,t_{sw}\\,f_{sw},\\qquad \\bar I = \\frac{\\sqrt{2}\\,I}{\\pi}",
+   "figure": "fig_18_loss.png",
+   "narration": [
+    "热从哪里来？逆变桥每个开关管有两种损耗。一是导通损耗，电流流过导通的管子，有大约 1 伏的压降再加一段电阻压降，所以损耗有一项和电流成正比、一项和电流平方成正比。二是开关损耗，管子从断到通、从通到断，有一段时间电压和电流同时不为零，平均功率大约是二分之一乘母线电压、乘开关时的平均电流、乘过渡时间、乘开关频率。正弦电流有效值是 I 的话，这个平均电流是根号 2 乘 I 除以 π。开关越快、频率越低，开关损耗越小。按算例参数，相电流 3 安时整个功率级大约 20 瓦，起停时 9 安，大约 74 瓦。电流涨 3 倍，损耗涨了将近 4 倍，就是因为电流平方那一项。",
+    "Where does the heat come from? Each inverter switch has two losses. First, conduction loss: current through a conducting device sees about 1 volt plus a resistive drop, so one term is proportional to current and one to current squared. Second, switching loss: each transition passes through an interval where voltage and current are both non-zero; the average is about one half times the DC-link voltage, times the average switched current, times the transition time, times the switching frequency. For a sinusoid of RMS value I, that average current is root two times I over pi. Faster switching and lower frequency mean less switching loss. With the example parameters, the whole power stage dissipates about 20 watts at 3 amps and about 74 watts at the 9 amps of a start or stop. Three times the current, nearly four times the loss—that is the current-squared term."
+   ]
+  },
+  {
+   "title": [
+    "热阻网络",
+    "Thermal-resistance network"
+   ],
+   "points": [
+    [
+     "温度像电压，热量像电流；热阻单位 K/W",
+     "Temperature acts like voltage, heat flow like current; thermal resistance in K/W"
+    ],
+    [
+     "结 → 散热器 3.5 K/W（单管），散热器 → 箱内空气 1.5 K/W（无风扇，铝壳兼散热器）",
+     "Junction → heat sink 3.5 K/W (per device), heat sink → box air 1.5 K/W (no fan, aluminium case as heat sink)"
+    ],
+    [
+     "箱内空气比车间高 0.6 K/W × 总发热；其他电路 8 W",
+     "Box air is 0.6 K/W × total heat above the workshop; other circuits 8 W"
+    ],
+    [
+     "结温 = 环境温度 + 各段热阻上的温升之和",
+     "Junction temperature = ambient + sum of rises across the resistances"
+    ]
+   ],
+   "formula": "T_j = T_a + \\sum_k R_{th,k}\\,P_k",
+   "figure": "",
+   "narration": [
+    "热量从开关管的芯片，也就是结出发，经封装和导热层到散热器，再到箱内空气，最后经外壳散到车间。每一段用一个热阻表示，单位是 K 每瓦，就是通过 1 瓦热量两端差几度。大家把它当电路看：温度是电压，热量是电流，结温等于环境温度加上每段热阻上的温升。算例取单管结到散热器 3.5，散热器到箱内空气 1.5，没有风扇，铝外壳兼作散热器；箱内空气比车间高 0.6 乘总发热，其他电路还有 8 瓦。这里有个要注意的地方：散热器上走的是整个功率级的损耗，而结到散热器那一段只走一只管子的损耗，别把两者混了。",
+    "Heat leaves the chip—the junction—through the package and interface layer to the heat sink, then to the air inside the box, then through the case to the workshop. Each stage is a thermal resistance in kelvin per watt: how many degrees across it per watt of heat. Treat it like a circuit: temperature is voltage, heat flow is current, and the junction temperature is ambient plus the rise across each resistance. The example takes 3.5 from junction to heat sink per device, 1.5 from heat sink to box air with no fan and the aluminium case as heat sink; the box air is 0.6 times the total heat above the workshop, and other circuits add 8 watts. One thing to watch: the heat sink carries the whole power-stage loss, while the junction-to-heat-sink stage carries only one device's loss—don't mix them up."
+   ]
+  },
+  {
+   "title": [
+    "缝纫是间歇负载",
+    "Sewing is an intermittent load"
+   ],
+   "points": [
+    [
+     "一直 9 A 运行，散热器会超过 200 °C；能用是因为负载间歇",
+     "Running continuously at 9 A would put the heat sink above 200 °C; intermittent load makes it workable"
+    ],
+    [
+     "散热器时间常数以分钟计 → 由平均损耗决定；结到散热器约 0.05 s → 每次起停结温跳一下",
+     "Heat sink time constant in minutes → set by average loss; junction-to-sink about 0.05 s → junction jumps at each start"
+    ],
+    [
+     "每分钟 30 次起停、缝纫一半：平均约 18 W；起停占 15% 时间、约 6 成热量",
+     "30 starts/min, sewing half the time: about 18 W average; starts take 15% of time but about 60% of heat"
+    ],
+    [
+     "40 °C：箱内约 56 °C、散热器约 83 °C、结温峰值约 110 °C；45 °C 时约 115 °C，余量约 10 °C",
+     "40 °C: box air about 56 °C, heat sink 83 °C, peak junction 110 °C; at 45 °C about 115 °C, a 10 °C margin"
+    ]
+   ],
+   "formula": "T_{j,pk} = T_{hs} + P_{dev}\\,R_{jh}\\left(1 - e^{-t_{acc}/\\tau}\\right)",
+   "figure": "fig_18_cycle.png",
+   "narration": [
+    "如果一直以 9 安运行，散热器会超过 200 度，根本做不出来。它能用，是因为缝纫是间歇负载：缝几秒停一会儿，每条缝开头加速、结尾减速，这零点几秒电流最大。散热器和箱子热容量大，时间常数以分钟计，它们的温度由平均损耗决定；芯片很小，结到散热器的时间常数只有零点几秒，算例取 0.05 秒，所以加速 0.15 秒里结温就几乎升到稳态。热设计要分两层看：平均损耗定散热器温度，峰值电流定结温再往上跳多少。按每分钟起停 30 次、缝纫一半算，平均损耗约 18 瓦，起停只占 15% 的时间却贡献了约六成热量。40 度车间，散热器约 83 度，结温峰值约 110 度；45 度时约 115 度，离 125 的设计上限只剩约 10 度。",
+    "Run continuously at 9 amps, the heat sink would exceed 200 degrees—it could not be built. It works because sewing is intermittent: sew a few seconds, then stop; every seam starts with an acceleration and ends with a deceleration, and those tenths of a second carry the highest current. The heat sink and box have large thermal capacity with time constants of minutes, so their temperature follows the average loss; the chip is tiny, its time constant to the heat sink only tenths of a second—0.05 seconds here—so within a 0.15 second acceleration the junction almost reaches steady state. So think in two layers: average loss sets the heat sink, peak current sets how far the junction jumps above it. At 30 starts a minute, sewing half the time, the average is about 18 watts, and starts take 15 percent of the time but about 60 percent of the heat. At 40 degrees: heat sink about 83, peak junction about 110; at 45 degrees about 115—only 10 degrees below the 125 limit."
+   ]
+  },
+  {
+   "title": [
+    "干扰从哪里来：共模电流",
+    "Where interference comes from: common-mode current"
+   ],
+   "points": [
+    [
+     "电控箱是干扰源：开关管几十到几百纳秒跳 310 V；电磁铁断电反电动势；开关电源",
+     "The box is a source: switches jump 310 V in tens to hundreds of ns; solenoid back-EMF; the switch-mode supply"
+    ],
+    [
+     "也是受害者：电压跌落、浪涌、快速脉冲群、几千伏静电",
+     "It is also a victim: dips, surges, fast transient bursts, several kV of ESD"
+    ],
+    [
+     "寄生电容上的共模电流 i_cm ≈ C_p·dv/dt",
+     "Common-mode current through parasitic capacitance: i_cm ≈ C_p·dv/dt"
+    ],
+    [
+     "算例：300 pF，310 V 在 150 ns 里上升 → 约 0.6 A；路径长像天线，还让主控板地电位跳动",
+     "Example: 300 pF, 310 V rising in 150 ns → about 0.6 A; the long path radiates and makes the board ground bounce"
+    ]
+   ],
+   "formula": "i_{cm}\\approx C_{p}\\,\\frac{dv}{dt}",
+   "figure": "fig_18_emc.png",
+   "narration": [
+    "再看电磁兼容。电控箱自己就是干扰源：逆变桥的管子每秒开关上万次，每次电压在几十到几百纳秒里从 0 跳到 310 伏；电磁铁断电也有很高的反电动势。反过来，它又要扛住别人的干扰：电网跌落和浪涌、接触器的快速脉冲群、冬天几千伏的静电。关键概念是共模电流：电机绕组和接地机壳之间、电缆芯线和屏蔽层之间都有寄生电容，电压每跳一次，就有一个电流脉冲经这些电容流到地，再经地线和电网绕回来，大小约等于寄生电容乘 dv/dt。算例取 300 皮法，为了简化把上升时间取成 t_sw 的一半，310 伏在 150 纳秒里上升，峰值约 0.6 安。它的路径很长，像天线往外辐射；流过地线时还会让主控板的地电位跳，干扰编码器和通信。",
+    "Now electromagnetic compatibility. The box is itself a source: inverter switches switch tens of thousands of times a second, each time jumping from 0 to 310 volts in tens to hundreds of nanoseconds; solenoids produce high back-EMF at turn-off. And it must withstand others' interference: mains dips and surges, fast bursts from contactors, several kilovolts of static in winter. The key idea is common-mode current. There is parasitic capacitance between motor windings and the earthed frame, and between cable conductors and shield; at every voltage jump a current pulse flows through these capacitances to earth and back through the earth wire and mains, roughly the capacitance times dv/dt. With 300 picofarads, and taking the rise time as half of t_sw for simplicity, 310 volts in 150 nanoseconds gives about 0.6 amps peak. Its long path radiates like an antenna, and in the earth conductors it makes the board ground bounce, upsetting the encoder and communications."
+   ]
+  },
+  {
+   "title": [
+    "标准要求与抑制对策",
+    "What the standards require and countermeasures"
+   ],
+   "points": [
+    [
+     "发射：CISPR 11 传导与辐射，IEC 61000-3-2/-3-3 谐波与闪烁",
+     "Emissions: CISPR 11 conducted and radiated; IEC 61000-3-2/-3-3 harmonics and flicker"
+    ],
+    [
+     "抗扰：IEC 61000-4-2 静电、-4-3 射频场、-4-4 脉冲群、-4-5 浪涌、-4-6 射频传导、-4-11 电压暂降",
+     "Immunity: IEC 61000-4-2 ESD, -4-3 RF field, -4-4 bursts, -4-5 surge, -4-6 conducted RF, -4-11 dips"
+    ],
+    [
+     "源头：放慢开关减小 dv/dt（但每次的电荷 C·V 不变，低频段仍靠滤波）",
+     "Source: slower switching lowers dv/dt (but charge C·V per transition is unchanged; lower bands still need filters)"
+    ],
+    [
+     "路径：入口共模电感 + X/Y 电容、屏蔽电缆大面积接地、小回路、地一点相连；受害者：差分信号、静电保护、看门狗 + 硬件下拉 PWM",
+     "Path: inlet common-mode choke + X/Y capacitors, shield earthed over large area, small loops, single-point ground; victim: differential signals, ESD protection, watchdog + hardware PWM pull-down"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "标准要做哪些试验？IEC 60204-31 的附录列了发射和抗扰两大类，具体等级要查原文。对策归纳成三条：源头、路径、受害者。源头上可以把开关放慢一点，dv/dt 小了，共模电流峰值和高频成分都小；但要注意，每次跳变流过的电荷 C 乘 V 没变，几百千赫到几兆赫的传导干扰改善不多，还得靠滤波器。路径上，电源入口装共模电感加 X、Y 电容的滤波器，电机电缆屏蔽层在箱子一端大面积接地，强电回路面积尽量小。受害者一侧，编码器用差分信号，接口加静电保护，软件设看门狗；复位期间 PWM 由硬件下拉，保证电机停下，而不是指望跑飞的程序去关输出。",
+    "What tests do the standards require? The annex of IEC 60204-31 lists two groups, emission and immunity; check the original text for levels. Countermeasures come in three groups: source, path and victim. At the source, slow the switching a little: lower dv/dt means a lower common-mode peak and less high-frequency content. But note that the charge C times V per jump is unchanged, so conducted interference from hundreds of kilohertz to a few megahertz barely improves; filters still do that job. On the path: a common-mode choke with X and Y capacitors at the inlet, the motor-cable shield earthed over a large area at the box, small power loops. At the victim: differential encoder signals, ESD protection at interfaces, a software watchdog—and during reset the PWM pins are pulled low by hardware, so the motor stops without relying on a runaway program."
+   ]
+  },
+  {
+   "title": [
+    "开关速度的折中",
+    "The switching-speed trade-off"
+   ],
+   "points": [
+    [
+     "t_sw 加大：共模电流减小，但开关损耗按比例增大、结温升高",
+     "Larger t_sw: less common-mode current, but switching loss and junction temperature rise in proportion"
+    ],
+    [
+     "45 °C：300 → 600 ns，i_cm 减半，结温 115 → 133 °C（超限）；100 ns 时结温约 104 °C，i_cm 约 1.9 A",
+     "45 °C: 300 → 600 ns halves i_cm but raises junction 115 → 133 °C (over limit); at 100 ns junction about 104 °C, i_cm about 1.9 A"
+    ],
+    [
+     "判据结温 ≤ 125 °C、i_cm ≤ 0.8 A：t_sw 只能在约 235–470 ns",
+     "With junction ≤ 125 °C and i_cm ≤ 0.8 A, t_sw must lie in about 235–470 ns"
+    ],
+    [
+     "开关频率十几千赫是噪声与损耗的折中；提到 20 kHz 窗口变窄",
+     "Ten-odd kHz switching balances noise and loss; at 20 kHz the window narrows"
+    ]
+   ],
+   "formula": "P_{sw}\\propto t_{sw},\\qquad i_{cm}\\propto \\frac{1}{t_{sw}}",
+   "figure": "",
+   "narration": [
+    "现在把热和干扰两条线连起来。开关时间 t_sw 加大，dv/dt 变小，共模电流减小；可开关损耗和 t_sw 成正比，结温就升高。看这张折中图：45 度车间，t_sw 从 300 纳秒加到 600，共模电流减半，结温峰值却从约 115 度升到约 133 度，超过上限；反过来缩到 100 纳秒，结温降到约 104 度，共模电流却到了约 1.9 安，滤波器很难对付。按结温不超过 125 度、共模电流不超过 0.8 安这两条示意判据，t_sw 只能在大约 235 到 470 纳秒之间选。开关频率也是折中：频率低损耗小，但纹波大、电机啸叫；要完全听不见得提到 16 到 20 千赫以上，损耗又上去了。虚拟实验里把频率提到 20 千赫，大家会看到这个窗口变得多窄。",
+    "Now connect the thermal and interference threads. A larger switching time t_sw lowers dv/dt and the common-mode current, but switching loss is proportional to t_sw, so the junction gets hotter. Look at the trade-off plot: in a 45 degree shop, going from 300 to 600 nanoseconds halves the common-mode current but raises peak junction temperature from about 115 to about 133 degrees, over the limit; going down to 100 nanoseconds cools the junction to about 104 degrees but the common-mode current becomes about 1.9 amps, hard for any filter. With the illustrative criteria—junction at most 125 degrees, common-mode current at most 0.8 amps—t_sw must lie between about 235 and 470 nanoseconds. Switching frequency is a trade-off too: lower frequency means less loss but more ripple and a shrill motor; making it inaudible needs 16 to 20 kilohertz or more, raising loss again. In the lab you'll raise it to 20 kilohertz and see how narrow the window becomes."
+   ]
+  },
+  {
+   "title": [
+    "嵌入式软件：分层与保护",
+    "Embedded software: layers and protection"
+   ],
+   "points": [
+    [
+     "四层：驱动层 → 运动控制层 → 工艺层 → 界面与通信层",
+     "Four layers: drivers → motion control → process → user interface and communication"
+    ],
+    [
+     "越往下越快：电流环约 0.1 ms 在 PWM 中断里；界面几十毫秒刷新",
+     "Lower is faster: current loop about every 0.1 ms in the PWM interrupt; UI refreshed every few tens of ms"
+    ],
+    [
+     "同一套运动控制配不同工艺层，就是平缝、包缝或花样机的电控",
+     "One motion-control layer with different process layers makes lockstitch, overlock or pattern-sewer controls"
+    ],
+    [
+     "保护按轻重分级处理；上电检查脚踏中位和机头翻起开关，落实防意外启动",
+     "Protection is graded by severity; at power-up, check pedal neutral and the head-tilt switch to prevent unexpected start"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_18_sw.png",
+   "narration": [
+    "电控软件一般分四层：最底下驱动层，直接操作 PWM、模数转换、编码器接口；往上是运动控制层，跑三个控制环；再往上是工艺层，就是回针、剪线、换色、花样插补；最上面是界面和通信。越往下越快、越要准时：电流环每 0.1 毫秒算一次，放在 PWM 中断里；界面几十毫秒刷新一次就够。分层的好处是改一层不影响别的层，同一套运动控制换个工艺层，就能做成平缝机、包缝机或花样机的电控。软件的一大块工作是保护：各种故障按轻重处理，有的先限速继续干，有的立即关断报故障码。上电时还要检查脚踏在不在中位、机头有没有翻起，这就是防意外启动在软件里的落实。",
+    "Control software usually has four layers. At the bottom the driver layer works the peripherals directly—PWM, A/D conversion, the encoder interface. Above it the motion-control layer runs the current, velocity and position loops of Chapter 13. Above that the process layer: start backtack, trimming, colour change, pattern interpolation from Chapters 14 to 17. At the top, user interface and communication. The lower the layer, the faster and stricter: the current loop runs every 0.1 milliseconds in the PWM interrupt, while the UI only needs refreshing every few tens of milliseconds. Layering means changing one layer leaves the others alone—the same motion control with a different process layer becomes a lockstitch, overlock or pattern-sewer control. A big part of the software is protection: faults are handled by severity—some limit speed and carry on, others cut the outputs and show a fault code. At power-up the software checks that the pedal is neutral and the head is not tilted: that is the unexpected-start rule implemented in software."
+   ]
+  },
+  {
+   "title": [
+    "参数存储与双区固件升级",
+    "Parameter storage and dual-bank firmware update"
+   ],
+   "points": [
+    [
+     "掉电不丢失的存储器擦写次数有限：延时写入或多块轮流写",
+     "Non-volatile memory has limited write cycles: delayed writes or rotating among blocks"
+    ],
+    [
+     "每组参数带校验码，上电校验，坏了就恢复默认并报警",
+     "Each parameter set has a checksum, verified at power-up; if corrupt, restore defaults and alarm"
+    ],
+    [
+     "双区升级：新固件写进备用区 → 校验（签名）→ 改启动标志；坏了退回原区",
+     "Dual-bank update: write to the spare area → verify (signature) → switch the boot flag; fall back if bad"
+    ],
+    [
+     "新版本首次启动只算试运行，应用确认前看门狗复位就回滚",
+     "First start of a new version is a trial; a watchdog reset before confirmation rolls back"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "再说两个容易出事的地方。第一是参数存储，用户设置和出厂标定都存在掉电不丢失的存储器里。擦写次数有限，所以改完延时再写，或几块区轮流写。每组参数带校验码，上电先校验，坏了就恢复默认值并报警，绝不带着乱的参数跑。第二是固件升级。升级最怕中途断电，写了一半的程序既不是旧版也不是新版，机器就起不来了。所以存储器分出引导程序和两个程序区：新固件先完整写进备用区，校验无误后才改启动标志；重启时引导程序检查校验码，不对就回原来那一区。还有一层：校验对了也可能一运行就卡死，所以第一次启动只算试运行，应用确认之前看门狗一复位，就退回旧版本。",
+    "Two more places where things go wrong. First, parameter storage: user settings and factory calibrations live in non-volatile memory. Its erase cycles are limited, so write after a delay or rotate among several blocks. Each parameter set carries a checksum verified at power-up; if corrupt, restore defaults and alarm—never run with garbled parameters. Second, firmware updates. The worst case is power loss halfway: a half-written program is neither old nor new and the machine won't start. So memory is split into a bootloader and two program areas. The new firmware is written completely into the spare area and verified before the boot flag changes; at restart the bootloader checks the checksum and falls back if it's wrong. One more layer: a correct checksum can still hang on start, so the first start is only a trial; if the watchdog resets before the application confirms, the bootloader rolls back."
+   ]
+  },
+  {
+   "title": [
+    "生产测试流程",
+    "Production test flow"
+   ],
+   "points": [
+    [
+     "贴片焊接 → AOI 光学检测 → ICT 针床在线测试 → 烧录与 FCT 功能测试",
+     "SMT soldering → AOI optical inspection → ICT bed-of-nails test → flashing and FCT functional test"
+    ],
+    [
+     "装箱后通电老化 → 再做功能测试 → 电气安全测试（接地连续性、绝缘电阻、耐压）",
+     "After assembly: powered burn-in → functional test again → electrical safety test (earth continuity, insulation, withstand voltage)"
+    ],
+    [
+     "最后装到缝纫机上整机跑合",
+     "Finally running-in on the complete sewing machine"
+    ],
+    [
+     "每块板贴条码，测试数据按条码存档，问题批次可追溯",
+     "Every board has a barcode; test data archived by barcode so problem batches can be traced"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_18_test.png",
+   "narration": [
+    "生产时怎么保证每一只都好？生产和测试是穿插进行的。电路板贴片焊接后，先用自动光学检测拍照，看元件有没有贴错贴歪、焊点有没有连锡。接着在线测试，把板子压在布满探针的针床上，逐个量电阻电容的数值和二极管方向。然后烧录程序做功能测试，在工装上接模拟的电机负载、编码器、脚踏和电磁铁，按测试程序把功能走一遍，记录电流电压。装成电控箱以后通电老化，老化后再做功能测试和电气安全测试：接地连续性、绝缘电阻和耐压。最后装到缝纫机上整机跑合。每块板都有条码，测试数据按条码存档，哪一批出了问题，能查到元件批次和测试记录。",
+    "In production, how do we make sure every unit is good? Production and testing are interleaved. After SMT soldering, automated optical inspection photographs each board for wrong or skewed parts and solder bridges. Then in-circuit test: the board is pressed onto a bed of nails and resistor and capacitor values and diode polarity are measured one by one. Then the program is flashed and a functional test runs: on a fixture, with simulated motor load, encoder, pedal and solenoids, the board goes through its functions while currents and voltages are recorded. Assembled into a box, it is burned in under power, functionally tested again, and safety tested—earth continuity, insulation resistance and withstand voltage. Finally it runs in on a sewing machine. Every board has a barcode and test data are archived by it, so if a batch goes wrong you can trace its component lots and test records."
+   ]
+  },
+  {
+   "title": [
+    "浴盆曲线与老化条件",
+    "The bathtub curve and burn-in conditions"
+   ],
+   "points": [
+    [
+     "早期失效（虚焊、元件缺陷）→ 随机失效 → 磨损失效",
+     "Early failures (poor joints, part defects) → random failures → wear-out"
+    ],
+    [
+     "高温带载老化，加速因子 AF 按阿伦尼乌斯关系，T_bi 是元件温度而非箱温",
+     "Hot, loaded burn-in; acceleration factor AF from Arrhenius, where T_bi is component temperature, not chamber temperature"
+    ],
+    [
+     "算例：E_a = 0.7 eV，使用 55 °C，箱 70 °C 时元件 85 °C → AF ≈ 8，8 h ≈ 使用 64 h",
+     "Example: E_a = 0.7 eV, 55 °C in use, 85 °C components at 70 °C chamber → AF ≈ 8; 8 h ≈ 64 h of use"
+    ],
+    [
+     "1% 早期缺陷：不老化第一年返修约 1.5%；70 °C 老化 8 h 降到约 0.9%",
+     "1% early defects: about 1.5% first-year returns without burn-in, about 0.9% after 8 h at 70 °C"
+    ]
+   ],
+   "formula": "AF=\\exp\\left[\\frac{E_a}{k}\\left(\\frac{1}{T_{use}}-\\frac{1}{T_{bi}}\\right)\\right]",
+   "figure": "",
+   "narration": [
+    "为什么要老化？失效率随时间像一个浴盆：开头是虚焊、元件缺陷造成的早期失效，出厂检测不一定查得出来；接着是很长的低而平的随机失效期；最后元件老化磨损，失效率又上升。老化就是让箱子在工厂里先用一段。室温下太慢，所以高温带载老化，加速因子用阿伦尼乌斯关系估算。注意 T_bi 是元件温度，不是老化箱温度。算例激活能 0.7 电子伏，使用时元件 55 度，老化箱 70 度时元件约 85 度，加速因子约 8，老化 8 小时相当于用 64 小时。假设每批 1% 有早期缺陷，不老化第一年返修约 1.5%，三分之二来自早期缺陷；70 度老化 8 小时，大约一半有缺陷的在厂里坏掉，返修率降到约 0.9%。老化越久筛得越干净，但箱子、电费和时间都是成本。",
+    "Why burn in? The failure rate over time looks like a bathtub: early failures from poor joints and part defects, which inspection may not catch; then a long, low, flat random-failure period; finally wear-out as parts age. Burn-in lets the box be 'used' in the factory first. At room temperature that takes too long, so it is done hot and loaded, with the acceleration factor from the Arrhenius relation. Note that T_bi is the component temperature, not the chamber's. With 0.7 electron-volts, components at 55 degrees in use and about 85 in a 70 degree chamber, the factor is about 8: 8 hours of burn-in equals 64 hours of use. If 1 percent of each batch has early defects, first-year returns without burn-in are about 1.5 percent, two-thirds from early defects; 8 hours at 70 degrees makes about half the defective boxes fail in the factory and cuts returns to about 0.9 percent. Longer burn-in screens better, but chambers, electricity and time all cost money."
+   ]
+  },
+  {
+   "title": [
+    "案例：夏天频繁报过热",
+    "Case: frequent overtemperature in summer"
+   ],
+   "points": [
+    [
+     "38 °C 干净箱：散热器约 81 °C、结温峰值约 108 °C，设计没问题",
+     "38 °C, clean box: heat sink about 81 °C, peak junction about 108 °C—the design is sound"
+    ],
+    [
+     "飞絮堵塞 0.3 → 散热器约 97 °C；堵塞 0.5 → 约 109 °C（报警），结温约 136 °C",
+     "Lint blockage 0.3 → heat sink about 97 °C; 0.5 → about 109 °C (alarm), junction about 136 °C"
+    ],
+    [
+     "十度法则 L = L₀·2^((T₀−T)/10)：电容 59 °C 约 10 年，66 °C 约 6 年，71 °C 约 4.4 年",
+     "Ten-degree rule L = L₀·2^((T₀−T)/10): capacitor at 59 °C about 10 years, 66 °C about 6, 71 °C about 4.4"
+    ],
+    [
+     "改进：定期清理、竖排宽齿外置散热片（1.0 K/W → 约 93 °C）、过热降额、长寿命电容、三防漆",
+     "Fixes: regular cleaning, external vertical wide-pitch fins (1.0 K/W → about 93 °C), thermal derating, long-life capacitors, conformal coating"
+    ]
+   ],
+   "formula": "L=L_{0}\\times2^{(T_{0}-T)/10}",
+   "figure": "fig_18_case.png",
+   "narration": [
+    "回到开头的问题。38 度、干净的电控箱，散热器约 81 度，结温峰值约 108 度，离 100 度报警和 125 度上限都有余量，设计本身没问题。那返修件和新件差在哪？拆开一看，散热片和通风孔糊着一层飞絮，像盖了一层棉被。用堵塞程度表示：0.3 时散热器约 97 度，快到报警值；0.5 时约 109 度，超过报警，结温峰值约 136 度，也超了上限。过热报警是保护在正确地起作用。电容鼓包是同一个原因：十度法则，每升 10 度寿命减半。干净时电容约 59 度，寿命约 10 年；堵塞 0.5 约 66 度，约 6 年；0.8 时只剩约 4.4 年。改进几条一起用：写进保养规程定期清理；做成密封箱、外置竖排宽齿散热片，热阻降到 1.0 后散热器约 93 度不再报警；软件降额；换长寿命电容。",
+    "Back to the opening problem. First the model at the design point: at 38 degrees a clean box has a heat sink at about 81 and a peak junction of about 108, with margin to both the 100 degree alarm and the 125 limit—the design is sound. So how do returned units differ? Open one: lint caked on the fins and vents, like a quilt. In terms of blockage: at 0.3 the heat sink is about 97, close to the alarm; at 0.5 about 109, over the alarm, with the junction at about 136, over the limit too. The overtemperature alarm is protection working correctly. Bulging capacitors have the same cause: by the ten-degree rule, every 10 degrees hotter halves life. Clean, the capacitor runs at about 59 degrees and lasts about 10 years; at blockage 0.5 about 66 and 6 years; at 0.8 only about 4.4 years. Use several fixes together: regular cleaning in the maintenance schedule; a sealed box with external vertical, wide-pitch fins—at 1.0 kelvin per watt the heat sink is about 93 and no longer alarms; derating in software; longer-life capacitors."
+   ]
+  },
+  {
+   "title": [
+    "设计要点与模型的边界",
+    "Design notes and limits of the model"
+   ],
+   "points": [
+    [
+     "损耗模型：固定压降 + 电阻、开关损耗线性估算，未计温度影响、反向恢复细节和纹波",
+     "Loss model: fixed drop + resistance, linear switching estimate; ignores temperature effects, reverse-recovery detail and ripple"
+    ],
+    [
+     "起步时电周期很长，单管可能几十毫秒通近峰值电流，实际结温高于模型；制动时损耗落在二极管上",
+     "At start-up the electrical period is long, one device may carry near-peak current for tens of ms, so the real junction is hotter; braking loads the diodes"
+    ],
+    [
+     "共模电流只按一个寄生电容估，实际与电缆长度、布局、滤波器有关，要靠测量",
+     "Common-mode current uses one capacitance; in reality it depends on cable length, layout and filter, so measure it"
+    ],
+    [
+     "阿伦尼乌斯只管温度主导的失效；焊点疲劳、连接器松动要靠温度循环和振动筛选",
+     "Arrhenius covers only temperature-driven failures; solder fatigue and loose connectors need temperature cycling and vibration"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后说说模型的边界。损耗模型把开关管看成固定压降加电阻，没考虑温度影响、反向恢复细节和纹波。它按正弦电流在一个电周期里平均，可起步时电机几乎不转，电周期很长，某一只管子可能几十毫秒一直通着接近峰值的电流，实际结温比模型高；制动时能量倒流，损耗主要在续流二极管上。共模电流只按一个寄生电容估，实际还与电缆、布局、滤波器有关，只能靠测。老化模型假设早期缺陷的比例和分布已知，实际要靠返修数据去估；阿伦尼乌斯只适用于温度主导的失效，焊点疲劳、连接器松动要靠温度循环和振动来筛。这些模型的用处是看清方向和大小，具体数值要用样机试验确认。",
+    "Finally, the limits of the models. The loss model treats a switch as a fixed drop plus a resistance, ignoring temperature effects, reverse-recovery detail and ripple. It averages a sinusoid over one electrical period, but at start-up the motor barely turns, the period is long, and one device may carry near-peak current for tens of milliseconds, so the real junction runs hotter; during braking energy flows back and the loss falls mainly on the freewheeling diodes. Common-mode current uses a single parasitic capacitance; really it depends on cables, layout and filter and must be measured. The burn-in model assumes the defect fraction and distribution are known, which in practice come from return data; Arrhenius applies only to temperature-driven failures, while solder fatigue and loose connectors need temperature cycling and vibration. These models show direction and magnitude; the actual numbers must be confirmed on prototypes."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "电控箱要在电压波动、高温、飞絮、干扰和频繁起停下用十年；开发按 V 模型，设计和验证逐层对应，并满足 ISO 10821 / IEC 60204-31 的要求。",
+   "A control box must last ten years under voltage swings, heat, lint, interference and frequent starts; it is developed on the V-model with design and verification matched level by level, meeting ISO 10821 / IEC 60204-31."
+  ],
+  [
+   "损耗 = 导通损耗（含 I² 项）+ 开关损耗 ½·V_dc·Ī·t_sw·f_sw；缝纫是间歇负载，平均损耗定散热器温度，峰值电流定结温跳升。",
+   "Loss = conduction loss (with an I² term) + switching loss ½·V_dc·Ī·t_sw·f_sw; sewing is intermittent, so average loss sets the heat sink and peak current sets the junction jump."
+  ],
+  [
+   "共模电流 i_cm ≈ C_p·dv/dt；抑制分源头、路径、受害者三类；开关时间在结温和共模电流之间折中，算例窗口约 235–470 ns。",
+   "Common-mode current i_cm ≈ C_p·dv/dt; suppression works at source, path and victim; switching time trades junction temperature against common-mode current, with a window of about 235–470 ns in the example."
+  ],
+  [
+   "软件分四层，保护按轻重分级；参数带校验码，固件双区升级并在试运行确认前可回滚。",
+   "Software has four layers with graded protection; parameters carry checksums, and dual-bank firmware can roll back until the trial run is confirmed."
+  ],
+  [
+   "生产测试 AOI → ICT → FCT → 老化 → 安全测试 → 跑合；老化按阿伦尼乌斯加速，用浴盆曲线权衡返修率和成本。",
+   "Production test runs AOI → ICT → FCT → burn-in → safety test → running-in; burn-in uses Arrhenius acceleration and the bathtub curve to balance returns and cost."
+  ],
+  [
+   "现场过热多因飞絮堵塞使热阻变大；电容寿命按十度法则每热 10 °C 减半；热设计余量要按真实安装和脏污来算。",
+   "Field overheating usually comes from lint raising thermal resistance; capacitor life halves for every 10 °C by the ten-degree rule; thermal margins must account for real installation and dirt."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "ebox",
+   "no": "18-1",
+   "title": [
+    "电控箱：热设计、干扰与老化",
+    "Control box: thermal design, interference and burn-in"
+   ],
+   "goal": [
+    [
+     "用电控箱模型观察工况、开关参数、散热和飞絮堵塞对平均损耗、散热器温度、结温峰值、电容寿命和共模电流的影响。",
+     "Use the control-box model to see how duty cycle, switching parameters, cooling and lint blockage affect average loss, heat-sink temperature, peak junction temperature, capacitor life and common-mode current."
+    ],
+    [
+     "在 20 kHz 开关频率下重新选择开关时间，体会热与干扰的折中。",
+     "Re-select the switching time at 20 kHz to experience the thermal–interference trade-off."
+    ],
+    [
+     "选择老化温度和时间，使第一年返修率和每台成本同时达标。",
+     "Choose burn-in temperature and time so that first-year returns and cost per unit both meet targets."
+    ]
+   ],
+   "theory": [
+    [
+     "单管开关损耗 = ½ × 310 V × (I_峰/π) × t_sw × f_sw；起停加速、减速各 0.15 s 用起停电流；散热器热阻按 1 + 1.5 × 堵塞程度、箱内温升按 1 + 堵塞程度放大。",
+     "Per-device switching loss = ½ × 310 V × (I_peak/π) × t_sw × f_sw; each start and stop uses the start current for 0.15 s; heat-sink resistance scales by 1 + 1.5 × blockage and box air rise by 1 + blockage."
+    ],
+    [
+     "结温峰值 = 散热器温度 + 单管损耗 × 3.5 K/W × (1 − e^(−0.15/0.05))；电容温度 = 箱内空气 + 5 °C，寿命按十度法则。",
+     "Peak junction = heat sink + device loss × 3.5 K/W × (1 − e^(−0.15/0.05)); capacitor = box air + 5 °C, life by the ten-degree rule."
+    ],
+    [
+     "共模电流峰值 = 300 pF × 310 V / (t_sw/2)；判据：散热器 ≤ 100 °C、结温 ≤ 125 °C、电容寿命 ≥ 5 年、i_cm ≤ 0.8 A、f_sw ≥ 8 kHz。",
+     "Peak common-mode current = 300 pF × 310 V / (t_sw/2); criteria: heat sink ≤ 100 °C, junction ≤ 125 °C, capacitor life ≥ 5 years, i_cm ≤ 0.8 A, f_sw ≥ 8 kHz."
+    ],
+    [
+     "老化：加速因子按阿伦尼乌斯（0.7 eV，元件比箱高 15 °C，箱温最高 70 °C）；早期缺陷按形状 0.5 的韦布尔分布；成本 = 0.3 元/台·h × 老化时间 + 600 元 × 返修率 + 50 元 × 老化中坏掉比例。",
+     "Burn-in: Arrhenius acceleration (0.7 eV, components 15 °C above chamber, chamber at most 70 °C); early defects follow a Weibull distribution of shape 0.5; cost = 0.3 yuan per unit·h × burn-in time + 600 yuan × return rate + 50 yuan × fraction failing in burn-in."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页“① 热设计与干扰”，点“恢复标准”，记录判据区的散热器温度、结温峰值、电容寿命、共模电流、平均损耗和起停贡献的热量，与教材 18.3 节核对。",
+     "Open page '① Thermal design and interference', click 'Reset to standard', and record heat-sink temperature, peak junction, capacitor life, common-mode current, average loss and heat share of starts; compare with Section 18.3."
+    ],
+    [
+     "把每分钟起停次数从 30 调到 60，观察周期图中散热器和结温的变化，记录平均损耗和结温峰值。",
+     "Raise starts per minute from 30 to 60, watch the heat-sink and junction curves in the cycle plot, and record average loss and peak junction."
+    ],
+    [
+     "点“夏天 + 堵塞（案例）”（38 °C、堵塞 0.5），记录哪些判据不满足；再把堵塞程度在 0–0.8 之间取几档，记录散热器温度和电容寿命。",
+     "Click 'Summer + blockage (case)' (38 °C, blockage 0.5), record which criteria fail; then try several blockage values from 0 to 0.8, recording heat-sink temperature and capacitor life."
+    ],
+    [
+     "任务 1：保持 38 °C、堵塞 0.5 和工况不变，只改设计参数（散热器热阻、开关频率、开关时间、电容额定寿命），使全部判据满足，记录你的方案。",
+     "Task 1: keeping 38 °C, blockage 0.5 and the duty cycle unchanged, change only design parameters (heat-sink resistance, switching frequency, switching time, capacitor rated life) until all criteria pass; record your design."
+    ],
+    [
+     "点“恢复标准”，在 45 °C 下把开关时间从 100 ns 调到 700 ns，对照折中图记录结温峰值和共模电流，找出绿色区域的范围。",
+     "Click 'Reset to standard'; at 45 °C vary switching time from 100 to 700 ns, recording peak junction and common-mode current against the trade-off plot, and find the extent of the green region."
+    ],
+    [
+     "任务 2：45 °C、不堵塞、开关频率 20 kHz，其他标准参数不变，重新选开关时间使全部判据满足，记录绿色区域的宽度。",
+     "Task 2: at 45 °C, no blockage, 20 kHz, other parameters standard, re-select the switching time so all criteria pass, and record the width of the green region."
+    ],
+    [
+     "切到“② 老化与返修”，早期缺陷比例 1%，在 55 °C 下把老化时间从 0 调到 48 h，记录加速因子、筛掉比例、第一年返修率和每台成本。",
+     "Go to '② Burn-in and returns'; with 1% early defects, vary burn-in time from 0 to 48 h at 55 °C, recording acceleration factor, fraction screened, first-year return rate and cost per unit."
+    ],
+    [
+     "任务 3：选老化箱温度和老化时间，使第一年返修率低于 1% 且每台综合成本不超过 9 元；确认页面底部 3 项任务都显示“✓ 完成”。",
+     "Task 3: choose chamber temperature and burn-in time so the first-year return rate is below 1% and cost per unit at most 9 yuan; confirm all 3 tasks at the bottom show '✓ Done'."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "热设计、干扰与老化记录",
+     "Thermal, interference and burn-in record"
+    ],
+    "headers": [
+     [
+      "工况 / 设定",
+      "Condition / setting"
+     ],
+     [
+      "平均损耗 W",
+      "Average loss W"
+     ],
+     [
+      "散热器 °C",
+      "Heat sink °C"
+     ],
+     [
+      "结温峰值 °C",
+      "Peak junction °C"
+     ],
+     [
+      "电容寿命 年",
+      "Capacitor life years"
+     ],
+     [
+      "共模电流 A",
+      "Common-mode current A"
+     ],
+     [
+      "返修率 %",
+      "Return rate %"
+     ],
+     [
+      "每台成本 元",
+      "Cost per unit yuan"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "任务 1 中，换大散热器、降开关频率、换长寿命电容各自解决了哪个判据？哪一项最管用？为什么只换电容不能消除报警？",
+     "In Task 1, which criterion does a bigger heat sink, a lower switching frequency and a longer-life capacitor each fix? Which helps most? Why can't a new capacitor alone stop the alarm?"
+    ],
+    [
+     "开关频率从 12 kHz 提到 20 kHz 后，开关时间的可选窗口为什么变窄？窗口的上下限分别由哪个判据决定？",
+     "Why does the switching-time window narrow when frequency goes from 12 to 20 kHz? Which criterion sets each end of the window?"
+    ],
+    [
+     "老化温度定在 70 °C 而不是更高，理由是什么？若出厂后返修多来自焊点疲劳，单靠提高老化温度有用吗？",
+     "Why is the burn-in chamber set at 70 °C and not higher? If field returns come mostly from solder fatigue, does raising burn-in temperature help?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "一只伺服电控箱的热校核与改进",
+   "Thermal check and improvement of a servo control box"
+  ],
+  "tasks": [
+   [
+    "热校核：车间 45 °C；功率级平均损耗 18.0 W，其他电路 8 W；箱内温升 0.6 K/W × 总发热，散热器到箱内空气 1.5 K/W；起停时单管损耗 8.30 W，结到散热器 3.5 K/W，时间常数 0.05 s，加速持续 0.15 s；母线电容 105 °C、2000 h，芯部比箱内高 5 °C。求箱内空气、散热器温度、结温峰值和电容寿命（h 与年，每年 4800 h），判断是否满足 100 °C 报警和 125 °C 结温上限。",
+    "Thermal check: workshop 45 °C; average power-stage loss 18.0 W, other circuits 8 W; box air rise 0.6 K/W × total heat, heat sink to box air 1.5 K/W; per-device loss during starts 8.30 W, junction to heat sink 3.5 K/W, time constant 0.05 s, acceleration lasting 0.15 s; DC-link capacitor 105 °C, 2000 h, core 5 °C above box air. Find the box air, heat-sink temperature, peak junction temperature and capacitor life (h and years at 4800 h/year), and judge against the 100 °C alarm and the 125 °C junction limit."
+   ],
+   [
+    "改进设计：车间 38 °C、飞絮堵塞 0.5（散热器热阻 × 1.75，箱内温升 × 1.5），其余同上题。为使散热器不超过 100 °C，干净散热器的热阻最大可取多少？若同时要求结温峰值不超过 125 °C，又最大取多少？哪一条约束更紧？",
+    "Improvement: workshop 38 °C, lint blockage 0.5 (heat-sink resistance × 1.75, box air rise × 1.5), otherwise as above. What is the largest clean heat-sink resistance that keeps the heat sink at or below 100 °C? If the peak junction must also stay at or below 125 °C, what is the largest? Which constraint is tighter?"
+   ],
+   [
+    "开关参数折中：用虚拟实验 18-1，在 45 °C、不堵塞、开关频率 16 kHz 下，找出同时满足结温 ≤ 125 °C、共模电流 ≤ 0.8 A 和散热器 ≤ 100 °C 的开关时间范围，与 12 kHz 时的 235–470 ns 比较，并用 P_sw ∝ t_sw·f_sw 和 i_cm ≈ C_p·dv/dt 解释。",
+    "Switching trade-off: with Virtual lab 18-1, at 45 °C, no blockage and 16 kHz, find the switching-time range that keeps junction ≤ 125 °C, common-mode current ≤ 0.8 A and heat sink ≤ 100 °C; compare with 235–470 ns at 12 kHz and explain using P_sw ∝ t_sw·f_sw and i_cm ≈ C_p·dv/dt."
+   ],
+   [
+    "（讨论）某工厂电控箱在老化工序中几乎不坏，出厂第一年返修率却达 2%。列出可能原因，并提出测试和老化流程的调整方案。",
+    "(Discussion) A factory's control boxes almost never fail in burn-in, yet first-year returns reach 2%. List possible causes and propose changes to the test and burn-in flow."
+   ]
+  ],
+  "deliverable": [
+   "提交 PDF 报告 3–4 页：前两题写出热阻网络图、公式、代入和结果；第三题附虚拟实验折中图截图和窗口数值；讨论题一段话加改进后的测试流程图。",
+   "Submit a 3–4 page PDF: for Tasks 1–2 draw the thermal network and show formulas, substitution and results; for Task 3 attach the lab's trade-off screenshot and window values; for the discussion give one paragraph plus a revised test-flow diagram."
+  ],
+  "rubric": [
+   [
+    "第 1 题温度与寿命计算正确、判断正确：30 分",
+    "Task 1 temperatures, life and judgement correct: 30 points"
+   ],
+   [
+    "第 2 题两种约束下的热阻上限正确，能指出更紧的约束：25 分",
+    "Task 2 resistance limits under both constraints correct, tighter constraint identified: 25 points"
+   ],
+   [
+    "第 3 题窗口数值与截图一致，物理解释正确：20 分",
+    "Task 3 window values match the screenshot, physical explanation correct: 20 points"
+   ],
+   [
+    "第 4 题原因分析全面、调整方案可行：15 分",
+    "Task 4 causes thorough, changes feasible: 15 points"
+   ],
+   [
+    "报告规范、单位与有效数字正确：10 分",
+    "Report presentation, units and significant figures: 10 points"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "numerical",
+   "text": [
+    "一只开关管在 310 V 母线下工作，开关频率 12 kHz，开关时电流的平均值 Ī = 3 A，一次开通加一次关断共 300 ns。按 P_sw ≈ ½·V_dc·Ī·t_sw·f_sw 估算开关损耗。",
+    "A switch works on a 310 V DC link at 12 kHz; the average switched current is Ī = 3 A and one turn-on plus one turn-off takes 300 ns. Estimate the switching loss with P_sw ≈ ½·V_dc·Ī·t_sw·f_sw."
+   ],
+   "answer": 1.674,
+   "tolerance": 0.05,
+   "unit": "W",
+   "feedback": [
+    "½ × 310 × 3 × 300×10⁻⁹ × 12000 = 1.67 W；开关时间或频率加倍，损耗也加倍。",
+    "½ × 310 × 3 × 300×10⁻⁹ × 12000 = 1.67 W; doubling switching time or frequency doubles it."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "功率模块总损耗 18 W，散热器到车间空气的热阻 2.0 K/W；单管损耗 4 W，结到散热器 3.5 K/W。车间 35 °C 时这只管子的结温约多少？",
+    "A power module dissipates 18 W in total; heat sink to workshop air is 2.0 K/W; one device dissipates 4 W with 3.5 K/W junction to heat sink. At 35 °C in the workshop, what is that device's junction temperature?"
+   ],
+   "answer": 85.0,
+   "tolerance": 1.0,
+   "unit": "°C",
+   "feedback": [
+    "散热器 = 35 + 18 × 2.0 = 71 °C；结温 = 71 + 4 × 3.5 = 85 °C。散热器走总损耗，结到散热器只走单管损耗。",
+    "Heat sink = 35 + 18 × 2.0 = 71 °C; junction = 71 + 4 × 3.5 = 85 °C. The heat sink carries the total loss, the junction stage only one device's."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一只额定 105 °C、2000 h 的电解电容工作在 70 °C，按十度法则估算寿命是多少小时？",
+    "An electrolytic capacitor rated 105 °C, 2000 h runs at 70 °C. Estimate its life in hours by the ten-degree rule."
+   ],
+   "answer": 22627.0,
+   "tolerance": 300,
+   "unit": "h",
+   "feedback": [
+    "L = 2000 × 2^((105−70)/10) = 2000 × 2^3.5 ≈ 22627 h，约 4.7 年（每年 4800 h）。",
+    "L = 2000 × 2^((105−70)/10) = 2000 × 2^3.5 ≈ 22627 h, about 4.7 years at 4800 h per year."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "寄生电容 300 pF，母线 310 V，电压上升时间 200 ns。共模电流峰值约多少？",
+    "Parasitic capacitance 300 pF, DC link 310 V, voltage rise time 200 ns. What is the peak common-mode current?"
+   ],
+   "answer": 0.465,
+   "tolerance": 0.02,
+   "unit": "A",
+   "feedback": [
+    "共模电流 i_cm ≈ C_p·dv/dt = 300×10⁻¹² × 310 / 200×10⁻⁹ ≈ 0.465 A。",
+    "i_cm ≈ C_p·dv/dt = 300×10⁻¹² × 310 / 200×10⁻⁹ ≈ 0.465 A."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "间歇缝纫工况下，下列哪种说法正确描述了散热器温度和结温的决定因素？",
+    "Under intermittent sewing, which statement correctly describes what sets the heat-sink and junction temperatures?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "散热器温度由一段时间的平均损耗决定；结温在其上随每次起停的峰值电流跳升",
+      "The heat sink follows the average loss over time; the junction jumps above it with each start's peak current"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "散热器和结温都由峰值电流决定",
+      "Both are set by the peak current"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "两者都只由平均损耗决定，起停电流无关紧要",
+      "Both depend only on average loss; start current does not matter"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "结温由平均损耗决定，散热器温度由峰值电流决定",
+      "The junction follows average loss and the heat sink follows peak current"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "散热器时间常数以分钟计，跟着平均损耗慢慢升；芯片到散热器只有约 0.05 s，加速 0.15 s 内就接近稳态。",
+    "The heat sink's time constant is minutes, so it follows average loss; chip to heat sink is about 0.05 s, so within a 0.15 s acceleration the junction nearly reaches steady state."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "把开关管的开关过程放慢，每次跳变流过寄生电容的电荷 C·V 也随之减小，所以几百千赫到几兆赫的传导干扰会显著改善。",
+    "Slowing the switching transitions also reduces the charge C·V passing through the parasitic capacitance each time, so conducted interference from a few hundred kHz to a few MHz improves markedly."
+   ],
+   "correct": false,
+   "feedback": [
+    "放慢开关减小的是 dv/dt 和高频成分，每次跳变的电荷 C·V 不变，这一频段的传导干扰改善不多，主要靠入口滤波器。",
+    "Slower switching lowers dv/dt and high-frequency content, but the charge C·V per transition is unchanged, so this band improves little and is handled mainly by the inlet filter."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于双区固件升级，哪些做法是为了防止升级后机器起不来？",
+    "In dual-bank firmware updating, which practices prevent the machine from failing to start after an update?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "新固件先完整写进备用区，校验无误后才改启动标志",
+      "Write the new firmware completely into the spare area and switch the boot flag only after verification"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "重启时引导程序检查该区校验码，不对就回到原来那一区",
+      "At restart the bootloader checks that area's checksum and falls back if it is wrong"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "新版本首次启动只算试运行，确认前看门狗复位就回滚",
+      "The first start is a trial; a watchdog reset before confirmation rolls back"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "每次升级同时改写引导程序，保证版本一致",
+      "Rewrite the bootloader with every update to keep versions consistent"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "参数每改一次就立即写入存储器",
+      "Write parameters to memory immediately on every change"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "引导程序很小，出厂后不再改动；参数立即写入会耗尽擦写次数，与升级安全无关。",
+    "The bootloader is tiny and never changed after shipment; writing parameters on every change wears out the memory and has nothing to do with update safety."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "主控程序跑飞后，什么措施保证电机一定停下来？",
+    "If the main program runs away, what guarantees the motor stops?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "看门狗复位主控，复位期间和之后 PWM 由硬件下拉、功率模块使能保持关断",
+      "The watchdog resets the controller, and during and after reset the PWM pins are pulled low by hardware with the power-module enable held off"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "由跑飞的程序在下一次中断里关断 PWM",
+      "The runaway program switches off PWM at its next interrupt"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "依靠母线电容放电使电机停转",
+      "Rely on the DC-link capacitor discharging to stop the motor"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "等操作工松开脚踏",
+      "Wait for the operator to release the pedal"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "不能指望已经跑飞的程序去关输出，必须由硬件保证复位状态下输出关断。",
+    "A runaway program cannot be trusted to switch outputs off; hardware must guarantee outputs are off in reset."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "在线测试（ICT）在生产测试流程中主要做什么？",
+    "What does in-circuit test (ICT) mainly do in the production flow?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "把电路板压在针床上，逐个测元件数值和二极管方向，找焊接和元件问题",
+      "Press the board onto a bed of nails and measure component values and diode polarity to find soldering and component faults"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "拍照检查元件是否贴错、贴歪和连锡",
+      "Photograph the board for wrong or skewed parts and solder bridges"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "接模拟负载按测试程序把各项功能走一遍",
+      "Run all functions with simulated loads according to a test program"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "测保护接地连续性、绝缘电阻和耐压",
+      "Test earth continuity, insulation resistance and withstand voltage"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "拍照是 AOI，走功能是 FCT，接地绝缘耐压是电气安全测试。",
+    "Photographing is AOI, running functions is FCT, earth/insulation/withstand is the electrical safety test."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于老化条件，哪些说法正确？",
+    "Which statements about burn-in conditions are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "阿伦尼乌斯公式里的 T_bi 是元件温度，不是老化箱温度",
+      "T_bi in the Arrhenius relation is the component temperature, not the chamber temperature"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "老化温度越高加速越多，但不能超过元件额定温度，也不能损伤正常品",
+      "Higher burn-in temperature accelerates more, but must not exceed component ratings or damage good units"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "焊点疲劳、连接器松动这类机械性早期失效要靠温度循环和振动筛选",
+      "Mechanical early failures such as solder fatigue and loose connectors need temperature cycling and vibration"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "老化时间越长，每台综合成本一定越低",
+      "The longer the burn-in, the lower the total cost per unit, always"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "老化时间长筛得干净，但老化箱、电费和时间都是成本，总成本存在最优点。",
+    "Longer burn-in screens better but chambers, electricity and time cost money, so total cost has an optimum."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "激活能 0.7 eV，使用时元件 50 °C，老化时元件 90 °C。按阿伦尼乌斯关系求加速因子（k = 8.617×10⁻⁵ eV/K）。",
+    "Activation energy 0.7 eV, components at 50 °C in use and 90 °C during burn-in. Find the Arrhenius acceleration factor (k = 8.617×10⁻⁵ eV/K)."
+   ],
+   "answer": 15.94,
+   "tolerance": 0.5,
+   "unit": "",
+   "feedback": [
+    "AF = exp[0.7/8.617×10⁻⁵ × (1/323.15 − 1/363.15)] ≈ 15.9；老化 1 h 约相当于使用 16 h。",
+    "AF = exp[0.7/8.617×10⁻⁵ × (1/323.15 − 1/363.15)] ≈ 15.9; 1 h of burn-in is about 16 h of use."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "寄生电容 250 pF，母线 310 V。要把共模电流峰值限制在 0.6 A 以内，电压上升时间至少多少 ns？",
+    "Parasitic capacitance 250 pF, DC link 310 V. To keep the peak common-mode current within 0.6 A, what is the minimum voltage rise time in ns?"
+   ],
+   "answer": 129.2,
+   "tolerance": 3,
+   "unit": "ns",
+   "feedback": [
+    "t ≥ C_p·V/i = 250×10⁻¹² × 310 / 0.6 ≈ 129 ns；上升时间越长开关损耗越大，要同时校核结温。",
+    "t ≥ C_p·V/i = 250×10⁻¹² × 310 / 0.6 ≈ 129 ns; a longer rise raises switching loss, so the junction must be checked too."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "某电控箱在实验室 38 °C 温升试验中散热器只有约 81 °C，但现场夏天频繁报过热。最可能的根本原因是：",
+    "A control box's heat sink reaches only about 81 °C in a 38 °C lab test, yet it frequently reports overtemperature in the field in summer. The most likely root cause is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "飞絮堵塞散热片和通风孔、安装处不透风，使散热器热阻和箱内温升变大",
+      "Lint clogging fins and vents, plus poor ventilation at the installation, raising heat-sink resistance and box air rise"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "过热报警阈值设置错误，应当取消报警",
+      "The overtemperature threshold is wrong and the alarm should be removed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "开关频率太低导致开关损耗过大",
+      "The switching frequency is too low, causing excessive switching loss"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "母线电容容量太大",
+      "The DC-link capacitance is too large"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "设计工况有余量，差别在真实安装和脏污；报警是保护在正确起作用，不应取消。",
+    "The design point has margin; the difference is real installation and dirt. The alarm is protection working correctly and must not be removed."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "在总缝纫时间相同的情况下，短缝多的工序（如缝口袋、钉商标）比长缝工序（如合缝）更容易使电控箱发热。",
+    "For the same total sewing time, operations with many short seams (such as setting pockets or attaching labels) heat the control box more than long-seam operations (such as joining seams)."
+   ],
+   "correct": true,
+   "feedback": [
+    "起停越频繁，加减速占的时间越多；起停电流大，平均损耗和温度随之升高。",
+    "More frequent starts mean more time accelerating and decelerating at high current, so average loss and temperature rise."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一只额定 105 °C、5000 h 的长寿命电解电容工作在 65 °C，按十度法则估算寿命是多少小时？",
+    "A long-life electrolytic capacitor rated 105 °C, 5000 h runs at 65 °C. Estimate its life in hours by the ten-degree rule."
+   ],
+   "answer": 80000.0,
+   "tolerance": 500,
+   "unit": "h",
+   "feedback": [
+    "L = 5000 × 2^((105−65)/10) = 5000 × 16 = 80000 h；注意厂家推算寿命一般有上限，不能无限外推。",
+    "L = 5000 × 2^((105−65)/10) = 5000 × 16 = 80000 h; manufacturers usually cap extrapolated life, so do not extrapolate indefinitely."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "开关损耗与热阻网络；间歇负载下“平均损耗定散热器、峰值电流定结温”；共模电流与开关时间的折中；老化的加速因子与返修率。",
+   "Switching loss and the thermal network; under intermittent load, average loss sets the heat sink and peak current sets the junction; common-mode current and the switching-time trade-off; burn-in acceleration factor and return rate."
+  ],
+  "difficult": [
+   "区分散热器上的总损耗与结到散热器的单管损耗；理解放慢开关只减 dv/dt 不减 C·V；把实验室余量和现场脏污、安装方式联系起来。",
+   "Distinguishing total loss on the heat sink from one device's loss junction-to-sink; understanding that slower switching lowers dv/dt but not C·V; linking lab margin to field dirt and installation."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Introduction"
+    ],
+    "minutes": 15,
+    "content": [
+     "展示说明书规格和故障码表，提出“夏天频繁报过热”问题；V 模型、需求与标准。",
+     "Show manual specs and fault codes, pose the summer-overtemperature problem; V-model, requirements and standards."
+    ]
+   },
+   {
+    "phase": [
+     "架构与热设计",
+     "Architecture and thermal design"
+    ],
+    "minutes": 45,
+    "content": [
+     "强弱电分区；损耗公式、热阻网络、间歇负载两层分析；板书算例 40 °C / 45 °C；虚拟实验 18-1 第①页演示。",
+     "Power/low-voltage partition; loss formula, thermal network, two-layer intermittent analysis; board calculation at 40/45 °C; demonstrate page ① of Virtual lab 18-1."
+    ]
+   },
+   {
+    "phase": [
+     "电磁兼容",
+     "EMC"
+    ],
+    "minutes": 35,
+    "content": [
+     "干扰源与受害者、共模电流、标准试验项目、三类对策；开关时间折中图与 20 kHz 讨论。",
+     "Sources and victims, common-mode current, standard tests, three kinds of countermeasure; the switching-time trade-off and the 20 kHz discussion."
+    ]
+   },
+   {
+    "phase": [
+     "嵌入式软件",
+     "Embedded software"
+    ],
+    "minutes": 25,
+    "content": [
+     "四层结构、保护与防意外启动、参数校验、双区升级与回滚、硬件在环测试。",
+     "Four layers, protection and start-up interlocks, parameter checksums, dual-bank update and rollback, HIL testing."
+    ]
+   },
+   {
+    "phase": [
+     "生产测试与老化",
+     "Production test and burn-in"
+    ],
+    "minutes": 30,
+    "content": [
+     "AOI/ICT/FCT/老化/安全测试；浴盆曲线、阿伦尼乌斯加速因子；虚拟实验第②页演示返修率与成本。",
+     "AOI/ICT/FCT/burn-in/safety test; bathtub curve, Arrhenius factor; demonstrate return rate and cost on page ②."
+    ]
+   },
+   {
+    "phase": [
+     "案例与小结",
+     "Case study and summary"
+    ],
+    "minutes": 30,
+    "content": [
+     "用模型分析夏天过热案例与电容寿命，讨论改进与模型边界；课堂测验，布置作业。",
+     "Analyse the summer case and capacitor life with the model, discuss fixes and model limits; quiz and assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“一只伺服电控箱的热校核与改进”；完成虚拟实验 18-1 的 3 项任务并截图；预习第 19 章。",
+   "Complete the assignment on the servo control box; finish the 3 tasks of Virtual lab 18-1 with screenshots; read Chapter 19 in advance."
+  ]
+ }
+}

@@ -1,0 +1,1223 @@
+{
+ "no": 27,
+ "title": [
+  "数字工厂：缝纫机工厂的整体信息化解决方案",
+  "The Digital Factory: An Integrated IT Solution for a Sewing-Machine Plant"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能画出缝纫机厂信息系统的五层架构，说明问渠数字工厂哪些部件可直接用、哪些是方案（待建），以及“只经总线”“写操作要人确认”两条规矩。",
+   "Draw the five-layer architecture of a sewing-machine plant's information systems, say which WenQuest Digital Factory parts can be reused and which are planned (to be built), and explain the two rules 'only via the bus' and 'writes need human confirmation'."
+  ],
+  [
+   "能用机型 × 选项算出变型数，说明 EBOM 与 MBOM 的差别，以及固件为什么要作为带版本的物料进 BOM。",
+   "Count variants from model × options, explain how EBOM and MBOM differ, and why firmware belongs in the BOM as a versioned item."
+  ],
+  [
+   "能按工艺数据算出工作中心负荷，找出瓶颈，并算出要达到目标负荷所需的 OEE。",
+   "Calculate work-centre load from process data, find the bottleneck, and work out the OEE needed to reach a target load."
+  ],
+  [
+   "能算出 X̄ 图的控制限和漂移下的超差概率，解释判异规则的灵敏度与误报，并按序列号—批次关系圈定受影响范围。",
+   "Calculate X̄-chart control limits and the out-of-tolerance probability under drift, explain the sensitivity and false alarms of run rules, and bound the affected range through serial–lot links."
+  ],
+  [
+   "能用韦布尔条件概率估计备件需求，并用分期节省和现金流说明实施路线与回收期。",
+   "Estimate spare-part demand with Weibull conditional probability, and use phased savings and cash flow to explain the roll-out and payback."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "梭尖间隙在悄悄变大",
+   "Hook clearance is quietly creeping up"
+  ],
+  "text": [
+   "某缝纫机厂总装线平均每小时装 22.5 台，调试工位逐台测梭尖间隙，过程稳定时均值 μ0 = 0.070 mm、标准差 σ = 6 μm，公差 0.04–0.10 mm。从第 2 h 起（第 46 台起）开始装用新一批旋梭 H2610-07（300 只），这批旋梭磨梭道时砂轮修整间隔被从 50 件放宽到 150 件，装出来的间隙以每小时 4 μm 的速度漂移。目前系统只在单台超差时自动开 NCR；工厂在第 8 h 发运一次。",
+   "A sewing-machine plant's final assembly line builds an average of 22.5 machines an hour, and the adjustment station measures every machine's hook clearance; when stable the mean is μ0 = 0.070 mm with standard deviation σ = 6 μm, tolerance 0.04–0.10 mm. From hour 2 (machine 46) a new hook lot H2610-07 (300 hooks) goes in; when its races were ground the wheel-dressing interval had been relaxed from 50 to 150 parts, and the clearance of machines built with it drifts upwards by 4 μm per hour. At present the system opens an NCR automatically only when a single machine is out of tolerance; the plant ships once at hour 8."
+  ],
+  "question": [
+   "以连续 5 台为一个子组，X̄ 图的控制限是多少？漂移开始 4、5、6 h 后单台超差的概率各是多少？只按超差处理和用 X̄ 图判异规则（R1–R4）处理，结果有什么不同？",
+   "With subgroups of 5 consecutive machines, what are the X̄-chart control limits? What is the single-machine out-of-tolerance probability 4, 5 and 6 hours after the drift starts? How do the outcomes differ between acting only on out-of-tolerance machines and using X̄-chart run rules (R1–R4)?"
+  ],
+  "answer": [
+   "控制限 = 0.070 ± 3 × 6/√5 μm = 0.070 ± 0.0080 mm，即 0.0620–0.0780 mm。漂移 h 小时后均值 m = 0.070 + 0.004h，超差概率 = 1 − Φ((0.100 − m)/0.006) + Φ((0.040 − m)/0.006)：4 h 约 1.0%，5 h 约 4.8%，6 h 约 16%。按教材的模拟（种子 5，报警后 0.5 h 停用该批）：只按超差，第一台超差在第 174 台（7.7 h）才出现，受影响 140 台、返工 3 台，第 8 h 已发走 135 台；用 R1–R4，第 70 台（3.1 h）由 R2 报警，受影响只有第 46–81 台共 36 台，全在厂内、没有一台超差，冻结剩余 264 只旋梭。",
+   "Control limits = 0.070 ± 3 × 6/√5 μm = 0.070 ± 0.0080 mm, i.e. 0.0620–0.0780 mm. After h hours of drift the mean is m = 0.070 + 0.004h and the out-of-tolerance probability is 1 − Φ((0.100 − m)/0.006) + Φ((0.040 − m)/0.006): about 1.0% at 4 h, 4.8% at 5 h and 16% at 6 h. In the textbook simulation (seed 5, lot withdrawn 0.5 h after the alarm): acting only on out-of-tolerance machines, the first one appears at machine 174 (7.7 h), 140 machines are affected, 3 need rework and 135 have already shipped at hour 8; with R1–R4, R2 alarms at machine 70 (3.1 h), only machines 46–81 (36 machines) are affected, all still in the plant and none out of tolerance, and the remaining 264 hooks are quarantined."
+  ]
+ },
+ "robot": {
+  "title": [
+   "一家机器人整机厂用同一套数字工厂",
+   "A robot plant runs on the same digital factory"
+  ],
+  "text": [
+   "把 WQ-LS 换成一台六轴机器人，这一讲的做法几乎原样适用：每个关节的减速器批次、电机和编码器序列号在装配线上扫码绑定到整机序列号；出厂测试的重复定位精度（mm）和关节回差（角分）单位各不相同，正适合用带单位字段的 test.result 上报；关节回差逐台测量，用 X̄ 图加判异规则在超差之前发现某批减速器在漂移，再按序列号—批次关系圈出受影响的机器人。控制器固件、参数表和关节标定文件也是带版本的物料，远程升级按 1%、10%、全部分圈推送，按每千运转小时的报警次数比较新旧版本，出问题用双区回滚。AI 只起草“冻结减速器批次”的提议，人确认后才执行，这和机器人安全里“关键动作要人确认”是同一种思路。",
+   "Replace the WQ-LS with a six-axis robot and this lesson applies almost unchanged: each joint's reducer lot and the serial numbers of its motor and encoder are scanned and bound to the robot's serial number on the assembly line; end-of-line repeatability (in mm) and joint backlash (in arc-minutes) have different units, a natural fit for test.result with its unit field; backlash measured on every robot, with an X̄ chart and run rules, reveals a drifting reducer lot before anything is out of tolerance, and the serial–lot links bound the robots affected. Controller firmware, parameter tables and joint calibration files are versioned items too; remote updates go out in rings of 1%, 10% and all, compare alarms per thousand operating hours between versions, and roll back with the dual bank if needed. AI only drafts the proposal to quarantine a reducer lot, executed after a person confirms: the same idea as requiring human confirmation for critical actions in robot safety."
+  ]
+ },
+ "life": {
+  "title": [
+   "按批号召回牛奶",
+   "Recalling milk by lot number"
+  ],
+  "text": [
+   "超市发现某一批牛奶有问题，会按盒子上印的批号召回，而不是把所有牛奶都下架；前提是每一盒在生产时就印上了批号、记下了发往哪些门店。缝纫机厂装配时扫码绑定旋梭批次，就是给每台机器“印批号”。",
+   "When a lot of milk turns out to be faulty, the supermarket recalls it by the lot number printed on the carton instead of clearing every carton off the shelf; that works only because each carton got its lot number at production and its shipments were recorded. Scanning the hook lot onto each machine at assembly is the plant's way of printing that lot number."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：一张订单与七个断点",
+    "Opening: one order and seven breaks"
+   ],
+   "points": [
+    [
+     "订单：WQ-LS-TED 200 台（自动剪线 T、电子针距 E、少油旋梭 D），10 天交货；总装节拍 2.4 min，每天 180 台",
+     "Order: 200 × WQ-LS-TED (auto trimming T, electronic feed E, low-oil hook D), due in 10 days; assembly takt 2.4 min, 180 machines a day"
+    ],
+    [
+     "断点：选项靠抄、MRP 不知道 DLC 外协、固件版本没人管、停机下班才知道",
+     "Breaks: options copied by hand, MRP unaware of the DLC subcontract, nobody owns the firmware version, stoppages known only after the shift"
+    ],
+    [
+     "测量值没有趋势、测试数据对不上序列号、追溯查不下去",
+     "Measurements without trends, test data not tied to serial numbers, traceability that stops short"
+    ],
+    [
+     "共同点：信息都产生过，只是没有在一个能查、能关联的地方带上编号记下来",
+     "Common thread: the information existed, but was never recorded with an ID in one searchable, linkable place"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_27_day.png",
+   "narration": [
+    "这一讲站在造缝纫机的工厂里：一家整机厂，总装节拍 2.4 分钟，每天 180 台。早上来了一张订单：WQ-LS-TED 200 台，带自动剪线、电子针距和少油旋梭，10 天交货。如果信息散在表格、纸质工票和测试电脑里，这张订单至少在七个地方断开：少油旋梭被抄成了标准旋梭；DLC 外协要 5 天，MRP 里没有；该烧哪版固件全凭测试工记得；瓶颈卧加停了 3 小时，下班才知道；间隙一天比一天大没人画图；三个月后客户投诉，查不出用的哪批旋梭。七个断点的共同点：信息都产生过，只是没有带上编号记在一个地方。",
+    "This lesson stands in a plant that makes sewing machines: assembly takt 2.4 minutes, 180 machines a day. An order arrives in the morning: 200 WQ-LS-TED, with automatic trimming, electronic feed and low-oil hooks, due in 10 days. If the information lives in spreadsheets, paper tickets and test PCs, this order breaks in at least seven places: the low-oil hook is copied as a standard hook; the 5-day DLC subcontract is missing from MRP; which firmware to flash depends on a tester's memory; the bottleneck HMC stops for 3 hours and nobody knows until the shift ends; clearances creep up daily with no chart; and three months later a complaint arrives and no one can say which hook lot went in. What the seven share: the information was created but never recorded, with an ID, in one place."
+   ]
+  },
+  {
+   "title": [
+    "总体架构与两条规矩",
+    "Overall architecture and two rules"
+   ],
+   "points": [
+    [
+     "五层：设备与产线 → 统一数据总线 → 历史库 → 业务系统（ERP、PLM、MES、QMS、WMS）→ 看板与 AI",
+     "Five layers: equipment and lines → unified data bus → historian → business systems (ERP, PLM, MES, QMS, WMS) → dashboards and AI"
+    ],
+    [
+     "问渠现有：Mosquitto 总线、PostgreSQL 历史库（hub/historian.py）、ERPNext + Node-RED 桥接、hub 里的 kpi、ai、mes、plm、configurator",
+     "WenQuest today: Mosquitto bus, PostgreSQL historian (hub/historian.py), ERPNext with a Node-RED bridge, and kpi, ai, mes, plm and configurator in the hub"
+    ],
+    [
+     "规矩一：任何组件不直接调用另一个组件，只经总线交换数据",
+     "Rule one: no component calls another directly; data are exchanged only via the bus"
+    ],
+    [
+     "规矩二：写操作要人确认，AI 和规则只起草提议（requires_confirm 为真）",
+     "Rule two: writes need human confirmation; AI and rules only draft proposals (requires_confirm true)"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_27_arch.png",
+   "narration": [
+    "看架构图，整厂的信息系统分五层。最下面是设备与产线；往上是统一数据总线，所有设备和软件只往总线上发、从总线上收；再往上是历史库，每条消息原样存下，是全厂唯一的事实来源；然后是 ERP、PLM、MES、QMS、WMS；最上面是看板和 AI。图里实线框是问渠数字工厂已经有的，它现在生产减速器；虚线框是为缝纫机厂设计、还没建的。两条规矩原样沿用：组件之间只经总线，所以把减速器换成缝纫机、把仿真机床换成真实机床，其余部分不用改；写操作要人确认，AI 只起草提议。",
+    "In the architecture diagram the plant's information systems sit in five layers. At the bottom, equipment and lines; above them the unified data bus, which every device and program only publishes to and subscribes from; then the historian, storing every message as it came, the plant's single source of truth; then ERP, PLM, MES, QMS and WMS; at the top, dashboards and AI. Solid boxes are what the WenQuest Digital Factory already has, built for a gearbox plant; dashed boxes are designed for the sewing-machine plant but not yet built. Two rules carry over unchanged: components talk only via the bus, so swapping gearboxes for sewing machines or simulated machines for real ones leaves the rest untouched; and writes need human confirmation, with AI only drafting proposals."
+   ]
+  },
+  {
+   "title": [
+    "主题与信封：只增加、不改动",
+    "Topics and envelope: add, never change"
+   ],
+   "points": [
+    [
+     "主题 wq/工厂/区域/单元/类别；缝纫机厂根主题 wq/sewing，新增 assembly、test、service 三个区域",
+     "Topic wq/plant/area/unit/category; the sewing plant's root is wq/sewing, adding assembly, test and service areas"
+    ],
+    [
+     "信封：v、id、ts（UTC）、type、source、mode（teach/prod）、corr，业务放 data",
+     "Envelope: v, id, ts (UTC), type, source, mode (teach/prod), corr; business content in data"
+    ],
+    [
+     "调试工位：quality.measurement 发到 wq/sewing/assembly/adj-03/measurement，附 hook_lot 字段",
+     "Adjustment station: quality.measurement on wq/sewing/assembly/adj-03/measurement, with an added hook_lot field"
+    ],
+    [
+     "quality.measurement 的数值以毫米计；停针角度、温升等用新类型 test.result（方案，待建）",
+     "quality.measurement values are in millimetres; stop angle, temperature rise and the like use a new type test.result (planned, to be built)"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "减速器厂的根主题是 wq/gearbox，缝纫机厂用 wq/sewing，按“只增加、不改动”的原则加装配、测试、服务三个区域。每条消息装在同一个信封里，业务内容在 data 里。调试工位发的梭尖间隙用现有的 quality.measurement 类型，加一个 hook_lot 字段；校验只查必有字段，加字段不会让旧组件报错。但出厂测试的很多项目不是长度，比如停针定位误差是度、温升是开尔文，硬塞进带 _mm 的字段会被下游当成长度，所以新增一个 test.result 类型，带单位、上下限、固件和参数表版本。",
+    "The gearbox plant's root topic is wq/gearbox; the sewing plant uses wq/sewing and, under the rule 'add, never change', adds three areas: assembly, test and service. Every message sits in the same envelope, with the business content in data. The adjustment station publishes hook clearance with the existing quality.measurement type plus a hook_lot field; validation checks only the required fields, so an extra field breaks no older component. But many end-of-line tests are not lengths: stop-position error is in degrees, temperature rise in kelvin, and forcing them into _mm fields would make downstream systems read them as lengths. So a new type, test.result, carries the unit, limits, and firmware and parameter-table versions."
+   ]
+  },
+  {
+   "title": [
+    "机型 × 选项：变型与配置器",
+    "Model × options: variants and the configurator"
+   ],
+   "points": [
+    [
+     "三个选项各有、无：2 × 2 × 2 = 8 种变型（WQ-LS … WQ-LS-TED）",
+     "Three options, each on or off: 2 × 2 × 2 = 8 variants (WQ-LS … WQ-LS-TED)"
+    ],
+    [
+     "ERPNext：WQ-LS 建成物料模板，T、E、D 为属性，生成 8 个变型，各挂 BOM",
+     "ERPNext: WQ-LS as an item template with T, E and D as attributes, generating 8 variants, each with its BOM"
+    ],
+    [
+     "选项再多就由配置器按规则即时生成 BOM：选项约束、交期影响（D 加外协约 5 天）",
+     "With more options, a configurator generates BOMs by rule: option constraints and lead-time effects (D adds about 5 days of subcontracting)"
+    ],
+    [
+     "销售点选项得到变型编码和 BOM，断点 1、2 在接单时被堵上",
+     "Sales picks options and gets a variant code and BOM, closing breaks 1 and 2 at order entry"
+    ]
+   ],
+   "formula": "N_{\\text{variants}}=\\prod_i m_i-N_{\\text{forbidden}}",
+   "figure": "fig_27_bom.png",
+   "narration": [
+    "工业平缝机通常是一个基本机型加若干选项。WQ-LS 取三个选项：自动剪线 T、电子针距 E、少油旋梭 D，各有各无，组合出 2 乘 2 乘 2 等于 8 种变型。在 ERPNext 里可以把 WQ-LS 建成物料模板，T、E、D 建成属性，由模板生成 8 个变型物料，各挂一张 BOM。选项再多，比如再加自动抬压脚和两档转速就是 32 种，给每种都建 BOM 容易出错，要由配置器按规则即时生成。销售在配置器里点选项，生成的是 WQ-LS-TED 这个编码和它的 BOM，MRP 展开时自然遇到 DLC 外协和它的周期，断点 1、2 就堵上了。",
+    "Industrial lockstitch machines are usually sold as a base model plus options. WQ-LS has three: automatic trimming T, electronic feed E and low-oil hook D, each present or absent, giving 2 × 2 × 2 = 8 variants. In ERPNext, WQ-LS can be an item template with T, E and D as attributes, generating 8 variant items, each with its own BOM. With more options, say an automatic presser lift and two speed grades, there are 32, and a BOM for each invites mistakes, so a configurator generates them by rule. Sales picks options in the configurator and gets the code WQ-LS-TED and its BOM, and when MRP explodes it, the DLC subcontract and its lead time appear naturally, closing breaks one and two."
+   ]
+  },
+  {
+   "title": [
+    "EBOM、MBOM、零件库与固件物料",
+    "EBOM, MBOM, the parts library and firmware as an item"
+   ],
+   "points": [
+    [
+     "EBOM 按功能组织；MBOM 按装配线部件和工序组织，加进外协工序、辅料和装配时绑定的固件",
+     "EBOM is organised by function; MBOM by line subassemblies and operations, adding subcontract steps, consumables and firmware bound at assembly"
+    ],
+    [
+     "BOM 跟着设计发布走：发布新版本，物料设计版本加一；生产模式先审批（hub/plm.py）",
+     "The BOM follows design release: a new release bumps the item's design revision; production mode requires approval first (hub/plm.py)"
+    ],
+    [
+     "标准件按 LIBRARY_REFS 对到零件库（如 BRG-6201 → A-BRG-DG/6201）；电控模块用建议编号，计划入库",
+     "Standard parts map to the library via LIBRARY_REFS (e.g. BRG-6201 → A-BRG-DG/6201); control modules use proposed IDs, planned for the library"
+    ],
+    [
+     "固件 FW-WQSC-LS 作为 BOM 的一行、带版本：工单知道烧哪版，测试台能核对，档案自动记下",
+     "Firmware FW-WQSC-LS is a versioned BOM line: the work order knows what to flash, the test bench can check it, and the record keeps it"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_27_bom.png",
+   "narration": [
+    "设计的 BOM 按功能组织，车间的 BOM 按装配线上的部件和工序组织，零件是同一批，层次不同；从 EBOM 到 MBOM 要加进设计里没有的东西，比如 DLC 外协工序和装配时才绑定的固件。标准件按 LIBRARY_REFS 对到零件库条目，库里没有的电控模块用第 19 章的建议编号，注明计划入库。最值得记住的一条：在 BOM 里给固件留一行，数量 1，带版本。这样工单一下达就知道该烧哪一版，测试台能核对，序列号档案也自然记下出厂固件，断点 3 就没了。",
+    "The design BOM is organised by function, the shop's by the line's subassemblies and operations: same parts, different structure; going from EBOM to MBOM adds what design never shows, such as the DLC subcontract step and firmware bound only at assembly. Standard parts map to library entries through LIBRARY_REFS, and control modules not yet in the library use the proposed IDs of Chapter 19, marked as planned. The point most worth remembering: give firmware its own BOM line, quantity one, with a version. Then the work order says which version to flash, the test bench can check it, and the serial-number record keeps the shipped firmware: break three is gone."
+   ]
+  },
+  {
+   "title": [
+    "工艺路线进 MES",
+    "Routings into MES"
+   ],
+   "points": [
+    [
+     "data.py 三张表：工作中心（台数、每小时折旧人工能耗）、工序、工艺路线（工序, 每件分钟）",
+     "Three tables in data.py: work centres (count, hourly depreciation, labour, energy), operations, routings (operation, minutes per piece)"
+    ],
+    [
+     "seed.py 导入 ERPNext，工单按路线生成作业卡，MES 逐工序派工",
+     "seed.py imports them into ERPNext; work orders generate job cards from the routing, and MES dispatches operation by operation"
+    ],
+    [
+     "四类关键件：机壳（一次装夹镗孔）、旋梭（渗碳、磨梭道、研磨，D 加 DLC 外协）、凸轮、机针（外购按批入库）",
+     "Four key parts: housing (single-setup boring), hook (carburise, race grind, lap; D adds DLC subcontract), cam, needle (bought in, received by lot)"
+    ],
+    [
+     "整机路线：总装 → 调试 → 跑合 → 出厂测试",
+     "Machine route: final assembly → adjustment → run-in → end-of-line test"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_27_route.png",
+   "narration": [
+    "减速器厂在 data.py 里用工作中心、工序、工艺路线三张表描述工艺。seed.py 把它们导入 ERPNext，每张工单按路线生成作业卡，MES 逐工序派工。缝纫机厂照这个写法：机壳是铣基准面、一次装夹镗孔、钻攻和孔系检验，这是第 25 章的内容；旋梭是车削、渗碳淬火、磨梭道、研磨梭尖和零件检验，少油旋梭再加一道 DLC 外协，第 24 章；凸轮是车、淬火、磨廓线、检验；机针外购，只有来料检验和按批入库。整机是总装、调试、跑合、出厂测试。",
+    "The gearbox plant describes its process in three tables in data.py: work centres, operations and routings. seed.py imports them into ERPNext, every work order generates job cards from its routing, and MES dispatches operation by operation. The sewing plant follows suit: the housing is face milling, single-setup boring, drilling and tapping and bore inspection, from Chapter 25; the hook is turning, carburising, race grinding, point lapping and inspection, plus a DLC subcontract for the low-oil hook, from Chapter 24; the cam is turning, hardening, profile grinding and inspection; needles are bought in, with only receiving inspection and stocking by lot. The machine itself goes through assembly, adjustment, run-in and end-of-line test."
+   ]
+  },
+  {
+   "title": [
+    "找瓶颈：工作中心负荷",
+    "Finding the bottleneck: work-centre load"
+   ],
+   "points": [
+    [
+     "负荷 = 每天台数 × 每台占用分钟 / (台数 × 班数 × 480 × OEE)",
+     "Load = machines per day × minutes per machine / (count × shifts × 480 × OEE)"
+    ],
+    [
+     "卧加 HMC-H：16 min/台，5 台 × 2 班，OEE 60% → 有效能力恰好 180 台/天，负荷 100%",
+     "HMC-H: 16 min per machine, 5 machines × 2 shifts, 60% OEE → effective capacity exactly 180 a day, 100% load"
+    ],
+    [
+     "OEE 提到 68%，负荷降到 88%，才有应付停机和插单的余量",
+     "Raising OEE to 68% cuts the load to 88%, leaving room for stoppages and rush orders"
+    ],
+    [
+     "非瓶颈设备的 OEE 提高了，全厂产量并不增加：第一期先联网瓶颈设备",
+     "Raising OEE on non-bottleneck machines adds no plant output: phase one connects the bottlenecks first"
+    ]
+   ],
+   "formula": "\\text{load}=\\frac{D\\,t}{n_{m}\\,n_{s}\\,480\\,\\mathrm{OEE}}",
+   "figure": "",
+   "narration": [
+    "把每台整机的自制件和总装工时按工作中心加总，除以有效能力，就是负荷率。算例每天 180 台，机加工两班、按 OEE 60% 折算，装配和测试一班、按 90% 折算。看表 27-5，最满的是卧式加工中心：每台机壳一次装夹镗孔 16 分钟，5 台两班，每天有效时间 5 乘 960 乘 0.6，2880 分钟，除以 16 正好 180 台，负荷 100%，一点余量都没有；总装线按节拍设计也是 100%。OEE 提到 68%，负荷降到 88%。这就是为什么第一期要先把瓶颈设备联网、提高 OEE；非瓶颈设备的 OEE 再高，全厂也不多出一台。",
+    "Add up each machine's part and assembly times by work centre and divide by effective capacity: that is the load. The example builds 180 machines a day, machining on two shifts at 60% OEE, assembly and test on one shift at 90%. In Table 27-5 the fullest is the horizontal machining centre: 16 minutes of single-setup boring per housing, 5 machines on two shifts, so 5 × 960 × 0.6 = 2880 effective minutes a day, divided by 16 gives exactly 180: 100% load with no margin at all; the assembly line, designed to takt, is also at 100%. Raise OEE to 68% and the load drops to 88%. That is why phase one connects the bottleneck machines and raises their OEE first; however high a non-bottleneck's OEE goes, the plant makes not one more machine."
+   ]
+  },
+  {
+   "title": [
+    "设备状态、报工、调试与出厂测试",
+    "Machine states, reporting, adjustment and end-of-line test"
+   ],
+   "points": [
+    [
+     "machine.status：run、idle、setup、down、fault，带工单、工序、零件序列号；machine.event 带实际节拍",
+     "machine.status: run, idle, setup, down, fault, with work order, operation and part serial; machine.event carries actual cycle time"
+    ],
+    [
+     "kpi.py：时间开动率 = 运行 / 负荷时间，性能开动率 = 标准节拍之和 / 实际节拍之和；砂轮修整记为 tool_change",
+     "kpi.py: availability = run / loading time, performance = sum of standard cycles / sum of actual cycles; wheel dressing is logged as tool_change"
+    ],
+    [
+     "机加工经车间终端开工、暂停、复位（machine.cmd → cmd/ack）；装配线在线头扫码绑定部件批次（方案）",
+     "Machining starts, pauses and resets from the shop terminal (machine.cmd → cmd/ack); the assembly line scans subassembly lots at the line head (planned)"
+    ],
+    [
+     "出厂测试台读出固件和参数表版本，与工单 BOM 核对，不一致判不合格",
+     "The EOL bench reads firmware and parameter versions and checks them against the work-order BOM; a mismatch fails"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "每台加工设备经网关按 machine.status 发五种状态，带上当前的工单号、工序和零件序列号；按 machine.event 发开始、结束、报警、换刀等事件。看板的 OEE 由 kpi.py 从这些消息算出；砂轮修整也记成 tool_change 事件。机加工在车间终端上点开工、暂停、复位，指令经总线发给设备，MES 不直接碰设备。装配线按节拍流动，要在线头扫码：机壳组件贴序列号，每个装部件的工位扫一下部件批次，就把哪批旋梭、哪个炉号的机壳记到序列号下。出厂测试台还要核对固件版本是不是工单要求的那一版。",
+    "Each machine tool, through a gateway, publishes five states with machine.status, carrying the current work order, operation and part serial; it publishes events such as cycle start, cycle end, alarm and tool change with machine.event. kpi.py computes the dashboard OEE from these messages; wheel dressing is logged as a tool_change event. Machining is started, paused and reset from the shop terminal, with commands going over the bus; MES never touches equipment directly. The assembly line is different: it flows to takt, so it scans at the line head: the housing gets a serial label, and each station that fits a subassembly scans its lot, recording which hook lot and which casting heat went into that serial number. The end-of-line bench also checks that the firmware is the version the work order requires."
+   ]
+  },
+  {
+   "title": [
+    "检验计划与现有的两道关",
+    "The inspection plan and the two existing gates"
+   ],
+   "points": [
+    [
+     "四个关口：来料、零件、装配调试、出厂；有检验模板的工序是质检门，先交质量检验单作业卡才能完成",
+     "Four gates: incoming, part, assembly adjustment, end of line; an operation with an inspection template is a quality gate whose job card closes only after an inspection record"
+    ],
+    [
+     "调试检验：梭尖间隙 0.04–0.10 mm、钩线定时 ±1.5°，逐台上总线",
+     "Adjustment inspection: hook clearance 0.04–0.10 mm, hook timing ±1.5°, every machine on the bus"
+    ],
+    [
+     "关一：结论为 fail 时 historian 自动开 NCR",
+     "Gate one: historian opens an NCR automatically when the result is fail"
+    ],
+    [
+     "关二：ai.py“趋近上限”——最近 5 件均值比中值高 ≥ 2 μm 且最大值距上限 < 公差带 25%；为 16 μm 公差带、σ ≈ 1.2 μm 的磨床写的",
+     "Gate two: ai.py 'approaching the upper limit', mean of the last 5 ≥ 2 μm above mid-tolerance and the maximum within 25% of the band from the limit; written for a 16 μm band with σ ≈ 1.2 μm"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "检验模板写在 inspection_templates() 里；有模板的物料，检验工序是一道质检门，先交检验单，作业卡才能完成。缝纫机厂有四个关口：来料、零件、装配调试、出厂。问渠现在已经有两道关。一是历史库：测量结论是 fail，就自动开一张 NCR。二是 AI 提醒：最近 5 件均值比公差中值高出 2 微米以上、最大值离上限不到公差带的 25%，就发“趋近上限”。这条规则是为减速器厂磨床写的，那里公差带 16 微米、标准差约 1.2 微米。可梭尖间隙公差带 60 微米、标准差 6 微米，这条规则还合适吗？下一页回答。",
+    "Inspection templates live in inspection_templates(); for an item with a template, inspection is a quality gate and the job card closes only after an inspection record. The sewing plant has four gates: incoming, part, assembly adjustment and end of line. WenQuest already has two gates. One is the historian: a fail result opens an NCR automatically. The other is the AI alert: if the mean of the last five is 2 microns or more above mid-tolerance and the maximum is within a quarter of the band from the upper limit, it warns 'approaching the upper limit'. That rule was written for the gearbox plant's grinder, with a 16 micron band and a standard deviation of about 1.2. Hook clearance has a 60 micron band and a 6 micron sigma; does the rule still fit? The next slide answers."
+   ]
+  },
+  {
+   "title": [
+    "X̄ 控制图与判异规则",
+    "The X̄ chart and run rules"
+   ],
+   "points": [
+    [
+     "连续 5 台为一个子组；μ0 = 0.070 mm、σ = 6 μm → 控制限 0.070 ± 0.0080 mm",
+     "Five consecutive machines per subgroup; μ0 = 0.070 mm, σ = 6 μm → limits 0.070 ± 0.0080 mm"
+    ],
+    [
+     "R1：1 点在 3σ 外；R2：连续 3 点中 2 点同侧 2σ 外；R3：连续 5 点中 4 点同侧 1σ 外；R4：连续 8 点在中心线同侧",
+     "R1: one point beyond 3σ; R2: 2 of 3 consecutive beyond 2σ on one side; R3: 4 of 5 consecutive beyond 1σ on one side; R4: 8 consecutive on one side of the centre line"
+    ],
+    [
+     "规则越多，漂移发现越早，误报也越多；控制限用过程稳定时的数据算，不用公差限代替",
+     "More rules catch drift sooner but raise false alarms; compute limits from stable-process data, never substitute tolerance limits"
+    ],
+    [
+     "报警以 ai.alert 发出，证据是触发子组的消息编号；同一规则 2 h 内不重复；起草“冻结可疑批次”提议",
+     "Alarms go out as ai.alert with the triggering subgroups' message IDs as evidence; the same rule is not repeated within 2 h; a 'quarantine suspect lot' proposal is drafted"
+    ]
+   ],
+   "formula": "CL=\\mu_0,\\qquad UCL/LCL=\\mu_0\\pm 3\\,\\frac{\\sigma}{\\sqrt{n}}",
+   "figure": "fig_27_spc.png",
+   "narration": [
+    "梭尖间隙的情况不同：公差带 60 微米，过程本身的标准差就有 6 微米，单台偶尔靠近上限是正常波动。这时更合适的是经典的均值控制图：连续 5 台作一个子组，算子组均值；中心线是 μ0，控制限是 μ0 加减 3 倍 σ 除以根号 n，算出来 0.070 加减 0.008 毫米。判异用西方电气手册里的四条：R1 一个点在 3σ 外；R2 连续 3 点中 2 点在同侧 2σ 外；R3 连续 5 点中 4 点在同侧 1σ 外；R4 连续 8 点在同侧。规则越多，漂移被发现得越早，没漂移时误报也越多，要权衡。提醒一句：控制限要用过程稳定时的数据算，不能用公差限代替。",
+    "Hook clearance is a different case: the band is 60 microns and the process itself has a 6 micron sigma, so a single machine near the upper limit now and then is normal variation. The classic chart of means fits better: take 5 consecutive machines as a subgroup and plot the subgroup mean; the centre line is μ0 and the limits are μ0 plus or minus 3 sigma over root n, which gives 0.070 plus or minus 0.008 mm. For run rules we use four from the Western Electric handbook: R1, one point beyond 3 sigma; R2, two of three consecutive points beyond 2 sigma on the same side; R3, four of five beyond 1 sigma on the same side; R4, eight in a row on one side. The more rules, the sooner a drift is caught and the more false alarms without drift, so it is a trade-off. Remember: compute control limits from stable-process data; never use tolerance limits instead."
+   ]
+  },
+  {
+   "title": [
+    "算例：漂移、晚发现的代价与 NCR、8D",
+    "Example: drift, the cost of late detection, NCR and 8D"
+   ],
+   "points": [
+    [
+     "新批旋梭从第 46 台起装用，间隙以 4 μm/h 漂移；漂移 4、5、6 h 后单台超差约 1%、4.8%、16%",
+     "The new hook lot goes in from machine 46 and clearance drifts 4 μm/h; single-machine out-of-tolerance is about 1%, 4.8% and 16% after 4, 5 and 6 h"
+    ],
+    [
+     "只按超差：第 174 台（7.7 h）才开 NCR，受影响 140 台，135 台已发货；R1–R4：第 70 台（3.1 h）报警，受影响 36 台",
+     "Out-of-tolerance only: NCR at machine 174 (7.7 h), 140 affected, 135 shipped; R1–R4: alarm at machine 70 (3.1 h), 36 affected"
+    ],
+    [
+     "每晚发现 1 h，受影响多约 22 台；但 R1–R4 在 1000 组随机数里 16 h 内至少误报一次的概率约 54%",
+     "Each hour of delay adds about 22 affected machines; but with R1–R4, 54% of 1000 random runs give at least one false alarm in 16 h"
+    ],
+    [
+     "先围堵后查因：冻结剩余 264 只、复检第 46–81 台、开 NCR；8D 找到根因是修整间隔未经验证就放宽",
+     "Contain first, then find the cause: quarantine 264 hooks, recheck machines 46–81, open an NCR; 8D finds the root cause, a dressing interval relaxed without validation"
+    ]
+   ],
+   "formula": "P_{out}=1-\\Phi\\!\\left(\\frac{USL-m}{\\sigma}\\right)+\\Phi\\!\\left(\\frac{LSL-m}{\\sigma}\\right)",
+   "figure": "fig_27_spc.png",
+   "narration": [
+    "回到导入问题。漂移 h 小时后均值是 0.070 加 0.004h，用正态分布算超差概率：4 小时约 1%，5 小时 4.8%，6 小时 16%，后期涨得很快。用同一组随机数模拟：只按超差，第 174 台才出现第一台超差，这时已经有 140 台装了这批旋梭，第 8 小时还发走了 135 台。四条规则全用，第 70 台就由 R2 报警，受影响的只有 36 台，全在厂里。每晚发现一小时，受影响多约 22 台。但规则多也有代价：1000 组随机数里有一半以上会误报。报警以后先围堵，冻结剩余库存、复检可疑整机，再按 8D 查根本原因。",
+    "Back to the opening problem. After h hours the mean is 0.070 plus 0.004h, and the normal distribution gives the out-of-tolerance probability: about 1% at 4 hours, 4.8% at 5 and 16% at 6, rising fast. Simulated with one set of random numbers: acting only on out-of-tolerance machines, the first appears at machine 174, by which time 140 machines carry this lot and 135 shipped at hour 8. With all four rules, R2 alarms at machine 70 and only 36 machines are affected, all still in the plant. Every hour of delay adds about 22 affected machines. But more rules have a price: over half of 1000 random runs give a false alarm. After an alarm, contain first: quarantine the remaining stock and recheck suspect machines; then find the root cause with 8D."
+   ]
+  },
+  {
+   "title": [
+    "序列号追溯：向后查原因，向前圈范围",
+    "Serial-number traceability: back to the cause, forward to the scope"
+   ],
+   "points": [
+    [
+     "向后（溯源）：报警的第 70 台 → 旋梭批次 H2610-07 → 旋梭工单与磨床 GRD-H-02 → 砂轮修整事件",
+     "Backward: alarm at machine 70 → hook lot H2610-07 → hook work order and grinder GRD-H-02 → wheel-dressing events"
+    ],
+    [
+     "向前（追踪）：同批还装了哪些整机（第 46–81 台）、仓库剩多少、有没有已发货",
+     "Forward: which other machines got the lot (46–81), how much stock is left, whether any shipped"
+    ],
+    [
+     "序列号、批次是 ERPNext 的 Serial No、Batch；“用了哪批”“测了多少”“哪版固件”是历史库的消息",
+     "Serial numbers and lots are ERPNext Serial No and Batch; 'which lot', 'what was measured' and 'which firmware' are historian messages"
+    ],
+    [
+     "整机档案（方案）：按序列号拼起来，每一项能点回原始消息；没有逐台扫码，只能按时段圈，范围大好几倍",
+     "Machine record (planned): assembled by serial number, each line clicking back to its message; without per-machine scanning you can only bound by time, several times wider"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_27_trace.png",
+   "narration": [
+    "追溯要从两个方向查。向后，也叫溯源：从报警的第 70 台出发，查到它装的旋梭批次 H2610-07，再查到这批旋梭的工单、在哪台梭道磨床上磨的、那几天的砂轮修整记录，原因线索就出来了。向前，也叫追踪：从这批旋梭出发，查出同批还装了哪些整机，第 46 到 81 台，仓库里还剩多少只，有没有已经发货的。两个方向都靠装配时的扫码绑定；整机档案就是把历史库里的这些消息按序列号拼起来的一张页面。现场要点：没有逐台扫码，只能说“这几天装的都可疑”。",
+    "Tracing runs in two directions. Backward, to the source: from machine 70, which raised the alarm, find its hook lot H2610-07, then that lot's work order, the race grinder it was ground on and the wheel-dressing records for those days, and the cause starts to show. Forward, to the scope: from the lot, find every other machine built with it, numbers 46 to 81, how many hooks remain in stock, and whether any have shipped. Both directions depend on scanning at assembly; the machine record is a page assembling those historian messages by serial number. The shop-floor note: without per-machine scanning you can only say 'everything built in these few days is suspect'."
+   ]
+  },
+  {
+   "title": [
+    "电控与软件的版本管理",
+    "Version control for controls and software"
+   ],
+   "points": [
+    [
+     "四个版本对象：固件（FW-WQSC-LS 1.5.0）、参数表（PAR-LS v8）、事件表（EVT-LS-T v5）、主控板硬件（B 版）",
+     "Four versioned objects: firmware (FW-WQSC-LS 1.5.0), parameter table (PAR-LS v8), event table (EVT-LS-T v5), controller hardware (rev B)"
+    ],
+    [
+     "兼容表：如 1.5.x 要求参数表 ≥ v8、硬件 ≥ B 版；出厂测试台和远程升级共同遵守",
+     "Compatibility table: e.g. 1.5.x needs parameter table ≥ v8 and hardware ≥ rev B; obeyed by both the EOL bench and remote updates"
+    ],
+    [
+     "ECO：变更请求 → 评审影响 → 定生效方式（按序列号断点或日期）→ 审批发布，沿用 PLM 的提交—审批—发布",
+     "ECO: change request → impact review → effectivity (serial breakpoint or date) → approval and release, reusing PLM's submit–approve–release"
+    ],
+    [
+     "远程升级分三圈：约 1% 观察 72 h，按每千运转小时故障率比较，再 10%、再全部；出问题双区回滚",
+     "Remote updates in three rings: about 1% watched for 72 h and compared on faults per thousand operating hours, then 10%, then all; roll back with the dual bank if needed"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "一台电控缝纫机的软件不只是固件。按第 19 章的固件框架，至少四样东西各有版本：固件、参数表、事件表，以及主控板的硬件版本。它们之间有兼容关系，比如新固件 1.5 要求参数表 v8 以上、主控板 B 版以上，事件表 EVT-LS-T 只用于带剪线的变型。这些关系写成兼容表，测试台和远程升级都照它核对。任何一样要改，都走同一个工程变更流程：提出请求、评审影响、定生效方式、审批发布。已卖出的联网机器要不要升级也是评审的一部分：先升约 1%，观察 72 小时，故障率不升高再推 10%，再推全部，出问题就回滚。",
+    "The software of an electronic sewing machine is more than firmware. Under the firmware framework of Chapter 19, at least four things each have a version: the firmware, the parameter table, the event table and the controller board's hardware revision. They depend on each other: firmware 1.5 needs parameter table v8 or later and board revision B or later, and event table EVT-LS-T applies only to variants with trimming. They go into a compatibility table that the test bench and remote updates both check. Changing any of them follows one engineering change process: request, impact review, effectivity, approval and release. Whether machines already sold should be updated is part of the review: update about 1% first, watch for 72 hours, move to 10% if the fault rate does not rise, then to all, and roll back if something goes wrong."
+   ]
+  },
+  {
+   "title": [
+    "服务数据回流：故障率与备件预测",
+    "Service data coming back: fault rates and spare-part forecasts"
+   ],
+   "points": [
+    [
+     "数据首先属于服装厂；经客户同意只转发设备数据，不含操作工个人数据",
+     "The data belong first to the garment factory; with consent only machine data are forwarded, never operators' personal data"
+    ],
+    [
+     "故障码按“每千运转小时”统计、按固件版本分组：E-31 从 0.62 降到 0.18 次/千 h，6000 台每年约 3350 → 970 次",
+     "Count fault codes per thousand operating hours, grouped by firmware: E-31 fell from 0.62 to 0.18 per kh, about 3350 → 970 a year across 6000 machines"
+    ],
+    [
+     "旋梭寿命按韦布尔 β = 2.2、η = 5000 h（平均约 4430 h）；按每台累计小时求下一季度条件失效概率再加总",
+     "Hook life as Weibull β = 2.2, η = 5000 h (mean about 4430 h); sum each machine's conditional failure probability next quarter from its accumulated hours"
+    ],
+    [
+     "按平均寿命约 303 只，按每台累计小时约 202 只；机群年轻时平均寿命法偏多",
+     "About 303 hooks by mean life, about 202 by accumulated hours; for a young fleet the mean-life method over-estimates"
+    ]
+   ],
+   "formula": "P=1-\\frac{R(a+\\Delta)}{R(a)},\\qquad R(t)=\\exp\\!\\left[-\\left(\\frac{t}{\\eta}\\right)^{\\beta}\\right]",
+   "figure": "fig_27_field.png",
+   "narration": [
+    "联网机器的数据首先属于服装厂，经客户同意、只转发设备数据。在这个前提下可以做三件事。第一，故障码按每千运转小时统计，再按固件版本分组，就能看出一次修改有没有用：剪线电磁铁过流 E-31 从 0.62 降到 0.18，6000 台一年从约 3350 次降到约 970 次。第二，按序列号做可靠性分析。第三，备件预测。旋梭寿命按韦布尔分布，一只已经转了 a 小时的旋梭，下一段 Δ 内坏的概率是 1 减 R(a+Δ) 比 R(a)。按每台自己的累计小时算再加总，下季度约 202 只，比按平均寿命算的 303 只少，因为机群还年轻。",
+    "The data of connected machines belong first to the garment factory; with consent, only machine data are forwarded. On that basis three things become possible. First, count fault codes per thousand operating hours and group them by firmware version to see whether a change worked: trim-solenoid overcurrent E-31 fell from 0.62 to 0.18, from about 3350 to about 970 events a year across 6000 machines. Second, reliability analysis by serial number. Third, forecast spare parts. Hook life follows a Weibull distribution; a hook that has already run a hours fails within the next Δ with probability one minus R(a+Δ) over R(a). Computed from each machine's own hours and summed, next quarter needs about 202 hooks, fewer than the 303 from mean life, because the fleet is still young."
+   ]
+  },
+  {
+   "title": [
+    "AI 在数字工厂里的位置",
+    "Where AI fits in the digital factory"
+   ],
+   "points": [
+    [
+     "今日简报（ai.briefing，保留消息）：每条附证据；教学模式写成提问",
+     "Daily briefing (ai.briefing, retained): every item carries evidence; in teaching mode it is phrased as questions"
+    ],
+    [
+     "主动提醒：停机、刀具或砂轮寿命 < 15%、趋近上限、新 NCR、订单可能延期、低于安全库存；同一件事 2 h 内不重复",
+     "Alerts: stoppages, tool or wheel life < 15%, approaching limits, new NCRs, likely late orders, stock below safety level; the same event not repeated within 2 h"
+    ],
+    [
+     "问答与起草提议：数字来自历史库并注明出处；写入 ERPNext 只起草，人确认后桥接执行",
+     "Answers and draft proposals: figures come from the historian with sources; writes to ERPNext are only drafted and executed by the bridge after a person confirms"
+    ],
+    [
+     "AI 选型 select.py 只从零件库挑，库里没有的编号不出现（invalid_refs）；国内只配已备案模型，美国用 Claude",
+     "AI selection (select.py) picks only from the parts library and never shows IDs not in it (invalid_refs); in China only registered models, in the US Claude"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "AI 做四件事，都有边界。今日简报，每条附证据，教学模式下写成提问。主动提醒，按规则查全厂，缝纫机厂要加的就是前面的判异规则、砂轮修整间隔超限，以及测试台读到的固件和工单不符。问答和起草提议：问“WQ-LS-TED 200 台 10 天能交吗”，AI 展开变型 BOM，发现 DLC 外协 5 天、卧加负荷 100%，回答约第 12 天完成，再起草加班或分批交货两份提议，由计划员选。AI 选型只从零件库里挑，库里没有推拉电磁铁，它就说没有，不编型号。三条规矩：只用库里的数据，注明出处，写操作只是提议。",
+    "AI does four things, each with limits. The daily briefing: every item carries evidence, and in teaching mode it asks questions. Alerts: rules checked across the plant; the sewing plant adds the run rules above, overdue wheel dressing, and a test bench reading firmware that differs from the work order. Answers and draft proposals: ask whether 200 WQ-LS-TED can ship in 10 days, and AI explodes the variant BOM, finds the 5-day DLC subcontract and the HMC at 100% load, answers that completion is around day 12, and drafts two proposals, an extra shift or a split delivery, for the planner to choose. AI selection picks only from the parts library: push-pull solenoids are not in it, so it says so rather than inventing a part number. Three rules: use only data in the stores, cite sources, and treat every write as a proposal."
+   ]
+  },
+  {
+   "title": [
+    "分三期实施与回收期",
+    "Three-phase roll-out and payback"
+   ],
+   "points": [
+    [
+     "第一期（约 6 月）：主数据、ERP、总线与历史库、瓶颈设备联网；KPI：周转 4 → 5、关键设备 OEE 60% → 68%",
+     "Phase 1 (about 6 months): master data, ERP, bus and historian, bottleneck machines connected; KPIs: turns 4 → 5, key-machine OEE 60% → 68%"
+    ],
+    [
+     "第二期（约 9 月）：装配扫码、QMS、测试数据；第三期（约 9 月）：服务回流、备件预测、AI 扩展",
+     "Phase 2 (about 9 months): assembly scanning, QMS, test data; phase 3 (about 9 months): service data, spare forecasts, AI roll-out"
+    ],
+    [
+     "年节省 154.1 / 64.0 / 83.0 万元；如库存 (6000/4 − 6000/5) × 20% = 60，OEE 800 × (1 − 60/68) = 94.1",
+     "Annual savings 1.541 / 0.640 / 0.830 million CNY; e.g. inventory (6000/4 − 6000/5) × 20% = 60, OEE 800 × (1 − 60/68) = 94.1 (10k CNY)"
+    ],
+    [
+     "投资 150、120、80 万元：三期全做第 33 个月收回、5 年净收益约 565 万；只做第一期第 23 个月收回、约 410 万；OEE 只到 64% 时回收期 38 个月",
+     "Investment 1.5, 1.2 and 0.8 million CNY: all three phases pay back in month 33 with about 5.65 million net over 5 years; phase 1 alone pays back in month 23 with about 4.10 million; at only 64% OEE payback is 38 months"
+    ]
+   ],
+   "formula": "\\text{saving}_{\\text{OEE}}=C_{\\text{key}}\\left(1-\\frac{\\mathrm{OEE}_0}{\\mathrm{OEE}_1}\\right)",
+   "figure": "fig_27_roi.png",
+   "narration": [
+    "整体信息化不宜一次铺开。所以分三期，每一期有看得见的交付物和量化的 KPI，后一期建在前一期的数据上。节省怎么算？库存周转从 4 次到 5 次，平均库存从 1500 万降到 1200 万，持有成本按 20%，一年省 60 万；关键设备 OEE 从 60% 到 68%，完成同样产量的设备时间按 60 比 68 缩短，800 万乘 1 减 60/68，约 94 万。看现金流图：三期全做，第 15 个月前后最低约负 203 万，第 33 个月收回；只做第一期 23 个月就收回，因为它的节省来自瓶颈和库存，见效最直接。",
+    "Plant-wide IT should not be rolled out all at once. We go in three phases, each with visible deliverables and measurable KPIs, each building on the data of the one before. How are savings calculated? Inventory turns from 4 to 5 take average stock from 15 to 12 million CNY; at 20% carrying cost that saves 600 thousand a year. Key-machine OEE from 60% to 68% cuts the machine time for the same output by 60 over 68: 8 million times one minus 60/68, about 940 thousand. On the cash-flow chart, all three phases bottom out near minus 2.03 million around month 15 and pay back in month 33; phase one alone pays back in month 23, because its savings come from the bottleneck and inventory, the most direct effects."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "七个断点的根源是信息没有带编号、记在一个能关联的地方；数字工厂按五层架构搭，组件只经总线，写操作要人确认。",
+   "The seven breaks come from information not recorded with IDs in one linkable place; the digital factory is built in five layers, components talk only via the bus, and writes need human confirmation."
+  ],
+  [
+   "变型由模板加属性或配置器生成；BOM 跟着设计发布走，固件、参数表、事件表作为带版本的物料管理。",
+   "Variants come from templates with attributes or from a configurator; the BOM follows design release, and firmware, parameter and event tables are managed as versioned items."
+  ],
+  [
+   "负荷 = 需求 × 工时 / 有效能力；瓶颈卧加负荷 100%，第一期先联网瓶颈、提高 OEE。",
+   "Load = demand × time / effective capacity; the bottleneck HMC runs at 100%, so phase one connects bottlenecks and raises their OEE first."
+  ],
+  [
+   "X̄ 图控制限 μ0 ± 3σ/√n，判异规则在超差之前发现漂移，规则越多越早也越易误报；报警后先围堵再查因。",
+   "X̄ limits are μ0 ± 3σ/√n; run rules find drift before parts go out of tolerance, with more rules meaning earlier detection and more false alarms; after an alarm, contain first, then find the cause."
+  ],
+  [
+   "追溯靠装配扫码绑定批次，向后查原因、向前圈范围；服务数据按每千运转小时和版本统计，备件按韦布尔条件概率预测。",
+   "Traceability depends on scanning lots at assembly: backward to the cause, forward to the scope; service data are counted per thousand operating hours and by version, and spares forecast by Weibull conditional probability."
+  ],
+  [
+   "分三期实施，按可核算的节省和现金流定回收期；第一期回收最快，回收期对瓶颈 OEE 目标最敏感。",
+   "Roll out in three phases and set payback from auditable savings and cash flow; phase one pays back fastest, and payback is most sensitive to the bottleneck OEE target."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "factory",
+   "no": "27-1",
+   "title": [
+    "数字工厂：质量闭环与追溯",
+    "Digital factory: quality loop and traceability"
+   ],
+   "goal": [
+    [
+     "看梭尖间隙测量值怎样逐台上总线、在 X̄ 图上触发报警和 NCR，比较不同判异规则的报警时刻和误报。",
+     "See how hook-clearance measurements reach the bus machine by machine and trigger alarms and NCRs on the X̄ chart, comparing alarm timing and false alarms across run rules."
+    ],
+    [
+     "从一次报警出发，按序列号—批次关系向后查原因、向前圈出受影响的整机，并算出晚发现的代价。",
+     "Starting from an alarm, trace backwards to the cause and forwards to the affected machines through serial–lot links, and calculate the cost of late detection."
+    ],
+    [
+     "用分期计算器分析投资、工期和 KPI 目标对回收期的影响。",
+     "Use the phase calculator to analyse how investment, duration and KPI targets affect payback."
+    ]
+   ],
+   "theory": [
+    [
+     "平均 22.5 台/h，16 h 共 360 台；μ0 = 0.070 mm、σ = 6 μm，公差 0.04–0.10 mm；第 t₀ h 起装用 H2610-07（300 只），间隙 = μ0 + 阶跃 + 漂移速度 × 装用时间 + 随机波动。",
+     "22.5 machines/h on average, 360 in 16 h; μ0 = 0.070 mm, σ = 6 μm, tolerance 0.04–0.10 mm; from hour t₀ lot H2610-07 (300 hooks) is used, and clearance = μ0 + step + drift rate × time in use + random variation."
+    ],
+    [
+     "X̄ 图子组 n = 5，控制限 μ0 ± 3σ/√5；判异规则 R1–R4 用于 X̄ 图，R0 是现有的“趋近上限”规则；同一规则 2 h 内不重复报。",
+     "X̄ subgroups of n = 5 with limits μ0 ± 3σ/√5; run rules R1–R4 apply to the X̄ chart and R0 is the existing 'approaching the upper limit' rule; the same rule is not repeated within 2 h."
+    ],
+    [
+     "报警后经反应时间停用该批；受影响整机 = 从漂移开始那台到停用为止装配的整机；第 8 h、16 h 各发运一次。",
+     "After an alarm the lot is withdrawn after the reaction time; affected machines = those built from the drift's first machine until withdrawal; shipments go at hours 8 and 16."
+    ],
+    [
+     "分期：投资在工期内均摊，上线后节省 6 个月内爬升到全额，运行费为已上线投资的 15%/年；回收月 = 累计现金流由负转为非负的第一个月。",
+     "Phasing: investment spread over the build period, savings ramp to full in 6 months after go-live, running cost 15%/yr of live investment; payback month = the first month cumulative cash flow turns non-negative."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页第①页“质量闭环”，点“恢复标准”（t₀ = 2 h、4 μm/h、阶跃 0、反应 0.5 h、种子 5，只勾 R1）。点“▶ 播放”，观察测量值和总线消息滚动，记下报警的台号、时间和受影响台数。",
+     "Open page ① 'Quality loop' and click Reset to standard (t₀ = 2 h, 4 μm/h, step 0, reaction 0.5 h, seed 5, only R1 ticked). Click ▶ Play, watch the measurements and bus messages scroll, and record the alarm's machine number, time and affected count."
+    ],
+    [
+     "依次勾选 R2、R3、R4，再单独试 R0（现有“趋近上限”规则），每次记下报警时刻、比首台超差提前多少小时、无漂移对照组 16 h 内的误报次数。",
+     "Tick R2, R3 and R4 in turn, then try R0 (the existing 'approaching the upper limit' rule) on its own; each time record the alarm time, how many hours it precedes the first out-of-tolerance machine, and false alarms in the no-drift control over 16 h."
+    ],
+    [
+     "找出一组规则，使报警比首台超差早至少 4 h，且无漂移时不误报（任务 1）。",
+     "Find a rule set whose alarm precedes the first out-of-tolerance machine by at least 4 h with no false alarms without drift (task 1)."
+    ],
+    [
+     "点“换一组随机数”或改种子几次，看同一组规则的报警时刻和误报怎样变化；再把漂移速度调到 2 μm/h、阶跃调到 10 μm 各试一次，然后恢复标准。",
+     "Click 'New random numbers' or change the seed a few times to see how alarm time and false alarms vary for the same rules; also try a drift of 2 μm/h and a step of 10 μm once each, then reset."
+    ],
+    [
+     "切到第②页“序列号—批次追溯”，沿关系图向后查到旋梭批次、工单、磨床和砂轮修整事件，向前查到受影响整机、仓库剩余和已发货台数。",
+     "Switch to page ② 'Serial–lot traceability'; follow the graph backwards to the hook lot, work order, grinder and dressing events, and forwards to the affected machines, remaining stock and shipped count."
+    ],
+    [
+     "算出受影响整机台数填入并点“核对”（任务 2）；用“序列号（第几台）”滑块查看第 70 台和第 46 台的整机档案。",
+     "Work out the affected-machine count, enter it and click Check (task 2); use the serial-number slider to view the records of machines 70 and 46."
+    ],
+    [
+     "拖动“比报警晚发现 N 小时”，记下 N = 1、2、4、5 h 时要复检、返工和已发货的台数。",
+     "Drag 'Detected N hours after the alarm' and record the machines to recheck, rework and already shipped for N = 1, 2, 4 and 5 h."
+    ],
+    [
+     "切到第③页“实施分期计算器”，记下标准设置的年节省、回收月和 5 年累计；把关键设备 OEE 调到 64%，看回收期变成多少。",
+     "Switch to page ③ 'Phase calculator', record the standard annual savings, payback month and 5-year total; set key-machine OEE to 64% and see the new payback."
+    ],
+    [
+     "保持 OEE 64%、其他 KPI 和投资不比标准更有利，只压缩各期工期（每期不少于 4 个月），把回收期拉回 36 个月以内（任务 3）。",
+     "Keeping OEE at 64% and no other KPI or investment more favourable than standard, shorten only the phase durations (at least 4 months each) to bring payback back within 36 months (task 3)."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "判异规则、追溯与分期记录",
+     "Run rules, traceability and phasing record"
+    ],
+    "headers": [
+     [
+      "设置",
+      "Setting"
+     ],
+     [
+      "报警台号 / 时间",
+      "Alarm machine / time"
+     ],
+     [
+      "比首台超差提前（h）",
+      "Lead over first out-of-tolerance (h)"
+     ],
+     [
+      "无漂移误报次数",
+      "False alarms without drift"
+     ],
+     [
+      "受影响 / 返工 / 已发货",
+      "Affected / rework / shipped"
+     ],
+     [
+      "回收月 / 5 年累计",
+      "Payback month / 5-year total"
+     ]
+    ],
+    "rows": 10
+   },
+   "questions": [
+    [
+     "现有的“趋近上限”规则在减速器厂好用，为什么用到梭尖间隙上误报很多？从公差带和过程标准差的比例来解释。",
+     "The existing 'approaching the upper limit' rule works in the gearbox plant; why does it false-alarm so often on hook clearance? Explain from the ratio of tolerance band to process sigma."
+    ],
+    [
+     "规则从 R1 加到 R1–R4，报警更早了，代价是什么？如果每次误报要停线检查 1 h，你会怎样选规则？",
+     "Going from R1 to R1–R4 gives earlier alarms; what is the price? If every false alarm costs a 1 h line stop for checking, how would you choose the rules?"
+    ],
+    [
+     "如果装配线没有逐台扫码绑定旋梭批次，第②页的受影响范围要怎样确定？会扩大多少？",
+     "If the assembly line did not scan hook lots per machine, how would page ②'s affected range be set, and how much wider would it be?"
+    ],
+    [
+     "为什么只压缩第一期的工期对回收期的效果最明显？",
+     "Why does shortening phase one have the most visible effect on payback?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "缝纫机厂的瓶颈、质量闭环与备件分析",
+   "Bottleneck, quality loop and spare-part analysis for a sewing-machine plant"
+  ],
+  "tasks": [
+   [
+    "按表 27-5 的数据（卧加 HMC-H 每台 16 min、5 台、两班、每班 480 min），工厂要把日产量提到 220 台。求 OEE 为 60% 和 68% 时卧加的负荷；要使负荷不超过 90%，不加设备时 OEE 至少多少？若增加 1 台卧加、OEE 68%，负荷是多少？给出你的建议并说明理由（考虑总装线节拍 2.4 min 的限制）。",
+    "Using Table 27-5 (HMC-H 16 min per machine, 5 machines, two 480 min shifts), the plant wants 220 machines a day. Find the HMC load at 60% and 68% OEE; without adding machines, what OEE keeps the load at or below 90%? With one more HMC at 68% OEE, what is the load? Give and justify a recommendation (mind the 2.4 min assembly takt)."
+   ],
+   [
+    "某调试特性 μ0 = 0.070 mm、σ = 5 μm、公差 0.04–0.10 mm，子组 n = 5。求 X̄ 图控制限；若某批零件使均值以 5 μm/h 漂移，求漂移 2、4、6 h 后单台超差的概率。说明你会选哪些判异规则、报警后围堵的步骤，以及 8D 前四步的内容。",
+    "An adjustment characteristic has μ0 = 0.070 mm, σ = 5 μm, tolerance 0.04–0.10 mm, subgroup n = 5. Find the X̄ limits; if a lot makes the mean drift by 5 μm/h, find the single-machine out-of-tolerance probability after 2, 4 and 6 h. State which run rules you would choose, the containment steps after an alarm, and the content of the first four 8D steps."
+   ],
+   [
+    "出厂测试要上报“剪线 50 次的成功次数”和“少油运转温升（K）”两项。为 test.result 写出两条示例消息（主题、信封、data 必有字段），并说明为什么不用 quality.measurement、为什么不违反“只增加、不改动”。",
+    "End-of-line test must report 'successful trims out of 50' and 'low-oil running temperature rise (K)'. Write two example test.result messages (topic, envelope, required data fields), and explain why quality.measurement is not used and why this does not break 'add, never change'."
+   ],
+   [
+    "旋梭寿命按韦布尔 β = 2.2、η = 5000 h。两台机器下一季度各运转 225 h，一台的旋梭已运转 1000 h，另一台已运转 4000 h。分别求它们下一季度失效的概率，并解释为什么对一个年轻机群，按平均寿命估算备件会偏多。",
+    "Hook life is Weibull with β = 2.2, η = 5000 h. Two machines each run 225 h next quarter; one hook has 1000 h on it, the other 4000 h. Find each one's probability of failing next quarter, and explain why mean-life forecasting over-estimates spares for a young fleet."
+   ]
+  ],
+  "deliverable": [
+   "一份不超过 6 页的报告（PDF）：各题计算过程与结论，第 3 题的 JSON 消息；可附虚拟实验 27-1 的截图或自己的 Python 脚本。",
+   "A report of no more than 6 pages (PDF): calculations and conclusions for each task and the JSON messages for task 3; screenshots from virtual lab 27-1 or your own Python script may be attached."
+  ],
+  "rubric": [
+   [
+    "负荷与所需 OEE 计算正确，建议考虑了总装节拍和瓶颈转移（25 分）",
+    "Load and required OEE correct, with a recommendation that considers assembly takt and bottleneck shift (25 points)"
+   ],
+   [
+    "控制限与超差概率正确，规则选择和围堵、8D 步骤合理（30 分）",
+    "Control limits and probabilities correct, with sensible rule choice, containment and 8D steps (30 points)"
+   ],
+   [
+    "test.result 消息字段完整、单位清楚，理由正确（20 分）",
+    "test.result messages complete with clear units and correct reasoning (20 points)"
+   ],
+   [
+    "韦布尔条件概率计算正确，解释清楚（25 分）",
+    "Weibull conditional probabilities correct and clearly explained (25 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "问渠数字工厂“任何组件不直接调用另一个组件，只经总线交换数据”这条规矩，最直接的好处是：",
+    "The WenQuest rule 'no component calls another directly; data go only via the bus' most directly means that:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "把仿真机床换成真实机床、把减速器换成缝纫机，只要按同样格式发消息，其余部分不用改",
+      "Swapping simulated for real machines, or gearboxes for sewing machines, needs no change elsewhere as long as messages keep the same format"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "总线可以替代 ERP 的财务和采购功能",
+      "The bus can replace ERP's finance and purchasing"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "AI 可以直接写 ERPNext，不需要人确认",
+      "AI can write to ERPNext directly without human confirmation"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "不再需要历史库",
+      "The historian is no longer needed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "解耦的价值在于替换任何一端都不影响其他组件；写操作仍要人确认，历史库是唯一的事实来源。",
+    "Decoupling means either end can be replaced without affecting the others; writes still need human confirmation, and the historian remains the single source of truth."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "出厂测试的停针定位误差（单位：度）可以直接放进 quality.measurement 的 value_mm 字段发送，只要在名称里注明“度”即可。",
+    "End-of-line stop-position error (in degrees) can go straight into quality.measurement's value_mm field, as long as the name says 'degrees'."
+   ],
+   "correct": false,
+   "feedback": [
+    "quality.measurement 规定数值以毫米计，下游系统会把它当作长度；所以新增带单位字段的 test.result 类型。",
+    "quality.measurement defines values in millimetres, so downstream systems would read it as a length; hence the new test.result type with a unit field."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "WQ-LS 若有 4 个“有 / 无”选项，另加最高转速 3 档，其中 8 种组合在技术上不允许。一共有多少种可用变型？",
+    "If WQ-LS has 4 on/off options plus 3 top-speed grades, and 8 combinations are technically not allowed, how many usable variants are there?"
+   ],
+   "answer": 40,
+   "tolerance": 0,
+   "unit": "种",
+   "feedback": [
+    "2⁴ × 3 = 48，去掉 8 种得 40 种；变型这么多，宜用模板加属性、由配置器按规则即时生成 BOM。",
+    "2⁴ × 3 = 48, minus 8 gives 40; with this many variants, use a template with attributes and let a configurator generate BOMs by rule."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "按表 27-5，卧加 HMC-H 每台 16 min，5 台两班（每班 480 min），OEE 60%。若每天要装 200 台，卧加的负荷是百分之多少？",
+    "From Table 27-5, HMC-H needs 16 min per machine, with 5 machines on two 480 min shifts at 60% OEE. At 200 machines a day, what is the HMC load in percent?"
+   ],
+   "answer": 111.1,
+   "tolerance": 0.5,
+   "unit": "%",
+   "feedback": [
+    "200 × 16 / (5 × 960 × 0.60) = 3200 / 2880 ≈ 111%；要 ≤ 90%，OEE 须 ≥ 74%。",
+    "200 × 16 / (5 × 960 × 0.60) = 3200 / 2880 ≈ 111%; to stay ≤ 90%, OEE must be ≥ 74%."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "为什么要在 BOM 里给固件 FW-WQSC-LS 留一行、带版本？",
+    "Why give firmware FW-WQSC-LS its own versioned line in the BOM?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "工单下达就知道烧哪版，测试台能按工单核对，序列号档案自然记下出厂固件",
+      "The work order says which version to flash, the test bench can check against it, and the serial record keeps the shipped version"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "固件也要按重量计入物料成本",
+      "Firmware must be costed by weight like material"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "零件库要求每个物料都有 STEP 模型",
+      "The parts library requires a STEP model for every item"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "这样就不需要工程变更流程",
+      "Then no engineering change process is needed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "固件作为带版本的物料，堵上了“固件版本没人管”这个断点；版本改动仍要走 ECO。",
+    "Firmware as a versioned item closes the 'nobody owns the firmware version' break; version changes still go through ECO."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某特性过程均值 μ0 = 0.070 mm、σ = 8 μm，X̄ 图子组 n = 4。上控制限 UCL 是多少 mm？",
+    "A characteristic has process mean μ0 = 0.070 mm and σ = 8 μm, with X̄ subgroups of n = 4. What is the upper control limit UCL in mm?"
+   ],
+   "answer": 0.082,
+   "tolerance": 0.0005,
+   "unit": "mm",
+   "feedback": [
+    "上控制限 UCL = μ0 + 3σ/√n = 0.070 + 3 × 0.008/2 = 0.082 mm。",
+    "UCL = μ0 + 3σ/√n = 0.070 + 3 × 0.008/2 = 0.082 mm."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "下列哪些是本讲 X̄ 图所用的西方电气判异规则？（选出所有正确项）",
+    "Which of these are the Western Electric run rules used for the X̄ chart in this lesson? (Select all that apply)"
+   ],
+   "answers": [
+    {
+     "text": [
+      "1 个点在 3σ 控制限之外",
+      "One point beyond the 3σ control limits"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "连续 3 点中有 2 点在同一侧的 2σ 之外",
+      "Two of three consecutive points beyond 2σ on the same side"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "连续 8 点在中心线同一侧",
+      "Eight consecutive points on one side of the centre line"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "1 个子组均值超出公差限",
+      "One subgroup mean beyond the tolerance limits"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "最近 5 件均值比公差中值高 2 μm 以上",
+      "The mean of the last 5 is 2 μm or more above mid-tolerance"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "R1、R2、R4 如选项所述（R3 是 5 点中 4 点在 1σ 外）；控制图用控制限而不是公差限；最后一项是现有的 R0“趋近上限”规则。",
+    "R1, R2 and R4 are as stated (R3 is 4 of 5 beyond 1σ); control charts use control limits, not tolerance limits; the last option is the existing R0 'approaching the limit' rule."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "按本讲算例（μ0 = 0.070 mm、σ = 6 μm、公差 0.04–0.10 mm、均值每小时漂移 4 μm），漂移开始 3 h 后单台超差的概率是百分之多少？",
+    "In this lesson's example (μ0 = 0.070 mm, σ = 6 μm, tolerance 0.04–0.10 mm, mean drifting 4 μm per hour), what is the single-machine out-of-tolerance probability, in percent, 3 h after the drift starts?"
+   ],
+   "answer": 0.135,
+   "tolerance": 0.01,
+   "unit": "%",
+   "feedback": [
+    "m = 0.082 mm，(0.100 − 0.082)/0.006 = 3，P ≈ 1 − Φ(3) ≈ 0.135%（下限一侧可忽略）；此时 X̄ 图早已能看出漂移。",
+    "m = 0.082 mm, (0.100 − 0.082)/0.006 = 3, P ≈ 1 − Φ(3) ≈ 0.135% (the lower tail is negligible); by now the X̄ chart can already see the drift."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "X̄ 图报警指向旋梭批次 H2610-07。按本讲的做法，第一步应当是：",
+    "The X̄ chart alarm points to hook lot H2610-07. Following this lesson, the first step is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "围堵：冻结该批剩余库存，把装了该批的整机列为可疑并复检",
+      "Contain: quarantine the lot's remaining stock and list machines built with it as suspect for recheck"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "先组织 8D 小组找出根本原因，查清以前照常装配",
+      "Form an 8D team to find the root cause first, assembling as usual until then"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "让 AI 直接在 ERPNext 里报废整批旋梭",
+      "Have AI scrap the whole lot directly in ERPNext"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "放宽控制限，减少误报",
+      "Widen the control limits to reduce false alarms"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "先围堵、后查因；AI 只起草“冻结可疑批次”的提议，由质检员确认后执行。",
+    "Contain first, investigate after; AI only drafts the quarantine proposal, executed after the quality inspector confirms."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "旋梭寿命服从韦布尔分布，β = 2.2、η = 5000 h。一只已运转 3000 h 的旋梭，在接下来 250 h 内失效的概率是百分之多少？",
+    "Hook life is Weibull with β = 2.2, η = 5000 h. What is the probability, in percent, that a hook with 3000 h on it fails within the next 250 h?"
+   ],
+   "answer": 6.07,
+   "tolerance": 0.05,
+   "unit": "%",
+   "feedback": [
+    "P = 1 − R(3250)/R(3000)，R(t) = exp[−(t/5000)^2.2]，得约 6.07%。",
+    "P = 1 − R(3250)/R(3000), R(t) = exp[−(t/5000)^2.2], giving about 6.07%."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "按表 27-5 的卧加数据（每台 16 min、5 台、两班 × 480 min），日产 200 台时，要使卧加负荷不超过 85%，OEE 至少要百分之多少？",
+    "With the HMC data of Table 27-5 (16 min per machine, 5 machines, two 480 min shifts), at 200 machines a day, what minimum OEE (%) keeps the HMC load at or below 85%?"
+   ],
+   "answer": 78.4,
+   "tolerance": 0.3,
+   "unit": "%",
+   "feedback": [
+    "负荷 ≤ 85% 要求 OEE ≥ 200 × 16 / (5 × 960 × 0.85) ≈ 78.4%。",
+    "OEE ≥ 200 × 16 / (5 × 960 × 0.85) ≈ 78.4%."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一个联网机群 4000 台，每台每年运转约 800 h，旋梭平均寿命约 4430 h。按“平均寿命法”，下一季度约需多少只旋梭？",
+    "A connected fleet of 4000 machines runs about 800 h per machine per year, and the mean hook life is about 4430 h. By the mean-life method, about how many hooks are needed next quarter?"
+   ],
+   "answer": 180.6,
+   "tolerance": 2,
+   "unit": "只",
+   "feedback": [
+    "4000 × 800 × 0.25 / 4430 ≈ 181 只；机群年轻时，按每台累计小时的条件概率求和会更少。",
+    "4000 × 800 × 0.25 / 4430 ≈ 181 hooks; for a young fleet, summing conditional probabilities from each machine's hours gives fewer."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "新固件只推给了 600 台，三个月里共运转约 13.5 万小时、出现某故障 30 次。新固件下该故障每千运转小时多少次？（旧版本为 0.62 次）",
+    "A new firmware went to only 600 machines, which ran about 135 000 h in three months with 30 occurrences of a fault. How many occurrences per thousand operating hours is that under the new firmware? (The old version gave 0.62.)"
+   ],
+   "answer": 0.222,
+   "tolerance": 0.005,
+   "unit": "次/千 h",
+   "feedback": [
+    "30 / 135 = 0.222 次/千 h；旧版本同样小时数下期望约 84 次。要下结论还需看这 600 台的机型、使用强度是否与全机群可比，以及置信区间。",
+    "30 / 135 = 0.222 per kh; the old version would expect about 84 in the same hours. A conclusion also needs to know whether these 600 machines are comparable in model and usage, plus a confidence interval."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "要做到“从一台报警的整机查到旋梭批次，再查出同批还装了哪些整机”，下列哪些是必须的？（选出所有正确项）",
+    "To trace from an alarmed machine to its hook lot and then to every machine built with that lot, which of these are required? (Select all that apply)"
+   ],
+   "answers": [
+    {
+     "text": [
+      "装配线逐台扫码，把部件批次绑定到整机序列号",
+      "Scanning on the assembly line, binding subassembly lots to each machine's serial number"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "序列号和批次在 ERPNext 里有记录（Serial No、Batch）",
+      "Serial numbers and lots recorded in ERPNext (Serial No, Batch)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "测量消息、批次绑定等原始消息存在历史库里，能按序列号查",
+      "Measurement and lot-binding messages stored in the historian and searchable by serial number"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "每月汇总一次装配数量报表",
+      "A monthly summary report of assembly quantities"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "只在单台超差时才记录测量值",
+      "Recording measurements only when a machine is out of tolerance"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "追溯靠逐台的绑定和原始消息；汇总报表丢掉了序列号，只记超差值则没有趋势也查不到合格机的批次。",
+    "Tracing relies on per-machine binding and raw messages; summaries lose serial numbers, and recording only failures loses trends and the lots of good machines."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "物料年用量 6000 万元，库存持有成本 20%/年。库存周转从 4 次/年提高到 6 次/年，每年节省多少？",
+    "Annual material usage is 60 million CNY and carrying cost is 20% a year. If inventory turns rise from 4 to 6 a year, how much is saved per year?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "100 万元",
+      "1.0 million CNY"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "60 万元",
+      "0.6 million CNY"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "500 万元",
+      "5.0 million CNY"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "40 万元",
+      "0.4 million CNY"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "平均库存从 6000/4 = 1500 万降到 6000/6 = 1000 万，少占 500 万，× 20% = 100 万元/年；500 万是占用资金的减少，不是年节省。",
+    "Average stock falls from 6000/4 = 15 to 6000/6 = 10 million CNY, freeing 5 million; × 20% = 1.0 million a year. The 5 million is capital freed, not an annual saving."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "五层架构与两条规矩；变型、BOM 与固件物料；负荷与瓶颈；X̄ 图与判异规则；序列号追溯；版本管理；分期实施与回收期。",
+   "The five-layer architecture and two rules; variants, BOMs and firmware as an item; load and bottlenecks; the X̄ chart and run rules; serial-number traceability; version control; phased roll-out and payback."
+  ],
+  "difficult": [
+   "公差限与控制限的区别；判异规则灵敏度与误报之间的权衡；哪些是问渠现有部件、哪些是“方案（待建）”，学生容易混淆。",
+   "The difference between tolerance and control limits; the trade-off between rule sensitivity and false alarms; and telling WenQuest's existing parts from those 'planned (to be built)', which students tend to blur."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：一张订单与七个断点",
+     "Opening: one order and seven breaks"
+    ],
+    "minutes": 15,
+    "content": [
+     "讲 WQ-LS-TED 订单的七个断点，引出梭尖间隙漂移问题。",
+     "Walk through the seven breaks of the WQ-LS-TED order and introduce the hook-clearance drift problem."
+    ]
+   },
+   {
+    "phase": [
+     "架构、主题与产品数据",
+     "Architecture, topics and product data"
+    ],
+    "minutes": 35,
+    "content": [
+     "五层架构与现有部件；两条规矩；主题与信封、test.result；变型、EBOM/MBOM、零件库与固件物料。",
+     "Five layers and existing parts; the two rules; topics, envelope and test.result; variants, EBOM/MBOM, the parts library and firmware as an item."
+    ]
+   },
+   {
+    "phase": [
+     "工艺、MES 与瓶颈",
+     "Process, MES and bottlenecks"
+    ],
+    "minutes": 25,
+    "content": [
+     "工艺路线进 MES；负荷计算课堂练习（180 台和 200 台）；设备状态、报工、调试与出厂测试。",
+     "Routings into MES; in-class load calculation (180 and 200 a day); machine states, reporting, adjustment and EOL test."
+    ]
+   },
+   {
+    "phase": [
+     "质量闭环与追溯",
+     "Quality loop and traceability"
+    ],
+    "minutes": 35,
+    "content": [
+     "检验计划与现有两道关；X̄ 图控制限与判异规则；漂移算例与晚发现代价；NCR、8D 与序列号追溯。",
+     "Inspection plan and the two existing gates; X̄ limits and run rules; the drift example and cost of delay; NCR, 8D and serial-number tracing."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 27-1",
+     "Virtual lab 27-1"
+    ],
+    "minutes": 40,
+    "content": [
+     "分组完成实验页三个任务（判异规则、受影响台数、压缩工期），填记录表并讨论误报成本。",
+     "Groups complete the three tasks (run rules, affected count, shortened phases), fill in the record and discuss the cost of false alarms."
+    ]
+   },
+   {
+    "phase": [
+     "版本、服务数据、AI 与实施路线",
+     "Versions, service data, AI and roll-out"
+    ],
+    "minutes": 30,
+    "content": [
+     "版本对象与 ECO、分圈升级；故障率按版本、韦布尔备件预测；AI 的四件事与三条规矩；三期实施与回收期；小结并布置作业。",
+     "Versioned objects, ECO and ring updates; fault rates by version and Weibull spares; AI's four jobs and three rules; three phases and payback; summary and assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“缝纫机厂的瓶颈、质量闭环与备件分析”；有兴趣的同学可以开始 27.10 节的学生项目（3–4 人一组）。",
+   "Complete the assignment 'Bottleneck, quality loop and spare-part analysis'; interested students may start the student project of Section 27.10 (groups of 3–4)."
+  ]
+ }
+}

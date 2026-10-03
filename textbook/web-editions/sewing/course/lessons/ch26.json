@@ -1,0 +1,1180 @@
+{
+ "no": 26,
+ "title": [
+  "设备联网与数字孪生",
+  "Connected Machines and Digital Twins"
+ ],
+ "hours": 3,
+ "goals": [
+  [
+   "能说明一台电控缝纫机能提供哪些数据、哪些要外加，并按识别、状态、计数、事件四类组织设备数据。",
+   "Explain which data an electronically controlled sewing machine can provide and which must be added, and organise machine data into identity, state, counters and events."
+  ],
+  [
+   "能解释 MQTT 的发布订阅、QoS、保留消息、遗嘱消息和统一命名空间，并为一个工位写出主题。",
+   "Explain MQTT publish/subscribe, QoS, retained and will messages and the unified namespace, and write the topics for a workstation."
+  ],
+  [
+   "能算出不同上报方式下全车间的消息率和年存储量，并选出满足实时性和容量判据的方式。",
+   "Calculate the shop-wide message rate and annual storage for different reporting strategies and pick one that meets the latency and capacity criteria."
+  ],
+  [
+   "能从一个班次的数据算出 A、P、Q 和 OEE，并分析按剪线、工票、衣架计件的误差来源。",
+   "Calculate A, P, Q and OEE from one shift's data, and analyse the error sources of counting pieces by trims, tickets and hangers."
+  ],
+  [
+   "能说明 MES 对接、数字孪生的两层含义，以及远程运维、网络安全和个人数据的基本要求。",
+   "Explain MES integration, the two layers of a digital twin, and the basic requirements of remote service, network security and personal data."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "一台平缝机的一个班次",
+   "One shift on one lockstitch machine"
+  ],
+  "text": [
+   "一条衬衫缝制线没有联网，管理者只知道每天交出多少件。现在给 7 号工位的平缝机装上联网模块。这个班次 480 min，休息 30 min；工序标准工时 0.6 min/件，操作工按标准工时的 85% 效率干活；等活 25 min，设备故障 12 min，断线平均每小时 1.5 次、每次处理 1 min；3% 的件要返修。每件缝 3 段、每段末尾剪线，另有 5% 的件因返工重缝多剪一次线，每次断线后重新起缝也多剪一次。车间打算用剪线次数来数件。",
+   "A shirt-sewing line is not connected; management only knows how many pieces come out each day. Now a connectivity module is fitted to the lockstitch machine at station 7. The shift is 480 min with a 30 min break; the operation's standard minute value is 0.6 min/piece and the operator works at 85% of standard; waiting for work takes 25 min, machine faults 12 min, and thread breaks average 1.5 per hour at 1 min each; 3% of pieces need rework. Each piece has 3 seams, each trimmed at the end; 5% of pieces get one extra trim from re-sewing, and every thread break also adds an extra trim on restart. The shop plans to count pieces by trims."
+  ],
+  "question": [
+   "这个班次实际做了多少件？A、P、Q 和 OEE 各是多少，最大的损失在哪里？按剪线次数统计的件数偏差多少？如果全车间 500 台都每针上报一条 250 字节的消息（两班、每年 300 天），一年要存多少数据？",
+   "How many pieces are actually made this shift? What are A, P, Q and OEE, and where is the largest loss? How far off is the count by trims? If all 500 machines reported every stitch as a 250-byte message (two shifts, 300 days a year), how much data would be stored per year?"
+  ],
+  "answer": [
+   "计划时间 450 min；断线 11.25 次，运行时间 450 − 25 − 12 − 11.25 = 401.75 min，A ≈ 89.3%；件数 401.75 × 0.85 / 0.6 ≈ 569 件，P = 85%；Q = 97%；OEE ≈ 73.6%。最大的损失是速度损失（约 60 min），其次是等活 25 min、故障 12 min。剪线次数 ≈ 569 × 3 + 569 × 0.05 + 11 ≈ 1747 次，除以 3 得约 582 件，多算约 2.3%。主轴转动约 120 min，约 36 万针；每针上报时 500 台平均每秒 6000 多条，一年约 27 TB。应改为“每件或每分钟汇总 + 状态变化即报”，一年约 36–45 GB。",
+   "Planned time is 450 min; 11.25 thread breaks; run time 450 − 25 − 12 − 11.25 = 401.75 min, A ≈ 89.3%; pieces 401.75 × 0.85 / 0.6 ≈ 569, P = 85%; Q = 97%; OEE ≈ 73.6%. The largest loss is speed loss (about 60 min), then 25 min waiting and 12 min faults. Trims ≈ 569 × 3 + 569 × 0.05 + 11 ≈ 1747; divided by 3 that is about 582 pieces, an over-count of about 2.3%. The spindle turns about 120 min, about 360 000 stitches; reporting every stitch, 500 machines average over 6000 messages a second, about 27 TB a year. Instead aggregate per piece or per minute and report state changes at once: about 36–45 GB a year."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人工作站的状态、计数和孪生",
+   "State, counters and twin of a robot cell"
+  ],
+  "text": [
+   "一台焊接或搬运机器人的控制器同样知道运行、待机、报警和每个循环的节拍，把它们按缝纫机的同一套规则上总线：状态用保留消息发到 wq/…/robot-01/status，掉线由遗嘱消息变成“离线”；循环数和抓取次数按累计值上报，丢一条也能从下一条补回。机器人工作站的 OEE 用同样的 A × P × Q 算，只是 P 的标准节拍来自程序的理想节拍，而不是含手工的标准工时。数字孪生里的虚拟机器人按总线上的关节角实时重放动作，也能把后面几小时的节拍和排队“快进”一遍，提前看到哪个工位会堵。计件也有类似的坑：按夹爪闭合次数数件，重抓一次就会多数一件，要用视觉或工件到位信号核对。",
+   "A welding or handling robot's controller also knows running, idle, alarm and each cycle time, and it goes onto the bus by the same rules as the sewing machine: state as a retained message on wq/…/robot-01/status, with a will message turning it 'offline' when it drops off; cycle and pick counts reported as cumulative values, so a lost message is recovered from the next. A robot cell's OEE is the same A × P × Q, except that P's standard cycle is the program's ideal cycle rather than a standard minute that includes handling. In the digital twin, a virtual robot replays the joint angles from the bus in real time, and can also fast-forward the next few hours of cycles and queues to show which station will jam. Counting has the same trap: count parts by gripper closures and every re-grip adds a part, so cross-check with vision or a part-present signal."
+  ]
+ },
+ "life": {
+  "title": [
+   "智能电表为什么报“累计读数”",
+   "Why a smart meter reports a cumulative reading"
+  ],
+  "text": [
+   "智能电表上报的是表上的累计读数，而不是“这一刻用了多少度”：中间丢了一次上报，下一次的读数照样能算出这段时间的用电，重复收到也不会多算。缝纫机上报累计针数和件数，用的是同一个道理。",
+   "A smart electricity meter reports its cumulative reading, not 'how much was used just now': if one report is lost, the next reading still gives the usage over the period, and a duplicate does no harm. A sewing machine reporting cumulative stitches and pieces relies on the same idea."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：一条缝制线的“黑箱”",
+    "Opening: the 'black box' of a sewing line"
+   ],
+   "points": [
+    [
+     "不联网：只知道每天交出多少件、每人交了多少张工票",
+     "Not connected: only the pieces handed in each day and each operator's tickets are known"
+    ],
+    [
+     "堵在哪道工序、哪台机器断线最多、主轴真正转了多久，没人说得清",
+     "Which operation is jammed, which machine breaks thread most, how long the spindles really turned: nobody knows"
+    ],
+    [
+     "联网后：每台机器此刻在缝、等活还是停机，每道工序离目标差多少，停机原因是什么",
+     "Connected: whether each machine is sewing, waiting or stopped right now, how far each operation is from target, why it stopped"
+    ],
+    [
+     "本讲算例：一台平缝机一个班次，480 min、休息 30 min、标准工时 0.6 min/件",
+     "Running example: one lockstitch machine for one shift, 480 min, 30 min break, standard minute value 0.6 min/piece"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "前面几章讲的电控缝纫机，控制器其实知道很多事：主轴什么时候转、转多快、缝了多少针、剪了几次线、有没有断线、报过什么故障。可这些数字一直锁在每台机器里。一条三十人的衬衫线，不联网时管理者只知道进去多少布、出来多少衣服，像一个黑箱。某道工序堵了，要等组长巡线才发现；某台机器上午断了十几次线，没人知道。这一讲讲怎样把这些数据送出来，变成车间看得懂的指标：采什么、怎么送、送多少、算什么。贯穿全讲的算例是一台平缝机的一个班次。",
+    "The electronically controlled machines of earlier chapters already know a great deal: when the spindle turns and how fast, how many stitches were sewn, how many trims, whether the thread broke, which faults occurred. But these numbers stay locked in each machine. On an unconnected thirty-person shirt line, management knows only how much fabric goes in and how many garments come out: a black box. A jammed operation is found only when the line leader walks past; a machine that broke thread a dozen times this morning goes unnoticed. This lesson shows how to get the data out and turn it into metrics the floor understands: what to collect, how to send it, how much to send and what to compute. The running example is one shift on one lockstitch machine."
+   ]
+  },
+  {
+   "title": [
+    "从缝纫机里能拿到什么数据",
+    "What data a sewing machine can provide"
+   ],
+   "points": [
+    [
+     "控制器已知：主轴启停与转速、针数、剪线倒缝抬压脚次数、断线、故障码、参数——不用加传感器",
+     "Already in the controller: spindle start/stop and speed, stitch count, trim, backtack and lift counts, thread breaks, fault codes, parameters; no extra sensors"
+    ],
+    [
+     "需要外加：谁在缝（刷工卡），缝的是哪一件（工票条码或衣架 RFID）",
+     "Must be added: who is sewing (badge reader) and which piece (ticket barcode or hanger RFID)"
+    ],
+    [
+     "采集：电控通信口 + 联网模块、电控集成联网、网关汇总；老机器装电流互感器只能知道开停",
+     "Collection: control-box port plus module, built-in connectivity, or a gateway; old machines with a current transformer give only on/off"
+    ],
+    [
+     "四层：设备层、边缘层、平台层、应用层",
+     "Four layers: device, edge, platform, application"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_layers.png",
+   "narration": [
+    "先看数据从哪来。电控缝纫机的控制器为了完成自己的工作，本来就在记录很多量：主轴启停和转速、针数，编码器每转一圈计一针，剪线倒缝抬压脚的次数，有断线检测的机型还知道断线，再加上故障码和参数。这些都不用加传感器，只要电控留出通信口。可控制器不知道是谁在缝、缝的是哪一件：操作工上班刷一下工卡，件和工序靠工票条码或吊挂衣架上的编号。两类信息对上，才能算出“谁在什么时候做了哪一件的哪道工序”。老机器没有通信口，装个电流互感器也行，但只能知道开停，拿不到针数和剪线。",
+    "First, where the data come from. To do its own job, the controller of an electronic sewing machine already records a lot: spindle start, stop and speed; stitch count, one per encoder revolution; counts of trims, backtacks and presser lifts; thread breaks on machines with detection; fault codes and parameters. None of this needs a sensor, only a communication port on the control box. But the controller does not know who is sewing or which piece: the operator badges in at the start of the shift, and the piece and operation come from a ticket barcode or the hanger number. Matching the two tells us who did which operation on which piece, and when. An old machine without a port can take a current transformer, but that tells only on or off, with no stitches or trims."
+   ]
+  },
+  {
+   "title": [
+    "设备数据模型：识别、状态、计数、事件",
+    "The machine data model: identity, state, counters, events"
+   ],
+   "points": [
+    [
+     "识别：设备编号、型号、序列号、固件版本、产线和工位，很少变化",
+     "Identity: machine ID, model, serial number, firmware version, line and station; rarely changes"
+    ],
+    [
+     "状态：运行、待机、故障、关机，对应 OPC UA for Machinery 的正在执行、可用但未执行、停用、不可用",
+     "State: running, idle, fault, off, mapping to OPC UA for Machinery's executing, not executing, out of service, not available"
+    ],
+    [
+     "计数：针数、剪线、件数、运行时间，上报累计值；接收方要识别计数器归零后接续",
+     "Counters: stitches, trims, pieces, run time, reported as cumulative values; the receiver must detect counter resets and continue"
+    ],
+    [
+     "事件：开始缝、停下、剪线、断线、报警、换操作工",
+     "Events: sewing starts, stops, trims, thread breaks, alarms, operator changes"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "车间里常有几家企业、几代型号的缝纫机，数据要先统一成同一种结构。一台设备的数据分四类。识别信息几乎不变。状态是此刻在干什么，可以参照 OPC UA 的机械设备通用规范：运行对应正在执行，待机对应可用但未执行，故障对应停用，关机对应不可用。计数是只增不减的累计量，这里有个要点：报累计值比报增量可靠，丢一条可以从下一条补回，重复收到也没害处；不过接收方要能认出计数器归零，比如断电重启、换控制器，归零以后要接上。事件是某一时刻发生的事，比如断线、换操作工。",
+    "A shop often has sewing machines from several makers and generations, so the data must first share one structure. A machine's data fall into four kinds. Identity hardly ever changes. State is what it is doing now, and we can follow the OPC UA machinery specification: running maps to executing, idle to not executing, fault to out of service, and off to not available. Counters are quantities that only increase, and here is the key point: reporting the cumulative value is more robust than reporting increments, because a lost message is recovered from the next one and a duplicate does no harm. The receiver must, however, recognise a counter reset, after a power cycle or a controller swap, and continue the series. Events are things that happen at an instant, like a thread break or an operator change."
+   ]
+  },
+  {
+   "title": [
+    "MQTT：发布与订阅",
+    "MQTT: publish and subscribe"
+   ],
+   "points": [
+    [
+     "设备把消息发布到主题，看板、MES、数据库各自订阅，由代理转发；双方互不认识",
+     "Devices publish to topics, dashboards, MES and databases each subscribe, and a broker forwards; neither side knows the other"
+    ],
+    [
+     "加一个看板或换数据库，设备一侧不用改；消息头小，无线和小模块跑得动",
+     "Adding a dashboard or changing the database needs no change on the device; small headers suit Wi-Fi and small modules"
+    ],
+    [
+     "QoS 0 最多一次、1 至少一次、2 恰好一次；计数和事件一般用 1",
+     "QoS 0 at most once, 1 at least once, 2 exactly once; counters and events normally use 1"
+    ],
+    [
+     "QoS 1 会重复：接收方按消息内容里的唯一编号去重，不能用报文标识符",
+     "QoS 1 can duplicate: the receiver de-duplicates by the unique ID inside the message, not by the packet identifier"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_mqtt.png",
+   "narration": [
+    "车间设备联网用得最多的协议之一是 MQTT。它像一个邮局：每台设备把消息发布到一个主题上，比如“3 号线 7 号工位 / 状态”，并不关心谁来收；看板、车间管理系统、数据库各自订阅关心的主题，由中间的代理转发。设备和应用互不认识，所以加一个看板、换一个数据库，设备一侧都不用改。服务质量分三级，计数和事件一般用 1 级，至少送到一次，代价是可能重复。重复了怎么办？接收方按消息内容里自带的唯一编号去重。注意 MQTT 报文本身的标识符会被反复使用，不能拿来去重，这是现场常犯的错。",
+    "One of the most widely used protocols for connecting shop-floor equipment is MQTT. It works like a post office: each machine publishes messages to a topic, such as 'line 3 station 7 / status', without caring who receives them; dashboards, the shop-floor management system and databases each subscribe to the topics they need, and a broker in the middle forwards. Machines and applications do not know each other, so adding a dashboard or changing a database needs no change on the machine side. Quality of service has three levels; counters and events normally use level 1, delivered at least once, at the price of possible duplicates. How do we handle duplicates? The receiver de-duplicates by the unique ID carried inside the message. Note that MQTT's own packet identifier is reused, so it cannot be used for de-duplication, a common mistake."
+   ]
+  },
+  {
+   "title": [
+    "保留消息、遗嘱消息和通配符",
+    "Retained messages, will messages and wildcards"
+   ],
+   "points": [
+    [
+     "保留消息：代理为每个主题只存最新一条，新打开的看板马上拿到每台机器的当前状态",
+     "Retained message: the broker keeps the latest per topic, so a newly opened dashboard gets every machine's current state at once"
+    ],
+    [
+     "遗嘱消息：连接时预留“我掉线了”，心跳超时（几十秒）后代理代发；设成保留、发到状态主题，看板显示“离线”",
+     "Will message: left at connect time, sent by the broker after the keep-alive times out (tens of seconds); retained on the state topic, the dashboard shows 'offline'"
+    ],
+    [
+     "正常下线不触发遗嘱，设备要自己先发离线状态",
+     "A clean disconnect does not fire the will; the device must publish its offline state first"
+    ],
+    [
+     "通配符：+ 匹配一层，# 匹配其后所有层且只能在末尾；wq/shirt/sewing/+/status 拿到全车间状态",
+     "Wildcards: + matches one level, # matches all remaining levels and only at the end; wq/shirt/sewing/+/status gets every state on the floor"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "MQTT 有几个功能对车间特别有用。保留消息：代理为每个主题存最新的一条，新打开的看板一连上就拿到每台机器的当前状态，不用等它下一次变化。遗嘱消息：设备连接时预先留下一条“我掉线了”，网络断了或断电，代理在心跳超时以后替它发出。把遗嘱也设成保留、发到状态主题上，看板上这台机器就显示离线，而不是一直停在最后的“运行”。所以机器长时间显示运行却没有件数，先查它是不是掉线了。还要注意，设备正常下线不会触发遗嘱，要自己先发一条离线状态。订阅时用加号匹配一层，井号匹配后面所有层。",
+    "Some MQTT features are especially useful on the floor. A retained message: the broker keeps the latest message for each topic, so a newly opened dashboard gets every machine's current state on connecting, without waiting for the next change. A will message: when it connects, the device leaves an 'I have dropped off' message, and if the network or power fails the broker sends it after the keep-alive times out. Make the will retained and publish it to the state topic, and the dashboard shows the machine offline instead of frozen at its last 'running'. So if a machine shows running for a long time with no pieces, first check whether it has dropped off. Note too that a clean disconnect does not fire the will, so the device must publish its offline state itself. In subscriptions, plus matches one level and hash matches everything below."
+   ]
+  },
+  {
+   "title": [
+    "统一命名空间与消息信封",
+    "The unified namespace and the message envelope"
+   ],
+   "points": [
+    [
+     "按 ISA-95 层级命名：工厂 / 车间 / 产线工位 / 类别，全厂系统在同一棵主题树上发布订阅",
+     "Name topics by the ISA-95 hierarchy: plant / area / line-station / category; every system publishes and subscribes on one topic tree"
+    ],
+    [
+     "问渠数字工厂：wq/工厂/区域/单元/类别；3 号线 7 号工位状态 = wq/shirt/sewing/l03-07/status",
+     "WenQuest Digital Factory: wq/plant/area/unit/category; line 3 station 7 state = wq/shirt/sewing/l03-07/status"
+    ],
+    [
+     "信封：版本、消息编号、UTC 时间、类型、来源、模式、关联工单，业务放 data，单位写进字段名",
+     "Envelope: version, message ID, UTC time, type, source, mode, linked work order; business content in data, units in field names"
+    ],
+    [
+     "“只增加、不改动”：为缝纫机新增 counter 类别和 offline 状态；仿真与真实设备只差 source",
+     "'Add, never change': a counter category and an offline state added for sewing machines; simulated and real machines differ only in source"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "主题怎么命名，决定了数据好不好找。一种做法是按 ISA-95 的企业层级，工厂、车间、产线、工位一层层往下，所有系统都在这一棵主题树上发布和订阅，叫统一命名空间。它还意味着代理是全厂唯一的实时数据源，系统之间不再两两对接。问渠数字工厂就是这么做的，每条消息外面有一个统一的信封，里面有版本、编号、时间、类型、来源、模式、关联工单号，业务内容放 data 里。为缝纫机，本章按“只增加、不改动”的原则加了计数类别和离线状态。仿真的缝纫机和真实的发同样格式，只是来源字段不同。",
+    "How topics are named decides how easy the data are to find. One approach follows the ISA-95 enterprise hierarchy, plant, area, line and station level by level, with every system publishing and subscribing on this single topic tree: the unified namespace. It also makes the broker the plant's single real-time source of data, instead of point-to-point links between systems. The WenQuest Digital Factory works this way: each message sits in a common envelope with version, ID, time, type, source, mode and linked work order, and the business content goes in data. For sewing machines this chapter adds a counter category and an offline state, following the rule 'add, never change'. Simulated and real machines send the same format; only the source field differs."
+   ]
+  },
+  {
+   "title": [
+    "OPC UA 与两种协议的分工",
+    "OPC UA and how the two protocols share the work"
+   ],
+   "points": [
+    [
+     "OPC UA：数据点挂在信息模型上，带名称、单位、类型和所属部件，客户端可浏览",
+     "OPC UA: each data point hangs on an information model with name, unit, type and owning component; clients can browse it"
+    ],
+    [
+     "行业配套规范统一某类设备的模型；缝纫机还没有专门规范，可先用 Machinery 通用模型",
+     "Companion specifications standardise models for a device class; sewing machines have none yet, so use the generic Machinery model"
+    ],
+    [
+     "设备到网关、网关到平台：数据量大、设备多、网络差，多用 MQTT",
+     "Device to gateway, gateway to platform: high volume, many devices, poor networks, so mostly MQTT"
+    ],
+    [
+     "需要被浏览、读写参数的高端设备和系统间对接用 OPC UA 或网页接口",
+     "High-end equipment whose parameters must be browsed and written, and system-to-system links, use OPC UA or web APIs"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "另一种常用的工业通信标准是 OPC UA。它的特点是传数据还传“这个数是什么”：每个数据点挂在一个信息模型上，带着名称、单位、类型，属于哪台设备的哪个部件，客户端连上就能浏览整个模型。缝纫机还没有专门的配套规范，可以先用 Machinery 通用模型描述识别信息和状态。两者不互相排斥。设备多、网络条件差的那一段多用 MQTT；需要被别的系统浏览、读写参数的高端设备，或者系统和系统之间，用 OPC UA 或网页接口。对缝纫机这种大量、廉价、数据简单的设备，MQTT 加统一主题和格式往往就够了。",
+    "Another widely used industrial standard is OPC UA. It sends not only values but also what each value is: every data point hangs on an information model with its name, unit, type and the component of the machine it belongs to, and a client can browse the whole model on connecting. Sewing machines have no companion specification yet, so the generic Machinery model can describe identity and state for now. The two are not rivals. For the stretch with many devices, simple data and poor networks, MQTT is the usual choice; for high-end equipment whose parameters other systems must browse and write, or between systems, OPC UA or web APIs. For large numbers of cheap, simple sewing machines, MQTT with a common topic scheme and format is usually enough."
+   ]
+  },
+  {
+   "title": [
+    "一台机器一个班次有多少数据",
+    "How much data one machine produces in a shift"
+   ],
+   "points": [
+    [
+     "算例：约 569 件，主轴转动约 120 min，约 36 万针，剪线约 1750 次",
+     "Example: about 569 pieces, spindle turning about 120 min, about 360 000 stitches, about 1750 trims"
+    ],
+    [
+     "每针一条：36 万条；每次踏板启停和剪线各一条：约 8600 条",
+     "One message per stitch: 360 000; one per pedal start, stop and trim: about 8600"
+    ],
+    [
+     "每件汇总一条：约 600 条；每分钟汇总一条：约 480 条",
+     "One per piece: about 600; one per minute: about 480"
+    ],
+    [
+     "事件图：主轴转动、剪线、断线、等活在一刻钟里交错出现",
+     "The event chart: spindle runs, trims, thread breaks and waiting interleave within a quarter-hour"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_events.png",
+   "narration": [
+    "先算一台机器。按本讲算例，这台平缝机一个班次缝约 569 件，主轴转动约 120 分钟，平均每分钟 3000 针，就是约 36 万针，剪线约 1750 次。看图，这是它一刻钟里的事件：蓝条是主轴在转，短线是剪线，中间夹着断线和等活。如果每一针都报一条消息，一个班次就是 36 万条；每次踩下、松开踏板和每次剪线各报一条，约 8600 条；每缝完一件报一条汇总，约 600 条；每分钟报一条，约 480 条。同一台机器，上报方式不同，消息数差了将近一千倍。下一页把它乘到整个车间。",
+    "Start with one machine. In our example this lockstitch machine sews about 569 pieces in a shift, the spindle turns about 120 minutes at an average of 3000 stitches a minute, so about 360 000 stitches, and it trims about 1750 times. The figure shows a quarter-hour of its events: blue bars are the spindle turning, short marks are trims, with thread breaks and waiting in between. Report every stitch and a shift is 360 000 messages; report each pedal press, release and trim and it is about 8600; one summary per finished piece, about 600; one per minute, about 480. For the same machine the message count differs by nearly a thousand times depending on how we report. The next slide multiplies it by a whole floor."
+   ]
+  },
+  {
+   "title": [
+    "上报策略：边缘汇总，事件即报",
+    "Reporting strategy: aggregate at the edge, report events at once"
+   ],
+   "points": [
+    [
+     "500 台、两班、300 天、250 B/条：每针上报约 6200 条/s、27 TB/年；踏板与剪线约 150 条/s、650 GB/年",
+     "500 machines, two shifts, 300 days, 250 B/message: per stitch about 6200 msg/s and 27 TB/yr; pedal and trim about 150 msg/s and 650 GB/yr"
+    ],
+    [
+     "每件汇总约 10 条/s、45 GB/年；每分钟汇总约 8 条/s、36 GB/年；每 10 分钟汇总不到 1 条/s，但停机 10 分钟后才显示",
+     "Per piece about 10 msg/s and 45 GB/yr; per minute about 8 msg/s and 36 GB/yr; every 10 minutes under 1 msg/s, but stoppages show 10 minutes late"
+    ],
+    [
+     "判据：≤ 500 条/s、≤ 100 GB/年、停机 5 s 内显示、件数 1 min 内更新",
+     "Criteria: ≤ 500 msg/s, ≤ 100 GB/yr, stoppages shown within 5 s, counts updated within 1 min"
+    ],
+    [
+     "计数在边缘汇总，状态变化立即单独上报；高峰按平均的几倍留余量",
+     "Aggregate counters at the edge and report state changes at once; size for peaks several times the average"
+    ]
+   ],
+   "formula": "\\text{rate}=\\frac{\\text{msgs per machine per shift}\\times N}{\\text{shift seconds}}",
+   "figure": "fig_19_traffic.png",
+   "narration": [
+    "乘上整个车间：500 台缝纫机，每天两班，每年 300 天，每条消息按 250 字节。每针上报，平均每秒 6000 多条，一年 27 TB，而这些数据绝大部分没人看。每次踏板启停和剪线都报，每秒约 150 条，一年 650 GB。每件汇总每秒约 10 条、45 GB；每分钟汇总每秒约 8 条、36 GB。反过来每 10 分钟才汇总一次，每秒不到 1 条，可停机要 10 分钟后才显示，失去了实时的意义。合理的做法是两条腿走路：计数在机器或网关上先汇总，每件或每分钟报一次累计值；状态变化在发生时立即单独上报。这样四条判据都能满足。",
+    "Now multiply by the floor: 500 sewing machines, two shifts a day, 300 days a year, 250 bytes per message. Reporting every stitch gives over 6000 messages a second on average and 27 TB a year, most of which nobody will ever look at. Reporting every pedal start, stop and trim gives about 150 a second and 650 GB a year. Per-piece summaries give about 10 a second and 45 GB; per-minute summaries about 8 a second and 36 GB. Go the other way and summarise every 10 minutes: under one message a second, but a stoppage appears 10 minutes late, which defeats real time. The sensible approach walks on two legs: aggregate counters on the machine or gateway and report the cumulative value per piece or per minute, and report state changes individually the moment they happen. That meets all four criteria."
+   ]
+  },
+  {
+   "title": [
+    "件数和缝纫时间比例",
+    "Piece counts and the sewing-time ratio"
+   ],
+   "points": [
+    [
+     "数件三法：剪线次数 ÷ 每件段数；扫工票；吊挂衣架经过工位读编号",
+     "Three ways to count: trims ÷ seams per piece; scanning tickets; reading hanger IDs as they pass the station"
+    ],
+    [
+     "缝纫时间比例 = 主轴真正转动时间 / 计划时间；算例约 120/450 ≈ 27%",
+     "Sewing-time ratio = time the spindle actually turns / planned time; about 120/450 ≈ 27% in the example"
+    ],
+    [
+     "其余时间在拿布、对齐、翻面、放下——标准工时里本来就包括",
+     "The rest is picking up, aligning, turning and putting down, already included in the standard minute value"
+    ],
+    [
+     "不能当“机器利用率”考核工人；要靠工位布置、辅助工具和自动单元减少拿放时间",
+     "Do not use it to judge operators as 'machine utilisation'; reduce handling through workstation layout, aids and automatic units"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "数据送上来以后算什么？最省事的是数剪线：剪线次数除以每件段数就是件数；另外两种是扫工票、数吊挂衣架。第二个容易得到也最容易被误读的数，是缝纫时间比例：主轴真正转动的时间占计划时间多少。算例里操作工按标准的 85% 效率干活，主轴只转了约 120 分钟，占计划时间约 27%。其余时间在拿布、对齐、翻面、放下衣片，这本来就是缝纫工作的一部分，标准工时里已经包括了。所以它不能拿来考核“机器利用率”，要提高它，靠的是工位布置、辅助工具和自动单元，而不是让工人踩快一点。",
+    "Once the data arrive, what do we compute? The cheapest way is counting trims: trims divided by seams per piece gives pieces; the other two ways are scanning tickets and counting hangers. The second number, easy to get and easy to misread, is the sewing-time ratio: the share of planned time in which the spindle really turns. In the example the operator works at 85% of standard and the spindle turns only about 120 minutes, about 27% of planned time. The rest goes on picking up, aligning, turning and putting down the pieces, which is part of sewing and already inside the standard minute value. So it must not be used to judge 'machine utilisation'; raising it is a matter of layout, aids and automatic units, not of pressing the pedal faster."
+   ]
+  },
+  {
+   "title": [
+    "设备综合效率 OEE",
+    "Overall equipment effectiveness (OEE)"
+   ],
+   "points": [
+    [
+     "A 扣停机：等活 25、故障 12、断线约 11 min，运行 401.75/450 ≈ 89.3%",
+     "A deducts stoppages: waiting 25, faults 12, thread breaks about 11 min; run time 401.75/450 ≈ 89.3%"
+    ],
+    [
+     "P 扣速度损失：应做 670 件，实做约 569 件，P = 85%；Q 扣返修：97%",
+     "P deducts speed loss: 670 pieces due, about 569 made, P = 85%; Q deducts rework: 97%"
+    ],
+    [
+     "OEE ≈ 73.6% = 合格件数 × 标准工时 / 计划时间；最大损失是速度（约 60 min）",
+     "OEE ≈ 73.6% = good pieces × standard minute value / planned time; the biggest loss is speed (about 60 min)"
+    ],
+    [
+     "P 用含手工的标准工时，衡量的是操作效率；手工工位的 OEE 不能和自动设备直接比",
+     "P uses a standard minute value that includes handling, so it measures operator efficiency; a manual station's OEE cannot be compared directly with an automatic machine's"
+    ]
+   ],
+   "formula": "OEE=A\\times P\\times Q=\\frac{\\text{run time}}{\\text{planned time}}\\times\\frac{\\text{pieces}\\times\\text{SAM}}{\\text{run time}}\\times\\frac{\\text{good pieces}}{\\text{pieces}}",
+   "figure": "fig_19_oee.png",
+   "narration": [
+    "衡量一个工位的综合表现用 OEE，它把计划时间里的损失分成三类。时间开动率 A 扣掉停机：等活 25 分钟、故障 12 分钟、断线约 11 次每次 1 分钟，450 分钟里运行约 402 分钟，A 约 89.3%。性能开动率 P 扣掉速度损失：运行时间里按标准工时应做 670 件，实际做了约 569 件，P 是 85%。合格品率 Q 扣掉返修，97%。三者相乘约 73.6%，也就是合格件数乘标准工时再除以计划时间。最大的损失是速度，约 60 分钟。提醒一点：这里的 P 用的标准工时包括手工拿放，衡量的其实是操作效率，不能和自动设备的 OEE 直接比较。",
+    "To measure a workstation's overall performance we use OEE, which splits the losses in planned time into three kinds. Availability A deducts stoppages: 25 minutes waiting, 12 minutes of faults and about 11 thread breaks at a minute each, leaving about 402 minutes of run time out of 450, so A is about 89.3%. Performance P deducts speed loss: at standard the run time should give 670 pieces, but about 569 were made, so P is 85%. Quality Q deducts rework: 97%. Multiplied, about 73.6%, which is also good pieces times standard minute value divided by planned time. The largest loss is speed, about 60 minutes. A caution: P here uses a standard minute value that includes handling, so it really measures operator efficiency and cannot be compared directly with an automatic machine's OEE."
+   ]
+  },
+  {
+   "title": [
+    "案例：用剪线次数数件，为什么数不准",
+    "Case: why counting pieces by trims goes wrong"
+   ],
+   "points": [
+    [
+     "多剪线：返工重缝每件 5% 多剪一次，约 11 次断线各多一次 → 1747 次 ÷ 3 ≈ 582 件，多算约 2.3%",
+     "Extra trims: 5% of pieces re-sewn add one each, about 11 thread breaks add one each → 1747 ÷ 3 ≈ 582 pieces, about 2.3% too many"
+    ],
+    [
+     "偏少：一段中途剪线、用手剪刀；每件段数越少，一次多余剪线误差越大",
+     "Too few: mid-seam trims or hand scissors; the fewer seams per piece, the larger the error from one extra trim"
+    ],
+    [
+     "工票：每扎 20 件，2% 的扎漏扫就少 2%，整扎地少；衣架计数最准",
+     "Tickets: 20 per bundle, 2% of bundles missed means 2% too few, a whole bundle at a time; hanger counts are the most accurate"
+    ],
+    [
+     "以衣架或工票为准记件，用剪线和主轴时间核对；剪线计数反映返工和断线",
+     "Count by hanger or ticket, cross-check with trims and spindle time; trim counts reveal rework and thread breaks"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_count.png",
+   "narration": [
+    "这是一个按原理编写的案例。某车间按剪线次数除以每件段数统计件数，再按件数发计件工资。一个月后工人反映统计数比工票多，可仓库成品和工票对得上。原因是不是每次剪线都对应一段缝完：缝错了拆掉重缝要多剪一次；断线以后重新起缝，前面那段也要剪。算例每件有 5% 的概率多剪一次，加上约 11 次断线，剪线约 1747 次，除以 3 得 582 件，比实际 569 多 2.3%。工票的误差来自漏扫，整扎整扎地少。实际做法是几种数据互相核对：以衣架或工票为准，剪线次数用来看返工和断线是不是多了。",
+    "This case is written from principles. A shop counted pieces as trims divided by seams per piece and paid piece rates on that count. A month later operators reported counts above their tickets, yet warehouse receipts matched the tickets. Not every trim means a finished seam: a mistake unpicked and re-sewn adds a trim, and after a thread break the operator restarts and trims off the previous bit. In the example 5% of pieces get an extra trim, plus about 11 thread breaks, giving about 1747 trims; divided by 3 that is 582 pieces, 2.3% more than the actual 569. Ticket errors come from missed scans, a whole bundle at a time. In practice the sources are cross-checked: count by hanger or ticket, and use trims to see whether rework and thread breaks are rising."
+   ]
+  },
+  {
+   "title": [
+    "MES 对接与数字孪生",
+    "MES integration and the digital twin"
+   ],
+   "points": [
+    [
+     "ERP 订单 → MES 拆成工单和工序派到工位 → 缝纫机和吊挂报工 → 回 ERP 算工时、计件工资和成本",
+     "ERP order → MES splits it into work orders and operations dispatched to stations → machines and hangers report completion → back to ERP for hours, piece pay and cost"
+    ],
+    [
+     "问渠做法：所有系统只和统一数据总线打交道，桥接程序在总线和 ERP 之间转换字段",
+     "The WenQuest way: every system talks only to the unified data bus, with a bridge translating fields between bus and ERP"
+    ],
+    [
+     "数字孪生第一层：实时镜像，每台机器、每个工位、每个衣架都有虚拟对象",
+     "Digital twin, layer one: a real-time mirror with a virtual object for every machine, station and hanger"
+    ],
+    [
+     "第二层：仿真预测，从当前状态“快进”几小时，试加人、改派工规则哪种最好",
+     "Layer two: predictive simulation, fast-forwarding a few hours from the current state to test adding an operator or changing dispatch rules"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_mes.png",
+   "narration": [
+    "缝纫机的数据只有和生产计划对上才有意义。MES 从 ERP 拿到订单，拆成工单和工序，派到产线和工位；缝纫机和吊挂报上来的件数和状态就是工序的完成情况，再回到 ERP 核算工时、计件工资和成本。问渠数字工厂的做法是所有系统只和统一数据总线打交道，由桥接程序在总线和 ERP 之间转换字段。数字孪生有两层意思。第一层是实时镜像，状态随总线消息实时更新。第二层是仿真预测：用当前实际状态作起点，把后面几个小时快进一遍，提前看到哪道工序会堵、哪张订单会延期，再比较几种调整方案。",
+    "Sewing-machine data mean something only when matched to the production plan. MES takes orders from ERP, splits them into work orders and operations, and dispatches them to lines and stations; the counts and states reported by machines and hangers are the completion of those operations, which flow back to ERP for hours, piece pay and cost. In the WenQuest Digital Factory every system deals only with the unified data bus, with a bridge program translating fields between the bus and ERP. A digital twin has two layers. The first is a real-time mirror whose states update with bus messages. The second is predictive simulation: starting from the actual current state, fast-forward the next few hours to see which operation will jam and which order will be late,, then compare adjustments."
+   ]
+  },
+  {
+   "title": [
+    "远程运维、网络安全与个人数据",
+    "Remote service, network security and personal data"
+   ],
+   "points": [
+    [
+     "远程看故障码、下发参数；固件远程升级用双区升级、分批推送，能回退",
+     "Read fault codes and push parameters remotely; remote firmware updates use dual-bank updating, staged roll-out and rollback"
+    ],
+    [
+     "安全：设备网与办公网分开、通信加密、每台设备单独账号、按主题授权、指令和改参有记录、固件签名校验",
+     "Security: separate device and office networks, encrypted links, one account per device, per-topic authorisation, logged commands and parameter changes, signed firmware"
+    ],
+    [
+     "个人数据：按《个人信息保护法》事先告知目的、方式和范围，只采必要数据；人力资源管理所必需可不经同意，但仍须告知",
+     "Personal data: under China's Personal Information Protection Law, tell workers the purpose, means and scope in advance and collect only what is needed; processing necessary for HR may proceed without consent but still requires notice"
+    ],
+    [
+     "统计展示尽量按工位或工序；设备企业看到的生产数据归属写进合同",
+     "Report by station or operation rather than by person where possible; put ownership of production data seen by the equipment maker into the contract"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "联网以后，设备厂家和工厂设备部门可以远程看故障码和运行记录，不到现场就能判断大部分问题；换款时参数一次推给整条线。固件远程升级要用第 18 章的双区升级，分批推送，先升几台，确认正常再推全车间，出问题能退回旧版本。安全方面几条基本措施：设备网和办公网分开，通信加密，每台设备单独账号，按主题授权，一台缝纫机只能往自己的主题上写，指令和改参都有记录。最后是个人数据：谁几点开始干活、每件用了多少秒，这是操作工的个人信息，要事先告知目的、方式和范围，只采必要的，展示时尽量按工位而不是个人。",
+    "Once connected, the equipment maker and the factory's maintenance team can read fault codes and run histories remotely and diagnose most problems without a site visit; at a style change the settings can be pushed to a whole line at once. Remote firmware updates should use the dual-bank scheme of Chapter 18 and a staged roll-out: update a few machines first, confirm they are fine, then the whole floor, with a way back to the old version. For security, a few basics: separate the device network from the office network, encrypt the links, give every machine its own account, authorise by topic so a sewing machine can write only to its own topics, and log every command and parameter change. Finally, personal data: who starts work when and how many seconds each piece takes is the operator's personal information; tell workers the purpose, means and scope in advance, collect only what is needed, and display by station rather than by person where possible."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "控制器已经知道针数、剪线、断线、故障和转速；谁在缝、缝哪一件要靠刷卡和工票、衣架编号补上。",
+   "The controller already knows stitches, trims, thread breaks, faults and speed; who is sewing and which piece come from badges, tickets and hanger IDs."
+  ],
+  [
+   "设备数据分识别、状态、计数、事件四类；计数报累计值，接收方按消息编号去重、识别归零。",
+   "Machine data split into identity, state, counters and events; counters are reported cumulatively, and the receiver de-duplicates by message ID and detects resets."
+  ],
+  [
+   "MQTT 发布订阅加统一命名空间，让代理成为全厂唯一的实时数据源；保留消息给当前状态，遗嘱消息标出离线。",
+   "MQTT publish/subscribe with a unified namespace makes the broker the plant's single real-time source; retained messages give current state and will messages mark machines offline."
+  ],
+  [
+   "计数在边缘汇总、状态变化即报：500 台从每针上报的 27 TB/年降到约 36–45 GB/年，仍能 5 s 内显示停机。",
+   "Aggregate counters at the edge and report state changes at once: 500 machines drop from 27 TB/yr reporting every stitch to about 36–45 GB/yr, still showing stoppages within 5 s."
+  ],
+  [
+   "OEE = A × P × Q；缝纫时间比例低不等于工人偷懒；剪线计数偏多，要以衣架或工票为准、互相核对。",
+   "OEE = A × P × Q; a low sewing-time ratio does not mean idle operators; trim counts run high, so count by hanger or ticket and cross-check."
+  ],
+  [
+   "数字孪生 = 实时镜像 + 仿真预测；远程运维要能回退，联网要分网、加密、按主题授权，并依法处理个人数据。",
+   "Digital twin = real-time mirror + predictive simulation; remote service needs rollback, and connectivity needs separate networks, encryption, per-topic authorisation and lawful handling of personal data."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "iot",
+   "no": "26-1",
+   "title": [
+    "缝纫机联网：事件、指标与数据量",
+    "Connected sewing machines: events, metrics and data volume"
+   ],
+   "goal": [
+    [
+     "看一台缝纫机 15 分钟的事件流怎样变成一个班次的件数、OEE 分解和总线消息。",
+     "See how a 15-minute event stream from one sewing machine becomes a shift's piece count, OEE breakdown and bus messages."
+    ],
+    [
+     "比较三种计件方法的误差，找出不改工况使统计误差小于 1% 的办法。",
+     "Compare the errors of three counting methods and find a way to keep the count error under 1% without changing working conditions."
+    ],
+    [
+     "比较五种上报方式的消息率、年存储量和延迟，选出满足 500 台四项判据的方式。",
+     "Compare message rate, annual storage and latency for five reporting strategies and choose one that meets all four criteria for 500 machines."
+    ]
+   ],
+   "theory": [
+    [
+     "运行时间 = 计划时间 − 等活 − 故障 − 断线处理；件数 = 运行时间 × 操作效率 / 标准工时；主轴转动时间 = 件数 × 标准工时 × 转动比例，平均 3000 针/min。",
+     "Run time = planned time − waiting − faults − thread-break handling; pieces = run time × operator efficiency / standard minute value; spindle time = pieces × SAM × running fraction, at an average of 3000 stitches/min."
+    ],
+    [
+     "OEE = A × P × Q：A = 运行时间 / 计划时间，P = 件数 × 标准工时 / 运行时间，Q = 合格件数 / 件数。",
+     "OEE = A × P × Q: A = run time / planned time, P = pieces × SAM / run time, Q = good pieces / pieces."
+    ],
+    [
+     "按剪线数件 = 剪线次数 / 每件段数；多余剪线来自返工重缝和断线后重新起缝。工票每扎 20 件，漏扫按扎计；衣架计数视为准确。",
+     "Count by trims = trims / seams per piece; extra trims come from re-sewing and restarting after thread breaks. Tickets are 20 per bundle and missed scans lose whole bundles; hanger counts are taken as exact."
+    ],
+    [
+     "平均消息率 = 每台每班消息数 × 台数 / 班次秒数；年存储 = 消息数 × 台数 × 班数 × 300 天 × 每条字节数。判据：≤ 500 条/s、≤ 100 GB/年、状态延迟 ≤ 5 s、件数延迟 ≤ 60 s。",
+     "Average message rate = messages per machine per shift × machines / shift seconds; annual storage = messages × machines × shifts × 300 days × bytes per message. Criteria: ≤ 500 msg/s, ≤ 100 GB/yr, state latency ≤ 5 s, count latency ≤ 60 s."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页第①页“一台机器的一个班次”，点“恢复标准”。读出结果栏的实际件数、统计件数（按剪线次数）及其误差、A、P、Q、OEE 和主轴转动时间，记入表格。",
+     "Open page ① 'One shift on one machine' and click Reset to standard. Read the actual pieces, the counted pieces (by trims) and its error, A, P, Q, OEE and spindle time from the results panel and record them."
+    ],
+    [
+     "点几次“换一段”，看事件流里主轴转动、剪线、断线、等活和故障怎样交错；数一数这一段的件数和剪线次数，说明为什么剪线数 ÷ 段数会偏多。",
+     "Click 'Next segment' a few times and watch how spindle runs, trims, thread breaks, waiting and faults interleave; count the pieces and trims in one segment and explain why trims ÷ seams runs high."
+    ],
+    [
+     "对照 OEE 瀑布图，找出最大的两项损失；查看下方按问渠信封格式生成的 counter 消息，指出主题、type 和 data 里的累计字段。",
+     "Use the OEE waterfall to find the two largest losses; look at the counter message generated below in the WenQuest envelope format and identify the topic, type and the cumulative fields in data."
+    ],
+    [
+     "不改工时、效率、断线、返修和多剪线概率，只改“件数怎样数”：依次选“扫工票（每扎 20 件）”和“吊挂衣架计数”，再调“工票漏扫概率”，使统计误差小于 1%（任务 2）。",
+     "Without changing SAM, efficiency, thread breaks, rework or extra-trim probability, change only 'How pieces are counted': choose 'scan tickets (20 per bundle)' then 'hanger count', and adjust the ticket miss probability, until the count error is under 1% (task 2)."
+    ],
+    [
+     "把“每件缝几段”从 3 调到 1 和 6（做完后恢复标准），记下按剪线计数的误差变化。",
+     "Change 'seams per piece' from 3 to 1 and to 6 (reset afterwards) and record how the trim-count error changes."
+    ],
+    [
+     "切到第②页“全车间的数据量”，保持 500 台、250 B、两班，依次选五种上报方式，记下消息率、年存储、状态延迟和件数延迟。",
+     "Switch to page ② 'Data volume for the whole floor', keep 500 machines, 250 B and two shifts, select each of the five reporting strategies and record message rate, annual storage, state latency and count latency."
+    ],
+    [
+     "选出四项判据全部满足的方式（任务 1）；再把台数调到 2000、每天班数调到 3，看哪种方式还能满足。",
+     "Choose a strategy that meets all four criteria (task 1); then set 2000 machines and 3 shifts a day and see which strategies still pass."
+    ],
+    [
+     "按任务 3 的班次数据（计划 450 min，等活 40、故障 20、断线处理 15 min，标准工时 0.5 min，600 件，18 件返修）手算 OEE，填入百分数并点“核对”。",
+     "Using the task 3 shift data (planned 450 min, waiting 40, faults 20, thread-break handling 15 min, SAM 0.5 min, 600 pieces, 18 reworked), calculate OEE by hand, enter the percentage and click Check."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "计件方法与上报方式记录",
+     "Counting methods and reporting strategies"
+    ],
+    "headers": [
+     [
+      "页面 / 设置",
+      "Page / setting"
+     ],
+     [
+      "件数或消息率",
+      "Pieces or message rate"
+     ],
+     [
+      "误差或年存储",
+      "Error or annual storage"
+     ],
+     [
+      "延迟（状态 / 件数）",
+      "Latency (state / count)"
+     ],
+     [
+      "OEE",
+      "OEE"
+     ],
+     [
+      "是否满足判据",
+      "Meets criteria?"
+     ]
+    ],
+    "rows": 10
+   },
+   "questions": [
+    [
+     "按剪线数件为什么总是偏多？每件段数从 3 改到 1 时误差怎样变，为什么？",
+     "Why does counting by trims always run high? How does the error change when seams per piece goes from 3 to 1, and why?"
+    ],
+    [
+     "“每件汇总”和“每分钟汇总”都满足判据，为什么还必须加上“状态变化即报”？如果只用“每 10 分钟汇总”，看板会出现什么问题？",
+     "Per-piece and per-minute summaries both pass; why must 'report state changes at once' be added? With 10-minute summaries only, what would the dashboard get wrong?"
+    ],
+    [
+     "任务 3 的 OEE 为什么也等于“合格件数 × 标准工时 / 计划时间”？这个班次最大的损失是哪一项？",
+     "Why does task 3's OEE also equal good pieces × SAM / planned time? Which loss is largest in that shift?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "一条缝制线的联网方案与班次分析",
+   "Connectivity plan and shift analysis for a sewing line"
+  ],
+  "tasks": [
+   [
+    "某工位一个班次 480 min、休息 30 min；等活 40 min，设备故障 20 min，断线每小时 2 次、每次 1 min；标准工时 0.75 min/件，操作效率 80%，返修 4%。每件缝 4 段，每件有 6% 的概率因返工多剪一次线，断线后重新起缝也多剪一次。求运行时间、件数、A、P、Q、OEE，以及按剪线次数统计的件数和误差；画出（或列出）损失分解，指出最该先改进的一项并说明理由。",
+    "A station works a 480 min shift with a 30 min break; waiting 40 min, faults 20 min, thread breaks 2 per hour at 1 min each; SAM 0.75 min/piece, operator efficiency 80%, rework 4%. Each piece has 4 seams; 6% of pieces get one extra trim from rework, and each thread break adds a trim on restart. Find run time, pieces, A, P, Q, OEE, and the trim-based count and its error; draw (or list) the loss breakdown and say which loss to tackle first, and why."
+   ],
+   [
+    "一个 300 台缝纫机的车间（每天两班、每年 300 天、每条消息 250 B）要上联网系统。选定上报方式，用第 1 题的工况估算每台每班消息数、全车间平均消息率和年存储量，并说明它是否满足“≤ 500 条/s、≤ 100 GB/年、停机 5 s 内显示、件数 1 min 内更新”。",
+    "A floor of 300 sewing machines (two shifts a day, 300 days a year, 250 B per message) is to be connected. Choose a reporting strategy and, using the conditions of task 1, estimate messages per machine per shift, the average floor message rate and annual storage, and show whether it meets ≤ 500 msg/s, ≤ 100 GB/yr, stoppages within 5 s and counts within 1 min."
+   ],
+   [
+    "为 2 号线 5 号工位设计主题（状态、事件、计数三类），写出一条 counter 消息的 JSON（按问渠信封格式），并说明哪一条用保留消息、遗嘱消息怎样设置，订阅全车间状态用什么通配符。",
+    "Design the topics for line 2 station 5 (state, event and counter), write one counter message in JSON (WenQuest envelope format), and explain which topic uses retained messages, how the will message is set up, and which wildcard subscribes to every state on the floor."
+   ],
+   [
+    "（简答）车间想把每个操作工的每件用时公开排名。结合本讲关于个人数据的内容，写出你的意见（不超过 300 字）。",
+    "(Short answer) The floor wants to publish a ranking of every operator's time per piece. Using this lesson's discussion of personal data, give your opinion (no more than 300 words)."
+   ]
+  ],
+  "deliverable": [
+   "一份不超过 5 页的报告（PDF）：第 1、2 题的计算过程和结论，第 3 题的主题表和 JSON，第 4 题的意见；可附虚拟实验 26-1 的截图核对。",
+   "A report of no more than 5 pages (PDF): calculations and conclusions for tasks 1 and 2, the topic table and JSON for task 3, and the opinion for task 4; screenshots from virtual lab 26-1 may be attached as checks."
+  ],
+  "rubric": [
+   [
+    "班次计算（A、P、Q、OEE、剪线计数误差）正确，损失分析有依据（35 分）",
+    "Shift calculations (A, P, Q, OEE, trim-count error) correct, with a reasoned loss analysis (35 points)"
+   ],
+   [
+    "上报方式的消息率、存储量计算正确，判据逐条核对（25 分）",
+    "Message rate and storage for the chosen strategy correct, with each criterion checked (25 points)"
+   ],
+   [
+    "主题与 JSON 符合统一命名空间和信封格式，保留与遗嘱设置正确（25 分）",
+    "Topics and JSON follow the unified namespace and envelope, with correct retained and will settings (25 points)"
+   ],
+   [
+    "个人数据意见合规、具体（15 分）",
+    "The personal-data opinion is lawful and specific (15 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "下面哪一项信息，电控缝纫机的控制器本身不知道、需要外加？",
+    "Which information does the controller of an electronic sewing machine not know by itself, so that it must be added?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "这一件是哪个订单、哪道工序、谁在缝",
+      "Which order, operation and operator this piece belongs to"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "这一段缝了多少针",
+      "How many stitches this seam has"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "剪了几次线",
+      "How many trims were made"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "报过什么故障码",
+      "Which fault codes occurred"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "针数、剪线、故障码都是控制器为完成自身工作本来就记录的；操作者和件号要靠工卡、工票条码或衣架编号。",
+    "Stitches, trims and fault codes are recorded by the controller for its own work; operator and piece identity come from badges, ticket barcodes or hanger IDs."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "计数类数据（针数、件数）上报累计值比上报增量更可靠，因为丢一条消息可以从下一条补回，重复收到也没有害处。",
+    "For counters (stitches, pieces), reporting cumulative values is more robust than increments, because a lost message is recovered from the next and duplicates do no harm."
+   ],
+   "correct": true,
+   "feedback": [
+    "累计值自带“到目前为止”的信息；接收方只需识别计数器归零（重启、换控制器、溢出）并接续。",
+    "A cumulative value carries 'so far' in itself; the receiver only has to detect counter resets (restart, controller swap, overflow) and continue."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "计数消息用 MQTT QoS 1 发送，接收方可能收到重复消息。应当怎样去重？",
+    "Counter messages are sent with MQTT QoS 1, so the receiver may get duplicates. How should it de-duplicate?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "按消息内容（信封）里自带的唯一编号",
+      "By the unique ID carried inside the message envelope"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "按 MQTT 报文的标识符",
+      "By the MQTT packet identifier"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "改用 QoS 0，就不会重复",
+      "Switch to QoS 0, which never duplicates"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "按到达时间，同一秒内的只留一条",
+      "By arrival time, keeping one per second"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "MQTT 报文标识符会被反复使用，不能去重；QoS 0 可能丢消息；按时间去重会误删真实消息。",
+    "MQTT packet identifiers are reused and cannot de-duplicate; QoS 0 can lose messages; de-duplicating by time would drop real messages."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于 MQTT 的保留消息和遗嘱消息，下列说法哪些正确？（选出所有正确项）",
+    "Which statements about MQTT retained and will messages are correct? (Select all that apply)"
+   ],
+   "answers": [
+    {
+     "text": [
+      "代理为每个主题只保存最新一条保留消息，新打开的看板马上能拿到当前状态",
+      "The broker keeps only the latest retained message per topic, so a new dashboard gets current state at once"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "遗嘱消息在设备掉线、心跳超时后由代理代发",
+      "A will message is sent by the broker after the device drops off and the keep-alive times out"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "把遗嘱设成保留并发到状态主题，看板会显示“离线”",
+      "Making the will retained on the state topic makes the dashboard show 'offline'"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "设备正常断开连接时也会自动触发遗嘱消息",
+      "A clean disconnect by the device also fires the will"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "保留消息会把一个主题的全部历史都存在代理里",
+      "Retained messages keep a topic's entire history on the broker"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "正常下线不触发遗嘱，设备要自己先发离线状态；保留消息每个主题只存最新一条，历史要靠历史库。",
+    "A clean disconnect does not fire the will, so the device must publish offline itself; retained messages keep only the latest per topic, and history belongs in the historian."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "在问渠数字工厂的主题规则下，看板要拿到缝制车间每台机器的状态，应订阅哪个主题？",
+    "Under the WenQuest topic rules, which topic should a dashboard subscribe to for the state of every machine on the sewing floor?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "主题 wq/shirt/sewing/+/status",
+      "Topic wq/shirt/sewing/+/status"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "主题 wq/shirt/sewing/#/status",
+      "Topic wq/shirt/sewing/#/status"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "主题 wq/shirt/sewing/l03-07/#",
+      "Topic wq/shirt/sewing/l03-07/#"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "主题 wq/shirt/+/status",
+      "Topic wq/shirt/+/status"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "+ 匹配单元这一层；# 只能放在末尾；第三项只拿到一个工位的所有类别；第四项少了一层，匹配不到。",
+    "+ matches the unit level; # may only appear at the end; the third gets all categories of one station; the fourth is a level short and matches nothing."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一台缝纫机平均每分钟缝 2500 针，一个班次主轴转动 100 min。若每针上报一条 250 字节的消息，一个班次的数据量是多少 MB（1 MB = 10⁶ 字节）？",
+    "A sewing machine averages 2500 stitches per minute and its spindle turns 100 min in a shift. If every stitch is reported as a 250-byte message, how many MB does one shift produce (1 MB = 10⁶ bytes)?"
+   ],
+   "answer": 62.5,
+   "tolerance": 0.5,
+   "unit": "MB",
+   "feedback": [
+    "2500 × 100 = 25 万针，× 250 B = 6.25×10⁷ B = 62.5 MB；每分钟汇总一条（450 条）只有约 0.11 MB。",
+    "2500 × 100 = 250 000 stitches, × 250 B = 6.25×10⁷ B = 62.5 MB; one summary per minute (450 messages) is only about 0.11 MB."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一个班次计划 450 min，停机共 50 min，标准工时 0.8 min/件，做了 400 件，其中 12 件返修。求 OEE（%）。",
+    "A shift has 450 min planned, 50 min of stoppages, SAM 0.8 min/piece, and 400 pieces made, 12 of them reworked. Find OEE (%)."
+   ],
+   "answer": 69.0,
+   "tolerance": 0.5,
+   "unit": "%",
+   "feedback": [
+    "A = 400/450 = 88.9%，P = 400 × 0.8 / 400 = 80%，Q = 388/400 = 97%，OEE ≈ 69.0%；也等于 388 × 0.8 / 450。",
+    "A = 400/450 = 88.9%, P = 400 × 0.8 / 400 = 80%, Q = 388/400 = 97%, OEE ≈ 69.0%; equally 388 × 0.8 / 450."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某工序每件缝 3 段、每段末尾剪线。一个班次做了 600 件，断线 10 次（每次多剪一次），另有 5% 的件返工重缝一段（多剪一次）。按剪线次数统计的件数比实际多百分之几？",
+    "An operation sews 3 seams per piece, trimming at the end of each. In one shift 600 pieces are made, with 10 thread breaks (one extra trim each) and 5% of pieces re-sewing one seam (one extra trim). By what percentage does the trim-based count exceed the actual?"
+   ],
+   "answer": 2.22,
+   "tolerance": 0.05,
+   "unit": "%",
+   "feedback": [
+    "剪线 = 600 × 3 + 30 + 10 = 1840 次，÷ 3 ≈ 613.3 件，比 600 多约 2.22%。",
+    "Trims = 600 × 3 + 30 + 10 = 1840, ÷ 3 ≈ 613.3 pieces, about 2.22% more than 600."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "算例中主轴真正转动的时间只占计划时间约 27%。对这个数字最恰当的理解是：",
+    "In the example the spindle actually turns only about 27% of planned time. The most appropriate reading of this figure is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "其余时间多数是拿布、对齐、翻面、放下，标准工时里本来就包括；要靠工位布置和辅助装置减少拿放时间",
+      "Most of the rest is picking up, aligning, turning and putting down, already in the standard minute value; reduce handling through layout and aids"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "操作工有七成时间在偷懒，应按这个比例考核",
+      "Operators idle seven-tenths of the time and should be judged on this ratio"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "缝纫机最高转速太低，应换更快的机器",
+      "The machine's top speed is too low and a faster one is needed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "它就是这台设备的 OEE",
+      "It is this machine's OEE"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "缝纫时间比例低是缝纫工作的特点，不能当机器利用率去考核工人；OEE 是另一回事（算例约 73.6%）。",
+    "A low sewing-time ratio is inherent in sewing and must not be used to judge operators as machine utilisation; OEE is a different measure (about 73.6% in the example)."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "800 台缝纫机都按“每分钟汇总一条”上报计数（暂不计状态消息），全车间平均每秒多少条消息？",
+    "800 sewing machines each report counters as one summary per minute (ignoring state messages). How many messages per second does the floor average?"
+   ],
+   "answer": 13.33,
+   "tolerance": 0.1,
+   "unit": "条/s",
+   "feedback": [
+    "每台每分钟 1 条：800 / 60 ≈ 13.3 条/s，远低于 500 条/s 的预算。",
+    "One per machine per minute: 800 / 60 ≈ 13.3 messages/s, far below the 500 msg/s budget."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "一个班次计划 450 min：等活 30 min、故障 18 min、断线处理 12 min；标准工时 0.45 min/件，做了 700 件，其中 21 件返修。求 OEE（%）。",
+    "A shift has 450 min planned: waiting 30 min, faults 18 min, thread-break handling 12 min; SAM 0.45 min/piece, 700 pieces made, 21 reworked. Find OEE (%)."
+   ],
+   "answer": 67.9,
+   "tolerance": 0.5,
+   "unit": "%",
+   "feedback": [
+    "运行时间 390 min，A = 86.7%，P = 700 × 0.45 / 390 = 80.8%，Q = 97%，OEE ≈ 67.9%（= 679 × 0.45 / 450）。",
+    "Run time 390 min, A = 86.7%, P = 700 × 0.45 / 390 = 80.8%, Q = 97%, OEE ≈ 67.9% (= 679 × 0.45 / 450)."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某工序每件缝 4 段、每段末尾剪线。一个班次做了 500 件，断线 12 次（每次多剪一次），另有 4% 的件返工重缝一段。按剪线次数统计的件数是多少？",
+    "An operation sews 4 seams per piece, trimming each. In one shift 500 pieces are made, with 12 thread breaks (one extra trim each) and 4% of pieces re-sewing one seam. What is the trim-based piece count?"
+   ],
+   "answer": 508,
+   "tolerance": 1,
+   "unit": "件",
+   "feedback": [
+    "剪线 = 2000 + 20 + 12 = 2032 次，÷ 4 = 508 件，多 1.6%；每件段数越多，误差越小（2 段时为 +3.2%）。",
+    "Trims = 2000 + 20 + 12 = 2032, ÷ 4 = 508 pieces, 1.6% high; more seams per piece means less error (+3.2% with 2 seams)."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "一家衬衫厂有 600 台普通平缝机，另有一条自动化产线需要被车间管理系统浏览参数、远程读写配方。按本讲的分工建议，比较合理的方案是：",
+    "A shirt factory has 600 ordinary lockstitch machines plus an automated line whose parameters and recipes the shop-floor system must browse and read/write. Following this lesson's division of labour, the sensible plan is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "缝纫机经网关用 MQTT 加统一主题上报，自动化产线与车间管理系统之间用 OPC UA 或网页接口",
+      "Sewing machines report via gateways over MQTT with a common topic scheme; the automated line links to the shop-floor system by OPC UA or a web API"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "全部设备都必须用 OPC UA，否则数据没有含义",
+      "Every device must use OPC UA or the data have no meaning"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "全部设备都用 MQTT 每针上报，由数据库筛选",
+      "Every device reports each stitch over MQTT and the database filters"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "缝纫机不联网，只给自动化产线联网",
+      "Leave the sewing machines unconnected and connect only the automated line"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "大量、廉价、数据简单的设备用 MQTT 就够；需要被浏览和读写参数的高端设备、系统之间的对接用 OPC UA 或网页接口。",
+    "MQTT suffices for many cheap, simple devices; high-end equipment that must be browsed and written, and system-to-system links, use OPC UA or web APIs."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "缝纫机联网后，下列哪些是本讲建议的基本网络安全措施？（选出所有正确项）",
+    "After connecting sewing machines, which are basic network-security measures recommended in this lesson? (Select all that apply)"
+   ],
+   "answers": [
+    {
+     "text": [
+      "车间设备网络与办公网络分开，只经受控网关交换数据",
+      "Separate the device network from the office network, exchanging data only through a controlled gateway"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "按主题授权，一台缝纫机只能写自己工位的主题",
+      "Authorise per topic, so a machine can write only to its own station's topics"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "远程升级的固件做签名校验，所有指令和改参留记录",
+      "Verify signatures on remotely updated firmware and log every command and parameter change"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "全车间设备共用一个账号，便于维护",
+      "Have all machines share one account for easy maintenance"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "为了实时性，关闭设备与代理之间的加密",
+      "Turn off encryption between devices and broker for speed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "每台设备、每个系统要用单独账号，通信要加密；共用账号使任何一台机器都能冒充别的机器。",
+    "Every device and system needs its own account, and links must be encrypted; a shared account lets any machine impersonate another."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "按《个人信息保护法》，工厂为人力资源管理所必需处理操作工的工作数据时，可以不经个人同意，因此也不必告知工人。",
+    "Under China's Personal Information Protection Law, when a factory processes operators' work data as necessary for HR management it may proceed without consent, so it need not inform the workers either."
+   ],
+   "correct": false,
+   "feedback": [
+    "可以不经同意，但仍须事先告知处理的目的、方式和范围，并只采集必要的数据。",
+    "Consent may be unnecessary, but the purpose, means and scope must still be notified in advance, and only necessary data collected."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "设备数据四类与累计计数；MQTT 的 QoS、保留、遗嘱与统一命名空间；上报方式与数据量估算；OEE 分解与计件误差。",
+   "The four kinds of machine data and cumulative counters; MQTT QoS, retained and will messages and the unified namespace; reporting strategies and data-volume estimates; OEE breakdown and counting errors."
+  ],
+  "difficult": [
+   "学生容易把缝纫时间比例当成设备利用率、把 OEE 里的 P 当成机器速度；也容易只看平均消息率而忽略状态延迟和高峰。要用算例把每一项的口径讲清楚。",
+   "Students tend to read the sewing-time ratio as machine utilisation and OEE's P as machine speed, and to look only at average message rate while ignoring state latency and peaks. Use the worked example to pin down what each figure measures."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：黑箱与车间问题",
+     "Opening: the black box and the shop problem"
+    ],
+    "minutes": 10,
+    "content": [
+     "讲不联网的衬衫线，给出 7 号工位一个班次的数据，提出要算的问题。",
+     "Describe the unconnected shirt line, give the station-7 shift data and pose the questions."
+    ]
+   },
+   {
+    "phase": [
+     "数据从哪来、怎么组织",
+     "Where the data come from and how to organise them"
+    ],
+    "minutes": 20,
+    "content": [
+     "控制器已知与外加数据；四层架构；识别、状态、计数、事件；OPC UA Machinery 状态对应。",
+     "Data in the controller versus added data; the four layers; identity, state, counters, events; mapping to OPC UA Machinery states."
+    ]
+   },
+   {
+    "phase": [
+     "通信：MQTT 与 OPC UA",
+     "Communication: MQTT and OPC UA"
+    ],
+    "minutes": 25,
+    "content": [
+     "发布订阅、QoS 与去重、保留与遗嘱、通配符；统一命名空间与信封；两种协议的分工。课堂练习：写一个工位的主题。",
+     "Publish/subscribe, QoS and de-duplication, retained and will messages, wildcards; unified namespace and envelope; how the two protocols divide the work. Exercise: write a station's topics."
+    ]
+   },
+   {
+    "phase": [
+     "数据量与指标",
+     "Data volume and metrics"
+    ],
+    "minutes": 30,
+    "content": [
+     "一台机器和全车间的数据量；边缘汇总与事件即报；件数、缝纫时间比例、OEE 分解；剪线计数案例。",
+     "Data volume for one machine and the floor; edge aggregation and immediate events; piece counts, sewing-time ratio, OEE breakdown; the trim-counting case."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 26-1",
+     "Virtual lab 26-1"
+    ],
+    "minutes": 30,
+    "content": [
+     "分组完成实验页三个任务，填记录表，讨论计件方法和上报方式的选择。",
+     "Groups complete the three tasks, fill in the record and discuss the choice of counting method and reporting strategy."
+    ]
+   },
+   {
+    "phase": [
+     "MES、数字孪生、远程运维与小结",
+     "MES, digital twin, remote service and summary"
+    ],
+    "minutes": 20,
+    "content": [
+     "MES 对接与数字孪生两层；远程运维、安全与个人数据；解答导入问题，布置作业。",
+     "MES integration and the two layers of a digital twin; remote service, security and personal data; solve the opening problem and set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“一条缝制线的联网方案与班次分析”；预习第 27 章数字工厂的总体架构。",
+   "Complete the assignment 'Connectivity plan and shift analysis for a sewing line'; preview the overall architecture of the digital factory in Chapter 27."
+  ]
+ }
+}

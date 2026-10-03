@@ -1,0 +1,1203 @@
+{
+ "no": 20,
+ "title": [
+  "平缝机与包缝机电控原型",
+  "Lockstitch and Overlock Control Prototypes"
+ ],
+ "hours": 5,
+ "goals": [
+  [
+   "能按 WQ-SC 平台画出平缝机原型的系统构成，说明机械改装、BOM、接线表、电源预算和急停联锁的要点。",
+   "Lay out the lockstitch prototype on the WQ-SC platform and explain the key points of mechanical retrofit, BOM, wiring table, power budget and emergency-stop interlocks."
+  ],
+  [
+   "能由电磁铁吸合延迟的范围、剪线转速和第 14 章的窗口，算出剪线和松线事件的通电角，并读懂角度中断和剪线序列代码。",
+   "Calculate trim and tension-release command angles from the range of solenoid pull-in delay, the trimming speed and the Chapter 14 windows, and read the angle-interrupt and trim-sequence code."
+  ],
+  [
+   "能按逐步调试的顺序上电，用对称两点法标定编码器 Z 相偏置，在转角上标定电磁铁延迟。",
+   "Bring the prototype up step by step, calibrate the encoder Z offset with the symmetric two-point method, and calibrate solenoid delay in the angle domain."
+  ],
+  [
+   "能把验收需求写成自动测试用例，并解释停针误差和剪线成功率为什么要分成两条需求。",
+   "Write acceptance requirements as automated test cases and explain why needle-stop error and trimming success are separate requirements."
+  ],
+  [
+   "能算出包缝机原型的传动比、每主轴转计数、布走后的提前减速针数，并说明两台原型的模块复用。",
+   "Calculate the overlock prototype's drive ratio, counts per spindle revolution and early-deceleration stitch count after the fabric leaves, and explain module reuse between the two prototypes."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "改装平缝机：剪线事件表的通电角怎么定？",
+   "Retrofitting a lockstitch head: how to set the trim command angles?"
+  ],
+  "text": [
+   "设备科要把一台带剪线机构的机械平缝机头改成电控原型。剪线在 300 r/min 下进行，动刀必须在 300°–330° 之间进刀，夹线器至少在 335° 到下一转 55° 之间松开。剪线、松线电磁铁（8 Ω，24 V 强激磁）在电源 ±10%、线圈从冷态 8 Ω 升到热态 9.5 Ω 时，吸合延迟在 6.2–9.4 ms 之间变化。车间还想把剪线转速提到 700 r/min 提高效率；平台指标要求电磁铁吸合折算转角 ≤ 20°。",
+   "The equipment department will turn a mechanical lockstitch head with a trimmer into a control prototype. Trimming runs at 300 r/min; the moving knife must enter between 300° and 330°, and the tension disc must be open at least from 335° to 55° of the next revolution. With supply at ±10% and the coil heating from 8 Ω cold to 9.5 Ω hot, the trim and tension-release solenoids (8 Ω, 24 V boost) pull in in 6.2–9.4 ms. The shop would also like to raise trimming speed to 700 r/min; the platform requires the solenoid pull-in angle to be ≤ 20°."
+  ],
+  "question": [
+   "300 r/min 时剪线和松线电磁铁应在多少度通电？提到 700 r/min 行不行？",
+   "At 300 r/min, at what angles should the trim and release solenoids be energised? Is 700 r/min acceptable?"
+  ],
+  "answer": [
+   "300 r/min 时主轴每毫秒转 1.8°，吸合折合 11.2°–17.0°，散布 5.7°。窗口中心 315° 减去平均提前量约 14.1°，剪线通电角约 301°，取 300°，进刀落在约 311°–317°，两边各有十几度余量；松线最晚吸合 17°，通电角不晚于 318°，取 310°。用模型随机仿真 1000 次全部合格，停针误差 −0.60° 到 −0.44°。700 r/min 时每毫秒 4.2°，吸合折合 26°–40°，通电角要提前到约 285°，窗口虽能满足，但已超出 ≤ 20° 的平台指标；按最慢 9.4 ms 算，剪线转速最高约 355 r/min，要提速应先让电磁铁更快、更一致。",
+   "At 300 r/min the spindle turns 1.8° per ms, so pull-in spans 11.2°–17.0°, a spread of 5.7°. The window centre 315° minus the mean lead of about 14.1° gives a trim command of about 301°, taken as 300°, so the knife enters at about 311°–317° with over ten degrees of margin each side; the latest release pull-in is 17°, so the release command must be no later than 318°—take 310°. A 1000-run random simulation passes every time, with needle-stop error from −0.60° to −0.44°. At 700 r/min (4.2° per ms) pull-in spans 26°–40°; commands must move to about 285°, and although the window can be met, the 20° platform limit is exceeded. With the slowest 9.4 ms, trimming can go only to about 355 r/min; to go faster, make the solenoid faster and more consistent first."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人关节上电与零点标定",
+   "Robot joint bring-up and zero calibration"
+  ],
+  "text": [
+   "新装的机械臂关节第一次上电，步骤和本章的逐步调试一样：先只上控制电，检查急停能否切断驱动使能；再手动或低速点动，确认编码器方向，方向反了速度环就成了正反馈，关节会飞车；然后做惯量辨识、整定速度环和位置环；最后才跑任务。关节零点标定也常用“两侧取平均”的办法：让关节分别从正、负两个方向慢速靠近原点开关，记下两次触发时的编码器读数，取平均作为零点，抵消开关的回差，这与本章用针杆下行、上行两次经过同一百分表读数来求下止点是同一个思路。夹爪电磁阀在传送带上抓取运动零件时，它的延迟同样要按速度折算成位移来标定，而不是只看毫秒。",
+   "A newly assembled robot joint is brought up exactly like this chapter's prototype: first only control power, checking that the emergency stop really removes drive enable; then a manual or slow jog to confirm encoder direction—reversed, the velocity loop becomes positive feedback and the joint runs away; then inertia identification and tuning of velocity and position loops; and only then the task. Joint zero calibration often uses 'average from both sides': the joint approaches its home switch slowly from the positive and negative directions, the encoder readings at the two trigger points are averaged as the zero, cancelling the switch hysteresis—the same idea as finding bottom dead centre from the needle bar passing one dial-gauge reading on the way down and on the way up. When a gripper valve picks moving parts from a conveyor, its delay must likewise be calibrated as a displacement at the belt speed, not just in milliseconds."
+  ]
+ },
+ "life": {
+  "title": [
+   "找门框的中点",
+   "Finding the middle of a door frame"
+  ],
+  "text": [
+   "想在门框正中间挂一个钩子，直接用眼睛找“中间”往往偏；从左右两边各量出同样的距离做记号，再取两个记号的中点就准得多。本章标定针杆上止点也是这样：在变化最明显的两侧取同一个读数，再取平均，而不是在最平的地方找最高点。",
+   "To hang a hook exactly in the middle of a door frame, eyeballing the middle is usually off; measure the same distance in from each side, mark both, and take the midpoint of the marks—much more accurate. Calibrating needle-bar top dead centre in this chapter works the same way: take the same reading on the two steep sides and average, rather than hunting for the top where the curve is flattest."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：两周内让机械机头缝出第一道线",
+    "Opening: first seam from a mechanical head in two weeks"
+   ],
+   "points": [
+    [
+     "桌上：带剪线机构的平缝机头、一箱 WQ-SC 模块；目标：缝、剪断、停上针位、把每次剪线数据发到看板",
+     "On the bench: a lockstitch head with trimmer and a box of WQ-SC modules; goal: sew, trim, stop needle-up, and report every trim to the dashboard"
+    ],
+    [
+     "动手前先想清三件事：机械改什么、控制怎么组织（按转角还是按时间）、怎样算“好了”",
+     "Settle three things first: what to change mechanically, how to organise control (by angle or by time), and how to know it is done"
+    ],
+    [
+     "全章数字来自同一套模型：J = 6×10⁻⁴ kg·m²、Kp = 200 s⁻¹、Kv = 0.2 N·m·s/rad、Ti = 12 ms；电磁铁 8 Ω、20→80 mH、24 V",
+     "All numbers come from one model: J = 6×10⁻⁴ kg·m², Kp = 200 s⁻¹, Kv = 0.2 N·m·s/rad, Ti = 12 ms; solenoid 8 Ω, 20→80 mH, 24 V"
+    ],
+    [
+     "顺序：构成与硬件 → 固件 → 逐步调试 → 验收；再换包缝机",
+     "Order: build-up and hardware → firmware → step-by-step bring-up → acceptance; then the overlocker"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "第 13、14 章讲了电控平缝机为什么这样控制，第 19 章给了一套搭原型的平台。今天把两者合起来：桌上有一台带剪线机构的机械平缝机头，一箱第 19 章列的模块，任务是两周内让它缝出第一道线、剪断、停在上针位，还要把每次剪线的数据发到数字工厂的看板上。动手以前先想清三件事：机械上改什么，哪些件拆、电机怎么接、五个电磁铁装哪里；控制上怎么组织，哪些动作按转角、哪些按时间，事件表初值从哪来；怎样知道它好了，什么时候算调通、什么时候算达标。很多原型做不下去，就是这三件事没想清楚。本章的数字都来自同一套模型，伺服和电磁铁沿用第 13 章的参数，剪线窗口沿用第 14 章。",
+    "Chapters 13 and 14 explained why a lockstitch machine is controlled the way it is; Chapter 19 gave a platform for prototypes. Today we combine them. On the bench: a mechanical lockstitch head with a trimmer and a box of Chapter 19 modules. Within two weeks it must sew its first seam, trim, stop at needle-up, and send every trim's data to the digital-factory dashboard. Before touching anything, settle three things: mechanically, what is removed, how the motor connects, where the five solenoids go; for control, which actions go by angle and which by time, and where the initial event table comes from; and how we know it works—when it is running and when it meets spec. Many prototypes stall because these three were never settled. All numbers here come from one model, with Chapter 13's servo and solenoid parameters and Chapter 14's trimming windows."
+   ]
+  },
+  {
+   "title": [
+    "系统构成：编码器信号直接进主控",
+    "System build-up: encoder signals straight to the controller"
+   ],
+   "points": [
+    [
+     "五层落到平缝机：直驱或 1:1 同步带；2500 线编码器 → 10000 计数/转，0.036°/计数；五只电磁铁；霍尔脚踏",
+     "Five layers on the lockstitch: direct drive or 1:1 belt; 2500-line encoder → 10 000 counts/rev, 0.036° per count; five solenoids; Hall pedal"
+    ],
+    [
+     "编码器接伺服驱动器，驱动器把 A、B、Z 1:1 转发给主控，主控自己计数",
+     "The encoder feeds the servo drive, which forwards A, B, Z 1:1 to the controller, which counts them itself"
+    ],
+    [
+     "若改由 CAN FD 报角度：几百微秒的随机延迟，300 r/min 时 0.5 ms 就是 0.9°，直接加到进刀角散布上",
+     "If angle came over CAN FD instead: hundreds of µs of random delay; 0.5 ms at 300 r/min is 0.9°, added straight to the knife-entry spread"
+    ],
+    [
+     "速度指令、状态和参数对时间不敏感，走 CAN FD 没问题",
+     "Speed commands, status and parameters are not time-critical and travel fine over CAN FD"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c20_lsarch.png",
+   "narration": [
+    "看系统构成图，就是第 19 章的五层落到这台平缝机上。往上是执行与传感：伺服电机带 2500 线编码器，四倍频每转一万个计数，分辨率 0.036 度；五只电磁铁管剪线、拨线、倒缝、抬压脚和松线；脚踏是霍尔传感器。有一处连线要单独说：编码器接在伺服驱动器上，因为驱动器做矢量控制必须用它，驱动器再把 A、B、Z 三路 1:1 转发给主控，主控的定时器自己计数，转角就在主控手里。为什么不让驱动器经 CAN FD 把角度报过来？因为每帧可能有几百微秒的延迟和抖动，300 转时 0.5 毫秒就是 0.9 度，而且是随机的，会直接加到进刀角的散布上。速度指令、状态和参数就没关系，走总线。",
+    "Here is the build-up: Chapter 19's five layers applied to this lockstitch head. Actuation and sensing: a servo motor with a 2500-line encoder, ten thousand counts per revolution after ×4, 0.036 degrees resolution; five solenoids for trimming, wiping, backtack, foot lift and tension release; a Hall pedal. One connection deserves comment: the encoder plugs into the servo drive, which needs it for vector control, and the drive forwards A, B and Z one-to-one to the controller, whose timer counts them itself—so the angle lives in the controller. Why not have the drive report angle over CAN FD? Each frame may carry hundreds of microseconds of delay and jitter; at 300 r/min, 0.5 milliseconds is 0.9 degrees, random, added straight to the knife-entry spread. Speed commands, status and parameters don't care, so they use the bus."
+   ]
+  },
+  {
+   "title": [
+    "机械改装",
+    "Mechanical retrofit"
+   ],
+   "points": [
+    [
+     "拆：离合器电机、V 带与带罩、机械定位器",
+     "Remove: clutch motor, V-belt and guard, mechanical positioner"
+    ],
+    [
+     "直驱首选：法兰装电机，梅花联轴器（A-CPL-JAW），用百分表打同轴度；带传动须用同步带且 1:1",
+     "Direct drive preferred: flange-mounted motor, jaw coupling (A-CPL-JAW), alignment checked with a dial gauge; belt drive must be a timing belt at 1:1"
+    ],
+    [
+     "五只电磁铁各推一根杆；行程留 0.3–0.5 mm 余量，让衔铁先吸到底",
+     "Each of the five solenoids pushes one lever; leave 0.3–0.5 mm of stroke margin so the armature bottoms first"
+    ],
+    [
+     "杠杆先顶死、衔铁吸不到底 → 在强激磁和维持间来回切换，发热、噪声大",
+     "If the lever bottoms first, the armature never seats → it cycles between boost and hold, with heat and noise"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c20_mount.png",
+   "narration": [
+    "看改装图。拆下离合器电机、V 带和带罩，还有老机器手轮上那个机械定位器。主轴电机首选直驱：法兰装电机，梅花联轴器连主轴；弹性体每转受压会发热，所以要用百分表打同轴度。台下带传动改动小，但必须用同步带，而且传动比取 1:1，原因等讲包缝机时就明白了。五只电磁铁各推一根杆：安装要注意一个细节：电磁铁行程要比杠杆有效行程多 0.3 到 0.5 毫米，让衔铁先吸到底。反过来，杠杆先顶死、衔铁差一点吸不到底，维持电流就保不住衔铁，线圈会在强激磁和维持之间来回切换，又热又响。",
+    "Look at the retrofit drawing. Remove the clutch motor, V-belt and guard, and the mechanical positioner on the old handwheel. Direct drive is preferred: a flange-mounted motor and a jaw coupling to the spindle; the elastomer heats if squeezed every revolution, so check alignment with a dial gauge. A belt under the table changes less, but it must be a timing belt at 1:1; you'll see why with the overlocker. Each solenoid pushes one lever. One detail: the solenoid stroke should exceed the lever's useful stroke by 0.3 to 0.5 millimetres, so the armature bottoms first. If the lever bottoms first, the hold current can't keep the armature and the coil cycles between boost and hold—hot and noisy."
+   ]
+  },
+  {
+   "title": [
+    "BOM 与接线表",
+    "BOM and wiring table"
+   ],
+   "points": [
+    [
+     "D 开头为建议编号（计划入库），A、C 开头为零件库已有条目；规格只写选型关键参数（示意）",
+     "IDs starting with D are proposed (planned for the library); A and C are existing entries; specs list only key sizing parameters (illustrative)"
+    ],
+    [
+     "伺服峰值 2.5 N·m、最高 ≥ 6000 r/min（两台原型共用）；电磁铁驱动板 6 路，留 1 路备用",
+     "Servo peak 2.5 N·m, ≥ 6000 r/min (shared by both prototypes); 6-channel solenoid board with one spare"
+    ],
+    [
+     "接线表把每根线落到主控端口和固件名（如 SOL_TRIM、io_pedal）；改接线只改配置，不改代码",
+     "The wiring table maps every wire to a controller port and a firmware name (e.g. SOL_TRIM, io_pedal); rewiring changes configuration, not code"
+    ],
+    [
+     "编码器 RS-422 差分双绞屏蔽；CAN 两端 120 Ω，心跳 10 ms，丢 3 帧进 SAFE；脚踏超出 0.3–4.7 V 判断线断",
+     "Encoder RS-422 differential, shielded twisted pair; CAN 120 Ω at both ends, 10 ms heartbeat, 3 lost frames → SAFE; pedal outside 0.3–4.7 V means a broken wire"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "BOM 按第 19 章的约定写：D 开头的缝制电控模块是建议编号，计划入库，A、C 开头的是库里已有的条目，规格栏只写选型用的关键参数，都是示意值。几个值得注意的地方：伺服电机峰值 2.5 牛米，最高转速按包缝机取 6000 转以上，这样两台原型共用一台；电磁铁驱动板 6 路，平缝机用 5 路，留 1 路备用。接线表是原型能不能照着搭的关键，也是以后排故的依据。它把每根线落到主控端口和固件名上，比如 SOL1 是剪线 SOL_TRIM。硬件抽象层里的通道名就是这一列，所以改接线只改配置，不改代码。还有几条电气细节：编码器用差分双绞屏蔽线，屏蔽层在控制箱一端接地；CAN 总线两端各一个 120 欧终端，心跳 10 毫秒，丢 3 帧进 SAFE；脚踏读数超出 0.3 到 4.7 伏就当作线断了。",
+    "The BOM follows Chapter 19's conventions: D-prefixed sewing-control modules are proposed IDs planned for the library, A and C are existing entries, and the spec column gives only key sizing parameters, all illustrative. Points to note: the servo's peak is 2.5 newton-metres and its top speed is chosen for the overlocker, at least 6000 r/min, so both prototypes share it; the solenoid board has 6 channels, 5 used, one spare. The wiring table is what makes the prototype buildable from the documents, and later the basis for fault-finding. It maps every wire to a controller port and a firmware name—SOL1 is trimming, SOL_TRIM. The HAL channel names are that column, so rewiring changes configuration, not code. Some electrical details: the encoder uses shielded differential twisted pair, shield earthed at the control box; CAN has a 120 ohm terminator at each end, a 10 millisecond heartbeat, and three lost frames mean SAFE; a pedal reading outside 0.3 to 4.7 volts is treated as a broken wire."
+   ]
+  },
+  {
+   "title": [
+    "电源预算与安全联锁",
+    "Power budget and safety interlocks"
+   ],
+   "points": [
+    [
+     "剪线、松线在 300°、310° 通电，300 r/min 时只隔 5.6 ms，强激磁 10 ms 重叠：峰值 2 × 3 A + 0.5 A = 6.5 A、156 W → 选 24 V 200 W",
+     "Trim and release fire at 300° and 310°, only 5.6 ms apart at 300 r/min, so 10 ms boosts overlap: 2 × 3 A + 0.5 A = 6.5 A, 156 W → 24 V 200 W"
+    ],
+    [
+     "平均功率很小；要核算的是抬压脚长时间维持：1 A × 8 Ω = 8 W，看线圈占空比",
+     "Average power is small; check the foot-lift hold: 1 A × 8 Ω = 8 W, against the coil duty rating"
+    ],
+    [
+     "原型一律加双触点急停：一组硬接线切断伺服使能和电磁铁 24 V，一组接 DI 给固件记录",
+     "Prototypes always get a two-contact E-stop: one hardwired to cut servo enable and solenoid 24 V, one to a DI for logging"
+    ],
+    [
+     "机头翻倒、上电时脚踏不在中位都禁止启动；PE 黄绿线单独接地，联轴器和带要有罩",
+     "Head tilted or pedal not neutral at power-up both block start; PE by green-yellow wire to its own terminal; guard couplings and belts"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "24 伏电源要应付的是强激磁电流。每只线圈强激磁时最高 24 除以 8，3 安。标准事件表里剪线和松线在 300 度和 310 度通电，300 转时只隔 5.6 毫秒，而强激磁各持续 10 毫秒，所以会重叠，峰值约 6 安；再加主控和传感器约 0.5 安，峰值 6.5 安、156 瓦，选 200 瓦的电源留余量。平均功率很小，要核算的是长时间保持的抬压脚，维持 1 安就是 8 瓦。安全方面，第 18 章说过用脚踏这种松开即停装置的机器可以不设急停，但原型不一样，防护罩可能没装、固件没验证，所以一律加双触点急停：一组触点硬接线切断伺服使能和电磁铁 24 伏，另一组接数字输入让固件记录。千万不要只靠固件停机。机头翻倒、上电时脚踏不在中位，都禁止启动。",
+    "The 24 volt supply must cope with boost currents. Each coil draws up to 24 over 8, 3 amps, during boost. In the standard table trim and release fire at 300 and 310 degrees—only 5.6 milliseconds apart at 300 r/min—while each boost lasts 10 milliseconds, so they overlap: about 6 amps peak, plus about 0.5 for controller and sensors, 6.5 amps or 156 watts; choose a 200 watt supply for margin. Average power is small; what needs checking is the long-held foot lift: 1 amp hold is 8 watts. On safety, Chapter 18 noted that release-to-stop pedal machines may omit an emergency stop. A prototype is different—guards may be missing and firmware unverified—so always fit a two-contact E-stop: one contact hardwired to cut servo enable and solenoid 24 volts, the other to a digital input so firmware can log it. Never rely on firmware alone to stop. A tilted head, or a pedal off neutral at power-up, blocks starting."
+   ]
+  },
+  {
+   "title": [
+    "固件结构：状态机 + 角度中断 + HAL",
+    "Firmware structure: state machine + angle interrupt + HAL"
+   ],
+   "points": [
+    [
+     "状态机：IDLE → RUN → SLOW → TRIM → POSITION → IDLE；任一故障进 SAFE",
+     "State machine: IDLE → RUN → SLOW → TRIM → POSITION → IDLE; any fault → SAFE"
+    ],
+    [
+     "三层任务：10 kHz 角度中断（编码器、事件表、回针计数）、1 kHz 控制任务（状态机、速度曲线、位置环）、后台（脚踏、参数、日志、网关）",
+     "Three task levels: 10 kHz angle interrupt (encoder, event table, backtack count), 1 kHz control task (state machine, speed profile, position loop), background (pedal, parameters, logs, gateway)"
+    ],
+    [
+     "10 kHz 扫描的最大触发误差：300 r/min 时 0.18°，700 r/min 时 0.42°，比电磁铁延迟散布小一个数量级",
+     "Maximum trigger error of the 10 kHz scan: 0.18° at 300 r/min, 0.42° at 700 r/min—an order below the solenoid spread"
+    ],
+    [
+     "剪线周期角 ψ：剪线那一针 0–360°，下一转 360–720°；零点必须先标定到针杆上止点",
+     "Trim-cycle angle ψ: 0–360° in the trim stitch, 360–720° in the next revolution; zero must first be calibrated to needle-bar TDC"
+    ]
+   ],
+   "formula": "\\delta\\theta_{max} = 6\\,n\\,\\Delta t_{scan}",
+   "figure": "fig_c20_fw.png",
+   "narration": [
+    "固件沿用第 19 章的框架。上面一行是状态机：IDLE 压脚落下等脚踏，RUN 调速并包含起缝回针和慢起针，SLOW 减速到剪线转速，TRIM 剪线事件表生效，POSITION 位置环停到上针位，然后回到 IDLE 拨线、抬压脚；任何状态出故障都进 SAFE。下面是三层任务：10 千赫的角度中断读编码器、扫描事件表、数回针针数；1 千赫的控制任务跑状态机、速度曲线和位置环；后台任务处理脚踏、参数、故障码、日志和网关。为什么事件放在 10 千赫的角度中断里？每 0.1 毫秒检查一次，300 转时主轴转 0.18 度，700 转时 0.42 度，这就是最大触发误差，比电磁铁延迟的散布小一个数量级。事件表里的角度用剪线周期角 ψ：剪线那一针 0 到 360 度，下一转记 360 到 720 度，表里写 408 度就是下一转的 48 度。",
+    "The firmware uses Chapter 19's framework. Top row, the state machine: IDLE with the foot down waiting for the pedal; RUN for speed control, including start backtack and slow start; SLOW down to trimming speed; TRIM with the trim event table active; POSITION, where the position loop stops at needle-up; then back to IDLE to wipe and lift the foot. Any fault in any state goes to SAFE. Below are three task levels: a 10 kilohertz angle interrupt reading the encoder, scanning the event table and counting backtack stitches; a 1 kilohertz control task running the state machine, speed profile and position loop; and background work for pedal, parameters, fault codes, logs and gateway. Why put events in a 10 kilohertz interrupt? Checking every 0.1 milliseconds, the spindle turns 0.18 degrees at 300 r/min or 0.42 at 700—the maximum trigger error, an order of magnitude below the solenoid spread. Angles use the trim-cycle angle psi: 0 to 360 in the trim stitch, 360 to 720 in the next revolution, so 408 means 48 degrees of the next turn."
+   ]
+  },
+  {
+   "title": [
+    "剪线事件表与初值",
+    "The trim event table and its initial values"
+   ],
+   "points": [
+    [
+     "剪线 300°–408°；松线 310°–保持到停稳；385° 切入位置环停到 70°；停稳 + 0 ms 拨线 40 ms；停稳 + 80 ms 抬压脚",
+     "Trim 300°–408°; release 310° until stopped; position loop at 385°, stop at 70°; wipe at stopped + 0 ms for 40 ms; foot lift at stopped + 80 ms"
+    ],
+    [
+     "实际进刀角 = 发令角 + 6nt；吸合 6.2–9.4 ms，300 r/min 时折合 11.2°–17.0°，散布 5.7°",
+     "Actual knife entry = command angle + 6nt; pull-in 6.2–9.4 ms is 11.2°–17.0° at 300 r/min, a 5.7° spread"
+    ],
+    [
+     "窗口中心 315° − 平均提前 14.1° ≈ 301° → 取 300°，进刀 311°–317°；松线最晚吸合 17°，通电不晚于 318° → 取 310°",
+     "Window centre 315° − mean lead 14.1° ≈ 301° → 300°, entry 311°–317°; release must fire by 318° → 310°"
+    ],
+    [
+     "拨线、抬压脚以“停稳”为起点按时间；剪断发生在位置环减速中，断电角要用模型按实际转速曲线算",
+     "Wipe and foot lift are timed from 'stopped'; the cut happens during position-loop deceleration, so the off angle is computed on the real speed profile with the model"
+    ]
+   ],
+   "formula": "\\theta_{entry} = \\theta_{cmd} + 6\\,n\\,t_{pull}",
+   "figure": "fig_c20_events.png",
+   "narration": [
+    "看剪线事件表。第一行剪线电磁铁 300 度通、408 度断，也就是下一转 48 度断；第二行松线 310 度通，保持到停稳；第三行下一转 25 度切入位置环，停在 70 度；第四、五行是停稳以后按时间拨线、抬压脚，因为主轴停住后转角不再变化，按转角已经没法排序了。初值从哪来？动刀实际进刀角等于发令角加 6nt。电磁铁吸合在电源正负 10%、线圈冷热变化下是 6.2 到 9.4 毫秒，300 转时每毫秒 1.8 度，折合 11.2 到 17.0 度，散布 5.7 度。窗口中心 315 度减平均提前 14.1 度，得 301 度，取 300 度，实际进刀 311 到 317 度，两边各有十几度余量。松线要在 335 度前打开，最晚吸合 17 度，所以通电不能晚于 318 度，取 310 度。注意转速曲线：25 度切入位置环后转速先被拉到 200 转再减速，剪断就在这段里，所以断电角要用模型按实际转速曲线算。",
+    "Here is the trim event table. Row one: the trim solenoid on at 300, off at 408—48 degrees of the next turn. Row two: tension release on at 310, held until stopped. Row three: the position loop engages at 25 degrees of the next turn and stops at 70. Rows four and five: wipe and foot lift timed after the spindle stops, because once it stops the angle no longer changes and can't order anything. Where do the initial values come from? Actual knife entry equals the command angle plus 6nt. Pull-in varies from 6.2 to 9.4 milliseconds with ±10 percent supply and a cold or hot coil; at 300 r/min that's 1.8 degrees per millisecond, 11.2 to 17.0 degrees, a 5.7 degree spread. The window centre 315 minus the mean lead of 14.1 gives 301—take 300—so entry falls at 311 to 317, more than ten degrees of margin each side. Release must open by 335; the latest pull-in is 17 degrees, so it must fire by 318—take 310. Watch the speed curve: after engaging at 25 degrees the spindle is pulled to 200 r/min and then decelerates, and the cut happens there, so the off angle is computed with the model on the real speed profile."
+   ]
+  },
+  {
+   "title": [
+    "关键代码：事件扫描与剪线序列",
+    "Key code: event scanning and the trim sequence"
+   ],
+   "points": [
+    [
+     "事件表行 = (on_x10, off_x10, ch, cond)，角度用 0.1° 整数；0xFFFF 表示保持到停稳；表带版本号随日志上报",
+     "Event row = (on_x10, off_x10, ch, cond), angles as 0.1° integers; 0xFFFF means hold until stopped; the table carries a version reported in logs"
+    ],
+    [
+     "角度中断里每行只在“从起始角以前跨到以后”的那一刻动作一次，停住后不会重复触发",
+     "In the angle interrupt each row acts once, at the moment ψ crosses its angle, so nothing re-fires after stopping"
+    ],
+    [
+     "1 kHz 剪线序列不直接开关电磁铁，只切换状态、设转速、在停稳后按时间排拨线和抬压脚，每一步都设超时",
+     "The 1 kHz trim sequence never switches solenoids directly: it changes state, sets speed, schedules wipe and foot lift after stopping, with a timeout on every step"
+    ],
+    [
+     "停稳判据：误差 ≤ 0.5°、转速 < 10 r/min、持续 5 ms；evt_flush_until_stop() 关掉结束角在停针角之后的行",
+     "Stopped flag: error ≤ 0.5°, speed < 10 r/min, for 5 ms; evt_flush_until_stop() closes rows whose end angle lies beyond the stop"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "来看代码。事件表每行四个字段：起始角、结束角、通道和条件，角度用 0.1 度整数；结束角 0xFFFF 表示保持到停稳。角度中断里的扫描很简单：每一行只在 ψ 从起始角以前跨到以后的那一刻动作一次，所以主轴停住以后不会重复触发。状态机里的剪线序列放在 1 千赫的控制任务里，它不直接开关电磁铁，只负责切换状态、设定转速、在停稳以后按时间排拨线和抬压脚，每一步设超时。两个细节要记住。第一，停稳判据是误差不超过 0.5 度、转速低于 10 转、持续 5 毫秒，判得太松，拨线杆会扫到还在微动的机针；判得太紧，剪线周期就拖长。第二，松线这类结束角在停针角之后的行，主轴停在 70 度永远到不了结束角，必须在停稳时统一关掉。",
+    "Now the code. Each event row has four fields—start, end, channel and condition—with angles as 0.1 degree integers; an end of 0xFFFF means hold until stopped. The scan in the angle interrupt is simple: each row acts once, at the moment psi crosses from before its angle to after it, so nothing re-fires once the spindle stops. The trim sequence lives in the 1 kilohertz control task. It never switches solenoids itself; it changes state, sets the speed, schedules wipe and foot lift by time after stopping, with a timeout on every step. Remember two details. First, the stopped flag—error within 0.5 degrees, speed under 10 r/min, for 5 milliseconds: too loose and the wiper sweeps a needle that's still creeping; too tight and the trim cycle drags on. Second, rows like tension release whose end lies beyond the stop angle never reach it—the spindle stops at 70—so they must be closed together when the spindle stops."
+   ]
+  },
+  {
+   "title": [
+    "自动回针",
+    "Automatic backtack"
+   ],
+   "points": [
+    [
+     "在送布牙沉到针板下时切换：114.2°–325.8°，空闲角 211.6°",
+     "Switch while the feed dog is below the plate: 114.2°–325.8°, an idle angle of 211.6°"
+    ],
+    [
+     "倒缝电磁铁延迟 18–22 ms（推连杆和弹簧，比剪线慢）；留 10° 余量，n_max = 201.6/(6t)",
+     "Backtack solenoid delay 18–22 ms (it moves a link and spring); with 10° margin, n_max = 201.6/(6t)"
+    ],
+    [
+     "18 ms → 1870 r/min，22 ms → 1530 r/min；回针转速取 1500 r/min，最慢折合 198°",
+     "18 ms → 1870 r/min, 22 ms → 1530 r/min; backtack speed 1500 r/min, slowest 198°"
+    ],
+    [
+     "bt_start() 在启动前通电（静止切换无时序问题）；每跨过一次 114.2° 减一针，减到零断电",
+     "bt_start() energises before starting (switching at rest has no timing issue); each crossing of 114.2° counts down one stitch, de-energising at zero"
+    ]
+   ],
+   "formula": "n_{max} = \\frac{211.6^\\circ - 10^\\circ}{6\\,t}",
+   "figure": "",
+   "narration": [
+    "回针的关键是在送布牙沉到针板下面时切换方向，第 14 章算过这段是 114.2 到 325.8 度，空闲角 211.6 度。固件在每一针的 114.2 度发令。倒缝电磁铁推的是连杆和弹簧，比剪线电磁铁慢，延迟设 18 到 22 毫秒。切换必须在 325.8 度以前完成，留 10 度余量，可用 201.6 度，转速上限就是 201.6 除以 6t：18 毫秒时 1870 转，22 毫秒时 1530 转。所以原型的回针转速取 1500 转，最慢的 22 毫秒折合 198 度，仍在 201.6 度以内。针数在角度中断里数，每过一次 114.2 度记一针。注意起点：踩脚踏前主轴停在上针位 70 度，bt_start 在启动前就给倒缝电磁铁通电，静止时切换没有时序问题，所以第一针的送布已经是倒向的；此后每跨过一次 114.2 度减一针，减到零时断电，切回正向的动作正好从空闲角的起点开始。",
+    "Backtack must switch direction while the feed dog is below the throat plate—Chapter 14 found that to be 114.2 to 325.8 degrees, an idle angle of 211.6. Firmware commands at 114.2 degrees of each stitch. The backtack solenoid moves a link and spring and is slower than the trim solenoid: 18 to 22 milliseconds. Switching must finish before 325.8 degrees; with 10 degrees of margin, 201.6 degrees are available, so the speed limit is 201.6 over 6t: 1870 r/min at 18 milliseconds, 1530 at 22. So the prototype backtacks at 1500 r/min; the slowest 22 milliseconds is 198 degrees, still within 201.6. Stitches are counted in the angle interrupt, one per crossing of 114.2 degrees. Note the start: before the pedal is pressed the spindle rests at needle-up, 70 degrees, and bt_start energises the backtack solenoid before moving—switching at rest has no timing issue—so the first stitch already feeds in reverse. Each crossing of 114.2 then counts one down, and at zero the solenoid drops, switching forward right at the start of the idle angle."
+   ]
+  },
+  {
+   "title": [
+    "脚踏曲线与速度曲线",
+    "Pedal map and speed profile"
+   ],
+   "points": [
+    [
+     "脚踏 0.5–4.5 V 分段：前掌 2.1–4.3 V 调速，中位 1.5–2.1 V 停，后跟轻踩 0.9–1.5 V 抬压脚，< 0.9 V 剪线",
+     "Pedal 0.5–4.5 V in bands: toe 2.1–4.3 V speed, neutral 1.5–2.1 V stop, light heel 0.9–1.5 V foot lift, < 0.9 V trim"
+    ],
+    [
+     "边界留 0.1 V 回差；调速段用平方曲线，脚尖刚踩下时转速变化慢，便于对位",
+     "0.1 V hysteresis at band edges; a square-law speed band so speed changes slowly at the first touch for positioning"
+    ],
+    [
+     "慢起针：回针后前 3 针限 400 r/min；加减速度 ≤ 伺服能力的 60%（约 2650 rad/s²）",
+     "Slow start: first 3 stitches after backtack limited to 400 r/min; acceleration ≤ 60% of servo capability (about 2650 rad/s²)"
+    ],
+    [
+     "400 → 4000 r/min 约 0.14 s、5.2 转；4000 → 300 r/min 约 0.15 s、5.2 转；斜坡放在控制任务里而不放进驱动器",
+     "400 → 4000 r/min in about 0.14 s, 5.2 revs; 4000 → 300 r/min about 0.15 s, 5.2 revs; ramps live in the control task, not the drive"
+    ]
+   ],
+   "formula": "n_{cmd} = n_{min} + (n_{max} - n_{min})\\,u^2,\\quad u = \\frac{V - 2.1}{2.2}",
+   "figure": "",
+   "narration": [
+    "脚踏是一个 0.5 到 4.5 伏的模拟量，原型用分段映射：前掌踩下 2.1 到 4.3 伏调速，中位 1.5 到 2.1 伏停，后跟轻踩 0.9 到 1.5 伏抬压脚，后跟踩到底低于 0.9 伏剪线。每段边界留 0.1 伏回差，免得在边界上来回跳；超出 0.3 到 4.7 伏当作线断。调速段用平方曲线，脚尖刚踩下时转速变化慢，便于操作工对位。脚踏给出的只是想要的转速，速度曲线还要加上第 14 章的几条限制：起缝回针以后前 3 针限 400 转慢起针；加减速度不超过伺服能力的 60%，约每秒平方 2650 弧度。按这个加速度，400 到 4000 转要 0.14 秒、5.2 转，4000 降到 300 转也是 0.15 秒左右、5.2 转。为什么斜坡放在控制任务里，而不放进伺服驱动器的加减速参数？因为剪线前的减速要按针数而不是按时间来安排。",
+    "The pedal is a 0.5 to 4.5 volt analogue signal, mapped in bands: toe pressed, 2.1 to 4.3 volts, controls speed; neutral, 1.5 to 2.1, stops; light heel, 0.9 to 1.5, lifts the foot; full heel below 0.9 trims. Each band edge has 0.1 volts of hysteresis so the reading doesn't chatter; outside 0.3 to 4.7 volts means a broken wire. The speed band is square-law, so speed changes slowly at first touch and the operator can position the work. The pedal only says what speed is wanted; the speed profile adds Chapter 14's limits: after the start backtack, the first 3 stitches are held to 400 r/min; acceleration and deceleration stay within 60 percent of servo capability, about 2650 radians per second squared. At that rate 400 to 4000 r/min takes 0.14 seconds and 5.2 revolutions, and 4000 down to 300 about 0.15 seconds and 5.2 revolutions. Why ramp in the control task rather than in the drive's acceleration parameters? Because the slow-down before trimming must be planned in stitches, not in time."
+   ]
+  },
+  {
+   "title": [
+    "逐步调试：每一步只引入一个新东西",
+    "Step-by-step bring-up: one new thing at a time"
+   ],
+   "points": [
+    [
+     "0 不通电：PE 连续性、绝缘、接线对表；1 只上 24 V：急停能断、逐路点动电磁铁、脚踏读数",
+     "0 unpowered: PE continuity, insulation, wiring vs table; 1 24 V only: E-stop really cuts, jog each solenoid, pedal reading"
+    ],
+    [
+     "2 手转手轮标定编码器；3 伺服上电：惯量辨识、速度环、位置环；4 不穿线按转角标定电磁铁延迟；5 穿线试缝",
+     "2 turn the handwheel to calibrate the encoder; 3 servo on: inertia ID, velocity and position loops; 4 calibrate solenoid delay by angle without thread; 5 thread and sew"
+    ],
+    [
+     "点动电磁铁看三样：推对了杆、方向对、电流回读有“凹口”（衔铁确实运动了）",
+     "When jogging a solenoid check three things: the right lever, the right direction, and the dip in the current trace (the armature really moved)"
+    ],
+    [
+     "每一步有判据，过了再走下一步；调试记录就是第 22 章测试用例的来源",
+     "Every step has a criterion, passed before moving on; the bring-up log becomes the source of Chapter 22's test cases"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "原型第一次通电，最忌讳全接好就按启动。正确的做法是一步一步来，每步只引入一个新东西，有判据，过了再走下一步。第 0 步不通电，查保护地连续性、绝缘和接线。第 1 步只上 24 伏，主轴不转：先确认急停真的能断，按下急停，量电磁铁驱动板的 24 伏和伺服使能端，必须都断开；再在网页界面上逐路点动电磁铁，看三样：推的是不是那根杆，方向对不对，电流回读波形上有没有第 13 章讲的那个凹口。有凹口说明衔铁真的动了，没有凹口可能是卡住或顶死。第 2 步手转手轮标定编码器，第 3 步伺服上电整定，第 4 步不穿线按转角标定电磁铁，第 5 步才穿线试缝。每一步的结果都写进调试记录，这份记录后来就是测试用例的来源。",
+    "On first power-up, never connect everything and just press start. Go step by step, adding one new thing at a time, each with a criterion, moving on only when it passes. Step 0, unpowered: protective-earth continuity, insulation and wiring. Step 1, 24 volts only, spindle still: first make sure the emergency stop really cuts—press it and measure the solenoid board's 24 volts and the servo enable, both must drop. Then jog each solenoid from the web interface and check three things: is it the right lever, the right direction, and is there the dip in the current trace from Chapter 13? A dip means the armature really moved; no dip may mean it's jammed or blocked. Step 2, turn the handwheel to calibrate the encoder; step 3, servo on and tuned; step 4, calibrate the solenoids by angle without thread; only step 5 threads and sews. Every result goes into the bring-up log, which later becomes the test cases."
+   ]
+  },
+  {
+   "title": [
+    "编码器方向与 Z 相偏置：对称两点法",
+    "Encoder direction and Z offset: the symmetric two-point method"
+   ],
+   "points": [
+    [
+     "方向：手轮正转读数应增大；反了速度环成正反馈，一启动就飞车，驱动器报超速或编码器异常",
+     "Direction: forward handwheel rotation must increase the reading; if reversed the velocity loop is positive feedback and runs away"
+    ],
+    [
+     "上止点附近针杆几乎不动：离上止点 1.8° 只下降约 0.01 mm，直接找最高点有 ±1.8° 不确定度",
+     "Near TDC the needle bar barely moves: 1.8° from TDC it drops only about 0.01 mm, so hunting the top gives ±1.8° uncertainty"
+    ],
+    [
+     "在针杆离上止点 12.00 mm 处下行、上行各读一次：φ_BDC = (r₁ + r₂)/2，偏置 Δ = 180° − φ_BDC",
+     "Read once going down and once going up at 12.00 mm from TDC: φ_BDC = (r₁ + r₂)/2, offset Δ = 180° − φ_BDC"
+    ],
+    [
+     "算例：r₁ = 307.6°、r₂ = 137.2°（跨 360°）→ 平均 42.4° → Δ = 137.6°；12 mm 处 0.01 mm 只对应约 0.04°",
+     "Example: r₁ = 307.6°, r₂ = 137.2° (wrapped) → mean 42.4° → Δ = 137.6°; at 12 mm, 0.01 mm is only about 0.04°"
+    ]
+   ],
+   "formula": "\\varphi_{BDC} = \\frac{r_1 + r_2}{2},\\qquad \\Delta = 180^\\circ - \\varphi_{BDC}",
+   "figure": "fig_c20_zcal.png",
+   "narration": [
+    "编码器的 Z 相和主轴上止点没有关系，计数方向也可能反，所以先让读数符合约定：正转增大，0 度是针杆上止点。先查方向：手轮正转，读数减小就在参数里取反。方向反了速度环就是正反馈，会飞车。再标偏置。最直接的想法是用百分表找针杆最高点，但曲柄滑块在上止点附近几乎不动，离上止点 1.8 度时针杆只下降 0.01 毫米，百分表读不出，有正负 1.8 度的不确定度。改在针杆运动快的地方测：位移曲线关于上下止点对称，选针杆离上止点 12 毫米这个读数，下行经过时记 r1，上行经过时记 r2，两次平均就是下止点。算例里 r1 是 307.6 度，r2 是 137.2 度，跨过了 360，加 360 再平均得 42.4 度，偏置就是 180 减 42.4，137.6 度。12 毫米处 0.01 毫米只对应 0.04 度，好四十多倍。",
+    "The encoder Z mark bears no relation to top dead centre and the count may be reversed, so first make the reading match the convention: increasing forward, zero at needle-bar top dead centre. Direction first: turn the handwheel forward; if the reading decreases, invert it in the parameters. Reversed, the velocity loop is positive feedback and runs away. Then the offset. The obvious idea is to find the needle bar's highest point with a dial gauge, but a slider-crank barely moves near top dead centre: 1.8 degrees away the bar has dropped only 0.01 millimetres, which the gauge can't see—±1.8 degrees of uncertainty. Measure where the bar moves fast instead. The displacement curve is symmetric about the dead centres, so pick 12 millimetres below the top: note r1 passing down and r2 passing up; their mean is bottom dead centre. In the example r1 is 307.6, r2 is 137.2, wrapped past 360; add 360 and average to get 42.4, so the offset is 180 minus 42.4, 137.6 degrees. At 12 millimetres, 0.01 millimetres is only 0.04 degrees—over forty times better."
+   ]
+  },
+  {
+   "title": [
+    "伺服整定与在转角上标定电磁铁",
+    "Servo tuning and calibrating solenoids by angle"
+   ],
+   "points": [
+    [
+     "惯量辨识：转矩模式给 1.0 N·m，0 → 1000 r/min 应约 75 ms；实测长说明惯量变大，按比例修正",
+     "Inertia ID: 1.0 N·m in torque mode, 0 → 1000 r/min should take about 75 ms; longer means more inertia, so scale the parameter"
+    ],
+    [
+     "速度环带宽 Kv/J ≈ 333 rad/s；Kp = 200 s⁻¹ 已是带宽的 0.6 倍，不要再加；判据：超调 ≤ 0.5°、停稳 ≤ 60 ms、静差 ≤ 0.05°",
+     "Velocity bandwidth Kv/J ≈ 333 rad/s; Kp = 200 s⁻¹ is already 0.6 of it—don't raise it; criteria: overshoot ≤ 0.5°, settle ≤ 60 ms, static error ≤ 0.05°"
+    ],
+    [
+     "电磁铁标定：匀速转，在固定角 φc 通电，以 10 kHz 记电流，凹口谷底时的角 φp；Δφ = φp − φc 对转速成直线，斜率 6t",
+     "Solenoid calibration: run at constant speed, fire at φc, log current at 10 kHz, note the angle φp at the dip; Δφ = φp − φc versus speed is a line of slope 6t"
+    ],
+    [
+     "冷、热各测一次：8 Ω → 9.5 Ω 时 24 V 下吸合 6.9 → 8.0 ms，300 r/min 差约 2°",
+     "Measure cold and hot: 8 Ω → 9.5 Ω raises pull-in at 24 V from 6.9 to 8.0 ms, about 2° at 300 r/min"
+    ]
+   ],
+   "formula": "\\Delta\\varphi = \\varphi_p - \\varphi_c = 6\\,n\\,t",
+   "figure": "",
+   "narration": [
+    "伺服整定先做惯量辨识：转矩模式给 1.0 牛米，测从静止到 1000 转的时间，应约 75 毫秒；更长说明惯量大了，按比例修正。然后按第 13 章的顺序：先让速度环硬起来，带宽 Kv 除以 J 约 333；位置环增益 200 已是带宽的 0.6 倍，接近上限，不要再加；判据是超调不超过 0.5 度、停稳 60 毫秒以内、静差 0.05 度以内。电磁铁的延迟最后要折算成转角，所以标定直接在转角上做：不穿线，主轴以剪线转速匀速转，固件在固定角通电，同时以 10 千赫记录线圈电流，电流凹口谷底就是衔铁吸到底的时刻，记下那时的主轴角，两者之差就是吸合角。在 200、300、500 转各做 20 次，吸合角对转速应是一条过原点的直线，斜率就是 6t。还要冷热各测一次，线圈从 8 欧热到 9.5 欧，300 转时吸合角差约 2 度。",
+    "Servo tuning starts with inertia identification: apply 1.0 newton-metre in torque mode and time 0 to 1000 r/min; it should be about 75 milliseconds; longer means more inertia, so scale the parameter. Then follow Chapter 13: stiffen the velocity loop first, bandwidth Kv over J about 333; the position gain of 200 is already 0.6 of that, near the limit, so don't raise it. Criteria: overshoot within 0.5 degrees, settled within 60 milliseconds, static error within 0.05. Solenoid delay ends up as an angle, so calibrate it in angle: no thread, spindle at constant trimming speed, firmware fires at a fixed angle while logging coil current at 10 kilohertz. The bottom of the current dip is when the armature seats; note the spindle angle there, and the difference is the pull-in angle. Do 20 shots each at 200, 300 and 500 r/min: pull-in angle versus speed is a line through the origin with slope 6t. Measure cold and hot too: from 8 to 9.5 ohms the pull-in angle at 300 r/min grows about 2 degrees."
+   ]
+  },
+  {
+   "title": [
+    "验收测试：调通不等于达标",
+    "Acceptance: running is not meeting spec"
+   ],
+   "points": [
+    [
+     "测试脚本经网关下发命令、读回测量、逐条对照需求编号判定，结果写报告并发到 measurement 主题",
+     "Test scripts send commands via the gateway, read back measurements, judge each against its requirement ID, write a report and publish to the measurement topic"
+    ],
+    [
+     "SIL 1000 次（300 r/min，残差 0.1°）：全部合格；进刀 310.4°–316.7°；停针 −0.60° 到 −0.44°，平均 −0.51°，标准差 0.06°",
+     "SIL, 1000 runs (300 r/min, 0.1° residual): all pass; entry 310.4°–316.7°; stop −0.60° to −0.44°, mean −0.51°, SD 0.06°"
+    ],
+    [
+     "电源 20 V 仍合格；700 r/min 不改表合格率 0.3%，提前到 285°/290° 又全合格；标定残差 0.7° 剪线全成功但停针全超差",
+     "20 V supply still passes; 700 r/min without changes passes 0.3%, with 285°/290° all pass; 0.7° residual trims perfectly but every stop is out of spec"
+    ],
+    [
+     "回针对齐、4 h 温升等模型给不出的项目填“待整机测试台实测”，不编数；每行带固件和事件表版本号",
+     "Items the model can't give—backtack alignment, 4 h temperature rise—are 'to be measured on the bench', never invented; every row carries firmware and event-table versions"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c20_accept.png",
+   "narration": [
+    "调通不等于达标。验收在测试台上自动执行：脚本下发命令、读回测量、按需求编号判定、写报告。测试台搭好以前，可以先在软件在环上跑同样的脚本，每次随机取电源电压、线圈温度、转速波动、摩擦和负载。标准事件表、300 转、标定残差 0.1 度时，1000 次全部合格：进刀 310.4 到 316.7 度，停针误差负 0.60 到负 0.44 度。为什么全为负？因为记录的是停稳标志置位那一刻，位置环从下方逼近。再看五种工况：电源跌到 20 伏仍合格，说明余量够；700 转不改表合格率只有 0.3%，提前到 285 和 290 度又全合格；最有意思的是标定残差 0.7 度，剪线全成功，停针却全部超出正负 1 度，说明残差直接叠加在停针误差上。模型给不出的项目，比如回针对齐、4 小时温升，填“待实测”，不编数。",
+    "Running is not meeting spec. Acceptance runs automatically on the bench: a script sends commands, reads back measurements, judges by requirement ID and writes the report. Before the bench exists, run the same script in software-in-the-loop, randomising supply voltage, coil temperature, speed ripple, friction and load each time. With the standard table, 300 r/min and a 0.1 degree calibration residual, all 1000 pass: entry 310.4 to 316.7 degrees, stop error minus 0.60 to minus 0.44. Why all negative? It is logged when the stopped flag sets, and the position loop approaches from below. Now the five conditions: a 20 volt supply still passes—margin is enough; 700 r/min with an unchanged table passes 0.3 percent, but moving to 285 and 290 passes everything; most telling, a 0.7 degree residual trims perfectly yet every stop exceeds one degree—the residual adds straight to stop error. What the model can't give, like backtack alignment or 4-hour temperature rise, is marked 'to be measured', never invented."
+   ]
+  },
+  {
+   "title": [
+    "包缝机原型：转速、传动比与链线",
+    "Overlock prototype: speed, ratio and chain"
+   ],
+   "points": [
+    [
+     "沿用同一块主控、伺服驱动、电磁铁驱动板、电源和网关；变的是转速、链线切刀与吸风、布边光电、可选电子差动",
+     "Same controller, servo drive, solenoid board, power supply and gateway; changes are speed, chain cutter and suction, edge sensor, optional electronic differential"
+    ],
+    [
+     "主轴侧惯量 4×10⁻⁴、转子 1.2×10⁻⁴ kg·m²；传动比 i 时折算惯量 J_m + i²J_s：i = 1、1.25、1.4 → 5.2、7.45、9.0（×10⁻⁴）",
+     "Spindle-side inertia 4×10⁻⁴, rotor 1.2×10⁻⁴ kg·m²; reflected J_m + i²J_s: i = 1, 1.25, 1.4 → 5.2, 7.45, 9.0 (×10⁻⁴)"
+    ],
+    [
+     "选 i = 1.25（电机 30 齿、主轴 24 齿）：每主轴转正好 8000 计数；i = 1.4 时 7142.857…，Z 相不能再校正主轴角",
+     "Choose i = 1.25 (30-tooth motor, 24-tooth spindle): exactly 8000 counts per spindle rev; at i = 1.4, 7142.857…, so Z can no longer correct spindle angle"
+    ],
+    [
+     "同步带仍可能跳齿：加主轴上针位传感器每转核对，偏差 > 1° 报警；链线切刀用气缸，阀 60 ms、吸风 300 ms",
+     "Belts can still skip: add a spindle needle-up sensor checked every revolution, alarm above 1°; chain cutter on a cylinder, valve 60 ms, suction 300 ms"
+    ]
+   ],
+   "formula": "J_{eq} = J_m + i^2 J_s,\\qquad \\frac{\\text{counts}}{\\text{spindle rev}} = \\frac{10000}{i}",
+   "figure": "fig_c20_ol.png",
+   "narration": [
+    "包缝机原型大部分直接搬过来，变的是四件事。第一是转速：第 9 章的算例机最高 7000 针每分，主轴侧惯量 4 乘 10 的负 4 次方，电机转子 1.2。经同步带升速时，传动比 i 是主轴转速比电机转速，主轴惯量折算到电机轴要乘 i 方。直驱最快，但电机要转到 7000 转，平台电机最高 6000 转，所以用 1 比 1.25 的同步带，电机 30 齿、主轴 24 齿。这里有个容易忽略的地方：i 等于 1.4 时，每主轴转对应 7142.857 个计数，不是整数，Z 相每转落在主轴不同角度上，不能再用来校正，舍入误差还会累积；i 等于 1.25 时正好 8000 个计数。即使这样同步带仍可能跳齿，所以再加一个上针位传感器每转核对。第二，包缝机不用剪线电磁铁，让链线长到三四十毫米，停车后气缸切刀切断、吸风吸走，对时间不敏感。",
+    "Most of the overlock prototype carries straight over; four things change. First, speed: Chapter 9's example runs at 7000 stitches a minute, with 4 times ten to the minus four spindle-side inertia and a 1.2 rotor. With a belt speed-up, the ratio i is spindle speed over motor speed, and spindle inertia reflects to the motor as i squared. Direct drive is fastest but needs 7000 r/min from a motor that tops out at 6000, so a 1 to 1.25 belt is used, 30 teeth on the motor and 24 on the spindle. Easily missed: at i equals 1.4 a spindle revolution is 7142.857 counts, not an integer, so the Z pulse lands at a different spindle angle each turn and can't correct anything, and rounding error accumulates; at 1.25 it's exactly 8000. Even so a belt can skip a tooth, so a needle-up sensor checks every revolution. Second, no trim solenoid: the chain grows to thirty or forty millimetres, then a cylinder-driven knife cuts it and suction removes it—not time-critical."
+   ]
+  },
+  {
+   "title": [
+    "布到即起、布走即停与两台原型的复用",
+    "Start on fabric, stop after fabric, and reuse between prototypes"
+   ],
+   "points": [
+    [
+     "去抖按针数不按时间：连续 2 针看到布才算布到（3 mm 针距 = 6 mm，与转速无关）",
+     "Debounce in stitches, not time: fabric is 'present' after 2 consecutive stitches (6 mm at 3 mm stitch length, independent of speed)"
+    ],
+    [
+     "布走后 N₁ = 25/3 ≈ 9 针布尾 + N₂ = 40/3 ≈ 14 针链线 = 23 针停车",
+     "After the fabric leaves: N₁ = 25/3 ≈ 9 stitches of tail + N₂ = 40/3 ≈ 14 of chain = stop at 23"
+    ],
+    [
+     "提前减速：剩余针数 ≤ N_b 开始减速，N_b ∝ 转速²；7000 r/min 时 15.8 针（第 7.2 针起），4000 r/min 时 5.2 针（第 17.8 针起）",
+     "Early braking: begin when remaining stitches ≤ N_b, with N_b ∝ speed²; 15.8 at 7000 r/min (from stitch 7.2), 5.2 at 4000 r/min (from stitch 17.8)"
+    ],
+    [
+     "两台原型 19 种物料中 11 种相同（包缝机 58% 沿用）；控制、驱动、电源、联网和固件框架全部相同，改动集中在执行器、传感器和机种状态机",
+     "11 of the overlocker's 19 item types are shared (58%); control, drive, power, network and firmware framework are identical—changes sit in actuators, sensors and the machine-specific state machine"
+    ]
+   ],
+   "formula": "N_b = \\frac{\\omega_s^2}{2\\,\\alpha_s}\\cdot\\frac{1}{2\\pi},\\qquad \\alpha_s = i\\,\\alpha_m",
+   "figure": "fig_c20_oltail.png",
+   "narration": [
+    "第三件事是布边光电传感器，装在针前 25 毫米。7000 转时布速 350 毫米每秒，20 毫秒去抖就是 7 毫米，3000 转又变成 3 毫米。所以去抖不按时间按针数：连续 2 针都看到布才算布到，对应 6 毫米，与转速无关。布走以后还要缝 25 除以 3 约 9 针布尾，再缝 40 除以 3 约 14 针链线，一共 23 针停车。问题是高速时停不下来：1 比 1.25 方案从 7000 转减速到停要转 15.8 转，如果等 23 针缝完才减速，链线要多出将近 16 针、约 47 毫米。所以固件要提前减速，剩余针数小于等于 Nb 就开始减速，Nb 随转速平方变化，7000 转时从第 7.2 针开始，4000 转时从第 17.8 针开始。最后数一数复用：包缝机 19 种物料里 11 种和平缝机完全相同，控制、驱动、电源、联网和固件框架全部相同，改动集中在执行器、传感器和机种状态机。",
+    "The third change is an edge sensor 25 millimetres ahead of the needle. At 7000 r/min the fabric moves 350 millimetres a second; a 20 millisecond debounce is 7 millimetres there, 3 at 3000 r/min. So debounce in stitches, not time: fabric counts as present after two consecutive stitches, 6 millimetres at any speed. After the fabric leaves, about 25 over 3, 9 stitches of tail reach the needle, then 40 over 3, about 14 stitches of chain—stop at 23. The trouble is that it can't stop quickly at high speed: with the 1.25 belt, braking from 7000 r/min takes 15.8 revolutions; wait for all 23 stitches and the chain grows by nearly 16 stitches, about 47 millimetres. So firmware brakes early, starting when remaining stitches fall to N_b, which scales with speed squared: from stitch 7.2 at 7000 r/min, from 17.8 at 4000. Finally count the reuse: 11 of the overlocker's 19 item types are identical to the lockstitch's; control, drive, power, networking and firmware framework are all the same, and the changes sit in actuators, sensors and the machine-specific state machine."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "平缝机原型按 WQ-SC 五层搭建：编码器 A/B/Z 1:1 转发进主控，转角在主控手里；直驱或 1:1 同步带；电磁铁行程留余量；双触点急停硬接线切断使能和 24 V。",
+   "The lockstitch prototype follows the five WQ-SC layers: encoder A/B/Z forwarded 1:1 so the controller owns the angle; direct drive or a 1:1 belt; solenoid stroke margin; a two-contact E-stop hardwired to cut enable and 24 V."
+  ],
+  [
+   "剪线事件表按转角写，初值由实际进刀角 = 发令角 + 6nt 和窗口中心算出；拨线、抬压脚以“停稳”为起点按时间；剪线转速一变，表就要改。",
+   "The trim event table is written in angle, with initial values from actual entry = command + 6nt and the window centre; wipe and foot lift are timed from 'stopped'; change the trimming speed and the table must change."
+  ],
+  [
+   "固件 = 10 kHz 角度中断（事件表、回针计数）+ 1 kHz 状态机 + HAL；回针在送布空闲角内切换，转速上限 201.6/(6t)；去抖、回针、链线都按针数计。",
+   "Firmware = 10 kHz angle interrupt (events, backtack count) + 1 kHz state machine + HAL; backtack switches within the feed idle angle, with speed limit 201.6/(6t); debounce, backtack and chain are counted in stitches."
+  ],
+  [
+   "逐步调试：不通电检查 → 24 V → 编码器方向与对称两点法标偏置 → 伺服整定 → 转角上标定电磁铁 → 试缝；每步有判据。",
+   "Step-by-step bring-up: unpowered checks → 24 V → encoder direction and symmetric two-point offset → servo tuning → solenoid calibration by angle → trial sewing; every step has a criterion."
+  ],
+  [
+   "验收自动化、按需求编号判定并带版本号；标定残差直接叠加到停针误差上，所以停针误差和剪线成功率要分成两条需求；模型给不出的项目留待实测。",
+   "Acceptance is automated, judged by requirement ID and versioned; calibration residual adds directly to stop error, so stop error and trimming success are separate requirements; what the model can't give waits for measurement."
+  ],
+  [
+   "包缝机原型用 1:1.25 同步带使每主轴转计数为整数并加上针位传感器，布走后按 N_b ∝ n² 提前减速；两台原型 58% 物料相同，改动集中在机种特有部分。",
+   "The overlock prototype uses a 1:1.25 belt for an integer count per spindle revolution plus a needle-up sensor, and brakes early by N_b ∝ n²; 58% of items are shared, with changes concentrated in machine-specific parts."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "proto-ls",
+   "no": "20-1",
+   "title": [
+    "平缝机原型调试台",
+    "Lockstitch prototype bring-up bench"
+   ],
+   "goal": [
+    [
+     "用对称两点法标定一台编码器装反、Z 相不在上止点的原型，使标定残差 ≤ 0.3°。",
+     "Calibrate a prototype whose encoder is reversed and whose Z mark is off TDC, using the symmetric two-point method, to a residual ≤ 0.3°."
+    ],
+    [
+     "按第 14 章窗口和电磁铁延迟编辑剪线事件表，使七项判定全过、100 次试缝合格 ≥ 99 次。",
+     "Edit the trim event table against the Chapter 14 windows and solenoid delays so all seven checks pass and at least 99 of 100 trial trims succeed."
+    ],
+    [
+     "体会剪线转速对事件表和平台指标的影响。",
+     "See how trimming speed affects the event table and the platform limit."
+    ]
+   ],
+   "theory": [
+    [
+     "书中角度约定 0° = 针杆上止点；百分表分辨率 0.01 mm，上止点附近约 ±1.8° 内读不出变化；同一读数的下行、上行两次编码器读数取平均即下止点（应为 180°）。",
+     "Book convention: 0° = needle-bar TDC; the gauge resolves 0.01 mm and sees nothing within about ±1.8° of TDC; averaging the down and up encoder readings at one gauge reading gives BDC (should be 180°)."
+    ],
+    [
+     "实际动作角 = 发令角 + 6·n·t；剪线、松线电磁铁 8 Ω、L 20→80 mH、24 V 强激磁 10 ms、1 A 维持、48 V 稳压管续流，吸合随电压和线圈温度变化。",
+     "Actual action angle = command angle + 6·n·t; trim and release solenoids: 8 Ω, L 20→80 mH, 24 V boost 10 ms, 1 A hold, 48 V Zener clamp; pull-in varies with voltage and coil temperature."
+    ],
+    [
+     "判据：进刀 300°–330°；剪断在下一转 45°–65°；松线覆盖 335°–55°；停针误差 ≤ ±1°（上针位 70°）；拨线持续 ≥ 吸合 12 ms；拨线复位后才抬压脚。",
+     "Criteria: knife entry 300°–330°; cut at 45°–65° of the next turn; release covering 335°–55°; stop error ≤ ±1° (needle-up 70°); wipe lasting ≥ the 12 ms pull-in; foot lift only after the wiper returns."
+    ],
+    [
+     "剪线那一针匀速转，在 25° 切入位置环（定位速度 200 r/min）；“停稳” = 误差 ≤ 0.5° 且转速 < 10 r/min 持续 5 ms。",
+     "The trim stitch runs at constant speed; the position loop engages at 25° (200 r/min positioning speed); 'stopped' = error ≤ 0.5° and speed < 10 r/min for 5 ms."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，在①区用“+1°”“+10°”等按钮正转手轮，观察编码器读数是增还是减；减小则把“计数方向”改为“取反”。",
+     "Open the lab; in section ① turn the handwheel forward with '+1°', '+10°' and so on, and watch whether the encoder reading rises or falls; if it falls, set 'count direction' to 'invert'."
+    ],
+    [
+     "把手轮转到百分表读数约 12.00 mm 的下行位置，用 ±0.1° 微调，记下编码器读数 r₁；继续正转到上行再次读到 12.00 mm，记下 r₂。",
+     "Turn to the falling-side position where the gauge reads about 12.00 mm, fine-tune with ±0.1°, and note the encoder reading r₁; keep turning forward to the rising side at 12.00 mm again and note r₂."
+    ],
+    [
+     "计算 φ_BDC = (r₁ + r₂)/2（跨 360° 时先加 360°），偏置 Δ = 180° − φ_BDC；输入“Z 相偏置”，点“写入参数”，确认判定区“编码器方向与 Z 相偏置”残差 ≤ 0.3°（任务 1）。",
+     "Compute φ_BDC = (r₁ + r₂)/2 (adding 360° if wrapped) and Δ = 180° − φ_BDC; enter it as the 'Z offset', click 'Write parameters', and confirm the residual ≤ 0.3° in the checks (Task 1)."
+    ],
+    [
+     "在②区查看标准事件表，记录右侧“剪线电磁铁吸合、释放”和“每毫秒主轴转过”的数值，手算进刀范围并与深色条对照。",
+     "In section ②, inspect the standard event table, record the solenoid pull-in, release and 'degrees per ms' readings on the right, and hand-compute the entry range to compare with the dark bars."
+    ],
+    [
+     "在③区点“试缝一次（动画）”慢放观察主轴角、指令与衔铁动作、停针；再点“试缝 100 次”，记录合格数、进刀角和停针误差分布。",
+     "In section ③ click 'Sew once (animation)' and watch spindle angle, commands, armature motion and stop; then 'Sew 100 times' and record passes, entry-angle and stop-error distributions."
+    ],
+    [
+     "点“打乱事件表”，根据判定区的红色项拖动色条或输入角度，把表改回能用（剪线转速保持 300 r/min），直到七项全过且 100 次合格 ≥ 99 次（任务 2）。",
+     "Click 'Scramble event table' and, guided by the red checks, drag the bars or type angles until the table works again (keep 300 r/min), with all seven checks passing and ≥ 99 of 100 (Task 2)."
+    ],
+    [
+     "把剪线转速提到 700 r/min 以上，观察进刀范围变化，按 6·n·t 提前剪线和松线通电角，直到七项全过、100 次合格 ≥ 99 次（任务 3）；记录吸合折算转角并与 ≤ 20° 的平台指标比较。",
+     "Raise trimming speed above 700 r/min, watch the entry range move, advance the trim and release commands by 6·n·t until all seven checks pass and ≥ 99 of 100 succeed (Task 3); record the pull-in angle and compare with the 20° platform limit."
+    ],
+    [
+     "确认任务区三项都显示“✓ 完成”，截图保存标定结果、事件表和 100 次统计图。",
+     "Confirm all three tasks show '✓ Done' and save screenshots of the calibration, the event table and the 100-run statistics."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "标定与事件表记录",
+     "Calibration and event-table record"
+    ],
+    "headers": [
+     [
+      "剪线转速 r/min",
+      "Trim speed r/min"
+     ],
+     [
+      "计数方向 / 偏置 °",
+      "Direction / offset °"
+     ],
+     [
+      "剪线 通/断 °",
+      "Trim on/off °"
+     ],
+     [
+      "松线 通/断 °",
+      "Release on/off °"
+     ],
+     [
+      "进刀范围 °",
+      "Entry range °"
+     ],
+     [
+      "停针误差 °",
+      "Stop error °"
+     ],
+     [
+      "100 次合格数",
+      "Passes of 100"
+     ]
+    ],
+    "rows": 5
+   },
+   "questions": [
+    [
+     "为什么在针杆离上止点 12 mm 处取读数比在上止点附近找最高点准得多？用针杆位移曲线的斜率说明。",
+     "Why is reading at 12 mm below TDC far more accurate than hunting the top near TDC? Explain with the slope of the needle-bar displacement curve."
+    ],
+    [
+     "剪线转速从 300 r/min 提到 700 r/min，进刀范围的散布从约 5.7° 变成多少？为什么散布会随转速变宽？",
+     "From 300 to 700 r/min, how does the entry spread change from about 5.7°? Why does it widen with speed?"
+    ],
+    [
+     "如果标定残差是 0.7°，剪线能否成功？停针误差会怎样？这说明验收为什么要把两项分开？",
+     "With a 0.7° calibration residual, does trimming succeed? What happens to stop error? What does this say about separating the two acceptance items?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "平缝机原型的事件表、标定与包缝机链线设计",
+   "Event table, calibration and overlock chain design for the prototypes"
+  ],
+  "tasks": [
+   [
+    "剪线转速改为 350 r/min，剪线、松线电磁铁吸合延迟 6.2–9.4 ms，动刀须在 300°–330° 进刀，松线须在 335° 以前打开。求吸合折算转角范围和散布、使进刀居中的剪线通电角、松线通电角的最晚值；检查是否满足 ≤ 20° 的平台指标。",
+    "Trimming speed becomes 350 r/min; trim and release solenoids pull in in 6.2–9.4 ms; the knife must enter at 300°–330° and the release must open before 335°. Find the pull-in angle range and spread, the trim command angle that centres entry, and the latest release command angle; check against the 20° platform limit."
+   ],
+   [
+    "另一台原型标定编码器时，方向已改对、偏置为 0，在针杆离上止点 12.00 mm 处下行读到 296.3°、上行读到 125.9°。求应写入的偏置；若此处针杆速度约 0.28 mm/°，百分表分辨率 0.01 mm 对应多少度？",
+    "On another prototype, with direction corrected and zero offset, the encoder reads 296.3° on the way down and 125.9° on the way up at 12.00 mm from TDC. Find the offset to write. If the needle bar moves about 0.28 mm/° there, how many degrees does the gauge's 0.01 mm resolution correspond to?"
+   ],
+   [
+    "包缝机原型 1:1.25 传动，7000 r/min 时减速到停需 15.8 转，减速转数与转速平方成正比。缝纫转速 6000 r/min，针距 2.5 mm，布边传感器在针前 30 mm，链线要求 35 mm。求布走后共缝几针停车、第几针开始减速；若不提前减速，链线多出多长？",
+    "The overlock prototype has a 1:1.25 belt and needs 15.8 revolutions to brake from 7000 r/min, scaling with speed squared. At 6000 r/min, 2.5 mm stitch length, with the edge sensor 30 mm ahead of the needle and a 35 mm chain required, how many stitches after the fabric leaves until the stop, and at which stitch should braking start? Without early braking, how much longer is the chain?"
+   ],
+   [
+    "（讨论）结合 20.5 节和表 20-6，说明为什么验收要把“停针误差”和“剪线成功率”分成两条需求；如果要把这台原型推进到 EVT，你会先补哪三项测试？",
+    "(Discussion) Using Section 20.5 and Table 20-6, explain why acceptance separates 'needle-stop error' and 'trimming success'; if you were taking this prototype to EVT, which three tests would you add first?"
+   ]
+  ],
+  "deliverable": [
+   "提交 PDF 报告 3–4 页：前三题给出公式、代入和结果；第 1 题附在虚拟实验 20-1 中把剪线转速设为 350 r/min 后的事件表与 100 次统计截图；讨论题一段话加测试清单。",
+   "Submit a 3–4 page PDF: formulas, substitution and results for Tasks 1–3; for Task 1 attach screenshots of the event table and 100-run statistics in Virtual lab 20-1 at 350 r/min; one paragraph plus a test list for the discussion."
+  ],
+  "rubric": [
+   [
+    "第 1 题角度计算正确、事件表在实验中验证通过：30 分",
+    "Task 1 angles correct and table verified in the lab: 30 points"
+   ],
+   [
+    "第 2 题偏置和分辨率计算正确：20 分",
+    "Task 2 offset and resolution correct: 20 points"
+   ],
+   [
+    "第 3 题针数、减速起点和多出链长正确：25 分",
+    "Task 3 stitch counts, braking start and extra chain correct: 25 points"
+   ],
+   [
+    "第 4 题论证清楚、所列测试合理：15 分",
+    "Task 4 argument clear and tests sensible: 15 points"
+   ],
+   [
+    "报告规范、单位与有效数字正确：10 分",
+    "Report presentation, units and significant figures: 10 points"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "numerical",
+   "text": [
+    "剪线转速 500 r/min，剪线电磁铁吸合延迟 6.2–9.4 ms，动刀窗口 300°–330°。使进刀范围居中的剪线通电角是多少度？",
+    "Trimming at 500 r/min, the trim solenoid pulls in in 6.2–9.4 ms and the knife window is 300°–330°. What command angle centres the entry range?"
+   ],
+   "answer": 291.6,
+   "tolerance": 1.0,
+   "unit": "°",
+   "feedback": [
+    "每毫秒 3°，吸合折合 18.6°–28.2°，平均提前 23.4°；315° − 23.4° ≈ 291.6°。但吸合已超过 20° 的平台指标。",
+    "3° per ms, so pull-in spans 18.6°–28.2° with mean lead 23.4°; 315° − 23.4° ≈ 291.6°. The pull-in already exceeds the 20° platform limit."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "计数方向已改对、偏置为 0。在针杆离上止点 12.00 mm 处，下行读到 79.0°，上行读到 301.0°。应写入的 Z 相偏置是多少度？",
+    "Direction corrected, offset zero. At 12.00 mm from TDC the reading is 79.0° going down and 301.0° going up. What Z offset should be written?"
+   ],
+   "answer": -10.0,
+   "tolerance": 0.2,
+   "unit": "°",
+   "feedback": [
+    "φ_BDC = (79.0 + 301.0)/2 = 190.0°，Δ = 180° − 190.0° = −10.0°（没有跨 360°，不必加 360°）。",
+    "φ_BDC = (79.0 + 301.0)/2 = 190.0°, Δ = 180° − 190.0° = −10.0° (no wrap, so no 360° added)."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "编码器计数方向反了时，伺服速度环会变成正反馈，一启动就可能飞车。",
+    "If the encoder count direction is reversed, the servo velocity loop becomes positive feedback and may run away at start."
+   ],
+   "correct": true,
+   "feedback": [
+    "所以真机上必须先手转手轮确认读数随正转增大，再上伺服；驱动器通常会报超速或编码器异常。",
+    "So on a real machine, confirm by turning the handwheel that the reading rises going forward before enabling the servo; drives usually trip overspeed or encoder fault."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "平缝机原型为什么让伺服驱动器把编码器 A、B、Z 信号 1:1 转发给主控，而不是经 CAN FD 报角度？",
+    "Why does the lockstitch prototype have the servo drive forward encoder A, B, Z 1:1 to the controller rather than report angle over CAN FD?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "总线帧有几百微秒的随机延迟和抖动，会直接加到进刀角的散布上",
+      "Bus frames carry hundreds of µs of random delay and jitter, which adds directly to the knife-entry spread"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "CAN FD 不能传输整数",
+      "CAN FD cannot carry integers"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "驱动器做矢量控制不需要编码器",
+      "The drive does not need the encoder for vector control"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "转发可以提高编码器的线数",
+      "Forwarding increases the encoder line count"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "300 r/min 时 0.5 ms 就是 0.9°，而且是随机的；速度指令、状态和参数对时间不敏感，走 CAN FD 没问题。",
+    "At 300 r/min, 0.5 ms is 0.9°, and random; speed commands, status and parameters are not time-critical and use CAN FD."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "倒缝电磁铁延迟 20 ms，送布空闲角 211.6°，留 10° 余量。回针转速最高是多少 r/min？",
+    "The backtack solenoid takes 20 ms; the feed idle angle is 211.6°, with 10° margin. What is the highest backtack speed in r/min?"
+   ],
+   "answer": 1680.0,
+   "tolerance": 10,
+   "unit": "r/min",
+   "feedback": [
+    "最高回针转速 n_max = 201.6/(6 × 0.020) = 1680 r/min。",
+    "n_max = 201.6/(6 × 0.020) = 1680 r/min."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "事件表里拨线和抬压脚为什么以“停稳”为起点、按时间安排，而不按转角？",
+    "Why are the wiper and foot lift scheduled by time from 'stopped' rather than by angle?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "主轴停住以后转角不再变化，按转角已经无法排先后",
+      "Once the spindle stops the angle no longer changes, so angle cannot order the actions"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "拨线电磁铁比剪线电磁铁快",
+      "The wiper solenoid is faster than the trim solenoid"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "按时间写代码更短",
+      "Time-based code is shorter"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "编码器在停车时会丢计数",
+      "The encoder loses counts when stopped"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "转动中的动作按转角，停车后的动作只能按时间；“停稳”判据决定了它们的起点。",
+    "Actions while turning go by angle; after stopping only time can order them, starting from the 'stopped' flag."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "包缝机原型 1:1.25 传动，7000 r/min 时减速到停需 15.8 转，减速转数与转速平方成正比。6000 r/min 时减速到停需多少转（针）？",
+    "With a 1:1.25 belt the overlock prototype needs 15.8 revolutions to stop from 7000 r/min, scaling with speed squared. How many revolutions (stitches) from 6000 r/min?"
+   ],
+   "answer": 11.61,
+   "tolerance": 0.2,
+   "unit": "针",
+   "feedback": [
+    "N_b = 15.8 × (6000/7000)² ≈ 11.6 针。",
+    "N_b = 15.8 × (6000/7000)² ≈ 11.6 stitches."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "下列哪些量在原型固件里应按针数（转角）而不是按时间计？",
+    "Which of these should the prototype firmware count in stitches (angle) rather than time?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "布边传感器的去抖",
+      "Edge-sensor debounce"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "起缝回针的针数",
+      "Start-backtack stitch count"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "布走后的链线长度",
+      "Chain length after the fabric leaves"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "停稳以后拨线电磁铁的通电时长",
+      "Wiper on-time after the spindle has stopped"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "电磁铁强激磁的持续时间",
+      "Duration of the solenoid boost"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "与布或机构位置有关的量按针数计才与转速无关；停车后的动作和电磁铁本身的电气时间仍按时间。",
+    "Quantities tied to fabric or mechanism position are speed-independent only when counted in stitches; post-stop actions and the solenoid's own electrical timing stay in time."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "包缝机原型为什么选 1:1.25 而不是 1:1.4 的同步带传动？",
+    "Why does the overlock prototype use a 1:1.25 belt rather than 1:1.4?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "1.25 使每主轴转正好 8000 计数，Z 相能周期性对准；1.4 是 7142.857…，不能校正且误差累积",
+      "1.25 gives exactly 8000 counts per spindle revolution so Z realigns periodically; 1.4 gives 7142.857…, which can't be corrected and accumulates error"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "1.4 时电机转速超过 6000 r/min",
+      "At 1.4 the motor would exceed 6000 r/min"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "1.25 时折算惯量最小",
+      "1.25 gives the smallest reflected inertia"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "1.4 的带轮不在零件库里",
+      "Pulleys for 1.4 are not in the library"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "1.4 时电机只需 5000 r/min、惯量更大；直驱惯量最小。选 1.25 的关键是整数计数。",
+    "At 1.4 the motor needs only 5000 r/min with more inertia; direct drive has the least inertia. The key to 1.25 is the integer count."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "逐步调试时，第一次只上 24 V（主轴不转）要先确认什么？",
+    "In step-by-step bring-up, what must be confirmed first when only 24 V is applied (spindle still)?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "按下急停时电磁铁驱动板的 24 V 和伺服使能确实断开",
+      "Pressing the E-stop really removes the solenoid board's 24 V and the servo enable"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "伺服停针超调 ≤ 0.5°",
+      "Servo stop overshoot ≤ 0.5°"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "剪线 1000 次成功率 ≥ 99.5%",
+      "Trimming success ≥ 99.5% over 1000 cycles"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "Z 相偏置残差 ≤ 0.3°",
+      "Z offset residual ≤ 0.3°"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "后三项分别属于第 3 步、验收和第 2 步；急停有效是之后所有步骤的安全前提。",
+    "The others belong to step 3, acceptance and step 2; a working E-stop is the safety precondition for everything after."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "平台要求电磁铁吸合折算转角 ≤ 20°。若提高强激磁电压后最慢吸合为 7.5 ms，剪线转速最高是多少 r/min？",
+    "The platform requires the solenoid pull-in angle ≤ 20°. If raising the boost voltage makes the slowest pull-in 7.5 ms, what is the highest trimming speed in r/min?"
+   ],
+   "answer": 444.4,
+   "tolerance": 3,
+   "unit": "r/min",
+   "feedback": [
+    "剪线转速上限 n = 20/(6 × 0.0075) ≈ 444 r/min。",
+    "n = 20/(6 × 0.0075) ≈ 444 r/min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "包缝机布边传感器按时间去抖 30 ms。缝纫转速 4500 r/min、针距 3 mm 时，去抖期间布走了多少毫米？",
+    "An overlock edge sensor uses a 30 ms time debounce. At 4500 r/min and 3 mm stitch length, how far does the fabric move during the debounce?"
+   ],
+   "answer": 6.75,
+   "tolerance": 0.1,
+   "unit": "mm",
+   "feedback": [
+    "布速 = 3 × 4500/60 = 225 mm/s，× 0.03 s = 6.75 mm；转速一变距离就变，所以应改为按针数去抖。",
+    "Fabric speed = 3 × 4500/60 = 225 mm/s, × 0.03 s = 6.75 mm; the distance changes with speed, so debounce should be in stitches."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "SIL 验收中，标定残差 0.7° 时剪线 1000 次全部成功，停针误差却全部超出 ±1°。正确的结论是：",
+    "In SIL acceptance with a 0.7° calibration residual, all 1000 trims succeed but every stop exceeds ±1°. The correct conclusion is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "标定残差直接叠加在停针误差上；停针误差和剪线成功率必须作为两条需求分别验收",
+      "The residual adds directly to stop error; stop error and trimming success must be accepted as separate requirements"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "剪线成功就说明原型合格，停针误差可以放宽",
+      "Successful trimming means the prototype passes and stop error can be relaxed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "应该提高位置环增益来消除这一误差",
+      "The position-loop gain should be raised to remove the error"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "应该把剪线通电角推后 0.7°",
+      "The trim command angle should be delayed by 0.7°"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "残差是标定问题，位置环看到的是带偏差的读数，增益再高也停在错的地方；要回到 20.4.2 节把残差做到 ≤ 0.3°。",
+    "The residual is a calibration error—the loop sees a biased reading and stops in the wrong place at any gain; return to Section 20.4.2 and get it ≤ 0.3°."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "原型阶段建议一开始就让固件按转速自动补偿电磁铁延迟，这样可以省去在转角上标定电磁铁。",
+    "At the prototype stage it is advisable to let firmware compensate solenoid delay by speed from the start, which removes the need to calibrate solenoids by angle."
+   ],
+   "correct": false,
+   "feedback": [
+    "自动补偿会把标定误差藏起来；应先用固定角调通并在转角上标定，再加补偿。",
+    "Automatic compensation hides calibration errors; first get it working with fixed angles and angle-domain calibration, then add compensation."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "剪线和松线电磁铁（各 8 Ω）的 24 V 强激磁在 300 r/min 时重叠，主控与传感器另需 0.5 A。24 V 电源的峰值功率是多少瓦？",
+    "The 24 V boosts of the trim and release solenoids (8 Ω each) overlap at 300 r/min, and the controller and sensors draw another 0.5 A. What is the peak power of the 24 V supply in watts?"
+   ],
+   "answer": 156.0,
+   "tolerance": 2,
+   "unit": "W",
+   "feedback": [
+    "(2 × 24/8 + 0.5) A × 24 V = 6.5 A × 24 V = 156 W，选 200 W 留余量。",
+    "(2 × 24/8 + 0.5) A × 24 V = 6.5 A × 24 V = 156 W; choose 200 W for margin."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "编码器 1:1 转发与转角在主控；剪线事件表初值的计算（θ_entry = θ_cmd + 6nt）；逐步调试与对称两点法；验收按需求编号；包缝机整数计数传动比与提前减速。",
+   "1:1 encoder forwarding and angle ownership; computing initial trim angles (θ_entry = θ_cmd + 6nt); step-by-step bring-up and the two-point method; acceptance by requirement ID; integer-count belt ratio and early braking for the overlocker."
+  ],
+  "difficult": [
+   "吸合延迟散布怎样决定通电角和余量；剪断发生在位置环减速段，断电角需按实际转速曲线计算；标定残差与停针误差的关系；N_b ∝ n² 的提前减速。",
+   "How pull-in spread sets command angle and margin; the cut occurs during position-loop deceleration so the off angle needs the real speed profile; how calibration residual relates to stop error; early braking with N_b ∝ n²."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入与系统构成",
+     "Introduction and build-up"
+    ],
+    "minutes": 35,
+    "content": [
+     "提出改装问题与三件事；框图、编码器转发、机械改装、BOM 与接线表、电源预算与急停联锁。",
+     "Pose the retrofit problem and the three questions; block diagram, encoder forwarding, retrofit, BOM and wiring, power budget and E-stop interlocks."
+    ]
+   },
+   {
+    "phase": [
+     "固件",
+     "Firmware"
+    ],
+    "minutes": 55,
+    "content": [
+     "状态机与三层任务；剪线事件表与初值计算（板书 300/700 r/min）；事件扫描与剪线序列代码；回针；脚踏与速度曲线。",
+     "State machine and task levels; trim event table and initial values (board work at 300/700 r/min); scanning and trim-sequence code; backtack; pedal and speed profile."
+    ]
+   },
+   {
+    "phase": [
+     "逐步调试",
+     "Bring-up"
+    ],
+    "minutes": 45,
+    "content": [
+     "调试步骤表；对称两点法标定（板书算例）；伺服整定；在转角上标定电磁铁；常见故障；虚拟实验 20-1 演示任务 1。",
+     "Bring-up table; symmetric two-point calibration (worked example); servo tuning; solenoid calibration by angle; common faults; demonstrate Task 1 of Virtual lab 20-1."
+    ]
+   },
+   {
+    "phase": [
+     "验收测试",
+     "Acceptance"
+    ],
+    "minutes": 35,
+    "content": [
+     "测试脚本结构；SIL 1000 次结果与五种工况；测试记录与版本；虚拟实验演示任务 2。",
+     "Test-script structure; SIL 1000-run results and five conditions; test record and versions; demonstrate Task 2 in the lab."
+    ]
+   },
+   {
+    "phase": [
+     "包缝机原型与复用",
+     "Overlock prototype and reuse"
+    ],
+    "minutes": 55,
+    "content": [
+     "传动比与整数计数、链线切刀、布边传感器与提前减速、电子差动；两台原型复用；模型边界；课堂测验，布置作业。",
+     "Ratio and integer counts, chain cutter, edge sensor and early braking, electronic differential; reuse between prototypes; model limits; quiz and assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“事件表、标定与包缝机链线设计”；完成虚拟实验 20-1 的 3 项任务并截图；预习第 21 章。",
+   "Complete the event-table, calibration and chain-design assignment; finish the 3 tasks of Virtual lab 20-1 with screenshots; read Chapter 21 in advance."
+  ]
+ }
+}
