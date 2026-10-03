@@ -1,0 +1,35 @@
+# 实验 14.4 的指导书与报告模板。目的、场景、参数、任务取自 lab14_4.js。
+原理:
+  - ["关节 4、5、6 的轴交于腕心 p_w。由引理 14.3.1，这三个关节的转动都不移动腕心，所以腕心的位置只由前三个关节决定。",
+     "Axes 4, 5, 6 meet at the wrist centre p_w. By Lemma 14.3.1 these joints never move it, so its position depends on joints 1–3 only."]
+  - 式: "e^[S1]θ1 e^[S2]θ2 e^[S3]θ3 p_w0 = T_d M⁻¹ p_w0          (14.4.1)"
+  - ["逆解分四步：子问题 3 求 θ₃（腕心到肩点的距离），子问题 2 求 θ₁、θ₂，子问题 2 求 θ₄、θ₅，子问题 1 求 θ₆。每步两种选择，一般共 8 组解。",
+     "Four steps: Subproblem 3 for θ₃ (wrist-to-shoulder distance), Subproblem 2 for θ₁, θ₂, Subproblem 2 for θ₄, θ₅, Subproblem 1 for θ₆. Two choices at each of three steps give eight solutions in general."]
+  - ["手腕翻转：(θ₄, θ₅, θ₆) 换成 (θ₄ + 180°, −θ₅, θ₆ + 180°)，前三个关节不变。θ₅ = 0 时轴 4 与轴 6 重合，只有 θ₄ + θ₆ 确定，这是手腕奇异。",
+     "Wrist flip: (θ₄, θ₅, θ₆) becomes (θ₄ + 180°, −θ₅, θ₆ + 180°), joints 1–3 unchanged. At θ₅ = 0 axes 4 and 6 coincide and only θ₄ + θ₆ is fixed: the wrist singularity."]
+步骤:
+  - ["打开实验 14.4，默认目标就是算例 14.4.1。把“解的编号”从 1 调到 8，逐组记录六个关节角，填入表 1，并与表 14.4.2 比较；找到与 θ* 相同的第 3 组（任务 1）。",
+     "Open Lab 14.4; the default target is Example 14.4.1. Step “solution” from 1 to 8, record all six joint angles in Table 1 and compare with Table 14.4.2; find number 3, equal to θ* (task 1)."]
+  - ["保持腕心不动，把偏航、俯仰、横滚改变 20° 以上（任务 2），记录第 3 组解的六个关节角，填入表 2。哪几个关节变了？",
+     "Keep the wrist centre and change yaw, pitch, roll by more than 20° in total (task 2); record solution 3 in Table 2. Which joints changed?"]
+  - ["回到算例 14.4.1 的目标，在第 3、4 组之间切换（任务 3），观察只有手腕在动，并验证翻转关系。",
+     "Return to the target of Example 14.4.1 and switch between solutions 3 and 4 (task 3); only the wrist moves; check the flip relation."]
+  - ["调整姿态使第 3 组解的 |θ₅| 小于 2°（任务 4）。再稍微改变横滚角，记录 θ₄、θ₆ 的变化。",
+     "Adjust the orientation until |θ₅| of solution 3 is under 2° (task 4). Then change roll slightly and record how θ₄ and θ₆ change."]
+  - ["切换到“端水倒水”，把倾斜角拖到 90° 以上（任务 5），观察哪几个关节在动。",
+     "Switch to “Pouring a glass of water” and drag the tilt past 90° (task 5); note which joints move."]
+数据表:
+  - 标题: ["表 1  算例 14.4.1 的 8 组解", "Table 1  The eight solutions of Example 14.4.1"]
+    表头: ["编号", "肩 · 肘 · 腕", "θ₁, θ₂, θ₃ / (°)", "θ₄, θ₅, θ₆ / (°)", "末端误差 / m"]
+    表头英文: ["No.", "Shoulder · elbow · wrist", "θ₁, θ₂, θ₃ / (°)", "θ₄, θ₅, θ₆ / (°)", "Tool error / m"]
+    行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""], ["5", "", "", "", ""], ["6", "", "", "", ""], ["7", "", "", "", ""], ["8", "", "", "", ""]]
+  - 标题: ["表 2  腕心不动、姿态改变时的第 3 组解", "Table 2  Solution 3 with the wrist centre fixed and the orientation changed"]
+    表头: ["偏航, 俯仰, 横滚 / (°)", "θ₁, θ₂, θ₃ / (°)", "θ₄, θ₅, θ₆ / (°)"]
+    表头英文: ["Yaw, pitch, roll / (°)", "θ₁, θ₂, θ₃ / (°)", "θ₄, θ₅, θ₆ / (°)"]
+    行: [["14.05, −17.58, −11.90", "", ""], ["", "", ""], ["", "", ""]]
+注意:
+  - ["目标姿态用 ZYX 欧拉角给出：先绕 z 转偏航 ψ，再绕新的 y 转俯仰 θ，最后绕新的 x 转横滚 φ（4.5 节）。", "The target orientation uses ZYX Euler angles: yaw ψ about z, then pitch θ about the new y, then roll φ about the new x (Section 4.5)."]
+  - ["虚线坐标系是目标，实线坐标系是机械臂末端；有解时两者重合。", "The dashed frame is the target, the solid one the tool; they coincide whenever there is a solution."]
+  - ["这台机械臂由圆柱和小球搭成，尺寸同表 14.4.1；零件库中没有球形手腕的机械臂模型。", "The arm is built from cylinders and balls with the sizes of Table 14.4.1; the parts library has no spherical-wrist arm."]
+思考题:
+  - ["θ₅ 接近 0 时，末端姿态的微小变化会让 θ₄、θ₆ 怎样变化？这对沿直线运动的焊枪意味着什么？", "Near θ₅ = 0, how do θ₄ and θ₆ respond to a small change of orientation? What does this mean for a welding torch moving along a line?"]

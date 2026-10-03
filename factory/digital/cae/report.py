@@ -50,6 +50,8 @@ def conclusion(stats, mat):
 
 
 def build(job, images=(), ai_text=None):
+    if (job.get("setup") or {}).get("analysis") in ("thermal", "thermo_mech"):
+        return build_thermal(job, images, ai_text)
     from docx import Document
     from docx.enum.text import WD_ALIGN_PARAGRAPH
     from docx.oxml.ns import qn
@@ -170,6 +172,119 @@ def build(job, images=(), ai_text=None):
         p.runs[0].font.size = Pt(9)
 
     p = d.add_paragraph("问渠数字工厂 · 仿真与分析 生成。计算模型为线弹性小变形，没有考虑接触、塑性、残余应力和表面状态；用于教学和方案比较，正式设计请按相关标准复核。")
+    p.runs[0].font.size = Pt(8)
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+TH_NAME = {"temperature": "固定温度", "convection": "对流散热", "heat_flux": "面发热", "heat_body": "整体发热"}
+
+
+def describe_thermal(l):
+    f = "其余所有面" if l.get("faces") == "rest" else ("整个零件" if l["type"] == "heat_body" else "面 " + "、".join(str(x) for x in l["faces"]))
+    if l["type"] == "temperature":
+        return TH_NAME[l["type"]], f, "{:g} ℃".format(l["value_c"])
+    if l["type"] == "convection":
+        return TH_NAME[l["type"]], f, "散热系数 {:g} W/(m²·K)，环境 {:g} ℃".format(l["h_w_m2k"], l["t_inf_c"])
+    return TH_NAME.get(l["type"], l["type"]), f, "{:g} W".format(l["power_w"])
+
+
+def build_thermal(job, images=(), ai_text=None):
+    """热分析 / 热—结构耦合的报告（第 14 轮）"""
+    from docx import Document
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml.ns import qn
+    from docx.shared import Cm, Pt
+
+    st, setup = job["stats"], job["setup"]
+    mat = M.get(setup["material_id"])
+    coupled = setup.get("analysis") == "thermo_mech"
+    d = Document()
+    style = d.styles["Normal"]
+    style.font.name = "Times New Roman"
+    style.font.size = Pt(10.5)
+    style.element.rPr.rFonts.set(qn("w:eastAsia"), "宋体")
+    for name in ("Title", "Heading 1", "Heading 2"):
+        d.styles[name].element.get_or_add_rPr().get_or_add_rFonts().set(qn("w:eastAsia"), "黑体")
+    for sec in d.sections:
+        sec.left_margin = sec.right_margin = Cm(2.2)
+
+    def table(rows, widths=None):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for i, r in enumerate(rows):
+            for j, v in enumerate(r):
+                c = t.cell(i, j)
+                c.text = str(v)
+                if i == 0:
+                    for run in c.paragraphs[0].runs:
+                        run.bold = True
+                if widths:
+                    c.width = Cm(widths[j])
+        d.add_paragraph()
+
+    d.add_heading("热—结构耦合计算报告" if coupled else "温度场计算报告", 0)
+    table([["项目", "内容"], ["计算名称", job.get("title") or "—"], ["零件", job.get("item") or "上传的零件"],
+           ["计算人", job.get("owner_name") or "—"], ["时间", dt.datetime.fromtimestamp(job["created"]).strftime("%Y-%m-%d %H:%M")],
+           ["任务编号", job["id"]]], [4, 12])
+    d.add_heading("1  材料", 1)
+    rows = [["材料", "导热系数 k", "比热 c", "密度", "线膨胀系数 α"],
+            [mat["name"], "{:g} W/(m·K)".format(mat["k_w_mk"]), "{:g} J/(kg·K)".format(mat["c_j_kgk"]),
+             "{:g} g/cm³".format(mat["density"]), "{:g} ×10⁻⁶/K".format(mat["alpha_1e6"])]]
+    table(rows)
+    p = d.add_paragraph("出处：" + mat["thermal_src"] + "。")
+    p.runs[0].font.size = Pt(9)
+    d.add_heading("2  热边界与载荷", 1)
+    table([["类型", "作用面", "大小"]] + [list(describe_thermal(l)) for l in setup.get("thermal") or []], [4, 4, 8])
+    if setup.get("transient"):
+        tr = setup["transient"]
+        d.add_paragraph("瞬态：初始温度 {:g} ℃，计算 {:g} 秒。".format(tr.get("t0_c", 20), tr["duration_s"]))
+    if coupled:
+        table([["类型", "作用面", "大小 / 方式"]] + [list(describe_load(l)) for l in setup.get("loads") or []], [5, 3.5, 7.5])
+        d.add_paragraph("无应力参考温度 {:g} ℃（零件在这个温度下没有热应力）。".format(setup.get("ref_temp_c", 20)))
+    d.add_heading("3  网格与求解", 1)
+    table([["项目", "内容"], ["单元", "二阶四面体（10 节点，CalculiX C3D10）"],
+           ["规模", "{} 个单元，{} 个节点，单元尺寸 {} mm".format(st["elements"], st["nodes"], st.get("mesh_size_mm"))],
+           ["求解", ("稳态热—结构耦合" if coupled else "瞬态导热" if setup.get("transient") else "稳态导热") + "，CalculiX；用时 {} 秒".format(st["seconds"])]],
+          [4, 12])
+    d.add_heading("4  结果", 1)
+    rows = [["项目", "数值", "位置（mm）"],
+            ["最高温度", "{:.1f} ℃".format(st["t_max_c"]), _vec(st["t_max_at"])],
+            ["最低温度", "{:.1f} ℃".format(st["t_min_c"]), _vec(st["t_min_at"])],
+            ["表面平均温度", "{:.1f} ℃".format(st["t_surface_mean_c"]), ""],
+            ["输入热量 / 对流散走", "{:.1f} W / {:.1f} W".format(st["heat_in_w"], st["heat_out_convection_w"]), "两者应相等（稳态）"]]
+    for g in st.get("film_groups") or []:
+        rows.append(["对流面组 {} 平均温度".format(g["load"] + 1), "{:.1f} ℃".format(g["mean_c"]),
+                     "面积 {:.4f} m²，散热 {:.1f} W".format(g["area_m2"], g["heat_w"])])
+    if coupled:
+        rows += [["最大 Von Mises 应力（评估值）", "{:.1f} MPa".format(st["vm_max_mpa"]), _vec(st["vm_max_at"])],
+                 ["最大热变形", "{:.4g} mm".format(st["u_max_mm"]), _vec(st["u_max_at"])]]
+        if st.get("safety_factor") is not None:
+            rows.append(["安全系数", "{:.2f}".format(st["safety_factor"]), ""])
+    table(rows, [5, 4, 7])
+    f = setup.get("formula")
+    n = 5
+    if f:
+        d.add_heading("5  与教材公式对比", 1)
+        table([["项目", "内容"]] + [[k, str(v)] for k, v in f.items() if k not in ("name", "note")] + [["公式", f.get("name", "")],
+                                                                                                    ["说明", f.get("note", "")]], [5, 11])
+        n = 6
+    for img in images:
+        try:
+            raw = base64.b64decode(img["data"].split(",", 1)[-1])
+        except Exception:  # noqa: BLE001
+            continue
+        d.add_picture(io.BytesIO(raw), width=Cm(15.5))
+        d.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cap = d.add_paragraph(img.get("caption") or "")
+        cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    if ai_text:
+        d.add_heading("{}  AI 分析与改进建议".format(n), 1)
+        for para in str(ai_text).split("\n"):
+            if para.strip():
+                d.add_paragraph(para.strip())
+    p = d.add_paragraph("问渠数字工厂 · 仿真与分析 生成。表面散热按给定的散热系数（对流与辐射合计），不考虑接触热阻、辐射细节和内部油液流动；用于教学和方案比较。")
     p.runs[0].font.size = Pt(8)
     buf = io.BytesIO()
     d.save(buf)

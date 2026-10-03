@@ -1,0 +1,1200 @@
+{
+ "no": 4,
+ "title": [
+  "挑线机构",
+  "The Thread Take-up Mechanism"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能沿面线线路说出各零件的作用，以及挑线机构在一针中依次完成的放线、收线、拉线三件事。",
+   "Trace the needle-thread path and state the role of each part, and the three tasks the take-up performs in each stitch: paying out, taking up and drawing thread."
+  ],
+  [
+   "能比较凸轮式、连杆式、滑杆式、旋转式挑线机构的优缺点和适用场合。",
+   "Compare cam, link, slide-lever and rotary take-ups: their advantages, drawbacks and uses."
+  ],
+  [
+   "能用两圆交点法求四连杆挑线机构的线孔位置和传动角，并由线路长度算出供线量。",
+   "Find the eye position and transmission angle of a four-bar take-up by intersecting two circles, and calculate the thread supply from the thread-path length."
+  ],
+  [
+   "能估算耗线量（钩线前 2max(0, x − e₀)、每针用线 q ≈ s + t），并用三条余线判据检查挑线是否够用。",
+   "Estimate thread demand (2max(0, x − e₀) before catching, q ≈ s + t per stitch) and check the take-up with the three surplus criteria."
+  ],
+  [
+   "能解释换厚料、改钩线时刻时怎样调过线板和挑线簧，以及高速机为什么用连杆式。",
+   "Explain how to adjust the thread guide and check spring for thick fabric or changed hook timing, and why high-speed machines use link take-ups."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "车间问题：换牛仔布以后断线、线迹不紧",
+   "Shop-floor problem: thread breaks and loose stitches after switching to denim"
+  ],
+  "text": [
+   "一台平缝机（挑线机构为本章算例尺寸，钩线时刻 206°，挑线簧行程 10 mm，针距 3 mm）缝 1.5 mm 厚的衬衫料一切正常。改缝 3 mm 厚的牛仔布后频繁断线，线迹时紧时松。班长同时问：一条 50 cm 长的缝要准备多少面线（车间损耗按 15% 计）？",
+   "A lockstitch machine (take-up to the chapter's worked-example dimensions, hook timing 206°, check-spring stroke 10 mm, stitch length 3 mm) sews 1.5 mm shirting perfectly. On 3 mm denim it breaks thread frequently and the stitches are alternately tight and loose. The line leader also asks how much needle thread to allow for a 50 cm seam (with 15% shop-floor waste)."
+  ],
+  "question": [
+   "用余线判据分析断线的原因；过线板应向哪个方向移动多少？移动后各判据是否满足？50 cm 的缝（针距 3 mm、布厚 1.5 mm）要准备多少面线？",
+   "Use the surplus criteria to explain the thread breaks. Which way and how far should the thread guide be moved, and are the criteria met afterwards? How much needle thread is needed for the 50 cm seam (3 mm stitch, 1.5 mm fabric)?"
+  ],
+  "answer": [
+   "布厚从 1.5 mm 增到 3 mm，耗线量曲线整体抬高：钩线到脱环的最小余量从 +1.9 mm 变为 −0.9 mm，针眼入布后还欠线 1.9 mm，旋梭只好从夹线器里硬拉面线，张力突增而断线。把过线板沿调节槽向“多放线”方向（本章坐标沿 285° 方向，向下）移动约 12 mm 后，最小余量回到 1.4 mm，欠线降到 0.6 mm（≤ 1 mm），针眼入布前的余线不到 9 mm，仍在 10 mm 挑线簧行程以内，三条判据都满足。面线用量：500/3 ≈ 167 针，每针 q ≈ s + t = 4.5 mm，约 75 cm，加 15% 损耗约 86 cm。",
+   "Going from 1.5 mm to 3 mm raises the whole demand curve: the minimum margin from catch to cast-off falls from +1.9 mm to −0.9 mm, and after the eye enters the fabric there is a 1.9 mm shortfall, so the hook pulls needle thread through the tension assembly by force, the tension jumps and the thread breaks. Moving the thread guide about 12 mm along its slot in the “more thread” direction (along 285°, downwards, in the chapter's coordinates) restores the minimum margin to 1.4 mm, cuts the shortfall to 0.6 mm (≤ 1 mm), and leaves the surplus before eye entry under 9 mm, within the 10 mm check-spring stroke: all three criteria are met. Thread: 500/3 ≈ 167 stitches at q ≈ s + t = 4.5 mm is about 75 cm, about 86 cm with 15% waste."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人联系：供需包络、线缆回收器与电子凸轮",
+   "Robot link: supply enveloping demand, cable retractors and electronic cams"
+  ],
+  "text": [
+   "挑线设计的核心是“供线量曲线在整个放线过程中包住耗线量曲线，多出来的由挑线簧收住”。焊接机器人的线缆包（焊枪电缆、送丝管）面对的是同一个问题：手腕转动时线缆需要的长度一会儿长一会儿短，给少了会被拉断，给多了会垂下来缠住工件，所以在第三、四轴附近装弹簧回收器，像挑线簧一样把余量收住。本章还看到，凸轮式供线曲线贴得越紧、线的加速度越大（算例约 290 km/s² 对连杆式 30 km/s²）；机器人用伺服电机做“电子凸轮”时也一样，跟踪曲线越陡，所需的加速度和电机峰值力矩越大，这正是用步进或伺服电机直接驱动挑线机构时要权衡的地方。",
+   "The heart of take-up design is that the supply curve must envelop the demand curve throughout paying out, with the check spring holding any surplus. A welding robot's dress pack (torch cable and wire-feed conduit) faces the same problem: as the wrist turns, the length the cable needs keeps changing; give too little and it is torn, give too much and it sags and snags the work. So a spring retractor near axes 3 and 4 takes up the excess, just like a check spring. This chapter also shows that the closer a cam supply curve follows demand, the higher the thread acceleration (about 290 km/s² against 30 km/s² for the link type in the example); a robot using a servo motor as an electronic cam is no different: the steeper the curve it tracks, the greater the acceleration and peak motor torque, which is exactly the trade-off when a take-up is driven directly by a stepper or servo motor."
+  ]
+ },
+ "life": {
+  "title": [
+   "生活例子：放风筝",
+   "Everyday example: flying a kite"
+  ],
+  "text": [
+   "风筝往上升时要及时放线，放少了线绷得太紧会断；风停了风筝下落，又要赶快收线，否则线松垮垮地垂下来缠到树上。手里的线轴就是挑线杆：什么时候放、放多少、什么时候收，全看风筝那一头要多少线。",
+   "As a kite climbs you must let out line in time; too little and the line is so tight it snaps. When the wind drops and the kite falls you must reel in quickly, or the slack line droops and tangles in a tree. The reel in your hand is the take-up lever: when to pay out, how much, and when to reel in all depend on how much line the kite end needs."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：一针要用多少线",
+    "Opening: how much thread does one stitch use?"
+   ],
+   "points": [
+    [
+     "车间症状：换厚料频频断线、布底浮线、线迹时紧时松、高速时面线啪啪响，修机师傅先怀疑挑线。",
+     "Shop symptoms: thread breaks on thick fabric, loose loops underneath, uneven stitches, needle thread snapping at speed; mechanics suspect the take-up first."
+    ],
+    [
+     "线业资料：301 每缝 1 cm 约用线 2.5 cm（每厘米 7 针），面线、底线各半，另加 10%–15% 损耗。",
+     "Thread-supplier guide: 301 uses about 2.5 cm of thread per cm of seam (7 stitches per cm), half needle and half bobbin, plus 10–15% waste."
+    ],
+    [
+     "每针真正留在布里的面线只有约两毫米，但绕梭时机针一侧要近 80 mm（本章算例）。",
+     "Only about two millimetres of needle thread stays in the fabric per stitch, yet nearly 80 mm is needed on the needle side while the loop passes round the bobbin (worked example)."
+    ],
+    [
+     "挑线机构就是按主轴转角“借线、还线”的机构。",
+     "The take-up is the mechanism that lends and recovers thread according to shaft angle."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "车间里有几种毛病，修机师傅首先会怀疑挑线：换厚料就断线，布底出现一圈圈松垮的面线，线迹一会儿紧一会儿松，高速时面线啪啪作响。它们都和一个问题有关：一针的每个时刻，针线需要多少，挑线机构又给了多少。先看总量：线业资料说，301 每缝 1 厘米用线约 2.5 厘米，面线底线各一半，算下来每针留在布里的面线只有两毫米上下。可是线环绕过梭壳那一刻，机针一侧要近 80 毫米。这么多线得先借出来，再还回去，这就是挑线机构的活。",
+    "There are several faults on the shop floor that make a mechanic suspect the take-up first: thread breaks on thick fabric, loose loops of needle thread underneath, stitches that are tight then loose, needle thread snapping at high speed. They all come down to one question: at each moment of a stitch, how much needle thread is needed and how much does the take-up give? First the total: thread suppliers say 301 uses about 2.5 centimetres of thread per centimetre of seam, half needle and half bobbin, so each stitch leaves only about two millimetres of needle thread in the fabric. Yet as the loop passes round the bobbin case nearly 80 millimetres are needed on the needle side. That thread must be lent and then recovered: that is the take-up's job."
+   ]
+  },
+  {
+   "title": [
+    "面线线路",
+    "The needle-thread path"
+   ],
+   "points": [
+    [
+     "线团 → 夹线器（两片夹线盘被弹簧压住，加张力）→ 挑线簧 → 过线板 → 挑线杆线孔 → 过线点 → 面板过线 → 针杆线钩 → 针眼。",
+     "Cone → tension assembly (two discs pressed by a spring, adding tension) → check spring → thread guide → take-up lever eye → lower guide point → face-plate guide → needle-bar thread guide → needle eye."
+    ],
+    [
+     "线孔上下运动时，“过线板—线孔”和“线孔—过线点”两段线的总长随之变化。",
+     "As the lever eye moves, the total length of the two spans thread guide–eye and eye–lower guide point changes."
+    ],
+    [
+     "这个变化量就是挑线机构放出或收回的线。",
+     "That change is the thread the take-up pays out or takes back."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_4_struct.png",
+   "narration": [
+    "先沿着面线走一遍。线从线团引下来，先穿过夹线器，两片夹线盘被弹簧压住，给面线加上张力；再绕过挑线簧，它是一根细钢丝弹簧；然后经过过线板进入挑线杆的线孔，再从过线点、面板过线、针杆线钩一路向下，最后穿进针眼。关键在中间这一段：挑线杆线孔上下运动时，过线板到线孔、线孔到过线点这两段线的总长跟着变。总长变长，线被收上来；总长变短，线被放下去。这个变化量，就是本章要算的供线量。图里线孔一周的轨迹也画出来了。",
+    "Let's follow the needle thread. It comes down from the cone and first passes through the tension assembly, where two discs pressed by a spring add tension; then it wraps around the check spring, a fine steel-wire spring; then over the thread guide into the take-up lever eye, and down via the lower guide point, the face-plate guide and the needle-bar thread guide to the needle eye. The key is the middle section: as the lever eye moves up and down, the total length of the two spans, thread guide to eye and eye to lower guide point, changes. When it gets longer, thread is taken up; when it gets shorter, thread is let down. That change is the thread supply we calculate in this chapter. The figure also shows the eye's path over one revolution."
+   ]
+  },
+  {
+   "title": [
+    "一针之中的三件事：放线、收线、拉线",
+    "Three tasks in each stitch: pay out, take up, draw"
+   ],
+   "points": [
+    [
+     "放线：机针刺布、线环被拉大绕过梭壳时，挑线杆一路下行及时放线；放少了，旋梭硬拽，张力猛增，轻则线迹不匀，重则断线。",
+     "Paying out: while the needle pierces and the loop is drawn round the bobbin case, the lever descends to let thread down in time; too little and the hook drags, tension soars, stitches go uneven or the thread breaks."
+    ],
+    [
+     "收线：线环脱出梭壳后快速上升，收回余线，把交织点拉进布厚中间。",
+     "Taking up: after cast-off the lever rises fast, recovers the slack and pulls the interlacing point into the fabric."
+    ],
+    [
+     "拉线：线迹固定后再上行一点，面线从夹线器中滑过，拉出下一针用线；夹线器张力此刻决定线迹收多紧。",
+     "Drawing: after the stitch is set the lever rises a little more, pulling thread through the tension assembly for the next stitch; tension at this moment decides how tight the stitch is set."
+    ],
+    [
+     "放线最难：需要量由机针和旋梭决定，挑线杆只能配合，供线曲线必须“包住”耗线曲线。",
+     "Paying out is hardest: demand is set by needle and hook, the lever can only follow, so the supply curve must envelop the demand curve."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "挑线机构在一针之中依次做三件事。第一件是放线：机针刺布以后布下的线越来越多，旋梭钩住线环后又把它越拉越大，这段时间挑线杆要一路往下放线，而且要放得及时，放少了旋梭只能硬拽，张力猛增，轻则线迹不匀，重则断线。第二件是收线：线环从梭壳上脱出，挑线杆快速上升，把多出来的线收回去，把交织点拉进布中间。第三件是拉线：收紧以后挑线杆再往上走一点，面线从夹线器里滑过，拉出下一针要用的那段。三件事里放线最难，因为需要多少由机针和旋梭说了算。",
+    "Within each stitch the take-up does three things in turn. First, paying out: after the needle pierces the fabric there is more and more thread below, and after the hook catches the loop it draws it larger and larger, so throughout this time the lever must keep going down to let thread out, and in time; too little and the hook has to drag it, the tension soars, and you get uneven stitches or a broken thread. Second, taking up: when the loop slips off the bobbin case the lever rises fast to pull back the surplus and draw the interlacing point into the fabric. Third, drawing: after the stitch is set the lever goes up a little more and pulls the next stitch's thread through the tension assembly. Paying out is the hardest, because needle and hook decide how much is needed."
+   ]
+  },
+  {
+   "title": [
+    "挑线簧：线路上的缓冲器",
+    "The check spring: the buffer on the thread path"
+   ],
+   "points": [
+    [
+     "挑线杆放线有时比机针用线快，多出来的线若没人管，会挂在机头前，被机针刺穿或绕到零件上。",
+     "Sometimes the lever pays out faster than the needle uses thread; unmanaged, the slack hangs in front of the head where the needle may pierce it or it may snag."
+    ],
+    [
+     "挑线簧在线松时收住余线，线紧时被拉到挡块上。",
+     "The check spring takes up slack when the thread is loose and is pulled against its stop when it is tight."
+    ],
+    [
+     "某维修手册：挑线簧动作在针尖刺入布料时完成，行程约 7 mm；线环最大时只动约 1 mm。",
+     "One service manual: the check-spring motion is completed as the point enters the fabric, stroke about 7 mm; when the loop is largest it moves only about 1 mm."
+    ],
+    [
+     "行程要和针尖入布前挑线杆提前放下的线相配；线环最大时线路里不能有多少松线。",
+     "Its stroke must match the thread let down before the point enters; at the largest loop there must be hardly any slack left."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_4_struct.png",
+   "narration": [
+    "线路上还有一个小零件很重要，就是挑线簧，它是线路上的缓冲器。挑线杆放线有时比机针用线快，多出来的线要是没人管，就会松松地挂在机头前面，可能被机针刺穿，也可能绕到别的零件上。挑线簧这时把余线收住；线一紧，它就被拉到挡块上。某机型的维修手册规定：挑线簧的动作在针尖刺入布料时完成，行程约 7 毫米；线环绕过旋梭、最大的时候，挑线簧只动约 1 毫米。这两条规定把挑线簧和机针、旋梭的动作对上了号，后面讲判据时就会看到为什么。",
+    "One small part on the path matters a lot: the check spring, the buffer of the thread path. The lever sometimes pays out faster than the needle uses thread, and if nobody looks after the extra, it hangs loosely in front of the head where the needle may pierce it or it may wrap around another part. The check spring takes up that slack; when the thread tightens, it is pulled against its stop. One service manual specifies that the check spring's motion should be finished as the needle point enters the fabric, with a stroke of about 7 millimetres, and that when the loop is passing the hook at its largest the spring should move only about 1 millimetre. These two rules tie the spring to the needle and hook, and we will see why when we come to the criteria."
+   ]
+  },
+  {
+   "title": [
+    "挑线机构的四种基本形式",
+    "Four basic types of take-up"
+   ],
+   "points": [
+    [
+     "凸轮式：滚子嵌在上轴凸轮槽里推挑线杆摆动；供线曲线几乎随意设计，但滚子与槽有间隙，高速冲击、磨损、噪声大，多用于低速家用机。",
+     "Cam: a roller in a grooved cam on the main shaft swings the lever; the supply curve is almost free to design, but roller–groove clearance means shock, wear and noise at speed, so it is mostly on slow household machines."
+    ],
+    [
+     "连杆式：挑线杆是四连杆的连杆，只有转动副，磨损小、噪声低、寿命长、能跑高速，工业平缝机普遍采用；代价是只能在连杆曲线里挑，往往多放线。",
+     "Link: the lever is the coupler of a four-bar with only revolute joints; low wear and noise, long life, high speed, so industrial machines use it; the price is choosing among coupler curves, so it usually pays out extra."
+    ],
+    [
+     "滑杆式：杆身穿过摆动滑块，线孔轨迹更扁长，结构紧凑，也用于高速机。",
+     "Slide-lever: the lever slides through a swinging block, giving a flatter, longer eye path in a compact layout, also used on fast machines."
+    ],
+    [
+     "旋转式：匀速转动的异形挑线盘，无往复冲击，适合高速；专利 US 5,555,830 指出普通挑线杆放线远多于需要。",
+     "Rotary: a shaped take-up disc turning steadily, with no reciprocating shock, suits high speed; patent US 5,555,830 notes that ordinary levers pay out far more than needed."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_4_types.png",
+   "narration": [
+    "按挑线杆怎样被驱动，挑线机构有四种基本形式。凸轮式，上轴上一个带槽的凸轮推着挑线杆摆，好处是供线曲线几乎可以随意设计，缺点是滚子和槽之间有间隙，高速时冲击大、噪声大，所以多用于低速的家用机。连杆式，挑线杆就是一个四连杆的连杆，机构里只有转动副，磨损小、噪声低、能跑高速，工业平缝机普遍用它，代价是曲线只能在连杆曲线里挑，往往多放线。滑杆式结构紧凑。旋转式用匀速转动的挑线盘，没有往复冲击。另外，也有企业用步进电机直接驱动挑线。",
+    "By how the lever is driven there are four basic types. The cam type: a grooved cam on the main shaft swings the lever; its supply curve can be designed almost freely, but the roller–groove clearance means shock and noise at speed, so it is mostly found on slow household machines. The link type: the lever is the coupler of a four-bar with only revolute joints, so wear and noise are low and it runs fast, and industrial lockstitch machines use it almost universally; the price is that its curve must be chosen among coupler curves, so it usually pays out extra. The slide-lever type is compact. The rotary type uses a steadily turning disc with no reciprocating shock. Some companies also drive the take-up directly with a stepper motor."
+   ]
+  },
+  {
+   "title": [
+    "连杆式挑线机构：坐标与位置解",
+    "Link take-up: coordinates and position solution"
+   ],
+   "points": [
+    [
+     "顺着上轴从机头左端看，以上轴中心 O 为原点，z 向右、y 向上（mm）；φ 仍以针杆最高点为 0。",
+     "Viewed along the main shaft from the left end, origin O at the shaft centre, z to the right, y up (mm); φ = 0 still at needle-bar top."
+    ],
+    [
+     "算例（表 4-1）：r = 20.7 mm，δ = −6.8°，Q = (21.5, −45.5)，b = 40.9 mm，a = 43.4 mm，c = 65.7 mm，α = 2.8°。",
+     "Example (Table 4-1): r = 20.7 mm, δ = −6.8°, Q = (21.5, −45.5), b = 40.9 mm, a = 43.4 mm, c = 65.7 mm, α = 2.8°."
+    ],
+    [
+     "M 是以 P 为圆心、半径 a 和以 Q 为圆心、半径 b 两圆的交点，取 +h 一支；a² − p² < 0 时装不上。",
+     "M is an intersection of the circle of radius a about P and the circle of radius b about Q, on the +h branch; if a² − p² < 0 the mechanism cannot assemble."
+    ],
+    [
+     "算例 φ = 0° 时 P = (2.45, −20.55)，M = (45.01, −12.03)。",
+     "Example at φ = 0°: P = (2.45, −20.55), M = (45.01, −12.03)."
+    ]
+   ],
+   "formula": "P = \\big(-r\\sin(\\varphi+\\delta),\\; -r\\cos(\\varphi+\\delta)\\big),\\quad p=\\frac{a^{2}-b^{2}+d^{2}}{2d},\\quad h=\\sqrt{a^{2}-p^{2}},\\quad M = P + p\\,\\mathbf{u} + h\\,\\mathbf{n}",
+   "figure": "fig_4_struct.png",
+   "narration": [
+    "现在来分析连杆式挑线机构。顺着上轴从机头左端看，以上轴中心为原点，z 轴向右，y 轴向上。挑线曲柄销 P 的位置由主轴转角直接给出，δ 是它和针杆曲柄销的相位差。摇杆铰点 M 离 P 是 a，离机架铰点 Q 是 b，所以 M 就是两个圆的交点：先算 P 到 Q 的距离 d，沿 PQ 方向走 p，再沿垂直方向走 h。两个交点对应两种装配方式，算例取正的那一支。如果某个转角下 a 方减 p 方小于零，两圆不相交，机构在那里就装不上，设计时必须避免。",
+    "Now analyse the link take-up. Looking along the main shaft from the left end, put the origin at the shaft centre, z to the right and y up. The take-up crank pin P follows directly from the shaft angle, with δ its phase relative to the needle-bar crank pin. The rocker joint M is a from P and b from the frame pivot Q, so M is the intersection of two circles: find the distance d from P to Q, go p along PQ, then h at right angles. The two intersections are the two assembly modes, and the example uses the positive one. If at some angle a squared minus p squared is negative, the circles do not meet and the mechanism cannot assemble there, which the design must avoid."
+   ]
+  },
+  {
+   "title": [
+    "线孔位置与传动角",
+    "Eye position and transmission angle"
+   ],
+   "points": [
+    [
+     "线孔 E：把 PM 方向转过 α 角、再延长到 c。",
+     "Eye E: rotate direction PM by α and extend it to length c."
+    ],
+    [
+     "传动角 μ：挑线杆与摇杆在 M 处的夹角；越接近 90° 越好推，一般希望不小于 40° 左右。",
+     "Transmission angle μ: the angle between lever and rocker at M; the nearer 90° the easier to drive, generally not below about 40°."
+    ],
+    [
+     "算例 φ = 0° 时 E = (66.16, −4.52)，μ = 43.6°；φ = 150° 时 E = (46.30, −12.93)，μ = 114.0°；一转内 μ 在 41.0°–114.8°。",
+     "Example: at φ = 0°, E = (66.16, −4.52), μ = 43.6°; at φ = 150°, E = (46.30, −12.93), μ = 114.0°; over a revolution μ ranges 41.0°–114.8°."
+    ],
+    [
+     "线孔几何最高在 φ ≈ 39°，最低在 288°，上下相差 38.4 mm。",
+     "The eye is geometrically highest at φ ≈ 39° and lowest at 288°, 38.4 mm apart."
+    ]
+   ],
+   "formula": "E = P + \\frac{c}{a}\\,R(\\alpha)\\,(M-P),\\qquad \\cos\\mu=\\frac{a^{2}+b^{2}-d^{2}}{2ab}",
+   "figure": "fig_4_path.png",
+   "narration": [
+    "有了 M，线孔 E 就好求了：把 PM 方向转过 α 角，再延长到长度 c。每隔 1 度算一次 E，就得到线孔一转的轨迹。四连杆受力好不好，用传动角 μ 衡量，它是挑线杆和摇杆在 M 处的夹角，可以用余弦定理算。μ 越接近 90 度，摇杆越容易推动；太小或太大，驱动力大部分都浪费在铰链上，磨损快，所以一般希望不小于 40 度左右。算例里 φ 等于 0 时，E 在 66.16、负 4.52，传动角 43.6 度；一转之内在 41 到 114.8 度之间，满足要求。线孔最高在 39 度，最低在 288 度。",
+    "With M known, the eye E is easy: rotate the direction PM by α and extend it to length c. Compute E every degree and you have the eye's path over a revolution. How well the four-bar transmits force is measured by the transmission angle μ, the angle between lever and rocker at M, found with the cosine rule. The closer μ is to 90°, the easier the rocker is to drive; too small or too large and most of the driving force is wasted in the joints, which wear fast, so we generally want at least about 40°. In the example at φ of zero, E is at 66.16, minus 4.52, and μ is 43.6°; over a revolution it stays between 41 and 114.8 degrees, which is acceptable. The eye is highest at 39° and lowest at 288°."
+   ]
+  },
+  {
+   "title": [
+    "线路长度与供线量",
+    "Thread-path length and thread supply"
+   ],
+   "points": [
+    [
+     "对线路有意义的是两段线总长 L(φ) = |AE| + |EB|，A 为过线板 (122.2, −45.7)，B 为过线点 (66.4, −117.7)。",
+     "What matters is the total L(φ) = |AE| + |EB|, with thread guide A = (122.2, −45.7) and lower guide point B = (66.4, −117.7)."
+    ],
+    [
+     "算例 L 在 55° 最大（210.2 mm），在 293° 最小（128.6 mm），相差 81.6 mm：一针中最多能放出的线。",
+     "In the example L is largest at 55° (210.2 mm) and smallest at 293° (128.6 mm), 81.6 mm apart: the most thread the lever can pay out per stitch."
+    ],
+    [
+     "收线最紧（55°）与线孔最高（39°）差约 16°，因为过线点不在线孔正下方。",
+     "Tightest take-up (55°) differs from the highest eye (39°) by about 16°, because the guide points are not directly below the eye."
+    ],
+    [
+     "从 293° 收到 55° 只用约 120°，从 55° 放到 293° 用约 240°：放线慢、收线快。",
+     "Taking up from 293° to 55° takes about 120°; paying out from 55° to 293° about 240°: slow out, fast in."
+    ]
+   ],
+   "formula": "L(\\varphi)=|AE|+|EB|,\\qquad S(\\varphi)=L_{\\max}-L(\\varphi)",
+   "figure": "fig_4_path.png",
+   "narration": [
+    "对线路有意义的不是线孔有多高，而是过线板到线孔、线孔到过线点这两段线的总长 L。L 最大时，挑线杆把线收得最紧；L 最小时，放下的线最多。算例里 L 在 55 度最大，210.2 毫米，在 293 度最小，128.6 毫米，相差 81.6 毫米，这就是一针之中挑线杆最多能放出的线。注意 55 度和线孔最高的 39 度差了 16 度，因为两个过线点都不在线孔正下方。供线量 S 定义为 L 最大值减当前 L，比如 150 度时 L 是 189.4，S 就是 20.8 毫米。放线用 240 度、收线只用 120 度，正是任务要求的节奏。",
+    "What matters for the thread path is not how high the eye is, but the total length L of the two spans, thread guide to eye and eye to lower guide point. When L is largest the lever holds the thread tightest; when L is smallest the most thread has been let down. In the example L peaks at 55°, 210.2 millimetres, and bottoms at 293°, 128.6 millimetres, a difference of 81.6: the most thread the lever can pay out in one stitch. Note that 55° is 16° away from the eye's highest point at 39°, because neither guide point is directly below the eye. Supply S is defined as L-max minus the current L; at 150°, for instance, L is 189.4, so S is 20.8 millimetres. Paying out over 240° and taking up in 120° is just the rhythm the task needs."
+   ]
+  },
+  {
+   "title": [
+    "耗线量（一）：钩线以前",
+    "Thread demand (1): before the hook catches"
+   ],
+   "points": [
+    [
+     "把线看成不能伸长；针眼穿过布面后，布下的线是“下去—回来”两股。",
+     "Treat the thread as inextensible; once the eye passes through the fabric, the thread below is two strands, down and back."
+    ],
+    [
+     "e₀：最高点时针眼在布面以上的高度；算例针眼在针板上方 20 mm、布厚 1.5 mm，e₀ = 18.5 mm。",
+     "e₀: height of the eye above the fabric surface at the top; in the example the eye is 20 mm above the plate and the fabric 1.5 mm thick, so e₀ = 18.5 mm."
+    ],
+    [
+     "针眼在布面以上时，上面线变长多少、针眼到布面那段就缩短多少，相互抵消，D = 0。",
+     "While the eye is above the fabric, the lengthening above is cancelled by the shortening between eye and fabric, so D = 0."
+    ],
+    [
+     "针尖约 102° 入布，针眼约 109° 入布；下止点 D = 2 × (31 − 18.5) = 25 mm。",
+     "The point enters at about 102° and the eye at about 109°; at bottom dead centre D = 2 × (31 − 18.5) = 25 mm."
+    ]
+   ],
+   "formula": "D(\\varphi)=2\\max\\big(0,\\;x(\\varphi)-e_{0}\\big)",
+   "figure": "",
+   "narration": [
+    "再看机针和旋梭一侧要多少线，这叫耗线量 D。我们把线看成不能伸长。钩线以前，机针一侧只有一处变化：针眼一旦穿过布面，布下的线就是下去、回来两股，每股长度等于针眼在布面以下的深度。所以 D 等于 2 乘以 x 减 e₀，再和零取大。e₀ 是针杆在最高点时针眼离布面的高度，算例是 20 减 1.5，等于 18.5。针眼还在布面以上时，上面的线变长多少，针眼到布面那段就缩短多少，正好抵消，D 等于零。针眼大约 109 度入布，到下止点 D 等于 2 乘 12.5，25 毫米。",
+    "Now how much thread the needle and hook side needs: the thread demand D. Treat the thread as inextensible. Before the hook catches, only one thing changes on the needle side: once the eye passes through the fabric, the thread below is two strands, down and back, each as long as the eye is deep below the surface. So D is twice x minus e₀, or zero if that is negative. e₀ is the height of the eye above the fabric when the needle bar is at the top: 20 minus 1.5, which is 18.5, in the example. While the eye is still above the fabric, whatever the upper thread gains, the stretch from eye to fabric loses, so D is zero. The eye enters at about 109°, and at bottom dead centre D is 2 times 12.5, 25 millimetres."
+   ]
+  },
+  {
+   "title": [
+    "耗线量（二）：线环的凸包模型",
+    "Thread demand (2): the convex-hull loop model"
+   ],
+   "points": [
+    [
+     "钩线以后，线环张在布孔 F、梭尖 H 和梭尖已扫过的那段梭壳外缘之间；针眼在布下时再加上针眼。",
+     "After catching, the loop stretches between the fabric hole F, the hook point H and the arc of bobbin case already swept, plus the eye while it is below the fabric."
+    ],
+    [
+     "耗线量取这些点所围凸包的周长 C(φ)；钩线前的“两股”正是布孔和针眼两点凸包的周长，一脉相承。",
+     "Demand is taken as the perimeter C(φ) of their convex hull; the two strands before catching are exactly the hull perimeter of the hole and eye, so the model is continuous."
+    ],
+    [
+     "算例：钩线时 D = 21.0 mm，梭尖转过 88°（φ = 250°）时 55.0 mm，梭尖到最下面（φ ≈ 296°）时最大 79.6 mm。",
+     "Example: D = 21.0 mm at catching, 55.0 mm when the hook has turned 88° (φ = 250°), and a maximum of 79.6 mm with the hook point at its lowest (φ ≈ 296°)."
+    ],
+    [
+     "此后线环滑向梭壳另一侧，到脱环（约 341°）降到每针用线 q。",
+     "After that the loop slides to the far side of the case and at cast-off (about 341°) falls to the per-stitch use q."
+    ]
+   ],
+   "formula": "D(\\varphi)=C(\\varphi),\\qquad 109^{\\circ}\\le\\varphi\\le 296^{\\circ}",
+   "figure": "fig_4_loop.png",
+   "narration": [
+    "钩线以后，布下的线变成一个被梭尖拉着的线环，形状很复杂。本章用一个简化的几何模型来估算：顺着旋梭轴看，线环张在布孔、梭尖和梭尖已经扫过的那段梭壳外缘之间，针眼还在布下的话再加上针眼，耗线量取这些点围成的凸包的周长。这个取法和钩线前是一脉相承的：钩线前那下去、回来两股，正好就是布孔和针眼两点凸包的周长。算例里，钩线时 D 是 21 毫米，梭尖转过 88 度时 55 毫米，梭尖转到最下面时最大，79.6 毫米，这就是开头说的近八十毫米。",
+    "After the hook catches, the thread below becomes a loop pulled by the hook point, with a complicated shape. This chapter estimates it with a simple geometric model: looking along the hook axis, the loop is stretched between the fabric hole, the hook point and the arc of the bobbin case the point has already swept, plus the needle eye if it is still below the fabric, and the demand is taken as the perimeter of the convex hull of these points. This follows on naturally from before catching: the two strands, down and back, are exactly the hull perimeter of two points, the hole and the eye. In the example D is 21 millimetres at catching, 55 when the hook has turned 88°, and 79.6 at the maximum with the hook point at its lowest: the nearly eighty millimetres we started with."
+   ]
+  },
+  {
+   "title": [
+    "每针用线：q ≈ s + t",
+    "Thread used per stitch: q ≈ s + t"
+   ],
+   "points": [
+    [
+     "脱环后需要的线降到这一针真正用掉的一段：面线走一个针距 s，再在布厚一半里下去、上来。",
+     "After cast-off the demand falls to what the stitch actually uses: one stitch length s plus down and up through half the fabric thickness."
+    ],
+    [
+     "算例 s = 3 mm、t = 1.5 mm，q ≈ 4.5 mm。",
+     "Example s = 3 mm, t = 1.5 mm: q ≈ 4.5 mm."
+    ],
+    [
+     "核对线业资料：每厘米 7 针（s ≈ 1.43 mm），面线 1.25 倍缝长，要求 t ≈ 0.36 mm，属薄料，量级对得上。",
+     "Check against the supplier guide: 7 stitches per cm (s ≈ 1.43 mm) and needle thread 1.25 times the seam length need t ≈ 0.36 mm, a thin fabric, so the order of magnitude agrees."
+    ],
+    [
+     "估算面线：50 cm 的缝、针距 3 mm、布厚 1.5 mm，约 167 针 × 4.5 mm ≈ 75 cm，加 15% 损耗约 86 cm。",
+     "Estimate: a 50 cm seam at 3 mm stitch and 1.5 mm fabric is about 167 stitches × 4.5 mm ≈ 75 cm, about 86 cm with 15% waste."
+    ]
+   ],
+   "formula": "q \\approx s + t",
+   "figure": "",
+   "narration": [
+    "线环脱出梭壳以后，需要的线降到这一针真正用掉的那一段，q 约等于 s 加 t。为什么？交织点在布厚中间，面线每针要沿布面走一个针距 s，还要在布厚的一半里下去、再上来，合起来就是一个 t。算例针距 3、布厚 1.5，q 约 4.5 毫米。我们用线业资料核对一下：每厘米 7 针，针距约 1.43 毫米，面线用量 1.25 倍缝长，反推布厚约 0.36 毫米，是薄料，量级对得上。这个式子在车间很实用：50 厘米的缝，约 167 针，面线约 75 厘米，加 15% 损耗约 86 厘米。",
+    "After the loop leaves the bobbin case, demand drops to what this stitch really uses: q is about s plus t. Why? The interlacing point is in the middle of the fabric, so each stitch the needle thread travels one stitch length s along the surface and goes down and back up through half the thickness, which adds up to one t. With a 3-millimetre stitch and 1.5-millimetre fabric, q is about 4.5 millimetres. Check against the supplier figures: at 7 stitches per centimetre the stitch is about 1.43 millimetres, and needle thread at 1.25 times the seam length implies a fabric about 0.36 millimetres thick, a thin fabric, so the magnitudes agree. It is handy on the floor: a 50-centimetre seam is about 167 stitches, about 75 centimetres of needle thread, about 86 with 15 per cent waste."
+   ]
+  },
+  {
+   "title": [
+    "余线与三条判据",
+    "Thread surplus and the three criteria"
+   ],
+   "points": [
+    [
+     "余线 Δ = S − D：Δ > 0 多放，由挑线簧收住；Δ < 0 放得不够，只能硬拉。",
+     "Surplus Δ = S − D: Δ > 0 is extra, held by the check spring; Δ < 0 is too little, and thread must be dragged."
+    ],
+    [
+     "第一段（55°→206°）：针眼入布前 0 ≤ Δ ≤ 挑线簧行程（算例最大 9.2 mm，行程 10 mm）；入布后欠线不超过 1 mm（算例最小 +1.1 mm）。",
+     "Phase one (55°→206°): before eye entry 0 ≤ Δ ≤ spring stroke (example max 9.2 mm, stroke 10 mm); after entry, shortfall no more than 1 mm (example min +1.1 mm)."
+    ],
+    [
+     "第二段（钩线到脱环，206°–341°）：Δ ≥ 0 并留 1–2 mm 余量；算例钩线时约 24 mm，梭尖到最下面（296°）时最小 1.9 mm，是全循环线最紧的时刻。",
+     "Phase two (catch to cast-off, 206°–341°): Δ ≥ 0 with a 1–2 mm margin; example about 24 mm at catching and a minimum 1.9 mm at 296°, the tightest moment of the cycle."
+    ],
+    [
+     "第三段（341°→55°）：脱环后余线骤增，要在下一针刺布前收回；接近 55° 时 Δ → −q，挑线杆从夹线器拉出下一针用线。",
+     "Phase three (341°→55°): after cast-off the surplus jumps and must be recovered before the next piercing; near 55° Δ → −q as the lever draws the next stitch's thread through the tension assembly."
+    ]
+   ],
+   "formula": "\\Delta(\\varphi)=S(\\varphi)-D(\\varphi)",
+   "figure": "fig_4_curves.png",
+   "narration": [
+    "把供线量和耗线量画在一张图上，两者之差叫余线。余线为正，说明放多了，要靠挑线簧收住；为负，说明放少了，只能硬拉。按时间顺序看三段。第一段从收线最紧到钩线：针眼入布前机针一点线不用，放下的线全靠挑线簧收，所以余线不能超过挑线簧行程，算例最大 9.2，行程 10；入布后欠线不能超过 1 毫米。第二段从钩线到脱环最要紧，余线必须大于零并留余量，算例在梭尖到最下面时最小，1.9 毫米。第三段脱环后要赶紧把线收回来，并拉出下一针的线。",
+    "Plot supply and demand on one chart and their difference is the thread surplus. Positive means too much has been let down and the check spring must hold it; negative means too little, and thread has to be dragged. Read it in three phases. Phase one runs from tightest take-up to catching: before the eye enters, the needle uses no thread, so all the thread let down is held by the check spring and the surplus must not exceed its stroke, 9.2 against 10 in the example; after the eye enters, the shortfall must not exceed 1 millimetre. Phase two, catch to cast-off, matters most: the surplus must stay positive with some margin, and in the example it is smallest, 1.9 millimetres, with the hook point at its lowest. In phase three the thread must be recovered quickly and the next stitch's thread drawn."
+   ]
+  },
+  {
+   "title": [
+    "调整要点：换料调过线板，钩线时刻要复核",
+    "Adjustments: move the thread guide for new fabric, re-check after hook timing"
+   ],
+   "points": [
+    [
+     "布厚 1.5 → 3 mm：最小余量 +1.9 → −0.9 mm，入布后欠线 1.9 mm，线环不够用。",
+     "Fabric 1.5 → 3 mm: minimum margin +1.9 → −0.9 mm and a 1.9 mm shortfall after eye entry; the loop is short of thread."
+    ],
+    [
+     "过线板向“多放线”方向移 12 mm 后：余量 1.4 mm，欠线 0.6 mm，入布前余线仍在 10 mm 行程内。说明书：厚料过线板左移、薄料右移。",
+     "After moving the thread guide 12 mm towards more thread: margin 1.4 mm, shortfall 0.6 mm, surplus before entry still within the 10 mm stroke. Manuals: move the guide left for heavy fabric, right for light."
+    ],
+    [
+     "梭尖早到 198°：绕梭多放的线 23.8 → 18.0 mm，余量仍 1.7 mm；晚到 214°：余量只剩 0.7 mm，216° 只剩 0.1 mm，多放的线反增到 30 mm 以上。",
+     "Hook early at 198°: excess round the bobbin 23.8 → 18.0 mm, margin still 1.7 mm; late at 214°: margin only 0.7 mm, 0.1 mm at 216°, and excess over 30 mm."
+    ],
+    [
+     "调过钩线时刻或换旋梭后，要用薄料、厚料各试缝一段复核挑线。",
+     "After changing hook timing or the hook, test-sew thin and thick fabric to re-check the take-up."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_4_curves.png",
+   "narration": [
+    "这几条判据马上就能用来解决车间问题。布从 1.5 毫米换成 3 毫米，针下那两股线变长，布孔也离梭壳更远，耗线曲线整体抬高：最小余量从正 1.9 变成负 0.9，入布后还欠线 1.9 毫米，难怪断线。办法是把过线板向多放线的方向移，说明书的说法是厚料左移、薄料右移。算例移 12 毫米，余量回到 1.4，欠线降到 0.6，入布前的余线仍在挑线簧行程以内。钩线时刻也会改变耗线曲线：梭尖晚到 214 度，余量只剩 0.7 毫米。所以调过钩线，挑线一定要复核。",
+    "These criteria solve our shop-floor problem straight away. Going from 1.5 to 3 millimetres makes the two strands under the needle longer and puts the fabric hole further from the bobbin case, so the whole demand curve rises: the minimum margin goes from plus 1.9 to minus 0.9, and after eye entry there is a 1.9-millimetre shortfall, so no wonder the thread breaks. The fix is to move the thread guide towards more thread; manuals say left for heavy fabric, right for light. Moving it 12 millimetres in the example brings the margin back to 1.4 and the shortfall down to 0.6, with the surplus before entry still within the spring stroke. Hook timing also changes the demand curve: with the hook late at 214° the margin is only 0.7 millimetres, so after any hook adjustment, re-check the take-up."
+   ]
+  },
+  {
+   "title": [
+    "连杆式与凸轮式的取舍，以及设计顺序",
+    "Link versus cam, and the design sequence"
+   ],
+   "points": [
+    [
+     "凸轮式可让供线紧贴耗线，把绕梭多放的线从约 24 mm 压到 8 mm 以下；但贴得越紧曲线越陡。",
+     "A cam can make supply hug demand, cutting the excess round the bobbin from about 24 mm to below 8 mm; but the closer it hugs, the steeper the curve."
+    ],
+    [
+     "5000 r/min 下面线最大加速度：算例连杆式约 30 km/s²，实验中一组合格凸轮曲线约 290 km/s²，接近十倍；动态张力随之增大。",
+     "Maximum needle-thread acceleration at 5000 r/min: about 30 km/s² for the example link type, about 290 km/s² for one acceptable cam curve in the lab, nearly ten times; dynamic tension rises with it."
+    ],
+    [
+     "所以高速平缝机宁可多放一点线也用平稳的连杆式；既平稳又少放线，要靠旋转式挑线盘或电机驱动。",
+     "So high-speed machines accept some extra thread for the smooth link type; smooth and lean together needs a rotary disc or a motor drive."
+    ],
+    [
+     "设计顺序：估耗线曲线 → 选四连杆（可装配、μ ≥ 40° 左右）→ 布置过线板与过线点，用三条判据查不同布厚 → 定挑线簧行程与弹力；挑线杆尽量轻，注意防油。",
+     "Design order: estimate demand → choose the four-bar (assemblable, μ ≥ about 40°) → place the guides and check the three criteria for several thicknesses → set spring stroke and force; keep the lever light and seal against oil."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后谈连杆式和凸轮式怎么取舍。在虚拟实验里用凸轮式设计供线曲线，可以让供线紧贴耗线，把绕梭时多放的线从 24 毫米压到 8 毫米以下，看起来很理想。但贴得越紧，曲线越陡：每分钟 5000 转时，连杆式面线最大加速度约 30 千米每二次方秒，一组合格的凸轮曲线约 290，接近十倍，线在过线点和夹线器里受的动态张力也大得多。所以高速平缝机宁可多放点线，也要用平稳的连杆式。设计顺序是：先估耗线，再选连杆，再布置过线点并用三条判据检查，最后定挑线簧。",
+    "Finally, the choice between link and cam. In the virtual lab, a cam supply curve can be made to hug the demand curve, cutting the excess round the bobbin from 24 millimetres to below 8, which looks ideal. But the closer it hugs, the steeper it gets: at 5000 r/min the link type's maximum needle-thread acceleration is about 30 kilometres per second squared, while one acceptable cam curve reaches about 290, nearly ten times as much, with far larger dynamic tension at the guides and tension assembly. That is why high-speed lockstitch machines accept a little extra thread and keep the smooth link type. The design order: estimate demand, choose the linkage, place the guides and check the three criteria, then set the check spring."
+   ]
+  },
+  {
+   "title": [
+    "模型的边界",
+    "Limits of the model"
+   ],
+   "points": [
+    [
+     "把线看成不能伸长的细绳，线环简化成平面凸包，梭尖到最下面后线环按光滑曲线减到脱环。",
+     "Thread is an inextensible string, the loop a plane convex hull, and after the hook point's lowest position the loop shrinks smoothly to cast-off."
+    ],
+    [
+     "实际线有弹性、过线点有摩擦、高速时线有惯性，所需挑线簧行程往往比算例（10 mm）小，手册给约 7 mm。",
+     "Real thread stretches, guides have friction and thread has inertia at speed, so the spring stroke needed is usually less than the example's 10 mm; the manual gives about 7 mm."
+    ],
+    [
+     "算例针尖入布时余线约 7.6 mm，与手册“针尖入布时完成、约 7 mm”大体吻合。",
+     "In the example the surplus as the point enters is about 7.6 mm, broadly matching the manual's “completed as the point enters, about 7 mm”."
+    ],
+    [
+     "最可靠的耗线曲线来自测量：面线做标记用高速摄像，或在过线点装张力传感器（第 7 章）。",
+     "The most reliable demand curve comes from measurement: mark the thread and film it at high speed, or fit a tension sensor at a guide (Chapter 7)."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后要说清楚模型的边界。本章把线看成不能伸长的细绳，把线环简化成平面上的凸包，还假定梭尖转到最下面以后线环光滑地减小到脱环，这些都是为了把供线、耗线的关系讲清楚。实际的线有弹性，过线点有摩擦，高速时线的惯性也不能忽略，所以实际需要的挑线簧行程往往比算例的 10 毫米小，维修手册给的是约 7 毫米。有意思的是，算例在针尖入布时余线约 7.6 毫米，和手册的说法大体吻合。要得到可靠的耗线曲线，最终还是要靠测量。",
+    "Finally, let's be clear about the limits of the model. This chapter treats the thread as an inextensible string, simplifies the loop to a convex hull in a plane, and assumes the loop shrinks smoothly to cast-off after the hook point's lowest position, all to make the relation between supply and demand clear. Real thread is elastic, the guides have friction, and at high speed the thread's inertia matters, so the check-spring stroke actually needed is usually less than the example's 10 millimetres; the service manual gives about 7. Interestingly, the example's surplus as the needle point enters the fabric is about 7.6 millimetres, which broadly agrees with the manual. For a reliable demand curve, in the end you have to measure."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "挑线机构按主轴转角借线、还线：一针中依次放线、收线、拉线；放线最难，供线曲线必须包住耗线曲线，多出的线由挑线簧收住。",
+   "The take-up lends and recovers thread by shaft angle: paying out, taking up and drawing in each stitch; paying out is hardest, the supply curve must envelop demand, and the check spring holds the surplus."
+  ],
+  [
+   "四种形式：凸轮式曲线自由但高速冲击大；连杆式只有转动副、平稳耐用，工业平缝机普遍采用；滑杆式紧凑；旋转式无往复冲击。",
+   "Four types: cam (free curve, shocks at speed); link (revolute joints only, smooth and durable, standard on industrial machines); slide-lever (compact); rotary (no reciprocating shock)."
+  ],
+  [
+   "连杆式分析：两圆交点求 M，转角 α、延长到 c 得线孔 E，传动角宜 ≥ 40° 左右；供线量 S = Lmax − L，算例最大 81.6 mm，收线最紧在 55°。",
+   "Link analysis: M from two circles, eye E by rotating α and extending to c, transmission angle preferably ≥ about 40°; supply S = Lmax − L, up to 81.6 mm in the example, tightest at 55°."
+  ],
+  [
+   "耗线量：钩线前 2max(0, x − e₀)，钩线后取凸包周长（算例最大 79.6 mm），脱环后为每针用线 q ≈ s + t。",
+   "Demand: 2max(0, x − e₀) before catching, a convex-hull perimeter after (up to 79.6 mm in the example), and q ≈ s + t per stitch after cast-off."
+  ],
+  [
+   "三条判据：入布前余线 ≤ 挑线簧行程、入布后欠线 ≤ 1 mm、钩线到脱环余量 ≥ 0 并留 1–2 mm；换厚料调过线板，改钩线时刻要复核挑线。",
+   "Three criteria: surplus before entry ≤ spring stroke, shortfall after entry ≤ 1 mm, margin from catch to cast-off ≥ 0 with 1–2 mm to spare; move the thread guide for thick fabric and re-check after any hook-timing change."
+  ],
+  [
+   "凸轮式能少放线但线的加速度约为连杆式的十倍，所以高速机用连杆式；要兼得，用旋转式挑线盘或电机驱动。",
+   "A cam can pay out less but gives roughly ten times the thread acceleration, so fast machines use links; to have both, use a rotary disc or a motor drive."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "takeup",
+   "no": "4-1",
+   "title": [
+    "挑线机构与供线量",
+    "Take-up mechanism and thread supply"
+   ],
+   "goal": [
+    [
+     "观察四连杆挑线机构、面线线路和线环随主轴转动的过程，读懂供线量、耗线量和余线曲线。",
+     "Watch the four-bar take-up, the needle-thread path and the loop as the shaft turns, and read the supply, demand and surplus curves."
+    ],
+    [
+     "用三条判据检查厚料、钩线时刻变化时挑线是否够用，并通过调过线板使其满足。",
+     "Use the three criteria to check the take-up for thick fabric and changed hook timing, and satisfy them by adjusting the thread guide."
+    ],
+    [
+     "比较连杆式与凸轮式的余线和面线加速度，体会两者的取舍。",
+     "Compare surplus and needle-thread acceleration for link and cam types, and see the trade-off."
+    ],
+    [
+     "观察摇杆长度改变对线孔轨迹、收线时刻、供线量和传动角的影响。",
+     "See how changing the rocker length affects the eye path, tightest moment, supply and transmission angle."
+    ]
+   ],
+   "theory": [
+    [
+     "供线量 S(φ) = Lmax − L(φ)，L = |AE| + |EB|；线孔 E 由四连杆位置解求得。",
+     "Supply S(φ) = Lmax − L(φ), with L = |AE| + |EB|; the eye E comes from the four-bar position solution."
+    ],
+    [
+     "耗线量：钩线前 D = 2max(0, x − e₀)；钩线后取布孔、梭尖、已扫过的梭壳外缘（及布下的针眼）所成凸包的周长；脱环后为 q ≈ s + t。",
+     "Demand: before catching D = 2max(0, x − e₀); after catching, the convex-hull perimeter of fabric hole, hook point, swept bobbin-case arc (and the eye if below); after cast-off q ≈ s + t."
+    ],
+    [
+     "余线 Δ = S − D。判据：针眼入布前最大余线 ≤ 挑线簧行程；入布后到钩线的欠线 ≤ 1 mm；钩线到脱环的最小余量 ≥ 1 mm。",
+     "Surplus Δ = S − D. Criteria: maximum surplus before eye entry ≤ spring stroke; shortfall from eye entry to catching ≤ 1 mm; minimum margin from catch to cast-off ≥ 1 mm."
+    ],
+    [
+     "面线加速度由供线曲线对转角的二阶导数乘 ω² 得到；曲线越陡，加速度越大。",
+     "Needle-thread acceleration is the second derivative of the supply curve with respect to angle times ω²; the steeper the curve, the larger the acceleration."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 4-1，选“连杆式（四连杆）”，在默认参数下（布厚 1.5 mm、针距 3 mm、钩线 206°、挑线簧行程 10 mm）读出“指标”区的最小余量、入布前余线、入布后欠线、绕梭最大余线、收线最紧 / 放线最多转角、传动角、面线最大加速度和最大供线量，记为第 1 行。",
+     "Open Virtual lab 4-1, choose “Link type (four-bar)”, and with the default parameters (1.5 mm fabric, 3 mm stitch, 206° catch, 10 mm spring stroke) read from Indicators the minimum margin, slack before eye entry, shortfall after entry, maximum slack round the bobbin, angles of tightest take-up and maximum payout, transmission angle, maximum thread acceleration and maximum supply, as row 1."
+    ],
+    [
+     "任务 1：点“暂停”，拖动“主轴转角”滑块到挑线杆收线最紧的位置（供线量为 0，±3°），与线孔几何最高点比较；可用“单步 +5°”逐步观察面板视图和旋梭处的线环。",
+     "Task 1: press Pause and drag the Main-shaft angle slider to the tightest take-up (supply = 0, ±3°), comparing it with the eye's highest point; use “Step +5°” to watch the face-plate view and the loop at the hook."
+    ],
+    [
+     "任务 2：把“布料厚度”改到 3 mm，记录各指标；保持挑线簧行程 10 mm、连杆尺寸和钩线 206° 不变，只调“过线板位置”，直到最小余量 ≥ 1 mm、入布前余线不超过行程、入布后欠线 ≤ 1 mm，记下过线板位置。",
+     "Task 2: set Fabric thickness to 3 mm and record the indicators; keeping the 10 mm spring stroke, link dimensions and 206° catch, adjust only the Thread-guide position until the minimum margin is ≥ 1 mm, slack before entry is within the stroke and the shortfall is ≤ 1 mm; note the guide position."
+    ],
+    [
+     "任务 3：把过线板和布厚恢复为 0 mm、1.5 mm，把“钩线时刻”先调到 198° 以前，看绕梭多放的线降到 18 mm 以下；再调到 214° 以后，看最小余量掉到 1 mm 以下，记录两组数据。",
+     "Task 3: return the guide to 0 mm and the fabric to 1.5 mm; set Hook timing before 198° and watch the excess round the bobbin drop below 18 mm, then after 214° and watch the minimum margin fall below 1 mm; record both."
+    ],
+    [
+     "任务 4：切换到“凸轮式（自己设计供线曲线）”，点“从连杆式曲线开始”，在曲线图上拖动蓝色圆点、必要时点“平滑一次”，在布厚 1.5 mm、钩线 206° 下把绕梭最大余线压到 8 mm 以下并满足另外三条，读出面线最大加速度，与连杆式比较。",
+     "Task 4: switch to “Cam type (design your own supply curve)”, press “Start from the link-type curve”, drag the blue dots on the chart (pressing “Smooth once” if needed) to bring the maximum slack round the bobbin below 8 mm with the other three conditions met at 1.5 mm and 206°, then read the maximum thread acceleration and compare with the link type."
+    ],
+    [
+     "任务 5：回到连杆式，展开“连杆尺寸”，把“摇杆长”分别改到 38.5 mm 以下和 43.5 mm 以上，比较线孔轨迹、收线最紧的时刻、最大供线量和传动角；最后点“恢复算例尺寸”。",
+     "Task 5: return to the link type, open “Link dimensions”, set the Rocker length below 38.5 mm and then above 43.5 mm, and compare the eye path, tightest moment, maximum supply and transmission angle; finally press “Reset to worked-example dimensions”."
+    ],
+    [
+     "把“转速”改为 4000 和 6000 r/min，记录连杆式面线最大加速度，验证它与转速平方成正比；检查“任务（自动判定）”区五个任务是否都显示完成。",
+     "Set Speed to 4000 and 6000 r/min, record the link type's maximum thread acceleration and verify it scales with speed squared; check that all five tasks under “Tasks (checked automatically)” show as done."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "挑线机构指标记录",
+     "Take-up indicators"
+    ],
+    "headers": [
+     [
+      "设置（类型、布厚、过线板、钩线时刻、摇杆长）",
+      "Setting (type, thickness, guide, hook timing, rocker)"
+     ],
+     [
+      "最小余量（mm）",
+      "Min. margin (mm)"
+     ],
+     [
+      "入布前余线 / 行程（mm）",
+      "Slack before entry / stroke (mm)"
+     ],
+     [
+      "入布后欠线（mm）",
+      "Shortfall after entry (mm)"
+     ],
+     [
+      "绕梭最大余线（mm）",
+      "Max. slack round bobbin (mm)"
+     ],
+     [
+      "收线最紧 / 放线最多（°）",
+      "Tightest / max. payout (°)"
+     ],
+     [
+      "传动角（°）",
+      "Transmission angle (°)"
+     ],
+     [
+      "面线最大加速度（km/s²）",
+      "Max. thread acceleration (km/s²)"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "厚料时你把过线板移了多少？为什么向“多放线”方向移动能增加供线量？（提示：进线方向与线孔运动方向的关系。）",
+     "How far did you move the thread guide for thick fabric? Why does moving it towards “more thread” increase supply? (Hint: the direction of the incoming thread relative to the eye's motion.)"
+    ],
+    [
+     "梭尖早到时多放的线为什么减少，晚到时最小余量为什么减小？这对第 5 章调钩线时刻有什么提示？",
+     "Why does early hook timing reduce the excess and late timing reduce the minimum margin? What does this suggest for setting hook timing in Chapter 5?"
+    ],
+    [
+     "你设计的凸轮曲线面线最大加速度是连杆式的几倍？在每分钟 5000 针的工业平缝机上你会选哪一种？说明理由。",
+     "How many times the link type's maximum thread acceleration did your cam curve reach? Which would you choose for a 5000-stitch-per-minute industrial machine, and why?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 4：挑线机构的计算与调整",
+   "Assignment 4: take-up calculation and adjustment"
+  ],
+  "tasks": [
+   [
+    "计算题（教材习题 1）。用表 4-1 的尺寸，按 4.4 节的公式手算 φ = 90° 时 P、M、E 的位置和传动角（写出 d、p、h 的中间结果），并与虚拟实验或图 4-3 核对。",
+    "Calculation (textbook exercise 1). With the dimensions of Table 4-1 and the formulas of Section 4.4, hand-calculate P, M, E and the transmission angle at φ = 90° (show the intermediate d, p and h), and check against the lab or Fig. 4-3."
+   ],
+   [
+    "调整题（教材习题 4 改编）。在虚拟实验 4-1 中把布厚改为 3 mm，只调过线板（挑线簧行程保持 10 mm），使三条判据都满足；附调整前后的指标截图，说明每条判据的变化原因。再把布厚改为 2.5 mm，判断是否需要调整。",
+    "Adjustment (adapted from exercise 4). In Virtual lab 4-1 set the fabric to 3 mm and adjust only the thread guide (spring stroke kept at 10 mm) until all three criteria are met; attach indicator screenshots before and after and explain why each criterion changed. Then set the fabric to 2.5 mm and decide whether adjustment is needed."
+   ],
+   [
+    "估算题。某衬衫厂一件衬衫的平缝缝线总长约 6 m，针距 2.5 mm，布厚 1.0 mm，车间损耗按 12% 计。按 q ≈ s + t 估算每件衬衫平缝要用多少米面线；若一个线团 5000 m，够缝多少件？",
+    "Estimate. A shirt has about 6 m of lockstitch seams in total, stitch length 2.5 mm, fabric 1.0 mm, waste 12%. Using q ≈ s + t, estimate the needle thread per shirt in metres; how many shirts does a 5000 m cone cover?"
+   ],
+   [
+    "讨论题（教材习题 6）。凸轮式可以让供线量紧贴耗线量，为什么高速工业平缝机仍普遍用连杆式？旋转式挑线盘和电机驱动挑线分别从什么角度解决这个矛盾？",
+    "Discussion (exercise 6). A cam can make supply hug demand, so why do high-speed industrial machines still use the link type? How do the rotary disc and motor-driven take-up each resolve the conflict?"
+   ]
+  ],
+  "deliverable": [
+   "一份 PDF（不超过 6 页）：手算过程、虚拟实验截图与分析、估算过程、讨论（300 字以内）。",
+   "One PDF of at most 6 pages: hand calculations, lab screenshots and analysis, the estimate, and the discussion (under 250 words)."
+  ],
+  "rubric": [
+   [
+    "四连杆位置与传动角计算正确，中间结果完整（30 分）",
+    "Correct four-bar positions and transmission angle with all intermediate results (30 points)"
+   ],
+   [
+    "厚料调整满足三条判据，对判据变化的解释正确（30 分）",
+    "Thick-fabric adjustment meets all three criteria, with correct explanations (30 points)"
+   ],
+   [
+    "用线估算正确，单位清楚（20 分）",
+    "Correct thread estimate with clear units (20 points)"
+   ],
+   [
+    "讨论抓住“供线紧贴”与“线的加速度”的矛盾（20 分）",
+    "Discussion captures the conflict between close supply and thread acceleration (20 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "挑线机构在一针中依次完成的三件事是：",
+    "The three tasks the take-up performs in turn in each stitch are:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "放线 → 收线 → 拉线",
+      "Pay out → take up → draw thread"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "收线 → 放线 → 拉线",
+      "Take up → pay out → draw thread"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "拉线 → 放线 → 收线",
+      "Draw thread → pay out → take up"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "放线 → 拉线 → 收线",
+      "Pay out → draw thread → take up"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "机针刺布、绕梭时放线；脱环后收线收紧线迹；线迹固定后再上行，从夹线器拉出下一针的线。",
+    "Pay out while piercing and passing round the bobbin; take up after cast-off to set the stitch; then rise further to draw the next stitch's thread through the tension assembly."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "工业平缝机普遍采用连杆式挑线机构，主要原因是：",
+    "Industrial lockstitch machines mostly use link take-ups mainly because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "只有转动副，没有滑动槽，磨损小、噪声低、寿命长、能跑高速",
+      "They have only revolute joints and no sliding groove, so wear and noise are low, life is long and they run fast"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "供线曲线可以随意设计，紧贴耗线曲线",
+      "The supply curve can be designed freely to hug the demand curve"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "放出的线最少，线环最紧",
+      "They pay out the least thread and keep the loop tightest"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "结构最简单、成本最低",
+      "They are the simplest and cheapest"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "随意设计曲线是凸轮式的优点；连杆式往往多放线；结构简单、成本低也是凸轮式的特点。",
+    "A freely designed curve is the cam's advantage; the link type usually pays out extra; simplicity and low cost also describe the cam type."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "挑线杆收线最紧的时刻，一定就是线孔几何上最高的时刻。",
+    "The moment of tightest take-up is always the moment the eye is geometrically highest."
+   ],
+   "correct": false,
+   "feedback": [
+    "对线路有意义的是两段线总长 L；过线板和过线点不在线孔正下方，所以算例中收线最紧在 55°，线孔最高在 39°。",
+    "What matters is the total path length L; the guides are not directly below the eye, so in the example tightest take-up is at 55° and the highest eye at 39°."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "算例中 L 的最大值为 210.2 mm，φ = 150° 时 L = 189.4 mm。此时挑线杆已放出的线（供线量 S）是多少？",
+    "In the example L peaks at 210.2 mm, and at φ = 150° L = 189.4 mm. How much thread has the lever paid out (supply S) at this point?"
+   ],
+   "answer": 20.8,
+   "tolerance": 0.1,
+   "unit": "mm",
+   "feedback": [
+    "供线量 S = Lmax − L = 210.2 − 189.4 = 20.8 mm。",
+    "S = Lmax − L = 210.2 − 189.4 = 20.8 mm."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "针杆行程 31 mm，最高点时针眼在针板上方 20 mm，布厚 3 mm。钩线以前，下止点时机针一侧的耗线量 D 是多少？",
+    "The needle-bar stroke is 31 mm, the eye is 20 mm above the throat plate at the top, and the fabric is 3 mm thick. Before catching, what is the demand D on the needle side at bottom dead centre?"
+   ],
+   "answer": 28,
+   "tolerance": 0.2,
+   "unit": "mm",
+   "feedback": [
+    "e₀ = 20 − 3 = 17 mm，D = 2 × (31 − 17) = 28 mm；比 1.5 mm 布厚时的 25 mm 多，厚料更费线。",
+    "e₀ = 20 − 3 = 17 mm, D = 2 × (31 − 17) = 28 mm, more than 25 mm for 1.5 mm fabric: thick fabric takes more thread."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一条 50 cm 长的缝，针距 3 mm、布厚 1.5 mm。按 q ≈ s + t 估算面线用量，再加 15% 车间损耗，需要准备多少厘米面线？（针数向上取整）",
+    "A 50 cm seam has a 3 mm stitch and 1.5 mm fabric. Estimating with q ≈ s + t and adding 15% waste, how many centimetres of needle thread are needed? (Round the stitch count up.)"
+   ],
+   "answer": 86.4,
+   "tolerance": 1,
+   "unit": "cm",
+   "feedback": [
+    "500/3 ≈ 166.7，取 167 针；167 × 4.5 mm ≈ 75.2 cm；× 1.15 ≈ 86.4 cm。",
+    "500/3 ≈ 166.7, so 167 stitches; 167 × 4.5 mm ≈ 75.2 cm; × 1.15 ≈ 86.4 cm."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于余线判据，下列哪些说法正确？",
+    "Which statements about the surplus criteria are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "针眼入布前，挑线杆放下的线全靠挑线簧收住，所以余线不能超过挑线簧行程",
+      "Before eye entry all the thread let down is held by the check spring, so the surplus must not exceed its stroke"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "钩线到脱环是最要紧的一段，余线必须 ≥ 0 并留 1–2 mm 余量",
+      "Catch to cast-off is the critical phase: surplus must be ≥ 0 with 1–2 mm to spare"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "绕梭时多放的线越多越好，线环越松越不容易跳针",
+      "The more excess round the bobbin the better, since a looser loop skips less"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "接近收线最紧时余线接近 −q，这是挑线杆从夹线器拉出下一针用线的时刻",
+      "Near tightest take-up the surplus approaches −q: the lever is drawing the next stitch's thread through the tension assembly"
+     ],
+     "correct": true
+    }
+   ],
+   "feedback": [
+    "多放的线越多，线环越松、越容易扭转被梭尖再次挑住，线迹也越不匀。",
+    "More excess makes the loop looser and more likely to twist and be caught again by the hook, and the stitching less even."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "布料从 1.5 mm 换成 3 mm 后挑线不够用，按说明书应该：",
+    "After changing from 1.5 mm to 3 mm fabric the take-up is short of thread. According to machine manuals you should:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "把过线板向“多放线”方向移动（厚料左移）",
+      "Move the thread guide towards more thread (left for heavy fabric)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "把过线板向“少放线”方向移动（厚料右移）",
+      "Move the thread guide towards less thread (right for heavy fabric)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "把挑线簧行程调小",
+      "Reduce the check-spring stroke"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "把钩线时刻推迟到 214° 以后",
+      "Retard the hook timing to after 214°"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "厚料耗线曲线整体抬高，要多放线；推迟钩线反而使最小余量减小。算例移 12 mm 后余量回到 1.4 mm。",
+    "Thick fabric raises the whole demand curve, so more thread is needed; retarding the hook reduces the margin further. In the example a 12 mm move restores the margin to 1.4 mm."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "算例连杆式挑线机构在 5000 r/min 时面线最大加速度约 30 km/s²。转速提高到 6000 r/min 时约为多少 km/s²？",
+    "The example link take-up gives a maximum needle-thread acceleration of about 30 km/s² at 5000 r/min. What is it at 6000 r/min?"
+   ],
+   "answer": 43.2,
+   "tolerance": 0.5,
+   "unit": "km/s²",
+   "feedback": [
+    "供线曲线随转角的形状不变，加速度与 ω² 成正比：30 × 1.2² = 43.2 km/s²。",
+    "The supply curve against angle is unchanged, so acceleration scales with ω²: 30 × 1.2² = 43.2 km/s²."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "凸轮式挑线能把绕梭多放的线压到 8 mm 以下，高速平缝机却仍用连杆式，主要因为：",
+    "A cam take-up can cut the excess round the bobbin below 8 mm, yet high-speed machines still use link take-ups, mainly because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "供线曲线贴得越紧越陡，面线加速度可达连杆式的近十倍，动态张力大",
+      "The closer the curve hugs demand the steeper it is, giving nearly ten times the link type's thread acceleration and high dynamic tension"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "凸轮式无法满足钩线到脱环余量 ≥ 0 的判据",
+      "A cam cannot meet the margin ≥ 0 criterion from catch to cast-off"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "凸轮式供线量太小，不够线环用",
+      "A cam pays out too little for the loop"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "凸轮式无法调节过线板",
+      "A cam take-up cannot have its thread guide adjusted"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "算例连杆式约 30 km/s²，一组合格凸轮曲线约 290 km/s²；要既平稳又少放线，就用旋转式挑线盘或电机驱动。",
+    "About 30 km/s² for the example link against about 290 km/s² for an acceptable cam curve; to be both smooth and lean, use a rotary disc or motor drive."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "某衬衫厂一件衬衫的平缝缝线总长约 80 cm（某一道工序），针距 2.5 mm、布厚 1.0 mm，车间损耗按 12% 计。按 q ≈ s + t 估算这道工序要准备多少厘米面线？",
+    "One lockstitch operation on a shirt sews about 80 cm of seam, stitch length 2.5 mm, fabric 1.0 mm, waste 12%. Using q ≈ s + t, how many centimetres of needle thread should be allowed?"
+   ],
+   "answer": 125.4,
+   "tolerance": 1.5,
+   "unit": "cm",
+   "feedback": [
+    "800/2.5 = 320 针；每针 3.5 mm，共 112 cm；× 1.12 ≈ 125.4 cm。",
+    "800/2.5 = 320 stitches; 3.5 mm each, 112 cm in total; × 1.12 ≈ 125.4 cm."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "四连杆挑线机构 a = 43.4 mm，b = 40.9 mm，某转角下曲柄销到机架铰点的距离 d = 50 mm。求此时的传动角 μ。",
+    "A four-bar take-up has a = 43.4 mm, b = 40.9 mm, and at some angle the crank pin is d = 50 mm from the frame pivot. Find the transmission angle μ."
+   ],
+   "answer": 72.7,
+   "tolerance": 0.3,
+   "unit": "°",
+   "feedback": [
+    "cosμ = (a² + b² − d²)/(2ab) = (1883.56 + 1672.81 − 2500)/(2 × 43.4 × 40.9) ≈ 0.2976，μ ≈ 72.7°，满足 ≥ 40° 左右。",
+    "cosμ = (a² + b² − d²)/(2ab) = (1883.56 + 1672.81 − 2500)/(2 × 43.4 × 40.9) ≈ 0.2976, so μ ≈ 72.7°, above about 40°."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "算例中梭尖晚到（钩线 214°）时，最小余量从 1.9 mm 降到 0.7 mm，原因是：",
+    "In the example, a late hook (catching at 214°) cuts the minimum margin from 1.9 mm to 0.7 mm because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "线环最大的时候挑线杆已经开始收线",
+      "The take-up is already drawing thread in when the loop is largest"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "挑线杆放线的总量减少了",
+      "The total thread the lever pays out is reduced"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "针眼入布的时刻推迟了",
+      "The eye enters the fabric later"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "每针用线 q 增大了",
+      "The per-stitch use q increases"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "钩线推迟使线环最大的时刻推后，而挑线杆的供线曲线不变，于是在它开始收线后线环还在长大。",
+    "Retarding the catch delays the largest loop while the supply curve stays the same, so the loop is still growing after the lever has started taking up."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "布底出现一圈圈松垮的面线（浮线），多半是挑线杆收线太迟或放线太多，应检查挑线簧弹力和过线板位置。",
+    "Loose loops of needle thread underneath the fabric usually mean the take-up draws in too late or pays out too much; check the check-spring force and the thread-guide position."
+   ],
+   "correct": true,
+   "feedback": [
+    "这是本章的现场要点之一：挑线簧失去弹性或过线板被移到“多放线”一侧，都会造成浮线。",
+    "This is one of the chapter's shop-floor notes: a weak check spring or a guide moved towards more thread both cause loose loops."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "设计连杆式挑线机构时，下列哪些是必须检查的？",
+    "When designing a link take-up, which of these must be checked?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "一转之内每个转角机构都能装配（a² − p² ≥ 0）",
+      "The mechanism assembles at every angle of a revolution (a² − p² ≥ 0)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "传动角不小于 40° 左右",
+      "The transmission angle is not below about 40°"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "在不同布厚下用三条余线判据检查，并留出过线板调节范围",
+      "The three surplus criteria at several fabric thicknesses, leaving range for the thread guide"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "供线曲线与耗线曲线处处相等",
+      "The supply curve equals the demand curve everywhere"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "供线要包住耗线、少量多放由挑线簧吸收，不可能也不需要处处相等；连杆式本来就会多放一些线。",
+    "Supply must envelop demand, with modest excess absorbed by the check spring; equality everywhere is neither possible nor needed, and the link type always pays out some extra."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "面线线路与放线、收线、拉线；四种挑线形式；连杆式位置解与供线量；耗线量模型与 q ≈ s + t；三条余线判据与调整。",
+   "The thread path and paying out, taking up, drawing; the four take-up types; link position solution and supply; the demand model and q ≈ s + t; the three surplus criteria and adjustments."
+  ],
+  "difficult": [
+   "为什么有意义的是线路长度而不是线孔高度；凸包耗线模型与钩线前“两股”的统一；三段余线判据各自的物理含义。",
+   "Why path length, not eye height, matters; how the convex-hull model unifies with the two strands before catching; the physical meaning of each phase's criterion."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Introduction"
+    ],
+    "minutes": 15,
+    "content": [
+     "车间问题：换牛仔布后断线；“一针用多少线”的总量与瞬时需要量对比。",
+     "Shop-floor problem: thread breaks on denim; compare total thread per stitch with the instantaneous need."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：线路、任务与类型",
+     "Lecture: path, tasks and types"
+    ],
+    "minutes": 30,
+    "content": [
+     "面线线路、三件事、挑线簧、四种形式。",
+     "Thread path, three tasks, check spring, four types."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：连杆式运动分析与供线量",
+     "Lecture: link kinematics and supply"
+    ],
+    "minutes": 35,
+    "content": [
+     "两圆交点、线孔与传动角、L 与 S；学生手算 φ = 0° 的位置。",
+     "Two-circle intersection, eye and transmission angle, L and S; students hand-calculate the position at φ = 0°."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：耗线量与三条判据",
+     "Lecture: demand and the three criteria"
+    ],
+    "minutes": 35,
+    "content": [
+     "钩线前两股、凸包模型、q ≈ s + t、余线三段判据；求解导入问题。",
+     "Two strands before catching, the convex-hull model, q ≈ s + t, the three-phase criteria; solve the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "实验：虚拟实验 4-1",
+     "Lab: Virtual lab 4-1"
+    ],
+    "minutes": 45,
+    "content": [
+     "学生完成五个自动判定任务并填写记录表。",
+     "Students complete the five auto-checked tasks and fill in the record table."
+    ]
+   },
+   {
+    "phase": [
+     "小结与测验",
+     "Summary and quiz"
+    ],
+    "minutes": 20,
+    "content": [
+     "连杆式与凸轮式取舍、设计顺序、模型边界；测验，布置作业。",
+     "Link versus cam, design order, model limits; quiz, assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业 4；预习第 5 章，想一想钩线时刻和梭尖间隙怎样调。",
+   "Complete Assignment 4; preview Chapter 5 and think about how hook timing and hook-point clearance are set."
+  ]
+ }
+}

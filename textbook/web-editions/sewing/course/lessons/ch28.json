@@ -1,0 +1,1185 @@
+{
+ "no": 28,
+ "title": [
+  "服装生产工艺与缝制车间",
+  "Garment Processes and the Sewing Floor"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能说明一件衣服从样衣到大货的主要环节，并能做简单的唛架件数与分床计算。",
+   "Describe the main stages from sample to bulk production, and do simple marker and cut-plan calculations."
+  ],
+  [
+   "能把一件衣服分解成工序、画出工序流程图，并用测时、评比和宽放算出标准工时。",
+   "Break a garment into operations, draw the operation flow chart, and calculate a standard minute value from time study, rating and allowances."
+  ],
+  [
+   "能算出节拍、理论最少人数、周期、产量和平衡率，并按分组规则和位置权重法做生产线平衡。",
+   "Calculate takt time, theoretical minimum operators, cycle time, output and balance efficiency, and balance a line using the grouping rules and positional weights."
+  ],
+  [
+   "能解释精益生产的七种浪费和常用做法，并说明最高转速为什么对多数工序的工时影响很小。",
+   "Explain the seven wastes and common practices of lean production, and why top speed has little effect on the time of most operations."
+  ],
+  [
+   "能按产量配置设备、算人机比，并用人机作业模型选出成本最低的看机台数。",
+   "Provision equipment for a target output, calculate the machine-to-operator ratio, and pick the cheapest number of machines per operator with the multi-machine model."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "26 个人，为什么做不到 120 件/时",
+   "Why 26 operators cannot reach 120 pieces an hour"
+  ],
+  "text": [
+   "某厂一条休闲裤线有 26 人，计划产量 120 件/时，全裤 23 道工序、总标准工时 13.20 分/件。原来的分工凭经验：基本一道工序一组，觉得忙的多派一个人。其中“绱拉链”和“合下裆”各 0.70 分，都只有 1 个人。车间主任想加人。若改用自动开袋机（开后袋 1.20 → 0.45 分）和绱腰机（绱腰头 1.30 → 0.80 分），3 台专机扣除少用的 6 台平缝机后净增投资 20 万元；人工按 0.5 元/分，每月 25 天、每天 8 小时。",
+   "A casual-trousers line has 26 operators and a planned output of 120 pieces an hour; the trousers take 23 operations totalling 13.20 standard minutes per piece. Work was assigned by experience: roughly one operation per group, with an extra operator wherever it looked busy. 'Set zip' and 'sew inseam' take 0.70 min each and have one operator each. The supervisor wants to add people. Switching to an automatic pocket welter (back pocket 1.20 → 0.45 min) and a waistband machine (waistband 1.30 → 0.80 min) means a net investment of 200 000 CNY for 3 special machines after six lockstitch machines are freed; labour costs 0.5 CNY/min, 25 days a month, 8 hours a day."
+  ],
+  "question": [
+   "现在这条线实际能做多少件/时、平衡率多少？做 120 件/时理论上至少要几人？同样 26 人重新分组能做到多少？换上两种专机后 26 人能否做到 120 件/时、平衡率多少？和“设备不变加到 29 人”相比，专机投资多久收回？",
+   "What output and balance efficiency does the line achieve now? What is the theoretical minimum number of operators for 120 per hour? What can the same 26 achieve after regrouping? With the two special machines, can 26 operators reach 120 per hour, and at what balance efficiency? Compared with keeping the equipment and going to 29 operators, how long does the special-machine investment take to pay back?"
+  ],
+  "answer": [
+   "现在周期 0.70 分（被绱拉链、合下裆卡住），产量 60 ÷ 0.70 ≈ 85.7 件/时，平衡率 13.20 ÷ (26 × 0.70) ≈ 72.5%。120 件/时节拍 0.5 分，理论最少 ⌈13.20 ÷ 0.5⌉ = 27 人。同样 26 人把相邻工序分组共担，周期降到 0.55 分，约 109 件/时，平衡率 92.3%，产量提高约 27%；设备不变要做到 120 件/时需要 29 人。换专机后总工时 11.95 分，26 人做到 120 件/时，平衡率 11.95 ÷ (26 × 0.5) ≈ 91.9%。比 29 人省 3 人，每月省 3 × 0.5 × 60 × 8 × 25 = 18 000 元，20 万元约 11 个月收回。",
+   "The cycle is now 0.70 min (held by 'set zip' and 'sew inseam'), so output is 60 ÷ 0.70 ≈ 85.7 per hour and balance efficiency 13.20 ÷ (26 × 0.70) ≈ 72.5%. At 120 per hour the takt is 0.5 min and the theoretical minimum is ⌈13.20 ÷ 0.5⌉ = 27 operators. Regrouping adjacent operations with the same 26 brings the cycle to 0.55 min, about 109 per hour, 92.3% balance, an increase of about 27%; with unchanged equipment, 120 per hour needs 29 operators. With the special machines total work is 11.95 min and 26 operators reach 120 per hour at 11.95 ÷ (26 × 0.5) ≈ 91.9%. That saves 3 operators against 29, i.e. 3 × 0.5 × 60 × 8 × 25 = 18 000 CNY a month, so 200 000 CNY pays back in about 11 months."
+  ]
+ },
+ "robot": {
+  "title": [
+   "一台机器人照看几台机床",
+   "How many machines one robot should tend"
+  ],
+  "text": [
+   "机器人上下料（machine tending）和一人看几台自动机是同一个模型：机器人每台装卸 a、在机床间移动 w，机床自动加工 t，看 n 台时周期 C = max[n(a+w), a+t]，平衡点 n* = (a+t)/(a+w)。机器人比人快，a 和 w 小，一台机器人就能多看几台；反过来，机床提速（t 变小）以后，一台机器人能看的台数变少，要靠双工位夹具或换料台缩短 a，这和花样机用两套模板交替是一个思路。机器人工作站组成的自动线同样要做线平衡：每个工作站的节拍就是这一讲的“负荷”，最慢的工作站决定整条线的产量；离线编程和仿真按“伸手、抓取、移动、放下”的基本动作估节拍，相当于服装业的预定动作时间标准（GSD）。",
+   "Robot machine tending and one operator minding several automatic machines are the same model: the robot spends a loading each machine and w moving between them, the machine runs t on its own, and with n machines the cycle is C = max[n(a+w), a+t], balanced at n* = (a+t)/(a+w). A robot is faster than a person, with small a and w, so it can tend more machines; conversely, when the machines speed up (smaller t), one robot can tend fewer, and a and w must shrink with dual-station fixtures or pallet changers, the same idea as alternating two clamps on a pattern sewer. An automatic line of robot cells must be balanced too: each cell's cycle is this lesson's 'load', and the slowest cell sets the line's output; offline programming and simulation estimate cycles from elementary motions such as reach, grasp, move and place, the robot counterpart of the garment industry's predetermined-time standards (GSD)."
+  ]
+ },
+ "life": {
+  "title": [
+   "一个人同时看电饭煲、洗衣机和烤箱",
+   "Minding the rice cooker, washing machine and oven at once"
+  ],
+  "text": [
+   "周末做家务，把米放进电饭煲、衣服塞进洗衣机、面包放进烤箱，转一圈回来，第一台正好好了——这就是一人多机。要是机器都变快了，你反而要在几台之间跑得更忙，能同时照看的台数就少了。",
+   "Doing chores on a weekend, you start the rice cooker, load the washing machine and put bread in the oven; by the time you are back at the first, it is done. That is one person tending several machines. If the machines all got faster, you would be running between them harder and could mind fewer at once."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：从样衣到大货",
+    "Opening: from sample to bulk production"
+   ],
+   "points": [
+    [
+     "技术准备：款式与纸样 → 样衣 → 工艺单（技术包）→ 产前样；同时 IE 拆工序、估工时、排生产线",
+     "Technical preparation: style and pattern → sample → tech pack → pre-production sample; meanwhile IE breaks down operations, estimates times and lays out the line"
+    ],
+    [
+     "大货生产：排料裁剪 → 缝制 → 后整理（锁眼钉扣、整烫、剪线头、折叠）→ 检验包装",
+     "Bulk production: marker and cutting → sewing → finishing (buttonholes and buttons, pressing, thread trimming, folding) → inspection and packing"
+    ],
+    [
+     "休闲裤算例：缝制约占全部人工工时的八成",
+     "Casual-trousers example: sewing takes about four-fifths of all labour time"
+    ],
+    [
+     "贯穿全章的例子：一条 23 道工序的休闲裤线",
+     "Running example: a 23-operation casual-trousers line"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_21_flow.png",
+   "narration": [
+    "一台缝纫机设计得再好，到了车间里也只是几十台中的一台。一件衣服进工厂大致走两段路。前一段是技术准备：设计出款式和纸样，做样衣、试穿修改，写出工艺单，也叫技术包，再做产前样请客户确认；同时工业工程人员，也就是 IE，把衣服拆成工序、估出工时、排好生产线，这是这一讲的主要内容。后一段是大货生产：排料裁剪、缝制、后整理、检验包装。四个环节里缝制工序最多、用人最多，按休闲裤算例占全部人工工时的约八成。前面各篇讲的缝纫机，都在这一段工作。",
+    "However well a sewing machine is designed, on the floor it is one of dozens. A garment travels two stretches in the factory. First, technical preparation: the designer produces style and pattern, a sample is made and fitted, the tech pack is written, and a pre-production sample goes to the customer for approval; meanwhile the industrial engineers, IE, break the garment into operations, estimate times and lay out the line, which is the subject of this lesson. Second, bulk production: marker making and cutting, sewing, finishing, then inspection and packing. Of the four, sewing has the most operations and the most people, about four-fifths of all labour time in the trousers example. Every machine in the earlier parts of this book works in this stretch."
+   ]
+  },
+  {
+   "title": [
+    "排料与裁剪：唛架与分床",
+    "Marker making and cutting: markers and cut plans"
+   ],
+   "points": [
+    [
+     "唛架：把纸样排在与布幅同宽的纸上；面料利用率 = 衣片总面积 / 唛架面积",
+     "Marker: pattern pieces laid on paper as wide as the fabric; utilisation = total piece area / marker area"
+    ],
+    [
+     "面料常占制造成本一半以上：利用率提高一两个百分点，比缝制省几秒钱多",
+     "Fabric is often over half of manufacturing cost: one or two points of utilisation save more than seconds on the sewing floor"
+    ],
+    [
+     "一张唛架排几件、大小码搭配：算例从 1 件 78% 升到 6 件 86%；唛架长度受裁床限制",
+     "Several garments per marker with mixed sizes: 78% for one rising to 86% for six in the example; marker length is limited by the table"
+    ],
+    [
+     "分床：S 200、M 400、L 400、XL 200，用 1:2:2:1 的六件唛架，每码 200 层；一床最多 80 层 → 80、80、40 三床",
+     "Cut plan: S 200, M 400, L 400, XL 200 with a 1:2:2:1 six-garment marker needs 200 plies; at 80 plies per lay → three lays of 80, 80 and 40"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_21_marker.png",
+   "narration": [
+    "把一件或几件衣服的全部纸样摆在一张和布幅一样宽的纸上，尽量排紧，这张图叫唛架；衣片总面积占唛架面积的比例就是面料利用率。为什么重要？面料常占服装制造成本的一半以上，利用率提高一两个百分点，比缝制车间省几秒钟工时省得多。一张唛架排一件，空隙填不满；排几件、大小码搭配，小码衣片能塞进大码的空隙里，算例从 78% 升到 86%。订单 S 200、M 400、L 400、XL 200，按 1 比 2 比 2 比 1 的六件唛架，每码都要 200 层，一床最多 80 层，就分 80、80、40 三床。",
+    "Lay all the pattern pieces of one or more garments as tightly as possible on paper as wide as the fabric: that layout is the marker, and the share of its area covered by pieces is the fabric utilisation. Why does it matter? Fabric is often more than half of a garment's manufacturing cost, so one or two points of utilisation save far more than a few seconds on the sewing floor. One garment per marker leaves gaps; several garments in mixed sizes let small pieces fill the gaps between large ones, from 78% to 86% in the example. An order of S 200, M 400, L 400 and XL 200 with a 1:2:2:1 six-garment marker needs 200 plies for every size; at most 80 plies per lay, that is three lays of 80, 80 and 40."
+   ]
+  },
+  {
+   "title": [
+    "工序分析与工序流程图",
+    "Operation breakdown and the flow chart"
+   ],
+   "points": [
+    [
+     "工序分解：按加工顺序拆成一道道工序；长流水拆得细，单元式拆得粗",
+     "Operation breakdown: split the garment into operations in sequence; finer for long lines, coarser for cells"
+    ],
+    [
+     "每道工序写清机器、线迹与针距、工艺要求和前道工序",
+     "For each operation record the machine, stitch and stitch length, quality requirements and predecessors"
+    ],
+    [
+     "休闲裤 23 道：后片、前片、门襟三部件先各自做，再汇合组装；合计 13.20 分/件（算例）",
+     "Trousers, 23 operations: back, front and fly made separately, then joined and assembled; 13.20 min per piece in total (worked example)"
+    ],
+    [
+     "流程图说明哪些可以同时做、哪些必须在后；同类产品工时可差好几倍，工厂用自己测的数据",
+     "The chart shows what can run in parallel and what must come later; similar products can differ several-fold in time, so factories use their own data"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_21_ops.png",
+   "narration": [
+    "裁好的衣片进缝制车间之前，要先回答两个问题：做哪些工序，先后顺序是什么。把一件衣服按加工顺序拆成一道道工序，叫工序分解。长流水线拆得细，单元式生产拆得粗。每道工序要写清楚用什么机器、什么线迹和针距、有什么要求，还有它的前道工序。看图，休闲裤拆成 23 道：后片、前片、门襟三个部件各自先做，汇合以后合裆、合侧缝、绱腰头、钉串带、卷裤脚、锁眼钉扣，最后剪线头检验。流程图告诉我们哪些可以同时做，哪些必须排在后面，比如不合好侧缝就没法绱腰头，这就是下一步分配工序时的约束。",
+    "Before cut parts enter the sewing room, two questions need answers: which operations, and in what order. Splitting a garment into operations in processing order is the operation breakdown. Long lines split finely, cells coarsely. Each operation records its machine, stitch type and length, requirements and predecessors. In the figure the trousers break into 23 operations: back, front and fly are made separately, then joined: crotch, side seams, waistband, belt loops, hems, buttonhole and button, and finally trimming and inspection. The chart shows what can run in parallel and what must come later; you cannot set the waistband before the side seams are closed. That precedence is the constraint when we assign operations next."
+   ]
+  },
+  {
+   "title": [
+    "标准工时：测时、评比、宽放",
+    "Standard minute value: time study, rating, allowances"
+   ],
+   "points": [
+    [
+     "标准工时（SAM/SMV）= 熟练工人按规定方法、正常速度完成一道工序的时间 + 必要宽放",
+     "Standard minute value (SAM/SMV) = time for a trained operator, prescribed method, normal pace, plus necessary allowances"
+    ],
+    [
+     "观测：“侧缝压明线”测 10 次，平均 0.48 分",
+     "Observe: 'topstitch side seams' timed 10 times, average 0.48 min"
+    ],
+    [
+     "评比：做得利索评 110%，基本时间 0.48 × 1.10 = 0.528 分",
+     "Rate: a brisk operator rated 110%, basic time 0.48 × 1.10 = 0.528 min"
+    ],
+    [
+     "宽放：个人 5%、疲劳 4%、机器 5%（包缝、套结 6%）；算例 14% → 0.528 × 1.14 ≈ 0.60 分 = 36 s",
+     "Allow: personal 5%, fatigue 4%, machine 5% (6% for overlock and bartack); 14% in the example → 0.528 × 1.14 ≈ 0.60 min = 36 s"
+    ]
+   ],
+   "formula": "\\mathrm{SAM}=t_{\\text{obs}}\\times\\text{rating}\\times(1+\\text{allowance})",
+   "figure": "fig_21_sam.png",
+   "narration": [
+    "标准工时是一个熟练工人用规定的方法、以正常速度完成一道工序的时间，加上必要的宽放。最常用的测法是秒表测时，三步。第一步观测：选熟练工人按规定方法做，测十来个循环取平均，“侧缝压明线”平均 0.48 分。第二步评比：这个工人可能比正常快也可能慢，测时员给他的速度打分，正常是 100%，他做得利索评 110%，基本时间就是 0.528 分。第三步宽放：人要喝水、会疲劳，机器要换线、换梭芯，按百分比加进去，算例取 14%，得 0.60 分，36 秒。新款投产前还可以用预定动作时间标准，比如 GSD，查表估算。",
+    "The standard minute value is the time a trained operator, using the prescribed method at normal pace, needs for an operation, plus necessary allowances. The usual method is stopwatch time study, in three steps. Observe: have a trained operator work by the prescribed method, time a dozen or so cycles and average them; 'topstitch side seams' averages 0.48 min. Rate: the operator may be faster or slower than normal, so the observer scores the pace, 100% being normal; this one is brisk and rated 110%, giving a basic time of 0.528 min. Allow: people drink, tire; machines need rethreading and bobbin changes; these are added as percentages, 14% here, giving 0.60 min, 36 seconds. Before a new style starts, predetermined-time standards such as GSD give an estimate from tables."
+   ]
+  },
+  {
+   "title": [
+    "机器时间与手工时间：转速有多大用",
+    "Machine time and handling time: how much does speed help"
+   ],
+   "points": [
+    [
+     "缝纫工约 80% 时间在拿取、放置、引导布料和放下衣片；机器实际运转占工时一两成到七成不等",
+     "Operators spend about 80% of their time picking up, positioning, guiding and putting down; actual machine running is one to seven tenths of the time"
+    ],
+    [
+     "一道缝：慢起针 3 针 → 加速 → 最高转速 → 减速 → 剪线停针（第 14 章的速度曲线）",
+     "One seam: 3 slow start stitches → accelerate → top speed → decelerate → trim and stop (speed profile of Chapter 14)"
+    ],
+    [
+     "“侧缝压明线”两道约 100 cm、每道约 333 针：4000 → 5000 r/min 一道 5.75 → 4.80 s，两道省 1.9 s，只占 36 s 的 5%",
+     "'Topstitch side seams', two seams of about 100 cm at about 333 stitches each: 4000 → 5000 r/min takes one seam from 5.75 to 4.80 s, saving 1.9 s for two, only 5% of 36 s"
+    ],
+    [
+     "40 针短缝从 4000 提到 6000 r/min 只省 0.10 s；缩短加减速、剪线和拿放时间更有效",
+     "A 40-stitch seam from 4000 to 6000 r/min saves only 0.10 s; cutting acceleration, trimming and handling time does more"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_21_sam.png",
+   "narration": [
+    "工序时间分成机器在缝和人在拿放两部分。缝纫工约 80% 的时间花在拿放和引导布料上。那最高转速对工时有多大影响？用第 14 章的速度曲线算：起针慢 3 针，加速到最高转速，快结束时减速，剪线停针。“侧缝压明线”两道约一米的缝，每道约 333 针，最高转速从 4000 提到 5000，一道从 5.75 秒降到 4.80 秒，两道省 1.9 秒，只占这道工序 36 秒的 5%。如果是 40 针的短缝，从 4000 提到 6000 只省 0.1 秒，因为慢起针和剪线停车一点没变。所以缩短加减速和剪线时间、让拿放更省事，对工时影响更大。",
+    "An operation's time splits into the machine sewing and the person picking up, aligning and putting down. Operators spend about 80% of their time handling and guiding the fabric. So how much does top speed matter? Use the speed profile of Chapter 14: three slow stitches to start, accelerate to top speed, slow down near the end, trim and stop. 'Topstitch side seams' has two seams of about a metre, about 333 stitches each; raising top speed from 4000 to 5000 takes one seam from 5.75 to 4.80 seconds, saving 1.9 seconds for both, only 5% of the 36-second operation. On a 40-stitch seam, going from 4000 to 6000 saves just 0.1 second, because the slow start and the trim-and-stop do not change at all. Shorter acceleration and trimming, and easier handling, matter far more."
+   ]
+  },
+  {
+   "title": [
+    "节拍、最少人数与平衡率",
+    "Takt time, minimum operators and balance efficiency"
+   ],
+   "points": [
+    [
+     "节拍 = 60 / 目标产量（分/件）；理论最少人数 N₀ = ⌈ΣSAM / 节拍⌉",
+     "Takt = 60 / target output (min/piece); theoretical minimum N₀ = ⌈ΣSAM / takt⌉"
+    ],
+    [
+     "休闲裤：120 件/时 → 节拍 0.5 分；13.20 / 0.5 → 至少 27 人",
+     "Trousers: 120 per hour → takt 0.5 min; 13.20 / 0.5 → at least 27 operators"
+    ],
+    [
+     "负荷最重的人的工时 = 周期（瓶颈时间）；实际产量 = 60 / 周期",
+     "The heaviest operator's load = cycle time (bottleneck time); actual output = 60 / cycle"
+    ],
+    [
+     "平衡率 = ΣSAM / (N × 周期)；1 − 平衡率 = 平衡损失率",
+     "Balance efficiency = ΣSAM / (N × cycle); 1 − balance efficiency = balance loss"
+    ]
+   ],
+   "formula": "\\text{takt}=\\frac{60}{\\text{output}},\\quad N_0=\\left\\lceil\\frac{\\sum \\mathrm{SAM}}{\\text{takt}}\\right\\rceil,\\quad \\eta=\\frac{\\sum \\mathrm{SAM}}{N\\times C}",
+   "figure": "",
+   "narration": [
+    "有了每道工序的标准工时，就可以排线了。先由目标产量算节拍，也就是平均隔多久要出一件：节拍等于 60 除以每小时产量。休闲裤目标 120 件每小时，节拍 0.5 分。总工时 13.20 分除以节拍，向上取整，理论上至少 27 人。接下来把工序分给人，每人分到的工时叫负荷。整条线的产量由负荷最重的那个人决定，他一件没做完，下游只能等；他的工时叫周期，实际产量等于 60 除以周期。衡量分得匀不匀用平衡率：总工时除以人数乘周期。1 减平衡率是平衡损失率，即等待时间占全线工时的比例。",
+    "With a standard minute value for every operation we can lay out the line. First, takt time from the target output: how often, on average, a piece must come off the line, 60 divided by output per hour. The trousers target is 120 an hour, so takt is 0.5 min. Total work of 13.20 min divided by takt and rounded up gives a theoretical minimum of 27 operators. Next, assign operations to people; each person's share is their load. The line's output is set by the most heavily loaded person: until they finish a piece, everyone downstream waits. Their time is the cycle time, and actual output is 60 divided by the cycle. Evenness is measured by balance efficiency: total work over operators times cycle. One minus it is the balance loss, the share of paid time spent waiting."
+   ]
+  },
+  {
+   "title": [
+    "一道工序一组为什么不行",
+    "Why one operation per group fails"
+   ],
+   "points": [
+    [
+     "工时超过节拍就多派人：做斜插袋 0.9 分派 2 人，开后袋 1.2 分派 3 人",
+     "Add operators where time exceeds takt: front pocket 0.9 min gets 2, back pocket 1.2 min gets 3"
+    ],
+    [
+     "人数只能是整数：门襟压明线 0.55 分也得 2 人，每人 0.275 分，一半时间在等；0.2 分的锁眼也占一人",
+     "Operators come in whole numbers: fly topstitch at 0.55 min still needs 2, each loaded 0.275, idle half the time; a 0.2 min buttonhole also takes a person"
+    ],
+    [
+     "结果：38 人，平衡率只有 69.5%",
+     "Result: 38 operators at only 69.5% balance"
+    ],
+    [
+     "零碎工时没法凑整，是平衡损失的主要来源",
+     "Fragments that cannot be pooled are the main source of balance loss"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_21_balance.png",
+   "narration": [
+    "最简单的分法是一道工序一组，工时超过节拍的多派几个人：0.9 分的做斜插袋派 2 人，1.2 分的开后袋派 3 人。问题出在人数只能是整数。0.55 分的门襟压明线只超过节拍一点点，也得派 2 个人，每人只分到 0.275 分，一半时间在等；0.2 分的锁眼也要占一个人。看左边的平衡图，柱子高高低低，红虚线是节拍。按这种分法，休闲裤线要 38 人，平衡率只有 69.5%，也就是三成的工时在等待。这里的关键是：零碎的工时没办法凑整，它们就是平衡损失的主要来源。下一页讲怎样把它们凑起来。",
+    "The simplest assignment is one operation per group, adding people where an operation exceeds takt: 2 for the 0.9 min front pocket, 3 for the 1.2 min back pocket. The trouble is that operators come in whole numbers. Fly topstitching at 0.55 min is only just over takt, yet it needs two people, each loaded 0.275 min and idle half the time; the 0.2 min buttonhole also ties up a person. In the left-hand balance chart the bars go up and down against the red dashed takt line. Done this way, the trousers line needs 38 operators at only 69.5% balance: about three-tenths of paid time is waiting. The key point: fragments of work that cannot be pooled are the main source of balance loss. The next slide shows how to pool them."
+   ]
+  },
+  {
+   "title": [
+    "分组共担与位置权重法",
+    "Shared groups and the positional-weight method"
+   ],
+   "points": [
+    [
+     "相邻几道工序合成一组由几人共担：前片锁边、后片锁边、收后省共 1.30 分，3 人各 0.433 分",
+     "Pool adjacent operations in a group shared by several people: front overlock, back overlock and back darts total 1.30 min, 3 operators at 0.433 each"
+    ],
+    [
+     "规则：一组 ≤ 4 人、≤ 4 道工序、≤ 2 种机器（手工不算）；不违反先后关系",
+     "Rules: at most 4 people, 4 operations and 2 machine types per group (manual work not counted); respect precedence"
+    ],
+    [
+     "位置权重 = 本工序工时 + 其后所有工序工时；按权重排序，用动态规划切分",
+     "Positional weight = own time + time of all following operations; sort by weight and cut the sequence by dynamic programming"
+    ],
+    [
+     "自动分组 29 人、平衡率 91.0%；调换“做串带”等顺序可到 28 人、94.3%",
+     "Automatic grouping: 29 operators, 91.0%; reordering, e.g. moving 'make belt loops', reaches 28 operators, 94.3%"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_21_balance.png",
+   "narration": [
+    "改进的办法是把相邻几道工序合成一组，由几个人共同承担。比如前片锁边、后片锁边、收后省三道合计 1.30 分，3 个人做，每人 0.433 分；这样 0.3 个人的活就不必占一个人。规矩：一组不超过 4 人、机器不超过 2 种，并满足先后关系。怎样分最好？常用位置权重法：每道工序的权重等于它自己加上后面所有工序的工时，权重大的先排，排成一列再切成若干段，用动态规划比较所有切法。这样休闲裤只要 29 人，平衡率 91%；调换几道工序顺序还能做到 28 人。",
+    "The remedy is to pool adjacent operations into a group shared by several people. Front overlock, back overlock and back darts total 1.30 min; three people share them at 0.433 min each. Three-tenths of a person's work no longer occupies a whole person. Rules: at most four people and two machine types per group, with precedence respected. What is the best grouping? A common approach is positional weights: each operation's weight is its own time plus the time of every operation after it; sort by weight into one sequence, then cut it into groups, comparing every cut by dynamic programming. The trousers then need just 29 operators at 91% balance; swapping the order of a few operations gets down to 28."
+   ]
+  },
+  {
+   "title": [
+    "节拍改变以后，以及和第 29 章的关系",
+    "When takt changes, and the link to Chapter 29"
+   ],
+   "points": [
+    [
+     "150 件/时（节拍 0.4）：自动分组 36 人、91.7%；100 件/时：25 人、91.8%",
+     "150 per hour (takt 0.4): automatic grouping 36 operators, 91.7%; 100 per hour: 25 operators, 91.8%"
+    ],
+    [
+     "工时与节拍的“凑整”关系变了，分组就要重排；换款、改方法也要重做线平衡",
+     "When the fit between times and takt changes, groups must be redone; style and method changes also need rebalancing"
+    ],
+    [
+     "理论平衡没有考虑个人快慢、一天里的波动和在制品缓冲",
+     "Theoretical balance ignores operator differences, daily variation and WIP buffers"
+    ],
+    [
+     "捆扎流水靠大量在制品吸收波动；吊挂单件流按工位空闲派活；U 型单元接力自己调分工",
+     "Bundle lines absorb variation with lots of WIP; hanger single-piece flow dispatches to free stations; U-cells rebalance themselves by relay"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "目标产量变了，节拍就变，原来合适的分组不一定还合适。目标 150 件每小时，节拍 0.4 分，自动分组要 36 人，平衡率 91.7%；目标 100 件，25 人，91.8%。凑整关系变了，分组就得重排，换款以后也要重做线平衡。上面都是理论值。实际车间里，同一道工序不同的人快慢不一，同一个人一天里也有快有慢，工序之间还要留一点在制品做缓冲。第 29 章讲的三种组织方式处理波动的办法各不相同：捆扎流水靠大量在制品吸收；吊挂单件流按工位空闲自动派活；U 型单元接力，快的人自然多做一段。这一讲的平衡计算是它们共同的起点。",
+    "When the target changes, takt changes, and a grouping that fitted before may not fit now. At 150 an hour, takt 0.4 min, automatic grouping needs 36 operators at 91.7%; at 100 an hour, 25 at 91.8%. The fit has changed, so groups must be rebuilt, as after a style change. All of this is theory. On a real floor, different people work an operation at different speeds, one person varies over the day, and some work in progress is needed between operations as a buffer. The three organisations of Chapter 29 handle variation differently: bundle lines absorb it with plenty of WIP; hanger single-piece flow dispatches automatically to free stations; U-cells use relay zones where faster people naturally take on more. This lesson's balancing is the common starting point for all three."
+   ]
+  },
+  {
+   "title": [
+    "精益生产：七种浪费与流动",
+    "Lean production: seven wastes and flow"
+   ],
+   "points": [
+    [
+     "源自丰田生产方式，核心是识别和消除浪费——一切不增加产品价值的活动",
+     "Rooted in the Toyota Production System; the core is finding and removing waste, any activity that adds no value"
+    ],
+    [
+     "七种浪费：做多了、等待、搬运、加工过度、库存、多余动作、返工",
+     "Seven wastes: overproduction, waiting, transport, over-processing, inventory, unnecessary motion, rework"
+    ],
+    [
+     "缝纫机只在缝的那几秒给衣服增加价值，其余时间都可能是浪费",
+     "A sewing machine adds value only in the seconds it sews; the rest may all be waste"
+    ],
+    [
+     "在制品越多，生产周期越长（利特尔法则），还会掩盖问题；小批量甚至单件流让问题马上暴露",
+     "More WIP means longer throughput time (Little's law) and hides problems; small batches or single-piece flow expose them at once"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "精益生产源自丰田生产方式，核心是识别和消除浪费。所谓浪费，是一切不增加产品价值的活动。服装车间常说七种：做多了，比订单多做或者提前太多做出来；等待，工人等活、等机器；搬运，衣片在工位之间来回搬；加工过度，比要求多缝了一道线；库存，线上和仓库里的在制品；多余的动作，伸手太远、找东西；返工，做坏了拆了重做。先说在制品和流动：第 29 章用利特尔法则说明，在制品越多，一件衣服在线上待的时间越长；在制品还会掩盖问题，小批量甚至单件流动，问题马上暴露，逼着人去解决。",
+    "Lean production comes from the Toyota Production System, and its core is to find and remove waste: any activity that adds no value to the product. Garment floors usually name seven: overproduction, making more than ordered or far too early; waiting, for work or machines; transport, moving cut parts back and forth; over-processing, an extra line of stitching nobody asked for; inventory, WIP on the line and in the warehouse; unnecessary motion, reaching too far or searching; and rework, unpicking and redoing faulty pieces. Take WIP and flow first: Chapter 29 used Little's law to show that the more WIP, the longer a garment sits on the line; WIP also hides problems. Small batches or single-piece flow expose problems at once and force people to solve them."
+   ]
+  },
+  {
+   "title": [
+    "标准作业、快速换型、质量内建与 5S",
+    "Standard work, quick changeover, built-in quality and 5S"
+   ],
+   "points": [
+    [
+     "标准作业：把最好的做法写成作业指导书配图或视频；方法一变，工时重测",
+     "Standard work: write the best method into work instructions with pictures or video; change the method and re-time it"
+    ],
+    [
+     "快速换型：停线前做好能提前做的准备；把停线才能做的事变短（电子针距、电子差动调程序，花样机换模板即换花样）",
+     "Quick changeover: prepare everything possible before stopping; shorten what needs the line stopped (recall electronic stitch length and differential programs, change a pattern sewer's clamp to change pattern)"
+    ],
+    [
+     "质量内建：首件检验、自检互检、当场停下解决；断线检测、线迹监测也是这个思路",
+     "Built-in quality: first-piece checks, self- and next-station checks, stop and fix on the spot; thread-break detection and stitch monitoring follow the same idea"
+    ],
+    [
+     "目视化与 5S：计划与实际挂在线头、故障亮灯；整理、整顿、清扫、清洁、素养",
+     "Visual management and 5S: plan versus actual at the line head, lights for faults; sort, set in order, shine, standardise, sustain"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "标准作业：把衣片放哪里、怎样拿、怎样对齐的最好做法写成作业指导书，配图片或视频。标准工时就是在标准作业的基础上测的，方法一变，工时就要重测。快速换型：换款时调机器、换线、换压脚是停线损失，办法是把能提前做的准备在停线前做好，把非停不可的事变短，比如电子针距和电子差动直接调程序，花样机换模板就换了花样。第 29 章算过，小单快反时换款停线是最大的一块损失。质量内建：不靠最后检验挑次品，每道工序自己保证质量。目视化和 5S：车间状态一眼看得出来，它是减少找东西和多余动作最直接的办法。",
+    "Standard work: the best way to place, pick up and align the pieces is written into work instructions with pictures or video. Standard minute values are measured on standard work, so if the method changes, re-time it. Quick changeover: adjusting machines, rethreading and changing feet at a style change are line-stop losses; prepare everything possible before the stop, and shorten what must be done during it, for example recalling electronic stitch length and differential settings as programs, or changing a pattern sewer's clamp to change its pattern. Chapter 29 showed that with small quick-response orders the changeover stop is the largest single loss. Built-in quality: each operation ensures its own quality instead of final inspection sorting out rejects. Visual management and 5S make the floor's state visible at a glance and are the most direct cure for searching and wasted motion."
+   ]
+  },
+  {
+   "title": [
+    "设备配置与人机比",
+    "Equipment provisioning and the machine-to-operator ratio"
+   ],
+   "points": [
+    [
+     "每组各机种台数 = ⌈该机种工时 ÷ 周期⌉（不超过组内人数）；如 3 人分担 1.2 分平缝 → 3 台平缝机，0.2 分套结 → 1 台套结机轮流用",
+     "Machines per type in a group = ⌈that type's time ÷ cycle⌉ (no more than the group's operators); e.g. 3 people sharing 1.2 min of lockstitch → 3 lockstitch machines, 0.2 min of bartack → 1 shared bartacker"
+    ],
+    [
+     "休闲裤 29 人方案：平缝 20、包缝 8、套结 3，链缝、锁眼、钉扣各 1，共 34 台；人机比 34/29 ≈ 1.17",
+     "Trousers, 29-operator plan: 20 lockstitch, 8 overlock, 3 bartack, one each chainstitch, buttonhole and button sewer, 34 in all; machine-to-operator ratio 34/29 ≈ 1.17"
+    ],
+    [
+     "另留 5%–10% 备用机：故障时马上换上，换款时先按新款调好",
+     "Keep 5–10% spare machines: swap in at a breakdown, pre-set for the next style at a changeover"
+    ],
+    [
+     "人机比太大，钱压在闲置机器上；太小，分工太粗、人排队等机器",
+     "Too high a ratio ties money up in idle machines; too low means coarse division and people queuing for machines"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "线平衡排好后，就能算每种机器要几台。组里每个人要能用到组里每种机器，但不一定每人一台。比如一组 3 个人分担 1.2 分的平缝工序，节拍 0.5 分，平缝机要 1.2 除以 0.5 向上取整，3 台；同组还有 0.2 分的套结，一台套结机就够了，三个人轮流用。休闲裤按 29 人的分组，需要平缝机 20 台、包缝机 8 台、套结机 3 台，链缝、锁眼、钉扣各 1 台，共 34 台，人机比约 1.17。另外留 5% 到 10% 的备用机，坏了马上换，换款时还能先调好。人机比大于 1 是常态；太大说明钱压在闲置机器上，太小说明分工太粗，人要排队等机器。",
+    "Once the line is balanced we can count machines of each type. Everyone in a group must be able to use each of its machine types, but not necessarily one each. A group of 3 sharing 1.2 min of lockstitch work at a 0.5 min takt needs 1.2 over 0.5, rounded up, 3 lockstitch machines; if the group also has 0.2 min of bartacking, one bartacker shared by all three is enough. The 29-operator trousers plan needs 20 lockstitch, 8 overlock, 3 bartack and one each of chainstitch, buttonhole and button machines: 34, a machine-to-operator ratio of about 1.17. Keep another 5 to 10% as spares, swapped in at a breakdown or set up ahead for the next style. A ratio above 1 is normal; too high means money tied up in idle machines, too low means coarse division of work and people queuing for machines."
+   ]
+  },
+  {
+   "title": [
+    "一个人看几台自动机",
+    "How many automatic machines one operator should mind"
+   ],
+   "points": [
+    [
+     "装卸 a、走动 w、自动缝 t；看 n 台：周期 C = max[n(a+w), a+t]；平衡台数 n* = (a+t)/(a+w)",
+     "Load/unload a, walk w, automatic sewing t; with n machines: cycle C = max[n(a+w), a+t]; balance at n* = (a+t)/(a+w)"
+    ],
+    [
+     "算例 a = 0.3、w = 0.05、t = 0.9 分：n* ≈ 3.43；看 3 台周期 1.2 分人等 13%，看 4 台周期 1.4 分机器各等 14%",
+     "Example a = 0.3, w = 0.05, t = 0.9 min: n* ≈ 3.43; 3 machines give a 1.2 min cycle with the operator waiting 13%, 4 give 1.4 min with each machine waiting 14%"
+    ],
+    [
+     "每件成本 = (工资 + n × 设备费率) × C / n：0.5 元/分、0.08 元/分·台 → 3 台 0.296 元，4 台 0.287 元",
+     "Cost per piece = (wage + n × machine rate) × C / n: at 0.5 CNY/min and 0.08 CNY/min per machine → 0.296 CNY for 3, 0.287 CNY for 4"
+    ],
+    [
+     "机器变快反而少看：t = 0.6 分时 n* = 2.57，最省从 4 台变 3 台；要同时缩短装卸（两套模板交替）",
+     "Faster machines mean fewer per operator: at t = 0.6 min n* = 2.57, and the cheapest drops from 4 to 3; shorten loading too (alternate two clamps)"
+    ]
+   ],
+   "formula": "C=\\max\\big[n(a+w),\\ a+t\\big],\\qquad \\text{cost}=\\frac{(w_{\\text{wage}}+n\\,r_{\\text{m}})\\,C}{n}",
+   "figure": "fig_21_mm.png",
+   "narration": [
+    "花样机、自动开袋机装好衣片后会自己缝完一个循环，所以一个人可以看几台：装好第一台走到第二台，再到第三台，回到第一台时它正好缝完。设每台装卸 a，走动 w，自动缝 t，看 n 台，周期等于 n(a+w) 和 a+t 里大的那个：前者是人转一圈，后者是一台机器一个循环。算例 a 0.3、w 0.05、t 0.9，平衡台数约 3.43。看 3 台，机器不停、人等；看 4 台，人不停、机器等。哪个划算看谁贵：每件成本 3 台 0.296 元，4 台 0.287 元。有个容易想错的地方：机器变快了，t 降到 0.6，最省的台数反而从 4 台变成 3 台。",
+    "Pattern sewers and automatic welters sew a full cycle on their own once loaded, so one person can mind several: load the first, walk to the second, then the third, and arrive back at the first just as it finishes. With loading a, walking w and automatic sewing t per machine, minding n machines, the cycle is the larger of n times a plus w and a plus t: the first is the operator's round, the second is one machine's cycle. With a 0.3, w 0.05 and t 0.9, balance falls at about 3.43. With 3 machines the machines never stop and the operator waits; with 4 the operator never stops and the machines wait. Which pays depends on which is dearer: cost per piece is 0.296 CNY for 3 and 0.287 for 4. A common trap: make the machines faster, t down to 0.6, and the cheapest number drops from 4 to 3."
+   ]
+  },
+  {
+   "title": [
+    "案例：休闲裤线的平衡改善",
+    "Case: improving a casual-trousers line"
+   ],
+   "points": [
+    [
+     "26 人、计划 120 件/时：绱拉链、合下裆各 0.70 分各 1 人 → 周期 0.70，约 85.7 件/时，平衡率 72.5%",
+     "26 operators, 120 per hour planned: 'set zip' and 'sew inseam' at 0.70 min with one each → cycle 0.70, about 85.7 per hour, 72.5% balance"
+    ],
+    [
+     "加人只能加在瓶颈上，加完下一个瓶颈马上冒出来（绱腰头 2 人各 0.65 分，还有五道 0.6 分）",
+     "Extra people only help at the bottleneck, and the next bottleneck appears at once (waistband 2 people at 0.65 each, five more operations at 0.6)"
+    ],
+    [
+     "第一步，设备不变重新分组：26 人周期 0.55，约 109 件/时，平衡率 92.3%，提高 27%；做到 120 件/时要 29 人",
+     "Step 1, regroup with the same equipment: 26 operators, cycle 0.55, about 109 per hour, 92.3% balance, up 27%; 120 per hour needs 29"
+    ],
+    [
+     "第二步，开后袋改自动开袋机（1.20 → 0.45）、绱腰头改绱腰机（1.30 → 0.80）：总工时 11.95，26 人做到 120 件/时，平衡率 91.9%",
+     "Step 2, back pocket on an automatic welter (1.20 → 0.45) and waistband on a waistband machine (1.30 → 0.80): total 11.95 min, 26 operators reach 120 per hour at 91.9%"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_21_case.png",
+   "narration": [
+    "回到导入的案例：26 人只能做约 86 件，车间主任想加人。IE 先画平衡图：原来基本一道工序一组，绱拉链和合下裆各 0.70 分都只有一个人，周期被它们拉到 0.70，全线只能做 85.7 件；另一边套结、做串带、锁眼钉扣的人一半时间在等，平衡率 72.5%。加人只能加在瓶颈上，加完下一个瓶颈马上冒出来。第一步，设备不变，按位置权重分组，同样 26 人周期降到 0.55，约 109 件，提高 27%，几乎不用投资。第二步，把最费时、最难拆的开后袋和绱腰头换成专机，总工时降到 11.95 分，26 人做到 120 件每小时。",
+    "Back to the opening case: 26 operators make only about 86 an hour, and the supervisor wants more people. The IE first draws the balance chart: work was assigned roughly one operation per group, and 'set zip' and 'sew inseam', 0.70 min each, have one person each, pulling the cycle to 0.70 so the line makes only 85.7 an hour; meanwhile the bartack, belt-loop and buttonhole-and-button people wait half the time, and balance is 72.5%. Extra people only help at the bottleneck, and then the next bottleneck appears. Step one: same equipment, regroup by positional weight; the same 26 bring the cycle to 0.55, about 109 an hour, up 27%, with almost no investment. Step two: put the slowest, least divisible operations, back pocket and waistband, on special machines; total work falls to 11.95 min and 26 operators reach 120 an hour."
+   ]
+  },
+  {
+   "title": [
+    "算账：专机划不划算",
+    "Doing the sums: do special machines pay"
+   ],
+   "points": [
+    [
+     "对比“设备不变、加到 29 人”：专机方案省 3 人",
+     "Compared with 'same equipment, 29 operators', the special-machine plan saves 3 people"
+    ],
+    [
+     "人工 0.5 元/分，每月 25 天 × 8 h：3 × 0.5 × 60 × 8 × 25 = 18 000 元/月",
+     "Labour 0.5 CNY/min, 25 days × 8 h a month: 3 × 0.5 × 60 × 8 × 25 = 18 000 CNY per month"
+    ],
+    [
+     "净增投资 20 万元 → 约 11 个月收回；机器从 34 台减到 31 台（平缝少用 6 台）",
+     "Net investment 200 000 CNY → payback in about 11 months; machines fall from 34 to 31 (six fewer lockstitch)"
+    ],
+    [
+     "常换款、专机用不上或款式没有后袋时，这笔账就算不过来",
+     "With frequent style changes, idle special machines or styles without back pockets, the sums do not work"
+    ]
+   ],
+   "formula": "\\text{payback}=\\frac{\\text{net investment}}{\\Delta N\\times \\text{wage}\\times 60\\times 8\\times 25}",
+   "figure": "fig_21_case.png",
+   "narration": [
+    "买专机划不划算？对照方案是设备不变、加到 29 人做到 120 件，专机方案只要 26 人，省 3 个人。人工按每分钟 0.5 元，这个数里含了社保和管理费用，每月 25 天、每天 8 小时，3 个人一个月约 1.8 万元。3 台专机扣掉少用的 6 台平缝机，净增投资 20 万元，大约 11 个月收回，还没算专机带来的质量稳定。可是反过来，如果这条线经常换款、专机用不上，或者款式根本没有后袋，这笔账就算不过来。所以设备投资要和产品结构、订单批量一起考虑，这正是第 29 章五类工厂设备差别那么大的原因。",
+    "Do the special machines pay? The alternative keeps the equipment and goes to 29 operators for 120 an hour; the special-machine plan needs only 26, saving 3 people. At 0.5 CNY a minute, including social insurance and overheads, 25 days of 8 hours a month, three people cost about 18 000 CNY a month. Three special machines, less the six lockstitch machines no longer needed, are a net 200 000 CNY, paid back in about 11 months, before counting the steadier quality they bring. But if the line changes style often and the special machines sit idle, or the styles have no back pockets at all, the sums do not work. Equipment investment must be weighed with product mix and order size, which is why the five factory types of Chapter 29 differ so much in equipment."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "一件衣服从技术准备到大货生产，缝制占人工工时的大头；排料时多件套排、大小码搭配能提高面料利用率，分床受层数上限约束。",
+   "From technical preparation to bulk production, sewing takes most of the labour; nesting several sizes on one marker raises utilisation, and cut plans are bounded by the ply limit."
+  ],
+  [
+   "标准工时 = 观测时间 × 评比 × (1 + 宽放)；工时里大部分是拿放，最高转速再提高对多数工序影响很小。",
+   "SAM = observed time × rating × (1 + allowance); most of it is handling, so higher top speed changes most operations very little."
+  ],
+  [
+   "节拍 = 60 / 产量，N₀ = ⌈ΣSAM / 节拍⌉，产量 = 60 / 周期，平衡率 = ΣSAM / (N × 周期)；整条线由负荷最重的人决定。",
+   "Takt = 60 / output, N₀ = ⌈ΣSAM / takt⌉, output = 60 / cycle, balance = ΣSAM / (N × cycle); the most heavily loaded person sets the line."
+  ],
+  [
+   "一道工序一组凑不了零碎工时；按位置权重把相邻工序分组共担（≤ 4 人、≤ 4 道、≤ 2 种机器），平衡率可从约 70% 提到 90% 以上。",
+   "One operation per group cannot pool fragments; grouping adjacent operations by positional weight (≤ 4 people, ≤ 4 operations, ≤ 2 machine types) lifts balance from about 70% to over 90%."
+  ],
+  [
+   "精益生产消除七种浪费：压低在制品、标准作业、快速换型、质量内建、目视化与 5S。",
+   "Lean production removes the seven wastes: low WIP, standard work, quick changeover, built-in quality, visual management and 5S."
+  ],
+  [
+   "一人多机周期 C = max[n(a+w), a+t]，按人和机器的成本选台数；机器提速要同时缩短装卸；专机投资要结合产品结构和批量算账。",
+   "Multi-machine cycle C = max[n(a+w), a+t]; choose the number by the cost of people versus machines; faster machines need shorter loading too; special machines must be costed against product mix and batch size."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "line21",
+   "no": "28-1",
+   "title": [
+    "生产线平衡",
+    "Line balancing"
+   ],
+   "goal": [
+    [
+     "对休闲裤 23 道工序做分组与生产线平衡，比较一道工序一组、自动分组和手工调整顺序的人数与平衡率。",
+     "Group and balance the 23 trousers operations, comparing operators and balance for one operation per group, automatic grouping and manual reordering."
+    ],
+    [
+     "看换上自动开袋机和绱腰机以后，同样产量能省几个人、各机种要几台。",
+     "See how many operators are saved for the same output, and how many machines of each type are needed, with an automatic pocket welter and a waistband machine."
+    ],
+    [
+     "用人机作业图找出每件成本最低的看机台数，并理解机器变快为什么反而少看。",
+     "Use the operator–machine chart to find the cheapest number of machines per operator, and understand why faster machines mean fewer."
+    ]
+   ],
+   "theory": [
+    [
+     "相邻几道工序组成一组，由 k = ⌈组内工时 ÷ 节拍⌉ 人共担，人均负荷 = 组内工时 ÷ k；一组最多 4 人、4 道工序、2 种机器（手工不计），并满足先后关系。",
+     "Adjacent operations form a group shared by k = ⌈group time ÷ takt⌉ operators, each loaded group time ÷ k; at most 4 people, 4 operations and 2 machine types per group (manual not counted), respecting precedence."
+    ],
+    [
+     "实际周期 = 最大人均负荷；产量 = 60 ÷ 周期；平衡率 = 总工时 ÷ (人数 × 周期)；各机种台数 = 每组 ⌈该机种工时 ÷ 周期⌉（不超过该组人数）之和。",
+     "Cycle = largest per-operator load; output = 60 ÷ cycle; balance = total time ÷ (operators × cycle); machines per type = sum over groups of ⌈that type's time ÷ cycle⌉ (capped at the group's operators)."
+    ],
+    [
+     "自动分组按位置权重排定顺序，再用动态规划切分；换专机后仍沿用原设备的顺序。",
+     "Automatic grouping orders operations by positional weight and cuts the sequence by dynamic programming; with special machines it keeps the original equipment's order."
+    ],
+    [
+     "一人看 n 台：C = max[n(a+w), a+t]；人的利用率 = n(a+w)/C，机器利用率 = (a+t)/C；每件成本 = (人工 + n × 设备费率) × C ÷ n（工资 0.5 元/分、设备 0.08 元/分·台）。",
+     "One operator, n machines: C = max[n(a+w), a+t]; operator utilisation = n(a+w)/C, machine utilisation = (a+t)/C; cost per piece = (wage + n × machine rate) × C ÷ n (wage 0.5 CNY/min, machine 0.08 CNY/min per machine)."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页第①页“工序分组与平衡”，目标产量 120 件/时、原设备。点“一道工序一组”，记下人数、周期、产量和平衡率，在平衡图上找出等待最多的工位。",
+     "Open page ① 'Grouping and balance', target 120 per hour, original equipment. Click 'One operation per group' and record operators, cycle, output and balance; find the stations with the most waiting on the balance chart."
+    ],
+    [
+     "点“自动分组（动态规划）”，记下人数（29 人）、平衡率和各机种台数。",
+     "Click 'Automatic grouping (DP)' and record operators (29), balance and machines per type."
+    ],
+    [
+     "在工序表里用 ↑↓ 调整顺序（不能违反前道关系），例如把不受约束的“做串带”移到几道锁边旁边，再用“在此分组”切分，使人数不超过 28 人、产量达到 120 件/时（任务 1）。",
+     "Use ↑↓ in the operation table to reorder (without breaking precedence), e.g. move the unconstrained 'make belt loops' next to the overlock operations, then cut with 'Group here' until no more than 28 operators reach 120 per hour (task 1)."
+    ],
+    [
+     "把目标产量改为 100 件/时，先自动分组（25 人），再调整顺序使人数不超过 24 人（任务 2）。",
+     "Set the target to 100 per hour, group automatically (25 operators), then reorder until no more than 24 operators suffice (task 2)."
+    ],
+    [
+     "目标改回 120 件/时，设备选“开后袋用自动开袋机、绱腰头用绱腰机”，自动分组后再调整，使不超过 25 人做到 120 件/时（任务 3）；记下各机种台数，与原设备比较。",
+     "Set the target back to 120, choose equipment 'automatic welter for back pockets, waistband machine for waistbands', group automatically and then adjust until no more than 25 operators reach 120 per hour (task 3); record machines per type and compare with the original equipment."
+    ],
+    [
+     "切到第②页“一人多机与机器时间”，点“恢复默认”（a = 0.3、t = 0.9、w = 0.05、设备 0.08 元/分）。把看机台数 n 从 1 调到 6，记下周期、人和机器的利用率与每件成本，选出最便宜的台数（任务 4）。",
+     "Switch to page ② 'Multi-machine tending and machine time' and click Reset (a = 0.3, t = 0.9, w = 0.05, machine 0.08 CNY/min). Step n from 1 to 6, record cycle, operator and machine utilisation and cost per piece, and pick the cheapest (task 4)."
+    ],
+    [
+     "把自动缝制时间 t 改为 0.6 分，重新找出每件成本最低的台数（任务 5）；再把设备费率调高到 0.2 元/分，看最省台数往哪边移。",
+     "Set automatic sewing time t to 0.6 min and find the cheapest number again (task 5); then raise the machine rate to 0.2 CNY/min and see which way the optimum moves."
+    ],
+    [
+     "在“一道缝的机器时间”里，针数取 333，最高转速分别取 4000、5000、6000 r/min，记下一道缝的时间；再把针数改为 40 重复一次。",
+     "In 'Machine time for one seam', with 333 stitches, set top speed to 4000, 5000 and 6000 r/min and record the seam time; repeat with 40 stitches."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "线平衡与一人多机记录",
+     "Line balancing and multi-machine record"
+    ],
+    "headers": [
+     [
+      "设置",
+      "Setting"
+     ],
+     [
+      "人数 / 看机台数",
+      "Operators / machines minded"
+     ],
+     [
+      "周期（分）",
+      "Cycle (min)"
+     ],
+     [
+      "产量（件/时）",
+      "Output (pieces/h)"
+     ],
+     [
+      "平衡率或利用率",
+      "Balance or utilisation"
+     ],
+     [
+      "每件成本（元）或台数",
+      "Cost per piece (CNY) or machine count"
+     ]
+    ],
+    "rows": 10
+   },
+   "questions": [
+    [
+     "为什么自动分组只按位置权重排一种顺序、不一定最优？你调整顺序时依据了什么？",
+     "Why is automatic grouping on a single positional-weight order not necessarily optimal? What guided your reordering?"
+    ],
+    [
+     "目标从 120 件/时降到 100 件/时，人数为什么没有按比例减少？",
+     "When the target drops from 120 to 100 per hour, why do operators not fall in proportion?"
+    ],
+    [
+     "最高转速从 4000 提到 6000 r/min，333 针和 40 针的缝各省多少时间？这对买高速缝纫机的决策有什么启示？",
+     "Raising top speed from 4000 to 6000 r/min, how much time is saved on the 333-stitch and the 40-stitch seams? What does this say about buying high-speed machines?"
+    ],
+    [
+     "自动缝制时间从 0.9 缩短到 0.6 分，最省台数为什么从 4 台变成 3 台？要想仍然看 4 台，应当改进什么？",
+     "When automatic sewing time falls from 0.9 to 0.6 min, why does the cheapest number drop from 4 to 3? What would you improve to keep minding 4?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "一条 T 恤线的平衡与一人多机配置",
+   "Balancing a T-shirt line and setting up multi-machine tending"
+  ],
+  "tasks": [
+   [
+    "某 T 恤线 8 道工序（标准工时，分/件；机种；前道）：①合肩缝 0.45 包缝；②绱领 0.70 包缝，①；③压领条 0.55 绷缝/链缝类（记 CS），②；④绱袖 1.10 包缝，③；⑤合侧缝 0.60 包缝，④；⑥卷袖口 0.30 CS，⑤；⑦卷下摆 0.80 CS，⑤；⑧剪线头检验 0.50 手工，⑥⑦。目标 150 件/时。求节拍、理论最少人数；按一道工序一组算人数、周期和平衡率；再按本讲规则（≤ 4 人、≤ 4 道、≤ 2 种机器、满足先后关系）给出你的分组，算出人数、周期、产量和平衡率。",
+    "A T-shirt line has 8 operations (SAM in min/piece; machine; predecessors): ① join shoulders 0.45 overlock; ② attach neckband 0.70 overlock, ①; ③ tape neck 0.55 cover/chainstitch (CS), ②; ④ set sleeves 1.10 overlock, ③; ⑤ close side seams 0.60 overlock, ④; ⑥ hem sleeves 0.30 CS, ⑤; ⑦ hem body 0.80 CS, ⑤; ⑧ trim and inspect 0.50 manual, ⑥⑦. Target 150 per hour. Find takt and the theoretical minimum; compute operators, cycle and balance with one operation per group; then propose your own grouping under this lesson's rules (≤ 4 people, ≤ 4 operations, ≤ 2 machine types, precedence) and compute operators, cycle, output and balance."
+   ],
+   [
+    "“绱袖”工序测时 10 次平均 0.52 分，测时员评比 90%，宽放 15%。求标准工时，并说明如果评比给成 110%，对线平衡和计件工价各有什么影响。",
+    "'Set sleeves' was timed 10 times at an average of 0.52 min, rated 90%, with 15% allowance. Find the SAM, and explain the effect on line balance and piece rates if the rating had been given as 110%."
+   ],
+   [
+    "花样机工位：每台装卸 0.25 分、走动 0.05 分、自动缝 1.0 分；工资 0.5 元/分，设备 0.10 元/分·台。求平衡台数 n*，算出看 3、4、5 台时的周期和每件成本，选出最省的台数，并说明若改用两套模板交替使装卸降到 0.15 分，结论会怎样变。",
+    "A pattern-sewer station: loading 0.25 min, walking 0.05 min and automatic sewing 1.0 min per machine; wage 0.5 CNY/min, machine 0.10 CNY/min per machine. Find n*, compute cycle and cost per piece for 3, 4 and 5 machines, choose the cheapest, and explain how the conclusion changes if alternating two clamps cuts loading to 0.15 min."
+   ]
+  ],
+  "deliverable": [
+   "一份不超过 5 页的报告（PDF）：平衡图（手绘或软件均可）、分组表、各题计算过程和结论；可附虚拟实验 28-1 的截图。",
+   "A report of no more than 5 pages (PDF): balance chart (hand-drawn or software), grouping table, calculations and conclusions for each task; screenshots from virtual lab 28-1 may be attached."
+  ],
+  "rubric": [
+   [
+    "节拍、理论人数、一道一组结果计算正确（20 分）",
+    "Takt, theoretical minimum and one-operation-per-group results correct (20 points)"
+   ],
+   [
+    "分组符合规则，人数、周期、平衡率计算正确，并说明分组理由（35 分）",
+    "Grouping follows the rules, with correct operators, cycle and balance and reasons for the grouping (35 points)"
+   ],
+   [
+    "标准工时计算正确，对评比误差的影响分析合理（15 分）",
+    "SAM correct, with a sound analysis of the effect of rating error (15 points)"
+   ],
+   [
+    "一人多机计算与选择正确，对缩短装卸的分析清楚（30 分）",
+    "Multi-machine calculations and choice correct, with a clear analysis of shorter loading (30 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "一张唛架上排几件衣服并让大小码搭配，面料利用率通常会提高，主要原因是：",
+    "Placing several garments of mixed sizes on one marker usually raises fabric utilisation, mainly because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "小码衣片可以填进大码衣片之间的空隙",
+      "Small-size pieces can fill the gaps between large-size pieces"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "唛架越长，裁床铺布越平整",
+      "Longer markers make spreading flatter"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "件数多了，每件的缝制工时变短",
+      "More garments shorten the sewing time per piece"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "层数可以无限增加",
+      "The number of plies can increase without limit"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "单件排料的空隙无法填满；唛架长度受裁床限制，层数受裁刀行程和面料厚度限制。",
+    "Gaps in a single-garment marker cannot be filled; marker length is limited by the table, and plies by knife stroke and fabric thickness."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "订单 S 150、M 300、L 300、XL 150 件，用按 1:2:2:1 搭配的六件唛架，一床最多铺 60 层。至少要分几床？",
+    "An order of S 150, M 300, L 300 and XL 150 uses a 1:2:2:1 six-garment marker, with at most 60 plies per lay. What is the minimum number of lays?"
+   ],
+   "answer": 3,
+   "tolerance": 0,
+   "unit": "床",
+   "feedback": [
+    "每个尺码都需要 150 层（如 M：300 ÷ 2）；150 ÷ 60 向上取整得 3 床，可分 60、60、30 层。",
+    "Every size needs 150 plies (e.g. M: 300 ÷ 2); 150 ÷ 60 rounded up is 3 lays, e.g. 60, 60 and 30 plies."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某工序观测时间平均 0.50 分，评比 105%，宽放 12%。标准工时是多少分？",
+    "An operation's observed time averages 0.50 min, rated 105%, with 12% allowance. What is its standard minute value in minutes?"
+   ],
+   "answer": 0.588,
+   "tolerance": 0.003,
+   "unit": "分",
+   "feedback": [
+    "基本时间 0.50 × 1.05 = 0.525 分，再乘 1.12 得约 0.588 分。",
+    "Basic time 0.50 × 1.05 = 0.525 min, times 1.12 gives about 0.588 min."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "“侧缝压明线”标准工时 36 s，把平缝机最高转速从 4000 提到 5000 r/min，能让这道工序的工时缩短约 20%。",
+    "'Topstitch side seams' has a SAM of 36 s; raising top speed from 4000 to 5000 r/min would cut its time by about 20%."
+   ],
+   "correct": false,
+   "feedback": [
+    "两道约 333 针的缝只省约 1.9 s，约 5%；慢起针、剪线停车和拿放时间都不随最高转速变。",
+    "The two 333-stitch seams save only about 1.9 s, about 5%; slow start, trim-and-stop and handling do not change with top speed."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一件衣服总工时 15.6 分，目标产量 100 件/时。理论最少人数是多少？",
+    "A garment totals 15.6 standard minutes and the target is 100 pieces per hour. What is the theoretical minimum number of operators?"
+   ],
+   "answer": 26,
+   "tolerance": 0,
+   "unit": "人",
+   "feedback": [
+    "节拍 = 60/100 = 0.6 分，N₀ = ⌈15.6 ÷ 0.6⌉ = 26 人。",
+    "Takt = 60/100 = 0.6 min, N₀ = ⌈15.6 ÷ 0.6⌉ = 26."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一条线总工时 16.2 分，实际用 40 人，周期 0.45 分。平衡率是百分之多少？",
+    "A line totals 16.2 min of work with 40 operators and a cycle of 0.45 min. What is the balance efficiency in percent?"
+   ],
+   "answer": 90.0,
+   "tolerance": 0.2,
+   "unit": "%",
+   "feedback": [
+    "平衡率 = 16.2 ÷ (40 × 0.45) = 90.0%；产量 = 60 ÷ 0.45 ≈ 133 件/时。",
+    "Balance = 16.2 ÷ (40 × 0.45) = 90.0%; output = 60 ÷ 0.45 ≈ 133 per hour."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "一条缝制线的实际产量由什么决定？",
+    "What determines the actual output of a sewing line?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "负荷最重的那个人的工时（周期）",
+      "The time of the most heavily loaded operator (the cycle time)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "全线工人负荷的平均值",
+      "The average load of all operators"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "工时最长的那道工序本身的工时",
+      "The time of the longest operation itself"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "缝纫机的最高转速",
+      "The machines' top speed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "产量 = 60 ÷ 周期；工时最长的工序可以由几个人分担，所以起决定作用的是人均负荷的最大值。",
+    "Output = 60 ÷ cycle; the longest operation can be shared by several people, so what counts is the largest per-operator load."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "按本讲的分组规则，下列哪些是相邻工序合成一组时要满足的条件？（选出所有正确项）",
+    "Under this lesson's grouping rules, which conditions must a group of adjacent operations satisfy? (Select all that apply)"
+   ],
+   "answers": [
+    {
+     "text": [
+      "一组不超过 4 人",
+      "No more than 4 people per group"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "一组里的机器不超过 2 种（剪线头之类手工不算）",
+      "No more than 2 machine types per group (manual work such as trimming not counted)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "每道工序所在的组排在其所有前道工序的组之后，或与它们同组",
+      "Each operation's group comes after, or is the same as, the groups of all its predecessors"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "每组的人数必须相等",
+      "Every group must have the same number of people"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "每组只能有一种机器",
+      "Each group may have only one machine type"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "规则是人数 ≤ 4、工序 ≤ 4、机种 ≤ 2，并满足先后关系；各组人数按组内工时定，不必相等。",
+    "The rules are ≤ 4 people, ≤ 4 operations, ≤ 2 machine types, plus precedence; group sizes follow their work content and need not be equal."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一人看花样机：每台装卸 0.2 分、走动 0.05 分、自动缝 0.8 分。人和机器都不等待的台数 n* 是多少？",
+    "One operator minds pattern sewers: loading 0.2 min, walking 0.05 min, automatic sewing 0.8 min per machine. What is the balance number n* at which neither operator nor machine waits?"
+   ],
+   "answer": 4.0,
+   "tolerance": 0.05,
+   "unit": "台",
+   "feedback": [
+    "n* = (a + t) ÷ (a + w) = 1.0 ÷ 0.25 = 4.0 台。",
+    "n* = (a + t) ÷ (a + w) = 1.0 ÷ 0.25 = 4.0 machines."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "把花样机的自动缝制时间缩短（机器变快），其他条件不变，每件成本最低的看机台数通常会：",
+    "If a pattern sewer's automatic sewing time is shortened (faster machine) with everything else unchanged, the cheapest number of machines per operator usually:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "减少，因为装卸和走动的时间变得更突出",
+      "Falls, because loading and walking become relatively larger"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "增加，因为机器快了可以多看",
+      "Rises, because faster machines allow more"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "不变，台数只取决于工资",
+      "Stays the same, since it depends only on wages"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "变成无穷多",
+      "Becomes unlimited"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "n* = (a + t)/(a + w) 随 t 减小而减小：算例 t 从 0.9 降到 0.6，最省台数从 4 台变成 3 台。",
+    "n* = (a + t)/(a + w) falls as t falls: in the example t from 0.9 to 0.6 takes the cheapest number from 4 to 3."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "一件衣服总工时 18 分，目标 150 件/时。实际用 50 人、周期 0.38 分。平衡率是百分之多少？",
+    "A garment totals 18 min; the target is 150 per hour. With 50 operators and a cycle of 0.38 min, what is the balance efficiency in percent?"
+   ],
+   "answer": 94.7,
+   "tolerance": 0.2,
+   "unit": "%",
+   "feedback": [
+    "平衡率 = 18 ÷ (50 × 0.38) ≈ 94.7%；节拍 0.4 分、理论最少 45 人，实际产量 60 ÷ 0.38 ≈ 158 件/时。",
+    "Balance = 18 ÷ (50 × 0.38) ≈ 94.7%; takt 0.4 min, theoretical minimum 45, actual output 60 ÷ 0.38 ≈ 158 per hour."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某工序观测时间平均 0.40 分，评比 95%，宽放 15%。标准工时是多少分？",
+    "An operation's observed time averages 0.40 min, rated 95%, with 15% allowance. What is the standard minute value in minutes?"
+   ],
+   "answer": 0.437,
+   "tolerance": 0.003,
+   "unit": "分",
+   "feedback": [
+    "0.40 × 0.95 × 1.15 ≈ 0.437 分。",
+    "0.40 × 0.95 × 1.15 ≈ 0.437 min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一人看花样机，每台装卸 0.25 分、走动 0.05 分、自动缝 1.0 分。看 5 台时周期是多少分？",
+    "One operator minds pattern sewers with loading 0.25 min, walking 0.05 min and automatic sewing 1.0 min per machine. What is the cycle time with 5 machines?"
+   ],
+   "answer": 1.5,
+   "tolerance": 0.01,
+   "unit": "分",
+   "feedback": [
+    "C = max[5 × 0.30, 0.25 + 1.0] = max(1.50, 1.25) = 1.50 分，人一刻不停，机器在等；n* ≈ 4.17。",
+    "C = max[5 × 0.30, 0.25 + 1.0] = max(1.50, 1.25) = 1.50 min: the operator never stops and the machines wait; n* ≈ 4.17."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "下列哪些属于服装车间常说的七种浪费？（选出所有正确项）",
+    "Which of these are among the seven wastes commonly cited on garment floors? (Select all that apply)"
+   ],
+   "answers": [
+    {
+     "text": [
+      "做多了（比订单多做或提前太多做出来）",
+      "Overproduction (more than ordered, or far too early)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "衣片在工位之间来回搬运",
+      "Moving cut parts back and forth between stations"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "比要求多缝一道线",
+      "Sewing an extra line of stitching beyond requirements"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "按标准作业培训新工人",
+      "Training new operators in standard work"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "设置 5%–10% 的备用机",
+      "Keeping 5–10% spare machines"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "做多了、搬运、加工过度都是浪费；标准作业培训和适量备用机是减少停线和返工的做法，不是浪费。",
+    "Overproduction, transport and over-processing are wastes; standard-work training and a modest stock of spares reduce stoppages and rework and are not waste."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "改用专机后可省 2 名工人，人工 0.5 元/分，每月 25 天、每天 8 小时；专机净增投资 15 万元。大约多少个月收回？",
+    "Special machines save 2 operators; labour costs 0.5 CNY/min, 25 days of 8 hours a month; the net investment is 150 000 CNY. Roughly how many months to pay back?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "约 12.5 个月",
+      "About 12.5 months"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "约 25 个月",
+      "About 25 months"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "约 6 个月",
+      "About 6 months"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "约 3 个月",
+      "About 3 months"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "每月省 2 × 0.5 × 60 × 8 × 25 = 12 000 元，150 000 ÷ 12 000 = 12.5 个月；只按 1 人算会得 25 个月。",
+    "Monthly saving 2 × 0.5 × 60 × 8 × 25 = 12 000 CNY, and 150 000 ÷ 12 000 = 12.5 months; counting only one operator would give 25 months."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "标准工时的测定；节拍、最少人数、周期、平衡率；分组共担与位置权重法；一人多机模型。",
+   "Determining standard minute values; takt, minimum operators, cycle and balance efficiency; shared groups and positional weights; the multi-machine model."
+  ],
+  "difficult": [
+   "学生容易把“工时最长的工序”当成瓶颈、把节拍和周期混为一谈；也容易以为机器越快越能多看几台。要用休闲裤平衡图和人机作业图反复对照。",
+   "Students tend to take the longest operation as the bottleneck, to confuse takt with cycle time, and to assume faster machines allow more per operator. Keep comparing the trousers balance chart and the operator–machine chart."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：26 人做不到 120 件",
+     "Opening: 26 operators short of 120"
+    ],
+    "minutes": 15,
+    "content": [
+     "给出休闲裤线现状数据，让学生先猜加不加人；讲从样衣到大货的流程。",
+     "Give the trousers line data and let students guess whether to add people; outline sample to bulk production."
+    ]
+   },
+   {
+    "phase": [
+     "排料裁剪、工序分析与标准工时",
+     "Marker and cutting, operation breakdown and SAM"
+    ],
+    "minutes": 35,
+    "content": [
+     "唛架与分床算例；工序流程图；测时、评比、宽放的课堂练习；最高转速对工时的影响。",
+     "Marker and cut-plan example; the operation flow chart; in-class practice on timing, rating and allowances; the effect of top speed on operation time."
+    ]
+   },
+   {
+    "phase": [
+     "生产线平衡",
+     "Line balancing"
+    ],
+    "minutes": 40,
+    "content": [
+     "节拍、N₀、周期、平衡率；一道工序一组与分组共担；位置权重法和动态规划；节拍变化与第 29 章的关系。",
+     "Takt, N₀, cycle and balance; one operation per group versus shared groups; positional weights and dynamic programming; changing takt and the link to Chapter 29."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 28-1",
+     "Virtual lab 28-1"
+    ],
+    "minutes": 40,
+    "content": [
+     "分组完成第①页任务 1–3 和第②页任务 4–5，填记录表。",
+     "Groups complete tasks 1–3 on page ① and tasks 4–5 on page ②, filling in the record."
+    ]
+   },
+   {
+    "phase": [
+     "精益生产、设备配置与一人多机",
+     "Lean production, equipment provisioning and multi-machine tending"
+    ],
+    "minutes": 30,
+    "content": [
+     "七种浪费与常用做法；各机种台数与人机比；一人多机模型与成本比较。",
+     "The seven wastes and common practices; machines per type and the machine-to-operator ratio; the multi-machine model and cost comparison."
+    ]
+   },
+   {
+    "phase": [
+     "案例解答与小结",
+     "Solving the case and summary"
+    ],
+    "minutes": 20,
+    "content": [
+     "用本讲方法解答导入问题并算专机投资回收期；小结并布置作业。",
+     "Solve the opening problem with the lesson's methods and compute the special-machine payback; summarise and set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“一条 T 恤线的平衡与一人多机配置”；预习第 29 章的捆扎流水、吊挂单件流和 U 型单元。",
+   "Complete the assignment 'Balancing a T-shirt line and setting up multi-machine tending'; preview bundle lines, hanger single-piece flow and U-cells in Chapter 29."
+  ]
+ }
+}

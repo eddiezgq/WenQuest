@@ -15,6 +15,7 @@
           <text class="wq-tab" :class="{ on: tab === 'requests' }" @click="setTab('requests')">{{ t("admin.requests") }}<text v-if="info?.requests" class="count">{{ info.requests }}</text></text>
           <text class="wq-tab" :class="{ on: tab === 'users' }" @click="setTab('users')">{{ t("admin.users") }}</text>
           <text class="wq-tab" :class="{ on: tab === 'committee' }" @click="setTab('committee')">{{ t("rev.committee") }}</text>
+          <text class="wq-tab" :class="{ on: tab === 'packs' }" @click="setTab('packs')">{{ t("pack.tab") }}</text>
         </view>
 
         <!-- teacher applications -->
@@ -139,6 +140,27 @@
             </view>
           </view>
         </template>
+        <!-- course packs (round 16) -->
+        <template v-if="tab === 'packs'">
+          <text class="wq-muted block">{{ t("pack.hint") }}</text>
+          <view v-if="!packs.length" class="wq-empty">{{ t("pack.none") }}</view>
+          <view v-for="pk in packs" :key="pk.book" class="wq-card pack">
+            <view class="wq-row pk-top">
+              <text class="a-name">{{ pk.title }}</text>
+              <text v-if="pk.courseid" class="wq-link" @click="openCourse(pk.courseid)">{{ t("pack.open") }} ›</text>
+            </view>
+            <text v-if="pk.status === 'running'" class="wq-tag info block">{{ t("pack.running", { d: pk.progress.done, n: pk.progress.total, c: pk.progress.current }) }}</text>
+            <text v-if="pk.status === 'failed'" class="wq-error block">{{ t("pack.failed", { e: pk.error }) }}</text>
+            <view v-for="b in pk.batches" :key="b.no" class="wq-row pk-batch">
+              <view class="pk-b">
+                <text>{{ b.name }}</text>
+                <text class="wq-muted">{{ t("pack.lessons", { p: b.published, n: b.lessons }) }}<text v-if="b.exams"> · {{ t("pack.exams", { p: b.exams_published, n: b.exams }) }}</text></text>
+              </view>
+              <text v-if="b.done" class="wq-tag ok">✓ {{ t("pack.done") }}</text>
+              <view v-else class="wq-btn primary" :class="{ disabled: pk.status === 'running' }" @click="publishPack(pk, b)">{{ t("pack.publish") }}</view>
+            </view>
+          </view>
+        </template>
         <text v-if="error" class="wq-error">{{ error }}</text>
       </template>
     </view>
@@ -150,11 +172,29 @@ import { ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import { type AdminUser, type Application, type EnrolRequest, accountApi, loadAdmin } from "../../accountApi";
-import { api, ApiError, token } from "../../api";
+import { api, ApiError, type CoursePack, token } from "../../api";
 import { confirmAction } from "../../courseApi";
 import { errorText, t } from "../../i18n";
 
-const tab = ref<"apps" | "requests" | "users" | "committee">("apps");
+const tab = ref<"apps" | "requests" | "users" | "committee" | "packs">("apps");
+const packs = ref<CoursePack[]>([]);
+let packTimer: ReturnType<typeof setTimeout> | undefined;
+async function loadPacks() {
+  clearTimeout(packTimer);
+  try {
+    packs.value = (await api.coursePacks()).packs;
+    if (tab.value === "packs" && packs.value.some((p) => p.status === "running")) packTimer = setTimeout(loadPacks, 3000);
+  } catch (e) { fail(e); }
+}
+async function publishPack(pk: CoursePack, b: CoursePack["batches"][number]) {
+  if (pk.status === "running" || !(await confirmAction(t("pack.confirm", { b: b.name }), t("pack.publish"), t("common.cancel")))) return;
+  error.value = "";
+  try { await api.publishCoursePack(pk.book, b.no); } catch (e) { fail(e); }
+  loadPacks();
+}
+function openCourse(id: number) {
+  uni.navigateTo({ url: `/pages/course/course?id=${id}` });
+}
 const comMembers = ref("");
 const comChair = ref("");
 const comSelf = ref(true);
@@ -223,6 +263,7 @@ function setTab(x: typeof tab.value) {
   if (x === "apps") loadApps();
   else if (x === "requests") loadReqs();
   else if (x === "committee") loadCommittee();
+  else if (x === "packs") loadPacks();
   else loadUsers(0);
 }
 
@@ -323,6 +364,10 @@ onShow(async () => {
 .acts { margin-top: 12px; }
 .wq-btn.big { padding: 9px 26px; font-size: 15px; }
 .short { min-height: 70px; }
+.pack { display: flex; flex-direction: column; gap: 8px; }
+.pk-top { justify-content: space-between; }
+.pk-batch { justify-content: space-between; border-top: 1px solid var(--wq-line); padding-top: 8px; }
+.pk-b { display: flex; flex-direction: column; gap: 2px; }
 .req { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; }
 .r-main { display: flex; flex-direction: column; gap: 2px; }
 .r-course { font-size: 14px; color: var(--wq-ink); }

@@ -1,0 +1,1161 @@
+{
+ "no": 23,
+ "title": [
+  "缝纫机的设计、制造与检测",
+  "Designing, Building and Testing the Sewing Machine"
+ ],
+ "hours": 3,
+ "goals": [
+  [
+   "能说出一台平缝机从设计输入到批量生产的主要步骤，以及关键零件的材料与工艺选择依据。",
+   "Outline the steps from design input to volume production of a lockstitch machine, and the reasons behind the materials and processes of its key parts."
+  ],
+  [
+   "能用极值法和统计法计算尺寸链封闭环的变化，并估算梭尖间隙的合格率。",
+   "Calculate the variation of a closing link by the worst-case and statistical methods and estimate the yield of the hook-point clearance."
+  ],
+  [
+   "能解释装配调整法为什么能用经济精度保证小间隙，以及换针后为什么要重新检查。",
+   "Explain why adjustment at assembly secures a small clearance with economical accuracy, and why the clearance must be rechecked after a needle change."
+  ],
+  [
+   "能用单自由度模型算出频率比和放大倍数，判断提速后的共振问题并比较改进措施。",
+   "Use the single-degree-of-freedom model to compute frequency ratio and amplification, diagnose resonance after a speed increase and compare remedies."
+  ],
+  [
+   "能列出新机型要满足的标准类别和知识产权工作，并说明各在什么阶段完成。",
+   "List the classes of standards and the intellectual-property work a new model requires, and when each should be done."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "提速到 5500 r/min 以后，车间里的平缝机“叫”得厉害",
+   "After the speed-up to 5500 r/min the lockstitch machines 'scream'"
+  ],
+  "text": [
+   "一家服装厂买了一批提速版平缝机，最高转速从 5000 r/min 提到 5500 r/min。操作工反映高速时机器“叫”得厉害。样机测试：5500 r/min 时机头振动是 5000 r/min 的三倍多，噪声从 83.5 dB(A) 升到约 94 dB(A)。转速扫描显示振动在 5000 r/min 以上急剧上升，频谱中增大的是二阶分量；模态试验测得机臂一阶弯曲固有频率约 190 Hz，阻尼比 0.03（示意值）。",
+   "A garment factory bought a batch of uprated lockstitch machines whose top speed rose from 5000 to 5500 r/min. Operators say the machines 'scream' at high speed. Prototype tests: vibration of the head at 5500 r/min is more than three times that at 5000 r/min, and noise rose from 83.5 dB(A) to about 94 dB(A). A speed sweep shows vibration climbing steeply above 5000 r/min, the growth being in the second-order component; a modal test puts the arm's first bending natural frequency at about 190 Hz with a damping ratio of 0.03 (illustrative values)."
+  ],
+  "question": [
+   "5000 r/min 和 5500 r/min 时二阶激振频率、频率比和放大倍数各是多少？转速只提高 10%，为什么振动增加这么多？如果在机臂内部加筋，使模态刚度提高 30%，5500 r/min 时情况如何？",
+   "What are the second-order excitation frequency, frequency ratio and amplification at 5000 and 5500 r/min? Why does a 10% speed increase raise vibration so much? If internal ribs raise the arm's modal stiffness by 30%, what happens at 5500 r/min?"
+  ],
+  "answer": [
+   "5000 r/min：f = 2 × 5000/60 ≈ 167 Hz，r ≈ 0.88，放大约 4.2 倍，振动约 4.0 mm/s；5500 r/min：f ≈ 183 Hz，r ≈ 0.96，放大约 11 倍，振动约 13.3 mm/s，噪声估算约 94 dB(A)。惯性力只增加约 21%（与转速平方成正比），但二阶激振频率逼近机臂固有频率，放大倍数增加了一倍半，这是共振。加筋使刚度 × 1.3，固有频率升到约 217 Hz，r ≈ 0.85，振动约 3.4 mm/s，噪声约 82 dB(A)，与原来 5000 r/min 时相当；代价是改铸件模具、重量略增，共振转速移到约 6500 r/min。",
+   "5000 r/min: f = 2 × 5000/60 ≈ 167 Hz, r ≈ 0.88, amplification about 4.2, vibration about 4.0 mm/s. 5500 r/min: f ≈ 183 Hz, r ≈ 0.96, amplification about 11, vibration about 13.3 mm/s, noise about 94 dB(A). Inertia forces grow only about 21% (with speed squared), but the second-order frequency approaches the arm's natural frequency and the amplification rises two and a half times — resonance. Ribs multiply stiffness by 1.3, raising the natural frequency to about 217 Hz; r ≈ 0.85, vibration about 3.4 mm/s, noise about 82 dB(A), as at 5000 r/min before. The costs: a new casting pattern, slightly more weight, and resonance moved to about 6500 r/min."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人标定与换工具：调整法和“换针”的翻版",
+   "Robot calibration and tool changes: the adjustment method and the needle change again"
+  ],
+  "text": [
+   "机械臂末端（TCP）的定位误差也是一条尺寸链：各连杆长度、关节零位、减速器间隙、工具长度首尾相接。靠把每个零件都做准来保证 0.1 mm 级精度很贵，工业上的做法和梭尖间隙一样是“调整”：装好后用激光跟踪仪做运动学标定，把连杆和零位误差写进控制器参数，一次吸收。可标定只对当时装的那把工具有效，就像调好的梭尖间隙只对那根针有效：换了焊枪或夹爪，工具长度这一环又回来了，所以机器人每次换工具都要做 TCP 标定。共振也一样：机械臂高速轨迹的激振频率接近手臂的固有频率时会抖动，办法同样是提高刚度、加阻尼或从轨迹上减小激振。",
+   "The positioning error of a robot's tool centre point is also a dimensional chain: link lengths, joint zero offsets, gearbox backlash and tool length end to end. Making every part accurate enough for 0.1 mm is costly, so industry does what the hook clearance does — adjust: after assembly a laser tracker performs kinematic calibration and the link and zero errors are written into the controller, absorbed in one go. But calibration holds only for the tool fitted at the time, just as the adjusted hook clearance holds only for that needle: fit a new torch or gripper and the tool-length link returns, which is why robots repeat TCP calibration after every tool change. Resonance carries over too: when a fast trajectory excites near the arm's natural frequency the arm shakes, and the remedies are again stiffness, damping, or a gentler excitation from the trajectory."
+  ]
+ },
+ "life": {
+  "title": [
+   "洗衣机甩干时的那一阵猛抖",
+   "The washing machine's shudder during spin-up"
+  ],
+  "text": [
+   "洗衣机甩干加速时，常在某个转速突然剧烈抖动，转速再升上去反而平稳了：那一刻转筒的激振频率正好经过机体的固有频率，就是共振。",
+   "A washing machine spinning up often shudders violently at one speed and then runs smoothly as it goes faster: at that moment the drum's excitation frequency is passing the cabinet's natural frequency — resonance."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "一台平缝机从图纸到量产",
+    "A lockstitch machine from drawing to volume production"
+   ],
+   "points": [
+    [
+     "设计输入：转速、针距、面料、噪声、价格和必须满足的标准",
+     "Design input: speed, stitch length, fabrics, noise, price and the standards to meet"
+    ],
+    [
+     "设计评审三问：能否经济地加工、能否方便准确地装配、坏了能否修",
+     "Three review questions: economical to make? easy and accurate to assemble? repairable?"
+    ],
+    [
+     "样机按试验大纲做性能、振动、噪声、寿命试验，往往要改好几轮",
+     "Prototypes undergo performance, vibration, noise and life tests, often over several rounds"
+    ],
+    [
+     "小批试产验证工装、工艺和检验方法后才批量生产；问题发现得越晚越贵",
+     "A pilot run proves fixtures, processes and inspection before volume; the later a problem is found, the dearer"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_20_flow.png",
+   "narration": [
+    "第 3 到 8 章把平缝机的机构一个个算清楚了，可图纸上算对，不等于造出来能用。一个新机型从立项到量产，先是设计输入：目标市场要什么转速、针距、面料、噪声和价格，要满足哪些标准。然后是方案和详细设计，评审时请工艺、质量和售后一起看图，问三个问题：能不能经济地加工，能不能方便准确地装上去，坏了能不能修。接着做样机、按大纲试验、改图，往往好几轮；再小批试产验证工装和检验方法，最后批量生产。最常见的教训是：问题发现得越晚，改起来越贵。",
+    "Chapters 3 to 8 worked out the lockstitch mechanisms one by one, but a correct drawing is not yet a working machine. From project approval to volume, first comes design input: what speed, stitch range, fabrics, noise and price the market wants, and which standards apply. Then concept and detail design, reviewed with manufacturing, quality and service people asking three questions: can it be made economically, assembled easily and accurately, and repaired? Then prototypes, tests to a plan and design changes, often for several rounds; then a pilot run to prove fixtures and inspection, and finally volume. The commonest lesson: the later a problem is found, the more it costs to fix."
+   ]
+  },
+  {
+   "title": [
+    "关键零件的材料与工艺",
+    "Materials and processes of the key parts"
+   ],
+   "points": [
+    [
+     "耐磨件（旋梭、梭床、针杆与针杆套、送布牙）：淬硬、精磨、研磨，可加 DLC 或镀硬铬",
+     "Wear parts (hook, basket, needle bar and bushing, feed dog): hardened, ground, lapped; DLC or hard chrome possible"
+    ],
+    [
+     "交变载荷件（上下轴、曲柄、连杆）：中碳钢或合金钢调质，轴颈淬硬后磨削",
+     "Fatigue-loaded parts (shafts, cranks, links): quenched-and-tempered medium-carbon or alloy steel, journals hardened and ground"
+    ],
+    [
+     "机壳：灰铸铁吸振、刚度高；铸后时效，关键轴孔一次装夹镗出",
+     "Housing: grey cast iron for damping and stiffness; aged after casting, key bores bored in one set-up"
+    ],
+    [
+     "DLC 旋梭：企业资料称硬度提高 86%、发热减少 33%，只需很少的油",
+     "DLC hooks: maker's data claim 86% higher hardness, 33% less heat, very little oil"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_20_parts.png",
+   "narration": [
+    "平缝机的零件按工作条件分几类，材料和工艺各不相同。高速滑动、要耐磨的，比如旋梭：梭尖在离机针不到 0.1 mm 的地方以十几米每秒掠过，所以要渗碳淬火或整体淬火，再精磨梭道、研磨梭尖；新出现的类金刚石碳涂层旋梭，据企业资料硬度提高 86%、发热减少 33%，只需很少的油。受交变载荷的轴、曲柄、连杆，用中碳钢或合金钢调质。机壳是整台机器的骨架，用灰铸铁吸振好、刚度高；铸好要时效消除内应力，关键轴孔要一次装夹镗出，保证平行度和距离。",
+    "The parts fall into classes by working conditions, each with its own materials and processes. High-speed sliding parts must resist wear — the hook point passes within 0.1 mm of the needle at more than ten metres a second — so the hook is carburised or through-hardened, then the race is ground and the point lapped; the newer DLC-coated hooks, by the maker's data, are 86% harder and run 33% cooler with very little oil. Shafts, cranks and links carry alternating loads and are quenched-and-tempered medium-carbon or alloy steel. The housing is the skeleton: grey cast iron damps well and is stiff; it is aged to relieve stress, and key bores are bored in one set-up for parallelism and spacing."
+   ]
+  },
+  {
+   "title": [
+    "精度链：梭尖间隙从哪里来",
+    "The accuracy chain: where the hook-point clearance comes from"
+   ],
+   "points": [
+    [
+     "梭尖与机针凹口的间隙要求 0.04–0.10 mm（某企业说明书）",
+     "Hook point to needle scarf clearance must be 0.04–0.10 mm (a maker's manual)"
+    ],
+    [
+     "八个环：针杆套孔位、针杆游隙、针夹孔偏移、机针凹口面、装针偏转、旋梭轴孔位、梭尖到基准、旋梭轴游隙",
+     "Eight links: bushing bore position, needle-bar play, clamp-hole offset, needle scarf face, needle twist, hook-shaft bore, point to datum, hook-shaft play"
+    ],
+    [
+     "首尾相接、封闭在“间隙”这一环上，叫尺寸链",
+     "Joined end to end and closed on the clearance: a dimensional chain"
+    ],
+    [
+     "每一环的误差都会传到间隙上",
+     "Every link's error passes to the clearance"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_20_chain.png",
+   "narration": [
+    "第 5 章说，梭尖与机针凹口的间隙要保持在 0.04 到 0.1 毫米。这几十微米是怎么来的？它由一长串零件的尺寸和位置共同决定：机壳上针杆套孔的位置、针杆在针杆套里的游隙、针夹孔偏移、机针凹口面到针杆轴线的距离、装针时的偏转，另一边是旋梭轴孔位置、梭尖到安装基准的距离、旋梭轴的径向游隙。一共八个环，首尾相接，最后封闭在间隙这一环上，这就叫尺寸链。每一环的误差都会传到间隙上，所以要算清楚整条链加起来会怎样。",
+    "Chapter 5 said the clearance between hook point and needle scarf must stay between 0.04 and 0.1 mm. Where do these few hundredths come from? A long string of part dimensions and positions: the needle-bar bushing bore in the housing, the play of the bar in the bushing, the clamp-hole offset, the distance from scarf face to bar axis, the twist of the needle as fitted; and on the other side the hook-shaft bore, the distance from hook point to its mounting datum, and the radial play of the hook shaft. Eight links joined end to end and closed on the clearance — a dimensional chain. Every link's error reaches the clearance, so we must work out what the whole chain adds up to."
+   ]
+  },
+  {
+   "title": [
+    "极值法与统计法",
+    "Worst-case and statistical methods"
+   ],
+   "points": [
+    [
+     "极值法：各环同时偏到最不利一端，变化范围 = 各环公差之和，算例 ±0.153 mm",
+     "Worst case: every link at its worst limit; range = sum of tolerances, ±0.153 mm in the example"
+    ],
+    [
+     "统计法：误差独立、正态，公差 = ±3σ，σg 为各环 σ 的平方和开方",
+     "Statistical: independent normal errors, tolerance = ±3σ, σg = root-sum-square of the link σs"
+    ],
+    [
+     "算例 σg ≈ 0.019 mm；允许 ±0.03 mm",
+     "Example σg ≈ 0.019 mm against an allowance of ±0.03 mm"
+    ],
+    [
+     "蒙特卡罗 4000 台：约 87% 合格，每 1000 台约 130 台撞针或易跳针",
+     "Monte Carlo of 4000 machines: about 87% good, about 130 per 1000 risk needle strikes or skipped stitches"
+    ]
+   ],
+   "formula": "\\sigma_g=\\sqrt{\\sum_i\\sigma_i^{2}},\\qquad \\sigma_i=\\frac{T_i}{3}",
+   "figure": "fig_20_hist.png",
+   "narration": [
+    "本章算例给八个环各定一个公差，比如孔位正负 0.03、机针正负 0.02、旋梭轴游隙正负 0.01 毫米，名义间隙 0.07。最保守的是极值法：假设每一环都恰好偏到最不利的一端，变化范围就是公差之和，正负 0.153，远超允许的正负 0.03。可各环同时偏到极限的机会微乎其微。统计法把每一环误差看成正态随机量，公差取正负 3σ，间隙的 σ 是各环 σ 的平方和再开方，约 0.019 毫米。蒙特卡罗模拟 4000 台，约 87% 合格，每 1000 台约 130 台要么撞针、要么容易跳针。",
+    "The example gives each of the eight links a tolerance — bore positions ±0.03, needle ±0.02, hook-shaft play ±0.01 mm — with a nominal clearance of 0.07. The most conservative method is worst case: assume every link sits at its worst limit, so the range is the sum of tolerances, ±0.153, far beyond the allowed ±0.03. But all links at their limits together is vanishingly rare. The statistical method treats each error as normal with the tolerance at ±3σ; the clearance σ is the root-sum-square of the link σs, about 0.019 mm. A Monte Carlo run of 4000 machines gives about 87% good: some 130 in every 1000 either strike the needle or skip stitches."
+   ]
+  },
+  {
+   "title": [
+    "靠零件精度提到 99%：代价有多大",
+    "Reaching 99% by part accuracy alone: the cost"
+   ],
+   "points": [
+    [
+     "99% 合格要 σg ≤ 0.03/2.576 ≈ 0.0116 mm",
+     "99% good needs σg ≤ 0.03/2.576 ≈ 0.0116 mm"
+    ],
+    [
+     "各环均匀收紧到原来的约 60%",
+     "All links tightened evenly to about 60% of their tolerance"
+    ],
+    [
+     "按“公差减半、成本加倍”的粗略关系，加工成本约增加三分之二",
+     "With 'half the tolerance, twice the cost', machining cost rises by about two thirds"
+    ],
+    [
+     "按加工难易分配公差可便宜些，但仍比原来贵、每一环都要做得很准",
+     "Allocating by difficulty is cheaper, but still dearer than before and every link must be accurate"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "如果坚持零件完全互换、装上就用，要把合格率提到 99%，就得让间隙的 σ 不超过 0.03 除以 2.576，约 0.0116 毫米。各环均匀收紧的话，每一环都要收到原来的约 60%。精度越高加工越贵，按“公差减半、成本加倍”的粗略经验，算例的加工成本要增加约三分之二。聪明一点，按各环加工难易分配公差，难加工的多给一点、容易的少给一点，可以便宜不少，但还是比原来贵，而且每一环都得做得很准。虚拟实验 23-1 的第一个任务就是在 33 元以内做到这一点，大家会发现很紧。",
+    "If parts must be fully interchangeable and fitted as they come, a 99% yield needs a clearance σ of at most 0.03 divided by 2.576, about 0.0116 mm. Tightening evenly means each link goes to about 60% of its tolerance. Accuracy costs money: with the rough rule 'half the tolerance, twice the cost', machining cost in the example rises by about two thirds. Allocating tolerances by difficulty — looser where machining is hard, tighter where it is easy — saves a good deal, but it is still dearer than before and every link must be made accurately. Task 1 of virtual lab 23-1 asks you to do this within 33 yuan; you will find it tight."
+   ]
+  },
+  {
+   "title": [
+    "装配时调整：用一个可调的环吸收整条链",
+    "Adjusting at assembly: one adjustable link absorbs the whole chain"
+   ],
+   "points": [
+    [
+     "旋梭沿轴向移动，装配工用塞尺把间隙调到 0.07 mm 再拧紧",
+     "The hook slides axially; the fitter sets 0.07 mm with a feeler gauge and tightens"
+    ],
+    [
+     "孔位、针夹孔、梭尖尺寸、机针两环被吸收，只剩调整误差（±0.01 mm）和两项游隙",
+     "Bore positions, clamp hole, point dimension and both needle links are absorbed; only adjustment error (±0.01 mm) and two plays remain"
+    ],
+    [
+     "间隙 σ 降到约 0.005 mm，几乎全部合格",
+     "Clearance σ falls to about 0.005 mm; practically all good"
+    ],
+    [
+     "可吸收的四个环可放宽到 ±0.05 mm，加工加调整总成本反而更低",
+     "The four absorbable links can be relaxed to ±0.05 mm, and machining plus adjustment costs less overall"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_20_hist.png",
+   "narration": [
+    "工业平缝机的实际做法是装配时调整：旋梭可以沿轴向移动，装配工对着装上的那根针，用塞尺把间隙调到 0.07 毫米再拧紧螺钉。这一调，机壳孔位、针夹孔、梭尖尺寸、机针这些环的误差统统被吸收，剩下的只有调整本身的误差，和调整时消除不了的针杆游隙、旋梭轴径向游隙。间隙的 σ 降到约 0.005 毫米，几乎全部合格，代价只是每台多一点调整工时。更妙的是，被吸收的环可以放宽，就算某一环批量偏移了，也照样被吸收。这就是调整法，它让大部分零件可以用经济精度加工。",
+    "What industrial lockstitch makers actually do is adjust at assembly: the hook can slide along its shaft, and the fitter sets the clearance to the fitted needle at 0.07 mm with a feeler gauge, then tightens the screw. This absorbs the errors of the bore positions, the clamp hole, the hook-point dimension and the needle; what remains is the adjustment error itself plus the needle-bar play and hook-shaft radial play that adjustment cannot remove. The clearance σ drops to about 0.005 mm, practically all good, for a little extra fitting time. Better still, the absorbed links can be relaxed, and even a batch shift in one of them is absorbed. This is the adjustment method, letting most parts be made with economical accuracy."
+   ]
+  },
+  {
+   "title": [
+    "换针以后：哪些环会反复回来",
+    "After a needle change: which links keep coming back"
+   ],
+   "points": [
+    [
+     "调整只对装上的那根针有效；机针是消耗品",
+     "Adjustment is valid only for the needle fitted; needles are consumables"
+    ],
+    [
+     "新针的凹口面尺寸和装针偏转不同，这两环的误差又回来了",
+     "A new needle brings its own scarf dimension and twist, so those two links return"
+    ],
+    [
+     "算例：换针后合格率从近 100% 降到约 98%",
+     "Example: after a needle change the yield falls from nearly 100% to about 98%"
+    ],
+    [
+     "对策：对机针厂提出更严的公差；换针号后重新调间隙",
+     "Remedies: tighter needle tolerances from the needle maker; readjust after changing needle size"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_20_hist.png",
+   "narration": [
+    "调整有个前提：它只对当时装上的那根针有效。车间里机针是消耗品，断了、钝了就换；新针的凹口面尺寸和装针偏转都和原来那根不一样，这两环的误差又回来了。算例中换针后合格率从接近 100% 降到约 98%。要让换针后仍然合格，一是对机针本身的精度提出更严的要求，这要落到机针厂的公差上，第 24 章会讲；二是换针号以后重新调间隙。尺寸链分析真正的价值就在这里：它告诉我们哪些环能靠调整一次解决，哪些环会在使用中反复出现，后者才是真正要控制精度的地方。",
+    "Adjustment has a catch: it is valid only for the needle fitted at the time. On the floor needles are consumables, replaced when broken or blunt, and a new needle has its own scarf dimension and twist, so those two links come back. In the example, the yield after a needle change falls from nearly 100% to about 98%. To stay good after a change, either demand tighter accuracy of the needle itself, which lands on the needle maker's tolerances in Chapter 24, or readjust the clearance after changing needle size. That is the real value of chain analysis: it shows which links adjustment settles once and which keep returning in use; the latter are where accuracy really must be controlled."
+   ]
+  },
+  {
+   "title": [
+    "装配、调试、出厂检验与跑合",
+    "Assembly, set-up, final inspection and running-in"
+   ],
+   "points": [
+    [
+     "装配从里到外、从下到上，每步规定拧紧力矩和检查项目",
+     "Assemble from inside out and bottom up, with specified torques and checks at each step"
+    ],
+    [
+     "调试：针杆高度、旋梭定时、梭尖间隙要按顺序联调；电控机型还要写入停针、剪线参数",
+     "Set-up: needle-bar height, hook timing and clearance adjusted together in order; electronic models also need stop and trim parameters"
+    ],
+    [
+     "出厂：空运转查温升、异响、漏油，试缝查线迹、针距、跳针、断线（QB/T 4293-2012 检验规则）",
+     "Final: running test for heat, noise, leaks; sewing test for stitches, length, skips, breaks (QB/T 4293-2012 inspection rules)"
+    ],
+    [
+     "跑合：新机运动副表面有微小凸起，头一段时间降速使用",
+     "Running-in: new sliding surfaces have micro-peaks, so run slower at first"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "装配大致从里到外、从下到上：先装上下轴、轴承和同步带，再装旋梭和送布，然后针杆、挑线和压脚，最后面板和电控。每一步都有规定的拧紧力矩和检查项目。装好后逐项调试，主要就是第 5、6、8 章那些定时和间隙；记住针杆高度、钩线时刻和间隙要按顺序联调，动了一个，另一个往往也要动。出厂前每台都要空运转和试缝，检验规则见 QB/T 4293-2012 等行业标准。新机器运动副表面还有加工留下的微小凸起，所以有的机型规定头一段时间降速跑合。",
+    "Assembly runs roughly from inside out and bottom up: first the shafts, bearings and belt in the housing and bed, then the hook and feed, then needle bar, take-up and presser foot, finally covers, controls and accessories, each step with specified tightening torques and checks. Then set-up, item by item — mainly the timings and clearances of Chapters 5, 6 and 8; remember that needle-bar height, loop-catch timing and clearance are adjusted together in order, because moving one usually moves another. Before shipping every machine is run and test-sewn under industry inspection rules such as QB/T 4293-2012. New sliding surfaces still carry micro-peaks from machining, so some models must be run in at reduced speed at first."
+   ]
+  },
+  {
+   "title": [
+    "振动与噪声怎样测",
+    "How vibration and noise are measured"
+   ],
+   "points": [
+    [
+     "振动按 QB/T 1178-2006：规定位置装加速度传感器，规定转速下测",
+     "Vibration by QB/T 1178-2006: accelerometers at set points, measured at set speeds"
+    ],
+    [
+     "看频谱：一阶（主轴频率）、二阶及更高次分量，判断振源",
+     "Read the spectrum: first order (spindle frequency), second and higher, to locate the source"
+    ],
+    [
+     "噪声按 ISO 10821、ISO 11204：5000 sti/min 时工位声压级 83.5 dB(A)、声功率级 88.0 dB",
+     "Noise by ISO 10821 and ISO 11204: at 5000 sti/min, 83.5 dB(A) at the workstation and 88.0 dB sound power"
+    ],
+    [
+     "声压级是工人听到的；声功率级与位置和房间无关，用来比较机器",
+     "Sound pressure is what the operator hears; sound power is independent of position and room, for comparing machines"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_20_measure.png",
+   "narration": [
+    "造好的机器要做振动、噪声试验。振动按 QB/T 1178-2006 测：在机头规定位置装加速度传感器，在规定转速下测。比总值更有用的是频谱：把信号分解到各个频率上，看主轴频率的一阶、两倍的二阶和更高次分量各有多大。针杆惯性力有一阶和二阶两部分，平衡块只平衡一阶的一部分，所以频谱能告诉你振源。噪声按 ISO 10821 和 11204 测：某企业标准平缝机 5000 针每分钟时工位声压级 83.5 dB(A)，声功率级 88.0 dB。前者是工人实际听到的，后者用来比较不同机器。",
+    "A finished machine faces vibration, noise and life tests. Vibration follows QB/T 1178-2006: accelerometers at specified points on the head, measured at specified speeds. More useful than the overall value is the spectrum: split the signal by frequency and see how large the first order at spindle frequency, the second order at twice that, and higher orders are. Chapters 3 and 8 showed the needle-bar inertia force has first- and second-order parts and the counterweight balances only some of the first, so the spectrum tells you where vibration comes from. Noise follows ISO 10821 and 11204: one maker's standard lockstitch at 5000 sti/min gives 83.5 dB(A) at the workstation and 88.0 dB sound power. The first is what the operator hears; the second compares machines."
+   ]
+  },
+  {
+   "title": [
+    "模态、共振与可靠性试验",
+    "Modes, resonance and reliability tests"
+   ],
+   "points": [
+    [
+     "力锤敲击或有限元算出机臂、机壳、台板的前几阶固有频率",
+     "Hammer tests or finite elements give the first natural frequencies of arm, housing and table"
+    ],
+    [
+     "工作转速范围内的一阶、二阶激振频率要避开固有频率",
+     "First- and second-order excitation across the working speed range must avoid those frequencies"
+    ],
+    [
+     "寿命用韦布尔分布分析：磨损类形状参数 > 1；B10 = 10% 失效的运转时间",
+     "Life data by Weibull analysis: wear-out shape parameter > 1; B10 = running time at which 10% have failed"
+    ],
+    [
+     "未坏样机按截尾数据处理；加速试验要确认失效方式不变",
+     "Unfailed units are censored data; accelerated tests must keep the failure mode unchanged"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_20_measure.png",
+   "narration": [
+    "机壳、机臂、台板都有自己的固有频率和振型。用力锤敲击或有限元计算，可以得到前几阶固有频率。设计时要让工作转速范围内的主要激振频率，一阶和二阶，避开这些固有频率，否则就会共振，振动和噪声成倍放大。寿命方面，机械零件主要受磨损和疲劳限制，寿命数据常用韦布尔分布分析：磨损类失效的形状参数大于 1，失效率随时间上升；B10 寿命是 10% 的机器失效对应的运转时间。未坏样机按截尾数据处理；加速试验要确认失效方式不变。",
+    "Housing, arm and table each have natural frequencies and mode shapes. Striking the arm with a hammer and measuring the response, or computing with finite elements, gives the first few. The design must keep the main excitations across the working speed range — first and second order — away from them, or resonance multiplies vibration and noise. For life, mechanical parts are limited mainly by wear and fatigue, and life data are often analysed with the Weibull distribution: wear-out failures have a shape parameter above 1, so the failure rate rises with time; B10 life is the running time at which 10% of machines have failed. Units not yet failed are treated as censored data, and accelerated tests must keep the failure mode the same as in normal use."
+   ]
+  },
+  {
+   "title": [
+    "案例：提速到 5500 r/min 后振动和噪声超标",
+    "Case: vibration and noise exceed limits after the speed-up to 5500 r/min"
+   ],
+   "points": [
+    [
+     "惯性力只增约 21%（368 → 445 N），振动却增加三倍多",
+     "Inertia force grows only about 21% (368 → 445 N), yet vibration more than triples"
+    ],
+    [
+     "扫描：5000 r/min 以上急升，约 5700 r/min 峰值；增大的是二阶分量",
+     "Sweep: steep rise above 5000 r/min, peak near 5700; it is the second order that grows"
+    ],
+    [
+     "5500 r/min 二阶 183 Hz，机臂固有频率约 190 Hz：r = 0.96，放大约 11 倍",
+     "At 5500 r/min the second order is 183 Hz, the arm about 190 Hz: r = 0.96, amplification about 11"
+    ],
+    [
+     "5000 r/min：r = 0.88、放大 4.2 倍、4.0 mm/s；5500 r/min：13.3 mm/s、约 94 dB(A)",
+     "5000 r/min: r = 0.88, ×4.2, 4.0 mm/s; 5500 r/min: 13.3 mm/s, about 94 dB(A)"
+    ]
+   ],
+   "formula": "X=\\frac{F}{k}\\cdot\\frac{1}{\\sqrt{(1-r^{2})^{2}+(2\\zeta r)^{2}}},\\qquad r=\\frac{f}{f_n}",
+   "figure": "fig_20_sweep.png",
+   "narration": [
+    "回到导入问题。转速提高 10%，惯性力只增加约 21%，振动却翻了三倍多。转速扫描显示振动在 5000 转以上急升、约 5700 转达到峰值，频谱里长的是二阶分量，5500 转时二阶频率 183 Hz；模态试验测得机臂固有频率在 190 Hz 附近。把机臂看成单自由度系统，响应是静变形乘放大倍数，r 是频率比。5000 转时 r 是 0.88，放大 4.2 倍；5500 转时 r 是 0.96，放大约 11 倍。转速只多 10%，放大倍数多了一倍半，这就是共振。",
+    "Now the opening problem. A 10% speed increase raises inertia force, which goes with speed squared, by only about 21%, yet vibration more than triples. The speed sweep shows a steep rise above 5000 r/min with a peak near 5700, the growth is in the second order, and at 5500 r/min the second order is at 183 Hz; the modal test puts the arm near 190 Hz. Treat the arm as a single spring–mass–damper: the response is the static deflection times an amplification, r being the ratio of excitation to natural frequency. At 5000 r/min r is 0.88 and the amplification 4.2; at 5500 r/min r is 0.96 and the amplification about 11. Ten percent more speed, two and a half times the amplification: that is life near resonance."
+   ]
+  },
+  {
+   "title": [
+    "三类改进：改结构、加阻尼、减激振",
+    "Three remedies: structure, damping, excitation"
+   ],
+   "points": [
+    [
+     "加筋加厚：模态刚度 +30%，固有频率约 217 Hz，r = 0.85，3.4 mm/s、约 82 dB(A)",
+     "Ribs and thicker walls: stiffness +30%, about 217 Hz, r = 0.85, 3.4 mm/s, about 82 dB(A)"
+    ],
+    [
+     "代价：改铸件模具、重量略增，共振转速移到约 6500 r/min",
+     "Costs: new casting pattern, a little more weight, resonance moved to about 6500 r/min"
+    ],
+    [
+     "加阻尼：ζ 0.03 → 0.06 约 9.0 mm/s，0.10 才约 6.1 mm/s",
+     "Damping: ζ 0.03 → 0.06 gives about 9.0 mm/s; only 0.10 gets to about 6.1 mm/s"
+    ],
+    [
+     "减往复质量：减 20% 约 10.6 mm/s，减 40% 才约 8.0 mm/s；最有效的是改结构",
+     "Lighter reciprocating mass: −20% gives about 10.6 mm/s, −40% only about 8.0; changing the structure works best"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_20_fix.png",
+   "narration": [
+    "办法有三类。第一是改结构：在机臂内部加筋、加厚壁，模态刚度提高 30%，固有频率升到约 217 Hz，5500 转时 r 降到 0.85，振动降到约 3.4 mm/s，噪声约 82 分贝，和原来 5000 转时相当；代价是改模具、略增重，共振转速移到约 6500 转。第二是加阻尼：阻尼比到 0.06 只降到 9.0，到 0.10 才 6.1。第三是从源头减激振：往复质量减 20% 只降到 10.6，减 40% 才 8.0。结论是把固有频率移出工作范围最有效，其余两类作辅助。",
+    "There are three kinds of remedy with very different effects. First, structure: ribs and thicker walls inside the arm raise modal stiffness 30% and the natural frequency to about 217 Hz; at 5500 r/min r drops to 0.85, vibration to about 3.4 mm/s and noise to about 82 dB, as at 5000 before. The costs: a new casting pattern, slightly more weight, and resonance moved to about 6500, which a future speed-up will meet again. Second, damping: doubling ζ to 0.06 only reaches 9.0, and 0.10 is needed for 6.1, because damping helps only near resonance. Third, less excitation: 20% lighter reciprocating parts give 10.6, 40% gives 8.0. Moving the natural frequency out of the working range is most effective; the other two assist."
+   ]
+  },
+  {
+   "title": [
+    "标准与知识产权",
+    "Standards and intellectual property"
+   ],
+   "points": [
+    [
+     "安全：ISO 10821；电气安全与 EMC：IEC 60204-31 / GB/T 5226.31",
+     "Safety: ISO 10821; electrical safety and EMC: IEC 60204-31 / GB/T 5226.31"
+    ],
+    [
+     "产品标准、试验方法标准（振动、噪声、连续缝纫、层缝）、检验规则（出厂与型式检验）",
+     "Product standards, test-method standards (vibration, noise, continuous and multi-layer sewing), inspection rules (routine and type tests)"
+    ],
+    [
+     "立项时把目标市场的标准列成设计输入，不要做完再“送检”",
+     "List the target market's standards as design input at project start, not at the end"
+    ],
+    [
+     "专利三件事：检索（含未授权申请、按销售地区）、规避设计、及时申请保护",
+     "Patents, three jobs: search (including pending applications, by sales region), design around, file your own in time"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "一台缝纫机要满足的标准大致分几类：安全标准，比如 ISO 10821，以及电气安全和电磁兼容的 IEC 60204-31；产品标准规定性能参数；试验方法标准规定振动、噪声、连续缝纫、层缝怎样测；检验规则规定出厂检验和型式检验做哪些项目、怎样抽样。关键是设计一开始就把它们列成设计输入，而不是做完了再去送检。知识产权也是三件事：方案定之前检索专利，专利有地域性，还要包括已公开未授权的申请；被保护的结构要规避设计、等过期或谈许可；自己的创新及时申请，结构改进常用实用新型。",
+    "A sewing machine must meet several kinds of standard: safety standards such as ISO 10821, plus IEC 60204-31 for electrical safety and EMC; product standards for performance parameters; test-method standards for how vibration, noise, continuous and multi-layer sewing are tested; and inspection rules for which routine and type tests are done and how samples are drawn. The key is to list them as design input at the very start, not to send the machine for testing at the end. Intellectual property is also three jobs: search patents before the concept is fixed — patents are territorial, and published pending applications count; design around protected structures, wait for expiry or license; and file your own innovations promptly, structural improvements often as utility models."
+   ]
+  },
+  {
+   "title": [
+    "模型的边界与现场要点",
+    "Limits of the models and shop-floor notes"
+   ],
+   "points": [
+    [
+     "尺寸链假定各环独立、正态；实际有刀具磨损带来的趋势偏移和相关性",
+     "The chain assumes independent normal links; real errors drift with tool wear and may correlate"
+    ],
+    [
+     "“公差减半、成本加倍”只是粗略经验；振动模型只有一个模态、两个激振力",
+     "'Half the tolerance, twice the cost' is only a rough rule; the vibration model has one mode and two forces"
+    ],
+    [
+     "换针、换针号后检查梭尖间隙；新机按说明书降速跑合",
+     "Check the hook clearance after changing needles or sizes; run new machines in at reduced speed"
+    ],
+    [
+     "某个转速突然“叫”、过了又好，多半是共振；修机用原厂规格的精密件",
+     "A machine that screams at one speed and calms beyond it is resonating; use original-spec precision parts in repairs"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后说模型的边界。尺寸链模型把八个环都看成独立、正态的，实际加工误差常常不是正态的，比如刀具磨损带来趋势性偏移，各环之间也可能相关；间隙还会随温度、磨损和机针在布里的偏摆变化。成本关系只是粗略经验。振动模型把机臂当单自由度系统，只考虑一个固有频率和一阶、二阶两个激振力，实际机器有多个模态、多个振源，还有台板和机架的影响。所以这些都要用企业的实测数据校准。现场记住几条：换针后查间隙；新机降速跑合；某个转速突然叫、过了又好，多半是共振。",
+    "Finally the limits. The chain model treats all eight links as independent and normal, whereas real machining errors often are not — tool wear brings drifts — and links may correlate; the clearance also changes with temperature, wear and needle deflection in the fabric. The cost relation is only a rough rule. The vibration model treats the arm as a single degree of freedom with one natural frequency and two excitations, while real machines have many modes and sources, plus the table and stand. All of this must be calibrated with company data. On the floor remember: check the clearance after a needle change; run new machines in slowly; a machine that screams at one speed and calms beyond it is most likely resonating."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "从设计输入、评审、样机试验到试产、量产，问题发现得越晚越贵；标准和专利要在立项时就列为设计输入。",
+   "From design input, reviews and prototype tests to pilot and volume production, the later a problem is found the dearer; standards and patents belong in the design input from day one."
+  ],
+  [
+   "尺寸链：极值法取公差之和，统计法 σg = √Σσi²；梭尖间隙算例完全互换只有约 87% 合格。",
+   "Dimensional chains: worst case adds tolerances, statistics gives σg = √Σσi²; with full interchangeability the example clearance is only about 87% good."
+  ],
+  [
+   "装配调整法用一个可调环吸收大部分误差，σ 降到约 0.005 mm，被吸收的环还能放宽；但换针会让机针两环回来（约 98%）。",
+   "Adjustment at assembly lets one adjustable link absorb most errors, σ falls to about 0.005 mm and absorbed links can be relaxed; but a needle change brings the two needle links back (about 98%)."
+  ],
+  [
+   "放大倍数 1/√((1 − r²)² + (2ζr)²)：激振频率接近固有频率时振动急剧放大，转速 +10% 可使放大倍数增加一倍半。",
+   "Amplification 1/√((1 − r²)² + (2ζr)²): near the natural frequency vibration soars, and +10% speed can raise amplification two and a half times."
+  ],
+  [
+   "治共振首选改结构、把固有频率移出工作范围；加阻尼和减往复质量作辅助，改后要重做扫描、噪声和寿命试验。",
+   "For resonance, first change the structure to move the natural frequency out of range; damping and lighter reciprocating parts assist; then repeat the sweep, noise and life tests."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "tol",
+   "no": "23-1",
+   "title": [
+    "尺寸链与共振",
+    "Tolerance chains and resonance"
+   ],
+   "goal": [
+    [
+     "用蒙特卡罗模拟比较完全互换、装配调整、调整后换针三种情况下梭尖间隙的合格率和成本。",
+     "Use Monte Carlo simulation to compare clearance yield and cost for full interchangeability, adjustment at assembly, and a needle change after adjustment."
+    ],
+    [
+     "学会按各环的方差贡献和成本系数分配公差。",
+     "Learn to allocate tolerances by each link's variance contribution and cost factor."
+    ],
+    [
+     "用转速扫描比较加筋、加阻尼和减轻往复质量三种措施对 5500 r/min 振动和噪声的效果。",
+     "Use speed sweeps to compare ribs, damping and lighter reciprocating mass on vibration and noise at 5500 r/min."
+    ]
+   ],
+   "theory": [
+    [
+     "名义间隙 0.07 mm，允许 0.04–0.10 mm；各环误差正态，公差 = ±3σ；不调整时间隙 = 0.07 + 各环误差之和。",
+     "Nominal clearance 0.07 mm, allowed 0.04–0.10 mm; link errors are normal with tolerance = ±3σ; without adjustment the clearance is 0.07 plus the sum of link errors."
+    ],
+    [
+     "装配调整时机壳孔位、针夹孔、梭尖尺寸和机针两环被吸收，只剩调整误差 ±0.01 mm、针杆游隙和旋梭轴径向游隙；换针时机针两环变成新针的值。",
+     "With adjustment the bore positions, clamp hole, point dimension and both needle links are absorbed, leaving the ±0.01 mm adjustment error, needle-bar play and hook-shaft play; a needle change replaces the two needle links with the new needle's values."
+    ],
+    [
+     "成本模型：每环加工成本与公差成反比（公差减半、成本加倍），装配调整每台 3 元（示意）。",
+     "Cost model: each link's machining cost is inversely proportional to its tolerance (half the tolerance, twice the cost); adjustment costs 3 yuan per machine (illustrative)."
+    ],
+    [
+     "机臂按单自由度系统：X = F/k × 1/√((1 − r²)² + (2ζr)²)，模态刚度 ∝ 固有频率²；激振力与转速平方和往复质量成正比；噪声按振动速度每加倍 +6 dB 估算。",
+     "The arm is a single-degree-of-freedom system: X = F/k × 1/√((1 − r²)² + (2ζr)²), modal stiffness ∝ natural frequency²; forces scale with speed squared and reciprocating mass; noise rises 6 dB per doubling of vibration velocity."
+    ],
+    [
+     "判据（示意）：工作转速范围内振动 ≤ 8 mm/s，当前转速噪声 ≤ 86 dB(A)。",
+     "Criteria (illustrative): vibration ≤ 8 mm/s over the working range and noise ≤ 86 dB(A) at the current speed."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 23-1 第①页，点“恢复标准”，读出标准公差下的合格率、间隙均值与标准差、极值法最大偏差和每台成本；看下方“各环贡献”图，找出方差占比最大的两环。",
+     "Open page ① of virtual lab 23-1 and press 'Reset to standard'; read the yield, clearance mean and σ, worst-case deviation and cost per machine; in the contribution chart find the two links with the largest variance share."
+    ],
+    [
+     "任务 1：保持“不调整（完全互换）”和“不换针”，拖动八个环的公差滑块，使合格率 ≥ 99%、每台成本 ≤ 33 元；先收紧方差贡献大、成本系数小的环。点“换一批”确认结果稳定。",
+     "Task 1: keep 'no adjustment' and 'no needle change', move the eight tolerance sliders until the yield is ≥ 99% at ≤ 33 yuan per machine, tightening first the links with large variance and small cost factor; press 'New batch' to confirm."
+    ],
+    [
+     "任务 2：“装配时调整间隙”选“调整（移动旋梭）”，把四个标有“调整吸收”的环放宽，使合格率 ≥ 99%、成本 ≤ 28 元；观察贡献图中哪些环变成灰色。",
+     "Task 2: set 'adjust clearance at assembly' to 'adjust (move the hook)', relax the four links marked 'absorbed by adjustment' to reach ≥ 99% at ≤ 28 yuan; note which links turn grey in the contribution chart."
+    ],
+    [
+     "任务 3：在调整的基础上“在车间换一根新针”选“换针”，记录合格率下降多少；收紧两个“换针时变”的环，使合格率 ≥ 99%、成本 ≤ 30 元。",
+     "Task 3: with adjustment on, set 'change to a new needle' to 'change', record the drop in yield, then tighten the two links marked 'changes with the needle' to reach ≥ 99% at ≤ 30 yuan."
+    ],
+    [
+     "切到第②页，点“恢复原设计”（5500 r/min、190 Hz、阻尼比 0.03、往复质量 100%），记录工作范围内最大振动、噪声、二阶频率、频率比和放大倍数；在扫描曲线上找二阶共振转速。",
+     "Switch to page ②, press 'Restore original design' (5500 r/min, 190 Hz, ζ 0.03, mass 100%) and record the maximum vibration in range, noise, second-order frequency, ratio and amplification; locate the second-order resonance speed on the sweep."
+    ],
+    [
+     "只改“机臂固有频率”到约 217 Hz（刚度 +30%），记录结果；再恢复原设计，只把阻尼比改为 0.06 和 0.10，记录结果。",
+     "Change only the arm natural frequency to about 217 Hz (stiffness +30%) and record; restore, then change only the damping ratio to 0.06 and 0.10 and record."
+    ],
+    [
+     "恢复原设计，只把“往复质量”改为 80% 和 60%，记录结果；比较三类措施，完成任务 4（5500 r/min 时振动和噪声都达标）。",
+     "Restore, change only the reciprocating mass to 80% and 60% and record; compare the three measures and complete task 4 (both limits met at 5500 r/min)."
+    ],
+    [
+     "把最高转速提到 6500 r/min，看加筋方案是否仍达标，说明为什么。",
+     "Raise the top speed to 6500 r/min and see whether the ribbed design still passes; explain why."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "尺寸链与共振实验记录",
+     "Record of the tolerance-chain and resonance experiments"
+    ],
+    "headers": [
+     [
+      "工况 / 措施",
+      "Case / measure"
+     ],
+     [
+      "关键参数设置",
+      "Key settings"
+     ],
+     [
+      "合格率或最大振动",
+      "Yield or max vibration"
+     ],
+     [
+      "间隙 σ（mm）或放大倍数",
+      "Clearance σ (mm) or amplification"
+     ],
+     [
+      "每台成本（元）或噪声 dB(A)",
+      "Cost (yuan) or noise dB(A)"
+     ],
+     [
+      "是否达标",
+      "Pass?"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "任务 1 中你先收紧了哪几环？为什么不是均匀收紧？",
+     "In task 1 which links did you tighten first, and why not evenly?"
+    ],
+    [
+     "装配调整后，为什么可吸收的环放宽了合格率几乎不变？换针后哪些环又重要起来？",
+     "After adjustment, why does relaxing the absorbable links hardly change the yield? Which links matter again after a needle change?"
+    ],
+    [
+     "加阻尼从 0.03 加到 0.06，振动为什么只降了约三分之一？什么时候阻尼最有用？",
+     "Why does doubling damping from 0.03 to 0.06 cut vibration by only about a third? When is damping most useful?"
+    ],
+    [
+     "加筋方案把共振转速移到约 6500 r/min，这对将来再提速意味着什么？",
+     "The ribbed design moves resonance to about 6500 r/min. What does that mean for a future speed-up?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "间隙尺寸链与提速共振分析",
+   "Clearance chain and speed-up resonance analysis"
+  ],
+  "tasks": [
+   [
+    "某间隙由五个环决定，公差分别为 ±0.025、±0.02、±0.015、±0.01、±0.01 mm，名义 0.07 mm，允许 0.04–0.10 mm。(a) 用极值法和统计法（公差 = ±3σ）求封闭环的变化范围和完全互换时的合格率；(b) 若前三环可由装配调整吸收（调整误差 ±0.01 mm），求调整后的 σ 和合格率；(c) 说明调整后哪些环值得继续控制精度，为什么。",
+    "A clearance is set by five links with tolerances ±0.025, ±0.02, ±0.015, ±0.01 and ±0.01 mm, nominal 0.07 mm, allowed 0.04–0.10 mm. (a) Find the closing-link range by the worst-case and statistical methods (tolerance = ±3σ) and the yield with full interchangeability. (b) If the first three links are absorbed by adjustment at assembly (adjustment error ±0.01 mm), find σ and the yield after adjustment. (c) Which links still deserve accuracy control after adjustment, and why?"
+   ],
+   [
+    "某平缝机机臂固有频率 200 Hz、阻尼比 0.03，计划最高转速 5800 r/min。(a) 求二阶激振的频率、频率比和放大倍数；(b) 若加筋使固有频率升到 250 Hz，重新计算，并求新的二阶共振转速；(c) 比较加筋、加阻尼、减轻往复质量三种办法的适用条件和代价。",
+    "A lockstitch arm has a natural frequency of 200 Hz and ζ = 0.03; the planned top speed is 5800 r/min. (a) Find the second-order excitation frequency, ratio and amplification. (b) If ribs raise the natural frequency to 250 Hz, recompute and give the new second-order resonance speed. (c) Compare ribs, damping and lighter reciprocating mass in terms of when they work and what they cost."
+   ],
+   [
+    "完成虚拟实验 23-1 的四个任务，截图并写出你在每个任务中的关键设置和理由。",
+    "Complete the four tasks of virtual lab 23-1, with screenshots, stating your key settings and reasons for each."
+   ],
+   [
+    "（设计评审）为一款新的高速平缝机列出从立项到量产要考虑的标准（至少四类）和知识产权工作（三件事），说明每项在哪个阶段完成、由谁负责。",
+    "(Design review) For a new high-speed lockstitch machine, list the standards (at least four kinds) and intellectual-property work (three jobs) from approval to volume, stating at which stage each is done and by whom."
+   ]
+  ],
+  "deliverable": [
+   "报告一份（不超过 5 页）：第 1、2 题计算过程与结论；第 3 题四个任务截图与说明；第 4 题表格。",
+   "A report of at most 5 pages: working and conclusions for tasks 1 and 2; screenshots and notes for the four tasks of task 3; a table for task 4."
+  ],
+  "rubric": [
+   [
+    "第 1、2 题计算正确（40 分）",
+    "Correct calculations in tasks 1 and 2 (40 points)"
+   ],
+   [
+    "对调整法、换针和三种减振措施的分析有依据（25 分）",
+    "Well-founded analysis of adjustment, needle change and the three remedies (25 points)"
+   ],
+   [
+    "虚拟实验四个任务完成并说明理由（20 分）",
+    "All four lab tasks done with reasons (20 points)"
+   ],
+   [
+    "标准与知识产权清单完整、阶段合理（15 分）",
+    "Complete standards and IP list with sensible stages (15 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "设计评审时请工艺、质量和售后一起看图，主要要回答哪三个问题？",
+    "Why are manufacturing, quality and service people invited to design reviews — which three questions must they answer?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "能否经济地加工、能否方便准确地装配、坏了能否修",
+      "Can it be made economically, assembled easily and accurately, and repaired?"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "能否申请专利、能否通过型式检验、能否出口",
+      "Can it be patented, pass type tests and be exported?"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "转速多高、针距多大、噪声多少",
+      "How fast, what stitch length, how much noise?"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "用什么材料、什么热处理、什么涂层",
+      "Which material, which heat treatment, which coating?"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "这是可制造性、可装配性和可维修性；在图纸上改几乎不花钱，开模后或售出后再改就贵得多。",
+    "These are manufacturability, assemblability and serviceability; changes on paper cost almost nothing, after tooling or sale far more."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一条尺寸链有三个环，公差分别为 ±0.03、±0.03、±0.02 mm。按统计法（公差 = ±3σ），封闭环的变化范围约为 ± 多少毫米？",
+    "A chain has three links with tolerances ±0.03, ±0.03 and ±0.02 mm. By the statistical method (tolerance = ±3σ), what is the closing-link range, ± how many millimetres?"
+   ],
+   "answer": 0.047,
+   "tolerance": 0.002,
+   "unit": "mm",
+   "feedback": [
+    "σ = √((0.03/3)² + (0.03/3)² + (0.02/3)²) ≈ 0.0156 mm，±3σ ≈ ±0.047 mm；极值法为 ±0.08 mm。",
+    "σ = √((0.03/3)² + (0.03/3)² + (0.02/3)²) ≈ 0.0156 mm, ±3σ ≈ ±0.047 mm; worst case gives ±0.08 mm."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "用极值法算出梭尖间隙可能偏差 ±0.153 mm，远超允许的 ±0.03 mm，所以完全互换时大多数机器都不合格。",
+    "The worst-case method gives ±0.153 mm against an allowed ±0.03 mm, so with full interchangeability most machines would be out of tolerance."
+   ],
+   "correct": false,
+   "feedback": [
+    "极值法假设各环同时偏到最不利一端，概率微乎其微；按统计法 σg ≈ 0.019 mm，约 87% 合格，问题是剩下约 13% 仍太多。",
+    "Worst case assumes every link at its worst limit at once, which almost never happens; statistically σg ≈ 0.019 mm and about 87% are good — the remaining 13% is still too many."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "工业平缝机为什么用“装配时沿轴向移动旋梭调间隙”来保证梭尖间隙？",
+    "Why do industrial lockstitch machines secure the hook clearance by sliding the hook axially at assembly?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "一个可调环能吸收孔位、针夹孔、梭尖尺寸和机针等环的误差，其余零件可用经济精度加工",
+      "One adjustable link absorbs the bore, clamp-hole, point and needle errors, so other parts can be made economically"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "调整后换针也不会影响间隙",
+      "After adjustment, needle changes no longer affect the clearance"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "调整能消除针杆游隙和旋梭轴径向游隙",
+      "Adjustment removes needle-bar play and hook-shaft radial play"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "调整比提高零件精度更快，但总成本更高",
+      "Adjustment is quicker than tighter parts but costs more overall"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "调整后 σ 约 0.005 mm，被吸收的环还能放宽，总成本反而更低；游隙造成的晃动和换针带来的两环误差调整吸收不了。",
+    "After adjustment σ is about 0.005 mm and the absorbed links can be relaxed, lowering total cost; play-induced wobble and the two links a new needle brings cannot be absorbed."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "调整好梭尖间隙后，车间换了一根新针。下列哪些环的误差会重新影响间隙？",
+    "After the clearance has been adjusted, the floor fits a new needle. Which links affect the clearance again?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "机针凹口面尺寸",
+      "Needle scarf-face dimension"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "机针安装偏转",
+      "Needle twist as fitted"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "针杆套孔位置",
+      "Needle-bar bushing bore position"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "梭尖到安装基准的距离",
+      "Hook point to mounting datum"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "调整只对装上的那根针有效；孔位和梭尖尺寸是机器本身的，调一次就吸收了，换针不会改变它们。",
+    "Adjustment holds only for the needle fitted; bore positions and point dimension belong to the machine and stay absorbed after one adjustment."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "平缝机主轴 4800 r/min，针杆惯性力二阶分量的激振频率是多少赫兹？",
+    "At a spindle speed of 4800 r/min, what is the frequency of the second-order needle-bar excitation in hertz?"
+   ],
+   "answer": 160,
+   "tolerance": 0.5,
+   "unit": "Hz",
+   "feedback": [
+    "一阶频率 = 4800/60 = 80 Hz，二阶为两倍，160 Hz。",
+    "First order = 4800/60 = 80 Hz; second order is twice that, 160 Hz."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "单自由度系统频率比 r = 0.9、阻尼比 ζ = 0.05，放大倍数是多少？",
+    "A single-degree-of-freedom system has r = 0.9 and ζ = 0.05. What is the amplification?"
+   ],
+   "answer": 4.76,
+   "tolerance": 0.05,
+   "unit": "",
+   "feedback": [
+    "放大倍数 = 1/√((1 − 0.81)² + (2 × 0.05 × 0.9)²) = 1/√(0.0361 + 0.0081) ≈ 4.76，频率比越接近 1 放大越大。",
+    "Amplification = 1/√((1 − 0.81)² + (2 × 0.05 × 0.9)²) = 1/√(0.0361 + 0.0081) ≈ 4.76; the closer r is to 1, the larger it gets."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "按“振动速度每加倍噪声增加 6 dB”估算，机臂振动速度变为原来的 3 倍时，噪声约增加多少分贝？",
+    "Using 'noise rises 6 dB for each doubling of vibration velocity', how many decibels does noise rise when vibration velocity triples?"
+   ],
+   "answer": 9.5,
+   "tolerance": 0.2,
+   "unit": "dB",
+   "feedback": [
+    "ΔL = 20 lg 3 ≈ 9.5 dB。教材算例从 4.0 到 13.3 mm/s，83.5 dB(A) 升到约 94 dB(A)。",
+    "ΔL = 20 lg 3 ≈ 9.5 dB. In the text 4.0 → 13.3 mm/s raises 83.5 dB(A) to about 94 dB(A)."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "提速后机臂共振，阻尼比从 0.03 加到 0.06，5500 r/min 振动只从约 13.3 降到约 9.0 mm/s。原因是什么？",
+    "After the speed-up the arm resonates; doubling ζ from 0.03 to 0.06 only lowers vibration at 5500 r/min from about 13.3 to 9.0 mm/s. Why?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "阻尼只在共振附近起作用，r = 0.96 时放大倍数仍很大，要加到很大才够",
+      "Damping acts only near resonance; at r = 0.96 amplification remains large, and much more damping is needed"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "阻尼会降低固有频率，使 r 更接近 1",
+      "Damping lowers the natural frequency and brings r closer to 1"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "阻尼只能减小一阶分量，二阶不受影响",
+      "Damping reduces only the first order, not the second"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "阻尼材料增加了往复质量",
+      "The damping material adds reciprocating mass"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "阻尼比 0.10 时才降到约 6.1 mm/s；把固有频率移到约 217 Hz（r = 0.85）一下就降到 3.4 mm/s。",
+    "Only at ζ = 0.10 does it reach about 6.1 mm/s; moving the natural frequency to about 217 Hz (r = 0.85) drops it to 3.4 mm/s at once."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "声压级和声功率级有什么区别？",
+    "What is the difference between sound pressure level and sound power level?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "声压级在操作工耳朵处测，反映工人听到的；声功率级是机器辐射的声能，与位置和房间无关，用于比较机器",
+      "Sound pressure is measured at the operator's ear and reflects what they hear; sound power is the energy the machine radiates, independent of position and room, for comparing machines"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "两者是同一个量，只是单位不同",
+      "They are the same quantity in different units"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "声功率级在操作工位置测，声压级在 1 m 外测",
+      "Sound power is measured at the operator, sound pressure at 1 m"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "声压级用于比较不同的机器，声功率级只用于工位评价",
+      "Sound pressure compares machines, sound power only assesses workstations"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "说明书数据：5000 sti/min 时工位声压级 83.5 dB(A)，声功率级 88.0 dB（ISO 10821、ISO 11204）。",
+    "Manual data: at 5000 sti/min, 83.5 dB(A) at the workstation and 88.0 dB sound power (ISO 10821, ISO 11204)."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "梭尖间隙名义 0.07 mm、允许 ±0.03 mm，间隙按正态分布、均值居中，标准差 0.012 mm。合格率约为百分之多少？",
+    "The hook clearance is nominal 0.07 mm, allowed ±0.03 mm, normal and centred with σ = 0.012 mm. What percentage is in tolerance?"
+   ],
+   "answer": 98.76,
+   "tolerance": 0.1,
+   "unit": "%",
+   "feedback": [
+    "±0.03/0.012 = ±2.5σ，合格率 = 2Φ(2.5) − 1 ≈ 98.76%。",
+    "±0.03/0.012 = ±2.5σ, yield = 2Φ(2.5) − 1 ≈ 98.76%."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "机臂一阶弯曲固有频率 210 Hz。主轴转速为多少 r/min 时，二阶激振频率正好等于固有频率？",
+    "The arm's first bending frequency is 210 Hz. At what spindle speed in r/min does the second-order excitation equal it?"
+   ],
+   "answer": 6300,
+   "tolerance": 10,
+   "unit": "r/min",
+   "feedback": [
+    "二阶频率 2n/60 = 210 → n = 210 × 30 = 6300 r/min。",
+    "Second order 2n/60 = 210 → n = 210 × 30 = 6300 r/min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "机臂固有频率 180 Hz、阻尼比 0.03，主轴 5200 r/min。二阶激振的放大倍数约为多少？",
+    "The arm has a natural frequency of 180 Hz and ζ = 0.03; the spindle runs at 5200 r/min. What is the second-order amplification?"
+   ],
+   "answer": 10.8,
+   "tolerance": 0.2,
+   "unit": "",
+   "feedback": [
+    "f = 2 × 5200/60 ≈ 173.3 Hz，r ≈ 0.963；放大 = 1/√((1 − 0.927)² + (2 × 0.03 × 0.963)²) ≈ 10.8。",
+    "f = 2 × 5200/60 ≈ 173.3 Hz, r ≈ 0.963; amplification = 1/√((1 − 0.927)² + (2 × 0.03 × 0.963)²) ≈ 10.8."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于新机型的标准与知识产权工作，下列哪些说法正确？",
+    "Which statements about standards and IP work for a new model are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "立项时就把目标市场要求的标准列成设计输入",
+      "List the target market's standards as design input at project start"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "专利检索要按产品销往的国家和地区做，并包括已公开未授权的申请",
+      "Search patents by the countries of sale, including published pending applications"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "在我国，缝纫机的结构改进常用实用新型专利保护",
+      "In China structural improvements to sewing machines are often protected by utility models"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "专利全球通用，在一个国家检索即可",
+      "Patents apply worldwide, so one country's search suffices"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "标准只需在样机完成后送检时再考虑",
+      "Standards need only be considered when sending the prototype for testing"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "专利有地域性；把标准当成事后送检会导致返工，越晚发现越贵。",
+    "Patents are territorial; treating standards as an afterthought causes rework, and the later the dearer."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "把机臂加筋使模态刚度提高 30%，固有频率约升到 217 Hz，5500 r/min 时振动可降到原 5000 r/min 的水平，但二阶共振转速也随之移到约 6500 r/min，将来再提速时还会碰上。",
+    "Ribs raising modal stiffness 30% lift the natural frequency to about 217 Hz and bring vibration at 5500 r/min back to the old 5000 r/min level, but the second-order resonance moves to about 6500 r/min, to be met again in a future speed-up."
+   ],
+   "correct": true,
+   "feedback": [
+    "fn = 190√1.3 ≈ 217 Hz；共振转速 = 217 × 30 ≈ 6500 r/min；振动约 3.4 mm/s、噪声约 82 dB(A)。",
+    "fn = 190√1.3 ≈ 217 Hz; resonance speed = 217 × 30 ≈ 6500 r/min; vibration about 3.4 mm/s, noise about 82 dB(A)."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "尺寸链的极值法与统计法、装配调整法的原理与换针的影响；单自由度放大倍数与提速共振的诊断和改进。",
+   "Worst-case and statistical chain analysis, the principle of adjustment and the effect of a needle change; single-degree-of-freedom amplification and diagnosing and fixing speed-up resonance."
+  ],
+  "difficult": [
+   "学生容易把“极值法超差”当成“大多数不合格”，也容易以为加阻尼是万能的；要用蒙特卡罗分布图和扫描曲线让他们看到数量级。",
+   "Students tend to read 'worst case out of tolerance' as 'most machines bad' and to see damping as a cure-all; show the Monte Carlo histograms and sweep curves to make the magnitudes visible."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：车间里“叫”的平缝机",
+     "Opening: the screaming machines"
+    ],
+    "minutes": 10,
+    "content": [
+     "给出提速后振动和噪声数据，请学生猜原因。",
+     "Present the vibration and noise data after the speed-up and let students guess the cause."
+    ]
+   },
+   {
+    "phase": [
+     "从图纸到量产；关键零件工艺",
+     "Drawing to production; key-part processes"
+    ],
+    "minutes": 15,
+    "content": [
+     "讲流程、评审三问和零件分类。",
+     "Cover the flow, the three review questions and the part classes."
+    ]
+   },
+   {
+    "phase": [
+     "尺寸链与装配调整",
+     "Dimensional chains and adjustment"
+    ],
+    "minutes": 35,
+    "content": [
+     "板书八个环；极值法、统计法、99% 的代价；调整法与换针。",
+     "Draw the eight links; worst case, statistics, the price of 99%; adjustment and needle changes."
+    ]
+   },
+   {
+    "phase": [
+     "装配调试、振动噪声与可靠性",
+     "Assembly, vibration, noise and reliability"
+    ],
+    "minutes": 15,
+    "content": [
+     "出厂检验与跑合；频谱、声压与声功率、模态与韦布尔。",
+     "Final inspection and running-in; spectra, sound pressure vs power, modes and Weibull."
+    ]
+   },
+   {
+    "phase": [
+     "案例：提速共振",
+     "Case: speed-up resonance"
+    ],
+    "minutes": 20,
+    "content": [
+     "推导放大倍数，算 5000 与 5500 r/min；比较三类改进，解答导入问题。",
+     "Derive the amplification, compute 5000 and 5500 r/min, compare the three remedies and answer the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 23-1",
+     "Virtual lab 23-1"
+    ],
+    "minutes": 30,
+    "content": [
+     "学生完成四个任务并填记录表。",
+     "Students complete the four tasks and the record table."
+    ]
+   },
+   {
+    "phase": [
+     "标准、知识产权与小结",
+     "Standards, IP and summary"
+    ],
+    "minutes": 10,
+    "content": [
+     "讲标准类别和专利三件事；小结并布置作业。",
+     "Cover the kinds of standards and the three patent jobs; summarise and set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“间隙尺寸链与提速共振分析”；预习第 24 章机针与旋梭的制造。",
+   "Complete the assignment on the clearance chain and speed-up resonance; read ahead Chapter 24 on needle and hook manufacture."
+  ]
+ }
+}

@@ -1,0 +1,27 @@
+# 实验 1.6 的指导书与报告模板。目的、场景、参数、任务取自 lab1_6.js。
+原理:
+  - ["小摆角时单摆的周期 T = 2π√(L/g)（式 (1.1.1)），平方后 T² = (4π²/g)L（式 (1.6.1)），T² 与 L 成正比，斜率为 4π²/g。若量得的摆长比真实摆长少了 r（只量到摆球顶端），则 T² = (4π²/g)(L + r)，直线有截距 4π²r/g，斜率不变。",
+     "For small amplitude T = 2π√(L/g) (Eq. (1.1.1)); squaring gives T² = (4π²/g)L (Eq. (1.6.1)), proportional to L with slope 4π²/g. If the measured length is short by r (measured to the top of the bob), T² = (4π²/g)(L + r): the line gains an intercept 4π²r/g and the slope is unchanged."]
+  - 式: "b = Σ(xᵢ − x̄)(yᵢ − ȳ)/Σ(xᵢ − x̄)²，u(b) = s/√Σ(xᵢ − x̄)²        (1.6.3)–(1.6.5)"
+  - ["用秒表测 20 个周期而不是 1 个：人的反应误差（约 0.1 s）分摊到 20 个周期上，周期的误差只有约 0.005 s。g = 4π²/b，u(g)/g = u(b)/b（式 (1.5.8)）。",
+     "Timing 20 periods instead of one spreads the reaction error (about 0.1 s) over 20 periods, leaving about 0.005 s per period. g = 4π²/b and u(g)/g = u(b)/b (Eq. (1.5.8))."]
+步骤:
+  - ["选“标定加速度计用的 g”，摆角 5°。摆长取 0.20、0.35、0.50、0.65、0.80、0.95 m，每个摆长点一次“放开摆球并计时”，把 t₂₀ 记入表 1（任务 1）。", "Choose the robot scene, amplitude 5°. For lengths 0.20, 0.35, 0.50, 0.65, 0.80, 0.95 m press “Release and time” once each and enter t₂₀ in Table 1 (task 1)."]
+  - ["算出 T 和 T²，作 T²–L 图，用最小二乘法求斜率 b、截距 a 和 u(b)，求 g 和 U(g)，把“你算出的 g”调到你的结果（任务 2）。由 a/b 估计摆球半径。", "Compute T and T², plot T² against L, fit b, a and u(b), find g and U(g); set “Your g” to your result (task 2). Estimate the bob radius from a/b."]
+  - ["摆长 0.80 m，摆角分别取 5°、30°、55°，各测一次，比较周期（任务 3），与图 1.1.1 比较。", "At 0.80 m, measure at 5°, 30° and 55° and compare the periods (task 3) with Figure 1.1.1."]
+  - ["切换到“秋千”，测 20 次摆动的时间，算出周期，与 2π√(L/g) 比较（任务 4）。", "Switch to “A swing”, time 20 swings, find the period and compare with 2π√(L/g) (task 4)."]
+数据表:
+  - 标题: ["表 1  摆长与周期（摆角 5°）", "Table 1  Length and period (amplitude 5°)"]
+    表头: ["L / m", "t₂₀ / s", "T / s", "T² / s²", "拟合值 / s²", "残差 / s²"]
+    表头英文: ["L / m", "t₂₀ / s", "T / s", "T² / s²", "Fitted / s²", "Residual / s²"]
+    行: [["0.20", "", "", "", "", ""], ["0.35", "", "", "", "", ""], ["0.50", "", "", "", "", ""], ["0.65", "", "", "", "", ""], ["0.80", "", "", "", "", ""], ["0.95", "", "", "", "", ""]]
+  - 标题: ["表 2  摆角的影响（L = 0.80 m）", "Table 2  Effect of amplitude (L = 0.80 m)"]
+    表头: ["θ₀ / (°)", "t₂₀ / s", "T / s", "比 5° 时长 / %"]
+    表头英文: ["θ₀ / (°)", "t₂₀ / s", "T / s", "Longer than at 5° / %"]
+    行: [["5", "", "", "0"], ["30", "", "", ""], ["55", "", "", ""]]
+注意:
+  - ["秒表计时含有随机的反应误差，同一摆长重复测会得到略有不同的结果；可以每个摆长测两三次取平均。", "The stopwatch includes a random reaction error; repeating a length gives slightly different times, so you may average two or three runs."]
+  - ["任务 2 按你自己记录的小摆角数据判定：程序用同一组数据做最小二乘拟合，你的 g 与它相差 0.5% 以内即可，不要求等于某个“标准答案”。", "Task 2 is judged on your own small-amplitude data: the program fits the same data, and your g must be within 0.5% of that fit; there is no fixed “right answer”."]
+  - ["画面先按真实速度摆一个半周期，其余快进；读数是 20 个周期的总时间。大摆角（> 10°）的数据在图上用红点表示，不要用于求 g。", "The picture swings in real time for one and a half periods and then fast-forwards; the reading is the total for 20 periods. Large-amplitude (> 10°) data are shown in red and should not be used for g."]
+思考题:
+  - ["如果用 T 对 L 的单次测量直接代公式求 g，摆球半径带来的系统误差有多大？用斜率为什么能避开它？", "If you put a single T and L straight into the formula, how large is the error caused by the bob radius? Why does the slope avoid it?"]

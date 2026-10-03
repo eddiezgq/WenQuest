@@ -1,0 +1,38 @@
+# 实验 14.2 的指导书与报告模板。目的、场景、参数、任务取自 lab14_2.js。
+原理:
+  - ["平面 2R 臂末端到基座的距离 r 只由 θ₂ 决定。由余弦定理得 cos θ₂；θ₂ 有正负两个值，对应肘下、肘上两种构型。",
+     "For a planar 2R arm the tip-to-base distance r depends only on θ₂. The law of cosines gives cos θ₂; its two signs are the elbow-down and elbow-up configurations."]
+  - 式: "cos θ₂ = (x² + y² − l₁² − l₂²) / (2 l₁ l₂)          (14.2.2)"
+  - 式: "θ₁ = atan2(y, x) − atan2(l₂ sin θ₂, l₁ + l₂ cos θ₂)          (14.2.4)"
+  - ["边界附近不要直接取反余弦：1 − cos θ₂ 与 1 + cos θ₂ 用因式分解直接算出（式 (14.2.6)），再用 atan2 求 θ₂。",
+     "Near the edges do not take arccos directly: compute 1 − cos θ₂ and 1 + cos θ₂ in factored form (Eq. (14.2.6)) and use atan2."]
+  - ["平面 3R 臂给定工具朝向 φ 时，先求腕点 W = (x − l₃ cos φ, y − l₃ sin φ)，对 W 解 2R，最后 θ₃ = φ − θ₁ − θ₂。",
+     "For a 3R arm with tool angle φ, first find the wrist W = (x − l₃ cos φ, y − l₃ sin φ), solve the 2R for W, then θ₃ = φ − θ₁ − θ₂."]
+步骤:
+  - ["打开实验 14.2 的“平面 2R/3R 臂”场景，连杆数取 0（2R）。把目标设为 (0.45, 0.35) m，读出两组解，记入表 1，并用式 (14.2.2)、(14.2.4) 手算核对（任务 1）。",
+     "Open Lab 14.2, scene “Planar 2R/3R arm”, links = 0 (2R). Set the target to (0.45, 0.35) m, record both solutions in Table 1 and check them by hand with Eqs. (14.2.2) and (14.2.4) (task 1)."]
+  - ["把“构型”改为 1，观察选中的手臂换到肘上（任务 2）。说明两组解的肘点与基座—目标连线的关系。",
+     "Set “branch” to 1: the chosen arm becomes elbow-up (task 2). Describe how the two elbow points relate to the base–target line."]
+  - ["沿 OA 方向把目标逐步外移，每步记录离基座的距离和两组 θ₂，直到两组解的 |θ₂| 都小于 12°（任务 3），记入表 2。",
+     "Move the target outward along OA step by step, recording the distance and both θ₂, until both |θ₂| are under 12° (task 3); fill in Table 2."]
+  - ["连杆数改为 1（3R），目标 (0.6, 0.05) m，φ = −90°（任务 4）。读出腕点 W 和两组解，记入表 1。",
+     "Set links = 1 (3R), target (0.6, 0.05) m, φ = −90° (task 4). Record the wrist point W and both solutions in Table 1."]
+  - ["切换到“台灯照到书上”，把灯罩移到 (0.35, 0.25) m，选择灯臂向上拱起的一组（任务 5）。",
+     "Switch to “A desk lamp over a book”, move the shade to (0.35, 0.25) m and choose the arms arching up (task 5)."]
+数据表:
+  - 标题: ["表 1  逆解", "Table 1  Inverse kinematics solutions"]
+    表头: ["情形", "目标 / m", "解 1 / (°)", "解 2 / (°)", "手算核对"]
+    表头英文: ["Case", "Target / m", "Solution 1 / (°)", "Solution 2 / (°)", "Hand check"]
+    行: [["2R，算例 14.2.1", "(0.45, 0.35)", "", "", ""], ["3R，算例 14.2.2", "(0.6, 0.05)，φ = −90°", "", "", ""], ["台灯", "(0.35, 0.25)", "", "", ""]]
+    行英文: [["2R, Example 14.2.1", "(0.45, 0.35)", "", "", ""], ["3R, Example 14.2.2", "(0.6, 0.05), φ = −90°", "", "", ""], ["Desk lamp", "(0.35, 0.25)", "", "", ""]]
+  - 标题: ["表 2  目标外移时的两组解", "Table 2  The two solutions as the target moves out"]
+    表头: ["目标 / m", "r / m", "解 1 的 θ₂ / (°)", "解 2 的 θ₂ / (°)", "两组 θ₁ 之差 / (°)"]
+    表头英文: ["Target / m", "r / m", "θ₂ of solution 1 / (°)", "θ₂ of solution 2 / (°)", "Difference of θ₁ / (°)"]
+    行: [["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["关节角按逆时针为正，单位为度；关节轴垂直于屏幕向外。", "Joint angles are counter-clockwise positive, in degrees; joint axes point out of the screen."]
+  - ["“构型”只在有两组解时起作用；只有一组解时两者相同。", "“Branch” matters only when there are two solutions; with one solution both are the same."]
+  - ["3R 场景中腕点 W 用黑点标出；腕点在 2R 的圆环之外时无解。", "In the 3R case the wrist W is the black dot; if it lies outside the 2R ring there is no solution."]
+思考题:
+  - ["由式 (14.2.7) 估计：θ₂ = 1° 时目标沿径向移动 1 mm，θ₂ 变化多少？这对靠近边界的工位意味着什么？",
+     "From Eq. (14.2.7): at θ₂ = 1°, how much does θ₂ change when the target moves 1 mm radially? What does this mean for work positions near the edge?"]

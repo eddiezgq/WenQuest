@@ -1,0 +1,35 @@
+# 实验 14.5 的指导书与报告模板。目的、场景、参数、任务取自 lab14_5.js。
+原理:
+  - ["UR5e 的逆解分三步，每步两个分支：θ₁（肩 A、B），θ₅ 与 θ₆（腕不翻、翻），θ₃ 与 θ₂、θ₄（肘上、下），至多 8 组解（定理 14.5.1）。",
+     "The UR5e inverse kinematics has three steps with two branches each: θ₁ (shoulder A, B), θ₅ and θ₆ (wrist no flip, flip), θ₃ with θ₂, θ₄ (elbow up, down): at most eight solutions (Theorem 14.5.1)."]
+  - 式: "x sin θ₁ − y cos θ₁ = d₄，(x, y) 为手腕点 p_w = p − W₄ y_b          (14.5.3)"
+  - 式: "cos θ₅ = (R₁ ω̂₂)ᵀ (R_d ŷ)          (14.5.7)"
+  - 式: "‖e^[S3]θ3 q₄ − q₂‖ = ‖g q₄ − q₂‖          (14.5.9)"
+  - ["选解的原则：离当前关节角最近；在连续运动中保持同一支（三个标签不变）；不超限位、不碰撞。两支解只在奇异位形处相遇。",
+     "Choosing: nearest to the current joint angles; keep one branch (the same three labels) during a continuous motion; respect limits and avoid collisions. Branches meet only at singular configurations."]
+步骤:
+  - ["打开实验 14.5，默认目标即算例 14.5.1。把“解的编号”从 1 调到 8，记录每组的标签、六个关节角和模型核对误差，填入表 1，与表 14.5.1 比较（任务 1）。",
+     "Open Lab 14.5; the default target is Example 14.5.1. Step “solution” from 1 to 8, recording labels, joint angles and the model-check error in Table 1; compare with Table 14.5.1 (task 1)."]
+  - ["选一组肘下的解（任务 2），说明肘点相对肩—腕连线的位置。",
+     "Pick an elbow-down solution (task 2) and describe where the elbow lies relative to the shoulder–wrist line."]
+  - ["选第 1 组（任务 3），与第 3 组比较 θ₅、θ₆，并说明为什么 θ₂、θ₃、θ₄ 也变了。",
+     "Pick solution 1 (task 3), compare θ₅ and θ₆ with solution 3, and explain why θ₂, θ₃, θ₄ changed as well."]
+  - ["保持姿态不变，逐步把法兰中心移向基座轴线，记录肩 A、肩 B 的 θ₁ 之差（任务 4），填入表 2。",
+     "Keeping the orientation, move the flange toward the base axis step by step, recording the θ₁ difference between shoulders A and B (task 4) in Table 2."]
+  - ["切换到“按墙上的开关”，找出碰台面或穿墙的解（标红），再选一组肩 B 的可用解（任务 5）。",
+     "Switch to “Pressing a wall switch”, find the solutions that hit the table or wall (red), then pick a usable shoulder-B one (task 5)."]
+数据表:
+  - 标题: ["表 1  算例 14.5.1 的 8 组解", "Table 1  The eight solutions of Example 14.5.1"]
+    表头: ["编号", "肩 · 肘 · 腕", "θ₁, θ₂, θ₃ / (°)", "θ₄, θ₅, θ₆ / (°)", "模型核对误差 / m"]
+    表头英文: ["No.", "Shoulder · elbow · wrist", "θ₁, θ₂, θ₃ / (°)", "θ₄, θ₅, θ₆ / (°)", "Model check / m"]
+    行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""], ["5", "", "", "", ""], ["6", "", "", "", ""], ["7", "", "", "", ""], ["8", "", "", "", ""]]
+  - 标题: ["表 2  接近肩部奇异", "Table 2  Approaching the shoulder singularity"]
+    表头: ["法兰中心 (x, y) / m", "手腕点离基座轴线 ρ / m", "肩 A、B 的 θ₁ 之差 / (°)", "2 arccos(d₄/ρ) / (°)"]
+    表头英文: ["Flange (x, y) / m", "Wrist distance from base axis ρ / m", "θ₁ difference A − B / (°)", "2 arccos(d₄/ρ) / (°)"]
+    行: [["(−0.4976, −0.4420)", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["(−0.1047, −0.0930)", "", "", ""]]
+注意:
+  - ["八台 UR5e 只是为了同时观看而排开，每一台的基座坐标系 {s} 相同，红点是各自基座坐标系中的同一个目标。", "The eight UR5e are spread out only for viewing; each has the same base frame {s}, and the red dot is the same target in each."]
+  - ["“模型核对”用零件库模型（三维引擎）计算法兰中心，与逆解所用的指数积公式互相独立。", "The model check computes the flange with the library model (the 3D engine), independent of the product of exponentials used by the solver."]
+  - ["姿态用 ZYX 欧拉角给出；默认值 (75°, 0°, −90°) 就是算例 14.5.1 的目标姿态。", "The orientation uses ZYX Euler angles; the default (75°, 0°, −90°) is the target orientation of Example 14.5.1."]
+思考题:
+  - ["机器人当前处在第 3 组解，要换到第 4 组（只差肘上、肘下），必须经过什么样的形态？", "The robot is in solution 3; to move to solution 4 (elbow up versus down) which posture must it pass through?"]

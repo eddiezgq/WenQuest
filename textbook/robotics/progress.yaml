@@ -11,27 +11,29 @@ parts_en:
   第六篇 编程与 AI 篇: "Part VI  Programming and AI"
 chapters:
   1:
-    status: ai
+    status: first
   2:
-    status: ai
+    status: first
   3:
-    status: ai
+    status: first
   5:
-    status: ai
+    status: first
   6:
-    status: ai
+    status: first
   7:
-    status: ai
+    status: first
   8:
-    status: ai
+    status: first
   9:
-    status: ai
+    status: first
   10:
-    status: ai
+    status: first
   11:
-    status: ai
+    status: first
+  14:
+    status: first
   13:
-    status: ai
+    status: first
   4:
     status: first
     title_en: "Rotation of Rigid Bodies: From Euler to Quaternions"

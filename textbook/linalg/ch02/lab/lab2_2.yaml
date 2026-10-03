@@ -1,0 +1,27 @@
+# 实验 2.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab2_2.js。
+原理:
+  - ["两连杆臂的上臂向量 r₁ = l₁(cos θ₁, sin θ₁)ᵀ，前臂向量 r₂ = l₂(cos(θ₁ + θ₂), sin(θ₁ + θ₂))ᵀ。从肩关节出发先走 r₁ 再走 r₂，到达腕心，p = r₁ + r₂（式 (2.2.1)）。向量加法满足交换律，先走 r₂ 再走 r₁ 也到达同一点，两条路径围成平行四边形。",
+     "The upper-arm vector is r₁ = l₁(cos θ₁, sin θ₁)ᵀ and the forearm vector r₂ = l₂(cos(θ₁ + θ₂), sin(θ₁ + θ₂))ᵀ. Walking r₁ then r₂ from the shoulder reaches the wrist: p = r₁ + r₂ (Eq. (2.2.1)). Addition is commutative, so r₂ then r₁ ends at the same point; the two paths bound a parallelogram."]
+  - 式: "p = r₁ + r₂，  | l₁ − l₂ | ≤ ‖p‖ ≤ l₁ + l₂，  l₁ = 0.425 m，l₂ = 0.392 m          (2.2.1)、(2.3.7)"
+  - ["u、w 不平行时，平面上任何向量 b 都能唯一地写成 c₁u + c₂w，系数由式 (2.2.6) 给出。",
+     "If u and w are not parallel, every b in the plane is uniquely c₁u + c₂w, with coefficients from Eq. (2.2.6)."]
+步骤:
+  - ["在“两连杆臂”场景保持 θ₁ = 30°、θ₂ = 45°，读出 r₁、r₂、p 和 ‖p‖，与 2.2.1 节的结果比较，填入表 1。", "In the arm scene keep θ₁ = 30°, θ₂ = 45°; read r₁, r₂, p, ‖p‖ and compare with Section 2.2.1. Fill in Table 1."]
+  - ["θ₁ 保持 30°，让 θ₂ 依次取 0°、90°、135°、180°，记录 ‖p‖，完成任务 1、2。", "Keep θ₁ = 30° and set θ₂ = 0°, 90°, 135°, 180°; record ‖p‖; complete tasks 1 and 2."]
+  - ["保持 θ₂ 不变、改变 θ₁，‖p‖ 变不变？为什么？", "Change θ₁ with θ₂ fixed: does ‖p‖ change? Why?"]
+  - ["切换到“平行四边形”场景，任取一组关节角，确认两条路径的终点重合；再把平行四边形调成矩形（任务 3），比较 ‖p‖² 与 l₁² + l₂²（勾股定理）。", "In the parallelogram scene check both paths end at the same point; then make it a rectangle (task 3) and compare ‖p‖² with l₁² + l₂² (Pythagoras)."]
+  - ["切换到“线性组合”场景，先用式 (2.2.6) 手算凑出 b = (7, 11)ᵀ 的系数，再调节滑块验证（任务 4）；把结果填入表 2。", "In the combination scene compute the coefficients for b = (7, 11)ᵀ with Eq. (2.2.6), then check with the sliders (task 4); fill in Table 2."]
+数据表:
+  - 标题: ["表 1  两连杆臂的向量相加（θ₁ = 30°）", "Table 1  Adding the link vectors (θ₁ = 30°)"]
+    表头: ["θ₂", "r₁ / m", "r₂ / m", "p / m", "‖p‖ / m"]
+    表头英文: ["θ₂", "r₁ / m", "r₂ / m", "p / m", "‖p‖ / m"]
+    行: [["45°", "", "", "", ""], ["0°", "", "", "", ""], ["90°", "", "", "", ""], ["135°", "", "", "", ""], ["180°", "", "", "", ""]]
+  - 标题: ["表 2  线性组合", "Table 2  Linear combination"]
+    表头: ["目标 b", "手算 c₁", "手算 c₂", "实验 c₁", "实验 c₂"]
+    表头英文: ["Target b", "c₁ by hand", "c₂ by hand", "c₁ in the lab", "c₂ in the lab"]
+    行: [["(7, 11)", "", "", "", ""], ["(1, 8)", "", "", "", ""]]
+注意:
+  - ["θ₂ 是前臂相对于上臂的转角，前臂的方向角是 θ₁ + θ₂。", "θ₂ is measured from the upper arm; the forearm's direction angle is θ₁ + θ₂."]
+  - ["真实的 UR5e 关节有转角限制，并且手臂会与自身或底座碰撞；本实验只看几何关系。", "The real UR5e has joint limits and can collide with itself; this lab shows the geometry only."]
+思考题:
+  - ["腕心的同一个位置，一般对应几组 (θ₁, θ₂)？什么位置只对应一组？", "How many (θ₁, θ₂) usually give the same wrist position? Which positions give only one?"]

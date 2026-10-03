@@ -1,0 +1,1113 @@
+{
+ "no": 31,
+ "title": [
+  "人工智能与制衣业",
+  "Artificial Intelligence and Apparel Making"
+ ],
+ "hours": 3,
+ "goals": [
+  [
+   "能把制衣业的 AI 应用分成感知、预测、优化与生成、语言助手四类，并说出每类用什么数据、容易在哪里出错。",
+   "Classify AI applications in apparel making into perception, prediction, optimisation and generation, and language assistants, stating the data each uses and where each tends to go wrong."
+  ],
+  [
+   "能由召回率、误报率和次品率算出每 1000 件的报警数和精确率，解释基础比例的作用。",
+   "Calculate alarms per 1000 items and precision from recall, false-alarm rate and defect rate, and explain the effect of the base rate."
+  ],
+  [
+   "能用代价公式和等方差正态模型求出成本最低的报警阈值，并判断什么时候必须提高检测器的区分能力 d′。",
+   "Use the cost formula and the equal-variance normal model to find the cheapest alarm threshold, and judge when the detector's discriminating power d′ must be raised."
+  ],
+  [
+   "能用提前量、误报和漏报三个数评价预测性维护方案，说明滑动平均窗口与阈值的取舍。",
+   "Evaluate a predictive-maintenance scheme by lead time, false alarms and misses, and explain the trade-off between moving-average window and threshold."
+  ],
+  [
+   "能说明“AI 缝纫机”感知—识别—调参闭环用到哪些章节的知识，并在学生项目中核验 AI 助手的结论。",
+   "Explain which chapters' knowledge the sense–recognise–adjust loop of an 'AI sewing machine' uses, and verify an AI assistant's conclusions in the student project."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "“召回率 95%”的视觉质检值得信吗？",
+   "Can a vision inspector with '95% recall' be trusted?"
+  ],
+  "text": [
+   "一家衬衫厂准备在领子工段装视觉质检。供应商的报告说：召回率 95%，误报率 3%（对应检测器区分能力 d′ = 3.53、阈值 1.88）。工段的次品率是 2%；漏检一件流到下道或客户手里的代价约 20 元，误报一件人工复检的代价约 0.5 元。",
+   "A shirt factory plans to install vision inspection on its collar section. The vendor's report says: recall 95%, false-alarm rate 3% (a detector discriminating power d′ = 3.53 with threshold 1.88). The section's defect rate is 2%; a miss that reaches the next operation or the customer costs about 20 yuan, and a false alarm costs about 0.5 yuan of manual re-inspection."
+  ],
+  "question": [
+   "每 1000 件会报警多少件、其中真正是次品的占几成？阈值设在哪里每 1000 件成本最低、成本多少？如果要精确率 80%、召回率 90%，检测器要改进到什么程度？",
+   "How many alarms per 1000 items, and what fraction are real defects? Where should the threshold be set for the lowest cost per 1000 items, and what is that cost? To get 80% precision and 90% recall, how much must the detector improve?"
+  ],
+  "answer": [
+   "1000 件中 20 件次品抓住约 19 件，980 件合格品误报约 29 件，共报警约 48 件，精确率约 39%：十次报警六次是误报。按 C = 1000[π(1 − 召回率)C_m + (1 − π)误报率 C_f]，最省阈值 t* = d′/2 + ln[(1 − π)C_f/(πC_m)]/d′ ≈ 1.82，每 1000 件约 34 元。只调阈值做不到精确率 80% 且召回率 90%，必须把 d′ 从 3.53 提高到约 3.9。",
+   "Of 1000 items, about 19 of the 20 defects are caught and about 29 of the 980 good items raise false alarms — about 48 alarms, precision about 39%: six alarms in ten are false. With C = 1000[π(1 − recall)C_m + (1 − π)·false-alarm rate·C_f], the cheapest threshold t* = d′/2 + ln[(1 − π)C_f/(πC_m)]/d′ ≈ 1.82, costing about 34 yuan per 1000. No threshold gives 80% precision with 90% recall; d′ must rise from 3.53 to about 3.9."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人上的同一套取舍",
+   "The same trade-offs on robots"
+  ],
+  "text": [
+   "机器人料框抓取用视觉给每个候选抓取点打一个置信度，超过阈值才去抓：阈值低了抓空、抓错多，高了漏抓多，和质检的召回率与误报率是同一条 ROC 曲线，阈值同样应按“抓错一次”和“漏抓一次”的代价来定。协作机器人的关节减速器磨损时，同样负载下关节电机电流会慢慢升高，控制器对电流做滑动平均再与阈值比较，就是本讲的预测性维护，窗口和阈值的取舍完全相同。AI 缝纫机的感知—识别—调参闭环，对应机器人的力控打磨：力传感器感知接触力，识别工件材质和余量，再调整进给速度和压力，并设上下限防止过载。",
+   "In robotic bin picking, vision gives each candidate grasp a confidence score and the robot only grasps above a threshold: too low and it grabs wrong items, too high and it skips good ones — the same ROC curve as recall versus false alarms in inspection, and the threshold should likewise be set by the cost of a wrong grab versus a missed one. When a cobot's joint reducer wears, the joint motor current under the same load creeps up; the controller averages the current and compares it with a threshold — exactly this lecture's predictive maintenance, with the same window-versus-threshold trade-off. The AI sewing machine's sense–recognise–adjust loop corresponds to robotic force-controlled grinding: a force sensor senses contact, the material and stock are recognised, feed rate and pressure are adjusted, and upper and lower limits prevent overload."
+  ]
+ },
+ "life": {
+  "title": [
+   "老是误报的烟雾报警器",
+   "The smoke alarm that cries wolf"
+  ],
+  "text": [
+   "厨房里的烟雾报警器一炒菜就响，响了十次都不是火灾，家里人就会把它拆了电池，真着火时反而不响。报警的精确率太低，人就不再相信报警，这正是车间质检要按代价定阈值的原因。",
+   "A kitchen smoke alarm that sounds every time someone fries food — ten alarms, no fire — ends up with its battery removed, so it is silent when there really is a fire. When the precision of an alarm is too low people stop trusting it; that is why shop-floor inspection thresholds must be set by cost."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "AI 在制衣业做什么：四类应用",
+    "What AI does in apparel: four types"
+   ],
+   "points": [
+    [
+     "感知：视觉质检、识别面料、追踪布边——怕“没见过”",
+     "Perception: vision inspection, fabric recognition, edge tracking — fears 'never seen it'"
+    ],
+    [
+     "预测：销量、延期、设备故障——怕“世道变了”",
+     "Prediction: sales, late orders, machine failures — fears 'the world has changed'"
+    ],
+    [
+     "优化与生成：排料、排产、设计图——怕“目标写错”；语言助手——怕“说得通顺”",
+     "Optimisation and generation: markers, scheduling, designs — fears 'wrong objective'; language assistants — fear 'sounding fluent'"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_24_map.png",
+   "narration": [
+    "报道里的 AI 无所不能，车间里的 AI 却常常让人失望。要看清它，就像对待任何工程技术一样问三个问题：它吃什么数据，怎样评价，会在哪里出错。按“做什么”分，制衣业的 AI 有四类：感知，从图像和信号里认东西；预测，从历史推将来；优化与生成，在一堆方案里找好的或者造新的；语言助手，读单据、答问题。每类各有怕的：感知怕没见过，预测怕世道变了，优化怕目标写错，语言助手怕说得通顺却不对。",
+    "In the press AI can do anything; on the floor it often disappoints. To see it clearly, treat it like any engineering technology and ask three questions: what data does it feed on, how is it judged, and where does it go wrong. Sorted by what they do, apparel AI applications fall into four types: perception, recognising things in images and signals; prediction, inferring the future from history; optimisation and generation, finding good solutions or making new ones; and language assistants, reading documents and answering questions. Each has its weakness: perception fears the unseen, prediction fears change, optimisation fears a wrong objective, and assistants fear sounding fluent but being wrong."
+   ]
+  },
+  {
+   "title": [
+    "设计、打版与虚拟样衣",
+    "Design, pattern making and virtual samples"
+   ],
+   "points": [
+    [
+     "生成式模型出款式效果图；三维虚拟样衣模拟悬垂和褶皱，少做实物样",
+     "Generative models render styles; 3D virtual samples simulate drape and wrinkles, cutting physical samples"
+    ],
+    [
+     "弯曲刚度是布料模拟的参数之一：参数不准，屏幕上的衣服就偏硬或偏软",
+     "Bending rigidity is one simulation parameter: get it wrong and the on-screen garment is too stiff or too soft"
+    ],
+    [
+     "两条边界：虚拟样衣代替不了试穿；生成设计涉及版权，设计师对最终作品负责",
+     "Two limits: a virtual sample cannot replace a fitting; generated designs raise copyright questions and the designer is responsible"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "在设计端，生成式模型可以根据文字或草图出效果图，让设计师快速试配色和细节；三维虚拟样衣软件把纸样“缝”在虚拟人台上，模拟悬垂和褶皱。第 30 章的弯曲刚度正是这类软件要用的参数，参数不准，屏幕上的衣服就比真衣服硬或软。打版端，定制西服厂靠成熟的规则和放码算法自动生成版型，AI 可以从历史订单里学特殊体型的修正。但边界要清楚：虚拟样衣代替不了试穿；生成的设计涉及版权，设计师要为最终作品负责。",
+    "On the design side, generative models produce renderings from text or sketches so designers can try colourways and details quickly; 3D virtual-sampling software sews pattern pieces onto a virtual form and simulates drape and wrinkles. The bending rigidity of Chapter 30 is exactly a parameter such software needs; get it wrong and the on-screen garment is stiffer or softer than the real one. In pattern making, made-to-measure factories generate patterns with mature rules and grading algorithms, and AI can learn corrections for unusual figures from past orders. But be clear on the limits: a virtual sample cannot replace a fitting, and generated designs raise copyright issues; the designer remains responsible."
+   ]
+  },
+  {
+   "title": [
+    "排料与排产：谁做什么",
+    "Markers and scheduling: who does what"
+   ],
+   "points": [
+    [
+     "排料是组合优化，摆法无法穷举：AI 给好的初始摆法，利用率仍用几何计算核实",
+     "Marker making is combinatorial optimisation: AI suggests good starting layouts, but utilisation is still verified geometrically"
+    ],
+    [
+     "传统算法（动态规划分组、吊挂动态派活）结果可解释、约束严格满足",
+     "Traditional algorithms (DP grouping, hanger dispatching) are explainable and meet constraints strictly"
+    ],
+    [
+     "合理分工：AI 预测和建议，优化算法在约束下求解，人做最后决定",
+     "Sensible split: AI predicts and suggests, optimisation solves under constraints, a person decides"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "排料本质上是组合优化：几十片不规则衣片摆进一张布，空隙越少越好，摆法多得无法穷举，所以排料软件一直用启发式算法和搜索。AI 可以更快给出好的初始摆法，但利用率最后仍要用几何计算核实。排产派工也一样：第 28 章用动态规划求分组，第 12 章的吊挂按工位空闲派活，这些传统算法的长处是结果能解释，工序先后、机种、人数这些约束能严格满足。AI 更适合补充难写成公式的部分，比如预测新款工时和学习曲线。分工是：AI 预测和建议，算法求解，人来决定。",
+    "Marker making is combinatorial optimisation: fit dozens of irregular pieces onto fabric with as little waste as possible; the layouts are too many to enumerate, so marker software has always used heuristics and search. AI can propose good starting layouts faster, but utilisation must still be verified geometrically. Scheduling is the same: Chapter 28 groups operations by dynamic programming, Chapter 12's hangers dispatch to idle stations — traditional algorithms whose results can be explained and whose constraints on precedence, machine type and headcount are met strictly. AI is better at the parts hard to write as formulas, such as predicting a new style's work content and learning curve. The split: AI predicts and suggests, algorithms solve, people decide."
+   ]
+  },
+  {
+   "title": [
+    "视觉质检：混淆矩阵与三个比例",
+    "Vision inspection: the confusion matrix and three ratios"
+   ],
+   "points": [
+    [
+     "四格：抓对、误报、漏检、正确放行",
+     "Four cells: caught, false alarm, missed, correctly passed"
+    ],
+    [
+     "召回率 = 次品中被抓住的比例；误报率 = 合格品中被报警的比例",
+     "Recall = fraction of defects caught; false-alarm rate = fraction of good items flagged"
+    ],
+    [
+     "精确率 = 报警中真正是次品的比例",
+     "Precision = fraction of alarms that are real defects"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_24_qc.png",
+   "narration": [
+    "视觉质检是制衣业最常见的 AI 应用之一：相机拍下每一片衣片或每一段缝线，模型打一个“像次品”的得分，超过阈值就报警。评价它，要把结果分成四格：次品被报警是抓对了，合格品被报警是误报，次品被放行是漏检，合格品被放行是正常。由此定义三个比例：召回率，次品里被抓住的比例；误报率，合格品里被报警的比例；精确率，报警里真是次品的比例。请大家记住，前两个是检测器自己的性质，第三个还和车间的次品率有关。",
+    "Vision inspection is one of the most common AI applications in apparel: a camera photographs each piece or stretch of seam, the model scores how defective it looks, and above a threshold it raises an alarm. To judge it, sort outcomes into four cells: a defect flagged is a catch, a good item flagged a false alarm, a defect passed a miss, a good item passed is normal. Three ratios follow: recall, the fraction of defects caught; false-alarm rate, the fraction of good items flagged; and precision, the fraction of alarms that are real defects. Remember: the first two belong to the detector itself; the third also depends on the factory's defect rate."
+   ]
+  },
+  {
+   "title": [
+    "得分分布、阈值与 ROC 曲线",
+    "Score distributions, threshold and the ROC curve"
+   ],
+   "points": [
+    [
+     "合格品得分 ~ N(0, 1)，次品得分 ~ N(d′, 1)；d′ 越大越分得开",
+     "Good scores ~ N(0, 1), defect scores ~ N(d′, 1); larger d′ separates them better"
+    ],
+    [
+     "算例 d′ = 3.53、阈值 1.88：召回率 95%，误报率 3%",
+     "Example d′ = 3.53, threshold 1.88: recall 95%, false-alarm rate 3%"
+    ],
+    [
+     "阈值右移：误报少、漏检多；左移相反；连起所有阈值得 ROC 曲线",
+     "Move the threshold right: fewer false alarms, more misses; left, the reverse; all thresholds trace the ROC curve"
+    ]
+   ],
+   "formula": "\\text{召回率}=1-\\Phi(t-d'),\\qquad \\text{误报率}=1-\\Phi(t)",
+   "figure": "",
+   "narration": [
+    "为了算得清楚，我们用一个简单模型：合格品的得分服从均值 0、标准差 1 的正态分布，次品服从均值 d′ 的正态分布，d′ 就是检测器的区分能力，越大两堆分得越开。算例取 d′ 等于 3.53，阈值 1.88：次品的得分超过 1.88 的比例约 95%，这就是召回率；合格品超过 1.88 的约 3%，这就是误报率。阈值往右挪，误报少了，漏检多了；往左挪相反。把每个阈值的误报率和召回率画成点连起来，就是 ROC 曲线。d′ 不变，阈值只是在这条曲线上滑动。",
+    "To calculate clearly we use a simple model: good items' scores follow a normal distribution with mean 0 and standard deviation 1, defects' a normal distribution with mean d-prime. D-prime is the detector's discriminating power; the larger it is, the further apart the two heaps. The example takes d-prime 3.53 and threshold 1.88: about 95% of defect scores exceed 1.88 — that is recall; about 3% of good scores do — the false-alarm rate. Move the threshold right and false alarms drop but misses rise; move it left and the reverse. Plot false-alarm rate against recall for every threshold and you get the ROC curve. With d-prime fixed, the threshold only slides along that curve."
+   ]
+  },
+  {
+   "title": [
+    "基础比例：次品少时报警大多是误报",
+    "Base rate: when defects are rare, most alarms are false"
+   ],
+   "points": [
+    [
+     "次品率 2%：1000 件抓住 19 件，误报 29 件，共 48 件报警，精确率约 39%",
+     "Defect rate 2%: of 1000, 19 caught and 29 false alarms, 48 in all, precision about 39%"
+    ],
+    [
+     "同一检测器：次品率 10% 时约 78%，1% 时约 24%",
+     "Same detector: about 78% at 10% defects, about 24% at 1%"
+    ],
+    [
+     "不能只看“准确率”：次品率 2% 时永远说“合格”也有 98%",
+     "Don't trust 'accuracy': at 2% defects, always saying 'good' scores 98%"
+    ]
+   ],
+   "formula": "\\text{精确率}=\\frac{\\pi R}{\\pi R+(1-\\pi)F}",
+   "figure": "fig_24_base.png",
+   "narration": [
+    "召回率 95%、误报率 3%，听起来很好。放到次品率 2% 的车间里算一算：1000 件里 20 件次品，抓住 19 件；980 件合格品里 3% 被误报，就是 29 件。一共报警 48 件，真是次品的只有 19 件，精确率约 39%。同一个检测器，次品率 10% 时精确率约 78%，次品率 1% 时只有约 24%。检测器一点没变，变的是次品在全部产品里的比例，这就是基础比例。后果很实际：工人发现十次报警六次是假的，就不当回事了。所以别只看供应商的“准确率”。",
+    "Recall 95%, false-alarm rate 3% — sounds great. Put it in a section with a 2% defect rate and calculate: of 1000 items, 20 are defective and 19 caught; 3% of the 980 good items raise false alarms, 29 of them. That is 48 alarms, only 19 real, precision about 39%. The same detector gives about 78% at a 10% defect rate and only about 24% at 1%. The detector has not changed at all; what changed is the share of defects among all products — the base rate. The consequence is practical: when workers find six alarms in ten are false, they stop paying attention. So don't just look at the vendor's 'accuracy'."
+   ]
+  },
+  {
+   "title": [
+    "阈值怎样定：按代价",
+    "Setting the threshold: by cost"
+   ],
+   "points": [
+    [
+     "每 1000 件成本 = 漏检件数 × C_m + 误报件数 × C_f",
+     "Cost per 1000 = misses × C_m + false alarms × C_f"
+    ],
+    [
+     "C_m = 20 元、C_f = 0.5 元：次品率 2% 时最省阈值约 1.82，每 1000 件约 34 元",
+     "C_m = 20, C_f = 0.5 yuan: at 2% defects the cheapest threshold is about 1.82, about 34 yuan per 1000"
+    ],
+    [
+     "次品率 10% 时最省阈值降到约 1.34，1% 时升到约 2.02：次品越少或误报越贵，t* 越大",
+     "At 10% defects it falls to about 1.34, at 1% rises to about 2.02: fewer defects or dearer false alarms raise t*"
+    ]
+   ],
+   "formula": "C = 1000\\left[\\pi(1-R)C_m+(1-\\pi)F\\,C_f\\right],\\qquad t^*=\\frac{d'}{2}+\\frac{1}{d'}\\ln\\frac{(1-\\pi)C_f}{\\pi C_m}",
+   "figure": "",
+   "narration": [
+    "阈值应该由代价决定。漏检一件的代价记作 C_m，是流到下道或客户手里的返工、退货；误报一件的代价 C_f，是人工复检。每 1000 件的成本就是漏检件数乘 C_m 加误报件数乘 C_f。算例取 20 元和 0.5 元，次品率 2% 时最省的阈值约 1.82，每 1000 件约 34 元。次品率升到 10%，最省阈值降到约 1.34，宁可多报几件；降到 1%，升到约 2.02。在等方差正态模型下有个公式：t 星等于 d′ 的一半，加上对数项除以 d′。次品越少、误报越贵，阈值越往右。",
+    "The threshold should be set by cost. Call the cost of a miss C_m — rework or returns when it reaches the next operation or the customer — and the cost of a false alarm C_f — manual re-inspection. Cost per 1000 is misses times C_m plus false alarms times C_f. With 20 and 0.5 yuan, at a 2% defect rate the cheapest threshold is about 1.82, about 34 yuan per 1000. Raise the defect rate to 10% and the cheapest threshold drops to about 1.34 — better to flag a few more; at 1% it rises to about 2.02. Under the equal-variance normal model there is a formula: t-star equals half of d-prime plus a log term over d-prime. Fewer defects or dearer false alarms push the threshold right."
+   ]
+  },
+  {
+   "title": [
+    "提高 d′：数据与换款",
+    "Raising d′: data and style changes"
+   ],
+   "points": [
+    [
+     "次品率 2% 时只调阈值做不到精确率 80% 且召回率 90%",
+     "At 2% defects no threshold gives 80% precision with 90% recall"
+    ],
+    [
+     "要求误报率 ≤ 0.46%、召回率 90%：d′ 须从 3.53 提高到约 3.9",
+     "That needs false alarms ≤ 0.46% at 90% recall: d′ must rise from 3.53 to about 3.9"
+    ],
+    [
+     "换面料颜色、换款式、出现新缺陷都会让 d′ 下降：持续收集误报漏检样本、定期重训、换款先小批验证",
+     "New colours, styles or defect types lower d′: keep collecting false alarms and misses, retrain, validate on a small batch at each change"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "要让精确率和召回率同时都高，只调阈值行不行？算一下：次品率 2%，要召回率 90%、精确率 80%，误报率必须压到约 0.46%，对应的阈值约 2.61，再加上召回率 90% 的条件，d′ 要约 3.9。原来的 3.53 怎么挪阈值都做不到，只能提高检测器本身。而 d′ 不是一个固定数，它取决于训练数据：换了面料颜色、换了款式、出现了新缺陷，d′ 都可能下降。所以系统上线后要持续收集误报和漏检的样本，定期重训，换款先小批量验证。这和机器人要重新标定是同一个问题。",
+    "Can threshold tuning alone make precision and recall both high? Calculate: at a 2% defect rate, for 90% recall and 80% precision the false-alarm rate must fall to about 0.46%, a threshold of about 2.61, and with the 90% recall condition d-prime must be about 3.9. With the original 3.53, no threshold works; only a better detector will. And d-prime is not a fixed number: it depends on training data. A new fabric colour, a new style or a new defect type can all lower it. So once live, keep collecting false alarms and misses, retrain periodically, and validate on a small batch at every style change — the same problem as robots needing recalibration."
+   ]
+  },
+  {
+   "title": [
+    "预测性维护：提前量与误报的取舍",
+    "Predictive maintenance: lead time versus false alarms"
+   ],
+   "points": [
+    [
+     "算例：200 台、180 天，指标正常为 1、噪声 0.08；89 台退化，30 天后故障",
+     "Example: 200 machines, 180 days, indicator 1 when normal, noise 0.08; 89 degrade and fail 30 days later"
+    ],
+    [
+     "单日值、阈值 1.15：全部检出，平均提前约 22 天，但每台每月误报约 0.85 次（200 台约 170 次）",
+     "Daily value, threshold 1.15: all caught, about 22 days ahead, but 0.85 false alarms per machine-month (about 170 for 200 machines)"
+    ],
+    [
+     "3 天滑动平均、阈值 1.12：提前约 18.5 天，误报降到约 0.09 次；7 天窗口提前量反而略降",
+     "3-day moving average, threshold 1.12: about 18.5 days ahead, false alarms about 0.09; a 7-day window gives slightly less lead"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_24_pdm.png",
+   "narration": [
+    "第 26 章的联网缝纫机能把转速、停机原因、电机电流送到数据总线，结合第 18 章的寿命知识，就能做预测性维护：从数据趋势里提前发现正在退化的部件，比如旋梭磨损、轴承损坏让振动和电流慢慢升高。最简单是给指标设阈值，但信号有噪声。算例：只看当天值、阈值 1.15，所有退化的机器都在故障前报了警，平均提前约 22 天，可每台每月误报 0.85 次，200 台一个月 170 次；改 3 天滑动平均、阈值 1.12，提前 18.5 天，误报降到 0.09 次。评价要同时看提前量、误报和漏报。",
+    "Chapter 26's networked machines send speed, stoppage reasons and motor current to the data bus; add the service-life knowledge of Chapter 18 and you have predictive maintenance: spotting degrading parts from data trends — hook wear or a failing bearing slowly raising vibration and current. The simplest method is a threshold on the indicator, but the signal is noisy. In the example, using each day's value with threshold 1.15 catches every degrading machine before failure, about 22 days ahead on average, but with 0.85 false alarms per machine per month — 170 a month for 200 machines. A 3-day moving average with threshold 1.12 gives 18.5 days' lead and 0.09 false alarms. Always judge lead time, false alarms and misses together."
+   ]
+  },
+  {
+   "title": [
+    "AI 缝纫机：感知—识别—调参闭环",
+    "The AI sewing machine: sense, recognise, adjust"
+   ],
+   "points": [
+    [
+     "感知：压脚高度反映厚度，主轴电流反映穿刺阻力，送布电机负载反映送布阻力",
+     "Sense: presser-foot height gives thickness, main-shaft current gives penetration resistance, feed-motor load gives feeding resistance"
+    ],
+    [
+     "识别：层数增加、遇到接缝还是换了面料；调参：电子送布、张力、压脚改针距、压力、张力、转速",
+     "Recognise: more plies, a cross seam, or a new fabric; adjust: electronic feed, tension and foot change stitch length, pressure, tension, speed"
+    ],
+    [
+     "专利例：在 t1、t3 两个时刻测厚度 H1、H3，查表得针距修正，转动针距电机",
+     "Patent example: measure thickness H1, H3 at moments t1, t3, look up a stitch-length correction and turn the stitch-length motor"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_24_t9.png",
+   "narration": [
+    "一件衣服有的地方一层布，有的地方四五层，比如牛仔裤过梗处；传统平缝机的针距、张力、压脚压力调好就固定了，厚薄突变处容易针距不匀、跳针、断针。AI 缝纫机的结构是个闭环：感知、识别、调参，调完继续测。感知靠压脚高度、主轴电流、送布电机负载，有的加相机；识别是判断层数变了、遇到接缝还是换了面料；调参由第 14 章的电子送布、电子张力、电子压脚执行。公开专利给的例子就是在两个时刻测厚度再查表，并不神秘。宣传里“效率提升 30%”要靠实测检验。",
+    "On one garment some places are one ply and others four or five — the yoke of a pair of jeans, say. A traditional lockstitch machine's stitch length, tension and foot pressure are fixed once set, so abrupt thickness changes bring uneven stitches, skips and broken needles. The AI sewing machine is a closed loop: sense, recognise, adjust, and keep measuring. Sensing uses presser-foot height, main-shaft current and feed-motor load, sometimes a camera; recognition decides whether plies increased, a cross seam arrived or the fabric changed; adjustment is done by the electronic feed, tension and foot of Chapter 14. The published patent simply measures thickness at two moments and looks up a table — nothing mysterious. Claims like '30% more efficient' must be checked by measurement."
+   ]
+  },
+  {
+   "title": [
+    "规则、查表还是学习",
+    "Rules, look-up tables or learning?"
+   ],
+   "points": [
+    [
+     "“自动适应布料”大部分是传感器、执行器和控制逻辑（第 13、14 章），AI 主要在识别一步",
+     "Most of 'adapting to fabric' is sensors, actuators and control logic (Chapters 13, 14); AI is mainly in recognition"
+    ],
+    [
+     "变化种类少、规律清楚：规则和查表就够，易验证；种类多：学习模型有优势，但要大量标注数据、出错难解释",
+     "Few, clear cases: rules and tables suffice and are easy to verify; many cases: learned models help but need labelled data and are harder to explain"
+    ],
+    [
+     "识别错了怎么办：四层误判成两层、压脚压力调小会打滑——调参要有上下限，关键动作要有保护",
+     "If recognition fails — four plies read as two, pressure reduced, feed slips — so adjustments need limits and critical actions protection"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "从本书的角度看，“自动适应布料”的大部分工作是传感器、执行器和控制逻辑，这是第 13、14 章的内容，AI 主要体现在识别那一步。怎么选方法？如果布料变化只有几种、规律清楚，规则和查表就够了，而且容易验证；如果要从多个信号里分辨很多种面料和工况，学习模型才有优势，但它要大量标注数据，出错时也更难解释。不管哪种，都要回答：识别错了会怎样？比如把四层误判成两层，压脚压力调小，送布就可能打滑。所以调参要有上下限，关键动作要有第 18 章那样的保护。",
+    "From this book's viewpoint, most of 'adapting to the fabric' is sensors, actuators and control logic — the content of Chapters 13 and 14 — and the AI lies mainly in the recognition step. How to choose? If fabric changes come in a few kinds with clear patterns, rules and look-up tables suffice and are easy to verify; if many fabrics and conditions must be told apart from several signals, learned models have the edge, but they need lots of labelled data and their errors are harder to explain. Either way, answer this: what if recognition is wrong? Mistake four plies for two, reduce foot pressure, and the feed may slip. So adjustments need upper and lower limits, and critical actions need protection as in Chapter 18."
+   ]
+  },
+  {
+   "title": [
+    "按需生产与语言助手的两条规矩",
+    "Make-to-order production and two rules for language assistants"
+   ],
+   "points": [
+    [
+     "从“先生产、再卖”到“先卖、再生产”：需求预测定首单，销售数据定追加",
+     "From 'make, then sell' to 'sell, then make': forecasts set the first order, sales data decide reorders"
+    ],
+    [
+     "排产把小单拼进合适的单元；联网和电子参数让换款一键下发",
+     "Scheduling fits small orders into cells; networking and electronic parameters download settings at a style change in one click"
+    ],
+    [
+     "语言助手：回答注明数据来源；起草的单据只是“提议”，人确认后才执行",
+     "Language assistants: cite data sources; drafted documents are only proposals, executed after a person confirms"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "第 29 章讲过小单快反，批量降到一两百件，一天换好几次款。AI 在这里的作用，是把“先生产、再卖”变成“先卖、再生产”：需求预测决定首单做多少，销售数据回来决定追不追加；排产系统把小单拼进合适的单元；设备联网和电子参数让换款时一键下发针距、张力和花样。语言助手也有位置：问渠数字工厂的 AI 工厂助手能回答本周瓶颈在哪、哪张订单会延期，它的回答注明数据来源，起草的订单只是提议，人确认才执行。这两条是工厂里用语言助手的底线。",
+    "Chapter 29 covered quick response: batches of one or two hundred and several style changes a day. AI's role here is to turn 'make, then sell' into 'sell, then make': demand forecasts set the first order, returning sales data decide reorders, scheduling fits small orders into suitable cells, and networking with electronic parameters downloads stitch length, tension and patterns in one click. Language assistants have a place too: in the WenQuest Digital Factory the AI factory assistant can answer where this week's bottleneck is or which order will be late; its answers cite their data sources, and the orders it drafts are only proposals executed after a person confirms. Those two rules are the bottom line."
+   ]
+  },
+  {
+   "title": [
+    "就业、技能与产业转移：几种观点",
+    "Jobs, skills and industrial shift: several views"
+   ],
+   "points": [
+    [
+     "冲击大：国际劳工组织 2017 年估计柬埔寨约 88% 纺织服装鞋类岗位高风险，含近 50 万缝纫工",
+     "Large impact: ILO 2017 estimated about 88% of Cambodia's textile, clothing and footwear jobs at high risk, including nearly 500 000 sewing operators"
+    ],
+    [
+     "冲击慢：缝制机器人仍卡在布料物理和回收期上；“高风险”是技术可能性，不等于岗位消失",
+     "Slow impact: sewing robots are still held back by cloth physics and payback; 'high risk' is technical feasibility, not jobs lost"
+    ],
+    [
+     "岗位在变：会调电子参数、懂电控网络、会用数据的人更有优势；生产可能回流近市场",
+     "Jobs change: people who set electronic parameters, understand controls and networks and use data gain; production may move closer to markets"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "自动化和 AI 对服装业就业的影响有争议，我们把几种观点并列。第一种认为冲击很大：国际劳工组织 2017 年的柬埔寨简报估计，约 88% 的纺织服装鞋类岗位面临被自动化替代的高风险，包括近 50 万名缝纫工。第二种认为会慢得多：缝制机器人还卡在布料物理和投资回收上，人形机器人还在单工序验证，“高风险”只是技术可能性。第三种关注岗位怎么变：操作工要会调电子参数，机修工要懂电控和网络。比较确定的是：懂机构、电控、工艺又懂数据的人，多数情景下更有优势。",
+    "The impact of automation and AI on garment jobs is contested, so we set views side by side. One says it will be large: the ILO's 2017 Cambodia brief estimated about 88% of textile, clothing and footwear jobs at high risk of automation, including nearly 500 000 sewing operators. Another says it will be much slower: sewing robots are still stuck on cloth physics and payback, humanoids are still at single-operation trials, and 'high risk' is only technical feasibility. A third looks at how jobs change: operators must set electronic parameters, mechanics must understand controls and networks. What is fairly certain: people who understand mechanisms, controls, processes and data will be better placed in most scenarios."
+   ]
+  },
+  {
+   "title": [
+    "学生项目：用 AI，也判断 AI",
+    "Student project: use AI, and judge it"
+   ],
+   "points": [
+    [
+     "准备：在问渠数字工厂完成实验 7，学会读看板、向 AI 工厂助手提问、查数据来源",
+     "Prepare: complete Lab 7 in the WenQuest Digital Factory — read the dashboard, ask the AI factory assistant, check data sources"
+    ],
+    [
+     "建数据、问 AI：工序、SMV、先后关系、分组和产量记录（可用虚拟实验 28-1、29-1），要求 AI 列出计算过程",
+     "Build data and ask AI: operations, SMVs, precedence, grouping and output (Virtual labs 28-1, 29-1 can help); require the AI to show its working"
+    ],
+    [
+     "自己算、写报告：用节拍、平衡率和利特尔法则逐条核对；评分看能否判断 AI",
+     "Check and report: verify point by point with takt, balance efficiency and Little's law; grading rewards judging the AI"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_24_proj.png",
+   "narration": [
+    "最后是一个把后几章串起来的学生项目，训练一种越来越重要的能力：用 AI，同时判断 AI。第一步，在问渠数字工厂完成实验 7，学会读看板、问 AI 工厂助手、查回答的数据来源。第二步，选一个款式，写出工序、标准工时、先后关系、分组和产量记录，可以用虚拟实验 28-1 和 29-1 生成。第三步，把数据交给 AI，让它找瓶颈、提改进，并列出计算过程。第四步，自己用节拍、平衡率和利特尔法则逐条核对：有没有把节拍和周期弄混，改进有没有违反约束。第五步写报告答辩。",
+    "Finally, a student project that ties the last chapters together and trains an increasingly important skill: using AI while judging it. Step one: complete Lab 7 in the WenQuest Digital Factory — read the dashboard, question the AI factory assistant, look up the sources behind its answers. Step two: choose a style and write down operations, standard minutes, precedence, grouping and output records; Virtual labs 28-1 and 29-1 can generate them. Step three: give the data to the AI, ask for the bottleneck and improvements, and require its working. Step four: check it yourself with takt, balance efficiency and Little's law — did it confuse takt with cycle time, do its proposals break constraints? Step five: report and defend."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "判断任何 AI 应用都问三件事：吃什么数据、怎样评价、会在哪里出错；四类应用各有怕的。",
+   "Judge any AI application by three questions — what data, how evaluated, where it fails; each of the four types has its own weakness."
+  ],
+  [
+   "召回率和误报率是检测器的性质，精确率还取决于次品率：次品越少，报警里误报越多，不能只看“准确率”。",
+   "Recall and false-alarm rate belong to the detector; precision also depends on the defect rate — the rarer the defects, the more alarms are false; don't trust 'accuracy' alone."
+  ],
+  [
+   "阈值按漏检和误报的代价定，t* = d′/2 + ln[(1 − π)C_f/(πC_m)]/d′；要精确率和召回率同时高，只能提高 d′。",
+   "Set the threshold by the costs of misses and false alarms, t* = d′/2 + ln[(1 − π)C_f/(πC_m)]/d′; to get high precision and recall together, d′ itself must improve."
+  ],
+  [
+   "预测性维护要同时看提前量、误报和漏报，滑动平均压误报但会推迟报警。",
+   "Predictive maintenance must weigh lead time, false alarms and misses together; moving averages cut false alarms but delay alarms."
+  ],
+  [
+   "AI 缝纫机的大部分是传感器、执行器和控制，AI 主要在识别；调参要有上下限和保护；语言助手要注明来源、由人确认。",
+   "Most of an AI sewing machine is sensors, actuators and control, with AI mainly in recognition; adjustments need limits and protection; language assistants must cite sources and be confirmed by people."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "aiqc",
+   "no": "31-1",
+   "title": [
+    "AI 质检与预测维护",
+    "AI quality inspection and predictive maintenance"
+   ],
+   "goal": [
+    [
+     "观察得分分布、阈值、混淆矩阵和 ROC 曲线的关系，找出每 1000 件成本最低的阈值。",
+     "See how score distributions, threshold, confusion matrix and ROC curve relate, and find the threshold with the lowest cost per 1000 items."
+    ],
+    [
+     "验证基础比例：同一个检测器在不同次品率下的精确率。",
+     "Verify the base-rate effect: the same detector's precision at different defect rates."
+    ],
+    [
+     "在预测性维护中权衡平滑窗口与阈值，使提前量、检出率和误报同时满足要求。",
+     "In predictive maintenance, balance smoothing window and threshold so that lead time, detection rate and false alarms all meet requirements."
+    ]
+   ],
+   "theory": [
+    [
+     "合格品得分 ~ N(0, 1)，次品 ~ N(d′, 1)；召回率 = 1 − Φ(t − d′)，误报率 = 1 − Φ(t)。",
+     "Good scores ~ N(0, 1), defects ~ N(d′, 1); recall = 1 − Φ(t − d′), false-alarm rate = 1 − Φ(t)."
+    ],
+    [
+     "精确率 = πR ÷ [πR + (1 − π)F]；每 1000 件成本 = 漏检件数 × 漏检代价 + 误报件数 × 复检代价。",
+     "Precision = πR ÷ [πR + (1 − π)F]; cost per 1000 = misses × miss cost + false alarms × re-inspection cost."
+    ],
+    [
+     "最省阈值 t* = d′/2 + ln[(1 − π)C_f/(πC_m)]/d′。",
+     "Cheapest threshold t* = d′/2 + ln[(1 − π)C_f/(πC_m)]/d′."
+    ],
+    [
+     "预测维护：指标正常为 1，噪声标准差 0.08；滑动平均超过阈值即报警；健康期报警算误报，退化后首次报警算检出，提前量 = 故障日 − 报警日。",
+     "Predictive maintenance: indicator 1 when normal, noise σ 0.08; alarm when the moving average exceeds the threshold; alarms while healthy are false, the first alarm after degradation is a detection, lead time = failure day − alarm day."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页第①页“视觉质检的阈值”，用默认值（次品率 2%、d′ 3.53、阈值 1.88、漏检 20 元、复检 0.5 元）记录召回率、误报率、精确率、混淆矩阵四格和每 1000 件成本。",
+     "Open page ① 'Vision inspection threshold' and, with the defaults (2% defects, d′ 3.53, threshold 1.88, miss 20 yuan, re-inspection 0.5 yuan), record recall, false-alarm rate, precision, the four confusion-matrix cells and cost per 1000."
+    ],
+    [
+     "拖动“报警阈值 t”，观察得分分布图上的竖线、ROC 曲线上的圆点和成本曲线上的圆点如何移动。",
+     "Move the threshold slider and watch the vertical line on the score plot, the point on the ROC curve and the point on the cost curve move."
+    ],
+    [
+     "任务 1：保持默认次品率和代价，把阈值调到每 1000 件成本最低（与结果栏显示的“最低可达”阈值相差 0.02 以内），记录阈值和成本。",
+     "Task 1: with the default defect rate and costs, set the threshold to the lowest cost per 1000 (within 0.02 of the 'lowest achievable' threshold shown), and record threshold and cost."
+    ],
+    [
+     "任务 2：把阈值放回 1.88，分别把次品率设为 10% 和 1%，记录精确率和报警件数。",
+     "Task 2: return the threshold to 1.88, set the defect rate to 10% and then 1%, and record precision and alarm count."
+    ],
+    [
+     "改变“漏检一件的代价”和“误报一件的代价”，观察最省阈值往哪边移动，并用 t* 公式核对。",
+     "Change the miss cost and false-alarm cost, see which way the cheapest threshold moves, and check with the t* formula."
+    ],
+    [
+     "任务 3：次品率 2%，逐步增大“区分能力 d′”并配合调阈值，找出精确率 ≥ 80%、召回率 ≥ 90% 所需的最小 d′（提示：召回率 90% 时 t ≈ d′ − 1.28）。",
+     "Task 3: at 2% defects, increase d′ step by step while adjusting the threshold to find the smallest d′ giving precision ≥ 80% and recall ≥ 90% (hint: at 90% recall, t ≈ d′ − 1.28)."
+    ],
+    [
+     "切到第②页“预测性维护”，用默认值（阈值 1.15、窗口 1 天、噪声 0.08）记录检出率、平均提前量和每台每月误报，观察三台机器的信号与 ▲ 报警。",
+     "Go to page ② 'Predictive maintenance'; with defaults (threshold 1.15, window 1 day, noise 0.08) record detection rate, average lead time and false alarms per machine-month, and look at the three machines' signals and ▲ alarms."
+    ],
+    [
+     "任务 4：噪声保持 0.08，组合调整“滑动平均窗口”和“报警阈值”，使检出率 ≥ 95%、误报 ≤ 0.1 次/台·月且平均提前量 ≥ 17 天；再试 7 天窗口，比较能达到的最大提前量。",
+     "Task 4: keep noise at 0.08 and combine moving-average window and threshold to reach detection ≥ 95%, false alarms ≤ 0.1 per machine-month and lead time ≥ 17 days; then try a 7-day window and compare the best achievable lead time."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "视觉质检：不同次品率与阈值下的结果（每 1000 件）",
+     "Vision inspection: results at different defect rates and thresholds (per 1000 items)"
+    ],
+    "headers": [
+     [
+      "次品率",
+      "Defect rate"
+     ],
+     [
+      "d′",
+      "d′"
+     ],
+     [
+      "阈值 t",
+      "Threshold t"
+     ],
+     [
+      "召回率",
+      "Recall"
+     ],
+     [
+      "误报率",
+      "False-alarm rate"
+     ],
+     [
+      "报警件数",
+      "Alarms"
+     ],
+     [
+      "精确率",
+      "Precision"
+     ],
+     [
+      "成本（元）",
+      "Cost (yuan)"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "任务 1 找到的最省阈值和“召回率 95%”的阈值 1.88 一样吗？代价比变大时最省阈值往哪边移？",
+     "Is the cheapest threshold from Task 1 the same as the 95%-recall threshold 1.88? Which way does it move when the cost ratio grows?"
+    ],
+    [
+     "任务 2 中检测器本身没变，为什么精确率差这么多？这对车间评价供应商的“准确率”有什么启示？",
+     "In Task 2 the detector did not change; why does precision differ so much? What does that imply for judging a vendor's 'accuracy'?"
+    ],
+    [
+     "任务 3 中为什么只调阈值做不到？提高 d′ 在实际中要靠什么？",
+     "In Task 3, why can't the threshold alone do it? In practice, what raises d′?"
+    ],
+    [
+     "任务 4 中加大平滑窗口为什么误报少了、报警却晚了？在“每台每月误报 ≤ 0.1 次”下，窗口越大越好吗？",
+     "In Task 4, why does a wider window cut false alarms but delay alarms? Under '≤ 0.1 false alarms per machine-month', is a wider window always better?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "为领子工段选一套视觉质检方案",
+   "Choosing a vision inspection scheme for the collar section"
+  ],
+  "tasks": [
+   [
+    "（计算）供应商 A 的检测器召回率 90%、误报率 5%；车间次品率 3%。求每 1000 件的报警数和精确率。漏检一件 30 元、误报一件 1 元，求每 1000 件成本；若提高阈值使召回率降到 80%、误报率降到 2%，成本变为多少？选哪个阈值，为什么？",
+    "(Calculation) Vendor A's detector has 90% recall and 5% false-alarm rate; the defect rate is 3%. Find alarms per 1000 and precision. With a miss costing 30 yuan and a false alarm 1 yuan, find the cost per 1000; if a higher threshold gives 80% recall and 2% false alarms, what is the cost? Which threshold, and why?"
+   ],
+   [
+    "（计算）供应商 B 声称 d′ = 3.53。按等方差正态模型，在次品率 2%、漏检 20 元、复检 0.5 元时求最省阈值 t* 和每 1000 件成本；若车间要求精确率 ≥ 80% 且召回率 ≥ 90%，B 的检测器能否满足？需要的 d′ 是多少？",
+    "(Calculation) Vendor B claims d′ = 3.53. With the equal-variance normal model, a 2% defect rate, 20-yuan misses and 0.5-yuan re-inspection, find the cheapest threshold t* and cost per 1000; if the section requires precision ≥ 80% and recall ≥ 90%, can B meet it? What d′ is needed?"
+   ],
+   [
+    "（方案）写出验收与运行方案：上线前用自己工段的样本验证哪些指标；换款、换面料时怎样重新验证；误报和漏检样本怎样收集、多久重训；报警阈值由谁按什么数据调整。",
+    "(Plan) Write an acceptance and operating plan: which metrics to validate on your own section's samples before go-live; how to re-validate at style or fabric changes; how false alarms and misses are collected and how often the model is retrained; who adjusts the threshold, using what data."
+   ]
+  ],
+  "deliverable": [
+   "计算过程（可附 Python 脚本）、虚拟实验 31-1 第①页对应设置的截图，以及 2 页以内的验收与运行方案。",
+   "Calculations (a Python script may be attached), screenshots of the corresponding settings on page ① of Virtual lab 31-1, and an acceptance and operating plan of up to 2 pages."
+  ],
+  "rubric": [
+   [
+    "报警数、精确率和两种阈值的成本计算正确，选择有理由（30 分）",
+    "Alarms, precision and the costs of both thresholds correct, with a reasoned choice (30 points)"
+   ],
+   [
+    "t*、成本和所需 d′ 计算正确，能说明只调阈值为什么不够（30 分）",
+    "t*, cost and required d′ correct, explaining why threshold tuning alone is insufficient (30 points)"
+   ],
+   [
+    "验收与运行方案具体可行，覆盖换款重验、样本收集和重训（30 分）",
+    "Acceptance and operating plan concrete and feasible, covering re-validation, sample collection and retraining (30 points)"
+   ],
+   [
+    "表达清楚、截图规范（10 分）",
+    "Clear writing and proper screenshots (10 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "用历史数据预测哪台缝纫机快要坏了，属于制衣业 AI 应用的哪一类？它最怕什么？",
+    "Predicting from historical data which sewing machine is about to fail belongs to which type of AI application, and what does it fear most?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "预测；怕数据少或工况变了",
+      "Prediction; it fears scarce data or changed conditions"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "感知；怕光照变了",
+      "Perception; it fears changed lighting"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "优化与生成；怕目标写错",
+      "Optimisation and generation; it fears a wrong objective"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "语言助手；怕说得通顺却不对",
+      "Language assistant; it fears sounding fluent but being wrong"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "预测从历史推将来，设备数据是原料；数据少或工况、市场变了，预测就偏。",
+    "Prediction infers the future from history with equipment data as raw material; with little data or changed conditions it drifts."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "精确率的定义是什么？",
+    "What is precision?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "报警中真正是次品的比例",
+      "The fraction of alarms that are real defects"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "次品中被报警的比例",
+      "The fraction of defects that raise alarms"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "合格品中被报警的比例",
+      "The fraction of good items that raise alarms"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "所有判断中正确的比例",
+      "The fraction of all judgements that are correct"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "次品中被报警的比例是召回率，合格品中被报警的比例是误报率，所有判断正确的比例是准确率。",
+    "The fraction of defects flagged is recall, of good items flagged the false-alarm rate, and of all judgements correct the accuracy."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某检测器召回率 95%、误报率 3%，车间次品率 5%。精确率是多少（%）？",
+    "A detector has 95% recall and 3% false-alarm rate; the defect rate is 5%. What is the precision (%)?"
+   ],
+   "answer": 62.5,
+   "tolerance": 0.5,
+   "unit": "%",
+   "feedback": [
+    "每 1000 件：抓住 50 × 0.95 = 47.5 件，误报 950 × 0.03 = 28.5 件，精确率 47.5 ÷ 76 = 62.5%。",
+    "Per 1000: 50 × 0.95 = 47.5 caught, 950 × 0.03 = 28.5 false alarms, precision 47.5 ÷ 76 = 62.5%."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某视觉质检系统召回率 90%、误报率 5%，车间次品率 3%。每 1000 件报警多少件？",
+    "A vision system has 90% recall and 5% false-alarm rate; the defect rate is 3%. How many alarms per 1000 items?"
+   ],
+   "answer": 75.5,
+   "tolerance": 0.3,
+   "unit": "件",
+   "feedback": [
+    "30 × 0.9 = 27 件次品被抓，970 × 0.05 = 48.5 件误报，共 75.5 件，精确率约 36%。",
+    "30 × 0.9 = 27 defects caught, 970 × 0.05 = 48.5 false alarms, 75.5 in all; precision about 36%."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "车间次品率 2% 时，一个永远判“合格”的检测器准确率也有 98%，所以“准确率”几乎说明不了质检模型的好坏。",
+    "At a 2% defect rate a detector that always says 'good' is 98% accurate, so 'accuracy' says almost nothing about an inspection model."
+   ],
+   "correct": true,
+   "feedback": [
+    "这个检测器召回率为 0。应看本厂次品率下的精确率、召回率以及漏检和复检的成本。",
+    "Its recall is zero. Look instead at precision and recall at your own defect rate and at the costs of misses and re-inspection."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "按等方差正态模型，d′ = 3.53、次品率 2%、漏检代价 20 元，误报代价从 0.5 元升到 1 元。最省阈值 t* 是多少？",
+    "Under the equal-variance normal model with d′ = 3.53, 2% defects and a 20-yuan miss cost, the false-alarm cost rises from 0.5 to 1 yuan. What is the cheapest threshold t*?"
+   ],
+   "answer": 2.02,
+   "tolerance": 0.02,
+   "unit": "",
+   "feedback": [
+    "t* = 3.53/2 + ln(0.98 × 1 ÷ (0.02 × 20))/3.53 = 1.765 + ln 2.45 ÷ 3.53 ≈ 2.02，误报变贵，阈值右移。",
+    "t* = 3.53/2 + ln(0.98 × 1 ÷ (0.02 × 20))/3.53 = 1.765 + ln 2.45 ÷ 3.53 ≈ 2.02; dearer false alarms move the threshold right."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "同一个检测器、阈值不变，车间次品率从 2% 升到 10%，成本最低的阈值会怎样变化？",
+    "With the same detector, if the defect rate rises from 2% to 10%, how does the cheapest threshold change?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "降低（约 1.82 → 1.34），宁可多报几件",
+      "It falls (about 1.82 → 1.34): better to flag a few more"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "升高，少报警以减少复检",
+      "It rises, to reduce re-inspection"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "不变，阈值只由检测器决定",
+      "It is unchanged; the threshold depends only on the detector"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "降到 0，所有衣片都报警",
+      "It falls to 0, flagging every piece"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "t* 中的对数项 ln[(1 − π)C_f/(πC_m)] 随 π 增大而减小：次品多时漏检的总代价上升，阈值左移。",
+    "The log term ln[(1 − π)C_f/(πC_m)] falls as π grows: with more defects, misses cost more in total and the threshold moves left."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于预测性维护的算例（200 台、噪声 0.08），下列哪些说法正确？",
+    "For the predictive-maintenance example (200 machines, noise 0.08), which statements are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "只看当天值、阈值 1.15 时，200 台的车间每月约有 170 次误报",
+      "With daily values and threshold 1.15, a 200-machine floor gets about 170 false alarms a month"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "3 天滑动平均、阈值 1.12 时，平均提前约 18.5 天，误报降到每台每月约 0.09 次",
+      "With a 3-day average and threshold 1.12, lead time is about 18.5 days and false alarms about 0.09 per machine-month"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "单日值方案平均提前约 22 天，其中一部分是噪声碰巧越线，提前量被高估",
+      "The daily-value scheme's 22-day average lead is partly noise crossing the line by chance, overestimating lead time"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "平滑窗口越大，在相同误报要求下提前量一定越长",
+      "The wider the window, the longer the lead time under the same false-alarm requirement"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "0.85 × 200 ≈ 170；7 天窗口在每台每月 ≤ 0.1 次的要求下提前量反而略降（约 17 天）：平滑压误报，但也推迟报警。",
+    "0.85 × 200 ≈ 170; under ≤ 0.1 per machine-month a 7-day window gives slightly less lead (about 17 days): smoothing cuts false alarms but delays alarms."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "在“AI 缝纫机”自动适应布料的闭环里，“AI”主要体现在哪一步？",
+    "In the AI sewing machine's fabric-adaptation loop, where does the 'AI' mainly lie?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "识别：从压脚高度、电机电流等信号判断布料发生了什么变化",
+      "Recognition: judging from presser-foot height, motor current and other signals what has changed"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "感知：测量压脚高度",
+      "Sensing: measuring presser-foot height"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "调参：步进电机转动针距调节机构",
+      "Adjustment: a stepper turning the stitch-length mechanism"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "线迹形成：旋梭钩线",
+      "Stitch formation: the hook catching the loop"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "感知和调参是第 13、14 章的传感器、执行器和控制；变化少而规律清楚时，识别用规则和查表也够。",
+    "Sensing and adjustment are the sensors, actuators and control of Chapters 13 and 14; with few, clear cases, rules and tables suffice for recognition."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "某视觉质检系统召回率 90%、误报率 5%，车间次品率 3%，漏检一件 30 元、误报一件 1 元。提高阈值后召回率降到 80%、误报率降到 2%。新阈值下每 1000 件成本是多少元？",
+    "A vision system has 90% recall and 5% false-alarm rate at 3% defects; a miss costs 30 yuan and a false alarm 1 yuan. A higher threshold gives 80% recall and 2% false alarms. What is the cost per 1000 items at the new threshold?"
+   ],
+   "answer": 199.4,
+   "tolerance": 0.5,
+   "unit": "元",
+   "feedback": [
+    "漏检 30 × 0.2 = 6 件 × 30 = 180 元，误报 970 × 0.02 = 19.4 件 × 1 = 19.4 元，合计 199.4 元，比原阈值的 138.5 元贵，原阈值更合适。",
+    "Misses 30 × 0.2 = 6 × 30 = 180 yuan; false alarms 970 × 0.02 = 19.4 × 1 = 19.4 yuan; total 199.4, dearer than 138.5 at the original threshold, so the original is better."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "次品率 4%，检测器召回率 92%、误报率 4%，漏检一件 25 元、误报一件 0.8 元。每 1000 件质检成本是多少元？",
+    "At 4% defects, a detector has 92% recall and 4% false alarms; a miss costs 25 yuan and a false alarm 0.8 yuan. What is the inspection cost per 1000 items?"
+   ],
+   "answer": 110.72,
+   "tolerance": 0.3,
+   "unit": "元",
+   "feedback": [
+    "漏检 40 × 0.08 = 3.2 件 × 25 = 80 元；误报 960 × 0.04 = 38.4 件 × 0.8 = 30.72 元；合计 110.72 元。",
+    "Misses 40 × 0.08 = 3.2 × 25 = 80 yuan; false alarms 960 × 0.04 = 38.4 × 0.8 = 30.72 yuan; total 110.72 yuan."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "按等方差正态模型，次品率 2%，要求精确率 80%、召回率 90%。检测器的区分能力 d′ 至少要多大？（Φ⁻¹(0.9) ≈ 1.2816）",
+    "Under the equal-variance normal model at 2% defects, precision 80% and recall 90% are required. What minimum d′ is needed? (Φ⁻¹(0.9) ≈ 1.2816)"
+   ],
+   "answer": 3.89,
+   "tolerance": 0.03,
+   "unit": "",
+   "feedback": [
+    "精确率 80% 要求误报率 ≤ 0.02 × 0.9 × 0.25 ÷ 0.98 ≈ 0.46%，阈值 t ≈ Φ⁻¹(0.9954) ≈ 2.61；召回率 90% 要求 d′ = t + 1.28 ≈ 3.89。",
+    "80% precision needs false alarms ≤ 0.02 × 0.9 × 0.25 ÷ 0.98 ≈ 0.46%, threshold t ≈ Φ⁻¹(0.9954) ≈ 2.61; 90% recall then needs d′ = t + 1.28 ≈ 3.89."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "一套视觉质检系统在旧款上验证良好。换了一种新颜色的面料后，最应该担心的是什么？",
+    "A vision system validated well on the old style. After switching to a fabric of a new colour, what should worry you most?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "区分能力 d′ 可能下降，召回率和精确率都会变差，需要先在小批量上重新验证",
+      "d′ may fall, worsening recall and precision; re-validate on a small batch first"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "次品率会自动下降",
+      "The defect rate will automatically fall"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "最省阈值只取决于代价，不受影响",
+      "The cheapest threshold depends only on costs and is unaffected"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "ROC 曲线不变，只需把阈值调高",
+      "The ROC curve is unchanged; just raise the threshold"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "d′ 取决于训练数据；换面料颜色、款式或出现新缺陷都会让它下降，所以要收集误报漏检样本并重训。",
+    "d′ depends on training data; new colours, styles or defect types can lower it, so collect false alarms and misses and retrain."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "在工厂里使用 AI 工厂助手（语言助手），下列哪些做法符合教材提出的底线？",
+    "Which practices for using an AI factory assistant (language assistant) meet the bottom line set out in the book?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "要求它的回答注明来自数据总线和历史库的数据来源",
+      "Require its answers to cite sources in the data bus and historian"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "它起草的订单、请购单作为“提议”，经人预览确认后才执行",
+      "Treat orders and requisitions it drafts as proposals, executed only after a person previews and confirms"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "让学生在项目中用节拍、平衡率和利特尔法则逐条核对它的结论",
+      "Have students check its conclusions point by point with takt, balance efficiency and Little's law"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "回答读起来通顺合理，就可以直接写入生产系统",
+      "If an answer reads fluently and sensibly, write it straight into the production system"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "语言助手怕“说得通顺”：注明来源让人能核对依据，先预览后确认让责任落在做决定的人身上。",
+    "Language assistants risk sounding fluent: citing sources lets people check the basis, and preview-then-confirm keeps responsibility with the decision-maker."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "AI 应用的三问与四类；混淆矩阵、精确率与基础比例；按代价定阈值；预测性维护的提前量与误报。",
+   "The three questions and four types of AI application; the confusion matrix, precision and base rate; threshold by cost; lead time versus false alarms in predictive maintenance."
+  ],
+  "difficult": [
+   "理解精确率为什么随次品率变化；由等方差正态模型推出最省阈值和所需 d′；理解平滑窗口的双重作用。",
+   "Why precision changes with the defect rate; deriving the cheapest threshold and required d′ from the equal-variance normal model; the double effect of the smoothing window."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：召回率 95% 的质检值得信吗",
+     "Opening: can 95% recall be trusted?"
+    ],
+    "minutes": 10,
+    "content": [
+     "提出领子工段视觉质检的问题；介绍判断 AI 的三问和四类应用。",
+     "Pose the collar-section inspection question; introduce the three questions and four types of AI application."
+    ]
+   },
+   {
+    "phase": [
+     "设计、排料与排产",
+     "Design, markers and scheduling"
+    ],
+    "minutes": 15,
+    "content": [
+     "虚拟样衣与版权边界；排料、排产中 AI、算法与人的分工。",
+     "Virtual samples and copyright limits; the division of labour among AI, algorithms and people in markers and scheduling."
+    ]
+   },
+   {
+    "phase": [
+     "视觉质检",
+     "Vision inspection"
+    ],
+    "minutes": 35,
+    "content": [
+     "混淆矩阵、得分分布与 ROC；基础比例课堂计算；代价与最省阈值；提高 d′ 与换款重验；回答导入问题。",
+     "Confusion matrix, score distributions and ROC; in-class base-rate calculation; cost and cheapest threshold; raising d′ and re-validation; answer the opening question."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 31-1",
+     "Virtual lab 31-1"
+    ],
+    "minutes": 30,
+    "content": [
+     "学生完成第①页任务 1–3 和第②页任务 4，填写记录表。",
+     "Students complete Tasks 1–3 on page ① and Task 4 on page ②, filling in the record table."
+    ]
+   },
+   {
+    "phase": [
+     "预测性维护与 AI 缝纫机",
+     "Predictive maintenance and AI sewing machines"
+    ],
+    "minutes": 20,
+    "content": [
+     "滑动平均与阈值的取舍；感知—识别—调参闭环、专利例子、规则还是学习、出错保护。",
+     "Window-versus-threshold trade-off; the sense–recognise–adjust loop, the patent example, rules versus learning, protection against errors."
+    ]
+   },
+   {
+    "phase": [
+     "按需生产、就业与学生项目",
+     "Make-to-order, jobs and the student project"
+    ],
+    "minutes": 20,
+    "content": [
+     "语言助手的两条规矩；就业的三种观点课堂讨论；布置学生项目和作业，小结。",
+     "Two rules for language assistants; class discussion of the three views on jobs; assign the student project and homework; summary."
+    ]
+   },
+   {
+    "phase": [
+     "机动与答疑",
+     "Buffer and questions"
+    ],
+    "minutes": 5,
+    "content": [
+     "回答学生问题，检查实验任务完成情况。",
+     "Answer questions and check lab task completion."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“为领子工段选一套视觉质检方案”，并开始 31.9 节学生项目的第一、二步。",
+   "Complete the assignment 'Choosing a vision inspection scheme for the collar section', and begin steps 1 and 2 of the Section 31.9 student project."
+  ]
+ }
+}

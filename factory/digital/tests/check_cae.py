@@ -77,6 +77,21 @@ assert 20 < peak["shoulder_lift_joint"] < 100, peak
 assert call("GET", "/api/mbd/jobs/{}/series.bin".format(j["id"]), token=tok, raw=True)[:4] == b"WQC1"
 print("动力学演练通过：肩部重力矩 {:.1f} N·m，用时 {} 秒".format(peak["shoulder_lift_joint"], j["stats"]["seconds"]))
 
+# 第 14 轮：温度场——WQR-105 简化箱体热平衡，与教材公式比
+g = call("POST", "/api/cae/geometry/example/housing", {"params": {}}, token=tok)
+ex = g["example"]
+j = call("POST", "/api/cae/jobs", {"step_sha": g["sha"], "item": None, "title": "演练 箱体热平衡", "setup": {
+    "analysis": "thermal", "material_id": ex["material_id"], "mesh": {"size_mm": ex["mesh_mm"]}, "thermal": ex["thermal"],
+    "formula": ex["formula"]}}, token=tok)
+t0 = time.time()
+while j["status"] not in ("done", "failed") and time.time() - t0 < 400:
+    time.sleep(2)
+    j = call("GET", "/api/cae/jobs/" + j["id"], token=tok)
+assert j["status"] == "done", j.get("error")
+assert abs(j["stats"]["film_groups"][0]["mean_c"] - ex["formula"]["t_oil_c"]) < 0.5, j["stats"]
+assert call("POST", "/api/cae/jobs/{}/report".format(j["id"]), {"images": []}, token=tok, raw=True)[:2] == b"PK"
+print("温度场演练通过：箱体外表面平均 {:.1f} ℃，公式 {} ℃".format(j["stats"]["film_groups"][0]["mean_c"], ex["formula"]["t_oil_c"]))
+
 # 第 13 轮：数控编程——SH-301 粗车工序（工艺规程 20）→ 编程单 → 生成、仿真；示例平板铣削
 ops = call("GET", "/api/cam/ops?item=SH-301", token=tok)
 assert [o["seq"] for o in ops["ops"] if o["cam"]] == [20, 40, 50], ops
@@ -96,8 +111,9 @@ boss = call("POST", "/api/login", {"name": "演练老师", "role": "manager", "m
 for c in r["comments"]:
     call("POST", "/api/process/submissions/{}/comments/{}".format(r["submission"], c["id"]), {"resolved": True}, token=boss)
 a = call("POST", "/api/process/submissions/{}/decision".format(r["submission"]), {"decision": "approve", "note": "演练"}, token=boss)
-assert a["status"] == "approved" and a["programs_released"] == 2, a
-gc = [g for g in call("GET", "/api/design/SH-301", token=tok)["gcode"] if g.get("process_revision") == a["revision"]]
+assert a["status"] == "approved" and a["programs_released"] >= 2, a      # 这一版挂着的全部程序（重复演练时还有上次的精车程序）
+gc = [g for g in call("GET", "/api/design/SH-301", token=tok)["gcode"] if g.get("process_revision") == a["revision"]
+      and g["operation"].startswith("粗车")]
 assert sorted(g["program"] for g in gc) == [1201, 1202] and all(g["machine"] == "cnc-l01-a" for g in gc), gc
 if A.erp:
     import base64

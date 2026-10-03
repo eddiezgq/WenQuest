@@ -1,0 +1,29 @@
+# 实验 2.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab2_7.js。
+原理:
+  - ["一份检测记录是 R⁶ 中的向量 x。各项目单位不同、数值范围相差很大，先按过程均值 μ 和标准差 σ 标准化：zᵢ = (xᵢ − μᵢ)/σᵢ，zᵢ 表示第 i 项偏离了几个标准差（式 (2.7.2)）。",
+     "An inspection record is a vector x in R⁶. Items have different units and ranges, so standardize with the process mean μ and standard deviation σ: zᵢ = (xᵢ − μᵢ)/σᵢ, the number of standard deviations off (Eq. (2.7.2))."]
+  - 式: "cos(u, v) = u·v / (‖u‖ ‖v‖)          (2.7.1)"
+  - ["余弦相似度只看方向：与某种故障的特征方向越接近 1，偏离的“模式”越像。长度 ‖z‖ 看程度：超过报警线 2.5 才认为异常。两者配合使用。",
+     "Cosine similarity sees direction only: the closer to 1 with a fault's direction, the more alike the pattern. The length ‖z‖ sees severity: above the alarm line 2.5 counts as abnormal. Use both."]
+步骤:
+  - ["在“检测记录”场景依次查看记录 1–8，把长度、三个相似度和判断填入表 1，找出长度最大的记录（任务 1），查看记录 3（任务 2）。",
+     "In the records scene view records 1–8; fill the length, the three similarities and the verdict into Table 1; find the record with the largest length (task 1); look at record 3 (task 2)."]
+  - ["切换到“对比”场景，比较记录 2 与 5（任务 3），以及记录 2 与 6，把原始值和标准化后的余弦相似度填入表 2。",
+     "In the compare scene compare records 2 and 5 (task 3), and records 2 and 6; fill Table 2 with the cosines before and after standardizing."]
+  - ["切换到“自己调”场景，调出一份最像“装配过紧”且超过报警线的记录（任务 4），记录六项的偏离量。",
+     "In the make-your-own scene build a record most like 'over-tight assembly' and over the alarm line (task 4); note the six deviations."]
+数据表:
+  - 标题: ["表 1  八份检测记录", "Table 1  Eight records"]
+    表头: ["记录", "‖z‖", "轴承磨损", "齿轮偏心", "装配过紧", "判断"]
+    表头英文: ["Record", "‖z‖", "Bearing wear", "Gear eccentricity", "Over-tight", "Verdict"]
+    行: [["1", "", "", "", "", ""], ["2", "", "", "", "", ""], ["3", "", "", "", "", ""], ["4", "", "", "", "", ""], ["5", "", "", "", "", ""], ["6", "", "", "", "", ""], ["7", "", "", "", "", ""], ["8", "", "", "", "", ""]]
+  - 标题: ["表 2  标准化前后的余弦相似度", "Table 2  Cosine before and after standardizing"]
+    表头: ["记录对", "原始值", "标准化后", "标准化后的距离"]
+    表头英文: ["Pair", "Raw", "Standardized", "Standardized distance"]
+    行: [["2 与 5", "", "", ""], ["2 与 6", "", "", ""], ["3 与 7", "", "", ""]]
+    行英文: [["2 and 5", "", "", ""], ["2 and 6", "", "", ""], ["3 and 7", "", "", ""]]
+注意:
+  - ["数据是按车间检测项目编制的模拟数据，故障特征方向和报警线 2.5 只用于教学。", "The data are simulated after the workshop's inspection items; the fault directions and the alarm line 2.5 are for teaching only."]
+  - ["长度很小的向量方向是偶然的，它的相似度没有意义。", "A very short vector's direction is accidental; its similarities mean nothing."]
+思考题:
+  - ["如果两个检测项目总是一起升高（相关），把它们都放进向量里，会对余弦相似度产生什么影响？（第 19 章的主成分分析处理这个问题。）", "If two items always rise together (correlated), how does keeping both affect the cosine similarity? (Principal component analysis, Chapter 19, deals with this.)"]

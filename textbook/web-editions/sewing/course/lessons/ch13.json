@@ -1,0 +1,1305 @@
+{
+ "no": 13,
+ "title": [
+  "控制基础：电机、驱动与传感",
+  "Control Basics: Motors, Drives and Sensors"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能说明主轴伺服的三个控制环各管什么，并用 K_v/J 估算速度环带宽、判断位置增益是否过大。",
+   "Explain what each of the three loops of the main-shaft servo does, estimate the velocity-loop bandwidth from K_v/J and judge whether the position gain is too high."
+  ],
+  [
+   "能算出没有速度环积分时库仑摩擦造成的最大停针静差，并解释为什么速度环要用 PI。",
+   "Calculate the largest needle-positioning error caused by Coulomb friction when the velocity-loop integral is removed, and explain why the velocity loop uses PI action."
+  ],
+  [
+   "能算出增量编码器四倍频后的分辨率，比较 M 法与 T 法在低速时的测速误差。",
+   "Calculate the resolution of an incremental encoder with ×4 decoding, and compare the speed-measurement errors of the M and T methods at low speed."
+  ],
+  [
+   "能把电磁铁的吸合、释放延迟折算成主轴转角，选择强激磁和续流方式，并算出允许的最高剪线转速。",
+   "Convert solenoid pull-in and release delays into main-shaft angle, choose boost and freewheeling schemes, and calculate the maximum allowable trimming speed."
+  ],
+  [
+   "能估算急停时母线电压的升高，说明制动电阻的作用；能说明步进电机失步的原因和对策。",
+   "Estimate the DC-link voltage rise during an emergency stop and explain the role of the braking resistor; explain the causes of and remedies for lost steps in a stepper motor."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "剪线转速提到 600 r/min 以后，剪线时好时坏",
+   "Trimming became unreliable after the trimming speed was raised to 600 r/min"
+  ],
+  "text": [
+   "某缝制车间为了缩短每道缝的停车时间，把一批电控平缝机的剪线转速从 400 r/min 提到 600 r/min，结果剪线时好时坏。剪线电磁铁的数据与第 13 章算例相同：线圈 8 Ω、24 V 强激磁后 1 A 维持，吸合延迟 6.9 ms；现用二极管续流，释放延迟 12.9 ms；换 48 V 稳压管续流时释放延迟 5.1 ms。剪线机构要求吸合和释放折算成的主轴转角都不超过 20°。",
+   "To shorten the stop at the end of each seam, a sewing floor raised the trimming speed of a batch of electronically controlled lockstitch machines from 400 r/min to 600 r/min, and trimming became unreliable. The trimming solenoid matches the Chapter 13 example: an 8 Ω coil, 24 V boost then 1 A hold, pull-in delay 6.9 ms; it now uses diode freewheeling, with a release delay of 12.9 ms; with 48 V Zener freewheeling the release delay is 5.1 ms. The trimming mechanism requires both pull-in and release, converted to main-shaft angle, to stay within 20°."
+  ],
+  "question": [
+   "600 r/min 时吸合和释放各占多少度主轴转角？只换稳压管续流够不够？在不改电磁铁的前提下，剪线转速最高能设多少？功率管至少要承受多高的电压？",
+   "At 600 r/min, how many degrees of main-shaft rotation do pull-in and release take? Is switching to Zener freewheeling alone enough? Without changing the solenoid, what is the highest trimming speed that can be set? What voltage must the power transistor withstand at least?"
+  ],
+  "answer": [
+   "转角 = 6 × n × t：600 r/min 时吸合 6.9 ms 占 24.8°，二极管续流释放 12.9 ms 占 46.4°，两项都超过 20°。换 48 V 稳压管后释放降到 5.1 ms（18.4°），但吸合仍是 24.8°，不够。较长的吸合延迟决定上限：n_max = 20 ÷ (6 × 0.0069) ≈ 483 r/min，剪线转速应设在约 480 r/min 以下（或者提高驱动电压缩短吸合）。功率管断开时承受 24 + 48 = 72 V，选管要留余量。",
+   "Angle = 6 × n × t: at 600 r/min the 6.9 ms pull-in takes 24.8° and the 12.9 ms diode-freewheeling release takes 46.4°; both exceed 20°. A 48 V Zener cuts release to 5.1 ms (18.4°), but pull-in is still 24.8°, so it is not enough. The longer pull-in delay sets the limit: n_max = 20 ÷ (6 × 0.0069) ≈ 483 r/min, so the trimming speed should be set below about 480 r/min (or the drive voltage raised to shorten pull-in). At switch-off the power transistor sees 24 + 48 = 72 V, and a margin must be allowed."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机械臂关节伺服：同样的三环、同样的惯量问题",
+   "Robot-arm joint servos: the same three loops, the same inertia problem"
+  ],
+  "text": [
+   "机械臂每个关节都是一台永磁同步电机加编码器，驱动器里同样是电流环、速度环、位置环三环嵌套，矢量控制让关节转矩 T = k_t·i_q。主轴停在上针位，对应机械臂关节停在目标角：位置增益太大会冲过头，速度环没有积分会因关节摩擦留下静差。机械臂抓起重物后，折算到关节的惯量变大，速度环带宽 K_v/J 下降，这和平缝机换了更重的手轮一样，所以机器人驱动器也有“负载惯量比”参数和在线惯量辨识。机械臂急停时关节电机回馈的能量同样充进母线，要靠制动电阻消耗；夹爪的电磁阀也有几毫秒到几十毫秒的延迟，在传送带上抓取时要像剪线发令一样按带速提前发出指令。",
+   "Every joint of a robot arm is a PMSM with an encoder, and its drive nests the same current, velocity and position loops, with vector control giving joint torque T = k_t·i_q. Stopping the main shaft at needle-up corresponds to stopping a joint at its target angle: too high a position gain overshoots, and without a velocity-loop integral, joint friction leaves a steady-state error. When the arm picks up a heavy part, the inertia referred to the joint grows and the velocity-loop bandwidth K_v/J falls, just as when a heavier handwheel is fitted to a lockstitch machine; that is why robot drives also have a load-inertia-ratio parameter and online inertia identification. In an emergency stop the joint motors also feed energy back into the DC link, which a braking resistor must dissipate; and a gripper's solenoid valve has a delay of milliseconds to tens of milliseconds, so when picking from a conveyor the command must be issued early according to the belt speed, exactly as the trimming command is issued early."
+  ]
+ },
+ "life": {
+  "title": [
+   "电梯平层",
+   "An elevator levelling at a floor"
+  ],
+  "text": [
+   "电梯快到楼层时先减到很低的爬行速度，离平层位置还差一小段时才切换到精确的位置控制，停稳时轿厢地面和楼层地面对齐——这正是停针定位“先降速、再切位置环”的两步法；乘客多了，惯量变大，好的电梯控制器同样要自动调整。",
+   "As an elevator approaches a floor it first slows to a low creep speed, and only a short distance before the levelling point does it switch to precise position control, stopping with the car floor flush with the landing — exactly the two-stage method of needle positioning: slow down first, then switch to the position loop. With more passengers the inertia grows, and a good elevator controller must adapt too."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "一台电控平缝机里有什么",
+    "What is inside an electronically controlled lockstitch machine"
+   ],
+   "points": [
+    [
+     "机构仍由主轴带动；主轴改由伺服电机驱动",
+     "The mechanisms are still driven by the main shaft; the shaft is now driven by a servo motor"
+    ],
+    [
+     "传感器 → 控制箱 → 执行器三类部件",
+     "Three groups: sensors → control box → actuators"
+    ],
+    [
+     "剪线、倒缝、抬压脚、针距、张力交给电磁铁、气缸和步进电机",
+     "Trimming, reverse stitching, presser-foot lift, stitch length and tension go to solenoids, cylinders and steppers"
+    ],
+    [
+     "两个贯穿问题：主轴怎样停准；执行器延迟折合多少度",
+     "Two running questions: how the shaft stops accurately; how many degrees an actuator delay is worth"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_13_sys.png",
+   "narration": [
+    "同学们，第 3 到第 8 章的机构，针杆、挑线杆、旋梭，在电控机上一个都没少，还是挂在主轴上。变的是主轴本身改由伺服电机驱动，原来靠手和脚调的剪线、倒缝、抬压脚、针距、张力，交给了电磁铁、气缸和步进电机。看这张图，左边是传感器，中间是控制箱，右边是执行器。今天这一讲始终抓两个问题：主轴怎样准确地停在上针位；执行器延迟几毫秒，主轴已经转过了多少度。",
+    "The mechanisms of Chapters 3 to 8 — needle bar, take-up lever, rotary hook — are all still there on an electronically controlled machine, still hanging on the main shaft. What has changed is that the shaft itself is driven by a servo motor, and trimming, reverse stitching, presser-foot lift, stitch length and tension, once set by hand and foot, are handed to solenoids, cylinders and steppers. In this figure, sensors are on the left, the control box in the middle, actuators on the right. Today we keep two questions in view: how the shaft stops accurately at needle-up, and how many degrees the shaft has turned during an actuator's few milliseconds of delay."
+   ]
+  },
+  {
+   "title": [
+    "从离合器电机到直驱伺服；矢量控制",
+    "From clutch motor to direct-drive servo; vector control"
+   ],
+   "points": [
+    [
+     "离合器电机一直空转，费电发热，停车位置靠运气",
+     "A clutch motor idles continuously, wastes power, and stops by chance"
+    ],
+    [
+     "直驱：转子直接装在主轴上，没有皮带弹性和打滑",
+     "Direct drive: rotor sits on the main shaft, no belt elasticity or slip"
+    ],
+    [
+     "永磁同步电机：电流磁场与转子磁场正交时转矩最大",
+     "PMSM: torque is greatest when the current's field is perpendicular to the rotor field"
+    ],
+    [
+     "i_d 控制为零，转矩只与 i_q 成正比",
+     "With i_d held at zero, torque is proportional to i_q alone"
+    ]
+   ],
+   "formula": "T = k_t\\, i_q",
+   "figure": "",
+   "narration": [
+    "老式离合器电机一直以额定转速空转，踩脚踏靠摩擦片接合，费电、发热，停在哪里全凭运气。伺服电机只在需要时转，直驱又把皮带省了，停针更准、机头更安静。缝纫机伺服几乎都是永磁同步电机。关键一点：电流产生的磁场和转子磁场垂直时，同样电流转矩最大，所以驱动器要时时从编码器读转子角度。把电流分成 i_d 和 i_q，让 i_d 为零，转矩就是 k_t 乘 i_q。一台三相电机就变成了一台简单的“转矩等于常数乘电流”的电机。",
+    "The old clutch motor idled at rated speed all the time; pressing the pedal engaged a friction clutch. It wasted power, ran hot, and where it stopped was pure luck. A servo turns only when needed, and direct drive removes the belt, so positioning is more accurate and the head is quieter. Sewing-machine servos are almost all PMSMs. The key point: for a given current, torque is greatest when the current's field is perpendicular to the rotor field, so the drive must read the rotor angle from the encoder at every instant. Split the current into i_d and i_q, hold i_d at zero, and torque is simply k_t times i_q. A three-phase motor becomes a simple motor whose torque equals a constant times current."
+   ]
+  },
+  {
+   "title": [
+    "三个嵌套的控制环",
+    "Three nested control loops"
+   ],
+   "points": [
+    [
+     "电流环最快（约 0.1 ms），速度环用 PI，位置环在最外",
+     "Current loop fastest (about 0.1 ms); velocity loop PI; position loop outermost"
+    ],
+    [
+     "外环输出就是内环指令，越靠里越快",
+     "Each outer loop's output is the inner loop's command; inner loops are faster"
+    ],
+    [
+     "速度环带宽约 K_v/J：算例 0.2 ÷ 6×10⁻⁴ ≈ 330 rad/s",
+     "Velocity-loop bandwidth ≈ K_v/J: 0.2 ÷ 6×10⁻⁴ ≈ 330 rad/s in the example"
+    ],
+    [
+     "主轴负载每转都变，速度环要压住这种周期扰动",
+     "The shaft load varies within every revolution; the velocity loop must suppress it"
+    ]
+   ],
+   "formula": "\\omega_{bw} \\approx \\frac{K_v}{J}",
+   "figure": "fig_13_loops.png",
+   "narration": [
+    "伺服驱动器里有三个环，一个套一个。最里面电流环，让实际 i_q 跟上转矩指令，大约每 0.1 毫秒算一次。中间速度环，比较转速指令和实际转速，用比例加积分算出转矩指令。最外面位置环，比较目标转角和实际转角，算出转速指令。K_v 的单位是牛米秒每弧度，意思是转速差 1 弧度每秒给多少转矩，它除以惯量 J 大致就是速度环带宽。本章算例 J 是 6×10⁻⁴，K_v 是 0.2，带宽约 330 rad/s。缝纫机主轴负载每转都在变，速度环硬不硬，直接决定转速稳不稳。",
+    "A servo drive contains three loops, one inside another. The innermost current loop makes the actual i_q follow the torque command, computed roughly every 0.1 ms. The velocity loop in the middle compares speed command and actual speed and produces a torque command with PI action. The outermost position loop compares target and actual angle and produces the speed command. K_v has units of N·m·s/rad: how much torque for 1 rad/s of speed error. Divided by the inertia J, it is roughly the velocity-loop bandwidth. In this chapter J is 6×10⁻⁴ and K_v is 0.2, so the bandwidth is about 330 rad/s. Because the shaft load changes within every revolution, how stiff the velocity loop is decides how steady the speed is."
+   ]
+  },
+  {
+   "title": [
+    "停针定位：先降速，再切位置环",
+    "Needle positioning: slow down, then switch to the position loop"
+   ],
+   "points": [
+    [
+     "速度环先降到定位速度（算例 200 r/min）",
+     "The velocity loop first slows to positioning speed (200 r/min in the example)"
+    ],
+    [
+     "离目标 45° 时切入位置环，输出限在定位速度以内",
+     "Switch to the position loop 45° before target; its output is limited to positioning speed"
+    ],
+    [
+     "标准参数 K_p = 200 s⁻¹、K_v = 0.2、T_i = 12 ms：超调约 0.1°，38 ms 进入 ±0.5°",
+     "Standard K_p = 200 s⁻¹, K_v = 0.2, T_i = 12 ms: about 0.1° overshoot, within ±0.5° after 38 ms"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_13_stop.png",
+   "narration": [
+    "松开脚踏，主轴要停在上针位，通常只有几十到一百多毫秒。做法分两步。先由速度环把主轴降到很低的定位速度，算例取 200 r/min；编码器发现离目标只差 45° 了，切换到位置环。位置环的输出被限在定位速度以内，所以误差大时主轴匀速靠近，误差小了才减速。看图里蓝色这条标准参数的曲线：冲过目标约 0.1°，又被拉回到 −0.5° 附近，被摩擦卡一下，再被积分推到目标，38 毫秒进入正负 0.5° 的容许带。",
+    "When the pedal is released the shaft must stop at needle-up, usually within tens of milliseconds to a little over a hundred. It is done in two stages. First the velocity loop slows the shaft to a very low positioning speed, 200 r/min in the example; when the encoder shows only 45° left to the target, control switches to the position loop. Its output is limited to positioning speed, so while the error is large the shaft approaches at constant speed and only decelerates once the error is small. Look at the blue standard curve: it overshoots by about 0.1°, is pulled back to about −0.5°, sticks there because of friction, and is pushed to the target by the integral, entering the ±0.5° band in 38 ms."
+   ]
+  },
+  {
+   "title": [
+    "增益过大与惯量变化",
+    "Too much gain, and a change of inertia"
+   ],
+   "points": [
+    [
+     "K_p = 500：超调约 1.8°、50 ms；速度环跟不上",
+     "K_p = 500: about 1.8° overshoot, 50 ms; the velocity loop cannot follow"
+    ],
+    [
+     "经验：K_p 取 K_v/J 的 1/4–1/2；先调硬速度环再加位置环",
+     "Rule: K_p ≈ 1/4 to 1/2 of K_v/J; stiffen the velocity loop first, then add the position loop"
+    ],
+    [
+     "刚减速时要求 K_p·ω_p，不能超过峰值转矩能给的减速度（约 4400 rad/s²）",
+     "The initial demand K_p·ω_p must not exceed the deceleration peak torque can give (about 4400 rad/s²)"
+    ],
+    [
+     "惯量加倍：超调约 2.2°、67 ms；要重设负载惯量，并降 K_p",
+     "Inertia doubled: about 2.2° overshoot, 67 ms; reset load inertia and lower K_p"
+    ]
+   ],
+   "formula": "K_p\\,\\omega_p \\le \\frac{T_{max}+T_f}{J}",
+   "figure": "",
+   "narration": [
+    "把位置增益从 200 加到 500 会怎样？主轴冲过目标约 1.8°，来回摆一下，50 毫秒才停。因为位置环要求的减速太猛，速度环带宽只有 330，跟不上。经验是先把速度环调硬，再加位置环，位置增益取速度环带宽的四分之一到二分之一。还有一个硬限制：刚开始减速时，要求的减速度大约是 K_p 乘定位速度，它不能超过峰值转矩能给的减速度，算例约 4400 rad/s²。换了更重的手轮、惯量加倍，带宽减半，结果像增益过大：超调 2.2°、67 毫秒。所以换机头一定要重设负载惯量。",
+    "What happens if the position gain goes from 200 to 500? The shaft overshoots by about 1.8°, swings once more and needs 50 ms to stop, because the position loop demands a deceleration the velocity loop, with only 330 rad/s of bandwidth, cannot follow. The rule is to stiffen the velocity loop first and then add the position loop, with K_p a quarter to a half of the velocity-loop bandwidth. There is also a hard limit: the deceleration demanded at first is about K_p times positioning speed, and it cannot exceed what peak torque can give, about 4400 rad/s² here. Fit a heavier handwheel, double the inertia, and the bandwidth halves; the result looks like too much gain: 2.2° overshoot and 67 ms. So whenever the head changes, reset the load inertia."
+   ]
+  },
+  {
+   "title": [
+    "摩擦造成的静差：为什么速度环要用 PI",
+    "Friction-induced error: why the velocity loop uses PI"
+   ],
+   "points": [
+    [
+     "停住时转速为零，只剩比例项：转矩 = K_v·K_p·e",
+     "At standstill only the proportional term remains: torque = K_v·K_p·e"
+    ],
+    [
+     "它小于库仑摩擦 T_f 就推不动，主轴可能停在这个范围内任何位置",
+     "If it is below Coulomb friction T_f the shaft cannot move; it may stop anywhere in this range"
+    ],
+    [
+     "算例：0.15 ÷ (0.2 × 200) rad ≈ 0.21°",
+     "Example: 0.15 ÷ (0.2 × 200) rad ≈ 0.21°"
+    ],
+    [
+     "积分把小误差累积成转矩，直到推得动",
+     "The integral accumulates the small error into torque until the shaft moves"
+    ]
+   ],
+   "formula": "|e| \\le \\frac{T_f}{K_v K_p}",
+   "figure": "",
+   "narration": [
+    "把速度环的积分去掉，T_i 设为零，主轴停在离目标约 0.2° 的地方不动了。为什么？停住时转速是零，速度环只剩比例项，它输出的转矩就是 K_v 乘 K_p 乘误差 e。只要这个转矩小于摩擦转矩 T_f，主轴就推不动。所以没有积分时，主轴可能停在正负 T_f 除以 K_v K_p 以内的任何地方，算例是 0.21°，注意要把弧度换成度。具体停在哪儿，取决于它是怎样冲过来的。积分项把这点误差慢慢积成转矩，直到推得动为止，这就是速度环要用 PI 的原因。",
+    "Remove the velocity-loop integral, set T_i to zero, and the shaft stops about 0.2° short of the target and stays there. Why? At standstill the speed is zero, only the proportional term remains, and the torque it outputs is K_v times K_p times the error e. As long as that torque is below the friction torque T_f, the shaft cannot be moved. So without integral action the shaft may stop anywhere within plus or minus T_f over K_v K_p — 0.21° in the example; remember to convert radians to degrees. Exactly where depends on how it arrived. The integral slowly turns that small error into torque until the shaft moves; that is why the velocity loop uses PI."
+   ]
+  },
+  {
+   "title": [
+    "上针位停不准的后果",
+    "What an inaccurate needle-up stop does"
+   ],
+   "points": [
+    [
+     "第 8 章时刻表：挑线杆 55° 到最高点，针尖 101.7° 入布",
+     "Chapter 8 timing: take-up lever top at 55°, needle point enters the fabric at 101.7°"
+    ],
+    [
+     "停早了：挑线杆未到顶，下一针可能把线头抽出针眼，起缝脱线",
+     "Too early: lever not at top; the next stitch may pull the thread end out of the eye"
+    ],
+    [
+     "停晚了：机针已下行，抽布时容易挂布",
+     "Too late: the needle has started down and catches the fabric as it is pulled out"
+    ],
+    [
+     "上针位是一段可设定的转角范围",
+     "Needle-up is a settable range of shaft angle"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "停不准到底有什么后果？按第 8 章的时刻表，挑线杆在 55° 到最高点，针尖在 101.7° 才刺入布料，上针位就设在这两者之间。停早了，挑线杆还没到顶，剪线后针眼里只留很短的线头，下一道起缝时挑线杆继续上升，可能把线头抽出来，起缝就脱线了，所以有的机器剪线后让主轴反转一点。停晚了，机针已经开始下行，离布面太近，抽布时容易挂住。所以实际机器的上针位是一段可以设定的转角，停在范围内就算合格。",
+    "What does an inaccurate stop actually cause? By the Chapter 8 timing chart the take-up lever reaches its top at 55° and the needle point enters the fabric at 101.7°; needle-up is set between the two. Stop too early and the lever is not yet at its top; after trimming only a short end is left in the eye, and as the lever keeps rising at the next start it may pull the end out, so the seam unthreads — which is why some machines reverse the shaft slightly after trimming. Stop too late and the needle is already descending, too close to the fabric, and catches it as the work is pulled out. So on real machines needle-up is a settable angle range; anywhere inside counts as acceptable."
+   ]
+  },
+  {
+   "title": [
+    "增量编码器与四倍频",
+    "Incremental encoders and ×4 decoding"
+   ],
+   "points": [
+    [
+     "A、B 两路错开 1/4 缝距：谁超前判断方向",
+     "Channels A and B offset by a quarter pitch: which leads gives direction"
+    ],
+    [
+     "上升沿、下降沿都计数，一个周期 4 次",
+     "Both edges of both channels are counted: 4 counts per cycle"
+    ],
+    [
+     "1024 线 × 4 = 4096 计数/转，分辨率约 0.088°",
+     "1024 lines × 4 = 4096 counts/rev, resolution about 0.088°"
+    ],
+    [
+     "原点信号定绝对角；U、V、W 磁极信号让电机先转起来",
+     "Index pulse gives absolute angle; U, V, W pole signals let the motor start"
+    ]
+   ],
+   "formula": "\\Delta\\theta = \\frac{360^\\circ}{4N}",
+   "figure": "fig_13_enc.png",
+   "narration": [
+    "伺服电机后端的增量编码器，是一个刻着均匀透光缝的码盘，两组光电管 A、B 错开四分之一缝距。A 超前 B 是正转，B 超前 A 是反转。两路的上升沿和下降沿都数，一个周期数 4 次，叫四倍频。1024 线的编码器每转 4096 个计数，分辨率约 0.088°，停针足够了。码盘上还有一条每转一个缝的原点信号，上电转一圈就知道绝对转角。有了绝对转角，上针位、下针位就只是两段转角区间，剪线、拨线也在指定转角发令。",
+    "The incremental encoder at the back of the servo is a code disc with evenly spaced slits and two detectors, A and B, offset by a quarter pitch. A leading B means forward; B leading A means reverse. Counting both edges of both signals gives four counts per cycle — ×4 decoding. A 1024-line encoder gives 4096 counts per revolution, about 0.088°, ample for positioning. An index track with one slit per revolution lets the controller find the absolute angle after one turn at power-up. Once the absolute angle is known, needle-up and needle-down are just two intervals of shaft angle, and trimming and wiping commands are issued at set angles."
+   ]
+  },
+  {
+   "title": [
+    "低速测速：M 法与 T 法",
+    "Low-speed measurement: M method and T method"
+   ],
+   "points": [
+    [
+     "M 法：固定时间数计数，误差 ±1 计数 ≈ 14.6 r/min；200 r/min 时约 7%",
+     "M method: count pulses in fixed time; error ±1 count ≈ 14.6 r/min, about 7% at 200 r/min"
+    ],
+    [
+     "T 法：高频时钟测两计数间隔；200 r/min 时约 0.14%",
+     "T method: time between counts with a fast clock; about 0.14% at 200 r/min"
+    ],
+    [
+     "两条误差曲线交于约 1500 r/min",
+     "The two error curves cross at about 1500 r/min"
+    ],
+    [
+     "停针在低速完成，所以低速用 T 法或 M/T 法",
+     "Positioning happens at low speed, so use the T or M/T method there"
+    ]
+   ],
+   "formula": "\\delta_M = \\frac{60}{N_c\\,T_s\\,n},\\qquad \\delta_T = \\frac{N_c\\,n}{60\\,f_c}",
+   "figure": "",
+   "narration": [
+    "转速是从转角算出来的。M 法每隔固定时间，比如 1 毫秒，数一次计数，误差是正负一个计数，4096 线时折合 14.6 r/min；转速越低相对误差越大，200 r/min 时约 7%。T 法反过来，用 10 兆赫的时钟测两个计数之间隔了多久，误差是一个时钟周期，转速越高越差，200 r/min 时只有 0.14%。两条曲线大约在 1500 r/min 相交。停针恰好发生在几十到两百 r/min，是 M 法最差的地方，所以驱动器低速段要用 T 法或者两者结合的 M/T 法。",
+    "Speed is computed from angle. The M method counts pulses over a fixed interval, say 1 ms; its error is plus or minus one count, about 14.6 r/min with 4096 counts per revolution, so the lower the speed the larger the relative error — about 7% at 200 r/min. The T method does the opposite: a 10 MHz clock times the gap between two counts; its error is one clock period, and it gets worse as speed rises, only 0.14% at 200 r/min. The curves cross at about 1500 r/min. Needle positioning happens at tens to two hundred r/min, exactly where the M method is worst, so drives use the T method or the combined M/T method at low speed."
+   ]
+  },
+  {
+   "title": [
+    "其他传感器",
+    "Other sensors"
+   ],
+   "points": [
+    [
+     "脚踏：霍尔元件或电位器；前掌缝纫，后跟抬压脚、剪线",
+     "Pedal: Hall element or potentiometer; ball of foot sews, heel lifts the foot or trims"
+    ],
+    [
+     "断线检测：挑线簧是否摆动，或面线带动小轮、光电检测",
+     "Thread-break detection: check-spring swing, or a small wheel turned by the needle thread, read by a photoelectric sensor"
+    ],
+    [
+     "底线余量：梭芯侧面反光标记，或按针数估算",
+     "Bobbin thread: a reflective mark on the bobbin side, or an estimate from stitch count"
+    ],
+    [
+     "布厚：压脚杆位移传感器；布边：光电传感器",
+     "Fabric thickness: displacement sensor on the presser bar; edges: photoelectric sensors"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "除了编码器，控制箱还要听很多传感器的话。脚踏里有个位置传感器，前掌踩得越深越快，后跟轻踩抬压脚，踩到底剪线。断线检测有两种常见做法：看挑线簧是不是每针都在摆，或者让面线绕过一个小轮，用光电管看它转不转，断了线几针之内就能停车。底线快用完时，梭芯侧面的反光标记露出来就报警，也有的干脆按针数估算。布厚用压脚杆上的位移传感器，布边用光电管，自动单元里用得最多。",
+    "Besides the encoder, the control box listens to many sensors. The pedal holds a position sensor: the further forward, the faster; a light heel press lifts the presser foot, a full heel press trims. Thread breaks are detected in two common ways: watching whether the check spring swings every stitch, or running the needle thread round a small wheel and checking with a photoelectric sensor whether it turns; the machine can stop within a few stitches. When the bobbin is nearly empty, a reflective mark on its side is exposed and triggers an alarm; some machines just estimate from the stitch count. Fabric thickness comes from a displacement sensor on the presser bar, edges from photoelectric sensors, used most in automatic units."
+   ]
+  },
+  {
+   "title": [
+    "步进电机：细分、矩频特性与失步",
+    "Stepper motors: microstepping, torque–frequency and lost steps"
+   ],
+   "points": [
+    [
+     "两相混合式 1.8°/步；不用编码器，发多少脉冲走多少步",
+     "Two-phase hybrid, 1.8° per step; no encoder needed — steps equal pulses"
+    ],
+    [
+     "16 细分：每转 3200 步、每步 0.1125°；更平稳，但精度不按比例提高",
+     "16 microsteps: 3200 steps/rev, 0.1125° each; smoother, but accuracy does not rise in proportion"
+    ],
+    [
+     "频率越高转矩越小；负载超过可用转矩就失步，控制器不知道",
+     "Higher step rate, lower torque; load above available torque loses steps unknown to the controller"
+    ],
+    [
+     "对策：高压斩波、留余量、加阻尼，或做成闭环步进",
+     "Remedies: higher voltage with chopping, margin, damping, or a closed-loop stepper"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_13_step.png",
+   "narration": [
+    "步进电机最大的好处是不用编码器也能定位，常用的两相混合式每步 1.8°，每转 200 步。整步走一顿一顿的，细分驱动让两相电流按正弦余弦一小格一小格变，16 细分时每转 3200 步。但要记住，细分让运动更平稳，不能同比例提高定位精度。再看右图矩频特性：绕组有电感，频率越高电流越来不及建立，转矩越小。负载超过可用转矩就失步，控制器以为走到了，其实少走了几步，送布失步针距不准，绣框失步整个图案错位。所以选型要留余量，要求高就做成闭环步进。",
+    "The great advantage of a stepper is positioning without an encoder; the common two-phase hybrid takes 1.8° per step, 200 steps per revolution. Full steps are jerky, so microstepping drives the two phase currents along sine and cosine in small increments; with 16 microsteps there are 3200 steps per revolution. But remember: microstepping makes motion smoother, it does not raise accuracy in the same proportion. Now the torque–frequency curve on the right: the winding inductance means that the higher the step rate, the less the current can build up, and the lower the torque. If the load exceeds the available torque the motor loses steps, and the controller does not know. Lost steps in feed mean wrong stitch length; on an embroidery frame, a misregistered design. So leave margin when selecting, and use a closed-loop stepper where it matters."
+   ]
+  },
+  {
+   "title": [
+    "电磁铁吸合：强激磁加斩波维持",
+    "Solenoid pull-in: boost plus chopped hold"
+   ],
+   "points": [
+    [
+     "电流按 τ = L/R 上升；电磁力 ∝ i²，超过弹簧力衔铁才动",
+     "Current rises with τ = L/R; force ∝ i², the armature moves only when it exceeds the spring force"
+    ],
+    [
+     "衔铁运动产生反电动势，电流曲线出现凹口",
+     "Armature motion generates back-EMF: the notch in the current curve"
+    ],
+    [
+     "算例：只给 1 A 吸不动；一直给 3 A 发热约 70 W",
+     "Example: 1 A alone will not pull in; 3 A continuously dissipates about 70 W"
+    ],
+    [
+     "24 V 强激磁 6.9 ms 吸到底，再斩波维持 1 A，发热 8 W",
+     "24 V boost pulls in at 6.9 ms, then chop to hold 1 A, dissipating 8 W"
+    ]
+   ],
+   "formula": "\\tau = \\frac{L}{R}",
+   "figure": "fig_13_sol.png",
+   "narration": [
+    "剪线、倒缝、抬压脚，行程几毫米、只有动和不动两个状态，用电磁铁最简单。线圈有电阻也有电感，接上电压，电流按时间常数 L 除以 R 慢慢上升。电磁力和电流平方成正比，超过弹簧力衔铁才开始动，衔铁一动电感变化产生反电动势，电流曲线上就有个凹口。算例线圈 8 欧、电感 20 到 80 毫亨、行程 3 毫米。只给 1 安吸不动，一直给 3 安发热约 70 瓦，几秒就烫手。所以用强激磁：先加 24 伏全电压，6.9 毫秒吸到底，再斩波维持 1 安，只发热 8 瓦。",
+    "Trimming, reverse stitching and presser-foot lift have strokes of a few millimetres and only two states, so a solenoid is the simplest choice. The coil has resistance and inductance; apply a voltage and the current rises with time constant L over R. The magnetic force goes as current squared, and the armature only starts to move once it beats the spring; as it moves, the inductance changes, generating back-EMF — the notch in the current curve. The example coil is 8 Ω, 20 to 80 mH, 3 mm stroke. 1 A will not pull it in; 3 A continuously dissipates about 70 W and is too hot to touch within seconds. Hence boost: apply the full 24 V, the armature is in at 6.9 ms, then chop to hold 1 A, only 8 W."
+   ]
+  },
+  {
+   "title": [
+    "释放、续流，以及把延迟折算成主轴转角",
+    "Release, freewheeling, and converting delay into shaft angle"
+   ],
+   "points": [
+    [
+     "二极管续流：按 L/R 慢衰减，释放 12.9 ms",
+     "Diode freewheeling: slow L/R decay, release 12.9 ms"
+    ],
+    [
+     "48 V 稳压管续流：释放 5.1 ms；功率管承受 24 + 48 = 72 V；每次吸收 ½Li² ≈ 40 mJ",
+     "48 V Zener: release 5.1 ms; transistor sees 24 + 48 = 72 V; ½Li² ≈ 40 mJ absorbed per release"
+    ],
+    [
+     "转角 = 6nt：400 r/min 时 1 ms = 2.4°；吸合 17°、释放 31° 或 12°",
+     "Angle = 6nt: at 400 r/min 1 ms = 2.4°; pull-in 17°, release 31° or 12°"
+    ],
+    [
+     "≤ 20° 时剪线转速上限约 480 r/min；气缸慢，只用于每件一两次的动作",
+     "With ≤ 20° the trimming-speed limit is about 480 r/min; cylinders are slow, for once-per-garment actions"
+    ]
+   ],
+   "formula": "\\theta = 6\\,n\\,t \\quad (n\\ \\text{in r/min},\\ t\\ \\text{in s})",
+   "figure": "",
+   "narration": [
+    "断电时电流不会马上消失，得给它一条续流回路。并个二极管最简单，可电流按 L/R 慢慢衰减，吸合时电感最大，衰减最慢，算例释放要 12.9 毫秒。换成 48 伏稳压管，线圈电压被钳住，电流很快降下来，只要 5.1 毫秒。代价是功率管要扛 24 加 48 等于 72 伏，稳压管每次要吸收二分之一 L i 平方，约 40 毫焦。最后把毫秒换成度：转角等于 6 乘转速乘时间。要求不超过 20°，较长的吸合 6.9 毫秒决定上限，约 480 r/min。气缸力大但慢，只适合每件衣服动一两次的动作。",
+    "At switch-off the current does not vanish at once; it needs a freewheeling path. A diode across the coil is simplest, but the current decays slowly with L over R, slowest when pulled in where inductance is largest — 12.9 ms to release in the example. With a 48 V Zener the coil voltage is clamped and the current falls quickly: 5.1 ms. The price: the transistor must withstand 24 plus 48, 72 V, and the Zener absorbs half L i squared, about 40 mJ, every release. Finally convert milliseconds to degrees: angle equals 6 times speed times time. With a 20° limit, the longer pull-in of 6.9 ms sets the limit, about 480 r/min. Cylinders are strong but slow, suited only to actions that happen once or twice per garment."
+   ]
+  },
+  {
+   "title": [
+    "功率电路：急停的能量往哪里去",
+    "Power circuit: where the energy goes in an emergency stop"
+   ],
+   "points": [
+    [
+     "220 V 整流后母线约 310 V；逆变桥六个开关管",
+     "220 V rectified gives about 310 V on the DC link; a six-switch inverter bridge"
+    ],
+    [
+     "急停时电机发电，整流桥单向，能量只能充进母线电容",
+     "In an emergency stop the motor generates; the rectifier is one-way, so energy charges the DC-link capacitor"
+    ],
+    [
+     "算例：5000 r/min 动能约 82 J，70% 回馈，470 μF 升到约 584 V",
+     "Example: about 82 J at 5000 r/min, 70% fed back, 470 μF rises to about 584 V"
+    ],
+    [
+     "制动电阻在约 400 V 导通；超过约 2550 r/min 急停就必须靠它",
+     "Braking resistor switches in at about 400 V; above about 2550 r/min a stop needs it"
+    ]
+   ],
+   "formula": "V_2=\\sqrt{V_0^2+\\frac{2E}{C}}",
+   "figure": "fig_13_inv.png",
+   "narration": [
+    "伺服驱动器的功率部分：220 伏交流整流成直流，母线电容滤平，约 310 伏，再由六个开关管组成的逆变桥给电机供电。急停时，电机变成发电机，把主轴的动能送回母线，可整流桥是单向的，能量回不了电网，只能充进电容，电压就往上升。算例 5000 r/min 时动能约 82 焦，七成回馈约 58 焦，470 微法的电容要升到 584 伏，远超电容耐压。所以母线上并一个制动电阻加开关管，超过 400 伏就导通放热。按算例，急停前转速超过约 2550 r/min 就必须靠它。",
+    "The power section of a servo drive: 220 V AC is rectified to DC and smoothed by the DC-link capacitor to about 310 V, then a six-switch inverter bridge feeds the motor. In an emergency stop the motor becomes a generator and returns the shaft's kinetic energy to the DC link; but the rectifier is one-way, so the energy cannot go back to the grid and can only charge the capacitor, and the voltage rises. In the example the kinetic energy at 5000 r/min is about 82 J; 70%, about 58 J, comes back, and a 470 μF capacitor would rise to 584 V, far above its rating. So a braking resistor with a switch sits across the link and conducts above 400 V. In the example, any stop from above about 2550 r/min needs it."
+   ]
+  },
+  {
+   "title": [
+    "控制器分工、总线与设计要点",
+    "Division of work in the controller, buses, and design notes"
+   ],
+   "points": [
+    [
+     "越快、越确定的任务越靠近硬件：中断或 FPGA；慢而复杂的放普通任务",
+     "The faster and more deterministic, the closer to hardware (interrupts, FPGA); slow, complex work in ordinary tasks"
+    ],
+    [
+     "常见错误：按转角触发的剪线放在普通任务里，界面一忙就晚几度",
+     "Common mistake: angle-triggered trimming in an ordinary task — a busy UI makes it late by degrees"
+    ],
+    [
+     "总线：面板 RS-485，多轴 CAN，高要求同步 EtherCAT",
+     "Buses: RS-485 to the panel, CAN between drives, EtherCAT for tight sync"
+    ],
+    [
+     "要点：先调速度环；惯量变了重调；执行器延迟按转速折成转角；母线要有制动电阻",
+     "Notes: tune the velocity loop first; retune when inertia changes; convert delays to angle; give the DC link a braking resistor"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "控制箱里的主控制器要同时干好几类事：电流环每 0.1 毫秒，速度环、位置环稍慢，每针按转角发送布、张力、剪线指令，还要管脚踏、面板和通信。分工原则一句话：越快、越确定的任务越靠近硬件，放在中断或 FPGA 里；越慢越复杂的放普通任务。一个常见错误就是把剪线这类按转角触发的动作放在普通任务里，界面一忙，剪线就晚几度。通信上，面板用 RS-485，多轴驱动之间用 CAN，多头刺绣机这类严格同步用 EtherCAT。最后把本讲的设计要点再串一遍。",
+    "The main controller must do several kinds of work at once: the current loop every 0.1 ms, the velocity and position loops a little slower, feed, tension and trimming commands each stitch by shaft angle, plus pedal, panel and communications. The rule in one sentence: the faster and more deterministic a task, the closer it goes to hardware — interrupts or an FPGA; slower, complex work goes in ordinary tasks. A common mistake is putting an angle-triggered action like trimming in an ordinary task; when the interface is busy, the trim is several degrees late. For communications: RS-485 to the panel, CAN between drives, EtherCAT for tight synchronisation such as multi-head embroidery. Finally, let us run through this lesson's design notes once more."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "主轴伺服是三环嵌套：电流环最快，速度环用 PI，位置环最外；速度环带宽约 K_v/J。",
+   "The main-shaft servo nests three loops: current fastest, velocity PI, position outermost; velocity-loop bandwidth ≈ K_v/J."
+  ],
+  [
+   "停针先降速再切位置环；K_p 取 K_v/J 的 1/4–1/2，且 K_p·ω_p 不能超过峰值转矩的减速能力；惯量变了要重调。",
+   "Needle positioning slows first, then switches to the position loop; K_p ≈ 1/4–1/2 of K_v/J, K_p·ω_p must not exceed peak-torque deceleration; retune when inertia changes."
+  ],
+  [
+   "没有积分时摩擦造成静差 |e| ≤ T_f/(K_v·K_p)；积分把它消掉。",
+   "Without integral action friction leaves |e| ≤ T_f/(K_v·K_p); the integral removes it."
+  ],
+  [
+   "增量编码器四倍频分辨率 360°/(4N)；低速测速用 T 法或 M/T 法。",
+   "×4 incremental-encoder resolution is 360°/(4N); use the T or M/T method at low speed."
+  ],
+  [
+   "电磁铁用强激磁加斩波维持，稳压管续流让释放快；延迟按 θ = 6nt 折成主轴转角，决定剪线转速上限。",
+   "Solenoids use boost plus chopped hold, and Zener freewheeling for fast release; delays convert to shaft angle by θ = 6nt and set the trimming-speed limit."
+  ],
+  [
+   "步进电机要按矩频特性留余量防失步；急停能量要靠制动电阻消耗；按转角触发的动作放在中断里。",
+   "Steppers need torque–frequency margin to avoid lost steps; emergency-stop energy goes to a braking resistor; angle-triggered actions belong in interrupts."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "servo",
+   "no": "13-1",
+   "title": [
+    "停针定位：伺服调参",
+    "Needle positioning: servo tuning"
+   ],
+   "goal": [
+    [
+     "观察位置增益、速度增益、积分时间对超调、停稳时间和静差的影响。",
+     "Observe how position gain, velocity gain and integral time affect overshoot, settling time and steady-state error."
+    ],
+    [
+     "验证没有积分时的最大静差公式 |e| ≤ T_f/(K_v·K_p)。",
+     "Verify the maximum-error formula |e| ≤ T_f/(K_v·K_p) without integral action."
+    ],
+    [
+     "在折算惯量加倍后重新调参，体会负载惯量设定的意义。",
+     "Retune after the referred inertia is doubled, and see why the load-inertia setting matters."
+    ]
+   ],
+   "theory": [
+    [
+     "速度环为 PI，位置环为比例控制，位置环输出被限制在定位速度以内；仿真从主轴以定位速度转动、离目标还差一段角度时开始。",
+     "The velocity loop is PI and the position loop proportional, with its output limited to positioning speed; the simulation starts with the shaft at positioning speed some angle short of the target."
+    ],
+    [
+     "速度环带宽约 K_v/J，位置增益一般取它的 1/4–1/2；刚开始减速时要求的减速度约 K_p·ω_p，不能超过 (T_max + T_f)/J。",
+     "Velocity-loop bandwidth ≈ K_v/J, and K_p is usually 1/4–1/2 of it; the initial deceleration demand ≈ K_p·ω_p must not exceed (T_max + T_f)/J."
+    ],
+    [
+     "停住时速度环只剩比例项，转矩 K_v·K_p·e 小于库仑摩擦 T_f 时主轴推不动，所以无积分时 |e| ≤ T_f/(K_v·K_p)。",
+     "At standstill only the proportional term remains; if K_v·K_p·e is below Coulomb friction T_f the shaft cannot move, so without integral |e| ≤ T_f/(K_v·K_p)."
+    ],
+    [
+     "判据：超调 ≤ 0.5°，停稳时间（进入 ±0.5°）≤ 60 ms，静差 ≤ 0.05°，转矩饱和时间 ≤ 5 ms。",
+     "Criteria: overshoot ≤ 0.5°, settling time (into ±0.5°) ≤ 60 ms, steady-state error ≤ 0.05°, torque-saturation time ≤ 5 ms."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，按“恢复标准”（K_p = 200 s⁻¹，K_v = 0.2 N·m·s/rad，T_i = 12 ms，定位速度 200 r/min，切入角 45°，J = 6×10⁻⁴ kg·m²，T_f = 0.15 N·m），在记录表第一行填下右侧“判据”的四个读数。",
+     "Open the lab and press “Reset to standard” (K_p = 200 s⁻¹, K_v = 0.2 N·m·s/rad, T_i = 12 ms, positioning speed 200 r/min, switch-in angle 45°, J = 6×10⁻⁴ kg·m², T_f = 0.15 N·m); record the four readings under “Criteria” in the first row of the table."
+    ],
+    [
+     "按“重放动画”，看手轮动画（容许范围放大 10 倍、慢放 20 倍）和误差放大图，找出主轴在 −0.5° 附近被摩擦卡住、再被积分推到目标的那一段。",
+     "Press replay and watch the handwheel animation (tolerance band magnified 10×, slowed 20×) and the magnified error plot; find where the shaft sticks near −0.5° and is then pushed to the target by the integral."
+    ],
+    [
+     "只把位置增益 K_p 调到 500，记录超调、停稳时间和转矩饱和时间；在下方转矩曲线上看转矩顶在 2.5 N·m 峰值线上的时间。然后按“恢复标准”。",
+     "Raise only K_p to 500 and record overshoot, settling time and saturation time; on the torque plot see how long the torque sits on the 2.5 N·m peak line. Then press “Reset to standard”."
+    ],
+    [
+     "任务 1：按“打乱”（增益变为 K_p = 450、K_v = 0.05、T_i = 0），只调 K_p、K_v、T_i 三个滑块，直到四条判据全部打勾；记录你的参数。",
+     "Task 1: press “Scramble” (gains become K_p = 450, K_v = 0.05, T_i = 0), adjust only K_p, K_v and T_i until all four criteria are ticked; record your parameters."
+    ],
+    [
+     "任务 2：恢复标准后把 T_i 调到 0，看主轴最后停在哪里；用 T_f/(K_v·K_p) 算出最大静差（换算成度），填入“静差预测”，按“核对”（允许 ±0.02°）。",
+     "Task 2: from standard, set T_i to 0 and see where the shaft finally stops; compute the maximum error T_f/(K_v·K_p) in degrees, enter it in the prediction box and press “Check” (±0.02°)."
+    ],
+    [
+     "保持 T_i = 0，把库仑摩擦 T_f 调到 0.3 N·m，再预测并核对一次，记录仿真停住的位置是否在预测范围内。",
+     "Keeping T_i = 0, raise T_f to 0.3 N·m, predict and check again, and record whether the simulated stop lies within the predicted range."
+    ],
+    [
+     "任务 3：恢复标准，把折算惯量 J 调到 12（×10⁻⁴ kg·m²），先不改增益，记录判据；再只调三个增益，让四条判据全部满足，记录参数。",
+     "Task 3: reset, set J to 12 (×10⁻⁴ kg·m²), record the criteria with the gains unchanged; then adjust only the three gains until all four criteria are met, and record them."
+    ],
+    [
+     "（选做）改变定位速度和切入位置环的角度，观察停稳时间和转矩饱和时间的变化。",
+     "(Optional) Change the positioning speed and the switch-in angle and observe how settling time and saturation time change."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 13-1　停针定位调参记录",
+     "Table 13-1 Needle-positioning tuning record"
+    ],
+    "headers": [
+     [
+      "工况",
+      "Case"
+     ],
+     [
+      "增益 K_p / K_v / T_i",
+      "Gains K_p / K_v / T_i"
+     ],
+     [
+      "惯量 J（10⁻⁴ kg·m²）",
+      "Inertia J (10⁻⁴ kg·m²)"
+     ],
+     [
+      "超调（°）",
+      "Overshoot (°)"
+     ],
+     [
+      "停稳时间（ms）",
+      "Settling time (ms)"
+     ],
+     [
+      "静差（°）",
+      "Steady-state error (°)"
+     ],
+     [
+      "饱和时间（ms）",
+      "Saturation time (ms)"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "K_p 从 200 加到 500 时，超调为什么变大？用速度环带宽和峰值转矩两条限制解释。",
+     "Why does overshoot grow when K_p goes from 200 to 500? Explain with the velocity-loop bandwidth and the peak-torque limit."
+    ],
+    [
+     "惯量加倍后，为什么只加大 K_v 还不够，还要降低 K_p？",
+     "After the inertia is doubled, why is raising K_v alone not enough, and K_p must also be lowered?"
+    ],
+    [
+     "没有积分时，仿真停住的位置为什么不一定等于你算出的最大静差？",
+     "Without integral action, why does the simulated stop not necessarily equal the maximum error you calculated?"
+    ]
+   ]
+  },
+  {
+   "id": "solenoid",
+   "no": "13-2",
+   "title": [
+    "电磁铁驱动：吸合与释放",
+    "Solenoid drive: pull-in and release"
+   ],
+   "goal": [
+    [
+     "观察强激磁、维持电流和续流方式对吸合延迟、释放延迟和线圈发热的影响。",
+     "Observe how boost, hold current and freewheeling affect pull-in delay, release delay and coil heating."
+    ],
+    [
+     "把电磁铁的延迟折算成主轴转角，找出满足 20° 要求的驱动参数。",
+     "Convert solenoid delays into main-shaft angle and find drive settings that meet the 20° requirement."
+    ],
+    [
+     "算出给定参数下允许的最高剪线转速。",
+     "Calculate the highest allowable trimming speed for given settings."
+    ]
+   ],
+   "theory": [
+    [
+     "线圈电流按 τ = L/R 上升，电磁力 F = ½ i² dL/dx，超过弹簧力（预紧力 + 1 N/mm × 行程）衔铁才动；衔铁运动产生反电动势，电流出现凹口。",
+     "Coil current rises with τ = L/R; force F = ½ i² dL/dx must exceed the spring force (preload + 1 N/mm × stroke) before the armature moves; the motion causes back-EMF and a notch in the current."
+    ],
+    [
+     "强激磁：先加全电压，到时间后斩波维持；维持阶段发热 P = I²R。",
+     "Boost: apply full voltage, then chop to the hold current after the set time; hold-phase heating P = I²R."
+    ],
+    [
+     "断电时续流两端电压为 0.7 V（二极管）或稳压管电压；电压越高电流降得越快，功率管承受“驱动电压 + 续流电压”。",
+     "At switch-off the freewheeling voltage is 0.7 V (diode) or the Zener voltage; the higher it is, the faster the current falls, and the transistor sees drive voltage + freewheeling voltage."
+    ],
+    [
+     "转角 θ = 6nt；判据：吸合、释放各 ≤ 20°，维持发热 ≤ 10 W，驱动电压 + 续流电压 ≤ 100 V。",
+     "Angle θ = 6nt; criteria: pull-in and release each ≤ 20°, hold heating ≤ 10 W, drive + freewheeling voltage ≤ 100 V."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，按“恢复标准”（24 V，强激磁 20 ms，维持 1 A，续流 0.7 V 二极管，弹簧预紧 7 N，剪线转速 400 r/min），记录四条判据：吸合约 6.9 ms，释放约 12.9 ms。",
+     "Open the lab and press “Reset to standard” (24 V, 20 ms boost, 1 A hold, 0.7 V diode freewheeling, 7 N spring preload, trimming speed 400 r/min); record the four criteria: pull-in about 6.9 ms, release about 12.9 ms."
+    ],
+    [
+     "在上方曲线上找出电流的凹口、电磁力超过弹簧力的时刻和衔铁吸到底的时刻；在下方条图上读出折算成的主轴转角。",
+     "On the upper plot find the current notch, the moment the magnetic force exceeds the spring force and the moment the armature bottoms; read the converted shaft angles on the lower bar."
+    ],
+    [
+     "把强激磁时间调到 0，看衔铁还吸不吸得动；再加大维持电流直到能吸动，看发热判据。记录后按“恢复标准”。",
+     "Set the boost time to 0 and see whether the armature still pulls in; then raise the hold current until it does and look at the heating criterion. Record, then reset."
+    ],
+    [
+     "任务 1：只调续流电压（或按“换稳压管 48 V”），让四条判据全部满足；再把续流电压加到 80 V，看哪条判据不满足。",
+     "Task 1: change only the freewheeling voltage (or press “Switch to 48 V Zener”) until all four criteria pass; then raise it to 80 V and see which criterion fails."
+    ],
+    [
+     "任务 2：把剪线转速提到 600 r/min，维持电流不超过 1.1 A，调驱动电压、强激磁时间和续流电压，让四条判据全部满足，记录参数。",
+     "Task 2: raise the trimming speed to 600 r/min, keep the hold current ≤ 1.1 A, and adjust drive voltage, boost time and freewheeling voltage until all criteria pass; record the settings."
+    ],
+    [
+     "任务 3：在四条判据都满足的参数下，读出吸合和释放中较长的延迟，算 n_max = 20 ÷ (6 × t)，填入“最高转速”，按“核对”（允许 ±5%）。",
+     "Task 3: with settings that meet all criteria, take the longer of the two delays, compute n_max = 20 ÷ (6 × t), enter it as the maximum speed and press “Check” (±5%)."
+    ],
+    [
+     "（选做）把弹簧预紧力从 7 N 调到 10 N，观察吸合和释放延迟各向哪个方向变化。",
+     "(Optional) Change the spring preload from 7 N to 10 N and observe which way pull-in and release delays move."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 13-2　电磁铁驱动参数与延迟",
+     "Table 13-2 Solenoid drive settings and delays"
+    ],
+    "headers": [
+     [
+      "工况",
+      "Case"
+     ],
+     [
+      "电压 / 强激磁（V / ms）",
+      "Voltage / boost (V / ms)"
+     ],
+     [
+      "维持电流（A）",
+      "Hold current (A)"
+     ],
+     [
+      "续流电压（V）",
+      "Freewheeling voltage (V)"
+     ],
+     [
+      "吸合（ms / °）",
+      "Pull-in (ms / °)"
+     ],
+     [
+      "释放（ms / °）",
+      "Release (ms / °)"
+     ],
+     [
+      "发热（W）",
+      "Heating (W)"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "为什么二极管续流时释放最慢？稳压管电压能不能无限加大？",
+     "Why is release slowest with diode freewheeling? Can the Zener voltage be raised without limit?"
+    ],
+    [
+     "强激磁时间从 20 ms 缩短到 10 ms 有什么好处？会不会影响吸合？用你的记录说明。",
+     "What is gained by cutting the boost time from 20 ms to 10 ms? Does it affect pull-in? Use your records."
+    ],
+    [
+     "同样的电磁铁，剪线前为什么要先把主轴降到很低的转速？",
+     "With the same solenoid, why must the shaft be slowed to a very low speed before trimming?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 13：编码器测速、剪线电磁铁与急停制动的核算",
+   "Assignment 13: checking encoder speed measurement, the trimming solenoid and emergency braking"
+  ],
+  "tasks": [
+   [
+    "一台主轴伺服用每转 2500 线的增量编码器（四倍频）。分别用 M 法（每 1 ms 计数一次）和 T 法（10 MHz 时钟）测速，算出 150 r/min 和 3000 r/min 时两种方法的相对误差，并说明停针定位段和高速缝纫段各应采用哪种方法。",
+    "A main-shaft servo uses a 2500-line incremental encoder (×4 decoding). For the M method (counting every 1 ms) and the T method (10 MHz clock), calculate the relative error of each at 150 r/min and 3000 r/min, and state which method should be used during needle positioning and during high-speed sewing."
+   ],
+   [
+    "剪线电磁铁数据同第 13 章算例（吸合 6.9 ms；二极管续流释放 12.9 ms；48 V 稳压管续流释放 5.1 ms；吸合后维持 1 A，吸合时电感 80 mH）。车间要求剪线转速 450 r/min，吸合和释放都不超过 20° 主轴转角。判断两种续流方式是否满足，选定方案，并给出功率管的耐压要求和稳压管每次吸收的能量；说明理由。",
+    "The trimming solenoid matches the Chapter 13 example (pull-in 6.9 ms; release 12.9 ms with diode freewheeling, 5.1 ms with a 48 V Zener; 1 A hold after pull-in; 80 mH when pulled in). The floor wants a trimming speed of 450 r/min, with pull-in and release each within 20° of shaft angle. Decide whether each freewheeling scheme meets this, choose one, and give the transistor voltage requirement and the energy the Zener absorbs per release; justify your choice."
+   ],
+   [
+    "主轴折算惯量 8×10⁻⁴ kg·m²，从 4500 r/min 急停，设 70% 的动能回馈到母线；母线电容 680 μF、原来 310 V。不用制动电阻，母线电压升到多少？若制动电阻在 400 V 导通，急停前转速超过多少就必须靠它？",
+    "The referred main-shaft inertia is 8×10⁻⁴ kg·m²; the machine makes an emergency stop from 4500 r/min, with 70% of the kinetic energy fed back to the DC link; the link capacitor is 680 μF at 310 V. Without a braking resistor, what does the link voltage rise to? If the braking resistor switches in at 400 V, above what speed before the stop is it needed?"
+   ],
+   [
+    "（讨论）电子送布有人用步进电机，有人用伺服电机。从定位方式、失步风险、低速平稳性和成本四方面比较，并说明你会怎样选。",
+    "(Discussion) Some electronic feeds use a stepper motor, others a servo. Compare them on positioning method, risk of lost steps, low-speed smoothness and cost, and say how you would choose."
+   ]
+  ],
+  "deliverable": [
+   "2–4 页计算报告（PDF）：每题写出公式、代入数据和结果，计算可附 Python 脚本；附虚拟实验 13-1、13-2 中三个任务完成状态的截图。",
+   "A 2–4 page calculation report (PDF): for each task give formulas, substituted data and results, optionally with a Python script; attach screenshots showing the task status in Virtual labs 13-1 and 13-2."
+  ],
+  "rubric": [
+   [
+    "测速误差计算正确、方法选择有依据（25 分）",
+    "Speed-measurement errors correct and method choice justified (25 points)"
+   ],
+   [
+    "电磁铁转角核算、续流方案和耐压/能量正确（30 分）",
+    "Solenoid angle check, freewheeling choice and voltage/energy correct (30 points)"
+   ],
+   [
+    "急停母线电压和制动转速计算正确（25 分）",
+    "Emergency-stop link voltage and braking speed correct (25 points)"
+   ],
+   [
+    "讨论题论点清楚、与本章原理一致（15 分）",
+    "Discussion clear and consistent with the chapter's principles (15 points)"
+   ],
+   [
+    "报告规范、单位齐全（5 分）",
+    "Report tidy, units complete (5 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "把速度环的积分去掉以后，主轴停针总是差一点、而且差的方向不定。最主要的原因是：",
+    "With the velocity-loop integral removed, the shaft always stops slightly off target, in an unpredictable direction. The main reason is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "停住时只剩比例项，K_v·K_p·e 小于库仑摩擦时推不动主轴",
+      "At standstill only the proportional term is left, and K_v·K_p·e below Coulomb friction cannot move the shaft"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "编码器分辨率不够，读不出 0.2° 的误差",
+      "The encoder resolution is too coarse to see a 0.2° error"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "电流环太慢，转矩跟不上指令",
+      "The current loop is too slow for the torque to follow"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "位置增益太大，主轴来回振荡停不下来",
+      "The position gain is too high, so the shaft oscillates and cannot stop"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "停住时转速为零，速度环只剩比例项，输出转矩 K_v·K_p·e；它小于 T_f 时主轴推不动，所以可能停在 ±T_f/(K_v·K_p) 内任何位置。0.088° 的编码器分辨率足以看出 0.2°。",
+    "At standstill speed is zero and only K_v·K_p·e remains; below T_f the shaft cannot move, so it may stop anywhere within ±T_f/(K_v·K_p). A 0.088° encoder easily resolves 0.2°."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一个每转 2048 线的增量编码器采用四倍频，分辨率是多少度？",
+    "An incremental encoder with 2048 lines per revolution uses ×4 decoding. What is its resolution in degrees?"
+   ],
+   "answer": 0.0439,
+   "tolerance": 0.001,
+   "unit": "°",
+   "feedback": [
+    "每转 2048 × 4 = 8192 个计数，360° ÷ 8192 ≈ 0.0439°。",
+    "2048 × 4 = 8192 counts per revolution; 360° ÷ 8192 ≈ 0.0439°."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "停针定位时去掉了速度环积分。库仑摩擦 T_f = 0.12 N·m，K_v = 0.3 N·m·s/rad，K_p = 150 s⁻¹。主轴可能停住的最大误差是多少度？",
+    "During needle positioning the velocity-loop integral is removed. Coulomb friction T_f = 0.12 N·m, K_v = 0.3 N·m·s/rad, K_p = 150 s⁻¹. What is the largest possible stopping error in degrees?"
+   ],
+   "answer": 0.153,
+   "tolerance": 0.005,
+   "unit": "°",
+   "feedback": [
+    "|e| ≤ T_f/(K_v·K_p) = 0.12 ÷ 45 = 0.00267 rad ≈ 0.153°。别忘了把弧度换成度。",
+    "|e| ≤ T_f/(K_v·K_p) = 0.12 ÷ 45 = 0.00267 rad ≈ 0.153°. Remember to convert radians to degrees."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "剪线时主轴转速 500 r/min，剪线电磁铁吸合延迟 8 ms。这段延迟里主轴转过多少度？",
+    "The shaft turns at 500 r/min during trimming and the trimming solenoid's pull-in delay is 8 ms. How many degrees does the shaft turn during this delay?"
+   ],
+   "answer": 24,
+   "tolerance": 0.5,
+   "unit": "°",
+   "feedback": [
+    "θ = 6nt = 6 × 500 × 0.008 = 24°。每毫秒转过 6n/1000 = 3°。",
+    "θ = 6nt = 6 × 500 × 0.008 = 24°; the shaft turns 6n/1000 = 3° per millisecond."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "停针定位在几十到两百 r/min 下完成。低速段测速应该优先采用：",
+    "Needle positioning takes place at a few tens to two hundred r/min. For speed measurement in this range one should prefer:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "T 法或 M/T 法",
+      "The T method or the M/T method"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "M 法，并把计数周期缩短到 0.1 ms",
+      "The M method with the counting period cut to 0.1 ms"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "M 法，因为它的误差是固定的 ±1 个计数",
+      "The M method, because its error is a fixed ±1 count"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "只用 U、V、W 磁极信号",
+      "Only the U, V, W pole signals"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "M 法误差 ±1 计数折合的转速是固定的，转速越低相对误差越大（200 r/min 时约 7%）；缩短计数周期反而更差。T 法在低速时只有约 0.14%。",
+    "The M method's ±1 count is a fixed speed error, so its relative error grows at low speed (about 7% at 200 r/min); a shorter period makes it worse. The T method gives about 0.14% at low speed."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "步进电机从整步改为 16 细分后，每步 0.1125°，所以定位精度也提高到整步的 16 倍。",
+    "Going from full steps to 16 microsteps gives 0.1125° per step, so a stepper's positioning accuracy also improves 16-fold."
+   ],
+   "correct": false,
+   "feedback": [
+    "细分让运动更平稳，但负载转矩一大，转子相对磁场的滞后角变化，每个细分步的实际转角就不均匀，精度不能按比例提高。",
+    "Microstepping makes motion smoother, but under load the rotor's lag behind the field changes, so microsteps are uneven and accuracy does not rise in proportion."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "伺服驱动器急停时报“过压”故障。下列哪些措施能解决或减轻这个问题？",
+    "A servo drive reports an over-voltage fault during emergency stops. Which measures solve or reduce the problem?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "检查制动电阻和它的开关管是否正常",
+      "Check the braking resistor and its switch"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "把减速时间设长一点，让摩擦和绕组多消耗能量",
+      "Lengthen the deceleration time so friction and windings absorb more energy"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "把剪线电磁铁改为稳压管续流",
+      "Change the trimming solenoid to Zener freewheeling"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "提高速度环增益 K_v",
+      "Raise the velocity-loop gain K_v"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "急停时动能回馈到母线，整流桥单向，能量只能充进电容；制动电阻把多余能量变成热，减速慢一些也能少回馈。电磁铁续流和速度环增益与母线过压无关。",
+    "In a stop the kinetic energy returns to the DC link and, with a one-way rectifier, can only charge the capacitor; the braking resistor burns the excess, and slower deceleration feeds back less. Solenoid freewheeling and K_v do not address link over-voltage."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "主轴折算惯量 5×10⁻⁴ kg·m²，从 4500 r/min 急停，70% 的动能回馈到母线；母线电容 470 μF、原来 310 V。不用制动电阻，母线电压升到多少伏？",
+    "The referred shaft inertia is 5×10⁻⁴ kg·m²; the machine stops from 4500 r/min with 70% of the kinetic energy fed back; the DC-link capacitor is 470 μF at 310 V. Without a braking resistor, what does the link voltage rise to, in volts?"
+   ],
+   "answer": 511,
+   "tolerance": 8,
+   "unit": "V",
+   "feedback": [
+    "E = ½Jω² = ½ × 5×10⁻⁴ × 471.2² ≈ 55.5 J，回馈 38.9 J；V₂ = √(310² + 2 × 38.9 / 470×10⁻⁶) ≈ 511 V，超过常用电容耐压。",
+    "E = ½Jω² = ½ × 5×10⁻⁴ × 471.2² ≈ 55.5 J, 38.9 J fed back; V₂ = √(310² + 2 × 38.9 / 470×10⁻⁶) ≈ 511 V, above usual capacitor ratings."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "标准参数下（K_v/J ≈ 330 rad/s），把位置增益 K_p 从 200 s⁻¹ 加到 500 s⁻¹，主轴冲过目标约 1.8°。最直接的原因是：",
+    "With standard parameters (K_v/J ≈ 330 rad/s), raising K_p from 200 to 500 s⁻¹ makes the shaft overshoot by about 1.8°. The most direct reason is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "位置环要求的减速超过了速度环能跟上的程度，转矩还顶到峰值",
+      "The position loop demands more deceleration than the velocity loop can follow, and torque also hits its peak"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "摩擦太小，主轴停不住",
+      "Friction is too low to stop the shaft"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "积分时间太短，积分饱和",
+      "The integral time is too short and the integral winds up"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "编码器在高速时丢脉冲",
+      "The encoder drops pulses at high speed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "位置增益已大于速度环带宽，速度环跟不上；且 K_p·ω_p ≈ 500 × 20.9 ≈ 10 500 rad/s² 超过峰值转矩的减速能力约 4400 rad/s²，响应不再由增益决定。",
+    "K_p now exceeds the velocity-loop bandwidth, and K_p·ω_p ≈ 500 × 20.9 ≈ 10 500 rad/s² exceeds the roughly 4400 rad/s² that peak torque can give, so the response is no longer governed by the gain."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "把剪线这类按主轴转角触发的动作放在操作系统的普通任务里处理也可以，只要处理器足够快。",
+    "Angle-triggered actions such as trimming can be handled in an ordinary operating-system task, as long as the processor is fast enough."
+   ],
+   "correct": false,
+   "feedback": [
+    "普通任务的响应时间不确定，界面一忙剪线就晚几度；按转角触发的动作应放在编码器中断或 FPGA 里。",
+    "Ordinary tasks have non-deterministic latency; a busy interface makes the trim several degrees late. Angle-triggered actions belong in encoder interrupts or an FPGA."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "剪线电磁铁吸合 7.5 ms、释放 9 ms，剪线动作要求吸合和释放都不超过 25° 主轴转角。剪线时主轴最高可以转多快（r/min）？",
+    "A trimming solenoid pulls in in 7.5 ms and releases in 9 ms; both must stay within 25° of main-shaft angle. What is the highest trimming speed (r/min)?"
+   ],
+   "answer": 463,
+   "tolerance": 5,
+   "unit": "r/min",
+   "feedback": [
+    "较长的释放 9 ms 决定上限：n = 25 ÷ (6 × 0.009) ≈ 463 r/min。",
+    "The longer release of 9 ms sets the limit: n = 25 ÷ (6 × 0.009) ≈ 463 r/min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "编码器每转 4096 个计数（四倍频后），用 M 法每 1 ms 计数一次。300 r/min 时测速的相对误差约为百分之几？",
+    "An encoder gives 4096 counts per revolution (after ×4), and the M method counts every 1 ms. At 300 r/min, what is the relative speed error in percent?"
+   ],
+   "answer": 4.88,
+   "tolerance": 0.1,
+   "unit": "%",
+   "feedback": [
+    "±1 计数折合 60 ÷ (4096 × 0.001) ≈ 14.6 r/min，14.6 ÷ 300 ≈ 4.9%。",
+    "±1 count ≈ 60 ÷ (4096 × 0.001) ≈ 14.6 r/min; 14.6 ÷ 300 ≈ 4.9%."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "一台平缝机换装了更重的手轮，折算惯量加倍，伺服参数没动。停针时最可能出现的现象和正确的处理是：",
+    "A lockstitch machine is fitted with a heavier handwheel that doubles the referred inertia; the servo parameters are unchanged. The most likely symptom and the correct remedy are:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "超调变大、来回摆；先重设负载惯量，再加大 K_v 并适当降低 K_p",
+      "More overshoot and swinging; reset load inertia, then raise K_v and lower K_p somewhat"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "停得更快更准；无需处理",
+      "Faster, more accurate stops; nothing to do"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "静差变大；只要把积分去掉",
+      "Larger steady-state error; just remove the integral"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "编码器分辨率减半；换高线数编码器",
+      "Encoder resolution halves; fit a higher-line encoder"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "惯量加倍使速度环带宽 K_v/J 减半、减速能力也减半，结果像增益过大：算例超调约 2.2°、67 ms。光加 K_v 不够，K_p 也要降。",
+    "Doubling inertia halves the bandwidth K_v/J and the deceleration capability, so it behaves like excessive gain: about 2.2° overshoot and 67 ms in the example. Raising K_v alone is not enough; K_p must come down too."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "电子送布的步进电机针距忽大忽小，怀疑失步。下列哪些是可能的原因？",
+    "The stitch length of a stepper-driven electronic feed varies; lost steps are suspected. Which are possible causes?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "负载转矩超过了当时频率下电机能给出的转矩",
+      "Load torque exceeds what the motor can give at that step rate"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "驱动电压不足，电流来不及建立",
+      "Insufficient drive voltage, so current cannot build up in time"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "加速太猛，步进频率升得太快",
+      "Acceleration too aggressive, step rate rises too fast"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "细分数太高，使每步角度太小",
+      "Too many microsteps, so each step is too small"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "失步发生在负载转矩超过矩频曲线上的可用转矩时：负载重、电压低（电流建立慢）、加速猛都会造成。细分只改变平稳性，不是失步原因。",
+    "Steps are lost when load torque exceeds the available torque on the torque–frequency curve: heavy load, low voltage (slow current build-up) and harsh acceleration all cause it. Microstepping affects smoothness, not lost steps."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "主轴折算惯量 6×10⁻⁴ kg·m²，急停时 70% 的动能回馈到母线；母线电容 680 μF、原来 310 V，母线电压不得超过 380 V。急停前转速超过多少 r/min 就必须靠制动电阻？",
+    "The referred shaft inertia is 6×10⁻⁴ kg·m², and 70% of the kinetic energy returns to the DC link in an emergency stop; the link capacitor is 680 μF at 310 V, and the link must not exceed 380 V. Above what speed (r/min) before the stop is the braking resistor needed?"
+   ],
+   "answer": 2670,
+   "tolerance": 40,
+   "unit": "r/min",
+   "feedback": [
+    "电容能吸收 ½C(380² − 310²) ≈ 16.4 J，对应动能 16.4 ÷ 0.7 ≈ 23.5 J；ω = √(2E/J) ≈ 280 rad/s ≈ 2670 r/min。",
+    "The capacitor can absorb ½C(380² − 310²) ≈ 16.4 J, i.e. 16.4 ÷ 0.7 ≈ 23.5 J of kinetic energy; ω = √(2E/J) ≈ 280 rad/s ≈ 2670 r/min."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "主轴伺服三环与停针定位调参；没有积分时的静差；编码器分辨率与低速测速；执行器延迟折算成主轴转角。",
+   "The three servo loops and tuning for needle positioning; steady-state error without integral; encoder resolution and low-speed measurement; converting actuator delay into shaft angle."
+  ],
+  "difficult": [
+   "位置增益受速度环带宽和峰值转矩两条限制、惯量变化后为何要同时调 K_v 和 K_p；电磁铁释放与续流电压、功率管耐压之间的取舍。",
+   "Why the position gain is limited by both velocity-loop bandwidth and peak torque, and why both K_v and K_p must change when inertia changes; the trade-off between release speed, freewheeling voltage and transistor rating."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Introduction"
+    ],
+    "minutes": 15,
+    "content": [
+     "提出车间问题：剪线转速提到 600 r/min 后剪线时好时坏；看图 13-1 认识电控平缝机的三类部件。",
+     "Pose the floor problem: trimming became unreliable at 600 r/min; use Fig. 13-1 to introduce the three groups of components."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：伺服与停针",
+     "Lecture: servo and positioning"
+    ],
+    "minutes": 40,
+    "content": [
+     "矢量控制、三环、速度环带宽；停针两步法、增益与惯量、静差公式；上针位的允许范围。",
+     "Vector control, three loops, velocity-loop bandwidth; two-stage positioning, gain and inertia, the error formula; the needle-up range."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 13-1",
+     "Virtual lab 13-1"
+    ],
+    "minutes": 30,
+    "content": [
+     "学生完成三个任务，填表 13-1；教师点评典型参数。",
+     "Students complete the three tasks and Table 13-1; the teacher reviews typical settings."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：传感、步进与电磁铁",
+     "Lecture: sensing, steppers, solenoids"
+    ],
+    "minutes": 35,
+    "content": [
+     "编码器与 M/T 测速；步进细分与失步；电磁铁强激磁、续流和转角折算。",
+     "Encoders and M/T measurement; microstepping and lost steps; boost, freewheeling and angle conversion."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 13-2",
+     "Virtual lab 13-2"
+    ],
+    "minutes": 25,
+    "content": [
+     "完成三个任务，回到导入问题算出最高剪线转速。",
+     "Complete the three tasks and return to the opening problem to compute the maximum trimming speed."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：功率电路与控制器",
+     "Lecture: power circuit and controller"
+    ],
+    "minutes": 20,
+    "content": [
+     "急停能量与制动电阻；任务分工与总线；设计要点与模型边界。",
+     "Emergency-stop energy and braking resistor; task allocation and buses; design notes and model limits."
+    ]
+   },
+   {
+    "phase": [
+     "测验与小结",
+     "Quiz and summary"
+    ],
+    "minutes": 15,
+    "content": [
+     "课堂测验，讲评错题，总结六条要点，布置作业。",
+     "In-class quiz, review of errors, six-point summary, assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业 13（测速误差、剪线电磁铁与急停制动核算），并预习第 14 章剪线时序。",
+   "Complete Assignment 13 (speed-measurement error, trimming solenoid, emergency braking) and preview the trimming sequence of Chapter 14."
+  ]
+ }
+}

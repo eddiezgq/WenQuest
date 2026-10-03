@@ -1,0 +1,37 @@
+# 实验 14.6 的指导书与报告模板。目的、场景、参数、任务取自 lab14_6.js。
+原理:
+  - ["SCARA 的四个关节分管不同的自由度：θ₁、θ₂ 决定水平位置（平面 2R），丝杠 θ₃ 决定高度，θ₄ 补足工具的转角。",
+     "The four SCARA joints split the work: θ₁, θ₂ set the horizontal position (a planar 2R), the screw θ₃ sets the height, θ₄ completes the tool angle."]
+  - 式: "θ₃ = z₀ − z，θ₄ = φ − θ₁ − θ₂          (14.6.1)"
+  - ["θ₂ > 0 为右手构型，θ₂ < 0 为左手构型，两者关于基座—目标连线对称。计入关节限位后，有的位置只有一种构型可用。",
+     "θ₂ > 0 is right-handed, θ₂ < 0 left-handed; they mirror each other about the base–target line. With joint limits some positions allow only one."]
+  - ["Delta 的每条支链是一次子问题 3：主动臂末端绕铰点轴转动，使它到动平台上对应点的距离为 Lb；一般两个解，肘部朝外的一个在限位以内。",
+     "Each Delta leg is one Subproblem 3: the arm end turns about the hinge axis until its distance to the platform point is Lb; usually two solutions, the elbow-out one within the limits."]
+  - 式: "‖P′ₖ − e^[Sk]θk Aₖ‖ = Lb          (14.6.2)"
+步骤:
+  - ["打开实验 14.6 的 SCARA 场景，设工具点 (0.40, 0.20, 0.15) m、φ = 30°，读出两种构型的关节变量和模型核对误差，填入表 1（任务 1）。",
+     "Open the SCARA scene, set the tool to (0.40, 0.20, 0.15) m and φ = 30°, record both configurations and the model check in Table 1 (task 1)."]
+  - ["把工具点移到 Q = (−0.30, 0.35) m，看哪一种构型超限，选出可用的一种（任务 2）。",
+     "Move the tool to Q = (−0.30, 0.35) m, see which configuration exceeds a limit and pick the usable one (task 2)."]
+  - ["切换到 Delta 场景，平台在 (0, 0, −420) mm。把支链 1 换成朝内的解，记录转角，说明为什么不能用（任务 3）。",
+     "Switch to the Delta scene, platform at (0, 0, −420) mm. Switch leg 1 to elbow-in, record the angle and explain why it cannot be used (task 3)."]
+  - ["三条支链都取朝外，按“运行”（任务 4），记录一圈中三个转角的最大、最小值和最大闭合误差，填入表 2。",
+     "With all legs elbow-out press Run (task 4); record the largest and smallest angles of each arm and the largest closure error in Table 2."]
+  - ["切换到“在桌上画圆”，按“运行”（任务 5），比较两种构型画圆时手臂的样子。",
+     "Switch to “Drawing a circle on the desk” and press Run (task 5); compare the arm shapes of the two configurations."]
+数据表:
+  - 标题: ["表 1  SCARA 的两种构型", "Table 1  The two SCARA configurations"]
+    表头: ["目标 (x, y, z) / m，φ", "右手 (θ₁, θ₂, θ₃, θ₄)", "左手 (θ₁, θ₂, θ₃, θ₄)", "可用的构型"]
+    表头英文: ["Target (x, y, z) / m, φ", "Right (θ₁, θ₂, θ₃, θ₄)", "Left (θ₁, θ₂, θ₃, θ₄)", "Usable configuration"]
+    行: [["(0.40, 0.20, 0.15)，30°", "", "", ""], ["(−0.30, 0.35, 0.15)，30°", "", "", ""]]
+    行英文: [["(0.40, 0.20, 0.15), 30°", "", "", ""], ["(−0.30, 0.35, 0.15), 30°", "", "", ""]]
+  - 标题: ["表 2  Delta 沿拾取路径一圈", "Table 2  The Delta once round the pick path"]
+    表头: ["主动臂", "最小转角 / (°)", "最大转角 / (°)", "最大闭合误差 / mm"]
+    表头英文: ["Arm", "Smallest angle / (°)", "Largest angle / (°)", "Largest closure error / mm"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""]]
+注意:
+  - ["SCARA 的丝杠向下为正：θ₃ = 0 时工具点最高（0.242 m）。", "The SCARA screw is positive downward: at θ₃ = 0 the tool is highest (0.242 m)."]
+  - ["Delta 的主动臂转角从水平量起，向下为正；限位 −40°～90°。", "Delta arm angles are measured from horizontal, downward positive; limits −40° to 90°."]
+  - ["“闭合误差”从三维模型上读点计算，是检查逆解与摆放是否一致的独立办法。", "The closure error is read off the 3D model, an independent check that the solution and the posing agree."]
+思考题:
+  - ["Delta 的工作空间沿中心轴向下到哪里为止？此时三条支链处于什么形态？与 14.6.3 节的结果比较。", "How far down the central axis does the Delta reach? What shape are the legs in then? Compare with Section 14.6.3."]

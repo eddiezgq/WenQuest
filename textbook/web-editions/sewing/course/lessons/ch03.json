@@ -1,0 +1,1124 @@
+{
+ "no": 3,
+ "title": [
+  "刺布机构",
+  "The Needle-Bar Mechanism"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能说出刺布机构的五条要求，指出针杆高度和机针朝向的两处调整。",
+   "State the five requirements of the needle-bar mechanism and identify the two adjustments for needle-bar height and needle orientation."
+  ],
+  [
+   "能把刺布机构简化为对心曲柄滑块，推导针杆位移精确式，并解释它与发动机活塞公式的差别。",
+   "Reduce the mechanism to an in-line slider-crank, derive the exact needle-bar displacement, and explain how it differs from the engine-piston formula."
+  ],
+  [
+   "能用精确式和近似式算出行程、最大速度、上下止点加速度和机针回升 2 mm 的转角。",
+   "Calculate stroke, maximum velocity, accelerations at top and bottom dead centre, and the angle at 2 mm needle rise from the exact and approximate formulas."
+  ],
+  [
+   "能解释连杆比 λ 对钩线时刻和下止点加速度的影响，以及工程上 λ 的折中。",
+   "Explain how the link ratio λ affects hook timing and bottom-dead-centre acceleration, and the engineering compromise in choosing λ."
+  ],
+  [
+   "能计算往复惯性力，区分一阶、二阶惯性力，说明平衡块能做什么、不能做什么。",
+   "Calculate the reciprocating inertia force, distinguish first- and second-order forces, and say what a counterweight can and cannot do."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "车间问题：提速到每分钟 6000 针，针杆受得了吗？",
+   "Shop-floor problem: can the needle bar take 6000 stitches per minute?"
+  ],
+  "text": [
+   "某厂平缝机的针杆机构按第 3 章算例：曲柄半径 r = 15.5 mm，连杆长 l = 55 mm，往复质量 m = 120 g（示意值），平时以每分钟 5000 转缝制。生产部要求提速到每分钟 6000 转。设备科按经验给针杆轴套定了一个限值：下止点往复惯性力不超过 800 N（为本题假定的设计限值）。",
+   "A factory's lockstitch machines have the needle-bar mechanism of the Chapter 3 example: crank radius r = 15.5 mm, link length l = 55 mm, reciprocating mass m = 120 g (illustrative value), normally sewing at 5000 r/min. Production wants 6000 r/min. From experience, the maintenance department sets a limit for the needle-bar bushings: the reciprocating inertia force at bottom dead centre must not exceed 800 N (a design limit assumed for this problem)."
+  ],
+  "question": [
+   "每分钟 6000 转时下止点惯性力是多少？是否超限？如果不改转速，往复质量要减到多少克以下？如果不改零件，转速最高能到多少？",
+   "What is the inertia force at bottom dead centre at 6000 r/min, and does it exceed the limit? Keeping 6000 r/min, to what mass must the reciprocating parts be reduced? Keeping the parts, what is the highest allowable speed?"
+  ],
+  "answer": [
+   "下止点加速度 a = rω²(1 + λ)，λ = 0.282。5000 r/min 时约 5447 m/s²，惯性力约 654 N；6000 r/min 时惯性力增大到 1.44 倍，约 942 N，超过 800 N。保持 6000 r/min，往复质量须减到约 102 g 以下（800 / 7844 m/s²）；保持 120 g，转速最高约 5530 r/min（5000 × √(800/654)）。工程上常见的做法是空心针杆、小型针夹、镂空连杆来减重，并复核平衡和润滑。",
+   "At bottom dead centre a = rω²(1 + λ), with λ = 0.282. At 5000 r/min this is about 5447 m/s² and the force about 654 N; at 6000 r/min the force grows 1.44 times to about 942 N, over the 800 N limit. Keeping 6000 r/min, the reciprocating mass must come down to about 102 g or less (800 / 7844 m/s²); keeping 120 g, the top speed is about 5530 r/min (5000 × √(800/654)). The usual engineering answer is to lighten the parts with a hollow needle bar, a small needle clamp and a pocketed link, and then re-check balancing and lubrication."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人联系：轨迹时间缩放与关节惯性力矩",
+   "Robot link: trajectory time scaling and joint inertia torque"
+  ],
+  "text": [
+   "针杆位移是主轴转角的函数 x(φ)，转速一变，同一条位移曲线走得快慢不同，加速度按 ω² 变化。机器人轨迹规划里有完全相同的关系：同一条几何路径，把运动时间缩短为原来的一半，各关节的速度变为 2 倍、加速度变为 4 倍，电机要提供的惯性力矩也变为 4 倍，所以提高节拍时最先碰到的往往是电机峰值力矩和减速器的冲击载荷。针杆在下止点“转身最快”，对应机器人点到点运动中加速度最大的拐点，规划时要在这些地方限加速度。缝纫机用平衡块抵消旋转质量，大负载机器人则在第二轴上装平衡缸或配重抵消重力矩，二者都是为了让电机和轴承只承担必要的力。",
+   "Needle-bar displacement is a function of shaft angle, x(φ); change the speed and the same curve is traversed faster or slower, with acceleration scaling as ω². Robot trajectory planning has exactly the same relation: run the same geometric path in half the time and joint velocities double, accelerations quadruple, and so does the inertia torque the motors must supply, so the first limits met when cycle time is cut are usually motor peak torque and shock loads on the gearbox. The needle bar “turns round fastest” at bottom dead centre, which corresponds to the high-acceleration turning points of a robot's point-to-point move, where the planner must limit acceleration. A sewing machine uses a counterweight against rotating mass; a heavy-payload robot uses a balancer cylinder or counterweight on its second axis against gravity torque; both let the motor and bearings carry only the forces they must."
+  ]
+ },
+ "life": {
+  "title": [
+   "生活例子：汽车发动机的平衡轴",
+   "Everyday example: the balance shafts in a car engine"
+  ],
+  "text": [
+   "汽车发动机的活塞、连杆、曲轴也是曲柄滑块，只是活塞在曲轴上方，上下止点正好和针杆对调。四缸发动机转速高时，以两倍曲轴转速变化的二阶惯性力会引起车身嗡嗡的振动，曲轴上的配重对它无能为力，所以有些发动机另加一对以两倍转速旋转的平衡轴。",
+   "A car engine's piston, connecting rod and crankshaft are also a slider-crank, except that the piston is above the crankshaft, so top and bottom dead centre are swapped compared with the needle bar. At high speed a four-cylinder engine's second-order inertia force, varying at twice crankshaft speed, makes the body hum, and counterweights on the crankshaft can do nothing about it, so some engines add a pair of balance shafts turning at twice crankshaft speed."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "刺布机构的任务：五条要求",
+    "What the needle-bar mechanism must do: five requirements"
+   ],
+   "points": [
+    [
+     "行程够用：上止点针尖高于抬起的布，下止点针眼低于梭尖轨迹；工业平缝机行程一般 31–35 mm（待核）。",
+     "Enough stroke: at top dead centre the point clears the lifted fabric, at bottom dead centre the eye is below the hook path; industrial strokes are generally 31–35 mm (to be verified)."
+    ],
+    [
+     "定时准确：下止点在 180°，回升约 2 mm 时梭尖钩线。",
+     "Exact timing: bottom dead centre at 180°, hook catches at about 2 mm of rise."
+    ],
+    [
+     "能跑高速：主轴 4000–6000 r/min（待核），针杆每秒往复八九十次。",
+     "High speed: main shaft 4000–6000 r/min (to be verified), the needle bar reciprocating eighty or ninety times a second."
+    ],
+    [
+     "振动小；针杆不能转、高度要能调。",
+     "Low vibration; the needle bar must not rotate, and its height must be adjustable."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "第 2 章说过一针靠四个动作配合，这一讲讲第一条传动链：上轴经针杆曲柄和连杆带着针杆上下往复，叫刺布机构。它结构最简单，却决定了整机的转速上限和振动水平，还是其他机构定时的基准。它要同时满足五条要求：行程要够，上止点放得进布，下止点让针眼低于梭尖轨迹；定时要准，下止点在 180 度；要跑得快，每秒往复八九十次；振动要小；最后，针杆不能转，因为凹口必须一直朝着梭尖，高度还要能微调。",
+    "Chapter 2 showed that a stitch needs four coordinated motions; this lesson covers the first drive train: the main shaft drives the needle bar up and down through the needle-bar crank and link. This is the needle-bar mechanism. It is the simplest in construction, yet it sets the machine's speed limit and vibration level, and it is the timing reference for everything else. It has five requirements at once: enough stroke, so the fabric fits at the top and the eye goes below the hook path at the bottom; exact timing, with bottom dead centre at 180°; high speed, reciprocating eighty or ninety times a second; low vibration; and finally the needle bar must not rotate, because the scarf must always face the hook, while its height must be finely adjustable."
+   ]
+  },
+  {
+   "title": [
+    "结构与两处调整",
+    "Construction and the two adjustments"
+   ],
+   "points": [
+    [
+     "上轴前端装针杆曲柄，曲柄销对面铸有平衡块；连杆一端套曲柄销，另一端铰接在夹于针杆上的连接轴上。",
+     "The needle-bar crank on the front of the main shaft carries a cast counterweight opposite the crank pin; the link runs from the crank pin to a connecting stud clamped on the needle bar."
+    ],
+    [
+     "针杆在上、下两个轴套里滑动；连接轴另一端的导滑块嵌在导槽里，保证针杆只上下动、不转动。",
+     "The needle bar slides in upper and lower bushings; a guide block on the stud runs in a guide slot so the bar only moves up and down and does not rotate."
+    ],
+    [
+     "松开连接轴螺钉调针杆高度；松开针夹螺钉调机针插入深度和朝向。",
+     "Loosen the stud screw to set needle-bar height; loosen the needle-clamp screw to set needle depth and orientation."
+    ],
+    [
+     "两处调整都不改变运动规律，只改变绝对位置。",
+     "Neither adjustment changes the motion law, only the absolute position."
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_needlebar_mech.png",
+   "narration": [
+    "这张图是顺着上轴看过去、拆下面板以后的刺布机构。上轴前端装着针杆曲柄，曲柄销对面铸了一块平衡块；针杆连杆一头套在曲柄销上，另一头和夹在针杆上的连接轴铰接。针杆在上下两个轴套里滑动，连接轴另一头有个导滑块嵌在机头的导槽里，这样针杆只能上下走、不会转。这里有两处调整：松开连接轴的螺钉，可以改针杆高度，也就是钩线时梭尖和针眼的高度差；松开针夹螺钉，可以调机针插多深、朝哪边。它们只改位置，不改运动规律。",
+    "This is the needle-bar mechanism viewed along the main shaft with the face plate off. The needle-bar crank is on the front of the main shaft, with a counterweight cast opposite the crank pin; the link fits over the crank pin at one end and is pinned at the other to a connecting stud clamped on the needle bar. The needle bar slides in an upper and a lower bushing, and a guide block on the stud runs in a slot in the head, so the bar can only go up and down, never turn. There are two adjustments: loosen the stud screw to change needle-bar height, that is, the height of the eye relative to the hook point at catching; loosen the needle-clamp screw to set how deep the needle goes and which way it faces. They change position, not the motion law."
+   ]
+  },
+  {
+   "title": [
+    "运动简图：倒挂的曲柄滑块",
+    "Kinematic diagram: an upside-down slider-crank"
+   ],
+   "points": [
+    [
+     "上轴是曲柄 OA，针杆连杆是连杆 AB，针杆是滑块 B：对心曲柄滑块机构。",
+     "Main shaft = crank OA, needle-bar link = connecting rod AB, needle bar = slider B: an in-line slider-crank."
+    ],
+    [
+     "内燃机活塞在曲轴上方，最高点时 OB = r + l。",
+     "An engine piston is above the crankshaft: at its highest point OB = r + l."
+    ],
+    [
+     "针杆悬在上轴下方，最高点时曲柄销朝上、背离针杆，OB = l − r。",
+     "The needle bar hangs below the shaft: at its highest point the crank pin points up, away from the bar, and OB = l − r."
+    ],
+    [
+     "上、下止点对调：直接套发动机公式会把上下止点加速度弄反。",
+     "Dead centres are swapped: applying the engine formula directly swaps the accelerations at top and bottom."
+    ]
+   ],
+   "formula": "",
+   "figure": "w_f239087a.png",
+   "narration": [
+    "去掉外形，只留下构件之间的连接，刺布机构就是一个对心曲柄滑块：上轴是曲柄 OA，连杆是 AB，针杆是滑块 B。大家在机械原理课上学过曲柄滑块，往往是以内燃机为例的。这里要特别小心：发动机的活塞在曲轴上方，活塞最高时曲柄销朝着活塞，OB 等于 r 加 l；针杆却是倒挂在上轴下面的，针杆最高时曲柄销朝上、背离针杆，OB 等于 l 减 r。两者的上下止点正好对调。直接套发动机教材的公式，就会把上下止点的加速度弄反。",
+    "Strip away the shapes and keep only the connections, and the needle-bar mechanism is an in-line slider-crank: the main shaft is crank OA, the link is AB and the needle bar is slider B. In your mechanisms course you probably met the slider-crank through the engine. Be careful here: the engine piston sits above the crankshaft, and at its highest point the crank pin points towards it, so OB equals r plus l. The needle bar hangs below the shaft, so at its highest point the crank pin points up, away from it, and OB equals l minus r. The dead centres are exactly swapped. Copy the engine textbook's formula directly and you will get the top and bottom accelerations the wrong way round."
+   ]
+  },
+  {
+   "title": [
+    "针杆位移的精确式",
+    "The exact needle-bar displacement"
+   ],
+   "points": [
+    [
+     "以上止点为位移零点、向下为正；由几何关系 OB = l cosβ − r cosφ，r sinφ = l sinβ。",
+     "Take top dead centre as zero, downward positive; geometry gives OB = l cosβ − r cosφ and r sinφ = l sinβ."
+    ],
+    [
+     "消去 β 得到 x(φ)，连杆比 λ = r / l。",
+     "Eliminating β gives x(φ), with link ratio λ = r / l."
+    ],
+    [
+     "第二项与发动机活塞位移式符号相反，因为滑块倒挂。",
+     "The second term has the opposite sign to the engine-piston formula because the slider hangs below."
+    ],
+    [
+     "算例 φ = 90° 时针杆只走了 13.3 mm，不到行程的一半。",
+     "In the example, at φ = 90° the needle bar has moved only 13.3 mm, less than half the stroke."
+    ]
+   ],
+   "formula": "x = r(1-\\cos\\varphi) - l\\left(1-\\sqrt{1-\\lambda^{2}\\sin^{2}\\varphi}\\right),\\qquad \\lambda=\\frac{r}{l}",
+   "figure": "",
+   "narration": [
+    "现在推导位移。以上止点为零点，向下为正。由运动简图，OB 等于 l 乘 cosβ 减 r 乘 cosφ，同时 r sinφ 等于 l sinβ，用后一个式子消去 β，就得到这个精确式，λ 等于 r 比 l，叫连杆比。大家对照一下发动机教材的活塞位移公式，会发现第二项的符号正好相反，原因就是刚才说的倒挂。代个数感受一下：算例 r 等于 15.5，l 等于 55，主轴转到 90 度时，针杆只走了 13.3 毫米，还不到行程 31 毫米的一半，这就是连杆倾斜带来的不对称。",
+    "Now derive the displacement. Take top dead centre as zero and downward as positive. From the diagram, OB equals l cos β minus r cos φ, and also r sin φ equals l sin β; use the second to eliminate β and you get this exact formula, with λ equal to r over l, the link ratio. Compare it with the piston displacement formula in an engine textbook and you will find the second term has the opposite sign, for the upside-down reason we just saw. Put in numbers to get a feel: in the example r is 15.5 and l is 55, and at 90° of shaft angle the needle bar has moved only 13.3 millimetres, less than half of the 31-millimetre stroke. That asymmetry comes from the inclined link."
+   ]
+  },
+  {
+   "title": [
+    "速度与加速度",
+    "Velocity and acceleration"
+   ],
+   "points": [
+    [
+     "主轴匀速 φ = ωt，对时间求导；记 S = √(1 − λ²sin²φ)。",
+     "With the shaft at constant speed, φ = ωt; differentiate with respect to time, writing S = √(1 − λ²sin²φ)."
+    ],
+    [
+     "精确式适合编程计算，虚拟实验 3-1 就是用它画曲线。",
+     "The exact formulas suit computation; Virtual lab 3-1 draws its curves with them."
+    ],
+    [
+     "上止点（φ = 0）a = rω²(1 − λ)；下止点（φ = 180°）a = −rω²(1 + λ)，在这两点精确式与近似式一致。",
+     "At top dead centre (φ = 0) a = rω²(1 − λ); at bottom (φ = 180°) a = −rω²(1 + λ); at these two points the exact and approximate formulas agree."
+    ]
+   ],
+   "formula": "v = r\\omega\\sin\\varphi\\left(1-\\frac{\\lambda\\cos\\varphi}{S}\\right),\\qquad a = r\\omega^{2}\\left(\\cos\\varphi-\\lambda\\,\\frac{\\cos2\\varphi+\\lambda^{2}\\sin^{4}\\varphi}{S^{3}}\\right)",
+   "figure": "",
+   "narration": [
+    "主轴匀速转动，φ 等于 ω t，把位移对时间求一次导是速度，求两次导是加速度，记根号那一项为 S，就得到这两个精确式。式子看着复杂，但它适合编程计算，虚拟实验 3-1 里的曲线就是用它算的。两个特殊点值得记住：上止点 φ 等于零时，加速度是 r ω 平方乘 1 减 λ；下止点 φ 等于 180 度时，加速度是负的 r ω 平方乘 1 加 λ。在这两个点上，sinφ 等于零，精确式和下一页的近似式完全一样，所以算上下止点加速度，用这两个简单式子就够了。",
+    "With the shaft turning steadily, φ equals ω t; differentiate the displacement once for velocity and twice for acceleration, call the square-root term S, and you get these two exact formulas. They look complicated, but they are ideal for a computer, and the curves in Virtual lab 3-1 come from them. Two special points are worth remembering: at top dead centre, φ equal to zero, the acceleration is r ω squared times one minus λ; at bottom dead centre, 180°, it is minus r ω squared times one plus λ. At these points sin φ is zero, so the exact formula and the approximation on the next slide agree exactly; for dead-centre accelerations those two simple expressions are all you need."
+   ]
+  },
+  {
+   "title": [
+    "近似式与两条结论",
+    "Approximations and two conclusions"
+   ],
+   "points": [
+    [
+     "λ 一般不超过 0.35，把根号展开到 λ² 项得到近似式。",
+     "λ is generally no more than 0.35; expanding the root to the λ² term gives the approximations."
+    ],
+    [
+     "结论一：下止点加速度比上止点大，两者之比为 (1 − λ) : (1 + λ)。",
+     "Conclusion 1: acceleration is larger at bottom than at top dead centre, in the ratio (1 − λ) : (1 + λ)."
+    ],
+    [
+     "结论二：加速度 = 以 ω 变化的一阶项 + 以 2ω 变化的二阶项，二阶项大小正比于 λ。",
+     "Conclusion 2: acceleration = a first-order term at ω + a second-order term at 2ω, the latter proportional to λ."
+    ]
+   ],
+   "formula": "x \\approx r\\left[(1-\\cos\\varphi)-\\frac{\\lambda}{4}(1-\\cos2\\varphi)\\right],\\quad v \\approx r\\omega\\left(\\sin\\varphi-\\frac{\\lambda}{2}\\sin2\\varphi\\right),\\quad a \\approx r\\omega^{2}(\\cos\\varphi-\\lambda\\cos2\\varphi)",
+   "figure": "",
+   "narration": [
+    "工程上 λ 一般不超过 0.35，把根号展开到 λ 平方项，就得到这组常用的近似式，手算很方便。从近似式马上能看出两条结论。第一，上止点加速度是 r ω 平方乘 1 减 λ，下止点是乘 1 加 λ，下止点比上止点大，两者之比是 1 减 λ 比 1 加 λ，算例 λ 等于 0.282，比值约 0.56。第二，加速度由两项叠加：一项随 ω 变化，叫一阶项；一项随 2ω 变化，叫二阶项，二阶项的大小正比于 λ。这第二条结论后面讲平衡的时候会再用到。",
+    "In practice λ is no more than about 0.35, so expanding the square root to the λ-squared term gives these handy approximations for hand calculation. Two conclusions follow at once. First, acceleration at top dead centre is r ω squared times one minus λ and at bottom it is times one plus λ, so it is larger at the bottom, in the ratio one minus λ to one plus λ; with λ equal to 0.282 that ratio is about 0.56. Second, the acceleration is the sum of two terms: one varying at ω, the first-order term, and one varying at 2ω, the second-order term, whose size is proportional to λ. We will use this second conclusion again when we come to balancing."
+   ]
+  },
+  {
+   "title": [
+    "算例：r = 15.5 mm，l = 55 mm，n = 5000 r/min",
+    "Worked example: r = 15.5 mm, l = 55 mm, n = 5000 r/min"
+   ],
+   "points": [
+    [
+     "λ = 0.282，ω = 2πn/60 = 523.6 rad/s，行程 2r = 31.0 mm。",
+     "λ = 0.282, ω = 2πn/60 = 523.6 rad/s, stroke 2r = 31.0 mm."
+    ],
+    [
+     "最大速度 8.43 m/s，在 φ ≈ 104.7° 和 255.3°。",
+     "Maximum velocity 8.43 m/s at φ ≈ 104.7° and 255.3°."
+    ],
+    [
+     "上止点加速度 3052 m/s²（约 311 g），下止点 −5447 m/s²（约 555 g）。",
+     "Acceleration 3052 m/s² (about 311 g) at top dead centre and −5447 m/s² (about 555 g) at bottom."
+    ],
+    [
+     "机针回升 2 mm 的转角 206.1°；针尖在上止点高出针板 18 mm、布厚 1.5 mm 时，机针在布中的区间为 101.7°–258.3°（示意取值）。",
+     "Angle at 2 mm rise 206.1°; with the point 18 mm above the plate at top and fabric 1.5 mm thick, the needle is in the fabric from 101.7° to 258.3° (illustrative values)."
+    ]
+   ],
+   "formula": "\\omega=\\frac{2\\pi n}{60},\\qquad a_{\\mathrm{BDC}}=-r\\omega^{2}(1+\\lambda)",
+   "figure": "",
+   "narration": [
+    "来看算例。r 等于 15.5 毫米，l 等于 55 毫米，λ 是 0.282；转速每分钟 5000 转，ω 等于 2π 乘 5000 除以 60，约 523.6 弧度每秒。行程就是 2r，31 毫米。用精确式算：最大速度 8.43 米每秒，出现在 104.7 度和 255.3 度；上止点加速度 3052，约 311 个 g；下止点 5447，约 555 个 g。大家可以用下止点那个简单式子自己验算一下：0.0155 乘 523.6 的平方再乘 1.282，正好约 5447。机针回升 2 毫米在 206.1 度，机针在布里是 101.7 到 258.3 度。",
+    "Now the worked example. r is 15.5 millimetres, l is 55, so λ is 0.282; at 5000 r/min, ω is 2π times 5000 over 60, about 523.6 radians per second. The stroke is 2r, 31 millimetres. From the exact formulas: maximum velocity 8.43 metres per second, at 104.7° and 255.3°; acceleration at top dead centre 3052, about 311 g; at bottom 5447, about 555 g. Check the bottom value yourself with the simple formula: 0.0155 times 523.6 squared times 1.282 comes to about 5447. The needle has risen 2 millimetres at 206.1°, and it is in the fabric from 101.7° to 258.3°."
+   ]
+  },
+  {
+   "title": [
+    "读曲线的三个要点",
+    "Three points for reading the curves"
+   ],
+   "points": [
+    [
+     "位移曲线不对称于 90°：90° 时只走 13.3 mm，最大速度在 104.7° 而不在 90°；λ 越大偏得越多。",
+     "Displacement is not symmetric about 90°: only 13.3 mm at 90°, and peak velocity at 104.7°, not 90°; the larger λ, the larger the offset."
+    ],
+    [
+     "上止点附近平缓（3.05 km/s²，前后 30° 几乎不变），下止点附近尖锐（5.45 km/s²）：上面“停留”久，下面转身快。",
+     "Flat near the top (3.05 km/s², nearly constant over ±30°), sharp near the bottom (5.45 km/s²): the needle dwells at the top and turns quickly at the bottom."
+    ],
+    [
+     "最大惯性力在下止点，恰是机针在布中、线环形成、梭尖准备钩线的时刻；轴套磨损和间隙直接影响钩线。",
+     "Maximum inertia force is at bottom dead centre, just when the needle is in the fabric, the loop forms and the hook is about to catch; bushing wear and clearance directly affect catching."
+    ]
+   ],
+   "formula": "",
+   "figure": "w_f0f8ad0a.png",
+   "narration": [
+    "这是一周内的位移、速度、加速度曲线，读的时候抓三点。第一，位移曲线并不对称于 90 度，90 度时针杆只走了 13.3 毫米，速度最大也不在 90 度，而在 104.7 度，这是连杆倾斜造成的。第二，上止点附近曲线平缓，下止点附近曲线尖锐：上止点加速度 3.05 千米每二次方秒，前后 30 度几乎不变，下止点却有 5.45。也就是说，机针在上面停留得久，在下面转身转得快。第三，最大惯性力在下止点，而这时恰恰是机针在布里、线环正在形成、梭尖准备钩线的时刻。",
+    "These are the displacement, velocity and acceleration curves over one revolution; read them for three points. First, the displacement curve is not symmetric about 90°: at 90° the bar has moved only 13.3 millimetres, and peak velocity is not at 90° but at 104.7°, because of the inclined link. Second, the curves are flat near the top and sharp near the bottom: at top dead centre the acceleration is 3.05 kilometres per second squared and barely changes over 30° either side, while at the bottom it is 5.45. In other words the needle lingers at the top and turns round fast at the bottom. Third, the largest inertia force is at bottom dead centre, which is exactly when the needle is in the fabric, the loop is forming and the hook is about to catch."
+   ]
+  },
+  {
+   "title": [
+    "连杆比与钩线时刻",
+    "Link ratio and hook timing"
+   ],
+   "points": [
+    [
+     "在 φ = 180° + δ 处展开，得到下止点附近的回升量 h(δ)。",
+     "Expanding about φ = 180° + δ gives the rise near bottom dead centre, h(δ)."
+    ],
+    [
+     "算例 h = 2 mm 时 δ ≈ 26°，钩线在 φ ≈ 206°。",
+     "In the example h = 2 mm at δ ≈ 26°, so catching is at φ ≈ 206°."
+    ],
+    [
+     "行程不变时 λ 越大回升越快、钩线越早：λ = 0.20、0.282、0.40 时分别为 206.9°、206.1°、204.9°。",
+     "For a fixed stroke, larger λ means faster rise and earlier catching: 206.9°, 206.1° and 204.9° for λ = 0.20, 0.282 and 0.40."
+    ],
+    [
+     "差一两度也不可忽略：不跳针窗口只有十度左右，改了 r 或 l 要重新校正旋梭安装角和针杆高度。",
+     "One or two degrees matters: the no-skip window is only about ten degrees, so after changing r or l the hook mounting angle and needle-bar height must be re-set."
+    ]
+   ],
+   "formula": "h(\\delta) = x(180^{\\circ}) - x(180^{\\circ}+\\delta) \\approx \\frac{r}{2}(1+\\lambda)\\,\\delta^{2}",
+   "figure": "w_55ae5477.png",
+   "narration": [
+    "第 2 章说梭尖要在机针回升约 2 毫米时钩线。把位移式在下止点附近展开，回升量约等于 r 除以 2 乘 1 加 λ 再乘 δ 的平方，δ 用弧度。代入算例，h 等于 2 毫米，δ 约 26 度，钩线就在 206 度左右。这个式子告诉我们：行程不变时，λ 越大，回升越快，钩线时刻越早。精确算一下，λ 取 0.20、0.282、0.40，回升 2 毫米分别在 206.9、206.1、204.9 度。看起来只差一两度，可第 2 章实验里不跳针的窗口只有十度左右，所以改了连杆或曲柄，旋梭安装角和针杆高度都要重新校正。",
+    "Chapter 2 said the hook point must catch when the needle has risen about 2 millimetres. Expand the displacement near bottom dead centre and the rise is about r over 2, times one plus λ, times δ squared, with δ in radians. With the example values, h equal to 2 millimetres gives δ of about 26°, so catching is around 206°. The formula says that for a fixed stroke, a larger λ means a faster rise and earlier catching. Exactly, for λ of 0.20, 0.282 and 0.40 the 2-millimetre rise comes at 206.9, 206.1 and 204.9 degrees. Only a degree or two, but the no-skip window in the Chapter 2 lab is only about ten degrees wide, so after changing the link or crank, the hook mounting angle and needle-bar height must be re-set."
+   ]
+  },
+  {
+   "title": [
+    "λ 的折中",
+    "The compromise in λ"
+   ],
+   "points": [
+    [
+     "λ 小（连杆长）：下止点加速度小，运动更接近简谐。",
+     "Small λ (long link): lower bottom-dead-centre acceleration, motion closer to simple harmonic."
+    ],
+    [
+     "代价：机头要加高，针杆组件变长变重。",
+     "The price: a taller head and a longer, heavier needle-bar assembly."
+    ],
+    [
+     "λ = 0.20、0.282、0.40 时下止点加速度 5099、5447、5949 m/s²（r = 15.5 mm，5000 r/min）。",
+     "Bottom-dead-centre acceleration is 5099, 5447 and 5949 m/s² for λ = 0.20, 0.282 and 0.40 (r = 15.5 mm, 5000 r/min)."
+    ],
+    [
+     "工业平缝机的 λ 多在 0.25–0.32（待核），是两者之间的折中。",
+     "Industrial lockstitch machines mostly use λ = 0.25–0.32 (to be verified), a compromise between the two."
+    ]
+   ],
+   "formula": "",
+   "figure": "w_55ae5477.png",
+   "narration": [
+    "反过来看，λ 小、也就是连杆长，有什么好处？下止点加速度小，运动更接近简谐。同样 r 等于 15.5、每分钟 5000 转，λ 从 0.40 降到 0.20，下止点加速度从 5949 降到 5099 米每二次方秒，降了一成多。代价是什么？连杆长了，机头就要加高，针杆组件变长变重，往复质量一增加，又会把惯性力拉回去。所以工业平缝机的 λ 多在 0.25 到 0.32 之间，是在这两者之间折中的结果。设计没有白拿的好处，每个参数都有代价，这是这门课反复要讲的思路。",
+    "Look at it the other way: what does a small λ, a long link, buy you? A lower acceleration at bottom dead centre and motion closer to simple harmonic. With r of 15.5 at 5000 r/min, going from λ of 0.40 to 0.20 brings the bottom acceleration down from 5949 to 5099 metres per second squared, more than ten per cent. And the price? A longer link means a taller head and a longer, heavier needle-bar assembly, and more reciprocating mass pushes the inertia force back up. So industrial lockstitch machines mostly use λ between 0.25 and 0.32, a compromise between the two. In design nothing comes free; every parameter has a cost, and that is a way of thinking this course keeps coming back to."
+   ]
+  },
+  {
+   "title": [
+    "往复惯性力",
+    "Reciprocating inertia force"
+   ],
+   "points": [
+    [
+     "往复质量 m：针杆、针夹、机针以及连杆折算到针杆一端的部分。",
+     "Reciprocating mass m: needle bar, needle clamp, needle and the share of the link referred to the needle-bar end."
+    ],
+    [
+     "算例 m = 120 g（示意值，待按实际零件称量）：下止点约 654 N，上止点约 366 N。",
+     "Example m = 120 g (illustrative, to be weighed on real parts): about 654 N at bottom dead centre and about 366 N at top."
+    ],
+    [
+     "惯性力与转速平方成正比：5000 → 6000 r/min，增大到 1.44 倍，约 942 N。",
+     "Inertia force scales with speed squared: from 5000 to 6000 r/min it grows 1.44 times, to about 942 N."
+    ],
+    [
+     "一百多克的部件，承受几百倍于自重的力，每秒来回八十多次。",
+     "Parts weighing a little over 100 g carry forces hundreds of times their weight, reversing more than eighty times a second."
+    ]
+   ],
+   "formula": "F = -m\\,a \\approx -m r\\omega^{2}\\cos\\varphi + m r\\omega^{2}\\lambda\\cos2\\varphi",
+   "figure": "",
+   "narration": [
+    "针杆、针夹、机针，再加上连杆折算到针杆一端的那部分，合起来叫往复质量 m。惯性力就是负的 m 乘 a。算例取 m 等于 120 克，这是示意值，真机要称零件。下止点惯性力约 0.12 乘 5447，约 654 牛；上止点约 366 牛。惯性力和转速平方成正比，从每分钟 5000 转提到 6000 转，变成 1.44 倍，约 942 牛。这就是本讲车间问题的答案：超过了假定的 800 牛限值。一百多克的零件，要扛几百倍于自重的力，每秒来回八十多次，这就是高速机的设计难点。",
+    "The needle bar, needle clamp and needle, plus the part of the link mass referred to the needle-bar end, make up the reciprocating mass m. The inertia force is minus m times a. The example takes m as 120 grams, an illustrative value; on a real machine you weigh the parts. At bottom dead centre the force is about 0.12 times 5447, about 654 newtons; at the top about 366. Inertia force scales with speed squared, so going from 5000 to 6000 r/min multiplies it by 1.44, to about 942 newtons. That answers our shop-floor problem: it exceeds the assumed 800-newton limit. A part of a hundred-odd grams carrying hundreds of times its own weight, reversing more than eighty times a second: that is what makes high-speed machines hard."
+   ]
+  },
+  {
+   "title": [
+    "一阶、二阶惯性力与平衡块",
+    "First- and second-order forces and the counterweight"
+   ],
+   "points": [
+    [
+     "一阶惯性力 m r ω² cosφ，频率等于主轴转速；曲柄上的平衡块产生同频离心力。",
+     "The first-order force m r ω² cosφ has the shaft frequency; a counterweight on the crank produces a centrifugal force at the same frequency."
+    ],
+    [
+     "平衡块能全部抵消曲柄、曲柄销等旋转质量，也能抵消一部分一阶往复力；但它的离心力随曲柄旋转，抵消竖直力的同时在水平方向产生新的不平衡，所以往复质量只平衡一部分。",
+     "The counterweight can fully cancel rotating masses such as crank and crank pin and part of the first-order reciprocating force; but its force rotates with the crank, creating new horizontal unbalance as it cancels vertical force, so reciprocating mass is only partly balanced."
+    ],
+    [
+     "二阶惯性力 m r ω² λ cos2φ，频率为两倍转速，平衡块对它无能为力；它正比于 λ。",
+     "The second-order force m r ω² λ cos2φ has twice the shaft frequency, and the counterweight can do nothing about it; it is proportional to λ."
+    ],
+    [
+     "降振最有效的办法仍是减小 m：空心钢管针杆、小巧的针夹和连接轴。",
+     "The most effective way to cut vibration is still to reduce m: a hollow steel needle bar and a small clamp and stud."
+    ]
+   ],
+   "formula": "F_{1}=m r\\omega^{2}\\cos\\varphi,\\qquad F_{2}=m r\\omega^{2}\\lambda\\cos2\\varphi",
+   "figure": "",
+   "narration": [
+    "惯性力分两部分。一阶惯性力的频率等于主轴转速，曲柄上曲柄销对面加的平衡块，会产生一个同频的离心力。它能把曲柄、曲柄销这些旋转质量完全平衡掉，也能抵消一部分一阶往复力。但为什么只能抵消一部分？因为平衡块的离心力方向跟着曲柄转，它在竖直方向抵消往复力的同时，会在水平方向产生一个新的不平衡力。二阶惯性力频率是两倍转速，平衡块对它完全无能为力，它的大小正比于 λ，这又是连杆不宜太短的理由。所以降振最有效的，还是把 m 做小。",
+    "The inertia force has two parts. The first-order force varies at shaft frequency, and a counterweight on the crank opposite the crank pin produces a centrifugal force at the same frequency. It can fully balance rotating masses like the crank and crank pin, and cancel part of the first-order reciprocating force. Why only part? Because the counterweight's force rotates with the crank: as it cancels the reciprocating force vertically, it creates a new unbalanced force horizontally. The second-order force varies at twice shaft speed, and the counterweight can do nothing about it at all; its size is proportional to λ, another reason not to make the link too short. So the most effective way to reduce vibration is still to make m small."
+   ]
+  },
+  {
+   "title": [
+    "设计要点",
+    "Design notes"
+   ],
+   "points": [
+    [
+     "定参数有先后：先由布厚、压脚抬高量和旋梭位置定行程 2r，再在 λ = 0.25–0.32（待核）选连杆长，最后按钩线时刻反推旋梭安装角。",
+     "Fix parameters in order: stroke 2r from fabric thickness, presser-foot lift and hook position; then link length within λ = 0.25–0.32 (to be verified); finally the hook mounting angle from the catching time."
+    ],
+    [
+     "减轻往复质量：空心针杆、小型针夹、工字形或镂空连杆。",
+     "Lighten the reciprocating mass: hollow needle bar, small clamp, I-section or pocketed link."
+    ],
+    [
+     "平衡：旋转质量全部平衡，往复质量只平衡一部分，比例由整机振动实测确定。",
+     "Balancing: rotating mass fully, reciprocating mass partly, with the proportion set by vibration tests on the complete machine."
+    ],
+    [
+     "润滑与防转：轴套、曲柄销、连杆两端可靠供油；导滑块间隙、针杆高度可调、凹口始终朝向梭尖。",
+     "Lubrication and anti-rotation: reliable oil to bushings, crank pin and link ends; guide-block clearance, adjustable height, scarf always facing the hook."
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后把设计要点串起来。参数是有先后顺序的：先由布料厚度、压脚抬高量和旋梭的位置定出行程，再在 λ 0.25 到 0.32 之间选连杆长，最后按钩线时刻反推旋梭的安装角。参数定了以后，想办法减轻往复质量，因为惯性力和它成正比：针杆做成空心，针夹做小，连杆用工字形或镂空截面。剩下的惯性力交给平衡块：旋转质量全平衡，往复质量只平衡一部分，比例靠整机振动实测来定。还有润滑和磨损，以及防转和可调，这些细节决定了一台高速机能不能长期稳定地钩线。",
+    "Finally, let's string the design notes together. The parameters come in order: first the stroke, from fabric thickness, presser-foot lift and hook position; then the link length, with λ between 0.25 and 0.32; and last the hook mounting angle, worked back from the catching time. Once the parameters are set, lighten the reciprocating mass, because the inertia force is proportional to it: a hollow needle bar, a small clamp, an I-section or pocketed link. The remaining force goes to the counterweight: rotating mass fully balanced, reciprocating mass only partly, with the proportion set by vibration tests on the whole machine. Then lubrication and wear, anti-rotation and adjustability: details that decide whether a high-speed machine keeps catching reliably for years."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "刺布机构是对心曲柄滑块，但针杆倒挂在上轴下方，上止点 OB = l − r，与发动机活塞的上下止点对调。",
+   "The needle-bar mechanism is an in-line slider-crank, but the bar hangs below the shaft, so OB = l − r at top dead centre and the dead centres are swapped relative to an engine piston."
+  ],
+  [
+   "位移 x = r(1 − cosφ) − l(1 − √(1 − λ²sin²φ))；上止点 a = rω²(1 − λ)，下止点 a = −rω²(1 + λ)，下止点加速度更大。",
+   "Displacement x = r(1 − cosφ) − l(1 − √(1 − λ²sin²φ)); a = rω²(1 − λ) at top and −rω²(1 + λ) at bottom dead centre, so the bottom is larger."
+  ],
+  [
+   "算例（r = 15.5 mm，l = 55 mm，5000 r/min）：行程 31 mm，最大速度 8.43 m/s，下止点 5447 m/s²，回升 2 mm 在 206.1°。",
+   "Example (r = 15.5 mm, l = 55 mm, 5000 r/min): stroke 31 mm, peak velocity 8.43 m/s, 5447 m/s² at bottom, 2 mm rise at 206.1°."
+  ],
+  [
+   "回升量 h ≈ (r/2)(1 + λ)δ²：行程不变时 λ 越大钩线越早；改 r 或 l 后要重校旋梭安装角和针杆高度。",
+   "Rise h ≈ (r/2)(1 + λ)δ²: for fixed stroke, larger λ catches earlier; after changing r or l, re-set the hook angle and needle-bar height."
+  ],
+  [
+   "惯性力 F = m·a 与转速平方成正比；平衡块只能处理一阶和旋转质量，二阶力正比于 λ、无法用曲柄平衡块消除；减小往复质量最有效。",
+   "Inertia force F = m·a scales with speed squared; a counterweight handles only first-order and rotating mass, the second-order force (proportional to λ) cannot be cancelled by it, and reducing reciprocating mass is most effective."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "slidercrank",
+   "no": "3-1",
+   "title": [
+    "针杆曲柄滑块机构",
+    "Needle-bar slider-crank mechanism"
+   ],
+   "goal": [
+    [
+     "改变 r、l、n、m，观察位移、速度、加速度曲线和钩线时刻的变化，与第 3 章算例（灰色虚线）对照。",
+     "Vary r, l, n and m and watch how displacement, velocity, acceleration and the catching moment change, compared with the Chapter 3 example (grey dashed)."
+    ],
+    [
+     "验证上下止点加速度、惯性力与转速平方的关系，以及连杆比对钩线时刻的影响。",
+     "Verify the dead-centre accelerations, the speed-squared law for inertia force, and the effect of link ratio on catching."
+    ],
+    [
+     "用实验核对自己的手算结果。",
+     "Use the lab to check your hand calculations."
+    ]
+   ],
+   "theory": [
+    [
+     "位移 x = r(1 − cosφ) − l(1 − √(1 − λ²sin²φ))，λ = r / l；曲线按精确式计算。",
+     "Displacement x = r(1 − cosφ) − l(1 − √(1 − λ²sin²φ)), λ = r / l; the curves use the exact formulas."
+    ],
+    [
+     "上止点 a = rω²(1 − λ)，下止点 a = −rω²(1 + λ)，ω = 2πn/60。",
+     "a = rω²(1 − λ) at top and −rω²(1 + λ) at bottom dead centre, ω = 2πn/60."
+    ],
+    [
+     "钩线时刻取机针从最低点回升 2 mm 的转角；近似 h ≈ (r/2)(1 + λ)δ²。",
+     "The catching moment is the angle at which the needle has risen 2 mm from its lowest point; approximately h ≈ (r/2)(1 + λ)δ²."
+    ],
+    [
+     "最大惯性力 F = m·|a|，出现在下止点，与转速平方成正比。",
+     "Maximum inertia force F = m·|a| occurs at bottom dead centre and scales with speed squared."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 3-1，确认参数为算例值（r = 15.5 mm，l = 55 mm，n = 5000 r/min，m = 120 g），在“结果”区读出 λ、行程、最大速度、上下止点加速度、最大惯性力、钩线时刻，记为第 1 行。",
+     "Open Virtual lab 3-1, check that the parameters are the example values (r = 15.5 mm, l = 55 mm, n = 5000 r/min, m = 120 g), and read λ, stroke, peak velocity, dead-centre accelerations, maximum inertia force and catching angle from Results as row 1."
+    ],
+    [
+     "点“暂停”，依次点“上止点”“下止点”“钩线时刻”，看机构图和曲线上红线的位置；拖动“主轴转角”滑块到 90°，读出位移，确认不到行程一半。",
+     "Press Pause, then press Top dead centre, Bottom dead centre and Loop-catch moment in turn, watching the mechanism and the red line on the curves; drag the Main-shaft angle slider to 90° and confirm the displacement is less than half the stroke."
+    ],
+    [
+     "任务 1：只把连杆长度 l 从 55 mm 改到 90 mm、再改到 35 mm（r 不变），记录行程和上下止点加速度的变化。",
+     "Task 1: change only the link length l from 55 mm to 90 mm, then to 35 mm (r fixed), and record the stroke and dead-centre accelerations."
+    ],
+    [
+     "任务 2：把 l 改到 40 mm，读出钩线时刻，与 55 mm 时比较提前还是推后、差几度。",
+     "Task 2: set l to 40 mm, read the catching angle, and compare with 55 mm: earlier or later, and by how many degrees."
+    ],
+    [
+     "任务 3：恢复 l = 55 mm，把转速 n 从 3000 改到 6000 r/min，记录最大惯性力，算出比值。",
+     "Task 3: return l to 55 mm, change n from 3000 to 6000 r/min, record the maximum inertia force and work out the ratio."
+    ],
+    [
+     "任务 4：n = 5000 r/min 时，调往复质量 m，找出最大惯性力不超过 400 N 的最大 m。",
+     "Task 4: at n = 5000 r/min, adjust the reciprocating mass m to find the largest m that keeps the maximum inertia force within 400 N."
+    ],
+    [
+     "把 r 改为 17 mm、l 改为 60 mm、n 改为 5500 r/min，读出各项结果，与作业第 1 题的手算核对。",
+     "Set r = 17 mm, l = 60 mm and n = 5500 r/min, read the results, and check them against your hand calculation for assignment task 1."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "参数与结果记录",
+     "Parameters and results"
+    ],
+    "headers": [
+     [
+      "r（mm）",
+      "r (mm)"
+     ],
+     [
+      "l（mm）",
+      "l (mm)"
+     ],
+     [
+      "n（r/min）",
+      "n (r/min)"
+     ],
+     [
+      "m（g）",
+      "m (g)"
+     ],
+     [
+      "上止点 / 下止点加速度（m/s²）",
+      "TDC / BDC acceleration (m/s²)"
+     ],
+     [
+      "最大惯性力（N）",
+      "Max. inertia force (N)"
+     ],
+     [
+      "钩线时刻（°）",
+      "Loop-catch angle (°)"
+     ],
+     [
+      "下止点 ±2 mm 停留宽度（°）",
+      "Dwell within 2 mm of BDC (°)"
+     ]
+    ],
+    "rows": 7
+   },
+   "questions": [
+    [
+     "只改连杆长度时行程为什么不变？上下止点加速度为什么一个变大一个变小？用 rω²(1 ∓ λ) 解释。",
+     "Why does the stroke not change when only the link length changes? Why does one dead-centre acceleration rise and the other fall? Explain with rω²(1 ∓ λ)."
+    ],
+    [
+     "把 l 从 55 mm 改到 40 mm，钩线时刻提前了约 1°。这对旋梭的安装角度意味着什么？",
+     "Changing l from 55 mm to 40 mm makes catching about 1° earlier. What does this mean for setting the rotary hook?"
+    ],
+    [
+     "转速从 3000 提到 6000 r/min，惯性力为什么正好变为 4 倍？往复质量减半又会怎样？",
+     "Why does the inertia force become exactly 4 times larger from 3000 to 6000 r/min? What if the reciprocating mass is halved?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 3：刺布机构的运动与惯性力计算",
+   "Assignment 3: needle-bar kinematics and inertia force"
+  ],
+  "tasks": [
+   [
+    "计算题（教材习题 3）。某机型 r = 17 mm，l = 60 mm，n = 5500 r/min。求行程、上下止点加速度、机针回升 2 mm 时的主轴转角；并用虚拟实验 3-1 核对（附截图），说明最大速度出现的位置为什么不在 90°。",
+    "Calculation (textbook exercise 3). A machine has r = 17 mm, l = 60 mm, n = 5500 r/min. Find the stroke, the accelerations at top and bottom dead centre, and the shaft angle at 2 mm needle rise; check with Virtual lab 3-1 (attach a screenshot) and explain why peak velocity is not at 90°."
+   ],
+   [
+    "设计题。算例机构（r = 15.5 mm，l = 55 mm）要提速到 6000 r/min，针杆轴套限值为下止点惯性力 ≤ 800 N（假定值）。原往复质量 120 g。给出两种方案（减重或限速）的具体数字，并说明你推荐哪一种、为什么，以及减重可以从哪些零件入手。",
+    "Design. The example mechanism (r = 15.5 mm, l = 55 mm) is to run at 6000 r/min, with a bushing limit of 800 N at bottom dead centre (assumed). The reciprocating mass is now 120 g. Give the numbers for two options (lighten or limit speed), say which you recommend and why, and which parts you would lighten."
+   ],
+   [
+    "分析题（教材习题 4）。保持行程不变，把连杆从 55 mm 缩短到 45 mm，钩线时刻大约变化几度？下止点加速度变化多少？旋梭安装角应当怎样调整？",
+    "Analysis (textbook exercise 4). Keeping the stroke, the link is shortened from 55 mm to 45 mm. By roughly how many degrees does the catching moment change, and how much does the bottom-dead-centre acceleration change? How should the hook mounting angle be adjusted?"
+   ],
+   [
+    "简答题（教材习题 6）。为什么曲柄上的平衡块不能完全平衡针杆的往复惯性力？说出两条理由。",
+    "Short answer (textbook exercise 6). Why can a counterweight on the crank not fully balance the reciprocating inertia force of the needle bar? Give two reasons."
+   ]
+  ],
+  "deliverable": [
+   "一份 PDF（不超过 5 页）：公式推导与计算过程、虚拟实验截图、方案比较与理由。可附自己的 Python 计算脚本。",
+   "One PDF of at most 5 pages: derivations and calculations, lab screenshots, and the comparison of options with reasons. Your own Python script may be attached."
+  ],
+  "rubric": [
+   [
+    "运动参数计算正确，单位清楚，与虚拟实验核对一致（35 分）",
+    "Correct kinematic results with clear units, consistent with the lab (35 points)"
+   ],
+   [
+    "设计题两种方案数字正确，推荐理由兼顾惯性力、振动和结构（25 分）",
+    "Correct numbers for both design options, with a recommendation weighing inertia force, vibration and structure (25 points)"
+   ],
+   [
+    "连杆比对钩线时刻和加速度的影响分析正确，调整方向明确（20 分）",
+    "Correct analysis of link ratio on catching and acceleration, with a clear adjustment (20 points)"
+   ],
+   [
+    "平衡块的两条理由准确（20 分）",
+    "Two accurate reasons about the counterweight (20 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "针杆在最高点时，曲柄中心 O 到滑块铰点 B 的距离 OB 等于：",
+    "When the needle bar is at its highest point, the distance OB from crank centre O to slider pin B is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "l − r，曲柄销朝上、背离针杆",
+      "l − r, with the crank pin pointing up, away from the needle bar"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "l + r，曲柄销朝向针杆",
+      "l + r, with the crank pin pointing towards the needle bar"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "l，曲柄销水平",
+      "l, with the crank pin horizontal"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "√(l² − r²)",
+      "√(l² − r²)"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "针杆倒挂在上轴下方，与发动机活塞相反；最高点时 OB = l − r，最低点时 OB = l + r。",
+    "The needle bar hangs below the shaft, the opposite of an engine piston; OB = l − r at the top and l + r at the bottom."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "对刺布机构来说，下止点的加速度比上止点大。",
+    "For the needle-bar mechanism, acceleration at bottom dead centre is larger than at top dead centre."
+   ],
+   "correct": true,
+   "feedback": [
+    "上止点 a = rω²(1 − λ)，下止点 |a| = rω²(1 + λ)。算例为 3052 与 5447 m/s²。",
+    "a = rω²(1 − λ) at top, |a| = rω²(1 + λ) at bottom; 3052 and 5447 m/s² in the example."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "连杆比 λ = 0.282 时，上止点与下止点加速度大小之比 (1 − λ)/(1 + λ) 是多少？",
+    "With link ratio λ = 0.282, what is the ratio (1 − λ)/(1 + λ) of top to bottom dead-centre acceleration?"
+   ],
+   "answer": 0.56,
+   "tolerance": 0.005,
+   "unit": "",
+   "feedback": [
+    "(1 − 0.282)/(1 + 0.282) = 0.718/1.282 ≈ 0.560，与算例 3052/5447 一致。",
+    "(1 − 0.282)/(1 + 0.282) = 0.718/1.282 ≈ 0.560, matching 3052/5447 in the example."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某刺布机构 r = 16 mm，l = 56 mm，主轴 4500 r/min。求下止点加速度的大小。",
+    "A needle-bar mechanism has r = 16 mm, l = 56 mm and runs at 4500 r/min. Find the magnitude of the acceleration at bottom dead centre."
+   ],
+   "answer": 4568,
+   "tolerance": 25,
+   "unit": "m/s²",
+   "feedback": [
+    "角速度 ω = 2π × 4500/60 = 471.2 rad/s，λ = 0.286，下止点 |a| = rω²(1 + λ) = 0.016 × 471.2² × 1.286 ≈ 4568 m/s²。",
+    "ω = 2π × 4500/60 = 471.2 rad/s, λ = 0.286, |a| = rω²(1 + λ) = 0.016 × 471.2² × 1.286 ≈ 4568 m/s²."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "算例中针杆最大速度出现在 φ ≈ 104.7°，而不在 90°，原因是：",
+    "In the example the needle bar's peak velocity is at φ ≈ 104.7°, not 90°, because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "连杆倾斜使运动不对称，λ 越大偏得越多",
+      "The inclined link makes the motion asymmetric, and the larger λ, the larger the offset"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "主轴转速不均匀",
+      "The shaft speed is not uniform"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "平衡块的离心力改变了速度",
+      "The counterweight's centrifugal force changes the velocity"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "机针穿过布料时受阻",
+      "The needle is slowed by passing through the fabric"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "如果连杆无限长（λ → 0），运动是简谐的，最大速度正好在 90°；有限长连杆带来偏移。",
+    "With an infinitely long link (λ → 0) the motion is simple harmonic and peak velocity is at 90°; a finite link shifts it."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "保持曲柄半径 r 不变，把连杆缩短（λ 增大），机针回升 2 mm 的钩线时刻会：",
+    "Keeping crank radius r fixed and shortening the link (larger λ), the angle at 2 mm needle rise will:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "提前，因为下止点附近回升更快",
+      "Come earlier, because the needle rises faster near bottom dead centre"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "推后，因为行程变小",
+      "Come later, because the stroke gets smaller"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "不变，因为行程不变",
+      "Not change, because the stroke is the same"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "推后，因为下止点加速度变大",
+      "Come later, because the bottom acceleration grows"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "h ≈ (r/2)(1 + λ)δ²，λ 越大，同样 2 mm 所需的 δ 越小。λ = 0.20、0.282、0.40 时分别为 206.9°、206.1°、204.9°。",
+    "h ≈ (r/2)(1 + λ)δ²: larger λ needs a smaller δ for the same 2 mm. 206.9°, 206.1° and 204.9° for λ = 0.20, 0.282, 0.40."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "算例针杆（m = 120 g）在 5000 r/min 时下止点惯性力约 654 N。转速提高到 6000 r/min 时约为多少牛？",
+    "The example needle bar (m = 120 g) has about 654 N at bottom dead centre at 5000 r/min. What is it at 6000 r/min?"
+   ],
+   "answer": 942,
+   "tolerance": 4,
+   "unit": "N",
+   "feedback": [
+    "惯性力与转速平方成正比：654 × (6000/5000)² = 654 × 1.44 ≈ 942 N。",
+    "Inertia force scales with speed squared: 654 × (6000/5000)² = 654 × 1.44 ≈ 942 N."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于曲柄上的平衡块，下列哪些说法正确？",
+    "Which statements about the counterweight on the crank are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "它可以完全平衡曲柄、曲柄销等旋转质量",
+      "It can fully balance rotating masses such as the crank and crank pin"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "它可以抵消一部分一阶往复惯性力",
+      "It can cancel part of the first-order reciprocating inertia force"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "它可以完全消除二阶惯性力",
+      "It can completely eliminate the second-order inertia force"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "它抵消竖直方向往复力的同时，会在水平方向产生新的不平衡力",
+      "While cancelling vertical reciprocating force, it creates a new unbalanced horizontal force"
+     ],
+     "correct": true
+    }
+   ],
+   "feedback": [
+    "平衡块的离心力与曲柄同频旋转：对旋转质量有效，对一阶往复力只能部分平衡，对两倍频的二阶力无能为力。",
+    "The counterweight's force rotates at shaft frequency: effective for rotating mass, only partial for first-order reciprocating force, useless against the second-order force at twice the frequency."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "算例机构 n = 5000 r/min，要使最大惯性力不超过 400 N，往复质量最多允许多少克？（下止点加速度 5447 m/s²）",
+    "For the example mechanism at 5000 r/min, what is the largest reciprocating mass in grams that keeps the maximum inertia force within 400 N? (Bottom acceleration 5447 m/s².)"
+   ],
+   "answer": 73.4,
+   "tolerance": 0.5,
+   "unit": "g",
+   "feedback": [
+    "往复质量 m = F / a = 400 / 5447 ≈ 0.0734 kg = 73.4 g。",
+    "m = F / a = 400 / 5447 ≈ 0.0734 kg = 73.4 g."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "降低刺布机构振动最有效的办法是：",
+    "The most effective way to reduce vibration of the needle-bar mechanism is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "减小往复质量，如空心针杆、小型针夹、镂空连杆",
+      "Reduce the reciprocating mass, e.g. hollow needle bar, small clamp, pocketed link"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "加大平衡块，直到完全平衡往复质量",
+      "Enlarge the counterweight until the reciprocating mass is fully balanced"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "缩短连杆以减小机头高度",
+      "Shorten the link to reduce head height"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "增大曲柄半径以降低转速",
+      "Enlarge the crank radius to lower the speed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "惯性力与 m 成正比；平衡块只能部分平衡且会产生水平不平衡，缩短连杆反而增大二阶力。",
+    "Inertia force is proportional to m; a counterweight balances only partly and adds horizontal unbalance, and a shorter link increases the second-order force."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "往复质量 100 g，要求最大惯性力不超过 500 N，算例机构（r = 15.5 mm，l = 55 mm）允许的最高转速是多少 r/min？",
+    "With a reciprocating mass of 100 g and a maximum inertia force of 500 N, what is the highest speed in r/min allowed for the example mechanism (r = 15.5 mm, l = 55 mm)?"
+   ],
+   "answer": 4790,
+   "tolerance": 15,
+   "unit": "r/min",
+   "feedback": [
+    "要求 a ≤ 500/0.1 = 5000 m/s²；由 a = rω²(1 + λ) 得 ω = √(5000/(0.0155 × 1.282)) ≈ 501.6 rad/s，n = 60ω/2π ≈ 4790 r/min。",
+    "Need a ≤ 500/0.1 = 5000 m/s²; from a = rω²(1 + λ), ω = √(5000/(0.0155 × 1.282)) ≈ 501.6 rad/s, so n = 60ω/2π ≈ 4790 r/min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某机型 r = 17 mm，l = 60 mm，n = 5500 r/min。求上止点加速度。",
+    "A machine has r = 17 mm, l = 60 mm, n = 5500 r/min. Find the acceleration at top dead centre."
+   ],
+   "answer": 4042,
+   "tolerance": 20,
+   "unit": "m/s²",
+   "feedback": [
+    "角速度 ω = 576.0 rad/s，λ = 0.283，上止点 a = rω²(1 − λ) = 0.017 × 576.0² × 0.717 ≈ 4042 m/s²。",
+    "ω = 576.0 rad/s, λ = 0.283, a = rω²(1 − λ) = 0.017 × 576.0² × 0.717 ≈ 4042 m/s²."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "二阶往复惯性力 m r ω² λ cos2φ 的特点是：",
+    "The second-order reciprocating inertia force m r ω² λ cos2φ:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "频率是主轴转速的两倍，曲柄平衡块无法消除，大小正比于 λ",
+      "Has twice the shaft frequency, cannot be removed by the crank counterweight, and is proportional to λ"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "频率等于主轴转速，可以用平衡块完全消除",
+      "Has the shaft frequency and can be fully removed by a counterweight"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "与连杆长度无关",
+      "Does not depend on link length"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "只在上止点出现",
+      "Appears only at top dead centre"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "二阶项随 2φ 变化；平衡块与曲柄同频，对它无能为力。λ 越大二阶力越大，这是连杆不宜过短的理由之一。",
+    "The second-order term varies with 2φ; the counterweight runs at shaft frequency and cannot touch it. Larger λ means a larger second-order force, one reason not to make the link too short."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "改变连杆长度或曲柄半径以后，只要行程不变，就不需要重新校正旋梭安装角。",
+    "After changing the link length or crank radius, as long as the stroke is unchanged there is no need to re-set the hook mounting angle."
+   ],
+   "correct": false,
+   "feedback": [
+    "λ 改变会使回升 2 mm 的转角移动一两度，而不跳针窗口只有十度左右，必须重新校正旋梭安装角和针杆高度。",
+    "A change in λ moves the 2 mm rise angle by a degree or two, while the no-skip window is only about ten degrees, so the hook angle and needle-bar height must be re-set."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "刺布机构设计时，参数确定的合理顺序是：",
+    "When designing a needle-bar mechanism, the sensible order for fixing parameters is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "先定行程 2r，再选连杆长使 λ 在 0.25–0.32，最后按钩线时刻反推旋梭安装角",
+      "Stroke 2r first, then link length for λ of 0.25–0.32, and finally the hook mounting angle from the catching time"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "先定旋梭安装角，再定行程，最后定连杆长",
+      "Hook angle first, then stroke, then link length"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "先定转速，再按惯性力限值反推行程",
+      "Speed first, then the stroke from the inertia-force limit"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "先定往复质量，再定连杆长，最后定行程",
+      "Reciprocating mass first, then link length, then stroke"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "行程由布厚、压脚抬高量和旋梭位置决定，是最先确定的；λ 是折中；旋梭安装角随前两者而定。",
+    "The stroke follows from fabric thickness, presser-foot lift and hook position and comes first; λ is a compromise; the hook angle follows from both."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "倒挂曲柄滑块的位移式；上下止点加速度；算例数值；连杆比与钩线时刻；惯性力与平衡。",
+   "Displacement of the upside-down slider-crank; dead-centre accelerations; the example values; link ratio and hook timing; inertia force and balancing."
+  ],
+  "difficult": [
+   "针杆与发动机活塞上下止点对调的几何原因；回升量展开式的物理意义；平衡块为什么只能部分平衡往复质量、对二阶力无效。",
+   "The geometric reason the needle bar's dead centres are swapped relative to an engine; the meaning of the rise expansion; why a counterweight only partly balances reciprocating mass and does nothing for the second-order force."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Introduction"
+    ],
+    "minutes": 15,
+    "content": [
+     "车间问题：提速到 6000 r/min，针杆受得了吗？回顾第 2 章时序图中的 180° 和 206°。",
+     "Shop-floor problem: can the needle bar take 6000 r/min? Review 180° and 206° on the Chapter 2 timing diagram."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：任务、结构与运动简图",
+     "Lecture: requirements, construction, kinematic diagram"
+    ],
+    "minutes": 30,
+    "content": [
+     "五条要求、两处调整、倒挂曲柄滑块与发动机的对比。",
+     "Five requirements, two adjustments, the upside-down slider-crank versus the engine."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：位移、速度、加速度与算例",
+     "Lecture: displacement, velocity, acceleration, example"
+    ],
+    "minutes": 40,
+    "content": [
+     "推导精确式与近似式，手算算例的上下止点加速度，读曲线三要点。",
+     "Derive exact and approximate formulas, hand-calculate dead-centre accelerations, three points for reading the curves."
+    ]
+   },
+   {
+    "phase": [
+     "实验：虚拟实验 3-1",
+     "Lab: Virtual lab 3-1"
+    ],
+    "minutes": 40,
+    "content": [
+     "学生完成四个实验任务并填写记录表。",
+     "Students complete the four lab tasks and fill in the record table."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：连杆比、惯性力与平衡",
+     "Lecture: link ratio, inertia force, balancing"
+    ],
+    "minutes": 35,
+    "content": [
+     "回升量展开、λ 的折中、一阶二阶惯性力、平衡块；求解导入问题。",
+     "The rise expansion, the λ compromise, first- and second-order forces, the counterweight; solve the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "小结与测验",
+     "Summary and quiz"
+    ],
+    "minutes": 20,
+    "content": [
+     "设计要点、小结、测验，布置作业。",
+     "Design notes, summary, quiz, assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业 3；预习第 4 章，想一想一针之中针线的需要量为什么不均匀。",
+   "Complete Assignment 3; preview Chapter 4 and think about why the needle thread demand within a stitch is uneven."
+  ]
+ }
+}

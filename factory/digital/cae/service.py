@@ -86,6 +86,8 @@ def write_surface(path, surf):
         f.write(struct.pack("<4sII", b"WQS1", len(pos), len(tri)))
         for a, dt in ((pos, "<f4"), (vm, "<f4"), (u, "<f4"), (tri, "<u4"), (face, "<u4")):
             f.write(np.ascontiguousarray(a, dtype=dt).tobytes())
+        if surf.get("temp") is not None:                  # 第 14 轮：热分析多一段节点温度（旧读法读到 face 为止，不受影响）
+            f.write(np.ascontiguousarray(surf["temp"], dtype="<f4").tobytes())
 
 
 def read_surface(path):
@@ -97,6 +99,8 @@ def read_surface(path):
                         ("triangles", nt * 3, "<u4"), ("face_of_triangle", nt, "<u4")):
         out[name] = np.frombuffer(raw, dt, n, o)
         o += 4 * n
+    if len(raw) >= o + 4 * nv:
+        out["temp"] = np.frombuffer(raw, "<f4", nv, o)
     out["positions"] = out["positions"].reshape(-1, 3)
     out["u"] = out["u"].reshape(-1, 3)
     out["triangles"] = out["triangles"].reshape(-1, 3)
@@ -105,7 +109,10 @@ def read_surface(path):
 
 def _solve_child(step_path, setup, outdir, q):
     try:
-        from cae import solve as S
+        if setup.get("analysis") in ("thermal", "thermo_mech"):
+            from cae import thermal as S
+        else:
+            from cae import solve as S
         stats, surf, _ = S.solve(open(step_path, "rb").read(), setup)
         write_surface(os.path.join(outdir, "surface.bin"), surf)
         q.put((True, stats))
@@ -230,6 +237,8 @@ def _worker():
             _update(jid, status="running", started=time.time())
             if j.get("kind") == "mbd":
                 ok, res = _isolated(_mbd_child, (_resolved(j["model"]), j["setup"], _job_path(jid)), TIME_LIMIT_S + 60)
+            elif j.get("kind") == "opt":
+                ok, res = _isolated(_opt_child, (j["spec"], _job_path(jid)), OPT_LIMIT_S + 120)
             else:
                 setup = dict(j["setup"])
                 setup["material"] = M.get(setup["material_id"])
@@ -296,7 +305,7 @@ def health():
 
 @app.get("/materials")
 def materials():
-    return {"materials": M.public()}
+    return {"materials": M.public(), "films": M.FILM}
 
 
 @app.post("/geometry")
@@ -348,10 +357,21 @@ def submit(body: dict = Body(...)):
     for l in loads:
         if not l.get("faces") or not set(l["faces"]) <= faces:
             raise HTTPException(400, "载荷或约束选的面不对")
-    if not any(l["type"] in ("fixed", "cyl_support") for l in loads):
-        raise HTTPException(400, "至少要有一个固定或支承面")
-    if not any(l["type"] not in ("fixed", "cyl_support") for l in loads):
-        raise HTTPException(400, "还没有加载荷")
+    an = setup.get("analysis", "static")
+    if an in ("thermal", "thermo_mech"):
+        th = setup.get("thermal") or []
+        for l in th:
+            if l["type"] != "heat_body" and l.get("faces") != "rest" and (not l.get("faces") or not set(l["faces"]) <= faces):
+                raise HTTPException(400, "热载荷选的面不对")
+        if not any(l["type"] in ("temperature", "convection") for l in th):
+            raise HTTPException(400, "至少要有一个固定温度或对流换热的面")
+        if an == "thermo_mech" and not any(l["type"] in ("fixed", "cyl_support") for l in loads):
+            raise HTTPException(400, "热—结构耦合至少要有一个固定或支承面")
+    else:
+        if not any(l["type"] in ("fixed", "cyl_support") for l in loads):
+            raise HTTPException(400, "至少要有一个固定或支承面")
+        if not any(l["type"] not in ("fixed", "cyl_support") for l in loads):
+            raise HTTPException(400, "还没有加载荷")
     jid = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:6]
     os.makedirs(_job_path(jid))
     j = {"id": jid, "status": "queued", "created": time.time(), "step_sha": sha, "setup": setup,
@@ -799,3 +819,58 @@ def cam_submission(jid: str, body: dict = Body(...)):
     if not os.path.exists(p):
         raise HTTPException(404, "没有这个任务")
     return _public(_update(jid.replace("/", ""), submission=str(body.get("submission") or "")[:40]))
+
+
+
+# ------------------------------------------------------------------ 设计优化（第 14 轮）
+OPT_LIMIT_S = 900
+
+
+def _opt_child(spec, outdir, q):
+    try:
+        from cae import optimize as O
+
+        def progress(rows):
+            _write_json(os.path.join(outdir, "progress.json"), {"rows": rows})
+        res = O.run(spec, progress)
+        _write_json(os.path.join(outdir, "result.json"), res)
+        best = (res.get("best") or [None])[0]
+        q.put((True, {"seconds": res["seconds"], "trials": len(res["trials"]), "feasible": sum(1 for r in res["trials"] if r["ok"]),
+                      "best": best, "base": res.get("base")}))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+@app.get("/opt/problems")
+def opt_problems():
+    from cae import optimize as O
+    return {"problems": [{"id": k, "label": O.LABELS[k], "vars": [{"name": n, "label": v[0], "low": v[1], "high": v[2], "step": v[3], "int": v[4]}
+                                                                  for n, v in O.VARS[k].items()],
+                          "default": O.DEFAULT_SPEC[k]} for k in O.VARS if k != "beam"],
+            "objectives": {k: {"label": v[0], "unit": v[1], "sense": v[2]} for k, v in O.OBJ.items()}, "max_trials": O.MAX_TRIALS}
+
+
+@app.post("/opt/jobs")
+def opt_submit(body: dict = Body(...)):
+    from cae import optimize as O
+    spec = body.get("spec") or {}
+    if spec.get("problem") not in O.VARS:
+        raise HTTPException(400, "不认识的优化问题")
+    jid = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:6]
+    os.makedirs(_job_path(jid))
+    j = {"id": jid, "kind": "opt", "status": "queued", "created": time.time(), "spec": spec,
+         "owner": body.get("owner"), "owner_name": body.get("owner_name"), "factory": body.get("factory"),
+         "title": body.get("title") or O.LABELS[spec["problem"]], "item": body.get("item")}
+    _write_json(_job_path(jid, "job.json"), j)
+    _Q.put(jid)
+    return _public(j)
+
+
+@app.get("/opt/jobs/{jid}/trials")
+def opt_trials(jid: str):
+    d = _job_path(jid.replace("/", ""))
+    for name in ("result.json", "progress.json"):
+        p = os.path.join(d, name)
+        if os.path.exists(p):
+            return dict(_read_json(p), final=name == "result.json")
+    return {"rows": [], "final": False}

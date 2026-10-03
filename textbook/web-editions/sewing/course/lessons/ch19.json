@@ -1,0 +1,1210 @@
+{
+ "no": 19,
+ "title": [
+  "电控原型平台与零件库",
+  "The Prototyping Platform and the Parts Library"
+ ],
+ "hours": 5,
+ "goals": [
+  [
+   "能说明 WQ-SC 五层参考架构怎样用同一套主控、模块和固件框架做出平缝机、包缝机、花样机和横机四种原型，以及为什么以主轴转角（横机以机头位置）为时间基准。",
+   "Explain how the five-layer WQ-SC reference architecture builds lockstitch, overlock, pattern-sewer and flat-knitting prototypes from one controller, module set and firmware framework, and why the spindle angle (carriage position for the knitter) is the time base."
+  ],
+  [
+   "能写出可计算、可测试的需求表，并按判据算出主轴电机与驱动器（加速转矩、等效转矩、惯量比、电流、急停回馈能量）和电磁铁（行程、力、折算转角）的选型结果。",
+   "Write a computable, testable requirements table and size the spindle motor and drive (acceleration torque, RMS torque, inertia ratio, currents, regenerated energy) and the solenoids (stroke, force, angle equivalent) against the criteria."
+  ],
+  [
+   "能解释零件库条目的参数角色（key、dim、perf、info），以及 BOM、接线表和固件配置为什么要由同一份数据生成；能说出 AI 选型助手的三条硬规矩。",
+   "Explain the parameter roles of library entries (key, dim, perf, info), why the BOM, wiring table and firmware configuration must be generated from one data set, and state the three hard rules of the AI selection assistant."
+  ],
+  [
+   "能读懂角度驱动的事件表、比较中断调度和状态机代码，并说明软件在环、硬件在环、整机测试台三级测试和联网上报的作用。",
+   "Read the angle-driven event table, compare-interrupt scheduling and state-machine code, and explain the roles of SIL, HIL and bench testing and of network reporting."
+  ],
+  [
+   "能按 P0、P1、EVT、DVT、PVT 说明原型走向工业级产品每一级的目标和退出条件。",
+   "Describe the goal and exit criteria of each stage from prototype to industrial product: P0, P1, EVT, DVT, PVT."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "学生小组：12 周做一台电控平缝机原型，选什么模块？",
+   "A student team builds a lockstitch control prototype in 12 weeks: which modules?"
+  ],
+  "text": [
+   "一个三四人的小组要把一台拆掉离合器电机的平缝机机头做成电控原型：脚踏调速，最高 5000 r/min，0 → 5000 r/min 加速 ≤ 0.15 s，负载折算惯量 5×10⁻⁴ kg·m²，库仑摩擦 0.15 N·m；每分钟起停 30 次、缝纫占一半时间、稳速负载 0.35 N·m；松开脚踏自动剪线（行程 3 mm、力 12 N，在 300 r/min 下动作，吸合/释放折算转角 ≤ 20°）、拨线、倒缝和抬压脚。示意零件库里的主轴电机有 250 W（转子 0.6×10⁻⁴ kg·m²，额定 0.80 N·m，峰值 2.0 N·m）、400 W（1.0×10⁻⁴，1.27 N·m，3.2 N·m，kt = 0.5 N·m/A）、550 W（1.4×10⁻⁴，1.50 N·m，4.5 N·m）三档；驱动器有 1.5 A（峰值 4.5 A，可吸收 30 J）和 3 A（峰值 9 A，可吸收 70 J）两档；剪线电磁铁候选 M15 吸合 6.9 ms、释放 5.1 ms。判据：加速转矩 ≤ 0.8 × 峰值，等效转矩 ≤ 额定，惯量比 ≤ 10，急停回馈按 0.7 × ½Jω² 计。",
+   "A team of three or four will turn a lockstitch head (clutch motor removed) into a control prototype: pedal speed control, 5000 r/min maximum, 0 → 5000 r/min in ≤ 0.15 s, reflected load inertia 5×10⁻⁴ kg·m², Coulomb friction 0.15 N·m; 30 starts and stops per minute, sewing half the time, 0.35 N·m steady load; on pedal release, automatic trimming (3 mm stroke, 12 N, acting at 300 r/min, pull-in/release angle ≤ 20°), wiping, backtack and presser-foot lift. The illustrative library offers spindle motors of 250 W (rotor 0.6×10⁻⁴ kg·m², rated 0.80 N·m, peak 2.0 N·m), 400 W (1.0×10⁻⁴, 1.27 N·m, 3.2 N·m, kt = 0.5 N·m/A) and 550 W (1.4×10⁻⁴, 1.50 N·m, 4.5 N·m); drives of 1.5 A (4.5 A peak, absorbs 30 J) and 3 A (9 A peak, absorbs 70 J); the trim-solenoid candidate M15 pulls in in 6.9 ms and releases in 5.1 ms. Criteria: acceleration torque ≤ 0.8 × peak, RMS torque ≤ rated, inertia ratio ≤ 10, regenerated energy taken as 0.7 × ½Jω²."
+  ],
+  "question": [
+   "该选哪一档电机和驱动器？为什么更便宜的 1.5 A 驱动器不行？M15 能不能做剪线电磁铁？",
+   "Which motor and drive should be chosen? Why won't the cheaper 1.5 A drive do? Can M15 serve as the trim solenoid?"
+  ],
+  "answer": [
+   "选 400 W 电机配 3 A 驱动器。400 W：总惯量 6×10⁻⁴ kg·m²，角加速度 3491 rad/s²，加速转矩 2.24 N·m ≤ 2.56 N·m；等效转矩 0.89 N·m ≤ 1.27 N·m；惯量比 5。250 W 加速转矩 2.10 > 1.60、等效转矩 0.84 > 0.80，不行；550 W 也满足但更贵。驱动器连续电流 1.79 A、加速电流 4.49 A，急停回馈 57.6 J；1.5 A 档连续电流不够，30 J 也吸收不了，第一次急停就会报过压。M15 在 300 r/min 下折算 12.4°（吸合）和 9.2°（释放），满足 ≤ 20°，最高可用到约 483 r/min。整套 BOM 示意总价 2455 元。",
+   "Choose the 400 W motor with the 3 A drive. 400 W: total inertia 6×10⁻⁴ kg·m², angular acceleration 3491 rad/s², acceleration torque 2.24 N·m ≤ 2.56 N·m; RMS torque 0.89 N·m ≤ 1.27 N·m; inertia ratio 5. The 250 W motor needs 2.10 > 1.60 and 0.84 > 0.80, so it fails; 550 W passes but costs more. Drive currents are 1.79 A continuous and 4.49 A during acceleration, and the regenerated energy is 57.6 J; the 1.5 A drive lacks continuous current and cannot absorb that against its 30 J—the first emergency stop would trip overvoltage. M15 at 300 r/min gives 12.4° (pull-in) and 9.2° (release), within 20°, usable up to about 483 r/min. The whole BOM totals an illustrative 2455 yuan."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人工作站的“快速配套”与位置凸轮",
+   "Rapid configuration and position cams in a robot cell"
+  ],
+  "text": [
+   "搭一台龙门点胶机器人，流程和 WQ-SC 一样：先写数字化的需求表（行程、速度、加速度、负载质量、重复定位精度），用 T = Jα + T_f 和惯量比、等效转矩判据给每根轴选伺服或闭环步进，从零件库挑满足判据的最便宜规格，再由同一份数据生成 BOM、I/O 表和控制器配置。点胶阀的开关也不按时间写，而是写成“X 轴走到 120–180 mm 之间开阀”的位置窗口，这就是运动控制器里的“位置凸轮开关”，和本章的角度事件表一一对应：主令从主轴转角换成轴的位置，执行器延迟同样按速度折算成提前量。程序上机前先在仿真里跑（软件在环），再接真控制器跑仿真对象（硬件在环），最后才上真机，每一步都对应需求编号。",
+   "Building a gantry glue-dispensing robot follows the WQ-SC flow: write a numerical requirements table (travel, speed, acceleration, payload, repeatability), size each axis's servo or closed-loop stepper with T = Jα + T_f plus the inertia-ratio and RMS-torque criteria, pick the cheapest qualifying size from the parts library, and generate the BOM, I/O table and controller configuration from the same data. The dispensing valve is not timed either; it is written as a position window, 'open the valve while X is between 120 and 180 mm'—the motion controller's 'position cam switch', which corresponds one-to-one to this chapter's angle event table: the master changes from spindle angle to axis position, and actuator delay is likewise converted into a lead using the speed. Before running on the machine the program runs in simulation (SIL), then on the real controller against a simulated plant (HIL), and only then on the real machine, every step tied to a requirement ID."
+  ]
+ },
+ "life": {
+  "title": [
+   "自己攒一台电脑",
+   "Building your own PC"
+  ],
+  "text": [
+   "自己攒电脑也是一次“快速配套”：先定需求（玩什么游戏、跑什么软件），再按接口和功率挑主板、CPU、显卡，最后把各部件功耗加起来乘个余量选电源——这和本章 24 V 电源按“逻辑 + 维持 + 一半强激磁”再乘 1.2 来选，是同一个思路。",
+   "Building your own PC is a rapid configuration too: set the requirements (which games, which software), choose motherboard, CPU and graphics card by interface and power, then add up the power of every part, multiply by a margin and pick the power supply—the same idea as sizing this chapter's 24 V supply as 'logic + hold + half the boost' times 1.2."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：从教材到一台能缝的样机",
+    "Opening: from a textbook to a prototype that sews"
+   ],
+   "points": [
+    [
+     "任务：一个学期约 12 周，三四人做一台电控平缝机原型，最高 5000 r/min",
+     "Task: a team of three or four, about 12 weeks, a lockstitch control prototype at 5000 r/min"
+    ],
+    [
+     "难处不在“应该怎样动”，而在选模块、写固件、证明它好了",
+     "The difficulty is not how it should move but choosing modules, writing firmware and proving it works"
+    ],
+    [
+     "搭—测—改的短循环；先改参数，再换模块，最后改机械",
+     "A short build–test–change loop: change parameters first, then modules, mechanics last"
+    ],
+    [
+     "每一轮留下数据：测试报告、固件版本、参数版本",
+     "Every round leaves data: test reports, firmware version, parameter version"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_iterate.png",
+   "narration": [
+    "第五篇我们讲完了电控原理。现在问一个很实在的问题：能不能照着这些原理，自己动手做一台能缝的电控样机？设想一个三四人的小组，一个学期大约 12 周，买一台拆掉离合器电机的平缝机机头，配上伺服、电磁铁和主控板，要求脚踏调速，松开脚踏自动剪线、拨线、停上针位、抬压脚，最高 5000 转。动作“应该”怎么做，第 13、14 章都讲了；难处在别处：选哪个电机、多大电源、I/O 够不够，固件从哪写起，做出来怎么知道它好了。工程团队靠的是“搭—测—改”的短循环：搭起来，自动测，按先参数、再模块、最后机械的顺序改。每一轮都留下测试报告和版本号，不然就退化成“试试看”。",
+    "Part V finished the principles of control. Now a practical question: can we build a control prototype that actually sews? Picture a team of three or four with about twelve weeks. They buy a lockstitch head with the clutch motor removed and add a servo, solenoids and a controller board. Requirements: pedal speed control; on release, automatic trimming, wiping, needle-up stop and presser-foot lift; 5000 r/min top speed. Chapters 13 and 14 told us how the actions should go; the difficulty lies elsewhere—which motor, how big a supply, are there enough I/O, where to start the firmware, and how do we know it's done. Engineering teams rely on a short build–test–change loop: build it, test automatically, and change parameters first, modules second, mechanics last. Every round leaves test reports and version numbers, or it degenerates into trial and error."
+   ]
+  },
+  {
+   "title": [
+    "实验室原型与工业产品差在哪里",
+    "How a lab prototype differs from an industrial product"
+   ],
+   "points": [
+    [
+     "差距主要不在功能，而在确定性：每一次都对，并能被测出来、被证明",
+     "The gap is not function but determinism: right every time, and measurably so"
+    ],
+    [
+     "验证范围：额定电压室温一台 → 电压 ±10%、5–45 °C、批量公差",
+     "Verification: rated voltage, room temperature, one unit → ±10% voltage, 5–45 °C, batch tolerances"
+    ],
+    [
+     "可靠性、EMC 与安全、测试、版本管理都要补齐",
+     "Reliability, EMC and safety, testing and version control must all be added"
+    ],
+    [
+     "12 周节奏能成立，前提是模块现成、参数清楚、接口统一",
+     "The 12-week pace works only if modules are ready-made, well specified and share interfaces"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "实验室原型和工业产品差在哪？大家第一反应可能是功能，其实功能往往差不多，差的是确定性。原型在额定电压、室温下一台能缝就行；产品要在电压正负 10%、5 到 45 度、一批零件的公差下每一次都对，还要两班制用十年。EMC 和安全，原型不出明显故障就行，产品要按 IEC 60204-31 试验认证。测试，原型手动加部分脚本，产品每条需求都有自动用例，出厂每台跑 EOL。版本，原型常常只有“最新版”，产品的固件、参数、BOM 都有版本、可追溯。这些差距就是第 18 章那些工作要补的。另外，12 周的节奏能成立，前提是模块不用自己设计：零件库里有现成的、参数清楚、接口统一的模块，固件框架也是现成的。这正是本章要准备的东西。",
+    "How does a lab prototype differ from a product? You might say function, but function is often similar; the difference is determinism. A prototype only has to sew on one unit at rated voltage and room temperature; a product must be right every time at ±10 percent voltage, 5 to 45 degrees and batch part tolerances, for ten years of two shifts. For EMC and safety, a prototype just shouldn't fail visibly; a product is tested and certified to IEC 60204-31. For testing, a prototype is manual plus some scripts; a product has an automated case for every requirement and an EOL test on every unit. For versions, a prototype often has only 'latest'; a product versions and traces its firmware, parameters and BOM. Chapter 18's work fills those gaps. And the twelve-week pace works only if the modules need no design: ready-made, well specified, with common interfaces, plus a ready firmware framework. That is what this chapter prepares."
+   ]
+  },
+  {
+   "title": [
+    "参考架构：五层加机械",
+    "Reference architecture: five layers plus mechanics"
+   ],
+   "points": [
+    [
+     "执行与传感层：PMSM 伺服（2500 线，四倍频 10000 计数/转）、闭环步进、推拉电磁铁、气缸、霍尔脚踏、光电、接近开关",
+     "Actuation and sensing: PMSM servo (2500 lines, 10 000 counts/rev ×4), closed-loop steppers, push-pull solenoids, cylinders, Hall pedal, photoelectric and proximity sensors"
+    ],
+    [
+     "驱动层：伺服驱动（CAN FD/RS-485）、步进驱动、电磁铁驱动板（强激磁 + 斩波维持 + 稳压管续流）",
+     "Drive layer: servo drive (CAN FD/RS-485), stepper drives, solenoid driver board (boost + chopped hold + Zener clamp)"
+    ],
+    [
+     "实时控制层：WQ-SC 主控板，170 MHz 级 Cortex-M4F + RTOS；横机可加 FPGA",
+     "Real-time layer: WQ-SC board with a 170 MHz-class Cortex-M4F and RTOS; an FPGA may be added for the knitter"
+    ],
+    [
+     "人机与联网层：网关（MQTT、网页参数）、触摸屏；最上面是数字工厂接口",
+     "HMI and network: gateway (MQTT, web parameters), touch panel; on top, the digital-factory interface"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_platform.png",
+   "narration": [
+    "四种机器看起来差别很大，电控骨架却相同：一根“主令”决定时间，若干执行器按主令的位置动作，传感器报状态，控制器在中间调度，再把数据送到车间系统。WQ-SC 把这个骨架固定成五层加机械。最下面执行与传感层：主轴是交流永磁同步伺服电机，2500 线编码器四倍频后每转一万个计数；送布、X–Y、度目、牵拉用闭环步进；剪线、拨线这些用推拉电磁铁。往上是驱动层，伺服驱动经 CAN FD 接主控，电磁铁驱动板负责强激磁、维持和续流。再往上是实时控制层，就是 WQ-SC 主控板，一颗 170 兆赫级的微控制器跑实时操作系统，横机可以加一块 FPGA 做逐针选针。然后是人机与联网层，最顶上接数字工厂。",
+    "The four machines look very different, but their control skeleton is the same: one master sets the time, actuators act at positions of the master, sensors report state, a controller schedules in between and passes data to the shop systems. WQ-SC fixes that skeleton as five layers plus mechanics. At the bottom, actuation and sensing: the spindle is an AC permanent-magnet synchronous servo whose 2500-line encoder gives ten thousand counts per revolution after ×4 decoding; feed, X–Y, stitch cams and take-down use closed-loop steppers; trimming and wiping use push-pull solenoids. Above that, the drive layer: the servo drive talks CAN FD to the controller, and the solenoid board handles boost, hold and freewheeling. Then the real-time layer, the WQ-SC board, a 170 megahertz-class microcontroller running an RTOS, with an optional FPGA for needle selection. Then HMI and networking, and on top the digital factory."
+   ]
+  },
+  {
+   "title": [
+    "一套平台，四种机器；主轴转角是时间基准",
+    "One platform, four machines; spindle angle is the time base"
+   ],
+   "points": [
+    [
+     "主控、网关、电磁铁驱动、电源、固件框架完全共用；差别在主令、位置轴和电磁铁动作",
+     "Controller, gateway, solenoid driver, power supply and firmware are shared; differences are the master, the axes and the solenoid actions"
+    ],
+    [
+     "包缝机少几个电磁铁、多一个气阀；花样机多 X、Y 两根步进轴；横机的主令换成机头位置",
+     "The overlocker has fewer solenoids and one valve; the pattern sewer adds X and Y steppers; the knitter's master is carriage position"
+    ],
+    [
+     "动作要对准机构位置而不是时刻：写成“主轴转到 205° 通电”，而不是“上止点后 8 ms”",
+     "Actions must align with mechanism position, not time: 'energise at 205°', not '8 ms after top dead centre'"
+    ],
+    [
+     "执行器延迟折算成转角 6·n·t 度，按动作时的转速检查",
+     "Actuator delay converts to 6·n·t degrees, checked at the speed when it acts"
+    ]
+   ],
+   "formula": "\\theta_{delay} = 6\\,n\\,t\\ \\ (^\\circ;\\ n\\ \\text{in r/min},\\ t\\ \\text{in s})",
+   "figure": "",
+   "narration": [
+    "看四种原型用哪些模块：主控、网关、电磁铁驱动、电源和固件框架完全共用，差别集中在三处：主令是什么、有几根位置轴、电磁铁做哪些动作。做完平缝机，包缝机只是换一张需求表、少几个电磁铁、多一个气阀；花样机多两根步进轴；横机把主令从主轴换成机头。为什么要用主轴转角做时间基准？因为主轴转速并不恒定，起缝慢、中间快、剪线前又慢。剪线、倒缝、X–Y 移动都要对准机构的位置，比如针在不在布里、送布牙在不在针板下面，而不是对准某个时刻。写成“上止点后 8 毫秒通电”，主轴一变速就错位；写成“转到 205 度通电”，什么转速都对得准。时间只在一个地方进来：执行器的延迟，折算成转角是 6 乘 n 乘 t 度，要按动作时的转速检查。",
+    "Look at which modules the four prototypes use: controller, gateway, solenoid driver, power supply and firmware framework are fully shared; differences lie in three places: what the master is, how many position axes, and which solenoid actions. After the lockstitch, the overlocker is just a new requirements table with fewer solenoids and one valve; the pattern sewer adds two stepper axes; the knitter swaps the spindle for the carriage as master. Why use spindle angle as the time base? Spindle speed is not constant—slow at the start, fast in the middle, slow again before trimming. Trimming, backtack and X–Y moves must align with mechanism position—is the needle in the fabric, is the feed dog below the plate—not with a moment in time. 'Energise 8 milliseconds after top dead centre' slips as soon as speed changes; 'energise at 205 degrees' aligns at any speed. Time enters in only one place: actuator delay, which converts to 6 times n times t degrees and must be checked at the speed of action."
+   ]
+  },
+  {
+   "title": [
+    "零件库里的电控模块",
+    "Control modules in the parts library"
+   ],
+   "points": [
+    [
+     "问渠零件与机器人库：A 标准件、B 机器人整机、C 机构、D 厂商器件",
+     "WenQuest Parts and Robot Library: A standard parts, B complete robots, C mechanisms, D vendor devices"
+    ],
+    [
+     "条目 = entry.yaml（身份、参数定义、出处、教学说明）+ specs.csv（一行一个规格）",
+     "An entry = entry.yaml (identity, parameter definitions, sources, teaching notes) + specs.csv (one row per size)"
+    ],
+    [
+     "参数角色：key 区分规格、dim 外形尺寸、perf 性能（选型判据比的就是它）、info 说明",
+     "Parameter roles: key distinguishes sizes, dim outline dimensions, perf performance (what criteria compare), info descriptive"
+    ],
+    [
+     "缝制电控模块用建议编号（如 D-MOT-PMSM/400），计划入库；补充 kt、制动能量、拐点转速、吸合释放时间等选型必需参数",
+     "Sewing-control modules use proposed IDs (e.g. D-MOT-PMSM/400), planned for the library, adding kt, brake energy, corner speed and pull-in/release times needed for sizing"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "快速配套要有一个参数清楚、能按参数检索的零件库。问渠零件与机器人库分四部分：A 标准件、B 机器人整机、C 机构、D 厂商器件。每个条目是一个目录，entry.yaml 写身份、参数定义和出处，specs.csv 是规格表，一行一个规格。关键是参数定义：每个参数有一个角色。key 区分规格，比如丝杠的直径和导程；dim 是外形和安装尺寸；perf 是性能参数，选型判据比的就是它；info 是说明。缝制电控模块目前还不在库里，本书给了建议编号，比如 D-MOT-PMSM/400 表示 400 瓦那一档，计划入库。注意表里补了几个样本上常没有、选型却离不开的参数：转矩常数、驱动器可吸收的制动能量、步进拐点转速、电磁铁的吸合释放时间。",
+    "Rapid configuration needs a library with clear, searchable parameters. The WenQuest Parts and Robot Library has four parts: A standard parts, B complete robots, C mechanisms, D vendor devices. Each entry is a directory: entry.yaml holds identity, parameter definitions and sources; specs.csv is the specification table, one row per size. The key is the parameter definition: each parameter has a role. key distinguishes sizes—a screw's diameter and lead; dim is outline and mounting dimensions; perf is performance, what selection criteria compare; info is descriptive. Sewing-control modules are not in the library yet; the book gives proposed IDs—D-MOT-PMSM/400 is the 400 watt size—planned for the library. Note the added parameters that catalogues often lack but sizing needs: torque constant, drive brake energy, stepper corner speed, solenoid pull-in and release times."
+   ]
+  },
+  {
+   "title": [
+    "需求表：每一行都能被计算或测试",
+    "Requirements table: every row computable or testable"
+   ],
+   "points": [
+    [
+     "写数字，不写“高速”“可靠”；每条有编号 REQ-…，将来对应测试用例",
+     "Write numbers, not 'fast' or 'reliable'; each row has an ID REQ-… that later maps to a test case"
+    ],
+    [
+     "主轴：5000 r/min；0 → 5000 r/min ≤ 0.15 s；负载惯量 5×10⁻⁴ kg·m²；停针误差 ≤ ±1°",
+     "Spindle: 5000 r/min; 0 → 5000 r/min ≤ 0.15 s; load inertia 5×10⁻⁴ kg·m²; needle-stop error ≤ ±1°"
+    ],
+    [
+     "电磁铁：剪线 3 mm/12 N，300 r/min 下 ≤ 20°；倒缝 8 mm/25 N，1800 r/min 下 ≤ 201.6°；拨线、抬压脚停车后动作",
+     "Solenoids: trim 3 mm/12 N, ≤ 20° at 300 r/min; backtack 8 mm/25 N, ≤ 201.6° at 1800 r/min; wiper and foot lift act at standstill"
+    ],
+    [
+     "I/O：DI 4、AI 2；联网按数字工厂格式上报状态、事件、版本",
+     "I/O: 4 DI, 2 AI; networking reports status, events and versions in digital-factory format"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "快速配套是一条固定流水线：写需求表，按第 13 到 17 章的公式算判据，到零件库里按 perf 参数筛，每类挑满足判据最便宜的规格，自动生成 BOM、接线表和固件配置，上测试台验证，结果再回到需求表。第一步需求表，规矩只有一条：每一行都要能被计算或测试，所以写数字，不写“高速”“可靠”。看平缝机原型的需求表：最高 5000 转，加速时间不超过 0.15 秒，负载折算惯量 5 乘 10 的负 4 次方，停针误差正负 1 度以内。四个电磁铁动作写清行程、力和什么时候动作：剪线在 300 转下动作，折算转角不超过 20 度；倒缝在 1800 转下切换，要装进 201.6 度的空闲角；拨线和抬压脚停车后动作，只看行程和力。每条需求都有编号，将来每个测试用例都对应一个编号。",
+    "Rapid configuration is a fixed pipeline: write the requirements table, compute criteria with the formulas of Chapters 13 to 17, filter the library on perf parameters, take the cheapest qualifying size in each class, generate the BOM, wiring table and firmware configuration, verify on the bench, and feed results back. Step one, the requirements table, has one rule: every row must be computable or testable, so write numbers, not 'fast' or 'reliable'. The lockstitch table: 5000 r/min top speed, acceleration within 0.15 seconds, reflected load inertia 5 times ten to the minus four, needle-stop error within plus or minus one degree. The four solenoid actions state stroke, force and when they act: trimming at 300 r/min within 20 degrees; backtack switching at 1800 r/min inside the 201.6 degree idle angle; wiper and presser-foot lift at standstill, needing only stroke and force. Every requirement has an ID, and every future test case maps to one."
+   ]
+  },
+  {
+   "title": [
+    "主轴电机选型",
+    "Sizing the spindle motor"
+   ],
+   "points": [
+    [
+     "加速转矩 T_acc = (J_load + J_rotor)·ω/t_acc + T_f；400 W：6×10⁻⁴ × 523.6/0.15 + 0.15 ≈ 2.24 N·m",
+     "Acceleration torque T_acc = (J_load + J_rotor)·ω/t_acc + T_f; 400 W: 6×10⁻⁴ × 523.6/0.15 + 0.15 ≈ 2.24 N·m"
+    ],
+    [
+     "判据：T_acc ≤ 0.8 T_peak；n_max ≤ 电机最高转速；惯量比 ≤ 10；等效转矩 ≤ 额定",
+     "Criteria: T_acc ≤ 0.8 T_peak; n_max ≤ motor maximum; inertia ratio ≤ 10; RMS torque ≤ rated"
+    ],
+    [
+     "间歇工况：加减速占 15%、稳速 35%（0.35 N·m）→ T_rms ≈ 0.89 N·m",
+     "Intermittent duty: 15% accelerating/decelerating, 35% steady at 0.35 N·m → T_rms ≈ 0.89 N·m"
+    ],
+    [
+     "250 W 峰值和等效转矩都不够；550 W 满足但贵；400 W 是最便宜的合格者",
+     "250 W fails on peak and RMS torque; 550 W passes but costs more; 400 W is the cheapest that qualifies"
+    ]
+   ],
+   "formula": "T_{acc}=\\left(J_{load}+J_{rotor}\\right)\\frac{2\\pi n_{max}/60}{t_{acc}}+T_f,\\qquad T_{rms}=\\sqrt{\\sum_k f_k T_k^2}",
+   "figure": "fig_19_sizing.png",
+   "narration": [
+    "来算主轴。从静止加速到最高转速，所需转矩等于总惯量乘角加速度，再加库仑摩擦 0.15 牛米。400 瓦那档，总惯量 6 乘 10 的负 4 次方，5000 转是 523.6 弧度每秒，除以 0.15 秒，角加速度大约 3491，算出加速转矩约 2.24 牛米。判据是不超过 0.8 倍峰值，留 20% 给电压偏低和随转角变化的惯性力矩，400 瓦的峰值 3.2，0.8 倍是 2.56，满足。另外三条：最高转速不超过电机最高转速；负载惯量和转子惯量之比不超过 10，太大速度环难调；还有间歇工况的等效转矩不超过额定转矩。按每分钟起停 30 次，加减速占 15% 的时间、稳速占 35%，等效转矩约 0.89，小于 1.27。250 瓦那档加速要 2.10，而 0.8 倍峰值只有 1.60，等效转矩也超了；550 瓦都满足，但更贵。所以 400 瓦是最便宜的合格者。",
+    "Now the spindle. Accelerating from rest to top speed takes total inertia times angular acceleration, plus 0.15 newton-metres of Coulomb friction. For the 400 watt size, total inertia is 6 times ten to the minus four; 5000 r/min is 523.6 radians per second; over 0.15 seconds that is about 3491 radians per second squared, giving about 2.24 newton-metres. The criterion is at most 0.8 of peak, leaving 20 percent for low voltage and the angle-varying inertia torque; 0.8 times 3.2 is 2.56, so it passes. Three more: top speed within the motor's maximum; load-to-rotor inertia ratio at most 10, since a large ratio makes the velocity loop hard to tune; and RMS torque under intermittent duty within the rated torque. With 30 starts a minute, 15 percent accelerating or decelerating and 35 percent steady, the RMS torque is about 0.89, below 1.27. The 250 watt size needs 2.10 against 1.60 and exceeds its RMS rating; 550 watt passes but costs more. So 400 watt is the cheapest that qualifies."
+   ]
+  },
+  {
+   "title": [
+    "驱动器、急停回馈与转矩限幅",
+    "Drive, regenerated energy and torque limit"
+   ],
+   "points": [
+    [
+     "电流 = 转矩/kt：连续 0.89/0.5 ≈ 1.79 A，加速 2.24/0.5 ≈ 4.49 A",
+     "Current = torque/kt: continuous 0.89/0.5 ≈ 1.79 A, acceleration 2.24/0.5 ≈ 4.49 A"
+    ],
+    [
+     "急停：½Jω² ≈ 82.2 J，70% 回馈到母线 ≈ 57.6 J，须 ≤ 驱动器可吸收能量",
+     "Emergency stop: ½Jω² ≈ 82.2 J, 70% returns to the DC link ≈ 57.6 J, which must not exceed what the drive can absorb"
+    ],
+    [
+     "1.5 A 驱动器：1.79 > 1.5 A，57.6 > 30 J → 第一次急停就报过压；选 3 A（9 A，70 J）",
+     "1.5 A drive: 1.79 > 1.5 A and 57.6 > 30 J → overvoltage on the first emergency stop; choose 3 A (9 A, 70 J)"
+    ],
+    [
+     "固件沿用 2.5 N·m 转矩限幅，最快加速 0.134 s，与第 13 章一致",
+     "Firmware keeps the 2.5 N·m torque limit; fastest acceleration 0.134 s, as in Chapter 13"
+    ]
+   ],
+   "formula": "E_{regen} = 0.7\\times\\frac{1}{2}J\\omega^2",
+   "figure": "",
+   "narration": [
+    "电机定了，配驱动器。电流等于转矩除以转矩常数：连续电流 0.89 除以 0.5，约 1.79 安；加速电流 2.24 除以 0.5，约 4.49 安。还有一条常被忽略的：急停。5000 转时的动能是二分之一 J ω 方，约 82 焦，按第 13 章取 70% 回馈到母线，约 57.6 焦，驱动器的母线电容加制动电阻必须吸收得下。更便宜的 1.5 安驱动器为什么不行？连续电流 1.79 超过了 1.5，57.6 焦也远超它能吸收的 30 焦。实际就会出现这种情况：样机在台上空转一切正常，装上手轮提到最高速，第一次急停就报过压。所以选 3 安那档，峰值 9 安，能吸收 70 焦。顺便说一下，400 瓦电机峰值 3.2，但固件里沿用第 13 章的 2.5 牛米限幅，加速只要 2.24，最快加速时间约 0.134 秒，停针参数都不用改。",
+    "With the motor chosen, size the drive. Current is torque over the torque constant: 0.89 over 0.5, about 1.79 amps continuous; 2.24 over 0.5, about 4.49 amps during acceleration. One criterion is often forgotten: the emergency stop. At 5000 r/min the kinetic energy, one half J omega squared, is about 82 joules; taking 70 percent back to the DC link as in Chapter 13 gives about 57.6 joules, which the drive's DC-link capacitors and braking resistor must absorb. Why not the cheaper 1.5 amp drive? 1.79 amps exceeds its 1.5, and 57.6 joules far exceeds its 30. You will see exactly this: the prototype idles fine on the bench, then with the handwheel fitted at top speed, the first emergency stop trips overvoltage. So choose the 3 amp drive, 9 amps peak, 70 joules. Note too that the motor's peak is 3.2, but the firmware keeps Chapter 13's 2.5 newton-metre limit; acceleration needs only 2.24, the fastest ramp is about 0.134 seconds, and the stop parameters stay unchanged."
+   ]
+  },
+  {
+   "title": [
+    "电磁铁、电源和 I/O",
+    "Solenoids, power supply and I/O"
+   ],
+   "points": [
+    [
+     "每个动作三条判据：行程、行程末端力、转动中动作的折算转角",
+     "Three criteria per action: stroke, force at end of stroke, and angle equivalent if acting while turning"
+    ],
+    [
+     "剪线选 M15（300 r/min：12.4°/9.2°，最高约 483 r/min）；拨线 S8；倒缝 L30（1800 r/min：118.8°）；抬压脚 XL60",
+     "Trim: M15 (300 r/min: 12.4°/9.2°, up to about 483 r/min); wiper S8; backtack L30 (1800 r/min: 118.8°); foot lift XL60"
+    ],
+    [
+     "驱动板 4 通道，峰值 ≥ 24 V/4 Ω = 6 A，维持 ≥ 1.5 A",
+     "Driver board: 4 channels, peak ≥ 24 V/4 Ω = 6 A, hold ≥ 1.5 A"
+    ],
+    [
+     "24 V 电源：逻辑 8 W + 维持约 30 W + 最大强激磁一半 72 W ≈ 110 W，× 1.2 → 选 150 W；I/O：ENC 1、DI 4、DO 4、AI 2、CAN FD 2",
+     "24 V supply: logic 8 W + hold about 30 W + half the largest boost 72 W ≈ 110 W, × 1.2 → choose 150 W; I/O: 1 ENC, 4 DI, 4 DO, 2 AI, 2 CAN FD"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "电磁铁每个动作看三条：行程够不够，行程末端的力够不够，在转动中动作的还要看折算转角。剪线在 300 转下动作，M15 吸合 6.9 毫秒、释放 5.1 毫秒，折算 12.4 度和 9.2 度，都在 20 度以内；S8 力只有 8 牛，不够 12 牛；L30 吸合 11 毫秒，折算 19.8 度，贴着上限。所以剪线选 M15，它最高能用到约 483 转。倒缝在 1800 转下切换，L30 折算 118.8 度，装得进 201.6 度的空闲角，M15 行程不够 8 毫米。拨线和抬压脚停车后动作，只看行程和力，分别选 S8 和 XL60。驱动板要 4 个通道，峰值电流不低于 XL60 的强激磁电流 24 伏除以 4 欧，6 安。24 伏电源按最坏情况预算：逻辑 8 瓦，四个同时维持约 30 瓦，强激磁按最大一个的一半 72 瓦，合计约 110 瓦，乘 1.2 余量是 132 瓦，选 150 瓦。I/O 也一一数清楚，主控 S 档够用。",
+    "Each solenoid action is checked three ways: enough stroke, enough force at the end of stroke, and, if it acts while turning, the angle equivalent. Trimming acts at 300 r/min: M15 pulls in in 6.9 and releases in 5.1 milliseconds—12.4 and 9.2 degrees, both within 20; S8 gives only 8 newtons, short of 12; L30's 11 milliseconds is 19.8 degrees, right at the limit. So trimming gets M15, usable up to about 483 r/min. Backtack switches at 1800 r/min: L30 is 118.8 degrees, inside the 201.6 degree idle angle, while M15 lacks the 8 millimetre stroke. Wiper and foot lift act at standstill, so only stroke and force matter: S8 and XL60. The driver board needs 4 channels and a peak at least XL60's boost current, 24 volts over 4 ohms, 6 amps. The 24 volt supply is budgeted worst case: 8 watts logic, about 30 for four solenoids holding, half the largest boost, 72; about 110 in total, times 1.2 is 132, so choose 150 watts. Count the I/O too; the S controller is enough."
+   ]
+  },
+  {
+   "title": [
+    "自动生成 BOM、接线表和固件配置",
+    "Generating the BOM, wiring table and firmware configuration"
+   ],
+   "points": [
+    [
+     "筛选规则：每类逐个规格查判据，取全部满足里最便宜的；有依赖的成对、成组挑，电源最后挑",
+     "Rule: check every size against the criteria and take the cheapest that passes; dependent items chosen in pairs or groups, power supply last"
+    ],
+    [
+     "平缝机 BOM 示意总价 2455 元（机头不计）",
+     "Lockstitch BOM illustrative total: 2455 yuan (head excluded)"
+    ],
+    [
+     "接线表同时是固件 HAL 引脚配置和测试台接线依据，必须由同一份数据生成",
+     "The wiring table is also the HAL pin configuration and the test-bench wiring, so all must come from one data set"
+    ],
+    [
+     "固件配置：HAL 驱动、主轴参数、事件表初值、上报主题，带参数版本号",
+     "Firmware configuration: HAL drivers, spindle parameters, initial event table, report topic, with a parameter version"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_matching.png",
+   "narration": [
+    "判据算完，筛选规则很简单：每一类模块在库里逐个规格查判据，挑全部满足里最便宜的；有依赖关系的一起挑，比如电机和驱动器成对挑，主控和扩展板成组挑，电源最后挑。平缝机原型的结果是 14 行 BOM，示意总价 2455 元，机头是现成的不计在内。接线表由 I/O 计数直接排出：编码器接 ENC1，四个数字输入、四个电磁铁输出、脚踏和温度两路模拟，伺服和网关挂在 CAN FD 上。注意一点：这张接线表同时是固件 HAL 的引脚配置和第 22 章测试台接线的依据，所以必须由同一份数据生成，而不是三处各写一份，否则迟早对不上。固件配置也是生成的：选哪个 HAL 驱动、主轴参数、事件表初值和上报主题，还有参数版本号 LS-P1-001，随设备上报。",
+    "With all criteria computed, the selection rule is simple: check every size of each module class against the criteria and take the cheapest that passes; dependent items go together—motor and drive as a pair, controller and expansion board as a group—and the power supply last. The lockstitch result is a 14-line BOM totalling an illustrative 2455 yuan, not counting the ready-made head. The wiring table follows directly from the I/O count: encoder on ENC1, four digital inputs, four solenoid outputs, pedal and temperature on two analogue inputs, servo drive and gateway on CAN FD. One point: this table is also the firmware HAL's pin configuration and the basis for wiring the Chapter 22 test bench, so it must be generated from one data set rather than written in three places, or sooner or later they disagree. The firmware configuration is generated too: HAL drivers, spindle parameters, initial event table, report topic, and the parameter version LS-P1-001, which the machine reports."
+   ]
+  },
+  {
+   "title": [
+    "换机种：包缝机提速与花样机的传动",
+    "Other machines: a faster overlocker and pattern-sewer drives"
+   ],
+   "points": [
+    [
+     "包缝机 6000 r/min：同样选 400 W + 3 A，示意总价 2415 元",
+     "Overlocker at 6000 r/min: also 400 W + 3 A, illustrative total 2415 yuan"
+    ],
+    [
+     "提到 7000 r/min：400 W 最高只有 6000 r/min；回馈 75.2 J > 70 J → 换 550 W + 5 A，2735 元",
+     "At 7000 r/min: the 400 W motor tops out at 6000 r/min and regen is 75.2 J > 70 J → 550 W + 5 A, 2735 yuan"
+    ],
+    [
+     "花样机 X–Y：两轴都选同步带（X：GT2-20-9 + NEMA 23；Y：3M-24-15 + NEMA 34，约 2.01 N·m，417 r/min）",
+     "Pattern sewer X–Y: both axes use belts (X: GT2-20-9 + NEMA 23; Y: 3M-24-15 + NEMA 34, about 2.01 N·m at 417 r/min)"
+    ],
+    [
+     "Y 换 16x10 丝杠：要 3000 r/min、角加速度约 15708 rad/s²，是同步带的 7 倍多，所需转矩超过 4 N·m",
+     "Y on a 16x10 ball screw: needs 3000 r/min and about 15 708 rad/s², over 7 times the belt case, so torque exceeds 4 N·m"
+    ]
+   ],
+   "formula": "\\alpha_{screw} = \\frac{2\\pi a}{P_h}",
+   "figure": "",
+   "narration": [
+    "换一个机种看看。包缝机原型最高 6000 转、负载惯量 3 乘 10 的负 4 次方，同样选到 400 瓦电机和 3 安驱动器，示意总价 2415 元。把它提到 7000 转，有两条判据变成叉：400 瓦电机最高只有 6000 转；急停回馈 0.7 乘二分之一乘 4 乘 10 的负 4 次方乘 733 的平方，约 75.2 焦，超过 3 安驱动器的 70 焦。换成 550 瓦电机以后，回馈约 82.8 焦，驱动器还得换 5 安那档，总价升到 2735 元。花样机更有意思：X、Y 两根轴都选了同步带。如果把 Y 轴换成 16x10 的滚珠丝杠，0.5 米每秒要求电机转 3000 转，角加速度约 15708，是同步带方案的 7 倍多，所需转矩超过 4 牛米，而步进电机在 3000 转只剩零点几牛米。花样机一针只有几毫米，要的是短距离、高加速度，同步带正合适；丝杠的长处是刚度和精度。",
+    "Try another machine. The overlocker prototype, 6000 r/min with 3 times ten to the minus four load inertia, also gets the 400 watt motor and 3 amp drive, an illustrative 2415 yuan. Raise it to 7000 r/min and two criteria fail: the 400 watt motor tops out at 6000, and the regenerated energy, 0.7 times one half times 4 times ten to the minus four times 733 squared, is about 75.2 joules, above the drive's 70. With the 550 watt motor the regen is about 82.8 joules and the drive must go to 5 amps, raising the total to 2735 yuan. The pattern sewer is more interesting: both X and Y choose timing belts. Put Y on a 16 by 10 ball screw and 0.5 metres per second needs 3000 r/min with about 15 708 radians per second squared, over seven times the belt case; the torque exceeds 4 newton-metres, while a stepper at 3000 r/min has only a few tenths left. A pattern sewer moves a few millimetres per stitch with high acceleration—belts suit it; screws excel at stiffness and accuracy."
+   ]
+  },
+  {
+   "title": [
+    "AI 选型助手：规矩比聪明更重要",
+    "AI selection assistant: rules matter more than cleverness"
+   ],
+   "points": [
+    [
+     "一句话提需求，按关键词找条目、按数字筛规格",
+     "State a need in one sentence; it finds entries by keyword and filters sizes by the numbers"
+    ],
+    [
+     "三条硬规矩：只从零件库挑；写成“编号/规格”并列出依据的规格行和出处；没有就说没有",
+     "Three hard rules: pick only from the library; write 'ID/size' with the supporting spec row and source; if nothing fits, say so"
+    ],
+    [
+     "答案里的编号逐个核对，不在库里的去掉并单独列出",
+     "Every ID in the answer is checked; IDs not in the library are removed and listed separately"
+    ],
+    [
+     "判据计算和最终选择由确定的程序完成；“库里没有”本身就是一条入库需求",
+     "Criteria and the final choice come from deterministic code; 'not in the library' is itself a request to add an entry"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "数字工厂里有一个 AI 选型功能：用户一句话提需求，它按关键词找条目、按数字筛规格。它有三条硬规矩：只从零件库里挑；每个推荐写成“编号斜杠规格”，并列出依据的那一行参数和出处；库里没有合适的就说没有，不编造编号或参数。在快速配套里，AI 适合做两件事：把口头需求整理成需求表里的数字，比如“缝牛仔裤”要问清最高转速、布厚和针距；以及解释为什么这么选、还有什么替代。判据计算和最终选择要由确定的程序完成。它最有价值的一句话往往是“库里没有”：比如要一个惯量小于 3 乘 10 的负 5 次方的联轴器，库里最小的 LM1 是 2 乘 10 的负 4 次方，不满足，这句回答本身就是一条入库需求。",
+    "The digital factory has an AI selection function: a user states a need in one sentence, and it finds entries by keyword and filters sizes by the numbers. It has three hard rules: pick only from the parts library; write each recommendation as ID slash size, with the supporting row of parameters and its source; and if nothing fits, say so—never invent an ID or a parameter. In rapid configuration, AI is good for two things: turning a verbal need into numbers—'sewing jeans' means asking about top speed, fabric thickness and stitch length—and explaining why something was chosen and what alternatives exist. Criteria and the final choice must come from deterministic code. Its most valuable sentence is often 'the library has nothing': asked for a coupling below 3 times ten to the minus five, the smallest, LM1, is 2 times ten to the minus four and fails—and that answer is itself a request to add an entry."
+   ]
+  },
+  {
+   "title": [
+    "固件：计数变角度与事件表",
+    "Firmware: counts to angle and the event table"
+   ],
+   "points": [
+    [
+     "角度单位 0.1°（0–3599）：角度 = 计数 × 9/25，整数运算",
+     "Angle unit 0.1° (0–3599): angle = counts × 9/25, in integer arithmetic"
+    ],
+    [
+     "0.1° 在 300 r/min 约 56 μs、5000 r/min 约 3.3 μs → 用编码器定时器比较中断，不靠任务轮询",
+     "0.1° lasts about 56 μs at 300 r/min and 3.3 μs at 5000 r/min → use the encoder timer's compare interrupt, not task polling"
+    ],
+    [
+     "事件表一行一个动作：起始角、结束角、输出、条件；换机头改参数不改代码",
+     "Event table: one row per action—start, end, output, condition; a new head means new parameters, not new code"
+    ],
+    [
+     "剪线 205.0°–330.0°（凸轮式剪线，吸合 12.4°）；拨线下一转 15°–60°；倒缝 114.2° 置位/复位",
+     "Trim 205.0°–330.0° (cam trimmer, 12.4° pull-in); wiper 15°–60° in the next revolution; backtack set/reset at 114.2°"
+    ]
+   ],
+   "formula": "\\theta_{0.1^\\circ} = \\text{counts}\\times\\frac{3600}{10000} = \\text{counts}\\times\\frac{9}{25}",
+   "figure": "fig_19_evtable.png",
+   "narration": [
+    "现在看固件。工艺层围绕三样东西：计数变角度、按角度查事件表、用状态机管住周期，都是数据驱动的。编码器每转一万个计数，固件角度单位取 0.1 度，一转 0 到 3599，换算是计数乘 9 除以 25，整数运算。0.1 度在 300 转时约 56 微秒，在 5000 转时只有约 3.3 微秒，所以不能靠任务轮询去“看”角度到没到，而要用编码器定时器的比较功能：预先算好下一个事件角对应的计数写进比较寄存器，计数一到就进中断。事件表一行一个动作：起始角、结束角、输出和条件。剪线 205 到 330 度通电，因为原型机头是凸轮式剪线，电磁铁只负责把滚子推进凸轮槽，所以通电要早；拨线在下一转 15 到 60 度；倒缝在 114.2 度、送布牙沉到针板以下时置位或复位。这些都是初值，换机头只改参数，不改代码。",
+    "Now the firmware. WQ-SC's process layer is built around three things: counts to angle, event lookup by angle, and a state machine for the whole cycle—all data-driven. The encoder gives ten thousand counts per revolution; the firmware's angle unit is 0.1 degree, 0 to 3599 per revolution, converted as counts times 9 over 25 in integer arithmetic. At 300 r/min, 0.1 degree lasts about 56 microseconds; at 5000 r/min only about 3.3. So a task cannot poll for the angle; the encoder timer's compare function is used: the count for the next event angle is written to the compare register in advance, and reaching it raises an interrupt. The event table has one row per action: start angle, end angle, output and condition. Trimming is energised from 205 to 330 degrees—early, because this head has a cam trimmer and the solenoid only pushes the roller into the cam groove; the wiper runs 15 to 60 degrees in the next revolution; backtack is set or reset at 114.2 degrees, when the feed dog is below the plate. These are initial values; a new head changes parameters, not code."
+   ]
+  },
+  {
+   "title": [
+    "状态机、HAL 与版本",
+    "State machine, HAL and versions"
+   ],
+   "points": [
+    [
+     "IDLE → RUN → SLOW → TRIM → POSITION → IDLE；任何故障进 SAFE",
+     "IDLE → RUN → SLOW → TRIM → POSITION → IDLE; any fault goes to SAFE"
+    ],
+    [
+     "SAFE：断开全部电磁铁、主轴自由停、记故障码；故障清除且脚踏回中位才回 IDLE",
+     "SAFE: all solenoids off, spindle coasts, fault logged; back to IDLE only when cleared and the pedal is neutral"
+    ],
+    [
+     "工艺层只经 HAL 访问硬件；换模块只换驱动文件（如 spindle_canfd）",
+     "The process layer reaches hardware only through the HAL; a new module means a new driver file (e.g. spindle_canfd)"
+    ],
+    [
+     "固件版本、参数版本（带校验）、BOM 版本随设备上报，测试报告必须写明",
+     "Firmware, parameter (checksummed) and BOM versions are reported by the machine and must appear in every test report"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_states.png",
+   "narration": [
+    "工作周期由状态机管：IDLE 停在上针位，踩脚踏进 RUN 调速，松开进 SLOW 降到剪线转速，到 180 度以后进 TRIM，这一针事件表执行剪线、拨线，下一转 25 度切位置环进 POSITION，停稳到正负 0.5 度再回 IDLE。任何状态检测到故障，过流、编码器丢失、超时、急停、机头翻起，都进 SAFE：断开全部电磁铁，主轴自由停，记故障码；只有故障清除、脚踏回到中位才回 IDLE，防止一复位机器就转。工艺层只通过硬件抽象层访问硬件，每类模块一个接口，换模块只换驱动文件，这是快速配套能落地的前提。最后是版本：参数表有版本号和校验码，固件有版本号，BOM 也有版本，三个都随设备上报。第 22 章每份测试报告都要写明用哪个固件、哪组参数测的，否则结果没法比。",
+    "The cycle is run by a state machine: IDLE at needle-up; pedal down to RUN for speed control; release to SLOW at trimming speed; past 180 degrees into TRIM, where the event table trims and wipes in that stitch; at 25 degrees of the next revolution the position loop engages in POSITION, and once settled within half a degree it returns to IDLE. Any fault in any state—overcurrent, encoder loss, timeout, emergency stop, head tilted—goes to SAFE: all solenoids off, spindle coasts, fault code logged; only when the fault is cleared and the pedal is back to neutral does it return to IDLE, so a reset never starts the machine. The process layer reaches hardware only through the HAL, one interface per module class; changing a module changes only a driver file—that is what makes rapid configuration practical. Finally versions: the parameter table carries a version and checksum, the firmware a version, the BOM a revision, all reported by the machine. Every Chapter 22 test report must state which firmware and parameters were tested, or results can't be compared."
+   ]
+  },
+  {
+   "title": [
+    "先在电脑上“缝”：SIL、HIL 与测试台",
+    "Sewing on the computer first: SIL, HIL and the test bench"
+   ],
+   "points": [
+    [
+     "SIL：工艺层编译到电脑，HAL 换仿真驱动，接本书虚拟实验的模型；50 μs 步长，比实时快几十倍，每次提交自动跑",
+     "SIL: process layer compiled for the PC, simulated HAL, plant models from the book's labs; 50 μs steps, tens of times faster than real time, run on every commit"
+    ],
+    [
+     "HIL：真主控 + 真固件 + 实时仿真台；5000 r/min 每秒 83.3 万计数，50 μs 约 42 个计数要均匀插值，并输出 Z 相",
+     "HIL: real board and firmware with a real-time simulator; 833 000 counts/s at 5000 r/min, about 42 counts per 50 μs spread evenly, plus the Z pulse"
+    ],
+    [
+     "HIL 最大用处是故障注入：断编码器、过流、欠压、急停，每晚跑几千次",
+     "HIL's greatest value is fault injection: encoder loss, overcurrent, undervoltage, E-stop, thousands of runs a night"
+    ],
+    [
+     "测试台：停针 ≤ ±1°、剪线 1000 次成功率 ≥ 99.5%；脚本用 Python/pytest，每个用例对应一条需求",
+     "Bench: needle stop ≤ ±1°, trimming ≥ 99.5% over 1000 cycles; scripts in Python/pytest, each case tied to a requirement"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_hil.png",
+   "narration": [
+    "样机装好以前，固件的大部分逻辑已经能测了。测试分三级，跑同一套用例，只换被测对象和对象模型。第一级软件在环：把工艺层、状态机、事件表编译成电脑程序，硬件抽象层换成仿真驱动，接上机器模型。模型用本书虚拟实验里现成的。50 微秒一步，比实时快几十倍，每次提交代码自动跑一遍。第二级硬件在环：换上真主控板和真固件，对象模型跑在实时仿真台上。编码器仿真最考验功夫：5000 转时每秒 83.3 万个计数，模型 50 微秒一步要走约 42 个计数，如果一次吐出来，主控看到的转角就是锯齿状的，所以要均匀插值。硬件在环最大的用处是故障注入，断编码器、过流、急停，每晚跑几千次。第三级是整机测试台，验收停针误差和剪线成功率。",
+    "Most firmware logic can be tested before the prototype is assembled. Testing has three levels running the same cases, changing only the unit under test and the plant model. First, software-in-the-loop: compile the process layer, state machine and event table for the PC, swap the HAL for simulated drivers and attach a machine model. The models are taken from the book's virtual labs. With 50 microsecond steps it runs tens of times faster than real time, on every commit. Second, hardware-in-the-loop: the real board and firmware against a plant model on a real-time simulator. Encoder simulation is the hard part: at 5000 r/min there are 833 thousand counts a second, about 42 per 50 microsecond step; emit them all at once and the controller sees a sawtooth angle, so they must be spread evenly. HIL's greatest value is fault injection—encoder loss, overcurrent, emergency stop—thousands of runs a night. Third, the machine test bench, where needle-stop error and trimming success are accepted."
+   ]
+  },
+  {
+   "title": [
+    "联网与从原型到工业级",
+    "Networking, and from prototype to industrial grade"
+   ],
+   "points": [
+    [
+     "主题按“wq/工厂/区域/单元/类别”，如 wq/sewing/rnd/proto-ls01/status；统一 JSON 信封，data 里放业务内容",
+     "Topics follow wq/factory/area/unit/class, e.g. wq/sewing/rnd/proto-ls01/status; a common JSON envelope with business content in data"
+    ],
+    [
+     "网关打包发送，主控只经 CAN FD 交数据；掉线缓存补发，遗嘱消息显示离线",
+     "The gateway packs and sends; the controller only hands data over CAN FD; offline buffering and a will message for 'offline'"
+    ],
+    [
+     "P0 能动 → P1 功能全（用例通过率 ≥ 95%、停针 ≤ ±1°、剪线 ≥ 99.5%）→ EVT → DVT → PVT",
+     "P0 moves → P1 complete (≥ 95% cases pass, stop ≤ ±1°, trimming ≥ 99.5%) → EVT → DVT → PVT"
+    ],
+    [
+     "电源、接地、屏蔽从 P1 起按产品做法；需求和用例从 P0 起就编号",
+     "Power, earthing and shielding follow product practice from P1; requirements and cases are numbered from P0"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_19_gates.png",
+   "narration": [
+    "原型机从第一天就按数字工厂格式联网，理由很实际：几十轮迭代之后，要靠集中存起来的测试数据、版本和故障，才说得清哪一版改好了什么。主题格式是 wq 斜杠工厂斜杠区域斜杠单元斜杠类别，比如平缝机原型 1 号的状态发在 wq/sewing/rnd/proto-ls01/status。每条消息用统一的 JSON 信封，业务内容放在 data 里，状态里带上固件、参数和 BOM 版本。网关负责打包发送，主控板只经 CAN FD 把数据交给网关，不在实时固件里做网络。原型变成产品要过五级：P0 能动，P1 功能全，实验室原型做到 P1 为止，退出条件是用例通过率 95% 以上、停针正负 1 度、剪线成功率 99.5%；然后 EVT 工程验证、DVT 设计验证、PVT 小批验证。要注意，电源、接地、屏蔽从 P1 起就要按产品的做法接，需求和用例从 P0 起就要编号，否则后面无法证明。",
+    "The prototype joins the digital factory from day one, for a practical reason: after dozens of iterations, only centrally stored test data, versions and faults can tell which version improved what. Topics follow wq slash factory slash area slash unit slash class; lockstitch prototype number one publishes status on wq/sewing/rnd/proto-ls01/status. Every message uses a common JSON envelope with business content in data, and status carries the firmware, parameter and BOM versions. The gateway packs and sends; the controller only hands data over CAN FD and does no networking in real-time firmware. Becoming a product takes five stages: P0, it moves; P1, it is complete—lab prototypes stop here, with exit criteria of at least 95 percent cases passing, needle stop within one degree and 99.5 percent trimming success; then EVT engineering validation, DVT design validation and PVT production validation. Note: power, earthing and shielding follow product practice from P1, and requirements and test cases are numbered from P0, or nothing can be proved later."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "WQ-SC 用五层参考架构加机械，同一套主控、模块和固件框架做出四种原型；差别在主令和执行器组合。",
+   "WQ-SC uses a five-layer reference architecture plus mechanics, building four prototypes from one controller, module set and firmware framework; they differ in master and actuator mix."
+  ],
+  [
+   "动作以主轴转角（横机以机头位置）为时间基准，执行器延迟按 6·n·t 折算成转角检查。",
+   "Actions use spindle angle (carriage position for the knitter) as the time base; actuator delay is checked as an angle of 6·n·t."
+  ],
+  [
+   "快速配套：数字化需求表 → 判据计算（加速转矩、等效转矩、惯量比、电流、急停回馈、行程、力、折算转角）→ 按 perf 参数挑最便宜的合格规格 → 由同一份数据生成 BOM、接线表和固件配置。",
+   "Rapid configuration: numerical requirements → criteria (acceleration and RMS torque, inertia ratio, currents, regen energy, stroke, force, angle) → cheapest qualifying size by perf parameters → BOM, wiring table and firmware configuration from one data set."
+  ],
+  [
+   "AI 选型助手只从零件库挑、写明依据、没有就说没有；判据计算和最终选择由确定的程序完成。",
+   "The AI selection assistant picks only from the library, cites its basis and says when nothing fits; criteria and final choice come from deterministic code."
+  ],
+  [
+   "固件 = 角度事件表 + 状态机 + HAL：比较中断调度，故障进 SAFE，换机头改参数、换模块换驱动；固件、参数、BOM 都有版本并随设备上报。",
+   "Firmware = angle event table + state machine + HAL: compare-interrupt scheduling, faults to SAFE, new heads mean new parameters and new modules new drivers; firmware, parameters and BOM are versioned and reported."
+  ],
+  [
+   "测试按单元、SIL、HIL、测试台逐级做，每个用例对应需求；原型经 P0、P1、EVT、DVT、PVT 分级走向产品，退出条件写成指标。",
+   "Testing goes unit, SIL, HIL, bench, each case tied to a requirement; the prototype moves through P0, P1, EVT, DVT and PVT with measurable exit criteria."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "config",
+   "no": "19-1",
+   "title": [
+    "零件库快速配套器",
+    "Parts-library rapid configurator"
+   ],
+   "goal": [
+    [
+     "体验从需求表到 BOM、接线表和固件配置的快速配套流水线。",
+     "Experience the rapid-configuration pipeline from requirements to BOM, wiring table and firmware configuration."
+    ],
+    [
+     "能看懂每条判据为什么满足或不满足，并通过手动换件验证最低成本方案。",
+     "Understand why each criterion passes or fails, and verify the lowest-cost solution by swapping parts by hand."
+    ],
+    [
+     "比较不同机种和需求下必须更换的模块，理解同步带与丝杠的取舍。",
+     "Compare which modules must change for different machines and requirements, and understand the belt-versus-screw trade-off."
+    ]
+   ],
+   "theory": [
+    [
+     "主轴所需转矩 T = (J_load + J_rotor)·ω/t_acc + 0.15 N·m，判据 T ≤ 0.8 T_peak；间歇工况每分钟起停 30 次、缝纫占一半时间、稳速负载 0.35 N·m，等效转矩 ≤ 额定；惯量比 ≤ 10；急停回馈 0.7·½Jω² ≤ 驱动器可吸收能量。",
+     "Spindle torque T = (J_load + J_rotor)·ω/t_acc + 0.15 N·m, with T ≤ 0.8 T_peak; intermittent duty of 30 starts/min, sewing half the time, 0.35 N·m steady, RMS torque ≤ rated; inertia ratio ≤ 10; regen 0.7·½Jω² ≤ drive absorption."
+    ],
+    [
+     "电磁铁折算转角 6·n·t：剪线 ≤ 20°，倒缝 ≤ 201.6°；驱动板峰值 ≥ 24 V/R。",
+     "Solenoid angle 6·n·t: trimming ≤ 20°, backtack ≤ 201.6°; driver peak ≥ 24 V/R."
+    ],
+    [
+     "步进矩频按拐点以下恒转矩、以上 1/n 下降，开环取 0.6、闭环取 0.8 余量；同步带轴固有频率 ≥ 80 Hz；丝杠 d0·n ≤ 70000。",
+     "Stepper torque–speed: constant below the corner speed, falling as 1/n above, with 0.6 (open loop) or 0.8 (closed loop) margin; belt axis natural frequency ≥ 80 Hz; ball screw d0·n ≤ 70 000."
+    ],
+    [
+     "24 V 电源 = (逻辑 8 W + 触摸屏 + 全部维持功率 + 最大强激磁一半) × 1.2；价格、规格都是示意值。",
+     "24 V supply = (8 W logic + touch panel + all hold power + half the largest boost) × 1.2; prices and specs are illustrative."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，选“平缝机”，先不点自动配套，查看初始“上一代样机”BOM 和右侧判据，记下哪些判据是 ✗、为什么。",
+     "Open the lab, choose 'Lockstitch' and, before configuring, inspect the initial 'previous prototype' BOM and the criteria on the right; note which criteria fail and why."
+    ],
+    [
+     "点“自动配套”，对照 19.4 节核对主轴电机、驱动器、四个电磁铁、电源的选择和示意总价 2455 元；查看 I/O 映射表和生成的固件配置 JSON。",
+     "Click 'Configure automatically'; check the motor, drive, four solenoids, power supply and the 2455-yuan total against Section 19.4; inspect the I/O map and the generated firmware JSON."
+    ],
+    [
+     "在 BOM 的下拉框里把伺服驱动器手动换成 1.5 A 档，记录变成 ✗ 的判据和数值，再换回；完成任务 1。",
+     "In the BOM drop-down, swap the servo drive to the 1.5 A size, record which criteria fail and by how much, then swap back; complete Task 1."
+    ],
+    [
+     "把剪线转速从 300 r/min 逐步提高到 500 r/min，观察剪线电磁铁的折算转角判据，记录开始不满足的转速。",
+     "Raise the trimming speed from 300 to 500 r/min step by step, watch the trim-solenoid angle criterion, and record where it fails."
+    ],
+    [
+     "切到“包缝机”，点“恢复默认需求”和“自动配套”，记录方案和总价；只把最高转速改为 7000 r/min、不换件，记录变成 ✗ 的判据；再自动配套，记录右上角列出的更换模块和新总价（任务 2）。",
+     "Switch to 'Overlock', click 'Reset requirements' and 'Configure automatically', and record the design and total; change only the top speed to 7000 r/min without swapping parts and record failed criteria; reconfigure and record the replaced modules listed top right and the new total (Task 2)."
+    ],
+    [
+     "切到“花样机”，自动配套后记下 X、Y 两轴的传动、电机、所需转矩和固有频率；把 Y 轴传动改成丝杠，记录失败的判据（任务 3 的前半）。",
+     "Switch to 'Pattern sewer', configure, and note each axis's drive, motor, required torque and natural frequency; change the Y drive to a ball screw and record the failing criteria (first half of Task 3)."
+    ],
+    [
+     "把传动改回“自动”或同步带，重新配套，使全部判据满足且成本最低，完成任务 3；确认三项任务都显示“✓ 完成”。",
+     "Set the drive back to 'Auto' or belt, reconfigure so every criterion passes at lowest cost, completing Task 3; confirm all three tasks show '✓ Done'."
+    ],
+    [
+     "（选做）切到“横机”，把机号从 E5 改为 E7、机头速度改为 0.8 m/s，观察选针器判据的变化。",
+     "(Optional) Switch to 'Flat knitter', change the gauge from E5 to E7 and the carriage speed to 0.8 m/s, and watch the selector criterion."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "配套结果记录",
+     "Configuration record"
+    ],
+    "headers": [
+     [
+      "机种 / 需求改动",
+      "Machine / requirement change"
+     ],
+     [
+      "主轴电机",
+      "Spindle motor"
+     ],
+     [
+      "伺服驱动",
+      "Servo drive"
+     ],
+     [
+      "失败的判据（数值 / 限值）",
+      "Failed criteria (value / limit)"
+     ],
+     [
+      "更换的模块",
+      "Modules replaced"
+     ],
+     [
+      "示意总价 元",
+      "Illustrative total yuan"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "1.5 A 驱动器在台上空转时一切正常，为什么装上手轮、第一次急停就会报过压？配套器里哪一条判据揭示了这一点？",
+     "Why does the 1.5 A drive run fine idle on the bench but trip overvoltage at the first emergency stop with the handwheel fitted? Which criterion in the configurator reveals this?"
+    ],
+    [
+     "包缝机提到 7000 r/min 后，为什么电机换成 550 W 了，驱动器还得再升一档？",
+     "When the overlocker goes to 7000 r/min, why must the drive move up a size even after the motor becomes 550 W?"
+    ],
+    [
+     "花样机 Y 轴用 16x10 丝杠时，导程怎样把电机转速和角加速度放大？什么样的轴更适合用丝杠？",
+     "With a 16x10 ball screw on the Y axis, how does the lead magnify motor speed and angular acceleration? What kind of axis suits a screw better?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "一台重机头平缝机原型的快速配套",
+   "Rapid configuration for a heavy-head lockstitch prototype"
+  ],
+  "tasks": [
+   [
+    "某厚料平缝机头负载折算惯量 6×10⁻⁴ kg·m²，要求最高 4500 r/min、0 → 4500 r/min ≤ 0.12 s；库仑摩擦 0.15 N·m；每分钟起停 30 次、缝纫占一半时间、稳速负载 0.35 N·m。示意库：电机 250 W（转子 0.6×10⁻⁴ kg·m²，最高 5000 r/min，额定 0.80 N·m，峰值 2.0 N·m，kt 0.45 N·m/A，520 元）、400 W（1.0×10⁻⁴，6000，1.27，3.2，0.50，680 元）、550 W（1.4×10⁻⁴，7500，1.50，4.5，0.50，860 元）、750 W（2.6×10⁻⁴，6000，2.39，7.2，0.55，1050 元）；驱动器 1.5 A（峰值 4.5 A，30 J，380 元）、3 A（9 A，70 J，480 元）、5 A（15 A，150 J，620 元）。按 19.4 节的七条判据算出每档电机的加速转矩、等效转矩、惯量比、连续与加速电流和急停回馈能量，选出最便宜的电机 + 驱动器组合。",
+    "A heavy-fabric lockstitch head has reflected load inertia 6×10⁻⁴ kg·m² and must reach 4500 r/min, 0 → 4500 r/min in ≤ 0.12 s; Coulomb friction 0.15 N·m; 30 starts/min, sewing half the time, 0.35 N·m steady load. Illustrative library: motors 250 W (rotor 0.6×10⁻⁴ kg·m², 5000 r/min max, rated 0.80 N·m, peak 2.0 N·m, kt 0.45 N·m/A, 520 yuan), 400 W (1.0×10⁻⁴, 6000, 1.27, 3.2, 0.50, 680 yuan), 550 W (1.4×10⁻⁴, 7500, 1.50, 4.5, 0.50, 860 yuan), 750 W (2.6×10⁻⁴, 6000, 2.39, 7.2, 0.55, 1050 yuan); drives 1.5 A (4.5 A peak, 30 J, 380 yuan), 3 A (9 A, 70 J, 480 yuan), 5 A (15 A, 150 J, 620 yuan). Using the seven criteria of Section 19.4, compute each motor's acceleration torque, RMS torque, inertia ratio, continuous and acceleration currents and regenerated energy, and choose the cheapest motor + drive pair."
+   ],
+   [
+    "厚料剪线要在 400 r/min 下动作，判据折算转角 ≤ 20°。候选 M15（吸合 6.9 ms、释放 5.1 ms）和 L30（吸合 11 ms、释放 7 ms），行程和力都够。算出两者的折算转角，选哪一个？在验证用虚拟实验 19-1 时，平缝机需求表要改哪几项？",
+    "Heavy-fabric trimming must act at 400 r/min with an angle limit of 20°. Candidates M15 (6.9 ms pull-in, 5.1 ms release) and L30 (11 ms, 7 ms) both have enough stroke and force. Compute both angles and choose. Which fields of the lockstitch requirements table would you change to verify this in Virtual lab 19-1?"
+   ],
+   [
+    "这台机头改用直接驱动动刀的剪线机构，按第 14 章的算法剪线起始角应在 290°–300°。写出事件表中剪线这一行（起始角、结束角、输出、条件，角度单位 0.1°），并用一段话说明为什么不能写成“松开脚踏后延时 180 ms 给剪线电磁铁通电”。",
+    "The head now uses a directly driven trimming knife, so by Chapter 14 the trim start angle should be 290°–300°. Write the trim row of the event table (start, end, output, condition, in 0.1° units), and explain in one paragraph why it must not be written as 'energise the trim solenoid 180 ms after pedal release'."
+   ],
+   [
+    "（讨论）你的原型在 P1 阶段剪线成功率 99.7%（固件 0.3.0、参数 LS-P1-001）。组员改了拨线角度后成功率降到 98%，却说不清改了什么。按 19.5、19.7 节设计版本、测试和上报的做法，使这类问题能被定位。",
+    "(Discussion) Your P1 prototype trims at 99.7% (firmware 0.3.0, parameters LS-P1-001). A teammate changed the wiper angle and success dropped to 98%, but cannot say what changed. Following Sections 19.5 and 19.7, design versioning, testing and reporting so such problems can be located."
+   ]
+  ],
+  "deliverable": [
+   "提交 PDF 报告 3–5 页：第 1 题列出每档电机的计算表和判据结论；第 2 题给出计算和虚拟实验截图；第 3 题给出事件表行和说明；第 4 题给出版本与上报方案（可附消息示例 JSON）。",
+   "Submit a 3–5 page PDF: Task 1 a calculation table and criteria verdict for every motor size; Task 2 calculations and a lab screenshot; Task 3 the event-table row and explanation; Task 4 a versioning and reporting plan (an example JSON message may be attached)."
+  ],
+  "rubric": [
+   [
+    "第 1 题七条判据计算正确、选型结论正确：35 分",
+    "Task 1 seven criteria computed correctly with the right choice: 35 points"
+   ],
+   [
+    "第 2 题折算转角正确并会用实验验证：15 分",
+    "Task 2 angles correct and verified in the lab: 15 points"
+   ],
+   [
+    "第 3 题事件表行正确，角度基准与时间基准的论证清楚：20 分",
+    "Task 3 event-table row correct, angle-versus-time argument clear: 20 points"
+   ],
+   [
+    "第 4 题版本、测试、上报方案可追溯、可执行：20 分",
+    "Task 4 versioning, testing and reporting plan traceable and workable: 20 points"
+   ],
+   [
+    "报告规范、单位与有效数字正确：10 分",
+    "Report presentation, units and significant figures: 10 points"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "WQ-SC 固件为什么把剪线写成“主轴转到 205° 通电”，而不是“上止点后 8 ms 通电”？",
+    "Why does WQ-SC firmware write trimming as 'energise at 205° of spindle angle' rather than '8 ms after top dead centre'?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "主轴转速不恒定，动作要对准机构位置而不是某个时刻；按转角写，任何转速都对得准",
+      "Spindle speed is not constant and actions must align with mechanism position, not a moment; written by angle they align at any speed"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "角度比时间更容易在单片机里计算",
+      "Angles are easier to compute on a microcontroller than time"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "编码器分辨率比定时器高",
+      "The encoder has higher resolution than the timer"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "按角度写可以省掉电磁铁的吸合延迟",
+      "Writing by angle removes the solenoid's pull-in delay"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "时间只在执行器延迟一处进来，要按动作时的转速折算成 6·n·t 度去检查，延迟并不会消失。",
+    "Time enters only through actuator delay, which must be checked as 6·n·t degrees at the speed of action; the delay does not disappear."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某主轴总惯量 7×10⁻⁴ kg·m²，要求 0.15 s 内从 0 加速到 4500 r/min，库仑摩擦 0.15 N·m。所需加速转矩是多少？",
+    "A spindle has total inertia 7×10⁻⁴ kg·m² and must accelerate from 0 to 4500 r/min in 0.15 s, with 0.15 N·m Coulomb friction. What acceleration torque is needed?"
+   ],
+   "answer": 2.349,
+   "tolerance": 0.03,
+   "unit": "N·m",
+   "feedback": [
+    "ω = 4500 × 2π/60 = 471.2 rad/s，T = 7×10⁻⁴ × 471.2/0.15 + 0.15 ≈ 2.35 N·m；400 W 电机 0.8 × 3.2 = 2.56 N·m，满足。",
+    "ω = 4500 × 2π/60 = 471.2 rad/s, T = 7×10⁻⁴ × 471.2/0.15 + 0.15 ≈ 2.35 N·m; a 400 W motor's 0.8 × 3.2 = 2.56 N·m suffices."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "M15 电磁铁吸合 6.9 ms。若剪线转速提高到 500 r/min，吸合折算的主轴转角是多少度？",
+    "The M15 solenoid pulls in in 6.9 ms. If trimming speed rises to 500 r/min, what spindle angle does the pull-in correspond to?"
+   ],
+   "answer": 20.7,
+   "tolerance": 0.3,
+   "unit": "°",
+   "feedback": [
+    "6 × 500 × 0.0069 = 20.7°，超过 20° 的判据；M15 最高只能用到约 483 r/min。",
+    "6 × 500 × 0.0069 = 20.7°, beyond the 20° limit; M15 is usable only up to about 483 r/min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "包缝机原型最高 6000 r/min，负载惯量 3×10⁻⁴ kg·m²，用 400 W 电机（转子 1×10⁻⁴ kg·m²）。按 0.7 × ½Jω² 计，急停回馈到母线的能量是多少焦？",
+    "The overlock prototype runs at 6000 r/min with load inertia 3×10⁻⁴ kg·m² and a 400 W motor (rotor 1×10⁻⁴ kg·m²). Taking 0.7 × ½Jω², how much energy returns to the DC link at an emergency stop?"
+   ],
+   "answer": 55.3,
+   "tolerance": 1.0,
+   "unit": "J",
+   "feedback": [
+    "J = 4×10⁻⁴ kg·m²，ω = 628.3 rad/s，0.7 × ½ × 4×10⁻⁴ × 628.3² ≈ 55.3 J ≤ 70 J，3 A 驱动器够用。",
+    "J = 4×10⁻⁴ kg·m², ω = 628.3 rad/s, 0.7 × ½ × 4×10⁻⁴ × 628.3² ≈ 55.3 J ≤ 70 J, so the 3 A drive suffices."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "零件库条目里，选型判据直接比较的是哪一类参数？",
+    "In a library entry, which parameter role do selection criteria compare directly?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "perf（性能参数，如额定动载荷、转矩、转速）",
+      "perf (performance, such as dynamic load rating, torque, speed)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "key（区分规格的关键参数）",
+      "key (parameters that distinguish sizes)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "dim（外形与安装尺寸）",
+      "dim (outline and mounting dimensions)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "info（说明性信息，如样本型号）",
+      "info (descriptive, such as catalogue model)"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "key 区分规格，dim 用于三维模型和安装图，info 只是说明；判据比的是 perf。",
+    "key distinguishes sizes, dim serves 3D models and drawings, info is descriptive; criteria compare perf."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "5000 r/min 时主轴转过 0.1° 只需约 3.3 μs，所以事件调度可以放在 1 ms 一次的 RTOS 任务里轮询角度。",
+    "At 5000 r/min the spindle turns 0.1° in about 3.3 μs, so event scheduling can poll the angle in a 1 ms RTOS task."
+   ],
+   "correct": false,
+   "feedback": [
+    "1 ms 里主轴要转过 30°，轮询误差可达几十度；必须用编码器定时器的比较中断，计数一到就触发。",
+    "In 1 ms the spindle turns 30°, so polling errors reach tens of degrees; the encoder timer's compare interrupt must fire on the count."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "主轴编码器每转 10000 个计数，固件角度单位 0.1°（0–3599）。计数值 3750 对应的角度值（以 0.1° 为单位的整数）是多少？",
+    "The spindle encoder gives 10 000 counts per revolution and the firmware angle unit is 0.1° (0–3599). What angle value (an integer in 0.1° units) corresponds to count 3750?"
+   ],
+   "answer": 1350.0,
+   "tolerance": 0.5,
+   "unit": "× 0.1°",
+   "feedback": [
+    "角度 = 计数 × 9/25 = 3750 × 9/25 = 1350，即 135.0°。",
+    "angle = counts × 9/25 = 3750 × 9/25 = 1350, i.e. 135.0°."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于 AI 选型助手的规矩，哪些说法正确？",
+    "Which statements about the AI selection assistant's rules are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "只从零件库里挑，不编造编号或参数",
+      "It picks only from the parts library and invents no IDs or parameters"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "每个推荐写成“编号/规格”，并列出依据的规格行和出处",
+      "Each recommendation is written as 'ID/size' with the supporting spec row and source"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "答案里不在库里的编号要去掉并单独列出",
+      "IDs in the answer that are not in the library are removed and listed separately"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "判据计算和最终选择由大模型直接给出",
+      "The language model directly produces the criteria calculation and the final choice"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "库里没有时，按经验给出一个最接近的厂商型号",
+      "When the library has nothing, it offers the closest vendor model from experience"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "判据和最终选择由确定的程序完成；“库里没有”本身是一条入库需求，不能拿外部型号填空。",
+    "Criteria and final choice come from deterministic code; 'not in the library' is a request to add an entry, not a gap to fill with outside models."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "状态机里，从 SAFE 回到 IDLE 为什么要求“故障清除且脚踏回到中位”？",
+    "Why does the state machine require 'fault cleared and pedal neutral' to go from SAFE back to IDLE?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "防止故障一复位、脚踏还踩着，机器就意外转起来",
+      "To prevent the machine starting unexpectedly when a fault is reset while the pedal is still pressed"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "脚踏中位时编码器才能计数",
+      "The encoder can count only with the pedal neutral"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "为了让电磁铁有时间冷却",
+      "To give the solenoids time to cool"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "为了节省上报的网络流量",
+      "To save network traffic for reporting"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "这是第 18 章、ISO 10821 防意外启动要求在固件里的落实。",
+    "This implements the unexpected-start requirement of Chapter 18 and ISO 10821 in firmware."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于硬件在环（HIL）测试，哪些说法正确？",
+    "Which statements about hardware-in-the-loop (HIL) testing are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "被测的是真主控板和真固件，对象模型跑在实时仿真台上",
+      "The real board and firmware are tested against a plant model on a real-time simulator"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "编码器仿真要把每步的计数均匀插在两步之间，并在固定计数处输出 Z 相",
+      "The encoder simulator must spread each step's counts evenly and output Z at a fixed count"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "最大用处是故障注入，如断编码器、过流、欠压、急停",
+      "Its greatest value is fault injection such as encoder loss, overcurrent, undervoltage, E-stop"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "通过 HIL 后可以省掉整机测试台的停针和剪线验收",
+      "After HIL, bench acceptance of needle stop and trimming can be skipped"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "停针误差、剪线成功率这类机械与电控配合的指标只能在整机测试台上验收。",
+    "Indicators of mechanical–electrical interaction such as needle-stop error and trimming success can only be accepted on the bench."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "厚料平缝机头负载惯量 6×10⁻⁴ kg·m²，用 400 W 电机（转子 1×10⁻⁴ kg·m²，峰值 3.2 N·m），要求 0.12 s 内从 0 加速到 4500 r/min，库仑摩擦 0.15 N·m。所需加速转矩是多少 N·m？（再判断是否满足 0.8 × 峰值）",
+    "A heavy lockstitch head has load inertia 6×10⁻⁴ kg·m² and a 400 W motor (rotor 1×10⁻⁴ kg·m², peak 3.2 N·m), and must accelerate from 0 to 4500 r/min in 0.12 s with 0.15 N·m friction. What acceleration torque in N·m is needed? (Then judge against 0.8 × peak.)"
+   ],
+   "answer": 2.899,
+   "tolerance": 0.03,
+   "unit": "N·m",
+   "feedback": [
+    "7×10⁻⁴ × 471.2/0.12 + 0.15 ≈ 2.90 N·m > 2.56 N·m，400 W 不满足，要升到 550 W（0.8 × 4.5 = 3.6 N·m）。",
+    "7×10⁻⁴ × 471.2/0.12 + 0.15 ≈ 2.90 N·m > 2.56 N·m, so 400 W fails and 550 W (0.8 × 4.5 = 3.6 N·m) is needed."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "倒缝电磁铁 L30 吸合 11 ms。回针转速 1500 r/min 时，吸合折算的主轴转角是多少度？",
+    "The L30 backtack solenoid pulls in in 11 ms. At a backtack speed of 1500 r/min, what spindle angle does the pull-in correspond to?"
+   ],
+   "answer": 99.0,
+   "tolerance": 1.0,
+   "unit": "°",
+   "feedback": [
+    "6 × 1500 × 0.011 = 99.0°，小于 201.6° 的空闲角，满足。",
+    "6 × 1500 × 0.011 = 99.0°, within the 201.6° idle angle."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "实验室原型的 P1“功能全”阶段，退出条件是什么？",
+    "What are the exit criteria of the P1 'functionally complete' stage for a lab prototype?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "用例通过率 ≥ 95%、停针误差 ≤ ±1°、剪线 1000 次成功率 ≥ 99.5%",
+      "≥ 95% of test cases pass, needle-stop error ≤ ±1°, trimming ≥ 99.5% over 1000 cycles"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "停针误差 ≤ ±3°、HIL 冒烟测试通过",
+      "Needle-stop error ≤ ±3° and HIL smoke test passed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "EMC 和电气安全标准试验通过、寿命试验无关键故障",
+      "EMC and electrical safety tests passed, no critical failures in life tests"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "EOL 一次通过率 ≥ 98%、返修原因都已闭环",
+      "EOL first-pass yield ≥ 98% and all return causes closed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "第二项是 P0 的放宽条件，第三项是 DVT，第四项是 PVT。",
+    "The second is P0's relaxed criterion, the third DVT, the fourth PVT."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "接线表、固件 HAL 的引脚配置和测试台接线应该由同一份数据生成，而不是三处各写一份。",
+    "The wiring table, the firmware HAL pin configuration and the test-bench wiring should be generated from one data set, not written separately in three places."
+   ],
+   "correct": true,
+   "feedback": [
+    "三处各写一份迟早会对不上，导致固件、样机和测试台互相矛盾。",
+    "Three separate copies will eventually disagree, putting firmware, prototype and test bench at odds."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某原型 24 V 电源预算：逻辑 8 W，四个电磁铁同时维持共 30 W，最大一个电磁铁强激磁功率 144 W（按一半计入），余量系数 1.2。所需电源功率是多少瓦？",
+    "A prototype's 24 V budget: 8 W logic, 30 W for four solenoids holding together, and a largest boost of 144 W (half counted), with a 1.2 margin. What supply power in watts is needed?"
+   ],
+   "answer": 132.0,
+   "tolerance": 1.0,
+   "unit": "W",
+   "feedback": [
+    "(8 + 30 + 144/2) × 1.2 = 132 W，选 150 W 那档。",
+    "(8 + 30 + 144/2) × 1.2 = 132 W, so choose the 150 W size."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "五层参考架构与“主令”概念；需求表到判据到最便宜合格规格的快速配套；角度事件表、状态机与 HAL；SIL/HIL/测试台与版本上报。",
+   "The five-layer architecture and the 'master' concept; rapid configuration from requirements to criteria to cheapest qualifying size; angle event table, state machine and HAL; SIL/HIL/bench testing and version reporting."
+  ],
+  "difficult": [
+   "急停回馈能量与等效转矩这两条容易被忽略的判据；为什么必须用比较中断而不能轮询角度；为什么 BOM、接线表和固件配置要同源生成。",
+   "The often-forgotten criteria of regenerated energy and RMS torque; why compare interrupts are needed instead of polling; why BOM, wiring table and firmware configuration must come from one source."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Introduction"
+    ],
+    "minutes": 20,
+    "content": [
+     "提出学生小组 12 周做原型的任务；搭—测—改循环；原型与产品的差别。",
+     "Pose the 12-week student prototype task; build–test–change loop; prototype versus product."
+    ]
+   },
+   {
+    "phase": [
+     "参考架构与零件库",
+     "Reference architecture and parts library"
+    ],
+    "minutes": 35,
+    "content": [
+     "五层架构、四种原型共用与差别、主轴转角作时间基准；零件库条目格式与参数角色、建议编号。",
+     "Five layers, shared and differing modules, spindle angle as time base; entry format, parameter roles and proposed IDs."
+    ]
+   },
+   {
+    "phase": [
+     "快速配套计算",
+     "Rapid-configuration calculations"
+    ],
+    "minutes": 60,
+    "content": [
+     "需求表；主轴转矩、等效转矩、惯量比、驱动电流与急停回馈；电磁铁、电源、I/O；板书平缝机算例并回答导入问题。",
+     "Requirements table; spindle torque, RMS torque, inertia ratio, drive current and regen; solenoids, supply, I/O; work the lockstitch example on the board and answer the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验与 AI 选型",
+     "Virtual lab and AI selection"
+    ],
+    "minutes": 35,
+    "content": [
+     "虚拟实验 19-1 演示平缝机、包缝机 7000 r/min、花样机丝杠；AI 选型助手的规矩。",
+     "Demonstrate Virtual lab 19-1: lockstitch, overlock at 7000 r/min, pattern-sewer screw; the AI assistant's rules."
+    ]
+   },
+   {
+    "phase": [
+     "固件框架",
+     "Firmware framework"
+    ],
+    "minutes": 40,
+    "content": [
+     "计数变角度、比较中断、事件表代码；状态机与 SAFE；HAL；参数与版本。",
+     "Counts to angle, compare interrupt, event-table code; state machine and SAFE; HAL; parameters and versions."
+    ]
+   },
+   {
+    "phase": [
+     "测试、联网与分级路线",
+     "Testing, networking and stage gates"
+    ],
+    "minutes": 35,
+    "content": [
+     "SIL/HIL/测试台；主题与信封；P0–PVT 各级目标与退出条件；课堂测验，布置作业。",
+     "SIL/HIL/bench; topics and envelope; goals and exit criteria P0–PVT; quiz and assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“重机头平缝机原型的快速配套”；完成虚拟实验 19-1 的 3 项任务并截图；预习第 20 章。",
+   "Complete the heavy-head lockstitch configuration assignment; finish the 3 tasks of Virtual lab 19-1 with screenshots; read Chapter 20 in advance."
+  ]
+ }
+}

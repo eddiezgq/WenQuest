@@ -8,7 +8,7 @@
         <view v-for="b in books" :key="b.book" class="cover" :class="{ web: b.web }" @click="open(b.book)">
           <text class="c-title">{{ en && b.title_en ? b.title_en : b.title }}<text v-if="b.web" class="c-web">{{ t("book.web") }}</text></text>
           <text v-if="b.web" class="c-meta">{{ t("book.web_meta", { c: b.chapters, l: b.labs || 0 }) }}</text>
-          <text v-else class="c-meta">{{ t("book.meta", { c: b.chapters, s: b.sections, w: b.written }) }}</text>
+          <text v-else class="c-meta">{{ t("book.meta", { c: b.chapters, s: b.sections ?? 0, w: b.written ?? 0 }) }}</text>
         </view>
       </view>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-title"><h1>仿真与分析</h1>
-      <span class="muted">有限元强度校核与疲劳寿命：选零件 → 材料 → 加约束和载荷 → 服务器计算 → 看应力、变形、安全系数、寿命</span>
+      <span class="muted">有限元强度校核、疲劳寿命、温度场与热应力：选零件 → 材料 → 加约束和载荷（或热边界）→ 服务器计算 → 看应力、变形、安全系数、寿命、温度</span>
       <span class="labs small">实验 8：<a href="/api/cae/lab8/guide.docx">指导书</a> · <a href="/api/cae/lab8/report-template.docx">报告模板</a></span></div>
 
     <div class="row">
@@ -12,12 +12,17 @@
           <select v-model="partSel" class="grow-in" aria-label="零件">
             <option value="" disabled>选择零件…</option>
             <option v-for="p in parts" :key="p.item" :value="p.item">{{ p.item }}{{ p.name ? ' · ' + p.name : '' }}</option>
+            <option v-for="e in examples" :key="e.key" :value="'ex:' + e.key">示例 · {{ e.label }}</option>
           </select>
           <button class="btn" :disabled="!partSel || busy" @click="loadItem">读入</button>
         </div>
         <label class="small upload">或者上传 STEP（任何 CAD 导出）
           <input type="file" accept=".step,.stp,.STEP,.STP" :disabled="busy" @change="upload"></label>
         <div v-if="mbdNote" class="small sugg">来自运动与动力分析：{{ mbdNote }}</div>
+        <div v-if="exSel" class="exbox small">
+          <div class="muted">示例参数（改了点“读入”重新生成）</div>
+          <div class="grid2"><label v-for="(n, k) in exSel.names" :key="k">{{ n }} <input v-model.number="exParams[k]" type="number" step="any"></label></div>
+        </div>
         <div v-if="geo" class="small ok">{{ geo.name }} · {{ geo.solid.faces }} 个面 · 体积 {{ (geo.solid.volume_mm3 / 1000).toFixed(1) }} cm³</div>
 
         <template v-if="geo">
@@ -26,12 +31,51 @@
             <option v-for="m in materials" :key="m.id" :value="m.id">{{ m.name }}</option>
           </select>
           <div v-if="mat" class="small muted matline">
-            E {{ (mat.E_mpa / 1000).toFixed(0) }} GPa · ν {{ mat.nu }} · {{ mat.yield_mpa ? '屈服 ' + mat.yield_mpa : '抗拉 ' + mat.ultimate_mpa }} MPa · σ₋₁ {{ mat.sigma_1 }} MPa
+            <template v-if="analysis !== 'thermal'">E {{ (mat.E_mpa / 1000).toFixed(0) }} GPa · ν {{ mat.nu }} · {{ mat.yield_mpa ? '屈服 ' + mat.yield_mpa : '抗拉 ' + mat.ultimate_mpa }} MPa · σ₋₁ {{ mat.sigma_1 }} MPa</template>
+            <template v-if="analysis !== 'static'"><br>导热 {{ mat.k_w_mk }} W/(m·K) · 比热 {{ mat.c_j_kgk }} J/(kg·K) · 线膨胀 {{ mat.alpha_1e6 }}×10⁻⁶/K</template>
             <a href="#" @click.prevent="showSrc = !showSrc">出处</a>
             <div v-if="showSrc" class="src-box">{{ mat.note }}<br><span v-for="s in mat.sources" :key="s">· {{ s }}<br></span></div>
           </div>
 
-          <div class="step"><b>3</b> 约束与载荷 <span class="muted small">一句话让 AI 填，或者点“+”再在模型上点面</span></div>
+          <div class="step"><b>3</b> 算什么</div>
+          <div class="seg">
+            <button v-for="a in ANALYSES" :key="a.k" type="button" :class="{ on: analysis === a.k }" :title="a.hint" @click="analysis = a.k">{{ a.label }}</button>
+          </div>
+          <template v-if="analysis !== 'static'">
+            <div class="step sub">热边界 <span class="muted small">点“+”再在模型上点面；对流可以勾“其余所有面”</span></div>
+            <div class="adds">
+              <button v-for="(k, key) in TH_KINDS" :key="key" type="button" class="add" :style="{ '--c': k.color }" :title="k.hint" @click="addTh(key)">+ {{ k.label }}</button>
+            </div>
+            <button v-if="geo.example" type="button" class="btn ghost small-btn" @click="fillExample">填入示范题：{{ geo.example.title }}</button>
+            <div v-for="(r, i) in thRows" :key="r.key" class="lrow" :class="{ active: active === 100 + i }" :style="{ '--c': TH_KINDS[r.kind].color }" @click="active = TH_KINDS[r.kind].nofaces || r.rest ? -1 : 100 + i">
+              <div class="lhead"><i></i><b>{{ TH_KINDS[r.kind].label }}</b>
+                <span v-if="!TH_KINDS[r.kind].nofaces && !r.rest" class="small muted">{{ active === 100 + i ? '正在选面：在模型上点' : '点这里再选面' }}</span>
+                <button type="button" class="x" title="删除" @click.stop="thRows.splice(i, 1); active = -1">×</button></div>
+              <div v-if="!TH_KINDS[r.kind].nofaces && !r.rest" class="chips">
+                <span v-for="f in r.faces" :key="f" class="chip" :title="faceText(faceById[f])">面 {{ f }} <a href="#" @click.prevent.stop="toggleThFace(i, f)">×</a></span>
+                <span v-if="!r.faces.length" class="small muted">（还没选面）</span>
+              </div>
+              <div class="params small">
+                <template v-if="r.kind === 'temperature'"><label>温度 <input v-model.number="r.value" type="number"></label><span>℃</span></template>
+                <template v-if="r.kind === 'heat_flux' || r.kind === 'heat_body'"><label>功率 <input v-model.number="r.value" type="number"></label><span>W</span></template>
+                <template v-if="r.kind === 'convection'">
+                  <label class="wide">散热系数 <select v-model="r.film" @change="r.h = films.find((x) => x.id === r.film)?.h ?? r.h">
+                    <option v-for="f in films" :key="f.id" :value="f.id" :title="f.src">{{ f.name }}（{{ f.h }}）</option><option value="">自己填</option></select></label>
+                  <label>h <input v-model.number="r.h" type="number" step="any"></label><span>W/(m²·K)</span>
+                  <label>环境 <input v-model.number="r.tinf" type="number"></label><span>℃</span>
+                  <label class="chk"><input v-model="r.rest" type="checkbox"> 其余所有面</label>
+                </template>
+              </div>
+            </div>
+            <div v-if="analysis === 'thermal'" class="small line">
+              <label class="chk"><input v-model="transient" type="checkbox"> 瞬态（看温度随时间怎么变）</label>
+              <template v-if="transient"><label>时长 <input v-model.number="trDur" class="num" type="number"> s</label><label>初温 <input v-model.number="trT0" class="num" type="number"> ℃</label></template>
+            </div>
+            <label v-if="analysis === 'thermo_mech'" class="small">无应力参考温度 <input v-model.number="refT" class="num" type="number"> ℃（装配时的温度）</label>
+          </template>
+
+          <template v-if="analysis !== 'thermal'">
+          <div class="step sub">约束与载荷 <span class="muted small">{{ analysis === 'thermo_mech' ? '至少一个固定或支承面；机械载荷可以不加（只看热应力）' : '一句话让 AI 填，或者点“+”再在模型上点面' }}</span></div>
           <div class="ai-box">
             <textarea v-model="aiText" rows="2" maxlength="500" :placeholder="aiHint"></textarea>
             <div class="line">
@@ -73,11 +117,13 @@
             <div v-if="rowErr(r)" class="small err">{{ rowErr(r) }}</div>
           </div>
 
+          </template>
+
           <div class="step"><b>4</b> 网格</div>
           <div class="seg">
             <button v-for="m in MESH" :key="m.k" type="button" :class="{ on: meshK === m.k }" @click="meshK = m.k">{{ m.label }}</button>
           </div>
-          <div class="small muted">单元尺寸约 {{ meshSize.toFixed(1) }} mm，载荷面附近自动加密。网格越细越准、越慢；教学版上限约 20 万个单元、5 分钟。</div>
+          <div class="small muted">单元尺寸约 {{ meshSize.toFixed(1) }} mm{{ meshOverride ? '（示例建议值）' : '' }}，载荷面附近自动加密。网格越细越准、越慢；教学版上限约 20 万个单元、5 分钟。</div>
 
           <label class="small">这次计算的名称 <input v-model.trim="title" class="full" maxlength="80" placeholder="例如：SH-301 额定扭矩校核"></label>
           <button class="btn primary big-w" :disabled="!ready || submitting" @click="submit">{{ submitting ? '正在提交…' : '开始计算' }}</button>
@@ -92,11 +138,14 @@
           <h2>{{ result ? '计算结果' : '模型' }}{{ job ? ' · ' + (job.title || job.item || '') : '' }}</h2>
           <template v-if="result">
             <div class="seg">
+              <button v-if="isThermal" type="button" :class="{ on: field === 'temp' }" @click="field = 'temp'">温度</button>
+              <template v-if="jobAnalysis !== 'thermal'">
               <button type="button" :class="{ on: field === 'vm' }" @click="field = 'vm'">Von Mises 应力</button>
-              <button type="button" :class="{ on: field === 'u' }" @click="field = 'u'">位移</button>
-              <button type="button" :class="{ on: field === 'life' }" :disabled="!result.surface.lgD" title="先在下面算疲劳寿命" @click="field = 'life'">疲劳寿命</button>
+              <button type="button" :class="{ on: field === 'u' }" @click="field = 'u'">{{ isThermal ? '热变形' : '位移' }}</button>
+              <button v-if="!isThermal" type="button" :class="{ on: field === 'life' }" :disabled="!result.surface.lgD" title="先在下面算疲劳寿命" @click="field = 'life'">疲劳寿命</button>
+              </template>
             </div>
-            <label class="small deform">变形放大 <input v-model.number="deformK" type="range" min="0" max="1" step="0.01"> {{ deformX.toFixed(0) }}×</label>
+            <label v-if="jobAnalysis !== 'thermal'" class="small deform">变形放大 <input v-model.number="deformK" type="range" min="0" max="1" step="0.01"> {{ deformX.toFixed(0) }}×</label>
             <button type="button" class="btn more" :disabled="reporting" @click="downloadReport">{{ reporting ? '正在生成报告…' : '下载计算报告（Word）' }}</button>
             <button type="button" class="btn ghost" @click="backToSetup">回到设置</button>
           </template>
@@ -108,9 +157,35 @@
         </div>
         <div v-if="!geo && !result" class="empty big-empty">先在左边选一个零件（例如 SH-301 输出轴）或上传 STEP。</div>
         <CaeViewer v-else ref="viewer" :glb-url="result ? '' : geo?.model_url" :faces="geo?.faces || []" :face-colors="faceColors"
-          :picking="!result && active >= 0" :surface="result?.surface" :field="field" :deform="deformX" :marks="marks" :peaks="{ vm: st.vm_peak_all_mpa, u: st.u_max_mm }" :block-seconds="fat?.block_seconds || 1" @pick="onPick" />
+          :picking="!result && active >= 0" :surface="result?.surface" :field="field" :deform="deformX" :marks="marks" :peaks="{ vm: st.vm_peak_all_mpa, u: st.u_max_mm, temp: st.t_max_c }" :block-seconds="fat?.block_seconds || 1" @pick="onPick" />
 
-        <div v-if="result" class="stats">
+        <div v-if="result && isThermal" class="stats">
+          <div class="stat" :class="tTone"><span>最高温度</span><b>{{ st.t_max_c.toFixed(1) }} <small>℃</small></b>
+            <small class="muted">{{ st.t_max_at.map((x) => x.toFixed(0)).join(', ') }} mm · 红点</small></div>
+          <div class="stat"><span>最低 / 表面平均</span><b>{{ st.t_min_c.toFixed(1) }} / {{ st.t_surface_mean_c.toFixed(1) }} <small>℃</small></b></div>
+          <div class="stat"><span>热平衡（进 / 散走）</span><b>{{ st.heat_in_w.toFixed(0) }} / {{ st.heat_out_convection_w.toFixed(0) }} <small>W</small></b>
+            <small class="muted">{{ job?.setup?.transient ? '瞬态：散走的是最后时刻' : '稳态时两者相等' }}</small></div>
+          <div v-if="jobAnalysis === 'thermo_mech'" class="stat" :class="sfTone"><span>热应力 / 安全系数</span><b>{{ st.vm_max_mpa.toFixed(0) }} <small>MPa</small> / {{ st.safety_factor?.toFixed(2) ?? '—' }}</b>
+            <small class="muted">最大热变形 {{ st.u_max_mm.toPrecision(3) }} mm</small></div>
+          <div v-else class="stat"><span>网格</span><b>{{ (st.elements / 1000).toFixed(1) }}k <small>单元</small></b><small class="muted">{{ st.mesh_size_mm }} mm · {{ st.seconds }} 秒</small></div>
+        </div>
+        <div v-if="result && isThermal && (st.film_groups || []).length" class="small muted notes">
+          <p v-for="g in st.film_groups" :key="g.load">对流散热（第 {{ g.load + 1 }} 行）：面积 {{ g.area_m2.toFixed(4) }} m²，平均 {{ g.mean_c.toFixed(1) }} ℃，散走 {{ g.heat_w.toFixed(1) }} W</p>
+        </div>
+        <div v-if="result && job?.setup?.formula" class="formula small">
+          <b>和教材公式比</b> {{ job.setup.formula.name }}
+          <div v-if="job.setup.formula.t_oil_c != null">发热 P(1−η) = {{ job.setup.formula.loss_w }} W（输入 {{ job.setup.formula.P_in_kw }} kW，η = {{ job.setup.formula.eta }}），K_s = {{ job.setup.formula.K_s }}，A = {{ job.setup.formula.A_m2 }} m² →
+            公式油温 <b>{{ job.setup.formula.t_oil_c }} ℃</b>；有限元外表面平均 <b>{{ (st.film_groups?.[0]?.mean_c ?? st.t_surface_mean_c).toFixed(1) }} ℃</b>、最高 {{ st.t_max_c.toFixed(1) }} ℃（限值约 {{ job.setup.formula.limit_c }} ℃）。</div>
+          <div v-else>粗估 {{ job.setup.formula.t_est_c }} ℃；有限元最高 <b>{{ st.t_max_c.toFixed(1) }} ℃</b>（限值约 {{ job.setup.formula.limit_c }} ℃）。</div>
+          <div class="muted">{{ job.setup.formula.note }}</div>
+        </div>
+        <svg v-if="result && st.series" class="tchart" viewBox="0 0 600 160" aria-label="温度—时间曲线">
+          <polyline :points="seriesPts(1)" fill="none" stroke="#C0392B" stroke-width="1.5" />
+          <polyline :points="seriesPts(2)" fill="none" stroke="#2E86C1" stroke-width="1.5" />
+          <text x="6" y="14" font-size="11">最高（红）、平均（蓝）温度随时间：{{ st.series[0][2].toFixed(0) }} → {{ st.series[st.series.length - 1][2].toFixed(1) }} ℃，{{ st.series[st.series.length - 1][0] }} 秒</text>
+        </svg>
+
+        <div v-if="result && !isThermal" class="stats">
           <div class="stat"><span>最大应力（Von Mises）</span><b>{{ st.vm_max_mpa.toFixed(1) }} <small>MPa</small></b>
             <small class="muted">面 {{ (st.vm_max_faces || []).join('、') || '—' }} · 粉色点</small></div>
           <div class="stat" :class="sfTone"><span>安全系数</span><b>{{ st.safety_factor?.toFixed(2) ?? '—' }}</b>
@@ -119,7 +194,7 @@
           <div class="stat"><span>网格</span><b>{{ (st.elements / 1000).toFixed(1) }}k <small>单元</small></b>
             <small class="muted">{{ st.nodes }} 节点 · {{ st.mesh_size_mm }} mm · {{ st.seconds }} 秒</small></div>
         </div>
-        <div v-if="result" class="small muted notes">
+        <div v-if="result && !isThermal" class="small muted notes">
           <p v-if="st.vm_peak_all_mpa > st.vm_max_mpa * 1.01">约束面附近最高 {{ st.vm_peak_all_mpa.toFixed(1) }} MPa：那是约束方式造成的（实际的支承没有那么“死”），评估时避开了约束面 {{ (1.5 * st.mesh_size_mm).toFixed(1) }} mm 以内的点。</p>
           <p>尖角（没有圆角的内角）处的应力理论上没有上限，网格越细数值越大——看到最大值在尖角，就要考虑加圆角，或者按规范的应力集中系数去校核。</p>
         </div>
@@ -137,7 +212,7 @@
           </div>
         </div>
 
-        <div v-if="result" class="fat">
+        <div v-if="result && !isThermal" class="fat">
           <h3>疲劳寿命 <span class="small muted">载荷反复变化时，零件能用多久（雨流计数 + S-N 曲线 + Miner 累积损伤，pyLife）</span></h3>
           <div class="fat-grid">
             <div class="field">
@@ -198,12 +273,12 @@
       <div class="card-head"><h2>{{ teacher ? '本厂的计算记录' : '我的计算记录' }}</h2><span class="small muted">点一条看结果</span></div>
       <div v-if="!jobs.length" class="empty">还没有计算记录。</div>
       <table v-else class="t">
-        <thead><tr><th>名称</th><th>零件</th><th v-if="teacher">提交人</th><th>时间</th><th>状态</th><th class="num">最大应力 MPa</th><th class="num">安全系数</th><th></th></tr></thead>
+        <thead><tr><th>名称</th><th>零件</th><th v-if="teacher">提交人</th><th>时间</th><th>状态</th><th class="num">最大应力 MPa / 温度</th><th class="num">安全系数</th><th></th></tr></thead>
         <tbody><tr v-for="j in jobs" :key="j.id" :class="{ cur: job?.id === j.id }">
           <td>{{ j.title || '—' }}</td><td class="mono">{{ j.item || '上传的零件' }}</td><td v-if="teacher">{{ j.owner_name }}</td>
           <td class="small">{{ new Date(j.created * 1000).toLocaleString('zh-CN', { hour12: false }) }}</td>
           <td><span class="pill" :class="TONE[j.status]">{{ STATUS[j.status] }}</span></td>
-          <td class="num">{{ j.stats ? j.stats.vm_max_mpa.toFixed(1) : '' }}</td>
+          <td class="num">{{ j.stats?.t_max_c != null ? '最高 ' + j.stats.t_max_c.toFixed(1) + ' ℃' : j.stats ? j.stats.vm_max_mpa.toFixed(1) : '' }}</td>
           <td class="num">{{ j.stats?.safety_factor?.toFixed(2) ?? '' }}</td>
           <td><a v-if="j.status === 'done'" href="#" @click.prevent="openJob(j)">看结果 →</a>
             <span v-else-if="j.status === 'failed'" class="small err" :title="j.error">原因</span></td>
@@ -214,10 +289,10 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { get, post, session, ApiError } from '../lib/api';
-import { KINDS, toLoad, axesOf, faceText, fetchSurface } from '../lib/cae';
+import { KINDS, TH_KINDS, toLoad, toThermal, axesOf, faceText, fetchSurface } from '../lib/cae';
 import CaeViewer from '../components/CaeViewer.vue';
 
 const router = useRouter();
@@ -226,12 +301,23 @@ const mbdSource = ref(null);              // 从运动与动力分析送来的�
 const mbdNote = ref('');
 const STATUS = { queued: '排队', running: '计算中', done: '完成', failed: '失败' };
 const TONE = { queued: 'mute', running: 'info', done: 'good', failed: 'bad' };
+const ANALYSES = [{ k: 'static', label: '强度', hint: '线弹性静力：应力、变形、安全系数、疲劳' },
+  { k: 'thermal', label: '温度', hint: '温度场：发热、散热、稳态或瞬态' },
+  { k: 'thermo_mech', label: '温度 + 热应力', hint: '先算温度，再算热膨胀产生的应力和变形' }];
 const MESH = [{ k: 'coarse', label: '粗（快）', div: 20 }, { k: 'mid', label: '中', div: 32 }, { k: 'fine', label: '细（慢）', div: 48 }];
 
 const teacher = computed(() => !!session.user?.teacher);
 const parts = ref([]);
 const materials = ref([]);
 const partSel = ref('SH-301');
+const examples = ref([]), films = ref([]);
+const exParams = ref({});
+const exSel = computed(() => (partSel.value.startsWith('ex:') ? examples.value.find((e) => 'ex:' + e.key === partSel.value) : null));
+watch(exSel, (e) => { if (e) exParams.value = { ...e.params }; });
+const analysis = ref('static');
+const thRows = ref([]);
+const transient = ref(false), trDur = ref(600), trT0 = ref(20), refT = ref(20);
+const meshOverride = ref(null);
 const geo = ref(null);
 const matId = ref('45-QT');
 const showSrc = ref(false);
@@ -255,10 +341,23 @@ const mat = computed(() => materials.value.find((m) => m.id === matId.value));
 const faceById = computed(() => Object.fromEntries((geo.value?.faces || []).map((f) => [f.id, f])));
 const axes = computed(() => axesOf(geo.value?.faces || []));
 const diag = computed(() => { const b = geo.value?.solid.bbox_mm; return b ? Math.hypot(b[3] - b[0], b[4] - b[1], b[5] - b[2]) : 100; });
-const meshSize = computed(() => diag.value / MESH.find((m) => m.k === meshK.value).div);
+const meshSize = computed(() => meshOverride.value || diag.value / MESH.find((m) => m.k === meshK.value).div);
+watch(meshK, () => { meshOverride.value = null; });
+const jobAnalysis = computed(() => job.value?.setup?.analysis || 'static');
+const isThermal = computed(() => jobAnalysis.value !== 'static');
+const tTone = computed(() => { const t = st.value.t_max_c, lim = job.value?.setup?.formula?.limit_c; return lim == null || t == null ? '' : t > lim ? 'bad' : t > lim - 10 ? 'warn' : 'good'; });
+function seriesPts(k) {
+  const s = st.value.series || []; if (!s.length) return '';
+  const t1 = s[s.length - 1][0] || 1;
+  let lo = Infinity, hi = -Infinity;
+  for (const r of s) { lo = Math.min(lo, r[1], r[2]); hi = Math.max(hi, r[1], r[2]); }
+  if (hi <= lo) hi = lo + 1;
+  return s.map((r) => `${(10 + r[0] / t1 * 580).toFixed(1)},${(150 - (r[k] - lo) / (hi - lo) * 125).toFixed(1)}`).join(' ');
+}
 const faceColors = computed(() => {
   const out = {};
-  rows.value.forEach((r) => r.faces.forEach((f) => { out[f] = KINDS[r.kind].color; }));
+  if (analysis.value !== 'thermal') rows.value.forEach((r) => r.faces.forEach((f) => { out[f] = KINDS[r.kind].color; }));
+  if (analysis.value !== 'static') thRows.value.forEach((r) => (r.rest ? [] : r.faces).forEach((f) => { out[f] = TH_KINDS[r.kind].color; }));
   return out;
 });
 const st = computed(() => result.value?.stats || {});
@@ -268,8 +367,9 @@ const deformX = computed(() => {                    // 滑块 0–1 → 让最�
   const um = st.value.u_max_mm || 0;
   return um > 0 ? Math.round((deformK.value * 0.1 * diag.value) / um) : 0;
 });
-const marks = computed(() => (result.value ? [
-  { at: st.value.vm_max_at, color: 0xff2bd6 }, { at: st.value.u_max_at, color: 0x00d0ff }] : []));
+const marks = computed(() => (!result.value ? [] : st.value.t_max_at ? [{ at: st.value.t_max_at, color: 0xff2020 }]
+  .concat(st.value.vm_max_at ? [{ at: st.value.vm_max_at, color: 0xff2bd6 }] : []) : [
+  { at: st.value.vm_max_at, color: 0xff2bd6 }, { at: st.value.u_max_at, color: 0x00d0ff }]));
 
 function rowErr(r) {
   if (!r.faces.length) return '';
@@ -280,13 +380,21 @@ function rowErr(r) {
   return '';
 }
 const notReady = computed(() => {
+  if (analysis.value !== 'static') {
+    if (!thRows.value.some((r) => (r.kind === 'temperature' || r.kind === 'convection') && (r.rest || r.faces.length))) return '还缺散热条件：至少一个固定温度或对流散热的面，否则热量散不出去';
+    if (thRows.value.some((r) => !TH_KINDS[r.kind].nofaces && !r.rest && !r.faces.length)) return '有一行热边界还没选面';
+    if (analysis.value === 'thermal') return '';
+    if (!rows.value.some((r) => KINDS[r.kind].support && r.faces.length)) return '热应力还缺约束：至少一个固定或支承面';
+    if (rows.value.some((r) => !r.faces.length) || rows.value.some(rowErr)) return '约束与载荷有一行没设好';
+    return '';
+  }
   if (!rows.value.some((r) => KINDS[r.kind].support && r.faces.length)) return '还缺约束：至少一个固定或支承面，否则零件会整体移动';
   if (!rows.value.some((r) => !KINDS[r.kind].support && r.faces.length)) return '还缺载荷';
   if (rows.value.some((r) => !r.faces.length)) return '有一行还没选面（选面或删掉这一行）';
   if (rows.value.some(rowErr)) return '有一行设置不对，看红字';
   return '';
 });
-const ready = computed(() => geo.value && mat.value && rows.value.length && !notReady.value);
+const ready = computed(() => geo.value && mat.value && (analysis.value !== 'static' ? thRows.value.length : rows.value.length) && !notReady.value);
 
 function addRow(kind) {
   const r = { key: ++keyN, kind, faces: [], fx: 0, fy: 0, fz: 0, value: 0, axis: axes.value[0]?.key, thrust: false };
@@ -307,7 +415,30 @@ function toggleFace(i, f) {
     if (a) r.axis = a.key;
   }
 }
-function onPick(f) { if (active.value >= 0) toggleFace(active.value, f); }
+function onPick(f) {
+  if (active.value >= 100) toggleThFace(active.value - 100, f);
+  else if (active.value >= 0) toggleFace(active.value, f);
+}
+let thKey = 0;
+function addTh(kind) {
+  const r = { key: ++thKey, kind, faces: [], value: kind === 'temperature' ? 80 : 100, film: 'air-vent', h: 17.45, tinf: 20, rest: false };
+  thRows.value.push(r);
+  active.value = TH_KINDS[kind].nofaces ? -1 : 100 + thRows.value.length - 1;
+}
+function toggleThFace(i, f) {
+  const r = thRows.value[i];
+  const k = r.faces.indexOf(f);
+  if (k >= 0) { r.faces.splice(k, 1); return; }
+  thRows.value.forEach((o) => { const j = o.faces.indexOf(f); if (j >= 0) o.faces.splice(j, 1); });
+  r.faces.push(f);
+}
+function fillExample() {
+  const ex = geo.value.example;
+  thRows.value = ex.thermal.map((l) => ({ key: ++thKey, kind: l.type, faces: Array.isArray(l.faces) ? [...l.faces] : [], rest: l.faces === 'rest',
+    value: l.value_c ?? l.power_w ?? 0, h: l.h_w_m2k ?? 17.45, tinf: l.t_inf_c ?? 20,
+    film: films.value.find((f) => Math.abs(f.h - (l.h_w_m2k ?? -1)) < 1e-6)?.id || '' }));
+  matId.value = ex.material_id; title.value = ex.title; meshOverride.value = ex.mesh_mm; active.value = -1;
+}
 
 // 示范题：两处轴承（Ø35）、输出端（Ø30，离键槽远的一端）限制转动、键槽一侧受 350 N·m
 function example() {
@@ -329,6 +460,11 @@ function example() {
 }
 
 async function loadItem() {
+  if (exSel.value) {
+    await withBusy(() => post('/cae/geometry/example/' + exSel.value.key, { params: exParams.value }));
+    if (geo.value?.example) { analysis.value = 'thermal'; fillExample(); }
+    return;
+  }
   await withBusy(() => post('/cae/geometry/item/' + encodeURIComponent(partSel.value)));
 }
 async function upload(ev) {
@@ -347,14 +483,22 @@ async function withBusy(fn) {
   busy.value = true; err.value = '';
   try {
     geo.value = await fn();
-    rows.value = []; active.value = -1; result.value = null; job.value = null; title.value = '';
+    rows.value = []; thRows.value = []; active.value = -1; result.value = null; job.value = null; title.value = ''; meshOverride.value = null;
   } catch (e) { err.value = e.message; } finally { busy.value = false; }
 }
 
 async function submit() {
   submitting.value = true; err.value = '';
   try {
-    const setup = { material_id: matId.value, mesh: { size_mm: +meshSize.value.toFixed(2) }, loads: rows.value.map((r) => toLoad(r, axes.value)) };
+    const setup = { material_id: matId.value, mesh: { size_mm: +meshSize.value.toFixed(2) },
+      loads: analysis.value === 'thermal' ? [] : rows.value.map((r) => toLoad(r, axes.value)) };
+    if (analysis.value !== 'static') {
+      setup.analysis = analysis.value;
+      setup.thermal = thRows.value.map(toThermal);
+      if (analysis.value === 'thermal' && transient.value) setup.transient = { duration_s: +trDur.value, steps: 50, t0_c: +trT0.value };
+      if (analysis.value === 'thermo_mech') setup.ref_temp_c = +refT.value;
+      if (geo.value.example) { setup.formula = geo.value.example.formula; setup.example = { key: geo.value.example.key, params: geo.value.example.params }; }
+    }
     if (mbdSource.value && geo.value?.sha === mbdSource.value.sha) setup.source = { job: mbdSource.value.job, member: mbdSource.value.member };
     job.value = await post('/cae/jobs', { step_sha: geo.value.sha, setup, item: geo.value.item, title: title.value || geo.value.name });
     result.value = null;
@@ -378,7 +522,8 @@ function poll() {
 async function showResult(j) {
   const surface = await fetchSurface(j.id);
   result.value = { stats: j.stats, surface };
-  field.value = 'vm';
+  field.value = j.setup?.analysis && j.setup.analysis !== 'static' ? 'temp' : 'vm';
+  surface.thermoOnly = j.setup?.analysis === 'thermal';
   exp.value = j.ai_text ? { text: j.ai_text, actions: [], engine: 'saved' } : null;
   resetFatigue(j);
 }
@@ -419,6 +564,19 @@ async function explain() {
   catch (e) { expErr.value = e.message; } finally { expBusy.value = false; }
 }
 async function act(a) {
+  if (a.kind === 'example') {                                     // 第 14 轮：示例零件改参数重算（加散热筋、加片数）
+    const ex = job.value?.setup?.example;
+    if (!ex) return;
+    actBusy.value = true;
+    try {
+      partSel.value = 'ex:' + ex.key;
+      await nextTick();
+      exParams.value = { ...ex.params, ...a.params };
+      await loadItem();
+      if (geo.value?.example) { title.value = geo.value.example.title; await submit(); }
+    } finally { actBusy.value = false; }
+    return;
+  }
   if (a.kind === 'design') {
     router.push({ path: '/work/engineer', query: { suggest: JSON.stringify(a.params), note: a.note || '' } });
     return;
@@ -488,24 +646,26 @@ async function downloadReport() {
   const keep = field.value;
   try {
     const images = [];
-    const shots = [['vm', 'Von Mises 应力云图（MPa）'], ['u', '位移云图（mm）']];
+    const shots = jobAnalysis.value === 'thermal' ? [['temp', '温度云图（℃）']] : jobAnalysis.value === 'thermo_mech'
+      ? [['temp', '温度云图（℃）'], ['vm', '热应力 Von Mises 云图（MPa）'], ['u', '热变形云图（mm）']] : [['vm', 'Von Mises 应力云图（MPa）'], ['u', '位移云图（mm）']];
     if (result.value.surface.lgD) shots.push(['life', '疲劳寿命云图（红 = 寿命最短）']);
     for (const [f, cap] of shots) {
       field.value = f;
       await frame(); await frame();
-      images.push({ data: viewer.value.snapshot(), caption: `${cap}，色标蓝 → 红 = 低 → 高（最高 ${f === 'vm' ? st.value.vm_peak_all_mpa.toFixed(1) + ' MPa' : f === 'u' ? st.value.u_max_mm.toPrecision(3) + ' mm' : (fat.value?.infinite ? '无限寿命' : '最短 ' + fmtHours(fat.value.life_hours))}），变形放大 ${deformX.value} 倍；粉点为最大应力位置，青点为最大位移位置` });
+      images.push({ data: viewer.value.snapshot(), caption: `${cap}，色标蓝 → 红 = 低 → 高（最高 ${f === 'temp' ? st.value.t_max_c.toFixed(1) + ' ℃' : f === 'vm' ? st.value.vm_peak_all_mpa.toFixed(1) + ' MPa' : f === 'u' ? st.value.u_max_mm.toPrecision(3) + ' mm' : (fat.value?.infinite ? '无限寿命' : '最短 ' + fmtHours(fat.value.life_hours))}），变形放大 ${deformX.value} 倍；粉点为最大应力位置，青点为最大位移位置` });
     }
     const r = await fetch(`/api/cae/jobs/${encodeURIComponent(job.value.id)}/report`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-wq-token': session.token }, body: JSON.stringify({ images }) });
     if (!r.ok) throw new ApiError(r.status, (await r.json().catch(() => ({}))).detail || '报告生成失败');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(await r.blob());
-    a.download = `有限元报告-${job.value.item || job.value.id}.docx`;
+    a.download = `${isThermal.value ? '温度场' : '有限元'}报告-${job.value.item || job.value.id}.docx`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   } catch (e) { err.value = e.message; } finally { field.value = keep; reporting.value = false; }
 }
 function backToSetup() { result.value = null; job.value = null; }
+watch(analysis, (a) => { if (a !== 'static' && field.value === 'life') field.value = 'temp'; });
 async function loadJobs() { try { jobs.value = (await get('/cae/jobs')).jobs; } catch (e) { /* 计算服务没开时不挡页面 */ } }
 
 watch(axes, (a) => rows.value.forEach((r) => { if (!a.find((x) => x.key === r.axis)) r.axis = a[0]?.key; }));
@@ -513,8 +673,14 @@ watch(axes, (a) => rows.value.forEach((r) => { if (!a.find((x) => x.key === r.ax
 onMounted(async () => {
   try {
     const [p, m] = await Promise.all([get('/cae/parts'), get('/cae/materials')]);
-    parts.value = p.items; materials.value = m.materials;
+    parts.value = p.items; materials.value = m.materials; examples.value = p.examples || []; films.value = m.films || [];
   } catch (e) { err.value = e.status === 503 ? '计算服务暂时连不上，请稍后再试' : e.message; }
+  if (route.query.example && examples.value.find((e) => e.key === route.query.example)) {   // 第 14 轮：设计优化 → 按这组参数重算温度场
+    partSel.value = 'ex:' + route.query.example;
+    await nextTick();
+    try { exParams.value = { ...exParams.value, ...JSON.parse(route.query.params || '{}') }; } catch (e) { /* 参数坏了用默认 */ }
+    await loadItem();
+  }
   if (route.query.mbd && route.query.member) {                     // 第 12 轮：动力学 → 有限元
     busy.value = true;
     try {
@@ -547,6 +713,13 @@ onUnmounted(() => { clearTimeout(pollT); clearInterval(listT); });
 .add { border: 1px solid var(--c); color: var(--c); background: #fff; border-radius: 14px; padding: 3px 10px; cursor: pointer; font-size: 12px; }
 .add:hover { background: color-mix(in srgb, var(--c) 10%, #fff); }
 .small-btn { height: 30px; font-size: 12px; }
+.step.sub { margin-top: 2px; font-size: 13px; }
+.exbox { border: 1px dashed var(--line); border-radius: 8px; padding: 6px 8px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-top: 4px; }
+.grid2 input { width: 70px; height: 26px; border: 1px solid #C8CEC7; border-radius: 5px; }
+input.num { width: 70px; height: 26px; border: 1px solid #C8CEC7; border-radius: 5px; padding: 0 4px; }
+.formula { margin-top: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--surface-2); line-height: 1.7; }
+.tchart { width: 100%; height: 160px; margin-top: 10px; background: var(--surface-2); border-radius: 8px; }
 .lrow { border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 8px; padding: 8px 10px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
 .lrow.active { box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 35%, transparent); }
 .lhead { display: flex; align-items: center; gap: 8px; }

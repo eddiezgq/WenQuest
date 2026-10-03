@@ -26,6 +26,7 @@ const routes = [
   { path: '/cae', component: () => import('./pages/Cae.vue') },
   { path: '/mbd', component: () => import('./pages/Mbd.vue') },
   { path: '/cam', component: () => import('./pages/Cam.vue') },
+  { path: '/opt', component: () => import('./pages/Opt.vue') },
   { path: '/:p(.*)*', redirect: '/' },
 ];
 

@@ -1,0 +1,27 @@
+# 实验 3.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_8.js。
+原理:
+  - ["一个运算的计算强度 I = 运算量 W ÷ 数据搬运量 Q。它在一块 GPU 上可达到的算力不超过 min(P, βI)：I 小于平衡点 P/β 时受显存带宽限制，大于时受算力限制（屋顶线模型，3.8 节）。",
+     "An operation's intensity is I = W/Q. Its attainable performance is at most min(P, βI): below the ridge point P/β it is bandwidth-bound, above it compute-bound (the roofline model, Section 3.8)."]
+  - 式: "P(I) = min(P_peak, βI)，平衡点 I* = P_peak / β          (3.8.1)"
+  - ["矩阵乘法 (M×K)(K×N)：W = 2MNK，半精度 Q = 2(MK + KN + MN) 字节；逐元素运算每个元素只做几次运算，I 在 0.2～2.5 FLOP/B。", "Matrix product (M×K)(K×N): W = 2MNK, Q = 2(MK + KN + MN) bytes in half precision; element-wise ops do a few operations per element, I ≈ 0.2–2.5 FLOP/B."]
+  - ["逐词生成时每条序列每次只算一个新词元，线性层退化为矩阵乘向量；B 条序列一起算时，读一次权重供 B 个词元使用，计算强度约为 B。", "In decoding each sequence computes one new token, so a linear layer becomes a matrix–vector product; with B sequences one read of the weights serves B tokens and the intensity is about B."]
+步骤:
+  - ["“训练前向”，H100，默认设置（任务 1）：记录平衡点、线性层计算强度、受带宽限制的层数，填入表 1。", "Training forward, H100, defaults (task 1): record the ridge point, the linear-layer intensity and the number of bandwidth-bound layers in Table 1."]
+  - ["换成 A100、RTX 4090、B200（任务 2），填入表 1，比较平衡点。", "Switch to A100, RTX 4090 and B200 (task 2); fill in Table 1 and compare the ridge points."]
+  - ["“逐词生成”，H100，B = 1（任务 3）：记录线性层的计算强度与可达到的算力。", "Decoding, H100, B = 1 (task 3): record the linear-layer intensity and attainable performance."]
+  - ["逐步加大 B，找出线性层受算力限制的最小 B（任务 4）；换成 RTX 4090 再找一次（任务 5）。填入表 2。", "Raise B to find the smallest batch at which the linear layers are compute-bound (task 4); repeat on an RTX 4090 (task 5). Fill in Table 2."]
+数据表:
+  - 标题: ["表 1  训练前向（d = 384，T = 256，B = 32）", "Table 1  Training forward (d = 384, T = 256, B = 32)"]
+    表头: ["GPU", "平衡点（FLOP/B）", "线性层计算强度", "线性层瓶颈", "受带宽限制的层"]
+    表头英文: ["GPU", "Ridge (FLOP/B)", "Linear intensity", "Linear bottleneck", "Bandwidth-bound layers"]
+    行: [["H100", "", "", "", ""], ["A100", "", "", "", ""], ["RTX 4090", "", "", "", ""], ["B200", "", "", "", ""]]
+  - 标题: ["表 2  逐词生成（d = 4096，T = 1024）", "Table 2  Decoding (d = 4096, T = 1024)"]
+    表头: ["GPU", "B", "线性层计算强度", "可达到的算力", "占峰值"]
+    表头英文: ["GPU", "B", "Linear intensity", "Attainable", "Share of peak"]
+    行: [["H100", "1", "", "", ""], ["H100", "", "", "", ""], ["RTX 4090", "", "", "", ""]]
+注意:
+  - ["屋顶线给出的是上限：真实程序还受启动开销、缓存命中、算子融合等影响，实测会低于屋顶线（第 4、5 章在云端 GPU 上实测）。", "The roofline is an upper bound; real programs also depend on launch overhead, caching and fusion and fall below it (measured on cloud GPUs from Chapter 4)."]
+  - ["逐元素运算不在张量核心上执行，它们的算力上限更低；它们远在平衡点左边，受带宽限制，这一点不影响结论。", "Element-wise ops do not run on tensor cores and have a lower compute ceiling; they lie far left of the ridge and are bandwidth-bound regardless."]
+  - ["这里 h 取 d/64，d_ff 取 4d；规格见 3.4、3.8 节（全书规格表 conventions/gpus.py）。RTX 4090 的半精度张量核心峰值取 FP32 累加时的值。", "Here h = d/64 and d_ff = 4d; specifications as in Sections 3.4 and 3.8 (conventions/gpus.py). The RTX 4090 tensor peak is with FP32 accumulation."]
+思考题:
+  - ["为什么 RTX 4090 逐词生成需要的批大小比 H100 小？这是否说明 RTX 4090 更适合推理？", "Why does an RTX 4090 need a smaller batch than an H100 to be compute-bound in decoding? Does this make it better for inference?"]

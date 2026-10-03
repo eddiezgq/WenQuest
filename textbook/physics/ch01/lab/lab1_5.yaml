@@ -1,0 +1,31 @@
+# 实验 1.5 的指导书与报告模板。目的、场景、参数、任务取自 lab1_5.js。
+原理:
+  - ["游标卡尺：主尺每格 1 mm，游标 50 格总长 49 mm，每格 0.98 mm，比主尺短 0.02 mm。游标零线左边主尺上的整毫米数是读数的整数部分；游标上第 n 条线与主尺某条线对齐，就加 n × 0.02 mm。",
+     "Vernier caliper: the main scale is in 1 mm; the vernier has 50 lines over 49 mm, 0.98 mm apart, 0.02 mm shorter than a main division. The whole millimetres left of the vernier zero give the integer part; if vernier line n lines up with a main-scale line, add n × 0.02 mm."]
+  - ["螺旋测微器（千分尺）：螺距 0.5 mm，微分筒一圈 50 格，每格 0.01 mm。读数 = 套筒上露出的最后一条刻线（含半毫米线）+ 微分筒与基准线对齐的格数 × 0.01 mm，再估读一位到 0.001 mm。",
+     "Micrometer: pitch 0.5 mm, 50 thimble divisions of 0.01 mm. Reading = last visible sleeve mark (including half-millimetre marks) + thimble division on the reference line × 0.01 mm, estimating one more digit to 0.001 mm."]
+  - 式: "u_A = s/√n，u_B = a/√3，u_c = √(u_A² + u_B²)，U = 2u_c        (1.5.3)–(1.5.6)"
+步骤:
+  - ["选“卡尺测转接盘外径”。先读主尺：游标零线在哪两个整毫米之间？调“主尺读数”。再移动“放大镜位置”，在放大镜里找到与主尺对齐的游标线，调“对齐的游标格数”，点“记录我的读数”核对（任务 1）。", "Choose “Caliper”. Read the main scale first: between which whole millimetres is the vernier zero? Set “Main scale”. Then move the magnifier to find the vernier line that lines up and set it; press “Record my reading” (task 1)."]
+  - ["点“换个位置”，转接盘转过一个角度，读数略有变化。重复读完 10 个位置（读熟以后也可以点“自动记录全部位置”），把读数记入表 1。", "Press “Another place”: the plate turns a little and the reading changes slightly. Read all 10 places (or press “Record all places” once you can read reliably) and enter the readings in Table 1."]
+  - ["计算平均值、实验标准差、u_A、u_B（最大允许误差 0.03 mm）、u_c 和 U，把“你算出的 U”调到你的结果（任务 4），写出 D = (D̄ ± U) mm（k = 2）。", "Compute the mean, s, u_A, u_B (MPE 0.03 mm), u_c and U; set “Your U” to your result (task 4) and write D = (D̄ ± U) mm (k = 2)."]
+  - ["选“千分尺测转接盘厚度”，读 5 个位置（任务 2），记入表 2，同样写出 h 的测量结果（最大允许误差 0.004 mm）。", "Choose “Micrometer”, read 5 places (task 2), enter them in Table 2 and report h likewise (MPE 0.004 mm)."]
+  - ["选“卡尺测一元硬币”，读出直径（任务 3）。", "Choose “Coin” and read the diameter (task 3)."]
+数据表:
+  - 标题: ["表 1  转接盘外径（游标卡尺，分度值 0.02 mm）", "Table 1  Plate diameter (vernier caliper, 0.02 mm)"]
+    表头: ["位置", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    表头英文: ["Place", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    行: [["D / mm", "", "", "", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  转接盘厚度（螺旋测微器，分度值 0.01 mm）", "Table 2  Plate thickness (micrometer, 0.01 mm)"]
+    表头: ["位置", "1", "2", "3", "4", "5"]
+    表头英文: ["Place", "1", "2", "3", "4", "5"]
+    行: [["h / mm", "", "", "", "", ""]]
+  - 标题: ["表 3  测量结果", "Table 3  Results"]
+    表头: ["量", "平均值", "s", "u_A", "u_B", "u_c", "U (k = 2)", "结果"]
+    表头英文: ["Quantity", "Mean", "s", "u_A", "u_B", "u_c", "U (k = 2)", "Result"]
+    行: [["D / mm", "", "", "", "", "", "", ""], ["h / mm", "", "", "", "", "", "", ""]]
+注意:
+  - ["卡尺读数不估读，末位必是 0.02 mm 的整数倍；千分尺要估读一位，末位是 0.001 mm。", "Caliper readings are not estimated (the last digit is a multiple of 0.02 mm); micrometer readings carry one estimated digit (0.001 mm)."]
+  - ["“记录我的读数”只记录读对了的数；读错时看提示，移动放大镜再看。", "“Record my reading” records only correct readings; if it is wrong, move the magnifier and look again."]
+思考题:
+  - ["按图样，外径的公差带是 62.95～63.00 mm。用这把卡尺测得的结果，能可靠地判定转接盘合格吗？应该怎样做？", "The tolerance band is 62.95–63.00 mm. Can this caliper decide reliably whether the plate passes? What should you do?"]

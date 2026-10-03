@@ -11,6 +11,12 @@ parts_en:
   第七篇 推广与抽象: "Part VII  Generalizations and Abstractions"
   第八篇 应用: "Part VIII  Applications"
 chapters:
+  1:
+    status: ai
+    title_en: "What Is Linear Algebra?"
+  2:
+    status: ai
+    title_en: "Vectors"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"

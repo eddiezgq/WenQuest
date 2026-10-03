@@ -519,6 +519,82 @@ function graph(ctx, o) {   // o = {x, y, w, h (pixels), xmin, xmax, ymin, ymax, 
   return G;
 }
 
+// ---------- GPU execution model (《人工智能》第 14 轮 2.5): a teaching model, not a GPU simulator ----------
+// One SM; two kinds of instruction (global load, arithmetic); fixed load latency; no caches, no dual issue.
+// Line for line the same as textbook/ai/ch03/code/_gpusim.py (textbook/tools/tests/test_gpusim.py runs both).
+// schedule(): warps repeat "one load, then k arithmetic instructions that need it"; each scheduler issues at most one
+// instruction per cycle ('gto' greedy-then-oldest or 'lrr' loose round-robin); gap > 0: at most one load per gap cycles
+// per scheduler (bandwidth). util is measured over the second half of the run (steady state).
+// trace rows: I issue, M waiting for memory, R ready but not picked, B waiting for bandwidth.
+// diverge(): a branch on the thread index; a warp with both kinds of thread runs both paths, the other lanes idle.
+const GPU = {
+  rng(seed) {   // mulberry32
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a) >>> 0;
+      t = (((t + Math.imul(t ^ (t >>> 7), 61 | t)) >>> 0) ^ t) >>> 0;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  },
+  schedule({ warps = 8, schedulers = 1, latency = 700, k = 4, cycles = 20000, gap = 0, policy = "gto", trace = 0 } = {}) {
+    const pc = new Array(warps).fill(0), it = new Array(warps).fill(0), ready = new Array(warps).fill(0);
+    const group = Array.from({ length: schedulers }, (_, s) => Array.from({ length: warps }, (_, w) => w).filter((w) => w % schedulers === s));
+    const rr = new Array(schedulers).fill(0), lastMem = new Array(schedulers).fill(-1e9), half = Math.floor(cycles / 2);
+    const rows = trace ? Array.from({ length: warps }, () => []) : null;
+    const can = (w, s, c) => (pc[w] === 0 ? gap <= 0 || c - lastMem[s] >= gap : c >= ready[w]);
+    let issued = 0;
+    for (let c = 0; c < cycles; c++) {
+      for (let s = 0; s < schedulers; s++) {
+        const g = group[s];
+        if (!g.length) continue;
+        let pick = -1;
+        const start = policy === "lrr" ? rr[s] : 0;
+        if (policy === "gto" && can(g[rr[s]], s, c)) pick = rr[s];
+        else for (let j = 0; j < g.length; j++) if (can(g[(start + j) % g.length], s, c)) { pick = (start + j) % g.length; break; }
+        if (trace && c < trace) g.forEach((w, j) => rows[w].push(
+          pick === j ? "I" : pc[w] === 0 ? (gap <= 0 || c - lastMem[s] >= gap ? "R" : "B") : (c >= ready[w] ? "R" : "M")));
+        if (pick < 0) continue;
+        const w = g[pick];
+        rr[s] = policy === "lrr" ? (pick + 1) % g.length : pick;
+        if (c >= half) issued++;
+        if (pc[w] === 0) { ready[w] = c + latency; lastMem[s] = c; pc[w] = 1; }
+        else { pc[w]++; if (pc[w] > k) { pc[w] = 0; it[w]++; } }
+      }
+    }
+    const res = { issued, util: issued / (schedulers * (cycles - half)), rounds: it };
+    if (trace) res.trace = rows.map((r) => r.join(""));
+    return res;
+  },
+  little(n, k, latency, gap = 0) {   // Little's law estimate of one scheduler's issue utilization
+    let u = Math.min(1, n * (k + 1) / (latency + k));
+    if (gap > 0) u = Math.min(u, (k + 1) / gap);
+    return u;
+  },
+  diverge({ cond = "odd", warps = 1, pre = 2, then = 4, other = 4, post = 2, p = 0.5, seed = 1 } = {}) {
+    const r = GPU.rng(seed), out = [], steps = [];
+    let issued = 0, active = 0;
+    for (let w = 0; w < warps; w++) {
+      const mask = [];
+      for (let lane = 0; lane < 32; lane++) {
+        const t = 32 * w + lane;
+        mask.push(cond === "none" ? true : cond === "half" ? lane < 16 : cond === "odd" ? t % 2 === 1
+          : cond === "warp" ? w % 2 === 1 : cond === "data" ? r() < p : (() => { throw new Error("cond " + cond); })());
+      }
+      const nT = mask.filter(Boolean).length, nF = 32 - nT, seq = [];
+      for (let i = 0; i < pre; i++) seq.push(["pre", 32]);
+      if (nT) for (let i = 0; i < then; i++) seq.push(["then", nT]);
+      if (nF) for (let i = 0; i < other; i++) seq.push(["else", nF]);
+      for (let i = 0; i < post; i++) seq.push(["post", 32]);
+      const wa = seq.reduce((a, q) => a + q[1], 0);
+      issued += seq.length; active += wa;
+      steps.push(seq.map((q) => q[0]));
+      out.push({ mask: mask.map((b) => (b ? "1" : "0")).join(""), issued: seq.length, active: wa });
+    }
+    return { warps: out, issued, active, eff: active / (32 * issued), steps };
+  },
+};
+
 // ---------- tasks & progress ----------
 function paintTasks() {
   let n = 0, k = 0;
@@ -700,7 +776,7 @@ function build(id, def) {
     rot2, fk, frame: (...a) => frame(ctx, ...a), arm: (...a) => arm(ctx, ...a), robot: (...a) => robot(ctx, ...a),
     lidar: (...a) => lidar(ctx, ...a), plot: (...a) => plot(ctx, ...a),
     la: LA, plane: (o) => plane(ctx, o), heat: (...a) => heat(ctx, ...a), image: (...a) => image(ctx, ...a), bars: (...a) => bars(ctx, ...a),
-    calc: CALC, graph: (o) => graph(ctx, o), qm: QM,
+    calc: CALC, graph: (o) => graph(ctx, o), qm: QM, gpu: GPU,
   };
   L.api = api;
   if (is3d) setup3d(L);

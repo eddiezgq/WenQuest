@@ -1,0 +1,1226 @@
+{
+ "no": 24,
+ "title": [
+  "机针与旋梭的制造",
+  "Manufacturing Needles and Rotary Hooks"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能说出机针和旋梭的工艺路线，每道关键工序的目的、关键参数和易出缺陷。",
+   "Describe the process routes of needles and rotary hooks, with the purpose, key parameters and typical defects of each key operation."
+  ],
+  [
+   "能用 d⁴ 关系比较不同针号的刚度，并解释硬度与韧性的取舍。",
+   "Compare the stiffness of needle sizes with the d⁴ relation and explain the hardness–toughness trade-off."
+  ],
+  [
+   "能计算 Cp、Cpk、控制限和平均运行长度 ARL，并据此选择抽样数、判断工序是否稳定。",
+   "Calculate Cp, Cpk, control limits and average run length (ARL), and use them to choose subgroup size and judge process stability."
+  ],
+  [
+   "能用分组选配的原理和蒙特卡罗结果，比较完全互换、提高精度与分组选配的合格率、剩余件和成本。",
+   "Use the principle of grouped selective assembly and Monte Carlo results to compare yield, leftovers and cost of interchangeability, tighter accuracy and grouping."
+  ],
+  [
+   "能把工艺路线、检验计划和测量消息写成数字工厂的数据，并找出车间瓶颈。",
+   "Write process routes, inspection plans and measurement messages as digital-factory data and find the shop bottleneck."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "“旋梭响”的源头：梭道与梭床的配合间隙怎样做稳",
+   "Where 'noisy hooks' start: holding the race-to-basket clearance"
+  ],
+  "text": [
+   "缝制车间里常有“旋梭响”的修机请求：梭道与梭床导轨的间隙太大，梭床晃动、发出“嗒嗒”声；太小又发热卡滞。一家旋梭厂要求直径间隙 10–30 μm（名义 20 μm）。梭道内孔和梭床导轨外圆淬硬后精磨，经济精度是各 ±15 μm（σ = 5 μm）。σ 减半，加工成本加倍；按虚拟实验 24-1 的成本规则，每件加工费 10 元 ×（5 μm/σ），每件测量 0.5 元，分组管理每套 0.4 元 ×（组数 − 1）。",
+   "'Noisy hook' calls are common on the sewing floor: when the clearance between race and basket rib is too large the basket rattles; too small and it heats up and sticks. A hook maker requires a diametral clearance of 10–30 μm (nominal 20 μm). The race bore and basket rib are ground after hardening to an economical ±15 μm each (σ = 5 μm). Halving σ doubles machining cost; by the cost rules of virtual lab 24-1, machining costs 10 yuan × (5 μm/σ) per part, measuring 0.5 yuan per part, and group management 0.4 yuan × (groups − 1) per set."
+  ],
+  "question": [
+   "完全互换时合格率约为多少？若不分组、只靠提高精度达到 99%，每个零件的 σ 要压到多少，每套成本多少？按 ±15 μm 分 3 组选配，合格率和每套成本是多少？",
+   "What is the yield with full interchangeability? To reach 99% without grouping, by accuracy alone, what σ must each part have and what does a set cost? With three groups over ±15 μm, what are the yield and cost per set?"
+  ],
+  "answer": [
+   "完全互换：σc = √(5² + 5²) ≈ 7.07 μm，间隙落在 ±10 μm 内约 84%（2000 套蒙特卡罗 84.5%，每套约 24.9 元）。要 99%：σc ≤ 10/2.576 ≈ 3.88 μm，每件 σ ≤ 约 2.7 μm；按算例取 σ = 2.6 μm，合格率 99.2%，每套约 39.8 元。分 3 组：组宽 10 μm，同组配对的间隙一定在 10–30 μm 内，测量误差 1 μm 时合格率 99.6%、剩余件 1.7%，每套约 22.3 元，比提高精度便宜约 44%。",
+   "Interchangeable: σc = √(5² + 5²) ≈ 7.07 μm, so about 84% fall within ±10 μm (84.5% in the 2000-set Monte Carlo, about 24.9 yuan per set). For 99%: σc ≤ 10/2.576 ≈ 3.88 μm, so each part needs σ ≤ about 2.7 μm; with σ = 2.6 μm as in the example the yield is 99.2% at about 39.8 yuan per set. Three groups: 10 μm wide, so same-group pairs always fall within 10–30 μm; with 1 μm measurement error the yield is 99.6% with 1.7% leftovers at about 22.3 yuan per set, about 44% cheaper than tightening accuracy."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人关节减速器的选配、视觉全检与趋势监测",
+   "Selective assembly in robot gearboxes, vision inspection and trend monitoring"
+  ],
+  "text": [
+   "机器人关节里的精密减速器（如 RV 减速器）要把回差控制在角分级，靠单个零件做到这么准很贵，装配时常按测得尺寸把针齿、轴承等零件分组选配，道理和旋梭的梭道—梭床选配一样；同样要盯住两种零件的尺寸分布是否一致，否则剩余件堆积。机针厂的在线视觉全检，正是机器人视觉检测的典型应用：相机拍轮廓，算法测直径、直度和孔宽，不合格品由执行机构剔除。控制图的思路也用在机器人运维上：把关节电机电流、振动按组画趋势，均值漂出控制限就提前报警，在减速器磨坏之前安排维护。",
+   "A robot joint's precision gearbox (an RV reducer, for example) must keep backlash to arc-minutes; making every part that accurate is costly, so at assembly pins, bearings and similar parts are often graded by measured size and fitted within groups — the same idea as matching hook races and baskets, and with the same need to keep the two size distributions aligned or leftovers pile up. The needle factory's in-line vision inspection is a classic robot-vision task: a camera captures the outline, software measures diameter, straightness and eye width, and an actuator rejects bad parts. Control-chart thinking carries over to robot maintenance: plot joint-motor current and vibration in subgroups, alarm when the mean leaves its control limits, and service the gearbox before it wears out."
+  ]
+ },
+ "life": {
+  "title": [
+   "鞋码分得越细，越合脚也越难备货",
+   "Finer shoe sizes fit better but are harder to stock"
+  ],
+  "text": [
+   "鞋店按尺码把鞋和脚“分组配对”：码分得越细越合脚，可每个码都要备货，某些码卖不动就积压——这就是选配的组数与剩余件之间的权衡。",
+   "A shoe shop 'matches by group' — shoes to feet by size. The finer the sizes, the better the fit, but every size must be stocked and slow sizes pile up — the same trade-off between number of groups and leftovers in selective assembly."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "两件最小也最难做的零件",
+    "The two smallest and hardest parts"
+   ],
+   "points": [
+    [
+     "机针：每秒刺布八十多次，会弯、会断、会钝；300 台的工厂一年约用 4.5 万根（示意）",
+     "Needle: pierces the fabric 80+ times a second, bends, breaks and blunts; a 300-machine plant uses about 45 000 a year (illustrative)"
+    ],
+    [
+     "旋梭：梭尖以十几米每秒掠过、离机针不到 0.1 mm；关键配合只有十几到几十微米",
+     "Hook: the point passes within 0.1 mm of the needle at over ten metres a second; key fits are tens of micrometres"
+    ],
+    [
+     "机针：大批量、单件便宜、每支都要合格 → 成形一致性 + 全数自动检测",
+     "Needle: huge volume, cheap, every one good → consistent forming + 100% automatic inspection"
+    ],
+    [
+     "旋梭：中批量、单件贵、配合要准 → 精磨、研磨 + 选配",
+     "Hook: medium volume, expensive, precise fits → fine grinding, lapping + selective assembly"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "车间里最常听到的修机请求有两类：一类是断针、针钝、跳针，换根针就好；另一类是旋梭响、老断线，要拆旋梭看梭尖和梭床。机针和旋梭都很小，却决定线迹能不能形成。机针是消耗品：按 300 台缝纫机、每台每天换半根、一年 300 天估算，一年约 4.5 万根，全世界按亿支计。旋梭是整机最精密的零件，梭尖以十几米每秒从机针旁不到 0.1 毫米处掠过。它们代表两种制造思路：机针靠成形的一致性和全数自动检测，旋梭靠精磨、研磨和选配。",
+    "The two commonest repair calls on a sewing floor: broken, blunt or skipping needles — fit a new one — and noisy hooks or frequent thread breaks — take the hook out and inspect point and basket. Both parts are tiny, yet they decide whether a stitch forms. Needles are consumables: 300 machines, half a needle per machine a day, 300 days a year make about 45 000 a year, and worldwide they are counted in hundreds of millions. The hook is the most precise part of the machine; its point sweeps past within 0.1 mm of the needle at over ten metres a second. They represent two ways of making things: needles rely on consistent forming and full automatic inspection, hooks on fine grinding, lapping and selective assembly."
+   ]
+  },
+  {
+   "title": [
+    "机针的结构与针系统",
+    "Needle anatomy and needle systems"
+   ],
+   "points": [
+    [
+     "针柄（夹在针杆里）→ 锥部 → 针身（直径即针号）→ 长槽、短槽与凹口 → 针孔 → 针尖",
+     "Shank (clamped in the bar) → taper → blade (its diameter is the size) → long groove, short groove and scarf → eye → point"
+    ],
+    [
+     "针系统规定针柄直径和长度，同系统可互换；工业平缝机常用 DB×1（16×231），针柄约 1.62 mm",
+     "The needle system fixes shank diameter and length; DB×1 (16×231), shank about 1.62 mm, is common on industrial lockstitch"
+    ],
+    [
+     "公制针号 Nm：针身直径以 0.01 mm 计，Nm 90 = 0.90 mm（约合 14 号）",
+     "Metric size Nm: blade diameter in 0.01 mm, Nm 90 = 0.90 mm (about size 14)"
+    ],
+    [
+     "长槽护住下行的面线；凹口让线环鼓出、让梭尖靠近",
+     "The long groove shields the descending thread; the scarf lets the loop bulge and the hook point come close"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_needle.png",
+   "narration": [
+    "先认识机针。从上到下：针柄插进针杆、被针夹螺钉夹紧，它的直径和长度由针系统规定，同一系统的针可以互换，工业平缝机常用 DB×1，针柄约 1.62 毫米；锥部过渡到针身，针身直径就是针号，公制 Nm 90 就是 0.90 毫米；长槽沿针身一侧贯通，面线下行时藏在槽里不被布磨；另一侧靠近针孔处是短槽和凹口，梭尖从凹口掠过；然后是针孔和针尖。每一部分都有自己的关键尺寸，后面讲工艺时，我们会看到每个尺寸是哪道工序做出来的。",
+    "First, the needle. From the top: the shank goes into the needle bar and is clamped by the screw; its diameter and length are fixed by the needle system, so needles of one system interchange — DB×1, with a shank of about 1.62 mm, is common on industrial lockstitch machines. A taper leads to the blade, whose diameter is the size: metric Nm 90 means 0.90 mm. The long groove runs down one side, sheltering the descending thread from the fabric; on the other side near the eye are the short groove and scarf, past which the hook point sweeps; then the eye and the point. Each part has its own key dimensions, and in the process route we will see which operation makes each one."
+   ]
+  },
+  {
+   "title": [
+    "针号与刚度：直径的四次方",
+    "Needle size and stiffness: diameter to the fourth power"
+   ],
+   "points": [
+    [
+     "抗弯刚度 EI ∝ d⁴；压弯临界力 ∝ d⁴/L²",
+     "Bending stiffness EI ∝ d⁴; buckling load ∝ d⁴/L²"
+    ],
+    [
+     "同样长度：Nm 110 是 Nm 90 的 2.23 倍，Nm 70 只有 0.37 倍，Nm 110 比 Nm 70 大 6.1 倍",
+     "Same length: Nm 110 is 2.23 × Nm 90, Nm 70 only 0.37 ×; Nm 110 is 6.1 × Nm 70"
+    ],
+    [
+     "厚料用粗针：细针易被推偏、撞梭尖、断针；直度因此是关键质量特性",
+     "Thick fabric needs a thick needle: thin ones deflect, hit the hook and break; hence straightness is a key characteristic"
+    ],
+    [
+     "DB×1、Nm 90 针身截面只剩针柄的约 31%，减面率约 69%",
+     "DB×1 Nm 90: blade section only about 31% of the shank, a 69% area reduction"
+    ]
+   ],
+   "formula": "EI=E\\,\\frac{\\pi d^{4}}{64},\\qquad F_{\\mathrm{cr}}=\\frac{\\pi^{2}EI}{(\\mu L)^{2}}\\;\\propto\\;\\frac{d^{4}}{L^{2}}",
+   "figure": "fig_c24_points.png",
+   "narration": [
+    "针身是一根细长杆。抗弯刚度与截面惯性矩成正比，失稳的临界力也与惯性矩成正比、与长度平方成反比，而惯性矩跟直径的四次方走。所以针号对刚度影响非常大：同样长度，Nm 110 是 Nm 90 的 2.23 倍，Nm 70 只有 0.37 倍。缝厚料要用粗针，原因之一就在这里：细针刺厚料容易被推偏、弯曲，偏了就撞上梭尖。这也说明直度为什么是关键：本来就弯的针，受力后偏得更多。另外，针身从针柄的 1.62 毫米减到 0.9 毫米，减面率约 69%，这么大的变形要靠专门的工艺。",
+    "The blade is a slender rod. Bending stiffness is proportional to the second moment of area, and so is the buckling load, inversely with length squared — and the second moment goes with diameter to the fourth power. So size matters enormously: at equal length Nm 110 is 2.23 times as stiff as Nm 90, Nm 70 only 0.37 times. That is one reason thick fabric needs a thick needle: a thin one is pushed aside and bent, and a deflected needle meets the hook point. It also shows why straightness is key: a needle already bent deflects further under load. And the blade shrinks from the 1.62 mm shank to 0.9 mm, a 69% area reduction — a deformation that needs a dedicated process."
+   ]
+  },
+  {
+   "title": [
+    "针尖形状与关键质量特性",
+    "Point shapes and key quality characteristics"
+   ],
+   "points": [
+    [
+     "梭织物用尖头；针织物用圆头（轻圆头、中圆头），推开纱线而不刺断；皮革用切割尖",
+     "Woven fabric: sharp point; knits: ball points (light, medium) that push yarns aside; leather: cutting points"
+    ],
+    [
+     "针孔：孔宽、对中、孔边圆滑无毛刺，否则割线、断线",
+     "Eye: width, centring, smooth burr-free edges, or thread is cut and breaks"
+    ],
+    [
+     "凹口位置与深度是第 23 章尺寸链中“换针时会变”的一环（±0.02 mm）",
+     "Scarf position and depth is the link of the Chapter 23 chain that changes with each needle (±0.02 mm)"
+    ],
+    [
+     "最难兼顾硬度与韧性：越硬越耐磨，但撞硬物时“断”而不是“弯”",
+     "The hardest balance is hardness vs toughness: harder wears less but breaks instead of bending"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c24_points.png",
+   "narration": [
+    "针尖按面料选：梭织物用尖头刺穿纤维；针织物用圆头，在纱线之间推开一条路，刺断纱线的针织物会脱散出洞；皮革用带刃口的切割尖。针尖形状由磨尖和抛光决定，抛光过度会把尖头磨圆。表 24-1 把功能和缺陷对应起来，得到关键质量特性。有两点特别要说：一是凹口位置，它是第 23 章尺寸链中换针时会变的那一环，整机厂没法调用户买的每根针，只能对机针厂提公差，所以机针凹口精度实际上是整机梭尖间隙的一部分；二是硬度与韧性，断针时碎片可能留在衣服里，这是严重的质量和安全事故。",
+    "Points are chosen by fabric: a sharp point pierces woven fibres; a ball point pushes between knitted yarns, because a cut yarn ladders into a hole; a cutting point slices leather. Grinding and polishing make the point, and over-polishing rounds it off. Table 24-1 maps functions to defects to get the key characteristics. Two deserve emphasis. The scarf position is the link of Chapter 23's chain that changes with each needle; the machine maker cannot adjust every needle a customer buys, only specify tolerances to the needle maker, so scarf accuracy is really part of the machine's hook clearance. And hardness versus toughness: a broken needle may leave fragments in a garment, a serious quality and safety incident."
+   ]
+  },
+  {
+   "title": [
+    "机针工艺路线（一）：备料、减径、冲槽",
+    "Needle route (1): stock, blade reducing, grooving"
+   ],
+   "points": [
+    [
+     "高碳钢丝进厂查直径、裂纹和脱碳层；校直、切成针坯",
+     "High-carbon wire checked for diameter, cracks and decarburisation; straightened and cut to blanks"
+    ],
+    [
+     "针身减径：旋锻（纤维连续、表面致密）或无心磨削，69% 的减面率常分几次完成",
+     "Blade reducing: rotary swaging (continuous grain, dense surface) or centreless grinding; the 69% reduction takes several passes"
+    ],
+    [
+     "减径不均匀，针身就弯：直度的第一道来源",
+     "Uneven reduction bends the blade: the first source of straightness error"
+    ],
+    [
+     "冷压长槽、短槽和凹口；模具按冲次管理，磨损后槽变浅、凹口漂移",
+     "Long groove, short groove and scarf are cold-pressed; dies are managed by stroke count, as wear makes grooves shallow and scarves drift"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c24_needleflow.png",
+   "narration": [
+    "机针的制造分五段：备料、成形、热处理、表面处理、检测与包装。备料：原料是高碳钢丝，直径约等于针柄直径，进厂查直径、裂纹和脱碳层，脱碳的钢丝淬火后表层软，针尖很快磨损。校直、切成针坯。针身减径：针柄保留钢丝原始直径，针身要减到针号直径，常用旋锻，一组锻模绕针坯高速旋转、径向锤击，把针身一点点锻细，材料纤维连续；也可以无心磨削。减径不均匀，针身就会弯。然后在压力机上冷压出长槽、短槽和凹口，模具磨损会让凹口漂移，所以按冲次管理。",
+    "Needle making has five stages: stock, forming, heat treatment, surface treatment, inspection and packing. Stock: high-carbon wire about the shank diameter, checked on arrival for diameter, cracks and decarburisation — a decarburised skin stays soft after hardening and the point wears fast. It is straightened and cut into blanks. Blade reducing: the shank keeps the wire diameter while the blade is reduced to size, usually by rotary swaging — dies spin round the blank and hammer it radially, thinning it bit by bit with continuous grain — or by centreless grinding. Uneven reduction bends the blade. Then a press cold-forms the long groove, short groove and scarf; die wear makes the scarf drift, so dies are managed by stroke count."
+   ]
+  },
+  {
+   "title": [
+    "冲针孔：最关键、最容易出问题的工序",
+    "Eye punching: the most critical and troublesome operation"
+   ],
+   "points": [
+    [
+     "先压扁局部、压出槽，再用比针孔还细的冲头冲穿",
+     "Flatten locally and press grooves, then pierce with a punch finer than the eye"
+    ],
+    [
+     "冲头磨损：毛刺变大、孔宽漂移；冲头偏心：孔不居中、一侧壁薄易断",
+     "Punch wear: bigger burrs, eye-width drift; off-centre punch: eye not centred, one thin wall that breaks"
+    ],
+    [
+     "毛刺和锐边是割线、断线的主要原因；抛光去不掉大毛刺",
+     "Burrs and sharp edges are the main cause of cut and broken thread; polishing cannot remove big burrs"
+    ],
+    [
+     "对策：在线检测孔宽（控制图），冲头按冲次强制更换",
+     "Remedy: in-line eye-width measurement (control charts) and punch replacement by stroke count"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c24_eye.png",
+   "narration": [
+    "压扁与冲针孔是机针制造里最关键、也最容易出问题的一道工序。针孔区先从两侧压出槽、局部压薄，再用很细的冲头冲穿。冲头比针孔还细，又要冲穿淬火前的高碳钢，磨损和折断都很快。冲头一磨损，孔边毛刺就变大，孔宽也会漂移；冲头稍有偏心，针孔就不在正中，一侧壁太薄，用的时候从针孔处断。针孔边缘的毛刺和锐边是割线、断线的主要原因，后面的抛光能去小毛刺，去不掉大的，只能靠冲孔本身控制。所以这道工序既要在线测孔宽画控制图，又要按冲次换冲头。",
+    "Flattening and eye punching is the most critical and troublesome needle operation. The eye region is first pressed from both sides to form grooves and thin it locally, then a very fine punch pierces it. The punch is thinner than the eye and must pierce unhardened high-carbon steel, so it wears and breaks quickly. As it wears, burrs at the eye grow and the width drifts; slightly off-centre, the eye is not central and one wall is too thin, breaking in use. Burrs and sharp edges at the eye are the main cause of cut and broken thread; later polishing removes small burrs but not large ones, which only the punching itself can prevent. So this operation gets in-line width measurement with control charts and punches replaced by stroke count."
+   ]
+  },
+  {
+   "title": [
+    "热处理、校直、抛光、镀层与检测",
+    "Heat treatment, straightening, polishing, plating and inspection"
+   ],
+   "points": [
+    [
+     "淬火：保护气氛连续加热（示意 760–820 °C）后油淬，防氧化脱碳",
+     "Hardening: continuous heating in protective atmosphere (illustrative 760–820 °C), oil quench, no scaling or decarburisation"
+    ],
+    [
+     "回火（示意 150–250 °C）是硬度—韧性平衡的主要手段：低则硬而脆，高则韧而易磨",
+     "Tempering (illustrative 150–250 °C) sets the hardness–toughness balance: lower is hard and brittle, higher tough but wears"
+    ],
+    [
+     "逐支校直；滚光或电解抛光去毛刺；镀镍、镀铬或硬质涂层，针孔里也要镀到",
+     "Straighten every needle; barrel or electrolytic polishing; nickel, chrome or hard coatings, including inside the eye"
+    ],
+    [
+     "机器视觉在线全检外形；硬度、凹口、毛刺、镀层按批抽检",
+     "Machine vision inspects every outline in line; hardness, scarf, burrs and plating are sampled per batch"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c24_needleflow.png",
+   "narration": [
+    "成形后的针还是软的，要淬火。针很细，加热冷却都很快，常在保护气氛中连续加热，防止氧化脱碳，再油淬。淬火后又硬又脆，必须回火：温度低一些，硬度高、耐磨但更脆；高一些，韧性好、宁弯不断，但针尖和针孔磨得快。具体取多少是机针厂的核心工艺数据。细长的针淬火必然变形，要逐支校直。然后滚光或电解抛光去毛刺，时间太短去不干净，太长把针尖磨圆。最后镀镍、镀铬或硬质涂层。检测靠机器视觉全数检查外形，要破坏或接触的硬度、镀层只能抽检。",
+    "After forming the needle is still soft and must be hardened. Being thin, it heats and cools fast, so it is heated continuously in a protective atmosphere against scaling and decarburisation, then oil-quenched. Hardened needles are hard and brittle and must be tempered: a lower temperature gives hardness and wear resistance but brittleness; a higher one toughness — bend rather than break — but faster wear of point and eye. The exact choice is core know-how of a needle maker. Slender needles always distort in hardening, so each is straightened. Barrel or electrolytic polishing removes burrs — too short leaves them, too long rounds the point. Finally nickel, chrome or hard coatings. Machine vision checks every outline; destructive or contact tests such as hardness and plating are sampled."
+   ]
+  },
+  {
+   "title": [
+    "工序能力：Cp 与 Cpk",
+    "Process capability: Cp and Cpk"
+   ],
+   "points": [
+    [
+     "Cp 只比宽度；Cpk 还看均值偏了多少，Cpk ≤ Cp",
+     "Cp compares widths only; Cpk also accounts for mean offset, Cpk ≤ Cp"
+    ],
+    [
+     "Cpk ≥ 1.33：最近规格限离均值 4σ（常用要求，示意）",
+     "Cpk ≥ 1.33: the nearest limit is 4σ from the mean (a common requirement, illustrative)"
+    ],
+    [
+     "针孔宽度 0.360 ± 0.020 mm：25 组 × 5 支，X̿ = 0.3622、R̄ = 0.0091、σ̂ = R̄/d₂ = 0.0039 mm",
+     "Eye width 0.360 ± 0.020 mm: 25 subgroups of 5, X̿ = 0.3622, R̄ = 0.0091, σ̂ = R̄/d₂ = 0.0039 mm"
+    ],
+    [
+     "Cp ≈ 1.70、Cpk ≈ 1.51，约 3.4 ppm；均值上移 1σ 后 Cpk ≈ 1.17、约 233 ppm",
+     "Cp ≈ 1.70, Cpk ≈ 1.51, about 3.4 ppm; after a 1σ upward shift Cpk ≈ 1.17, about 233 ppm"
+    ]
+   ],
+   "formula": "C_p=\\frac{\\mathrm{USL}-\\mathrm{LSL}}{6\\sigma},\\qquad C_{pk}=\\min\\!\\left(\\frac{\\mathrm{USL}-\\mu}{3\\sigma},\\ \\frac{\\mu-\\mathrm{LSL}}{3\\sigma}\\right)",
+   "figure": "fig_c24_cpk.png",
+   "narration": [
+    "工厂更想知道：这道工序有没有能力稳定地做出合格品？Cp 只比较公差带和工序波动谁宽，Cpk 还考虑均值偏离中心多少。Cpk 等于 1 是 3σ，常用要求 1.33 是 4σ。算例：针孔宽度规格 0.360 正负 0.020，在线视觉每次抽 5 支，收 25 组。真实的 μ 和 σ 不知道，要估：总均值估 μ，平均极差除以 d₂ 估 σ。算得 Cp 约 1.70、Cpk 约 1.51，超差约 3.4 ppm，能力够。可冲头一磨损，均值上移 1σ，Cpk 降到 1.17，超差率涨了约 70 倍。",
+    "Knowing whether each needle passes is not enough; the plant wants to know whether the operation can make good parts steadily. Cp compares the tolerance width with the process spread; Cpk also accounts for how far the mean is off centre. Cpk of 1 means the nearest limit is exactly 3σ from the mean; many industries ask for 1.33, which is 4σ. Example: eye width 0.360 ± 0.020; in-line vision takes 5 needles at a time, 25 subgroups. The true μ and σ are unknown and estimated: the grand mean for μ, average range over d₂ for σ. Cp is about 1.70 and Cpk about 1.51, some 3.4 ppm out — capable. But when the punch wears and the mean shifts up 1σ, Cpk falls to 1.17 and the reject rate rises about seventy-fold."
+   ]
+  },
+  {
+   "title": [
+    "控制图：多快能发现漂移",
+    "Control charts: how soon is a drift seen?"
+   ],
+   "points": [
+    [
+     "均值图控制限 X̿ ± A₂R̄，极差上限 D₄R̄；n = 5 时 A₂ = 0.577、D₄ = 2.114",
+     "X̄ limits X̿ ± A₂R̄, range limit D₄R̄; for n = 5, A₂ = 0.577, D₄ = 2.114"
+    ],
+    [
+     "算例控制限 0.3570–0.3675 mm；控制限来自工序波动，与规格限无关",
+     "Example limits 0.3570–0.3675 mm; they come from process variation, not from the specification"
+    ],
+    [
+     "ARL₀ ≈ 370；1σ 漂移、n = 5 时 ARL₁ ≈ 4.5 组，n = 3 时约 9.8 组",
+     "ARL₀ ≈ 370; for a 1σ drift ARL₁ ≈ 4.5 subgroups at n = 5 and about 9.8 at n = 3"
+    ],
+    [
+     "0.5σ 小漂移 n = 5 也要约 33 组；全检的工序把 n 取大，破坏性项目靠工艺预防",
+     "A small 0.5σ drift needs about 33 subgroups even at n = 5; take n large where measurement is free, rely on prevention for destructive tests"
+    ]
+   ],
+   "formula": "\\mathrm{UCL},\\mathrm{LCL}=\\bar{\\bar X}\\pm A_2\\bar R,\\qquad \\mathrm{ARL}=\\frac{1}{\\Phi(-3+\\delta\\sqrt n)+\\Phi(-3-\\delta\\sqrt n)}",
+   "figure": "fig_c24_cpk.png",
+   "narration": [
+    "怎样尽早发现漂移？靠控制图。把每组均值按时间画出来，中心线是总均值，控制限是总均值加减 A₂ 乘平均极差。注意控制限是从工序自己的波动算出来的，和规格限无关：点出界说明工序变了，即使这支针还在规格内，也该停下来查原因。算例从第 26 组注入 1σ 漂移，第 29 组报警。多快报警可以事先算：漂移 δσ 后每组出界的概率代进去，倒数就是平均运行长度 ARL。没漂移时平均 370 组误报一次；1σ 漂移、每组 5 支平均 4.5 组发现，每组 3 支要近 10 组；0.5σ 的小漂移就慢多了。",
+    "How do we catch a drift early? With a control chart. Plot each subgroup mean in time order; the centre line is the grand mean and the limits are the grand mean plus or minus A₂ times the average range. The limits come from the process's own variation, not the specification: a point outside means the process has changed, so stop and investigate even if the needle is still in spec. In the example a 1σ drift injected from subgroup 26 alarms at subgroup 29. The speed can be computed in advance: the chance a subgroup falls outside after a δσ drift, inverted, gives the average run length. Without drift there is a false alarm every 370 subgroups on average; a 1σ drift is caught in 4.5 subgroups of 5, nearly 10 of 3; a 0.5σ drift far more slowly."
+   ]
+  },
+  {
+   "title": [
+    "旋梭的结构与工作条件",
+    "Rotary hook structure and working conditions"
+   ],
+   "points": [
+    [
+     "旋梭体（带梭尖、梭道）+ 梭床（导轨在梭道里滑动）+ 梭壳与梭芯 + 压圈",
+     "Hook body (point, race) + basket (rib sliding in the race) + bobbin case and bobbin + gib"
+    ],
+    [
+     "全回转旋梭转速是主轴两倍：5000 r/min 时梭尖约 14.1 m/s，梭道滑动约 12.6 m/s，每班滑过约 360 km",
+     "A full rotary hook turns at twice spindle speed: at 5000 r/min the point moves at about 14.1 m/s, the race slides at 12.6 m/s, about 360 km a shift"
+    ],
+    [
+     "梭尖掠过一根 Nm 90 机针只用约 64 μs",
+     "The point passes an Nm 90 needle in about 64 μs"
+    ],
+    [
+     "四条要求：梭尖形状与刃口、梭道硬而光、梭道—导轨间隙、梭尖到安装孔的位置",
+     "Four requirements: point shape and edge, hard smooth race, race-to-rib clearance, point position relative to the bore"
+    ]
+   ],
+   "formula": "v=2\\pi R\\cdot\\frac{2n}{60}",
+   "figure": "fig_hook_exploded.png",
+   "narration": [
+    "旋梭由旋梭体、梭床、梭壳梭芯和压圈组成。从制造看，旋梭体和梭床是两个主要的精密零件，梭床外缘的导轨在旋梭体内侧的梭道里滑动。全回转旋梭的转速是主轴的两倍，梭尖半径按 13.5 毫米、梭道半径按 12 毫米算，主轴 5000 转时梭尖线速度约 14.1 米每秒，梭道滑动约 12.6 米每秒，一个班下来梭道里滑过约 360 公里；梭尖掠过一根 0.9 毫米的机针只用 64 微秒。翻译成零件要求就是四条：梭尖形状准、刃口圆滑无毛刺；梭道硬而光；梭道和导轨的间隙不大不小；梭尖相对安装孔的位置准。",
+    "A rotary hook consists of the hook body, the basket, bobbin case and bobbin, and the gib. For manufacturing, body and basket are the two main precision parts; the rib on the basket's rim slides in the race inside the body. A full rotary hook turns at twice spindle speed; with the point at 13.5 mm radius and the race at 12 mm, at 5000 r/min the point moves at about 14.1 m/s and the race slides at about 12.6 m/s — some 360 km in a shift — and the point passes a 0.9 mm needle in 64 microseconds. In part requirements that makes four: an accurate point with a smooth, burr-free edge; a hard, smooth race; a race-to-rib clearance neither too large nor too small; and an accurate point position relative to the mounting bore."
+   ]
+  },
+  {
+   "title": [
+    "旋梭的工艺路线",
+    "Process route of the rotary hook"
+   ],
+   "points": [
+    [
+     "旋梭体：锻坯 → 数控车（安装孔与梭道粗形一次装夹）→ 五轴铣梭尖与梭道 → 渗碳淬火",
+     "Body: forging → CNC turning (bore and rough race in one set-up) → five-axis milling of point and race → carburising"
+    ],
+    [
+     "热处理后精磨梭道与导轨（算例各 ±15 μm，σ = 5 μm），逐件测量分组",
+     "After heat treatment, grind race and rib (±15 μm, σ = 5 μm in the example), measure and grade every part"
+    ],
+    [
+     "梭尖研磨抛光：“尖而不利”，最依赖手艺的工序",
+     "Point lapping and polishing: 'sharp but not cutting', the operation most dependent on skill"
+    ],
+    [
+     "DLC 涂层 → 选配装配 → 跑合与噪声检测 → 出厂检验",
+     "DLC coating → selective fitting → run-in and noise test → final inspection"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c24_hookflow.png",
+   "narration": [
+    "旋梭体和梭床分两条线加工，在选配站汇合。旋梭体常用锻造毛坯，让金属流线沿梭尖分布。数控车床车出内外圆和安装孔，安装孔是后面所有工序的基准，要和梭道粗形一次装夹车出。梭尖和梭道是空间曲面，在五轴加工中心上一次装夹铣出，梭尖相对基准的位置就由机床保证，而不是几次装夹误差叠加，这个原则第 25 章还会反复讲。然后渗碳淬火，表层硬、心部韧；热处理后再精磨梭道和导轨，这是精度最高的工序。梭尖要尖而不利，研磨抛光最依赖手艺。最后涂层、选配、跑合测噪声。",
+    "Body and basket are made on two lines that meet at the matching station. The body usually starts as a forging so the grain follows the point. A CNC lathe turns the bores and the mounting bore, which is the datum for everything after and is turned with the rough race in one set-up. Point and race are 3-D surfaces milled in one set-up on a five-axis machine, so the point's position relative to the datum is set by the machine, not by stacked set-up errors — a principle Chapter 25 repeats. Then carburising: a hard case and tough core. After heat treatment the race and rib are ground, the most precise operation. The point must be sharp but not cutting; lapping and polishing rely most on skill. Finally coating, matching, and running in with a noise test."
+   ]
+  },
+  {
+   "title": [
+    "完全互换要多高的精度",
+    "How accurate must parts be for full interchangeability?"
+   ],
+   "points": [
+    [
+     "间隙只由两个直径决定，没有可调的环：c = D − d = c₀ + x − y",
+     "The clearance depends only on two diameters, with no adjustable link: c = D − d = c₀ + x − y"
+    ],
+    [
+     "算例 c₀ = 20 μm，允许 10–30 μm，即只能变化 ±10 μm",
+     "Example c₀ = 20 μm, allowed 10–30 μm — only ±10 μm of variation"
+    ],
+    [
+     "两件各 σ = 5 μm：σc = 7.07 μm，合格率约 84%",
+     "Each part σ = 5 μm: σc = 7.07 μm, about 84% good"
+    ],
+    [
+     "要 99%：σc ≤ 3.88 μm，每件 σ ≤ 约 2.7 μm，几乎减半，成本约加倍",
+     "For 99%: σc ≤ 3.88 μm, each part σ ≤ about 2.7 μm — nearly halved, roughly doubling the cost"
+    ]
+   ],
+   "formula": "c=c_0+x-y,\\qquad \\sigma_c=\\sqrt{\\sigma_D^{2}+\\sigma_d^{2}}",
+   "figure": "fig_c24_racefit.png",
+   "narration": [
+    "梭尖间隙有可调的环；梭道和梭床的间隙没有，它只由两个直径决定：名义间隙加两个零件偏差之差。算例名义 20 微米，允许 10 到 30，只能变化正负 10 微米。如果任取一个旋梭体和一个梭床都能装，间隙的标准差是两者的平方和开方。两件都按 σ 5 微米加工，这已是不错的经济精度，可间隙 σ 有 7.07 微米，合格率只有约 84%。要 99%，每件 σ 要压到 2.7 微米以下，几乎减半。",
+    "Chapter 23's hook-point clearance had an adjustable link; the race-to-basket clearance has none. It depends only on two diameters: race diameter minus rib diameter, which is the nominal clearance plus the difference of the two parts' deviations. In the example the nominal is 20 μm and the allowance 10 to 30 — only ±10 μm. If any body can be fitted with any basket, the clearance σ is the root-sum-square of the two. Both made to ±15 μm with σ of 5 μm — already a good economical accuracy for hardened, ground bores and diameters — give a clearance σ of 7.07 μm and only about 84% good. For 99% each part needs σ below 2.7 μm, almost half."
+   ]
+  },
+  {
+   "title": [
+    "分组选配：用测量代替精度",
+    "Grouped selective assembly: measurement instead of accuracy"
+   ],
+   "points": [
+    [
+     "零件按经济精度加工、全部测量，把 ±15 μm 等分成 k 组，只在同组之间配对",
+     "Make parts economically, measure them all, split ±15 μm into k groups and pair only within a group"
+    ],
+    [
+     "组宽 w = 30/k μm；同组 |x − y| < w，分 3 组时间隙一定在 10–30 μm 内",
+     "Group width w = 30/k μm; within a group |x − y| < w, so with 3 groups the clearance is always 10–30 μm"
+    ],
+    [
+     "代价一：全部测量、按组存放管理；代价二：测量误差把组界附近的零件分错组",
+     "Cost 1: measure everything and manage stock by group; cost 2: measurement error misgrades parts near the group boundaries"
+    ],
+    [
+     "代价三（最重要）：两种零件各组件数必须相等，否则产生剩余不配套件",
+     "Cost 3 (the biggest): both parts must arrive in equal numbers per group, or leftovers pile up"
+    ]
+   ],
+   "formula": "w=\\frac{2T}{k},\\qquad c_0-w<c<c_0+w",
+   "figure": "fig_c24_racefit.png",
+   "narration": [
+    "分组选配换一个思路：零件仍按经济精度加工，但全部测量，按测得的尺寸分成 k 组，只在同组之间配对。把正负 15 微米等分成 k 组，每组宽 30 除以 k。同组两个偏差落在同一个宽 w 的区间，差小于 w，间隙就在名义值加减 w 之间。分 3 组时 w 是 10 微米，间隙一定在 10 到 30 之内，与零件本身的精度无关。这就是用测量代替提高精度。代价有三个：全测并按组管理；测量误差会把组界附近的零件分错；最重要的，两种零件在各组的件数必须相等。",
+    "Grouped selective assembly takes another route: parts are still made economically but all are measured, sorted into k groups by measured size, and paired only within a group. Divide ±15 μm into k equal groups, each 30 over k wide. Within a group both deviations lie in the same interval of width w, so their difference is less than w and the clearance stays within the nominal plus or minus w. With 3 groups w is 10 μm, so the clearance is always between 10 and 30, whatever the parts' own accuracy. That is measurement replacing accuracy, and measuring is far cheaper than machining more accurately. Three costs: measure everything and manage by group; measurement error misgrades parts near boundaries; and, most important, both parts must arrive in equal numbers per group."
+   ]
+  },
+  {
+   "title": [
+    "蒙特卡罗算例：分几组、怎样防剩余件",
+    "Monte Carlo example: how many groups, and how to avoid leftovers"
+   ],
+   "points": [
+    [
+     "完全互换 84.5%、24.9 元；提高精度（σ 2.6）99.2%、39.8 元；分 3 组 99.6%、剩余 1.7%、22.3 元",
+     "Interchangeable 84.5%, 24.9 yuan; tighter (σ 2.6) 99.2%, 39.8 yuan; 3 groups 99.6%, 1.7% left, 22.3 yuan"
+    ],
+    [
+     "分 2 组只有 97.9%；分 4 组 100% 但剩余与管理费增加：组宽不大于允许变化再留余量",
+     "2 groups only 97.9%; 4 groups 100% but more leftovers and overhead: group width ≤ allowed variation, with margin"
+    ],
+    [
+     "测量误差 1 → 2 μm：3 组合格率 99.6% → 98.4%；量仪误差约不超过公差的十分之一（示意）",
+     "Measurement error 1 → 2 μm: 3-group yield 99.6% → 98.4%; keep gauge error to about a tenth of the tolerance (illustrative)"
+    ],
+    [
+     "梭道均值偏 +4 μm：合格率仍 99.6%，剩余件升到 27%、30.1 元；梭床目标也调 +4 μm 回到 1.8%",
+     "Race mean +4 μm: yield still 99.6% but leftovers 27% and 30.1 yuan; moving the rib target +4 μm too brings it back to 1.8%"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c24_select.png",
+   "narration": [
+    "模拟一批 2000 套，结论有四条。第一，分组选配用经济精度达到了高合格率：分 3 组 99.6%、每套 22.3 元，而完全互换靠提高精度要 39.8 元，贵约 80%。第二，组不是越多越好：2 组不够，4 组管理费和剩余件增加。第三，测量误差吃余量：从 1 微米增到 2 微米，3 组合格率降到 98.4%，所以量仪要比零件公差准得多。第四，现场最容易忽视：两种零件的分布必须一致。梭道磨床修整砂轮后均值偏了 4 微米，合格率不变，剩余件却升到 27%。补救是让梭床跟上，或把梭道拉回中心。",
+    "Simulating a batch of 2000 sets with the textbook model gives four conclusions. First, grouping reaches a high yield with economical accuracy: 3 groups give 99.6% at 22.3 yuan per set, while full interchangeability by tighter accuracy costs 39.8, about 80% more. Second, more groups is not always better: 2 are not enough, 4 add a little yield but more overhead and leftovers. Third, measurement error eats margin: from 1 to 2 μm the 3-group yield drops to 98.4%, so gauges must be far more accurate than the parts. Fourth, the one most often missed: both distributions must match. After a wheel dressing the race mean shifted 4 μm; yield stayed, but leftovers jumped to 27%. The cure is moving the basket target to follow, or bringing the race back to centre."
+   ]
+  },
+  {
+   "title": [
+    "数字化：工艺路线、检验计划与测量数据",
+    "Going digital: routes, inspection plans and measurement data"
+   ],
+   "points": [
+    [
+     "按 factory/data.py 的写法写物料、工作中心、工艺路线、BOM 和检验模板",
+     "Write items, work centres, routes, BOMs and inspection templates in the factory/data.py style"
+    ],
+    [
+     "瓶颈：机针线热处理和抛光（单班约 80 千支）；旋梭线梭道与导轨磨床（每套 14 min、2 台，约 69 套）",
+     "Bottlenecks: needle heat treatment and polishing (about 80 thousand per shift); hook race and rib grinders (14 min per set, 2 machines, about 69 sets)"
+    ],
+    [
+     "选配站发 quality.measurement 到 wq/sewing/quality/hk-match/measurement，data 里加 group、gauge、lot",
+     "The matching station sends quality.measurement to wq/sewing/quality/hk-match/measurement, adding group, gauge and lot to data"
+    ],
+    [
+     "历史库自动算控制图和各组件数；AI 工厂助手附证据提醒，改参数仍由人确认",
+     "The historian computes control charts and group counts automatically; the AI factory assistant alerts with evidence, and people confirm any change"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c24_digital.png",
+   "narration": [
+    "工艺路线、检验计划和选配规则最终要变成数字工厂的数据。按减速器厂 data.py 的写法写出物料、工作中心、工艺路线、BOM 和检验模板，ERP、MES 才能用。用它做瓶颈分析：机针线卡在热处理和抛光，单班约 80 千支；旋梭线卡在梭道与导轨磨床，每套占 14 分钟、只有 2 台，单班约 69 套。精度最高的工序恰好产能最紧，剩余件和返修吃掉的正是瓶颈产能。测量数据按统一信封上总线，分组号、量仪号、批号直接加在 data 里；历史库自动画控制图，AI 助手附证据提醒，改参数仍由人确认。",
+    "Routes, inspection plans and matching rules must finally become digital-factory data. Written in the style of the WenQuest gearbox plant's data.py — items, work centres, routes, BOMs and inspection templates — they let ERP cost and plan and MES dispatch and book work. They also support bottleneck analysis: the needle line is limited by heat treatment and polishing, about 80 thousand per shift; the hook line by the race and rib grinders, 14 minutes per set on only 2 machines, about 69 sets a shift. The most precise operation is also the tightest in capacity, so leftovers and rework eat bottleneck time. Measurements go onto the bus in the standard envelope with group, gauge and lot added to data; the historian draws control charts, the AI assistant alerts with evidence, and people confirm any change."
+   ]
+  },
+  {
+   "title": [
+    "模型的边界与现场要点",
+    "Limits of the models and shop-floor notes"
+   ],
+   "points": [
+    [
+     "工艺流程按原理整理，温度、材料、公差、成本均为示意；刚度只算针身直径",
+     "Routes are reconstructed from principles; temperatures, materials, tolerances and costs are illustrative; stiffness counts only blade diameter"
+    ],
+    [
+     "Cpk 与控制图假设正态、各组独立；直度、毛刺是偏态的单侧特性，小样本 Cpk 只作参考",
+     "Cpk and charts assume normality and independent subgroups; straightness and burrs are skewed one-sided characteristics, and small-sample Cpk is only a guide"
+    ],
+    [
+     "选配把梭道、导轨简化成一个直径，未计圆度、截面形状、热膨胀和磨损",
+     "Matching treats race and rib as single diameters, ignoring roundness, section shape, thermal growth and wear"
+    ],
+    [
+     "冲头按冲次强制换；断针找齐碎片并分析断口；选配件按组号入库发料",
+     "Replace punches by stroke count; collect all fragments of a broken needle and analyse the fracture; store and issue matched parts by group"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后说模型的边界。工艺流程是按工艺原理整理的典型路线，不同厂家差别很大，温度、材料、镀层都只给了示意值。针号与刚度只看了针身直径，没计锥部、长槽和针孔的削弱。Cpk 和控制图假设正态、各组独立；直度、毛刺高度这类越小越好的特性往往偏态，样本少时 Cpk 误差很大。ARL 只算了点出界一条准则。选配把梭道和导轨各简化成一个直径，没计圆度、热膨胀和磨损；剩余件实际可以留到下一批再配。现场记住：冲头按冲次换，断针找齐碎片，选配件按组号管理。",
+    "Finally the limits. The routes are typical ones reconstructed from process principles; real makers differ widely, and temperatures, materials and coatings are illustrative. Stiffness looked only at blade diameter, ignoring the weakening by taper, groove and eye. Cpk and control charts assume normality and independent subgroups; smaller-is-better characteristics such as straightness and burr height are often skewed, and small-sample Cpk is very uncertain. ARL used only the point-outside rule. Matching reduced race and rib to single diameters, ignoring roundness, thermal growth and wear, and leftovers can in practice wait for the next batch. On the floor: change punches by stroke count, collect every fragment of a broken needle, manage matched parts by group number."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "机针靠成形一致性与全数视觉检测，旋梭靠精磨、研磨与选配；冲针孔和梭道精磨分别是两条线上最关键的工序。",
+   "Needles rely on consistent forming and full vision inspection, hooks on grinding, lapping and matching; eye punching and race grinding are the most critical operations on each line."
+  ],
+  [
+   "针身刚度 ∝ d⁴：Nm 110 是 Nm 90 的 2.23 倍；回火温度是硬度与韧性的平衡点，机针要“宁弯不断”。",
+   "Blade stiffness ∝ d⁴: Nm 110 is 2.23 × Nm 90; tempering temperature balances hardness and toughness — a needle should bend rather than break."
+  ],
+  [
+   "Cp 比宽度、Cpk 还看偏移；控制限 X̿ ± A₂R̄ 来自工序本身；ARL 说明抽样数越大，漂移发现得越快。",
+   "Cp compares widths, Cpk also offset; control limits X̿ ± A₂R̄ come from the process itself; ARL shows larger subgroups catch drifts sooner."
+  ],
+  [
+   "梭道—梭床间隙无可调环：完全互换约 84%；分 3 组选配用经济精度达到 99.6%，每套比提高精度便宜约 44%，但两种零件的分布必须一致。",
+   "The race-to-basket clearance has no adjustable link: about 84% when interchangeable; three-group matching reaches 99.6% with economical accuracy, about 44% cheaper per set than tighter accuracy, provided both distributions match."
+  ],
+  [
+   "工艺路线、检验计划和测量消息写成数字工厂数据，才能自动做控制图、选配统计和瓶颈分析。",
+   "Routes, inspection plans and measurement messages written as digital-factory data make automatic control charts, matching statistics and bottleneck analysis possible."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "hookfit",
+   "no": "24-1",
+   "title": [
+    "旋梭选配与工序能力",
+    "Rotary-hook selective assembly and process capability"
+   ],
+   "goal": [
+    [
+     "比较完全互换、提高精度和分组选配三种方案的合格率、剩余件和每套成本。",
+     "Compare yield, leftovers and cost per set for interchangeability, tighter accuracy and grouped matching."
+    ],
+    [
+     "观察两种零件分布不一致（均值偏移、σ 不等）对剩余件的影响，并找出补救办法。",
+     "See how mismatched distributions (mean shift, unequal σ) create leftovers, and find remedies."
+    ],
+    [
+     "用针孔宽度工序的控制图理解 Cp、Cpk、控制限与 ARL，并选择合适的抽样数。",
+     "Use the eye-width control chart to understand Cp, Cpk, control limits and ARL, and choose a suitable subgroup size."
+    ]
+   ],
+   "theory": [
+    [
+     "直径间隙 c = 20 + x − y（μm），允许 10–30 μm；x、y 分别为梭道、导轨直径偏差，按正态分布加工。",
+     "Diametral clearance c = 20 + x − y (μm), allowed 10–30 μm; x and y are the race and rib deviations, normally distributed."
+    ],
+    [
+     "全部测量（测量误差 σm），超出 ±15 μm 判废；其余按测得值把 −15…+15 μm 等分成 k 组，同组配对，多出来的是剩余不配套件。",
+     "Everything is measured (error σm); parts outside ±15 μm are scrapped; the rest are graded into k equal groups over −15…+15 μm and paired within groups; the surplus are leftovers."
+    ],
+    [
+     "成本：每件加工 10 元 × (5 μm/σ)，测量每件 0.5 元，分组管理每套 0.4 元 × (k − 1)；总费用除以合格套数。",
+     "Cost: machining 10 yuan × (5 μm/σ) per part, measuring 0.5 yuan per part, group management 0.4 yuan × (k − 1) per set; total divided by good sets."
+    ],
+    [
+     "针孔宽度规格 0.360 ± 0.020 mm；σ̂ = R̄/d₂，Cp = (USL − LSL)/6σ̂，Cpk = min(USL − X̿, X̿ − LSL)/3σ̂；控制限 X̿ ± A₂R̄、D₄R̄。",
+     "Eye width 0.360 ± 0.020 mm; σ̂ = R̄/d₂, Cp = (USL − LSL)/6σ̂, Cpk = min(USL − X̿, X̿ − LSL)/3σ̂; limits X̿ ± A₂R̄ and D₄R̄."
+    ],
+    [
+     "漂移 δσ 后 ARL₁ = 1/[Φ(−3 + δ√n) + Φ(−3 − δ√n)]，只用“点出界”一条准则。",
+     "After a δσ drift ARL₁ = 1/[Φ(−3 + δ√n) + Φ(−3 − δ√n)], using only the point-outside rule."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 24-1 第①页，点“恢复标准”（k = 1 完全互换，两零件 σ 5 μm、均值 0，测量误差 1 μm），记录合格率、剩余件、判废件数和每套成本。",
+     "Open page ① of virtual lab 24-1 and press 'Reset to standard' (k = 1 interchangeable, both σ 5 μm, means 0, measurement error 1 μm); record yield, leftovers, scrap and cost per set."
+    ],
+    [
+     "任务 1：保持 k = 1，同时减小“梭道直径加工 σ”和“梭床导轨外径加工 σ”，直到合格率 ≥ 99%，记录此时的 σ 和每套成本。",
+     "Task 1: keep k = 1 and reduce both machining σ sliders until the yield is ≥ 99%; record σ and the cost per set."
+    ],
+    [
+     "把两零件 σ 恢复为 5 μm，把“分组数 k”依次设为 2、3、4、5，记录合格率、剩余件和成本，完成任务 2（合格率 ≥ 99%、剩余件 ≤ 3%、成本 ≤ 25 元）。",
+     "Return both σ to 5 μm and set k to 2, 3, 4 and 5 in turn, recording yield, leftovers and cost; complete task 2 (yield ≥ 99%, leftovers ≤ 3%, cost ≤ 25 yuan)."
+    ],
+    [
+     "在 k = 3 时把“测量误差 σm”从 1 改为 2 和 3 μm，看合格率怎样变化。",
+     "With k = 3, change the measurement error σm from 1 to 2 and 3 μm and watch the yield."
+    ],
+    [
+     "恢复 σm = 1 μm，点“注入：梭道磨削均值 +4 μm”，观察各组件数图和剩余件；再把“梭床导轨外径均值偏差”也调到 +4 μm，比较结果。",
+     "Restore σm = 1 μm, press 'Inject: race grinding mean +4 μm' and watch the group counts and leftovers; then set the rib mean deviation to +4 μm as well and compare."
+    ],
+    [
+     "恢复标准后设 k = 3、梭道 σ 6 μm、梭床 σ 4 μm，观察哪些组哪种零件多出来。",
+     "Reset, then set k = 3, race σ 6 μm and rib σ 4 μm, and see which part is surplus in which groups."
+    ],
+    [
+     "切到第②页，点“恢复标准”（μ 0.362、σ 0.004、n = 5、漂移 0），读出 Cp、Cpk、控制限和 ARL₀。",
+     "Switch to page ②, press 'Reset to standard' (μ 0.362, σ 0.004, n = 5, drift 0) and read Cp, Cpk, the control limits and ARL₀."
+    ],
+    [
+     "任务 3：保持 Cpk 估计值 ≥ 1.33，把“第 26 组起的均值漂移”设为 1.0σ 以上，调整“每组抽样数 n”使 ARL₁ ≤ 5，点“重新抽样”直到本次模拟确实报警，记录报警组号。",
+     "Task 3: keep the estimated Cpk ≥ 1.33, set the drift from subgroup 26 to at least 1.0σ, adjust the subgroup size n so that ARL₁ ≤ 5, and press 'Resample' until this run alarms; record the alarm subgroup."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "选配方案与控制图实验记录",
+     "Record of matching schemes and control-chart runs"
+    ],
+    "headers": [
+     [
+      "页面 / 方案",
+      "Page / scheme"
+     ],
+     [
+      "关键参数（k、σ、均值、σm 或 n、漂移）",
+      "Key settings (k, σ, means, σm or n, drift)"
+     ],
+     [
+      "合格率或 Cpk",
+      "Yield or Cpk"
+     ],
+     [
+      "剩余件或控制限",
+      "Leftovers or control limits"
+     ],
+     [
+      "每套成本或 ARL₁",
+      "Cost per set or ARL₁"
+     ],
+     [
+      "报警组号 / 备注",
+      "Alarm subgroup / notes"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "为什么分组数从 3 增加到 5，合格率提高很少，成本和剩余件却增加？怎样选组数？",
+     "Why does going from 3 to 5 groups add little yield but more cost and leftovers? How should the number of groups be chosen?"
+    ],
+    [
+     "梭道均值偏 +4 μm 时，为什么合格率几乎不变而剩余件大增？两种补救办法各有什么利弊？",
+     "With the race mean +4 μm, why is the yield almost unchanged while leftovers soar? What are the pros and cons of the two remedies?"
+    ],
+    [
+     "控制限和规格限有什么不同？点出界而针仍在规格内，为什么也要停下来查？",
+     "How do control limits differ from specification limits? Why stop and investigate when a point is outside the limits but the needles are still in spec?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "机针工序能力与旋梭选配方案",
+   "Needle process capability and a hook-matching plan"
+  ],
+  "tasks": [
+   [
+    "(a) 同样长度下，Nm 120 和 Nm 65 的针身抗弯刚度各是 Nm 90 的多少倍？(b) 某针厂直度规格只有上限 0.030 mm，过程均值 0.012 mm、标准差 0.004 mm，求单侧 Cpk；若冲头和校直机磨损后均值 0.015 mm、标准差 0.005 mm，Cpk 变为多少？(c) 直度不服从正态分布，这对 Cpk 的使用意味着什么？",
+    "(a) At equal length, how many times as stiff as Nm 90 are Nm 120 and Nm 65 blades? (b) A needle maker's straightness spec has only an upper limit of 0.030 mm; the process mean is 0.012 mm and σ 0.004 mm — find the one-sided Cpk. After punch and straightener wear the mean is 0.015 mm and σ 0.005 mm — what is Cpk now? (c) Straightness is not normally distributed; what does that mean for using Cpk?"
+   ],
+   [
+    "针孔宽度均值控制图只用“点出界”准则。希望 0.8σ 的漂移平均 6 组以内报警，每组至少要抽几支？用 ARL 公式列表计算 n = 4–8 的 ARL₁，并在虚拟实验 24-1 第②页把漂移设为 0.8σ 核对一次；再说明对硬度这类破坏性项目应怎样做。",
+    "The eye-width X̄ chart uses only the point-outside rule. For a 0.8σ drift to alarm within 6 subgroups on average, what is the smallest subgroup size? Tabulate ARL₁ for n = 4–8 with the ARL formula, check one case on page ② of virtual lab 24-1 with the drift set to 0.8σ, and explain what to do for destructive items such as hardness."
+   ],
+   [
+    "旋梭直径间隙要求 10–30 μm。用虚拟实验 24-1 第①页给出一个方案：在两零件 σ = 5 μm 下选组数，使合格率 ≥ 99%、剩余件 ≤ 3%、成本 ≤ 25 元；再注入“梭道磨削均值 +4 μm”，给出补救措施和补救后的数据，并说明你会在数字工厂看板上盯哪几个指标。",
+    "The hook's diametral clearance must be 10–30 μm. Using page ① of virtual lab 24-1, propose a plan: with both σ = 5 μm, choose the number of groups to reach yield ≥ 99%, leftovers ≤ 3% and cost ≤ 25 yuan; then inject 'race grinding mean +4 μm', give a remedy with its resulting data, and state which indicators you would watch on the digital-factory dashboard."
+   ],
+   [
+    "（数字化）为“梭尖到安装基准的位置”写一条检验项目：物料、特性名、名义值与上下偏差（算例 ±0.02 mm）、由哪个工作中心测量、发到哪个主题，并写出一条 quality.measurement 消息的 data 部分。另：若梭道磨床由 2 台增到 3 台，旋梭线单班产能变为多少？下一个瓶颈是什么？",
+    "(Digital) Write an inspection item for 'hook point to mounting datum': item, characteristic name, nominal and limits (±0.02 mm in the example), measuring work centre and topic, and the data part of one quality.measurement message. Also: if race grinders go from 2 to 3, what is the hook line's capacity per shift, and what is the next bottleneck?"
+   ]
+  ],
+  "deliverable": [
+   "报告一份（不超过 5 页）：第 1、2 题计算与表格；第 3 题实验截图、数据与建议；第 4 题检验项目、消息示例与产能计算。",
+   "A report of at most 5 pages: calculations and tables for tasks 1 and 2; lab screenshots, data and recommendations for task 3; the inspection item, message example and capacity calculation for task 4."
+  ],
+  "rubric": [
+   [
+    "第 1、2 题计算正确（35 分）",
+    "Correct calculations in tasks 1 and 2 (35 points)"
+   ],
+   [
+    "选配方案数据完整、补救措施有依据（25 分）",
+    "Complete matching-plan data with justified remedies (25 points)"
+   ],
+   [
+    "检验项目与消息格式符合数字工厂规范，产能计算正确（25 分）",
+    "Inspection item and message follow the digital-factory conventions; capacity correct (25 points)"
+   ],
+   [
+    "表达清楚、结论先行（15 分）",
+    "Clear presentation, conclusions first (15 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "机针和旋梭代表两种制造思路。下列哪种概括正确？",
+    "Needles and hooks represent two manufacturing approaches. Which summary is right?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "机针靠成形工艺的一致性和全数自动检测；旋梭靠精磨、研磨和选配",
+      "Needles rely on consistent forming and full automatic inspection; hooks on grinding, lapping and selective assembly"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "机针靠选配保证凹口位置；旋梭靠全数视觉检测保证间隙",
+      "Needles use matching for scarf position; hooks use full vision inspection for clearance"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "两者都靠装配时调整来保证精度",
+      "Both rely on adjustment at assembly for accuracy"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "机针单件贵、批量小；旋梭单件便宜、批量大",
+      "Needles are expensive and low-volume; hooks cheap and high-volume"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "机针是“大批量、单件便宜、每支都要合格”；旋梭是“中批量、单件贵、配合要准”。",
+    "Needles: huge volume, cheap, every one good; hooks: medium volume, expensive, precise fits."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "同样长度的针身，Nm 100 的抗弯刚度是 Nm 80 的多少倍？",
+    "At equal length, how many times as stiff in bending is an Nm 100 blade as an Nm 80 blade?"
+   ],
+   "answer": 2.44,
+   "tolerance": 0.02,
+   "unit": "",
+   "feedback": [
+    "EI ∝ d⁴：(1.00/0.80)⁴ ≈ 2.44。直径只大 25%，刚度大一倍半。",
+    "EI ∝ d⁴: (1.00/0.80)⁴ ≈ 2.44. A 25% larger diameter gives about two and a half times the stiffness."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "机针回火温度取低一些，会怎样？",
+    "What happens if needles are tempered at a lower temperature?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "硬度高、耐磨，但更脆，撞硬物时容易断",
+      "Harder and more wear-resistant, but more brittle, breaking on hard objects"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "韧性好、宁弯不断，但针尖和针孔磨得快",
+      "Tougher, bending rather than breaking, but point and eye wear faster"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "消除淬火变形，不必再校直",
+      "It removes hardening distortion, so no straightening is needed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "表面不会脱碳，可以省去保护气氛",
+      "The surface cannot decarburise, so no protective atmosphere is needed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "回火温度是“硬度—韧性”平衡的主要调节手段；温度高则相反。断针碎片留在衣服里是严重事故，所以要在耐磨和宁弯不断之间取平衡。",
+    "Tempering temperature is the main lever on the hardness–toughness balance; a higher one does the opposite. Fragments left in a garment are a serious incident, so wear resistance must be balanced against bending before breaking."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "下列机针检测项目中，哪些可以用光学方法在线全检？",
+    "Which needle checks can be done 100% in line by optical methods?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "针身直径",
+      "Blade diameter"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "直度",
+      "Straightness"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "针孔宽度与位置",
+      "Eye width and position"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "显微维氏硬度",
+      "Micro-Vickers hardness"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "镀层附着力",
+      "Plating adhesion"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "外形尺寸都能非接触测，这是机针能全数检测的原因；硬度、镀层附着要接触或破坏，只能抽检。",
+    "Outline dimensions can be measured without contact, which is why needles can be fully inspected; hardness and adhesion need contact or destruction and are sampled."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "全回转旋梭梭尖半径 13.5 mm，主轴 4500 r/min。梭尖线速度约为多少？",
+    "A full rotary hook has its point at 13.5 mm radius; the spindle runs at 4500 r/min. What is the point speed?"
+   ],
+   "answer": 12.7,
+   "tolerance": 0.1,
+   "unit": "m/s",
+   "feedback": [
+    "旋梭转速是主轴两倍 9000 r/min：v = 2π × 0.0135 × 9000/60 ≈ 12.7 m/s。",
+    "The hook turns at twice spindle speed, 9000 r/min: v = 2π × 0.0135 × 9000/60 ≈ 12.7 m/s."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "针孔宽度规格 0.360 ± 0.020 mm，过程均值 0.358 mm、标准差 0.005 mm。Cpk 是多少？",
+    "Eye width spec 0.360 ± 0.020 mm, process mean 0.358 mm, σ 0.005 mm. What is Cpk?"
+   ],
+   "answer": 1.2,
+   "tolerance": 0.02,
+   "unit": "",
+   "feedback": [
+    "Cpk = min(0.380 − 0.358, 0.358 − 0.340)/(3 × 0.005) = 0.018/0.015 = 1.20；Cp = 0.040/0.030 ≈ 1.33，偏心使 Cpk 低于 Cp。",
+    "Cpk = min(0.380 − 0.358, 0.358 − 0.340)/(3 × 0.005) = 0.018/0.015 = 1.20; Cp = 0.040/0.030 ≈ 1.33, and the offset puts Cpk below Cp."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "均值控制图的控制限是由规格限算出来的，点落在控制限以内就说明针孔宽度合格。",
+    "The control limits of an X̄ chart are computed from the specification limits, so a point inside them means the eye width is in spec."
+   ],
+   "correct": false,
+   "feedback": [
+    "控制限 X̿ ± A₂R̄ 来自工序本身的波动，与规格限无关；它判断的是工序有没有变，而不是零件是否合格。",
+    "The limits X̿ ± A₂R̄ come from the process's own variation and are unrelated to the specification; they judge whether the process changed, not whether parts conform."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "均值控制图每组抽 4 支，只用“点出界”准则。均值漂移 1σ 后，平均多少组报警（ARL₁）？",
+    "An X̄ chart uses subgroups of 4 and only the point-outside rule. After a 1σ drift, how many subgroups on average until an alarm (ARL₁)?"
+   ],
+   "answer": 6.3,
+   "tolerance": 0.1,
+   "unit": "",
+   "feedback": [
+    "δ√n = 2：p = Φ(−1) + Φ(−5) ≈ 0.159，ARL₁ = 1/p ≈ 6.3 组（表 24-4）。",
+    "δ√n = 2: p = Φ(−1) + Φ(−5) ≈ 0.159, ARL₁ = 1/p ≈ 6.3 (Table 24-4)."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "梭道与梭床导轨各按 σ = 3 μm 加工，名义间隙 20 μm、允许 10–30 μm，完全互换。合格率约为百分之多少？",
+    "Race and rib are each made with σ = 3 μm; nominal clearance 20 μm, allowed 10–30 μm, fully interchangeable. What percentage is good?"
+   ],
+   "answer": 98.2,
+   "tolerance": 0.2,
+   "unit": "%",
+   "feedback": [
+    "σc = 3√2 ≈ 4.24 μm，±10/4.24 ≈ ±2.36σ，合格率 = 2Φ(2.36) − 1 ≈ 98.2%，仍不到 99%。",
+    "σc = 3√2 ≈ 4.24 μm, ±10/4.24 ≈ ±2.36σ, yield = 2Φ(2.36) − 1 ≈ 98.2%, still short of 99%."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "梭道磨床修整砂轮后均值偏了 +4 μm，分 3 组选配的合格率几乎不变，剩余件却升到约 27%。下列做法哪个最根本？",
+    "After a wheel dressing the race mean shifted +4 μm; the 3-group yield is almost unchanged but leftovers rose to about 27%. Which action is most fundamental?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "查明原因，把梭道磨削的均值拉回公差中心",
+      "Find the cause and bring the race grinding mean back to the centre of tolerance"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "把多出来的零件跨组硬配",
+      "Force-fit the surplus parts across groups"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "把分组数增加到 6 组",
+      "Increase to 6 groups"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "降低测量误差到 0.5 μm",
+      "Reduce measurement error to 0.5 μm"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "让梭床目标也调 +4 μm 见效快（剩余件回到 1.8%），但两种零件一起偏离名义值，可能影响备件互换；跨组硬配会使间隙超差。",
+    "Moving the rib target +4 μm works fast (leftovers back to 1.8%) but shifts both parts off nominal, which may affect spare-part interchange; cross-group fitting puts clearances out of tolerance."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "针孔宽度控制图前 25 组（每组 5 支）得 X̿ = 0.3605 mm、R̄ = 0.0080 mm，A₂ = 0.577。均值图的上控制限是多少毫米？",
+    "The first 25 subgroups of 5 give X̿ = 0.3605 mm and R̄ = 0.0080 mm, with A₂ = 0.577. What is the upper control limit of the X̄ chart in millimetres?"
+   ],
+   "answer": 0.3651,
+   "tolerance": 0.0002,
+   "unit": "mm",
+   "feedback": [
+    "上控制限 UCL = 0.3605 + 0.577 × 0.0080 ≈ 0.3651 mm；下控制限 LCL ≈ 0.3559 mm。",
+    "UCL = 0.3605 + 0.577 × 0.0080 ≈ 0.3651 mm; LCL ≈ 0.3559 mm."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "均值控制图每组 3 支，只用“点出界”准则。均值漂移 1.5σ 后的 ARL₁ 是多少？",
+    "An X̄ chart with subgroups of 3 uses only the point-outside rule. What is ARL₁ after a 1.5σ drift?"
+   ],
+   "answer": 2.9,
+   "tolerance": 0.1,
+   "unit": "",
+   "feedback": [
+    "δ√n = 1.5√3 ≈ 2.60：p = Φ(−0.40) + Φ(−5.60) ≈ 0.345，ARL₁ ≈ 2.9 组。",
+    "δ√n = 1.5√3 ≈ 2.60: p = Φ(−0.40) + Φ(−5.60) ≈ 0.345, ARL₁ ≈ 2.9."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "旋梭直径间隙名义 20 μm、允许 ±10 μm。若不分组、完全互换，且两零件 σ 相等，要使合格率达到 99.5%，每个零件的 σ 最大是多少微米？",
+    "The diametral clearance is nominal 20 μm, allowed ±10 μm. Without grouping and with equal σ for both parts, what is the largest σ per part for a 99.5% yield?"
+   ],
+   "answer": 2.52,
+   "tolerance": 0.03,
+   "unit": "μm",
+   "feedback": [
+    "需 ±10 μm = 2.807σc（双侧 99.5%），σc ≤ 3.56 μm；每件 σ ≤ 3.56/√2 ≈ 2.52 μm。",
+    "±10 μm must equal 2.807σc (two-sided 99.5%), so σc ≤ 3.56 μm and each part σ ≤ 3.56/√2 ≈ 2.52 μm."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "分组选配用测量代替提高加工精度。它的代价有哪些？",
+    "Grouped matching replaces accuracy with measurement. What are its costs?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "全部零件都要测量，并按组存放、按组号管理库存",
+      "Every part must be measured and stored and managed by group"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "测量误差会把组界附近的零件分错组",
+      "Measurement error misgrades parts near group boundaries"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "两种零件分布不一致时，各组件数不等，产生剩余不配套件",
+      "Mismatched distributions give unequal group counts and leftovers"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "必须先把零件加工精度提高一倍",
+      "Part accuracy must first be doubled"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "分组越多，合格率越低",
+      "More groups give a lower yield"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "分组选配的零件仍按经济精度加工；组越多间隙越集中，但管理费和剩余件增加；选配的零件坏了还要整套更换。",
+    "Matched parts are still made economically; more groups concentrate the clearance but add overhead and leftovers; and a failed matched part means replacing the whole set."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "为什么说机针凹口的位置精度实际上是整台缝纫机梭尖间隙的一部分？",
+    "Why is the scarf position accuracy of a needle really part of the machine's hook-point clearance?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "凹口面尺寸是尺寸链中换针时会变的一环，整机厂没法调用户买的每根针，只能对机针厂提出公差",
+      "The scarf dimension is the chain link that changes with each needle; the machine maker cannot adjust every needle a user buys, only specify the needle maker's tolerance"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "凹口位置决定针身刚度",
+      "The scarf position determines blade stiffness"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "凹口由整机厂在装配时冲出",
+      "The scarf is punched by the machine maker at assembly"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "凹口位置偏差可以由旋梭选配吸收",
+      "Scarf position error can be absorbed by hook matching"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "第 23 章：装配调整只对装上的那根针有效，换针后凹口面和装针偏转两环又回来，合格率约降到 98%。",
+    "Chapter 23: adjustment holds only for the needle fitted; after a change the scarf and twist links return and the yield falls to about 98%."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "机针与旋梭的工艺路线和关键工序；Cp、Cpk、控制限与 ARL；分组选配的原理、代价与剩余件；工艺与检验数据的数字化。",
+   "The routes and key operations of needles and hooks; Cp, Cpk, control limits and ARL; the principle, costs and leftovers of grouped matching; digitising process and inspection data."
+  ],
+  "difficult": [
+   "控制限与规格限的区别、ARL 与抽样数的关系、以及“合格率不变而剩余件大增”的原因，学生不易理解；要用虚拟实验的控制图和各组件数图现场演示。",
+   "The difference between control and specification limits, ARL versus subgroup size, and why leftovers soar while yield stays put are hard for students; demonstrate them live with the lab's control chart and group-count chart."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：车间里的断针和“旋梭响”",
+     "Opening: broken needles and noisy hooks"
+    ],
+    "minutes": 10,
+    "content": [
+     "从两类修机请求引出两种制造思路，给出旋梭间隙问题。",
+     "Use the two kinds of repair call to introduce two manufacturing approaches and pose the hook-clearance problem."
+    ]
+   },
+   {
+    "phase": [
+     "机针结构、针号与刚度",
+     "Needle anatomy, size and stiffness"
+    ],
+    "minutes": 20,
+    "content": [
+     "讲针系统、针号、d⁴ 关系、针尖与关键质量特性。",
+     "Cover needle systems, sizes, the d⁴ relation, points and key characteristics."
+    ]
+   },
+   {
+    "phase": [
+     "机针工艺路线",
+     "Needle process route"
+    ],
+    "minutes": 25,
+    "content": [
+     "按五段讲工序，重点讲冲针孔和回火。",
+     "Go through the five stages, stressing eye punching and tempering."
+    ]
+   },
+   {
+    "phase": [
+     "检测与统计过程控制",
+     "Inspection and statistical process control"
+    ],
+    "minutes": 35,
+    "content": [
+     "推导 Cp、Cpk、控制限和 ARL，当堂算针孔算例和表 24-4 的几格。",
+     "Derive Cp, Cpk, control limits and ARL; compute the eye-width example and cells of Table 24-4 in class."
+    ]
+   },
+   {
+    "phase": [
+     "旋梭结构与工艺",
+     "Hook structure and process"
+    ],
+    "minutes": 20,
+    "content": [
+     "工作条件表、四条要求、两条工艺线与一次装夹原则。",
+     "Working-condition table, four requirements, the two lines and the single-set-up principle."
+    ]
+   },
+   {
+    "phase": [
+     "选配与蒙特卡罗",
+     "Selective assembly and Monte Carlo"
+    ],
+    "minutes": 30,
+    "content": [
+     "讲完全互换、分组原理和三种代价，用表 24-7 解答导入问题。",
+     "Cover interchangeability, grouping and its three costs; answer the opening problem with Table 24-7."
+    ]
+   },
+   {
+    "phase": [
+     "数字化与虚拟实验 24-1",
+     "Digitisation and virtual lab 24-1"
+    ],
+    "minutes": 40,
+    "content": [
+     "讲主数据、瓶颈与测量消息（15 min）；学生完成实验三个任务（25 min）；小结并布置作业。",
+     "Cover master data, bottlenecks and measurement messages (15 min); students do the three lab tasks (25 min); summarise and set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“机针工序能力与旋梭选配方案”；预习第 25 章机壳与凸轮的制造。",
+   "Complete the assignment on needle process capability and hook matching; read ahead Chapter 25 on housings and cams."
+  ]
+ }
+}

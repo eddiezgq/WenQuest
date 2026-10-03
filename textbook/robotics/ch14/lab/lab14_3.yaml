@@ -1,0 +1,38 @@
+# 实验 14.3 的指导书与报告模板。目的、场景、参数、任务取自 lab14_3.js。
+原理:
+  - ["绕一根轴转动时：轴上的点不动；到轴上一点的距离不变；沿轴方向的分量不变（引理 14.3.1）。三个帕登-卡汉子问题都由此求解。",
+     "A rotation about an axis fixes the points on the axis, keeps distances to them and keeps the component along the axis (Lemma 14.3.1). The three Paden–Kahan subproblems follow from this."]
+  - ["子问题 2：先绕 ω₂、再绕 ω₁ 把 p 转到 q。中间点 c 在 p 绕 ω₂ 的圆与 q 绕 ω₁ 的圆的交点上，一般有两个。",
+     "Subproblem 2: turn p about ω₂ and then ω₁ to reach q. The middle point c lies where the circle of p about ω₂ meets the circle of q about ω₁; usually there are two."]
+  - 式: "c − r = α ω̂₁ + β ω̂₂ + γ ω̂₁ × ω̂₂          (14.3.6)–(14.3.8)"
+  - ["子问题 3：绕轴转动 p，使它到 q 的距离为 δ。先扣除沿轴方向的距离，δ′² = δ² − (ω̂ᵀ(p − q))²，再在垂直于轴的平面内用余弦定理。",
+     "Subproblem 3: turn p about the axis so that its distance to q is δ. Remove the distance along the axis, δ′² = δ² − (ω̂ᵀ(p − q))², then use the law of cosines in the plane normal to the axis."]
+  - 式: "θ = θ₀ ± arccos((|u′|² + |v′|² − δ′²) / (2|u′||v′|))          (14.3.10)"
+步骤:
+  - ["打开实验 14.3 的“手腕：子问题 2”场景。设目标方位 45°、仰角 −35.26°，即 d = (1, 1, −1)/√3。读出两组 (θ₅, θ₆)，与算例 14.3.2 比较，记入表 1（任务 1）。",
+     "Open scene “Wrist: Subproblem 2”. Set azimuth 45°, elevation −35.26°, i.e. d = (1, 1, −1)/√3. Read both (θ₅, θ₆), compare with Example 14.3.2 and record in Table 1 (task 1)."]
+  - ["把“第几组解”改为 1（任务 2）。观察红色箭头（模型的末端 x 轴）是否仍与金色箭头重合，读出夹角。",
+     "Set “which solution” to 1 (task 2). Check that the red arrow (the model's tool x axis) still coincides with the gold one; record the angle."]
+  - ["再任取三个目标方向，记录两组解，验证两组的 θ₅ 是否总相差 180°、θ₆ 有什么关系。",
+     "Choose three more directions, record both solutions, and check whether θ₅ always differs by 180° and how θ₆ relates."]
+  - ["切换到“肘部：子问题 3”，δ = 0.6 m，读出两个 θ₃ 和模型上测得的 |q₄ − q₂|（任务 3），用式 (14.3.9)、(14.3.10) 手算核对。",
+     "Switch to “Elbow: Subproblem 3”, δ = 0.6 m; read both θ₃ and the measured |q₄ − q₂| (task 3), checking by hand with Eqs. (14.3.9) and (14.3.10)."]
+  - ["逐步增大 δ 直到 0.827 m 以上，记录 θ₃ 的变化（任务 4），记入表 2。",
+     "Increase δ step by step beyond 0.827 m, recording θ₃ (task 4) in Table 2."]
+  - ["切换到“云台对准星星”，方位 120°、仰角 30°，分别选两组解，观察相机是否倒过来（任务 5）。",
+     "Switch to “A camera mount aimed at a star”, azimuth 120°, elevation 30°; try both solutions and see whether the camera is upside down (task 5)."]
+数据表:
+  - 标题: ["表 1  手腕的两组解（子问题 2）", "Table 1  The two wrist solutions (Subproblem 2)"]
+    表头: ["目标方向 d", "解 0 (θ₅, θ₆) / (°)", "解 1 (θ₅, θ₆) / (°)", "模型核对夹角 / (°)"]
+    表头英文: ["Target direction d", "Solution 0 (θ₅, θ₆) / (°)", "Solution 1 (θ₅, θ₆) / (°)", "Model check angle / (°)"]
+    行: [["(1, 1, −1)/√3", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+  - 标题: ["表 2  肘部的两个解（子问题 3）", "Table 2  The two elbow solutions (Subproblem 3)"]
+    表头: ["δ / m", "δ′ / m", "θ₃ 的两个解 / (°)", "模型上 |q₄ − q₂| / m"]
+    表头英文: ["δ / m", "δ′ / m", "The two θ₃ / (°)", "|q₄ − q₂| on the model / m"]
+    行: [["0.6", "", "", ""], ["0.7", "", "", ""], ["0.8", "", "", ""], ["0.827", "", "", ""]]
+注意:
+  - ["坐标以 UR5e 的基座坐标系 {s} 表示；三维视图中的坐标轴画的就是 {s}。", "Coordinates are in the UR5e base frame {s}; the axes drawn in the view are {s}."]
+  - ["方位角从 x 轴量起、逆时针为正；仰角向上为正。", "Azimuth is measured from the x axis, counter-clockwise positive; elevation is positive upward."]
+  - ["手腕场景中其余关节都为零，肘部场景中只有关节 3 转动。", "In the wrist scene all other joints are zero; in the elbow scene only joint 3 turns."]
+思考题:
+  - ["δ 小于多少时肘部场景无解？用 L₁、L₂、W₂ 写出这个下限，并在实验中验证。", "Below what δ does the elbow scene have no solution? Write the bound in L₁, L₂, W₂ and check it in the lab."]

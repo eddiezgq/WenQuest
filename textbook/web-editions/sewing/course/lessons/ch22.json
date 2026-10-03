@@ -1,0 +1,1212 @@
+{
+ "no": 22,
+ "title": [
+  "自动化测试与持续迭代",
+  "Automated Testing and Continuous Iteration"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能说出测试金字塔五层各测什么、多快、多贵，并判断一个缺陷应当在哪一层被发现。",
+   "State what each of the five levels of the test pyramid tests, how fast and at what cost, and decide at which level a given defect should be caught."
+  ],
+  [
+   "能把验收要求写成编号需求，用 pytest 的夹具、参数化和标记写出可追溯的测试用例。",
+   "Write acceptance requirements as numbered REQs and write traceable test cases with pytest fixtures, parametrisation and markers."
+  ],
+  [
+   "能算出零失效验证的试验次数、有失效时的置信下限、抓住回归所需的次数和单侧 Cpk，并据此判定是否达标。",
+   "Calculate zero-failure trial counts, lower confidence bounds with failures, the trials needed to catch a regression and one-sided Cpk, and judge compliance from them."
+  ],
+  [
+   "能设计每晚 HIL 的用例集和时间预算，并用二分法把失败定位到提交。",
+   "Design a nightly HIL case set within a time budget and locate a failure to a commit by bisection."
+  ],
+  [
+   "能用测试数据定义从 P0 到量产的成熟度退出条件，说明出厂与现场数据怎样回流。",
+   "Define maturity exit criteria from P0 to production with test data, and explain how end-of-line and field data flow back."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "固件升级后，车间里的平缝机偶尔剪不断线",
+   "After a firmware update, lockstitch machines on the floor occasionally fail to trim"
+  ],
+  "text": [
+   "一家西裤厂把 WQ-SC/LS 平缝机的固件从 v1.3.2 升级到 v1.4.0，新版本的“快速剪线”让从 4000 r/min 停车剪线从 0.38 s 缩到约 0.22 s。工程师上线前在样机上 3000–4000 r/min 各试缝了几十次，没有一次剪不断。可是车间里操作工常常一脚踩到 5000 r/min 再松开，厂区电网电压也不稳，几天后开始有零星的“剪不断”报修。按第 22 章的模型，4500 r/min 以下的失败率与改动前相同（约 0.012%），4750 r/min 约 1.2%，5000 r/min 约 17%。剪线电磁铁在剪线针 290° 发令，延迟 6–10 ms，动刀进刀角 = 290° + 6nt，晚过 330° 就剪不断。",
+   "A trouser factory updated its WQ-SC/LS lockstitch firmware from v1.3.2 to v1.4.0, whose 'fast trim' cut a stop-and-trim from 4000 r/min from 0.38 s to about 0.22 s. Before release an engineer sewed a few dozen trials each at 3000–4000 r/min on the prototype without a single failed trim. On the floor, however, operators often floor the pedal to 5000 r/min and then let go, and the plant's mains voltage is unsteady; within days there were scattered 'failed to trim' calls. By the Chapter 22 model the failure rate up to 4500 r/min is unchanged (about 0.012%), about 1.2% at 4750 r/min and about 17% at 5000 r/min. The trimmer solenoid fires at 290° of the trimming stitch with a 6–10 ms delay, the knife enters at 290° + 6nt, and if that is later than 330° the thread is not cut."
+  ],
+  "question": [
+   "(1) 发令时转速超过多少，10 ms 延迟就会剪不断？(2) 如果有人在 4750 r/min 试 50 次，一次失败也看不到的概率有多大？(3) 要以 95% 的置信度证明剪线成功率不低于 99.5%，零失效要测多少次？(4) 每晚在 4750 r/min 测 250 次，抓住这个回归的概率有多大？",
+   "(1) Above what speed at firing does a 10 ms delay mean the trim fails? (2) If someone tried 50 trims at 4750 r/min, what is the chance of seeing no failure at all? (3) How many trials with zero failures are needed to show a trim success rate of at least 99.5% at 95% confidence? (4) With 250 trims a night at 4750 r/min, what is the chance of catching this regression?"
+  ],
+  "answer": [
+   "(1) 290° + 6n × 0.010 ≤ 330° → n ≤ 667 r/min；v1.4.0 从 5000 r/min 停车时发令转速正常电压下约 514 r/min，电压低 10% 时约 1150 r/min，必然剪不断。(2) (1 − 0.012)⁵⁰ ≈ 0.55，一半以上的机会一次也看不到。(3) n ≥ ln 0.05/ln 0.995 = 597.6，取 598 次。(4) 1 − (1 − 0.012)²⁵⁰ ≈ 95%；放在 5000 r/min 几次就能看到。所以每晚的 HIL 要做 3000–5000 r/min 的转速扫描，把次数花在最可能出问题的工况上。",
+   "(1) 290° + 6n × 0.010 ≤ 330° → n ≤ 667 r/min; stopping from 5000 r/min, v1.4.0 fires at about 514 r/min at normal voltage but about 1150 r/min when the voltage is 10% low, which must fail. (2) (1 − 0.012)⁵⁰ ≈ 0.55 — more than an even chance of seeing nothing. (3) n ≥ ln 0.05/ln 0.995 = 597.6, so 598 trials. (4) 1 − (1 − 0.012)²⁵⁰ ≈ 95%; at 5000 r/min a few trims would show it. Hence the nightly HIL sweeps 3000–5000 r/min and spends its trials where failure is most likely."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人控制器的 SIL、HIL 与抓取成功率",
+   "SIL, HIL and grasp success for robot controllers"
+  ],
+  "text": [
+   "机械臂和移动机器人的控制软件同样按金字塔测：单元测试测逆运动学和状态机；SIL 把控制器接到仿真器（如 Gazebo 一类的物理仿真）跑轨迹；HIL 用真的关节驱动器接电机仿真器；最后才上真机测试单元。本章的回归在机器人上有几乎一样的版本：轨迹按关节电机 100% 能力规划，电池电压下降时电机基速降低、进入恒功率区，高速段跟不上参考轨迹，只有带实测转矩–转速曲线的 HIL 或真机能发现。抓取成功率也要按本章的统计算：要以 95% 置信度证明 99.5%，同样要 598 次零失败，所以机器人测试单元会让夹爪每晚自动抓放上千次，结果连同固件版本和序列号上报。",
+   "Robot arm and mobile-robot software is tested by the same pyramid: unit tests for inverse kinematics and state machines; SIL with the controller connected to a physics simulator (Gazebo-like) running trajectories; HIL with real joint drives on a motor emulator; and only then the real robot in a test cell. This chapter's regression has a near twin in robotics: trajectories planned at 100% of joint-motor capability fall behind at high speed when the battery voltage sags, the base speed drops and the motor enters its constant-power region — only HIL with a measured torque–speed curve, or the real robot, will show it. Grasp success follows the same statistics: showing 99.5% at 95% confidence takes 598 grasps without a failure, so robot test cells pick and place thousands of times a night and report results with firmware version and serial number."
+  ]
+ },
+ "life": {
+  "title": [
+   "新雨伞在小雨里不漏，不等于暴雨里不漏",
+   "An umbrella that keeps out drizzle may still leak in a storm"
+  ],
+  "text": [
+   "新买的雨伞在毛毛雨里撑了几次都没漏，并不能说明它在大风暴雨里也不漏；要试，就得专门挑最坏的天气、试足够多次。测试的次数和工况，比“试过了”三个字重要得多。",
+   "A new umbrella that stayed dry in a few drizzles says little about a windy downpour; to know, you must pick the worst weather and try enough times. How often and under what conditions you test matters far more than 'we tried it'."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：一次只在高速出现的剪线失败",
+    "Opening: a trimming failure that shows only at high speed"
+   ],
+   "points": [
+    [
+     "v1.4.0“快速剪线”：减速按 100% 能力、终点推迟到剪线针 180°，每次省约 0.16 s",
+     "v1.4.0 'fast trim': decelerate at 100% capability with the end moved to 180° of the trimming stitch, saving about 0.16 s"
+    ],
+    [
+     "手工试缝、SIL 扫描全通过；当夜 HIL：5000 r/min 停车 250 次失败 43 次",
+     "Hand trials and the SIL sweep passed; that night HIL: 43 failures in 250 stops from 5000 r/min"
+    ],
+    [
+     "恒功率区：高于基速减速能力下降，基速随电网电压变",
+     "Constant-power region: above base speed deceleration capability falls, and base speed moves with mains voltage"
+    ],
+    [
+     "进刀角 290° + 6nt > 330° 剪不断：10 ms 延迟时发令转速须 ≤ 约 667 r/min",
+     "Knife entry 290° + 6nt > 330° fails: with a 10 ms delay the speed at firing must be ≤ about 667 r/min"
+    ]
+   ],
+   "formula": "\\theta_{knife}=290^\\circ+6nt\\le330^\\circ",
+   "figure": "fig_c22_intro.png",
+   "narration": [
+    "先看一个故事。平缝原型 v1.4.0 想把停车剪线做快：减速用满伺服能力，终点推迟到剪线针中间，每次省 0.16 秒。工程师在 3000 到 4000 转试了几十次都好，SIL 扫描也全过，就合并了。当天夜里 HIL 报红：从 5000 转停车剪 250 次，43 次没剪断。原因是伺服的减速能力不是常数，高于基速进入恒功率区，基速还随电网电压变。高速时主轴跟不上，290° 发令时还没降下来；进刀角 290 加 6nt 一旦晚过 330°，就剪不断。",
+    "Start with a story. Firmware v1.4.0 of the lockstitch prototype wanted a faster stop-and-trim: decelerate at full servo capability and push the end into the middle of the trimming stitch, saving 0.16 s each time. The engineer tried dozens of trims at 3000 to 4000 r/min, the SIL sweep passed, and it was merged. That night HIL went red: 43 of 250 stops from 5000 r/min failed to cut. The deceleration capability is not constant: above base speed the motor is in its constant-power region, and the base speed moves with mains voltage. At high speed the spindle fell behind and was still too fast when the solenoid fired at 290°; once the knife entry 290 plus 6nt is later than 330°, the thread is not cut."
+   ]
+  },
+  {
+   "title": [
+    "手工试缝为什么测不出",
+    "Why hand trials missed it"
+   ],
+   "points": [
+    [
+     "工况覆盖不到：人习惯在 3000–4000 r/min 试，不会专挑低电压",
+     "Conditions not covered: people test at 3000–4000 r/min and never pick low mains voltage"
+    ],
+    [
+     "次数不够：4750 r/min 失败率 1.2%，试 50 次有约 55% 的机会一次也看不到",
+     "Too few trials: at 4750 r/min with 1.2% failures, 50 trials show nothing about 55% of the time"
+    ],
+    [
+     "模型不够：SIL 用理想电机，没有恒功率区；HIL 用样机实测的转矩–转速曲线",
+     "Model not good enough: SIL uses an ideal motor without a constant-power region; HIL uses the measured torque–speed curve"
+    ],
+    [
+     "自动化测试：规定的工况、足够的次数、足够真实的模型，每晚都跑",
+     "Automated testing: specified conditions, enough trials, realistic models, every night"
+    ]
+   ],
+   "formula": "P(\\text{0 failures in } n)=(1-p)^{n}",
+   "figure": "",
+   "narration": [
+    "手工试缝为什么测不出？三个原因，每一个都是本章要解决的问题。第一，工况：人习惯在三四千转试，很少一脚踩到五千转再松开，更不会专挑电压低的时候试。第二，次数：就算在 4750 转试，失败率 1.2%，试 50 次，一次都看不到的概率是 0.988 的 50 次方，约 55%。第三，模型：SIL 用的是第 13 章的理想电机，没有恒功率区，所以全过；HIL 仿真器用样机实测的转矩–转速曲线，才把它暴露出来。三条合起来，就是让机器按规定工况、足够次数、真实模型，每晚测一遍。",
+    "Why did hand trials miss it? Three reasons, each a problem this chapter solves. First, conditions: people test at three to four thousand r/min, rarely floor the pedal to five thousand and release it, and never choose a low-voltage moment. Second, numbers: even at 4750 r/min with a 1.2% failure rate, the chance of seeing nothing in 50 trials is 0.988 to the 50th, about 55%. Third, the model: SIL uses Chapter 13's ideal motor with no constant-power region, so it passed; the HIL emulator uses the torque–speed curve measured on the prototype, and that exposed it. Together: let a machine test, every night, under specified conditions, enough times, with realistic models."
+   ]
+  },
+  {
+   "title": [
+    "测试金字塔：五层",
+    "The test pyramid: five levels"
+   ],
+   "points": [
+    [
+     "单元（≈400 例，< 1 min，每次提交）：逻辑、边界、换算",
+     "Unit (≈ 400 cases, < 1 min, every commit): logic, boundaries, conversions"
+    ],
+    [
+     "SIL（≈60 例，5–10 min，每次提交）：时序配合、参数敏感性",
+     "SIL (≈ 60 cases, 5–10 min, every commit): timing interplay, parameter sensitivity"
+    ],
+    [
+     "HIL（≈40 例，3–4 h，每晚）：实时性、真实驱动与执行器、故障处理",
+     "HIL (≈ 40 cases, 3–4 h, nightly): real-time behaviour, real drives and actuators, fault handling"
+    ],
+    [
+     "整机测试台（约 2 天，每周）：线迹、机械、热、噪声；EOL（每台 3–5 min）：装配与元件",
+     "Machine bench (about 2 days, weekly): stitches, mechanics, heat, noise; EOL (3–5 min per unit): assembly and parts"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c22_pyramid.png",
+   "narration": [
+    "把测试按离真机多远分层，越往下越快、越便宜、跑得越勤；越往上越真实，但越慢越贵。单元测试在电脑上测单个函数，几百个用例一分钟跑完，能抓逻辑错误，比如 359.9° 到 0° 的跨越。SIL 把固件接上机器模型，能做大量参数扫描，但模型里没有的物理它看不见。HIL 用真的主控板和驱动板，接实时仿真器，中断、总线、电磁铁延迟都是真的，还能故意注入故障。整机测试台测模型里根本没有的东西，比如线迹和噪声。出厂测试不同：它验证的是这一台装得对不对。",
+    "Layer the tests by distance from the real machine: lower is faster, cheaper and runs more often; higher is more realistic but slower and dearer. Unit tests run single functions on a PC, hundreds of cases in a minute, and catch logic errors such as the wrap from 359.9° to 0°. SIL connects the firmware to a machine model and allows large sweeps, but cannot see physics absent from the model. HIL uses the real controller and driver boards on a real-time emulator: interrupts, bus and solenoid delays are real, and faults can be injected. The machine bench tests what no model contains, such as stitch quality and noise. End-of-line is different: it checks that this particular unit was built right."
+   ]
+  },
+  {
+   "title": [
+    "缺陷要在能发现它的最低一层被发现",
+    "Catch each defect at the lowest level that can catch it"
+   ],
+   "points": [
+    [
+     "单元里发现：改代码几分钟；HIL 里发现：等一夜、要二分；整机上发现：要拆机头",
+     "Found in a unit test: minutes to fix; on HIL: a night's wait and a bisection; on the bench: the head comes apart"
+    ],
+    [
+     "到了用户那里：返修、索赔和名声",
+     "Found by the customer: repairs, claims and reputation"
+    ],
+    [
+     "高层每抓到一个缺陷，都要问：能不能在低一层加一个用例抓住它",
+     "Whenever a higher level catches a defect, ask whether a lower-level case could catch it"
+    ],
+    [
+     "本案例：把 HIL 的转矩–转速曲线移植进 SIL，以后几分钟就能抓住同类问题",
+     "In this case: port the HIL torque–speed curve into SIL so the same class of problem is caught in minutes"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "分层的要点只有一句话：一个缺陷应该在能发现它的最低那一层被发现。同一个缺陷，在单元测试里发现，改代码几分钟；在 HIL 里发现，要等一夜、再二分定位；在整机测试台发现，要拆机头；到了用户那里，就是返修、索赔和名声。所以每当高层抓到一个缺陷，修完以后都要问一句：能不能在低一层加一个用例把它抓住？本章案例最后就是这么做的：把 HIL 仿真器里的转矩–转速曲线，连同电压系数，搬进 SIL 的电机模型。注意这不等于可以取消 HIL，因为实时性和真实执行器 SIL 仍然看不到。",
+    "The point of layering fits in one sentence: a defect should be caught at the lowest level that can catch it. The same defect found by a unit test takes minutes to fix; on HIL, a night's wait and a bisection; on the machine bench, the head comes apart; at the customer, repairs, claims and reputation. So whenever a higher level catches a defect, after fixing it ask: could a case one level lower catch it? The case study does exactly that, porting the HIL emulator's torque–speed curve, with its voltage factor, into the SIL motor model. That does not mean HIL can be dropped: SIL still cannot see real-time behaviour or real actuators."
+   ]
+  },
+  {
+   "title": [
+    "需求—测试—结果的追溯",
+    "Tracing requirements to tests to results"
+   ],
+   "points": [
+    [
+     "每条需求：编号 REQ-…、一句可判定的话、数值判据、来源",
+     "Each requirement: a REQ number, a judgeable sentence, a numerical criterion, a source"
+    ],
+    [
+     "例：REQ-TRM-01 剪线成功率 ≥ 99.5%（置信度 95%），单点 1000 次最多 1 次失败",
+     "E.g. REQ-TRM-01: trim success ≥ 99.5% (95% confidence), at most 1 failure in 1000 at any speed"
+    ],
+    [
+     "追溯矩阵：没有用例的需求等于没有需求；由 @pytest.mark.req 自动汇总",
+     "Traceability matrix: a requirement with no test is no requirement; built automatically from @pytest.mark.req"
+    ],
+    [
+     "每条结果带五样：需求编号、用例名、样机序列号、固件版本、参数版本",
+     "Every result carries five items: REQ number, case name, prototype serial, firmware version, parameter version"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "自动化测试的第一步不是写脚本，而是把“要测什么”写成编号的需求。每条需求有编号、一句可以判定的话、一个数值判据和来源。比如 REQ-TRM-01：从三千转到最高转速任一转速停车剪线，成功率不低于 99.5%，置信度 95%。需求和用例多对多，排成一张表就是追溯矩阵：它告诉你每条需求有没有被测到、哪个用例失败影响哪条需求。这张表不用手工维护，用例里打上需求标记，每次运行自动汇总。最后，每条结果都要带五样东西，少一样，几个月后这条记录就说不清了。",
+    "The first step of automated testing is not writing scripts but writing 'what to test' as numbered requirements. Each has a number, a judgeable sentence, a numerical criterion and a source. For example REQ-TRM-01: stopping from any speed between 3000 r/min and the top speed, trimming succeeds at least 99.5% of the time at 95% confidence. Requirements and cases are many-to-many; laid out as a table, that is the traceability matrix, showing whether each requirement is tested and which requirement a failing case affects. Nobody maintains it by hand: cases carry a requirement marker and every run builds it. Finally every result carries five items; without any one, a record found months later says nothing clear."
+   ]
+  },
+  {
+   "title": [
+    "通用测试台：一套测量模块测四种原型",
+    "A universal test bench: one set of instruments for four prototypes"
+   ],
+   "points": [
+    [
+     "测试计算机（pytest）+ 被测原型 DUT（网关、主控、驱动）+ 测试台模块",
+     "Test PC (pytest) + device under test (gateway, controller, drives) + bench modules"
+    ],
+    [
+     "模块：负载电机与测功、编码器模拟、HIL 仿真器、数据采集、行程传感器、线迹相机、温度",
+     "Modules: load motor and dynamometer, encoder emulator, HIL simulator, DAQ, stroke sensor, stitch camera, temperature"
+    ],
+    [
+     "“真值”来自独立传感器：只读原型自己的编码器，装偏了会一起“正确”地错",
+     "Truth comes from independent sensors: read only the prototype's own encoder and both go wrong together"
+    ],
+    [
+     "换型：适配板 + 同一套带编号的插头 + 测试配置文件，半小时以内（示意）",
+     "Change-over: adapter plate + one numbered connector set + a test configuration file, under half an hour (illustrative)"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c22_bench.png",
+   "narration": [
+    "要自动化，先得有一台能被程序指挥、能自己测量的测试台。它分三部分：左边测试计算机跑 Python 脚本，经网关给原型下命令、读数据；中间是被测原型；右边是测试台模块。最重要的一条是：测试台模块要独立于被测原型测量。如果停针误差只读原型自己的编码器，编码器装偏了，原型和测试会一起“正确”地错下去。所以停针用独立的编码器模拟和测功，剪线用线迹相机判断剪没剪断，电磁铁延迟用行程传感器测。换型靠三件标准化的事：机械适配板、电气插头、软件配置文件，测试脚本本身不变。",
+    "To automate, you first need a bench that a program can command and that measures for itself. It has three parts: on the left a test PC running Python scripts, commanding the prototype through its gateway and reading its data; in the middle the prototype under test; on the right the bench modules. The most important rule is that the bench measures independently of the prototype. If stop error were read only from the prototype's own encoder, a misaligned encoder would make prototype and test wrong together, both 'correctly'. So stopping is checked with independent instruments, trimming by the stitch camera, solenoid delay by a stroke sensor. Change-over rests on three standard things — adapter plate, connectors, configuration file — and the scripts stay the same."
+   ]
+  },
+  {
+   "title": [
+    "测试脚本：pytest 的夹具、参数化与标记",
+    "Test scripts: pytest fixtures, parametrisation and markers"
+   ],
+   "points": [
+    [
+     "夹具 dut：经网关连原型，读序列号、固件和参数版本；测完无论成败都 safe",
+     "Fixture dut: connects through the gateway, reads serial, firmware and parameter versions; always 'safe' at the end"
+    ],
+    [
+     "夹具 report：结果按统一信封发到 MQTT …/measurement 主题（类型 test.result）",
+     "Fixture report: results go to the MQTT …/measurement topic in the standard envelope (type test.result)"
+    ],
+    [
+     "参数化：一个剪线用例变成 6 个转速点，哪个转速出问题一目了然",
+     "Parametrisation: one trim case becomes six speed points, so the failing speed is obvious"
+    ],
+    [
+     "同一用例可以在 SIL、HIL、整机上原样运行，结果直接比较",
+     "The same case runs unchanged on SIL, HIL and the bench, so results compare directly"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "测试脚本用 Python 和 pytest。夹具管理“连上样机、测完断电”这类准备和收尾：dut 夹具连网关、读三个版本号，测完不论成败都把执行器断电；report 夹具把每条结果按问渠数字工厂的统一信封发到总线。参数化把一个用例扩成一组：剪线用例按 3000 到 5000 的六个转速各跑 250 次，本章的回归就是靠 4750 和 5000 这两个点抓住的，只测 4000 它照样漏过去。用例不认机型，换个配置文件就能测包缝原型，还能原样搬到 SIL、HIL 和整机上跑。",
+    "Scripts are Python with pytest. Fixtures handle set-up and tear-down such as connecting and powering off: the dut fixture connects through the gateway and reads the three version numbers, and always switches the actuators off at the end; the report fixture sends each result to the bus in the WenQuest digital-factory envelope. Parametrisation turns one case into a set in one line: the trim case runs 250 times at each of six speeds from 3000 to 5000, and this chapter's regression was caught by the 4750 and 5000 points — testing only at 4000 would have missed it. Cases know only gateway commands and measurements, not machine types, so a configuration file switches them to the overlock prototype, and the same case runs unchanged on SIL, HIL and the bench."
+   ]
+  },
+  {
+   "title": [
+    "要测多少次：零失效验证",
+    "How many tests: zero-failure demonstration"
+   ],
+   "points": [
+    [
+     "若真实可靠度只有 R，n 次全成功的概率是 Rⁿ；要求它 ≤ 1 − C",
+     "If the true reliability were only R, n successes in a row have probability Rⁿ; require it ≤ 1 − C"
+    ],
+    [
+     "R = 99.5%、C = 95%：n ≥ ln 0.05/ln 0.995 = 597.6 → 598 次",
+     "R = 99.5%, C = 95%: n ≥ ln 0.05/ln 0.995 = 597.6 → 598 trials"
+    ],
+    [
+     "近似：C = 95% 时 n ≈ 3/(1 − R)，即失效率倒数的三倍",
+     "Rule of thumb at C = 95%: n ≈ 3/(1 − R), three times the reciprocal of the failure rate"
+    ],
+    [
+     "允许 1、2、3 次失败：947、1258、1549 次",
+     "With 1, 2, 3 failures allowed: 947, 1258, 1549 trials"
+    ]
+   ],
+   "formula": "R^{\\,n}\\le 1-C\\quad\\Longrightarrow\\quad n\\ \\ge\\ \\frac{\\ln(1-C)}{\\ln R}",
+   "figure": "fig_c22_stats.png",
+   "narration": [
+    "剪线成功率要不低于 99.5%，试了 200 次全成功，够不够？不够。要把问题说成统计的语言：在置信度 C 下，证明可靠度不低于 R。思路是反证：如果可靠度真的只有 R，连续 n 次全成功的概率是 R 的 n 次方；要求这个概率不超过 1 减 C，也就是“如果它只有 R，我们几乎不可能看到 n 次全成功”。代入 99.5% 和 95%，得 598 次。好记的近似是：零失效时，要测的次数约是失效率倒数的三倍。允许失败几次，次数还要多，表 22-5 给出 947、1258、1549。",
+    "Trimming must succeed at least 99.5% of the time; 200 successes in a row — is that enough? No. Put it in statistical language: at confidence C, show the reliability is at least R. Argue by contradiction: if the reliability really were only R, the chance of n successes in a row is R to the power n; require that this is at most 1 minus C, meaning 'if it were only R, we would almost never see n straight successes'. With 99.5% and 95% that gives 598. A handy approximation: with zero failures you need about three times the reciprocal of the failure rate. Allowing failures needs more: Table 22-5 gives 947, 1258 and 1549."
+   ]
+  },
+  {
+   "title": [
+    "有失效时：置信下限",
+    "With failures: the lower confidence bound"
+   ],
+   "points": [
+    [
+     "点估计 1 − x/n 不能直接判定，要用单侧置信下限 RL",
+     "The point estimate 1 − x/n cannot be used directly; use the one-sided lower bound RL"
+    ],
+    [
+     "Clopper–Pearson 方法：上限 pU = Beta⁻¹(C; x + 1, n − x)，RL = 1 − pU",
+     "Clopper–Pearson: pU = Beta⁻¹(C; x + 1, n − x), RL = 1 − pU"
+    ],
+    [
+     "1000 次：0 次失败 99.70%，1 次 99.53%（合格），2 次 99.37%（不合格）",
+     "1000 trials: 0 failures 99.70%, 1 failure 99.53% (pass), 2 failures 99.37% (fail)"
+    ],
+    [
+     "所以“单点 1000 次最多 1 次失败”；转速扫描合计 1500 次最多 2 次",
+     "Hence 'at most 1 failure in 1000 per speed'; at most 2 in the 1500 of the sweep"
+    ]
+   ],
+   "formula": "\\sum_{k=0}^{x}\\binom{n}{k}p_U^{\\,k}(1-p_U)^{\\,n-k}=1-C,\\qquad R_L=1-p_U",
+   "figure": "fig_c22_stats.png",
+   "narration": [
+    "如果 n 次里失败了 x 次呢？点估计是 1 减 x 除以 n，但判定要用置信下限。设失效率为 p，失败次数服从二项分布；单侧置信上限 pU 就是让“失败不超过 x 次”的概率恰好等于 1 减 C 的那个 p。这叫 Clopper–Pearson 方法，两行 Python 就能算。看算例：1000 次剪线，失败 1 次，下限 99.53%，满足；失败 2 次，点估计 99.8% 看着不错，下限却只有 99.37%，不满足。这就是需求里写“单点 1000 次最多 1 次失败”的来历。",
+    "What if x of n trials fail? The point estimate is 1 minus x over n, but the decision uses a confidence bound. Let the failure rate be p; failures follow a binomial distribution, and the one-sided upper bound pU is the p at which 'no more than x failures' has probability exactly 1 minus C. This is the Clopper–Pearson method, two lines of Python with a beta quantile. In the example, 1000 trims with 1 failure give a lower bound of 99.53%, a pass; with 2 failures the point estimate of 99.8% looks fine but the bound is only 99.37%, a fail. That is where 'at most one failure in 1000 at any speed point' comes from."
+   ]
+  },
+  {
+   "title": [
+    "抓住回归要几次；计量型指标 Cpk",
+    "Trials to catch a regression; variables data and Cpk"
+   ],
+   "points": [
+    [
+     "n 次里至少看到一次失败：1 − (1 − p)ⁿ；95% 把握抓住 p = 0.5% 也要约 598 次",
+     "At least one failure in n: 1 − (1 − p)ⁿ; 95% sure of catching p = 0.5% also takes about 598"
+    ],
+    [
+     "4750 r/min（p ≈ 1.2%）250 次约 95%；5000 r/min（17%）几次即可：次数花在最敏感工况",
+     "At 4750 r/min (p ≈ 1.2%) 250 trials give about 95%; at 5000 (17%) a few will do — spend trials where it is sensitive"
+    ],
+    [
+     "停针只有上限：Cpk = (USL − μ)/3σ，≥ 1.33 即上限离均值 4σ",
+     "Stop error has only an upper limit: Cpk = (USL − μ)/3σ; ≥ 1.33 means 4σ of room"
+    ],
+    [
+     "Kp = 300 s⁻¹：单次 0.91° 看似合格，50 次 Cpk ≈ 0.34、最大 1.13°",
+     "Kp = 300 s⁻¹: one stop of 0.91° looks fine, but 50 stops give Cpk ≈ 0.34 and a maximum of 1.13°"
+    ]
+   ],
+   "formula": "P_{detect}=1-(1-p)^{n},\\qquad C_{pk}=\\frac{\\mathrm{USL}-\\mu}{3\\sigma}",
+   "figure": "fig_c22_stats.png",
+   "narration": [
+    "持续集成还要问另一个问题：它变坏了，测多少次能发现？至少看到一次失败的概率是 1 减 (1 减 p) 的 n 次方。要有 95% 把握抓住 0.5% 的回归，也要约 598 次，和零失效验证是同一个式子。由此得到一个原则：把有限的次数花在最可能出问题的工况上。同样 250 次，放在 4000 转一次也看不到，放在最高转速几乎必然抓住。停针误差是连续量，可以用计量型指标：只有上限 1°，用单侧 Cpk。Kp 提到 300 时单次 0.91° 看着合格，统计 50 次才发现 Cpk 只有 0.34。",
+    "Continuous integration asks another question: if it gets worse, how many trials reveal it? The chance of at least one failure is 1 minus (1 minus p) to the n. Being 95% sure of catching a 0.5% regression also takes about 598 trials — the same formula as the zero-failure demonstration. Hence a principle: spend limited trials where failure is most likely. The same 250 trials show nothing at 4000 r/min but almost surely catch it at top speed. Stop error is continuous, so use variables data: with only an upper limit of 1°, use one-sided Cpk. With Kp raised to 300, a single stop of 0.91° looks acceptable; 50 stops reveal a Cpk of only 0.34."
+   ]
+  },
+  {
+   "title": [
+    "持续集成：三条流水线与每晚的时间预算",
+    "Continuous integration: three pipelines and the nightly budget"
+   ],
+   "points": [
+    [
+     "每次推送约 12 min：交叉编译 + 单元 + SIL，失败不准合并",
+     "Every push, about 12 min: cross-compile + unit + SIL; no merge on failure"
+    ],
+    [
+     "每晚 4 h：最新主干刷进 HIL 台架跑回归，失败自动二分",
+     "Nightly, 4 h: flash the latest main line into the HIL rig and run regressions; failures bisect automatically"
+    ],
+    [
+     "每周或候选版本约 2 天：整机测试台长跑、1000 次真剪线、相机看线迹",
+     "Weekly or per candidate, about 2 days: bench soak, 1000 real trims, camera checks"
+    ],
+    [
+     "240 min 按“风险 × 能抓住的缺陷 ÷ 时间”分：剪线扫描 80、故障注入 35（必跑）、停针 50 次 6",
+     "Split the 240 min by risk × defects caught ÷ time: trim sweep 80, fault injection 35 (mandatory), 50 stops 6"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c22_ci.png",
+   "narration": [
+    "持续集成的意思是：每一次提交都自动构建、自动测试，不通过的改动不准合并。它把金字塔变成三条流水线：每次推送跑单元和 SIL，约 12 分钟；每晚把最新主干刷进 HIL 台架跑 4 小时回归；每周或每个候选版本上整机测试台跑两天。每晚只有 240 分钟，用例却越来越多，所以要按“风险乘能抓住的缺陷，再除以时间”来挑。反面例子：把剪线定成“4000 转剪 1000 次”、停针定成“停 1 次”，总时间还更短，可两个回归一个都抓不住。用例集本身也要测，办法是故意放进已知缺陷。",
+    "Continuous integration means every commit is built and tested automatically, and failing changes cannot be merged. It turns the pyramid into three pipelines: every push runs unit tests and SIL in about 12 minutes; every night the latest main line is flashed into the HIL rig for four hours of regression; weekly or per candidate, two days on the machine bench. A night has only 240 minutes while cases keep growing, so choose by risk times defects caught, divided by time. The counter-example: trims fixed at 1000 at 4000 r/min and stops at a single stop take less time and catch neither regression. The case set itself must be tested — by planting known defects."
+   ]
+  },
+  {
+   "title": [
+    "失败自动定位到提交：二分",
+    "Locating the failing commit: bisection"
+   ],
+   "points": [
+    [
+     "k 轮能在 2ᵏ 个提交里找到第一个坏的；23 个提交 5 轮",
+     "k rounds find the first bad commit among 2ᵏ; 23 commits need 5 rounds"
+    ],
+    [
+     "git bisect run：编不过的提交跳过（exit 125），只重跑失败的那个用例",
+     "git bisect run: skip commits that don't build (exit 125) and rerun only the failing case"
+    ],
+    [
+     "用最敏感的工况：5000 r/min 剪 250 次，坏提交平均失败 43 次",
+     "Use the most sensitive condition: 250 trims from 5000 r/min, where a bad commit fails 43 times on average"
+    ],
+    [
+     "检出率不够（如 4750 r/min 约 95%），二分可能判错、冤枉无辜提交",
+     "Too low a detection rate (about 95% at 4750 r/min) can misjudge a round and blame an innocent commit"
+    ]
+   ],
+   "formula": "k=\\lceil\\log_2 N\\rceil",
+   "figure": "fig_c22_case.png",
+   "narration": [
+    "上一晚全绿，这一晚变红，中间合并了二三十个提交，是哪一个？逐个试太慢。二分法每次试中间那个：好就往后找，坏就往前找，k 轮能在 2 的 k 次方个提交里找到第一个坏的，23 个提交要 5 轮。git 自带这个功能，编不过的提交返回 125 跳过。关键是二分时只跑那一个失败的用例，而且选它最敏感的工况：坏的一定失败，好的一定通过。在 5000 转剪 250 次，坏提交平均失败 43 次，一轮就判清；如果选 4750 转，坏提交也只有约 95% 的概率露出来，二分可能把账算到无辜的提交上。",
+    "HIL failed: last night green, tonight red, and twenty or thirty commits merged in between. Which one? Trying each is too slow. Bisection tries the middle one: if good, look later; if bad, look earlier. k rounds find the first bad commit among 2 to the k; 23 commits need 5 rounds. git does this itself, skipping commits that will not build with exit code 125. The key is to rerun only the failing case, at its most sensitive condition, so a bad commit surely fails and a good one surely passes. At 5000 r/min, 250 trims fail 43 times on average for a bad commit, settled in one round; at 4750 a bad commit shows itself only about 95% of the time, and bisection may blame an innocent commit."
+   ]
+  },
+  {
+   "title": [
+    "从原型到工业级：成熟度与退出条件",
+    "From prototype to industrial grade: maturity and exit criteria"
+   ],
+   "points": [
+    [
+     "P0 能动 → P1 功能全 → EVT 工程验证 → DVT 设计验证 → PVT 生产验证 → 量产",
+     "P0 moves → P1 complete → EVT engineering → DVT design → PVT production validation → volume"
+    ],
+    [
+     "每级退出条件都是自动测试可判定的数字，评审只看数据",
+     "Every exit criterion is a number automated tests can judge; reviews look only at data"
+    ],
+    [
+     "EVT：停针 Cpk ≥ 1.33、剪线单点 1000 次 ≤ 1 次、HIL 连续 10 晚全绿",
+     "EVT: stop Cpk ≥ 1.33, ≤ 1 failure in 1000 trims per point, HIL green 10 nights in a row"
+    ],
+    [
+     "DVT：99.9%/90% 要 2302 次零失效，多台样机、电压 ±10%、5–45 °C；PVT：EOL 一次通过率 ≥ 98%",
+     "DVT: 99.9%/90% needs 2302 failure-free trials across units, ±10% voltage, 5–45 °C; PVT: EOL first-pass yield ≥ 98%"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c22_maturity.png",
+   "narration": [
+    "原型什么时候算做好了？靠人拍脑袋，它会一直停在“差不多”。电子行业用一串成熟度级别：P0、P1，然后工程验证、设计验证、生产验证，最后量产。本章的做法是把每一级的退出条件都写成自动测试能判定的数字。注意几个变化：到了设计验证，剪线验证从 99.5%/95% 提到 99.9%/90%，要 2302 次零失效，还要在多台样机、多种电压和温度下分别做，因为要回答的是设计本身有没有余量。到了生产验证，重点转向制造，看按生产工艺装出来的一批是否一致，指标是出厂测试一次通过率。",
+    "When is a prototype finished? Left to judgement, it stays at 'nearly there' forever. Electronics uses a ladder of maturity levels: P0, P1, then engineering, design and production validation, then volume. This chapter writes every level's exit criteria as numbers automated tests can judge. Note the changes: at design validation the trim demonstration rises from 99.5%/95% to 99.9%/90%, 2302 trials without failure, repeated on several units, voltages and temperatures, because the question is whether the design itself has margin. At production validation the focus moves to manufacturing — is a batch built with production processes consistent? — measured by end-of-line first-pass yield."
+   ]
+  },
+  {
+   "title": [
+    "出厂测试与现场数据回流",
+    "End-of-line testing and field data flowing back"
+   ],
+   "points": [
+    [
+     "EOL 挑“快、能发现装配缺陷”的项目：编码器零位、停针 10 次、剪线 20 次、线圈电流波形等，每台 3–5 min",
+     "EOL picks fast items that reveal assembly faults: encoder index, 10 stops, 20 trims, coil-current waveform…, 3–5 min per unit"
+    ],
+    [
+     "EOL 结果带序列号和版本发到 wq/sewing/eol/…/measurement，进历史库和质量系统",
+     "EOL results with serial and versions go to wq/sewing/eol/…/measurement, into the historian and quality system"
+    ],
+    [
+     "现场联网数据按版本、批次、序列号与出厂数据对照，发现实验室看不到的问题",
+     "Field data matched to EOL data by version, batch and serial reveals what the lab cannot see"
+    ],
+    [
+     "每个新问题 → 新增或收紧一条 REQ + 一个能复现它的用例：用例集跟着产品长大",
+     "Each new problem → a new or tighter REQ + a case that reproduces it: the case set grows with the product"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c22_maturity.png",
+   "narration": [
+    "量产以后每台控制箱和整机下线都要过出厂测试。它从验收用例里挑“快、能发现装配缺陷”的：编码器读数和零位、停针 10 次、剪线 20 次，看有没有剪不断，而不是证明 99.5%，那是设计验证的事；再加线圈电流波形、版本核对和电气安全，每台三五分钟。结果带序列号和版本号进历史库。机器到了用户车间联网以后，上报的剪线次数、故障码和版本号可以和出厂数据对起来，比如某版固件在电压不稳的厂区报修多。每发现一个问题，就加一条需求、一个用例，用例集跟着产品一起长大。",
+    "In production every control box and machine passes an end-of-line test. It takes the fast items from the acceptance cases that reveal assembly faults: encoder reading and index, 10 stops, 20 trims — checking for a failed cut, not proving 99.5%, which is the job of design validation — plus coil-current waveforms, version checks and electrical safety, three to five minutes a unit. Results go to the historian with serial and versions. Once machines are networked on customers' floors, their reported trim counts, fault codes and versions can be matched with factory data — revealing, say, that one firmware version draws more calls at plants with unsteady voltage. Each finding adds a requirement and a case, so the case set grows with the product."
+   ]
+  },
+  {
+   "title": [
+    "案例收尾：修复、回归与潜伏的第二个问题",
+    "Closing the case: fix, regression and a hidden second problem"
+   ],
+   "points": [
+    [
+     "v1.4.1：按实测转矩–转速曲线的 90% 规划（基速按 0.9 倍电压）；270° 时转速 > 400 r/min 就推迟一针剪线",
+     "v1.4.1: plan with 90% of the measured torque–speed curve (base speed at 0.9 voltage); if speed at 270° > 400 r/min, trim one stitch later"
+    ],
+    [
+     "从 4000 r/min 停车剪断约 0.23 s，仍比 v1.3.2 快约 0.15 s",
+     "Stop-and-trim from 4000 r/min about 0.23 s, still about 0.15 s faster than v1.3.2"
+    ],
+    [
+     "回归：HIL 剪线扫描 0/1500；整机 5000 r/min 真剪 1000 次 0 失败，下限 99.70%",
+     "Regression: HIL sweep 0/1500; 1000 real trims at 5000 r/min with no failure, lower bound 99.70%"
+    ],
+    [
+     "潜伏问题：v1.3.2 的 Kp 300 s⁻¹ 靠停针 50 次统计才显形，v1.4.2 改为 220 s⁻¹、Cpk 约 7",
+     "Hidden issue: v1.3.2's Kp 300 s⁻¹ showed only in 50-stop statistics; v1.4.2 uses 220 s⁻¹, Cpk about 7"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c22_case.png",
+   "narration": [
+    "回到案例。周三凌晨 HIL 报红，自动二分 5 轮约 80 分钟，指向第 14 个提交；早上工程师看到一份报告：需求、用例、提交和失败时的转速记录。修复版 v1.4.1 做两件事：按电机实测的转矩–转速曲线只用 90% 规划；再加一道保险，270° 时转速还高于 400 就推迟一针剪线。从 4000 转停车剪断约 0.23 秒，优化的好处大部分保住了。案例里还潜伏着第二个问题：位置增益提到 300 后单次停车 0.91°，一路“通过”，直到换成 50 次统计才显形，v1.4.2 改回 220。",
+    "Back to the case. HIL went red early on Wednesday; automatic bisection took 5 rounds, about 80 minutes, and pointed to the 14th commit. In the morning the engineer found a report: which requirement, which case, which commit, and the speed records of the failures. The fix, v1.4.1, does two things: plan with only 90% of the motor's measured torque–speed curve, and add a safeguard — if the speed at 270° is still above 400, trim one stitch later. A stop-and-trim from 4000 r/min takes about 0.23 s, so most of the gain is kept. A second problem was hiding too: with the position gain raised to 300, a single stop of 0.91° kept 'passing' until 50-stop statistics exposed it; v1.4.2 goes back to 220."
+   ]
+  },
+  {
+   "title": [
+    "模型的边界与现场要点",
+    "Limits of the models and shop-floor notes"
+   ],
+   "points": [
+    [
+     "剪线模型只看进刀角；电磁铁延迟取正态 N(8, 0.667) ms，真实尾部可能更长",
+     "The trim model looks only at knife entry; solenoid delay is normal N(8, 0.667) ms, and the real tail may be longer"
+    ],
+    [
+     "统计公式假定各次独立、失效率不变；一台样机的 99.5% 不等于每台都是",
+     "The statistics assume independent trials and a constant failure rate; 99.5% on one unit is not 99.5% on every unit"
+    ],
+    [
+     "测试只能证明“测过的工况下没发现问题”：工况范围要覆盖需求并留余量",
+     "Tests only show 'no problem found under the conditions tested': cover the full required range with margin"
+    ],
+    [
+     "手工试缝“没问题”先问：试了哪些转速、多少次、什么电压",
+     "When hand trials say 'no problem', ask: which speeds, how many times, at what voltage"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后说说这些模型的边界。剪线模型把失败只归到进刀角晚过 330°，没考虑线环形状、刀刃磨损；电磁铁延迟取正态分布，真实分布可能偏斜、尾部更长，而尾部恰恰决定了 99.5% 这个量级的失效率。统计公式假定每次试验独立、失效率不变，可同一台样机连剪一千次，线、刀、温度都在变；在一台样机上证明的 99.5%，不等于每台都是，所以设计验证要用多台。还要记住：测试只能证明在测过的工况下没发现问题。回归如果只在 5200 转以上出现，而扫描只到 5000，它照样漏过去。",
+    "Finally, the limits of these models. The trim model blames failures only on knife entry later than 330°, ignoring loop shape and knife wear; the solenoid delay is taken as normal, whereas the real distribution may be skewed with a longer tail — and the tail is exactly what decides failure rates around 99.5%. The statistics assume independent trials and a constant failure rate, yet over a thousand trims on one unit the thread, knife and temperature all change; 99.5% shown on one unit is not 99.5% on every unit, hence several units at design validation. And remember: tests only show that nothing was found under the conditions tested. A regression appearing only above 5200 r/min would slip past a sweep that stops at 5000."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "测试金字塔：单元、SIL、HIL、整机测试台、EOL，越往下越快越便宜；缺陷要在能发现它的最低一层被发现。",
+   "The test pyramid — unit, SIL, HIL, machine bench, EOL — gets faster and cheaper lower down; catch each defect at the lowest level that can."
+  ],
+  [
+   "先写编号需求，再写用例；每条结果带需求编号、用例名、序列号、固件和参数版本，追溯矩阵自动生成。",
+   "Write numbered requirements before cases; every result carries REQ, case, serial, firmware and parameter versions, and the traceability matrix builds itself."
+  ],
+  [
+   "零失效验证 n ≥ ln(1 − C)/ln R（99.5%/95% 要 598 次）；有失效用 Clopper–Pearson 下限；抓回归的概率 1 − (1 − p)ⁿ；连续量用 Cpk。",
+   "Zero-failure demonstration n ≥ ln(1 − C)/ln R (598 for 99.5%/95%); with failures use the Clopper–Pearson bound; detection probability 1 − (1 − p)ⁿ; continuous data use Cpk."
+  ],
+  [
+   "持续集成：推送 12 min、每晚 4 h HIL、每周整机；时间按“风险 × 能抓住的缺陷 ÷ 时间”分配，失败用二分定位到提交。",
+   "CI: 12 min per push, 4 h HIL nightly, bench weekly; budget time by risk × defects caught ÷ time, and bisect failures to a commit."
+  ],
+  [
+   "成熟度 P0 → 量产的每级退出条件都写成可自动判定的数字；EOL 与现场数据回流，用例集跟着产品长大。",
+   "Every maturity level from P0 to volume has numeric, automatically judged exit criteria; EOL and field data flow back and the case set grows with the product."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "testbench",
+   "no": "22-1",
+   "title": [
+    "自动化测试台",
+    "Automated test bench"
+   ],
+   "goal": [
+    [
+     "在不同测试层级上运行同一组需求的用例，找出引入回归的固件版本和失败的需求。",
+     "Run cases for the same requirements at different test levels and find the firmware version that introduced a regression and the failing requirement."
+    ],
+    [
+     "在每晚 240 min 的 HIL 预算内设计用例集，体会“工况和次数比用例数量更重要”。",
+     "Design an HIL case set within the 240 min nightly budget and see that conditions and trial counts matter more than the number of cases."
+    ],
+    [
+     "用二项分布计算器求零失效试验次数和置信下限。",
+     "Use the binomial calculator for zero-failure trial counts and lower confidence bounds."
+    ]
+   ],
+   "theory": [
+    [
+     "剪线模型：电磁铁在剪线针 290° 发令，延迟 N(8, 0.667) ms，进刀角 290° + 6nt 须在 300°–330°；伺服高于基速进入恒功率区，基速随电网电压变化；SIL 用理想电机。",
+     "Trim model: the solenoid fires at 290° of the trimming stitch with delay N(8, 0.667) ms; knife entry 290° + 6nt must lie in 300°–330°; above base speed the servo is in its constant-power region and base speed moves with mains voltage; SIL uses an ideal motor."
+    ],
+    [
+     "零失效验证：n ≥ ln(1 − C)/ln R；有失效时用 Clopper–Pearson 单侧下限判定。",
+     "Zero-failure demonstration: n ≥ ln(1 − C)/ln R; with failures judge by the one-sided Clopper–Pearson bound."
+    ],
+    [
+     "停针用单侧 Cpk = (1° − μ)/3σ 和最大值两个判据；单次停车测不出过程能力。",
+     "Stopping is judged by one-sided Cpk = (1° − μ)/3σ and by the maximum; a single stop cannot show process capability."
+    ],
+    [
+     "每层有时间预算：每次提交单元 1 min、SIL 10 min，每晚 HIL 240 min，每周整机 48 h。",
+     "Each level has a time budget: unit 1 min and SIL 10 min per commit, HIL 240 min nightly, machine bench 48 h weekly."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 22-1，先读右侧“版本记录”，弄清 v1.3.0–v1.4.2 每个版本改了什么。",
+     "Open virtual lab 22-1 and read the 'Change log' on the right to see what each version from v1.3.0 to v1.4.2 changed."
+    ],
+    [
+     "固件版本选 v1.4.0，测试层级选“软件在环 SIL”，点“默认用例集”再点“▶ 运行”，记录结果表；再选“硬件在环 HIL”运行默认用例集，比较两层的结论。",
+     "Choose v1.4.0 and the SIL level, press 'Default set' then '▶ Run' and record the results; then run the default set at the HIL level and compare."
+    ],
+    [
+     "在 HIL 层只勾选“剪线转速扫描 3000–5000，6 点 × 250”，依次在 v1.3.2、v1.4.0、v1.4.1 上运行，记录各转速点的失败数和可靠度下限；在任务 1 中填入版本和需求编号，点“核对”。",
+     "At HIL tick only 'Trim speed sweep 3000–5000, 6 × 250', run it on v1.3.2, v1.4.0 and v1.4.1, and record failures per speed and the lower bound; enter the version and REQ in task 1 and press Check."
+    ],
+    [
+     "在 v1.3.2 的 HIL 层分别只跑“停针 1 次”和“停针 50 次统计（Cpk）”，比较两者的判定，并看版本趋势图右侧的停针最大值。",
+     "On v1.3.2 at HIL, run 'Stop, 1 run' and then 'Stop, 50 runs with statistics (Cpk)' alone; compare the verdicts and look at the stop maximum in the trend chart."
+    ],
+    [
+     "任务 2：版本 v1.4.0、层级 HIL，点“默认用例集”（207 min），观察预算条；增删用例，使总时间不超过 240 min、保留“故障注入”，并能同时抓住剪线和停针两个回归，运行确认。",
+     "Task 2: v1.4.0 at HIL, press 'Default set' (207 min) and watch the budget bar; add and remove cases so the total stays within 240 min, keeps fault injection and catches both the trim and the stop regressions; run to confirm."
+    ],
+    [
+     "层级换“整机测试台”，在 v1.4.0 和 v1.4.2 上各运行一次默认用例集，在版本趋势图上比较剪线最差转速点失败率和停针最大值。",
+     "Switch to the machine bench and run the default set on v1.4.0 and v1.4.2; compare the worst-speed trim failure rate and the stop maximum in the trend chart."
+    ],
+    [
+     "任务 3：在右侧计算器中 R 填 99.5、C 填 95，失败次数 x 分别填 0 和 1，读出需要的试验次数，填入任务框点“核对”。",
+     "Task 3: in the calculator enter R = 99.5 and C = 95, with failures x = 0 and then 1, read the trial counts, enter them in the task boxes and press Check."
+    ],
+    [
+     "在计算器下半部分输入已试验次数 n = 1000，失败 x = 0、1、2，读出置信下限；再用 n = 1500 试出最多允许几次失败。",
+     "In the lower part enter n = 1000 with x = 0, 1, 2 and read the lower bounds; then find the largest x still allowed for n = 1500."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "各固件版本在不同层级的测试结果",
+     "Test results of firmware versions at different levels"
+    ],
+    "headers": [
+     [
+      "固件版本",
+      "Firmware version"
+     ],
+     [
+      "测试层级",
+      "Level"
+     ],
+     [
+      "用例",
+      "Case"
+     ],
+     [
+      "需求编号",
+      "REQ"
+     ],
+     [
+      "测量值",
+      "Measured value"
+     ],
+     [
+      "判据",
+      "Criterion"
+     ],
+     [
+      "结果（✓/✗）",
+      "Result (✓/✗)"
+     ],
+     [
+      "耗时（min）",
+      "Time (min)"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "v1.4.0 的剪线回归为什么在 SIL 上看不到、在 HIL 上看得到？如果把 HIL 的转矩–转速曲线移植进 SIL，还需要每晚的 HIL 剪线扫描吗？",
+     "Why is the v1.4.0 trim regression invisible on SIL but visible on HIL? If the HIL torque–speed curve were ported into SIL, would the nightly HIL trim sweep still be needed?"
+    ],
+    [
+     "默认用例集为什么一个回归也抓不住？你在任务 2 中用哪两个用例换掉了什么，理由是什么？",
+     "Why does the default set catch neither regression? Which cases did you swap in task 2, and why?"
+    ],
+    [
+     "停针“1 次”与“50 次统计”的结论为什么不同？Cpk 判据有什么前提？",
+     "Why do 'one stop' and '50 stops with statistics' disagree? What does the Cpk criterion assume?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "剪线可靠性验证与每晚测试设计",
+   "Trim reliability demonstration and nightly test design"
+  ],
+  "tasks": [
+   [
+    "客户要求剪线成功率达到 99.8%（置信度 90%）。(a) 零失效验证要剪多少次？允许 1 次失败时要多少次？（用 22.6 节的公式或 r_lower 逐次试算，并用虚拟实验 22-1 的计算器核对。）(b) 若每次剪线循环 3 s，各需要多少分钟？(c) 这些次数应该分到哪些转速和电压工况上，为什么？",
+    "A customer requires a trim success rate of 99.8% at 90% confidence. (a) How many trims for a zero-failure demonstration, and how many if one failure is allowed? (Use Section 22.6 or iterate r_lower, and check with the calculator in virtual lab 22-1.) (b) At 3 s per trim cycle, how many minutes does each take? (c) How should these trials be spread over speeds and voltages, and why?"
+   ],
+   [
+    "某次改动可能让 4750 r/min 的剪线失效率变成 1.2%，而 4000 r/min 不变（约 0.012%）。(a) 每晚要以 99% 的把握抓住它，在 4750 r/min 至少剪多少次？3 s 一次要多少分钟？(b) 同样次数放在 4000 r/min，抓住它的概率是多少？(c) 由此说明每晚用例的工况应当怎样选。",
+    "A change may raise the trim failure rate at 4750 r/min to 1.2% while 4000 r/min stays at about 0.012%. (a) To be 99% sure of catching it each night, how many trims at 4750 r/min are needed, and how many minutes at 3 s each? (b) With the same number at 4000 r/min, what is the chance of catching it? (c) What does this say about choosing nightly test conditions?"
+   ],
+   [
+    "两个候选固件在 HIL 上各停车 50 次（上限 1°）：A 均值 0.55°、σ 0.11°；B 均值 0.30°、σ 0.05°。分别求单侧 Cpk，判断是否满足 Cpk ≥ 1.33；除 Cpk 外还应看什么，为什么？",
+    "Two candidate firmware builds each stop 50 times on HIL (upper limit 1°): A has mean 0.55° and σ 0.11°; B has mean 0.30° and σ 0.05°. Compute the one-sided Cpk of each, judge against Cpk ≥ 1.33, and state what else should be checked besides Cpk, and why."
+   ],
+   [
+    "为 WQ-SC/OL 包缝原型列出 4 条验收需求（编号、可判定的说法、判据、来源章节），说明每条在哪一层用什么用例验证，并给出每晚 240 min 的 HIL 时间分配表，说明分配理由。",
+    "For the WQ-SC/OL overlock prototype, list 4 acceptance requirements (number, judgeable sentence, criterion, source chapter), state at which level and with which case each is verified, and give a 240 min nightly HIL time allocation with reasons."
+   ]
+  ],
+  "deliverable": [
+   "报告一份（不超过 5 页）：第 1–3 题的计算过程与结论、计算器核对截图；第 4 题的需求表、用例对照表和时间分配表。",
+   "A report of at most 5 pages: working and conclusions for tasks 1–3 with calculator screenshots; for task 4 the requirement table, case mapping and time allocation."
+  ],
+  "rubric": [
+   [
+    "第 1–3 题计算正确（35 分）",
+    "Correct calculations in tasks 1–3 (35 points)"
+   ],
+   [
+    "工况选择和判据的理由充分（20 分）",
+    "Well-argued choice of conditions and criteria (20 points)"
+   ],
+   [
+    "第 4 题需求可判定、用例分层合理、时间分配有依据（30 分）",
+    "Task 4: judgeable requirements, sensible levels, justified time allocation (30 points)"
+   ],
+   [
+    "表达清楚、结论先行（15 分）",
+    "Clear presentation, conclusions first (15 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "v1.4.0 的剪线回归在哪一层测试中最先被发现？",
+    "At which test level was the v1.4.0 trim regression first caught?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "硬件在环 HIL",
+      "Hardware-in-the-loop (HIL)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "单元测试",
+      "Unit tests"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "软件在环 SIL",
+      "Software-in-the-loop (SIL)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "出厂测试 EOL",
+      "End-of-line (EOL) test"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "单元测试只验证规划函数算得对；SIL 用理想电机，没有恒功率区；HIL 仿真器用实测的转矩–转速曲线，当夜的剪线扫描就报了红。",
+    "Unit tests only check the planner's arithmetic; SIL uses an ideal motor with no constant-power region; the HIL emulator uses the measured torque–speed curve and its trim sweep went red that night."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "要以 95% 的置信度证明某动作的成功率不低于 99%，零失效验证至少要做多少次？",
+    "To show a success rate of at least 99% at 95% confidence with zero failures, how many trials are needed at least?"
+   ],
+   "answer": 299,
+   "tolerance": 0,
+   "unit": "",
+   "feedback": [
+    "n ≥ ln(1 − 0.95)/ln 0.99 = 298.1，取 299 次（表 22-5）。近似 3/(1 − R) = 300。",
+    "n ≥ ln(1 − 0.95)/ln 0.99 = 298.1, so 299 (Table 22-5); the rule of thumb 3/(1 − R) gives 300."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "剪线测试 1000 次失败 2 次，点估计 99.8% 高于 99.5%，所以满足 REQ-TRM-01（99.5%，置信度 95%）。",
+    "1000 trims with 2 failures give a point estimate of 99.8%, above 99.5%, so REQ-TRM-01 (99.5% at 95% confidence) is met."
+   ],
+   "correct": false,
+   "feedback": [
+    "判定要用置信下限：2 次失败时下限只有约 99.37%，低于 99.5%，不满足；1000 次最多允许 1 次失败。",
+    "The decision uses the lower bound: with 2 failures it is only about 99.37%, below 99.5%, so it fails; 1000 trials allow at most 1 failure."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "剪线 1000 次失败 1 次。按 Clopper–Pearson 方法，可靠度的 95% 单侧置信下限是多少（%）？",
+    "1000 trims with 1 failure. By Clopper–Pearson, what is the one-sided 95% lower confidence bound on reliability (%)?"
+   ],
+   "answer": 99.53,
+   "tolerance": 0.02,
+   "unit": "%",
+   "feedback": [
+    "RL = 1 − Beta⁻¹(0.95; 2, 999) ≈ 99.53%，高于 99.5%，满足。",
+    "RL = 1 − Beta⁻¹(0.95; 2, 999) ≈ 99.53%, above 99.5%, so it passes."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "通用测试台为什么强调“真值”要来自独立于被测原型的传感器？",
+    "Why does the universal test bench insist that the 'truth' comes from sensors independent of the prototype?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "如果只读原型自己的编码器，编码器装偏时原型和测试会一起“正确”地错下去",
+      "If only the prototype's own encoder is read, a misaligned encoder makes prototype and test wrong together"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "独立传感器采样更快，能缩短每晚的测试时间",
+      "Independent sensors sample faster and shorten the nightly run"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "网关不能上报测量值，只能下发命令",
+      "The gateway cannot report measurements, only accept commands"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "这样就不需要校准测试台",
+      "That way the bench never needs calibration"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "两者都记下来，它们的差本身就是有用的指标；测试台的测量链也要定期校准，否则所有结论都不可信。",
+    "Record both; their difference is itself a useful metric. The bench's own measurement chain still needs regular calibration, or no conclusion can be trusted."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某次改动可能让一个动作的失效率变为 2%。每晚要有 95% 的把握至少看到一次失败，至少要测多少次？",
+    "A change may raise a failure rate to 2%. To be 95% sure of seeing at least one failure each night, how many trials are needed at least?"
+   ],
+   "answer": 149,
+   "tolerance": 1,
+   "unit": "",
+   "feedback": [
+    "1 − (1 − 0.02)ⁿ ≥ 0.95 → n ≥ ln 0.05/ln 0.98 ≈ 148.3，取 149 次。",
+    "1 − (1 − 0.02)ⁿ ≥ 0.95 → n ≥ ln 0.05/ln 0.98 ≈ 148.3, so 149."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "HIL 上停车 50 次，停针误差均值 0.40°、标准差 0.12°，上限 1°。单侧 Cpk 是多少？",
+    "50 stops on HIL give a mean stop error of 0.40° and σ of 0.12°, upper limit 1°. What is the one-sided Cpk?"
+   ],
+   "answer": 1.67,
+   "tolerance": 0.02,
+   "unit": "",
+   "feedback": [
+    "Cpk = (1 − 0.40)/(3 × 0.12) ≈ 1.67 ≥ 1.33，合格；判定时还要同时看最大值，因为停针误差不一定正态。",
+    "Cpk = (1 − 0.40)/(3 × 0.12) ≈ 1.67 ≥ 1.33, a pass; also check the maximum, since stop error need not be normal."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "用 git bisect 把 HIL 失败定位到提交时，下列哪些做法正确？",
+    "When bisecting an HIL failure to a commit with git bisect, which practices are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "只重跑失败的那一个用例，不跑整套每晚用例",
+      "Rerun only the failing case, not the whole nightly set"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "选它最敏感的工况，如从 5000 r/min 停车剪 250 次",
+      "Use its most sensitive condition, e.g. 250 trims from 5000 r/min"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "编译不过的提交返回 125 跳过",
+      "Skip commits that don't build by returning 125"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "选 4750 r/min，因为失败率低，更能区分好坏提交",
+      "Use 4750 r/min because its lower failure rate separates good and bad commits better"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "二分用的用例要“坏的一定失败、好的一定通过”；4750 r/min 时坏提交只有约 95% 的检出率，某一轮可能判错。",
+    "The bisection case must make bad commits fail and good ones pass; at 4750 r/min a bad commit is detected only about 95% of the time, so a round may be misjudged."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "SIL 的剪线转速扫描对 v1.4.0 全部通过，根本原因是什么？",
+    "What is the root reason the SIL trim sweep passed v1.4.0 entirely?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "SIL 用第 13 章的理想电机，减速能力处处是 4400 rad/s²，没有恒功率区",
+      "SIL uses Chapter 13's ideal motor with 4400 rad/s² everywhere and no constant-power region"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "SIL 每个转速点只跑 200 次，次数不够",
+      "SIL runs only 200 trims per speed, too few"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "SIL 没有测到 5000 r/min",
+      "SIL did not test 5000 r/min"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "SIL 的电磁铁延迟设得太短",
+      "SIL's solenoid delay was set too short"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "SIL 扫描本来就包含 5000 r/min；在理想电机里 v1.4.0 的规划完全可行，失败率与改动前相同（约 0.011%），所以次数再多也看不到。",
+    "The SIL sweep did include 5000 r/min; with an ideal motor v1.4.0's plan is feasible and the failure rate is unchanged (about 0.011%), so no number of trials would show it."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "从 EVT 到 DVT，剪线验证从 99.5%/95% 提高到 99.9%/90%（2302 次零失效），还要在多台样机、多种电压和温度下做。主要原因是什么？",
+    "From EVT to DVT the trim demonstration rises from 99.5%/95% to 99.9%/90% (2302 failure-free trials), on several units, voltages and temperatures. Why?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "DVT 要回答设计本身有没有余量，样机之间、环境之间的差异都要包括",
+      "DVT must show whether the design itself has margin, including unit-to-unit and environmental variation"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "DVT 阶段固件还在频繁改动，需要更多次数",
+      "Firmware still changes often at DVT and needs more trials"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "DVT 的目的是检查每台的装配是否正确",
+      "DVT checks that each unit is assembled correctly"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "一台样机跑不了 2302 次，只能分到多台",
+      "One unit cannot run 2302 trims, so they must be spread"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "DVT 时固件冻结、只修缺陷；检查每台装配是 EOL 的事。多台样机既为统计次数，也为看出台与台之间的差异。",
+    "At DVT firmware is frozen except for fixes; checking each unit's assembly is EOL's job. Several units serve both the trial count and unit-to-unit variation."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "要以 95% 的置信度证明可靠度不低于 99.9%，且允许 1 次失败，至少要试验多少次？",
+    "To show reliability of at least 99.9% at 95% confidence with one failure allowed, how many trials are needed at least?"
+   ],
+   "answer": 4742,
+   "tolerance": 3,
+   "unit": "",
+   "feedback": [
+    "找最小的 n 使 r_lower(n, 1, 0.95) ≥ 0.999，得 4742 次；零失效只要 2995 次。",
+    "Find the smallest n with r_lower(n, 1, 0.95) ≥ 0.999: 4742; with zero failures only 2995 are needed."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "某需求要求可靠度 ≥ 99.5%（置信度 95%）。一共试验 2000 次，最多允许失败几次仍能判定合格？",
+    "A requirement asks for reliability ≥ 99.5% at 95% confidence. In 2000 trials, how many failures at most still allow a pass?"
+   ],
+   "answer": 4,
+   "tolerance": 0,
+   "unit": "",
+   "feedback": [
+    "r_lower(2000, 4) ≥ 0.995，r_lower(2000, 5) < 0.995，所以最多 4 次（1000 次 1 次、1500 次 2 次）。",
+    "r_lower(2000, 4) ≥ 0.995 but r_lower(2000, 5) < 0.995, so at most 4 (1 in 1000, 2 in 1500)."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "两晚之间合并了 60 个提交，HIL 剪线用例失败。每轮编译刷写 3 min、跑一个用例 13 min，二分最多需要多少分钟？",
+    "Sixty commits were merged between two nights and the HIL trim case failed. With 3 min to build and flash and 13 min per case run, how many minutes does bisection take at most?"
+   ],
+   "answer": 96,
+   "tolerance": 1,
+   "unit": "min",
+   "feedback": [
+    "⌈log₂ 60⌉ = 6 轮，每轮 16 min，共 96 min。",
+    "⌈log₂ 60⌉ = 6 rounds of 16 min, 96 min in all."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "剪线电磁铁在剪线针 290° 发令，发令时主轴转速 850 r/min，电磁铁延迟 8 ms。动刀进刀角是多少度？",
+    "The trimmer solenoid fires at 290° of the trimming stitch with the spindle at 850 r/min and an 8 ms delay. At what angle does the knife enter?"
+   ],
+   "answer": 330.8,
+   "tolerance": 0.3,
+   "unit": "°",
+   "feedback": [
+    "290° + 6nt = 290 + 6 × 850 × 0.008 ≈ 330.8°，已晚过 330°，剪不断（正文：电压低 5% 时的情形）。",
+    "290° + 6nt = 290 + 6 × 850 × 0.008 ≈ 330.8°, past 330°, so the trim fails (the 5%-low-voltage case in the text)."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "v1.4.0 上，在每晚 240 min 的 HIL 预算内要保留故障注入、并同时抓住剪线和停针两个回归。默认用例集为 207 min（含 4000 r/min 剪线 1000 次 55 min、停针 1 次 2 min）。下列哪些调整是合理的？",
+    "On v1.4.0, the nightly HIL set must fit 240 min, keep fault injection and catch both the trim and the stop regressions. The default set takes 207 min (including 1000 trims at 4000 r/min, 55 min, and one stop, 2 min). Which changes are sensible?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "用“剪线转速扫描 3000–5000，6 点 × 250”（80 min）替换“4000 r/min 剪 1000 次”",
+      "Replace '1000 trims at 4000 r/min' by 'trim sweep 3000–5000, 6 × 250' (80 min)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "加上“停针 50 次统计（Cpk）”（6 min）",
+      "Add 'stop, 50 runs with statistics (Cpk)' (6 min)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "保留“故障注入 12 种 × 5 次”（35 min）",
+      "Keep 'fault injection, 12 kinds × 5' (35 min)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "加上“2 h 浸泡”以覆盖热问题",
+      "Add the '2 h soak' to cover thermal problems"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "把停针改为每晚停 3 次以节省时间",
+      "Change stopping to three stops a night to save time"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "207 − 55 + 80 + 6 = 238 min ≤ 240；2 h 浸泡会超预算，应挪到周末；停 3 次仍看不出 Cpk。",
+    "207 − 55 + 80 + 6 = 238 min ≤ 240; the 2 h soak would break the budget and belongs at the weekend; three stops still cannot show Cpk."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "测试金字塔与“最低一层发现”原则；需求追溯；零失效次数、置信下限、检出概率与 Cpk 的计算和判定；每晚预算与二分。",
+   "The test pyramid and the lowest-level principle; requirement tracing; computing and judging zero-failure counts, lower bounds, detection probability and Cpk; nightly budget and bisection."
+  ],
+  "difficult": [
+   "“点估计合格不等于合格”和“次数要花在最敏感工况上”学生容易想不通；要用 1000 次 2 次失败、4000 与 4750 r/min 的对比当场算给他们看。",
+   "Students struggle with 'a passing point estimate is not a pass' and 'spend trials at the most sensitive condition'; compute live the 2-in-1000 case and the 4000 vs 4750 r/min comparison."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：车间剪线报修",
+     "Opening: trim complaints from the floor"
+    ],
+    "minutes": 15,
+    "content": [
+     "讲剪线回归的故事，让学生猜为什么手工试缝没发现；算 0.988⁵⁰。",
+     "Tell the regression story, let students guess why hand trials missed it, and compute 0.988⁵⁰."
+    ]
+   },
+   {
+    "phase": [
+     "测试金字塔与需求追溯",
+     "Test pyramid and requirement tracing"
+    ],
+    "minutes": 30,
+    "content": [
+     "五层对比、最低一层原则；REQ 编号、追溯矩阵、结果五要素。",
+     "Compare the five levels and the lowest-level principle; REQ numbers, traceability matrix, the five items of a result."
+    ]
+   },
+   {
+    "phase": [
+     "测试台与 pytest 脚本",
+     "Test bench and pytest scripts"
+    ],
+    "minutes": 25,
+    "content": [
+     "讲测试台模块与独立真值；读 conftest.py 与验收用例，讲夹具、参数化和标记。",
+     "Cover bench modules and independent truth; read conftest.py and the acceptance cases, explaining fixtures, parametrisation and markers."
+    ]
+   },
+   {
+    "phase": [
+     "要测多少次",
+     "How many tests"
+    ],
+    "minutes": 40,
+    "content": [
+     "推导零失效公式、Clopper–Pearson 下限、检出概率和 Cpk；学生当堂用 Python 算表 22-5 的几格。",
+     "Derive the zero-failure formula, Clopper–Pearson bound, detection probability and Cpk; students compute cells of Table 22-5 in Python."
+    ]
+   },
+   {
+    "phase": [
+     "持续集成、二分与成熟度",
+     "CI, bisection and maturity"
+    ],
+    "minutes": 35,
+    "content": [
+     "三条流水线与 240 min 分配；git bisect；P0 到量产的退出条件，EOL 与现场数据回流；案例收尾。",
+     "Three pipelines and the 240 min split; git bisect; exit criteria from P0 to volume, EOL and field data; closing the case."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 22-1 与小结",
+     "Virtual lab 22-1 and summary"
+    ],
+    "minutes": 35,
+    "content": [
+     "学生完成三个任务并填记录表；小结并布置作业。",
+     "Students complete the three tasks and the record table; summarise and set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“剪线可靠性验证与每晚测试设计”；预习第 23 章尺寸链与振动的内容。",
+   "Complete the assignment on trim reliability and nightly test design; read ahead the tolerance chains and vibration of Chapter 23."
+  ]
+ }
+}

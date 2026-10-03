@@ -1,0 +1,1509 @@
+{
+ "no": 9,
+ "title": [
+  "包缝机",
+  "The Overlock Machine"
+ ],
+ "hours": 6,
+ "goals": [
+  [
+   "能说明 504 线迹三根线各管哪一段，以及一针中三次“穿线环”的时刻与间隙要求。",
+   "Explain which stretch each of the three threads of the 504 stitch covers, and the timing and clearance needed for the three loop entries in one stitch."
+  ],
+  [
+   "能用曲柄滑块公式算出斜针的入布、出布转角，并判断送布牙的时间余量。",
+   "Use the slider-crank formula to find the angles at which the slanted needle enters and leaves the fabric, and judge the timing margin of the feed dogs."
+  ],
+  [
+   "能用 RSSR 的位置方程求摆角，用速度公式求角速度和传动角，并判断曲柄能否整周转动。",
+   "Solve the RSSR position equation for the swing angle, use the velocity formula to find angular velocity and transmission angle, and check whether the crank can make full turns."
+  ],
+  [
+   "能解释上弯针摆动导杆机构为什么走出“先竖后横”的钩形轨迹，并读懂包缝机时序图上的三对间隙。",
+   "Explain why the oscillating guide-bar mechanism gives the upper looper its “first vertical, then horizontal” hook path, and read the three clearance pairs on the overlock timing diagram."
+  ],
+  [
+   "能用差动送布简化模型算出平整差动比和波浪高度，并据此给不同面料设定差动比。",
+   "Use the simplified differential-feed model to calculate the flat-edge differential ratio and the wave height, and set the differential ratio for different fabrics."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "汗布 T 恤侧缝起波浪",
+   "Wavy side seams on jersey T-shirts"
+  ],
+  "text": [
+   "某针织厂用高速三线包缝机（504 线迹，针距 2.5 mm）合汗布 T 恤的侧缝，差动比一直放在 1.0。质检发现侧缝布边鼓成波浪，波长约 30 mm。试缝测得：差动比为 1 时，汗布布边在缝制中被拉长约 18%；送布牙多走的距离只有约 0.85 能传给布。下周这条线还要缝罗纹领口，罗纹被拉长约 30%，传递比例约 0.80，波长约 26 mm。",
+   "A knitwear factory joins the side seams of single-jersey T-shirts on a high-speed three-thread overlock machine (504 stitch, stitch length 2.5 mm), with the differential ratio left at 1.0. Inspection finds the seam edge bulging into waves with a wavelength of about 30 mm. Test sewing shows that at a differential ratio of 1 the jersey edge is stretched by about 18% during sewing, and only about 0.85 of the extra travel of the feed dog reaches the fabric. Next week the same line will sew rib-knit necklines: rib stretches by about 30%, with a transmitted fraction of about 0.80 and a wavelength of about 26 mm."
+  ],
+  "question": [
+   "差动比为 1.0 时汗布侧缝的波浪大约多高？两种面料各应把差动比调到多少？",
+   "How high are the waves on the jersey side seam at a differential ratio of 1.0? To what differential ratio should each fabric be set?"
+  ],
+  "answer": [
+   "按 9.10 节的模型，D = 1 时布边应变 ε = 18%，波浪高 A ≈ λ√ε/π = 30 × 0.424 / 3.14 ≈ 4.0 mm，一眼就能看出的次品。平整差动比 D* = 1 + ε₀/η：汗布 1 + 0.18/0.85 ≈ 1.21，罗纹 1 + 0.30/0.80 ≈ 1.38（罗纹若误用 D = 1，波浪约 4.5 mm）。两者都在算例机 1:0.7 到 1:2 的调节范围内。",
+   "With the model of Section 9.10, at D = 1 the edge strain is ε = 18% and the wave height is A ≈ λ√ε/π = 30 × 0.424 / 3.14 ≈ 4.0 mm, a defect visible at a glance. The flat-edge ratio is D* = 1 + ε₀/η: for jersey 1 + 0.18/0.85 ≈ 1.21, for rib 1 + 0.30/0.80 ≈ 1.38 (rib sewn at D = 1 by mistake would wave about 4.5 mm high). Both lie within the 1:0.7 to 1:2 range of the worked-example machine."
+  ]
+ },
+ "robot": {
+  "title": [
+   "弯针的空间四杆 ↔ 机器人的闭链运动学",
+   "The looper’s spatial four-bar ↔ closed-chain robot kinematics"
+  ],
+  "text": [
+   "下弯针的 RSSR 只靠“连杆长度不变”一条约束，就把主轴转角 φ 换算成摆角 θ；Delta 并联机器人每条支链也是“转动副—球铰—球铰”，控制器解的正是同一类方程。θ = atan2(K,P) ± arccos(M/√(P²+K²)) 的两个解对应两种装配方式，就像机械臂逆解里的“肘上、肘下”两种构型，程序必须选定一种并保持连续。|M| ≤ √(P²+K²) 是工作空间的边界，超出就“够不着”，和目标点超出机械臂臂展是一回事。θ̇ = d·Ȧ/(d·t) 是一个一维雅可比，分母 d·t 趋于零就是奇异位形（死点），关节速度和受力会暴涨；传动角就是离奇异有多远的量度，机器人设计同样要求工作区远离奇异。",
+   "The lower-looper RSSR turns the main-shaft angle φ into the swing angle θ with a single constraint, “the link length is constant”; each leg of a Delta parallel robot is also revolute–spherical–spherical, and its controller solves the same kind of equation. The two solutions of θ = atan2(K,P) ± arccos(M/√(P²+K²)) are the two assembly configurations, just like the elbow-up and elbow-down solutions of a robot arm’s inverse kinematics; the program must pick one and stay on it. |M| ≤ √(P²+K²) is the boundary of the workspace: beyond it the link cannot reach, exactly as a target point can lie outside an arm’s reach. θ̇ = d·Ȧ/(d·t) is a one-dimensional Jacobian; when d·t tends to zero the mechanism is at a singularity (dead point) and joint speeds and loads blow up. The transmission angle measures how far the mechanism is from that singularity, and robot designers likewise keep the working range well away from singular poses."
+  ]
+ },
+ "life": {
+  "title": [
+   "手推布，就是差动送布",
+   "Pushing the fabric by hand is differential feed"
+  ],
+  "text": [
+   "用家用缝纫机改针织 T 恤的下摆，布边常常起波浪。有经验的人会一边缝，一边用手指在压脚前把布轻轻往针下推，手指就是那只“差动送布牙”：多推进一点布，正好抵消压脚拖拉造成的拉伸。",
+   "Hem a knit T-shirt on a home sewing machine and the edge often comes out wavy. Experienced sewers gently push the fabric towards the needle with their fingers in front of the presser foot as they sew. The fingers act as the differential feed dog: feeding in a little extra fabric cancels the stretch caused by the drag of the presser foot."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "为什么 T 恤侧缝用包缝",
+    "Why a T-shirt side seam is overlocked"
+   ],
+   "points": [
+    [
+     "弹性：汗布可拉长 30% 以上，锁式线迹几乎不能伸长",
+     "Elasticity: jersey stretches 30% or more; a lockstitch hardly stretches"
+    ],
+    [
+     "锁边：一道工序完成切齐、缝合、锁边",
+     "Edge finishing: trimming, seaming and neatening in one operation"
+    ],
+    [
+     "连续高速：大线筒供线、无梭芯，主轴可达 7000 r/min",
+     "Continuous and fast: threads from cones, no bobbin, main shaft up to 7000 r/min"
+    ],
+    [
+     "结构由需求而来：上下刀、上弯针、弯针成圈、差动送布",
+     "Structure follows need: knives, upper looper, looper loops, differential feed"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "同学们翻过一件针织 T 恤看侧缝，布边上包着一排密密的线圈，这就是包缝。为什么不用平缝？三个原因都和针织料有关。第一是弹性，汗布能拉长三成以上，平缝线迹一拉就断，包缝的线圈能滑动、能跟着布伸长。第二是针织布一剪就卷边脱散，包缝机边切边缝边包，一道工序做完。第三是线从大线筒供给，没有梭芯，可以长时间开到每分钟七千转。记住这三点，后面每个机构为什么存在就都好理解了。",
+    "Turn a knitted T-shirt inside out and look at the side seam: a dense row of loops wraps the edge. That is overlocking. Why not lockstitch? Three reasons, all about knits. First, elasticity: jersey stretches more than thirty per cent, a lockstitch snaps, but overlock loops can slide and stretch with the fabric. Second, a cut knit edge curls and unravels, and the overlocker trims, seams and wraps it in one pass. Third, the threads come from big cones with no bobbin, so it can run for hours at seven thousand r/min. Keep these three in mind and every mechanism that follows makes sense."
+   ]
+  },
+  {
+   "title": [
+    "整机：一根主轴带动一切",
+    "The whole machine: one main shaft drives everything"
+   ],
+   "points": [
+    [
+     "机头短，针杆在左上，机针向操作者一侧斜 20°",
+     "Short head, needle bar at the upper left, needle inclined 20° toward the operator"
+    ],
+    [
+     "主轴贯穿底座，右端手轮；各偏心经球头连杆驱动弯针",
+     "Main shaft runs through the base, handwheel on the right; eccentrics drive the loopers through ball-jointed links"
+    ],
+    [
+     "没有上轴、下轴、同步带，结构紧凑、转速高",
+     "No arm shaft, bed shaft or timing belt: compact and fast"
+    ],
+    [
+     "分工：针穿布，下弯针钩针线，上弯针绕布边，刀切边，两牙送布",
+     "Roles: needle penetrates, lower looper catches, upper looper wraps the edge, knife trims, two dogs feed"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_ol3d_xray.png",
+   "narration": [
+    "这是算例机的透视图，主轴转在 270°。和平缝机比，最大的不同是没有长机臂，也没有上轴、下轴和同步带那一套，几乎所有动作都从底座里一根主轴上的几个偏心取出来，所以结构紧凑、能跑得很快。大家先把分工记住：机针把针线带过布，下弯针在布下钩住针线，上弯针绕过布边把线拉到布面，刀负责切齐，两只送布牙一只多送、一只少送。下面我们从线迹讲起，因为线迹决定了这些机构怎样配合。",
+    "This is the X-ray view of the worked-example machine at a shaft angle of 270°. Compared with a lockstitch machine, there is no long arm and no arm shaft, bed shaft and timing belt; nearly every motion comes from eccentrics on one main shaft in the base, so it is compact and fast. Remember the roles: the needle carries the thread through, the lower looper catches it underneath, the upper looper goes round the edge and brings thread to the top, the knife trims, and the two feed dogs feed, one more and one less. We start from the stitch, because the stitch decides how these parts must cooperate."
+   ]
+  },
+  {
+   "title": [
+    "500 类线迹：504、514、516",
+    "Class 500 stitches: 504, 514, 516"
+   ],
+   "points": [
+    [
+     "ISO 4915 的 500 类：至少有一根线绕过布边",
+     "ISO 4915 Class 500: at least one thread passes round the edge"
+    ],
+    [
+     "504 三线：针线穿布，下弯针线管布底到布边，上弯针线管布边到布面",
+     "504 three-thread: needle thread penetrates, lower-looper thread underside to edge, upper-looper thread edge to top"
+    ],
+    [
+     "514 多一根针（相距 2 mm），更牢；516 = 401 链缝 + 504",
+     "514 adds a needle 2 mm away, stronger; 516 = 401 chainstitch + 504"
+    ],
+    [
+     "没有死结，线可在套结处滑动，所以有弹性",
+     "No tight knots; threads slide at interloops, hence elasticity"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_500.png",
+   "narration": [
+    "图上把布边展开画：上半是布面，中间深色窄条是布边，下半是布底。504 用一根针线、两根弯针线，三根线各管一段：针线管穿透布料，下弯针线从布底走到布边，上弯针线从布边回到布面、被下一针压住。整条线迹没有一个死结，受拉时线能在各个套结处滑动，这就是弹性的来源。514 多一根针，两针相距 2 毫米，布面多压一道，常用于针织合缝；516 其实是一道 401 链缝加一道 504，牛仔、外套的梭织料合缝常用它。",
+    "The figure draws the edge unfolded: top half is the fabric face, the dark strip is the edge, bottom half is the underside. 504 uses one needle thread and two looper threads, each covering one stretch: the needle thread goes through the fabric, the lower-looper thread runs from underside to edge, and the upper-looper thread runs from edge back to the top, where the next stitch pins it. There is not a single tight knot; under tension the threads slide at every interloop, and that is where the stretch comes from. 514 adds a second needle 2 mm away for knit seams; 516 is a 401 chainstitch plus a 504, used on woven jeans and jackets."
+   ]
+  },
+  {
+   "title": [
+    "一针三次“穿线环”",
+    "Three loop entries in one stitch"
+   ],
+   "points": [
+    [
+     "① 213.6°：下弯针尖钻进针线环，针已回升 2.6 mm，间隙 0.05 mm",
+     "① 213.6°: lower-looper point enters the needle loop; needle risen 2.6 mm; clearance 0.05 mm"
+    ],
+    [
+     "② 270.8°：上弯针从下弯针刀身与其线之间穿过，间隙 0.10 mm",
+     "② 270.8°: upper looper passes between lower-looper blade and its thread; clearance 0.10 mm"
+    ],
+    [
+     "③ 57.5°：机针穿入上弯针线三角，间隙 0.10 mm",
+     "③ 57.5°: needle enters the upper-looper thread triangle; clearance 0.10 mm"
+    ],
+    [
+     "共同要求：时刻要对，间隙要小",
+     "Common demands: right timing, small clearance"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_ol_stages.png",
+   "narration": [
+    "平缝机一针只有一次关键交接，包缝机一针要交接三次，这是读懂包缝机的钥匙。第一次在 213.6°，针从最低点回升 2.6 毫米，线环鼓出，下弯针尖从针后面擦过钻进去，刀身离针只有 0.05 毫米。第二次在 270.8°，下弯针摆到最左，它的刀身和自己的线张开一个细长三角，上弯针从下往上穿过去，间隙 0.10 毫米。第三次在 57.5° 前后，上弯针已经把线带到布面左上方，机针从它的刀身和线之间刺下去。三次都是一个尖去穿一个三角，所以时刻和间隙缺一不可。",
+    "A lockstitch has one critical hand-over per stitch; an overlock stitch has three, and they are the key to the whole machine. First, at 213.6°, the needle has risen 2.6 mm, the loop bulges, and the lower-looper point slips in behind the needle with a blade clearance of only 0.05 mm. Second, at 270.8°, the lower looper is at its leftmost, its blade and its own thread open a long thin triangle, and the upper looper rises through it with 0.10 mm clearance. Third, around 57.5°, the upper looper has carried thread to the upper left and the needle comes down between its blade and its thread. Each time a point enters a triangle, so both timing and clearance matter."
+   ]
+  },
+  {
+   "title": [
+    "斜向引针机构",
+    "The slanted needle-bar mechanism"
+   ],
+   "points": [
+    [
+     "对心曲柄滑块：r = 12.25 mm，l = 42 mm，λ = 0.292，行程 24.5 mm",
+     "In-line slider-crank: r = 12.25 mm, l = 42 mm, λ = 0.292, stroke 24.5 mm"
+    ],
+    [
+     "竖直高度乘 cos 20°：最高针板上 9.5 mm，最低针板下 13.5 mm",
+     "Vertical height × cos 20°: 9.5 mm above to 13.5 mm below the throat plate"
+    ],
+    [
+     "布厚 1.5 mm：80.8° 入布、279.2° 出布，布中 198°，送布 162°",
+     "1.5 mm fabric: enters 80.8°, leaves 279.2°; 198° in fabric, 162° for feeding"
+    ],
+    [
+     "针斜是为了让下弯针摆轴与针平行，间隙处处相同",
+     "The needle is slanted so the lower-looper shaft can be parallel to it, keeping the clearance constant"
+    ]
+   ],
+   "formula": "s(\\varphi) = r(1-\\cos\\varphi) - l\\left(1-\\sqrt{1-\\lambda^{2}\\sin^{2}\\varphi}\\right)",
+   "figure": "",
+   "narration": [
+    "引针机构还是第 3 章的曲柄滑块，只是整个机构连针杆一起斜了 20 度。针尖沿针的轴线走，位移用这个公式算，竖直高度再乘以 cos20°：最高在针板上 9.5 毫米，最低在针板下 13.5 毫米。两层汗布约 1.5 毫米厚，针尖在 80.8° 刺入、279.2° 离开，在布里待 198°，剩下 162° 给送布。为什么要斜？关键在下弯针：它的摆轴和针平行，弯针尖就在垂直于针的平面里走圆弧，针升到哪里，间隙都一样。实际机器多用六杆机构驱动针杆，但行程和入布出布时刻几乎相同。",
+    "The needle-bar drive is still the slider-crank of Chapter 3, only the whole thing, needle bar included, is tilted 20 degrees. The point moves along the needle axis, its displacement comes from this formula, and its vertical height is multiplied by cos 20°: 9.5 mm above the plate at the top, 13.5 mm below at the bottom. With two plies of jersey, about 1.5 mm, the point enters at 80.8° and leaves at 279.2°: 198° in the fabric and 162° left for feeding. Why slant it? Because of the lower looper: with its rocking shaft parallel to the needle, the looper point swings in a plane perpendicular to the needle, so the clearance is the same wherever the needle is. Real machines often use a six-bar drive, but stroke and entry and exit angles are almost unchanged."
+   ]
+  },
+  {
+   "title": [
+    "下弯针：一个空间四杆机构",
+    "The lower looper: a spatial four-bar linkage"
+   ],
+   "points": [
+    [
+     "弯针尖半径 R = 38 mm，摆角 25.7°，从针右 13.0 mm 摆到针左 3.8 mm",
+     "Point radius R = 38 mm, swing 25.7°, from 13.0 mm right of the needle to 3.8 mm left"
+    ],
+    [
+     "刀身做成以摆轴为圆心的圆弧，整片刀身沿同一圆弧滑过",
+     "The blade is an arc centred on the rocking shaft, so the whole blade follows one arc"
+    ],
+    [
+     "主轴左右向，摆轴斜 20°：两轴既不平行也不相交",
+     "Main shaft runs left–right, rocking shaft tilted 20°: neither parallel nor intersecting"
+    ],
+    [
+     "曲柄 r = 4.36 mm，球头连杆 b = 22.48 mm，摆杆 c = 22 mm：RSSR",
+     "Crank r = 4.36 mm, ball-jointed link b = 22.48 mm, rocker c = 22 mm: an RSSR"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_ll_rssr.png",
+   "narration": [
+    "下弯针是一根弯成圆弧的细长钢片，装在一根与机针平行的摆轴上。算例机弯针尖离摆轴 38 毫米，摆角 25.7 度，从针右边 13 毫米摆到针左边 3.8 毫米。刀身也做成以摆轴为圆心的圆弧，所以摆动时整片刀身都贴着同一条圆弧走。难点在驱动：主轴是左右方向的，摆轴却斜在前后竖直面里，两根轴既不平行也不相交，平面四杆机构用不上，只好在连杆两端都用球铰，构成转动副、球铰、球铰、转动副，简称 RSSR。",
+    "The lower looper is a slender steel blade bent into an arc, mounted on a rocking shaft parallel to the needle. On the worked-example machine the point is 38 mm from the shaft and swings 25.7 degrees, from 13 mm right of the needle to 3.8 mm left of it. The blade itself is an arc centred on the shaft, so the whole blade slides along one arc. The difficulty is the drive: the main shaft runs left to right, the rocking shaft is tilted in the fore–aft vertical plane, and the two axes neither meet nor are parallel. A planar four-bar cannot work, so both ends of the link get ball joints: revolute, spherical, spherical, revolute, RSSR for short."
+   ]
+  },
+  {
+   "title": [
+    "摆角怎样算",
+    "Calculating the swing angle"
+   ],
+   "points": [
+    [
+     "关键约束：|A − B| = b，连杆长度不变",
+     "Key constraint: |A − B| = b, the link length is constant"
+    ],
+    [
+     "B = Q + c(cosθ v₀ + sinθ v₁)，代入得一次三角方程",
+     "B = Q + c(cosθ v₀ + sinθ v₁) gives a first-degree trigonometric equation"
+    ],
+    [
+     "θ = atan2(K,P) ± arccos(M/√(P²+K²))，正负号对应两种装配",
+     "θ = atan2(K,P) ± arccos(M/√(P²+K²)); the sign picks the assembly configuration"
+    ],
+    [
+     "粗估 Δθ ≈ 2r/c = 22.7°，精确 25.7°（大 13%）",
+     "Rough estimate Δθ ≈ 2r/c = 22.7°; exact 25.7° (13% more)"
+    ]
+   ],
+   "formula": "P\\cos\\theta + K\\sin\\theta = M,\\quad M = \\frac{|\\mathbf{A}-\\mathbf{Q}|^{2}+c^{2}-b^{2}}{2c}",
+   "figure": "",
+   "narration": [
+    "空间机构听着吓人，算起来只抓一条：连杆长度不变。曲柄球心 A 只取决于主轴转角，是已知的；摆杆球心 B 绕摆轴转，写成 Q 加上 c 乘以两个垂直单位向量的组合。把它代进 |A−B| 等于 b，平方项一消，就剩下这个 P cosθ 加 K sinθ 等于 M 的一次方程，直接解出 θ。正负号对应两种装配方式，按实际安装选一个。粗估的话，把 B 的行程当成曲柄直径，摆角约 2r/c，22.7 度；精确值 25.7 度，大了 13%，因为连杆是在空间里斜着推的。",
+    "Spatial mechanisms sound frightening, but the calculation rests on one fact: the link length is constant. The crank ball A depends only on the shaft angle and is known; the rocker ball B turns about the rocking shaft and is written as Q plus c times a combination of two perpendicular unit vectors. Put that into |A − B| = b, the squared terms cancel, and you are left with P cosθ + K sinθ = M, which solves directly for θ. The two signs are the two assemblies; pick the one that matches the machine. For a rough estimate take B’s travel as the crank diameter: 2r/c, 22.7 degrees. The exact value is 25.7, 13% more, because the link pushes obliquely in space."
+   ]
+  },
+  {
+   "title": [
+    "自由度与能否整周转动",
+    "Mobility and full rotation of the crank"
+   ],
+   "points": [
+    [
+     "F = 6×3 − (5+3+3+5) = 2，其中 1 个是连杆自转的局部自由度",
+     "F = 6×3 − (5+3+3+5) = 2, one being the passive spin of the link"
+    ],
+    [
+     "局部自由度不影响运动，但高速下磨球窝；可改用万向节",
+     "The passive freedom does not affect motion but wears the sockets at speed; a universal joint removes it"
+    ],
+    [
+     "有解条件 |M| ≤ √(P²+K²)：逐角检查一整圈",
+     "Solvable only if |M| ≤ √(P²+K²): check every angle over a revolution"
+    ],
+    [
+     "算例最小余量 5.2 mm；r 大于约 10.7 mm 就卡死",
+     "Worked example: minimum margin 5.2 mm; jams if r exceeds about 10.7 mm"
+    ]
+   ],
+   "formula": "F = 6(n-1) - \\sum_i (6 - f_i) = 2,\\qquad |M| \\le \\sqrt{P^{2}+K^{2}}",
+   "figure": "",
+   "narration": [
+    "先问自由度。空间机构的公式算出来是 2，可主轴只有一个输入，多的那个在哪？在连杆身上：两端都是球铰，它能绕两个球心的连线自转，这种自转不影响任何别的构件，叫局部自由度，去掉它实际自由度是 1。它对运动无害，但高速时会让连杆轻微自转、磨损球窝。再问能不能整周转动。方程左边最大只有根号 P 方加 K 方，所以要 |M| 不超过它才有解。平面机构有格拉晓夫条件，空间机构没有简单公式，最可靠的就是让 φ 走一圈逐角检查。算例机余量最小还有 5.2 毫米，曲柄加大到 10.7 毫米以上就会卡死。",
+    "First, mobility. The spatial formula gives 2, yet the shaft is the only input. Where is the extra one? In the link: with a ball at each end it can spin about the line through the two ball centres without moving anything else. That is a passive freedom; remove it and the real mobility is 1. It does no harm to the motion but at speed the link spins slightly and wears the sockets. Second, can the crank turn fully? The left side of the equation can be at most the square root of P squared plus K squared, so |M| must not exceed it. Planar linkages have the Grashof test; spatial ones do not, so step φ round a full turn and check each angle. The worked example keeps at least 5.2 mm of margin; push r beyond about 10.7 mm and it jams."
+   ]
+  },
+  {
+   "title": [
+    "角速度、角加速度与传动角",
+    "Angular velocity, acceleration and transmission angle"
+   ],
+   "points": [
+    [
+     "刚性连杆两端速度在连杆方向的分量相等",
+     "Both ends of a rigid link have equal velocity components along it"
+    ],
+    [
+     "分母 d·t → 0 即死点：速度、加速度暴涨",
+     "Denominator d·t → 0 is a dead point: velocity and acceleration blow up"
+    ],
+    [
+     "7000 r/min：θ̇ 最大 182 rad/s（弯针尖 6.9 m/s），θ̈ 最大 1.42 × 10⁵ rad/s²",
+     "At 7000 r/min: max θ̇ 182 rad/s (point 6.9 m/s), max θ̈ 1.42 × 10⁵ rad/s²"
+    ],
+    [
+     "下弯针传动角 49.5°–75°，最小在 223° 附近；经验下限 40°",
+     "Lower-looper transmission angle 49.5°–75°, minimum near 223°; rule of thumb ≥ 40°"
+    ]
+   ],
+   "formula": "\\dot\\theta = \\frac{\\mathbf{d}\\cdot\\dot{\\mathbf{A}}}{\\mathbf{d}\\cdot\\mathbf{t}},\\quad \\mathbf{t} = \\mathbf{e}\\times\\mathbf{r},\\qquad \\sin\\gamma = \\frac{|\\mathbf{d}\\cdot\\mathbf{t}|}{|\\mathbf{d}|\\,|\\mathbf{t}|}",
+   "figure": "w_2aac36cf.png",
+   "narration": [
+    "对连杆长度不变求导，得到这个式子：分子是曲柄球心速度在连杆方向的分量，分母是摆杆球心单位角速度时的速度在连杆方向的分量。意思很朴素，刚性杆两头沿杆方向的速度必须相等。分母趋于零就是死点。传动角的正弦就是 d·t 除以两者长度，90 度时推得最正。算例机 7000 转时，摆杆最大角速度 182 弧度每秒，乘 38 毫米就是弯针尖 6.9 米每秒；最大角加速度 1.42 乘 10 的 5 次方，出现在弯针摆到最右、准备换向的时候。传动角在 49.5 到 75 度之间，满足 40 度的经验值。",
+    "Differentiate the constant link length and you get this formula. The numerator is the crank ball’s velocity along the link; the denominator is the rocker ball’s velocity per unit angular velocity, also along the link. The idea is plain: both ends of a rigid bar must move equally along the bar. When the denominator goes to zero we have a dead point. The sine of the transmission angle is d·t divided by the two lengths; at 90 degrees the push is perfectly square. At 7000 r/min the rocker peaks at 182 radians per second, which at 38 mm is a looper-point speed of 6.9 m/s, and the peak angular acceleration is 1.42 times ten to the fifth, just as the looper reverses at the right. The transmission angle stays between 49.5 and 75 degrees, above the 40-degree rule."
+   ]
+  },
+  {
+   "title": [
+    "传动角与时间余量的取舍",
+    "Trading transmission angle for timing margin"
+   ],
+   "points": [
+    [
+     "下弯针向左 168.5°、向右 191.5°：向左快、向右慢",
+     "Lower looper: 168.5° leftward, 191.5° rightward — fast left, slow right"
+    ],
+    [
+     "摆杆上移 5 mm：行程 174°，最小传动角 64°；上移 10 mm：180°，74°",
+     "Rocker up 5 mm: 174°, minimum angle 64°; up 10 mm: 180°, 74°"
+    ],
+    [
+     "不对称换来时间余量，代价是传动角",
+     "Asymmetry buys timing margin at the cost of transmission angle"
+    ],
+    [
+     "上弯针 RSSR 最小 39°：连杆力系数 1.59 对 1.56，只差 2%，暂不改",
+     "Upper-looper RSSR minimum 39°: force factor 1.59 vs 1.56, only 2% more, left as is"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "下弯针的传动角为什么不更大？因为设计者故意让它向左快、向右慢，向左摆只用 168.5 度。如果把摆杆沿摆轴上移 5 毫米、重调曲柄保持摆角，向左行程变成 174 度，最小传动角升到 64 度；上移 10 毫米完全对称，传动角 74 度。也就是说，不对称换来的时间余量，是拿传动角买的。上弯针那一套更紧，最小只有 39 度，比经验值低一点。算例机还是保留了它：连杆力和 1/sinγ 成正比，39 度是 1.59，40 度是 1.56，只大 2%；而一改摇杆轴，三处间隙和整张时序图都要重算。",
+    "Why is the lower looper’s transmission angle not larger? Because the designer deliberately made it fast to the left and slow to the right: the leftward swing takes only 168.5 degrees. Move the rocker 5 mm up its shaft, readjust the crank to keep the swing, and the leftward stroke becomes 174 degrees with a minimum angle of 64; move it 10 mm and the motion is symmetric with 74 degrees. So the timing margin from asymmetry is paid for in transmission angle. The upper-looper linkage is tighter, only 39 degrees, a little under the rule. The machine still keeps it: link force goes as one over sin gamma, 1.59 at 39 degrees against 1.56 at 40, only 2% more, while moving the rocker shaft means rechecking three clearances and the whole timing diagram."
+   ]
+  },
+  {
+   "title": [
+    "上弯针：绕过布边的那一钩",
+    "The upper looper: the hook round the edge"
+   ],
+   "points": [
+    [
+     "路径要“先竖后横”：在布边右侧竖直上升，高过布面后向左平伸",
+     "Path must be vertical then horizontal: rise outside the edge, then reach left above the fabric"
+    ],
+    [
+     "摆动导杆：摇杆 30 mm、摆角 50.5°，导杆在摆动导套 G 中滑动兼摆动",
+     "Oscillating guide bar: rocker 30 mm swinging 50.5°; the bar slides and swings in bushing G"
+    ],
+    [
+     "针尖 T = Q + Lu + hn，L = 60.06 mm，h = 9.96 mm；|QG| 由 44 mm 缩到 21 mm",
+     "Point T = Q + Lu + hn, L = 60.06 mm, h = 9.96 mm; |QG| shrinks from 44 to 21 mm"
+    ],
+    [
+     "22° 到左上极限，距针 4.3 mm（调机标准 4–4.5 mm）；最高约 10 m/s、约 1260 g",
+     "Upper-left limit at 22°, 4.3 mm from the needle (setting standard 4–4.5 mm); up to about 10 m/s and about 1260 g"
+    ]
+   ],
+   "formula": "\\mathbf{u} = \\frac{\\mathbf{G}-\\mathbf{Q}}{|\\mathbf{G}-\\mathbf{Q}|},\\qquad \\mathbf{T} = \\mathbf{Q} + L\\,\\mathbf{u} + h\\,\\mathbf{n}",
+   "figure": "fig_ul_mech.png",
+   "narration": [
+    "上弯针的活最难：布从针一直铺到右边 4 毫米的布边，它不能穿布，只能先在布边右侧竖着上来，高过布面再拐弯横着伸到针的左上方。一根普通摆杆只能走圆弧，做不到。办法是摆动导杆：导杆穿过一个只能摆不能移的导套，下端由摇杆推着。针尖位置就是 Q 加 L 倍 u 再加 h 倍 n。妙处在 QG 的长度：低处 44 毫米，导杆几乎不转，针尖竖着走；高处缩到 21 毫米，同样的推动转得快一倍多，针尖就横着甩出去。22 度到达左上极限，离针 4.3 毫米，正好落在工厂调机标准里。",
+    "The upper looper has the hardest job. Fabric lies from the needle to the edge 4 mm to the right; the looper cannot go through it, so it must rise vertically outside the edge and only above the fabric turn left to reach the upper left of the needle. A simple rocker only traces arcs and cannot do this. The answer is an oscillating guide bar: the bar passes through a bushing that can swing but not move, and its lower end is pushed by a rocker. The point is at Q plus L times u plus h times n. The trick is the length QG: 44 mm low down, so the bar hardly turns and the point goes straight up; 21 mm up high, so the same push turns it more than twice as fast and the point is flung sideways. It reaches its upper-left limit at 22 degrees, 4.3 mm from the needle, inside the factory standard."
+   ]
+  },
+  {
+   "title": [
+    "时序图与三对“不能撞”",
+    "The timing diagram and three must-not-collide pairs"
+   ],
+   "points": [
+    [
+     "机针–下弯针：125° 针穿过下弯针平面时弯针尖在右 12.2 mm；213.6° 擦过 0.05 mm",
+     "Needle–lower looper: at 125° the point is 12.2 mm to the right; at 213.6° they pass at 0.05 mm"
+    ],
+    [
+     "上–下弯针最紧：162.5° 两尖相距 1.4 mm；对称摆动时只剩 0.7 mm",
+     "Upper–lower looper, the tightest: 1.4 mm apart at 162.5°; only 0.7 mm with symmetric swing"
+    ],
+    [
+     "机针–上弯针：22° 针尖在上方 3.7 mm，57.5° 穿过，间隙 0.10 mm",
+     "Needle–upper looper: at 22° needle 3.7 mm above; passes at 57.5° with 0.10 mm"
+    ],
+    [
+     "送布 292°–68°，两头各留约 13°；上刀 180° 最低，布静止时切",
+     "Feed 292°–68°, about 13° margin each end; knife lowest at 180° while fabric is still"
+    ]
+   ],
+   "formula": "",
+   "figure": "w_d90f8ced.png",
+   "narration": [
+    "把机针、两根弯针、送布牙和上刀画在同一条时间轴上，就是这张时序图，竖虚线是三次交接和入布、出布。读出三对不能撞的关系。机针和下弯针：125 度针往下穿过下弯针平面时，弯针尖还在右边 12.2 毫米，畅通无阻。上弯针和下弯针是全机最紧的一对：上弯针下降时在 162.5 度穿过下弯针平面，两个尖只差 1.4 毫米；如果下弯针改成对称摆动，它会早出发约 5 度，只剩 0.7 毫米，这就是不对称设计的用处。机针和上弯针在 57.5 度擦过。送布和切刀简单：布只在针不在布里时走，刀在针在布里、布静止时切。",
+    "Put the needle, both loopers, the feed dogs and the knife on one time axis and you get this diagram; the dashed lines are the three hand-overs plus needle entry and exit. Read off three pairs that must not collide. Needle and lower looper: at 125 degrees the needle passes down through the looper plane while the looper point is still 12.2 mm to the right, so the way is clear. Upper and lower looper are the tightest pair: on the way down the upper looper crosses the lower looper’s plane at 162.5 degrees, only 1.4 mm apart. With a symmetric lower looper it would set off about 5 degrees earlier and leave just 0.7 mm; that is what the asymmetry buys. Needle and upper looper pass at 57.5 degrees. Feed and knife are simple: fabric moves only when the needle is out, and the knife cuts while the needle holds it still."
+   ]
+  },
+  {
+   "title": [
+    "切边机构",
+    "The trimming mechanism"
+   ],
+   "points": [
+    [
+     "下刀固定，内侧边即切边线，距针 4 mm = 线迹宽度",
+     "Lower knife fixed; its inner edge is the trim line, 4 mm from the needle = stitch width"
+    ],
+    [
+     "上刀行程 6 mm：最高张开 5.2 mm，最低越过下刀 0.8 mm",
+     "Upper-knife stroke 6 mm: opens 5.2 mm, overlaps the lower knife by 0.8 mm"
+    ],
+    [
+     "三要素：切时布静止、两刀无间隙（弹簧贴紧）、重叠量 0.5–1 mm",
+     "Three essentials: fabric still while cutting, no gap (spring-loaded), overlap 0.5–1 mm"
+    ],
+    [
+     "下刀硬质合金或高速钢，上刀工具钢；磨钝先换上刀",
+     "Lower knife carbide or HSS, upper knife tool steel; replace the upper knife first"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_ol_knife.png",
+   "narration": [
+    "切边就是一把剪刀。下刀固定在针板右边，刃口和针板面齐平，它的内侧边离针 4 毫米，这就是线迹宽度。上刀由主轴偏心驱动，贴着下刀外侧上下走，行程 6 毫米：最高时张开 5.2 毫米让布进来，最低时越过下刀 0.8 毫米把布边剪断。切得好要三条：切时布要静止，所以上刀最低点放在 180 度，针正在布里；两刀之间不能有缝，上刀靠弹簧轻压在下刀上，否则薄料会被夹进刀缝拉毛；重叠量一般调 0.5 到 1 毫米，小了切不断，大了刀口磨得快。",
+    "Trimming is a pair of scissors. The lower knife is fixed to the right of the throat plate, edge flush with the plate, and its inner edge is 4 mm from the needle: that is the stitch width. The upper knife, driven by an eccentric, moves up and down against the outside of the lower knife with a 6 mm stroke: 5.2 mm open at the top to let the fabric in, 0.8 mm past the lower edge at the bottom to cut it. Three things make a clean cut. The fabric must be still, so the knife bottoms at 180 degrees while the needle is in the fabric. There must be no gap, so a spring presses the upper knife lightly against the lower one, otherwise thin fabric is dragged into the gap and frays. And the overlap is usually 0.5 to 1 mm: too little will not cut, too much wears the edges."
+   ]
+  },
+  {
+   "title": [
+    "差动送布：为什么要两只牙",
+    "Differential feed: why two feed dogs"
+   ],
+   "points": [
+    [
+     "针后主送布牙送一个针距 s，针前差动牙送 s_d",
+     "Main dog behind the needle feeds s; differential dog in front feeds s_d"
+    ],
+    [
+     "差动比 D = s_d/s ≈ l_d/l_m，调节杆移动槽中滑块",
+     "Differential ratio D = s_d/s ≈ l_d/l_m; the lever moves a slide block in a slot"
+    ],
+    [
+     "D > 1 推挤布，抵消针织料的拉伸；D < 1 拉开薄滑梭织料",
+     "D > 1 pushes fabric together to cancel knit stretch; D < 1 stretches thin slippery wovens"
+    ],
+    [
+     "常见调节范围 1:0.7 到 1:2",
+     "Typical range 1:0.7 to 1:2"
+    ]
+   ],
+   "formula": "D = \\frac{s_d}{s} \\approx \\frac{l_d}{l_m}",
+   "figure": "fig_ol_diff.png",
+   "narration": [
+    "回到 T 恤。缝针织料时，压脚把上层布往后拖，主送布牙在下面往前拉，线圈被拉长，线迹把这段拉长了的布边定了型；一松手布要缩回，线不缩，多出来的长度就鼓成波浪。办法是在针前再放一只差动牙，每针多送一点布，把两牙之间的布推紧一点，正好抵消那份拉伸。两只牙由同一根送布摆轴驱动，摆角相同，行程就和臂长成正比，所以差动比约等于 l_d 比 l_m。外面那根调节杆移动的就是槽里的滑块。反过来，雪纺这类薄滑梭织料容易被推皱，就让差动牙少送一点。",
+    "Back to the T-shirt. While a knit is sewn, the presser foot drags the top ply back and the main dog pulls forward underneath, so the loops stretch and the stitch fixes the stretched edge. Release it and the fabric shrinks back but the thread does not, so the extra length bulges into waves. The cure is a second dog in front of the needle that feeds a little more each stitch, packing the fabric between the dogs just enough to cancel the stretch. Both dogs are driven by one feed rocking shaft through the same angle, so their strokes are proportional to arm length, and the ratio is about l_d over l_m. The lever outside moves the slide block in the slot. For thin, slippery wovens like chiffon, which pucker easily, set the differential dog to feed a little less."
+   ]
+  },
+  {
+   "title": [
+    "差动比的简化模型",
+    "A simplified model of the differential ratio"
+   ],
+   "points": [
+    [
+     "有效差动比 D_e = 1 + η(D − 1)，布边应变 ε = (1+ε₀)/D_e − 1",
+     "Effective ratio D_e = 1 + η(D − 1); edge strain ε = (1+ε₀)/D_e − 1"
+    ],
+    [
+     "平整差动比 D* = 1 + ε₀/η；汗布 1.21，罗纹约 1.4，卫衣布 1.1，斜纹 1.0，雪纺 0.94",
+     "Flat-edge ratio D* = 1 + ε₀/η: jersey 1.21, rib ~1.4, fleece 1.1, twill 1.0, chiffon 0.94"
+    ],
+    [
+     "波浪高 A ≈ λ√ε/π：汗布 D = 1 时约 4 mm",
+     "Wave height A ≈ λ√ε/π: about 4 mm for jersey at D = 1"
+    ],
+    [
+     "故意调过头：汗布 D ≈ 0.8 做生菜边，雪纺 D > 1.5 收碎褶",
+     "Overdone on purpose: jersey at D ≈ 0.8 gives a lettuce edge; chiffon above 1.5 gathers"
+    ]
+   ],
+   "formula": "D_e = 1 + \\eta\\,(D-1),\\quad \\varepsilon = \\frac{1+\\varepsilon_0}{D_e} - 1,\\quad D^{*} = 1 + \\frac{\\varepsilon_0}{\\eta},\\quad A \\approx \\frac{\\lambda\\sqrt{\\varepsilon}}{\\pi}",
+   "figure": "w_c094b35b.png",
+   "narration": [
+    "工厂靠试缝定差动比，模型能讲清道理。设 D 为 1 时布边被拉长 ε₀，牙齿多走的距离只有比例 η 传到布上，于是有效差动比是 1 加 η 乘 (D−1)，布边应变就是这个式子。令应变为零，得 D* 等于 1 加 ε₀ 除以 η。汗布取 18% 和 0.85，D* 约 1.21。不调的话多出的 18% 鼓成正弦波，波高约 λ 根号 ε 除以 π，30 毫米波长就是 4 毫米。图上五种面料各有平整点，曲线两头变平是送布牙打滑。故意调过头，还能做生菜边或收碎褶。ε₀ 和 η 是示意值，要试缝测定。",
+    "In the factory the ratio is found by test sewing, but this simple model shows why. Let the edge stretch by ε₀ at D equal to 1, and let only a fraction η of the extra dog travel reach the fabric. Then the effective ratio is 1 plus η times D minus 1, and the edge strain is this formula. Set the strain to zero: D star equals 1 plus ε₀ over η. For jersey, 18% and 0.85 give about 1.21. Leave it at 1 and the extra 18% bulges into a sine wave whose height is about λ root ε over π: with a 30 mm wavelength, 4 mm, obvious at a glance. Each fabric in the chart has its own flat point; where curves flatten, the dogs slip. Overdo it on purpose and you get a lettuce edge or gathers. ε₀ and η are illustrative and must come from test sewing."
+   ]
+  },
+  {
+   "title": [
+    "设计要点与制造难点",
+    "Design notes and manufacturing challenges"
+   ],
+   "points": [
+    [
+     "一切从线迹出发：三次穿线环，每次十分之一毫米间隙",
+     "Everything starts from the stitch: three loop entries, each with a tenth-of-a-millimetre clearance"
+    ],
+    [
+     "针与下弯针摆轴同斜；两轴不平行只好用 RSSR；上弯针用摆动导杆走钩形",
+     "Needle and lower-looper shaft slant together; non-parallel shafts demand RSSR; guide bar gives the hook path"
+    ],
+    [
+     "用机构不对称安排两根弯针的进退；切刀、送布避开或利用针在布中",
+     "Asymmetry orders the loopers; knife and feed avoid or use the needle-in-fabric period"
+    ],
+    [
+     "制造难点：成缝区孔系位置精度、高速球铰与导套、弯针本身",
+     "Manufacturing: bore positions in the stitch zone, high-speed ball joints and bushing, the looper itself"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后把整章串一下。包缝机的设计从 504 线迹出发：一针要三次穿线环，每次都要在对的时刻、以十分之一毫米的间隙完成。为了让下弯针始终以同样的间隙擦过机针，摆轴和针一起斜放；主轴和摆轴不平行，只能用球头连杆组成空间四杆。上弯针要绕过布边，就用摆动导杆走先竖后横的钩，弯针本体顺着轨迹做弯。两根弯针互不干涉，靠的是机构的不对称。最后，针织物容易拉长，所以要有差动送布。制造上难在三处：机壳上几个方向不同的孔要精确到百分之几毫米，高速下的球铰和导套，以及弯针本身。这些在第 23 章还会展开。",
+    "Let us tie the chapter together. Overlock design starts from the 504 stitch: three loop entries per stitch, each at the right moment with a tenth-of-a-millimetre clearance. To keep the lower looper’s clearance constant, its shaft is slanted together with the needle; since that shaft is not parallel to the main shaft, a ball-jointed spatial four-bar is needed. To get the upper looper round the edge, a guide bar traces the vertical-then-horizontal hook, and the looper is bent to follow it. Mechanism asymmetry keeps the two loopers apart, and differential feed handles stretchy knits. In manufacturing the hard parts are three: bores in different directions held to a few hundredths of a millimetre, ball joints and bushings at high speed, and the looper itself. Chapter 23 picks these up again."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "504 线迹由针线、下弯针线、上弯针线各管一段，没有死结，所以有弹性；一针要完成三次“穿线环”（213.6°、270.8°、57.5°），间隙 0.05–0.10 mm。",
+   "In the 504 stitch the needle, lower-looper and upper-looper threads each cover one stretch with no tight knot, hence its elasticity; each stitch needs three loop entries (213.6°, 270.8°, 57.5°) with clearances of 0.05–0.10 mm."
+  ],
+  [
+   "机针斜 20° 是为了让下弯针摆轴与针平行；布厚 1.5 mm 时针在 80.8° 入布、279.2° 出布，送布牙在 292°–68° 送布，两头各留约 13°。",
+   "The needle is slanted 20° so the lower-looper shaft can be parallel to it; with 1.5 mm fabric the needle enters at 80.8° and leaves at 279.2°, and the feed dogs work from 292° to 68°, about 13° of margin at each end."
+  ],
+  [
+   "RSSR 的分析全靠“连杆长度不变”：位置用 P cosθ + K sinθ = M，有解条件 |M| ≤ √(P²+K²)，角速度 θ̇ = d·Ȧ/(d·t)，传动角 sinγ = |d·t|/(|d||t|)。",
+   "RSSR analysis rests on the constant link length: position from P cosθ + K sinθ = M, solvability |M| ≤ √(P²+K²), angular velocity θ̇ = d·Ȧ/(d·t), transmission angle sinγ = |d·t|/(|d||t|)."
+  ],
+  [
+   "上弯针用摆动导杆，T = Q + Lu + hn，|QG| 由长变短使轨迹先竖后横；两根弯针最紧处在 162.5°，下弯针“向左快、向右慢”把余量从 0.7 mm 提到 1.4 mm，代价是传动角。",
+   "The upper looper uses an oscillating guide bar, T = Q + Lu + hn, and the shrinking |QG| turns the path from vertical to horizontal; the loopers are closest at 162.5°, where the fast-left, slow-right lower looper doubles the margin from 0.7 to 1.4 mm at the cost of transmission angle."
+  ],
+  [
+   "差动比 D = s_d/s；简化模型给出平整差动比 D* = 1 + ε₀/η、波浪高 A ≈ λ√ε/π，汗布约 1.21、罗纹约 1.4、雪纺约 0.94。",
+   "Differential ratio D = s_d/s; the simplified model gives the flat-edge ratio D* = 1 + ε₀/η and wave height A ≈ λ√ε/π: about 1.21 for jersey, about 1.4 for rib and about 0.94 for chiffon."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "model-overlock",
+   "no": "M9-1",
+   "title": [
+    "高速包缝机三维结构",
+    "3D structure of a high-speed overlock machine"
+   ],
+   "goal": [
+    [
+     "在三维模型中认出斜向引针、下弯针、上弯针、送布和切边五组机构及它们与主轴的连接。",
+     "Identify the five mechanism groups — slanted needle bar, lower looper, upper looper, feed and trimming — and how each connects to the main shaft."
+    ],
+    [
+     "用主轴转角滑杆复现一针中的三次“穿线环”，读出关键时刻的针尖高度和弯针尖位置。",
+     "Reproduce the three loop entries with the shaft-angle slider and read the needle height and looper-point positions at the key instants."
+    ],
+    [
+     "观察差动比改变时两只送布牙行程的变化。",
+     "Observe how the strokes of the two feed dogs change with the differential ratio."
+    ]
+   ],
+   "theory": [
+    [
+     "全部机构由底座里一根主轴驱动；两套弯针都由偏心经球头连杆驱动，曲柄轴线与摆轴不平行，属于空间四杆机构（RSSR）。",
+     "All mechanisms are driven by one main shaft in the base; both loopers are driven by eccentrics through ball-jointed links whose crank axis is not parallel to the rocking shaft, i.e. RSSR spatial four-bars."
+    ],
+    [
+     "主轴转角以针尖最高为 0°；针尖高出针板的高度 = 9.5 mm − s(φ)·cos 20°，布厚 1.5 mm 时在 80.8° 入布、279.2° 出布。",
+     "Shaft angle is 0° at the needle’s highest point; needle height above the plate = 9.5 mm − s(φ)·cos 20°, so with 1.5 mm fabric it enters at 80.8° and leaves at 279.2°."
+    ],
+    [
+     "主送布牙行程等于针距 2.5 mm，差动牙行程 = 差动比 × 2.5 mm。",
+     "The main dog’s stroke equals the 2.5 mm stitch length; the differential dog’s stroke = differential ratio × 2.5 mm."
+    ]
+   ],
+   "steps": [
+    [
+     "打开模型 9-1，选“外观”和“斜视”，拖动旋转、滚轮缩放，找到倾斜 20° 的机针、针右侧的切刀和右侧面的手轮。",
+     "Open Model 9-1, choose “Exterior” and the oblique view; drag to rotate and scroll to zoom; find the needle tilted 20°, the knife to its right and the handwheel on the right side."
+    ],
+    [
+     "切换到“透视”，把“主轴转角”拖到 270°，与图 9-2 对照，指认主轴、两根球头连杆、下弯针摆轴、上弯针导杆和摆动导套。",
+     "Switch to “X-ray”, set the shaft angle to 270° and compare with Fig. 9-2; point out the main shaft, the two ball-jointed links, the lower-looper rocking shaft, the upper-looper guide bar and the oscillating bushing."
+    ],
+    [
+     "选“爆炸”，拖动“拆开程度”，按“部件分组”的颜色把六组部件逐一找出，记下每组由主轴上的哪个偏心或曲柄驱动。",
+     "Choose “Exploded” and drag the separation slider; find each of the six colour-coded part groups and note which eccentric or crank on the main shaft drives it."
+    ],
+    [
+     "回到“透视”，选“成缝区特写”视角，勾选“针尖轨迹”，用“主轴转角”滑杆依次转到 214°、271°、22°、57°，与图 9-4 的四个瞬间对照，把读数面板上的针尖高度、下弯针尖横向位置和上弯针尖 X、Z 填入记录表。",
+     "Back in “X-ray”, choose the “stitch-forming zone close-up” view, tick “paths”, and set the shaft angle to 214°, 271°, 22° and 57° in turn; compare with the four moments of Fig. 9-4 and record the needle height, lower-looper lateral position and upper-looper X, Z from the readout panel."
+    ],
+    [
+     "再转到 81° 和 279° 附近，确认针尖高出针板的读数约为 1.5 mm（布面），即入布和出布时刻；转到 180°，看上刀到达最低点、机针在布中。",
+     "Turn to about 81° and 279° and confirm that the needle-height readout is about 1.5 mm (the fabric surface), i.e. entry and exit; turn to 180° and see the upper knife at its lowest while the needle is in the fabric."
+    ],
+    [
+     "选“正面”视角，按“播放”，速度选“很慢”，观察下弯针“向左快、向右慢”和上弯针“先竖后横”的钩形路径。",
+     "Choose the front view, press Play at “very slow” and watch the lower looper move fast to the left and slow to the right, and the upper looper trace its vertical-then-horizontal hook."
+    ],
+    [
+     "把“差动比”滑杆从 1.0 拖到 2.0，再拖到 0.7，观察前后两只送布牙行程的变化并记录。",
+     "Drag the differential-ratio slider from 1.0 to 2.0 and then to 0.7, and record how the strokes of the two feed dogs change."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "关键转角下的读数",
+     "Readings at key shaft angles"
+    ],
+    "headers": [
+     [
+      "主轴转角 φ（°）",
+      "Shaft angle φ (°)"
+     ],
+     [
+      "针尖高出针板（mm）",
+      "Needle height above plate (mm)"
+     ],
+     [
+      "下弯针尖横向位置（mm）",
+      "Lower-looper lateral position (mm)"
+     ],
+     [
+      "上弯针尖 X、Z（mm）",
+      "Upper-looper X, Z (mm)"
+     ],
+     [
+      "此刻发生的事件",
+      "Event at this instant"
+     ]
+    ],
+    "rows": 7
+   },
+   "questions": [
+    [
+     "214° 时针尖已在针板以下并开始回升，为什么下弯针要等针回升约 2.6 mm 才钩线？",
+     "At 214° the needle is below the plate and rising. Why must the lower looper wait until the needle has risen about 2.6 mm before catching the loop?"
+    ],
+    [
+     "22° 时上弯针尖离机针多远？与工厂“4–4.5 mm”的调机标准对照，偏大或偏小各会出什么问题？",
+     "How far is the upper-looper point from the needle at 22°? Compare with the factory setting of 4–4.5 mm: what goes wrong if it is larger or smaller?"
+    ],
+    [
+     "从爆炸图看，包缝机为什么不需要平缝机那样的上轴、下轴和同步带？这对最高转速有什么好处？",
+     "From the exploded view, why does the overlock machine not need the arm shaft, bed shaft and timing belt of a lockstitch machine, and how does that help its top speed?"
+    ]
+   ]
+  },
+  {
+   "id": "difffeed",
+   "no": "9-1",
+   "title": [
+    "差动送布",
+    "Differential feed"
+   ],
+   "goal": [
+    [
+     "验证差动送布简化模型，找出五种面料中汗布、罗纹和雪纺的平整差动比。",
+     "Verify the simplified differential-feed model and find the flat-edge ratios of jersey, rib and chiffon."
+    ],
+    [
+     "理解送布牙打滑如何限制差动的效果。",
+     "Understand how feed-dog slip limits what the differential can do."
+    ],
+    [
+     "把差动“调过头”做出生菜边和碎褶两种工艺效果。",
+     "Deliberately overdo the differential to make a lettuce edge and fine gathers."
+    ]
+   ],
+   "theory": [
+    [
+     "差动比 D = s_d/s；有效差动比 D_e = 1 + η(D − 1)；布边应变 ε = (1+ε₀)/D_e − 1，ε > 0 起波浪，ε < 0 收细褶。",
+     "D = s_d/s; effective ratio D_e = 1 + η(D − 1); edge strain ε = (1+ε₀)/D_e − 1, with ε > 0 giving waves and ε < 0 gathers."
+    ],
+    [
+     "令 ε = 0 得平整差动比 D* = 1 + ε₀/η；波浪高度 A ≈ λ√ε/π。",
+     "Setting ε = 0 gives D* = 1 + ε₀/η; wave height A ≈ λ√ε/π."
+    ],
+    [
+     "两牙之间的布能被推挤或拉伸的程度有限，超过后送布牙打滑，再调 D 也没有效果（曲线两端变平）；压脚越重，针织布被拉伸得越多。",
+     "Fabric between the dogs can only be compressed or stretched so far; beyond that the dogs slip and changing D has no effect (the flat curve ends); a heavier presser foot stretches knits more."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 9-1，用“上一步/下一步”读完 5 步实验指导。",
+     "Open Virtual lab 9-1 and read the 5-step guide with Previous/Next."
+    ],
+    [
+     "面料选“汗布”，差动比 D = 1.00、针距 2.5 mm、压脚压力“标准”，记录 D_e、ε 和波浪高度。",
+     "Choose single jersey, D = 1.00, stitch length 2.5 mm, presser-foot pressure “standard”; record D_e, ε and wave height."
+    ],
+    [
+     "每次把 D 加大 0.05，记录 ε，找出 ε 落进 ±2% 绿色带的 D，完成任务 1，并与 D* = 1 + 0.18/0.85 对照。",
+     "Raise D in steps of 0.05, recording ε; find the D at which ε enters the ±2% green band, completing Task 1, and compare with D* = 1 + 0.18/0.85."
+    ],
+    [
+     "面料换成“罗纹”，压脚标准，重复上一步，完成任务 2，并与 D* = 1 + 0.30/0.80 对照。",
+     "Switch to rib knit with standard pressure, repeat the previous step to complete Task 2, and compare with D* = 1 + 0.30/0.80."
+    ],
+    [
+     "换成“雪纺”，先看 D = 1 时 ε 为负，再把 D 调到 1 以下，使 |ε| ≤ 1.5%，完成任务 3。",
+     "Switch to chiffon: note that ε is negative at D = 1, then lower D below 1 until |ε| ≤ 1.5%, completing Task 3."
+    ],
+    [
+     "回到汗布，把 D 调小到 0.8 左右，使 ε 在 +30% 到 +45% 之间且不打滑，完成任务 4（生菜边）。",
+     "Back on jersey, lower D to about 0.8 so that ε lies between +30% and +45% without slip, completing Task 4 (lettuce edge)."
+    ],
+    [
+     "再换雪纺，把 D 调到 1.5 以上，使 ε ≤ −35% 且两牙间不堵塞，完成任务 5（碎褶）。",
+     "Switch to chiffon again and raise D above 1.5 so that ε ≤ −35% without jamming, completing Task 5 (gathers)."
+    ],
+    [
+     "汗布、D = 1.20 时，分别改变针距（1–4 mm）和压脚压力（0.6–1.4），记录 ε 和波浪或缩褶高度的变化。",
+     "With jersey at D = 1.20, vary the stitch length (1–4 mm) and the presser-foot pressure (0.6–1.4), and record how ε and the wave or gather height change."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "差动比与布边应变",
+     "Differential ratio and edge strain"
+    ],
+    "headers": [
+     [
+      "面料",
+      "Fabric"
+     ],
+     [
+      "差动比 D",
+      "Ratio D"
+     ],
+     [
+      "有效差动比 D_e",
+      "Effective ratio D_e"
+     ],
+     [
+      "布边应变 ε（%）",
+      "Edge strain ε (%)"
+     ],
+     [
+      "波浪/缩褶高度（mm）",
+      "Wave/gather height (mm)"
+     ],
+     [
+      "是否打滑",
+      "Slipping?"
+     ]
+    ],
+    "rows": 10
+   },
+   "questions": [
+    [
+     "汗布被拉长 18%，为什么平整差动比不是 1.18 而要更大？",
+     "Jersey stretches 18%; why is the flat-edge ratio larger than 1.18?"
+    ],
+    [
+     "斜纹布的曲线为什么几乎是平的？对梭织布调差动比还有意义吗？",
+     "Why is the twill curve almost flat? Is adjusting the differential still meaningful for wovens?"
+    ],
+    [
+     "压脚压力加大后，同一种针织布的平整差动比变大还是变小？为什么？",
+     "With higher presser-foot pressure, does the flat-edge ratio of the same knit go up or down? Why?"
+    ]
+   ]
+  },
+  {
+   "id": "rssr",
+   "no": "9-2",
+   "title": [
+    "空间四杆机构 RSSR",
+    "RSSR spatial four-bar linkage"
+   ],
+   "goal": [
+    [
+     "按 9.6 节的公式逐步复核下弯针 RSSR 的位置、角速度、角加速度和传动角。",
+     "Check the position, angular velocity, angular acceleration and transmission angle of the lower-looper RSSR step by step with the formulas of Section 9.6."
+    ],
+    [
+     "用“逐角检查是否有解”的方法判断曲柄能否整周转动，找出卡死的临界曲柄半径。",
+     "Use the angle-by-angle solvability check to decide whether the crank can turn fully, and find the critical crank radius."
+    ],
+    [
+     "在摆角不变的前提下改善传动角，体会它与行程对称性的取舍。",
+     "Improve the transmission angle at constant swing and see the trade-off with stroke symmetry."
+    ]
+   ],
+   "theory": [
+    [
+     "位置：P cosθ + K sinθ = M，θ = atan2(K,P) ± arccos(M/√(P²+K²))；有解条件 |M| ≤ √(P²+K²)。",
+     "Position: P cosθ + K sinθ = M, θ = atan2(K,P) ± arccos(M/√(P²+K²)); solvable only if |M| ≤ √(P²+K²)."
+    ],
+    [
+     "速度：θ̇ = d·Ȧ/(d·t)，t = e × r；加速度 θ̈ = (|ḋ|² + d·Ä + θ̇² d·r)/(d·t)。",
+     "Velocity: θ̇ = d·Ȧ/(d·t), t = e × r; acceleration θ̈ = (|ḋ|² + d·Ä + θ̇² d·r)/(d·t)."
+    ],
+    [
+     "传动角 sinγ = |d·t|/(|d||t|)；经验上最小传动角不小于 40°，连杆力与 1/sinγ 成正比。",
+     "Transmission angle sinγ = |d·t|/(|d||t|); the minimum should be at least 40° by rule of thumb, and link force is proportional to 1/sinγ."
+    ],
+    [
+     "两轴夹角为 0 时 RSSR 退化为平面曲柄摇杆机构。",
+     "With zero angle between the shafts the RSSR reduces to a planar crank-rocker."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 9-2，读完 5 步实验指导；选“下弯针”预设，拖动三维视图，看清曲柄（转动副，轴线沿 X）、球头连杆（两端球铰）、摇杆（转动副）和两根不平行也不相交的轴线。",
+     "Open Virtual lab 9-2 and read the 5-step guide; choose the lower-looper preset and rotate the 3D view to identify the crank (revolute, axis along X), the ball-jointed link, the rocker (revolute) and the two skew axes."
+    ],
+    [
+     "按“暂停”，把主轴转角依次拖到 0°、60°、120°、180°、214°、240°、300°，从“逐步计算”框读 P、K、M、θ、θ̇、γ，填表并与教材表对照，同时检查 ⑥ 中 |A−B| 是否始终等于 b。",
+     "Press Pause and set the shaft angle to 0°, 60°, 120°, 180°, 214°, 240° and 300°; read P, K, M, θ, θ̇ and γ from the step-by-step panel, fill in the table, compare with the textbook table, and check in ⑥ that |A−B| always equals b."
+    ],
+    [
+     "记录统计栏的摇杆摆角、回程/工作行程转角、最小传动角、最大角速度和最大角加速度。",
+     "Record the swing angle, return/working stroke angles, minimum transmission angle, maximum angular velocity and maximum angular acceleration from the statistics bar."
+    ],
+    [
+     "任务 1：只改曲柄半径 r，使摆角为 30.0° ± 0.3°，记下 r，并与粗估式 Δθ ≈ 2r/c 得出的半径比较。",
+     "Task 1: change only the crank radius r so that the swing is 30.0° ± 0.3°; note r and compare it with the radius from the rough estimate Δθ ≈ 2r/c."
+    ],
+    [
+     "任务 2：重新载入“下弯针”，调摇杆沿轴移动量 s 和 r，保持摆角 25.7° ± 0.5°，使最小传动角 ≥ 60°，记录回程/工作行程转角的变化。",
+     "Task 2: reload the lower-looper preset, adjust the rocker shift s and r, keep the swing at 25.7° ± 0.5° and raise the minimum transmission angle to 60° or more; record how the stroke angles change."
+    ],
+    [
+     "任务 3：选“上弯针”，可改 r、b 和摇杆轴位置（s、Y 偏移、Z 偏移），保持摆角 50.5° ± 1°，使最小传动角 ≥ 50°。",
+     "Task 3: choose the upper-looper preset; using r, b and the rocker-shaft position (s, Y offset, Z offset), keep the swing at 50.5° ± 1° and raise the minimum transmission angle to 50° or more."
+    ],
+    [
+     "任务 4：任选一个预设，逐步加大 r，直到状态栏显示“装不上……卡死”，记下临界 r 和无解的转角范围。",
+     "Task 4: on any preset, increase r until the status line reports that the linkage cannot be assembled (jam); note the critical r and the range of angles without a solution."
+    ],
+    [
+     "任务 5：选“平面曲柄摇杆”（两轴夹角 γ = 0），调 r、b、c，使摆角 40° ± 1° 且曲柄能整周转动；然后逐渐加大两轴夹角，观察四条曲线的变化。",
+     "Task 5: choose the planar crank-rocker (angle between shafts 0), adjust r, b and c for a 40° ± 1° swing with full crank rotation; then gradually increase the shaft angle and watch the four curves change."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "下弯针 RSSR 逐步计算（7000 r/min）",
+     "Lower-looper RSSR step-by-step results (7000 r/min)"
+    ],
+    "headers": [
+     [
+      "φ（°）",
+      "φ (°)"
+     ],
+     [
+      "P（mm）",
+      "P (mm)"
+     ],
+     [
+      "K（mm）",
+      "K (mm)"
+     ],
+     [
+      "M（mm）",
+      "M (mm)"
+     ],
+     [
+      "θ（°）",
+      "θ (°)"
+     ],
+     [
+      "θ̇（rad/s）",
+      "θ̇ (rad/s)"
+     ],
+     [
+      "γ（°）",
+      "γ (°)"
+     ]
+    ],
+    "rows": 7
+   },
+   "questions": [
+    [
+     "任务 1 得到的 r 和粗估值差多少？粗估式在这里是高估还是低估了所需的半径？为什么？",
+     "How far is the r from Task 1 from the rough estimate? Does the rough formula over- or under-estimate the radius here, and why?"
+    ],
+    [
+     "任务 2 之后行程变得更对称，这对 9.8 节上下弯针在 162.5° 处的余量意味着什么？",
+     "After Task 2 the strokes are more symmetric. What does this mean for the upper/lower-looper margin at 162.5° in Section 9.8?"
+    ],
+    [
+     "为什么 φ = 180° 附近角速度最大而角加速度几乎为零？",
+     "Why is the angular velocity largest and the angular acceleration almost zero near φ = 180°?"
+    ],
+    [
+     "任务 3 改动摇杆轴以后，实际机器上还必须重新校核哪些量？",
+     "After moving the rocker shaft in Task 3, which quantities must be rechecked on the real machine?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "包缝机成缝区与差动送布的校核",
+   "Checking the stitch-forming zone and differential feed of an overlocker"
+  ],
+  "tasks": [
+   [
+    "计算题：算例机斜向引针机构 r = 12.25 mm、l = 42 mm，针倾斜 20°，针尖最高在针板上方 9.5 mm。改缝两层卫衣布，布厚 3 mm。求针尖入布、出布的主轴转角和针在布外的转角；送布牙在 292° 到 68° 之间露出针板，求两头的时间余量，与布厚 1.5 mm 时比较并说明风险和对策。",
+    "Calculation: the worked-example needle-bar mechanism has r = 12.25 mm, l = 42 mm, needle inclined 20°, needle point at most 9.5 mm above the throat plate. The machine now sews two plies of sweatshirt fleece 3 mm thick. Find the shaft angles at which the point enters and leaves the fabric and the angle during which it is out; the feed dogs are above the plate from 292° to 68°: find the margin at each end, compare with 1.5 mm fabric, and state the risk and a remedy."
+   ],
+   [
+    "设计题：下弯针 RSSR（c = 22 mm，r = 4.36 mm，摆角 25.7°）要求摆角增大到 30°。先用粗估式 Δθ ≈ 2r/c 估算曲柄半径，再用虚拟实验 9-2 任务 1 求精确值；比较两者，解释差异，并检查最小传动角是否仍不小于 40°。",
+    "Design: the lower-looper RSSR (c = 22 mm, r = 4.36 mm, swing 25.7°) must swing 30°. Estimate the crank radius with Δθ ≈ 2r/c, then find the exact value with Task 1 of Virtual lab 9-2; compare the two, explain the difference, and check that the minimum transmission angle is still at least 40°."
+   ],
+   [
+    "计算题：卫衣布在差动比为 1 时布边被拉长 10%，传递比例 η = 0.90，波浪波长约 36 mm。求 D = 1 时的波浪高度和平整差动比；若差动机构主送布牙臂长 l_m = 20 mm，差动牙滑块的作用半径 l_d 应调到多少？",
+    "Calculation: sweatshirt fleece stretches 10% at a differential ratio of 1, with η = 0.90 and a wavelength of about 36 mm. Find the wave height at D = 1 and the flat-edge ratio; if the main-dog arm is l_m = 20 mm, to what effective radius l_d should the differential slide block be set?"
+   ],
+   [
+    "分析题：说明下弯针为什么设计成“向左快、向右慢”，用 9.8 节的数字说明它带来的好处，以及在传动角上付出的代价。",
+    "Analysis: explain why the lower looper is designed to move fast to the left and slow to the right, using the figures of Section 9.8 to show the benefit and the cost in transmission angle."
+   ]
+  ],
+  "deliverable": [
+   "计算过程（手算或 Python 脚本均可，脚本附源代码）；虚拟实验 9-2 任务 1 完成状态与统计栏的截图；2–3 页报告。",
+   "Working for all calculations (by hand or Python, with source code if scripted); a screenshot of Virtual lab 9-2 showing Task 1 completed and the statistics bar; a 2–3 page report."
+  ],
+  "rubric": [
+   [
+    "入布、出布角与送布余量计算正确，风险分析合理：25 分",
+    "Entry/exit angles and feed margins correct, sound risk analysis: 25 points"
+   ],
+   [
+    "RSSR 粗估与精确结果对比正确，差异解释到位，传动角已核查：25 分",
+    "RSSR rough vs exact comparison correct, difference explained, transmission angle checked: 25 points"
+   ],
+   [
+    "差动送布波浪高、平整差动比和 l_d 计算正确：25 分",
+    "Wave height, flat-edge ratio and l_d correct: 25 points"
+   ],
+   [
+    "不对称设计的分析有数据、讲清了取舍：15 分",
+    "Asymmetry analysis supported by figures and clear about the trade-off: 15 points"
+   ],
+   [
+    "报告条理清楚、单位规范、图表完整：10 分",
+    "Clear report, correct units, complete figures and tables: 10 points"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "504 三线包缝线迹中，负责从布底走到布边的是哪根线？",
+    "In the 504 three-thread overedge stitch, which thread runs from the underside to the edge?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "下弯针线",
+      "The lower-looper thread"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "针线",
+      "The needle thread"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "上弯针线",
+      "The upper-looper thread"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "链缝弯针线",
+      "A chainstitch looper thread"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "针线管穿透布料，下弯针线管布底到布边，上弯针线管布边到布面。",
+    "The needle thread penetrates the fabric, the lower-looper thread covers underside to edge, and the upper-looper thread covers edge to top."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "包缝机把机针斜放 20°，最直接的原因是什么？",
+    "What is the most direct reason for slanting the overlock needle by 20°?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "让下弯针摆轴与针平行，弯针尖到针的间隙在针升降时保持不变",
+      "So the lower-looper rocking shaft can be parallel to the needle, keeping the point-to-needle clearance constant as the needle moves"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "缩短针杆行程，提高转速",
+      "To shorten the needle-bar stroke and raise speed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "减小针杆的惯性力",
+      "To reduce the inertia force of the needle bar"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "让上弯针更容易绕过布边",
+      "To make it easier for the upper looper to go round the edge"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "摆轴与针平行时，弯针尖在垂直于针的平面里走圆弧，针升到哪里间隙都一样；针斜了，摆轴跟着斜。",
+    "With the shaft parallel to the needle, the looper point moves in a plane perpendicular to the needle, so the clearance is the same at every needle height; the shaft is slanted along with the needle."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "RSSR 的自由度公式算出 F = 2，说明除主轴外还需要第二个输入才能确定弯针位置。",
+    "The mobility formula gives F = 2 for the RSSR, so a second input besides the main shaft is needed to fix the looper position."
+   ],
+   "correct": false,
+   "feedback": [
+    "多出的 1 个是连杆绕两球心连线自转的局部自由度，不影响其他构件，实际自由度为 1。",
+    "The extra one is the passive spin of the link about the line through its ball centres; it moves nothing else, so the real mobility is 1."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "下弯针曲柄半径 r = 4.36 mm，摆杆长 c = 22 mm。用粗估式 Δθ ≈ 2r/c 估算摆角（单位：度）。",
+    "The lower-looper crank radius is r = 4.36 mm and the rocker c = 22 mm. Estimate the swing angle with Δθ ≈ 2r/c (in degrees)."
+   ],
+   "answer": 22.7,
+   "tolerance": 0.3,
+   "unit": "°",
+   "feedback": [
+    "2 × 4.36 / 22 = 0.396 rad ≈ 22.7°；精确计算为 25.7°，因为连杆在空间里斜着推。",
+    "2 × 4.36 / 22 = 0.396 rad ≈ 22.7°; the exact value is 25.7° because the link pushes obliquely in space."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "主轴 7000 r/min 时，下弯针摆杆最大角速度为 182 rad/s，弯针尖到摆轴 38 mm。弯针尖最大速度是多少 m/s？",
+    "At 7000 r/min the lower-looper rocker peaks at 182 rad/s, and the point is 38 mm from the shaft. What is the maximum point speed in m/s?"
+   ],
+   "answer": 6.9,
+   "tolerance": 0.1,
+   "unit": "m/s",
+   "feedback": [
+    "v = θ̇R = 182 × 0.038 ≈ 6.9 m/s，与对摆角曲线数值求导的结果一致。",
+    "v = θ̇R = 182 × 0.038 ≈ 6.9 m/s, matching numerical differentiation of the swing curve."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于上弯针的摆动导杆机构，下列哪些说法正确？",
+    "Which statements about the upper-looper oscillating guide-bar mechanism are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "上弯针在低处时 |QG| 长，导杆几乎不转，针尖主要竖直移动",
+      "When the looper is low, |QG| is long, the bar hardly turns and the point moves mainly vertically"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "上弯针在高处时 |QG| 短，同样的推动使导杆转得更快，针尖横向甩出",
+      "When it is high, |QG| is short, the same push turns the bar faster and the point is flung sideways"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "弯针外形可按针尖自身走过的轨迹生成",
+      "The looper outline can be generated from the path its own point travels"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "驱动摇杆的那一级是平面曲柄摇杆机构",
+      "The stage driving the rocker is a planar crank-rocker"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "上弯针尖的最大加速度比下弯针小",
+      "The upper-looper point has a smaller peak acceleration than the lower looper"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "主轴与摇杆轴不平行，这一级也是 RSSR；上弯针尖最高约 10 m/s、约 1260 g，比下弯针更剧烈。",
+    "The main shaft and rocker shaft are not parallel, so that stage is also an RSSR; the upper-looper point reaches about 10 m/s and 1260 g, more violent than the lower looper."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "如果把算例机的下弯针改成左右对称摆动（各 180°），哪一处余量会从约 1.4 mm 降到约 0.7 mm？",
+    "If the lower looper were made to swing symmetrically (180° each way), which margin would fall from about 1.4 mm to about 0.7 mm?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "上弯针下降时（162.5°）与下弯针尖之间",
+      "Between the descending upper looper (162.5°) and the lower-looper point"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "下弯针钩线时（213.6°）与机针之间",
+      "Between the lower looper and the needle at loop catching (213.6°)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "机针穿过上弯针线三角时（57.5°）",
+      "When the needle passes the upper-looper triangle (57.5°)"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "送布牙与机针出布之间（279.2°–292°）",
+      "Between needle exit and the feed dog rising (279.2°–292°)"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "钩线时刻由机针定死在 213.6°；对称摆动使下弯针提前约 5° 从最右出发，162.5° 时已到 7.2 mm，与上弯针只差 0.7 mm。",
+    "Loop catching is fixed by the needle at 213.6°; symmetric motion makes the lower looper leave the right about 5° earlier, reaching 7.2 mm at 162.5°, only 0.7 mm from the upper looper."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "汗布 ε₀ = 18%、η = 0.85，把差动比调到 1.30，按 9.10 节模型布边应变 ε 是多少（%）？",
+    "Jersey with ε₀ = 18% and η = 0.85 is sewn at a differential ratio of 1.30. What is the edge strain ε in % by the model of Section 9.10?"
+   ],
+   "answer": -6.0,
+   "tolerance": 0.3,
+   "unit": "%",
+   "feedback": [
+    "D_e = 1 + 0.85 × 0.30 = 1.255，ε = 1.18/1.255 − 1 ≈ −6.0%，调过了头，布边会收成细褶。",
+    "D_e = 1 + 0.85 × 0.30 = 1.255, ε = 1.18/1.255 − 1 ≈ −6.0%: overdone, so the edge gathers."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "罗纹 ε₀ = 30%、η = 0.80。按简化模型，平整差动比 D* 是多少？",
+    "Rib knit has ε₀ = 30% and η = 0.80. What is the flat-edge differential ratio D* by the simplified model?"
+   ],
+   "answer": 1.375,
+   "tolerance": 0.01,
+   "unit": "",
+   "feedback": [
+    "D* = 1 + ε₀/η = 1 + 0.30/0.80 = 1.375，约 1.4，与图 9-10 一致。",
+    "D* = 1 + ε₀/η = 1 + 0.30/0.80 = 1.375, about 1.4, as in Fig. 9-10."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "上弯针 RSSR 的最小传动角为 39°，下弯针为 49.5°。驱动同样的阻力矩，上弯针连杆力约是下弯针的多少倍？",
+    "The upper-looper RSSR has a minimum transmission angle of 39°, the lower looper 49.5°. For the same resisting torque, about how many times the lower-looper link force is the upper-looper link force?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "约 1.2 倍",
+      "About 1.2 times"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "约 1.02 倍",
+      "About 1.02 times"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "约 1.6 倍",
+      "About 1.6 times"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "约 0.8 倍",
+      "About 0.8 times"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "连杆力与 1/sinγ 成正比：1.589/1.315 ≈ 1.21，只大约 20%；1.02 是 39° 与 40° 之比，1.6 是 1/sin39° 本身。",
+    "Link force goes as 1/sinγ: 1.589/1.315 ≈ 1.21, about 20% more; 1.02 is the 39° vs 40° ratio and 1.6 is 1/sin 39° itself."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "算例机斜针（r = 12.25 mm，l = 42 mm，针斜 20°，针尖最高在针板上方 9.5 mm）缝 3 mm 厚的两层卫衣布。针尖在主轴转角多少度时刺入布面？",
+    "The worked-example slanted needle (r = 12.25 mm, l = 42 mm, inclined 20°, point at most 9.5 mm above the plate) sews two plies of fleece 3 mm thick. At what shaft angle does the point enter the fabric surface?"
+   ],
+   "answer": 72.5,
+   "tolerance": 0.5,
+   "unit": "°",
+   "feedback": [
+    "令 9.5 − s(φ)cos20° = 3，得 s = 6.92 mm，解曲柄滑块方程得 φ ≈ 72.5°（出布约 287.5°），比 1.5 mm 时早约 8°，送布余量从约 13° 降到约 4.5°。",
+    "Set 9.5 − s(φ)cos20° = 3, so s = 6.92 mm; solving the slider-crank gives φ ≈ 72.5° (exit about 287.5°), about 8° earlier than for 1.5 mm, cutting the feed margin from about 13° to about 4.5°."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "φ = 180° 时下弯针 RSSR：A = (22.00, 4.77, −48.93) mm，B = (22.00, 16.89, −67.86) mm，Q = (0, 16.65, −67.77) mm，摆轴 e = (0, 0.342, 0.940)，曲柄中心 C = (22.00, 1.28, −51.53) mm，ω = 733 rad/s 绕 X 轴。求摆杆角速度的大小（rad/s）。",
+    "Lower-looper RSSR at φ = 180°: A = (22.00, 4.77, −48.93) mm, B = (22.00, 16.89, −67.86) mm, Q = (0, 16.65, −67.77) mm, shaft e = (0, 0.342, 0.940), crank centre C = (22.00, 1.28, −51.53) mm, ω = 733 rad/s about X. Find the magnitude of the rocker angular velocity (rad/s)."
+   ],
+   "answer": 182.3,
+   "tolerance": 1.5,
+   "unit": "rad/s",
+   "feedback": [
+    "d = A − B，t = e × (B − Q)，Ȧ = ω i × (A − C)；θ̇ = d·Ȧ/(d·t) ≈ −182 rad/s，与教材表中 −182.4 一致。",
+    "d = A − B, t = e × (B − Q), Ȧ = ω i × (A − C); θ̇ = d·Ȧ/(d·t) ≈ −182 rad/s, matching −182.4 in the textbook table."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "罗纹 ε₀ = 30%，误用差动比 D = 1，布边波长 26 mm。按 A ≈ λ√ε/π，波浪高约多少 mm？",
+    "Rib with ε₀ = 30% is sewn at D = 1 by mistake; the edge wavelength is 26 mm. By A ≈ λ√ε/π, about how high are the waves (mm)?"
+   ],
+   "answer": 4.53,
+   "tolerance": 0.1,
+   "unit": "mm",
+   "feedback": [
+    "D = 1 时 ε = ε₀ = 0.30，A = 26 × √0.30 / π ≈ 4.5 mm。",
+    "At D = 1, ε = ε₀ = 0.30, so A = 26 × √0.30 / π ≈ 4.5 mm."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "把下弯针 RSSR 的曲柄半径从 4.36 mm 加大到 11 mm，最可能出现什么情况？",
+    "If the lower-looper crank radius is increased from 4.36 mm to 11 mm, what is most likely to happen?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "有一段转角 |M| > √(P²+K²)，连杆够不着摆杆，曲柄不能整周转动而卡死",
+      "Over some range of angles |M| > √(P²+K²); the link cannot reach the rocker and the crank jams"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "摆角按比例增大到约 65°，机构照常工作",
+      "The swing grows proportionally to about 65° and the linkage works normally"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "局部自由度消失，机构变成平面机构",
+      "The passive freedom disappears and the linkage becomes planar"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "传动角全程变成 90°",
+      "The transmission angle becomes 90° throughout"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "教材指出曲柄半径超过约 10.7 mm 就会出现无解区；空间机构没有格拉晓夫条件，要逐角检查 |M| ≤ √(P²+K²)。",
+    "The text states that beyond about 10.7 mm a no-solution range appears; spatial linkages have no Grashof test, so |M| ≤ √(P²+K²) must be checked at every angle."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于包缝机切边机构，下列哪些做法正确？",
+    "Which practices for the overlock trimming mechanism are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "上刀最低点安排在 180°，此时机针在布中、布静止",
+      "Place the upper knife’s lowest point at 180°, when the needle is in the fabric and the fabric is still"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "上刀靠弹簧轻压在下刀上，两刀之间不留间隙",
+      "Press the upper knife lightly against the lower one with a spring, leaving no gap"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "刀的重叠量一般调在 0.5–1 mm",
+      "Set the knife overlap to about 0.5–1 mm"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "重叠量越大越好，切得最干净",
+      "The larger the overlap the better, for the cleanest cut"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "刀口磨钝后一般先换下刀",
+      "When the edges dull, replace the lower knife first"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "重叠量大了刀口磨损快；下刀用硬质合金或高速钢，磨钝后一般先换工具钢的上刀。",
+    "Too much overlap wears the edges fast; the lower knife is carbide or HSS, so the tool-steel upper knife is normally replaced first."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "504 线迹的三次穿线环与时序间隙；RSSR 的位置、速度与传动角分析；差动送布模型与平整差动比。",
+   "The three loop entries of the 504 stitch with their timing and clearances; position, velocity and transmission-angle analysis of the RSSR; the differential-feed model and the flat-edge ratio."
+  ],
+  "difficult": [
+   "空间矢量形式的 RSSR 推导（P、K、M 的几何意义，d·t 为何是死点判据）以及上弯针摆动导杆“先竖后横”的成因；建议先在虚拟实验 9-2 里看逐步计算，再回到公式。",
+   "The vector derivation of the RSSR (the geometric meaning of P, K and M, why d·t signals a dead point) and why the guide bar gives a vertical-then-horizontal path; let students watch the step-by-step panel in Virtual lab 9-2 before returning to the formulas."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入",
+     "Opening"
+    ],
+    "minutes": 15,
+    "content": [
+     "展示汗布 T 恤侧缝起波浪的实物或照片，提出本讲的车间问题；对比平缝与包缝的弹性。",
+     "Show a T-shirt with a wavy side seam, pose the shop-floor problem and compare lockstitch and overlock elasticity."
+    ]
+   },
+   {
+    "phase": [
+     "整机与 500 类线迹",
+     "Machine layout and Class 500 stitches"
+    ],
+    "minutes": 30,
+    "content": [
+     "用模型 9-1 讲一根主轴的布置；讲 504、514、516 的结构与用途。",
+     "Use Model 9-1 to show the single-shaft layout; explain the structure and uses of 504, 514 and 516."
+    ]
+   },
+   {
+    "phase": [
+     "三次穿线环与斜向引针",
+     "Three loop entries and the slanted needle"
+    ],
+    "minutes": 35,
+    "content": [
+     "按图 9-4 逐个讲三次交接；推导入布、出布角，讨论针为什么要斜。",
+     "Walk through the three hand-overs of Fig. 9-4; derive entry and exit angles and discuss why the needle is slanted."
+    ]
+   },
+   {
+    "phase": [
+     "RSSR 位置分析",
+     "RSSR position analysis"
+    ],
+    "minutes": 40,
+    "content": [
+     "推导 P cosθ + K sinθ = M 与解；粗估与精确比较；自由度与有解条件。",
+     "Derive P cosθ + K sinθ = M and its solution; rough versus exact; mobility and solvability."
+    ]
+   },
+   {
+    "phase": [
+     "RSSR 速度、传动角与取舍",
+     "RSSR velocity, transmission angle and trade-offs"
+    ],
+    "minutes": 40,
+    "content": [
+     "推导 θ̇、θ̈ 与传动角，读图 9-5b；讨论不对称行程与传动角的取舍、上弯针 39° 为何保留。",
+     "Derive θ̇, θ̈ and the transmission angle, read Fig. 9-5b; discuss asymmetric strokes versus transmission angle and why the upper looper keeps 39°."
+    ]
+   },
+   {
+    "phase": [
+     "上弯针与时序间隙",
+     "Upper looper and timing clearances"
+    ],
+    "minutes": 35,
+    "content": [
+     "讲摆动导杆与 T = Q + Lu + hn；读时序图 9-7 的三对间隙。",
+     "Explain the guide bar and T = Q + Lu + hn; read the three clearance pairs on timing diagram 9-7."
+    ]
+   },
+   {
+    "phase": [
+     "切边与差动送布",
+     "Trimming and differential feed"
+    ],
+    "minutes": 30,
+    "content": [
+     "切边三要素；差动原理、调节机构与简化模型，回答导入问题。",
+     "The three essentials of trimming; differential principle, adjustment and the simplified model; answer the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验实操",
+     "Virtual lab session"
+    ],
+    "minutes": 35,
+    "content": [
+     "学生分组完成虚拟实验 9-1 的任务 1–3 与虚拟实验 9-2 的任务 1、4，教师巡视答疑。",
+     "Groups complete Tasks 1–3 of Virtual lab 9-1 and Tasks 1 and 4 of Virtual lab 9-2 while the instructor circulates."
+    ]
+   },
+   {
+    "phase": [
+     "小结与测验",
+     "Summary and quiz"
+    ],
+    "minutes": 10,
+    "content": [
+     "回顾五条小结，布置作业，开放本讲测验。",
+     "Review the five summary points, set the assignment and open the quiz."
+    ]
+   }
+  ],
+  "homework": [
+   "完成本讲作业（斜针入布角、RSSR 摆角设计、卫衣布差动计算、不对称分析），并完成虚拟实验 9-1 的任务 4、5 和虚拟实验 9-2 的任务 2、3、5。",
+   "Complete the assignment (needle entry angles, RSSR swing design, fleece differential calculation, asymmetry analysis) and finish Tasks 4–5 of Virtual lab 9-1 and Tasks 2, 3 and 5 of Virtual lab 9-2."
+  ]
+ }
+}

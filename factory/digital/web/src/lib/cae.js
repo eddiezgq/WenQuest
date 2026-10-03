@@ -16,9 +16,10 @@ export async function fetchSurface(jobId) {
   const u = take(Float32Array, nv * 3);
   const triangles = take(Uint32Array, nt * 3);
   const faceOf = take(Uint32Array, nt);
+  const temp = buf.byteLength >= o + 4 * nv ? take(Float32Array, nv) : null;     // 第 14 轮：热分析的节点温度
   const umag = new Float32Array(nv);
   for (let i = 0; i < nv; i++) umag[i] = Math.hypot(u[3 * i], u[3 * i + 1], u[3 * i + 2]);
-  return { positions, vm, u, umag, triangles, faceOf, nv, nt };
+  return { positions, vm, u, umag, triangles, faceOf, nv, nt, temp };
 }
 
 // Turbo 色标（Google，2019）的多项式近似：蓝 → 青 → 绿 → 黄 → 红
@@ -78,3 +79,21 @@ export function axesOf(faces) {
 
 export const KIND_NAME = { plane: '平面', cylinder: '圆柱面', cone: '圆锥面', sphere: '球面', torus: '圆环面', other: '曲面' };
 export const faceText = (f) => f ? `面 ${f.id} · ${KIND_NAME[f.kind] || f.kind}${f.radius_mm ? ' Ø' + (f.radius_mm * 2).toFixed(1) : ''} · ${f.area_mm2.toFixed(1)} mm²` : '';
+
+// 热分析（第 14 轮）：热载荷的种类
+export const TH_KINDS = {
+  temperature: { label: '固定温度', hint: '这个面的温度已知（例如贴着热源、冷却水套）', color: '#C0392B' },
+  convection: { label: '对流散热', hint: '表面向周围空气 / 液体散热：散热系数 h 和环境温度', color: '#2E86C1' },
+  heat_flux: { label: '面发热', hint: '这个面上总共进来多少瓦热量（例如芯片贴合面、摩擦面）', color: '#E67E22' },
+  heat_body: { label: '整体发热', hint: '整个零件体积内均匀发热（例如线圈、整体损耗），不用选面', color: '#8E44AD', nofaces: true },
+};
+
+export function toThermal(row) {
+  switch (row.kind) {
+    case 'temperature': return { type: 'temperature', faces: row.faces, value_c: +row.value || 0 };
+    case 'convection': return { type: 'convection', faces: row.rest ? 'rest' : row.faces, h_w_m2k: +row.h || 0, t_inf_c: +row.tinf || 0 };
+    case 'heat_flux': return { type: 'heat_flux', faces: row.faces, power_w: +row.value || 0 };
+    case 'heat_body': return { type: 'heat_body', power_w: +row.value || 0 };
+    default: return null;
+  }
+}

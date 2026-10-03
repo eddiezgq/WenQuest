@@ -1,0 +1,1402 @@
+{
+ "no": 15,
+ "title": [
+  "花样机与锁眼、钉扣、套结机控制",
+  "Control of Pattern Sewers, Buttonholers and Bartackers"
+ ],
+ "hours": 6,
+ "goals": [
+  [
+   "能说明电子花样机的组成，以及 X–Y 工作台、中压脚、压框和剪线怎样与主轴配合。",
+   "Describe the composition of a programmable pattern sewer and how the X–Y table, intermediate presser foot, clamp and trimmer work with the main shaft."
+  ],
+  [
+   "能由针杆运动和布厚算出离布窗口 W，再由针距和轴加速度算出每针的转速上限 n_max = W/(6t_move)。",
+   "Calculate the off-fabric window W from needle-bar motion and fabric thickness, and the per-stitch speed limit n_max = W/(6t_move) from stitch length and axis acceleration."
+  ],
+  [
+   "能解释电子凸轮为什么以主轴转角为自变量、怎样补偿驱动延迟，比较三种运动规律，并用前瞻算法给一串针安排转速。",
+   "Explain why the electronic cam uses shaft angle as its variable and how drive delay is compensated, compare three motion laws, and assign speeds to a stitch sequence with the look-ahead algorithm."
+  ],
+  [
+   "能把轮廓编成花样文件（分段、等分、工艺针、排序、检查），并说明套结、钉扣、锁眼机是固定花样的参数化特例。",
+   "Turn an outline into a pattern file (segmentation, equal division, process stitches, ordering, checking) and explain bartackers, button sewers and buttonholers as parametric special cases."
+  ],
+  [
+   "能按峰值转矩、转速和均方根转矩为 X 轴选伺服电机，并说明控制箱硬件、剪线电磁铁驱动和软件分层的设计要点。",
+   "Size an X-axis servo by peak torque, speed and RMS torque, and explain the key points of control-box hardware, trimming-solenoid drive and software layering."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "口袋盖花样机：针距从 3 mm 改成 6 mm 以后断针",
+   "Pocket-flap pattern sewer: needles break after the stitch length goes from 3 mm to 6 mm"
+  ],
+  "text": [
+   "某牛仔车间用电子花样机缝口袋盖装饰线，一个口袋盖约 60 针，主轴设定 2000 r/min，布加下模板总厚 1.5 mm。客户要求装饰线更粗犷，技术员把针距从 3 mm 改成 6 mm，转速没动，结果频繁断针。机器按第 15 章算例：针杆 r = 15.5 mm、l = 55 mm，上止点时针尖在针板上方 18 mm，离布窗口 W = 203.4°（布 + 下模板厚 1.5 mm；6 mm 厚时 170.5°）；每轴加速度 a = 50 m/s²，等加速等减速。",
+   "A denim floor uses a programmable pattern sewer for pocket-flap topstitching: about 60 stitches per flap, main shaft set to 2000 r/min, fabric plus lower template 1.5 mm thick. The customer wanted bolder stitching, so the technician changed the stitch length from 3 mm to 6 mm without changing speed, and needles began to break. The machine follows the Chapter 15 example: needle bar r = 15.5 mm, l = 55 mm, needle point 18 mm above the plate at top dead centre; off-fabric window W = 203.4° (1.5 mm fabric + template; 170.5° at 6 mm); axis acceleration a = 50 m/s², constant acceleration and deceleration."
+  ],
+  "question": [
+   "3 mm 和 6 mm 针距时每针的转速上限各是多少？为什么改针距后会断针，转速应降到多少？如果换成总厚 6 mm 的厚料、6 mm 针距呢？一个口袋盖的缝制时间约多少，提高转速对产能有多大意义？",
+   "What is the per-stitch speed limit for 3 mm and for 6 mm? Why did needles break after the change, and to what speed should the machine be lowered? What about 6 mm stitches on 6 mm-thick material? About how long does one flap take to sew, and how much does a higher speed matter for output?"
+  ],
+  "answer": [
+   "t_move = 2√(s/a)：3 mm 时 15.5 ms，n_max = 203.4/(6 × 0.0155) ≈ 2190 r/min，2000 r/min 可以；6 mm 时 21.9 ms，n_max ≈ 1550 r/min，2000 r/min 下模板在机针入布后还在动，所以断针，转速要降到约 1550 r/min 以下（或启用前瞻自动限速）。厚料 W = 170.5°，6 mm 针距只能到约 1300 r/min。60 针在 2000 r/min 下缝约 1.8 s，加剪线、空走和起停约 3.3 s，而人工取放模板要 8–10 s，所以产能主要受上下料限制，靠提转速收效很小。",
+   "t_move = 2√(s/a): at 3 mm it is 15.5 ms and n_max = 203.4/(6 × 0.0155) ≈ 2190 r/min, so 2000 r/min is fine; at 6 mm it is 21.9 ms and n_max ≈ 1550 r/min, so at 2000 r/min the template is still moving after the needle enters the fabric — hence broken needles; the speed must drop below about 1550 r/min (or look-ahead must limit it automatically). On thick material W = 170.5° and 6 mm stitches allow only about 1300 r/min. Sixty stitches at 2000 r/min take about 1.8 s, about 3.3 s with trims, jumps and start/stop, while loading and unloading the template by hand takes 8–10 s, so output is limited by loading, and higher speed gains little."
+  ]
+ },
+ "robot": {
+  "title": [
+   "电子凸轮、前瞻和电机选型：机器人轨迹规划的同一套方法",
+   "Electronic cams, look-ahead and motor sizing: the same toolkit as robot trajectory planning"
+  ],
+  "text": [
+   "机器人跟随传送带作业（例如在移动的衣片上涂胶或缝合）时，把关节或末端位置写成传送带编码器读数的函数，这就是以主轴角为主令的电子凸轮；同样要用预测位置补偿驱动延迟，否则会落后。机械臂沿一条带尖角的路径运动时，控制器也要像花样机前瞻调速那样提前几个插补段减速，否则到了拐角才减速会超出关节的加速度能力。机械臂的点到点运动常用加速度连续的 S 形规律，原因和花样机选修正梯形、摆线规律一样：加速度跳变会激起臂的振动。给机器人轴选电机也按峰值转矩和均方根转矩两步核算，减速比的选择就是 15.8 节带轮半径问题的翻版：最优传动比使电机惯量与负载惯量匹配。",
+   "When a robot works on a moving conveyor (say, gluing or sewing a moving garment panel), its joint or tool position is written as a function of the conveyor encoder reading — an electronic cam with the conveyor as master, and predicted position must again compensate drive delay or the robot lags. When an arm follows a path with sharp corners, the controller must slow down several interpolation segments ahead, exactly like look-ahead speed control on a pattern sewer, or it will exceed the joints' acceleration capability at the corner. Point-to-point robot moves usually use acceleration-continuous S-curves, for the same reason a pattern sewer picks modified-trapezoid or cycloidal laws: jumps in acceleration excite vibration of the arm. Robot-axis motors are sized by the same two checks, peak and RMS torque, and choosing the gear ratio is the same problem as the pulley radius in Section 15.8: the best ratio matches motor and load inertia."
+  ]
+ },
+ "life": {
+  "title": [
+   "跳大绳",
+   "Running into a long skipping rope"
+  ],
+  "text": [
+   "两人摇长绳时，跳绳的人只能在绳子离开地面的那段时间里跑进去或换位置；绳摇得越快，这个窗口越短，一步迈得越大越来不及——这就是离布窗口、针距和转速的关系。",
+   "With two people turning a long rope, a jumper can only run in or change position while the rope is off the ground; the faster it turns, the shorter that window, and the longer the stride, the less time there is — just like the off-fabric window, stitch length and speed."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "引子：让模板带着布走",
+    "Opening: let the template carry the fabric"
+   ],
+   "points": [
+    [
+     "口袋盖、肩带、鞋面、座椅装饰线：形状复杂但每件相同",
+     "Pocket flaps, straps, shoe uppers, seat topstitching: complex shapes, identical every piece"
+    ],
+    [
+     "机头只管刺布；布夹在模板里由 X–Y 工作台按程序带着走",
+     "The head only pierces; the fabric, clamped in a template, is moved by the X–Y table"
+    ],
+    [
+     "核心问题：工作台什么时候走、走多快、一针最多走多远",
+     "Core questions: when may the table move, how fast, and how far per stitch"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_pattern_struct.png",
+   "narration": [
+    "口袋盖、肩带、鞋面、汽车座椅上的装饰线，形状复杂，可每一件都一样。让熟练工在平缝机上一边送布一边转方向，一件要几分钟，线迹还时好时坏。花样机把这件事拆开了：机头只管上下刺布，布料夹在模板里，由 X–Y 工作台按程序带着走，工人只要把布放进模板、踩一下踏板。问题随之变成三个：工作台什么时候能走、能走多快、一针最多能走多远。这一讲就围绕这三个问题，最后再看套结、钉扣、锁眼这些特例，以及控制器怎样设计和制造。",
+    "Topstitching on pocket flaps, straps, shoe uppers and car seats has complex shapes, yet every piece is the same. A skilled operator steering fabric on a lockstitch machine takes minutes per piece, with uneven results. The pattern sewer splits the job: the head only pierces up and down; the fabric is clamped in a template and carried by the X–Y table under program control; the worker just loads the template and presses the pedal. The questions become three: when may the table move, how fast, and how far per stitch. This lesson answers them, then looks at bartackers, button sewers and buttonholers as special cases, and at how the controller is designed and built."
+   ]
+  },
+  {
+   "title": [
+    "花样机的组成",
+    "Composition of the pattern sewer"
+   ],
+   "points": [
+    [
+     "机头：刺布、挑线、钩线与平缝机相同，少了送布牙；直驱伺服 + 编码器",
+     "Head: piercing, take-up and hook as on a lockstitch machine, but no feed dog; direct-drive servo + encoder"
+    ],
+    [
+     "主轴角 φ 是全机的时间基准",
+     "Shaft angle φ is the time base of the whole machine"
+    ],
+    [
+     "X–Y 工作台 + 模板与气动压框代替送布",
+     "X–Y table + template and pneumatic clamp replace the feed"
+    ],
+    [
+     "中压脚随针杆跳动；剪线、拨线、松线由电磁铁驱动",
+     "Intermediate presser foot follows the needle bar; trimming, wiping and release by solenoids"
+    ]
+   ],
+   "formula": "",
+   "figure": "ps_exp.png",
+   "narration": [
+    "和平缝机比，花样机的机头少了一样东西：送布牙。刺布、挑线、钩线三个机构和第 2 章完全一样，主轴转一圈缝一针。上轴末端是一台带编码器的直驱伺服，编码器读出的主轴角 φ 是整台机器的时间基准，工作台移动、中压脚、剪线都是“主轴转到某个角度时做某件事”。送布牙的活由 X–Y 工作台接了：Y 横梁前后走，X 滑座在横梁上左右走，压框和模板装在 X 滑座上。普通压脚会挡住模板，所以换成随针杆跳动的中压脚。看这张爆炸图，各部分用颜色分开了。",
+    "Compared with a lockstitch machine, the pattern sewer's head lacks one thing: the feed dog. Piercing, take-up and hook are exactly as in Chapter 2, one stitch per revolution. A direct-drive servo with an encoder sits at the end of the arm shaft, and the shaft angle φ it reads is the time base of the whole machine: table moves, intermediate presser foot and trimming all happen “when the shaft reaches a certain angle”. The feed dog's job goes to the X–Y table: the Y beam moves back and forth, the X carriage moves left and right on the beam, and the clamp and template ride on the X carriage. An ordinary foot would block the template, so a small foot bouncing with the needle bar is used. This exploded view separates the groups by colour."
+   ]
+  },
+  {
+   "title": [
+    "X–Y 工作台与同步带的弹性",
+    "The X–Y table and belt elasticity"
+   ],
+   "points": [
+    [
+     "龙门式：X 轴只拖滑座和压框，Y 轴拖整根横梁连同 X 轴",
+     "Gantry: X moves carriage and clamp; Y moves the whole beam with the X axis"
+    ],
+    [
+     "同步带轻快便宜但有弹性；丝杠刚但惯量大；直线电机动态最好但贵",
+     "Belts are light, fast, cheap but elastic; screws stiff but heavy; linear motors best but costly"
+    ],
+    [
+     "算例：EA = 150 kN，L₁ = 0.3 m、L₂ = 0.5 m → k = 800 kN/m，m = 3 kg → fₙ ≈ 82 Hz",
+     "Example: EA = 150 kN, L₁ = 0.3 m, L₂ = 0.5 m → k = 800 kN/m, m = 3 kg → fₙ ≈ 82 Hz"
+    ],
+    [
+     "周期 12 ms，与一针移动 15–20 ms 同量级：加宽带、减轻压框、用平滑运动规律",
+     "12 ms period, same order as a 15–20 ms move: wider belt, lighter clamp, smoother motion law"
+    ]
+   ],
+   "formula": "k = \\frac{EA}{L_1} + \\frac{EA}{L_2},\\qquad f_n = \\frac{1}{2\\pi}\\sqrt{\\frac{k}{m}}",
+   "figure": "",
+   "narration": [
+    "工作台是龙门式两轴：Y 横梁两端骑在导轨上，X 滑座在横梁上，所以 X 电机只拖滑座和压框，Y 电机要拖整根横梁连同 X 轴，Y 轴更重。传动三种：同步带轻快便宜但有弹性；丝杠刚度高但惯量大；直线电机最好但贵。同步带可以看成滑座两侧两根并联的弹簧。算例 EA 150 千牛，两段带长 0.3 和 0.5 米，刚度 800 千牛每米，3 公斤的运动质量，固有频率约 82 赫兹，周期 12 毫秒，和一针的移动时间同一个量级。移动一停，模板就晃，晃没停就入布，针位就不准。",
+    "The table is a two-axis gantry: the Y beam rides on rails at both ends, the X carriage on the beam, so the X motor moves only carriage and clamp while the Y motor drags the whole beam with the X axis — Y is heavier. Three drives: belts are light, fast and cheap but elastic; ball screws are stiff but high-inertia; linear motors are best but expensive. A belt is two parallel springs on either side of the carriage. With EA = 150 kN and belt lengths of 0.3 and 0.5 m the stiffness is 800 kN/m; with 3 kg moving, the natural frequency is about 82 Hz, a 12 ms period — the same order as one stitch's move. When the move stops the template rings, and if the needle enters before the ringing dies, the stitch lands off position."
+   ]
+  },
+  {
+   "title": [
+    "中压脚与气动压框",
+    "Intermediate presser foot and pneumatic clamp"
+   ],
+   "points": [
+    [
+     "中压脚：入布前压下，出布后才抬起；抬起后模板才能动",
+     "Intermediate foot: down before needle entry, up only after exit; the template moves only when it is up"
+    ],
+    [
+     "电子中压脚：步进电机设最低点，可按段改（PRESS 命令）",
+     "Electronic intermediate foot: stepper sets the lowest point, changeable per section (PRESS)"
+    ],
+    [
+     "压框：过滤减压阀 0.5–0.6 MPa → 二位五通阀 → 单向节流阀 → 气缸 + 磁性开关",
+     "Clamp: filter-regulator 0.5–0.6 MPa → 5/2 valve → flow control → cylinder + reed switch"
+    ],
+    [
+     "缸径 32 mm、0.5 MPa：F ≈ 400 N；压力不足，布在模板里慢慢溜",
+     "32 mm bore at 0.5 MPa: F ≈ 400 N; too little and the fabric creeps in the template"
+    ]
+   ],
+   "formula": "F = p\\,\\frac{\\pi d^2}{4}",
+   "figure": "w_ef69cb27.png",
+   "narration": [
+    "中压脚是套在机针外面的一个小圆环，由上轴凸轮经连杆驱动，和针杆同步跳。机针上提时它压住布，不让布被针带起来，否则线环形成不好就跳针。它的时序有两条硬要求：入布前压下，出布后才抬起；抬起以后模板才能动。厚料薄料布面高度不同，电子中压脚用步进电机设定最低点，还能由花样文件按段改。压框由 2 到 4 个双作用气缸压紧，回路是减压阀、二位五通电磁阀、单向节流阀、气缸。32 毫米缸径、0.5 兆帕约 400 牛。压力不够，布会在模板里一点点溜，线迹慢慢偏离槽中心。",
+    "The intermediate presser foot is a small ring around the needle, driven from the arm shaft by a cam and link, bouncing in step with the needle bar. As the needle rises it holds the fabric down so it is not lifted, which would spoil the loop and skip stitches. Two hard timing rules: down before needle entry, up only after exit — and only then may the template move. Fabric surfaces sit at different heights, so an electronic foot uses a stepper to set the lowest point, changeable per section from the pattern file. Two to four double-acting cylinders press the clamp through a regulator, a 5/2 solenoid valve and flow-control valves. A 32 mm bore at 0.5 MPa gives about 400 N. Too little and the fabric creeps in the template, the seam drifting from the slot centre."
+   ]
+  },
+  {
+   "title": [
+    "控制系统的三层",
+    "Three layers of the control system"
+   ],
+   "points": [
+    [
+     "应用层：解析花样文件、前瞻规划、缝纫周期逻辑；每针一次",
+     "Application layer: parse the file, look-ahead planning, cycle logic; once per stitch"
+    ],
+    [
+     "运动控制层（DSP/FPGA）：以主轴编码器为主令生成 X、Y 指令，按角度触发中压脚和剪线；0.1–1 ms",
+     "Motion layer (DSP/FPGA): X, Y commands from the shaft encoder; angle-triggered foot and trimming; 0.1–1 ms"
+    ],
+    [
+     "硬实时：2800 r/min 时 1 ms = 16.8°",
+     "Hard real time: at 2800 r/min, 1 ms = 16.8°"
+    ],
+    [
+     "机械送布链换成“编码器 + 软件”",
+     "The mechanical feed chain becomes encoder plus software"
+    ]
+   ],
+   "formula": "",
+   "figure": "w_e7c09f47.png",
+   "narration": [
+    "控制系统分三层。最上面是应用层，读花样文件、解析成针点，做前瞻规划给每针分配转速，管理从压框压下到回原点的整个周期，每针只算一次，慢几毫秒没关系。中间是运动控制层，用 DSP 或 FPGA，以主轴编码器为主令，在规定的角度窗口里生成 X、Y 位置指令，并按角度触发中压脚、剪线、拨线，周期 0.1 到 1 毫秒。这层必须硬实时：2800 转时 1 毫秒就是 16.8°，错过一次就可能断针。最下面是驱动层。平缝机送布由偏心轮机械锁在主轴上，花样机把这条机械链换成了编码器加软件。",
+    "The control system has three layers. On top, the application layer reads the pattern file into stitch points, runs look-ahead planning to assign each stitch a speed, and manages the cycle from clamp down to return to origin; it computes once per stitch, so a few milliseconds late does no harm. In the middle, the motion-control layer on a DSP or FPGA uses the shaft encoder as master, generates X and Y positions inside the angle window and fires the foot, trimmer and wiper by angle, every 0.1 to 1 ms. This layer must be hard real-time: at 2800 r/min, 1 ms is 16.8°, and one miss can break a needle. At the bottom is the drive layer. On a lockstitch machine an eccentric locks the feed to the shaft mechanically; the pattern sewer replaces that chain with encoder plus software."
+   ]
+  },
+  {
+   "title": [
+    "核心约束：机针在布中时模板不能动",
+    "Core constraint: the template must not move while the needle is in the fabric"
+   ],
+   "points": [
+    [
+     "针尖高度 h(φ) = 18 − x(φ)；降到 t 为入布角 φ₁，升回 t 为出布角 φ₂",
+     "Needle height h(φ) = 18 − x(φ); reaching t gives entry angle φ₁, leaving t gives exit φ₂"
+    ],
+    [
+     "窗口 W = 360° − (φ₂ − φ₁)",
+     "Window W = 360° − (φ₂ − φ₁)"
+    ],
+    [
+     "厚度 t = 1.5 / 3 / 6 mm：W = 203.4° / 192.6° / 170.5°",
+     "t = 1.5 / 3 / 6 mm: W = 203.4° / 192.6° / 170.5°"
+    ],
+    [
+     "违反约束：针孔拉大、线迹歪，重则机针被别弯撞梭尖断针",
+     "Violation: enlarged holes, crooked stitches, or a bent needle hitting the hook and breaking"
+    ]
+   ],
+   "formula": "h(\\varphi) = 18 - x(\\varphi),\\quad x(\\varphi) = r(1-\\cos\\varphi) - l\\left(1-\\sqrt{1-\\lambda^2\\sin^2\\varphi}\\right),\\quad W = 360^\\circ - (\\varphi_2-\\varphi_1)",
+   "figure": "w_85b283fd.png",
+   "narration": [
+    "平缝机的送布牙只在机针离布后才推布，这条规则由偏心轮安装角保证。花样机必须用程序遵守同一条规则：机针一刺进布，模板就得静止，否则轻则针孔拉大，重则机针被别弯撞到梭尖断针。窗口多大？用第 3 章的针杆位移 x，算例上止点时针尖在针板上方 18 毫米，针尖高度就是 18 减 x。设布加下模板厚 t，h 降到 t 是入布角，升回 t 是出布角，可动窗口等于 360° 减去两者之差。1.5 毫米时 203.4°，3 毫米时 192.6°，6 毫米时 170.5°。布越厚，入布越早出布越晚，窗口越窄。",
+    "A lockstitch feed dog pushes only after the needle has left the fabric, a rule guaranteed by the eccentric's mounting angle. A pattern sewer must obey the same rule in software: once the needle enters, the template must be still — otherwise holes are torn larger, or worse, the needle is bent into the hook point and breaks. How big is the window? Using the needle-bar displacement x from Chapter 3, with the point 18 mm above the plate at top dead centre, the needle height is 18 minus x. With fabric plus lower template t thick, h falling to t gives the entry angle, rising back to t the exit angle, and the usable window is 360° minus their difference: 203.4° at 1.5 mm, 192.6° at 3 mm, 170.5° at 6 mm. Thicker fabric means earlier entry, later exit, narrower window."
+   ]
+  },
+  {
+   "title": [
+    "走一针要多久",
+    "How long one stitch's move takes"
+   ],
+   "points": [
+    [
+     "三角形速度曲线（s ≤ v²/a）：t = 2√(s/a)",
+     "Triangular profile (s ≤ v²/a): t = 2√(s/a)"
+    ],
+    [
+     "梯形（s > v²/a）：t = s/v + v/a",
+     "Trapezoidal (s > v²/a): t = s/v + v/a"
+    ],
+    [
+     "a = 50 m/s²、v = 1 m/s：v²/a = 20 mm，针距全落在三角形区",
+     "a = 50 m/s², v = 1 m/s: v²/a = 20 mm, so all stitch lengths are triangular"
+    ],
+    [
+     "针距 3 mm：t = 2√(0.003/50) = 15.5 ms",
+     "3 mm: t = 2√(0.003/50) = 15.5 ms"
+    ]
+   ],
+   "formula": "t_{move} = \\begin{cases} 2\\sqrt{s/a}, & s \\le v^2/a \\\\ s/v + v/a, & s > v^2/a \\end{cases}",
+   "figure": "",
+   "narration": [
+    "知道了窗口，再看走一针要多久。每轴有最大加速度 a 和最高速度 v。短距离移动时还没加速到 v 就得减速，速度曲线是三角形，时间是 2 倍根号 s 除以 a；距离超过 v 平方除以 a，才是梯形。算例 a 取 50 米每秒平方，v 取 1 米每秒，v 平方除以 a 是 20 毫米，而花样机的针距在 0.1 到 12.7 毫米之间，全部落在三角形区。所以对花样机，最高速度 v 基本用不上，决定快慢的是加速度。3 毫米一针，时间是 15.5 毫秒。这个数一会儿就要和窗口时间比。",
+    "Now that we have the window, how long does one stitch's move take? Each axis has a maximum acceleration a and maximum speed v. Over a short distance the axis must start braking before reaching v, so the speed profile is a triangle and the time is 2 root s over a; only beyond v squared over a is it a trapezoid. With a = 50 m/s² and v = 1 m/s, v²/a is 20 mm, while pattern-sewer stitches are 0.1 to 12.7 mm — all in the triangular region. So for a pattern sewer the top speed v hardly matters; acceleration decides. A 3 mm stitch takes 15.5 ms, a number we will now compare with the window time."
+   ]
+  },
+  {
+   "title": [
+    "转速上限与图 15-4 的四个结论",
+    "Speed limit and the four lessons of Fig. 15-4"
+   ],
+   "points": [
+    [
+     "针距越大转速越低：n_max ∝ 1/√s，针距 4 倍转速减半",
+     "Longer stitches, lower speed: n_max ∝ 1/√s; 4× the stitch halves the speed"
+    ],
+    [
+     "布越厚转速越低：6 mm 比 1.5 mm 约低 16%",
+     "Thicker fabric, lower speed: about 16% lower at 6 mm than at 1.5 mm"
+    ],
+    [
+     "斜向反而快：45° 每轴只走 s/√2，可高约 19%",
+     "Diagonal is faster: at 45° each axis moves s/√2, about 19% higher"
+    ],
+    [
+     "2 mm 以下受机头限制（示例 2800 r/min）",
+     "Below 2 mm the head limits speed (2800 r/min in the example)"
+    ]
+   ],
+   "formula": "n_{max} = \\frac{W}{6\\,t_{move}}",
+   "figure": "w_a1581ea5.png",
+   "narration": [
+    "转过窗口 W 的时间不能小于走一针的时间，整理一下，n_max 等于 W 除以 6 倍 t_move。3 毫米、1.5 毫米厚：203.4 除以 6 乘 0.0155，约 2190 转。图 15-4 告诉我们四件事。第一，针距越大转速越低，n_max 和根号 s 成反比，针距变 4 倍转速减半。第二，布越厚越慢，6 毫米比 1.5 毫米低约 16%。第三，斜向的一针反而快，每轴只走 s 除以根号 2，转速高约 19%。第四，2 毫米以下受机头本身限制。",
+    "At shaft speed n, sweeping the window W takes W over 360 times 60 over n, which must not be less than the move time; rearranged, n_max equals W over 6 t_move. For 3 mm on 1.5 mm material: 203.4 over 6 times 0.0155, about 2190 r/min. Fig. 15-4 teaches four things. First, longer stitches mean lower speed: n_max goes as one over root s, so four times the stitch halves the speed. Second, thicker material is slower: about 16% lower at 6 mm than at 1.5 mm. Third, a diagonal stitch is actually faster: each axis moves only s over root 2, about 19% higher. Fourth, below about 2 mm the head itself is the limit."
+   ]
+  },
+  {
+   "title": [
+    "电子凸轮：按主轴角度而不是按时间",
+    "Electronic cam: by shaft angle, not by time"
+   ],
+   "points": [
+    [
+     "主轴转速会变：起针慢、中间快、剪线前慢、负载波动",
+     "Shaft speed varies: slow start, fast middle, slow before trimming, load fluctuations"
+    ],
+    [
+     "X、Y 位置写成主轴角的函数；主轴变速时同步自动成立",
+     "X and Y positions are functions of shaft angle; synchronisation holds as speed changes"
+    ],
+    [
+     "每 250 μs：读编码器 → 算 τ → 查 f(τ) → 发指令；2500 线四倍频 0.036°",
+     "Every 250 μs: read encoder → τ → look up f(τ) → command; 2500 lines ×4 gives 0.036°"
+    ],
+    [
+     "驱动延迟 0.5–2 ms：用预测角 φ + ωT_d 查表",
+     "Drive delay 0.5–2 ms: look up with predicted angle φ + ωT_d"
+    ]
+   ],
+   "formula": "x(\\varphi) = x_{i-1} + s_x\\, f(\\tau),\\qquad \\tau = \\frac{\\varphi-\\varphi_s}{\\Delta\\varphi}",
+   "figure": "w_c8dfdae2.png",
+   "narration": [
+    "主轴转速不是恒定的：起针慢、中间快、剪线前又慢，负载一变也会波动。如果 X–Y 按时间出发，比如上止点前 8 毫秒开始动，主轴一变速就错位了。做法是把 X、Y 的位置写成主轴角度的函数。主轴就是凸轮轴，X、Y 是从动件，f(τ) 就是凸轮廓线，只不过存在内存里，每针都可以不同。主轴变速，曲线形状不变，只是走完它的时间变了，同步自动成立，这就叫电子凸轮。要注意驱动延迟，0.5 到 2 毫秒，2800 转时 1 毫秒就是 16.8°，所以要用预测角 φ 加 ω 乘 T_d 去查表。",
+    "Shaft speed is not constant: slow at the start, fast in the middle, slow again before trimming, and it wobbles with load. If X–Y started on a time basis — say 8 ms before top dead centre — any speed change would misalign it. Instead, X and Y positions are written as functions of shaft angle. The shaft is the camshaft, X and Y the followers, and f(τ) the cam profile — stored in memory and different for every stitch if needed. When the shaft changes speed, the curve's shape is unchanged, only the time to traverse it changes, so synchronisation holds automatically: an electronic cam. Mind the drive delay, 0.5 to 2 ms; at 2800 r/min 1 ms is 16.8°, so the table is looked up with the predicted angle φ plus ω times T_d."
+   ]
+  },
+  {
+   "title": [
+    "选哪种运动规律",
+    "Which motion law to choose"
+   ],
+   "points": [
+    [
+     "峰值加速度 a = C·s/Δt²",
+     "Peak acceleration a = C·s/Δt²"
+    ],
+    [
+     "等加速等减速 C = 4：峰值最小、转速最高，但两端加速度突变激振",
+     "Constant acceleration C = 4: lowest peak, highest speed, but acceleration jumps excite vibration"
+    ],
+    [
+     "修正梯形 C = 4.89、摆线 C = 6.28：两端加速度为零，更平滑",
+     "Modified trapezoid C = 4.89, cycloid C = 6.28: zero end acceleration, smoother"
+    ],
+    [
+     "摆线：Δt 放大 √(6.28/4) = 1.25 倍，转速上限 × 0.80",
+     "Cycloid: Δt grows by √(6.28/4) = 1.25, speed limit × 0.80"
+    ]
+   ],
+   "formula": "a = C\\,\\frac{s}{\\Delta t^2}",
+   "figure": "",
+   "narration": [
+    "这其实是机械原理里凸轮那一章的问题，答案也一样。用时 Δt 走距离 s，峰值加速度都能写成 C 乘 s 除以 Δt 平方，只是系数 C 不同。等加速等减速 C 等于 4，峰值最小、转速上限最高，但两端加速度跳变，会激起模板和横梁振动，到位后要等振动衰减，前面的同步带 82 赫兹就是这个隐患。修正梯形 C 是 4.89，摆线 6.28，两端加速度为零，最平滑。换成摆线，在同样加速度能力下 Δt 要放大 1.25 倍，转速上限乘 0.8。工程上薄料小针距用硬规律争转速，大模板大针距用平滑规律换稳定。",
+    "This is really the cam chapter of the theory of machines, with the same answer. Moving s in time Δt, the peak acceleration can always be written C times s over Δt squared; only C differs. Constant acceleration has C = 4: lowest peak and highest speed limit, but acceleration jumps at the ends excite template and beam vibration, and you must wait for it to die after each move — that is the hazard of the 82 Hz belt. Modified trapezoid has C = 4.89 and cycloid 6.28, with zero acceleration at both ends, the smoothest. Switching to a cycloid with the same acceleration capability stretches Δt by 1.25 and multiplies the speed limit by 0.8. In practice: light fabric and short stitches take the hard law for speed; large templates and long stitches take a smooth law for stability."
+   ]
+  },
+  {
+   "title": [
+    "前瞻调速",
+    "Look-ahead speed control"
+   ],
+   "points": [
+    [
+     "主轴每针只能改变 Δn，不能为一针长针突然减速",
+     "The shaft can change only Δn per stitch; it cannot brake suddenly for one long stitch"
+    ],
+    [
+     "① 每针自身上限 cap；② 起针、剪线前限速；③ 反向扫描提前减速；④ 正向扫描限制加速",
+     "① each stitch's own cap; ② slow at start and before trimming; ③ backward pass to brake early; ④ forward pass to limit acceleration"
+    ],
+    [
+     "算例：2 mm 针 2680 r/min，第 5 针 10 mm 只能 1198 r/min，Δn = 300",
+     "Example: 2 mm stitches at 2680 r/min, stitch 5 of 10 mm capped at 1198 r/min, Δn = 300"
+    ],
+    [
+     "前瞻后：2398、2098、1798、1498、1198；不前瞻则 10 mm 只有 12.7 ms、需要 28.3 ms → 断针",
+     "After look-ahead: 2398, 2098, 1798, 1498, 1198; without it 10 mm gets 12.7 ms but needs 28.3 ms → broken needle"
+    ]
+   ],
+   "formula": "c_i \\leftarrow \\min(c_i,\\ c_{i+1}+\\Delta n),\\qquad n_i = \\min(c_i,\\ n_{i-1}+\\Delta n)",
+   "figure": "",
+   "narration": [
+    "一个花样里针距各不相同，每针都用自己的上限行不行？不行。主轴连同旋梭有惯量，每转只能改变有限的转速 Δn。所以控制器要先往后看几针，提前减速，算法和数控机床的前瞻插补一样：先算每针自己的上限，起针和剪线前再限速，然后反向扫描一遍，后面有慢针，前面就提前降；再正向扫描一遍，加速也不能太猛。看算例：2 毫米针距稳定在 2680 转，第 5 针是 10 毫米的长针，上限只有 1198。Δn 取 300，控制器从第 1 针就开始降：2398、2098、1798、1498，到第 5 针正好 1198。",
+    "Stitch lengths vary within a pattern; can each stitch just use its own limit? No. The shaft and hook have inertia, so speed can change only by a limited Δn per revolution. The controller must look ahead several stitches and slow down early, with the same algorithm as CNC look-ahead interpolation: compute each stitch's own cap, add slow limits at the start and before trimming, scan backwards so a slow stitch ahead pulls earlier ones down, then scan forwards so acceleration is not too harsh. In the example, 2 mm stitches run steadily at 2680 r/min and stitch 5 is a 10 mm stitch capped at 1198. With Δn = 300 the controller starts slowing at stitch 1: 2398, 2098, 1798, 1498, and exactly 1198 at stitch 5."
+   ]
+  },
+  {
+   "title": [
+    "花样数据与编程",
+    "Pattern data and programming"
+   ],
+   "points": [
+    [
+     "文件头 + “命令 + ΔX + ΔY”记录；整数增量（0.1 或 0.05 mm），紧凑、不累积舍入误差",
+     "Header + “command + ΔX + ΔY” records; integer increments (0.1 or 0.05 mm), compact, no accumulated rounding"
+    ],
+    [
+     "六步：取轮廓 → 分段 → 等分 → 加工艺针 → 排序 → 仿真检查",
+     "Six steps: outline → segments → equal division → process stitches → ordering → simulation check"
+    ],
+    [
+     "等分：n = ⌈L/s⌉，实际针距 L/n；段端必须落针，否则尖角变圆",
+     "Equal division: n = ⌈L/s⌉, actual length L/n; segment ends must get a stitch or corners round off"
+    ],
+    [
+     "空走（JUMP）前剪线；排序类似旅行商问题",
+     "Trim before a JUMP; ordering is a travelling-salesman-like problem"
+    ]
+   ],
+   "formula": "n = \\left\\lceil \\frac{L}{s} \\right\\rceil,\\qquad s_{actual} = \\frac{L}{n}",
+   "figure": "w_91e0852b.png",
+   "narration": [
+    "花样文件各厂格式不同，内容大同小异：一个文件头，加一串“命令加 ΔX 加 ΔY”的针迹记录，Δ 是相对上一针的位移，用整数存，单位 0.1 或 0.05 毫米。为什么用整数增量？数据紧凑，累加也不会产生舍入误差。从一个口袋盖轮廓到花样文件，编程软件做六步：取轮廓、分段、等分、加工艺针、排序、仿真检查。等分时针数取 L 除以 s 向上取整，实际针距是 L 除以 n，这样段端恰好落针，尖角不会被切成圆角。多段花样之间先剪线再空走，各段顺序决定空走距离和剪线次数。",
+    "Pattern-file formats differ by maker, but the content is similar: a header plus a string of stitch records, each “command + ΔX + ΔY”, Δ being the displacement from the previous stitch stored as an integer in units of 0.1 or 0.05 mm. Why integer increments? The data are compact and summing them never accumulates rounding error. From a pocket-flap outline to a file, the software does six steps: take the outline, segment it, divide equally, add process stitches, order the sections, and simulate and check. When dividing, the stitch count is L over s rounded up, giving an actual length of L over n, so a stitch falls exactly at each segment end and corners are not rounded off. Between sections the machine trims, then jumps; the section order decides jump distances and trim counts."
+   ]
+  },
+  {
+   "title": [
+    "模板、联锁与周期时间",
+    "Templates, interlocks and cycle time"
+   ],
+   "points": [
+    [
+     "模板：PVC、亚克力或环氧板，激光切割；下片厚度计入 t，越薄越好",
+     "Templates: PVC, acrylic or epoxy board, laser cut; the lower sheet counts in t, so thinner is better"
+    ],
+    [
+     "槽宽 = 中压脚外径 + 1–2 mm；封闭槽用错开开槽或连接桥；内侧贴防滑层",
+     "Slot width = foot diameter + 1–2 mm; closed slots need offset slots or bridges; non-slip lining"
+    ],
+    [
+     "启动联锁：压框到位、气压正常、安全光幕无遮挡",
+     "Start interlocks: clamp in position, air pressure normal, light curtain clear"
+    ],
+    [
+     "口袋盖约 60 针：缝 1.8 s，合计约 3.3 s；上下料 8–10 s → 双工位、自动上料",
+     "Pocket flap about 60 stitches: 1.8 s sewing, about 3.3 s total; loading 8–10 s → twin stations, auto loading"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "花样机的精度不只看电机，也看模板，模板设计是工艺的一半。模板常用 PVC、亚克力或环氧板激光切割，下片厚度要计入窗口里的 t，所以越薄越好。槽宽等于中压脚外径加 1 到 2 毫米，太窄碰中压脚，太宽布会鼓起来；封闭槽里面那块会掉，要错开开槽或加连接桥；内侧贴砂纸或橡胶防滑。控制器只在压框到位、气压正常、光幕无遮挡三个条件同时满足时才启动。再算一笔账：口袋盖约 60 针，2000 转缝 1.8 秒，加剪线空走约 3.3 秒，而人工上下料要 8 到 10 秒。所以瓶颈在上下料。",
+    "A pattern sewer's accuracy depends on the template as much as on the motors; template design is half the process. Templates are laser cut from PVC, acrylic or epoxy board; the lower sheet counts in the window's t, so thinner is better. Slot width is the foot diameter plus 1 to 2 mm: too narrow hits the foot, too wide lets the fabric bulge; the island inside a closed slot falls out, so slots are offset or bridged; the inside is lined with abrasive or rubber against slipping. The controller starts only when the clamp is in position, air pressure is normal and the light curtain is clear. Now a quick budget: a pocket flap is about 60 stitches, 1.8 s at 2000 r/min, about 3.3 s with trims and jumps, while manual loading takes 8 to 10 s. The bottleneck is loading."
+   ]
+  },
+  {
+   "title": [
+    "套结、钉扣、锁眼：固定花样的特例",
+    "Bartacking, button sewing, buttonholing: fixed-pattern special cases"
+   ],
+   "points": [
+    [
+     "小幅面、少针数的花样机；只调长、宽、针数等参数",
+     "Small-field, few-stitch pattern sewers; only length, width, stitch count are adjusted"
+    ],
+    [
+     "钢制花样凸轮 → 两台步进电机 + 程序（字面意义的电子凸轮）",
+     "Steel pattern cam → two steppers + program (an electronic cam in the literal sense)"
+    ],
+    [
+     "参数化生成针点：套结先打底、再覆盖",
+     "Stitch points generated parametrically: bartack underlay then cover"
+    ],
+    [
+     "锁眼切刀联锁：主轴停在上针位才能切；刀未回位不许启动",
+     "Buttonhole knife interlock: cut only at needle-up; no start until the knife is back"
+    ]
+   ],
+   "formula": "x_j = \\frac{jL}{N_1},\\ y_j = \\pm 0.3W;\\qquad x_k = L-\\frac{kL}{N_2},\\ y_k = \\pm\\frac{W}{2}",
+   "figure": "w_12ef282f.png",
+   "narration": [
+    "套结机、钉扣机、锁眼机是服装厂里数量最多的特种机。从控制角度看，它们都是小幅面、少针数的花样机，花样是固定几种，只调长度、宽度、针数。机械式的里面有一块大花样凸轮，换花样就换凸轮；电子式换成两台步进电机加程序，这正是字面意义上的电子凸轮。这类机器一般不存针点，开机按参数实时生成。套结先打底再覆盖，按这两个式子算针点，改参数就是不同尺寸。锁眼机的切刀是独立动作，必须主轴停在上针位才能切，刀没回位不许启动，这两个联锁用状态机实现。",
+    "Bartackers, button sewers and buttonholers are the most numerous special machines in a garment plant. From a control standpoint they are small-field, few-stitch pattern sewers with a handful of fixed patterns; only length, width and stitch count change. Mechanical versions carry a large pattern cam, swapped to change patterns; electronic versions use two steppers and a program — an electronic cam in the literal sense. These machines usually do not store stitch points but generate them from parameters at run time: a bartack lays an underlay then a cover, by these two formulas, and new parameters give a new size. A buttonholer's knife is a separate action: it may cut only with the shaft at needle-up, and the machine may not start until the knife is back — two interlocks implemented in a state machine."
+   ]
+  },
+  {
+   "title": [
+    "设计实例：X 轴伺服电机选型",
+    "Design example: sizing the X-axis servo"
+   ],
+   "points": [
+    [
+     "m = 3 kg、a = 50 m/s²、r_p = 15 mm、μ = 0.05；400 W：额定 1.27 N·m、峰值 3.8 N·m",
+     "m = 3 kg, a = 50 m/s², r_p = 15 mm, μ = 0.05; 400 W: rated 1.27 N·m, peak 3.8 N·m"
+    ],
+    [
+     "峰值：F ≈ 151.5 N，T_peak ≈ 2.37 N·m < 3.8，可以",
+     "Peak: F ≈ 151.5 N, T_peak ≈ 2.37 N·m < 3.8: OK"
+    ],
+    [
+     "发热：T_rms ≈ 2.37 × √0.57 ≈ 1.79 N·m > 1.27，会过热",
+     "Heating: T_rms ≈ 2.37 × √0.57 ≈ 1.79 N·m > 1.27: overheats"
+    ],
+    [
+     "改带轮半径 10 mm：T_peak ≈ 1.67、T_rms ≈ 1.26 N·m，用转速余量换转矩余量",
+     "Pulley radius 10 mm: T_peak ≈ 1.67, T_rms ≈ 1.26 N·m — trading speed margin for torque margin"
+    ]
+   ],
+   "formula": "T_{peak} = (ma+\\mu m g)\\,r_p + J_m\\frac{a}{r_p},\\qquad T_{rms}\\approx T_{peak}\\sqrt{W/360^\\circ}",
+   "figure": "",
+   "narration": [
+    "每轴 50 米每秒平方，要多大的电机才做得到？X 轴运动部分 3 公斤，带轮节圆半径 15 毫米，候选 400 瓦伺服。第一步峰值：力约 151.5 牛，乘半径再加上电机转子惯量那一项，约 2.37 牛米，小于峰值 3.8，可以。第二步转速：1 米每秒只要 637 转，转速余量没用上，这是个信号。第三步发热：最坏每针都用满窗口，移动时间占 0.57，均方根转矩约 1.79，超过额定 1.27，连续高速缝会过热。改法之一是带轮半径改成 10 毫米，均方根降到 1.26，刚好合格。",
+    "So far we assumed each axis can deliver 50 m/s²; how big a motor does that take? The X axis moves 3 kg, the pulley pitch radius is 15 mm, the candidate is a 400 W servo. Step one, peak: the force is about 151.5 N; times the radius plus the rotor-inertia term gives about 2.37 N·m, under the 3.8 N·m peak — fine. Step two, speed: 1 m/s needs only 637 r/min, leaving the speed capability unused — a hint. Step three, heating: in the worst case every stitch uses the whole window, so the move fraction is 0.57 and the RMS torque is about 1.79 N·m, above the rated 1.27 — continuous fast sewing would overheat it. One fix is a 10 mm pulley radius, bringing RMS down to 1.26, just within rating."
+   ]
+  },
+  {
+   "title": [
+    "控制器的设计与制造",
+    "Designing and building the controller"
+   ],
+   "points": [
+    [
+     "硬件三原则：强弱分区单点接地；编码器 RS-422 差分 + 双绞屏蔽；输入光耦、电感负载续流",
+     "Three hardware rules: separate power and logic with single-point ground; RS-422 differential encoder lines with shielded twisted pair; opto-isolated inputs and freewheeling for inductive loads"
+    ],
+    [
+     "剪线电磁铁：24 V 吸合 6.9 ms 太慢；75 V 过压 1.37 ms，再 PWM 保持；48 V TVS 释放约 1 ms",
+     "Trimming solenoid: 24 V pulls in at 6.9 ms, too slow; 75 V overdrive 1.37 ms, then PWM hold; 48 V TVS releases in about 1 ms"
+    ],
+    [
+     "软件分层：FPGA → 运动内核 → 缝纫状态机 → 规划 → 界面；安全判断两道保险",
+     "Software layers: FPGA → motion kernel → sewing state machine → planning → UI; safety checks doubled"
+    ],
+    [
+     "制造测试：贴片与 AOI → ICT → 烧录与 FCT → 老化 → 整机联调",
+     "Manufacture and test: SMT and AOI → ICT → programming and FCT → burn-in → system test"
+    ]
+   ],
+   "formula": "t_{pull} = -\\tau \\ln\\left(1-\\frac{I_{pull}R}{U}\\right)",
+   "figure": "w_830708e2.png",
+   "narration": [
+    "最后看控制箱。硬件三原则：强电弱电分区、地只在一点相连；编码器走 RS-422 差分和双绞屏蔽线，丢一个脉冲电子凸轮就错位；输入光耦隔离，电磁铁、气阀这类电感负载要续流。剪线电磁铁的例子：线圈 6 欧、30 毫亨，吸合要 3 安。24 伏直接驱动要 6.9 毫秒，比窗口还长；75 伏过压启动只要 1.37 毫秒，吸合后改 PWM 保持；关断串 48 伏 TVS，约 1 毫秒释放。软件越往下越快越硬，安全相关的判断状态机查一次、硬件再独立切一次。制造上测试点和自测功能要在设计时就留好。",
+    "Finally, the control box. Three hardware rules: separate power and logic, with grounds joined at a single point; run encoder signals as RS-422 differential pairs on shielded twisted cable, because one lost pulse misaligns the electronic cam; opto-isolate inputs and give inductive loads such as solenoids and valves a freewheeling path. The trimming-solenoid example: a 6 Ω, 30 mH coil needing 3 A to pull in. Driven straight from 24 V it takes 6.9 ms, longer than the window; a 75 V overdrive takes only 1.37 ms, then PWM holds it; a 48 V TVS at switch-off releases in about 1 ms. Software gets faster and harder towards the bottom; safety checks are made by the state machine and independently cut by hardware. For manufacture, test points and self-test must be designed in from the start."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "花样机用 X–Y 工作台代替送布牙，主轴编码器角度是全机的时间基准；送布这条机械链换成了编码器加软件。",
+   "The pattern sewer replaces the feed dog with an X–Y table, and the shaft-encoder angle is the machine's time base; the mechanical feed chain becomes encoder plus software."
+  ],
+  [
+   "机针在布中时模板不能动：离布窗口 W = 360° − (φ₂ − φ₁)，布越厚越窄；n_max = W/(6t_move)，t_move = 2√(s/a)，所以 n_max ∝ 1/√s。",
+   "The template must not move while the needle is in the fabric: W = 360° − (φ₂ − φ₁), narrower for thicker material; n_max = W/(6t_move) with t_move = 2√(s/a), so n_max ∝ 1/√s."
+  ],
+  [
+   "电子凸轮以主轴角为自变量，用预测角补偿驱动延迟；运动规律 C 越大越平滑、转速越低；前瞻算法反向、正向各扫一遍，提前为慢针减速。",
+   "The electronic cam uses shaft angle, with predicted angle compensating drive delay; larger C is smoother but slower; look-ahead scans backwards and forwards to slow early for slow stitches."
+  ],
+  [
+   "花样编程六步：取轮廓、分段、等分（n = ⌈L/s⌉）、加工艺针、排序、检查；文件用整数增量。",
+   "Pattern programming in six steps: outline, segments, equal division (n = ⌈L/s⌉), process stitches, ordering, checking; files store integer increments."
+  ],
+  [
+   "套结、钉扣、锁眼是参数化的固定花样；切刀、压框、光幕等联锁用状态机加硬件双保险。",
+   "Bartacks, buttons and buttonholes are parametric fixed patterns; knife, clamp and light-curtain interlocks use a state machine plus independent hardware."
+  ],
+  [
+   "X 轴电机按峰值、转速、均方根转矩三步选型；带轮半径用转速余量换转矩余量；产能往往受上下料而非转速限制。",
+   "Size the X-axis motor by peak, speed and RMS torque; the pulley radius trades speed margin for torque margin; output is often limited by loading, not speed."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "pattern",
+   "no": "15-1",
+   "title": [
+    "花样机仿真",
+    "Pattern-sewer simulation"
+   ],
+   "goal": [
+    [
+     "验证每针转速上限 n_max = W/(6t_move) 与针距、布厚的关系。",
+     "Verify how the per-stitch limit n_max = W/(6t_move) depends on stitch length and thickness."
+    ],
+    [
+     "观察斜向针与 X、Y 方向针的差别，以及三种运动规律对缝制时间的影响。",
+     "Observe the difference between diagonal and axial stitches, and how the three motion laws affect sewing time."
+    ],
+    [
+     "体会前瞻调速怎样避免走不完的针。",
+     "See how look-ahead speed control avoids stitches that cannot be completed."
+    ]
+   ],
+   "theory": [
+    [
+     "机头参数：r = 15.5 mm，l = 55 mm，上止点时针尖在针板上方 18 mm；离布窗口由布 + 下模板厚 t 决定，再扣除两端余量。",
+     "Head parameters: r = 15.5 mm, l = 55 mm, point 18 mm above the plate at TDC; the window depends on fabric + lower template thickness t, minus end margins."
+    ],
+    [
+     "每轴独立受加速度 a 和速度 v 限制，按各轴分量计算 t_move；运动规律系数 C = 4、4.89、6.28。",
+     "Each axis is limited independently by a and v, with t_move from the axis components; motion-law coefficient C = 4, 4.89 or 6.28."
+    ],
+    [
+     "“自动前瞻”按 15.4.3 节算法安排每针转速：起针 3 针、剪线前 2 针限速 400 r/min，每针最大变速 Δn；机头最高 2800 r/min。",
+     "“Auto look-ahead” assigns each stitch a speed by the Section 15.4.3 algorithm: 400 r/min for 3 start and 2 pre-trim stitches, maximum change Δn per stitch; head maximum 2800 r/min."
+    ],
+    [
+     "蓝色针点能在窗口内走完，红色走不完；表盘显示主轴转角和离布窗口。",
+     "Blue stitch points can be completed in the window, red ones cannot; the dial shows shaft angle and the window."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，选“口袋盖（60 × 40 mm，R10 圆角）”，参数保持默认（针距 3 mm、厚 1.5 mm、a = 50 m/s²、v = 1 m/s、余量 0°、2000 r/min、Δn = 300、等加速等减速、固定转速），记录“结果”中的窗口 W、针数、走不完的针、最慢一针的上限和缝制时间。",
+     "Open the lab, choose “Pocket flap (60 × 40 mm, R10 corners)” with default parameters (3 mm, 1.5 mm, a = 50 m/s², v = 1 m/s, 0° margin, 2000 r/min, Δn = 300, constant acceleration, fixed speed); record the window W, stitch count, incomplete stitches, slowest stitch limit and sewing time."
+    ],
+    [
+     "按“播放”（慢放 60×），对照右上角表盘看模板只在蓝色弧段内移动；用“下一针”单步看当前针的针距、用时和可用时间。",
+     "Press “Play” (60× slow) and check on the dial that the template moves only in the blue arc; use “Next stitch” to read each stitch's length, move time and available time."
+    ],
+    [
+     "任务 1：把针距从 3 mm 调到 6 mm，数出红色的针；再逐步降低设定转速，直到全部变蓝，记录这个转速并与 n_max 公式和图 15-4 对照。",
+     "Task 1: change the stitch length from 3 mm to 6 mm and count the red stitches; then lower the set speed step by step until all turn blue; record that speed and compare with the n_max formula and Fig. 15-4."
+    ],
+    [
+     "任务 2：恢复 3 mm，把布厚从 1.5 mm 调到 6 mm，记录窗口 W 和走不完的针，说明厚料为什么必须降速。",
+     "Task 2: back at 3 mm, raise the thickness from 1.5 mm to 6 mm, record W and the incomplete stitches, and explain why thick material must run slower."
+    ],
+    [
+     "任务 3：选“五角星”，针距 6 mm，从 1200 r/min 逐步提高转速，记录哪些针先变红（接近水平或竖直的，还是斜向的）。",
+     "Task 3: choose “Five-pointed star”, 6 mm, and raise the speed from 1200 r/min; record which stitches turn red first (near-horizontal/vertical or diagonal)."
+    ],
+    [
+     "任务 4：切到“自动前瞻”，依次选三种运动规律，记录缝制时间和平均转速；再把窗口两端余量调到 15°，记录时间增加多少。",
+     "Task 4: switch to “Auto look-ahead”, select each of the three motion laws in turn and record sewing time and average speed; then set the end margin to 15° and record the time increase."
+    ],
+    [
+     "（选做）选“自己画”，在图上点出一个轮廓，比较固定转速与自动前瞻的结果。",
+     "(Optional) Choose “Draw your own”, click an outline on the plot, and compare fixed speed with auto look-ahead."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 15-1　花样机仿真记录",
+     "Table 15-1 Pattern-sewer simulation record"
+    ],
+    "headers": [
+     [
+      "花样 / 针距（mm）",
+      "Pattern / stitch (mm)"
+     ],
+     [
+      "厚度 t（mm）",
+      "Thickness t (mm)"
+     ],
+     [
+      "窗口 W（°）",
+      "Window W (°)"
+     ],
+     [
+      "运动规律 / 调速",
+      "Motion law / speed mode"
+     ],
+     [
+      "走不完的针",
+      "Incomplete stitches"
+     ],
+     [
+      "最慢一针上限（r/min）",
+      "Slowest-stitch limit (r/min)"
+     ],
+     [
+      "缝制时间（s）",
+      "Sewing time (s)"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "用 n_max ∝ 1/√s 估算：口袋盖针距从 3 mm 到 6 mm，转速上限应降到原来的多少？与你在任务 1 中找到的转速比较。",
+     "Using n_max ∝ 1/√s, to what fraction should the limit fall from 3 mm to 6 mm? Compare with the speed you found in Task 1."
+    ],
+    [
+     "为什么五角星上斜向的针反而能转得更快？若改为限制合成加速度，结论会怎样？",
+     "Why can diagonal stitches on the star run faster? How would that change if the resultant acceleration were limited instead?"
+    ],
+    [
+     "根据任务 4，薄料小针距和厚料大模板各应选哪种运动规律？说明理由。",
+     "From Task 4, which motion law suits light fabric with short stitches, and which suits thick material with large templates? Why?"
+    ]
+   ]
+  },
+  {
+   "id": "patprog",
+   "no": "15-2",
+   "title": [
+    "花样编程",
+    "Pattern programming"
+   ],
+   "goal": [
+    [
+     "像在花样机编程软件里一样，用直线、圆弧、圆、曲线画花样并生成花样文件。",
+     "Draw patterns with lines, arcs, circles and curves and generate a pattern file, as in real programming software."
+    ],
+    [
+     "掌握针距、限速、起止回针、双重缝和剪线的设置，理解它们对线迹和周期时间的影响。",
+     "Learn to set stitch length, speed limits, start/end backtacks, double stitching and trimming, and see their effect on stitches and cycle time."
+    ],
+    [
+     "通过安排段的顺序和起点压缩周期时间。",
+     "Shorten cycle time by arranging section order and start points."
+    ]
+   ],
+   "theory": [
+    [
+     "坐标原点在模板中心，X 向右、Y 向上，单位 mm；缝纫区 120 × 80 mm，网格 5 mm，吸附 1 mm。",
+     "The origin is at the template centre, X right, Y up, in mm; sewing field 120 × 80 mm, 5 mm grid, 1 mm snap."
+    ],
+    [
+     "每段按针距等分，转角处必落一针；花样文件为 HEAD、SEW、JUMP、TRIM、END，坐标为 0.1 mm 整数增量。",
+     "Each section is divided equally with a stitch at every corner; the file uses HEAD, SEW, JUMP, TRIM, END with 0.1 mm integer increments."
+    ],
+    [
+     "检查按 15.3–15.4 节：每轴 50 m/s²、最高 1 m/s、每针最大变速 300 r/min；超出缝纫区或针距超过 12.7 mm 的针标红。",
+     "Checks follow Sections 15.3–15.4: 50 m/s² per axis, 1 m/s maximum, 300 r/min maximum change per stitch; stitches outside the field or longer than 12.7 mm are flagged red."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，在左侧“编程指导”里依次点开 7 个步骤，读完“认识模板坐标”和“画直线段”。",
+     "Open the lab and click through the 7 steps of the programming guide on the left, reading “Template coordinates” and “Drawing line sections” first."
+    ],
+    [
+     "任务 1：选“直线”，画一个 40 × 30 mm 的矩形，最后一点点回起点闭合，按“结束本段”；在“花样段”里把针距设为 3 mm，起针、收尾回针各 2 针。",
+     "Task 1: choose “Line”, draw a 40 × 30 mm rectangle closing on the start point, press “Finish section”; under “Pattern sections” set 3 mm stitches and 2 start and 2 end backtacks."
+    ],
+    [
+     "看右下角的花样文件，找出 HEAD、SEW 和回针记录，核对 3 mm 针距对应的增量是 30。",
+     "Look at the pattern file at bottom right, find HEAD, SEW and the backtack records, and check that a 3 mm stitch shows an increment of 30."
+    ],
+    [
+     "任务 2：按“清空”，用直线和“圆弧（三点）”画 60 × 40 mm、底部两个圆角的 U 形口袋盖（上边不缝），各段首尾相接、只在最后剪线；可先按“示例：口袋盖”参考。",
+     "Task 2: press “Clear” and draw a 60 × 40 mm U-shaped pocket flap with two bottom corners (top edge open) using lines and “Arc (three points)”, sections joined end to end and trimmed only at the end; “Example: pocket flap” is a reference."
+    ],
+    [
+     "任务 3：重画任务 1 的矩形，再在里面用“圆”画一个直径 16 mm 的圆；两段结束后都勾选“剪线”，确认没有标红的针，观察橙色虚线空走。",
+     "Task 3: redraw the Task 1 rectangle and add a 16 mm-diameter circle inside with “Circle”; tick “Trim” after both sections, confirm no red stitches, and observe the orange dashed jump."
+    ],
+    [
+     "任务 4：把“布 + 下模板厚”设为 3 mm，记录周期时间；在针距不大于 4 mm、每段起止至少回针 1 针的条件下，调针距、回针和段的起点，把周期时间压到 4.7 s 以内。",
+     "Task 4: set fabric + lower template to 3 mm and record the cycle time; with stitches ≤ 4 mm and at least 1 backtack at each end, adjust stitch length, backtacks and section starts to bring the cycle time under 4.7 s."
+    ],
+    [
+     "按“仿真缝制”，看机针按文件顺序走一遍；把“机头最高转速”从 2800 调到 2000，记录周期时间和被限速的针数的变化。",
+     "Press “Simulate sewing” and watch the needle follow the file; change the head maximum from 2800 to 2000 and record how cycle time and the number of limited stitches change."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 15-2　花样编程记录",
+     "Table 15-2 Pattern programming record"
+    ],
+    "headers": [
+     [
+      "任务 / 方案",
+      "Task / variant"
+     ],
+     [
+      "段数",
+      "Sections"
+     ],
+     [
+      "针数",
+      "Stitches"
+     ],
+     [
+      "剪线 / 空走",
+      "Trims / jumps"
+     ],
+     [
+      "被限速的针",
+      "Limited stitches"
+     ],
+     [
+      "周期时间（s）",
+      "Cycle time (s)"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "花样文件为什么用 0.1 mm 的整数增量，而且由四舍五入后的绝对坐标相减得到？",
+     "Why does the pattern file use 0.1 mm integer increments derived by subtracting rounded absolute coordinates?"
+    ],
+    [
+     "任务 4 中哪一项改动缩短周期时间最多？为什么？",
+     "Which change in Task 4 shortened the cycle time most, and why?"
+    ],
+    [
+     "如果两段之间不剪线就空走，会出现什么问题？",
+     "What goes wrong if the machine jumps between sections without trimming?"
+    ]
+   ]
+  },
+  {
+   "id": "model-pattern",
+   "no": "M15-1",
+   "title": [
+    "电子花样机三维结构",
+    "3D structure of the programmable pattern sewer"
+   ],
+   "goal": [
+    [
+     "认清机头、针杆与中压脚、模板与压框、X 轴、Y 轴、底板与旋梭六组部件及其连接关系。",
+     "Identify the six groups — head, needle bar and intermediate foot, template and clamp, X axis, Y axis, bed and hook — and how they connect."
+    ],
+    [
+     "在缝制动画中验证：模板只在机针离布时移动。",
+     "Verify in the sewing animation that the template moves only while the needle is out of the fabric."
+    ]
+   ],
+   "theory": [
+    [
+     "龙门式 X–Y：Y 横梁沿两条直线导轨移动，X 滑座在横梁上移动，压框经连臂固定在 X 滑座上；本模型为同步带单电机方案。",
+     "Gantry X–Y: the Y beam runs on two linear rails, the X carriage on the beam, and the clamp is fixed to the X carriage by an arm; this model uses single-motor belt drive."
+    ],
+    [
+     "离布窗口按第 15.3 节计算；中压脚随针杆跳动，入布前压下、出布后抬起。",
+     "The off-fabric window follows Section 15.3; the intermediate foot bounces with the needle bar, down before entry and up after exit."
+    ]
+   ],
+   "steps": [
+    [
+     "打开三维模型，用鼠标拖动旋转、滚轮缩放，依次点“斜视”“正面”“俯视”三个视角，找出 X 轴（橙）和 Y 轴（绿）。",
+     "Open the 3D model, drag to rotate and scroll to zoom, and click the iso, front and top views in turn to find the X axis (orange) and Y axis (green)."
+    ],
+    [
+     "点“透视”，观察机头里主轴伺服电机和针杆的位置；再点“机针特写”看中压脚套在机针外面。",
+     "Click “X-ray” to see the main-shaft servo and needle bar inside the head; then “Needle close-up” to see the intermediate foot around the needle."
+    ],
+    [
+     "点“爆炸”，把“拆开程度”从 0 拖到 1，对照右侧“部件分组”逐一认出六组部件，记录每组包含的零件。",
+     "Click “Explode” and drag the separation from 0 to 1; identify the six groups against the legend and record the parts in each."
+    ],
+    [
+     "回到“外观”，速度选“很慢”，按“播放”，注意右侧主轴转角 φ、当前针、X、Y 读数和“机针在布中 / 离布”的状态。",
+     "Return to “Solid”, set speed to “Very slow” and press “Play”; watch the shaft angle φ, current stitch, X, Y readings and the in-fabric / out-of-fabric status."
+    ],
+    [
+     "在至少 3 针里，记下 X、Y 开始变化和停止变化时的主轴转角，以及状态切换时的转角，填入记录表。",
+     "For at least 3 stitches, record the shaft angles at which X and Y start and stop changing, and at which the status switches."
+    ],
+    [
+     "把速度改为“中”和“快”，确认无论转速多少，X–Y 的移动始终落在离布阶段。",
+     "Change the speed to “Medium” and “Fast” and confirm that, whatever the speed, X–Y motion always falls in the out-of-fabric phase."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 15-3　模板移动与主轴转角",
+     "Table 15-3 Template motion versus shaft angle"
+    ],
+    "headers": [
+     [
+      "针号",
+      "Stitch"
+     ],
+     [
+      "出布时转角（°）",
+      "Angle at exit (°)"
+     ],
+     [
+      "X–Y 开始移动（°）",
+      "X–Y starts (°)"
+     ],
+     [
+      "X–Y 停止移动（°）",
+      "X–Y stops (°)"
+     ],
+     [
+      "入布时转角（°）",
+      "Angle at entry (°)"
+     ]
+    ],
+    "rows": 4
+   },
+   "questions": [
+    [
+     "为什么 Y 轴电机的负载比 X 轴重？设计上怎样应对？",
+     "Why is the Y-axis motor more heavily loaded than the X axis? How is this handled in design?"
+    ],
+    [
+     "动画里模板移动的转角范围与 15.3 节算出的离布窗口是否一致？为什么转速改变时这个范围不变？",
+     "Does the angle range of template motion in the animation match the window of Section 15.3? Why does it not change with speed?"
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 15：花样机的转速规划与 X–Y 电机选型",
+   "Assignment 15: speed planning and X–Y motor sizing for a pattern sewer"
+  ],
+  "tasks": [
+   [
+    "布加下模板总厚 3 mm（W = 192.6°），每轴 a = 50 m/s²。分别按等加速等减速（C = 4）和摆线（C = 6.28）规律，算出沿 X 方向针距 2、4、8 mm 时的转速上限，列表；再算 4 mm 针沿 45° 方向时的上限（C = 4），说明转速规划为什么要按各轴分量计算。",
+    "Fabric plus lower template is 3 mm thick (W = 192.6°) and a = 50 m/s² per axis. For constant acceleration (C = 4) and cycloidal (C = 6.28) laws, compute the speed limits for 2, 4 and 8 mm stitches along X and tabulate them; then compute the limit for a 4 mm stitch at 45° (C = 4) and explain why speed planning must use axis components."
+   ],
+   [
+    "一段花样 2 mm 针距稳定运行在 2680 r/min，第 5 针是 10 mm 的长针（布厚 1.5 mm，上限 1198 r/min），每针允许转速变化 Δn = 200 r/min。用 15.4.3 节的算法算出第 1–8 针的转速，说明控制器要提前几针开始减速；如果不做前瞻，第 5 针会发生什么？",
+    "A pattern section runs steadily at 2680 r/min with 2 mm stitches; stitch 5 is a 10 mm stitch (1.5 mm material, limit 1198 r/min), and Δn = 200 r/min per stitch. Use the Section 15.4.3 algorithm to find the speeds of stitches 1–8, and state how many stitches ahead the controller must start slowing; what would happen at stitch 5 without look-ahead?"
+   ],
+   [
+    "候选 400 W 伺服：额定 1.27 N·m，峰值 3.8 N·m，转子惯量 0.3×10⁻⁴ kg·m²；带轮节圆半径 12 mm，导轨 μ = 0.05，要求 a = 50 m/s²，移动时间占比按 0.57 计。分别核算 X 轴（运动质量 2.5 kg）和 Y 轴（运动质量 7 kg）的峰值转矩和均方根转矩；不满足的轴给出至少两种改进方案，并算出这台电机按额定转矩连续工作时 Y 轴能用的最大加速度。",
+    "A candidate 400 W servo has rated torque 1.27 N·m, peak 3.8 N·m, rotor inertia 0.3×10⁻⁴ kg·m²; pulley pitch radius 12 mm, rail μ = 0.05, required a = 50 m/s², move fraction 0.57. Check peak and RMS torque for the X axis (2.5 kg moving) and the Y axis (7 kg moving); for any axis that fails, propose at least two improvements, and compute the maximum acceleration the Y axis can use if this motor works continuously at rated torque."
+   ],
+   [
+    "在虚拟实验 15-2 中完成任务 4（周期时间 < 4.7 s），提交花样文件和截图，并用一段话说明你做了哪些改动、各节省了多少时间。",
+    "Complete Task 4 of Virtual lab 15-2 (cycle time < 4.7 s); submit the pattern file and a screenshot, and explain in one paragraph what you changed and how much time each change saved."
+   ]
+  ],
+  "deliverable": [
+   "3–5 页报告（PDF）：计算表格与过程（可附 Python 脚本）、电机选型结论、虚拟实验 15-2 的花样文件文本和截图。",
+   "A 3–5 page report (PDF): calculation tables and working (optionally a Python script), motor-sizing conclusions, and the pattern-file text and screenshot from Virtual lab 15-2."
+  ],
+  "rubric": [
+   [
+    "转速上限表格正确，能解释斜向针和运动规律的影响（25 分）",
+    "Speed-limit table correct, with diagonal and motion-law effects explained (25 points)"
+   ],
+   [
+    "前瞻调速计算正确，结论清楚（20 分）",
+    "Look-ahead calculation correct and conclusion clear (20 points)"
+   ],
+   [
+    "电机峰值、均方根校核正确，改进方案可行并有数据支撑（30 分）",
+    "Peak and RMS checks correct, improvements feasible and backed by numbers (30 points)"
+   ],
+   [
+    "编程任务完成，改动说明合理（20 分）",
+    "Programming task completed with a sound explanation of changes (20 points)"
+   ],
+   [
+    "报告规范、单位齐全（5 分）",
+    "Report tidy, units complete (5 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "numerical",
+   "text": [
+    "布加下模板总厚 1.5 mm，离布窗口 W = 203.4°；每轴 a = 50 m/s²，等加速等减速。沿 X 方向针距 4 mm 时，转速上限约为多少 r/min？",
+    "Fabric plus lower template is 1.5 mm, window W = 203.4°; a = 50 m/s² per axis, constant acceleration. What is the speed limit for a 4 mm stitch along X, in r/min?"
+   ],
+   "answer": 1895,
+   "tolerance": 20,
+   "unit": "r/min",
+   "feedback": [
+    "移动时间 t_move = 2√(0.004/50) ≈ 17.9 ms；转速上限 n_max = 203.4/(6 × 0.0179) ≈ 1895 r/min。",
+    "t_move = 2√(0.004/50) ≈ 17.9 ms; n_max = 203.4/(6 × 0.0179) ≈ 1895 r/min."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "主轴 2400 r/min，X–Y 驱动从发指令到跟上的延迟为 1.2 ms。若不做延迟补偿，模板的动作会滞后多少度主轴转角？",
+    "The shaft runs at 2400 r/min and the X–Y drive lags its command by 1.2 ms. Without delay compensation, by how many degrees of shaft angle does the template lag?"
+   ],
+   "answer": 17.3,
+   "tolerance": 0.3,
+   "unit": "°",
+   "feedback": [
+    "滞后角 = 6nT_d = 6 × 2400 × 0.0012 ≈ 17.3°，所以要用预测角 φ + ωT_d 查表。",
+    "Lag = 6nT_d = 6 × 2400 × 0.0012 ≈ 17.3°, which is why the table is looked up at the predicted angle φ + ωT_d."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "条件同上（W = 203.4°，每轴 a = 50 m/s²，X、Y 两轴各自独立受限）。一针长 5 mm、沿 45° 方向，转速上限约为多少 r/min？",
+    "Same conditions (W = 203.4°, a = 50 m/s² per axis, each axis limited independently). A 5 mm stitch runs at 45°. What is its speed limit in r/min?"
+   ],
+   "answer": 2016,
+   "tolerance": 25,
+   "unit": "r/min",
+   "feedback": [
+    "每轴只走 5/√2 ≈ 3.54 mm，t_move = 2√(0.00354/50) ≈ 16.8 ms，n_max ≈ 203.4/(6 × 0.0168) ≈ 2016 r/min，比沿 X 方向的 5 mm 针（约 1695 r/min）高约 19%。",
+    "Each axis moves only 5/√2 ≈ 3.54 mm, t_move ≈ 16.8 ms, n_max ≈ 203.4/(6 × 0.0168) ≈ 2016 r/min, about 19% above a 5 mm stitch along X (about 1695 r/min)."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "电子凸轮把 X、Y 的位置写成主轴角度的函数，而不是时间的函数，主要是因为：",
+    "The electronic cam writes X and Y positions as functions of shaft angle rather than time mainly because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "主轴转速会变，按角度同步时变速不会使模板和机针错位",
+      "Shaft speed varies, and angle-based synchronisation keeps template and needle aligned through speed changes"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "按角度计算比按时间计算更省内存",
+      "Angle-based calculation saves memory"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "编码器只能输出角度，不能计时",
+      "The encoder can only output angle, not time"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "这样就不需要考虑驱动延迟",
+      "It removes the need to consider drive delay"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "起针慢、中间快、剪线前慢，负载也会让转速波动；曲线以角度为自变量，变速时形状不变、同步自动成立。驱动延迟仍要用预测角补偿。",
+    "Speed is slow at start, fast in the middle, slow before trimming, and fluctuates with load; with angle as the variable the curve keeps its shape and sync holds. Drive delay still needs predicted-angle compensation."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "其他条件不变，把运动规律从等加速等减速（C = 4）换成摆线（C = 6.28），转速上限约变为原来的：",
+    "All else equal, switching from constant acceleration (C = 4) to a cycloid (C = 6.28) changes the speed limit to about:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "0.80 倍",
+      "0.80 times"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "0.64 倍",
+      "0.64 times"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "1.25 倍",
+      "1.25 times"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "不变，因为峰值加速度不变",
+      "Unchanged, because peak acceleration is unchanged"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "同样的加速度能力下 Δt 放大 √(6.28/4) ≈ 1.25 倍，转速上限乘 1/1.25 ≈ 0.80；0.64 是忘了开方。",
+    "With the same acceleration capability Δt grows by √(6.28/4) ≈ 1.25, so the limit is multiplied by 1/1.25 ≈ 0.80; 0.64 forgets the square root."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于中压脚的时序，下列说法正确的是：",
+    "Which statements about intermediate-presser-foot timing are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "必须在机针入布前压下",
+      "It must be down before the needle enters the fabric"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "必须在机针出布后才抬起",
+      "It must lift only after the needle leaves the fabric"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "中压脚抬起以后模板才能移动",
+      "The template may move only after the foot has lifted"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "中压脚压下时模板移动可以减少跳针",
+      "Moving the template while the foot is down reduces skipped stitches"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "中压脚在机针上提时压住布面防止布被带起而跳针；它未抬起时移动模板会拖动布料。",
+    "The foot holds the fabric as the needle rises so it is not lifted and stitches do not skip; moving the template while it is down drags the fabric."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "前瞻调速要做一次反向扫描，是因为主轴每针只能改变有限的转速 Δn，必须为后面的慢针提前减速。",
+    "Look-ahead speed control includes a backward pass because the shaft can change speed only by a limited Δn per stitch and must slow down early for slow stitches ahead."
+   ],
+   "correct": true,
+   "feedback": [
+    "主轴连同旋梭有惯量，不能在一针之内从 2680 降到 1198 r/min；反向扫描令 cap[i] ≤ cap[i+1] + Δn。",
+    "The shaft and hook have inertia and cannot drop from 2680 to 1198 r/min in one stitch; the backward pass enforces cap[i] ≤ cap[i+1] + Δn."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "同步带 EA = 150 kN，滑座两侧带长 L₁ = 0.2 m、L₂ = 0.6 m，X 轴运动质量 2.5 kg。工作台沿 X 方向的固有频率约为多少 Hz？",
+    "A belt has EA = 150 kN; the belt lengths either side of the carriage are L₁ = 0.2 m and L₂ = 0.6 m, and the X-axis moving mass is 2.5 kg. What is the natural frequency along X, in Hz?"
+   ],
+   "answer": 101,
+   "tolerance": 2,
+   "unit": "Hz",
+   "feedback": [
+    "两段带并联：k = 150 000/0.2 + 150 000/0.6 = 1.0×10⁶ N/m；固有频率 fₙ = √(k/m)/(2π) = √(4×10⁵)/(2π) ≈ 101 Hz。",
+    "k = 150 000/0.2 + 150 000/0.6 = 1.0×10⁶ N/m; fₙ = √(k/m)/(2π) = √(4×10⁵)/(2π) ≈ 101 Hz."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "X 轴运动质量 4 kg，要求 a = 40 m/s²，导轨 μ = 0.05，带轮节圆半径 12 mm，电机转子惯量 0.3×10⁻⁴ kg·m²。所需峰值转矩约为多少 N·m？（g = 9.8 m/s²）",
+    "The X axis moves 4 kg at a = 40 m/s², rail μ = 0.05, pulley pitch radius 12 mm, rotor inertia 0.3×10⁻⁴ kg·m². What peak torque is needed, in N·m? (g = 9.8 m/s²)"
+   ],
+   "answer": 2.04,
+   "tolerance": 0.03,
+   "unit": "N·m",
+   "feedback": [
+    "驱动力 F = 4 × 40 + 0.05 × 4 × 9.8 ≈ 162 N；峰值转矩 T = 162 × 0.012 + 0.3×10⁻⁴ × 40/0.012 ≈ 1.94 + 0.10 = 2.04 N·m。",
+    "F = 4 × 40 + 0.05 × 4 × 9.8 ≈ 162 N; T = 162 × 0.012 + 0.3×10⁻⁴ × 40/0.012 ≈ 1.94 + 0.10 = 2.04 N·m."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "花样文件用“相对上一针的整数增量（单位 0.1 mm）”而不用浮点绝对坐标，主要原因是：",
+    "Pattern files store integer increments from the previous stitch (in 0.1 mm) rather than floating-point absolute coordinates mainly because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "数据紧凑，累加不会产生舍入误差",
+      "Data are compact and summing them accumulates no rounding error"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "机器无法处理负数坐标",
+      "The machine cannot handle negative coordinates"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "增量格式可以不需要原点",
+      "An incremental format needs no origin"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "整数运算可以让工作台走得更快",
+      "Integer arithmetic makes the table move faster"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "整数增量紧凑，且由四舍五入后的绝对坐标相减得到，不会累积误差；原点仍必须与模板对准。",
+    "Integer increments are compact and, derived from rounded absolute coordinates, do not accumulate error; the origin must still match the template."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "一段花样以 2 mm 针距稳定运行在 2680 r/min，第 5 针是 10 mm 的长针，自身上限 1198 r/min；每针允许转速变化 Δn = 250 r/min。按前瞻算法，第 3 针的转速是多少 r/min？",
+    "A section runs steadily at 2680 r/min with 2 mm stitches; stitch 5 is a 10 mm stitch with its own limit of 1198 r/min; Δn = 250 r/min per stitch. By the look-ahead algorithm, what is the speed of stitch 3 in r/min?"
+   ],
+   "answer": 1698,
+   "tolerance": 2,
+   "unit": "r/min",
+   "feedback": [
+    "反向扫描：第 4 针 1198 + 250 = 1448，第 3 针 1448 + 250 = 1698，第 2 针 1948，第 1 针 2198。",
+    "Backward pass: stitch 4 = 1198 + 250 = 1448, stitch 3 = 1698, stitch 2 = 1948, stitch 1 = 2198."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "布加下模板总厚 3 mm（W = 192.6°），每轴 a = 60 m/s²，等加速等减速。沿 X 方向针距 2.5 mm 时转速上限约为多少 r/min？",
+    "Fabric plus lower template is 3 mm (W = 192.6°), a = 60 m/s² per axis, constant acceleration. What is the speed limit for a 2.5 mm stitch along X, in r/min?"
+   ],
+   "answer": 2486,
+   "tolerance": 25,
+   "unit": "r/min",
+   "feedback": [
+    "t_move = 2√(0.0025/60) ≈ 12.9 ms；n_max = 192.6/(6 × 0.0129) ≈ 2486 r/min（若机头最高 2800 r/min，仍由工作台限制）。",
+    "t_move = 2√(0.0025/60) ≈ 12.9 ms; n_max = 192.6/(6 × 0.0129) ≈ 2486 r/min (below a 2800 r/min head limit, so the table governs)."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "X 轴电机每针移动时转矩为 ±2.0 N·m，静止时接近零，移动时间占一针周期的 50%。均方根转矩约为多少 N·m？",
+    "An X-axis motor delivers ±2.0 N·m while moving and nearly zero at rest, moving for 50% of each stitch period. What is the RMS torque in N·m?"
+   ],
+   "answer": 1.414,
+   "tolerance": 0.02,
+   "unit": "N·m",
+   "feedback": [
+    "T_rms ≈ T_peak √(占比) = 2.0 × √0.5 ≈ 1.41 N·m；发热看均方根转矩，要与额定转矩比较。",
+    "T_rms ≈ T_peak √(fraction) = 2.0 × √0.5 ≈ 1.41 N·m; heating is judged by RMS torque against the rated torque."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "花样机控制器允许启动缝纫必须同时满足的条件有：",
+    "Which conditions must all hold before a pattern-sewer controller allows sewing to start?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "压框到位信号有效",
+      "The clamp-in-position signal is valid"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "气压正常",
+      "Air pressure is normal"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "安全光幕无遮挡",
+      "The light curtain is clear"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "主轴转速已达到最高转速",
+      "The shaft has reached top speed"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "三个条件同时满足才允许启动，缝纫中任一失效，主轴立即停在上针位；这些判断不能只放在界面层，还要硬件独立切断。",
+    "All three must hold to start; if any fails while sewing, the shaft stops at needle-up at once. These checks must not live only in the UI; hardware must also cut independently."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "剪线电磁铁线圈 R = 5 Ω、L = 25 mH，吸合需要 2.5 A。用 60 V 过压启动，从通电到电流达到 2.5 A 需要多少毫秒？",
+    "A trimming-solenoid coil has R = 5 Ω and L = 25 mH and needs 2.5 A to pull in. With a 60 V overdrive, how many milliseconds does the current take to reach 2.5 A?"
+   ],
+   "answer": 1.17,
+   "tolerance": 0.03,
+   "unit": "ms",
+   "feedback": [
+    "τ = L/R = 5 ms，稳态电流 60/5 = 12 A；t = −5 × ln(1 − 2.5/12) ≈ 1.17 ms。",
+    "τ = L/R = 5 ms, steady current 60/5 = 12 A; t = −5 × ln(1 − 2.5/12) ≈ 1.17 ms."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "离布窗口与每针转速上限；电子凸轮与延迟补偿；前瞻调速；花样编程；X 轴电机选型。",
+   "The off-fabric window and per-stitch speed limit; electronic cam and delay compensation; look-ahead speed control; pattern programming; X-axis motor sizing."
+  ],
+  "difficult": [
+   "把针杆运动、布厚、轴加速度、运动规律和主轴转速联系成一个约束；前瞻算法的反向与正向扫描；峰值转矩与均方根转矩的区别。",
+   "Linking needle motion, thickness, axis acceleration, motion law and shaft speed into one constraint; the backward and forward passes of look-ahead; peak versus RMS torque."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入与组成",
+     "Introduction and composition"
+    ],
+    "minutes": 30,
+    "content": [
+     "提出口袋盖断针问题；用三维模型 15-1 认识花样机的六组部件和 X–Y、中压脚、压框。",
+     "Pose the pocket-flap needle-breakage problem; use 3D model 15-1 to introduce the six groups, X–Y table, foot and clamp."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：控制系统与核心约束",
+     "Lecture: control system and core constraint"
+    ],
+    "minutes": 45,
+    "content": [
+     "三层控制系统；离布窗口、走一针的时间、转速上限及图 15-4 的四个结论；课堂算例。",
+     "Three-layer control; window, move time, speed limit and the four lessons of Fig. 15-4; worked examples."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 15-1",
+     "Virtual lab 15-1"
+    ],
+    "minutes": 40,
+    "content": [
+     "完成四个任务并填写表 15-1，回到导入问题核对答案。",
+     "Complete the four tasks and Table 15-1; check the opening problem."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：运动规划",
+     "Lecture: motion planning"
+    ],
+    "minutes": 35,
+    "content": [
+     "电子凸轮与延迟补偿、三种运动规律、前瞻调速算法与算例。",
+     "Electronic cam and delay compensation, three motion laws, look-ahead algorithm and example."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：花样编程、模板与特例",
+     "Lecture: programming, templates, special cases"
+    ],
+    "minutes": 30,
+    "content": [
+     "花样文件与六步编程、模板与联锁、周期时间、套结钉扣锁眼。",
+     "Pattern files and six-step programming, templates and interlocks, cycle time, bartack, button and buttonhole."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 15-2",
+     "Virtual lab 15-2"
+    ],
+    "minutes": 35,
+    "content": [
+     "完成任务 1–3，课后完成任务 4；填写表 15-2。",
+     "Complete Tasks 1–3 in class and Task 4 after class; fill in Table 15-2."
+    ]
+   },
+   {
+    "phase": [
+     "讲授：电机选型与控制器",
+     "Lecture: motor sizing and controller"
+    ],
+    "minutes": 40,
+    "content": [
+     "X 轴电机三步选型；控制箱硬件、剪线电磁铁驱动、软件分层、制造测试。",
+     "Three-step X-axis motor sizing; control-box hardware, trimming-solenoid drive, software layers, manufacture and test."
+    ]
+   },
+   {
+    "phase": [
+     "测验与小结",
+     "Quiz and summary"
+    ],
+    "minutes": 15,
+    "content": [
+     "课堂测验、讲评、小结，布置作业。",
+     "Quiz, review, summary and assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业 15，包括虚拟实验 15-2 任务 4；选学第 16 章刺绣机的读者预习多头绷架的转速上限。",
+   "Complete Assignment 15, including Task 4 of Virtual lab 15-2; those taking optional Chapter 16 should preview the speed limit of multi-head frames."
+  ]
+ }
+}

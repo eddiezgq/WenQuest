@@ -20,6 +20,17 @@ SRC = {
     "ASM1": "ASM Handbook Vol.1《Properties and Selection: Irons, Steels》",
     "HB": "成大先《机械设计手册》第六版 第 1 卷（材料弹性常数）",
     "PL": "塑料典型值（厂商物性表区间的中值，如 CHIMEI PA-757、DuPont Zytel 101 干态），仅作教学",
+    "TH": "热物性（导热系数 k、比热 c、线膨胀系数 α，20–100 ℃）：钢、不锈钢、铝取 ASM Handbook Vol.1/Vol.2 对应牌号"
+          "（45→AISI 1045、40Cr→4140、20CrMnTi→8620、Q235→A36、304、6061-T6、7075-T6）的典型值；"
+          "铸铁取 GB/T 9439、GB/T 1348 附录的物理性能参考值；塑料取厂商物性表中值。教学用，精确计算请查牌号实测值",
+}
+
+# 热物性：k 导热系数 W/(m·K)，c 比热 J/(kg·K)，alpha 线膨胀系数 10⁻⁶/K（第 14 轮）
+THERMAL = {
+    "45-QT": (49.8, 486, 11.2), "40Cr-QT": (42.6, 473, 12.2), "20CrMnTi-CQ": (46.6, 477, 11.9),
+    "Q235": (51.9, 486, 11.7), "Q345": (46.0, 480, 12.0), "HT200": (50.0, 460, 10.5), "QT500-7": (35.2, 515, 12.5),
+    "6061-T6": (167.0, 896, 23.6), "7075-T6": (130.0, 960, 23.6), "304": (16.2, 500, 17.3),
+    "ABS": (0.17, 1400, 90.0), "PA66": (0.25, 1700, 80.0),
 }
 
 _STEEL_SN = {"N_D": 1e7, "k": 9, "sn_note": "钢：N₀ = 10⁷，m = 9（濮良贵《机械设计》第 3 章）"}
@@ -73,6 +84,8 @@ def get(mid):
     m["density_t_mm3"] = m["density"] * 1e-9
     m["strength_mpa"] = m["yield_mpa"] or m["ultimate_mpa"]       # 安全系数按这个算
     m["strength_kind"] = "屈服强度" if m["yield_mpa"] else "抗拉强度"
+    k, c, a = THERMAL[mid]
+    m.update(k_w_mk=k, c_j_kgk=c, alpha_1e6=a, thermal_src=SRC["TH"])
     return m
 
 
@@ -80,6 +93,19 @@ def public():
     out = []
     for m in MATERIALS:
         d = dict(m)
-        d["sources"] = [SRC[s] for s in m["src"]]
+        d["sources"] = [SRC[s] for s in m["src"]] + [SRC["TH"]]
+        d["k_w_mk"], d["c_j_kgk"], d["alpha_1e6"] = THERMAL[m["id"]]
         out.append(d)
     return out
+
+
+# 表面换热系数参考（第 14 轮）：W/(m²·K)。对流 + 辐射合在一起的“散热系数”，用于箱体外表面
+FILM = [
+    {"id": "air-still", "name": "室内静止空气，自然对流（通风差）", "h": 8.15, "src": "濮良贵《机械设计》第十版 11.6 节：散热系数 K_s = 8.15–17.45 W/(m²·℃)，通风差取小值"},
+    {"id": "air-vent", "name": "通风良好，自然对流", "h": 17.45, "src": "同上，通风良好取大值"},
+    {"id": "fan-1000", "name": "轴端装风扇（风扇转速 1000 r/min）", "h": 31.0, "src": "濮良贵《机械设计》第十版 第 11 章蜗杆传动热平衡：风扇冷却时的散热系数（风扇转速 750 r/min 约 27、1000 r/min 约 31、1550 r/min 约 38 W/(m²·℃)）"},
+    {"id": "fan-1500", "name": "轴端装风扇（风扇转速约 1500 r/min）", "h": 38.0, "src": "同上"},
+    {"id": "air-forced", "name": "强制风冷（散热片、风扇直吹）", "h": 50.0, "src": "传热学教材常用区间：强制对流空气 25–250 W/(m²·K)，取偏小值"},
+    {"id": "oil", "name": "箱内油液与内壁（参考）", "h": 100.0, "src": "传热学教材：油液自然对流约 50–350 W/(m²·K)，教学取 100"},
+    {"id": "water", "name": "水冷（参考）", "h": 1000.0, "src": "传热学教材：水强制对流约 500–10000 W/(m²·K)，教学取 1000"},
+]

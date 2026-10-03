@@ -1,0 +1,1233 @@
+{
+ "no": 21,
+ "title": [
+  "电子花样机与电脑横机电控原型",
+  "Pattern Sewer and Flat-Knitting Control Prototypes"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能从离布窗口出发，算出花样机 X–Y 轴所需的加速度、峰值转矩和 rms 转矩，并定出针距–转速上限。",
+   "Starting from the needle-out window, calculate the acceleration, peak torque and RMS torque required of the X–Y axes and derive the stitch-length vs speed limits."
+  ],
+  [
+   "能解释前瞻限速、窗口内插补和延迟补偿 φ + ω·Td 怎样保证“针在布中模板不动”。",
+   "Explain how look-ahead speed planning, in-window interpolation and the delay compensation φ + ω·Td guarantee zero clamp motion while the needle is in the fabric."
+  ],
+  [
+   "能做缩比横机的选针时序预算：算出提前量、量化误差、离散和最高机头速度，并判断用 MCU 还是 FPGA。",
+   "Draw up the selection timing budget of the scaled knitting machine: calculate lead, quantisation error, scatter and top carriage speed, and decide between an MCU and an FPGA."
+  ],
+  [
+   "能用两速扫描法标定选针器响应时间，并按验收表安排两台原型的调试步骤。",
+   "Calibrate the selector response time by the two-speed sweep and plan the bring-up of both prototypes against their acceptance tables."
+  ],
+  [
+   "能说明三台原型共用哪些模块、差别集中在哪里。",
+   "Explain which modules the three prototypes share and where their differences lie."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "口袋盖花样机原型：电机够不够、能跑多快",
+   "A pocket-flap pattern-sewer prototype: is the motor big enough, and how fast can it sew?"
+  ],
+  "text": [
+   "一家衬衫厂的缝制车间每天要缝几千个口袋盖，请问渠学院实验室先做一台花样机原型来验证。原型用现成平缝机头，X–Y 平台为滚珠丝杠 16×10（导程 10 mm），X 轴运动质量 4 kg、Y 轴 12 kg，X、Y 各用一台 400 W 伺服（额定 1.27 N·m、峰值 3.8 N·m、转子 0.3×10⁻⁴ kg·m²）。布加下模板厚 1.5 mm，两端各留 10° 后实用窗口为 183.4°；固件用 S 形加减速，峰值加速度系数 C = 5.33。车间希望口袋盖上 3 mm 的针以 1600 r/min 缝。",
+   "The sewing floor of a shirt factory stitches thousands of pocket flaps a day and asks the WenQuest lab to build a pattern-sewer prototype first. It uses an existing lockstitch head and an X–Y table on 16×10 ball screws (10 mm lead); the X axis moves 4 kg and the Y axis 12 kg, each driven by a 400 W servo (rated 1.27 N·m, peak 3.8 N·m, rotor 0.3×10⁻⁴ kg·m²). Fabric plus lower template is 1.5 mm thick, so after 10° is reserved at each end the usable window is 183.4°; the firmware uses an S-curve with peak-acceleration coefficient C = 5.33. The floor wants the 3 mm stitches of the flap sewn at 1600 r/min."
+  ],
+  "question": [
+   "3 mm 针距、1600 r/min 时，模板要在多少毫秒内走完一针？X 轴需要多大的加速度和峰值转矩？按发热定下的设计加速度（X 50 m/s²、Y 40 m/s²），沿 X 和沿 Y 的 3 mm 针各能跑多快，能否达到 1600 r/min？",
+   "At 3 mm and 1600 r/min, how many milliseconds does the clamp have to make one stitch? What acceleration and peak torque does the X axis need? With the heat-limited design accelerations (X 50 m/s², Y 40 m/s²), how fast can 3 mm stitches run along X and along Y, and is 1600 r/min reached?"
+  ],
+  "answer": [
+   "Δt = 183.4/(6 × 1600) = 19.1 ms；a = 5.33 × 0.003/0.0191² ≈ 43.9 m/s²。X 轴折算到电机的惯量约 0.668×10⁻⁴ kg·m²，峰值转矩约 1.84 N·m，低于 3.8 N·m。连续缝纫受 rms 转矩限制（Trms = 0.58 Tpk ≤ 1.27 N·m），所以设计加速度取 X 50、Y 40 m/s²。由 Δt = √(C·s/a)、n = Wu/(6Δt)：沿 X 的 3 mm 针约 1708 r/min，满足；沿 Y 只有约 1528 r/min，固件的前瞻会在 Y 向针段自动降速。",
+   "Δt = 183.4/(6 × 1600) = 19.1 ms; a = 5.33 × 0.003/0.0191² ≈ 43.9 m/s². The X inertia referred to the motor is about 0.668×10⁻⁴ kg·m², so the peak torque is about 1.84 N·m, below 3.8 N·m. Continuous sewing is limited by RMS torque (Trms = 0.58 Tpk ≤ 1.27 N·m), so the design accelerations are X 50 and Y 40 m/s². With Δt = √(C·s/a) and n = Wu/(6Δt), a 3 mm stitch along X reaches about 1708 r/min, which meets the target; along Y only about 1528 r/min, so the firmware's look-ahead slows the spindle automatically on Y-direction stitches."
+  ]
+ },
+ "robot": {
+  "title": [
+   "位置触发：机器人传送带跟踪与逐针选针是同一个问题",
+   "Position triggering: robot conveyor tracking is the same problem as needle selection"
+  ],
+  "text": [
+   "机械臂从传送带上抓工件时，相机拍照和夹爪动作都按传送带编码器的位置触发，而不是按时间触发，这与横机按机头位置逐针选针完全对应。控制器给动作加提前量 v ×（响应时间 + 半个查询周期），就是选针的 x_cmd = x_i − v(Tr + Tq/2)。提前量能补偿固定延迟，补偿不了抖动：传送带 0.6 m/s、夹爪电磁阀离散 ±0.3 ms，位置误差就有 ±0.18 mm。所以高速分拣机器人用运动控制卡的硬件位置比较输出（相当于 FPGA 逐计数比较），而不是在 1 ms 的 PLC 周期里查位置。花样机“只在窗口内动”则对应机械臂与冲压机的节拍同步：机械臂只能在滑块离开的那段角度窗口里进出，所需加速度和电机转矩也要从这个窗口倒推。",
+   "When a robot arm picks parts off a conveyor, the camera shot and the gripper action are triggered by the conveyor encoder position, not by time, exactly like the knitting carriage selecting needle by needle. The controller adds a lead of v × (response time + half a polling period), which is the selection formula x_cmd = x_i − v(Tr + Tq/2). Lead compensates a fixed delay but not jitter: at 0.6 m/s with a gripper valve scattering by ±0.3 ms the position error is ±0.18 mm. That is why high-speed picking robots use the hardware position-compare output of a motion card (the counterpart of FPGA count-by-count comparison) rather than polling position in a 1 ms PLC cycle. The pattern sewer's 'move only inside the window' corresponds to synchronising a robot with a press: the arm may enter only in the angular window when the ram is clear, and its acceleration and motor torque are worked back from that window."
+  ]
+ },
+ "life": {
+  "title": [
+   "传球给跑动的队友",
+   "Passing to a running teammate"
+  ],
+  "text": [
+   "篮球传球要传到跑动队友的前面，提前量大约是“队友速度 × 球飞行时间”，这就是选针的提前量；可你出手总有一点忽早忽晚，队友跑得越快，这点抖动造成的落点偏差越大，这正是限制机头速度的离散 J。",
+   "A basketball pass goes ahead of a running teammate by roughly 'teammate speed × flight time' — the selector's lead. But your release is always a little early or late, and the faster the teammate runs, the bigger the miss this jitter causes — the scatter J that limits carriage speed."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "两台原型，一个问题：位置决定的窗口",
+    "Two prototypes, one problem: a window set by position"
+   ],
+   "points": [
+    [
+     "花样机：模板必须在针离开布料的那段主轴转角里走完一针",
+     "Pattern sewer: the clamp must finish each stitch inside the spindle arc when the needle is out of the fabric"
+    ],
+    [
+     "缩比横机：选针器必须在机头经过每枚针的那段行程里动作",
+     "Scaled knitting machine: the selector must act within the stretch of carriage travel past each needle"
+    ],
+    [
+     "先做时序预算：窗口 → 加速度、转矩、提前量、抖动 → 定零件，再动手",
+     "Budget first: window → acceleration, torque, lead, jitter → choose parts, then build"
+    ],
+    [
+     "目标（P1）：花样机 3 mm 针距 ≥ 1600 r/min；横机机头 ≥ 0.6 m/s、误差 ≤ 0.1 针距",
+     "Targets (P1): pattern sewer ≥ 1600 r/min at 3 mm; knitting carriage ≥ 0.6 m/s with error ≤ 0.1 pitch"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "第 20 章的平缝机原型是“主轴转一圈、几个电磁铁按角度动作”。今天这两台不一样，它们都要按位置连续控制。花样机的模板只能在针离开布料的那一小段转角里移动；横机的选针器只能在机头经过每一枚针的那一小段行程里作决定。两台机器的控制问题其实是同一个：动作必须落进一个由位置决定的窗口。电机买小了、选针器做慢了，靠试是试不出来的，所以我们先从窗口出发做时序预算，一步步算到加速度、转矩、提前量和抖动，再去选零件。",
+    "The lockstitch prototype of Chapter 20 is a machine where the spindle turns and a few solenoids act at set angles. Today's two machines are different: both need continuous position control. The pattern sewer's clamp may move only in the short arc when the needle is out of the fabric; the knitting selector must decide in the short stretch of travel past each needle. It is really one problem: an action has to land inside a window defined by position. Undersized motors or a slow selector cannot be fixed by trial and error, so we start from the window and budget the timing — acceleration, torque, lead, jitter — before choosing any part."
+   ]
+  },
+  {
+   "title": [
+    "花样机原型的构成与 X–Y 传动选择",
+    "Make-up of the pattern-sewer prototype and the X–Y drive"
+   ],
+   "points": [
+    [
+     "现成平缝机头 + 自制 X–Y 平台（行程 300 × 200 mm）+ 压框；主轴模块与平缝原型共用",
+     "Existing lockstitch head + home-built X–Y table (300 × 200 mm) + clamp; spindle module shared with the lockstitch prototype"
+    ],
+    [
+     "丝杠 16×10：分辨率 1 μm，负载惯量约为转子 1.2 倍，刚度约 53 N/μm、约 580 Hz",
+     "16×10 screw: 1 μm resolution, load inertia about 1.2 × rotor, stiffness ≈ 53 N/μm, ≈ 580 Hz"
+    ],
+    [
+     "同步带直驱：负载惯量约为转子 34 倍，约 0.8 N/μm、82 Hz",
+     "Direct belt: load inertia about 34 × rotor, ≈ 0.8 N/μm, 82 Hz"
+    ],
+    [
+     "库里最小梅花联轴器惯量是转子 7 倍 → 改用 1:1 同步带轮平行布置",
+     "The smallest jaw coupling in the library is 7 × the rotor inertia → use a parallel 1:1 belt instead"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c21_ps_arch.png",
+   "narration": [
+    "花样机原型新增的东西只有两样：自制的 X–Y 平台和压框，机头就是拆了送布牙的平缝机头。平台用丝杠还是同步带？用零件库里实有的规格算一算：丝杠方案折算到电机的负载惯量只有转子的 1.2 倍左右，刚度高一个数量级，固有频率约 580 Hz；同步带直驱惯量是转子的 34 倍，82 Hz 的晃动很难压住。所以选丝杠。还有一个细节：库里最小的梅花联轴器自身惯量就是转子的 7 倍，会吃掉大半加速能力，所以电机和丝杠平行布置，中间用一对 1:1 的带轮，同时建议零件库补小规格联轴器。",
+    "Only two things are new on this prototype: the home-built X–Y table and the clamp; the head is a lockstitch head without its feed dog. Screw or belt? Work it out with what the parts library actually holds. With the screw the load inertia at the motor is only about 1.2 times the rotor, the stiffness is ten times higher and the natural frequency is about 580 Hz; a direct belt puts 34 times the rotor inertia on the motor and rings at 82 Hz. So the screw wins. One detail: the smallest jaw coupling in the library alone has 7 times the rotor inertia and would eat most of the acceleration, so the motor sits parallel to the screw with a 1:1 pulley pair, and we recommend adding small couplings to the library."
+   ]
+  },
+  {
+   "title": [
+    "从窗口到时间和加速度",
+    "From the window to time and acceleration"
+   ],
+   "points": [
+    [
+     "1.5 mm 布厚：针在 101.7° 入布、258.3° 出布，几何窗口 203.4°，两端各留 10° → Wu = 183.4°",
+     "1.5 mm material: needle in at 101.7°, out at 258.3°, geometric window 203.4°; 10° reserve each end → Wu = 183.4°"
+    ],
+    [
+     "允许时间 Δt = Wu/(6n)：1600 r/min 时 19.1 ms",
+     "Available time Δt = Wu/(6n): 19.1 ms at 1600 r/min"
+    ],
+    [
+     "S 形七段式加减速：C = 5.33、峰值速度系数 2.0（等加速为 4 和 2）",
+     "Seven-segment S-curve: C = 5.33, peak-velocity coefficient 2.0 (4 and 2 for constant acceleration)"
+    ],
+    [
+     "3 mm 针：a = 43.9 m/s²，vpk = 0.314 m/s，对应电机约 1885 r/min",
+     "3 mm stitch: a = 43.9 m/s², vpk = 0.314 m/s, about 1885 r/min at the motor"
+    ]
+   ],
+   "formula": "\\Delta t=\\frac{W_u}{6n},\\qquad a=C\\,\\frac{s}{\\Delta t^{2}},\\qquad v_{pk}=2.0\\,\\frac{s}{\\Delta t}",
+   "figure": "fig_c21_ps_budget.png",
+   "narration": [
+    "计算链从窗口开始。第 15 章算过，布加下模板 1.5 mm 时针在 101.7° 入布、258.3° 出布，几何窗口 203.4°。两端各留 10°，实用窗口 183.4°。主轴每分钟 n 转，每度用 1/(6n) 秒，所以 1600 r/min 时只有 19.1 ms。固件用 S 形加减速，不激振平台，代价是峰值系数从 4 变成 5.33。代进去，3 mm 针要 43.9 m/s²，峰值速度 0.314 m/s，电机约 1885 r/min，离额定 3000 r/min 还远。",
+    "The chain starts from the window. Chapter 15 found that with 1.5 mm of material the needle enters at 101.7° and leaves at 258.3°, a geometric window of 203.4°. The prototype keeps 10° at each end for servo settling and delay errors, leaving 183.4°. One degree takes 1/(6n) seconds, so at 1600 r/min we have just 19.1 ms. The firmware uses an S-curve: the acceleration is continuous and does not shake the table, but the peak coefficient rises from 4 to 5.33. A 3 mm stitch then needs 43.9 m/s² and a peak speed of 0.314 m/s — about 1885 r/min at the motor, well below the rated 3000."
+   ]
+  },
+  {
+   "title": [
+    "从加速度到转矩，再用发热定设计值",
+    "From acceleration to torque, then set the design value by heating"
+   ],
+   "points": [
+    [
+     "惯量四项：转子 0.30、带轮 0.01、丝杠 0.25、滑座 0.10（×10⁻⁴ kg·m²），合计约 0.668",
+     "Four inertia terms: rotor 0.30, pulleys 0.01, screw 0.25, carriage 0.10 (×10⁻⁴ kg·m²), about 0.668 in all"
+    ],
+    [
+     "X 轴峰值转矩约 1.84 N·m，Y 轴（12 kg）约 2.27 N·m，都低于峰值 3.8 N·m",
+     "Peak torque ≈ 1.84 N·m on X and ≈ 2.27 N·m on Y (12 kg), both below the 3.8 N·m peak"
+    ],
+    [
+     "真正卡住的是 rms：Trms = 0.58 Tpk ≤ 1.27 N·m → Tpk ≤ 2.2 N·m",
+     "The real limit is RMS: Trms = 0.58 Tpk ≤ 1.27 N·m → Tpk ≤ 2.2 N·m"
+    ],
+    [
+     "设计加速度 X 50、Y 40 m/s²；短时能力 72、59 m/s² 留作余量",
+     "Design accelerations X 50 and Y 40 m/s²; short-time capability 72 and 59 m/s² kept as margin"
+    ]
+   ],
+   "formula": "T=J\\,\\frac{2\\pi a}{P_h}+\\frac{\\mu m g P_h}{2\\pi\\eta},\\qquad T_{rms}=T_{pk}\\times0.816\\sqrt{\\frac{183.4}{360}}=0.58\\,T_{pk}",
+   "figure": "",
+   "narration": [
+    "丝杠把直线加速度变成电机角加速度 2πa/Ph，负载质量折算成 m(Ph/2π)²。把四项惯量加起来约 0.668×10⁻⁴，乘角加速度，再加上很小的摩擦项，X 轴峰值转矩约 1.84 N·m。转矩几乎全花在转子和丝杠上，滑座只占一小部分。峰值够了，但电机连续缝纫会不会烫？要看均方根转矩：S 形规律的形状系数 0.816，最坏情况每针都用满窗口，合起来是 0.58 倍峰值，不得超过额定 1.27。反算出 X 约 52、Y 约 42 m/s²，取整就是设计值 50 和 40。",
+    "The screw turns linear acceleration into motor angular acceleration 2πa/Ph and refers the load mass as m(Ph/2π)². The four inertia terms add up to about 0.668×10⁻⁴; times the angular acceleration, plus a tiny friction term, the X axis needs about 1.84 N·m peak. Notice that nearly all of it accelerates the motor's own rotor and the screw; the 4 kg carriage is a minor share. The peak is fine, but will the motor overheat in continuous sewing? That is the RMS torque: S-curve shape factor 0.816, every stitch using the full window in the worst case, giving 0.58 of the peak, which must not exceed the rated 1.27. Working back gives about 52 m/s² for X and 42 for Y, rounded to the design values 50 and 40."
+   ]
+  },
+  {
+   "title": [
+    "针距–转速上限表",
+    "The stitch-length vs speed table"
+   ],
+   "points": [
+    [
+     "每针反算：Δt = √(C·s/a)，ncap = Wu/(6Δt)，再与机头限速 2500 r/min 取小",
+     "Per stitch: Δt = √(C·s/a), ncap = Wu/(6Δt), then the smaller of that and the 2500 r/min head limit"
+    ],
+    [
+     "3 mm：沿 X 1708、沿 Y 1528、45° 斜向 1817 r/min",
+     "3 mm: 1708 along X, 1528 along Y, 1817 r/min on the 45° diagonal"
+    ],
+    [
+     "6 mm：沿 X 1208、沿 Y 1080 r/min；1 mm 时受机头 2500 r/min 限制",
+     "6 mm: 1208 along X, 1080 along Y; at 1 mm the 2500 r/min head limit governs"
+    ],
+    [
+     "这张表既是固件自动降速的依据，也是第 22 章测试用例的期望值",
+     "The table drives the firmware's automatic slow-down and gives the expected values for the Chapter 22 tests"
+    ]
+   ],
+   "formula": "n_{cap}=\\min\\left(\\frac{W_u}{6\\sqrt{C s/a}},\\;2500\\right)",
+   "figure": "fig_c21_ps_budget.png",
+   "narration": [
+    "把计算链倒过来，就能给每种针距定一个转速上限。走 s 所需的时间是根号下 C 乘 s 除以 a，窗口除以 6 倍这个时间就是转速上限，再和机头限速 2500 取小。结果就是表 21-5：3 mm 针沿 X 能跑 1708 r/min，满足 1600 的目标；沿 Y 因为质量大、设计加速度只有 40，只有 1528；斜 45° 时两轴各走 s/√2，受 Y 轴限制，反而能到 1817。注意这张表不是给人看看的，它会写进固件做自动降速，也会变成第 22 章测试用例里的期望值。",
+    "Turn the chain around and each stitch length gets a speed limit. The time to travel s is the square root of C·s/a; the window divided by six times that time is the speed limit, capped by the 2500 r/min head limit. That gives Table 21-5: a 3 mm stitch along X runs at 1708 r/min and meets the 1600 target; along Y, with the heavier axis held to 40 m/s², only 1528; on the 45° diagonal each axis moves s/√2, Y still governs, and it reaches 1817. This table is not just for reading: it goes into the firmware for automatic slow-down and into the Chapter 22 test cases as expected values."
+   ]
+  },
+  {
+   "title": [
+    "固件结构与 .wqp 花样文件",
+    "Firmware structure and the .wqp pattern file"
+   ],
+   "points": [
+    [
+     "沿用第 19 章框架：时间基准是主轴角，剪线、拨线、中压脚走事件表",
+     "Chapter 19 framework: spindle angle as time base; trimmer, wiper and intermediate presser foot from the event table"
+    ],
+    [
+     "状态机新增 CLAMP、JUMP、HOME；新写三块：花样解析、前瞻限速、窗口内插补",
+     "New states CLAMP, JUMP, HOME; three new blocks: pattern parsing, look-ahead, in-window interpolation"
+    ],
+    [
+     ".wqp：16 字节文件头 + 每针 3 字节（cmd、dx、dy，单位 0.1 mm，±12.7 mm）",
+     ".wqp: 16-byte header + 3 bytes per stitch (cmd, dx, dy in 0.1 mm, ±12.7 mm)"
+    ],
+    [
+     "解析时校验 CRC、整数累加坐标、检查 300 × 200 mm 行程",
+     "The parser checks the CRC, accumulates integer coordinates and checks the 300 × 200 mm travel"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c21_ps_fw.png",
+   "narration": [
+    "固件的大框架没变：时间基准还是主轴转角，剪线、拨线、中压脚按事件表触发。状态机多了压框、空走和回原点三个状态。真正新写的只有三块：花样文件解析、前瞻限速、窗口内插补，分别是每段一次、每针一次、每毫秒一次。花样文件用一种自定的示意格式 .wqp，每针只占 3 个字节：命令、ΔX、ΔY，以 0.1 mm 为单位，正好覆盖 ±12.7 mm 的最大针距。解析时用整数累加坐标，几千针以后也没有舍入误差，并且先检查有没有超出平台行程。",
+    "The overall framework is unchanged: spindle angle is still the time base, and trimmer, wiper and intermediate presser foot fire from the event table. The state machine gains three states — clamp, jump and home. Only three blocks are new: pattern parsing, look-ahead and in-window interpolation, running once per segment, once per stitch and once per millisecond. The pattern file uses an illustrative format, .wqp, with three bytes per stitch: command, ΔX and ΔY in 0.1 mm units, exactly covering the ±12.7 mm maximum stitch. The parser accumulates integer coordinates, so there is no rounding error after thousands of stitches, and it checks the table travel before anything moves."
+   ]
+  },
+  {
+   "title": [
+    "前瞻限速：主轴自动降速",
+    "Look-ahead: automatic spindle slow-down"
+   ],
+   "points": [
+    [
+     "每针先按两轴中较慢的一轴算上限，起针和剪线前各 2 针限 400 r/min",
+     "Each stitch's limit comes from the slower axis; 2 stitches after start and before a trim are held to 400 r/min"
+    ],
+    [
+     "反向一遍：为后面的慢针提前减速；正向一遍：加速也不能太猛",
+     "Backward pass: slow down in advance for slow stitches ahead; forward pass: don't accelerate too hard"
+    ],
+    [
+     "每针允许转速变化 Δn = 300 r/min",
+     "Allowed speed change per stitch Δn = 300 r/min"
+    ],
+    [
+     "算例：2092 → 1980 → 1680 → 1380 → 1080（6 mm 长针）→ 1380 …，提前 4 针开始降速",
+     "Example: 2092 → 1980 → 1680 → 1380 → 1080 (the 6 mm stitch) → 1380 …, slowing four stitches ahead"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "每针都有自己的上限，但主轴不能一针就从 2092 跳到 1080 r/min。前瞻算法分两遍：先从后往前扫一遍，每一针不得比下一针快超过 300 r/min，这样遇到前面有慢针，就提前减速；再从前往后扫一遍，每一针不得比上一针快超过 300，避免加速太猛。看算例：一串沿 X 的 2 mm 针中间夹一针沿 Y 的 6 mm 针，控制器提前 4 针开始降，到长针时刚好降到 1080，过了长针再逐针加回去。这个计算在后台任务里对整段花样做一次，不占实时中断。",
+    "Every stitch has its own limit, but the spindle cannot drop from 2092 to 1080 r/min in one stitch. The look-ahead makes two passes. Backwards first: no stitch may be more than 300 r/min faster than the next, so a slow stitch ahead causes an early slow-down. Then forwards: no stitch may be more than 300 faster than the previous one, so acceleration stays gentle. In the example, a row of 2 mm stitches along X contains one 6 mm stitch along Y; the controller starts slowing four stitches early, reaches exactly 1080 at the long stitch, then speeds up again stitch by stitch. This runs once per segment in a background task, not in the real-time interrupt."
+   ]
+  },
+  {
+   "title": [
+    "窗口内插补与延迟补偿",
+    "In-window interpolation and delay compensation"
+   ],
+   "points": [
+    [
+     "插补中断每 1 ms 一次，不看时间、只看主轴转角",
+     "The interpolation interrupt runs every 1 ms and looks at spindle angle, not time"
+    ],
+    [
+     "预测角 φp = φ + ω·Td，Td = 1.5 ms（CAN FD + 驱动器插补周期），1600 r/min 时约 14.4°",
+     "Predicted angle φp = φ + ω·Td, Td = 1.5 ms (CAN FD + drive interpolation), about 14.4° at 1600 r/min"
+    ],
+    [
+     "窗口内查 S 形表 f(τ)（Q15 定点、1025 点）；窗口外命令保持不变",
+     "Inside the window look up the S-curve f(τ) (Q15, 1025 points); outside it the command is held"
+    ],
+    [
+     "φ 必须来自主控直接接的编码器，Td 要测不要估",
+     "φ must come from the encoder wired to the controller; measure Td, don't guess it"
+    ]
+   ],
+   "formula": "\\varphi_p=\\varphi+\\omega T_d,\\qquad x=x_0+\\Delta x\\,f(\\tau),\\quad \\tau=\\frac{\\varphi_p-268.3^\\circ}{183.4^\\circ}",
+   "figure": "",
+   "narration": [
+    "插补中断每毫秒跑一次，但它不按时间算，而是按主轴转角算。从发出位置命令到电机真正跟上有个总延迟 Td，约 1.5 ms，包括 CAN FD 传输和驱动器内部的一个插补周期；1600 r/min 时这相当于 14.4°，比两端留的 10° 还大，所以要用预测角 φ 加 ω·Td 去查表。在窗口内，用 τ 查 S 形表算出本针走了多少；窗口以外，命令一律保持不变。这一条是“针在布中模板不动”的软件保证：就算上层规划算错了，模板也不会在针在布中时被命令移动。",
+    "The interpolation interrupt runs every millisecond, but it works on spindle angle, not time. Between sending a position command and the motor following there is a total delay Td of about 1.5 ms — CAN FD transfer plus one interpolation cycle in the drive. At 1600 r/min that is 14.4°, more than the 10° reserve, so the table is read at the predicted angle φ plus ω·Td. Inside the window, τ indexes the S-curve table to give how far this stitch has gone; outside the window the command is simply held. That is the software guarantee of zero motion with the needle in the fabric: even if the planner above were wrong, the clamp is never commanded to move while the needle is in."
+   ]
+  },
+  {
+   "title": [
+    "花样机原型的调试与验收",
+    "Bring-up and acceptance of the pattern sewer"
+   ],
+   "points": [
+    [
+     "回原点：先碰开关再找电机 Z 相，20 次重复性 ≤ 0.01 mm",
+     "Homing: touch the switch, then find the motor Z pulse; repeatability ≤ 0.01 mm over 20 runs"
+    ],
+    [
+     "反向间隙与螺距误差补偿（参照 ISO 230-2 双向测量），补偿后 ≤ 0.02 mm",
+     "Backlash and pitch-error compensation (bidirectional, after ISO 230-2): ≤ 0.02 mm after compensation"
+    ],
+    [
+     "坐标标定：5 × 5 针孔，对角线求垂直度 δ ≈ (d1² − d2²)/(4ab)",
+     "Coordinate calibration: 5 × 5 needle holes; squareness from the diagonals δ ≈ (d1² − d2²)/(4ab)"
+    ],
+    [
+     "同步验证：针在布中位移从 0.18 mm 降到 0.002 mm（位置环 40→100 Hz、前馈 95%、预测角）",
+     "Sync check: in-fabric motion cut from 0.18 to 0.002 mm (position loop 40→100 Hz, 95% feed-forward, predicted angle)"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c21_ps_sync.png",
+   "narration": [
+    "调试按“由静到动、由单轴到同步”。第一步回原点，开关本身只有零点几毫米的重复性，所以再找电机编码器的 Z 相，才能到微米级。第二步测反向间隙和螺距误差，做成补偿表。第三步在纸上刺 5×5 个针孔，标定偏移、比例和垂直度。最关键的是第四步同步验证：1600 r/min 连续缝，按主轴角对齐命令和实际位置。初调时位置环只有约 40 Hz、前馈只开一半、没做延迟补偿，针在布中模板还滑了 0.18 mm；三项都改好后降到 0.002 mm，也就是 2 个编码器计数。",
+    "Bring-up goes from static to moving and from single axis to synchronised. Step one is homing: the switch alone repeats only to a few tenths of a millimetre, so we then find the motor encoder's Z pulse to get micrometres. Step two measures backlash and pitch error and builds a compensation table. Step three pricks 5 by 5 holes in paper to calibrate offset, scale and squareness. The key step is four, the sync check: sew continuously at 1600 r/min and align command and actual position by spindle angle. At first, with a 40 Hz position loop, half feed-forward and no delay compensation, the clamp still slid 0.18 mm with the needle in; with all three fixed it fell to 0.002 mm, two encoder counts."
+   ]
+  },
+  {
+   "title": [
+    "缩比横机原型 WQ-SC/FK 的构成",
+    "Make-up of the scaled knitting prototype WQ-SC/FK"
+   ],
+   "points": [
+    [
+     "单系统、单针床、60 枚针、E5（针距 5.08 mm），针床宽 304.8 mm",
+     "Single system, single bed, 60 needles, E5 (5.08 mm pitch); the bed is 304.8 mm wide"
+    ],
+    [
+     "机头：200 W 伺服 + 5M 同步带，0.01 mm/计数；2.5 kg、10 m/s² 时推力约 42.5 N",
+     "Carriage: 200 W servo + 5M belt, 0.01 mm per count; about 42.5 N thrust at 2.5 kg and 10 m/s²"
+    ],
+    [
+     "选针器 8 段电磁铁：第 i 针由第 i mod 8 段负责，0.6 m/s 时同段间隔 67.7 ms",
+     "Eight-step solenoid selector: needle i goes to step i mod 8; same-step interval 67.7 ms at 0.6 m/s"
+    ],
+    [
+     "决定精度和寿命、有标准规格的用零件库；决定“是横机”的自己做",
+     "Library parts for what sets accuracy and life; home-made parts for what makes it a knitting machine"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c21_fk_arch.png",
+   "narration": [
+    "工业横机有几百枚针、两三个系统、两块针床，教学原型把它缩到最小：单系统、单针床、60 针、E5。粗针距有两个好处：针槽、三角、选针片都大，普通铣床和激光切割就能做；选针时间宽，自制选针器也来得及。机头用 200 W 伺服经同步带驱动，位置分辨率 0.01 mm。选针器是这台原型的核心：8 个小电磁铁叠成 8 段，相邻针轮流分到不同段，同一段两次动作隔 8 个针距，0.6 m/s 时有 67.7 ms，远大于吸合加释放的 3 ms。",
+    "An industrial flat machine has hundreds of needles, two or three systems and two beds; the teaching prototype shrinks it to the minimum: single system, single bed, 60 needles, E5. The coarse gauge helps twice: grooves, cams and jacks are large enough for an ordinary mill and a laser cutter, and the selection time is long enough for a home-made selector. The carriage is driven by a 200 W servo through a timing belt with 0.01 mm resolution. The selector is the heart of the machine: eight small solenoids stacked as eight steps, neighbouring needles taking turns, so one step acts only every eight pitches — 67.7 ms at 0.6 m/s, far more than the 3 ms to pull in and release."
+   ]
+  },
+  {
+   "title": [
+    "以机头位置为时间基准：提前量",
+    "Carriage position as time base: the lead"
+   ],
+   "points": [
+    [
+     "第 i 枚针应在 x_i = c + (i + ½)p 处被选中（c 为换向余量）",
+     "Needle i should be selected at x_i = c + (i + ½)p (c is the reversal margin)"
+    ],
+    [
+     "选针器响应 Tr，命令必须提前；MCU 平均还晚半个控制周期 Tq/2",
+     "The selector responds after Tr, so the command must lead; an MCU is also late by half a period Tq/2 on average"
+    ],
+    [
+     "MCU：Tq = 控制周期 Tc；FPGA：Tq 只是走过一个计数（0.01 mm）的时间",
+     "MCU: Tq = control period Tc; FPGA: Tq is just the time to travel one count (0.01 mm)"
+    ],
+    [
+     "算例 0.6 m/s、Tr 1.5 ms、Tc 1 ms：提前量 1.20 mm ≈ 0.24p",
+     "Example 0.6 m/s, Tr 1.5 ms, Tc 1 ms: lead 1.20 mm ≈ 0.24p"
+    ]
+   ],
+   "formula": "x_{cmd}=x_i-v\\left(T_r+\\tfrac{1}{2}T_q\\right)",
+   "figure": "",
+   "narration": [
+    "横机的固件框架只改一处：时间基准从主轴转角换成机头位置。第 i 枚针应当在 c 加 (i 加二分之一) 个针距处被选中。选针器从接到命令到衔铁动作要 Tr，所以命令要提前 v 乘 Tr。这里比第 17 章多了一项二分之一 Tq：MCU 每个控制周期才查一次位置，过了命令点也要等到下个周期才发，平均晚半个周期。FPGA 每个编码器计数都比较一次，这一项几乎为零。算例里提前量是 1.2 mm，约 0.24 个针距，如果不补偿，就已经贴着错选的边界了。",
+    "The knitting firmware changes in one place only: the time base becomes carriage position instead of spindle angle. Needle i should be selected at c plus (i plus one half) pitches. The selector takes Tr from command to armature motion, so the command must lead by v times Tr. Compared with Chapter 17 there is an extra half Tq: an MCU checks position only once per control period, so even after passing the command point it waits for the next period — half a period late on average. An FPGA compares at every encoder count, so this term almost vanishes. In the example the lead is 1.2 mm, about 0.24 pitch; without compensation we would already be at the edge of mis-selection."
+   ]
+  },
+  {
+   "title": [
+    "选针时序预算",
+    "The selection timing budget"
+   ],
+   "points": [
+    [
+     "能补偿的：延迟 Tr；补偿不了的：量化 ±vTq/2 和响应离散 ±vJ",
+     "Compensable: the delay Tr; not compensable: quantisation ±vTq/2 and response scatter ±vJ"
+    ],
+    [
+     "判据：|e| ≤ 0.25p 才能正确选针；验收 ≤ 0.1p，留 2.5 倍余量",
+     "Criteria: |e| ≤ 0.25p for correct selection; acceptance ≤ 0.1p, a 2.5× margin"
+    ],
+    [
+     "E5、0.6 m/s、MCU 1 ms：量化 ±0.30、离散 ±0.18，合计 0.48 mm = 0.094p ✓",
+     "E5, 0.6 m/s, MCU 1 ms: quantisation ±0.30, scatter ±0.18, total 0.48 mm = 0.094p ✓"
+    ],
+    [
+     "一行 D = 2c + 60p + Lk = 464.8 mm，0.935 s，约 3850 行/h",
+     "One course D = 2c + 60p + Lk = 464.8 mm, 0.935 s, about 3850 courses/h"
+    ]
+   ],
+   "formula": "|e|_{max}=v\\left(\\tfrac{1}{2}T_q+J\\right)+|e_{lead}|",
+   "figure": "fig_c21_fk_timing.png",
+   "narration": [
+    "衔铁实际动作的位置离理想位置有多远？三个来源加在一起：量化的半个周期、响应时间的离散 J、提前量本身算错的部分。用实时速度算提前量时第三项为零。判据有两条：误差不超过四分之一针距，选针片还能被正确推入；超过就错选。验收更严，要求不超过十分之一针距，留 2.5 倍余量。按标准参数算：量化 0.30 mm，离散 0.18 mm，合计 0.48 mm，约 0.094 个针距，刚好在验收线以内。顺便算出一行行程 464.8 mm、一行 0.935 秒、每小时约 3850 行。",
+    "How far from the ideal position does the armature actually move? Add three sources: half a period of quantisation, the scatter J of the response time, and any error in the lead itself. With a real-time-speed lead the third term is zero. There are two criteria: within a quarter pitch the jack is still pushed in correctly; beyond that it is a mis-selection. Acceptance is stricter, a tenth of a pitch, a 2.5-fold margin. With standard values, quantisation gives 0.30 mm and scatter 0.18 mm, 0.48 mm in all, about 0.094 pitch — just inside acceptance. Along the way: one course is 464.8 mm of travel, 0.935 s, about 3850 courses an hour."
+   ]
+  },
+  {
+   "title": [
+    "机头最多能跑多快：MCU 还是 FPGA",
+    "How fast can the carriage go: MCU or FPGA"
+   ],
+   "points": [
+    [
+     "MCU 1 ms：vmax = 0.508/(0.5 + 0.3) ≈ 0.635 m/s，约 4020 行/h",
+     "MCU 1 ms: vmax = 0.508/(0.5 + 0.3) ≈ 0.635 m/s, about 4020 courses/h"
+    ],
+    [
+     "控制周期 0.5 ms、0.25 ms：上限约 0.91、1.16 m/s（完整模型）",
+     "Control period 0.5 ms and 0.25 ms: about 0.91 and 1.16 m/s (full model)"
+    ],
+    [
+     "FPGA：vmax ≈ (0.1p − 0.005)/J ≈ 1.68 m/s（完整模型 1.66），约 6590 行/h",
+     "FPGA: vmax ≈ (0.1p − 0.005)/J ≈ 1.68 m/s (1.66 full model), about 6590 courses/h"
+    ],
+    [
+     "速度 2.6 倍、产量只多 64%：加减速和换向停顿不随速度缩短",
+     "2.6× the speed but only 64% more output: acceleration and reversal pauses don't shrink"
+    ]
+   ],
+   "formula": "v_{max}=\\frac{0.1p}{T_c/2+J}\\;(\\mathrm{MCU}),\\qquad v_{max}\\approx\\frac{0.1p-0.005\\ \\mathrm{mm}}{J}\\;(\\mathrm{FPGA})",
+   "figure": "fig_c21_fk_timing.png",
+   "narration": [
+    "0.6 m/s 已在验收线以内，那最多能跑多快？令最坏误差等于十分之一针距，MCU 1 ms 时约 0.635 m/s。把控制周期缩到 0.5 和 0.25 ms，上限升到约 0.91 和 1.16。换 FPGA 逐计数比较，量化只剩半个计数，上限就由选针器自己的离散决定，约 1.66 m/s。可产量只多 64%，因为加减速和换向停顿不缩短。反直觉的是：减小 Tr 对上限没有帮助，因为它已被提前量补偿；卡住速度的是离散 J。所以 E5 原型 P0 用 MCU 就够，提速先上 FPGA。",
+    "0.6 m/s passes; how far can we go? Set the worst-case error equal to a tenth of a pitch: with a 1 ms MCU, about 0.635 m/s. Cutting the period to 0.5 and 0.25 ms raises the limit to about 0.91 and 1.16. With an FPGA comparing at every count, quantisation is half a count and the selector's own scatter sets the limit, about 1.66 m/s. Yet output rises only 64%, because acceleration and reversal pauses do not shrink. Counter-intuitively, a smaller Tr does not raise the limit, because the lead already compensates it; what limits speed is the scatter J. So P0 on E5 is fine with an MCU; to go faster, add an FPGA first."
+   ]
+  },
+  {
+   "title": [
+    "从花型行到选针位图；换向区里的五件事",
+    "From a design course to selection bitmaps; five jobs at reversal"
+   ],
+   "points": [
+    [
+     "主控按“行”工作：意匠数据 K/T/· 拆成 S1、S2 两个选针点的位，按 k = i mod 8 分段",
+     "The controller works by course: K/T/· design data become S1 and S2 bits, split by step k = i mod 8"
+    ],
+    [
+     "目标位置以计数存表：第 0 针 4254、第 1 针 4762……；提前量由机头板实时减去",
+     "Targets stored in counts: needle 0 at 4254, needle 1 at 4762 …; the head board subtracts the lead in real time"
+    ],
+    [
+     "换向停顿 0.1 s 内并行：换选针表、度目（约 50 ms）、换纱嘴、牵拉补一行、查断纱",
+     "Within the 0.1 s reversal, in parallel: swap tables, stitch cam (≈ 50 ms), carriers, take-down, yarn-break check"
+    ],
+    [
+     "急停 20 m/s²：1.66 m/s 要 69 mm 才停住，0.635 m/s 只要 10 mm",
+     "E-stop at 20 m/s²: 69 mm to stop from 1.66 m/s, only 10 mm from 0.635 m/s"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig_c21_fk_bitmap.png",
+   "narration": [
+    "主控按“行”工作。每到换向区，它把下一行的意匠数据拆成两个选针点的位：编织要 S1 选，只有编织才要 S2 选；再按针号除以 8 的余数分到各段，按机头走向把每枚针的目标位置排成表，写进机头板的空闲缓冲。注意提前量不写进表，由机头板按实时速度去减。机头在换向区停 0.1 秒，这段时间要并行做完五件事，其中最慢的是度目步进换值，约 50 毫秒。最后提醒一点：急停时从 1.66 m/s 停下要走 69 毫米，提速以后限位开关外是否留够距离，是最容易漏掉的一项。",
+    "The controller works course by course. At each reversal it splits the next course's design data into bits for the two selection points: knit or tuck selects at S1, only knit selects at S2. It distributes needles to steps by the remainder of the needle number divided by eight, orders the target positions in the direction of travel and writes them into the head board's idle buffer. The lead is not stored in the table; the head board subtracts it at the live speed. The carriage pauses 0.1 s at reversal, and five jobs run in parallel then, the slowest being the stitch-cam stepper at about 50 ms. One last warning: an emergency stop from 1.66 m/s takes 69 mm, so after any speed-up check the room beyond the limit switches — the item most often forgotten."
+   ]
+  },
+  {
+   "title": [
+    "横机原型的调试：两速扫描标定 Tr",
+    "Bringing up the knitting prototype: calibrating Tr by a two-speed sweep"
+   ],
+   "points": [
+    [
+     "按初值 Tr 算提前量再加偏置 δ，在 0.3 和 0.9 m/s 各织“选/不选”交替行",
+     "Lead from an initial Tr plus an offset δ; knit alternating select/no-select courses at 0.3 and 0.9 m/s"
+    ],
+    [
+     "100% 正确的 δ 区间是通过带，中点随速度移动，斜率就是 Tr 的误差",
+     "The δ range with 100% correct selection is the pass band; its centre moves with speed and the slope is the Tr error"
+    ],
+    [
+     "算例：中点 0.09 → 0.26 mm，斜率 0.28 ms，Tr 由 1.2 改为约 1.48 ms",
+     "Example: centre 0.09 → 0.26 mm, slope 0.28 ms, Tr from 1.2 to about 1.48 ms"
+    ],
+    [
+     "排故：错针号 mod 8 相同查那一段；集中在两侧查加速区；随机分布查离散",
+     "Troubleshooting: same needle number mod 8 → that step; at the edges → acceleration zone; random → scatter"
+    ]
+   ],
+   "formula": "\\Delta T_r=\\frac{\\Delta x_{mid}}{\\Delta v}=\\frac{0.26-0.09}{0.9-0.3}\\ \\mathrm{ms}",
+   "figure": "fig_c21_fk_calib.png",
+   "narration": [
+    "Tr 不能只信计算或电磁铁样本，要在整机上标。办法叫两速扫描：固件按一个初值算提前量，再人为加一个偏置 δ，在低速和高速下各织一种“选、不选”交替的测试行，统计每个 δ 的选针正确率。正确率 100% 的那段就是通过带。通过带中点里混着两样东西：与速度无关的几何偏移，和与速度成正比的 Tr 误差。用两种速度就能把它们分开，斜率就是 Tr 误差。算例斜率 0.28 ms，Tr 从 1.2 改到约 1.48。另外，通过带在高速下变窄的速率，正好反映离散 J。",
+    "Don't trust a calculation or a solenoid datasheet for Tr; calibrate it on the machine. The method is a two-speed sweep: the firmware computes the lead from an initial value plus a deliberate offset δ, and knits alternating select/no-select courses at a low and a high speed, recording the selection success for each δ. The δ range with 100% success is the pass band. Its centre mixes two things: a geometric offset independent of speed, and the Tr error, proportional to speed. Two speeds separate them, and the slope is the Tr error. In the example the slope is 0.28 ms, so Tr goes from 1.2 to about 1.48. And how fast the band narrows at high speed reflects the scatter J."
+   ]
+  },
+  {
+   "title": [
+    "三台原型共用多少；模型的边界",
+    "How much the three prototypes share; limits of the model"
+   ],
+   "points": [
+    [
+     "共用：主控、电磁铁驱动、位置轴 stepper_* 接口、I/O、网关、电源、测试脚本",
+     "Shared: controller, solenoid drivers, stepper_* position-axis interface, I/O, gateway, power, test scripts"
+    ],
+    [
+     "差别集中在“窗口是什么、窗口里做什么”：主轴角 vs 机头位置",
+     "Differences lie in what the window is and what happens in it: spindle angle vs carriage position"
+    ],
+    [
+     "新代码：花样解析、前瞻、窗口插补；行编译、逐针触发、换向序列",
+     "New code: pattern parsing, look-ahead, window interpolation; course compiling, per-needle firing, reversal sequence"
+    ],
+    [
+     "边界：理想伺服与选针器模型、未计布料抬起与带伸长；数值要在样机上实测",
+     "Limits: idealised servo and selector models, fabric lift and belt stretch ignored; measure on the prototype"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "把三台原型放在一起比，会发现电机、驱动、电磁铁、总线、测试这些“体力活”都是共用的，差别集中在两件事：窗口是什么，窗口里做什么。平缝和花样机以主轴角为时间基准，横机以机头位置为时间基准。这正是第 19 章把固件按硬件抽象层分层、把动作写成事件表的回报：第二台的新代码约是第一台的一半，第三台又少一些。最后记住模型的边界：伺服是理想二阶模型，选针器当作均匀离散的理想开关，没算布料被针带起和同步带伸长，这些都要在样机上测。",
+    "Put the three prototypes side by side and the heavy lifting — motors, drives, solenoids, bus, testing — is shared. The differences come down to two things: what the window is and what happens inside it. Lockstitch and pattern sewer use spindle angle as time base; the knitting machine uses carriage position. That is the pay-off of Chapter 19's layered firmware and event tables: the second machine needs about half the new code of the first, the third less again. Finally, remember the limits of the models: an ideal second-order servo, a selector treated as an ideal switch with uniform scatter, no fabric lift by the needle and no belt stretch. All of these must be measured on the prototype."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "两台原型的控制问题相同：动作必须落进由位置决定的窗口，先做时序预算再选零件。",
+   "Both prototypes share one control problem: actions must land in a window set by position, so budget the timing before choosing parts."
+  ],
+  [
+   "花样机：Δt = Wu/(6n)，a = C·s/Δt²；峰值转矩看惯量，设计加速度由 rms 转矩（0.58 Tpk ≤ 额定）决定。",
+   "Pattern sewer: Δt = Wu/(6n), a = C·s/Δt²; peak torque is set by inertia, the design acceleration by RMS torque (0.58 Tpk ≤ rated)."
+  ],
+  [
+   "前瞻限速 + 按预测角 φ + ω·Td 的窗口内插补，保证针在布中模板不动；验收时把“为 0”落成 ≤ 5 个计数。",
+   "Look-ahead plus in-window interpolation at the predicted angle φ + ω·Td keep the clamp still with the needle in; acceptance turns 'zero' into ≤ 5 counts."
+  ],
+  [
+   "选针：提前量 v(Tr + Tq/2) 补偿延迟；最坏误差 v(Tq/2 + J) ≤ 0.1p 决定最高速度，限制它的是离散 J 和控制周期，不是 Tr。",
+   "Selection: the lead v(Tr + Tq/2) compensates delay; the worst error v(Tq/2 + J) ≤ 0.1p sets the top speed, limited by scatter J and the control period, not by Tr."
+  ],
+  [
+   "E5 原型 MCU 1 ms 可跑约 0.635 m/s，FPGA 约 1.66 m/s；Tr 用两速扫描在整机上标定。",
+   "The E5 prototype runs about 0.635 m/s with a 1 ms MCU and about 1.66 m/s with an FPGA; Tr is calibrated on the machine by a two-speed sweep."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "proto-fk",
+   "no": "21-1",
+   "title": [
+    "缩比横机原型：机头速度与选针时序",
+    "Scaled flat-knitting prototype: carriage speed and selection timing"
+   ],
+   "goal": [
+    [
+     "用时序预算找出 MCU 1 ms 控制周期下满足验收（≤ 0.1p）的最高机头速度。",
+     "Use the timing budget to find the highest carriage speed that passes acceptance (≤ 0.1p) with a 1 ms MCU."
+    ],
+    [
+     "比较 MCU 与 FPGA 逐针触发的最高速度和每小时行数，说明产量为什么不与速度成正比。",
+     "Compare top speed and courses per hour for MCU and FPGA firing, and explain why output is not proportional to speed."
+    ],
+    [
+     "体会提前量方式、换向余量和选针器段数对选针误差的影响。",
+     "See how the lead method, reversal margin and number of selector steps affect selection error."
+    ]
+   ],
+   "theory": [
+    [
+     "第 i 枚针在 x_i = c + (i + ½)p 处应被选中；实时提前量 = v(Tr + Tq/2)。",
+     "Needle i should be selected at x_i = c + (i + ½)p; the real-time lead is v(Tr + Tq/2)."
+    ],
+    [
+     "误差 = 衔铁动作时的机头位置 − x_i；用实时提前量时最坏误差 ≈ v(Tq/2 + J)。|误差| ≤ 0.1p 为验收合格，> 0.25p 为错选。",
+     "Error = carriage position at armature motion − x_i; with a real-time lead the worst error ≈ v(Tq/2 + J). |error| ≤ 0.1p passes acceptance; > 0.25p is a mis-selection."
+    ],
+    [
+     "MCU 的量化时间 Tq 等于控制周期 Tc；FPGA 每个编码器计数（0.01 mm）比较一次，Tq 只是走过一个计数的时间。",
+     "For an MCU, Tq equals the control period Tc; an FPGA compares at every encoder count (0.01 mm), so Tq is the time to travel one count."
+    ],
+    [
+     "同段两次动作的间隔 n段·p/v 必须 ≥ 2Tr（吸合 + 释放）。",
+     "The interval between two actions of one step, n_steps·p/v, must be ≥ 2Tr (pull-in + release)."
+    ],
+    [
+     "一行行程 D = 2c + 60p + Lk（三角座跨度 Lk = 80 mm），梯形速度曲线，两端各停 0.1 s 换向。",
+     "One course travels D = 2c + 60p + Lk (cam-box span Lk = 80 mm) on a trapezoidal profile, with a 0.1 s reversal pause at each end."
+    ]
+   ],
+   "steps": [
+    [
+     "打开虚拟实验 21-1，点“恢复标准”，核对标准参数：E5、0.6 m/s、10 m/s²、c = 40 mm、Tr = 1.5 ± 0.3 ms、MCU 1 ms、8 段、按实时速度计算提前量。",
+     "Open virtual lab 21-1, press 'Reset to standard' and check the standard set: E5, 0.6 m/s, 10 m/s², c = 40 mm, Tr = 1.5 ± 0.3 ms, MCU 1 ms, 8 steps, real-time lead."
+    ],
+    [
+     "点“织一行（动画）”（慢放可选 1/20），在放大图中看当前针的命令点、触发点和衔铁动作位置；记录判据栏的最坏误差和右侧的一行用时、每小时行数。",
+     "Press 'Knit one course (animation)' (slow motion 1/20 if you like) and watch the command point, firing point and armature action in the zoom; record the worst error and the course time and courses per hour."
+    ],
+    [
+     "先用 vmax = 0.1p/(Tc/2 + J) 估算，再拖动“机头最高速度 v”滑块，找到判据第 1、2 条刚好仍为 ✓ 的最高速度（精确到 0.01 m/s），完成任务 1；点“统计 1000 行”记录错选数。",
+     "Estimate vmax = 0.1p/(Tc/2 + J), then drag the 'carriage top speed v' slider to the highest value at which checks 1 and 2 are still ✓ (to 0.01 m/s) to complete task 1; press 'Statistics over 1000 courses' and record the mis-selections."
+    ],
+    [
+     "把速度再调高到判据变红，再点“统计 1000 行”，区分“超出验收（> 0.1p）”和“错选（> 0.25p）”。",
+     "Raise the speed until the checks turn red and run the 1000-course statistics again; distinguish 'outside acceptance (> 0.1p)' from 'mis-selection (> 0.25p)'."
+    ],
+    [
+     "点“改用 FPGA”，重新找最高速度，完成任务 2；比较两种方案的一行用时和每小时行数，算出速度和产量各提高了多少。",
+     "Press 'Switch to FPGA', find the top speed again to complete task 2, and compare course time and courses per hour to see how much speed and output each rose."
+    ],
+    [
+     "在“逐针触发由谁做”中改回 MCU，把“MCU 控制周期 Tc”依次设为 0.5 ms 和 0.25 ms，各找最高速度，填入记录表。",
+     "Set 'who fires each needle' back to MCU, set the control period Tc to 0.5 ms and then 0.25 ms, and find the top speed for each; enter them in the table."
+    ],
+    [
+     "保持其余参数，把 Tr 改为 0.8 ms 和 2.5 ms，看最高速度是否变化；再把离散 ±J 从 0.30 改为 0.15 ms，比较。",
+     "Keeping the rest, set Tr to 0.8 ms and 2.5 ms and see whether the top speed changes; then halve the scatter ±J from 0.30 to 0.15 ms and compare."
+    ],
+    [
+     "把“选针器段数”改为 1，逐步提高速度，观察判据第 3 条“同段两次动作间隔”何时变红。",
+     "Set the number of selector steps to 1, raise the speed step by step and note when check 3, the same-step interval, turns red."
+    ],
+    [
+     "任务 3：针距选 E7，改用 FPGA，“提前量”选固定提前量，机头速度设 1.00 m/s；点“按当前最高速度整定 Lf”，再调换向余量 c（≤ 50 mm）和 Lf，直到 60 针全部满足验收。",
+     "Task 3: choose E7, FPGA, a fixed lead and a carriage speed of 1.00 m/s; press 'Set Lf for the current top speed', then adjust the reversal margin c (≤ 50 mm) and Lf until all 60 needles pass."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "不同控制方案下的最高机头速度与产量",
+     "Top carriage speed and output for different control schemes"
+    ],
+    "headers": [
+     [
+      "方案（MCU/FPGA、Tc）",
+      "Scheme (MCU/FPGA, Tc)"
+     ],
+     [
+      "针距",
+      "Gauge"
+     ],
+     [
+      "Tr ± J（ms）",
+      "Tr ± J (ms)"
+     ],
+     [
+      "最高速度 v（m/s）",
+      "Top speed v (m/s)"
+     ],
+     [
+      "最坏误差（p）",
+      "Worst error (p)"
+     ],
+     [
+      "一行用时（s）",
+      "Course time (s)"
+     ],
+     [
+      "每小时行数",
+      "Courses per hour"
+     ],
+     [
+      "1000 行错选数",
+      "Mis-selections in 1000 courses"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "为什么把 Tr 改小，最高速度几乎不变；而把 J 减半，最高速度明显提高？",
+     "Why does a smaller Tr hardly change the top speed, while halving J raises it clearly?"
+    ],
+    [
+     "FPGA 方案速度约为 MCU 1 ms 的 2.6 倍，每小时行数却只多约 64%，时间花在哪里？",
+     "The FPGA scheme is about 2.6 times as fast as the 1 ms MCU, yet courses per hour rise only about 64%. Where does the time go?"
+    ],
+    [
+     "任务 3 中，为什么固定提前量在织物两侧的针上误差最大？加大换向余量为什么有用？",
+     "In task 3, why is the fixed lead worst on the needles at the edges, and why does a larger reversal margin help?"
+    ],
+    [
+     "结合表 21-13，比较“原型先用 MCU、量产再上 FPGA”与“一开始就上 FPGA”的利弊。",
+     "Using Table 21-13, compare 'MCU on the prototype, FPGA for production' with 'FPGA from the start'."
+    ]
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "花样机原型与缩比横机的时序预算",
+   "Timing budgets for the pattern-sewer and knitting prototypes"
+  ],
+  "tasks": [
+   [
+    "花样机原型布加下模板厚 3 mm（几何窗口 192.6°，两端仍各留 10°），设计加速度 X 50 m/s²、Y 40 m/s²，S 形 C = 5.33。(a) 算出 2、3、4 mm 针距沿 X、沿 Y 的转速上限（机头限速 2500 r/min）；(b) 与表 21-5（1.5 mm 布厚）比较，判断 3 mm 针沿 X 还能否达到 1600 r/min，并说明前瞻会怎样处理沿 Y 的针。",
+    "On the pattern sewer, fabric plus lower template is 3 mm thick (geometric window 192.6°, still 10° reserved at each end); design accelerations X 50 m/s², Y 40 m/s², S-curve C = 5.33. (a) Calculate the speed limits for 2, 3 and 4 mm stitches along X and along Y (head limit 2500 r/min). (b) Compare with Table 21-5 (1.5 mm), decide whether 3 mm stitches along X still reach 1600 r/min, and explain how the look-ahead treats stitches along Y."
+   ],
+   [
+    "12 kg 的 Y 轴想也用 50 m/s²。取折算惯量 J = 0.820×10⁻⁴ kg·m²、导程 10 mm，算峰值转矩和最坏 rms 转矩（rms = 0.58 Tpk），判断 400 W 电机（额定 1.27、峰值 3.8 N·m）是否可用；给出至少两种改法并说明各自的代价。",
+    "The 12 kg Y axis should also run at 50 m/s². With a referred inertia J = 0.820×10⁻⁴ kg·m² and a 10 mm lead, calculate the peak torque and the worst-case RMS torque (RMS = 0.58 Tpk), decide whether the 400 W motor (rated 1.27, peak 3.8 N·m) is acceptable, and give at least two remedies with their costs."
+   ],
+   [
+    "缩比横机改为 E6（p = 4.23 mm），选针器 Tr = 1.5 ± 0.3 ms，按 0.1p 验收。用解析式分别算出 MCU 1 ms、MCU 0.5 ms、FPGA（计数 0.01 mm）三种方案的最高机头速度，并在虚拟实验 21-1 中核对；选一个方案用于原型，从速度、成本和开发难度说明理由。",
+    "The knitting prototype changes to E6 (p = 4.23 mm), selector Tr = 1.5 ± 0.3 ms, acceptance 0.1p. Using the analytical formulas, calculate the top carriage speed for MCU 1 ms, MCU 0.5 ms and FPGA (0.01 mm count), check them in virtual lab 21-1, and choose one scheme for the prototype, justifying it by speed, cost and development effort."
+   ],
+   [
+    "急停制动加速度为 20 m/s²。机头分别以 0.6、1.0、1.66 m/s 运行时，制动距离各是多少？限位开关应装在离行程端点多远处？还要考虑哪些因素（至少两条）？",
+    "The emergency-stop deceleration is 20 m/s². What is the braking distance from 0.6, 1.0 and 1.66 m/s? How far from the end of travel should the limit switches be placed, and what else must be considered (at least two points)?"
+   ]
+  ],
+  "deliverable": [
+   "计算书一份（公式、代入、结果和单位，不超过 4 页）；虚拟实验 21-1 三个任务完成状态和第 3 题核对的截图；第 2、3 题的方案说明各半页。",
+   "A calculation report (formulas, substitution, results and units, at most 4 pages); screenshots of the three completed tasks of virtual lab 21-1 and of the check for task 3; half a page each justifying your choices in tasks 2 and 3."
+  ],
+  "rubric": [
+   [
+    "第 1–4 题计算正确（40 分）",
+    "Correct calculations for tasks 1–4 (40 points)"
+   ],
+   [
+    "过程清楚、公式与单位正确（20 分）",
+    "Clear working, correct formulas and units (20 points)"
+   ],
+   [
+    "判断与改进方案有依据，代价说清楚（20 分）",
+    "Judgements and remedies are justified and their costs stated (20 points)"
+   ],
+   [
+    "虚拟实验截图与核对（10 分）",
+    "Lab screenshots and cross-check (10 points)"
+   ],
+   [
+    "表达规范、结论先行（10 分）",
+    "Clear presentation, conclusions first (10 points)"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "花样机原型的 X–Y 平台选滚珠丝杠而不选同步带直驱，最主要的理由是什么？",
+    "Why does the pattern-sewer prototype use ball screws rather than a direct belt drive for its X–Y table?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "丝杠刚度高一个数量级、折算惯量约为转子 1.2 倍，不必担心 82 Hz 晃动",
+      "The screw is ten times stiffer and its referred inertia is only about 1.2 × the rotor, so 82 Hz ringing is not a concern"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "丝杠比同步带便宜",
+      "Screws are cheaper than belts"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "同步带的分辨率更高，用不上",
+      "The belt has a higher resolution than needed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "丝杠的临界转速比电机额定转速低，可以限速保护",
+      "The screw's critical speed is below the motor's rated speed and acts as a speed limit"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "表 21-2：丝杠约 53 N/μm、580 Hz，惯量比 1.2；同步带直驱约 0.8 N/μm、82 Hz，惯量比 34。丝杠的分辨率反而更高（1 μm 对 10 μm），临界转速约 9700 r/min 远高于所需。",
+    "Table 21-2: screw ≈ 53 N/μm, 580 Hz, inertia ratio 1.2; direct belt ≈ 0.8 N/μm, 82 Hz, ratio 34. The screw also resolves finer (1 μm vs 10 μm), and its critical speed (≈ 9700 r/min) is far above what is needed."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "实用窗口 183.4°，主轴 2000 r/min。模板走一针可用的时间是多少毫秒？",
+    "The usable window is 183.4° and the spindle runs at 2000 r/min. How many milliseconds does the clamp have for one stitch?"
+   ],
+   "answer": 15.28,
+   "tolerance": 0.1,
+   "unit": "ms",
+   "feedback": [
+    "Δt = Wu/(6n) = 183.4/(6 × 2000) ≈ 15.28 ms。转速越高，窗口时间越短，所需加速度按 1/Δt² 增大。",
+    "Δt = Wu/(6n) = 183.4/(6 × 2000) ≈ 15.28 ms. Higher speed shortens the window, and the required acceleration grows as 1/Δt²."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "X 轴峰值转矩只要约 1.84 N·m，远低于峰值 3.8 N·m，为什么设计加速度只取 50 m/s²？",
+    "The X axis needs only about 1.84 N·m against a 3.8 N·m peak. Why is the design acceleration only 50 m/s²?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "连续缝纫时电机发热取决于 rms 转矩，Trms = 0.58 Tpk 不能超过额定 1.27 N·m",
+      "In continuous sewing heating depends on RMS torque, and Trms = 0.58 Tpk must not exceed the rated 1.27 N·m"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "丝杠临界转速限制了加速度",
+      "The screw's critical speed limits the acceleration"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "S 形加减速的峰值加速度不能超过 50 m/s²",
+      "An S-curve cannot exceed 50 m/s² peak acceleration"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "驱动器的 CAN FD 通信周期限制了加速度",
+      "The CAN FD cycle of the drive limits the acceleration"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "Tpk ≤ 1.27/0.58 ≈ 2.2 N·m，反算 X 约 52 m/s²，取 50；短时峰值能力（约 72 m/s²）只留作余量。",
+    "Tpk ≤ 1.27/0.58 ≈ 2.2 N·m gives about 52 m/s² for X, rounded to 50; the short-time capability (about 72 m/s²) is kept as margin."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "沿 Y 方向缝 2 mm 针距，Y 轴设计加速度 40 m/s²，S 形 C = 5.33，实用窗口 183.4°，机头限速 2500 r/min。主轴转速上限约为多少？",
+    "Stitching 2 mm along Y with a design acceleration of 40 m/s², S-curve C = 5.33, usable window 183.4° and head limit 2500 r/min: what is the spindle speed limit?"
+   ],
+   "answer": 1871,
+   "tolerance": 10,
+   "unit": "r/min",
+   "feedback": [
+    "Δt = √(5.33 × 0.002/40) ≈ 16.3 ms，n = 183.4/(6 × 0.0163) ≈ 1871 r/min，低于 2500，与表 21-5 一致。",
+    "Δt = √(5.33 × 0.002/40) ≈ 16.3 ms, n = 183.4/(6 × 0.0163) ≈ 1871 r/min, below 2500, as in Table 21-5."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "窗口以外插补中断保持位置命令不变，所以即使上层的前瞻规划算错，模板也不会在针在布中时被命令移动；剩下的风险只来自伺服跟不上。",
+    "Outside the window the interrupt holds the position command, so even if the look-ahead were wrong the clamp is never commanded to move with the needle in; the remaining risk is only the servo failing to follow."
+   ],
+   "correct": true,
+   "feedback": [
+    "这是 21.3.5 节强调的“软件保证”；伺服是否跟得上要靠 21.4 节的同步验证（REQ-PS-04）去测。",
+    "This is the software guarantee stressed in Section 21.3.5; whether the servo keeps up is measured by the sync check of Section 21.4 (REQ-PS-04)."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "插补中断按预测角 φ + ω·Td 查表，Td = 1.5 ms。这样做的目的是什么？",
+    "The interrupt reads the table at the predicted angle φ + ω·Td, with Td = 1.5 ms. What is this for?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "补偿从发命令到电机跟上的总延迟，1600 r/min 时约 14.4°，大于两端 10° 的余量",
+      "To compensate the total delay from command to motor response, about 14.4° at 1600 r/min, more than the 10° reserve"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "让模板在针入布之前就停止，留出更大的安全余量",
+      "To stop the clamp before the needle enters, giving a larger safety margin"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "减少查表的计算量，避免浮点除法",
+      "To reduce the table-lookup computation and avoid floating-point division"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "补偿编码器的量化误差",
+      "To compensate the encoder quantisation error"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "Td 包括 CAN FD 传输和驱动器内一个插补周期；不补偿时模板动作整体滞后，会滑进针在布中的区间（图 21-4 初调时 0.18 mm）。",
+    "Td covers CAN FD transfer and one interpolation cycle in the drive; without it the clamp lags and slides into the needle-in interval (0.18 mm in the first trial of Fig. 21-4)."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "缩比横机 E5，机头 0.6 m/s，选针器响应时间 Tr = 1.5 ms，MCU 控制周期 1 ms，按实时速度算提前量。提前量是多少毫米？",
+    "Knitting prototype E5, carriage 0.6 m/s, selector response Tr = 1.5 ms, MCU period 1 ms, real-time lead. What is the lead in millimetres?"
+   ],
+   "answer": 1.2,
+   "tolerance": 0.02,
+   "unit": "mm",
+   "feedback": [
+    "提前量 = v(Tr + Tc/2) = 0.6 m/s × 2.0 ms = 1.20 mm，约 0.24 个针距；不补偿就接近 0.25p 的错选边界。",
+    "Lead = v(Tr + Tc/2) = 0.6 m/s × 2.0 ms = 1.20 mm, about 0.24 pitch; without it we would be near the 0.25p mis-selection limit."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "把缩比横机改为 E6（p = 4.23 mm），选针器离散 J = ±0.3 ms，MCU 控制周期 1 ms。按 0.1p 验收，解析式估算的最高机头速度是多少？",
+    "The knitting prototype changes to E6 (p = 4.23 mm), selector scatter J = ±0.3 ms, MCU period 1 ms. With 0.1p acceptance, what top carriage speed does the analytical formula give?"
+   ],
+   "answer": 0.529,
+   "tolerance": 0.01,
+   "unit": "m/s",
+   "feedback": [
+    "vmax = 0.1p/(Tc/2 + J) = 0.423 mm/0.8 ms ≈ 0.529 m/s；针距变细，允许的误差带按比例变窄，速度上限随之下降。",
+    "vmax = 0.1p/(Tc/2 + J) = 0.423 mm/0.8 ms ≈ 0.529 m/s; a finer gauge narrows the allowed band in proportion, and the speed limit falls with it."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于缩比横机的选针时序，下列哪些说法正确？",
+    "Which statements about the selection timing of the knitting prototype are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "限制最高速度的是响应时间的离散 J，而不是 Tr 本身",
+      "The top speed is limited by the scatter J, not by Tr itself"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "改用 FPGA 逐计数比较后，量化误差只剩约半个计数",
+      "With FPGA count-by-count comparison the quantisation error drops to about half a count"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "8 段选针器使同一段两次动作相隔 8 个针距，0.6 m/s 时约 67.7 ms",
+      "An eight-step selector spaces actions of one step by eight pitches, about 67.7 ms at 0.6 m/s"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "把选针器做快（减小 Tr）是提高机头速度最有效的办法",
+      "Making the selector faster (smaller Tr) is the most effective way to raise carriage speed"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "固定提前量在加速区也同样准确",
+      "A fixed lead is equally accurate in the acceleration zone"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "Tr 已被提前量补偿，剩下补偿不了的是量化和离散；固定提前量只在全速段对，在两侧加速区会算错（第 17 章图 17-4）。",
+    "Tr is already compensated by the lead; what cannot be compensated is quantisation and scatter. A fixed lead is right only at full speed and wrong in the acceleration zones at the edges (Chapter 17, Fig. 17-4)."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "横机原型织出的样片上，出错的针号除以 8 的余数总是相同。最可能的原因是什么？",
+    "On the knitting prototype's swatch the faulty needle numbers all leave the same remainder when divided by 8. What is the most likely cause?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "负责那一段的选针器线圈或衔铁有问题",
+      "The coil or armature of the selector step responsible for them is faulty"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "提前量用了固定值，加速区算错",
+      "A fixed lead is used and is wrong in the acceleration zone"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "选针器响应离散 J 太大",
+      "The selector scatter J is too large"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "MCU 控制周期太长",
+      "The MCU control period is too long"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "第 i 枚针由第 i mod 8 段负责，错针号 mod 8 相同说明是同一段的硬件问题，不是时序问题；加速区问题集中在两侧，离散或周期问题则随机分布。",
+    "Needle i is handled by step i mod 8, so a common remainder points to one step's hardware, not timing; acceleration-zone errors cluster at the edges, and scatter or period problems are random."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "花样机原型布加下模板厚 3 mm，几何窗口 192.6°，两端各留 10°。沿 X 缝 3 mm 针距，X 轴设计加速度 50 m/s²，S 形 C = 5.33，机头限速 2500 r/min。主轴转速上限约为多少？",
+    "On the pattern sewer, fabric plus template is 3 mm thick, geometric window 192.6°, with 10° reserved at each end. Stitching 3 mm along X at a design acceleration of 50 m/s², S-curve C = 5.33, head limit 2500 r/min: what is the spindle speed limit?"
+   ],
+   "answer": 1608,
+   "tolerance": 10,
+   "unit": "r/min",
+   "feedback": [
+    "Wu = 192.6 − 20 = 172.6°；Δt = √(5.33 × 0.003/50) ≈ 17.9 ms；n = 172.6/(6 × 0.0179) ≈ 1608 r/min，比 1.5 mm 布厚时的 1708 低约 100 r/min。",
+    "Wu = 192.6 − 20 = 172.6°; Δt = √(5.33 × 0.003/50) ≈ 17.9 ms; n = 172.6/(6 × 0.0179) ≈ 1608 r/min, about 100 r/min below the 1708 for 1.5 mm material."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "花样机原型主轴 2500 r/min 时，如果固件忘了按 φ + ω·Td 查表（Td = 1.5 ms），模板动作会滞后多少度？",
+    "With the spindle at 2500 r/min, if the firmware forgot to read the table at φ + ω·Td (Td = 1.5 ms), by how many degrees would the clamp motion lag?"
+   ],
+   "answer": 22.5,
+   "tolerance": 0.3,
+   "unit": "°",
+   "feedback": [
+    "2500 r/min = 15 000 °/s，乘 1.5 ms 得 22.5°，远大于两端各 10° 的余量，模板会在针入布后仍在移动。",
+    "2500 r/min = 15 000 °/s; times 1.5 ms gives 22.5°, far more than the 10° reserve, so the clamp would still be moving after the needle enters."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "用两速扫描标定选针器：初值 Tr = 1.2 ms，机头 0.4 m/s 时通过带中点为 0.05 mm，1.0 m/s 时为 0.29 mm。Tr 应改为多少？",
+    "A selector is calibrated by a two-speed sweep: initial Tr = 1.2 ms; the pass-band centre is 0.05 mm at 0.4 m/s and 0.29 mm at 1.0 m/s. What should Tr become?"
+   ],
+   "answer": 1.6,
+   "tolerance": 0.02,
+   "unit": "ms",
+   "feedback": [
+    "斜率 = (0.29 − 0.05)/(1.0 − 0.4) = 0.40 mm/(m/s) = 0.40 ms，即 Tr 少估了 0.40 ms，应改为 1.6 ms；截距部分是与速度无关的几何偏移。",
+    "Slope = (0.29 − 0.05)/(1.0 − 0.4) = 0.40 mm/(m/s) = 0.40 ms, so Tr was underestimated by 0.40 ms and becomes 1.6 ms; the intercept is the speed-independent geometric offset."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "花样机同步验证中，把针在布中位移从 0.18 mm 降到 0.002 mm，采用了下列哪些措施？",
+    "In the pattern sewer's sync check, which measures cut the in-fabric motion from 0.18 mm to 0.002 mm?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "把位置环带宽从约 40 Hz 提到约 100 Hz",
+      "Raising the position-loop bandwidth from about 40 Hz to about 100 Hz"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "加速度前馈加到 95%",
+      "Raising acceleration feed-forward to 95%"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "按预测角 φ + ω·Td 查表",
+      "Reading the table at the predicted angle φ + ω·Td"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "改为从总线上的主轴驱动器读主轴角",
+      "Reading spindle angle from the spindle drive over the bus"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "把 S 形加减速改为等加速等减速",
+      "Replacing the S-curve with constant acceleration"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "图 21-4：三项一起做，跟随误差从 0.22 mm 降到 0.006 mm。主轴角必须来自主控直接接的编码器，从总线读会多一个总线周期的延迟。",
+    "Fig. 21-4: with all three, following error fell from 0.22 to 0.006 mm. Spindle angle must come from the encoder wired to the controller; reading it over the bus adds a bus cycle of delay."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "急停制动加速度 20 m/s² 时，机头从 1.66 m/s 停下约需 69 mm，从 0.635 m/s 只需约 10 mm；所以提速以后必须重新检查限位开关以外是否留够制动距离。",
+    "With 20 m/s² emergency braking the carriage needs about 69 mm to stop from 1.66 m/s but only about 10 mm from 0.635 m/s, so after a speed-up the room beyond the limit switches must be rechecked."
+   ],
+   "correct": true,
+   "feedback": [
+    "制动距离 v²/(2a)：1.66²/40 ≈ 0.069 m，0.635²/40 ≈ 0.010 m；距离与速度平方成正比，速度上去后最容易漏掉这一项。",
+    "Braking distance v²/(2a): 1.66²/40 ≈ 0.069 m, 0.635²/40 ≈ 0.010 m; it grows with the square of speed and is the item most often forgotten."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "从窗口出发的时序预算：花样机的 Δt → 加速度 → 峰值与 rms 转矩 → 针距–转速表；横机的提前量 v(Tr + Tq/2) 与最坏误差 v(Tq/2 + J) → 最高机头速度。",
+   "Timing budgets starting from the window: for the pattern sewer Δt → acceleration → peak and RMS torque → stitch-length vs speed table; for the knitting machine the lead v(Tr + Tq/2) and worst error v(Tq/2 + J) → top carriage speed."
+  ],
+  "difficult": [
+   "学生容易以为“选针器越快越好”“峰值转矩够就行”。要讲清楚：延迟可以补偿、离散不能；电机发热看 rms；以及窗口外命令不变为什么是软件保证。",
+   "Students tend to think 'the faster the selector the better' and 'enough peak torque is enough'. Make clear that delay can be compensated but scatter cannot, that heating follows RMS torque, and why holding the command outside the window is a software guarantee."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：车间口袋盖问题",
+     "Opening: the pocket-flap problem"
+    ],
+    "minutes": 15,
+    "content": [
+     "给出 1600 r/min、3 mm 针距和 400 W 电机的条件，让学生先猜够不够；引出“动作落在位置窗口里”的共同问题。",
+     "Present 1600 r/min, 3 mm stitches and the 400 W motor; let students guess whether it is enough; introduce the common problem of actions inside a position window."
+    ]
+   },
+   {
+    "phase": [
+     "花样机：窗口到转矩与转速上限",
+     "Pattern sewer: window to torque and speed limits"
+    ],
+    "minutes": 40,
+    "content": [
+     "板书推导 Δt、a、J、T、Trms，算出表 21-5 的几格；当堂解出导入问题。",
+     "Derive Δt, a, J, T and Trms on the board, compute a few cells of Table 21-5 and solve the opening problem in class."
+    ]
+   },
+   {
+    "phase": [
+     "花样机固件与调试",
+     "Pattern-sewer firmware and bring-up"
+    ],
+    "minutes": 25,
+    "content": [
+     "讲 .wqp、前瞻两遍扫描、窗口插补与预测角；结合图 21-4 讲同步验证与 REQ-PS-04。",
+     "Cover .wqp, the two-pass look-ahead, window interpolation and predicted angle; use Fig. 21-4 to explain the sync check and REQ-PS-04."
+    ]
+   },
+   {
+    "phase": [
+     "横机：构成与选针时序预算",
+     "Knitting machine: make-up and selection timing budget"
+    ],
+    "minutes": 35,
+    "content": [
+     "讲 8 段选针器、提前量、量化与离散；推导 MCU 和 FPGA 的最高速度，说明产量不与速度成正比。",
+     "Cover the eight-step selector, lead, quantisation and scatter; derive top speeds for MCU and FPGA and explain why output is not proportional to speed."
+    ]
+   },
+   {
+    "phase": [
+     "虚拟实验 21-1",
+     "Virtual lab 21-1"
+    ],
+    "minutes": 40,
+    "content": [
+     "学生分组完成三个任务并填记录表；教师巡视，引导比较 Tr 与 J 的影响。",
+     "Groups complete the three tasks and fill in the record table; the teacher circulates and prompts comparison of Tr and J."
+    ]
+   },
+   {
+    "phase": [
+     "标定、共用与小结",
+     "Calibration, sharing and summary"
+    ],
+    "minutes": 25,
+    "content": [
+     "讲两速扫描标定和排故三条；用表 21-13 总结三台原型的共用；布置作业。",
+     "Cover two-speed calibration and the three troubleshooting rules; summarise sharing with Table 21-13; set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "完成作业“花样机原型与缩比横机的时序预算”；预习第 22 章的测试金字塔与 22.6 节的统计方法。",
+   "Complete the assignment on timing budgets; read ahead the test pyramid and the statistics of Section 22.6 in Chapter 22."
+  ]
+ }
+}

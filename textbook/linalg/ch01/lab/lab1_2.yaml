@@ -1,0 +1,37 @@
+# 实验 1.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab1_2.js。
+原理:
+  - ["差速 AGV 的左右轮各由一台电机驱动。轮子不打滑时，车体的前进速度是两轮着地点速度的平均值，转动角速度是两轮速度之差除以轮距（式 (1.2.1)）。写成矩阵形式就是式 (1.2.3)。",
+     "Each wheel of a differential-drive AGV has its own motor. Without slip the body's forward speed is the mean of the two wheel speeds and its turn rate is their difference divided by the track (Eq. (1.2.1)); in matrix form, Eq. (1.2.3)."]
+  - 式: "(v, ω)ᵀ = A (ω_L, ω_R)ᵀ，  A = [r/2  r/2; −r/b  r/b]，  r = 0.075 m，b = 0.40 m          (1.2.2)、(1.2.3)"
+  - ["按列看，(v, ω)ᵀ = ω_L a₁ + ω_R a₂：车体速度是两列按轮速加权的和（列图，式 (1.2.4)）。把 A 看作平面上的变换，它把正方形网格变成平行四边形网格，(1, 0)ᵀ 和 (0, 1)ᵀ 的像就是 A 的两列。",
+     "By columns, (v, ω)ᵀ = ω_L a₁ + ω_R a₂: the body velocity is the columns weighted by the wheel speeds (column picture, Eq. (1.2.4)). As a map of the plane, A turns the square grid into a grid of parallelograms; the images of (1, 0)ᵀ and (0, 1)ᵀ are its columns."]
+步骤:
+  - ["在“差速 AGV”场景保持默认轮速 ω_L = 2、ω_R = 6 rad/s，点“开始”，观察 AGV 的运动，读出 v、ω 和转弯半径，与式 (1.2.3) 的手算结果比较，填入表 1。",
+     "In the AGV scene keep ω_L = 2, ω_R = 6 rad/s and press Start; read v, ω and the turning radius and compare with a hand calculation from Eq. (1.2.3). Fill in Table 1."]
+  - ["调节轮速，完成任务 1（直线前进 0.3 m/s）和任务 2（原地转圈），记录轮速。", "Adjust the wheel speeds for task 1 (straight at 0.3 m/s) and task 2 (spin on the spot); record the wheel speeds."]
+  - ["用 1.2 节的方法手算使 v = 0.5 m/s、ω = 0.5 rad/s 的轮速，设置后验证（任务 3）。", "Compute by hand (Section 1.2) the wheel speeds for v = 0.5 m/s, ω = 0.5 rad/s, set them and check (task 3)."]
+  - ["把两个轮速同时乘以 2、乘以 −1，观察 v、ω 和轨迹的变化；再取两组轮速，分别读出 (v, ω)，与两组轮速之和对应的 (v, ω) 比较，填入表 2。",
+     "Multiply both wheel speeds by 2 and by −1 and watch v, ω and the path; then take two sets of wheel speeds, read (v, ω) for each and for their sum. Fill in Table 2."]
+  - ["切换到“矩阵与网格”场景，分别做出伸缩、剪切（任务 4）和翻面的矩阵，记录矩阵和单位正方形的像的面积，填入表 3。",
+     "In the matrix scene make a stretch, a shear (task 4) and a flip; record each matrix and the area of the unit square's image in Table 3."]
+数据表:
+  - 标题: ["表 1  轮速与车体速度", "Table 1  Wheel speeds and body velocity"]
+    表头: ["ω_L / (rad/s)", "ω_R / (rad/s)", "v / (m/s)", "ω / (rad/s)", "转弯半径 / m", "运动描述"]
+    表头英文: ["ω_L / (rad/s)", "ω_R / (rad/s)", "v / (m/s)", "ω / (rad/s)", "Turning radius / m", "Motion"]
+    行: [["2", "6", "", "", "", ""], ["", "", "0.3", "0", "∞", "直线前进"], ["", "", "0", "", "0", "原地转圈"], ["", "", "0.5", "0.5", "", ""]]
+    行英文: [["2", "6", "", "", "", ""], ["", "", "0.3", "0", "∞", "straight"], ["", "", "0", "", "0", "spin"], ["", "", "0.5", "0.5", "", ""]]
+  - 标题: ["表 2  比例与叠加", "Table 2  Proportion and superposition"]
+    表头: ["轮速 (ω_L, ω_R)", "读出的 (v, ω)", "按比例或叠加算出的 (v, ω)"]
+    表头英文: ["Wheel speeds (ω_L, ω_R)", "(v, ω) read", "(v, ω) by proportion or superposition"]
+    行: [["(2, 6)", "", "—"], ["(4, 12)", "", ""], ["(−2, −6)", "", ""], ["(1, 3) + (3, −1)", "", ""]]
+  - 标题: ["表 3  矩阵与网格", "Table 3  Matrices and grids"]
+    表头: ["变换", "矩阵", "单位正方形的像的面积", "是否翻面"]
+    表头英文: ["Map", "Matrix", "Area of the square's image", "Flipped"]
+    行: [["伸缩", "", "", ""], ["剪切", "", "", ""], ["翻面", "", "", ""]]
+    行英文: [["Stretch", "", "", ""], ["Shear", "", "", ""], ["Flip", "", "", ""]]
+注意:
+  - ["角速度以逆时针为正；ω 为负表示向右转。", "Turn rates are positive counter-clockwise; negative ω turns right."]
+  - ["真实的 AGV 轮子会打滑、电机有转速上限，本实验按理想情况计算。", "A real AGV's wheels slip and its motors have speed limits; this lab assumes ideal conditions."]
+思考题:
+  - ["把车体速度写成三个分量 (vₓ, v_y, ω)ᵀ，其中 v_y 是沿车体横向的速度，则 (vₓ, v_y, ω)ᵀ = A′(ω_L, ω_R)ᵀ，A′ 是 3×2 矩阵。写出 A′，并说明 (0, 1, 0)ᵀ（只横向平移）能不能由 A′ 的两列组合出来。这说明了 AGV 的什么局限？",
+     "Write the body velocity with three components (vₓ, v_y, ω)ᵀ, v_y sideways; then (vₓ, v_y, ω)ᵀ = A′(ω_L, ω_R)ᵀ with a 3×2 matrix A′. Write A′ and decide whether (0, 1, 0)ᵀ (pure sideways motion) is a combination of its columns. What limitation of the AGV does this show?"]

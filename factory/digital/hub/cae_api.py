@@ -80,7 +80,23 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
     @app.get("/api/cae/parts")
     def cae_parts(u=Depends(user_of)):
         """可以直接分析的零件：有现行 STEP 的物料（SH-301 总有）；另外可以上传 STEP"""
-        return {"items": [dict(plm.item_info(i) or {"item": i}, item=i) for i in plm.items_with_step(H.db, u["mode"])]}
+        from cae import thermal_parts as TP
+        return {"items": [dict(plm.item_info(i) or {"item": i}, item=i) for i in plm.items_with_step(H.db, u["mode"])],
+                "examples": [{"key": k, "label": TP.LABELS[k], "params": TP.DEFAULTS[k], "names": TP.PARAM_NAMES[k]} for k in TP.DEFAULTS]}
+
+    @app.post("/api/cae/geometry/example/{key}")
+    def cae_geometry_example(key: str, body: dict = Body(default={}), u=Depends(user_of)):
+        """热分析的参数化示例（第 14 轮）：按参数现做 STEP，读入，并给出自动填好的热载荷和教材公式估算"""
+        from cae import thermal_parts as TP
+        if key not in TP.DEFAULTS:
+            raise HTTPException(404, "没有这个示例")
+        try:
+            p = TP.params_of(key, body.get("params"))
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+        g = _geo(TP.build(key, p), name=TP.LABELS[key])
+        g["example"] = dict(TP.example(key, p, g["faces"]), key=key, params=p)
+        return g
 
     def _geo(step, item=None, name=None):
         g = call("POST", "/geometry", content=step, headers={"content-type": "application/step"}).json()
@@ -252,6 +268,11 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
         if j["status"] != "done":
             raise HTTPException(409, "结果还没出来")
         _ai_quota(u)
+        if (j.get("setup") or {}).get("analysis") in ("thermal", "thermo_mech"):       # 第 14 轮：温度场
+            from hub import thermal_ai
+            r = thermal_ai.explain(H.ai.llm if H.ai else None, j)
+            call("POST", "/jobs/{}/note".format(urllib.parse.quote(jid)), json={"ai_text": r["text"]})
+            return r
         params = None
         if j.get("item") == "SH-301":
             from hub import design as D

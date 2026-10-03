@@ -1424,6 +1424,10 @@ from hub import cam_api as _cam  # noqa: E402
 _cam.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
 _cam.mount_release(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), _emit_as, _can_submit)
 
+# ---------------------------------------------------------------- 设计优化（第 14 轮）
+from hub import opt_api as _opt  # noqa: E402
+_opt.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
+
 
 # ---------------------------------------------------------------- 网页
 if os.path.isdir(WEB_DIST):
