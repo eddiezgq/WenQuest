@@ -51,6 +51,14 @@ def loss_w(p):
     return P_in * (1 - eta), {"eta": eta, "P_out_w": P_out, "P_in_w": P_in, "n_out_rpm": n_out}
 
 
+def tempfile_step(shape):
+    import build123d as bd
+    with tempfile.TemporaryDirectory() as tmp:
+        f = os.path.join(tmp, "part.step")
+        bd.export_step(shape, f)
+        return open(f, "rb").read()
+
+
 def build(key, p):
     import build123d as bd
     if key == "housing":

@@ -237,6 +237,8 @@ def _worker():
             _update(jid, status="running", started=time.time())
             if j.get("kind") == "mbd":
                 ok, res = _isolated(_mbd_child, (_resolved(j["model"]), j["setup"], _job_path(jid)), TIME_LIMIT_S + 60)
+            elif j.get("kind") == "opt":
+                ok, res = _isolated(_opt_child, (j["spec"], _job_path(jid)), OPT_LIMIT_S + 120)
             else:
                 setup = dict(j["setup"])
                 setup["material"] = M.get(setup["material_id"])
@@ -817,3 +819,58 @@ def cam_submission(jid: str, body: dict = Body(...)):
     if not os.path.exists(p):
         raise HTTPException(404, "没有这个任务")
     return _public(_update(jid.replace("/", ""), submission=str(body.get("submission") or "")[:40]))
+
+
+
+# ------------------------------------------------------------------ 设计优化（第 14 轮）
+OPT_LIMIT_S = 900
+
+
+def _opt_child(spec, outdir, q):
+    try:
+        from cae import optimize as O
+
+        def progress(rows):
+            _write_json(os.path.join(outdir, "progress.json"), {"rows": rows})
+        res = O.run(spec, progress)
+        _write_json(os.path.join(outdir, "result.json"), res)
+        best = (res.get("best") or [None])[0]
+        q.put((True, {"seconds": res["seconds"], "trials": len(res["trials"]), "feasible": sum(1 for r in res["trials"] if r["ok"]),
+                      "best": best, "base": res.get("base")}))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+@app.get("/opt/problems")
+def opt_problems():
+    from cae import optimize as O
+    return {"problems": [{"id": k, "label": O.LABELS[k], "vars": [{"name": n, "label": v[0], "low": v[1], "high": v[2], "step": v[3], "int": v[4]}
+                                                                  for n, v in O.VARS[k].items()],
+                          "default": O.DEFAULT_SPEC[k]} for k in O.VARS if k != "beam"],
+            "objectives": {k: {"label": v[0], "unit": v[1], "sense": v[2]} for k, v in O.OBJ.items()}, "max_trials": O.MAX_TRIALS}
+
+
+@app.post("/opt/jobs")
+def opt_submit(body: dict = Body(...)):
+    from cae import optimize as O
+    spec = body.get("spec") or {}
+    if spec.get("problem") not in O.VARS:
+        raise HTTPException(400, "不认识的优化问题")
+    jid = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:6]
+    os.makedirs(_job_path(jid))
+    j = {"id": jid, "kind": "opt", "status": "queued", "created": time.time(), "spec": spec,
+         "owner": body.get("owner"), "owner_name": body.get("owner_name"), "factory": body.get("factory"),
+         "title": body.get("title") or O.LABELS[spec["problem"]], "item": body.get("item")}
+    _write_json(_job_path(jid, "job.json"), j)
+    _Q.put(jid)
+    return _public(j)
+
+
+@app.get("/opt/jobs/{jid}/trials")
+def opt_trials(jid: str):
+    d = _job_path(jid.replace("/", ""))
+    for name in ("result.json", "progress.json"):
+        p = os.path.join(d, name)
+        if os.path.exists(p):
+            return dict(_read_json(p), final=name == "result.json")
+    return {"rows": [], "final": False}

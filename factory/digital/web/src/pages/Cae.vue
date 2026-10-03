@@ -675,6 +675,12 @@ onMounted(async () => {
     const [p, m] = await Promise.all([get('/cae/parts'), get('/cae/materials')]);
     parts.value = p.items; materials.value = m.materials; examples.value = p.examples || []; films.value = m.films || [];
   } catch (e) { err.value = e.status === 503 ? '计算服务暂时连不上，请稍后再试' : e.message; }
+  if (route.query.example && examples.value.find((e) => e.key === route.query.example)) {   // 第 14 轮：设计优化 → 按这组参数重算温度场
+    partSel.value = 'ex:' + route.query.example;
+    await nextTick();
+    try { exParams.value = { ...exParams.value, ...JSON.parse(route.query.params || '{}') }; } catch (e) { /* 参数坏了用默认 */ }
+    await loadItem();
+  }
   if (route.query.mbd && route.query.member) {                     // 第 12 轮：动力学 → 有限元
     busy.value = true;
     try {
