@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ngspice 浏览器核对</title>
+<style>
+/* 问渠微电子实验组件库 · 样式（与大学物理第 1 章实验台同一套色板） */
+:root {
+  --bg: #eef2f1; --panel: #ffffff; --ink: #15212b; --muted: #5a6a73; --line: #d3dcdc; --soft: #e5ecea;
+  --accent: #1e2761; --accent-ink: #ffffff; --amber: #c98f00; --amber-soft: #fff4d1;
+  --blue: #1f6feb; --green: #1a7f37; --red: #cf222e; --orange: #c2570c; --violet: #8250df;
+  --stage: #f8faf9; --grid: #e3e9e7; --ok: #1a7f37;
+  --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e1418; --panel: #151d23; --ink: #e4ebef; --muted: #8d9ba5; --line: #283640; --soft: #1b262e;
+    --accent: #7aa2ff; --accent-ink: #0e1418; --amber: #f2c14e; --amber-soft: #2d2612;
+    --blue: #58a6ff; --green: #56d364; --red: #ff7b72; --orange: #ffa657; --violet: #d2a8ff;
+    --stage: #10181d; --grid: #1c2830; --ok: #56d364;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e1418; --panel: #151d23; --ink: #e4ebef; --muted: #8d9ba5; --line: #283640; --soft: #1b262e;
+  --accent: #7aa2ff; --accent-ink: #0e1418; --amber: #f2c14e; --amber-soft: #2d2612;
+  --blue: #58a6ff; --green: #56d364; --red: #ff7b72; --orange: #ffa657; --violet: #d2a8ff;
+  --stage: #10181d; --grid: #1c2830; --ok: #56d364;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; margin: 0; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 40px; }
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 20px; }
+.course { font-size: 13px; color: var(--muted); letter-spacing: 0.04em; }
+h1 { font-size: 26px; margin: 2px 0 0; text-wrap: balance; }
+.hright { display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--muted); }
+.lang { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+nav.tabs { display: flex; gap: 8px; margin: 18px 0 16px; overflow-x: auto; padding-bottom: 2px; }
+nav.tabs button { flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 10px; padding: 8px 14px; font: inherit; cursor: pointer; display: flex; gap: 8px; align-items: baseline; }
+nav.tabs button .no { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+nav.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+nav.tabs button[aria-selected="true"] .no, nav.tabs button[aria-selected="true"] .done { color: inherit; opacity: .85; }
+nav.tabs button .done { font-size: 12px; color: var(--ok); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.lab { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; }
+@media (max-width: 900px) { .lab { grid-template-columns: 1fr; } }
+.stagebox { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; min-width: 0; }
+.stagebox canvas { display: block; width: 100%; aspect-ratio: 16 / 10; background: var(--stage); touch-action: none; }
+.stagebox canvas.short { aspect-ratio: 16 / 6; border-top: 1px solid var(--line); }
+.stagebar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); }
+.goal { padding: 12px 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.goal b { color: var(--ink); }
+.problem { padding: 12px 14px; border-top: 1px solid var(--line); background: var(--amber-soft); font-size: 14px; }
+.problem b { display: block; margin-bottom: 2px; }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.card h3 { margin: 0 0 10px; font-size: 13px; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+.ctl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; margin-bottom: 10px; }
+.ctl label { font-size: 14px; }
+.ctl output { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.ctl input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font: inherit; font-size: 14px; border-radius: 8px; padding: 6px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 500; }
+.btn.chip { padding: 4px 10px; font-size: 13px; }
+.btn.chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); font-weight: 500; }
+.readout { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 14px; margin: 0; }
+.readout dt { color: var(--muted); }
+.readout dd { margin: 0; text-align: right; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.tasks li { display: grid; grid-template-columns: 20px 1fr; gap: 8px; font-size: 14px; }
+.tasks li .box { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--line); margin-top: 3px; display: grid; place-items: center; font-size: 12px; color: var(--accent-ink); }
+.tasks li.ok .box { background: var(--ok); border-color: var(--ok); }
+.tasks li.ok .t { color: var(--muted); }
+.tasks li .tag { font-size: 11px; color: var(--amber); border: 1px solid var(--amber); border-radius: 4px; padding: 0 4px; margin-right: 4px; }
+.tasks .ans { display: flex; gap: 6px; margin-top: 6px; }
+.tasks .ans input { font: inherit; font-family: var(--mono); font-size: 13px; width: 7.5em; border: 1px solid var(--line); border-radius: 8px; padding: 3px 8px; background: var(--panel); color: var(--ink); }
+.tasks .ans .unit { font-size: 13px; color: var(--muted); align-self: center; }
+.tasks .ans .msg { font-size: 12px; color: var(--red); align-self: center; }
+.open textarea { width: 100%; min-height: 90px; font: inherit; font-size: 14px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: var(--panel); color: var(--ink); resize: vertical; }
+.open p { margin: 0 0 8px; font-size: 14px; }
+.hint { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); padding: 8px 12px 0; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
+</style>
+<style>
+  @media (min-width: 901px) { .lab { grid-template-columns: minmax(0, 1fr) 360px; } }
+  pre { font-family: var(--mono); font-size: 12px; background: var(--soft); border-radius: 8px; padding: 10px; overflow-x: auto; margin: 0; white-space: pre; }
+  .status { font-size: 14px; }
+  .status.ok { color: var(--ok); } .status.err { color: var(--red); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="course" data-en="WenQuest microelectronics · browser toolchain check (Round 17, step 3b)">问渠微电子 · 浏览器档工具核对（第 17 轮 3b）</div>
+      <h1 data-en="ngspice in the Browser">ngspice 浏览器核对</h1>
+    </div>
+    <div class="hright"><button class="lang" id="lang">EN</button></div>
+  </header>
+  <p class="hint" data-en="Runs real ngspice (compiled to WebAssembly, package eecircuit-engine, MIT) on the inverter used in Chapter 1, and overlays the lab bench’s JS model. The engine is about 5.7 MB compressed and is fetched once from the CDN.">在浏览器里运行真正的 ngspice（编译成 WebAssembly，eecircuit-engine 包，MIT 许可），仿真第 1 章用的反相器，并与实验台的 JS 模型叠加对照。引擎压缩后约 5.7 MB，首次从 CDN 下载。</p>
+  <section class="lab" id="lab-1" style="margin-top:12px">
+    <div class="stagebox">
+      <div class="legend" id="lg"></div>
+      <canvas id="c" aria-label="传输特性对照"></canvas>
+      <div class="stagebar">
+        <button class="btn primary" id="run" data-en="Run ngspice">运行 ngspice</button>
+        <span class="status" id="st"></span>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl"><label for="r" data-en="Size ratio Wp/Wn">尺寸比 Wp/Wn</label><output id="ro"></output><input type="range" id="r" min="0.5" max="4" step="0.05" value="2.25"></div>
+      </div>
+      <div class="card"><h3 data-en="RESULTS">结果</h3><dl class="readout" id="res"></dl></div>
+      <div class="card"><h3 data-en="NETLIST">网表</h3><pre id="net"></pre></div>
+    </div>
+  </section>
+  <footer data-en="Level-1 MOS models use the same KP and VTO as the lab bench, so the two curves should coincide. Calibration against SKY130 models happens in step 4 (container image).">ngspice 的 level-1 模型用与实验台相同的 KP、VTO，两条曲线应重合。按 SKY130 模型校准放在第 4 步（容器镜像）。</footer>
+</div>
+<script>window.WQ_PARAMS = {
+  "_note": "示意值（第17轮 RM3）：长沟道公式＋有效参数，按 SKY130 1.8 V 器件饱和电流量级取值；第 4 步用 ngspice＋SKY130 校准",
+  "VDD": 1.8,
+  "VTn": 0.45,
+  "VTp": 0.45,
+  "kn": 90e-6,
+  "kp": 40e-6,
+  "L": 0.15,
+  "Wmin": 0.42,
+  "Cg": 1.8e-15,
+  "Cd": 1.2e-15,
+  "problems": {
+    "p11": {"Iload": 1e-3, "VOLmax": 0.2},
+    "p12": {"noise": 0.3},
+    "p14": {"CL": 10e-12},
+    "p15": {"N": 1e4, "alpha": 0.1, "Cgate": 5e-15, "f": 1e8, "Vlow": 1.2}
+  }
+};</script>
+<script>
+/* 问渠微电子实验 · MOSFET 与 CMOS 反相器模型（长沟道平方律＋有效参数）
+ * 与 samples/数字集成电路设计/生成脚本/model.py 算法一一对应（第 17 轮 RM2）。
+ * 用法：浏览器 WQMos.create(params)；Node require('./mos.js').create(params)
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.WQMos = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  function create(P) {
+    const { VDD, VTn, VTp, kn, kp, L, Wmin, Cg, Cd } = P;
+    const m = { P };
+
+    m.idn = (vgs, vds, W, l = L) => {
+      const vov = vgs - VTn;
+      if (vov <= 0 || vds <= 0) return 0;
+      const k = kn * W / l;
+      return vds < vov ? k * (vov * vds - vds * vds / 2) : k / 2 * vov * vov;
+    };
+    m.idp = (vsg, vsd, W, l = L) => {
+      const vov = vsg - VTp;
+      if (vov <= 0 || vsd <= 0) return 0;
+      const k = kp * W / l;
+      return vsd < vov ? k * (vov * vsd - vsd * vsd / 2) : k / 2 * vov * vov;
+    };
+    m.region = (vgs, vds, VT) => (vgs - VT <= 0 ? 'off' : vds < vgs - VT ? 'lin' : 'sat');
+
+    m.vout = (vin, Wn, Wp, vdd = VDD) => {
+      let lo = 0, hi = vdd;
+      for (let i = 0; i < 60; i++) {
+        const mid = (lo + hi) / 2;
+        const f = m.idn(vin, mid, Wn) - m.idp(vdd - vin, vdd - mid, Wp);
+        if (f > 0) hi = mid; else lo = mid;
+      }
+      return (lo + hi) / 2;
+    };
+    m.vm = (Wn, Wp, vdd = VDD) => {
+      const r = Math.sqrt(kp * Wp / (kn * Wn));
+      return (VTn + r * (vdd - VTp)) / (1 + r);
+    };
+    m.vtc = (Wn, Wp, vdd = VDD, step = 0.0005) => {
+      const n = Math.round(vdd / step), vs = [], vo = [];
+      for (let i = 0; i <= n; i++) { vs.push(i * step); vo.push(m.vout(i * step, Wn, Wp, vdd)); }
+      return { vs, vo, step };
+    };
+    m.noiseMargins = (Wn, Wp, vdd = VDD, step = 0.0005) => {
+      const { vs, vo } = m.vtc(Wn, Wp, vdd, step);
+      let first = -1, last = -1;
+      for (let i = 1; i < vs.length - 1; i++) {
+        const g = (vo[i + 1] - vo[i - 1]) / (2 * step);
+        if (g < -1) { if (first < 0) first = i; last = i; }
+      }
+      const VIL = vs[first], VIH = vs[last];
+      const VOH = m.vout(VIL, Wn, Wp, vdd), VOL = m.vout(VIH, Wn, Wp, vdd);
+      return { VIL, VIH, VOH, VOL, NML: VIL - VOL, NMH: VOH - VIH };
+    };
+
+    m.idsatN = (W, vdd = VDD) => kn / 2 * W / L * (vdd - VTn) ** 2;
+    m.idsatP = (W, vdd = VDD) => kp / 2 * W / L * (vdd - VTp) ** 2;
+    m.reqN = (W, vdd = VDD) => 0.75 * vdd / m.idsatN(W, vdd);
+    m.reqP = (W, vdd = VDD) => 0.75 * vdd / m.idsatP(W, vdd);
+    m.cin = (Wn, Wp) => (Wn + Wp) * Cg;
+    m.delays = (Wn, Wp, CL, vdd = VDD) => {
+      const Cself = (Wn + Wp) * Cd;
+      return { tphl: 0.69 * m.reqN(Wn, vdd) * (Cself + CL), tplh: 0.69 * m.reqP(Wp, vdd) * (Cself + CL) };
+    };
+    m.fo4 = (Wn, Wp, vdd = VDD) => m.delays(Wn, Wp, 4 * m.cin(Wn, Wp), vdd);
+    m.chainDelay = (N, CL, ratio, vdd = VDD) => {
+      const Wn = Wmin, Wp = ratio * Wmin, C1 = m.cin(Wn, Wp);
+      const f = Math.pow(CL / C1, 1 / N);
+      const R = (m.reqN(Wn, vdd) + m.reqP(Wp, vdd)) / 2;
+      return N * 0.69 * R * C1 * (Cd / Cg + f);
+    };
+    m.wnForVol = (I, VOLmax, vdd = VDD) => I / (kn / L * ((vdd - VTn) * VOLmax - VOLmax * VOLmax / 2));
+    m.dynPower = (N, alpha, C, V, f) => alpha * C * V * V * f * N;
+    /* 给实验动画用：一阶 RC 近似的输出波形（输入理想方波，周期 T） */
+    m.rcWave = (Wn, Wp, CL, T, npts = 400, vdd = VDD) => {
+      const Cself = (Wn + Wp) * Cd, C = Cself + CL;
+      const tauF = m.reqN(Wn, vdd) * C, tauR = m.reqP(Wp, vdd) * C;
+      const t = [], vin = [], vo = [];
+      let v = vdd;
+      const dt = T / npts;
+      for (let i = 0; i <= 2 * npts; i++) {
+        const ti = i * dt, high = (ti % T) < T / 2;
+        // 输入高 → 输出向 0 放电；输入低 → 向 VDD 充电
+        if (i > 0) v = high ? v * Math.exp(-dt / tauF) : vdd - (vdd - v) * Math.exp(-dt / tauR);
+        t.push(ti); vin.push(high ? vdd : 0); vo.push(v);
+      }
+      return { t, vin, vo };
+    };
+
+    m.reference = () => {
+      const r = kn / kp, pr = P.problems, out = { r, idsat_n_per_um: m.idsatN(1), idsat_p_per_um: m.idsatP(1) };
+      const w = m.wnForVol(pr.p11.Iload, pr.p11.VOLmax);
+      out.p11 = { Wn: w, WnL: w / L, Ron: pr.p11.VOLmax / pr.p11.Iload };
+      out.p12 = {};
+      for (const [key, ratio] of [['ratio1', 1], ['ratio_r', r]]) {
+        const nm = m.noiseMargins(Wmin, ratio * Wmin); nm.VM = m.vm(Wmin, ratio * Wmin); out.p12[key] = nm;
+      }
+      out.p13 = {};
+      for (const [key, ratio] of [['ratio1', 1], ['ratio_sqrt', Math.sqrt(r)], ['ratio_r', r]]) {
+        const d = m.fo4(Wmin, ratio * Wmin), tp = (d.tphl + d.tplh) / 2;
+        out.p13[key] = { ratio, tphl: d.tphl, tplh: d.tplh, tp, mismatch: (d.tplh - d.tphl) / tp };
+      }
+      const CL = pr.p14.CL, C1 = m.cin(Wmin, r * Wmin), t = {};
+      for (let N = 1; N <= 8; N++) t[N] = m.chainDelay(N, CL, r);
+      out.p14 = { Cin: C1, F: CL / C1, Nopt4: Math.log(CL / C1) / Math.log(4), t };
+      const q = pr.p15;
+      out.p15 = { P_VDD: m.dynPower(q.N, q.alpha, q.Cgate, VDD, q.f), P_low: m.dynPower(q.N, q.alpha, q.Cgate, q.Vlow, q.f) };
+      return out;
+    };
+    return m;
+  }
+  return { create };
+});
+</script>
+<script>
+/* 问渠微电子实验组件库（第 17 轮 RM4）
+ * 参数面板、读数、曲线图、任务判定、中 / EN 切换、操作记录。
+ * 不依赖外部库；构建时内联进单个 HTML，可离线打开。
+ */
+(function (root) {
+  const $ = (id) => document.getElementById(id);
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  // ---------- 存储（私密窗口等环境可能不可用，全部 try/catch） ----------
+  function makeStore(prefix) {
+    return {
+      get(k) { try { const v = localStorage.getItem(prefix + k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+      set(k, v) { try { localStorage.setItem(prefix + k, JSON.stringify(v)); } catch (e) { /* 忽略 */ } },
+    };
+  }
+
+  const Lab = { log: [], tasks: {}, hooks: [], lang: 'zh' };
+  let store = makeStore('wq-');
+  let LAB_ID = 'lab';
+
+  // ---------- 操作记录：报给问渠（父窗口），字段对齐第 2 轮附录 lab_task_status ----------
+  Lab.report = function (type, data) {
+    const msg = Object.assign({ source: 'wenquest-lab', lab_page: LAB_ID, type, t: new Date().toISOString() }, data);
+    Lab.log.push(msg);
+    try { if (root.parent && root.parent !== root) root.parent.postMessage(msg, '*'); } catch (e) { /* 忽略 */ }
+  };
+
+  // ---------- 语言 ----------
+  Lab.T = (zh, en) => (Lab.lang === 'en' ? en : zh);
+  Lab.onLang = (f) => { Lab.hooks.push(f); };
+  Lab.applyLang = function () {
+    document.documentElement.lang = Lab.lang === 'en' ? 'en' : 'zh-CN';
+    document.querySelectorAll('[data-en]').forEach((el) => {
+      if (el.dataset.zh === undefined) el.dataset.zh = el.innerHTML;
+      el.innerHTML = Lab.lang === 'en' ? el.dataset.en : el.dataset.zh;
+    });
+    document.querySelectorAll('[data-ph-en]').forEach((el) => {
+      if (el.dataset.phZh === undefined) el.dataset.phZh = el.placeholder;
+      el.placeholder = Lab.lang === 'en' ? el.dataset.phEn : el.dataset.phZh;
+    });
+    const b = $('lang'); if (b) b.textContent = Lab.lang === 'en' ? '中文' : 'EN';
+    Lab.hooks.forEach((f) => f());
+    paintTasks();
+  };
+
+  Lab.init = function (opts) {
+    LAB_ID = opts.id; store = makeStore('wq-' + opts.id + '-');
+    Lab.lang = store.get('lang') || 'zh';
+    if (/(^|[-#])en$/.test(location.hash)) Lab.lang = 'en';
+    const b = $('lang');
+    if (b) b.onclick = () => { Lab.lang = Lab.lang === 'en' ? 'zh' : 'en'; store.set('lang', Lab.lang); Lab.report('lang', { lang: Lab.lang }); Lab.applyLang(); };
+    Lab.saved = store.get('tasks') || {};
+    Lab.report('open', {});
+  };
+
+  // ---------- 选项卡 ----------
+  Lab.tabs = function (onShow) {
+    const btns = [...document.querySelectorAll('nav.tabs button[data-lab]')];
+    function show(key) {
+      btns.forEach((b) => b.setAttribute('aria-selected', b.dataset.lab === key));
+      document.querySelectorAll('section.lab').forEach((s) => (s.hidden = s.id !== 'lab-' + key));
+      store.set('tab', key); onShow && onShow(key);
+      Lab.report('tab', { lab: key });
+    }
+    btns.forEach((b) => (b.onclick = () => show(b.dataset.lab)));
+    const want = (location.hash.match(/lab(\d+)/) || [])[1];
+    show(want && btns.some((b) => b.dataset.lab === want) ? want : store.get('tab') || btns[0].dataset.lab);
+    Lab.show = show;
+  };
+
+  // ---------- 控件 ----------
+  Lab.range = function (id, show, onChange) {
+    const el = $(id), out = $(id + 'o');
+    const upd = () => { if (out) out.textContent = show(+el.value); };
+    el.addEventListener('input', () => { upd(); onChange && onChange(); });
+    el.addEventListener('change', () => Lab.report('param', { param: id, value: +el.value }));
+    Lab.onLang(upd); upd();
+    el.refresh = upd;
+    el.set = (v) => { el.value = v; upd(); };
+    return el;
+  };
+  Lab.readout = function (id, rows) {
+    const dl = $(id);
+    if (dl.childElementCount !== rows.length * 2) dl.innerHTML = rows.map(() => '<dt></dt><dd></dd>').join('');
+    rows.forEach((r, i) => { dl.children[2 * i].textContent = r[0]; dl.children[2 * i + 1].textContent = r[1]; });
+  };
+  Lab.problem = function (id, zhT, zhX, enT, enX) {
+    const el = $(id); el.hidden = false;
+    el.innerHTML = '<b></b><span></span>';
+    el.firstChild.textContent = Lab.T(zhT, enT); el.lastChild.textContent = Lab.T(zhX, enX);
+  };
+
+  // ---------- 数字格式 ----------
+  Lab.fmt = (v, d = 2) => (Number.isFinite(v) ? v.toFixed(d) : '—');
+  Lab.si = function (v, unit, digits = 3) {
+    if (!Number.isFinite(v)) return '—';
+    if (v === 0) return '0 ' + unit;
+    const pre = [[1e9, 'G'], [1e6, 'M'], [1e3, 'k'], [1, ''], [1e-3, 'm'], [1e-6, 'μ'], [1e-9, 'n'], [1e-12, 'p'], [1e-15, 'f']];
+    const a = Math.abs(v);
+    for (const [s, p] of pre) if (a >= s * 0.9995) return (v / s).toPrecision(digits) + ' ' + p + unit;
+    return v.toExponential(2) + ' ' + unit;
+  };
+
+  // ---------- 任务 ----------
+  // t = {id, zh, en, robot?, check?(state)→bool, answer?:{value, tol, unit}}
+  Lab.defineTasks = function (lab, list, ulId) {
+    Lab.tasks[lab] = { ul: ulId, list: list.map((t) => Object.assign({}, t, { ok: !!Lab.saved[lab + ':' + t.id] })) };
+  };
+  Lab.done = function (lab, id) {
+    const t = Lab.tasks[lab].list.find((x) => x.id === id);
+    if (!t || t.ok) return;
+    t.ok = true; Lab.saved[lab + ':' + id] = true; store.set('tasks', Lab.saved);
+    Lab.report('task', { lab, task: id, ok: true });
+    paintTasks();
+  };
+  Lab.check = function (lab, state) {
+    const g = Lab.tasks[lab]; if (!g) return;
+    g.list.forEach((t) => { if (!t.ok && t.check) { try { if (t.check(state)) Lab.done(lab, t.id); } catch (e) { /* 忽略 */ } } });
+  };
+  Lab.reset = function () {
+    Lab.saved = {}; store.set('tasks', {});
+    Object.values(Lab.tasks).forEach((g) => g.list.forEach((t) => (t.ok = false)));
+    Lab.report('reset', {}); paintTasks();
+  };
+  function paintTasks() {
+    let n = 0, k = 0;
+    Object.entries(Lab.tasks).forEach(([lab, g]) => {
+      const ul = $(g.ul); if (!ul) return;
+      const keepVals = {};
+      ul.querySelectorAll('input[data-task]').forEach((i) => (keepVals[i.dataset.task] = i.value));
+      ul.innerHTML = '';
+      let ok = 0;
+      g.list.forEach((t) => {
+        n++; if (t.ok) { k++; ok++; }
+        const li = document.createElement('li');
+        li.className = t.ok ? 'ok' : '';
+        li.dataset.task = t.id;
+        li.innerHTML = `<span class="box" aria-hidden="true">${t.ok ? '✓' : ''}</span><div class="t"></div>`;
+        const box = li.querySelector('.t');
+        if (t.robot) { const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = Lab.T('机器人', 'Robot'); box.appendChild(tag); }
+        box.appendChild(document.createTextNode(Lab.T(t.zh, t.en)));
+        if (t.answer && !t.ok) {
+          const row = document.createElement('div'); row.className = 'ans';
+          row.innerHTML = `<input inputmode="decimal" data-task="${lab}:${t.id}" aria-label="${Lab.T('答案', 'Answer')}"><span class="unit"></span><button class="btn chip">${Lab.T('提交', 'Check')}</button><span class="msg"></span>`;
+          row.querySelector('.unit').textContent = t.answer.unit || '';
+          const inp = row.querySelector('input'); inp.value = keepVals[lab + ':' + t.id] || '';
+          const go = () => {
+            const v = parseFloat(String(inp.value).replace(',', '.'));
+            const a = t.answer, okv = Number.isFinite(v) && Math.abs(v - a.value) <= Math.abs(a.value) * a.tol;
+            Lab.report('answer', { lab, task: t.id, value: v, ok: okv });
+            if (okv) Lab.done(lab, t.id);
+            else row.querySelector('.msg').textContent = Lab.T('再算一下', 'Not yet — check again');
+          };
+          row.querySelector('button').onclick = go;
+          inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+          box.appendChild(row);
+        }
+        ul.appendChild(li);
+      });
+      const tab = document.querySelector(`nav.tabs [data-lab="${lab}"] .done`);
+      if (tab) tab.textContent = ok === g.list.length && ok ? '✓' : ok ? `${ok}/${g.list.length}` : '';
+    });
+    const p = $('progress'); if (p) p.textContent = Lab.T(`已完成 ${k} / ${n} 个任务`, `${k} / ${n} tasks done`);
+  }
+  Lab.paintTasks = paintTasks;
+
+  // ---------- 开放问题：本地暂存，离开输入框时报给问渠 ----------
+  Lab.openQuestion = function (lab, taId) {
+    const ta = $(taId); if (!ta) return;
+    ta.value = store.get('open:' + lab) || '';
+    ta.addEventListener('input', () => store.set('open:' + lab, ta.value));
+    ta.addEventListener('change', () => Lab.report('open_answer', { lab, length: ta.value.length }));
+  };
+
+  // ---------- 曲线图 ----------
+  // opts: {x:[min,max], y:[min,max], xlabel, ylabel, xlog?, ylog?, series:[{x,y,color,width,dash,label}],
+  //        points:[{x,y,color,label,r}], hlines:[{y,color,dash,label}], vlines:[{x,color,dash,label}], bands:[{y0,y1,color}],
+  //        xfmt, yfmt}
+  Lab.plot = function (canvas, opts) {
+    const dpr = root.devicePixelRatio || 1;
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (!w || !h) return;
+    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); }
+    const c = canvas.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+    const small = w < 480, fs = small ? 11 : 12;
+    const pad = { l: small ? 46 : 58, r: 14, t: 14, b: small ? 34 : 40 };
+    const X0 = pad.l, X1 = w - pad.r, Y0 = h - pad.b, Y1 = pad.t;
+    const tx = opts.xlog ? Math.log10 : (v) => v, ty = opts.ylog ? Math.log10 : (v) => v;
+    const [xa, xb] = opts.x.map(tx), [ya, yb] = opts.y.map(ty);
+    const sx = (v) => X0 + (tx(v) - xa) / (xb - xa) * (X1 - X0);
+    const sy = (v) => Y0 - (ty(v) - ya) / (yb - ya) * (Y0 - Y1);
+    const grid = css('--grid'), muted = css('--muted'), ink = css('--ink'), sans = css('--sans'), mono = css('--mono');
+    c.font = `${fs}px ${mono}`; c.lineWidth = 1;
+    const ticks = (a, b, log) => {
+      if (log) { const out = []; for (let e = Math.ceil(a); e <= Math.floor(b); e++) out.push(Math.pow(10, e)); return out; }
+      const span = b - a, raw = span / (small ? 4 : 6), mag = Math.pow(10, Math.floor(Math.log10(raw)));
+      const step = [1, 2, 2.5, 5, 10].map((s) => s * mag).find((s) => s >= raw);
+      const out = []; for (let v = Math.ceil(a / step) * step; v <= b + step * 1e-9; v += step) out.push(+v.toPrecision(12)); return out;
+    };
+    const xf = opts.xfmt || ((v) => String(+v.toPrecision(4))), yf = opts.yfmt || ((v) => String(+v.toPrecision(4)));
+    c.strokeStyle = grid; c.fillStyle = muted;
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    ticks(xa, xb, opts.xlog).forEach((v) => { const X = sx(v); c.beginPath(); c.moveTo(X, Y0); c.lineTo(X, Y1); c.stroke(); c.fillText(xf(v), X, Y0 + 5); });
+    c.textAlign = 'right'; c.textBaseline = 'middle';
+    ticks(ya, yb, opts.ylog).forEach((v) => { const Y = sy(v); c.beginPath(); c.moveTo(X0, Y); c.lineTo(X1, Y); c.stroke(); c.fillText(yf(v), X0 - 6, Y); });
+    c.strokeStyle = muted; c.strokeRect(X0, Y1, X1 - X0, Y0 - Y1);
+    c.font = `${fs}px ${sans}`; c.fillStyle = muted;
+    if (opts.xlabel) { c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText(opts.xlabel, X1, h - 2); }
+    if (opts.ylabel) { c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText(opts.ylabel, X0 + 6, Y1 + 4); }
+    c.save(); c.beginPath(); c.rect(X0, Y1, X1 - X0, Y0 - Y1); c.clip();
+    (opts.bands || []).forEach((b) => { c.fillStyle = b.color; c.fillRect(X0, sy(b.y1), X1 - X0, sy(b.y0) - sy(b.y1)); });
+    (opts.xbands || []).forEach((b) => { c.fillStyle = b.color; c.fillRect(sx(b.x0), Y1, sx(b.x1) - sx(b.x0), Y0 - Y1); });
+    const line = (pts, color, width, dash) => {
+      c.strokeStyle = color; c.lineWidth = width || 2; c.setLineDash(dash || []); c.beginPath();
+      pts.forEach(([X, Y], i) => (i ? c.lineTo(X, Y) : c.moveTo(X, Y))); c.stroke(); c.setLineDash([]);
+    };
+    (opts.hlines || []).forEach((l) => line([[X0, sy(l.y)], [X1, sy(l.y)]], l.color || muted, 1, l.dash || [5, 4]));
+    (opts.vlines || []).forEach((l) => line([[sx(l.x), Y0], [sx(l.x), Y1]], l.color || muted, 1, l.dash || [5, 4]));
+    (opts.series || []).forEach((s) => line(s.x.map((v, i) => [sx(v), sy(s.y[i])]), s.color, s.width, s.dash));
+    c.restore();
+    c.font = `${fs}px ${sans}`;
+    (opts.hlines || []).forEach((l) => { if (l.label) { c.fillStyle = l.color || muted; c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText(l.label, X1 - 4, sy(l.y) - 2); } });
+    (opts.vlines || []).forEach((l) => { if (l.label) { c.fillStyle = l.color || muted; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText(l.label, sx(l.x) + 4, Y1 + 18); } });
+    (opts.points || []).forEach((p) => {
+      const X = sx(p.x), Y = sy(p.y);
+      c.fillStyle = p.color || ink; c.beginPath(); c.arc(X, Y, p.r || 4.5, 0, 2 * Math.PI); c.fill();
+      if (p.label) { c.fillStyle = p.color || ink; c.textAlign = X > (X0 + X1) / 2 ? 'right' : 'left'; c.textBaseline = 'bottom'; c.fillText(p.label, X + (X > (X0 + X1) / 2 ? -8 : 8), Y - 6); }
+    });
+    return { sx, sy, X0, X1, Y0, Y1, c, w, h };
+  };
+
+  Lab.css = css; Lab.$ = $;
+  root.WQLab = Lab;
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<script type="module">
+const L = WQLab, $ = L.$, T = L.T, css = L.css;
+const P = window.WQ_PARAMS, M = WQMos.create(P);
+const ENGINE = 'https://cdn.jsdelivr.net/npm/eecircuit-engine@1.8.0/dist/eecircuit-engine.mjs';
+L.init({ id: 'spice-check' });
+let sim = null, spice = null, loadMs = null, runMs = null;
+const rr = L.range('r', (v) => v.toFixed(2), () => { spice = null; draw(); });
+const netlist = (ratio) => `inverter VTC
+.model nmos1 nmos level=1 vto=${P.VTn} kp=${P.kn} lambda=0
+.model pmos1 pmos level=1 vto=-${P.VTp} kp=${P.kp} lambda=0
+.options gmin=1e-15
+vdd vdd 0 ${P.VDD}
+vin in 0 0
+mn out in 0 0 nmos1 w=${P.Wmin}u l=${P.L}u
+mp out in vdd vdd pmos1 w=${(ratio * P.Wmin).toFixed(4)}u l=${P.L}u
+.dc vin 0 ${P.VDD} 0.005
+.end`;
+function status(msg, cls) { const s = $('st'); s.textContent = msg; s.className = 'status ' + (cls || ''); }
+async function run() {
+  const ratio = +rr.value;
+  try {
+    if (!sim) {
+      status(T('正在下载并启动 ngspice…', 'Downloading and starting ngspice…'));
+      const t0 = performance.now();
+      const { Simulation } = await import(ENGINE);
+      sim = new Simulation(); await sim.start();
+      loadMs = performance.now() - t0;
+      L.report('engine_loaded', { ms: Math.round(loadMs) });
+    }
+    status(T('仿真中…', 'Simulating…'));
+    sim.setNetList(netlist(ratio));
+    const t1 = performance.now(); const res = await sim.runSim(); runMs = performance.now() - t1;
+    const n = res.variableNames, d = res.data;
+    spice = { ratio, vin: d[n.indexOf('v(in)')].values, vout: d[n.indexOf('v(out)')].values };
+    status(T('完成', 'Done'), 'ok');
+    L.report('spice_run', { ratio, ms: Math.round(runMs) });
+  } catch (e) {
+    status(T('失败：', 'Failed: ') + e.message, 'err');
+    L.report('spice_error', { message: String(e.message || e) });
+  }
+  draw();
+}
+function draw() {
+  const ratio = +rr.value, vm = M.vm(P.Wmin, ratio * P.Wmin), js = M.vtc(P.Wmin, ratio * P.Wmin, P.VDD, 0.005);
+  $('net').textContent = netlist(ratio);
+  const series = [{ x: js.vs, y: js.vo, color: css('--blue'), width: 5 }];
+  let maxErr = NaN, vmS = NaN;
+  if (spice) {
+    series.push({ x: spice.vin, y: spice.vout, color: css('--orange'), width: 2 });
+    maxErr = 0;
+    spice.vin.forEach((v, i) => { if (Math.abs(v - vm) > 0.03) maxErr = Math.max(maxErr, Math.abs(spice.vout[i] - M.vout(v, P.Wmin, ratio * P.Wmin))); });
+    for (let i = 1; i < spice.vin.length; i++) { const a = spice.vout[i - 1] - spice.vin[i - 1], b = spice.vout[i] - spice.vin[i]; if (a * b <= 0) { vmS = spice.vin[i - 1] + (spice.vin[i] - spice.vin[i - 1]) * a / (a - b); break; } }
+  }
+  L.plot($('c'), { x: [0, P.VDD], y: [0, P.VDD], xlabel: 'V_in (V)', ylabel: 'V_out (V)', series, points: [{ x: vm, y: vm, color: css('--red'), label: 'V_M' }] });
+  $('lg').innerHTML = `<span><i style="background:${css('--blue')}"></i>${T('实验台 JS 模型', 'lab-bench JS model')}</span><span><i style="background:${css('--orange')}"></i>ngspice (WebAssembly)</span>`;
+  L.readout('res', [
+    [T('引擎下载＋启动', 'Engine download + start'), loadMs == null ? '—' : (loadMs / 1000).toFixed(1) + ' s'],
+    [T('一次直流扫描', 'One DC sweep'), runMs == null ? '—' : runMs.toFixed(0) + ' ms'],
+    ['V_M ' + T('（JS / ngspice）', '(JS / ngspice)'), vm.toFixed(4) + ' / ' + (Number.isFinite(vmS) ? vmS.toFixed(4) : '—') + ' V'],
+    [T('最大偏差（V_M±0.03 V 以外）', 'Max deviation (outside V_M ± 0.03 V)'), Number.isFinite(maxErr) ? (maxErr * 1000).toFixed(2) + ' mV' : '—'],
+  ]);
+  window.SPICE_CHECK = { loadMs, runMs, maxErr, vmS, vm };
+}
+$('run').onclick = run;
+L.onLang(draw);
+window.addEventListener('resize', draw);
+L.applyLang();
+</script>
+</body>
+</html>

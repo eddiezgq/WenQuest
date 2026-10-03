@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ngspice 浏览器核对</title>
+<link rel="stylesheet" href="../kit/wq-lab.css">
+<style>
+  @media (min-width: 901px) { .lab { grid-template-columns: minmax(0, 1fr) 360px; } }
+  pre { font-family: var(--mono); font-size: 12px; background: var(--soft); border-radius: 8px; padding: 10px; overflow-x: auto; margin: 0; white-space: pre; }
+  .status { font-size: 14px; }
+  .status.ok { color: var(--ok); } .status.err { color: var(--red); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="course" data-en="WenQuest microelectronics · browser toolchain check (Round 17, step 3b)">问渠微电子 · 浏览器档工具核对（第 17 轮 3b）</div>
+      <h1 data-en="ngspice in the Browser">ngspice 浏览器核对</h1>
+    </div>
+    <div class="hright"><button class="lang" id="lang">EN</button></div>
+  </header>
+  <p class="hint" data-en="Runs real ngspice (compiled to WebAssembly, package eecircuit-engine, MIT) on the inverter used in Chapter 1, and overlays the lab bench’s JS model. The engine is about 5.7 MB compressed and is fetched once from the CDN.">在浏览器里运行真正的 ngspice（编译成 WebAssembly，eecircuit-engine 包，MIT 许可），仿真第 1 章用的反相器，并与实验台的 JS 模型叠加对照。引擎压缩后约 5.7 MB，首次从 CDN 下载。</p>
+  <section class="lab" id="lab-1" style="margin-top:12px">
+    <div class="stagebox">
+      <div class="legend" id="lg"></div>
+      <canvas id="c" aria-label="传输特性对照"></canvas>
+      <div class="stagebar">
+        <button class="btn primary" id="run" data-en="Run ngspice">运行 ngspice</button>
+        <span class="status" id="st"></span>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl"><label for="r" data-en="Size ratio Wp/Wn">尺寸比 Wp/Wn</label><output id="ro"></output><input type="range" id="r" min="0.5" max="4" step="0.05" value="2.25"></div>
+      </div>
+      <div class="card"><h3 data-en="RESULTS">结果</h3><dl class="readout" id="res"></dl></div>
+      <div class="card"><h3 data-en="NETLIST">网表</h3><pre id="net"></pre></div>
+    </div>
+  </section>
+  <footer data-en="Level-1 MOS models use the same KP and VTO as the lab bench, so the two curves should coincide. Calibration against SKY130 models happens in step 4 (container image).">ngspice 的 level-1 模型用与实验台相同的 KP、VTO，两条曲线应重合。按 SKY130 模型校准放在第 4 步（容器镜像）。</footer>
+</div>
+<!--@params-->
+<script src="../kit/models/mos.js"></script>
+<script src="../kit/wq-lab.js"></script>
+<script type="module">
+const L = WQLab, $ = L.$, T = L.T, css = L.css;
+const P = window.WQ_PARAMS, M = WQMos.create(P);
+const ENGINE = 'https://cdn.jsdelivr.net/npm/eecircuit-engine@1.8.0/dist/eecircuit-engine.mjs';
+L.init({ id: 'spice-check' });
+let sim = null, spice = null, loadMs = null, runMs = null;
+const rr = L.range('r', (v) => v.toFixed(2), () => { spice = null; draw(); });
+const netlist = (ratio) => `inverter VTC
+.model nmos1 nmos level=1 vto=${P.VTn} kp=${P.kn} lambda=0
+.model pmos1 pmos level=1 vto=-${P.VTp} kp=${P.kp} lambda=0
+.options gmin=1e-15
+vdd vdd 0 ${P.VDD}
+vin in 0 0
+mn out in 0 0 nmos1 w=${P.Wmin}u l=${P.L}u
+mp out in vdd vdd pmos1 w=${(ratio * P.Wmin).toFixed(4)}u l=${P.L}u
+.dc vin 0 ${P.VDD} 0.005
+.end`;
+function status(msg, cls) { const s = $('st'); s.textContent = msg; s.className = 'status ' + (cls || ''); }
+async function run() {
+  const ratio = +rr.value;
+  try {
+    if (!sim) {
+      status(T('正在下载并启动 ngspice…', 'Downloading and starting ngspice…'));
+      const t0 = performance.now();
+      const { Simulation } = await import(ENGINE);
+      sim = new Simulation(); await sim.start();
+      loadMs = performance.now() - t0;
+      L.report('engine_loaded', { ms: Math.round(loadMs) });
+    }
+    status(T('仿真中…', 'Simulating…'));
+    sim.setNetList(netlist(ratio));
+    const t1 = performance.now(); const res = await sim.runSim(); runMs = performance.now() - t1;
+    const n = res.variableNames, d = res.data;
+    spice = { ratio, vin: d[n.indexOf('v(in)')].values, vout: d[n.indexOf('v(out)')].values };
+    status(T('完成', 'Done'), 'ok');
+    L.report('spice_run', { ratio, ms: Math.round(runMs) });
+  } catch (e) {
+    status(T('失败：', 'Failed: ') + e.message, 'err');
+    L.report('spice_error', { message: String(e.message || e) });
+  }
+  draw();
+}
+function draw() {
+  const ratio = +rr.value, vm = M.vm(P.Wmin, ratio * P.Wmin), js = M.vtc(P.Wmin, ratio * P.Wmin, P.VDD, 0.005);
+  $('net').textContent = netlist(ratio);
+  const series = [{ x: js.vs, y: js.vo, color: css('--blue'), width: 5 }];
+  let maxErr = NaN, vmS = NaN;
+  if (spice) {
+    series.push({ x: spice.vin, y: spice.vout, color: css('--orange'), width: 2 });
+    maxErr = 0;
+    spice.vin.forEach((v, i) => { if (Math.abs(v - vm) > 0.03) maxErr = Math.max(maxErr, Math.abs(spice.vout[i] - M.vout(v, P.Wmin, ratio * P.Wmin))); });
+    for (let i = 1; i < spice.vin.length; i++) { const a = spice.vout[i - 1] - spice.vin[i - 1], b = spice.vout[i] - spice.vin[i]; if (a * b <= 0) { vmS = spice.vin[i - 1] + (spice.vin[i] - spice.vin[i - 1]) * a / (a - b); break; } }
+  }
+  L.plot($('c'), { x: [0, P.VDD], y: [0, P.VDD], xlabel: 'V_in (V)', ylabel: 'V_out (V)', series, points: [{ x: vm, y: vm, color: css('--red'), label: 'V_M' }] });
+  $('lg').innerHTML = `<span><i style="background:${css('--blue')}"></i>${T('实验台 JS 模型', 'lab-bench JS model')}</span><span><i style="background:${css('--orange')}"></i>ngspice (WebAssembly)</span>`;
+  L.readout('res', [
+    [T('引擎下载＋启动', 'Engine download + start'), loadMs == null ? '—' : (loadMs / 1000).toFixed(1) + ' s'],
+    [T('一次直流扫描', 'One DC sweep'), runMs == null ? '—' : runMs.toFixed(0) + ' ms'],
+    ['V_M ' + T('（JS / ngspice）', '(JS / ngspice)'), vm.toFixed(4) + ' / ' + (Number.isFinite(vmS) ? vmS.toFixed(4) : '—') + ' V'],
+    [T('最大偏差（V_M±0.03 V 以外）', 'Max deviation (outside V_M ± 0.03 V)'), Number.isFinite(maxErr) ? (maxErr * 1000).toFixed(2) + ' mV' : '—'],
+  ]);
+  window.SPICE_CHECK = { loadMs, runMs, maxErr, vmS, vm };
+}
+$('run').onclick = run;
+L.onLang(draw);
+window.addEventListener('resize', draw);
+L.applyLang();
+</script>
+</body>
+</html>
