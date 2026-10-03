@@ -1,0 +1,30 @@
+# 实验 1.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab1_6.js。
+原理:
+  - ["空间中的一个位移可以用三个数表示：沿基座坐标系 x、y、z 三个方向各移动多少。这三个数排成一列，就是一个三维向量 d = (dₓ, d_y, d_z)ᵀ。末端从点 p 沿向量 d 移动，到达 p + d。",
+     "A displacement in space is three numbers: how far to move along the base x, y and z axes. Written as a column they form a 3D vector d = (dₓ, d_y, d_z)ᵀ. Moving the tool from p along d takes it to p + d."]
+  - 式: "移动的距离 ‖d‖ = √(dₓ² + d_y² + d_z²)；  先沿 d₁ 再沿 d₂，总位移为 d₁ + d₂"
+  - ["程序把直线路径分成 40 小步，每一步解一次“末端速度 = 雅可比矩阵 × 关节速度”的线性方程组（用伪逆，第 18 章），求出六个关节各转多少，同时保持末端姿态不变。这正是 1.1.3 节所说的“非线性问题每一步解一个线性问题”。",
+     "The program splits the straight path into 40 small steps; at each step it solves the linear system 'tool velocity = Jacobian × joint velocity' (with the pseudo-inverse, Chapter 18) for the six joint turns, keeping the tool orientation fixed. This is the idea of Section 1.1.3: solve a linear problem at each step of a nonlinear one."]
+步骤:
+  - ["点“回到起始姿态”，读出起始点坐标，填入表 1。", "Press 'Back to the start pose' and record the start point in Table 1."]
+  - ["设定向量 (0.1, 0, 0) m，点“沿向量移动”（任务 1），观察末端的轨迹和红色箭头，记录终点和实际位移。再分别做 (0, 0, 0.05) m（任务 2）和 (0.1, 0.1, 0) m（任务 3），每次先回到起始姿态。",
+     "Set (0.1, 0, 0) m and press 'Move along the vector' (task 1); watch the path and the red arrow; record the end point and the actual displacement. Repeat for (0, 0, 0.05) m (task 2) and (0.1, 0.1, 0) m (task 3), returning to the start pose each time."]
+  - ["对任务 3，用勾股定理手算移动的距离，与读数比较。", "For task 3 compute the distance by Pythagoras and compare with the reading."]
+  - ["回到起始姿态，先沿 d₁ 移动，再改变三个分量，沿 d₂ 移动（任务 4）；在表 2 记录 d₁、d₂、d₁ + d₂ 和读出的总位移。",
+     "Return to the start pose, move along d₁, change the components and move along d₂ (task 4); record d₁, d₂, d₁ + d₂ and the total displacement in Table 2."]
+  - ["比较移动前后的六个关节角，哪个关节转得最多？", "Compare the six joint angles before and after: which joint turned most?"]
+数据表:
+  - 标题: ["表 1  单次移动", "Table 1  Single moves"]
+    表头: ["设定的向量 / m", "起点 / m", "终点 / m", "实际位移 / m", "距离（读数）/ m", "距离（手算）/ m"]
+    表头英文: ["Vector set / m", "Start / m", "End / m", "Actual displacement / m", "Distance (read) / m", "Distance (by hand) / m"]
+    行: [["(0.1, 0, 0)", "", "", "", "", ""], ["(0, 0, 0.05)", "", "", "", "", ""], ["(0.1, 0.1, 0)", "", "", "", "", ""]]
+  - 标题: ["表 2  两次移动", "Table 2  Two moves"]
+    表头: ["d₁ / m", "d₂ / m", "d₁ + d₂ / m", "总位移（读数）/ m"]
+    表头英文: ["d₁ / m", "d₂ / m", "d₁ + d₂ / m", "Total displacement (read) / m"]
+    行: [["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["坐标是 UR5e 基座坐标系中的坐标，z 轴竖直向上。", "Coordinates are in the UR5e base frame, z up."]
+  - ["向量太长或方向不当时，末端可能超出手臂能到达的范围，或者手臂接近奇异位形（第 18 章），此时实际位移会与设定的向量不同。", "If the vector is too long or badly directed the tool may leave the reachable region or the arm may approach a singularity (Chapter 18); the actual displacement then differs from the vector set."]
+  - ["可以用鼠标拖动画面，从不同角度观察箭头和轨迹。", "Drag the view with the mouse to see the arrow and the path from other angles."]
+思考题:
+  - ["先沿 d₁ 再沿 d₂，与先沿 d₂ 再沿 d₁，终点相同吗？关节角相同吗？", "Moving along d₁ then d₂, or d₂ then d₁: is the end point the same? Are the joint angles the same?"]
