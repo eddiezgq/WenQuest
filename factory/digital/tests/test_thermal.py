@@ -163,3 +163,28 @@ def test_heatsink_groups():
     assert len(ex["groups"]["pad"]) == 1 and ex["thermal"][0]["power_w"] == 65
     with pytest.raises(ValueError):
         TP.params_of("heatsink", {"fins": 30, "fin_t": 3})
+
+
+def test_thermal_one_sentence_rules():
+    """第 14 轮：一句话设置热边界（规则）"""
+    pytest.importorskip("build123d")
+    from cae import geometry as G
+    from cae import thermal_parts as TP
+    from hub import thermal_ai as A
+    p = TP.params_of("housing", {})
+    faces, _, solid = G.faces(TP.build("housing", p))
+    g = TP.groups("housing", p, faces)
+    r = A.rules_setup("箱体内壁发热 482.6 W，外表面自然对流通风良好，环境 25 度，HT200", faces, solid, g)
+    assert r["material_id"] == "HT200" and not r["unmatched"]
+    assert r["rows"][0] == {"kind": "heat_flux", "faces": g["inner"], "rest": False, "value": 482.6}
+    assert r["rows"][1]["faces"] == g["outer"] and r["rows"][1]["h"] == 17.45 and r["rows"][1]["tinf"] == 25
+    p = TP.params_of("heatsink", {})
+    faces, _, solid = G.faces(TP.build("heatsink", p))
+    g = TP.groups("heatsink", p, faces)
+    r = A.rules_setup("CPU 接触面 65W，散热系数 h=40，30 分钟瞬态，初温 25 度", faces, solid, g)
+    assert r["rows"][0]["faces"] == g["pad"] and r["rows"][1]["rest"] and r["rows"][1]["h"] == 40
+    assert r["transient"] == {"duration_s": 1800.0, "t0_c": 25.0} and not r["unmatched"]
+    r = A.rules_setup("接触面发热 65 W", faces, solid, g)                  # 没说散热：自动补其余所有面自然对流
+    assert r["rows"][-1]["kind"] == "convection" and r["rows"][-1]["rest"]
+    with pytest.raises(ValueError):
+        A.setup(None, " ", faces, solid, g)

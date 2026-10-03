@@ -87,3 +87,15 @@ def test_topo_explain():
     r["volfrac"] = 0.5
     t = A.topo_explain({}, r)
     assert "桁架" in t and "柔度" in t and "有限元校核" in t
+
+
+def test_lab11_documents():
+    import io
+    import docx
+    from cae import labdoc
+    g = docx.Document(io.BytesIO(labdoc.guide_docx("lab11")))
+    text = "\n".join(p.text for p in g.paragraphs)
+    assert "实验 11" in text and "热平衡" in text and "帕累托" in text and len(g.tables) >= 1
+    t = docx.Document(io.BytesIO(labdoc.report_template_docx("lab11")))
+    cells = " ".join(c.text for tb in t.tables for r in tb.rows for c in r.cells)
+    assert "482.6" in cells and "自由热伸长" in cells and "卡住最优解" in cells

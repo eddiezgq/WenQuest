@@ -57,10 +57,10 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
 
     @app.get("/api/cae/{lab}/{kind}.docx")
     def cae_lab(lab: str, kind: str):
-        """实验 8、9、10 的指导书 / 报告模板（Word，公开，课程里直接链接）"""
+        """实验 8–11 的指导书 / 报告模板（Word，公开，课程里直接链接）"""
         from cae import labdoc
         titles = {"lab8": "实验8-输出轴强度与疲劳校核", "lab9": "实验9-机械臂关节力矩与电机选型",
-                  "lab10": "实验10-输出轴数控车削与键槽铣削编程"}
+                  "lab10": "实验10-输出轴数控车削与键槽铣削编程", "lab11": "实验11-减速器热平衡与输出轴轻量化"}
         if lab not in titles or kind not in ("guide", "report-template"):
             raise HTTPException(404, "没有这个文件")
         data = labdoc.guide_docx(lab) if kind == "guide" else labdoc.report_template_docx(lab)
@@ -257,6 +257,19 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
         _ai_quota(u)
         try:
             return cae_ai.setup(H.ai.llm if H.ai else None, body.get("text"), faces, body.get("solid"))
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+
+    @app.post("/api/cae/ai-setup-thermal")
+    def cae_ai_setup_thermal(body: dict = Body(...), u=Depends(user_of)):
+        """一句话设置热边界（第 14 轮）：只填表。body = {text, faces, solid, groups}（groups：示例零件按位置分好的面组）"""
+        from hub import thermal_ai
+        faces = body.get("faces") or []
+        if not faces:
+            raise HTTPException(400, "请先读入零件")
+        _ai_quota(u)
+        try:
+            return thermal_ai.setup(H.ai.llm if H.ai else None, body.get("text"), faces, body.get("solid"), body.get("groups"))
         except ValueError as e:
             raise HTTPException(400, str(e)) from None
 

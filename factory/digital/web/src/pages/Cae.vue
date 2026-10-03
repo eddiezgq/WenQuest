@@ -2,7 +2,7 @@
   <div class="page">
     <div class="page-title"><h1>仿真与分析</h1>
       <span class="muted">有限元强度校核、疲劳寿命、温度场与热应力：选零件 → 材料 → 加约束和载荷（或热边界）→ 服务器计算 → 看应力、变形、安全系数、寿命、温度</span>
-      <span class="labs small">实验 8：<a href="/api/cae/lab8/guide.docx">指导书</a> · <a href="/api/cae/lab8/report-template.docx">报告模板</a></span></div>
+      <span class="labs small">实验 8：<a href="/api/cae/lab8/guide.docx">指导书</a> · <a href="/api/cae/lab8/report-template.docx">报告模板</a>　实验 11：<a href="/api/cae/lab11/guide.docx">指导书</a> · <a href="/api/cae/lab11/report-template.docx">报告模板</a></span></div>
 
     <div class="row">
       <!-- 左：设置 -->
@@ -45,6 +45,19 @@
             <div class="step sub">热边界 <span class="muted small">点“+”再在模型上点面；对流可以勾“其余所有面”</span></div>
             <div class="adds">
               <button v-for="(k, key) in TH_KINDS" :key="key" type="button" class="add" :style="{ '--c': k.color }" :title="k.hint" @click="addTh(key)">+ {{ k.label }}</button>
+            </div>
+            <div class="ai-box">
+              <textarea v-model="thAiText" rows="2" maxlength="500" :placeholder="thAiHint"></textarea>
+              <div class="line">
+                <button class="btn" :disabled="thAiBusy || !thAiText.trim()" @click="thAiFill">{{ thAiBusy ? 'AI 正在理解…' : 'AI 填热边界' }}</button>
+                <span class="small muted">AI 只填表，你确认后再点“开始计算”</span>
+              </div>
+              <div v-if="thAiRes" class="small ai-notes">
+                <div v-for="n in thAiRes.notes" :key="n">✓ {{ n }}</div>
+                <div v-for="n in thAiRes.unmatched" :key="n" class="warnline">？没看懂或找不到面：“{{ n }}”——请手动补上</div>
+                <div v-if="thAiRes.note" class="muted">{{ thAiRes.note }}</div>
+                <div class="muted">{{ thAiRes.engine === 'rules' ? '（规则理解：能认发热 / 功率 W、对流 / 风扇 / 自然 / 水冷、散热系数 h、环境温度、固定温度、瞬态时长和初温、内壁 / 外表面 / 底面 / 接触面 / 其余所有面、面编号、材料）' : '（由 AI 模型理解）' }}</div>
+              </div>
             </div>
             <button v-if="geo.example" type="button" class="btn ghost small-btn" @click="fillExample">填入示范题：{{ geo.example.title }}</button>
             <div v-for="(r, i) in thRows" :key="r.key" class="lrow" :class="{ active: active === 100 + i }" :style="{ '--c': TH_KINDS[r.kind].color }" @click="active = TH_KINDS[r.kind].nofaces || r.rest ? -1 : 100 + i">
@@ -553,6 +566,26 @@ async function aiFill() {
     active.value = -1;
     if (!title.value) title.value = aiText.value.slice(0, 40);
   } catch (e) { err.value = e.message; } finally { aiBusy.value = false; }
+}
+// 第 14 轮：一句话设置热边界
+const thAiText = ref(''), thAiBusy = ref(false), thAiRes = ref(null);
+const thAiHint = computed(() => (geo.value?.example?.key === 'heatsink'
+  ? '例如：CPU 接触面发热 65 W，其余所有面风扇直吹散热，室温 25 ℃'
+  : geo.value?.example ? '例如：箱体内壁发热 480 W，外表面自然对流（通风良好），底面装在机座上不散热，环境 20 度'
+    : '例如：面 3 发热 20 W，其余所有面自然对流，环境 25 ℃，6061 铝'));
+async function thAiFill() {
+  thAiBusy.value = true; err.value = '';
+  try {
+    const r = await post('/cae/ai-setup-thermal', { text: thAiText.value, faces: geo.value.faces, solid: geo.value.solid, groups: geo.value.example?.groups });
+    thAiRes.value = r;
+    thRows.value = r.rows.map((x) => ({ key: ++thKey, faces: [], rest: false, value: 0, h: 17.45, tinf: 20,
+      ...x, film: x.film ?? (films.value.find((f) => Math.abs(f.h - (x.h ?? -1)) < 1e-6)?.id || ''), faces: [...(x.faces || [])] }));
+    if (r.material_id) matId.value = r.material_id;
+    if (r.transient && analysis.value === 'thermal') { transient.value = true; trDur.value = r.transient.duration_s; trT0.value = r.transient.t0_c ?? trT0.value; }
+    if (r.ref_temp_c != null) refT.value = r.ref_temp_c;
+    active.value = -1;
+    if (!title.value) title.value = thAiText.value.slice(0, 40);
+  } catch (e) { err.value = e.message; } finally { thAiBusy.value = false; }
 }
 const exp = ref(null);
 const expBusy = ref(false);

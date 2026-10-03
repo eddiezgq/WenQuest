@@ -1,7 +1,8 @@
 <template>
   <div class="page">
     <div class="page-title"><h1>设计优化</h1>
-      <span class="muted">人只定目标和要求，平台自己改尺寸、跑几十次有限元 / 温度场，找出满足要求的最好方案（Optuna 贝叶斯优化）；结果送设计台或回仿真与分析</span></div>
+      <span class="muted">人只定目标和要求，平台自己改尺寸、跑几十次有限元 / 温度场，找出满足要求的最好方案（Optuna 贝叶斯优化）；结果送设计台或回仿真与分析</span>
+      <span class="labs small">实验 11：<a href="/api/cae/lab11/guide.docx">指导书</a> · <a href="/api/cae/lab11/report-template.docx">报告模板</a></span></div>
 
     <div class="seg modeseg">
       <button type="button" :class="{ on: mode === 'param' }" @click="setMode('param')">参数优化（改尺寸）</button>
@@ -312,6 +313,7 @@ onUnmounted(() => clearTimeout(pollT));
 .step b { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
 .full { width: 100%; height: 34px; border: 1px solid #C8CEC7; border-radius: 6px; padding: 0 8px; background: #fff; }
 .modeseg { margin-bottom: 12px; }
+.labs { margin-left: auto; white-space: nowrap; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; align-self: flex-start; flex-wrap: wrap; }
 .seg button { border: 0; background: #fff; padding: 6px 12px; cursor: pointer; font-size: 13px; }
 .seg button.on { background: var(--accent-bg); font-weight: 600; }

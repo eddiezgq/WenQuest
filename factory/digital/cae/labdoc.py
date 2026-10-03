@@ -7,7 +7,8 @@ import re
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GUIDE_MD = os.path.join(HERE, "实验8_输出轴强度与疲劳校核.md")
 GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节力矩与电机选型.md"),
-          "lab10": os.path.join(HERE, "实验10_输出轴数控车削与键槽铣削编程.md")}
+          "lab10": os.path.join(HERE, "实验10_输出轴数控车削与键槽铣削编程.md"),
+          "lab11": os.path.join(HERE, "实验11_减速器热平衡与输出轴轻量化.md")}
 
 
 def _doc():
@@ -93,6 +94,8 @@ def report_template_docx(lab="lab8"):
         return lab9_template()
     if lab == "lab10":
         return lab10_template()
+    if lab == "lab11":
+        return lab11_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -265,6 +268,59 @@ def lab10_template():
     d.add_paragraph("")
     d.add_heading("八、附件", 1)
     d.add_paragraph("平台生成的程序（.nc）、截图。", style="List Bullet")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab11_template():
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 11　减速器热平衡与输出轴轻量化　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、热平衡手算与有限元（任务 1）", 1)
+    table([["项目", "手算", "平台"], ["总效率 η = 0.97² × 0.99³", "", "0.913"], ["输出功率 P_out  W", "", ""], ["输入功率 P_in  W", "", ""],
+           ["发热 Φ = P_in(1 − η)  W", "", "482.6"], ["散热面积 A  m²（不计底面）", "", ""], ["油温 t = t₀ + Φ/(K_s·A)  ℃", "", ""]])
+    table([["有限元结果", "数值", "位置 / 说明"], ["最高温度 ℃", "", ""], ["外表面平均温度 ℃", "", ""], ["热平衡：进来 / 散走 W", "", ""],
+           ["与公式的差 ℃", "", ""]])
+    hint("最高温度为什么比平均高？有限元比公式多告诉了你什么？")
+    d.add_heading("二、降温方案比较（任务 2）", 1)
+    table([["方案", "散热系数 / 面积", "公式油温 ℃", "外表面平均 ℃", "最高 ℃", "代价"], ["无散热筋，通风良好", "", "", "", "", ""],
+           ["每侧 8 条散热筋", "", "", "", "", ""], ["轴端装风扇", "", "", "", "", ""]])
+    table([["一句话设置", "记录"], ["写的那句话", ""], ["AI 选的面、散热系数", ""], ["需要手动改的地方", ""]])
+    d.add_heading("三、热应力（任务 3）", 1)
+    table([["项目", "手算 / 结果"], ["线膨胀系数 α（10⁻⁶/K）", ""], ["自由热伸长 ΔL = α·L·Δt  mm", ""], ["有限元最大热变形 mm", ""],
+           ["最大热应力 MPa / 位置", ""], ["安全系数", ""]])
+    hint("热应力从哪来？实际减速器怎样减小热应力？")
+    d.add_heading("四、输出轴轻量化（任务 4）", 1)
+    table([["项目", "现行设计", "最优方案"], ["齿轮位直径 mm", "40", ""], ["轴伸直径 mm", "30", ""], ["质量 kg（平台）", "", ""],
+           ["质量 kg（手算，不扣键槽、倒角）", "", "—"], ["安全系数", "", ""], ["疲劳寿命", "", ""]])
+    table([["问题", "回答"], ["一句话：AI 填了哪些", ""], ["第几次以后很难再变好", ""], ["不满足要求的几次被哪条要求挡住", ""],
+           ["卡住最优解的要求", ""], ["安全系数要求提到 1.5 会怎样", ""], ["送设计台后校核结果、键要不要换", ""]])
+    d.add_heading("五、选做：CPU 散热片 / 拓扑优化（任务 5、6）", 1)
+    table([["项目", "结果"], ["散热片 h = 50 最高温度 ℃", ""], ["散热片 h = 8 最高温度 ℃", ""], ["散热片优化：最轻方案", ""],
+           ["拓扑优化 50%：柔度、形状", ""], ["拓扑优化 30%：柔度、形状", ""], ["拉伸成板件后安全系数", ""]])
+    d.add_heading("六、结论与讨论", 1)
+    d.add_paragraph("")
+    d.add_heading("七、附件", 1)
+    d.add_paragraph("平台生成的温度场报告（Word）、优化结果截图。", style="List Bullet")
     buf = io.BytesIO()
     d.save(buf)
     return buf.getvalue()
