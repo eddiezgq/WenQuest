@@ -1,0 +1,17 @@
+# 各章状态与英文标题（第 8 轮 2.1、2.2；本书第 18 轮）。
+# status：draft 草稿 / ai AI 审稿 / first 初审 / team 团队审阅 / final 定稿。没写的章不列。
+# title_en：有英文版的章必须写英文章名。
+parts_en:
+  导论: Introduction
+  第一篇 控制基础与 PLC 硬件: "Part I  Control Fundamentals and PLC Hardware"
+  第二篇 IEC 61131-3 编程语言: "Part II  The IEC 61131-3 Programming Languages"
+  第三篇 程序设计方法: "Part III  Program Design Methods"
+  第四篇 运动控制: "Part IV  Motion Control"
+  第五篇 工业通信: "Part V  Industrial Communication"
+  第六篇 人机界面、SCADA 与批处理: "Part VI  HMI, SCADA and Batch Control"
+  第七篇 安全: "Part VII  Safety"
+  第八篇 调试、测试与虚拟调试: "Part VIII  Commissioning, Testing and Virtual Commissioning"
+  第九篇 新一代控制器: "Part IX  New Generations of Controllers"
+  第十篇 典型设备的控制: "Part X  Controlling Typical Machines"
+  第十一篇 综合项目: "Part XI  Capstone Projects"
+chapters: {}
