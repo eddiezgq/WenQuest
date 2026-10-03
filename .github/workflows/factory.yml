@@ -294,6 +294,7 @@ jobs:
           pip install -q pyyaml
           python3 factory/deploy/classes.py factory/deploy/classes.yaml stage/docker-compose.classes.yml
           python3 factory/deploy/classes.py factory/deploy/classes.yaml --ids > stage/classes.ids
+          python3 factory/deploy/classes.py factory/deploy/classes.yaml --names > stage/classes.names
           tar czf - -C stage . | ssh "deploy@$HOST" \
             'mkdir -p /opt/wenquest/factory && tar xzf - -C /opt/wenquest/factory && chmod +x /opt/wenquest/factory/deploy/*.sh'
       - name: 更新数字工厂

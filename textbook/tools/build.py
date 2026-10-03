@@ -946,7 +946,9 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     for ch, secs in sorted(by_ch.items()):
         for sec in secs:
             for no, path, t in sec.tasks:
-                where = (f"《{book['title']}》{sec.id} 节", f"{book.get('title_en') or book['title']}, Section {sec.id}")
+                where = ((f"《{book['title']}》第 {ch} 章", f"{book.get('title_en') or book['title']}, Chapter {ch}")
+                         if sec.id.endswith((".0", ".end")) else      # 章首、章末小结不是“节”
+                         (f"《{book['title']}》{sec.id} 节", f"{book.get('title_en') or book['title']}, Section {sec.id}"))
                 stem = f"ts{no.replace('.', '_')}"
                 try:
                     tasksheet.task_doc(t, task_dir / f"{stem}-task.docx", no, where)
@@ -955,6 +957,9 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 except Exception as e:  # noqa: BLE001 — a broken task sheet is reported, not a crash
                     rep.add("error", "任务", sec.id, f"任务 {no}：生成 Word 失败：{e}")
                     continue
+                spec = dict(t, book=book["book"], no=no, section=sec.id, where=list(where),
+                            docs=[k for k in ("task", "rubric", "calc") if (task_dir / f"{stem}-{k}.docx").exists()])
+                (task_dir / f"{stem}.json").write_text(json.dumps(spec, ensure_ascii=False, indent=1), encoding="utf-8")   # 下达时发给数字工厂（第 11 轮 2.7（5））
                 index["tasks"].setdefault(str(ch), []).append({"no": no, "id": t["编号"], "title": t["标题"], "section": sec.id})
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     for ch, secs in by_ch.items():

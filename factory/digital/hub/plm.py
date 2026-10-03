@@ -204,8 +204,9 @@ def items_with_step(db, mode):
 
 # ---------------------------------------------------------------- 提交、审批
 def submit(db, emit, mode, author, author_uid, item, step=None, step_name=None, drawing=None, drawing_name=None,
-           gcode=None, operation=None, note="", params=None, extra_files=None, gcode_info=None):
-    """提交一个新版本。教学模式直接生效；生产模式进待审。返回提交记录"""
+           gcode=None, operation=None, note="", params=None, extra_files=None, gcode_info=None, hold=False):
+    """提交一个新版本。教学模式直接生效；生产模式进待审。hold=True（工程任务单里的提交，第 11 轮 2.7（5））：
+    教学模式也进待审，任务单批准时一并批准。返回提交记录"""
     from psycopg.types.json import Jsonb
     sid = uuid.uuid4().hex[:12]
     base = current_revision(db, mode, item)
@@ -245,7 +246,7 @@ def submit(db, emit, mode, author, author_uid, item, step=None, step_name=None, 
          "values (%s,%s,%s,'pending',%s,%s,%s,%s,%s,%s,%s,%s)",
          (sid, mode, item, author, author_uid, note, Jsonb(files), Jsonb(g) if g else None, Jsonb(params) if params else None,
           base, Jsonb(diff) if diff else None))
-    if mode == "teach":                                   # 教学模式：一步生效
+    if mode == "teach" and not hold:                      # 教学模式：一步生效
         return approve(db, emit, sid, author, "教学模式自动生效", check_self=False)
 
     emit("wq/gearbox/design/{}/submit".format(item.lower()), "design.submit",

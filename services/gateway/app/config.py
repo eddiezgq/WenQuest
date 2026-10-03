@@ -52,6 +52,10 @@ class Settings(BaseSettings):
     # 问渠数字工厂 course interface (read-only key copied by deploy/update.sh). Empty = lessons without factory data.
     factory_url: str = ""
     factory_read_key: str = ""
+    # Engineering task sheets (round 11, 2.7 (5)): server-to-server key of the hubs' /api/tasks/course/* and the class
+    # factories "pilot:试点班,g2:二班" (both copied by deploy/update.sh). Empty key = the course's 任务单 menu says “not connected”.
+    factory_task_key: str = ""
+    factory_classes: str = ""
     labcheck_timeout: float = 150.0
     # Built textbooks (textbook/ in the repository, built by CI): <dir>/<book>/web/index.json …
     textbook_dir: str = "/textbook"

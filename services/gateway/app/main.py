@@ -36,6 +36,7 @@ from . import slides as sl
 from . import studio as st
 from . import studio_api
 from . import textbook_api
+from . import tasks_api
 from .ai import ModelGateway
 from .mailer import Mailer
 from .config import Settings, get_settings
@@ -119,6 +120,7 @@ def create_app() -> FastAPI:
     life_api.register(app, sys.modules[__name__])
     textbook_api.register(app, sys.modules[__name__])
     course_pack.register(app, sys.modules[__name__])
+    tasks_api.register(app, sys.modules[__name__])
     return app
 
 

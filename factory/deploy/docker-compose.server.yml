@@ -90,6 +90,7 @@ services:
       WQ_LIBRARY_DIR: /library
       WQ_LIBRARY_ORIGINS: https://learn.${SITE_DOMAIN},https://factory.${SITE_DOMAIN}
       WQ_FACTORY_READ_KEY: ${WQ_FACTORY_READ_KEY:-}      # 课程接口只读钥匙（第 4 轮 C2）
+      WQ_FACTORY_TASK_KEY: ${WQ_FACTORY_TASK_KEY:-}      # 工程任务单钥匙（第 11 轮 2.7（5））
       WQ_PUBLIC_URL: https://factory.${SITE_DOMAIN}
       WQ_CLAUDE_KEY: ${WQ_CLAUDE_KEY:-}
       WQ_CLAUDE_MODEL: ${WQ_CLAUDE_MODEL:-claude-sonnet-5}

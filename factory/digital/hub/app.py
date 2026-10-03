@@ -1429,6 +1429,11 @@ from hub import opt_api as _opt  # noqa: E402
 _opt.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
 
 
+# ---------------------------------------------------------------- 工程任务单（第 11 轮《机械设计》2.7（5））
+from hub import tasks as _tasks  # noqa: E402
+_tasks.mount(app, H, user_of, who, _uid, _emit_as)
+
+
 # ---------------------------------------------------------------- 网页
 if os.path.isdir(WEB_DIST):
     app.mount("/assets", StaticFiles(directory=os.path.join(WEB_DIST, "assets")), name="assets")

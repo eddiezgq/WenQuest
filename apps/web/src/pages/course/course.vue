@@ -150,6 +150,7 @@
       <People v-else-if="tab === 'people'" :course-id="id" />
 
       <Grades v-else-if="tab === 'grades'" :course-id="id" />
+      <Tasks v-else-if="tab === 'tasks'" :course-id="id" />
       <Calendar v-else-if="tab === 'calendar'" :course-id="id" />
     </template>
 
@@ -182,6 +183,7 @@ import Discussions from "../../components/course/Discussions.vue";
 import Online from "../../components/course/Online.vue";
 import People from "../../components/course/People.vue";
 import Grades from "../../components/course/Grades.vue";
+import Tasks from "../../components/course/Tasks.vue";
 import Calendar from "../../components/course/Calendar.vue";
 import CourseEditor from "../../components/course/CourseEditor.vue";
 import { confirmAction, lifeApi } from "../../courseApi";

@@ -70,3 +70,21 @@ def test_problems_are_reported(tmp_path):
     _, bad = tasksheet.load(p)
     text = " ".join(bad)
     assert "缺少“背景”" in text and "XYZ" in text and "合计 60 分" in text and "none.py 不存在" in text
+
+
+def test_deliverable_kinds_for_the_platform(tmp_path):
+    """第 11 轮 2.7（5）：交付物的类型、格式、零件、必列。"""
+    import copy
+    d = copy.deepcopy(GOOD)
+    d["交付物"] = [
+        dict(GOOD["交付物"][0], 类型="文件", 格式=["docx", "pdf"]),
+        dict(GOOD["交付物"][0], 类型="设计发布", 零件="SH-301", 轴承=["6207"]),
+        dict(GOOD["交付物"][0], 类型="更改单", 必列=["GR-302", "KEY|键"]),
+    ]
+    _, p = write(tmp_path, d)
+    assert tasksheet.load(p)[1] == []
+    d["交付物"] = [dict(GOOD["交付物"][0], 类型="照片"), dict(GOOD["交付物"][0], 类型="分析"),
+                  dict(GOOD["交付物"][0], 格式=["exe"]), dict(GOOD["交付物"][0], 必列=["GR-302"])]
+    (p.parent / "ts1_1.yaml").write_text(yaml.safe_dump(d, allow_unicode=True), encoding="utf-8")
+    bad = " ".join(tasksheet.load(p)[1])
+    assert "类型 照片" in bad and "要写“零件”" in bad and "格式" in bad and "只用于类型“更改单”" in bad

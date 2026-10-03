@@ -36,6 +36,17 @@ if [ -r "$FACTORY_ENV" ]; then
         log "Digital factory read key updated."
     fi
     [ -n "$(envval WQ_FACTORY_URL)" ] || envset WQ_FACTORY_URL "https://factory.$(envval SITE_DOMAIN)"
+    # 工程任务单（第 11 轮 2.7（5））：任务单钥匙和班级工厂清单（编号:名称,…），课程里下达任务单时选班级工厂
+    tk=$(grep -E '^WQ_FACTORY_TASK_KEY=' "$FACTORY_ENV" | tail -n 1 | cut -d= -f2- || true)
+    if [ -n "$tk" ] && [ "$tk" != "$(envval WQ_FACTORY_TASK_KEY)" ]; then
+        envset WQ_FACTORY_TASK_KEY "$tk"
+        log "Digital factory task key updated."
+    fi
+    CLASSES_FILE="$(dirname "$FACTORY_ENV")/classes.names"
+    if [ -r "$CLASSES_FILE" ]; then
+        cn=$(tr -d '\n' < "$CLASSES_FILE")
+        [ "$cn" = "$(envval WQ_FACTORY_CLASSES)" ] || envset WQ_FACTORY_CLASSES "$cn"
+    fi
 fi
 
 log "Starting services..."
