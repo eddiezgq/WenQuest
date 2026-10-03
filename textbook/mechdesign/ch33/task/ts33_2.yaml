@@ -1,0 +1,35 @@
+# 工程任务单 TS-33-2（配 33.9、33.10 节）：协作机器人肩关节空心输出轴 RJ-201。格式见 textbook/tools/tasksheet.py。
+编号: TS-33-2
+标题: ["协作机器人肩关节空心输出轴 RJ-201 设计", "Design of the hollow shoulder-joint output shaft RJ-201 of a cobot"]
+角色: ["机器人事业部的关节设计工程师", "joint design engineer, robotics division"]
+背景:
+  - "公司要为一台工作半径约 850 mm、负载 4 kg 的协作机器人（零件库 B-ARM-UR5E 级）开发肩关节 J2 模组：伺服电机 → 谐波减速器 CSF-25-100 → 空心输出轴 RJ-201 → 一对深沟球轴承 → 大臂。系统设计分配给“输出轴扭转”的末端弹性偏移不超过 0.20 mm（峰值力矩下），内孔要留 Ø30 走线，设计寿命 20 000 h。你负责输出轴的设计，并核对减速器选型。"
+  - "The company is developing the shoulder (J2) module of a cobot with about 850 mm reach and 4 kg payload (class of B-ARM-UR5E in the parts library): servo motor → harmonic drive CSF-25-100 → hollow output shaft RJ-201 → a pair of deep-groove ball bearings → upper arm. The system budget allows at most 0.20 mm of tool deflection from output-shaft twist at peak torque, the bore must leave Ø30 for cables, and the design life is 20 000 h. You design the shaft and check the drive selection."
+输入:
+  - {名称: ["机械臂模型与搬运节拍（A → B 1 s，停 0.5 s，往返；末端 4 kg）", "Robot model and pick-and-place cycle (A → B in 1 s, 0.5 s dwell, and back; 4 kg payload)"], 来源: ["零件库 B-ARM-UR5E；数字工厂“运动与动力分析”（实验 9）；教材 33.10.2 节", "Parts library B-ARM-UR5E; factory Multibody Dynamics (Lab 9); Section 33.10.2"]}
+  - {名称: ["谐波减速器与轴承数据（额定、启停峰值、平均负载、瞬时最大转矩，输入最高转速；6009、6010 尺寸）", "Harmonic drive and bearing data (rated, repeated-peak, average, momentary torques, max input speed; 6009 and 6010 sizes)"], 来源: ["零件库 D-RDC-HD-CSF、A-BRG-DG", "Parts library D-RDC-HD-CSF, A-BRG-DG"]}
+  - {名称: ["物料 RJ-201（ERPNext）与材料库（40Cr 调质、7075-T6）", "Item RJ-201 (ERPNext) and material library (40Cr QT, 7075-T6)"], 来源: ["数字工厂 ERPNext；“仿真与分析”材料库", "Factory ERPNext; Simulation & Analysis material library"]}
+交付物:
+  - {名称: ["设计计算书（载荷、减速器核对、按刚度定尺寸、钢与铝方案比较、强度与急停、疲劳寿命）", "Calculation sheet (loads, drive check, stiffness sizing, steel vs aluminium, strength and emergency stop, fatigue life)"], 验收: ["力矩曲线来自自己的动力学计算；减速器三项核对有零件库出处；尺寸由末端偏移定，余量有说明；钢铝比较有结论和理由", "Torque curve from your own dynamics run; three drive checks cite the library; size set by tool deflection with a stated margin; steel vs aluminium concluded with reasons"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["三维模型（STEP，build123d 脚本或任何 CAD）", "3D model (STEP, from a build123d script or any CAD)"], 验收: ["内孔贯通、台阶有圆角、轴承位长度等于轴承宽度；尺寸与计算书一致", "Through bore, filleted steps, bearing seats as long as the bearings; dimensions match the sheet"], 类型: 设计发布, 零件: RJ-201, 轴承: [6010]}
+  - {名称: ["有限元与疲劳分析报告（“仿真与分析”导出的 Word：扭转角、应力、关节力矩记录的疲劳寿命）", "FEA and fatigue report (Word from Simulation & Analysis: twist, stress, fatigue life from the joint-torque record)"], 验收: ["扭转角与手算对照并解释差别；末端偏移 ≤ 0.20 mm；载荷谱选关节力矩记录", "Twist compared with hand calculation and the difference explained; tool deflection ≤ 0.20 mm; load spectrum from the joint-torque record"], 类型: 分析, 零件: RJ-201}
+工位: [MBD, CAD, FEA, FAT, PLM, ERP]
+步骤:
+  - ["载荷：在“运动与动力分析”里用 UR5e 模型、4 kg 末端负载算一个搬运节拍（可以自己改姿态），导出 J2 驱动力矩和大臂受力（33.10.2 节）", "Loads: run one pick-and-place cycle of the UR5e model with 4 kg in Multibody Dynamics (you may change the poses); export the J2 torque and the arm force (Section 33.10.2)"]
+  - ["减速器：在零件库查 CSF-25-100，核对峰值、平均负载转矩和输入转速；按瞬时允许最大转矩定急停工况（33.10.3 节）", "Drive: look up CSF-25-100 in the library; check peak, average torque and input speed; take the momentary torque as the emergency-stop case (Section 33.10.3)"]
+  - ["尺寸：按末端偏移列出至少三个方案（轴承位 / 内孔），选满足刚度的最轻方案；比较钢与铝合金（33.10.4、33.10.6 节）", "Size: tabulate at least three options (seat / bore) by tool deflection, pick the lightest that is stiff enough; compare steel and aluminium (Sections 33.10.4, 33.10.6)"]
+  - ["建模：用 build123d（参照程序 33.10.1 的 step_bytes）或任何 CAD 建 RJ-201，在“设计发布与审批”上传 STEP（33.9 节第 2 步）", "Model RJ-201 with build123d (see step_bytes in Program 33.10.1) or any CAD; upload the STEP in Design Release (Section 33.9, step 2)"]
+  - ["分析：在“仿真与分析”读入 RJ-201，减速器法兰端面固定、大臂法兰加峰值力矩，算扭转角和应力；疲劳载荷谱选“关节力矩记录”，算寿命，下载报告", "Analysis: load RJ-201 in Simulation & Analysis, fix the drive flange face, apply the peak torque at the arm flange, get twist and stress; choose the joint-torque record as the load spectrum, compute life, download the report"]
+  - ["提交：在“我的任务”上传计算书、模型和报告，预检，回复 AI 评审员和老师的意见", "Submit the sheet, model and report in My Tasks, run the pre-check, answer the AI reviewer and the instructor"]
+评审要点:
+  - ["载荷来自自己的动力学计算，计算书写明姿态、节拍和负载", "Loads come from your own dynamics run; poses, timing and payload are stated"]
+  - ["减速器核对用对了指标：峰值对启停允许峰值、平均负载转矩对平均负载允许值，没有拿峰值和额定转矩比", "Drive checked against the right limits: peak vs repeated peak, average vs average; peak not compared with the rated torque"]
+  - ["直径由刚度定，手算与有限元扭转角的差别有解释，余量有依据", "Diameter set by stiffness; difference between hand and FE twist explained; margin justified"]
+  - ["钢与铝的比较同时考虑刚度、质量和制造，结论不是“铝更轻”一句话", "Steel vs aluminium weighs stiffness, mass and manufacture; the answer is more than “aluminium is lighter”"]
+  - ["有限元约束与载荷说明清楚，没有读约束面附近的应力", "FE constraints and loads stated; no stresses read next to constraints"]
+评分:
+  - {项: ["载荷与减速器核对", "Loads and drive check"], 分: 25, 标准: ["力矩曲线正确；三项核对用对零件库数据；急停工况合理", "Correct torque curve; three checks with the right library data; sensible emergency-stop case"]}
+  - {项: ["按刚度定尺寸与材料比较", "Stiffness sizing and material comparison"], 分: 30, 标准: ["方案表完整；选型理由清楚；钢铝比较有数据有结论", "Complete option table; clear reasoning; data-based steel vs aluminium conclusion"]}
+  - {项: ["模型与有限元、疲劳报告", "Model, FEA and fatigue report"], 分: 30, 标准: ["模型正确；扭转角有手算对照；寿命按关节力矩记录计算并解释", "Correct model; twist checked by hand; life from the joint-torque record, explained"]}
+  - {项: ["评审闭环", "Review loop"], 分: 15, 标准: ["意见逐条回复、关闭", "Comments answered and closed one by one"]}
+学时: 4

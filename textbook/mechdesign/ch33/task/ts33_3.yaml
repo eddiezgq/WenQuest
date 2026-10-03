@@ -1,0 +1,35 @@
+# 工程任务单 TS-33-3（配 33.9、33.11 节）：工业平缝机上轴 LS-101 校核与提速评估。格式见 textbook/tools/tasksheet.py。
+编号: TS-33-3
+标题: ["工业平缝机上轴 LS-101 校核与提速评估", "Check of the lockstitch-machine upper shaft LS-101 and a speed-up assessment"]
+角色: ["缝纫机厂研发部的结构工程师", "structural engineer, R&D of a sewing-machine maker"]
+背景:
+  - "WQ-LS 工业平缝机的最高转速是 5 000 r/min。市场部希望下一代产品提到 5 500 r/min。上轴 LS-101（45 钢调质，轴颈 Ø12 磨削，两端 6201 轴承）每天转几千万圈，必须无限寿命。你负责校核上轴在两种转速下的强度和临界转速，并写出提速评估意见。"
+  - "The WQ-LS lockstitch machine runs at up to 5 000 r/min; marketing wants 5 500 r/min for the next model. The upper shaft LS-101 (45 steel QT, ground Ø12 journals, 6201 bearings at both ends) turns tens of millions of times a day and must have infinite life. You check its strength and critical speed at both speeds and write a speed-up assessment."
+输入:
+  - {名称: ["针杆机构数据（r = 15.5 mm，l = 55 mm，往复质量 0.12 kg，平衡率 0.45）、上轴结构与轴上零件质量", "Needle-bar mechanism data (r = 15.5 mm, l = 55 mm, reciprocating mass 0.12 kg, balance ratio 0.45), shaft layout and masses on the shaft"], 来源: ["《缝纫机设计与制造》第 3、8、23 章（示意数据）；教材 33.11.2 节", "Sewing Machine Design and Manufacturing, Chapters 3, 8, 23 (illustrative data); Section 33.11.2"]}
+  - {名称: ["物料 LS-101（ERPNext）、6201 轴承数据", "Item LS-101 (ERPNext), 6201 bearing data"], 来源: ["数字工厂 ERPNext；零件库 A-BRG-DG", "Factory ERPNext; parts library A-BRG-DG"]}
+  - {名称: ["机头臂一阶固有频率约 190 Hz", "First natural frequency of the head casting, about 190 Hz"], 来源: ["《缝纫机设计与制造》第 23 章（示意数据）", "Sewing Machine Design and Manufacturing, Chapter 23 (illustrative)"]}
+交付物:
+  - {名称: ["校核计算书（惯性力与转矩、台阶处一转之内的应力循环、无限寿命安全系数、临界转速；5 000 与 5 500 r/min 两种）", "Check sheet (inertia force and torque, stress cycle at the step over one revolution, infinite-life safety factor, critical speed; at 5 000 and 5 500 r/min)"], 验收: ["应力循环按轴上一点随轴转动来算，平均应力和应力幅都有；系数有出处；两种转速的结果列表对比", "Stress cycle computed for a point turning with the shaft, with mean and amplitude; factors cite sources; both speeds tabulated"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["三维模型（STEP）", "3D model (STEP)"], 验收: ["轴颈台阶有圆角，轴承位长度等于 6201 宽度；尺寸与计算书一致", "Journal steps filleted; bearing seats as long as a 6201; dimensions match the sheet"], 类型: 设计发布, 零件: LS-101, 轴承: [6201]}
+  - {名称: ["有限元报告（“仿真与分析”导出的 Word：强度、前三阶固有频率、按一转转矩 CSV 的疲劳寿命）", "FEA report (Word from Simulation & Analysis: strength, first three natural frequencies, fatigue life from a one-revolution torque CSV)"], 验收: ["固有频率用“只限中间一圈”的轴承支承，并与梁单元法（光轴）对照；说明整圈约束为什么偏高", "Natural frequencies with ring bearing supports, compared with the beam model (bare shaft); why full-seat constraints read high is explained"], 类型: 分析, 零件: LS-101}
+  - {名称: ["提速评估意见（一页）", "Speed-up assessment (one page)"], 验收: ["结论明确：上轴是否需要改；提速的主要风险在哪里（二阶激振与机头固有频率）；建议的措施", "Clear conclusion: does the shaft need changes; where the main risk lies (second-order excitation vs the head's natural frequency); recommended measures"], 类型: 文件, 格式: [docx, pdf]}
+工位: [CAD, FEA, FAT, PY, PLM]
+步骤:
+  - ["载荷：按式 (33.11.1) 算两种转速下曲柄对上轴的力和惯性转矩，画出随转角的曲线（可改程序 33.11.1）", "Loads: compute the crank force and inertia torque at both speeds from Eq. (33.11.1) and plot them against crank angle (you may adapt Program 33.11.1)"]
+  - ["应力循环与安全系数：在台阶截面取点随轴转一圈，求 σa、σm 和 τa、τm，按式 (33.5.5) 算无限寿命安全系数（33.11.3、33.11.4 节）", "Stress cycle and safety: follow points on the step section round one revolution, get σa, σm, τa, τm, and the infinite-life safety factor from Eq. (33.5.5) (Sections 33.11.3, 33.11.4)"]
+  - ["临界转速：梁单元法带集中质量和不带集中质量各算一次（33.7、33.11.5 节）", "Critical speed: beam elements with and without the lumped masses (Sections 33.7, 33.11.5)"]
+  - ["建模与分析：建 LS-101 并上传；在“仿真与分析”里算强度和固有频率（两种轴承支承各算一次）；把一转之内的转矩写成 CSV 上传作载荷谱，算疲劳寿命，下载报告（33.9 节）", "Model and upload LS-101; in Simulation & Analysis compute strength and natural frequencies (both bearing-support options); upload one revolution of torque as a CSV spectrum, compute life, download the report (Section 33.9)"]
+  - ["评估：比较 5 000 与 5 500 r/min，结合机头臂固有频率写提速评估意见（33.11.6 节）", "Assess: compare 5 000 and 5 500 r/min and, with the head's natural frequency, write the speed-up assessment (Section 33.11.6)"]
+  - ["提交：在“我的任务”上传交付物，预检，回复意见", "Submit in My Tasks, pre-check, answer comments"]
+评审要点:
+  - ["没有简单地把弯曲应力当作对称循环；随轴转动的力产生平均应力，这一点在计算书里说清楚", "Bending is not just assumed fully reversed; the mean stress from loads turning with the shaft is explained"]
+  - ["台阶处的应力集中系数、缺口敏感系数、尺寸和表面系数有出处", "Stress-concentration, notch-sensitivity, size and surface factors at the step cite sources"]
+  - ["有限元固有频率与梁单元法对照，轴承约束的选择有理由", "FE natural frequencies compared with the beam model; the bearing constraint is justified"]
+  - ["提速意见回到整台机器：轴之外的风险（机头振动、平衡）有分析", "The assessment looks at the whole machine: risks beyond the shaft (head vibration, balancing) are analysed"]
+评分:
+  - {项: ["载荷与应力循环", "Loads and stress cycle"], 分: 25, 标准: ["惯性力、转矩正确；应力循环按旋转点计算", "Correct inertia force and torque; stress cycle for a rotating point"]}
+  - {项: ["无限寿命与临界转速", "Infinite life and critical speed"], 分: 25, 标准: ["系数与安全系数正确；两种转速对比；临界转速与转速比正确", "Correct factors and safety; both speeds compared; correct critical speed and ratio"]}
+  - {项: ["模型与有限元报告", "Model and FEA report"], 分: 25, 标准: ["模型正确；固有频率有对照；疲劳寿命按 CSV 载荷谱计算", "Correct model; natural frequencies checked; fatigue from the CSV spectrum"]}
+  - {项: ["提速评估与评审闭环", "Assessment and review loop"], 分: 25, 标准: ["结论明确、有依据；意见逐条关闭", "Clear, supported conclusion; comments closed one by one"]}
+学时: 4

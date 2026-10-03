@@ -573,6 +573,7 @@
 33,刚性轴,rigid shaft (subcritical shaft),
 33,挠性轴,flexible shaft (supercritical shaft),
 33,梁单元法,beam element method,
+33,无限寿命,infinite life,按疲劳极限设计、不计循环次数
 34,滚动轴承,rolling-element bearing; rolling bearing,
 34,深沟球轴承,deep-groove ball bearing,
 34,角接触球轴承,angular-contact ball bearing,

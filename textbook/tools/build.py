@@ -775,6 +775,9 @@ def check_numbers(sec: Section, rep: Report) -> None:
     text = re.sub(r"https?://\S+", "", text)
     text = re.sub(r"\b(?:JJF|JJG|GB(?:/T)?|JB(?:/T)?|ISO|IEC|IEEE|DIN|VDI|EN|ASTM|ASME|AWS|SAE)\s*[A-Z]?[\d.]+", "", text)     # standard numbers, e.g. JJF 1059.1, JB/T 9165.2
     text = re.split(r"\*\*本节参考文献\*\*|#+\s*(?:本章)?参考文献|\*\*Section references\*\*|#+\s*(?:Chapter )?References", text, flags=re.I)[0]
+    ch = sec.id.split(".")[0]
+    if ch.isdigit():                                    # 本章的节号（如 33.10、33.11）不是数据
+        text = re.sub(rf"(?<![\d.]){ch}\.\d{{1,2}}(?![\d])", "", text)
     for line_no, line in enumerate(text.splitlines(), 1):
         for m in NUMBER.finditer(line):
             digits = m.group(1).replace(".", "").lstrip("0")
