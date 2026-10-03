@@ -36,6 +36,8 @@ defineProps<{ html: string }>();
 .book :deep(.wq-poster) { display: block; width: 100%; border-radius: 6px; }
 .book :deep(.wq-labbtn) { display: inline-block; margin: 6px 0 4px; padding: 10px 18px; border-radius: 8px; background: #b8860b; color: #fff; font-family: "Noto Sans CJK SC", sans-serif; font-size: 15px; text-decoration: none; }
 .book :deep(.wq-labdoc) { display: inline-block; margin: 6px 0 4px 10px; padding: 9px 14px; border-radius: 8px; border: 1px solid #b8860b; color: #8a6508; font-family: "Noto Sans CJK SC", sans-serif; font-size: 14px; text-decoration: none; background: #fff; }
+.book :deep(.wq-part) { color: #1d5f8c; text-decoration: none; border-bottom: 1px dotted #1d5f8c; }
+.book :deep(.wq-part-ref) { font-size: 0.7em; color: #6b7780; margin-left: 2px; }
 .book :deep(.wq-taskbox) { border: 1px solid #2f6f4f; border-left: 5px solid #2f6f4f; border-radius: 8px; background: #f4faf6; padding: 12px 14px; margin: 12px 0; font-family: "Noto Sans CJK SC", sans-serif; font-size: 15px; }
 .book :deep(.wq-task-head) { color: #1f4d36; font-size: 16px; margin-bottom: 4px; }
 .book :deep(.wq-task-role) { color: #4b5b52; font-size: 14px; margin-bottom: 6px; }

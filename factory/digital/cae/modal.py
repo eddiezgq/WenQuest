@@ -87,7 +87,14 @@ def solve(step_bytes, setup, workdir=None, n_modes=6):
                 fixed |= nodes
             else:
                 o, d = S._axis(l)
-                cyl.append((nodes, o, d, sorted({S.SUPPORT_DOFS[k] for k in l.get("dofs") or ["radial"]})))
+                nodes = S.band_nodes(nodes, P, o, d, l.get("band_mm"))
+                dofs = sorted({S.SUPPORT_DOFS[k] for k in l.get("dofs") or ["radial"]})
+                if l.get("band_mm") and 3 in dofs and len(dofs) > 1:          # 同 solve.py：铰支的止推只限一个节点的轴向
+                    n0 = min(nodes)
+                    cyl.append((nodes - {n0}, o, d, [x for x in dofs if x != 3]))
+                    cyl.append(({n0}, o, d, dofs))
+                else:
+                    cyl.append((nodes, o, d, dofs))
         seen = set(fixed)
         for nodes, *_ in cyl:
             nodes -= seen

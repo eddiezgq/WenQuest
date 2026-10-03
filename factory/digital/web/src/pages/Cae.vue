@@ -126,6 +126,7 @@
                   <select v-model="r.axis"><option v-for="a in axes" :key="a.key" :value="a.key">{{ a.label }}</option></select></label>
               </template>
               <label v-if="r.kind === 'bearing'" class="chk"><input v-model="r.thrust" type="checkbox"> 止推（也限制轴向）</label>
+              <label v-if="r.kind === 'bearing'" class="chk" title="单列深沟球轴承允许轴在轴承里转一点角度，接近铰支；整个轴承位都限径向相当于把轴夹住，刚度、固有频率偏高"><input v-model="r.ring" type="checkbox"> 只限中间一圈（铰支）</label>
             </div>
             <div v-if="rowErr(r)" class="small err">{{ rowErr(r) }}</div>
           </div>

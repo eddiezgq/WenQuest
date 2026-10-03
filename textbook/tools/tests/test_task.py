@@ -88,3 +88,17 @@ def test_deliverable_kinds_for_the_platform(tmp_path):
     (p.parent / "ts1_1.yaml").write_text(yaml.safe_dump(d, allow_unicode=True), encoding="utf-8")
     bad = " ".join(tasksheet.load(p)[1])
     assert "类型 照片" in bad and "要写“零件”" in bad and "格式" in bad and "只用于类型“更改单”" in bad
+
+
+def test_parts_library_links():
+    """第 11 轮：[[零件:编号/规格]] 链到零件库，编号、规格都要在零件库里"""
+    import build
+    rep = build.Report()
+
+    class Sec:
+        id, lang = "33.2", "zh"
+    h = build.part_html(Sec, "A-BRG-DG", "6207", rep)
+    assert "深沟球轴承 6207" in h and "ref=A-BRG-DG/6207" in h and not rep.problems
+    build.part_html(Sec, "A-BRG-DG", "9999", rep)
+    build.part_html(Sec, "X-NOPE", None, rep)
+    assert len(rep.problems) == 2

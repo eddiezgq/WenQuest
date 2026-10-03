@@ -166,6 +166,19 @@ SUPPORT_DOFS = {"radial": 1, "tangential": 2, "axial": 3}
 SUPPORTS = ("fixed", "cyl_support")
 
 
+def band_nodes(nodes, P, o, d, band_mm):
+    """轴承支承只限制轴承位中间宽 band_mm（建议 1 mm）的一圈（第 11 轮《机械设计》）：整个轴承位都限径向，相当于把轴夹住、不让它在
+    轴承里转一点角度，弯曲刚度和固有频率都会偏高；单列深沟球轴承更接近“铰支”。band_mm 为空或 0 = 整个面（原来的做法）"""
+    if not band_mm:
+        return nodes
+    zs = {n: float(np.dot(P[n] - o, d)) for n in nodes}
+    mid = (min(zs.values()) + max(zs.values())) / 2
+    gaps = sorted(abs(z - mid) for z in zs.values())
+    thr = max(float(band_mm) / 2, gaps[min(11, len(gaps) - 1)])       # 网格粗时一圈里节点少：至少留 12 个
+    keep = {n for n, z in zs.items() if abs(z - mid) <= thr + 1e-9}
+    return keep or nodes
+
+
 def _axis(l):
     o = np.array(l["axis"]["origin"], float)
     d = np.array(l["axis"]["dir"], float)
@@ -212,7 +225,14 @@ def solve(step_bytes, setup, workdir=None):
             if l["type"] == "cyl_support":
                 o, d = _axis(l)
                 dofs = sorted({SUPPORT_DOFS[k] for k in l.get("dofs") or ["radial"]})
-                cyl.append((nodes, o, d, dofs))
+                nodes = band_nodes(nodes, P, o, d, l.get("band_mm"))
+                if l.get("band_mm") and 3 in dofs and len(dofs) > 1:
+                    # 铰支的止推：轴向只限一个节点（只消除沿轴线的刚体移动）；整圈都限轴向会把截面夹住、不让它转角
+                    n0 = min(nodes)
+                    cyl.append((nodes - {n0}, o, d, [x for x in dofs if x != 3]))
+                    cyl.append(({n0}, o, d, dofs))
+                else:
+                    cyl.append((nodes, o, d, dofs))
                 constrained |= nodes
                 continue
             area = sum(np.linalg.norm(np.cross(P[t[1]] - P[t[0]], P[t[2]] - P[t[0]])) / 2 for t in tris)

@@ -279,3 +279,34 @@ def test_modal_cantilever_matches_beam_theory():
     assert abs(float(surf["u"].__abs__().max()) - 1.0) < 1e-3 or abs(float((surf["u"] ** 2).sum(axis=1).max()) - 1.0) < 1e-3
     with pytest.raises(ValueError):
         MO.solve(step, {"material": mat, "loads": [{"type": "force", "faces": [1], "vector_n": [1, 0, 0]}]})
+
+
+def test_ring_bearing_supports_are_pinned():
+    """第 11 轮：轴承“只限中间一圈”（band_mm）接近铰支——两轴承间光轴的一阶固有频率与梁理论（简支）相差 < 5%；
+    整个轴承位都限径向、整圈限轴向时明显偏高（把轴夹住了）"""
+    import build123d as bd
+    import tempfile
+    from cae import modal as MO
+    z, s = 0.0, None
+    for d, L in ((12, 10), (16, 200), (12, 10)):
+        c = bd.Pos(0, 0, z) * bd.Cylinder(d / 2, L, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN))
+        s = c if s is None else s + c
+        z += L
+    p = os.path.join(tempfile.mkdtemp(), "s.step")
+    bd.export_step(s.clean(), p)
+    step = open(p, "rb").read()
+    faces, _, _ = G.faces(step)
+    seats = sorted((f for f in faces if f["kind"] == "cylinder" and abs(f["bbox"][3] - f["bbox"][0] - 12) < 0.1), key=lambda f: f["bbox"][2])
+    ax = {"origin": [0, 0, 0], "dir": [0, 0, 1]}
+    mat = M.get("45-QT")
+
+    def f1(band):
+        st, _ = MO.solve(step, {"material": mat, "mesh": {"size_mm": 3}, "loads": [
+            {"type": "cyl_support", "faces": [seats[0]["id"]], "dofs": ["radial", "axial"], "axis": ax, "band_mm": band},
+            {"type": "cyl_support", "faces": [seats[1]["id"]], "dofs": ["radial"], "axis": ax, "band_mm": band}]}, n_modes=1)
+        return st["freqs"][0]["hz"]
+    # 简支梁（跨距 = 两轴承中心距 210，忽略两端各 5 mm 的细段）：f = (π/2L²)√(EI/ρA)
+    I, A, Ls = math.pi * 16 ** 4 / 64, math.pi * 16 ** 2 / 4, 210.0
+    f_ss = math.pi / (2 * Ls ** 2) * math.sqrt(mat["E_mpa"] * I / (mat["density_t_mm3"] * A))
+    assert abs(f1(1) - f_ss) / f_ss < 0.05
+    assert f1(None) > 1.3 * f_ss

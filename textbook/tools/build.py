@@ -563,9 +563,51 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
             f"<figcaption>{label}{gap}{cap}</figcaption>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
 
 
+# ---------------------------------------------------------------- 零件库链接（第 11 轮《机械设计》第 33 章修订，各书共用）
+# 正文写 [[零件:A-BRG-DG/6207]] 或 [[零件:D-RDC-HD-CSF]]：阅读页显示零件名和规格，点开是数字工厂零件库的对应页面；
+# 构建时核对编号（和规格）在零件库里存在（library/catalog）。
+PART = re.compile(r"\[\[零件:([A-Z][A-Z0-9-]+)(?:/([^\]\s]+))?\]\]")
+LIBRARY_DIR = ROOT / "library" / "catalog"
+LIBRARY_URL = os.environ.get("WQ_LIBRARY_URL", "https://factory.wenquestrobotics.com/library")
+_LIB: dict = {}
+
+
+def library_entry(pid: str) -> dict | None:
+    if pid not in _LIB:
+        hit = next(iter(LIBRARY_DIR.glob(f"*/{pid}/entry.yaml")), None) if LIBRARY_DIR.is_dir() else None
+        if hit is None:
+            _LIB[pid] = None
+        else:
+            import csv
+            e = yaml.safe_load(hit.read_text(encoding="utf-8")) or {}
+            sizes = set()
+            sp = hit.parent / "specs.csv"
+            if sp.exists():
+                with sp.open(encoding="utf-8") as fh:
+                    sizes = {r[0] for r in csv.reader(fh) if r}
+            _LIB[pid] = {"name": e.get("name") or {}, "sizes": sizes}
+    return _LIB[pid]
+
+
+def part_html(sec: "Section", pid: str, size: str | None, rep: "Report") -> str:
+    e = library_entry(pid)
+    if e is None:
+        rep.add("error", "零件库", sec.id, f"零件库里没有 {pid}（library/catalog）")
+        return html.escape(pid + ("/" + size if size else ""))
+    if size and size not in e["sizes"]:
+        rep.add("error", "零件库", sec.id, f"零件库 {pid} 没有规格 {size}")
+    name = (e["name"].get("en") if sec.lang == "en" else e["name"].get("zh")) or pid
+    ref = pid + ("/" + size if size else "")
+    label = name + (" " + size if size else "")
+    return (f"<a class='wq-part' data-ref='{html.escape(ref)}' href='{html.escape(LIBRARY_URL)}?ref={html.escape(ref)}' "
+            f"target='_blank' rel='noopener'>{html.escape(label)}<sup class='wq-part-ref'>{'library ' if sec.lang == 'en' else '零件库 '}"
+            f"{html.escape(ref)}</sup></a>")
+
+
 def render_section(sec: Section, text: str, values: dict, rep: Report, formulas: list) -> str:
     store: list = []
     text = protect(text, store, FENCE, lambda m: ("raw", None, m.group(0)))
+    text = protect(text, store, PART, lambda m: ("part", (m.group(1), m.group(2)), None))
     text = protect(text, store, DIRECTIVE, lambda m: ("directive", (m.group(1), m.group(2), m.group(3)), None))
     text = protect(text, store, DISPLAY, lambda m: ("math", True, m.group(1).strip()))
     text = protect(text, store, INLINE, lambda m: ("math", False, m.group(1).strip()))
@@ -580,6 +622,8 @@ def render_section(sec: Section, text: str, values: dict, rep: Report, formulas:
         kind, a, b = store[i]
         if kind == "directive":
             return directive_html(sec, a[0], a[1], a[2], values, rep)
+        if kind == "part":
+            return part_html(sec, a[0], a[1], rep)
         if kind == "math":
             formulas.append((sec.id, b, a))
             return f"WQMATH{len(formulas) - 1}Z"
