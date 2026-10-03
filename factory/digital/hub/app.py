@@ -78,6 +78,7 @@ class Hub:
         self.hist = None
         self.mes = None
         self.teach = None
+        self.twin = None
         self.stop = threading.Event()
         self.last_brief = {}
         self._ncr_sent = set()
@@ -97,15 +98,24 @@ class Hub:
         self.hist.load()
         self.mes = MES(self.db, self.publish)
         self.teach = Teach(self.db)
+        from hub.twin import TwinService
+        self.twin = TwinService(self.db, self.publish)
+        self.twin.init()
         self.bus.subscribe("wq/#", self.hist.handle_raw, raw=True)
         try:
             self.bus.start(timeout=float(os.environ.get("WQ_MQTT_TIMEOUT", "20")))
         except ConnectionError:
             log.exception("总线未就绪，后台继续重连")
         threading.Thread(target=self._loop, daemon=True, name="ai-loop").start()
+        threading.Thread(target=self.twin.run, daemon=True, name="field-sim").start()
 
     def on_message(self, tp, msg):
         t = msg["type"]
+        if t in ("test.torque", "twin.telemetry"):
+            try:
+                self.twin.on_message(tp, msg)
+            except Exception:  # noqa: BLE001
+                log.exception("数字孪生处理消息出错")
         if t == "erp.doc":
             self.ai.on_erp_result(msg)
         elif t == "design.release":
@@ -1402,6 +1412,7 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     H.hist._failed_parts.clear()
     H.ai._sent = {k: v for k, v in H.ai._sent.items() if k[0] != "teach"}
     H.db.x("update quality_problem set cleared_at=now(), cleared_how='scenario' where mode='teach' and cleared_at is null")
+    H.twin.reset("teach")
     H.mes.command("sim", "load_scenario", "teach", who(u), speed=float(body.get("speed", 1)))
     return {"reset": True}
 
@@ -1427,6 +1438,10 @@ _cam.mount_release(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")),
 # ---------------------------------------------------------------- 设计优化（第 14 轮）
 from hub import opt_api as _opt  # noqa: E402
 _opt.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
+
+# ---------------------------------------------------------------- 数字孪生（第 15 轮）
+from hub import twin_api as _twin  # noqa: E402
+_twin.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
 
 
 # ---------------------------------------------------------------- 工程任务单（第 11 轮《机械设计》2.7（5））

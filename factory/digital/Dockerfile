@@ -31,6 +31,7 @@ COPY seed.py seed.py
 COPY digital/wqbus/ digital/wqbus/
 COPY digital/sim/ digital/sim/
 COPY digital/hub/ digital/hub/
+COPY digital/twin/ digital/twin/
 COPY digital/freecad/ digital/freecad/
 COPY --from=menagerie /opt/menagerie /opt/menagerie
 COPY digital/cae/ digital/cae/

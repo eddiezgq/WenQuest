@@ -69,6 +69,14 @@ DATA_SCHEMAS = {
     "test.torque": _obj(["item", "part_serial", "rate_hz", "samples_nm"], {
         "rate_hz": {"type": "number", "exclusiveMinimum": 0},
         "samples_nm": {"type": "array", "items": NUM, "minItems": 2, "maxItems": 20000}}),
+    # 第 15 轮：现场运行摘要（客户现场模拟器和真设备都发这个），主题 wq/gearbox/field/<序列号>/telemetry
+    "twin.telemetry": _obj(["serial", "day", "period_h", "run_h"], {
+        "serial": STR, "day": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"}, "period_h": {"type": "number", "exclusiveMinimum": 0},
+        "run_h": {"type": "number", "minimum": 0}, "starts": {"type": "integer", "minimum": 0}, "n_in_rpm": NUM,
+        "torque_mean_nm": NUM, "torque_max_nm": NUM, "t_amb_c": NUM, "oil_t_c": NUM, "oil_t_max_c": NUM,
+        "vib_mm_s": {"type": "number", "minimum": 0},
+        "rainflow": {"type": "array", "items": {"type": "array", "minItems": 3, "maxItems": 3, "items": NUM}},
+        "load_hist": {"type": "array", "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": NUM}}}),
     "logistics.status": _obj(["x_m", "y_m"], {"x_m": NUM, "y_m": NUM, "battery": FRAC}),
     "ai.alert": _obj(["level", "title"], {"level": {"enum": ["info", "warn", "critical"]},
                                           "evidence": EVIDENCE}),
