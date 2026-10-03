@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CMOS 反相器实验台</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../kit/wq-lab.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="course" data-en="Digital Integrated Circuit Design · Chapter 1 The CMOS Inverter">数字集成电路设计 · 第 1 章 CMOS 反相器</div>
+      <h1 data-en="CMOS Inverter Lab Bench">CMOS 反相器实验台</h1>
+    </div>
+    <div class="hright">
+      <span id="progress"></span>
+      <button class="lang" id="lang" aria-label="切换语言 / Switch language">EN</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="实验">
+    <button data-lab="1"><span class="no">1.1</span><span data-en="Switch &amp; inverter">开关与反相器</span><span class="done"></span></button>
+    <button data-lab="2"><span class="no">1.2</span><span data-en="Transfer curve">传输特性</span><span class="done"></span></button>
+    <button data-lab="3"><span class="no">1.3</span><span data-en="Sizing">尺寸与对称</span><span class="done"></span></button>
+    <button data-lab="4"><span class="no">1.4</span><span data-en="Inverter chain">延时与反相器链</span><span class="done"></span></button>
+    <button data-lab="5"><span class="no">1.5</span><span data-en="Power">功耗</span><span class="done"></span></button>
+  </nav>
+
+  <!-- ===================================================== 1.1 -->
+  <section class="lab" id="lab-1" hidden>
+    <div class="stagebox">
+      <canvas id="s1" class="short" style="border-top:0" aria-label="反相器开关示意"></canvas>
+      <div class="legend" id="lg1"></div>
+      <canvas id="c1" aria-label="NMOS 输出特性与负载线"></canvas>
+      <div class="goal" data-en="&lt;b&gt;Goal&lt;/b&gt; When the input is high the NMOS acts as a resistor to ground. Where its output curve meets the load current is the output low level V&lt;sub&gt;OL&lt;/sub&gt;. Widen the NMOS and watch V&lt;sub&gt;OL&lt;/sub&gt; fall."><b>目标</b> 输入为高时，NMOS 相当于接地的电阻。它的输出特性曲线与负载电流的交点，就是输出低电平 V<sub>OL</sub>。加宽 NMOS，看 V<sub>OL</sub> 怎样下降。</div>
+      <div class="problem" id="pb1"></div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="row" style="margin-bottom:10px">
+          <span data-en="Input">输入</span>
+          <button class="btn chip" id="vin1lo" aria-pressed="false" data-en="Low 0 V">低 0 V</button>
+          <button class="btn chip" id="vin1hi" aria-pressed="true" data-en="High 1.8 V">高 1.8 V</button>
+        </div>
+        <div class="ctl"><label for="wn1" data-en="NMOS width W&lt;sub&gt;n&lt;/sub&gt;">NMOS 宽度 W<sub>n</sub></label><output id="wn1o"></output><input type="range" id="wn1" min="0.42" max="12" step="0.01" value="2"></div>
+        <div class="ctl"><label for="il1" data-en="Load current I&lt;sub&gt;load&lt;/sub&gt;">负载电流 I<sub>load</sub></label><output id="il1o"></output><input type="range" id="il1" min="0.1" max="3" step="0.05" value="1"></div>
+        <p class="hint" data-en="L = 0.15 μm, V&lt;sub&gt;DD&lt;/sub&gt; = 1.8 V. Parameters are illustrative, calibrated to SKY130 later.">L = 0.15 μm，V<sub>DD</sub> = 1.8 V。参数为示意值，以后按 SKY130 校准。</p>
+      </div>
+      <div class="card"><h3 data-en="READINGS">读数</h3><dl class="readout" id="ro1"></dl></div>
+      <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk1"></ul></div>
+      <div class="card open"><h3 data-en="OPEN QUESTION">开放问题</h3>
+        <p data-en="If the optocoupler needed 5 mA, is simply widening the NMOS a good answer? What else could you do on the chip or on the board?">如果光耦需要 5 mA，只靠继续加宽 NMOS 合理吗？在芯片上或电路板上还能怎么办？</p>
+        <textarea id="op1" data-ph-en="Your answer (saved on this device)" placeholder="写下你的想法（保存在本机）"></textarea></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 1.2 -->
+  <section class="lab" id="lab-2" hidden>
+    <div class="stagebox">
+      <div class="legend" id="lg2"></div>
+      <canvas id="c2" aria-label="电压传输特性"></canvas>
+      <div class="goal" data-en="&lt;b&gt;Goal&lt;/b&gt; Sweep the input and read the transfer curve: the switching threshold V&lt;sub&gt;M&lt;/sub&gt;, the two slope = −1 points V&lt;sub&gt;IL&lt;/sub&gt;, V&lt;sub&gt;IH&lt;/sub&gt;, and the noise margins. The shaded bands are input noise."><b>目标</b> 扫描输入，读出传输特性：开关阈值 V<sub>M</sub>、两个斜率为 −1 的点 V<sub>IL</sub>、V<sub>IH</sub>，以及噪声容限。阴影带表示输入上的干扰。</div>
+      <div class="problem" id="pb2"></div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl"><label for="r2" data-en="Size ratio W&lt;sub&gt;p&lt;/sub&gt;/W&lt;sub&gt;n&lt;/sub&gt;">尺寸比 W<sub>p</sub>/W<sub>n</sub></label><output id="r2o"></output><input type="range" id="r2" min="0.5" max="4" step="0.05" value="1"></div>
+        <div class="ctl"><label for="vi2" data-en="Input V&lt;sub&gt;in&lt;/sub&gt; (cursor)">输入 V<sub>in</sub>（游标）</label><output id="vi2o"></output><input type="range" id="vi2" min="0" max="1.8" step="0.01" value="0.4"></div>
+        <div class="ctl"><label for="nz2" data-en="Noise amplitude">干扰幅度</label><output id="nz2o"></output><input type="range" id="nz2" min="0" max="0.6" step="0.05" value="0"></div>
+      </div>
+      <div class="card"><h3 data-en="READINGS">读数</h3><dl class="readout" id="ro2"></dl></div>
+      <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk2"></ul></div>
+      <div class="card open"><h3 data-en="OPEN QUESTION">开放问题</h3>
+        <p data-en="In the middle of the curve the slope is much steeper than −1. Why does that matter when ten inverters are cascaded and a little noise rides on the first input?">传输特性中段的斜率远大于 1。十个反相器串起来、第一级输入带一点干扰时，这有什么好处？</p>
+        <textarea id="op2" data-ph-en="Your answer (saved on this device)" placeholder="写下你的想法（保存在本机）"></textarea></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 1.3 -->
+  <section class="lab" id="lab-3" hidden>
+    <div class="stagebox">
+      <div class="legend" id="lg3"></div>
+      <canvas id="c3" aria-label="输入输出波形"></canvas>
+      <canvas id="d3" class="short" aria-label="延时随尺寸比变化"></canvas>
+      <div class="goal" data-en="&lt;b&gt;Goal&lt;/b&gt; The PMOS has lower mobility, so a same-size PMOS pulls up slowly. Change W&lt;sub&gt;p&lt;/sub&gt;/W&lt;sub&gt;n&lt;/sub&gt; and compare t&lt;sub&gt;PHL&lt;/sub&gt;, t&lt;sub&gt;PLH&lt;/sub&gt; and their average t&lt;sub&gt;p&lt;/sub&gt; (lower plot)."><b>目标</b> PMOS 迁移率低，同样尺寸时上拉慢。改变 W<sub>p</sub>/W<sub>n</sub>，比较 t<sub>PHL</sub>、t<sub>PLH</sub> 和平均延时 t<sub>p</sub>（下图）。</div>
+      <div class="problem" id="pb3"></div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl"><label for="r3" data-en="Size ratio W&lt;sub&gt;p&lt;/sub&gt;/W&lt;sub&gt;n&lt;/sub&gt;">尺寸比 W<sub>p</sub>/W<sub>n</sub></label><output id="r3o"></output><input type="range" id="r3" min="0.5" max="4" step="0.05" value="1"></div>
+        <div class="ctl"><label for="fo3" data-en="Fan-out (load = n identical inverters)">扇出（负载为 n 个相同反相器）</label><output id="fo3o"></output><input type="range" id="fo3" min="1" max="8" step="1" value="4"></div>
+        <p class="hint" data-en="W&lt;sub&gt;n&lt;/sub&gt; = 0.42 μm (minimum). Delay model: t = 0.69·R&lt;sub&gt;eq&lt;/sub&gt;·C.">W<sub>n</sub> = 0.42 μm（最小）。延时模型：t = 0.69·R<sub>eq</sub>·C。</p>
+      </div>
+      <div class="card"><h3 data-en="READINGS">读数</h3><dl class="readout" id="ro3"></dl></div>
+      <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk3"></ul></div>
+      <div class="card open"><h3 data-en="OPEN QUESTION">开放问题</h3>
+        <p data-en="Symmetric sizing gives equal edges; W&lt;sub&gt;p&lt;/sub&gt;/W&lt;sub&gt;n&lt;/sub&gt; ≈ √r gives the smallest average delay. Which would you use for the motor-controller clock buffer, and which for an ordinary logic path? Why?">对称尺寸让上升下降一样快；W<sub>p</sub>/W<sub>n</sub> ≈ √r 让平均延时最小。电机控制芯片的时钟缓冲该用哪个？普通逻辑路径呢？为什么？</p>
+        <textarea id="op3" data-ph-en="Your answer (saved on this device)" placeholder="写下你的想法（保存在本机）"></textarea></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 1.4 -->
+  <section class="lab" id="lab-4" hidden>
+    <div class="stagebox">
+      <canvas id="s4" class="short" style="border-top:0" aria-label="反相器链示意"></canvas>
+      <div class="legend" id="lg4"></div>
+      <canvas id="c4" aria-label="总延时随级数变化"></canvas>
+      <div class="goal" data-en="&lt;b&gt;Goal&lt;/b&gt; A minimum inverter cannot drive 10 pF quickly. Insert a chain whose stages grow by a factor f each. Find the number of stages that minimises total delay."><b>目标</b> 最小反相器直接驱动 10 pF 很慢。插入逐级放大 f 倍的反相器链，找出总延时最小的级数。</div>
+      <div class="problem" id="pb4"></div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl"><label for="n4" data-en="Number of stages N">级数 N</label><output id="n4o"></output><input type="range" id="n4" min="1" max="10" step="1" value="1"></div>
+        <div class="ctl"><label for="cl4" data-en="Load C&lt;sub&gt;L&lt;/sub&gt;">负载 C<sub>L</sub></label><output id="cl4o"></output><input type="range" id="cl4" min="1" max="20" step="0.5" value="10"></div>
+        <p class="hint" data-en="First stage: minimum symmetric inverter (W&lt;sub&gt;p&lt;/sub&gt;/W&lt;sub&gt;n&lt;/sub&gt; = 2.25).">第一级为最小对称反相器（W<sub>p</sub>/W<sub>n</sub> = 2.25）。</p>
+      </div>
+      <div class="card"><h3 data-en="READINGS">读数</h3><dl class="readout" id="ro4"></dl></div>
+      <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk4"></ul></div>
+      <div class="card open"><h3 data-en="OPEN QUESTION">开放问题</h3>
+        <p data-en="Six and seven stages give almost the same delay. Besides delay, what decides the choice — think of area, power and whether the output is inverted.">6 级和 7 级的延时几乎一样。除了延时，还有什么决定选几级？想想面积、功耗，以及输出是否反相。</p>
+        <textarea id="op4" data-ph-en="Your answer (saved on this device)" placeholder="写下你的想法（保存在本机）"></textarea></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== 1.5 -->
+  <section class="lab" id="lab-5" hidden>
+    <div class="stagebox">
+      <div class="legend" id="lg5"></div>
+      <canvas id="c5" aria-label="功耗随电压变化"></canvas>
+      <canvas id="d5" class="short" aria-label="延时随电压变化"></canvas>
+      <div class="goal" data-en="&lt;b&gt;Goal&lt;/b&gt; Every switching event charges a capacitor and dumps the energy: P = αCV²fN. Lowering V&lt;sub&gt;DD&lt;/sub&gt; saves power quadratically but slows the gates (lower plot)."><b>目标</b> 每翻转一次就给电容充一次电、放掉一次能量：P = αCV²fN。降低 V<sub>DD</sub> 功耗按平方下降，但门变慢（下图）。</div>
+      <div class="problem" id="pb5"></div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3 data-en="PARAMETERS">参数</h3>
+        <div class="ctl"><label for="v5" data-en="Supply V&lt;sub&gt;DD&lt;/sub&gt;">电源电压 V<sub>DD</sub></label><output id="v5o"></output><input type="range" id="v5" min="0.9" max="1.8" step="0.01" value="1.8"></div>
+        <div class="ctl"><label for="f5" data-en="Clock f">时钟频率 f</label><output id="f5o"></output><input type="range" id="f5" min="10" max="200" step="10" value="100"></div>
+        <div class="ctl"><label for="a5" data-en="Activity α">翻转率 α</label><output id="a5o"></output><input type="range" id="a5" min="0.02" max="0.5" step="0.01" value="0.1"></div>
+        <div class="ctl"><label for="g5" data-en="Gate count N">门数 N</label><output id="g5o"></output><input type="range" id="g5" min="3" max="5" step="0.1" value="4"></div>
+        <p class="hint" data-en="Load per gate C = 5 fF. Leakage is ignored here.">每门负载 C = 5 fF。这里不计漏电。</p>
+      </div>
+      <div class="card"><h3 data-en="READINGS">读数</h3><dl class="readout" id="ro5"></dl></div>
+      <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk5"></ul></div>
+      <div class="card open"><h3 data-en="OPEN QUESTION">开放问题</h3>
+        <p data-en="This model ignores leakage. As V&lt;sub&gt;DD&lt;/sub&gt; approaches V&lt;sub&gt;T&lt;/sub&gt;, what happens to delay, and why can total energy per operation start to rise again?">这个模型没算漏电。V<sub>DD</sub> 接近 V<sub>T</sub> 时延时会怎样？为什么每次运算的总能量反而可能回升？</p>
+        <textarea id="op5" data-ph-en="Your answer (saved on this device)" placeholder="写下你的想法（保存在本机）"></textarea></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="row"><button class="btn chip" id="resetAll" data-en="Reset tasks">重置任务</button>
+    <span data-en="Model: long-channel square law with effective parameters (illustrative, to be calibrated against ngspice + SKY130). WenQuest · Chapter 1 sample.">模型：长沟道平方律＋有效参数（示意值，待与 ngspice＋SKY130 校准）。问渠 · 第 1 章样例。</span></div>
+  </footer>
+</div>
+
+<!--@params-->
+<script src="../kit/models/mos.js"></script>
+<script src="../kit/wq-lab.js"></script>
+<script>
+(function () {
+  const L = WQLab, $ = L.$, T = L.T, css = L.css, fmt = L.fmt, si = L.si;
+  const P = window.WQ_PARAMS, M = WQMos.create(P);
+  const { VDD, VTn, VTp, L: Lch, Wmin } = P;
+  const r = P.kn / P.kp;
+  L.init({ id: 'dic-ch1' });
+  const legend = (id, items) => { $(id).innerHTML = items.map(([c, t]) => `<span><i style="background:${css(c)}"></i>${t}</span>`).join(''); };
+  const near = (a, b, tol) => Math.abs(a - b) <= tol;
+  const draws = {};
+  const redraw = () => Object.values(draws).forEach((f) => f());
+
+  /* ------------------------------------------------------------------ 1.1 */
+  (function () {
+    let vinHigh = true; const seen = { lo: false, hi: false };
+    const wn = L.range('wn1', (v) => v.toFixed(2) + ' μm', draw);
+    const il = L.range('il1', (v) => v.toFixed(2) + ' mA', draw);
+    const setVin = (hi) => { vinHigh = hi; seen[hi ? 'hi' : 'lo'] = true; $('vin1hi').setAttribute('aria-pressed', hi); $('vin1lo').setAttribute('aria-pressed', !hi); L.report('param', { param: 'vin1', value: hi ? VDD : 0 }); draw(); };
+    $('vin1hi').onclick = () => setVin(true); $('vin1lo').onclick = () => setVin(false);
+    L.defineTasks('1', [
+      { id: 'both', zh: '把输入分别切到低、高电平，对照上方示意图：稳态时 PMOS 与 NMOS 总有一个截止，反相器本身没有直流通路。', en: 'Switch the input low and high. In either steady state one transistor is off, so the inverter itself draws no DC current.', check: () => seen.lo && seen.hi },
+      { id: 'size', robot: true, zh: '光耦负载 1 mA：调 Wn，使 VOL ≤ 0.2 V，并且 Wn 不超过所需最小值的 1.08 倍（不浪费面积）。', en: 'Optocoupler load 1 mA: choose Wn so that VOL ≤ 0.2 V, with Wn no more than 1.08 × the minimum needed.', check: (s) => near(s.I, 1e-3, 2.6e-5) && s.vinHigh && s.vol <= 0.2 && s.Wn <= 1.08 * M.wnForVol(1e-3, 0.2) },
+      { id: 'twice', zh: '保持上一步的 Wn（约 6.67 μm），把负载加到 2 mA。VOL 变成多少？（是否正好翻倍？）', en: 'Keep Wn ≈ 6.67 μm and raise the load to 2 mA. What is VOL now? Is it exactly twice?', answer: { value: volFor(M.wnForVol(1e-3, 0.2), 2e-3), tol: 0.03, unit: 'V' } },
+    ], 'tk1');
+    L.openQuestion('1', 'op1');
+    function volFor(W, I) { // 线性区解 Idn(VDD, v, W) = I
+      if (M.idsatN(W) <= I) return NaN;
+      let lo = 0, hi = VDD - VTn;
+      for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (M.idn(VDD, m, W) > I) hi = m; else lo = m; }
+      return (lo + hi) / 2;
+    }
+    function schematic(cv, state) {
+      const dpr = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; if (!w) return;
+      cv.width = w * dpr; cv.height = h * dpr; const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const ink = css('--ink'), mu = css('--muted'), on = css('--green'), off = css('--line'), cur = css('--orange');
+      c.clearRect(0, 0, w, h); c.lineWidth = 2; c.font = `12px ${css('--sans')}`;
+      const x = w * 0.42, top = 14, bot = h - 14, mid = h / 2;
+      const sw = (y0, y1, closed, label) => { // 开关符号
+        c.strokeStyle = closed ? on : off; c.beginPath(); c.moveTo(x, y0); c.lineTo(x, y0 + 8);
+        if (closed) c.lineTo(x, y1 - 8); else c.lineTo(x + 14, y1 - 12);
+        c.moveTo(x, y1 - 8); c.lineTo(x, y1); c.stroke();
+        c.fillStyle = closed ? on : mu; c.textAlign = 'right'; c.textBaseline = 'middle'; c.fillText(label, x - 10, (y0 + y1) / 2);
+      };
+      c.strokeStyle = mu; c.beginPath(); c.moveTo(x - 40, top); c.lineTo(x + 40, top); c.moveTo(x - 40, bot); c.lineTo(x + 40, bot); c.stroke();
+      c.fillStyle = mu; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText('VDD', x + 46, top); c.fillText('GND', x + 46, bot);
+      sw(top, mid - 4, !state.vinHigh, 'PMOS ' + (state.vinHigh ? T('截止', 'off') : T('导通', 'on')));
+      sw(mid + 4, bot, state.vinHigh, 'NMOS ' + (state.vinHigh ? T('导通', 'on') : T('截止', 'off')));
+      c.strokeStyle = ink; c.beginPath(); c.moveTo(x, mid - 4); c.lineTo(x, mid + 4); c.moveTo(x, mid); c.lineTo(w * 0.78, mid); c.stroke();
+      c.fillStyle = ink; c.beginPath(); c.arc(x, mid, 3.5, 0, 7); c.fill();
+      const tx = x + 14, narrow = w < 600;
+      c.textAlign = 'left'; c.fillText(T('输出 ', 'out ') + (state.vinHigh ? fmt(state.vol, 3) : VDD.toFixed(2)) + ' V', tx, mid - 12);
+      c.fillStyle = mu; c.fillText(T('输入 ', 'in ') + (state.vinHigh ? VDD.toFixed(1) : '0') + ' V', 8, mid);
+      if (state.vinHigh) { c.fillStyle = cur; c.textAlign = 'left'; c.fillText('← ' + T('负载 ', 'load ') + (state.I * 1e3).toFixed(2) + ' mA' + (narrow ? '' : T('（光耦）', ' (optocoupler)')), tx, mid + 14); }
+    }
+    function draw() {
+      const W = +wn.value, I = +il.value * 1e-3, vol = vinHigh ? volFor(W, I) : NaN;
+      const s = { Wn: W, I, vinHigh, vol };
+      schematic($('s1'), s);
+      const xs = [], ys = [], ymax = Math.max(4, M.idsatN(12) * 1e3 * 0.25);
+      for (let v = 0; v <= VDD + 1e-9; v += 0.01) { xs.push(v); ys.push(M.idn(VDD, v, W) * 1e3); }
+      const pts = [];
+      if (vinHigh && Number.isFinite(vol)) pts.push({ x: vol, y: I * 1e3, color: css('--orange'), label: 'VOL = ' + vol.toFixed(3) + ' V' });
+      L.plot($('c1'), {
+        x: [0, VDD], y: [0, Math.min(ymax, 8)], xlabel: 'V_DS (V)', ylabel: 'I_D (mA)',
+        series: [{ x: xs, y: ys, color: css('--blue'), width: 2.5 }],
+        hlines: vinHigh ? [{ y: I * 1e3, color: css('--orange'), label: T('负载 ', 'load ') + (I * 1e3).toFixed(2) + ' mA' }] : [],
+        vlines: [{ x: 0.2, color: css('--red'), label: '0.2 V' }],
+        points: pts,
+      });
+      legend('lg1', [['--blue', T('NMOS 输出特性（V_GS = 1.8 V）', 'NMOS output curve (V_GS = 1.8 V)')], ['--orange', T('负载电流', 'load current')], ['--red', T('允许的 V_OL 上限', 'V_OL limit')]]);
+      const Ron = Number.isFinite(vol) ? vol / I : NaN, Rlin = 1 / (P.kn * W / Lch * (VDD - VTn));
+      L.readout('ro1', [
+        [T('输入', 'Input'), vinHigh ? '1.8 V' : '0 V'],
+        [T('NMOS 工作区', 'NMOS region'), vinHigh ? (Number.isFinite(vol) ? T('线性区', 'linear') : T('饱和（拉不住）', 'saturated (cannot sink)')) : T('截止', 'off')],
+        ['VOL', vinHigh ? (Number.isFinite(vol) ? vol.toFixed(3) + ' V' : T('> 1.35 V', '> 1.35 V')) : '—'],
+        [T('等效电阻 VOL / I', 'Effective R = VOL / I'), vinHigh && Number.isFinite(Ron) ? Ron.toFixed(0) + ' Ω' : '—'],
+        [T('小信号 Ron（理论）', 'Small-signal Ron (theory)'), Rlin.toFixed(0) + ' Ω'],
+        [T('Wn / L', 'Wn / L'), (W / Lch).toFixed(1)],
+        [T('反相器静态电流', 'Inverter static current'), '0'],
+      ]);
+      L.problem('pb1', '机器人问题：关节驱动板的光耦输入', '芯片输出管脚要吸收 1 mA 点亮光耦的发光二极管，输出低电平不能超过 0.2 V，否则光耦可能不导通。NMOS 至少要多宽？', 'Robot problem: optocoupler input on a joint driver', 'The output pin must sink 1 mA to light the optocoupler LED, with the output low level at most 0.2 V. How wide must the NMOS be?');
+      L.check('1', s);
+    }
+    draws['1'] = draw; L.onLang(draw);
+  })();
+
+  /* ------------------------------------------------------------------ 1.2 */
+  (function () {
+    const rr = L.range('r2', (v) => v.toFixed(2), draw);
+    const vi = L.range('vi2', (v) => v.toFixed(2) + ' V', draw);
+    const nz = L.range('nz2', (v) => '±' + v.toFixed(2) + ' V', draw);
+    let cache = {};
+    const nmFor = (ratio) => { const k = ratio.toFixed(2); if (!cache[k]) { const nm = M.noiseMargins(Wmin, ratio * Wmin, VDD, 0.002); nm.VM = M.vm(Wmin, ratio * Wmin); nm.vtc = M.vtc(Wmin, ratio * Wmin, VDD, 0.01); cache[k] = nm; } return cache[k]; };
+    L.defineTasks('2', [
+      { id: 'vm', zh: '调尺寸比，使开关阈值 VM = 0.90 V（VDD 的一半，误差 ±0.01 V）。此时 Wp/Wn 是多少？与迁移率比 r 比较。', en: 'Adjust the size ratio so that VM = 0.90 V (half of VDD, ±0.01 V). What is Wp/Wn? Compare with the mobility ratio r.', check: (s) => near(s.VM, 0.9, 0.01) },
+      { id: 'nml', zh: '把尺寸比设为 1，读出低电平噪声容限 NML。', en: 'Set the ratio to 1 and read the low noise margin NML.', answer: { value: M.noiseMargins(Wmin, Wmin).NML, tol: 0.04, unit: 'V' } },
+      { id: 'noise', robot: true, zh: '编码器电缆干扰 ±0.3 V：把干扰幅度设为 0.30 V，选一个尺寸比，使 NML 和 NMH 都不小于干扰的 2 倍。', en: 'Encoder cable noise ±0.3 V: set the noise to 0.30 V and pick a ratio so that both NML and NMH are at least twice the noise.', check: (s) => near(s.noise, 0.3, 1e-6) && Math.min(s.NML, s.NMH) >= 0.6 },
+    ], 'tk2');
+    L.openQuestion('2', 'op2');
+    function draw() {
+      const ratio = +rr.value, nm = nmFor(ratio), v = +vi.value, n = +nz.value;
+      const vo = M.vout(v, Wmin, ratio * Wmin);
+      const rn = M.region(v, vo, VTn), rp = M.region(VDD - v, VDD - vo, VTp);
+      const name = { off: T('截止', 'off'), lin: T('线性', 'linear'), sat: T('饱和', 'saturation') };
+      const soft = css('--amber-soft');
+      L.plot($('c2'), {
+        x: [0, VDD], y: [0, VDD], xlabel: 'V_in (V)', ylabel: 'V_out (V)',
+        xbands: n > 0 ? [{ x0: 0, x1: n, color: soft }, { x0: VDD - n, x1: VDD, color: soft }] : [],
+        series: [{ x: nm.vtc.vs, y: nm.vtc.vo, color: css('--blue'), width: 2.5 }, { x: [0, VDD], y: [0, VDD], color: css('--line'), width: 1, dash: [4, 4] }],
+        vlines: [{ x: nm.VIL, color: css('--green'), label: 'V_IL' }, { x: nm.VIH, color: css('--violet'), label: 'V_IH' }],
+        points: [{ x: nm.VM, y: nm.VM, color: css('--red'), label: 'V_M = ' + nm.VM.toFixed(3) }, { x: v, y: vo, color: css('--orange'), r: 5 }],
+      });
+      legend('lg2', [['--blue', T('传输特性', 'transfer curve')], ['--red', T('开关阈值', 'threshold')], ['--orange', T('游标', 'cursor')], ['--amber', T('输入干扰带', 'noise band')]]);
+      const VMth = (VTn + Math.sqrt(1 / r * ratio) * (VDD - VTp)) / (1 + Math.sqrt(1 / r * ratio));
+      L.readout('ro2', [
+        ['VM ' + T('（曲线）', '(curve)'), nm.VM.toFixed(3) + ' V'],
+        ['VM ' + T('（公式）', '(formula)'), VMth.toFixed(3) + ' V'],
+        ['VIL / VIH', nm.VIL.toFixed(3) + ' / ' + nm.VIH.toFixed(3) + ' V'],
+        ['NML / NMH', nm.NML.toFixed(3) + ' / ' + nm.NMH.toFixed(3) + ' V'],
+        [T('游标处 V_out', 'V_out at cursor'), vo.toFixed(3) + ' V'],
+        [T('NMOS / PMOS 工作区', 'NMOS / PMOS region'), name[rn] + ' / ' + name[rp]],
+        [T('迁移率比 r', 'Mobility ratio r'), r.toFixed(2)],
+      ]);
+      L.problem('pb2', '机器人问题：编码器信号的抗干扰', '关节编码器的信号经 2 m 电缆进入控制芯片，叠加约 ±0.3 V 的电机干扰。接收端反相器会不会误翻转？噪声容限要留多大？', 'Robot problem: noise immunity of an encoder signal', 'The joint encoder signal travels 2 m of cable and picks up about ±0.3 V of motor noise. Will the receiving inverter switch falsely? How much noise margin is enough?');
+      L.check('2', { VM: nm.VM, NML: nm.NML, NMH: nm.NMH, noise: n, ratio });
+    }
+    draws['2'] = draw; L.onLang(draw);
+  })();
+
+  /* ------------------------------------------------------------------ 1.3 */
+  (function () {
+    const rr = L.range('r3', (v) => v.toFixed(2), draw);
+    const fo = L.range('fo3', (v) => 'FO' + v, draw);
+    const tpOf = (ratio, n) => { const d = M.delays(Wmin, ratio * Wmin, n * M.cin(Wmin, ratio * Wmin)); return { ...d, tp: (d.tphl + d.tplh) / 2 }; };
+    let minTp = (n) => { let b = Infinity; for (let p = 0.5; p <= 4.0001; p += 0.01) b = Math.min(b, tpOf(p, n).tp); return b; };
+    L.defineTasks('3', [
+      { id: 'sym', zh: '扇出为 4 时，调尺寸比使 tPHL 与 tPLH 相差不超过 5%。', en: 'At fan-out 4, adjust the ratio until tPHL and tPLH differ by at most 5%.', check: (s) => s.fo === 4 && Math.abs(s.mis) <= 0.05 },
+      { id: 'min', zh: '扇出为 4 时，找出平均延时 tp 最小的尺寸比（tp 不超过最小值的 1.005 倍）。它和 √r 有什么关系？', en: 'At fan-out 4, find the ratio with the smallest average delay tp (within 0.5% of the minimum). How does it relate to √r?', check: (s) => s.fo === 4 && s.tp <= 1.005 * minTp(4) },
+      { id: 'mis', robot: true, zh: '时钟缓冲若用相同尺寸（Wp/Wn = 1，FO4），tPLH 比 tPHL 长百分之多少（以平均延时为基准）？', en: 'If the clock buffer used equal widths (Wp/Wn = 1, FO4), by what percentage does tPLH exceed tPHL (relative to the average)?', answer: { value: (() => { const d = tpOf(1, 4); return (d.tplh - d.tphl) / d.tp * 100; })(), tol: 0.04, unit: '%' } },
+    ], 'tk3');
+    L.openQuestion('3', 'op3');
+    function draw() {
+      const ratio = +rr.value, n = +fo.value, d = tpOf(ratio, n);
+      const CL = n * M.cin(Wmin, ratio * Wmin), Tp = Math.max(d.tphl, d.tplh) * 8;
+      const wv = M.rcWave(Wmin, ratio * Wmin, CL, Tp, 300);
+      const ps = (x) => x * 1e12;
+      L.plot($('c3'), {
+        x: [0, ps(2 * Tp)], y: [-0.1, VDD + 0.15], xlabel: 't (ps)', ylabel: 'V',
+        series: [{ x: wv.t.map(ps), y: wv.vin, color: css('--muted'), width: 1.5, dash: [6, 4] }, { x: wv.t.map(ps), y: wv.vo, color: css('--blue'), width: 2.5 }],
+        hlines: [{ y: VDD / 2, color: css('--line'), label: '50%' }],
+        vlines: [{ x: ps(d.tphl), color: css('--green'), label: 't_PHL ' + ps(d.tphl).toFixed(1) }, { x: ps(Tp / 2 + d.tplh), color: css('--violet'), label: 't_PLH ' + ps(d.tplh).toFixed(1) }],
+      });
+      const rs = [], a = [], b = [], c = [];
+      for (let p = 0.5; p <= 4.0001; p += 0.05) { const q = tpOf(p, n); rs.push(p); a.push(ps(q.tphl)); b.push(ps(q.tplh)); c.push(ps(q.tp)); }
+      L.plot($('d3'), {
+        x: [0.5, 4], y: [0, Math.max(...b, ...a) * 1.1], xlabel: 'Wp/Wn', ylabel: 'ps',
+        series: [{ x: rs, y: a, color: css('--green'), width: 1.5 }, { x: rs, y: b, color: css('--violet'), width: 1.5 }, { x: rs, y: c, color: css('--red'), width: 2.5 }],
+        vlines: [{ x: Math.sqrt(r), color: css('--muted'), label: '√r' }, { x: r, color: css('--muted'), label: 'r' }],
+        points: [{ x: ratio, y: ps(d.tp), color: css('--red') }],
+      });
+      legend('lg3', [['--muted', T('输入', 'input')], ['--blue', T('输出', 'output')], ['--green', 't_PHL'], ['--violet', 't_PLH'], ['--red', T('平均 t_p', 'average t_p')]]);
+      const mis = (d.tplh - d.tphl) / d.tp;
+      L.readout('ro3', [
+        ['Wp', (ratio * Wmin).toFixed(2) + ' μm'],
+        ['Req,n / Req,p', (M.reqN(Wmin) / 1e3).toFixed(2) + ' / ' + (M.reqP(ratio * Wmin) / 1e3).toFixed(2) + ' kΩ'],
+        [T('负载电容', 'Load C'), (CL * 1e15).toFixed(2) + ' fF'],
+        ['tPHL / tPLH', ps(d.tphl).toFixed(1) + ' / ' + ps(d.tplh).toFixed(1) + ' ps'],
+        [T('平均 tp', 'Average tp'), ps(d.tp).toFixed(1) + ' ps'],
+        [T('上升下降差', 'Mismatch'), (mis * 100).toFixed(0) + '%'],
+        ['√r / r', Math.sqrt(r).toFixed(2) + ' / ' + r.toFixed(2)],
+      ]);
+      L.problem('pb3', '机器人问题：电机控制芯片的时钟缓冲', '时钟缓冲的上升、下降延时不一样，时钟的占空比就会走样，PWM 计数器的分辨率跟着变差。尺寸比怎样取才能让两种延时接近？', 'Robot problem: the clock buffer of a motor-control chip', 'If the clock buffer rises and falls at different speeds the clock duty cycle is distorted and the PWM counter loses resolution. Which size ratio makes the two delays match?');
+      L.check('3', { fo: n, mis, tp: d.tp });
+    }
+    draws['3'] = draw; L.onLang(draw);
+  })();
+
+  /* ------------------------------------------------------------------ 1.4 */
+  (function () {
+    const nn = L.range('n4', (v) => String(v), draw);
+    const cl = L.range('cl4', (v) => v.toFixed(1) + ' pF', draw);
+    L.defineTasks('4', [
+      { id: 'best', zh: 'CL = 10 pF：找到总延时最小的级数（不超过最小值的 1.01 倍）。', en: 'CL = 10 pF: find the number of stages with the smallest total delay (within 1% of the minimum).', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t <= 1.01 * s.tmin },
+      { id: 'f', zh: '取 6 级时，每级的扇出 f 是多少？', en: 'With 6 stages, what is the fan-out f of each stage?', answer: { value: Math.pow(P.problems.p14.CL / M.cin(Wmin, r * Wmin), 1 / 6), tol: 0.03, unit: '' } },
+      { id: 'fewest', robot: true, zh: '栅极驱动器输入要求延时小于 0.3 ns：在 CL = 10 pF 下，用最少的级数满足要求。', en: 'The gate-driver input needs a delay under 0.3 ns: with CL = 10 pF, meet it with the fewest stages.', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t < 0.3e-9 && s.N === s.nFew },
+    ], 'tk4');
+    L.openQuestion('4', 'op4');
+    function chainSketch(cv, N, f) {
+      const dpr = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; if (!w) return;
+      cv.width = w * dpr; cv.height = h * dpr; const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+      const ink = css('--blue'), mu = css('--muted'), mid = h / 2, gap = (w - 90) / Math.max(N, 1);
+      c.strokeStyle = mu; c.lineWidth = 1.5; c.beginPath(); c.moveTo(10, mid); c.lineTo(w - 50, mid); c.stroke();
+      for (let i = 0; i < N; i++) {
+        const s = Math.min(1, 0.25 + 0.75 * (N > 1 ? i / (N - 1) : 0)), size = 10 + s * Math.min(h * 0.32, gap * 0.35);
+        const x = 22 + i * gap + gap / 2;
+        c.fillStyle = css('--panel'); c.strokeStyle = ink; c.lineWidth = 2;
+        c.beginPath(); c.moveTo(x - size * 0.6, mid - size); c.lineTo(x - size * 0.6, mid + size); c.lineTo(x + size * 0.7, mid); c.closePath(); c.fill(); c.stroke();
+        c.beginPath(); c.arc(x + size * 0.7 + 3, mid, 3, 0, 7); c.stroke();
+        c.fillStyle = mu; c.font = `11px ${css('--mono')}`; c.textAlign = 'center'; c.textBaseline = 'top';
+        if (gap > 34) c.fillText('×' + (Math.pow(f, i) >= 100 ? Math.pow(f, i).toFixed(0) : Math.pow(f, i).toPrecision(2)), x, mid + size + 4);
+      }
+      c.fillStyle = css('--orange'); c.fillRect(w - 46, mid - 14, 8, 28);
+      c.fillStyle = mu; c.font = `12px ${css('--sans')}`; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText('C_L', w - 34, mid);
+    }
+    function draw() {
+      const N = +nn.value, CL = +cl.value * 1e-12, C1 = M.cin(Wmin, r * Wmin), F = CL / C1, f = Math.pow(F, 1 / N);
+      const t = M.chainDelay(N, CL, r), Ns = [], ts = [];
+      for (let k = 1; k <= 10; k++) { Ns.push(k); ts.push(M.chainDelay(k, CL, r) * 1e9); }
+      const tmin = Math.min(...ts) * 1e-9;
+      const nFew = Ns.find((k) => M.chainDelay(k, CL, r) < 0.3e-9) || 0;
+      chainSketch($('s4'), N, f);
+      L.plot($('c4'), {
+        x: [1, 10], y: [Math.min(...ts) * 0.6, Math.max(...ts) * 1.6], ylog: true, xlabel: T('级数 N', 'stages N'), ylabel: T('总延时 (ns)', 'total delay (ns)'),
+        series: [{ x: Ns, y: ts, color: css('--blue'), width: 2 }],
+        hlines: [{ y: 0.3, color: css('--red'), label: '0.3 ns' }],
+        vlines: [{ x: Math.log(F) / Math.log(4), color: css('--muted'), label: 'ln F / ln 4' }],
+        points: Ns.map((k, i) => ({ x: k, y: ts[i], color: k === N ? css('--orange') : css('--blue'), r: k === N ? 6 : 3, label: k === N ? (ts[i] < 1 ? (ts[i] * 1000).toFixed(0) + ' ps' : ts[i].toFixed(2) + ' ns') : '' })),
+        yfmt: (v) => (v < 1 ? v.toPrecision(1) : String(v)),
+      });
+      legend('lg4', [['--blue', T('总延时', 'total delay')], ['--orange', T('当前级数', 'current N')], ['--red', T('要求', 'requirement')]]);
+      L.readout('ro4', [
+        [T('第一级输入电容', 'First-stage C_in'), (C1 * 1e15).toFixed(2) + ' fF'],
+        [T('总扇出 F = CL / Cin', 'Total fan-out F'), F.toFixed(0)],
+        [T('每级扇出 f', 'Fan-out per stage f'), f.toFixed(2)],
+        [T('总延时', 'Total delay'), t < 1e-9 ? (t * 1e12).toFixed(0) + ' ps' : (t * 1e9).toFixed(2) + ' ns'],
+        ['ln F / ln 4', (Math.log(F) / Math.log(4)).toFixed(2)],
+        [T('输出相位', 'Output polarity'), N % 2 ? T('反相', 'inverted') : T('同相', 'non-inverted')],
+      ]);
+      L.problem('pb4', '机器人问题：驱动板上的栅极驱动器', '芯片输出要经焊盘、走线驱动电路板上的栅极驱动器输入，总负载约 10 pF。最小反相器直接驱动要几十纳秒，PWM 边沿会被拖慢。插几级缓冲最快？', 'Robot problem: driving the gate driver on the board', 'The chip output drives pad, trace and gate-driver input, about 10 pF in all. A minimum inverter takes tens of nanoseconds, smearing the PWM edges. How many buffer stages are fastest?');
+      L.check('4', { N, CL, t, tmin, nFew });
+    }
+    draws['4'] = draw; L.onLang(draw);
+  })();
+
+  /* ------------------------------------------------------------------ 1.5 */
+  (function () {
+    const q = P.problems.p15;
+    const v = L.range('v5', (x) => x.toFixed(2) + ' V', draw);
+    const f = L.range('f5', (x) => x + ' MHz', draw);
+    const a = L.range('a5', (x) => x.toFixed(2), draw);
+    const g = L.range('g5', (x) => Math.round(Math.pow(10, x)).toLocaleString('en-US'), draw);
+    const fo4 = (V) => { const d = M.fo4(Wmin, r * Wmin, V); return (d.tphl + d.tplh) / 2; };
+    L.defineTasks('5', [
+      { id: 'read', robot: true, zh: '巡线小车控制芯片：1 万个门、翻转率 0.1、100 MHz、1.8 V。读出动态功耗。', en: 'Line-following car controller: 10 000 gates, α = 0.1, 100 MHz, 1.8 V. Read the dynamic power.', answer: { value: q.N * q.alpha * q.Cgate * VDD * VDD * q.f * 1e3, tol: 0.02, unit: 'mW' } },
+      { id: 'low', zh: '其他条件不变，把电压降到 1.20 V。功耗降到多少？降了百分之几？', en: 'Keep everything else and lower the supply to 1.20 V. What does the power become, and by what percentage did it fall?', check: (s) => near(s.V, 1.2, 0.001) && near(s.f, 1e8, 1) && near(s.a, 0.1, 1e-6) && near(s.N, 1e4, 1) },
+      { id: 'limit', robot: true, zh: '控制环要求 FO4 延时不超过 100 ps：找出满足要求的最低电压（不比最低值高出 0.01 V 以上）。', en: 'The control loop needs FO4 delay ≤ 100 ps: find the lowest supply that meets it (within 0.01 V of the limit).', check: (s) => s.d <= 100e-12 && fo4(s.V - 0.011) > 100e-12 },
+    ], 'tk5');
+    L.openQuestion('5', 'op5');
+    function draw() {
+      const V = +v.value, fr = +f.value * 1e6, al = +a.value, N = Math.round(Math.pow(10, +g.value));
+      const Pw = M.dynPower(N, al, q.Cgate, V, fr), d = fo4(V);
+      const vs = [], ps = [], ds = [];
+      for (let x = 0.9; x <= 1.8001; x += 0.01) { vs.push(x); ps.push(M.dynPower(N, al, q.Cgate, x, fr) * 1e3); ds.push(fo4(x) * 1e12); }
+      L.plot($('c5'), {
+        x: [0.9, 1.8], y: [0, Math.max(...ps) * 1.15], xlabel: 'V_DD (V)', ylabel: T('动态功耗 (mW)', 'dynamic power (mW)'),
+        series: [{ x: vs, y: ps, color: css('--blue'), width: 2.5 }],
+        points: [{ x: V, y: Pw * 1e3, color: css('--orange'), label: (Pw * 1e3).toFixed(3) + ' mW' }],
+      });
+      L.plot($('d5'), {
+        x: [0.9, 1.8], y: [0, Math.min(250, Math.max(...ds) * 1.1)], xlabel: 'V_DD (V)', ylabel: 'FO4 (ps)',
+        series: [{ x: vs, y: ds, color: css('--violet'), width: 2 }],
+        hlines: [{ y: 100, color: css('--red'), label: '100 ps' }],
+        points: [{ x: V, y: d * 1e12, color: css('--orange') }],
+      });
+      legend('lg5', [['--blue', T('动态功耗', 'dynamic power')], ['--violet', T('FO4 延时', 'FO4 delay')], ['--orange', T('当前工作点', 'operating point')]]);
+      const hours = 7.4 / Pw;
+      L.readout('ro5', [
+        [T('动态功耗', 'Dynamic power'), si(Pw, 'W')],
+        [T('相对 1.8 V', 'Relative to 1.8 V'), ((V / VDD) ** 2 * 100).toFixed(0) + '%'],
+        [T('每次翻转能量 CV²', 'Energy per transition CV²'), si(q.Cgate * V * V, 'J')],
+        [T('FO4 延时', 'FO4 delay'), (d * 1e12).toFixed(1) + ' ps'],
+        [T('只供芯片时 7.4 Wh 电池可用', '7.4 Wh battery, chip only'), hours > 1e4 ? (hours / 24 / 365).toFixed(1) + T(' 年', ' yr') : hours.toFixed(0) + ' h'],
+      ]);
+      L.problem('pb5', '机器人问题：巡线小车控制芯片的功耗预算', '小车控制芯片约 1 万个门，平均每个时钟有 10% 的门翻转，时钟 100 MHz。动态功耗多大？把电压从 1.8 V 降到 1.2 V 能省多少，又要付出什么代价？', 'Robot problem: power budget of a line-following car controller', 'The controller has about 10 000 gates, 10% switching each cycle at 100 MHz. What is the dynamic power? How much does dropping from 1.8 V to 1.2 V save, and at what cost?');
+      L.check('5', { V, f: fr, a: al, N, P: Pw, d });
+    }
+    draws['5'] = draw; L.onLang(draw);
+  })();
+
+  L.tabs(() => requestAnimationFrame(redraw));
+  $('resetAll').onclick = () => { L.reset(); redraw(); };
+  window.addEventListener('resize', () => requestAnimationFrame(redraw));
+  if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+  L.applyLang();
+})();
+</script>
+</body>
+</html>
