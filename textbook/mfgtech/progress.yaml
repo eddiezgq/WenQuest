@@ -18,5 +18,8 @@ parts_en:
   第十三篇 计量与质量: "Part XIII  Metrology and Quality"
   第十四篇 制造系统与智能制造: "Part XIV  Manufacturing Systems and Smart Manufacturing"
   第十五篇 综合项目: "Part XV  Capstone Projects"
-chapters: {}
+chapters:
+  50:
+    status: ai
+    title_en: "Process and Process Documents"
 # 第 50 章 v0.1 样章（机械加工工艺规程设计）按 Eddie 2026-10-02 的意见重排后移到 drafts/v01_ch50，作新第 56、57 章的底稿。

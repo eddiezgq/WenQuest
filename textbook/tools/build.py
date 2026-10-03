@@ -325,6 +325,10 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "std").glob("*.yaml")))   # standard tables (机械设计, 第 11 轮)
         shared += (TOOLS / "stdtab.py").read_bytes()                     # table reader and the shared calculation sheet (第 13 轮)
         shared += (ROOT / "textbook" / "mechdesign" / "conventions" / "calcsheet.py").read_bytes() if (ROOT / "textbook" / "mechdesign" / "conventions" / "calcsheet.py").exists() else b""
+        meta_p = book["root"] / "meta.yaml"
+        if meta_p.exists():          # files outside the book the programs read (e.g. the digital factory's process plans, 第 13 轮)
+            for pat in (yaml.safe_load(meta_p.read_text(encoding="utf-8")) or {}).get("program_deps") or []:
+                shared += b"".join(p.read_bytes() for p in sorted(ROOT.glob(pat)) if p.is_file())
         if (book["root"] / "conventions" / "mdstd.py").exists():       # its materials come from the digital factory's library
             shared += (ROOT / "factory" / "digital" / "cae" / "materials.py").read_bytes()
             for rel in ("cae/solve.py", "cae/fatigue.py", "cae/geometry.py", "sim/engine.py"):   # 有限元、疲劳、试验台记录（第 33 章起）

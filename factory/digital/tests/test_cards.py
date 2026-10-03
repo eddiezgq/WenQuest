@@ -37,11 +37,11 @@ def test_every_drawing_characteristic_is_inspected_and_the_checker_notices_a_gap
 
 
 def test_step_values_are_computed_from_cutting_data():
-    st = op(plan(), "粗车")["steps"][0]                  # 车端面 Ø50，v_c = 120，f = 0.2
+    st = op(plan(), "粗车")["steps"][0]                  # 车端面 Ø50，v_c = 120，f = 0.2，4 刀
     v = cards.step_values(st)
     n = 1000 * 120 / (math.pi * 50)
     assert abs(v["n"] - n) < 1e-9
-    assert abs(v["tb"] - (25 + 2) / (n * 0.2)) < 1e-9
+    assert abs(v["tb"] - 4 * (25 + 2) / (n * 0.2)) < 1e-9            # 车端面分 4 刀
     kw = cards.step_values(op(plan(), "铣键槽")["steps"][2])
     assert abs(kw["tb"] - 5 * 33 / (0.03 * 2 * 1000 * 25 / (math.pi * 12))) < 1e-9
 

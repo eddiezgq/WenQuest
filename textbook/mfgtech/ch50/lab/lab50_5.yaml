@@ -1,0 +1,30 @@
+# 实验 50.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab50_5.js。
+原理:
+  - ["工序卡上一个车削工步的主轴转速由切削速度和工件直径算出；进给次数由单边余量和每刀背吃刀量定；机动时间由走刀长度、转速和进给量算出。", "On an operation sheet, a turning step's spindle speed follows from cutting speed and diameter; the number of passes from the stock per side and the depth per pass; the machining time from the length of cut, speed and feed."]
+  - 式: "n = 1000 v_c /(π d)，i = ⌈Z/a_p⌉，t_b = Σ L/(n f)        (50.5.1)"
+  - ["进给量和刀尖圆弧半径决定残留面积的高度，即理论粗糙度；实际粗糙度因积屑瘤、振动、刀尖磨损而更大，本实验按理论值的 1.5 倍估计。", "Feed and nose radius set the height of the cusps, i.e. the theoretical roughness; the real value is larger because of built-up edge, vibration and nose wear, and is taken here as 1.5 times the theoretical value."]
+  - 式: "Rz ≈ f²/(8 r_ε)，Ra ≈ 0.0321 f²/r_ε        (50.5.2)"
+  - ["主切削力按 Kienzle 公式估算：F_c = k_c1.1 · h^(1−m_c) · b（主偏角接近 90° 时 h ≈ f、b ≈ a_p）；切削功率 P_c = F_c v_c /60 000，除以传动效率后不能超过机床主电机功率。", "The main cutting force follows Kienzle: F_c = k_c1.1 · h^(1−m_c) · b (with a lead angle near 90°, h ≈ f and b ≈ a_p); the cutting power P_c = F_c v_c / 60 000, divided by the drive efficiency, must stay within the main motor's power."]
+步骤:
+  - ["打开实验 50.5，选“SH-301 粗车”，设 v_c = 120 m/min、f = 0.3 mm/r、a_p ≤ 2.5 mm，点“计算”。读出转速、刀数、机动时间，与图 50.5.1 第 3 工步核对（任务 1），记入表 1。", "Open Lab 50.5, choose “SH-301 rough turning”, set v_c = 120 m/min, f = 0.3 mm/r, a_p ≤ 2.5 mm and press “Compute”. Read the speed, passes and time and compare with step 3 of Figure 50.5.1 (task 1); enter them in Table 1."]
+  - ["把切削速度依次调到 150、180 m/min，记录机动时间和单件时间的变化，算出单件时间节省的百分比。", "Raise the cutting speed to 150 and 180 m/min; record the machining time and time per piece, and the percentage saved per piece."]
+  - ["把 a_p 调到 4.3 mm（一刀车完），逐步加大进给量，记录电机功率超过 11 kW 时的进给量（任务 2）。", "Set a_p to 4.3 mm (one pass) and raise the feed step by step; record the feed at which motor power passes 11 kW (task 2)."]
+  - ["选“SH-301 精车”，在 Ra 3.2 的限制下找最大进给量（任务 3），与按式 (50.5.2) 的手算比较。", "Choose “SH-301 finish turning” and find the largest feed within Ra 3.2 (task 3); compare with a hand calculation by Eq. (50.5.2)."]
+  - ["选“关节输出轴精车”，在 Ra 1.6 和功率限制下把单件时间压到 7.5 min 以内（任务 4），记下你选的 v_c 和 f。", "Choose “joint shaft finishing” and get the time per piece below 7.5 min within Ra 1.6 and the power limit (task 4); record your v_c and f."]
+数据表:
+  - 标题: ["表 1  粗车：切削速度对时间的影响", "Table 1  Rough turning: cutting speed and time"]
+    表头: ["v_c / m/min", "n / r/min", "刀数", "t_b / min", "单件时间 / min", "比定额节省 / %"]
+    表头英文: ["v_c / m/min", "n / r/min", "Passes", "t_b / min", "Time per piece / min", "Saved vs standard / %"]
+    行: [["120", "", "", "", "", ""], ["150", "", "", "", "", ""], ["180", "", "", "", "", ""]]
+    行英文: [["120", "", "", "", "", ""], ["150", "", "", "", "", ""], ["180", "", "", "", "", ""]]
+  - 标题: ["表 2  进给量的上限", "Table 2  Upper limits of feed"]
+    表头: ["场景", "限制条件", "最大进给量 / mm/r", "此时 t_b / min", "手算值"]
+    表头英文: ["Scene", "Limit", "Largest feed / mm/r", "t_b / min", "Hand calculation"]
+    行: [["粗车（一刀）", "电机功率 11 kW", "", "", ""], ["精车", "Ra 3.2", "", "", ""], ["关节输出轴", "Ra 1.6", "", "", ""]]
+    行英文: [["Rough (one pass)", "motor 11 kW", "", "", ""], ["Finish", "Ra 3.2", "", "", ""], ["Joint shaft", "Ra 1.6", "", "", ""]]
+注意:
+  - ["转速按第一刀的直径算；后面几刀直径变小，转速变大，机动时间按每刀分别算再相加。", "The speed shown is for the first pass; later passes are on smaller diameters at higher speed, and the time is summed pass by pass."]
+  - ["机床功率 11 kW、传动效率 0.8、单件定额里的辅助时间是数字工厂的教学示意值；粗糙度倍数 1.5 是教学取值。", "The 11 kW motor, 0.8 efficiency and handling times are the digital factory's teaching values; the roughness factor 1.5 is a teaching value."]
+思考题:
+  - ["切削速度从 120 提到 180 m/min，单件时间只省了百分之几。要把粗车的单件时间降一半，应该从哪里下手？", "Raising the cutting speed from 120 to 180 m/min saves only a few per cent per piece. To halve the rough-turning time, where would you start?"]
+  - ["为什么工序卡要同时写切削速度和主轴转速？操作工在机床上设的是哪一个？数控程序里又写的是哪一个（第 47 章的 G96 与 G97）？", "Why does an operation sheet give both cutting speed and spindle speed? Which does the operator set, and which does an NC program use (G96 and G97, Chapter 47)?"]

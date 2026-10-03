@@ -2,3 +2,12 @@
 outline: docs/教材/机械制造技术/00_提纲.md
 title: 机械制造技术
 title_en: Mechanical Manufacturing Technology
+# 程序读到的书外文件（数字工厂的工艺规程、卡片生成器、尺寸链库、误差模型、工厂数据）：改了它们，程序要重算
+program_deps:
+  - factory/digital/std/*.yaml
+  - factory/digital/hub/cards.py
+  - factory/digital/hub/sketch.py
+  - factory/digital/hub/tolerance.py
+  - factory/digital/hub/process.py
+  - factory/digital/sim/errors.py
+  - factory/factory/data.py

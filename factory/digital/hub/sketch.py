@@ -4,7 +4,7 @@
 - 零件在本工序结束时的形状用细实线画出，本工序加工的表面用粗实线；
 - 标出本工序的工序尺寸及偏差、几何公差、表面粗糙度；
 - 用定位、夹紧符号标出定位面、限制的自由度数和夹紧位置（GB/T 24740 的含义：定位符号旁的数字是限制的自由度数，
-  夹紧符号为指向夹紧面的箭头，液压、气动、电动夹紧在箭头旁注 Y、Q、D）。
+  夹紧符号为指向夹紧面的箭头，动力夹紧在箭头旁注字母，如 Y 液压、Q 气动；字母以标准原文为准）。
 
 只用标准库：工厂镜像不装绘图库，书里和数字工厂网页用的是同一个函数。
 """
@@ -89,11 +89,11 @@ def _locate(s, x, y, dof, up=False, label=None):
 
 
 def _clamp(s, x, y, kind="manual", up=True, label=None):
-    """Clamping symbol: an arrow pointing at the clamped surface (letter Y/Q/D for hydraulic/pneumatic/electric)."""
+    """Clamping symbol: an arrow pointing at the clamped surface (letter Y/Q for hydraulic/pneumatic; check the standard)."""
     k = -1 if up else 1
     s.line(x, y + k * 22, x, y + k * 3, w=1.4, color=SYM)
     s.arrow(x, y + k * 1, 0, -k, color=SYM, size=6)
-    letter = {"hydraulic": "Y", "pneumatic": "Q", "electric": "D"}.get(kind)
+    letter = {"hydraulic": "Y", "pneumatic": "Q"}.get(kind)
     if letter:
         s.text(x + 6, y + k * 16, letter, size=9, anchor="start", color=SYM, weight="bold")
     if label:
@@ -250,7 +250,7 @@ def shaft_sketch(part: dict, op: dict, width=1000, height=300, keyway_done=None)
             i = 0 if surf.startswith("左") else _seg_of(surf, part, stock)
             xa, xb, r = xs[i]
             _clamp(s, (xa + xb) / 2 + (6 if i else 0), yc - r, cl.get("kind", "manual"), up=True)
-    s.text(8, height - 6, "定位与夹紧符号（GB/T 24740 的画法示意）：定位符号旁的数字为限制的自由度数；箭头为夹紧，旁注 Y/Q/D 为液压/气动/电动", size=9, anchor="start", color="#7a868d")
+    s.text(8, height - 6, "定位与夹紧符号（GB/T 24740 的画法示意）：定位符号旁的数字为限制的自由度数；箭头为夹紧，旁注 Y 液压、Q 气动", size=9, anchor="start", color="#7a868d")
     return s.svg()
 
 

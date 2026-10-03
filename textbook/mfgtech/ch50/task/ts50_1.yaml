@@ -1,0 +1,38 @@
+# 工程任务单 TS-50-1（配 50.4–50.9 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-50-1
+标题: [读懂并核对 SH-301 输出轴的全套工艺文件, "Read and audit the complete process documents of the SH-301 output shaft"]
+角色: [新入职的工艺员, newly hired process engineer]
+背景:
+  - "你第一周到数字工厂机加车间报到。工艺主管交给你输出轴 SH-301 的全套工艺文件（过程卡、5 张工序卡、检验卡、刀具卡），要你一周内弄懂每一栏的意思，并到现场核对：ERPNext 里的工艺路线和工时、车间终端上派的工序、质量系统里的检验模板，是否都和工艺文件一致。另有一张同事交来的过程卡草稿（图 50.4.2），请你找出其中的错误。最后，对发现的不一致提出工艺更改建议。"
+  - "In your first week at the digital factory's machining shop, the process supervisor hands you the full document set of the SH-301 output shaft (route sheet, five operation sheets, inspection sheet, tool list). Within a week you must understand every field and check on the floor whether the routing and times in ERPNext, the operations dispatched to the shop terminals and the inspection template in the quality system all agree with the documents. A colleague's draft route sheet (Figure 50.4.2) also needs checking for errors. Finally, propose process changes for whatever does not agree."
+输入:
+  - {名称: [SH-301 全套工艺文件, SH-301 document set], 来源: [数字工厂 /api/process/cards/reference/SH-301；教材图 50.4.1–50.7.1, "Digital factory /api/process/cards/reference/SH-301; Figures 50.4.1–50.7.1"]}
+  - {名称: [ERPNext 的 SH-301 BOM 与工艺路线, SH-301 BOM and routing in ERPNext], 来源: [ERPNext“BOM”“工艺路线”, "ERPNext BOM, Routing"]}
+  - {名称: [车间终端上的工单与工序, Work orders and operations on the shop terminals], 来源: [数字工厂“操作工”页, "Digital factory Operator page"]}
+  - {名称: [质量检验模板“零件检验-输出轴”与三坐标记录, "Inspection template and CMM records"], 来源: [ERPNext“质量检验模板”；数字工厂“质量”页, "ERPNext Quality Inspection Template; digital factory Quality page"]}
+  - {名称: [有错误的过程卡草稿, Draft route sheet with errors], 来源: [教材图 50.4.2, Figure 50.4.2]}
+交付物:
+  - {名称: [文件与现场核对表, Documents-versus-floor checklist], 验收: [逐道工序核对工序名称、工作中心、单件工时（ERPNext）、派工内容（车间终端）；逐项核对检验卡与质量系统，标出一致与不一致, "Each operation checked for name, work center and time (ERPNext) and dispatch (terminal); each inspection item checked against the quality system; matches and mismatches marked"]}
+  - {名称: [过程卡草稿纠错表, Error list for the draft route sheet], 验收: [找出图 50.4.2 的 10 处错误，每处写明错在哪里、按标准或工艺原则应当怎样、不改会造成什么后果, "Finds the 10 errors in Figure 50.4.2; for each, what is wrong, what the rule or standard requires, and what would happen if left"]}
+  - {名称: [工艺更改建议单, Process change proposal], 验收: [针对核对中发现的不一致（至少一项），写明更改内容、理由、影响的文件和系统、在制品与库存的处置, "For at least one mismatch found: the change, the reason, the documents and systems affected, and what happens to work in progress and stock"]}
+  - {名称: [一张自己核算的工序卡, One operation sheet checked by hand], 验收: [任选一道切削工序，手算每个工步的主轴转速和机动时间，与卡片和实验 50.5 的结果一致（误差 < 1%）, "For one machining operation, hand-compute every step's spindle speed and machining time; agree with the sheet and Lab 50.5 within 1%"]}
+工位: [PLM, ERP, MES, QMS]
+步骤:
+  - ["读文件：对照 50.4–50.7 节，逐栏读懂过程卡、工序卡、检验卡、刀具卡。把不懂的栏目记下来。", "Read: with Sections 50.4–50.7, go through every field of the route sheet, operation sheets, inspection sheet and tool list. Note anything unclear."]
+  - ["核对 ERPNext：打开 SH-301 的 BOM，逐道核对工序、工作中心和工时；记下成本单上的工时费。", "Check ERPNext: open the SH-301 BOM and compare operations, work centers and times; note the labour cost on the costing."]
+  - ["核对车间：在“操作工”页看一张 SH-301 工单派到各工位的工序，与工序卡比较（车间终端上能看到哪些内容、看不到哪些内容）。", "Check the shop: on the Operator page, look at an SH-301 work order's operations and compare with the operation sheets (what the terminal shows and what it does not)."]
+  - ["核对质量：把检验卡的终检项目与质量检验模板、三坐标测量项目逐项对照，统计哪些特性进了 ERPNext、哪些只在检验记录表上。", "Check quality: compare the final-inspection items with the inspection template and the CMM items; count which characteristics reach ERPNext and which stay on paper."]
+  - ["纠错：找出图 50.4.2 的 10 处错误。", "Errors: find the 10 errors in Figure 50.4.2."]
+  - ["核算：任选一道切削工序，手算转速与机动时间，并在实验 50.5 里复现。", "Check: for one machining operation, compute speeds and machining times by hand, and reproduce them in Lab 50.5."]
+  - ["写工艺更改建议单，交工艺主管（老师）评审。", "Write the change proposal for the supervisor (teacher) to review."]
+评审要点:
+  - ["〔老师检查〕核对表覆盖全部 7 道工序和终检的全部 14 项特性，结论有数据（截图或记录号）支撑。", "[Teacher] The checklist covers all 7 operations and all 14 final-inspection characteristics, with evidence (screenshots or record numbers)."]
+  - ["〔老师检查〕10 处错误全部找到；每处的后果说得具体（例如“磨床做不了调质：车间无法派工”）。", "[Teacher] All 10 errors found, each with a concrete consequence (e.g. “a grinder cannot heat-treat: the shop cannot dispatch it”)."]
+  - ["〔老师检查〕更改建议有理由、写明影响的文件与系统、给出在制品处置。", "[Teacher] The proposal gives reasons, names the affected documents and systems, and disposes of work in progress."]
+  - ["〔AI 检查〕手算的转速、机动时间与卡片一致（把工序数据提交到“AI 预检”可核对）。", "[AI] Hand-computed speeds and times match the sheet (the AI pre-check can verify them)."]
+评分:
+  - {项: [文件与现场核对表, Checklist], 分: 35, 标准: [覆盖全面，结论有据, "Complete, with evidence"]}
+  - {项: [纠错表, Error list], 分: 30, 标准: [10 处全对，原因与后果具体, "All 10, with reasons and consequences"]}
+  - {项: [工艺更改建议单, Change proposal], 分: 20, 标准: [内容完整，影响分析清楚, "Complete, with a clear impact analysis"]}
+  - {项: [工序卡核算, Sheet check], 分: 15, 标准: [计算正确，与卡片和实验一致, "Correct, agrees with the sheet and the lab"]}
+学时: 4

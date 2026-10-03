@@ -56,8 +56,8 @@ characteristics:         # 图纸全部特性；key: true 为关键特性（检�
   - {id: C9, name: 齿轮定位轴肩端面圆跳动, spec: "0.02（对 A–B 公共轴线）", kind: geo}
   - {id: C10, name: 轴承位、齿轮位表面粗糙度, spec: "Ra 0.8 μm", kind: rough, qms: 轴承位粗糙度 Roughness Ra (μm)}
   - {id: C11, name: 其余表面粗糙度, spec: "轴端、键槽侧面 Ra 3.2 μm，其余 Ra 6.3 μm", kind: rough}
-  - {id: C12, name: 总长与各段长度, spec: "167；未注公差按 GB/T 1804-m", nominal: 167, es: 0.3, ei: -0.3, kind: dim}
-  - {id: C13, name: 倒角与中心孔, spec: "未注倒角 C1.5；两端中心孔 A3.15/6.7 保留", kind: other}
+  - {id: C12, name: 总长与各段长度, spec: "167；未注公差按 GB/T 1804-m（±0.5）", nominal: 167, es: 0.5, ei: -0.5, kind: dim}
+  - {id: C13, name: 倒角与中心孔, spec: "未注倒角 C1.5；两端中心孔 A3.15（GB/T 145）保留", kind: other}
   - {id: C14, name: 调质硬度, spec: "217–255 HB", kind: hard, key: true, qms: 调质硬度 Hardness (HB)}
 tool_list:               # 刀具卡
   - {id: T01, name: 外圆车刀, spec: "PCLNR 2525M12 刀杆 + CNMG 120408 刀片（涂层硬质合金 P25）", ops: [20], life: "刀刃寿命 15 min"}
@@ -77,6 +77,7 @@ gauges:
   - {id: G08, name: 键槽对称度检具}
   - {id: G09, name: 表面粗糙度仪}
   - {id: G10, name: 布氏硬度计}
+  - {id: G11, name: 深度千分尺 0–25 mm（以磨后外圆母线为基准测 d − t）}
 operations:
   - seq: 10
     operation: 下料 Sawing
@@ -113,9 +114,9 @@ operations:
     setup_min: 30
     coolant: 乳化液
     fixture: 三爪自定心卡盘，回转顶尖
-    locate: [{surface: 左端外圆, symbol: chuck, dof: 4}, {surface: 右端中心孔, symbol: center_live, dof: 2}]
+    locate: [{surface: 左端外圆, symbol: chuck, dof: 3}, {surface: 右端中心孔, symbol: center_live, dof: 2}]   # 安装 1：短夹持外圆 2 个移动 + 端面靠卡爪 1 个，顶尖 2 个，共 5 个；安装 2 调头后夹齿轮位、顶左端
     clamp: [{surface: 左端外圆, kind: manual}]
-    sketch:            # 第 5 工步（一夹一顶粗车右段）后的状态；左段在第 6 工步调头后车
+    sketch:            # 本工序结束时的状态
       stock: [[31.5, 39.5], [36.5, 12], [41.5, 60], [36.5, 25], [31.5, 31.5]]
       machined: [0, 1, 2, 3, 4, end_L, end_R]
       dims:
@@ -127,14 +128,14 @@ operations:
         - {kind: length, from: 0, to: 168, text: "168±0.2"}
       ra: {all: 12.5}
     steps:
-      - {step: 1, content: 夹毛坯外圆（伸出约 35），车右端面，见平即可, tool: T01, op: face, d: 50, vc: 120, f: 0.2, ap: 1, passes: 1, gauge: G02}
+      - {step: 1, content: 安装 1：三爪卡盘短夹持毛坯左端外圆（夹持长约 15，端面靠卡爪），车右端面，车去约 7（分 4 刀）, tool: T01, op: face, d: 50, vc: 120, f: 0.2, ap: 1.75, passes: 4, gauge: G02}
       - {step: 2, content: 钻右端中心孔 A3.15, tool: T03, op: drill, d: 3.15, vc: 20, f: 0.05, depth: 7, gauge: G02}
-      - {step: 3, content: 调头夹外圆，车左端面，保证总长 168±0.2, tool: T01, op: face, d: 50, vc: 120, f: 0.2, ap: 1, passes: 1, gauge: G02}
-      - {step: 4, content: 钻左端中心孔 A3.15, tool: T03, op: drill, d: 3.15, vc: 20, f: 0.05, depth: 7}
-      - {step: 5, content: 夹左端、顶右端中心孔，粗车 Ø40 段至 Ø41.5（2 刀），右 Ø35 段至 Ø36.5，右轴端至 Ø31.5, tool: T01, op: turn,
-         passes_detail: [[50, 2.125, 119.5], [45.75, 2.125, 119.5], [41.5, 2.5, 59.5], [36.5, 2.5, 34.5]], vc: 120, f: 0.3, gauge: G03}
-      - {step: 6, content: 调头夹 Ø41.5 外圆（垫铜皮）、顶左端中心孔，粗车左 Ø35 段至 Ø36.5，左轴端至 Ø31.5, tool: T01, op: turn,
-         passes_detail: [[50, 2.125, 53.5], [45.75, 2.125, 53.5], [41.5, 2.5, 53.5], [36.5, 2.5, 41.5]], vc: 120, f: 0.3, gauge: G03}
+      - {step: 3, content: 回转顶尖顶右端中心孔（一夹一顶），粗车齿轮位至 Ø41.5，左、右轴承位至 Ø36.5，右轴端至 Ø31.5, tool: T01, op: turn,
+         passes_detail: [[50, 2.125, 130.5], [45.75, 2.125, 130.5], [41.5, 2.5, 14], [41.5, 2.5, 58.5], [36.5, 2.5, 33.5]], vc: 120, f: 0.3, gauge: G03}
+      - {step: 4, content: 安装 2：调头，三爪卡盘短夹持 Ø41.5 齿轮位外圆（垫铜皮，轴肩靠卡爪），车左端面（分 4 刀），保证总长 168±0.2, tool: T01, op: face, d: 50, vc: 120, f: 0.2, ap: 1.75, passes: 4, gauge: G02}
+      - {step: 5, content: 钻左端中心孔 A3.15, tool: T03, op: drill, d: 3.15, vc: 20, f: 0.05, depth: 7}
+      - {step: 6, content: 回转顶尖顶左端中心孔，粗车左轴端至 Ø31.5, tool: T01, op: turn,
+         passes_detail: [[50, 2.125, 42], [45.75, 2.125, 42], [41.5, 2.5, 42], [36.5, 2.5, 42]], vc: 120, f: 0.3, gauge: G03}
     inspect:
       - {char: 总长 168±0.2, gauge: G02, freq: 首件、每 10 件}
       - {char: 各外圆 Ø31.5、Ø36.5、Ø41.5（0/−0.25）, gauge: G03, freq: 首件、每 10 件}
@@ -154,7 +155,7 @@ operations:
     operation: 精车 Finish turning
     workstation: 数控车床 CNC-L01
     shop: 机加
-    content: 修研中心孔；两顶尖装夹精车各外圆、轴肩与倒角，两端面车至总长 167，轴承位和齿轮位留磨量
+    content: 修研中心孔；两顶尖装夹精车各外圆、轴肩与倒角，两端面用半缺顶尖车至总长 167，轴承位和齿轮位留磨量
     datum: 两端中心孔
     clamping: 前后顶尖，鸡心夹头
     tools: 外圆车刀 DNMG 110404（涂层硬质合金）
@@ -186,7 +187,7 @@ operations:
       - {step: 1, content: 用 60° 硬质合金顶尖修研两端中心孔, tool: 中心孔修研顶尖, gauge: 着色检查, ta_min: 1.5}
       - {step: 2, content: 两顶尖装夹（鸡心夹头夹左轴端），精车右轴端至 Ø30 h8、右轴承位和齿轮位至 Ø35.3、Ø40.3，车轴肩、倒角 C1.5, tool: T02, op: turn,
          passes_detail: [[41.5, 0.6, 121.5], [36.5, 0.6, 57.5], [31.5, 0.75, 32.5]], vc: 150, f: 0.15, gauge: G03}
-      - {step: 3, content: 调头（鸡心夹头夹右轴端，垫铜皮），精车左轴承位至 Ø35.3、左轴端至 Ø30 h8，车左端面保证总长 167±0.3，倒角 C1.5, tool: T02, op: turn,
+      - {step: 3, content: 调头（鸡心夹头夹右轴端，垫铜皮），精车左轴承位至 Ø35.3、左轴端至 Ø30 h8，换半缺顶尖车左端面保证总长 167±0.3，倒角 C1.5, tool: T02, op: turn,
          passes_detail: [[36.5, 0.6, 54], [31.5, 0.75, 42]], vc: 150, f: 0.15, gauge: G03}
     inspect:
       - {char: "Ø35.3、Ø40.3（0/−0.039）", gauge: G03, freq: 首件、每 5 件}
@@ -220,7 +221,7 @@ operations:
     steps:
       - {step: 1, content: 齿轮位外圆放入 V 形块，左轴肩靠挡销，压板压紧, ta_min: 1.5}
       - {step: 2, content: 对刀（对中心、对槽底）, ta_min: 1.0, gauge: G08}
-      - {step: 3, content: 分 5 层铣键槽，每层 1 mm，至 H 35.15, tool: T04, op: keyway, d: 12, vc: 25, fz: 0.03, z: 2, layers: 5, ap_layer: 1, travel: 33}
+      - {step: 3, content: 分 5 层铣键槽（每层约 1.03 mm）至 H 35.15, tool: T04, op: keyway, d: 12, vc: 25, fz: 0.03, z: 2, layers: 5, ap_layer: 1.03, travel: 33}
     inspect:
       - {char: "键槽宽 12 N9（C4）", gauge: G06, freq: 每件}
       - {char: "槽底尺寸 H 35.15（−0.03/−0.20）", gauge: G07, freq: 首件、每 5 件}
@@ -275,7 +276,7 @@ operations:
       - {char: C2, gauge: G04, freq: 每件, record: QMS}
       - {char: C3, gauge: G03, freq: 抽检 5 件/批}
       - {char: C4, gauge: G06, freq: 每件, record: QMS}
-      - {char: C5, gauge: G07, freq: 抽检 5 件/批}
+      - {char: C5, gauge: G11, freq: 抽检 5 件/批}
       - {char: C6, gauge: G08, freq: 抽检 5 件/批}
       - {char: C7, gauge: G05, freq: 每件}
       - {char: C8, gauge: G05, freq: 抽检 5 件/批}
