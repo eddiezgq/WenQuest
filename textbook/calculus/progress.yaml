@@ -12,6 +12,9 @@ parts_en:
   第八篇 多元积分学与向量分析: "Part VIII  Multiple Integrals and Vector Analysis"
   第九篇 拓展与应用: "Part IX  Further Topics and Applications"
 chapters:
+  1:
+    status: ai
+    title_en: "What Is Calculus?"
   7:
     status: ai
     title_en: "The Derivative"
