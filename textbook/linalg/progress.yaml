@@ -14,6 +14,9 @@ chapters:
   1:
     status: ai
     title_en: "What Is Linear Algebra?"
+  2:
+    status: ai
+    title_en: "Vectors"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"
