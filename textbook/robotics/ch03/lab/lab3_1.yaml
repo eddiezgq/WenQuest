@@ -26,7 +26,7 @@
     行: [["1  x 轴对准箭头", "", "", ""], ["2  两分量相等", "", "", ""], ["3  y 轴与箭头反向", "", "", ""]]
     行英文: [["1  x axis along the arrow", "", "", ""], ["2  equal components", "", "", ""], ["3  y axis against the arrow", "", "", ""]]
 注意:
-  - ["转角以逆时针为正（从 z 轴正向往下看）。", "Angles are positive counter-clockwise (seen from +z)."]
+  - ["转角以逆时针为正（从 z 轴正向往下看）。", "Angles are positive anticlockwise (seen from +z)."]
   - ["箭头本身在转动 {b} 时始终不动；变的只是读数。记录时写清楚是哪一个坐标系中的分量。", "The arrow never moves when {b} turns; only the readings change. Always note which frame a set of components belongs to."]
   - ["手算保留 4 位小数，与读数相差在最后一位以内即可认为一致。", "Keep 4 decimals by hand; agreement within the last digit counts as equal."]
 思考题:

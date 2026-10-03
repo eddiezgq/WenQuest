@@ -101,6 +101,9 @@ def _forms(t: str) -> set[str]:
         if t.endswith(suf):
             out.add(t[: -len(suf)])
     out.add(t + "s")
+    for a, b in (("is", "es"), ("ex", "ices"), ("ix", "ices")):     # axis → axes, index → indices, matrix → matrices
+        if t.endswith(a):
+            out.add(t[: -len(a)] + b)
     if " of " in t:                       # "degree of freedom" → "degrees of freedom"
         head, tail = t.split(" of ", 1)
         out.add(f"{head}s of {tail}")

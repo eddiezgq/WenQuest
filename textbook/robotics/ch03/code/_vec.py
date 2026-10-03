@@ -15,7 +15,7 @@ def d(deg):
 
 
 def skew(a):
-    """叉积矩阵 [a]，式 (3.2.9)：[a] b = a × b。"""
+    """叉积矩阵 [a]，式 (3.2.10)：[a] b = a × b。"""
     a = np.asarray(a, float)
     return np.array([[0, -a[2], a[1]], [a[2], 0, -a[0]], [-a[1], a[0], 0]])
 
@@ -26,7 +26,7 @@ def unskew(A):
 
 
 def cross(a, b):
-    """叉积的分量公式 (3.2.7)，逐项写出，用来与 numpy.cross 核对。"""
+    """叉积的分量公式 (3.2.9)，逐项写出，用来与 numpy.cross 核对。"""
     return np.array([a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]])
 
 

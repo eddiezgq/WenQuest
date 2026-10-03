@@ -11,9 +11,9 @@ WQ.lab({
   models: ["B-ARM-UR5E"],
   scenes: [
     { id: "ur", robot: true, name: ["UR5e 单关节转动", "UR5e, one joint turning"],
-      problem: { title: ["机器人问题：关节转多快，末端就有多快", "Robot problem: how fast the tool moves when a joint turns"],
+      problem: { title: ["机器人问题：关节转多快，末端就有多快", "Robot problem: how fast the end-effector moves when a joint turns"],
                  text: ["示教时末端速度不得超过 250 mm/s。手臂水平伸出时，底座关节转多快才不超限？",
-                        "During teaching the tool may not exceed 250 mm/s. With the arm stretched out, how fast may the base joint turn?"] } },
+                        "During teaching the end-effector may not exceed 250 mm/s. With the arm stretched out, how fast may the base joint turn?"] } },
     { id: "disk", name: ["唱片机转盘", "Record turntable"], hide: ["joint", "h"],
       problem: { title: ["生活中的例子：唱片外圈为什么转得“快”", "Everyday example: why the outer groove moves faster"],
                  text: ["转盘以 33⅓ r/min（每秒 200°）转动。唱片外缘半径 0.15 m，外缘的线速度是多少？",
@@ -29,7 +29,7 @@ WQ.lab({
   tasks: [
     { id: "j1", robot: true, text: ["关节 1 以 60°/s 转动：公式速度与测量速度相符（相差小于 1%），读出 |v|。", "Joint 1 at 60°/s: the formula and the measurement agree (within 1%); read |v|."],
       demo: { scene: "ur", set: { joint: 1, w: 60, h: 0 }, press: ["start"], wait: 4 } },
-    { id: "limit", robot: true, text: ["零位下，找出使法兰盘速度不超过 250 mm/s 的关节 1 最大整数转速。", "At home, find the largest whole-degree rate of joint 1 that keeps the flange at or below 250 mm/s."],
+    { id: "limit", robot: true, text: ["零位下，找出使法兰盘速度不超过 250 mm/s 的关节 1 最大整数转速。", "In the zero position, find the largest whole-degree rate of joint 1 that keeps the flange at or below 250 mm/s."],
       demo: { scene: "ur", set: { joint: 1, w: 16, h: 0 }, press: [], wait: 1 } },
     { id: "ref", robot: true, text: ["关节 2 转动时，把参考点沿轴移动 0.1 m 以上：r 改变，而 ω × r 不变。", "With joint 2 turning, move the reference point along the axis by 0.1 m or more: r changes, ω × r does not."],
       demo: { scene: "ur", set: { joint: 2, w: 30, h: 0.3 }, press: ["start"], wait: 4 } },

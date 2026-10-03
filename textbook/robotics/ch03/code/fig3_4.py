@@ -43,7 +43,7 @@ for j, lam in enumerate((1.6, 0.6)):
     e = ev[:, j] * lam
     ax1.plot([-e[0], e[0]], [-e[1], e[1]], color=C["z"], lw=1, ls=":")
 ax1.text(1.25, 0.95, T("主轴", "principal axis"), fontsize=9.5, color=C["z"])
-ax1.text(-1.75, 1.75, T("(a) 线性算子：单位圆 → 椭圆，Au 一般不平行于 u", "(a) A linear operator: unit circle → ellipse; Au is not parallel to u"), fontsize=10)
+ax1.text(-1.75, 1.75, T("(a) 线性算子：单位圆 → 椭圆，Au 一般不平行于 u", "(a) A linear operator: unit circle → ellipse; Au is generally not parallel to u"), fontsize=10)
 ax1.text(-1.0, -1.3, T("虚线：单位圆", "dashed: unit circle"), fontsize=9, color=C["muted"])
 ax1.set_xlim(-1.8, 1.9)
 ax1.set_ylim(-1.45, 1.9)
@@ -144,7 +144,7 @@ for k, (pc, nn) in enumerate((((0.6, 0.3, 0.3), (1, 0, 0)), ((0.3, 0.6, 0.3), (0
     arrow3(ax, pc, 0.45 * tt / np.linalg.norm(tt), C["x"], 2.2)
 ax.text(1.0, 0.3, 0.42, r"$\hat{\boldsymbol{n}}$", fontsize=12, color=C["muted"])
 ax.text(1.02, 0.55, 0.35, r"$\boldsymbol{t}=\boldsymbol{\sigma}\hat{\boldsymbol{n}}$", fontsize=12, color=C["x"])
-ax.text2D(0.0, 0.96, T("(b) 应力：每个截面上的应力矢量 t 由法线 n 线性决定", "(b) Stress: the traction t on a cut depends linearly on its normal n"),
+ax.text2D(0.0, 0.96, T("(b) 应力：每个截面上的应力矢量 t 由法线 n 线性决定", "(b) Stress: the stress vector t on a cut depends linearly on its normal n"),
           transform=ax.transAxes, fontsize=10)
 fig.subplots_adjust(wspace=0.05)
 figure(fig, "fig3_4_3")

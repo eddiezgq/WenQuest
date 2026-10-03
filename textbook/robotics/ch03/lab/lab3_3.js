@@ -18,7 +18,7 @@ WQ.lab({
   ],
   params: [
     { id: "psi", name: ["绕竖直轴 z_a 转 ψ", "Turn ψ about z_a"], min: -180, max: 180, step: 1, value: -90, unit: "°", digits: 0 },
-    { id: "phi", name: ["再绕自身 x 轴转 φ", "then φ about own x"], min: -180, max: 180, step: 1, value: 120, unit: "°", digits: 0 },
+    { id: "phi", name: ["再绕自身 x 轴转 φ", "then φ about its own x"], min: -180, max: 180, step: 1, value: 120, unit: "°", digits: 0 },
   ],
   buttons: [{ id: "reset", name: ["重置", "Reset"] }],
   tasks: [

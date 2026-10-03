@@ -1,7 +1,7 @@
 # 实验 3.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_3.js。
 原理:
   - ["坐标系 {b} 相对 {a} 的方位，用 {b} 三根轴与 {a} 三根轴之间九个夹角的余弦表示，排成方向余弦矩阵 R_ab：第 j 列是 {b} 的第 j 根轴在 {a} 中的分量，第 i 行是 {a} 的第 i 根轴在 {b} 中的分量。",
-     "The attitude of frame {b} relative to {a} is given by the cosines of the nine angles between their axes, arranged in the direction cosine matrix R_ab: column j is axis j of {b} written in {a}; row i is axis i of {a} written in {b}."]
+     "The orientation of frame {b} relative to {a} is given by the cosines of the nine angles between their axes, arranged in the direction cosine matrix R_ab: column j is axis j of {b} written in {a}; row i is axis i of {a} written in {b}."]
   - 式: "p_a = R_ab p_b,    p_b = R_abᵀ p_a          (3.3.3)、(3.3.4)"
   - 式: "R_abᵀ R_ab = I,    det R_ab = 1          (3.3.5)"
   - ["本实验中 {b} 先绕 z_a 转 ψ、再绕自身 x 轴转 φ，所以 R_ab = Rot(z, ψ) Rot(x, φ)（两次转动的合成规则见第 4 章）。箭头在 {a} 中固定不动，转动 {b} 只改变它在 {b} 中的读数。",
@@ -23,13 +23,13 @@
     表头英文: ["ψ", "Column 1 of R_ab (read)", "(cos ψ, sin ψ, 0)", "Agree?"]
     行: [["30°", "", "", ""], ["90°", "", "", ""]]
     行英文: [["30°", "", "", ""], ["90°", "", "", ""]]
-  - 标题: ["表 2  几个方位下的读数", "Table 2  Readings at several attitudes"]
+  - 标题: ["表 2  几个方位下的读数", "Table 2  Readings at several orientations"]
     表头: ["设置 (ψ, φ)", "d_b 或加速度读数", "det R_ab", "RᵀR − I 最大偏差"]
     表头英文: ["Setting (ψ, φ)", "d_b or accelerometer reading", "det R_ab", "Largest entry of RᵀR − I"]
     行: [["(−90°, 160°)", "", "", ""], ["任务 2", "", "", ""], ["任务 3", "", "", ""], ["任务 4", "", "", ""]]
     行英文: [["(−90°, 160°)", "", "", ""], ["Task 2", "", "", ""], ["Task 3", "", "", ""], ["Task 4", "", "", ""]]
 注意:
   - ["图中采用斜二测投影：x 轴画向左下方，y 轴向右，z 轴向上。判断方向时以读数为准。", "The picture uses an oblique projection: x to the lower left, y right, z up. Trust the numbers when judging directions."]
-  - ["ψ、φ 的次序不能交换：先绕竖直轴、再绕自身 x 轴。", "The order of ψ and φ matters: first about the vertical, then about the own x axis."]
+  - ["ψ、φ 的次序不能交换：先绕竖直轴、再绕自身 x 轴。", "The order of ψ and φ matters: first about the vertical, then about its own x axis."]
 思考题:
   - ["任务 3 中 φ 取任何值都能完成，为什么？", "Why can task 3 be done with any φ?"]

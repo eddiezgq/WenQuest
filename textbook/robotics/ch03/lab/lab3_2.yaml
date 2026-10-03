@@ -14,7 +14,7 @@
   - ["完成任务 1～3，观察力矩为零、最大、为负的一半时，虚线平行四边形的形状和点积的值。",
      "Do tasks 1–3 and watch the dashed parallelogram and the dot product when the moment is zero, largest, and minus one half."]
   - ["切换到场景“扳手拧螺栓”，只用 50 N 的力拧出至少 20 N·m 的力矩（任务 4）。改变扳手长度和用力方向，找出两种可行的组合，填入表 2。",
-     "Switch to “Wrench on a bolt” and produce at least 20 N·m with 50 N (task 4). Vary the handle length and the push direction; find two combinations that work and enter them in Table 2."]
+     "Switch to “Spanner on a bolt” and produce at least 20 N·m with 50 N (task 4). Vary the handle length and the push direction; find two combinations that work and enter them in Table 2."]
 数据表:
   - 标题: ["表 1  力矩随力的方向变化（|r| = 0.3 m，α = 20°，|F| = 40 N）", "Table 1  The moment against the force direction (|r| = 0.3 m, α = 20°, |F| = 40 N)"]
     表头: ["β", "β − α", "r·F 手算 / N·m", "r·F 读数 / N·m", "m_z 手算 / N·m", "m_z 读数 / N·m"]
@@ -25,7 +25,7 @@
     表头英文: ["Handle length |r| / m", "β − α", "m_z / N·m", "Reached?"]
     行: [["", "", "", ""], ["", "", "", ""]]
 注意:
-  - ["角度从屏幕向右的方向量起，逆时针为正。", "Angles are measured from the rightward screen direction, counter-clockwise positive."]
+  - ["角度从屏幕向右的方向量起，逆时针为正。", "Angles are measured from the rightward screen direction, anticlockwise positive."]
   - ["力的箭头按比例缩小画出，平行四边形的面积与 |m| 成正比，但单位不同。", "The force arrow is drawn to a reduced scale; the parallelogram's area is proportional to |m| but has other units."]
 思考题:
   - ["若力的作用点沿力的作用线移动（r 变了，F 不变），力矩会变吗？用叉积的性质说明。", "If the point of application slides along the line of action (r changes, F does not), does the moment change? Explain with the cross product."]

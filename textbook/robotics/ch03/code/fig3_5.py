@@ -52,7 +52,7 @@ for kk in range(3):
             col = C["y"] if v > 0 else C["x"] if v < 0 else C["muted"]
             ax2.text(x0 + 0.25 + 0.5 * j, 1.95 - 0.7 * i, f"{v:+d}" if v else "0", ha="center", va="center", fontsize=13, color=col)
     ax2.text(x0 + 0.75, -0.15, rf"$\varepsilon_{{ij{kk + 1}}}=-[\hat{{\boldsymbol{{e}}}}_{kk + 1}]_{{ij}}$", ha="center", fontsize=11)
-ax2.text(-0.1, 2.95, T("(b) ε_ijk 的 27 个值：按 k 分为三层，第 i 行、第 j 列", "(b) The 27 values of ε_ijk in three layers k; row i, column j"), fontsize=10)
+ax2.text(-0.1, 2.95, T("(b) ε_ijk 的 27 个值：按 k 分为三层，第 i 行、第 j 列", "(b) The 27 values of ε_ijk in three layers by k; row i, column j"), fontsize=10)
 ax2.set_xlim(-0.2, 5.7)
 ax2.set_ylim(-0.45, 3.15)
 fig.subplots_adjust(wspace=0.08)

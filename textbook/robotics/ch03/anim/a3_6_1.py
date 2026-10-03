@@ -37,7 +37,7 @@ class Lesson(Base):
 
         pts = always_redraw(points)
         self.add(pts)
-        self.caption("各点的速度都垂直于半径，大小与到轴的距离 ρ 成正比", "Every velocity is perpendicular to the radius, its size proportional to the distance ρ", wait=0)
+        self.caption("各点的速度都垂直于半径，大小与到轴的距离 ρ 成正比", "Every velocity is perpendicular to the radius, with magnitude proportional to the distance ρ", wait=0)
         self.play(ang.animate.set_value(2.4), run_time=5, rate_func=linear)
         self.play(FadeOut(pts), run_time=0.5)
         # 第二部分：参考点沿轴移动
