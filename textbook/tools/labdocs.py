@@ -96,9 +96,23 @@ def guide(m: dict, g: dict, out: Path, no: str, where: tuple[str, str]) -> Path:
             d.eq(x["式"])
         else:
             d.bp(x[0], x[1])
-    d.bh("三、实验环境", "3  The virtual lab")
-    d.bp(f"打开方式：在问渠“教材”中阅读{where[0]}，点“打开实验”按钮；实验在浏览器中运行，不需要安装软件。",
-         "How to open: read the section in WenQuest Textbooks and press “Open lab”; it runs in the browser, nothing to install.")
+    gpu = m.get("gpu")
+    d.bh("三、实验环境", "3  The GPU lab" if gpu else "3  The virtual lab")
+    if gpu:                 # 云端 GPU 实验（人工智能第 14 轮附）
+        tier = {"basic": ("普通 GPU（如 RTX 4090）", "a standard GPU (e.g. RTX 4090)"), "hopper": ("Hopper 架构 GPU（H100 / H800 / H20）", "a Hopper GPU (H100 / H800 / H20)"),
+                "profile": ("能读性能计数器的 GPU 虚拟机", "a GPU virtual machine with performance counters")}[gpu["tier"]]
+        d.bp(f"打开方式：在问渠“教材”中阅读{where[0]}，点“打开 GPU 实验”，再点“开机”；一两分钟后点“进入 JupyterLab”，打开本实验的笔记本，按顺序运行各格。"
+             f"本实验需要{tier[0]}。机器按秒计费，做完请点“关机”；空闲 30 分钟或开机满 3 小时自动关机，机器上的文件随之删除。",
+             f"How to open: in WenQuest Textbooks press “Open the GPU lab”, then “Start”; after a minute or two open JupyterLab and run the notebook "
+             f"cell by cell. This lab needs {tier[1]}. Machines are billed by the second; press “Stop” when done. They stop after 30 idle minutes "
+             "or 3 hours, and their files are deleted.")
+        d.bp("笔记本的最后一格把测得的数回传问渠；实验页上可以下载已经填好这些数的实验报告。回传的结果：",
+             "The notebook's last cell sends your measurements to WenQuest; the lab page then offers your report with them filled in. Results sent:")
+        d.table(["结果 Result", "说明 Meaning", "单位 Unit"], [[n, f"{z}  {e}", u] for n, (z, e), u in
+                                                           [(n, desc, u) for n, desc, u in gpu["results"]]], widths=[3.5, 10.0, 2.5], font_size=9.5)
+    else:
+        d.bp(f"打开方式：在问渠“教材”中阅读{where[0]}，点“打开实验”按钮；实验在浏览器中运行，不需要安装软件。",
+             "How to open: read the section in WenQuest Textbooks and press “Open lab”; it runs in the browser, nothing to install.")
     for s in m.get("scenes") or []:
         tag = ("机器人场景", "Robot scene") if s.get("robot") else ("生活场景", "Everyday scene")
         d.bp(f"{tag[0]}“{s['name'][0]}”：{s['problem']['text'][0]}", f"{tag[1]} “{s['name'][1]}”: {s['problem']['text'][1]}")
@@ -109,10 +123,12 @@ def guide(m: dict, g: dict, out: Path, no: str, where: tuple[str, str]) -> Path:
         d.bp("按钮：" + "、".join(b["name"][0] for b in m["buttons"]), "Buttons: " + ", ".join(b["name"][1] for b in m["buttons"]))
     d.bh("四、实验步骤", "4  Procedure")
     d.blist(g["步骤"], numbered=True)
-    d.bp("实验页右侧列出以下任务，完成后自动打勾：", "The lab page lists these tasks and ticks them off as you complete them:")
-    d.blist([t["text"] for t in m.get("tasks") or []], numbered=True)
+    if m.get("tasks"):
+        d.bp("实验页右侧列出以下任务，完成后自动打勾：", "The lab page lists these tasks and ticks them off as you complete them:")
+        d.blist([t["text"] for t in m.get("tasks") or []], numbered=True)
     d.bh("五、数据记录", "5  Data record")
-    d.bp("以下表格同时出现在实验报告模板中，请在报告里填写。", "The same tables appear in the report template; fill them in there.")
+    d.bp("以下表格同时出现在实验报告模板中，请在报告里填写。" + ("写有 {{结果名}} 的格子由回传的数自动填好。" if m.get("gpu") else ""),
+         "The same tables appear in the report template; fill them in there." + (" Cells marked {{name}} are filled from your results." if m.get("gpu") else ""))
     for t in g["数据表"]:
         _table(d, t)
     d.bh("六、注意事项", "6  Notes")

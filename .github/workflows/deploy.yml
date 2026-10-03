@@ -294,6 +294,27 @@ jobs:
             exit 1
           fi
 
+      - name: GPU lab settings (《人工智能》第 14 轮附：仓库加密变量 → 服务器 .env)
+        if: env.SKIP != '1'
+        env:
+          G_PROVIDER: ${{ secrets.WQ_GPU_PROVIDER }}
+          G_AUTODL_TOKEN: ${{ secrets.WQ_GPU_AUTODL_TOKEN }}
+          G_AUTODL_SPECS: ${{ secrets.WQ_GPU_AUTODL_SPECS }}
+          G_LAMBDA_KEY: ${{ secrets.WQ_GPU_LAMBDA_KEY }}
+          G_LAMBDA_SSH_KEY: ${{ secrets.WQ_GPU_LAMBDA_SSH_KEY }}
+        run: |
+          # only plain tokens are passed on (letters, digits and - _ . : = , /); nothing is printed
+          cmd=""
+          for pair in "WQ_GPU_PROVIDER=$G_PROVIDER" "WQ_GPU_AUTODL_TOKEN=$G_AUTODL_TOKEN" "WQ_GPU_AUTODL_SPECS=$G_AUTODL_SPECS" \
+                      "WQ_GPU_LAMBDA_KEY=$G_LAMBDA_KEY" "WQ_GPU_LAMBDA_SSH_KEY=$G_LAMBDA_SSH_KEY"; do
+            k="${pair%%=*}"; v="${pair#*=}"
+            [ -n "$v" ] || continue
+            if ! printf '%s' "$v" | grep -Eq '^[A-Za-z0-9._:=,/-]+$'; then echo "::error::$k 含有不允许的字符"; exit 1; fi
+            cmd="$cmd"$'\n'"envset $k '$v'"
+          done
+          [ -n "$cmd" ] || { echo "GPU 实验未设置"; exit 0; }
+          printf 'cd /opt/wenquest\n. deploy/lib.sh%s\n' "$cmd" | ssh "deploy@$HOST" bash -s > /dev/null
+          echo "GPU 实验设置已写入服务器"
       - name: Update the server
         if: env.SKIP != '1'
         run: |

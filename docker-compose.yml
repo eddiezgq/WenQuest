@@ -81,6 +81,14 @@ services:
       WQ_FACTORY_TASK_KEY: ${WQ_FACTORY_TASK_KEY:-}      # 工程任务单（第 11 轮 2.7（5））
       WQ_FACTORY_CLASSES: ${WQ_FACTORY_CLASSES:-}
       WQ_TEXTBOOK_DIR: /textbook
+      # 云端 GPU 实验（《人工智能》第 14 轮附）：平台与密钥只在服务器的 .env 里（docs/帮助/GPU平台接入说明.md）
+      WQ_GPU_PROVIDER: ${WQ_GPU_PROVIDER:-}
+      WQ_GPU_AUTODL_TOKEN: ${WQ_GPU_AUTODL_TOKEN:-}
+      WQ_GPU_AUTODL_SPECS: ${WQ_GPU_AUTODL_SPECS:-}
+      WQ_GPU_LAMBDA_KEY: ${WQ_GPU_LAMBDA_KEY:-}
+      WQ_GPU_LAMBDA_TYPES: ${WQ_GPU_LAMBDA_TYPES:-basic=gpu_1x_a10,hopper=gpu_1x_h100_sxm5,profile=gpu_1x_a10}
+      WQ_GPU_LAMBDA_REGION: ${WQ_GPU_LAMBDA_REGION:-us-east-1}
+      WQ_GPU_LAMBDA_SSH_KEY: ${WQ_GPU_LAMBDA_SSH_KEY:-}
     volumes:
       # Uploaded materials, course generation progress and converted slides survive redeploys.
       - gatewaydata:/data

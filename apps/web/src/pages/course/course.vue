@@ -123,6 +123,7 @@
           </view>
         </view>
         <text v-if="tab === 'labs'" class="lead">{{ t("course.labsLead") }}</text>
+        <GpuQuota v-if="tab === 'labs' && isTeacher(d)" :course-id="id" />
         <view v-if="!grouped.length" class="muted">{{ t("course.nothing") }}</view>
         <view v-for="g in grouped" :key="g.section.id" class="group">
           <text class="g-name">{{ g.section.name }}</text>
@@ -184,6 +185,7 @@ import Online from "../../components/course/Online.vue";
 import People from "../../components/course/People.vue";
 import Grades from "../../components/course/Grades.vue";
 import Tasks from "../../components/course/Tasks.vue";
+import GpuQuota from "../../components/course/GpuQuota.vue";
 import Calendar from "../../components/course/Calendar.vue";
 import CourseEditor from "../../components/course/CourseEditor.vue";
 import { confirmAction, lifeApi } from "../../courseApi";

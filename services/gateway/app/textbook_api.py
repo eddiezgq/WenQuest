@@ -30,6 +30,7 @@ PDF_TTL = 3600
 MEDIA_TTL = 86400
 LABBOX = re.compile(r"<div class='wq-media-box wq-labbox' data-lab='(\d+)-(\d+)'>(.*?)</div>", re.S)
 BOX = re.compile(r"<div class='wq-media-box' data-anim='(\w+)' data-hash='(\w+)'>(.*?)</div>", re.S)
+GPUBOX = re.compile(r"<div class='wq-media-box wq-gpubox' data-gpulab='(\d+)-(\d+)'>(.*?)</div>", re.S)   # 云端 GPU 实验
 TASKBOX = re.compile(r"(<div class='wq-taskbox' data-task='(\d+)-(\d+)'>)")      # 工程任务单 (第 13 轮)
 TASKDOCS = ("task", "rubric", "calc")
 # 网页版教材（第 15 轮）：整本网页书放在 <dir>/<book>/webed/（book.json + 页面、实验、插图），登录后经有时效的链接阅读
@@ -162,7 +163,7 @@ def register(app, m) -> None:
         tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "n": name, "h": h, "k": kind}).encode()).decode()
         return f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-media/{tok}"
 
-    def with_media(book: str, html_: str, mp: bool, lang: str = "zh") -> str:
+    def with_media(book: str, html_: str, mp: bool, lang: str = "zh", sess: Session | None = None) -> str:
         """Put the rendered animations into the page; a scene not rendered yet keeps its box."""
         en = lang == "en"
 
@@ -218,7 +219,28 @@ def register(app, m) -> None:
                     links += (f"<a class='wq-labdoc' href='{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-taskdoc/{t}' "
                               f"download>{text}</a> ")
             return mt.group(1) + (f"<div class='wq-task-docs'>{links}</div>" if links and not mp else "")
-        return TASKBOX.sub(task, html_)
+        html_ = TASKBOX.sub(task, html_)
+
+        def gpu(mt):              # 云端 GPU 实验（第 14 轮附）：本人专用、12 小时有效的控制页链接；指导书与报告模板
+            ch, k, label = mt.group(1), mt.group(2), mt.group(3)
+            lab = f"{int(ch)}.{int(k)}"
+            if mp:
+                note = f"{label}: please open the GPU lab on the web" if en else f"{label}：请在网页端打开 GPU 实验"
+                return f"<p class='wq-note'>{note}</p>"
+            if sess is None or not hasattr(m, "gpulab_link") or lab not in m.gpulab_catalog(book).get("labs", {}):
+                return mt.group(0)
+            url = m.gpulab_link(sess, book, lab)
+            out = (f"<a class='wq-labbtn' href='{url}' target='_blank' rel='noopener'>↗ "
+                   f"{'Open the GPU lab' if en else '打开 GPU 实验'}</a>")
+            names = (("guide", "Lab guide (Word)"),) if en else (("guide", "实验指导书（Word）"),)
+            for kind, text in names:
+                if (root() / book / "gpulab" / f"lab{ch}_{k}-{kind}{'.en' if en else ''}.docx").exists():
+                    d = {"b": book, "l": f"{ch}_{k}", "d": kind, "gpu": 1, **({"g": "en"} if en else {})}
+                    t = m.state.codec.fernet.encrypt(json.dumps(d).encode()).decode()
+                    out += (f" <a class='wq-labdoc' href='{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-labdoc/{t}' "
+                            f"download>{text}</a>")
+            return out
+        return GPUBOX.sub(gpu, html_)
 
     @app.get("/api/v1/textbook-lab/{signed}")
     async def lab_page(signed: str):
@@ -266,7 +288,7 @@ def register(app, m) -> None:
         if not (BOOK.match(d["b"]) and re.fullmatch(r"\d{1,3}_\d{1,3}", d["l"]) and d["d"] in ("guide", "report")):
             raise EngineError("not_found", "no such file", 404)
         en = d.get("g") == "en"
-        p = root() / d["b"] / "lab" / f"lab{d['l']}-{d['d']}{'.en' if en else ''}.docx"
+        p = root() / d["b"] / ("gpulab" if d.get("gpu") else "lab") / f"lab{d['l']}-{d['d']}{'.en' if en else ''}.docx"
         if not p.exists():
             raise EngineError("not_found", "no such file", 404)
         idx = index(d["b"])
@@ -331,7 +353,7 @@ def register(app, m) -> None:
         return {"id": sid, "lang": "en" if en else "zh", "title": cur.get("title_en") if en else cur["title"],
                 "chapter": {"no": chapter["no"], "title": (chapter.get("title_en") or chapter["title"]) if en else chapter["title"],
                             "status": chapter.get("status", "")},
-                "html": with_media(book, p.read_text(encoding="utf-8"), mp, "en" if en else "zh"),
+                "html": with_media(book, p.read_text(encoding="utf-8"), mp, "en" if en else "zh", sess),
                 "prev": order[i - 1] if i > 0 else None, "next": order[i + 1] if i + 1 < len(order) else None}
 
     @app.get("/api/v1/textbooks/{book}/pdf/{chapter}")

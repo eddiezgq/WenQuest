@@ -59,6 +59,21 @@ class Settings(BaseSettings):
     labcheck_timeout: float = 150.0
     # Built textbooks (textbook/ in the repository, built by CI): <dir>/<book>/web/index.json …
     textbook_dir: str = "/textbook"
+    # Cloud GPU labs (《人工智能》第 14 轮附). gpu_provider: "" (off) | autodl | lambda | mock. Specs map a lab's tier
+    # (basic / hopper / profile) to the platform's machine: AutoDL "tier=gpu_spec_uuid:image_uuid,…", Lambda "tier=instance_type,…".
+    gpu_provider: str = ""
+    gpu_autodl_token: str = ""
+    gpu_autodl_url: str = "https://api.autodl.com"
+    gpu_autodl_specs: str = ""
+    gpu_autodl_cuda: int = 121
+    gpu_lambda_key: str = ""
+    gpu_lambda_url: str = "https://cloud.lambda.ai/api/v1"
+    gpu_lambda_types: str = "basic=gpu_1x_a10,hopper=gpu_1x_h100_sxm5,profile=gpu_1x_a10"
+    gpu_lambda_region: str = "us-east-1"
+    gpu_lambda_ssh_key: str = ""
+    gpu_lambda_prices: str = "gpu_1x_a10=1.29,gpu_1x_h100_sxm5=3.99"
+    gpu_idle_minutes: int = 30
+    gpu_max_hours: float = 3.0
     data_dir: str = "/tmp/wq-data"  # converted slides and small settings; a persistent volume in production
 
     # --- accounts: sign-up, email codes, teacher approval (app/accounts.py) ---

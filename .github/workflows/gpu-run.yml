@@ -1,0 +1,58 @@
+# 书中数字的 GPU 实测（《人工智能》第 14 轮附 4.4 节）：手动触发，在 Lambda 上开一台机器运行 code/runs/ 下的程序，
+# 把实测记录（code/runs/<名>.json）提交回 main，最后一定关机。需要仓库的加密变量 LAMBDA_KEY、LAMBDA_SSH_KEY_NAME、
+# LAMBDA_SSH_PRIVATE_KEY（见 docs/帮助/GPU平台接入说明.md）。
+name: GPU measurements
+on:
+  workflow_dispatch:
+    inputs:
+      book:
+        description: "书（如 ai）"
+        required: true
+        default: ai
+      chapter:
+        description: "章号"
+        required: true
+      name:
+        description: "只测这一个（如 run4_1），留空 = 本章全部"
+        required: false
+        default: ""
+      stale:
+        description: "只测没有记录或程序改过的"
+        type: boolean
+        default: true
+permissions:
+  contents: write
+concurrency:
+  group: gpu-run
+  cancel-in-progress: false
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Measure on a rented GPU
+        env:
+          LAMBDA_KEY: ${{ secrets.LAMBDA_KEY }}
+          LAMBDA_SSH_KEY_NAME: ${{ secrets.LAMBDA_SSH_KEY_NAME }}
+          SSH_PRIVATE: ${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}
+        run: |
+          test -n "$LAMBDA_KEY" || { echo "::error::没有设置 LAMBDA_KEY"; exit 1; }
+          pip install -q pyyaml
+          install -m 600 /dev/null "$RUNNER_TEMP/gpu_key" && printf '%s\n' "$SSH_PRIVATE" > "$RUNNER_TEMP/gpu_key"
+          export LAMBDA_SSH_KEY_FILE="$RUNNER_TEMP/gpu_key"
+          args="run ${{ inputs.book }} ${{ inputs.chapter }}"
+          [ -n "${{ inputs.name }}" ] && args="$args --name ${{ inputs.name }}"
+          [ "${{ inputs.stale }}" = "true" ] && args="$args --stale"
+          python textbook/tools/gpurun.py $args
+      - name: Commit the records
+        run: |
+          git config user.name "WenQuest GPU runner"
+          git config user.email "noreply@wenquestrobotics.com"
+          git add textbook/*/ch*/code/runs/*.json
+          git diff --cached --quiet && { echo "没有新的记录"; exit 0; }
+          git commit -m "GPU 实测记录：${{ inputs.book }} 第 ${{ inputs.chapter }} 章"
+          git pull --rebase origin main && git push origin HEAD:main

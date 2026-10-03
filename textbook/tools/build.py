@@ -42,6 +42,8 @@ import yaml
 from markdown_it import MarkdownIt
 
 import english
+import gpulab
+import gpurun
 import labdocs
 import tasksheet
 
@@ -112,7 +114,7 @@ def anim_check(code: str) -> str:
         exec(compile(ast.Module(body=keep, type_ignores=[]), "animator-check", "exec"), ns)
         _ANIM_CHECK = ns["check"]
     return _ANIM_CHECK(code)
-KINDS = ("程序", "动画", "实验", "图", "表", "任务")          # 任务: engineering task sheets (第 11、13 轮)
+KINDS = ("程序", "动画", "实验", "GPU实验", "图", "表", "任务")   # GPU实验: 云端 GPU 实验（人工智能第 14 轮附）          # 任务: engineering task sheets (第 11、13 轮)
 REF_KINDS = ("式", "定义", "定律", "定理", "引理", "推论", "准则", "算例", "程序", "图", "表", "动画", "实验", "任务", "习题")
 
 
@@ -141,6 +143,7 @@ class Section:
     anims: list = field(default_factory=list)
     labs: list = field(default_factory=list)
     labdocs: list = field(default_factory=list)
+    gpulabs: list = field(default_factory=list)       # (number, folder, lab.yaml, notebook cells): 云端 GPU 实验
     tasks: list = field(default_factory=list)       # (number, yaml path, task data): 工程任务单 (第 13 轮)
     media: list = field(default_factory=list)       # (kind, number, caption) of animations and labs: the 互动资源 lists (第 9 轮 2.5)
     defines: set = field(default_factory=set)
@@ -387,6 +390,8 @@ def fill(sec: Section, values: dict, rep: Report) -> str:
         if prog not in values:
             rep.add("error", "占位符", sec.id, f"{{{{{prog}.{name}}}}}：没有程序 {prog}.py 或它没有运行成功")
             return m.group(0)
+        if values[prog].get(gpurun.PENDING):          # GPU 实测还没有做（第 14 轮附 4.4 节）
+            return "[to be measured]" if sec.lang == "en" else "〔待实测〕"
         if name not in values[prog]:
             rep.add("error", "占位符", sec.id, f"{{{{{prog}.{name}}}}}：程序 {prog}.py 没有交出 {name}")
             return m.group(0)
@@ -512,6 +517,22 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
                 sec.labdocs.append((num, script, g))
             return (f"<figure class='wq-lab' id='{kind}-{num}'><div class='wq-media-box wq-labbox' data-lab='{num.replace('.', '-')}'>"
                     f"{box}{cap}</div>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
+    if kind == "GPU实验":    # 云端 GPU 实验（人工智能第 14 轮附）：chNN/gpulab/<src>/lab.yaml + lab.py
+        sec.defines.add(f"实验 {num}")             # the text refers to it as “GPU 实验 4.1”
+        label = f"GPU Lab {num}" if en else f"GPU 实验 {num}"
+        box = f"[{label}] " if en else f"【{label}】"
+        name = meta.get("src", "")
+        folder = sec.path.parent / "gpulab" / name if name else sec.path.parent / "gpulab" / "?"
+        g, cs, bad = gpulab.load(folder)
+        for why in bad:
+            rep.add("error", "实验", sec.id, f"{label}：{why}")
+        if g is not None and not bad and not en:
+            sec.gpulabs.append((num, folder, g, cs))
+        tier = {"basic": ("普通 GPU", "a standard GPU"), "hopper": ("Hopper 架构 GPU", "a Hopper GPU"),
+                "profile": ("能读性能计数器的 GPU", "a GPU with performance counters")}.get((g or {}).get("显卡"), ("GPU", "a GPU"))
+        need = f" (needs {tier[1]})" if en else f"（需要{tier[0]}）"
+        return (f"<figure class='wq-lab wq-gpulab' id='实验-{num}'><div class='wq-media-box wq-gpubox' data-gpulab='{num.replace('.', '-')}'>"
+                f"{box}{cap}{need}</div>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     if kind == "任务":       # 工程任务单 (第 11 轮 2.7（3）5a、第 13 轮): task/NAME.yaml → task sheet, rubric, blank calculation sheet
         name = meta.get("src", "")
         path = sec.path.parent / "task" / f"{name}.yaml" if name else None
@@ -806,6 +827,12 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     check_other_books(book, rep)
     check_std_tables(book, rep)
     values = run_programs(book, {s.chapter for s in sections}, rep)
+    # 书中数字的 GPU 实测记录（人工智能第 14 轮附 4.4 节）：code/runs/<名>/ 与 <名>.json
+    status = {int(k): (v or {}).get("status", "draft") for k, v in (prog_meta.get("chapters") or {}).items()}
+    run_vals, run_probs = gpurun.values(book["root"], {s.chapter for s in sections}, status)
+    values.update(run_vals)
+    for level, where, text in run_probs:
+        rep.add(level, "实测", where, text)
     en_chapters = {s.chapter for s in sections_en}
     values_en = run_programs(book, en_chapters, rep, "en") if en_chapters else {}
     for prog, v in values_en.items():
@@ -941,6 +968,16 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 labdocs.report_en(m, g, lab_dir / f"{stem}-report.en.docx", no, where[0])
         if labs:
             trial_labs(page_html, [no.replace(".", "-") for no, _ in items], rep, f"第 {ch} 章实验页")
+    gl = [x for sec in sections for x in sec.gpulabs]       # 云端 GPU 实验：笔记本、文件、指导书与报告模板
+    index["gpulabs"] = {}
+    if gl:
+        index["gpulabs"] = gpulab.pack(out / "gpulab", [(no, folder, g, cs) for no, folder, g, cs in gl])["labs"]
+        for sec in sections:
+            for no, folder, g, cs in sec.gpulabs:
+                where = (f"《{book['title']}》{sec.id} 节", f"{book.get('title_en') or book['title']}, Section {sec.id}")
+                stem = f"lab{no.replace('.', '_')}"
+                labdocs.guide(gpulab.meta(g), g, out / "gpulab" / f"{stem}-guide.docx", no, where)
+                labdocs.report(gpulab.meta(g), g, out / "gpulab" / f"{stem}-report.docx", no, where)
     index["tasks"] = {}           # 工程任务单 (第 13 轮): task sheet, rubric and blank calculation sheet in Word
     task_dir = out / "task"
     for ch, secs in sorted(by_ch.items()):

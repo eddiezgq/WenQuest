@@ -22,7 +22,15 @@ export interface Member { id: number; fullname: string; email: string; avatar: s
 export interface Group { id: number; name: string; members: number[] }
 export interface PlanGroup { name: string; members: number[]; note: string; names: string[] }
 
+export interface GpuUsage {
+  grant_hours: number;
+  students: { user_id: number; name: string; hours: number; cost: number; sessions: number }[];
+}
+
 export const courseApi = {
+  // 云端 GPU 实验（《人工智能》第 14 轮附）
+  gpuUsage: (cid: number) => request<GpuUsage>("GET", `/api/v1/courses/${cid}/gpulab/usage`),
+  gpuGrant: (cid: number, hours: number) => request<{ hours: number }>("PUT", `/api/v1/courses/${cid}/gpulab/grant`, { hours }),
   announcements: (cid: number) =>
     request<{ forum: number | null; items: Discussion[]; can_post: boolean }>("GET", `/api/v1/courses/${cid}/announcements`),
   announce: (cid: number, subject: string, message: string) =>
