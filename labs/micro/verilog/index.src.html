@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verilog 在线综合与仿真</title>
+<link rel="stylesheet" href="../kit/wq-lab.css">
+<style>
+  @media (min-width: 901px) { .lab { grid-template-columns: minmax(0, 1fr) 360px; } }
+  textarea.code { width: 100%; min-height: 230px; font-family: var(--mono); font-size: 13px; line-height: 1.5; border: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; background: var(--stage); color: var(--ink); resize: vertical; tab-size: 2; }
+  #paper { min-height: 260px; overflow: auto; border-top: 1px solid var(--line); background: #fff; }
+  #monitor { border-top: 1px solid var(--line); overflow-x: auto; background: #fff; }
+  #iopanel { padding: 8px 12px; border-top: 1px solid var(--line); font-size: 13px; }
+  pre.log { font-family: var(--mono); font-size: 12px; background: var(--soft); border-radius: 8px; padding: 10px; overflow: auto; max-height: 220px; margin: 0; white-space: pre-wrap; }
+  .status { font-size: 14px; } .status.ok { color: var(--ok); } .status.err { color: var(--red); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="course" data-en="WenQuest microelectronics · browser toolchain (Round 17, step 3c)">问渠微电子 · 浏览器档工具（第 17 轮 3c）</div>
+      <h1 data-en="Verilog: Synthesise and Simulate Online">Verilog 在线综合与仿真</h1>
+    </div>
+    <div class="hright"><span id="progress"></span><button class="lang" id="lang">EN</button></div>
+  </header>
+  <p class="hint" data-en="Write Verilog, synthesise it with Yosys (WebAssembly, ISC licence) and simulate the gate-level result with DigitalJS (BSD-2). The tests below run automatically after each synthesis.">写 Verilog，用 Yosys（WebAssembly，ISC 许可）综合，再用 DigitalJS（BSD-2）对综合出的门级电路仿真。每次综合后自动运行下面的测试。</p>
+  <section class="lab" id="lab-1" style="margin-top:12px">
+    <div class="stagebox">
+      <div class="stagebar" style="border-top:0">
+        <span data-en="Examples">样例</span>
+        <button class="btn chip" data-ex="counter" aria-pressed="true" data-en="4-bit counter">4 位计数器</button>
+        <button class="btn chip" data-ex="pwm" aria-pressed="false" data-en="PWM generator (robot joint)">PWM 发生器（机器人关节）</button>
+      </div>
+      <textarea class="code" id="src" spellcheck="false" aria-label="Verilog 源代码"></textarea>
+      <div class="stagebar">
+        <button class="btn primary" id="run" data-en="Synthesise &amp; simulate">综合并仿真</button>
+        <span class="status" id="st"></span>
+      </div>
+      <div id="paper"></div>
+      <div id="monitor"></div>
+      <div id="iopanel"></div>
+    </div>
+    <div class="side">
+      <div class="card"><h3 data-en="RESULTS">结果</h3><dl class="readout" id="res"></dl></div>
+      <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk1"></ul></div>
+      <div class="card"><h3 data-en="YOSYS STATISTICS">Yosys 统计</h3><pre class="log" id="log">—</pre></div>
+    </div>
+  </section>
+  <footer data-en="The engines are fetched on first use: Yosys about 15.5 MB compressed, DigitalJS about 1 MB. For deployment in China the files should be served from the WenQuest server instead of a public CDN.">引擎在首次使用时下载：Yosys 压缩后约 15.5 MB，DigitalJS 约 1 MB。国内部署时应改由问渠服务器提供这些文件，而不是公共 CDN。</footer>
+</div>
+<!--@params-->
+<script src="../kit/wq-lab.js"></script>
+<script>/*@y2d*/</script>
+<script type="module">
+const L = WQLab, $ = L.$, T = L.T;
+// 引擎地址：可由 window.WQ_ENGINE_BASE 覆盖（问渠服务器自托管），否则依次尝试公共 CDN
+const BASES = (window.WQ_ENGINE_BASE ? [window.WQ_ENGINE_BASE] : []).concat(['https://unpkg.com/', 'https://cdn.jsdelivr.net/npm/']);
+const YOSYS = '@yowasp/yosys@0.70.62-dev.1236/gen/bundle.js';
+const DIGITALJS = 'digitaljs@0.14.2/dist/main.js';
+L.init({ id: 'verilog' });
+
+const EX = {
+  counter: `// 4 位计数器：rst 同步清零，en 为 1 时每个时钟加 1
+module counter4 (
+  input            clk,
+  input            rst,
+  input            en,
+  output reg [3:0] q
+);
+  always @(posedge clk)
+    if (rst)     q <= 4'd0;
+    else if (en) q <= q + 4'd1;
+endmodule
+`,
+  pwm: `// 关节电机 PWM 发生器：16 个时钟一个周期，duty 个时钟输出高电平
+module pwm4 (
+  input        clk,
+  input        rst,
+  input  [3:0] duty,
+  output       out
+);
+  reg [3:0] cnt;
+  always @(posedge clk)
+    if (rst) cnt <= 4'd0;
+    else     cnt <= cnt + 4'd1;
+  assign out = (cnt < duty);
+endmodule
+`,
+};
+let ex = 'counter';
+const state = { yosysMs: null, synthMs: null, cells: null, devices: null };
+document.querySelectorAll('[data-ex]').forEach((b) => (b.onclick = () => {
+  ex = b.dataset.ex; $('src').value = EX[ex];
+  document.querySelectorAll('[data-ex]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+  L.report('param', { param: 'example', value: ex });
+}));
+$('src').value = EX[ex];
+
+L.defineTasks('1', [
+  { id: 'synth', zh: '综合任一样例，读出 Yosys 统计中的单元数。', en: 'Synthesise either example and read the cell count in the Yosys statistics.' },
+  { id: 'counter', zh: '4 位计数器通过自动测试：复位后连续计数 1…15，第 16 个时钟回到 0。', en: '4-bit counter passes the automatic test: after reset it counts 1…15 and wraps to 0 on the 16th clock.' },
+  { id: 'pwm', robot: true, zh: 'PWM 发生器通过自动测试：duty = 4 和 12 时，每 16 个时钟分别有 4 个和 12 个高电平。', en: 'PWM generator passes the automatic test: with duty = 4 and 12 the output is high for 4 and 12 of every 16 clocks.' },
+], 'tk1');
+
+function status(m, c) { $('st').textContent = m; $('st').className = 'status ' + (c || ''); }
+function loadScript(url) { return new Promise((ok, bad) => { const s = document.createElement('script'); s.src = url; s.onload = ok; s.onerror = () => bad(new Error('load ' + url)); document.head.appendChild(s); }); }
+async function firstOk(fn) { let err; for (const b of BASES) { try { return await fn(b); } catch (e) { err = e; } } throw err; }
+
+let runYosys = null;
+async function ensureEngines() {
+  if (!window.digitaljs) await firstOk((b) => loadScript(b + DIGITALJS));
+  if (!runYosys) {
+    const t0 = performance.now();
+    const mod = await firstOk((b) => import(b + YOSYS));
+    runYosys = mod.runYosys;
+    await runYosys(['-V'], {}, { stdout: () => {}, stderr: () => {} }); // 预热：下载并编译 wasm
+    state.yosysMs = performance.now() - t0;
+    L.report('engine_loaded', { engine: 'yosys', ms: Math.round(state.yosysMs) });
+  }
+}
+
+/* 门级自动测试（DigitalJS 无界面仿真，手动驱动时钟） */
+function testbench(json) {
+  const c = new digitaljs.HeadlessCircuit(json);
+  const ins = {}, outs = {};
+  c.getInputCells().forEach((x) => (ins[x.get('net')] = x));
+  c.getOutputCells().forEach((x) => (outs[x.get('net')] = x));
+  if (!ins.clk) return { kind: null };
+  const V = ins.clk.get('outputSignals').out.constructor;
+  const set = (n, v) => ins[n] && ins[n].setInput(V.fromNumber(v, ins[n].get('bits')));
+  const settle = () => { let k = 0; while (c.hasPendingEvents && k++ < 100000) c.updateGates(); };
+  const tick = () => { set('clk', 1); settle(); set('clk', 0); settle(); };
+  const reset = () => { set('rst', 1); tick(); set('rst', 0); };
+  Object.keys(ins).forEach((n) => set(n, 0)); settle();
+  if (outs.q && ins.en) {
+    reset(); set('en', 1); const seq = [];
+    for (let i = 0; i < 16; i++) { tick(); seq.push(outs.q.getOutput().toNumber()); }
+    const ok = seq.join() === [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0].join();
+    return { kind: 'counter', ok, detail: seq.join(' ') };
+  }
+  if (outs.out && ins.duty) {
+    const res = {};
+    for (const d of [4, 12]) {
+      set('duty', d); reset(); let hi = 0;
+      for (let i = 0; i < 16; i++) { if (outs.out.getOutput().toNumber()) hi++; tick(); }
+      res[d] = hi;
+    }
+    return { kind: 'pwm', ok: res[4] === 4 && res[12] === 12, detail: `duty 4 → ${res[4]}/16, duty 12 → ${res[12]}/16` };
+  }
+  return { kind: null };
+}
+
+let circuit = null;
+async function run() {
+  try {
+    status(T('正在下载引擎（首次约 16 MB）…', 'Downloading engines (about 16 MB the first time)…'));
+    await ensureEngines();
+    status(T('综合中…', 'Synthesising…'));
+    const t1 = performance.now();
+    let log = '';
+    const files = await runYosys(['-q', '-p', 'read_verilog top.v; proc; opt; memory; opt; wreduce; opt_clean; write_json out.json; tee -q -o stat.txt stat'],
+      { 'top.v': $('src').value }, { stdout: () => {}, stderr: (d) => { if (d) log += new TextDecoder().decode(d); } });
+    state.synthMs = performance.now() - t1;
+    if (!files['out.json']) throw new Error(log || 'Yosys');
+    const stat = files['stat.txt'] ? (typeof files['stat.txt'] === 'string' ? files['stat.txt'] : new TextDecoder().decode(files['stat.txt'])) : '';
+    $('log').textContent = stat.trim().split('\n').filter((l) => l.trim()).slice(-20).join('\n');
+    const m = stat.match(/Number of cells:\s+(\d+)/) || stat.match(/(\d+)\s+cells/);
+    state.cells = m ? +m[1] : null;
+    const yj = JSON.parse(typeof files['out.json'] === 'string' ? files['out.json'] : new TextDecoder().decode(files['out.json']));
+    const plain = WQY2D.yosys2digitaljs(yj);
+    state.devices = Object.keys(plain.devices).length;
+    L.done('1', 'synth');
+    const tb = testbench(JSON.parse(JSON.stringify(plain)));
+    state.test = tb;
+    if (tb.kind && tb.ok) L.done('1', tb.kind);
+    L.report('verilog_test', { kind: tb.kind, ok: !!tb.ok, detail: tb.detail });
+    // 交互显示：时钟、按钮、数码显示
+    const ui = JSON.parse(JSON.stringify(plain)); WQY2D.io_ui(ui);
+    if (circuit) { circuit.stop(); circuit.shutdown && circuit.shutdown(); }
+    $('paper').innerHTML = ''; $('monitor').innerHTML = ''; $('iopanel').innerHTML = '';
+    circuit = new digitaljs.Circuit(ui);
+    const monitor = new digitaljs.Monitor(circuit);
+    new digitaljs.MonitorView({ model: monitor, el: $('monitor') });
+    new digitaljs.IOPanelView({ model: circuit, el: $('iopanel') });
+    const jq = window.jQuery || window.$jq;
+    circuit.displayOn(jq ? jq('#paper') : $('paper'));
+    circuit.start();
+    status(tb.kind ? (tb.ok ? T('测试通过：', 'Test passed: ') : T('测试未通过：', 'Test failed: ')) + tb.detail : T('综合完成', 'Synthesised'), tb.kind && !tb.ok ? 'err' : 'ok');
+  } catch (e) {
+    status(T('出错：', 'Error: ') + (e.message || e), 'err');
+    L.report('verilog_error', { message: String(e.message || e).slice(0, 300) });
+  }
+  paint();
+}
+function paint() {
+  L.readout('res', [
+    [T('Yosys 下载＋启动', 'Yosys download + start'), state.yosysMs == null ? '—' : (state.yosysMs / 1000).toFixed(1) + ' s'],
+    [T('一次综合', 'One synthesis'), state.synthMs == null ? '—' : (state.synthMs / 1000).toFixed(2) + ' s'],
+    [T('单元数', 'Cells'), state.cells == null ? '—' : String(state.cells)],
+    [T('仿真器器件数', 'Simulator devices'), state.devices == null ? '—' : String(state.devices)],
+    [T('自动测试', 'Automatic test'), state.test && state.test.kind ? (state.test.ok ? T('通过', 'pass') : T('未通过', 'fail')) : '—'],
+  ]);
+  window.VERILOG_CHECK = Object.assign({}, state, { tasks: WQLab.tasks['1'].list.map((t) => [t.id, t.ok]) });
+}
+$('run').onclick = run;
+L.onLang(paint);
+L.applyLang(); paint();
+</script>
+</body>
+</html>
