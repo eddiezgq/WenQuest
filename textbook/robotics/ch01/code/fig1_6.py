@@ -4,6 +4,7 @@
 图 1.6.2：五台贯穿机器人的关节结构：由零件库关节表画出的“连杆—关节”树；方框是连杆，连线上的字母是关节类型。
 """
 import re
+import textwrap
 
 import yaml
 from matplotlib.patches import FancyBboxPatch
@@ -16,16 +17,54 @@ C = COLORS
 book = yaml.safe_load((ROOT / "textbook" / "robotics" / "book.yaml").read_text(encoding="utf-8"))
 prog = yaml.safe_load((ROOT / "textbook" / "robotics" / "progress.yaml").read_text(encoding="utf-8")) or {}
 parts_en = prog.get("parts_en", {})
-LEVEL = {"基础": ("#dcefdc", T("基础", "basic")), "进阶": ("#dbe9f6", T("进阶", "advanced")),
-         "专题": ("#f6d9d5", T("专题", "special topic")), "基础/进阶": ("#e8f0d0", T("基础/进阶", "basic/advanced"))}
+LEVEL = {"基础": ("#dcefdc", T("基础", "Basic")), "进阶": ("#dbe9f6", T("进阶", "Advanced")),
+         "专题": ("#f6d9d5", T("专题", "Special topic")), "基础/进阶": ("#e8f0d0", T("基础/进阶", "Basic/Advanced"))}
+EN = T("", "en") == "en"
+# 英文版图中的篇名用短名，章名用英文（第 1、4、12、39 章以 progress.yaml 的 title_en 为准）
+PART_SHORT = {"导论": "Introduction", "第一篇 数学基础篇": "Part I  Mathematics", "第二篇 运动学篇": "Part II  Kinematics",
+              "第三篇 动力学篇": "Part III  Dynamics", "第四篇 结构与机电设计篇": "Part IV  Design", "第五篇 控制篇": "Part V  Control",
+              "第六篇 编程与 AI 篇": "Part VI  Programming & AI"}
+TITLE_EN = {
+    1: "Introduction to Robotics", 2: "Essentials of Linear Algebra", 3: "Vectors and Tensors",
+    4: "Rotation of Rigid Bodies: From Euler to Quaternions", 5: "Pose and Homogeneous Transformations",
+    6: "Screws, Lie Groups and Lie Algebras", 7: "Differential Equations and Numerical Methods", 8: "Fundamentals of Optimization",
+    9: "Fundamentals of Probability and Estimation", 10: "Kinematics of a Point", 11: "Mechanisms, Degrees of Freedom and Configuration Space",
+    12: "Forward Kinematics: The Product of Exponentials", 13: "Forward Kinematics: The DH Parameters",
+    14: "Inverse Kinematics: Analytical Solutions", 15: "Inverse Kinematics: Numerical Solutions",
+    16: "Velocity Kinematics and the Jacobian", 17: "Redundant Robots", 18: "Parallel Mechanisms", 19: "Kinematics of Mobile Robots",
+    20: "Kinematics of Legged and Humanoid Robots", 21: "Kinematics of Aerial Robots", 22: "Trajectory Planning",
+    23: "Fundamentals of Rigid-Body Dynamics", 24: "Lagrangian Dynamics", 25: "Newton–Euler Recursion in Screw Form",
+    26: "Dynamic Properties and Parameter Identification", 27: "Contact, Impact and Friction",
+    28: "Dynamics of Mobile, Legged and Aerial Robots", 29: "Dynamic Simulation", 30: "Overall Design of Robots",
+    31: "Structures, Materials and Strength", 32: "Transmissions and Speed Reducers", 33: "End-Effectors", 34: "Digital Prototypes",
+    35: "Fundamentals of Circuits and Electronics", 36: "Electric Motors and Drive Circuits", 37: "Controller Hardware",
+    38: "Principles of Sensors", 39: "Signal Conditioning and Automatic Testing", 40: "Communication and Buses",
+    41: "Power Supplies, Batteries and Electrical Safety", 42: "Fundamentals of Control Theory", 43: "Single-Joint Control",
+    44: "Multi-Joint Motion Control", 45: "Force Control and Impedance Control", 46: "State Estimation",
+    47: "Mobile Robots: Localization, Mapping and Navigation", 48: "Control of Legged and Humanoid Robots", 49: "Quadrotor Control",
+    50: "Visual Servoing", 51: "Fundamentals of Robot Programming", 52: "ROS 2", 53: "Motion Planning", 54: "Robot Vision",
+    55: "Fundamentals of Machine Learning", 56: "Reinforcement Learning", 57: "Imitation Learning and Data",
+    58: "Embodied Intelligence: Principles", 59: "Embodied Intelligence: Main Technical Routes",
+    60: "System Integration and the Digital Factory", 61: "Ethics, Regulations and Careers"}
+for _n, _c in (prog.get("chapters") or {}).items():
+    if isinstance(_c, dict) and _c.get("title_en"):
+        TITLE_EN[int(_n)] = _c["title_en"]
 ROBOT = [("B-ARM-UR5E", "#1f77b4", "UR5e"), ("B-ARM-PANDA", "#9467bd", "Panda"), ("B-LEG-GO2", "#2ca02c", "Go2"),
-         ("B-EDU-DIFF", "#d9822b", "AGV"), ("B-UAV-X2", "#d62728", T("四旋翼", "quadrotor"))]
+         ("B-EDU-DIFF", "#d9822b", "AGV"), ("B-UAV-X2", "#d62728", T("四旋翼", "Quadrotor"))]
 outline = (ROOT / "docs" / "教材" / "机器人学" / "00_提纲.md").read_text(encoding="utf-8")
 body = outline[outline.index("## 三、提纲"):outline.index("### 附录")]
 blocks = re.split(r"\n\*\*第 (\d+) 章", body)[1:]
 text_of = {int(blocks[i]): blocks[i + 1] for i in range(0, len(blocks), 2)}
 KEYS = {"B-ARM-UR5E": r"UR5e", "B-ARM-PANDA": r"Panda|七轴", "B-LEG-GO2": r"Go2|四足|足式",
         "B-EDU-DIFF": r"AGV|差速|移动机器人", "B-UAV-X2": r"四旋翼|无人机|空中机器人"}
+
+
+def en_title(no):
+    """英文章名折成至多两行，放进方框。"""
+    lines = textwrap.wrap(f"{no}  {TITLE_EN[no]}", 33)
+    if len(lines) > 2:
+        lines = [lines[0], textwrap.shorten(" ".join(lines[1:]), 33, placeholder=" …")]
+    return "\n".join(lines)
 
 
 def short(title):
@@ -41,8 +80,8 @@ for c in book["chapters"]:
     groups[-1][1].append(c)
 groups[0][1] = groups[0][1] + []           # 导论只有 1 章，与第一篇并排放在第一列的上方
 cols = [[groups[0], groups[1]]] + [[g] for g in groups[2:]]
-fig, ax = plt.subplots(figsize=(12.6, 6.0))
-W, Hrow = 1.72, 0.52
+fig, ax = plt.subplots(figsize=(12.6, 7.6) if EN else (12.6, 6.0))
+W, Hrow = 1.72, (0.70 if EN else 0.52)
 ax.set_xlim(-0.1, len(cols) * 1.86 + 0.1)
 ax.axis("off")
 ylow = 15.0
@@ -50,19 +89,23 @@ for ci, col in enumerate(cols):
     x = ci * 1.86 + W / 2 + 0.05
     y = 15.0
     for part, chs in col:
-        ax.text(x, y, T(part, parts_en.get(part, part)), ha="center", va="center", fontsize=8.4, weight="bold",
+        ax.text(x, y, T(part, PART_SHORT.get(part, parts_en.get(part, part))), ha="center", va="center", fontsize=8.4, weight="bold",
                 color=C["ink"], wrap=True)
         y -= 0.55
         for c in chs:
             fc = LEVEL.get(c["level"], ("#eeeeee", ""))[0]
             ax.add_patch(FancyBboxPatch((x - W / 2, y - Hrow / 2 + 0.03), W, Hrow - 0.06,
                                         boxstyle="round,pad=0.0,rounding_size=0.05", fc=fc, ec=C["muted"], lw=0.6))
-            ax.text(x - W / 2 + 0.06, y + 0.07, T(f"{c['no']}  {short(c['title'])}", f"Chapter {c['no']}"), ha="left",
-                    va="center", fontsize=6.9, color=C["ink"])
+            if EN:
+                ax.text(x - W / 2 + 0.06, y + Hrow / 2 - 0.07, en_title(c["no"]), ha="left", va="top", fontsize=6.2,
+                        color=C["ink"], linespacing=1.15)
+            else:
+                ax.text(x - W / 2 + 0.06, y + 0.07, f"{c['no']}  {short(c['title'])}", ha="left",
+                        va="center", fontsize=6.9, color=C["ink"])
             k = 0
             for rid, colr, _ in ROBOT:
                 if re.search(KEYS[rid], text_of[c["no"]]):
-                    ax.plot([x - W / 2 + 0.12 + 0.13 * k], [y - 0.15], "o", color=colr, ms=3.6)
+                    ax.plot([x - W / 2 + 0.12 + 0.13 * k], [y - (0.22 if EN else 0.15)], "o", color=colr, ms=3.6)
                     k += 1
             y -= Hrow
             ylow = min(ylow, y)
@@ -76,14 +119,14 @@ for i, (_, colr, name) in enumerate(ROBOT):
     xx = 6.8 + i * 0.95
     ax.plot([xx], [yl], "o", color=colr, ms=5)
     ax.text(xx + 0.1, yl, name, va="center", fontsize=8.5)
-ax.text(0.2, yl - 0.55, T("圆点：提纲中该章（含配套实验）用到的贯穿机器人", "Dots: the through-robots a chapter (with its labs) uses in the outline"),
+ax.text(0.2, yl - 0.55, T("圆点：提纲中该章（含配套实验）用到的贯穿机器人", "Dots: the recurring robots each chapter (with its labs) uses, per the outline"),
         fontsize=8.2, color=C["muted"])
 ax.set_ylim(yl - 0.8, 15.4)
 figure(fig, "fig1_6_1")
 plt.close(fig)
 
 # ---------------------------------------------------------------- 图 1.6.2
-NAME = {"B-ARM-UR5E": "UR5e", "B-ARM-PANDA": "Panda", "B-LEG-GO2": "Go2", "B-EDU-DIFF": T("差速小车", "Diff. cart"),
+NAME = {"B-ARM-UR5E": "UR5e", "B-ARM-PANDA": "Panda", "B-LEG-GO2": "Go2", "B-EDU-DIFF": T("差速小车", "Differential-drive cart"),
         "B-UAV-X2": T("四旋翼 X2", "Quadrotor X2")}
 JT = {"revolute": "R", "continuous": "R", "prismatic": "P"}
 fig, axs = plt.subplots(1, 5, figsize=(12.4, 5.4), gridspec_kw={"width_ratios": [1, 1.1, 2.4, 1.1, 0.9]})

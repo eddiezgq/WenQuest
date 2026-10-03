@@ -145,11 +145,11 @@ TIMELINE = [
     (-250, "克特西比乌斯：带浮子调节的水钟", "Ctesibius: water clock with a float regulator", "ctrl"),
     (60, "希罗：绳索与木钉“编程”的自动小车", "Hero: a cart programmed by rope and pegs", "auto"),
     (1088, "苏颂、韩公廉：水运仪象台", "Su Song, Han Gonglian: astronomical clock tower", "auto"),
-    (1206, "加扎里：《精巧机械装置知识书》", "al-Jazari: Book of Knowledge of Ingenious Mechanical Devices", "auto"),
+    (1206, "加扎里：《精巧机械装置知识书》", "al-Jazari: Book of Ingenious Mechanical Devices", "auto"),
     (1739, "沃康松：消化鸭", "Vaucanson: the Digesting Duck", "auto"),
     (1774, "雅克-德罗：书写者（凸轮编程）", "Jaquet-Droz: the Writer (programmed by cams)", "auto"),
     (1788, "瓦特：离心调速器", "Watt: centrifugal governor", "ctrl"),
-    (1804, "雅卡尔：穿孔卡片织机", "Jacquard: punched-card loom", "auto"),
+    (1804, "雅卡尔：穿孔卡片织机", "Jacquard loom controlled by punched cards", "auto"),
     (1868, "麦克斯韦：《论调速器》", "Maxwell: On Governors", "ctrl"),
     (1920, "恰佩克：《罗素姆万能机器人》", "Čapek: R.U.R.", "ind"),
     (1942, "阿西莫夫：机器人三定律", "Asimov: Three Laws of Robotics", "ai"),
@@ -183,8 +183,10 @@ IFR = {
     "stock_2025": 5.0e6,            # 2025 年末在役“创纪录的 500 万台”（增长 9%）
     "fc_2026": 655000, "fc_2029": 806000,       # WR 2026 预测
     # 各国安装量：2024 年（WR 2025），2025 年（WR 2026）
+    # 德国 2025 年只公布为“少于 2.5 万台”，表中 25000 是上限，图中标作“<25”
+    "upper_2025": ["德国"],
     "country": [("中国", "China", 295000, 354000), ("美国", "USA", 34200, 38500), ("日本", "Japan", 44500, 36219),
-                ("韩国", "Korea", 30600, 30000), ("德国", "Germany", 26982, 25000)],
+                ("韩国", "Rep. of Korea", 30600, 30000), ("德国", "Germany", 26982, 25000)],
 }
 # IFR WR 2025 服务机器人（2025-10-07 发布）：2024 年专业服务机器人销量（台）
 IFR_SERVICE_2024 = [("运输与物流", "Transport & logistics", 102900), ("餐饮酒店", "Hospitality", 42000),

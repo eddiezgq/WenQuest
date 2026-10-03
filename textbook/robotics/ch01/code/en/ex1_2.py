@@ -1,7 +1,8 @@
-"""算例 1.2.1、1.2.2：从 IFR《World Robotics》公布的数字算出年均增长率和中国所占份额。
+"""Examples 1.2.1, 1.2.2: average annual growth rate and China's share, from the figures published in IFR World Robotics.
 
-式 (1.2.1)：N_t = N_0 (1 + r)^t；式 (1.2.2)：r = (N_t / N_0)^{1/t} − 1。
-年均增长率用两种方法算：开 t 次方；取对数。两者必须一致，并且按 r 逐年复利 t 年必须回到 N_t / N_0。
+Eq. (1.2.1): N_t = N_0 (1 + r)^t; Eq. (1.2.2): r = (N_t / N_0)^{1/t} − 1.
+The average annual growth rate is computed two ways: by taking the t-th root, and by logarithms. The two must agree,
+and compounding at r for t years must return N_t / N_0.
 """
 import math
 
@@ -10,51 +11,51 @@ from bookout import T, out
 
 
 def grp(n):
-    """大数按三位分节：中文版用空格（GB/T 15835），英文版用逗号。"""
+    """Group the digits of a large number in threes: spaces in the Chinese edition (GB/T 15835), commas in English."""
     t = f"{int(round(n)):,}"
     return T(t.replace(",", " "), t)
 
 
 def cagr(ratio, years):
-    """式 (1.2.2)。"""
+    """Eq. (1.2.2)."""
     return ratio ** (1 / years) - 1
 
 
 def cagr_log(ratio, years):
-    """同一个量用对数算：ln(1 + r) = ln(ratio) / t。"""
+    """The same quantity by logarithms: ln(1 + r) = ln(ratio) / t."""
     return math.exp(math.log(ratio) / years) - 1
 
 
-# 算例 1.2.1：“十年翻一番”相当于每年增长多少
+# Example 1.2.1: what yearly growth "doubling in ten years" amounts to
 r10 = cagr(2.0, 10)
 assert abs(r10 - cagr_log(2.0, 10)) < 1e-12
 x = 1.0
 for _ in range(10):
     x *= 1 + r10
-assert abs(x - 2.0) < 1e-12                       # 逐年复利十年，恰好翻一番
-r_simple = 1.0 / 10                               # 误把“翻一番”平均分到十年得到的 10%
-x_wrong = (1 + r_simple) ** 10                    # 按 10% 复利十年实际是多少倍
+assert abs(x - 2.0) < 1e-12                       # compounding for ten years doubles exactly
+r_simple = 1.0 / 10                               # the 10% obtained by wrongly spreading "doubling" evenly over ten years
+x_wrong = (1 + r_simple) ** 10                    # what 10% compounded for ten years actually gives
 
 inst24 = IFR["inst_2024"]
-inst14_max = inst24 / 2                            # “十年前的一半还不到”，即 2014 年少于这个数
+inst14_max = inst24 / 2                            # "more than double ten years earlier": 2014 was below this number
 
-# 预测：2026 年 65.5 万台到 2029 年 80.6 万台
+# Forecast: 655,000 units in 2026 to 806,000 units in 2029
 r_fc = cagr(IFR["fc_2029"] / IFR["fc_2026"], 3)
 assert abs(r_fc - cagr_log(IFR["fc_2029"] / IFR["fc_2026"], 3)) < 1e-12
 
-# 算例 1.2.2：中国所占份额
+# Example 1.2.2: China's share
 cn24, cn25 = IFR["country"][0][2], IFR["country"][0][3]
-inst25 = inst24 * (1 + IFR["growth_2025"])        # IFR 只说“超过 60 万台、增长 11%”，按增长率推算
+inst25 = inst24 * (1 + IFR["growth_2025"])        # IFR only says "over 600,000, up 11%"; estimated from the growth rate
 assert inst25 > 600000
 share24 = cn24 / inst24
 share25 = cn25 / inst25
 others25 = inst25 - cn25
-stock25 = IFR["stock_2024"] * 1.09                 # 在役量增长 9%
-assert 4.95e6 < stock25 < 5.15e6                   # 与“约 500 万台”相符
+stock25 = IFR["stock_2024"] * 1.09                 # operational stock up 9%
+assert 4.95e6 < stock25 < 5.15e6                   # consistent with "about 5 million"
 top5_24 = sum(c[2] for c in IFR["country"]) / inst24
 top5_25 = sum(c[3] for c in IFR["country"]) / inst25
 
-# 年表中的几个间隔
+# A few intervals in the timeline
 gap_word_unimate = 1961 - 1920
 gap_unimate_cobot = 2008 - 1961
 n_events = len(TIMELINE)

@@ -20,8 +20,9 @@ from wqbus import UNITS           # noqa: E402
 
 # 英文版平面图上用短名，免得字压到相邻设备
 SHORT_EN = {"vmc-01": "VMC", "hmc-01": "HMC", "ht-01": "Furnace", "grd-01": "Grinder", "qc-01": "Inspection",
-            "test-01": "Run-in rig", "asm-01": "Assembly", "hob-01": "Hobber", "key-01": "Keyway mill",
-            "cnc-l01-a": "Lathe A", "cnc-l01-b": "Lathe B", "saw-01": "Band saw", "store-01": "Raw store", "store-02": "Store"}
+            "test-01": "Run-in rig", "asm-01": "Assembly", "hob-01": "Hobber", "key-01": "Keyway",
+            "cnc-l01-a": "Lathe A", "cnc-l01-b": "Lathe B", "saw-01": "Band saw", "store-01": "Raw-material\nstore", "store-02": "Finished-\ngoods store"}
+EN = T("zh", "en") == "en"
 # ---------------------------------------------------------------- 图 1.5.1
 W, D = layout.FLOOR
 fig, ax = plt.subplots(figsize=(10.0, 6.2))
@@ -32,7 +33,8 @@ ax.add_patch(Rectangle((layout.CROSS_X - 1.0, layout.AISLES[0]), 2.0, layout.AIS
 for u, (x, y, w, d) in layout.LAYOUT.items():
     store = u.startswith("store")
     ax.add_patch(Rectangle((x - w / 2, y - d / 2), w, d, fc="#c9d6e3" if store else "#ffffff", ec=C["ink"], lw=0.8))
-    ax.text(x, y + 0.35, T(UNITS[u][1], SHORT_EN.get(u, UNITS[u][2])), ha="center", va="center", fontsize=7.4)
+    ax.text(x, y + (0.85 if store and EN else 0.35), T(UNITS[u][1], SHORT_EN.get(u, UNITS[u][2])), ha="center", va="center",
+            fontsize=6.4 if store and EN else 7.4)
     ax.text(x, y - 0.55, u, ha="center", va="center", fontsize=6.6, color=C["muted"])
 for a, (x, y) in layout.AGV_HOME.items():
     ax.add_patch(Rectangle((x - 0.65, y - 0.42), 1.3, 0.85, fc="#f28c28", ec=C["ink"], lw=0.6))
@@ -116,7 +118,7 @@ n = np.linspace(0, 4, 200)
 c.plot(n, 1 - np.exp(-n), color=C["accent"], lw=1.8)
 c.axhline(0.95, color=C["muted"], ls="--", lw=0.8)
 c.axvline(math.log(20), color=C["muted"], ls="--", lw=0.8)
-c.text(math.log(20) + 0.06, 0.4, f"n = ln 20 ≈ {math.log(20):.2f}", fontsize=8.5)
+c.text(math.log(20) - 0.06, 0.4, f"n = ln 20 ≈ {math.log(20):.2f}", fontsize=8.5, ha="right")   # 写在虚线左侧，免得被裁掉
 c.set_xlabel(T("清扫过的“遍数” n", "number of passes n"))
 c.set_ylabel(T("覆盖率 c", "coverage c"))
 c.set_title(T("(c) 随机清扫的覆盖率 c = 1 − e⁻ⁿ", "(c) Random coverage c = 1 − e⁻ⁿ"), fontsize=9.5)

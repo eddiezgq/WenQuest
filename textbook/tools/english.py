@@ -57,6 +57,15 @@ def structure(text: str, lang: str) -> dict:
 
 def parity(zh: str, en: str) -> list[str]:
     a, b = structure(zh, "zh"), structure(en, "en")
+    # A Chinese 万-quantity ({{prog.x_wan}}) has no English form; the English edition writes the same number from a
+    # value the same program hands over in English units (thousands, millions), e.g. dv_2025_wan → dv_2025_mio.
+    k = "占位符"
+    wan = [x for x in a[k] if x[1].endswith("_wan") and x not in b[k]]
+    progs = {p for p, _ in wan}
+    extra = [x for x in b[k] if x not in a[k] and x[0] in progs]
+    if wan and extra and {p for p, _ in extra} == progs:
+        a[k] = [x for x in a[k] if x not in wan]
+        b[k] = [x for x in b[k] if x not in extra]
     out = []
     for k in a:
         if a[k] != b[k]:
@@ -92,6 +101,11 @@ def _forms(t: str) -> set[str]:
         if t.endswith(suf):
             out.add(t[: -len(suf)])
     out.add(t + "s")
+    if " of " in t:                       # "degree of freedom" → "degrees of freedom"
+        head, tail = t.split(" of ", 1)
+        out.add(f"{head}s of {tail}")
+        if head.endswith("s"):
+            out.add(f"{head[:-1]} of {tail}")
     return out
 
 

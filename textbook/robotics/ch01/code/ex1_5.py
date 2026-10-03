@@ -150,4 +150,4 @@ out(n_ops=len(ops), mach_min=mach_min, n_mv=len(mv), dist=dist, dist_1=dist_1, t
     grip=grip, payload=payload, tot202=m202 + grip, tot302=m302 + grip, tot301=m301 + grip,
     A=A, w=w, v=v, ov=ov, t_row_min=t_row / 60, n95=n95, t_rand_min=t_rand / 60, rand_ratio=t_rand / t_row,
     c_sim=c_sim, c_formula=c_formula, n_sim=n_sim, strokes=strokes,
-    dv_2025=dv_2025, dv_2024=dv_2024, dv_growth_pct=dv_growth * 100, dv_2025_wan=dv_2025 / 1e4, dv_2024_wan=dv_2024 / 1e4, dv_per_day=dv_per_day, tl_share_pct=tl_share * 100)
+    dv_2025=dv_2025, dv_2024=dv_2024, dv_growth_pct=dv_growth * 100, dv_2025_wan=dv_2025 / 1e4, dv_2024_wan=dv_2024 / 1e4, dv_2025_mio=dv_2025 / 1e6, dv_2024_mio=dv_2024 / 1e6, dv_per_day=dv_per_day, tl_share_pct=tl_share * 100)
