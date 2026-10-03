@@ -1,0 +1,35 @@
+# 工程任务单 TS-51-1（配 51.3–51.9 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-51-1
+标题: [SH-301 铣键槽的定位方案论证, "Locating scheme for milling the SH-301 keyway"]
+角色: [工艺员（夹具方案）, process engineer (fixturing)]
+背景:
+  - "数字工厂准备为 SH-301 的铣键槽工序（工序 50）设计一套专用夹具（第 52 章）。动手画图之前，工艺主管要你先论证定位方案：用 V 形块、两顶尖，还是三爪卡盘加后顶尖？每种方案限制哪些自由度，会不会欠定位或过定位，槽底尺寸 H 和键槽对称度的定位误差各是多少，能不能保证？最后在数字工厂里用 AI 预检核对你的计算，并用仿真车间的三坐标数据看实际的对称度。"
+  - "The digital factory is about to design a dedicated fixture for milling the SH-301 keyway (operation 50, Chapter 52). Before any drawing, the supervisor wants the locating scheme argued out: V-blocks, between centres, or a chuck with a tail centre? Which freedoms does each restrict, is any under- or over-located, how large is the locating error for the slot-bottom dimension H and for keyway symmetry, and can they be held? Finally check your figures with the AI pre-check in the digital factory and look at the actual symmetry in the simulated shop's CMM data."
+输入:
+  - {名称: [SH-301 工艺规程与工序 50 的工序卡, "SH-301 process plan and the operation 50 sheet"], 来源: [数字工厂 /api/process/cards/reference/SH-301；教材图 50.5.2, "Digital factory; Figure 50.5.2"]}
+  - {名称: [SH-301 图纸特性（C4–C6）, "SH-301 drawing characteristics C4–C6"], 来源: [教材图 50.6.1, Figure 50.6.1]}
+  - {名称: [定位误差计算库与实验 51.7, "Locating-error library and Lab 51.7"], 来源: [factory/digital/hub/tolerance.py；实验 51.7, "factory/digital/hub/tolerance.py; Lab 51.7"]}
+  - {名称: [仿真车间的键槽对称度数据, Keyway symmetry data from the simulated shop], 来源: [数字工厂“质量”页, "Digital factory Quality page"]}
+交付物:
+  - {名称: [定位方案论证书（2–3 页）, "Locating scheme report (2–3 pages)"], 验收: [三种方案各有定位简图（定位符号与自由度数）、自由度分析结论、H 与对称度的定位误差计算（写出公式和代入的数）、按三分之一判据的结论；选定方案并说明理由, "Each scheme has a sketch with locating symbols and DOF counts, a DOF verdict, locating-error calculations for H and symmetry (formula and numbers), and a verdict by the one-third rule; one scheme chosen with reasons"]}
+  - {名称: [AI 预检记录, AI pre-check record], 验收: [把选定方案的 locate_check 写进工序 50，提交“AI 预检”，没有定位误差方面的意见；再故意把定位外圆的公差 Td 改为 0.3 mm（相当于在不控制公差的粗车外圆上定位），记录评审员给出的意见，并说明为什么 Td = 0.25 时评审员不提意见, "Put the chosen scheme's locate_check into operation 50 and run the AI pre-check with no locating comments; then deliberately set the locating OD tolerance Td to 0.3 mm (as if locating on an uncontrolled rough-turned OD), record the reviewer's comment, and explain why it says nothing at Td = 0.25"]}
+  - {名称: [对称度数据复核, Symmetry data check], 验收: [从“质量”页读出最近 20 件的键槽对称度，算均值和最大值，判断与你的定位误差估计是否相符，说明差别从哪里来, "Read the last 20 keyway-symmetry values from the Quality page, give mean and maximum, judge whether they agree with your estimate, and explain any difference"]}
+工位: [PY, PLM, QMS]
+步骤:
+  - ["读工序 50 的工序卡和图纸特性，写出这道工序必须限制的自由度（为什么绕轴线的转动不必限制）。", "Read the operation 50 sheet and drawing characteristics; list the freedoms that must be restricted (and why rotation about the axis need not be)."]
+  - ["画出三种定位方案的简图，标定位符号和自由度数，用 51.4 节的方法判断是否欠定位或过定位。", "Sketch the three schemes with locating symbols and DOF counts; judge under- or over-location as in Section 51.4."]
+  - ["按 51.7 节的公式算 H 和对称度的定位误差，在实验 51.7 中核对 V 形块方案。", "Compute the locating errors for H and symmetry by Section 51.7, and check the V-block scheme in Lab 51.7."]
+  - ["按三分之一判据评价，选定方案。", "Judge by the one-third rule and choose."]
+  - ["在数字工厂把选定方案写进工序 50 的 locate_check，运行 AI 预检；再把 Td 改为 0.3 mm 故意改坏一次，记录意见。", "Write the chosen scheme into operation 50's locate_check in the digital factory and run the AI pre-check; break it once on purpose with Td = 0.3 mm and record the comment."]
+  - ["读仿真车间的对称度数据，复核你的估计。", "Read the simulated shop's symmetry data and check your estimate."]
+评审要点:
+  - ["〔老师检查〕自由度分析正确：V 形块 + 挡销为不完全定位（5 个），长夹持卡盘加顶尖为过定位，只用 V 形块为欠定位。", "[Teacher] DOF analysis correct: V-blocks + stop give partial location (5), a long chuck grip plus centre over-locates, V-blocks alone under-locate."]
+  - ["〔AI 检查〕定位误差：选定方案的 H 定位误差不超过 H 公差的三分之一。", "[AI] Locating error: the chosen scheme's error for H is within a third of H's tolerance."]
+  - ["〔老师检查〕对称度的定位误差有分析：考虑了精车外圆对中心孔连线的偏心，卡盘定心精度（跳动读数）换算成偏心、再换算到对称度公差带（2e）。", "[Teacher] Symmetry error is analysed: the finish-turned OD's eccentricity to the centre line is included, and the chuck's centring accuracy (an indicator reading) is converted to eccentricity and then to the symmetry zone (2e)."]
+  - ["〔老师检查〕数据复核结论合理，能说出实测对称度里除定位误差外的其他来源（对刀、夹具制造、铣刀偏摆）。", "[Teacher] The data check is sound and names sources of measured asymmetry other than locating (tool setting, fixture making, cutter runout)."]
+评分:
+  - {项: [自由度分析, DOF analysis], 分: 25, 标准: [三种方案判断全部正确，简图规范, "All three verdicts right, sketches tidy"]}
+  - {项: [定位误差计算, Locating error], 分: 35, 标准: [公式、代入、结果正确, "Formulas, numbers and results correct"]}
+  - {项: [方案选择, Scheme choice], 分: 15, 标准: [按判据选择，理由充分, "Chosen by the rule, with sound reasons"]}
+  - {项: [AI 预检与数据复核, Pre-check and data], 分: 25, 标准: [预检记录完整；数据复核结论合理, "Complete pre-check record; sound data conclusion"]}
+学时: 3

@@ -192,8 +192,9 @@ operations:
     inspect:
       - {char: "Ø35.3、Ø40.3（0/−0.039）", gauge: G03, freq: 首件、每 5 件}
       - {char: "轴端 Ø30 h8（C3）", gauge: G03, freq: 首件、每 5 件}
-      - {char: "总长 167±0.3、各段长度（C12）", gauge: G02, freq: 首件、每 10 件}
+      - {char: "总长 167±0.3（工序控制，严于图纸 C12 的 ±0.5）、各段长度", gauge: G02, freq: 首件、每 10 件}
       - {char: "齿轮定位轴肩端面圆跳动 0.02（C9）", gauge: G05, freq: 首件、每 10 件}
+      - {char: "齿轮位跳动 ≤ 0.006（对两中心孔连线；保证铣键槽的对称度，第 51 章）", tir: 0.006, gauge: G05, freq: 首件、每 10 件}
   - seq: 50
     operation: 铣键槽 Keyway milling
     workstation: 键槽铣床 KEY-01

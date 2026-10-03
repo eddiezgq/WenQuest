@@ -81,3 +81,37 @@ def test_sh301_keyway_depth_chain_holds():
     c5 = next(c for c in p["characteristics"] if c["id"] == "C5")
     assert r.nominal == pytest.approx(c5["nominal"])
     assert r.es <= c5["es"] + 1e-9 and r.ei >= c5["ei"] - 1e-9
+
+
+def test_dof_analysis():
+    plane = {"z", "rx", "ry"}
+    side = {"y", "rz"}
+    end = {"x"}
+    assert T.dof_analysis([("底面", plane), ("侧面", side), ("端面", end)], set(T.DOF))["verdict"] == "完全定位"
+    # 铣通槽：沿槽长方向 x 不必限制
+    assert T.dof_analysis([("底面", plane), ("侧面", side)], {"z", "rx", "ry", "y", "rz"})["verdict"] == "不完全定位"
+    assert T.dof_analysis([("底面", plane)], {"z", "rx", "ry", "y"})["missing"] == ["y"]
+    # 长 V 形块（4 个）+ 两个端面挡销都限制 x：过定位
+    r = T.dof_analysis([("长 V 形块", {"y", "z", "ry", "rz"}), ("左挡销", {"x"}), ("右挡销", {"x"})], {"x", "y", "z", "ry", "rz"})
+    assert r["verdict"] == "过定位" and r["repeated"] == ["x"]
+
+
+def test_v_block_contact_geometry_and_roundness():
+    import math as m
+    cx, cy = T.v_block_contact(T.circle_points(40, 720), 90)
+    assert abs(cx) < 1e-9 and cy == pytest.approx(20 / m.sin(m.pi / 4), rel=1e-4)
+    # 工作面不对称磨损：轴心偏离对称面
+    cx2, _ = T.v_block_contact(T.circle_points(40, 720), 90, wear_left=0.01)
+    assert abs(cx2) > 0.005
+    # 三棱圆的圆度误差在 V 形块上被放大或缩小，公式不能反映
+    base = T.v_block_mc(40.3, 0, -0.039, 90, "bottom", n=2000)
+    assert base == pytest.approx(T.v_block(0.039, 90, "bottom"), rel=0.01)
+    lob = T.v_block_mc(40.3, 0, -0.039, 90, "bottom", n=300, lobes=3, roundness=0.01)
+    assert lob > base
+
+
+def test_two_pins_point_and_diamond_pin():
+    r = T.two_pins_point(150, 220, 0.029, 0.03)
+    assert r["perp"] == pytest.approx(0.029 * (1 - 150 / 220) + 0.03 * 150 / 220)
+    dp = T.diamond_pin((8, 0.015, 0), 3, 0.05, 0.01, 0.009)
+    assert dp["X2min"] == pytest.approx(2 * 3 * 0.06 / 8) and dp["X2max"] == pytest.approx(8.015 - (8 - 0.045 - 0.009))

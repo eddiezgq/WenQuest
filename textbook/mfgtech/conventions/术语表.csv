@@ -976,6 +976,11 @@
 50,调整卡,machine setup sheet,
 50,数控程序单,NC program sheet,
 50,工艺更改单,process change notice,
+51,定位基面,locating surface,
+51,基准重合,coincidence of datums,
+51,削边销,diamond pin,
+51,一面两孔,one plane and two holes,
+51,自由度,degree of freedom (DOF),
 52,机床夹具,machine-tool fixture,
 52,夹具,fixture,
 52,钻模,drill jig,
@@ -1228,3 +1233,4 @@
 77,样件,prototype,
 77,量产爬坡,production ramp-up,
 77,持续改进,continuous improvement,
+51,浮动前顶尖,floating front centre,只定心、轴向由端面定位

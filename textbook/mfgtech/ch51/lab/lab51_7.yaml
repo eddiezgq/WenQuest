@@ -1,0 +1,30 @@
+# 实验 51.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab51_7.js。
+原理:
+  - ["定位误差 ΔD 是一批工件在夹具上定位时，工序基准沿工序尺寸方向的最大位移。它由两部分组成：工序基准与定位基准不重合引起的基准不重合误差 ΔB，以及定位基准在定位元件上的位移引起的基准位移误差 ΔY。", "The locating error ΔD is the largest movement of the operation datum along the operation dimension over a batch located in the fixture. It has two parts: the datum-mismatch error ΔB, when the operation datum is not the locating datum, and the datum-shift error ΔY, from the locating datum moving on the locator."]
+  - 式: "ΔD = ΔB ± ΔY        (51.6.1)"
+  - ["外圆在 V 形块上定位时，直径变小，轴心下移；工序基准是轴心、上母线还是下母线，误差各不相同。", "On a V-block a smaller diameter drops the axis; the error depends on whether the operation datum is the axis, the top or the bottom generatrix."]
+  - 式: "ΔY = T_d /(2 sin(α/2))；上母线 ΔY + T_d/2，下母线 ΔY − T_d/2        (51.7.1)"
+  - ["孔套在心轴或定位销上，孔心可偏向任意方向时，偏心最大 X_max/2，车出的外圆对孔的跳动最大为 X_max；只有工件总靠向同一侧、且工序尺寸也在这个方向上时，才可用 (T_D + T_d)/2。一面两销：两销连线上离圆柱销 x 处的孔，垂直连线方向的变动范围为 X1max(1 − x/L) + X2max·x/L，沿连线方向为 X1max。", "A bore on a mandrel or pin that can shift any way is off-centre by up to X_max/2, so the OD turned on it runs out by up to X_max; (T_D + T_d)/2 applies only when the work always rests on one side and the dimension lies in that direction. Plane and two pins: a bore on the pin line x from the round pin scatters by X1max(1 − x/L) + X2max·x/L across the line and by X1max along it."]
+  - ["经验判据：定位误差不超过工序公差的三分之一，留给加工和测量的余地。", "Rule of thumb: the locating error should not exceed a third of the operation tolerance, leaving room for machining and measurement."]
+步骤:
+  - ["选“SH-301 铣键槽：V 形块”，保持 α = 90°、T_d = 0.039 mm，读出轴心、上母线、下母线的定位误差，记入表 1，与式 (51.7.1) 的手算比较。", "Choose “SH-301 keyway: V-block”, keep α = 90° and T_d = 0.039 mm, read the errors at the axis, top and bottom, enter them in Table 1 and compare with Eq. (51.7.1)."]
+  - ["把 T_d 加大到 0.25、0.5 mm（用粗车后的外圆定位），记录下母线的误差，找出超过 H 公差三分之一的 T_d（任务 1）。", "Increase T_d to 0.25 and 0.5 mm (locating on the rough-turned OD), record the bottom-line error, and find the T_d at which it passes a third of H's tolerance (task 1)."]
+  - ["T_d 回到 0.039，夹角依次取 60°、90°、120°（任务 2），记入表 1，说明夹角怎样影响误差。", "Back to T_d = 0.039, take α = 60°, 90°, 120° (task 2), enter in Table 1, and explain how the angle matters."]
+  - ["选“GR-302 齿坯：心轴”，读出最大间隙（外圆对孔的最大跳动）和孔心的最大偏心；调孔、心轴公差和最小间隙，使误差 ≤ 0.015 mm（任务 3），记入表 2。", "Choose “GR-302 blank: mandrel”, read the maximum clearance (the largest OD runout) and the largest bore-centre offset; adjust the tolerances and minimum clearance until the error is ≤ 0.015 mm (task 3); enter in Table 2."]
+  - ["选“关节壳体：一面两销”，在 L ≤ 120 mm 的限制下选两销的间隙（任务 4），记下你的方案。", "Choose “joint housing: plane + two pins” and, with L ≤ 120 mm, choose the clearances (task 4); record your choice."]
+数据表:
+  - 标题: ["表 1  V 形块定位误差", "Table 1  V-block locating error"]
+    表头: ["α / °", "T_d / mm", "轴心 / µm", "上母线 / µm", "下母线 / µm", "手算下母线 / µm", "能否保证 H"]
+    表头英文: ["α / °", "T_d / mm", "Axis / µm", "Top / µm", "Bottom / µm", "Bottom by hand / µm", "H held?"]
+    行: [["90", "0.039", "", "", "", "", ""], ["90", "0.25", "", "", "", "", ""], ["90", "0.5", "", "", "", "", ""], ["60", "0.039", "", "", "", "", ""], ["120", "0.039", "", "", "", "", ""]]
+    行英文: [["90", "0.039", "", "", "", "", ""], ["90", "0.25", "", "", "", "", ""], ["90", "0.5", "", "", "", "", ""], ["60", "0.039", "", "", "", "", ""], ["120", "0.039", "", "", "", "", ""]]
+  - 标题: ["表 2  心轴定位误差", "Table 2  Mandrel locating error"]
+    表头: ["T_D / mm", "T_d / mm", "X_min / mm", "X_max（跳动）/ µm", "最大偏心 / µm", "结论"]
+    表头英文: ["T_D / mm", "T_d / mm", "X_min / mm", "X_max (runout) / µm", "Largest offset / µm", "Result"]
+    行: [["0.025", "0.016", "0.009", "", "", ""], ["", "", "", "", "", ""]]
+    行英文: [["0.025", "0.016", "0.009", "", "", ""], ["", "", "", "", "", ""]]
+注意:
+  - ["图上把直径的变化放大了 400 倍，否则看不出来。", "Diameter changes are drawn 400 times enlarged; otherwise they would not show."]
+  - ["跳动、位置度的要求和两销的间隙是教学示意值；SH-301 的数据取自数字工厂的工艺规程。任务 3 要把间隙压到 IT4–IT5 级配合才能达到，生产中一般改用胀胎心轴等无间隙心轴；任务 4 的间隙相当于 H6/h5 一类的精密配合。", "The runout and position tolerances and pin clearances are teaching values; the SH-301 data come from the digital factory's process plan. Task 3 needs IT4–IT5 fits, so in production a clearance-free (expanding) mandrel is used instead; task 4's clearances correspond to precision fits such as H6/h5."]
+思考题:
+  - ["心轴定位误差太大时，除了减小间隙，还有哪些办法？（提示：锥度心轴、胀胎心轴、过盈心轴，第 52 章。）", "When a mandrel's locating error is too large, what can be done besides reducing the clearance? (Hint: tapered, expanding and press-fit mandrels, Chapter 52.)"]

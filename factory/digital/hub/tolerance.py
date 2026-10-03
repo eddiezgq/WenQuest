@@ -240,15 +240,55 @@ def v_block(Td: float, alpha_deg: float = 90.0, measure: str = "center") -> floa
     return {"center": dy, "top": dy + Td / 2, "bottom": dy - Td / 2}[measure]
 
 
-def v_block_mc(d_nom, es, ei, alpha_deg=90.0, measure="center", n=100_000, seed=2):
-    """蒙特卡罗核对 V 形块公式：工件直径在公差带内均匀抽样，求工序基准的竖直位置变动范围。"""
+def v_block_contact(points, alpha_deg=90.0, wear_left=0.0, wear_right=0.0, radius=None):
+    """按接触几何求工件在 V 形块上的位置（不用 V 形块公式）。
+
+    points：工件轮廓上的点（相对工件自身中心，mm），可以是任意形状（圆、带圆度误差的多棱圆）；为 None 时按半径 radius 的理想圆计算；
+    V 形块顶点在原点、对称面为 y 轴，两工作面与对称面夹 α/2；wear_left/right：两个工作面的磨损量（工作面沿法向后退）。
+    工件靠重力落到两个工作面上：每个工作面上轮廓的最低接触点与工作面距离为零，两个条件解出工件中心 (cx, cy)。"""
+    h = math.radians(alpha_deg) / 2
+    nL = (math.cos(h), math.sin(h))           # 左工作面的内法向
+    nR = (-math.cos(h), math.sin(h))          # 右工作面的内法向
+    if points is None:                          # 理想圆：轮廓沿任一方向的最小投影就是 −r
+        mL = mR = -radius
+    else:
+        mL = min(nL[0] * x + nL[1] * y for x, y in points)
+        mR = min(nR[0] * x + nR[1] * y for x, y in points)
+    # nL·c + mL = −wear_left，nR·c + mR = −wear_right
+    bL, bR = -wear_left - mL, -wear_right - mR
+    det = nL[0] * nR[1] - nL[1] * nR[0]
+    cx = (bL * nR[1] - nL[1] * bR) / det
+    cy = (nL[0] * bR - bL * nR[0]) / det
+    return cx, cy
+
+
+def circle_points(d, n=360, lobes=0, roundness=0.0):
+    """直径 d 的轮廓点；lobes、roundness：等直径多棱形的棱数和圆度误差（峰谷值）。"""
+    pts = []
+    for k in range(n):
+        t = 2 * math.pi * k / n
+        r = d / 2 + (roundness / 2) * math.cos(lobes * t) if lobes else d / 2
+        pts.append((r * math.cos(t), r * math.sin(t)))
+    return pts
+
+
+def v_block_mc(d_nom, es, ei, alpha_deg=90.0, measure="center", n=20_000, seed=2, lobes=0, roundness=0.0, n_pts=720):
+    """蒙特卡罗核对 V 形块定位误差：直径在公差带内均匀抽样，按接触几何（v_block_contact）求每件的位置，
+    返回工序基准（轴心、上母线、下母线）竖直位置的变动范围。可以加圆度误差，看公式不能反映的影响。"""
     rng = random.Random(seed)
-    s = math.sin(math.radians(alpha_deg) / 2)
     ys = []
     for _ in range(n):
         d = rng.uniform(d_nom + ei, d_nom + es)
-        yc = (d / 2) / s                          # 轴心到 V 形块交点的距离
-        y = {"center": yc, "top": yc + d / 2, "bottom": yc - d / 2}[measure]
+        if lobes:
+            pts = circle_points(d, n_pts, lobes, roundness * rng.random() if roundness else 0.0)
+            ph = rng.uniform(0, 2 * math.pi)       # 工件放上 V 形块时的转角随机
+            pts = [(x * math.cos(ph) - y * math.sin(ph), x * math.sin(ph) + y * math.cos(ph)) for x, y in pts]
+            top, bot = max(q[1] for q in pts), min(q[1] for q in pts)
+        else:                                       # 理想圆：接触点解析求出，不受离散点数的影响
+            pts = None
+            top, bot = d / 2, -d / 2
+        cx, cy = v_block_contact(pts, alpha_deg, radius=d / 2)
+        y = {"center": cy, "top": cy + top, "bottom": cy + bot}[measure]
         ys.append(y)
     return max(ys) - min(ys)
 
@@ -274,6 +314,26 @@ def two_pins(L: float, hole1: tuple, pin1: tuple, hole2: tuple, pin2_width_clear
     return {"X1max": X1, "X2max": pin2_width_clear, "rot_deg": th, "rot_mm_per_100": math.tan(math.radians(th)) * 100}
 
 
+def two_pins_point(x: float, L: float, X1: float, X2: float) -> dict:
+    """一面两销定位时，两销连线上离圆柱销 x 处一点的位置变动范围。
+
+    垂直于连线方向：圆柱销处偏移 u1 ∈ [−X1/2, X1/2]，削边销处 u2 ∈ [−X2/2, X2/2]，该点偏移 u1(1 − x/L) + u2·x/L，
+    变动范围 = X1·|1 − x/L| + X2·|x/L|；沿连线方向削边销不起作用，变动范围 = X1。"""
+    perp = X1 * abs(1 - x / L) + X2 * abs(x / L)
+    return {"perp": perp, "along": X1}
+
+
+def diamond_pin(D2: tuple, b: float, dLK: float, dLJ: float, T_pin: float) -> dict:
+    """削边销的设计：D2 = (孔基本尺寸, ES, EI)；b 削边销圆柱部分宽度（查 JB/T 8014.3）；
+    ±dLK 工件两孔中心距公差、±dLJ 夹具两销中心距公差（一般取 dLK 的 1/3–1/5）；T_pin 销的直径公差。
+    削边销与孔的最小间隙 X2min = 2b(dLK + dLJ)/D2，销的最大直径 d2max = D2min − X2min。"""
+    D, ES, EI = D2
+    X2min = 2 * b * (dLK + dLJ) / D
+    d2max = D + EI - X2min
+    d2min = d2max - T_pin
+    return {"X2min": X2min, "d2max": d2max, "d2min": d2min, "X2max": (D + ES) - d2min}
+
+
 def center_hole_axial(dD: float, cone_deg: float = 60.0) -> float:
     """两顶尖装夹：中心孔锥面直径的变动 dD 引起的工件轴向位移（锥角 60° 时 Δz = dD / (2 tan 30°)）。"""
     return dD / (2 * math.tan(math.radians(cone_deg) / 2))
@@ -292,3 +352,44 @@ def locate_error(dB: float, dY: float, same_dir: bool = True) -> float:
 def ok_against(tol: float, error: float, fraction: float = 1 / 3) -> bool:
     """经验判据：定位误差不超过工序公差的 1/3（留出加工与测量误差的空间）。"""
     return error <= tol * fraction + 1e-12
+
+
+# ---------------------------------------------------------------- 自由度分析（第 51 章）
+DOF = ("x", "y", "z", "rx", "ry", "rz")       # 沿 x、y、z 的移动，绕 x、y、z 的转动
+DOF_ZH = {"x": "沿 x 移动", "y": "沿 y 移动", "z": "沿 z 移动", "rx": "绕 x 转动", "ry": "绕 y 转动", "rz": "绕 z 转动"}
+
+
+def dof_analysis(locators: list[tuple[str, set]], required: set) -> dict:
+    """定位方案的自由度分析。
+
+    locators：[(定位元件名称, 它限制的自由度集合)]；required：按工序要求必须限制的自由度。
+    返回限制了哪些、重复限制了哪些（过定位）、该限没限的（欠定位），以及结论：
+    完全定位（六个都限制且无重复）、不完全定位（限制了要求的全部、但不足六个）、欠定位、过定位。"""
+    count = {d: 0 for d in DOF}
+    for _, ds in locators:
+        for d in ds:
+            count[d] += 1
+    limited = {d for d, n in count.items() if n > 0}
+    repeated = {d for d, n in count.items() if n > 1}
+    missing = set(required) - limited
+    if missing:
+        verdict = "欠定位"
+    elif repeated:
+        verdict = "过定位"
+    elif len(limited) == 6:
+        verdict = "完全定位"
+    else:
+        verdict = "不完全定位"
+    return {"limited": sorted(limited, key=DOF.index), "repeated": sorted(repeated, key=DOF.index),
+            "missing": sorted(missing, key=DOF.index), "n": len(limited), "verdict": verdict}
+
+
+def chuck_runout_error(tir: float) -> float:
+    """自定心卡盘的定心精度常以径向跳动读数 TIR 表示，偏心 e = TIR/2。
+    对称度、同轴度的公差带宽度对应中心偏移的两倍，所以一批工件对称度方面的定位误差 = 2e = TIR。"""
+    return tir
+
+
+def offset_to_zone(e: float) -> float:
+    """中心偏移 e 换算到对称度、同轴度、位置度公差带（直径或宽度）上的占用量：2e。"""
+    return 2 * e
