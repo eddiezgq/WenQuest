@@ -174,7 +174,7 @@ def current_glb(db, mode, item):
 
 
 def current_step(db, mode, item):
-    """现行版 STEP（有限元用，第 11 轮）：最近批准的提交 → 最近发布消息 → SH-301 第 1 版"""
+    """现行版 STEP（有限元用，第 11 轮）：最近批准的提交 → 最近发布消息 → 第 1 版（SH-301、教材案例件）"""
     r = db.one("select files from design_submission where mode=%s and item=%s and status='approved' order by decided_at desc limit 1",
                (mode, item))
     if r:
@@ -190,18 +190,20 @@ def current_step(db, mode, item):
     if item == "SH-301":
         from hub import design as D
         return D.step_bytes(D.normalize(D.defaults()))
-    return None
+    from hub import case_parts
+    return case_parts.step_bytes(item)                       # 教材案例件 RJ-201、LS-101 的第 1 版（第 11 轮）
 
 
 def items_with_step(db, mode):
     """有现行 STEP 的物料（有限元选零件用）"""
-    out = {"SH-301"}
+    from hub import case_parts
+    out = {"SH-301", *case_parts.CASES}
     for r in db.q("select distinct item from design_submission where mode=%s and status='approved'", (mode,)):
         out.add(r["item"])
     for m in db.messages(["design.release"], mode=mode, order="desc", limit=500):
         if any(f.get("kind") == "step" for f in m["data"].get("files") or []):
             out.add(m["data"]["item"])
-    return sorted(out)
+    return ["SH-301"] + sorted(out - {"SH-301"})                # 主线零件 SH-301 排第一
 
 
 # ---------------------------------------------------------------- 提交、审批

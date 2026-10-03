@@ -465,7 +465,13 @@ def mount(app, H):
                        "用设计优化（Optuna 驱动有限元）在安全系数和无限寿命要求下找最轻的输出轴并送回设计台；选做 CPU 散热片和平面拓扑优化。",
             "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/opt",
             "guide_url": public_base(request) + "/api/cae/lab11/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab11/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab11/report-template.docx"}, {
+            "id": "lab12", "name": {"zh": "实验 12：一根轴的数字化设计与两个典型案例", "en": "Lab 12: digital design of a shaft and two case studies"},
+            "summary": "零件库选件 → 在线设计台建 SH-301 B 版（台阶圆角）并发布；协作机器人关节空心轴 RJ-201 按扭转刚度核对、用“运动与动力分析”的"
+                       "关节力矩记录算疲劳寿命、比较钢与铝；平缝机上轴 LS-101 比较两种轴承支承的固有频率并与梁理论对照、上传 CSV 载荷谱。",
+            "mode": "teach", "products": ["SH-301", "RJ-201", "LS-101"], "tool_url": public_base(request) + "/cae",
+            "guide_url": public_base(request) + "/api/cae/lab12/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab12/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

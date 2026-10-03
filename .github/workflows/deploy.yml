@@ -100,6 +100,11 @@ jobs:
           pip install -q -r ../../services/labcheck/requirements.txt trimesh
           python -m playwright install --with-deps --only-shell chromium > /dev/null
           pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 jsonschema pytest httpx fastapi pydantic gmsh==4.15.2 pylife==2.3.1 paho-mqtt==2.1.0 trimesh==5.1.0 sympy
+          if [ "${{ matrix.book }}" = mechdesign ]; then   # 第 33 章案例：build123d 建模、MuJoCo 机械臂动力学（数字工厂同一模型）
+            pip install -q build123d==0.13.0 mujoco==3.14.0
+            sh ../../factory/deploy/fetch_menagerie.sh "$RUNNER_TEMP/menagerie" > /dev/null
+            export WQ_MENAGERIE="$RUNNER_TEMP/menagerie"
+          fi
           if [ "${{ matrix.book }}" = robotics ]; then   # the tools' own tests run once, with the book they use
             python -m pytest -q tests 2>&1 | tee /tmp/pytest.log || { grep -E "^(FAILED|E  )" /tmp/pytest.log | head -20 | sed 's/^/::error::/'; exit 1; }
           fi
