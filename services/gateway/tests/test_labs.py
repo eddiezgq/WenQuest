@@ -229,3 +229,24 @@ console.log(JSON.stringify({ well: w.E, ho: ho.E, norm, dE: dw.E[1] - dw.E[0], o
         assert abs(e - (n + 0.5) * 0.1) < 1e-4
     assert abs(out["norm"] - 1) < 1e-9
     assert abs(out["dE"]) < 1e-9 and abs(out["overlap"]) < 1e-9   # degenerate states come out orthogonal
+
+
+def test_gpu_teaching_model_hand_cases():
+    """《人工智能》第 14 轮 2.5: api.gpu — divergence efficiency and Little's-law latency hiding on cases worked by hand."""
+    import shutil
+    import subprocess
+    if not shutil.which("node"):
+        pytest.skip("node is not installed")
+    kit = (labs.KIT / "kit.js").read_text(encoding="utf-8")
+    gpu = kit[kit.index("const GPU = {"):kit.index("// ---------- tasks & progress")]
+    script = gpu + """
+const d = [GPU.diverge({ cond: "odd", pre: 0, post: 0 }).eff, GPU.diverge({ cond: "warp", warps: 4 }).eff,
+           GPU.diverge({ cond: "odd" }).issued];
+const u = [[1, 4, 600], [16, 4, 600], [16, 40, 600], [16, 8, 100]].map(([n, k, L]) =>
+  [GPU.schedule({ warps: n, k, latency: L }).util, GPU.little(n, k, L)]);
+console.log(JSON.stringify({ d, u }));
+"""
+    out = json.loads(subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout)
+    assert out["d"] == [0.5, 1.0, 12]
+    for got, want in out["u"]:
+        assert abs(got - want) < 0.03 * want + 1e-3
