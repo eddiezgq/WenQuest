@@ -160,3 +160,29 @@ def explain(llm, job, res):
     except Exception:  # noqa: BLE001
         return base
     return {"text": got["text"].strip(), "engine": llm.name} if got.get("text") else base
+
+
+SHAPE_WORDS = {
+    "mbb": "简支梁上材料长成了“桁架”：上弦受压、下弦受拉，中间几根斜杆把力传到支座——和钢桥、屋架的样子一样",
+    "cantilever": "悬臂梁上材料集中在上下两条边（离中性轴最远，抗弯最有效），中间用斜杆连成三角形，靠近固定端最粗",
+    "bridge": "材料长成了拱（或吊杆拱桥）：载荷沿拱传到两个支座，拱下用竖杆把载荷挂上去",
+    "bracket": "支架上材料从载荷点向固定边斜着展开，形成三角形撑杆，上边受拉、下边受压",
+}
+
+
+def topo_explain(job, r):
+    """拓扑优化的规则解释（不费 AI 次数）"""
+    h = r.get("history") or []
+    out = []
+    if h:
+        c0, c1 = h[0][1], h[-1][1]
+        out.append("从均匀的灰色（每格密度都是 {:g}）开始，迭代 {} 次{}；柔度（越小越刚）从 {:.1f} 降到 {:.1f}，下降 {:.0f}%。".format(
+            r["volfrac"], r["iterations"], "后收敛（每格密度的最大变化小于 0.01）" if r.get("converged") else "（到了次数上限，还没完全收敛，可以再算一次或加大过滤半径）",
+            c0, c1, (1 - c1 / c0) * 100))
+    out.append(SHAPE_WORDS.get(r.get("preset"), "") + "。")
+    g = r.get("grey") or 0
+    out.append("灰色单元（密度 0.1–0.9，说不清有没有材料）占 {:.0f}%：{}".format(
+        g * 100, "很少，轮廓清楚，可以直接取轮廓做零件。" if g < 0.25 else "偏多，轮廓有些模糊；把惩罚指数调到 3–4、或把过滤半径调小一点，图会更黑白分明（但太小会出现棋盘格）。"))
+    out.append("下一步：点“拉伸成板件，去有限元校核”，按密度 0.5 取轮廓、拉伸成板，看实际的应力和安全系数——拓扑优化只管刚度，强度要另外校核；"
+               "真正做零件还要把锯齿状的边修圆、按加工方法（铣、激光切、3D 打印）调整。")
+    return "\n".join(x for x in out if x.strip("。"))

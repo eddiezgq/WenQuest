@@ -18,7 +18,7 @@
         </div>
         <label class="small upload">或者上传 STEP（任何 CAD 导出）
           <input type="file" accept=".step,.stp,.STEP,.STP" :disabled="busy" @change="upload"></label>
-        <div v-if="mbdNote" class="small sugg">来自运动与动力分析：{{ mbdNote }}</div>
+        <div v-if="mbdNote" class="small sugg">{{ mbdNote }}</div>
         <div v-if="exSel" class="exbox small">
           <div class="muted">示例参数（改了点“读入”重新生成）</div>
           <div class="grid2"><label v-for="(n, k) in exSel.names" :key="k">{{ n }} <input v-model.number="exParams[k]" type="number" step="any"></label></div>
@@ -689,7 +689,17 @@ onMounted(async () => {
       rows.value = r.rows.map((x) => ({ key: ++keyN, fx: 0, fy: 0, fz: 0, value: 0, thrust: false, axis: null, ...x }));
       title.value = r.title; matId.value = '45-QT'; active.value = -1;
       mbdSource.value = { ...r.source, sha: r.geometry.sha };
-      mbdNote.value = r.note + `；最大受力 ${r.peak_N.toFixed(0)} N，出现在 t = ${r.peak_t.toFixed(3)} s。`;
+      mbdNote.value = '来自运动与动力分析：' + r.note + `；最大受力 ${r.peak_N.toFixed(0)} N，出现在 t = ${r.peak_t.toFixed(3)} s。`;
+    } catch (e) { err.value = e.message; } finally { busy.value = false; }
+  }
+  if (route.query.topo) {                                          // 第 14 轮：拓扑优化 → 拉伸成板件做有限元校核
+    busy.value = true;
+    try {
+      const r = await post(`/opt/topo/${encodeURIComponent(route.query.topo)}/to-fea`, {});
+      geo.value = r.geometry;
+      rows.value = r.rows.map((x) => ({ key: ++keyN, fx: 0, fy: 0, fz: 0, value: 0, thrust: false, axis: null, ...x }));
+      title.value = r.title; matId.value = r.material_id; meshOverride.value = r.mesh_mm; active.value = -1;
+      mbdNote.value = '来自拓扑优化：' + r.note + '。';
     } catch (e) { err.value = e.message; } finally { busy.value = false; }
   }
   loadJobs();

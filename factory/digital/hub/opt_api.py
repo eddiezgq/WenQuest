@@ -11,7 +11,7 @@ from hub.cae_api import FACTORY_ID, call
 def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
 
     def mine(u, j):
-        if j.get("factory") != FACTORY_ID or j.get("kind") != "opt":
+        if j.get("factory") != FACTORY_ID or j.get("kind") not in ("opt", "topo"):
             raise HTTPException(404, "没有这个优化任务")
         if is_teacher(u) or str(j.get("owner")) == uid_of(u):
             return j
@@ -98,3 +98,36 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
             ai_quota(u)
         res = call("GET", "/opt/jobs/{}/trials".format(urllib.parse.quote(jid))).json()
         return opt_ai.explain(H.ai.llm if H.ai else None, j, res)
+
+    # ---------- 拓扑优化（平面件，第 14 轮 H6） ----------
+    @app.get("/api/opt/topo/presets")
+    def topo_presets(u=Depends(user_of)):
+        return call("GET", "/topo/presets").json()
+
+    @app.post("/api/opt/topo")
+    def topo_submit(body: dict = Body(...), u=Depends(user_of)):
+        return call("POST", "/topo/jobs", json={"spec": body.get("spec") or {}, "title": (body.get("title") or "")[:80],
+                                                "owner": uid_of(u), "owner_name": who(u), "factory": FACTORY_ID}).json()
+
+    @app.get("/api/opt/topo/jobs")
+    def topo_jobs(u=Depends(user_of)):
+        params = {"factory": FACTORY_ID, "limit": 50, "kind": "topo"}
+        if not is_teacher(u):
+            params["owner"] = uid_of(u)
+        return call("GET", "/jobs", params=params).json()
+
+    @app.get("/api/opt/topo/{jid}/result")
+    def topo_result(jid: str, u=Depends(user_of)):
+        from hub import opt_ai
+        j = mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        r = call("GET", "/topo/jobs/{}/result".format(urllib.parse.quote(jid))).json()
+        r["explain"] = opt_ai.topo_explain(j, r)
+        return r
+
+    @app.post("/api/opt/topo/{jid}/to-fea")
+    def topo_to_fea(jid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        r = call("POST", "/topo/jobs/{}/to-fea".format(urllib.parse.quote(jid)), json=body).json()
+        r["geometry"]["model_url"] = "/api/cae/geometry/{}/model.glb".format(r["geometry"]["sha"])
+        r["geometry"]["name"] = r["title"]
+        return r
