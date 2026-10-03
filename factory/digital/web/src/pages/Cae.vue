@@ -212,6 +212,21 @@
           <p>尖角（没有圆角的内角）处的应力理论上没有上限，网格越细数值越大——看到最大值在尖角，就要考虑加圆角，或者按规范的应力集中系数去校核。</p>
         </div>
 
+        <div v-if="result && !isThermal" class="fat">
+          <h3>固有频率 <span class="small muted">用同样的零件、材料、网格和支承求前几阶固有频率——高速轴看临界转速，工作转速（及其 2 倍）要离开它们</span></h3>
+          <div class="line">
+            <button class="btn" :disabled="modBusy" @click="runModal">{{ modBusy ? '正在计算…' : (job?.modal ? '重新计算' : '计算固有频率') }}</button>
+            <label class="small">工作转速 <input v-model.number="workRpm" type="number" min="0" step="100" class="num-in"> r/min</label>
+          </div>
+          <div v-if="modErr" class="err small">{{ modErr }}</div>
+          <table v-if="job?.modal" class="t small">
+            <thead><tr><th>阶次</th><th class="num">频率 Hz</th><th class="num">相当转速 r/min</th><th class="num">与工作转速之比</th></tr></thead>
+            <tbody><tr v-for="m in job.modal.freqs" :key="m.mode"><td>{{ m.mode }}</td><td class="num">{{ m.hz.toFixed(1) }}</td>
+              <td class="num">{{ m.rpm.toFixed(0) }}</td><td class="num">{{ workRpm ? (m.rpm / workRpm).toFixed(2) : '—' }}</td></tr></tbody>
+          </table>
+          <p v-if="job?.modal" class="small muted">只算了零件本身（齿轮、曲柄等装在轴上的零件的质量没计入，计入后频率会降低）；去掉了 {{ job.modal.rigid_modes }} 个刚体运动（绕轴转、沿轴移）。弯曲振型成对出现（两个方向）。</p>
+        </div>
+
         <div v-if="result" class="ai-exp">
           <div class="line"><h3>AI 解释与建议</h3>
             <button class="btn" :disabled="expBusy" @click="explain">{{ expBusy ? 'AI 正在分析…' : (exp ? '重新分析' : '请 AI 解释结果') }}</button></div>
@@ -234,12 +249,35 @@
                 <button type="button" :class="{ on: spec.kind === 'const' }" @click="spec.kind = 'const'">恒幅</button>
                 <button type="button" :class="{ on: spec.kind === 'log' }" :disabled="!hasTorque" :title="hasTorque ? '' : '要有扭矩载荷才能用转矩记录'" @click="spec.kind = 'log'">跑合试验台转矩记录</button>
                 <button v-if="job?.setup?.source" type="button" :class="{ on: spec.kind === 'mbd' }" @click="spec.kind = 'mbd'">动力学受力记录</button>
+                <button type="button" :class="{ on: spec.kind === 'joint' }" :disabled="!hasTorque" :title="hasTorque ? '' : '要有扭矩载荷才能用关节力矩记录'" @click="spec.kind = 'joint'">关节力矩记录</button>
+                <button type="button" :class="{ on: spec.kind === 'csv' }" @click="spec.kind = 'csv'">上传载荷记录</button>
               </div>
             </div>
             <template v-if="spec.kind === 'const'">
               <div class="field"><label>最大（{{ refUnit }}）</label><input v-model.number="spec.max" type="number"></div>
               <div class="field"><label>最小（{{ refUnit }}）</label><input v-model.number="spec.min" type="number"></div>
               <div class="field"><label>每秒几次（Hz）</label><input v-model.number="spec.freq" type="number" step="0.1" min="0.001"></div>
+            </template>
+            <template v-else-if="spec.kind === 'joint'">
+              <div class="field wide">
+                <label>“运动与动力分析”的计算（自己算完的）和关节——用这个关节的驱动力矩随时间的变化作载荷谱，按计算工况的扭矩线性缩放</label>
+                <select v-model="spec.mjob">
+                  <option value="" disabled>{{ mjobs.length ? '选择计算…' : '还没有：先到“运动与动力分析”算一次机械臂的运动' }}</option>
+                  <option v-for="m in mjobs" :key="m.id" :value="m.id">{{ m.title || m.id }} · {{ new Date(m.created * 1000).toLocaleString('zh-CN', { hour12: false }) }}</option>
+                </select>
+                <select v-model="spec.joint" :disabled="!spec.mjob">
+                  <option value="" disabled>选择关节…</option>
+                  <option v-for="jn in mjoints" :key="jn" :value="jn">{{ jn }}</option>
+                </select>
+              </div>
+            </template>
+            <template v-else-if="spec.kind === 'csv'">
+              <div class="field wide">
+                <label>CSV 文件：每行一个数（多列时取最后一列），单位与计算工况相同（{{ refUnit }}）；整段当作一块，不断重复</label>
+                <input type="file" accept=".csv,.txt" @change="readCsv">
+                <span v-if="spec.values.length" class="small muted">读到 {{ spec.values.length }} 个点，最大 {{ Math.max(...spec.values.map(Math.abs)).toPrecision(4) }}</span>
+              </div>
+              <div class="field"><label>这一段多少秒</label><input v-model.number="spec.secs" type="number" step="0.1" min="0.001"></div>
             </template>
             <div v-else-if="spec.kind === 'mbd'" class="field wide small muted">用这根杆件在动力学计算中、沿所加力方向的受力随时间的变化作为载荷谱（整段运动当作一块，不断重复）。</div>
             <div v-else class="field wide">
@@ -258,7 +296,7 @@
             <div class="field"><label>附加缺口系数 Kf <span class="muted">有限元已算形状集中，一般 1</span></label><input v-model.number="fopt.kf" type="number" step="0.1" min="1"></div>
             <label class="chk small"><input v-model="fopt.haibach" type="checkbox"> 疲劳极限以下也计损伤（Haibach，偏安全）</label>
           </div>
-          <button class="btn primary" :disabled="fatBusy || (spec.kind === 'log' && !spec.log)" @click="runFatigue">{{ fatBusy ? '正在计算…' : '计算疲劳寿命' }}</button>
+          <button class="btn primary" :disabled="fatBusy || (spec.kind === 'log' && !spec.log) || (spec.kind === 'joint' && !spec.joint) || (spec.kind === 'csv' && spec.values.length < 2)" @click="runFatigue">{{ fatBusy ? '正在计算…' : '计算疲劳寿命' }}</button>
           <div v-if="fatErr" class="err small">{{ fatErr }}</div>
           <div v-if="fat" class="fat-res">
             <div class="stat" :class="fat.infinite ? 'good' : fat.life_hours < 2000 ? 'bad' : fat.life_hours < 20000 ? 'warn' : 'good'">
@@ -632,9 +670,27 @@ const SURF = { polished: '抛光（β 1.0）', ground: '磨削（β 0.92）', fi
 const hasTorque = computed(() => (job.value?.setup?.loads || []).some((l) => l.type === 'torque'));
 const refLoad = computed(() => (job.value?.setup?.loads || []).filter((l) => l.type === 'torque').reduce((a, l) => a + l.value_nmm / 1000, 0));
 const refUnit = computed(() => (hasTorque.value ? 'N·m' : '× 计算工况'));
-const spec = ref({ kind: 'const', max: 350, min: 0, freq: 1, log: '' });
+const spec = ref({ kind: 'const', max: 350, min: 0, freq: 1, log: '', mjob: '', joint: '', values: [], secs: 1, name: '' });
+const mjobs = ref([]);                  // 第 11 轮 F1：关节力矩记录
+const mjoints = computed(() => ((mjobs.value.find((m) => m.id === spec.value.mjob)?.stats?.drives) || []).map((d) => d.joint));
+async function readCsv(ev) {
+  const f = ev.target.files[0];
+  if (!f) return;
+  const nums = [];
+  for (const line of (await f.text()).split(/\r?\n/)) {
+    const cells = line.split(/[,;\t]/).map((x) => x.trim()).filter(Boolean);
+    const v = cells.length ? Number(cells[cells.length - 1]) : NaN;
+    if (Number.isFinite(v)) nums.push(v);
+  }
+  spec.value = { ...spec.value, values: nums.slice(0, 200000), name: f.name };
+}
 const fopt = ref({ surface: 'ground', size_factor: 0.85, kf: 1, haibach: true });
 const fat = ref(null);
+const modBusy = ref(false), modErr = ref(''), workRpm = ref(0);       // 固有频率（第 11 轮 F2）
+async function runModal() {
+  modBusy.value = true; modErr.value = '';
+  try { job.value = { ...job.value, modal: await post(`/cae/jobs/${encodeURIComponent(job.value.id)}/modal`) }; } catch (e) { modErr.value = e.message; } finally { modBusy.value = false; }
+}
 const fatBusy = ref(false);
 const fatErr = ref('');
 const logs = ref([]);
@@ -650,14 +706,18 @@ watch(() => spec.value.log, async (id) => {
   if (id) { try { logSeries.value = (await get('/cae/torque-logs/' + id)).samples_nm; } catch (e) { /* 看不到曲线不影响计算 */ } }
 });
 watch(() => spec.value.kind, async (k) => { if (k === 'log' && !logs.value.length) { try { logs.value = (await get('/cae/torque-logs')).logs; } catch (e) { /* */ } } });
+watch(() => spec.value.kind, async (k) => { if (k === 'joint' && !mjobs.value.length) { try { mjobs.value = ((await get('/mbd/jobs')).jobs || []).filter((m) => m.status === 'done'); } catch (e) { /* */ } } });
 function resetFatigue(j) {
   fat.value = j?.fatigue || null; fatErr.value = '';
-  spec.value = { kind: 'const', max: hasTorque.value ? +refLoad.value.toFixed(1) : 1, min: hasTorque.value ? 0 : -1, freq: 1, log: '' };
+  spec.value = { kind: 'const', max: hasTorque.value ? +refLoad.value.toFixed(1) : 1, min: hasTorque.value ? 0 : -1, freq: 1, log: '', mjob: '', joint: '', values: [], secs: 1, name: '' };
 }
 async function runFatigue() {
   fatBusy.value = true; fatErr.value = '';
   try {
-    const sp = spec.value.kind === 'log' ? { kind: 'log', id: spec.value.log } : spec.value.kind === 'mbd' ? { kind: 'mbd' }
+    const k = spec.value.kind;
+    const sp = k === 'log' ? { kind: 'log', id: spec.value.log } : k === 'mbd' ? { kind: 'mbd' }
+      : k === 'joint' ? { kind: 'joint', job: spec.value.mjob, joint: spec.value.joint }
+      : k === 'csv' ? { kind: 'csv', values: spec.value.values, duration_s: spec.value.secs, name: spec.value.name }
       : { kind: 'const', max: spec.value.max, min: spec.value.min, freq_hz: spec.value.freq };
     const r = await post(`/cae/jobs/${encodeURIComponent(job.value.id)}/fatigue`, { spectrum: sp, ...fopt.value });
     fat.value = r.summary;
@@ -808,6 +868,7 @@ tr.cur td { background: var(--accent-bg); }
 .exp-text p { margin: 4px 0; line-height: 1.7; }
 .fat { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .fat h3 { font-size: 15px; }
+.num-in { width: 90px; }
 .fat-grid { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; }
 .fat-grid .field input { width: 120px; }
 .fat-grid .field.wide { flex-basis: 100%; }

@@ -104,3 +104,18 @@ def test_freecad_pack(monkeypatch):
     assert "def submit" in z.read("wenquest-freecad/wq_submit.py").decode("utf-8")
     swb = z.read("wenquest-freecad/SolidWorks/wq_submit_solidworks.swb").decode("ascii")             # 第 10 轮
     assert 'Const WQ_HUB = "https://factory.example.com"' in swb and tok in swb and "__WQ_" not in swb
+
+
+def test_step_fillets():
+    """第 11 轮 F4：台阶过渡圆角——小于台阶高才能做，做出来的模型每个台阶都有圆角面"""
+    import pytest
+    pytest.importorskip("build123d")
+    from hub import design as D, task_review as R
+    p = D.normalize({"segments": [[35, 37], [40, 53], [48, 10], [42, 15], [35, 57], [30, 68]], "chamfer": 1, "fillet": 1.0,
+                     "keyway": {"segment": 1, "b": 12, "t": 5, "L": 45}})
+    assert D.check(p)["ok"]
+    g = R.shaft_features(D.step_bytes(p))
+    assert len(g["fillets"]) == 5 and all(abs(r - 1.0) < 1e-6 for _, r in g["fillets"])
+    bad = D.normalize({"segments": [[35, 37], [37, 10]], "chamfer": 0, "fillet": 1.5, "keyway": None})
+    assert "做不出来" in D.check(bad)["errors"][0]
+    assert "fillet" not in D.normalize(D.defaults())           # 旧参数不变

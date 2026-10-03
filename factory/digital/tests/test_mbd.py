@@ -338,3 +338,24 @@ def test_lab9_documents():
     t = docx.Document(io.BytesIO(labdoc.report_template_docx("lab9")))
     cells = " ".join(c.text for tb in t.tables for r in tb.rows for c in r.cells)
     assert "J2 大臂" in cells and "虚功原理" in cells
+
+
+def test_joint_series_for_fatigue(tmp_path, monkeypatch):
+    """第 11 轮 F1：关节驱动力矩可以取出来当疲劳载荷谱"""
+    from fastapi.testclient import TestClient
+    from cae import service
+    monkeypatch.setattr(service, "DATA", str(tmp_path))
+    with TestClient(service.app) as c:
+        ref = {"source": "mech", "id": "C-LNK-SLIDER", "params": {}}
+        j = c.post("/mbd/jobs", json={"model": ref, "factory": "t", "setup": {
+            "duration_s": 1.0, "gravity": False, "drives": [{"joint": "crank", "kind": "speed", "value": 2 * math.pi}],
+            "forces": [{"body": "slider", "force": [-2000, 0, 0]}]}}).json()
+        for _ in range(200):
+            j = c.get("/jobs/" + j["id"]).json()
+            if j["status"] in ("done", "failed"):
+                break
+            time.sleep(0.3)
+        assert j["status"] == "done", j.get("error")
+        r = c.get("/mbd/jobs/{}/joint-series".format(j["id"]), params={"joint": "crank"}).json()
+        assert r["peak"] > 10 and len(r["values"]) > 10 and 0.9 < r["duration_s"] <= 1.0 and "crank" in r["joints"]
+        assert c.get("/mbd/jobs/{}/joint-series".format(j["id"]), params={"joint": "nope"}).status_code == 404

@@ -323,7 +323,8 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
 
     @app.post("/api/cae/jobs/{jid}/fatigue")
     def cae_fatigue(jid: str, body: dict = Body(...), u=Depends(user_of)):
-        """spectrum: {kind: const, max, min, freq_hz} 或 {kind: log, id}。
+        """spectrum: {kind: const, max, min, freq_hz} 或 {kind: log, id} 或 {kind: joint, job, joint}（第 11 轮）
+        或 {kind: csv, values, duration_s, name}（第 11 轮）。
         计算工况里有扭矩时，载荷按 N·m（扭矩总和）；没有扭矩时按“计算工况的倍数”"""
         j = mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
         torques = [l for l in j["setup"]["loads"] if l["type"] == "torque"]
@@ -342,6 +343,30 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
                      params={"member": src["member"], "direction": ",".join(str(x) for x in v)}).json()
             series, secs = r["values"], r["duration_s"]
             label = "动力学受力记录：{}（{:.2f} 秒一块，重复）".format(mbd.get("title") or mbd["id"], secs)
+            keys = ("surface", "size_factor", "kf", "haibach")
+            return call("POST", "/jobs/{}/fatigue".format(urllib.parse.quote(jid)), json=dict(
+                {k: body[k] for k in keys if k in body}, ref_load=ref, ref_unit=unit, series=series, block_seconds=secs, label=label)).json()
+        if sp.get("kind") == "joint":
+            # 第 11 轮 F1：载荷谱 = “运动与动力分析”算出的某个关节的驱动力矩（机器人关节轴）；按扭矩载荷线性缩放
+            if not torques:
+                raise HTTPException(400, "关节力矩记录只能用在有扭矩载荷的计算上")
+            mbd = mine(u, call("GET", "/jobs/" + urllib.parse.quote(str(sp.get("job") or ""))).json())
+            r = call("GET", "/mbd/jobs/{}/joint-series".format(urllib.parse.quote(mbd["id"])), params={"joint": sp.get("joint") or ""}).json()
+            series, secs = r["values"], r["duration_s"]
+            label = "关节力矩记录：{} · {}（{:.2f} 秒一块，重复）".format(mbd.get("title") or mbd["id"], sp.get("joint"), secs)
+            keys = ("surface", "size_factor", "kf", "haibach")
+            return call("POST", "/jobs/{}/fatigue".format(urllib.parse.quote(jid)), json=dict(
+                {k: body[k] for k in keys if k in body}, ref_load=ref, ref_unit=unit, series=series, block_seconds=secs, label=label)).json()
+        if sp.get("kind") == "csv":
+            # 第 11 轮 F1：自己的载荷记录（CSV 一列数，单位与计算工况相同），一段为一块
+            try:
+                series = [float(x) for x in sp.get("values") or []]
+                secs = float(sp.get("duration_s") or 0)
+            except (TypeError, ValueError):
+                raise HTTPException(400, "载荷记录里有不是数字的值") from None
+            if len(series) < 2 or len(series) > 200000 or secs <= 0:
+                raise HTTPException(400, "载荷记录要有 2～200000 个数，并写明这一段有多少秒")
+            label = "上传的载荷记录 {}（{} 个点，{:g} 秒一块）".format((sp.get("name") or "")[:60], len(series), secs)
             keys = ("surface", "size_factor", "kf", "haibach")
             return call("POST", "/jobs/{}/fatigue".format(urllib.parse.quote(jid)), json=dict(
                 {k: body[k] for k in keys if k in body}, ref_load=ref, ref_unit=unit, series=series, block_seconds=secs, label=label)).json()
@@ -366,6 +391,12 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
         keys = ("surface", "size_factor", "kf", "haibach")
         return call("POST", "/jobs/{}/fatigue".format(urllib.parse.quote(jid)), json=dict(
             {k: body[k] for k in keys if k in body}, ref_load=ref, ref_unit=unit, series=series, block_seconds=secs, label=label)).json()
+
+    @app.post("/api/cae/jobs/{jid}/modal")
+    def cae_modal(jid: str, u=Depends(user_of)):
+        """固有频率（第 11 轮 F2）：前几阶固有频率和相当转速，高速轴看临界转速"""
+        mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        return call("POST", "/jobs/{}/modal".format(urllib.parse.quote(jid)), timeout=420).json()
 
     @app.get("/api/cae/jobs/{jid}/surface.bin")
     def cae_surface(jid: str, u=Depends(user_of)):

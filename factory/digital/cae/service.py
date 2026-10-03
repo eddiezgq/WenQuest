@@ -585,6 +585,24 @@ def mbd_member_series(jid: str, member: str, direction: str = ""):
             "peak_N": ml["peak_N"], "direction": [float(x) for x in u]}
 
 
+@app.get("/mbd/jobs/{jid}/joint-series")
+def mbd_joint_series(jid: str, joint: str):
+    """疲劳用（第 11 轮 F1）：关节驱动力矩（N·m 或 N）随时间的变化——机器人关节轴的载荷谱"""
+    p = _job_path(jid.replace("/", ""), "job.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个任务")
+    j = _read_json(p)
+    if j.get("kind") != "mbd" or j["status"] != "done":
+        raise HTTPException(409, "动力学结果还没出来")
+    ser = read_series(_job_path(j["id"], "series.bin"))
+    key = "drive." + joint
+    if key not in ser:
+        raise HTTPException(404, "这次计算里没有关节 {} 的驱动力矩".format(joint))
+    v, t = ser[key], ser["t"]
+    return {"values": [round(float(x), 4) for x in v], "duration_s": float(t[-1] - t[0]) if len(t) > 1 else 1.0,
+            "peak": float(np.max(np.abs(v))), "joints": sorted(k[6:] for k in ser if k.startswith("drive."))}
+
+
 @app.get("/jobs/{jid}/series.bin")
 def job_series(jid: str):
     p = _job_path(jid.replace("/", ""), "series.bin")
@@ -676,6 +694,33 @@ def note(jid: str, body: dict = Body(...)):
         raise HTTPException(404, "没有这个任务")
     _update(jid.replace("/", ""), ai_text=str(body.get("ai_text") or "")[:4000])
     return {"ok": True}
+
+
+def _modal_child(step_path, setup, q):
+    try:
+        from cae import modal as MO
+        stats, _ = MO.solve(open(step_path, "rb").read(), setup)
+        q.put((True, stats))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+@app.post("/jobs/{jid}/modal")
+def modal(jid: str):
+    """固有频率（第 11 轮 F2）：用这次强度计算的零件、材料、网格和支承，求前几阶固有频率；结果记进任务（报告用）"""
+    p = _job_path(jid.replace("/", ""), "job.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个任务")
+    j = _read_json(p)
+    if j["status"] != "done" or j.get("kind") not in (None, "fea") or (j["setup"].get("analysis") or "static") != "static":
+        raise HTTPException(409, "要先完成一次强度计算（固有频率用它的零件、材料和支承）")
+    setup = dict(j["setup"])
+    setup["material"] = M.get(setup["material_id"])
+    ok, res = _isolated(_modal_child, (_p("geo", j["step_sha"], "part.step"), setup), TIME_LIMIT_S + 60)
+    if not ok:
+        raise HTTPException(422, "固有频率没算出来：{}".format(res))
+    _update(j["id"], modal=res)
+    return res
 
 
 @app.post("/jobs/{jid}/fatigue")

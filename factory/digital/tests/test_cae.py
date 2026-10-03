@@ -262,3 +262,20 @@ def test_size_limit_gives_plain_message(monkeypatch, tmp_path):
     with pytest.raises(S.TooBig, match="教学版上限"):
         S.solve(step, {"material": M.get("Q235"), "mesh": {"size_mm": 2},
                        "loads": [{"type": "fixed", "faces": [fix]}, {"type": "force", "faces": [tip], "vector_n": [0, -1, 0]}]})
+
+
+def test_modal_cantilever_matches_beam_theory():
+    """第 11 轮 F2：固有频率——悬臂梁一阶弯曲 f = (1.875²/2π)·√(EI/(ρAL⁴))，两个方向各一个（方截面），误差 < 3%"""
+    from cae import modal as MO
+    step = beam_step(L=200.0)
+    faces, _, _ = G.faces(step)
+    mat = M.get("45-QT")
+    st, surf = MO.solve(step, {"material": mat, "mesh": {"size_mm": 4}, "loads": [{"type": "fixed", "faces": [face_at(faces, 0, 0.0)]}]})
+    I, A, L = 10 * 10 ** 3 / 12, 100.0, 200.0
+    f1 = 1.875 ** 2 / (2 * math.pi) * math.sqrt(mat["E_mpa"] * I / (mat["density_t_mm3"] * A * L ** 4))
+    fs = [x["hz"] for x in st["freqs"]]
+    assert abs(fs[0] - f1) / f1 < 0.03 and abs(fs[1] - f1) / f1 < 0.03 and fs[2] > 3 * f1
+    assert st["freqs"][0]["rpm"] == round(fs[0] * 60, 0) and st["rigid_modes"] == 0
+    assert abs(float(surf["u"].__abs__().max()) - 1.0) < 1e-3 or abs(float((surf["u"] ** 2).sum(axis=1).max()) - 1.0) < 1e-3
+    with pytest.raises(ValueError):
+        MO.solve(step, {"material": mat, "loads": [{"type": "force", "faces": [1], "vector_n": [1, 0, 0]}]})

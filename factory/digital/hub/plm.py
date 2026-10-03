@@ -23,6 +23,8 @@ def item_info(item, erp_lookup=None):
     """物料是否存在：先查工厂数据，再（线上）查 ERPNext。返回 {item, name, routing_ops} 或 None"""
     if item in F.ITEMS:
         name = F.ITEMS[item][0]
+    elif item in getattr(F, "CASE_ITEMS", {}):               # 教材案例件（第 11 轮）
+        name = F.CASE_ITEMS[item][0]
     elif erp_lookup:
         name = erp_lookup(item)
         if not name:
