@@ -7,7 +7,7 @@
         <div class="cbar-max mono">{{ field === 'life' ? fmtH(lifeH(range[1])) : fmt(range[1]) }}</div>
         <div class="cbar-grad" :style="{ background: grad }"></div>
         <div class="cbar-min mono">{{ field === 'life' ? '≥ ' + fmtH(lifeH(range[0])) : fmt(range[0]) }}</div>
-        <div class="cbar-unit">{{ field === 'vm' ? 'MPa' : field === 'u' ? 'mm' : '疲劳寿命' }}</div>
+        <div class="cbar-unit">{{ field === 'vm' ? 'MPa' : field === 'u' ? 'mm' : field === 'temp' ? '℃' : '疲劳寿命' }}</div>
       </div>
       <slot />
     </div>
@@ -49,7 +49,8 @@ const note = ref('拖动旋转 · 滚轮缩放 · 右键平移');
 const tip = ref(''), tipX = ref(0), tipY = ref(0);
 const grad = turboCss();
 // 疲劳（life）：按每块损伤的对数着色，红 = 损伤最大（寿命最短），显示 6 个数量级
-const fieldArr = () => (!props.surface ? null : props.field === 'vm' ? props.surface.vm : props.field === 'u' ? props.surface.umag : props.surface.lgD);
+const fieldArr = () => (!props.surface ? null : props.field === 'vm' ? props.surface.vm : props.field === 'u' ? props.surface.umag
+  : props.field === 'temp' ? props.surface.temp : props.surface.lgD);
 const range = computed(() => {
   const a = fieldArr();
   if (!a || !a.length) return [0, 1];
@@ -226,7 +227,8 @@ function move(ev) {
   else if (resultMesh) {
     const i = nearestValue(h), s = props.surface;
     const fid = s.faceOf[h.faceIndex];
-    tip.value = `面 ${fid} · 应力 ${s.vm[i].toFixed(1)} MPa · 位移 ${s.umag[i].toPrecision(3)} mm`
+    tip.value = `面 ${fid} · ` + (s.temp ? `温度 ${s.temp[i].toFixed(1)} ℃` + (s.thermoOnly ? '' : ' · ') : '')
+      + (s.thermoOnly ? '' : `应力 ${s.vm[i].toFixed(1)} MPa · 位移 ${s.umag[i].toPrecision(3)} mm`)
       + (s.lgD && props.field === 'life' ? ` · 寿命 ${s.lgD[i] < -29 ? '无限' : fmtH(lifeH(s.lgD[i]))}` : '');
   } else {
     id = h.object.userData.face;

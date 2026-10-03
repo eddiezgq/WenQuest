@@ -98,7 +98,7 @@ def solve(step_bytes, setup, workdir=None):
         if bad:
             raise ValueError("没有这些面：{}".format(bad))
         size = (setup.get("mesh") or {}).get("size_mm")
-        ntags, xyz, tets = mesh(gmsh, size, [f for l in th if l["type"] == "heat_flux" for f in l["faces"]])
+        ntags, xyz, tets = mesh(gmsh, size, [])           # 温度场平滑，发热面不用加密
         h_mesh = float(gmsh.option.getNumber("Mesh.MeshSizeMax"))
         P = {int(t): p for t, p in zip(ntags, xyz)}
         tris_of = {f: face_tris(gmsh, f) for f in all_faces}
@@ -260,7 +260,7 @@ def solve(step_bytes, setup, workdir=None):
         tm, A = mean_on(faces)
         q = hcoef * A * 1e-6 * (tm - tinf)
         out_w += q
-        groups.append({"load": gi, "area_m2": round(A * 1e-6, 6), "mean_c": round(tm, 3), "heat_w": round(q, 3)})
+        groups.append({"load": gi, "area_m2": round(A * 1e-6, 6), "mean_c": round(float(tm), 3), "heat_w": round(float(q), 3)})
     stats = {"analysis": kind, "nodes": n_nodes, "elements": n_el, "mesh_size_mm": round(h_mesh, 3),
              "seconds": round(time.time() - t0, 1), "volume_mm3": round(vol, 1),
              "t_max_c": round(float(allT[imax]), 3), "t_max_at": [round(float(x), 3) for x in P[int(allid[imax])]],

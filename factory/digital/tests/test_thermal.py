@@ -135,3 +135,31 @@ def test_service_thermal_job(tmp_path, monkeypatch, bar):
         assert j["stats"]["t_max_c"] == pytest.approx(20 + 5e5 * 0.01 / (2 * 49.8), rel=0.02)
         surf = service.read_surface(os.path.join(str(tmp_path), "jobs", j["id"], "surface.bin"))
         assert surf["temp"].max() == pytest.approx(j["stats"]["t_max_c"], rel=1e-3)
+
+
+def test_housing_heat_balance_matches_textbook():
+    """WQR-105 简化箱体（无散热筋）：内壁输入 P(1−η)，外表面 K_s = 17.45，底面绝热——外表面平均温度与教材公式一致"""
+    from cae import thermal_parts as TP
+    p = TP.params_of("housing")
+    s = TP.build("housing", p)
+    F = G.faces(s)[0]
+    ex = TP.example("housing", p, F)
+    assert {k: len(v) for k, v in ex["groups"].items()} == {"inner": 6, "outer": 5, "bottom": 1}
+    f = ex["formula"]
+    assert f["eta"] == pytest.approx(0.97 ** 2 * 0.99 ** 3, rel=1e-3) and f["loss_w"] == pytest.approx(482.6, abs=0.5)
+    st, _, _ = TH.solve(s, {"material": M.get(ex["material_id"]), "thermal": ex["thermal"], "mesh": {"size_mm": ex["mesh_mm"]}})
+    assert st["heat_out_convection_w"] == pytest.approx(f["loss_w"], rel=0.005)
+    assert st["film_groups"][0]["mean_c"] == pytest.approx(f["t_oil_c"], abs=0.5)
+    assert st["t_max_c"] > f["limit_c"]                      # 不加散热措施会超过 80 ℃：实验里要加散热筋或风扇
+    p8 = TP.params_of("housing", {"fins": 8})
+    assert TP.example("housing", p8, G.faces(TP.build("housing", p8))[0])["formula"]["t_oil_c"] < f["t_oil_c"] - 15
+
+
+def test_heatsink_groups():
+    from cae import thermal_parts as TP
+    p = TP.params_of("heatsink")
+    F = G.faces(TP.build("heatsink", p))[0]
+    ex = TP.example("heatsink", p, F)
+    assert len(ex["groups"]["pad"]) == 1 and ex["thermal"][0]["power_w"] == 65
+    with pytest.raises(ValueError):
+        TP.params_of("heatsink", {"fins": 30, "fin_t": 3})
