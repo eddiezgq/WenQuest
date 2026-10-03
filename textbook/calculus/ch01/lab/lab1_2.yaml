@@ -1,0 +1,31 @@
+# 实验 1.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab1_2.js。
+原理:
+  - ["编码器每隔采样周期 Ts 报告一次位置 x_k。相邻读数相减再除以 Ts，得到这一段的平均速度 v_k = (x_{k+1} − x_k)/Ts；Ts 越短，平均速度越接近瞬时速度（1.2.3 节）。",
+     "The encoder reports a position x_k every Ts. The difference of neighbouring readings divided by Ts is the average speed v_k = (x_{k+1} − x_k)/Ts over that period; the shorter Ts, the closer it is to the instantaneous speed (Section 1.2.3)."]
+  - 式: "相减：v_k = (x_{k+1} − x_k) / Ts       相加：x_n = x_0 + Σ v_k · Ts"
+  - ["把各段速度乘以 Ts 再累加，恢复出位置：在离散的数据上，相减与相加严格互逆（1.2.5 节）。读数误差 e 在相减后被除以 Ts，速度的误差约为 2e/Ts，采样周期越短放大越多。",
+     "Multiplying each speed by Ts and adding recovers the positions: on discrete data, subtracting and adding are exact inverses (Section 1.2.5). A reading error e is divided by Ts after subtraction, so the speed error is about 2e/Ts and grows as the period shrinks."]
+步骤:
+  - ["在“AGV 编码器”场景中保持 Ts = 20 ms、e = 0.5 mm，把 t₀ 调到 0.5（即 2 s），读出由数据求出的速度和真实速度（任务 1），填入表 1。",
+     "In 'AGV encoder' keep Ts = 20 ms and e = 0.5 mm, set t₀ to 0.5 (2 s), read the estimated and true speeds (task 1) and fill in Table 1."]
+  - ["按“行驶”跑完 4 s（任务 2），比较最后一个读数和把速度加回去得到的距离。",
+     "Press Drive and run the full 4 s (task 2); compare the last reading with the distance from adding the speeds back."]
+  - ["把 Ts 依次取 200、50、20、5、2 ms，记录速度的最大误差，填入表 2；找出误差超过 0.15 m/s 的采样周期（任务 3）。",
+     "Set Ts = 200, 50, 20, 5, 2 ms and record the largest speed error in Table 2; find a period that gives an error above 0.15 m/s (task 3)."]
+  - ["切换到“汽车行程”场景，观察速度表与里程表的关系，说明哪一个表坏了都能由另一个恢复。",
+     "Switch to 'A car trip'; watch how the speedometer and odometer relate, and explain how either meter can be recovered from the other."]
+数据表:
+  - 标题: ["表 1  t = 2 s 时的速度（Ts = 20 ms，e = 0.5 mm）", "Table 1  Speed at t = 2 s (Ts = 20 ms, e = 0.5 mm)"]
+    表头: ["由数据求出 / (m/s)", "真实值 / (m/s)", "误差 / (m/s)"]
+    表头英文: ["From data / (m/s)", "True / (m/s)", "Error / (m/s)"]
+    行: [["", "", ""]]
+  - 标题: ["表 2  采样周期与速度误差（e = 0.5 mm）", "Table 2  Sampling period and speed error (e = 0.5 mm)"]
+    表头: ["Ts / ms", "200", "50", "20", "5", "2"]
+    表头英文: ["Ts / ms", "200", "50", "20", "5", "2"]
+    行: [["最大误差 / (m/s)", "", "", "", "", ""]]
+    行英文: [["Largest error / (m/s)", "", "", "", "", ""]]
+注意:
+  - ["读数误差由固定种子的随机数生成，重做实验得到相同的数据。", "The reading errors come from a fixed random seed, so a repeated run gives the same data."]
+  - ["“汽车行程”场景中采样周期按 0.1–10 s 解读，速度以 km/h、里程以 km 显示。", "In 'A car trip' the period reads as 0.1–10 s; speed is in km/h and distance in km."]
+思考题:
+  - ["Ts 很大（如 200 ms）时误差也会变大，但原因与 Ts 很小时不同。两种误差各来自哪里？", "With a long period (200 ms) the error also grows, but for a different reason than with a short one. Where does each error come from?"]
