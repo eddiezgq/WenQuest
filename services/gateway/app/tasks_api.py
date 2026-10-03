@@ -47,14 +47,15 @@ class Store:
         Path(folder).mkdir(parents=True, exist_ok=True)
         self.path = str(Path(folder) / "tasks.db")
         self.lock = threading.Lock()
-        with self._db() as c:
-            c.execute("create table if not exists course_task (course_id integer not null, code text not null, factory text not null,"
-                      " tid text not null, cmid integer, book text, no text, title_zh text, title_en text, due integer,"
-                      " issued_by integer, issued_at integer, primary key (course_id, code))")
+        self._db()
 
     def _db(self):
         c = sqlite3.connect(self.path)
         c.row_factory = sqlite3.Row
+        with c:                               # every time: the file may have been replaced (restore, cleanup)
+            c.execute("create table if not exists course_task (course_id integer not null, code text not null, factory text not null,"
+                      " tid text not null, cmid integer, book text, no text, title_zh text, title_en text, due integer,"
+                      " issued_by integer, issued_at integer, primary key (course_id, code))")
         return c
 
     def put(self, **row: Any) -> None:

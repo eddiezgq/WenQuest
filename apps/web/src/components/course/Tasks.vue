@@ -82,7 +82,7 @@
           <text class="pill" :class="'s-' + (x.mine?.status || 'draft')">{{ x.mine ? t("tasks.st." + x.mine.status) : t("tasks.notStarted") }}</text>
           <text v-if="x.mine?.total != null" class="b">{{ x.mine.total }} / 100</text>
           <view class="grow"></view>
-          <view class="wq-btn primary" @click="openUrl(x.url)">↗ {{ t("tasks.doIt") }}</view>
+          <view class="wq-btn" :class="{ primary: x.mine?.status !== 'graded' }" @click="openUrl(x.url)">↗ {{ x.mine?.status === "graded" ? t("tasks.view") : t("tasks.doIt") }}</view>
         </view>
       </template>
     </view>
