@@ -1,0 +1,60 @@
+"""图 2.6.1–2.6.2：双曲函数；悬链线与抛物线。"""
+import math
+
+import numpy as np
+
+from _fig import ACC, BLUE, GREEN, INK, MUTED, RED, T, clean, figure, plt
+
+fig, (a1, a2, a3) = plt.subplots(1, 3, figsize=(13, 4))
+x = np.linspace(-2.5, 2.5, 400)
+a1.plot(x, np.cosh(x), color=RED, lw=2, label="$\\cosh x$")
+a1.plot(x, np.sinh(x), color=BLUE, lw=2, label="$\\sinh x$")
+a1.plot(x, np.exp(x) / 2, color=MUTED, lw=1, ls="--", label="$\\frac{1}{2}e^x$")
+a1.plot(x, np.exp(-x) / 2, color=MUTED, lw=1, ls=":", label="$\\frac{1}{2}e^{-x}$")
+a1.set_ylim(-4, 5)
+a1.legend(fontsize=9, frameon=False, loc="upper center")
+a1.set_title(T("双曲正弦与双曲余弦", "Hyperbolic sine and cosine"), fontsize=10)
+clean(a1)
+x = np.linspace(-4, 4, 400)
+a2.plot(x, np.tanh(x), color=GREEN, lw=2, label="$\\tanh x$")
+a2.plot(x, x, color=MUTED, lw=1, ls=":", label="$y = x$")
+a2.axhline(1, color=RED, lw=0.8, ls="--")
+a2.axhline(-1, color=RED, lw=0.8, ls="--")
+a2.set_ylim(-1.6, 1.6)
+a2.legend(fontsize=9, frameon=False, loc="upper left")
+a2.set_title(T("tanh：原点附近像 x，远处饱和于 ±1", "tanh: like x near 0, saturates at ±1"), fontsize=10)
+clean(a2)
+t = np.linspace(-1.8, 1.8, 300)
+a3.plot(np.cosh(t), np.sinh(t), color=BLUE, lw=2, label="$x^2 - y^2 = 1$")
+a3.plot(-np.cosh(t), np.sinh(t), color=BLUE, lw=1, ls="--")
+c = np.linspace(0, 2 * np.pi, 300)
+a3.plot(np.cos(c), np.sin(c), color=RED, lw=1.5, label="$x^2 + y^2 = 1$")
+t0 = 1.0
+a3.plot([0, math.cosh(t0)], [0, math.sinh(t0)], color=INK, lw=1)
+a3.plot([math.cosh(t0)], [math.sinh(t0)], "o", color=INK, ms=5)
+a3.text(math.cosh(t0) + 0.1, math.sinh(t0), "$(\\cosh t, \\sinh t)$", fontsize=10)
+a3.set_aspect("equal")
+a3.set_xlim(-3.2, 3.6)
+a3.set_ylim(-3, 3)
+a3.legend(fontsize=9, frameon=False, loc="lower right")
+a3.set_title(T("“双曲”的由来", "Why 'hyperbolic'"), fontsize=10)
+clean(a3)
+a3.axvline(0, color=MUTED, lw=0.6)
+fig.tight_layout()
+figure(fig, "fig2_6_1")
+
+fig, axs = plt.subplots(1, 2, figsize=(10, 3.8))
+L = 10.0
+x = np.linspace(-L, L, 400)
+for a, A in zip(axs, (25.0, 5.0)):
+    sag = A * (math.cosh(L / A) - 1)
+    a.plot(x, A * np.cosh(x / A) - A, color=RED, lw=2, label=T("悬链线", "catenary"))
+    a.plot(x, sag * (x / L) ** 2, color=BLUE, lw=1.5, ls="--", label=T("同垂度的抛物线", "parabola, same sag"))
+    a.plot([-L, -L], [0, sag + 0.5], color=INK, lw=3)
+    a.plot([L, L], [0, sag + 0.5], color=INK, lw=3)
+    a.set_title(T(f"a = {A:.0f} m，垂度 {sag:.2f} m", f"a = {A:.0f} m, sag {sag:.2f} m"), fontsize=10)
+    a.set_xlabel("x / m")
+    a.legend(fontsize=9, frameon=False, loc="upper center")
+    clean(a)
+fig.tight_layout()
+figure(fig, "fig2_6_2")

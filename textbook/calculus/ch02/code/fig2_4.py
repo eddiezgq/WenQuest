@@ -1,0 +1,133 @@
+"""图 2.4.1–2.4.4：幂函数；指数与对数；单位圆与三角函数；反三角函数与两节连杆的逆运动学。"""
+import json
+import math
+from pathlib import Path
+
+import numpy as np
+
+from _fig import ACC, BLUE, GREEN, INK, MUTED, RED, T, clean, figure, plt
+
+# 图 2.4.1 幂函数
+fig, (a1, a2) = plt.subplots(1, 2, figsize=(10, 4.2))
+x = np.linspace(-2, 2, 400)
+for n, c in ((1, MUTED), (2, BLUE), (3, RED), (4, GREEN)):
+    a1.plot(x, x**n, color=c, lw=1.8, label=f"$x^{n}$")
+xp = np.linspace(0, 2, 300)
+a1.plot(xp, np.sqrt(xp), color=ACC, lw=1.8, label="$x^{1/2}$")
+a1.plot(x, np.cbrt(x), color=INK, lw=1.4, ls="--", label="$x^{1/3}$")
+a1.set_ylim(-3, 4)
+a1.legend(fontsize=9, frameon=False, ncol=2)
+a1.set_title(T("α 为正整数与 1/2、1/3", "α a positive integer, 1/2, 1/3"), fontsize=10)
+clean(a1)
+for xs in (np.linspace(-2, -0.2, 200), np.linspace(0.2, 2, 200)):
+    a2.plot(xs, 1 / xs, color=BLUE, lw=1.8, label="$x^{-1}$" if xs[0] > 0 else None)
+    a2.plot(xs, 1 / xs**2, color=RED, lw=1.8, label="$x^{-2}$" if xs[0] > 0 else None)
+a2.plot([1], [1], "o", color=INK, ms=5)
+a2.text(1.08, 1.2, "(1, 1)")
+a2.set_ylim(-5, 5)
+a2.legend(fontsize=9, frameon=False)
+a2.set_title(T("α 为负数", "α negative"), fontsize=10)
+clean(a2)
+fig.tight_layout()
+figure(fig, "fig2_4_1")
+
+# 图 2.4.2 指数与对数
+fig, (a1, a2) = plt.subplots(1, 2, figsize=(10, 4.2))
+x = np.linspace(-3, 3, 400)
+a1.plot(x, 2.0**x, color=BLUE, lw=1.8, label="$2^x$")
+a1.plot(x, np.exp(x), color=RED, lw=2, label="$e^x$")
+a1.plot(x, 0.5**x, color=GREEN, lw=1.8, label="$(1/2)^x$")
+a1.plot([0], [1], "o", color=INK, ms=5)
+a1.set_ylim(0, 8)
+a1.legend(fontsize=9, frameon=False, loc="upper center")
+a1.set_title(T("指数函数：恒为正，过 (0, 1)", "Exponentials: positive, through (0, 1)"), fontsize=10)
+clean(a1)
+x = np.linspace(-3, 2.2, 400)
+a2.plot(x, np.exp(x), color=RED, lw=2, label="$e^x$")
+xl = np.linspace(0.05, 8, 400)
+a2.plot(xl, np.log(xl), color=BLUE, lw=2, label="$\\ln x$")
+a2.plot(xl, np.log2(xl), color=GREEN, lw=1.4, ls="--", label="$\\log_2 x$")
+a2.plot([-3, 8], [-3, 8], color=MUTED, lw=1, ls=":")
+a2.text(5.2, 5.6, "$y = x$", color=MUTED)
+a2.set_xlim(-3, 8)
+a2.set_ylim(-3, 8)
+a2.set_aspect("equal")
+a2.legend(fontsize=9, frameon=False, loc="lower right")
+a2.set_title(T("对数函数：指数函数关于 y = x 的反射", "Logarithms: reflections of exponentials in y = x"), fontsize=10)
+clean(a2)
+a2.axvline(0, color=MUTED, lw=0.6)
+fig.tight_layout()
+figure(fig, "fig2_4_2")
+
+# 图 2.4.3 单位圆与三角函数
+fig, (a1, a2) = plt.subplots(1, 2, figsize=(10, 4.3), gridspec_kw={"width_ratios": [1, 1.6]})
+t = np.linspace(0, 2 * np.pi, 400)
+a1.plot(np.cos(t), np.sin(t), color=INK, lw=1.2)
+x0 = 0.8
+tt = np.linspace(0, x0, 100)
+a1.plot(np.cos(tt), np.sin(tt), color=RED, lw=3)
+a1.plot([0, math.cos(x0)], [0, math.sin(x0)], color=MUTED, lw=1)
+a1.plot([math.cos(x0), math.cos(x0)], [0, math.sin(x0)], color=BLUE, lw=2.5)
+a1.plot([0, 1.2], [0, 0], color=MUTED, lw=0.8)
+a1.plot([math.cos(x0)], [math.sin(x0)], "o", color=INK, ms=5)
+a1.text(1.0, 0.45, T("弧长 x", "arc x"), color=RED)
+a1.text(math.cos(x0) - 0.05, 0.25, "$\\sin x$", color=BLUE, ha="right")
+a1.text(math.cos(x0) + 0.05, math.sin(x0) + 0.08, "$(\\cos x, \\sin x)$", fontsize=10)
+a1.set_aspect("equal")
+a1.set_xlim(-1.2, 1.6)
+a1.axis("off")
+a1.set_title(T("单位圆：x 小时弧长 ≈ sin x", "Unit circle: for small x, arc ≈ sin x"), fontsize=10)
+x = np.linspace(-2 * np.pi, 2 * np.pi, 2000)
+a2.plot(x, np.sin(x), color=BLUE, lw=1.8, label="$\\sin x$")
+a2.plot(x, np.cos(x), color=RED, lw=1.8, label="$\\cos x$")
+tn = np.tan(x)
+tn[np.abs(np.cos(x)) < 0.03] = np.nan
+a2.plot(x, tn, color=GREEN, lw=1.4, label="$\\tan x$")
+a2.set_ylim(-3, 3)
+a2.set_xticks([-2 * np.pi, -np.pi, 0, np.pi, 2 * np.pi])
+a2.set_xticklabels(["$-2\\pi$", "$-\\pi$", "0", "$\\pi$", "$2\\pi$"])
+a2.legend(fontsize=9, frameon=False, loc="upper right", ncol=3)
+clean(a2)
+fig.tight_layout()
+figure(fig, "fig2_4_3")
+
+# 图 2.4.4 反三角函数；两节连杆逆运动学的两组解
+e = json.loads((Path(__file__).resolve().parents[2] / "models" / "B-ARM-UR5E" / "entry.json").read_text(encoding="utf-8"))
+js = {j["name"]: j for j in e["robot"]["joints"]}
+l1, l2 = js["elbow_joint"]["origin"]["xyz"][2], js["wrist_1_joint"]["origin"]["xyz"][2]
+fig, (a1, a2) = plt.subplots(1, 2, figsize=(10, 4.3))
+u = np.linspace(-1, 1, 400)
+a1.plot(u, np.arcsin(u), color=BLUE, lw=2, label="$\\arcsin x$")
+a1.plot(u, np.arccos(u), color=RED, lw=2, label="$\\arccos x$")
+w = np.linspace(-6, 6, 400)
+a1.plot(w, np.arctan(w), color=GREEN, lw=2, label="$\\arctan x$")
+for yv in (np.pi / 2, -np.pi / 2, np.pi):
+    a1.axhline(yv, color=MUTED, lw=0.6, ls=":")
+a1.set_yticks([-np.pi / 2, 0, np.pi / 2, np.pi])
+a1.set_yticklabels(["$-\\pi/2$", "0", "$\\pi/2$", "$\\pi$"])
+a1.legend(fontsize=9, frameon=False, loc="lower right")
+a1.set_title(T("反三角函数（主值）", "Inverse trigonometric functions (principal values)"), fontsize=10)
+clean(a1)
+a1.axvline(0, color=MUTED, lw=0.6)
+px, py = 0.5, 0.3
+c2 = (px * px + py * py - l1 * l1 - l2 * l2) / (2 * l1 * l2)
+for s, c, name in ((1, BLUE, T("肘下", "elbow down")), (-1, RED, T("肘上", "elbow up"))):
+    t2 = s * math.acos(c2)
+    t1 = math.atan2(py, px) - math.atan2(l2 * math.sin(t2), l1 + l2 * math.cos(t2))
+    E = (l1 * math.cos(t1), l1 * math.sin(t1))
+    a2.plot([0, E[0], px], [0, E[1], py], color=c, lw=3, marker="o", ms=6, label=name)
+ang = np.linspace(0, 2 * np.pi, 400)
+a2.plot((l1 + l2) * np.cos(ang), (l1 + l2) * np.sin(ang), color=MUTED, lw=0.8, ls="--")
+a2.plot(abs(l1 - l2) * np.cos(ang), abs(l1 - l2) * np.sin(ang), color=MUTED, lw=0.8, ls="--")
+a2.plot([0, px], [0, py], color=MUTED, lw=0.8, ls=":")
+a2.plot([px], [py], "*", color=ACC, ms=14)
+a2.text(px + 0.04, py + 0.07, "$P(0.5, 0.3)$")
+a2.text(-0.3, -0.62, T("工作空间：两个虚线圆之间", "workspace: between the dashed circles"), fontsize=9, color=MUTED)
+a2.set_aspect("equal")
+a2.set_xlim(-0.85, 0.9)
+a2.set_ylim(-0.85, 0.85)
+a2.legend(fontsize=9, frameon=False, loc="lower left")
+a2.set_title(T("两节连杆的逆运动学：两组解", "Two-link inverse kinematics: two solutions"), fontsize=10)
+a2.axis("off")
+fig.tight_layout()
+figure(fig, "fig2_4_4")
