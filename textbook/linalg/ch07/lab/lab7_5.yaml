@@ -1,0 +1,25 @@
+# 实验 7.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab7_5.js。
+原理:
+  - ["向量组线性相关，当且仅当其中某个向量可以由其余向量线性表示（定理 7.5.1）；这个向量就是“多余的”。", "A set is linearly dependent exactly when some vector is a combination of the others (Theorem 7.5.1); that vector is redundant."]
+  - 式: "r_k = Σ_{j≠k} c_j r_j  ⇔  剩余 r_k − Σ c_j r_j = 0"
+  - ["把记录作为列排成矩阵，化为简化行阶梯形：主元列是一个极大无关组，主元个数就是秩，非主元列的系数可以直接读出（定理 7.5.3）。", "Put the records as columns and reduce: the pivot columns form a maximal independent set, the number of pivots is the rank, and the coefficients of the other columns can be read off (Theorem 7.5.3)."]
+步骤:
+  - ["目标记录选 4，调节记录 1、2、3、5、6 的系数，使剩余全为零（任务 1），把系数记入表 1。", "Choose target 4 and adjust the other coefficients until the remainder is zero (task 1); record the coefficients in Table 1."]
+  - ["同样凑出记录 6（任务 2）和记录 5。", "Likewise rebuild record 6 (task 2) and record 5."]
+  - ["目标记录选 1，用其余记录凑出它（任务 3）。说明为什么“哪条记录多余”取决于先选了哪些记录。", "Choose target 1 and rebuild it from the others (task 3). Explain why which record is 'redundant' depends on which records were chosen first."]
+  - ["点“程序判断”（任务 4），把秩和极大无关组填入表 2，与你的结果比较。", "Press 'Let the program decide' (task 4); enter the rank and the maximal independent set in Table 2 and compare."]
+数据表:
+  - 标题: ["表 1  用其余记录表示目标记录", "Table 1  Target records as combinations of the others"]
+    表头: ["目标", "c₁", "c₂", "c₃", "c₄", "c₅", "c₆"]
+    表头英文: ["Target", "c₁", "c₂", "c₃", "c₄", "c₅", "c₆"]
+    行: [["r4", "", "", "", "—", "", ""], ["r5", "", "", "", "", "—", ""], ["r6", "", "", "", "", "", "—"], ["r1", "—", "", "", "", "", ""]]
+  - 标题: ["表 2  秩与极大无关组", "Table 2  Rank and maximal independent set"]
+    表头: ["方法", "秩", "极大无关组", "备注"]
+    表头英文: ["Method", "Rank", "Maximal independent set", "Notes"]
+    行: [["手工凑", "", "", ""], ["程序（消元）", "", "", ""]]
+    行英文: [["By hand", "", "", ""], ["Program (elimination)", "", "", ""]]
+注意:
+  - ["数据是按叠加原理编制的理想值，没有测量噪声；实际数据见思考题。", "The data are ideal values built by superposition, without noise; for real data see the question below."]
+  - ["系数滑块的步长为 0.5，本实验所需的系数都是整数。", "Coefficient sliders move in steps of 0.5; the coefficients needed here are integers."]
+思考题:
+  - ["若每条记录都有约 0.05 mm/s 的测量噪声，怎样判断“几乎多余”？（提示：第 18 章的奇异值。）", "If every record has about 0.05 mm/s of noise, how would you judge 'almost redundant'? (Hint: singular values, Chapter 18.)"]

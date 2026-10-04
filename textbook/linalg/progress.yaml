@@ -29,6 +29,9 @@ chapters:
   6:
     status: ai
     title_en: "Determinants"
+  7:
+    status: ai
+    title_en: "Vector Spaces and Subspaces"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"
