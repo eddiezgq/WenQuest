@@ -47,7 +47,7 @@ def pend_f(wn2, damp=0.0):
 
 
 def pend_energy(x, wn2):
-    """单位转动惯量的能量 E/J_o = θ̇²/2 + ω_n²(1 − cos θ)（式 (7.1.13)），单位 1/s²。"""
+    """单位转动惯量的能量 E/J_o = θ̇²/2 + ω_n²(1 − cos θ)（式 (7.1.16)），单位 1/s²。"""
     x = np.asarray(x)
     return 0.5 * x[..., 1] ** 2 + wn2 * (1 - np.cos(x[..., 0]))
 
@@ -60,13 +60,13 @@ def euler(f, t, x, h):
 
 
 def midpoint(f, t, x, h):
-    """中点法，二阶龙格-库塔法（式 (7.2.8)）。"""
+    """中点法，二阶龙格-库塔法（式 (7.2.5)）。"""
     k1 = f(t, x)
     return x + h * f(t + h / 2, x + h / 2 * k1)
 
 
 def rk4(f, t, x, h):
-    """经典四阶龙格-库塔法（式 (7.2.10)）。"""
+    """经典四阶龙格-库塔法（式 (7.2.6)）。"""
     k1 = f(t, x)
     k2 = f(t + h / 2, x + h / 2 * k1)
     k3 = f(t + h / 2, x + h / 2 * k2)
@@ -87,7 +87,7 @@ def run(step, f, x0, T, h, t0=0.0, keep=False):
 
 
 def symp_euler(wn2, x, h):
-    """辛欧拉法（式 (7.2.13)）：先用旧位置更新速度，再用新速度更新位置。"""
+    """辛欧拉法（式 (7.2.9)）：先用旧位置更新速度，再用新速度更新位置。"""
     th, om = x
     om = om - h * wn2 * math.sin(th)
     th = th + h * om
@@ -95,7 +95,7 @@ def symp_euler(wn2, x, h):
 
 
 def verlet(wn2, x, h):
-    """速度形式的施特默-韦莱法（式 (7.2.16)）。"""
+    """速度形式的施特默-韦莱法（式 (7.2.11)）。"""
     th, om = x
     a = -wn2 * math.sin(th)
     om_half = om + h / 2 * a
@@ -134,7 +134,7 @@ def pend_exact_period(wn2, th0):
     return 4 * ellipk(math.sin(th0 / 2) ** 2) / math.sqrt(wn2)
 
 
-# ---------------------------------------------------------------- SO(3)（7.2.5 节）
+# ---------------------------------------------------------------- SO(3)（7.2.7 节）
 
 def skew(w):
     """[ω]：反对称矩阵，[ω] p = ω × p（第 3 章 3.2 节）。"""
@@ -171,7 +171,7 @@ def angle_between(A, B):
     return 2 * math.asin(min(1.0, float(np.linalg.norm(A - B)) / (2 * math.sqrt(2))))
 
 
-# 锥形运动：R(t) = Rot(ẑ, a t) Rot(x̂, b t)，物体角速度 ω_b(t) = (b, a sin bt, a cos bt)（式 (7.2.19)）
+# 锥形运动：R(t) = Rot(ẑ, a t) Rot(x̂, b t)，物体角速度 ω_b(t) = (b, a sin bt, a cos bt)（式 (7.2.18)）
 CONE = dict(a=2.0, b=3.0)
 
 
@@ -184,12 +184,12 @@ def cone_wb(t, c=CONE):
     return np.array([b, a * math.sin(b * t), a * math.cos(b * t)])
 
 
-# ---------------------------------------------------------------- 陀螺仪积分（7.2.5 节）
+# ---------------------------------------------------------------- 陀螺仪积分（7.2.7 节）
 S3 = math.sqrt(3)
 
 
 def lie_step(meth, R, t, h):
-    """由陀螺仪读数 ω_b(t) 积分 Ṙ = R[ω_b] 的一步（7.2.5 节的五种方法）。"""
+    """由陀螺仪读数 ω_b(t) 积分 Ṙ = R[ω_b] 的一步（7.2.7 节的五种方法）。"""
     if meth == "euler":
         return R @ (np.eye(3) + h * skew(cone_wb(t)))
     if meth == "rk4":
@@ -236,7 +236,7 @@ def fk2(th, l1=L1, l2=L2):
 
 
 def jac2(th, l1=L1, l2=L2):
-    """2R 臂的雅可比矩阵 ∂p/∂θ（式 (7.3.10)）。"""
+    """2R 臂的雅可比矩阵 ∂p/∂θ（式 (7.3.9)）。"""
     t1, t12 = th[0], th[0] + th[1]
     return np.array([[-l1 * math.sin(t1) - l2 * math.sin(t12), -l2 * math.sin(t12)],
                      [l1 * math.cos(t1) + l2 * math.cos(t12), l2 * math.cos(t12)]])
@@ -260,7 +260,7 @@ def wrap(a):
 
 
 def newton2_batch(th0, p, iters=40, tol=1e-10, l1=L1, l2=L2):
-    """从许多初值同时做 2R 逆运动学的牛顿迭代（式 (7.3.9)）。th0: (N, 2)。
+    """从许多初值同时做 2R 逆运动学的牛顿迭代（式 (7.3.8)）。th0: (N, 2)。
     返回 (最终关节角, 是否收敛, 所用迭代次数)。雅可比矩阵奇异或迭代 iters 次仍未收敛的算作失败。"""
     th = np.array(th0, float)
     n = th.shape[0]

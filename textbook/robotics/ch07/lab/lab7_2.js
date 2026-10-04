@@ -6,7 +6,7 @@
 WQ.lab({
   title: ["实验 7.2 积分方法与步长", "Lab 7.2 Integration methods and step size"],
   goal: ["用不同的积分方法和步长仿真同一个系统，看误差、稳定性、能量漂移和姿态的正交性。",
-         "Simulate one system with different methods and step sizes; see the error, stability, energy drift and the orthogonality of the attitude."],
+         "Simulate one system with different methods and step sizes; see the error, stability, energy drift and the orthogonality of the orientation matrix."],
   scenes: [
     { id: "link", robot: true, name: ["连杆的长时间仿真", "A long simulation of the link"], hide: ["hM", "hG", "hO"],
       problem: { title: ["机器人问题：仿真软件该用哪种积分方法", "Robot problem: which integrator should the simulator use"],
@@ -17,9 +17,9 @@ WQ.lab({
       problem: { title: ["机器人问题：步长取多大会出错", "Robot problem: how large a step is too large"],
                  text: ["电机起动 τω̇ + ω = Ku，τ = 19.02 ms。逐渐加大步长，找出仿真开始发散的步长。方法：0 欧拉，1 RK4。",
                         "Motor start-up τω̇ + ω = Ku with τ = 19.02 ms. Increase the step until the simulation starts to diverge. Method: 0 Euler, 1 RK4."] } },
-    { id: "gyro", robot: true, name: ["由陀螺仪积分姿态", "Attitude from a gyroscope"], hide: ["hL", "hM", "hO", "dur"],
+    { id: "gyro", robot: true, name: ["由陀螺仪积分姿态", "Orientation from a gyroscope"], hide: ["hL", "hM", "hO", "dur"],
       params: { method: { min: 0, max: 2, step: 1, value: 0 } },
-      problem: { title: ["机器人问题：四旋翼的姿态解算", "Robot problem: attitude of a quadrotor"],
+      problem: { title: ["机器人问题：四旋翼的姿态解算", "Robot problem: orientation of a quadrotor"],
                  text: ["四旋翼做锥形运动，陀螺仪给出物体角速度。积分 10 s，看 det R 是否保持为 1。方法：0 欧拉（矩阵元素），1 李-欧拉，2 李-中点。",
                         "A quadrotor moves on a cone; the gyroscope gives the body angular velocity. Integrate for 10 s and check whether det R stays 1. Method: 0 Euler (entries), 1 Lie–Euler, 2 Lie midpoint."] } },
     { id: "orbit", name: ["地球绕太阳", "The Earth around the Sun"], hide: ["hL", "hM", "hG", "dur"],
@@ -37,13 +37,13 @@ WQ.lab({
   ],
   buttons: [{ id: "start", name: ["回放", "Play"], primary: true }, { id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "euler", robot: true, text: ["连杆：欧拉法、h = 0.02 s、20 s，回放后读出能量增长到几倍（超过 2 倍时连杆已越过顶点）。", "Link: Euler, h = 0.02 s, 20 s; after playback read how many times the energy has grown (above 2 the link goes over the top)."],
+    { id: "euler", robot: true, text: ["连杆：欧拉法、h = 0.02 s、20 s，回放后读出能量增长到几倍（超过 2 倍时连杆已越过顶点）。", "Link: Euler's method, h = 0.02 s, 20 s; after playback read how many times the energy has grown (above 2 the link goes over the top)."],
       demo: { scene: "link", set: { method: 0, hL: 0.02, dur: 20 }, press: ["start"], wait: 8 } },
     { id: "symp", robot: true, text: ["连杆：辛欧拉法、h = 0.02 s、100 s 以上，能量误差始终在 ±5% 以内。", "Link: symplectic Euler, h = 0.02 s, 100 s or more; the energy error stays within ±5%."],
       demo: { scene: "link", set: { method: 2, hL: 0.02, dur: 100 }, press: ["start"], wait: 8 } },
-    { id: "diverge", robot: true, text: ["电机：欧拉法，找到刚好发散的步长（不超过 42 ms），与 2τ = 38.0 ms 比较。", "Motor: Euler; find a step that just diverges (42 ms or less) and compare with 2τ = 38.0 ms."],
+    { id: "diverge", robot: true, text: ["电机：欧拉法，找到刚好发散的步长（不超过 42 ms），与 2τ = 38.0 ms 比较。", "Motor: Euler's method; find a step that just diverges (42 ms or less) and compare with 2τ = 38.0 ms."],
       demo: { scene: "motor", set: { method: 0, hM: 40 }, press: ["start"], wait: 6 } },
-    { id: "gyro", robot: true, text: ["陀螺仪：欧拉法（矩阵元素）、h ≥ 0.02 s 积分 10 s，det R 超过 1.1；换成李-欧拉法，det R 保持为 1。", "Gyro: Euler on the entries, h ≥ 0.02 s for 10 s: det R exceeds 1.1; with Lie–Euler det R stays 1."],
+    { id: "gyro", robot: true, text: ["陀螺仪：欧拉法（矩阵元素）、h ≥ 0.02 s 积分 10 s，det R 超过 1.1；换成李-欧拉法，det R 保持为 1。", "Gyro: Euler's method on the entries, h ≥ 0.02 s for 10 s: det R exceeds 1.1; with Lie–Euler det R stays 1."],
       demo: { scene: "gyro", set: { method: 0, hG: 0.02 }, press: ["start"], wait: 6 } },
     { id: "orbit", text: ["地球轨道：施特默-韦莱法、h ≥ 10 d，20 年后能量误差小于 1%，轨道闭合；欧拉法则螺旋外逃。", "Orbit: Störmer–Verlet with h ≥ 10 d keeps the energy within 1% for 20 years and the orbit closes; Euler spirals out."],
       demo: { scene: "orbit", set: { method: 3, hO: 10 }, press: ["start"], wait: 6 } },
@@ -160,7 +160,7 @@ WQ.lab({
     if (api.scene === "gyro") {
       if (s.finished && I.meth === 0 && I.h >= 0.02 - 1e-9 && I.det > 1.1) api.done("gyro");
       return [[["方法", "method"], api.T(GM[I.meth], GE[I.meth])], [["10 s 后 det R", "det R after 10 s"], I.det.toFixed(I.meth === 0 ? 4 : 12)],
-              [["‖RᵀR − I‖", "‖RᵀR − I‖"], I.orth.toExponential(2)], [["姿态误差角", "attitude error"], api.fmt(I.err, 3) + "°"]];
+              [["‖RᵀR − I‖", "‖RᵀR − I‖"], I.orth.toExponential(2)], [["姿态误差角", "orientation error"], api.fmt(I.err, 3) + "°"]];
     }
     if (s.finished && I.meth === 3 && I.h >= 10 && I.Eerr < 0.01 && I.maxErr < 0.05) api.done("orbit");
     return [[["方法", "method"], api.T(M[I.meth], ME[I.meth])], [["20 年后能量误差", "energy error after 20 years"], api.fmt(I.Eerr * 100, 3) + " %"],

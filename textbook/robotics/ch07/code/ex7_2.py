@@ -33,7 +33,7 @@ hs = [0.005, 0.0025, 0.00125, 0.000625]
 errs_m = [abs(run(euler, f_m, [0.0], T1, h)[0] - exact(T1)) for h in hs]
 ratios_m = [errs_m[i] / errs_m[i + 1] for i in range(3)]
 assert all(1.9 < r < 2.1 for r in ratios_m)                  # 一阶：步长减半，误差减半
-# 欧拉法的显式解：ω_k = ω∞ (1 − (1 − h/τ)^k)（式 (7.2.6)）
+# 欧拉法的显式解：ω_k = ω∞ (1 − (1 − h/τ)^k)（式 (7.2.3)）
 k = int(round(T1 / h1))
 assert abs(w1 - w_inf * (1 - (1 - h1 / tau) ** k)) < 1e-9
 
@@ -120,7 +120,7 @@ xs_small = run_pend("rk4", wn2, [math.radians(2), 0.0], 1000.0, hx)
 r4_small = float(1 - pend_energy(xs_small[-1], wn2) / pend_energy(xs_small[0], wn2)) * 100
 r4_small_pred = (1 - (1 - y ** 6 / 72 + y ** 8 / 576) ** int(round(1000 / hx))) * 100
 assert abs(r4_small / r4_small_pred - 1) < 0.02
-# 辛欧拉法对小摆幅精确保持 Q = θ̇² + ω_n²θ² − hω_n²θθ̇（式 (7.2.15)），能量本身只在 O(h) 的范围内振荡
+# 辛欧拉法对小摆幅精确保持 Q = θ̇² + ω_n²θ² − hω_n²θθ̇（式 (7.2.10)），能量本身只在 O(h) 的范围内振荡
 xs_small = run_pend("symp", wn2, [math.radians(2), 0.0], 100.0, hx)
 from _ode import symp_euler as _se
 th_l, om_l = math.radians(2), 0.0
@@ -130,12 +130,12 @@ for _ in range(2000):                                         # 线性化的辛�
     th_l = th_l + hx * om_l
     Qs.append(om_l ** 2 + wn2 * th_l ** 2 - hx * wn2 * th_l * om_l)
 assert np.ptp(Qs) < 1e-12 * Qs[0]
-amp_eu = math.sqrt(1 + (hx * wn) ** 2)
+amp_eu = math.sqrt(1 + (hx * wn) ** 2)                       # 线性化后欧拉法每步把振幅放大的倍数
 # RK4 在负实轴上的稳定区间 [−x*, 0]：放大因子 G(z) = 1 + z + z²/2 + z³/6 + z⁴/24 在负实轴上为正，区间的端点满足 G = 1
 from scipy.optimize import brentq
 G4 = lambda z: 1 + z + z * z / 2 + z ** 3 / 6 + z ** 4 / 24
 rk4_lim = -brentq(lambda z: G4(z) - 1, -3.5, -2.0)
-assert all(abs(G4(z)) <= 1 + 1e-12 for z in np.linspace(-rk4_lim, 0, 200)) and G4(-rk4_lim - 0.01) > 1                       # 线性化后欧拉法每步把振幅放大的倍数
+assert all(abs(G4(z)) <= 1 + 1e-12 for z in np.linspace(-rk4_lim, 0, 200)) and G4(-rk4_lim - 0.01) > 1
 steps_10 = int(round(10 / hx))
 
 out(

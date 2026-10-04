@@ -12,6 +12,7 @@ from _ode import link_params, motor_first_order
 from bookout import COLORS, T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 C = COLORS
 box = dict(fc="white", ec="none", pad=1.0, alpha=0.9)
 
@@ -81,7 +82,7 @@ plt.close(fig)
 
 # ---------------------------------------------------------------- 图 7.1.3
 Jo, lc, wn2 = link_params()
-fig = plt.figure(figsize=(9.6, 4.2))
+fig = plt.figure(figsize=(9.6, 4.6))
 ax = fig.add_axes([0.0, 0.08, 0.27, 0.84])
 ax.set_aspect("equal")
 ax.axis("off")
@@ -106,7 +107,7 @@ ax.text(-0.18, -0.70, T("(a) 刹车松开后自由摆动的连杆", "(a) a link 
 ax.set_xlim(-0.25, 0.42)
 ax.set_ylim(-0.75, 0.08)
 
-ax = fig.add_axes([0.36, 0.13, 0.62, 0.8])
+ax = fig.add_axes([0.36, 0.2, 0.62, 0.76])
 th_g = np.linspace(-1.5 * math.pi, 1.5 * math.pi, 25)
 om_g = np.linspace(-11, 11, 13)
 TH, OM = np.meshgrid(th_g, om_g)
@@ -133,14 +134,14 @@ ax.set_xlim(-1.5 * math.pi, 1.5 * math.pi)
 ax.set_ylim(-12, 12)
 ax.set_xlabel(T("角度 θ / rad", "angle θ / rad"))
 ax.set_ylabel(T("角速度 $\\dot\\theta$ / (rad/s)", "angular velocity $\\dot\\theta$ / (rad/s)"))
-ax.text(0.12, 0.7, T("稳定平衡点", "stable\nequilibrium"), fontsize=9, color=C["ink"], bbox=box)
+ax.text(0, 0.7, T("稳定平衡点", "stable\nequilibrium"), fontsize=9, color=C["ink"], bbox=box, ha="center", va="bottom")
 ax.text(math.pi + 0.12, 0.7, T("不稳定\n平衡点", "unstable\nequilibrium"), fontsize=9, color=C["ink"], bbox=box)
 ax.annotate(T("分界线", "separatrix"), xy=(-0.5 * math.pi, 2 * math.sqrt(wn2) * math.cos(math.pi / 4)), xytext=(-1.45 * math.pi, 3.2),
             color=C["x"], fontsize=9.5, bbox=box, arrowprops=dict(arrowstyle="-", color=C["x"], lw=0.7))
 ax.text(1.5 * math.pi - 0.1, 7.4, T("越过顶点、\n一直转下去", "over the top,\nkeeps turning"), color=C["y"], fontsize=9.5, bbox=box, ha="right")
 ax.text(-0.75, -3.0, T("来回摆动", "swinging"), color=C["z"], fontsize=9.5, bbox=box)
-ax.text(-0.35 * math.pi, -11.4, T("(b) 相平面：箭头表示 $(\\dot\\theta,\\ \\ddot\\theta)$ 的方向", "(b) phase plane: arrows give the direction of $(\\dot\\theta,\\ \\ddot\\theta)$"),
-        fontsize=10, bbox=box)
+ax.text(0.5, -0.19, T("(b) 相平面：箭头表示 $(\\dot\\theta,\\ \\ddot\\theta)$ 的方向", "(b) phase plane: arrows give the direction of $(\\dot\\theta,\\ \\ddot\\theta)$"),
+        fontsize=10, transform=ax.transAxes, ha="center", va="top")
 clean(ax)
 figure(fig, "fig7_1_3")
 plt.close(fig)

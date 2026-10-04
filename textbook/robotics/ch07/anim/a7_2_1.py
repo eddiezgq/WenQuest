@@ -12,7 +12,7 @@ def exact(t):
     return WINF * (1 - math.exp(-t / TAU))
 
 
-def euler(h, T=0.06):
+def euler(h, T=0.05):                     # 到 50 ms，与算例 7.2.1 一致
     w, out = 0.0, [(0.0, 0.0)]
     for k in range(int(round(T / h))):
         w = w + h * (WINF - w) / TAU
@@ -43,7 +43,7 @@ class Lesson(Base):
             elif h == 0.005:
                 self.caption("步长减半：h = 5 ms", "Halve the step: h = 5 ms", wait=0)
             else:
-                self.caption("再减半：h = 2.5 ms，折线贴近精确解", "Halve again: h = 2.5 ms, the polyline hugs the curve", wait=0)
+                self.caption("再减半：h = 2.5 ms，折线贴近精确解", "Halve again: h = 2.5 ms, the polygonal line hugs the exact solution", wait=0)
             if h == 0.010:
                 for (t0, w0), (t1, w1) in zip(pts, pts[1:]):
                     seg = Line(ax.c2p(t0 * 1000, w0), ax.c2p(t1 * 1000, w1), color=col, stroke_width=4)
@@ -62,11 +62,11 @@ class Lesson(Base):
                 grp.add(poly, dots)
             t_end, w_end = pts[-1]
             err = w_end - exact(t_end)
-            lab = Text("h = %.1f ms   e(60 ms) = %.2f rad/s" % (h * 1000, err), font=LATIN, font_size=22, color=col)
+            lab = Text("h = %.1f ms   e(50 ms) = %.2f rad/s" % (h * 1000, err), font=LATIN, font_size=22, color=col)
             lab.to_corner(UR, buff=0.5).shift(DOWN * (0.8 + 0.4 * [0.010, 0.005, 0.0025].index(h)))
             self.play(FadeIn(lab), run_time=0.4)
             self.wait(0.3)
-        self.caption("步长减半，误差也约减半：欧拉法是一阶方法", "Halve the step and the error roughly halves: Euler is first order")
+        self.caption("步长减半，误差也约减半：欧拉法是一阶方法", "Halve the step and the error roughly halves: Euler's method is first order")
         self.wait(1)
         self.card([["欧拉法", "Euler's method"],
                    MathTex(r"x_{k+1} = x_k + h\,f(t_k, x_k)", font_size=46),

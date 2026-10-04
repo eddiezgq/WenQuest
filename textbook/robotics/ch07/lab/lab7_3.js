@@ -4,12 +4,12 @@
 WQ.lab({
   title: ["实验 7.3 牛顿法与逆运动学", "Lab 7.3 Newton's method and inverse kinematics"],
   goal: ["一步一步地运行牛顿法，看它怎样把 2R 臂的末端送到目标，体会二次收敛、初值的作用和失败的情形。",
-         "Run Newton's method step by step; watch it bring the 2R arm's tip to the target, and see quadratic convergence, the role of the start and how it fails."],
+         "Run Newton's method step by step; watch it bring the end-effector of the 2R arm to the target, and see quadratic convergence, the role of the start and how it fails."],
   scenes: [
     { id: "arm", robot: true, name: ["2R 臂的逆运动学", "Inverse kinematics of a 2R arm"], hide: ["a", "x0"],
-      problem: { title: ["机器人问题：末端要到 p_d，关节角是多少", "Robot problem: which joint angles put the tip at p_d"],
+      problem: { title: ["机器人问题：末端要到 p_d，关节角是多少", "Robot problem: which joint angles put the end-effector at p_d"],
                  text: ["拖动目标 (x_d, y_d) 和初始关节角，按“迭代一步”或“开始”。读数给出每一步末端到目标的距离。",
-                        "Set the target (x_d, y_d) and the starting joint angles, then press “One step” or “Start”. The readings give the tip-to-target distance after each step."] } },
+                        "Set the target (x_d, y_d) and the starting joint angles, then press “One step” or “Start”. The readings give the distance from the end-effector to the target after each step."] } },
     { id: "sqrt", name: ["用牛顿法开平方", "Square roots by Newton's method"], hide: ["px", "py", "t1", "t2", "ls"],
       problem: { title: ["生活中的例子：计算器怎样算 √a", "Everyday example: how a calculator finds √a"],
                  text: ["解 x² − a = 0：猜一个 x，用 x 与 a/x 的平均值作下一个猜测。看有效位数怎样增长。",
@@ -28,9 +28,9 @@ WQ.lab({
   tasks: [
     { id: "ex", robot: true, text: ["复现算例 7.3.4：目标 (0.45, 0.35) m，初值 (0°, 57°)，6 次迭代内收敛。", "Example 7.3.4: target (0.45, 0.35) m, start (0°, 57°): converge within 6 steps."],
       demo: { scene: "arm", set: { px: 0.45, py: 0.35, t1: 0, t2: 57, ls: 0 }, press: ["start"], wait: 8 } },
-    { id: "other", robot: true, text: ["换一个初值，使牛顿法收敛到肘部在另一侧（θ₂ < 0）的解。", "Choose another start so that Newton converges to the other elbow (θ₂ < 0)."],
+    { id: "other", robot: true, text: ["换一个初值，使牛顿法收敛到肘部在另一侧（θ₂ < 0）的解。", "Choose another start so that Newton's method converges to the other elbow (θ₂ < 0)."],
       demo: { scene: "arm", set: { px: 0.45, py: 0.35, t1: 60, t2: -60, ls: 0 }, press: ["start"], wait: 8 } },
-    { id: "ls", robot: true, text: ["找一个纯牛顿法 40 步不收敛、打开线搜索后收敛的初值（例如 (−170°, −140°)）。", "Find a start where plain Newton fails in 40 steps but converges with line search (e.g. (−170°, −140°))."],
+    { id: "ls", robot: true, text: ["找一个纯牛顿法 40 步不收敛、打开线搜索后收敛的初值（例如 (−170°, −140°)）。", "Find a start where plain Newton's method fails in 40 steps but converges with line search (e.g. (−170°, −140°))."],
       demo: { scene: "arm", set: { px: 0.45, py: 0.35, t1: -170, t2: -140, ls: 1 }, press: ["start"], wait: 12 } },
     { id: "far", robot: true, text: ["把目标移到够不着的地方（距基座超过 0.817 m），迭代 10 次以上，观察残差不会小于距离之差。", "Move the target out of reach (more than 0.817 m away), iterate 10 times or more, and see that the residual cannot drop below the gap."],
       demo: { scene: "arm", set: { px: 0.9, py: 0.3, t1: 10, t2: 30, ls: 0 }, press: ["start"], wait: 12 } },
@@ -137,6 +137,6 @@ WQ.lab({
     const tg = P(api.p.px, api.p.py);
     api.circle(tg[0], tg[1], 7, null, api.css("--red")); api.line(tg[0] - 10, tg[1], tg[0] + 10, tg[1], api.css("--red"), 1.5); api.line(tg[0], tg[1] - 10, tg[0], tg[1] + 10, api.css("--red"), 1.5);
     api.label("p_d", tg[0] + 10, tg[1] - 12, api.css("--red"), 13);
-    api.label(api.T("灰色：前几次迭代的形态", "grey: earlier iterates"), 12, 18, api.css("--muted"), 12);
+    api.label(api.T("灰色：前几次迭代的形态", "grey: configurations at earlier iterations"), 12, 18, api.css("--muted"), 12);
   },
 });

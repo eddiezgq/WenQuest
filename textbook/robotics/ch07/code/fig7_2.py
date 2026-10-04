@@ -14,9 +14,10 @@ from scipy.integrate import solve_ivp
 
 from _ode import (angle_between, cone_R, euler, lie_integrate, lie_step, orth, link_params, motor_first_order, pend_energy, pend_f, rk4, run, run_pend, symp_euler,
                   verlet)
-from bookout import COLORS, T, figure, style
+from bookout import COLORS, T, figure, style, LANG
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 C = COLORS
 box = dict(fc="white", ec="none", pad=1.0, alpha=0.9)
 PURPLE = "#8e44ad"
@@ -123,7 +124,7 @@ a1.axhline(2, color=C["muted"], lw=0.6, ls=":")
 a1.text(0.3, 2.08, T("高于此线：连杆越过顶点", "above: the link goes over the top"), fontsize=8.5, color=C["muted"])
 a1.set_xlabel(T("时间 t / s", "time t / s"))
 a1.set_ylabel(T("能量 E / E(0)", "energy E / E(0)"))
-a1.set_title(T("(a) 欧拉法，h = 0.02 s", "(a) Euler, h = 0.02 s"), fontsize=10.5)
+a1.set_title(T("(a) 欧拉法，h = 0.02 s", "(a) Euler's method, h = 0.02 s"), fontsize=10.5)
 clean(a1)
 
 
@@ -218,10 +219,11 @@ for m_, (lab, col, mk) in names.items():
     es = [math.degrees(angle_between(lie_integrate(m_, 2.0, h), cone_R(2.0))) for h in hs]
     a1.loglog(hs, es, marker=mk, color=col, lw=1.2, ms=4.5, label=lab)
 a1.set_xlabel(T("步长 h / s", "step size h / s"))
-a1.set_ylabel(T("t = 2 s 时的姿态误差 / (°)", "attitude error at t = 2 s / (°)"))
+a1.set_ylabel(T("t = 2 s 时的姿态误差 / (°)", "orientation error at t = 2 s / (°)"))
 a1.set_title(T("(a) 误差与步长", "(a) error versus step size"), fontsize=10.5)
 a1.grid(True, which="major", lw=0.3, alpha=0.5)
-a1.legend(loc="lower right", frameon=False, fontsize=8.5)
+a1.legend(loc="lower right", frameon=False,
+          **(dict(fontsize=8.5) if LANG == "zh" else dict(fontsize=8, handlelength=1.4, borderaxespad=0.1)))   # 英文图例较宽，避免压住曲线
 clean(a1)
 h = 0.01
 for m_ in ("euler", "rk4", "lie", "mag4"):

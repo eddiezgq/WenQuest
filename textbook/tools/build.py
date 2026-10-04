@@ -426,10 +426,12 @@ def fill(sec: Section, values: dict, rep: Report) -> str:
             return f"{m_}\\times 10^{{{int(e_)}}}"
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             try:
-                return format(v, fmt.strip()) if fmt else (str(v) if isinstance(v, int) else sig(v))
+                s = format(v, fmt.strip()) if fmt else (str(v) if isinstance(v, int) else sig(v))
             except ValueError:
                 rep.add("error", "占位符", sec.id, f"{m.group(0)}：格式 {fmt} 不对")
                 return m.group(0)
+            # 英文版负数用真正的减号 “−”（U+2212）；公式里 MathJax 把 “-” 也排成 U+2212，两者一样
+            return "−" + s[1:] if sec.lang == "en" and s.startswith("-") else s
         if sec.lang == "en" and english.CJK.search(str(v)):
             rep.add("error", "占位符", sec.id + "（英文版）", f"{m.group(0)} 的值是中文：程序里写成 T(中文, English)")
         return str(v)
