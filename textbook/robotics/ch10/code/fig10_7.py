@@ -104,7 +104,7 @@ for P in (Ap, Bp):
     ax.plot(*np.array([P + k * vel(P), P + k * pr]).T, color=C["x"], lw=0.7, ls=":")
     ax.plot(*np.array([P, P + k * pr]).T, color=C["x"], lw=2.5, alpha=0.6)
 ax.text(-0.3, -0.45, T(r"粗红线：$v_A$、$v_B$ 在 AB 方向上的投影，二者相等", r"thick red: projections of $v_A$ and $v_B$ on AB, which are equal"), fontsize=9)
-ax.text(-0.3, 1.0, T(r"$\omega$ 垂直纸面向外", r"$\omega$ points out of the page"), fontsize=9)
+ax.text(-0.3, 1.0, T(r"$\omega$ 垂直纸面向外", "$\\omega$ out of\nthe page"), fontsize=9)
 ax.set_xlim(-0.45, 2.1)
 ax.set_ylim(-0.55, 1.65)
 figure(fig, "fig10_7_2")

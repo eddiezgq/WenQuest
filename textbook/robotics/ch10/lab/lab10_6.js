@@ -12,7 +12,7 @@ WQ.lab({
   models: ["B-EDU-DIFF"],
   scenes: [
     { id: "agv", robot: true, name: ["转台上沿半径行驶", "Driving along a radius of the turntable"],
-      problem: { title: ["机器人问题：直线匀速行驶，为什么有横向加速度", "Robot problem: driving straight and steady, why a sideways acceleration"],
+      problem: { title: ["机器人问题：直线匀速行驶，为什么有横向加速度", "Robot problem: driving straight at constant speed, why a sideways acceleration?"],
                  text: ["转台以 0.5 rad/s 转动，小车沿转台上的导引线以 0.4 m/s 匀速向外行驶。离中心 1.0 m 时加速度计读到什么？",
                         "The table turns at 0.5 rad/s and the cart drives out along the guide line at a steady 0.4 m/s. What does its accelerometer read 1.0 m from the centre?"] } },
     { id: "ball", name: ["转盘上滚动的小球", "A ball rolling on a turntable"], hide: ["vr", "al"],
@@ -21,9 +21,9 @@ WQ.lab({
                         "The ball rolls out from the centre along a fixed direction on the ground. What path does someone on the turntable see?"] } },
   ],
   params: [
-    { id: "Om", name: ["转台角速度 Ω", "Table rate Ω"], min: -1, max: 1, step: 0.05, value: 0.5, unit: "rad/s", digits: 2 },
+    { id: "Om", name: ["转台角速度 Ω", "Table angular velocity Ω"], min: -1, max: 1, step: 0.05, value: 0.5, unit: "rad/s", digits: 2 },
     { id: "al", name: ["转台角加速度 α", "Table angular acceleration α"], min: 0, max: 0.4, step: 0.05, value: 0, unit: "rad/s²", digits: 2 },
-    { id: "vr", name: ["小车相对转台的速度 v_rel", "Cart speed on the table v_rel"], min: 0.1, max: 0.8, step: 0.05, value: 0.4, unit: "m/s", digits: 2 },
+    { id: "vr", name: ["小车相对转台的速度 v_rel", "Cart speed relative to the table v_rel"], min: 0.1, max: 0.8, step: 0.05, value: 0.4, unit: "m/s", digits: 2 },
   ],
   buttons: [{ id: "start", name: ["开始", "Start"], primary: true }, { id: "reset", name: ["重置", "Reset"] }],
   tasks: [

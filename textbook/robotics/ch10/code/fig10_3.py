@@ -71,7 +71,7 @@ ax.text(0.008, 0.72, "$y_s$", color=C["y"], fontsize=11)
 ax.plot([0, J[0], E[0]], [0, J[1], E[1]], color="#8fa3b5", lw=7, solid_capstyle="round", zorder=1)
 for p in (np.zeros(2), J):
     ax.plot(*p, "o", color="white", mec=C["ink"], ms=7, zorder=2)
-ax.text(-0.075, -0.045, T("关节 1", "joint 1"), fontsize=8.5, color=G_COL)
+ax.text(-0.075, -0.045, T("关节 1", "joint 1"), fontsize=8.5, color=G_COL, ha=T("left", "right"))
 ax.text(J[0] + 0.015, J[1] - 0.03, T("关节 2", "joint 2"), fontsize=8.5, color=G_COL)
 ax.plot([0, E[0]], [0, E[1]], color=C["ink"], lw=1.0, ls="--", zorder=3)
 ax.text(E[0] * 0.45 - 0.06, E[1] * 0.45 + 0.01, r"$\rho$", fontsize=12)
@@ -93,7 +93,7 @@ ka = 0.6
 arrow(ax, E, E + ka * a_rho * er, A_COL, 1.2, ls="--")
 arrow(ax, E, E + ka * a_phi * ep, A_COL, 1.2, ls="--")
 arrow(ax, E, E + ka * (a_rho * er + a_phi * ep), A_COL, 2.0)
-ax.text(*(E + ka * (a_rho * er + a_phi * ep) + np.array([-0.03, -0.035])), "$a$", color=A_COL, fontsize=12)
+ax.text(*(E + ka * (a_rho * er + a_phi * ep) + np.array([-0.065, -0.005])), "$a$", color=A_COL, fontsize=12)
 ax.text(*(E + ka * a_rho * er + np.array([0.012, -0.02])), r"$a_\rho$", color=A_COL, fontsize=10)
 ax.text(*(E + ka * a_phi * ep + np.array([-0.02, -0.04])), r"$a_\varphi$", color=A_COL, fontsize=10)
 ax.text(-0.17, -0.12, T("实线：速度 v（橙）与加速度 a（红）；虚线：它们的径向、横向分量",

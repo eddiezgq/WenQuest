@@ -7,10 +7,10 @@ WQ.lab({
   goal: ["观察动点的位置矢量、速度和加速度怎样随时间变化，并在速度图上看出加速度就是速度图的切线方向。",
          "Watch the position vector, velocity and acceleration change in time, and see on the hodograph that the acceleration is tangent to it."],
   scenes: [
-    { id: "glue", robot: true, name: ["SCARA 涂胶椭圆", "SCARA glue ellipse"], hide: ["v0", "ang"],
-      problem: { title: ["机器人问题：胶条为什么粗细不匀", "Robot problem: why the glue bead is uneven"],
+    { id: "glue", robot: true, name: ["SCARA 涂胶椭圆", "SCARA sealant ellipse"], hide: ["v0", "ang"],
+      problem: { title: ["机器人问题：胶条为什么粗细不匀", "Robot problem: why the sealant bead is uneven"],
                  text: ["工具尖按参数均匀增加的方式走椭圆，出胶量恒定。速率在哪里最大、哪里最小？",
-                        "The tool follows the ellipse with an evenly growing parameter at constant glue flow. Where is the speed largest and smallest?"] } },
+                        "The tool follows the ellipse with an evenly growing parameter at constant sealant flow. Where is the speed largest and smallest?"] } },
     { id: "ball", name: ["投篮", "Shooting a basketball"], hide: ["a", "b", "T"],
       problem: { title: ["生活中的例子：篮球的速度图", "Everyday example: the hodograph of a basketball"],
                  text: ["出手后篮球只受重力，加速度始终竖直向下。它的速度图是什么形状？",
@@ -27,7 +27,7 @@ WQ.lab({
   legend: [{ name: ["位置矢量 r", "position r"], color: "#1d2327" }, { name: ["速度 v", "velocity v"], color: "#e07b00" }, { name: ["加速度 a", "acceleration a"], color: "#c0392b" }],
   tasks: [
     { id: "ex", robot: true, text: ["按算例 10.2.1 设置（a = 0.12 m，b = 0.08 m，T = 4 s），运行一整圈，读出速率的最大值和最小值。",
-                                    "Set Example 10.2.1 (a = 0.12 m, b = 0.08 m, T = 4 s), run one full loop and read the largest and smallest speed."],
+                                    "Set Example 10.2.1 (a = 0.12 m, b = 0.08 m, T = 4 s), run one full loop and read the largest and smallest speeds."],
       demo: { scene: "glue", set: { a: 0.12, b: 0.08, T: 4 }, press: ["start"], wait: 6 } },
     { id: "circle", robot: true, text: ["把椭圆调成圆（a = b），运行：速率恒定，加速度仍然指向中心。",
                                         "Make the ellipse a circle (a = b) and run: the speed is constant, the acceleration still points to the centre."],
@@ -37,7 +37,7 @@ WQ.lab({
       demo: { scene: "ball", set: { v0: 8, ang: 52 }, press: ["start"], wait: 3 } },
   ],
   think: ["按算例 10.2.1 的参数化，速率最大和最小之比是多少？要让胶条粗细均匀，应当怎样改变工具尖的运动规律（10.5 节）？",
-          "With the parametrisation of Example 10.2.1, what is the ratio of the largest to the smallest speed? How should the motion be changed for an even bead (Section 10.5)?"],
+          "With the parametrization of Example 10.2.1, what is the ratio of the largest to the smallest speed? How should the motion be changed for an even bead (Section 10.5)?"],
 
   G: 9.81,
   kin(api, t) {               // 位置、速度、加速度（二维）
@@ -85,7 +85,7 @@ WQ.lab({
   draw(api, s) {
     const { w, h, ctx } = api, split = w * 0.6;
     api.line(split, 10, split, h - 10, api.css("--grid"), 1, [5, 5]);
-    api.label(api.T("轨迹（俯视）", "Path (top view)"), split / 2, 16, api.css("--ink"), 13, "center");
+    api.label(api.T("轨迹（俯视）", "Trajectory (top view)"), split / 2, 16, api.css("--ink"), 13, "center");
     api.label(api.T("速度图", "Hodograph"), (split + w) / 2, 16, api.css("--ink"), 13, "center");
     const ball = api.scene === "ball";
     const k = ball ? Math.min(split / 8, h / 5.5) : Math.min(split / 0.75, h / 0.4);

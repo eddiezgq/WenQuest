@@ -33,7 +33,7 @@ a1.text(0.006, 0.225, "$y_s$", color=C["y"], fontsize=11)
 a1.text(-0.03, -0.025, "$O_s$", fontsize=11)
 a1.plot(xc, yc, "+", color=G_COL, ms=8)
 a1.plot([xc, xc + 0.01], [yc, yc - 0.083], color=G_COL, lw=0.5, ls=":")
-a1.text(xc - 0.02, yc - 0.105, T("椭圆中心 +", "centre +"), fontsize=9, color=G_COL)
+a1.text(xc - 0.02, yc - 0.105, T("椭圆中心", "centre of ellipse"), fontsize=9, color=G_COL)
 k = 0.2                                    # 加速度箭头比例：1 m/s² 画成 0.2 m
 for t in np.linspace(0, 4, 9)[:-1]:
     p = r(t)
@@ -49,7 +49,7 @@ a1.plot(*p1, "o", color=C["ink"], ms=4, zorder=6)
 a1.text(p1[0] + 0.01, p1[1] + 0.012, "$t = 0.5$ s", fontsize=10)
 a1.text(0.0, -0.13, T("细红箭头：其他时刻的加速度，都指向椭圆中心", "thin red arrows: accelerations at other times, all towards the centre"),
         fontsize=8.5, color=A_COL)
-a1.set_title(T("(a) 工具尖的轨迹（俯视）", "(a) Path of the tool tip (top view)"), fontsize=11)
+a1.set_title(T("(a) 工具尖的轨迹（俯视）", "(a) Trajectory of the tool tip (top view)"), fontsize=11)
 a1.set_xlim(-0.05, 0.66)
 a1.set_ylim(-0.14, 0.24)
 # (b) 速度图
@@ -97,7 +97,7 @@ ax.text(vx0 * tl * 0.5 + 0.06, h - 0.5 * g * (tl * 0.5) ** 2 - 0.06, "$a = (0, 0
 ax.annotate("", xy=(-0.09, 0.0), xytext=(-0.09, h), arrowprops=dict(arrowstyle="<->", color=C["ink"], lw=0.8))
 ax.text(-0.135, h / 2, "$h$", fontsize=11)
 ax.annotate("", xy=(vx0 * tl, -0.045), xytext=(0, -0.045), arrowprops=dict(arrowstyle="<->", color=C["ink"], lw=0.8))
-ax.text(vx0 * tl / 2 - 0.04, -0.075, T("落点前移 x", "landing shift x"), fontsize=9.5)
+ax.text(vx0 * tl / 2 - 0.04, -0.075, T("落点前移 x", "forward shift x"), fontsize=9.5)
 ax.text(-0.02, h + 0.11, T("松开", "release"), fontsize=9.5, color=G_COL)
 ax.set_xlim(-0.16, 0.36)
 ax.set_ylim(-0.09, 0.39)

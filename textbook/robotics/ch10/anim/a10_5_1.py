@@ -11,7 +11,7 @@ W = math.pi / 2
 CAM = np.array([0.40, 0.05, 0.40])
 K = 9.0                                        # 画面中 1 m 画成 9 个单位
 CENTERS = [np.array([-3.4, 0.8, 0]), np.array([3.4, 0.8, 0]), np.array([-3.4, -1.45, 0]), np.array([3.4, -1.45, 0])]
-NAMES = [("直角", "Cartesian"), ("柱面", "cylindrical"), ("球面", "spherical"), ("自然", "natural")]
+NAMES = [("直角", "Cartesian"), ("柱面", "Cylindrical"), ("球面", "Spherical"), ("自然", "Natural")]
 
 
 def state(t):
@@ -23,7 +23,7 @@ def state(t):
 
 def basis(k, p, v, a):
     if k == 0:
-        return [np.array([1.0, 0, 0]), np.array([0, 1.0, 0])], [r"e_x", r"e_y"]
+        return [np.array([1.0, 0, 0]), np.array([0, 1.0, 0])], [r"\hat x", r"\hat y"]
     if k == 1:
         ph = math.atan2(p[1], p[0])
         return [np.array([math.cos(ph), math.sin(ph), 0]), np.array([-math.sin(ph), math.cos(ph), 0])], [r"e_\rho", r"e_\varphi"]
@@ -56,7 +56,7 @@ class Lesson(Base):
                        bi(NAMES[k], 22, YELLOW).next_to(CENTERS[k] + UP * 0.85 + LEFT * 1.6, UP, buff=0.05))
         frames.add(Square(0.2, color=GREY_B, fill_color=GREY_E, fill_opacity=1).move_to(proj(2, CAM)))
         frames.add(Arrow(proj(1, np.array([XC - A - 0.02, YC, Z0])), proj(1, np.array([XC - A - 0.11, YC - 0.012, Z0])), buff=0, color=GREY_B,
-                         stroke_width=3), zh("指向关节 1 轴", 16, MUTED).move_to(proj(1, np.array([XC - A - 0.07, YC + 0.03, Z0]))))
+                         stroke_width=3), bi(["指向关节 1 轴", "to the joint-1 axis"], 16, MUTED).move_to(proj(1, np.array([XC - A - 0.07, YC + 0.03, Z0]))).shift(DOWN * 0.72 + RIGHT * 0.1))
         self.play(FadeIn(frames))
         t = ValueTracker(0.0)
         cols = [RED, GREEN, BLUE]
@@ -90,5 +90,5 @@ class Lesson(Base):
         self.caption("局部基各不相同，读出的分量也不同；长度 |v|、|a| 却处处相等", "Different local bases give different components; the lengths |v|, |a| agree", wait=0)
         self.play(t.animate.set_value(4.0), run_time=8, rate_func=linear)
         self.card([["四种坐标，同一个矢量", "Four coordinates, one vector"],
-                   MathTex(r"\boldsymbol v = \dot x\,\boldsymbol e_x + \dot y\,\boldsymbol e_y = \dot\rho\,\boldsymbol e_\rho + \rho\dot\varphi\,\boldsymbol e_\varphi = \dot s\,\boldsymbol e_t", font_size=40),
+                   MathTex(r"\boldsymbol v = \dot x\,\hat{\boldsymbol x} + \dot y\,\hat{\boldsymbol y} = \dot\rho\,\boldsymbol e_\rho + \rho\dot\varphi\,\boldsymbol e_\varphi = \dot s\,\boldsymbol e_t", font_size=40),
                    ["曲线坐标的局部基在转动：基矢量的导数 = 角速度 × 基矢量", "Curvilinear bases turn: rate of a basis vector = angular velocity × basis vector"]])

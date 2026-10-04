@@ -30,7 +30,7 @@ WQ.lab({
   legend: [{ name: ["A", "A"], color: "#d62728" }, { name: ["B", "B"], color: "#2ca02c" }, { name: ["C", "C"], color: "#7b3fa0" }],
   tasks: [
     { id: "ex", robot: true, text: ["设置算例 10.7.1 的位姿：(−0.45, −0.20, 0.30) m，ψ = 30°，θ = 0°，φ = 180°；读出三个标记点的坐标，与书中比较。",
-                                    "Set the pose of Example 10.7.1: (−0.45, −0.20, 0.30) m, ψ = 30°, θ = 0°, φ = 180°; compare the marker coordinates with the book."],
+                                    "Set the pose of Example 10.7.1: (−0.45, −0.20, 0.30) m, ψ = 30°, θ = 0°, φ = 180°; compare the marker coordinates with the values in Example 10.7.1."],
       demo: { scene: "grip", set: { x: -0.45, y: -0.2, z: 0.3, yaw: 30, pitch: 0, roll: 180 }, press: [], wait: 1 } },
     { id: "rigid", robot: true, text: ["同时改变至少四个数：九个坐标都变了，三个距离始终不变，重建出的六个数与滑块一致。",
                                        "Change at least four numbers: all nine coordinates change, the three distances do not, and the rebuilt six numbers match the sliders."],
@@ -87,7 +87,7 @@ WQ.lab({
     if (near(api.p.x, -0.45) && near(api.p.y, -0.2) && near(api.p.z, 0.3) && near(api.p.yaw, 30) && near(api.p.pitch, 0) && near(Math.abs(api.p.roll), 180)) api.done("ex");
     if (changed >= 4 && distOK && angOK) api.done("rigid");
     if (changed === 1 && !near(api.p.yaw, 0) && near(P[0][0], -0.4) && near(P[0][1], -0.2) && P.every((q) => near(q[2], 0.3, 1e-12))) api.done("yaw");
-    return [[["A（9 个坐标之一组）", "A (one of the nine coordinates)"], V(P[0]) + " m"], [["B", "B"], V(P[1]) + " m"], [["C", "C"], V(P[2]) + " m"],
+    return [[["A（9 个坐标之一组）", "A (three of the nine coordinates)"], V(P[0]) + " m"], [["B", "B"], V(P[1]) + " m"], [["C", "C"], V(P[2]) + " m"],
             [["|AB|、|AC|、|BC|", "|AB|, |AC|, |BC|"], `${api.fmt(d[0], 4)}, ${api.fmt(d[1], 4)}, ${api.fmt(d[2], 4)} m`],
             [["由三点重建的位置", "position rebuilt from the points"], V(rb.p) + " m"],
             [["由三点重建的 (ψ, θ, φ)", "(ψ, θ, φ) rebuilt from the points"], `(${api.fmt(rb.ang[0], 1)}°, ${api.fmt(rb.ang[1], 1)}°, ${api.fmt(rb.ang[2], 1)}°)`]];

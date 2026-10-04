@@ -9,9 +9,9 @@
      "Moving all velocity vectors to one origin, their tips trace the hodograph; the acceleration is the velocity of that tip, tangent to the hodograph."]
 步骤:
   - ["选择场景“SCARA 涂胶椭圆”，设 a = 0.12 m、b = 0.08 m、T = 4 s。先按式 (10.2.10) 手算 t = 0.5 s 时的速度和加速度，填入表 1。",
-     "Choose “SCARA glue ellipse” with a = 0.12 m, b = 0.08 m, T = 4 s. Compute the velocity and acceleration at t = 0.5 s with Eq. (10.2.10) and enter them in Table 1."]
+     "Choose “SCARA sealant ellipse” with a = 0.12 m, b = 0.08 m, T = 4 s. Compute the velocity and acceleration at t = 0.5 s with Eq. (10.2.10) and enter them in Table 1."]
   - ["按“开始”运行一整圈，读出速率的最大值和最小值，与 aω、bω 比较（任务 1）。注意速率最大处和最小处分别在椭圆的哪里。",
-     "Press Start for one full loop, read the largest and smallest speed and compare with aω, bω (task 1). Note where on the ellipse they occur."]
+     "Press Start for one full loop, read the largest and smallest speeds and compare with aω, bω (task 1). Note where on the ellipse they occur."]
   - ["观察速度图：它也是一个椭圆，半轴为 aω、bω；加速度箭头始终沿速度图的切线。",
      "Watch the hodograph: it is also an ellipse with semi-axes aω, bω; the acceleration arrow is always tangent to it."]
   - ["把 a、b 都调为 0.10 m，运行，验证速率恒定、加速度指向中心（任务 2）；记入表 2。",
@@ -33,4 +33,4 @@
   - ["速度图的单位是 m/s，与轨迹图的比例不同，两者的箭头长度不能直接比较。", "The hodograph is in m/s with its own scale; arrow lengths cannot be compared with the path view."]
   - ["速率是速度的大小，没有方向；速率恒定时加速度不一定为零。", "Speed is the size of the velocity; a constant speed does not mean zero acceleration."]
 思考题:
-  - ["为什么椭圆参数化 (10.2.9) 的加速度总指向中心？若中心不在 SCARA 基座附近，这对机器人意味着什么？", "Why does the acceleration of parametrisation (10.2.9) always point to the centre? What does that mean for the robot?"]
+  - ["为什么椭圆参数化 (10.2.9) 的加速度总指向中心？若中心不在 SCARA 基座附近，这对机器人意味着什么？", "Why does the acceleration of the parametrization (10.2.9) always point to the centre? If the centre is not near the SCARA base, what does this mean for the robot?"]

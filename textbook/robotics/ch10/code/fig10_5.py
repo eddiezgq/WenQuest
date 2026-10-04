@@ -87,10 +87,10 @@ ua = np.linspace(math.radians(55), math.radians(125), 80)
 ax.plot(r2 * np.cos(ua), b - r2 + r2 * np.sin(ua), color=C["z"], lw=0.9, ls="--")
 ax.plot([a - r1, a], [0, 0], color=C["x"], lw=0.9)
 ax.text(a - r1 / 2 - 0.012, 0.006, r"$1/\kappa_{\max}$", color=C["x"], fontsize=10)
-ax.annotate("", xy=(0, b), xytext=(0, -0.1), arrowprops=dict(arrowstyle="-|>", color=C["z"], lw=0.9))
-ax.text(-0.075, -0.098, r"$1/\kappa_{\min}$ = 0.18 m" + T("（圆心在下方图外）", " (centre below, off the figure)"), color=C["z"], fontsize=9)
+ax.annotate("", xy=(0, b), xytext=(0, -0.085), arrowprops=dict(arrowstyle="-|>", color=C["z"], lw=0.9))
+ax.text(-0.075, -0.105, r"$1/\kappa_{\min}$ = 0.18 m" + T("（圆心在下方图外）", " (centre below, off the figure)"), color=C["z"], fontsize=9)
 ax.text(-0.17, 0.115, T("长轴端点曲率最大，短轴端点曲率最小；虚线为两处的密切圆",
-                        "curvature is largest at the ends of the major axis, smallest at the ends of the minor axis; dashed: osculating circles"),
+                        "curvature is largest at the ends of the major axis, smallest at the ends\nof the minor axis; dashed: the osculating circles there"),
         fontsize=8.5)
 ax.set_xlim(-0.18, 0.18)
 ax.set_ylim(-0.12, 0.13)

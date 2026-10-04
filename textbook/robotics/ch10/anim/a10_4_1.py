@@ -16,20 +16,20 @@ def top(x, y):
 
 class Lesson(Base):
     def construct(self):
-        self.title("10.4", "云台跟踪与锁孔问题", "Gimbal tracking and the keyhole")
+        self.title("10.4", "云台跟踪与锁孔问题", "Gimbal tracking and the keyhole problem")
         cam = VGroup(Square(0.3, color=GREY_B, fill_color=GREY_E, fill_opacity=1).move_to(CAM), Dot(CAM, radius=0.05, color=WHITE))
-        cam_lab = zh("云台（俯视）", 20, INK).next_to(cam, LEFT, buff=0.15)
+        cam_lab = bi(["云台（俯视）", "pan-tilt gimbal (top view)"], 20, INK).next_to(cam, LEFT, buff=0.15)
         ax = Axes(x_range=[-3, 3, 1], y_range=[-240, 0, 60], x_length=5.4, y_length=3.6, tips=False,
                   axis_config={"color": GREY_B, "stroke_width": 2}).move_to(np.array([3.5, 0.0, 0]))
         xl = MathTex(r"t\ /\ \mathrm{s}", font_size=26, color=MUTED).next_to(ax.x_axis.get_right(), UR, buff=0.05)
         yl = MathTex(r"\dot\varphi\ /\ (^\circ/\mathrm{s})", font_size=26, color=MUTED).next_to(ax.c2p(-3, -30), LEFT, buff=0.1)
         ticks = VGroup(*[MathTex(str(v), font_size=20, color=MUTED).next_to(ax.c2p(0, v), LEFT, buff=0.08) for v in (-60, -120, -180, -240)])
         lim = DashedLine(ax.c2p(-3, -90), ax.c2p(3, -90), color=WHITE, stroke_width=2)
-        lim_lab = zh("限速 90°/s", 18, INK).next_to(ax.c2p(3, -90), UP, buff=0.05).shift(LEFT * 0.6)
+        lim_lab = bi(["限速 90°/s", "limit 90°/s"], 18, INK).next_to(ax.c2p(3, -90), UP, buff=0.05).shift(LEFT * 0.6)
         self.play(FadeIn(cam), FadeIn(cam_lab), Create(ax), FadeIn(xl), FadeIn(yl), FadeIn(ticks), Create(lim), FadeIn(lim_lab))
 
         for d, col, cap in ((0.5, ORANGE, ("偏距 d = 0.5 m：最近时方位角速度 v/d ≈ 115°/s，超过限速", "Offset d = 0.5 m: at closest the pan rate v/d ≈ 115°/s exceeds the limit")),
-                            (0.25, RED, ("偏距减半：峰值加倍，峰也变窄；d 趋于 0 时方位角速度趋于无穷", "Half the offset: twice the peak, and narrower; as d → 0 the pan rate grows without bound"))):
+                            (0.25, RED, ("偏距减半：峰值加倍，峰也变窄；d 趋于 0 时方位角速度趋于无穷", "Halve the offset: the peak doubles and narrows; as d → 0 the pan rate grows without bound"))):
             t = ValueTracker(-3.0)
             lane = DashedLine(top(-2.6, d), top(2.6, d), color=col, stroke_width=2)
             self.play(Create(lane), run_time=0.5)

@@ -5,16 +5,16 @@
 WQ.lab({
   title: ["实验 10.3 径向分量与横向分量", "Lab 10.3 Radial and transverse components"],
   goal: ["把 SCARA 末端的速度和加速度沿随手臂转动的径向、横向分解，找出边转边伸时出现的 2ρ̇φ̇ 项。",
-         "Split the SCARA tool's velocity and acceleration along the radial and transverse directions that turn with the arm, and find the 2ρ̇φ̇ term."],
+         "Split the velocity and acceleration of the SCARA end-effector along the radial and transverse directions that turn with the arm, and find the 2ρ̇φ̇ term."],
   scenes: [
     { id: "scara", robot: true, name: ["SCARA 边转边伸", "SCARA turning and extending"], hide: ["rd", "om"],
       problem: { title: ["机器人问题：夹爪要承受多大的横向加速度", "Robot problem: how much sideways acceleration must the gripper take"],
                  text: ["关节 1 以 1 rad/s 转动，同时关节 2 伸直手臂。两个关节都匀速，末端的横向加速度是多少？",
-                        "Joint 1 turns at 1 rad/s while joint 2 straightens the arm, both steadily. What is the tool's transverse acceleration?"] } },
+                        "Joint 1 turns at 1 rad/s while joint 2 straightens the arm, both steadily. What is the transverse acceleration of the end-effector?"] } },
     { id: "walk", name: ["转盘上向外走", "Walking out on a turntable"], hide: ["th2", "w1", "w2"],
       problem: { title: ["生活中的例子：在转盘上沿半径行走", "Everyday example: walking along a radius of a turntable"],
                  text: ["转盘匀速转动，人沿半径匀速向外走。人的脚要向哪个方向用力？",
-                        "The turntable turns steadily and a person walks steadily outward along a radius. Which way must the feet push?"] } },
+                        "The turntable turns steadily and a person walks steadily outwards along a radius. Which way must the feet push?"] } },
   ],
   params: [
     { id: "th2", name: ["关节 2 的初始角 θ₂", "Initial joint-2 angle θ₂"], min: 20, max: 160, step: 1, value: 90, unit: "°", digits: 0 },
@@ -37,7 +37,7 @@ WQ.lab({
       demo: { scene: "walk", set: { rd: 1, om: 1 }, press: [], wait: 1 } },
   ],
   think: ["两个关节都匀速转动，末端的 ρ̈、φ̈ 为什么不为零？这对“关节匀速运动时末端没有加速度”的直觉说明了什么？",
-          "Both joints turn steadily; why are ρ̈ and φ̈ of the tool not zero? What does this say about the idea that steady joints give no tool acceleration?"],
+          "Both joints turn steadily; why are ρ̈ and φ̈ of the end-effector not zero? What does this say about the intuition that steady joints give the end-effector no acceleration?"],
 
   L1: 0.35, L2: 0.25,
   state(api, t) {             // ρ, φ, ρ̇, ρ̈, φ̇, φ̈（θ̈ = 0）

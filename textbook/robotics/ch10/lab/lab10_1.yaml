@@ -15,7 +15,7 @@
   - ["把 Ω 改为 0.5 rad/s 和 −0.25 rad/s，重复上一步，记入表 1，说明 Ω 为负时零件在 {b} 中的转向。",
      "Repeat with Ω = 0.5 rad/s and −0.25 rad/s, record in Table 1, and explain the sense of rotation in {b} when Ω is negative."]
   - ["把 Ω 调为 0，运行，观察零件在 {b} 中的轨迹和速率（任务 2）。",
-     "Set Ω = 0, run, and observe the part's path and speed in {b} (task 2)."]
+     "Set Ω = 0, run, and observe the part's trajectory and speed in {b} (task 2)."]
   - ["切换到场景“雨中行车”，依次把车速调到 0、10、20、30 m/s，读出雨丝的倾角和相对速率，填入表 2（任务 3）。",
      "Switch to “Driving in the rain”; set the car speed to 0, 10, 20, 30 m/s, read the slant and the relative speed, and fill Table 2 (task 3)."]
 数据表:
@@ -33,4 +33,4 @@
   - ["读数保留 3 位小数，与手算值相差在最后一位以内即可。", "Keep 3 decimals; agreement within the last digit counts as equal."]
 思考题:
   - ["若零件放在圆心 C 处，它在 AGV 看来怎样运动？若放在 AGV 行驶的圆周上呢？", "If the part sits at the centre C, how does it move as seen from the AGV? And if it sits on the AGV's own circle?"]
-  - ["“换坐标系只换读数，换参考系才换运动”：用本实验的两个画面各举一例说明。", "“Changing coordinates changes only the numbers; changing the reference frame changes the motion”: give an example of each from this lab."]
+  - ["“换坐标系只换读数，换参考系才换运动”：用本实验的两个画面各举一例说明。", "“Changing the coordinate system changes only the readings; changing the reference frame changes the motion”: give an example of each from this lab."]

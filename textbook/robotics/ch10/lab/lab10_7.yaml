@@ -8,7 +8,7 @@
   - ["本实验用 ZYX 欧拉角表示姿态：R = Rot(ẑ, ψ) Rot(ŷ, θ) Rot(x̂, φ)；由重建的 R 按式 (4.5.4) 求回三个角。", "Orientation here uses ZYX Euler angles: R = Rot(ẑ, ψ) Rot(ŷ, θ) Rot(x̂, φ); the three angles are recovered from the rebuilt R with Eq. (4.5.4)."]
 步骤:
   - ["选择“夹爪上的三个标记点”，按算例 10.7.1 设置位姿（任务 1），把三个标记点的九个坐标和三个距离填入表 1，与书中比较。",
-     "Choose “Three markers on a gripper”, set the pose of Example 10.7.1 (task 1), enter the nine coordinates and three distances in Table 1 and compare with the book."]
+     "Choose “Three markers on a gripper”, set the pose of Example 10.7.1 (task 1), enter the nine coordinates and three distances in Table 1 and compare them with the values in Example 10.7.1."]
   - ["同时改变至少四个数（任务 2），再记录一组，验证三个距离不变、重建出的位置和三个角与滑块一致。",
      "Change at least four numbers (task 2), record another set, and check that the distances stay the same and the rebuilt position and angles match the sliders."]
   - ["按“重置”，只改变偏航角（任务 3），观察哪些坐标改变、哪些不变，并解释原因。",
