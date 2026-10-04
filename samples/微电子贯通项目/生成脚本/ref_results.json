@@ -5,7 +5,7 @@
  "step2": {"drc_errors": 0, "lvs_match": true, "area_um2": 54.52, "width_um": 8.71, "height_um": 6.26,
            "stdcell": {"cell": "sky130_fd_sc_hd__nand2_1", "area_um2": 3.754, "width_um": 1.38, "height_um": 2.72, "nmos_w_um": [0.65], "pmos_w_um": [1.0]},
            "area_ratio_vs_stdcell": 14.5},
- "step3": {"tests": 6, "passed": 6, "seconds": 15.2},
+ "step3": {"tests": 10, "passed": 10, "seconds": 15},
  "step4": {"tt_ready": true, "tapeout_ready": true, "setup_ws_ns": 28.6, "hold_ws_ns": 0.116, "magic_drc_errors": 0, "lvs_errors": 0,
            "antenna_violations": 0, "cells": 1576, "seconds": 158, "peak_mem_mb": 653, "clock_ns": 50, "die_um": [161, 111.52]}
 }

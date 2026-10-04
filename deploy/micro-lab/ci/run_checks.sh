@@ -60,14 +60,36 @@ wqlab nand2 --out "$OUT/capstone/step2" > "$OUT/capstone/step2.log" 2>&1 || { fa
 cp -r "$WQ_CAP_REF/step3_rtl" "$OUT/capstone/step3"
 wqlab test "$OUT/capstone/step3" > "$OUT/capstone/step3.log" 2>&1 || { fail=1; tail -40 "$OUT/capstone/step3.log"; }
 wqlab tt "$OUT/capstone/step3" --out "$OUT/capstone/step4" > "$OUT/capstone/step4.log" 2>&1 || { fail=1; tail -40 "$OUT/capstone/step4.log"; tail -30 "$OUT/capstone/step4/librelane.log" 2>/dev/null; }
+# 指导书里的参考数值（ref_results.json）必须与本次参考解运行结果一致，否则说明参考解变了、指导书没跟着更新
+python3 - "$REPO/samples/微电子贯通项目/生成脚本/ref_results.json" "$OUT/capstone" <<'PY' || { echo "::error::贯通项目参考数值与本次运行不一致：更新 ref_results.json 并重新生成指导书"; fail=1; }
+import json, sys, os
+ref = json.load(open(sys.argv[1])); d = sys.argv[2]
+def j(k):
+    try: return json.load(open(os.path.join(d, k, "result.json")))
+    except Exception: return {}
+got = {k: j(k) for k in ("step1", "step2", "step3", "step4")}
+bad = []
+for step, key, tol in (("step1", "vtn_v", 0.005), ("step1", "vtp_v", 0.005), ("step1", "idsat_n_ua_um", 2), ("step1", "idsat_p_ua_um", 2),
+                       ("step1", "swing_n_mv_dec", 1), ("step2", "area_um2", 0.5), ("step4", "setup_ws_ns", 1.5)):
+    a, b = ref[step].get(key), got[step].get(key)
+    if a is None or b is None or abs(float(a) - float(b)) > tol:
+        bad.append(f"{step}.{key}: guide {a}, run {b}")
+for step, key in (("step2", "lvs_match"), ("step4", "tt_ready")):
+    if ref[step].get(key) != got[step].get(key):
+        bad.append(f"{step}.{key}: guide {ref[step].get(key)}, run {got[step].get(key)}")
+if ref["step3"].get("tests") != got["step3"].get("tests"):
+    bad.append(f"step3.tests: guide {ref['step3'].get('tests')}, run {got['step3'].get('tests')}")
+print("\n".join(bad) or "reference numbers match the guides")
+sys.exit(1 if bad else 0)
+PY
+
 # 第 5 步试点：AI 测试学生只看指导书和起始文件做出的作品，在镜像里用学生命令检查，步骤四在这里跑
-PILOT=$REPO/samples/微电子贯通项目/试点/第1次
+PILOT=$REPO/samples/微电子贯通项目/试点/第3次
 if [ -d "$PILOT" ]; then
   P=$OUT/pilot; rm -rf "$P"; cp -r "$PILOT" "$P"
   wqlab device --script "$P/step1_device/device_curves.py" --out "$P/step1_device/out" > "$P/step1.log" 2>&1 || { fail=1; tail -20 "$P/step1.log"; }
   wqlab nand2 --check "$P/step2_nand2" --schematic "$P/step2_nand2/nand2_schematic.spice" > "$P/step2.log" 2>&1 || { fail=1; tail -20 "$P/step2.log"; }
   wqlab test "$P/step3_rtl" > "$P/step3.log" 2>&1 || { fail=1; tail -30 "$P/step3.log"; }
-  cp "$P/step3_rtl/result.json" "$P/step3_own.json" 2>/dev/null || true
   wqlab test "$P/step3_rtl" --ref > "$P/step3ref.log" 2>&1 || { fail=1; tail -30 "$P/step3ref.log"; }
   wqlab tt "$P/step3_rtl" --config "$CAP/start/step4_chip/config.json" --out "$P/step4" > "$P/step4.log" 2>&1 || { fail=1; tail -30 "$P/step4.log"; }
 fi
@@ -95,8 +117,8 @@ print(f"::notice title=贯通 1 器件::VTn {c1.get('vtn_v')} V，VTp {c1.get('v
 sc = c2.get("stdcell") or {}
 print(f"::notice title=贯通 2 与非门::DRC {c2.get('drc_errors')}，LVS {c2.get('lvs_match')}，面积 {c2.get('area_um2')} μm²；标准单元 {sc.get('area_um2')} μm²（{sc.get('width_um')}×{sc.get('height_um')}），管宽 n {sc.get('nmos_w_um')} p {sc.get('pmos_w_um')}；面积比 {c2.get('area_ratio_vs_stdcell')}")
 print(f"::notice title=贯通 3 测试::{c3.get('passed')}/{c3.get('tests')} 通过，{c3.get('seconds')} s")
-pl = {"step1": j("pilot/step1_device/out/result.json"), "step2": j("pilot/step2_nand2/result.json"), "step3_own": j("pilot/step3_own.json"),
-      "step3_ref": j("pilot/step3_rtl/result.json"), "step4": j("pilot/step4/result.json")}
+pl = {"step1": j("pilot/step1_device/out/result.json"), "step2": j("pilot/step2_nand2/result.json"), "step3_own": j("pilot/step3_rtl/result.json"),
+      "step3_ref": j("pilot/step3_rtl/result_ref.json"), "step4": j("pilot/step4/result.json")}
 if any(pl.values()):
     p4, p2 = pl["step4"] or {}, pl["step2"] or {}
     print(f"::notice title=试点学生::器件 VTn {(pl['step1'] or {}).get('vtn_v')}；与非门 DRC {p2.get('drc_errors')} LVS {p2.get('lvs_match')} 面积 {p2.get('area_um2')}；"

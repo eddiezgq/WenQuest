@@ -4,6 +4,7 @@
 // 3. 四倍频解码：A、B 每变一次（一个格雷码步）计数加一或减一；A 超前 B 为正转。
 //    同时变化（跳过一步）是非法的，计入 err 但不计数。
 // 4. 计数为 16 位有符号数，溢出时回绕；dir 为最近一步的方向（1 = 正转）。
+// 5. 复位后第一次被采用的状态只作为起点（编码器停在哪一格都可以），不计数、不报错。
 `default_nettype none
 module quad_dec #(
     parameter FILTER = 4
@@ -32,11 +33,13 @@ module quad_dec #(
     localparam FW = $clog2(FILTER + 1);
     reg [1:0]    cand, stable;
     reg [FW-1:0] same;
+    reg          valid;                // stable holds a real, accepted state
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             cand   <= 2'b00;
             stable <= 2'b00;
             same   <= 0;
+            valid  <= 1'b0;
         end else if ({a_s[1], b_s[1]} != cand) begin
             cand <= {a_s[1], b_s[1]};
             same <= 0;
@@ -44,18 +47,26 @@ module quad_dec #(
             same <= same + 1'b1;
         end else begin
             stable <= cand;
+            valid  <= 1'b1;
         end
     end
 
     // x4 decoding: compare the accepted state with the previous one
     reg [1:0] prev;
+    reg       primed;                  // prev holds the first accepted state: decoding may start
     wire [3:0] step = {prev, stable};
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            prev  <= 2'b00;
-            count <= 16'd0;
-            dir   <= 1'b1;
-            err   <= 1'b0;
+            prev   <= 2'b00;
+            primed <= 1'b0;
+            count  <= 16'd0;
+            dir    <= 1'b1;
+            err    <= 1'b0;
+        end else if (!primed) begin
+            if (valid) begin           // the first accepted state is only the starting point
+                prev   <= stable;
+                primed <= 1'b1;
+            end
         end else begin
             prev <= stable;
             case (step)

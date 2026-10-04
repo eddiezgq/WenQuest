@@ -1,0 +1,70 @@
+magic
+tech sky130A
+magscale 1 2
+timestamp 1791155931
+<< viali >>
+rect -145 961 -111 995
+rect 557 961 591 995
+rect -145 -185 -111 -151
+rect 557 -185 591 -151
+<< metal1 >>
+rect -175 995 877 1007
+rect -175 961 -145 995
+rect -111 961 557 995
+rect 591 961 877 995
+rect -175 949 877 961
+rect -67 883 -21 949
+rect 635 883 681 949
+rect 18 752 70 764
+rect 18 688 70 700
+rect 720 752 772 764
+rect 720 688 772 700
+rect -29 43 29 648
+rect 673 43 731 648
+rect 720 -5 772 7
+rect 21 -73 681 -27
+rect 720 -69 772 -57
+rect -67 -139 -21 -73
+rect -175 -151 877 -139
+rect -175 -185 -145 -151
+rect -111 -185 557 -151
+rect 591 -185 877 -151
+rect -175 -197 877 -185
+<< via1 >>
+rect 18 700 70 752
+rect 720 700 772 752
+rect 720 -57 772 -5
+<< metal2 >>
+rect 18 752 772 764
+rect 70 700 720 752
+rect 18 688 772 700
+rect 720 -5 772 688
+rect 720 -69 772 -57
+use sky130_fd_pr__nfet_01v8_2MLY76  n1
+timestamp 1791155774
+transform 1 0 0 0 1 0
+box -211 -221 211 221
+use sky130_fd_pr__nfet_01v8_2MLY76  n2
+timestamp 1791155774
+transform 1 0 702 0 1 0
+box -211 -221 211 221
+use sky130_fd_pr__pfet_01v8_LPXEAP  p1
+timestamp 1791155774
+transform 1 0 0 0 1 750
+box -211 -281 211 281
+use sky130_fd_pr__pfet_01v8_LPXEAP  p2
+timestamp 1791155774
+transform 1 0 702 0 1 750
+box -211 -281 211 281
+<< labels >>
+rlabel metal1 0 300 0 300 0 A
+port 1 nsew
+rlabel metal1 702 300 702 300 0 B
+port 2 nsew
+rlabel metal2 746 300 746 300 0 OUT
+port 3 nsew
+rlabel metal1 300 978 300 978 0 VDD
+port 4 nsew
+rlabel metal1 300 -168 300 -168 0 VSS
+port 5 nsew
+<< end >>

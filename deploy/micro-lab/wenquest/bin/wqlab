@@ -182,6 +182,7 @@ def device(a):
     res = {"vtn_v": prm.get("n", {}).get("vt"), "vtp_v": prm.get("p", {}).get("vt"),
            "idsat_n_ua_um": prm.get("n", {}).get("idsat_ua_per_um"), "idsat_p_ua_um": prm.get("p", {}).get("idsat_ua_per_um"),
            "swing_n_mv_dec": prm.get("n", {}).get("swing_mv_dec"), "mobility_ratio": prm.get("mobility_ratio")}
+    res = {k: (v if isinstance(v, (int, float)) and v == v and abs(v) != float("inf") else None) for k, v in res.items()}   # NaN → missing
     (out / "result.json").write_text(json.dumps(res, indent=1))
     return res
 
@@ -242,24 +243,45 @@ def nand2(a):
     return r
 
 
+def junit(path: Path) -> dict:
+    """Count test cases and failures in cocotb's results.xml (JUnit format). The log is not trusted: a design
+    can print anything, but results.xml is written by cocotb itself after the run."""
+    import xml.etree.ElementTree as ET
+    if not path.exists():
+        return {"tests": 0, "passed": 0, "failed": -1}
+    cases = list(ET.parse(path).getroot().iter("testcase"))
+    bad = [c for c in cases if c.find("failure") is not None or c.find("error") is not None]
+    skipped = [c for c in cases if c.find("skipped") is not None]
+    n = len(cases) - len(skipped)
+    return {"tests": n, "passed": n - len(bad), "failed": len(bad), "names_failed": [c.get("name") for c in bad]}
+
+
 def test(a):
-    tdir = Path(a.rtl).resolve() / "test"
-    if a.ref:                       # teachers: the reference tests against the student's design
-        tdir = Path(a.rtl).resolve() / "test_ref"
-        if tdir.exists():
-            shutil.rmtree(tdir)
-        shutil.copytree(need_ref("wqlab test --ref") / "step3_rtl" / "test", tdir)
+    import tempfile
+    rtl = Path(a.rtl).resolve()
+    tmp = None
+    if a.ref:                       # teachers: the reference tests against the student's design, in a temporary copy
+        tmp = Path(tempfile.mkdtemp(prefix="wqref-"))
+        shutil.copytree(rtl / "src", tmp / "src")
+        shutil.copytree(need_ref("wqlab test --ref") / "step3_rtl" / "test", tmp / "test")
+        tdir = tmp / "test"
+    else:
+        tdir = rtl / "test"
+    (tdir / "results.xml").unlink(missing_ok=True)
     t0 = time.time()
     p = subprocess.run(["make", "-C", str(tdir)], capture_output=True, text=True, timeout=1800)
     log = p.stdout + p.stderr
-    (tdir / "wqlab_test.log").write_text(log)
-    m = re.search(r"TESTS=(\d+) PASS=(\d+) FAIL=(\d+)", log)
-    res = {"tests": int(m.group(1)) if m else 0, "passed": int(m.group(2)) if m else 0, "failed": int(m.group(3)) if m else -1,
-           "seconds": round(time.time() - t0, 1)}
-    res["all_passed"] = bool(m) and res["failed"] == 0 and res["tests"] > 0
-    (Path(a.rtl).resolve() / "result.json").write_text(json.dumps(res, indent=1))
+    res = junit(tdir / "results.xml")
+    res["seconds"] = round(time.time() - t0, 1)
+    res["all_passed"] = res["tests"] > 0 and res["failed"] == 0
+    res["reference_tests"] = bool(a.ref)
+    (rtl / ("result_ref.json" if a.ref else "result.json")).write_text(json.dumps(res, indent=1))
+    if not a.ref:
+        (tdir / "wqlab_test.log").write_text(log)
     print("\n".join(ln for ln in log.splitlines() if "PASS" in ln or "FAIL" in ln or "Error" in ln or "error" in ln)[-4000:])
     print(json.dumps(res))
+    if tmp:
+        shutil.rmtree(tmp, ignore_errors=True)
     return res
 
 
@@ -292,7 +314,11 @@ def tt(a):
     res = flow(fa)
     res.update(fmt)
     res["ports"] = ports
+    fmt["clock_ok"] = float(cfg.get("CLOCK_PERIOD", 1e9)) <= 50          # the chip must meet the 20 MHz spec
+    fmt["die_origin_ok"] = list(cfg.get("DIE_AREA", [1, 1])[:2]) == [0, 0]
+    res.update(fmt)
     res["tt_ready"] = bool(res["tapeout_ready"] and fmt["top_name_ok"] and fmt["ports_ok"] and fmt["fits_one_tile"]
+                           and fmt["clock_ok"] and fmt["die_origin_ok"]
                            and res.get("antenna_violations") is not None and float(res["antenna_violations"]) == 0)
     (out / "result.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
     print(json.dumps(res, ensure_ascii=False))
@@ -341,6 +367,8 @@ def main():
         sys.exit(0 if r["drc_errors"] == 0 and r["lvs_match"] else 1)
     if a.cmd == "test":
         sys.exit(0 if r["all_passed"] else 1)
+    if a.cmd == "device":
+        sys.exit(0 if r.get("vtn_v") is not None and r.get("vtp_v") is not None and r.get("idsat_n_ua_um") is not None else 1)
     if a.cmd == "tt":
         sys.exit(0 if r["tt_ready"] else 1)
 

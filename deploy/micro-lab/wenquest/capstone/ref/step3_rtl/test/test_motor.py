@@ -1,10 +1,14 @@
 """贯通项目步骤三参考解：用 cocotb 验证电机控制芯片。
 
-六个测试：
-  test_pwm_duty        占空比 0、64、128、200、255 时，一个 PWM 周期里高电平的时钟数 = 4 × duty
+十个测试：
+  test_pwm_duty        占空比 0、64、128、200、255 时，一个 PWM 周期里高电平的时钟数正好 = 4 × duty
+  test_duty_mid_period 周期中途改占空比，当前周期不变，下一周期才用新值
+  test_dir_output      方向输出 uio_out[6] 跟随方向命令
   test_brake           刹车一拉高，PWM 在同一个时钟内变低
   test_encoder_steps   正转 40 步、反转 25 步，计数 = 15；转向输出跟着变
   test_glitch          A、B 相上 2 个时钟宽的毛刺不计数（每个时钟都检查计数，不只看最后结果）
+  test_missed_step     A、B 同时变化（跳步）不计数，err 置 1 并保持
+  test_reset_position  复位时编码器停在任意一格：只作起点，不计数、不报错
   test_wrap            计数从 0 再减 1 变成 0xFFFF（16 位回绕，作为有符号数即 −1）
   test_motor           闭环检验：芯片的 PWM 驱动一个直流电机模型，电机转动产生编码器 A、B 信号送回芯片，
                        芯片的计数必须和电机实际转过的角度一致（误差不超过 2 个计数），正反转都要对
@@ -49,9 +53,11 @@ class Pins:
         self.dut.uio_in.value = self.a | self.b << 1 | self.dir << 2 | self.brake << 3 | self.sel << 4
 
 
-async def reset(dut):
-    cocotb.start_soon(clock(dut).start())
+async def reset(dut, a=0, b=0, start_clock=True):
+    if start_clock:
+        cocotb.start_soon(clock(dut).start())
     p = Pins(dut)
+    p.a, p.b = a, b
     dut.ena.value = 1
     dut.ui_in.value = 0
     p.put()
@@ -101,8 +107,41 @@ async def test_pwm_duty(dut):
         for _ in range(PERIOD):
             await RisingEdge(dut.clk)
             high += pwm(dut)
-        assert abs(high - 4 * duty) <= 4, f"duty {duty}: {high} high clocks in a period, expected {4 * duty}"
+        assert high == 4 * duty, f"duty {duty}: {high} high clocks in a period, expected exactly {4 * duty}"
         dut._log.info("duty %d → %d/%d high clocks (%.1f %%)", duty, high, PERIOD, 100 * high / PERIOD)
+
+
+@cocotb.test()
+async def test_duty_mid_period(dut):
+    """A new duty must wait for the next period: changing it in the middle of a period leaves that period as it was."""
+    p = await reset(dut)
+    dut.ui_in.value = 64
+    await ClockCycles(dut.clk, 3 * PERIOD)
+    while pwm(dut) == 1:                                # find the start of a period: a rising edge of pwm
+        await RisingEdge(dut.clk)
+    while pwm(dut) == 0:
+        await RisingEdge(dut.clk)
+    await ClockCycles(dut.clk, 600)                     # well past the 256 high clocks of duty 64
+    dut.ui_in.value = 200
+    for k in range(400):                                # rest of this period: still duty 64, so low
+        await RisingEdge(dut.clk)
+        assert pwm(dut) == 0, f"duty changed in the middle of a period ({600 + k} clocks after its start)"
+    await ClockCycles(dut.clk, PERIOD - 1000)           # next period starts here
+    high = 0
+    for _ in range(PERIOD):
+        await RisingEdge(dut.clk)
+        high += pwm(dut)
+    assert high == 800, f"the next period should have duty 200 (800 high clocks), got {high}"
+
+
+@cocotb.test()
+async def test_dir_output(dut):
+    """The H-bridge direction pin uio_out[6] follows the direction command."""
+    p = await reset(dut)
+    for d in (1, 0, 1):
+        p.dir = d; p.put()
+        await ClockCycles(dut.clk, 4)
+        assert (int(dut.uio_out.value) >> 6) & 1 == d
 
 
 @cocotb.test()
@@ -140,14 +179,40 @@ async def test_glitch(dut):
     await step(dut, p, 0, 8)
     before = await read_count(dut, p)                 # sel = 0: uo_out shows the low byte from here on
     await ClockCycles(dut.clk, 4)
-    for line in ("a", "b"):
+    for line, width in (("a", 2), ("b", 2), ("a", 4), ("b", 4)):
         setattr(p, line, getattr(p, line) ^ 1); p.put()
-        await ClockCycles(dut.clk, 2)                   # 100 ns spike
+        await ClockCycles(dut.clk, width)               # 100 ns and 200 ns spikes (shorter than the filter)
         setattr(p, line, getattr(p, line) ^ 1); p.put()
         for _ in range(30):
             await RisingEdge(dut.clk)
-            assert int(dut.uo_out.value) == before & 0xFF, f"a 2-clock glitch on {line.upper()} changed the count"
+            assert int(dut.uo_out.value) == before & 0xFF, f"a {width}-clock glitch on {line.upper()} changed the count"
     assert await read_count(dut, p) == before
+
+
+@cocotb.test()
+async def test_missed_step(dut):
+    """A and B changing together (a step was missed) must not be counted, and err goes to 1 and stays."""
+    p = await reset(dut)
+    pos = await step(dut, p, 0, 4)                      # back at state 00
+    before = await read_count(dut, p)
+    p.a, p.b = 1, 1; p.put()                            # 00 → 11 in one go
+    await ClockCycles(dut.clk, 20)
+    assert await read_count(dut, p) == before, "a missed step must not change the count"
+    assert int(dut.u_dec.err.value) == 1, "err must be set on a missed step"
+    await step(dut, p, 2, 1)                            # carry on normally from 11
+    assert int(dut.u_dec.err.value) == 1, "err stays set until reset"
+
+
+@cocotb.test()
+async def test_reset_position(dut):
+    """The encoder may stand at any state at reset: that state is only the starting point (no count, no error)."""
+    for k, (a, b, start) in enumerate(((1, 0, 1), (1, 1, 2), (0, 1, 3))):
+        p = await reset(dut, a, b, start_clock=(k == 0))
+        await ClockCycles(dut.clk, 20)
+        assert await read_count(dut, p) == 0, f"reset with (A,B) = ({a},{b}) must leave the count at 0"
+        assert int(dut.u_dec.err.value) == 0, f"reset with (A,B) = ({a},{b}) must not flag an error"
+        await step(dut, p, start, 3)
+        assert signed16(await read_count(dut, p)) == 3
 
 
 @cocotb.test()

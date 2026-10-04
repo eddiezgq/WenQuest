@@ -1,8 +1,8 @@
 # 贯通项目：从晶体管到芯片 · Capstone: from transistor to chip
 
-为机器人关节设计一块电机控制芯片的数字部分（PWM 发生器 + 正交编码器计数器），四步做完，交出一份可以报名开源共享流片（Tiny Tapeout，SKY130 工艺）的芯片版图。每一步的做法、要求和报告写法见对应的实验指导书。
+为机器人关节设计一块电机控制芯片的数字部分（PWM 发生器 + 正交编码器计数器），四步做完，交出一份按开源共享流片项目 Tiny Tapeout（SKY130 工艺）格式、通过本课程流片就绪检查的芯片版图（真正报名前还要用官方预检工具再查）。每一步的做法、要求和报告写法见对应的实验指导书。
 
-Design the digital part of a motor-control chip for a robot joint (PWM generator + quadrature encoder counter) in four steps, ending with a layout ready for a shared open-source tapeout (Tiny Tapeout, SKY130). The lab guides give the details for each step.
+Design the digital part of a motor-control chip for a robot joint (PWM generator + quadrature encoder counter) in four steps, ending with a layout in the Tiny Tapeout (SKY130) format that passes the course's tapeout-readiness checks (an actual submission is checked again with the official precheck). The lab guides give the details for each step.
 
 | 步 Step | 目录 Folder | 你要完成的 What you complete | 检查命令 Check |
 |---|---|---|---|

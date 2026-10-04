@@ -44,7 +44,7 @@ READINESS = {
            ("LVS 一致（含尺寸）LVS match incl. sizes", 7, "lvs_match = true"),
            ("与标准单元比较完成 Comparison with the standard cell", 3, "area_ratio_vs_stdcell 有值")],
     "三": [("自己的测试全部通过 Own tests all pass", 5, "wqlab test：all_passed"),
-           ("参考测试全部通过 Reference tests all pass", 7, "wqlab test --ref：6/6"),
+           ("参考测试全部通过 Reference tests all pass", 7, "wqlab test --ref：全部通过"),
            ("闭环检验差 ≤ 2 Closed loop within 2 counts", 3, "test_motor 通过")],
     "四": [("时序：setup、hold 余量不为负 Timing: setup and hold slack ≥ 0", 4, "setup_ws_ns ≥ 0 且 hold_ws_ns ≥ 0"),
            ("DRC、LVS 为 0 DRC and LVS 0", 5, "magic_drc_errors = 0 且 lvs_errors = 0"),

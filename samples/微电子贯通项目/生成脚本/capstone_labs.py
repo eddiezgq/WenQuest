@@ -15,10 +15,11 @@ LINK = ("问渠课程页“实验镜像”（网页远程桌面），或教师�
         "the lab image from the WenQuest course page (web desktop) or the image wenquest/micro-lab; copy the starting files with wqlab start my_folder")
 PROJECT = ("整个项目为机器人关节设计一块电机控制芯片的数字部分：PWM 发生器控制电机电压，正交编码器计数器测量转过的角度。"
            "四步分别对应半导体器件物理、数字集成电路设计、硬件描述语言与集成电路验证、VLSI 物理设计四门课，最后交出一份符合 Tiny Tapeout 格式、"
-           "时序、DRC、LVS 全部通过的芯片版图。",
+           "时序、DRC、LVS 全部通过、达到本课程流片就绪标准的芯片版图（真正报名前还要用 Tiny Tapeout 官方预检）。",
            "The project designs the digital part of a motor-control chip for a robot joint: a PWM generator sets the motor voltage and a "
            "quadrature encoder counter measures the angle turned. The four steps belong to four courses (device physics, digital IC design, "
-           "HDL and verification, VLSI physical design) and end with a Tiny Tapeout-format layout that passes timing, DRC and LVS.")
+           "HDL and verification, VLSI physical design) and end with a Tiny Tapeout-format layout that passes timing, DRC and LVS — tapeout-ready "
+           "by this course's checks (an actual submission is checked again with Tiny Tapeout's official precheck).")
 
 LABS = [
   {
@@ -117,10 +118,10 @@ LABS = [
             ("引脚", "Pins", "ui_in 占空比；uio[0..4] 输入 A、B、方向、刹车、读数选择；uio[5..7] 输出 PWM、方向、转向；uo_out 计数字节", "ui_in duty; uio[0..4] in: A, B, dir, brake, select; uio[5..7] out: PWM, dir, rotation; uo_out count byte"),
             ("检查命令", "Check", "wqlab test step3_rtl（教师另用参考测试 wqlab test step3_rtl --ref 评分）", "the teacher grades with the reference tests (--ref)")],
     "steps": [("读 project.v，弄清引脚分配和两个子模块的接口；读示范测试 test_pwm_duty。", "Read project.v for the pins and the two sub-module interfaces; read the example test test_pwm_duty."),
-              ("完成 pwm_gen.v：分频、8 位计数、周期开始时装入占空比、比较输出、刹车门控、复位。运行检查命令，test_pwm_duty 应通过。", "Complete pwm_gen.v: prescaler, 8-bit counter, duty loaded at period start, compare, brake gating, reset. Run the check: test_pwm_duty should pass."),
-              ("完成 quad_dec.v：两级同步；去抖（同步后的 (A,B) 变化后连续保持 FILTER 个时钟以上不变才采用）；四倍频状态比较；跳步时把 err 置 1 并保持到复位；16 位计数与方向。", "Complete quad_dec.v: two-flop synchronisers; debounce (a new synchronised (A,B) is accepted only after it stays unchanged for more than FILTER clocks); ×4 state comparison; on a missed step set err and keep it until reset; 16-bit count and direction."),
+              ("完成 pwm_gen.v：分频、8 位计数、周期开始时（计数回到 0 的那一拍）装入占空比、比较输出、刹车门控、复位。刹车松开后约 2 拍恢复（刹车信号同步后与原始引脚相或：拉下立即生效，松开经同步）。运行检查命令，test_pwm_duty 应通过。", "Complete pwm_gen.v: prescaler, 8-bit counter, duty loaded at the start of a period (when the count returns to 0), compare, brake gating, reset. After brake is released PWM returns within about 2 clocks (the brake is the raw pin OR its synchronised copy: on at once, off through the synchroniser). Run the check: test_pwm_duty should pass."),
+              ("完成 quad_dec.v：两级同步；去抖（同步后的 (A,B) 变化后要连续保持超过 FILTER 个时钟不变才采用，恰好 FILTER 个时钟宽的脉冲不采用）；四倍频状态比较；跳步时不计数、不改方向，把新状态作为当前位置，err 置 1 并保持到复位（芯片没有空余引脚输出 err，它只在仿真里检查）；复位为异步、低有效（与 project.v 一致）；复位后第一次采用的状态只作起点，不计数、不报错（编码器可能停在任意一格）；16 位计数与方向。", "Complete quad_dec.v: two-flop synchronisers; debounce (a new synchronised (A,B) is accepted only after it stays unchanged for more than FILTER clocks); ×4 state comparison; on a missed step do not count or change direction, take the new state as the position, and set err until reset (no spare pin carries err; it is checked in simulation); reset is asynchronous, active low (as in project.v); the first accepted state after reset is only the starting point — no count, no error (the encoder may stand anywhere); 16-bit count and direction."),
               ("完成 test_brake、test_encoder_steps、test_glitch、test_wrap 四个测试，全部通过。测刹车时改 brake 后用 await ns(1) 再读 PWM；测毛刺时要在每个时钟检查计数——被误计的毛刺会先加一再减一，只看最后结果发现不了。测完后故意把去抖去掉，确认你的测试能失败。", "Write test_brake, test_encoder_steps, test_glitch and test_wrap; make them pass. For the brake, await ns(1) after changing brake before reading PWM; for glitches, check the count at every clock — a miscounted glitch adds one and then subtracts one, so the final count alone hides it. Then remove the debounce on purpose and confirm your test fails."),
-              ("用 Motor 类完成 test_motor：正转 3 ms（占空比 180）、反转 4 ms（占空比 120），每段结束比较芯片计数与模型位置，差不超过 2（读计数要拨 sel、等几个时钟，这时暂停模型即可）；转速单位为转/秒；记录转速与计数，填表 1、表 2。", "Use the Motor class for test_motor: 3 ms forward (duty 180), 4 ms reverse (duty 120); compare the chip count with the model position after each, within 2 (reading the count needs sel and a few clocks: pause the model meanwhile); speed is in rev/s; record speeds and counts in Tables 1 and 2.")],
+              ("用 Motor 类完成 test_motor：正转 3 ms（占空比 180）、反转 4 ms（占空比 120），每段结束比较芯片计数与模型位置，差不超过 2（读计数要拨 sel、等几个时钟，这时暂停模型即可）；模型的方向取方向命令；反转段结束时检查模型转速 w < 0；转速单位为转/秒；表中数字从测试日志（test/wqlab_test.log）里的输出抄录；记录转速与计数，填表 1、表 2。", "Use the Motor class for test_motor: 3 ms forward (duty 180), 4 ms reverse (duty 120); compare the chip count with the model position after each, within 2 (reading the count needs sel and a few clocks: pause the model meanwhile); drive the model with the direction command; at the end of the reverse phase check w < 0; speed is in rev/s; copy the numbers from your test output in test/wqlab_test.log; record speeds and counts in Tables 1 and 2.")],
     "tables": [
       ("表 1  PWM 占空比 Table 1  PWM duty", ["占空比 duty", "0", "64", "128", "200", "255"],
        [["一个周期内高电平时钟数（测）", "", "", "", "", ""], ["理论 4 × duty", "0", "256", "512", "800", "1020"]], [5.0, 2.0, 2.0, 2.0, 2.0, 2.0]),
@@ -129,12 +130,12 @@ LABS = [
     ],
     "cautions": [("刹车要“立即”生效：pwm 输出用组合逻辑与刹车门控，不要等下一个时钟沿。", "Brake must act at once: gate the pwm output with brake combinationally, without waiting for a clock edge."),
                  ("cocotb 2.x 与 1.x 的个别写法不同（Clock、Timer 的 unit/units），起始文件里的 clock() 和 ns() 已经处理，等待纳秒用 await ns(t)。", "cocotb 2.x and 1.x differ in small ways (unit/units in Clock and Timer); the starting file's clock() and ns() handle it — wait with await ns(t)."),
-                 (f"参考结果：参考设计 {S3['tests']} 个测试全部通过，用时约 {S3['seconds']:.0f} s。", f"Reference: all {S3['tests']} tests pass in about {S3['seconds']:.0f} s.")],
+                 (f"参考结果：参考设计通过教师用的 {S3['tests']} 个参考测试（除你写的几项外，还检查周期中途改占空比、方向输出、跳步、复位时的编码器位置等），用时约 {S3['seconds']:.0f} s。评分时用参考测试检查你的设计，所以规格里的每一条都要做到。", f"Reference: the reference design passes the teacher's {S3['tests']} reference tests (besides yours, they check a duty change mid-period, the direction pin, missed steps, the encoder position at reset and more) in about {S3['seconds']:.0f} s. Your design is graded with these tests, so meet every point of the specification.")],
     "questions": [("如果不做同步，直接把 A、B 接到计数逻辑，仿真能发现问题吗？真芯片上会出现什么现象？", "Without synchronisers, would simulation catch the problem? What would happen on a real chip?"),
                   ("去抖的 FILTER 取多大合适？太大时电机高速转动会出什么问题？用编码器线数和最高转速算一下上限。", "How large should FILTER be? What goes wrong at high speed if it is too large? Work out the limit from the line count and top speed.")],
     "problem": ("关节转了多少度", "How far did the joint turn",
-                "关节电机经 50:1 减速器带动关节，电机轴上的编码器为 1000 线。(1) 关节转 90° 时芯片计数多少？(2) 16 位计数能表示关节转多少圈才回绕？机器人需要怎样处理回绕？(3) 电机 3000 转/分时，A、B 两次变化最短相隔多少个时钟？与去抖的 4 个时钟加同步的 2 个时钟比较，还有多少余量？",
-                "The joint motor drives the joint through a 50:1 gearbox; the encoder on the motor shaft has 1000 lines. (1) What is the count for a 90° joint turn? (2) How many joint turns before the 16-bit count wraps, and how should the robot handle it? (3) At 3000 rpm, what is the shortest time between A/B changes in clocks? How much margin is left over the 4-clock debounce plus 2-clock synchroniser?"),
+                "关节电机经 50:1 减速器带动关节，电机轴上的编码器为 1000 线。(1) 关节转 90° 时电机轴转过多少计数？(2) 16 位有符号计数在关节转多少度时就回绕？既然一个 90° 动作就会回绕，机器人控制器应怎样处理（例如定时读取、在软件里把计数扩展成 32 位）？(3) 电机 3000 转/分时，A、B 两次变化最短相隔多少个时钟？与去抖的 4 个时钟加同步的 2 个时钟比较，还有多少余量？",
+                "The joint motor drives the joint through a 50:1 gearbox; the encoder on the motor shaft has 1000 lines. (1) How many counts does the motor shaft turn for a 90° joint move? (2) At what joint angle does the signed 16-bit count wrap? Since even a 90° move wraps, how should the robot controller handle it (e.g. read regularly and extend the count to 32 bits in software)? (3) At 3000 rpm, what is the shortest time between A/B changes in clocks? How much margin is left over the 4-clock debounce plus 2-clock synchroniser?"),
     "everyday": ("数楼梯：每踩一级记一次，上楼加、下楼减；有人在台阶上一闪而过（毛刺）不算，看清站稳了才记。", "Counting stairs: one count per step, up adds and down subtracts; a stumble that does not land (a glitch) is not counted — only a firm step is."),
   },
   {
