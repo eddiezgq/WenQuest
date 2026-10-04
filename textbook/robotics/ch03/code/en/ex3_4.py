@@ -2,7 +2,7 @@
 
 Example 3.4.1: polishing a workpiece surface tilted 20°. "Projecting the velocity onto the surface" is a projection
            tensor P: in the surface frame {b}, P_b = diag(1, 1, 0); in the base frame {a}, P_a = R_ab P_b R_abᵀ,
-           which should equal I − n nᵀ. The command velocity v_cmd is perpendicular to the normal after projection;
+           which should equal I − n nᵀ. The commanded velocity v_cmd is perpendicular to the normal after projection;
            if diag(1, 1, 0) is wrongly used directly in {a}, the tool digs into the surface at some speed. Compare the
            traces, determinants and eigenvalues of the two sets of components.
 Example 3.4.2: a rectangular plate tilted 30° in a gripper (a first look at the inertia tensor).

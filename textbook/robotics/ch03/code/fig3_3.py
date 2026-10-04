@@ -29,7 +29,7 @@ for i in range(3):
     P = circle3(ax, np.zeros(3), e, w, rr, 0, ang, AXIS[i], 1.3)
     mid = P[:, len(P[0]) // (5 if i == 2 else 2)]
     ax.text(*(mid * (1.32 - 0.04 * i)), labs[i], color=AXIS[i], fontsize=12, ha="center")
-ax.text2D(0.0, 0.97, T("(a) {b} 的 x 轴与 {a} 三根轴的夹角", "(a) Angles between x_b and the three axes of {a}"),
+ax.text2D(0.0, 0.97, T("(a) {b} 的 x 轴与 {a} 三根轴的夹角", r"(a) Angles between $\hat{\boldsymbol{x}}_b$ and the three axes of {a}"),
           transform=ax.transAxes, fontsize=10)
 ax2 = fig.add_subplot(122)
 ax2.axis("off")

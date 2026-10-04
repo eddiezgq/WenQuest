@@ -70,5 +70,5 @@ class Lesson(Base):
         self.play(beta.animate.set_value(math.radians(30)), run_time=2, rate_func=smooth)
         self.wait(0.5)
         self.card([["矢量与分量", "Vector and components"],
-                   ["箭头 d 与坐标系无关；分量 d_a、d_b 随坐标系而变", "The arrow d is frame-free; its components d_a, d_b depend on the frame"],
+                   ["箭头 d 与坐标系无关；分量 d_a、d_b 随坐标系而变", "The arrow d is independent of the frame; its components d_a, d_b depend on the frame"],
                    MathTex(r"|\boldsymbol d| = \sqrt{d_a^{\mathsf T}d_a} = \sqrt{d_b^{\mathsf T}d_b}", font_size=44)])

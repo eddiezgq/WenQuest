@@ -17,7 +17,7 @@
   - ["关节选 2，转速 30°/s，按“开始”。把 h 从 0 调到 0.3 m 再调到 −0.3 m（任务 3），观察 r 与公式速度的读数，填入表 2。",
      "Joint 2, 30°/s, press Start. Move h from 0 to 0.3 m and then to −0.3 m (task 3); watch r and the formula velocity and fill in Table 2."]
   - ["切换到场景“唱片机转盘”，转速 200°/s，按“开始”（任务 4），读出外缘线速度，并与 ρ θ̇ 比较。",
-     "Switch to “Record turntable”, 200°/s, press Start (task 4); read the rim speed and compare with ρ θ̇."]
+     "Switch to “Record player turntable”, 200°/s, press Start (task 4); read the rim speed and compare with ρ θ̇."]
 数据表:
   - 标题: ["表 1  关节 1 以 60°/s 转动（零位）", "Table 1  Joint 1 at 60°/s (zero position)"]
     表头: ["量", "读数", "手算", "相对差"]

@@ -27,8 +27,8 @@ for a_, b_ in ((1, 2), (2, 3), (3, 1)):
     out = mid / np.linalg.norm(mid) * 0.32
     arrow2(ax1, p + (q - p) * 0.2 + out * 0.4, q - (q - p) * 0.2 + out * 0.4, C["y"], 1.8)
     arrow2(ax1, q - (q - p) * 0.2 - out * 0.4, p + (q - p) * 0.2 - out * 0.4, C["x"], 1.4)
-ax1.text(0.0, -0.05, T("顺着读：\n123、231、312\nε = +1", "with the arrows:\n123, 231, 312\nε = +1"), ha="center", va="center", fontsize=10, color=C["y"])
-ax1.text(0.0, -1.05, T("逆着读：132、213、321，ε = −1；有重复指标，ε = 0", "against: 132, 213, 321, ε = −1; repeated index, ε = 0"),
+ax1.text(0.0, -0.12, T("顺着读：\n123、231、312\nε = +1", "cyclic:\n123, 231, 312\nε = +1"), ha="center", va="center", fontsize=9.5, color=C["y"])
+ax1.text(0.0, -1.05, T("逆着读：132、213、321，ε = −1；有重复指标，ε = 0", "anticyclic: 132, 213, 321, ε = −1; repeated index, ε = 0"),
          ha="center", fontsize=9.5, color=C["x"])
 ax1.text(-1.25, 1.35, T("(a) 轮换次序与符号", "(a) Cyclic order and sign"), fontsize=10)
 ax1.set_xlim(-1.3, 1.3)
@@ -52,7 +52,7 @@ for kk in range(3):
             col = C["y"] if v > 0 else C["x"] if v < 0 else C["muted"]
             ax2.text(x0 + 0.25 + 0.5 * j, 1.95 - 0.7 * i, f"{v:+d}" if v else "0", ha="center", va="center", fontsize=13, color=col)
     ax2.text(x0 + 0.75, -0.15, rf"$\varepsilon_{{ij{kk + 1}}}=-[\hat{{\boldsymbol{{e}}}}_{kk + 1}]_{{ij}}$", ha="center", fontsize=11)
-ax2.text(-0.1, 2.95, T("(b) ε_ijk 的 27 个值：按 k 分为三层，第 i 行、第 j 列", "(b) The 27 values of ε_ijk in three layers by k; row i, column j"), fontsize=10)
+ax2.text(-0.1, 2.95, T(r"(b) $\varepsilon_{ijk}$ 的 27 个值：按 k 分为三层，第 i 行、第 j 列", r"(b) The 27 values of $\varepsilon_{ijk}$ in three layers by k; row i, column j"), fontsize=10)
 ax2.set_xlim(-0.2, 5.7)
 ax2.set_ylim(-0.45, 3.15)
 fig.subplots_adjust(wspace=0.08)
