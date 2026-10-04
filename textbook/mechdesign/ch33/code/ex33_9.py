@@ -13,7 +13,7 @@ import mdstd
 
 
 def build(fillets=True, keys=True):
-    """SH-301 B：沿 z 叠圆柱 → 台阶内角倒圆 → 铣两个 A 型键槽（同一条母线）。返回 build123d 实体。"""
+    """SH-301 B：沿 z 叠圆柱 → 台阶内角倒圆 → 铣两个键槽（齿轮处 A 型、外伸段开口 C 型，同一条母线）。返回 build123d 实体。"""
     import build123d as bd
     z, s, steps = 0.0, None, []
     for d, L, *_ in S.SEG_B:
@@ -28,22 +28,24 @@ def build(fillets=True, keys=True):
             if len(es) == 2:
                 s = s.fillet(r, [min(es, key=lambda e: e.radius)])
     if keys:
-        for z0, z1, d in KEYWAYS:
+        for z0, z1, d, kind in KEYWAYS:
             k = mdstd.key_for(d)
-            b, t, L = k["b"], k["t"], z1 - z0
+            b, t = k["b"], k["t"]
+            if kind == "C":
+                z1 = z1 + b                             # 开口键槽：刀具铣出轴端
+            L = z1 - z0
             H = 10.0                                    # 刀具从轴面以上切入，槽底在 d/2 − t
             yc = d / 2 - t + H / 2
             cut = bd.Pos(0, yc, (z0 + z1) / 2) * bd.Box(b, H, L - b)
-            for zc in (z0 + b / 2, z1 - b / 2):
+            for zc in ((z0 + b / 2,) if kind == "C" else (z0 + b / 2, z1 - b / 2)):
                 cut = cut + bd.Pos(0, yc, zc) * bd.Rot(90, 0, 0) * bd.Cylinder(b / 2, H)
             s = s - cut
     return s
 
 
-# 键槽的位置：齿轮键、联轴器键（33.2 节：键比轮毂短 5–10 mm、取标准长度，居中在轮毂上）
-L_kg = mdstd.key_length(S.HUB_GEAR - 10)
-L_kc = mdstd.key_length(S.HUB_CPL - 7)
-KEYWAYS = [(S.Z_GEAR - L_kg / 2, S.Z_GEAR + L_kg / 2, 40), (S.Z_CPL - L_kc / 2, S.Z_CPL + L_kc / 2, 30)]
+# 键槽的位置（33.2 节，_shaft.KEYWAYS）：齿轮键居中在轮毂上（A 型）；外伸段开口键槽开到轴端（C 型）
+L_kg, L_kc = S.L_KEY_GEAR, S.L_KEY_CPL
+KEYWAYS = S.KEYWAYS
 
 solid = build()
 rho = mdstd.material(S.MAT)["density"]                 # g/cm³
@@ -117,5 +119,5 @@ fig.tight_layout()
 figure(fig, "fig33_9_1")
 
 out(vol_cm3=vol / 1000, mass=mass, n_faces=n_faces, dvol=(vol0 - vol) / 1000, step_kb=step_kb, length=S.LEN_B,
-    key_gear=f"{mdstd.key_for(40)['b']}×{mdstd.key_for(40)['h']}×{L_kg}", key_cpl=f"{mdstd.key_for(30)['b']}×{mdstd.key_for(30)['h']}×{L_kc}",
+    key_gear=f"{mdstd.key_for(40)['b']}×{mdstd.key_for(40)['h']}×{L_kg}", key_cpl=f"C {mdstd.key_for(30)['b']}×{mdstd.key_for(30)['h']}×{L_kc}",
     n_fillets=len(S.FILLET_B), r_max=max(S.FILLET_B.values()), r_min=min(S.FILLET_B.values()))

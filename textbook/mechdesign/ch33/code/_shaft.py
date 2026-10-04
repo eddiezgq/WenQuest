@@ -68,6 +68,11 @@ Z_BRG_B = LAY_B[4][0] + _brg["B"] / 2                # 右轴承中心
 Z_GEAR = LAY_B[1][0] - 2 + HUB_GEAR / 2              # 齿轮毂比轴段长 2 mm（套筒压在毂上）
 Z_CPL = LAY_B[6][0] + HUB_CPL / 2                    # 联轴器轮毂中心：轮毂靠在 Ø35 → Ø30 的轴肩上，伸出轴端 2 mm，由轴端挡圈压紧
 SPAN = Z_BRG_B - Z_BRG_A
+# 键槽（33.2 节）：键比轮毂短 5–10 mm、取标准长度。齿轮键居中在轮毂上（A 型，两端圆头）；外伸段的键槽一直开到轴端（开口键槽），
+# 用 C 型（单圆头）平键——联轴器轮毂只比外伸段长 2 mm，闭口键槽放不下够长的 A 型键，开口槽也不会把端面倒角铣穿。
+L_KEY_GEAR = mdstd.key_length(HUB_GEAR - 10)
+L_KEY_CPL = mdstd.key_length(HUB_CPL - 7)
+KEYWAYS = [(Z_GEAR - L_KEY_GEAR / 2, Z_GEAR + L_KEY_GEAR / 2, 40, "A"), (LEN_B - L_KEY_CPL, LEN_B, 30, "C")]   # (z0, z1, 轴径, 键型)
 
 
 def diameter_at(z: float, lay=LAY_B) -> float:
@@ -267,9 +272,10 @@ def gear_mass():
 SIGMA_P_ALLOW = 135.0      # 钢制轮毂静联接许用挤压应力 120–150 MPa 的中值（与数字工厂参数配置器一致）
 
 
-def key_torque_limit(d, b, h, L):
-    """A 型平键：工作长度 l = L − b，接触高度 k = h/2；T = σp·d·k·l/2（N·mm）。"""
-    return SIGMA_P_ALLOW * d * (h / 2) * (L - b) / 2
+def key_torque_limit(d, b, h, L, kind="A"):
+    """平键：工作长度 A 型 l = L − b、C 型（单圆头）l = L − b/2、B 型 l = L；接触高度 k = h/2；T = σp·d·k·l/2（N·mm）。"""
+    l = {"A": L - b, "C": L - b / 2, "B": L}[kind]
+    return SIGMA_P_ALLOW * d * (h / 2) * l / 2
 
 
 def torque_series(serial="WQR-105-00001", work_order="WO-TS-33"):

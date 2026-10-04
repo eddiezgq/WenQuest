@@ -38,14 +38,44 @@ DEFLECT_BUDGET_MM = 0.20            # 系统设计分配给“关节输出轴扭
 HAND_MARGIN = 1.2                   # 手算选型时给台阶、法兰处的局部变形留的余量（33.10.4 用有限元核对）
 
 # ---- RJ-201 的结构（外径, 长度, 名称）；内孔贯通
+# 第 1 版（两端法兰都与轴一体、两轴承间是轴肩）装不起来（第 3.5.4 节）；现在的结构：减速器法兰与轴一体，两个轴承装在连续的
+# 轴承位上、中间一个隔套，外端是渐开线花键，大臂法兰 RJ-202 是单独零件、靠花键传转矩，最外端圆螺母把 RJ-202 毂、
+# 外侧轴承内圈、隔套、内侧轴承内圈一起压紧在减速器法兰端面上。两个轴承都从大臂一端装入。
 BORE = 30.0                         # 本书方案的内孔
-ARM_OFFSET = 30.0                   # 大臂法兰面到外侧轴承中心的距离（剪力的力臂）
+SPLINE_M = 1.5                      # 渐开线花键（GB/T 3478.1，30° 平齿根）的模数
+SPACER_L = 24.0                     # 两轴承之间的隔套长
+SPLINE_L = 20.0                     # 花键长（= RJ-202 毂长）
+THREADS = [30, 33, 36, 39, 42, 45, 48]   # 圆螺母 GB/T 812 的细牙螺纹（螺距 1.5）
+
+
+def spline(seat):
+    """花键：外径要比轴承内径小（轴承从这一端装入）。返回 齿数、分度圆、大径、小径（mm）"""
+    z = int((seat - 3) / SPLINE_M) - 1
+    return {"z": z, "d": SPLINE_M * z, "D_ee": SPLINE_M * (z + 1), "D_ie": SPLINE_M * (z - 1.5)}
+
+
+def thread(seat):
+    """锁紧螺母的螺纹：比花键小径小的最大一档"""
+    return max(t for t in THREADS if t < spline(seat)["D_ie"] - 0.5)
 
 
 def segments(seat):
-    """轴承位直径 seat（= 轴承内径）决定其余尺寸"""
-    return [(seat + 20, 10, "减速器法兰"), (seat, 16, "轴承位（内侧）"), (seat + 5, 24, "轴肩（两轴承之间）"),
-            (seat, 16, "轴承位（外侧）"), (seat - 4, 20, "大臂毂"), (seat + 30, 10, "大臂法兰")]
+    """扭转与质量的计算模型（外径, 长度, 名称）：转矩从减速器法兰进、在花键段传给 RJ-202。轴承位直径 seat 决定其余尺寸；
+    花键段按小径的圆柱计（齿不全参与扭转，偏于安全）。隔套、RJ-202、螺母不传扭转（与轴压紧在一起，但转矩只走轴）。"""
+    return [(seat + 20, 10, "减速器法兰"), (seat, 16, "轴承位（内侧）"), (seat, SPACER_L, "隔套段"),
+            (seat, 16, "轴承位（外侧）"), (spline(seat)["D_ie"], SPLINE_L, "花键段（RJ-202）")]
+
+
+def shaft_segments(seat):
+    """轴本身（数字工厂案例件 RJ-201 的模型）：计算模型 + 外端的螺纹段（花键按小径、螺纹按大径，都简化成圆柱）"""
+    return segments(seat) + [(thread(seat), 10, "螺纹段 M{}×1.5".format(thread(seat)))]
+
+
+def arm_offset(seat):
+    """外侧轴承中心到大臂连接面（RJ-202 法兰外侧端面 = 花键段外端）的距离：大臂的力对外侧轴承的力臂"""
+    sg = segments(seat)
+    z_brg = sg[0][1] + sg[1][1] + sg[2][1] + sg[3][1] / 2
+    return sum(L for _, L, _ in sg) - z_brg
 
 
 SEAT = 50.0                         # 本书方案：轴承位 Ø50，6010 一对（零件库 A-BRG-DG 的 60 系列最大到 6010）
@@ -107,7 +137,7 @@ def W_hollow(D, d=BORE):
 
 
 def twist(T_nmm, segs, G, d=BORE):
-    """减速器法兰到大臂法兰之间的扭转角（rad）：各段串联"""
+    """减速器法兰到花键段（转矩传给 RJ-202 处）之间的扭转角（rad）：各段串联；两端各算一半长度"""
     return sum(T_nmm * L / (G * J_hollow(D, d)) for D, L, *_ in segs[1:-1]) + \
         sum(T_nmm * (L / 2) / (G * J_hollow(D, d)) for D, L, *_ in (segs[0], segs[-1]))
 
@@ -121,15 +151,16 @@ def step_bytes(segs, d=BORE, fillet=1.0):
     import tempfile
     import build123d as bd
     z, s, steps = 0.0, None, []
-    for D, L, *_ in segs:
+    for k, (D, L, *_) in enumerate(segs):
         c = bd.Pos(0, 0, z) * bd.Cylinder(D / 2, L, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN))
         s = c if s is None else s + c
         z += L
-        steps.append(z)
+        if k + 1 < len(segs) and abs(segs[k + 1][0] - D) / 2 > 1.5 * fillet:    # 台阶高度够才倒圆（花键与螺纹之间的小台阶不倒）
+            steps.append(z)
     s = s.clean()
     if fillet:
         sel = []
-        for zz in steps[:-1]:
+        for zz in steps:
             es = [e for e in s.edges() if e.geom_type == bd.GeomType.CIRCLE and abs(e.center().Z - zz) < 1e-6]
             if len(es) == 2:
                 sel.append(min(es, key=lambda e: e.radius))

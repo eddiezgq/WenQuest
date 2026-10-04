@@ -71,7 +71,7 @@ Ls = max(x for p_ in vis for x, _ in p_)
 sh.line((-5, 0), (Ls + 5, 0), "center")
 ydown = -60.0
 names = ["A", "B"]
-for (z0, z1, d), nm in zip(kw, names):
+for (z0, z1, d, *_), nm in zip(kw, names):
     xc = (z0 + z1) / 2
     regs = H.cross_section(sh301, xc, view="left")
     # 断面在剖切位置的正下方（移出断面放在剖切线的延长线上，可以省略标注字母；这里仍标出以便对照）

@@ -10,7 +10,7 @@ from hub import case_parts as C
 TEXTBOOK = os.path.join(os.path.dirname(__file__), "..", "..", "..", "textbook", "mechdesign", "ch33", "code")
 
 
-@pytest.mark.parametrize("item,n_cyl", [("RJ-201", 7), ("LS-101", 5)])
+@pytest.mark.parametrize("item,n_cyl", [("RJ-201", 5), ("LS-101", 5)])
 def test_case_part_steps(item, n_cyl):
     step = C.step_bytes(item)
     faces, _, _ = G.faces(step)
@@ -25,7 +25,7 @@ def test_same_dimensions_as_textbook():
     sys.path.insert(0, os.path.abspath(TEXTBOOK))
     import _ls
     import _rj
-    assert [(d, L) for d, L, _ in C.RJ_SEGS] == [(d, L) for d, L, _ in _rj.segments(_rj.SEAT)] and C.RJ_BORE == _rj.BORE
+    assert [(d, L) for d, L, _ in C.RJ_SEGS] == [(d, L) for d, L, _ in _rj.shaft_segments(_rj.SEAT)] and C.RJ_BORE == _rj.BORE
     assert [(d, L) for d, L, _ in C.LS_SEGS] == [(d, L) for d, L, _ in _ls.SEGS] and C.LS_FILLET == _ls.FILLET
 
 

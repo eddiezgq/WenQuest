@@ -51,7 +51,7 @@ a_codes = {c: q for c, q in F.BOMS["SA-300"][1]}
 diff = []
 for r in rows_b:
     if r.get("old"):
-        diff.append((T("换料号", "new code"), f"{r['old']} → {r['code']}", T("联轴器键加长（第 33.2 节）", "longer coupling key (Sec. 33.2)")))
+        diff.append((T("换料号", "new code"), f"{r['old']} → {r['code']}", T("联轴器键加长，改 C 型（开口键槽，第 33.2 节）", "longer type C coupling key, open keyseat (Sec. 33.2)")))
     elif r.get("chg"):
         diff.append((T("新增", "added"), T("套筒（待分配编号）", "sleeve (code to be assigned)"), T("左轴承轴向定位", "locates the left bearing")))
 diff = [(T("升版", "new rev."), "SH-301 A → B", T("结构改版，材料改为 40Cr（第 33 章）", "redesign, material to 40Cr (Ch. 33)")),

@@ -29,7 +29,7 @@ z_sl = (z_brgA[1], z_hub0)
 
 
 rows = H.sa300_rows()
-key_c_code = rows[[r["code"].startswith("KEY-8") for r in rows].index(True)]["code"]
+key_c_code = rows[[r["code"].startswith("KEY-C8") for r in rows].index(True)]["code"]
 no_of = {r["code"]: r["no"] for r in rows}
 no_sleeve = rows[-1]["no"]
 

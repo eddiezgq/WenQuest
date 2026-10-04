@@ -19,8 +19,8 @@ lay = S.LAY_B
 seg = {i + 1: s for i, s in enumerate(lay)}
 key_gear = mdstd.key_for(40)
 key_ext = mdstd.key_for(30)
-L_key_gear = mdstd.key_length(S.HUB_GEAR - 10)          # The key is 5-10 mm shorter than the hub; take a standard length
-L_key_ext = mdstd.key_length(S.HUB_CPL - 7)
+L_key_gear = S.L_KEY_GEAR          # The key is 5-10 mm shorter than the hub; take a standard length
+L_key_ext = S.L_KEY_CPL
 
 # ---- Example 33.2.1: rule check of design B
 checks = []
@@ -44,10 +44,12 @@ chk("联轴器位比轮毂短 2 mm（轴端挡圈压紧）", "coupling seat 2 mm
 T_key_gear = S.key_torque_limit(40, key_gear["b"], key_gear["h"], L_key_gear) / 1e3
 # Check with the actual contact height on the hub side, h - t (height of the key above the shaft surface): smaller than the usual k = h/2
 T_key_gear_exact = S.key_torque_limit(40, key_gear["b"], 2 * (key_gear["h"] - key_gear["t"]), L_key_gear) / 1e3
-T_key_ext = S.key_torque_limit(30, key_ext["b"], key_ext["h"], L_key_ext) / 1e3
-T_key_ext_exact = S.key_torque_limit(30, key_ext["b"], 2 * (key_ext["h"] - key_ext["t"]), L_key_ext) / 1e3
+T_key_ext = S.key_torque_limit(30, key_ext["b"], key_ext["h"], L_key_ext, "C") / 1e3
+T_key_ext_exact = S.key_torque_limit(30, key_ext["b"], 2 * (key_ext["h"] - key_ext["t"]), L_key_ext, "C") / 1e3
 chk("齿轮键的挤压承载 ≥ 额定转矩", "gear key capacity ≥ rated torque", T_key_gear >= S.T_RATED / 1e3, f"{T_key_gear:.0f} ≥ {S.T_RATED / 1e3:.0f}")
 chk("联轴器键的挤压承载 ≥ 额定转矩", "coupling key capacity ≥ rated torque", T_key_ext >= S.T_RATED / 1e3, f"{T_key_ext:.0f} ≥ {S.T_RATED / 1e3:.0f}")
+chk("外伸段开口键槽离轴肩 ≥ 3 mm", "open keyseat ≥ 3 mm from the shoulder", S.KEYWAYS[1][0] - seg[7][0] >= 3,
+    f"{S.KEYWAYS[1][0] - seg[7][0]:.0f} ≥ 3")
 n_ok_B = sum(ok for _, ok, _ in checks)
 
 # ---- Example 33.2.2: review of design A
@@ -62,7 +64,7 @@ T_key_gear_hub45 = S.key_torque_limit(40, 12, 8, mdstd.key_length(S.BLANK_GEAR_A
 plt = style()
 fig, ax = plt.subplots(figsize=(9.6, 4.4))
 keys = [(S.Z_GEAR - L_key_gear / 2, S.Z_GEAR + L_key_gear / 2, key_gear["t"]),
-        (S.Z_CPL - L_key_ext / 2, S.Z_CPL + L_key_ext / 2, key_ext["t"])]
+        (S.KEYWAYS[1][0], S.KEYWAYS[1][1], key_ext["t"])]
 D.shaft(ax, lay, keys=keys)
 D.bearing(ax, S.Z_BRG_A, brg["d"], brg["D"], brg["B"])
 D.bearing(ax, S.Z_BRG_B, brg["d"], brg["D"], brg["B"])
@@ -154,7 +156,7 @@ out(L1=seg[1][1] - seg[1][0], L2=seg[2][1] - seg[2][0], L3=seg[3][1] - seg[3][0]
     z_A=S.Z_BRG_A, z_B=S.Z_BRG_B, z_gear=S.Z_GEAR, z_cpl=S.Z_CPL, span=S.SPAN, a_gear=S.Z_GEAR - S.Z_BRG_A,
     b_gear=S.Z_BRG_B - S.Z_GEAR, c_cpl=S.Z_CPL - S.Z_BRG_B, B_brg=brg["B"], da_min=brg["da_min"], r_smin=brg["r_smin"],
     h_collar=h_collar, h_min=0.07 * 40, key_gear=f"{key_gear['b']}×{key_gear['h']}×{L_key_gear}",
-    key_ext=f"{key_ext['b']}×{key_ext['h']}×{L_key_ext}", t_gear=key_gear["t"], t_ext=key_ext["t"],
+    key_ext=f"C {key_ext['b']}×{key_ext['h']}×{L_key_ext}", t_gear=key_gear["t"], t_ext=key_ext["t"],
     T_key_gear=T_key_gear, T_key_ext=T_key_ext, T_key_gear_exact=T_key_gear_exact, T_key_ext_exact=T_key_ext_exact,
     k_gear_exact=key_gear["h"] - key_gear["t"], k_ext_exact=key_ext["h"] - key_ext["t"], n_checks=len(checks), n_ok_B=n_ok_B,
     checks=[[c[0], c[1], c[2]] for c in checks],

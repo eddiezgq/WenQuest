@@ -79,19 +79,20 @@ RJ_HOLES = {"减速器法兰": (6, 5.5, 60.0), "大臂法兰": (6, 6.6, 68.0)}  
 
 
 def rj201(holes=False, axis="x"):
-    """协作机器人肩关节空心轴 RJ-201（第 33.10 节；结构与数字工厂案例件第 1 版相同）。
+    """协作机器人肩关节空心轴 RJ-201（第 33.10 节修改后的结构，与数字工厂案例件相同：花键段、螺纹段简化成圆柱）。
     holes=True 时补上两个法兰的螺钉通孔——这是出零件图时补全的细节，第 33 章算强度时没有考虑。轴线沿 X。"""
     import build123d as bd
     segs, bore, fil = CP.CASES["RJ-201"]
     z, s, steps = 0.0, None, []
-    for D, L, _ in segs:
+    for k, (D, L, _) in enumerate(segs):
         c = bd.Pos(0, 0, z) * bd.Cylinder(D / 2, L, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN))
         s = c if s is None else s + c
         z += L
-        steps.append(z)
+        if k + 1 < len(segs) and abs(segs[k + 1][0] - D) / 2 > 1.5 * fil:      # 台阶够高才倒圆
+            steps.append(z)
     s = s.clean()
     sel = []
-    for zz in steps[:-1]:
+    for zz in steps:
         es = [e for e in s.edges() if e.geom_type == bd.GeomType.CIRCLE and abs(e.center().Z - zz) < 1e-6]
         if len(es) == 2:
             sel.append(min(es, key=lambda e: e.radius))
@@ -134,24 +135,24 @@ def sh301b():
         es = [e for e in s.edges() if e.geom_type == bd.GeomType.CIRCLE and abs(e.center().Z - zz) < 1e-6]
         if len(es) == 2:
             s = s.fillet(r, [min(es, key=lambda e: e.radius)])
-    for z0, z1, d in sh301_keyways():
+    for z0, z1, d, kind in sh301_keyways():
         k = mdstd.key_for(d)
         b, t = k["b"], k["t"]
+        if kind == "C":
+            z1 = z1 + b                                # 开口键槽：铣出轴端
         Hc = 10.0
         yc = -(d / 2 - t + Hc / 2)                     # 键槽朝 −Y，即朝着看主视图的人（GB 的习惯画法）
         cut = bd.Pos(0, yc, (z0 + z1) / 2) * bd.Box(b, Hc, z1 - z0 - b)
-        for zc in (z0 + b / 2, z1 - b / 2):
+        for zc in ((z0 + b / 2,) if kind == "C" else (z0 + b / 2, z1 - b / 2)):
             cut = cut + bd.Pos(0, yc, zc) * bd.Rot(90, 0, 0) * bd.Cylinder(b / 2, Hc)
         s = s - cut
     return bd.Rot(0, 90, 0) * s            # 轴线由 Z 转到 X，Y 不变
 
 
 def sh301_keyways():
-    """键槽位置（第 33.2 节的规则：键比轮毂短、取标准长度、居中在轮毂上），与 ex33_9.py 相同"""
+    """键槽位置与键型（第 33.2 节，ch33/code/_shaft.py 的 KEYWAYS）：[(z0, z1, 轴径, 键型)]"""
     import _shaft as S
-    L_kg = mdstd.key_length(S.HUB_GEAR - 10)
-    L_kc = mdstd.key_length(S.HUB_CPL - 7)
-    return [(S.Z_GEAR - L_kg / 2, S.Z_GEAR + L_kg / 2, 40), (S.Z_CPL - L_kc / 2, S.Z_CPL + L_kc / 2, 30)]
+    return S.KEYWAYS
 
 
 # ---------------------------------------------------------------- 投影（第一角画法）
@@ -478,7 +479,7 @@ def sa300_rows():
         return " ".join(tok[:k]), " ".join(tok[k:]) + (" " + tok[1] if k > 1 and re.search(r"\d", tok[1]) else "")
 
     rows = [{"code": c, "qty": q} for c, q in F.BOMS["SA-300"][1]]
-    key_c_code = f"KEY-{key_c['b']}x{key_c['h']}x{L_kc:g}"
+    key_c_code = f"KEY-C{key_c['b']}x{key_c['h']}x{L_kc:g}"          # 外伸段开口键槽用 C 型（单圆头）平键
     for r in rows:
         if r["code"] == "KEY-8x7x36":
             r["old"], r["code"], r["chg"] = "KEY-8x7x36", key_c_code, T("改", "chg.")
@@ -491,7 +492,7 @@ def sa300_rows():
             zh, en = zh_en((F.ITEMS.get(c) or F.ITEMS["KEY-8x7x36"])[0])
             if c.startswith("KEY-"):
                 b_, h_, l_ = c[4:].split("x")
-                zh, en = f"平键 {b_}×{h_}×{l_}", f"Parallel key {b_}×{h_}×{l_}"
+                zh, en = f"平键 {b_}×{h_}×{l_}", f"Parallel key {b_}×{h_}×{l_}"         # 如“平键 C8×7×63”
             r["name"] = (zh.replace("深沟球轴承 ", "轴承 "), en)
             r["mat"] = MAT.get(c, MAT["KEY"] if c.startswith("KEY") else "")
         r["std"] = STD.get(c, STD["KEY"] if c.startswith("KEY") else "")
