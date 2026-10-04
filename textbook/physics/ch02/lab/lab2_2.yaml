@@ -1,0 +1,29 @@
+# 实验 2.2 的指导书与报告模板。目的、场景、参数、任务取自 lab2_2.js。
+原理:
+  - ["矢量加法的三角形法则：把 b 的起点放到 a 的终点，从 a 的起点指向 b 的终点的矢量就是 a + b。用分量计算时，对应分量相加（式 (2.3.4)）。",
+     "Triangle rule: put the tail of b at the head of a; the vector from the tail of a to the head of b is a + b. In components, add the components (Eq. (2.3.4))."]
+  - 式: "r = a + b，a = l₁(cos θ₁, sin θ₁)，b = l₂(cos(θ₁ + θ₂), sin(θ₁ + θ₂))        (2.2.1)、(2.3.2)"
+  - ["SCARA 末端到肩关节的距离由余弦定理给出：r² = l₁² + l₂² + 2l₁l₂ cos θ₂，所以 l₁ − l₂ ≤ r ≤ l₁ + l₂（三角不等式，式 (2.2.3)）。同一个 r 一般有两组关节角，θ₂ 一正一负。",
+     "The distance of the SCARA end from the shoulder follows from the law of cosines: r² = l₁² + l₂² + 2l₁l₂ cos θ₂, so l₁ − l₂ ≤ r ≤ l₁ + l₂ (triangle inequality, Eq. (2.2.3)). The same r usually has two sets of joint angles, θ₂ positive and negative."]
+  - ["渡河：船相对岸的速度 = 船相对水的速度 + 水流的速度。要正对着到达对岸，合速度必须垂直于河岸，即船速沿河岸的分量与水流抵消。",
+     "Crossing: velocity over ground = velocity through water + current. To land opposite, the sum must be perpendicular to the bank, so the along-bank component of the boat's velocity cancels the current."]
+步骤:
+  - ["选“SCARA 末端去抓零件”。先用余弦定理算出末端到达零件 (0.45, 0.30) m 时所需的 θ₂，再算 θ₁，填入表 1；然后调两个关节角，核对“离零件”小于 1 cm（任务 1）。", "Choose the SCARA scene. Use the law of cosines to find θ₂ for reaching the part at (0.45, 0.30) m, then θ₁; enter them in Table 1, set the joints and check that the distance is below 1 cm (task 1)."]
+  - ["把 θ₂ 改成相反的符号，重新算 θ₁，找到另一种构型（任务 2）。比较两种构型中 a、b 的分量，验证 r 相同。", "Reverse the sign of θ₂, recompute θ₁ and find the other configuration (task 2). Compare the components of a and b and check that r is the same."]
+  - ["选“AGV 三段路线回到起点”。用分量算出前两段之和，第三段应等于它的负矢量；算出长度和方向，调好后核对离起点小于 0.25 m（任务 3）。", "Choose the AGV scene. Add the first two legs by components; leg 3 must be its negative. Compute its length and direction and check that the AGV ends within 0.25 m of the start (task 3)."]
+  - ["选“渡河”，船速 2.0 m/s。算出船头应偏向上游多少度，调好后核对下游偏离小于 1 m（任务 4）。再把船速调到 0.8 m/s，看能不能正对着过河。", "Choose the river, boat speed 2.0 m/s. Compute the heading upstream, set it and check that the drift is below 1 m (task 4). Then try a boat speed of 0.8 m/s."]
+数据表:
+  - 标题: ["表 1  SCARA 到达零件的两组关节角", "Table 1  Two sets of joint angles reaching the part"]
+    表头: ["构型", "θ₁ / (°)", "θ₂ / (°)", "a / m", "b / m", "r / m", "离零件 / cm"]
+    表头英文: ["Configuration", "θ₁ / (°)", "θ₂ / (°)", "a / m", "b / m", "r / m", "Distance / cm"]
+    行: [["1", "", "", "", "", "", ""], ["2", "", "", "", "", "", ""]]
+  - 标题: ["表 2  AGV 三段路线的分量", "Table 2  Components of the three AGV legs"]
+    表头: ["段", "长度 / m", "方向 / (°)", "Δx / m", "Δy / m"]
+    表头英文: ["Leg", "Length / m", "Direction / (°)", "Δx / m", "Δy / m"]
+    行: [["1", "12", "0", "", ""], ["2", "8", "60", "", ""], ["3", "", "", "", ""], ["合计", "", "", "", ""]]
+注意:
+  - ["关节 2 的角度是小臂相对大臂转过的角，不是相对 x 轴的角；小臂的方向角是 θ₁ + θ₂。", "Joint 2 is measured from the upper arm, not from the x axis; the forearm's direction is θ₁ + θ₂."]
+  - ["求方向角用 atan2，不要只看分量之比。", "Use atan2 for directions, not the ratio of components alone."]
+思考题:
+  - ["两段连杆一样长时，末端能不能回到肩关节？SCARA 的工作范围为什么是一个圆环？", "With equal links, can the end reach the shoulder? Why is the SCARA workspace a ring?"]
+  - ["水流比船快时，怎样使船被冲到下游的距离最短？", "If the current is faster than the boat, how do you minimise the drift?"]
