@@ -158,7 +158,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       <div class="card"><h3 data-en="READINGS">读数</h3><dl class="readout" id="ro2"></dl></div>
       <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk2"></ul></div>
       <div class="card open"><h3 data-en="OPEN QUESTION">开放问题</h3>
-        <p data-en="In the middle of the curve the slope is much steeper than −1. Why does that matter when ten inverters are cascaded and a little noise rides on the first input?">传输特性中段的斜率远大于 1。十个反相器串起来、第一级输入带一点干扰时，这有什么好处？</p>
+        <p data-en="In the middle of the curve the slope is much steeper than −1 (its magnitude is far above 1). Why does that matter when ten inverters are cascaded and a little noise rides on the first input?">传输特性中段斜率的绝对值远大于 1。十个反相器串起来、第一级输入带一点干扰时，这有什么好处？</p>
         <textarea id="op2" data-ph-en="Your answer (saved on this device)" placeholder="写下你的想法（保存在本机）"></textarea></div>
     </div>
   </section>
@@ -225,9 +225,9 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
         <h3 data-en="PARAMETERS">参数</h3>
         <div class="ctl"><label for="v5" data-en="Supply V&lt;sub&gt;DD&lt;/sub&gt;">电源电压 V<sub>DD</sub></label><output id="v5o"></output><input type="range" id="v5" min="0.9" max="1.8" step="0.01" value="1.8"></div>
         <div class="ctl"><label for="f5" data-en="Clock f">时钟频率 f</label><output id="f5o"></output><input type="range" id="f5" min="10" max="200" step="10" value="100"></div>
-        <div class="ctl"><label for="a5" data-en="Activity α">翻转率 α</label><output id="a5o"></output><input type="range" id="a5" min="0.02" max="0.5" step="0.01" value="0.1"></div>
+        <div class="ctl"><label for="a5" data-en="0→1 activity α">0→1 翻转率 α</label><output id="a5o"></output><input type="range" id="a5" min="0.02" max="0.5" step="0.01" value="0.1"></div>
         <div class="ctl"><label for="g5" data-en="Gate count N">门数 N</label><output id="g5o"></output><input type="range" id="g5" min="3" max="5" step="0.1" value="4"></div>
-        <p class="hint" data-en="Load per gate C = 5 fF. Leakage is ignored here.">每门负载 C = 5 fF。这里不计漏电。</p>
+        <p class="hint" data-en="α = probability that a gate output rises 0→1 in a cycle. Load per gate C = 5 fF. Leakage is ignored here.">α 为每个时钟一个门输出发生 0→1 翻转的概率。每门负载 C = 5 fF。这里不计漏电。</p>
       </div>
       <div class="card"><h3 data-en="READINGS">读数</h3><dl class="readout" id="ro5"></dl></div>
       <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk5"></ul></div>
@@ -689,7 +689,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
         [T('NMOS 工作区', 'NMOS region'), vinHigh ? (Number.isFinite(vol) ? T('线性区', 'linear') : T('饱和（拉不住）', 'saturated (cannot sink)')) : T('截止', 'off')],
         ['VOL', vinHigh ? (Number.isFinite(vol) ? vol.toFixed(3) + ' V' : T('> 1.35 V', '> 1.35 V')) : '—'],
         [T('等效电阻 VOL / I', 'Effective R = VOL / I'), vinHigh && Number.isFinite(Ron) ? Ron.toFixed(0) + ' Ω' : '—'],
-        [T('小信号 Ron（理论）', 'Small-signal Ron (theory)'), Rlin.toFixed(0) + ' Ω'],
+        [T('线性区导通电阻 Ron（公式）', 'Linear-region on-resistance Ron (formula)'), Rlin.toFixed(0) + ' Ω'],
         [T('Wn / L', 'Wn / L'), (W / Lch).toFixed(1)],
         [T('反相器静态电流', 'Inverter static current'), '0'],
       ]);
@@ -705,7 +705,8 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
     const vi = L.range('vi2', (v) => v.toFixed(2) + ' V', draw);
     const nz = L.range('nz2', (v) => '±' + v.toFixed(2) + ' V', draw);
     let cache = {};
-    const nmFor = (ratio) => { const k = ratio.toFixed(2); if (!cache[k]) { const nm = M.noiseMargins(Wmin, ratio * Wmin, VDD, 0.002); nm.VM = M.vm(Wmin, ratio * Wmin); nm.vtc = M.vtc(Wmin, ratio * Wmin, VDD, 0.01); cache[k] = nm; } return cache[k]; };
+    const vmCurve = (ratio) => { const v = M.vtc(Wmin, ratio * Wmin, VDD, 0.0005); for (let i = 1; i < v.vs.length; i++) { const a = v.vo[i - 1] - v.vs[i - 1], b = v.vo[i] - v.vs[i]; if (a * b <= 0) return v.vs[i - 1] + (v.vs[i] - v.vs[i - 1]) * a / (a - b); } return NaN; };
+    const nmFor = (ratio) => { const k = ratio.toFixed(2); if (!cache[k]) { const nm = M.noiseMargins(Wmin, ratio * Wmin, VDD, 0.002); nm.VM = vmCurve(ratio); nm.vtc = M.vtc(Wmin, ratio * Wmin, VDD, 0.01); cache[k] = nm; } return cache[k]; };
     L.defineTasks('2', [
       { id: 'vm', zh: '调尺寸比，使开关阈值 VM = 0.90 V（VDD 的一半，误差 ±0.01 V）。此时 Wp/Wn 是多少？与迁移率比 r 比较。', en: 'Adjust the size ratio so that VM = 0.90 V (half of VDD, ±0.01 V). What is Wp/Wn? Compare with the mobility ratio r.', check: (s) => near(s.VM, 0.9, 0.01) },
       { id: 'nml', zh: '把尺寸比设为 1，读出低电平噪声容限 NML。', en: 'Set the ratio to 1 and read the low noise margin NML.', answer: { value: M.noiseMargins(Wmin, Wmin).NML, tol: 0.04, unit: 'V' } },
@@ -795,7 +796,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
     const nn = L.range('n4', (v) => String(v), draw);
     const cl = L.range('cl4', (v) => v.toFixed(1) + ' pF', draw);
     L.defineTasks('4', [
-      { id: 'best', zh: 'CL = 10 pF：找到总延时最小的级数（不超过最小值的 1.01 倍）。', en: 'CL = 10 pF: find the number of stages with the smallest total delay (within 1% of the minimum).', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t <= 1.01 * s.tmin },
+      { id: 'best', zh: 'CL = 10 pF：找到总延时真正最小的级数（不超过最小值的 1.01 倍）。它和经验公式 ln F / ln 4 一样吗？', en: 'CL = 10 pF: find the number of stages with the truly smallest delay (within 1% of the minimum). Does it match the rule of thumb ln F / ln 4?', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t <= 1.01 * s.tmin },
       { id: 'f', zh: '取 6 级时，每级的扇出 f 是多少？', en: 'With 6 stages, what is the fan-out f of each stage?', answer: { value: Math.pow(P.problems.p14.CL / M.cin(Wmin, r * Wmin), 1 / 6), tol: 0.03, unit: '' } },
       { id: 'fewest', robot: true, zh: '栅极驱动器输入要求延时小于 0.3 ns：在 CL = 10 pF 下，用最少的级数满足要求。', en: 'The gate-driver input needs a delay under 0.3 ns: with CL = 10 pF, meet it with the fewest stages.', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t < 0.3e-9 && s.N === s.nFew },
     ], 'tk4');
@@ -856,7 +857,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
     const g = L.range('g5', (x) => Math.round(Math.pow(10, x)).toLocaleString('en-US'), draw);
     const fo4 = (V) => { const d = M.fo4(Wmin, r * Wmin, V); return (d.tphl + d.tplh) / 2; };
     L.defineTasks('5', [
-      { id: 'read', robot: true, zh: '巡线小车控制芯片：1 万个门、翻转率 0.1、100 MHz、1.8 V。读出动态功耗。', en: 'Line-following car controller: 10 000 gates, α = 0.1, 100 MHz, 1.8 V. Read the dynamic power.', answer: { value: q.N * q.alpha * q.Cgate * VDD * VDD * q.f * 1e3, tol: 0.02, unit: 'mW' } },
+      { id: 'read', robot: true, zh: '巡线小车控制芯片：1 万个门、0→1 翻转率 0.1、100 MHz、1.8 V。读出动态功耗。', en: 'Line-following car controller: 10 000 gates, 0→1 activity α = 0.1, 100 MHz, 1.8 V. Read the dynamic power.', answer: { value: q.N * q.alpha * q.Cgate * VDD * VDD * q.f * 1e3, tol: 0.02, unit: 'mW' } },
       { id: 'low', zh: '其他条件不变，把电压降到 1.20 V。功耗降到多少？降了百分之几？', en: 'Keep everything else and lower the supply to 1.20 V. What does the power become, and by what percentage did it fall?', check: (s) => near(s.V, 1.2, 0.001) && near(s.f, 1e8, 1) && near(s.a, 0.1, 1e-6) && near(s.N, 1e4, 1) },
       { id: 'limit', robot: true, zh: '控制环要求 FO4 延时不超过 100 ps：找出满足要求的最低电压（不比最低值高出 0.01 V 以上）。', en: 'The control loop needs FO4 delay ≤ 100 ps: find the lowest supply that meets it (within 0.01 V of the limit).', check: (s) => s.d <= 100e-12 && fo4(s.V - 0.011) > 100e-12 },
     ], 'tk5');
@@ -882,11 +883,11 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       L.readout('ro5', [
         [T('动态功耗', 'Dynamic power'), si(Pw, 'W')],
         [T('相对 1.8 V', 'Relative to 1.8 V'), ((V / VDD) ** 2 * 100).toFixed(0) + '%'],
-        [T('每次翻转能量 CV²', 'Energy per transition CV²'), si(q.Cgate * V * V, 'J')],
+        [T('每次 0→1 翻转电源送出 CV²', 'Supply energy per 0→1 transition CV²'), si(q.Cgate * V * V, 'J')],
         [T('FO4 延时', 'FO4 delay'), (d * 1e12).toFixed(1) + ' ps'],
         [T('只供芯片时 7.4 Wh 电池可用', '7.4 Wh battery, chip only'), hours > 1e4 ? (hours / 24 / 365).toFixed(1) + T(' 年', ' yr') : hours.toFixed(0) + ' h'],
       ]);
-      L.problem('pb5', '机器人问题：巡线小车控制芯片的功耗预算', '小车控制芯片约 1 万个门，平均每个时钟有 10% 的门翻转，时钟 100 MHz。动态功耗多大？把电压从 1.8 V 降到 1.2 V 能省多少，又要付出什么代价？', 'Robot problem: power budget of a line-following car controller', 'The controller has about 10 000 gates, 10% switching each cycle at 100 MHz. What is the dynamic power? How much does dropping from 1.8 V to 1.2 V save, and at what cost?');
+      L.problem('pb5', '机器人问题：巡线小车控制芯片的功耗预算', '小车控制芯片约 1 万个门，平均每个时钟有 10% 的门发生 0→1 翻转，时钟 100 MHz。动态功耗多大？把电压从 1.8 V 降到 1.2 V 能省多少，又要付出什么代价？', 'Robot problem: power budget of a line-following car controller', 'The controller has about 10 000 gates, 10% making a 0→1 transition each cycle at 100 MHz. What is the dynamic power? How much does dropping from 1.8 V to 1.2 V save, and at what cost?');
       L.check('5', { V, f: fr, a: al, N, P: Pw, d });
     }
     draws['5'] = draw; L.onLang(draw);

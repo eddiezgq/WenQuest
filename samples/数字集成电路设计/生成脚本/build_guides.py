@@ -102,7 +102,7 @@ def report(lab=None):
     d.bh("九、AI 使用声明", "9  AI use statement")
     d.p("□ 未使用 AI　　□ 用 AI 解释概念　　□ 用 AI 检查计算　　□ 其他：____________", indent=False)
     d.en("□ No AI used   □ AI to explain concepts   □ AI to check calculations   □ Other: ____________")
-    d.p("如使用了 AI，请写明用在哪里：", indent=False); d.lines(2)
+    d.p("如使用了 AI，请写明用在哪里：", indent=False); d.en("If you used AI, say where and how:"); d.lines(2)
     d.bh("评分量规", "Rubric")
     d.table(["项目 Criterion", "分值 Points", "要求 What earns full marks"],
             [["原理 Principles", "20", "公式正确、说明物理意义 / correct formulas with physical meaning"],

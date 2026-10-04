@@ -33,18 +33,19 @@ EN = {
     "波形上看：上升和下降变得一样快": "In the waveform: rising and falling edges now match",
     "代价：PMOS 更大，输入电容也更大": "The cost: a larger PMOS and a larger input capacitance",
     "最小反相器直接驱动 10 pF：RC 很大，边沿很慢": "A minimum inverter driving 10 pF directly: huge RC, very slow edge",
-    "插入逐级放大的反相器链，每级只驱动约 4 倍于自己的负载": "Insert a chain that grows stage by stage; each drives about 4 times its own load",
+    "插入逐级放大的反相器链，每级的负载约为本级输入电容的 4 倍": "Insert a tapered chain; each stage drives a load about 4× its own input capacitance",
     "每级都很快，总延时从几十纳秒降到不到 0.3 纳秒": "Each stage is fast; total delay drops from tens of ns to under 0.3 ns",
     "充电：电源送出 CV²，一半存在电容里，一半在 PMOS 上变成热": "Charging: the supply delivers CV², half stored, half burnt in the PMOS",
     "放电：电容里的 ½CV² 在 NMOS 上变成热": "Discharging: the stored ½CV² is burnt in the NMOS",
-    "每秒翻转 αfN 次：P = αCV²fN": "αfN transitions per second: P = αCV²fN",
+    "每秒 αfN 次 0→1 翻转：P = αCV²fN": "αfN rising (0→1) transitions per second: P = αCV²fN",
     "电压从 1.8 V 降到 1.2 V：功耗降到 44%": "Lower the supply from 1.8 V to 1.2 V: power drops to 44%",
     "静态时总有一个管子截止，没有直流功耗": "One transistor is always off in steady state: no static power",
     "线性区 NMOS 相当于电阻 Ron": "In the linear region the NMOS acts as a resistor Ron",
     "VM 由两管强弱之比决定": "VM is set by the strength ratio of the two transistors",
     "噪声容限 NML = VIL − VOL，NMH = VOH − VIH": "Noise margins NML = VIL − VOL, NMH = VOH − VIH",
     "对称尺寸：上升下降一样快": "Symmetric sizing: equal rise and fall",
-    "最优级数：每级扇出约 4": "Optimum number of stages: fan-out about 4 per stage",
+    "经验公式：每级扇出约 4": "Rule of thumb: fan-out about 4 per stage",
+    "本模型自载较小（γ ≈ 0.67），最优为 7 级，只比 6 级快 1%": "With small self-load (γ ≈ 0.67) the optimum here is 7 stages, only 1% faster than 6",
     "降压最省电，但门会变慢": "Lowering VDD saves most power, but slows the gates",
 }
 
@@ -82,7 +83,7 @@ class Base(Scene):
         full = []
         for m in lines:
             full.append(m)
-            src = getattr(m, "text", None) or getattr(m, "original_text", None)
+            src = getattr(m, "original_text", None) or getattr(m, "text", None)
             if isinstance(m, Text) and src in EN:
                 full.append(en(EN[src], 22))
         body = VGroup(*full).arrange(DOWN, buff=0.3)
@@ -120,7 +121,7 @@ class SwitchPath(Base):
             n = switch([x, 0, 0], [x, -2.3, 0], vin == 1, GREEN_ if vin == 1 else MUTED)
             lp = zh("PMOS", 24, GREEN_ if vin == 0 else MUTED).next_to(p, LEFT, buff=0.3)
             ln = zh("NMOS", 24, GREEN_ if vin == 1 else MUTED).next_to(n, LEFT, buff=0.3)
-            li = zh(f"输入 = {vin}", 28, YELLOW).move_to([-5.2, 0, 0])
+            li = VGroup(zh(f"输入 = {vin}", 28, YELLOW), en(f"input = {vin}", 20)).arrange(DOWN, buff=0.08).move_to([-5.2, 0, 0])
             return VGroup(p, n, lp, ln, li)
 
         s0 = stage(0)
@@ -172,7 +173,7 @@ class VtcSweep(Base):
 
         def regions():
             i = int(t.get_value() * 360); v, o = vs[i], vo[i]
-            name = {"off": "截止", "lin": "线性", "sat": "饱和"}
+            name = {"off": "截止 off", "lin": "线性 linear", "sat": "饱和 saturation"}
             def reg(vgs, vds, vt): return "off" if vgs <= vt else ("lin" if vds < vgs - vt else "sat")
             rn, rp = reg(v, o, M.VTn), reg(M.VDD - v, M.VDD - o, M.VTp)
             g = VGroup(zh(f"NMOS：{name[rn]}", 28, GREEN_), zh(f"PMOS：{name[rp]}", 28, VIOLET_),
@@ -275,7 +276,7 @@ class Chain(Base):
         slow = ax.plot(lambda x: 1.8 * (1 - np.exp(-x * 1.2)), x_range=[0, 1], color=RED_, stroke_width=4)
         tl = MathTex(rf"t\approx{t1*1e9:.0f}\,\mathrm{{ns}}", font_size=34, color=RED_).next_to(ax, RIGHT, buff=0.2).shift(UP * 0.5)
         self.play(Create(ax), Create(slow, run_time=3, rate_func=linear), Write(tl)); self.wait(0.8)
-        self.caption("插入逐级放大的反相器链，每级只驱动约 4 倍于自己的负载")
+        self.caption("插入逐级放大的反相器链，每级的负载约为本级输入电容的 4 倍")
         N = 6; f = (CL / M.cin(M.Wmin, r * M.Wmin)) ** (1 / N)
         stages = VGroup(*[inv(0.18 + 0.12 * i) for i in range(N)]).arrange(RIGHT, buff=0.35).move_to([0, 1.2, 0])
         labels = VGroup(*[MathTex(rf"\times{f**i:.0f}" if f ** i >= 10 else rf"\times{f**i:.1f}", font_size=22, color=MUTED).next_to(s, DOWN, buff=0.15) for i, s in enumerate(stages)])
@@ -287,35 +288,36 @@ class Chain(Base):
         fast = ax.plot(lambda x: 1.8 * (1 - np.exp(-x * 60)), x_range=[0, 1], color=GREEN_, stroke_width=4)
         self.play(Create(fast), run_time=1.0)
         self.caption("每级都很快，总延时从几十纳秒降到不到 0.3 纳秒")
-        tf_ = VGroup(zh("6 级", 28, GREEN_), MathTex(rf"t\approx{tN*1e12:.0f}\,\mathrm{{ps}}", font_size=34, color=GREEN_)).arrange(RIGHT, buff=0.15).next_to(tl, DOWN, buff=0.3)
+        tf_ = VGroup(zh("6 级 6 stages", 26, GREEN_), MathTex(rf"t\approx{tN*1e12:.0f}\,\mathrm{{ps}}", font_size=34, color=GREEN_)).arrange(RIGHT, buff=0.15).next_to(tl, DOWN, buff=0.3)
         self.play(Write(tf_)); self.wait(2.5)
-        self.card([zh("最优级数：每级扇出约 4", 30), MathTex(r"N\approx\frac{\ln F}{\ln 4},\quad F=\frac{C_L}{C_{in}}", font_size=44),
-                   MathTex(rf"F\approx{CL / M.cin(M.Wmin, r * M.Wmin):.0f}\ \Rightarrow\ N\approx 6", font_size=40)])
+        self.card([zh("经验公式：每级扇出约 4", 30), MathTex(r"N\approx\frac{\ln F}{\ln 4},\quad F=\frac{C_L}{C_{in}}", font_size=44),
+                   MathTex(rf"F\approx{CL / M.cin(M.Wmin, r * M.Wmin):.0f}\ \Rightarrow\ N\approx 6", font_size=40),
+                   zh("本模型自载较小（γ ≈ 0.67），最优为 7 级，只比 6 级快 1%", 26)])
 
 
 # ---------------------------------------------------------------------------------- 1.5
 class Power(Base):
     def construct(self):
         self.title("1.5", "功耗：每次翻转的能量")
-        supply = VGroup(Rectangle(width=1.6, height=0.9, color=BLUE_), zh("电源", 26, BLUE_)).move_to([-4.6, 1.2, 0])
+        supply = VGroup(Rectangle(width=2.0, height=0.9, color=BLUE_), zh("电源 Supply", 22, BLUE_)).move_to([-4.6, 1.2, 0])
         pm = VGroup(Rectangle(width=1.4, height=0.8, color=VIOLET_), zh("PMOS", 24, VIOLET_)).move_to([-1.6, 1.2, 0])
         capb = VGroup(Rectangle(width=1.2, height=2.0, color=WHITE), zh("C", 28)).move_to([1.4, 1.0, 0])
         nm = VGroup(Rectangle(width=1.4, height=0.8, color=GREEN_), zh("NMOS", 24, GREEN_)).move_to([4.4, 1.2, 0])
         arrows = VGroup(Arrow(supply.get_right(), pm.get_left(), color=MUTED), Arrow(pm.get_right(), capb.get_left(), color=MUTED), Arrow(capb.get_right(), nm.get_left(), color=MUTED))
         self.play(FadeIn(supply, pm, capb, nm), Create(arrows))
-        fill = Rectangle(width=1.1, height=0.01, fill_color=ORANGE_, fill_opacity=0.8, stroke_width=0).align_to(capb[0], DOWN).shift(UP * 0.05)
+        fill = Rectangle(width=1.1, height=0.01, fill_color=ORANGE_, fill_opacity=0.8, stroke_width=0).move_to(capb[0].get_bottom() + UP * 0.06)
         self.add(fill)
         self.caption("充电：电源送出 CV²，一半存在电容里，一半在 PMOS 上变成热")
-        heat1 = VGroup(MathTex(r"\tfrac12 CV^2", font_size=32, color=RED_), zh("热", 26, RED_)).arrange(RIGHT, buff=0.12).next_to(pm, DOWN)
+        heat1 = VGroup(MathTex(r"\tfrac12 CV^2", font_size=32, color=RED_), zh("热 heat", 22, RED_)).arrange(RIGHT, buff=0.12).next_to(pm, DOWN)
         store = MathTex(r"\tfrac12 CV^2", font_size=32, color=ORANGE_).next_to(capb, DOWN)
         draw = MathTex(r"CV^2", font_size=32, color=BLUE_).next_to(supply, DOWN)
         self.play(fill.animate.stretch_to_fit_height(1.8, about_edge=DOWN), Write(draw), Write(heat1), Write(store), run_time=2.5)
         self.wait(0.8)
         self.caption("放电：电容里的 ½CV² 在 NMOS 上变成热")
-        heat2 = VGroup(MathTex(r"\tfrac12 CV^2", font_size=32, color=RED_), zh("热", 26, RED_)).arrange(RIGHT, buff=0.12).next_to(nm, DOWN)
+        heat2 = VGroup(MathTex(r"\tfrac12 CV^2", font_size=32, color=RED_), zh("热 heat", 22, RED_)).arrange(RIGHT, buff=0.12).next_to(nm, DOWN)
         self.play(fill.animate.stretch_to_fit_height(0.01, about_edge=DOWN), Write(heat2), FadeOut(store), run_time=2.5)
         self.wait(0.6)
-        self.caption("每秒翻转 αfN 次：P = αCV²fN")
+        self.caption("每秒 αfN 次 0→1 翻转：P = αCV²fN")
         q = M.P["problems"]["p15"]
         p1 = M.dyn_power(q["N"], q["alpha"], q["Cgate"], M.VDD, q["f"]); p2 = M.dyn_power(q["N"], q["alpha"], q["Cgate"], q["Vlow"], q["f"])
         eq = MathTex(rf"P=0.1\times 5\,\mathrm{{fF}}\times(1.8\,\mathrm{{V}})^2\times 100\,\mathrm{{MHz}}\times 10^4={p1*1e3:.2f}\,\mathrm{{mW}}", font_size=34).move_to([0, -1.1, 0])
@@ -332,4 +334,4 @@ class Power(Base):
         l2 = MathTex(rf"1.2\,\mathrm{{V}}:\ {p2*1e3:.2f}\,\mathrm{{mW}}", font_size=28).next_to(b2, RIGHT)
         self.play(FadeIn(l2)); self.wait(2.5)
         self.card([zh("降压最省电，但门会变慢", 30), MathTex(r"P_{dyn}=\alpha\,C\,V_{DD}^2\,f\,N", font_size=48),
-                   MathTex(r"E_{\mathrm{transition}}=C V_{DD}^2", font_size=40)])
+                   MathTex(r"E_{0\to 1}=C V_{DD}^2\ \ (\alpha:\ P(0\to 1))", font_size=40)])
