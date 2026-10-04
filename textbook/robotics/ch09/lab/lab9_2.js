@@ -5,12 +5,12 @@
 WQ.lab({
   title: ["实验 9.2 不确定性椭圆", "Lab 9.2 The uncertainty ellipse"],
   goal: ["由关节角的误差求末端位置的协方差矩阵和不确定性椭圆，用蒙特卡洛模拟核对，并找出线性化失效的条件。",
-         "Propagate joint-angle errors to the tip covariance and uncertainty ellipse, check by Monte Carlo, and find where linearization fails."],
+         "Propagate joint-angle errors to the end-effector covariance and uncertainty ellipse, check by Monte Carlo, and find where linearization fails."],
   scenes: [
     { id: "arm", robot: true, name: ["平面 2R 臂（UR5e 侧视）", "Planar 2R arm (UR5e side view)"], hide: ["d", "hand"],
-      problem: { title: ["机器人问题：关节角差 0.1°，末端差多少", "Robot problem: 0.1° on the joints, how much at the tip"],
+      problem: { title: ["机器人问题：关节角差 0.1°，末端差多少", "Robot problem: 0.1° on the joints, how much at the end-effector?"],
                  text: ["编码器、背隙和连杆变形使关节角有小的随机误差。末端位置的误差有多大、朝哪个方向？",
-                        "Encoders, backlash and link bending give the joint angles small random errors. How large is the tip error, and in which direction?"] } },
+                        "Encoders, backlash and link bending give the joint angles small random errors. How large is the end-effector error, and in which direction?"] } },
     { id: "laser", name: ["手持激光笔照墙", "A hand-held laser pointer"], hide: ["t2", "s2", "mag"],
       params: { t1: { min: -20, max: 20, step: 1, value: 0 }, s1: { min: 0, max: 2, step: 0.05, value: 0.5 } },
       problem: { title: ["生活中的例子：光点为什么在墙上晃", "Everyday example: why the dot dances on the wall"],
@@ -24,21 +24,21 @@ WQ.lab({
     { id: "s2", name: ["θ₂ 的标准差", "Std of θ₂"], min: 0, max: 10, step: 0.05, value: 0.1, unit: "°", digits: 2 },
     { id: "mag", name: ["椭圆放大倍数", "Ellipse magnification"], min: 1, max: 300, step: 1, value: 100, unit: "×", digits: 0 },
     { id: "d", name: ["到墙的距离", "Distance to the wall"], min: 0.5, max: 10, step: 0.5, value: 5, unit: "m", digits: 1 },
-    { id: "hand", name: ["手的平移误差（标准差）", "Hand shift (std)"], min: 0, max: 20, step: 1, value: 0, unit: "mm", digits: 0 },
+    { id: "hand", name: ["手的平移误差（标准差）", "Hand shift (standard deviation)"], min: 0, max: 20, step: 1, value: 0, unit: "mm", digits: 0 },
   ],
   buttons: [{ id: "start", name: ["开始蒙特卡洛", "Run Monte Carlo"], primary: true }, { id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "ex", robot: true, text: ["复现算例 9.2.3：θ = (30°, 60°)，两个标准差都为 0.1°，蒙特卡洛 2000 次以上，两种方法的 σx 相差不到 5%。", "Example 9.2.3: θ = (30°, 60°), both stds 0.1°, at least 2000 Monte Carlo runs; the two σx agree within 5%."],
+    { id: "ex", robot: true, text: ["复现算例 9.2.3：θ = (30°, 60°)，两个标准差都为 0.1°，蒙特卡洛 2000 次以上，两种方法的 σx 相差不到 5%。", "Reproduce Example 9.2.3: θ = (30°, 60°), both standard deviations 0.1°, at least 2,000 Monte Carlo runs; the two σx agree within 5%."],
       demo: { scene: "arm", set: { t1: 30, t2: 60, s1: 0.1, s2: 0.1, mag: 100 }, press: ["start"], wait: 6 } },
     { id: "flat", robot: true, text: ["把手臂接近伸直，使椭圆长短轴之比超过 20。", "Nearly straighten the arm so the ellipse axis ratio exceeds 20."],
       demo: { scene: "arm", set: { t1: 30, t2: 8, s1: 0.1, s2: 0.1 }, press: [], wait: 1 } },
-    { id: "big", robot: true, text: ["两个标准差都加大到 8°，运行蒙特卡洛，观察末端均值偏离 f(μ) 超过 5 mm。", "Raise both stds to 8°, run Monte Carlo, and see the mean tip move more than 5 mm from f(μ)."],
+    { id: "big", robot: true, text: ["两个标准差都加大到 8°，运行蒙特卡洛，观察末端均值偏离 f(μ) 超过 5 mm。", "Raise both standard deviations to 8°, run Monte Carlo, and see the mean end-effector position move more than 5 mm from f(μ)."],
       demo: { scene: "arm", set: { t1: 30, t2: 60, s1: 8, s2: 8, mag: 1 }, press: ["start"], wait: 6 } },
     { id: "laser", text: ["激光笔：手抖 0.5°、距墙 5 m、手不平移，读出光点的标准差。", "Laser: 0.5° tremor, 5 m to the wall, no hand shift; read the dot's standard deviation."],
       demo: { scene: "laser", set: { t1: 0, s1: 0.5, d: 5, hand: 0 }, press: ["start"], wait: 5 } },
   ],
   think: ["二维的 1 倍椭圆只包含约 39% 的点，为什么比一维 ±σ 的 68% 少？手臂伸直时，为什么沿手臂方向几乎没有误差？",
-          "Why does the 2-D 1σ ellipse hold only about 39% of the points, fewer than 68% in 1-D? Why is there almost no error along a straight arm?"],
+          "Why does the 2D 1σ ellipse hold only about 39% of the points, fewer than 68% in 1D? Why is there almost no error along a straight arm?"],
 
   L: [0.425, 0.392],
   C95: Math.sqrt(-2 * Math.log(0.05)),
@@ -87,11 +87,11 @@ WQ.lab({
     if (api.scene === "laser") {
       const sl = this.laserSig(api);
       if (m && m.n >= 500 && Math.abs(api.p.s1 - 0.5) < 0.01 && Math.abs(api.p.d - 5) < 0.01 && api.p.hand === 0) api.done("laser");
-      return [[["光点标准差（公式）", "dot std (formula)"], mm(sl)],
+      return [[["光点标准差（公式）", "dot standard deviation (formula)"], mm(sl)],
               [["其中转角部分 d·σ", "angle part d·σ"], mm(api.p.d * api.p.s1 * this.rad)],
               [["其中平移部分", "shift part"], mm(api.p.hand / 1000)],
               [["蒙特卡洛次数", "Monte Carlo runs"], m ? String(m.n) : "0"],
-              [["光点标准差（蒙特卡洛）", "dot std (Monte Carlo)"], m ? mm(m.sy) : "—"]];
+              [["光点标准差（蒙特卡洛）", "dot standard deviation (Monte Carlo)"], m ? mm(m.sy) : "—"]];
     }
     const L = this.lin(api), sx = Math.sqrt(L.S[0][0]), sy = Math.sqrt(L.S[1][1]), ratio = Math.sqrt(L.l1 / Math.max(L.l2, 1e-30));
     const r = this.rad, f = this.fk(api.p.t1 * r, api.p.t2 * r);

@@ -62,10 +62,10 @@ WQ.lab({
     if (api.scene === "qc") {
       const al = p.hit * p.base + p.fa * (1 - p.base), post = p.hit * p.base / al;
       if (Math.abs(p.base - 0.01) < 1e-6 && Math.abs(p.hit - 0.95) < 1e-6 && Math.abs(p.fa - 0.05) < 1e-6) api.done("qc");
-      return [[["1000 个中有缺陷", "defective of 1000"], api.fmt(1000 * p.base, 1)],
+      return [[["1000 个中有缺陷", "defective of 1,000"], api.fmt(1000 * p.base, 1)],
               [["其中报警", "of which alarmed"], api.fmt(1000 * p.base * p.hit, 1)],
               [["无缺陷却报警（误报）", "good but alarmed"], api.fmt(1000 * (1 - p.base) * p.fa, 1)],
-              [["报警的概率 Pr(A)", "P(alarm)"], api.fmt(100 * al, 2) + " %"],
+              [["报警的概率 Pr(A)", "Pr(alarm)"], api.fmt(100 * al, 2) + " %"],
               [["报警齿轮真有缺陷 Pr(D | A)", "P(defective | alarm)"], api.fmt(100 * post, 1) + " %"]];
     }
     const tags = this.TAGS.reduce((a, i) => a + s.bel[i], 0);

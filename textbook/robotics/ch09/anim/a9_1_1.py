@@ -18,7 +18,7 @@ class Lesson(Base):
                   axis_config={"color": GREY_B, "include_tip": False, "font_size": 22},
                   x_axis_config={"numbers_to_include": [14.8, 14.9, 15.0, 15.1, 15.2], "decimal_number_config": {"num_decimal_places": 1}},
                   y_axis_config={"numbers_to_include": [0, 100, 200]}).shift(UP * 0.45 + LEFT * 1.2)
-        xl = zh("读数 / N", 20, MUTED).next_to(ax.x_axis, RIGHT, buff=0.2)
+        xl = bi(["读数 / N", "Reading / N"], 20, MUTED).next_to(ax.x_axis, RIGHT, buff=0.2)
         self.play(Create(ax), FadeIn(xl), run_time=1.0)
 
         n = ValueTracker(1)
@@ -73,7 +73,7 @@ class Lesson(Base):
         s = float(np.std(data, ddof=1))
         curve = ax.plot(lambda x: 2000 * 0.02 * math.exp(-0.5 * ((x - m) / s) ** 2) / (s * math.sqrt(2 * math.pi)),
                         x_range=[14.70, 15.30, 0.002], color=BLUE, stroke_width=5)
-        self.caption("用样本均值和样本标准差画出高斯曲线：两者吻合", "The Gaussian with the sample mean and std fits the bars", wait=0)
+        self.caption("用样本均值和样本标准差画出高斯曲线：两者吻合", "The Gaussian drawn with the sample mean and sample standard deviation fits the bars", wait=0)
         self.play(Create(curve), run_time=2.5)
         self.wait(1.5)
         self.caption("样本均值和 s 随读数增多而稳定，接近 15 N 和 0.08 N", "x̄ and s settle near 15 N and 0.08 N as readings accumulate")

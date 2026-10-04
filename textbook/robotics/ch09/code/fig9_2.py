@@ -13,6 +13,7 @@ from _prob import ellipse_pts, fk2, jac2, L2R
 from bookout import COLORS as C, T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 d = math.radians
 rng = np.random.default_rng(9021)
 c95 = math.sqrt(-2 * math.log(0.05))
@@ -36,7 +37,7 @@ th = np.array([d(30), d(60)])
 P = (fk2(th[:, None] + sth * rng.standard_normal((2, n))) - fk2(th)[:, None]) * 1000
 sets = [(a, b, T("两个独立的传感器", "two independent sensors"), "N", 0.4),
         (X, Y, T("共用电源的两个传感器", "two sensors on one supply"), "N", 0.4),
-        (P[0], P[1], T("2R 臂末端的 x、y 偏差", "2R arm tip: x and y errors"), "mm", 4.5)]
+        (P[0], P[1], T("2R 臂末端的 x、y 偏差", "2R arm end-effector: x and y errors"), "mm", 4.5)]
 for ax, (u, v, title, unit, lim) in zip(axs, sets):
     ax.scatter(u, v, s=4, color=C["z"], alpha=0.45, lw=0)
     r = np.corrcoef(u, v)[0, 1]
@@ -45,8 +46,8 @@ for ax, (u, v, title, unit, lim) in zip(axs, sets):
     ax.set_xlim(-lim, lim)
     ax.set_ylim(-lim, lim)
     ax.set_aspect("equal")
-    ax.set_xlabel(T(f"偏差 1 / {unit}", f"error 1 / {unit}") if unit == "N" else f"$\\delta x$ / mm", fontsize=9)
-    ax.set_ylabel(T(f"偏差 2 / {unit}", f"error 2 / {unit}") if unit == "N" else f"$\\delta y$ / mm", fontsize=9)
+    ax.set_xlabel(T(f"偏差 1 / {unit}", f"Error 1 / {unit}") if unit == "N" else f"$\\delta x$ / mm", fontsize=9)
+    ax.set_ylabel(T(f"偏差 2 / {unit}", f"Error 2 / {unit}") if unit == "N" else f"$\\delta y$ / mm", fontsize=9)
     ax.tick_params(labelsize=8)
     clean(ax)
 fig.tight_layout()
@@ -66,7 +67,7 @@ for c, ls, lab in ((1, "-", "$c = 1$"), (2, "--", "$c = 2$"), (c95, ":", T("95% 
     h, = ax.plot(E[0], E[1], color=C["z"], lw=1.5, ls=ls, label=lab)
     handles.append(h)
 ax.legend(handles=handles, loc="lower left", fontsize=9, frameon=False)
-for i, col, name, pos in ((1, C["x"], r"$\sqrt{\lambda_1}\,v_1$", (1.55, -0.95)), (0, C["accent"], r"$\sqrt{\lambda_2}\,v_2$", (0.55, 0.95))):
+for i, col, name, pos in ((1, C["x"], r"$\sqrt{\lambda_1}\,v_1$", (1.0, -1.9)), (0, C["accent"], r"$\sqrt{\lambda_2}\,v_2$", (0.55, 0.95))):
     v = V[:, i] * math.sqrt(lam[i])
     if v[0] < 0:
         v = -v
@@ -110,7 +111,7 @@ for ax, (t1, t2), title in zip(axs, ((30, 60), (30, 10)),
     ax.set_ylim(-0.12, 1.2)
     ax.axis("off")
 fig.text(0.5, 0.01, T("蓝点：关节角各加标准差 0.1° 的随机误差后的末端；蓝线：95% 不确定性椭圆。均放大 100 倍",
-                            "blue dots: tip with 0.1° random errors on each joint; blue line: 95% uncertainty ellipse; both magnified ×100"),
+                            "blue dots: end-effector with 0.1° random errors on each joint; blue line: 95% uncertainty ellipse; both magnified 100 times"),
             fontsize=8.5, color=C["muted"], ha="center")
 fig.tight_layout(rect=(0, 0.04, 1, 1))
 figure(fig, "fig9_2_3")
@@ -129,16 +130,16 @@ ax.plot(E[0], E[1], color=C["z"], lw=1.6)
 mc = cl.mean(axis=1)
 ax.plot(*e, "o", ms=6, color=C["z"])
 ax.plot(*mc, "s", ms=6, color=C["x"])
-ax.annotate(T("f(μ)：关节角取均值时的末端", "f(μ): tip at the mean joint angles"), xy=e, xytext=(0.42, 0.72),
+ax.annotate(T("f(μ)：关节角取均值时的末端", "f(μ): end-effector at the mean joint angles"), xy=e, xytext=(0.42, 0.72),
             fontsize=9, color=C["z"], arrowprops=dict(arrowstyle="-", color=C["z"], lw=0.8))
-ax.annotate(T("末端位置的均值（蒙特卡洛）", "mean tip position (Monte Carlo)"), xy=mc, xytext=(0.06, 0.44),
+ax.annotate(T("末端位置的均值（蒙特卡洛）", "mean end-effector position (Monte Carlo)"), xy=mc, xytext=(0.06, 0.44),
             fontsize=9, color=C["x"], arrowprops=dict(arrowstyle="-", color=C["x"], lw=0.8))
 ax.text(0.645, 0.50, T("线性化的\n95% 椭圆", "linearized\n95% ellipse"), fontsize=9, color=C["z"])
 # 以基座为圆心的圆弧：末端与基座的距离只由 θ2 决定
 r = np.linalg.norm(e)
 ang = np.linspace(math.atan2(e[1], e[0]) - 0.6, math.atan2(e[1], e[0]) + 0.6, 100)
 ax.plot(r * np.cos(ang), r * np.sin(ang), color=C["accent"], lw=0.9, ls="--")
-ax.text(-0.02, 0.73, T("以基座为圆心的圆弧（虚线）", "arc about the base (dashed)"), fontsize=9, color=C["accent"])
+ax.text(-0.04, 0.765, T("以基座为圆心的圆弧（虚线）", "arc about the base (dashed)"), fontsize=9, color=C["accent"])
 ax.set_aspect("equal")
 ax.set_xlim(-0.06, 0.78)
 ax.set_ylim(0.28, 0.80)

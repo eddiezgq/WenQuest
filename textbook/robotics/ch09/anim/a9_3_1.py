@@ -17,11 +17,11 @@ class Lesson(Base):
                   axis_config={"color": GREY_B, "include_tip": False, "font_size": 22},
                   x_axis_config={"numbers_to_include": [3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0], "decimal_number_config": {"num_decimal_places": 1}},
                   y_axis_config={"include_ticks": False}).shift(DOWN * 0.35)
-        xl = zh("通道上的位置 x / m", 20, MUTED).next_to(ax.x_axis, UP, buff=0.12).align_to(ax.x_axis, LEFT).shift(RIGHT * 0.3)
+        xl = bi(["通道上的位置 x / m", "Position along the aisle x / m"], 20, MUTED).next_to(ax.x_axis, UP, buff=0.12).align_to(ax.x_axis, LEFT).shift(RIGHT * 0.3)
         floor_y = ax.c2p(0, 14.5)[1]
         wall = VGroup(Line(ax.c2p(6.0, 0), [ax.c2p(6.0, 0)[0], floor_y + 1.4, 0], color=GREY_B, stroke_width=6),
                       Dot([ax.c2p(6.0, 0)[0] - 0.08, floor_y + 0.45, 0], radius=0.09, color=YELLOW))
-        tag = zh("标志", 20, YELLOW).next_to(wall[1], RIGHT, buff=0.12)
+        tag = bi(["标志", "Tag"], 20, YELLOW).next_to(wall[1], RIGHT, buff=0.12)
         self.play(Create(ax), FadeIn(xl), FadeIn(wall), FadeIn(tag), run_time=1.2)
 
         mu = ValueTracker(3.2)
