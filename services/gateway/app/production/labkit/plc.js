@@ -1403,7 +1403,119 @@ function ladderToSt(rungs) {
   return out.join("\n\n");
 }
 
-const API = { lex, parse, parseExpr, compile, compileLadder, ladderToSt, Runtime, runTest, exportXml, parseTime, fmtTime, normAddr, PlcError, STD_FB, STD_FN };
+// ---------------------------------------------------------------- program review (the rule part of the AI program reviewer)
+// review({st} | {decls, ladder}, io) -> [{level: "error"|"warning"|"info", rule, line, msg: [zh, en]}]
+// The rules catch what PLC engineers check in a code review; a language model may later word the findings, never add them.
+function review(prog, io = []) {
+  const out = [];
+  const add = (level, rule, line, zh, en) => out.push({ level, rule, line: line || 0, msg: [zh, en] });
+  const ioBy = {};
+  io.forEach((x) => { ioBy[x.name.toUpperCase()] = x; });
+  const isLadder = !!prog.ladder;
+  let ast;
+  try {
+    const text = isLadder ? `PROGRAM Main\n${prog.decls || ""}\n${ladderToSt(prog.ladder)}\nEND_PROGRAM` : prog.st;
+    ast = parse(text);
+  } catch (e) { add("error", "syntax", e.line, e.message, e.message); return out; }
+
+  // walk all statements, collecting reads, writes and calls
+  const reads = new Map(), writes = new Map(), topWrites = new Map(), calls = new Map(), trueWrites = new Set(), falseWrites = new Set();
+  const note = (m, n, line) => { const k = n.toUpperCase(); if (!m.has(k)) m.set(k, []); m.get(k).push(line); };
+  const rootName = (x) => (x.e === "name" ? x.n : x.e === "field" || x.e === "index" || x.e === "bit" ? rootName(x.a) : null);
+  function walkExpr(x, line) {
+    if (!x || typeof x !== "object") return;
+    if (x.e === "name") note(reads, x.n, line);
+    if (x.e === "call") { (x.args || []).forEach((a) => { if (a.v) walkExpr(a.v, line); if (a.out) { const r = rootName(a.out); if (r) note(writes, r, line); } }); if (x.f.e !== "name" || !STD_FN[x.f.n.toUpperCase()]) { const r = rootName(x.f); if (r) note(calls, r, line); } return; }
+    for (const k of ["a", "b", "v"]) if (x[k] && typeof x[k] === "object") walkExpr(x[k], line);
+    if (x.idx) x.idx.forEach((i) => walkExpr(i, line));
+  }
+  function walk(list, depth, loops) {
+    for (const s of list) {
+      const line = s.line;
+      if (s.s === "assign") {
+        const r = rootName(s.target);
+        if (r) { note(writes, r, line); if (depth === 0 && s.target.e === "name") note(topWrites, r, line); }
+        if (s.target.e !== "name") walkExpr(s.target, line);
+        if (s.v.e === "bool" && r) (s.v.v ? trueWrites : falseWrites).add(r.toUpperCase());
+        else if (r) { trueWrites.add(r.toUpperCase()); falseWrites.add(r.toUpperCase()); }
+        walkExpr(s.v, line);
+      } else if (s.s === "call") walkExpr(s.call, line);
+      else if (s.s === "if") { s.arms.forEach(([c, b]) => { walkExpr(c, line); walk(b, depth + 1, loops); }); walk(s.other, depth + 1, loops); }
+      else if (s.s === "case") { walkExpr(s.sel, line); s.arms.forEach((a) => walk(a.body, depth + 1, loops)); walk(s.other, depth + 1, loops); }
+      else if (s.s === "for") { note(writes, s.v, line); walkExpr(s.from, line); walkExpr(s.to, line); walk(s.body, depth + 1, loops + 1); }
+      else if (s.s === "while" || s.s === "repeat") {
+        walkExpr(s.c, line);
+        // a loop that waits for an input never ends inside one scan (Chapter 10.7)
+        const condNames = new Set(); (function names(x) { if (!x || typeof x !== "object") return; if (x.e === "name") condNames.add(x.n.toUpperCase()); for (const k of ["a", "b"]) names(x[k]); })(s.c);
+        const bodyWrites = new Map(); const saveW = new Map(writes);
+        walk(s.body, depth + 1, loops + 1);
+        const changed = [...condNames].some((n) => (writes.get(n) || []).length > (saveW.get(n) || []).length);
+        const waitsForInput = [...condNames].some((n) => ioBy[n] && ioBy[n].dir === "in");
+        if (waitsForInput) add("error", "loop-input", line, "这个循环在等输入变化：一次扫描里输入不会变，循环停不下来，看门狗会让 PLC 停机。改成每次扫描检查一次（IF）。",
+          "This loop waits for an input to change: inputs do not change within a scan, so it never ends and the watchdog stops the PLC. Check it once per scan with IF instead.");
+        else if (!changed) add("warning", "loop-static", line, "循环条件里的变量在循环体里没有改变，循环可能停不下来。", "Nothing in the loop body changes the loop condition: the loop may never end.");
+      }
+    }
+  }
+  const declared = new Map();
+  for (const u of ast.pous) {
+    walk(u.body, 0, 0);
+    if (u.kind === "program") u.vars.forEach((v) => declared.set(v.name.toUpperCase(), v));
+  }
+  const nameOf = (n) => (ioBy[n] && ioBy[n].name) || (declared.get(n) && declared.get(n).name) || n;
+  // R1 double coil: an output written unconditionally in two places (the last one wins, Chapter 4.6 and 8.5)
+  for (const [n, lines] of topWrites) if (lines.length > 1) add("error", "double-coil", lines[1], `双线圈：${nameOf(n)} 在第 ${lines.join("、")} 行都被无条件赋值，只有最后一处起作用。合并成一个表达式。`,
+    `Double coil: ${nameOf(n)} is assigned unconditionally on lines ${lines.join(", ")}; only the last one counts. Merge them into one expression.`);
+  if (isLadder) {
+    const coils = {};
+    prog.ladder.forEach((r, ri) => r.cells.forEach((row) => row.forEach((c) => { if (c && (c.k === "COIL" || c.k === "NCOIL")) (coils[c.v.toUpperCase()] = coils[c.v.toUpperCase()] || []).push(ri + 1); })));
+    for (const [n, rs] of Object.entries(coils)) if (rs.length > 1) add("error", "double-coil", 0, `双线圈：${nameOf(n)} 的线圈出现在网络 ${rs.join("、")}，只有最后一个起作用。`, `Double coil: ${nameOf(n)} has coils in rungs ${rs.join(", ")}; only the last one counts.`);
+  }
+  // R2 latched but never released: set TRUE somewhere and never FALSE (SET without RESET)
+  for (const n of trueWrites) if (!falseWrites.has(n) && ioBy[n] && ioBy[n].dir === "out")
+    add("warning", "latch", 0, `${nameOf(n)} 只被置为 TRUE，没有任何地方把它复位：一旦置位就一直保持（直到断电）。`, `${nameOf(n)} is only ever set TRUE and never reset: once set, it stays on.`);
+  // R3 stop / e-stop inputs must be used
+  for (const x of io) {
+    const nm = x.name.toUpperCase();
+    if (x.dir === "in" && /STOP|ESTOP|EMERG|急停|停止|LC|CURTAIN|LIM/.test(nm + JSON.stringify(x.comment || "")) && !reads.has(nm))
+      add("error", "stop-unused", 0, `停止或安全输入 ${x.name} 在程序里没有用到。`, `Stop or safety input ${x.name} is not used by the program.`);
+    else if (x.dir === "in" && !reads.has(nm)) add("info", "input-unused", 0, `输入 ${x.name} 没有用到。`, `Input ${x.name} is not used.`);
+    if (x.dir === "out" && !writes.has(nm)) add("info", "output-unused", 0, `输出 ${x.name} 从来没有被写。`, `Output ${x.name} is never written.`);
+  }
+  // R4 writing an input
+  for (const [n, lines] of writes) if (ioBy[n] && ioBy[n].dir === "in") add("error", "write-input", lines[0], `第 ${lines[0]} 行给输入 ${nameOf(n)} 赋值：输入映像在下一次扫描开始时会被现场信号覆盖。`,
+    `Line ${lines[0]} writes input ${nameOf(n)}: the input image is overwritten by the field signal at the next scan.`);
+  // R5 unused or never-written variables; vague names
+  for (const [n, v] of declared) {
+    if (v.kind !== "var" || v.addr) continue;
+    const used = reads.has(n) || calls.has(n);
+    if (!used && !writes.has(n)) add("info", "var-unused", v.line, `变量 ${v.name} 声明了但没有用。`, `Variable ${v.name} is declared but not used.`);
+    if (/^[a-z]\d*$|^(tmp|temp|aa|bb|xx)\d*$/i.test(v.name) && !/^[ijk]$/i.test(v.name)) add("info", "naming", v.line, `变量名 ${v.name} 看不出含义，按符号约定第二节命名。`, `The name ${v.name} says nothing; name it as in the conventions, section 2.`);
+  }
+  // R6 a timer or counter instance called in more than one place with different inputs is a classic source of bugs
+  for (const [n, lines] of calls) {
+    const v = declared.get(n);
+    if (v && v.type && STD_FB[(v.type.name || "").toUpperCase()] && lines.length > 2)
+      add("warning", "fb-multi-call", lines[0], `${nameOf(n)} 在 ${lines.length} 处被调用：同一个定时器或计数器每次扫描最好只调用一次。`, `${nameOf(n)} is called in ${lines.length} places: call a timer or counter once per scan.`);
+  }
+  // R7 an output with an interlock partner (…Fwd/…Rev, Up/Down, Open/Close) whose logic never mentions the partner
+  const pairs = [[/(FWD|FORWARD)$/, "REV"], [/UP$/, "DOWN"], [/OPEN$/, "CLOSE"]];
+  for (const x of io) {
+    if (x.dir !== "out") continue;
+    const nm = x.name.toUpperCase();
+    for (const [re, other] of pairs) {
+      if (!re.test(nm)) continue;
+      const partner = io.find((y) => y.dir === "out" && y.name.toUpperCase() === nm.replace(re, other));
+      if (partner && reads.has(nm) === false && reads.has(partner.name.toUpperCase()) === false && writes.has(nm) && writes.has(partner.name.toUpperCase()))
+        add("warning", "interlock", 0, `${x.name} 与 ${partner.name} 不能同时得电，但程序里两者互相没有联锁（都没有读对方）。`,
+          `${x.name} and ${partner.name} must never be on together, but neither one's logic reads the other: no interlock.`);
+    }
+  }
+  const order = { error: 0, warning: 1, info: 2 };
+  return out.sort((a, b) => order[a.level] - order[b.level] || a.line - b.line);
+}
+
+const API = { review, lex, parse, parseExpr, compile, compileLadder, ladderToSt, Runtime, runTest, exportXml, parseTime, fmtTime, normAddr, PlcError, STD_FB, STD_FN };
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 else root.WQPLC = API;
 })(typeof window !== "undefined" ? window : globalThis);

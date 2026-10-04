@@ -366,6 +366,24 @@ function setup(L, K) {
   testv.firstChild.append(bRun, biText(el("span", "hint"), ["测试用你现在的程序，在模拟时间里驱动设备，自动判断对不对（含故障）。",
     "Tests run your current program against the machine in simulated time and judge the result (faults included)."]));
   bRun.addEventListener("click", runTests);
+  const bRev = biText(el("button", "btn"), ["程序检查", "Review the program"]);
+  const revList = el("ul", "plcreview");
+  testv.firstChild.insertBefore(bRev, testv.firstChild.children[1]);
+  testv.appendChild(revList);
+  bRev.addEventListener("click", runReview);
+  function runReview() {
+    const prog = S.lang === "LD" ? { decls: S.decls, ladder: S.ladder } : { st: S.st };
+    const res = WQPLC.review(prog, io);
+    revList.innerHTML = "";
+    if (!res.length) revList.appendChild(biText(el("li", "ok"), ["没有发现问题。", "No findings."]));
+    res.forEach((r) => {
+      const li = el("li", r.level);
+      li.append(el("span", "lv", { error: "✗", warning: "!", info: "i" }[r.level]), biText(el("span"), [(r.line ? `第 ${r.line} 行：` : "") + r.msg[0], (r.line ? `Line ${r.line}: ` : "") + r.msg[1]]));
+      revList.appendChild(li);
+    });
+    if (!res.some((r) => r.level === "error")) def.tasks.filter((k) => k.review).forEach((k) => api.done(k.id));
+    return res;
+  }
   function paintTests() {
     tlist.innerHTML = "";
     (cfg.tests || []).forEach((t) => {

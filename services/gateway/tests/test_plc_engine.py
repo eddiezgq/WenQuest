@@ -13,7 +13,7 @@ HERE = Path(__file__).parent
 @pytest.mark.skipif(not shutil.which("node"), reason="needs Node.js")
 def test_plc_engine(tmp_path):
     out = tmp_path / "export.xml"
-    r = subprocess.run(["node", "--test", str(HERE / "plc" / "plc.test.mjs"), str(HERE / "plc" / "plants.test.mjs")], capture_output=True, text=True,
+    r = subprocess.run(["node", "--test", str(HERE / "plc" / "plc.test.mjs"), str(HERE / "plc" / "plants.test.mjs"), str(HERE / "plc" / "wrong.test.mjs")], capture_output=True, text=True,
                        env={**os.environ, "PLC_XML_OUT": str(out)}, timeout=120)
     assert r.returncode == 0, r.stdout[-4000:] + r.stderr[-2000:]
     root = ET.fromstring(out.read_text(encoding="utf-8"))
