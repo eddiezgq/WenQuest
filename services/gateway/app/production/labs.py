@@ -80,6 +80,7 @@ THREE_ENGINE = Path(__file__).parent / "three" / "wq3d.js"
 # CircuitJS1 (GPL-2.0) built from source without network access: tools/circuitjs/ (patch, bundle) and its README.
 CIRCUITJS = KIT / "circuitjs-embed.html"
 CIRCUIT_VIEW = re.compile(r"""view\s*:\s*["']circuit["']""")
+PLC_VIEW = re.compile(r"""view\s*:\s*["']plc["']""")   # PLC labs (第 18 轮): the PLC engine and its editor
 
 
 def models_used(code: str, models: dict) -> list[str]:
@@ -104,6 +105,9 @@ def page(labs: list[tuple[str, str]], *, course: list[str], chapter: list[str], 
             raise FileNotFoundError(f"circuit labs need {CIRCUITJS} (build it with tools/circuitjs/build.sh)")
         cj = json.dumps(CIRCUITJS.read_text(encoding="utf-8"), ensure_ascii=False).replace("</", "<\\/")
         three += f"<script>window.WQ_CIRCUITJS = {cj};</script>\n"
+    if any(PLC_VIEW.search(code or "") for _, code in labs):
+        for f in ("plc.js", "plcui.js"):
+            three += "<script>\n" + (KIT / f).read_text(encoding="utf-8").replace("</script", "<\\/script") + "\n</script>\n"
     cj_note = ("<footer class=\"bi\" data-zh=\"电路仿真器 CircuitJS1（Paul Falstad、Iain Sharp，GPL-2.0），源码：github.com/pfalstad/circuitjs1；嵌入用的改动见问渠仓库 tools/circuitjs/。\" "
                "data-en=\"Circuit simulator CircuitJS1 (Paul Falstad, Iain Sharp; GPL-2.0), source: github.com/pfalstad/circuitjs1; embedding changes in the WenQuest repository, tools/circuitjs/.\">"
                "电路仿真器 CircuitJS1（GPL-2.0）</footer>") if "WQ_CIRCUITJS" in three else ""

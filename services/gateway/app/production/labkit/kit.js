@@ -22,6 +22,7 @@ const ORDER = [];
 let current = null;   // the lab id being defined (set by WQ.begin)
 let active = null;
 const saved = store.get(KEY + "-tasks") || {};
+const LANG_HOOKS = [];
 
 function el(tag, cls, text) {
   const e = document.createElement(tag);
@@ -635,6 +636,7 @@ function applyLang() {
   document.querySelectorAll(".bi").forEach((e) => { e.textContent = lang === "en" ? e.dataset.en : e.dataset.zh; });
   $("lang").textContent = lang === "en" ? "中文" : "EN";
   ORDER.forEach((id) => { const L = LABS[id]; paintParams(L); paintProblem(L); readouts(L); });
+  LANG_HOOKS.forEach((f) => { try { f(); } catch (e) { /* a lab's own repaint */ } });
   document.title = P(JSON.parse(document.documentElement.dataset.title || '["虚拟实验","Virtual lab"]'));
   paintTasks();
 }
@@ -716,7 +718,10 @@ function build(id, def) {
   });
   const canvas = el("canvas"); canvas.setAttribute("aria-label", `${def.title[0]} ${def.title[1] || ""}`);
   const bar = el("div", "stagebar");
-  const buttons = (def.buttons && def.buttons.length ? def.buttons : [
+  const buttons = (def.buttons && def.buttons.length ? def.buttons : def.view === "plc" ? [
+    { id: "run", name: ["运行 RUN", "Run"], primary: true }, { id: "stop", name: ["停止 STOP", "Stop"] },
+    { id: "step", name: ["单步扫描", "One scan"] }, { id: "slow", name: ["慢放 ×0.1", "Slow ×0.1"] }, { id: "reset", name: ["复位设备", "Reset machine"] },
+  ] : [
     { id: "start", name: ["开始", "Start"], primary: true }, { id: "reset", name: ["重置", "Reset"] },
   ]);
   buttons.forEach((b) => {
@@ -756,6 +761,7 @@ function build(id, def) {
   const tc = el("div", "card"); tc.appendChild(biText(el("h3"), ["任务", "TASKS"]));
   const tasks = el("ul", "tasks"); tc.appendChild(tasks);
   if (def.think) tc.appendChild(biText(el("p", "hint"), def.think));
+  if (!def.params.length) pc.hidden = true;   // e.g. PLC labs: the machine is driven by the program, not by sliders
   side.append(pc, rc, tc);
   sec.append(stageBox, side);
   $("labs").appendChild(sec);
@@ -781,6 +787,10 @@ function build(id, def) {
   L.api = api;
   if (is3d) setup3d(L);
   if (circuit) setupCircuit(L);
+  if (def.view === "plc") {
+    if (!window.WQPLCUI) throw new Error("this page has no PLC engine (view: 'plc')");
+    window.WQPLCUI.setup(L, { el, biText, T, P, css, store, KEY, onLang: (f) => LANG_HOOKS.push(f) });
+  }
   def.tasks.forEach((t) => { t.ok = !!saved[id + ":" + t.id]; });
   LABS[id] = L; ORDER.push(id);
   // controls
@@ -806,6 +816,7 @@ function build(id, def) {
     const a = b.dataset.action;
     if (a === "start") start(L);
     else if (a === "reset") reset(L);
+    else if (a === "run" && def.view === "plc") { safe(L, () => def.start && def.start(L.api, L.state)); L.api.running = !!(L.plc && L.plc.rt && !L.plc.rt.error); }
     else safe(L, () => def.action && def.action(a, api, L.state));
     readouts(L);
   }));
@@ -931,7 +942,7 @@ window.WQ = {
     const labs = {};
     ORDER.forEach((id) => {
       const L = LABS[id];
-      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.is3d ? "3d" : L.circuit ? "circuit" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
+      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.is3d ? "3d" : L.circuit ? "circuit" : L.def.view === "plc" ? "plc" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
         tasks: Object.fromEntries(L.def.tasks.map((t) => [t.id, !!t.ok])), demos: Object.fromEntries(L.def.tasks.map((t) => [t.id, t.demo || null])) };
     });
     return { errors: errors.slice(), active, labs };
