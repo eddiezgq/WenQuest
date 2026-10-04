@@ -1,0 +1,22 @@
+# 实验 6.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab6_8.js。
+原理:
+  - ["两连杆臂的末端速度 v = J θ̇。J 的第 1 列是只转肩关节（1 rad/s）时的末端速度，第 2 列是只转肘关节时的末端速度。", "For the two-link arm v = J θ̇. Column 1 of J is the tool velocity when only the shoulder turns at 1 rad/s; column 2 is for the elbow."]
+  - 式: "det J = l₁ l₂ sin θ₂，  l₁ = 0.425 m，l₂ = 0.392 m（UR5e）"
+  - ["关节角速度取遍单位圆时，末端速度画出一个椭圆，面积为 π|det J|。det J = 0 时椭圆压成线段：这是奇异位形，有一个方向的速度产生不出来（6.8.4 节）。", "As the joint rates run over the unit circle the tool velocity traces an ellipse of area π|det J|. When det J = 0 the ellipse collapses to a segment: a singular configuration where one direction of motion is lost (Section 6.8.4)."]
+步骤:
+  - ["固定 θ₁ = 30°，把 θ₂ 从 0° 拖到 180°，每隔 30° 记录 det J、两列夹角和椭圆面积（表 1）。", "Fix θ₁ = 30° and drag θ₂ from 0° to 180°; every 30° record det J, the angle between the columns and the ellipse area (Table 1)."]
+  - ["找出 det J 最大的位形（任务 1），与 l₁l₂ 比较。", "Find the configuration with the largest det J (task 1) and compare with l₁l₂."]
+  - ["让手臂接近伸直，使 |det J| 小于最大值的 2%（任务 2），记录两列的方向。", "Nearly straighten the arm so that |det J| is below 2% of the maximum (task 2); record the directions of the columns."]
+  - ["把 θ₂ 从正角度转到负角度（任务 3），观察 det J 的符号与椭圆。", "Turn θ₂ from positive to negative (task 3); watch the sign of det J and the ellipse."]
+  - ["改变 θ₁，确认 det J 不变。", "Change θ₁ and check that det J does not change."]
+数据表:
+  - 标题: ["表 1  肘关节角与雅可比行列式（θ₁ = 30°）", "Table 1  Elbow angle and the Jacobian determinant (θ₁ = 30°)"]
+    表头: ["θ₂ / °", "det J / m²", "l₁l₂ sin θ₂ / m²", "两列夹角 / °", "椭圆面积 / (m²/s²)"]
+    表头英文: ["θ₂ / °", "det J / m²", "l₁l₂ sin θ₂ / m²", "Column angle / °", "Ellipse area / (m²/s²)"]
+    行: [["0", "", "", "", ""], ["30", "", "", "", ""], ["60", "", "", "", ""], ["90", "", "", "", ""], ["120", "", "", "", ""], ["150", "", "", "", ""], ["180", "", "", "", ""]]
+注意:
+  - ["速度椭圆按 0.5 m 代表 1 m/s 画在末端处；只看形状和大小的变化。", "The velocity ellipse is drawn at the tool with 0.5 m ≙ 1 m/s; look at its shape and size."]
+  - ["本实验只考虑 UR5e 的肩、肘两个关节在同一平面内的运动，其余关节固定。", "Only the UR5e shoulder and elbow are used, moving in one plane; the other joints are fixed."]
+思考题:
+  - ["θ₂ = 180°（完全折叠）时末端回到哪里？这时哪个方向的速度产生不出来？", "Where is the tool at θ₂ = 180° (fully folded)? Which direction of velocity is lost?"]
+  - ["为什么实际的机器人控制器在 |det J| 还没变成零时就要降速？", "Why do real controllers slow down before |det J| actually reaches zero?"]

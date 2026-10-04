@@ -26,6 +26,9 @@ chapters:
   5:
     status: ai
     title_en: "Inverses and LU Factorization"
+  6:
+    status: ai
+    title_en: "Determinants"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"

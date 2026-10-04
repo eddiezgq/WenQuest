@@ -11,19 +11,19 @@ WQ.lab({
                         "The steel frame of an AGV docking station must be checked under k load cases. The matrix depends only on the frame; the right-hand side changes with the case. (The matrix is illustrative, generated from a fixed seed.)"] } },
   ],
   params: [
-    { id: "n", name: ["未知数个数 n", "Unknowns n"], min: 50, max: 300, step: 50, value: 200, digits: 0 },
+    { id: "n", name: ["未知数个数 n", "Unknowns n"], min: 50, max: 200, step: 25, value: 100, digits: 0 },
     { id: "k", name: ["工况个数 k", "Load cases k"], min: 1, max: 100, step: 1, value: 100, digits: 0 },
     { id: "c", name: ["查看第几个工况", "Case shown"], min: 1, max: 100, step: 1, value: 1, digits: 0 },
   ],
   buttons: [{ id: "run", name: ["两种方法各算一遍", "Run both methods"], primary: true },
-            { id: "pair", name: ["k = 100，n = 100 与 200 各算一遍", "k = 100, n = 100 and 200"] }, { id: "clear", name: ["清空记录", "Clear the log"] }],
+            { id: "pair", name: ["k = 100，n = 50 与 100 各算一遍", "k = 100, n = 50 and 100"] }, { id: "clear", name: ["清空记录", "Clear the log"] }],
   tasks: [
     { id: "same", text: ["取 k = 100 运行，确认两种方法的解相同（最大差小于 10⁻⁹）。", "Run with k = 100 and check the two methods agree (largest difference below 10⁻⁹)."],
-      demo: { scene: "cases", set: { n: 100, k: 100 }, press: ["run"], wait: 3 } },
+      demo: { scene: "cases", set: { n: 50, k: 100 }, press: ["run"], wait: 2 } },
     { id: "tenth", text: ["n = 200 时，找出使乘法次数之比达到 10 倍以上的最小 k（看读数中的“倍数”），在这个 k 下点“两种方法各算一遍”。", "With n = 200, find the smallest k for which the ratio of multiplications reaches 10 (see the readout) and press Run both methods at that k."],
       demo: { scene: "cases", set: { n: 200, k: 12 }, press: ["run"], wait: 2 } },
-    { id: "double", text: ["k = 100 时，分别取 n = 100 和 n = 200 各运行一次（或点“k = 100，n = 100 与 200 各算一遍”），比较两种方法的耗时各增加到几倍。", "With k = 100, run once with n = 100 and once with n = 200 (or press the pair button); by what factor does each method's time grow?"],
-      demo: { scene: "cases", set: { n: 200, k: 100 }, press: ["pair"], wait: 5 } },
+    { id: "double", text: ["k = 100 时，分别取 n = 50 和 n = 100 各运行一次（或点“k = 100，n = 50 与 100 各算一遍”），比较两种方法的耗时各增加到几倍。", "With k = 100, run once with n = 50 and once with n = 100 (or press the pair button); by what factor does each method's time grow?"],
+      demo: { scene: "cases", set: { n: 100, k: 100 }, press: ["pair"], wait: 3 } },
   ],
   think: ["k 很大时，两种方法的乘法次数之比趋于多少？为什么说 LU 分解是“消元的记录”？",
           "What does the ratio of multiplications tend to for large k? Why is the LU factorization 'a record of elimination'?"],
@@ -72,7 +72,7 @@ WQ.lab({
   action(id, api) {
     const L = this.log();
     if (id === "clear") { L.runs = []; L.last = null; return; }
-    if (id === "pair") { this.solveAll(100, 100); this.solveAll(200, 100); return; }
+    if (id === "pair") { this.solveAll(50, 100); this.solveAll(100, 100); return; }
     if (id === "run") this.solveAll(api.p.n, api.p.k);
   },
   solveAll(n, k) {
@@ -93,7 +93,7 @@ WQ.lab({
     if (r && r.k === 100 && r.diff < 1e-9) api.done("same");
     if (r && r.n === 200 && r.k === kmin && r.diff < 1e-9) api.done("tenth");
     const ok = (nn) => L.runs.some((q) => q.n === nn && q.k === 100 && q.diff < 1e-9);
-    if (ok(100) && ok(200)) api.done("double");
+    if (ok(50) && ok(100)) api.done("double");
     const rows = [[["乘法次数：每次从头消元", "Multiplications: from scratch"], c.sep.toExponential(2)],
                   [["乘法次数：分解一次 + k 次前代、回代", "Multiplications: factor once + k solves"], c.lu.toExponential(2)],
                   [["倍数", "Ratio"], api.fmt(c.ratio, 2)]];

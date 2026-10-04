@@ -1,0 +1,23 @@
+# 实验 6.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab6_1.js。
+原理:
+  - ["2 阶行列式 det A = ad − bc 是 A 的两列张成的平行四边形的有向面积：绝对值是面积，正号表示方向不变（逆时针），负号表示翻面（顺时针）（6.1 节）。", "The 2×2 determinant ad − bc is the signed area of the parallelogram spanned by the columns: its absolute value is the area; positive keeps the orientation, negative flips it (Section 6.1)."]
+  - 式: "面积(A(Ω)) = |det A| · 面积(Ω)；  det(AB) = det A · det B"
+  - ["det A = 0 时平行四边形压成线段，A 不可逆（定理 6.6.1）。", "When det A = 0 the parallelogram collapses to a segment and A is not invertible (Theorem 6.6.1)."]
+步骤:
+  - ["在“有向面积”场景中拖动四个元素，使 det A = 6（任务 1），记入表 1。", "In the signed-area scene make det A = 6 (task 1); record in Table 1."]
+  - ["保持四个元素都不为零，使平行四边形压成线段（任务 2），记下此时两列的关系。", "Keeping all four entries nonzero, flatten the parallelogram (task 2); note how the columns are related."]
+  - ["使图形翻面且面积为 2（任务 3），观察两列箭头的转向。", "Flip the figure with area 2 (task 3); watch the turning direction from column 1 to column 2."]
+  - ["切换到“乘积”场景，使 det A = 2（任务 4），记下 det(AB) 与 det A · det B，填表 2。", "Switch to the product scene and make det A = 2 (task 4); record det(AB) and det A · det B in Table 2."]
+数据表:
+  - 标题: ["表 1  矩阵与有向面积", "Table 1  Matrices and signed areas"]
+    表头: ["a", "b", "c", "d", "ad − bc", "面积", "方向"]
+    表头英文: ["a", "b", "c", "d", "ad − bc", "Area", "Orientation"]
+    行: [["", "", "", "", "", "", ""], ["", "", "", "", "", "", ""], ["", "", "", "", "", "", ""], ["", "", "", "", "", "", ""]]
+  - 标题: ["表 2  乘积的行列式（det B = 1.5）", "Table 2  Determinant of a product (det B = 1.5)"]
+    表头: ["A", "det A", "det(AB)", "det A · det B"]
+    表头英文: ["A", "det A", "det(AB)", "det A · det B"]
+    行: [["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["滑块步长为 0.1，凑整数行列式时可以先让某些元素为 0。", "Sliders move in steps of 0.1; to hit an exact determinant, try setting some entries to 0 first."]
+思考题:
+  - ["在“乘积”场景中任取一个 A，手算 BA，与实验给出的 AB 比较：两个矩阵不同，行列式为什么相同？", "In the product scene pick any A, compute BA by hand and compare it with AB from the lab: the matrices differ, so why are their determinants equal?"]

@@ -97,7 +97,16 @@ def trial_labs(page_html: str, ids: list[str], rep: "Report", where: str) -> Non
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     for lab in ids:
-        res = asyncio.run(mod.run(page_html, lab))
+        res = None
+        for attempt in (1, 2):   # headless Chromium occasionally stalls (a click times out); one retry before reporting
+            try:
+                res = asyncio.run(mod.run(page_html, lab))
+                break
+            except Exception as e:  # noqa: BLE001
+                if attempt == 2:
+                    rep.add("error", "实验", where, f"实验 {lab.replace('-', '.')}：试做时浏览器出错两次（{type(e).__name__}: {str(e)[:120]}）")
+        if res is None:
+            continue
         for p in res.get("problems") or []:
             rep.add("error", "实验", where, f"实验 {lab.replace('-', '.')}：{p}")
 
