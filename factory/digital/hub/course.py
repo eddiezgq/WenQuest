@@ -471,7 +471,13 @@ def mount(app, H):
                        "关节力矩记录算疲劳寿命、比较钢与铝；平缝机上轴 LS-101 比较两种轴承支承的固有频率并与梁理论对照、上传 CSV 载荷谱。",
             "mode": "teach", "products": ["SH-301", "RJ-201", "LS-101"], "tool_url": public_base(request) + "/cae",
             "guide_url": public_base(request) + "/api/cae/lab12/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab12/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab12/report-template.docx"}, {
+            "id": "lab13", "name": {"zh": "实验 13：减速器数字孪生与预测性维护", "en": "Lab 13: digital twin and predictive maintenance of a gearbox"},
+            "summary": "卖出去的每台 WQR-105 都有一个分身：出厂数据 + 现场运行数据 + 寿命模型（轴承 L10、输出轴疲劳、热平衡油温、润滑油）。"
+                       "手算轴承载荷与寿命核对；从油温残差和振动诊断散热变差、轴承损坏；开维修单进 ERPNext、维修后寿命复位；假如分析与机队数据反馈设计。",
+            "mode": "teach", "products": ["WQR-105"], "tool_url": public_base(request) + "/twin",
+            "guide_url": public_base(request) + "/api/cae/lab13/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab13/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

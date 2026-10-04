@@ -1,0 +1,96 @@
+# 问渠微电子实验镜像（第 17 轮附 4a–4d）：构建 wenquest/micro-lab，在 GitHub 运行机里无界面验收：
+# 反相器原理图→版图→DRC→LVS、SKY130 校准复核、8 位计数器 RTL→GDS、网页远程桌面截图。
+# 结果（JSON、日志、GDS、截图）作为构建产物保存；要点写成运行注释（notice）。
+name: Micro lab image
+
+on:
+  workflow_dispatch:
+    inputs:
+      push:
+        description: "把镜像推送到 ghcr.io（约 4 GB）"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - deploy/micro-lab/**
+      - samples/数字集成电路设计/生成脚本/calib/**
+      - .github/workflows/micro-lab.yml
+
+concurrency:
+  group: micro-lab
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space (the base image is about 20 GB unpacked)
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost /usr/share/swift /usr/local/.ghcup
+          sudo docker image prune -af > /dev/null
+          df -h /
+
+      - name: Pull the base image and check its digest
+        id: base
+        run: |
+          base=$(sed -n 's/^ARG BASE=//p' deploy/micro-lab/Dockerfile)
+          if [[ "$base" != *@sha256:* ]]; then echo "::error::Dockerfile 的基础镜像没有按摘要锁定（ARG BASE=…@sha256:…）"; exit 1; fi
+          docker pull -q "$base"            # 按锁定的摘要拉取
+          echo "::notice title=基础镜像摘要::$base"
+          echo "digest=${base#*@}" >> "$GITHUB_OUTPUT"
+          # 只作提示：上游标签是否已指向新版本（升级时改 Dockerfile 并重新验收）
+          tag=${base%@*}
+          now=$(docker buildx imagetools inspect "$tag" --format '{{json .Manifest.Digest}}' 2>/dev/null | tr -d '"') || true
+          if [ -n "$now" ] && [ "$now" != "${base#*@}" ]; then echo "::notice title=上游有新版本::$tag 现在指向 $now"; fi
+          docker image ls
+
+      - name: Build wenquest/micro-lab
+        run: docker build -t wenquest/micro-lab:ci deploy/micro-lab
+
+      - name: Checks inside the image (inverter, calibration, counter RTL→GDS)
+        run: |
+          mkdir -p out && chmod 777 out
+          docker run --rm --user 1000:1000 -e IIC_OSIC_TOOLS_QUIET=1 \
+            -v "$PWD:/repo:ro" -v "$PWD/out:/out" wenquest/micro-lab:ci --skip bash -lc /repo/deploy/micro-lab/ci/run_checks.sh
+
+      - name: Web desktop (noVNC) with Xschem and KLayout
+        if: always()
+        run: |
+          mkdir -p desk && chmod 777 desk
+          cp out/inv/build/inv.gds desk/ || { echo "::error::没有反相器 GDS，无法检查 KLayout"; exit 1; }
+          docker run -d --name wqdesk --user 1000:1000 -p 8080:80 -v "$PWD/desk:/foss/designs" wenquest/micro-lab:ci --wait
+          pip install -q playwright==1.56.0 && python -m playwright install --with-deps --only-shell chromium > /dev/null
+          python deploy/micro-lab/ci/vnc_shot.py wqdesk 8080 out/screens
+          docker stats --no-stream wqdesk | tee out/screens/stats.txt
+          echo "::notice title=网页桌面资源（Xschem、KLayout 打开时）::$(docker stats --no-stream --format 'CPU {{.CPUPerc}}，内存 {{.MemUsage}}' wqdesk)"
+          docker rm -f wqdesk
+
+      - name: Screenshot thumbnails as notices
+        if: always()
+        run: |
+          pip install -q pillow
+          python deploy/micro-lab/ci/notice_shots.py out/screens || true
+
+      - name: Push to ghcr.io
+        if: ${{ inputs.push }}
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          img=ghcr.io/${GITHUB_REPOSITORY,,}/micro-lab
+          docker tag wenquest/micro-lab:ci $img:${GITHUB_SHA::12}
+          docker push -q $img:${GITHUB_SHA::12}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: micro-lab-results
+          path: out/
+          retention-days: 30

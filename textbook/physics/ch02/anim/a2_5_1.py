@@ -1,6 +1,6 @@
 """动画 2.5.1（配图 2.5.1）：叉积。A 固定，B 绕起点转一圈；平行四边形的面积等于 |A × B| = AB sin θ。
-右侧的竖直箭头表示 A × B（画面朝外为上），θ 在 0°～180° 时朝外，180°～360° 时（从 A 逆时针量超过 180°，
-即 B 转到 A 的另一侧）朝里；下方的曲线是 (A × B)_z 随 θ 的变化，正是正弦曲线。"""
+右侧用 ⊙/⊗ 表示 A × B（垂直于画面：⊙ 指向读者，⊗ 背离读者），θ 在 0°～180° 时为 ⊙，180°～360° 时
+（B 转到 A 的另一侧）为 ⊗，圆的大小随 |sin θ|；下方的曲线是 (A × B)_z 随 θ 的变化，正是正弦曲线。"""
 from manim import *
 from wq_anim import *
 import numpy as np
@@ -13,7 +13,7 @@ Bl = 1.8
 class Lesson(Base):
     def construct(self):
         self.title("2.5", "叉积：有方向的面积", "The cross product: an area with a direction")
-        th = ValueTracker(30.0)
+        th = ValueTracker(0.0)
         a = vec(O, O + A, BLUE, r"\boldsymbol A", DOWN)
 
         def Bv():
@@ -27,15 +27,21 @@ class Lesson(Base):
                                             fill_opacity=0.25, stroke_width=1))
         self.play(GrowArrow(a[0]), FadeIn(a[1]))
         self.add(par, b, bl)
-        base = np.array([2.2, 0.4, 0])
+        base = np.array([2.6, 0.9, 0])
 
         def zarrow():
-            s = np.sin(np.radians(th.get_value()))
-            g = VGroup(Line(base + LEFT * 0.5, base + RIGHT * 0.5, color=GREY_B))
-            if abs(s) > 0.02:
-                g.add(Arrow(base, base + UP * 2.0 * s, buff=0, color=RED, stroke_width=7, max_tip_length_to_length_ratio=0.25))
-            g.add(MathTex(r"\boldsymbol A\times\boldsymbol B", font_size=30, color=RED).next_to(base, RIGHT, buff=0.6).shift(UP * 1.6))
-            g.add(zh("朝外" if s > 0.02 else ("朝里" if s < -0.02 else "零"), 24, RED).next_to(base, RIGHT, buff=0.6).shift(UP * 0.9))
+            """A × B 垂直于画面：⊙ 指向读者，⊗ 背离读者；圆的大小随 |sin θ|。"""
+            sn = np.sin(np.radians(th.get_value()))
+            R = 0.15 + 0.75 * abs(sn)
+            g = VGroup(Circle(radius=R, color=RED, stroke_width=5).move_to(base))
+            if sn > 0.02:
+                g.add(Dot(base, radius=0.06 + 0.12 * abs(sn), color=RED))
+            elif sn < -0.02:
+                d = R * 0.7
+                g.add(Line(base + np.array([-d, -d, 0]), base + np.array([d, d, 0]), color=RED, stroke_width=5),
+                      Line(base + np.array([-d, d, 0]), base + np.array([d, -d, 0]), color=RED, stroke_width=5))
+            g.add(MathTex(r"\boldsymbol A\times\boldsymbol B", font_size=30, color=RED).move_to(base + UP * 1.25))
+            g.add(zh("指向你" if sn > 0.02 else ("背离你" if sn < -0.02 else "零"), 24, RED).move_to(base + DOWN * 1.15))
             return g
 
         za = always_redraw(zarrow)
@@ -46,14 +52,13 @@ class Lesson(Base):
                                               color=RED) if th.get_value() > 0.5 else VGroup())
         self.play(FadeIn(za), Create(ax), FadeIn(lab))
         self.caption("面积 = AB sin θ；拇指方向（右手定则）是 A × B 的方向", "Area = AB sin θ; the right-hand thumb gives the direction of A × B", wait=0)
-        th.set_value(0.0)
         self.add(trace)
         self.play(th.animate.set_value(90), run_time=2.5, rate_func=linear)
         self.caption("垂直时面积最大", "Largest when perpendicular", wait=0.8)
         self.play(th.animate.set_value(180), run_time=2.5, rate_func=linear)
         self.caption("平行时面积为零，叉积为零", "Parallel: zero area, zero cross product", wait=0.8)
         self.play(th.animate.set_value(359), run_time=4, rate_func=linear)
-        self.caption("B 转到 A 的另一侧，A × B 朝里：B × A = −A × B", "With B on the other side of A, A × B points in: B × A = −A × B")
+        self.caption("B 转到 A 的另一侧，A × B 背离你：B × A = −A × B", "With B on the other side of A, A × B points away: B × A = −A × B")
         self.card([["叉积", "The cross product"],
                    ["大小：平行四边形的面积 AB sin θ", "Size: the parallelogram area AB sin θ"],
                    ["方向：垂直于 A、B，按右手定则；交换次序就反向", "Direction: perpendicular to A and B by the right-hand rule; swapping the order reverses it"]])

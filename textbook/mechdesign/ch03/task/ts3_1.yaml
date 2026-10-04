@@ -1,0 +1,37 @@
+# 工程任务单 TS-3-1（配第 3 章）：用 FreeCAD 画 SH-301 B 版零件图并提交审批。格式见 textbook/tools/tasksheet.py。
+编号: TS-3-1
+标题: ["用 FreeCAD 画 SH-301 B 版零件图并提交审批", "Draw the SH-301 rev. B part drawing in FreeCAD and submit it for approval"]
+角色: ["设计部门的绘图工程师", "drafting engineer, design department"]
+背景:
+  - "设计组已经定下 WQR-105 输出轴 SH-301 的 B 版结构（第 33 章）：各段直径和长度、两个键槽、台阶圆角、配合、表面粗糙度和材料都写在设计组给你的尺寸表里。车间要按图加工、质检要按图检验，所以 B 版要有一张符合国标的零件图。你作为绘图工程师，用 FreeCAD 建三维模型、用 TechDraw 出零件图，提交“设计发布与审批”；AI 设计评审员先按国标挑图面错误，再由老师（主管设计师）审核。"
+  - "The design team has settled the rev. B layout of the WQR-105 output shaft SH-301 (Chapter 33): diameters and lengths, two keyseats, fillets, fits, roughness and material are in the size table they gave you. The shop machines to the drawing and quality inspects to it, so rev. B needs a part drawing to GB. As drafting engineer, model it in FreeCAD, make the drawing with TechDraw and submit it to Design Release & Approval; the AI design reviewer checks the sheet against GB first, then the instructor (lead designer) reviews it."
+输入:
+  - {名称: ["SH-301 B 版尺寸表：七段直径与长度（Ø35 × 37、Ø40 × 53、Ø48 × 10、Ø42 × 15、Ø35 × 17、Ø35 × 40、Ø30 × 68，总长 240）、台阶圆角、两个 A 型键槽的位置与尺寸", "SH-301 rev. B size table: seven diameters and lengths (Ø35 × 37, Ø40 × 53, Ø48 × 10, Ø42 × 15, Ø35 × 17, Ø35 × 40, Ø30 × 68; 240 overall), step fillets, position and size of the two type A keyseats"], 来源: ["教材程序 3.2.1、3.3.1（数据取第 33 章 ch33/code/_shaft.py）", "Programs 3.2.1, 3.3.1 (data from Chapter 33, ch33/code/_shaft.py)"]}
+  - {名称: ["公差带与粗糙度：两轴承位 Ø35k6、齿轮位 Ø40r6、外伸段 Ø30k6、密封段 Ø35f9；轴承位 Ra 0.8，密封段 Ra 0.4（唇形油封，GB/T 13871），齿轮位、外伸段 Ra 1.6，其余 Ra 3.2", "Tolerance classes and roughness: bearing seats Ø35k6, gear seat Ø40r6, extension Ø30k6, seal journal Ø35f9; Ra 0.8 on bearing seats, Ra 0.4 on the seal journal (lip seal, GB/T 13871), Ra 1.6 on gear seat and extension, Ra 3.2 elsewhere"], 来源: ["设计组（第 33.2、33.5 节）", "Design team (Sections 33.2, 33.5)"]}
+  - {名称: ["几何公差与键槽：以两轴承位的公共轴线为基准 A–B，齿轮位、外伸段、密封段对 A–B 的径向圆跳动 0.015 mm；键槽宽 12N9、8N9，槽深按 GB/T 1095 注成 d − t（极限偏差 0/−0.2），键槽对称度 0.02 mm；材料 40Cr 调质 241–286 HBW", "Geometry and keyseats: datum A–B = common axis of the bearing seats; radial run-out of gear seat, extension and seal journal 0.015 mm to A–B; keyseat widths 12N9 and 8N9, depth given as d − t per GB/T 1095 (limits 0/−0.2), symmetry 0.02 mm; 40Cr quenched and tempered, 241–286 HBW"], 来源: ["设计组（第 33 章；第 4 章讲这些代号的含义）", "Design team (Chapter 33; Chapter 4 explains the symbols)"]}
+  - {名称: ["FreeCAD 与问渠宏（建轴、出图、提交）；零件图样例：图 3.4.1", "FreeCAD with the WenQuest macros (shaft, drawing, submit); sample part drawing: Fig. 3.4.1"], 来源: ["数字工厂“设计与工艺”页的下载与说明", "Digital factory, Design & Process page: downloads and help"]}
+  - {名称: ["标准：GB/T 14689（图幅）、GB/T 14690（比例）、GB/T 4457.4（图线）、GB/T 4458.4（尺寸注法）、GB/T 10609.1（标题栏）、GB/T 131（表面结构）、GB/T 1804（一般公差）", "Standards: GB/T 14689 (sheet sizes), 14690 (scales), 4457.4 (lines), 4458.4 (dimensioning), 10609.1 (title block), 131 (surface texture), 1804 (general tolerances)"], 来源: ["教材第 3 章", "Chapter 3"]}
+交付物:
+  - {名称: ["SH-301 B 版：三维模型（STEP）与零件图（PDF），一起提交设计发布", "SH-301 rev. B: 3D model (STEP) and part drawing (PDF), submitted together to Design Release"], 验收: ["模型尺寸与尺寸表一致，台阶有圆角，两个键槽在同一母线上；零件图视图完整（主视图 + 键槽处移出断面），尺寸按功能注、不封闭，公差带代号、几何公差、粗糙度、技术要求、标题栏齐全并符合国标；图上的每个直径与模型一致", "Model matches the table, steps filleted, both keyseats on one line; the drawing has the needed views (front view + removed sections at the keyseats), dimensions by function and not closed, tolerance classes, geometric tolerances, roughness, notes and title block complete and to GB; every diameter on the drawing matches the model"], 类型: 设计发布, 零件: SH-301, 轴承: [6207, 6207], 要图: true}
+  - {名称: ["图面自查表（按 3.4 节的清单逐项打勾，写明依据的标准）", "Self-check list (tick each item of the Section 3.4 list, citing the standard)"], 验收: ["视图、剖面、图线、尺寸、公差、粗糙度、技术要求、标题栏八项都有自查结果；发现的问题写明怎样改了", "Results for all eight items — views, sections, lines, dimensions, tolerances, roughness, notes, title block; problems found and how they were fixed"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["评审意见答复（AI 评审员和老师的每条意见：接受并改了，或不接受并说明理由）", "Replies to review comments (each comment from the AI reviewer and the instructor: accepted and fixed, or declined with a reason)"], 验收: ["每条意见都有答复；改了的写明改在哪里；不接受的有标准或功能上的理由", "Every comment answered; fixes located; declines justified by a standard or by function"], 类型: 文件, 格式: [docx, pdf]}
+工位: [CAD, PLM]
+步骤:
+  - ["读尺寸表：画出 SH-301 B 版的草图，标出哪些尺寸是功能尺寸（轴承位、齿轮定位面、外伸段长），定尺寸基准（3.3 节）", "Read the table: sketch rev. B, mark the functional sizes (bearing seats, gear locating face, extension length) and choose the datums (Section 3.3)"]
+  - ["建模：在 FreeCAD 里用问渠宏或 Part Design 建三维模型——各段圆柱、台阶圆角、两个键槽（3.7 节）", "Model: build it in FreeCAD with the WenQuest macro or Part Design — cylinders, step fillets, two keyseats (Section 3.7)"]
+  - ["出图：TechDraw 新建 A3 图纸，先把投影法设为“第一角”（First Angle），标题栏按 GB/T 10609.1 填写；插入主视图（轴线水平、键槽朝前）和两个键槽处的移出断面；注尺寸、公差带代号、几何公差、粗糙度、技术要求（3.2、3.4 节）", "Drawing: a new A3 TechDraw page; set the projection to First Angle and fill in the title block to GB/T 10609.1; insert the front view (axis horizontal, keyseats facing you) and removed sections at both keyseats; add dimensions, tolerance classes, geometric tolerances, roughness and notes (Sections 3.2, 3.4)"]
+  - ["自查：按 3.4 节的清单逐项检查，填自查表", "Self-check against the list in Section 3.4 and fill in the form"]
+  - ["提交：用问渠的“提交”宏把模型和零件图一起提交设计发布；在“我的任务”里关联这次发布，交自查表，预检", "Submit: send model and drawing together to Design Release with the WenQuest submit macro; link the release in My tasks, attach the self-check and run the pre-check"]
+  - ["评审：逐条答复 AI 评审员和老师的意见，改图后重新提交，直到老师批准", "Review: answer every comment from the AI reviewer and the instructor, revise and resubmit until approved"]
+评审要点:
+  - ["视图选择合理：主视图按加工位置、键槽朝前；键槽深度用移出断面表达；没有多余的视图", "Sensible views: front view in the machining position with keyseats facing the viewer; keyseat depth shown by removed sections; no redundant views"]
+  - ["尺寸按功能注：轴承位、齿轮定位面、外伸段直接注出，不注封闭尺寸，没有漏注或重复", "Dimensions by function: bearing seats, gear locating face and extension given directly; no closed chain, nothing missing or repeated"]
+  - ["公差带代号、几何公差、粗糙度、技术要求与设计组给的数据一致，写法符合 GB/T 4458.4、GB/T 1182、GB/T 131", "Tolerance classes, geometric tolerances, roughness and notes match the design data and follow GB/T 4458.4, GB/T 1182 and GB/T 131"]
+  - ["标题栏、比例、图线符合国标；图与模型一致", "Title block, scale and lines to GB; drawing and model agree"]
+评分:
+  - {项: ["三维模型", "3D model"], 分: 15, 标准: ["尺寸正确，圆角、键槽齐全", "Correct sizes, fillets and keyseats"]}
+  - {项: ["视图与剖面", "Views and sections"], 分: 20, 标准: ["视图选择合理，断面、剖面线正确", "Sensible views, correct sections and hatching"]}
+  - {项: ["尺寸与公差", "Dimensions and tolerances"], 分: 30, 标准: ["按功能注，不封闭，公差带代号与几何公差正确", "By function, not closed, correct tolerance classes and geometric tolerances"]}
+  - {项: ["粗糙度、技术要求、标题栏", "Roughness, notes, title block"], 分: 15, 标准: ["齐全，符合国标", "Complete, to GB"]}
+  - {项: ["自查与评审答复", "Self-check and replies"], 分: 20, 标准: ["自查认真，每条意见都有答复", "Careful self-check, every comment answered"]}
+学时: 4

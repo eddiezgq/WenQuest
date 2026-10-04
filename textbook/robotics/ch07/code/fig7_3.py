@@ -13,6 +13,7 @@ from _ode import G, L1, L2, LINK, fk2, ik2_analytic, jac2, link_params, newton2_
 from bookout import COLORS, T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 C = COLORS
 box = dict(fc="white", ec="none", pad=1.0, alpha=0.9)
 
@@ -118,7 +119,7 @@ th0 = np.column_stack([T1.ravel(), T2.ravel()])
 cm = ListedColormap(["#d9d9d9", "#9ecae1", "#fdae6b"])
 fig, axs = plt.subplots(1, 2, figsize=(9.6, 4.4), gridspec_kw=dict(wspace=0.25))
 sols = ik2_analytic(p_d)
-for ax, fn, title in ((axs[0], newton2_batch, T("(a) 纯牛顿法", "(a) plain Newton")),
+for ax, fn, title in ((axs[0], newton2_batch, T("(a) 纯牛顿法", "(a) plain Newton's method")),
                       (axs[1], newton2_batch_ls, T("(b) 加回溯线搜索", "(b) with backtracking line search"))):
     thf, ok, _ = fn(th0, p_d)
     cls = np.where(~ok, 0, np.where(wrap(thf[:, 1]) > 0, 1, 2)).reshape(N, N)
@@ -136,7 +137,7 @@ axs[0].set_ylabel(r"$\theta_2^{(0)}$ / rad")
 from matplotlib.patches import Patch
 handles = [Patch(color="#9ecae1", label=T("收敛到 θ₂ > 0 的解（▲）", "converges to the θ₂ > 0 solution (▲)")),
            Patch(color="#fdae6b", label=T("收敛到 θ₂ < 0 的解（▼）", "converges to the θ₂ < 0 solution (▼)")),
-           Patch(color="#d9d9d9", label=T("40 步内不收敛", "no convergence in 40 steps"))]
+           Patch(color="#d9d9d9", label=T("40 步内不收敛", "no convergence in 40 iterations"))]
 fig.legend(handles=handles, loc="lower center", ncol=3, frameon=False, fontsize=9.5, bbox_to_anchor=(0.5, -0.1))
 figure(fig, "fig7_3_3")
 plt.close(fig)

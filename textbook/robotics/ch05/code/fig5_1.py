@@ -1,19 +1,19 @@
 """5.1 节的示意图。
 
-图 5.1.1：原点不同的两个坐标系 {a}、{b}，同一点 P；三个位置矢量构成三角形 O_a O_b P。
-图 5.1.2：UR5e 工作站中的坐标系：工作台 {w}、基座 {s}、法兰 {b}、工具 {t}、相机 {c}、工件 {o}。
+图 5.1.2：原点不同的两个坐标系 {a}、{b}，同一点 P；三个位置矢量构成三角形 O_a O_b P。
+图 5.1.1：UR5e 工作站中的坐标系：工作台 {w}、基座 {s}、法兰 {b}、工具 {t}、相机 {c}、工件 {o}。
 """
 import math
 
 import numpy as np
 
-from _fig5 import C, arrow, axes3d, box3d, camera3, cylinder3, draw_ur, equal3d, frame2, frame3, plane, table3
+from _fig5 import C, arrow, axes3d, box3d, camera3, crop3d, cylinder3, draw_ur, equal3d, frame2, frame3, plane, table3
 from _frames import DEG, T, T_bt, T_og, T_wc, T_ws, inv, rot_z, ur_ik
 from bookout import T as TT, figure, style
 
 plt = style()
 
-# ---------------------------------------------------------------- 图 5.1.1
+# ---------------------------------------------------------------- 图 5.1.2
 fig, ax = plt.subplots(figsize=(6.0, 4.3))
 Oa, Ob, P = np.array([0.0, 0.0]), np.array([2.3, 0.8]), np.array([3.4, 2.75])
 ang_b = 35 * DEG
@@ -31,13 +31,13 @@ ax.text(0.15, 2.95, TT("在 {a} 中读：", "read in {a}:") + r"  $p_a$", fontsi
 ax.text(0.15, 2.65, TT("在 {a} 中读：", "read in {a}:") + r"  $p_{ab}$", fontsize=10.5, color=C["accent"])
 ax.text(0.15, 2.35, TT("在 {b} 中读：", "read in {b}:") + r"  $p_b$", fontsize=10.5, color="#1f77b4")
 ax.text(-0.35, -0.75, TT("矢量等式  " + r"$\overrightarrow{O_aP}=\overrightarrow{O_aO_b}+\overrightarrow{O_bP}$" + "  与坐标系无关",
-                         "The vector equation " + r"$\overrightarrow{O_aP}=\overrightarrow{O_aO_b}+\overrightarrow{O_bP}$" + " holds in every frame"),
+                         "The vector equation " + r"$\overrightarrow{O_aP}=\overrightarrow{O_aO_b}+\overrightarrow{O_bP}$" + "\nis independent of any frame"),
         fontsize=10.5, color=C["ink"])
 plane(ax, (-0.5, 4.1), (-0.9, 3.2))
-figure(fig, "fig5_1_1")
+figure(fig, "fig5_1_2")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 5.1.2
+# ---------------------------------------------------------------- 图 5.1.1
 Tws, Twc = T_ws(), T_wc()
 Two = T(rot_z(25 * DEG), (0.80, 0.45, 0.02))
 Tsb_goal = inv(Tws) @ Two @ T_og() @ inv(T_bt())
@@ -63,9 +63,10 @@ frame3(ax, Twb, 0.09, "{b}", off=(-0.04, -0.1, 0.06))
 frame3(ax, Twt, 0.07, "{t}", off=(-0.11, -0.03, 0.02))
 frame3(ax, Twc, L, "{c}", off=(-0.02, -0.12, 0.06))
 frame3(ax, Two, 0.1, "{o}", off=(0.1, -0.06, -0.02))
-ax.text(1.0, -0.07, 0.0, TT("工作台", "worktable"), fontsize=9, color=C["muted"])
+ax.text(0.9, -0.2, 0.0, TT("工作台", "worktable"), fontsize=9, color=C["muted"])
 ax.text(0.72, 0.10, 0.0, TT("料盘与齿轮坯", "tray and gear blank"), fontsize=9, color="#8a6d2b")
 ax.text(1.19, 0.44, 0.45, TT("相机支架", "camera stand"), fontsize=9, color=C["muted"])
 box3d(ax, (-0.05, -0.05, 0.0), (1.25, 0.85, 0.95), zoom=1.12)
-figure(fig, "fig5_1_2")
+crop3d(ax)
+figure(fig, "fig5_1_1")
 plt.close(fig)

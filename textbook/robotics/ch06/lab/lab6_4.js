@@ -13,7 +13,7 @@ WQ.lab({
     { id: "ur", robot: true, name: ["UR5e 一次位移的螺旋轴", "Screw axis of a UR5e move"], hide: ["ang", "lead"],
       problem: { title: ["机器人问题：两个位姿之间最直接的运动", "Robot problem: the most direct motion between two poses"],
                  text: ["法兰盘从零位运动到当前位姿。由沙勒定理，这次位移是绕某根轴的螺旋运动。它是哪根轴？",
-                        "The flange moves from home to the current pose. By Chasles' theorem the displacement is a screw motion. About which axis?"] } },
+                        "The flange moves from the zero position to the current pose. By Chasles' theorem the displacement is a screw motion. About which axis?"] } },
     { id: "stair", name: ["旋转楼梯", "A spiral staircase"], hide: ["j1", "j2", "j3", "j4", "j5", "j6"],
       problem: { title: ["生活中的例子：走旋转楼梯", "Everyday example: climbing a spiral staircase"],
                  text: ["楼梯绕中心柱盘旋而上。人沿楼梯走，就是绕中心柱的螺旋运动：轴是中心柱，节距由每圈上升的高度决定。",
@@ -31,7 +31,7 @@ WQ.lab({
   ],
   buttons: [{ id: "demo", name: ["沿螺旋轴演示", "Screw it along the axis"], primary: true }, { id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "ex", robot: true, text: ["设置算例 6.4.2 的关节角 (30°, −45°, 60°, −15°, 90°, 30°)，读出转角和节距。", "Set Example 6.4.2, (30°, −45°, 60°, −15°, 90°, 30°), and read the angle and the pitch."],
+    { id: "ex", robot: true, text: ["设置算例 6.4.2 的关节角 (30°, −45°, 60°, −15°, 90°, 30°)，读出转角和节距。", "Set the joint angles of Example 6.4.2, (30°, −45°, 60°, −15°, 90°, 30°), and read the angle and the pitch."],
       demo: { scene: "ur", set: { j1: 30, j2: -45, j3: 60, j4: -15, j5: 90, j6: 30 }, press: [], wait: 1 } },
     { id: "one", robot: true, text: ["只转动关节 1：节距为零，螺旋轴就是关节 1 的轴。", "Turn joint 1 only: the pitch is zero and the screw axis is joint 1's axis."],
       demo: { scene: "ur", set: { j1: 60, j2: 0, j3: 0, j4: 0, j5: 0, j6: 0 }, press: [], wait: 1 } },
@@ -137,7 +137,7 @@ WQ.lab({
     if (api.scene === "stair") {
       const a = api.p.ang * Math.PI / 180, h = api.p.lead / (2 * Math.PI), rise = h * a;
       if (api.p.ang === 720 && Math.abs(api.p.lead - 0.5) < 1e-9) api.done("stair");
-      return [[["旋量轴 S（中心柱，过原点、沿 z）", "screw axis S (the post, through 0 along z)"], `(0, 0, 1, 0, 0, ${f(h, 4)})`],
+      return [[["旋量轴 S（中心柱，过原点、沿 z）", "screw axis S (the post, through the origin along z)"], `(0, 0, 1, 0, 0, ${f(h, 4)})`],
               [["节距 h = 每圈上升 / 2π", "pitch h = rise per turn / 2π"], f(h, 4) + " m/rad"],
               [["转角 θ", "angle θ"], f(a, 3) + " rad"], [["上升 hθ", "rise hθ"], f(rise, 3) + " m"]];
     }

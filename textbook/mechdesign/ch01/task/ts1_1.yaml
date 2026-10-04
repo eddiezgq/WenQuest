@@ -1,0 +1,36 @@
+# 工程任务单 TS-1-1（配第 1 章，提纲的“工程任务 0”）：第一次走进班级工厂，把一项小的设计更改从申请走到检验。格式见 textbook/tools/tasksheet.py。
+编号: TS-1-1
+标题: ["进入班级工厂：SH-301 键槽改版走一遍全流程", "Into the class factory: take an SH-301 keyway change through the whole process"]
+角色: ["设计部门的助理工程师", "assistant engineer, design department"]
+背景:
+  - "质量部门在输出轴 SH-301 的疲劳分析中发现：齿轮位上的键槽一直开到轴环的圆角附近，键槽端部和圆角的应力集中叠在一起。工艺员提出把键槽由 45 mm 缩短到 40 mm（平键相应由 12×8×45 改为 12×8×40）。你作为设计部门的助理工程师，负责这项工程更改：先评估它会带来什么后果，再决定怎样改、提交更改申请、改设计并发布，跟踪车间按新版本加工和检验。这是你在班级工厂的第一张任务单，目的是走通“申请—评审—发布—制造—检验”的全过程，并体会“一个小改动会牵动别的东西”。"
+  - "In a fatigue review of output shaft SH-301 the quality department found that the keyway on the gear seat runs right up to the collar fillet, so the stress raisers of the keyway end and the fillet overlap. The process engineer proposes shortening the keyway from 45 mm to 40 mm (and the key from 12×8×45 to 12×8×40). As assistant engineer in the design department you own this engineering change: first assess its consequences, then decide how to make it, file the change request, revise and release the design, and follow the shop as it makes and inspects the new revision. This is your first task sheet in the class factory; the aims are to go once through request, review, release, manufacture and inspection, and to see how one small change pulls on other things."
+输入:
+  - {名称: ["工艺员的更改建议（键槽 45 → 40 mm，键 12×8×45 → 12×8×40）", "The process engineer's proposal (keyway 45 → 40 mm, key 12×8×45 → 12×8×40)"], 来源: ["本任务单背景", "This sheet"]}
+  - {名称: ["SH-301 现行版本的模型、零件图、物料清单与检验模板；平键 KEY-12x8x45", "Current SH-301 model, drawing, BOM and inspection template; key KEY-12x8x45"], 来源: ["数字工厂“设计与工艺”页；ERPNext；零件库 A-KEY-FLAT", "Digital factory, Design & Process page; ERPNext; parts library A-KEY-FLAT"]}
+  - {名称: ["额定输出转矩 T = 350 N·m（已含工况系数），齿轮位直径 d = 40 mm", "Rated output torque T = 350 N·m (incl. application factor), gear-seat diameter d = 40 mm"], 来源: ["数字工厂参数配置器；教材 1.1 节", "Digital-factory configurator; Section 1.1"]}
+  - {名称: ["平键挤压强度：σp = 4T/(d·h·l) ≤ [σp]，A 型（圆头）键的工作长度 l = L − b，B 型（平头）键 l = L；钢制轮毂静联接 [σp] = 135 MPa（120–150 MPa 的中值）", "Key bearing stress: σp = 4T/(d·h·l) ≤ [σp]; working length l = L − b for a type A (round-end) key, l = L for type B (flat-end); steel hub, static joint, [σp] = 135 MPa (middle of 120–150 MPa)"], 来源: ["数字工厂参数配置器的键校核；第 25 章", "The configurator's key check; Chapter 25"]}
+交付物:
+  - {名称: ["工程更改申请（改什么、为什么、影响哪些物料和文件、建议怎样改）", "Engineering change request (what, why, which items and documents are affected, what you recommend)"], 验收: ["写明键槽和键的改动及其后果；列出受影响的平键、SH-301 的图纸与数控程序、配置器的额定转矩、在制品和库存的处置；给出建议的做法和理由", "States the keyway and key change and its consequence; lists the affected key, the SH-301 drawing and CNC program, the configurator's rated torque, and what to do with work in progress and stock; recommends a course of action with reasons"], 类型: 更改单, 必列: ["KEY|键", "SH-301", "额定转矩|配置器|350", "在制品|库存|WIP"]}
+  - {名称: ["一页计算书：键槽缩短后平键的挤压强度校核", "One-page calculation sheet: key bearing-stress check after shortening"], 验收: ["按 1.6 节的格式：已知、公式、代入、结果、出处、结论；算出 12×8×40 的 A 型键在 350 N·m 下是否满足；不满足时比较至少两种措施（如改用 B 型平头键、降低额定转矩、双键）", "In the format of Section 1.6: given, formula, substitution, result, source, conclusion; whether a type A 12×8×40 key passes at 350 N·m; if not, compare at least two remedies (e.g. a type B flat-end key, a lower rated torque, two keys)"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["SH-301 新版本（在线设计台发布，按评审结论）", "New SH-301 revision (released from the web design desk, as the review decides)"], 验收: ["键槽长度与批准的更改申请一致；校核通过；改动说明写清楚采用了哪种措施", "Keyway length matches the approved change request; design check passes; the change note says which remedy was adopted"], 类型: 设计发布, 零件: SH-301}
+  - {名称: ["制造与检验复盘（一页）", "Manufacturing and inspection review (one page)"], 验收: ["新版本的工单、数控程序版本、检验记录各截一张图；说明检验结果是否合格，从申请到检验经过了哪些系统和哪些人；指出这次更改还有哪一处没有自动跟上（提示：参数配置器）", "One screenshot each of the work order, CNC-program revision and inspection record for the new revision; whether the inspection passed, and which systems and people the change passed through; point out what did not follow the change automatically (hint: the configurator)"], 类型: 文件, 格式: [docx, pdf]}
+工位: [PLM, CAD, ERP, MES, QMS]
+步骤:
+  - ["读需求：在 ERPNext 里打开 SH-301 的物料、物料清单和检验模板，找出键槽改短会影响到的东西（1.2、1.3 节）", "Read the need: open SH-301's item, BOM and inspection template in ERPNext and find what a shorter keyway affects (Sections 1.2, 1.3)"]
+  - ["校核：用任务单给出的公式，先算现行 12×8×45 A 型键，再算 12×8×40 A 型键；写成一页计算书（1.6 节）。不满足时比较几种措施", "Check: with the formula on this sheet, check the present type A 12×8×45 key and then a type A 12×8×40 key; write a one-page calculation sheet (Section 1.6). If it fails, compare remedies"]
+  - ["申请：在“我的任务”里提交工程更改申请，写明改什么、为什么、后果和建议", "Request: file the engineering change request in My tasks — what, why, the consequence and your recommendation"]
+  - ["评审与改设计：按老师（评审人）的结论，在“设计与工艺”的在线设计台把键槽改成批准的长度，看三维模型和校核结果，填改动说明，发布新版本", "Review and revise: following the instructor's (reviewer's) decision, set the approved keyway length on the web design desk, check the model and the design check, write the change note and publish"]
+  - ["提交：在“我的任务”里提交全部交付物，预检，回复 AI 评审员和老师的意见", "Submit all deliverables in My tasks, run the pre-check and answer the AI reviewer and the instructor"]
+  - ["制造与检验：批准后跟踪下一张工单，看铣键槽工序用的是不是新程序、检验记录是否合格，写复盘", "Make and inspect: after approval follow the next work order — is the keyway operation using the new program, did the inspection pass — and write the review"]
+评审要点:
+  - ["看到了“连带”的后果：键缩短后工作长度变小，A 型键的挤压应力超过许用值，额定转矩要跟着变或者换键型", "Sees the knock-on effect: a shorter key has less working length, the type A key's bearing stress exceeds the allowable, so either the rated torque or the key type must change"]
+  - ["计算书格式完整：每个数有单位和出处，结论明确，措施有比较", "The calculation sheet is complete: units and sources for every number, a clear verdict, remedies compared"]
+  - ["发布的新版本与批准的更改申请一致，改动说明写清楚", "The released revision matches the approved change request and the change note is clear"]
+  - ["复盘能说出数据在 PLM、ERP、MES、QMS 之间是怎样传递的，以及哪里没有自动跟上", "The review can say how the data passed between PLM, ERP, MES and QMS, and where it did not follow automatically"]
+评分:
+  - {项: ["工程更改申请", "Engineering change request"], 分: 25, 标准: ["受影响的物料和文件列全，理由清楚", "Affected items and documents complete, reasons clear"]}
+  - {项: ["计算书", "Calculation sheet"], 分: 30, 标准: ["计算正确，格式符合 1.6 节，结论明确，措施有比较", "Correct, formatted as in Section 1.6, clear verdict, remedies compared"]}
+  - {项: ["设计发布", "Design release"], 分: 20, 标准: ["新版本正确，评审意见逐条关闭", "Correct revision; review comments closed one by one"]}
+  - {项: ["制造与检验复盘", "Manufacturing and inspection review"], 分: 25, 标准: ["截图齐全，检验结论正确，说清楚数据流", "Screenshots complete, inspection verdict right, data flow explained"]}
+学时: 2

@@ -1,7 +1,7 @@
 # 实验 8.2 的指导书与报告模板。目的、场景、参数、任务取自 lab8_2.js。
 原理:
   - ["扭簧手臂的末端被固定在 p_d，手臂停在扭簧势能最小的形态：min ½(θ − θ_c)ᵀK(θ − θ_c)，约束 p(θ) = p_d。这是一个等式约束优化问题。",
-     "With the tip held at p_d, the spring arm settles at the least spring energy: min ½(θ − θ_c)ᵀK(θ − θ_c) subject to p(θ) = p_d, an equality-constrained problem."]
+     "With the end-effector held at p_d, the spring arm settles in the configuration of least spring energy: min ½(θ − θ_c)ᵀK(θ − θ_c) subject to p(θ) = p_d, an equality-constrained problem."]
   - 式: "拉格朗日条件：K(θ − θ_c) + J(θ)ᵀλ = 0，p(θ) − p_d = 0          (8.2.5)"
   - ["拉格朗日-牛顿法用牛顿法解上面的方程组，每一步解一个 5×5 的线性方程组（式 (8.2.10)），在解附近二次收敛。",
      "The Lagrange–Newton method solves these equations by Newton's method, one 5×5 linear system per step (Eq. (8.2.10)); it converges quadratically near the solution."]
@@ -28,7 +28,7 @@
     表头英文: ["Length ℓ / m", "Weight G / N", "Angle α / (°)", "Tension λ / N", "G/(2 cos α) / N"]
     行: [["2.6", "20", "", "", ""], ["3.0", "20", "", "", ""], ["2.2", "20", "", "", ""], ["", "", "", "", ""]]
 注意:
-  - ["改变任一滑块都会让手臂回到自然形态，需要重新按“求解”。", "Moving any slider returns the arm to its natural posture; press “Solve” again."]
+  - ["改变任一滑块都会让手臂回到自然形态，需要重新按“求解”。", "Moving any slider returns the arm to its natural configuration; press “Solve” again."]
   - ["乘子的符号取决于拉格朗日函数的写法；本实验用 L = f + λᵀh，与正文一致。", "The sign of a multiplier depends on how the Lagrangian is written; this lab uses L = f + λᵀh, as in the text."]
   - ["目标点离工作空间边界太近时，牛顿法可能不收敛，界面会显示“未收敛”。", "If the target is too close to the edge of the workspace, Newton's method may fail; the screen then shows “not converged”."]
 思考题:

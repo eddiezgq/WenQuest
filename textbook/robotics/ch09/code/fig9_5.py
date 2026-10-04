@@ -12,6 +12,7 @@ from _prob import gauss_pdf
 from bookout import COLORS as C, T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 
 
 def clean(ax):
@@ -86,8 +87,8 @@ ax.axhline(0, color=C["ink"], lw=0.6)
 ax.text(0.3, 112, T("蓝带：滤波器给出的 " + r"$\pm 2\sqrt{P_k}$", "blue band: the filter's " + r"$\pm 2\sqrt{P_k}$"), fontsize=9, color=C["z"],
         bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.85))
 ax.set_ylim(-170, 130)
-ax.set_xlabel(T("时间 t / s", "time t / s"))
-ax.set_ylabel(T("估计值 − 真实位置 / mm", "estimate − true position / mm"))
+ax.set_xlabel(T("时间 t / s", "Time t / s"))
+ax.set_ylabel(T("估计值 − 真实位置 / mm", "Estimate − true position / mm"))
 ax.legend(fontsize=9, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.12), ncol=3)
 clean(ax)
 figure(fig, "fig9_5_2")
@@ -105,18 +106,18 @@ for i in range(2000):
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.6, 3.4))
 k = np.arange(1, N + 1)
 ax1.plot(k, 1000 * np.sqrt(Ps), color=C["z"], lw=1.8, label=T("滤波器的 " + r"$\sqrt{P_k}$", "filter's " + r"$\sqrt{P_k}$"))
-ax1.plot(k[::4], 1000 * E.std(axis=0, ddof=1)[::4], "o", color=C["x"], ms=3.5, label=T("2000 次仿真的误差标准差", "error std over 2000 runs"))
+ax1.plot(k[::4], 1000 * E.std(axis=0, ddof=1)[::4], "o", color=C["x"], ms=3.5, label=T("2000 次仿真的误差标准差", "error standard deviation over 2,000 runs"))
 ax1.axhline(1000 * math.sqrt(P_inf), color=C["muted"], lw=0.8, ls="--")
 ax1.text(60, 1000 * math.sqrt(P_inf) - 5, T("稳态值", "steady state"), fontsize=9, color=C["muted"])
 ax1.set_ylim(0, 55)
-ax1.set_xlabel(T("步数 k", "step k"))
+ax1.set_xlabel(T("步数 k", "Step k"))
 ax1.set_ylabel("mm")
 ax1.legend(fontsize=9, frameon=False)
 clean(ax1)
 ax2.plot(k, Ks, color=C["z"], lw=1.8)
 ax2.axhline(K_inf, color=C["muted"], lw=0.8, ls="--")
 ax2.text(55, K_inf + 0.04, T("稳态增益 " + r"$K_\infty$" + f" = {K_inf:.3f}", "steady-state gain " + r"$K_\infty$" + f" = {K_inf:.3f}"), fontsize=9, color=C["muted"])
-ax2.set_xlabel(T("步数 k", "step k"))
+ax2.set_xlabel(T("步数 k", "Step k"))
 ax2.set_ylabel(T("卡尔曼增益 " + r"$K_k$", "Kalman gain " + r"$K_k$"))
 ax2.set_ylim(0, 1)
 clean(ax2)

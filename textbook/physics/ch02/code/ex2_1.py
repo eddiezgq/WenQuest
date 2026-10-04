@@ -56,7 +56,8 @@ n0 = np.array([0, 0, 1.0])
 n_xy, n_yx = R_xy @ n0, R_yx @ n0
 dirname = {(1, 0, 0): "+x", (-1, 0, 0): "−x", (0, 1, 0): "+y", (0, -1, 0): "−y", (0, 0, 1): "+z", (0, 0, -1): "−z"}
 nm = lambda v: dirname[tuple(int(round(c)) for c in v)]
-out(big=big, small=small, small_pred=math.degrees(s1 * s1), n_xy=nm(n_xy), n_yx=nm(n_yx))
+out(big=big, small=small, small_rad=math.radians(small), small_pred=math.degrees(s1 * s1), n_xy=nm(n_xy), n_yx=nm(n_yx),
+    s1_rad=s1)
 
 plt = style()
 # ---- 图 2.1.1：路程与位移；平移后的同一个矢量
@@ -97,9 +98,12 @@ def draw_box(ax, R, title):
     for v, c, n in ((np.array([1.9, 0, 0]), d.X_, "x"), (np.array([0, 1.9, 0]), d.Y_, "y"), (np.array([0, 0, 1.9]), d.Z_, "z")):
         ax.quiver(0, 0, 0, *v, color=c, lw=1.2, arrow_length_ratio=0.12)
         ax.text(*(v * 1.12), n, color=c, fontsize=9)
+    nv = R @ np.array([0, 0, 1.0])                     # 封面的法线：橙色面朝向哪里
+    ax.quiver(0, 0, 0, *(1.5 * nv), color="#c0392b", lw=2.2, arrow_length_ratio=0.18)
+    lab = dirname[tuple(int(round(c)) for c in nv)]
     ax.set_xlim(-1.6, 1.6); ax.set_ylim(-1.6, 1.6); ax.set_zlim(-1.6, 1.6)
     ax.set_box_aspect((1, 1, 1)); ax.view_init(elev=22, azim=-58); ax.set_axis_off()
-    ax.set_title(title, fontsize=9)
+    ax.set_title(title + T("\n封面朝 ", "\ncover faces ") + lab, fontsize=9)
 
 
 fig = plt.figure(figsize=(7.6, 4.4))

@@ -18,18 +18,18 @@ WQ.lab({
                         "Nine judges score; now and then one gives a wild score. Which is closest: mean, median, or the mean without the extremes?"] } },
   ],
   params: [
-    { id: "s1", name: ["激光的标准差 σ₁", "Laser std σ₁"], min: 1, max: 20, step: 0.5, value: 3, unit: "mm", digits: 1 },
-    { id: "s2", name: ["超声的标准差 σ₂", "Ultrasonic std σ₂"], min: 1, max: 20, step: 0.5, value: 10, unit: "mm", digits: 1 },
+    { id: "s1", name: ["激光的标准差 σ₁", "Laser standard deviation σ₁"], min: 1, max: 20, step: 0.5, value: 3, unit: "mm", digits: 1 },
+    { id: "s2", name: ["超声的标准差 σ₂", "Ultrasonic standard deviation σ₂"], min: 1, max: 20, step: 0.5, value: 10, unit: "mm", digits: 1 },
     { id: "w", name: ["激光的权重 w", "Laser weight w"], min: 0, max: 1, step: 0.01, value: 0.5, unit: "", digits: 2 },
     { id: "pout", name: ["离谱分数的概率 p", "Probability of a wild score p"], min: 0, max: 0.3, step: 0.01, value: 0.1, unit: "", digits: 2 },
     { id: "est", name: ["估计方法：0 平均 / 1 中位数 / 2 去掉最高最低", "Estimator: 0 mean / 1 median / 2 trimmed"], min: 0, max: 2, step: 1, value: 0, unit: "", digits: 0 },
   ],
   tasks: [
-    { id: "avg", robot: true, text: ["w = 0.5（简单平均），模拟 1000 次以上，验证误差的标准差大于只用激光的 3 mm。", "w = 0.5 (plain average), at least 1000 runs: the error std exceeds the laser's 3 mm."],
+    { id: "avg", robot: true, text: ["w = 0.5（简单平均），模拟 1000 次以上，验证误差的标准差大于只用激光的 3 mm。", "w = 0.5 (plain average), at least 1,000 runs: the error standard deviation exceeds the laser's 3 mm."],
       demo: { scene: "dock", set: { s1: 3, s2: 10, w: 0.5 }, press: ["start"], wait: 5 } },
-    { id: "best", robot: true, text: ["调节 w，使误差的标准差最小；与式 (9.4.11) 的最优权重相差不超过 0.02。", "Tune w to minimize the error std; it should be within 0.02 of the optimum from Eq. (9.4.11)."],
+    { id: "best", robot: true, text: ["调节 w，使误差的标准差最小；与式 (9.4.11) 的最优权重相差不超过 0.02。", "Tune w to minimize the error standard deviation; it should be within 0.02 of the optimum from Eq. (9.4.11)."],
       demo: { scene: "dock", set: { s1: 3, s2: 10, w: 0.92 }, press: ["start"], wait: 5 } },
-    { id: "trim", text: ["离谱分数的概率 0.1：选“去掉最高最低”，模拟 1000 次以上，它的均方根误差小于平均分的。", "Wild-score probability 0.1: choose “trimmed”, run 1000+ times; its RMS error is below the mean's."],
+    { id: "trim", text: ["离谱分数的概率 0.1：选“去掉最高最低”，模拟 1000 次以上，它的均方根误差小于平均分的。", "Wild-score probability 0.1: choose “trimmed”, run 1,000+ times; its RMS error is below the mean's."],
       demo: { scene: "judge", set: { pout: 0.1, est: 2 }, press: ["start"], wait: 5 } },
   ],
   think: ["把一个好传感器和一个差传感器简单平均，为什么可能比只用好的还差？两个传感器精度相同时，最优权重是多少？",
@@ -75,11 +75,11 @@ WQ.lab({
       if (std3 && Math.abs(p.w - 0.5) < 1e-6 && n >= 1000 && sw > 3) api.done("avg");
       if (n >= 1000 && Math.abs(p.w - wopt) <= 0.02) api.done("best");
       return [[["模拟次数", "runs"], String(n)],
-              [["误差的标准差（模拟，权重 w）", "error std (simulated, weight w)"], f(sw, 3) + " mm"],
+              [["误差的标准差（模拟，权重 w）", "error standard deviation (simulated, weight w)"], f(sw, 3) + " mm"],
               [["理论值 √(w²σ₁² + (1−w)²σ₂²)", "theory √(w²σ₁² + (1−w)²σ₂²)"], f(sth, 3) + " mm"],
               [["只用激光（模拟）", "laser only (simulated)"], f(this.sd(s.eL), 3) + " mm"],
               [["简单平均（模拟）", "plain average (simulated)"], f(this.sd(s.eA), 3) + " mm"],
-              [["最优权重 w* 与最小标准差", "best weight w* and its std"], `${api.fmt(wopt, 3)}，${api.fmt(smin, 3)} mm`]];
+              [["最优权重 w* 与最小标准差", "best weight w* and its standard deviation"], `${api.fmt(wopt, 3)}，${api.fmt(smin, 3)} mm`]];
     }
     const n = s.jm.length, rm = this.rms(s.jm), rd = this.rms(s.jd), rt = this.rms(s.jt);
     if (p.pout >= 0.1 - 1e-6 && p.est === 2 && n >= 1000 && rt < rm) api.done("trim");
@@ -131,7 +131,7 @@ WQ.lab({
     const names = [api.T("平均分", "mean"), api.T("中位数", "median"), api.T("去掉最高最低", "trimmed")];
     arrs.forEach((a, k) => {
       this.hist(api, a, 30 + k * third, 30 + (k + 1) * third - 20, y0, y1, -1, 1, k === p.est ? api.css("--blue") : api.css("--grid"));
-      api.label(names[k] + api.T("的误差（−1～1 分）", " error (−1 to 1)"), 30 + k * third, y0 - 10, api.css("--muted"), 12);
+      api.label(names[k] + api.T("的误差（−1～1 分）", " error (−1 to 1 point)"), 30 + k * third, y0 - 10, api.css("--muted"), 12);
     });
     api.label(api.T("红色：离谱分数（偏差超过 0.8 分）", "red: wild scores (off by more than 0.8)"), 16, 20, api.css("--muted"), 12);
   },

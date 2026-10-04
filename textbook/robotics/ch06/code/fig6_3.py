@@ -36,9 +36,9 @@ for z, rr in ((0.0, 0.0), (0.0, 0.5), (0.0, 1.0), (0.9, 0.0), (0.9, 1.0)):
 t = np.linspace(0, 4.2, 200)
 ax.plot(1.0 * np.cos(t), 1.0 * np.sin(t), 0.0 + h * t, color=C["x"], lw=1.2, alpha=0.8)
 ax.text(0.1, 0.1, 1.05, r"$h|\omega|$", color=C["z"], fontsize=12, ha="left")
-ax.text2D(0.0, 0.10, T("轴上的点：只沿轴运动", "on the axis: moves along it only"), transform=ax.transAxes, fontsize=9.5, color=C["z"])
-ax.text2D(0.0, 0.04, T("离轴 r 处：垂直速度 |ω| r", "at distance r: |ω| r across"), transform=ax.transAxes, fontsize=9.5, color=C["accent"])
-ax.text2D(0.0, -0.02, T("一点的轨迹：螺旋线", "a point's path: a helix"), transform=ax.transAxes, fontsize=9.5, color=C["x"])
+ax.text2D(0.0, 0.10, T("轴上的点：只沿轴运动", "On the axis: moves along it only"), transform=ax.transAxes, fontsize=9.5, color=C["z"])
+ax.text2D(0.0, 0.04, T("离轴 r 处：垂直速度 |ω| r", "At distance r: |ω|r across the axis"), transform=ax.transAxes, fontsize=9.5, color=C["accent"])
+ax.text2D(0.0, -0.02, T("一点的轨迹：螺旋线", "A point's path: a helix"), transform=ax.transAxes, fontsize=9.5, color=C["x"])
 tight3d(ax, np.array([[-1.1, -1.1, -0.3], [1.1, 1.1, 1.6]]), pad=0.0, zoom=1.25)
 figure(fig, "fig6_3_1")
 plt.close(fig)
@@ -56,16 +56,16 @@ for qq in P[1:-1]:
 # 关节 1、3 的轴
 (w1, q1), (w3, q3) = UR_AXES[0], UR_AXES[2]
 ax.plot(*np.array([q1 - 0.25 * w1, q1 + 0.45 * w1]).T, color=C["z"], lw=1.4, ls="--")
-ax.text(*(q1 + 0.5 * w1), T("关节 1 的轴", "joint 1 axis"), color=C["z"], fontsize=9.5, ha="center")
+ax.text(*(q1 + 0.5 * w1), T("关节 1 的轴", "Joint 1 axis"), color=C["z"], fontsize=9.5, ha="center")
 ax.plot(*np.array([q3 - 0.35 * w3, q3 + 0.3 * w3]).T, color=C["z"], lw=1.4, ls="--")
-ax.text(*(q3 + 0.36 * w3 + np.array([0, 0, -0.02])), T("关节 3 的轴", "joint 3 axis"), color=C["z"], fontsize=9.5, ha="left")
+ax.text(*(q3 + 0.38 * w3 + np.array([0, 0, -0.04])), T("关节 3 的轴", "Joint 3 axis"), color=C["z"], fontsize=9.5, ha="right")
 # 瞬时螺旋轴
 A = np.array([q - 0.45 * s_hat, q + 0.55 * s_hat])
 ax.plot(*A.T, color=C["accent"], lw=2.2)
 ax.quiver(*(q + 0.4 * s_hat), *(0.15 * s_hat), color=C["accent"], lw=2.2, arrow_length_ratio=0.4)
 ax.scatter(*q, color=C["accent"], s=30, depthshade=False)
 ax.text(*(q + np.array([-0.02, 0.0, 0.05])), "$q$", color=C["accent"], fontsize=13)
-ax.text(*(q + 0.6 * s_hat + np.array([0, 0, 0.02])), T("瞬时螺旋轴（节距 h = L₁/2）", "instantaneous screw axis (pitch h = L₁/2)"), color=C["accent"], fontsize=9.5, ha="center")
+ax.text(*(q + 0.6 * s_hat + np.array([0, 0, 0.04])), T("瞬时螺旋轴\n（节距 h = L₁/2）", "Instantaneous screw axis\n(pitch h = L₁/2)"), color=C["accent"], fontsize=9.5, ha="center")
 # 基座坐标系
 for i in range(3):
     e = np.zeros(3)

@@ -5,12 +5,12 @@
 WQ.lab({
   title: ["实验 7.4 数值微分与刚性", "Lab 7.4 Numerical differentiation and stiffness"],
   goal: ["由编码器和卫星定位的读数求速度，找出最佳的差商跨度；用显式和隐式欧拉法仿真刚性的电机电流环。",
-         "Get speed from encoder and satellite readings and find the best difference span; simulate a stiff motor current loop with explicit and implicit Euler."],
+         "Get speed from encoder and satellite readings and find the best difference interval; simulate a stiff motor current loop with explicit and implicit Euler."],
   scenes: [
     { id: "enc", robot: true, name: ["编码器测速", "Speed from an encoder"], hide: ["meth", "hS", "sigma", "span"],
-      problem: { title: ["机器人问题：每毫秒一个计数值，怎样求角速度", "Robot problem: one count reading per millisecond — what is the speed"],
+      problem: { title: ["机器人问题：每毫秒一个计数值，怎样求角速度", "Robot problem: one encoder count every millisecond: what is the speed?"],
                  text: ["关节按 θ = 2 sin 2πt rad 运动。调节差商的跨度和编码器的分辨率，读出角速度估计的均方根误差。差商：0 后向，1 中心。",
-                        "The joint moves as θ = 2 sin 2πt rad. Change the span and the encoder resolution; read the RMS error of the speed estimate. Difference: 0 backward, 1 central."] } },
+                        "The joint moves as θ = 2 sin 2πt rad. Change the difference interval and the encoder resolution; read the RMS error of the speed estimate. Difference: 0 backward, 1 central."] } },
     { id: "stiff", robot: true, name: ["电流环的刚性", "A stiff current loop"], hide: ["n", "bits", "dm", "sigma", "span"],
       problem: { title: ["机器人问题：仿真步长被电流环卡住", "Robot problem: the current loop limits the step"],
                  text: ["电流的时间常数约 28 µs，转速的时间常数约 20 ms。显式欧拉法要求 h ≤ 2/|λ快| ≈ 56.7 µs。方法：0 显式欧拉，1 隐式欧拉。",
@@ -21,29 +21,29 @@ WQ.lab({
                         "The watch gets a position every second with an error of a few metres. Estimate the speed from the position change over the last S seconds: short S jumps, long S lags."] } },
   ],
   params: [
-    { id: "n", name: ["差商跨度 h", "Span h"], min: 1, max: 60, step: 1, value: 1, unit: "ms", digits: 0 },
+    { id: "n", name: ["差商跨度 h", "Difference interval h"], min: 1, max: 60, step: 1, value: 1, unit: "ms", digits: 0 },
     { id: "bits", name: ["编码器分辨率（每转 2^bits 计数）", "Encoder resolution (2^bits counts/rev)"], min: 10, max: 20, step: 1, value: 14, unit: "bit", digits: 0 },
     { id: "dm", name: ["差商：0 后向，1 中心", "Difference: 0 backward, 1 central"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
     { id: "meth", name: ["方法：0 显式，1 隐式", "Method: 0 explicit, 1 implicit"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
     { id: "hS", name: ["步长 h", "Step h"], min: 10, max: 2000, step: 1, value: 50, unit: "µs", digits: 0 },
     { id: "sigma", name: ["定位误差 σ", "Position error σ"], min: 0.5, max: 5, step: 0.5, value: 2, unit: "m", digits: 1 },
-    { id: "span", name: ["跨度 S", "Span S"], min: 1, max: 60, step: 1, value: 1, unit: "s", digits: 0 },
+    { id: "span", name: ["跨度 S", "Difference interval S"], min: 1, max: 60, step: 1, value: 1, unit: "s", digits: 0 },
   ],
   buttons: [{ id: "start", name: ["回放", "Play"], primary: true }, { id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "best", robot: true, text: ["编码器 14 bit、后向差商：找到均方根误差最小的跨度。", "Encoder 14 bit, backward difference: find the span with the smallest RMS error."],
+    { id: "best", robot: true, text: ["编码器 14 bit、后向差商：找到均方根误差最小的跨度。", "Encoder 14 bit, backward difference: find the difference interval with the smallest RMS error."],
       demo: { scene: "enc", set: { bits: 14, dm: 0, n: 2 }, press: ["start"], wait: 4 } },
-    { id: "central", robot: true, text: ["换成中心差商并调跨度，使误差不到后向差商最佳值的一半。", "Switch to the central difference and tune the span until the error is under half the best backward value."],
+    { id: "central", robot: true, text: ["换成中心差商并调跨度，使误差不到后向差商最佳值的一半。", "Switch to the central difference and tune the difference interval until the error is under half the best backward value."],
       demo: { scene: "enc", set: { bits: 14, dm: 1, n: 10 }, press: ["start"], wait: 4 } },
     { id: "explode", robot: true, text: ["显式欧拉法：把步长从 50 µs 加大，找到刚好发散的步长（不超过 70 µs）。", "Explicit Euler: raise the step from 50 µs and find one that just diverges (70 µs or less)."],
       demo: { scene: "stiff", set: { meth: 0, hS: 60 }, press: ["start"], wait: 4 } },
     { id: "implicit", robot: true, text: ["隐式欧拉法、h = 1 ms：仿真稳定，0.1 s 时转速与精确值相差不到 1 rad/s。", "Implicit Euler, h = 1 ms: stable, and at 0.1 s the speed is within 1 rad/s of the exact value."],
       demo: { scene: "stiff", set: { meth: 1, hS: 1000 }, press: ["start"], wait: 4 } },
-    { id: "watch", text: ["跑步手表：定位误差 2 m，选一个跨度使速度的均方根误差小于 0.3 m/s。", "Running watch: position error 2 m; choose a span so that the RMS speed error is below 0.3 m/s."],
+    { id: "watch", text: ["跑步手表：定位误差 2 m，选一个跨度使速度的均方根误差小于 0.3 m/s。", "Running watch: position error 2 m; choose a difference interval so that the RMS speed error is below 0.3 m/s."],
       demo: { scene: "watch", set: { sigma: 2, span: 15 }, press: ["start"], wait: 4 } },
   ],
   think: ["编码器分辨率提高 64 倍（从 14 bit 到 20 bit），最佳跨度和最小误差各变为多少？用式 (7.4.7) 估计后再验证。",
-          "With 64 times the resolution (14 bit to 20 bit), what become the best span and the smallest error? Estimate with Eq. (7.4.7), then check."],
+          "With 64 times the resolution (14 bit to 20 bit), what do the best difference interval and the smallest error become? Estimate with Eq. (7.4.7), then check."],
 
   // ---------- 编码器
   enc(api) {
@@ -116,7 +116,7 @@ WQ.lab({
       if (s.finished && api.p.bits === 14 && api.p.dm === 1 && s.rms < 0.5 * s.bestB) api.done("central");
       return [[["一个计数 q", "one count q"], api.fmt(s.E.q * 1e6, 1) + " µrad"], [["q / 1 ms", "q / 1 ms"], api.fmt(s.E.q * 1000, 3) + " rad/s"],
               [["角速度幅值", "speed amplitude"], "12.57 rad/s"], [["均方根误差", "RMS error"], api.fmt(s.rms, 4) + " rad/s"],
-              [["后向差商的最佳跨度", "best backward span"], s.nBest + " ms"], [["后向差商的最小误差", "smallest backward error"], api.fmt(s.bestB, 4) + " rad/s"]];
+              [["后向差商的最佳跨度", "best backward difference interval"], s.nBest + " ms"], [["后向差商的最小误差", "smallest backward error"], api.fmt(s.bestB, 4) + " rad/s"]];
     }
     if (api.scene === "stiff") {
       const h = api.p.hS;
@@ -131,7 +131,7 @@ WQ.lab({
     if (s.finished && api.p.sigma === 2 && s.G.rms < 0.3) api.done("watch");
     const pace = (v) => { const sec = 1000 / v; return `${Math.floor(sec / 60)}′${String(Math.round(sec % 60)).padStart(2, "0")}″`; };
     return [[["速度的均方根误差", "RMS speed error"], api.fmt(s.G.rms, 3) + " m/s"], [["平均配速", "mean pace"], pace(3) + api.T(" /公里", " /km")],
-            [["跨度 S", "span S"], api.p.span + " s"]];
+            [["跨度 S", "difference interval S"], api.p.span + " s"]];
   },
   draw(api, s) {
     const { w, h } = api, P = s.play;

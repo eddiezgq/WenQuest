@@ -30,7 +30,7 @@ class Lesson(Base):
         self.play(Create(ax), FadeIn(xl), FadeIn(yl))
         free = ax.plot(lambda t: 1.5 * THF / T_ * 4 * (t / T_) * (1 - t / T_), x_range=[0, 2], color=GREY_B, stroke_width=4)
         self.play(Create(free), run_time=1.5)
-        self.caption("不限速：最优速度是抛物线，峰值 1.5 rad/s，∫a²dt = 6", "No limit: the best speed is a parabola peaking at 1.5 rad/s; ∫a²dt = 6")
+        self.caption("不限速：最优速度是抛物线，峰值 1.5 rad/s，∫a²dt = 6", "No limit: the optimal speed is a parabola peaking at 1.5 rad/s; ∫a²dt = 6")
         vm = ValueTracker(1.5)
         lim = always_redraw(lambda: DashedLine(ax.c2p(0, vm.get_value()), ax.c2p(2, vm.get_value()), color=RED, stroke_width=3))
         cur = always_redraw(lambda: ax.plot(lambda t: profile(vm.get_value(), t), x_range=[0, 2, 0.01], color=BLUE_C, stroke_width=5))

@@ -8,6 +8,7 @@ BLUE = "#1f77b4"
 ORANGE = "#d9730d"
 PURPLE = "#7b4fa0"
 GREY = "#9aa4ab"
+BOX = dict(fc="white", ec="none", pad=1.0, alpha=0.85)     # 文字压在曲线上时垫一层白底
 
 
 def arrow(ax, p, q, color, lw=1.4, z=4, ms=11, style="-|>"):

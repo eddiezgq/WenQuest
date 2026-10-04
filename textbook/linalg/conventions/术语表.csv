@@ -95,6 +95,7 @@
 4,稠密矩阵,dense matrix,
 4,施特拉森算法,Strassen algorithm,
 4,矩阵的幂,matrix power,
+4,压缩稀疏行,compressed sparse row (CSR),
 5,逆矩阵,inverse matrix,
 5,可逆矩阵,invertible matrix,
 5,奇异矩阵,singular matrix,

@@ -31,7 +31,7 @@ LABELS = {"robot example", "engineer's notes", "engineer’s notes", "exercises"
 TAG = re.compile(r"\\tag\{([^}]+)\}")
 FENCE = re.compile(r"^```.*?^```", re.S | re.M)
 PLACE = re.compile(r"\{\{\s*(\w+)\.(\w+)\s*(?::[^}]+)?\}\}")
-ZH_DIR = re.compile(r"^:::[ \t]*(程序|动画|实验|图|表)[ \t]+([\d.]+)", re.M)
+ZH_DIR = re.compile(r"^:::[ \t]*(程序|动画|实验|图|表|任务)[ \t]+([\d.]+)", re.M)
 EN_DIR = re.compile(r"^:::[ \t]*(" + "|".join(KINDS) + r")[ \t]+([\d.]+)", re.M)
 ZH_ITEM = re.compile(r"\*\*(定义|定律|定理|引理|推论|算例) (\d+\.\d+\.\d+)")
 EN_ITEM = re.compile(r"\*\*(" + "|".join(ITEMS) + r") (\d+\.\d+\.\d+)")
@@ -101,7 +101,7 @@ def _forms(t: str) -> set[str]:
         if t.endswith(suf):
             out.add(t[: -len(suf)])
     out.add(t + "s")
-    for a, b in (("is", "es"), ("ex", "ices"), ("ix", "ices")):     # axis → axes, index → indices, matrix → matrices
+    for a, b in (("is", "es"), ("ex", "ices"), ("ix", "ices"), ("y", "ies")):     # axis → axes, index → indices, matrix → matrices
         if t.endswith(a):
             out.add(t[: -len(a)] + b)
     if " of " in t:                       # "degree of freedom" → "degrees of freedom"

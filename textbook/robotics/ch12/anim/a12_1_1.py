@@ -35,7 +35,7 @@ class Lesson(Base):
         qlabels = VGroup(*[MathTex(f"q_{i + 1}", color=YELLOW, font_size=30).next_to(p, DOWN, buff=0.35)
                            for i, p in enumerate(planar_fk(O, [0, 0, 0], LEN)[:3])])
         self.play(FadeIn(base), Create(zero), FadeIn(arm_m), Write(qlabels))
-        self.caption("零位：三个关节角都为零，三段连杆排成一直线", "Home: all joint angles zero, the links in a line")
+        self.caption("零位：三个关节角都为零，三段连杆排成一直线", "Zero position: all joint angles zero, the links in a line")
 
         trace = TracedPath(lambda: planar_fk(O, [x.get_value() for x in t], LEN)[-1], stroke_color=ORANGE, stroke_width=3)
         self.add(trace)

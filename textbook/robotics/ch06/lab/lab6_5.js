@@ -3,7 +3,7 @@
 //   ω_s = ω，v_s = R(φ) v_b + ω (p_y, −p_x)，
 // 得到空间运动旋量。界面同时画出刚体上各点的速度（由 V_s 算出）和瞬心。
 WQ.lab({
-  title: ["实验 6.5 伴随变换：同一个运动，两种写法", "Lab 6.5 The adjoint: one motion, two descriptions"],
+  title: ["实验 6.5 伴随变换：同一个运动，两种写法", "Lab 6.5 The adjoint transformation: one motion, two descriptions"],
   goal: ["给定物体运动旋量 V_b 和 {b} 的位姿，用伴随矩阵求空间运动旋量 V_s，并从速度场上验证两者描述的是同一个运动。",
          "Given the body twist V_b and the pose of {b}, find the spatial twist V_s with the adjoint, and check on the velocity field that both describe the same motion."],
   scenes: [

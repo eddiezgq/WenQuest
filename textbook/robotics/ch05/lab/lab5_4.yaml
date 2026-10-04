@@ -8,7 +8,7 @@
   - ["改变一条边，只有这条边以下的子树移动；树的其他部分不受影响。", "Changing one edge moves only the subtree below it; the rest of the tree is unaffected."]
 步骤:
   - ["打开实验 5.4，场景“UR5e 工作站”。按算例 5.1.1 安装底座（任务 1），选择 {w} → {s}，记录 T_ws，与算例 5.2.1 比较。",
-     "Open Lab 5.4, scene “UR5e workcell”. Mount the base as in Example 5.1.1 (task 1), pick {w} → {s}, record T_ws and compare with Example 5.2.1."]
+     "Open Lab 5.4, scene “UR5e workstation”. Mount the base as in Example 5.1.1 (task 1), pick {w} → {s}, record T_ws and compare with Example 5.2.1."]
   - ["保持 θ₁ = 0、θ₂ = −90°，选择 {c} → {t}（任务 2）。记录路径和 T_ct，与算例 5.4.2 比较，并记录回路检查的数值。",
      "Keep θ₁ = 0, θ₂ = −90°, pick {c} → {t} (task 2). Record the path and T_ct, compare with Example 5.4.2, and record the loop check."]
   - ["把关节 1 转到 30°（任务 3）。分别选择 {w} → {c} 和 {c} → {t}，记录哪些位姿变了、哪些没变。",
@@ -26,7 +26,7 @@
     行: [["0", "", ""], ["", "", ""]]
 注意:
   - ["坐标系编号：0 {w}，1 {s}，2 {b}，3 {t}，4 {c}，5 {o}。", "Frame numbers: 0 {w}, 1 {s}, 2 {b}, 3 {t}, 4 {c}, 5 {o}."]
-  - ["本实验中 {s} 到 {b} 的六个连杆合成一条边，由第 12 章的指数积公式计算；表 5.4.1 把它们拆成八条边，结果相同。", "Here the six links from {s} to {b} form one edge computed with the PoE formula of Chapter 12; Table 5.4.1 splits them into eight edges with the same result."]
+  - ["本实验中 {s} 到 {b} 的六个连杆合成一条边，由第 12 章的指数积公式计算；表 5.4.1 把它们拆成八条边，结果相同。", "Here the six links from {s} to {b} form one edge computed with the product-of-exponentials formula of Chapter 12; Table 5.4.1 splits them into eight edges with the same result."]
   - ["三维视图中三色坐标轴为 x 红、y 绿、z 蓝；用鼠标拖动可以旋转视角。", "Axes: x red, y green, z blue; drag with the mouse to turn the view."]
 思考题:
   - ["若相机被碰歪，树中哪一条边需要更新？哪些坐标系之间的位姿会受影响？", "If the camera is knocked askew, which edge needs updating? Which poses are affected?"]

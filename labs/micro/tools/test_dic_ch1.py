@@ -2,13 +2,20 @@
 逐个实验按任务要求设置参数、填答案，检查全部任务自动判定完成；中/EN 切换；手机宽度无横向滚动；无脚本错误。
 用法：python labs/micro/tools/test_dic_ch1.py [--shots 目录]
 """
-import json, sys, pathlib
+import json, math, sys, pathlib
 from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 PAGE = ROOT / "labs/micro/dic-ch1/index.html"
 REF = json.loads((ROOT / "samples/数字集成电路设计/生成脚本/ref.json").read_text(encoding="utf-8"))
 shots = pathlib.Path(sys.argv[sys.argv.index("--shots") + 1]) if "--shots" in sys.argv else None
+
+
+def vol_at(W, I):
+    """VOL of the NMOS (linear region, VGS = VDD) sinking I, from the calibrated parameters."""
+    P = json.loads((ROOT / "labs/micro/kit/models/params.json").read_text(encoding="utf-8"))
+    k = P["kn"] * W / P["L"]; vov = P["VDD"] - P["VTn"]
+    return vov - math.sqrt(vov * vov - 2 * I / k)
 
 
 def set_range(page, rid, value):
@@ -41,22 +48,22 @@ def main():
         set_range(page, "il1", 1.0); set_range(page, "wn1", round(REF["p11"]["Wn"] + 0.02, 2))
         page.wait_for_timeout(50)
         vol2 = None
-        answer(page, 1, "twice", 0.443)
+        answer(page, 1, "twice", round(vol_at(REF["p11"]["Wn"], 2e-3), 3))
         if shots: page.screenshot(path=str(shots / "lab1.png"), full_page=True)
         # 1.2
         page.click('nav.tabs [data-lab="2"]')
-        set_range(page, "r2", 2.25)
+        set_range(page, "r2", REF["r_lab"])
         set_range(page, "r2", 1.0); answer(page, 2, "nml", round(REF["p12"]["ratio1"]["NML"], 3))
-        set_range(page, "nz2", 0.3); set_range(page, "r2", 2.25)
+        set_range(page, "nz2", 0.3); set_range(page, "r2", REF["r_lab"])
         if shots: page.screenshot(path=str(shots / "lab2.png"), full_page=True)
         # 1.3
         page.click('nav.tabs [data-lab="3"]')
-        set_range(page, "fo3", 4); set_range(page, "r3", 2.25); set_range(page, "r3", 1.5)
+        set_range(page, "fo3", 4); set_range(page, "r3", REF["r_lab"]); set_range(page, "r3", round(REF["p13"]["ratio_sqrt"]["ratio"] * 20) / 20)
         answer(page, 3, "mis", round(REF["p13"]["ratio1"]["mismatch"] * 100, 1))
         if shots: page.screenshot(path=str(shots / "lab3.png"), full_page=True)
         # 1.4
         page.click('nav.tabs [data-lab="4"]')
-        set_range(page, "cl4", 10); set_range(page, "n4", 7); set_range(page, "n4", 5)
+        set_range(page, "cl4", 10); set_range(page, "n4", REF["p14"]["Nbest"]); set_range(page, "n4", REF["p14"]["Nfew"])
         f6 = REF["p14"]["F"] ** (1 / 6)
         answer(page, 4, "f", round(f6, 2))
         if shots: page.screenshot(path=str(shots / "lab4.png"), full_page=True)
@@ -64,7 +71,7 @@ def main():
         page.click('nav.tabs [data-lab="5"]')
         answer(page, 5, "read", round(REF["p15"]["P_VDD"] * 1e3, 2))
         set_range(page, "v5", 1.2)
-        set_range(page, "v5", 1.21)
+        set_range(page, "v5", math.ceil(REF["p15"]["Vlim"] * 100 - 1e-9) / 100)
         if shots: page.screenshot(path=str(shots / "lab5.png"), full_page=True)
 
         results = {lab: done(page, lab) for lab in "12345"}

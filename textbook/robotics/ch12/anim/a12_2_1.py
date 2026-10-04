@@ -29,10 +29,10 @@ class Lesson(Base):
         for k in (1, 2, 3):
             formula[k].set_opacity(0.15)
         self.play(Write(formula))
-        self.caption("从零位出发：T = M", "Start at home: T = M")
+        self.caption("从零位出发：T = M", "Start at the zero position: T = M")
 
-        steps = [(2, -90, 3, "先转关节 3：绕零位时的 q₃ 转 −90°", "First joint 3: turn −90° about q₃ where it sits at home"),
-                 (1, 45, 2, "再转关节 2：关节 2 还没动过，它的轴仍在零位处", "Then joint 2: it has not moved, so its axis is still at home"),
+        steps = [(2, -90, 3, "先转关节 3：绕零位时的 q₃ 转 −90°", "First joint 3: turn −90° about q₃ where it sits at the zero position"),
+                 (1, 45, 2, "再转关节 2：关节 2 还没动过，它的轴仍在零位处", "Then joint 2: it has not moved, so its axis is still at the zero position"),
                  (0, 30, 1, "最后转关节 1：整条手臂绕原点转 30°", "Last joint 1: the whole arm turns 30° about the origin")]
         for k, deg, f, zt, et in steps:
             mark = Dot(zero_pts[k], radius=0.16, color=RED)
@@ -46,7 +46,7 @@ class Lesson(Base):
         res = MathTex(r"p=(0.566,\ 0.565)\ \mathrm{m}", color=YELLOW, font_size=36).next_to(formula, DOWN, buff=0.4)
         self.play(Write(res), Indicate(Dot(tip, color=YELLOW)))
         self.caption("从右往左读：先作用的是最外面的关节；每一步用的都是零位时的旋量轴",
-                     "Read right to left: the outermost joint acts first, always with its home screw axis")
+                     "Read right to left: the outermost joint acts first, always with its zero-position screw axis")
         self.card([["指数积公式（空间形式）", "Product of exponentials (space form)"],
                    MathTex(r"T(\theta)=e^{[\mathcal{S}_1]\theta_1}e^{[\mathcal{S}_2]\theta_2}\cdots e^{[\mathcal{S}_n]\theta_n}M", font_size=46),
-                   ["只需要零位位姿 M 和零位时的各旋量轴", "all it needs: the home pose M and the home screw axes"]])
+                   ["只需要零位位姿 M 和零位时的各旋量轴", "all it needs: the zero-position pose M and the zero-position screw axes"]])

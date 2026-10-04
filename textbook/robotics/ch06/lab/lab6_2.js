@@ -2,9 +2,9 @@
 // 陀螺仪测得的是物体角速度 ω_b。按 Ṙ = R[ω_b]（式 (6.2.5)）逐步右乘 e^{[ω_b]Δt} 得到正确姿态；
 // 误把 ω_b 当成空间角速度左乘，结果相当于绕固定轴依次转动，一般是错的。
 WQ.lab({
-  title: ["实验 6.2 陀螺仪积分：物体角速度要右乘", "Lab 6.2 Integrating a gyroscope: body rates multiply on the right"],
+  title: ["实验 6.2 陀螺仪积分：物体角速度要右乘", "Lab 6.2 Integrating a gyroscope: body angular velocity postmultiplies"],
   goal: ["用陀螺仪读数（物体角速度）积分姿态，比较右乘与左乘两种做法，理解 Ṙ = R[ω_b] = [ω_s]R。",
-         "Integrate the attitude from gyroscope readings (body angular velocity); compare right and left multiplication and see why Ṙ = R[ω_b] = [ω_s]R."],
+         "Integrate the attitude from gyroscope readings (body angular velocity); compare postmultiplication and premultiplication and see why Ṙ = R[ω_b] = [ω_s]R."],
   scenes: [
     { id: "quad", robot: true, name: ["四旋翼的姿态解算", "Quadrotor attitude estimation"],
       problem: { title: ["机器人问题：飞控怎样由陀螺仪算姿态", "Robot problem: attitude from the gyroscope"],
@@ -20,21 +20,21 @@ WQ.lab({
     { id: "a2", name: ["第二段：绕自身 y 轴转 a₂", "Stage 2: a₂ about own y"], min: -180, max: 180, step: 5, value: 90, unit: "°", digits: 0 },
   ],
   buttons: [
-    { id: "start", name: ["开始：右乘（R ← R e^[ω_b]Δt）", "Start: right (R ← R e^[ω_b]Δt)"], primary: true },
-    { id: "wrong", name: ["开始：左乘（R ← e^[ω_b]Δt R）", "Start: left (R ← e^[ω_b]Δt R)"] },
+    { id: "start", name: ["开始：右乘（R ← R e^[ω_b]Δt）", "Start: postmultiply (R ← R e^[ω_b]Δt)"], primary: true },
+    { id: "wrong", name: ["开始：左乘（R ← e^[ω_b]Δt R）", "Start: premultiply (R ← e^[ω_b]Δt R)"] },
     { id: "reset", name: ["重置", "Reset"] },
   ],
   tasks: [
-    { id: "right", robot: true, text: ["a₁ = a₂ = 90°，按右乘积分：结束时与真实姿态的误差小于 0.5°。", "a₁ = a₂ = 90°, integrate by right multiplication: final error below 0.5°."],
+    { id: "right", robot: true, text: ["a₁ = a₂ = 90°，按右乘积分：结束时与真实姿态的误差小于 0.5°。", "a₁ = a₂ = 90°, integrate by postmultiplication: final error below 0.5°."],
       demo: { scene: "quad", set: { a1: 90, a2: 90 }, press: ["start"], wait: 4 } },
-    { id: "left", robot: true, text: ["同样的动作改用左乘：误差很大。读出误差角。", "Same motion, left multiplication: a large error. Read the error angle."],
+    { id: "left", robot: true, text: ["同样的动作改用左乘：误差很大。读出误差角。", "Same motion, premultiplication: a large error. Read the error angle."],
       demo: { scene: "quad", set: { a1: 90, a2: 90 }, press: ["wrong"], wait: 4 } },
-    { id: "one", robot: true, text: ["令 a₂ = 0（只绕一根轴转）：左乘也没有误差。", "Set a₂ = 0 (one axis only): left multiplication is then error-free too."],
+    { id: "one", robot: true, text: ["令 a₂ = 0（只绕一根轴转）：左乘也没有误差。", "Set a₂ = 0 (one axis only): premultiplication is then error-free too."],
       demo: { scene: "quad", set: { a1: 90, a2: 0 }, press: ["wrong"], wait: 4 } },
-    { id: "phone", text: ["手机先绕长边转 90°、再绕短边转 90°，用右乘算出屏幕方向。", "Turn the phone 90° about its long edge, then 90° about its short edge; get the screen direction by right multiplication."],
+    { id: "phone", text: ["手机先绕长边转 90°、再绕短边转 90°，用右乘算出屏幕方向。", "Turn the phone 90° about its long edge, then 90° about its short edge; get the screen direction by postmultiplication."],
       demo: { scene: "phone", set: { a1: 90, a2: 90 }, press: ["start"], wait: 4 } },
   ],
-  think: ["两段转动的次序对调（先绕 y、再绕 x），右乘的结果会变吗？左乘呢？", "Swap the two stages (y first, then x). Does the right-multiplication result change? And the left one?"],
+  think: ["两段转动的次序对调（先绕 y、再绕 x），右乘的结果会变吗？左乘呢？", "Swap the two stages (y first, then x). Does the postmultiplication result change? And the premultiplication one?"],
 
   // ---- 3×3 矩阵工具
   mul(A, B) { return A.map((r) => [0, 1, 2].map((j) => r[0] * B[0][j] + r[1] * B[1][j] + r[2] * B[2][j])); },
@@ -104,6 +104,6 @@ WQ.lab({
     }
     for (let i = 0; i < 3; i++) { const e = [0, 0, 0]; e[i] = 0.75; const q = P(this.mv(s.R, e)); api.arrow(cx, cy, q[0], q[1], cols[i], 3); api.label(["x_b", "y_b", "z_b"][i], q[0] + 6, q[1] - 8, cols[i], 13); }
     api.label(api.T("虚线：真实的最终姿态", "dashed: the true final attitude"), 12, 18, api.css("--muted"), 12);
-    if (s.method) api.label(s.method === "right" ? api.T("正在右乘积分", "integrating: right") : api.T("正在左乘积分", "integrating: left"), 12, 38, s.method === "right" ? api.css("--ok") : api.css("--red"), 13);
+    if (s.method) api.label(s.method === "right" ? api.T("正在右乘积分", "integrating: postmultiply") : api.T("正在左乘积分", "integrating: premultiply"), 12, 38, s.method === "right" ? api.css("--ok") : api.css("--red"), 13);
   },
 });

@@ -49,6 +49,7 @@ set_env GATEWAY_IMAGE ""
 set_env WEB_IMAGE ""
 set_env ANIMATOR_IMAGE ""
 set_env LABCHECK_IMAGE ""
+set_env MICROSYNTH_IMAGE ""
 set_env VOICE_IMAGE ""
 
 echo

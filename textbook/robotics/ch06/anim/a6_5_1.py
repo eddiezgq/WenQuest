@@ -69,6 +69,6 @@ class Lesson(Base):
         self.play(a.animate.set_value(0.5), run_time=2)
         self.caption("但转轴、角速度大小和节距（0）都相同：伴随矩阵只是换了一种写法", "Same axis, same rate, same pitch (0): the adjoint only rewrites the motion")
         self.wait(1)
-        self.card([["伴随变换", "The adjoint map"],
+        self.card([["伴随变换", "The adjoint transformation"],
                    ["运动旋量从一个坐标系换到另一个坐标系", "Moving a twist from one frame to another"],
                    MathTex(r"\mathcal V_a = [\mathrm{Ad}_{T_{ab}}]\mathcal V_b,\qquad [\mathrm{Ad}_T] = \begin{pmatrix} R & 0 \\ [p]R & R \end{pmatrix}", font_size=44)])

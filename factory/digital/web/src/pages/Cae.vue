@@ -191,6 +191,8 @@
           <b>和教材公式比</b> {{ job.setup.formula.name }}
           <div v-if="job.setup.formula.t_oil_c != null">发热 P(1−η) = {{ job.setup.formula.loss_w }} W（输入 {{ job.setup.formula.P_in_kw }} kW，η = {{ job.setup.formula.eta }}），K_s = {{ job.setup.formula.K_s }}，A = {{ job.setup.formula.A_m2 }} m² →
             公式油温 <b>{{ job.setup.formula.t_oil_c }} ℃</b>；有限元外表面平均 <b>{{ (st.film_groups?.[0]?.mean_c ?? st.t_surface_mean_c).toFixed(1) }} ℃</b>、最高 {{ st.t_max_c.toFixed(1) }} ℃（限值约 {{ job.setup.formula.limit_c }} ℃）。</div>
+          <div v-else-if="job.setup.formula.dt_air_c != null">发热 {{ job.setup.formula.loss_w }} W，风口 {{ job.setup.formula.A_vent_m2 }} m²，估算通风量 {{ job.setup.formula.Q_m3s }} m³/s →
+            出风温升约 <b>{{ job.setup.formula.dt_air_c }} ℃</b>；有限元最高 <b>{{ st.t_max_c.toFixed(1) }} ℃</b>（元件限值约 {{ job.setup.formula.limit_c }} ℃）。</div>
           <div v-else>粗估 {{ job.setup.formula.t_est_c }} ℃；有限元最高 <b>{{ st.t_max_c.toFixed(1) }} ℃</b>（限值约 {{ job.setup.formula.limit_c }} ℃）。</div>
           <div class="muted">{{ job.setup.formula.note }}</div>
         </div>
@@ -785,6 +787,22 @@ onMounted(async () => {
       title.value = r.title; matId.value = '45-QT'; active.value = -1;
       mbdSource.value = { ...r.source, sha: r.geometry.sha };
       mbdNote.value = '来自运动与动力分析：' + r.note + `；最大受力 ${r.peak_N.toFixed(0)} N，出现在 t = ${r.peak_t.toFixed(3)} s。`;
+    } catch (e) { err.value = e.message; } finally { busy.value = false; }
+  }
+  if (route.query.cfd) {                                           // 第 16 轮：流体分析算出的散热系数 → 温度场
+    busy.value = true;
+    try {
+      const r = await post(`/cfd/jobs/${encodeURIComponent(route.query.cfd)}/to-thermal`, {});
+      geo.value = r.geometry;
+      partSel.value = r.geometry.example ? 'ex:' + r.geometry.example.key : '';
+      analysis.value = 'thermal';
+      await nextTick();
+      thRows.value = r.thermal.map((l) => ({ key: ++thKey, kind: l.type, faces: Array.isArray(l.faces) ? [...l.faces] : [], rest: l.faces === 'rest',
+        value: l.value_c ?? l.power_w ?? 0, h: l.h_w_m2k ?? 17.45, tinf: l.t_inf_c ?? 20, film: '' }));
+      if (r.material_id) matId.value = r.material_id;
+      if (r.mesh_mm) meshOverride.value = r.mesh_mm;
+      title.value = r.title; active.value = -1;
+      mbdNote.value = '来自流体分析：' + r.note + '。';
     } catch (e) { err.value = e.message; } finally { busy.value = false; }
   }
   if (route.query.topo) {                                          // 第 14 轮：拓扑优化 → 拉伸成板件做有限元校核

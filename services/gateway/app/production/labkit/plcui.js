@@ -687,6 +687,23 @@ function setup(L, K) {
     }
     paintStatus();
   };
+  // a task's demo (the automatic trial run, WQ.demo): {program: {st} | {sfc}, faults, tests: true, review: true, run: true, panel: {name: v}, release: ms, wait: s}
+  def.plcDemo = (d) => {
+    if (d.program) {
+      if (d.program.sfc != null) { S.sfc = d.program.sfc; setLang("SFC"); } else { S.st = d.program.st; setLang("ST"); }
+      ta.value = S.lang === "SFC" ? S.sfc : S.st; paintGutter();
+    }
+    Object.assign(S.faults, d.faults || {}); paintPanel();
+    load();
+    if (d.tests) runTests();
+    if (d.review) runReview();
+    if (d.panel) {
+      Object.assign(S.panel, d.panel);
+      if (d.release) setTimeout(() => { Object.keys(d.panel).forEach((k) => { S.panel[k] = !d.panel[k]; }); }, d.release);
+    }
+    if (d.run && S.rt) api.running = true;
+    return d.wait || 5;
+  };
   const userReadouts = def.readouts;
   def.readouts = (a, s) => {
     paintStatus();

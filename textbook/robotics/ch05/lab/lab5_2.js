@@ -3,9 +3,9 @@
 // 点 P（垫块右上角）按 (P, 1) 变换，既转又移；方向 v（垫块长边方向）按 (v, 0) 变换，只转不移。
 // 生活场景：沙发 2.0 m × 0.9 m，D = Trans(p)·[绕沙发自身中心 c 转 θ]，由式 (5.2.10) 得第三列 = c − R c + p。
 WQ.lab({
-  title: ["实验 5.2 搭一个齐次变换", "Lab 5.2 Building a homogeneous transform"],
+  title: ["实验 5.2 搭一个齐次变换", "Lab 5.2 Building a homogeneous transformation"],
   goal: ["拖动转角和平移量，看 3×3 齐次矩阵怎样把工件上的点和方向变到新位置；体会第三列的含义和“点既转又移、方向只转不移”。",
-         "Drag the angle and the shift: see how the 3×3 homogeneous matrix moves a point and a direction of the part; understand the third column and why points move but directions only turn."],
+         "Drag the angle and the translation: see how the 3×3 homogeneous matrix moves a point and a direction of the part; understand the third column and why points move but directions only turn."],
   scenes: [
     { id: "fix", robot: true, name: ["垫块放进夹具", "Block into the fixture"],
       problem: { title: ["机器人问题：一次位移把垫块放进夹具", "Robot problem: one displacement puts the block into the fixture"],
@@ -14,25 +14,25 @@ WQ.lab({
     { id: "sofa", name: ["沙发挪进凹位", "Sofa into the alcove"],
       problem: { title: ["生活中的例子：挪沙发", "Everyday example: moving a sofa"],
                  text: ["沙发先绕自身中心转，再整体平移。墙角的凹位要求沙发竖着放，中心移到 (1.0, 1.4) m。",
-                        "The sofa turns about its own centre, then shifts. The alcove needs it upright, centred at (1.0, 1.4) m."] },
+                        "The sofa turns about its own centre, then translates. The alcove needs it lengthwise along y, centred at (1.0, 1.4) m."] },
       params: { px: { min: -1, max: 1.5, value: 0 }, py: { min: -1, max: 1.5, value: 0 } } },
   ],
   params: [
     { id: "th", name: ["转角 θ", "Angle θ"], min: -180, max: 180, step: 5, value: 0, unit: "°", digits: 0 },
-    { id: "px", name: ["平移 x", "Shift x"], min: -1, max: 1.5, step: 0.1, value: 0, unit: "m", digits: 1 },
-    { id: "py", name: ["平移 y", "Shift y"], min: -1, max: 1.5, step: 0.1, value: 0, unit: "m", digits: 1 },
+    { id: "px", name: ["平移 x", "Translation x"], min: -1, max: 1.5, step: 0.1, value: 0, unit: "m", digits: 1 },
+    { id: "py", name: ["平移 y", "Translation y"], min: -1, max: 1.5, step: 0.1, value: 0, unit: "m", digits: 1 },
   ],
   buttons: [{ id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "trans", robot: true, text: ["转角保持 0，只平移：方向 v 的读数 (v, 0) 不变，点 P 的读数改变。", "Keep θ = 0 and only shift: the direction (v, 0) stays, the point P changes."],
+    { id: "trans", robot: true, text: ["转角保持 0，只平移：方向 v 的读数 (v, 0) 不变，点 P 的读数改变。", "Keep θ = 0 and only translate: the direction (v, 0) stays, the point P changes."],
       demo: { scene: "fix", set: { th: 0, px: 0.5, py: 0.3 }, press: [] } },
-    { id: "fix", robot: true, text: ["把垫块放进夹具（θ = 90°，平移 (0.8, 0.5) m），读出矩阵第三列：它是垫块中心的新位置。", "Put the block into the fixture (θ = 90°, shift (0.8, 0.5) m); read column 3: the block centre's new position."],
+    { id: "fix", robot: true, text: ["把垫块放进夹具（θ = 90°，平移 (0.8, 0.5) m），读出矩阵第三列：它是垫块中心的新位置。", "Put the block into the fixture (θ = 90°, translation (0.8, 0.5) m); read column 3: the block centre's new position."],
       demo: { scene: "fix", set: { th: 90, px: 0.8, py: 0.5 }, press: [] } },
-    { id: "sofa", text: ["把沙发绕自身中心转 90°，再平移进凹位。", "Turn the sofa 90° about its own centre, then shift it into the alcove."],
+    { id: "sofa", text: ["把沙发绕自身中心转 90°，再平移进凹位。", "Turn the sofa 90° about its own centre, then translate it into the alcove."],
       demo: { scene: "sofa", set: { th: 90, px: 0, py: 0.5 }, press: [] } },
   ],
   think: ["在沙发场景中，矩阵第三列为什么不等于你拖动的平移量？用式 (5.2.10) 解释。",
-          "In the sofa scene, why is column 3 not equal to the shift you dragged? Explain with Eq. (5.2.10)."],
+          "In the sofa scene, why is column 3 not equal to the translation you dragged? Explain with Eq. (5.2.10)."],
 
   shape(api) {
     return api.scene === "fix" ? { L: 0.4, W: 0.2, c: [0, 0], target: [0.8, 0.5, 90] }

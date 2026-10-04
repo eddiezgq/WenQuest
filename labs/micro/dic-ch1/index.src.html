@@ -47,7 +47,7 @@
         </div>
         <div class="ctl"><label for="wn1" data-en="NMOS width W&lt;sub&gt;n&lt;/sub&gt;">NMOS 宽度 W<sub>n</sub></label><output id="wn1o"></output><input type="range" id="wn1" min="0.42" max="12" step="0.01" value="2"></div>
         <div class="ctl"><label for="il1" data-en="Load current I&lt;sub&gt;load&lt;/sub&gt;">负载电流 I<sub>load</sub></label><output id="il1o"></output><input type="range" id="il1" min="0.1" max="3" step="0.05" value="1"></div>
-        <p class="hint" data-en="L = 0.15 μm, V&lt;sub&gt;DD&lt;/sub&gt; = 1.8 V. Parameters are illustrative, calibrated to SKY130 later.">L = 0.15 μm，V<sub>DD</sub> = 1.8 V。参数为示意值，以后按 SKY130 校准。</p>
+        <p class="hint" data-en="L = 0.15 μm, V&lt;sub&gt;DD&lt;/sub&gt; = 1.8 V. Effective parameters calibrated to SKY130 (tt, 27 °C).">L = 0.15 μm，V<sub>DD</sub> = 1.8 V。参数为按 SKY130（tt，27 °C）校准的有效值。</p>
       </div>
       <div class="card"><h3 data-en="READINGS">读数</h3><dl class="readout" id="ro1"></dl></div>
       <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk1"></ul></div>
@@ -118,12 +118,12 @@
         <h3 data-en="PARAMETERS">参数</h3>
         <div class="ctl"><label for="n4" data-en="Number of stages N">级数 N</label><output id="n4o"></output><input type="range" id="n4" min="1" max="10" step="1" value="1"></div>
         <div class="ctl"><label for="cl4" data-en="Load C&lt;sub&gt;L&lt;/sub&gt;">负载 C<sub>L</sub></label><output id="cl4o"></output><input type="range" id="cl4" min="1" max="20" step="0.5" value="10"></div>
-        <p class="hint" data-en="First stage: minimum symmetric inverter (W&lt;sub&gt;p&lt;/sub&gt;/W&lt;sub&gt;n&lt;/sub&gt; = 2.25).">第一级为最小对称反相器（W<sub>p</sub>/W<sub>n</sub> = 2.25）。</p>
+        <p class="hint" data-en="First stage: minimum symmetric inverter (W&lt;sub&gt;p&lt;/sub&gt;/W&lt;sub&gt;n&lt;/sub&gt; = r).">第一级为最小对称反相器（W<sub>p</sub>/W<sub>n</sub> = r）。</p>
       </div>
       <div class="card"><h3 data-en="READINGS">读数</h3><dl class="readout" id="ro4"></dl></div>
       <div class="card"><h3 data-en="TASKS">任务</h3><ul class="tasks" id="tk4"></ul></div>
       <div class="card open"><h3 data-en="OPEN QUESTION">开放问题</h3>
-        <p data-en="Six and seven stages give almost the same delay. Besides delay, what decides the choice — think of area, power and whether the output is inverted.">6 级和 7 级的延时几乎一样。除了延时，还有什么决定选几级？想想面积、功耗，以及输出是否反相。</p>
+        <p data-en="Near the optimum, neighbouring numbers of stages give almost the same delay. Besides delay, what decides the choice — think of area, power and whether the output is inverted.">最优附近相邻几种级数的延时几乎一样。除了延时，还有什么决定选几级？想想面积、功耗，以及输出是否反相。</p>
         <textarea id="op4" data-ph-en="Your answer (saved on this device)" placeholder="写下你的想法（保存在本机）"></textarea></div>
     </div>
   </section>
@@ -156,7 +156,7 @@
 
   <footer>
     <div class="row"><button class="btn chip" id="resetAll" data-en="Reset tasks">重置任务</button>
-    <span data-en="Model: long-channel square law with effective parameters (illustrative, to be calibrated against ngspice + SKY130). WenQuest · Chapter 1 sample.">模型：长沟道平方律＋有效参数（示意值，待与 ngspice＋SKY130 校准）。问渠 · 第 1 章样例。</span></div>
+    <span data-en="Model: long-channel square law with effective parameters calibrated to ngspice + SKY130 (saturation current and average delay within about 1%). WenQuest · Chapter 1 sample.">模型：长沟道平方律＋按 ngspice＋SKY130 校准的有效参数（饱和电流、平均延时误差约 1%）。问渠 · 第 1 章样例。</span></div>
   </footer>
 </div>
 
@@ -185,7 +185,7 @@
     L.defineTasks('1', [
       { id: 'both', zh: '把输入分别切到低、高电平，对照上方示意图：稳态时 PMOS 与 NMOS 总有一个截止，反相器本身没有直流通路。', en: 'Switch the input low and high. In either steady state one transistor is off, so the inverter itself draws no DC current.', check: () => seen.lo && seen.hi },
       { id: 'size', robot: true, zh: '光耦负载 1 mA：调 Wn，使 VOL ≤ 0.2 V，并且 Wn 不超过所需最小值的 1.08 倍（不浪费面积）。', en: 'Optocoupler load 1 mA: choose Wn so that VOL ≤ 0.2 V, with Wn no more than 1.08 × the minimum needed.', check: (s) => near(s.I, 1e-3, 2.6e-5) && s.vinHigh && s.vol <= 0.2 && s.Wn <= 1.08 * M.wnForVol(1e-3, 0.2) },
-      { id: 'twice', zh: '保持上一步的 Wn（约 6.67 μm），把负载加到 2 mA。VOL 变成多少？（是否正好翻倍？）', en: 'Keep Wn ≈ 6.67 μm and raise the load to 2 mA. What is VOL now? Is it exactly twice?', answer: { value: volFor(M.wnForVol(1e-3, 0.2), 2e-3), tol: 0.03, unit: 'V' } },
+      { id: 'twice', zh: `保持上一步的 Wn（约 ${M.wnForVol(1e-3, 0.2).toFixed(2)} μm），把负载加到 2 mA。VOL 变成多少？（是否正好翻倍？）`, en: `Keep Wn ≈ ${M.wnForVol(1e-3, 0.2).toFixed(2)} μm and raise the load to 2 mA. What is VOL now? Is it exactly twice?`, answer: { value: volFor(M.wnForVol(1e-3, 0.2), 2e-3), tol: 0.03, unit: 'V' } },
     ], 'tk1');
     L.openQuestion('1', 'op1');
     function volFor(W, I) { // 线性区解 Idn(VDD, v, W) = I
@@ -345,10 +345,11 @@
   (function () {
     const nn = L.range('n4', (v) => String(v), draw);
     const cl = L.range('cl4', (v) => v.toFixed(1) + ' pF', draw);
+    const TMAXS = +(P.problems.p14.tmax * 1e9).toFixed(2) + ' ns';
     L.defineTasks('4', [
       { id: 'best', zh: 'CL = 10 pF：找到总延时真正最小的级数（不超过最小值的 1.01 倍）。它和经验公式 ln F / ln 4 一样吗？', en: 'CL = 10 pF: find the number of stages with the truly smallest delay (within 1% of the minimum). Does it match the rule of thumb ln F / ln 4?', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t <= 1.01 * s.tmin },
       { id: 'f', zh: '取 6 级时，每级的扇出 f 是多少？', en: 'With 6 stages, what is the fan-out f of each stage?', answer: { value: Math.pow(P.problems.p14.CL / M.cin(Wmin, r * Wmin), 1 / 6), tol: 0.03, unit: '' } },
-      { id: 'fewest', robot: true, zh: '栅极驱动器输入要求延时小于 0.3 ns：在 CL = 10 pF 下，用最少的级数满足要求。', en: 'The gate-driver input needs a delay under 0.3 ns: with CL = 10 pF, meet it with the fewest stages.', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t < 0.3e-9 && s.N === s.nFew },
+      { id: 'fewest', robot: true, zh: '栅极驱动器输入要求延时小于 ' + TMAXS + '：在 CL = 10 pF 下，用最少的级数满足要求。', en: 'The gate-driver input needs a delay under ' + TMAXS + ': with CL = 10 pF, meet it with the fewest stages.', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t < P.problems.p14.tmax && s.N === s.nFew },
     ], 'tk4');
     L.openQuestion('4', 'op4');
     function chainSketch(cv, N, f) {
@@ -373,12 +374,12 @@
       const t = M.chainDelay(N, CL, r), Ns = [], ts = [];
       for (let k = 1; k <= 10; k++) { Ns.push(k); ts.push(M.chainDelay(k, CL, r) * 1e9); }
       const tmin = Math.min(...ts) * 1e-9;
-      const nFew = Ns.find((k) => M.chainDelay(k, CL, r) < 0.3e-9) || 0;
+      const nFew = Ns.find((k) => M.chainDelay(k, CL, r) < P.problems.p14.tmax) || 0;
       chainSketch($('s4'), N, f);
       L.plot($('c4'), {
         x: [1, 10], y: [Math.min(...ts) * 0.6, Math.max(...ts) * 1.6], ylog: true, xlabel: T('级数 N', 'stages N'), ylabel: T('总延时 (ns)', 'total delay (ns)'),
         series: [{ x: Ns, y: ts, color: css('--blue'), width: 2 }],
-        hlines: [{ y: 0.3, color: css('--red'), label: '0.3 ns' }],
+        hlines: [{ y: P.problems.p14.tmax * 1e9, color: css('--red'), label: TMAXS }],
         vlines: [{ x: Math.log(F) / Math.log(4), color: css('--muted'), label: 'ln F / ln 4' }],
         points: Ns.map((k, i) => ({ x: k, y: ts[i], color: k === N ? css('--orange') : css('--blue'), r: k === N ? 6 : 3, label: k === N ? (ts[i] < 1 ? (ts[i] * 1000).toFixed(0) + ' ps' : ts[i].toFixed(2) + ' ns') : '' })),
         yfmt: (v) => (v < 1 ? v.toPrecision(1) : String(v)),

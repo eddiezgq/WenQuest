@@ -7,7 +7,7 @@
 import numpy as np
 from matplotlib.patches import FancyBboxPatch
 
-from _fig5 import AX, C, axes3d, box3d, frame3
+from _fig5 import AX, C, axes3d, box3d, crop3d, frame3
 from _frames import DEG, T, T_bt, ur_edges_from_table
 from bookout import T as TT, figure, style
 
@@ -55,7 +55,7 @@ def edge(p, c, label, color="#5b6b75", ls="-"):
 for n in nodes:
     box(n)
 edge("w", "s", TT("安装：$T_{ws}$", "mounting: $T_{ws}$"))
-edge("w", "c", TT("标定：$T_{wc}$", "calibration: $T_{wc}$"))
+edge("w", "c", TT("标定：$T_{wc}$", "$T_{wc}$:\ncalibration"))
 edge("c", "o", TT("视觉测量：$T_{co}$", "vision: $T_{co}$"), ls="--")
 edge("o", "g", TT("抓取设计：$T_{og}$", "grasp design: $T_{og}$"))
 edge("s", "base", TT("固定：绕 z 转 180°", "fixed: 180° about z"))
@@ -70,12 +70,12 @@ ax.annotate("", xy=(6.15, 9.55), xytext=(8.6, 8.6),
 ax.text(7.5, 9.45, TT("向上：乘 $T_{wc}^{-1}$", "up: multiply by $T_{wc}^{-1}$"), fontsize=9.5, color="#d62728")
 ax.annotate("", xy=(1.25, nodes["t"][1]), xytext=(1.25, 9.0),
             arrowprops=dict(arrowstyle="-|>", color="#d62728", lw=2.2, mutation_scale=14))
-ax.text(1.05, 5.0, TT("向下：依次乘各条边的 $T$", "down: multiply the edges' $T$ in turn"), fontsize=9.5, color="#d62728",
+ax.text(1.05, 5.0, TT("向下：依次乘各条边的 $T$", "down: multiply by each edge's $T$ in turn"), fontsize=9.5, color="#d62728",
         rotation=90, ha="right", va="center")
-ax.text(5.9, 3.6, TT("从 {c} 到 {t} 的唯一路径（高亮）：", "The unique path from {c} to {t} (highlighted):"), fontsize=9.5)
-ax.text(5.9, 3.1, r"$T_{ct}=T_{wc}^{-1}\,T_{ws}\,T_{s,\mathrm{base}}\cdots T_{bt}$", fontsize=11)
-ax.text(5.9, 2.4, TT("实线：固定或由关节角决定", "solid: fixed or set by a joint angle"), fontsize=9, color=C["muted"])
-ax.text(5.9, 2.0, TT("虚线：由测量得到，随时更新", "dashed: measured, updated as it changes"), fontsize=9, color=C["muted"])
+ax.text(5.2, 3.6, TT("从 {c} 到 {t} 的唯一路径（高亮）：", "The unique path from {c} to {t} (highlighted):"), fontsize=9.5)
+ax.text(5.2, 3.1, r"$T_{ct}=T_{wc}^{-1}\,T_{ws}\,T_{s0}\cdots T_{6b}\,T_{bt}$", fontsize=11)
+ax.text(5.2, 2.4, TT("实线：固定或由关节角决定", "solid: fixed or set by a joint angle"), fontsize=9, color=C["muted"])
+ax.text(5.2, 2.0, TT("虚线：由测量得到，随时更新", "dashed: measured, updated as it changes"), fontsize=9, color=C["muted"])
 figure(fig, "fig5_4_1")
 plt.close(fig)
 
@@ -103,7 +103,9 @@ for child, F in frames:
         frame3(ax, F, 0.07, names[child], fs=10, off=offs[child], lw=1.3, color=C["accent"])
 frame3(ax, tip, 0.06, "{t}", fs=10, off=(0.05, 0.0, -0.04), lw=1.3)
 box3d(ax, (-0.6, -0.25, 0.0), (0.12, 0.12, 0.66), zoom=1.0)
-ax.text2D(0.02, 0.02, TT("金色数字：连杆坐标系 1–6；每个坐标系由上一个乘一条边得到",
-                         "Gold numbers: link frames 1–6; each is the previous one times one edge"), transform=ax.transAxes, fontsize=9)
+ax.text2D(0.5, 0.2, TT("金色数字：连杆坐标系 1–6；每个坐标系由上一个乘一条边得到",
+                       "Gold numbers: link frames 1–6;\neach is the previous one times one edge"), transform=ax.transAxes, fontsize=9,
+          ha="center", va="top")
+crop3d(ax)
 figure(fig, "fig5_4_2")
 plt.close(fig)

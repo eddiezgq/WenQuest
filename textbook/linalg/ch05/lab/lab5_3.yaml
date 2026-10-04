@@ -1,0 +1,26 @@
+# 实验 5.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab5_3.js。
+原理:
+  - ["A = LU：U 是消元的结果，L 记录了消元的乘数。解 Ax = b 分两步：前代 Lc = b，回代 Ux = c（式 5.3.3）。", "A = LU: U is the result of elimination, L records the multipliers. Solve Ax = b by forward substitution Lc = b and back substitution Ux = c (5.3.3)."]
+  - 式: "从头消元：每个右端约 n³/3 + n² 次乘法；  分解一次约 n³/3 次，之后每个右端约 n² 次"
+  - ["k 个右端的乘法次数之比为 k(n³/3 + n²) / (n³/3 + kn²)，k 很大时趋于 n/3。", "For k right-hand sides the ratio is k(n³/3 + n²) / (n³/3 + kn²), tending to n/3 for large k."]
+步骤:
+  - ["取 n = 100、k = 100，点“两种方法各算一遍”（任务 1），把乘法次数、耗时、最大差记入表 1。", "Set n = 100, k = 100 and press Run both methods (task 1); record the counts, times and difference in Table 1."]
+  - ["拖动“查看第几个工况”，观察不同载荷下的解；截图两个工况附在报告中。", "Drag 'Case shown' to look at different load cases; attach screenshots of two cases."]
+  - ["取 n = 200，从 k = 1 起逐个增大 k，找出乘法次数之比首次达到 10 的 k（任务 2），填表 2。", "Set n = 200 and increase k from 1; find the first k where the ratio reaches 10 (task 2); fill in Table 2."]
+  - ["k = 100，分别取 n = 100、200（或点“k = 100，n = 100 与 200 各算一遍”）（任务 3），比较耗时的增长，填表 1。", "With k = 100 run n = 100 and 200 (or press the pair button) (task 3); compare the growth of the times in Table 1."]
+数据表:
+  - 标题: ["表 1  两种方法的比较（k = 100）", "Table 1  The two methods (k = 100)"]
+    表头: ["n", "乘法次数：从头消元", "乘法次数：分解一次", "耗时：从头消元 / ms", "耗时：分解一次 / ms", "最大差"]
+    表头英文: ["n", "Mults: scratch", "Mults: factored", "Time: scratch / ms", "Time: factored / ms", "Largest difference"]
+    行: [["100", "", "", "", "", ""], ["200", "", "", "", "", ""], ["300", "", "", "", "", ""]]
+  - 标题: ["表 2  乘法次数之比与 k（n = 200）", "Table 2  Ratio of multiplications against k (n = 200)"]
+    表头: ["k", "1", "5", "10", "（最小达到 10 的 k）", "50", "100"]
+    表头英文: ["k", "1", "5", "10", "(smallest k reaching 10)", "50", "100"]
+    行: [["倍数", "", "", "", "", "", ""]]
+    行英文: [["Ratio", "", "", "", "", "", ""]]
+注意:
+  - ["矩阵按固定种子生成，对角占优，所以不选主元也稳定；实际的刚度矩阵对称正定，用 5.5 节的乔列斯基（LDLᵀ）分解，无需选主元。", "The matrix comes from a fixed seed and is diagonally dominant, so no pivoting is needed; real stiffness matrices are symmetric positive definite and use the Cholesky (LDLᵀ) factorization of Section 5.5 without pivoting."]
+  - ["浏览器计时受其他程序影响，比较比值而不是绝对值；n = 300 时“从头消元”可能要一两秒。", "Browser timings vary; compare ratios, not absolute values. At n = 300 the scratch method may take a second or two."]
+思考题:
+  - ["实测加速倍数与乘法次数之比是否一致？如果不一致，可能的原因是什么？", "Does the measured speed-up match the ratio of multiplications? If not, why?"]
+  - ["若右端不是事先都知道，而是一个接一个陆续到来（例如每个控制周期一个），分解法还能用吗？要保存什么？", "If the right-hand sides arrive one by one (say one per control cycle), does the factored method still work? What must be kept?"]

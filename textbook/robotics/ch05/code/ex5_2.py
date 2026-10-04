@@ -54,10 +54,10 @@ for _ in range(200):
     assert np.allclose(np.cross(gb - ga, gc - ga), G[:3, :3] @ np.cross(b - a, c - a), atol=1e-12)
 assert all(abs(np.linalg.norm(moved[i] - moved[j]) - np.linalg.norm(corners[i] - corners[j])) < 1e-15
            for i in range(4) for j in range(4))
-# 式 (5.2.7)：绕点 c 转动 = Trans(c) Rot Trans(−c) = [[R, c − R c], [0, 1]]
+# 式 (5.2.10)：绕点 c 转动 = Trans(c) Rot Trans(−c) = [[R, c − R c], [0, 1]]
 Rc = T(rot_z(math.pi / 2))
 assert np.allclose(trans(*ctr) @ Rc @ trans(*(-ctr)), T(rot_z(math.pi / 2), ctr - rot_z(math.pi / 2) @ ctr))
-# 定理 5.2.2：封闭、逆元（式 (5.2.5)、(5.2.6)）
+# 定理 5.2.2：封闭、逆元（式 (5.2.7)、(5.2.8)）
 for _ in range(200):
     A = T(rot_axis(rng.normal(size=3), rng.uniform(-3, 3)), rng.normal(size=3))
     B = T(rot_axis(rng.normal(size=3), rng.uniform(-3, 3)), rng.normal(size=3))

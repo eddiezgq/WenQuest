@@ -14,6 +14,7 @@ from _opt import L2R, barrier_qp, ik_closed_2r, tip
 from bookout import T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 
 
 def halfplanes(P):
@@ -74,7 +75,7 @@ a4.plot([0, 1], [0, 0], "-o", color=C["x"], ms=4, lw=1.2)
 a4.text(-0.05, 0.0015, "A", fontsize=10, color=BLUE)
 a4.text(1.0, 0.0015, "B", fontsize=10, color=ORANGE)
 a4.text(0.25, 0.004, T("弦（f = 0）在下方", "chord (f = 0) below"), fontsize=8.5, color=C["x"])
-a4.set_title(T("(d) 非凸：IK 目标函数沿 A→B", "(d) non-convex: the IK objective along A→B"), fontsize=9.5)
+a4.set_title(T("(d) 非凸：IK 目标函数沿 A→B", "(d) non-convex: IK objective along A→B"), fontsize=9.5)
 a4.set_xlabel("$s$", fontsize=9)
 a4.set_ylabel(r"$f((1-s)\theta_A + s\theta_B)$", fontsize=8.5)
 a4.tick_params(labelsize=7.5)
@@ -162,7 +163,7 @@ fig, ax = plt.subplots(figsize=(8.6, 5.2))
 clean(ax)
 ax.fill([0, 6, 6, 0], [0, 0, 4, 4], color="#f4f1ea")
 ax.fill([0, 4.6, 4.6, 0], [1.8 - 0.0, 1.8 - 0.6 * 4.6 / 6, 4, 4], color="#c9c2b6")
-ax.text(1.6, 2.9, T("货架区（障碍，已按 AGV 半径膨胀）", "shelf area (obstacle, inflated by the AGV radius)"), fontsize=9.5)
+ax.text(1.6, 2.9, T("货架区（障碍，已按 AGV 半径膨胀）", "shelf area (obstacle,\ninflated by the AGV radius)"), fontsize=9.5)
 ax.fill([0, 6, 6, 0], [0, 0, 1.2, 1.8], color="#d7e7f5", alpha=0.6)
 ax.fill([4.6, 6, 6, 4.6], [0, 0, 4, 4], color="#e4d7f0", alpha=0.6)
 ax.plot([0, 6, 6, 0, 0], [0, 0, 1.2, 1.8, 0], color=BLUE, lw=1.0)

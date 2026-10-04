@@ -4,9 +4,9 @@ from wq_anim import *
 import numpy as np
 
 
-def node(text_zh, pos, color=STEEL):
-    t = zh(text_zh, 24, INK)
-    box = RoundedRectangle(width=max(1.9, t.width + 0.4), height=0.6, corner_radius=0.12, color=color,
+def node(pair, pos, color=STEEL):
+    t = bi(pair, 22, INK)
+    box = RoundedRectangle(width=max(1.9, t.width + 0.4), height=t.height + 0.18, corner_radius=0.12, color=color,
                            fill_color=NAVY, fill_opacity=0.9, stroke_width=3)
     return VGroup(box, t).move_to(pos)
 
@@ -17,11 +17,12 @@ def edge(a, b, color=GREY_B, width=3):
 
 class Lesson(Base):
     def construct(self):
-        self.title("5.4", "坐标系树", "A tree of frames")
-        P = {"w": [0, 2.0, 0], "s": [-2.6, 1.0, 0], "c": [2.6, 1.0, 0], "L": [-2.6, 0.0, 0], "b": [-2.6, -1.0, 0],
-             "t": [-2.6, -2.0, 0], "o": [2.6, 0.0, 0]}
-        names = {"w": "{w} 工作台", "s": "{s} 基座", "c": "{c} 相机", "L": "连杆 0 … 6", "b": "{b} 法兰",
-                 "t": "{t} 工具", "o": "{o} 工件"}
+        self.title("5.4", "坐标系树", "The frame tree")
+        P = {"w": [0, 2.5, 0], "s": [-2.6, 1.3, 0], "c": [2.6, 1.3, 0], "L": [-2.6, 0.1, 0], "b": [-2.6, -1.1, 0],
+             "t": [-2.6, -2.3, 0], "o": [2.6, 0.1, 0]}
+        names = {"w": ["{w} 工作台", "{w} worktable"], "s": ["{s} 基座", "{s} base"], "c": ["{c} 相机", "{c} camera"],
+                 "L": ["连杆 0 … 6", "links 0 … 6"], "b": ["{b} 法兰", "{b} flange"],
+                 "t": ["{t} 工具", "{t} tool"], "o": ["{o} 工件", "{o} workpiece"]}
         N = {k: node(v, P[k]) for k, v in names.items()}
         E = {("w", "s"): edge(N["w"], N["s"]), ("w", "c"): edge(N["w"], N["c"]), ("s", "L"): edge(N["s"], N["L"]),
              ("L", "b"): edge(N["L"], N["b"]), ("b", "t"): edge(N["b"], N["t"]), ("c", "o"): edge(N["c"], N["o"])}
@@ -40,7 +41,7 @@ class Lesson(Base):
         self.play(Write(formula[0:2]))
         up = Arrow(N["c"].get_top() + LEFT * 0.3, N["w"].get_right() + DOWN * 0.1, buff=0.05, color=RED, stroke_width=7)
         self.play(GrowArrow(up), Write(formula[2].set_color(RED)))
-        self.caption("向上一步：从子走到父，乘这条边的逆", "One step up, child to parent: multiply by the inverse", wait=1.0)
+        self.caption("向上一步：从子走到父，乘这条边的逆", "One step up, child to parent: multiply by the inverse of the edge", wait=1.0)
         steps = [(("w", "s"), 3), (("s", "L"), 4), (("L", "b"), 4), (("b", "t"), 5)]
         for (k, i) in steps:
             anims = [E[k].animate.set_color(RED).set_stroke(width=7)]
@@ -48,7 +49,7 @@ class Lesson(Base):
                 anims.append(Write(formula[i].set_color(RED)))
             self.play(*anims, run_time=0.8)
         self.caption("向下各步：从父走到子，乘这条边本身", "Steps down, parent to child: multiply by the edge itself", wait=1.2)
-        self.caption("路径唯一：先上到最近公共祖先 {w}，再下到 {t}", "The path is unique: up to the common ancestor {w}, then down to {t}")
+        self.caption("路径唯一：先上到最近公共祖先 {w}，再下到 {t}", "The path is unique: up to the lowest common ancestor {w}, then down to {t}")
         self.card([["任意两个坐标系之间的位姿", "The pose between any two frames"],
                    MathTex(r"T_{ab} = T_{ra}^{-1}\,T_{rb}", font_size=46),
-                   ["沿树中唯一的路径相乘：向上乘逆，向下乘本身", "multiply along the unique path: inverse going up, the edge itself going down"]])
+                   ["沿树中唯一的路径相乘：向上乘逆，向下乘本身", "Multiply along the unique path: the inverse going up, the edge itself going down"]])

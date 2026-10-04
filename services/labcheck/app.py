@@ -222,7 +222,7 @@ async def run(html: str, lab: str) -> dict:
                     problems.append(f"task '{tid}': after its demo {demo} the task was not ticked (it cannot be completed as written)")
             # the picture for the slides: the first task's demo at normal speed; keep the busiest frame
             first = next(iter(info["demos"].items()), (None, None))
-            canvas = page.locator(f"{sec} canvas")
+            canvas = page.locator(f"{sec} canvas").first   # the stage; a PLC lab also has its timing-chart canvas
             best = -1
             await page.evaluate("() => { WQ.speed = 1; }")
             if first[0]:

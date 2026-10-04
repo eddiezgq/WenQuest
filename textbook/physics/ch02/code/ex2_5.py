@@ -24,8 +24,14 @@ Mmag = float(np.linalg.norm(M))
 arm = math.hypot(r[0], r[1])                       # 力臂：r 在水平面内的投影长度
 assert abs(Mmag - arm * m * g) < 1e-9 and abs(M @ r) < 1e-9 and abs(M @ F) < 1e-9
 # 行列式展开的各项
-out(m=m, mg=m * g, Mx=M[0], My=M[1], Mz=M[2], Mmag=Mmag, arm=arm,
-    Mmax=0.85 * m * g)                             # 水平伸直到 0.85 m 时（习题 1.7.2）
+rlen = float(np.linalg.norm(r))                    # 负载到肩关节中心的距离
+L2, L3 = 0.425, 0.392                              # UR5e 大臂、小臂长度（肩关节轴到腕部，与实验 2.5 相同）
+# 肩关节的转轴水平、垂直于手臂所在的竖直平面；M 与 r 的水平投影垂直，正好沿这根轴
+axis = np.array([-r[1], r[0], 0.0]) / arm
+assert abs(abs(M @ axis) - Mmag) < 1e-9
+out(m=m, mg=m * g, Mx=M[0], My=M[1], Mz=M[2], Mmag=Mmag, arm=arm, rlen=rlen,
+    Mhor=rlen * m * g,                             # 同样 0.68 m、但水平伸出时的力矩
+    L23=L2 + L3, Mmax=(L2 + L3) * m * g)           # 手臂水平伸直时的最大力矩
 
 # ---- 用随机矢量核对反交换律、分配律和混合积的轮换（习题 2.5.6）
 rng = np.random.default_rng(25)
@@ -91,8 +97,9 @@ _e = r + F * fs; ax.plot([r[0], _e[0]], [r[1], _e[1]], [r[2], _e[2]], color=d.VB
 ms = 0.015
 ax.quiver(0, 0, 0, *(M * ms), color=d.VR, lw=2.4, arrow_length_ratio=0.1); ax.text(*(M * ms + np.array([-0.3, 0.05, 0.06])), r"$\boldsymbol{M}=\boldsymbol{r}\times\boldsymbol{F}$", color=d.VR, fontsize=11)
 ax.plot([r[0], r[0]], [r[1], r[1]], [r[2], -0.45], color=d.MUTED, lw=0.8, ls=":")
-ax.plot([0, r[0]], [0, r[1]], [-0.45, -0.45], color=d.MUTED, lw=1.0, ls="--")
-ax.text(r[0] / 2, r[1] / 2 - 0.05, -0.5, T(f"力臂 {arm:.2f} m", f"lever arm {arm:.2f} m"), fontsize=9, color=d.MUTED)
+ax.plot([0, r[0]], [0, r[1]], [0, 0], color=d.FIT, lw=1.6, ls="--")
+ax.plot([r[0], r[0]], [r[1], r[1]], [0, r[2]], color=d.MUTED, lw=0.8, ls=":")
+ax.text(r[0] * 0.25, r[1] * 0.25, -0.2, T(f"力臂 {arm:.2f} m", f"lever arm {arm:.2f} m"), fontsize=9, color=d.FIT)
 for v, c, n in ((np.array([0.8, 0, 0]), d.X_, "x"), (np.array([0, 0.75, 0]), d.Y_, "y"), (np.array([0, 0, 0.5]), d.Z_, "z")):
     ax.quiver(0, 0, 0, *v, color=c, lw=1, arrow_length_ratio=0.08); ax.text(*(v * 1.07), n, color=c)
 ax.set_xlim(-0.3, 0.8); ax.set_ylim(-0.6, 0.7); ax.set_zlim(-0.5, 0.6)

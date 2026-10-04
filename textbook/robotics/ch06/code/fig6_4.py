@@ -7,6 +7,7 @@
 import math
 
 import numpy as np
+from mpl_toolkits.mplot3d import proj3d
 
 from _screw import AXIS, C, UR_AXES, UR_M, UR_S, axes3d, axis_of, exp6, frame3d, inv, log6, tight3d, ur_fk
 from bookout import T, figure, style
@@ -40,23 +41,26 @@ for P, col in ((P0, "#9aa5ad"), (P1, C["accent"])):
     ax.scatter(*P[1:-1].T, color="white", edgecolor=col, s=18, depthshade=False)
 frame3d(ax, UR_M, 0.12, "", fs=10, show_axes_labels=False)
 frame3d(ax, Tt, 0.12, "", fs=10, show_axes_labels=False)
-A = np.array([q - 0.35 * s_hat, q + 0.45 * s_hat])
+A = np.array([q - 0.35 * s_hat, q + 0.36 * s_hat])
 ax.plot(*A.T, color=C["ink"], lw=1.5, ls="-.")
-ax.quiver(*(q + 0.42 * s_hat), *(0.12 * s_hat), color=C["ink"], lw=1.6, arrow_length_ratio=0.4)
+LEFT = np.array([math.sin(math.radians(60)), -math.cos(math.radians(60)), 0.0])    # 屏幕上向左的方向（azim = 60°）
 ax.scatter(*q, color=C["ink"], s=16, depthshade=False)
-ax.text(*(q + np.array([0.03, 0.0, 0.03])), "$q$", fontsize=13)
-ax.text(*(q + 0.5 * s_hat + np.array([0.0, 0.05, 0.0])), r"$\hat s$", fontsize=13)
+ax.text(*(q + 0.05 * LEFT + np.array([0.0, 0.0, 0.01])), "$q$", fontsize=13, ha="right")
+ax.text(*(q + 0.46 * s_hat + 0.05 * LEFT), r"$\hat s$", fontsize=13, ha="right")
 ax.plot(*path.T, color=C["x"], lw=2.0)
 ax.plot(*np.array([path[0], path[-1]]).T, color=C["muted"], lw=1.0, ls="--")
-ax.text(*(path[0] + np.array([0.0, 0.08, -0.12])), T("零位", "home"), fontsize=10, color=C["muted"], ha="center")
-ax.text(*(path[-1] + np.array([0.0, 0.06, 0.07])), T("目标", "target"), fontsize=10, color=C["accent"], ha="center")
-ax.text2D(0.02, 0.06, T("红：沿螺旋轴插值时法兰盘中心的路径", "red: flange-centre path under screw interpolation"), transform=ax.transAxes, fontsize=9.5, color=C["x"])
-ax.text2D(0.02, 0.01, T("虚线：两端点之间的直线", "dashed: the straight line between the ends"), transform=ax.transAxes, fontsize=9.5, color=C["muted"])
+ax.text(*(path[0] + np.array([0.0, 0.0, -0.26])), T("零位", "Zero position"), fontsize=10, color=C["muted"], ha="center")
+ax.text(*(path[-1] + 0.12 * LEFT + np.array([0.0, 0.0, 0.08])), T("目标", "Target"), fontsize=10, color=C["accent"], ha="right")
+ax.text2D(0.02, 0.06, T("红：沿螺旋轴插值时法兰盘中心的路径", "Red: flange-centre path under screw interpolation"), transform=ax.transAxes, fontsize=9.5, color=C["x"])
+ax.text2D(0.02, 0.01, T("虚线：两端点之间的直线", "Dashed: the straight line between the ends"), transform=ax.transAxes, fontsize=9.5, color=C["muted"])
 for i in range(3):
     e = np.zeros(3)
     e[i] = 0.15
     ax.quiver(0, 0, 0, *e, color=AXIS[i], lw=1.4, arrow_length_ratio=0.3)
 ax.text(0.03, 0.03, -0.07, "{s}", fontsize=10)
 tight3d(ax, np.vstack([P0, P1, A, path, [[0, 0, -0.08]]]), pad=0.04, zoom=1.15)
+# ŝ 的箭头：在投影后的平面上画（三维 quiver 的箭头沿视线方向时看不见）
+(xa, ya), (xb, yb) = [proj3d.proj_transform(*(q + f * s_hat), ax.get_proj())[:2] for f in (0.30, 0.42)]
+ax.annotate("", xy=(xb, yb), xytext=(xa, ya), arrowprops=dict(arrowstyle="-|>,head_length=0.6,head_width=0.3", color=C["ink"], lw=1.6))
 figure(fig, "fig6_4_1")
 plt.close(fig)

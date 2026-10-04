@@ -60,6 +60,8 @@ services:
       WQ_ANIMATOR_URL: http://animator:8000
       # AI-written virtual labs are tried in a headless browser by the lab checker (below).
       WQ_LABCHECK_URL: http://labcheck:8000
+      # Verilog labs on phones: synthesis on the server (第 17 轮附).
+      WQ_MICROSYNTH_URL: http://micro-synth:8000
       # Lecture videos: speech synthesis and recognition by the voice service (below).
       WQ_VOICE_URL: http://voice:8000
       # 问渠零件与机器人库, published by the digital factory (docs/方案/数字工厂资源接口约定.md). Empty = built-in sample.
@@ -131,6 +133,23 @@ services:
     tmpfs:
       - /tmp:size=512m
       - /home/lab:size=128m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    networks:
+      - render
+
+  # Verilog synthesis for phones (第 17 轮附): Yosys behind the gateway. No secrets, no internet, 1 CPU and 1 GB.
+  micro-synth:
+    build: services/micro-synth
+    image: ${MICROSYNTH_IMAGE:-wenquest/micro-synth:0.1}
+    restart: unless-stopped
+    cpus: 1
+    mem_limit: 1g
+    pids_limit: 64
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m
     security_opt:
       - no-new-privileges:true
     cap_drop: [ALL]

@@ -1,8 +1,8 @@
 """6.1 节的示意图。
 
-图 6.1.1：算例 6.1.2 的螺旋运动：零件从输送带（位姿 1）到夹具（位姿 2），等价于绕螺旋轴转 θ、同时沿轴移 d；
+图 6.1.2：算例 6.1.2 的螺旋运动：零件从输送带（位姿 1）到夹具（位姿 2），等价于绕螺旋轴转 θ、同时沿轴移 d；
           零件中心走过一段螺旋线。
-图 6.1.2：算例 6.1.1 的平面位移：两点连线的中垂线交于极点 c，绕 c 转 60° 完成整个位移。
+图 6.1.1：算例 6.1.1 的平面位移：两点连线的中垂线交于极点 c，绕 c 转 60° 完成整个位移。
 """
 import math
 
@@ -14,7 +14,7 @@ from bookout import T, figure, style
 plt = style()
 d = math.radians
 
-# ---------------------------------------------------------------- 图 6.1.1
+# ---------------------------------------------------------------- 图 6.1.2
 p1 = np.array([0.5, -0.2, 0.1])
 T1 = pose(np.eye(3), p1)
 T2 = pose(rot_z(d(90)), np.array([0.3, 0.4, 0.25]))
@@ -63,14 +63,14 @@ ax.text(q[0] + 0.03, q[1] + 0.03, (c1[2] + c2[2]) / 2 + 0.03, r"$d = h\theta$", 
 arc = np.array([q + exp3(s * th * f) @ ((c1 - f1) * 0.45) + np.array([0, 0, c1[2]]) for f in np.linspace(0, 1, 40)])
 ax.plot(*arc.T, color=C["accent"], lw=1.2)
 ax.text(*(arc[22] + np.array([0.0, 0.0, 0.02])), r"$\theta$", color=C["accent"], fontsize=13)
-ax.text(*(c1 + np.array([0.0, 0.0, -0.095])), T("位姿 1（输送带）", "pose 1 (conveyor)"), fontsize=9.5, color=C["muted"], ha="center")
-ax.text(*(c2 + np.array([0.0, 0.0, 0.06])), T("位姿 2（夹具）", "pose 2 (fixture)"), fontsize=9.5, color=C["accent"], ha="center")
-ax.text2D(1.0, 0.13, T("零件中心的\n螺旋线", "helix of the\npart centre"), transform=ax.transAxes, fontsize=9.5, color=C["accent"], ha="right")
-tight3d(ax, np.vstack([H, [q + [0, 0, z0]], [q + [0, 0, z1]], [c1 + [0.08, -0.06, -0.06]], [c2 + [-0.08, 0.08, 0.06]]]), pad=0.02, zoom=1.45)
-figure(fig, "fig6_1_1")
+ax.text(*(c1 + np.array([0.0, 0.0, -0.095])), T("位姿 1（输送带）", "Pose 1 (conveyor)"), fontsize=9.5, color=C["muted"], ha="center")
+ax.text(*(c2 + np.array([0.0, 0.0, 0.115])), T("位姿 2（夹具）", "Pose 2 (fixture)"), fontsize=9.5, color=C["accent"], ha="center")
+ax.text2D(0.95, 0.15, T("零件中心的\n螺旋线", "Helix of the\npart centre"), transform=ax.transAxes, fontsize=9.5, color=C["accent"], ha="right")
+tight3d(ax, np.vstack([H, [q + [0, 0, z0]], [q + [0, 0, z1]], [c1 + [0.08, -0.06, -0.06]], [c2 + [-0.08, 0.08, 0.12]]]), pad=0.02, zoom=1.45)
+figure(fig, "fig6_1_2")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 6.1.2
+# ---------------------------------------------------------------- 图 6.1.1
 def rot2(t):
     return np.array([[math.cos(t), -math.sin(t)], [math.sin(t), math.cos(t)]])
 
@@ -119,10 +119,10 @@ am = a0 + ph / 2
 ax.text(c[0] + 0.085 * math.cos(am) - 0.01, c[1] + 0.085 * math.sin(am) - 0.012, r"$\varphi$", fontsize=12, color=C["accent"])
 t2 = np.linspace(a0, a0 + ph, 30)
 ax.plot(c[0] + 0.06 * np.cos(t2), c[1] + 0.06 * np.sin(t2), color=C["accent"], lw=0.9)
-ax.text(0.30, -0.075, T("位姿 A", "pose A"), fontsize=10, color=C["muted"])
-ax.text(0.585, 0.40, T("位姿 B", "pose B"), fontsize=10, color=C["accent"])
-ax.text(0.06, 0.40, T("两条中垂线\n交于极点 c", "the two perpendicular\nbisectors meet at the pole c"), fontsize=9.5, color=C["z"])
+ax.text(0.30, -0.075, T("位姿 A", "Pose A"), fontsize=10, color=C["muted"])
+ax.text(0.585, 0.40, T("位姿 B", "Pose B"), fontsize=10, color=C["accent"])
+ax.text(0.06, 0.40, T("两条中垂线\n交于极点 c", "The two perpendicular\nbisectors meet at the pole c"), fontsize=9.5, color=C["z"])
 ax.set_xlim(-0.05, 0.70)
 ax.set_ylim(-0.10, 0.55)
-figure(fig, "fig6_1_2")
+figure(fig, "fig6_1_1")
 plt.close(fig)

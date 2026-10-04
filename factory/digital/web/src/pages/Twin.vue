@@ -1,7 +1,8 @@
 <template>
   <div class="page">
     <div class="page-title"><h1>数字孪生</h1>
-      <span class="muted">卖出去的每一台 WQR-105 在这里都有一个“分身”：出厂数据 + 现场运行数据 + 寿命模型，算还能用多久、哪里快坏了、该做什么</span></div>
+      <span class="muted">卖出去的每一台 WQR-105 在这里都有一个“分身”：出厂数据 + 现场运行数据 + 寿命模型，算还能用多久、哪里快坏了、该做什么</span>
+      <span class="labs small">实验 13：<a href="/api/cae/lab13/guide.docx">指导书</a> · <a href="/api/cae/lab13/report-template.docx">报告模板</a></span></div>
 
     <div class="topbar">
       <span class="pill info">现场日期 {{ fleet?.field_today || '…' }}</span>
@@ -124,7 +125,7 @@
           <h3>假如……</h3>
           <div class="whatif">
             <label>负载 <input v-model.number="wi.load" type="range" min="0.5" max="1.3" step="0.05"><b>{{ Math.round(wi.load * 100) }}%</b></label>
-            <label class="chk"><input v-model="wi.fan" type="checkbox"> 轴端加风扇（散热系数 17.45 → 31）</label>
+            <label class="chk"><input v-model="wi.fan" type="checkbox"> 轴端加风扇（散热系数 17.45 → {{ fan.k }}）<span class="small muted" :title="fan.src">{{ fan.src.startsWith('流体') ? '· 来自流体分析' : '· 教材值' }}</span></label>
             <label>输出轴材料 <select v-model="wi.mat"><option value="45-QT">45 钢调质（现行）</option><option value="40Cr-QT">40Cr 调质</option></select></label>
             <button class="btn" type="button" :disabled="wiBusy" @click="whatif">{{ wiBusy ? '计算中…' : '重算' }}</button>
           </div>
@@ -155,6 +156,29 @@
         </template>
       </section>
     </div>
+
+    <section class="card">
+      <div class="card-head"><h2>机械臂关节孪生</h2><span class="small muted">一个搬运循环（“运动与动力分析”算的关节力矩、转速）→ 每个关节谐波减速器的寿命，按每天运行小时累计</span></div>
+      <div class="line">
+        <select v-model="rb.job" class="jobsel"><option value="">选一次已完成的动力学计算…</option>
+          <option v-for="j in mbdJobs" :key="j.id" :value="j.id">{{ j.title || j.id }}（{{ j.id }}）</option></select>
+        <label class="small">每天运行 <input v-model.number="rb.hours" type="number" min="1" max="24" class="numin"> 小时</label>
+        <button class="btn small-btn" type="button" :disabled="!rb.job || rbBusy" @click="addRobot">{{ rbBusy ? '计算中…' : '建孪生' }}</button>
+        <a href="/mbd" class="small">去“运动与动力分析”算一个搬运循环 →</a>
+      </div>
+      <div v-if="!robotList.length" class="empty small">还没有机械臂孪生。</div>
+      <div v-for="r in robotList" :key="r.id" class="robot">
+        <div><b>{{ r.name }}</b> <span class="small muted">· {{ r.start_day }} 起 · 每天 {{ r.hours_per_day }} h · 已运行 {{ r.run_h.toFixed(0) }} h · 循环 {{ r.cycle_s?.toFixed(1) }} s · 最先到期：{{ r.first || '—' }}</span></div>
+        <table class="t">
+          <thead><tr><th>关节</th><th>谐波减速器</th><th class="num">i</th><th class="num">平均负载力矩</th><th class="num">平均输入转速</th><th class="num">L10 h</th><th>已用</th><th class="num">约剩</th></tr></thead>
+          <tbody><tr v-for="j in r.joints" :key="j.joint" :class="lvl(j.used)">
+            <td class="mono">{{ j.joint }}</td><td>{{ j.gear }}（额定 {{ j.rated_Nm }} N·m）</td><td class="num">{{ j.ratio }}</td>
+            <td class="num">{{ j.T_av?.toFixed(1) }} N·m</td><td class="num">{{ j.n_av_in?.toFixed(0) }} r/min</td><td class="num">{{ j.L10_h ? j.L10_h.toFixed(0) : '—' }}</td>
+            <td><span class="bar"><i :style="{ width: Math.min(100, j.used * 100) + '%' }"></i></span> {{ pctx(j.used) }}</td><td class="num">{{ daysTxt(j.remaining_days) }}</td></tr></tbody>
+        </table>
+        <div class="small muted">{{ r.formula }}；T_av 按输入转速加权的立方平均，n_av 含停顿；每天负载在 ±10% 内变，按 3 次方折算。</div>
+      </div>
+    </section>
 
     <section class="card">
       <div class="card-head"><h2>机队数据反馈设计</h2><span class="small muted">每类客户的实际载荷和设计假设（额定 350 N·m）比，寿命最短的部位</span>
@@ -192,8 +216,19 @@ const H_ORDER = { red: 0, yellow: 1, green: 2 };
 const teacher = computed(() => !!session.user?.teacher);
 const fleet = ref(null), d = ref(null), sel = ref(route.query.serial || ''), faults = ref(null);
 const siteSel = ref(''), sortBy = ref('health'), showConsole = ref(false), range = ref(90);
+const fan = ref({ k: 31, src: '教材' });
 const wi = ref({ load: 0.8, fan: false, mat: '45-QT' }), wiRes = ref(null), wiBusy = ref(false);
 const exp = ref(null), expBusy = ref(false), pv = ref(null), ordBusy = ref(false), doneNote = ref({}), fb = ref(null);
+const mbdJobs = ref([]), robotList = ref([]), rb = ref({ job: '', hours: 16 }), rbBusy = ref(false);
+async function loadRobots() {
+  try { robotList.value = (await get('/twin/robots')).robots; } catch (e) { /* */ }
+  try { mbdJobs.value = (await get('/mbd/jobs')).jobs.filter((j) => j.status === 'done'); } catch (e) { /* */ }
+}
+async function addRobot() {
+  rbBusy.value = true;
+  try { await post('/twin/robots', { mbd_job: rb.value.job, hours_per_day: rb.value.hours }); await loadRobots(); }
+  catch (e) { alert(e.message); } finally { rbBusy.value = false; }
+}
 let timer = null;
 const openOrders = computed(() => (d.value?.events || []).filter((e) => e.kind === 'order' && e.status === 'ordered'));
 async function explain() {
@@ -272,11 +307,12 @@ async function setClock(v) { await post('/twin/clock', { days_per_min: v }); loa
 async function fault(serial, kind) { await post(`/twin/units/${encodeURIComponent(serial)}/fault`, { kind }); loadFaults(); }
 watch(showConsole, (v) => { if (v) loadFaults(); });
 
-onMounted(() => { loadFleet(); timer = setInterval(loadFleet, 10000); });
+onMounted(() => { get('/twin/fan').then((r) => { fan.value = r; }).catch(() => {}); loadFleet(); loadRobots(); timer = setInterval(() => { loadFleet(); get('/twin/robots').then((r) => { robotList.value = r.robots; }).catch(() => {}); }, 10000); });
 onUnmounted(() => clearInterval(timer));
 </script>
 
 <style scoped>
+.labs { margin-left: auto; white-space: nowrap; }
 .topbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
 .topbar .grow { flex: 1; }
 .side { width: 360px; flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; align-self: flex-start; max-height: calc(100vh - 180px); overflow-y: auto; }
@@ -317,6 +353,11 @@ h3 { margin: 8px 0 0; font-size: 15px; }
 .order pre { white-space: pre-wrap; margin: 0; font-family: inherit; }
 .note { flex: 1; height: 28px; border: 1px solid #C8CEC7; border-radius: 5px; padding: 0 6px; }
 .okline { color: var(--good, #1B5E20); }
+.jobsel { height: 30px; min-width: 320px; }
+.numin { width: 60px; height: 26px; }
+.robot { border-top: 1px solid var(--line); padding-top: 8px; margin-top: 6px; }
+.bar { display: inline-block; width: 90px; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; vertical-align: middle; }
+.bar i { display: block; height: 100%; background: var(--accent); }
 .big-empty { padding: 140px 0; text-align: center; }
 .console .line { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
 .small-btn { height: 28px; font-size: 12px; }

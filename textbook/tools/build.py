@@ -435,10 +435,12 @@ def fill(sec: Section, values: dict, rep: Report) -> str:
             return f"{m_}\\times 10^{{{int(e_)}}}"
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             try:
-                return format(v, fmt.strip()) if fmt else (str(v) if isinstance(v, int) else sig(v))
+                s = format(v, fmt.strip()) if fmt else (str(v) if isinstance(v, int) else sig(v))
             except ValueError:
                 rep.add("error", "占位符", sec.id, f"{m.group(0)}：格式 {fmt} 不对")
                 return m.group(0)
+            # 负数用真正的减号 “−”（U+2212）；公式里 MathJax 把 “-” 也排成 U+2212，两者一样
+            return "−" + s[1:] if s.startswith("-") else s
         if sec.lang == "en" and english.CJK.search(str(v)):
             rep.add("error", "占位符", sec.id + "（英文版）", f"{m.group(0)} 的值是中文：程序里写成 T(中文, English)")
         return str(v)
@@ -598,7 +600,7 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
 # ---------------------------------------------------------------- 零件库链接（第 11 轮《机械设计》第 33 章修订，各书共用）
 # 正文写 [[零件:A-BRG-DG/6207]] 或 [[零件:D-RDC-HD-CSF]]：阅读页显示零件名和规格，点开是数字工厂零件库的对应页面；
 # 构建时核对编号（和规格）在零件库里存在（library/catalog）。
-PART = re.compile(r"\[\[零件:([A-Z][A-Z0-9-]+)(?:/([^\]\s]+))?\]\]")
+PART = re.compile(r"\[\[(?:零件|part):([A-Z][A-Z0-9-]+)(?:/([^\]\s]+))?\]\]")
 LIBRARY_DIR = ROOT / "library" / "catalog"
 LIBRARY_URL = os.environ.get("WQ_LIBRARY_URL", "https://factory.wenquestrobotics.com/library")
 _LIB: dict = {}
@@ -747,6 +749,19 @@ def check_tags(sec: Section, rep: Report) -> None:
         if not n.startswith(sec.id + "."):
             rep.add("error", "编号", sec.id, f"小节 {n} 不属于 {sec.id} 节")
         sec.defines.add(f"节 {n}")
+
+
+FIG_DIRECTIVE = re.compile(r"(?m)^:::[ \t]*(?:图|Figure)[ \t]+([\d.]+)[ \t]*$")
+STRICT_FIG_ORDER = {"robotics"}      # other books: a warning only, until their figures are renumbered
+
+
+def check_figure_order(sec: Section, rep: Report, level: str = "error") -> None:
+    """The k-th ::: 图 directive of section N.M must be 图 N.M.k (numbered in order of appearance)."""
+    found = FIG_DIRECTIVE.findall(FENCE.sub("", sec.source))
+    want = [f"{sec.id}.{k}" for k in range(1, len(found) + 1)]
+    if found != want:
+        where = sec.id + ("（英文版）" if sec.lang == "en" else "")
+        rep.add(level, "编号", where, f"图编号应按出现顺序从 1 起连续：{'、'.join(found)}（应为 {'、'.join(want)}）")
 
 
 REF = re.compile(r"(" + "|".join(REF_KINDS) + r")\s*\(?(\d+\.\d+(?:\.\d+)?)\)?")
@@ -923,9 +938,11 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
             rep.add("error", "程序", "英文版", why)
     formulas: list = []
     figdir = book["root"].parent / "build" / book_name / "figs"
+    fig_level = "error" if book_name in STRICT_FIG_ORDER else "warning"
     for sec in sections:
         sec.figdir = figdir
         check_tags(sec, rep)
+        check_figure_order(sec, rep, fig_level)
         check_numbers(sec, rep)
         check_terms(sec, terms, rep)
         sec.html = render_section(sec, fill(sec, values, rep), values, rep, formulas)
@@ -942,6 +959,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         left = sorted(set(re.findall(r"[\u4e00-\u9fff]+", FENCE.sub("", sec.source))))
         if left:
             rep.add("error", "英文版", where, "正文里还有中文：" + "、".join(left[:8]))
+        check_figure_order(sec, rep, fig_level)
         check_numbers(sec, rep)
         for why in english.check_terms(zh.source, sec.source, gl_en):
             rep.add("error", "术语", where, why)

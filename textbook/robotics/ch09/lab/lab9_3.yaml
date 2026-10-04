@@ -8,7 +8,7 @@
 步骤:
   - ["场景“走廊里的 AGV”，取默认参数（0.9、0.1、0.1）。按“重置”，再按一次“测量”，记录四个标志格的概率之和和最可能的格（任务 1，表 1 第 1 行）。", "Scene “AGV in an aisle”, default parameters (0.9, 0.1, 0.1). Press Reset, then Measure once; record the total on the four tags and the most likely cell (task 1, Table 1 row 1)."]
   - ["交替按“前进一格”和“测量”，每一步记录读数、最可能的格及其概率、AGV 实际所在格的概率（表 1）。", "Alternate Move and Measure; at each step record the reading, the most likely cell with its probability, and the probability of the true cell (Table 1)."]
-  - ["把参数改为 0.95、0.05、0.05，重复第 1、2 步，直到实际所在格的概率超过 0.8（任务 2），比较两组参数所需的步数。", "Set 0.95, 0.05, 0.05 and repeat steps 1–2 until the true cell exceeds 0.8 (task 2); compare the number of steps for the two settings."]
+  - ["把参数改为 0.95、0.05、0.05，重复第 1、2 步，直到实际所在格的概率超过 0.8（任务 2），比较两组参数所需的步数。", "Set 0.95, 0.05, 0.05 and repeat steps 1–2 until the probability of the AGV's true cell exceeds 0.8 (task 2); compare the number of steps for the two settings."]
   - ["切换到“质检报警”，按算例 9.3.1 设置缺陷率 1%、检出率 0.95、误报率 0.05，读出后验（任务 3）；再把缺陷率改为 10% 和 0.1%，填表 2。", "Switch to “Inspection alarm”, set 1%, 0.95, 0.05 as in Example 9.3.1 and read the posterior (task 3); then try 10% and 0.1% defects and fill in Table 2."]
 数据表:
   - 标题: ["表 1  走廊定位的逐步记录", "Table 1  Step-by-step localization in the aisle"]
@@ -18,7 +18,7 @@
     行英文: [["1", "Measure", "", "", "", "", ""], ["2", "Move", "—", "", "", "", ""], ["3", "Measure", "", "", "", "", ""], ["4", "Move", "—", "", "", "", ""], ["5", "Measure", "", "", "", "", ""], ["6", "Move", "—", "", "", "", ""], ["7", "Measure", "", "", "", "", ""]]
   - 标题: ["表 2  缺陷率对后验的影响（检出率 0.95，误报率 0.05）", "Table 2  Effect of the defect rate (detection 0.95, false alarm 0.05)"]
     表头: ["缺陷率", "1000 个中报警", "其中有缺陷", "Pr(D | A) / %"]
-    表头英文: ["Defect rate", "Alarmed of 1000", "Of which defective", "Pr(D | A) / %"]
+    表头英文: ["Defect rate", "Alarms out of 1,000", "Of which defective", "Pr(D | A) / %"]
     行: [["10%", "", "", ""], ["1%", "", "", ""], ["0.1%", "", "", ""]]
 注意:
   - ["读数和 AGV 的实际走格由固定种子的随机数产生，按“重置”后重复相同的序列；改变参数会自动重置。", "Readings and the true moves come from fixed-seed random numbers, repeated after Reset; changing a parameter resets the lab."]

@@ -53,7 +53,7 @@ class Lesson(Base):
         self.play(TransformFromCopy(dotsL, tgt), TransformFromCopy(circ, ell), run_time=2.5)
         form = MathTex(r"\Sigma_p = J\,\Sigma_\theta\,J^{\mathsf T}", font_size=40, color=BLUE).move_to(right + UP * 1.4 + RIGHT * 2.2)
         self.play(Write(form))
-        self.caption("圆变成斜着的椭圆：末端误差有方向，x、y 负相关", "The circle becomes a tilted ellipse: the tip error has a direction", wait=1.2)
+        self.caption("圆变成斜着的椭圆：末端误差有方向，x、y 负相关", "The circle becomes a tilted ellipse: the end-effector error has a direction; x and y are negatively correlated", wait=1.2)
         self.clear_stage()
 
         # ---------------- 第二段：手臂逐渐伸直
@@ -83,10 +83,10 @@ class Lesson(Base):
 
         sc = always_redraw(scene)
         self.add(sc)
-        note = zh("椭圆放大 100 倍", 22, MUTED).to_corner(UR, buff=0.6).shift(DOWN * 2.3)
+        note = bi(["椭圆放大 100 倍", "Ellipse magnified 100×"], 22, MUTED).to_corner(UR, buff=0.6).shift(DOWN * 2.3)
         self.add(note)
-        self.caption("关节角各有 0.1° 的误差：末端的 95% 椭圆", "0.1° on each joint: the tip's 95% ellipse", wait=0.8)
-        self.caption("手臂逐渐伸直，椭圆越来越扁", "As the arm straightens, the ellipse flattens", wait=0)
+        self.caption("关节角各有 0.1° 的误差：末端的 95% 椭圆", "0.1° on each joint: the 95% ellipse of the end-effector", wait=0.8)
+        self.caption("手臂逐渐伸直，椭圆越来越扁", "As the arm straightens, the ellipse grows more elongated", wait=0)
         self.play(t2.animate.set_value(8), run_time=5, rate_func=smooth)
         self.caption("接近伸直：沿手臂方向几乎没有误差，误差全部垂直于手臂", "Nearly straight: almost no error along the arm, all across it", wait=1.5)
         sc.clear_updaters()

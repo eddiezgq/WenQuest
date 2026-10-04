@@ -88,6 +88,16 @@
       return { t, vin, vo };
     };
 
+    m.fopt = (gamma) => {
+      let lo = Math.E, hi = 10;
+      for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (mid * (Math.log(mid) - 1) < gamma) lo = mid; else hi = mid; }
+      return (lo + hi) / 2;
+    };
+    m.fo4Tp = (ratio, vdd = VDD) => { const d = m.fo4(Wmin, ratio * Wmin, vdd); return (d.tphl + d.tplh) / 2; };
+    m.vddForFo4 = (limit, ratio, lo = 0.9, hi = VDD) => {
+      for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (m.fo4Tp(ratio, mid) > limit) lo = mid; else hi = mid; }
+      return hi;
+    };
     m.reference = () => {
       const r = kn / kp, pr = P.problems, out = { r, idsat_n_per_um: m.idsatN(1), idsat_p_per_um: m.idsatP(1) };
       const w = m.wnForVol(pr.p11.Iload, pr.p11.VOLmax);
@@ -102,10 +112,15 @@
         out.p13[key] = { ratio, tphl: d.tphl, tplh: d.tplh, tp, mismatch: (d.tplh - d.tphl) / tp };
       }
       const CL = pr.p14.CL, C1 = m.cin(Wmin, r * Wmin), t = {};
-      for (let N = 1; N <= 8; N++) t[N] = m.chainDelay(N, CL, r);
-      out.p14 = { Cin: C1, F: CL / C1, Nopt4: Math.log(CL / C1) / Math.log(4), t };
+      for (let N = 1; N <= 10; N++) t[N] = m.chainDelay(N, CL, r);
+      let Nbest = 1; for (let N = 2; N <= 10; N++) if (t[N] < t[Nbest]) Nbest = N;
+      let Nfew = 0; for (let N = 1; N <= 10; N++) if (t[N] < pr.p14.tmax) { Nfew = N; break; }
+      const gamma = Cd / Cg;
+      out.p14 = { Cin: C1, F: CL / C1, Nopt4: Math.log(CL / C1) / Math.log(4), t, gamma, fopt: m.fopt(gamma), Nbest, Nfew };
       const q = pr.p15;
-      out.p15 = { P_VDD: m.dynPower(q.N, q.alpha, q.Cgate, VDD, q.f), P_low: m.dynPower(q.N, q.alpha, q.Cgate, q.Vlow, q.f) };
+      out.p15 = { P_VDD: m.dynPower(q.N, q.alpha, q.Cgate, VDD, q.f), P_low: m.dynPower(q.N, q.alpha, q.Cgate, q.Vlow, q.f),
+                  Vlim: m.vddForFo4(q.fo4max, r), fo4_low: m.fo4Tp(r, q.Vlow) };
+      out.r_lab = Math.round(r * 20) / 20;
       return out;
     };
     return m;

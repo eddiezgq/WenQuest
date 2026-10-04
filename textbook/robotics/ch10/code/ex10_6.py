@@ -83,7 +83,7 @@ imu2 = np.array([a_abs2 @ er2, a_abs2 @ ep2])
 w_E = 2 * math.pi / 86164.0905             # 地球相对恒星的自转角速度，rad/s（恒星日 86164.0905 s）
 lat = math.radians(31.2)
 v_n = 1.0
-aC_h = 2 * w_E * v_n * math.sin(lat)       # 水平分量（指向东）
+aC_h = 2 * w_E * v_n * math.sin(lat)       # 水平分量的大小（a_C 指向西）
 aC_v = 2 * w_E * v_n * 0.0                 # 向北运动时竖直分量为 0
 # 当地坐标 (东, 北, 天) 中：Ω = ω_E (0, cos λ, sin λ)，v = (0, 1, 0)
 Om_E = w_E * np.array([0, math.cos(lat), math.sin(lat)])

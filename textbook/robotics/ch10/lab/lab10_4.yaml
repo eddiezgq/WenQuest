@@ -6,7 +6,7 @@
   - ["小车沿直线 y = d 以速度 v 驶过时，方位角 φ = atan2(d, vt)，φ̇ = −v d / (v²t² + d²)，最大值 |φ̇|max = v/d 出现在离正下方最近处，与相机高度 H 无关（式 (10.4.13)、(10.4.14)）。",
      "For a cart passing along y = d at speed v, φ = atan2(d, vt) and φ̇ = −v d / (v²t² + d²); the largest |φ̇| = v/d occurs at closest approach and does not depend on the height H (Eqs. (10.4.13), (10.4.14))."]
   - ["d → 0 时 |φ̇|max → ∞：目标经过正下方附近时，方位-俯仰结构的云台必须急转，这就是锁孔问题，原因是式 (10.4.12) 的分母 r sin θ 趋于零。",
-     "As d → 0, |φ̇|max → ∞: a target passing almost beneath forces an azimuth-elevation gimbal to whip round. This is the keyhole problem, caused by the denominator r sin θ in Eq. (10.4.12)."]
+     "As d → 0, |φ̇|max → ∞: a target passing almost beneath forces an azimuth–elevation gimbal to whip round. This is the keyhole problem, caused by the denominator r sin θ in Eq. (10.4.12)."]
 步骤:
   - ["打开实验 10.4，选择“车间顶部的云台”，设 v = 1 m/s、d = 0.5 m、H = 3 m。先按式 (10.4.14) 手算最大水平转动角速度，填入表 1。",
      "Open Lab 10.4, choose “Gimbal on the workshop ceiling”, set v = 1 m/s, d = 0.5 m, H = 3 m. Compute the largest pan rate with Eq. (10.4.14) and enter it in Table 1."]

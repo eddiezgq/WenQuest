@@ -37,7 +37,7 @@ class Lesson(Base):
         lb = MathTex(r"L(\mu)", font_size=32, color=YELLOW).next_to(bot, RIGHT, buff=0.1)
         dots = VGroup(*[Dot(top.c2p(z, 0), radius=0.07, color=RED) for z in Z])
         self.play(Create(top), Create(bot), FadeIn(dots), Write(lt), Write(lb), run_time=1.5)
-        self.caption("5 个超声读数（红点），噪声标准差 10 mm", "Five ultrasonic readings (red), noise std 10 mm")
+        self.caption("5 个超声读数（红点），噪声标准差 10 mm", "Five ultrasonic readings (red), noise standard deviation 10 mm")
 
         mu = ValueTracker(125.0)
         curve = always_redraw(lambda: top.plot(lambda x: g(x, mu.get_value()), x_range=[115, 185, 0.25], color=BLUE, stroke_width=4))

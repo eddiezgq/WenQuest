@@ -5,7 +5,7 @@
 WQ.lab({
   title: ["实验 10.1 同一运动，两个参考系", "Lab 10.1 One motion, two reference frames"],
   goal: ["同时从地面和从 AGV 上观察同一个静止的零件；体会运动依赖于参考系，而换坐标系只换读数。",
-         "Watch the same resting part from the ground and from the AGV at once; see that motion depends on the reference frame."],
+         "Watch the same resting part from the ground and from the AGV at once; see that motion depends on the reference frame, while changing the coordinate system changes only the readings."],
   scenes: [
     { id: "agv", robot: true, name: ["转弯的 AGV", "A turning AGV"], hide: ["vc"],
       problem: { title: ["机器人问题：雷达说静止的零件在转圈", "Robot problem: the lidar says a resting part is circling"],
@@ -87,8 +87,8 @@ WQ.lab({
   draw(api, s) {
     const { w, h, ctx } = api, half = w / 2;
     api.line(half, 10, half, h - 10, api.css("--grid"), 1, [5, 5]);
-    api.label(api.T("以地面为参考系", "Ground as reference"), half * 0.5, 16, api.css("--ink"), 13, "center");
-    api.label(api.T("以 AGV（或汽车）为参考系", "AGV (or car) as reference"), half * 1.5, 16, api.css("--ink"), 13, "center");
+    api.label(api.T("以地面为参考系", "Ground as reference frame"), half * 0.5, 16, api.css("--ink"), 13, "center");
+    api.label(api.T("以 AGV（或汽车）为参考系", "AGV (or car) as reference frame"), half * 1.5, 16, api.css("--ink"), 13, "center");
     if (api.scene === "rain") {
       const gy = h * 0.78, cx = half * 0.5, carx = (api.t * api.p.vc * 8) % (half * 1.2) - half * 0.1;
       api.ground(gy, half - 6);

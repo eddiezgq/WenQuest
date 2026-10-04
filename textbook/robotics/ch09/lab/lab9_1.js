@@ -3,13 +3,13 @@
 WQ.lab({
   title: ["实验 9.1 噪声读数的统计", "Lab 9.1 Statistics of noisy readings"],
   goal: ["收集带噪声的读数，计算样本均值和样本标准差，检验 68–95–99.7 规则，并验证平均 N 个读数使标准差缩小为 1/√N。",
-         "Collect noisy readings, compute the sample mean and standard deviation, check the 68–95–99.7 rule, and verify that averaging N readings shrinks the spread by 1/√N."],
+         "Collect noisy readings, compute the sample mean and standard deviation, check the 68–95–99.7 rule, and verify that averaging N readings reduces the standard deviation to 1/√N of its value."],
   scenes: [
     { id: "force", robot: true, name: ["夹爪测力传感器", "Gripper force sensor"],
       params: { sig: { min: 0.01, max: 0.3, step: 0.01, value: 0.08 } },
-      problem: { title: ["机器人问题：夹紧力的读数在跳", "Robot problem: the clamping-force reading jumps"],
+      problem: { title: ["机器人问题：夹紧力的读数在跳", "Robot problem: the clamping-force reading fluctuates"],
                  text: ["夹紧力恒为 15 N，读数却在 15 N 上下跳动。用多少个读数、怎样平均，才能得到稳定可信的力？",
-                        "The clamping force is a steady 15 N, yet the reading jumps around it. How many readings, averaged how, give a trustworthy force?"] } },
+                        "The clamping force is a steady 15 N, yet the reading fluctuates about it. How many readings, averaged how, give a trustworthy force?"] } },
     { id: "scale", name: ["厨房秤", "Kitchen scale"],
       params: { sig: { min: 0.1, max: 2, step: 0.05, value: 0.5 } },
       problem: { title: ["生活中的例子：称 250 g 面粉", "Everyday example: weighing 250 g of flour"],
@@ -21,7 +21,7 @@ WQ.lab({
     { id: "N", name: ["每次平均的读数个数 N", "Readings per average N"], min: 1, max: 64, step: 1, value: 1, unit: "", digits: 0 },
   ],
   tasks: [
-    { id: "rule", robot: true, text: ["N = 1，收集 2000 个读数，验证落在 x̄ ± s 内的读数约占 68%。", "With N = 1 collect 2000 readings; about 68% lie within x̄ ± s."],
+    { id: "rule", robot: true, text: ["N = 1，收集 2000 个读数，验证落在 x̄ ± s 内的读数约占 68%。", "With N = 1 collect 2,000 readings; about 68% lie within x̄ ± s."],
       demo: { scene: "force", set: { sig: 0.08, N: 1 }, press: ["start"], wait: 8 } },
     { id: "avg", robot: true, text: ["N = 16，验证平均值的标准差约为单个读数的 1/4。", "With N = 16 the averages spread about 1/4 as much as single readings."],
       demo: { scene: "force", set: { sig: 0.08, N: 16 }, press: ["start"], wait: 10 } },
@@ -29,7 +29,7 @@ WQ.lab({
       demo: { scene: "scale", set: { sig: 0.5, N: 25 }, press: ["start"], wait: 12 } },
   ],
   think: ["为什么要把标准差减小到 1/10，需要平均 100 个读数，而不是 10 个？如果相邻读数不独立（例如都偏高），平均的效果会怎样？",
-          "Why does cutting the spread to 1/10 need 100 readings, not 10? What happens to averaging if neighbouring readings are not independent?"],
+          "Why does cutting the standard deviation to 1/10 need 100 readings, not 10? What happens to averaging if neighbouring readings are not independent (e.g. all reading high together)?"],
 
   truth(api) { return api.scene === "force" ? 15 : 250; },
   unit(api) { return api.scene === "force" ? "N" : "g"; },
@@ -66,10 +66,10 @@ WQ.lab({
     const d = api.scene === "force" ? 4 : 3;
     return [[["读数个数 n", "readings n"], String(st.n)],
             [["样本均值 x̄", "sample mean x̄"], api.fmt(st.m, d) + " " + u],
-            [["样本标准差 s", "sample std s"], api.fmt(st.s, d) + " " + u],
+            [["样本标准差 s", "sample standard deviation s"], api.fmt(st.s, d) + " " + u],
             [["落在 x̄ ± s 内", "within x̄ ± s"], api.fmt(100 * frac, 1) + " %"],
             [["平均值的个数", "number of averages"], String(sa.n)],
-            [["平均值的样本标准差", "sample std of the averages"], api.fmt(sa.s, d) + " " + u],
+            [["平均值的样本标准差", "sample standard deviation of the averages"], api.fmt(sa.s, d) + " " + u],
             [["理论值 σ/√N", "theory σ/√N"], api.fmt(api.p.sig / Math.sqrt(N), d) + " " + u]];
   },
   draw(api, s) {

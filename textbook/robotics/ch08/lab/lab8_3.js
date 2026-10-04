@@ -10,7 +10,7 @@ WQ.lab({
     { id: "step", robot: true, name: ["受限的一步", "A limited step"], hide: ["vmax"],
       problem: { title: ["机器人问题：每步关节转角有上限", "Robot problem: each step of a joint is limited"],
                  text: ["手臂在 (0°, 90°)，要让末端尽量接近目标，但每个关节这一步最多转 d。截断超限的分量，并不是最好的办法。",
-                        "The arm is at (0°, 90°) and should bring the tip as close to the target as possible, but no joint may turn more than d in this step. Clipping is not the best answer."] } },
+                        "The arm is at (0°, 90°) and should bring the end-effector as close to the target as possible, but no joint may turn more than d in this step. Clipping is not the best answer."] } },
     { id: "lift", name: ["电梯", "A lift"], hide: ["px", "py", "dmax"],
       problem: { title: ["生活中的例子：电梯的速度曲线", "Everyday example: the speed profile of a lift"],
                  text: ["电梯 20 s 上升 30 m，起止静止。不限速时最省能的速度曲线是抛物线；有额定速度时，中段匀速。",
@@ -92,8 +92,8 @@ WQ.lab({
             [["二次规划的解 Δ*", "QP solution Δ*"], `(${f(r.x[0], 4)}, ${f(r.x[1], 4)}) rad`],
             [["起作用的约束", "active constraints"], r.act.length ? r.act.map((i) => names[i]).join(", ") : api.T("无", "none")],
             [["乘子 μ₁…μ₄", "multipliers μ₁…μ₄"], `(${r.mu.map((m) => f(m, 5)).join(", ")})`],
-            [["末端误差 ‖JΔ − e‖：二次规划", "tip error ‖JΔ − e‖: QP"], f(err(r.x), 4) + " m"],
-            [["末端误差 ‖JΔ − e‖：截断", "tip error ‖JΔ − e‖: clipped"], f(err(clip), 4) + " m"]];
+            [["末端误差 ‖JΔ − e‖：二次规划", "end-effector error ‖JΔ − e‖: QP"], f(err(r.x), 4) + " m"],
+            [["末端误差 ‖JΔ − e‖：截断", "end-effector error ‖JΔ − e‖: clipped"], f(err(clip), 4) + " m"]];
   },
   draw(api, s) {
     const { w, h, ctx } = api;

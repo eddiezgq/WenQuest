@@ -3,37 +3,37 @@
 // 夹爪场景：步长 0.1 m、转角 30°，起点 (0.6, 0.3, 0°)，夹具位姿 (1.0, 0.7, 90°)。
 // 街区场景：步长 1 m、转角 90°，起点 (0, 0)、面朝北（90°），商店在 (−2, 3)。
 WQ.lab({
-  title: ["实验 5.3 左乘与右乘", "Lab 5.3 Left- and right-multiplication"],
+  title: ["实验 5.3 左乘与右乘", "Lab 5.3 Premultiplication and postmultiplication"],
   goal: ["用四个按钮移动一只夹爪（或一个行人）：两个相对自身（右乘），两个相对基座（左乘）。比较结果，并读出位姿矩阵和它的逆。",
-         "Move a gripper (or a walker) with four buttons: two relative to itself (right-multiply), two relative to the base (left-multiply). Compare the results and read the pose and its inverse."],
+         "Move a gripper (or a walker) with four buttons: two relative to itself (postmultiply), two relative to the base (premultiply). Compare the results and read the pose and its inverse."],
   scenes: [
     { id: "grip", robot: true, name: ["夹爪进夹具", "Gripper into the fixture"],
       problem: { title: ["机器人问题：只用工具坐标系中的点动", "Robot problem: jog only in the tool frame"],
                  text: ["示教时只允许“沿夹爪前进 0.1 m”和“绕夹爪自身转 30°”。把夹爪从 (0.6, 0.3) m 送进 (1.0, 0.7) m 处朝上的夹具。",
-                        "Only “forward 0.1 m along the gripper” and “turn 30° about the gripper” are allowed. Bring it from (0.6, 0.3) m into the upward fixture at (1.0, 0.7) m."] } },
+                        "Only “forward 0.1 m along the gripper” and “turn 30° about the gripper” are allowed. Bring it from (0.6, 0.3) m into the fixture at (1.0, 0.7) m, which faces up (+y)."] } },
     { id: "walk", name: ["街区里的行人", "A walker in town"],
-      problem: { title: ["生活中的例子：“前进、左转”与“向北、向东”", "Everyday example: “ahead, turn left” vs “north, east”"],
+      problem: { title: ["生活中的例子：“前进、左转”与“向北、向东”", "Everyday example: “forward, turn left” vs “north, east”"],
                  text: ["行人在 (0, 0) 面朝北。只用“前进 1 格”和“左转 90°”，走到 (−2, 3) 的商店。",
-                        "The walker is at (0, 0) facing north. Using only “ahead 1 block” and “turn left 90°”, reach the shop at (−2, 3)."] } },
+                        "The walker is at (0, 0) facing north. Using only “forward 1 block” and “turn left 90°”, reach the shop at (−2, 3)."] } },
   ],
   params: [],
   buttons: [
-    { id: "fwd", name: ["右乘：沿自身 x 前进", "Right: ahead along own x"], primary: true },
-    { id: "rotB", name: ["右乘：绕自身原点左转", "Right: turn left about own origin"], primary: true },
-    { id: "movS", name: ["左乘：沿基座 x 平移", "Left: shift along base x"] },
-    { id: "rotS", name: ["左乘：绕基座原点左转", "Left: turn left about the base origin"] },
+    { id: "fwd", name: ["右乘：沿自身 x 前进", "Post: forward along own x"], primary: true },
+    { id: "rotB", name: ["右乘：绕自身原点左转", "Post: turn left about own origin"], primary: true },
+    { id: "movS", name: ["左乘：沿基座 x 平移", "Pre: translate along base x"] },
+    { id: "rotS", name: ["左乘：绕基座原点左转", "Pre: turn left about the base origin"] },
     { id: "reset", name: ["重置", "Reset"] },
   ],
   tasks: [
-    { id: "fix", robot: true, text: ["只用两个“右乘”按钮，把夹爪送进夹具。", "Using only the two “right” buttons, bring the gripper into the fixture."],
+    { id: "fix", robot: true, text: ["只用两个“右乘”按钮，把夹爪送进夹具。", "Using only the two “Post” (postmultiply) buttons, bring the gripper into the fixture."],
       demo: { scene: "grip", press: ["reset", "fwd", "fwd", "fwd", "fwd", "rotB", "rotB", "rotB", "fwd", "fwd", "fwd", "fwd"] } },
     { id: "swing", robot: true, text: ["从起点按一次“绕基座原点左转”，读出夹爪被甩出的距离。", "From the start, press “turn left about the base origin” once and read how far the gripper is flung."],
       demo: { scene: "grip", press: ["reset", "rotS"] } },
-    { id: "walk", text: ["只用“前进”和“左转”走到商店。", "Reach the shop using only “ahead” and “turn left”."],
+    { id: "walk", text: ["只用“前进”和“左转”走到商店。", "Reach the shop using only “forward” and “turn left”."],
       demo: { scene: "walk", press: ["reset", "fwd", "fwd", "fwd", "rotB", "fwd", "fwd"] } },
   ],
   think: ["“绕基座原点左转”与“绕自身原点左转”的转角相同，为什么夹爪的姿态相同、位置却不同？什么情况下两者完全一样？",
-          "The two left turns have the same angle: why is the orientation the same but the position different? When are they identical?"],
+          "“Turn left about the base origin” and “turn left about own origin” turn through the same angle: why is the orientation the same but the position different? When are the two exactly the same?"],
 
   cfg(api) {
     return api.scene === "grip" ? { step: 0.1, turn: 30, start: [0.6, 0.3, 0], goal: [1.0, 0.7, 90] }
@@ -67,8 +67,8 @@ WQ.lab({
       [["T_ts = T_st⁻¹ 第 1、2 行", "T_ts = T_st⁻¹ rows 1, 2"], `${r([co, si, ix])} ${r([-si, co, iy])}`],
       [["工具原点 / 朝向", "tool origin / heading"], `(${api.fmt(x, 3)}, ${api.fmt(y, 3)}) ${api.scene === "grip" ? "m" : ""} / ${api.fmt(a, 0)}°`],
       [["{s} 原点在工具坐标系中 p_ts", "origin of {s} in the tool frame, p_ts"], `(${api.fmt(ix, 3)}, ${api.fmt(iy, 3)})`],
-      [["上一次左乘转动甩出的距离", "distance flung by the last left turn"], s.swing === null ? "—" : api.fmt(s.swing, 4) + (api.scene === "grip" ? " m" : "")],
-      [["用过左乘按钮", "used a left button"], s.base ? api.T("是", "yes") : api.T("否", "no")],
+      [["上一次左乘转动甩出的距离", "distance flung by the last premultiplied turn"], s.swing === null ? "—" : api.fmt(s.swing, 4) + (api.scene === "grip" ? " m" : "")],
+      [["用过左乘按钮", "used a premultiply button"], s.base ? api.T("是", "yes") : api.T("否", "no")],
     ];
   },
   draw(api, s) {

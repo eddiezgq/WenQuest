@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """假如分析（第 15 轮 T5）：拿最近 30 个现场日的实测工况（转矩分布、雨流计数、环境温度），改一个条件重算消耗速度和油温，
-换算成剩余寿命。降载按比例缩放转矩；加风扇把散热系数从 17.45 提到 31（濮良贵：轴端装风扇约 31–38）；换材料用材料库的 S-N。"""
+换算成剩余寿命。降载按比例缩放转矩；加风扇把散热系数从 17.45 提到 31（濮良贵：轴端装风扇约 31–38；第 16 轮起有箱体风扇冷却的流体分析结果时改用它算出的值）；换材料用材料库的 S-N。"""
 from twin import engine as E
 from twin import models as M
 
@@ -35,11 +35,11 @@ def rates(logs, design=None, load=1.0, k_s=M.K_S, mat="45-QT"):
             "oil_t_c": oil_sum / run if run else None}
 
 
-def compare(state, logs, design=None, load=1.0, fan=False, mat="45-QT"):
+def compare(state, logs, design=None, load=1.0, fan=False, mat="45-QT", k_fan=K_FAN):
     """现状 vs 假如：剩余天数（最先到期的轴承、输出轴）、换油间隔天数、平均油温"""
     logs = [r for r in logs if r.get("load_hist") is not None][-30:]
     base = rates(logs, design)
-    alt = rates(logs, design, load, K_FAN if fan else M.K_S, mat)
+    alt = rates(logs, design, load, k_fan if fan else M.K_S, mat)
 
     def life(rt):
         b = {k: E._remaining_days(state["brg_D"].get(k, 0.0), v) for k, v in rt["brg"].items()}
@@ -47,7 +47,7 @@ def compare(state, logs, design=None, load=1.0, fan=False, mat="45-QT"):
         due = M.OIL_INTERVAL_H
         return {"bearing": worst, "bearing_days": b[worst], "shaft_days": E._remaining_days(state["shaft_D"], rt["shaft"]),
                 "oil_interval_days": due / rt["oil_eq_per_day"] if rt["oil_eq_per_day"] else None, "oil_t_c": rt["oil_t_c"]}
-    out = {"base": life(base), "alt": life(alt), "load": load, "fan": fan, "mat": mat, "days": len(logs)}
+    out = {"base": life(base), "alt": life(alt), "load": load, "fan": fan, "fan_k": k_fan, "mat": mat, "days": len(logs)}
     for k in ("base", "alt"):
         for f in ("bearing_days", "shaft_days"):
             if out[k][f] == float("inf"):

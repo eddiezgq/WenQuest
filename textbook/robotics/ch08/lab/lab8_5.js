@@ -4,24 +4,24 @@
 // 高斯-牛顿法（式 (8.5.4)）、LM 法（式 (8.5.5)，尼尔森的阻尼系数 μ 更新 (8.5.9)）。
 // “室内定位”：4 个 UWB 基站，测距误差取算例 8.5.3 的同一组值；房间按约 1:5.5 缩小显示。
 WQ.lab({
-  title: ["实验 8.5 用不同方法求同一个逆运动学问题", "Lab 8.5 One inverse-kinematics problem, several methods"],
+  title: ["实验 8.5 用不同方法求同一个逆运动学问题", "Lab 8.5 One inverse kinematics problem, several methods"],
   goal: ["用梯度下降、牛顿法、高斯-牛顿法和 LM 法求 UR5e 的位置逆解，比较迭代次数和对初值的敏感程度；用高斯-牛顿法做室内定位。",
-         "Solve the UR5e position inverse kinematics by gradient descent, Newton, Gauss-Newton and Levenberg-Marquardt; compare iteration counts and sensitivity to the start; locate a phone indoors by Gauss-Newton."],
+         "Solve the UR5e position inverse kinematics by gradient descent, Newton, Gauss–Newton and Levenberg–Marquardt; compare iteration counts and sensitivity to the start; locate a phone indoors by Gauss–Newton."],
   view: "3d",
   models: ["B-ARM-UR5E"],
   scenes: [
     { id: "ur", robot: true, name: ["UR5e 位置逆解", "UR5e position IK"], hide: ["ux", "uy", "uz"],
       problem: { title: ["机器人问题：法兰盘中心到达目标点", "Robot problem: bring the flange centre to a target"],
                  text: ["目标点由“目标关节角”算出（红球）。从起始形态出发迭代，手臂一步步运动，直到法兰盘中心到达红球。",
-                        "The target (red ball) is computed from the “target joint angles”. Starting from the chosen posture the arm moves step by step until the flange centre reaches it."] } },
+                        "The target (red ball) is computed from the “target joint angles”. Starting from the chosen start configuration the arm moves step by step until the flange centre reaches it."] } },
     { id: "uwb", name: ["室内定位", "Indoor positioning"], hide: ["method", "start", "j1", "j2", "j3"],
       problem: { title: ["生活中的例子：手机在哪里", "Everyday example: where is the phone?"],
                  text: ["四个 UWB 基站（蓝球）测出到手机的距离，带有标准差约 5 cm 的误差。高斯-牛顿法从房间中央出发，求出手机的位置（红球），绿块是实际位置。",
-                        "Four UWB anchors (blue) measure their distances to the phone, with errors of standard deviation about 5 cm. Gauss-Newton starts at the room centre and finds the phone (red); the green block is the true position."] } },
+                        "Four UWB anchors (blue) measure their distances to the phone, with errors of standard deviation about 5 cm. Gauss–Newton starts at the room centre and finds the phone (red); the green block is the true position."] } },
   ],
   params: [
-    { id: "method", name: ["方法：0 梯度下降 / 1 牛顿 / 2 高斯-牛顿 / 3 LM", "Method: 0 GD / 1 Newton / 2 Gauss-Newton / 3 LM"], min: 0, max: 3, step: 1, value: 2, unit: "", digits: 0 },
-    { id: "start", name: ["起始形态：0 (0°, −90°, 90°) / 1 伸直 (0, 0, 0)", "Start: 0 (0°, −90°, 90°) / 1 stretched (0, 0, 0)"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
+    { id: "method", name: ["方法：0 梯度下降 / 1 牛顿 / 2 高斯-牛顿 / 3 LM", "Method: 0 gradient descent / 1 Newton / 2 Gauss–Newton / 3 LM"], min: 0, max: 3, step: 1, value: 2, unit: "", digits: 0 },
+    { id: "start", name: ["起始形态：0 (0°, −90°, 90°) / 1 伸直 (0, 0, 0)", "Start: 0 (0°, −90°, 90°) / 1 fully extended (0, 0, 0)"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
     { id: "j1", name: ["目标关节角 θ₁", "Target joint θ₁"], min: -180, max: 180, step: 1, value: 40, unit: "°", digits: 0 },
     { id: "j2", name: ["目标关节角 θ₂", "Target joint θ₂"], min: -180, max: 0, step: 1, value: -70, unit: "°", digits: 0 },
     { id: "j3", name: ["目标关节角 θ₃", "Target joint θ₃"], min: -160, max: 160, step: 1, value: 100, unit: "°", digits: 0 },
@@ -31,17 +31,17 @@ WQ.lab({
   ],
   buttons: [{ id: "start", name: ["求解", "Solve"], primary: true }, { id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "gn", robot: true, text: ["用高斯-牛顿法复现算例 8.5.1（默认目标、起始形态 0），记下迭代次数。", "Reproduce Example 8.5.1 with Gauss-Newton (default target, start 0) and note the iterations."],
+    { id: "gn", robot: true, text: ["用高斯-牛顿法复现算例 8.5.1（默认目标、起始形态 0），记下迭代次数。", "Reproduce Example 8.5.1 with Gauss–Newton (default target, start 0) and note the iterations."],
       demo: { scene: "ur", set: { method: 2, start: 0, j1: 40, j2: -70, j3: 100 }, press: ["start"], wait: 6 } },
     { id: "gd", robot: true, text: ["换用梯度下降求同一问题，比较迭代次数。", "Solve the same problem by gradient descent and compare the iterations."],
       demo: { scene: "ur", set: { method: 0, start: 0, j1: 40, j2: -70, j3: 100 }, press: ["start"], wait: 10 } },
-    { id: "sing", robot: true, text: ["从伸直的形态出发用 LM 法求解：关节角不绕圈，直接收敛到目标关节角。", "Start from the stretched posture with LM: the joints do not wind round and converge straight to the target angles."],
+    { id: "sing", robot: true, text: ["从伸直的形态出发用 LM 法求解：关节角不绕圈，直接收敛到目标关节角。", "Start from the fully extended configuration with LM: the joints do not wind round and converge straight to the target angles."],
       demo: { scene: "ur", set: { method: 3, start: 1, j1: 40, j2: -70, j3: 100 }, press: ["start"], wait: 8 } },
     { id: "uwb", text: ["在“室内定位”中求出手机的位置，误差小于 15 cm。", "In “Indoor positioning” locate the phone to within 15 cm."],
       demo: { scene: "uwb", set: { ux: 3.6, uy: 1.2, uz: 1.0 }, press: ["start"], wait: 8 } },
   ],
   think: ["从伸直的形态出发，高斯-牛顿法第一步为什么转了那么大的角度？用 JᵀJ 的最小特征值解释，再说明 LM 的阻尼项起了什么作用。",
-          "Starting from the stretched posture, why is Gauss-Newton's first step so large? Explain with the smallest eigenvalue of JᵀJ, and say what LM's damping term does."],
+          "Starting from the fully extended configuration, why is Gauss–Newton's first step so large? Explain with the smallest eigenvalue of JᵀJ, and say what LM's damping term does."],
 
   WRIST: [-90, -90, 0].map((d) => d * Math.PI / 180),
   NOISE: [0.10204596, -0.12778325, 0.02090494, -0.02838848],
@@ -195,7 +195,7 @@ WQ.lab({
     if (s.done && def && api.p.start === 0 && api.p.method === 2) api.done("gn");
     if (s.done && def && api.p.start === 0 && api.p.method === 0) api.done("gd");
     if (s.done && def && api.p.start === 1 && api.p.method === 3 && s.x.every((v) => Math.abs(v) <= Math.PI + 1e-9)) api.done("sing");
-    const names = [api.T("梯度下降", "gradient descent"), api.T("牛顿法", "Newton"), api.T("高斯-牛顿法", "Gauss-Newton"), api.T("LM 法", "Levenberg-Marquardt")];
+    const names = [api.T("梯度下降", "gradient descent"), api.T("牛顿法", "Newton"), api.T("高斯-牛顿法", "Gauss–Newton"), api.T("LM 法", "Levenberg–Marquardt")];
     const t = this.target(api), J = this.jac3(this.full(s.x)), ev = this.eig3(this.JtJ(J)).d;
     return [[["方法", "method"], names[api.p.method]], [["迭代次数 k", "iteration k"], String(s.k)],
             [["残差 ‖r‖", "residual ‖r‖"], s.rn < 1e-3 ? s.rn.toExponential(1) + " m" : f(s.rn, 4) + " m"],

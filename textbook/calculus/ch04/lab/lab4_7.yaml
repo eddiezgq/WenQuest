@@ -1,0 +1,30 @@
+# 实验 4.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab4_7.js。
+原理:
+  - ["双精度浮点数约有 16 位有效数字，机器精度 ε_mach ≈ 2.2×10⁻¹⁶。每个数存入计算机都有相对大小约 ε_mach 的舍入误差（4.7.2 节）。",
+     "Double precision carries about 16 significant digits; machine epsilon is ε_mach ≈ 2.2×10⁻¹⁶. Every stored number has a relative rounding error of about ε_mach (Section 4.7.2)."]
+  - 式: "相消：a ≈ b 时，a − b 的相对误差 ≈ ε_mach · |a| / |a − b|；(1 − cos x)/x² 的相对误差 ≈ ε_mach / x²"
+  - ["两个几乎相等的数相减，相同的有效数字全部抵消，舍入误差被放大，这叫相消。改写公式（三角恒等式、有理化、韦达定理）或调用 expm1、log1p 等专门函数，可以避开相消（4.7.4 节）。",
+     "Subtracting two nearly equal numbers cancels their common digits and magnifies the rounding error: cancellation. Rewriting (trigonometric identities, rationalising, Vieta's formulas) or special functions such as expm1 and log1p avoid it (Section 4.7.4)."]
+步骤:
+  - ["在“函数的极限”场景中选函数 2，把 lg x 依次取表 1 所列的值，记录原式与改写式的相对误差，填入表 1；找出原式相对误差超过 1% 的 x（任务 1）。",
+     "In 'Limits of functions' choose function 2, set lg x to each value listed in Table 1, record both relative errors, and find an x where the original's error exceeds 1% (task 1)."]
+  - ["令 lg x = −8，确认改写式的相对误差小于 10⁻¹²（任务 2）。对函数 1、3 重复，比较三个函数的曲线。",
+     "Set lg x = −8 and check that the rewritten error is below 10⁻¹² (task 2). Repeat for functions 1 and 3 and compare the three curves."]
+  - ["在“AGV 里程计”场景中令 lg ω = −6，读出两种算法的 Δy 和原式的相对误差，原式的相对误差应超过 5%（任务 3）；再把 ω 减到 10⁻⁸，原式给出什么？",
+     "In 'AGV odometry' set lg ω = −6 and read both Δy values and the original's relative error, which should exceed 5% (task 3); then lower ω to 10⁻⁸. What does the original give?"]
+数据表:
+  - 标题: ["表 1  (1 − cos x)/x² 的相对误差", "Table 1  Relative error of (1 − cos x)/x²"]
+    表头: ["lg x", "−1", "−2", "−4", "−6", "−7", "−8", "−10"]
+    表头英文: ["lg x", "−1", "−2", "−4", "−6", "−7", "−8", "−10"]
+    行: [["原式", "", "", "", "", "", "", ""], ["改写式", "", "", "", "", "", "", ""]]
+    行英文: [["Original", "", "", "", "", "", "", ""], ["Rewritten", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  AGV 一个控制周期的横向位移 Δy（v = 1 m/s，T = 20 ms）", "Table 2  Sideways step Δy in one cycle (v = 1 m/s, T = 20 ms)"]
+    表头: ["ω / (rad/s)", "原式 Δy / m", "改写式 Δy / m", "原式的相对误差"]
+    表头英文: ["ω / (rad/s)", "Original Δy / m", "Rewritten Δy / m", "Original rel. error"]
+    行: [["10⁻²", "", "", ""], ["10⁻⁴", "", "", ""], ["10⁻⁶", "", "", ""], ["10⁻⁸", "", "", ""]]
+注意:
+  - ["“真值”由泰勒级数计算（第 9、24 章），在 |x| ≤ 1 内精确到机器精度，可以作为比较的基准。", "The 'true value' comes from a Taylor series (Chapters 9 and 24), accurate to machine precision for |x| ≤ 1, and serves as the reference."]
+  - ["图中两条灰色水平线分别是 ε_mach（约 10^−15.65）和 1%（10⁻²）。", "The two grey horizontal lines mark ε_mach (about 10^−15.65) and 1% (10⁻²)."]
+思考题:
+  - ["表 4.7.1 中原式的相对误差大约按 ε_mach/x² 增长，为什么？若函数是 (x − sin x)/x³，误差会按 x 的几次方增长？", "In Table 4.7.1 the original's relative error grows roughly like ε_mach/x². Why? For (x − sin x)/x³, with what power of x would it grow?"]
+  - ["sin x / x 为什么在 x 很小时也算得准？“0/0 型”与“相消”是不是一回事？", "Why is sin x / x accurate even for tiny x? Is a '0/0 form' the same thing as cancellation?"]

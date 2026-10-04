@@ -11,9 +11,9 @@
   - ["打开实验 6.3，场景“差速 AGV 转弯”。改变 ω、v_x，观察橙色速度箭头和红色瞬心的位置。按“运动 3 s”，看 AGV 沿以瞬心为圆心的圆弧运动。",
      "Open Lab 6.3, scene “Differential AGV turning”. Vary ω and v_x and watch the orange velocity arrows and the red centre. Press “Move for 3 s” and see the AGV travel on an arc about the centre."]
   - ["用式 (6.3.12) 手算：要让瞬心在 (0, 1.0) m，v_x 与 ω 应满足什么关系？在界面中验证（任务 1），记入表 1。",
-     "Use Eq. (6.3.12): for the centre at (0, 1.0) m, how must v_x relate to ω? Check it (task 1); Table 1."]
+     "Use Eq. (6.3.12): for the centre at (0, 1.0) m, how must v_x relate to ω? Check it in the interface (task 1) and record it in Table 1."]
   - ["令 v_x = v_y = 0、ω ≠ 0（任务 2）；再令 ω = 0、v_x ≠ 0（任务 3）。记录瞬心的位置并解释。",
-     "Set v_x = v_y = 0 with ω ≠ 0 (task 2), then ω = 0 with v_x ≠ 0 (task 3). Record and explain the centre."]
+     "Set v_x = v_y = 0 with ω ≠ 0 (task 2), then ω = 0 with v_x ≠ 0 (task 3). Record where the centre is and explain it."]
   - ["在“差速 AGV 转弯”中读出左轮的速度，与 v_x − 0.2ω 比较，说明差速 AGV 怎样用两轮的速度差实现转弯。",
      "Read the left-wheel velocity in the AGV scene and compare with v_x − 0.2ω; explain how a differential AGV turns by the difference of its wheel speeds."]
   - ["切换到“滚动的车轮”，找出使接触点速度为零的 ω（任务 4）。记录轮顶点 (0, 0.3) 的速度，说明它为什么是轮心速度的两倍。",

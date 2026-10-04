@@ -1,0 +1,27 @@
+# 实验 5.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab5_6.js。
+原理:
+  - ["三次样条在每段上是三次多项式，在路点处位置、速度、加速度都连续。记路点处的角加速度为 M₀…M₅，自然样条取 M₀ = M₅ = 0。", "A cubic spline is a cubic on each segment, with continuous position, velocity and acceleration at the waypoints. Let M₀…M₅ be the accelerations at the waypoints; the natural spline has M₀ = M₅ = 0."]
+  - 式: "M_{i−1} + 4M_i + M_{i+1} = 6(θ_{i+1} − 2θ_i + θ_{i−1}) / h²，  i = 1, …, 4"
+  - ["这是三对角方程组。追赶法先自上而下消去下对角（“追”），再自下而上回代（“赶”），运算量与未知数个数成正比（5.6.2 节）。", "This is a tridiagonal system. The solver eliminates the subdiagonal top-down and back-substitutes bottom-up; the work is proportional to the number of unknowns (Section 5.6.2)."]
+  - ["每段内角加速度是线性的，最大值出现在某个路点处；所有路点同时缩放时间 h，角加速度按 1/h² 变化。", "Within a segment the acceleration is linear, so its peak is at a waypoint; scaling h scales the acceleration by 1/h²."]
+步骤:
+  - ["保持默认路点（0, 20, 60, 90, 70, 40）° 与 h = 1 s（任务 1），记录右端、M₁…M₄、最大角速度和最大角加速度（表 1 第 1 行）。", "With the default waypoints and h = 1 s (task 1), record the right side, M₁…M₄ and the peak velocity and acceleration (Table 1, row 1)."]
+  - ["只改 h，找出使最大角加速度不超过 50°/s² 的最小 h（任务 2），与公式 h ≥ √(74.9/50) 比较，填表 1。", "Change only h; find the smallest h giving peak acceleration ≤ 50°/s² (task 2) and compare with h ≥ √(74.9/50); fill in Table 1."]
+  - ["h = 1 s，只改中间路点（θ₃ ≥ 70°），使最大角加速度不超过 50°/s²（任务 3），记下你的路点，填表 2。", "With h = 1 s change only the middle waypoints (θ₃ ≥ 70°) to get peak acceleration ≤ 50°/s² (task 3); record your waypoints in Table 2."]
+  - ["任取一组路点和 h，确认追赶法与一般消元的结果一致（任务 4）。", "For any waypoints and h, check that the tridiagonal solver agrees with general elimination (task 4)."]
+数据表:
+  - 标题: ["表 1  每段时长对轨迹的影响（默认路点）", "Table 1  Effect of the segment time (default waypoints)"]
+    表头: ["h / s", "M₁", "M₂", "M₃", "M₄", "最大角速度 / (°/s)", "最大角加速度 / (°/s²)"]
+    表头英文: ["h / s", "M₁", "M₂", "M₃", "M₄", "Peak velocity / (°/s)", "Peak acceleration / (°/s²)"]
+    行: [["1.0", "", "", "", "", "", ""], ["1.2", "", "", "", "", "", ""], ["", "", "", "", "", "", ""], ["2.0", "", "", "", "", "", ""]]
+  - 标题: ["表 2  改路点满足加速度限制（h = 1 s）", "Table 2  Meeting the limit by moving waypoints (h = 1 s)"]
+    表头: ["θ₁", "θ₂", "θ₃", "θ₄", "最大角加速度 / (°/s²)", "说明"]
+    表头英文: ["θ₁", "θ₂", "θ₃", "θ₄", "Peak acceleration / (°/s²)", "Notes"]
+    行: [["20", "60", "90", "70", "", "默认"], ["", "", "", "", "", ""], ["", "", "", "", "", ""]]
+    行英文: [["20", "60", "90", "70", "", "default"], ["", "", "", "", "", ""], ["", "", "", "", "", ""]]
+注意:
+  - ["首末两个路点固定为 0° 和 40°，首末两点的角加速度取零（自然样条）；实际控制器常改用首末速度为零的“夹持”样条。", "The end waypoints are fixed at 0° and 40° with zero end acceleration (natural spline); real controllers often use a clamped spline with zero end velocity."]
+  - ["50°/s² 是本实验假定的限值，不是 UR5e 的实际参数。", "50°/s² is the limit assumed here, not an actual UR5e specification."]
+思考题:
+  - ["路点有 1000 个时，用一般的高斯消元和用追赶法求 M，运算量各约多少？", "With 1000 waypoints, roughly how much work do general elimination and the tridiagonal solver take?"]
+  - ["为什么这个三对角矩阵（对角元 4，相邻元素 1）用追赶法不选主元也稳定？", "Why is the tridiagonal solver stable without pivoting for this matrix (4 on the diagonal, 1 beside it)?"]

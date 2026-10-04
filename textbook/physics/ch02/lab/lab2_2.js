@@ -1,6 +1,6 @@
 // 实验 2.2 矢量的合成：两连杆机械臂（配 2.2 节）。三个场景都是“首尾相接”：SCARA 的两段连杆、AGV 的三段路线、
 // 渡河时船相对水的速度加上水流的速度。画面中蓝、绿是两个分矢量，红是合矢量；读数给出各矢量的分量与大小。
-// 是否“到过”某个构型记在闭包里，重置时不丢（任务 2 要求先后找到肘朝上和肘朝下两种构型：关节 2 为正或为负）。
+// 是否“到过”某个构型记在闭包里，重置时不丢（任务 2 要求先后找到“左手”“右手”两种构型：关节 2 为正或为负）。
 const L1_22 = 0.30, L2_22 = 0.25, Q22 = [0.45, 0.30];
 const seen22 = { up: false, down: false };
 const rad22 = (d) => d * Math.PI / 180;
@@ -41,7 +41,7 @@ WQ.lab({
                         "The river is 60 m wide and flows at 1.0 m/s to the right. The boat's velocity over the ground is its velocity through the water plus the current."] } },
   ],
   params: [
-    { id: "th1", name: ["关节 1：大臂与 x 轴的夹角", "Joint 1: upper arm from x axis"], min: -180, max: 180, step: 1, value: 90, unit: "°", digits: 0 },
+    { id: "th1", name: ["关节 1：大臂与 x 轴的夹角", "Joint 1: upper arm from x axis"], min: 0, max: 180, step: 1, value: 90, unit: "°", digits: 0 },
     { id: "th2", name: ["关节 2：小臂相对大臂转过", "Joint 2: forearm relative to upper arm"], min: -170, max: 170, step: 1, value: 0, unit: "°", digits: 0 },
     { id: "L3", name: ["第三段的长度", "Length of leg 3"], min: 0, max: 25, step: 0.05, value: 10, unit: "m", digits: 2 },
     { id: "a3", name: ["第三段的方向（从 x 轴量）", "Direction of leg 3 (from x axis)"], min: -180, max: 180, step: 1, value: 180, unit: "°", digits: 0 },
@@ -51,7 +51,7 @@ WQ.lab({
   tasks: [
     { id: "reach", robot: true, text: ["让 SCARA 的末端到达零件，误差 1 cm 以内。", "Bring the SCARA end to the part, within 1 cm."],
       demo: { scene: "scara", set: { th1: 24, th2: 21 }, press: [], wait: 1 } },
-    { id: "elbow", robot: true, text: ["找到到达零件的另一组关节角（肘朝上与肘朝下各一次）。", "Find the other set of joint angles that reaches the part (elbow up once and elbow down once)."],
+    { id: "elbow", robot: true, text: ["找到到达零件的另一组关节角（“左手”与“右手”两种构型各一次）。", "Find the other set of joint angles that reaches the part (left-handed and right-handed configurations once each)."],
       demo: { scene: "scara", set: { th1: 43, th2: -21 }, press: [], wait: 1 } },
     { id: "close", robot: true, text: ["调第三段，让 AGV 回到起点（离起点 0.25 m 以内）。", "Set leg 3 so that the AGV ends within 0.25 m of the start."],
       demo: { scene: "agv", set: { L3: 17.45, a3: -157 }, press: [], wait: 1 } },
@@ -68,7 +68,7 @@ WQ.lab({
     const ang = (u) => f(Math.atan2(u[1], u[0]) * 180 / Math.PI, 1) + "°";
     if (api.scene === "scara") {
       const { a, b, r } = scara22(api.p);
-      return [[["a（大臂）", "a (upper arm)"], v(a) + " m"], [["b（小臂）", "b (forearm)"], v(b) + " m"],
+      return [[["a（大臂）", "a (upper arm)"], v(a) + " m, " + ang(a)], [["b（小臂）", "b (forearm)"], v(b) + " m, " + ang(b)],
               [["r = a + b", "r = a + b"], v(r) + " m"], [["|r|、方向", "|r|, direction"], f(n(r), 3) + " m, " + ang(r)],
               [["离零件", "Distance to the part"], f(100 * Math.hypot(r[0] - Q22[0], r[1] - Q22[1]), 1) + " cm"]];
     }

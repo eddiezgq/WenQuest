@@ -1,4 +1,4 @@
-"""动画 6.6.1（配图 6.6.1）：潘索的约化。两个不共面的力 f₁、f₂ 先平移到原点 O，得到合力 f 和对 O 的力矩 m_O；
+"""动画 6.6.1（配图 6.6.2）：潘索的约化。两个不共面的力 f₁、f₂ 先平移到原点 O，得到合力 f 和对 O 的力矩 m_O；
 再把参考点移到中心轴上，力矩中垂直于 f 的部分消失，只剩与 f 平行的力偶矩 m = h f：一个力旋量。"""
 from manim import *
 from wq_anim import *
@@ -55,6 +55,6 @@ class Lesson(Base):
         self.play(FadeIn(lab("f", Q + K * FR, ORANGE, RIGHT)), FadeIn(lab("m = h f", Q - 0.2 * u, BLUE_C, LEFT)))
         self.caption("力矩只剩与 f 平行的部分 m = h f：力旋量，节距 h = 0.1 m", "Only the part along f is left, m = h f: a wrench of pitch h = 0.1 m")
         self.wait(2.5)
-        self.card([["潘索定理", "Poinsot's theorem"],
+        self.card([["潘索定理", "The central axis (Poinsot)"],
                    ["任何力系都等价于沿某一根轴的力，加上绕这根轴的力偶", "Any force system is a force along some axis plus a couple about that axis"],
                    MathTex(r"\mathcal F = (m,\ f) = (q\times f + h f,\ f),\qquad h = \frac{m\cdot f}{|f|^2}", font_size=44)])

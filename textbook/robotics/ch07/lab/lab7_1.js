@@ -113,7 +113,7 @@ WQ.lab({
             [["小摆幅周期 2π/ω_n", "small-swing period 2π/ω_n"], api.fmt(T0, 3) + " s"],
             [["测得的周期", "measured period"], s.period ? api.fmt(s.period, 3) + " s" : "—"],
             [["周期之比", "period ratio"], s.period ? api.fmt(s.period / T0, 3) : "—"],
-            [["能量 E/J（每单位转动惯量）", "energy E/J per unit inertia"], api.fmt(E, 2) + " 1/s²"]];
+            [["能量 E/J（每单位转动惯量）", "energy per unit inertia E/J_o"], api.fmt(E, 2) + " 1/s²"]];
   },
   draw(api, s) {
     const { w, h } = api;

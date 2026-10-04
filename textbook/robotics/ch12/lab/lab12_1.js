@@ -27,7 +27,7 @@ WQ.lab({
   ],
   buttons: [{ id: "clear", name: ["清除轨迹", "Clear trace"] }],
   tasks: [
-    { id: "j1", robot: true, text: ["从零位出发只把关节 1 转到 90°：末端在以竖直轴为中心的圆上运动。", "From home turn only joint 1 to 90°: the tool moves on a circle about the vertical axis."],
+    { id: "j1", robot: true, text: ["从零位出发只把关节 1 转到 90°：末端在以竖直轴为中心的圆上运动。", "From the zero position turn only joint 1 to 90°: the tool moves on a circle about the vertical axis."],
       demo: { scene: "ur", set: { j1: 90, j2: 0, j3: 0, j4: 0, j5: 0, j6: 0 }, press: [], wait: 1 } },
     { id: "j6", robot: true, text: ["只转动关节 6：法兰盘中心不动。", "Turn only joint 6: the flange centre does not move."],
       demo: { scene: "ur", set: { j1: 0, j2: 0, j3: 0, j4: 0, j5: 0, j6: 60 }, press: [], wait: 1 } },

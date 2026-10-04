@@ -4,6 +4,7 @@
 """
 import sys
 from pathlib import Path
+import math
 import numpy as np
 from manim import *
 
@@ -11,6 +12,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import model as M  # noqa: E402
 
 CJK = "Noto Sans CJK SC"
+REF = M.reference()                       # 按 SKY130 校准的模型给出的各题结果（与实验台、课件同源）
+RR, NB, GAM, FOPT = REF["r"], REF["p14"]["Nbest"], REF["p14"]["gamma"], REF["p14"]["fopt"]
+CAP_R = f"加宽 PMOS 到 r = {RR:.2f} 倍：VM 回到 VDD / 2"
+CAP_N = f"本模型（按 SKY130 校准，γ ≈ {GAM:.2f}）最优 f ≈ {FOPT:.1f}，最快为 {NB} 级"
 config.background_color = "#0f1419"
 BLUE_ = "#58a6ff"; GREEN_ = "#56d364"; ORANGE_ = "#ffa657"; RED_ = "#ff7b72"; VIOLET_ = "#d2a8ff"; MUTED = "#8d9ba5"
 
@@ -29,12 +34,12 @@ EN = {
     "斜率为 −1 的两点定出 VIL、VIH": "The two points with slope −1 define VIL and VIH",
     "输入干扰小于噪声容限，输出仍是正确的逻辑值": "Noise smaller than the margin still gives the correct logic output",
     "Wp = Wn 时，PMOS 弱，阈值偏低": "With Wp = Wn the PMOS is weaker and the threshold sits low",
-    "加宽 PMOS 到 r = 2.25 倍：VM 回到 VDD / 2": "Widen the PMOS to r = 2.25 times: VM moves to VDD / 2",
+    CAP_R: f"Widen the PMOS to r = {RR:.2f} times: VM moves to VDD / 2",
     "波形上看：上升和下降变得一样快": "In the waveform: rising and falling edges now match",
     "代价：PMOS 更大，输入电容也更大": "The cost: a larger PMOS and a larger input capacitance",
     "最小反相器直接驱动 10 pF：RC 很大，边沿很慢": "A minimum inverter driving 10 pF directly: huge RC, very slow edge",
     "插入逐级放大的反相器链，每级的负载约为本级输入电容的 4 倍": "Insert a tapered chain; each stage drives a load about 4× its own input capacitance",
-    "每级都很快，总延时从几十纳秒降到不到 0.3 纳秒": "Each stage is fast; total delay drops from tens of ns to under 0.3 ns",
+    "每级都很快，总延时从几十纳秒降到零点几纳秒": "Each stage is fast; total delay drops from tens of ns to a few tenths of a ns",
     "充电：电源送出 CV²，一半存在电容里，一半在 PMOS 上变成热": "Charging: the supply delivers CV², half stored, half burnt in the PMOS",
     "放电：电容里的 ½CV² 在 NMOS 上变成热": "Discharging: the stored ½CV² is burnt in the NMOS",
     "每秒 αfN 次 0→1 翻转：P = αCV²fN": "αfN rising (0→1) transitions per second: P = αCV²fN",
@@ -45,7 +50,7 @@ EN = {
     "噪声容限 NML = VIL − VOL，NMH = VOH − VIH": "Noise margins NML = VIL − VOL, NMH = VOH − VIH",
     "对称尺寸：上升下降一样快": "Symmetric sizing: equal rise and fall",
     "经验公式：每级扇出约 4": "Rule of thumb: fan-out about 4 per stage",
-    "本模型自载较小（γ ≈ 0.67），最优为 7 级，只比 6 级快 1%": "With small self-load (γ ≈ 0.67) the optimum here is 7 stages, only 1% faster than 6",
+    CAP_N: f"In this SKY130-calibrated model (γ ≈ {GAM:.2f}) the optimum f ≈ {FOPT:.1f}: {NB} stages are fastest",
     "降压最省电，但门会变慢": "Lowering VDD saves most power, but slows the gates",
 }
 
@@ -241,16 +246,16 @@ class Sizing(Base):
         self.play(Create(ax), Create(ax2), Create(half), FadeIn(vin))
         self.add(vtc, vmd, w, lab)
         self.caption("Wp = Wn 时，PMOS 弱，阈值偏低", wait=2.0)
-        self.caption("加宽 PMOS 到 r = 2.25 倍：VM 回到 VDD / 2")
+        self.caption(CAP_R)
         self.play(ratio.animate.set_value(r), run_time=6, rate_func=smooth)
         self.wait(2.5)
         self.caption("波形上看：上升和下降变得一样快", wait=2.5)
         a = M.fo4(M.Wmin, M.Wmin); b = M.fo4(M.Wmin, r * M.Wmin)
         tbl = VGroup(MathTex(rf"W_p/W_n=1:\ t_{{PHL}}={a[0]*1e12:.0f},\ t_{{PLH}}={a[1]*1e12:.0f}\ \mathrm{{ps}}", font_size=30),
-                     MathTex(rf"W_p/W_n=2.25:\ t_{{PHL}}=t_{{PLH}}={b[0]*1e12:.0f}\ \mathrm{{ps}}", font_size=30)).arrange(DOWN, aligned_edge=LEFT).move_to([0, -2.0, 0])
+                     MathTex(rf"W_p/W_n={r:.2f}:\ t_{{PHL}}=t_{{PLH}}={b[0]*1e12:.0f}\ \mathrm{{ps}}", font_size=30)).arrange(DOWN, aligned_edge=LEFT).move_to([0, -2.0, 0])
         self.play(Write(tbl), run_time=1.5)
         self.caption("代价：PMOS 更大，输入电容也更大", wait=2.5)
-        self.card([zh("对称尺寸：上升下降一样快", 30), MathTex(r"\frac{W_p}{W_n}=r=\frac{k_n'}{k_p'}\approx 2.25", font_size=44),
+        self.card([zh("对称尺寸：上升下降一样快", 30), MathTex(rf"\frac{{W_p}}{{W_n}}=r=\frac{{k_n'}}{{k_p'}}\approx {RR:.2f}", font_size=44),
                    MathTex(r"t_p=0.69\,R_{eq}\,C_L,\quad R_{eq}\approx\frac{3}{4}\frac{V_{DD}}{I_{DSAT}}", font_size=40)])
 
 
@@ -277,7 +282,7 @@ class Chain(Base):
         tl = MathTex(rf"t\approx{t1*1e9:.0f}\,\mathrm{{ns}}", font_size=34, color=RED_).next_to(ax, RIGHT, buff=0.2).shift(UP * 0.5)
         self.play(Create(ax), Create(slow, run_time=3, rate_func=linear), Write(tl)); self.wait(0.8)
         self.caption("插入逐级放大的反相器链，每级的负载约为本级输入电容的 4 倍")
-        N = 6; f = (CL / M.cin(M.Wmin, r * M.Wmin)) ** (1 / N)
+        N = NB; f = (CL / M.cin(M.Wmin, r * M.Wmin)) ** (1 / N)
         stages = VGroup(*[inv(0.18 + 0.12 * i) for i in range(N)]).arrange(RIGHT, buff=0.35).move_to([0, 1.2, 0])
         labels = VGroup(*[MathTex(rf"\times{f**i:.0f}" if f ** i >= 10 else rf"\times{f**i:.1f}", font_size=22, color=MUTED).next_to(s, DOWN, buff=0.15) for i, s in enumerate(stages)])
         self.play(FadeOut(wire), ReplacementTransform(one, stages[0]), LaggedStart(*[GrowFromCenter(s) for s in stages[1:]], lag_ratio=0.2), FadeIn(labels), load.animate.move_to([stages.get_right()[0] + 0.6, 1.2, 0]), ll.animate.next_to([stages.get_right()[0] + 0.6, 1.9, 0], UP, buff=0.05), run_time=2.5)
@@ -287,12 +292,12 @@ class Chain(Base):
         tN = M.chain_delay(N, CL, r)
         fast = ax.plot(lambda x: 1.8 * (1 - np.exp(-x * 60)), x_range=[0, 1], color=GREEN_, stroke_width=4)
         self.play(Create(fast), run_time=1.0)
-        self.caption("每级都很快，总延时从几十纳秒降到不到 0.3 纳秒")
-        tf_ = VGroup(zh("6 级 6 stages", 26, GREEN_), MathTex(rf"t\approx{tN*1e12:.0f}\,\mathrm{{ps}}", font_size=34, color=GREEN_)).arrange(RIGHT, buff=0.15).next_to(tl, DOWN, buff=0.3)
+        self.caption("每级都很快，总延时从几十纳秒降到零点几纳秒")
+        tf_ = VGroup(zh(f"{NB} 级 {NB} stages", 26, GREEN_), MathTex(rf"t\approx{tN*1e12:.0f}\,\mathrm{{ps}}", font_size=34, color=GREEN_)).arrange(RIGHT, buff=0.15).next_to(tl, DOWN, buff=0.3)
         self.play(Write(tf_)); self.wait(2.5)
         self.card([zh("经验公式：每级扇出约 4", 30), MathTex(r"N\approx\frac{\ln F}{\ln 4},\quad F=\frac{C_L}{C_{in}}", font_size=44),
-                   MathTex(rf"F\approx{CL / M.cin(M.Wmin, r * M.Wmin):.0f}\ \Rightarrow\ N\approx 6", font_size=40),
-                   zh("本模型自载较小（γ ≈ 0.67），最优为 7 级，只比 6 级快 1%", 26)])
+                   MathTex(rf"F\approx{CL / M.cin(M.Wmin, r * M.Wmin):.0f}\ \Rightarrow\ N\approx {math.log(CL / M.cin(M.Wmin, r * M.Wmin)) / math.log(4):.1f}", font_size=40),
+                   zh(CAP_N, 26)])
 
 
 # ---------------------------------------------------------------------------------- 1.5

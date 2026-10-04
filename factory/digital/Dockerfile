@@ -20,8 +20,9 @@ ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 TZ=America/New_York
 WORKDIR /app
 # build123d（网页设计台出 STEP，第 6 轮 W3）用到 OpenCASCADE，需要这几个系统库；
 # 有限元（第 11 轮）：CalculiX 求解器 ccx，gmsh 需要 libGLU 等
+# 流体分析（第 16 轮）：OpenFOAM（Debian 自带的软件包）与并行用的 Open MPI
 RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 libxrender1 libx11-6 libxext6 \
-        calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 libgomp1 \
+        calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 libgomp1 openfoam openmpi-bin \
     && rm -rf /var/lib/apt/lists/*
 COPY digital/requirements.txt digital/requirements.txt
 RUN pip install -r digital/requirements.txt "requests>=2.31"
@@ -37,7 +38,7 @@ COPY --from=menagerie /opt/menagerie /opt/menagerie
 COPY digital/cae/ digital/cae/
 # 工艺数据表与读表模块（第 13 轮：教材原件的副本，见 digital/std/sync.py）
 COPY digital/std/ digital/std/
-COPY ["digital/实验8_输出轴强度与疲劳校核.md", "digital/实验9_机械臂关节力矩与电机选型.md", "digital/实验10_输出轴数控车削与键槽铣削编程.md", "digital/实验11_减速器热平衡与输出轴轻量化.md", "digital/"]
+COPY ["digital/实验8_输出轴强度与疲劳校核.md", "digital/实验9_机械臂关节力矩与电机选型.md", "digital/实验10_输出轴数控车削与键槽铣削编程.md", "digital/实验11_减速器热平衡与输出轴轻量化.md", "digital/实验12_一根轴的数字化设计与两个典型案例.md", "digital/实验13_减速器数字孪生与预测性维护.md", "digital/"]
 COPY digital/mock_erpnext/ digital/mock_erpnext/
 COPY --from=web /web/dist digital/web/dist
 WORKDIR /app/digital

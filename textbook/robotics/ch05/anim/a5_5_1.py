@@ -27,7 +27,7 @@ def ik(tip):
 
 class Lesson(Base):
     def construct(self):
-        self.title("5.5", "相机-机械臂-工件的坐标链", "The camera-arm-part chain")
+        self.title("5.5", "相机-机械臂-工件的坐标链", "The camera–arm–workpiece chain of frames")
         table = Line(scr(-0.05, 0), scr(1.25, 0), color=GREY_B, stroke_width=5)
         stand = VGroup(Line(scr(1.17, 0), scr(1.17, 0.98), color=GREY_B, stroke_width=5),
                        Line(scr(1.17, 0.98), scr(1.05, 0.98), color=GREY_B, stroke_width=5))
@@ -52,7 +52,7 @@ class Lesson(Base):
         g = scr(0.80, 0.035)
         ray = DashedLine(cam.get_center(), g, color=YELLOW)
         self.play(Create(ray))
-        self.caption("相机报告工件相对相机的位姿", "The camera reports the part's pose relative to itself", wait=1.0)
+        self.caption("相机报告工件相对相机的位姿", "The camera reports the pose of the workpiece relative to the camera", wait=1.0)
 
         def link(a, b, color, label, d):
             ar = Arrow(a, b, buff=0.08, color=color, stroke_width=5, max_tip_length_to_length_ratio=0.08)
@@ -65,9 +65,9 @@ class Lesson(Base):
                       link(scr(0.30, 0), g + UP * 0.1, BLUE, r"T_{sb}(\theta)\,T_{bt}", UP))
         blue[1][1].move_to(scr(0.56, 0.16))
         self.play(FadeOut(ray), LaggedStart(*[FadeIn(m) for m in red], lag_ratio=0.5), run_time=1.5)
-        self.caption("相机一侧：工作台 → 相机 → 工件 → 抓取点", "Camera side: table → camera → part → grasp point", wait=1.0)
+        self.caption("相机一侧：工作台 → 相机 → 工件 → 抓取点", "Camera side: table → camera → workpiece → grasp point", wait=1.0)
         self.play(LaggedStart(*[FadeIn(m) for m in blue], lag_ratio=0.5), run_time=2)
-        self.caption("机器人一侧：工作台 → 基座 → 法兰 → 工具；两条路径必须在抓取点相遇", "Robot side: table → base → flange → tool; both paths must meet at the grasp point")
+        self.caption("机器人一侧：工作台 → 基座 → 法兰 → 工具；两条路径必须在抓取点相遇", "Robot side: table → base → flange → tool; the two paths must meet at the grasp point")
         eq = MathTex(r"T_{ws}\,T_{sb}\,T_{bt} = T_{wc}\,T_{co}\,T_{og}", font_size=38).to_corner(UR, buff=0.5).shift(DOWN * 0.9)
         sol = MathTex(r"T_{sb}^{*} = T_{sw}\,T_{wc}\,T_{co}\,T_{og}\,T_{tb}", font_size=38, color=YELLOW).next_to(eq, DOWN, buff=0.3)
         self.play(Write(eq))
@@ -75,9 +75,9 @@ class Lesson(Base):
         self.play(FadeOut(red), FadeOut(blue))
         self.caption("先到工件上方 50 mm 的预抓取位姿", "First to the pre-grasp pose, 50 mm above the part", wait=0)
         self.play(tip.animate.set_value(1.0), run_time=2, rate_func=smooth)
-        self.caption("再沿夹爪的接近方向竖直下降，夹住齿轮坯", "Then straight down along the approach direction to grip", wait=0)
+        self.caption("再沿夹爪的接近方向竖直下降，夹住齿轮坯", "Then straight down along the gripper's approach direction to grip the gear blank", wait=0)
         self.play(tip.animate.set_value(2.0), run_time=1.5, rate_func=smooth)
         self.wait(1)
         self.card([["闭合方程", "The closure equation"],
                    MathTex(r"T_{ws}\,T_{sb}(\theta)\,T_{bt} = T_{wc}\,T_{co}\,T_{og}", font_size=42),
-                   ["两条路径到达同一个坐标系，位姿必须相等", "two paths to the same frame must give the same pose"]])
+                   ["两条路径到达同一个坐标系，位姿必须相等", "two paths reaching the same frame must give the same pose"]])

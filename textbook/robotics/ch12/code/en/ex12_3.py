@@ -3,7 +3,7 @@
 UR5e: forward kinematics from the screw table of Example 12.1.2, compared with the model (the same model shown in the 3D lab)
       at 10000 random sets of joint angles; the tool position error must be below 10⁻⁶ m (the hard limit of this chapter).
       Then compute again with the manufacturer's published DH parameters and see how far they are from the model.
-Panda: seven revolute joints; home pose and screws read from the model.
+Panda: seven revolute joints; zero-position pose and screws read from the model.
 SCARA: three revolute joints and one prismatic joint.
 """
 import numpy as np
@@ -71,7 +71,7 @@ for _ in range(N):
     q = rng.uniform(-np.pi, np.pi, 7)
     err_pa = max(err_pa, float(np.linalg.norm(fk_space(Sp, Mp, q)[:3, 3] - pa.fk(q)[:3, 3])))
 assert err_pa < 1e-6
-# Redundancy: a family of solutions turning joints 1 and 3 with the tool fixed; near home, θ1 and θ3 turn by equal and opposite amounts (the two axes coincide)
+# Redundancy: a family of solutions turning joints 1 and 3 with the tool fixed; near the zero position, θ1 and θ3 turn by equal and opposite amounts (the two axes coincide)
 q0 = np.zeros(7)
 q0[3], q0[5] = -np.pi / 2, np.pi / 2
 self_motion = max(float(np.abs(fk_space(Sp, Mp, q0 + np.array([a, 0, -a, 0, 0, 0, 0])) - fk_space(Sp, Mp, q0)).max())

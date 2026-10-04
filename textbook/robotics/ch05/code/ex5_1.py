@@ -23,7 +23,7 @@ p_s = R_ws.T @ (p_w - p_ws)                  # 定理 5.1.1 解出 p_s
 d = p_w - p_ws
 p_s_geo = np.array([-d[0], -d[1], d[2]])     # x_s 与 x_w 反向，y_s 与 y_w 反向，z 相同
 assert np.allclose(p_s, p_s_geo, atol=1e-15)
-assert np.allclose(p_ws + R_ws @ p_s, p_w)   # 反过来代回式 (5.1.3)
+assert np.allclose(p_ws + R_ws @ p_s, p_w)   # 反过来代回式 (5.1.2)
 
 # 位置矢量依赖原点：|O_w P| 与 |O_s P| 不同；而 O_s 到 P 的距离在两个坐标系中算出来相同
 dist_s = np.linalg.norm(p_s)
@@ -31,7 +31,7 @@ dist_s_from_w = np.linalg.norm(p_w - p_ws)
 assert abs(dist_s - dist_s_from_w) < 1e-15
 dist_w = np.linalg.norm(p_w)
 
-# 第二点：夹具定位销 Q 在 {w} 中为 (0.80, 0.25, 0.02) m；两点间距离与坐标系无关
+# 第二点：料盘上的定位销 Q 在 {w} 中为 (0.80, 0.25, 0.02) m；两点间距离与坐标系无关
 q_w = np.array([0.80, 0.25, 0.02])
 q_s = R_ws.T @ (q_w - p_ws)
 assert abs(np.linalg.norm(p_w - q_w) - np.linalg.norm(p_s - q_s)) < 1e-15

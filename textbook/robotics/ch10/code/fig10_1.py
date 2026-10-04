@@ -43,8 +43,8 @@ ax.text(ow[0] + 0.05, ow[1] + 0.05, "$O_w$", fontsize=11)
 pw = np.array([(P - ow) @ ex, (P - ow) @ ey])
 ax.text(-0.55, -0.78, T("同一点 P 的三组读数：", "Three readings of the same point P:"), fontsize=9.5)
 ax.text(-0.55, -0.95, T(f"直角坐标 {{s}}：(x, y) = (2.0, 0.5) m", f"Cartesian {{s}}: (x, y) = (2.0, 0.5) m"), fontsize=9, color=C["ink"])
-ax.text(-0.55, -1.10, T(f"极坐标：(ρ, φ) = ({math.hypot(*P):.3f} m, {math.degrees(math.atan2(P[1], P[0])):.2f}°)",
-                       f"polar: (ρ, φ) = ({math.hypot(*P):.3f} m, {math.degrees(math.atan2(P[1], P[0])):.2f}°)"), fontsize=9, color=C["accent"])
+ax.text(-0.55, -1.10, T(f"极坐标：($\\rho$, $\\varphi$) = ({math.hypot(*P):.3f} m, {math.degrees(math.atan2(P[1], P[0])):.2f}°)",
+                       f"polar: ($\\rho$, $\\varphi$) = ({math.hypot(*P):.3f} m, {math.degrees(math.atan2(P[1], P[0])):.2f}°)"), fontsize=9, color=C["accent"])
 ax.text(-0.55, -1.25, T(f"直角坐标 {{w}}：({pw[0]:.3f}, {pw[1]:.3f}) m", f"Cartesian {{w}}: ({pw[0]:.3f}, {pw[1]:.3f}) m"), fontsize=9, color=C["ink"])
 ax.set_xlim(-0.65, 3.35)
 ax.set_ylim(-1.32, 2.05)
@@ -97,13 +97,13 @@ a1.text(-1.68, -0.62, "$x_s$", color=C["x"], fontsize=11)
 a1.text(-2.35, 0.18, "$y_s$", color=C["y"], fontsize=11)
 a1.set_title(T("(a) 以地面为参考系", "(a) Ground as the reference frame"), fontsize=11)
 a1.set_xlim(-2.6, 3.4)
-a1.set_ylim(-0.8, 4.3)
+a1.set_ylim(-0.8, 4.9)                     # 两图的坐标范围一样大，标题才在同一高度
 # (b) AGV
 cb = np.array([0.0, R0])
 d = float(np.linalg.norm(Pp - Cc))
 a2.plot(cb[0] + d * np.cos(t), cb[1] + d * np.sin(t), ls="--", color=C["accent"], lw=1.0)
 car(a2, np.zeros(2), 0.0, C["z"])
-a2.text(0.12, -0.42, T("AGV（静止）", "AGV (at rest)"), fontsize=9.5, color=C["z"])
+a2.text(0.2, 0.22, T("AGV（静止）", "AGV (at rest)"), fontsize=9.5, color=C["z"])
 a2.plot(*cb, "+", color=C["ink"], ms=8)
 a2.text(cb[0] + 0.08, cb[1] + 0.08, "C", fontsize=11)
 for tt in (0.0, 6.0):
@@ -116,12 +116,12 @@ for tt in (0.0, 6.0):
         vb = -np.array([-Om * pb[1], Om * pb[0]]) - np.array([v, 0])
         arrow(a2, pb, pb + 1.2 * vb, V_COL, 1.6)
         a2.text(pb[0] + 1.2 * vb[0] - 0.1, pb[1] + 1.2 * vb[1] - 0.4, r"$\dot p_b$", color=V_COL, fontsize=11)
-a2.text(cb[0] - 2.4, cb[1] + 2.6, T("零件 P 的轨迹：以 C 为圆心、半径 |CP| 的圆", "path of P: circle about C, radius |CP|"),
+a2.text(cb[0] - 2.4, cb[1] + 2.6, T("零件 P 的轨迹：以 C 为圆心、半径 |CP| 的圆", "trajectory of P: circle about C, radius |CP|"),
         fontsize=9.5, color=C["accent"])
 a2.text(0.5, 0.05, "$x_b$", color=C["x"], fontsize=11)
 a2.text(-0.25, 0.48, "$y_b$", color=C["y"], fontsize=11)
 a2.set_title(T("(b) 以 AGV 为参考系", "(b) The AGV as the reference frame"), fontsize=11)
-a2.set_xlim(-2.8, 2.8)
+a2.set_xlim(-3.0, 3.0)
 a2.set_ylim(-0.8, 4.9)
 figure(fig, "fig10_1_2")
 plt.close(fig)

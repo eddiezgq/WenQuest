@@ -1,7 +1,7 @@
 """10.4 节的示意图。
 
 图 10.4.1：球面坐标 (r, θ, φ)（ISO 80000-2：θ 为极角，从 +z 量起；φ 为方位角）与点 P 处的局部基 e_r、e_θ、e_φ。
-图 10.4.2：云台相机跟踪 AGV。(a) 几何关系（斜投影）；(b) 不同偏距 d 下水平转动角速度 φ̇ 随时间的变化，虚线为 90°/s 限速。
+图 10.4.2：云台相机跟踪 AGV。(a) 几何关系（斜投影）；(b) 不同偏距 d 下水平转动角速度 φ̇ 随时间的变化，虚线为 −90°/s 限速线（φ̇ 为负，限值取绝对值 90°/s）。
 """
 import math
 
@@ -11,6 +11,7 @@ from _kin import AXIS, C, G_COL, V_COL, arrow, oblique, sph_basis
 from bookout import T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”
 
 
 def line3(ax, pts, sc=1.0, **kw):
@@ -51,9 +52,9 @@ for e, lab, col, off in ((er, r"$e_r$", AXIS[0], (0.03, 0.02)), (et, r"$e_\theta
     q = oblique(P + 0.55 * e)
     arrow(ax, oblique(P), q, col, 2.0)
     ax.text(*(q + np.array(off)), lab, color=col, fontsize=13)
-ax.text(-1.3, -1.05, T(r"θ：从 +z 轴量起的极角，0 ≤ θ ≤ π；φ：方位角", r"θ: polar angle measured from +z, 0 ≤ θ ≤ π; φ: azimuth"),
+ax.text(-1.3, -1.05, T(r"$\theta$：从 +z 轴量起的极角，$0 \leq \theta \leq \pi$；$\varphi$：方位角", r"$\theta$: polar angle measured from +z, $0 \leq \theta \leq \pi$; $\varphi$: azimuthal angle"),
         fontsize=9)
-ax.text(-1.3, -1.2, T("（ISO 80000-2 的约定；部分数学书把 θ、φ 对调）", "(ISO 80000-2 convention; some mathematics books swap θ and φ)"),
+ax.text(-1.3, -1.2, T(r"（ISO 80000-2 的约定；部分数学书把 $\theta$、$\varphi$ 对调）", r"(ISO 80000-2 convention; some mathematics books swap $\theta$ and $\varphi$)"),
         fontsize=9, color=G_COL)
 ax.set_xlim(-1.35, 2.2)
 ax.set_ylim(-1.3, 1.85)
@@ -74,7 +75,7 @@ for i, (lab, L) in enumerate((("x", 1.4), ("y", 1.3), ("z", 0.7))):
     arrow(ax, oblique(O, s), oblique(e, s), AXIS[i], 1.0)
     ax.text(*(oblique(e, s) + (np.array([-0.16, -0.1]) if i == 0 else np.array([0.03, 0.0]))), f"${lab}_g$", color=AXIS[i], fontsize=11)
 ax.add_patch(plt.Rectangle(oblique(O, s) - np.array([0.12, 0.05]), 0.24, 0.1, color="#4a5560", zorder=4))
-ax.text(*(oblique(O, s) + np.array([-0.85, 0.12])), T("云台相机（离地 H）", "gimbal camera (height H)"), fontsize=9)
+ax.text(*(oblique(O, s) + np.array([-0.85, 0.12])), T("云台相机（离地 H）", "gimbal camera\n(height H)"), fontsize=9)
 # 地面与 AGV 路线
 fl = [np.array([-3.0, -1.2, -H]), np.array([3.0, -1.2, -H]), np.array([3.0, 1.6, -H]), np.array([-3.0, 1.6, -H])]
 q = np.array([oblique(p, s) for p in fl + [fl[0]]])

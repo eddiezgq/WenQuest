@@ -126,21 +126,36 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
   <footer data-en="Level-1 MOS models use the same KP and VTO as the lab bench, so the two curves should coincide. Calibration against SKY130 models happens in step 4 (container image).">ngspice 的 level-1 模型用与实验台相同的 KP、VTO，两条曲线应重合。按 SKY130 模型校准放在第 4 步（容器镜像）。</footer>
 </div>
 <script>window.WQ_PARAMS = {
-  "_note": "示意值（第17轮 RM3）：长沟道公式＋有效参数，按 SKY130 1.8 V 器件饱和电流量级取值；第 4 步用 ngspice＋SKY130 校准",
+  "_note": "SKY130 tt 27 °C 校准值（第 17 轮附 3.4，samples/数字集成电路设计/生成脚本/calib/calib.py）：VT 为使传输特性最接近仿真的有效值（线性区外推值见 calib/result.json），k′ 由 IDSAT 反推，Cg、Cd 由输入电容与扇出拟合后按 FO4 延时修正",
   "VDD": 1.8,
-  "VTn": 0.45,
-  "VTp": 0.45,
-  "kn": 90e-6,
-  "kp": 40e-6,
+  "VTn": 0.55,
+  "VTp": 0.55,
+  "kn": 8.45e-05,
+  "kp": 3.48e-05,
   "L": 0.15,
   "Wmin": 0.42,
-  "Cg": 1.8e-15,
-  "Cd": 1.2e-15,
+  "Cg": 1.25e-15,
+  "Cd": 1.97e-15,
   "problems": {
-    "p11": {"Iload": 1e-3, "VOLmax": 0.2},
-    "p12": {"noise": 0.3},
-    "p14": {"CL": 10e-12},
-    "p15": {"N": 1e4, "alpha": 0.1, "Cgate": 5e-15, "f": 1e8, "Vlow": 1.2}
+    "p11": {
+      "Iload": 0.001,
+      "VOLmax": 0.2
+    },
+    "p12": {
+      "noise": 0.3
+    },
+    "p14": {
+      "CL": 1e-11,
+      "tmax": 3.5e-10
+    },
+    "p15": {
+      "N": 10000.0,
+      "alpha": 0.1,
+      "Cgate": 5e-15,
+      "f": 100000000.0,
+      "Vlow": 1.2,
+      "fo4max": 1e-10
+    }
   }
 };</script>
 <script>
@@ -234,6 +249,16 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       return { t, vin, vo };
     };
 
+    m.fopt = (gamma) => {
+      let lo = Math.E, hi = 10;
+      for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (mid * (Math.log(mid) - 1) < gamma) lo = mid; else hi = mid; }
+      return (lo + hi) / 2;
+    };
+    m.fo4Tp = (ratio, vdd = VDD) => { const d = m.fo4(Wmin, ratio * Wmin, vdd); return (d.tphl + d.tplh) / 2; };
+    m.vddForFo4 = (limit, ratio, lo = 0.9, hi = VDD) => {
+      for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (m.fo4Tp(ratio, mid) > limit) lo = mid; else hi = mid; }
+      return hi;
+    };
     m.reference = () => {
       const r = kn / kp, pr = P.problems, out = { r, idsat_n_per_um: m.idsatN(1), idsat_p_per_um: m.idsatP(1) };
       const w = m.wnForVol(pr.p11.Iload, pr.p11.VOLmax);
@@ -248,10 +273,15 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
         out.p13[key] = { ratio, tphl: d.tphl, tplh: d.tplh, tp, mismatch: (d.tplh - d.tphl) / tp };
       }
       const CL = pr.p14.CL, C1 = m.cin(Wmin, r * Wmin), t = {};
-      for (let N = 1; N <= 8; N++) t[N] = m.chainDelay(N, CL, r);
-      out.p14 = { Cin: C1, F: CL / C1, Nopt4: Math.log(CL / C1) / Math.log(4), t };
+      for (let N = 1; N <= 10; N++) t[N] = m.chainDelay(N, CL, r);
+      let Nbest = 1; for (let N = 2; N <= 10; N++) if (t[N] < t[Nbest]) Nbest = N;
+      let Nfew = 0; for (let N = 1; N <= 10; N++) if (t[N] < pr.p14.tmax) { Nfew = N; break; }
+      const gamma = Cd / Cg;
+      out.p14 = { Cin: C1, F: CL / C1, Nopt4: Math.log(CL / C1) / Math.log(4), t, gamma, fopt: m.fopt(gamma), Nbest, Nfew };
       const q = pr.p15;
-      out.p15 = { P_VDD: m.dynPower(q.N, q.alpha, q.Cgate, VDD, q.f), P_low: m.dynPower(q.N, q.alpha, q.Cgate, q.Vlow, q.f) };
+      out.p15 = { P_VDD: m.dynPower(q.N, q.alpha, q.Cgate, VDD, q.f), P_low: m.dynPower(q.N, q.alpha, q.Cgate, q.Vlow, q.f),
+                  Vlim: m.vddForFo4(q.fo4max, r), fo4_low: m.fo4Tp(r, q.Vlow) };
+      out.r_lab = Math.round(r * 20) / 20;
       return out;
     };
     return m;

@@ -28,7 +28,7 @@ def rms(n):
 
 class Lesson(Base):
     def construct(self):
-        self.title("7.4", "编码器测速：差商的跨度", "Speed from an encoder: the span of the difference")
+        self.title("7.4", "编码器测速：差商的跨度", "Speed from an encoder: the difference interval")
         top = Axes(x_range=[0, 12, 4], y_range=[0, 16, 4], x_length=5.4, y_length=3.0,
                    axis_config={"color": GREY_B, "include_tip": False}).shift(LEFT * 3.4 + DOWN * 0.1)
         tl = VGroup(zh("角度的减少量（计数）", 18, MUTED), en("decrease of the angle (counts)", 14)).arrange(DOWN, buff=0.03).next_to(top.y_axis.get_end(), UP, buff=0.1).align_to(top, LEFT)
@@ -50,7 +50,7 @@ class Lesson(Base):
 
         bot = Axes(x_range=[850, 930, 20], y_range=[6, 12.5, 1], x_length=6.0, y_length=3.6,
                    axis_config={"color": GREY_B, "include_tip": False}).shift(RIGHT * 3.3 + DOWN * 0.1)
-        bl = VGroup(zh("角速度 / (rad/s)", 18, MUTED), en("speed / (rad/s)", 14)).arrange(DOWN, buff=0.03).next_to(bot.y_axis.get_end(), UP, buff=0.1).align_to(bot, LEFT)
+        bl = VGroup(zh("角速度 / (rad/s)", 18, MUTED), en("angular velocity / (rad/s)", 14)).arrange(DOWN, buff=0.03).next_to(bot.y_axis.get_end(), UP, buff=0.1).align_to(bot, LEFT)
         xl2 = Text("t / ms", font=LATIN, font_size=16, color=MUTED).next_to(bot.x_axis.get_end(), DOWN, buff=0.15)
         tw = bot.plot_line_graph(np.arange(I0, I1), W[I0:I1], add_vertex_dots=False, line_color=WHITE, stroke_width=3)
         self.play(Create(bot), FadeIn(bl), FadeIn(xl2), Create(tw))
@@ -67,14 +67,14 @@ class Lesson(Base):
         ec = always_redraw(est_curve)
         lb = always_redraw(label)
         self.add(ec, lb)
-        self.caption("跨度 1 ms：多走一个计数，速度就跳 0.38 rad/s", "Span 1 ms: one extra count makes the speed jump by 0.38 rad/s")
-        self.caption("加大跨度：量化误差变小，估计变平滑", "A longer span: less quantization error, a smoother estimate", wait=0)
+        self.caption("跨度 1 ms：多走一个计数，速度就跳 0.38 rad/s", "Difference interval 1 ms: one extra count makes the speed jump by 0.38 rad/s")
+        self.caption("加大跨度：量化误差变小，估计变平滑", "A longer difference interval: less quantization error, a smoother estimate", wait=0)
         self.play(n.animate.set_value(2), run_time=1.5)
         self.wait(0.8)
         self.play(n.animate.set_value(10), run_time=2.5)
-        self.caption("跨度太大：估计落后于真值，截断误差变大", "Too long a span: the estimate lags, the truncation error grows", wait=0)
+        self.caption("跨度太大：估计落后于真值，截断误差变大", "Too long a difference interval: the estimate lags, the truncation error grows", wait=0)
         self.play(n.animate.set_value(20), run_time=2.0)
         self.wait(1.0)
         self.card([["后向差商的权衡", "The trade-off of a backward difference"],
                    MathTex(r"\dot\theta \approx \frac{\theta(t) - \theta(t-h)}{h},\qquad E(h) \approx \frac{M_2}{2}h + \frac{q}{h}", font_size=42),
-                   ["跨度小则跳，跨度大则慢", "short span: jumpy; long span: late"]])
+                   ["跨度小则跳，跨度大则慢", "short interval: jumpy; long interval: late"]])

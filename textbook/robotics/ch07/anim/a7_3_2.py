@@ -63,8 +63,8 @@ class Lesson(Base):
 
         ro = always_redraw(readout)
         self.add(ro)
-        self.caption("初值 θ = (0, 1) rad：末端离目标 0.19 m", "Start θ = (0, 1) rad: the tip is 0.19 m from the target")
-        self.caption("每次迭代：用雅可比矩阵把末端误差换算成关节的修正量", "Each step: the Jacobian turns the tip error into joint corrections", wait=0)
+        self.caption("初值 θ = (0, 1) rad：末端离目标 0.19 m", "Start θ = (0, 1) rad: the end-effector is 0.19 m from the target")
+        self.caption("每次迭代：用雅可比矩阵把末端误差换算成关节的修正量", "Each step: the Jacobian turns the end-effector error into joint corrections", wait=0)
         for k in range(1, 5):
             ghost = pose().set_opacity(0.18)
             self.add(ghost)

@@ -12,14 +12,20 @@ WQR105 = {"T_out_nm": 350.0, "n_in_rpm": 1450.0, "ratio": 10.5, "eta_gear": 0.97
 DEFAULTS = {
     "housing": {"L": 410.0, "W": 150.0, "H": 300.0, "wall": 10.0, "fins": 0, "fin_h": 25.0, "fin_t": 6.0, "load_pct": 100.0},
     "heatsink": {"base": 60.0, "base_t": 6.0, "fins": 9, "fin_h": 30.0, "fin_t": 1.5, "pad": 30.0, "power_w": 65.0},
+    "agv_box": {"L": 400.0, "W": 300.0, "H": 220.0, "wall": 6.0, "vent_w": 180.0, "vent_h": 50.0, "layout": 1, "p_drive": 60.0, "p_pc": 30.0},
 }
-LABELS = {"housing": "WQR-105 简化箱体（减速器热平衡）", "heatsink": "电脑 CPU 散热片（生活例子）"}
+LABELS = {"housing": "WQR-105 简化箱体（减速器热平衡）", "heatsink": "电脑 CPU 散热片（生活例子）",
+          "agv_box": "AGV 小车电控箱通风（机器人例子）"}
+AGV_LAYOUTS = {1: "前下进、后上出", 2: "前上进、后上出", 3: "前下进、后下出"}
 PARAM_NAMES = {
     "housing": {"L": "外形长 mm", "W": "外形宽 mm", "H": "外形高 mm", "wall": "壁厚 mm", "fins": "每个长侧面的散热筋数",
                 "fin_h": "散热筋高 mm", "fin_t": "散热筋厚 mm", "load_pct": "负载率 %（额定 350 N·m = 100）"},
     "heatsink": {"base": "底板边长 mm", "base_t": "底板厚 mm", "fins": "散热片数", "fin_h": "片高 mm", "fin_t": "片厚 mm",
                  "pad": "CPU 接触面边长 mm", "power_w": "CPU 发热功率 W"},
+    "agv_box": {"L": "箱长 mm（沿行驶方向）", "W": "箱宽 mm", "H": "箱高 mm", "wall": "壁厚 mm", "vent_w": "风口宽 mm", "vent_h": "风口高 mm",
+                "layout": "风口布置：1 前下进后上出 / 2 前上进后上出 / 3 前下进后下出", "p_drive": "电机驱动器发热 W", "p_pc": "工控机发热 W"},
 }
+AGV_PARTS = {"drive": (150.0, 100.0, 70.0, -0.18, -0.12), "pc": (120.0, 110.0, 45.0, 0.20, 0.12)}   # 长、宽、高，箱内位置（占内长 / 内宽的比例）
 
 
 def params_of(key, p=None):
@@ -31,6 +37,14 @@ def params_of(key, p=None):
         if out["wall"] < 4 or out["wall"] > min(out["W"], out["H"]) / 4:
             raise ValueError("壁厚要在 4 mm 到外形的 1/4 之间")
         out["fins"] = int(max(0, min(out["fins"], 20)))
+    elif key == "agv_box":
+        out["layout"] = int(out["layout"]) if int(out["layout"]) in AGV_LAYOUTS else 1
+        if not 4 <= out["wall"] <= 12:
+            raise ValueError("壁厚要在 4–12 mm（网格要分得开）")
+        if out["L"] < 300 or out["W"] < 240 or out["H"] < 140:
+            raise ValueError("箱子太小，放不下驱动器和工控机（至少 300 × 240 × 140 mm）")
+        if out["vent_w"] > out["W"] - 2 * out["wall"] - 20 or out["vent_h"] > out["H"] / 2 - out["wall"] - 10 or out["vent_h"] < 15:
+            raise ValueError("风口尺寸不合适：宽不超过箱内宽，高 15 mm 到箱高的一半")
     else:
         out["fins"] = int(max(2, min(out["fins"], 30)))
         gap = (out["base"] - out["fins"] * out["fin_t"]) / (out["fins"] - 1)
@@ -76,6 +90,8 @@ def build(key, p):
                     with bd.Locations(*locs):
                         bd.Box(p["fin_t"], p["fin_h"], hz)
         shape = part.part
+    elif key == "agv_box":
+        shape = _agv_box(p)
     else:
         b, bt, n, fh, ft, pad = p["base"], p["base_t"], int(p["fins"]), p["fin_h"], p["fin_t"], p["pad"]
         with bd.BuildPart() as part:
@@ -90,6 +106,34 @@ def build(key, p):
         f = os.path.join(tmp, key + ".step")
         bd.export_step(shape, f)
         return open(f, "rb").read()
+
+
+def _vent_z(p, where):
+    t, vh = p["wall"], p["vent_h"]
+    return t + 10 + vh / 2 if where == "low" else p["H"] - t - 10 - vh / 2
+
+
+def _agv_vents(p):
+    """(进风口 z, 出风口 z)：进风在前面（−X，迎风），出风在后面（+X）"""
+    return {1: ("low", "high"), 2: ("high", "high"), 3: ("low", "low")}[int(p["layout"])]
+
+
+def _agv_box(p):
+    """电控箱：铝板箱体，前面一个进风口、后面一个出风口；箱底上放电机驱动器和工控机（简化成实心块，和箱底连成一体）"""
+    import build123d as bd
+    L, W, H, t = p["L"], p["W"], p["H"], p["wall"]
+    vin, vout = _agv_vents(p)
+    with bd.BuildPart() as part:
+        bd.Box(L, W, H, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN))
+        with bd.Locations((0, 0, t)):
+            bd.Box(L - 2 * t, W - 2 * t, H - 2 * t, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN), mode=bd.Mode.SUBTRACT)
+        for x, where in ((-L / 2 + t / 2, vin), (L / 2 - t / 2, vout)):
+            with bd.Locations((x, 0, _vent_z(p, where))):
+                bd.Box(t * 3, p["vent_w"], p["vent_h"], mode=bd.Mode.SUBTRACT)
+        for (l, w, h, fx, fy) in AGV_PARTS.values():
+            with bd.Locations((fx * (L - 2 * t), fy * (W - 2 * t), t)):
+                bd.Box(l, w, h, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN))
+    return part.part
 
 
 def groups(key, p, faces):
@@ -107,6 +151,24 @@ def groups(key, p, faces):
             else:
                 outer.append(f["id"])
         out = {"inner": inner, "outer": outer, "bottom": bottom}
+    elif key == "agv_box":
+        L, W, H, t = p["L"], p["W"], p["H"], p["wall"]
+        out = {"drive": [], "pc": [], "inner": [], "outer": [], "bottom": []}
+        boxes = {k: (fx * (L - 2 * t), fy * (W - 2 * t), l, w, h) for k, (l, w, h, fx, fy) in AGV_PARTS.items()}
+        for f in faces:
+            c = f["center"]
+            if f["kind"] == "plane" and abs(c[2]) < 1e-6:
+                out["bottom"].append(f["id"]); continue
+            hit = None
+            for k, (cx, cy, l, w, h) in boxes.items():
+                if abs(c[0] - cx) <= l / 2 + 1e-3 and abs(c[1] - cy) <= w / 2 + 1e-3 and t + 1e-3 < c[2] <= t + h + 1e-3:
+                    hit = k
+            if hit:
+                out[hit].append(f["id"])
+            elif abs(c[0]) < L / 2 - t + 1e-3 and abs(c[1]) < W / 2 - t + 1e-3 and t - 1e-3 <= c[2] <= H - t + 1e-3:
+                out["inner"].append(f["id"])
+            else:
+                out["outer"].append(f["id"])                         # 外表面和风口的侧壁
     else:
         pad_face = [f["id"] for f in faces if f["kind"] == "plane" and abs(f["center"][2] + 0.5) < 1e-6]
         out = {"pad": pad_face, "rest": [f["id"] for f in faces if f["id"] not in pad_face]}
@@ -132,6 +194,19 @@ def example(key, p, faces):
         return {"material_id": "HT200", "thermal": thermal, "groups": g, "formula": formula,
                 "title": "WQR-105 箱体热平衡（{}）".format("{} 条散热筋 / 侧".format(n) if n else "无散热筋"),
                 "mesh_mm": round(max(6.0, 1.2 * p["wall"]), 1)}
+    if key == "agv_box":
+        P = p["p_drive"] + p["p_pc"]
+        A_v = p["vent_w"] * p["vent_h"] * 1e-6
+        thermal = [{"type": "heat_flux", "faces": g["drive"], "power_w": p["p_drive"]},
+                   {"type": "heat_flux", "faces": g["pc"], "power_w": p["p_pc"]},
+                   {"type": "convection", "faces": "rest", "h_w_m2k": 5.0, "t_inf_c": 25}]
+        formula = {"name": "通风量估算：Q = μ·A·v（流量系数 μ 取 0.3），出风温升 Δt = P/(ρ·c_p·Q)",
+                   "loss_w": P, "A_vent_m2": round(A_v, 5), "v_ms": 1.5, "Q_m3s": round(0.3 * A_v * 1.5, 5),
+                   "dt_air_c": round(P / (1.18 * 1007 * 0.3 * A_v * 1.5), 1), "t0_c": 25, "limit_c": 60,
+                   "note": "小车以 1.5 m/s 行驶，风从前面的风口灌进箱子；μ 是粗估（风口进出的损失、箱内绕流都算进去），实际通风量看流体分析；"
+                           "驱动器、工控机一般要求环境温度不超过 50–60 ℃。默认的“其余所有面 h = 5”是箱内几乎不通风时的值，流体分析后换成算出的 h"}
+        return {"material_id": "6061-T6", "thermal": thermal, "groups": g, "formula": formula,
+                "title": "AGV 电控箱 {}（{:g} W）".format(AGV_LAYOUTS[int(p["layout"])], P), "mesh_mm": round(max(4.0, p["wall"]), 1)}
     h = 50.0
     A = (p["base"] ** 2 * 2 - p["pad"] ** 2 + 4 * p["base"] * p["base_t"]
          + int(p["fins"]) * (2 * p["fin_h"] * p["base"] + 2 * p["fin_h"] * p["fin_t"] + p["fin_t"] * p["base"])) * 1e-6

@@ -1439,6 +1439,10 @@ _cam.mount_release(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")),
 from hub import opt_api as _opt  # noqa: E402
 _opt.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
 
+# ---------------------------------------------------------------- 流体分析（第 16 轮）
+from hub import cfd_api as _cfd  # noqa: E402
+_cfd.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
+
 # ---------------------------------------------------------------- 数字孪生（第 15 轮）
 from hub import twin_api as _twin  # noqa: E402
 _twin.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)

@@ -31,6 +31,7 @@ set_images() {
     envset WEB_IMAGE "${1/\/engine:/\/web:}"
     envset ANIMATOR_IMAGE "${1/\/engine:/\/animator:}"
     envset LABCHECK_IMAGE "${1/\/engine:/\/labcheck:}"
+    envset MICROSYNTH_IMAGE "${1/\/engine:/\/micro-synth:}"
     envset VOICE_IMAGE "${1/\/engine:/\/voice:}"
 }
 

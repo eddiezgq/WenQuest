@@ -9,7 +9,7 @@ WQ.lab({
     { id: "agv", robot: true, name: ["AGV 与货架工位", "AGV and shelf station"],
       problem: { title: ["机器人问题：工位在车头的哪一侧？", "Robot problem: on which side of the AGV is the station?"],
                  text: ["地图给出工位 Q 的坐标 (14.5, 8.0) m。AGV 的控制器需要知道它在车头前方多远、偏左还是偏右。",
-                        "The map gives station Q at (14.5, 8.0) m. The AGV controller needs how far ahead it is and whether it is to the left or right."] } },
+                        "The map gives station Q at (14.5, 8.0) m. The AGV controller needs to know how far ahead it is and whether it is to the left or right."] } },
     { id: "museum", name: ["博物馆里的游客", "A visitor in a museum"],
       problem: { title: ["生活中的例子：展品在我的左边还是右边？", "Everyday example: is the exhibit to my left or right?"],
                  text: ["导览图标出展品的位置。游客站在某处、面朝某个方向，展品在他前方多远、左边多远？",
@@ -19,7 +19,7 @@ WQ.lab({
   params: [
     { id: "x", name: ["位置 x（向东）", "Position x (east)"], min: 8, max: 18, step: 0.1, value: 10, unit: "m", digits: 1 },
     { id: "y", name: ["位置 y（向北）", "Position y (north)"], min: 1, max: 11, step: 0.1, value: 3, unit: "m", digits: 1 },
-    { id: "psi", name: ["航向 ψ（从正东逆时针）", "Heading ψ (ccw from east)"], min: -180, max: 180, step: 1, value: 0, unit: "°", digits: 0 },
+    { id: "psi", name: ["航向 ψ（从正东逆时针）", "Heading ψ (anticlockwise from east)"], min: -180, max: 180, step: 1, value: 0, unit: "°", digits: 0 },
   ],
   buttons: [{ id: "reset", name: ["重置", "Reset"] }],
   tasks: [
@@ -27,7 +27,7 @@ WQ.lab({
       demo: { scene: "agv", set: { x: 12, y: 5, psi: 30 }, press: [] } },
     { id: "ahead", robot: true, text: ["调整 AGV，使工位恰在车头正前方 2 m（Q 在 {v} 中为 (2, 0)）。", "Move the AGV so that the station is exactly 2 m straight ahead (Q in {v} = (2, 0))."],
       demo: { scene: "agv", set: { x: 12.5, y: 8, psi: 0 }, press: [] } },
-    { id: "left", text: ["让游客站好、转身，使展品恰在他的正左方（前方分量为 0）。", "Place and turn the visitor so that the exhibit is exactly to the left (ahead component 0)."],
+    { id: "left", text: ["让游客站好、转身，使展品恰在他的正左方（前方分量为 0）。", "Place and turn the visitor so that the exhibit is directly to their left (ahead component 0)."],
       demo: { scene: "museum", set: { x: 14.5, y: 5, psi: 0 }, press: [] } },
   ],
   think: ["AGV 只转动、不移动时，Q 到 AGV 的距离变不变？Q 在 {v} 中的坐标变不变？为什么？",

@@ -1,0 +1,37 @@
+# 实验 5.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab5_5.js。
+原理:
+  - ["零点定理：f 在 [a, b] 上连续，f(a) 与 f(b) 异号，则 (a, b) 内至少有一个根（5.4.3 节）。二分法每一步取中点 m，保留两端仍异号的那一半，根所在的区间每步缩短一半。",
+     "Zero theorem: if f is continuous on [a, b] and f(a), f(b) differ in sign, there is a root in (a, b) (Section 5.4.3). Bisection takes the midpoint m and keeps the half whose ends still differ in sign; the interval containing a root halves at every step."]
+  - 式: "k 步后区间宽度 = (b − a)/2ᵏ；达到容差 tol 所需步数 k = ⌈log₂((b − a)/tol)⌉"
+  - ["二分法只要求连续和变号。没有变号（如偶数重根）时无从下手；有间断时，变号不一定意味着有根，二分法可能收敛到间断点（5.5.4 节）。",
+     "Bisection needs only continuity and a sign change. Without a sign change (e.g. a double root) it cannot start; across a discontinuity a sign change need not mean a root, and bisection may converge to the discontinuity (Section 5.5.4)."]
+步骤:
+  - ["在“函数的根”场景中选 x² − 2，容差 10⁻³，连续按“二分一步”，把前 6 步的区间填入表 1；再按“算到容差”，记录总步数。",
+     "In 'Roots of functions' choose x² − 2 with tolerance 10⁻³, press 'One step' repeatedly and record the first 6 intervals in Table 1; then press 'Run to tolerance' and record the total number of steps."]
+  - ["把容差依次取 10⁻³、10⁻⁶、10⁻⁹、10⁻¹²，按“算到容差”，记录步数，填入表 2，与公式比较（任务 1 用 10⁻⁶）。",
+     "Set the tolerance to 10⁻³, 10⁻⁶, 10⁻⁹, 10⁻¹² in turn, run, record the step counts in Table 2 and compare with the formula (task 1 uses 10⁻⁶)."]
+  - ["选 (x − 1)²，按“二分一步”（任务 2）；选 x³ − x，算到容差，看找到的是哪一个根；选 tan x，容差 10⁻⁹，算到容差，读出 f(m)（任务 3）。",
+     "Choose (x − 1)² and press 'One step' (task 2); choose x³ − x and run: which root is found? Choose tan x with tolerance 10⁻⁹, run and read f(m) (task 3)."]
+  - ["在“关节到达 95% 的时间”场景中取 ζ = 0.6、容差 10⁻⁴，求到达 95% 的时刻（任务 4）；再取 ζ = 0.4、0.8，填入表 3。",
+     "In 'Joint time to 95%' take ζ = 0.6 and tolerance 10⁻⁴ and find the time to 95% (task 4); repeat for ζ = 0.4 and 0.8 and fill in Table 3."]
+数据表:
+  - 标题: ["表 1  x² − 2 的二分过程（初始区间 [0, 2]）", "Table 1  Bisection for x² − 2 (initial interval [0, 2])"]
+    表头: ["k", "a", "b", "中点 m", "f(m) 的符号"]
+    表头英文: ["k", "a", "b", "midpoint m", "sign of f(m)"]
+    行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""], ["5", "", "", "", ""], ["6", "", "", "", ""]]
+  - 标题: ["表 2  容差与步数", "Table 2  Tolerance and number of steps"]
+    表头: ["容差", "10⁻³", "10⁻⁶", "10⁻⁹", "10⁻¹²"]
+    表头英文: ["tolerance", "10⁻³", "10⁻⁶", "10⁻⁹", "10⁻¹²"]
+    行: [["实际步数", "", "", "", ""], ["⌈log₂(2/容差)⌉", "", "", "", ""]]
+    行英文: [["steps used", "", "", "", ""], ["⌈log₂(2/tol)⌉", "", "", "", ""]]
+  - 标题: ["表 3  关节到达 95% 的时刻（ωₙ = 10 rad/s）", "Table 3  Time to 95% (ωₙ = 10 rad/s)"]
+    表头: ["ζ", "0.4", "0.6", "0.8"]
+    表头英文: ["ζ", "0.4", "0.6", "0.8"]
+    行: [["t₉₅ / s", "", "", ""], ["步数", "", "", ""]]
+    行英文: [["t₉₅ / s", "", "", ""], ["steps", "", "", ""]]
+注意:
+  - ["“机器人”场景只在 [0, 峰值时刻] 上二分：q(t) 在那里单调递增、两端异号，恰好穿过 95% 一次。ζ 较小（约小于 0.43）时，峰值之后响应还会回落到 95% 以下再穿过，区间取得过大，二分法可能找到别的穿越点。", "The robot scene bisects only on [0, peak time], where q(t) increases and crosses 95% exactly once. For small ζ (below about 0.43) the response falls back below 95% after the peak and crosses again, so a larger interval could lead bisection to another crossing."]
+  - ["容差取得很小时，区间的两端可能变成相邻的浮点数，再也分不开，读数会给出提示（5.5.3 节）。", "With a very small tolerance the ends may become adjacent floating-point numbers that cannot be split further; the readout says so (Section 5.5.3)."]
+思考题:
+  - ["二分法每一步只用到函数值的符号。这是它的长处还是短处？若知道函数值的大小（比如 f(a) = −0.01，f(b) = 5），能不能更聪明地选分点？", "Bisection only uses the signs of function values. Is that a strength or a weakness? If you know the sizes (say f(a) = −0.01, f(b) = 5), could you choose a smarter point?"]
+  - ["tan x 在 [1, 2] 两端异号，二分法收敛到了 π/2。程序怎样才能发现“这不是根”？", "tan x changes sign on [1, 2], and bisection converges to π/2. How can a program detect that this is not a root?"]

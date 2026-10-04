@@ -7,6 +7,108 @@ const RESET = [{ set: { S_Reset: true } }, { wait: 50 }, { set: { S_Reset: false
 // 每个测试先拨到“自动”、按一次复位、等就绪灯：15.3 节的程序不用这两个信号，照样通过；加上 15.4–15.5 节的操作方式后也照样能测。
 const AUTO = [{ set: { S_Auto: true, S_EStop: true, S_LC: true } }, { wait: 100 }, ...RESET, { until: { H_Ready: true }, within: 6000 }];
 const cycle = (...mid) => [...AUTO, LOAD, { wait: 200 }, HANDS, ...mid, { until: { B_PressUp: true, Y_Clamp: false }, within: 8000 }, FREE, { until: { B_Unclamped: true }, within: 2000 }];
+// 参考程序（与书中程序 5.5.1 相同），只供自动试做（每个任务的 demo）用；书里已全文印出。
+const SOL = { st: String.raw`(* 程序 15.5.1  压装工位：加上异常处理——动作超时、传感器冲突、急停与恢复 *)
+TYPE E_Press : (INIT, HOMING, IDLE, CLAMPING, PRESSING, RETURNING, UNCLAMPING, FAULT, ESTOP); END_TYPE
+
+PROGRAM Main
+  VAR
+    state : E_Press := INIT;
+    prev : E_Press := INIT;    (* 上一次扫描的状态：状态一变，计时重新开始 *)
+    tState : TON;              (* 本状态已经停留的时间 *)
+    limit : TIME;              (* 本状态允许停留的最长时间 *)
+    faultCode : INT;               (* 故障代码：0 无；1 夹紧超时；2 压装超时；3 回程超时；4 松开超时；5 回原点超时；9 传感器冲突 *)
+    clampHold : BOOL;          (* 进入故障或急停时夹具是否夹着：保持原样 *)
+    auto, go, jog : BOOL;
+    rStep, rReset : R_TRIG;
+    tTwoHand : TON;
+    force, peak : REAL;
+    resOk, resNok : BOOL;
+  END_VAR
+
+  force := INT_TO_REAL(AI_Force) * 10.0 / 27648.0;
+  tTwoHand(IN := S_Hand1 OR S_Hand2, PT := T#500ms);
+  rStep(CLK := S_Step);
+  rReset(CLK := S_Reset);
+  auto := S_Auto;
+  go := auto OR rStep.Q;
+
+  (* 1. 急停与传感器冲突：任何状态下都优先 *)
+  IF NOT S_EStop AND state <> ESTOP THEN
+    clampHold := Y_Clamp; state := ESTOP;
+  ELSIF ((B_Clamped AND B_Unclamped) OR (B_PressUp AND B_PressDown)) AND state <> FAULT AND state <> ESTOP THEN
+    clampHold := Y_Clamp; faultCode := 9; state := FAULT;
+  END_IF;
+
+  (* 2. 状态时限：自动方式和回原点时才计时（单步时等的是人） *)
+  CASE state OF
+    CLAMPING, UNCLAMPING: limit := T#1s;
+    PRESSING: limit := T#4s;
+    RETURNING: limit := T#5s;
+    HOMING: limit := T#5s;
+  ELSE
+    limit := T#1h;
+  END_CASE;
+  tState(IN := state = prev AND (auto OR state = HOMING), PT := limit);
+  prev := state;
+
+  (* 3. 转移 *)
+  CASE state OF
+    INIT:
+      IF rReset.Q THEN state := HOMING; END_IF;
+    HOMING:
+      IF B_PressUp AND B_Unclamped THEN state := IDLE;
+      ELSIF tState.Q THEN clampHold := FALSE; faultCode := 5; state := FAULT; END_IF;
+    IDLE:
+      IF rReset.Q THEN
+        state := HOMING;
+      ELSIF B_Part AND B_PressUp AND B_Unclamped AND S_LC
+            AND ((auto AND S_Hand1 AND S_Hand2 AND NOT tTwoHand.Q) OR (NOT auto AND rStep.Q)) THEN
+        resOk := FALSE; resNok := FALSE; peak := 0.0;
+        state := CLAMPING;
+      ELSIF NOT auto AND (S_JogClamp OR S_JogDown OR S_JogUp) THEN
+        state := INIT;                    (* 点动过：位置不再确定，再启动前要回原点 *)
+      END_IF;
+    CLAMPING:
+      IF go AND B_Clamped THEN state := PRESSING;
+      ELSIF tState.Q THEN clampHold := TRUE; faultCode := 1; state := FAULT; END_IF;
+    PRESSING:
+      peak := MAX(peak, force);
+      IF force > 8.0 THEN
+        resNok := TRUE; state := RETURNING;
+      ELSIF go AND B_PressDown THEN
+        resOk := peak >= 4.0 AND peak <= 7.0; resNok := NOT resOk;
+        state := RETURNING;
+      ELSIF auto AND NOT (S_Hand1 AND S_Hand2 AND S_LC) THEN
+        resNok := TRUE; state := RETURNING;
+      ELSIF tState.Q THEN clampHold := TRUE; faultCode := 2; state := FAULT; END_IF;
+    RETURNING:
+      IF go AND B_PressUp THEN state := UNCLAMPING;
+      ELSIF tState.Q THEN clampHold := TRUE; faultCode := 3; state := FAULT; END_IF;
+    UNCLAMPING:
+      IF go AND B_Unclamped THEN state := IDLE;
+      ELSIF tState.Q THEN clampHold := FALSE; faultCode := 4; state := FAULT; END_IF;
+    FAULT:                                (* 停在原地，等人看清原因、按复位 *)
+      IF rReset.Q AND S_EStop AND NOT ((B_Clamped AND B_Unclamped) OR (B_PressUp AND B_PressDown)) THEN
+        faultCode := 0; state := HOMING;
+      END_IF;
+    ESTOP:                                (* 急停松开后也不自己动，按复位才回原点 *)
+      IF S_EStop AND rReset.Q THEN state := HOMING; END_IF;
+  END_CASE;
+
+  (* 4. 输出 *)
+  jog := NOT auto AND (state = IDLE OR state = INIT OR state = FAULT);   (* 故障时允许点动，联锁照样有效 *)
+  Y_Clamp     := state = CLAMPING OR state = PRESSING OR state = RETURNING OR (jog AND S_JogClamp)
+                 OR ((state = FAULT OR state = ESTOP) AND clampHold);
+  Y_PressDown := ((state = PRESSING AND S_Hand1 AND S_Hand2) OR (jog AND S_JogDown AND B_Clamped)) AND S_LC AND S_EStop;
+  Y_PressUp   := (state = RETURNING OR (state = HOMING AND NOT B_PressUp) OR (jog AND S_JogUp))
+                 AND S_EStop AND NOT Y_PressDown;
+  H_OK    := resOk;
+  H_NOK   := resNok;
+  H_Ready := state = IDLE;
+  H_Fault := state = FAULT OR state = ESTOP;
+END_PROGRAM
+` };
 WQ.lab({
   title: ["实验 15.3 压装工位的顺序控制", "Lab 15.3 Sequential control of the press-fit station"],
   goal: ["用状态机设计法写出压装工位的自动循环程序：列状态、写转移、写输出，再用五个测试证明它满足控制要求。",
@@ -84,11 +186,11 @@ END_PROGRAM
   },
   plant,
   tasks: [
-    { id: "good", test: "good", text: ["合格件压到底亮绿灯（测试“合格件”通过）。", "A good part lights green (test 'good part' passes)."] },
-    { id: "nok", test: "loose", text: ["过盈不合适的件判不合格（测试“过盈太小”通过）。", "A bad fit is NOK (test 'too small' passes)."] },
-    { id: "curtain", test: "curtain", text: ["挡光时压头立即停下（测试“挡光”通过）。", "The ram stops at once when the curtain is broken (curtain test passes)."] },
-    { id: "twohand", test: "twohand", text: ["双手按钮相隔太久不启动（测试“双手”通过）。", "Hand buttons too far apart do not start (two-hand test passes)."] },
-    { id: "review", review: true, text: ["程序检查没有错误（没有双线圈，安全输入都用到了）。", "The program check finds no errors (no double coils, all safety inputs used)."] },
+    { id: "good", test: "good", text: ["合格件压到底亮绿灯（测试“合格件”通过）。", "A good part lights green (test 'good part' passes)."], demo: { program: SOL, tests: true } },
+    { id: "nok", test: "loose", text: ["过盈不合适的件判不合格（测试“过盈太小”通过）。", "A bad fit is NOK (test 'too small' passes)."], demo: { program: SOL, tests: true } },
+    { id: "curtain", test: "curtain", text: ["挡光时压头立即停下（测试“挡光”通过）。", "The ram stops at once when the curtain is broken (curtain test passes)."], demo: { program: SOL, tests: true } },
+    { id: "twohand", test: "twohand", text: ["双手按钮相隔太久不启动（测试“双手”通过）。", "Hand buttons too far apart do not start (two-hand test passes)."], demo: { program: SOL, tests: true } },
+    { id: "review", review: true, text: ["程序检查没有错误（没有双线圈，安全输入都用到了）。", "The program check finds no errors (no double coils, all safety inputs used)."], demo: { program: SOL, review: true } },
   ],
   think: ["把下行阀改成纯摩尔型（Y_PressDown := state = PRESSING;），五个测试照样通过。为什么测试抓不到这个隐患？怎样的程序修改会让它变成真的危险？",
           "Make ram down a pure Moore output (Y_PressDown := state = PRESSING;): all five tests still pass. Why can the tests not catch this weakness, and what later change would make it a real hazard?"],

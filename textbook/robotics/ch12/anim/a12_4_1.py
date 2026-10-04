@@ -71,7 +71,7 @@ class Lesson(Base):
         path = TracedPath(lambda: wrong_pts()[-1], stroke_color=RED, stroke_width=3)
         self.add(bad, path)
         self.play(FadeIn(marks))
-        self.caption("写反次序：每一步都绕零位时的点（橙色）转", "Wrong order: every turn about the home points (orange)", wait=0.5)
+        self.caption("写反次序：每一步都绕零位时的点（橙色）转", "Wrong order: every turn about the zero-position points (orange)", wait=0.5)
         for i in range(3):
             self.play(s.animate.set_value(i + 1), run_time=1.6)
         self.caption("后两次转动绕的是空中的点：那里早已没有关节，末端跑出了虚线圆",
@@ -79,4 +79,4 @@ class Lesson(Base):
         self.card([["次序不能写反", "Never reverse the order"],
                    MathTex(r"e^{[\mathcal{S}_1]\theta_1}e^{[\mathcal{S}_2]\theta_2}=e^{[\mathcal{S}_2']\theta_2}e^{[\mathcal{S}_1]\theta_1},\quad \mathcal{S}_2'=[\mathrm{Ad}_{E_1}]\mathcal{S}_2", font_size=40),
                    ["从外往里：轴都在零位；从里往外：每转一个关节就更新外侧各轴",
-                    "outermost-first: axes stay at home; inside-out: update the outer axes after each turn"]])
+                    "outermost-first: axes stay at the zero position; inside-out: update the outer axes after each turn"]])

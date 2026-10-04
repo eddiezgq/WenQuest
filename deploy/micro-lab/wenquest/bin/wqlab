@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""wqlab — 问渠微电子实验镜像里的小工具（第 17 轮附 3.1）。
+
+  wqlab tools                         列出各工具版本（JSON）
+  wqlab netlist <x.sch> [-o 目录]     用 Xschem 导出 LVS 网表
+  wqlab inv [--wn 0.42] [--wp 0.97] [--schematic 网表] [--out 目录]
+                                      第 1 章反相器：版图、DRC、提取、LVS（见 ch1/build_inv.py）
+  wqlab flow <config.json> [--out 目录]
+                                      LibreLane RTL→GDS，汇总时序、DRC、LVS、面积、用时、内存峰值
+  wqlab results <目录>...             把各步的 result.json 合成“结果名 → 数值”，供问渠实验报告回填
+
+结果格式与 GPU 实验的 wqgpu 一致：{"results": {名: 值}, "env": {工具版本与 PDK}}；回传问渠由以后的调度服务完成。
+"""
+import argparse
+import glob
+import json
+import os
+import re
+import resource
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+HOME = Path(os.environ.get("WQ_HOME", Path(__file__).resolve().parents[1]))
+PDK_ROOT = os.environ.get("PDK_ROOT", "/foss/pdks")
+PDK = os.environ.get("PDK", "sky130A")
+PDKPATH = Path(os.environ.get("PDKPATH", f"{PDK_ROOT}/{PDK}"))
+
+
+def sh(cmd, **kw):
+    return subprocess.run(cmd, capture_output=True, text=True, **kw)
+
+
+def first_line(cmd):
+    try:
+        p = sh(cmd, timeout=60)
+        txt = (p.stdout + p.stderr).strip()
+        for ln in txt.splitlines():
+            if re.search(r"\d+\.\d+", ln):
+                return ln.strip()[:120]
+        return txt.splitlines()[0][:120] if txt else ""
+    except Exception as e:  # noqa: BLE001
+        return f"unavailable ({type(e).__name__})"
+
+
+def tools(_a=None):
+    v = {
+        "magic": first_line(["magic", "--version"]),
+        "netgen": first_line(["sh", "-c", "echo quit | netgen -batch 2>&1 | head -3"]),
+        "ngspice": first_line(["ngspice", "-v"]),
+        "xschem": first_line(["xschem", "-v"]),
+        "klayout": first_line(["klayout", "-v"]),
+        "yosys": first_line(["yosys", "-V"]),
+        "openroad": first_line(["openroad", "-version"]),
+        "librelane": first_line(["librelane", "--version"]),
+        "pdk": f"{PDK} @ {PDKPATH}",
+    }
+    print(json.dumps(v, indent=1, ensure_ascii=False))
+    return v
+
+
+def env():
+    return {"PDK": PDK, "PDK_ROOT": PDK_ROOT}
+
+
+def netlist(a):
+    out = Path(a.out or ".").resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    rc = PDKPATH / "libs.tech" / "xschem" / "xschemrc"
+    p = sh(["xschem", "--rcfile", str(rc), "-n", "-s", "-q", "-x", "--tcl", "set lvs_netlist 1", "-o", str(out), str(Path(a.sch).resolve())],
+           cwd=out, timeout=300)
+    net = out / (Path(a.sch).stem + ".spice")
+    if not net.exists():
+        sys.exit(f"xschem produced no netlist:\n{p.stdout}{p.stderr}")
+    print(net)
+    return net
+
+
+def inv(a):
+    os.environ.setdefault("MAGICRC", str(PDKPATH / "libs.tech" / "magic" / f"{PDK}.magicrc"))
+    os.environ.setdefault("NETGEN_SETUP", str(PDKPATH / "libs.tech" / "netgen" / f"{PDK}_setup.tcl"))
+    sys.path.insert(0, str(HOME / "ch1"))
+    import build_inv  # noqa: E402
+    r = build_inv.build(a.wn, a.wp, Path(a.out).resolve(), Path(a.schematic).resolve() if a.schematic else None)
+    print(json.dumps(r, ensure_ascii=False))
+    return r
+
+
+def _metric(m: dict, *names, default=None):
+    for n in names:
+        if n in m:
+            return m[n]
+    return default
+
+
+def flow(a):
+    cfg = Path(a.config).resolve()
+    out = Path(a.out or cfg.parent / "runs").resolve()
+    work = out / "design"
+    if work.exists():
+        shutil.rmtree(work)
+    shutil.copytree(cfg.parent, work, ignore=shutil.ignore_patterns("runs"))
+    cmd = ["librelane", "--manual-pdk", "--pdk-root", PDK_ROOT, "--pdk", PDK, "--run-tag", "wq", "--overwrite", str(work / cfg.name)]
+    t0 = time.time()
+    with open(out / "librelane.log", "w") as log:
+        p = subprocess.run(cmd, cwd=work, stdout=log, stderr=subprocess.STDOUT, timeout=4 * 3600)
+    secs = time.time() - t0
+    peak_mb = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss / 1024
+    mfile = next(iter(glob.glob(str(work / "runs" / "wq" / "final" / "metrics.json"))), None)
+    m = json.loads(Path(mfile).read_text()) if mfile else {}
+    gds = next(iter(glob.glob(str(work / "runs" / "wq" / "final" / "gds" / "*.gds"))), "")
+    res = {
+        "exit_code": p.returncode, "seconds": round(secs), "peak_mem_mb": round(peak_mb),
+        "gds": gds,
+        "setup_ws_ns": _metric(m, "timing__setup__ws", "timing__setup__ws__corner:nom_tt_025C_1v80"),
+        "hold_ws_ns": _metric(m, "timing__hold__ws", "timing__hold__ws__corner:nom_tt_025C_1v80"),
+        "route_drc_errors": _metric(m, "route__drc_errors"),
+        "magic_drc_errors": _metric(m, "magic__drc_error__count"),
+        "klayout_drc_errors": _metric(m, "klayout__drc_error__count"),
+        "lvs_errors": _metric(m, "design__lvs_error__count"),
+        "antenna_violations": _metric(m, "antenna__violating__nets", "route__antenna_violation__count"),
+        "cells": _metric(m, "design__instance__count"),
+        "core_area_um2": _metric(m, "design__core__area"),
+    }
+    def zero(x):
+        return x is not None and float(x) == 0
+    res["tapeout_ready"] = bool(p.returncode == 0 and gds and zero(res["magic_drc_errors"]) and zero(res["lvs_errors"])
+                                and res["setup_ws_ns"] is not None and float(res["setup_ws_ns"]) >= 0
+                                and res["hold_ws_ns"] is not None and float(res["hold_ws_ns"]) >= 0)
+    (out / "result.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    print(json.dumps(res, ensure_ascii=False))
+    return res
+
+
+def results(a):
+    vals = {}
+    for d in a.dirs:
+        f = Path(d) / "result.json"
+        if f.exists():
+            for k, v in json.loads(f.read_text()).items():
+                if isinstance(v, (int, float, bool)):
+                    vals[f"{Path(d).name}_{k}"] = v
+    out = {"results": vals, "env": env(), "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+    print(json.dumps(out, indent=1, ensure_ascii=False))
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser(prog="wqlab", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("tools").set_defaults(fn=tools)
+    p = sub.add_parser("netlist"); p.add_argument("sch"); p.add_argument("-o", "--out"); p.set_defaults(fn=netlist)
+    p = sub.add_parser("inv"); p.add_argument("--wn", type=float, default=0.42); p.add_argument("--wp", type=float, default=0.97)
+    p.add_argument("--schematic"); p.add_argument("--out", default="inv_build"); p.set_defaults(fn=inv)
+    p = sub.add_parser("flow"); p.add_argument("config"); p.add_argument("--out"); p.set_defaults(fn=flow)
+    p = sub.add_parser("results"); p.add_argument("dirs", nargs="+"); p.set_defaults(fn=results)
+    a = ap.parse_args()
+    r = a.fn(a)
+    if a.cmd == "inv":
+        sys.exit(0 if r["drc_errors"] == 0 and r["lvs_match"] else 1)
+    if a.cmd == "flow":
+        sys.exit(0 if r["tapeout_ready"] else 1)
+
+
+if __name__ == "__main__":
+    main()

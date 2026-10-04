@@ -20,6 +20,12 @@ chapters:
   3:
     status: ai
     title_en: "Systems of Linear Equations and Elimination"
+  4:
+    status: ai
+    title_en: "Matrices and Matrix Multiplication"
+  5:
+    status: ai
+    title_en: "Inverses and LU Factorization"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"

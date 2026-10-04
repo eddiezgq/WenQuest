@@ -14,6 +14,7 @@ from _prob import gauss_pdf, p_within
 from bookout import COLORS as C, T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 
 
 def clean(ax):
@@ -39,7 +40,7 @@ for k in (-1, 1):
 ax.text(mean + s + 0.008, 228, r"$\pm s$", color=C["accent"], fontsize=11, va="center")
 ax.text(mean + 0.006, 258, T(f"样本均值 {mean:.3f} N", f"sample mean {mean:.3f} N"), fontsize=9)
 ax.text(15.12, 150, T(f"高斯密度曲线\n（均值 {mean:.3f} N，标准差 {s:.3f} N）",
-                      f"Gaussian density\n(mean {mean:.3f} N, std {s:.3f} N)"), fontsize=9, color=C["z"])
+                      f"Gaussian density\n(mean {mean:.3f} N, standard deviation {s:.3f} N)"), fontsize=9, color=C["z"])
 ax.set_xlim(14.70, 15.30)
 ax.set_ylim(0, 285)
 ax.set_xlabel(T("读数 / N", "Reading / N"))
@@ -79,7 +80,7 @@ ax2.set_yticks([0, 0.5, 1])
 ax2.text(15.15, 0.80, "$F(x)$", color=C["x"], fontsize=12)
 ax2.set_xlim(14.72, 15.28)
 ax2.set_ylim(0, 1.05)
-ax2.set_title(T("分布函数：从左边累积到 x 的概率", "Distribution function: probability accumulated up to x"), fontsize=10)
+ax2.set_title(T("分布函数：从左边累积到 x 的概率", "Cumulative distribution function: probability up to x"), fontsize=10)
 clean(ax2)
 fig.tight_layout()
 figure(fig, "fig9_1_2")
@@ -119,7 +120,7 @@ ax1.plot(th, rd, color=C["z"], lw=1.8, drawstyle="steps-mid")
 ax1.set_xlabel(T("真实角度 / q", "True angle / q"))
 ax1.set_ylabel(T("读数 / q", "Reading / q"))
 ax1.text(3.3, 2.2, T("读数（阶梯）", "reading (staircase)"), color=C["z"], fontsize=9)
-ax1.text(0.35, 2.1, T("真实角度（虚线）", "true angle (dashed)"), color=C["muted"], fontsize=9)
+ax1.text(0.2, 3.0, T("真实角度（虚线）", "true angle (dashed)"), color=C["muted"], fontsize=9)
 ax1.set_title(T("编码器只能读出 q 的整数倍", "The encoder reads whole multiples of q"), fontsize=10)
 clean(ax1)
 e = rd - th
@@ -153,7 +154,7 @@ for ax, k in zip(axs, (1, 2, 12)):
     ax.set_xlim(-4, 4)
     ax.set_xticks([-3, 0, 3])
     clean(ax)
-axs[0].set_ylabel(T("密度（化为标准差 1）", "density (scaled to std 1)"))
+axs[0].set_ylabel(T("密度（化为标准差 1）", "Density (scaled to σ = 1)"))
 axs[2].text(1.2, 0.33, T("高斯曲线", "Gaussian"), color=C["z"], fontsize=9)
 fig.tight_layout()
 figure(fig, "fig9_1_5")

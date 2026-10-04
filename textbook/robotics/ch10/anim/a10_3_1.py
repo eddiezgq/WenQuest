@@ -63,9 +63,9 @@ class Lesson(Base):
 
         sc = always_redraw(scene)
         self.add(sc)
-        self.caption("关节 1 匀速转动，关节 2 匀速伸直：末端离轴越来越远", "Joint 1 turns steadily, joint 2 straightens steadily: the tool moves away from the axis", wait=0)
+        self.caption("关节 1 匀速转动，关节 2 匀速伸直：末端离轴越来越远", "Joint 1 turns steadily, joint 2 straightens steadily: the end-effector moves away from the axis", wait=0)
         self.play(t.animate.set_value(0.6), run_time=5, rate_func=linear)
-        self.caption("局部基 e_ρ、e_φ 跟着末端转动：这就是加速度里多出来的项", "The local basis turns with the tool: that is where the extra terms come from", wait=0)
+        self.caption("局部基 e_ρ、e_φ 跟着末端转动：这就是加速度里多出来的项", "The local basis turns with the end-effector: that is where the extra terms come from", wait=0)
         self.play(t.animate.set_value(1.0), run_time=4, rate_func=linear)
         self.caption("边转边伸时，横向加速度中的“二倍伸出速度乘角速度”一项往往最大", "Turning while extending, the term “twice the outward speed times the turn rate” is often the largest", wait=0)
         self.play(t.animate.set_value(1.25), run_time=3, rate_func=linear)

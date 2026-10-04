@@ -22,7 +22,7 @@ class Lesson(Base):
                   x_axis_config={"numbers_to_include": [0, 1, 2, 3, 4, 5]},
                   y_axis_config={"include_ticks": False}).shift(DOWN * 0.55)
         ax.y_axis.set_opacity(0)
-        xl = zh("位置 x / m", 20, MUTED).next_to(ax.x_axis, DOWN, buff=0.12).align_to(ax.x_axis, LEFT)
+        xl = bi(["位置 x / m", "Position x / m"], 20, MUTED).next_to(ax.c2p(-0.8, 0), DOWN, buff=0.12, aligned_edge=LEFT)
         self.play(Create(ax), FadeIn(xl), run_time=1.0)
         floor = ax.c2p(0, 1.6)[1] + 0.05
 
@@ -53,7 +53,7 @@ class Lesson(Base):
             x = xm + K * (z - xm)
             P = (1 - K) * Pm
             if k == 0:
-                self.caption("更新：二者相乘，均值向测量移动 K 倍，曲线变窄", "Update: multiply, the mean moves K of the way, the curve narrows", wait=0)
+                self.caption("更新：二者相乘，均值向测量移动 K 倍，曲线变窄", "Update: multiply, the mean moves a fraction K of the way, the curve narrows", wait=0)
             kt = MathTex(r"K = %.2f" % K, font_size=34, color=ORANGE).to_corner(UR, buff=0.5).shift(DOWN * 1.4)
             self.play(mu.animate.set_value(x), sd.animate.set_value(math.sqrt(P)), FadeIn(kt), run_time=1.6 if k < 2 else 1.0)
             self.play(FadeOut(lik), FadeOut(zd), FadeOut(kt), run_time=0.4)

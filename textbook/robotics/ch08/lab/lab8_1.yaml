@@ -1,7 +1,7 @@
 # 实验 8.1 的指导书与报告模板。目的、场景、参数、任务取自 lab8_1.js。
 原理:
   - ["把逆运动学写成无约束优化：f(θ) = ½‖p(θ) − p_d‖²。f 为零的点就是逆解。f 的梯度是 Jᵀr，r = p(θ) − p_d 是末端的位置误差，J 是雅可比矩阵。",
-     "Inverse kinematics as unconstrained optimisation: f(θ) = ½‖p(θ) − p_d‖². The zeros of f are the solutions. Its gradient is Jᵀr, where r = p(θ) − p_d is the tip error and J the Jacobian."]
+     "Inverse kinematics as unconstrained optimization: f(θ) = ½‖p(θ) − p_d‖². The zeros of f are the solutions. Its gradient is Jᵀr, where r = p(θ) − p_d is the position error of the end-effector and J the Jacobian."]
   - 式: "梯度下降：θ_{k+1} = θ_k − α ∇f(θ_k)          (8.1.11)"
   - 式: "牛顿法：∇²f(θ_k) d_k = −∇f(θ_k)，θ_{k+1} = θ_k + d_k          (8.1.15)"
   - ["在极小点附近，梯度下降的误差每步乘以 max|1 − αλ_i|，λ_i 是黑塞矩阵的特征值。步长超过 2/λ_max 就不再收敛；条件数 κ = λ_max/λ_min 越大，最好的固定步长也收敛得越慢，最好的倍数是 (κ − 1)/(κ + 1)。",

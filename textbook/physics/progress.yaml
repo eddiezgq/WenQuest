@@ -23,5 +23,8 @@ chapters:
     status: ai
     title_en: "Physics and Measurement"
   2:
-    status: draft
+    status: ai
     title_en: "Vectors"
+  3:
+    status: draft
+    title_en: "Change and Accumulation: Calculus in Physics"

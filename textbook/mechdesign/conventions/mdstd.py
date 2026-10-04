@@ -49,6 +49,20 @@ def _row(name: str, d: float) -> dict:
     raise ValueError(f"{name}: 公称尺寸 {d} mm 超出表的范围")
 
 
+
+def general_tol(L: float, cls: str = "m") -> float:
+    """未注公差的线性尺寸极限偏差 ±（mm），GB/T 1804 / ISO 2768-1；cls = f / m / c / v。"""
+    v = _row("gbt1804_linear", L)[cls]
+    if v is None:
+        raise ValueError(f"GB/T 1804 {cls} 级对 {L} mm 没有规定")
+    return v
+
+
+def drawing_scales() -> list[str]:
+    """图样比例（GB/T 14690）：优先与允许的值"""
+    return list(table("gbt14690_scale")["values"])
+
+
 # ---------------------------------------------------------------- 极限与配合（GB/T 1800.1 / ISO 286-1）
 
 def it(grade: int, d: float) -> int:

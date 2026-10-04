@@ -2,8 +2,8 @@
 
 图 7.4.1：用差商求 sin t 在 t = 1 处的导数：误差与步长（双对数坐标），截断误差与舍入误差此消彼长。
 图 7.4.2：编码器测速：(a) 量化后的角度读数；(b) 均方根误差与差商跨度 h；(c) 三种估计与真实角速度。
-图 7.4.3：带电流环的电机（刚性方程）：(a) 电流和转速的精确解；(b) 显式欧拉法 50 µs 与 60 µs；(c) 隐式欧拉法 1 ms。
-图 7.4.4：三种方法的稳定区域（复平面上的 hλ），以及电机快、慢两个特征值与单摆特征值的位置。
+图 7.4.4：带电流环的电机（刚性方程）：(a) 电流和转速的精确解；(b) 显式欧拉法 50 µs 与 60 µs；(c) 隐式欧拉法 1 ms。
+图 7.4.3：三种方法的稳定区域（复平面上的 hλ），以及电机快、慢两个特征值与单摆特征值的位置。
 """
 import math
 
@@ -14,6 +14,7 @@ from _ode import MOTOR, link_params
 from bookout import COLORS, T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 C = COLORS
 box = dict(fc="white", ec="none", pad=1.0, alpha=0.9)
 PURPLE = "#8e44ad"
@@ -79,12 +80,12 @@ for n in ns:
     rc.append(np.sqrt(np.mean((est - w_true[start:len(t) - 2 * n]) ** 2)))
 hgrid = ns * Ts
 th_rms = np.sqrt((hgrid * A * Om ** 2 / (2 * math.sqrt(2))) ** 2 + (q / (math.sqrt(6) * hgrid)) ** 2)
-a2.loglog(hgrid * 1e3, rb, "o", color=C["x"], ms=3.5, label=T("后向差商（仿真）", "backward difference (simulated)"))
-a2.loglog(hgrid * 1e3, th_rms, color=C["x"], lw=1.0, label=T("后向差商（式 (7.4.7)）", "backward difference (Eq. (7.4.7))"))
-a2.loglog(hgrid * 1e3, rc, "s", color=C["z"], ms=3.5, label=T("中心差商（仿真）", "central difference (simulated)"))
-a2.set_xlabel(T("差商跨度 h / ms", "difference span h / ms"))
+a2.loglog(hgrid * 1e3, rb, "o", color=C["x"], ms=3.5, label=T("后向差商（仿真）", "backward (simulated)"))
+a2.loglog(hgrid * 1e3, th_rms, color=C["x"], lw=1.0, label=T("后向差商（式 (7.4.7)）", "backward (Eq. (7.4.7))"))
+a2.loglog(hgrid * 1e3, rc, "s", color=C["z"], ms=3.5, label=T("中心差商（仿真）", "central (simulated)"))
+a2.set_xlabel(T("差商跨度 h / ms", "difference interval h / ms"))
 a2.set_ylabel(T("均方根误差 / (rad/s)", "RMS error / (rad/s)"))
-a2.set_title(T("(b) 误差与跨度", "(b) error versus span"), fontsize=10.5)
+a2.set_title(T("(b) 误差与跨度", "(b) error versus difference interval"), fontsize=10.5)
 a2.legend(loc="upper center", frameon=False, fontsize=8.3)
 a2.set_ylim(3e-3, 3)
 a2.grid(True, which="major", lw=0.3, alpha=0.5)
@@ -92,10 +93,10 @@ clean(a2)
 w0, w1 = 0.62, 0.66
 m = (t >= w0) & (t <= w1)
 idx = np.where(m)[0]
-a3.plot(t[m], w_true[m], color=C["ink"], lw=1.8, label=T("真实角速度", "true speed"))
-for n, col, lab, kind in ((1, C["muted"], T("后向差商 h = 1 ms", "backward, h = 1 ms"), "b"),
-                          (2, C["x"], T("后向差商 h = 2 ms", "backward, h = 2 ms"), "b"),
-                          (10, C["z"], T("中心差商 h = 10 ms（晚 10 ms 得到）", "central, h = 10 ms (10 ms late)"), "c")):
+a3.plot(t[m], w_true[m], color=C["ink"], lw=1.8, label=T("真实角速度", "true"))
+for n, col, lab, kind in ((1, C["muted"], T("后向差商 h = 1 ms", "backward, 1 ms"), "b"),
+                          (2, C["x"], T("后向差商 h = 2 ms", "backward, 2 ms"), "b"),
+                          (10, C["z"], T("中心差商 h = 10 ms（晚 10 ms 得到）", "central, 10 ms (delayed)"), "c")):
     if kind == "b":
         est = (theta_q[idx] - theta_q[idx - n]) / (n * Ts)
     else:
@@ -104,12 +105,12 @@ for n, col, lab, kind in ((1, C["muted"], T("后向差商 h = 1 ms", "backward, 
 a3.set_xlabel(T("时间 t / s", "time t / s"))
 a3.set_ylabel(T("角速度 / (rad/s)", "speed / (rad/s)"))
 a3.set_title(T("(c) 估计出的角速度", "(c) estimated speed"), fontsize=10.5)
-a3.legend(loc="upper right", frameon=False, fontsize=8.3)
+a3.legend(loc="lower right", frameon=False, fontsize=8.3)
 clean(a3)
 figure(fig, "fig7_4_2")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 7.4.3
+# ---------------------------------------------------------------- 图 7.4.4
 mo = MOTOR
 Kp, Kv, w_ref = 20.0, 0.04, 100.0
 L, R, Kt, Ke, Jm, b = mo["L"], mo["R"], mo["Kt"], mo["Ke"], mo["Jm"], mo["b"]
@@ -127,8 +128,8 @@ a1b.set_ylabel(T("电流 i / A", "current i / A"), color=C["accent"])
 a1.set_xlabel(T("时间 t / ms", "time t / ms"))
 a1.set_ylabel(T("转速 ω / (rad/s)", "speed ω / (rad/s)"), color=C["z"])
 a1.set_title(T("(a) 精确解：电流约 0.2 ms 时达到峰值", "(a) exact: the current peaks at about 0.2 ms"), fontsize=10)
-a1.text(28, 60, T("转速：时间常数约 20 ms，\n约 60 ms 达到 95%", "speed: time constant ~20 ms,\n95% at ~60 ms"), color=C["z"], fontsize=9, bbox=box)
-a1.text(12, 20, T("电流", "current"), color=C["accent"], fontsize=9, bbox=box)
+a1.text(28, 60, T("转速：时间常数约 20 ms，\n约 60 ms 达到 95%", "speed: τ ≈ 20 ms,\n95% at ≈ 60 ms"), color=C["z"], fontsize=9, bbox=box)
+a1.text(12, 20, T("电流", "i"), color=C["accent"], fontsize=9, bbox=box)
 for h, col, lab in ((60e-6, C["x"], "h = 60 µs"), (50e-6, C["y"], "h = 50 µs")):
     x = np.zeros(2)
     ts_, ws_ = [0.0], [0.0]
@@ -160,10 +161,10 @@ a3.set_ylabel(T("转速 ω / (rad/s)", "speed ω / (rad/s)"))
 a3.set_title(T("(c) 隐式欧拉法：步长为上限的 18 倍仍稳定", "(c) implicit Euler: stable at ~18× the explicit limit"), fontsize=10)
 a3.legend(loc="lower right", frameon=False, fontsize=8.5)
 clean(a3)
-figure(fig, "fig7_4_3")
+figure(fig, "fig7_4_4")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 7.4.4
+# ---------------------------------------------------------------- 图 7.4.3
 fig, ax = plt.subplots(figsize=(6.4, 4.6))
 xr = np.linspace(-4.5, 2.5, 600)
 yr = np.linspace(-3.5, 3.5, 600)
@@ -189,7 +190,7 @@ for z, lab, dy in ((0.02 * math.sqrt(wn2) * 1j, T("单摆 hλ = ±ihω_n（h = 0
     ax.annotate(lab.replace("ω_n", "$\\omega_n$").replace("hλ", "$h\\lambda$").replace("±ih", "$\\pm ih$"),
                 xy=(0, z.imag), xytext=(0.25, 1.2), fontsize=9, color=C["accent"],
                 arrowprops=dict(arrowstyle="-", color=C["accent"], lw=0.7))
-ax.annotate(T("电机快模态 hλ ≈ −35（h = 1 ms），在左边很远处", "fast motor mode hλ ≈ −35 (h = 1 ms), far to the left"),
+ax.annotate(T("电机快模态 hλ ≈ −35（h = 1 ms），在左边很远处", "fast motor mode: hλ ≈ −35"),
             xy=(-4.4, 0), xytext=(-4.3, -2.6), fontsize=9, color=C["ink"],
             arrowprops=dict(arrowstyle="-|>", color=C["ink"], lw=0.8))
 ax.text(-4.3, -3.2, T("显式方法：不稳定；隐式欧拉法：稳定", "explicit: unstable; implicit Euler: stable"), fontsize=9)
@@ -198,5 +199,5 @@ ax.set_ylabel(T("Im(hλ)", "Im(hλ)"))
 ax.set_xlim(-4.5, 2.5)
 ax.set_ylim(-3.5, 3.5)
 ax.set_aspect("equal")
-figure(fig, "fig7_4_4")
+figure(fig, "fig7_4_3")
 plt.close(fig)

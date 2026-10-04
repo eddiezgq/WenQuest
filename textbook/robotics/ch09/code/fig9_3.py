@@ -34,10 +34,13 @@ def node(x, y, text, col, w=2.1):
 
 def edge(p, q, text, side=1):
     ax.plot([p[0] + 1.05, q[0] - 1.05], [p[1], q[1]], color=C["muted"], lw=1)
-    ax.text((p[0] + q[0]) / 2, (p[1] + q[1]) / 2 + 0.22 * side, text, ha="center", fontsize=8.5, color=C["muted"])
+    dx, dy = q[0] - p[0], q[1] - p[1]
+    nx, ny = -dy * side / math.hypot(dx, dy), dx * side / math.hypot(dx, dy)   # 线的法向：标注离开线一段距离
+    ax.text((p[0] + q[0]) / 2 + 0.12 * nx, (p[1] + q[1]) / 2 + 0.12 * ny, text, ha="center",
+            va="bottom" if side > 0 else "top", fontsize=8.5, color=C["muted"])
 
 
-node(1.2, 2.5, T("1000 个零件", "1000 parts"), C["ink"])
+node(1.2, 2.5, T("1000 个零件", "1,000 parts"), C["ink"])
 node(4.6, 3.9, T("有缺陷 10 个", "defective: 10"), C["x"])
 node(4.6, 1.1, T("无缺陷 990 个", "good: 990"), C["z"])
 node(8.6, 4.5, T("报警 9.5 个", "alarm: 9.5"), C["x"])
@@ -51,7 +54,7 @@ edge((4.6, 3.9), (8.6, 3.3), "5%", -1)
 edge((4.6, 1.1), (8.6, 1.7), "5%")
 edge((4.6, 1.1), (8.6, 0.5), "95%", -1)
 ax.text(5.0, -0.25, T("报警的 59 个零件中，真有缺陷的只有 9.5 个：9.5 / 59 ≈ 16%",
-                      "Of the 59 parts that raise an alarm only 9.5 are defective: 9.5 / 59 ≈ 16%"), ha="center", fontsize=10)
+                      "Of the 59 parts that raise an alarm, only 9.5 are defective: 9.5 / 59 ≈ 16%"), ha="center", fontsize=10)
 ax.set_ylim(-0.5, 5)
 figure(fig, "fig9_3_1")
 plt.close(fig)
@@ -98,7 +101,7 @@ for ax, (title, b, tp) in zip(axs, rows):
                     arrowprops=dict(arrowstyle="-|>", color=C["x"], lw=1.2))
     clean(ax)
 axs[-1].set_xticks(range(ncell))
-axs[-1].set_xlabel(T("格号（金色：有反光标志的格；红箭头：AGV 实际所在的格）", "cell (gold: cells with a reflector; red arrow: where the AGV really is)"), fontsize=9)
+axs[-1].set_xlabel(T("格号（金色：有反光标志的格；红箭头：AGV 实际所在的格）", "Cell (gold: cells with a reflective tag; red arrow: where the AGV really is)"), fontsize=9)
 fig.text(0.01, 0.5, T("概率", "probability"), rotation=90, va="center", fontsize=10)
 fig.tight_layout(rect=(0.02, 0, 1, 1))
 figure(fig, "fig9_3_2")
@@ -119,7 +122,7 @@ ax.text(mu1 + 0.035, 14.2, T(f"后验 $\\mathcal{{N}}$({mu1:.3f}, {s1:.3f}²)", 
 ax.set_xlim(4.85, 5.55)
 ax.set_ylim(0, 15.5)
 ax.set_xlabel(T("AGV 沿通道的位置 x / m", "AGV position along the aisle x / m"))
-ax.set_ylabel(T("概率密度 / m⁻¹", "density / m⁻¹"))
+ax.set_ylabel(T("概率密度 / m⁻¹", "Density / m⁻¹"))
 clean(ax)
 figure(fig, "fig9_3_3")
 plt.close(fig)

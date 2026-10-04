@@ -72,6 +72,19 @@ create table if not exists field_unit (
     faults    jsonb not null default '[]',
     primary key (serial, mode)
 );
+create table if not exists robot_twin (
+    id        bigserial primary key,
+    mode      text not null,
+    name      text not null,
+    owner     text,
+    mbd_job   text,
+    life      jsonb not null,
+    hours_per_day double precision not null default 16,
+    start_day date not null,
+    last_day  date,
+    state     jsonb not null default '{}',
+    created   timestamptz not null default now()
+);
 create table if not exists field_clock (
     mode        text primary key,
     anchor_real timestamptz not null,
@@ -340,6 +353,33 @@ class TwinService:
                 n += 1
         return n
 
+    # ------------------------------------------------------------ 机械臂关节孪生（选做 T8）
+    def add_robot(self, mode, name, life, hours_per_day, owner=None):
+        today = self.field_today(mode)
+        st = {"run_h": 0.0, "used": {j["joint"]: 0.0 for j in life["joints"]}}
+        return self.db.one("insert into robot_twin (mode, name, owner, mbd_job, life, hours_per_day, start_day, last_day, state) "
+                           "values (%s,%s,%s,%s,%s,%s,%s,%s,%s) returning id",
+                           (mode, name, owner, life.get("job"), Jsonb(life), float(hours_per_day), today, today, Jsonb(st)))["id"]
+
+    def tick_robots(self, mode):
+        """机械臂按同一个搬运程序每天干 hours_per_day 小时；每天负载（工件重量、节拍）在 ±10% 内变，寿命按 3 次方折算"""
+        today = self.field_today(mode)
+        for r in self.db.q("select * from robot_twin where mode=%s and last_day < %s", (mode, today)):
+            st = r["state"]
+            day = r["last_day"] + dt.timedelta(days=1)
+            k = 0
+            while day <= today and k < MAX_DAYS_PER_TICK:
+                rng = random.Random(zlib.crc32("robot{}|{}".format(r["id"], day).encode()))
+                lf = rng.uniform(0.9, 1.1)
+                h = r["hours_per_day"] * (rng.uniform(0.9, 1.0) if day.weekday() < 6 else 0.0)
+                for j in r["life"]["joints"]:
+                    if j.get("L10_h"):
+                        st["used"][j["joint"]] = st["used"].get(j["joint"], 0.0) + h / j["L10_h"] * lf ** 3
+                st["run_h"] = st.get("run_h", 0.0) + h
+                day += dt.timedelta(days=1)
+                k += 1
+            self.db.x("update robot_twin set state=%s, last_day=%s where id=%s", (Jsonb(st), day - dt.timedelta(days=1), r["id"]))
+
     def run(self, every_s=5.0):
         for mode in FIELD_MODES:
             try:
@@ -350,6 +390,7 @@ class TwinService:
             for mode in FIELD_MODES:
                 try:
                     self.tick(mode)
+                    self.tick_robots(mode)
                 except Exception:  # noqa: BLE001
                     log.exception("现场模拟出错（%s）", mode)
 
@@ -387,7 +428,7 @@ class TwinService:
     def reset(self, mode, reseed=True):
         """教学情景重置：孪生、现场、日志全部清空，重新建情景设备"""
         with self.lock:
-            for t in ("twin", "twin_log", "twin_event", "field_unit", "field_clock"):
+            for t in ("twin", "twin_log", "twin_event", "field_unit", "field_clock", "robot_twin"):
                 self.db.x("delete from {} where mode=%s".format(t), (mode,))
         if reseed and mode in FIELD_MODES:
             threading.Thread(target=self.seed, args=(mode,), daemon=True).start()
@@ -453,3 +494,21 @@ def detail(db, mode, serial, days=400):
 
 def json_safe(x):
     return json.loads(json.dumps(x, default=str))
+
+
+def robots(db, mode):
+    out = []
+    for r in db.q("select * from robot_twin where mode=%s order by id", (mode,)):
+        st = r["state"]
+        days = max(1, (r["last_day"] - r["start_day"]).days)
+        joints = []
+        for j in r["life"]["joints"]:
+            u = st["used"].get(j["joint"], 0.0)
+            rate = u / days
+            joints.append(dict(j, used=u, remaining_days=(1 - u) / rate if rate > 0 and u < 1 else (0 if u >= 1 else None)))
+        first = min([j for j in joints if j["remaining_days"] is not None] or [None], key=lambda j: j["remaining_days"] if j else 0)
+        out.append({"id": r["id"], "name": r["name"], "mbd_job": r["mbd_job"], "hours_per_day": r["hours_per_day"],
+                    "start_day": r["start_day"].isoformat(), "last_day": r["last_day"].isoformat(), "run_h": st.get("run_h", 0.0),
+                    "cycle_s": r["life"].get("cycle_s"), "formula": r["life"].get("formula"), "joints": joints,
+                    "first": first and first["joint"]})
+    return out

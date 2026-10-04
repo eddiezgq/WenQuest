@@ -1,0 +1,31 @@
+# 实验 1.5 的指导书与报告模板。目的、场景、参数、任务取自 lab1_5.js。
+原理:
+  - ["零件的强度 S 和它承受的应力 s 都不是确定的数：材料有分散，载荷有分散。把两者都看作正态分布的随机变量，平均值 μlim、μσ，变异系数（标准差 / 平均值）Clim、Cσ。",
+     "A part's strength S and the stress s it carries are not fixed numbers: materials scatter and loads scatter. Treat both as normal random variables with means μlim, μσ and coefficients of variation (standard deviation / mean) Clim, Cσ."]
+  - ["两条分布重叠的部分就是应力可能超过强度的情形。可靠性指标与可靠度：", "Where the two distributions overlap, the stress may exceed the strength. The reliability index and the reliability are:"]
+  - 式: "z = (S − 1) / √(S²·Clim² + Cσ²)，S = μlim / μσ，R = Φ(z)，失效概率 = 1 − R          (1.5.2)"
+  - ["同样的平均安全系数 S，分散越大，z 越小，失效概率越大。经验安全系数的取值，实际上是对分散和后果的估计。",
+     "For the same mean safety factor S, more scatter means a smaller z and a larger probability of failure. An empirical safety factor is really an estimate of scatter and consequence."]
+步骤:
+  - ["打开实验 1.5，场景“减速器输出轴外伸段”。保持默认参数（S = 1.81，Clim = 0.08，Cσ = 0.03），按“评估”，记下 z、可靠度和失效概率（任务 1），填入表 1 第 1 行，与算例 1.5.1 比较（滑块只到两位小数，与正文差一点是正常的）。",
+     "Open Lab 1.5, scene “Gearbox output-shaft extension”. Keep the defaults (S = 1.81, Clim = 0.08, Cσ = 0.03), press Evaluate and record z, R and the probability of failure (task 1) in row 1 of Table 1; compare with Example 1.5.1 (the sliders have two decimals, so a small difference is normal)."]
+  - ["只改 Cσ（0.10、0.15、0.25），每次评估一次，填入表 1，观察失效概率的变化。", "Change only Cσ (0.10, 0.15, 0.25), evaluating each time; fill in Table 1 and watch the probability of failure."]
+  - ["保持 Cσ = 0.25，逐步加大 S，找出失效概率不超过百万分之一的最小安全系数（任务 2），与算例 1.5.2 比较，填入表 2。", "Keep Cσ = 0.25 and raise S until the probability of failure is at most one in a million (task 2); compare with Example 1.5.2 and fill in Table 2."]
+  - ["切换到“电梯钢丝绳”，Clim = 0.05、Cσ = 0.35，找出失效概率低于千万分之一的安全系数（任务 3），填入表 2。", "Switch to “Lift rope” with Clim = 0.05 and Cσ = 0.35; find the safety factor for a probability of failure below one in ten million (task 3); fill in Table 2."]
+数据表:
+  - 标题: ["表 1  外伸段：载荷分散的影响（S = 1.81，Clim = 0.08）", "Table 1  Extension: effect of load scatter (S = 1.81, Clim = 0.08)"]
+    表头: ["Cσ", "z", "可靠度 R", "失效概率 1 − R", "每百万次失效"]
+    表头英文: ["Cσ", "z", "Reliability R", "Probability of failure 1 − R", "Failures per million"]
+    行: [["0.03", "", "", "", ""], ["0.10", "", "", "", ""], ["0.15", "", "", "", ""], ["0.25", "", "", "", ""]]
+  - 标题: ["表 2  达到要求的可靠度需要的安全系数", "Table 2  Safety factor needed for a required reliability"]
+    表头: ["场景", "Clim", "Cσ", "要求的失效概率", "需要的 S", "正文或规范的值"]
+    表头英文: ["Scene", "Clim", "Cσ", "Required probability of failure", "Required S", "Text or code value"]
+    行: [["外伸段", "0.08", "0.25", "1 × 10⁻⁶", "", "算例 1.5.2"], ["电梯钢丝绳", "0.05", "0.35", "1 × 10⁻⁷", "", "≥ 12（GB/T 7588.1）"]]
+    行英文: [["Extension", "0.08", "0.25", "1 × 10⁻⁶", "", "Example 1.5.2"], ["Lift rope", "0.05", "0.35", "1 × 10⁻⁷", "", "≥ 12 (EN 81-20)"]]
+注意:
+  - ["正态分布的尾部是理想化的：失效概率小到百万分之一以下时，结果对分布形状非常敏感，只能用来比较方案，不能当作真实的事故率。", "The normal tail is an idealisation: below one in a million the result is very sensitive to the shape of the distribution, so use it to compare designs, not as a real accident rate."]
+  - ["电梯钢丝绳规范要求的安全系数远大于本实验算出的值，因为规范还考虑了磨损、锈蚀、疲劳使强度逐年下降，以及失效后果的严重性。", "Lift codes demand a much larger rope safety factor than this lab gives, because they also cover the loss of strength from wear, corrosion and fatigue over the years, and the gravity of a failure."]
+  - ["这里的应力只考虑一次加载（静强度）。反复加载的零件还要考虑疲劳，见第 11 章和第 40 章。", "The stress here is a single loading (static strength). Repeatedly loaded parts also need a fatigue check — Chapters 11 and 40."]
+思考题:
+  - ["为什么提高安全系数到一定程度以后，失效概率下降得越来越慢？哪一个变异系数在这时起主要作用？", "Why does raising the safety factor beyond a point reduce the probability of failure more and more slowly? Which COV dominates then?"]
+  - ["如果有了本批材料的拉伸试验数据，CS 会怎样变化？对需要的安全系数有什么影响？", "If tensile tests of this batch of material were available, how would CS change, and what would that do to the required safety factor?"]

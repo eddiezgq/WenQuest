@@ -1,8 +1,8 @@
 """7.2 节的示意图。
 
 图 7.2.1：欧拉法的几何意义：沿切线走一步；局部截断误差与全局误差（电机起动，h = 10 ms）。
-图 7.2.2：连杆单摆积分 2 s 的误差与步长（双对数坐标），斜率就是方法的阶。
-图 7.2.3：欧拉法仿真电机起动：h = 5 ms、30 ms、45 ms。
+图 7.2.3：连杆单摆积分 2 s 的误差与步长（双对数坐标），斜率就是方法的阶。
+图 7.2.2：欧拉法仿真电机起动：h = 5 ms、30 ms、45 ms。
 图 7.2.4：长时间仿真中的能量误差：(a) 欧拉法 10 s；(b) RK4、辛欧拉法、施特默-韦莱法 1000 s。
 图 7.2.5：相空间中一小片初始状态经过 2 s 后的样子：欧拉法使面积变大，辛欧拉法保持面积。
 图 7.2.6：陀螺仪积分：(a) 姿态误差与步长；(b) 正交性误差随时间增长。
@@ -14,9 +14,10 @@ from scipy.integrate import solve_ivp
 
 from _ode import (angle_between, cone_R, euler, lie_integrate, lie_step, orth, link_params, motor_first_order, pend_energy, pend_f, rk4, run, run_pend, symp_euler,
                   verlet)
-from bookout import COLORS, T, figure, style
+from bookout import COLORS, T, figure, style, LANG
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 C = COLORS
 box = dict(fc="white", ec="none", pad=1.0, alpha=0.9)
 PURPLE = "#8e44ad"
@@ -68,7 +69,7 @@ clean(ax)
 figure(fig, "fig7_2_1")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 7.2.2
+# ---------------------------------------------------------------- 图 7.2.3
 Jo, lc, wn2 = link_params()
 x0 = np.array([math.pi / 2, 0.0])
 ref = solve_ivp(pend_f(wn2), (0, 2.0), x0, method="DOP853", rtol=1e-13, atol=1e-13).y[:, -1]
@@ -90,10 +91,10 @@ ax.grid(True, which="major", lw=0.3, alpha=0.5)
 ax.legend(loc="lower right", frameon=False, fontsize=9)
 ax.set_xlim(1e-3, 0.06)
 clean(ax)
-figure(fig, "fig7_2_2")
+figure(fig, "fig7_2_3")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 7.2.3
+# ---------------------------------------------------------------- 图 7.2.2
 fig, ax = plt.subplots(figsize=(5.8, 3.6))
 ts = np.linspace(0, 0.32, 400)
 ax.plot(ts * 1e3, w_ex(ts), color=C["ink"], lw=1.8, label=T("精确解", "exact solution"))
@@ -109,7 +110,7 @@ ax.set_ylabel(T("转速 ω / (rad/s)", "speed ω / (rad/s)"))
 ax.text(250, 570, T("h > 2τ：发散", "h > 2τ: diverges"), color=C["x"], fontsize=10, bbox=box)
 ax.legend(loc="upper left", bbox_to_anchor=(1.0, 1.0), frameon=False, fontsize=9)
 clean(ax)
-figure(fig, "fig7_2_3")
+figure(fig, "fig7_2_2")
 plt.close(fig)
 
 # ---------------------------------------------------------------- 图 7.2.4
@@ -123,7 +124,7 @@ a1.axhline(2, color=C["muted"], lw=0.6, ls=":")
 a1.text(0.3, 2.08, T("高于此线：连杆越过顶点", "above: the link goes over the top"), fontsize=8.5, color=C["muted"])
 a1.set_xlabel(T("时间 t / s", "time t / s"))
 a1.set_ylabel(T("能量 E / E(0)", "energy E / E(0)"))
-a1.set_title(T("(a) 欧拉法，h = 0.02 s", "(a) Euler, h = 0.02 s"), fontsize=10.5)
+a1.set_title(T("(a) 欧拉法，h = 0.02 s", "(a) Euler's method, h = 0.02 s"), fontsize=10.5)
 clean(a1)
 
 
@@ -218,10 +219,11 @@ for m_, (lab, col, mk) in names.items():
     es = [math.degrees(angle_between(lie_integrate(m_, 2.0, h), cone_R(2.0))) for h in hs]
     a1.loglog(hs, es, marker=mk, color=col, lw=1.2, ms=4.5, label=lab)
 a1.set_xlabel(T("步长 h / s", "step size h / s"))
-a1.set_ylabel(T("t = 2 s 时的姿态误差 / (°)", "attitude error at t = 2 s / (°)"))
+a1.set_ylabel(T("t = 2 s 时的姿态误差 / (°)", "orientation error at t = 2 s / (°)"))
 a1.set_title(T("(a) 误差与步长", "(a) error versus step size"), fontsize=10.5)
 a1.grid(True, which="major", lw=0.3, alpha=0.5)
-a1.legend(loc="lower right", frameon=False, fontsize=8.5)
+a1.legend(loc="lower right", frameon=False,
+          **(dict(fontsize=8.5) if LANG == "zh" else dict(fontsize=8, handlelength=1.4, borderaxespad=0.1)))   # 英文图例较宽，避免压住曲线
 clean(a1)
 h = 0.01
 for m_ in ("euler", "rk4", "lie", "mag4"):

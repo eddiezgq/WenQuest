@@ -9,7 +9,7 @@
      "Crossing: velocity over ground = velocity through water + current. To land opposite, the sum must be perpendicular to the bank, so the along-bank component of the boat's velocity cancels the current."]
 步骤:
   - ["选“SCARA 末端去抓零件”。先用余弦定理算出末端到达零件 (0.45, 0.30) m 时所需的 θ₂，再算 θ₁，填入表 1；然后调两个关节角，核对“离零件”小于 1 cm（任务 1）。", "Choose the SCARA scene. Use the law of cosines to find θ₂ for reaching the part at (0.45, 0.30) m, then θ₁; enter them in Table 1, set the joints and check that the distance is below 1 cm (task 1)."]
-  - ["把 θ₂ 改成相反的符号，重新算 θ₁，找到另一种构型（任务 2）。比较两种构型中 a、b 的分量，验证 r 相同。", "Reverse the sign of θ₂, recompute θ₁ and find the other configuration (task 2). Compare the components of a and b and check that r is the same."]
+  - ["把 θ₂ 改成相反的符号，重新算 θ₁，找到另一种构型（“左手”或“右手”，任务 2）。比较两种构型中 a、b 的分量，验证 r 相同。", "Reverse the sign of θ₂, recompute θ₁ and find the other configuration (task 2). Compare the components of a and b and check that r is the same."]
   - ["选“AGV 三段路线回到起点”。用分量算出前两段之和，第三段应等于它的负矢量；算出长度和方向，调好后核对离起点小于 0.25 m（任务 3）。", "Choose the AGV scene. Add the first two legs by components; leg 3 must be its negative. Compute its length and direction and check that the AGV ends within 0.25 m of the start (task 3)."]
   - ["选“渡河”，船速 2.0 m/s。算出船头应偏向上游多少度，调好后核对下游偏离小于 1 m（任务 4）。再把船速调到 0.8 m/s，看能不能正对着过河。", "Choose the river, boat speed 2.0 m/s. Compute the heading upstream, set it and check that the drift is below 1 m (task 4). Then try a boat speed of 0.8 m/s."]
 数据表:

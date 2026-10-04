@@ -1,7 +1,7 @@
 """14.5 节的示意图。
 
-图 14.5.1：UR5e 到达算例 14.5.1 的目标位姿的 8 组解（编号、标签与表 14.5.1 相同）。8 种形态的法兰盘都在同一处、朝向相同。
-图 14.5.2：求 θ1 的几何（俯视）：关节 2、3、4 所在的平面离基座轴线恒为 d4，所以这个平面与半径 d4 的圆相切；
+图 14.5.2：UR5e 到达算例 14.5.1 的目标位姿的 8 组解（编号、标签与表 14.5.1 相同）。8 种形态的法兰盘都在同一处、朝向相同。
+图 14.5.1：求 θ1 的几何（俯视）：关节 2、3、4 所在的平面离基座轴线恒为 d4，所以这个平面与半径 d4 的圆相切；
            腕点 p_w 要落在这个平面内，过 p_w 作圆的两条切线，得到 θ1 的两个解。
 """
 import math
@@ -18,7 +18,7 @@ Td = ur_fk(ths)
 sols = ur_ik(Td)
 ordered = ur_ordered(sols)                         # 与表 14.5.1 相同的次序和标签
 
-# ---------------------------------------------------------------- 图 14.5.1
+# ---------------------------------------------------------------- 图 14.5.2
 fig = plt.figure(figsize=(10.4, 5.6))
 pts_all = np.vstack([ur_chain(s) for s, _ in ordered])
 for k, (s, lab) in enumerate(ordered):
@@ -36,10 +36,10 @@ for k, (s, lab) in enumerate(ordered):
     txt = f"{k + 1}  {T('肩', 'sh.')} {lab[0]} · {T('肘', 'elb.')} {T('上', 'up') if up else T('下', 'down')} · {T('腕', 'wr.')} {T('不翻', 'no flip') if lab[2] else T('翻', 'flip')}"
     ax.set_title(txt, fontsize=9, pad=-4)
     equal3d(ax, pts_all, pad=0.02, zoom=1.35)
-figure(fig, "fig14_5_1")
+figure(fig, "fig14_5_2")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 14.5.2
+# ---------------------------------------------------------------- 图 14.5.1
 fig, ax = plt.subplots(figsize=(6.2, 5.0))
 plane(ax, (-0.95, 0.4), (-0.8, 0.35))
 pw = Td[:3, 3] - W4 * Td[:3, 1]
@@ -69,5 +69,5 @@ for sg, col, name in ((1, C["z"], "A"), (-1, C["accent"], "B")):
     ax.annotate("", xy=foot + 0.12 * w2, xytext=foot, arrowprops=dict(arrowstyle="-|>", color=col, lw=1.0))
 ax.text(0.03, -0.17, r"$d_4$", fontsize=11, color=BLUE2)
 ax.text(-0.93, 0.28, T("俯视：手臂平面与半径 $d_4$ 的圆相切，并经过 $p_w$", "top view: the arm plane touches the circle of radius $d_4$ and passes through $p_w$"), fontsize=9.5, color=C["ink"])
-figure(fig, "fig14_5_2")
+figure(fig, "fig14_5_1")
 plt.close(fig)

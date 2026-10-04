@@ -28,8 +28,8 @@ def table(center, ang):
 class Lesson(Base):
     def construct(self):
         self.title("10.6", "转台上的科氏偏转", "Coriolis deflection on a turntable")
-        lt = zh("地面上看", 24, INK).move_to(LC + UP * 2.3)
-        rt = zh("转台上看", 24, INK).move_to(RC + UP * 2.3)
+        lt = bi(["地面上看", "Seen from the ground"], 24, INK).move_to(LC + UP * 2.3)
+        rt = bi(["转台上看", "Seen on the table"], 24, INK).move_to(RC + UP * 2.3)
         self.play(FadeIn(lt), FadeIn(rt))
         t = ValueTracker(0.0)
         left_tab = always_redraw(lambda: table(LC, OM * t.get_value()))

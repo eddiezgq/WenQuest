@@ -74,7 +74,7 @@ for P, Q in (((B[0], 0, 0), (B[0], B[1], 0)), ((0, B[1], 0), (B[0], B[1], 0)), (
     ax.plot(*zip(P, Q), color=d.MUTED, lw=0.8, ls="--")
 for v, n in ((np.array([1, 0, 0]), "i"), (np.array([0, 1, 0]), "j"), (np.array([0, 0, 1]), "k")):
     ax.quiver(0, 0, 0, *v, color=d.INK, lw=2.2, arrow_length_ratio=0.3)
-    ax.text(*(v * 1.15 + np.array([0, 0, 0.05])), rf"$\boldsymbol{{{n}}}$", fontsize=11)
+    ax.text(*(v * 1.15 + np.array([0.15, -0.25, 0.0]) * (n == "j") + np.array([0, 0, 0.05])), rf"$\boldsymbol{{{n}}}$", fontsize=11)
 ax.set_xlim(0, 4); ax.set_ylim(0, 4); ax.set_zlim(0, 3)
 ax.view_init(elev=20, azim=-55); ax.set_axis_off(); ax.set_box_aspect((1, 1, 0.75))
 ax.set_title(T("空间", "space") + r"：$\boldsymbol{A}=A_x\boldsymbol{i}+A_y\boldsymbol{j}+A_z\boldsymbol{k}$", fontsize=9)
@@ -112,16 +112,16 @@ for k, ax in enumerate(axs):
     if k == 0:
         d.arrow(ax, (0, 0), (2.0, 0), d.X_, lw=1.2); ax.text(2.1, -0.05, "x", color=d.X_)
         d.arrow(ax, (0, 0), (0, 1.5), d.Y_, lw=1.2); ax.text(0.08, 1.45, "y", color=d.Y_)
-        d.arrow(ax, (0, 0), w, d.VR, lw=2.4); ax.text(w[0] + 0.12, w[1] + 0.3, r"$\boldsymbol{W}$", color=d.VR, fontsize=12)
+        d.arrow(ax, (0, 0), w, d.VR, lw=2.4); ax.text(w[0] + 0.12, w[1] + 0.3, r"$\boldsymbol{F}_\mathrm{g}$", color=d.VR, fontsize=12)
         ax.set_title(T("水平—竖直坐标：", "level axes: ") + r"$(0,\ -mg)$", fontsize=9)
     else:
         d.arrow(ax, (0, 0), 2.0 * ex, d.X_, lw=1.2); ax.text(*(2.1 * ex), "x′", color=d.X_)
         d.arrow(ax, (0, 0), 1.5 * ey, d.Y_, lw=1.2); ax.text(*(1.5 * ey + np.array([0.08, 0])), "y′", color=d.Y_)
         px, py = (w @ ex) * ex, (w @ ey) * ey
         ax.plot([px[0], w[0]], [px[1], w[1]], color=d.MUTED, lw=0.8, ls="--"); ax.plot([py[0], w[0]], [py[1], w[1]], color=d.MUTED, lw=0.8, ls="--")
-        d.arrow(ax, (0, 0), w, d.VR, lw=2.4); ax.text(w[0] - 0.12, w[1] + 0.25, r"$\boldsymbol{W}$", color=d.VR, fontsize=12, ha="right")
-        d.arrow(ax, (0, 0), px, d.X_, lw=2.2); ax.text(px[0] - 0.15, px[1] + 0.2, r"$W_{x'}$", color=d.X_, fontsize=11, ha="right")
-        d.arrow(ax, (0, 0), py, d.Y_, lw=2.2); ax.text(py[0] + 0.15, py[1] + 0.35, r"$W_{y'}$", color=d.Y_, fontsize=11, ha="left")
+        d.arrow(ax, (0, 0), w, d.VR, lw=2.4); ax.text(w[0] - 0.12, w[1] + 0.25, r"$\boldsymbol{F}_\mathrm{g}$", color=d.VR, fontsize=12, ha="right")
+        d.arrow(ax, (0, 0), px, d.X_, lw=2.2); ax.text(px[0] - 0.15, px[1] + 0.2, r"$F_{\mathrm{g},x'}$", color=d.X_, fontsize=11, ha="right")
+        d.arrow(ax, (0, 0), py, d.Y_, lw=2.2); ax.text(py[0] + 0.15, py[1] + 0.35, r"$F_{\mathrm{g},y'}$", color=d.Y_, fontsize=11, ha="left")
         ax.set_title(T("沿坡—垂直坡面坐标：", "slope axes: ") + r"$(-mg\sin\alpha,\ -mg\cos\alpha)$", fontsize=9)
     ax.set_xlim(-2.7, 2.7); ax.set_ylim(-2.4, 1.9); ax.set_aspect("equal"); d.clean(ax)
 figure(fig, "fig2_3_3")

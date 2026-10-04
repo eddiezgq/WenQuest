@@ -1,9 +1,9 @@
 # 实验 12.2 的指导书与报告模板。目的、场景、参数、任务取自 lab12_2.js。
 原理:
   - ["指数积公式的空间形式：从零位出发，想象先转最外面的关节 n，再转关节 n − 1，……最后转关节 1。每转一个关节，它以内的连杆都还没动，所以它的轴仍在零位时的位置。",
-     "Space form: from home, imagine turning the outermost joint first, then the next one in, and joint 1 last. When a joint turns, the links inside it have not moved, so its axis is still where it was at home."]
+     "Space form: from the zero position, imagine turning the outermost joint first, then the next one in, and joint 1 last. When a joint turns, the links inside it have not moved, so its axis is still where it was at the zero position."]
   - 式: "T = e^[S₁]θ₁ e^[S₂]θ₂ ⋯ e^[Sₙ]θₙ M          (12.2.3)"
-  - ["把 M 搬到左边，各旋量轴换成在零位末端坐标系 {b} 中的表示 B_i = [Ad_{M⁻¹}] S_i，得到物体形式：", "Moving M to the left and expressing the axes in the home tool frame {b}, B_i = [Ad_{M⁻¹}] S_i, gives the body form:"]
+  - ["把 M 搬到左边，各旋量轴换成在零位末端坐标系 {b} 中的表示 B_i = [Ad_{M⁻¹}] S_i，得到物体形式：", "Moving M to the left and expressing the axes in the end-effector frame {b} at the zero position, B_i = [Ad_{M⁻¹}] S_i, gives the body form:"]
   - 式: "T = M e^[B₁]θ₁ e^[B₂]θ₂ ⋯ e^[Bₙ]θₙ          (12.2.5)"
   - ["平面 3R 臂（L₁ = 0.425 m，L₂ = 0.392 m，L₃ = 0.1 m）可以用几何方法核对：x = L₁cos θ₁ + L₂cos(θ₁ + θ₂) + L₃cos(θ₁ + θ₂ + θ₃)，y 同理。",
      "For the planar 3R arm (L₁ = 0.425 m, L₂ = 0.392 m, L₃ = 0.1 m) geometry gives a check: x = L₁cos θ₁ + L₂cos(θ₁ + θ₂) + L₃cos(θ₁ + θ₂ + θ₃), and likewise y."]
