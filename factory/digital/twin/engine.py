@@ -12,7 +12,7 @@ import math
 from twin import models as M
 
 WINDOW_DAYS = 30
-EWMA = 0.4
+EWMA = 0.5
 
 
 def new_state():
@@ -41,7 +41,8 @@ def update(state, t, design=None):
     row = {"day": t["day"], "period_h": t.get("period_h", 24), "run_h": run_h, "starts": t.get("starts", 0),
            "t_amb_c": t.get("t_amb_c"), "torque_mean_nm": t.get("torque_mean_nm"), "torque_max_nm": t.get("torque_max_nm"),
            "oil_t_c": t.get("oil_t_c"), "oil_t_max_c": t.get("oil_t_max_c"), "vib_mm_s": t.get("vib_mm_s"),
-           "n_in_rpm": n_in, "d_shaft": ds, "d_brg": db}
+           "n_in_rpm": n_in, "d_shaft": ds, "d_brg": db,
+           "rainflow": t.get("rainflow") or [], "load_hist": t.get("load_hist") or []}
     if run_h > 0 and t.get("torque_mean_nm") is not None and t.get("oil_t_c") is not None:
         model = M.oil_temp_model(t["torque_mean_nm"], t["t_amb_c"], n_in)
         r = t["oil_t_c"] - model

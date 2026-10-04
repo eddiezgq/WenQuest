@@ -19,6 +19,7 @@ import zlib
 
 from psycopg.types.json import Jsonb
 
+from twin import diagnose as DG
 from twin import engine as E
 from twin import field as F
 from twin import models as M
@@ -41,6 +42,7 @@ create table if not exists twin (
     updated  timestamptz not null default now(),
     primary key (serial, mode)
 );
+alter table twin add column if not exists health text not null default 'green';
 create table if not exists twin_log (
     serial text not null,
     mode   text not null,
@@ -181,7 +183,43 @@ class TwinService:
             self.db.x("update twin set state=%s, updated=now(), site=coalesce(site, %s), customer=coalesce(customer, %s), "
                       "start_day=coalesce(start_day, %s) where serial=%s and mode=%s",
                       (Jsonb(st), d.get("site"), d.get("customer"), st["first_day"], serial, mode))
+            if not msg.get("_seed"):
+                self.check(serial, mode, st, r["as_built"])
             return st
+
+    def check(self, serial, mode, st=None, as_built=None, announce=True):
+        """诊断，并和已开着的报警对账：新的开一条（发 AI 提醒），升级的更新，消失的关掉"""
+        if st is None:
+            r = self.db.one("select state, as_built from twin where serial=%s and mode=%s", (serial, mode))
+            st, as_built = r["state"], r["as_built"]
+        logs = [x["data"] for x in reversed(self.db.q(
+            "select data from twin_log where serial=%s and mode=%s order by day desc limit 30", (serial, mode)))]
+        found = DG.diagnose(st, logs, as_built)
+        open_ = {e["kind"]: e for e in self.db.q(
+            "select * from twin_event where serial=%s and mode=%s and status in ('open', 'ordered') and kind not in ('maint', 'order')",
+            (serial, mode))}
+        for f in found:
+            e = open_.pop(f["kind"], None)
+            detail = Jsonb(DG_json(f))
+            if e is None:
+                self.db.x("insert into twin_event (serial, mode, day, kind, level, title, detail) values (%s,%s,%s,%s,%s,%s,%s)",
+                          (serial, mode, f["day"], f["kind"], f["level"], f["title"], detail))
+                fire = announce and f["level"] != "info"
+            else:
+                up = DG.LEVEL[f["level"]] > DG.LEVEL[e["level"]]
+                self.db.x("update twin_event set level=%s, title=%s, detail=%s, day=%s where id=%s",
+                          (f["level"], f["title"], detail, f["day"], e["id"]))
+                fire = announce and up
+            if fire:
+                self.publish(topic("ai", "alert"), "ai.alert", "twin",
+                             {"level": f["level"], "title": "{} {}".format(serial, f["title"]), "detail": f["detail"] + f["cause"],
+                              "evidence": [{"topic": topic("field", serial, "telemetry"), "serial": serial, "day": f["day"]}],
+                              "action_hint": f["advice"], "key": "twin:{}:{}".format(serial, f["kind"])}, serial, mode)
+        for e in open_.values():                       # 没再出现：没派单的“已消失”，派过单的“已解决”
+            self.db.x("update twin_event set status=%s where id=%s", ("resolved" if e["status"] == "ordered" else "cleared", e["id"]))
+        h = DG.health(found)
+        self.db.x("update twin set health=%s where serial=%s and mode=%s", (h, serial, mode))
+        return found
 
     # ------------------------------------------------------------ 现场时钟
     def field_today(self, mode):
@@ -252,17 +290,18 @@ class TwinService:
             daily_from = today - dt.timedelta(days=14)
             neglect = i == 4                                    # 这一台磨合后换过一次油就再没换过（练“换油到期”）
             while day < daily_from:
-                self._emit(mode, serial, site, day, faults, 7)
+                self._emit(mode, serial, site, day, faults, 7, direct=True)
                 self._seed_service(mode, serial, day, neglect)
                 n += 1
                 day += dt.timedelta(days=7)
             day = day - dt.timedelta(days=6)
             while day < today:
-                self._emit(mode, serial, site, day, faults, 1)
+                self._emit(mode, serial, site, day, faults, 1, direct=True)
                 self._seed_service(mode, serial, day, neglect)
                 n += 1
                 day += dt.timedelta(days=1)
             self.db.x("update field_unit set last_day=%s where serial=%s and mode=%s", (today - dt.timedelta(days=1), serial, mode))
+            self.check(serial, mode, announce=False)
         log.info("数字孪生：已建 %s 台情景设备，补发 %s 条历史运行摘要（%s）", len(SEED), n, mode)
         return n
 
@@ -277,8 +316,12 @@ class TwinService:
             self.db.x("insert into twin_event (serial, mode, day, kind, level, title, status, detail) values (%s,%s,%s,'maint','info',%s,'done',%s)",
                       (serial, mode, day, "换油（例行保养）", Jsonb({"action": "oil", "eq_h": round(sm["oil"]["eq_h"])})))
 
-    def _emit(self, mode, serial, site, day, faults, period_days):
+    def _emit(self, mode, serial, site, day, faults, period_days, direct=False):
         data = F.day_summary(serial, site, day, faults, period_days)
+        if direct:                       # 情景设备的历史：直接记进孪生（相当于导入历史数据），不占总线和历史库
+            import wqbus
+            self.ingest(dict(wqbus.make("twin.telemetry", "field-sim/" + site, data, mode=mode, corr=serial), _seed=True))
+            return
         self.publish(topic("field", serial, "telemetry"), "twin.telemetry", "field-sim/" + site, data, serial, mode)
 
     def tick(self, mode):
@@ -310,6 +353,37 @@ class TwinService:
                 except Exception:  # noqa: BLE001
                     log.exception("现场模拟出错（%s）", mode)
 
+    def set_fault(self, mode, serial, kind):
+        """老师：给一台现场设备“制造”故障（从当前现场日开始）；kind=None 清除全部"""
+        u = self.db.one("select * from field_unit where serial=%s and mode=%s", (serial, mode))
+        if u is None:
+            raise KeyError(serial)
+        if kind is None:
+            faults = []
+        else:
+            if kind not in F.FAULTS:
+                raise ValueError("没有这种故障：" + str(kind))
+            faults = [f for f in u["faults"] if f["kind"] != kind] + [{"kind": kind, "start": self.field_today(mode).isoformat()}]
+        self.db.x("update field_unit set faults=%s where serial=%s and mode=%s", (Jsonb(faults), serial, mode))
+        return faults
+
+    def repair(self, mode, serial, action, day=None):
+        """维修完成回写（第 4 步接维修单）：寿命复位，现场的对应故障消失"""
+        with self.lock:
+            r = self.db.one("select state from twin where serial=%s and mode=%s", (serial, mode))
+            day = day or r["state"].get("last_day") or self.field_today(mode).isoformat()
+            st = E.maintain(r["state"], action, day)
+            self.db.x("update twin set state=%s where serial=%s and mode=%s", (Jsonb(st), serial, mode))
+            fix = {"oil": None, "cooling": "cooling"}.get(action, "bearing" if action.startswith("bearing") else None)
+            u = self.db.one("select faults from field_unit where serial=%s and mode=%s", (serial, mode))
+            if u and fix:
+                self.db.x("update field_unit set faults=%s where serial=%s and mode=%s",
+                          (Jsonb([f for f in u["faults"] if f["kind"] != fix]), serial, mode))
+            self.db.x("insert into twin_event (serial, mode, day, kind, level, title, status, detail) values (%s,%s,%s,'maint','info',%s,'done',%s)",
+                      (serial, mode, day, MAINT_NAME.get(action.split(":")[0], action), Jsonb({"action": action})))
+            self.check(serial, mode, st)
+            return st
+
     def reset(self, mode, reseed=True):
         """教学情景重置：孪生、现场、日志全部清空，重新建情景设备"""
         with self.lock:
@@ -317,6 +391,13 @@ class TwinService:
                 self.db.x("delete from {} where mode=%s".format(t), (mode,))
         if reseed and mode in FIELD_MODES:
             threading.Thread(target=self.seed, args=(mode,), daemon=True).start()
+
+
+MAINT_NAME = {"oil": "换油", "bearing": "更换轴承", "cooling": "清洁散热、修风扇、补油"}
+
+
+def DG_json(f):
+    return json.loads(json.dumps(f, default=str))
 
 
 def _runin_summary(d):
@@ -341,11 +422,15 @@ def _seed_shaft(serial, start):
 
 def fleet(db, mode):
     out = []
-    for r in db.q("select serial, item, source, site, customer, start_day, state, created from twin where mode=%s order by serial", (mode,)):
+    events = {}
+    for e in db.q("select serial, kind, level, title, status from twin_event where mode=%s and status in ('open', 'ordered') "
+                  "and kind not in ('maint', 'order')", (mode,)):
+        events.setdefault(e["serial"], []).append({"kind": e["kind"], "level": e["level"], "title": e["title"], "ordered": e["status"] == "ordered"})
+    for r in db.q("select serial, item, source, site, customer, start_day, state, created, health from twin where mode=%s order by serial", (mode,)):
         sm = E.summary(r["state"])
         out.append({"serial": r["serial"], "item": r["item"], "source": r["source"], "site": r["site"], "customer": r["customer"],
                     "start_day": r["start_day"].isoformat() if r["start_day"] else None, "run_h": r["state"]["run_h"],
-                    "last": r["state"].get("last"), "summary": sm})
+                    "last": r["state"].get("last"), "summary": sm, "health": r["health"], "alerts": events.get(r["serial"], [])})
     return out
 
 
@@ -356,9 +441,12 @@ def detail(db, mode, serial, days=400):
     logs = db.q("select day, data from twin_log where serial=%s and mode=%s order by day desc limit %s", (serial, mode, days))
     ab = dict(r["as_built"] or {})
     ab.pop("runin_samples", None)
-    return {"serial": serial, "item": r["item"], "source": r["source"], "site": r["site"], "customer": r["customer"],
+    P = M.bearing_loads(M.RATED_T_NM, ab.get("design"))
+    n = M.speeds()
+    model = {"loads": P, "l10": {b[0]: M.l10_hours(b[3], P[b[0]], n[b[4]]) for b in M.BEARINGS}}
+    return {"serial": serial, "item": r["item"], "source": r["source"], "site": r["site"], "customer": r["customer"], "health": r["health"],
             "start_day": r["start_day"].isoformat() if r["start_day"] else None, "as_built": ab, "state": r["state"],
-            "summary": E.summary(r["state"]), "log": [x["data"] for x in reversed(logs)],
+            "summary": E.summary(r["state"]), "log": [x["data"] for x in reversed(logs)], "model": model,
             "events": [dict(e, ts=e["ts"].isoformat(), day=e["day"].isoformat() if e["day"] else None)
                        for e in db.q("select * from twin_event where serial=%s and mode=%s order by ts desc limit 50", (serial, mode))]}
 

@@ -186,6 +186,9 @@ jobs:
             dc() { docker compose -p wq-factory -f /tmp/fac/docker-compose.yml -f /tmp/fac/ci.yml -f /tmp/fac/docker-compose.classes.yml "$@"; }
             { tail -n 60 /tmp/logs/class_setup.log; echo "---- 闭环 ----"; grep -v "ERPNext 进度" /tmp/logs/class_loop.log 2>/dev/null | tail -n 60;
               echo "---- 枢纽 ----"; dc logs --no-color --tail 40 hub-c-$id; echo "---- 桥接 ----"; dc logs --no-color --tail 40 bridge-c-$id; } > /tmp/logs/class_diag.log 2>&1
+            # 闭环测试的失败项单独发一条注释（混在长日志里会被截掉）
+            grep -v "ERPNext 进度" /tmp/logs/class_loop.log 2>/dev/null | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/class_fail.log
+            python3 factory/deploy/ci_annotate.py 班级工厂闭环失败项 /tmp/logs/class_fail.log 40
             python3 factory/deploy/ci_annotate.py 班级工厂诊断 /tmp/logs/class_diag.log 200
           fi
           exit "$st"

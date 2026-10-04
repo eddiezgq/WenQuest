@@ -217,3 +217,169 @@ def test_real_device_without_record_and_seed(db, monkeypatch):
     assert by
     tw.reset("teach", reseed=False)
     assert not db.q("select * from twin where mode='teach'")
+
+
+# ---------------------------------------------------------------- 第 2 步：异常判断
+def _diag_run(site, days, faults=None, serial="WQR105-T-09", d0=dt.date(2026, 3, 1)):
+    from twin import diagnose as DG
+    s, logs, hist = E.new_state(), [], []
+    for i in range(days):
+        s, row = E.update(s, F.day_summary(serial, site, d0 + dt.timedelta(days=i), faults))
+        logs.append(row)
+        hist.append(DG.diagnose(s, logs[-30:]))
+    return s, hist
+
+
+def test_no_false_alarm_in_normal_month():
+    for site in F.SITES:
+        for serial in ("WQR105-T-11", "WQR105-T-12", "WQR105-T-13"):
+            _, hist = _diag_run(site, 31, serial=serial)
+            # 保养到期（磨合后首次换油）是该报的，不算误报
+            bad = [(i, f["kind"], f["title"]) for i, fs in enumerate(hist) for f in fs if f["level"] != "info" and f["kind"] != "oil"]
+            assert not bad, (site, serial, bad[:3])
+
+
+def test_cooling_fault_detected_within_a_day():
+    _, hist = _diag_run("port", 12, [{"kind": "cooling", "start": "2026-03-06"}])
+    assert not any(f["kind"] == "cooling" for fs in hist[:5] for f in fs)
+    hit = next(i for i, fs in enumerate(hist) if any(f["kind"] == "cooling" for f in fs))
+    assert hit - 5 <= 1                                              # 故障开始后 1 个现场日内
+    f = next(f for f in hist[hit] if f["kind"] == "cooling")
+    assert "散热变差" in f["title"] and f["action"]["kind"] == "cooling"
+    assert not any(f["kind"] == "bearing" for fs in hist for f in fs)
+
+
+def test_bearing_fault_detected_and_located():
+    _, hist = _diag_run("mine", 40, [{"kind": "bearing", "start": "2026-03-06"}])
+    first = next(i for i, fs in enumerate(hist) if any(f["kind"] == "bearing" for f in fs))
+    assert 5 < first < 25
+    f = next(f for f in hist[first] if f["kind"] == "bearing")
+    assert f["level"] == "warn" and "中间轴轴承 B" in f["cause"] and f["action"]["kind"] == "bearing:mid-B"
+    assert any(f["kind"] == "bearing" and f["level"] == "critical" for f in hist[-1])
+    assert not any(f["kind"] == "cooling" and "散热变差" in f["title"] for fs in hist[:first] for f in fs)
+
+
+def test_overload_detected():
+    _, hist = _diag_run("mine", 10, [{"kind": "overload", "start": "2026-03-01"}])
+    assert any(f["kind"] == "overload" and f["level"] == "warn" for f in hist[-1])
+    _, hist = _diag_run("mine", 10)
+    assert not any(f["kind"] == "overload" for fs in hist for f in fs)
+
+
+def test_fleet_health_and_repair(db, monkeypatch):
+    from hub import twin as TW
+    monkeypatch.setattr(TW, "FIELD_MODES", ["teach"])
+    tw, sent, hist = _service(db)
+    tw.seed("teach")
+    fl = {u["serial"]: u for u in TW.fleet(db, "teach")}
+    bad = {s: [a["kind"] for a in u["alerts"]] for s, u in fl.items() if u["health"] != "green"}
+    kinds = sorted(k for v in bad.values() for k in v)
+    assert "bearing" in kinds and "cooling" in kinds and "oil" in kinds, bad
+    assert not [m for _, m in sent if m["type"] == "ai.alert"]       # 情景历史不发提醒
+    brg = next(s for s, v in bad.items() if "bearing" in v)
+    # 修好：换中间轴轴承 B → 寿命复位、故障从现场消失；之后的数据不再报警
+    tw.repair("teach", brg, "bearing:mid-B")
+    st = db.one("select state from twin where serial=%s", (brg,))["state"]
+    assert st["brg_D"]["mid-B"] == 0 and not db.one("select faults from field_unit where serial=%s", (brg,))["faults"]
+    db.x("update field_clock set anchor_day = anchor_day + 3 where mode='teach'")
+    tw.tick("teach")
+    assert "bearing" not in [a["kind"] for a in next(u for u in TW.fleet(db, "teach") if u["serial"] == brg)["alerts"]]
+    # 老师制造故障 → 报警并发 AI 提醒
+    ok = next(s for s, u in fl.items() if u["health"] == "green" and u["site"] == "port")
+    tw.set_fault("teach", ok, "cooling")
+    db.x("update field_clock set anchor_day = anchor_day + 3 where mode='teach'")
+    tw.tick("teach")
+    u = next(u for u in TW.fleet(db, "teach") if u["serial"] == ok)
+    assert u["health"] != "green" and any(a["kind"] == "cooling" for a in u["alerts"])
+    assert any(m["type"] == "ai.alert" and ok in m["data"]["title"] for _, m in sent)
+    with pytest.raises(ValueError):
+        tw.set_fault("teach", ok, "nope")
+
+
+def test_whatif_load_fan_material():
+    from twin import whatif as W
+    s, logs = E.new_state(), []
+    for i in range(40):
+        s, row = E.update(s, F.day_summary("WQR105-T-21", "mine", dt.date(2026, 3, 1) + dt.timedelta(days=i)))
+        logs.append(row)
+    base = W.compare(s, logs)
+    assert base["base"]["bearing_days"] == base["alt"]["bearing_days"]
+    r = W.compare(s, logs, load=0.8)
+    # 剩余寿命 = (1 − 已用) / 速度：速度变成 0.8³ 倍
+    assert abs(r["alt"]["bearing_days"] / r["base"]["bearing_days"] - 1 / 0.8 ** 3) < 1e-6
+    f = W.compare(s, logs, fan=True)
+    assert f["alt"]["oil_t_c"] < f["base"]["oil_t_c"] - 10 and f["alt"]["oil_interval_days"] >= f["base"]["oil_interval_days"]
+    assert f["alt"]["bearing_days"] == f["base"]["bearing_days"]
+    m = W.compare(s, logs, mat="40Cr-QT")
+    assert m["alt"]["shaft_days"] > m["base"]["shaft_days"]
+
+
+def test_api_order_done_explain_feedback(db, monkeypatch):
+    """网页接口：机队、详情、假如、AI 说明（规则）、开维修单（提议 → 确认）、维修完成（寿命复位、ERPNext 工单改为已解决）、反馈设计"""
+    import importlib
+    from fastapi.testclient import TestClient
+    monkeypatch.setenv("WQ_HUB_NO_START", "1")
+    monkeypatch.setenv("WQ_SECRET", "t")
+    import hub.app as app_mod
+    app_mod = importlib.reload(app_mod)
+    from hub import twin as TW
+    from hub.ai import Assistant
+    from hub.historian import Historian
+    monkeypatch.setattr(TW, "FIELD_MODES", ["teach"])
+    sent = []
+
+    def publish(tp, type_, source, data, corr=None, mode=None):
+        msg = wqbus.make(type_, source, data, mode=mode or "teach", corr=corr)
+        sent.append((tp, msg))
+        app_mod.H.hist.handle(tp, msg)
+        return msg
+    app_mod.H.db = db
+    app_mod.H.twin = TW.TwinService(db, publish)
+    app_mod.H.twin.init()
+    app_mod.H.hist = Historian(db, app_mod.H.twin.on_message)
+    app_mod.H.ai = Assistant(db, publish)
+
+    class _Teach:
+        def start(self, name):
+            pass
+    app_mod.H.teach = _Teach()
+    app_mod.H.twin.seed("teach")
+    c = TestClient(app_mod.app)
+    h = {"x-wq-token": c.post("/api/login", json={"name": "老师", "role": "manager", "mode": "teach"}).json()["token"]}
+    fl = c.get("/api/twin/fleet", headers=h).json()
+    assert len(fl["units"]) == 12 and fl["clock"]["simulated"]
+    brg = next(u for u in fl["units"] if any(a["kind"] == "bearing" for a in u["alerts"]))
+    d = c.get("/api/twin/units/" + brg["serial"], headers=h).json()
+    assert d["model"]["l10"]["mid-B"] > 10000
+    ev = next(e for e in d["events"] if e["kind"] == "bearing" and e["status"] == "open")
+    ex = c.post(f"/api/twin/units/{brg['serial']}/explain", headers=h).json()
+    assert ex["engine"] == "rules" and "中间轴轴承 B" in ex["text"]
+    wi = c.post(f"/api/twin/units/{brg['serial']}/whatif", json={"load": 0.8}, headers=h).json()
+    assert wi["alt"]["bearing_days"] > wi["base"]["bearing_days"]
+    assert c.post(f"/api/twin/units/{brg['serial']}/whatif", json={"load": 3}, headers=h).status_code == 400
+    pv = c.post(f"/api/twin/units/{brg['serial']}/order", json={"action": ev["detail"]["action"]["kind"], "event_id": ev["id"], "preview_only": True}, headers=h).json()
+    assert "中间轴轴承 B" in pv["subject"] and pv["priority"] in ("一般", "紧急")
+    r = c.post(f"/api/twin/units/{brg['serial']}/order", json={"action": ev["detail"]["action"]["kind"], "event_id": ev["id"]}, headers=h).json()
+    p = db.one("select * from ai_proposal where proposal_id=%s", (r["proposal_id"],))
+    assert p["status"] == "confirmed" and p["action"] == "twin_service_order"
+    assert any(m["type"] == "ai.proposal" and m["data"]["status"] == "confirmed" for _, m in sent)
+    # 桥接写进 ERPNext 后发回 erp.doc（这里模拟）
+    app_mod.H.ai.on_erp_result(wqbus.make("erp.doc", "bridge", {"doctype": "Issue", "name": "ISS-2026-00001", "action": "created",
+                                                                 "proposal_done": True, "created": [["Issue", "ISS-2026-00001"]]},
+                                          mode="teach", corr=r["proposal_id"]))
+    d = c.get("/api/twin/units/" + brg["serial"], headers=h).json()
+    o = next(e for e in d["events"] if e["kind"] == "order")
+    assert o["status"] == "ordered" and next(e for e in d["events"] if e["id"] == ev["id"])["status"] == "ordered"
+    assert c.post(f"/api/twin/units/{brg['serial']}/order", json={"action": "nope"}, headers=h).status_code == 400
+    done = c.post(f"/api/twin/units/{brg['serial']}/done", json={"order_id": o["id"], "note": "外圈剥落，已换"}, headers=h).json()
+    assert done["issue"] == "ISS-2026-00001"
+    p2 = db.one("select * from ai_proposal where action='twin_service_done'")
+    assert p2["status"] == "confirmed" and p2["preview"]["issue"] == "ISS-2026-00001" if isinstance(p2["preview"], dict) else "ISS-2026-00001" in p2["preview"]
+    d = c.get("/api/twin/units/" + brg["serial"], headers=h).json()
+    assert d["state"]["brg_D"]["mid-B"] == 0
+    assert next(e for e in d["events"] if e["id"] == ev["id"])["status"] == "resolved"
+    assert c.post(f"/api/twin/units/{brg['serial']}/done", json={"order_id": o["id"]}, headers=h).status_code == 409
+    fb = c.get("/api/twin/feedback", headers=h).json()
+    by = {s["site"]: s for s in fb["sites"]}
+    assert by["mine"]["eq_vs_rated"] > by["port"]["eq_vs_rated"] > by["food"]["eq_vs_rated"]
+    assert by["mine"]["worst_bearing"] == "mid-B" and any("6306" in n for n in fb["notes"])
