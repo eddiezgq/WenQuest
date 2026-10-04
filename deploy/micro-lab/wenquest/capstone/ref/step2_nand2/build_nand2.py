@@ -14,6 +14,7 @@
 """
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -24,6 +25,7 @@ from layout import U, check, place_nand2, run_magic, um  # noqa: E402
 
 
 def build(wn: float, wp: float, out: Path, schematic: Path | None = None) -> dict:
+    os.environ["WQ_OVERWRITE"] = "1"
     g = place_nand2(out, wn, wp)
     T, rings, xB, yP, n_top, p_bot = g["T"], g["rings"], g["xB"], g["yP"], g["n_top"], g["p_bot"]
     W = um(0.30)

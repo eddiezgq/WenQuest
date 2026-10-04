@@ -117,6 +117,8 @@ def flow(a):
         shutil.rmtree(work)
     shutil.copytree(cfg.parent, work, ignore=shutil.ignore_patterns("runs"))
     cmd = ["librelane", "--manual-pdk", "--pdk-root", PDK_ROOT, "--pdk", PDK, "--run-tag", "wq", "--overwrite", str(work / cfg.name)]
+    if not shutil.which("librelane"):
+        sys.exit("LibreLane is not installed here: run this step in the WenQuest lab image (wenquest/micro-lab).")
     t0 = time.time()
     with open(out / "librelane.log", "w") as log:
         p = subprocess.run(cmd, cwd=work, stdout=log, stderr=subprocess.STDOUT, timeout=4 * 3600)
@@ -291,7 +293,7 @@ def tt(a):
     res.update(fmt)
     res["ports"] = ports
     res["tt_ready"] = bool(res["tapeout_ready"] and fmt["top_name_ok"] and fmt["ports_ok"] and fmt["fits_one_tile"]
-                           and (res.get("antenna_violations") in (0, None)))
+                           and res.get("antenna_violations") is not None and float(res["antenna_violations"]) == 0)
     (out / "result.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
     print(json.dumps(res, ensure_ascii=False))
     return res

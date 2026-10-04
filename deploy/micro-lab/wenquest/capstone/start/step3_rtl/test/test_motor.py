@@ -73,6 +73,7 @@ async def read_count(dut, p) -> int:
         await ClockCycles(dut.clk, 4)                 # sel passes a two-flop synchroniser
         vals.append(int(dut.uo_out.value))
     p.sel = 0; p.put()
+    await ClockCycles(dut.clk, 4)                     # back to the low byte (through the synchroniser again)
     return vals[0] | vals[1] << 8
 
 

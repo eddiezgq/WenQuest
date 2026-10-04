@@ -88,6 +88,8 @@ def place_nand2(out: Path, wn: float = 0.42, wp: float = 0.97, cell: str = "nand
     in the bottom row, PMOS P1 (A), P2 (B) above. Writes out/<cell>.mag with the devices only, no wiring.
     Returns positions, terminal boxes and ring segments (internal units) for scripts that wire it."""
     out.mkdir(parents=True, exist_ok=True)
+    if (out / f"{cell}.mag").exists() and os.environ.get("WQ_OVERWRITE") != "1":
+        raise SystemExit(f"{out / (cell + '.mag')} already exists: choose a new folder (or set WQ_OVERWRITE=1 to replace it)")
     for f in out.glob("*.mag"):
         f.unlink()
     dev = {"n1": ("nfet", wn, "topc 1 botc 0"), "n2": ("nfet", wn, "topc 1 botc 0"),
