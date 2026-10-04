@@ -135,7 +135,8 @@ const STATUS = { queued: '排队', running: '计算中', done: '完成', failed:
 const TONE = { queued: 'mute', running: 'info', done: 'good', failed: 'bad' };
 const DIRS = { '+x': '沿 +X（从左往右）', '-x': '沿 −X', '+y': '沿 +Y（从前往后）', '-y': '沿 −Y', '+z': '沿 +Z（从下往上）', '-z': '沿 −Z（从上往下）' };
 const MESH = [{ k: 'c', label: '粗（快）', cells: 60000 }, { k: 'm', label: '中', cells: 120000 }, { k: 'f', label: '细（慢）', cells: 250000 }];
-const EX_DEFAULT = { housing: { dir: '+x', vel: 5, ground: true, wall: 70 }, heatsink: { dir: '+y', vel: 3, ground: true, wall: 70 } };
+const EX_DEFAULT = { housing: { dir: '+x', vel: 5, ground: true, wall: 70 }, heatsink: { dir: '+y', vel: 3, ground: true, wall: 70 },
+  agv_box: { dir: '+x', vel: 1.5, ground: true, wall: 50, level: 3, mesh: 'f' } };
 const teacher = computed(() => !!session.user?.teacher);
 const parts = ref([]), examples = ref([]), partSel = ref(''), exParams = ref({}), geo = ref(null);
 const vel = ref(5), dir = ref('+x'), tAir = ref(25), ground = ref(false), heat = ref(true), tWall = ref(70), meshK = ref('m'), title = ref('');
@@ -157,7 +158,7 @@ async function loadPart() {
       geo.value = await post('/cae/geometry/example/' + exSel.value.key, { params: exParams.value });
       exKey = exSel.value.key;
       const d = EX_DEFAULT[exKey];
-      if (d) { dir.value = d.dir; vel.value = d.vel; ground.value = d.ground; tWall.value = d.wall; }
+      if (d) { dir.value = d.dir; vel.value = d.vel; ground.value = d.ground; tWall.value = d.wall; if (d.mesh) meshK.value = d.mesh; }
     } else {
       geo.value = await post('/cae/geometry/item/' + encodeURIComponent(partSel.value)); exKey = null;
     }
@@ -177,7 +178,7 @@ async function upload(e) {
 async function submit() {
   busy.value = true; err.value = ''; res.value = null; exp.value = null;
   const setup = { flow: { velocity_ms: vel.value, direction: dir.value, air_t_c: tAir.value }, heat: heat.value ? { wall_t_c: tWall.value } : null,
-    domain: { ground: ground.value }, mesh: { cells_target: MESH.find((m) => m.k === meshK.value).cells, level: 2 } };
+    domain: { ground: ground.value }, mesh: { cells_target: MESH.find((m) => m.k === meshK.value).cells, level: (exKey && EX_DEFAULT[exKey]?.level) || 2 } };
   if (exKey && geo.value?.example) setup.example = { key: exKey, params: geo.value.example.params };
   try {
     job.value = await post('/cfd/jobs', { step_sha: geo.value.sha, setup, title: title.value || `${geo.value.name || '零件'} · ${vel.value} m/s ${dir.value}`, item: geo.value.item });

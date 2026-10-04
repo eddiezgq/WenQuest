@@ -46,3 +46,23 @@ def test_h_rad():
     from hub.cfd_api import h_rad
     assert abs(h_rad(70, 25) - 6.76) < 0.05                    # 涂漆铸铁 70 ℃ 对 25 ℃ 空气
     assert h_rad(70, 25, eps=0.1) < 1
+
+
+def test_agv_box_example():
+    """机器人例子：AGV 电控箱（前后风口三种布置、箱内驱动器和工控机），面分组和到温度场的行"""
+    import pytest
+    pytest.importorskip("build123d")
+    from cae import geometry as G
+    from cae import thermal_parts as TP
+    p = TP.params_of("agv_box", {"layout": 2})
+    faces = G.faces(TP.build("agv_box", p))[0]
+    ex = TP.example("agv_box", p, faces)
+    g = ex["groups"]
+    assert len(g["drive"]) == 5 and len(g["pc"]) == 5 and len(g["bottom"]) == 1 and g["inner"] and g["outer"]
+    assert ex["thermal"][0]["power_w"] == 60 and ex["formula"]["dt_air_c"] > 0
+    fs = [{"id": f["id"], "area_mm2": 1000.0, "h_w_m2k": 10.0} for f in faces]
+    rows = thermal_rows(fs, 25.0, dict(ex, key="agv_box"))
+    conv = {i for r in rows if r["type"] == "convection" for i in r["faces"]}
+    assert set(g["inner"]) <= conv and set(g["drive"]) <= conv and not set(g["bottom"]) & conv
+    with pytest.raises(ValueError):
+        TP.params_of("agv_box", {"vent_h": 200})

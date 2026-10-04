@@ -1101,6 +1101,8 @@ def cfd_submit(body: dict = Body(...)):
         tgt = int((setup.get("mesh") or {}).get("cells_target", 120000))
         if not 10000 <= tgt <= CF.MAX_CELLS:
             raise HTTPException(400, "网格目标单元数要在 1 万–{} 之间".format(CF.MAX_CELLS))
+        if not 1 <= int((setup.get("mesh") or {}).get("level", 3)) <= 4:
+            raise HTTPException(400, "表面加密级别要在 1–4 之间")
         if setup.get("heat") and abs(float(setup["heat"].get("wall_t_c", 70)) - float(fl.get("air_t_c", 25))) < 1:
             raise HTTPException(400, "表面温度和空气温度至少差 1 ℃")
         j = {"kind": "cfd", "step_sha": sha, "setup": setup, "title": body.get("title") or "流体分析"}

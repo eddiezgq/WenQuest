@@ -191,6 +191,8 @@
           <b>和教材公式比</b> {{ job.setup.formula.name }}
           <div v-if="job.setup.formula.t_oil_c != null">发热 P(1−η) = {{ job.setup.formula.loss_w }} W（输入 {{ job.setup.formula.P_in_kw }} kW，η = {{ job.setup.formula.eta }}），K_s = {{ job.setup.formula.K_s }}，A = {{ job.setup.formula.A_m2 }} m² →
             公式油温 <b>{{ job.setup.formula.t_oil_c }} ℃</b>；有限元外表面平均 <b>{{ (st.film_groups?.[0]?.mean_c ?? st.t_surface_mean_c).toFixed(1) }} ℃</b>、最高 {{ st.t_max_c.toFixed(1) }} ℃（限值约 {{ job.setup.formula.limit_c }} ℃）。</div>
+          <div v-else-if="job.setup.formula.dt_air_c != null">发热 {{ job.setup.formula.loss_w }} W，风口 {{ job.setup.formula.A_vent_m2 }} m²，估算通风量 {{ job.setup.formula.Q_m3s }} m³/s →
+            出风温升约 <b>{{ job.setup.formula.dt_air_c }} ℃</b>；有限元最高 <b>{{ st.t_max_c.toFixed(1) }} ℃</b>（元件限值约 {{ job.setup.formula.limit_c }} ℃）。</div>
           <div v-else>粗估 {{ job.setup.formula.t_est_c }} ℃；有限元最高 <b>{{ st.t_max_c.toFixed(1) }} ℃</b>（限值约 {{ job.setup.formula.limit_c }} ℃）。</div>
           <div class="muted">{{ job.setup.formula.note }}</div>
         </div>

@@ -17,7 +17,9 @@ def thermal_rows(faces, air_t, example=None):
             if t["type"] in ("heat_flux", "heat_body", "temperature"):
                 rows.append(dict(t))
         g = example.get("groups") or {}
-        skip |= set(g.get("inner") or []) | set(g.get("bottom") or []) | set(g.get("pad") or [])
+        skip |= set(g.get("bottom") or []) | set(g.get("pad") or [])          # 底面装在机座 / 车上，CPU 接触面贴着芯片
+        if example.get("key") != "agv_box":
+            skip |= set(g.get("inner") or [])                                 # 减速器箱内壁泡在油里，不吹风（电控箱内壁照样吹风）
         _ = TP
     fs = sorted((f for f in faces if f["id"] not in skip and f.get("h_w_m2k") is not None), key=lambda f: f["h_w_m2k"])
     groups = []                                    # h 相差不到 12% 的面合成一行（面积加权平均），一般零件也就五六行
