@@ -1,0 +1,7 @@
+* 贯通项目步骤二参考解：二输入与非门原理图网表（LVS 用）。串联 NMOS 的 Wn 可按步骤二的分析加宽。
+.subckt nand2 A B OUT VDD VSS
+XMN1 X A VSS VSS sky130_fd_pr__nfet_01v8 W=0.42 L=0.15 nf=1 m=1
+XMN2 OUT B X VSS sky130_fd_pr__nfet_01v8 W=0.42 L=0.15 nf=1 m=1
+XMP1 OUT A VDD VDD sky130_fd_pr__pfet_01v8 W=0.97 L=0.15 nf=1 m=1
+XMP2 OUT B VDD VDD sky130_fd_pr__pfet_01v8 W=0.97 L=0.15 nf=1 m=1
+.ends

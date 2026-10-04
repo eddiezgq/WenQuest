@@ -49,6 +49,17 @@ wqlab flow "$CH1/counter8/config.json" --out "$OUT/counter8" || fail=1
 tail -30 "$OUT/counter8/librelane.log"
 endstep
 
+step "第 5 步 贯通项目参考解：器件 → 与非门 → RTL 测试 → Tiny Tapeout 格式 GDS"
+CAP=$WQ_HOME/capstone
+mkdir -p "$OUT/capstone"
+cmp -s "$CAP/ch1_params.json" "$REPO/labs/micro/kit/models/params.json" || { echo "::error::capstone/ch1_params.json 与 labs/micro/kit/models/params.json 不一致（运行 regen_ch1.sh）"; fail=1; }
+wqlab device --out "$OUT/capstone/step1" > "$OUT/capstone/step1.log" 2>&1 || { fail=1; tail -20 "$OUT/capstone/step1.log"; }
+wqlab nand2 --out "$OUT/capstone/step2" > "$OUT/capstone/step2.log" 2>&1 || { fail=1; tail -20 "$OUT/capstone/step2.log"; }
+cp -r "$CAP/ref/step3_rtl" "$OUT/capstone/step3"
+wqlab test "$OUT/capstone/step3" > "$OUT/capstone/step3.log" 2>&1 || { fail=1; tail -40 "$OUT/capstone/step3.log"; }
+wqlab tt "$OUT/capstone/step3" --out "$OUT/capstone/step4" > "$OUT/capstone/step4.log" 2>&1 || { fail=1; tail -40 "$OUT/capstone/step4.log"; tail -30 "$OUT/capstone/step4/librelane.log" 2>/dev/null; }
+endstep
+
 python3 - <<'PY'
 import json, os
 o = "/out"
@@ -63,6 +74,15 @@ print(f"::notice title=反相器::DRC {inv.get('drc_errors')}，LVS {inv.get('lv
 print(f"::notice title=计数器 GDS::流片就绪 {c8.get('tapeout_ready')}，setup {c8.get('setup_ws_ns')} ns，hold {c8.get('hold_ws_ns')} ns，DRC {c8.get('magic_drc_errors')}，LVS {c8.get('lvs_errors')}，{c8.get('seconds')} s，内存峰值 {c8.get('peak_mem_mb')} MB")
 cc = s["calib_compare"] or {}
 print("::notice title=校准对照::" + "；".join(f"{k} {v['diff_pct']}%" for k, v in cc.items()))
+cs = {k: j(f"capstone/{k}/result.json") or {} for k in ("step1", "step2", "step3", "step4")}
+s["capstone"] = cs
+json.dump(s, open(os.path.join(o, "summary.json"), "w"), indent=1, ensure_ascii=False)
+c1, c2, c3, c4 = (cs[k] for k in ("step1", "step2", "step3", "step4"))
+print(f"::notice title=贯通 1 器件::VTn {c1.get('vtn_v')} V，VTp {c1.get('vtp_v')} V，IDSAT n/p {c1.get('idsat_n_ua_um')}/{c1.get('idsat_p_ua_um')} μA/μm，S {c1.get('swing_n_mv_dec')} mV/dec，迁移率比 {c1.get('mobility_ratio')}")
+sc = c2.get("stdcell") or {}
+print(f"::notice title=贯通 2 与非门::DRC {c2.get('drc_errors')}，LVS {c2.get('lvs_match')}，面积 {c2.get('area_um2')} μm²；标准单元 {sc.get('area_um2')} μm²（{sc.get('width_um')}×{sc.get('height_um')}），管宽 n {sc.get('nmos_w_um')} p {sc.get('pmos_w_um')}；面积比 {c2.get('area_ratio_vs_stdcell')}")
+print(f"::notice title=贯通 3 测试::{c3.get('passed')}/{c3.get('tests')} 通过，{c3.get('seconds')} s")
+print(f"::notice title=贯通 4 芯片::TT 就绪 {c4.get('tt_ready')}（流片就绪 {c4.get('tapeout_ready')}，接口 {c4.get('ports_ok')}，1 块 {c4.get('fits_one_tile')}）；setup {c4.get('setup_ws_ns')} ns，hold {c4.get('hold_ws_ns')} ns，DRC {c4.get('magic_drc_errors')}，LVS {c4.get('lvs_errors')}，天线 {c4.get('antenna_violations')}，单元 {c4.get('cells')}，{c4.get('seconds')} s，{c4.get('peak_mem_mb')} MB")
 # 镜像里的完整校准结果（gzip + base64），供仓库采用：python -c "import sys,gzip,base64;print(gzip.decompress(base64.b64decode(sys.argv[1])).decode())" <注释内容>
 import base64, gzip
 for name in ("result", "params.sky130"):

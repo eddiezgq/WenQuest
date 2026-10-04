@@ -5,6 +5,7 @@ set -e
 HERE=$(cd "$(dirname "$0")" && pwd); ROOT=$(cd "$HERE/../../.." && pwd)
 cd "$ROOT"
 node labs/micro/tools/build.js
+cp labs/micro/kit/models/params.json deploy/micro-lab/wenquest/capstone/ch1_params.json   # 贯通项目步骤一的对照值（镜像里用）
 python3 labs/micro/tools/test_dic_ch1.py
 cd "$HERE"
 python3 build_guides.py
