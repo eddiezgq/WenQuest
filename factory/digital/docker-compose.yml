@@ -59,7 +59,16 @@ services:
     environment:
       <<: *env
       WQ_SIM_SPEED: ${WQ_SIM_SPEED:-20}
+      WQ_OPENPLC_CHECK_URL: http://openplc:8300
     depends_on: [bus]
+
+  # OpenPLC 运行时（第 18 轮第 8 步）：虚拟 PLC 的程序在这里再编译、运行一次，检查是不是标准 IEC 61131-3
+  openplc:
+    build:
+      context: .
+      dockerfile: openplc/Dockerfile
+    image: wq-digital-factory-openplc:1.0
+    restart: unless-stopped
 
   bridge:
     build: ./bridge

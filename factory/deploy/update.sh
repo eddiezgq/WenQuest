@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # 把数字工厂换到新镜像并重启（由 GitHub Actions“数字工厂部署”调用，也可在服务器上手动运行）。
-# 用法：deploy/update.sh [工厂镜像] [桥接镜像]      不带参数：用现有镜像重启（例如改了 .env 之后）
+# 用法：deploy/update.sh [工厂镜像] [桥接镜像] [OpenPLC 镜像]      不带参数：用现有镜像重启（例如改了 .env 之后）
 # 第一次运行会先检查内存，再自动执行 deploy/install.sh。
 . "$(dirname "$0")/lib.sh"
 
-APP="${1:-}"; BRIDGE="${2:-}"
+APP="${1:-}"; BRIDGE="${2:-}"; OPENPLC="${3:-}"
 [ -n "$APP" ] && envset FACTORY_APP_IMAGE "$APP"
 [ -n "$BRIDGE" ] && envset FACTORY_BRIDGE_IMAGE "$BRIDGE"
+[ -n "$OPENPLC" ] && envset FACTORY_OPENPLC_IMAGE "$OPENPLC"          # OpenPLC 运行时（第 18 轮第 8 步）
 [ -n "$(envval FACTORY_APP_IMAGE)" ] || { echo "还没有镜像：请通过 GitHub Actions 部署" >&2; exit 1; }
 
 # 课程接口只读钥匙（第 4 轮 C2）：没有就生成；学习平台的 deploy/update.sh 从这里读去用

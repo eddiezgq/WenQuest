@@ -42,13 +42,14 @@
       <div class="card-head"><h2>班次记录</h2><span class="small muted">点一行看详情</span></div>
       <div v-if="!data?.runs?.length" class="empty">还没有班次。</div>
       <table v-else class="t">
-        <thead><tr><th>班次</th><th>设备</th><th>程序</th><th>来源</th><th>状态</th><th class="num">产量</th><th class="num">合格率</th><th class="num">平均节拍</th><th class="num">报警</th><th class="num">停机</th><th>开始</th></tr></thead>
+        <thead><tr><th>班次</th><th>设备</th><th>程序</th><th>来源</th><th>状态</th><th class="num">产量</th><th class="num">合格率</th><th class="num">平均节拍</th><th class="num">报警</th><th class="num">停机</th><th>OpenPLC</th><th>开始</th></tr></thead>
         <tbody><tr v-for="r in data.runs" :key="r.id" class="click" :class="{ on: sel?.id === r.id }" @click="open(r.id)">
           <td class="mono">{{ r.id }}</td><td>{{ unitName(r.unit) }}</td><td class="small">{{ r.title }}</td><td class="small">{{ ORIGIN[r.origin] }}</td>
           <td><span class="pill" :class="TONE[r.status]">{{ STATUS[r.status] }}</span></td>
           <td class="num">{{ count(r).n }}</td><td class="num">{{ count(r).n ? pct(count(r).good / count(r).n, 1) : '—' }}</td>
           <td class="num">{{ cyc(r) }}</td><td class="num">{{ r.alarms.length }}</td>
-          <td class="num">{{ r.summary ? r.summary.downtime_min + ' 分' : '—' }}</td><td class="small">{{ timeOf(r.started_at || r.created_at) }}</td></tr></tbody>
+          <td class="num">{{ r.summary ? r.summary.downtime_min + ' 分' : '—' }}</td>
+          <td><span class="pill" :class="compatTone(r)">{{ compatText(r) }}</span></td><td class="small">{{ timeOf(r.started_at || r.created_at) }}</td></tr></tbody>
       </table>
     </section>
 
@@ -75,6 +76,15 @@
           <p class="small muted">好的程序在设备出故障时报警、停在安全状态，修好后复位就能接着生产；不处理故障的程序会一直等下去（停线）。</p>
         </div>
       </div>
+      <h3>OpenPLC 兼容性检查</h3>
+      <p class="small muted">同一个程序交给开源软 PLC——OpenPLC 运行时（MatIEC 编译器）编译，并按真实时间控制同一台虚拟设备 90 秒：编译得过、设备照样能生产，说明程序是标准的 IEC 61131-3，换到真的 PLC 上也能用。</p>
+      <div v-if="!sel.compat" class="empty">{{ ['queued', 'running'].includes(sel.status) ? '正在检查（约 2–3 分钟）…' : '这个班次没有做兼容性检查。' }}</div>
+      <template v-else>
+        <p><span class="pill" :class="compatTone(sel)">{{ compatText(sel) }}</span>
+          <span v-if="sel.compat.summary" class="small">　90 秒内生产 {{ sel.compat.summary.parts }} 件（合格 {{ sel.compat.summary.good }}），报警 {{ (sel.compat.alarms || []).length }} 次{{ (sel.compat.alarms || []).length ? "（" + sel.compat.alarms.join("、") + "；开机头几十毫秒远程 I/O 还没读进来，急停输入为 0，程序会先进急停状态，复位后正常）" : "" }}，危险动作 {{ sel.compat.summary.hazards }} 次；Modbus 轮询 {{ sel.compat.polls }} 次</span></p>
+        <pre v-if="!sel.compat.ok" class="prog">{{ sel.compat.log }}</pre>
+        <details v-if="sel.compat.program"><summary class="small">交给 OpenPLC 的程序（编译错误的行号按这个算）</summary><pre class="prog">{{ sel.compat.program }}</pre></details>
+      </template>
       <h3>报警</h3>
       <div v-if="!sel.alarms.length" class="empty">没有报警。</div>
       <table v-else class="t small"><thead><tr><th>班次内时刻</th><th>代码</th><th>内容</th></tr></thead>
@@ -110,6 +120,9 @@ const pct = (x, d = 0) => (x == null ? '—' : (x * 100).toFixed(d) + '%');
 const progress = (r) => (r.status === 'done' ? 1 : r.live?.progress || 0);
 const count = (r) => (r.summary ? { n: r.summary.parts, good: r.summary.good, nok: r.summary.nok } : { n: r.live?.n || 0, good: r.live?.good_n || 0, nok: r.live?.nok_n || 0 });
 const cyc = (r) => { const v = r.summary ? r.summary.cycle_mean_s : r.live?.cycle_s; return v == null ? '—' : v + ' s'; };
+const compatText = (r) => { const c = r.compat; if (!c) return ['queued', 'running'].includes(r.status) ? '检查中' : '—';
+  return c.ok ? '通过' : { compile: '编译不过', prepare: '程序不合要求', run: '运行出错' }[c.stage] || '没做成'; };
+const compatTone = (r) => (!r.compat ? 'mute' : r.compat.ok ? 'good' : r.compat.stage === 'error' ? 'warn' : 'bad');
 const unitName = (u) => (data.value?.units || []).find((x) => x.unit === u)?.name || u;
 const hms = (s) => { if (s == null) return '—'; const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = Math.floor(s % 60); return `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}`; };
 

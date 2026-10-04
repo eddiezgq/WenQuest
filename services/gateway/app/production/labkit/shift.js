@@ -38,7 +38,7 @@ const UNITS = {
       if (!op.k) { Object.assign(op, { k: "boot", until: t + 2000 }); set({ S_Auto: true, S_EStop: true, S_LC: true, B_Part: false, S_Hand1: false, S_Hand2: false, S_Reset: false, S_Step: false, S_JogClamp: false, S_JogDown: false, S_JogUp: false }); }
       const wait = (lo, hi) => t + lo + r() * (hi - lo);
       // a fault lamp: the operator stops, calls maintenance, and resets once the machine is fixed (or after a look round)
-      if (o.H_Fault && op.k !== "fault") { set({ S_Hand1: false, S_Hand2: false }); Object.assign(op, { k: "fault", until: t + 180000 }); }
+      if (o.H_Fault && op.k !== "fault") { set({ S_Hand1: false, S_Hand2: false }); Object.assign(op, { k: "fault", until: t + (ctx.faultWait || 180000) }); }
       switch (op.k) {
         case "boot": if (t >= op.until) { ctx.pulse("S_Reset"); Object.assign(op, { k: "load", until: wait(4000, 8000) }); } break;
         case "load":
@@ -51,21 +51,25 @@ const UNITS = {
         case "start":        // both hands, the second within 0–0.25 s (1 % of the time 0.7 s: the PLC must refuse)
           if (t >= op.until) {
             set({ S_Hand1: true });
-            Object.assign(op, { k: "hand2", until: t + (op.late ? 700 : r() * 250), tStart: t, curtain: r() < 0.003 ? t + 900 + r() * 600 : 0 });
+            Object.assign(op, { k: "hand2", until: t + (op.late ? 700 : r() * 250), tStart: t, curtain: r() < 0.003 && !ctx.noCurtain ? t + 900 + r() * 600 : 0, began: false });
           }
           break;
         case "hand2":
           if (t >= op.until) { set({ S_Hand2: true }); op.k = "hold"; }
           break;
         case "hold":         // hold both until the ram comes back up or a lamp says the part is done
+          // (the lamps of the last part stay on until the PLC starts this one: only count them once the clamp has moved;
+          //  with remote I/O, as in the OpenPLC check, the PLC sees the buttons a few tens of ms later)
+          if (o.Y_Clamp) op.began = true;
           if (op.curtain && t >= op.curtain && t < op.curtain + 300) set({ S_LC: false }); else set({ S_LC: true });
-          if (o.Y_PressUp || o.H_OK || o.H_NOK || t - op.tStart > 8000) {
+          if (o.Y_PressUp || (op.began && (o.H_OK || o.H_NOK)) || t - op.tStart > 8000) {
             set({ S_Hand1: false, S_Hand2: false, S_LC: true });
             Object.assign(op, { k: "done", tHold: t });
           }
           break;
         case "done":
-          if ((o.H_OK || o.H_NOK) && ins.B_Unclamped && !o.Y_Clamp) Object.assign(op, { k: "unload", until: wait(3000, 5000) });
+          if (o.Y_Clamp) op.began = true;
+          if (op.began && (o.H_OK || o.H_NOK) && ins.B_Unclamped && !o.Y_Clamp) Object.assign(op, { k: "unload", until: wait(3000, 5000) });
           else if (t - op.tHold > 20000 && !o.Y_Clamp && !o.Y_PressDown && !o.Y_PressUp) {
             // the press did not start (two hands too far apart, or the program did not react): take hands off and try again
             set({ S_Hand1: false, S_Hand2: false }); Object.assign(op, { k: "start", until: t + 1500, late: false });
@@ -84,7 +88,7 @@ const UNITS = {
           break;
         case "after":
           if (!o.H_Fault && (o.H_Ready || t >= op.until)) Object.assign(op, { k: "load", until: wait(4000, 8000) });
-          else if (o.H_Fault && t >= op.until) Object.assign(op, { k: "fault", until: t + 180000 });
+          else if (o.H_Fault && t >= op.until) Object.assign(op, { k: "fault", until: t + (ctx.faultWait || 180000) });
           break;
       }
     },
@@ -106,7 +110,7 @@ const UNITS = {
       if (!op.k) { Object.assign(op, { k: "boot", until: t + 1000 }); set({ S_Stop: true, S_Start: false }); }
       // keep parts coming: metal 30 %, red 30 %, blue 30 %, tall (reject) 10 %
       if (ps.seq && ps.seq.length < 3) { const x = r(); ps.seq.push(x < 0.3 ? "metal" : x < 0.6 ? "red" : x < 0.9 ? "blue" : "tallred"); }
-      if (o.H_Fault && op.k !== "fault") Object.assign(op, { k: "fault", until: t + 120000 });
+      if (o.H_Fault && op.k !== "fault") Object.assign(op, { k: "fault", until: t + (ctx.faultWait || 120000) });
       switch (op.k) {
         case "boot": if (t >= op.until) { ctx.pulse("S_Start"); op.k = "run"; op.until = t + 5000; } break;
         case "run":
@@ -173,7 +177,7 @@ function session(job) {
     step(t, o, dt, codeNow) {
       const ins = lastIns;
       plant.step(dt, o, ps, ins);
-      const ctx = { o, ins, r, t, op, ps, faults, plant, broken,
+      const ctx = { o, ins, r, t, op, ps, faults, plant, broken, faultWait: job.faultWait, noCurtain: job.noCurtain,
         set: (m) => Object.assign(manual, m),
         pulse: (name, v = true) => { manual[name] = v; pulses.push({ name, v: !v, at: t + 150 }); } };
       for (let k = pulses.length - 1; k >= 0; k--) if (t >= pulses[k].at) { manual[pulses[k].name] = pulses[k].v; pulses.splice(k, 1); }

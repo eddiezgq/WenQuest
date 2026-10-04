@@ -65,7 +65,8 @@ def services(c, ci_ports=None):
                      "interval": "15s", "timeout": "8s", "retries": 5, "start_period": "30s"},
         networks={"default": {}, "edge": {"aliases": ["wqf-hub-c-" + cid]}, "erp": {"aliases": ["wqf-hub-c-" + cid]}})
     s["sim-c-" + cid] = dict(app, command=["python", "sim/main.py"], depends_on=["bus-c-" + cid], environment=dict(
-        base_env, WQ_MQTT_USER="sim", WQ_MQTT_PASSWORD="${WQ_MQTT_SIM_PASSWORD:?}", WQ_SIM_SPEED="${WQ_SIM_SPEED:-20}"))
+        base_env, WQ_MQTT_USER="sim", WQ_MQTT_PASSWORD="${WQ_MQTT_SIM_PASSWORD:?}", WQ_SIM_SPEED="${WQ_SIM_SPEED:-20}",
+        WQ_OPENPLC_CHECK_URL="http://openplc:8300"))
     s["bridge-c-" + cid] = {"image": "${FACTORY_BRIDGE_IMAGE:?FACTORY_BRIDGE_IMAGE}", "restart": "unless-stopped", "logging": log,
                             "depends_on": ["bus-c-" + cid], "networks": ["default", "erp"],
                             "environment": {"WQ_MQTT_HOST": "bus-c-" + cid, "WQ_MQTT_PORT": "1883", "WQ_MQTT_USER": "bridge",

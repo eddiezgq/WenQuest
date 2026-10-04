@@ -213,3 +213,32 @@ def test_task_upload_review_approve_runs_a_shift(db, monkeypatch):
         for k in ("WQ_AUTH", "WQ_SSO_URL", "WQ_FACTORY_TASK_KEY"):
             os.environ.pop(k, None)
         importlib.reload(A)
+
+
+def test_openplc_program_rewrite():
+    """给 OpenPLC 的程序：去注释、I/O 声明（地址挪到从站映射区）、拆开一行多个实例的声明（MatIEC 会崩）、加 CONFIGURATION"""
+    from vplc.openplc_st import mapping, to_openplc
+    io = [{"name": "B_Part", "addr": "%IX0.0", "dir": "in"}, {"name": "S_EStop", "addr": "%IX1.0", "dir": "in"},
+          {"name": "AI_Force", "addr": "%IW64", "dir": "in", "type": "INT"}, {"name": "Y_Clamp", "addr": "%QX0.0", "dir": "out"}]
+    assert [(m[1], m[3], m[4]) for m in mapping(io)] == [("%IX100.0", 0, "di"), ("%IX101.0", 8, "di"), ("%IW100", 0, "ir"), ("%QX100.0", 0, "coil")]
+    src = to_openplc("(* 中文注释 *)\nPROGRAM Main\n  VAR\n    a, b, c : R_TRIG;  (* 三个 *)\n  END_VAR\n"
+                     "  CASE x OF\n    A, B: y := 1;\n  END_CASE;\n  Y_Clamp := B_Part;\nEND_PROGRAM\n", io)
+    assert "中文" not in src and "B_Part AT %IX100.0 : BOOL;" in src and "AI_Force AT %IW100 : INT;" in src
+    assert "a : R_TRIG;" in src and "c : R_TRIG;" in src and "A, B: y := 1;" in src
+    assert "PROGRAM Inst0 WITH MainTask : Main;" in src
+
+
+def test_compat_result_is_published_and_recorded():
+    from vplc.runner import VirtualPLC
+    out = []
+    v = VirtualPLC(lambda tp, ty, src, d, corr: out.append((tp, wqbus.make(ty, src, d, corr=corr))),
+                   compute_fn=lambda unit, st, h, seed: _fake_shift(),
+                   check_fn=lambda unit, st: {"ok": True, "stage": "run", "summary": {"parts": 5, "good": 5}})
+    v.handle("press-01", wqbus.make("plc.download", "hub", {"run_id": "PLC-C", "program": "x", "speed": 0}), block=True)
+    import time
+    for _ in range(50):
+        if any(m["data"].get("phase") == "compat" for _, m in out if m["type"] == "plc.shift"):
+            break
+        time.sleep(0.05)
+    c = [m["data"]["compat"] for _, m in out if m["type"] == "plc.shift" and m["data"]["phase"] == "compat"]
+    assert c and c[0]["ok"] and c[0]["summary"]["parts"] == 5

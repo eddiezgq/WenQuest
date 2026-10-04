@@ -145,13 +145,14 @@
       <section v-if="sub?.plc_runs?.length" class="card">
         <div class="card-head"><h2>虚拟 PLC 试生产</h2><router-link to="/plc" class="more">打开“虚拟 PLC”页看详情</router-link></div>
         <table class="t small">
-          <thead><tr><th>班次</th><th>状态</th><th class="num">产量</th><th class="num">合格 / 不合格</th><th class="num">平均节拍</th><th class="num">报警</th><th class="num">停机</th></tr></thead>
+          <thead><tr><th>班次</th><th>状态</th><th class="num">产量</th><th class="num">合格 / 不合格</th><th class="num">平均节拍</th><th class="num">报警</th><th class="num">停机</th><th>OpenPLC 兼容</th></tr></thead>
           <tbody><tr v-for="r in sub.plc_runs" :key="r.id"><td class="mono">{{ r.id }}</td>
             <td>{{ { queued: '排队', running: '运行中', done: '班次完成', failed: '失败', cancelled: '已停止' }[r.status] }}{{ r.status === 'running' ? '（' + Math.round((r.live.progress || 0) * 100) + '%）' : '' }}</td>
             <td class="num">{{ r.summary ? r.summary.parts : r.live.n || 0 }}</td>
             <td class="num">{{ r.summary ? r.summary.good + ' / ' + r.summary.nok : (r.live.good_n || 0) + ' / ' + (r.live.nok_n || 0) }}</td>
             <td class="num">{{ r.summary?.cycle_mean_s ?? r.live.cycle_s ?? '—' }} s</td><td class="num">{{ r.alarms.length }}</td>
-            <td class="num">{{ r.summary ? r.summary.downtime_min + ' 分' : '—' }}</td></tr></tbody>
+            <td class="num">{{ r.summary ? r.summary.downtime_min + ' 分' : '—' }}</td>
+            <td>{{ !r.compat ? '—' : r.compat.ok ? '通过' : r.compat.stage === 'compile' ? '编译不过（看详情）' : '没做成' }}</td></tr></tbody>
         </table>
         <div v-for="r in sub.plc_runs.filter((x) => x.error)" :key="r.id + 'e'" class="err small">{{ r.id }}：{{ r.error }}</div>
       </section>

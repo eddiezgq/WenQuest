@@ -35,6 +35,27 @@ def tool(job, timeout=180):
     return json.loads(p.stdout.decode("utf-8"))
 
 
+def openplc_check(unit, program_st, seconds=90, url=None):
+    """同一程序在 OpenPLC 运行时上编译并按真实时间控制同一台虚拟设备 seconds 秒（openplc/control.py）。
+    没配 WQ_OPENPLC_CHECK_URL 时返回 None（不做）。"""
+    import urllib.request
+    url = url or os.environ.get("WQ_OPENPLC_CHECK_URL", "")
+    if not url:
+        return None
+    req = urllib.request.Request(url.rstrip("/") + "/check", data=json.dumps({"st": program_st, "unit": PLC_UNITS[unit], "seconds": seconds}).encode(),
+                                 headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=seconds + 900) as r:      # 前面可能有别的设备在排队
+            out = json.loads(r.read().decode("utf-8"))
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "stage": "error", "log": "OpenPLC 检查服务没有回应：" + str(e)[:300]}
+    for k in ("program", "log"):
+        if isinstance(out.get(k), str):
+            out[k] = out[k][-60000:]
+    out.pop("cycles", None)
+    return out
+
+
 def compute(unit, program_st, hours=8.0, seed=1):
     return tool({"op": "shift", "unit": PLC_UNITS[unit], "program": {"st": program_st}, "hours": hours, "seed": seed},
                 timeout=60 + 30 * hours)
@@ -43,8 +64,8 @@ def compute(unit, program_st, hours=8.0, seed=1):
 class VirtualPLC:
     """收 plc.download，算班次，按倍速回放到总线。publish(topic, type, source, data, corr)；speed() 给当前倍速。"""
 
-    def __init__(self, publish, speed=lambda: 20.0, compute_fn=compute, sleep=time.sleep):
-        self.publish, self.speed, self.compute_fn, self.sleep = publish, speed, compute_fn, sleep
+    def __init__(self, publish, speed=lambda: 20.0, compute_fn=compute, sleep=time.sleep, check_fn=openplc_check):
+        self.publish, self.speed, self.compute_fn, self.sleep, self.check_fn = publish, speed, compute_fn, sleep, check_fn
         self.current = {}           # 设备 → 正在回放的班次的取消标志
         self.lock = threading.Lock()
 
@@ -81,6 +102,12 @@ class VirtualPLC:
         if res.get("error") and not res.get("events"):
             shift("failed", error=res["error"][:500])
             return
+        if self.check_fn is not None:            # OpenPLC 兼容性检查与回放同时进行（真实时间约 2–3 分钟）
+            def compat():
+                r = self.check_fn(unit, d["program"])
+                if r is not None:
+                    shift("compat", compat=r)
+            threading.Thread(target=compat, daemon=True, name="openplc-" + rid).start()
         speed = d.get("speed")
         # 回放的时钟：从 (a_real, a_sim) 起按倍速 sp 走；车间改了倍速就从此刻起按新倍速
         a_real, a_sim = time.monotonic(), 0.0

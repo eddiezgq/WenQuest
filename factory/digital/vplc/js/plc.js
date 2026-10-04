@@ -1780,6 +1780,10 @@ function review(prog, io = []) {
     `Line ${lines[0]} writes input ${nameOf(n)}: the input image is overwritten by the field signal at the next scan.`);
   // R5 unused or never-written variables; vague names
   for (const [n, v] of declared) {
+    // IEC 61131-3: a variable may not have the name of a standard function or function block (LIMIT, MAX, TON …):
+    // the WenQuest engine tells them apart, real compilers (MatIEC in OpenPLC, CODESYS) refuse the program
+    if (STD_FN[n] || STD_FB[n]) add("error", "std-name", v.line, `变量 ${v.name} 与标准函数或功能块 ${n} 同名：换到真的 PLC 上编译不过，换个名字。`,
+      `Variable ${v.name} has the name of the standard function or function block ${n}: real PLC compilers reject it. Rename it.`);
     if (v.kind !== "var" || v.addr) continue;
     const used = reads.has(n) || calls.has(n);
     if (!used && !writes.has(n)) add("info", "var-unused", v.line, `变量 ${v.name} 声明了但没有用。`, `Variable ${v.name} is declared but not used.`);

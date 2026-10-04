@@ -119,7 +119,14 @@ services:
       WQ_MQTT_USER: sim
       WQ_MQTT_PASSWORD: ${WQ_MQTT_SIM_PASSWORD:?}
       WQ_SIM_SPEED: ${WQ_SIM_SPEED:-20}
+      WQ_OPENPLC_CHECK_URL: http://openplc:8300          # 虚拟 PLC 的 OpenPLC 兼容性检查（第 18 轮第 8 步）
     depends_on: [bus]
+
+  # OpenPLC 运行时（第 18 轮第 8 步）：所有工厂共用，一次检查一个程序；只在内部网络
+  openplc:
+    image: ${FACTORY_OPENPLC_IMAGE:?FACTORY_OPENPLC_IMAGE}
+    restart: unless-stopped
+    logging: *logging
 
   # 有限元计算服务（第 11 轮 F2）：所有工厂共用，排队一次算一个；只在内部网络，枢纽转交任务
   cae:
@@ -220,6 +227,7 @@ services:
       WQ_MQTT_USER: sim
       WQ_MQTT_PASSWORD: ${WQ_MQTT_SIM_PASSWORD:?}
       WQ_SIM_SPEED: ${WQ_DEMO_SIM_SPEED:-20}
+      WQ_OPENPLC_CHECK_URL: http://openplc:8300
     depends_on: [bus-demo]
 
   bridge-demo:

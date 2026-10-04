@@ -45,6 +45,7 @@ create table if not exists plc_run (
     started_at timestamptz,
     finished_at timestamptz
 );
+alter table plc_run add column if not exists compat jsonb;     -- OpenPLC 兼容性检查的结果
 create index if not exists plc_run_unit on plc_run (mode, unit, created_at desc);
 create index if not exists plc_run_sub on plc_run (task_sub);
 """
@@ -117,6 +118,8 @@ class VPLC:
                               (Jsonb(d.get("summary") or {}), rid))
                 elif ph == "failed":
                     self.db.x("update plc_run set status='failed', error=%s, finished_at=now() where id=%s", ((d.get("error") or "")[:2000], rid))
+                elif ph == "compat":
+                    self.db.x("update plc_run set compat=%s where id=%s", (Jsonb(d.get("compat") or {}), rid))
                 elif ph == "cancelled":
                     self.db.x("update plc_run set status='cancelled', finished_at=coalesce(finished_at, now()) where id=%s", (rid,))
             elif t == "plc.cycle":
@@ -132,6 +135,7 @@ class VPLC:
     # ------------------------------------------------------------ 查询
     def runs(self, mode, unit=None, limit=30, task_sub=None):
         sql = ("select id, unit, title, origin, task_sub, hours, status, live, alarms, summary, error, created_by, created_at, "
+               "case when compat is null then null else jsonb_build_object('ok', compat->'ok', 'stage', compat->'stage') end as compat, "
                "started_at, finished_at from plc_run where mode=%s")
         args = [mode]
         if unit:

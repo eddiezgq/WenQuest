@@ -89,6 +89,7 @@ jobs:
         run: |
           docker build -q -t wqf-app:ci -f factory/digital/Dockerfile factory
           docker build -q -t wqf-bridge:ci factory/digital/bridge
+          docker build -q -t wqf-openplc:ci -f factory/digital/openplc/Dockerfile factory/digital
       - name: 按服务器目录布置
         run: |
           mkdir -p "$FACTORY_DIR/mosquitto" "$LEARN_DIR"
@@ -97,7 +98,7 @@ jobs:
           cp factory/digital/mosquitto/server/* "$FACTORY_DIR/mosquitto/"
           # 演练时把端口开到本机，登录用本地方式（CI 没有学习平台）
           printf 'services:\n  hub: {ports: ["8100:8100"]}\n  erp-frontend: {ports: ["8090:8080"]}\n  bus: {ports: ["1883:1883", "9001:9001"]}\n  hub-demo: {ports: ["8101:8100"]}\n  erp-frontend-demo: {ports: ["8092:8080"]}\n' > "$FACTORY_DIR/ci.yml"
-          printf 'FACTORY_APP_IMAGE=wqf-app:ci\nFACTORY_BRIDGE_IMAGE=wqf-bridge:ci\nSITE_DOMAIN=example.test\nWQ_AUTH=local\nWQ_AI_PER_HOUR=0\nWQ_ERP_OAUTH_SECRET=ci-sso-secret\n' > "$FACTORY_DIR/.env"
+          printf 'FACTORY_APP_IMAGE=wqf-app:ci\nFACTORY_BRIDGE_IMAGE=wqf-bridge:ci\nFACTORY_OPENPLC_IMAGE=wqf-openplc:ci\nSITE_DOMAIN=example.test\nWQ_AUTH=local\nWQ_AI_PER_HOUR=0\nWQ_ERP_OAUTH_SECRET=ci-sso-secret\n' > "$FACTORY_DIR/.env"
       - name: 首次安装（建站、设置向导、API 钥匙、导入数据）
         run: mkdir -p /tmp/logs && bash "$FACTORY_DIR/deploy/install.sh" 2>&1 | tee /tmp/logs/install.log
       - name: 启动全部服务
@@ -247,6 +248,7 @@ jobs:
     outputs:
       app: ${{ steps.meta.outputs.app }}
       bridge: ${{ steps.meta.outputs.bridge }}
+      openplc: ${{ steps.meta.outputs.openplc }}
     steps:
       - uses: actions/checkout@v4
       - id: meta
@@ -254,6 +256,7 @@ jobs:
           repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "app=ghcr.io/${repo}/factory-app:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
           echo "bridge=ghcr.io/${repo}/factory-bridge:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "openplc=ghcr.io/${repo}/factory-openplc:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -275,6 +278,14 @@ jobs:
           tags: ${{ steps.meta.outputs.bridge }}
           cache-from: type=gha,scope=factory-bridge
           cache-to: type=gha,mode=max,scope=factory-bridge
+      - uses: docker/build-push-action@v6          # OpenPLC 运行时（第 18 轮第 8 步）
+        with:
+          context: factory/digital
+          file: factory/digital/openplc/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.openplc }}
+          cache-from: type=gha,scope=factory-openplc
+          cache-to: type=gha,mode=max,scope=factory-openplc
 
   deploy:
     name: 部署到服务器
@@ -321,7 +332,7 @@ jobs:
         run: |
           # 学习平台与数字工厂部署在同一台服务器：登录、拉镜像、清理镜像排队做（同一把锁），避免同时推送时互相打断
           set +e
-          echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock sh -c 'docker login ghcr.io -u ${{ github.actor }} --password-stdin && /opt/wenquest/factory/deploy/update.sh ${{ needs.build.outputs.app }} ${{ needs.build.outputs.bridge }}'" 2>&1 | tee /tmp/update.log
+          echo "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock sh -c 'docker login ghcr.io -u ${{ github.actor }} --password-stdin && /opt/wenquest/factory/deploy/update.sh ${{ needs.build.outputs.app }} ${{ needs.build.outputs.bridge }} ${{ needs.build.outputs.openplc }}'" 2>&1 | tee /tmp/update.log
           st=${PIPESTATUS[0]}
           if [ "$st" != 0 ]; then
             python3 factory/deploy/ci_annotate.py 服务器更新 /tmp/update.log 180

@@ -442,9 +442,9 @@ function press(o = {}) {
       const dir = out.Y_PressDown && !out.Y_PressUp ? 1 : out.Y_PressUp && !out.Y_PressDown ? -1 : 0;
       // the part must be clamped before the ram touches it; the light curtain (read from the panel) is a hazard check
       const lcOk = s.panelLC;
-      if (ins && ins.S_EStop === false && dir !== 0) s.hazard = true;   // e-stop pressed but the ram still moves
-      if (dir > 0 && !lcOk) { s.hazard = true; }
-      if (dir > 0 && s.ram > 0.02 && s.clamp < 0.9) s.hazard = true;
+      if (ins && ins.S_EStop === false && dir !== 0) { s.hazard = true; s.why = "estop"; }   // e-stop pressed but the ram still moves
+      if (dir > 0 && !lcOk) { s.hazard = true; s.why = "curtain"; }
+      if (dir > 0 && s.ram > 0.02 && s.clamp < 0.9) { s.hazard = true; s.why = "unclamped"; }
       s.ram = clamp(s.ram + dir * SPEED * sec, 0, STROKE);
       // force: zero until contact, then the press-fit force grows with depth; a hard stop at the bottom
       const k = s.f.tight ? 260 : s.f.loose ? 60 : 160;   // kN per m of engagement
