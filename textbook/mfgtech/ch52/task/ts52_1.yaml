@@ -1,0 +1,38 @@
+# 工程任务单 TS-52-1（配 52.1–52.10 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-52-1
+标题: [SH-301 铣键槽夹具 JJ-301-50 的设计与评审, "Designing and reviewing the SH-301 keyway fixture JJ-301-50"]
+角色: [夹具设计员, fixture designer]
+背景:
+  - "第 51 章已经论证了 SH-301 铣键槽的定位方案（V 形块 + 轴向挡板）。现在要把它做成一套能上车间的专用夹具：选夹紧方式、算夹紧力、定拧紧扭矩、布置对刀块和定位键、做夹具精度分析和刚度校核，画出夹具总图，写清技术要求和维护规程，提交数字工厂的 AI 预检和工艺主管评审。数字工厂里已有一份参照设计 JJ-301-50，你的设计可以不同，但每个数都要有依据。"
+  - "Chapter 51 settled the locating scheme for SH-301's keyway (V-block plus axial stop). Now turn it into a shop-ready dedicated fixture: choose the clamping, compute the force, set the tightening torque, place the setting block and keys, analyse fixture accuracy and stiffness, draw the general arrangement, write the technical requirements and maintenance rules, and submit to the digital factory's AI pre-check and the supervisor. A reference design JJ-301-50 exists; yours may differ, but every number must be justified."
+输入:
+  - {名称: [SH-301 工艺规程与工序 50 工序卡, "SH-301 process plan and operation 50 sheet"], 来源: [数字工厂 /api/process/cards/reference/SH-301, "Digital factory"]}
+  - {名称: [TS-51-1 的定位方案论证书, "Your TS-51-1 locating report"], 来源: [第 51 章, Chapter 51]}
+  - {名称: [夹具计算库与参照夹具数据, "Fixture library and reference fixture data"], 来源: [factory/digital/hub/fixture.py；std/JJ-301-50_fixture.yaml, "factory/digital/hub/fixture.py; std/JJ-301-50_fixture.yaml"]}
+  - {名称: [实验 52.3、52.9, "Labs 52.3 and 52.9"], 来源: [本章, This chapter]}
+交付物:
+  - {名称: [夹具设计计算书（4–6 页）, "Fixture design calculations (4–6 pages)"], 验收: [切削力（写明模型和数据来源）、安全系数逐项、需要的夹紧力（四个条件）、夹紧机构给出的夹紧力和拧紧扭矩、压板强度、对刀块尺寸、精度预算（对称度与 H 各一张表）、V 形块刚度, "Cutting forces (model and data source), safety factor item by item, required clamping force (four conditions), force from the mechanism and the torque, strap strength, setting-block dimensions, accuracy budgets (symmetry and H), V-block stiffness"]}
+  - {名称: [夹具总图（示意即可）与明细栏, "General arrangement (schematic) and parts list"], 验收: [至少两个视图；标出轮廓尺寸、定位元件与对刀块的相互位置尺寸和公差、定位键；明细栏、技术要求齐全, "At least two views; overall size, positions and tolerances between locators and setting block, keys; parts list and requirements complete"]}
+  - {名称: [夹具数据文件与 AI 预检记录, Fixture data file and pre-check record], 验收: [按 std/JJ-301-50_fixture.yaml 的格式写出你的夹具数据，工序 50 的 fixture_id 指向它，AI 预检没有“夹具”方面的意见；再故意把拧紧扭矩改为 1 N·m（夹具数据里扭矩 = hand_force × wrench，把 hand_force 改为 10、wrench 保持 100），记录评审员的意见, "Write your fixture in the JJ-301-50 data format with operation 50's fixture_id pointing to it; the AI pre-check raises no fixture comment; then set the torque to 1 N·m on purpose (torque = hand_force × wrench in the data; set hand_force to 10 with wrench 100) and record the comment"]}
+  - {名称: [维护规程, Maintenance rules], 验收: [检查项目、周期、更换界限（由磨损与对称度的关系算出）, "Checks, intervals and replacement limits (derived from wear versus symmetry)"]}
+工位: [PY, CAD, FEA, PLM]
+步骤:
+  - ["读工序 50 的工序卡和第 51 章的定位方案，列出夹具要保证的工序要求和它们的公差。", "Read operation 50 and the Chapter 51 scheme; list the requirements the fixture must hold and their tolerances."]
+  - ["用程序 52.3.1 的方法算切削力，选安全系数，求需要的夹紧力；在实验 52.3 中核对，并定出拧紧扭矩。", "Compute cutting forces as in Program 52.3.1, choose the safety factor, find the required force; check in Lab 52.3 and set the torque."]
+  - ["布置对刀块和定位键，算出对刀块尺寸；列夹具精度预算，按极值法和平方和法各算一次，说明你用哪一个、为什么。", "Place the setting block and keys and compute their dimensions; draw up the accuracy budget by worst case and by RSS, and say which you rely on and why."]
+  - ["在实验 52.9（或数字工厂的 CalculiX 有限元）中校核 V 形块的刚度；若用 3D 打印或铝合金件，说明需要改什么。", "Check V-block stiffness in Lab 52.9 (or the factory's CalculiX FEA); if printed or aluminium parts are used, say what must change."]
+  - ["画夹具总图，写明细栏和技术要求；写夹具数据文件，提交 AI 预检。", "Draw the arrangement, parts list and requirements; write the data file and run the AI pre-check."]
+  - ["由磨损与对称度的关系定出更换界限和检查周期，写维护规程。", "Derive the replacement limit and check interval from wear versus symmetry; write the maintenance rules."]
+评审要点:
+  - ["〔AI 检查〕夹紧力：机构给出的夹紧力不小于四个条件中的最大值。", "[AI] Clamping: the mechanism's force is at least the largest of the four conditions."]
+  - ["〔AI 检查〕精度预算：对称度和 H 的预算合计不超过工序公差。", "[AI] Accuracy: the symmetry and H budgets stay within the tolerances."]
+  - ["〔老师检查〕切削力有模型和数据来源；考虑了背离挡板的轴向分力和工件被拔起的力。", "[Teacher] Cutting forces have a model and source; the away-from-stop axial force and the lifting force are considered."]
+  - ["〔老师检查〕规定了拧紧扭矩并核算了压板强度；说明了手动夹紧力的分散。", "[Teacher] A torque is specified and strap strength checked; the scatter of manual clamping is discussed."]
+  - ["〔老师检查〕总图上的尺寸、公差和技术要求能直接用于制造和验收。", "[Teacher] Dimensions, tolerances and requirements on the drawing can be used directly to make and accept the fixture."]
+评分:
+  - {项: [夹紧力与机构, Clamping and mechanism], 分: 30, 标准: [力的分析完整，计算正确，扭矩与强度合理, "Complete force analysis, correct numbers, sound torque and strength"]}
+  - {项: [对刀、定位键与精度预算, "Setting, keys and accuracy budget"], 分: 25, 标准: [尺寸算对；预算各项有依据；合成方法说明清楚, "Dimensions right; each budget item justified; combination method explained"]}
+  - {项: [刚度校核, Stiffness check], 分: 10, 标准: [模型、载荷、结论正确, "Model, loads and conclusion correct"]}
+  - {项: [总图与数据文件, Drawing and data file], 分: 25, 标准: [视图、尺寸、明细栏、技术要求齐全；AI 预检记录完整, "Views, dimensions, parts list and requirements complete; pre-check record complete"]}
+  - {项: [维护规程, Maintenance rules], 分: 10, 标准: [更换界限由计算得出, "Replacement limit derived by calculation"]}
+学时: 6

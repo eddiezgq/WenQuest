@@ -23,7 +23,7 @@
   - ["在数字工厂把选定方案写进工序 50 的 locate_check，运行 AI 预检；再把 Td 改为 0.3 mm 故意改坏一次，记录意见。", "Write the chosen scheme into operation 50's locate_check in the digital factory and run the AI pre-check; break it once on purpose with Td = 0.3 mm and record the comment."]
   - ["读仿真车间的对称度数据，复核你的估计。", "Read the simulated shop's symmetry data and check your estimate."]
 评审要点:
-  - ["〔老师检查〕自由度分析正确：V 形块 + 挡销为不完全定位（5 个），长夹持卡盘加顶尖为过定位，只用 V 形块为欠定位。", "[Teacher] DOF analysis correct: V-blocks + stop give partial location (5), a long chuck grip plus centre over-locates, V-blocks alone under-locate."]
+  - ["〔老师检查〕自由度分析正确：V 形块 + 挡板为不完全定位（5 个），长夹持卡盘加顶尖为过定位，只用 V 形块为欠定位。", "[Teacher] DOF analysis correct: V-blocks + stop give partial location (5), a long chuck grip plus centre over-locates, V-blocks alone under-locate."]
   - ["〔AI 检查〕定位误差：选定方案的 H 定位误差不超过 H 公差的三分之一。", "[AI] Locating error: the chosen scheme's error for H is within a third of H's tolerance."]
   - ["〔老师检查〕对称度的定位误差有分析：考虑了精车外圆对中心孔连线的偏心，卡盘定心精度（跳动读数）换算成偏心、再换算到对称度公差带（2e）。", "[Teacher] Symmetry error is analysed: the finish-turned OD's eccentricity to the centre line is included, and the chuck's centring accuracy (an indicator reading) is converted to eccentricity and then to the symmetry zone (2e)."]
   - ["〔老师检查〕数据复核结论合理，能说出实测对称度里除定位误差外的其他来源（对刀、夹具制造、铣刀偏摆）。", "[Teacher] The data check is sound and names sources of measured asymmetry other than locating (tool setting, fixture making, cutter runout)."]

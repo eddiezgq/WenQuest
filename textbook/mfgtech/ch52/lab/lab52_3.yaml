@@ -1,0 +1,28 @@
+# 实验 52.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab52_3.js。
+原理:
+  - ["夹紧力要使工件在切削力、重力和惯性力作用下保持在定位元件上。把各个力对工件的作用分成几种可能的失效（被抬起、滑出 V 形块、绕轴线转动、沿轴线打滑），每种算出需要的夹紧力，取最大值，再乘安全系数 K。", "The clamping force must hold the work on its locators against cutting forces, weight and inertia. Split the possible failures (lift-off, sliding out of the V, rotating about the axis, axial slip), compute the force each needs, take the largest and multiply by the safety factor K."]
+  - 式: "W ≥ max{K·Fz − G, K·Fy·tan(α/2) − G, K·Fy·r_f/(μ·r_c + μ·r_v/sin(α/2)), …}        (52.3.2)"
+  - ["螺旋夹紧：拧紧扭矩 M 与螺杆轴向力 W 的关系 M = W·[r2·tan(λ + φ′) + r′·tan φ1]，λ 为螺纹升角，φ′ 为当量摩擦角；移动压板再按杠杆比把螺杆力传到工件上。", "Screw clamp: M = W·[r2·tan(λ + φ′) + r′·tan φ1], λ the lead angle and φ′ the equivalent friction angle; a strap then passes the screw force to the work by its lever ratio."]
+  - 式: "斜楔 W = Q/(tan φ1 + tan(α + φ2))，自锁 α ≤ φ1 + φ2；圆偏心自锁 2e/D ≤ μ        (52.4.1)、(52.4.2)、(52.4.5)"
+步骤:
+  - ["选“SH-301 铣键槽：压板”，保持 fz = 0.03、μ = 0.16、K = 3.4，从小到大调拧紧扭矩，找出刚好够的扭矩（任务 1），记入表 1。", "Choose “SH-301 keyway: strap clamps”, keep fz = 0.03, μ = 0.16, K = 3.4, raise the torque and find the smallest that holds (task 1); enter in Table 1."]
+  - ["把 μ 改为 0.10 和 0.20（切削液、表面状态不同），记录需要的夹紧力和给出的夹紧力，说明摩擦系数对两者的影响为什么方向相反。", "Set μ to 0.10 and 0.20 (different coolant and surfaces), record required and available forces, and explain why friction affects them in opposite directions."]
+  - ["继续加大扭矩，直到压板弯曲应力超过 300 MPa（任务 2），记下这时的扭矩。", "Keep raising the torque until the strap stress passes 300 MPa (task 2); record that torque."]
+  - ["选“斜楔”，μ = 0.1，楔角从 4° 起每次加 2°，记录增力比和是否自锁（任务 3），记入表 2。", "Choose “Wedge”, μ = 0.1, raise the angle from 4° in 2° steps, record the force ratio and whether it self-locks (task 3); enter in Table 2."]
+  - ["选“圆偏心”，μ = 0.1，选 D 和 e 满足任务 4，记下你的方案。", "Choose “Eccentric”, μ = 0.1, pick D and e for task 4 and record them."]
+数据表:
+  - 标题: ["表 1  SH-301 铣键槽的夹紧力", "Table 1  Clamping SH-301 for keyway milling"]
+    表头: ["μ", "K", "M / N·m", "需要 / N", "控制条件", "给出 / N", "压板应力 / MPa", "结论"]
+    表头英文: ["μ", "K", "M / N·m", "Required / N", "Governing", "Available / N", "Strap stress / MPa", "Result"]
+    行: [["0.16", "3.4", "", "", "", "", "", ""], ["0.10", "3.4", "", "", "", "", "", ""], ["0.20", "3.4", "", "", "", "", "", ""]]
+    行英文: [["0.16", "3.4", "", "", "", "", "", ""], ["0.10", "3.4", "", "", "", "", "", ""], ["0.20", "3.4", "", "", "", "", "", ""]]
+  - 标题: ["表 2  斜楔的增力比与自锁（μ = 0.1，Q = 100 N）", "Table 2  Wedge force ratio and self-locking (μ = 0.1, Q = 100 N)"]
+    表头: ["α / °", "W / N", "W/Q", "无摩擦 W / N", "自锁"]
+    表头英文: ["α / °", "W / N", "W/Q", "Frictionless W / N", "Self-locks"]
+    行: [["4", "", "", "", ""], ["6", "", "", "", ""], ["8", "", "", "", ""], ["10", "", "", "", ""], ["12", "", "", "", ""]]
+    行英文: [["4", "", "", "", ""], ["6", "", "", "", ""], ["8", "", "", "", ""], ["10", "", "", "", ""], ["12", "", "", "", ""]]
+注意:
+  - ["切削力的基准值由程序 52.3.1 逐齿积分算出（Kienzle 单位切削力），本实验只按 fz^(1−mc) 缩放；摩擦系数、安全系数、许用应力是教学取值。", "The baseline cutting forces come from Program 52.3.1 (tooth-by-tooth, Kienzle); here they are only scaled by fz^(1−mc). Friction, safety factor and allowable stress are teaching values."]
+  - ["实验里螺纹和支承面的摩擦系数都取 μ，与程序 52.4.1 分开取值略有差别。", "The lab uses μ for both thread and bearing face, slightly different from Program 52.4.1, which sets them separately."]
+思考题:
+  - ["为什么工序卡上要规定拧紧扭矩、并用定扭矩扳手，而不是写“压紧”两个字？（提示：夹紧力的分散、压板强度、工件变形，52.5 节。）", "Why should the operation sheet specify a torque and a torque wrench rather than just “clamp tight”? (Hint: scatter of clamping force, strap strength, work deformation; Section 52.5.)"]

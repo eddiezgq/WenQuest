@@ -17,7 +17,7 @@ tir_chuck = 0.03                                    # 三爪卡盘的定心精�
 schemes = {
     # A：V 形块定位在精车外圆上，H 的工序基准是该外圆的下母线；V 形块对中，直径误差不影响对称度，
     #    但精车外圆的轴线相对中心孔连线（磨后的齿轮位轴线）有偏心，一批工件偏向各方向，对称度上占 2e_t
-    "A": {"name": T("V 形块 + 轴向挡销", "V-blocks + axial stop"), "H": TL.v_block(Td, 90, "bottom"), "sym": TL.offset_to_zone(e_t)},
+    "A": {"name": T("V 形块 + 轴向挡板", "V-blocks + axial stop"), "H": TL.v_block(Td, 90, "bottom"), "sym": TL.offset_to_zone(e_t)},
     # B：两顶尖，定位基准是中心孔连线；H 从精车外圆下母线量起：半径公差 Td/2 加外圆偏心在竖直方向的变动 2e_t
     "B": {"name": T("两顶尖", "between centres"),
           "H": TL.datum_mismatch([TL.Link("半径", 20.15, 0, -Td / 2), TL.Link("外圆偏心", 0, e_t, -e_t)]), "sym": 0.0},

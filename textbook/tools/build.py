@@ -710,6 +710,7 @@ def check_numbers(sec: Section, rep: Report) -> None:
     text = re.sub(r"https?://\S+", "", text)
     text = re.sub(r"\b(?:JJF|JJG|GB(?:/T)?|JB(?:/T)?|ISO|IEC|IEEE|DIN|VDI|EN|ASTM|ASME|AWS|SAE)\s*[A-Z]?[\d.]+", "", text)     # standard numbers, e.g. JJF 1059.1, JB/T 9165.2
     text = re.split(r"\*\*本节参考文献\*\*|#+\s*(?:本章)?参考文献", text)[0]
+    text = re.sub(r"\d+(?:\.\d+)+\s*节", "", text)       # section references such as “52.10 节” are not measured values
     for line_no, line in enumerate(text.splitlines(), 1):
         for m in NUMBER.finditer(line):
             digits = m.group(1).replace(".", "").lstrip("0")

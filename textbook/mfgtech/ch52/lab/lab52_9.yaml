@@ -1,0 +1,21 @@
+# 实验 52.9 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab52_9.js。
+原理:
+  - ["把 V 形块的横截面分成许多小三角形单元，每个单元内应变为常数（常应变三角形单元）；由单元刚度矩阵组装出整体刚度矩阵 K，底面节点固定，接触点施加工件传来的力 F，解方程 K·u = F 得到各节点的位移 u。截面的厚度取工作面长度（平面应力）。", "Divide the V-block section into small triangles with constant strain in each; assemble the element stiffness matrices into K, fix the base nodes, apply the work's force F at the contacts and solve K·u = F for the nodal displacements u. The section thickness is the land length (plane stress)."]
+  - 式: "K·u = F，k_e = t·A·Bᵀ·D·B        (52.9.2)"
+  - ["工件两侧接触点的法向力 N = W/(2 sin(α/2))；接触点沿工作面法向退让 δ_n，工件轴心下沉 δ_n/sin(α/2)。", "Each contact carries N = W/(2 sin(α/2)); if a contact yields δ_n along its normal, the axis sinks δ_n/sin(α/2)."]
+  - ["集中力作用点附近的位移随网格加密而增大（点载荷的奇异性），真实的接触是线接触（Hertz 接触），所以绝对值只能估量级；比较不同材料、不同尺寸的相对变化是可靠的。", "Near a point load the displacement grows as the mesh is refined (the singularity of a point load); real contact is a Hertzian line contact, so the absolute value is only an order of magnitude, while comparisons between materials and sizes are reliable."]
+步骤:
+  - ["选“钢 V 形块”，读出工件下沉，与书中程序 52.9.1 用同样网格的结果比较，记入表 1。", "Choose “Steel V-block”, read the sink and compare with Program 52.9.1 on the same mesh; enter in Table 1."]
+  - ["把顶点离底面的厚度减到 5 mm（任务 1），再把夹角改为 120°（任务 2），记录下沉，解释原因。", "Cut the apex thickness to 5 mm (task 1), then open the angle to 120° (task 2); record the sink and explain."]
+  - ["选“铝合金 V 形块”（任务 3）和“3D 打印尼龙”（任务 4），记录下沉；尼龙的情况调夹紧力和工作面长度，直到不超过 0.03 mm。", "Choose “Aluminium” (task 3) and “3D-printed nylon” (task 4) and record the sink; for nylon, adjust force and land length until it is within 0.03 mm."]
+数据表:
+  - 标题: ["表 1  V 形块的刚度", "Table 1  V-block stiffness"]
+    表头: ["材料", "E / GPa", "W / N", "t / mm", "顶点离底面 / mm", "α / °", "下沉 / µm"]
+    表头英文: ["Material", "E / GPa", "W / N", "t / mm", "Apex above base / mm", "α / °", "Sink / µm"]
+    行: [["钢", "210", "1800", "18", "20", "90", ""], ["钢", "210", "1800", "18", "5", "90", ""], ["钢", "210", "1800", "18", "20", "120", ""], ["铝合金", "69", "1800", "18", "20", "90", ""], ["尼龙 PA12", "1.7", "", "", "20", "90", ""]]
+    行英文: [["Steel", "210", "1800", "18", "20", "90", ""], ["Steel", "210", "1800", "18", "5", "90", ""], ["Steel", "210", "1800", "18", "20", "120", ""], ["Aluminium", "69", "1800", "18", "20", "90", ""], ["Nylon PA12", "1.7", "", "", "20", "90", ""]]
+注意:
+  - ["网格边长固定为 2 mm，比书中程序（1 mm）粗，下沉略小；两者用同一种单元和加载方式，书中程序也按 2 mm 算了一遍核对。", "The mesh is fixed at 2 mm, coarser than the book's 1 mm, so the sink is a little smaller; the book's program also runs the 2 mm mesh as a check."]
+  - ["3D 打印尼龙的弹性模量随打印方向、填充率、温度和吸湿变化很大，1.7 GPa 是教学取值；尼龙还会蠕变。", "Printed nylon's modulus varies a lot with build direction, infill, temperature and moisture; 1.7 GPa is a teaching value, and nylon also creeps."]
+思考题:
+  - ["夹紧力恒定时，钢 V 形块下沉 1–2 µm 对工件尺寸有没有影响？什么情况下会有影响？", "With a constant clamping force, does a 1–2 µm sink of a steel V-block affect part size? When would it?"]

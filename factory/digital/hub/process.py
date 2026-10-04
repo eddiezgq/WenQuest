@@ -280,6 +280,13 @@ def _review_v2(plan, say):
         elif not TL.ok_against(tol, e):
             say("定位误差", "warning", "“{}”的定位误差约 {:.4f} mm，超过工序公差 {:.3f} mm 的三分之一，留给加工和测量的余地太小。"
                 .format(lc.get("what", ""), e, tol), o["seq"])
+    # 2b 夹具：工序登记了夹具编号（fixture_id），且数字工厂有这套夹具的设计数据（std/<编号>_fixture.yaml）时，
+    #    核算夹紧力够不够、夹具精度预算是否满足（第 52 章，hub/fixture.py）
+    from hub import fixture as FX
+    for o in plan.get("operations") or []:
+        if o.get("fixture_id"):
+            for level, text in FX.review(o["fixture_id"]):
+                say("夹具", level, text, o["seq"])
     # 3 尺寸链：工艺规程里登记的尺寸链，按极值法算出的封闭环要落在图纸特性之内
     for ch in plan.get("chains") or []:
         links = [TL.Link(l["name"], l["nominal"], l.get("es", 0), l.get("ei", 0), l.get("sense", 1)) for l in ch["links"]]

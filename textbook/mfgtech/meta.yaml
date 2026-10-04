@@ -8,6 +8,9 @@ program_deps:
   - factory/digital/hub/cards.py
   - factory/digital/hub/sketch.py
   - factory/digital/hub/tolerance.py
+  - factory/digital/hub/fixture.py
+  - factory/digital/hub/fe2d.py
+  - factory/digital/cae/cam_power.py
   - factory/digital/hub/process.py
   - factory/digital/sim/errors.py
   - factory/factory/data.py

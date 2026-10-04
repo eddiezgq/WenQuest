@@ -201,15 +201,16 @@ operations:
     shop: 机加
     content: 铣齿轮位键槽 12N9×45，控制槽底到精车外圆下母线的尺寸 H = 35.15（−0.03/−0.20），磨削后得 d − t₁ = 35（0/−0.2）
     datum: 齿轮位外圆与轴肩（V 形块）
-    clamping: V 形块，压板
+    clamping: V 形块，移动压板（定扭矩 5 N·m）
     tools: 键槽铣刀 Ø12
     minutes: 10
     setup_min: 20
     coolant: 乳化液
-    fixture: 键槽铣夹具 JJ-301-50（两个短 V 形块 + 轴向挡销 + 压板）
+    fixture: 键槽铣夹具 JJ-301-50（两个短 V 形块 + 轴向挡板 + 移动压板）
+    fixture_id: JJ-301-50
     locate_check: {method: v_block, Td: 0.039, alpha: 90, measure: bottom, tol: 0.17, what: 槽底尺寸 H（以齿轮位外圆下母线为工序基准）}
     locate: [{surface: 齿轮位外圆, symbol: v, dof: 4}, {surface: 轴肩, symbol: plane, dof: 1}]
-    clamp: [{surface: 齿轮位外圆, kind: manual}]
+    clamp: [{surface: 左轴端、右轴承位（移动压板，5 N·m）, kind: manual}]
     sketch:
       stock: [[30, 40], [35.3, 12], [40.3, 60], [35.3, 25], [30, 30]]
       machined: [keyway]
@@ -220,9 +221,9 @@ operations:
         - {kind: keyway_pos, text: "7.5"}
       ra: {keyway: 3.2}
     steps:
-      - {step: 1, content: 齿轮位外圆放入 V 形块，左轴肩靠挡销，压板压紧, ta_min: 1.5}
-      - {step: 2, content: 对刀（对中心、对槽底）, ta_min: 1.0, gauge: G08}
-      - {step: 3, content: 分 5 层铣键槽（每层约 1.03 mm）至 H 35.15, tool: T04, op: keyway, d: 12, vc: 25, fz: 0.03, z: 2, layers: 5, ap_layer: 1.03, travel: 33}
+      - {step: 1, content: 齿轮位外圆放入 V 形块，左轴肩靠挡板，两个移动压板压左轴端和右轴承位，用定扭矩扳手拧至 5 N·m, ta_min: 1.5}
+      - {step: 2, content: 用对刀块和 3 mm 塞尺对刀（对中心、对槽底）；首件试切后用对称度检具测量并微调横向位置, ta_min: 1.0, gauge: G08}
+      - {step: 3, content: 分 5 层铣键槽（每层约 1.03 mm）至 H 35.15；铣刀朝挡板方向进给，每层单向切削、抬刀快速返回, tool: T04, op: keyway, d: 12, vc: 25, fz: 0.03, z: 2, layers: 5, ap_layer: 1.03, travel: 33}
     inspect:
       - {char: "键槽宽 12 N9（C4）", gauge: G06, freq: 每件}
       - {char: "槽底尺寸 H 35.15（−0.03/−0.20）", gauge: G07, freq: 首件、每 5 件}
