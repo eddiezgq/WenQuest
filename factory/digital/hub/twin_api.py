@@ -1,11 +1,37 @@
 # -*- coding: utf-8 -*-
 """数字孪生的网页接口（第 15 轮）"""
-from fastapi import Body, Depends, HTTPException
+import hmac
+import os
+
+from fastapi import Body, Depends, Header, HTTPException
 
 from hub import twin as TW
 
 
 def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
+
+    @app.post("/api/twin/telemetry")
+    def twin_device_telemetry(body: dict = Body(...), authorization: str = Header(default="")):
+        """真设备接入口（T2）：现场的采集器（例如 ESP32）用 HTTPS 发一条运行摘要（格式同 twin.telemetry 的 data），
+        钥匙放在 Authorization: Bearer <WQ_TWIN_DEVICE_KEY>。校验后发到总线 wq/gearbox/field/<序列号>/telemetry，和模拟器走同一条路。"""
+        import wqbus
+        from wqbus.topics import topic
+        key = os.environ.get("WQ_TWIN_DEVICE_KEY", "")
+        if not key or not hmac.compare_digest(authorization.encode(), ("Bearer " + key).encode()):
+            raise HTTPException(401, "设备钥匙不对（或服务器没设 WQ_TWIN_DEVICE_KEY）")
+        mode = body.pop("mode", None) or os.environ.get("WQ_MODE", "teach")
+        serial = str(body.get("serial") or "")
+        if not serial or "/" in serial or "+" in serial or "#" in serial or len(serial) > 40:
+            raise HTTPException(422, "序列号不对")
+        try:
+            msg = wqbus.make("twin.telemetry", "device/" + serial, body, mode=mode, corr=serial)
+        except wqbus.ValidationError as e:
+            raise HTTPException(422, "数据不合规范：{}".format(e)) from None
+        tp = topic("field", serial, "telemetry")
+        if H.bus is not None:
+            H.bus.publish_msg(tp, msg)
+        H.hist.handle(tp, msg)
+        return {"id": msg["id"], "topic": tp}
 
     @app.get("/api/twin/fleet")
     def twin_fleet(u=Depends(user_of)):
@@ -115,6 +141,27 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
             if units:
                 rows.append((site, info["label"], units))
         return TW.json_safe(twin_ai.feedback(rows))
+
+    @app.get("/api/twin/robots")
+    def twin_robots(u=Depends(user_of)):
+        return TW.json_safe({"robots": TW.robots(H.db, u["mode"])})
+
+    @app.post("/api/twin/robots")
+    def twin_robot_add(body: dict = Body(...), u=Depends(user_of)):
+        """机械臂关节孪生：从“运动与动力分析”的一次计算（一个搬运循环）建，按每天运行小时累计谐波减速器寿命"""
+        import urllib.parse
+        from hub.cae_api import call
+        jid = str(body.get("mbd_job") or "")
+        h = float(body.get("hours_per_day") or 16)
+        if not 1 <= h <= 24:
+            raise HTTPException(400, "每天运行 1–24 小时")
+        j = call("GET", "/jobs/" + urllib.parse.quote(jid)).json()
+        if j.get("kind") != "mbd" or (not is_teacher(u) and str(j.get("owner")) != uid_of(u)):
+            raise HTTPException(404, "没有这次动力学计算")
+        life = call("GET", "/mbd/jobs/{}/reducer-life".format(urllib.parse.quote(jid))).json()
+        name = (body.get("name") or j.get("title") or "机械臂")[:60]
+        rid = H.twin.add_robot(u["mode"], name, life, h, who(u))
+        return {"id": rid, "life": life}
 
     @app.get("/api/twin/faults")
     def twin_faults(u=Depends(user_of)):

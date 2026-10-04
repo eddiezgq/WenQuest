@@ -383,3 +383,81 @@ def test_api_order_done_explain_feedback(db, monkeypatch):
     by = {s["site"]: s for s in fb["sites"]}
     assert by["mine"]["eq_vs_rated"] > by["port"]["eq_vs_rated"] > by["food"]["eq_vs_rated"]
     assert by["mine"]["worst_bearing"] == "mid-B" and any("6306" in n for n in fb["notes"])
+
+
+# ---------------------------------------------------------------- 第 5 步：机械臂关节孪生
+def test_harmonic_reducer_life_formula():
+    import numpy as np
+    from twin import robot as R
+    t = np.linspace(0, 10, 2001)
+    w = np.full_like(t, 0.5)                                     # 关节 0.5 rad/s
+    tau = np.full_like(t, 60.0)
+    r = R.joint_life(t, tau, w, 137.0, 100)
+    n_in = 0.5 * 60 / (2 * math.pi) * 100
+    assert abs(r["n_av_in"] - n_in) / n_in < 1e-6 and abs(r["T_av"] - 60) < 1e-6
+    assert abs(r["L10_h"] - 7000 * (137 / 60) ** 3 * (2000 / n_in)) / r["L10_h"] < 1e-6
+    # 两段：力矩 40 N·m 转 1 rad/s 一半时间，80 N·m 转 0.5 rad/s 另一半 → 按转速加权的立方平均
+    w2 = np.where(t < 5, 1.0, 0.5)
+    tau2 = np.where(t < 5, 40.0, 80.0)
+    r2 = R.joint_life(t, tau2, w2, 137.0, 100)
+    expect = ((1.0 * 40 ** 3 + 0.5 * 80 ** 3) / 1.5) ** (1 / 3)
+    assert abs(r2["T_av"] - expect) / expect < 0.01
+    ser = {"t": t, "drive.j1": tau2, "qd.j1": w2, "qdd.j1": np.gradient(w2, t)}
+    out = R.reducer_life(ser, ["j1"])
+    j = out["joints"][0]
+    assert j["gear"].startswith("谐波") and j["L10_h"] > 0 and out["cycle_s"] == 10
+
+
+def test_robot_twin_accumulates(db, monkeypatch):
+    from hub import twin as TW
+    monkeypatch.setattr(TW, "FIELD_MODES", ["teach"])
+    tw, sent, hist = _service(db)
+    life = {"job": "J1", "cycle_s": 12, "joints": [{"joint": "shoulder", "L10_h": 20000, "gear": "谐波 32 号"},
+                                                   {"joint": "wrist", "L10_h": 80000, "gear": "谐波 17 号"}]}
+    rid = tw.add_robot("teach", "UR5e 搬运", life, 16)
+    db.x("update field_clock set anchor_day = anchor_day + 30 where mode='teach'")
+    tw.tick_robots("teach")
+    r = TW.robots(db, "teach")[0]
+    assert r["id"] == rid and r["first"] == "shoulder"
+    sh = next(j for j in r["joints"] if j["joint"] == "shoulder")
+    assert 30 * 16 * 0.85 / 20000 * 0.7 < sh["used"] < 30 * 16 / 20000 * 1.35
+    assert abs(sh["remaining_days"] - (1 - sh["used"]) / (sh["used"] / 30)) < 1e-6
+
+
+def test_real_device_http_entry(db, monkeypatch):
+    """真设备经 HTTPS 发运行摘要（钥匙校验、格式校验），和模拟器走同一条路进孪生"""
+    import importlib
+    from fastapi.testclient import TestClient
+    monkeypatch.setenv("WQ_HUB_NO_START", "1")
+    monkeypatch.setenv("WQ_TWIN_DEVICE_KEY", "dev-key")
+    import hub.app as app_mod
+    app_mod = importlib.reload(app_mod)
+    from hub import twin as TW
+    from hub.historian import Historian
+    app_mod.H.db = db
+    app_mod.H.twin = TW.TwinService(db, lambda *a, **k: None)
+    app_mod.H.twin.init()
+    app_mod.H.hist = Historian(db, app_mod.H.twin.on_message)
+    c = TestClient(app_mod.app)
+    d = F.day_summary("REAL-0002", "port", dt.date(2026, 9, 1))
+    assert c.post("/api/twin/telemetry", json=d).status_code == 401
+    assert c.post("/api/twin/telemetry", json=d, headers={"Authorization": "Bearer nope"}).status_code == 401
+    bad = dict(d, day="2026-9-1")
+    assert c.post("/api/twin/telemetry", json=bad, headers={"Authorization": "Bearer dev-key"}).status_code == 422
+    r = c.post("/api/twin/telemetry", json=dict(d, mode="teach"), headers={"Authorization": "Bearer dev-key"}).json()
+    assert r["topic"] == "wq/gearbox/field/REAL-0002/telemetry"
+    t = db.one("select * from twin where serial='REAL-0002' and mode='teach'")
+    assert t["source"] == "field" and t["state"]["days"] == 1
+    assert db.one("select count(*) as n from bus_message where type='twin.telemetry'")["n"] == 1
+
+
+def test_lab13_documents():
+    import io
+    import docx
+    from cae import labdoc
+    g = docx.Document(io.BytesIO(labdoc.guide_docx("lab13")))
+    text = "\n".join(p.text for p in g.paragraphs)
+    assert "实验 13" in text and "数字孪生" in text and "ISO 281" in text
+    t = docx.Document(io.BytesIO(labdoc.report_template_docx("lab13")))
+    cells = " ".join(c.text for tb in t.tables for r in tb.rows for c in r.cells)
+    assert "2990" in cells and "ERPNext 服务工单号" in cells

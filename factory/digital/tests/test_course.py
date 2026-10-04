@@ -124,6 +124,7 @@ def test_designs_cases_layout(client):
     assert c[3]["id"] == "lab10" and c[3]["tool_url"].endswith("/cam") and c[3]["report_template_url"].endswith("/api/cae/lab10/report-template.docx")
     assert c[4]["id"] == "lab11" and c[4]["tool_url"].endswith("/opt") and c[4]["guide_url"].endswith("/api/cae/lab11/guide.docx")
     assert c[5]["id"] == "lab12" and c[5]["tool_url"].endswith("/cae") and "RJ-201" in c[5]["products"]
+    assert c[6]["id"] == "lab13" and c[6]["tool_url"].endswith("/twin") and c[6]["guide_url"].endswith("/api/cae/lab13/guide.docx")
     lay = client.get("/api/course/layout", headers=AUTH).json()
     assert lay["floor"] == {"w_m": 50, "d_m": 28}
     grd = next(u for u in lay["units"] if u["unit"] == "grd-01")

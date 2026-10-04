@@ -575,6 +575,21 @@ def mbd_motors(jid: str, safety: float = 1.2):
     return {"joints": out, "table": MT.table()}
 
 
+@app.get("/mbd/jobs/{jid}/reducer-life")
+def mbd_reducer_life(jid: str):
+    """机械臂关节孪生（第 15 轮）：一个循环里每个关节谐波减速器的平均负载力矩、平均输入转速、L10 寿命"""
+    from twin import robot as RB
+    j = _read_json(_job_path(jid.replace("/", ""), "job.json"))
+    if j.get("kind") != "mbd" or j["status"] != "done":
+        raise HTTPException(409, "动力学结果还没出来")
+    ser = read_series(_job_path(j["id"], "series.bin"))
+    joints = [d["joint"] for d in j["stats"]["drives"] if d["kind"] != "coupled" and ("drive." + d["joint"]) in ser
+              and np.any(np.abs(ser["qd." + d["joint"]]) > 0)]
+    if not joints:
+        raise HTTPException(409, "这次计算里没有转动的驱动关节")
+    return dict(RB.reducer_life(ser, joints), job=j["id"], title=j.get("title"), model=(j.get("model") or {}).get("id"))
+
+
 @app.get("/mbd/jobs/{jid}/member-series")
 def mbd_member_series(jid: str, member: str, direction: str = ""):
     """疲劳用：杆件 B 端受力在指定方向（构件坐标，默认最大力的方向）上的分量随时间的变化"""

@@ -73,7 +73,7 @@ def order_preview(d, event, action):
         "诊断：" + event["title"] if event else "",
         x.get("detail", ""), "依据：" + x.get("cause", "") if x.get("cause") else "",
         "要做：" + what + ("。" + x["advice"] if x.get("advice") else ""),
-        "来源：问渠数字工厂 · 数字孪生（{}）".format(d.get("summary", {}).get("vib_zone") and "振动 {} 区".format(d["summary"]["vib_zone"]) or "")] if x)
+        "来源：问渠数字工厂 · 数字孪生"] if x)
     return {"serial": d["serial"], "customer": d.get("customer"), "action": action, "what": what, "subject": subject[:140],
             "description": desc, "event_id": event["id"] if event else None,
             "priority": "紧急" if event and event["level"] == "critical" else "一般"}

@@ -148,3 +148,43 @@ j = call("POST", "/api/cam/jobs", {"spec": spec, "title": "演练"}, token=tok)
 assert j["status"] == "done" and j["programs"][0]["sim"]["over"] == 0, j.get("error") or j["programs"][0]["checks"]
 assert len(call("GET", "/api/cam/jobs/{}/h0.bin".format(j["id"]), token=tok, raw=True)) == 4 * j["programs"][0]["sim"]["nx"] * j["programs"][0]["sim"]["ny"]
 print("数控编程演练通过：SH-301 粗车 {} 个程序，平板铣削 {:.1f} 分钟".format(n_rough, j["compare"]["program_minutes"]))
+
+# 第 15 轮：数字孪生——情景机队、诊断、开维修单（经桥接进真 ERPNext 的服务工单）、维修完成
+t0 = time.time()
+fl = {"units": []}
+while time.time() - t0 < 120:
+    fl = call("GET", "/api/twin/fleet", token=tok)
+    if len(fl["units"]) >= 12 and any(a["kind"] == "bearing" for u in fl["units"] for a in u["alerts"]):
+        break
+    time.sleep(3)
+assert len(fl["units"]) >= 12, len(fl["units"])
+brg = next(u for u in fl["units"] if any(a["kind"] == "bearing" for a in u["alerts"]))
+d = call("GET", "/api/twin/units/" + brg["serial"], token=tok)
+ev = next(e for e in d["events"] if e["kind"] == "bearing" and e["status"] == "open")
+r = call("POST", "/api/twin/units/{}/order".format(brg["serial"]), {"action": ev["detail"]["action"]["kind"], "event_id": ev["id"]}, token=tok)
+issue = None
+t0 = time.time()
+while time.time() - t0 < 90:
+    p = call("GET", "/api/proposals/" + r["proposal_id"], token=tok)
+    if p["status"] in ("executed", "failed"):
+        break
+    time.sleep(2)
+assert p["status"] == "executed", p
+issue = next(x["name"] for x in p["results"] if x["doctype"] == "Issue")
+o = next(e for e in call("GET", "/api/twin/units/" + brg["serial"], token=tok)["events"] if e["kind"] == "order")
+done = call("POST", "/api/twin/units/{}/done".format(brg["serial"]), {"order_id": o["id"], "note": "演练：更换中间轴轴承 B"}, token=tok)
+assert done["issue"] == issue
+assert call("GET", "/api/twin/units/" + brg["serial"], token=tok)["state"]["brg_D"]["mid-B"] == 0
+if A.erp:
+    t0 = time.time()
+    st = None
+    while time.time() - t0 < 90:
+        q = urllib.request.Request(A.erp + "/api/resource/Issue/" + urllib.parse.quote(issue), headers=hdr)
+        doc = json.loads(urllib.request.urlopen(q, timeout=30).read().decode())["data"]
+        st = doc.get("status")
+        if st == "Resolved":
+            break
+        time.sleep(2)
+    assert st == "Resolved" and doc.get("wq_serial") == brg["serial"], (st, doc.get("wq_serial"))
+    print("ERPNext：服务工单 {} 开单并已解决（设备 {}）".format(issue, brg["serial"]))
+print("数字孪生演练通过：{} 台，{} 轴承报警 → 维修单 {} → 维修完成、寿命复位".format(len(fl["units"]), brg["serial"], issue))

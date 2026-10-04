@@ -9,7 +9,8 @@ GUIDE_MD = os.path.join(HERE, "实验8_输出轴强度与疲劳校核.md")
 GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节力矩与电机选型.md"),
           "lab10": os.path.join(HERE, "实验10_输出轴数控车削与键槽铣削编程.md"),
           "lab11": os.path.join(HERE, "实验11_减速器热平衡与输出轴轻量化.md"),
-          "lab12": os.path.join(HERE, "实验12_一根轴的数字化设计与两个典型案例.md")}
+          "lab12": os.path.join(HERE, "实验12_一根轴的数字化设计与两个典型案例.md"),
+          "lab13": os.path.join(HERE, "实验13_减速器数字孪生与预测性维护.md")}
 
 
 def _doc():
@@ -99,6 +100,8 @@ def report_template_docx(lab="lab8"):
         return lab11_template()
     if lab == "lab12":
         return lab12_template()
+    if lab == "lab13":
+        return lab13_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -379,6 +382,56 @@ def lab12_template():
     table([["轴", "决定尺寸的因素", "依据（本实验的数据）"], ["SH-301", "", ""], ["RJ-201", "", ""], ["LS-101", "", ""]])
     d.add_heading("七、附件", 1)
     d.add_paragraph("平台生成的计算报告（Word）：RJ-201 扭转与疲劳、LS-101 固有频率（两种约束）、LS-101 扭转疲劳。", style="List Bullet")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab13_template():
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 13　减速器数字孪生与预测性维护　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、读懂一台的分身（任务 1）", 1)
+    table([["项目", "记录"], ["序列号 / 客户 / 起运行日期", ""], ["工单、输出轴序列号、设计版本", ""], ["跑合峰值转矩 N·m", ""],
+           ["运行小时 / 起动次数", ""], ["最先到期的轴承、已用 L10", ""], ["输出轴疲劳损伤", ""], ["换油剩余 / 油温残差 / 振动", ""]])
+    hint("为什么总是中间轴轴承 B 最先到期？")
+    d.add_heading("二、手算核对（任务 2）", 1)
+    table([["项目", "手算", "平台"], ["中间轴转矩 T₂ N·m", "", ""], ["第二级 Ft / Fr / F N", "", ""], ["输入轴转矩 T₁ N·m", "", ""],
+           ["第一级 Ft / Fr N", "", ""], ["中间轴轴承 B 径向力 P N", "", "2990"], ["中间轴转速 r/min", "", ""],
+           ["L10 h（额定）", "", "约 10 800"], ["85% 负载时寿命倍数 1/0.85³", "", ""], ["某天热平衡油温 ℃", "", ""]])
+    hint("为什么不能直接用平均转矩算轴承寿命？")
+    d.add_heading("三、诊断（任务 3）", 1)
+    table([["设备", "异常的数据", "判断的原因", "依据", "AI 的说法与你的异同"], ["港口（红）", "", "", "", ""], ["矿山（振动）", "", "", "", ""],
+           ["港口（换油过期）", "", "", "", ""]])
+    d.add_heading("四、预测性维护（任务 4）", 1)
+    table([["项目", "记录"], ["维修单标题 / 优先级", ""], ["ERPNext 服务工单号", ""], ["维修记录", ""],
+           ["完成前后：轴承已用、振动、报警状态", ""], ["ERPNext 工单状态", ""], ["老师制造的故障：哪一台、什么问题、怎么发现的", ""]])
+    d.add_heading("五、假如与反馈设计（任务 5）", 1)
+    table([["假如", "最先到期的轴承约剩", "输出轴约剩", "换油间隔", "平均油温"], ["现在", "", "", "", ""], ["负载 80%", "", "", "", ""],
+           ["加风扇", "", "", "", ""], ["输出轴 40Cr", "", "", "", ""]])
+    table([["机队反馈", "记录"], ["轴承当量转矩最高的客户 / 占额定", ""], ["中间轴轴承每年用掉 L10", ""], ["平台的设计建议", ""], ["你的意见", ""]])
+    d.add_heading("六、选做（任务 6、7）", 1)
+    d.add_paragraph("")
+    d.add_heading("七、结论与讨论", 1)
+    d.add_paragraph("")
     buf = io.BytesIO()
     d.save(buf)
     return buf.getvalue()
