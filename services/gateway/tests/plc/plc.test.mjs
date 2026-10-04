@@ -284,3 +284,63 @@ END_PROGRAM`;
   assert.match(xml, /<!\[CDATA\[  x\(a := start\);\n  lamp := x.q;\]\]>/);
   writeFileSync(process.env.PLC_XML_OUT || "/dev/null", xml);
 });
+
+// ---------------- SFC (Chapter 12)
+const SFC_IO = [
+  { name: "start", addr: "%IX0.0", dir: "in" }, { name: "up", addr: "%IX0.1", dir: "in" }, { name: "down", addr: "%IX0.2", dir: "in" },
+  { name: "left", addr: "%IX0.3", dir: "in" }, { name: "right", addr: "%IX0.4", dir: "in" },
+  { name: "lift", addr: "%QX0.0", dir: "out" }, { name: "lower", addr: "%QX0.1", dir: "out" }, { name: "moveR", addr: "%QX0.2", dir: "out" },
+  { name: "grip", addr: "%QX0.3", dir: "out" }, { name: "lamp", addr: "%QX0.4", dir: "out" }, { name: "count", addr: "%QW2", dir: "out", type: "INT" },
+];
+test("SFC: sequence with S/R, P, D and L qualifiers, step flags and times, and a parallel branch", () => {
+  const r = new P.Runtime({ io: SFC_IO, cycle: 10, st: `PROGRAM Main
+    VAR n : INT; END_VAR
+    INITIAL_STEP S0: END_STEP
+    STEP S1: lower(N); grip(S); END_STEP
+    STEP S2: lift(N); Count(P); END_STEP
+    STEP S3: moveR(N); lamp(L, T#50ms); END_STEP
+    STEP S4: grip(R); END_STEP
+    STEP S5a: lamp(D, T#30ms); END_STEP
+    STEP S5b: END_STEP
+    STEP S6: END_STEP
+    ACTION Count: n := n + 1; count := n; END_ACTION
+    TRANSITION FROM S0 TO S1 := start; END_TRANSITION
+    TRANSITION FROM S1 TO S2 := down; END_TRANSITION
+    TRANSITION FROM S2 TO S3 := up; END_TRANSITION
+    TRANSITION FROM S3 TO S4 := right; END_TRANSITION
+    TRANSITION FROM S4 TO (S5a, S5b) := TRUE; END_TRANSITION
+    TRANSITION FROM S5b TO S6 := S5b.T >= T#20ms; END_TRANSITION
+    TRANSITION FROM (S5a, S6) TO S0 := S5a.T >= T#100ms; END_TRANSITION
+  END_PROGRAM` });
+  const step = (n = 1) => { for (let k = 0; k < n; k++) r.scan(); };
+  step(2);
+  assert.equal(r.watch("Main.S0.X"), true);
+  r.setInput("start", true); step(2);
+  assert.equal(r.output("lower"), true); assert.equal(r.output("grip"), true);
+  r.setInput("start", false); r.setInput("down", true); step(2);
+  assert.equal(r.output("lower"), false); assert.equal(r.output("lift"), true);
+  step(5);
+  assert.equal(r.output("count"), 1, "P action runs once");
+  r.setInput("down", false); r.setInput("up", true); step(2);
+  assert.equal(r.output("moveR"), true); assert.equal(r.output("lamp"), true, "L: on at first");
+  step(6);
+  assert.equal(r.output("lamp"), false, "L: off after 50 ms");
+  assert.equal(r.output("grip"), true, "S keeps grip on");
+  r.setInput("right", true); step(2);
+  assert.equal(r.output("grip"), false, "R in S4");
+  step(1);
+  assert.equal(r.watch("Main.S5a.X"), true); assert.equal(r.watch("Main.S5b.X"), true);
+  assert.equal(r.output("lamp"), false);
+  step(4);
+  assert.equal(r.output("lamp"), true, "D: on after 30 ms");
+  assert.equal(r.watch("Main.S6.X"), true);
+  step(12);
+  assert.equal(r.watch("Main.S0.X"), true, "both branches joined back to S0");
+  assert.equal(r.watch("Main.S5a.X"), false);
+});
+test("SFC errors: no initial step, unknown step, unknown action; a variable may still be called step", () => {
+  assert.throws(() => P.compile(`PROGRAM Main STEP S1: END_STEP END_PROGRAM`, { io: [] }), /INITIAL_STEP/);
+  assert.throws(() => P.compile(`PROGRAM Main INITIAL_STEP S0: END_STEP TRANSITION FROM S0 TO S9 := TRUE; END_TRANSITION END_PROGRAM`, { io: [] }), /S9/);
+  assert.throws(() => P.compile(`PROGRAM Main INITIAL_STEP S0: foo(N); END_STEP END_PROGRAM`, { io: [] }), /foo/);
+  P.compile(`PROGRAM Main VAR step : INT; END_VAR step := step + 1; END_PROGRAM`, { io: [] });
+});

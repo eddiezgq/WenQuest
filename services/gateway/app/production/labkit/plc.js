@@ -265,9 +265,10 @@ function Parser(src) {
   }
 
   // statements
+  const atEnder = (enders) => (toks[p].t === "kw" && enders.includes(toks[p].v)) || (toks[p].t === "id" && enders.includes(toks[p].v.toUpperCase()));
   function stmts(...enders) {
     const out = [];
-    while (!(toks[p].t === "kw" && enders.includes(toks[p].v)) && !is("eof")) {
+    while (!atEnder(enders) && !is("eof")) {
       if (accept("op", ";")) continue;
       out.push(stmt());
     }
@@ -424,6 +425,68 @@ function Parser(src) {
     }
   }
 
+  // ---- textual SFC (IEC 61131-3 §6.7): INITIAL_STEP / STEP … END_STEP, TRANSITION FROM … TO … := cond; END_TRANSITION,
+  // ACTION name: … END_ACTION. The words are not reserved (a variable may be called "step"): they count only here.
+  const word = (k = 0) => (toks[p + k].t === "id" ? toks[p + k].v.toUpperCase() : null);
+  function atSfc() {
+    const w = word();
+    if ((w === "STEP" || w === "INITIAL_STEP") && toks[p + 1].t === "id") return true;
+    if (w === "TRANSITION" && (word(1) === "FROM" || (toks[p + 1].t === "id" && word(2) === "FROM"))) return true;
+    if (w === "ACTION" && toks[p + 1].t === "id" && toks[p + 2].t === "op" && toks[p + 2].v === ":") return true;
+    return false;
+  }
+  function expectWord(w) {
+    if (word() === w) return next();
+    const k = toks[p];
+    throw E("syntax", `这里应该是 ${w}，实际是 “${k.v == null ? "文件结尾" : k.v}” / expected ${w}`, k.line);
+  }
+  function stepList() {
+    if (accept("op", "(")) { const l = [ident("步 step")]; while (accept("op", ",")) l.push(ident("步 step")); expect("op", ")"); return l; }
+    return [ident("步 step")];
+  }
+  function pouBody(end) {
+    const body = [];
+    let sfc = null;
+    const S = () => sfc || (sfc = { steps: [], transitions: [], actions: {} });
+    while (!is("kw", end) && !is("eof")) {
+      if (accept("op", ";")) continue;
+      if (!atSfc()) { body.push(stmt()); continue; }
+      const line = peek().line, w = word();
+      if (w === "STEP" || w === "INITIAL_STEP") {
+        next();
+        const name = ident("步名 step name"); expect("op", ":");
+        const acts = [];
+        while (word() !== "END_STEP") {
+          if (is("eof")) throw E("syntax", "STEP 没有 END_STEP / STEP without END_STEP", line);
+          const an = ident("动作名 action name"); expect("op", "(");
+          const q = ident("限定符 qualifier").toUpperCase();
+          if (!["N", "S", "R", "P", "L", "D", "P0", "P1"].includes(q)) throw E("syntax", `不支持的动作限定符 ${q}（N、S、R、P、L、D） / unsupported qualifier ${q}`, line);
+          let t = null;
+          if (accept("op", ",")) t = expr();
+          expect("op", ")"); accept("op", ";");
+          if ((q === "L" || q === "D") && !t) throw E("syntax", `限定符 ${q} 要给时间，如 ${an}(${q}, T#2s) / ${q} needs a time`, line);
+          acts.push({ name: an, q, t });
+        }
+        next();
+        S().steps.push({ name, initial: w === "INITIAL_STEP", acts, line });
+      } else if (w === "TRANSITION") {
+        next();
+        let tname = null;
+        if (word() !== "FROM") tname = ident();
+        expectWord("FROM"); const from = stepList();
+        expect("kw", "TO"); const to = stepList();
+        expect("op", ":="); const cond = expr(); accept("op", ";");
+        expectWord("END_TRANSITION");
+        S().transitions.push({ name: tname, from, to, cond, line });
+      } else {
+        next();
+        const name = ident(); expect("op", ":");
+        const b = stmts("END_ACTION"); expectWord("END_ACTION");
+        S().actions[name.toUpperCase()] = { name, body: b, line };
+      }
+    }
+    return { body, sfc };
+  }
   function pous() {
     const out = { pous: [], types: {}, globals: [] };
     while (!is("eof")) {
@@ -441,9 +504,9 @@ function Parser(src) {
       const vars = [];
       const SECTIONS = { VAR: "var", VAR_INPUT: "input", VAR_OUTPUT: "output", VAR_IN_OUT: "inout", VAR_EXTERNAL: "external", VAR_TEMP: "temp", VAR_GLOBAL: "global" };
       while (isKw(...Object.keys(SECTIONS))) { const s = next().v; vars.push(...varSection(SECTIONS[s])); }
-      const body = stmts(end);
+      const { body, sfc } = pouBody(end);
       expect("kw", end);
-      out.pous.push({ kind, name, ret, vars, body, line: k.line });
+      out.pous.push({ kind, name, ret, vars, body, sfc, line: k.line });
     }
     return out;
   }
@@ -451,6 +514,28 @@ function Parser(src) {
 }
 
 function parse(src) { return Parser(src).pous(); }
+
+// an expression back to ST text (for SFC transition labels and the FBD view)
+const PREC = { OR: 1, XOR: 2, AND: 3, "=": 4, "<>": 4, "<": 5, ">": 5, "<=": 5, ">=": 5, "+": 6, "-": 6, "*": 7, "/": 7, MOD: 7, "**": 8 };
+function exprText(x, outer = 0) {
+  switch (x.e) {
+    case "num": return x.typed ? `${x.typed}#${x.v}` : String(x.v);
+    case "time": return fmtTime(x.v);
+    case "str": return `'${x.v}'`;
+    case "bool": return x.v ? "TRUE" : "FALSE";
+    case "name": return x.n;
+    case "addr": return x.a;
+    case "enumref": return `${x.t}#${x.v}`;
+    case "field": return `${exprText(x.a, 9)}.${x.f}`;
+    case "bit": return `${exprText(x.a, 9)}.${x.b}`;
+    case "index": return `${exprText(x.a, 9)}[${x.idx.map((i) => exprText(i)).join(", ")}]`;
+    case "not": return `NOT ${exprText(x.a, 9)}`;
+    case "neg": return `-${exprText(x.a, 9)}`;
+    case "call": return `${exprText(x.f, 9)}(${x.args.map((a) => (a.name ? `${a.name} ${a.out ? "=>" : ":="} ${exprText(a.out || a.v)}` : exprText(a.v))).join(", ")})`;
+    case "bin": { const p = PREC[x.op]; const t = `${exprText(x.a, p)} ${x.op} ${exprText(x.b, p + 1)}`; return p < outer ? `(${t})` : t; }
+  }
+  return "?";
+}
 function parseExpr(src) { const P = Parser(src); const x = P.expr(); return x; }
 
 // ---------------------------------------------------------------- standard function blocks
@@ -550,6 +635,27 @@ class Ctx {
 function compile(src, opts = {}) {
   const ast = typeof src === "string" ? parse(src) : src;
   const types = Object.assign({}, ast.types);
+  // SFC steps are variables of a built-in structure: S1.X (active) and S1.T (time since activation)
+  types.__SFCSTEP = { name: "__SFCSTEP", struct: [{ name: "X", type: { name: "BOOL" } }, { name: "T", type: { name: "TIME" } }] };
+  for (const u of ast.pous) {
+    if (!u.sfc) continue;
+    const sf = u.sfc;
+    if (!sf.steps.some((x) => x.initial)) throw E("semantic", `${u.name}：顺序功能图要有一个 INITIAL_STEP（初始步） / the SFC needs an INITIAL_STEP`, u.line);
+    const names = new Set();
+    for (const st of sf.steps) {
+      const k = st.name.toUpperCase();
+      if (names.has(k)) throw E("semantic", `步 ${st.name} 重复了 / step ${st.name} is defined twice`, st.line);
+      names.add(k);
+      if (u.vars.some((v) => v.name.toUpperCase() === k)) throw E("semantic", `步名 ${st.name} 与变量重名 / step ${st.name} has the name of a variable`, st.line);
+      u.vars.push({ name: st.name, type: { name: "__SFCSTEP" }, kind: "var", line: st.line, step: true, initial: st.initial });
+    }
+    for (const t of sf.transitions) for (const n of t.from.concat(t.to))
+      if (!names.has(n.toUpperCase())) throw E("semantic", `转移引用了不存在的步 ${n} / the transition names an unknown step ${n}`, t.line);
+    for (const st of sf.steps) for (const a of st.acts)
+      if (!sf.actions[a.name.toUpperCase()] && !u.vars.some((v) => v.name.toUpperCase() === a.name.toUpperCase()) &&
+          !(ast.globals.some((g) => g.name.toUpperCase() === a.name.toUpperCase()) || (opts.io || []).some((x) => x.name.toUpperCase() === a.name.toUpperCase())))
+        throw E("semantic", `动作 ${a.name} 既不是 ACTION，也不是布尔变量 / action ${a.name} is neither an ACTION nor a BOOL variable`, st.line);
+  }
   const pous = {};
   for (const u of ast.pous) {
     const k = u.name.toUpperCase();
@@ -646,6 +752,7 @@ function compile(src, opts = {}) {
       if (v.kind === "external" || v.kind === "temp") continue;
       const fi = init && init.k === "struct" ? init.fields[v.name] : v.init;
       o[v.name.toUpperCase()] = defaultValue(v.type, fi, null);
+      if (v.step) Object.assign(o[v.name.toUpperCase()], { X: !!v.initial, T: 0, _t0: 0, _new: !!v.initial });
     }
     return o;
   }
@@ -667,6 +774,7 @@ function compile(src, opts = {}) {
     const c = { pou: u, scope, body: null };
     compiled[key] = c;
     c.body = block(u.body, scope);
+    if (u.sfc) { const st = block([], scope); const run = sfcRunner(u, scope); const b0 = c.body; c.body = (f) => { const r = b0(f); run(f); return r; }; void st; }
     return c;
   }
 
@@ -899,6 +1007,51 @@ function compile(src, opts = {}) {
       out.push([v, expr(a.v, scope)]);
     });
     return out;
+  }
+
+  // one SFC evolution per scan, as CODESYS does it: actions of the active steps, then the transitions that can fire
+  // (all preceding steps active and the condition true; a step leaves by the first such transition in source order)
+  function sfcRunner(u, scope) {
+    const sf = u.sfc;
+    const steps = sf.steps.map((st) => ({ k: st.name.toUpperCase(), acts: st.acts.map((a) => ({ an: a.name.toUpperCase(), q: a.q, t: a.t ? expr(a.t, scope) : null })) }));
+    const trans = sf.transitions.map((t) => ({ from: t.from.map((n) => n.toUpperCase()), to: t.to.map((n) => n.toUpperCase()), cond: expr(t.cond, scope) }));
+    const bodies = {};
+    for (const [k, a] of Object.entries(sf.actions)) bodies[k] = block(a.body, scope);
+    const names = [...new Set(steps.flatMap((s) => s.acts.map((a) => a.an)))];
+    const refs = {};
+    for (const n of names) if (!bodies[n]) refs[n] = ref({ e: "name", n, line: u.line }, scope);
+    return (f) => {
+      const now = f.env.now, self = f.self;
+      const stored = self._sfcStored || (self._sfcStored = {});
+      for (const st of steps) { const x = self[st.k]; if (x.X) x.T = now - x._t0; }
+      const on = {};
+      for (const st of steps) {
+        const x = self[st.k];
+        if (!x.X) continue;
+        for (const a of st.acts) {
+          const dt = now - x._t0;
+          if (a.q === "N") on[a.an] = true;
+          else if (a.q === "P" || a.q === "P1") { if (x._new) on[a.an] = true; }
+          else if (a.q === "S") stored[a.an] = true;
+          else if (a.q === "R") stored[a.an] = false;
+          else if (a.q === "L") { if (dt < num(a.t(f))) on[a.an] = true; }
+          else if (a.q === "D") { if (dt >= num(a.t(f))) on[a.an] = true; }
+        }
+      }
+      for (const n of names) {
+        const active = !!(on[n] || stored[n]);
+        if (bodies[n]) { if (active) bodies[n](f); } else refs[n].set(f, active);
+      }
+      for (const st of steps) self[st.k]._new = false;
+      const X0 = {};
+      for (const st of steps) X0[st.k] = self[st.k].X;
+      const taken = new Set(), fire = [];
+      for (const t of trans) {
+        if (t.from.every((n) => X0[n] && !taken.has(n)) && t.cond(f)) { t.from.forEach((n) => taken.add(n)); fire.push(t); }
+      }
+      for (const t of fire) for (const n of t.from) self[n].X = false;
+      for (const t of fire) for (const n of t.to) Object.assign(self[n], { X: true, _t0: now, _new: true, T: 0 });
+    };
   }
 
   const BREAK = { exit: true }, RET = { ret: true };
@@ -1460,6 +1613,11 @@ function review(prog, io = []) {
   const declared = new Map();
   for (const u of ast.pous) {
     walk(u.body, 0, 0);
+    if (u.sfc) {
+      u.sfc.transitions.forEach((t) => walkExpr(t.cond, t.line));
+      Object.values(u.sfc.actions).forEach((a) => walk(a.body, 1, 0));
+      u.sfc.steps.forEach((st) => { note(reads, st.name, st.line); st.acts.forEach((a) => { if (!u.sfc.actions[a.name.toUpperCase()]) { note(writes, a.name, st.line); trueWrites.add(a.name.toUpperCase()); falseWrites.add(a.name.toUpperCase()); } if (a.t) walkExpr(a.t, st.line); }); });
+    }
     if (u.kind === "program") u.vars.forEach((v) => declared.set(v.name.toUpperCase(), v));
   }
   const nameOf = (n) => (ioBy[n] && ioBy[n].name) || (declared.get(n) && declared.get(n).name) || n;
@@ -1515,7 +1673,7 @@ function review(prog, io = []) {
   return out.sort((a, b) => order[a.level] - order[b.level] || a.line - b.line);
 }
 
-const API = { review, lex, parse, parseExpr, compile, compileLadder, ladderToSt, Runtime, runTest, exportXml, parseTime, fmtTime, normAddr, PlcError, STD_FB, STD_FN };
+const API = { exprText, review, lex, parse, parseExpr, compile, compileLadder, ladderToSt, Runtime, runTest, exportXml, parseTime, fmtTime, normAddr, PlcError, STD_FB, STD_FN };
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 else root.WQPLC = API;
 })(typeof window !== "undefined" ? window : globalThis);

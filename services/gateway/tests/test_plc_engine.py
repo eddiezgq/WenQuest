@@ -108,3 +108,48 @@ def test_plc_labs_on_3d_machines(tmp_path):
         assert pg.evaluate("document.querySelector('#lab-1-3 canvas').dataset.engine || ''").startswith("three.js")
         assert errors == []
         b.close()
+
+
+def test_sfc_and_fbd_editors_in_a_browser(tmp_path):
+    """Chapter 11–12 tools: the SFC chart follows the active steps; FBD networks are drawn as blocks."""
+    import json
+    from app.production import labs
+    io = [{"name": "start", "addr": "%IX0.0", "dir": "in"}, {"name": "stopNC", "addr": "%IX0.1", "dir": "in"},
+          {"name": "lift", "addr": "%QX0.0", "dir": "out"}, {"name": "grip", "addr": "%QX0.3", "dir": "out"}]
+    sfc = ("PROGRAM Main\n INITIAL_STEP S0: END_STEP\n STEP S1: lift(N); END_STEP\n STEP S2: grip(N); END_STEP\n"
+           " TRANSITION FROM S0 TO S1 := start; END_TRANSITION\n TRANSITION FROM S1 TO S2 := S1.T >= T#200ms; END_TRANSITION\n"
+           " TRANSITION FROM S2 TO S0 := NOT start; END_TRANSITION\nEND_PROGRAM")
+    def lab(lang, prog):
+        return (f'WQ.lab({{ title: ["{lang}", "{lang}"], goal: ["x", "x"], view: "plc", scenes: [{{id: "a", name: ["a", "a"]}}], params: [], '
+                f'plc: {{ io: {json.dumps(io)}, lang: "{lang}", program: {json.dumps(prog)}, tests: [] }}, '
+                f'plant: {{ panel: [{{name: "start", kind: "switch", label: ["启动", "Start"]}}], reset(s) {{}}, inputs(s) {{ return {{}}; }}, step() {{}} }}, '
+                f'tasks: [{{id: "a", text: ["a", "a"]}}, {{id: "b", text: ["b", "b"]}}], draw(api, s) {{}} }});')
+    page = labs.page([("1.1", lab("SFC", {"sfc": sfc})),
+                      ("1.2", lab("FBD", {"decls": "VAR t1 : TON; END_VAR", "fbd": [{"text": "lift := (start OR lift) AND stopNC AND NOT t1.Q"}, {"text": "t1(IN := lift, PT := T#3s)"}]}))],
+                     course=["x", "x"], chapter=["x", "x"])
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        pytest.skip("needs Playwright")
+    f = tmp_path / "sfc.html"
+    f.write_text(page, encoding="utf-8")
+    with sync_playwright() as p:
+        try:
+            b = p.chromium.launch()
+        except Exception as e:  # noqa: BLE001
+            pytest.skip(f"no Chromium: {e}")
+        pg = b.new_page()
+        errors = []
+        pg.on("pageerror", lambda e: errors.append(str(e)))
+        pg.goto(f.as_uri())
+        pg.wait_for_timeout(400)
+        pg.click("#lab-1-1 [data-action=run]")
+        pg.click("#lab-1-1 .opbtn")
+        pg.wait_for_timeout(900)
+        on = pg.locator("#lab-1-1 .sfcdiag rect.st.on").count()
+        names = pg.locator("#lab-1-1 .sfcdiag text.sn").all_text_contents()
+        assert on == 1 and any(t.startswith("S2") for t in names), names
+        pg.click("#tab-1-2")
+        assert pg.locator("#lab-1-2 .fbdpic svg rect.fb").count() >= 3
+        assert errors == [] and pg.evaluate("WQ.status()")["errors"] == []
+        b.close()

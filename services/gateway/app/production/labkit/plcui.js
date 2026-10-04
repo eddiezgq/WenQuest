@@ -29,11 +29,14 @@ function setup(L, K) {
   const api = L.api;
   const saveKey = `${KEY}-plc-${L.id}`;
   const saved = store.get(saveKey) || {};
-  const lang0 = (saved.lang || cfg.lang || (cfg.program && cfg.program.ladder ? "LD" : "ST")).toUpperCase();
+  const p0 = cfg.program || {};
+  const lang0 = (saved.lang || cfg.lang || (p0.ladder ? "LD" : p0.sfc ? "SFC" : p0.fbd ? "FBD" : "ST")).toUpperCase();
   const S = L.plc = {
     lang: lang0,
     st: saved.st != null ? saved.st : (cfg.program && cfg.program.st) || "PROGRAM Main\n  (* 在这里写程序 / write your program here *)\nEND_PROGRAM\n",
     decls: saved.decls != null ? saved.decls : (cfg.program && cfg.program.decls) || "",
+    sfc: saved.sfc != null ? saved.sfc : p0.sfc || "PROGRAM Main\n  INITIAL_STEP S0: END_STEP\n  STEP S1: END_STEP\n  TRANSITION FROM S0 TO S1 := FALSE; END_TRANSITION\n  TRANSITION FROM S1 TO S0 := FALSE; END_TRANSITION\nEND_PROGRAM\n",
+    fbd: saved.fbd || JSON.parse(JSON.stringify(p0.fbd || [{ comment: "", text: "" }])),
     ladder: saved.ladder || JSON.parse(JSON.stringify((cfg.program && cfg.program.ladder) || [{ cells: [[null, null, null, null, null, null, null, null]], links: [] }])),
     rt: null, ps: {}, panel: {}, faults: {}, acc: 0, speed: 1, err: null, sel: null, results: {},
   };
@@ -74,11 +77,16 @@ function setup(L, K) {
   const langbar = el("div", "row plclang");
   const bST = biText(el("button", "btn chip"), ["结构化文本 ST", "Structured text ST"]);
   const bLD = biText(el("button", "btn chip"), ["梯形图 LD", "Ladder LD"]);
+  const bSFC = biText(el("button", "btn chip"), ["顺序功能图 SFC", "SFC"]);
+  const bFBD = biText(el("button", "btn chip"), ["功能块图 FBD", "FBD"]);
+  const LANGB = { ST: bST, LD: bLD, SFC: bSFC, FBD: bFBD };
+  (cfg.langs || ["ST", "LD", "SFC", "FBD"]).forEach((l) => { LANGB[l].dataset.allowed = "1"; });
+  Object.values(LANGB).forEach((b) => { if (!b.dataset.allowed) b.hidden = true; });
   const bLoad = biText(el("button", "btn primary"), ["编译并下载", "Compile & download"]);
   const bAsSt = biText(el("button", "btn"), ["看等价的 ST", "Show as ST"]);
   const bXml = biText(el("button", "btn"), ["导出 PLCopen XML", "Export PLCopen XML"]);
   const bReset = biText(el("button", "btn"), ["恢复初始程序", "Restore the starting program"]);
-  langbar.append(bST, bLD, el("span", "spacer"), bLoad, bAsSt, bXml, bReset);
+  langbar.append(bST, bLD, bSFC, bFBD, el("span", "spacer"), bLoad, bAsSt, bXml, bReset);
   const msg = el("div", "plcmsg");
   const stWrap = el("div", "plcst");
   const gutter = el("pre", "gutter");
@@ -92,28 +100,39 @@ function setup(L, K) {
   const ldEdit = el("div", "ldedit");
   ldWrap.append(declLabel, decl, ldTools, ldGrid, ldEdit);
   const asSt = el("pre", "plcasst"); asSt.hidden = true;
-  pv.append(langbar, msg, stWrap, ldWrap, asSt);
+  const sfcDiag = el("div", "sfcdiag");
+  const fbdWrap = el("div", "plcfbd");
+  const fbdDecl = el("textarea", "plcdecl"); fbdDecl.spellcheck = false; fbdDecl.rows = 3; fbdDecl.value = S.decls;
+  const fbdNets = el("div", "fbdnets");
+  const fbdAdd = biText(el("button", "btn chip"), ["+ 网络", "+ Network"]);
+  fbdWrap.append(biText(el("div", "plclbl"), ["变量声明（VAR … END_VAR）", "Declarations (VAR … END_VAR)"]), fbdDecl, fbdNets, fbdAdd);
+  fbdDecl.addEventListener("input", () => { S.decls = fbdDecl.value; decl.value = S.decls; persist(); });
+  fbdAdd.addEventListener("click", () => { S.fbd.push({ comment: "", text: "" }); persist(); paintFbd(); });
+  pv.append(langbar, msg, stWrap, sfcDiag, ldWrap, fbdWrap, asSt);
 
   function paintGutter() {
     const n = ta.value.split("\n").length;
     gutter.textContent = Array.from({ length: n }, (_, k) => k + 1).join("\n");
   }
-  ta.addEventListener("input", () => { S.st = ta.value; paintGutter(); persist(); });
+  ta.addEventListener("input", () => { if (S.lang === "SFC") S.sfc = ta.value; else S.st = ta.value; paintGutter(); persist(); });
   ta.addEventListener("scroll", () => { gutter.scrollTop = ta.scrollTop; });
   ta.addEventListener("keydown", (e) => {
-    if (e.key === "Tab") { e.preventDefault(); const s = ta.selectionStart; ta.setRangeText("  ", s, ta.selectionEnd, "end"); S.st = ta.value; persist(); }
+    if (e.key === "Tab") { e.preventDefault(); const s = ta.selectionStart; ta.setRangeText("  ", s, ta.selectionEnd, "end"); if (S.lang === "SFC") S.sfc = ta.value; else S.st = ta.value; persist(); }
   });
-  decl.addEventListener("input", () => { S.decls = decl.value; persist(); });
+  decl.addEventListener("input", () => { S.decls = decl.value; fbdDecl.value = S.decls; persist(); });
   bST.addEventListener("click", () => setLang("ST"));
   bLD.addEventListener("click", () => setLang("LD"));
+  bSFC.addEventListener("click", () => setLang("SFC"));
+  bFBD.addEventListener("click", () => setLang("FBD"));
   bLoad.addEventListener("click", () => { load(); if (!S.err) say(T("已下载到 PLC，按“运行”开始扫描。", "Downloaded; press Run to start scanning."), "ok"); });
   bAsSt.addEventListener("click", () => {
     asSt.hidden = !asSt.hidden;
-    if (!asSt.hidden) asSt.textContent = S.lang === "LD" ? `PROGRAM Main\n${S.decls}\n${WQPLC.ladderToSt(S.ladder).replace(/^/gm, "  ")}\nEND_PROGRAM` : S.st;
+    if (!asSt.hidden) asSt.textContent = S.lang === "LD" ? `PROGRAM Main\n${S.decls}\n${WQPLC.ladderToSt(S.ladder).replace(/^/gm, "  ")}\nEND_PROGRAM` : source().st;
   });
   bXml.addEventListener("click", () => {
     try {
-      const src = S.lang === "LD" ? `PROGRAM Main\n${S.decls}\n${ldStWithEdges()}\nEND_PROGRAM` : S.st;
+      if (S.lang === "SFC") { say(T("顺序功能图的 PLCopen XML（图形格式）还没做；先用“看等价的 ST”。", "PLCopen XML for SFC (graphical) is not available yet."), "bad"); return; }
+      const src = S.lang === "LD" ? `PROGRAM Main\n${S.decls}\n${ldStWithEdges()}\nEND_PROGRAM` : source().st;
       const xml = WQPLC.exportXml(src, { io, name: P(def.title), cycle: cfg.cycle || 10 });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([xml], { type: "application/xml" }));
@@ -124,7 +143,8 @@ function setup(L, K) {
     if (!confirm(T("恢复成实验给的初始程序？你写的会被替换。", "Restore the starting program? Your edits will be replaced."))) return;
     const p0 = cfg.program || {};
     S.st = p0.st || S.st; S.decls = p0.decls || ""; S.ladder = JSON.parse(JSON.stringify(p0.ladder || S.ladder));
-    ta.value = S.st; decl.value = S.decls; paintGutter(); paintLadder(); persist(); load();
+    S.sfc = p0.sfc || S.sfc; S.fbd = JSON.parse(JSON.stringify(p0.fbd || S.fbd));
+    ta.value = S.lang === "SFC" ? S.sfc : S.st; decl.value = S.decls; fbdDecl.value = S.decls; paintGutter(); paintLadder(); paintFbd(); persist(); load();
   });
   function ldStWithEdges() {
     // ladder → ST for export: edge contacts need R_TRIG / F_TRIG instances declared
@@ -135,12 +155,165 @@ function setup(L, K) {
   }
   function setLang(l) {
     S.lang = l; persist();
-    bST.setAttribute("aria-pressed", String(l === "ST")); bLD.setAttribute("aria-pressed", String(l === "LD"));
-    stWrap.hidden = l !== "ST"; ldWrap.hidden = l !== "LD"; asSt.hidden = true;
+    Object.entries(LANGB).forEach(([k, b]) => b.setAttribute("aria-pressed", String(k === l)));
+    stWrap.hidden = l !== "ST" && l !== "SFC"; ldWrap.hidden = l !== "LD"; fbdWrap.hidden = l !== "FBD"; sfcDiag.hidden = l !== "SFC"; asSt.hidden = true;
+    if (l === "ST" || l === "SFC") { ta.value = l === "SFC" ? S.sfc : S.st; paintGutter(); }
     if (l === "LD") paintLadder();
+    if (l === "FBD") paintFbd();
     load();
+    if (l === "SFC") paintSfc();
   }
-  function persist() { store.set(saveKey, { lang: S.lang, st: S.st, decls: S.decls, ladder: S.ladder }); }
+  function persist() { store.set(saveKey, { lang: S.lang, st: S.st, decls: S.decls, ladder: S.ladder, sfc: S.sfc, fbd: S.fbd }); }
+  function fbdSource() {
+    return `PROGRAM Main\n${S.decls}\n` + S.fbd.map((n, k) => `(* 网络 ${k + 1} ${n.comment || ""} *)\n${n.text.trim().replace(/;?$/, ";")}`).filter((x) => !/\n;$/.test(x)).join("\n") + "\nEND_PROGRAM";
+  }
+  function source() {
+    if (S.lang === "LD") return { decls: S.decls, ladder: S.ladder };
+    if (S.lang === "SFC") return { st: S.sfc };
+    if (S.lang === "FBD") return { st: fbdSource() };
+    return { st: S.st };
+  }
+
+  // ---- SFC chart: steps by level from the initial step, transitions as bars, parallel branches as double lines
+  function paintSfc() {
+    let ast;
+    try { ast = WQPLC.parse(S.sfc); } catch (e) { return; }
+    const u = ast.pous.find((x) => x.sfc);
+    if (!u) { sfcDiag.innerHTML = ""; return; }
+    const sf = u.sfc;
+    const level = {}, col = {};
+    const init = sf.steps.filter((x) => x.initial).map((x) => x.name.toUpperCase());
+    const queue = init.slice(); init.forEach((n) => { level[n] = 0; });
+    const back = new Set();
+    while (queue.length) {
+      const n = queue.shift();
+      sf.transitions.filter((t) => t.from.some((x) => x.toUpperCase() === n)).forEach((t) => t.to.forEach((m) => {
+        const k = m.toUpperCase();
+        if (level[k] == null) { level[k] = level[n] + 1; queue.push(k); }
+      }));
+    }
+    sf.steps.forEach((x) => { const k = x.name.toUpperCase(); if (level[k] == null) level[k] = 0; });
+    const rows = {};
+    sf.steps.forEach((x) => { const k = x.name.toUpperCase(); (rows[level[k]] = rows[level[k]] || []).push(k); });
+    Object.values(rows).forEach((r) => r.forEach((k, i) => { col[k] = i; }));
+    const W = 150, H = 92, BW = 96, BH = 30, X0 = 40;
+    const maxCols = Math.max(...Object.values(rows).map((r) => r.length));
+    const nLev = Object.keys(rows).length;
+    const pos = (k) => [X0 + col[k] * W + (maxCols - rows[level[k]].length) * W / 2, 14 + level[k] * H];
+    const live = S.rt ? (k) => S.rt.watchAny(`${u.name}.${k}`) : () => null;
+    let svg = "";
+    const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    // transitions
+    sf.transitions.forEach((t) => {
+      const fr = t.from.map((x) => x.toUpperCase()), to = t.to.map((x) => x.toUpperCase());
+      const isBack = to.some((k) => level[k] <= Math.max(...fr.map((f) => level[f])));
+      const yb = Math.max(...fr.map((k) => pos(k)[1])) + BH + 22;
+      const xs = fr.map((k) => pos(k)[0] + BW / 2);
+      const xt = to.map((k) => pos(k)[0] + BW / 2);
+      fr.forEach((k) => { const [x, y] = pos(k); svg += `<line x1="${x + BW / 2}" y1="${y + BH}" x2="${x + BW / 2}" y2="${yb - (fr.length > 1 ? 6 : 0)}" class="w"/>`; });
+      if (fr.length > 1) svg += `<line x1="${Math.min(...xs)}" y1="${yb - 6}" x2="${Math.max(...xs)}" y2="${yb - 6}" class="w"/><line x1="${Math.min(...xs)}" y1="${yb - 9}" x2="${Math.max(...xs)}" y2="${yb - 9}" class="w"/>`;
+      const xm = fr.length > 1 ? (Math.min(...xs) + Math.max(...xs)) / 2 : xs[0];
+      if (fr.length > 1) svg += `<line x1="${xm}" y1="${yb - 6}" x2="${xm}" y2="${yb}" class="w"/>`;
+      svg += `<line x1="${xm - 12}" y1="${yb}" x2="${xm + 12}" y2="${yb}" class="tb"/>`;
+      svg += `<text x="${xm + 16}" y="${yb + 4}" class="tc">${esc(WQPLC.exprText(t.cond)).slice(0, 34)}</text>`;
+      if (isBack) {
+        const xl = 12 + (sf.transitions.indexOf(t) % 3) * 6;
+        const [tx, ty] = pos(to[0]);
+        svg += `<polyline points="${xm},${yb} ${xm},${yb + 12} ${xl},${yb + 12} ${xl},${ty - 8} ${tx + BW / 2},${ty - 8} ${tx + BW / 2},${ty}" class="w" fill="none"/>`;
+        svg += `<polygon points="${tx + BW / 2 - 4},${ty - 6} ${tx + BW / 2 + 4},${ty - 6} ${tx + BW / 2},${ty}" class="ar"/>`;
+      } else {
+        const yd = yb + (to.length > 1 ? 10 : 0);
+        if (to.length > 1) svg += `<line x1="${xm}" y1="${yb}" x2="${xm}" y2="${yd}" class="w"/><line x1="${Math.min(...xt)}" y1="${yd}" x2="${Math.max(...xt)}" y2="${yd}" class="w"/><line x1="${Math.min(...xt)}" y1="${yd + 3}" x2="${Math.max(...xt)}" y2="${yd + 3}" class="w"/>`;
+        to.forEach((k) => { const [x, y] = pos(k); svg += `<polyline points="${to.length > 1 ? x + BW / 2 : xm},${to.length > 1 ? yd + 3 : yb} ${x + BW / 2},${to.length > 1 ? yd + 3 : yb + 8} ${x + BW / 2},${y}" class="w" fill="none"/>`; });
+      }
+    });
+    // steps
+    sf.steps.forEach((st) => {
+      const k = st.name.toUpperCase(), [x, y] = pos(k);
+      const v = live(k) || {};
+      svg += `<rect x="${x}" y="${y}" width="${BW}" height="${BH}" class="st${v.X ? " on" : ""}"/>`;
+      if (st.initial) svg += `<rect x="${x + 3}" y="${y + 3}" width="${BW - 6}" height="${BH - 6}" class="st2${v.X ? " on" : ""}"/>`;
+      svg += `<text x="${x + BW / 2}" y="${y + 19}" class="sn">${esc(st.name)}${v.X ? " · " + Math.round((v.T || 0) / 100) / 10 + "s" : ""}</text>`;
+      if (st.acts.length) {
+        svg += `<line x1="${x + BW}" y1="${y + BH / 2}" x2="${x + BW + 8}" y2="${y + BH / 2}" class="w"/>`;
+        svg += `<text x="${x + BW + 10}" y="${y + BH / 2 + 4}" class="ac">${esc(st.acts.map((a) => `${a.q} ${a.name}`).join(" · ")).slice(0, 26)}</text>`;
+      }
+    });
+    const w = X0 + maxCols * W + 120, h = 30 + nLev * H;
+    sfcDiag.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="SFC">${svg}</svg>`;
+  }
+
+  // ---- FBD: one statement per network, drawn as blocks (AND &, OR ≥1, NOT o, compare, arithmetic, functions, FB boxes)
+  function fbdBlocks(x) {
+    // tree → {w, h, svg(x, y) -> {svg, out:[x,y]}}
+    const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    const flat = (e, op) => (e.e === "bin" && e.op === op ? [...flat(e.a, op), ...flat(e.b, op)] : [e]);
+    const valOf = (txt) => { if (!S.rt) return undefined; try { return S.rt.watchAny(txt); } catch (e) { return undefined; } };
+    function node(e) {
+      if (["name", "field", "index", "addr", "bit", "num", "bool", "time", "enumref"].includes(e.e)) {
+        const t = WQPLC.exprText(e);
+        return { h: 26, w: Math.max(54, t.length * 7 + 12), draw(x, y, w) { const v = valOf(t); return { svg: `<text x="${x + w - 4}" y="${y + 17}" class="fv${v === true ? " on" : ""}" text-anchor="end">${esc(t)}</text>`, out: [x + w, y + 13] }; } };
+      }
+      let label, kids, neg = null;
+      if (e.e === "not") { const k = node(e.a); return { h: k.h, w: k.w + 14, draw(x, y) { const r = k.draw(x, y, k.w); return { svg: r.svg + `<circle cx="${r.out[0] + 5}" cy="${r.out[1]}" r="4" class="neg"/>`, out: [r.out[0] + 9, r.out[1]] }; } }; }
+      if (e.e === "bin") {
+        const op = e.op;
+        kids = ["AND", "OR", "XOR"].includes(op) ? flat(e, op) : [e.a, e.b];
+        label = { AND: "&", OR: "≥1", XOR: "=1", "+": "ADD", "-": "SUB", "*": "MUL", "/": "DIV", MOD: "MOD", "**": "EXPT" }[op] || op;
+      } else if (e.e === "call") { const ins = e.args.filter((a) => a.v); kids = ins.map((a) => a.v); label = WQPLC.exprText(e.f); var pinNames = ins.map((a) => a.name || ""); var outNames = e.args.filter((a) => a.out).map((a) => a.name); }
+      else if (e.e === "neg") { kids = [e.a]; label = "NEG"; }
+      else return { h: 26, w: 60, draw(x, y) { return { svg: `<text x="${x}" y="${y + 17}" class="fv">?</text>`, out: [x + 60, y + 13] }; } };
+      const ks = kids.map(node);
+      const kw = Math.max(...ks.map((k) => k.w));
+      const kh = ks.reduce((s, k) => s + k.h, 0);
+      const BW2 = (typeof pinNames !== "undefined" && pinNames.some((x) => x)) ? 70 : 44;
+      const pn = typeof pinNames !== "undefined" ? pinNames : [], on = typeof outNames !== "undefined" ? outNames : [];
+      return { h: Math.max(kh, 34), w: kw + 18 + BW2, draw(x, y) {
+        let svg = "", yy = y;
+        const pins = [];
+        ks.forEach((k) => { const r = k.draw(x, yy, kw); svg += r.svg; pins.push(r.out); yy += k.h; });
+        const bx = x + kw + 14, by = y + 2, bh = Math.max(kh, 34) - 4;
+        pins.forEach(([px, py], i) => { svg += `<polyline points="${px},${py} ${bx - 6},${py} ${bx},${py}" class="w" fill="none"/>`; if (pn[i]) svg += `<text x="${bx + 4}" y="${py + 4}" class="pin">${esc(pn[i])}</text>`; });
+        svg += `<rect x="${bx}" y="${by}" width="${BW2}" height="${bh}" class="fb"/><text x="${bx + BW2 / 2}" y="${by + 15}" class="fl">${esc(label)}</text>`;
+        on.forEach((nm, i) => { svg += `<text x="${bx + BW2 - 4}" y="${by + bh / 2 + 4 + i * 14}" class="pin" text-anchor="end">${esc(nm)}</text>`; });
+        return { svg, out: [bx + BW2, by + bh / 2] };
+      } };
+    }
+    return node(x);
+  }
+  function paintFbd() {
+    fbdNets.innerHTML = "";
+    S.fbd.forEach((n, k) => {
+      const box = el("div", "fbdnet");
+      const hd = el("div", "runghead");
+      hd.append(el("span", "rungno", String(k + 1)));
+      const cm = el("input", "rungcm"); cm.type = "text"; cm.placeholder = T("网络注释", "Network comment"); cm.value = n.comment || "";
+      cm.addEventListener("input", () => { n.comment = cm.value; persist(); });
+      const del = el("button", "btn chip", "✕"); del.title = T("删除网络", "Delete network");
+      del.addEventListener("click", () => { S.fbd.splice(k, 1); if (!S.fbd.length) S.fbd.push({ comment: "", text: "" }); persist(); paintFbd(); });
+      hd.append(cm, del);
+      const inp = el("input", "fbdtext"); inp.type = "text"; inp.value = n.text; inp.placeholder = T("如：M1_Run := (S1_Start OR M1_Run) AND S2_Stop", "e.g. M1_Run := (S1_Start OR M1_Run) AND S2_Stop");
+      inp.addEventListener("change", () => { n.text = inp.value; persist(); paintFbd(); });
+      const pic = el("div", "fbdpic");
+      box.append(hd, inp, pic);
+      fbdNets.appendChild(box);
+      drawNet(n, pic);
+    });
+  }
+  function drawNet(n, pic) {
+    if (!n.text.trim()) { pic.innerHTML = ""; return; }
+    let stmt;
+    try { stmt = WQPLC.parse(`PROGRAM X\n${n.text.trim().replace(/;?$/, ";")}\nEND_PROGRAM`).pous[0].body[0]; } catch (e) { pic.textContent = errText(e); return; }
+    if (!stmt) { pic.innerHTML = ""; return; }
+    let tree, target;
+    if (stmt.s === "assign") { tree = fbdBlocks(stmt.v); target = WQPLC.exprText(stmt.target); }
+    else if (stmt.s === "call") { tree = fbdBlocks(stmt.call); target = (stmt.call.args.filter((a) => a.out).map((a) => WQPLC.exprText(a.out)).join(", ")); }
+    else { pic.textContent = T("一个网络写一条赋值或一次功能块调用。", "One assignment or one block call per network."); return; }
+    const r = tree.draw(6, 6, tree.w);
+    const tv = S.rt ? S.rt.watchAny(target) : undefined;
+    const w = tree.w + 30 + target.length * 7 + 40, h = tree.h + 12;
+    pic.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${r.svg}<line x1="${r.out[0]}" y1="${r.out[1]}" x2="${r.out[0] + 24}" y2="${r.out[1]}" class="w${tv === true ? " on" : ""}"/><text x="${r.out[0] + 28}" y="${r.out[1] + 4}" class="fv${tv === true ? " on" : ""}">${target.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text></svg>`;
+  }
   function say(text, kind) { msg.textContent = text; msg.className = "plcmsg " + (kind || ""); }
   function errText(e) { return (e.line ? T(`第 ${e.line} 行：`, `Line ${e.line}: `) : "") + (e.message || String(e)); }
 
@@ -372,7 +545,7 @@ function setup(L, K) {
   testv.appendChild(revList);
   bRev.addEventListener("click", runReview);
   function runReview() {
-    const prog = S.lang === "LD" ? { decls: S.decls, ladder: S.ladder } : { st: S.st };
+    const prog = source();
     const res = WQPLC.review(prog, io);
     revList.innerHTML = "";
     if (!res.length) revList.appendChild(biText(el("li", "ok"), ["没有发现问题。", "No findings."]));
@@ -442,8 +615,7 @@ function setup(L, K) {
   function rtOptions() {
     const base = { io, cycle: cfg.cycle || 10, filter: cfg.filter || 0, budget: cfg.budget || 100000 };
     try {
-      if (S.lang === "LD") { const o = Object.assign(base, { decls: S.decls, ladder: S.ladder }); new WQPLC.Runtime(o); return o; }
-      const o = Object.assign(base, { st: S.st }); new WQPLC.Runtime(o); return o;
+      const o = Object.assign(base, source()); new WQPLC.Runtime(o); return o;
     } catch (e) { S.err = e; say(errText(e), "bad"); return null; }
   }
   function load() {
@@ -509,12 +681,19 @@ function setup(L, K) {
   const userReadouts = def.readouts;
   def.readouts = (a, s) => {
     paintStatus();
-    if (!document.hidden) { if (S.tab === "io") paintIo(); if (S.tab === "trace") drawTrace(); if (S.tab === "prog" && S.lang === "LD" && S.rt && api.running) paintLadderLive(); }
+    if (!document.hidden) { if (S.tab === "io") paintIo(); if (S.tab === "trace") drawTrace(); if (S.tab === "prog" && S.rt && (api.running || !S.drawnOnce)) { S.drawnOnce = true; paintLadderLive(); } }
     if (def.check) def.check(api, S.ps);
     return userReadouts ? userReadouts(a, S.ps) : [];
   };
   let lastLive = 0;
-  function paintLadderLive() { const t = performance.now(); if (t - lastLive > 150) { lastLive = t; paintLadder(); } }
+  function paintLadderLive() {
+    const t = performance.now();
+    if (t - lastLive < 150) return;
+    lastLive = t;
+    if (S.lang === "LD") paintLadder();
+    else if (S.lang === "SFC") paintSfc();
+    else if (S.lang === "FBD") fbdNets.querySelectorAll(".fbdpic").forEach((pic, k) => drawNet(S.fbd[k], pic));
+  }
   const userDraw = def.draw;
   if (plant.build3d) {
     // the machine in 3D: the kit treats the lab as a 3D lab (it resizes and renders L.st every frame)

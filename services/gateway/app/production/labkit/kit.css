@@ -164,3 +164,28 @@ canvas.plctrace { width: 100%; display: block; background: var(--stage); border-
 .plcreview li.warning .lv { color: var(--orange); font-weight: 600; }
 .plcreview li.info .lv { color: var(--muted); }
 .plcreview li.ok { color: var(--ok); display: block; }
+.sfcdiag { margin-top: 8px; overflow: auto; max-height: 460px; background: var(--stage); border-radius: 8px; }
+.sfcdiag svg { display: block; font: 12px var(--mono); }
+.sfcdiag .w { stroke: var(--muted); stroke-width: 1.5; }
+.sfcdiag .tb { stroke: var(--ink); stroke-width: 3; }
+.sfcdiag .ar { fill: var(--muted); }
+.sfcdiag .tc { fill: var(--muted); font-size: 11px; }
+.sfcdiag .st, .sfcdiag .st2 { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+.sfcdiag .st.on { fill: #dafbe1; stroke: var(--green); stroke-width: 2.5; }
+.sfcdiag .st2.on { stroke: var(--green); }
+.sfcdiag .sn { fill: var(--ink); text-anchor: middle; font-weight: 600; }
+.sfcdiag .ac { fill: var(--accent); font-size: 11px; }
+.plcfbd .fbdnets { display: flex; flex-direction: column; gap: 10px; margin: 8px 0; }
+.fbdnet { border-left: 4px solid var(--line); padding: 2px 0 4px 8px; }
+.fbdnet .runghead { display: flex; gap: 6px; align-items: center; }
+.fbdtext { width: 100%; margin: 4px 0; }
+.fbdpic { overflow-x: auto; }
+.fbdpic svg { display: block; font: 12px var(--mono); }
+.fbdpic .w { stroke: var(--muted); stroke-width: 1.5; }
+.fbdpic .w.on { stroke: var(--green); stroke-width: 2.5; }
+.fbdpic .fb { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+.fbdpic .fl { fill: var(--ink); text-anchor: middle; font-weight: 600; }
+.fbdpic .fv { fill: var(--ink); }
+.fbdpic .fv.on { fill: var(--green); font-weight: 600; }
+.fbdpic .neg { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+.fbdpic .pin { fill: var(--muted); font-size: 10px; }
