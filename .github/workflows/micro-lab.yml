@@ -73,6 +73,12 @@ jobs:
           docker stats --no-stream wqdesk | tee out/screens/stats.txt
           docker rm -f wqdesk
 
+      - name: Screenshot thumbnails as notices
+        if: always()
+        run: |
+          pip install -q pillow
+          python deploy/micro-lab/ci/notice_shots.py out/screens || true
+
       - name: Push to ghcr.io
         if: ${{ inputs.push }}
         run: |

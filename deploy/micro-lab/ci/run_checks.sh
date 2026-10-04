@@ -63,5 +63,12 @@ print(f"::notice title=反相器::DRC {inv.get('drc_errors')}，LVS {inv.get('lv
 print(f"::notice title=计数器 GDS::流片就绪 {c8.get('tapeout_ready')}，setup {c8.get('setup_ws_ns')} ns，hold {c8.get('hold_ws_ns')} ns，DRC {c8.get('magic_drc_errors')}，LVS {c8.get('lvs_errors')}，{c8.get('seconds')} s，内存峰值 {c8.get('peak_mem_mb')} MB")
 cc = s["calib_compare"] or {}
 print("::notice title=校准对照::" + "；".join(f"{k} {v['diff_pct']}%" for k, v in cc.items()))
+# 镜像里的完整校准结果（gzip + base64），供仓库采用：python -c "import sys,gzip,base64;print(gzip.decompress(base64.b64decode(sys.argv[1])).decode())" <注释内容>
+import base64, gzip
+for name in ("result", "params.sky130"):
+    f = os.path.join(o, "calib", name + ".json")
+    if os.path.exists(f):
+        raw = json.dumps(json.load(open(f)), separators=(",", ":")).encode()
+        print(f"::notice title=校准结果 {name}.json::" + base64.b64encode(gzip.compress(raw)).decode())
 PY
 exit $fail
