@@ -15,6 +15,7 @@ on:
     paths:
       - deploy/micro-lab/**
       - samples/数字集成电路设计/生成脚本/calib/**
+      - samples/微电子贯通项目/试点/**
       - .github/workflows/micro-lab.yml
 
 concurrency:

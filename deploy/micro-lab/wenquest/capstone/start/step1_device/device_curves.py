@@ -1,4 +1,4 @@
-"""贯通项目步骤一起始文件：在 SKY130 模型上测 MOSFET 曲线，提取后面设计要用的参数（第 17 轮附二 5a）。
+"""贯通项目步骤一起始文件：在 SKY130 模型上测 MOSFET 曲线，提取后面设计要用的参数。
 
 测量对象：sky130_fd_pr__nfet_01v8 / pfet_01v8，W = 0.42 μm（最小宽度）、L = 0.15 μm，tt 工艺角、27 °C。
   1. 转移特性 ID–VGS：|VDS| = 0.05 V（线性区）和 1.8 V（饱和区）；
@@ -84,11 +84,13 @@ def extract(lin, sat) -> dict:
     """从曲线提取参数。lin、sat 是 [(|VGS|, |ID|), ...]，分别在 |VDS| = 0.05 V 和 1.8 V 下测得，VGS 步长 5 mV。
     返回的键名不要改（wqlab 和实验报告按这些名字取数）。"""
     # ===== 在这里完成 TODO 1：阈值电压 VT —— 线性区最大跨导外推法 =====
-    #   gm = dID/dVGS（用相邻点差分）；找 gm 最大的点 (VGS0, ID0)；切线与横轴交点 VGS0 − ID0/gm；再减去 VDS/2。
+    #   用线性区曲线 lin（|VDS| = 0.05 V）：gm = dID/dVGS（用相邻点差分）；找 gm 最大的点 (VGS0, ID0)；
+    #   切线与横轴交点 VGS0 − ID0/gm；再减去 VDS/2（= 0.025 V）。
     vt = float("nan")
     # ===== 在这里完成 TODO 2：饱和电流 IDSAT（|VGS| = 1.8 V 时 sat 的电流）与关态电流 IOFF（|VGS| = 0）=====
     idsat, ioff = float("nan"), float("nan")
-    # ===== 在这里完成 TODO 3：亚阈值摆幅 S —— 亚阈值区里电流每增大 10 倍所需的 ΔVGS（mV/dec），取最小值 =====
+    # ===== 在这里完成 TODO 3：亚阈值摆幅 S —— 用饱和区曲线 sat（|VDS| = 1.8 V），在亚阈值区（约 1e-11 – 1e-7 A）里
+    #       求电流每增大 10 倍所需的 ΔVGS（mV/dec），取最小值 =====
     s = float("nan")
     return {"vt": round(vt, 4), "idsat_a": idsat, "idsat_ua_per_um": round(idsat / W * 1e6, 1),
             "ioff_a": ioff, "swing_mv_dec": round(s * 1000, 1), "ion_ioff": round(idsat / ioff, 0) if ioff > 0 else None}

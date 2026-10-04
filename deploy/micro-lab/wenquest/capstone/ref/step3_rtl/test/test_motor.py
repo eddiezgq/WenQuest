@@ -1,10 +1,10 @@
-"""贯通项目步骤三参考解：用 cocotb 验证电机控制芯片（第 17 轮附二 5a）。
+"""贯通项目步骤三参考解：用 cocotb 验证电机控制芯片。
 
 六个测试：
   test_pwm_duty        占空比 0、64、128、200、255 时，一个 PWM 周期里高电平的时钟数 = 4 × duty
   test_brake           刹车一拉高，PWM 在同一个时钟内变低
   test_encoder_steps   正转 40 步、反转 25 步，计数 = 15；转向输出跟着变
-  test_glitch          A 相上 2 个时钟宽的毛刺不计数
+  test_glitch          A、B 相上 2 个时钟宽的毛刺不计数（每个时钟都检查计数，不只看最后结果）
   test_wrap            计数从 0 再减 1 变成 0xFFFF（16 位回绕，作为有符号数即 −1）
   test_motor           闭环检验：芯片的 PWM 驱动一个直流电机模型，电机转动产生编码器 A、B 信号送回芯片，
                        芯片的计数必须和电机实际转过的角度一致（误差不超过 2 个计数），正反转都要对
@@ -30,6 +30,14 @@ def clock(dut):
         return Clock(dut.clk, CLK_NS, unit="ns")       # cocotb 2.x
     except TypeError:
         return Clock(dut.clk, CLK_NS, units="ns")      # cocotb 1.x
+
+
+async def ns(t):
+    """Wait t nanoseconds (cocotb 2.x: unit=, 1.x: units=)."""
+    try:
+        await Timer(t, unit="ns")
+    except TypeError:
+        await Timer(t, units="ns")
 
 
 class Pins:
@@ -103,7 +111,7 @@ async def test_brake(dut):
     await ClockCycles(dut.clk, 2 * PERIOD)
     assert pwm(dut) == 1
     p.brake = 1; p.put()
-    await Timer(1, "ns")
+    await ns(1)
     assert pwm(dut) == 0, "PWM must drop as soon as brake is high"
     await ClockCycles(dut.clk, PERIOD)
     assert pwm(dut) == 0
@@ -125,14 +133,20 @@ async def test_encoder_steps(dut):
 
 @cocotb.test()
 async def test_glitch(dut):
+    """2-clock spikes on A and on B must never change the count — checked at every clock, because a counted
+    spike adds one and then subtracts one, so looking only at the final count would miss it."""
     p = await reset(dut)
     await step(dut, p, 0, 8)
-    before = await read_count(dut, p)
-    p.a ^= 1; p.put()
-    await ClockCycles(dut.clk, 2)                       # 100 ns spike on A
-    p.a ^= 1; p.put()
-    await ClockCycles(dut.clk, 30)
-    assert await read_count(dut, p) == before, "a 2-clock glitch must not be counted"
+    before = await read_count(dut, p)                 # sel = 0: uo_out shows the low byte from here on
+    await ClockCycles(dut.clk, 4)
+    for line in ("a", "b"):
+        setattr(p, line, getattr(p, line) ^ 1); p.put()
+        await ClockCycles(dut.clk, 2)                   # 100 ns spike
+        setattr(p, line, getattr(p, line) ^ 1); p.put()
+        for _ in range(30):
+            await RisingEdge(dut.clk)
+            assert int(dut.uo_out.value) == before & 0xFF, f"a 2-clock glitch on {line.upper()} changed the count"
+    assert await read_count(dut, p) == before
 
 
 @cocotb.test()

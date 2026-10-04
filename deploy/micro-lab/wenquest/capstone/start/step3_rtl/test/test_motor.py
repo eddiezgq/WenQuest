@@ -32,6 +32,14 @@ def clock(dut):
         return Clock(dut.clk, CLK_NS, units="ns")      # cocotb 1.x
 
 
+async def ns(t):
+    """等待 t 纳秒（cocotb 2.x 写 unit=，1.x 写 units=，这里两种都处理）。"""
+    try:
+        await Timer(t, unit="ns")
+    except TypeError:
+        await Timer(t, units="ns")
+
+
 class Pins:
     """The bidirectional inputs: A, B, dir, brake, sel on uio_in[4:0]."""
     def __init__(self, dut):
@@ -98,7 +106,7 @@ async def test_pwm_duty(dut):
 
 @cocotb.test()
 async def test_brake(dut):
-    """刹车一拉高，PWM 在同一个时钟内变低；松开后恢复。"""
+    """刹车一拉高，PWM 在同一个时钟内变低；松开后恢复。提示：改 brake 后 await ns(1) 再读 pwm(dut)，不要等时钟沿。"""
     p = await reset(dut)
     # ===== 在这里完成 =====
     raise NotImplementedError("test_brake")
@@ -114,7 +122,8 @@ async def test_encoder_steps(dut):
 
 @cocotb.test()
 async def test_glitch(dut):
-    """A 相上 2 个时钟宽的毛刺不应计数。"""
+    """A 相（以及 B 相）上 2 个时钟宽的毛刺不应计数。注意：被计入的毛刺会先加一再减一，只看最后的计数发现不了，
+    要在毛刺之后的每个时钟检查 uo_out（sel = 0 时为计数低字节）都不变。"""
     p = await reset(dut)
     # ===== 在这里完成 =====
     raise NotImplementedError("test_glitch")
@@ -129,8 +138,9 @@ async def test_wrap(dut):
 
 
 class Motor:
-    """直流电机 + 1000 线编码器模型（一阶）。每个时钟调用一次 tick(pwm, direction)。
-    平均电压按每个 PWM 周期测得的占空比更新；θ 以编码器计数为单位（每转 4000 个）。"""
+    """直流电机 + 1000 线编码器模型（一阶）。每个时钟调用一次 tick(pwm, direction)，返回轴的位置（编码器计数）。
+    平均电压按每个 PWM 周期测得的占空比更新；转速 w 的单位是转/秒（rev/s），θ 以编码器计数为单位（每转 4000 个）。
+    读芯片计数（read_count 要拨 sel、等几个时钟）时可以暂停调用 tick，模型随之暂停，不影响比较。"""
     TAU, KV, VBUS, LINES = 0.5e-3, 50.0 / 12.0, 12.0, 1000
 
     def __init__(self):

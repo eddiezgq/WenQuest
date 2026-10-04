@@ -1,0 +1,3 @@
+# 参考解不进学生用的镜像；验收时由仓库挂载（WQ_CAP_REF）
+wenquest/capstone/ref
+**/__pycache__
