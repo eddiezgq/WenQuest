@@ -8,3 +8,4 @@ program_deps:
   - factory/digital/hub/configurator.py
   - factory/digital/sim/engine.py
   - library/catalog/A/A-CPL-JAW/specs.csv
+  - library/catalog/B/B-LEG-GO2/vendor.yaml

@@ -1,0 +1,35 @@
+# 工程任务单 TS-2-1（配第 2 章）：Go2 四足机器人自动充电桩的对接机构方案（小组完成、每人提交整套）。格式见 textbook/tools/tasksheet.py。
+编号: TS-2-1
+标题: ["Go2 四足机器人自动充电桩的对接机构方案", "Concept design of an automatic charging dock for the Go2 quadruped"]
+角色: ["新产品开发部的方案工程师（3–5 人一组）", "concept engineer, new-product development (groups of 3–5)"]
+背景:
+  - "一家巡检服务公司用 Unitree Go2 四足机器人在变电站和厂区巡检，希望机器人电量低时能自己走回充电桩充电，不要人去插线。公司委托你们小组提出充电桩对接机构的方案，经评审后选定一个进入详细设计。小组共同讨论、各人分工；评审会上小组一起答辩。平台上的“小组”提交方式还在开发中，这次每位组员都在“我的任务”里提交整套小组交付物（内容相同），封面写明组员和各人的分工。4 学时是课内时间（讨论、答辩），草图、计算和文件整理在课外完成。"
+  - "An inspection-services company patrols substations and plants with Unitree Go2 quadrupeds and wants each robot to walk back to a charging dock by itself when its battery runs low, with nobody plugging it in. Your group is asked to propose concepts for the dock's docking mechanism and, after review, choose one for detail design. Discuss together and split the work; the group defends the result together at the review. Group submission on the platform is still being built, so this time every member submits the complete group package (identical copies) in My tasks, with a cover page naming the members and their roles. The 4 class hours cover discussion and the review; sketches, calculations and documents are done outside class."
+输入:
+  - {名称: ["Go2 的参数：重 15 kg、额定负载 8 kg、站高约 400 mm、外形 700 × 310 mm、三维模型", "Go2 data: 15 kg, 8 kg payload, about 400 mm standing height, 700 × 310 mm footprint, 3D model"], 来源: ["零件库 B-LEG-GO2", "Parts library B-LEG-GO2"]}
+  - {名称: ["使用条件：户外、雨雪与灰尘；机器人走回桩前的位置误差约 ±50 mm、朝向误差约 ±10°；充电 1–2 h；每天对接 3–6 次（以上为委托方给出的设计条件）", "Conditions: outdoors with rain, snow and dust; position error on arrival about ±50 mm and heading error about ±10°; 1–2 h charging; 3–6 dockings a day (design conditions given by the client)"], 来源: ["本任务单", "This sheet"]}
+  - {名称: ["教材 2.1–2.4 节的方法与 Go2 对接机构的形态矩阵（程序 2.2.1、2.4.1）", "Methods of Sections 2.1–2.4 and the Go2 docking morphological matrix (Programs 2.2.1, 2.4.1)"], 来源: ["教材第 2 章", "Chapter 2"]}
+交付物:
+  - {名称: ["设计任务书（需求、指标、目标值、检验方法、约束）", "Design specification (needs, metrics, targets, test methods, constraints)"], 验收: ["每条指标有数值、单位和检验方法；包含对接成功率、容许的位置与朝向误差、充电电流、防护等级、成本上限；附质量屋（需求权重、关系矩阵、工程特性重要度）", "Every metric has a value, a unit and a test method; includes docking success rate, allowed position and heading error, charging current, ingress protection and a cost ceiling; a house of quality (need weights, relationship matrix, metric importance) is attached"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["方案报告（功能结构、形态矩阵、至少三个方案的草图、普氏矩阵与加权评分、权重敏感性、推荐方案）", "Concept report (function structure, morphological matrix, sketches of at least three concepts, Pugh matrix and weighted scoring, weight sensitivity, recommendation)"], 验收: ["功能用动词加名词；每个分功能至少三种解法；不相容的组合写出理由；至少有一种图 2.2.1 里没有的新解法、一个教材里没有的新方案；评价准则先于方案确定；敏感性分析说明推荐是否稳健", "Functions written as verb + noun; at least three solutions per sub-function; reasons given for incompatible pairs; at least one solution not in Fig. 2.2.1 and one concept not in the textbook; criteria fixed before seeing the concepts; the sensitivity analysis shows whether the recommendation is robust"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["推荐方案的三维示意模型（STEP）或装配草图（PDF）", "3D concept model (STEP) or assembly sketch (PDF) of the recommended concept"], 验收: ["能看出机器人与桩的相对位置、导向与接触的方式、主要尺寸", "Shows the robot and dock positions, how guidance and contact work, and the main dimensions"], 类型: 文件, 格式: [step, pdf]}
+  - {名称: ["评审纪要（意见、答复、结论）", "Review minutes (comments, answers, decision)"], 验收: ["逐条记录评审意见和小组的答复；写明结论（通过、修改后通过或返工）和下一步", "Records each review comment and the group's answer; states the decision (pass, pass after changes or rework) and next steps"], 类型: 文件, 格式: [docx, pdf]}
+工位: [CAD, PY, PLM]
+步骤:
+  - ["需求：小组讨论使用场景，整理需求，写设计任务书；用质量屋找出最要紧的指标（2.1 节）", "Needs: discuss the use case, list the needs, write the specification; find the key metrics with a house of quality (Section 2.1)"]
+  - ["功能与形态矩阵：画功能结构；每个分功能用头脑风暴和类比至少想三种解法；排除不相容的组合（2.2、2.3 节）", "Functions and matrix: draw the function structure; at least three solutions per sub-function by brainstorming and analogy; remove incompatible pairs (Sections 2.2, 2.3)"]
+  - ["方案：挑出至少三个原理不同的方案，各画草图（可在零件库的 Go2 模型上示意）", "Concepts: choose at least three concepts on different principles and sketch each (on the Go2 model from the library if you like)"]
+  - ["评价：先定准则与权重，再做普氏矩阵和加权评分；修改程序 2.4.1 做权重敏感性分析（2.4 节）", "Evaluate: fix criteria and weights first, then a Pugh matrix and weighted scoring; adapt Program 2.4.1 for weight sensitivity (Section 2.4)"]
+  - ["评审：小组答辩，记录意见和答复，写评审纪要；评审后把整套交付物（含纪要）在“我的任务”里提交", "Review: defend as a group, record comments and answers, write the minutes; after the review, submit the complete package (minutes included) in My tasks"]
+评审要点:
+  - ["设计任务书可检查：有数值、单位、检验方法，没有把解决办法写成需求", "The specification is checkable: values, units and test methods; no solutions disguised as needs"]
+  - ["方案之间原理确有不同，不是同一方案的小变化", "The concepts really differ in principle, not small variants of one"]
+  - ["评价有理有据：每个 + / − 和分数有理由；做了敏感性分析，结论与之相符", "Evaluation is reasoned: every + / − and score has a reason; the sensitivity analysis was done and the conclusion matches it"]
+  - ["推荐方案考虑了户外防护和安全（裸露带电体）", "The recommended concept deals with outdoor protection and safety (exposed live parts)"]
+评分:
+  - {项: ["设计任务书", "Design specification"], 分: 20, 标准: ["指标完整、可检查", "Complete, checkable metrics"]}
+  - {项: ["功能结构与形态矩阵", "Function structure and morphological matrix"], 分: 25, 标准: ["分解合理，解法多样，不相容组合有理由", "Sound decomposition, varied solutions, reasons for incompatibilities"]}
+  - {项: ["方案评价与推荐", "Evaluation and recommendation"], 分: 30, 标准: ["方法正确，有敏感性分析，推荐有说服力", "Correct method, sensitivity analysis, convincing recommendation"]}
+  - {项: ["模型或草图", "Model or sketch"], 分: 10, 标准: ["关键关系表达清楚", "Key relations clear"]}
+  - {项: ["评审与纪要", "Review and minutes"], 分: 15, 标准: ["答辩清楚，意见逐条答复", "Clear defence, every comment answered"]}
+学时: 4
