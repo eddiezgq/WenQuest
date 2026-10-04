@@ -10,8 +10,10 @@ CURRENT=$(envval ENGINE_IMAGE)
 if [ -n "$NEW_IMAGE" ] && [ "$NEW_IMAGE" != "$CURRENT" ]; then
     # A new image may upgrade the database; take a backup first if the site is already running.
     if [ -n "$(dc ps -q moodle 2>/dev/null)" ]; then
+        # Skipped when a backup is less than an hour old or the disk is too full (round 19); a failed
+        # backup is reported but does not stop the deploy.
         log "Backing up before the update..."
-        "$(dirname "$0")/backup.sh"
+        "$(dirname "$0")/backup.sh" --pre-update || log "WARNING: the pre-update backup failed; continuing the update."
     fi
     log "Engine image: ${CURRENT:-none} -> $NEW_IMAGE"
     [ -n "$CURRENT" ] && echo "$CURRENT" >> .deploy-history

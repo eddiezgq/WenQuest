@@ -360,6 +360,16 @@ jobs:
             exit "$st"
           fi
 
+      - name: Disk space on the server (round 19)
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: |
+          used=$(ssh "deploy@$HOST" "df -P / | awk 'NR==2 {sub(\"%\", \"\", \$5); print \$5}'")
+          echo "Server disk used: ${used}%"
+          if [ "${used:-0}" -gt 90 ]; then
+            echo "::warning title=Server disk ${used}% full::Free space on the server (run deploy/status.sh there to see backups and images). Backups are skipped below 15% free."
+          fi
+
       - name: Textbook animations (wait for the server to render them; report failures)
         if: env.SKIP != '1'
         continue-on-error: true
