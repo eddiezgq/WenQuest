@@ -23,6 +23,9 @@ chapters:
   4:
     status: ai
     title_en: "Matrices and Matrix Multiplication"
+  5:
+    status: ai
+    title_en: "Inverses and LU Factorization"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"
