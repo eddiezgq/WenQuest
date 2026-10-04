@@ -407,8 +407,17 @@ def sig(x: float, n: int = 5) -> str:
     return s
 
 
+UNICODE_MINUS = {"on": False}   # meta.yaml 的 unicode_minus: true —— 程序给出的负数用“−”（U+2212）排版，不用连字符“-”
+
+
 def fill(sec: Section, values: dict, rep: Report) -> str:
     def one(m):
+        out = _one(m)
+        if UNICODE_MINUS["on"] and isinstance(out, str) and re.fullmatch(r"[+\-]?\d[\d.,eE+\-]*", out or "x"):
+            out = out.replace("-", "−")
+        return out
+
+    def _one(m):
         prog, name, fmt = m.group(1), m.group(2), m.group(3)
         if prog not in values:
             rep.add("error", "占位符", sec.id, f"{{{{{prog}.{name}}}}}：没有程序 {prog}.py 或它没有运行成功")
@@ -893,6 +902,8 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         outline_in_sync(book_name, rep)
     sections = load_sections(book, rep, only)
     sections_en = load_sections_en(book, sections, rep)
+    meta_p = book["root"] / "meta.yaml"
+    UNICODE_MINUS["on"] = bool(meta_p.exists() and (yaml.safe_load(meta_p.read_text(encoding="utf-8")) or {}).get("unicode_minus"))
     prog_meta = progress(book)
     terms = glossary(book)
     check_other_books(book, rep)

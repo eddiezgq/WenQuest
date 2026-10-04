@@ -115,3 +115,38 @@ def test_two_pins_point_and_diamond_pin():
     assert r["perp"] == pytest.approx(0.029 * (1 - 150 / 220) + 0.03 * 150 / 220)
     dp = T.diamond_pin((8, 0.015, 0), 3, 0.05, 0.01, 0.009)
     assert dp["X2min"] == pytest.approx(2 * 3 * 0.06 / 8) and dp["X2max"] == pytest.approx(8.015 - (8 - 0.045 - 0.009))
+
+
+def test_statistical_general_and_allocate():
+    links = [Link("A", 50, 0.1, -0.1, 1), Link("B", 30, 0.05, -0.05, -1)]
+    g = T.statistical_general(links)
+    s = T.statistical(links)
+    assert g.T == pytest.approx(s.T) and g.es == pytest.approx(s.es)
+    u = T.statistical_general(links, ["uniform", "uniform"])
+    assert u.T == pytest.approx(1.73 * s.T)
+    sk = T.statistical_general(links, ["skew_out", "normal"])
+    assert sk.detail["mid"] == pytest.approx(0.26 * 0.2 / 2)
+    a = T.allocate(0.3, [10, 100])
+    assert sum(a) == pytest.approx(0.3) and a[1] > a[0]
+
+
+def test_sh301_tolerance_chart_and_review():
+    import copy
+    import yaml
+    from pathlib import Path
+    from hub import process as P
+    p = yaml.safe_load((Path(__file__).resolve().parents[1] / "std" / "SH-301_process.yaml").read_text(encoding="utf-8"))
+    r = T.chart_from_plan(p["tolerance_chart"])
+    assert all(d["ok"] for d in r["drawing"]) and all(a["ok"] for a in r["allowances"])
+    bad = copy.deepcopy(p)
+    for c in bad["tolerance_chart"]["cuts"]:
+        if c["seq"] == 40.3:
+            c["es"], c["ei"] = 0.3, -0.3
+    rb = T.chart_from_plan(bad["tolerance_chart"])
+    assert not next(d for d in rb["drawing"] if d["nominal"] == 60)["ok"]
+    found = [x for x in P.review(bad) if "跟踪图" in str(x)]
+    assert found, "评审员应当指出齿轮位长度 60 保证不了"
+    assert not [x for x in P.review(p) if "cut_dir" in str(x)]
+    nodir = copy.deepcopy(p)
+    del nodir["tolerance_chart"]["cut_dir"]
+    assert [x for x in P.review(nodir) if "cut_dir" in str(x)], "缺加工方向时应给出警告"

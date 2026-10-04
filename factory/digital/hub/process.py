@@ -296,9 +296,32 @@ def _review_v2(plan, say):
             say("尺寸链", "warning", "尺寸链“{}”没有对应到图纸特性（char）。".format(ch.get("name")))
             continue
         lo, hi = c["nominal"] + c["ei"], c["nominal"] + c["es"]
-        if abs(r.nominal - c["nominal"]) > 1e-6 or r.min < lo - 1e-9 or r.max > hi + 1e-9:
-            say("尺寸链", "error", "尺寸链“{}”算得 {}，即 {:.4f}–{:.4f}，不在图纸 {} 的 {:.4f}–{:.4f} 之内。"
+        if r.min < lo - 1e-9 or r.max > hi + 1e-9:          # 只比较极限尺寸（名义值与偏差的写法可以不同）
+            say("尺寸链", "error", "尺寸链“{}”算得 {}，即 {:.4f}–{:.4f}，不在图纸 {}的 {:.4f}–{:.4f} 之内。"
                 .format(ch["name"], r.text(4), r.min, r.max, c["spec"], lo, hi))
+    # 3b 工艺尺寸跟踪图（第 53 章）：图纸轴向尺寸能否保证，每次精加工端面、轴肩的余量是否够
+    tc = plan.get("tolerance_chart")
+    if tc:
+        try:
+            r = TL.chart_from_plan(tc)
+        except (KeyError, ValueError) as e:
+            say("尺寸链", "error", "工艺尺寸跟踪图有错：{}".format(e))
+        else:
+            names = tc.get("surfaces", {})
+            cd = tc.get("cut_dir") or {}
+            miss = sorted({c["surf"] for c in tc["cuts"]} - set(cd))
+            if miss:
+                say("尺寸链", "warning", "跟踪图没有给出{}的 cut_dir（加工方向），余量只能按名义值判断方向，车过头查不出来。".format(
+                    "、".join(names.get(m, m) for m in miss)))
+            for d in r["drawing"]:
+                if not d["ok"]:
+                    spec = TL.Result(d["nominal"], d["es"], d["ei"], "图纸").text(3)
+                    say("尺寸链", "error", "跟踪图：{}–{} 的图纸尺寸 {} 保证不了，工艺上得到 {}（尺寸链：{}）。".format(
+                        names.get(d["a"], d["a"]), names.get(d["b"], d["b"]), spec, d["result"].text(3), "、".join(d["links"])))
+            for a in r["allowances"]:
+                if not a["ok"]:
+                    say("尺寸链", "error", "跟踪图：工步 {} 加工{}时余量最小只有 {} mm（要求不小于 {:g}），可能车不出来。".format(
+                        a["seq"], names.get(a["surface"], a["surface"]), f"{a['min']:.3f}".replace("-", "−"), r["min_allowance"]))
     # 4 工序简图上的工序尺寸与工序尺寸表一致
     for o in plan.get("operations") or []:
         sk = o.get("sketch") or {}

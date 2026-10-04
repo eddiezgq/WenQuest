@@ -71,7 +71,9 @@ class Result:
 
     def text(self, nd=3):
         def s(x):
-            return "0" if abs(x) < 10 ** -(nd + 1) else f"{x:+.{nd}f}".rstrip("0").rstrip(".")
+            return "0" if abs(x) < 10 ** -(nd + 1) else f"{x:+.{nd}f}".rstrip("0").rstrip(".").replace("-", "−")
+        if abs(self.es + self.ei) < 10 ** -(nd + 1) and abs(self.es) > 10 ** -(nd + 1):
+            return f"{self.nominal:g} ± {s(self.es)[1:]}"
         return f"{self.nominal:g}（{s(self.es)}/{s(self.ei)}）"
 
 
@@ -92,14 +94,21 @@ def statistical(links, k=1.0) -> Result:
 
 
 def monte_carlo(links, n=200_000, dist="normal", seed=1) -> Result:
-    """蒙特卡罗：各环按正态（公差带 = ±3σ，截尾于公差带）或均匀分布抽样，返回封闭环的 ±3σ 区间与实际极值。"""
+    """蒙特卡罗：各环按正态（公差带 = ±3σ，截尾于公差带）、均匀、三角或偏态分布抽样，返回封闭环的 ±3σ 区间与实际极值。
+    dist 可以是一个分布名（所有环相同），也可以是与 links 对应的列表。"""
     rng = random.Random(seed)
+    dl = dist if isinstance(dist, (list, tuple)) else [dist] * len(links)
     vals = []
     for _ in range(n):
         s = 0.0
-        for l in links:
+        for l, dist in zip(links, dl):
             if dist == "uniform":
                 x = rng.uniform(l.min, l.max)
+            elif dist == "triangle":
+                x = rng.triangular(l.min, l.max)
+            elif dist in ("skew_out", "skew_in"):           # 偏态：beta(3.23, 1.90) 或 beta(1.90, 3.23)，k ≈ 1.17、e ≈ ±0.26，与 DIST_KE 一致
+                b = rng.betavariate(*SKEW_BETA) if dist == "skew_out" else rng.betavariate(*SKEW_BETA[::-1])
+                x = l.min + b * l.T
             else:
                 while True:
                     x = rng.gauss(l.nominal + l.mid, l.T / 6)
@@ -111,7 +120,50 @@ def monte_carlo(links, n=200_000, dist="normal", seed=1) -> Result:
     mu = sum(vals) / n
     sd = math.sqrt(sum((v - mu) ** 2 for v in vals) / (n - 1))
     return Result(A0, mu - A0 + 3 * sd, mu - A0 - 3 * sd, "蒙特卡罗",
-                  {"n": n, "dist": dist, "mean": mu, "sd": sd, "min": min(vals), "max": max(vals)})
+                  {"n": n, "dist": dl, "mean": mu, "sd": sd, "min": min(vals), "max": max(vals), "values": vals if n <= 50_000 else None})
+
+
+# 各种分布的相对分布系数 k 与相对不对称系数 e（国内工艺尺寸链教材常用的取值，以 GB/T 5847 和所用手册为准）：
+# 正态 k = 1、e = 0；三角 k ≈ 1.22；均匀 k ≈ 1.73；瑞利（如跳动、偏心）k ≈ 1.14、e ≈ −0.28；
+# 偏态（试切法加工，外尺寸偏向最大实体）k ≈ 1.17、e ≈ +0.26，内尺寸 e ≈ −0.26。
+SKEW_BETA = (3.23, 1.90)   # 均值 0.63（e = +0.26）、标准差 0.195 个公差（k = 6σ/T ≈ 1.17）的 beta 分布，蒙特卡罗用它模拟偏态
+DIST_KE = {"normal": (1.0, 0.0), "triangle": (1.22, 0.0), "uniform": (1.73, 0.0), "rayleigh": (1.14, -0.28),
+           "skew_out": (1.17, 0.26), "skew_in": (1.17, -0.26)}
+
+
+def statistical_general(links, dists=None, k0: float = 1.0) -> Result:
+    """概率法的一般形式：T0 = (1/k0)·√Σ(ki·Ti)²，封闭环的中间偏差 Δ0 = Σ ±(Δi + ei·Ti/2)。
+    dists：与 links 一一对应的分布名（DIST_KE 的键）或 (k, e)；缺省全按正态（即 statistical）。
+    e 的正负：分布中心偏向公差带上限为正。"""
+    dists = dists or ["normal"] * len(links)
+    ke = [DIST_KE[d] if isinstance(d, str) else d for d in dists]
+    A0 = sum(l.sense * l.nominal for l in links)
+    d0 = sum(l.sense * (l.mid + e * l.T / 2) for l, (k, e) in zip(links, ke))
+    T0 = math.sqrt(sum((k * l.T) ** 2 for l, (k, e) in zip(links, ke))) / k0
+    return Result(A0, d0 + T0 / 2, d0 - T0 / 2, "概率法（一般式）", {"mid": d0, "ke": ke})
+
+
+SIZE_STEPS = (1, 3, 6, 10, 18, 30, 50, 80, 120, 180, 250, 315, 400, 500)   # GB/T 1800.1 的主段落（≤ 500 mm）
+
+
+def tolerance_unit(D: float, by_step: bool = True) -> float:
+    """标准公差因子 i = 0.45·∛D + 0.001·D（µm）。D 取尺寸所在段落两端的几何平均值（by_step=True，与 GB/T 1800.1 一致），
+    by_step=False 时直接用 D。"""
+    if by_step:
+        lo = max(x for x in SIZE_STEPS if x < D) if D > SIZE_STEPS[0] else 0
+        hi = min(x for x in SIZE_STEPS if x >= D)
+        D = math.sqrt(lo * hi) if lo else math.sqrt(1 * 3)
+    return 0.45 * D ** (1 / 3) + 0.001 * D
+
+
+def allocate(T0: float, nominals: list, method: str = "equal_precision") -> list:
+    """把封闭环公差 T0 分给各组成环（极值法）：equal_tolerance 等公差，equal_precision 等精度（各环公差与公差因子成正比）。"""
+    n = len(nominals)
+    if method == "equal_tolerance":
+        return [T0 / n] * n
+    iu = [tolerance_unit(max(D, 1.0)) for D in nominals]
+    a = T0 / sum(iu)
+    return [a * u for u in iu]
 
 
 def solve_link(links, closing: tuple, unknown: str, sense: int = +1) -> Link:
@@ -214,19 +266,40 @@ class ToleranceChart:
         links = self.chain(a, b)
         return extreme(links) if method == "extreme" else statistical(links)
 
-    def allowances(self) -> list[dict]:
-        """每次加工的余量（沿 x 的切除厚度，取正值）：上一版本到新版本之间的尺寸链。"""
+    def allowances(self, cut_dir: dict | None = None) -> list[dict]:
+        """每次加工的余量（切除厚度）：上一版本到新版本之间的尺寸链 r = x(新) − x(旧)。
+        cut_dir：每个面加工时向哪个方向移动（+1 向 x 正向，如左端面、朝左的轴肩；−1 向负向，如右端面、朝右的轴肩）。
+        给出时余量 = cut_dir·r，可以是负值（车过头、车不到）；不给时按名义值的正负判断方向（旧的做法，判断不了车过头）。"""
         out = []
         for c, prev, v in self.cuts:
             if not prev:
                 continue
             links = [Link(lab, nom, es, ei, d) for nom, es, ei, lab, d in self._path(prev, v)]
             r = extreme(links)
-            sign = -1 if r.nominal < 0 else 1          # 切除厚度的方向：面向哪边移动
+            sign = (cut_dir or {}).get(c.surf) or (-1 if r.nominal < 0 else 1)
             zmin, zmax = sorted((sign * r.min, sign * r.max))
-            out.append({"seq": c.seq, "surface": c.surf, "nominal": abs(r.nominal), "min": zmin, "max": zmax,
+            out.append({"seq": c.seq, "surface": c.surf, "nominal": sign * r.nominal, "min": zmin, "max": zmax,
                         "links": [l.name for l in links]})
         return out
+
+
+def chart_from_plan(tc: dict) -> dict:
+    """从工艺规程数据里的 tolerance_chart 建立工艺尺寸跟踪图，核算图纸轴向尺寸和每次加工的余量。
+    tc = {blank: [[A, B, nom, es, ei]], cuts: [{seq, ref, surf, nominal, es, ei, label?}], drawing: [{a, b, nominal, tol 或 es/ei}],
+          min_allowance}。返回 {chart, drawing: [{a, b, spec, result, ok}], allowances: [... ok]}。"""
+    ch = ToleranceChart([tuple(b) for b in tc["blank"]])
+    for c in tc["cuts"]:
+        ch.cut(Cut(c["seq"], c["ref"], c["surf"], c["nominal"], c.get("es", 0.0), c.get("ei", 0.0), c.get("label", "")))
+    dr = []
+    for d in tc.get("drawing", []):
+        es, ei = (d["tol"], -d["tol"]) if "tol" in d else (d["es"], d["ei"])
+        r = ch.resultant(d["a"], d["b"])
+        ok = r.max <= d["nominal"] + es + 1e-9 and r.min >= d["nominal"] + ei - 1e-9      # 只比较极限尺寸：名义值写法不同不算错
+        dr.append({"a": d["a"], "b": d["b"], "nominal": d["nominal"], "es": es, "ei": ei, "result": r, "ok": ok,
+                   "links": [l.name for l in ch.chain(d["a"], d["b"])]})
+    zmin = tc.get("min_allowance", 0.0)
+    al = [a | {"ok": a["min"] >= zmin - 1e-9} for a in ch.allowances(tc.get("cut_dir"))]
+    return {"chart": ch, "drawing": dr, "allowances": al, "min_allowance": zmin}
 
 
 # ---------------------------------------------------------------- 定位误差

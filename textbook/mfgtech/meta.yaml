@@ -2,6 +2,7 @@
 outline: docs/教材/机械制造技术/00_提纲.md
 title: 机械制造技术
 title_en: Mechanical Manufacturing Technology
+unicode_minus: true        # 程序给出的负数排成“−”
 # 程序读到的书外文件（数字工厂的工艺规程、卡片生成器、尺寸链库、误差模型、工厂数据）：改了它们，程序要重算
 program_deps:
   - factory/digital/std/*.yaml
@@ -10,6 +11,7 @@ program_deps:
   - factory/digital/hub/tolerance.py
   - factory/digital/hub/fixture.py
   - factory/digital/hub/fe2d.py
+  - factory/digital/std/WQR-105_chains.yaml
   - factory/digital/cae/cam_power.py
   - factory/digital/hub/process.py
   - factory/digital/sim/errors.py

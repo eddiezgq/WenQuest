@@ -1,0 +1,35 @@
+# 工程任务单 TS-53-1（配 53.1–53.9 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-53-1
+标题: [SH-301 与 SH-101 的工艺尺寸链, "Process dimension chains for SH-301 and SH-101"]
+角色: [工艺员（工序尺寸）, process engineer (operation dimensions)]
+背景:
+  - "工艺主管要你把 WQR-105 两根轴的工序尺寸“算清楚”：SH-301 的键槽深度是铣键槽后再磨外圆间接得到的，轴向各段长度经过两道工序、四次安装；SH-101 的轴承位渗碳淬火后要磨削，磨后还要保证渗碳层深度。每个工序尺寸都要有尺寸链做依据，写进工艺规程，让数字工厂的 AI 预检能复核。"
+  - "The supervisor wants the operation dimensions of two WQR-105 shafts worked out properly: SH-301's keyway depth results from milling before the OD is ground, and its axial lengths pass through two operations and four set-ups; SH-101's bearing seat is ground after carburizing yet must keep its case depth. Every operation dimension needs a chain behind it, written into the process plan so the digital factory's AI pre-check can verify it."
+输入:
+  - {名称: [SH-301 工艺规程（含 chains、tolerance_chart）, "SH-301 process plan (chains, tolerance_chart)"], 来源: [factory/digital/std/SH-301_process.yaml, factory/digital/std/SH-301_process.yaml]}
+  - {名称: [SH-101 与 GR-203 的尺寸链数据, "Chain data for SH-101 and GR-203"], 来源: [factory/digital/std/WQR-105_chains.yaml, factory/digital/std/WQR-105_chains.yaml]}
+  - {名称: [尺寸链计算库与实验 53.3、53.7, "Chain library and Labs 53.3, 53.7"], 来源: [factory/digital/hub/tolerance.py；本章, "factory/digital/hub/tolerance.py; this chapter"]}
+交付物:
+  - {名称: [工艺尺寸链计算书（3–5 页）, "Dimension-chain calculations (3–5 pages)"], 验收: [每条链有尺寸链图、封闭环与增减环的判断、所用方法（极值法或概率法及理由）、计算过程和结果；至少包括：键槽深度（正、反计算）、齿轮位长度 60、左右轴肩的精车余量、SH-101 渗碳层深度, "Each chain has a diagram, the closing link and increasing/decreasing links, the method (worst case or statistical, with reasons), the working and the result; at least the keyway depth (forward and reverse), the 60 gear seat, the shoulder finishing allowances, and SH-101's case depth"]}
+  - {名称: [SH-301 轴向工艺尺寸跟踪图, SH-301 axial tolerance chart], 验收: [图上有全部轴向工步、图纸尺寸及其结果、每次精加工的余量范围；指出初稿的问题和你的改法, "All axial cuts, the drawing dimensions with their results, and each finishing allowance range; the draft's problems and your fixes"]}
+  - {名称: [工艺规程修改与 AI 预检记录, Plan changes and pre-check record], 验收: [键槽深度的链已在 SH-301 的 chains 里，轴向尺寸和余量在 tolerance_chart 里（不要另加进 chains）；SH-101 的渗碳层深度链已登记在 std/WQR-105_chains.yaml，核对其数据并写出渗碳工序的技术要求（这一项 AI 预检不复核，由老师检查）。按你的方案修改 tolerance_chart，提交 AI 预检，没有“尺寸链”方面的错误意见；再故意把 tolerance_chart 里第 40.3 刀（工序 40 总长）的公差改为 ±0.3，记录意见, "The keyway chain is already in SH-301's chains and the axial dimensions and allowances are in tolerance_chart (do not add them to chains); SH-101's case-depth chain is already in std/WQR-105_chains.yaml; check its data and write the carburizing requirement (not checked by the AI pre-check; the teacher checks it). Update tolerance_chart with your plan and run the AI pre-check with no chain errors; then set cut 40.3 (operation 40 overall length) in tolerance_chart to ±0.3 on purpose and record the comment"]}
+  - {名称: [渗碳工序的技术要求, Carburizing requirement], 验收: [写出交给热处理车间的渗碳层深度要求（含公差），并说明它与磨削余量、磨削公差的关系, "State the case-depth requirement (with tolerance) for the heat-treatment shop and explain how it relates to the grinding allowance and tolerance"]}
+工位: [PY, PLM]
+步骤:
+  - ["读 SH-301、SH-101 的图纸要求和工艺路线，列出所有不是直接加工得到的尺寸（封闭环）。", "Read the drawings and routes of SH-301 and SH-101 and list every dimension not made directly (closing links)."]
+  - ["画尺寸链图，用回路法判断增减环；用程序 53.2.1 的方法做正、反计算。", "Draw the chains, find increasing and decreasing links by the loop rule, and work forward and reverse as in Program 53.2.1."]
+  - ["在实验 53.3 中比较极值法、概率法和蒙特卡罗；说明你用哪种方法、为什么。", "Compare worst case, statistical and Monte Carlo in Lab 53.3; say which you use and why."]
+  - ["在实验 53.7 中完成 SH-301 轴向跟踪图的四个任务，定出工序 40 的总长公差和轴肩粗车余量。", "Do the four tasks of Lab 53.7 and fix operation 40's overall tolerance and the shoulder roughing allowance."]
+  - ["算 SH-101 渗碳层深度，写出渗碳工序的技术要求。", "Compute SH-101's case depth and write the carburizing requirement."]
+  - ["修改工艺规程，提交 AI 预检；故意改坏一次，记录意见。", "Update the plan and run the AI pre-check; break it once on purpose and record the comment."]
+评审要点:
+  - ["〔AI 检查〕尺寸链：工艺规程登记的尺寸链按极值法算出的封闭环在图纸公差内。", "[AI] Chains: every chain in the plan gives a closing link within the drawing tolerance by worst case."]
+  - ["〔AI 检查〕跟踪图：图纸轴向尺寸都能保证，每次精加工的最小余量不小于规定值。", "[AI] Chart: all axial drawing dimensions hold and every finishing allowance meets the minimum."]
+  - ["〔老师检查〕封闭环找对了；增减环判断正确；用概率法时说明了前提。", "[Teacher] Closing links are right; increasing/decreasing links correct; statistical use is justified."]
+  - ["〔老师检查〕渗碳层深度要求合理，热处理车间能做到。", "[Teacher] The case-depth requirement is sound and achievable by the heat-treatment shop."]
+评分:
+  - {项: [尺寸链计算, Chain calculations], 分: 40, 标准: [链图、增减环、计算全部正确, "Diagrams, links and working all correct"]}
+  - {项: [跟踪图, Tolerance chart], 分: 25, 标准: [完整、问题找对、改法合理, "Complete; problems found; sound fixes"]}
+  - {项: [工艺规程与 AI 预检, Plan and pre-check], 分: 20, 标准: [数据正确、预检记录完整, "Correct data; complete record"]}
+  - {项: [渗碳技术要求, Carburizing requirement], 分: 15, 标准: [数值与说明正确, "Correct values and explanation"]}
+学时: 4

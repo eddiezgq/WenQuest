@@ -1,0 +1,20 @@
+# 实验 53.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab53_3.js。
+原理:
+  - ["尺寸链中，加工中间接得到的尺寸是封闭环 A0，直接加工得到的是组成环 Ai。增环增大使封闭环增大，减环增大使封闭环减小。", "In a chain, the dimension obtained indirectly is the closing link A0; the dimensions made directly are component links Ai. Increasing links raise A0, decreasing links lower it."]
+  - 式: "极值法：ES0 = ΣES增 − ΣEI减，EI0 = ΣEI增 − ΣES减，T0 = ΣTi        (53.2.2)–(53.2.4)"
+  - 式: "概率法：Δ0 = Σ±(Δi + ei·Ti/2)，T0 = √Σ(ki·Ti)²        (53.3.2)、(53.3.3)"
+  - ["蒙特卡罗：按各环的分布随机抽取一批“零件”，逐件算出封闭环，直接看超差率。", "Monte Carlo: draw a batch of “parts” from each link's distribution, compute the closing link part by part, and read the reject rate directly."]
+步骤:
+  - ["选“SH-301 键槽深度”，逐步加大组成环 1（H）的公差，记录极值法、概率法的结果，找出极值法仍满足的最大公差（任务 1），记入表 1。", "Choose “SH-301 keyway depth”, widen link 1 (H) step by step, record worst-case and statistical results, and find the largest tolerance worst case allows (task 1); enter in Table 1."]
+  - ["选“SH-301 齿轮位长度 60”，把总长公差从 0.6 逐步减小，找出极值法不满足、概率法满足的范围，读超差率（任务 2）；再把分布改为均匀（任务 3）。", "Choose “SH-301 gear-seat length 60”, reduce the overall tolerance from 0.6, find where worst case fails but the statistical method holds, read the reject rate (task 2); then switch to uniform (task 3)."]
+  - ["选“SH-101 渗碳层深度”，找出渗碳层深公差的最大值（任务 4）。", "Choose “SH-101 case depth” and find the widest depth tolerance (task 4)."]
+数据表:
+  - 标题: ["表 1  三种算法的比较", "Table 1  The three methods compared"]
+    表头: ["场景", "组成环公差", "分布", "极值法", "概率法", "蒙特卡罗超差率 / %", "结论"]
+    表头英文: ["Scene", "Link tolerances", "Distribution", "Worst case", "Statistical", "MC reject rate / %", "Result"]
+    行: [["键槽", "", "正态", "", "", "", ""], ["齿轮位 60", "", "正态", "", "", "", ""], ["齿轮位 60", "", "均匀", "", "", "", ""], ["渗碳层", "", "正态", "", "", "", ""]]
+    行英文: [["Keyway", "", "normal", "", "", "", ""], ["Gear seat 60", "", "normal", "", "", "", ""], ["Gear seat 60", "", "uniform", "", "", "", ""], ["Case depth", "", "normal", "", "", "", ""]]
+注意:
+  - ["组成环的中间偏差固定，取自数字工厂的工艺规程和尺寸链数据；只改公差。偏态分布取偏向公差带上限的 beta(3.23, 1.90)，它的 k ≈ 1.17、e ≈ +0.26，与表 53.3.1 一致。", "Link mid-deviations are fixed from the factory's data; only the tolerances change. The skewed distribution is beta(3.23, 1.90), leaning to the upper limit, with k ≈ 1.17 and e ≈ +0.26 as in Table 53.3.1."]
+思考题:
+  - ["蒙特卡罗的超差率很小时，是否就可以放心用概率法定公差？还要满足哪些条件？", "If the Monte Carlo reject rate is tiny, can the statistical tolerance be trusted? What else must be true?"]

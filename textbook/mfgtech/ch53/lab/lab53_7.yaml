@@ -1,0 +1,18 @@
+# 实验 53.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab53_7.js。
+原理:
+  - ["工艺尺寸跟踪图把每一道工序“以哪个面为基准、加工哪个面、工序尺寸多少”按顺序登记，每个面在各工序中的位置连成一棵树。任两个面之间的路径就是一条尺寸链：图纸尺寸的链看能否保证，同一个面相邻两次加工之间的链就是余量。", "A tolerance chart records, operation by operation, which face is the datum, which face is cut and to what dimension; the positions of each face at each stage form a tree. The path between any two faces is a chain: for a drawing dimension it shows whether it can be held, and between successive cuts of the same face it gives the allowance."]
+  - 式: "图纸尺寸（封闭环）的公差 = 链中各工序尺寸公差之和；余量 Z = Z名义 ± ΣT/2（链中各工序尺寸半公差之和）        (53.7.1)"
+步骤:
+  - ["在默认参数（初稿）下读出每个图纸尺寸和每个余量，找出问题（任务 1），记入表 1。", "At the default (draft) settings read every drawing dimension and allowance and find the problems (task 1); enter in Table 1."]
+  - ["保持总长公差不小于 ±0.2，调其他参数直到全部满足（任务 2），记下方案。", "Keep the overall tolerance at ±0.2 or wider and adjust the rest until everything holds (task 2); record the plan."]
+  - ["把精车轴肩公差放宽到 ±0.08，求总长公差（任务 3）；把粗车余量减到 0.6 以下（任务 4）。", "Relax the finish-shoulder tolerance to ±0.08 and find the overall tolerance (task 3); cut the roughing allowance below 0.6 (task 4)."]
+数据表:
+  - 标题: ["表 1  跟踪图的结果", "Table 1  Chart results"]
+    表头: ["方案", "总长 ±", "精车轴肩 ±", "粗车余量", "齿轮位 60", "左侧轴肩余量", "右侧轴肩余量", "结论"]
+    表头英文: ["Plan", "Overall ±", "Finish shoulder ±", "Rough allowance", "Gear seat 60", "Left shoulder allowance", "Right shoulder allowance", "Result"]
+    行: [["初稿", "0.3", "0.05", "0.5", "", "", "", ""], ["改进", "", "", "", "", "", "", ""], ["取舍", "", "0.08", "", "", "", "", ""], ["省料", "", "", "", "", "", "", ""]]
+    行英文: [["Draft", "0.3", "0.05", "0.5", "", "", "", ""], ["Fix", "", "", "", "", "", "", ""], ["Trade-off", "", "0.08", "", "", "", "", ""], ["Lean", "", "", "", "", "", "", ""]]
+注意:
+  - ["工序与基准取自数字工厂的 SH-301 工艺规程；公式由跟踪图程序推出，书中程序 53.7.1 核对。", "Operations and datums come from SH-301's process plan; the formulas were derived from the chart program and are checked by Program 53.7.1."]
+思考题:
+  - ["余量变动的范围比图纸尺寸的公差更容易被忽视。余量不够会怎样？余量太大又会怎样？", "Allowance scatter is easier to overlook than drawing tolerances. What happens if an allowance is too small, and if it is too large?"]

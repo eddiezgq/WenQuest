@@ -49,7 +49,7 @@ characteristics:         # 图纸全部特性；key: true 为关键特性（检�
   - {id: C2, name: 齿轮位直径, spec: "Ø40 k6（+0.018/+0.002）", nominal: 40, es: 0.018, ei: 0.002, kind: dim, key: true, qms: 齿轮位直径 Gear seat Ø40 k6 (mm)}
   - {id: C3, name: 轴端直径（两处）, spec: "Ø30 h8（0/−0.033）", nominal: 30, es: 0, ei: -0.033, kind: dim}
   - {id: C4, name: 键槽宽, spec: "12 N9（0/−0.043）", nominal: 12, es: 0, ei: -0.043, kind: dim, key: true, qms: 键槽宽 Keyway 12 N9 (mm)}
-  - {id: C5, name: 键槽深（d − t）, spec: "35（0/−0.2）", nominal: 35, es: 0, ei: -0.2, kind: dim}
+  - {id: C5, name: 键槽深（d − t₁）, spec: "35（0/−0.2）", nominal: 35, es: 0, ei: -0.2, kind: dim}
   - {id: C6, name: 键槽对称度, spec: "0.02（对齿轮位轴线）", kind: geo}
   - {id: C7, name: 轴承位径向圆跳动, spec: "0.012（对 A–B 公共轴线）", kind: geo, key: true}
   - {id: C8, name: 齿轮位径向圆跳动, spec: "0.015（对 A–B 公共轴线）", kind: geo}
@@ -77,7 +77,7 @@ gauges:
   - {id: G08, name: 键槽对称度检具}
   - {id: G09, name: 表面粗糙度仪}
   - {id: G10, name: 布氏硬度计}
-  - {id: G11, name: 深度千分尺 0–25 mm（以磨后外圆母线为基准测 d − t）}
+  - {id: G11, name: 深度千分尺 0–25 mm（以键槽两侧的外圆母线为基准测槽深 t₁，d − t₁ = 实测 d − t₁，第 53 章）}
 operations:
   - seq: 10
     operation: 下料 Sawing
@@ -117,7 +117,7 @@ operations:
     locate: [{surface: 左端外圆, symbol: chuck, dof: 3}, {surface: 右端中心孔, symbol: center_live, dof: 2}]   # 安装 1：短夹持外圆 2 个移动 + 端面靠卡爪 1 个，顶尖 2 个，共 5 个；安装 2 调头后夹齿轮位、顶左端
     clamp: [{surface: 左端外圆, kind: manual}]
     sketch:            # 本工序结束时的状态
-      stock: [[31.5, 39.5], [36.5, 12], [41.5, 60], [36.5, 25], [31.5, 31.5]]
+      stock: [[31.5, 39.7], [36.5, 12], [41.5, 61.6], [36.5, 25], [31.5, 29.7]]
       machined: [0, 1, 2, 3, 4, end_L, end_R]
       dims:
         - {kind: dia, seg: 0, text: "Ø31.5 0/−0.25"}
@@ -130,12 +130,12 @@ operations:
     steps:
       - {step: 1, content: 安装 1：三爪卡盘短夹持毛坯左端外圆（夹持长约 15，端面靠卡爪），车右端面，车去约 7（分 4 刀）, tool: T01, op: face, d: 50, vc: 120, f: 0.2, ap: 1.75, passes: 4, gauge: G02}
       - {step: 2, content: 钻右端中心孔 A3.15, tool: T03, op: drill, d: 3.15, vc: 20, f: 0.05, depth: 7, gauge: G02}
-      - {step: 3, content: 回转顶尖顶右端中心孔（一夹一顶），粗车齿轮位至 Ø41.5，左、右轴承位至 Ø36.5，右轴端至 Ø31.5, tool: T01, op: turn,
-         passes_detail: [[50, 2.125, 130.5], [45.75, 2.125, 130.5], [41.5, 2.5, 14], [41.5, 2.5, 58.5], [36.5, 2.5, 33.5]], vc: 120, f: 0.3, gauge: G03}
-      - {step: 4, content: 安装 2：调头，三爪卡盘短夹持 Ø41.5 齿轮位外圆（垫铜皮，轴肩靠卡爪），车左端面（分 4 刀），保证总长 168±0.2, tool: T01, op: face, d: 50, vc: 120, f: 0.2, ap: 1.75, passes: 4, gauge: G02}
+      - {step: 3, content: 回转顶尖顶右端中心孔（一夹一顶），粗车齿轮位一带至 Ø41.5（车到左轴承位左端），右轴承位至 Ø36.5，右轴端至 Ø31.5；轴肩按工艺尺寸跟踪图留轴向余量 0.8, tool: T01, op: turn,
+         passes_detail: [[50, 2.125, 130.5], [45.75, 2.125, 130.5], [41.5, 2.5, 58.5], [36.5, 2.5, 33.5]], vc: 120, f: 0.3, gauge: G03}
+      - {step: 4, content: 安装 2：调头，三爪卡盘短夹持 Ø41.5 齿轮位外圆（垫铜皮，轴肩靠卡爪），车左端面（分 4 刀，试切：用卡尺以右端面为测量基准量总长），保证总长 168±0.2, tool: T01, op: face, d: 50, vc: 120, f: 0.2, ap: 1.75, passes: 4, gauge: G02}
       - {step: 5, content: 钻左端中心孔 A3.15, tool: T03, op: drill, d: 3.15, vc: 20, f: 0.05, depth: 7}
-      - {step: 6, content: 回转顶尖顶左端中心孔，粗车左轴端至 Ø31.5, tool: T01, op: turn,
-         passes_detail: [[50, 2.125, 42], [45.75, 2.125, 42], [41.5, 2.5, 42], [36.5, 2.5, 42]], vc: 120, f: 0.3, gauge: G03}
+      - {step: 6, content: 回转顶尖顶左端中心孔，粗车左轴承位至 Ø36.5、左轴端至 Ø31.5（齿轮位左轴肩朝左，只能在这次安装中车出）, tool: T01, op: turn,
+         passes_detail: [[50, 2.125, 42], [45.75, 2.125, 42], [41.5, 2.5, 53.2], [36.5, 2.5, 41.2]], vc: 120, f: 0.3, gauge: G03}
     inspect:
       - {char: 总长 168±0.2, gauge: G02, freq: 首件、每 10 件}
       - {char: 各外圆 Ø31.5、Ø36.5、Ø41.5（0/−0.25）, gauge: G03, freq: 首件、每 10 件}
@@ -178,21 +178,22 @@ operations:
         - {kind: dia, seg: 2, text: "Ø40.3 0/−0.039"}
         - {kind: dia, seg: 3, text: "Ø35.3 0/−0.039"}
         - {kind: dia, seg: 4, text: "Ø30 h8（0/−0.033）"}
-        - {kind: length, from: 0, to: 167, text: "167±0.3"}
-        - {kind: length, from: 40, to: 52, text: "12"}
-        - {kind: length, from: 52, to: 112, text: "60"}
-        - {kind: length, from: 112, to: 137, text: "25"}
+        - {kind: length, from: 0, to: 167, text: "167±0.2"}
+        - {kind: length, from: 0, to: 40, text: "40±0.05"}
+        - {kind: length, from: 0, to: 52, text: "52±0.05"}
+        - {kind: length, from: 112, to: 167, text: "55±0.05"}
+        - {kind: length, from: 137, to: 167, text: "30±0.05"}
       ra: {all: 3.2}
     steps:
       - {step: 1, content: 用 60° 硬质合金顶尖修研两端中心孔, tool: 中心孔修研顶尖, gauge: 着色检查, ta_min: 1.5}
-      - {step: 2, content: 两顶尖装夹（鸡心夹头夹左轴端），精车右轴端至 Ø30 h8、右轴承位和齿轮位至 Ø35.3、Ø40.3，车轴肩、倒角 C1.5, tool: T02, op: turn,
+      - {step: 2, content: 两顶尖装夹（鸡心夹头夹左轴端），换半缺顶尖车右端面，以左端面为测量基准保证 167.5±0.1；精车右轴端至 Ø30 h8、右轴承位和齿轮位至 Ø35.3、Ø40.3，以右端面为基准车右侧两轴肩（55±0.05、30±0.05），倒角 C1.5, tool: T02, op: turn,
          passes_detail: [[41.5, 0.6, 121.5], [36.5, 0.6, 57.5], [31.5, 0.75, 32.5]], vc: 150, f: 0.15, gauge: G03}
-      - {step: 3, content: 调头（鸡心夹头夹右轴端，垫铜皮），精车左轴承位至 Ø35.3、左轴端至 Ø30 h8，换半缺顶尖车左端面保证总长 167±0.3，倒角 C1.5, tool: T02, op: turn,
+      - {step: 3, content: 调头（鸡心夹头夹右轴端，垫铜皮），精车左轴承位至 Ø35.3、左轴端至 Ø30 h8，换半缺顶尖车左端面保证总长 167±0.2，以左端面为基准车左侧两轴肩（40±0.05、52±0.05），倒角 C1.5, tool: T02, op: turn,
          passes_detail: [[36.5, 0.6, 54], [31.5, 0.75, 42]], vc: 150, f: 0.15, gauge: G03}
     inspect:
       - {char: "Ø35.3、Ø40.3（0/−0.039）", gauge: G03, freq: 首件、每 5 件}
       - {char: "轴端 Ø30 h8（C3）", gauge: G03, freq: 首件、每 5 件}
-      - {char: "总长 167±0.3（工序控制，严于图纸 C12 的 ±0.5）、各段长度", gauge: G02, freq: 首件、每 10 件}
+      - {char: "总长 167±0.2（工序控制，严于图纸 C12 的 ±0.5：由工艺尺寸跟踪图定出，保证齿轮位长度 60 和轴肩的精车余量，第 53 章）、各段长度", gauge: G02, freq: 首件、每 10 件}
       - {char: "齿轮定位轴肩端面圆跳动 0.02（C9）", gauge: G05, freq: 首件、每 10 件}
       - {char: "齿轮位跳动 ≤ 0.006（对两中心孔连线；保证铣键槽的对称度，第 51 章）", tir: 0.006, gauge: G05, freq: 首件、每 10 件}
   - seq: 50
@@ -289,11 +290,35 @@ operations:
       - {char: C13, gauge: 目测, freq: 每件}
       - {char: C14, gauge: G10, freq: 每炉抽 3 件（查热处理记录）, record: QMS}
 chains:                  # 工艺尺寸链（AI 工艺评审员按极值法核算）
-  - name: 键槽深度 d − t（铣键槽后再磨外圆）
+  - name: 键槽深度 d − t₁（铣键槽后再磨外圆）
     char: C5
     links:
       - {name: 槽底尺寸 H（工序 50）, nominal: 35.15, es: -0.03, ei: -0.20, sense: 1}
       - {name: 精车齿轮位半径（工序 40）, nominal: 20.15, es: 0, ei: -0.0195, sense: -1}
       - {name: 磨削齿轮位半径（工序 60）, nominal: 20, es: 0.009, ei: 0.001, sense: 1}
+tolerance_chart:         # 轴向工艺尺寸跟踪图（第 53 章）：坐标 x 沿轴线向右，以精车后的左端面为 0；轴肩名见 surfaces
+  surfaces: {L: 左端面, S1: 左轴端—左轴承位轴肩, S2: 齿轮位左轴肩, S3: 齿轮位右轴肩, S4: 右轴承位—右轴端轴肩, R: 右端面}
+  blank: [[L, R, 182, 1.0, -1.0]]            # 锯料长度 182 ± 1
+  min_allowance: 0.1                          # 精车端面、轴肩的最小轴向余量
+  cut_dir: {L: 1, S1: 1, S2: 1, S3: -1, S4: -1, R: -1}   # 加工时面移动的方向：左端面和朝左的轴肩向右移，右端面和朝右的轴肩向左移
+  cuts:
+    - {seq: 20.1, ref: L, surf: R, nominal: 175, es: 0.2, ei: -0.2, label: 工序 20 安装 1 车右端面（毛坯左端靠卡盘挡块）}
+    - {seq: 20.3, ref: R, surf: S3, nominal: -54.7, es: 0.1, ei: -0.1, label: 工序 20 粗车齿轮位右轴肩（留 0.8）}
+    - {seq: 20.31, ref: R, surf: S4, nominal: -29.7, es: 0.1, ei: -0.1, label: 工序 20 粗车右轴承位轴肩（留 0.8）}
+    - {seq: 20.4, ref: R, surf: L, nominal: -168, es: 0.2, ei: -0.2, label: 工序 20 安装 2 车左端面，总长 168}
+    - {seq: 20.6, ref: L, surf: S2, nominal: 51.7, es: 0.1, ei: -0.1, label: 工序 20 粗车齿轮位左轴肩（留 0.8）}
+    - {seq: 20.61, ref: L, surf: S1, nominal: 39.7, es: 0.1, ei: -0.1, label: 工序 20 粗车左轴承位轴肩（留 0.8）}
+    - {seq: 40.2, ref: L, surf: R, nominal: 167.5, es: 0.1, ei: -0.1, label: 工序 40 车右端面（半缺顶尖）}
+    - {seq: 40.21, ref: R, surf: S3, nominal: -55, es: 0.05, ei: -0.05, label: 工序 40 精车齿轮位右轴肩}
+    - {seq: 40.22, ref: R, surf: S4, nominal: -30, es: 0.05, ei: -0.05, label: 工序 40 精车右轴承位轴肩}
+    - {seq: 40.3, ref: R, surf: L, nominal: -167, es: 0.2, ei: -0.2, label: 工序 40 调头车左端面（总长）}
+    - {seq: 40.31, ref: L, surf: S2, nominal: 52, es: 0.05, ei: -0.05, label: 工序 40 精车齿轮位左轴肩}
+    - {seq: 40.32, ref: L, surf: S1, nominal: 40, es: 0.05, ei: -0.05, label: 工序 40 精车左轴承位轴肩}
+  drawing:                                    # 图纸轴向尺寸（未注公差 GB/T 1804-m）；右轴端长 30 不标注（开口环）
+    - {a: L, b: S1, nominal: 40, tol: 0.3}
+    - {a: S1, b: S2, nominal: 12, tol: 0.2}
+    - {a: S2, b: S3, nominal: 60, tol: 0.3}
+    - {a: S3, b: S4, nominal: 25, tol: 0.2}
+    - {a: L, b: R, nominal: 167, tol: 0.5}
 attachments:
   - {kind: calc, name: SH-301 工艺计算书.docx, missing: []}
