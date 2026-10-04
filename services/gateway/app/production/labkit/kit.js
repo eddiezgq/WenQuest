@@ -985,6 +985,7 @@ window.WQ = {
     const L = LABS[id]; show(id);
     const t = L.def.tasks.find((x) => x.id === tid);
     const d = (t && t.demo) || {};
+    if (L.def.view === "plc" && L.def.plcDemo) return L.def.plcDemo(d);   // PLC labs: load a program, run tests / review / the machine
     if (d.scene) { const chip = L.dom.chips.find((b) => b.dataset.scene === d.scene); if (chip) chip.click(); }
     Object.entries(d.set || {}).forEach(([pid, v]) => {
       const c = L.dom.params[pid]; if (!c) return;
