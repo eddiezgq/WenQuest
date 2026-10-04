@@ -47,7 +47,7 @@
       <div class="card"><h3 data-en="YOSYS STATISTICS">Yosys 统计</h3><pre class="log" id="log">—</pre></div>
     </div>
   </section>
-  <footer data-en="The engines are fetched on first use: Yosys about 15.5 MB compressed, DigitalJS about 1 MB. For deployment in China the files should be served from the WenQuest server instead of a public CDN.">引擎在首次使用时下载：Yosys 压缩后约 15.5 MB，DigitalJS 约 1 MB。国内部署时应改由问渠服务器提供这些文件，而不是公共 CDN。</footer>
+  <footer data-en="On computers Yosys runs in this browser (about 15.5 MB the first time); on phones, or when it loads too slowly, the WenQuest server synthesises and the phone only loads the simulator (about 1 MB). The circuit, test and waveforms are the same either way.">电脑上 Yosys 在本机浏览器里运行（首次下载约 15.5 MB）；手机上，或本机加载太慢时，改由问渠服务器综合，手机只下载约 1 MB 的仿真器。两种方式得到的电路、测试和波形相同。</footer>
 </div>
 <!--@params-->
 <script src="../kit/wq-lab.js"></script>
@@ -89,7 +89,19 @@ endmodule
 `,
 };
 let ex = 'counter';
-const state = { yosysMs: null, synthMs: null, cells: null, devices: null };
+const state = { yosysMs: null, synthMs: null, cells: null, devices: null, mode: null };
+// 服务器综合（第 17 轮附 3.3）：地址由问渠平台给出（window.WQ_SYNTH_URL，或链接参数 synth=）。
+// 手机默认走服务器；电脑默认在本机用 WebAssembly 版 Yosys，本机加载超过 15 秒时改走服务器。
+const SYNTH_URL = (() => {
+  const q = new URLSearchParams(location.search), h = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const u = window.WQ_SYNTH_URL || q.get('synth') || h.get('synth') || '';
+  return /^(https:\/\/|\/)/.test(u) || /^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(u) ? u : '';
+})();
+const FORCE = new URLSearchParams(location.search).get('mode');
+const PHONE = (navigator.userAgentData && navigator.userAgentData.mobile) || (matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 820);
+const LOCAL_LIMIT_MS = 15000;
+state.mode = FORCE === 'browser' || FORCE === 'server' ? FORCE : (SYNTH_URL && PHONE ? 'server' : 'browser');
+if (state.mode === 'server' && !SYNTH_URL) state.mode = 'browser';
 document.querySelectorAll('[data-ex]').forEach((b) => (b.onclick = () => {
   ex = b.dataset.ex; $('src').value = EX[ex];
   document.querySelectorAll('[data-ex]').forEach((x) => x.setAttribute('aria-pressed', x === b));
@@ -107,17 +119,38 @@ function status(m, c) { $('st').textContent = m; $('st').className = 'status ' +
 function loadScript(url) { return new Promise((ok, bad) => { const s = document.createElement('script'); s.src = url; s.onload = ok; s.onerror = () => bad(new Error('load ' + url)); document.head.appendChild(s); }); }
 async function firstOk(fn) { let err; for (const b of BASES) { try { return await fn(b); } catch (e) { err = e; } } throw err; }
 
-let runYosys = null;
-async function ensureEngines() {
+let runYosys = null, yosysLoading = null;
+async function ensureSimulator() {
   if (!window.digitaljs) await firstOk((b) => loadScript(b + DIGITALJS));
-  if (!runYosys) {
+}
+function loadYosys() {
+  if (!yosysLoading) yosysLoading = (async () => {
     const t0 = performance.now();
     const mod = await firstOk((b) => import(b + YOSYS));
+    await mod.runYosys(['-V'], {}, { stdout: () => {}, stderr: () => {} }); // 预热：下载并编译 wasm
     runYosys = mod.runYosys;
-    await runYosys(['-V'], {}, { stdout: () => {}, stderr: () => {} }); // 预热：下载并编译 wasm
     state.yosysMs = performance.now() - t0;
     L.report('engine_loaded', { engine: 'yosys', ms: Math.round(state.yosysMs) });
-  }
+  })();
+  return yosysLoading;
+}
+const SCRIPT = 'read_verilog top.v; proc; opt; memory; opt; wreduce; opt_clean; write_json out.json; tee -q -o stat.txt stat';
+const text = (x) => (x == null ? '' : typeof x === 'string' ? x : new TextDecoder().decode(x));
+
+/* 本机综合：返回 {json, stat} */
+async function synthBrowser(source) {
+  let log = '';
+  const files = await runYosys(['-q', '-p', SCRIPT], { 'top.v': source }, { stdout: () => {}, stderr: (d) => { if (d) log += text(d); } });
+  if (!files['out.json']) throw new Error(log || 'Yosys');
+  return { json: JSON.parse(text(files['out.json'])), stat: text(files['stat.txt']) };
+}
+/* 服务器综合：同一套命令，由问渠的综合服务运行 */
+async function synthServer(source) {
+  const r = await fetch(SYNTH_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source }) });
+  let d = null; try { d = await r.json(); } catch (e) { /* 忽略 */ }
+  if (!r.ok && !(d && d.ok === false)) throw new Error((d && (d.detail || d.log)) || ('HTTP ' + r.status));
+  if (!d || !d.ok) throw new Error((d && d.log) || T('服务器综合失败', 'server synthesis failed'));
+  return { json: d.json, stat: d.stat || '' };
 }
 
 /* 门级自动测试（DigitalJS 无界面仿真，手动驱动时钟） */
@@ -154,20 +187,23 @@ function testbench(json) {
 let circuit = null;
 async function run() {
   try {
-    status(T('正在下载引擎（首次约 16 MB）…', 'Downloading engines (about 16 MB the first time)…'));
-    await ensureEngines();
-    status(T('综合中…', 'Synthesising…'));
+    if (state.mode === 'browser' && !runYosys) {
+      status(T('正在下载引擎（首次约 16 MB）…', 'Downloading engines (about 16 MB the first time)…'));
+      const slow = new Promise((ok) => setTimeout(() => ok('slow'), LOCAL_LIMIT_MS));
+      const got = await Promise.race([loadYosys().then(() => 'ok'), SYNTH_URL ? slow : new Promise(() => {})]);
+      if (got === 'slow') { state.mode = 'server'; L.report('synth_mode', { mode: 'server', reason: 'slow_local' }); }
+    }
+    status(T('正在下载仿真器…', 'Loading the simulator…'));
+    await ensureSimulator();
+    status(state.mode === 'server' ? T('服务器综合中…', 'Synthesising on the server…') : T('综合中…', 'Synthesising…'));
     const t1 = performance.now();
-    let log = '';
-    const files = await runYosys(['-q', '-p', 'read_verilog top.v; proc; opt; memory; opt; wreduce; opt_clean; write_json out.json; tee -q -o stat.txt stat'],
-      { 'top.v': $('src').value }, { stdout: () => {}, stderr: (d) => { if (d) log += new TextDecoder().decode(d); } });
+    const res = state.mode === 'server' ? await synthServer($('src').value) : await synthBrowser($('src').value);
     state.synthMs = performance.now() - t1;
-    if (!files['out.json']) throw new Error(log || 'Yosys');
-    const stat = files['stat.txt'] ? (typeof files['stat.txt'] === 'string' ? files['stat.txt'] : new TextDecoder().decode(files['stat.txt'])) : '';
+    const stat = res.stat;
     $('log').textContent = stat.trim().split('\n').filter((l) => l.trim()).slice(-20).join('\n');
     const m = stat.match(/Number of cells:\s+(\d+)/) || stat.match(/(\d+)\s+cells/);
     state.cells = m ? +m[1] : null;
-    const yj = JSON.parse(typeof files['out.json'] === 'string' ? files['out.json'] : new TextDecoder().decode(files['out.json']));
+    const yj = res.json;
     const plain = WQY2D.yosys2digitaljs(yj);
     state.devices = Object.keys(plain.devices).length;
     L.done('1', 'synth');
@@ -195,7 +231,8 @@ async function run() {
 }
 function paint() {
   L.readout('res', [
-    [T('Yosys 下载＋启动', 'Yosys download + start'), state.yosysMs == null ? '—' : (state.yosysMs / 1000).toFixed(1) + ' s'],
+    [T('综合方式', 'Synthesis'), state.mode === 'server' ? T('问渠服务器', 'WenQuest server') : T('本机浏览器', 'this browser')],
+    [T('Yosys 下载＋启动', 'Yosys download + start'), state.mode === 'server' ? '—' : state.yosysMs == null ? '—' : (state.yosysMs / 1000).toFixed(1) + ' s'],
     [T('一次综合', 'One synthesis'), state.synthMs == null ? '—' : (state.synthMs / 1000).toFixed(2) + ' s'],
     [T('单元数', 'Cells'), state.cells == null ? '—' : String(state.cells)],
     [T('仿真器器件数', 'Simulator devices'), state.devices == null ? '—' : String(state.devices)],

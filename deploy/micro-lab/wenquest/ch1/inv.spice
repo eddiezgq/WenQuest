@@ -1,0 +1,5 @@
+* 第 1 章参考解：CMOS 反相器原理图网表（与 inv.sch 一致），LVS 用
+.subckt inv IN OUT VDD VSS
+XMN OUT IN VSS VSS sky130_fd_pr__nfet_01v8 W=0.42 L=0.15 nf=1 m=1
+XMP OUT IN VDD VDD sky130_fd_pr__pfet_01v8 W=0.97 L=0.15 nf=1 m=1
+.ends

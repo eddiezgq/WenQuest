@@ -111,6 +111,34 @@ def dyn_power(N, alpha, C, V, f):
     return alpha * C * V * V * f * N
 
 
+def fopt(gamma):
+    """Optimum fan-out per stage: f (ln f − 1) = γ, by bisection on [e, 10]."""
+    lo, hi = math.e, 10.0
+    for _ in range(80):
+        mid = (lo + hi) / 2
+        if mid * (math.log(mid) - 1) < gamma:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
+def fo4_tp(ratio, vdd=VDD):
+    a, b = fo4(Wmin, ratio * Wmin, vdd)
+    return (a + b) / 2
+
+
+def vdd_for_fo4(limit, ratio, lo=0.9, hi=VDD):
+    """Lowest supply whose FO4 delay (average of the two edges) is at most `limit`."""
+    for _ in range(80):
+        mid = (lo + hi) / 2
+        if fo4_tp(ratio, mid) > limit:
+            lo = mid
+        else:
+            hi = mid
+    return hi
+
+
 def reference():
     r = kn / kp
     pr = P["problems"]
@@ -135,12 +163,18 @@ def reference():
     # 1.4
     CL = pr["p14"]["CL"]
     C1 = cin(Wmin, r * Wmin)
-    out["p14"] = {"Cin": C1, "F": CL / C1, "Nopt4": math.log(CL / C1) / math.log(4),
-                  "t": {str(N): chain_delay(N, CL, r) for N in range(1, 9)}}
+    t = {str(N): chain_delay(N, CL, r) for N in range(1, 11)}
+    nbest = min(range(1, 11), key=lambda N: t[str(N)])
+    nfew = next((N for N in range(1, 11) if t[str(N)] < pr["p14"]["tmax"]), 0)
+    gamma = Cd / Cg
+    out["p14"] = {"Cin": C1, "F": CL / C1, "Nopt4": math.log(CL / C1) / math.log(4), "t": t,
+                  "gamma": gamma, "fopt": fopt(gamma), "Nbest": nbest, "Nfew": nfew}
     # 1.5
     q = pr["p15"]
     out["p15"] = {"P_VDD": dyn_power(q["N"], q["alpha"], q["Cgate"], VDD, q["f"]),
-                  "P_low": dyn_power(q["N"], q["alpha"], q["Cgate"], q["Vlow"], q["f"])}
+                  "P_low": dyn_power(q["N"], q["alpha"], q["Cgate"], q["Vlow"], q["f"]),
+                  "Vlim": vdd_for_fo4(q["fo4max"], r), "fo4_low": fo4_tp(r, q["Vlow"])}
+    out["r_lab"] = round(r * 20) / 20          # the symmetric ratio on the lab's 0.05-step slider
     return out
 
 

@@ -18,12 +18,16 @@ T1, TS, TR = R["p13"]["ratio1"], R["p13"]["ratio_sqrt"], R["p13"]["ratio_r"]
 C14 = R["p14"]
 P15 = R["p15"]
 f6 = C14["F"] ** (1 / 6)
+RL = R["r_lab"]                                    # 对称尺寸比在实验滑块上的取值（步长 0.05）
+G, FOPT, NB, NF = C14["gamma"], C14["fopt"], C14["Nbest"], C14["Nfew"]
+fNB = C14["F"] ** (1 / NB)
+VLIM, FO4LOW = P15["Vlim"], P15["fo4_low"]
 
 LINK = "问渠课程页“虚拟实验”，或课件实验页的“打开虚拟实验”按钮 / the Virtual Lab link on the course page or the “Open virtual lab” button in the slides"
 H = "数字集成电路设计 · 第 1 章 CMOS 反相器 · 虚拟实验"
 HE = "Digital Integrated Circuit Design · Chapter 1 · Virtual Lab"
-PARAM_NOTE = (f"模型参数（示意值，以后按 SKY130 校准）：VDD = {M.VDD} V，|VT| = {M.VTn} V，k′n = {M.kn*1e6:.0f} μA/V²，k′p = {M.kp*1e6:.0f} μA/V²，L = {M.L} μm，最小 W = {M.Wmin} μm。",
-              f"Model parameters (illustrative, to be calibrated to SKY130): VDD = {M.VDD} V, |VT| = {M.VTn} V, k′n = {M.kn*1e6:.0f} μA/V², k′p = {M.kp*1e6:.0f} μA/V², L = {M.L} μm, minimum W = {M.Wmin} μm.")
+PARAM_NOTE = (f"模型参数（按 SKY130 工艺库 tt、27 °C 校准的有效值，校准记录见生成脚本 calib/）：VDD = {M.VDD} V，|VT| = {M.VTn} V，k′n = {M.kn*1e6:.0f} μA/V²，k′p = {M.kp*1e6:.0f} μA/V²，L = {M.L} μm，最小 W = {M.Wmin} μm。",
+              f"Model parameters (effective values calibrated to SKY130, tt, 27 °C; see calib/ in the build scripts): VDD = {M.VDD} V, |VT| = {M.VTn} V, k′n = {M.kn*1e6:.0f} μA/V², k′p = {M.kp*1e6:.0f} μA/V², L = {M.L} μm, minimum W = {M.Wmin} μm.")
 
 LABS = [
   {
@@ -50,7 +54,7 @@ LABS = [
        [["VOL  V（测）", "", "", "", ""], ["I·Ron（线性估算）", "", "", "", ""]], [4.2, 2.6, 2.6, 2.6, 2.6]),
     ],
     "cautions": [("负载电流超过 NMOS 饱和电流时，输出拉不下来，读数显示“饱和（拉不住）”。", "If the load exceeds the NMOS saturation current, the output cannot be pulled low; the reading shows “saturated”."),
-                 ("参数是示意值，结果的数量级和趋势可靠，具体数字待按 SKY130 工艺库校准。", "Parameters are illustrative: magnitudes and trends are reliable; exact numbers await SKY130 calibration.")],
+                 ("参数按 SKY130 工艺库校准：饱和电流与 ngspice 仿真一致，平均延时误差约 1%，传输特性误差在 7% 以内；平方律模型对上升、下降单边延时的误差可达约 20%。", "Parameters are calibrated to SKY130: saturation currents match ngspice, average delays within about 1% and transfer curves within 7%; single rising or falling edges can be off by up to about 20% in the square-law model.")],
     "questions": [("表 2 中，负载从 1 mA 加到 2 mA，VOL 是否正好翻倍？为什么？", "In Table 2, does VOL exactly double when the load goes from 1 to 2 mA? Why?"),
                   ("为什么说 CMOS 反相器“静态功耗几乎为零”？接了光耦以后，芯片还有静态电流吗？", "Why is the static power of a CMOS inverter almost zero? With the optocoupler attached, is there still static current?")],
     "problem": ("关节驱动板的光耦输入", "Optocoupler input on a joint driver",
@@ -72,14 +76,14 @@ LABS = [
             ("输入游标", "Input cursor", "0 – 1.8 V", "0 – 1.8 V"),
             ("输入干扰幅度", "Input noise", "0 – 0.6 V", "0 – 0.6 V")],
     "steps": [("尺寸比 1，拖动输入游标从 0 到 1.8 V，观察两管工作区怎样变化，记录五个典型点，填表 1。", "Ratio 1: drag the input cursor from 0 to 1.8 V, watch the regions change and record five points in Table 1."),
-              ("读出 VM、VIL、VIH、NML、NMH；把尺寸比改为 1.5、2.25、3.0 重复，填表 2。", "Read VM, VIL, VIH, NML and NMH; repeat for ratios 1.5, 2.25 and 3.0 in Table 2."),
+              (f"读出 VM、VIL、VIH、NML、NMH；把尺寸比改为 1.5、{RL:.2f}、3.0 重复，填表 2。", f"Read VM, VIL, VIH, NML and NMH; repeat for ratios 1.5, {RL:.2f} and 3.0 in Table 2."),
               ("调尺寸比使 VM = 0.90 V，与理论值 r 比较。", "Adjust the ratio until VM = 0.90 V and compare with r."),
               ("把干扰幅度设为 0.30 V，找出两个噪声容限都不小于 0.6 V 的尺寸比范围。", "Set the noise to 0.30 V and find the range of ratios for which both margins are at least 0.6 V.")],
     "tables": [
       ("表 1  传输特性（Wp/Wn = 1） Table 1  Transfer curve", ["Vin  V", "0.30", "0.60", "0.80", "1.00", "1.50"],
        [["Vout  V", "", "", "", "", ""], ["NMOS 工作区", "", "", "", "", ""], ["PMOS 工作区", "", "", "", "", ""]], [3.6, 2.4, 2.4, 2.4, 2.4, 2.4]),
       ("表 2  尺寸比与噪声容限 Table 2  Ratio and noise margins", ["Wp/Wn", "VM  V（曲线）", "VM  V（公式）", "VIL / VIH  V", "NML  V", "NMH  V"],
-       [["1.0", "", "", "", "", ""], ["1.5", "", "", "", "", ""], ["2.25", "", "", "", "", ""], ["3.0", "", "", "", "", ""]], [2.2, 2.6, 2.8, 3.0, 2.4, 2.4]),
+       [["1.0", "", "", "", "", ""], ["1.5", "", "", "", "", ""], [f"{RL:.2f}", "", "", "", "", ""], ["3.0", "", "", "", "", ""]], [2.2, 2.6, 2.8, 3.0, 2.4, 2.4]),
     ],
     "cautions": [("“VM（曲线）”取传输曲线与 Vout = Vin 直线的交点，“VM（公式）”由两管同时饱和的公式算出，两者应几乎相同。", "“VM (curve)” is where the curve crosses Vout = Vin; “VM (formula)” comes from the both-saturated formula. They should nearly agree."),
                  ("模型忽略沟道长度调制，真实器件的中段斜率是有限的。", "The model ignores channel-length modulation; real devices have a finite slope in the middle.")],
@@ -104,15 +108,15 @@ LABS = [
             ("扇出", "Fan-out", "FO1 – FO8", "FO1 – FO8")],
     "steps": [("扇出 FO4，尺寸比依次取表 1 中的值，读出 tPHL、tPLH、tp、上升下降差，填表 1。", "At FO4, set each ratio in Table 1 and record tPHL, tPLH, tp and the mismatch."),
               ("从下方曲线找出 tp 最小的尺寸比，与 √r 比较。", "From the lower plot, find the ratio with the smallest tp and compare with √r."),
-              ("尺寸比 2.25，把扇出改为 1、2、8，记录 tp，填表 2，分析 tp 与扇出的关系。", "At ratio 2.25, set fan-out to 1, 2 and 8, record tp in Table 2 and analyse how tp scales with fan-out.")],
+              (f"尺寸比 {RL:.2f}，把扇出改为 1、2、8，记录 tp，填表 2，分析 tp 与扇出的关系。", f"At ratio {RL:.2f}, set fan-out to 1, 2 and 8, record tp in Table 2 and analyse how tp scales with fan-out.")],
     "tables": [
       ("表 1  FO4 下尺寸比与延时 Table 1  Ratio vs delay at FO4", ["Wp/Wn", "tPHL  ps", "tPLH  ps", "tp  ps", "差 Mismatch %"],
-       [["1.0", "", "", "", ""], ["1.5", "", "", "", ""], ["2.25", "", "", "", ""], ["3.0", "", "", "", ""]], [2.6, 3.0, 3.0, 3.0, 3.4]),
-      ("表 2  扇出与延时（Wp/Wn = 2.25） Table 2  Fan-out vs delay", ["扇出 Fan-out", "FO1", "FO2", "FO4", "FO8"],
+       [["1.0", "", "", "", ""], ["1.5", "", "", "", ""], [f"{RL:.2f}", "", "", "", ""], ["3.0", "", "", "", ""]], [2.6, 3.0, 3.0, 3.0, 3.4]),
+      (f"表 2  扇出与延时（Wp/Wn = {RL:.2f}） Table 2  Fan-out vs delay", ["扇出 Fan-out", "FO1", "FO2", "FO4", "FO8"],
        [["tp  ps", "", "", "", ""]], [3.4, 2.6, 2.6, 2.6, 2.6]),
     ],
     "cautions": [("波形用一阶 RC 近似，真实波形边沿形状略有不同，但延时数量级一致。", "Waveforms use a first-order RC approximation; real edge shapes differ slightly but the delay magnitude agrees."),
-                 ("延时数值依赖示意参数，FO4 约几十皮秒的量级与 130 nm 级工艺相符。", "Delays depend on the illustrative parameters; tens of picoseconds for FO4 is consistent with a 130 nm-class process.")],
+                 (f"延时按 SKY130 校准：对称反相器 FO4 约 {TR['tp']*1e12:.0f} ps，与 ngspice 仿真相差约 1%。", f"Delays are calibrated to SKY130: the symmetric inverter’s FO4 is about {TR['tp']*1e12:.0f} ps, within about 1% of ngspice.")],
     "questions": [("为什么加宽 PMOS 后 tPHL 也会变长？", "Why does widening the PMOS also lengthen tPHL?"),
                   ("tp 与扇出大致成什么关系？为什么有一个“与扇出无关”的部分？", "Roughly how does tp scale with fan-out? Why is there a part that does not depend on fan-out?")],
     "problem": ("电机控制芯片的时钟缓冲", "The clock buffer of a motor-control chip",
@@ -127,13 +131,13 @@ LABS = [
              ("学会用等比反相器链优化驱动大负载的延时。", "Optimise the delay of driving a large load with a tapered inverter chain."),
              ("掌握“每级扇出约 4”的经验规则及其来源。", "Learn the rule of thumb of about 4 per stage and where it comes from.")],
     "theory": [("总扇出 F = CL/Cin。N 级等比链每级扇出 f = F^(1/N)，总延时 t = N·tp0·(γ + f)，tp0 = 0.69·Req·Cin，γ 为自载与输入电容之比。", "Total fan-out F = CL/Cin. In an N-stage tapered chain each stage has f = F^(1/N), total delay t = N·tp0·(γ + f), tp0 = 0.69·Req·Cin, γ = self-load / input capacitance."),
-               ("最优 f 满足 f(ln f − 1) = γ：γ = 0 时 f = e ≈ 2.7，γ ≈ 1 时 f ≈ 3.6。工程上常取 f ≈ 4，得经验公式 N ≈ ln F / ln 4。本实验 γ = Cd/Cg ≈ 0.67，最优 f ≈ 3.3。", "The optimum f satisfies f(ln f − 1) = γ: f = e ≈ 2.7 for γ = 0 and f ≈ 3.6 for γ ≈ 1. Engineers often take f ≈ 4, giving the rule N ≈ ln F / ln 4. In this lab γ = Cd/Cg ≈ 0.67, so the optimum f ≈ 3.3."),
+               (f"最优 f 满足 f(ln f − 1) = γ：γ = 0 时 f = e ≈ 2.7，γ ≈ 1 时 f ≈ 3.6。工程上常取 f ≈ 4，得经验公式 N ≈ ln F / ln 4。本实验按 SKY130 校准，γ = Cd/Cg ≈ {G:.2f}，最优 f ≈ {FOPT:.1f}。", f"The optimum f satisfies f(ln f − 1) = γ: f = e ≈ 2.7 for γ = 0 and f ≈ 3.6 for γ ≈ 1. Engineers often take f ≈ 4, giving the rule N ≈ ln F / ln 4. Calibrated to SKY130, this lab has γ = Cd/Cg ≈ {G:.2f}, so the optimum f ≈ {FOPT:.1f}."),
                ("级数为奇数时输出反相，为偶数时同相。", "An odd number of stages inverts the signal; an even number does not."),
                PARAM_NOTE],
     "env": [("级数 N", "Stages N", "1 – 10", "1 – 10"),
             ("负载 CL", "Load CL", "1 – 20 pF", "1 – 20 pF")],
     "steps": [("CL = 10 pF，级数从 1 到 8 依次设置，读出每级扇出 f 和总延时，填表 1。", "CL = 10 pF: set N from 1 to 8 and record f and total delay in Table 1."),
-              ("找出总延时最小的级数，与经验公式 ln F / ln 4 比较，并用 γ ≈ 0.67 解释差别。", "Find the N with the smallest delay, compare with the rule ln F / ln 4, and explain the difference with γ ≈ 0.67."),
+              (f"找出总延时最小的级数，与经验公式 ln F / ln 4 比较，并用 γ ≈ {G:.2f} 说明二者为什么接近或不同。", f"Find the N with the smallest delay, compare with the rule ln F / ln 4, and use γ ≈ {G:.2f} to explain why they agree or differ."),
               ("找出延时小于 0.3 ns 的最少级数。", "Find the fewest stages that give a delay under 0.3 ns."),
               ("把 CL 改为 2 pF 和 20 pF，重复找最优级数，填表 2。", "Repeat for CL = 2 pF and 20 pF; record the optimum in Table 2.")],
     "tables": [
@@ -147,8 +151,8 @@ LABS = [
     "questions": [("为什么级数太多反而变慢？", "Why does adding too many stages make it slower?"),
                   ("最优附近总延时变化很平缓，工程上会怎样取舍级数？", "Near the optimum the delay is flat. How would an engineer choose the number of stages?")],
     "problem": ("驱动板上的栅极驱动器", "Driving the gate driver on the board",
-                f"芯片输出驱动约 10 pF 的总负载。(1) 最小对称反相器的输入电容和总扇出 F 各多少（参考：{C14['Cin']*1e15:.2f} fF，F ≈ {C14['F']:.0f}）？(2) 单级驱动延时多大（参考：约 {C14['t']['1']*1e9:.0f} ns）？(3) 取 6 级（经验公式的结果）时每级扇出和总延时多少（参考：f ≈ {f6:.1f}，约 {C14['t']['6']*1e12:.0f} ps）？本模型真正最快的是几级（参考：7 级，f ≈ 3.3，约 {C14['t']['7']*1e12:.0f} ps）？要求输出与输入同相时应取几级？",
-                f"The chip output drives about 10 pF. (1) What are the minimum symmetric inverter’s input capacitance and the total fan-out F (reference: {C14['Cin']*1e15:.2f} fF, F ≈ {C14['F']:.0f})? (2) What is the single-stage delay (reference: about {C14['t']['1']*1e9:.0f} ns)? (3) With 6 stages (the rule-of-thumb answer), what are f and the total delay (reference: f ≈ {f6:.1f}, about {C14['t']['6']*1e12:.0f} ps)? Which N is truly fastest in this model (reference: 7, f ≈ 3.3, about {C14['t']['7']*1e12:.0f} ps)? How many stages if the output must not be inverted?"),
+                f"芯片输出驱动约 10 pF 的总负载。(1) 最小对称反相器的输入电容和总扇出 F 各多少（参考：{C14['Cin']*1e15:.2f} fF，F ≈ {C14['F']:.0f}）？(2) 单级驱动延时多大（参考：约 {C14['t']['1']*1e9:.0f} ns）？(3) 经验公式给出 ln F / ln 4 ≈ {C14['Nopt4']:.1f}；本模型最快的是几级，每级扇出和总延时多少（参考：{NB} 级，f ≈ {fNB:.1f}，约 {C14['t'][str(NB)]*1e12:.0f} ps）？满足 0.3 ns 的最少级数是几（参考：{NF} 级）？要求输出与输入同相时应取几级？",
+                f"The chip output drives about 10 pF. (1) What are the minimum symmetric inverter’s input capacitance and the total fan-out F (reference: {C14['Cin']*1e15:.2f} fF, F ≈ {C14['F']:.0f})? (2) What is the single-stage delay (reference: about {C14['t']['1']*1e9:.0f} ns)? (3) The rule gives ln F / ln 4 ≈ {C14['Nopt4']:.1f}. Which N is fastest in this model, and what are f and the total delay (reference: {NB} stages, f ≈ {fNB:.1f}, about {C14['t'][str(NB)]*1e12:.0f} ps)? What is the fewest number of stages meeting 0.3 ns (reference: {NF})? How many stages if the output must not be inverted?"),
     "everyday": ("搬一件很重的东西，一个人搬太慢，分几段逐级加人接力更快。人越多越好吗？", "Moving something heavy: relays with more and more people at each stage go faster. Are more people always better?"),
   },
   {
@@ -180,8 +184,8 @@ LABS = [
     "questions": [("电压降为原来的 2/3，功耗变为原来的多少？为什么不是 2/3？", "If the supply drops to 2/3, what fraction of the power remains, and why not 2/3?"),
                   ("为了省电同时降频和降压，计算速度会怎样变化？", "If you lower both clock and supply to save power, what happens to computing speed?")],
     "problem": ("巡线小车控制芯片的功耗预算", "Power budget of a line-following car controller",
-                f"约 1 万个门，0→1 翻转率 α = 0.1，100 MHz，每门 5 fF。(1) 1.8 V 时动态功耗多少（参考：{P15['P_VDD']*1e3:.2f} mW）？(2) 降到 1.2 V 呢（参考：{P15['P_low']*1e3:.2f} mW）？(3) 控制环要求 FO4 ≤ 100 ps，最低能降到多少伏（参考：约 1.21 V；1.20 V 时 FO4 为 100.5 ps，刚好超标）？电机电流远大于芯片，芯片省电对整车续航有意义吗？什么场合有意义？",
-                f"About 10 000 gates, 0→1 activity α = 0.1, 100 MHz, 5 fF per gate. (1) Dynamic power at 1.8 V (reference: {P15['P_VDD']*1e3:.2f} mW)? (2) At 1.2 V (reference: {P15['P_low']*1e3:.2f} mW)? (3) If the control loop needs FO4 ≤ 100 ps, how low can the supply go (reference: about 1.21 V; at 1.20 V FO4 is 100.5 ps, just over)? The motors draw far more than the chip—does saving chip power matter for battery life, and when does it?"),
+                f"约 1 万个门，0→1 翻转率 α = 0.1，100 MHz，每门 5 fF。(1) 1.8 V 时动态功耗多少（参考：{P15['P_VDD']*1e3:.2f} mW）？(2) 降到 1.2 V 呢（参考：{P15['P_low']*1e3:.2f} mW）？(3) 控制环要求 FO4 ≤ 100 ps，最低能降到多少伏（参考：约 {VLIM:.2f} V；1.20 V 时 FO4 约 {FO4LOW*1e12:.0f} ps，超标）？电机电流远大于芯片，芯片省电对整车续航有意义吗？什么场合有意义？",
+                f"About 10 000 gates, 0→1 activity α = 0.1, 100 MHz, 5 fF per gate. (1) Dynamic power at 1.8 V (reference: {P15['P_VDD']*1e3:.2f} mW)? (2) At 1.2 V (reference: {P15['P_low']*1e3:.2f} mW)? (3) If the control loop needs FO4 ≤ 100 ps, how low can the supply go (reference: about {VLIM:.2f} V; at 1.20 V FO4 is about {FO4LOW*1e12:.0f} ps, over the limit)? The motors draw far more than the chip—does saving chip power matter for battery life, and when does it?"),
     "everyday": ("手机的省电模式会降频、降压。它为什么能省电？代价是什么？", "Phone power-saving modes lower clock and voltage. Why does that save power, and what is the cost?"),
   },
 ]

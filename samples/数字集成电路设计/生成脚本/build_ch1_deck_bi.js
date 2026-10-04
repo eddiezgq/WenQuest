@@ -45,7 +45,8 @@ const T1 = R.p13.ratio1, TS = R.p13.ratio_sqrt, TR = R.p13.ratio_r;
 const C14 = R.p14, f6 = Math.pow(C14.F, 1 / 6);
 const P15 = R.p15;
 const ps = (x) => (x * 1e12).toFixed(0);
-let vLim = 1.8; for (let v = 1.8; v >= 0.9; v -= 0.01) { const d = M.fo4(P.Wmin, r * P.Wmin, v); if ((d.tphl + d.tplh) / 2 <= 100e-12) vLim = v; }
+const vLim = P15.Vlim, fo4Low = P15.fo4_low, RL = R.r_lab;
+const NB = C14.Nbest, NF = C14.Nfew, fNB = Math.pow(C14.F, 1 / NB), G = C14.gamma, FOPT = C14.fopt;
 
 const L = [
   {
@@ -53,7 +54,7 @@ const L = [
     prob: { zh: "关节驱动板的光耦输入", en: "Optocoupler input on a joint driver",
       text: ["关节驱动板用光耦隔离控制芯片与功率电路。芯片输出管脚要吸收 1 mA 点亮光耦，低电平不能超过 0.2 V。输出级的 NMOS 至少要多宽？",
              "The joint driver isolates the control chip from the power stage with an optocoupler. The output pin must sink 1 mA with a low level of at most 0.2 V. How wide must the output NMOS be?"],
-      given: [["负载电流 I = 1 mA", "load current I = 1 mA"], ["VOL ≤ 0.2 V，VDD = 1.8 V", "VOL ≤ 0.2 V, VDD = 1.8 V"], ["L = 0.15 μm，k′n = 90 μA/V²（示意值）", "L = 0.15 μm, k′n = 90 μA/V² (illustrative)"]] },
+      given: [["负载电流 I = 1 mA", "load current I = 1 mA"], ["VOL ≤ 0.2 V，VDD = 1.8 V", "VOL ≤ 0.2 V, VDD = 1.8 V"], [`L = 0.15 μm，k′n = ${(P.kn * 1e6).toFixed(0)} μA/V²（按 SKY130 校准）`, `L = 0.15 μm, k′n = ${(P.kn * 1e6).toFixed(0)} μA/V² (calibrated to SKY130)`]] },
     concept: { zh: "开关模型与互补结构", en: "Switch model and complementary structure",
       pts: [["MOSFET 是电压控制的开关：VGS > VT 导通，VGS < VT 截止", "A MOSFET is a voltage-controlled switch: on for VGS > VT, off below"],
             ["CMOS 反相器：PMOS 上拉、NMOS 下拉，栅极接在一起", "CMOS inverter: PMOS pull-up, NMOS pull-down, gates tied together"],
@@ -117,13 +118,13 @@ const L = [
     concept: { zh: "反相器链：逐级放大", en: "Inverter chain: grow stage by stage",
       pts: [["总扇出 F = CL / Cin，N 级等比链每级扇出 f = F^(1/N)", "Total fan-out F = CL / Cin; each of N stages has f = F^(1/N)"],
             ["总延时 t = N · tp0 · (γ + f)，γ 为自载与输入电容之比", "Total delay t = N · tp0 · (γ + f), γ = self-load / input capacitance"],
-            ["最优 f 满足 f(ln f − 1) = γ：γ = 0 时 e ≈ 2.7；工程上常取 4，本模型 γ ≈ 0.67，最优 f ≈ 3.3", "The optimum satisfies f(ln f − 1) = γ: e ≈ 2.7 for γ = 0; engineers often use 4; here γ ≈ 0.67 gives f ≈ 3.3"],
+            [`最优 f 满足 f(ln f − 1) = γ：γ = 0 时 e ≈ 2.7；工程上常取 4；按 SKY130 校准，γ ≈ ${G.toFixed(2)}，最优 f ≈ ${FOPT.toFixed(1)}`, `The optimum satisfies f(ln f − 1) = γ: e ≈ 2.7 for γ = 0; engineers often use 4; calibrated to SKY130, γ ≈ ${G.toFixed(2)} gives f ≈ ${FOPT.toFixed(1)}`],
             ["级数奇偶决定输出是否反相", "An odd or even number of stages decides whether the output is inverted"]],
       formula: "经验公式 N ≈ ln F / ln 4    最优 f(ln f − 1) = γ\nRule of thumb N ≈ ln F / ln 4    optimum f(ln f − 1) = γ" },
     vq: ["一级驱动和六级驱动，延时为什么能差一百多倍？", "Why can one stage and six stages differ in delay by more than a hundred times?"],
     tasks: [["CL = 10 pF：找出延时真正最小的级数（与 ln F / ln 4 比较）", "CL = 10 pF: find the truly fastest N (compare with ln F / ln 4)"], ["6 级时每级扇出 f 是多少？", "What is f with 6 stages?"], ["延时 < 0.3 ns 的最少级数", "Fewest stages for a delay under 0.3 ns"]],
     model: [["建模", "Model", "等比反相器链，第一级为最小对称反相器；负载集中为 10 pF；每级 RC 模型", "Tapered chain starting from a minimum symmetric inverter; 10 pF lumped load; RC model per stage"],
-            ["求解", "Solve", `F ≈ ${C14.F.toFixed(0)}，ln F / ln 4 ≈ ${f2(C14.Nopt4)}；单级 ≈ ${(C14.t[1] * 1e9).toFixed(0)} ns；6 级 f ≈ ${f6.toFixed(1)}、t ≈ ${ps(C14.t[6])} ps；真正最快为 7 级（f ≈ 3.3，${ps(C14.t[7])} ps），只快 1%；5 级 ${ps(C14.t[5])} ps 即满足 < 0.3 ns`, `F ≈ ${C14.F.toFixed(0)}, ln F / ln 4 ≈ ${f2(C14.Nopt4)}; one stage ≈ ${(C14.t[1] * 1e9).toFixed(0)} ns; 6 stages f ≈ ${f6.toFixed(1)}, t ≈ ${ps(C14.t[6])} ps; truly fastest is 7 stages (f ≈ 3.3, ${ps(C14.t[7])} ps), only 1% better; 5 stages (${ps(C14.t[5])} ps) already meet < 0.3 ns`],
+            ["求解", "Solve", `F ≈ ${C14.F.toFixed(0)}，ln F / ln 4 ≈ ${f2(C14.Nopt4)}；单级 ≈ ${(C14.t[1] * 1e9).toFixed(0)} ns；最快为 ${NB} 级（f ≈ ${fNB.toFixed(1)}，${ps(C14.t[NB])} ps），与经验公式一致；相邻级数 ${NB - 1}、${NB + 1} 级为 ${ps(C14.t[NB - 1])}、${ps(C14.t[NB + 1])} ps；满足 < 0.3 ns 至少要 ${NF} 级`, `F ≈ ${C14.F.toFixed(0)}, ln F / ln 4 ≈ ${f2(C14.Nopt4)}; one stage ≈ ${(C14.t[1] * 1e9).toFixed(0)} ns; fastest is ${NB} stages (f ≈ ${fNB.toFixed(1)}, ${ps(C14.t[NB])} ps), as the rule predicts; ${NB - 1} and ${NB + 1} stages give ${ps(C14.t[NB - 1])} and ${ps(C14.t[NB + 1])} ps; meeting < 0.3 ns needs at least ${NF} stages`],
             ["检验", "Check", "虚拟实验 1.4：CL = 10 pF，级数 1–10 扫描，对照 0.3 ns 线", "Lab 1.4: CL = 10 pF, sweep 1–10 stages against the 0.3 ns line"],
             ["修正", "Improve", "最优附近曲线很平：可少用一级省面积和功耗；要同相输出取偶数级；焊盘和走线电感还会带来振铃", "The optimum is flat: drop a stage to save area and power; use an even count for a non-inverted output; pad and trace inductance add ringing"]],
     everyday: ["搬重物接力：一人搬太慢，分几段逐级加人更快，但人太多交接也费时", "Relay carrying: one person is slow, adding people stage by stage is faster, but too many hand-offs waste time"],
@@ -143,7 +144,7 @@ const L = [
     vq: ["电容充一次电、放一次电，电源一共送出多少能量？都去哪里了？", "One charge and one discharge: how much energy does the supply deliver, and where does it go?"],
     tasks: [["读出默认设置下的动态功耗", "Read the dynamic power at the default settings"], ["电压降到 1.20 V，功耗降多少？", "Lower the supply to 1.20 V: how much is saved?"], ["FO4 ≤ 100 ps 的最低电压", "Lowest supply with FO4 ≤ 100 ps"]],
     model: [["建模", "Model", "只计动态功耗，不计漏电与短路电流；所有门负载相同；翻转率取平均值", "Dynamic power only, no leakage or short-circuit current; identical gate loads; average activity"],
-            ["求解", "Solve", `P = 0.1 × 5 fF × 1.8² × 100 MHz × 10⁴ = ${(P15.P_VDD * 1e3).toFixed(2)} mW；1.2 V 时 ${(P15.P_low * 1e3).toFixed(2)} mW（降 56%）；FO4 ≤ 100 ps 要求 VDD 约 1.21 V（1.20 V 时 100.5 ps，刚好超标）`, `P = 0.1 × 5 fF × 1.8² × 100 MHz × 10⁴ = ${(P15.P_VDD * 1e3).toFixed(2)} mW; at 1.2 V ${(P15.P_low * 1e3).toFixed(2)} mW (56% less); FO4 ≤ 100 ps needs about 1.21 V (100.5 ps at 1.20 V, just over)`],
+            ["求解", "Solve", `P = 0.1 × 5 fF × 1.8² × 100 MHz × 10⁴ = ${(P15.P_VDD * 1e3).toFixed(2)} mW；1.2 V 时 ${(P15.P_low * 1e3).toFixed(2)} mW（降 56%）；FO4 ≤ 100 ps 要求 VDD 约 ${vLim.toFixed(2)} V（1.20 V 时约 ${ps(fo4Low)} ps，超标）`, `P = 0.1 × 5 fF × 1.8² × 100 MHz × 10⁴ = ${(P15.P_VDD * 1e3).toFixed(2)} mW; at 1.2 V ${(P15.P_low * 1e3).toFixed(2)} mW (56% less); FO4 ≤ 100 ps needs about ${vLim.toFixed(2)} V (about ${ps(fo4Low)} ps at 1.20 V, over the limit)`],
             ["检验", "Check", "虚拟实验 1.5：改电压、频率、翻转率，对照功耗曲线和 FO4 延时曲线", "Lab 1.5: vary supply, clock and activity against the power and FO4 delay plots"],
             ["修正", "Improve", "低电压、高温时漏电不能忽略；小车上电机耗电远大于芯片，芯片省电主要延长待机和传感器节点的电池寿命", "Leakage matters at low voltage and high temperature; on the car the motors dominate, so chip savings mainly extend standby and sensor-node battery life"]],
     everyday: ["手机省电模式：降频、降压，代价是变慢", "Phone power-saving mode lowers clock and voltage, at the cost of speed"],
@@ -258,7 +259,7 @@ L.forEach((l) => {
     T({ x: 9.6, y: 1.9, w: 2.9, h: 3.3, fontFace: CN, fontSize: 15, color: INK, valign: "top" }));
   sl.addText("芯片设计也靠模型：先用简单模型估算，再用仿真和工艺库校准，最后指出模型的局限。\nChip design runs on models: estimate simply, calibrate with simulation and the process library, then name the limits.",
     T({ x: 9.4, y: 5.5, w: 3.3, h: 1.4, fontFace: CN, fontSize: 10.5, color: MUTED, valign: "top" }));
-  sl.addNotes("对照五步讲解，强调第⑤步：模型在哪里失效。实验报告第六部分按这五步写。数值为示意参数下的结果，以后按 SKY130 校准。\nWalk through the five steps, stressing step ⑤. Section 6 of the lab report follows them. Numbers use illustrative parameters, to be calibrated to SKY130.");
+  sl.addNotes("对照五步讲解，强调第⑤步：模型在哪里失效。实验报告第六部分按这五步写。数值来自按 SKY130 校准的模型：饱和电流、平均延时与 ngspice 相差约 1%，单边延时可差约 20%，这本身就是第⑤步的好例子。\nWalk through the five steps, stressing step ⑤. Section 6 of the lab report follows them. Numbers come from the model calibrated to SKY130: saturation current and average delay within about 1% of ngspice, single edges up to about 20% off, itself a good example for step ⑤.");
 });
 
 // ---- 例题：FO4 延时
@@ -276,7 +277,7 @@ s.addText(biList([
   [`Cin = (Wn + Wp)·Cg = ${f2(Cin * 1e15)} fF；自载 (Wn + Wp)·Cd = ${f2(Cself * 1e15)} fF`, `Cin = (Wn + Wp)·Cg = ${f2(Cin * 1e15)} fF; self-load (Wn + Wp)·Cd = ${f2(Cself * 1e15)} fF`],
   [`CL = 4·Cin + 自载 = ${f2(CL * 1e15)} fF；tPHL = 0.69·Req,n·CL ≈ ${(tphl * 1e12).toFixed(1)} ps（虚拟实验 1.3 中验证）`, `CL = 4·Cin + self-load = ${f2(CL * 1e15)} fF; tPHL = 0.69·Req,n·CL ≈ ${(tphl * 1e12).toFixed(1)} ps (check it in lab 1.3)`]], 17, 12, INK, MUTED, true),
   T({ x: 1.0, y: 2.65, w: 11.4, h: 3.9, fontFace: CN, valign: "top" }));
-s.addNotes("先让学生独立算 3 分钟，再展开；最后在虚拟实验 1.3 中设 Wp/Wn = 2.25、FO4 对照。\nGive students three minutes, then work through it and check in lab 1.3 with Wp/Wn = 2.25 at FO4.");
+s.addNotes(`先让学生独立算 3 分钟，再展开；最后在虚拟实验 1.3 中设 Wp/Wn = ${RL.toFixed(2)}、FO4 对照。\nGive students three minutes, then work through it and check in lab 1.3 with Wp/Wn = ${RL.toFixed(2)} at FO4.`);
 
 // ---- 本章小结
 s = pres.addSlide();

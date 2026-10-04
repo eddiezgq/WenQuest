@@ -23,6 +23,7 @@ from pydantic import BaseModel, Field
 
 from . import accounts
 from . import gpulab
+from . import micro
 from . import catalog_api
 from . import course_pack
 from . import content
@@ -125,6 +126,7 @@ def create_app() -> FastAPI:
     course_pack.register(app, sys.modules[__name__])
     tasks_api.register(app, sys.modules[__name__])
     gpulab.register(app, sys.modules[__name__])
+    micro.register(app, sys.modules[__name__])
     return app
 
 
