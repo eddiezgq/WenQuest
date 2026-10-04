@@ -115,6 +115,7 @@ def test_model_rules():
 
 
 def _pdf(text):
+    pytest.importorskip("matplotlib")            # 测试用 matplotlib 生成带文字的 PDF；CI 的测试环境没有它时跳过
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
