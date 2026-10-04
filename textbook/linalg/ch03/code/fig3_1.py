@@ -1,0 +1,85 @@
+"""图 3.1.1：二元方程组 2x − y = 1、x + y = 5 的行图（两条直线交于 (2, 3)）与列图（2·列1 + 3·列2 = b）。
+图 3.1.2：三种合金配料——行图（三个平面交于一点）与列图（三列按 40、30、30 kg 组合成目标成分）。"""
+import numpy as np
+
+from _fig import ACC, BLUE, GREEN, INK, MUTED, RED, T, arrow, figure, plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+fig, (a1, a2) = plt.subplots(1, 2, figsize=(10.0, 4.4))
+x = np.linspace(-1, 6, 2)
+a1.plot(x, 2 * x - 1, color=BLUE, lw=2, label="2x − y = 1")
+a1.plot(x, 5 - x, color=GREEN, lw=2, label="x + y = 5")
+a1.plot(2, 3, "o", color=RED, ms=7, zorder=5)
+a1.text(2.2, 3.2, "(2, 3)", color=RED, fontsize=12)
+a1.set_xlim(-1, 6)
+a1.set_ylim(-2, 7)
+a1.set_aspect("equal")
+a1.axhline(0, color=MUTED, lw=0.6)
+a1.axvline(0, color=MUTED, lw=0.6)
+a1.legend(frameon=False, loc="upper left")
+a1.set_title(T("行图：每个方程一条直线，解是交点", "Row picture: one line per equation, the solution is where they meet"), fontsize=10.5)
+c1, c2, b = np.array([2.0, 1.0]), np.array([-1.0, 1.0]), np.array([1.0, 5.0])
+arrow(a2, c1, BLUE, None, lw=3)
+arrow(a2, c2, GREEN, None, lw=3)
+arrow(a2, 2 * c1, BLUE, None, lw=1.6)
+arrow(a2, 3 * c2, GREEN, None, start=2 * c1, lw=1.6)
+arrow(a2, b, RED, None, lw=2.4)
+a2.text(c1[0] + 0.1, c1[1] - 0.45, r"$(2,1)^{\mathrm{T}}$", color=BLUE, fontsize=11)
+a2.text(c2[0] - 1.2, c2[1] + 0.1, r"$(-1,1)^{\mathrm{T}}$", color=GREEN, fontsize=11)
+a2.text(4.1, 1.7, r"$2\cdot$" + T("列", "col") + " 1", color=BLUE, fontsize=11)
+a2.text(2.6, 4.0, r"$3\cdot$" + T("列", "col") + " 2", color=GREEN, fontsize=11)
+a2.text(b[0] - 1.6, b[1] + 0.2, r"$\boldsymbol{b}=(1,5)^{\mathrm{T}}$", color=RED, fontsize=12)
+a2.set_xlim(-2.5, 5.5)
+a2.set_ylim(-1, 6.5)
+a2.set_aspect("equal")
+a2.axhline(0, color=MUTED, lw=0.6)
+a2.axvline(0, color=MUTED, lw=0.6)
+a2.set_title(T("列图：b 是两列的组合，系数就是解", "Column picture: b combines the columns; the weights are the solution"), fontsize=10.5)
+for ax in (a1, a2):
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
+fig.tight_layout()
+figure(fig, "fig3_1_1")
+
+A = np.array([[0.80, 0.60, 0.70], [0.15, 0.35, 0.10], [0.05, 0.05, 0.20]])
+bb = np.array([71.0, 19.5, 9.5])
+sol = np.array([40.0, 30.0, 30.0])
+fig = plt.figure(figsize=(10.6, 4.8))
+a1 = fig.add_subplot(1, 2, 1, projection="3d")
+g = np.linspace(0, 70, 2)
+X, Y = np.meshgrid(g, g)
+for row, rhs, col in zip(A, bb, (BLUE, GREEN, ACC)):
+    g2 = np.linspace(0, 70, 60)
+    X, Y = np.meshgrid(g2, g2)
+    Z = (rhs - row[0] * X - row[1] * Y) / row[2]
+    Z[(Z < 0) | (Z > 70)] = np.nan
+    a1.plot_surface(X, Y, Z, color=col, alpha=0.28, linewidth=0)
+a1.scatter(*sol, color=RED, s=40)
+a1.text(sol[0] + 3, sol[1], sol[2] + 8, "(40, 30, 30)", color=RED, fontsize=10)
+a1.set_xlim(0, 70)
+a1.set_ylim(0, 70)
+a1.set_zlim(0, 70)
+a1.set_xlabel(T("料 A / kg", "alloy A / kg"))
+a1.set_ylabel(T("料 B / kg", "alloy B / kg"))
+a1.set_zlabel(T("料 C / kg", "alloy C / kg"))
+a1.view_init(18, -60)
+a1.set_title(T("行图：铜、锌、锡三个平衡方程是三个平面", "Row picture: the Cu, Zn, Sn balances are three planes"), fontsize=10.5)
+a2 = fig.add_subplot(1, 2, 2, projection="3d")
+p = np.zeros(3)
+for k, col, name in ((0, BLUE, "40·A"), (1, GREEN, "30·B"), (2, ACC, "30·C")):
+    v = sol[k] * A[:, k]
+    a2.quiver(*p, *v, color=col, arrow_length_ratio=0.08, lw=2.2)
+    a2.text(*(p + v / 2 + np.array([0, 0, 1.0])), name, color=col, fontsize=10)
+    p = p + v
+a2.quiver(0, 0, 0, *bb, color=RED, arrow_length_ratio=0.06, lw=1.8)
+a2.text(*(bb + np.array([2, 0, 0.5])), r"$\boldsymbol{b}$", color=RED, fontsize=13)
+a2.set_xlabel(T("铜 / kg", "Cu / kg"))
+a2.set_ylabel(T("锌 / kg", "Zn / kg"))
+a2.set_zlabel(T("锡 / kg", "Sn / kg"))
+a2.set_xlim(0, 75)
+a2.set_ylim(0, 22)
+a2.set_zlim(0, 11)
+a2.view_init(20, -65)
+a2.set_title(T("列图：三种料的成分向量组合成目标 b", "Column picture: the composition vectors combine to b"), fontsize=10.5)
+fig.tight_layout()
+figure(fig, "fig3_1_2")

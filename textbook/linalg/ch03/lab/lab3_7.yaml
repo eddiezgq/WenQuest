@@ -1,0 +1,24 @@
+# 实验 3.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_7.js。
+原理:
+  - ["以地为零电位，节点电位 V₁…V₄ 为未知数。基尔霍夫电流定律：流出每个节点的电流之和为零；欧姆定律：经电阻 R 从节点 j 流到 k 的电流为 (Vⱼ − Vₖ)/R。电机支路的电流为 (V₂ − V₃ − Em)/Rₐ。四个节点给出 4×4 方程组 G V = i（式 (3.7.1)）。",
+     "With ground at 0 V, the node voltages V₁…V₄ are unknown. Kirchhoff's current law: the currents leaving each node sum to zero; Ohm's law: the current from node j to k through R is (Vⱼ − Vₖ)/R. The motor branch carries (V₂ − V₃ − Em)/Rₐ. Four nodes give a 4×4 system G V = i (Eq. (3.7.1))."]
+  - 式: "G 的对角元 = 与该节点相连的电导之和，非对角元 = −相邻节点间的电导；  电机电流 = V₄ / Rs"
+步骤:
+  - ["保持 Em = 12 V、Rs = 0.1 Ω，手工写出 G 和 i，用消元解出 V₁…V₄，与仿真器的读数比较（任务 4），填入表 1。", "With Em = 12 V and Rs = 0.1 Ω write G and i by hand, solve for V₁…V₄ by elimination and compare with the simulator (task 4); fill in Table 1."]
+  - ["把 Em 调到 0（堵转），读出电机电流（任务 1）；再让 Em 取 4、8、16、20 V，在表 2 记录电流。电流与 Em 是什么关系？", "Set Em = 0 (stall) and read the current (task 1); then Em = 4, 8, 16, 20 V, recording the current in Table 2. How does the current depend on Em?"]
+  - ["找出使电机电流约为 5 A 的 Em（任务 2）。", "Find the Em giving about 5 A (task 2)."]
+  - ["Em = 12 V 时把 Rs 改为 0.2 Ω（任务 3），记录哪些电位变化、采样电压变化多少。", "At Em = 12 V change Rs to 0.2 Ω (task 3); record which voltages change and how much the sense voltage changes."]
+数据表:
+  - 标题: ["表 1  节点电位：方程组与仿真器（Em = 12 V，Rs = 0.1 Ω）", "Table 1  Node voltages: equations and simulator (Em = 12 V, Rs = 0.1 Ω)"]
+    表头: ["节点", "方程组 / V", "仿真器 / V", "差 / mV"]
+    表头英文: ["Node", "Equations / V", "Simulator / V", "Difference / mV"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""], ["4", "", "", ""]]
+  - 标题: ["表 2  电机电流与反电动势", "Table 2  Motor current and back-EMF"]
+    表头: ["Em / V", "电机电流 / A", "采样电压 / V"]
+    表头英文: ["Em / V", "Motor current / A", "Sense voltage / V"]
+    行: [["0", "", ""], ["4", "", ""], ["8", "", ""], ["12", "", ""], ["16", "", ""], ["20", "", ""]]
+注意:
+  - ["这是直流稳态的简化模型：开关管看成导通电阻，忽略了 PWM 开关、电感和电容。", "This is a simplified DC steady-state model: switches are on-resistances; PWM switching, inductance and capacitance are ignored."]
+  - ["Em 大于约 23.9 V 时电流反向，电机处于发电（回馈制动）状态。", "Above about 23.9 V the current reverses: the motor generates (regenerative braking)."]
+思考题:
+  - ["电机电流与 Em 为什么是一次函数关系？它的斜率由电路中的哪些量决定？", "Why is the motor current a linear function of Em? Which circuit quantities set its slope?"]

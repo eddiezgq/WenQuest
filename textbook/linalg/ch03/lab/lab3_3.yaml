@@ -1,0 +1,28 @@
+# 实验 3.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_3.js。
+原理:
+  - ["三种初等行变换：交换两行（Rᵢ ↔ Rⱼ）；用非零数乘一行（Rᵢ ← cRᵢ，c ≠ 0）；把一行的倍数加到另一行（Rᵢ ← Rᵢ + cRⱼ，i ≠ j）。它们都可以撤销，所以不改变方程组的解（定理 3.3.1）。",
+     "Three row operations: swap two rows; scale a row by c ≠ 0; add c times row j to row i (i ≠ j). Each can be undone, so the solution set is unchanged (Theorem 3.3.1)."]
+  - 式: "乘数 ℓᵢₖ = aᵢₖ / aₖₖ；  Rᵢ ← Rᵢ − ℓᵢₖ Rₖ"
+  - ["化为简化行阶梯形后：出现 (0 0 0 | d)、d ≠ 0 的行则无解；三列都有主元则解唯一；有不含主元的列则该变量自由，有无穷多解（定理 3.5.1）。",
+     "In reduced echelon form: a row (0 0 0 | d) with d ≠ 0 means no solution; pivots in all three columns mean a unique solution; a column without a pivot gives a free variable and infinitely many solutions (Theorem 3.5.1)."]
+步骤:
+  - ["在“唯一解”场景，自己选择行变换，把增广矩阵化为上三角形（任务 1），在表 1 中记录每一步的变换和乘数。", "In the unique scene choose operations yourself to reach upper-triangular form (task 1); record each operation and multiplier in Table 1."]
+  - ["继续化为简化行阶梯形（任务 2），读出解，与 3.3.3 节的结果比较。", "Continue to reduced echelon form (task 2), read off the solution and compare with Section 3.3.3."]
+  - ["点“重新开始”，改用“程序走一步”逐步执行，比较程序的步骤与你的步骤。", "Press 'Start over' and use 'Program's step'; compare its steps with yours."]
+  - ["切换到“无解”场景，消元到出现矛盾的一行（任务 3）。", "Switch to the no-solution scene and eliminate until a contradictory row appears (task 3)."]
+  - ["切换到“无穷多解”场景，化为简化行阶梯形（任务 4），写出通解。", "Switch to the infinitely-many scene, reduce completely (task 4) and write the general solution."]
+数据表:
+  - 标题: ["表 1  方程组 (3.3.1) 的消元记录", "Table 1  Elimination record for system (3.3.1)"]
+    表头: ["步", "行变换", "乘数或倍数", "变换后的增广矩阵（关键行）"]
+    表头英文: ["Step", "Operation", "Multiplier", "Augmented matrix (key row)"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""], ["4", "", "", ""], ["5", "", "", ""], ["6", "", "", ""], ["7", "", "", ""]]
+  - 标题: ["表 2  三个方程组的结论", "Table 2  Conclusions for the three systems"]
+    表头: ["方程组", "主元列", "自由变量", "解"]
+    表头英文: ["System", "Pivot columns", "Free variables", "Solution"]
+    行: [["(3.3.1)", "", "", ""], ["(乙)", "", "", ""], ["(丙)", "", "", ""]]
+    行英文: [["(3.3.1)", "", "", ""], ["(B)", "", "", ""], ["(C)", "", "", ""]]
+注意:
+  - ["倍数用分子 p 和分母 q 输入，例如 −1/6 输入 p = −1、q = 6。", "Enter a multiplier as numerator p and denominator q, e.g. −1/6 as p = −1, q = 6."]
+  - ["程序用分数精确计算，不会出现舍入误差。", "The program computes with exact fractions, so there is no rounding."]
+思考题:
+  - ["若在“无解”场景中只做了一半就停下，能否已经断定无解？什么时候可以断定？", "In the no-solution scene, can you conclude 'no solution' halfway? When can you?"]
