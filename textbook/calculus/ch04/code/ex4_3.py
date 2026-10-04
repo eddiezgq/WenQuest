@@ -28,6 +28,6 @@ for gap_mm in (100, 10, 1, 0.1, 0.01):
     s = (th2(r) - th2(r + d)) / d                 # 每外伸 1 m 肘关节要转过的弧度（灵敏度）
     rows.append((gap_mm, math.degrees(th2(r)), s))
 out(R=R, sens_tab="\n".join(f"| {g:g} | {a:.3f} | {s:.1f} |" for g, a, s in rows))
-# 灵敏度 ≈ C/√(R − r)，C = ½√(2R/(l₁l₂))（由 cos θ ≈ 1 − θ²/2 推出，第 9 章）
+# 灵敏度 ≈ C/√(R − r)，C = ½√(2R/(l₁l₂))（由第 7 章的导数和 4.6 节的 1 − cos θ ~ θ²/2 推出）
 C = rows[-1][2] * math.sqrt(rows[-1][0] / 1000)
 out(C=C, C_pred=0.5 * math.sqrt(2 * R / (l1 * l2)))
