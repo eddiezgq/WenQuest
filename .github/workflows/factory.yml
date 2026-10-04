@@ -47,7 +47,8 @@ jobs:
         run: sh factory/deploy/fetch_menagerie.sh "$RUNNER_TEMP/menagerie" && echo "WQ_MENAGERIE=$RUNNER_TEMP/menagerie" >> "$GITHUB_ENV"
       - name: 工厂数据与导入脚本
         working-directory: factory
-        run: pip install -q -r digital/requirements.txt pytest "requests>=2.31" && python -m pytest -q tests
+        # matplotlib 只在测试里用：test_drawing_gb_rules 用它生成样例零件图 PDF（第 11 轮《机械设计》第 3 章）
+        run: pip install -q -r digital/requirements.txt pytest "requests>=2.31" matplotlib && python -m pytest -q tests
       - name: 独立的 G 代码解析器（第 13 轮验收用，只装在测试环境；euclid3 的 setup.py 在新版 setuptools 下装不上，直接放模块文件）
         run: |
           pip install -q --no-deps pygcode==0.2.1 six
