@@ -5,7 +5,7 @@
 WQ.lab({
   title: ["实验 6.6 力旋量与关节力矩", "Lab 6.6 Wrenches and joint torques"],
   goal: ["用 τ_i = S_iᵀF 计算托住负载所需的关节力矩，看力矩怎样随姿态变化；体会力臂就是力旋量与关节旋量轴的“互易”关系。",
-         "Use τ_i = S_iᵀF for the torques that hold a load and watch them change with posture; see the lever arm as the reciprocal relation between the wrench and the joint screw."],
+         "Use τ_i = S_iᵀF for the torques that hold a load and watch them change with posture; see how a zero lever arm means the wrench is reciprocal to the joint screw."],
   scenes: [
     { id: "ur", robot: true, name: ["UR5e 托住 5 kg 负载", "UR5e holding 5 kg"],
       problem: { title: ["机器人问题：电机要出多大力矩", "Robot problem: how much torque the motors must give"],
@@ -24,7 +24,7 @@ WQ.lab({
   ],
   buttons: [{ id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "home", robot: true, text: ["零位、负载 5 kg：读出 τ₂、τ₃、τ₄，与算例 6.6.1 比较。", "Home, 5 kg: read τ₂, τ₃, τ₄ and compare with Example 6.6.1."],
+    { id: "home", robot: true, text: ["零位、负载 5 kg：读出 τ₂、τ₃、τ₄，与算例 6.6.1 比较。", "Zero position, 5 kg: read τ₂, τ₃, τ₄ and compare with Example 6.6.1."],
       demo: { scene: "ur", set: { m: 5, j2: 0, j3: 0, j4: 0 }, press: [] } },
     { id: "up", robot: true, text: ["负载仍为 5 kg，找一个姿态使 |τ₂| < 1 N·m。", "Still 5 kg: find a posture with |τ₂| < 1 N·m."],
       demo: { scene: "ur", set: { m: 5, j2: -90, j3: 0, j4: 90 }, press: [] } },

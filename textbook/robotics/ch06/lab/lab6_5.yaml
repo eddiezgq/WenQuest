@@ -8,12 +8,12 @@
   - ["换坐标系不改变运动本身：角速度的大小、瞬心（三维中为螺旋轴）和节距都不变。", "Changing frames does not change the motion: the rate, the instantaneous centre (the screw axis in 3D) and the pitch stay the same."]
 步骤:
   - ["打开实验 6.5，场景“工具坐标系与基座坐标系”。把 {b} 放到 (0.6, 0.2) m、朝向 90°，取 V_b = (0.5, 0, 0)（任务 1）。用式 (6.5.4) 手算 V_s，与读数比较，记入表 1。观察瞬心与 {b} 原点重合。",
-     "Open Lab 6.5, scene “Tool frame and base frame”. Put {b} at (0.6, 0.2) m, heading 90°, with V_b = (0.5, 0, 0) (task 1). Compute V_s by Eq. (6.5.4) and compare; Table 1. The centre sits on {b}'s origin."]
+     "Open Lab 6.5, scene “Tool frame and base frame”. Put {b} at (0.6, 0.2) m, heading 90°, with V_b = (0.5, 0, 0) (task 1). Compute V_s by hand with Eq. (6.5.4), compare it with the reading and record it in Table 1. The centre sits on {b}'s origin."]
   - ["保持 {b} 和 ω 不变，调节 v_bx、v_by，使 V_s 的线速度部分为零（任务 2）。此时瞬心在哪里？用 V_b = [Ad_Tsb]⁻¹ V_s 手算核对。",
      "Keep {b} and ω; adjust v_bx, v_by until V_s has no linear part (task 2). Where is the centre now? Check with V_b = [Ad_Tsb]⁻¹ V_s by hand."]
   - ["任选一组 V_b，改变 {b} 的朝向 φ（不改变位置），观察 V_s 怎样变化、瞬心是否随之移动，并解释。",
      "Pick any V_b and change only the heading φ of {b}; watch how V_s changes and whether the centre moves; explain."]
-  - ["切换到“转盘上的人”，完成任务 3，记入表 1。", "Switch to “On a merry-go-round” and do task 3; Table 1."]
+  - ["切换到“转盘上的人”，完成任务 3，记入表 1。", "Switch to “On a merry-go-round” and do task 3; record it in Table 1."]
 数据表:
   - 标题: ["表 1  物体运动旋量与空间运动旋量", "Table 1  Body and spatial twists"]
     表头: ["{b} 的位姿 (p_x, p_y, φ)", "V_b", "手算 V_s", "读出 V_s", "瞬心 / m"]

@@ -1,6 +1,6 @@
 """Examples 12.1.1 and 12.1.2: joint screws.
 
-12.1.1 Planar 3R arm (with the upper-arm and forearm lengths of the UR5e): the three joint screws and the home pose M.
+12.1.1 Planar 3R arm (with the upper-arm and forearm lengths of the UR5e): the three joint screws and the zero-position pose M.
 12.1.2 UR5e: write ω and q of the six joints from the dimensions of the parts-library model, compute S = (ω, −ω × q),
        and compare them one by one with "the axes read directly from the node matrices of the model" (the two sources must agree).
 """

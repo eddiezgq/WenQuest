@@ -35,6 +35,6 @@ for k, ax in enumerate(axs):
     ax.text(tip[0] + 0.03, tip[1] - (0.09 if k == 0 else -0.03), f"({tip[0]:.3f}, {tip[1]:.3f})", fontsize=8.5, color=C["ink"])
     ax.set_title(names[k], fontsize=10)
 fig.text(0.5, 0.01, T("红点：这一步转动所绕的点，仍在零位时的位置；灰色：上一步的结果；虚线：零位",
-                       "Red dot: the point this step turns about, still where it was in the home configuration;\ngrey: result of the previous step; dashed: home configuration"), ha="center", fontsize=9)
+                       "Red dot: the point this step turns about, still where it was at the zero position;\ngrey: result of the previous step; dashed: zero position"), ha="center", fontsize=9)
 figure(fig, "fig12_2_1")
 plt.close(fig)

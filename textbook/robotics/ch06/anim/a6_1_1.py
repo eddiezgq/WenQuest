@@ -39,7 +39,7 @@ def center(a, z):
 
 class Lesson(Base):
     def construct(self):
-        self.title("6.1", "沙勒定理：任何刚体位移都是螺旋运动", "Chasles: every rigid displacement is a screw motion")
+        self.title("6.1", "沙勒定理：任何刚体位移都是螺旋运动", "Chasles: every rigid-body displacement is a screw motion")
         floor = VGroup(*[Line(P([x, -0.35, 0]), P([x, 0.55, 0]), color=GREY_D, stroke_width=1) for x in np.arange(-0.1, 0.71, 0.1)],
                        *[Line(P([-0.1, y, 0]), P([0.7, y, 0]), color=GREY_D, stroke_width=1) for y in np.arange(-0.35, 0.56, 0.1)])
         self.add(floor)
@@ -76,5 +76,5 @@ class Lesson(Base):
         self.caption("节距 h = d/θ：每转 1 弧度沿轴前进的距离", "Pitch h = d/θ: distance advanced along the axis per radian")
         self.wait(1.0)
         self.card([["沙勒定理（1830）", "Chasles' theorem (1830)"],
-                   ["任何刚体位移都是绕某一根轴的螺旋运动", "Every rigid displacement is a screw motion about some axis"],
+                   ["任何刚体位移都是绕某一根轴的螺旋运动", "Every rigid-body displacement is a screw motion about some axis"],
                    MathTex(r"x' = q + e^{[\hat s]\theta}(x - q) + h\theta\,\hat s", font_size=44)])

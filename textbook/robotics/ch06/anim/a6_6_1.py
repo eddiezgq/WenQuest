@@ -55,6 +55,6 @@ class Lesson(Base):
         self.play(FadeIn(lab("f", Q + K * FR, ORANGE, RIGHT)), FadeIn(lab("m = h f", Q - 0.2 * u, BLUE_C, LEFT)))
         self.caption("力矩只剩与 f 平行的部分 m = h f：力旋量，节距 h = 0.1 m", "Only the part along f is left, m = h f: a wrench of pitch h = 0.1 m")
         self.wait(2.5)
-        self.card([["潘索定理", "Poinsot's theorem"],
+        self.card([["潘索定理", "The central axis (Poinsot)"],
                    ["任何力系都等价于沿某一根轴的力，加上绕这根轴的力偶", "Any force system is a force along some axis plus a couple about that axis"],
                    MathTex(r"\mathcal F = (m,\ f) = (q\times f + h f,\ f),\qquad h = \frac{m\cdot f}{|f|^2}", font_size=44)])

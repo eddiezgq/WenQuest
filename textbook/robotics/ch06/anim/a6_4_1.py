@@ -95,7 +95,7 @@ class Lesson(Base):
         self.play(Create(home), Create(goal), run_time=1.5)
         f0, f1 = frame_at(M), frame_at(TT)
         self.play(FadeIn(f0), FadeIn(f1))
-        self.caption("已知两个位姿：零位（灰）与目标（金）。连接它们的螺旋运动是什么？", "Two poses: home (grey) and target (gold). Which screw motion joins them?")
+        self.caption("已知两个位姿：零位（灰）与目标（金）。连接它们的螺旋运动是什么？", "Two poses: zero position (grey) and target (gold). Which screw motion joins them?")
         axis = DashedLine(P(Q - 0.5 * w), P(Q + 0.75 * w), color=YELLOW, stroke_width=4)
         self.play(Create(axis))
         self.caption("对数映射：由 D = T M⁻¹ 求出螺旋轴、转角 66.45° 和节距", "Log map: from D = T M⁻¹ get the screw axis, the angle 66.45° and the pitch")

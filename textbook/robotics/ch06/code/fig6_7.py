@@ -47,24 +47,24 @@ ax.axis("off")
 agv(ax, *poses[0], C["muted"], 0.9, "--")
 agv(ax, *poses[-1], C["accent"])
 ax.plot(path[:, 0], path[:, 1], color=C["x"], lw=1.6)
-labels = [T("① 前进 ε", "① forward ε"), T("② 左转 ε", "② turn left ε"), T("③ 后退 ε", "③ back ε"), T("④ 右转 ε", "④ turn right ε")]
+labels = [T("① 前进 ε", "① Forward ε"), T("② 左转 ε", "② Turn left ε"), T("③ 后退 ε", "③ Back ε"), T("④ 右转 ε", "④ Turn right ε")]
 spots = [(0.12, 0.04), (0.42, 0.04), (0.16, -0.16), (-0.12, -0.24)]
 for lab, o in zip(labels, spots):
     ax.text(*o, lab, fontsize=9.5, color=C["ink"])
 ax.annotate("", xy=poses[-1][:2], xytext=(0, 0), arrowprops=dict(arrowstyle="-|>", color=C["z"], lw=1.8))
-ax.text(-0.30, -0.10, T("净位移 ≈ ε²\n（向右平移）", "net ≈ ε²\n(a shift to the right)"), fontsize=9.5, color=C["z"])
+ax.text(-0.30, -0.10, T("净位移 ≈ ε²\n（向右平移）", "Net ≈ ε²\n(a shift to the right)"), fontsize=9.5, color=C["z"])
 ax.text(-0.30, 0.16, T("(a) ε = 0.4（m 与 rad）", "(a) ε = 0.4 (m and rad)"), fontsize=10)
-ax.text(-0.30, 0.10, T("虚线：起点；金色：终点", "dashed: start; gold: end"), fontsize=9, color=C["muted"])
+ax.text(-0.30, 0.10, T("虚线：起点；金色：终点", "Dashed: start; gold: end"), fontsize=9, color=C["muted"])
 ax.set_xlim(-0.32, 0.62)
 ax.set_ylim(-0.30, 0.20)
 
 es = np.geomspace(0.02, 0.6, 30)
 ys = [abs(run(x, 200)[1][-1][1]) for x in es]
-bx.loglog(es, ys, "o", ms=3.5, color=C["x"], label=T("实际侧移 |y|", "actual side shift |y|"))
+bx.loglog(es, ys, "o", ms=3.5, color=C["x"], label=T("实际侧移 |y|", "Actual sideways shift |y|"))
 bx.loglog(es, es ** 2, color=C["z"], lw=1.2, label="ε²")
 bx.set_xlabel(T("ε（前进的距离 m，转过的角度 rad）", "ε (distance in m, angle in rad)"))
 bx.set_ylabel(T("|y| / m", "|y| / m"))
-bx.set_title(T("(b) 侧移与 ε² 成正比", "(b) the side shift grows as ε²"), fontsize=10)
+bx.set_title(T("(b) 侧移与 ε² 成正比", "(b) The sideways shift grows as ε²"), fontsize=10)
 bx.legend(frameon=False, fontsize=9)
 bx.grid(True, which="both", lw=0.3, alpha=0.5)
 fig.tight_layout()
