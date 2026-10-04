@@ -13,7 +13,7 @@ class Lesson(Base):
         self.title("3.1", "割线变切线", "From secant to tangent")
         ax = Axes(x_range=[0, 4.2, 1], y_range=[0, 4.4, 1], x_length=6.8, y_length=4.0, tips=False,
                   axis_config={"color": GREY_B, "include_numbers": True, "font_size": 24}).shift(LEFT * 2.0 + UP * 0.3)
-        xl = ax.get_x_axis_label(MathTex(r"t/\mathrm s", font_size=28), edge=RIGHT, direction=DOWN)
+        xl = MathTex(r"t/\mathrm s", font_size=28).next_to(ax.x_axis, RIGHT, buff=0.2)
         yl = ax.get_y_axis_label(MathTex(r"x/\mathrm m", font_size=28), edge=UP, direction=LEFT)
         curve = ax.plot(x_of, x_range=[0, 4.15], color=BLUE, stroke_width=4)
         self.play(Create(ax), FadeIn(xl), FadeIn(yl))

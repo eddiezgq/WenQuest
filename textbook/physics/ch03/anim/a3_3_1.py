@@ -14,7 +14,7 @@ class Lesson(Base):
         self.title("3.3", "矩形面积和逼近曲线下的面积", "Rectangles approaching the area under a curve")
         ax = Axes(x_range=[0, 5.2, 1], y_range=[0, 1.2, 0.5], x_length=7.0, y_length=3.7, tips=False,
                   axis_config={"color": GREY_B, "include_numbers": True, "font_size": 24}).shift(LEFT * 1.8 + UP * 0.35)
-        xl = ax.get_x_axis_label(MathTex(r"t/\mathrm s", font_size=28), edge=RIGHT, direction=DOWN)
+        xl = MathTex(r"t/\mathrm s", font_size=28).next_to(ax.x_axis, RIGHT, buff=0.2)
         yl = ax.get_y_axis_label(MathTex(r"v/(\mathrm{m/s})", font_size=28), edge=UP, direction=LEFT)
         curve = ax.plot(v_of, x_range=[0, 5], color=WHITE, stroke_width=4)
         self.play(Create(ax), FadeIn(xl), FadeIn(yl), Create(curve))

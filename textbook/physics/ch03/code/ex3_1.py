@@ -55,8 +55,8 @@ fig, axs = plt.subplots(1, 2, figsize=(7.4, 3.1), gridspec_kw={"width_ratios": [
 ax = axs[0]
 tt = np.linspace(0, 3.2, 200)
 ax.plot(tt, x(tt), color=d.INK, lw=2)
-cols = ["#9fb8d9", "#6f97c9", "#3f74b5", d.VA]
-for c, dt in zip(cols, (1.0, 0.5, 0.25, 0.1)):
+cols = ["#9fb8d9", "#6f97c9", d.VA]
+for c, dt in zip(cols, (1.0, 0.5, 0.1)):   # 与表 3.1.1 的 Δt 相同
     k = (x(t0 + dt) - x(t0)) / dt
     ax.plot([0.6, 3.2], [x(t0) + k * (0.6 - t0), x(t0) + k * (3.2 - t0)], color=c, lw=1.2)
     ax.plot([t0 + dt], [x(t0 + dt)], "o", color=c, ms=4)
@@ -66,7 +66,7 @@ ax.text(2.55, 0.55, T("切线：斜率 = 瞬时速度", "tangent: slope = instan
 ax.text(1.0, 2.2, T("割线：斜率 = 平均速度", "secants: slope = average velocity"), color=d.VA, fontsize=8.5)
 ax.set_xlim(0, 3.2); ax.set_ylim(0, 2.6); ax.set_xlabel("t / s"); ax.set_ylabel("x / m"); d.spines(ax)
 ax = axs[1]
-dts = np.array([1.0, 0.5, 0.25, 0.1, 0.05, 0.01])
+dts = np.array([1.0, 0.5, 0.1, 0.01, 0.001])                # 与表 3.1.1 相同
 ax.plot(dts, [(x(t0 + h) - x(t0)) / h for h in dts], "o-", color=d.VA)
 ax.axhline(v_exact, color=d.VR, ls="--", lw=1.2)
 ax.text(0.5, v_exact + 0.01, T("瞬时速度 1.00 m/s", "instantaneous 1.00 m/s"), color=d.VR, fontsize=8.5, ha="left", va="bottom")
@@ -79,8 +79,8 @@ figure(fig, "fig3_1_1")
 fig, ax = plt.subplots(figsize=(5.2, 3.4))
 ax.loglog(hs, err_f, "o", ms=3, color=d.VA, label=T("前向差分", "forward difference"))
 ax.loglog(hs, err_c, "s", ms=3, color=d.VB, label=T("中心差分", "central difference"))
-ax.loglog(hs, x2 * hs / 2 + q / hs, color=d.VA, lw=1, alpha=0.7, ls="--")
-ax.loglog(hs, x3 * hs ** 2 / 6 + q / (2 * hs), color=d.VB, lw=1, alpha=0.7, ls="--")
+ax.loglog(hs, x2 * hs / 2 + q / (math.sqrt(6) * hs), color=d.VA, lw=1, alpha=0.7, ls="--")
+ax.loglog(hs, x3 * hs ** 2 / 6 + q / (2 * math.sqrt(6) * hs), color=d.VB, lw=1, alpha=0.7, ls="--")
 ax.text(2e-4, 1.2, T("h 小：量化误差被放大", "small h: quantisation amplified"), fontsize=8.5, color=d.MUTED)
 ax.text(0.06, 2e-5, T("h 大：割线偏离切线", "large h: secant leaves tangent"), fontsize=8.5, color=d.MUTED)
 ax.set_xlabel(T("步长 h / s", "step h / s")); ax.set_ylabel(T("速度误差 / (m/s)", "velocity error / (m/s)"))

@@ -8,8 +8,8 @@
 步骤:
   - ["选“土丘上的坡度”，机器人在 (5, 3)。记下梯度的两个分量，计算 |∇H| 和最陡的坡度角，与读数比较。", "Choose the hill with the robot at (5, 3). Note the gradient components, compute |∇H| and the steepest slope angle, and compare with the readout."]
   - ["φ 每隔 30° 记一次坡度，填入表 1，在同一张图上画出坡度的正切与 |∇H| cos α 的关系。找出坡度在 5°～15° 之间的上坡方向（任务 1）和坡度几乎为零的方向（任务 2）。", "Record the slope every 30° of φ in Table 1 and plot its tangent against |∇H| cos α. Find an uphill heading with slope 5°–15° (task 1) and a level heading (task 2)."]
-  - ["选“势场导航”。先用默认值让 AGV 到达目标（任务 3）。再把目标的 y_g 从 0.3 m 逐步调到 4.6 m，记下哪些位置 AGV 会卡住（任务 4），填入表 2。", "Choose potential-field navigation. Reach the goal with the defaults (task 3). Then move y_g from 0.3 m to 4.6 m and note where the AGV gets stuck (task 4) in Table 2."]
-  - ["目标在墙后时加绕行分量，看能否绕出来（任务 5）；改变斥力强度 k_r，看离立柱最近的距离怎样变化。", "With the goal behind the wall add swirl and see whether the AGV escapes (task 5); vary k_r and watch the closest distance to a pillar."]
+  - ["选“势场导航”。开始时目标在墙后（y_g = 2.4 m），AGV 卡在墙前，提交（任务 4）。再把 y_g 从 0.3 m 逐步调到 4.6 m，记下哪些位置 AGV 会卡住，填入表 2；选一个能到达的目标位置提交（任务 3）。", "Choose potential-field navigation. Reach the goal with the defaults (task 3). Then move y_g from 0.3 m to 4.6 m and note where the AGV gets stuck (task 4) in Table 2."]
+  - ["目标在墙后时加绕行分量，看能否绕出来，提交（任务 5）。加了绕行分量后，AGV 受的“力”已不是某个势的负梯度；改变斥力强度 k_r，看离立柱最近的距离怎样变化。", "With the goal behind the wall add swirl and see whether the AGV escapes (task 5); vary k_r and watch the closest distance to a pillar."]
   - ["选“雨水往哪里流”，移动落点，找出流进东边小水塘的区域（任务 6），在草图上大致画出分水岭。", "Choose the rain scene, move the landing point, find the region that drains into the small east pond (task 6) and sketch the watershed."]
 数据表:
   - 标题: ["表 1  (5, 3) 处各方向的坡度", "Table 1  Slopes at (5, 3) in different headings"]
@@ -21,6 +21,7 @@
     表头英文: ["y_g / m", "Swirl", "Outcome", "Steps", "Closest / m"]
     行: [["0.5", "0", "", "", ""], ["1.5", "0", "", "", ""], ["2.4", "0", "", "", ""], ["3.5", "0", "", "", ""], ["2.4", "", "", "", ""], ["4.2", "", "", "", ""]]
 注意:
+  - ["每个任务都要点“提交”才判定。", "Each task is judged only when you press “Submit”."]
   - ["行驶方向 φ 从 x 轴逆时针量起；坡度为负表示下坡。", "φ is measured anticlockwise from the x axis; a negative slope is downhill."]
   - ["势场导航中 AGV 每步走 5 cm，最多算 1200 步；超过还没到就判为卡住。", "The AGV moves 5 cm per step for at most 1200 steps; if it has not arrived by then it counts as stuck."]
 思考题:

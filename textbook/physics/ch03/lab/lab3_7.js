@@ -54,52 +54,55 @@ WQ.lab({
     { id: "py", name: ["机器人位置 y", "Robot y"], min: -5, max: 5, step: 0.5, value: 3, unit: "m", digits: 1 },
     { id: "phi", name: ["行驶方向 φ（从 x 轴逆时针）", "Heading φ (from x, anticlockwise)"], min: 0, max: 359, step: 1, value: 0, unit: "°", digits: 0 },
     { id: "kr", name: ["斥力强度 k_r", "Repulsion k_r"], min: 0.2, max: 4, step: 0.1, value: 1, unit: "", digits: 1 },
-    { id: "gy", name: ["目标位置 y_g", "Goal y_g"], min: 0.3, max: 4.6, step: 0.1, value: 0.5, unit: "m", digits: 1 },
+    { id: "gy", name: ["目标位置 y_g", "Goal y_g"], min: 0.3, max: 4.6, step: 0.1, value: 2.4, unit: "m", digits: 1 },
     { id: "vort", name: ["绕行（切向）分量", "Swirl (tangential) part"], min: 0, max: 1, step: 0.1, value: 0, unit: "", digits: 1 },
     { id: "rx", name: ["雨滴落点 x", "Raindrop x"], min: 0.2, max: 9.8, step: 0.1, value: 5, unit: "m", digits: 1 },
     { id: "ry", name: ["雨滴落点 y", "Raindrop y"], min: 0.2, max: 4.8, step: 0.1, value: 4, unit: "m", digits: 1 },
   ],
-  buttons: [],
+  buttons: [{ id: "submit", name: ["提交", "Submit"], primary: true }],
   tasks: [
-    { id: "up", robot: true, text: ["土丘：在 (5, 3) 处找一个上坡方向，坡度在 5°～15° 之间。它与梯度的夹角大约是多少？",
+    { id: "up", robot: true, text: ["土丘：在 (5, 3) 处找一个上坡方向，坡度在 5°～15° 之间，提交。它与梯度的夹角大约是多少？",
                                    "Hill: at (5, 3) find an uphill heading with a slope between 5° and 15°. Roughly what angle does it make with the gradient?"],
-      demo: { scene: "hill", set: { px: 5, py: 3, phi: 296 }, press: [], wait: 1 } },
-    { id: "lev", robot: true, text: ["土丘：找一个坡度几乎为零（小于 0.5°）的方向。它与等高线、与梯度各是什么关系？",
+      demo: { scene: "hill", set: { px: 5, py: 3, phi: 296 }, press: ["submit"], wait: 1 } },
+    { id: "lev", robot: true, text: ["土丘：在 (5, 3) 处找一个坡度几乎为零（小于 0.5°）的方向，提交。它与等高线、与梯度各是什么关系？",
                                     "Hill: find a heading with almost no slope (below 0.5°). How does it relate to the contour and to the gradient?"],
-      demo: { scene: "hill", set: { px: 5, py: 3, phi: 326 }, press: [], wait: 1 } },
-    { id: "arr", robot: true, text: ["势场：让 AGV 绕过立柱墙到达目标。", "Potential field: get the AGV round the wall to the goal."],
-      demo: { scene: "apf", set: { gy: 0.5, kr: 1, vort: 0 }, press: [], wait: 1 } },
-    { id: "stuck", robot: true, text: ["势场：没有绕行分量时，把目标移到墙的正后方附近，AGV 停在哪里？那里的 ∇U 等于多少？",
+      demo: { scene: "hill", set: { px: 5, py: 3, phi: 326 }, press: ["submit"], wait: 1 } },
+    { id: "arr", robot: true, text: ["势场：开始时 AGV 卡在墙前。不加绕行分量，只移动目标，让 AGV 绕过立柱墙到达目标，提交。", "Potential field: at first the AGV is stuck at the wall. Without swirl, move only the goal so that the AGV gets round the wall, and submit."],
+      demo: { scene: "apf", set: { gy: 0.5, kr: 1, vort: 0 }, press: ["submit"], wait: 1 } },
+    { id: "stuck", robot: true, text: ["势场：没有绕行分量时，把目标放在墙的正后方附近，提交。AGV 停在哪里？那里的 ∇U 等于多少？",
                                       "Potential field: with no swirl, move the goal to just behind the wall. Where does the AGV stop, and what is ∇U there?"],
-      demo: { scene: "apf", set: { gy: 2.4, kr: 1, vort: 0 }, press: [], wait: 1 } },
-    { id: "esc", robot: true, text: ["势场：目标仍在墙后（y_g 在 1.5～2.8 m 之间），加一点绕行分量，让 AGV 绕出来到达目标。",
+      demo: { scene: "apf", set: { gy: 2.4, kr: 1, vort: 0 }, press: ["submit"], wait: 1 } },
+    { id: "esc", robot: true, text: ["势场：目标仍在墙后（y_g 在 1.5～2.8 m 之间），加一点绕行分量，让 AGV 绕出来到达目标，提交。",
                                     "Potential field: with the goal still behind the wall (y_g between 1.5 and 2.8 m), add some swirl so the AGV escapes and reaches the goal."],
-      demo: { scene: "apf", set: { gy: 2.4, kr: 1, vort: 0.6 }, press: [], wait: 1 } },
-    { id: "rain", text: ["雨水：找一个落点，让雨水流进东边（右边）的小水塘。在两个落点之间的分界线（分水岭）上，梯度是什么样的？",
+      demo: { scene: "apf", set: { gy: 2.4, kr: 1, vort: 0.6 }, press: ["submit"], wait: 1 } },
+    { id: "rain", text: ["雨水：找一个落点，让雨水流进东边（右边）的小水塘，提交。在两个落点之间的分界线（分水岭）上，梯度是什么样的？",
                          "Rain: find a landing point from which the water reaches the small pond on the east (right). What does the gradient look like on the dividing line (watershed)?"],
-      demo: { scene: "rain", set: { rx: 8.5, ry: 4 }, press: [], wait: 1 } },
+      demo: { scene: "rain", set: { rx: 8.5, ry: 4 }, press: ["submit"], wait: 1 } },
   ],
   think: ["势场导航为什么会卡住？卡住的点上吸引力和斥力是什么关系？绕行分量为什么有时能帮忙、有时反而让 AGV 卡在别处（试试 y_g = 4.2 m）？",
           "Why does potential-field navigation get stuck, and how do the attraction and repulsion compare there? Why does the swirl sometimes help and sometimes trap the AGV elsewhere (try y_g = 4.2 m)?"],
 
   reset(api, s) {},
-  change(api, s, pid) {
-    const p = api.p;
-    if (api.scene === "hill") { const S = slope37(p); if (p.px === 5 && p.py === 3) { if (S.deg >= 5 && S.deg <= 15) api.done("up"); if (Math.abs(S.deg) < 0.5) api.done("lev"); } }
-    if (api.scene === "apf") { const A = apf37(p.gy, p.kr, p.vort); if (A.ok && A.dmin > 0.25) api.done("arr");
-      if (!A.ok && !p.vort) api.done("stuck"); if (A.ok && p.vort > 0 && p.gy >= 1.5 && p.gy <= 2.8) api.done("esc"); }
-    if (api.scene === "rain" && rain37(p.rx, p.ry).lake === 1) api.done("rain");
+  change(api, s, pid) { s.msg = ""; },
+  action(id, api, s) {                                    // 只在点“提交”时判定，拖动滑块经过合格值不算
+    if (id !== "submit") return;
+    const p = api.p; let ok = false; const d = (t) => { api.done(t); ok = true; };
+    if (api.scene === "hill") { const S = slope37(p); if (p.px === 5 && p.py === 3) { if (S.deg >= 5 && S.deg <= 15) d("up"); if (Math.abs(S.deg) < 0.5) d("lev"); } }
+    if (api.scene === "apf") { const A = apf37(p.gy, p.kr, p.vort); if (A.ok && A.dmin > 0.25 && !p.vort) d("arr");
+      if (!A.ok && !p.vort) d("stuck"); if (A.ok && p.vort > 0 && p.gy >= 1.5 && p.gy <= 2.8) d("esc"); }
+    if (api.scene === "rain" && rain37(p.rx, p.ry).lake === 1) d("rain");
+    s.msg = ok ? api.T("对了", "correct") : api.T("还不满足任务要求", "not yet");
   },
   readouts(api, s) {
     const f = api.fmt, p = api.p;
     if (api.scene === "hill") { const S = slope37(p);
       return [[["高度 H", "Height H"], f(H37(p.px, p.py), 2) + " m"], [["梯度 ∇H", "Gradient ∇H"], `(${f(S.g[0], 2)}, ${f(S.g[1], 2)})`], [["最陡的坡度", "Steepest slope"], f(S.gmax, 1) + "°"],
-        [["方向导数 ∇H·û", "Directional derivative ∇H·û"], f(S.D, 3)], [["这个方向的坡度", "Slope this way"], f(S.deg, 1) + "°" + (S.deg > 15 ? api.T("（太陡）", " (too steep)") : S.deg < 0 ? api.T("（下坡）", " (downhill)") : "")]]; }
+        [["方向导数 ∇H·û", "Directional derivative ∇H·û"], f(S.D, 3)], [["这个方向的坡度", "Slope this way"], f(S.deg, 1) + "°" + (S.deg > 15 ? api.T("（太陡）", " (too steep)") : S.deg < 0 ? api.T("（下坡）", " (downhill)") : "")], [["提交结果", "Submission"], s.msg || "—"]]; }
     if (api.scene === "apf") { const A = apf37(p.gy, p.kr, p.vort), e = A.path[A.path.length - 1];
       return [[["结果", "Result"], A.ok ? api.T("到达目标", "reached the goal") : api.T("卡住了", "stuck")], [["步数", "Steps"], String(A.steps)],
-        [["离立柱中心最近", "Closest to a pillar"], f(A.dmin, 2) + " m"], [["终点", "End point"], `(${f(e[0], 2)}, ${f(e[1], 2)}) m`]]; }
+        [["离立柱中心最近", "Closest to a pillar"], f(A.dmin, 2) + " m"], [["终点", "End point"], `(${f(e[0], 2)}, ${f(e[1], 2)}) m`], [["提交结果", "Submission"], s.msg || "—"]]; }
     const R = rain37(p.rx, p.ry);
-    return [[["落点高度", "Height where it lands"], f(Z37(p.rx, p.ry), 2) + " m"], [["流进", "Ends in"], R.lake === 0 ? api.T("西边的大水塘", "the big west pond") : R.lake === 1 ? api.T("东边的小水塘", "the small east pond") : "—"]];
+    return [[["落点高度", "Height where it lands"], f(Z37(p.rx, p.ry), 2) + " m"], [["流进", "Ends in"], R.lake === 0 ? api.T("西边的大水塘", "the big west pond") : R.lake === 1 ? api.T("东边的小水塘", "the small east pond") : "—"], [["提交结果", "Submission"], s.msg || "—"]];
   },
   draw(api, s) {
     const { w, h } = api, css = api.css, p = api.p, mut = css("--muted"), ink = css("--ink"), red = css("--red"), blue = css("--blue"), green = css("--green");

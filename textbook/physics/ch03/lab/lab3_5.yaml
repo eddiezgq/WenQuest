@@ -8,15 +8,15 @@
   - 式: "x_{n+1} = x_n + h f(x_n, t_n)        (3.5.6)"
 步骤:
   - ["选“关节停转测 τ”。把画面左侧的 11 个读数抄入表 1，算出 ln ω。纵轴取 1（ln ω），看数据点是否大致在一条直线上。", "Choose the coast-down. Copy the 11 readings into Table 1 and compute ln ω. Set the vertical axis to 1 (ln ω) and check that the points lie close to a line."]
-  - ["用最小二乘法拟合 ln ω–t，求斜率 b 及其标准不确定度 u(b)（式 (1.6.5)），τ = −1/b，u(τ) = u(b)/b²。写出 τ = (τ̄ ± U) s（k = 2）。把“你测得的 τ”调到 τ̄，点“提交 τ”（任务 1）。红虚线按你的 τ 画出，应与数据点吻合。", "Fit ln ω against t, find the slope b and u(b) (Eq. (1.6.5)); τ = −1/b, u(τ) = u(b)/b². Write τ = (τ̄ ± U) s with k = 2. Set “Your τ” and press “Submit τ” (task 1). The red dashed line uses your τ and should follow the points."]
-  - ["选“欧拉法”。h 取 0.4、0.2、0.1、0.05、0.02 s，记录 t ≈ 2 s 处的相对误差，填入表 2，找出误差小于 5% 的步长（任务 2）。", "Choose Euler. For h = 0.4, 0.2, 0.1, 0.05 and 0.02 s record the relative error near t = 2 s in Table 2 and find a step with error below 5% (task 2)."]
-  - ["把 h 加大到 τ 以上和 2τ 以上，观察欧拉解（任务 3、4）。", "Increase h above τ and above 2τ and watch the Euler solution (tasks 3 and 4)."]
-  - ["选“咖啡变凉”，无盖、有盖各找出降到 60 °C 的时刻（任务 5），与公式 t = τ ln(70/40) 比较。", "Choose the coffee. Find when it reaches 60 °C with and without the lid (task 5) and compare with t = τ ln(70/40)."]
+  - ["用最小二乘法拟合 ln ω–t，求斜率 p 及其标准不确定度 u(p)（式 (1.6.5)），τ = −1/p，u(τ) = u(p)/p²。写出 τ = (τ̄ ± U) s（k = 2）。把“你测得的 τ”调到 τ̄，点“提交”（任务 1）。提交后才画出按你的 τ 计算的红虚线，看它是否与数据点吻合。", "Fit ln ω against t, find the slope p and u(p) (Eq. (1.6.5)); τ = −1/p, u(τ) = u(p)/p². Write τ = (τ̄ ± U) s with k = 2. Set “Your τ” and press “Submit” (task 1). Only then is the red dashed line drawn with your τ; check that it follows the points."]
+  - ["选“欧拉法”。h 取 0.4、0.2、0.1、0.05、0.02 s，记录 t ≈ 2 s 处的相对误差，填入表 2，找出误差小于 5% 的步长，提交（任务 2）。", "Choose Euler. For h = 0.4, 0.2, 0.1, 0.05 and 0.02 s record the relative error near t = 2 s in Table 2 and find a step with error below 5% (task 2)."]
+  - ["把 h 加大到 τ 以上和 2τ 以上，观察欧拉解，各提交一次（任务 3、4）。", "Increase h above τ and above 2τ and watch the Euler solution (tasks 3 and 4)."]
+  - ["选“咖啡变凉”，无盖、有盖各找出降到 60 °C 的时刻，无盖时提交（任务 5），与公式 t = τ ln(70/40) 比较。", "Choose the coffee. Find when it reaches 60 °C with and without the lid (task 5) and compare with t = τ ln(70/40)."]
 数据表:
   - 标题: ["表 1  关节停转的转速读数", "Table 1  Coast-down speed readings"]
     表头: ["t / s", "ω / (rad/s)", "ln(ω / (rad/s))"]
     表头英文: ["t / s", "ω / (rad/s)", "ln(ω / (rad/s))"]
-    行: [["0.0", "", ""], ["0.2", "", ""], ["0.4", "", ""], ["0.6", "", ""], ["0.8", "", ""], ["1.0", "", ""], ["1.2", "", ""], ["1.4", "", ""], ["1.6", "", ""], ["1.8", "", ""], ["2.0", "", ""], ["斜率 b ± u(b) / s⁻¹", "", ""], ["τ = (τ̄ ± U) s，k = 2", "", ""]]
+    行: [["0.0", "", ""], ["0.2", "", ""], ["0.4", "", ""], ["0.6", "", ""], ["0.8", "", ""], ["1.0", "", ""], ["1.2", "", ""], ["1.4", "", ""], ["1.6", "", ""], ["1.8", "", ""], ["2.0", "", ""], ["斜率 p ± u(p) / s⁻¹", "", ""], ["τ = (τ̄ ± U) s，k = 2", "", ""]]
   - 标题: ["表 2  欧拉法的误差与步长", "Table 2  Euler error against step"]
     表头: ["h / s", "0.4", "0.2", "0.1", "0.05", "0.02"]
     表头英文: ["h / s", "0.4", "0.2", "0.1", "0.05", "0.02"]
@@ -26,7 +26,7 @@
     表头英文: ["", "τ / min", "Read off / min", "τ ln(70/40) / min"]
     行: [["无盖", "22", "", ""], ["有盖", "40", "", ""]]
 注意:
-  - ["读数的误差按序号确定，重新打开页面读数不变。真实的时间常数没有显示，判定只看你提交的结果是否在真实值的 4% 以内。", "The reading errors are fixed by the sample number. The true time constant is not shown; the task checks only whether your result is within 4% of it."]
+  - ["读数的误差按序号确定，重新打开页面读数不变。真实的时间常数没有显示，判定只看你提交的结果是否在真实值的 2% 以内。其余任务也都要点“提交”才判定。", "The reading errors are fixed by the sample number. The true time constant is not shown; the task checks only whether your result is within 2% of it. The other tasks are also judged only when you press “Submit”."]
   - ["ω 很小时，零点误差相对变大，ln ω 的分散也变大。可以比较“用全部 11 点”和“只用前 8 点”拟合的结果。", "At small ω the zero error matters more and ln ω scatters more; compare fits with all 11 points and with the first 8 only."]
 思考题:
   - ["只用第一个和最后一个读数（两点法）也能求 τ。它与拟合的结果相比如何？哪一个更可信？", "τ can also be found from the first and the last reading alone. How does that compare with the fit, and which is more trustworthy?"]

@@ -58,6 +58,9 @@ for h, c in ((0.4, "#f0a35e"), (0.1, d.VA)):
     te, we = euler(h, 4.0)
     ax.plot(te, we, "o-", ms=3, lw=1, color=c, label=T(f"欧拉法 h = {h:g} s", f"Euler, h = {h:g} s"))
 ax.axvline(tau, color=d.MUTED, lw=0.8, ls=":"); ax.text(tau + 0.05, 2.6, r"$t=\tau$", color=d.MUTED, fontsize=9)
+ax.plot([0, tau], [w0, 0], color=d.VR, lw=1.2, ls="--")            # t = 0 处的切线与 t 轴交于 τ
+ax.annotate(T("t = 0 处的切线\n交 t 轴于 τ", "tangent at t = 0\nmeets the axis at τ"), xy=(0.5, 1.12), xytext=(1.25, 1.55), color=d.VR, fontsize=8.5,
+            arrowprops=dict(arrowstyle="->", color=d.VR, lw=0.8))
 ax.axhline(w0 / math.e, color=d.MUTED, lw=0.8, ls=":"); ax.text(2.6, w0 / math.e + 0.08, r"$\omega_0/\mathrm{e}$", color=d.MUTED, fontsize=9)
 ax.set_xlabel("t / s"); ax.set_ylabel(r"$\omega$ / (rad/s)"); ax.legend(frameon=False, fontsize=8.5); d.spines(ax)
 ax = axs[1]

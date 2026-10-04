@@ -1,6 +1,7 @@
 // 实验 3.5 时间常数与欧拉法（配 3.5 节）。
 // 停转场景（测量型）：关节断电后靠粘性摩擦停下，编码器每 0.2 s 给一个转速读数（相对误差约 ±3%，另有 ±0.012 rad/s 的零点误差，
-// 按序号确定的伪随机数）。真实的时间常数 0.65 s 学生不知道；学生画 ln ω–t 图拟合斜率求 τ，提交结果，与真实值相差 4% 以内算对。
+// 按序号确定的伪随机数）。学生画 ln ω–t 图拟合斜率求 τ，提交结果，与真实值相差 2% 以内算对（约为拟合标准不确定度的 2 倍）；
+// 提交之后才画出按学生的 τ 计算的曲线，避免靠目测对齐。其余任务也都在点“提交”时判定。
 // 欧拉法场景：dω/dt = −ω/τ，τ = 0.8 s，学生选步长 h，看欧拉解与精确解；h > τ 时来回振荡，h > 2τ 时发散。
 // 咖啡场景：T = 20 + 70 e^(−t/τ)，有盖 τ = 40 min，无盖 τ = 22 min；学生找到降到 60 °C 的时刻。
 const TAU35 = 0.65, W035 = 2.8;
@@ -37,43 +38,40 @@ WQ.lab({
     { id: "lid", name: ["杯盖：0 无盖，1 有盖", "Lid: 0 off, 1 on"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
     { id: "tw", name: ["等待时间", "Waiting time"], min: 0, max: 60, step: 0.5, value: 5, unit: "min", digits: 1 },
   ],
-  buttons: [{ id: "submit", name: ["提交 τ（停转）", "Submit τ (coast-down)"], primary: true }],
+  buttons: [{ id: "submit", name: ["提交", "Submit"], primary: true }],
   tasks: [
-    { id: "tau", robot: true, text: ["停转：由读数拟合求出时间常数，提交（与真实值相差 4% 以内）。用 ln ω–t 图为什么比 ω–t 图好？",
-                                    "Coast-down: fit the readings for the time constant and submit it (within 4% of the true value). Why is the ln ω–t plot better than the ω–t plot?"],
+    { id: "tau", robot: true, text: ["停转：由读数拟合求出时间常数，提交（与真实值相差 2% 以内）。用 ln ω–t 图为什么比 ω–t 图好？",
+                                    "Coast-down: fit the readings for the time constant and submit it (within 2% of the true value). Why is the ln ω–t plot better than the ω–t plot?"],
       demo: { scene: "coast", set: { yax: 1, tauhat: 0.645 }, press: ["submit"], wait: 1 } },
-    { id: "e5", text: ["欧拉法：选步长，使 t ≈ 2 s 处的相对误差小于 5%。", "Euler: choose h so that the relative error near t = 2 s is below 5%."],
-      demo: { scene: "euler", set: { h: 0.03 }, press: [], wait: 1 } },
-    { id: "osc", text: ["欧拉法：加大步长，找出欧拉解开始正负来回跳的范围（仍然逐渐变小）。", "Euler: increase h until the Euler solution flips sign every step (while still shrinking)."],
-      demo: { scene: "euler", set: { h: 1.2 }, press: [], wait: 1 } },
-    { id: "div", text: ["欧拉法：步长再大，解会越跳越大（发散）。这个临界步长与 τ 是什么关系？", "Euler: with a still larger step the solution grows without bound. How does this critical step relate to τ?"],
-      demo: { scene: "euler", set: { h: 1.8 }, press: [], wait: 1 } },
-    { id: "cof", text: ["咖啡：无盖时，找到温度降到 60 °C 的时刻（相差 1 °C 以内）。有盖时要多等多久？", "Coffee: without the lid, find when the temperature reaches 60 °C (within 1 °C). How much longer with the lid?"],
-      demo: { scene: "coffee", set: { lid: 0, tw: 12.5 }, press: [], wait: 1 } },
+    { id: "e5", text: ["欧拉法：选步长，使 t ≈ 2 s 处的相对误差小于 5%，提交。", "Euler: choose h so that the relative error near t = 2 s is below 5%, and submit."],
+      demo: { scene: "euler", set: { h: 0.03 }, press: ["submit"], wait: 1 } },
+    { id: "osc", text: ["欧拉法：加大步长，找一个让欧拉解每一步正负来回跳、但仍逐渐变小的步长，提交。", "Euler: find a step for which the Euler solution flips sign every step while still shrinking, and submit."],
+      demo: { scene: "euler", set: { h: 1.2 }, press: ["submit"], wait: 1 } },
+    { id: "div", text: ["欧拉法：步长再大，解会越跳越大（发散）。找一个这样的步长，提交。这个临界步长与 τ 是什么关系？", "Euler: with a still larger step the solution grows without bound. Find such a step and submit. How does this critical step relate to τ?"],
+      demo: { scene: "euler", set: { h: 1.8 }, press: ["submit"], wait: 1 } },
+    { id: "cof", text: ["咖啡：无盖时，找到温度降到 60 °C 的时刻（相差 1 °C 以内），提交。有盖时要多等多久？", "Coffee: without the lid, find when the temperature reaches 60 °C (within 1 °C) and submit. How much longer with the lid?"],
+      demo: { scene: "coffee", set: { lid: 0, tw: 12.5 }, press: ["submit"], wait: 1 } },
   ],
   think: ["停转实验中，尾部的读数（ω 很小时）在 ln ω 图上为什么比前面的分散得多？拟合时应当怎样对待它们？欧拉法发散的临界步长为什么正好是 2τ？",
           "Why are the late readings (small ω) much more scattered on the ln ω plot, and how should the fit treat them? Why is the critical Euler step exactly 2τ?"],
 
   reset(api, s) {},
   action(id, api, s) {
-    if (id === "submit" && api.scene === "coast") {
-      const ok = Math.abs(api.p.tauhat - TAU35) / TAU35 < 0.04;
-      s.msg = ok ? api.T("对了", "correct") : api.T("不对，再检查拟合", "not yet, check your fit");
-      if (ok) api.done("tau");
-    }
+    if (id !== "submit") return;
+    const p = api.p; let ok = false;
+    if (api.scene === "coast") { s.shown = true; ok = Math.abs(p.tauhat - TAU35) / TAU35 < 0.02; if (ok) api.done("tau"); }
+    if (api.scene === "euler") { const E = err35(p.h); if (E.rel < 5) { api.done("e5"); ok = true; } if (p.h > TE35 && p.h < 2 * TE35) { api.done("osc"); ok = true; } if (p.h > 2 * TE35) { api.done("div"); ok = true; } }
+    if (api.scene === "coffee" && !p.lid && Math.abs(cof35(p.tw, 0) - 60) <= 1) { api.done("cof"); ok = true; }
+    s.msg = ok ? api.T("对了", "correct") : api.T("还不满足任务要求", "not yet");
   },
-  change(api, s, pid) {
-    const p = api.p;
-    if (api.scene === "euler") { const E = err35(p.h); if (E.rel < 5) api.done("e5"); if (p.h > TE35 && p.h < 2 * TE35) api.done("osc"); if (p.h > 2 * TE35) api.done("div"); }
-    if (api.scene === "coffee" && !p.lid && Math.abs(cof35(p.tw, 0) - 60) <= 1) api.done("cof");
-  },
+  change(api, s, pid) { s.msg = ""; if (pid === "tauhat") s.shown = false; },
   readouts(api, s) {
     const f = api.fmt, p = api.p;
     if (api.scene === "coast") return [[["读数个数", "Readings"], String(DATA35.length)], [["ω₀（第一个读数）", "ω₀ (first reading)"], f(DATA35[0][1], 3) + " rad/s"],
       [["你测得的 τ", "Your τ"], f(p.tauhat, 3) + " s"], [["提交结果", "Submission"], s.msg || "—"]];
     if (api.scene === "euler") { const E = err35(p.h); return [[["步长 h / τ", "h / τ"], f(p.h / TE35, 2)], [["t ≈ 2 s 处（实际 t）", "near t = 2 s (actual t)"], f(E.t, 2) + " s"],
-      [["欧拉解", "Euler"], f(E.wn, 4) + " rad/s"], [["精确解", "Exact"], f(E.ex, 4) + " rad/s"], [["相对误差", "Relative error"], f(E.rel, 1) + "%"]]; }
-    return [[["时间常数 τ", "Time constant τ"], tauC35(p.lid) + " min"], [["等待时间", "Waiting time"], f(p.tw, 1) + " min"], [["咖啡温度", "Coffee temperature"], f(cof35(p.tw, p.lid), 1) + " °C"]];
+      [["欧拉解", "Euler"], f(E.wn, 4) + " rad/s"], [["精确解", "Exact"], f(E.ex, 4) + " rad/s"], [["相对误差", "Relative error"], f(E.rel, 1) + "%"], [["提交结果", "Submission"], s.msg || "—"]]; }
+    return [[["时间常数 τ", "Time constant τ"], tauC35(p.lid) + " min"], [["等待时间", "Waiting time"], f(p.tw, 1) + " min"], [["咖啡温度", "Coffee temperature"], f(cof35(p.tw, p.lid), 1) + " °C"], [["提交结果", "Submission"], s.msg || "—"]];
   },
   draw(api, s) {
     const { w, h } = api, css = api.css, p = api.p, blue = css("--blue"), mut = css("--muted"), ink = css("--ink"), red = css("--red");
@@ -85,9 +83,11 @@ WQ.lab({
       const lg = !!p.yax;
       const G = api.graph({ x: w * 0.3, y: 26, w: w * 0.66, h: h - 80, xmin: 0, xmax: 2.2, ymin: lg ? -2.5 : 0, ymax: lg ? 1.5 : 3.2, xlabel: "t / s", ylabel: lg ? "ln(ω / (rad/s))" : "ω / (rad/s)" }).axes();
       DATA35.forEach(([t, v]) => G.point(t, lg ? Math.log(v) : v, blue));
-      if (lg) G.line(0, Math.log(DATA35[0][1]), -1 / p.tauhat, red, 1.5, [6, 4]);
-      else G.fn((t) => DATA35[0][1] * Math.exp(-t / p.tauhat), red, 1.5, [6, 4]);
-      G.text(api.T("红虚线：按你的 τ 画出", "red dashed: drawn with your τ"), 1.0, lg ? 1.2 : 3.0, red, 11);
+      if (s.shown) {                                       // 提交之后才画按学生的 τ 计算的曲线
+        if (lg) G.line(0, Math.log(DATA35[0][1]), -1 / p.tauhat, red, 1.5, [6, 4]);
+        else G.fn((t) => DATA35[0][1] * Math.exp(-t / p.tauhat), red, 1.5, [6, 4]);
+        G.text(api.T("红虚线：按你提交的 τ 画出", "red dashed: drawn with the τ you submitted"), 1.0, lg ? 1.2 : 3.0, red, 11);
+      }
       return;
     }
     if (api.scene === "euler") {

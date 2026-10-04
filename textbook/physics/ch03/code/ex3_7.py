@@ -30,7 +30,7 @@ c = smax / gmag
 half = math.degrees(math.acos(c))                     # 与最陡上坡方向夹角超过 half 才不超过 15°
 phi_e = 0.0                                           # 朝正东行驶
 D_e = float(grad @ np.array([1.0, 0.0]))
-out(gx=grad[0], gy=grad[1], gmag=gmag, half_c=180 - half, top=math.degrees(math.atan2(-P[1], -P[0])), gdeg=math.degrees(math.atan(gmag)), up=up, smax=smax, half=half,
+out(gx=grad[0], gy=grad[1], gmag=gmag, half_c=180 - half, top=math.degrees(math.atan2(-P[1], -P[0])), up360=math.degrees(math.atan2(grad[1], grad[0])) % 360, top360=math.degrees(math.atan2(-P[1], -P[0])) % 360, gdeg=math.degrees(math.atan(gmag)), up=up, smax=smax, half=half,
     D_e=D_e, D_edeg=math.degrees(math.atan(abs(D_e))), hP=h(*P))
 
 # ---- 算例 3.7.2：正规方程

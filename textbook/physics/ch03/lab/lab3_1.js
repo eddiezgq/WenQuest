@@ -16,10 +16,11 @@ function enc31(n, meth) {                                        // 0.6～3.4 s 
 }
 const I31 = (t) => 8 + 22 * (1 - Math.exp(-t / 25)) + 5 * Math.sin(1.3 * t) * Math.exp(-t / 200), T31 = 120;
 const QREF31 = (() => { let s = 0; const h = 0.01, n = Math.round(T31 / h); for (let i = 0; i < n; i++) s += (I31(i * h) + I31((i + 1) * h)) / 2 * h; return s; })();
+const ts31 = (dt) => { const t = []; for (let k = 0; k * dt < T31 - 1e-9; k++) t.push(k * dt); t.push(T31); return t; };   // Δt 不整除 120 s 时，最后一段较短
 function bat31(dt, rule) {
-  const n = Math.floor(T31 / dt + 1e-9); let s = 0;
-  for (let i = 0; i < n; i++) s += rule ? (I31(i * dt) + I31((i + 1) * dt)) / 2 * dt : I31(i * dt) * dt;
-  return { Q: s, err: 100 * (s - QREF31) / QREF31, n: n + 1 };
+  const t = ts31(dt); let s = 0;
+  for (let i = 0; i + 1 < t.length; i++) { const h = t[i + 1] - t[i]; s += rule ? (I31(t[i]) + I31(t[i + 1])) / 2 * h : I31(t[i]) * h; }
+  return { Q: s, err: 100 * (s - QREF31) / QREF31, n: t.length };
 }
 function hash31(a, b) { const x = Math.sin(a * 12.9898 + b * 78.233 + 1.2345) * 43758.5453; return x - Math.floor(x); }
 const gn31 = (k) => (hash31(k, 1.1) + hash31(k, 2.2) + hash31(k, 3.3) + hash31(k, 4.4) - 2) * Math.sqrt(3) * 2.0;   // 近似正态，σ = 2 m
@@ -56,44 +57,45 @@ WQ.lab({
     { id: "rule", name: ["方法：0 左矩形和，1 梯形法", "Rule: 0 left rectangles, 1 trapezoid"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
     { id: "w", name: ["半窗口 w", "Half-window w"], min: 1, max: 20, step: 1, value: 1, unit: "s", digits: 0 },
   ],
-  buttons: [],
+  buttons: [{ id: "submit", name: ["提交我的选择", "Submit my choice"], primary: true }],
   tasks: [
-    { id: "encF", robot: true, text: ["编码器：用前向差分，找一个 n 使速度的方均根误差小于 0.012 m/s。n 比这大或小，误差为什么都变大？",
-                                     "Encoder: with forward differences, find n that brings the RMS speed error below 0.012 m/s. Why does the error grow when n is larger or smaller?"],
-      demo: { scene: "enc", set: { meth: 0, n: 5 }, press: [], wait: 1 } },
-    { id: "encC", robot: true, text: ["编码器：改用中心差分，找一个 n 使方均根误差小于 0.0025 m/s。最佳的 h 比前向差分大还是小？",
-                                     "Encoder: switch to central differences and find n that brings the RMS error below 0.0025 m/s. Is the best h larger or smaller than for forward differences?"],
-      demo: { scene: "enc", set: { meth: 1, n: 10 }, press: [], wait: 1 } },
-    { id: "batT", robot: true, text: ["安时积分：用梯形法，找出误差不超过 0.1% 的最大采样间隔。",
-                                     "Coulomb counting: with the trapezoid rule, find the largest sampling interval whose error is within 0.1%."],
-      demo: { scene: "bat", set: { rule: 1, dt: 2 }, press: [], wait: 1 } },
-    { id: "batL", robot: true, text: ["安时积分：同样的采样间隔改用左矩形和，误差是梯形法的多少倍？为什么左矩形和总是偏小？",
-                                     "Coulomb counting: at the same interval use left rectangles. How many times larger is the error, and why is it always low?"],
-      demo: { scene: "bat", set: { rule: 0, dt: 2 }, press: [], wait: 1 } },
-    { id: "gps", text: ["手机：选半窗口 w，使速度的方均根误差小于 0.26 m/s。窗口太大时，停下和起步的时刻看起来怎样？",
-                        "Phone: choose w so that the RMS speed error is below 0.26 m/s. With a large window, what do the stop and the restart look like?"],
-      demo: { scene: "gps", set: { w: 8 }, press: [], wait: 1 } },
+    { id: "encF", robot: true, text: ["编码器：用前向差分，找一个 n 使速度的方均根误差小于 0.012 m/s，点“提交我的选择”。n 比这大或小，误差为什么都变大？",
+                                     "Encoder: with forward differences, find n that brings the RMS speed error below 0.012 m/s and press “Submit my choice”. Why does the error grow when n is larger or smaller?"],
+      demo: { scene: "enc", set: { meth: 0, n: 5 }, press: ["submit"], wait: 1 } },
+    { id: "encC", robot: true, text: ["编码器：改用中心差分，找一个 n 使方均根误差小于 0.0025 m/s，提交。最佳的 h 比前向差分大还是小？",
+                                     "Encoder: switch to central differences and find n that brings the RMS error below 0.0025 m/s and submit it. Is the best h larger or smaller than for forward differences?"],
+      demo: { scene: "enc", set: { meth: 1, n: 10 }, press: ["submit"], wait: 1 } },
+    { id: "batT", robot: true, text: ["安时积分：用梯形法，找出误差不超过 0.1% 的最大采样间隔，提交。",
+                                     "Coulomb counting: with the trapezoid rule, find the largest sampling interval whose error is within 0.1% and submit it."],
+      demo: { scene: "bat", set: { rule: 1, dt: 2 }, press: ["submit"], wait: 1 } },
+    { id: "batL", robot: true, text: ["安时积分：同样的采样间隔改用左矩形和，提交。误差是梯形法的多少倍？电流总体在上升，为什么左矩形和多半偏小？",
+                                     "Coulomb counting: at the same interval use left rectangles and submit. How many times larger is the error, and why is it mostly low while the current rises?"],
+      demo: { scene: "bat", set: { rule: 0, dt: 2 }, press: ["submit"], wait: 1 } },
+    { id: "gps", text: ["手机：选半窗口 w，使速度的方均根误差小于 0.26 m/s，提交。窗口太大时，停下和起步的时刻看起来怎样？",
+                        "Phone: choose w so that the RMS speed error is below 0.26 m/s and submit. With a large window, what do the stop and the restart look like?"],
+      demo: { scene: "gps", set: { w: 8 }, press: ["submit"], wait: 1 } },
   ],
-  think: ["三个场景里，步长（窗口）都不是越小越好。误差由哪两部分组成？各自怎样随步长变化？电量场景中 Δt = 5 s、10 s 时误差忽大忽小，说明了什么？",
-          "In all three scenes a smaller step is not always better. Which two parts make up the error, and how does each depend on the step? What do the erratic errors at Δt = 5 s and 10 s in the battery scene tell you?"],
+  think: ["编码器和手机两个场景里，步长（窗口）不是越小越好：误差由哪两部分组成？各自怎样随步长变化？电量记录没有噪声，Δt 越小越准；但 Δt 在 4 s 以上时误差忽大忽小，说明了什么？",
+          "In the encoder and phone scenes a smaller step is not always better: which two parts make up the error, and how does each depend on the step? The current log has no noise, so a smaller Δt is always more accurate; but above 4 s the error jumps about. What does that tell you?"],
 
   reset(api, s) {},
-  change(api, s, pid) { check31(api); },
+  action(id, api, s) { if (id === "submit") { s.msg = check31(api) ? api.T("对了", "correct") : api.T("还不满足任务要求", "not yet"); } },
+  change(api, s, pid) { s.msg = ""; },
   readouts(api, s) {
     const f = api.fmt, p = api.p;
     if (api.scene === "enc") {
       const E = enc31(p.n, p.meth);
       return [[["方法", "Method"], p.meth ? api.T("中心差分", "central") : api.T("前向差分", "forward")], [["步长 h", "Step h"], f(p.n * 10, 0) + " ms"],
-        [["速度的方均根误差", "RMS speed error"], f(E.rms, 4) + " m/s"], [["读数分辨率造成的误差约", "Error from the resolution, about"], f(Q31 / (p.n * DT31) / (p.meth ? 2 : 1), 4) + " m/s"]];
+        [["速度的方均根误差", "RMS speed error"], f(E.rms, 4) + " m/s"], [["提交结果", "Submission"], s.msg || "—"], [["读数分辨率造成的误差最大约", "Error from the resolution, at most about"], f(Q31 / (p.n * DT31) / (p.meth ? 2 : 1), 4) + " m/s"]];
     }
     if (api.scene === "bat") {
       const B = bat31(p.dt, p.rule);
       return [[["方法", "Rule"], p.rule ? api.T("梯形法", "trapezoid") : api.T("左矩形和", "left rectangles")], [["采样点数", "Samples"], String(B.n)],
-        [["算出的电荷量", "Computed charge"], f(B.Q, 1) + " C"], [["参考值（0.01 s 记录）", "Reference (0.01 s log)"], f(QREF31, 1) + " C"], [["相对误差", "Relative error"], f(B.err, 3) + "%"]];
+        [["算出的电荷量", "Computed charge"], f(B.Q, 1) + " C"], [["参考值（0.01 s 记录）", "Reference (0.01 s log)"], f(QREF31, 1) + " C"], [["相对误差", "Relative error"], f(B.err, 3) + "%"], [["提交结果", "Submission"], s.msg || "—"]];
     }
     const G = gps31(p.w);
     return [[["半窗口 w", "Half-window w"], p.w + " s"], [["速度的方均根误差", "RMS speed error"], f(G.rms, 2) + " m/s"],
-      [["位置误差造成的速度误差约", "Speed error from position noise, about"], f(2 * Math.SQRT2 / (2 * p.w), 2) + " m/s"]];
+      [["位置误差造成的速度误差约", "Speed error from position noise, about"], f(2 * Math.SQRT2 / (2 * p.w), 2) + " m/s"], [["提交结果", "Submission"], s.msg || "—"]];
   },
   draw(api, s) {
     const { w, h } = api, css = api.css, p = api.p, blue = css("--blue"), mut = css("--muted"), red = css("--red");
@@ -134,13 +136,15 @@ WQ.lab({
   },
 });
 
-function check31(api) {
-  const p = api.p;
-  if (api.scene === "enc") { const E = enc31(p.n, p.meth); if (!p.meth && E.rms < 0.012) api.done("encF"); if (p.meth && E.rms < 0.0025) api.done("encC"); }
+function check31(api) {                                // 只在点“提交我的选择”时判定，拖动滑块经过合格值不算
+  const p = api.p; let ok = false;
+  if (api.scene === "enc") { const E = enc31(p.n, p.meth); if (!p.meth && E.rms < 0.012) { api.done("encF"); ok = true; } if (p.meth && E.rms < 0.0025) { api.done("encC"); ok = true; } }
   if (api.scene === "bat") {
     const B = bat31(p.dt, p.rule);
-    if (p.rule && Math.abs(B.err) <= 0.1 && p.dt === 2) api.done("batT");
-    if (!p.rule && p.dt === 2) api.done("batL");
+    let all = true; for (let d = 0.5; d <= p.dt + 1e-9; d += 0.5) if (Math.abs(bat31(d, 1).err) > 0.1) all = false;   // 从 0.5 s 到所选 Δt 都在 0.1% 以内（个别更大的 Δt 碰巧准确不算）
+    if (p.rule && all && Math.abs(bat31(p.dt + 0.5, 1).err) > 0.1) { api.done("batT"); ok = true; }
+    if (!p.rule && p.dt === 2) { api.done("batL"); ok = true; }
   }
-  if (api.scene === "gps" && gps31(p.w).rms < 0.26) api.done("gps");
+  if (api.scene === "gps" && gps31(p.w).rms < 0.26) { api.done("gps"); ok = true; }
+  return ok;
 }
