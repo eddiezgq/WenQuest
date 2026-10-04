@@ -34,6 +34,11 @@ GPUS = {
     # HBM3 3.35 TB/s，L2 50 MB（NVIDIA H100 架构白皮书 2022；H100 数据手册）
     "h100": dict(name="H100", year=2022, arch="Hopper", sm=132, cores=16896, clock=1980e6, fp32=67e12, fp16t=989.4e12,
                  bw=3.35e12, mem=80e9, l2=50 * 2 ** 20),
+    # A10（Ampere GA102，2021，数据中心卡，PCIe 4.0 ×16，150 W）：9216 个 FP32 核心，FP32 31.2 TFLOP/s，FP16 张量核心 125 TFLOP/s
+    # （稠密，计入稀疏为 250），GDDR6 24 GB、600 GB/s（NVIDIA A10 数据手册；Lenovo 产品指南 LP1816）。SM 数按每 SM 128 个 FP32
+    # 核心为 72 个，频率由 31.2 TFLOP/s ÷ (9216 × 2) 反推约 1695 MHz；L2 6 MB（GA102）。云平台上常见的“入门”卡（Lambda gpu_1x_a10）。
+    "a10": dict(name="A10", year=2021, arch="Ampere", sm=72, cores=9216, clock=1695e6, fp32=31.2e12, fp16t=125e12,
+                bw=600e9, mem=24e9, l2=6 * 2 ** 20),
     # GeForce RTX 4090（Ada Lovelace，2022）：128 个 SM、16 384 个核心、2520 MHz；FP32 82.6 TFLOP/s；FP16 张量核心
     # （FP32 累加）165.2 TFLOP/s（稠密），GDDR6X 1008 GB/s，24 GB，L2 72 MB（NVIDIA Ada GPU 架构白皮书 2022）
     "rtx4090": dict(name="RTX 4090", year=2022, arch="Ada", sm=128, cores=16384, clock=2520e6, fp32=82.6e12, fp16t=165.2e12,
@@ -65,4 +70,7 @@ H100_LAT = dict(l2=145e-9, hbm=353e-9)
 
 # 代表性的服务器 CPU（与第 1 章 _ch1.py 中 CPU 相同的教学假设，不对应某一型号）：64 核，3.0 GHz，每核每周期 64 FLOP（FP32），
 # 8 通道 DDR5-4800（307.2 GB/s）；访问内存的延迟取 100 ns（服务器 CPU 的常见量级，作估算用）
+# 主机与 GPU 之间的 PCIe 链路，每个方向的理论带宽（×16）：PCIe 4.0 每通道 16 GT/s、PCIe 5.0 32 GT/s，128b/130b 编码
+PCIE = {4: 16e9 * 16 * 128 / 130 / 8, 5: 32e9 * 16 * 128 / 130 / 8}
+
 CPU = dict(cores=64, clock=3.0e9, flop_per_cycle=64, bw=8 * 4800e6 * 8, lat=100e-9, line=64)

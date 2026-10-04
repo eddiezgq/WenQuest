@@ -11,6 +11,8 @@ APP="${1:-}"; BRIDGE="${2:-}"
 
 # 课程接口只读钥匙（第 4 轮 C2）：没有就生成；学习平台的 deploy/update.sh 从这里读去用
 [ -n "$(envval WQ_FACTORY_READ_KEY)" ] || envset WQ_FACTORY_READ_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
+# 工程任务单钥匙（第 11 轮 2.7（5））：学习平台下达任务单、读进度和分数；公共工厂和班级工厂共用，学习平台部署时复制过去
+[ -n "$(envval WQ_FACTORY_TASK_KEY)" ] || envset WQ_FACTORY_TASK_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # ERPNext 单点登录密钥（第 7 轮 E5）：枢纽与 ERPNext 社交登录共用；没有就生成
 [ -n "$(envval WQ_ERP_OAUTH_SECRET)" ] || envset WQ_ERP_OAUTH_SECRET "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # 企业版演示工厂（第 9 轮）的工作台密钥：启动前要有

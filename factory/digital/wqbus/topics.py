@@ -2,7 +2,7 @@
 """主题命名：wq/<工厂>/<区域>/<单元>/<类别>（附录 A.1）。"""
 
 ROOT = "wq/gearbox"
-AREAS = ("office", "design", "machining", "quality", "warehouse", "logistics", "ai")
+AREAS = ("office", "design", "machining", "quality", "warehouse", "logistics", "ai", "field")
 
 # 单元代号 → (区域, 中文名, 英文名, 工厂数据里的工作中心名)
 UNITS = {
@@ -29,7 +29,7 @@ MACHINES = ("saw-01", "cnc-l01-a", "cnc-l01-b", "vmc-01", "hmc-01", "key-01",
             "hob-01", "ht-01", "grd-01", "qc-01", "asm-01", "test-01")
 
 CATEGORIES = ("status", "event", "cmd", "cmd/ack", "measurement", "ncr", "release", "gcode",
-              "alert", "briefing", "proposal", "torque")
+              "alert", "briefing", "proposal", "torque", "telemetry")
 RETAINED = ("status", "briefing")
 
 

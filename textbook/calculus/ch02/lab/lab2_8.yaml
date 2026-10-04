@@ -1,0 +1,35 @@
+# 实验 2.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab2_8.js。
+原理:
+  - ["数据点 (x_i, y_i) 不会恰好落在任何一条曲线上。最小二乘法选择模型的参数，使残差 r_i = y_i − f(x_i) 的平方和最小（2.8.3 节）。多项式模型对参数是线性的，解一个小的线性方程组即可。",
+     "Data points (x_i, y_i) never lie exactly on a curve. Least squares chooses the model's parameters to minimise the sum of squared residuals r_i = y_i − f(x_i) (Section 2.8.3). A polynomial model is linear in its parameters, so a small linear system gives the fit."]
+  - 式: "S = Σ (y_i − f(x_i))²  最小；直线：k = Σ(x_i − x̄)(y_i − ȳ) / Σ(x_i − x̄)²，b = ȳ − k x̄"
+  - ["判断模型好坏，不能只看残差的均方根，还要看残差图：形式正确的模型，残差只是测量误差，正负随机；残差呈现有规律的形状（如 S 形），说明模型漏掉了系统性的部分。指数模型 y = c + A e^(bx)（c 已知：舵机取 0，热茶取室温 20 °C）取对数后对 x 是线性的（2.8.6 节）。",
+     "Do not judge a model by its RMS alone; look at the residual plot. For a model of the right form the residuals are just measurement noise, randomly signed; a systematic shape (such as an S) means the model misses part of the law. The exponential y = c + A e^(bx) (c known: 0 for the servo, room temperature 20 °C for the tea) becomes linear in x after taking logarithms (Section 2.8.6)."]
+  - ["由模型反求“达到目标值需要的输入”，就是求模型的反函数在目标值处的值（2.5.4 节），实验中用二分法计算。",
+     "Finding the input that reaches a target is evaluating the model's inverse at the target (Section 2.5.4); the lab uses bisection."]
+步骤:
+  - ["在“舵机标定”场景中选一次模型（任务 1），记下拟合结果、斜率和残差的均方根，填入表 1；观察残差图的形状。",
+     "In 'Servo calibration' choose the linear model (task 1); record the fit, the slope and the RMS residual in Table 1, and look at the shape of the residual plot."]
+  - ["依次选二次、三次、指数模型，记录残差的均方根和最大值，描述残差图有无规律，找出合适的模型（任务 2）。",
+     "Choose the quadratic, cubic and exponential models in turn; record the RMS and largest residual, describe any pattern, and find a suitable model (task 2)."]
+  - ["把目标角设为 150°，记下各模型反求的脉宽与真值，填入表 2（任务 3）。",
+     "Set the target angle to 150° and record the pulse width each model gives and the true value in Table 2 (task 3)."]
+  - ["切换到“一杯热茶”场景，比较一次模型与指数模型的残差图，把目标温度设为 50 °C，读出茶降到 50 °C 的时刻。",
+     "Switch to 'A cup of tea'; compare the residuals of the linear and exponential models, set the target to 50 °C and read when the tea gets there."]
+数据表:
+  - 标题: ["表 1  舵机数据的拟合（19 组数据）", "Table 1  Fitting the servo data (19 points)"]
+    表头: ["模型", "拟合结果", "均方根 / (°)", "最大残差 / (°)", "残差有无规律"]
+    表头英文: ["Model", "Fit", "RMS / (°)", "Largest residual / (°)", "Pattern?"]
+    行: [["一次", "", "", "", ""], ["二次", "", "", "", ""], ["三次", "", "", "", ""], ["指数", "", "", "", ""]]
+    行英文: [["Linear", "", "", "", ""], ["Quadratic", "", "", "", ""], ["Cubic", "", "", "", ""], ["Exponential", "", "", "", ""]]
+  - 标题: ["表 2  转到 150° 所需的脉宽", "Table 2  Pulse width for 150°"]
+    表头: ["模型", "模型反求 / μs", "真值 / μs", "误差 / μs"]
+    表头英文: ["Model", "From the model / μs", "True / μs", "Error / μs"]
+    行: [["一次", "", "", ""], ["三次", "", "", ""]]
+    行英文: [["Linear", "", "", ""], ["Cubic", "", "", ""]]
+注意:
+  - ["数据由书中写明的示意模型加固定种子的随机误差生成，与程序 2.8.1 完全相同，所以实验能给出“真值”。实际标定时真值未知，只能靠残差和独立的检验数据判断。", "The data come from the stated model plus seeded noise, exactly as in program 2.8.1, so the lab can show the 'true' value. In a real calibration the truth is unknown; residuals and independent check data are all you have."]
+  - ["多项式模型的自变量先换成标准区间上的 u（舵机 u = (p − 1500)/1000），系数是对 u 而言的。", "Polynomial models use a scaled variable u (servo: u = (p − 1500)/1000); the coefficients refer to u."]
+思考题:
+  - ["一次模型的均方根还不到 2°，看上去也不坏。为什么还要看残差图？十次多项式的均方根更小，为什么不用它？", "The linear model's RMS is under 2°, which looks fine. Why look at the residual plot at all? A tenth-degree polynomial has an even smaller RMS; why not use it?"]
+  - ["二次模型为什么几乎没有改善舵机数据的拟合？（提示：数据的偏差关于中点是对称的还是反对称的？）", "Why does the quadratic barely improve the servo fit? (Hint: is the deviation symmetric or antisymmetric about the midpoint?)"]

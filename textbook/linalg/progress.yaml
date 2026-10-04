@@ -17,6 +17,9 @@ chapters:
   2:
     status: ai
     title_en: "Vectors"
+  3:
+    status: ai
+    title_en: "Systems of Linear Equations and Elimination"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"

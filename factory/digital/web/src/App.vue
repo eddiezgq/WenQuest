@@ -69,6 +69,7 @@ const route = useRoute();
 const router = useRouter();
 const nav = [
   { to: '/', label: '首页 · 运营总览' },
+  { to: '/tasks', label: '我的任务' },
   { to: '/work/planner', label: '订单与计划', role: 'planner' },
   { to: '/work/engineer', label: '设计与工艺', role: 'engineer' },
   { to: '/work/operator', label: '车间执行', role: 'operator' },
@@ -86,14 +87,16 @@ const apps = computed(() => [
   { name: '运动与动力', role: 'MBD', href: '/mbd', route: '/mbd' },
   { name: '数控编程', role: 'CAM', href: '/cam', route: '/cam' },
   { name: '设计优化', role: 'OPT', href: '/opt', route: '/opt' },
+  { name: '数字孪生', role: 'TWIN', href: '/twin', route: '/twin' },
   { name: '车间终端', role: 'MES', href: '/work/operator', route: '/work/operator' },
   { name: 'Node-RED', role: '数据流', href: cfg.value.nodered_url || '#', ext: true },
 ].filter((a) => a.name !== 'Node-RED' || cfg.value.nodered_url));   // 线上 Node-RED 不对外（第 3 轮 D8）
 const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
   '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
-  '/design': '设计发布与审批', '/members': '企业成员', '/configurator': '参数配置器', '/cae': '仿真与分析', '/mbd': '运动与动力分析', '/cam': '数控编程', '/opt': '设计优化',
-}[route.path] || (route.path.startsWith('/design/') ? '设计审阅' : '')));
+  '/design': '设计发布与审批', '/members': '企业成员', '/configurator': '参数配置器', '/cae': '仿真与分析', '/mbd': '运动与动力分析', '/cam': '数控编程', '/opt': '设计优化', '/twin': '数字孪生', '/tasks': '我的任务',
+}[route.path] || (route.path.startsWith('/design/') ? '设计审阅' : route.path.startsWith('/tasks/review/') ? '任务单审阅'
+  : route.path.startsWith('/tasks/') ? '工程任务单' : '')));
 const clock = ref('');
 let timer;
 function tick() {

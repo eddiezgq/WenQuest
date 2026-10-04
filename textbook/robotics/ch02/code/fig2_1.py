@@ -47,9 +47,9 @@ ax.plot([b[0], v[0]], [b[1], v[1]], color=C["muted"], lw=0.8, ls="--")
 ax.text(a[0] + 0.0, a[1] - 0.075, r"$\dot\theta_1 j_1$", color=C["z"], fontsize=12)
 ax.text(b[0] - 0.01, b[1] - 0.06, r"$\dot\theta_2 j_2$", color=C["accent"], fontsize=12)
 ax.text(v[0] + 0.015, v[1] + 0.0, r"$v = J\dot\theta$", color=C["ink"], fontsize=12)
-ax.text(tip[0] + 0.02, tip[1] - 0.05, T("末端", "tip"), fontsize=10, color=C["ink"])
+ax.text(tip[0] + 0.02, tip[1] - 0.05, T("末端", "end-effector"), fontsize=10, color=C["ink"])
 ax.text(-0.08, -0.15, T("蓝：只转关节 1 时末端的速度；金：只转关节 2 时末端的速度；黑：两者之和",
-                        "blue: tip velocity from joint 1 alone; gold: from joint 2 alone; black: their sum"),
+                        "blue: end-effector velocity from joint 1 alone; gold: from joint 2 alone; black: their sum"),
         fontsize=9, color=C["ink"])
 ax.set_xlim(-0.1, 0.75)
 ax.set_ylim(-0.2, 0.9)
@@ -60,6 +60,7 @@ plt.close(fig)
 L1, L2 = L2R
 t2 = np.linspace(-180, 180, 361)
 detJ = L1 * L2 * np.sin(np.radians(t2))
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”
 fig = plt.figure(figsize=(6.6, 4.0))
 ax = fig.add_axes([0.1, 0.14, 0.86, 0.5])
 ax.plot(t2, detJ, color=C["z"], lw=1.6)

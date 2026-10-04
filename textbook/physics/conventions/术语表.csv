@@ -52,6 +52,10 @@
 2,球面坐标,spherical coordinates,
 2,位置矢量,position vector,
 2,方向余弦,direction cosine,
+2,位移,displacement,与《线性代数》中的“位移”（shift，平移）含义不同
+2,路程,distance travelled,
+2,力矩,torque; moment of force; moment,
+2,三角形法则,triangle rule,
 3,导数,derivative,
 3,变化率,rate of change,
 3,瞬时变化率,instantaneous rate of change,
@@ -71,8 +75,6 @@
 4,运动学,kinematics,
 4,参考系,reference frame,
 4,质点,particle,
-4,位移,displacement,与《线性代数》中的“位移”（shift，平移）含义不同
-4,路程,distance travelled,
 4,速度,velocity,
 4,速率,speed,
 4,平均速度,average velocity,
@@ -211,7 +213,6 @@
 12,转动惯量,moment of inertia,
 12,平行轴定理,parallel-axis theorem,
 12,回转半径,radius of gyration,
-12,力矩,torque; moment of force; moment,
 12,力臂,lever arm,
 12,转动定律,rotational form of Newton's second law,
 12,滚动,rolling,

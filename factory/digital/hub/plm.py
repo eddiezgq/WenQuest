@@ -23,6 +23,8 @@ def item_info(item, erp_lookup=None):
     """物料是否存在：先查工厂数据，再（线上）查 ERPNext。返回 {item, name, routing_ops} 或 None"""
     if item in F.ITEMS:
         name = F.ITEMS[item][0]
+    elif item in getattr(F, "CASE_ITEMS", {}):               # 教材案例件（第 11 轮）
+        name = F.CASE_ITEMS[item][0]
     elif erp_lookup:
         name = erp_lookup(item)
         if not name:
@@ -172,7 +174,7 @@ def current_glb(db, mode, item):
 
 
 def current_step(db, mode, item):
-    """现行版 STEP（有限元用，第 11 轮）：最近批准的提交 → 最近发布消息 → SH-301 第 1 版"""
+    """现行版 STEP（有限元用，第 11 轮）：最近批准的提交 → 最近发布消息 → 第 1 版（SH-301、教材案例件）"""
     r = db.one("select files from design_submission where mode=%s and item=%s and status='approved' order by decided_at desc limit 1",
                (mode, item))
     if r:
@@ -188,24 +190,27 @@ def current_step(db, mode, item):
     if item == "SH-301":
         from hub import design as D
         return D.step_bytes(D.normalize(D.defaults()))
-    return None
+    from hub import case_parts
+    return case_parts.step_bytes(item)                       # 教材案例件 RJ-201、LS-101 的第 1 版（第 11 轮）
 
 
 def items_with_step(db, mode):
     """有现行 STEP 的物料（有限元选零件用）"""
-    out = {"SH-301"}
+    from hub import case_parts
+    out = {"SH-301", *case_parts.CASES}
     for r in db.q("select distinct item from design_submission where mode=%s and status='approved'", (mode,)):
         out.add(r["item"])
     for m in db.messages(["design.release"], mode=mode, order="desc", limit=500):
         if any(f.get("kind") == "step" for f in m["data"].get("files") or []):
             out.add(m["data"]["item"])
-    return sorted(out)
+    return ["SH-301"] + sorted(out - {"SH-301"})                # 主线零件 SH-301 排第一
 
 
 # ---------------------------------------------------------------- 提交、审批
 def submit(db, emit, mode, author, author_uid, item, step=None, step_name=None, drawing=None, drawing_name=None,
-           gcode=None, operation=None, note="", params=None, extra_files=None, gcode_info=None):
-    """提交一个新版本。教学模式直接生效；生产模式进待审。返回提交记录"""
+           gcode=None, operation=None, note="", params=None, extra_files=None, gcode_info=None, hold=False):
+    """提交一个新版本。教学模式直接生效；生产模式进待审。hold=True（工程任务单里的提交，第 11 轮 2.7（5））：
+    教学模式也进待审，任务单批准时一并批准。返回提交记录"""
     from psycopg.types.json import Jsonb
     sid = uuid.uuid4().hex[:12]
     base = current_revision(db, mode, item)
@@ -245,7 +250,7 @@ def submit(db, emit, mode, author, author_uid, item, step=None, step_name=None, 
          "values (%s,%s,%s,'pending',%s,%s,%s,%s,%s,%s,%s,%s)",
          (sid, mode, item, author, author_uid, note, Jsonb(files), Jsonb(g) if g else None, Jsonb(params) if params else None,
           base, Jsonb(diff) if diff else None))
-    if mode == "teach":                                   # 教学模式：一步生效
+    if mode == "teach" and not hold:                      # 教学模式：一步生效
         return approve(db, emit, sid, author, "教学模式自动生效", check_self=False)
 
     emit("wq/gearbox/design/{}/submit".format(item.lower()), "design.submit",

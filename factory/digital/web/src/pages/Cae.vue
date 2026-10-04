@@ -2,7 +2,7 @@
   <div class="page">
     <div class="page-title"><h1>仿真与分析</h1>
       <span class="muted">有限元强度校核、疲劳寿命、温度场与热应力：选零件 → 材料 → 加约束和载荷（或热边界）→ 服务器计算 → 看应力、变形、安全系数、寿命、温度</span>
-      <span class="labs small">实验 8：<a href="/api/cae/lab8/guide.docx">指导书</a> · <a href="/api/cae/lab8/report-template.docx">报告模板</a></span></div>
+      <span class="labs small">实验 8：<a href="/api/cae/lab8/guide.docx">指导书</a> · <a href="/api/cae/lab8/report-template.docx">报告模板</a>　实验 11：<a href="/api/cae/lab11/guide.docx">指导书</a> · <a href="/api/cae/lab11/report-template.docx">报告模板</a></span></div>
 
     <div class="row">
       <!-- 左：设置 -->
@@ -18,7 +18,7 @@
         </div>
         <label class="small upload">或者上传 STEP（任何 CAD 导出）
           <input type="file" accept=".step,.stp,.STEP,.STP" :disabled="busy" @change="upload"></label>
-        <div v-if="mbdNote" class="small sugg">来自运动与动力分析：{{ mbdNote }}</div>
+        <div v-if="mbdNote" class="small sugg">{{ mbdNote }}</div>
         <div v-if="exSel" class="exbox small">
           <div class="muted">示例参数（改了点“读入”重新生成）</div>
           <div class="grid2"><label v-for="(n, k) in exSel.names" :key="k">{{ n }} <input v-model.number="exParams[k]" type="number" step="any"></label></div>
@@ -45,6 +45,19 @@
             <div class="step sub">热边界 <span class="muted small">点“+”再在模型上点面；对流可以勾“其余所有面”</span></div>
             <div class="adds">
               <button v-for="(k, key) in TH_KINDS" :key="key" type="button" class="add" :style="{ '--c': k.color }" :title="k.hint" @click="addTh(key)">+ {{ k.label }}</button>
+            </div>
+            <div class="ai-box">
+              <textarea v-model="thAiText" rows="2" maxlength="500" :placeholder="thAiHint"></textarea>
+              <div class="line">
+                <button class="btn" :disabled="thAiBusy || !thAiText.trim()" @click="thAiFill">{{ thAiBusy ? 'AI 正在理解…' : 'AI 填热边界' }}</button>
+                <span class="small muted">AI 只填表，你确认后再点“开始计算”</span>
+              </div>
+              <div v-if="thAiRes" class="small ai-notes">
+                <div v-for="n in thAiRes.notes" :key="n">✓ {{ n }}</div>
+                <div v-for="n in thAiRes.unmatched" :key="n" class="warnline">？没看懂或找不到面：“{{ n }}”——请手动补上</div>
+                <div v-if="thAiRes.note" class="muted">{{ thAiRes.note }}</div>
+                <div class="muted">{{ thAiRes.engine === 'rules' ? '（规则理解：能认发热 / 功率 W、对流 / 风扇 / 自然 / 水冷、散热系数 h、环境温度、固定温度、瞬态时长和初温、内壁 / 外表面 / 底面 / 接触面 / 其余所有面、面编号、材料）' : '（由 AI 模型理解）' }}</div>
+              </div>
             </div>
             <button v-if="geo.example" type="button" class="btn ghost small-btn" @click="fillExample">填入示范题：{{ geo.example.title }}</button>
             <div v-for="(r, i) in thRows" :key="r.key" class="lrow" :class="{ active: active === 100 + i }" :style="{ '--c': TH_KINDS[r.kind].color }" @click="active = TH_KINDS[r.kind].nofaces || r.rest ? -1 : 100 + i">
@@ -113,6 +126,7 @@
                   <select v-model="r.axis"><option v-for="a in axes" :key="a.key" :value="a.key">{{ a.label }}</option></select></label>
               </template>
               <label v-if="r.kind === 'bearing'" class="chk"><input v-model="r.thrust" type="checkbox"> 止推（也限制轴向）</label>
+              <label v-if="r.kind === 'bearing'" class="chk" title="单列深沟球轴承允许轴在轴承里转一点角度，接近铰支；整个轴承位都限径向相当于把轴夹住，刚度、固有频率偏高"><input v-model="r.ring" type="checkbox"> 只限中间一圈（铰支）</label>
             </div>
             <div v-if="rowErr(r)" class="small err">{{ rowErr(r) }}</div>
           </div>
@@ -121,9 +135,10 @@
 
           <div class="step"><b>4</b> 网格</div>
           <div class="seg">
-            <button v-for="m in MESH" :key="m.k" type="button" :class="{ on: meshK === m.k }" @click="meshK = m.k">{{ m.label }}</button>
+            <button v-for="m in MESH" :key="m.k" type="button" :class="{ on: meshK === m.k && !meshOverride }" @click="meshK = m.k; meshOverride = null">{{ m.label }}</button>
           </div>
-          <div class="small muted">单元尺寸约 {{ meshSize.toFixed(1) }} mm{{ meshOverride ? '（示例建议值）' : '' }}，载荷面附近自动加密。网格越细越准、越慢；教学版上限约 20 万个单元、5 分钟。</div>
+          <label class="small">或指定单元尺寸 <input type="number" min="0.5" step="0.5" class="num-in" :value="meshOverride || ''" placeholder="mm" @change="meshOverride = +$event.target.value > 0 ? +$event.target.value : null"> mm</label>
+          <div class="small muted">单元尺寸约 {{ meshSize.toFixed(1) }} mm{{ meshOverride ? '（指定值）' : '' }}，载荷面附近自动加密。网格越细越准、越慢；教学版上限约 20 万个单元、5 分钟。</div>
 
           <label class="small">这次计算的名称 <input v-model.trim="title" class="full" maxlength="80" placeholder="例如：SH-301 额定扭矩校核"></label>
           <button class="btn primary big-w" :disabled="!ready || submitting" @click="submit">{{ submitting ? '正在提交…' : '开始计算' }}</button>
@@ -199,6 +214,21 @@
           <p>尖角（没有圆角的内角）处的应力理论上没有上限，网格越细数值越大——看到最大值在尖角，就要考虑加圆角，或者按规范的应力集中系数去校核。</p>
         </div>
 
+        <div v-if="result && !isThermal" class="fat">
+          <h3>固有频率 <span class="small muted">用同样的零件、材料、网格和支承求前几阶固有频率——高速轴看临界转速，工作转速（及其 2 倍）要离开它们</span></h3>
+          <div class="line">
+            <button class="btn" :disabled="modBusy" @click="runModal">{{ modBusy ? '正在计算…' : (job?.modal ? '重新计算' : '计算固有频率') }}</button>
+            <label class="small">工作转速 <input v-model.number="workRpm" type="number" min="0" step="100" class="num-in"> r/min</label>
+          </div>
+          <div v-if="modErr" class="err small">{{ modErr }}</div>
+          <table v-if="job?.modal" class="t small">
+            <thead><tr><th>阶次</th><th class="num">频率 Hz</th><th class="num">相当转速 r/min</th><th class="num">与工作转速之比</th></tr></thead>
+            <tbody><tr v-for="m in job.modal.freqs" :key="m.mode"><td>{{ m.mode }}</td><td class="num">{{ m.hz.toFixed(1) }}</td>
+              <td class="num">{{ m.rpm.toFixed(0) }}</td><td class="num">{{ workRpm ? (m.rpm / workRpm).toFixed(2) : '—' }}</td></tr></tbody>
+          </table>
+          <p v-if="job?.modal" class="small muted">只算了零件本身（齿轮、曲柄等装在轴上的零件的质量没计入，计入后频率会降低）；去掉了 {{ job.modal.rigid_modes }} 个刚体运动（绕轴转、沿轴移）。弯曲振型成对出现（两个方向）。</p>
+        </div>
+
         <div v-if="result" class="ai-exp">
           <div class="line"><h3>AI 解释与建议</h3>
             <button class="btn" :disabled="expBusy" @click="explain">{{ expBusy ? 'AI 正在分析…' : (exp ? '重新分析' : '请 AI 解释结果') }}</button></div>
@@ -221,12 +251,35 @@
                 <button type="button" :class="{ on: spec.kind === 'const' }" @click="spec.kind = 'const'">恒幅</button>
                 <button type="button" :class="{ on: spec.kind === 'log' }" :disabled="!hasTorque" :title="hasTorque ? '' : '要有扭矩载荷才能用转矩记录'" @click="spec.kind = 'log'">跑合试验台转矩记录</button>
                 <button v-if="job?.setup?.source" type="button" :class="{ on: spec.kind === 'mbd' }" @click="spec.kind = 'mbd'">动力学受力记录</button>
+                <button type="button" :class="{ on: spec.kind === 'joint' }" :disabled="!hasTorque" :title="hasTorque ? '' : '要有扭矩载荷才能用关节力矩记录'" @click="spec.kind = 'joint'">关节力矩记录</button>
+                <button type="button" :class="{ on: spec.kind === 'csv' }" @click="spec.kind = 'csv'">上传载荷记录</button>
               </div>
             </div>
             <template v-if="spec.kind === 'const'">
               <div class="field"><label>最大（{{ refUnit }}）</label><input v-model.number="spec.max" type="number"></div>
               <div class="field"><label>最小（{{ refUnit }}）</label><input v-model.number="spec.min" type="number"></div>
               <div class="field"><label>每秒几次（Hz）</label><input v-model.number="spec.freq" type="number" step="0.1" min="0.001"></div>
+            </template>
+            <template v-else-if="spec.kind === 'joint'">
+              <div class="field wide">
+                <label>“运动与动力分析”的计算（自己算完的）和关节——用这个关节的驱动力矩随时间的变化作载荷谱，按计算工况的扭矩线性缩放</label>
+                <select v-model="spec.mjob">
+                  <option value="" disabled>{{ mjobs.length ? '选择计算…' : '还没有：先到“运动与动力分析”算一次机械臂的运动' }}</option>
+                  <option v-for="m in mjobs" :key="m.id" :value="m.id">{{ m.title || m.id }} · {{ new Date(m.created * 1000).toLocaleString('zh-CN', { hour12: false }) }}</option>
+                </select>
+                <select v-model="spec.joint" :disabled="!spec.mjob">
+                  <option value="" disabled>选择关节…</option>
+                  <option v-for="jn in mjoints" :key="jn" :value="jn">{{ jn }}</option>
+                </select>
+              </div>
+            </template>
+            <template v-else-if="spec.kind === 'csv'">
+              <div class="field wide">
+                <label>CSV 文件：每行一个数（多列时取最后一列），单位与计算工况相同（{{ refUnit }}）；整段当作一块，不断重复</label>
+                <input type="file" accept=".csv,.txt" @change="readCsv">
+                <span v-if="spec.values.length" class="small muted">读到 {{ spec.values.length }} 个点，最大 {{ Math.max(...spec.values.map(Math.abs)).toPrecision(4) }}</span>
+              </div>
+              <div class="field"><label>这一段多少秒</label><input v-model.number="spec.secs" type="number" step="0.1" min="0.001"></div>
             </template>
             <div v-else-if="spec.kind === 'mbd'" class="field wide small muted">用这根杆件在动力学计算中、沿所加力方向的受力随时间的变化作为载荷谱（整段运动当作一块，不断重复）。</div>
             <div v-else class="field wide">
@@ -245,7 +298,7 @@
             <div class="field"><label>附加缺口系数 Kf <span class="muted">有限元已算形状集中，一般 1</span></label><input v-model.number="fopt.kf" type="number" step="0.1" min="1"></div>
             <label class="chk small"><input v-model="fopt.haibach" type="checkbox"> 疲劳极限以下也计损伤（Haibach，偏安全）</label>
           </div>
-          <button class="btn primary" :disabled="fatBusy || (spec.kind === 'log' && !spec.log)" @click="runFatigue">{{ fatBusy ? '正在计算…' : '计算疲劳寿命' }}</button>
+          <button class="btn primary" :disabled="fatBusy || (spec.kind === 'log' && !spec.log) || (spec.kind === 'joint' && !spec.joint) || (spec.kind === 'csv' && spec.values.length < 2)" @click="runFatigue">{{ fatBusy ? '正在计算…' : '计算疲劳寿命' }}</button>
           <div v-if="fatErr" class="err small">{{ fatErr }}</div>
           <div v-if="fat" class="fat-res">
             <div class="stat" :class="fat.infinite ? 'good' : fat.life_hours < 2000 ? 'bad' : fat.life_hours < 20000 ? 'warn' : 'good'">
@@ -554,6 +607,26 @@ async function aiFill() {
     if (!title.value) title.value = aiText.value.slice(0, 40);
   } catch (e) { err.value = e.message; } finally { aiBusy.value = false; }
 }
+// 第 14 轮：一句话设置热边界
+const thAiText = ref(''), thAiBusy = ref(false), thAiRes = ref(null);
+const thAiHint = computed(() => (geo.value?.example?.key === 'heatsink'
+  ? '例如：CPU 接触面发热 65 W，其余所有面风扇直吹散热，室温 25 ℃'
+  : geo.value?.example ? '例如：箱体内壁发热 480 W，外表面自然对流（通风良好），底面装在机座上不散热，环境 20 度'
+    : '例如：面 3 发热 20 W，其余所有面自然对流，环境 25 ℃，6061 铝'));
+async function thAiFill() {
+  thAiBusy.value = true; err.value = '';
+  try {
+    const r = await post('/cae/ai-setup-thermal', { text: thAiText.value, faces: geo.value.faces, solid: geo.value.solid, groups: geo.value.example?.groups });
+    thAiRes.value = r;
+    thRows.value = r.rows.map((x) => ({ key: ++thKey, faces: [], rest: false, value: 0, h: 17.45, tinf: 20,
+      ...x, film: x.film ?? (films.value.find((f) => Math.abs(f.h - (x.h ?? -1)) < 1e-6)?.id || ''), faces: [...(x.faces || [])] }));
+    if (r.material_id) matId.value = r.material_id;
+    if (r.transient && analysis.value === 'thermal') { transient.value = true; trDur.value = r.transient.duration_s; trT0.value = r.transient.t0_c ?? trT0.value; }
+    if (r.ref_temp_c != null) refT.value = r.ref_temp_c;
+    active.value = -1;
+    if (!title.value) title.value = thAiText.value.slice(0, 40);
+  } catch (e) { err.value = e.message; } finally { thAiBusy.value = false; }
+}
 const exp = ref(null);
 const expBusy = ref(false);
 const expErr = ref('');
@@ -599,9 +672,27 @@ const SURF = { polished: '抛光（β 1.0）', ground: '磨削（β 0.92）', fi
 const hasTorque = computed(() => (job.value?.setup?.loads || []).some((l) => l.type === 'torque'));
 const refLoad = computed(() => (job.value?.setup?.loads || []).filter((l) => l.type === 'torque').reduce((a, l) => a + l.value_nmm / 1000, 0));
 const refUnit = computed(() => (hasTorque.value ? 'N·m' : '× 计算工况'));
-const spec = ref({ kind: 'const', max: 350, min: 0, freq: 1, log: '' });
+const spec = ref({ kind: 'const', max: 350, min: 0, freq: 1, log: '', mjob: '', joint: '', values: [], secs: 1, name: '' });
+const mjobs = ref([]);                  // 第 11 轮 F1：关节力矩记录
+const mjoints = computed(() => ((mjobs.value.find((m) => m.id === spec.value.mjob)?.stats?.drives) || []).map((d) => d.joint));
+async function readCsv(ev) {
+  const f = ev.target.files[0];
+  if (!f) return;
+  const nums = [];
+  for (const line of (await f.text()).split(/\r?\n/)) {
+    const cells = line.split(/[,;\t]/).map((x) => x.trim()).filter(Boolean);
+    const v = cells.length ? Number(cells[cells.length - 1]) : NaN;
+    if (Number.isFinite(v)) nums.push(v);
+  }
+  spec.value = { ...spec.value, values: nums.slice(0, 200000), name: f.name };
+}
 const fopt = ref({ surface: 'ground', size_factor: 0.85, kf: 1, haibach: true });
 const fat = ref(null);
+const modBusy = ref(false), modErr = ref(''), workRpm = ref(0);       // 固有频率（第 11 轮 F2）
+async function runModal() {
+  modBusy.value = true; modErr.value = '';
+  try { job.value = { ...job.value, modal: await post(`/cae/jobs/${encodeURIComponent(job.value.id)}/modal`) }; } catch (e) { modErr.value = e.message; } finally { modBusy.value = false; }
+}
 const fatBusy = ref(false);
 const fatErr = ref('');
 const logs = ref([]);
@@ -617,14 +708,18 @@ watch(() => spec.value.log, async (id) => {
   if (id) { try { logSeries.value = (await get('/cae/torque-logs/' + id)).samples_nm; } catch (e) { /* 看不到曲线不影响计算 */ } }
 });
 watch(() => spec.value.kind, async (k) => { if (k === 'log' && !logs.value.length) { try { logs.value = (await get('/cae/torque-logs')).logs; } catch (e) { /* */ } } });
+watch(() => spec.value.kind, async (k) => { if (k === 'joint' && !mjobs.value.length) { try { mjobs.value = ((await get('/mbd/jobs')).jobs || []).filter((m) => m.status === 'done'); } catch (e) { /* */ } } });
 function resetFatigue(j) {
   fat.value = j?.fatigue || null; fatErr.value = '';
-  spec.value = { kind: 'const', max: hasTorque.value ? +refLoad.value.toFixed(1) : 1, min: hasTorque.value ? 0 : -1, freq: 1, log: '' };
+  spec.value = { kind: 'const', max: hasTorque.value ? +refLoad.value.toFixed(1) : 1, min: hasTorque.value ? 0 : -1, freq: 1, log: '', mjob: '', joint: '', values: [], secs: 1, name: '' };
 }
 async function runFatigue() {
   fatBusy.value = true; fatErr.value = '';
   try {
-    const sp = spec.value.kind === 'log' ? { kind: 'log', id: spec.value.log } : spec.value.kind === 'mbd' ? { kind: 'mbd' }
+    const k = spec.value.kind;
+    const sp = k === 'log' ? { kind: 'log', id: spec.value.log } : k === 'mbd' ? { kind: 'mbd' }
+      : k === 'joint' ? { kind: 'joint', job: spec.value.mjob, joint: spec.value.joint }
+      : k === 'csv' ? { kind: 'csv', values: spec.value.values, duration_s: spec.value.secs, name: spec.value.name }
       : { kind: 'const', max: spec.value.max, min: spec.value.min, freq_hz: spec.value.freq };
     const r = await post(`/cae/jobs/${encodeURIComponent(job.value.id)}/fatigue`, { spectrum: sp, ...fopt.value });
     fat.value = r.summary;
@@ -689,7 +784,17 @@ onMounted(async () => {
       rows.value = r.rows.map((x) => ({ key: ++keyN, fx: 0, fy: 0, fz: 0, value: 0, thrust: false, axis: null, ...x }));
       title.value = r.title; matId.value = '45-QT'; active.value = -1;
       mbdSource.value = { ...r.source, sha: r.geometry.sha };
-      mbdNote.value = r.note + `；最大受力 ${r.peak_N.toFixed(0)} N，出现在 t = ${r.peak_t.toFixed(3)} s。`;
+      mbdNote.value = '来自运动与动力分析：' + r.note + `；最大受力 ${r.peak_N.toFixed(0)} N，出现在 t = ${r.peak_t.toFixed(3)} s。`;
+    } catch (e) { err.value = e.message; } finally { busy.value = false; }
+  }
+  if (route.query.topo) {                                          // 第 14 轮：拓扑优化 → 拉伸成板件做有限元校核
+    busy.value = true;
+    try {
+      const r = await post(`/opt/topo/${encodeURIComponent(route.query.topo)}/to-fea`, {});
+      geo.value = r.geometry;
+      rows.value = r.rows.map((x) => ({ key: ++keyN, fx: 0, fy: 0, fz: 0, value: 0, thrust: false, axis: null, ...x }));
+      title.value = r.title; matId.value = r.material_id; meshOverride.value = r.mesh_mm; active.value = -1;
+      mbdNote.value = '来自拓扑优化：' + r.note + '。';
     } catch (e) { err.value = e.message; } finally { busy.value = false; }
   }
   loadJobs();
@@ -765,6 +870,7 @@ tr.cur td { background: var(--accent-bg); }
 .exp-text p { margin: 4px 0; line-height: 1.7; }
 .fat { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .fat h3 { font-size: 15px; }
+.num-in { width: 90px; }
 .fat-grid { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; }
 .fat-grid .field input { width: 120px; }
 .fat-grid .field.wide { flex-basis: 100%; }

@@ -51,7 +51,7 @@ export function toLoad(row, axes) {
   };
   switch (row.kind) {
     case 'fixed': return { type: 'fixed', faces: row.faces };
-    case 'bearing': return { type: 'cyl_support', faces: row.faces, axis: ax(row.axis), dofs: row.thrust ? ['radial', 'axial'] : ['radial'] };
+    case 'bearing': return { type: 'cyl_support', faces: row.faces, axis: ax(row.axis), dofs: row.thrust ? ['radial', 'axial'] : ['radial'], ...(row.ring ? { band_mm: 1 } : {}) };
     case 'coupling': return { type: 'cyl_support', faces: row.faces, axis: ax(row.axis), dofs: ['tangential'] };
     case 'force': return { type: 'force', faces: row.faces, vector_n: [+row.fx || 0, +row.fy || 0, +row.fz || 0] };
     case 'pressure': return { type: 'pressure', faces: row.faces, value_mpa: +row.value || 0 };

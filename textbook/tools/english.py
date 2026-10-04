@@ -21,7 +21,7 @@ import math
 import re
 from pathlib import Path
 
-KINDS = {"Program": "程序", "Animation": "动画", "Lab": "实验", "Figure": "图", "Table": "表", "Task": "任务"}
+KINDS = {"Program": "程序", "Animation": "动画", "Lab": "实验", "GPU Lab": "GPU实验", "Figure": "图", "Table": "表", "Task": "任务"}
 LABEL = {v: k for k, v in KINDS.items()}
 ITEMS = {"Definition": "定义", "Law": "定律", "Theorem": "定理", "Lemma": "引理", "Corollary": "推论", "Criterion": "准则", "Example": "算例"}
 REFS = {**ITEMS, **KINDS, "Fig.": "图", "Exercise": "习题"}
@@ -57,6 +57,15 @@ def structure(text: str, lang: str) -> dict:
 
 def parity(zh: str, en: str) -> list[str]:
     a, b = structure(zh, "zh"), structure(en, "en")
+    # A Chinese 万-quantity ({{prog.x_wan}}) has no English form; the English edition writes the same number from a
+    # value the same program hands over in English units (thousands, millions), e.g. dv_2025_wan → dv_2025_mio.
+    k = "占位符"
+    wan = [x for x in a[k] if x[1].endswith("_wan") and x not in b[k]]
+    progs = {p for p, _ in wan}
+    extra = [x for x in b[k] if x not in a[k] and x[0] in progs]
+    if wan and extra and {p for p, _ in extra} == progs:
+        a[k] = [x for x in a[k] if x not in wan]
+        b[k] = [x for x in b[k] if x not in extra]
     out = []
     for k in a:
         if a[k] != b[k]:
@@ -92,6 +101,14 @@ def _forms(t: str) -> set[str]:
         if t.endswith(suf):
             out.add(t[: -len(suf)])
     out.add(t + "s")
+    for a, b in (("is", "es"), ("ex", "ices"), ("ix", "ices")):     # axis → axes, index → indices, matrix → matrices
+        if t.endswith(a):
+            out.add(t[: -len(a)] + b)
+    if " of " in t:                       # "degree of freedom" → "degrees of freedom"
+        head, tail = t.split(" of ", 1)
+        out.add(f"{head}s of {tail}")
+        if head.endswith("s"):
+            out.add(f"{head[:-1]} of {tail}")
     return out
 
 

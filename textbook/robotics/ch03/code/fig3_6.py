@@ -31,10 +31,10 @@ P = np.array([0.6, 0.0, hz])
 O = np.array([0, 0, 0.0])
 O2 = np.array([0, 0, 0.8])
 ax.plot(*P, "o", color=C["x"], ms=6)
-ax.text(*(P + [0.05, -0.08, 0.02]), "P", fontsize=13)
+ax.text(*(P + [0.02, 0.0, 0.07]), "P", fontsize=13, ha="left", va="bottom")
 for o, lab, col in ((O, r"$O$", C["z"]), (O2, r"$O'$", C["y"])):
     ax.plot(*o, "o", color=col, ms=5)
-    ax.text(*(o + [-0.12, 0, 0]), lab, fontsize=12, color=col)
+    ax.text(*(o + [-0.06, 0, 0]), lab, fontsize=12, color=col, ha="right", va="center")
     arrow3(ax, o, P - o, col, 1.6, ratio=0.06)
 ax.text(*(0.5 * (O + P) + [0.0, 0.05, -0.1]), r"$\boldsymbol{r}$", fontsize=13, color=C["z"])
 ax.text(*(0.5 * (O2 + P) + [0.0, 0.05, 0.05]), r"$\boldsymbol{r}'$", fontsize=13, color=C["y"])
@@ -45,7 +45,7 @@ v = np.cross(w, P - O) * 0.9
 arrow3(ax, P, v, C["x"], 2.6, ratio=0.15)
 ax.text(*(P + v + [-0.35, 0.0, 0.16]), r"$\boldsymbol{v}=\boldsymbol{\omega}\times\boldsymbol{r}=\boldsymbol{\omega}\times\boldsymbol{r}'$",
         fontsize=12, color=C["x"])
-ax.text(0.9, -0.6, -0.1, r"$|\boldsymbol{v}|=\rho\,\dot\theta$" + T("，方向沿圆的切线", ", along the tangent of the circle"), fontsize=10, color=C["muted"])
+ax.text(0.9, -0.6, -0.1, r"$|\boldsymbol{v}|=\rho\,\dot\theta$" + T("，方向沿圆的切线", ", along the tangent of the circle"), fontsize=10, color=C["muted"], ha="center")
 figure(fig, "fig3_6_1")
 plt.close(fig)
 

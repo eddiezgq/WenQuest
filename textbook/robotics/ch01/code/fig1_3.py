@@ -33,7 +33,7 @@ for ax in (axa, axb):
 # (a) 按用途
 axa.set_xlim(0, 10.45)
 axa.set_ylim(0, 2.6)
-node(axa, 5.1, 2.2, T("机器人（按用途）", "Robots (by use)"), "#f3e2b3", w=2.6, bold=True)
+node(axa, 5.1, 2.2, T("机器人（按用途）", "Robots (by application)"), "#f3e2b3", w=2.6, bold=True)
 use = [(1.7, T("工业机器人", "industrial robot"), T("UR5e、Panda、SCARA、Delta", "UR5e, Panda, SCARA, Delta")),
        (5.1, T("服务机器人", "service robot"), T("个人用：扫地机器人\n专业用：物流、清洁、巡检", "personal: robot vacuum\nprofessional: logistics, cleaning, inspection")),
        (8.5, T("医疗机器人", "medical robot"), T("手术、康复", "surgery, rehabilitation"))]
@@ -46,14 +46,15 @@ axa.text(0.0, 2.45, "(a)", fontsize=10)
 axb.set_xlim(0, 10.45)
 axb.set_ylim(0, 4.1)
 axb.text(0.0, 3.95, "(b)", fontsize=10)
-node(axb, 5.1, 3.65, T("机器人（按结构与移动方式）", "Robots (by structure and mobility)"), "#f3e2b3", w=3.6, bold=True)
+node(axb, 5.1, 3.65, T("机器人（按结构与移动方式）", "Robots (by structure and mode of locomotion)"), "#f3e2b3",
+     w=3.6 if T("zh", "en") == "zh" else 4.8, bold=True)
 mid = [(2.3, T("固定基座的操作臂", "fixed-base manipulators")), (7.9, T("移动机器人", "mobile robots"))]
 for x, t in mid:
     link(axb, (5.1, 3.44), (x, 2.98))
     node(axb, x, 2.78, t, "#dbe9f6", w=2.8)
 leaves_l = [(0.75, T("串联关节型", "articulated"), "UR5e\nPanda"), (2.3, "SCARA", T("问渠\nSCARA", "WenQuest\nSCARA")),
             (3.85, T("并联", "parallel"), "Delta")]
-leaves_r = [(5.55, T("轮式", "wheeled"), T("差速小车\n(AGV)", "diff-drive\ncart (AGV)")), (6.95, T("足式", "legged"), "Go2"),
+leaves_r = [(5.55, T("轮式", "wheeled"), T("差速小车\n(AGV)", "differential-drive\ncart (AGV)")), (6.95, T("足式", "legged"), "Go2"),
             (8.35, T("仿人", "humanoid"), "G1"), (9.75, T("空中", "aerial"), T("四旋翼\nX2", "quadrotor\nX2"))]
 for x, t, ex in leaves_l:
     link(axb, (2.3, 2.57), (x, 1.92))

@@ -1,0 +1,10 @@
+# 书的基本信息（第 18 轮）：outline.py 从这里找提纲和书名。
+outline: docs/教材/PLC/00_提纲.md
+title: PLC 原理及实践
+title_en: "Programmable Logic Controllers: Principles and Practice"
+# 程序读到的书外文件（第 18 轮）：PLC 引擎、虚拟设备、运行它们的工具。改了它们，书里的 PLC 程序要重新测试
+program_deps:
+  - services/gateway/app/production/labkit/plc.js
+  - services/gateway/app/production/labkit/plants.js
+  - textbook/tools/plcrun.mjs
+  - textbook/tools/plcbook.py

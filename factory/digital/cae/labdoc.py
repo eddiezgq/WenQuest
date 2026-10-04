@@ -7,7 +7,9 @@ import re
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GUIDE_MD = os.path.join(HERE, "实验8_输出轴强度与疲劳校核.md")
 GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节力矩与电机选型.md"),
-          "lab10": os.path.join(HERE, "实验10_输出轴数控车削与键槽铣削编程.md")}
+          "lab10": os.path.join(HERE, "实验10_输出轴数控车削与键槽铣削编程.md"),
+          "lab11": os.path.join(HERE, "实验11_减速器热平衡与输出轴轻量化.md"),
+          "lab12": os.path.join(HERE, "实验12_一根轴的数字化设计与两个典型案例.md")}
 
 
 def _doc():
@@ -93,6 +95,10 @@ def report_template_docx(lab="lab8"):
         return lab9_template()
     if lab == "lab10":
         return lab10_template()
+    if lab == "lab11":
+        return lab11_template()
+    if lab == "lab12":
+        return lab12_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -265,6 +271,114 @@ def lab10_template():
     d.add_paragraph("")
     d.add_heading("八、附件", 1)
     d.add_paragraph("平台生成的程序（.nc）、截图。", style="List Bullet")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab11_template():
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 11　减速器热平衡与输出轴轻量化　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、热平衡手算与有限元（任务 1）", 1)
+    table([["项目", "手算", "平台"], ["总效率 η = 0.97² × 0.99³", "", "0.913"], ["输出功率 P_out  W", "", ""], ["输入功率 P_in  W", "", ""],
+           ["发热 Φ = P_in(1 − η)  W", "", "482.6"], ["散热面积 A  m²（不计底面）", "", ""], ["油温 t = t₀ + Φ/(K_s·A)  ℃", "", ""]])
+    table([["有限元结果", "数值", "位置 / 说明"], ["最高温度 ℃", "", ""], ["外表面平均温度 ℃", "", ""], ["热平衡：进来 / 散走 W", "", ""],
+           ["与公式的差 ℃", "", ""]])
+    hint("最高温度为什么比平均高？有限元比公式多告诉了你什么？")
+    d.add_heading("二、降温方案比较（任务 2）", 1)
+    table([["方案", "散热系数 / 面积", "公式油温 ℃", "外表面平均 ℃", "最高 ℃", "代价"], ["无散热筋，通风良好", "", "", "", "", ""],
+           ["每侧 8 条散热筋", "", "", "", "", ""], ["轴端装风扇", "", "", "", "", ""]])
+    table([["一句话设置", "记录"], ["写的那句话", ""], ["AI 选的面、散热系数", ""], ["需要手动改的地方", ""]])
+    d.add_heading("三、热应力（任务 3）", 1)
+    table([["项目", "手算 / 结果"], ["线膨胀系数 α（10⁻⁶/K）", ""], ["自由热伸长 ΔL = α·L·Δt  mm", ""], ["有限元最大热变形 mm", ""],
+           ["最大热应力 MPa / 位置", ""], ["安全系数", ""]])
+    hint("热应力从哪来？实际减速器怎样减小热应力？")
+    d.add_heading("四、输出轴轻量化（任务 4）", 1)
+    table([["项目", "现行设计", "最优方案"], ["齿轮位直径 mm", "40", ""], ["轴伸直径 mm", "30", ""], ["质量 kg（平台）", "", ""],
+           ["质量 kg（手算，不扣键槽、倒角）", "", "—"], ["安全系数", "", ""], ["疲劳寿命", "", ""]])
+    table([["问题", "回答"], ["一句话：AI 填了哪些", ""], ["第几次以后很难再变好", ""], ["不满足要求的几次被哪条要求挡住", ""],
+           ["卡住最优解的要求", ""], ["安全系数要求提到 1.5 会怎样", ""], ["送设计台后校核结果、键要不要换", ""]])
+    d.add_heading("五、选做：CPU 散热片 / 拓扑优化（任务 5、6）", 1)
+    table([["项目", "结果"], ["散热片 h = 50 最高温度 ℃", ""], ["散热片 h = 8 最高温度 ℃", ""], ["散热片优化：最轻方案", ""],
+           ["拓扑优化 50%：柔度、形状", ""], ["拓扑优化 30%：柔度、形状", ""], ["拉伸成板件后安全系数", ""]])
+    d.add_heading("六、结论与讨论", 1)
+    d.add_paragraph("")
+    d.add_heading("七、附件", 1)
+    d.add_paragraph("平台生成的温度场报告（Word）、优化结果截图。", style="List Bullet")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab12_template():
+    """实验 12（第 11 轮《机械设计》第 33 章）：零件库 → 建模 → 强度、刚度、固有频率、疲劳 → 发布；RJ-201、LS-101 两个案例"""
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 12　一根轴的数字化设计与两个典型案例　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、零件库选件（任务 1）", 1)
+    table([["轴承", "d mm", "D mm", "B mm", "r_s mm", "用在"], ["6207", "", "", "", "", "SH-301"], ["6010", "", "", "", "", "RJ-201"],
+           ["6201", "", "", "", "", "LS-101"]])
+    table([["CSF-25-100", "额定 N·m", "启停峰值 N·m", "平均负载 N·m", "瞬时最大 N·m", "输入最高 r/min"], ["零件库", "", "", "", "", ""]])
+    hint("台阶圆角是否小于轴承内圈倒角？不小于会怎样？")
+    d.add_heading("二、SH-301 B 版建模与发布（任务 2）", 1)
+    table([["项目", "记录"], ["各段直径 × 长度", ""], ["台阶圆角", ""], ["键槽", ""], ["下料重量（设计台）kg", ""],
+           ["教材 33.9.4 节的质量 kg", ""], ["发布的版本号", ""]])
+    d.add_heading("三、RJ-201：扭转刚度与关节力矩载荷谱（任务 3）", 1)
+    table([["项目", "手算", "有限元"], ["J2 最大力矩 N·m（运动与动力分析）", "", "—"], ["扭转角 θ μrad", "", ""], ["差别 % 及原因", "", ""],
+           ["末端偏移 δ = θ × 850 mm", "", ""], ["是否 ≤ 0.20 mm", "", ""]])
+    table([["疲劳", "记录"], ["载荷谱（计算编号、关节）", ""], ["最大应力幅 MPa", ""], ["修正后疲劳极限 MPa", ""], ["寿命 h", ""], ["为什么这么长", ""]])
+    table([["材料", "扭转角 μrad", "末端偏移 mm", "质量 kg"], ["40Cr（调质）", "", "", ""], ["7075-T6", "", "", ""]])
+    hint("铝轴要达到同样刚度需要多大直径？减重主要来自材料还是来自直径？")
+    d.add_heading("四、LS-101：轴承支承与固有频率（任务 4）", 1)
+    table([["约束方式", "一阶 Hz", "二阶 Hz", "三阶 Hz"], ["整个轴承位限径向", "", "", ""], ["只限中间一圈（铰支）", "", "", ""],
+           ["梁理论（简支光轴）", "", "—", "—"]])
+    table([["项目", "记录"], ["5 000 r/min 对应 Hz", ""], ["一阶固有频率 / 转频", ""], ["哪种约束与梁理论一致、为什么", ""],
+           ["强度计算用哪种约束", ""]])
+    d.add_heading("五、LS-101：CSV 载荷谱（任务 5）", 1)
+    table([["项目", "记录"], ["CSV 点数、最大 |T| N·m", ""], ["一转的时间 s", ""], ["扭转疲劳寿命", ""], ["弯曲：σa、σm MPa（手算 / 程序 33.11.1）", ""],
+           ["无限寿命安全系数 S", ""]])
+    hint("平台的载荷谱为什么表达不了“轴在转、力也在转”？")
+    d.add_heading("六、小结：三根轴的尺寸由什么决定", 1)
+    table([["轴", "决定尺寸的因素", "依据（本实验的数据）"], ["SH-301", "", ""], ["RJ-201", "", ""], ["LS-101", "", ""]])
+    d.add_heading("七、附件", 1)
+    d.add_paragraph("平台生成的计算报告（Word）：RJ-201 扭转与疲劳、LS-101 固有频率（两种约束）、LS-101 扭转疲劳。", style="List Bullet")
     buf = io.BytesIO()
     d.save(buf)
     return buf.getvalue()

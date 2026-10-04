@@ -244,9 +244,12 @@ const d = [GPU.diverge({ cond: "odd", pre: 0, post: 0 }).eff, GPU.diverge({ cond
            GPU.diverge({ cond: "odd" }).issued];
 const u = [[1, 4, 600], [16, 4, 600], [16, 40, 600], [16, 8, 100]].map(([n, k, L]) =>
   [GPU.schedule({ warps: n, k, latency: L }).util, GPU.little(n, k, L)]);
-console.log(JSON.stringify({ d, u }));
+const m = [GPU.coalesce(GPU.addresses()).sectors, GPU.coalesce(GPU.addresses({ kind: "stride", k: 2 })).sectors,
+           GPU.banks(GPU.bankWords({ k: 2 })).ways, GPU.banks(GPU.bankWords({ kind: "column", pad: 1 })).ways, GPU.banks(GPU.bankWords({ kind: "same" })).ways];
+console.log(JSON.stringify({ d, u, m }));
 """
     out = json.loads(subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout)
     assert out["d"] == [0.5, 1.0, 12]
+    assert out["m"] == [4, 8, 2, 1, 1]                   # sectors: contiguous, stride 2; bank ways: stride 2, padded column, broadcast
     for got, want in out["u"]:
         assert abs(got - want) < 0.03 * want + 1e-3

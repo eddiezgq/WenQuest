@@ -1,0 +1,33 @@
+# 实验 2.3 的指导书与报告模板。目的、场景、参数、任务取自 lab2_3.js。
+原理:
+  - ["物体静止时，作用在它上面的各力之和为零（第 6、14 章）。把每个力分解成水平和竖直分量，两个方向的分量之和分别为零。吊索称重：W = T₁cos α + T₂cos β，且 T₁sin α = T₂sin β。",
+     "At rest, the forces on a body add up to zero (Chapters 6 and 14): the horizontal and the vertical components each sum to zero. Slings: W = T₁cos α + T₂cos β and T₁sin α = T₂sin β."]
+  - 式: "W = T₁cos α + T₂cos β；F = mg sin α（坡道）        (2.3.2)、(2.3.7)"
+  - ["坡道上被平行于坡面的绳子拉住的 AGV，拉力等于重力沿坡面的分量 mg sin α（不计滚动阻力）。F 对 sin α 是一条直线，斜率为 mg，用 1.6 节的最小二乘法求出斜率，再除以 g。",
+     "An AGV held on a ramp by a rope parallel to the slope pulls with the along-slope component mg sin α (rolling resistance neglected). F against sin α is a straight line of slope mg; fit it by least squares (Section 1.6) and divide by g."]
+  - ["力学台：三个力的合力为零时，圆环停在中心。滑轮有摩擦，合力很小时圆环也不动，所以平衡位置有一个“不灵敏区”，它决定了这种测量的不确定度。",
+     "Force table: the ring sits in the middle when the three forces add to zero. Pulley friction keeps the ring still for small net forces as well, so equilibrium has a dead zone, which sets the uncertainty of the method."]
+步骤:
+  - ["选“吊索称重”。在三组不同的角度 (α, β) 下读出 T₁、T₂，填入表 1，分别算出 W 和水平分量之差。求 W 的平均值，把“你算出的壳体重力”调到它（任务 1）。", "Choose the slings. Read T₁ and T₂ for three pairs of angles, fill Table 1, compute W and the horizontal mismatch each time; set “Your weight” to the mean (task 1)."]
+  - ["选“坡道上称 AGV”。在 4 个以上不同的倾角下点“记录这一组”，把 α、sin α、F 填入表 2，作 F–sin α 图，用最小二乘法求斜率和 m，把“你算出的 AGV 总质量”调到你的结果（任务 2）。", "Choose the ramp. Record at least 4 angles, fill Table 2, plot F against sin α, fit the slope and find m; set “Your AGV mass” to your result (task 2)."]
+  - ["选“力学台”。由前两个力的分量算出第三个力应有的大小和方向，调好砝码和方向，看圆环是否居中（任务 3）。再把方向向两边慢慢调，记下圆环刚开始偏离时的两个角度。", "Choose the force table. From the components of the first two forces compute the third, set it and check that the ring is centred (task 3). Then turn the direction both ways and note where the ring starts to move."]
+  - ["选“晾衣绳”，减小下垂量，直到拉力超过外套重力的 5 倍（任务 4），记下这时的下垂量。", "Choose the clothesline and reduce the sag until the tension exceeds 5 times the weight (task 4); note the sag."]
+数据表:
+  - 标题: ["表 1  吊索称重", "Table 1  Weighing with two slings"]
+    表头: ["α / (°)", "β / (°)", "T₁ / N", "T₂ / N", "T₁cos α + T₂cos β / N", "T₁sin α − T₂sin β / N"]
+    表头英文: ["α / (°)", "β / (°)", "T₁ / N", "T₂ / N", "T₁cos α + T₂cos β / N", "T₁sin α − T₂sin β / N"]
+    行: [["", "", "", "", "", ""], ["", "", "", "", "", ""], ["", "", "", "", "", ""]]
+  - 标题: ["表 2  坡道上的拉力", "Table 2  Pull on the ramp"]
+    表头: ["α / (°)", "sin α", "F / N"]
+    表头英文: ["α / (°)", "sin α", "F / N"]
+    行: [["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""]]
+  - 标题: ["表 3  力学台", "Table 3  Force table"]
+    表头: ["", "m / g", "方向 / (°)", "Fx / N", "Fy / N"]
+    表头英文: ["", "m / g", "Direction / (°)", "Fx / N", "Fy / N"]
+    行: [["F₁", "100", "0", "", ""], ["F₂", "150", "90", "", ""], ["F₃（计算）", "", "", "", ""], ["F₃（平衡时）", "", "", "", ""]]
+注意:
+  - ["传感器读数含有约 ±0.5% 的误差，同样的角度读数相同；换几组角度再平均，误差会减小。", "Sensor readings carry about ±0.5% error and repeat for the same angles; averaging over several angle pairs reduces the error."]
+  - ["坡道场景的判定按你自己的数据拟合，不要求等于某个“标准答案”。", "The ramp task is judged on a fit of your own data, not against a fixed answer."]
+思考题:
+  - ["吊索称重时，α、β 取多大，传感器误差对 W 的影响最小？", "Which sling angles make the weight least sensitive to sensor error?"]
+  - ["力学台的不灵敏区有多宽？由它估计第三个力方向的不确定度。", "How wide is the force table's dead zone? Use it to estimate the uncertainty in the direction of the third force."]

@@ -9,9 +9,9 @@ WQ.lab({
                  text: ["拖动 A 的四个元素。任何 2×2 矩阵都把单位圆变成椭圆（可能压扁成线段），半轴是两个奇异值。",
                         "Drag the four entries of A. Every 2×2 matrix maps the unit circle to an ellipse (perhaps flattened to a segment) with the singular values as semi-axes."] } },
     { id: "arm", robot: true, name: ["2R 臂的可操作度", "Manipulability of a 2R arm"], hide: ["a11", "a12", "a21", "a22"],
-      problem: { title: ["机器人问题：末端往哪个方向走得最快", "Robot problem: which way can the tip move fastest?"],
+      problem: { title: ["机器人问题：末端往哪个方向走得最快", "Robot problem: which way can the end-effector move fastest?"],
                  text: ["A 是雅可比矩阵（L₁ = 0.425 m，L₂ = 0.392 m）。末端处的椭圆是 |θ̇| = 1 rad/s 时末端速度的集合。",
-                        "A is the Jacobian (L₁ = 0.425 m, L₂ = 0.392 m). The ellipse at the tip holds the tip velocities for |θ̇| = 1 rad/s."] } },
+                        "A is the Jacobian (L₁ = 0.425 m, L₂ = 0.392 m). The ellipse at the end-effector holds the end-effector velocities for |θ̇| = 1 rad/s."] } },
   ],
   params: [
     { id: "a11", name: ["a₁₁", "a₁₁"], min: -2, max: 2, step: 0.1, value: 1.2, unit: "", digits: 1 },

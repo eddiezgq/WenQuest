@@ -82,7 +82,7 @@ export function units(d: CourseData): Section[] {
   return d.sections.filter((s) => isUnit(d, s));
 }
 
-/** The 13 items of the course menu (R11). Teachers always see all of them; students only see
+/** The 14 items of the course menu (R11; 任务单 since round 11 of 机械设计). Teachers always see all of them; students only see
  * content menus that have something behind them, plus the class-wide ones. */
 export function courseMenu(d: CourseData): { key: string }[] {
   const mods = d.sections.flatMap((s) => visibleModules(d, s));
@@ -96,6 +96,7 @@ export function courseMenu(d: CourseData): { key: string }[] {
     slides: teacher || has("slides", "pdf"),
     labs: teacher || has("lab"),
     assignments: teacher || has("assign"),
+    tasks: teacher || mods.some((m) => moduleKind(m) === "assign" && /工程任务单|TS-\d+-\d+/.test(m.name || "")),
     quizzes: teacher || has("quiz"),
     discussions: true,
     online: true,
@@ -107,7 +108,7 @@ export function courseMenu(d: CourseData): { key: string }[] {
 }
 
 export const MENU_ORDER = [
-  "home", "announcements", "syllabus", "modules", "slides", "labs", "assignments",
+  "home", "announcements", "syllabus", "modules", "slides", "labs", "assignments", "tasks",
   "quizzes", "discussions", "online", "grades", "people", "calendar",
 ];
 

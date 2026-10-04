@@ -35,7 +35,7 @@ def null_dir(th):
 
 class Lesson(Base):
     def construct(self):
-        self.title("2.6", "自运动：末端不动，手臂在动", "Self-motion: the tip stays, the arm moves")
+        self.title("2.6", "自运动：末端不动，手臂在动", "Self-motion: the end-effector stays, the arm moves")
         tip = fk([math.radians(30), math.radians(60), math.radians(-60)])[3]
         U = 5.2
         O = np.array([-4.6, -2.4, 0])
@@ -75,7 +75,7 @@ class Lesson(Base):
         star = Star(5, outer_radius=0.16, color=YELLOW, fill_opacity=1).move_to(P(tip))
         self.add(trail, a, star)
         self.play(FadeIn(b), run_time=0.6)
-        self.caption("末端（星号）不动，θ₁ 从 30° 增大到 55°", "The tip (star) stays; θ₁ grows from 30° to 55°", wait=0)
+        self.caption("末端（星号）不动，θ₁ 从 30° 增大到 55°", "The end-effector (star) stays; θ₁ grows from 30° to 55°", wait=0)
         self.play(t1.animate.set_value(55), run_time=4, rate_func=smooth)
         self.caption("再减小到 27°：其余两个关节随之调整", "Back down to 27°: the other two joints follow", wait=0)
         self.play(t1.animate.set_value(27), run_time=4.5, rate_func=smooth)
@@ -84,4 +84,4 @@ class Lesson(Base):
         self.wait(1.2)
         self.card([["零空间与自运动", "Null space and self-motion"],
                    MathTex(r"J\dot\theta = 0", font_size=48),
-                   ["的解 = 末端不动的关节运动；rank J + dim N(J) = 3", "solutions = joint motions that keep the tip still; rank J + dim N(J) = 3"]])
+                   ["的解 = 末端不动的关节运动；rank J + dim N(J) = 3", "solutions = joint motions that keep the end-effector still; rank J + dim N(J) = 3"]])

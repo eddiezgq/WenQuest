@@ -13,7 +13,7 @@ C = COLORS
 THREAD = {"auto": ("#8c6d1f", T("自动机与程序", "automata and programs")),
           "ctrl": ("#2ca02c", T("反馈与控制", "feedback and control")),
           "ind": ("#1f77b4", T("工业机器人", "industrial robots")),
-          "ai": ("#d62728", T("智能、移动与学习", "intelligence, mobility, learning"))}
+          "ai": ("#d62728", T("智能、移动与学习", "intelligence, mobility and learning"))}
 
 
 def year_text(y):
@@ -43,8 +43,9 @@ for col, items, x0, head in ((0, early, 0.2, T("1950 年以前", "Before 1950"))
         ax.plot([x0 + 1.05], [yy], "o", color=col_th, ms=6, zorder=3)
         ax.text(x0 + 0.95, yy, year_text(y), ha="right", va="center", fontsize=8.6, color=C["ink"])
         ax.text(x0 + 1.2, yy, T(zh_en, _en), ha="left", va="center", fontsize=8.6, color=C["ink"])
+LEG_X = (0.3, 2.85, 5.4, 7.95) if T("zh", "en") == "zh" else (0.2, 2.45, 4.45, 6.1)
 for k, (key, (colr, name)) in enumerate(THREAD.items()):
-    xx = 0.3 + 2.55 * k
+    xx = LEG_X[k]
     ax.plot([xx], [-1.1], "o", color=colr, ms=7)
     ax.text(xx + 0.15, -1.1, name, va="center", fontsize=9.5, color=C["ink"])
 figure(fig, "fig1_2_1")
@@ -59,9 +60,10 @@ x = np.arange(len(names))
 w = 0.38
 b1 = ax.bar(x - w / 2, a24, w, color="#9fb4c8", label="2024")
 b2 = ax.bar(x + w / 2, a25, w, color=C["z"], label="2025")
-for bars in (b1, b2):
-    for b in bars:
-        ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 4, f"{b.get_height():.1f}", ha="center", fontsize=7.8,
+for bars, year in ((b1, 2024), (b2, 2025)):
+    for b, c in zip(bars, IFR["country"]):
+        lab = f"<{b.get_height():.0f}" if year == 2025 and c[0] in IFR.get("upper_2025", []) else f"{b.get_height():.1f}"
+        ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 4, lab, ha="center", fontsize=7.8,
                 color=C["ink"])
 ax.set_xticks(x)
 ax.set_xticklabels(names)

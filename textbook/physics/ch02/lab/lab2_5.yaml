@@ -1,0 +1,25 @@
+# 实验 2.5 的指导书与报告模板。目的、场景、参数、任务取自 lab2_5.js。
+原理:
+  - ["叉积 r × F 的大小为 rF sin θ，等于以 r、F 为邻边的平行四边形的面积；方向垂直于 r、F 所在的平面，按右手定则。平面内的两个矢量，叉积只有 z 分量 r_xF_y − r_yF_x：为正时朝外（逆时针），为负时朝里（顺时针）。",
+     "|r × F| = rF sin θ, the area of the parallelogram on r and F; its direction is perpendicular to their plane by the right-hand rule. For vectors in a plane only the z component r_xF_y − r_yF_x survives: positive points out (counter-clockwise), negative points in (clockwise)."]
+  - 式: "M = r × F，M = F × 力臂，力臂 = r sin θ        (2.5.1)、(2.5.5)"
+  - ["负载重力竖直向下，它对肩关节的力矩等于 mg 乘以负载到肩关节的水平距离，与负载的高度无关。", "The load's weight is vertical, so its torque about the shoulder is mg times the horizontal distance, whatever the height."]
+步骤:
+  - ["选“r × F”。固定 |r|、|F| 和 r 的方向，把 F 的方向从 0° 调到 180°，每 30° 记下 (r × F)_z，填入表 1，与 rF sin θ 比较。找出使力矩最大的方向（任务 1）。", "Choose r × F. Keep |r|, |F| and the direction of r; turn F from 0° to 180° in 30° steps, record (r × F)_z in Table 1 and compare with rF sin θ. Find the direction of largest torque (task 1)."]
+  - ["把 F 转到 r 的另一侧，看 ⊙ 变成 ⊗（任务 2）。", "Turn F to the other side of r and watch ⊙ become ⊗ (task 2)."]
+  - ["选“UR5e 肩关节的负载力矩”。保持负载的水平距离不变而改变它的高度，看力矩是否改变；再找到力矩最大的姿态，读出最大力矩（任务 3），与 mg(l₂ + l₃) 比较。", "Choose the UR5e. Change the load's height at a fixed horizontal distance and see whether the torque changes; then find the pose of largest torque (task 3) and compare with mg(l₂ + l₃)."]
+  - ["选“扳手”。算出用 40 N 拧出 12 N·m 至少需要多长的力臂，再调手的位置和用力方向完成任务 4。", "Choose the wrench. Work out the lever arm needed for 12 N·m with 40 N, then set the grip and direction (task 4)."]
+数据表:
+  - 标题: ["表 1  叉积随夹角的变化（|r| = ____ m，|F| = ____ N）", "Table 1  Cross product against angle (|r| = ____ m, |F| = ____ N)"]
+    表头: ["θ / (°)", "0", "30", "60", "90", "120", "150", "180"]
+    表头英文: ["θ / (°)", "0", "30", "60", "90", "120", "150", "180"]
+    行: [["(r × F)_z / (N·m)", "", "", "", "", "", "", ""], ["rF sin θ / (N·m)", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  肩关节的负载力矩", "Table 2  Load torque on the shoulder"]
+    表头: ["肩 / (°)", "肘 / (°)", "水平距离 / m", "高度 / m", "力矩 / (N·m)"]
+    表头英文: ["Shoulder / (°)", "Elbow / (°)", "Horizontal distance / m", "Height / m", "Torque / (N·m)"]
+    行: [["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["画面中 r 与 F 的比例尺不同，平行四边形只表示形状；面积的数值看读数。", "r and F are drawn to different scales, so the parallelogram shows only the shape; read the area from the numbers."]
+思考题:
+  - ["θ = 30° 和 150° 时，|r × F| 一样吗？方向一样吗？", "Is |r × F| the same at 30° and 150°? And its direction?"]
+  - ["为什么协作机器人的关节转矩要在手臂水平伸直、满负载时校核？", "Why are cobot joint torques checked with the arm straight out and fully loaded?"]

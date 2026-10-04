@@ -6,7 +6,7 @@
 """
 import numpy as np
 
-from _gpusim import diverge
+from gpusim import diverge
 from bookout import COLORS, T, figure, style
 
 plt = style()

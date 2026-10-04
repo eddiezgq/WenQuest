@@ -22,7 +22,15 @@ export interface Member { id: number; fullname: string; email: string; avatar: s
 export interface Group { id: number; name: string; members: number[] }
 export interface PlanGroup { name: string; members: number[]; note: string; names: string[] }
 
+export interface GpuUsage {
+  grant_hours: number;
+  students: { user_id: number; name: string; hours: number; cost: number; sessions: number }[];
+}
+
 export const courseApi = {
+  // 云端 GPU 实验（《人工智能》第 14 轮附）
+  gpuUsage: (cid: number) => request<GpuUsage>("GET", `/api/v1/courses/${cid}/gpulab/usage`),
+  gpuGrant: (cid: number, hours: number) => request<{ hours: number }>("PUT", `/api/v1/courses/${cid}/gpulab/grant`, { hours }),
   announcements: (cid: number) =>
     request<{ forum: number | null; items: Discussion[]; can_post: boolean }>("GET", `/api/v1/courses/${cid}/announcements`),
   announce: (cid: number, subject: string, message: string) =>
@@ -310,4 +318,27 @@ export const lifeApi = {
   exportCourse: (cid: number, kind: "backup" | "files") => request<ExportJob>("POST", `/api/v1/courses/${cid}/exports`, { kind }),
   exportBin: (bid: number) => request<ExportJob>("POST", `/api/v1/trash/${bid}/exports`),
   exports: () => request<{ exports: ExportJob[] }>("GET", "/api/v1/exports"),
+};
+
+// Engineering task sheets (round 11, 2.7 (5)): issued from the textbooks to a class factory; the work happens in the factory.
+export interface TaskCatalogItem {
+  book: string; book_title: string; no: string; code: string; title: [string, string]; role: [string, string] | null;
+  hours: number | null; stations: string[] | null; section: string | null;
+}
+export interface TaskSub {
+  id: string; author_uid: string; name: string; status: string; status_zh: string; rounds: number; open_errors: number;
+  open_warnings: number; suggested: number | null; total: number | null; pushed_at: string | null; review_url: string;
+}
+export interface CourseTask {
+  code: string; book: string; no: string; title: { zh: string; en: string }; factory: string; factory_name: string;
+  due: number; cmid: number | null; url: string; submissions?: TaskSub[]; counts?: Record<string, number>; to_push?: number;
+  mine?: { status: string; status_zh: string; total: number | null; open_errors: number } | null;
+}
+export const taskApi = {
+  catalog: () => request<{ tasks: TaskCatalogItem[]; factories: { id: string; name: string }[]; connected: boolean }>("GET", "/api/v1/task-catalog"),
+  list: (cid: number) => request<{ teacher: boolean; tasks: CourseTask[]; factory_error: string | null }>("GET", `/api/v1/courses/${cid}/tasks`),
+  issue: (cid: number, body: { book: string; no: string; factory: string; due: number; section: number }) =>
+    request<{ code: string; tid: string; cmid: number; url: string }>("POST", `/api/v1/courses/${cid}/tasks`, body),
+  push: (cid: number, code: string, again = false) =>
+    request<{ pushed: number; failed: { name: string; error: string }[] }>("POST", `/api/v1/courses/${cid}/tasks/${code}/push`, { again }),
 };

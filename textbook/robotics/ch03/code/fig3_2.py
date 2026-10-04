@@ -98,7 +98,7 @@ Gt = np.array([r[0], r[1]])
 axt.plot(*Gt, "o", color=C["x"], ms=5)
 axt.plot([0, Gt[0]], [0, Gt[1]], color=C["accent"], lw=2)
 axt.text(Gt[0] / 2 + 0.003, Gt[1] / 2 + 0.012, r"$\rho$", fontsize=12, color=C["accent"])
-axt.text(Gt[0] + 0.006, Gt[1] - 0.012, T("质心（重力向下，垂直纸面）", "centre of mass (weight into the page)"), fontsize=9)
+axt.text(Gt[0] + 0.006, Gt[1] - 0.012, T("质心（重力向下，垂直纸面）", "centre of mass\n(weight into the page)"), fontsize=9)
 mvec = np.cross(r, [0, 0, -14.715])
 ms = mvec[:2] / np.linalg.norm(mvec) * 0.09
 arrow2(axt, (0, 0), ms, C["z"], 2.4)
@@ -155,12 +155,12 @@ ax.text(*(vpar + 0.55 * vperp + [0, 0, 0.06]), r"$\boldsymbol{v}_\perp$", color=
 arrow3(ax, vpar, uxv, C["y"], 2.0)
 ax.text(*(vpar + uxv + [-0.05, 0.05, 0.05]), r"$\hat{\boldsymbol{u}}\times\boldsymbol{v}$", color=C["y"], fontsize=12)
 arrow3(ax, vpar, uuxv, C["z"], 2.0)
-ax.text(*(vpar + uuxv + [-0.02, -0.05, -0.12]), r"$\hat{\boldsymbol{u}}\times(\hat{\boldsymbol{u}}\times\boldsymbol{v})=-\boldsymbol{v}_\perp$",
+ax.text(*(vpar + uuxv + [0.0, 0.0, 0.3]), r"$\hat{\boldsymbol{u}}\times(\hat{\boldsymbol{u}}\times\boldsymbol{v})=-\boldsymbol{v}_\perp$",
         color=C["z"], fontsize=11.5, ha="center")
 circle3(ax, vpar, unit(vperp), unit(uxv), np.linalg.norm(vperp), 0, 2 * math.pi, C["muted"], 0.8, ":")
 ax.plot([0, vpar[0]], [0, vpar[1]], [0, vpar[2]], color=C["ink"], lw=3, alpha=0.5)
 ax.text(-0.3, 0, vpar[2] / 2, r"$(\hat{\boldsymbol{u}}\cdot\boldsymbol{v})\hat{\boldsymbol{u}}$", fontsize=11, ha="right")
-ax.text2D(0.02, 0.95, T("(b) 二重叉积：每叉乘一次 û，在垂直平面内转 90°", "(b) Each cross product with û turns 90° in the plane across û"),
+ax.text2D(0.02, 0.95, T("(b) 二重叉积：每叉乘一次 û，在垂直平面内转 90°", "(b) Each cross product with û turns 90° in the plane perpendicular to û"),
           transform=ax.transAxes, fontsize=10)
 fig.subplots_adjust(wspace=0.02)
 figure(fig, "fig3_2_3")

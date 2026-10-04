@@ -56,7 +56,8 @@ def services(c, ci_ports=None):
         WQ_AI_PER_HOUR="${WQ_AI_PER_HOUR:-30}", WQ_HISTORY_DAYS="${WQ_HISTORY_DAYS:-30}", WQ_LIBRARY_DIR="/library",
         WQ_LIBRARY_ORIGINS="https://%s.factory.${SITE_DOMAIN}" % cid, WQ_PUBLIC_URL="https://%s.factory.${SITE_DOMAIN}" % cid,
         WQ_CLAUDE_KEY="${WQ_CLAUDE_KEY:-}", WQ_CLAUDE_MODEL="${WQ_CLAUDE_MODEL:-claude-sonnet-5}",
-        WQ_FACTORY_NAME=c["name"], WQ_CLASS_TEACHERS=",".join(c["teachers"])),
+        WQ_FACTORY_NAME=c["name"], WQ_CLASS_TEACHERS=",".join(c["teachers"]),
+        WQ_FACTORY_TASK_KEY="${WQ_FACTORY_TASK_KEY:-}"),          # 工程任务单钥匙（第 11 轮 2.7（5））：学习平台下达、读进度
         volumes=["./library:/library:ro"],
         depends_on={"db": {"condition": "service_healthy"}, "bus-c-" + cid: {"condition": "service_started"}},
         healthcheck={"test": ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen("
@@ -101,6 +102,9 @@ if __name__ == "__main__":
     cls = load(sys.argv[1])
     if "--ids" in sys.argv:
         print(" ".join(c["id"] for c in cls))
+        sys.exit(0)
+    if "--names" in sys.argv:                 # 学习平台下达任务单时选班级工厂用（第 11 轮 2.7（5））：编号:名称,编号:名称
+        print(",".join("{}:{}".format(c["id"], str(c["name"]).replace(",", "，").replace(":", "：")) for c in cls))
         sys.exit(0)
     head = "# 由 deploy/classes.py 按 classes.yaml 生成（第 10 轮），不要手改\n"
     open(sys.argv[2], "w", encoding="utf-8").write(head + yaml.safe_dump(compose(cls, "--ci-ports" in sys.argv),

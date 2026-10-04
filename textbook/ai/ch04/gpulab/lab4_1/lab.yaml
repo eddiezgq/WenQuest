@@ -1,0 +1,49 @@
+标题: ["GPU 实验 4.1 第一个核函数：向量加法与图像灰度化", "GPU Lab 4.1 The first kernels: vector addition and grayscale"]
+目的: ["在真正的 GPU 上编译、运行两个核函数，测出耗时与有效带宽，与显存带宽比较；改变每块线程数，看对耗时的影响。",
+       "Compile and run two kernels on a real GPU, measure their time and effective bandwidth, compare with the memory bandwidth, and see how the block size matters."]
+显卡: basic
+结果:
+  - {名: vadd_ms, 说明: ["向量加法耗时（2^26 个元素）", "vector addition time (2^26 elements)"], 单位: ms}
+  - {名: vadd_GBs, 说明: ["向量加法有效带宽", "vector addition effective bandwidth"], 单位: GB/s}
+  - {名: gray_ms, 说明: ["灰度化耗时（3840×2160）", "grayscale time (3840×2160)"], 单位: ms}
+  - {名: gray_GBs, 说明: ["灰度化有效带宽", "grayscale effective bandwidth"], 单位: GB/s}
+  - {名: peak_GBs, 说明: ["这块 GPU 的显存带宽（规格）", "this GPU's memory bandwidth (spec)"], 单位: GB/s}
+  - {名: best_block, 说明: ["向量加法最快的每块线程数", "fastest block size for vector addition"], 单位: ""}
+  - {名: t32_ms, 说明: ["每块 32 个线程时的耗时", "time with 32 threads per block"], 单位: ms}
+  - {名: t64_ms, 说明: ["每块 64 个线程时的耗时", "time with 64 threads per block"], 单位: ms}
+  - {名: t128_ms, 说明: ["每块 128 个线程时的耗时", "time with 128 threads per block"], 单位: ms}
+  - {名: t256_ms, 说明: ["每块 256 个线程时的耗时", "time with 256 threads per block"], 单位: ms}
+  - {名: t512_ms, 说明: ["每块 512 个线程时的耗时", "time with 512 threads per block"], 单位: ms}
+  - {名: t1024_ms, 说明: ["每块 1024 个线程时的耗时", "time with 1024 threads per block"], 单位: ms}
+文件: [vadd.cu, gray.cu, check.cuh]
+实际问题:
+  标题: ["数字工厂检测工位：每帧八百万像素", "Inspection station: eight million pixels a frame"]
+  内容: ["相机每秒 60 帧、每帧 3840×2160。灰度化与阈值判断能否在 GPU 上跟上帧率？时间主要花在哪里？",
+         "The camera takes 60 frames a second at 3840×2160. Can grayscale and thresholding keep up on a GPU, and where does the time go?"]
+原理:
+  - ["每个线程负责一个元素：i = blockIdx.x · blockDim.x + threadIdx.x（式 (4.2.1)）；线程块数 = ⌈n / b⌉（式 (4.2.2)）。", "Each thread handles one element: i = blockIdx.x · blockDim.x + threadIdx.x (Eq. (4.2.1)); blocks = ⌈n/b⌉ (Eq. (4.2.2))."]
+  - 式: "有效带宽 = 搬运的字节 / 耗时；向量加法每个元素 12 字节，灰度化每个像素 5 字节"
+  - ["这两个核函数每读一个字节只做不到一次运算，远在屋顶线的平衡点左边（3.8 节），耗时由显存带宽决定。", "Both kernels do less than one operation per byte, far left of the ridge point (Section 3.8); memory bandwidth sets their time."]
+  - ["GPU 上的运算是异步的：计时用 CUDA 事件（cudaEventRecord），并且先预热一次。", "GPU work is asynchronous: time it with CUDA events (cudaEventRecord) after a warm-up run."]
+步骤:
+  - ["运行第一格检查环境，记下 GPU 型号、驱动、CUDA 版本。", "Run the first cell and note the GPU, driver and CUDA version."]
+  - ["编译运行向量加法，记录耗时与有效带宽，与这块 GPU 的显存带宽比较（任务 1）。", "Compile and run vector addition; record time and bandwidth and compare with the memory bandwidth (task 1)."]
+  - ["编译运行灰度化，记录耗时、有效带宽和暗斑像素数（应为 11277），算出每帧需要的时间占 1/60 秒的多少（任务 2）。", "Run grayscale; record time, bandwidth and the dark-pixel count (11277); what fraction of 1/60 s does a frame take (task 2)?"]
+  - ["把向量加法的每块线程数依次取 32、64、128、256、512、1024，画出耗时随它变化的曲线（任务 3）。", "Run vector addition with 32, 64, 128, 256, 512, 1024 threads per block and plot the time (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  两个核函数的测量", "Table 1  The two kernels"]
+    表头: ["核函数", "耗时（ms）", "有效带宽（GB/s）", "显存带宽（GB/s）", "占显存带宽的比例"]
+    表头英文: ["Kernel", "Time (ms)", "Effective bandwidth (GB/s)", "Memory bandwidth (GB/s)", "Fraction"]
+    行: [["向量加法", "{{vadd_ms}}", "{{vadd_GBs}}", "{{peak_GBs}}", ""], ["灰度化", "{{gray_ms}}", "{{gray_GBs}}", "{{peak_GBs}}", ""]]
+  - 标题: ["表 2  每块线程数的影响（向量加法）", "Table 2  Block size (vector addition)"]
+    表头: ["每块线程数", "32", "64", "128", "256", "512", "1024"]
+    表头英文: ["Threads per block", "32", "64", "128", "256", "512", "1024"]
+    行: [["耗时（ms）", "{{t32_ms}}", "{{t64_ms}}", "{{t128_ms}}", "{{t256_ms}}", "{{t512_ms}}", "{{t1024_ms}}"]]
+注意:
+  - ["机器按秒计费：做完点“关机”。空闲 30 分钟自动关机，机器上的文件随之删除。", "Billed by the second: press Stop when done. Idle machines stop after 30 minutes and their files are deleted."]
+  - ["不同 GPU 的结果不同；报告中写明 GPU 型号。", "Results depend on the GPU; give its model in your report."]
+  - ["每块 32 个线程时，一个 SM 上最多驻留的线程块数（视计算能力为 16～32 个，A10 为 16 个）限制了线程数，延迟藏不住（3.7 节）。", "With 32 threads per block the limit on resident blocks per SM (16–32 depending on the compute capability; 16 on an A10) caps the threads, and latency is not hidden (Section 3.7)."]
+思考题:
+  - ["向量加法的有效带宽为什么达不到规格上的显存带宽？", "Why does vector addition not reach the specified memory bandwidth?"]
+  - ["若把灰度化与阈值判断之后的结果都留在 GPU 上，只把暗斑的位置传回主机，整个流程的时间会怎样变化（4.3 节）？", "If the results stay on the GPU and only the dark-spot positions go back to the host, how does the whole pipeline's time change (Section 4.3)?"]

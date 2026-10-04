@@ -1,0 +1,24 @@
+# 实验 4.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab4_6.js。
+原理:
+  - ["一个线程束的一次全局内存访问，按 32 字节扇区搬运。32 个线程访问的地址落在多少个扇区里，就搬多少个扇区；有效带宽比 = 请求的字节 ÷ 搬运的字节（式 (4.6.1)）。", "A warp's global access moves 32-byte sectors: as many as its 32 addresses touch. Efficiency = bytes requested ÷ bytes moved (Eq. (4.6.1))."]
+  - ["共享内存分成 32 个存储体，4 字节的字 w 在第 w mod 32 个存储体。一个线程束中，若几个线程访问同一存储体的不同字，就要分几次完成（冲突路数）；访问同一个字则广播，不冲突（4.7 节）。", "Shared memory has 32 banks; word w sits in bank w mod 32. Threads of a warp hitting different words of one bank take that many passes (ways); the same word is broadcast (Section 4.7)."]
+  - 式: "跨步 k 个字时，冲突路数 = gcd(k, 32)"
+步骤:
+  - ["“合并访问”场景：连续、错位 4 字节、跨步 2、4、8、32，记录扇区数与有效带宽比，填入表 1（任务 1、2）。", "Coalescing: contiguous, offset 4, strides 2, 4, 8, 32; fill in Table 1 (tasks 1, 2)."]
+  - ["结构体数组（24 字节）与连续读（相当于数组结构体）比较（任务 3）；每个线程读 16 字节（任务 4）。", "Array of 24-byte structs vs contiguous (struct of arrays) (task 3); 16 bytes per thread (task 4)."]
+  - ["“存储体冲突”场景：跨步 1～8、按列读 32×32 块（不填充与填充 1 个字）、同一个字，记录冲突路数，填入表 2（任务 5、6）。", "Banks: strides 1–8, a tile column without and with padding, the same word; fill in Table 2 (tasks 5, 6)."]
+数据表:
+  - 标题: ["表 1  合并访问（每个线程 4 字节）", "Table 1  Coalescing (4 bytes per thread)"]
+    表头: ["访问方式", "扇区数", "缓存行数", "有效带宽比"]
+    表头英文: ["Pattern", "Sectors", "Lines", "Efficiency"]
+    行: [["连续", "", "", ""], ["错位 4 字节", "", "", ""], ["跨步 2", "", "", ""], ["跨步 4", "", "", ""], ["跨步 8", "", "", ""], ["跨步 32", "", "", ""], ["结构体数组 24 字节", "", "", ""]]
+  - 标题: ["表 2  存储体冲突", "Table 2  Bank conflicts"]
+    表头: ["访问方式", "冲突路数", "gcd(k, 32)"]
+    表头英文: ["Pattern", "Ways", "gcd(k, 32)"]
+    行: [["跨步 1", "", "1"], ["跨步 2", "", "2"], ["跨步 3", "", "1"], ["跨步 4", "", "4"], ["跨步 8", "", "8"], ["按列读 32×32", "", "—"], ["按列读 32×33", "", "—"], ["同一个字", "", "—"]]
+注意:
+  - ["“随机”方式固定在 32 × 64 = 2048 个元素里随机读（种子固定），与算例 4.6.1 相同；“跨步”滑块对它不起作用。", "The random pattern always reads among 32 × 64 = 2048 elements (fixed seed), as in Example 4.6.1; the stride slider does not affect it."]
+  - ["这是教学模型：不模拟 L1/L2 缓存命中——真实 GPU 上，相邻线程束重复读同一扇区时可能命中缓存，实际的显存流量会小一些。", "A teaching model: cache hits are not modelled; on a real GPU neighbouring warps may hit in cache and move less."]
+  - ["存储体按 4 字节字计；8 字节访问在新的 GPU 上按半个线程束处理，这里不模拟。", "Banks are counted in 4-byte words; 8-byte accesses (handled per half-warp on recent GPUs) are not modelled."]
+思考题:
+  - ["随机访问时有效带宽比约为多少？为什么查表、稀疏矩阵、图计算在 GPU 上往往受带宽限制？", "What efficiency does random access give? Why are table lookups, sparse matrices and graphs often bandwidth-bound on GPUs?"]

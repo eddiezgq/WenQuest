@@ -195,6 +195,20 @@ class ERP {
         const mr = await this.materialRequest(company, d.preview.material_requests, erpDate(new Date().toISOString()));
         out.push(this.doc('Material Request', mr, 'submitted', opt));
         created.push(['Material Request', mr.name]);
+      } else if (d.action === 'twin_service_order') {
+        // 第 15 轮：数字孪生开的维修单 → ERPNext 服务工单（Issue），设备序列号记在自定义字段里
+        const pv = d.preview;
+        await this.ensureCustomField('Issue', 'wq_serial', { label: '设备序列号 Serial', fieldtype: 'Data', insert_after: 'subject' });
+        const iss = await this.insert('Issue', { subject: pv.subject, description: `${pv.customer || ''}\n${pv.description}`.trim(),
+          status: 'Open', wq_serial: pv.serial });
+        out.push(this.doc('Issue', iss, 'created', opt));
+        created.push(['Issue', iss.name]);
+      } else if (d.action === 'twin_service_done') {
+        const pv = d.preview;
+        const iss = await this.update('Issue', pv.issue, { status: 'Resolved',
+          resolution_details: `已完成：${pv.what}${pv.note ? '。' + pv.note : ''}（问渠数字工厂 · 数字孪生）` });
+        out.push(this.doc('Issue', iss, 'updated', opt));
+        created.push(['Issue', iss.name]);
       } else {
         return [];      // 其他提议（如下达工单）由工作台的 MES 执行
       }

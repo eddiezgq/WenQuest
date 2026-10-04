@@ -1,9 +1,9 @@
-"""算例 3.6.1、3.6.2：线程束分化的代价（GPU 执行模拟器的 Python 参考版 _gpusim.py，部分 ②）。
+"""算例 3.6.1、3.6.2：线程束分化的代价（GPU 执行模拟器的 Python 参考版 gpusim.py，部分 ②）。
 
 式 (3.6.1)：一个线程束内两种线程都有时，发射的指令数 = pre + then + else + post；
 SIMT 效率 = 活动线程·指令 / (32 × 发射的指令)。
 """
-from _gpusim import diverge
+from gpusim import diverge
 from bookout import out
 
 base = dict(pre=2, then=4, other=4, post=2)

@@ -42,6 +42,9 @@ import yaml
 from markdown_it import MarkdownIt
 
 import english
+import gpulab
+import gpurun
+import cucheck
 import labdocs
 import tasksheet
 
@@ -112,7 +115,7 @@ def anim_check(code: str) -> str:
         exec(compile(ast.Module(body=keep, type_ignores=[]), "animator-check", "exec"), ns)
         _ANIM_CHECK = ns["check"]
     return _ANIM_CHECK(code)
-KINDS = ("程序", "动画", "实验", "图", "表", "任务")          # 任务: engineering task sheets (第 11、13 轮)
+KINDS = ("程序", "动画", "实验", "GPU实验", "图", "表", "任务")   # GPU实验: 云端 GPU 实验（人工智能第 14 轮附）          # 任务: engineering task sheets (第 11、13 轮)
 REF_KINDS = ("式", "定义", "定律", "定理", "引理", "推论", "准则", "算例", "程序", "图", "表", "动画", "实验", "任务", "习题")
 
 
@@ -141,6 +144,7 @@ class Section:
     anims: list = field(default_factory=list)
     labs: list = field(default_factory=list)
     labdocs: list = field(default_factory=list)
+    gpulabs: list = field(default_factory=list)       # (number, folder, lab.yaml, notebook cells): 云端 GPU 实验
     tasks: list = field(default_factory=list)       # (number, yaml path, task data): 工程任务单 (第 13 轮)
     media: list = field(default_factory=list)       # (kind, number, caption) of animations and labs: the 互动资源 lists (第 9 轮 2.5)
     defines: set = field(default_factory=set)
@@ -366,6 +370,28 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
     return values
 
 
+def check_cuda(book: dict, chapters: set[int], rep: "Report") -> None:
+    """书中的 CUDA 程序（code/ 与 gpulab/ 下的 .cu）都要能编译（cucheck.py，clang 的 CUDA 前端）；结果按文件内容缓存。"""
+    files = [f for ch in sorted(chapters) for d in ("code", "gpulab") for f in sorted((book["root"] / f"ch{ch:02d}" / d).rglob("*.cu"))]
+    if not files:
+        return
+    if not cucheck.available():
+        rep.add("warning", "程序", "CUDA", f"{len(files)} 个 CUDA 程序没有检查：缺少 clang++ 或 CUDA 头文件（pip install nvidia-cuda-runtime-cu12 nvidia-cuda-nvcc-cu12 nvidia-cuda-cccl-cu12 nvidia-curand-cu12）")
+        return
+    cache = book["root"].parent / "build" / book["book"] / "cucheck"
+    cache.mkdir(parents=True, exist_ok=True)
+    for f in files:
+        h = hashlib.sha256(f.read_bytes() + b"".join(p.read_bytes() for p in sorted(f.parent.glob("*.cuh")))).hexdigest()[:16]
+        hit = cache / f"{h}.ok"
+        if hit.exists():
+            continue
+        probs = cucheck.check(f)
+        for why in probs:
+            rep.add("error", "程序", str(f.relative_to(book["root"])), why)
+        if not probs:
+            hit.write_text("ok")
+
+
 PLACE = re.compile(r"\{\{\s*(\w+)\.(\w+)\s*(?::([^}]+))?\}\}")
 
 
@@ -387,6 +413,8 @@ def fill(sec: Section, values: dict, rep: Report) -> str:
         if prog not in values:
             rep.add("error", "占位符", sec.id, f"{{{{{prog}.{name}}}}}：没有程序 {prog}.py 或它没有运行成功")
             return m.group(0)
+        if values[prog].get(gpurun.PENDING):          # GPU 实测还没有做（第 14 轮附 4.4 节）
+            return "[to be measured]" if sec.lang == "en" else "〔待实测〕"
         if name not in values[prog]:
             rep.add("error", "占位符", sec.id, f"{{{{{prog}.{name}}}}}：程序 {prog}.py 没有交出 {name}")
             return m.group(0)
@@ -512,6 +540,22 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
                 sec.labdocs.append((num, script, g))
             return (f"<figure class='wq-lab' id='{kind}-{num}'><div class='wq-media-box wq-labbox' data-lab='{num.replace('.', '-')}'>"
                     f"{box}{cap}</div>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
+    if kind == "GPU实验":    # 云端 GPU 实验（人工智能第 14 轮附）：chNN/gpulab/<src>/lab.yaml + lab.py
+        sec.defines.add(f"实验 {num}")             # the text refers to it as “GPU 实验 4.1”
+        label = f"GPU Lab {num}" if en else f"GPU 实验 {num}"
+        box = f"[{label}] " if en else f"【{label}】"
+        name = meta.get("src", "")
+        folder = sec.path.parent / "gpulab" / name if name else sec.path.parent / "gpulab" / "?"
+        g, cs, bad = gpulab.load(folder)
+        for why in bad:
+            rep.add("error", "实验", sec.id, f"{label}：{why}")
+        if g is not None and not bad and not en:
+            sec.gpulabs.append((num, folder, g, cs))
+        tier = {"basic": ("普通 GPU", "a standard GPU"), "hopper": ("Hopper 架构 GPU", "a Hopper GPU"),
+                "profile": ("能读性能计数器的 GPU", "a GPU with performance counters")}.get((g or {}).get("显卡"), ("GPU", "a GPU"))
+        need = f" (needs {tier[1]})" if en else f"（需要{tier[0]}）"
+        return (f"<figure class='wq-lab wq-gpulab' id='实验-{num}'><div class='wq-media-box wq-gpubox' data-gpulab='{num.replace('.', '-')}'>"
+                f"{box}{cap}{need}</div>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     if kind == "任务":       # 工程任务单 (第 11 轮 2.7（3）5a、第 13 轮): task/NAME.yaml → task sheet, rubric, blank calculation sheet
         name = meta.get("src", "")
         path = sec.path.parent / "task" / f"{name}.yaml" if name else None
@@ -542,9 +586,51 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
             f"<figcaption>{label}{gap}{cap}</figcaption>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
 
 
+# ---------------------------------------------------------------- 零件库链接（第 11 轮《机械设计》第 33 章修订，各书共用）
+# 正文写 [[零件:A-BRG-DG/6207]] 或 [[零件:D-RDC-HD-CSF]]：阅读页显示零件名和规格，点开是数字工厂零件库的对应页面；
+# 构建时核对编号（和规格）在零件库里存在（library/catalog）。
+PART = re.compile(r"\[\[零件:([A-Z][A-Z0-9-]+)(?:/([^\]\s]+))?\]\]")
+LIBRARY_DIR = ROOT / "library" / "catalog"
+LIBRARY_URL = os.environ.get("WQ_LIBRARY_URL", "https://factory.wenquestrobotics.com/library")
+_LIB: dict = {}
+
+
+def library_entry(pid: str) -> dict | None:
+    if pid not in _LIB:
+        hit = next(iter(LIBRARY_DIR.glob(f"*/{pid}/entry.yaml")), None) if LIBRARY_DIR.is_dir() else None
+        if hit is None:
+            _LIB[pid] = None
+        else:
+            import csv
+            e = yaml.safe_load(hit.read_text(encoding="utf-8")) or {}
+            sizes = set()
+            sp = hit.parent / "specs.csv"
+            if sp.exists():
+                with sp.open(encoding="utf-8") as fh:
+                    sizes = {r[0] for r in csv.reader(fh) if r}
+            _LIB[pid] = {"name": e.get("name") or {}, "sizes": sizes}
+    return _LIB[pid]
+
+
+def part_html(sec: "Section", pid: str, size: str | None, rep: "Report") -> str:
+    e = library_entry(pid)
+    if e is None:
+        rep.add("error", "零件库", sec.id, f"零件库里没有 {pid}（library/catalog）")
+        return html.escape(pid + ("/" + size if size else ""))
+    if size and size not in e["sizes"]:
+        rep.add("error", "零件库", sec.id, f"零件库 {pid} 没有规格 {size}")
+    name = (e["name"].get("en") if sec.lang == "en" else e["name"].get("zh")) or pid
+    ref = pid + ("/" + size if size else "")
+    label = name + (" " + size if size else "")
+    return (f"<a class='wq-part' data-ref='{html.escape(ref)}' href='{html.escape(LIBRARY_URL)}?ref={html.escape(ref)}' "
+            f"target='_blank' rel='noopener'>{html.escape(label)}<sup class='wq-part-ref'>{'library ' if sec.lang == 'en' else '零件库 '}"
+            f"{html.escape(ref)}</sup></a>")
+
+
 def render_section(sec: Section, text: str, values: dict, rep: Report, formulas: list) -> str:
     store: list = []
     text = protect(text, store, FENCE, lambda m: ("raw", None, m.group(0)))
+    text = protect(text, store, PART, lambda m: ("part", (m.group(1), m.group(2)), None))
     text = protect(text, store, DIRECTIVE, lambda m: ("directive", (m.group(1), m.group(2), m.group(3)), None))
     text = protect(text, store, DISPLAY, lambda m: ("math", True, m.group(1).strip()))
     text = protect(text, store, INLINE, lambda m: ("math", False, m.group(1).strip()))
@@ -559,6 +645,8 @@ def render_section(sec: Section, text: str, values: dict, rep: Report, formulas:
         kind, a, b = store[i]
         if kind == "directive":
             return directive_html(sec, a[0], a[1], a[2], values, rep)
+        if kind == "part":
+            return part_html(sec, a[0], a[1], rep)
         if kind == "math":
             formulas.append((sec.id, b, a))
             return f"WQMATH{len(formulas) - 1}Z"
@@ -709,8 +797,11 @@ def check_numbers(sec: Section, rep: Report) -> None:
     text = PLACE.sub("", text)
     text = re.sub(r"https?://\S+", "", text)
     text = re.sub(r"\b(?:JJF|JJG|GB(?:/T)?|JB(?:/T)?|ISO|IEC|IEEE|DIN|VDI|EN|ASTM|ASME|AWS|SAE)\s*[A-Z]?[\d.]+", "", text)     # standard numbers, e.g. JJF 1059.1, JB/T 9165.2
-    text = re.split(r"\*\*本节参考文献\*\*|#+\s*(?:本章)?参考文献", text)[0]
-    text = re.sub(r"\d+(?:\.\d+)+\s*节", "", text)       # section references such as “52.10 节” are not measured values
+    text = re.split(r"\*\*本节参考文献\*\*|#+\s*(?:本章)?参考文献|\*\*Section references\*\*|#+\s*(?:Chapter )?References", text, flags=re.I)[0]
+    ch = sec.id.split(".")[0]
+    if ch.isdigit():                                    # 本章的节号（如 33.10、33.11）不是数据
+        text = re.sub(rf"(?<![\d.]){ch}\.\d{{1,2}}(?![\d])", "", text)
+    text = re.sub(r"\d+(?:\.\d+)+\s*节", "", text)       # 其他章的节号引用（如“52.10 节”）也不是数据
     for line_no, line in enumerate(text.splitlines(), 1):
         for m in NUMBER.finditer(line):
             digits = m.group(1).replace(".", "").lstrip("0")
@@ -807,6 +898,13 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     check_other_books(book, rep)
     check_std_tables(book, rep)
     values = run_programs(book, {s.chapter for s in sections}, rep)
+    # 书中数字的 GPU 实测记录（人工智能第 14 轮附 4.4 节）：code/runs/<名>/ 与 <名>.json
+    status = {int(k): (v or {}).get("status", "draft") for k, v in (prog_meta.get("chapters") or {}).items()}
+    check_cuda(book, {s.chapter for s in sections}, rep)
+    run_vals, run_probs = gpurun.values(book["root"], {s.chapter for s in sections}, status)
+    values.update(run_vals)
+    for level, where, text in run_probs:
+        rep.add(level, "实测", where, text)
     en_chapters = {s.chapter for s in sections_en}
     values_en = run_programs(book, en_chapters, rep, "en") if en_chapters else {}
     for prog, v in values_en.items():
@@ -942,12 +1040,24 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 labdocs.report_en(m, g, lab_dir / f"{stem}-report.en.docx", no, where[0])
         if labs:
             trial_labs(page_html, [no.replace(".", "-") for no, _ in items], rep, f"第 {ch} 章实验页")
+    gl = [x for sec in sections for x in sec.gpulabs]       # 云端 GPU 实验：笔记本、文件、指导书与报告模板
+    index["gpulabs"] = {}
+    if gl:
+        index["gpulabs"] = gpulab.pack(out / "gpulab", [(no, folder, g, cs) for no, folder, g, cs in gl])["labs"]
+        for sec in sections:
+            for no, folder, g, cs in sec.gpulabs:
+                where = (f"《{book['title']}》{sec.id} 节", f"{book.get('title_en') or book['title']}, Section {sec.id}")
+                stem = f"lab{no.replace('.', '_')}"
+                labdocs.guide(gpulab.meta(g), g, out / "gpulab" / f"{stem}-guide.docx", no, where)
+                labdocs.report(gpulab.meta(g), g, out / "gpulab" / f"{stem}-report.docx", no, where)
     index["tasks"] = {}           # 工程任务单 (第 13 轮): task sheet, rubric and blank calculation sheet in Word
     task_dir = out / "task"
     for ch, secs in sorted(by_ch.items()):
         for sec in secs:
             for no, path, t in sec.tasks:
-                where = (f"《{book['title']}》{sec.id} 节", f"{book.get('title_en') or book['title']}, Section {sec.id}")
+                where = ((f"《{book['title']}》第 {ch} 章", f"{book.get('title_en') or book['title']}, Chapter {ch}")
+                         if sec.id.endswith((".0", ".end")) else      # 章首、章末小结不是“节”
+                         (f"《{book['title']}》{sec.id} 节", f"{book.get('title_en') or book['title']}, Section {sec.id}"))
                 stem = f"ts{no.replace('.', '_')}"
                 try:
                     tasksheet.task_doc(t, task_dir / f"{stem}-task.docx", no, where)
@@ -956,6 +1066,9 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 except Exception as e:  # noqa: BLE001 — a broken task sheet is reported, not a crash
                     rep.add("error", "任务", sec.id, f"任务 {no}：生成 Word 失败：{e}")
                     continue
+                spec = dict(t, book=book["book"], no=no, section=sec.id, where=list(where),
+                            docs=[k for k in ("task", "rubric", "calc") if (task_dir / f"{stem}-{k}.docx").exists()])
+                (task_dir / f"{stem}.json").write_text(json.dumps(spec, ensure_ascii=False, indent=1), encoding="utf-8")   # 下达时发给数字工厂（第 11 轮 2.7（5））
                 index["tasks"].setdefault(str(ch), []).append({"no": no, "id": t["编号"], "title": t["标题"], "section": sec.id})
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     for ch, secs in by_ch.items():

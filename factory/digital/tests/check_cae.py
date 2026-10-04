@@ -92,6 +92,18 @@ assert abs(j["stats"]["film_groups"][0]["mean_c"] - ex["formula"]["t_oil_c"]) < 
 assert call("POST", "/api/cae/jobs/{}/report".format(j["id"]), {"images": []}, token=tok, raw=True)[:2] == b"PK"
 print("温度场演练通过：箱体外表面平均 {:.1f} ℃，公式 {} ℃".format(j["stats"]["film_groups"][0]["mean_c"], ex["formula"]["t_oil_c"]))
 
+# 第 14 轮：拓扑优化——MBB 梁（经典算例，柔度约 203），拉伸成板件交给有限元
+j = call("POST", "/api/opt/topo", {"spec": {"preset": "mbb"}}, token=tok)
+t0 = time.time()
+while j["status"] not in ("done", "failed") and time.time() - t0 < 200:
+    time.sleep(1)
+    j = call("GET", "/api/opt/jobs/" + j["id"], token=tok)
+assert j["status"] == "done", j.get("error")
+assert abs(j["stats"]["compliance"] - 203) < 5, j["stats"]
+f = call("POST", "/api/opt/topo/{}/to-fea".format(j["id"]), {}, token=tok)
+assert f["geometry"]["solid"]["solids"] == 1 and len(f["rows"]) == 3, f["rows"]
+print("拓扑优化演练通过：MBB 梁柔度 {}，{} 次迭代".format(j["stats"]["compliance"], j["stats"]["iterations"]))
+
 # 第 13 轮：数控编程——SH-301 粗车工序（工艺规程 20）→ 编程单 → 生成、仿真；示例平板铣削
 ops = call("GET", "/api/cam/ops?item=SH-301", token=tok)
 assert [o["seq"] for o in ops["ops"] if o["cam"]] == [20, 40, 50], ops

@@ -167,6 +167,43 @@ create table if not exists known_user (
     teacher     boolean not null default false,
     last_seen   timestamptz not null default now()
 );
+-- 工程任务单（第 11 轮《机械设计》2.7（5））：学习平台下达，学生在“我的任务”提交，AI 设计评审员出意见，老师批准、评分；
+-- 批注沿用 design_comment（sub_id 前加 T），多两列：level（AI 意见的级别）、reply（学生的回复）
+create table if not exists task_sheet (
+    id          text primary key,
+    code        text not null,              -- TS-33-1
+    book        text,
+    no          text,                       -- 33.1
+    spec        jsonb not null,             -- 任务单说明文件的内容（教材构建时生成）
+    course_id   integer not null,
+    course_name text,
+    cmid        integer,                    -- 学习平台课程里对应的作业（成绩回传用）
+    due         timestamptz,
+    issued_by   text,
+    issued_at   timestamptz not null default now(),
+    status      text not null default 'open',
+    unique (code, course_id)
+);
+create table if not exists task_submission (
+    id           text primary key,
+    task_id      text not null references task_sheet (id),
+    author       text not null,
+    author_uid   text not null,
+    status       text not null default 'draft',   -- draft / submitted / returned / approved / graded
+    deliverables jsonb not null default '{}'::jsonb,
+    review       jsonb,
+    submitted_at timestamptz,
+    rounds       integer not null default 0,
+    decided_by   text,
+    decided_at   timestamptz,
+    decision     text,
+    score        jsonb,
+    pushed_at    timestamptz,
+    updated_at   timestamptz not null default now(),
+    unique (task_id, author_uid)
+);
+alter table design_comment add column if not exists level text;
+alter table design_comment add column if not exists reply text;
 create table if not exists enterprise_member (
     uid         text primary key,
     roles       text[] not null,

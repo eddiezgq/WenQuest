@@ -48,7 +48,7 @@ class Lesson(Base):
             dt = A @ b
             dt = 0.0 if abs(dt) < 0.005 else dt
             return VGroup(MathTex(r"\varphi = %d^\circ" % round(math.degrees(t) % 360), color=YELLOW, font_size=36),
-                          bi(["φ：b 从 a 起逆时针转过的角", "φ: angle turned by b from a, counterclockwise"], 22, GREY_B),
+                          bi(["φ：b 从 a 起逆时针转过的角", "φ: angle turned by b from a, anticlockwise"], 22, GREY_B),
                           MathTex(r"|\boldsymbol a\times\boldsymbol b| = |\boldsymbol a||\boldsymbol b|\,|\sin\varphi| = %.2f" % cr, font_size=34),
                           MathTex(r"\boldsymbol a\cdot\boldsymbol b = |\boldsymbol a||\boldsymbol b|\cos\varphi = %.2f" % dt, font_size=30, color=GREY_B),
                           bi(["黄色平行四边形的面积 = |a×b|", "yellow area = |a×b|"], 24, YELLOW)).arrange(DOWN, aligned_edge=LEFT, buff=0.3).move_to(np.array([3.6, 0.8, 0]))

@@ -1,8 +1,16 @@
 <template>
   <div class="page">
     <div class="page-title"><h1>设计优化</h1>
-      <span class="muted">人只定目标和要求，平台自己改尺寸、跑几十次有限元 / 温度场，找出满足要求的最好方案（Optuna 贝叶斯优化）；结果送设计台或回仿真与分析</span></div>
+      <span class="muted">人只定目标和要求，平台自己改尺寸、跑几十次有限元 / 温度场，找出满足要求的最好方案（Optuna 贝叶斯优化）；结果送设计台或回仿真与分析</span>
+      <span class="labs small">实验 11：<a href="/api/cae/lab11/guide.docx">指导书</a> · <a href="/api/cae/lab11/report-template.docx">报告模板</a></span></div>
 
+    <div class="seg modeseg">
+      <button type="button" :class="{ on: mode === 'param' }" @click="setMode('param')">参数优化（改尺寸）</button>
+      <button type="button" :class="{ on: mode === 'topo' }" @click="setMode('topo')">拓扑优化（平面件：材料该放在哪）</button>
+    </div>
+
+    <TopoPanel v-if="mode === 'topo'" />
+    <template v-else>
     <div class="row">
       <section class="card side">
         <div class="step"><b>1</b> 优化什么</div>
@@ -135,15 +143,20 @@
         </tr></tbody>
       </table>
     </section>
+    </template>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { get, post, session } from '../lib/api';
+import TopoPanel from '../components/TopoPanel.vue';
 
 const router = useRouter();
+const route = useRoute();
+const mode = ref(route.query.mode === 'topo' ? 'topo' : 'param');
+function setMode(m) { mode.value = m; router.replace({ query: { ...route.query, mode: m === 'topo' ? 'topo' : undefined } }); }
 const STATUS = { queued: '排队', running: '计算中', done: '完成', failed: '失败' };
 const TONE = { queued: 'mute', running: 'info', done: 'good', failed: 'bad' };
 const AI_HINT = {
@@ -299,6 +312,8 @@ onUnmounted(() => clearTimeout(pollT));
 .step { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-top: 6px; }
 .step b { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
 .full { width: 100%; height: 34px; border: 1px solid #C8CEC7; border-radius: 6px; padding: 0 8px; background: #fff; }
+.modeseg { margin-bottom: 12px; }
+.labs { margin-left: auto; white-space: nowrap; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; align-self: flex-start; flex-wrap: wrap; }
 .seg button { border: 0; background: #fff; padding: 6px 12px; cursor: pointer; font-size: 13px; }
 .seg button.on { background: var(--accent-bg); font-weight: 600; }

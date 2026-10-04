@@ -22,6 +22,7 @@ const ORDER = [];
 let current = null;   // the lab id being defined (set by WQ.begin)
 let active = null;
 const saved = store.get(KEY + "-tasks") || {};
+const LANG_HOOKS = [];
 
 function el(tag, cls, text) {
   const e = document.createElement(tag);
@@ -519,9 +520,9 @@ function graph(ctx, o) {   // o = {x, y, w, h (pixels), xmin, xmax, ymin, ymax, 
   return G;
 }
 
-// ---------- GPU execution model (《人工智能》第 14 轮 2.5): a teaching model, not a GPU simulator ----------
+// ---------- GPU execution model (《人工智能》第 14 轮 2.5, parts 1-4): a teaching model, not a GPU simulator ----------
 // One SM; two kinds of instruction (global load, arithmetic); fixed load latency; no caches, no dual issue.
-// Line for line the same as textbook/ai/ch03/code/_gpusim.py (textbook/tools/tests/test_gpusim.py runs both).
+// Line for line the same as textbook/ai/conventions/gpusim.py (textbook/tools/tests/test_gpusim.py runs both).
 // schedule(): warps repeat "one load, then k arithmetic instructions that need it"; each scheduler issues at most one
 // instruction per cycle ('gto' greedy-then-oldest or 'lrr' loose round-robin); gap > 0: at most one load per gap cycles
 // per scheduler (bandwidth). util is measured over the second half of the run (steady state).
@@ -593,6 +594,37 @@ const GPU = {
     }
     return { warps: out, issued, active, eff: active / (32 * issued), steps };
   },
+  // part ③: byte addresses read by the 32 threads of a warp; coalesce() counts 32-byte sectors and 128-byte lines
+  addresses({ kind = "contiguous", size = 4, k = 1, offset = 0, struct = 16, seed = 1, base = 0 } = {}) {
+    const r = GPU.rng(seed), out = [];
+    for (let i = 0; i < 32; i++) {
+      const a = kind === "contiguous" ? i * size : kind === "stride" ? i * k * size : kind === "offset" ? i * size + offset
+        : kind === "aos" ? i * struct : kind === "random" ? Math.floor(r() * 32 * k) * size : (() => { throw new Error("kind " + kind); })();
+      out.push(base + a);
+    }
+    return out;
+  },
+  coalesce(addrs, size = 4) {
+    const sectors = new Set(), lines = new Set();
+    for (const a of addrs) for (let s = Math.floor(a / 32); s <= Math.floor((a + size - 1) / 32); s++) { sectors.add(s); lines.add(Math.floor(s / 4)); }
+    const requested = addrs.length * size, moved = sectors.size * 32;
+    return { sectors: sectors.size, lines: lines.size, requested, moved, eff: requested / moved, sector_list: [...sectors].sort((x, y) => x - y) };
+  },
+  // part ④: 4-byte word indices accessed by a warp in shared memory; banks() gives the conflict ways (broadcast counts once)
+  bankWords({ kind = "stride", k = 1, pad = 0, col = 0, seed = 1 } = {}) {
+    const r = GPU.rng(seed), out = [];
+    for (let i = 0; i < 32; i++) {
+      out.push(kind === "stride" ? i * k : kind === "column" ? i * (32 + pad) + col : kind === "same" ? col
+        : kind === "random" ? Math.floor(r() * 1024) : (() => { throw new Error("kind " + kind); })());
+    }
+    return out;
+  },
+  banks(words, nbanks = 32) {
+    const per = Array.from({ length: nbanks }, () => new Set());
+    for (const w of words) per[((w % nbanks) + nbanks) % nbanks].add(w);
+    const load = per.map((s) => s.size);
+    return { ways: Math.max(...load), load };
+  },
 };
 
 // ---------- tasks & progress ----------
@@ -635,6 +667,7 @@ function applyLang() {
   document.querySelectorAll(".bi").forEach((e) => { e.textContent = lang === "en" ? e.dataset.en : e.dataset.zh; });
   $("lang").textContent = lang === "en" ? "中文" : "EN";
   ORDER.forEach((id) => { const L = LABS[id]; paintParams(L); paintProblem(L); readouts(L); });
+  LANG_HOOKS.forEach((f) => { try { f(); } catch (e) { /* a lab's own repaint */ } });
   document.title = P(JSON.parse(document.documentElement.dataset.title || '["虚拟实验","Virtual lab"]'));
   paintTasks();
 }
@@ -716,7 +749,11 @@ function build(id, def) {
   });
   const canvas = el("canvas"); canvas.setAttribute("aria-label", `${def.title[0]} ${def.title[1] || ""}`);
   const bar = el("div", "stagebar");
-  const buttons = (def.buttons && def.buttons.length ? def.buttons : [
+  const buttons = (def.buttons && def.buttons.length ? def.buttons : def.view === "plc" ? [
+    { id: "run", name: ["运行 RUN", "Run"], primary: true }, { id: "stop", name: ["停止 STOP", "Stop"] },
+    { id: "step", name: ["单步扫描", "One scan"] }, { id: "slow", name: ["慢放 ×0.1", "Slow ×0.1"] }, { id: "power", name: ["断电再上电", "Power cycle"] },
+    { id: "reset", name: ["复位设备", "Reset machine"] },
+  ] : [
     { id: "start", name: ["开始", "Start"], primary: true }, { id: "reset", name: ["重置", "Reset"] },
   ]);
   buttons.forEach((b) => {
@@ -756,11 +793,13 @@ function build(id, def) {
   const tc = el("div", "card"); tc.appendChild(biText(el("h3"), ["任务", "TASKS"]));
   const tasks = el("ul", "tasks"); tc.appendChild(tasks);
   if (def.think) tc.appendChild(biText(el("p", "hint"), def.think));
+  if (!def.params.length) pc.hidden = true;   // e.g. PLC labs: the machine is driven by the program, not by sliders
   side.append(pc, rc, tc);
   sec.append(stageBox, side);
   $("labs").appendChild(sec);
 
-  const is3d = def.view === "3d";
+  const plc3d = def.view === "plc" && def.plant && typeof def.plant.build3d === "function";   // PLC lab on a 3D machine (WQPLANTS)
+  const is3d = def.view === "3d" || plc3d;
   const ctx = is3d ? null : canvas.getContext("2d");
   const L = { id, def, broken: false, state: {}, sceneDef: def.scenes[0], is3d, ready: !is3d && !circuit, circuit,
     dom: { tab, tabDone: tab.querySelector(".done"), sec, canvas, chips, params, read, tasks, err, problem } };
@@ -779,8 +818,12 @@ function build(id, def) {
     calc: CALC, graph: (o) => graph(ctx, o), qm: QM, gpu: GPU,
   };
   L.api = api;
-  if (is3d) setup3d(L);
+  if (is3d && !plc3d) setup3d(L);
   if (circuit) setupCircuit(L);
+  if (def.view === "plc") {
+    if (!window.WQPLCUI) throw new Error("this page has no PLC engine (view: 'plc')");
+    window.WQPLCUI.setup(L, { el, biText, T, P, css, store, KEY, onLang: (f) => LANG_HOOKS.push(f) });
+  }
   def.tasks.forEach((t) => { t.ok = !!saved[id + ":" + t.id]; });
   LABS[id] = L; ORDER.push(id);
   // controls
@@ -806,6 +849,7 @@ function build(id, def) {
     const a = b.dataset.action;
     if (a === "start") start(L);
     else if (a === "reset") reset(L);
+    else if (a === "run" && def.view === "plc") { safe(L, () => def.start && def.start(L.api, L.state)); L.api.running = !!(L.plc && L.plc.rt && !L.plc.rt.error); }
     else safe(L, () => def.action && def.action(a, api, L.state));
     readouts(L);
   }));
@@ -914,7 +958,7 @@ function check(def) {   // clear messages for the lab author (the checker report
     `param ${p.id}: needs id, name [zh, en], min < max, value`));
   need(Array.isArray(def.tasks) && def.tasks.length >= 2 && def.tasks.length <= 6, "tasks: 2-6 tasks");
   def.tasks.forEach((t) => need(t.id && Array.isArray(t.text), "every task needs id and text [zh, en]"));
-  need(typeof def.draw === "function", "draw(api, state) is required");
+  need(typeof def.draw === "function" || (def.view === "plc" && def.plant && def.plant.build3d), "draw(api, state) is required");
 }
 
 window.WQ = {
@@ -931,7 +975,7 @@ window.WQ = {
     const labs = {};
     ORDER.forEach((id) => {
       const L = LABS[id];
-      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.is3d ? "3d" : L.circuit ? "circuit" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
+      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.def.view === "plc" ? "plc" : L.is3d ? "3d" : L.circuit ? "circuit" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
         tasks: Object.fromEntries(L.def.tasks.map((t) => [t.id, !!t.ok])), demos: Object.fromEntries(L.def.tasks.map((t) => [t.id, t.demo || null])) };
     });
     return { errors: errors.slice(), active, labs };

@@ -27,6 +27,10 @@ const routes = [
   { path: '/mbd', component: () => import('./pages/Mbd.vue') },
   { path: '/cam', component: () => import('./pages/Cam.vue') },
   { path: '/opt', component: () => import('./pages/Opt.vue') },
+  { path: '/twin', component: () => import('./pages/Twin.vue') },
+  { path: '/tasks', component: () => import('./pages/Tasks.vue') },
+  { path: '/tasks/review/:sid', component: () => import('./pages/TaskReview.vue') },
+  { path: '/tasks/:tid', component: () => import('./pages/TaskPage.vue') },
   { path: '/:p(.*)*', redirect: '/' },
 ];
 

@@ -43,7 +43,7 @@ for j, lam in enumerate((1.6, 0.6)):
     e = ev[:, j] * lam
     ax1.plot([-e[0], e[0]], [-e[1], e[1]], color=C["z"], lw=1, ls=":")
 ax1.text(1.25, 0.95, T("主轴", "principal axis"), fontsize=9.5, color=C["z"])
-ax1.text(-1.75, 1.75, T("(a) 线性算子：单位圆 → 椭圆，Au 一般不平行于 u", "(a) A linear operator: unit circle → ellipse; Au is not parallel to u"), fontsize=10)
+ax1.text(-1.75, 1.75, T("(a) 线性算子：单位圆 → 椭圆，Au 一般不平行于 u", "(a) Linear operator: unit circle → ellipse"), fontsize=10)
 ax1.text(-1.0, -1.3, T("虚线：单位圆", "dashed: unit circle"), fontsize=9, color=C["muted"])
 ax1.set_xlim(-1.8, 1.9)
 ax1.set_ylim(-1.45, 1.9)
@@ -130,7 +130,7 @@ Lh = L / np.linalg.norm(L) * 0.24
 arrow3(ax, np.zeros(3), Lh, C["x"], 2.4)
 ax.text(*(Lh + [0, -0.1, 0.0]), r"$\boldsymbol{L}=\boldsymbol{I}\boldsymbol{\omega}$", fontsize=13, color=C["x"])
 ax.text(0, 0.12, -0.12, T("板面相对工具 xy 平面倾斜 30°", "plate tilted 30° from the tool xy plane"), fontsize=9.5, color=C["accent"])
-ax.text2D(0.0, 0.96, T("(a) 倾斜 30° 的板绕工具 z 轴转动：L 偏离 ω", "(a) A plate tilted 30° spinning about the tool z axis: L leans away from ω"),
+ax.text2D(0.0, 0.96, T("(a) 倾斜 30° 的板绕工具 z 轴转动：L 偏离 ω", r"(a) Tilted plate spinning about $z_t$: $\boldsymbol{L}$ not parallel to $\boldsymbol{\omega}$"),
           transform=ax.transAxes, fontsize=10)
 
 ax = sub3d(fig, 122, elev=20, azim=-55, lim=0.9, zoom=1.2, center=(0.3, 0.3, 0.3))
@@ -144,7 +144,7 @@ for k, (pc, nn) in enumerate((((0.6, 0.3, 0.3), (1, 0, 0)), ((0.3, 0.6, 0.3), (0
     arrow3(ax, pc, 0.45 * tt / np.linalg.norm(tt), C["x"], 2.2)
 ax.text(1.0, 0.3, 0.42, r"$\hat{\boldsymbol{n}}$", fontsize=12, color=C["muted"])
 ax.text(1.02, 0.55, 0.35, r"$\boldsymbol{t}=\boldsymbol{\sigma}\hat{\boldsymbol{n}}$", fontsize=12, color=C["x"])
-ax.text2D(0.0, 0.96, T("(b) 应力：每个截面上的应力矢量 t 由法线 n 线性决定", "(b) Stress: the traction t on a cut depends linearly on its normal n"),
+ax.text2D(0.0, 0.96, T("(b) 应力：每个截面上的应力矢量 t 由法线 n 线性决定", r"(b) Stress: $\boldsymbol{t}$ depends linearly on $\hat{\boldsymbol{n}}$"),
           transform=ax.transAxes, fontsize=10)
 fig.subplots_adjust(wspace=0.05)
 figure(fig, "fig3_4_3")

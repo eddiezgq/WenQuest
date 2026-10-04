@@ -1,4 +1,5 @@
-"""GPU 执行模拟器的 Python 参考版（第 14 轮细则 2.5 节，部分 ① 线程束执行、② 线程束分化）。以下划线开头，构建时不单独运行。
+"""GPU 执行模拟器的 Python 参考版（第 14 轮细则 2.5 节：① 线程束执行、② 线程束分化、③ 合并访问、④ 存储体冲突）。
+全书共用（conventions/ 在程序的搜索路径上）。
 
 平台实验工具包里的 `gpu` 模块（services/gateway/app/production/labkit/kit.js，`const GPU = {`）与本文件逐行对应；
 textbook/tools/tests/test_gpusim.py 用 node 运行 JS 版，核对两者在同一组情形下给出完全相同的结果。
@@ -152,3 +153,71 @@ def diverge(cond="odd", warps=1, pre=2, then=4, other=4, post=2, p=0.5, seed=1):
         steps.append([kind for kind, _ in seq])
         out.append({"mask": "".join("1" if b else "0" for b in mask), "issued": wi, "active": wa})
     return {"warps": out, "issued": issued, "active": active, "eff": active / (32 * issued), "steps": steps}
+
+
+def addresses(kind="contiguous", size=4, k=1, offset=0, struct=16, seed=1, base=0):
+    """部分 ③：一个线程束 32 个线程各读一个元素的字节地址。
+    kind: 'contiguous' 第 i 个线程读第 i 个元素；'stride' 读第 k·i 个；'offset' 整体错开 offset 字节；
+          'aos' 结构体数组（每个结构体 struct 字节，读同一字段）；'random' 在 32·k 个元素里随机读（mulberry32，种子 seed）。"""
+    r = rng(seed)
+    out = []
+    for i in range(32):
+        if kind == "contiguous":
+            a = i * size
+        elif kind == "stride":
+            a = i * k * size
+        elif kind == "offset":
+            a = i * size + offset
+        elif kind == "aos":
+            a = i * struct
+        elif kind == "random":
+            a = int(r() * 32 * k) * size
+        else:
+            raise ValueError(kind)
+        out.append(base + a)
+    return out
+
+
+def coalesce(addrs, size=4):
+    """一个线程束的一次读：每个地址读 size 字节。显存按 32 字节扇区搬运，按 128 字节缓存行组织。
+    返回扇区数、缓存行数、请求的字节、搬运的字节与有效带宽比（请求 ÷ 搬运）。"""
+    sectors, lines = set(), set()
+    for a in addrs:
+        for sct in range(a // 32, (a + size - 1) // 32 + 1):      # 这次读用到的每个扇区
+            sectors.add(sct)
+            lines.add(sct // 4)
+    req = len(addrs) * size
+    moved = len(sectors) * 32
+    return {"sectors": len(sectors), "lines": len(lines), "requested": req, "moved": moved, "eff": req / moved,
+            "sector_list": sorted(sectors)}
+
+
+def bank_words(kind="stride", k=1, pad=0, col=0, seed=1):
+    """部分 ④：一个线程束 32 个线程访问共享内存的 4 字节字地址（字的序号）。
+    kind: 'stride' 第 i 个线程访问第 k·i 个字；'column' 读 32×(32+pad) 的二维数组的第 col 列（第 i 个线程读第 i 行）；
+          'same' 全部读同一个字（广播）；'random' 在 1024 个字里随机。"""
+    r = rng(seed)
+    out = []
+    for i in range(32):
+        if kind == "stride":
+            w = i * k
+        elif kind == "column":
+            w = i * (32 + pad) + col
+        elif kind == "same":
+            w = col
+        elif kind == "random":
+            w = int(r() * 1024)
+        else:
+            raise ValueError(kind)
+        out.append(w)
+    return out
+
+
+def banks(words, nbanks=32):
+    """共享内存 nbanks 个存储体，字 w 在存储体 w % nbanks。同一存储体的不同字要分几次读，同一个字广播（只算一次）。
+    返回冲突路数 ways（= 读完要几次）、每个存储体被访问的不同字数。"""
+    per = [set() for _ in range(nbanks)]
+    for w in words:
+        per[w % nbanks].add(w)
+    load = [len(s) for s in per]
+    return {"ways": max(load), "load": load}

@@ -24,6 +24,7 @@
           <div class="line">
             <button class="btn ghost small" :disabled="form.segments.length >= 8" @click="addSeg">＋ 加一段</button>
             <label>两端倒角 <input v-model.number="form.chamfer" type="number" step="0.5" min="0" max="5"> mm</label>
+            <label title="各台阶内角的过渡圆角，0 为尖角；轴承靠紧的轴肩要小于轴承内圈倒角">台阶圆角 <input v-model.number="form.fillet" type="number" step="0.2" min="0" max="5" placeholder="0"> mm</label>
           </div>
           <div class="line kw">
             <label><input v-model="hasKey" type="checkbox"> 平键槽</label>

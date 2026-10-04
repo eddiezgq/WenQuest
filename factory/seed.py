@@ -225,6 +225,13 @@ class Seeder:
                      "price_list_rate": D.FG_SELLING_PRICE},
                     key=[["item_code", "=", "WQR-105"], ["price_list", "=", selling]])
 
+    # ---- 4′ 教材案例件（第 11 轮）：可单独重复运行，每次部署都补建
+    def case_items(self):
+        self.log("教材案例件")
+        for code, (name, kind, uom, price, sup, qit, note) in D.CASE_ITEMS.items():
+            self.ensure("Item", code, item_doc(code, name, kind, uom, price, qit, note, self.company,
+                                               self.wh(D.KIND_WAREHOUSE[kind]), None, None))
+
     # ---- 5 工位、工序、工艺路线
     def routing(self):
         self.log("工作中心、工序与工艺路线")
@@ -377,6 +384,7 @@ class Seeder:
         self.parties()
         self.quality()
         self.items()
+        self.case_items()
         self.routing()
         self.boms()
         if opening_stock:
@@ -470,6 +478,10 @@ def main(argv=None):
                 print("出错：--erp-sso-only 需要 --factory-url 和 --sso-secret", file=sys.stderr)
                 return 1
             sd.erp_sso(args.factory_url, args.sso_secret, args.hub_internal)
+            try:
+                sd.case_items()                       # 第 11 轮：每次部署补建教材案例件（失败不影响单点登录）
+            except ERPError as e:
+                print("教材案例件没有建成：{}".format(e), file=sys.stderr)
         elif args.library_refs_only:
             sd.library_refs(args.factory_url)
         else:

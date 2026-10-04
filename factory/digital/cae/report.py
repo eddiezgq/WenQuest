@@ -158,6 +158,13 @@ def build(job, images=(), ai_text=None):
                 [c["load_amp"], c["load_mean"], c["sigma_a"], c["sigma_m"], c["sigma_a_eq"],
                  "∞" if c["N"] is None else "{:.3g}".format(c["N"])] for c in fat["hot_cycles"]])
         n = 6
+    mo = job.get("modal")                         # 固有频率（第 11 轮 F2）
+    if mo:
+        d.add_heading("{}  固有频率".format(n), 1)
+        table([["阶次", "频率 Hz", "相当转速 r/min"]] + [[str(x["mode"]), "{:.1f}".format(x["hz"]), "{:.0f}".format(x["rpm"])]
+                                                     for x in mo["freqs"]], [3, 5, 6])
+        d.add_paragraph("同样的网格与支承，CalculiX *FREQUENCY；只计零件本身的质量，去掉了 {} 个刚体运动。".format(mo.get("rigid_modes", 0)))
+        n += 1
     d.add_heading("{}  结论".format(n), 1)
     d.add_paragraph(conclusion(st, mat))
     if fat:

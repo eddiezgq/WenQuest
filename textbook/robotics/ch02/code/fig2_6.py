@@ -44,7 +44,7 @@ ax.plot(L1 * np.cos(tt), L1 * np.sin(tt), color=C["muted"], lw=0.8, ls=":")
 j3 = np.array([arm_points(ik_rest(t, tip), L3R)[2] for t in tt])
 ax.plot(j3[:, 0], j3[:, 1], color=C["muted"], lw=0.8, ls=":")
 ax.plot(*tip, "*", color=C["accent"], ms=12, zorder=8)
-ax.text(tip[0] + 0.02, tip[1] + 0.02, T("末端不动", "tip fixed"), fontsize=10)
+ax.text(tip[0] + 0.02, tip[1] + 0.02, T("末端不动", "end-effector fixed"), fontsize=10)
 ax.text(-0.1, -0.08, T("虚线：关节 2、关节 3 的轨迹；黑色是算例 2.6.1 的形态",
                        "dotted: paths of joints 2 and 3; black: the configuration of Example 2.6.1"), fontsize=9, color=C["ink"])
 ax.set_xlim(-0.12, 0.7)
@@ -71,7 +71,7 @@ def space(cx, cy, top, bot, name, ctop, cbot):
     ax.text(cx + 0.95, cy - 0.15, r"$\perp$", fontsize=16)
 
 
-space(2.0, 2.5, T("行空间\n维数 r", "row space\ndim r"), T("零空间 N(A)\n维数 n − r", "null space N(A)\ndim n − r"), r"$\mathbb{R}^n$", C["z"], C["x"])
+space(2.0, 2.5, T("行空间\n维数 r", "row space R(Aᵀ)\ndim r"), T("零空间 N(A)\n维数 n − r", "null space N(A)\ndim n − r"), r"$\mathbb{R}^n$", C["z"], C["x"])
 space(8.0, 2.5, T("值域 R(A)\n维数 r", "range R(A)\ndim r"), T("左零空间 N(Aᵀ)\n维数 m − r", "left null space N(Aᵀ)\ndim m − r"), r"$\mathbb{R}^m$", C["z"], C["y"])
 ax.annotate("", xy=(6.6, 3.5), xytext=(3.4, 3.5), arrowprops=dict(arrowstyle="-|>", color=C["z"], lw=1.6))
 ax.text(4.3, 3.65, T("A：一一对应", "A: one-to-one"), fontsize=10, color=C["z"])

@@ -1,6 +1,6 @@
 # 实验 2.7 的指导书与报告模板。目的、场景、参数、任务取自 lab2_7.js。
 原理:
-  - ["格拉姆-施密特法把线性无关的向量 a₁, a₂, … 依次整理成标准正交的 q₁, q₂, …：第一个只归一化；以后每一个先减去它在已得各方向上的投影，再归一化。", "Gram–Schmidt turns independent vectors a₁, a₂, … into orthonormal q₁, q₂, … in turn: normalise the first; from each later one subtract its projections on the directions already found, then normalise."]
+  - ["格拉姆-施密特法把线性无关的向量 a₁, a₂, … 依次整理成标准正交的 q₁, q₂, …：第一个只归一化；以后每一个先减去它在已得各方向上的投影，再归一化。", "Gram–Schmidt turns independent vectors a₁, a₂, … into orthonormal q₁, q₂, … in turn: normalize the first; from each later one subtract its projections on the directions already found, then normalize."]
   - 式: "w_j = a_j − Σ_{i<j} (q_i · a_j) q_i ，  q_j = w_j / ‖w_j‖          (2.7.3)"
   - ["前 k 个新向量与前 k 个原向量张成同一个子空间（定理 2.7.2）。所以第一根轴严格沿 a₁，误差全部由后面的轴承担，结果依赖于处理的次序。三点法示教中，p₀→p₁ 定 x 轴，p₂ 只用来定平面。", "The first k new vectors span the same subspace as the first k old ones (Theorem 2.7.2). So the first axis lies exactly along a₁, the later axes absorb all the error, and the result depends on the order. In three-point teaching p₀→p₁ fixes the x axis and p₂ only fixes the plane."]
 步骤:
@@ -9,7 +9,7 @@
   - ["保持 ε₁ = ε₂ = 10 mm，把次序改为 1（先处理 y），记录各量，与次序 0 比较（任务 2）。", "Keep ε₁ = ε₂ = 10 mm and set the order to 1 (y first); record the same quantities and compare with order 0 (task 2)."]
   - ["切换到场景“木工画直角”，把画线误差设为 6°，按“用直角尺修正”（任务 3）。说明这一操作与格拉姆-施密特法的对应关系。", "Switch to “A carpenter's right angle”, set the error to 6° and press “Correct with a try square” (task 3). Explain how this corresponds to Gram–Schmidt."]
 数据表:
-  - 标题: ["表 1  示教误差与正交化（次序 0）", "Table 1  Teaching errors and orthonormalisation (order 0)"]
+  - 标题: ["表 1  示教误差与正交化（次序 0）", "Table 1  Teaching errors and orthonormalization (order 0)"]
     表头: ["ε₁ / mm", "ε₂ / mm", "示教方向夹角", "x 轴偏离", "y 轴偏离", "x · y", "det"]
     表头英文: ["ε₁ / mm", "ε₂ / mm", "Taught angle", "x axis off", "y axis off", "x · y", "det"]
     行: [["0", "0", "", "", "", "", ""], ["10", "0", "", "", "", "", ""], ["0", "10", "", "", "", "", ""], ["10", "10", "", "", "", "", ""], ["−10", "10", "", "", "", "", ""]]
@@ -22,4 +22,4 @@
   - ["图中示教误差放大 5 倍画出，读数栏中的角度按真实误差计算。", "The drawing exaggerates the teaching errors 5×; the readouts use the true errors."]
   - ["x·y 的读数是浮点舍入误差的量级（10⁻¹⁷ 左右），即严格为零。", "The x·y readout is at rounding level (about 10⁻¹⁷), i.e. exactly zero."]
 思考题:
-  - ["ε₁ = 10 mm 而 ε₂ = −10 mm 时，示教方向的夹角是多少？为什么正交化后两根轴都几乎不变？", "With ε₁ = 10 mm and ε₂ = −10 mm, what is the taught angle? Why do both axes barely change after orthonormalisation?"]
+  - ["ε₁ = 10 mm 而 ε₂ = −10 mm 时，示教方向的夹角是多少？为什么正交化后两根轴都几乎不变？", "With ε₁ = 10 mm and ε₂ = −10 mm, what is the taught angle? Why do both axes barely change after orthonormalization?"]

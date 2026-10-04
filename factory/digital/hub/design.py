@@ -26,7 +26,7 @@ GBT1095 = [(6, 8, 2, 1.2), (8, 10, 3, 1.8), (10, 12, 4, 2.5), (12, 17, 5, 3.0), 
            (22, 30, 8, 4.0), (30, 38, 10, 5.0), (38, 44, 12, 5.0), (44, 50, 14, 5.5), (50, 58, 16, 6.0),
            (58, 65, 18, 7.0), (65, 75, 20, 7.5), (75, 85, 22, 9.0)]
 
-LIMITS = {"segments": (1, 8), "d": (5.0, 48.0), "len": (2.0, 300.0), "chamfer": (0.0, 5.0)}   # 棒料 Ø50
+LIMITS = {"segments": (1, 8), "d": (5.0, 48.0), "len": (2.0, 300.0), "chamfer": (0.0, 5.0), "fillet": (0.0, 5.0)}   # 棒料 Ø50
 
 
 def defaults():
@@ -46,7 +46,10 @@ def normalize(p):
         segs = [(float(d), float(l)) for d, l in p["segments"]]
         kw = p.get("keyway")
         kw = None if not kw else {"segment": int(kw["segment"]), "b": float(kw["b"]), "t": float(kw["t"]), "L": float(kw["L"])}
-        return {"segments": segs, "chamfer": float(p.get("chamfer", 0)), "keyway": kw}
+        out = {"segments": segs, "chamfer": float(p.get("chamfer", 0)), "keyway": kw}
+        if p.get("fillet"):                       # 台阶过渡圆角（第 11 轮《机械设计》33.2 节 F4）；不写或 0 = 尖角，与旧参数一致
+            out["fillet"] = float(p["fillet"])
+        return out
     except (KeyError, TypeError, ValueError) as e:
         raise ValueError("参数格式不对：{}".format(e)) from None
 
@@ -67,6 +70,14 @@ def check(params):
         errors.append("倒角 {} mm 超出范围 0～5 mm".format(c))
     elif segs and c >= min(segs[0][0], segs[-1][0]) / 2:
         errors.append("倒角不能大于端面半径")
+    r = params.get("fillet", 0.0)
+    if not LIMITS["fillet"][0] <= r <= LIMITS["fillet"][1]:
+        errors.append("台阶圆角 {} mm 超出范围 0～5 mm".format(r))
+    elif r > 0:
+        for i, ((da, _), (db, _)) in enumerate(zip(segs, segs[1:])):
+            h = abs(da - db) / 2
+            if h > 0 and r >= h:
+                errors.append("第 {}、{} 段之间的台阶高只有 {:g} mm，圆角 {:g} mm 做不出来（圆角要小于台阶高）".format(i + 1, i + 2, h, r))
     if not errors:
         errors += wq_shaft.check_keyway(segs, params["keyway"])
     kw = params["keyway"]
@@ -94,6 +105,16 @@ def step_bytes(params):
     for z0, z1, d in layout:
         cyl = bd.Pos(0, 0, z0) * bd.Cylinder(d / 2, z1 - z0, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN))
         shaft = cyl if shaft is None else shaft + cyl
+    r = params.get("fillet", 0.0)
+    if r > 0:                                     # 台阶的内角（小直径一侧的圆）倒圆角
+        inner = []
+        for (z0, z1, d), (_, _, d2) in zip(layout, layout[1:]):
+            if abs(d - d2) > 1e-6:
+                rr = min(d, d2) / 2
+                inner += [e for e in shaft.edges().filter_by(bd.GeomType.CIRCLE)
+                          if abs(e.center().Z - z1) < 1e-6 and abs(e.radius - rr) < 1e-6]
+        if inner:
+            shaft = bd.fillet(inner, r)
     c = params["chamfer"]
     if c > 0:
         ends = [e for e in shaft.edges().filter_by(bd.GeomType.CIRCLE)                 # 两端面外圆

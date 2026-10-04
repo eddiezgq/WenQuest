@@ -134,6 +134,13 @@ ITEMS = {
     # 成品
     "WQR-105": ("二级圆柱齿轮减速器 i=10.5 Two-stage gear reducer", "fg", "Nos", None, None, "出厂检验-减速器", "输入 1450 r/min，输出约 138 r/min"),
 }
+
+# 教材案例件（第 11 轮《机械设计》第 33 章 33.9、33.10）：不是减速器厂的产品，不进 BOM、不备料，只在 ERPNext 里建物料，
+# 学生才能把这两根轴的模型读入“仿真与分析”、提交“设计发布与审批”。每次部署都补建（seed.py case_items）。
+CASE_ITEMS = {
+    "RJ-201": ("机器人关节空心轴 Robot joint hollow shaft", "make", "Nos", None, None, None, "教材案例件：协作机器人肩关节（谐波减速器输出侧）"),
+    "LS-101": ("平缝机上轴 Lockstitch machine upper shaft", "make", "Nos", None, None, None, "教材案例件：工业平缝机 WQ-LS 主轴（伺服直驱）"),
+}
 FG_SELLING_PRICE = 1650.00
 
 # 标准外购件（及成品 WQR-105）在问渠零件库里的编号（第 5 轮 P10②）；与零件库各条目的 factory.erp_items 一致（library/tests 核对）

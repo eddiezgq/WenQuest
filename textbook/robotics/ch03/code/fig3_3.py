@@ -1,7 +1,7 @@
 """3.3 节的示意图。
 
 图 3.3.1：方向余弦：{b} 的 x 轴与 {a} 三根轴的夹角 α11、α21、α31，它们的余弦就是 R_ab 的第一列。
-图 3.3.2：算例 3.3.1、3.3.2：俯视传送带的相机，机座坐标系 {a}、支架坐标系 {c}、相机坐标系 {b}，以及位移 d。
+图 3.3.2：算例 3.3.2、3.3.3：俯视传送带的相机，机座坐标系 {a}、支架坐标系 {c}、相机坐标系 {b}，以及位移 d。
 """
 import math
 
@@ -29,7 +29,7 @@ for i in range(3):
     P = circle3(ax, np.zeros(3), e, w, rr, 0, ang, AXIS[i], 1.3)
     mid = P[:, len(P[0]) // (5 if i == 2 else 2)]
     ax.text(*(mid * (1.32 - 0.04 * i)), labs[i], color=AXIS[i], fontsize=12, ha="center")
-ax.text2D(0.0, 0.97, T("(a) {b} 的 x 轴与 {a} 三根轴的夹角", "(a) Angles between x_b and the three axes of {a}"),
+ax.text2D(0.0, 0.97, T("(a) {b} 的 x 轴与 {a} 三根轴的夹角", r"(a) Angles between $\hat{\boldsymbol{x}}_b$ and the three axes of {a}"),
           transform=ax.transAxes, fontsize=10)
 ax2 = fig.add_subplot(122)
 ax2.axis("off")

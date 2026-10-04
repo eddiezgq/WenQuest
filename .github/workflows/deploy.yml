@@ -100,6 +100,15 @@ jobs:
           pip install -q -r ../../services/labcheck/requirements.txt trimesh
           python -m playwright install --with-deps --only-shell chromium > /dev/null
           pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 jsonschema pytest httpx fastapi pydantic gmsh==4.15.2 pylife==2.3.1 paho-mqtt==2.1.0 trimesh==5.1.0 sympy
+          if [ "${{ matrix.book }}" = mechdesign ]; then   # 第 33 章案例：build123d 建模、MuJoCo 机械臂动力学（数字工厂同一模型）
+            pip install -q build123d==0.13.0 mujoco==3.14.0
+            sh ../../factory/deploy/fetch_menagerie.sh "$RUNNER_TEMP/menagerie" > /dev/null
+            export WQ_MENAGERIE="$RUNNER_TEMP/menagerie"
+          fi
+          if [ "${{ matrix.book }}" = ai ]; then   # 《人工智能》：CUDA 程序的编译检查（clang + NVIDIA 的头文件包）与 Numba 的 CUDA 模拟器
+            pip install -q nvidia-cuda-runtime-cu12 nvidia-cuda-nvcc-cu12 nvidia-cuda-cccl-cu12 nvidia-curand-cu12 numba
+            which clang++ > /dev/null || sudo apt-get install -y -qq clang > /dev/null
+          fi
           if [ "${{ matrix.book }}" = robotics ]; then   # the tools' own tests run once, with the book they use
             python -m pytest -q tests 2>&1 | tee /tmp/pytest.log || { grep -E "^(FAILED|E  )" /tmp/pytest.log | head -20 | sed 's/^/::error::/'; exit 1; }
           fi
@@ -294,6 +303,27 @@ jobs:
             exit 1
           fi
 
+      - name: GPU lab settings (《人工智能》第 14 轮附：仓库加密变量 → 服务器 .env)
+        if: env.SKIP != '1'
+        env:
+          G_PROVIDER: ${{ secrets.WQ_GPU_PROVIDER }}
+          G_AUTODL_TOKEN: ${{ secrets.WQ_GPU_AUTODL_TOKEN }}
+          G_AUTODL_SPECS: ${{ secrets.WQ_GPU_AUTODL_SPECS }}
+          G_LAMBDA_KEY: ${{ secrets.WQ_GPU_LAMBDA_KEY }}
+          G_LAMBDA_SSH_KEY: ${{ secrets.WQ_GPU_LAMBDA_SSH_KEY }}
+        run: |
+          # only plain tokens are passed on (letters, digits and - _ . : = , /); nothing is printed
+          cmd=""
+          for pair in "WQ_GPU_PROVIDER=$G_PROVIDER" "WQ_GPU_AUTODL_TOKEN=$G_AUTODL_TOKEN" "WQ_GPU_AUTODL_SPECS=$G_AUTODL_SPECS" \
+                      "WQ_GPU_LAMBDA_KEY=$G_LAMBDA_KEY" "WQ_GPU_LAMBDA_SSH_KEY=$G_LAMBDA_SSH_KEY"; do
+            k="${pair%%=*}"; v="${pair#*=}"
+            [ -n "$v" ] || continue
+            if ! printf '%s' "$v" | grep -Eq '^[A-Za-z0-9._:=,/-]+$'; then echo "::error::$k 含有不允许的字符"; exit 1; fi
+            cmd="$cmd"$'\n'"envset $k '$v'"
+          done
+          [ -n "$cmd" ] || { echo "GPU 实验未设置"; exit 0; }
+          printf 'cd /opt/wenquest\n. deploy/lib.sh%s\n' "$cmd" | ssh "deploy@$HOST" bash -s > /dev/null
+          echo "GPU 实验设置已写入服务器"
       - name: Update the server
         if: env.SKIP != '1'
         run: |

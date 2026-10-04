@@ -22,6 +22,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from . import accounts
+from . import gpulab
 from . import catalog_api
 from . import course_pack
 from . import content
@@ -36,6 +37,7 @@ from . import slides as sl
 from . import studio as st
 from . import studio_api
 from . import textbook_api
+from . import tasks_api
 from .ai import ModelGateway
 from .mailer import Mailer
 from .config import Settings, get_settings
@@ -83,10 +85,12 @@ async def lifespan(app: FastAPI):
     pace = asyncio.create_task(_pace_loop())
     sweep = asyncio.create_task(_accounts_loop())
     books = asyncio.create_task(textbook_api.media_loop(sys.modules[__name__]))
+    gpus = asyncio.create_task(gpulab.reap_loop(sys.modules[__name__]))
     yield
     pace.cancel()
     sweep.cancel()
     books.cancel()
+    gpus.cancel()
     await state.http.aclose()
 
 log = logging.getLogger("wenquest.gateway")
@@ -119,6 +123,8 @@ def create_app() -> FastAPI:
     life_api.register(app, sys.modules[__name__])
     textbook_api.register(app, sys.modules[__name__])
     course_pack.register(app, sys.modules[__name__])
+    tasks_api.register(app, sys.modules[__name__])
+    gpulab.register(app, sys.modules[__name__])
     return app
 
 

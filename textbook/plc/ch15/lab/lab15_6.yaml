@@ -1,0 +1,44 @@
+# 实验 15.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、任务取自 lab15_6.js。
+原理:
+  - ["电梯要记住乘客的呼梯，直到到达那一层。把呼梯登记在布尔数组 call[1..3] 里，状态机只保留三个状态：停层开门（DOOR_OPEN）、关门（CLOSING）、运行（MOVING）。状态数不随楼层和呼梯组合膨胀（15.6.3 节）。",
+     "The lift must remember calls until it reaches the floor. Calls are kept in a Boolean array call[1..3]; the state machine keeps only three states, DOOR_OPEN, CLOSING and MOVING, so the number of states does not grow with floors and call combinations (Section 15.6.3)."]
+  - ["停层开门时从 call 数组选出目标层 target；运行时 target 在上面就上行、在下面就下行；到达目标层（该层平层传感器为 1）就消除这一层的呼梯、回到开门。floor 记最近经过的楼层，轿厢在两层之间时保持原值。",
+     "With the door open the target is chosen from call[]; when moving, the lift goes up if the target is above and down if below; on reaching it (its level sensor is 1) the call is cleared and the door opens. floor keeps the last floor passed while between floors."]
+  - ["门关到位、上下极限开关这些安全条件直接写在接触器输出上（准则 15.4.1）；上下接触器互锁。关门设 4 s 时限，门被挡住就回到开门，这是自动门“回头”转移在电梯上的翻版。",
+     "Door-closed and the end limits are written directly on the contactor outputs (Guideline 15.4.1), and the up and down contactors are interlocked. Closing has a 4 s limit; a blocked door goes back to open, like the automatic door's reversal."]
+  - ["用顺序功能图写时，步对应状态，转移对应转移条件；动作名用布尔输出（如 Y_DoorClose(N)），步一结束输出自动变假（15.6.4 节）。",
+     "In SFC, steps are states and transitions are transition conditions; naming an action after a Boolean output (e.g. Y_DoorClose(N)) makes the output false automatically when the step ends (Section 15.6.4)."]
+步骤:
+  - ["打开实验 15.6，在 I/O 与监视页认识电梯的 I/O；在操作面板上按“3 楼呼梯”，看 S_C3 和 H_C3。",
+     "Open Lab 15.6 and get to know the lift's I/O; press 'Call 3' on the panel and watch S_C3 and H_C3."]
+  - ["选 CASE 或顺序功能图。画出电梯的状态转换图（或顺序功能图），把每个状态的转移条件和输出填入表 1。",
+     "Choose CASE or SFC. Draw the state diagram (or the SFC) and fill each state's transitions and outputs into Table 1."]
+  - ["在程序框架里补全转移和输出，编译并下载，改正编译错误。",
+     "Complete the transitions and outputs in the skeleton, compile and download, and fix any errors."]
+  - ["按“运行”，用操作面板呼梯，观察三维画面和时序图；记录从 1 楼到 3 楼的运行时间和平层误差，填入表 2。",
+     "Press Run, call the lift from the panel and watch the 3D view and timing chart; record the 1→3 travel time and levelling error in Table 2."]
+  - ["到测试页按“运行全部测试”，修改程序直到四个测试全部通过；再按“程序检查”，处理所有错误。",
+     "Run all tests and fix the program until all four pass; then review the program and deal with every error."]
+  - ["注入“2 楼平层传感器坏”，电梯停在 1 楼时呼 2 楼，观察电梯怎样运行，填入表 3，回答思考题。",
+     "Inject 'floor-2 sensor dead', call floor 2 from floor 1, observe, fill in Table 3 and answer the question."]
+数据表:
+  - 标题: ["表 1  状态、转移与输出", "Table 1  States, transitions and outputs"]
+    表头: ["状态（步）", "转移条件 → 下一状态", "得电的输出"]
+    表头英文: ["State (step)", "Condition → next state", "Outputs on"]
+    行: [["DOOR_OPEN", "", ""], ["CLOSING", "", ""], ["MOVING", "", ""]]
+  - 标题: ["表 2  运行记录", "Table 2  Run record"]
+    表头: ["行程", "接触器得电时间 / s", "停层后轿厢与楼面的高差 / cm", "危险判定"]
+    表头英文: ["Trip", "Contactor on / s", "Car-to-floor offset / cm", "Hazard"]
+    行: [["1 → 3", "", "", ""], ["3 → 2", "", "", ""], ["2 → 1", "", "", ""]]
+  - 标题: ["表 3  测试与故障记录", "Table 3  Tests and fault"]
+    表头: ["项目", "结果", "说明"]
+    表头英文: ["Item", "Result", "Notes"]
+    行: [["1 楼呼 3 楼", "", ""], ["3 楼回 2 楼", "", ""], ["门卡住", "", ""], ["连续呼梯", "", ""], ["程序检查", "", ""], ["2 楼传感器坏时呼 2 楼", "", ""]]
+    行英文: [["Call 3 from 1", "", ""], ["Back from 3 to 2", "", ""], ["Door jammed", "", ""], ["Calls in a row", "", ""], ["Review", "", ""], ["Call 2 with floor-2 sensor dead", "", ""]]
+注意:
+  - ["门没关到位时绝不能让接触器得电；这一条写在输出上，不要只写在转移里。", "Never energise a contactor with the door not closed; write this on the outputs, not only in the transitions."]
+  - ["上下极限开关是常闭的：正常时为 1，碰到极限变 0。", "The end limits are NC: 1 normally, 0 at the limit."]
+  - ["测试在模拟时间里运行；手动操作是实时的，从 1 楼到 3 楼约需 6 s。", "Tests run in simulated time; by hand it is real time, about 6 s from floor 1 to 3."]
+思考题:
+  - ["2 楼平层传感器坏时，电梯为什么没有冲顶？程序应该怎样发现这个故障？（提示：从 1 楼到 2 楼正常需要多长时间？）", "With the floor-2 sensor dead, why does the lift not hit the top, and how should the program detect the fault? (Hint: how long does 1 → 2 normally take?)"]
+  - ["1 楼时 2 楼和 3 楼同时呼梯，你的程序先去哪层？提出一种更合理的调度规则。", "At floor 1 with calls at 2 and 3 together, where does your program go first? Propose a better scheduling rule."]

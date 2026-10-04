@@ -65,5 +65,5 @@ out(r10_pct=r10 * 100, x_wrong=x_wrong, inst24=inst24, inst14_max=inst14_max, r_
     top5_24_pct=top5_24 * 100, top5_25_pct=top5_25 * 100, gap_word_unimate=gap_word_unimate,
     gap_unimate_cobot=gap_unimate_cobot, n_events=n_events,
     inst24_s=grp(inst24), stock24_s=grp(IFR["stock_2024"]), fc26_s=grp(IFR["fc_2026"]), fc29_s=grp(IFR["fc_2029"]),
-    cn24_s=grp(cn24), cn25_s=grp(cn25), inst25_wan=inst25 / 1e4,
+    cn24_s=grp(cn24), cn25_s=grp(cn25), inst25_wan=inst25 / 1e4, inst25_s=grp(round(inst25, -3)),
     note=T("2025 年总安装量按 2024 年 542 076 台增长 11% 推算", "2025 total estimated as 542,076 units in 2024 plus 11%"))

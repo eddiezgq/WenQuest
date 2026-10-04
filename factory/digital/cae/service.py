@@ -239,6 +239,8 @@ def _worker():
                 ok, res = _isolated(_mbd_child, (_resolved(j["model"]), j["setup"], _job_path(jid)), TIME_LIMIT_S + 60)
             elif j.get("kind") == "opt":
                 ok, res = _isolated(_opt_child, (j["spec"], _job_path(jid)), OPT_LIMIT_S + 120)
+            elif j.get("kind") == "topo":
+                ok, res = _isolated(_topo_child, (j["spec"], _job_path(jid)), TOPO_LIMIT_S)
             else:
                 setup = dict(j["setup"])
                 setup["material"] = M.get(setup["material_id"])
@@ -583,6 +585,24 @@ def mbd_member_series(jid: str, member: str, direction: str = ""):
             "peak_N": ml["peak_N"], "direction": [float(x) for x in u]}
 
 
+@app.get("/mbd/jobs/{jid}/joint-series")
+def mbd_joint_series(jid: str, joint: str):
+    """疲劳用（第 11 轮 F1）：关节驱动力矩（N·m 或 N）随时间的变化——机器人关节轴的载荷谱"""
+    p = _job_path(jid.replace("/", ""), "job.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个任务")
+    j = _read_json(p)
+    if j.get("kind") != "mbd" or j["status"] != "done":
+        raise HTTPException(409, "动力学结果还没出来")
+    ser = read_series(_job_path(j["id"], "series.bin"))
+    key = "drive." + joint
+    if key not in ser:
+        raise HTTPException(404, "这次计算里没有关节 {} 的驱动力矩".format(joint))
+    v, t = ser[key], ser["t"]
+    return {"values": [round(float(x), 4) for x in v], "duration_s": float(t[-1] - t[0]) if len(t) > 1 else 1.0,
+            "peak": float(np.max(np.abs(v))), "joints": sorted(k[6:] for k in ser if k.startswith("drive."))}
+
+
 @app.get("/jobs/{jid}/series.bin")
 def job_series(jid: str):
     p = _job_path(jid.replace("/", ""), "series.bin")
@@ -674,6 +694,33 @@ def note(jid: str, body: dict = Body(...)):
         raise HTTPException(404, "没有这个任务")
     _update(jid.replace("/", ""), ai_text=str(body.get("ai_text") or "")[:4000])
     return {"ok": True}
+
+
+def _modal_child(step_path, setup, q):
+    try:
+        from cae import modal as MO
+        stats, _ = MO.solve(open(step_path, "rb").read(), setup)
+        q.put((True, stats))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+@app.post("/jobs/{jid}/modal")
+def modal(jid: str):
+    """固有频率（第 11 轮 F2）：用这次强度计算的零件、材料、网格和支承，求前几阶固有频率；结果记进任务（报告用）"""
+    p = _job_path(jid.replace("/", ""), "job.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "没有这个任务")
+    j = _read_json(p)
+    if j["status"] != "done" or j.get("kind") not in (None, "fea") or (j["setup"].get("analysis") or "static") != "static":
+        raise HTTPException(409, "要先完成一次强度计算（固有频率用它的零件、材料和支承）")
+    setup = dict(j["setup"])
+    setup["material"] = M.get(setup["material_id"])
+    ok, res = _isolated(_modal_child, (_p("geo", j["step_sha"], "part.step"), setup), TIME_LIMIT_S + 60)
+    if not ok:
+        raise HTTPException(422, "固有频率没算出来：{}".format(res))
+    _update(j["id"], modal=res)
+    return res
 
 
 @app.post("/jobs/{jid}/fatigue")
@@ -874,3 +921,102 @@ def opt_trials(jid: str):
         if os.path.exists(p):
             return dict(_read_json(p), final=name == "result.json")
     return {"rows": [], "final": False}
+
+
+# ---------- 拓扑优化（第 14 轮 H6）：平面件 SIMP，几秒算完，也走排队（和有限元抢同一个 CPU） ----------
+TOPO_LIMIT_S = 180
+
+
+def _topo_spec(body):
+    from cae import topo as T
+    s = body.get("spec") or {}
+    pre = s.get("preset") if s.get("preset") in T.PRESETS else "mbb"
+    out = {"preset": pre, "nelx": int(s.get("nelx") or T.PRESETS[pre]["nelx"]), "nely": int(s.get("nely") or T.PRESETS[pre]["nely"]),
+           "volfrac": float(s.get("volfrac") or 0.5), "penal": float(s.get("penal") or 3.0), "rmin": float(s.get("rmin") or 1.5),
+           "length_mm": float(s.get("length_mm") or 300), "thickness_mm": float(s.get("thickness_mm") or 10),
+           "force_n": float(s.get("force_n") or 2000), "material_id": s.get("material_id") or "6061-T6"}
+    if out["nelx"] * out["nely"] > T.MAX_ELEMENTS or out["nelx"] < 8 or out["nely"] < 4:
+        raise HTTPException(400, "网格 {}×{} 不合适：长边至少 8 格、短边至少 4 格，总数不超过 {}".format(out["nelx"], out["nely"], T.MAX_ELEMENTS))
+    if not 0.1 <= out["volfrac"] <= 0.9:
+        raise HTTPException(400, "材料用量（体积比）要在 0.1–0.9 之间")
+    if not 1.0 <= out["penal"] <= 5.0 or not 1.0 <= out["rmin"] <= 4.0:
+        raise HTTPException(400, "惩罚指数要在 1–5、过滤半径要在 1–4 格之间")
+    if not 20 <= out["length_mm"] <= 2000 or not 1 <= out["thickness_mm"] <= 200:
+        raise HTTPException(400, "长度 20–2000 mm、板厚 1–200 mm")
+    try:
+        M.get(out["material_id"])
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from None
+    return out
+
+
+def _topo_child(spec, outdir, q):
+    try:
+        from cae import topo as T
+        t0 = time.time()
+        r = T.run(spec["preset"], spec["nelx"], spec["nely"], spec["volfrac"], spec["penal"], spec["rmin"])
+        r["seconds"] = round(time.time() - t0, 1)
+        _write_json(os.path.join(outdir, "result.json"), r)
+        q.put((True, {k: r[k] for k in ("iterations", "converged", "compliance", "grey", "seconds")}))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+@app.get("/topo/presets")
+def topo_presets():
+    from cae import topo as T
+    return {"presets": [dict(v, key=k) for k, v in T.PRESETS.items()], "max_elements": T.MAX_ELEMENTS}
+
+
+@app.post("/topo/jobs")
+def topo_submit(body: dict = Body(...)):
+    from cae import topo as T
+    spec = _topo_spec(body)
+    jid = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:6]
+    os.makedirs(_job_path(jid))
+    j = {"id": jid, "kind": "topo", "status": "queued", "created": time.time(), "spec": spec,
+         "owner": body.get("owner"), "owner_name": body.get("owner_name"), "factory": body.get("factory"),
+         "title": body.get("title") or "拓扑优化：" + T.PRESETS[spec["preset"]]["label"].split("（")[0]}
+    _write_json(_job_path(jid, "job.json"), j)
+    _Q.put(jid)
+    return _public(j)
+
+
+@app.get("/topo/jobs/{jid}/result")
+def topo_result(jid: str):
+    p = _job_path(jid.replace("/", ""), "result.json")
+    if not os.path.exists(p):
+        raise HTTPException(404, "还没算完")
+    return _read_json(p)
+
+
+@app.post("/topo/jobs/{jid}/to-fea")
+def topo_to_fea(jid: str, body: dict = Body(default={})):
+    """拓扑结果按密度 0.5 取轮廓、拉伸成板件，交给有限元校核：返回零件（同 /geometry）和自动填好的约束、载荷"""
+    from cae import topo as T
+    jid = jid.replace("/", "")
+    j = _read_json(_job_path(jid, "job.json"))
+    if j.get("kind") != "topo" or j["status"] != "done":
+        raise HTTPException(400, "拓扑优化还没算完")
+    spec = dict(j["spec"], **{k: float(body[k]) for k in ("length_mm", "thickness_mm", "force_n") if body.get(k)})
+    r = _read_json(_job_path(jid, "result.json"))
+    try:
+        step, pads, note, info = T.fea_part(spec["preset"], r["density"], spec["length_mm"], spec["thickness_mm"])
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    sha = hashlib.sha256(step).hexdigest()
+    d = _p("geo", sha)
+    if not os.path.exists(os.path.join(d, "faces.json")):
+        os.makedirs(d, exist_ok=True)
+        open(os.path.join(d, "part.step"), "wb").write(step)
+        ok, err = _isolated(_geo_child, (os.path.join(d, "part.step"), d), GEO_LIMIT_S)
+        if not ok:
+            raise HTTPException(422, "板件模型生成失败：{}".format(err))
+    geo = dict(_read_json(os.path.join(d, "faces.json")), sha=sha)
+    try:
+        rows = T.fea_rows(spec["preset"], pads, geo["faces"], spec["force_n"])
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    return {"geometry": geo, "rows": rows, "material_id": spec["material_id"], "info": info, "mesh_mm": round(max(2.0, info["cell_mm"]), 2),
+            "title": "拓扑优化结果校核：{}（体积比 {:g}，{:g} N）".format(T.PRESETS[spec["preset"]]["label"].split("（")[0], spec["volfrac"], spec["force_n"]),
+            "note": "按密度 0.5 取轮廓、拉伸成 {:g} mm 厚的板；{}".format(spec["thickness_mm"], note), "source": {"topo": jid}}

@@ -24,6 +24,14 @@
     评分: [{项: [..], 分: 30, 标准: [..]}]            # 合计 100
     学时: 4
     计算书: {程序: code/ts50_1_calc.py, 函数: sheet}  # 可选
+
+交付物每项还可以写（第 11 轮 2.7（5），平台流程用；都不写就是“上传文件”）：
+    类型: 文件 | 设计发布 | 分析 | 工艺规程 | 更改单
+    格式: [docx, pdf]                                 # 上传文件允许的格式
+    必列: [GR-302, 键]                                # 只用于“更改单”：AI 评审员核对必须列出的物料关键词（可写 a|b 表示任一）
+    零件: SH-301                                      # 设计发布、工艺规程、分析：对哪个物料
+    轴承: [6207]                                      # 可选，设计发布：AI 评审员核对轴承位长度
+构建时另存 build/<书>/task/tsNN_k.json（说明文件的内容），学习平台下达任务单时发给数字工厂。
 """
 from __future__ import annotations
 
@@ -46,6 +54,8 @@ STATION_EN = {"CAD": "3D modeling and drawings", "PLM": "release and approval", 
               "FAT": "fatigue life", "MBD": "multibody dynamics", "CAM": "NC programming", "PY": "calculation sheets and lab benches",
               "THM": "thermal and nonlinear analysis", "CFD": "mold filling", "CNC": "virtual CNC machine", "AM": "AM slicing",
               "SPC": "quality statistics"}
+DELIVERABLE_KINDS = ("文件", "设计发布", "分析", "工艺规程", "更改单")   # 第 11 轮 2.7（5）：交付物在数字工厂里怎样交
+FORMATS = ("docx", "pdf", "xlsx", "step", "png", "jpg", "zip", "txt")
 REQUIRED = ("编号", "标题", "角色", "背景", "输入", "交付物", "工位", "步骤", "评审要点", "评分", "学时")
 
 
@@ -76,6 +86,16 @@ def load(path: Path) -> tuple[dict | None, list[str]]:
     for x in t.get("交付物") or []:
         if not (isinstance(x, dict) and _pair(x.get("名称")) and _pair(x.get("验收"))):
             bad.append(f"{n}“交付物”每项要有 名称、验收（中英）")
+            continue
+        kind = x.get("类型", "文件")           # 平台上怎样交（第 11 轮 2.7（5））；不写就是上传文件
+        if kind not in DELIVERABLE_KINDS:
+            bad.append(f"{n}“交付物”的类型 {kind} 不对（可用：{'、'.join(DELIVERABLE_KINDS)}）")
+        if x.get("格式") is not None and not (isinstance(x["格式"], list) and all(f in FORMATS for f in x["格式"])):
+            bad.append(f"{n}“交付物”的格式写成列表，可用：{'、'.join(FORMATS)}")
+        if kind in ("设计发布", "工艺规程", "分析") and not (isinstance(x.get("零件"), str) and x["零件"].strip()):
+            bad.append(f"{n}“交付物”类型为 {kind} 时要写“零件”（物料编号，如 SH-301）")
+        if x.get("必列") is not None and (kind != "更改单" or not (isinstance(x["必列"], list) and all(isinstance(k, str) and k.strip() for k in x["必列"]))):
+            bad.append(f"{n}“交付物”的“必列”只用于类型“更改单”，写成关键词列表（如 [GR-302, 键]）")
     for s in t.get("工位") or []:
         if s not in STATIONS:
             bad.append(f"{n}“工位”里的 {s} 不是工具链标注（{'、'.join(sorted(STATIONS))}）")

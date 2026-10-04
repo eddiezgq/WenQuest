@@ -459,7 +459,19 @@ def mount(app, H):
                        "斜线下刀；浏览器里试切（回放、去除材料、比对、功率与超程检查），加工时间与工艺规程比，挂到工艺规程审批后下发车间。",
             "mode": "teach", "products": ["SH-301"], "tool_url": public_base(request) + "/cam",
             "guide_url": public_base(request) + "/api/cae/lab10/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab10/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab10/report-template.docx"}, {
+            "id": "lab11", "name": {"zh": "实验 11：减速器热平衡与输出轴轻量化", "en": "Lab 11: gearbox heat balance and output-shaft lightweighting"},
+            "summary": "按传动效率算 WQR-105 的发热，教材公式估油温，有限元温度场看箱体上的温度分布；比较散热筋、风扇的降温效果，算热应力；"
+                       "用设计优化（Optuna 驱动有限元）在安全系数和无限寿命要求下找最轻的输出轴并送回设计台；选做 CPU 散热片和平面拓扑优化。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/opt",
+            "guide_url": public_base(request) + "/api/cae/lab11/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab11/report-template.docx"}, {
+            "id": "lab12", "name": {"zh": "实验 12：一根轴的数字化设计与两个典型案例", "en": "Lab 12: digital design of a shaft and two case studies"},
+            "summary": "零件库选件 → 在线设计台建 SH-301 B 版（台阶圆角）并发布；协作机器人关节空心轴 RJ-201 按扭转刚度核对、用“运动与动力分析”的"
+                       "关节力矩记录算疲劳寿命、比较钢与铝；平缝机上轴 LS-101 比较两种轴承支承的固有频率并与梁理论对照、上传 CSV 载荷谱。",
+            "mode": "teach", "products": ["SH-301", "RJ-201", "LS-101"], "tool_url": public_base(request) + "/cae",
+            "guide_url": public_base(request) + "/api/cae/lab12/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab12/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():
