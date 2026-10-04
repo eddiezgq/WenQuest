@@ -1,0 +1,31 @@
+# 实验 6.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab6_6.js。
+原理:
+  - ["安全裕量 g(t) = d(t) − s，d(t) 是末端到障碍的距离，s = 50 mm。末端速度不超过 K，所以 |g(t) − g(t′)| ≤ K|t − t′|（利普希茨条件，5.6.4 节）。",
+     "Safety margin g(t) = d(t) − s, where d(t) is the end-effector's distance to the obstacle and s = 50 mm. The end-effector speed is at most K, so |g(t) − g(t′)| ≤ K|t − t′| (Lipschitz condition, Section 5.6.4)."]
+  - 式: "相邻采样点 a < b 之间：g(t) ≥ max{g(a) − K(t − a), g(b) − K(b − t)} ≥ (g(a) + g(b))/2 − K(b − a)/2；等距采样时 min g ≥ min g(tᵢ) − Kh/2"
+  - ["下界为正，就证明了整个过程安全；有采样点裕量 ≤ 0，就发现了碰撞；两者都不是，需要加密。自适应二分检查只在下界不够的地方加密（6.6.4 节）。",
+     "A positive bound proves the whole motion safe; a sample with margin ≤ 0 reveals a collision; otherwise refine. Adaptive bisection refines only where the bound is not enough (Section 6.6.4)."]
+步骤:
+  - ["在“等距采样”场景中选障碍 1，把区间数 N 从 4 逐步增大（步长 h = 1/N s），记录采样点的最小裕量、保证的下界和结论，填入表 1；找出能证明安全的最小 N（任务 3）。",
+     "In 'Uniform sampling' choose obstacle 1, raise the number of intervals N from 4 (step h = 1/N s), record the smallest sample margin, the guaranteed bound and the verdict in Table 1, and find the smallest N that proves safety (task 3)."]
+  - ["选障碍 2，N = 10（步长 0.1 s），观察“采样点都安全却无法证明”（任务 1）；再增大 N，直到发现碰撞（任务 2），同样填表。",
+     "Choose obstacle 2 with N = 10 (step 0.1 s) and see 'all samples safe but no proof' (task 1); then increase N until a collision is found (task 2), and fill in the table."]
+  - ["在“自适应二分检查”场景中，分别对障碍 1、障碍 2 一步步检查，再检查到底，记录计算 g 的次数与结论，填入表 2（任务 4）。",
+     "In 'Adaptive bisection check', check obstacles 1 and 2 step by step and then to the end; record the number of evaluations and the verdict in Table 2 (task 4)."]
+数据表:
+  - 标题: ["表 1  等距采样", "Table 1  Uniform sampling"]
+    表头: ["障碍", "区间数 N", "步长 h / s", "最小裕量 / mm", "保证的下界 / mm", "结论"]
+    表头英文: ["obstacle", "intervals N", "step h / s", "smallest margin / mm", "guaranteed bound / mm", "verdict"]
+    行: [["1", "4", "0.25", "", "", ""], ["1", "10", "0.1", "", "", ""], ["1", "", "", "", "", "证明安全"], ["2", "10", "0.1", "", "", ""], ["2", "", "", "", "", "发现碰撞"]]
+    行英文: [["1", "4", "0.25", "", "", ""], ["1", "10", "0.1", "", "", ""], ["1", "", "", "", "", "proved safe"], ["2", "10", "0.1", "", "", ""], ["2", "", "", "", "", "collision found"]]
+  - 标题: ["表 2  自适应二分检查", "Table 2  Adaptive bisection check"]
+    表头: ["障碍", "计算 g 的次数", "已证明安全的区间个数", "结论"]
+    表头英文: ["obstacle", "evaluations", "intervals proved safe", "verdict"]
+    行: [["1", "", "", ""], ["2", "", "", ""]]
+注意:
+  - ["实验中“保证的下界”用相邻两个采样点的值一起估计，比 (6.6.1) 的 min g(tᵢ) − Kh/2 略好，但同样是严格的下界。", "The lab's 'guaranteed bound' uses both neighbouring samples, slightly better than (6.6.1)'s min g(tᵢ) − Kh/2, and equally rigorous."]
+  - ["对障碍 2，某些较小的 N（如 N = 7、9）恰好有一个采样点落进危险窗口，也能发现碰撞；这是运气，不是保证。请比较 N = 8、10。", "For obstacle 2, some small N (such as N = 7, 9) happen to put a sample inside the danger window; that is luck, not a guarantee. Compare N = 8, 10."]
+  - ["K 由各关节角速度和臂长估计（6.5.1 节），是保守的上界；K 越大，需要的采样越密。", "K is a conservative bound from joint speeds and link lengths (Section 6.5.1); the larger K, the denser the sampling must be."]
+思考题:
+  - ["若不知道利普希茨常数 K，只知道 g 连续，还能用有限次计算证明 g > 0 吗？为什么？", "Without the Lipschitz constant K, knowing only that g is continuous, can finitely many evaluations prove g > 0? Why?"]
+  - ["对障碍 1，自适应检查与等距采样的计算量差不多。在什么样的 g(t) 上，自适应检查的优势会大得多？（提示：大部分时间离障碍很远，只在很短的时间内接近。）", "For obstacle 1, adaptive checking needs about as many evaluations as uniform sampling. For what kind of g(t) would its advantage be much larger? (Hint: far from the obstacle most of the time, close only briefly.)"]
