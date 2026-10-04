@@ -1,0 +1,35 @@
+# 实验 3.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab3_3.js。
+原理:
+  - ["数列 aₙ 收敛于 L：对任意 ε > 0，存在 N，当 n > N 时 |aₙ − L| < ε（定义 3.3.1）。几何上：无论以 L 为中心的带多窄，从第 N 项以后所有的点都落在带内。ε 越小，N 一般越大；N 不必是最小的。",
+     "aₙ converges to L: for every ε > 0 there is an N with |aₙ − L| < ε whenever n > N (Definition 3.3.1). Geometrically: however narrow the band around L, every point after the N-th lies inside it. A smaller ε usually needs a larger N, and N need not be the smallest."]
+  - 式: "收敛：∀ε > 0, ∃N, n > N ⇒ |aₙ − L| < ε        发散：∃ε₀ > 0, ∀N, ∃n > N, |aₙ − L| ≥ ε₀"
+  - ["控制工程中的调节时间就是 N：误差从这一步起永远留在给定的误差带（如 ±2%）之内（3.2.1 节）。",
+     "The settling time of a control loop is such an N: from that step on the error stays inside the given band (e.g. ±2%) for good (Section 3.2.1)."]
+  - ["求 √a：二分法每步把区间减半，误差约减半（线性收敛）；迭代 x_{k+1} = (x_k + a/x_k)/2 的误差满足 e_{k+1} = e_k²/(2x_k)，每步约平方一次（二次收敛，3.5.4 节）。",
+     "Square roots: bisection halves the interval, roughly halving the error (linear convergence); for x_{k+1} = (x_k + a/x_k)/2 the error obeys e_{k+1} = e_k²/(2x_k), roughly squaring each step (quadratic convergence, Section 3.5.4)."]
+步骤:
+  - ["在“ε–N 游戏”中选数列 1（(−1)ⁿ/n），依次令 k = 1、2、3（ε = 0.1、0.01、0.001），找出最小的可用 N，填入表 1；对数列 2、3 重复（任务 1）。",
+     "In 'The ε–N game' choose sequence 1 ((−1)ⁿ/n), set k = 1, 2, 3 (ε = 0.1, 0.01, 0.001) and find the smallest working N for Table 1; repeat for sequences 2 and 3 (task 1)."]
+  - ["选数列 4（(−1)ⁿ），把 N 调到最大，观察是否还有点在带外，说明它为什么发散。",
+     "Choose sequence 4 ((−1)ⁿ), move N to the maximum, see whether points still escape, and explain why it diverges."]
+  - ["在“关节误差”场景中找出调节时间：误差从第 N 步起永远在 ±0.2° 内，而第 N − 1 步不满足（任务 2）。",
+     "In 'Joint error' find the settling time: from step N on the error stays within ±0.2°, but not from step N − 1 (task 2)."]
+  - ["在“迭代开方”场景中，对 a = 2、10、1000 记录两种方法达到 10⁻¹²（相对）所需的步数，填入表 2；把步数调到迭代 (3.1.1) 刚好达到 10⁻¹² 的最少步数（任务 3）。",
+     "In 'Iterative square root' record, for a = 2, 10, 1000, the steps each method needs for 10⁻¹² (relative) in Table 2; set the steps to the fewest that reach 10⁻¹² with (3.1.1) (task 3)."]
+数据表:
+  - 标题: ["表 1  不同 ε 下最小的可用 N", "Table 1  The smallest working N for each ε"]
+    表头: ["数列", "ε = 0.1", "ε = 0.01", "ε = 0.001"]
+    表头英文: ["Sequence", "ε = 0.1", "ε = 0.01", "ε = 0.001"]
+    行: [["(−1)ⁿ/n", "", "", ""], ["(3n+1)/(2n−1)", "", "", ""], ["n^(1/n)", "", "", ""]]
+    行英文: [["(−1)ⁿ/n", "", "", ""], ["(3n+1)/(2n−1)", "", "", ""], ["n^(1/n)", "", "", ""]]
+  - 标题: ["表 2  求 √a 达到 10⁻¹²（相对误差）所需的步数", "Table 2  Steps to reach 10⁻¹² (relative) for √a"]
+    表头: ["a", "二分法", "迭代 (3.1.1)"]
+    表头英文: ["a", "Bisection", "Iteration (3.1.1)"]
+    行: [["2", "", ""], ["10", "", ""], ["1000", "", ""]]
+注意:
+  - ["“迭代开方”中的步数是迭代次数：第 k 步得到的是 x_{k+1}（从 x₁ 算起），与表 3.5.2 按项编号差 1。", "In 'Iterative square root' the step count is the number of iterations: step k gives x_{k+1} (counting from x₁), one off from the term numbers of Table 3.5.2."]
+  - ["“ε–N 游戏”只检查到第 20000 项，“关节误差”检查到第 3000 步；这是计算机能做的有限检查，不能代替 3.3.2 节的证明。", "The game checks up to n = 20000 and the joint scene up to step 3000: a finite check by computer, not a substitute for the proofs of Section 3.3.2."]
+  - ["n^(1/n) 先增后减（在 n = 3 处最大），N 要从数列开始单调递减之后去找。", "n^(1/n) rises then falls (largest at n = 3), so look for N after it starts to decrease."]
+思考题:
+  - ["证明里给出的 N 往往比实际需要的大得多（表 3.3.1），这为什么不影响证明？", "The N given in a proof is often far larger than needed (Table 3.3.1); why does that not spoil the proof?"]
+  - ["为什么迭代 (3.1.1) 的误差每步大约平方一次，二分法却每步只减半？a 很大时，迭代 (3.1.1) 从 x₁ = a 出发，前几步为什么收敛得慢？", "Why does the error of (3.1.1) roughly square each step while bisection only halves it? Starting from x₁ = a, why are the first few steps slow when a is very large?"]
