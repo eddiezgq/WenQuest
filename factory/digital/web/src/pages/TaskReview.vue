@@ -27,6 +27,11 @@
           <template v-else-if="dv.kind === '工艺规程'">
             <p class="small">工艺规程提交 <span class="mono">{{ got.process }}</span>；任务单批准时一并生效（ERPNext 新版 BOM、车间按新工艺派工）。</p>
           </template>
+          <template v-else-if="dv.kind === 'PLC 程序'">
+            <p class="small"><a :href="got.files[0].url" target="_blank">下载 {{ got.files[0].name }}</a> ·
+              {{ got.check?.ok ? '编译通过' + (got.check.errors ? '，程序检查 ' + got.check.errors + ' 条错误' : '，程序检查没有错误') : '编译不过：' + (got.check?.error || '') }}。
+              批准后程序自动下载到数字工厂的<router-link to="/plc">虚拟 PLC</router-link>，控制{{ { 'press-01': '压装工位', 'sort-01': '分拣线' }[got.unit] || got.unit }}跑一个班次。</p>
+          </template>
           <template v-else-if="dv.kind === '更改单'">
             <table class="t small"><thead><tr><th>物料或文件</th><th>改什么</th><th>理由</th></tr></thead>
               <tbody><tr v-for="(r, i) in got.rows" :key="i"><td>{{ r.item }}</td><td>{{ r.change }}</td><td>{{ r.reason }}</td></tr></tbody></table>

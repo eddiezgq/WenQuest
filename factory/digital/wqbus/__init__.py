@@ -6,5 +6,5 @@
 """
 from .envelope import SPEC_VERSION, make, now_iso, parse, validate, ValidationError  # noqa: F401
 from .topics import (  # noqa: F401
-    ROOT, AREAS, UNITS, MACHINES, UNIT_AREA, topic, split, unit_topic, RETAINED, qos_for,
+    ROOT, AREAS, UNITS, MACHINES, PLC_UNITS, UNIT_AREA, topic, split, unit_topic, RETAINED, qos_for,
 )

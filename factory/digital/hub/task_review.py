@@ -471,4 +471,37 @@ def review(spec, deliverables, get_file=None, get_design=None, get_job=None, get
                 _say(out, "工艺规程", "error", i, "工艺规程还有 {} 条 AI 工艺评审员的“必须改”意见（在工艺规程页处理）。".format(errs))
         elif kind == "更改单":
             check_change(got.get("rows"), x.get("必列"), i, out)
+        elif kind == "PLC 程序":
+            check_plc(got, x, i, out, get_file)
     return out
+
+
+# ---------------------------------------------------------------- PLC 程序（第 18 轮第 8 步《PLC 原理及实践》）
+def check_plc(got, x, d, out, get_file=None):
+    """编译检查与程序检查（与学习平台实验台的“程序检查”同一套规则）：错误记“必改”，提醒记“建议”。
+    另查一条第 15 章准则 15.7.1：状态变量不得设为保持型（RETAIN）。"""
+    name = x["名称"][0]
+    files = got.get("files") or []
+    if not files:
+        _say(out, "完整", "error", d, "“{}”还没有上传（交 PLCopen XML 或 .st 文件）。".format(name))
+        return
+    data = get_file(files[0]["url"]) if get_file else None
+    if data is None:
+        return
+    from hub import vplc as V
+    unit = got.get("unit") or x.get("设备") or "press-01"
+    try:
+        st = V.to_st(files[0]["name"], data, unit)
+        c = V.check(st, unit)
+    except Exception as e:  # noqa: BLE001
+        _say(out, "PLC 程序", "error", d, "程序读不出来：{}".format(str(e)[:200]))
+        return
+    if not c.get("ok"):
+        _say(out, "PLC 程序", "error", d, "程序编译不过：{}".format(c.get("error")))
+        return
+    for r in c.get("review") or []:
+        if r["level"] in ("error", "warning"):
+            line = "第 {} 行：".format(r["line"]) if r.get("line") else ""
+            _say(out, "程序检查", r["level"], d, line + r["msg"][0])
+    if any(re.search(r"\bstate\s*:", sec, re.I) for sec in re.findall(r"\bVAR\s+RETAIN\b([\s\S]*?)\bEND_VAR\b", st, re.I)):
+        _say(out, "程序检查", "error", d, "状态变量 state 声明成了保持型（RETAIN）：断电再来电后设备会自己动起来（准则 15.7.1）。")

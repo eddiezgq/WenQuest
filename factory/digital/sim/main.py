@@ -38,6 +38,9 @@ class Service:
         self.bus = Bus("wq-sim", mode=self.mode)
         self.inbox = queue.Queue()
         self.eng = self._new_engine()
+        # 虚拟 PLC（第 18 轮第 8 步）：压装工位、分拣线由学生的 PLC 程序控制，按本车间的倍速回放班次
+        from vplc.runner import VirtualPLC
+        self.vplc = VirtualPLC(lambda tp, ty, src, d, corr: self._publish(tp, ty, src, d, corr), speed=lambda: self.speed)
 
     def _publish(self, tp, type_, source, data, corr, ts=None):
         self.bus.publish(tp, type_, source, data, corr=corr, ts=ts)
@@ -97,6 +100,9 @@ class Service:
                     while True:
                         t, m = self.inbox.get_nowait()
                         unit = t.split("/")[3]
+                        if self.vplc.handle(unit, m):
+                            log.info("虚拟 PLC：%s 收到程序（班次 %s）", unit, m["data"].get("run_id"))
+                            continue
                         if unit == "sim":
                             ok, reason = self.sim_command(m["data"], m.get("corr"))
                             self.bus.publish(topic("machining", "sim", "cmd/ack"), "machine.ack", "sim",

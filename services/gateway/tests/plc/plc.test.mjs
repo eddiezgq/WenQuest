@@ -344,3 +344,28 @@ test("SFC errors: no initial step, unknown step, unknown action; a variable may 
   assert.throws(() => P.compile(`PROGRAM Main INITIAL_STEP S0: foo(N); END_STEP END_PROGRAM`, { io: [] }), /foo/);
   P.compile(`PROGRAM Main VAR step : INT; END_VAR step := step + 1; END_PROGRAM`, { io: [] });
 });
+
+test("PLCopen XML import: what exportXml writes comes back as the same program (enum initial values, RETAIN sections, arrays)", () => {
+  const src = `TYPE E_S : (INIT, RUN, DONE); END_TYPE
+PROGRAM Main
+  VAR RETAIN
+    count : INT := 3;
+  END_VAR
+  VAR
+    state : E_S := RUN;
+    tab : ARRAY[1..3] OF INT := [1, 2, 3];
+    t : TON;
+  END_VAR
+  t(IN := state = RUN, PT := T#1s);
+  IF t.Q THEN count := count + tab[2]; state := DONE; END_IF;
+END_PROGRAM`;
+  const xml = P.exportXml(src, { date: new Date(0) });
+  assert.match(xml, /<simpleValue value="RUN"\/>/);
+  const back = P.importXml(xml);
+  assert.equal(P.exportXml(back, { date: new Date(0) }), xml);
+  const rt = new P.Runtime({ io: [], st: back, cycle: 10 });
+  for (let i = 0; i < 101; i++) rt.scan();
+  assert.equal(rt.watch("Main.count"), 5);
+  assert.equal(rt.watch("Main.state"), 2);   // DONE
+  assert.throws(() => P.importXml("<foo/>"), /PLCopen/);
+});

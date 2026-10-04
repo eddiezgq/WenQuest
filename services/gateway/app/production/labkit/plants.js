@@ -267,6 +267,7 @@ function sorter(o = {}) {
     { name: "Y2", addr: "%QX0.2", dir: "out", comment: ["推杆 2 电磁阀", "Pusher 2 valve"] },
     { name: "Y3", addr: "%QX0.3", dir: "out", comment: ["推杆 3 电磁阀", "Pusher 3 valve"] },
     { name: "H_Run", addr: "%QX0.4", dir: "out", comment: ["运行指示灯", "Running lamp"] },
+    { name: "H_Fault", addr: "%QX0.5", dir: "out", comment: ["故障指示灯", "Fault lamp"] },
   ];
   const L = 3.0, V = 0.2;                           // belt length m, speed m/s
   const POS = { entry: 0.15, insp: 0.7, p1: 1.4, p2: 1.9, p3: 2.4, end: 2.9 };   // the inspection sensors all look at x = 0.7 m

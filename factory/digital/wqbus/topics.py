@@ -22,7 +22,12 @@ UNITS = {
     "agv-02":    ("logistics", "物流小车 2", "AGV 2", None),
     "store-01":  ("warehouse", "原料库", "Raw store", None),
     "store-02":  ("warehouse", "成品库", "Finished store", None),
+    # 《PLC 原理及实践》（第 18 轮第 8 步）：由虚拟 PLC 控制的两台设备，学生的 PLC 程序在这里跑一个班次
+    "press-01":  ("machining", "轴承压装工位", "Bearing press-fit station", None),
+    "sort-01":   ("warehouse", "成品分拣线", "Finished-part sorting line", None),
 }
+# 虚拟 PLC 控制的设备 → 虚拟设备模型（学习平台 labkit/plants.js 里的名字）
+PLC_UNITS = {"press-01": "press", "sort-01": "sorter"}
 UNIT_AREA = {u: v[0] for u, v in UNITS.items()}
 # 看板“车间实况”里显示的 12 台加工与检验设备（顺序即显示顺序）
 MACHINES = ("saw-01", "cnc-l01-a", "cnc-l01-b", "vmc-01", "hmc-01", "key-01",

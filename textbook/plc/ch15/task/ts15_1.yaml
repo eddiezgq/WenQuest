@@ -12,7 +12,7 @@
 交付物:
   - {名称: [控制要求说明（2–3 页）, "Control requirements specification (2–3 pages)"], 验收: [七个部分齐全（设备、I/O、动作顺序、时间与节拍、异常、操作方式、安全）；每条要求编号、可检验, "All seven parts present (equipment, I/O, sequence, times and cycle, abnormal cases, modes, safety); every requirement numbered and testable"]}
   - {名称: [状态转换图与状态—事件表, "State diagram and state-event table"], 验收: [含 INIT、HOMING、FAULT、ESTOP；状态—事件表没有空格或“？”, "Includes INIT, HOMING, FAULT, ESTOP; no blank or '?' cells in the table"]}
-  - {名称: [PLC 程序（PLCopen XML）, "PLC program (PLCopen XML)"], 验收: [按准则 15.3.1 的结构；状态变量不保持；在实验 15.3 中通过全部 9 个测试（含异常处理和断电重启），程序检查没有错误, "Structured per Guideline 15.3.1; state not retentive; passes all 9 tests of Lab 15.3 (including abnormal cases and power cycle) with no review errors"]}
+  - {名称: [PLC 程序（PLCopen XML）, "PLC program (PLCopen XML)"], 类型: PLC 程序, 设备: press-01, 格式: [xml, st], 验收: [按准则 15.3.1 的结构；状态变量不保持；在实验 15.3 中通过全部 9 个测试（含异常处理和断电重启），程序检查没有错误, "Structured per Guideline 15.3.1; state not retentive; passes all 9 tests of Lab 15.3 (including abnormal cases and power cycle) with no review errors"]}
   - {名称: [测试用例清单与测试报告, "Test list and report"], 验收: [每条要求至少一个测试用例（写成“给输入—等—检查”的表格）；实验 15.3 已有的测试注明对应哪条要求，没有现成测试的要求（单步、点动、回原点超时等）在实验台上按用例手动执行，记录结果和截图, "At least one test case per requirement (as a set-wait-check table); map Lab 15.3's existing tests to requirements, and run the remaining cases (single step, jog, homing timeout, …) by hand on the bench with results and screenshots"]}
 工位: [PY, PLM]
 步骤:
@@ -21,7 +21,7 @@
   - ["按准则 15.3.1 写程序：枚举状态、CASE 写转移、输出统一赋值；加上操作方式、超时、冲突检查、急停。", "Write the program per Guideline 15.3.1 with modes, timeouts, conflict checks and e-stop."]
   - ["把每条要求写成测试用例；在实验 15.3 中运行全部测试直到通过，其余用例在实验台上手动执行；运行程序检查。", "Turn each requirement into a test case; run Lab 15.3's tests until all pass, run the remaining cases by hand, and review the program."]
   - ["做一次断电重启试验：回程途中断电再上电，确认设备不动作。", "Power-cycle during the return stroke and confirm the station stays still."]
-  - ["导出 PLCopen XML，整理测试报告，提交审批。", "Export PLCopen XML, compile the test report and submit for approval."]
+  - ["导出 PLCopen XML，整理测试报告，提交审批。老师批准后，程序自动下载到数字工厂的虚拟 PLC，控制压装工位跑一个 8 小时班次；到“虚拟 PLC”页看产量、合格率、节拍和报警，写进测试报告的“试生产”一节。", "Export PLCopen XML, compile the test report and submit. On approval the program is downloaded to the digital factory's virtual PLC and runs the press station for an 8-hour shift; read output, yield, cycle time and alarms on the Virtual PLC page and add them to the report's trial-run section."]
 评审要点:
   - ["〔AI 检查〕程序检查没有错误；全部测试通过。", "[AI] No review errors; all tests pass."]
   - ["〔AI 检查〕状态变量没有声明为 RETAIN；每个输出只赋值一次。", "[AI] The state variable is not RETAIN; every output is assigned once."]

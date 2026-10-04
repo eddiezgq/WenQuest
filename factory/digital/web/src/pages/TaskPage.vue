@@ -48,11 +48,15 @@
                 <span v-else-if="d.kind === '分析'">✓ 仿真与分析 作业 <span class="mono">{{ got(d).job }}</span></span>
                 <span v-else-if="d.kind === '工艺规程'">✓ 工艺规程提交 <span class="mono">{{ got(d).process }}</span></span>
                 <span v-else-if="d.kind === '更改单'">✓ {{ got(d).rows.length }} 项</span>
+                <span v-else-if="d.kind === 'PLC 程序'">✓ <a :href="got(d).files[0].url" target="_blank">{{ got(d).files[0].name }}</a>
+                  <span v-if="!got(d).check?.ok" class="err">编译不过：{{ got(d).check?.error }}</span>
+                  <span v-else-if="got(d).check.errors" class="err">程序检查 {{ got(d).check.errors }} 条错误</span>
+                  <span v-else class="ok">编译通过</span></span>
               </template>
               <span v-else class="muted">○ 未交</span></td>
             <td class="act">
               <template v-if="editable">
-                <label v-if="d.kind === '文件'" class="btn small">上传<input type="file" hidden @change="sendFile(d, $event)"></label>
+                <label v-if="d.kind === '文件' || d.kind === 'PLC 程序'" class="btn small">上传<input type="file" hidden @change="sendFile(d, $event)"></label>
                 <button v-else-if="d.kind === '设计发布'" class="btn small" @click="open = { d, kind: 'design' }">提交模型</button>
                 <button v-else-if="d.kind === '分析'" class="btn small" @click="pickJob(d)">选择作业</button>
                 <button v-else-if="d.kind === '工艺规程'" class="btn small" @click="pickProcess(d)">选择工艺规程</button>
@@ -138,6 +142,20 @@
         </table>
       </section>
 
+      <section v-if="sub?.plc_runs?.length" class="card">
+        <div class="card-head"><h2>虚拟 PLC 试生产</h2><router-link to="/plc" class="more">打开“虚拟 PLC”页看详情</router-link></div>
+        <table class="t small">
+          <thead><tr><th>班次</th><th>状态</th><th class="num">产量</th><th class="num">合格 / 不合格</th><th class="num">平均节拍</th><th class="num">报警</th><th class="num">停机</th></tr></thead>
+          <tbody><tr v-for="r in sub.plc_runs" :key="r.id"><td class="mono">{{ r.id }}</td>
+            <td>{{ { queued: '排队', running: '运行中', done: '班次完成', failed: '失败', cancelled: '已停止' }[r.status] }}{{ r.status === 'running' ? '（' + Math.round((r.live.progress || 0) * 100) + '%）' : '' }}</td>
+            <td class="num">{{ r.summary ? r.summary.parts : r.live.n || 0 }}</td>
+            <td class="num">{{ r.summary ? r.summary.good + ' / ' + r.summary.nok : (r.live.good_n || 0) + ' / ' + (r.live.nok_n || 0) }}</td>
+            <td class="num">{{ r.summary?.cycle_mean_s ?? r.live.cycle_s ?? '—' }} s</td><td class="num">{{ r.alarms.length }}</td>
+            <td class="num">{{ r.summary ? r.summary.downtime_min + ' 分' : '—' }}</td></tr></tbody>
+        </table>
+        <div v-for="r in sub.plc_runs.filter((x) => x.error)" :key="r.id + 'e'" class="err small">{{ r.id }}：{{ r.error }}</div>
+      </section>
+
       <section v-if="sub?.score" class="card">
         <div class="card-head"><h2>成绩：{{ sub.score.total }} 分</h2></div>
         <table class="t small"><tbody><tr v-for="(x, i) in task.rubric" :key="i"><td>{{ x['项'][0] }}</td><td class="num">{{ sub.score.items[i] }} / {{ x['分'] }}</td></tr></tbody></table>
@@ -164,7 +182,7 @@ import { timeOf } from '../lib/fmt';
 import { LEVEL, STAGES, STATUS, TONE, stageIndex, upload } from '../lib/tasks';
 
 const DOCS = { task: '任务单（Word）', rubric: '评分量规（Word）', calc: '空白计算书（Word）' };
-const KIND = { 文件: '上传文件', 设计发布: '设计发布（模型、图纸）', 分析: '仿真与分析的作业', 工艺规程: '工艺规程', 更改单: '表单' };
+const KIND = { 文件: '上传文件', 设计发布: '设计发布（模型、图纸）', 分析: '仿真与分析的作业', 工艺规程: '工艺规程', 更改单: '表单', 'PLC 程序': 'PLC 程序（批准后在虚拟 PLC 上跑一个班次）' };
 const route = useRoute();
 const task = ref(null);
 const sub = ref(null);

@@ -79,6 +79,7 @@ class Hub:
         self.mes = None
         self.teach = None
         self.twin = None
+        self.vplc = None
         self.stop = threading.Event()
         self.last_brief = {}
         self._ncr_sent = set()
@@ -101,6 +102,9 @@ class Hub:
         from hub.twin import TwinService
         self.twin = TwinService(self.db, self.publish)
         self.twin.init()
+        from hub.vplc import VPLC                     # 虚拟 PLC（第 18 轮第 8 步）
+        self.vplc = VPLC(self.db, self.publish)
+        self.vplc.init()
         self.bus.subscribe("wq/#", self.hist.handle_raw, raw=True)
         try:
             self.bus.start(timeout=float(os.environ.get("WQ_MQTT_TIMEOUT", "20")))
@@ -116,6 +120,11 @@ class Hub:
                 self.twin.on_message(tp, msg)
             except Exception:  # noqa: BLE001
                 log.exception("数字孪生处理消息出错")
+        if self.vplc is not None and t in ("plc.shift", "plc.cycle", "machine.status", "machine.event"):
+            try:
+                self.vplc.on_message(tp, msg)
+            except Exception:  # noqa: BLE001
+                log.exception("虚拟 PLC 处理消息出错")
         if t == "erp.doc":
             self.ai.on_erp_result(msg)
         elif t == "design.release":
@@ -1446,6 +1455,11 @@ _cfd.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quot
 # ---------------------------------------------------------------- 数字孪生（第 15 轮）
 from hub import twin_api as _twin  # noqa: E402
 _twin.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
+
+
+# ---------------------------------------------------------------- 虚拟 PLC（第 18 轮第 8 步《PLC 原理及实践》）
+from hub import vplc as _vplc  # noqa: E402
+_vplc.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")))
 
 
 # ---------------------------------------------------------------- 工程任务单（第 11 轮《机械设计》2.7（5））

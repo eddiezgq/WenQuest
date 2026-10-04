@@ -1483,6 +1483,108 @@ function typeXml(t) {
   if (ELEMENTARY.has(n)) return n === "STRING" ? "<string/>" : `<${n}/>`;
   return `<derived name="${xmlEsc(t.name)}"/>`;
 }
+// an initial value as PLCopen XML: simpleValue holds the ST literal text; arrays and structures nest
+function valueXml(init) {
+  if (init.k === "arr") return `<arrayValue>${init.items.map((x) => `<value>${valueXml(x)}</value>`).join("")}</arrayValue>`;
+  if (init.k === "struct") return `<structValue>${Object.entries(init.fields).map(([f, x]) => `<value member="${xmlEsc(f)}">${valueXml(x)}</value>`).join("")}</structValue>`;
+  return `<simpleValue value="${xmlEsc(exprText(init))}"/>`;
+}
+
+// ---------------------------------------------------------------- PLCopen XML import (the files exportXml writes, and ST bodies from other tools)
+// importXml(xml) -> ST source text the engine runs: TYPE … END_TYPE, then each POU with its VAR sections and ST body.
+function xmlTree(xml) {
+  const root = { tag: "#root", attrs: {}, kids: [], text: "" };
+  const stack = [root];
+  const re = /<!\[CDATA\[([\s\S]*?)\]\]>|<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<\/([\w:.-]+)\s*>|<([\w:.-]+)((?:\s+[\w:.-]+\s*=\s*(?:"[^"]*"|'[^']*'))*)\s*(\/?)>|([^<]+)/g;
+  const unesc = (t) => t.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&amp;/g, "&");
+  let m;
+  while ((m = re.exec(xml))) {
+    const top = stack[stack.length - 1];
+    if (m[1] != null) top.text += m[1];
+    else if (m[2]) { if (stack.length > 1) stack.pop(); }
+    else if (m[3]) {
+      const attrs = {};
+      (m[4] || "").replace(/([\w:.-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g, (_, k, a, b) => { attrs[k.replace(/^.*:/, "")] = unesc(a != null ? a : b); });
+      const el = { tag: m[3].replace(/^.*:/, ""), attrs, kids: [], text: "" };
+      top.kids.push(el);
+      if (!m[5]) stack.push(el);
+    } else if (m[6]) top.text += unesc(m[6]);
+  }
+  return root;
+}
+function importXml(xml, opts = {}) {
+  const root = xmlTree(xml);
+  const find = (el, tag) => el.kids.find((k) => k.tag === tag);
+  const all = (el, tag, out = []) => { el.kids.forEach((k) => { if (k.tag === tag) out.push(k); all(k, tag, out); }); return out; };
+  const textOf = (el) => (el.text || "") + el.kids.map(textOf).join("");
+  const project = all(root, "project")[0];
+  if (!project) throw E("xml", "不是 PLCopen XML 文件（没有 project 元素） / Not a PLCopen XML file (no project element)");
+  const typeText = (t) => {
+    const k = t && t.kids[0];
+    if (!k) throw E("xml", "类型缺失 / Missing type");
+    if (k.tag === "derived") return k.attrs.name;
+    if (k.tag === "string") return "STRING";
+    if (k.tag === "wstring") return "WSTRING";
+    if (k.tag === "array") {
+      const dims = k.kids.filter((d) => d.tag === "dimension").map((d) => `${d.attrs.lower}..${d.attrs.upper}`);
+      return `ARRAY[${dims.join(", ")}] OF ${typeText(find(k, "baseType"))}`;
+    }
+    return k.tag.toUpperCase();
+  };
+  const valueText = (v) => {
+    const k = v && v.kids[0];
+    if (!k) return "";
+    if (k.tag === "simpleValue") return k.attrs.value;
+    if (k.tag === "arrayValue") return "[" + k.kids.filter((x) => x.tag === "value").map((x) => (x.attrs.repetitionValue ? `${x.attrs.repetitionValue}(${valueText(x)})` : valueText(x))).join(", ") + "]";
+    if (k.tag === "structValue") return "(" + k.kids.filter((x) => x.tag === "value").map((x) => `${x.attrs.member} := ${valueText(x)}`).join(", ") + ")";
+    return "";
+  };
+  const varLine = (v) => `    ${v.attrs.name}${v.attrs.address ? " AT " + v.attrs.address : ""} : ${typeText(find(v, "type"))}` +
+    (find(v, "initialValue") ? " := " + valueText(find(v, "initialValue")) : "") + ";";
+  const SECTION = { inputVars: "VAR_INPUT", outputVars: "VAR_OUTPUT", inOutVars: "VAR_IN_OUT", localVars: "VAR", tempVars: "VAR_TEMP", externalVars: "VAR_EXTERNAL" };
+  const out = [];
+  const types = all(project, "dataType");
+  if (types.length) {
+    out.push("TYPE");
+    for (const t of types) {
+      const b = find(t, "baseType"), k = b && b.kids[0];
+      if (k && k.tag === "struct") out.push(`  ${t.attrs.name} : STRUCT\n${k.kids.filter((x) => x.tag === "variable").map((v) => "  " + varLine(v)).join("\n")}\n  END_STRUCT;`);
+      else if (k && k.tag === "enum") {
+        const vals = all(k, "value");
+        const explicit = vals.some((x, i) => x.attrs.value != null && +x.attrs.value !== i);
+        const init = find(t, "initialValue");
+        out.push(`  ${t.attrs.name} : (${vals.map((x) => x.attrs.name + (explicit && x.attrs.value != null ? " := " + x.attrs.value : "")).join(", ")})${init ? " := " + valueText(init) : ""};`);
+      } else out.push(`  ${t.attrs.name} : ${typeText(b)};`);
+    }
+    out.push("END_TYPE", "");
+  }
+  const ioNames = new Set((opts.io || []).map((x) => x.name.toUpperCase()));
+  const globals = all(project, "globalVars").flatMap((g) => g.kids.filter((v) => v.tag === "variable" && !ioNames.has(v.attrs.name.toUpperCase())));
+  if (globals.length) out.push("VAR_GLOBAL", ...globals.map(varLine), "END_VAR", "");
+  const KW = { program: "PROGRAM", functionBlock: "FUNCTION_BLOCK", function: "FUNCTION" };
+  const pous = all(project, "pou");
+  if (!pous.length) throw E("xml", "XML 里没有程序（pou） / The XML has no program (pou)");
+  for (const u of pous) {
+    const kw = KW[u.attrs.pouType];
+    if (!kw) throw E("xml", `不认识的程序组织单元类型 ${u.attrs.pouType} / Unknown POU type ${u.attrs.pouType}`);
+    const itf = find(u, "interface") || { kids: [] };
+    const ret = find(itf, "returnType");
+    out.push(`${kw} ${u.attrs.name}${ret ? " : " + typeText(ret) : ""}`);
+    for (const sec of itf.kids) {
+      if (!SECTION[sec.tag]) continue;
+      out.push(`  ${SECTION[sec.tag]}${sec.attrs.retain === "true" ? " RETAIN" : ""}${sec.attrs.constant === "true" ? " CONSTANT" : ""}`);
+      sec.kids.filter((v) => v.tag === "variable").forEach((v) => out.push(varLine(v)));
+      out.push("  END_VAR");
+    }
+    const body = find(u, "body");
+    const st = body && find(body, "ST");
+    if (!st) throw E("xml", `${u.attrs.name} 的程序体不是结构化文本：问渠目前只导入 ST 程序体（梯形图、SFC 图形请先在原软件里转成 ST） / ` +
+      `The body of ${u.attrs.name} is not Structured Text: only ST bodies are imported for now (convert LD / graphical SFC to ST first)`);
+    out.push(textOf(st).replace(/^\n+|\s+$/g, ""), `END_${kw}`, "");
+  }
+  return out.join("\n");
+}
+
 function exportXml(src, opts = {}) {
   const ast = parse(src);
   const kindOf = { program: "program", fb: "functionBlock", function: "function" };
@@ -1497,16 +1599,21 @@ function exportXml(src, opts = {}) {
     return lines.slice(lastVar + 1, k).join("\n").replace(/^\n+|\s+$/g, "");
   };
   const varsXml = (vars) => {
-    const groups = {};
-    vars.forEach((v) => { (groups[v.kind] = groups[v.kind] || []).push(v); });
-    return Object.entries(groups).map(([k, vs]) => `<${SECTION[k]}${vs[0].retain ? ' retain="true"' : ""}${vs[0].constant ? ' constant="true"' : ""}>` +
+    // one section per kind and RETAIN / CONSTANT flags, in declaration order
+    const groups = [];
+    vars.forEach((v) => {
+      const key = v.kind + (v.retain ? "R" : "") + (v.constant ? "C" : "");
+      const g = groups.length && groups[groups.length - 1].key === key ? groups[groups.length - 1] : null;
+      if (g) g.vs.push(v); else groups.push({ key, k: v.kind, vs: [v] });
+    });
+    return groups.map(({ k, vs }) => `<${SECTION[k]}${vs[0].retain ? ' retain="true"' : ""}${vs[0].constant ? ' constant="true"' : ""}>` +
       vs.map((v) => `<variable name="${xmlEsc(v.name)}"${v.addr ? ` address="${v.addr}"` : ""}><type>${typeXml(v.type)}</type>` +
-        (v.init && v.init.e && ["num", "bool", "time", "str"].includes(v.init.e) ? `<initialValue><simpleValue value="${xmlEsc(v.init.e === "time" ? fmtTime(v.init.v) : v.init.e === "bool" ? (v.init.v ? "TRUE" : "FALSE") : v.init.v)}"/></initialValue>` : "") +
-        "</variable>").join("") + `</${SECTION[k]}>`).join("");
+        (v.init ? `<initialValue>${valueXml(v.init)}</initialValue>` : "") + "</variable>").join("") + `</${SECTION[k]}>`).join("");
   };
   const typesXml = Object.values(ast.types).map((t) => {
     if (t.struct) return `<dataType name="${xmlEsc(t.name)}"><baseType><struct>${t.struct.map((f) => `<variable name="${xmlEsc(f.name)}"><type>${typeXml(f.type)}</type></variable>`).join("")}</struct></baseType></dataType>`;
-    if (t.enumeration) return `<dataType name="${xmlEsc(t.name)}"><baseType><enum><values>${t.enumeration.map(([v]) => `<value name="${xmlEsc(v)}"/>`).join("")}</values></enum></baseType></dataType>`;
+    if (t.enumeration) return `<dataType name="${xmlEsc(t.name)}"><baseType><enum><values>${t.enumeration.map(([v, n]) => `<value name="${xmlEsc(v)}" value="${n}"/>`).join("")}</values></enum></baseType>` +
+      (t.init ? `<initialValue><simpleValue value="${xmlEsc(t.init)}"/></initialValue>` : "") + "</dataType>";
     return `<dataType name="${xmlEsc(t.name)}"><baseType>${typeXml(t.alias)}</baseType></dataType>`;
   }).join("");
   const pousXml = ast.pous.map((u) => `<pou name="${xmlEsc(u.name)}" pouType="${kindOf[u.kind]}"><interface>` +
@@ -1701,7 +1808,7 @@ function review(prog, io = []) {
   return out.sort((a, b) => order[a.level] - order[b.level] || a.line - b.line);
 }
 
-const API = { exprText, review, lex, parse, parseExpr, compile, compileLadder, ladderToSt, Runtime, runTest, exportXml, parseTime, fmtTime, normAddr, PlcError, STD_FB, STD_FN };
+const API = { exprText, review, lex, parse, parseExpr, compile, compileLadder, ladderToSt, Runtime, runTest, exportXml, importXml, parseTime, fmtTime, normAddr, PlcError, STD_FB, STD_FN };
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 else root.WQPLC = API;
 })(typeof window !== "undefined" ? window : globalThis);

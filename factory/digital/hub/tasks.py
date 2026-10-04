@@ -10,18 +10,23 @@
 """
 import datetime as dt
 import hmac
+import logging
 import os
 import uuid
 
 from fastapi import Body, Depends, File, Form, Header, HTTPException, UploadFile
 
+import wqbus
 from hub import task_review as R
+
+log = logging.getLogger("hub.tasks")
 
 STATUS_ZH = {"draft": "未提交", "submitted": "待老师审阅", "returned": "退回修改", "approved": "已批准", "graded": "已评分"}
 MAX_FILE = 50 * 1024 * 1024
 MIME = {"docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "pdf": "application/pdf",
         "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "step": "application/step",
-        "png": "image/png", "jpg": "image/jpeg", "zip": "application/zip", "txt": "text/plain"}
+        "png": "image/png", "jpg": "image/jpeg", "zip": "application/zip", "txt": "text/plain",
+        "xml": "application/xml", "st": "text/plain"}
 
 
 def _key():
@@ -299,6 +304,8 @@ def mount(app, H, user_of, who, uid_of, emit_as):
         out["mine"] = s["author_uid"] == uid_of(u)
         item = next((x.get("零件") for x in t["spec"].get("交付物") or [] if x.get("零件")), None)
         out["inspection"] = inspection(H.db, u["mode"], item, s["decided_at"]) if s["status"] in ("approved", "graded") else []
+        if getattr(H, "vplc", None) is not None and any(x.get("类型") == "PLC 程序" for x in t["spec"].get("交付物") or []):
+            out["plc_runs"] = H.vplc.runs(u["mode"], task_sub=s["id"], limit=5)       # 批准后在虚拟 PLC 上跑的班次
         out["stage"] = ("graded" if s["status"] == "graded" else "inspected" if out["inspection"] else
                         "approved" if s["status"] == "approved" else s["status"])
         out.pop("author_uid", None) if not is_teacher(u) else None
@@ -330,7 +337,8 @@ def mount(app, H, user_of, who, uid_of, emit_as):
     async def task_file(tid: str, i: int, file: UploadFile = File(...), u=Depends(user_of)):
         t = get_task(tid)
         x = call(_deliverable, t, i)
-        if x.get("类型", "文件") != "文件":
+        kind = x.get("类型", "文件")
+        if kind not in ("文件", "PLC 程序"):
             raise HTTPException(422, "这项交付物不是上传文件")
         data = await file.read()
         if len(data) > MAX_FILE:
@@ -338,6 +346,18 @@ def mount(app, H, user_of, who, uid_of, emit_as):
         ext = call(check_file, x, file.filename or "")
         f = plm.store(H.db, file.filename, MIME.get(ext, file.content_type or "application/octet-stream"), data)
         s = mine(H.db, tid, uid_of(u), who(u))
+        if kind == "PLC 程序":           # 第 18 轮第 8 步：PLC 程序（ST 或 PLCopen XML），上传时就编译检查
+            from hub import vplc as V
+            unit = x.get("设备") or "press-01"
+            try:
+                st = V.to_st(file.filename, data, unit)
+                c = V.check(st, unit)
+            except ValueError as e:
+                c = {"ok": False, "error": str(e), "review": []}
+            chk = {"ok": bool(c.get("ok")), "error": c.get("error"),
+                   "errors": sum(1 for r in c.get("review") or [] if r.get("level") == "error"),
+                   "warnings": sum(1 for r in c.get("review") or [] if r.get("level") == "warning")}
+            return full(t, call(set_deliverable, H.db, s, i, {"kind": "PLC 程序", "files": [f], "unit": unit, "check": chk}), u)
         return full(t, call(set_deliverable, H.db, s, i, {"kind": "文件", "files": [f]}), u)
 
     @app.post("/api/tasks/{tid}/deliverables/{i}/design")
@@ -450,6 +470,24 @@ def mount(app, H, user_of, who, uid_of, emit_as):
                     if p and p["status"] == "pending":
                         plm.approve(H.db, emit_as(u), got["plm"], who(u), "任务单 {} 批准".format(t["code"]), check_self=False)
                         done.append("{} 设计发布生效".format(x.get("零件")))
+                if x.get("类型") == "PLC 程序" and got.get("files") and getattr(H, "vplc", None) is not None:
+                    # 批准的程序下载到数字工厂的虚拟 PLC，跑一个班次（第 18 轮第 8 步）
+                    from hub import vplc as V
+                    unit = got.get("unit") or x.get("设备") or "press-01"
+                    f = got["files"][0]
+                    try:
+                        st = V.to_st(f["name"], plm.load_file(H.db, f["url"]) or b"", unit)
+                        c = V.check(st, unit)
+                        if c.get("ok"):
+                            rid = H.vplc.start(u["mode"], unit, st, title="{} · {}".format(t["code"], s.get("author") or ""),
+                                               origin="task", task_sub=s["id"], hours=float(x.get("班次小时") or 8),
+                                               who=who(u), uid=s.get("author_uid"), review=c.get("review"))
+                            done.append("程序已下载到虚拟 PLC，{}开始一个班次（{}）".format(wqbus.UNITS[unit][1], rid))
+                        else:
+                            done.append("程序编译不过，没有下载到虚拟 PLC：" + (c.get("error") or ""))
+                    except Exception as e:  # noqa: BLE001 —— 下载不成功不影响批准，写进批准记录
+                        log.exception("下发 PLC 程序失败")
+                        done.append("程序没能下载到虚拟 PLC：" + str(e)[:200])
                 if x.get("类型") == "工艺规程" and got.get("process"):
                     p = process.get(H.db, got["process"])
                     if p and p["status"] == "pending":

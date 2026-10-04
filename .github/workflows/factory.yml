@@ -8,6 +8,9 @@ on:
     paths:
       - "factory/**"
       - ".github/workflows/factory.yml"
+      - "services/gateway/app/production/labkit/plc.js"       # 虚拟 PLC 用的是这几份的副本（tests/test_vplc.py 核对一致）
+      - "services/gateway/app/production/labkit/plants.js"
+      - "services/gateway/app/production/labkit/shift.js"
   workflow_dispatch:
 
 permissions:
@@ -124,6 +127,17 @@ jobs:
           val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
           python tests/check_cae.py --hub http://localhost:8100 --erp http://localhost:8090 \
             --erp-key "$(val WQ_ERP_API_KEY)" --erp-secret "$(val WQ_ERP_API_SECRET)"
+      - name: 虚拟 PLC（第 18 轮第 8 步）
+        working-directory: factory/digital
+        run: |
+          set +e
+          python tests/check_vplc.py --hub http://localhost:8100 2>&1 | tee /tmp/logs/vplc.log
+          st=${PIPESTATUS[0]}
+          if [ "$st" != 0 ]; then
+            { cat /tmp/logs/vplc.log; echo "---- 仿真车间 ----"; docker compose -p wq-factory -f /tmp/fac/docker-compose.yml -f /tmp/fac/ci.yml logs --no-color --tail 60 sim; } > /tmp/logs/vplc_diag.log 2>&1
+            python3 ../deploy/ci_annotate.py 虚拟PLC诊断 /tmp/logs/vplc_diag.log 120
+          fi
+          exit "$st"
       - name: ERPNext 单点登录（第 7 轮）
         working-directory: /tmp/fac
         run: |

@@ -77,6 +77,15 @@ DATA_SCHEMAS = {
         "vib_mm_s": {"type": "number", "minimum": 0},
         "rainflow": {"type": "array", "items": {"type": "array", "minItems": 3, "maxItems": 3, "items": NUM}},
         "load_hist": {"type": "array", "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": NUM}}}),
+    # 第 18 轮第 8 步《PLC 原理及实践》：虚拟 PLC。枢纽下发程序，虚拟 PLC 跑一个班次并上报每个工件和班次结果
+    "plc.download": _obj(["run_id", "program"], {
+        "run_id": STR, "program": {"type": "string", "minLength": 1, "maxLength": 200000},
+        "hours": {"type": "number", "exclusiveMinimum": 0, "maximum": 12}, "seed": {"type": "integer"},
+        "speed": {"type": "number", "minimum": 0}}),
+    "plc.cycle": _obj(["run_id", "good", "n"], {"run_id": STR, "good": {"type": "boolean"}, "n": {"type": "integer", "minimum": 1},
+                                                 "cycle_s": NUM, "peak_kN": NUM, "progress": FRAC}),
+    "plc.shift": _obj(["run_id", "phase"], {"run_id": STR, "phase": {"enum": ["started", "done", "failed", "cancelled"]},
+                                             "summary": {"type": "object"}, "error": STR}),
     "logistics.status": _obj(["x_m", "y_m"], {"x_m": NUM, "y_m": NUM, "battery": FRAC}),
     "ai.alert": _obj(["level", "title"], {"level": {"enum": ["info", "warn", "critical"]},
                                           "evidence": EVIDENCE}),
