@@ -27,6 +27,7 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+OUT = Path(os.environ.get("CALIB_OUT", HERE))          # CI 在镜像里运行时写到别处（仓库只读挂载）
 ROOT = HERE.parents[3]
 PARAMS = json.loads((ROOT / "labs/micro/kit/models/params.json").read_text(encoding="utf-8"))
 VDD, L, WMIN = 1.8, 0.15, 0.42
@@ -164,8 +165,8 @@ def effective_vt(res):
 
 
 def main():
-    if "--fit-only" in sys.argv and (HERE / "result.json").exists():
-        res = json.loads((HERE / "result.json").read_text(encoding="utf-8"))
+    if "--fit-only" in sys.argv and (OUT / "result.json").exists():
+        res = json.loads((OUT / "result.json").read_text(encoding="utf-8"))
         res.pop("fit", None)
     else:
         res = {"device": device()}
@@ -201,12 +202,13 @@ def main():
            "Cg": float(f"{cg_eff:.3g}"), "Cd": float(f"{cd_eff:.3g}")}
     res["fit"] = {**fit, "vt_extracted": [d["vtn"], abs(d["vtp"])], "gamma": gamma, "cg_from_charge": cg, "delay_scale": scale,
                   "fo4_sim_ps": {k: [x * 1e12 for x in res["delay"][k]["4"]] for k in res["delay"]}}
-    (HERE / "result.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "result.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
     newp = dict(PARAMS)
     newp.update(fit)
     newp["_note"] = ("SKY130 tt 27 °C 校准值（第 17 轮附 3.4，samples/数字集成电路设计/生成脚本/calib/calib.py）："
                      "VT 为使传输特性最接近仿真的有效值（线性区外推值见 calib/result.json），k′ 由 IDSAT 反推，Cg、Cd 由输入电容与扇出拟合后按 FO4 延时修正")
-    (HERE / "params.sky130.json").write_text(json.dumps(newp, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (OUT / "params.sky130.json").write_text(json.dumps(newp, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     print(f"IDSAT n {d['idsat_n_per_um']*1e6:.0f} μA/μm, p {d['idsat_p_per_um']*1e6:.0f} μA/μm; VT extracted {d['vtn']:.3f}/{abs(d['vtp']):.3f} V, effective {vtn:.2f}/{vtp:.2f} V")
     print(f"k'n {kn*1e6:.1f} μA/V², k'p {kp*1e6:.1f} μA/V², r = {kn/kp:.2f}")
