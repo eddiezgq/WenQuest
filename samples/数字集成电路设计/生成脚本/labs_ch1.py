@@ -22,6 +22,7 @@ RL = R["r_lab"]                                    # 对称尺寸比在实验滑
 G, FOPT, NB, NF = C14["gamma"], C14["fopt"], C14["Nbest"], C14["Nfew"]
 fNB = C14["F"] ** (1 / NB)
 VLIM, FO4LOW = P15["Vlim"], P15["fo4_low"]
+TMAX = round(M.P["problems"]["p14"]["tmax"] * 1e9, 2)          # 1.4 机器人任务的延时上限，ns
 
 LINK = "问渠课程页“虚拟实验”，或课件实验页的“打开虚拟实验”按钮 / the Virtual Lab link on the course page or the “Open virtual lab” button in the slides"
 H = "数字集成电路设计 · 第 1 章 CMOS 反相器 · 虚拟实验"
@@ -138,7 +139,7 @@ LABS = [
             ("负载 CL", "Load CL", "1 – 20 pF", "1 – 20 pF")],
     "steps": [("CL = 10 pF，级数从 1 到 8 依次设置，读出每级扇出 f 和总延时，填表 1。", "CL = 10 pF: set N from 1 to 8 and record f and total delay in Table 1."),
               (f"找出总延时最小的级数，与经验公式 ln F / ln 4 比较，并用 γ ≈ {G:.2f} 说明二者为什么接近或不同。", f"Find the N with the smallest delay, compare with the rule ln F / ln 4, and use γ ≈ {G:.2f} to explain why they agree or differ."),
-              ("找出延时小于 0.3 ns 的最少级数。", "Find the fewest stages that give a delay under 0.3 ns."),
+              (f"找出延时小于 {TMAX:g} ns 的最少级数，它和最快的级数一样吗？", f"Find the fewest stages that give a delay under {TMAX:g} ns. Is it the same as the fastest N?"),
               ("把 CL 改为 2 pF 和 20 pF，重复找最优级数，填表 2。", "Repeat for CL = 2 pF and 20 pF; record the optimum in Table 2.")],
     "tables": [
       ("表 1  级数与延时（CL = 10 pF） Table 1  Stages vs delay", ["N", "1", "2", "3", "4", "5", "6", "7", "8"],
@@ -151,8 +152,8 @@ LABS = [
     "questions": [("为什么级数太多反而变慢？", "Why does adding too many stages make it slower?"),
                   ("最优附近总延时变化很平缓，工程上会怎样取舍级数？", "Near the optimum the delay is flat. How would an engineer choose the number of stages?")],
     "problem": ("驱动板上的栅极驱动器", "Driving the gate driver on the board",
-                f"芯片输出驱动约 10 pF 的总负载。(1) 最小对称反相器的输入电容和总扇出 F 各多少（参考：{C14['Cin']*1e15:.2f} fF，F ≈ {C14['F']:.0f}）？(2) 单级驱动延时多大（参考：约 {C14['t']['1']*1e9:.0f} ns）？(3) 经验公式给出 ln F / ln 4 ≈ {C14['Nopt4']:.1f}；本模型最快的是几级，每级扇出和总延时多少（参考：{NB} 级，f ≈ {fNB:.1f}，约 {C14['t'][str(NB)]*1e12:.0f} ps）？满足 0.3 ns 的最少级数是几（参考：{NF} 级）？要求输出与输入同相时应取几级？",
-                f"The chip output drives about 10 pF. (1) What are the minimum symmetric inverter’s input capacitance and the total fan-out F (reference: {C14['Cin']*1e15:.2f} fF, F ≈ {C14['F']:.0f})? (2) What is the single-stage delay (reference: about {C14['t']['1']*1e9:.0f} ns)? (3) The rule gives ln F / ln 4 ≈ {C14['Nopt4']:.1f}. Which N is fastest in this model, and what are f and the total delay (reference: {NB} stages, f ≈ {fNB:.1f}, about {C14['t'][str(NB)]*1e12:.0f} ps)? What is the fewest number of stages meeting 0.3 ns (reference: {NF})? How many stages if the output must not be inverted?"),
+                f"芯片输出驱动约 10 pF 的总负载。(1) 最小对称反相器的输入电容和总扇出 F 各多少（参考：{C14['Cin']*1e15:.2f} fF，F ≈ {C14['F']:.0f}）？(2) 单级驱动延时多大（参考：约 {C14['t']['1']*1e9:.0f} ns）？(3) 经验公式给出 ln F / ln 4 ≈ {C14['Nopt4']:.1f}；本模型最快的是几级，每级扇出和总延时多少（参考：{NB} 级，f ≈ {fNB:.1f}，约 {C14['t'][str(NB)]*1e12:.0f} ps）？满足 {TMAX:g} ns 的最少级数是几（参考：{NF} 级）？要求输出与输入同相时应取几级？",
+                f"The chip output drives about 10 pF. (1) What are the minimum symmetric inverter’s input capacitance and the total fan-out F (reference: {C14['Cin']*1e15:.2f} fF, F ≈ {C14['F']:.0f})? (2) What is the single-stage delay (reference: about {C14['t']['1']*1e9:.0f} ns)? (3) The rule gives ln F / ln 4 ≈ {C14['Nopt4']:.1f}. Which N is fastest in this model, and what are f and the total delay (reference: {NB} stages, f ≈ {fNB:.1f}, about {C14['t'][str(NB)]*1e12:.0f} ps)? What is the fewest number of stages meeting {TMAX:g} ns (reference: {NF})? How many stages if the output must not be inverted?"),
     "everyday": ("搬一件很重的东西，一个人搬太慢，分几段逐级加人接力更快。人越多越好吗？", "Moving something heavy: relays with more and more people at each stage go faster. Are more people always better?"),
   },
   {

@@ -10,7 +10,7 @@ execFileSync('node', [path.join(micro, 'tools/check_model.js')], { stdio: 'inher
 const PAGES = [
   { src: 'dic-ch1/index.src.html', out: ['samples/数字集成电路设计/课程资料/第1章 CMOS反相器/虚拟实验/第1章虚拟实验（中英）.html', 'labs/micro/dic-ch1/index.html'] },
   { src: 'spice/index.src.html', out: ['labs/micro/spice/index.html'] },
-  { src: 'verilog/index.src.html', out: ['labs/micro/verilog/index.html'] },
+  { src: 'verilog/index.src.html', out: ['labs/micro/verilog/index.html', 'services/gateway/app/static/micro_verilog.html'] },
 ];
 
 for (const p of PAGES) {

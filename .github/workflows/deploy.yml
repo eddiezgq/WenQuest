@@ -49,12 +49,11 @@ jobs:
           python -m playwright install --with-deps --only-shell chromium
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk > /dev/null
           python -m pytest -q
-      - name: Verilog synthesis service tests (real Yosys)
+      - name: Verilog synthesis service tests (inside its own image, with the Yosys that goes live)
         working-directory: services/micro-synth
         run: |
-          sudo apt-get install -y -qq yosys > /dev/null
-          pip install -q -r requirements.txt pytest httpx
-          python -m pytest -q
+          docker build -q -t wq-micro-synth:test .
+          docker run --rm -u root -v "$PWD:/t" -w /t wq-micro-synth:test sh -c "pip3 install -q pytest httpx && python3 -m pytest -q -p no:cacheprovider"
       - name: Voice service tests (speech synthesis and recognition with the real models)
         working-directory: services/voice
         run: |

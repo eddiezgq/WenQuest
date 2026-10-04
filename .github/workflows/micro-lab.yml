@@ -43,14 +43,14 @@ jobs:
         id: base
         run: |
           base=$(sed -n 's/^ARG BASE=//p' deploy/micro-lab/Dockerfile)
+          if [[ "$base" != *@sha256:* ]]; then echo "::error::Dockerfile 的基础镜像没有按摘要锁定（ARG BASE=…@sha256:…）"; exit 1; fi
+          docker pull -q "$base"            # 按锁定的摘要拉取
+          echo "::notice title=基础镜像摘要::$base"
+          echo "digest=${base#*@}" >> "$GITHUB_OUTPUT"
+          # 只作提示：上游标签是否已指向新版本（升级时改 Dockerfile 并重新验收）
           tag=${base%@*}
-          docker pull -q "$tag"
-          digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$tag")
-          echo "::notice title=基础镜像摘要::$digest"
-          echo "digest=$digest" >> "$GITHUB_OUTPUT"
-          if [[ "$base" == *@sha256:* ]] && [[ "$digest" != *"${base#*@}" ]]; then
-            echo "::error::Dockerfile 锁定的摘要 ${base#*@} 与仓库当前的 $digest 不同"; exit 1
-          fi
+          now=$(docker buildx imagetools inspect "$tag" --format '{{json .Manifest.Digest}}' 2>/dev/null | tr -d '"') || true
+          if [ -n "$now" ] && [ "$now" != "${base#*@}" ]; then echo "::notice title=上游有新版本::$tag 现在指向 $now"; fi
           docker image ls
 
       - name: Build wenquest/micro-lab
@@ -66,11 +66,12 @@ jobs:
         if: always()
         run: |
           mkdir -p desk && chmod 777 desk
-          cp out/inv/build/inv.gds desk/ 2>/dev/null || true
+          cp out/inv/build/inv.gds desk/ || { echo "::error::没有反相器 GDS，无法检查 KLayout"; exit 1; }
           docker run -d --name wqdesk --user 1000:1000 -p 8080:80 -v "$PWD/desk:/foss/designs" wenquest/micro-lab:ci --wait
           pip install -q playwright==1.56.0 && python -m playwright install --with-deps --only-shell chromium > /dev/null
           python deploy/micro-lab/ci/vnc_shot.py wqdesk 8080 out/screens
           docker stats --no-stream wqdesk | tee out/screens/stats.txt
+          echo "::notice title=网页桌面资源（Xschem、KLayout 打开时）::$(docker stats --no-stream --format 'CPU {{.CPUPerc}}，内存 {{.MemUsage}}' wqdesk)"
           docker rm -f wqdesk
 
       - name: Screenshot thumbnails as notices

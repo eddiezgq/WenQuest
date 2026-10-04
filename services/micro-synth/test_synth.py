@@ -84,3 +84,19 @@ def test_parallel_limit(monkeypatch):
     asyncio.run(go())
     assert running["max"] == 2
     monkeypatch.setattr(synth, "run_yosys", real)
+
+
+@pytest.mark.parametrize("src", [
+    "`define R $readmem``h\nmodule m(output [7:0] y); reg [7:0] x[0:0]; initial `R(\"/etc/hostname\", x); assign y = x[0]; endmodule",
+    "`define F readmemh\nmodule m; endmodule",
+    "module m; initial $ fopen(\"x\"); endmodule",
+    "` include \"/etc/passwd\"\nmodule m; endmodule",
+])
+def test_forbidden_tricks(src):
+    r = c.post("/synth", json={"source": src})
+    assert r.status_code == 422 and r.json()["error"] == "forbidden"
+
+
+def test_macros_still_allowed():
+    src = "`timescale 1ns/1ps\n`define W 4\nmodule m(input [`W-1:0] a, output [`W-1:0] b); assign b = ~a; endmodule"
+    assert c.post("/synth", json={"source": src}).json()["ok"]

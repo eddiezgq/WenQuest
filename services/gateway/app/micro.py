@@ -6,18 +6,23 @@ simulates the returned netlist with DigitalJS as before.
 
 Two ways in:
   POST /api/v1/micro/synth                 — a signed-in user (the WenQuest app);
-  GET  /api/v1/micro/synth-link            — gives a signed link for a lab page opened inside a course or textbook;
-  POST /api/v1/micro-synth/{signed}        — the lab page posts there (no session header inside an iframe).
+  GET  /api/v1/micro/synth-link            — a personal, signed link (12 h) to the Verilog lab page served by the
+                                             gateway, for a course or textbook to open;
+  GET  /api/v1/micro-verilog/{signed}      — that page: the built lab (app/static/micro_verilog.html, copied by
+                                             labs/micro/tools/build.js) with its synthesis address set to the next route;
+  POST /api/v1/micro-synth/{signed}        — the lab page posts there (same site; no session header inside an iframe).
 Limits on top of the service's own (64 KB, 20 s, 2 at a time): 10 syntheses per user per minute.
 """
 
 import json
 import time
+from pathlib import Path
 from collections import defaultdict, deque
 from typing import Annotated
 
 import httpx
 from fastapi import Depends
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from .moodle import EngineError
@@ -26,6 +31,7 @@ from .session import Session
 PER_MINUTE = 10
 LINK_TTL = 12 * 3600
 MAX_SOURCE = 64 * 1024
+PAGE = Path(__file__).resolve().parent / "static" / "micro_verilog.html"
 
 
 class SynthIn(BaseModel):
@@ -67,15 +73,7 @@ def register(app, m) -> None:
     async def synth(body: SynthIn, sess: Annotated[Session, Depends(current)]):
         return await forward(sess, body)
 
-    @app.get("/api/v1/micro/synth-link")
-    async def synth_link(sess: Annotated[Session, Depends(current)]):
-        tok = state.codec.fernet.encrypt(json.dumps({"s": state.codec.issue(sess), "k": "synth"}).encode()).decode()
-        base = (state.settings.public_url or state.settings.app_url).rstrip("/")
-        return {"url": f"{base}/api/v1/micro-synth/{tok}", "expires_in": LINK_TTL,
-                "on": bool(state.settings.microsynth_url)}
-
-    @app.post("/api/v1/micro-synth/{signed}")
-    async def synth_signed(signed: str, body: SynthIn):
+    def signed_session(signed: str) -> Session:
         try:
             d = json.loads(state.codec.fernet.decrypt(signed.encode(), ttl=LINK_TTL))
         except Exception as e:  # noqa: BLE001
@@ -83,4 +81,25 @@ def register(app, m) -> None:
         sess = state.codec.read(d.get("s", "")) if d.get("k") == "synth" else None
         if not sess:
             raise EngineError("link_expired", "link expired; open the lab again", 410)
-        return await forward(sess, body)
+        return sess
+
+    @app.get("/api/v1/micro/synth-link")
+    async def synth_link(sess: Annotated[Session, Depends(current)]):
+        tok = state.codec.fernet.encrypt(json.dumps({"s": state.codec.issue(sess), "k": "synth"}).encode()).decode()
+        base = (state.settings.public_url or state.settings.app_url).rstrip("/")
+        return {"url": f"{base}/api/v1/micro-verilog/{tok}", "synth_url": f"{base}/api/v1/micro-synth/{tok}",
+                "expires_in": LINK_TTL, "on": bool(state.settings.microsynth_url)}
+
+    @app.get("/api/v1/micro-verilog/{signed}")
+    async def verilog_page(signed: str):
+        signed_session(signed)
+        if not PAGE.exists():
+            raise EngineError("unavailable", "the Verilog lab page is not installed on this site", 503)
+        conf = (f"<script>window.WQ_SYNTH_URL = {json.dumps('/api/v1/micro-synth/' + signed)};"
+                f"window.WQ_SYNTH_ON = {json.dumps(bool(state.settings.microsynth_url))};</script>")
+        page = PAGE.read_text(encoding="utf-8").replace("<head>", "<head>" + conf, 1)
+        return HTMLResponse(page, headers={"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"})
+
+    @app.post("/api/v1/micro-synth/{signed}")
+    async def synth_signed(signed: str, body: SynthIn):
+        return await forward(signed_session(signed), body)

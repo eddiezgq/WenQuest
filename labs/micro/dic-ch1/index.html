@@ -248,11 +248,11 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
   "VDD": 1.8,
   "VTn": 0.55,
   "VTp": 0.55,
-  "kn": 8.98e-05,
-  "kp": 3.89e-05,
+  "kn": 8.45e-05,
+  "kp": 3.48e-05,
   "L": 0.15,
   "Wmin": 0.42,
-  "Cg": 1.28e-15,
+  "Cg": 1.25e-15,
   "Cd": 1.97e-15,
   "problems": {
     "p11": {
@@ -264,7 +264,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
     },
     "p14": {
       "CL": 1e-11,
-      "tmax": 3e-10
+      "tmax": 3.5e-10
     },
     "p15": {
       "N": 10000.0,
@@ -825,10 +825,11 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
   (function () {
     const nn = L.range('n4', (v) => String(v), draw);
     const cl = L.range('cl4', (v) => v.toFixed(1) + ' pF', draw);
+    const TMAXS = +(P.problems.p14.tmax * 1e9).toFixed(2) + ' ns';
     L.defineTasks('4', [
       { id: 'best', zh: 'CL = 10 pF：找到总延时真正最小的级数（不超过最小值的 1.01 倍）。它和经验公式 ln F / ln 4 一样吗？', en: 'CL = 10 pF: find the number of stages with the truly smallest delay (within 1% of the minimum). Does it match the rule of thumb ln F / ln 4?', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t <= 1.01 * s.tmin },
       { id: 'f', zh: '取 6 级时，每级的扇出 f 是多少？', en: 'With 6 stages, what is the fan-out f of each stage?', answer: { value: Math.pow(P.problems.p14.CL / M.cin(Wmin, r * Wmin), 1 / 6), tol: 0.03, unit: '' } },
-      { id: 'fewest', robot: true, zh: '栅极驱动器输入要求延时小于 0.3 ns：在 CL = 10 pF 下，用最少的级数满足要求。', en: 'The gate-driver input needs a delay under 0.3 ns: with CL = 10 pF, meet it with the fewest stages.', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t < 0.3e-9 && s.N === s.nFew },
+      { id: 'fewest', robot: true, zh: '栅极驱动器输入要求延时小于 ' + TMAXS + '：在 CL = 10 pF 下，用最少的级数满足要求。', en: 'The gate-driver input needs a delay under ' + TMAXS + ': with CL = 10 pF, meet it with the fewest stages.', check: (s) => near(s.CL, 10e-12, 1e-15) && s.t < P.problems.p14.tmax && s.N === s.nFew },
     ], 'tk4');
     L.openQuestion('4', 'op4');
     function chainSketch(cv, N, f) {
@@ -853,12 +854,12 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       const t = M.chainDelay(N, CL, r), Ns = [], ts = [];
       for (let k = 1; k <= 10; k++) { Ns.push(k); ts.push(M.chainDelay(k, CL, r) * 1e9); }
       const tmin = Math.min(...ts) * 1e-9;
-      const nFew = Ns.find((k) => M.chainDelay(k, CL, r) < 0.3e-9) || 0;
+      const nFew = Ns.find((k) => M.chainDelay(k, CL, r) < P.problems.p14.tmax) || 0;
       chainSketch($('s4'), N, f);
       L.plot($('c4'), {
         x: [1, 10], y: [Math.min(...ts) * 0.6, Math.max(...ts) * 1.6], ylog: true, xlabel: T('级数 N', 'stages N'), ylabel: T('总延时 (ns)', 'total delay (ns)'),
         series: [{ x: Ns, y: ts, color: css('--blue'), width: 2 }],
-        hlines: [{ y: 0.3, color: css('--red'), label: '0.3 ns' }],
+        hlines: [{ y: P.problems.p14.tmax * 1e9, color: css('--red'), label: TMAXS }],
         vlines: [{ x: Math.log(F) / Math.log(4), color: css('--muted'), label: 'ln F / ln 4' }],
         points: Ns.map((k, i) => ({ x: k, y: ts[i], color: k === N ? css('--orange') : css('--blue'), r: k === N ? 6 : 3, label: k === N ? (ts[i] < 1 ? (ts[i] * 1000).toFixed(0) + ' ps' : ts[i].toFixed(2) + ' ns') : '' })),
         yfmt: (v) => (v < 1 ? v.toPrecision(1) : String(v)),

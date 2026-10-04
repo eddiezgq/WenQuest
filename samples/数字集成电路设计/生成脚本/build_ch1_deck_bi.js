@@ -46,6 +46,7 @@ const C14 = R.p14, f6 = Math.pow(C14.F, 1 / 6);
 const P15 = R.p15;
 const ps = (x) => (x * 1e12).toFixed(0);
 const vLim = P15.Vlim, fo4Low = P15.fo4_low, RL = R.r_lab;
+const TMAX = +(P.problems.p14.tmax * 1e9).toFixed(2);
 const NB = C14.Nbest, NF = C14.Nfew, fNB = Math.pow(C14.F, 1 / NB), G = C14.gamma, FOPT = C14.fopt;
 
 const L = [
@@ -114,7 +115,7 @@ const L = [
     prob: { zh: "驱动板上的栅极驱动器", en: "Driving the gate driver on the board",
       text: ["芯片的 PWM 输出要经焊盘、走线驱动电路板上的栅极驱动器输入，总负载约 10 pF。最小反相器直接驱动要几十纳秒，PWM 边沿被拖慢。插几级缓冲最快？",
              "The chip’s PWM output drives pad, trace and gate-driver input, about 10 pF in all. A minimum inverter takes tens of nanoseconds, smearing the PWM edges. How many buffer stages are fastest?"],
-      given: [["负载 CL = 10 pF", "load CL = 10 pF"], [`第一级输入电容 Cin ≈ ${f2(C14.Cin * 1e15)} fF`, `first-stage Cin ≈ ${f2(C14.Cin * 1e15)} fF`], ["边沿延时要求 < 0.3 ns", "edge delay must be < 0.3 ns"]] },
+      given: [["负载 CL = 10 pF", "load CL = 10 pF"], [`第一级输入电容 Cin ≈ ${f2(C14.Cin * 1e15)} fF`, `first-stage Cin ≈ ${f2(C14.Cin * 1e15)} fF`], [`边沿延时要求 < ${TMAX} ns`, `edge delay must be < ${TMAX} ns`]] },
     concept: { zh: "反相器链：逐级放大", en: "Inverter chain: grow stage by stage",
       pts: [["总扇出 F = CL / Cin，N 级等比链每级扇出 f = F^(1/N)", "Total fan-out F = CL / Cin; each of N stages has f = F^(1/N)"],
             ["总延时 t = N · tp0 · (γ + f)，γ 为自载与输入电容之比", "Total delay t = N · tp0 · (γ + f), γ = self-load / input capacitance"],
@@ -122,10 +123,10 @@ const L = [
             ["级数奇偶决定输出是否反相", "An odd or even number of stages decides whether the output is inverted"]],
       formula: "经验公式 N ≈ ln F / ln 4    最优 f(ln f − 1) = γ\nRule of thumb N ≈ ln F / ln 4    optimum f(ln f − 1) = γ" },
     vq: ["一级驱动和六级驱动，延时为什么能差一百多倍？", "Why can one stage and six stages differ in delay by more than a hundred times?"],
-    tasks: [["CL = 10 pF：找出延时真正最小的级数（与 ln F / ln 4 比较）", "CL = 10 pF: find the truly fastest N (compare with ln F / ln 4)"], ["6 级时每级扇出 f 是多少？", "What is f with 6 stages?"], ["延时 < 0.3 ns 的最少级数", "Fewest stages for a delay under 0.3 ns"]],
+    tasks: [["CL = 10 pF：找出延时真正最小的级数（与 ln F / ln 4 比较）", "CL = 10 pF: find the truly fastest N (compare with ln F / ln 4)"], ["6 级时每级扇出 f 是多少？", "What is f with 6 stages?"], [`延时 < ${TMAX} ns 的最少级数`, `Fewest stages for a delay under ${TMAX} ns`]],
     model: [["建模", "Model", "等比反相器链，第一级为最小对称反相器；负载集中为 10 pF；每级 RC 模型", "Tapered chain starting from a minimum symmetric inverter; 10 pF lumped load; RC model per stage"],
-            ["求解", "Solve", `F ≈ ${C14.F.toFixed(0)}，ln F / ln 4 ≈ ${f2(C14.Nopt4)}；单级 ≈ ${(C14.t[1] * 1e9).toFixed(0)} ns；最快为 ${NB} 级（f ≈ ${fNB.toFixed(1)}，${ps(C14.t[NB])} ps），与经验公式一致；相邻级数 ${NB - 1}、${NB + 1} 级为 ${ps(C14.t[NB - 1])}、${ps(C14.t[NB + 1])} ps；满足 < 0.3 ns 至少要 ${NF} 级`, `F ≈ ${C14.F.toFixed(0)}, ln F / ln 4 ≈ ${f2(C14.Nopt4)}; one stage ≈ ${(C14.t[1] * 1e9).toFixed(0)} ns; fastest is ${NB} stages (f ≈ ${fNB.toFixed(1)}, ${ps(C14.t[NB])} ps), as the rule predicts; ${NB - 1} and ${NB + 1} stages give ${ps(C14.t[NB - 1])} and ${ps(C14.t[NB + 1])} ps; meeting < 0.3 ns needs at least ${NF} stages`],
-            ["检验", "Check", "虚拟实验 1.4：CL = 10 pF，级数 1–10 扫描，对照 0.3 ns 线", "Lab 1.4: CL = 10 pF, sweep 1–10 stages against the 0.3 ns line"],
+            ["求解", "Solve", `F ≈ ${C14.F.toFixed(0)}，ln F / ln 4 ≈ ${f2(C14.Nopt4)}；单级 ≈ ${(C14.t[1] * 1e9).toFixed(0)} ns；最快为 ${NB} 级（f ≈ ${fNB.toFixed(1)}，${ps(C14.t[NB])} ps），与经验公式一致；相邻级数 ${NB - 1}、${NB + 1} 级为 ${ps(C14.t[NB - 1])}、${ps(C14.t[NB + 1])} ps；满足 < ${TMAX} ns 至少要 ${NF} 级${NF < NB ? "（比最快的少一级以上，省面积和功耗）" : ""}`, `F ≈ ${C14.F.toFixed(0)}, ln F / ln 4 ≈ ${f2(C14.Nopt4)}; one stage ≈ ${(C14.t[1] * 1e9).toFixed(0)} ns; fastest is ${NB} stages (f ≈ ${fNB.toFixed(1)}, ${ps(C14.t[NB])} ps), as the rule predicts; ${NB - 1} and ${NB + 1} stages give ${ps(C14.t[NB - 1])} and ${ps(C14.t[NB + 1])} ps; meeting < ${TMAX} ns needs at least ${NF} stages${NF < NB ? " (fewer than the fastest, saving area and power)" : ""}`],
+            ["检验", "Check", `虚拟实验 1.4：CL = 10 pF，级数 1–10 扫描，对照 ${TMAX} ns 线`, `Lab 1.4: CL = 10 pF, sweep 1–10 stages against the ${TMAX} ns line`],
             ["修正", "Improve", "最优附近曲线很平：可少用一级省面积和功耗；要同相输出取偶数级；焊盘和走线电感还会带来振铃", "The optimum is flat: drop a stage to save area and power; use an even count for a non-inverted output; pad and trace inductance add ringing"]],
     everyday: ["搬重物接力：一人搬太慢，分几段逐级加人更快，但人太多交接也费时", "Relay carrying: one person is slow, adding people stage by stage is faster, but too many hand-offs waste time"],
   },

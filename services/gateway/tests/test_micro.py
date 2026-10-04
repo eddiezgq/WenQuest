@@ -60,11 +60,25 @@ def test_needs_sign_in(client):
 def test_signed_link(client):
     h = login(client, "s")
     link = client.get("/api/v1/micro/synth-link", headers=h).json()
-    assert link["on"] and link["url"].startswith("https://learn.test/api/v1/micro-synth/")
-    path = link["url"].replace("https://learn.test", "")
+    assert link["on"] and link["synth_url"].startswith("https://learn.test/api/v1/micro-synth/")
+    assert link["url"].startswith("https://learn.test/api/v1/micro-verilog/")
+    path = link["synth_url"].replace("https://learn.test", "")
     d = client.post(path, json={"source": COUNTER}).json()
     assert d["ok"]
     assert client.post("/api/v1/micro-synth/not-a-token", json={"source": COUNTER}).status_code == 410
+    # the page served by the gateway posts to the same site, to this user's signed address
+    page = client.get(link["url"].replace("https://learn.test", ""))
+    assert page.status_code == 200 and f'window.WQ_SYNTH_URL = "{path}"' in page.text and "DigitalJS" in page.text
+    assert client.get("/api/v1/micro-verilog/not-a-token").status_code == 410
+
+
+def test_link_tampered_or_expired(client, monkeypatch):
+    h = login(client, "s")
+    path = client.get("/api/v1/micro/synth-link", headers=h).json()["synth_url"].replace("https://learn.test", "")
+    tampered = path[:-6] + ("AAAAAA" if not path.endswith("AAAAAA") else "BBBBBB")
+    assert client.post(tampered, json={"source": COUNTER}).status_code == 410
+    monkeypatch.setattr(micro, "LINK_TTL", -1)    # every link is past its lifetime
+    assert client.post(path, json={"source": COUNTER}).status_code == 410
 
 
 def test_errors_pass_through(client):

@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     labcheck_url: str = ""
     # The Verilog synthesis service for phones (services/micro-synth, 第 17 轮附), e.g. http://micro-synth:8000. Empty = off.
     microsynth_url: str = ""
-    microsynth_timeout: float = 30.0
+    microsynth_timeout: float = 60.0  # the service may queue 30 s and then synthesise 20 s
     # 问渠零件与机器人库 (digital factory). Empty = the built-in sample library generated into data_dir.
     library_url: str = ""
     # The voice service (services/voice): speech synthesis and recognition for lecture videos. Empty = no lecture videos.

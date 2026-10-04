@@ -39,7 +39,7 @@ EN = {
     "代价：PMOS 更大，输入电容也更大": "The cost: a larger PMOS and a larger input capacitance",
     "最小反相器直接驱动 10 pF：RC 很大，边沿很慢": "A minimum inverter driving 10 pF directly: huge RC, very slow edge",
     "插入逐级放大的反相器链，每级的负载约为本级输入电容的 4 倍": "Insert a tapered chain; each stage drives a load about 4× its own input capacitance",
-    "每级都很快，总延时从几十纳秒降到不到 0.3 纳秒": "Each stage is fast; total delay drops from tens of ns to under 0.3 ns",
+    "每级都很快，总延时从几十纳秒降到零点几纳秒": "Each stage is fast; total delay drops from tens of ns to a few tenths of a ns",
     "充电：电源送出 CV²，一半存在电容里，一半在 PMOS 上变成热": "Charging: the supply delivers CV², half stored, half burnt in the PMOS",
     "放电：电容里的 ½CV² 在 NMOS 上变成热": "Discharging: the stored ½CV² is burnt in the NMOS",
     "每秒 αfN 次 0→1 翻转：P = αCV²fN": "αfN rising (0→1) transitions per second: P = αCV²fN",
@@ -292,7 +292,7 @@ class Chain(Base):
         tN = M.chain_delay(N, CL, r)
         fast = ax.plot(lambda x: 1.8 * (1 - np.exp(-x * 60)), x_range=[0, 1], color=GREEN_, stroke_width=4)
         self.play(Create(fast), run_time=1.0)
-        self.caption("每级都很快，总延时从几十纳秒降到不到 0.3 纳秒")
+        self.caption("每级都很快，总延时从几十纳秒降到零点几纳秒")
         tf_ = VGroup(zh(f"{NB} 级 {NB} stages", 26, GREEN_), MathTex(rf"t\approx{tN*1e12:.0f}\,\mathrm{{ps}}", font_size=34, color=GREEN_)).arrange(RIGHT, buff=0.15).next_to(tl, DOWN, buff=0.3)
         self.play(Write(tf_)); self.wait(2.5)
         self.card([zh("经验公式：每级扇出约 4", 30), MathTex(r"N\approx\frac{\ln F}{\ln 4},\quad F=\frac{C_L}{C_{in}}", font_size=44),

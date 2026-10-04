@@ -14,6 +14,7 @@ import asyncio
 import json
 import os
 import re
+import resource
 import tempfile
 import time
 
@@ -28,7 +29,11 @@ QUEUE_WAIT = 30.0
 YOSYS = os.environ.get("YOSYS", "yosys")
 TOP = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]{0,63}$")
 # Verilog features that reach outside the design: file reads and includes are refused before Yosys sees them.
-FORBIDDEN = re.compile(r"`include|\$readmem[bh]|\$fopen|\$fread|\$fscanf|\$system", re.I)
+# Macro token pasting (``) is refused too, so a name such as $readmemh cannot be assembled from pieces; the
+# file-function names are refused anywhere in the text (also inside macro bodies), not only after a `$`.
+FORBIDDEN = re.compile(r"`\s*include|``|readmem|\$\s*f(open|read|scanf|gets|write|display|close)|\$\s*system", re.I)
+MEM_LIMIT = int(os.environ.get("SYNTH_MEM_MB", "768")) * 1024 * 1024
+MAX_OUTPUT = 1024 * 1024
 
 app = FastAPI(title="WenQuest Verilog synthesis")
 SLOTS = asyncio.Semaphore(PARALLEL)
@@ -46,6 +51,11 @@ def script(top: str | None) -> str:
             "proc; opt; memory; opt; wreduce; opt_clean; write_json out.json; tee -q -o stat.txt stat")
 
 
+def limit_memory() -> None:
+    """Runs in the Yosys child before exec: cap its address space so one design cannot take the container's memory."""
+    resource.setrlimit(resource.RLIMIT_AS, (MEM_LIMIT, MEM_LIMIT))
+
+
 def clean_log(text: str) -> str:
     """Keep Yosys' messages useful to a student (errors, warnings), drop paths and banners."""
     lines = [ln for ln in text.splitlines() if ln.strip() and ("ERROR" in ln or "Warning" in ln or "error" in ln)]
@@ -57,10 +67,18 @@ async def run_yosys(source: str, top: str | None) -> dict:
         with open(os.path.join(d, "top.v"), "w", encoding="utf-8") as f:
             f.write(source)
         proc = await asyncio.create_subprocess_exec(
-            YOSYS, "-q", "-p", script(top), cwd=d,
+            YOSYS, "-q", "-p", script(top), cwd=d, preexec_fn=limit_memory,
             stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+
+        async def read_capped() -> bytes:
+            buf = bytearray()
+            while chunk := await proc.stdout.read(65536):
+                if len(buf) < MAX_OUTPUT:
+                    buf += chunk[:MAX_OUTPUT - len(buf)]
+            await proc.wait()
+            return bytes(buf)
         try:
-            out, _ = await asyncio.wait_for(proc.communicate(), TIMEOUT)
+            out = await asyncio.wait_for(read_capped(), TIMEOUT)
         except asyncio.TimeoutError:
             proc.kill()
             await proc.wait()
@@ -90,7 +108,7 @@ async def synth(body: SynthIn):
     if body.top is not None and not TOP.match(body.top):
         return JSONResponse({"ok": False, "error": "bad_top", "log": "the top module name is not a Verilog identifier"}, status_code=422)
     if FORBIDDEN.search(body.source):
-        return JSONResponse({"ok": False, "error": "forbidden", "log": "`include, $readmem and file functions are not allowed here"}, status_code=422)
+        return JSONResponse({"ok": False, "error": "forbidden", "log": "`include, $readmem, file functions and macro pasting (``) are not allowed here"}, status_code=422)
     t0 = time.monotonic()
     try:
         await asyncio.wait_for(SLOTS.acquire(), QUEUE_WAIT)

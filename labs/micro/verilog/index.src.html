@@ -90,18 +90,27 @@ endmodule
 };
 let ex = 'counter';
 const state = { yosysMs: null, synthMs: null, cells: null, devices: null, mode: null };
-// 服务器综合（第 17 轮附 3.3）：地址由问渠平台给出（window.WQ_SYNTH_URL，或链接参数 synth=）。
-// 手机默认走服务器；电脑默认在本机用 WebAssembly 版 Yosys，本机加载超过 15 秒时改走服务器。
+// 服务器综合（第 17 轮附 3.3）：地址由问渠平台给出——网关送出本页时写入 window.WQ_SYNTH_URL；
+// 也可用链接参数 synth=，但只认本站的综合接口（或本机测试地址），以免学生的代码被别人的链接引到别处。
+// 手机默认走服务器；电脑默认在本机用 WebAssembly 版 Yosys，本机加载超过 15 秒或失败时改走服务器。
 const SYNTH_URL = (() => {
+  if (window.WQ_SYNTH_URL) return window.WQ_SYNTH_URL;
   const q = new URLSearchParams(location.search), h = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const u = window.WQ_SYNTH_URL || q.get('synth') || h.get('synth') || '';
-  return /^(https:\/\/|\/)/.test(u) || /^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(u) ? u : '';
+  const u = q.get('synth') || h.get('synth') || '';
+  if (!u) return '';
+  try {
+    const x = new URL(u, location.href);
+    if (/^(localhost|127\.0\.0\.1)$/.test(x.hostname) && /^https?:$/.test(x.protocol)) return x.href;
+    const site = location.protocol !== 'file:' && x.origin === location.origin;
+    return site && /^\/api\/v1\/(micro-synth\/|micro\/synth$)/.test(x.pathname) ? x.href : '';
+  } catch (e) { return ''; }
 })();
 const FORCE = new URLSearchParams(location.search).get('mode');
 const PHONE = (navigator.userAgentData && navigator.userAgentData.mobile) || (matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 820);
 const LOCAL_LIMIT_MS = 15000;
 state.mode = FORCE === 'browser' || FORCE === 'server' ? FORCE : (SYNTH_URL && PHONE ? 'server' : 'browser');
 if (state.mode === 'server' && !SYNTH_URL) state.mode = 'browser';
+window.VERILOG_MODE = state.mode;   // 自动测试读取
 document.querySelectorAll('[data-ex]').forEach((b) => (b.onclick = () => {
   ex = b.dataset.ex; $('src').value = EX[ex];
   document.querySelectorAll('[data-ex]').forEach((x) => x.setAttribute('aria-pressed', x === b));
@@ -190,8 +199,9 @@ async function run() {
     if (state.mode === 'browser' && !runYosys) {
       status(T('正在下载引擎（首次约 16 MB）…', 'Downloading engines (about 16 MB the first time)…'));
       const slow = new Promise((ok) => setTimeout(() => ok('slow'), LOCAL_LIMIT_MS));
-      const got = await Promise.race([loadYosys().then(() => 'ok'), SYNTH_URL ? slow : new Promise(() => {})]);
-      if (got === 'slow') { state.mode = 'server'; L.report('synth_mode', { mode: 'server', reason: 'slow_local' }); }
+      const local = loadYosys().then(() => 'ok', (e) => { if (!SYNTH_URL) throw e; return 'failed'; });
+      const got = await Promise.race([local, SYNTH_URL ? slow : new Promise(() => {})]);
+      if (got !== 'ok') { state.mode = 'server'; L.report('synth_mode', { mode: 'server', reason: got === 'slow' ? 'slow_local' : 'local_failed' }); }
     }
     status(T('正在下载仿真器…', 'Loading the simulator…'));
     await ensureSimulator();
