@@ -113,6 +113,48 @@ def test_model_rules():
     assert "不在同一条母线上" in levels(out, "warning")[0]
 
 
+
+def _pdf(text):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.rcParams["pdf.fonttype"] = 42
+    fig = plt.figure()
+    for k, line in enumerate(text.split("\n")):
+        fig.text(0.05, 0.9 - 0.08 * k, line, fontsize=9)
+    b = io.BytesIO()
+    fig.savefig(b, format="pdf")
+    plt.close(fig)
+    return b.getvalue()
+
+
+def test_drawing_gb_rules():
+    """第 11 轮《机械设计》第 3 章 F5：零件图的国标图面检查（标题栏、比例、粗糙度、配合代号、旧符号、与模型的外径对照）"""
+    pytest.importorskip("pypdf")
+    from hub import task_review as R
+    feats = {"segments": [(0, 37, 35.0), (37, 90, 40.0), (90, 100, 48.0), (100, 115, 42.0), (115, 172, 35.0), (172, 240, 30.0)]}
+    good = _pdf("SH-301  45 QT  1:1\nØ35k6  Ø40r6  Ø48  Ø42  Ø30k6\nRa 0.8  Ra 1.6  Ra 3.2  runout symmetry HBW notes")
+    out = []
+    R.check_drawing(good, 2, out, item="SH-301", feats=feats)
+    assert [f for f in out if f["rule"] == "图面"] == []
+    bad = _pdf("SH-302  1:3.5\nØ35K6  Ø40r6  Ø30k6\nRa 2  ▽")
+    out = []
+    R.check_drawing(bad, 2, out, item="SH-301", feats=feats)
+    t = " ".join(f["text"] for f in out if f["rule"] == "图面")
+    for want in ("图号 SH-301", "材料", "1:3.5", "Ra 2", "▽", "Ø35K6", "Ø48", "Ø42"):
+        assert want in t, want
+    assert any(f["level"] == "error" for f in out if "▽" in f["text"])
+    # 不误报：换行后的 R1、C1、A3，时间 9:30，允许的比例 1:15，空心轴内孔的 H7，“45°”不算材料
+    tricky = _pdf("SH-301  40Cr  Scale 1:15  9:30\nØ35k6  Ø40r6  Ø48  Ø42\nR1 C1 A3  Ø30k6  Ø20H7\nRa 0.8 runout symmetry HBW notes")
+    out = []
+    R.check_drawing(tricky, 2, out, item="SH-301", feats=feats)
+    assert [f["text"] for f in out if f["rule"] == "图面"] == []
+    nomat = _pdf("SH-301  1:1  chamfer 1x45°\nØ35k6 Ø40r6 Ø48 Ø42 Ø30k6\nRa 0.8 runout symmetry HBW notes")
+    out = []
+    R.check_drawing(nomat, 2, out, item="SH-301", feats=feats)
+    assert any("材料" in f["text"] for f in out if f["rule"] == "图面")
+
+
 def test_change_and_score_rules():
     from hub import task_review as R
     out = []

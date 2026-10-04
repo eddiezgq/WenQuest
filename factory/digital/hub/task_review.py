@@ -138,10 +138,28 @@ DRAWING_ITEMS = [
 ]
 
 
-def check_drawing(data, d, out):
+# 国标图面检查（第 11 轮《机械设计》第 3 章 F5）：从 PDF 读出的文字核对
+SCALES = {"1:1", "2:1", "5:1", "10:1", "20:1", "50:1", "100:1", "1:2", "1:5", "1:10", "1:20", "1:50", "1:100", "1:200", "1:500", "1:1000",
+          "4:1", "2.5:1", "40:1", "25:1", "1:1.5", "1:2.5", "1:3", "1:4", "1:6", "1:15", "1:25", "1:30", "1:40", "1:60",
+          "1:150", "1:250", "1:300", "1:400", "1:600"}                                  # GB/T 14690 优先与允许的比例（n ≤ 2）
+RA_SERIES = (0.012, 0.025, 0.05, 0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 6.3, 12.5, 25, 50, 100)   # GB/T 1031 Ra 的第一系列
+DIA = r"[ØøΦφ⌀∅][ \t]?(\d+(?:[.,]\d+)?)"            # 直径符号与数字之间最多一个空格，不跨行
+# 材料：查牌号，不查“材料”这个标签（标题栏里本来就印着“材料”二字）；“45°”不算 45 钢
+MATERIAL = (r"(?:不锈|碳素|合金|结构|弹簧|轴承)?钢|铸铁|铝合金|黄铜|青铜|"
+            r"(?<![\d.])(?:45|40Cr|42CrMo4?|20CrMnTi|35CrMo|GCr15|Q235[A-D]?|Q345[A-D]?|Q355[A-D]?|HT\d{3}|QT\d{3}-\d+|"
+            r"6061(?:-T6)?|7075(?:-T6)?|2A12|ZL\d{3}|POM|PA6{1,2}|C45E?|S355\w*|AISI ?\d{4})(?![\d°.])")
+
+
+def _pdf_text(data):
+    from pypdf import PdfReader
+    return "\n".join((p.extract_text() or "") for p in PdfReader(io.BytesIO(data)).pages)
+
+
+def check_drawing(data, d, out, item=None, feats=None):
+    """零件图（PDF）：技术内容有没有（配合、粗糙度、热处理……），再按国标核对图面——标题栏、比例、粗糙度取值、
+    轴上配合代号的大小写、公差等级、旧符号；同一次提交有三维模型时，模型的每个外径都应在图上标出。"""
     try:
-        from pypdf import PdfReader
-        text = "\n".join((p.extract_text() or "") for p in PdfReader(io.BytesIO(data)).pages)
+        text = _pdf_text(data)
     except Exception:  # noqa: BLE001
         _say(out, "零件图", "warning", d, "零件图读不出来（不是有效的 PDF），由老师直接看。")
         return
@@ -151,6 +169,54 @@ def check_drawing(data, d, out):
     missing = [name for name, pat in DRAWING_ITEMS if not re.search(pat, text, re.I)]
     for name in missing:
         _say(out, "零件图", "warning", d, "零件图上没找到“{}”。若已标注，可能是导出 PDF 时文字转成了线条，请在回复里说明。".format(name))
+    check_drawing_gb(text, d, out, item, feats)
+
+
+def check_drawing_gb(text, d, out, item=None, feats=None):
+    """国标图面检查（只看文字，图形由老师看）"""
+    t = text.replace("，", ",")
+    # 标题栏：图号、材料、比例（GB/T 10609.1、GB/T 14690）
+    if item and item not in t:
+        _say(out, "图面", "warning", d, "标题栏里没找到图号 {}（GB/T 10609.1：标题栏要写图样代号）。".format(item))
+    if not re.search(MATERIAL, t, re.I):
+        _say(out, "图面", "warning", d, "标题栏里没找到材料（GB/T 10609.1）。")
+    # 比例：先在“比例 / Scale”后面找；没有这个标签时，只认一边是 1 的写法（如 1:2、5:1），免得把“9:30”这类时间当成比例
+    scales = re.findall(r"(?:比例|scale)[ \t]*[:：]?[ \t]*(\d+(?:\.\d+)?)[ \t]*:[ \t]*(\d+(?:\.\d+)?)", t, re.I)
+    if not scales:
+        scales = [(a, b) for a, b in re.findall(r"(?<![\d.:])(\d+(?:\.\d+)?)[ \t]?:[ \t]?(\d+(?:\.\d+)?)(?![\d.:])", t) if "1" in (a, b)]
+    scales = ["{}:{}".format(a, b) for a, b in scales]
+    if not scales:
+        _say(out, "图面", "warning", d, "图上没找到比例（如 1:1、2:1），标题栏要写比例（GB/T 14690）。")
+    for sc in sorted(set(scales)):
+        if sc not in SCALES:
+            _say(out, "图面", "warning", d, "比例 {} 不是 GB/T 14690 规定的比例；优先用 1:1、1:2、2:1、1:5 等。".format(sc))
+    # 表面粗糙度（GB/T 131、GB/T 1031）
+    for v in sorted({float(x.replace(",", ".")) for x in re.findall(r"Ra\s*(\d+(?:[.,]\d+)?)", t)}):
+        if not any(abs(v - r) < 1e-6 for r in RA_SERIES):
+            _say(out, "图面", "warning", d, "Ra {:g} 不是 GB/T 1031 的第一系列值；取 0.4、0.8、1.6、3.2、6.3、12.5 等。".format(v))
+    if re.search(r"[▽∇]", t):
+        _say(out, "图面", "error", d, "图上有“▽”：这是旧标准的光洁度符号，现行标准（GB/T 131-2006）用 √ 形符号加 Ra 值。")
+    # 尺寸公差代号：轴（物料号 SH-、RJ-、LS-，或任务单写明是轴）上的配合代号应为小写；公差等级 IT01–IT18
+    # 公差带代号紧跟在直径后面（中间最多一个空格、不换行）。轴类零件上，和模型某段外径相同的直径若用了大写（孔）代号，提醒一下；
+    # 不等于任何外径的（如空心轴的内孔）不提醒
+    shaft = bool(item and re.match(r"(SH|RJ|LS)-", item)) or bool(feats)
+    outer = {round(sg[2], 1) for sg in (feats or {}).get("segments") or []}
+    for m in re.finditer(DIA + r"[ \t]?([A-Za-z]{1,2})(\d{1,2})(?![\d.])", t):
+        dia, code, grade = round(float(m.group(1).replace(",", ".")), 1), m.group(2), int(m.group(3))
+        if code.upper() in ("EQS", "M", "R", "C", "A", "B", "IT") or not re.fullmatch(r"[A-Za-z]{1,2}", code):
+            continue
+        if grade > 18:
+            _say(out, "图面", "error", d, "Ø{:g}{}{}：公差等级只有 IT01–IT18。".format(dia, code, grade))
+        elif shaft and code.isupper() and (not outer or any(abs(dia - o) < 0.06 for o in outer)):
+            _say(out, "图面", "warning", d, "Ø{:g}{}{}：大写字母是孔的基本偏差；这一段是轴的外圆，公差带应为小写（如 k6、r6）。"
+                 "若这一处确实是内孔，请在回复里说明。".format(dia, code, grade))
+    # 与三维模型对照：每个外径都应在图上有直径尺寸
+    if feats and feats.get("segments"):
+        shown = {round(float(x.replace(",", ".")), 1) for x in re.findall(DIA, t)}
+        want = sorted({round(s[2], 1) for s in feats["segments"]})
+        lost = [w for w in want if not any(abs(w - s) < 0.06 for s in shown)]
+        for w in lost:
+            _say(out, "图面", "warning", d, "三维模型上有 Ø{:g} 的轴段，零件图上没找到这个直径尺寸。".format(w))
 
 
 # ---------------------------------------------------------------- 三维模型（STEP，轴类）
@@ -351,7 +417,7 @@ def review(spec, deliverables, get_file=None, get_design=None, get_job=None, get
                 if ext == "docx" and ("计算书" in name or "calculation" in x["名称"][1].lower()):
                     check_calc(data, i, out, name)
                 elif ext == "pdf" and ("图" in name or "drawing" in x["名称"][1].lower()):
-                    check_drawing(data, i, out)
+                    check_drawing(data, i, out, item=x.get("零件"))
         elif kind == "设计发布":
             sid = got.get("plm")
             s = get_design(sid) if (sid and get_design) else None
@@ -365,6 +431,18 @@ def review(spec, deliverables, get_file=None, get_design=None, get_job=None, get
                 check_model(step, i, out, x.get("轴承") or ())
             else:
                 _say(out, "模型", "warning", i, "设计发布里只有图纸、没有 STEP 模型，模型检查跳过。")
+            pdf = next((get_file(f["url"]) for f in s.get("files") or [] if f.get("kind") == "drawing" and f.get("name", "").lower().endswith(".pdf")), None) \
+                if get_file else None
+            if pdf:                                              # 设计发布里带的零件图：按国标查图面，并与模型的外径对照
+                feats = None
+                if step:
+                    try:
+                        feats = shaft_features(step)
+                    except ValueError:
+                        feats = None
+                check_drawing(pdf, i, out, item=x.get("零件"), feats=feats)
+            elif x.get("要图"):
+                _say(out, "完整", "error", i, "设计发布里没有零件图（PDF）。")
         elif kind == "分析":
             jid = got.get("job")
             j = None

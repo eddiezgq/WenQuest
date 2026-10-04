@@ -2,10 +2,13 @@
 outline: docs/教材/机械设计/00_提纲.md
 title: 机械设计
 title_en: Mechanical Design
-# 程序读到的书外文件（缓存键要包含它们，改了就重算）：第 1 章读数字工厂的主数据、参数配置器、跑合试验台转矩记录和零件库
+# 程序读到的书外文件（以及别章的共用模块）（缓存键要包含它们，改了就重算）：第 1 章读数字工厂的主数据、参数配置器、跑合试验台转矩记录和零件库
 program_deps:
   - factory/factory/data.py
   - factory/digital/hub/configurator.py
   - factory/digital/sim/engine.py
   - library/catalog/A/A-CPL-JAW/specs.csv
   - library/catalog/B/B-LEG-GO2/vendor.yaml
+  # 第 3 章：SH-301 B 版的尺寸（第 33 章）、案例件 RJ-201 的结构
+  - textbook/mechdesign/ch33/code/_shaft.py
+  - factory/digital/hub/case_parts.py
