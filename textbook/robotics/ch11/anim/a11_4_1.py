@@ -45,16 +45,20 @@ def arm(p, phi):
 class Lesson(Base):
     def construct(self):
         self.title("11.4", "可达与灵巧：末端到得了，朝向随意吗", "Reachable and dexterous")
+        # 灵巧区（定理 11.4.2）：|r − L3| ≥ |L1 − L2| 且 r ≤ L1 + L2 − L3，即中心小圆盘加外面的圆环；两者之间是只可达、不灵巧的窄环
+        r_in, r_out = L3 - abs(L1 - L2), L3 + abs(L1 - L2)
         rings = VGroup(Circle(K * (L1 + L2 + L3), color=BLUE_E, fill_color=BLUE_E, fill_opacity=0.25, stroke_width=2).move_to(X((0, 0))),
-                       Circle(K * (L1 + L2 - L3), color=BLUE_D, fill_color=BLUE_D, fill_opacity=0.45, stroke_width=2).move_to(X((0, 0))))
-        lab = VGroup(zh("浅：可达", 22, INK), zh("深：灵巧", 22, INK)).arrange(DOWN, aligned_edge=LEFT).to_corner(UR, buff=0.6).shift(DOWN * 0.8)
+                       Annulus(inner_radius=K * r_out, outer_radius=K * (L1 + L2 - L3), color=BLUE_D, fill_opacity=0.45,
+                               stroke_color=BLUE_D, stroke_width=2).move_to(X((0, 0))),
+                       Circle(K * r_in, color=BLUE_D, fill_color=BLUE_D, fill_opacity=0.45, stroke_width=2).move_to(X((0, 0))))
+        lab = VGroup(bi(["浅：可达", "light: reachable"], 22, INK), bi(["深：灵巧", "dark: dexterous"], 22, INK)).arrange(DOWN, aligned_edge=LEFT).to_corner(UR, buff=0.6).shift(DOWN * 0.8)
         self.play(FadeIn(rings), FadeIn(lab), FadeIn(Square(0.2, color=GREY_B, fill_opacity=1).move_to(X((0, 0)))), run_time=0.8)
         phi = ValueTracker(0.0)
         a = always_redraw(lambda: arm(PA, phi.get_value()))
         dA = Dot(X(PA), color=YELLOW, radius=0.08)
         self.play(FadeIn(a), FadeIn(dA), run_time=0.5)
         self.caption("A 在灵巧区内：末端不动，工具朝向转一整圈，手臂处处跟得上",
-                     "A is dexterous: the tip stays put while the tool turns a full circle", wait=0)
+                     "A is in the dexterous region: the end-effector stays put while the tool turns a full circle", wait=0)
         self.play(phi.animate.set_value(2 * PI), run_time=5.0, rate_func=linear)
         self.play(FadeOut(a), FadeOut(dA), run_time=0.4)
         phi.set_value(-1.6)
@@ -62,7 +66,7 @@ class Lesson(Base):
         dB = Dot(X(PB), color=YELLOW, radius=0.08)
         self.play(FadeIn(b), FadeIn(dB), run_time=0.5)
         self.caption("B 在外缘附近：只有工具大致指向外侧时才够得着，其余朝向都不行（红叉）",
-                     "B is near the rim: only tool directions pointing roughly outwards work (red cross: unreachable)", wait=0)
+                     "B is near the rim: only tool orientations pointing roughly outwards work (red cross: unreachable)", wait=0)
         self.play(phi.animate.set_value(-1.6 + 2 * PI), run_time=6.0, rate_func=linear)
         self.wait(0.5)
         self.card([["工作空间", "Workspace"],

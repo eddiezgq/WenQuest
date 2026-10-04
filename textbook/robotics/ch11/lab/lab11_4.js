@@ -11,7 +11,7 @@ WQ.lab({
   models: ["B-ARM-UR5E", "B-SCA-WQ4", "B-HUM-G1"],
   scenes: [
     { id: "ur", robot: true, name: ["UR5e", "UR5e"], hide: ["d3"],
-      problem: { title: ["机器人问题：这个工位，UR5e 够得着吗", "Robot problem: can the UR5e serve this station?"],
+      problem: { title: ["机器人问题：这个工位，UR5e 够得着吗", "Robot problem: can the UR5e serve this workstation?"],
                  text: ["够得着（可达）还不够：要以需要的姿态够着。测量区显示当前法兰中心能以 100 个方向中的几个到达。",
                         "Reaching is not enough; it must reach in the needed orientation. The readout shows in how many of 100 directions the flange centre can be reached here."] } },
     { id: "scara", robot: true, name: ["SCARA", "SCARA"], hide: ["j3", "j5", "j6"],
@@ -34,7 +34,7 @@ WQ.lab({
   ],
   buttons: [{ id: "start", name: ["扫描工作空间", "Sample the workspace"], primary: true }, { id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "scan_ur", robot: true, text: ["扫描 UR5e 的可达工作空间（2000 个随机构型）。", "Sample the UR5e's reachable workspace (2000 random configurations)."],
+    { id: "scan_ur", robot: true, text: ["扫描 UR5e 的可达工作空间（2000 个随机构型）。", "Sample the UR5e's reachable workspace (2,000 random configurations)."],
       demo: { scene: "ur", set: {}, press: ["start"], wait: 6 } },
     { id: "dex", robot: true, text: ["调关节，使法兰中心处在灵巧工作空间内（100 个方向都能到达）。", "Set the joints so that the flange centre lies in the dexterous workspace (all 100 directions)."],
       demo: { scene: "ur", set: { j1: 0, j2: -90, j3: 90, j4: -90, j5: -90, j6: 0 }, press: [], wait: 1 } },
@@ -180,7 +180,7 @@ WQ.lab({
     if (!m["B-ARM-UR5E"] || !m["B-SCA-WQ4"] || !m["B-HUM-G1"] || !api.keep.cloud) return [];
     if (!api.running) this.setFrom(api, this.sliders(api));
     const c = api.keep.cloud, [x, y, z] = this.local(api), rho = Math.hypot(x, y), f = (v, n) => api.fmt(v, n);
-    const rows = [[["末端 (x, y, z)", "end point (x, y, z)"], `(${f(x, 3)}, ${f(y, 3)}, ${f(z, 3)}) m`],
+    const rows = [[["末端 (x, y, z)", "end-effector (x, y, z)"], `(${f(x, 3)}, ${f(y, 3)}, ${f(z, 3)}) m`],
                   [["离基座轴线", "from the base axis"], f(rho, 3) + " m"],
                   [["点云样本数", "samples in the cloud"], String(c.scene === api.scene ? c.n : 0)]];
     if (api.scene === "ur") {

@@ -5,10 +5,10 @@
 WQ.lab({
   title: ["实验 11.1 关节即旋量", "Lab 11.1 Joints as screws"],
   goal: ["比较转动关节、螺旋副和移动关节：同一根轴，节距不同；并读出理想螺旋副中轴向力与扭矩的关系。",
-         "Compare a revolute joint, a helical joint and a prismatic joint: one axis, different pitches; and read how axial force and torque are tied in an ideal screw."],
+         "Compare a revolute joint, a helical joint and a prismatic joint: one axis, different pitches; and read how axial force and torque are tied in an ideal helical joint."],
   scenes: [
     { id: "spline", robot: true, name: ["SCARA 的滚珠丝杠花键轴", "SCARA ball-screw spline"],
-      problem: { title: ["机器人问题：只转工具，工具为什么会升降", "Robot problem: why the tool moves up when only its rotation is commanded"],
+      problem: { title: ["机器人问题：只转工具，工具为什么会升降", "Robot problem: why the tool moves up or down when only its rotation is commanded"],
                  text: ["丝杠螺母不动、花键螺母带轴转动时，轴相对丝杠螺母作螺旋运动：转 θ，沿轴移动 hθ。",
                         "With the screw nut held and the spline nut turning the shaft, the shaft makes a screw motion relative to the screw nut: turn θ, advance hθ."] } },
     { id: "cap", name: ["拧瓶盖", "Unscrewing a bottle cap"],

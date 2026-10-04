@@ -93,7 +93,7 @@ class Lesson(Base):
         pA = always_redraw(lambda: panel(["A：两轮同时变速", "A: both wheels, varying"], at(QA, s.get_value()), BLUE).move_to([1.9, 0.2, 0]))
         self.play(FadeOut(c0), run_time=0.15)
         self.add(carA, pA)
-        self.caption("车 A：两个轮子同时转，转速不断变化", "Car A: both wheels turn together at changing speeds", wait=0)
+        self.caption("车 A：两个轮子同时转，转速不断变化", "AGV A: both wheels turn together at changing speeds", wait=0)
         self.play(s.animate.set_value(1.0), Create(trA), run_time=4.0, rate_func=linear)
         endA = car(QA[-1], BLUE)
         self.add(endA, panel(["A：两轮同时变速", "A: both wheels, varying"], QA[-1], BLUE).move_to([1.9, 0.2, 0]))
@@ -105,7 +105,7 @@ class Lesson(Base):
         pB = always_redraw(lambda: panel(["B：先右轮，后左轮", "B: right, then left"], at(QB, s2.get_value()), ORANGE).move_to([5.4, 0.2, 0]))
         self.add(carB, pB)
         self.caption("车 B：先只转右轮，再只转左轮，两个轮子转过的总角度与 A 相同",
-                     "Car B: right wheel only, then left only; the same total wheel angles as A", wait=0)
+                     "AGV B: right wheel only, then left only; the same total wheel angles as A", wait=0)
         self.play(s2.animate.set_value(1.0), Create(trB), run_time=4.0, rate_func=linear)
         gap = np.linalg.norm(QA[-1, :2] - QB[-1, :2])
         ln = DashedLine(P(*QA[-1, :2]), P(*QB[-1, :2]), color=YELLOW)

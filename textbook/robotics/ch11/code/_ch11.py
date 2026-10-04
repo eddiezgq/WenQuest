@@ -38,7 +38,7 @@ def screw_prismatic(v):
 
 
 def screw_helical(w, q, h):
-    """螺旋关节的旋量轴 S = (ω, −ω × q + h ω)，式 (11.1.2)。"""
+    """螺旋关节的旋量轴 S = (ω, −ω × q + h ω)，式 (11.1.1)。"""
     w = np.asarray(w, float)
     return np.r_[w, -np.cross(w, np.asarray(q, float)) + h * w]
 

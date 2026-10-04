@@ -1,8 +1,8 @@
 # 实验 11.4 的指导书与报告模板。目的、场景、参数、任务取自 lab11_4.js。
 原理:
   - ["工作空间是末端能够到达的点的集合。可达工作空间：至少以一种姿态能到达的点；灵巧工作空间：以任意姿态都能到达的点。灵巧工作空间是可达工作空间的一部分。",
-     "The workspace is the set of points the end can reach. Reachable workspace: points reached in at least one orientation; dexterous workspace: points reached in every orientation. The dexterous workspace lies inside the reachable one."]
-  - ["扫描：在关节限位内随机抽取关节变量，算出末端位置，样本点组成可达工作空间的近似。", "Sampling: draw random joint values within the limits; the end points approximate the reachable workspace."]
+     "The workspace is the set of points the end-effector can reach. Reachable workspace: points reached in at least one orientation; dexterous workspace: points reached in every orientation. The dexterous workspace lies inside the reachable one."]
+  - ["扫描：在关节限位内随机抽取关节变量，算出末端位置，样本点组成可达工作空间的近似。", "Sampling: draw random joint values within the limits; the end-effector positions approximate the reachable workspace."]
   - ["UR5e 的灵巧性检查：法兰绕自身法线的转动由关节 6 完成，所以只需检查 100 个法兰法线方向。对每个方向用解析逆运动学判断有没有解；100 个都有解即在灵巧工作空间内。",
      "Dexterity check on the UR5e: turning about the flange normal is done by joint 6, so 100 normal directions suffice. Each is tested with the analytic inverse kinematics; all 100 solvable means dexterous."]
   - 式: "体积 V = Σ 2πρ Δρ Δz（关节 1 可整周转动，工作空间绕基座轴线对称）"

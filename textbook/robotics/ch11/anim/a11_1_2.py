@@ -39,6 +39,6 @@ class Lesson(Base):
         self.caption("h = 0：点走圆，关节只转不移；h 越大，螺旋线拉得越直",
                      "h = 0: a circle, turning only; larger h stretches the helix", wait=2.0)
         self.caption("h → ∞：只剩沿轴的平移，这就是移动关节", "h → ∞: only the slide along the axis remains, the prismatic joint", wait=2.0)
-        self.card([["三种单自由度低副是同一种东西", "The three 1-DOF lower pairs are one thing"],
+        self.card([["三种单自由度低副是同一种东西", "The three 1-DOF lower pairs are one and the same"],
                    MathTex(r"\mathcal{S}=\begin{pmatrix}\hat\omega\\ -\hat\omega\times q + h\hat\omega\end{pmatrix}", font_size=46),
                    ["R：h = 0　　H：h 有限　　P：h → ∞", "R: h = 0    H: finite h    P: h → ∞"]])

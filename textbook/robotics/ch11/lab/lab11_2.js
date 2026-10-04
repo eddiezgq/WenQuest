@@ -10,7 +10,7 @@ WQ.lab({
     { id: "five", robot: true, name: ["平面五杆机器人", "Planar five-bar robot"], hide: ["extra", "phi"],
       problem: { title: ["机器人问题：两台电机定位一个点", "Robot problem: two motors place a point"],
                  text: ["机架上的两根曲柄各由一台电机驱动，末端（红点）是两根连杆的铰点。M = 2，两个输入一起才能把末端送到指定位置。",
-                        "Each grounded crank has a motor; the tip (red) is the joint of the two couplers. M = 2: both inputs are needed to place the tip."] } },
+                        "Each grounded crank has a motor; the end-effector (red) is the joint of the two couplers. M = 2: both inputs are needed to place the end-effector."] } },
     { id: "para", name: ["平行四边形机构", "Parallelogram linkage"], hide: ["a2", "phi"], params: { a1: { value: 60 } },
       problem: { title: ["机构：平行四边形与第三根曲柄", "Mechanism: a parallelogram and an extra crank"],
                  text: ["机架 0.4 m，两根曲柄 0.2 m，连杆 0.4 m。可以再加一根等长、平行的曲柄（红）。",
@@ -18,7 +18,7 @@ WQ.lab({
     { id: "lift", name: ["剪叉式升降台", "Scissor lift"], hide: ["a1", "a2", "extra"],
       problem: { title: ["生活中的例子：两级剪叉升降台", "Everyday example: a two-stage scissor lift"],
                  text: ["杆长 1.2 m，两级。推动底部的滑块，剪叉的夹角 φ 改变，平台升降。",
-                        "Bars 1.2 m long, two stages. Pushing the bottom slider changes the angle φ and the platform rises."] } },
+                        "Bars 1.2 m long, two stages. Pushing the bottom slider changes the angle φ and raises or lowers the platform."] } },
   ],
   params: [
     { id: "a1", name: ["输入 1：曲柄 1 转角 θ₁", "Input 1: crank 1 angle θ₁"], min: -180, max: 180, step: 1, value: 110, unit: "°", digits: 0 },
@@ -28,7 +28,7 @@ WQ.lab({
   ],
   buttons: [{ id: "reset", name: ["重置", "Reset"] }],
   tasks: [
-    { id: "target", robot: true, text: ["五杆机器人：同时调两个输入，把末端送到绿色目标点（误差小于 5 mm）。", "Five-bar robot: set both inputs so that the tip reaches the green target (within 5 mm)."],
+    { id: "target", robot: true, text: ["五杆机器人：同时调两个输入，把末端送到绿色目标点（误差小于 5 mm）。", "Five-bar robot: set both inputs so that the end-effector reaches the green target (within 5 mm)."],
       demo: { scene: "five", set: { a1: 130, a2: 50 }, press: [] } },
     { id: "extra", text: ["平行四边形：加上第三根曲柄，读出公式的结果，再把曲柄从 60° 转动 30° 以上，验证它照样能动。", "Parallelogram: add the extra crank, read the formula, then turn the crank by more than 30°: it still moves."],
       demo: { scene: "para", set: { extra: 1, a1: 110 }, press: [] } },
@@ -120,7 +120,7 @@ WQ.lab({
       [["格吕布勒公式 M", "Grübler M"], String(c.grubler).replace("-", "−")], [["按秩算出的瞬时自由度", "instantaneous mobility (rank)"], String(c.inst)]];
     if (api.scene === "five") {
       const t = this.tgt(), d = Math.hypot(mc.tip[0] - t[0], mc.tip[1] - t[1]);
-      rows.push([["末端 (x, y)", "tip (x, y)"], `(${api.fmt(mc.tip[0], 3)}, ${api.fmt(mc.tip[1], 3)}) m`], [["离目标", "to target"], api.fmt(d * 1000, 1) + " mm"]);
+      rows.push([["末端 (x, y)", "end-effector (x, y)"], `(${api.fmt(mc.tip[0], 3)}, ${api.fmt(mc.tip[1], 3)}) m`], [["离目标", "to target"], api.fmt(d * 1000, 1) + " mm"]);
       if (d < 0.005) api.done("target");
     }
     if (api.scene === "para") {

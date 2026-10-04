@@ -47,7 +47,7 @@ for t1 in t1s:
         assert t3 is not None                          # 曲柄能整周转动
         assert closure(*L, t1, t3) < 1e-12 and abs(freud(*L, t1, t3)) < 1e-12
         rocker[mode].append(t3)
-r_up = np.degrees(np.unwrap(rocker[1]))
+r_up = np.degrees(np.unwrap(rocker[-1]))
 swing = r_up.max() - r_up.min()
 # 两种装配模式在 θ3 上互不相交：在环面上是两条分开的闭曲线
 gap_modes = min(abs((a - b + math.pi) % (2 * math.pi) - math.pi) for a, b in zip(rocker[1], rocker[-1]))

@@ -12,6 +12,7 @@ from bookout import T, figure, style
 from _ch11 import L1, L2, OBS_C, OBS_R, collide, fk2, wrap
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”
 
 # ---------------------------------------------------------------- 图 11.3.1
 fig = plt.figure(figsize=(9.6, 4.2))
@@ -37,11 +38,11 @@ br = np.where(np.abs(np.diff(tm)) > 180)[0] + 1
 for seg_h, seg_m in zip(np.split(th, br), np.split(tm, br)):
     ax.plot(seg_h, seg_m, color=C["accent"], lw=1.1)
 ax.plot([-180, 180], [-180, 180], color=C["muted"], lw=0.9, ls="--")
-ax.text(0, -210, T("时针角 θh / (°)", "hour hand θh / (°)"), ha="center", fontsize=9.5)
-ax.text(-212, 0, T("分针角 θm / (°)", "minute hand θm / (°)"), ha="center", va="center", rotation=90, fontsize=9.5)
+ax.text(0, -210, T("时针角 $\\theta_h$ / (°)", "hour hand $\\theta_h$ / (°)"), ha="center", fontsize=9.5)
+ax.text(-212, 0, T("分针角 $\\theta_m$ / (°)", "minute hand $\\theta_m$ / (°)"), ha="center", va="center", rotation=90, fontsize=9.5)
 for v in (-180, 180):
-    ax.text(v, -188, str(v), ha="center", va="top", fontsize=8, color=C["muted"])
-    ax.text(-186, v, str(v), ha="right", va="center", fontsize=8, color=C["muted"])
+    ax.text(v, -188, f"{v:d}".replace("-", "−"), ha="center", va="top", fontsize=8, color=C["muted"])
+    ax.text(-186, v, f"{v:d}".replace("-", "−"), ha="right", va="center", fontsize=8, color=C["muted"])
 ax.text(60, 120, T("虚线：两针重合", "dashed: hands overlap"), fontsize=8.5, color=C["muted"],
         bbox=dict(facecolor="white", edgecolor="none", pad=1))
 ax.set_title(T("(a) 左右边（红）粘合，上下边（蓝）粘合", "(a) glue left to right (red), top to bottom (blue)"), fontsize=10)
@@ -85,7 +86,7 @@ for q, col, name in ((ta, C["z"], T("起点 A", "start A")), (tb, C["accent"], T
     a1.plot([0, e[0]], [0, e[1]], "o", color="white", mec=C["ink"], ms=6, zorder=4)
     a1.text(w[0] + 0.03, w[1] - 0.06, name, fontsize=9.5, color=col)
 a1.plot(0, 0, "s", color=C["dark"], ms=8)
-a1.text(-0.85, -0.7, T("淡绿：沿环面最短路的中间构型", "faint green: intermediate poses on the shortest path"), fontsize=8.5, color=C["dark"])
+a1.text(-0.85, -0.7, T("淡绿：沿环面最短路的中间构型", "faint green: shortest path"), fontsize=8.5, color=C["dark"])
 a1.set_title(T("(a) 工作空间中的两连杆臂", "(a) The 2R arm in its workspace"), fontsize=10)
 
 g = np.arange(-180, 180, 1.0)

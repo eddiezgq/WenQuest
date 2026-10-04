@@ -64,7 +64,7 @@ class Lesson(Base):
         self.play(t.animate.set_value(2.6), run_time=5.0, rate_func=smooth)
         self.play(t.animate.set_value(0.5), run_time=4.0, rate_func=smooth)
         self.caption("几何条件让 6 个闭环方程中的 3 个自动满足：秩为 3，自由度 4 − 3 = 1",
-                     "The geometry makes 3 of the 6 loop equations redundant: rank 3, freedom 4 − 3 = 1", wait=2.0)
+                     "The geometry makes 3 of the 6 loop equations redundant: rank 3, mobility 4 − 3 = 1", wait=2.0)
         self.card([["过约束机构", "Overconstrained mechanism"],
                    MathTex(r"M_{\mathrm{inst}} = n - \mathrm{rank}\,(\mathcal{S}_1\ \cdots\ \mathcal{S}_n) \ \ge\ M", font_size=44),
                    ["格吕布勒公式只是下界", "Grübler's count is only a lower bound"]])

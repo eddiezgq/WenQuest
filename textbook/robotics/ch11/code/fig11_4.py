@@ -14,6 +14,7 @@ from _fig11 import C, plane
 from bookout import T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”
 L1, L2, L3 = 0.425, 0.392, 0.1
 
 
@@ -51,12 +52,16 @@ for ph in (okphi[0], okphi[len(okphi) // 2], okphi[-1]):
 ax.plot(*pB, "o", color=C["x"], ms=6, zorder=5)
 ax.text(pB[0] + 0.04, pB[1] - 0.06, "B", fontsize=12, color=C["x"], weight="bold")
 ax.plot(0, 0, "s", color=C["dark"], ms=7)
-for r, lab, ang in ((r_out, f"{r_out:.3f}", 100), (dex_out, f"{dex_out:.3f}", 50), (g1, f"{g1:.3f}", 30)):
+for r, lab, ang in ((r_out, f"{r_out:.3f}", 100), (dex_out, f"{dex_out:.3f}", 75), (g1, f"{g1:.3f}", 30)):
     a = math.radians(ang)
     ax.annotate("", xy=(r * math.cos(a), r * math.sin(a)), xytext=(0, 0), arrowprops=dict(arrowstyle="-|>", color=C["dark"], lw=0.8))
-    ax.text(r * math.cos(a) * 1.02, r * math.sin(a) * 1.02 + 0.02, lab + " m", fontsize=9, color=C["dark"])
+    if r == dex_out:                               # 标在浅色圆环正中，不压圆周
+        rl = (dex_out + r_out) / 2
+        ax.text(rl * math.cos(a), rl * math.sin(a), lab + " m", fontsize=9, color=C["dark"], ha="center", va="center")
+    else:
+        ax.text(r * math.cos(a) * 1.02, r * math.sin(a) * 1.02 + 0.02, lab + " m", fontsize=9, color=C["dark"])
 ax.text(-0.98, -1.25, T("浅蓝：可达工作空间（末端能到）\n深蓝：灵巧工作空间（能以任意朝向到达）",
-                        "light: reachable workspace (the tip gets there)\ndark: dexterous workspace (in every orientation)"), fontsize=9.5)
+                        "light: reachable workspace (the end-effector gets there)\ndark: dexterous workspace (in every orientation)"), fontsize=9.5)
 ax.text(-0.98, 1.06, T("A：灵巧区内，8 个朝向都行\nB：外缘附近，只有一小段朝向",
                      "A: inside, all 8 orientations work\nB: near the rim, only a narrow range"), fontsize=9.5, color=C["ink"])
 figure(fig, "fig11_4_1")
@@ -87,9 +92,10 @@ a1.plot([-0.075, 0.075], [0, 0], color=C["dark"], lw=6)
 a1.plot([0, 0], [0, H1], color=C["dark"], lw=4)
 a1.plot([0, -0.817], [H1, H1], color=C["dark"], lw=3)
 a1.set_aspect("equal")
+a1.set_ylim(zz[0] - h / 2, 1.52)                   # 上方留出图例的位置，不压工作空间
 a1.set_xlabel(T("到基座轴线的水平距离（左右对称画出）/ m", "horizontal distance from the base axis (mirrored) / m"))
 a1.set_ylabel(T("高度 z / m", "height z / m"))
-a1.text(-1.0, 1.0, T("深蓝：灵巧\n浅蓝：可达\n橙线内：法兰可朝下", "dark: dexterous\nlight: reachable\ninside orange: flange can face down"), fontsize=9,
+a1.text(-1.0, 1.49, T("深蓝：灵巧\n浅蓝：可达\n橙线内：法兰可朝下", "dark: dexterous\nlight: reachable\ninside orange: flange can face down"), fontsize=9,
         va="top", bbox=dict(facecolor="white", edgecolor="none", alpha=0.85, pad=2))
 a1.set_title(T("(a) UR5e 法兰中心（零位手臂画在左侧）", "(a) UR5e flange centre (arm at home drawn on the left)"), fontsize=10)
 
@@ -106,12 +112,16 @@ for r, ls in ((SC_L1 + SC_L2, "-"), (rmin, "--"), (abs(SC_L1 - SC_L2), ":")):
 for a in (lim["J1"][0], lim["J1"][1]):
     a2.plot([0, 0.6 * math.cos(a)], [0, 0.6 * math.sin(a)], color=C["x"], lw=1, ls="--")
 a2.plot(0, 0, "s", color=C["dark"], ms=7)
-a2.text(0.32, 0.5, "0.6 m", fontsize=9)
-a2.text(rmin * 0.72 - 0.02, -rmin * 0.72 - 0.04, f"{rmin:.3f} m", fontsize=9, color=C["dark"])
-a2.text(-0.64, 0.3, T("关节 1 ±140°\n的限位", "joint 1 limit\n±140°"), fontsize=8.5, color=C["x"],
-        bbox=dict(facecolor="white", edgecolor="none", alpha=0.85, pad=1), zorder=6)
-a2.text(-0.62, -0.62, T("点线：L₁ − L₂ = 0.1 m（无限位时的内径）", "dotted: L₁ − L₂ = 0.1 m (inner radius without limits)"), fontsize=8.5)
+a2.text(0.62 * math.cos(math.radians(50)), 0.62 * math.sin(math.radians(50)), "0.6 m", fontsize=9, va="bottom")
+a2.annotate("", xy=(rmin * math.cos(math.radians(-50)), rmin * math.sin(math.radians(-50))), xytext=(0, 0),
+            arrowprops=dict(arrowstyle="-|>", color=C["dark"], lw=0.8))
+a2.text(-0.02, -0.16, f"{rmin:.3f} m", fontsize=9, color=C["dark"], ha="center", va="center")
+a1j = lim["J1"][1]
+a2.annotate(T("关节 1 ±140°\n的限位", "joint 1 limit\n±140°"), xy=(0.5 * math.cos(a1j), 0.5 * math.sin(a1j)), xytext=(-0.62, 0.635),
+            fontsize=8.5, color=C["x"], ha="left", va="top", arrowprops=dict(arrowstyle="-", color=C["x"], lw=0.7))
+a2.text(-0.62, -0.76, T("点线：L₁ − L₂ = 0.1 m（无限位时的内径）", "dotted: L₁ − L₂ = 0.1 m (inner radius without limits)"), fontsize=8.5)
 a2.set_aspect("equal")
+a2.set_ylim(-0.8, g[-1] + hs / 2)                  # 下方留出脚注的位置
 a2.set_xlabel("x / m")
 a2.set_ylabel("y / m")
 a2.set_title(T("(b) SCARA 工具中心的水平可达区域", "(b) SCARA tool centre: horizontal reach"), fontsize=10)

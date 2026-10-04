@@ -106,7 +106,7 @@ JOINTS = [
     ("P", "移动关节 P：沿一个方向滑动", "Prismatic P: slides along one direction", 1),
     ("H", "螺旋副 H：每转一个角度，沿轴前进一段", "Helical H: advances along the axis as it turns", 1),
     ("C", "圆柱副 C：可转、可滑，互不影响", "Cylindrical C: turns and slides independently", 2),
-    ("U", "万向节 U：绕两根相交的轴摆动", "Universal U: swings about two crossing axes", 2),
+    ("U", "万向节 U：绕两根相交的轴摆动", "Universal U: swings about two intersecting axes", 2),
     ("S", "球关节 S：绕球心任意转动", "Spherical S: any rotation about the centre", 3),
     ("E", "平面副 E：在平面上平移和转动", "Planar E: slides and turns on a plane", 3),
 ]

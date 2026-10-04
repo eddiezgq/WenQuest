@@ -16,6 +16,7 @@ from _fig11 import C, bar, clean3d, ground, pin, plane
 from bookout import T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”
 
 
 def e(t):
@@ -65,7 +66,7 @@ for P, s, d in ((A, "A", (-0.035, 0.012)), (B, "B", (-0.035, 0.01)), (Co, "C", (
     a1.text(P[0] + d[0], P[1] + d[1], s, fontsize=10, weight="bold")
 a1.text(Cx[0] + 0.022, Cx[1] - 0.012, "C′", fontsize=10, color=C["muted"], weight="bold")
 a1.text(-0.11, -0.25, T("实线：开式（C 在上）\n淡色：交叉式（C′，连杆与机架交叉）",
-                        "solid: open mode (C above)\nfaint: crossed mode (C′, coupler crosses the frame)"), fontsize=8.5, color=C["dark"])
+                        "solid: open (C above)\nfaint: crossed (C′, coupler crosses the ground)"), fontsize=8.5, color=C["dark"])
 a1.set_title(T("(a) 四杆机构，θ₁ = 60° 时的两种装配模式", "(a) Four-bar: two assembly modes at θ₁ = 60°"), fontsize=10)
 
 
@@ -84,12 +85,12 @@ def plot_wrapped(ax, xy, **kw):
         first = False
 
 
-plot_wrapped(a2, branch(FB, -1), color=C["z"], lw=2.2, label=T("开式（机架 0.40 m）", "open (frame 0.40 m)"))
-plot_wrapped(a2, branch(FB, 1), color=C["accent"], lw=2.2, label=T("交叉式（机架 0.40 m）", "crossed (frame 0.40 m)"))
+plot_wrapped(a2, branch(FB, -1), color=C["z"], lw=2.2, label=T("开式（机架 0.40 m）", "open (ground 0.40 m)"))
+plot_wrapped(a2, branch(FB, 1), color=C["accent"], lw=2.2, label=T("交叉式（机架 0.40 m）", "crossed (ground 0.40 m)"))
 ng_up, ng_dn = branch(FB_NG, -1), branch(FB_NG, 1)
 ok = ~np.isnan(ng_up[:, 0])
 loop = np.vstack([ng_up[ok], ng_dn[ok][::-1], ng_up[ok][:1]])
-plot_wrapped(a2, loop, color=C["dark"], lw=1.6, ls="--", label=T("机架 0.58 m：一条闭曲线", "frame 0.58 m: a single loop"))
+plot_wrapped(a2, loop, color=C["dark"], lw=1.6, ls="--", label=T("机架 0.58 m：一条闭曲线", "ground 0.58 m: a single loop"))
 for k in (0, -1):
     P = ng_up[ok][k]
     a2.plot(P[0], P[1] % 360, "o", color=C["ink"], ms=5, zorder=6)
@@ -133,7 +134,7 @@ Eo, Ei = (E1, E2) if E1[0] > E2[0] else (E2, E1)   # 朝外、朝内两个肘点
 plane(a1, (-0.22, 0.62), (-0.62, 0.2))
 a1.plot([-0.2, 0.25], [0, 0], color=C["dark"], lw=6, solid_capstyle="butt")
 a1.text(-0.2, 0.035, T("静平台（基座）", "base"), fontsize=9, color=C["dark"])
-a1.plot([0, 0], [0.12, -0.6], color=C["muted"], lw=0.8, ls=(0, (6, 3)))
+a1.plot([0, 0], [0.12, -0.53], color=C["muted"], lw=0.8, ls=(0, (6, 3)))
 a1.text(0.005, 0.13, "z", fontsize=10, color=C["muted"])
 tt = np.linspace(0, 2 * math.pi, 200)
 a1.plot(O[0] + La * np.cos(tt), O[1] + La * np.sin(tt), color=C["z"], lw=0.9, ls=":")
@@ -155,10 +156,12 @@ a1.text(O[0] + 0.09, -0.035, "$\\theta_1$", color=C["x"], fontsize=11)
 a1.text(*(O + Eo) / 2 + np.array([0.0, 0.025]), "$L_a$", color=C["z"], fontsize=11)
 a1.text(*(Eo + Pp) / 2 + np.array([0.02, 0.0]), "$L_b$", color=C["dark"], fontsize=11)
 a1.text(Eo[0] + 0.02, Eo[1] + 0.02, T("肘点 E₁", "elbow E₁"), fontsize=9, color=C["x"])
-a1.text(Ei[0] - 0.01, Ei[1] - 0.06, T("另一组解的肘点", "elbow of the\nother solution"), fontsize=8.5, color=C["muted"], ha="center", va="top")
+HALO = dict(facecolor="white", edgecolor="none", alpha=0.85, pad=1.0)
+a1.text(Ei[0] - 0.01, Ei[1] - 0.06, T("另一组解的肘点", "elbow of the\nother solution"), fontsize=8.5, color=C["muted"], ha="center", va="top",
+        bbox=HALO, zorder=9)
 a1.text(Pp[0] + 0.02, Pp[1] - 0.045, "P′", fontsize=10, color=C["x"])
-a1.text(p1[0] - 0.09, p1[1] - 0.06, T("动平台中心 p", "platform centre p"), fontsize=9, color=C["accent"])
-a1.text(-0.21, -0.6, T("点线：半径 La、Lb 的两个圆；交点即肘点", "dotted: circles of radii La and Lb; they meet at the elbow"),
+a1.text(p1[0] - 0.06, p1[1] - 0.095, T("动平台中心 $p$", "platform centre $p$"), fontsize=9, color=C["accent"], bbox=HALO, zorder=9)
+a1.text(-0.21, -0.6, T("点线：半径 $L_a$、$L_b$ 的两个圆；交点即肘点", "dotted: circles of radii $L_a$ and $L_b$; they meet at the elbow"),
         fontsize=8.5, color=C["dark"])
 a1.set_title(T("(a) Delta 支链 1 所在的竖直平面（p 在此平面内）", "(a) The vertical plane of Delta leg 1 (p lies in it)"), fontsize=10)
 
@@ -182,7 +185,8 @@ for i in range(6):
     ax.scatter(*B6[i], color=C["x"], s=14)
     m = A6[i] + 0.55 * (B6[i] - A6[i])
     off = 0.06 * np.array([math.cos(math.radians([-10, 10, 110, 130, 230, 250][i])), math.sin(math.radians([-10, 10, 110, 130, 230, 250][i])), 0])
-    ax.text(*(m + off), f"{legs[i]:.3f}", fontsize=8, color=C["z"])
+    ax.text(*(m + off), f"{legs[i]:.3f}", fontsize=8, color=C["z"], zorder=20,
+            bbox=dict(facecolor="white", edgecolor="none", alpha=0.9, pad=0.8))
 ax.quiver(*(ps + z0), 0.25, 0, 0, color=C["x"], lw=1.4, arrow_length_ratio=0.2)
 ax.text(*(ps + z0 + np.array([0.27, 0, 0.0])), "x", color=C["x"], fontsize=9)
 ax.text2D(0.02, 0.02, T("动平台中心升到 0.6 m 并绕 x 轴转 10°；数字为腿长 / m",
@@ -216,10 +220,10 @@ a1.text(0.96, -0.04, "x", fontsize=10, color=C["muted"])
 a1.text(-0.18, 0.9, "y", fontsize=10, color=C["muted"])
 a1.plot([c[0], c[0] + 0.3], [c[1], c[1]], color=C["muted"], lw=0.8, ls="--")
 arc(a1, c, 0.22, 0, ph, C["z"])
-a1.text(c[0] + 0.235, c[1] + 0.035, "φ", fontsize=11, color=C["z"])
+a1.text(c[0] + 0.235, c[1] + 0.035, "$\\varphi$", fontsize=12, color=C["z"])
 a1.plot(*c, "o", color=C["ink"], ms=4)
 a1.text(c[0] - 0.15, c[1] - 0.035, "(x, y)", fontsize=9.5)
-a1.text(-0.28, -0.22, "$\\dot x\\,\\sin\\varphi - \\dot y\\,\\cos\\varphi = 0$", fontsize=12)
+a1.text(-0.12, -0.22, "$\\dot x\\,\\sin\\varphi - \\dot y\\,\\cos\\varphi = 0$", fontsize=12)
 a1.set_title(T("(a) 车轮不侧滑：速度只能沿车头方向", "(a) No side slip: velocity along the heading only"), fontsize=10)
 
 qa, qb = agv_programs()

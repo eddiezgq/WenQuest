@@ -41,7 +41,7 @@ t1 = math.radians(60)
 B = A + 0.15 * np.array([math.cos(t1), math.sin(t1)])
 Cc = circ_int(B, 0.35, D, 0.30, 1)
 j4 = [(0, 1, joint_R(z, P3(A))), (1, 2, joint_R(z, P3(B))), (2, 3, joint_R(z, P3(Cc))), (3, 0, joint_R(z, P3(D)))]
-g4_planar, m4, _ = record(T("平面四杆机构", "planar four-bar"), 3, 3, j4, [1, 1, 1, 1])
+g4_planar, m4, _ = record(T("平面四杆机构", "Planar four-bar linkage"), 3, 3, j4, [1, 1, 1, 1])
 g4_spatial = grubler(6, 4, [1, 1, 1, 1])
 assert g4_planar == 1 and m4 == 1 and g4_spatial == -2
 
@@ -50,7 +50,7 @@ t1 = math.radians(60)
 B = 0.1 * np.array([math.cos(t1), math.sin(t1)])
 xs = B[0] + math.sqrt(0.3 ** 2 - B[1] ** 2)
 jsc = [(0, 1, joint_R(z, P3(A))), (1, 2, joint_R(z, P3(B))), (2, 3, joint_R(z, P3((xs, 0)))), (3, 0, joint_P(xh))]
-gsc, msc, _ = record(T("曲柄滑块机构", "slider-crank"), 3, 3, jsc, [1, 1, 1, 1])
+gsc, msc, _ = record(T("曲柄滑块机构", "Slider-crank mechanism"), 3, 3, jsc, [1, 1, 1, 1])
 assert gsc == 1 and msc == 1
 
 # 平面五杆机构：机架两点相距 0.30，四根杆长 0.20、0.30、0.30、0.20
@@ -59,7 +59,7 @@ B5 = A5 + 0.2 * np.array([math.cos(math.radians(110)), math.sin(math.radians(110
 D5 = E5 + 0.2 * np.array([math.cos(math.radians(70)), math.sin(math.radians(70))])
 C5 = circ_int(B5, 0.3, D5, 0.3, -1)
 j5 = [(0, 1, joint_R(z, P3(A5))), (1, 2, joint_R(z, P3(B5))), (2, 3, joint_R(z, P3(C5))), (3, 4, joint_R(z, P3(D5))), (4, 0, joint_R(z, P3(E5)))]
-g5, m5, _ = record(T("平面五杆机构", "planar five-bar"), 3, 4, j5, [1] * 5)
+g5, m5, _ = record(T("平面五杆机构", "Planar five-bar linkage"), 3, 4, j5, [1] * 5)
 assert g5 == 2 and m5 == 2
 
 # 平行四边形机构加第三根曲柄：机架上三个铰点 (0,0)、(0.3,0)、(0.6,0)，三根曲柄长 0.25，连杆连接三个端点
@@ -68,7 +68,7 @@ e = 0.25 * np.array([math.cos(tp), math.sin(tp)])
 G = [np.array([0.0, 0]), np.array([0.3, 0]), np.array([0.6, 0])]
 jpp = [(0, 1, joint_R(z, P3(G[0]))), (0, 2, joint_R(z, P3(G[1]))), (0, 3, joint_R(z, P3(G[2]))),
        (1, 4, joint_R(z, P3(G[0] + e))), (2, 4, joint_R(z, P3(G[1] + e))), (3, 4, joint_R(z, P3(G[2] + e)))]
-gpp, mpp, _ = record(T("平行四边形加一根曲柄", "parallelogram with an extra crank"), 3, 4, jpp, [1] * 6)
+gpp, mpp, _ = record(T("平行四边形加一根曲柄", "Parallelogram with an extra crank"), 3, 4, jpp, [1] * 6)
 assert gpp == 0 and mpp == 1
 # 第三根曲柄若稍长一点（0.26，它在连杆上的铰点也外移 1 cm，原位置仍能装上），机构就卡死了：几何条件一破坏，过约束机构就动不了
 jbad = list(jpp)
@@ -89,7 +89,7 @@ c, s = math.cos(phi), math.sin(phi)
 jsl = [(0, 1, joint_R(z, P3((0, 0)))), (0, 4, joint_P(xh)), (4, 2, joint_R(z, P3((2 * a * c, 0)))),
        (1, 2, joint_R(z, P3((a * c, a * s)))), (2, 3, joint_R(z, P3((0, 2 * a * s)))), (3, 5, joint_P(xh)),
        (5, 1, joint_R(z, P3((2 * a * c, 2 * a * s))))]
-gsl, msl, _ = record(T("剪叉式升降台（一级）", "scissor lift (one stage)"), 3, 5, jsl, [1] * 7)
+gsl, msl, _ = record(T("剪叉式升降台（一级）", "Scissor lift (one stage)"), 3, 5, jsl, [1] * 7)
 assert gsl == 1 and msl == 1
 
 # ---------------------------------------------------------------- 空间机构
@@ -149,7 +149,7 @@ def delta_joints(p, th, rod_end="S"):
 th3 = [th_rest] * 3
 jd = delta_joints(pz, th3, "S")
 fd = [1] * 3 + [3] * 12
-gd, md, Nd = record(T("Delta（杆两端为球关节）", "Delta (ball joints at both rod ends)"), 6, 10, jd, fd)
+gd, md, Nd = record(T("Delta（杆两端为球关节）", "Delta (spherical joints at both rod ends)"), 6, 10, jd, fd)
 # 动平台的运动旋量：取零空间里各基向量中动平台的 6 个分量，其张成的空间是 3 维的纯平移
 Vp = Nd[6 * 9:6 * 10, :]
 rank_p = np.linalg.matrix_rank(Vp, tol=1e-9)
@@ -157,7 +157,7 @@ assert rank_p == 3 and np.allclose(Vp[:3, :], 0, atol=1e-9)
 # 杆的空转：每根杆的角速度可以沿杆的方向任意取，共 6 个
 jd2 = delta_joints(pz, th3, "U")
 fd2 = [1] * 3 + [3, 2] * 6
-gd2, md2, _ = record(T("Delta（杆一端改为万向节）", "Delta (one rod end a universal joint)"), 6, 10, jd2, fd2)
+gd2, md2, _ = record(T("Delta（杆一端改为万向节）", "Delta (universal joint at one rod end)"), 6, 10, jd2, fd2)
 assert (gd, md) == (9, 9) and (gd2, md2) == (3, 3)
 
 # Stewart 平台 6-UPS：静平台、动平台上的六个点（三对，对称布置）
@@ -221,7 +221,7 @@ col = [P3((0, 0)), P3((0.2, 0)), P3((0.6, 0)), P3((0.4, 0))]
 rank_col = np.linalg.matrix_rank(np.column_stack([screw_revolute(z, q) for q in col]), tol=1e-9)
 m_col = 4 - rank_col
 assert m_col == 2
-# 一般位置（曲柄 60°）时仍为 1
+# 一般位置（曲柄转 1 rad）时仍为 1
 q2 = P3(0.2 * np.array([math.cos(1.0), math.sin(1.0)]))
 gen = [P3((0, 0)), q2, q2 + P3((0.4, 0)), P3((0.4, 0))]
 assert 4 - np.linalg.matrix_rank(np.column_stack([screw_revolute(z, q) for q in gen]), tol=1e-9) == 1

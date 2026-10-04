@@ -75,7 +75,7 @@ class Lesson(Base):
         c5 = count([r"N = 5,\ J = 5", r"M = 3(5-1-5) + 5 = 2"])
         self.play(FadeIn(m5), Write(c5), run_time=0.8)
         self.add(tip)
-        self.caption("五杆机构：两个输入一起变，末端才能走遍一块区域", "Five-bar: two inputs together steer the tip over an area", wait=0)
+        self.caption("五杆机构：两个输入一起变，末端才能走遍一块区域", "Five-bar: two inputs together steer the end-effector over an area", wait=0)
         self.play(t1.animate.set_value(np.radians(150)), run_time=1.3)
         self.play(t2.animate.set_value(np.radians(30)), run_time=1.3)
         self.play(t1.animate.set_value(np.radians(95)), t2.animate.set_value(np.radians(60)), run_time=1.3)

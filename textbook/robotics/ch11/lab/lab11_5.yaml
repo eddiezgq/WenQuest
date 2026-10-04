@@ -35,4 +35,4 @@
   - ["AGV 按纯滚动、不侧滑积分；真实车轮有打滑和轮径误差，里程计的误差会随行驶距离累积。", "The AGV is integrated with pure rolling and no side slip; real wheels slip and differ in diameter, so odometry errors grow with distance."]
 思考题:
   - ["两种轮速过程的终点车头方向相同、位置不同。如果再给你一个“只读两轮转角”的传感器，能否由它确定车的位置？需要什么额外信息？",
-     "The two programmes end with the same heading but different positions. With a sensor that reads only the two wheel angles, could you tell where the car is? What else would you need?"]
+     "The two programmes end with the same heading but different positions. With a sensor that reads only the two wheel angles, could you tell where the AGV is? What else would you need?"]

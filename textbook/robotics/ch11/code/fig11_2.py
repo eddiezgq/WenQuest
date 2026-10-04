@@ -39,7 +39,7 @@ for p in (A, D):
 for p in (A, B, Cc, D):
     pin(ax, p, 0.016)
 plane(ax, (-0.12, 0.52), (-0.16, 0.5))
-ax.text(0.2, 0.44, T("(a) 四杆机构", "(a) four-bar"), **lab)
+ax.text(0.2, 0.44, T("(a) 四杆机构", "(a) four-bar linkage"), **lab)
 ax.text(0.2, -0.2, "N = 4, J = 4\n$M = 3\\cdot 3 - 2\\cdot 4 = 1$", **lab)
 # (b) 曲柄滑块
 ax = axs[1]
@@ -69,7 +69,7 @@ for p in (A5, B5, C5, D5, E5):
     pin(ax, p, 0.016)
 ax.plot(*C5, "o", color=C["x"], ms=5, zorder=8)
 plane(ax, (-0.17, 0.47), (-0.16, 0.5))
-ax.text(0.15, 0.44, T("(c) 五杆机构", "(c) five-bar"), **lab)
+ax.text(0.15, 0.44, T("(c) 五杆机构", "(c) five-bar linkage"), **lab)
 ax.text(0.15, -0.2, "N = 5, J = 5\n$M = 3\\cdot 4 - 2\\cdot 5 = 2$", **lab)
 # (d) 平行四边形加一根曲柄
 ax = axs[3]
@@ -129,9 +129,9 @@ for k in range(3):
         ax.scatter(*(E + sgn * w / 2 * et), color=C["x"], s=10)
         ax.scatter(*(P + sgn * w / 2 * et), color=C["x"], s=10)
     ax.scatter(*B, color=C["ink"], s=14)
-ax.text(0.0, 0.0, 0.08, T("主动臂（R）", "upper arms (R)"), fontsize=9, color=C["z"])
-ax.text2D(0.6, 0.14, T("← 动平台", "← platform"), transform=ax.transAxes, fontsize=9, color=C["accent"])
-ax.text2D(0.02, 0.02, T("红点为球关节；平行四边形使动平台只平移", "red dots: ball joints; the parallelograms keep the platform from turning"),
+ax.text(0.0, 0.0, 0.08, T("主动臂（R）", "active arms (R)"), fontsize=9, color=C["z"])
+ax.text2D(0.6, 0.14, T("← 动平台", "← moving platform"), transform=ax.transAxes, fontsize=9, color=C["accent"])
+ax.text2D(0.02, 0.02, T("红点为球关节；平行四边形使动平台只平移", "red dots: spherical joints;\nparallelograms keep the\nplatform from turning"),
           transform=ax.transAxes, fontsize=8.5)
 ax.set_title(T("(a) Delta：3 × (R + 两根 S–S 杆)", "(a) Delta: 3 × (R + two S–S rods)"), fontsize=10, pad=-6)
 # (b) Stewart 6-UPS
@@ -148,7 +148,7 @@ for i in range(6):
     ax.plot(*np.array([m - 0.05 * (bb[i] - aa[i]), bb[i]]).T, color=C["muted"], lw=2)
     ax.scatter(*aa[i], color=C["y"], s=14)
     ax.scatter(*bb[i], color=C["x"], s=14)
-ax.text2D(0.02, 0.02, T("绿：万向节 U；蓝灰之间：移动关节 P；红：球关节 S", "green: U joints; blue/grey: P joints; red: S joints"),
+ax.text2D(0.02, 0.02, T("绿：万向节 U；蓝灰之间：移动关节 P；红：球关节 S", "green: U joints; red: S joints;\nbetween blue and grey: P joints"),
           transform=ax.transAxes, fontsize=8.5)
 ax.set_title(T("(b) Stewart 平台 6-UPS", "(b) Stewart platform 6-UPS"), fontsize=10, pad=-6)
 # (c) 本内特机构

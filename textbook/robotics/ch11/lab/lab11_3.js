@@ -24,7 +24,7 @@ WQ.lab({
   tasks: [
     { id: "hit", robot: true, text: ["让手臂碰到立柱，观察构型空间中的点落在灰色区域里。", "Make the arm touch the post and see the point fall in the grey region."],
       demo: { scene: "arm", set: { t1: 38, t2: 0 }, press: [] } },
-    { id: "up", robot: true, text: ["用肘上构型（θ₂ < 0）把末端送到绿色目标点 (0.55, −0.25) m（误差小于 1 cm）。", "With elbow up (θ₂ < 0) put the tip on the green target (0.55, −0.25) m, within 1 cm."],
+    { id: "up", robot: true, text: ["用肘上构型（θ₂ < 0）把末端送到绿色目标点 (0.55, −0.25) m（误差小于 1 cm）。", "With elbow up (θ₂ < 0) put the end-effector on the green target (0.55, −0.25) m, within 1 cm."],
       demo: { scene: "arm", set: { t1: 16, t2: -84.5 }, press: [] } },
     { id: "down", robot: true, text: ["用肘下构型（θ₂ > 0）到达同一个目标点，比较两组关节角。", "Reach the same target with elbow down (θ₂ > 0) and compare the two joint-angle pairs."],
       demo: { scene: "arm", set: { t1: -64.5, t2: 84.5 }, press: [] } },
@@ -69,7 +69,7 @@ WQ.lab({
       if (err < 0.01 && api.p.t2 < 0) api.done("up");
       if (err < 0.01 && api.p.t2 > 0) api.done("down");
       return [[["构型 (θ₁, θ₂)", "configuration (θ₁, θ₂)"], `(${api.fmt(api.p.t1, 1)}°, ${api.fmt(api.p.t2, 1)}°)`],
-              [["末端位置", "tip"], `(${api.fmt(w[0], 3)}, ${api.fmt(w[1], 3)}) m`],
+              [["末端位置", "end-effector"], `(${api.fmt(w[0], 3)}, ${api.fmt(w[1], 3)}) m`],
               [["离目标", "to target"], api.fmt(err * 1000, 1) + " mm"],
               [["碰撞", "collision"], h ? (api.lang() === "en" ? "yes" : "是") : (api.lang() === "en" ? "no" : "否")],
               [["肘向", "elbow"], api.p.t2 < 0 ? (api.lang() === "en" ? "up" : "上") : (api.lang() === "en" ? "down" : "下")]];

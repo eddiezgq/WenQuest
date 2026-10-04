@@ -1,4 +1,4 @@
-"""动画 11.3.1（配图 11.3.1）：把关节角长方形的左右两边、上下两边分别粘合，得到环面 T²；跨过边界的路径在环面上是连续的。"""
+"""动画 11.3.1（配图 11.3.1）：先把关节角正方形的上下两边粘合成圆管，再把圆管两端（左右两边）粘合，得到环面 T²；跨过边界的路径在环面上是连续的。"""
 from manim import *
 from wq_anim import *
 import numpy as np
@@ -59,8 +59,8 @@ class Lesson(Base):
         a, b = ValueTracker(0.0), ValueTracker(0.0)
         m = always_redraw(lambda: mesh(a.get_value(), b.get_value()))
         self.play(FadeIn(m), run_time=0.8)
-        self.caption("关节角长方形：横向 θ₁，纵向 θ₂，各从 −180° 到 180°；绿线跨出了右边界",
-                     "Joint-angle rectangle: θ₁ across, θ₂ up, each −180° to 180°; the green path leaves on the right", wait=1.5)
+        self.caption("关节角正方形：横向 θ₁，纵向 θ₂，各从 −180° 到 180°；绿线跨出了右边界",
+                     "Joint-angle square: θ₁ across, θ₂ up, each −180° to 180°; the green path leaves on the right", wait=1.5)
         self.caption("θ₂ = −180° 与 180° 是同一个构型：把上下两边（蓝）粘起来，卷成圆管",
                      "θ₂ = −180° and 180° are the same: glue top to bottom (blue) into a tube", wait=0)
         self.play(a.animate.set_value(1.0), run_time=4.0, rate_func=smooth)

@@ -131,7 +131,7 @@ class Lesson(Base):
         lims = VGroup(*[Dot(to_sq(*loop[k]), radius=0.08, color=RED) for k in (0, len(th) - 1)])
         self.play(FadeOut(cv_open, cv_cross), FadeIn(m3), FadeIn(dot3), run_time=0.6)
         self.caption("机架加长到 0.58 m：s + l > p + q，曲柄转到极限位置（红点）就转不过去",
-                     "Frame 0.58 m: s + l > p + q; the crank stops at the limit positions (red)", wait=0)
+                     "Ground 0.58 m: s + l > p + q; the crank stops at the limit positions (red)", wait=0)
         self.play(FadeIn(lims), s.animate.set_value(0.5), Create(cv_ng.copy().pointwise_become_partial(cv_ng, 0, 0.5)), run_time=3.5, rate_func=linear)
         self.caption("在极限位置，点沿曲线拐回：机构从开式连续地进入交叉式，两种模式连成一条曲线",
                      "At a limit position the point turns back: open passes into crossed, one single loop", wait=0)
