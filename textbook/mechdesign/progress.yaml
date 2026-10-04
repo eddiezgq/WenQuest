@@ -12,6 +12,9 @@ parts_en:
   第八篇 机器人与智能装备的机械设计: "Part VIII  Mechanical Design of Robots and Intelligent Equipment"
   第九篇 综合设计: "Part IX  Integrated Design Projects"
 chapters:
+  1:
+    status: ai
+    title_en: "What Mechanical Design Is: How Engineers Work"
   33:
     status: first
     title_en: "Shafts"
