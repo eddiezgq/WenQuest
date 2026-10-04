@@ -53,4 +53,4 @@ class Lesson(Base):
         self.wait(1)
         self.card([["旋转轴上一点的应力", "Stress at a point of a rotating shaft"],
                    MathTex(r"\sigma_P(\theta)=\frac{M_x\cos(\theta+\varphi)+M_y\sin(\theta+\varphi)}{W}", font_size=38),
-                   ["方向固定的力 → 交变应力；随轴转的力 → 平均应力。逐点算一圈，取最危险的点", "Fixed-direction loads → alternating; loads turning with the shaft → mean. Follow each point round, take the worst"]])
+                   ["方向固定的力 → 交变应力；随轴转的力 → 平均应力。平缝机上轴：平衡块与一阶惯性力正转的一半几乎抵消，平均应力很小", "Fixed-direction loads → alternating; loads turning with the shaft → mean. In the sewing shaft the counterweight nearly cancels the forward half of the first-order force, so the mean is small"]])

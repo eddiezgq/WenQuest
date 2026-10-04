@@ -3,8 +3,8 @@
 标题: ["工业平缝机上轴 LS-101 校核与提速评估", "Check of the lockstitch-machine upper shaft LS-101 and a speed-up assessment"]
 角色: ["缝纫机厂研发部的结构工程师", "structural engineer, R&D of a sewing-machine maker"]
 背景:
-  - "WQ-LS 工业平缝机的最高转速是 5 000 r/min。市场部希望下一代产品提到 5 500 r/min。上轴 LS-101（45 钢调质，轴颈 Ø12 磨削，两端 6201 轴承）每天转几千万圈，必须无限寿命。你负责校核上轴在两种转速下的强度和临界转速，并写出提速评估意见。"
-  - "The WQ-LS lockstitch machine runs at up to 5 000 r/min; marketing wants 5 500 r/min for the next model. The upper shaft LS-101 (45 steel QT, ground Ø12 journals, 6201 bearings at both ends) turns tens of millions of times a day and must have infinite life. You check its strength and critical speed at both speeds and write a speed-up assessment."
+  - "WQ-LS 工业平缝机的最高转速是 5 000 r/min。市场部希望下一代产品提到 5 500 r/min。上轴 LS-101（45 钢调质，轴颈 Ø12 磨削，两端 6201 轴承）每天转几十万到上百万圈，必须无限寿命。你负责校核上轴在两种转速下的强度和临界转速，并写出提速评估意见。"
+  - "The WQ-LS lockstitch machine runs at up to 5 000 r/min; marketing wants 5 500 r/min for the next model. The upper shaft LS-101 (45 steel QT, ground Ø12 journals, 6201 bearings at both ends) turns hundreds of thousands to over a million times a day and must have infinite life. You check its strength and critical speed at both speeds and write a speed-up assessment."
 输入:
   - {名称: ["针杆机构数据（r = 15.5 mm，l = 55 mm，往复质量 0.12 kg，平衡率 0.45）、上轴结构与轴上零件质量", "Needle-bar mechanism data (r = 15.5 mm, l = 55 mm, reciprocating mass 0.12 kg, balance ratio 0.45), shaft layout and masses on the shaft"], 来源: ["《缝纫机设计与制造》第 3、8、23 章（示意数据）；教材 33.11.2 节", "Sewing Machine Design and Manufacturing, Chapters 3, 8, 23 (illustrative data); Section 33.11.2"]}
   - {名称: ["物料 LS-101（ERPNext）、6201 轴承数据", "Item LS-101 (ERPNext), 6201 bearing data"], 来源: ["数字工厂 ERPNext；零件库 A-BRG-DG", "Factory ERPNext; parts library A-BRG-DG"]}
@@ -16,10 +16,10 @@
   - {名称: ["提速评估意见（一页）", "Speed-up assessment (one page)"], 验收: ["结论明确：上轴是否需要改；提速的主要风险在哪里（二阶激振与机头固有频率）；建议的措施", "Clear conclusion: does the shaft need changes; where the main risk lies (second-order excitation vs the head's natural frequency); recommended measures"], 类型: 文件, 格式: [docx, pdf]}
 工位: [CAD, FEA, FAT, PY, PLM]
 步骤:
-  - ["载荷：按式 (33.11.1) 算两种转速下曲柄对上轴的力和惯性转矩，画出随转角的曲线（可改程序 33.11.1）", "Loads: compute the crank force and inertia torque at both speeds from Eq. (33.11.1) and plot them against crank angle (you may adapt Program 33.11.1)"]
-  - ["应力循环与安全系数：在台阶截面取点随轴转一圈，求 σa、σm 和 τa、τm，按式 (33.5.5) 算无限寿命安全系数（33.11.3、33.11.4 节）", "Stress cycle and safety: follow points on the step section round one revolution, get σa, σm, τa, τm, and the infinite-life safety factor from Eq. (33.5.5) (Sections 33.11.3, 33.11.4)"]
+  - ["载荷：按式 (33.11.1)、(33.11.2) 算两种转速下曲柄对上轴的力和惯性转矩，画出随转角的曲线（可改程序 33.11.1）", "Loads: compute the crank force and inertia torque at both speeds from Eqs. (33.11.1) and (33.11.2) and plot them against crank angle (you may adapt Program 33.11.1)"]
+  - ["应力循环与安全系数：在两个台阶截面（曲柄座 Ø10→Ø12、前轴颈 Ø12→Ø16）取点随轴转一圈，求 σa、σm 和 τa、τm，按式 (33.5.5) 算无限寿命安全系数（33.11.3、33.11.4 节）", "Stress cycle and safety: follow points on both step sections (crank seat Ø10→Ø12, journal Ø12→Ø16) round one revolution, get σa, σm, τa, τm, and the infinite-life safety factor from Eq. (33.5.5) (Sections 33.11.3, 33.11.4)"]
   - ["临界转速：梁单元法带集中质量和不带集中质量各算一次（33.7、33.11.5 节）", "Critical speed: beam elements with and without the lumped masses (Sections 33.7, 33.11.5)"]
-  - ["建模与分析：建 LS-101 并上传；在“仿真与分析”里算强度和固有频率（两种轴承支承各算一次）；把一转之内的转矩（式 (33.11.2)）写成 CSV 上传作载荷谱，算扭转疲劳寿命，下载报告；弯曲的旋转应力循环用手算（33.9 节、数字工厂实验 12）", "Model and upload LS-101; in Simulation & Analysis compute strength and natural frequencies (both bearing-support options); upload one revolution of torque (Eq. (33.11.2)) as a CSV spectrum, compute the torsional fatigue life, download the report; the rotating bending cycle is done by hand (Section 33.9, factory Lab 12)"]
+  - ["建模与分析：建 LS-101 并上传；在“仿真与分析”里算强度和固有频率（两种轴承支承各算一次）；把一转之内的转矩（式 (33.11.2)）写成 CSV 上传作载荷谱，算扭转疲劳寿命，下载报告；弯曲的旋转应力循环用手算（33.11.3、33.11.4 节；操作见 33.9 节和数字工厂实验 12）", "Model and upload LS-101; in Simulation & Analysis compute strength and natural frequencies (both bearing-support options); upload one revolution of torque (Eq. (33.11.2)) as a CSV spectrum, compute the torsional fatigue life, download the report; the rotating bending cycle is done by hand (Sections 33.11.3–33.11.4; procedure in Section 33.9 and factory Lab 12)"]
   - ["评估：比较 5 000 与 5 500 r/min，结合机头臂固有频率写提速评估意见（33.11.6 节）", "Assess: compare 5 000 and 5 500 r/min and, with the head's natural frequency, write the speed-up assessment (Section 33.11.6)"]
   - ["提交：在“我的任务”上传交付物，预检，回复意见", "Submit in My Tasks, pre-check, answer comments"]
 评审要点:

@@ -22,7 +22,9 @@ nw = np.abs(W)
 T_av = float((np.sum(nw * Tabs ** 3) / max(np.sum(nw), 1e-12)) ** (1 / 3))
 hd = R.harmonic("25-100")
 n_in_max = w_max * hd["ratio"] * 60 / (2 * math.pi)
-hd_ok = T_peak <= hd["repeat"] and T_av <= hd["avg"] and n_in_max <= hd["n_max"]
+n_in_avg = float(np.mean(nw)) * hd["ratio"] * 60 / (2 * math.pi)          # 一个节拍内的平均输入转速（含停顿）
+hd_ok = T_peak <= hd["repeat"] and T_av <= hd["avg"] and n_in_max <= hd["n_max"] and n_in_avg <= hd["n_avg"]
+hd_life = R.HD_L10_H * (hd["rated"] / T_av) ** 3 * (R.HD_N_RATED / n_in_avg)    # 样本的寿命式
 
 # ---- 材料
 st, al = mdstd.material("40Cr-QT"), mdstd.material("7075-T6")
@@ -51,10 +53,12 @@ segs_al = [(D_ * k, L, n) for D_, L, n in segs]
 m_al_same = R.mass(segs_al, al["density"])
 # 同样的大外径做成薄壁钢管：内孔加大到扭转角与 Ø50/30 钢轴相同——看减重到底来自材料还是来自直径
 bore_big = R.BORE
-while R.twist(T_peak * 1e3, segs_al, G(st), bore_big + 0.1) <= th_st and bore_big < segs_al[4][0] - 4:
+while R.twist(T_peak * 1e3, segs_al, G(st), bore_big + 0.1) <= th_st and bore_big + 0.1 < segs_al[4][0] - 2:
     bore_big += 0.1
 m_st_big = R.mass(segs_al, st["density"], bore_big)
 wall_big = (R.SEAT * k - bore_big) / 2
+wall_hub_big = (segs_al[4][0] - bore_big) / 2
+th_big_ratio = R.twist(T_peak * 1e3, segs_al, G(st), bore_big) / th_st
 # 只看两法兰之间的“管身”（决定扭转刚度的部分）：法兰要装螺钉，壁厚不由刚度定
 m_al_body = R.mass(segs_al[1:-1], al["density"])
 m_big_body = R.mass(segs_al[1:-1], st["density"], bore_big)
@@ -68,7 +72,11 @@ tau = T_peak * 1e3 / (2 * R.W_hollow(R.SEAT))
 s_vm = math.sqrt(sig ** 2 + 3 * tau ** 2)
 S_static = st["sigma_s"] / s_vm
 # 急停：减速器瞬时允许最大转矩（零件库）作用在轴上，轴不能先坏
-tau_stop = hd["momentary"] * 1e3 / (2 * R.W_hollow(R.SEAT))
+HUB = R.SEAT - 4                                  # 大臂毂：传全部转矩、截面最小
+tau_hub = T_peak * 1e3 / (2 * R.W_hollow(HUB))
+sig_hub = M_b / R.W_hollow(HUB)
+S_hub = st["sigma_s"] / math.sqrt(sig_hub ** 2 + 3 * tau_hub ** 2)
+tau_stop = hd["momentary"] * 1e3 / (2 * R.W_hollow(HUB))
 S_stop = st["sigma_s"] / (math.sqrt(3) * tau_stop)
 
 # ---- 有限元（数字工厂“仿真与分析”的同一套程序）：减速器法兰端面固定，大臂法兰外圆加峰值扭矩
@@ -95,6 +103,11 @@ vm_keep = np.where(keep, surf["vm"], 0.0)
 vm_hot = float(vm_keep.max())
 _, fs = FAT.compute(vm_keep, T_peak, np.abs(Tq), R.CYCLE_S, mat_fe, surface="fine_turned", size_factor=mdstd.size_factor(R.SEAT))
 life_inf = bool(fs["infinite"])
+
+def pose_txt(P):
+    """姿态写成度（J1–J6 依次为 shoulder_pan … wrist_3），数字工厂“运动与动力分析”里填的就是度"""
+    return "、".join("J{} {:.0f}°".format(i + 1, math.degrees(v)).replace("-", "−") for i, v in enumerate(P.values()))
+
 
 # ---------------------------------------------------------------- 图
 plt = style()
@@ -128,7 +141,7 @@ ax.set_xlabel(T("轴承位直径 / mm（标注：外径/内孔）", "bearing-sea
 ax.set_ylabel(T("末端偏移 / mm（峰值力矩）", "tool deflection / mm (peak torque)"))
 ax.legend(fontsize=8, frameon=False)
 fig.tight_layout()
-figure(fig, "fig33_10_2")
+figure(fig, "fig33_10_3")
 
 fig, ax = plt.subplots(figsize=(6.6, 2.9))
 lay, z = [], 0.0
@@ -150,7 +163,7 @@ ax.set_ylim(-75, 70)
 ax.set_aspect("equal")
 ax.axis("off")
 fig.tight_layout()
-figure(fig, "fig33_10_3")
+figure(fig, "fig33_10_2")
 
 out(T_peak=T_peak, T_min=T_min, T_rms=T_rms, T_av=T_av, F_peak=F_peak, w_max_deg=math.degrees(w_max), cycle_s=R.CYCLE_S,
     payload=R.PAYLOAD_KG, reach=R.REACH_MM, budget=R.DEFLECT_BUDGET_MM, life_req=R.LIFE_H,
@@ -162,7 +175,9 @@ out(T_peak=T_peak, T_min=T_min, T_rms=T_rms, T_av=T_av, F_peak=F_peak, w_max_deg
     G_st=G(st) / 1000, G_al=G(al) / 1000, rho_st=st["density"], rho_al=al["density"],
     th_st_urad=th_st * 1e6, th_al_urad=th_al * 1e6, d_al=th_al * R.REACH_MM, m_st=m_st, m_al=m_al, k_al=k,
     m_al_same=m_al_same, bore_big=bore_big, m_st_big=m_st_big, wall_big=wall_big, m_al_body=m_al_body, m_big_body=m_big_body, m_al_fl=m_al_fl, m_big_fl=m_big_fl, m_5034=rows[3]["mass"], Gr_st=G(st) / st["density"] / 1000, Gr_al=G(al) / al["density"] / 1000, seat_al=R.SEAT * k, M_b=M_b / 1e3, sig=sig, tau=tau, s_vm=s_vm, S_static=S_static,
-    sigma_s=st["sigma_s"], tau_stop=tau_stop, S_stop=S_stop, arm_offset=R.ARM_OFFSET,
+    sigma_s=st["sigma_s"], tau_stop=tau_stop, hub=HUB, tau_hub=tau_hub, sig_hub=sig_hub, S_hub=S_hub, vm_hub_hand=math.sqrt(3) * tau_hub,
+    n_in_avg=n_in_avg, hd_navg=hd["n_avg"], hd_life=hd_life, hd_l10=R.HD_L10_H, wall_hub_big=wall_hub_big, th_big_ratio=th_big_ratio, limit_hand=R.DEFLECT_BUDGET_MM / R.HAND_MARGIN, pose_a=pose_txt(R.POSE_A), pose_b=pose_txt(R.POSE_B), move_s=R.MOVE_S, dwell_s=R.DWELL_S,
+    **{"ok_{}{}".format(r["seat"], r["bore"]): ("✓" if r["ok"] else "×") for r in rows}, S_stop=S_stop, arm_offset=R.ARM_OFFSET,
     vm_hot=vm_hot, margin=R.HAND_MARGIN, d_fe=theta_fe * R.REACH_MM, n_el=stats["elements"], theta_fe_urad=theta_fe * 1e6, err_theta=err_theta, vm_fe=stats["vm_max_mpa"],
     tau_hand_body=tau_hand_body, life_inf=life_inf, life_h=fs["life_hours"], life_exp=math.floor(math.log10(fs["life_hours"])) if fs["life_hours"] and math.isfinite(fs["life_hours"]) else None, cycles_block=fs["cycles_per_block"], S_D=fs["S_D"],
     total_len=z)

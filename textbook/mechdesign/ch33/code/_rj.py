@@ -63,7 +63,10 @@ def harmonic(size):
     r = lib_specs("D-RDC-HD-CSF")[size]
     return {"size": size, "rated": float(r["T_rated_Nm"]), "repeat": float(r["T_repeat_Nm"]), "avg": float(r["T_avg_Nm"]),
             "momentary": float(r["T_momentary_Nm"]), "n_max": float(r["n_max_grease_rpm"]), "ratio": float(r["ratio"]),
-            "OD": float(r["OD_mm"]), "mass": float(r["mass_kg"]), "src": r["src_url"]}
+            "OD": float(r["OD_mm"]), "mass": float(r["mass_kg"]), "src": r["src_url"], "n_avg": float(r["n_avg_grease_rpm"])}
+
+
+HD_L10_H, HD_N_RATED = 7000.0, 2000.0     # CSF 系列：额定转矩下、输入 2 000 r/min 的额定寿命 L10（样本 csf-csg-catalog，寿命一节）
 
 
 def bearing(code):

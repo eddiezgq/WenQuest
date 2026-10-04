@@ -23,8 +23,8 @@ class Lesson(Base):
         br = always_redraw(lambda: BraceBetweenPoints(J + RIGHT * L, J + L * np.array([np.cos(th.get_value()), np.sin(th.get_value()), 0]), direction=RIGHT))
         d = MathTex(r"\delta=\theta R", font_size=36, color=YELLOW).move_to(J + RIGHT * (L + 1.1) + UP * 0.35)
         self.play(FadeIn(br), Write(d))
-        self.caption("末端偏移 δ = θR：工作半径接近 1 m，扭转角被放大近千倍（图中放大画出）",
-                     "Tool deflection δ = θR: with a reach near 1 m the twist is magnified about a thousand times (drawn exaggerated)")
+        self.caption("末端偏移 δ = θR：扭转角只有约 0.18 mrad，乘上 850 mm 的工作半径就是 0.15 mm（图中放大画出）",
+                     "Tool deflection δ = θR: a twist of only about 0.18 mrad times an 850 mm reach gives 0.15 mm (drawn exaggerated)")
         self.wait(1)
         self.play(FadeOut(VGroup(br, d)), th.animate.set_value(0.0))
         # 实心轴与空心轴：同样的截面积
@@ -33,10 +33,10 @@ class Lesson(Base):
         r_o, r_i = 1.2, np.sqrt(1.2 ** 2 - 0.8 ** 2)
         ring = Annulus(inner_radius=r_i, outer_radius=r_o, color=BLUE_D, fill_opacity=0.8).move_to(c2)
         self.play(FadeIn(solid), FadeIn(ring))
-        t1 = MathTex(r"J_1", font_size=34).next_to(solid, DOWN)
-        t2 = MathTex(r"J_2=%.1f\,J_1" % ((r_o ** 4 - r_i ** 4) / 0.8 ** 4), font_size=34).next_to(ring, DOWN)
+        t1 = MathTex(r"J_\mathrm{s}", font_size=34).next_to(solid, DOWN)
+        t2 = MathTex(r"J_\mathrm{h}=%.1f\,J_\mathrm{s}" % ((r_o ** 4 - r_i ** 4) / 0.8 ** 4), font_size=34).next_to(ring, DOWN)
         self.play(Write(t1), Write(t2))
-        self.caption("截面积（质量）相同：空心轴把材料放到外圈，扭转刚度大得多，中间还能走线",
+        self.caption("截面积（质量）相同：空心轴（Jh）把材料放到外圈，扭转刚度比实心轴（Js）大得多，中间还能走线",
                      "Same area (same mass): the hollow shaft puts material outside — much stiffer, with room for cables")
         self.wait(1)
         self.card([["机器人关节轴：刚度设计", "Robot joint shafts: designed for stiffness"],

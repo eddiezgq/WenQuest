@@ -15,7 +15,7 @@
   - {名称: ["有限元与疲劳分析报告（“仿真与分析”导出的 Word：扭转角、应力、关节力矩记录的疲劳寿命）", "FEA and fatigue report (Word from Simulation & Analysis: twist, stress, fatigue life from the joint-torque record)"], 验收: ["扭转角与手算对照并解释差别；末端偏移 ≤ 0.20 mm；载荷谱选关节力矩记录", "Twist compared with hand calculation and the difference explained; tool deflection ≤ 0.20 mm; load spectrum from the joint-torque record"], 类型: 分析, 零件: RJ-201}
 工位: [MBD, CAD, FEA, FAT, PLM, ERP]
 步骤:
-  - ["载荷：在“运动与动力分析”里用 UR5e 模型、4 kg 末端负载算一个搬运节拍（可以自己改姿态），导出 J2 驱动力矩和大臂受力（33.10.2 节）", "Loads: run one pick-and-place cycle of the UR5e model with 4 kg in Multibody Dynamics (you may change the poses); export the J2 torque and the arm force (Section 33.10.2)"]
+  - ["载荷：在“运动与动力分析”里用 UR5e 模型、4 kg 末端负载算 A → B 一段搬运（姿态见 33.10.2 节，可以自己改；一次计算每个关节只能做一段运动，这一段作为重复的块），导出 J2 驱动力矩和大臂受力（33.10.2 节）", "Loads: run the A → B leg of the UR5e with 4 kg in Multibody Dynamics (poses in Section 33.10.2, you may change them; one run allows one move per joint, and this leg is the repeated block); export the J2 torque and the arm force (Section 33.10.2)"]
   - ["减速器：在零件库查 CSF-25-100，核对峰值、平均负载转矩和输入转速；按瞬时允许最大转矩定急停工况（33.10.3 节）", "Drive: look up CSF-25-100 in the library; check peak, average torque and input speed; take the momentary torque as the emergency-stop case (Section 33.10.3)"]
   - ["尺寸：按末端偏移列出至少三个方案（轴承位 / 内孔），选满足刚度的最轻方案；比较钢与铝合金（33.10.4、33.10.6 节）", "Size: tabulate at least three options (seat / bore) by tool deflection, pick the lightest that is stiff enough; compare steel and aluminium (Sections 33.10.4, 33.10.6)"]
   - ["建模：用 build123d（参照程序 33.10.1 的 step_bytes）或任何 CAD 建 RJ-201，在“设计发布与审批”上传 STEP（33.9 节第 2 步）", "Model RJ-201 with build123d (see step_bytes in Program 33.10.1) or any CAD; upload the STEP in Design Release (Section 33.9, step 2)"]

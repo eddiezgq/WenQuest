@@ -27,17 +27,17 @@ def section_stress(n, z_sec, d):
     tau = (L.crank_torque(th, n) + L.P_SEW / L.omega(n) * 1000) / WT          # 曲柄与电机之间的截面传全部转矩
     out_ = []
     for phi in np.linspace(0, 2 * np.pi, 72, endpoint=False):
-        psi = th + phi                                         # 这个点随轴转动
+        psi = phi - th                                         # 这个点随轴转动：曲柄在 (sinθ, cosθ)，从 +y 转向 +x，按常规角度是反向
         sig = (Mx * np.cos(psi) + My * np.sin(psi)) / W
         out_.append((phi, sig))
     return out_, tau
 
 
-def safety(n, alpha):
-    pts, tau = section_stress(n, L.Z_STEP, 12)
+def safety(n, alpha, z_sec=L.Z_STEP, d=12):
+    pts, tau = section_stress(n, z_sec, d)
     f = dict(q_s=mdstd.notch_sensitivity(L.FILLET, mat["sigma_b"]), q_t=mdstd.notch_sensitivity(L.FILLET, mat["sigma_b"], torsion=True))
     k_s, k_t = 1 + f["q_s"] * (alpha[0] - 1), 1 + f["q_t"] * (alpha[1] - 1)
-    eps, beta = mdstd.size_factor(12), mdstd.surface_factor("ground", mat["sigma_b"])
+    eps, beta = mdstd.size_factor(d), mdstd.surface_factor("ground", mat["sigma_b"])
     K_s, K_t = k_s / eps + 1 / beta - 1, k_t / eps + 1 / beta - 1
     ps, pt = mat["sigma_1"] / mat["sigma_b"], mat["tau_1"] / (mat["sigma_b"] / math.sqrt(3))
     ta, tm = (tau.max() - tau.min()) / 2, (tau.max() + tau.min()) / 2
@@ -53,9 +53,15 @@ def safety(n, alpha):
 
 
 # ---- 台阶 Ø12 → Ø16、r = 0.5 的理论应力集中系数：有限元（33.5.4 节同一个程序）
-kt = _fea.stepped_bar_kt(12.0, 16.0, L.FILLET, fine=4)
-alpha = (kt["alpha_sigma"], kt["alpha_tau"])
-A5, A55 = safety(L.N_MAX, alpha), safety(L.N_UP, alpha)
+# 两个台阶都校核：截面 I = 曲柄座 Ø10 → 前轴颈 Ø12（z = 22，转矩全部通过、弯矩 11F）；截面 II = 前轴颈 Ø12 → 轴身 Ø16（z = 32）
+Z_I, D_I = L.LAY[0][1], 10
+ktI = _fea.stepped_bar_kt(10.0, 12.0, L.FILLET, fine=4)
+ktII = _fea.stepped_bar_kt(12.0, 16.0, L.FILLET, fine=4)
+alpha = (ktI["alpha_sigma"], ktI["alpha_tau"])
+alphaII = (ktII["alpha_sigma"], ktII["alpha_tau"])
+A5, A55 = safety(L.N_MAX, alpha, Z_I, D_I), safety(L.N_UP, alpha, Z_I, D_I)          # 截面 I（最危险）
+B5, B55 = safety(L.N_MAX, alphaII), safety(L.N_UP, alphaII)                            # 截面 II
+assert A5["S"] < B5["S"]
 fx, fy = L.crank_force(th, L.N_MAX)
 F_abs = np.hypot(fx, fy)
 Tq = L.crank_torque(th, L.N_MAX) / 1000                            # N·m
@@ -104,11 +110,11 @@ fig.tight_layout()
 figure(fig, "fig33_11_1")
 
 fig, ax = plt.subplots(figsize=(6.4, 3.2))
-ax.plot(deg, A5["sig"], color=D.MOMENT, lw=1.5, label=T("弯曲正应力 σ（最危险点）", "bending σ (worst point)"))
+ax.plot(deg, A5["sig"], color=D.MOMENT, lw=1.5, label=T("弯曲正应力 σ（截面 I 最危险点）", "bending σ (worst point, section I)"))
 ax.plot(deg, A5["tau"], color=D.TORQUE, lw=1.5, label=T("扭转切应力 τ", "torsional τ"))
 ax.axhline(0, color=D.MUTED, lw=0.6)
 ax.set_xlabel(T("曲柄转角 θ / (°)", "crank angle θ / °"))
-ax.set_ylabel(T("名义应力 / MPa（台阶 Ø12→Ø16）", "nominal stress / MPa (step Ø12→Ø16)"))
+ax.set_ylabel(T("名义应力 / MPa（截面 I，Ø10→Ø12）", "nominal stress / MPa (section I, Ø10→Ø12)"))
 ax.set_xticks(range(0, 361, 90))
 ax.legend(fontsize=8, frameon=False)
 fig.tight_layout()
@@ -141,7 +147,9 @@ out(n_max=L.N_MAX, n_up=L.N_UP, r=L.R_CRANK, l=L.L_ROD, lam=L.LAMBDA, m_r=L.M_RE
     T_pp=float(Tq.max() - Tq.min()), T_max=float(abs(Tq).max()), P_sew=L.P_SEW, cyc_h=cyc_h, belt=L.BELT_N,
     alpha_s=alpha[0], alpha_t=alpha[1], q_s=A5["q_s"], q_t=A5["q_t"], k_s=A5["k_s"], k_t=A5["k_t"], eps=A5["eps"], beta=A5["beta"],
     K_s=A5["K_s"], K_t=A5["K_t"], sa5=A5["sa"], sm5=A5["sm"], ta5=A5["ta"], tm5=A5["tm"], S5=A5["S"], Ss5=A5["S_s"], St5=A5["S_t"],
-    sa55=A55["sa"], S55=A55["S"], phi5=math.degrees(A5["phi"]), sigma_1=mat["sigma_1"], tau_1=mat["tau_1"], sigma_b=mat["sigma_b"],
+    sa55=A55["sa"], S55=A55["S"], Ss55=A55["S_s"], St55=A55["S_t"],
+    alpha_sB=alphaII[0], alpha_tB=alphaII[1], saB5=B5["sa"], smB5=B5["sm"], SB5=B5["S"], SB55=B55["S"], StB5=B5["S_t"],
+    h_1e7=1e7 / cyc_h, bal_cancel=0.5 - L.BALANCE, hz2_5=2 * L.N_MAX / 60, hz2_55=2 * L.N_UP / 60, phi5=math.degrees(A5["phi"]), sigma_1=mat["sigma_1"], tau_1=mat["tau_1"], sigma_b=mat["sigma_b"],
     nc1=float(nc[0]), nc2=float(nc[1]), ratio=float(nc[0] / L.N_MAX), nc0=float(nc0[0]), hz0=float(nc0[0]) / 60, bal_pct=L.BALANCE * 100, k_up=(L.N_UP / L.N_MAX) ** 2, f_fe=f_fe, n_fe=f_fe * 60, err_fe=err_fe,
     f_full=mst_full["freqs"][0]["hz"], f_fe2=mst["freqs"][1]["hz"], f_fe3=mst["freqs"][2]["hz"], n_el_modal=mst["elements"], hz5=L.N_MAX / 60, hz55=L.N_UP / 60,
     length=L.LEN, fillet=L.FILLET, m_total=sum(m for _, _, m in L.MASSES))

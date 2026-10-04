@@ -135,9 +135,10 @@
 
           <div class="step"><b>4</b> 网格</div>
           <div class="seg">
-            <button v-for="m in MESH" :key="m.k" type="button" :class="{ on: meshK === m.k }" @click="meshK = m.k">{{ m.label }}</button>
+            <button v-for="m in MESH" :key="m.k" type="button" :class="{ on: meshK === m.k && !meshOverride }" @click="meshK = m.k; meshOverride = null">{{ m.label }}</button>
           </div>
-          <div class="small muted">单元尺寸约 {{ meshSize.toFixed(1) }} mm{{ meshOverride ? '（示例建议值）' : '' }}，载荷面附近自动加密。网格越细越准、越慢；教学版上限约 20 万个单元、5 分钟。</div>
+          <label class="small">或指定单元尺寸 <input type="number" min="0.5" step="0.5" class="num-in" :value="meshOverride || ''" placeholder="mm" @change="meshOverride = +$event.target.value > 0 ? +$event.target.value : null"> mm</label>
+          <div class="small muted">单元尺寸约 {{ meshSize.toFixed(1) }} mm{{ meshOverride ? '（指定值）' : '' }}，载荷面附近自动加密。网格越细越准、越慢；教学版上限约 20 万个单元、5 分钟。</div>
 
           <label class="small">这次计算的名称 <input v-model.trim="title" class="full" maxlength="80" placeholder="例如：SH-301 额定扭矩校核"></label>
           <button class="btn primary big-w" :disabled="!ready || submitting" @click="submit">{{ submitting ? '正在提交…' : '开始计算' }}</button>

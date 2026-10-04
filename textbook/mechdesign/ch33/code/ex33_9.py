@@ -56,7 +56,7 @@ import build123d as bd  # noqa: E402
 bd.export_step(solid, p)
 step_kb = os.path.getsize(p) / 1024
 
-# ---------------------------------------------------------------- 图 33.9.1：三维模型（三角化后用 matplotlib 画）
+# ---------------------------------------------------------------- 图 33.9.2：三维模型（三角化后用 matplotlib 画）
 plt = style()
 verts, tris = solid.tessellate(0.03, 0.2)
 V = np.array([[v.X, v.Y, v.Z] for v in verts])
@@ -81,16 +81,16 @@ ax.set_ylim(Q[:, 2].min() - 3, Q[:, 2].max() + 3)
 ax.set_aspect("equal")
 ax.axis("off")
 fig.tight_layout()
-figure(fig, "fig33_9_1")
+figure(fig, "fig33_9_2")
 
-# ---------------------------------------------------------------- 图 33.9.2：设计步骤 ↔ 本章 ↔ 数字工厂
+# ---------------------------------------------------------------- 图 33.9.1：设计步骤 ↔ 本章 ↔ 数字工厂
 steps = [
     (T("1 选标准件", "1 Standard parts"), "33.2", T("零件库：6207、平键、油封 → STEP / FreeCAD", "Parts library: 6207, keys, seal → STEP / FreeCAD"), "#e8eef7"),
     (T("2 建模出图", "2 Model & drawing"), "33.2", T("在线设计台（台阶圆角、键槽）或 build123d 脚本", "Web design desk (fillets, keyways) or a build123d script"), "#eef6e8"),
     (T("3 强度", "3 Strength"), "33.4–33.5", T("仿真与分析：轴承支承、扭矩、力 → 应力云图", "Simulation: bearing supports, torque, forces → stress"), "#fbefe0"),
     (T("4 刚度与固有频率", "4 Stiffness & modes"), "33.6–33.7", T("仿真与分析：位移；固有频率（轴承“只限中间一圈”）", "Simulation: displacement; natural frequencies (ring bearings)"), "#fbefe0"),
     (T("5 疲劳寿命", "5 Fatigue life"), "33.8", T("仿真与分析：载荷谱（试验台记录 / 关节力矩 / CSV）→ 寿命 → Word 报告", "Simulation: load spectrum (rig / joint torque / CSV) → life → report"), "#fbefe0"),
-    (T("6 评审与发布", "6 Review & release"), T("任务单", "task sheet"), T("我的任务 → AI 预审 → 老师批注 → 设计发布与审批 → ERPNext 新版本", "My tasks → AI pre-review → instructor → release → ERPNext revision"), "#f3e8f7"),
+    (T("6 评审与发布", "6 Review & release"), T("任务单", "task sheet"), T("我的任务 → AI 预检 → 老师批注 → 设计发布与审批 → ERPNext 新版本", "My tasks → AI pre-review → instructor → release → ERPNext revision"), "#f3e8f7"),
     (T("7 制造与检验", "7 Make & inspect"), T("任务单", "task sheet"), T("工单 → 数控编程 → 车间加工 → 三坐标检验 → 质量记录", "Work order → CNC → shop floor → CMM → quality record"), "#e8f4f4"),
 ]
 fig, ax = plt.subplots(figsize=(6.8, 4.4))
@@ -114,7 +114,7 @@ ax.set_xlim(-0.7, 8.5)
 ax.set_ylim(-len(steps) * (h + gap) - 0.05, 0.35)
 ax.axis("off")
 fig.tight_layout()
-figure(fig, "fig33_9_2")
+figure(fig, "fig33_9_1")
 
 out(vol_cm3=vol / 1000, mass=mass, n_faces=n_faces, dvol=(vol0 - vol) / 1000, step_kb=step_kb, length=S.LEN_B,
     key_gear=f"{mdstd.key_for(40)['b']}×{mdstd.key_for(40)['h']}×{L_kg}", key_cpl=f"{mdstd.key_for(30)['b']}×{mdstd.key_for(30)['h']}×{L_kc}",
