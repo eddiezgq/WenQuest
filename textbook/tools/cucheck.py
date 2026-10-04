@@ -59,6 +59,19 @@ def cuda_root() -> Path | None:
     return _ROOT
 
 
+def gcc_dir() -> list[str]:
+    """clang 18 与 GCC 14 的 C++ 头文件一起编译 CUDA 设备代码时会报 “__float128 is not supported”（GCC 14 的 <limits>
+    在设备端也声明 __float128）。机器上装了多个 GCC 时，选 13 及以下中最新的一个。"""
+    base = Path("/usr/lib/gcc/x86_64-linux-gnu")
+    if not base.is_dir():
+        return []
+    vers = sorted((int(p.name), p) for p in base.iterdir() if p.name.isdigit())
+    if not vers or vers[-1][0] <= 13:
+        return []
+    old = [p for v, p in vers if v <= 13 and (p / "crtbegin.o").exists()]
+    return [f"--gcc-install-dir={old[-1]}"] if old else []
+
+
 def available() -> bool:
     return shutil.which("clang++") is not None and cuda_root() is not None
 
@@ -69,13 +82,16 @@ def check(path: Path, archs: tuple[str, ...] = ARCHS) -> list[str]:
     if root is None or not shutil.which("clang++"):
         return ["无法检查：缺少 clang++ 或 CUDA 头文件"]
     env = dict(os.environ, PATH=f"{root / 'bin'}{os.pathsep}{os.environ.get('PATH', '')}")
-    base = ["clang++", "-std=c++17", "-O1", "-Wno-unknown-cuda-version", f"--cuda-path={root}", "-I", str(path.parent)]
+    base = ["clang++", "-std=c++17", "-O1", "-Wno-unknown-cuda-version", f"--cuda-path={root}", "-I", str(path.parent), *gcc_dir()]
     out = []
     runs = [[f"--cuda-gpu-arch={a}", "--cuda-device-only"] for a in archs] + [["--cuda-host-only"]]
     for extra in runs:
         with tempfile.TemporaryDirectory() as tmp:
             r = subprocess.run([*base, *extra, "-c", str(path), "-o", str(Path(tmp) / "x.o")], capture_output=True, text=True, env=env,
                                timeout=180)
+            if r.returncode != 0 and "__float128" in r.stderr:      # 没有旧版 GCC 可选时：不让 <limits> 声明 __float128 再试一次
+                r = subprocess.run([*base, "-U__SIZEOF_FLOAT128__", "-U__FLOAT128__", *extra, "-c", str(path), "-o", str(Path(tmp) / "x.o")],
+                                   capture_output=True, text=True, env=env, timeout=180)
         if r.returncode != 0:
             msg = [ln for ln in r.stderr.splitlines() if "error" in ln][:3] or r.stderr.splitlines()[-3:]
             where = "主机端" if "--cuda-host-only" in extra else extra[0].split("=")[1]
