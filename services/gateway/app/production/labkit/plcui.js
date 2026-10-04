@@ -454,13 +454,14 @@ function setup(L, K) {
   function scanOnce() {
     const rt = S.rt;
     const fromPlant = plant.inputs ? plant.inputs(S.ps) : {};
+    const ins = {};
     io.forEach((x) => {
       if (x.dir !== "in") return;
       const v = x.name in S.panel ? S.panel[x.name] : x.name in fromPlant ? fromPlant[x.name] : undefined;
-      if (v !== undefined) rt.phys[x.addr] = v;
+      if (v !== undefined) { rt.phys[x.addr] = v; ins[x.name] = v; }
     });
     const ok = rt.scan();
-    if (plant.step) plant.step(rt.cycle, rt.outputs(), S.ps);
+    if (plant.step) plant.step(rt.cycle, rt.outputs(), S.ps, ins);
     if (!ok) { api.running = false; say(T("PLC 停机（STOP）：", "PLC stopped: ") + errText(rt.error), "bad"); }
     return ok;
   }
@@ -497,7 +498,22 @@ function setup(L, K) {
   let lastLive = 0;
   function paintLadderLive() { const t = performance.now(); if (t - lastLive > 150) { lastLive = t; paintLadder(); } }
   const userDraw = def.draw;
-  def.draw = (a) => userDraw(a, S.ps);
+  if (plant.build3d) {
+    // the machine in 3D: the kit treats the lab as a 3D lab (it resizes and renders L.st every frame)
+    if (!window.WQ3D) throw new Error("this page has no 3D engine (a PLC lab on WQPLANTS needs it)");
+    const E3 = window.WQ3D;
+    const st = E3.stage(L.dom.canvas, { width: 800, height: 500, theme: "light" });
+    L.st = st;
+    S.view3d = plant.build3d(st, E3.THREE);
+    try {
+      L.orbit = new E3.OrbitControls(st.camera, L.dom.canvas);
+      L.orbit.enableDamping = true;
+      if (st.target) { L.orbit.target.set(...st.target); L.orbit.update(); }
+    } catch (e) { /* view rotation is optional */ }
+    api.st = st;
+    def.draw = (a) => { plant.draw3d(S.view3d, S.ps, api.plc.io); if (userDraw) userDraw(a, S.ps); };
+    L.ready = true;
+  } else def.draw = (a) => userDraw(a, S.ps);
 
   // language switch repaint
   K.onLang(() => { paintTests(); paintStatus(); paintIo(true); if (S.lang === "LD") paintLadder(); });

@@ -1246,12 +1246,13 @@ function runTest(rtOpts, plant, test, opts = {}) {
     const end = rt.now + ms;
     while (rt.now < end - 1e-9) {
       const fromPlant = plant && plant.inputs ? plant.inputs(ps) : {};
+      const ins = {};
       for (const io of rt.io) if (io.dir === "in") {
         const v = io.name in manual ? manual[io.name] : io.name in fromPlant ? fromPlant[io.name] : undefined;
-        if (v !== undefined) rt.phys[io.addr] = v;
+        if (v !== undefined) { rt.phys[io.addr] = v; ins[io.name] = v; }
       }
       if (!rt.scan()) return false;
-      if (plant && plant.step) plant.step(dt, rt.outputs(), ps);
+      if (plant && plant.step) plant.step(dt, rt.outputs(), ps, ins);
       if (check && check()) return true;
     }
     return null;

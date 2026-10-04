@@ -766,7 +766,8 @@ function build(id, def) {
   sec.append(stageBox, side);
   $("labs").appendChild(sec);
 
-  const is3d = def.view === "3d";
+  const plc3d = def.view === "plc" && def.plant && typeof def.plant.build3d === "function";   // PLC lab on a 3D machine (WQPLANTS)
+  const is3d = def.view === "3d" || plc3d;
   const ctx = is3d ? null : canvas.getContext("2d");
   const L = { id, def, broken: false, state: {}, sceneDef: def.scenes[0], is3d, ready: !is3d && !circuit, circuit,
     dom: { tab, tabDone: tab.querySelector(".done"), sec, canvas, chips, params, read, tasks, err, problem } };
@@ -785,7 +786,7 @@ function build(id, def) {
     calc: CALC, graph: (o) => graph(ctx, o), qm: QM, gpu: GPU,
   };
   L.api = api;
-  if (is3d) setup3d(L);
+  if (is3d && !plc3d) setup3d(L);
   if (circuit) setupCircuit(L);
   if (def.view === "plc") {
     if (!window.WQPLCUI) throw new Error("this page has no PLC engine (view: 'plc')");
@@ -925,7 +926,7 @@ function check(def) {   // clear messages for the lab author (the checker report
     `param ${p.id}: needs id, name [zh, en], min < max, value`));
   need(Array.isArray(def.tasks) && def.tasks.length >= 2 && def.tasks.length <= 6, "tasks: 2-6 tasks");
   def.tasks.forEach((t) => need(t.id && Array.isArray(t.text), "every task needs id and text [zh, en]"));
-  need(typeof def.draw === "function", "draw(api, state) is required");
+  need(typeof def.draw === "function" || (def.view === "plc" && def.plant && def.plant.build3d), "draw(api, state) is required");
 }
 
 window.WQ = {
@@ -942,7 +943,7 @@ window.WQ = {
     const labs = {};
     ORDER.forEach((id) => {
       const L = LABS[id];
-      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.is3d ? "3d" : L.circuit ? "circuit" : L.def.view === "plc" ? "plc" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
+      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.def.view === "plc" ? "plc" : L.is3d ? "3d" : L.circuit ? "circuit" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
         tasks: Object.fromEntries(L.def.tasks.map((t) => [t.id, !!t.ok])), demos: Object.fromEntries(L.def.tasks.map((t) => [t.id, t.demo || null])) };
     });
     return { errors: errors.slice(), active, labs };
