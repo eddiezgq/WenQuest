@@ -239,6 +239,10 @@ def _worker():
                 ok, res = _isolated(_mbd_child, (_resolved(j["model"]), j["setup"], _job_path(jid)), TIME_LIMIT_S + 60)
             elif j.get("kind") == "opt":
                 ok, res = _isolated(_opt_child, (j["spec"], _job_path(jid)), OPT_LIMIT_S + 120)
+            elif j.get("kind") == "cfd":
+                ok, res = _isolated(_cfd_child, (_p("geo", j["step_sha"], "part.step"), j["setup"], _job_path(jid)), CFD_LIMIT_S)
+            elif j.get("kind") == "cfd_bench":
+                ok, res = _isolated(_cfd_bench_child, (_job_path(jid),), CFD_LIMIT_S)
             elif j.get("kind") == "topo":
                 ok, res = _isolated(_topo_child, (j["spec"], _job_path(jid)), TOPO_LIMIT_S)
             else:
@@ -1035,3 +1039,88 @@ def topo_to_fea(jid: str, body: dict = Body(default={})):
     return {"geometry": geo, "rows": rows, "material_id": spec["material_id"], "info": info, "mesh_mm": round(max(2.0, info["cell_mm"]), 2),
             "title": "拓扑优化结果校核：{}（体积比 {:g}，{:g} N）".format(T.PRESETS[spec["preset"]]["label"].split("（")[0], spec["volfrac"], spec["force_n"]),
             "note": "按密度 0.5 取轮廓、拉伸成 {:g} mm 厚的板；{}".format(spec["thickness_mm"], note), "source": {"topo": jid}}
+
+
+# ---------- 流体分析（第 16 轮）：OpenFOAM，排队、独立进程、限时 ----------
+CFD_LIMIT_S = 1200
+
+
+def _cfd_child(step_path, setup, outdir, q):
+    try:
+        import shutil
+        from cae import cfd as CF
+        work = os.path.join(outdir, "case")
+        shutil.rmtree(work, ignore_errors=True)
+        os.makedirs(work)
+
+        def progress(stage):
+            _write_json(os.path.join(outdir, "progress.json"), {"stage": stage, "t": time.time()})
+        st, surf, aux = CF.solve(open(step_path, "rb").read(), setup, work, progress)
+        _write_json(os.path.join(outdir, "surface.json"), {k: np.asarray(v).round(5).tolist() for k, v in surf.items()})
+        _write_json(os.path.join(outdir, "aux.json"), aux)
+        shutil.rmtree(work, ignore_errors=True)                     # 算完删掉 OpenFOAM 算例（几十 MB），只留结果
+        q.put((True, st))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+def _cfd_bench_child(outdir, q):
+    try:
+        import shutil
+        from cae import cfd_bench as B
+        work = os.path.join(outdir, "bench")
+        res = B.all_cases(work)
+        shutil.rmtree(work, ignore_errors=True)
+        _write_json(os.path.join(outdir, "aux.json"), {"bench": res})
+        q.put((True, {"bench": res}))
+    except Exception as e:  # noqa: BLE001
+        q.put((False, str(e) or e.__class__.__name__))
+
+
+@app.post("/cfd/jobs")
+def cfd_submit(body: dict = Body(...)):
+    """流体分析任务：{step_sha, setup:{flow:{velocity_ms, direction, air_t_c}, heat:{wall_t_c}|null, turbulence, domain:{ground}, mesh:{cells_target, level}}}"""
+    from cae import cfd as CF
+    kind = body.get("kind") or "cfd"
+    if kind == "cfd_bench":
+        j = {"kind": "cfd_bench", "setup": {}, "title": "流体分析标准题核对"}
+    else:
+        sha = str(body.get("step_sha") or "")
+        if not os.path.exists(_p("geo", sha, "part.step")):
+            raise HTTPException(404, "先读入零件")
+        setup = body.get("setup") or {}
+        fl = setup.get("flow") or {}
+        try:
+            v = float(fl.get("velocity_ms", 5))
+        except (TypeError, ValueError):
+            raise HTTPException(400, "风速不对") from None
+        if not 0.01 <= v <= 60:
+            raise HTTPException(400, "风速要在 0.01–60 m/s 之间")
+        if fl.get("direction", "+x") not in CF.DIRS:
+            raise HTTPException(400, "来流方向只能是 ±x、±y、±z")
+        tgt = int((setup.get("mesh") or {}).get("cells_target", 120000))
+        if not 10000 <= tgt <= CF.MAX_CELLS:
+            raise HTTPException(400, "网格目标单元数要在 1 万–{} 之间".format(CF.MAX_CELLS))
+        if setup.get("heat") and abs(float(setup["heat"].get("wall_t_c", 70)) - float(fl.get("air_t_c", 25))) < 1:
+            raise HTTPException(400, "表面温度和空气温度至少差 1 ℃")
+        j = {"kind": "cfd", "step_sha": sha, "setup": setup, "title": body.get("title") or "流体分析"}
+    jid = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:6]
+    os.makedirs(_job_path(jid))
+    j.update(id=jid, status="queued", created=time.time(), owner=body.get("owner"), owner_name=body.get("owner_name"),
+             factory=body.get("factory"), item=body.get("item"))
+    _write_json(_job_path(jid, "job.json"), j)
+    _Q.put(jid)
+    return _public(j)
+
+
+@app.get("/cfd/jobs/{jid}/result")
+def cfd_result(jid: str):
+    d = _job_path(jid.replace("/", ""))
+    out = {}
+    for name in ("aux", "surface", "progress"):
+        p = os.path.join(d, name + ".json")
+        if os.path.exists(p):
+            out[name] = _read_json(p)
+    if not out:
+        raise HTTPException(404, "还没有结果")
+    return out
