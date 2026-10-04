@@ -1,0 +1,24 @@
+# 实验 5.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab5_8.js。
+原理:
+  - ["线程块负责 C 的 b×b 块，沿 K 每步把 A 的 b×b_k 块与 B 的 b_k×b 块读进共享内存；每个数被块内 b 个线程使用，显存读量降为不分块时的 1/b，计算强度约为 b/4 FLOP/B（5.8 节）。", "A block computes a b×b tile of C, loading a b×b_k tile of A and a b_k×b tile of B per step; each value serves b threads, so traffic falls to 1/b and the intensity is about b/4 FLOP/B (Section 5.8)."]
+  - ["每个线程算 t×t 个输出时，每次乘加读共享内存 2/t 个数（式 (5.9.1)）；一个 SM 每周期 128 次乘加、共享内存每周期 32 个字，预算是每次乘加 0.25 个字（5.9 节）。", "With t×t outputs per thread, each FMA reads 2/t shared values (Eq. (5.9.1)); an SM does 128 FMAs a cycle against 32 shared words, a budget of 0.25 words per FMA (Section 5.9)."]
+  - 式: "计算强度 = 2n³ / ((2n³/b + n²) × 4 字节)"
+步骤:
+  - ["“共享内存分块”场景：块取 2^0、2^3、2^4、2^5、2^6，记录显存读取量与计算强度，填入表 1（任务 1、2）。", "Shared-memory tiles: tiles 2^0, 2^3 … 2^6; record traffic and intensity in Table 1 (tasks 1, 2)."]
+  - ["n 取 2^8，按“开始”看一个线程块逐步装入 A、B 的块（任务 3）。", "With n = 2^8 press Start and watch one block load its tiles (task 3)."]
+  - ["“寄存器分块”场景：块 128、步长 8，t 取 1、2、4、8，记录每次乘加读共享内存的次数与线程数，填入表 2（任务 4）。", "Register tiles: tile 128, step 8, t = 1, 2, 4, 8; record shared reads per FMA and threads in Table 2 (task 4)."]
+  - ["加大块直到越过屋脊；再试双缓冲（任务 5、6）。", "Grow the tile past the ridge, then try double buffering (tasks 5, 6)."]
+数据表:
+  - 标题: ["表 1  块的大小（n = 4096，t = 1）", "Table 1  Tile size (n = 4096, t = 1)"]
+    表头: ["块 b", "显存读取量（GB）", "计算强度（FLOP/B）", "是否越过屋脊"]
+    表头英文: ["Tile b", "Traffic (GB)", "Intensity (FLOP/B)", "Past the ridge?"]
+    行: [["1", "", "", ""], ["8", "", "", ""], ["16", "", "", ""], ["32", "", "", ""], ["64", "", "", ""]]
+  - 标题: ["表 2  寄存器分块（块 128，步长 8）", "Table 2  Register tiles (tile 128, step 8)"]
+    表头: ["t×t", "每次乘加读共享内存", "线程数", "在预算内吗"]
+    表头英文: ["t×t", "Shared reads per FMA", "Threads", "Within budget?"]
+    行: [["1×1", "", "", ""], ["2×2", "", "", ""], ["4×4", "", "", ""], ["8×8", "", "", ""]]
+注意:
+  - ["这是教学模型：显存读量按“每次装入共享内存都从显存读”计，不计 L1、L2 缓存；真实 GPU 上同时运行的线程块共用 L2，实际流量更小。", "A teaching model: every shared-memory load is counted as a memory read, ignoring L1/L2; on a real GPU concurrent blocks share the L2 and move less."]
+  - ["线程数超过 1024、共享内存超过 99 KB（A10）时程序无法运行，读数中会标出“超过上限”。", "More than 1024 threads or 99 KB of shared memory (A10) cannot run; the readouts flag it."]
+思考题:
+  - ["为什么计算强度与沿 K 的步长无关？步长影响什么？", "Why does the intensity not depend on the K step? What does the step affect?"]

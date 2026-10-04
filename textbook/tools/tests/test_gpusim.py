@@ -25,6 +25,10 @@ DIV = [dict(cond=c, warps=w, pre=a, then=b, other=o, post=d, p=p, seed=sd)
 
 ADDR = [({"kind": "contiguous"}, 4), ({"kind": "stride", "k": 2}, 4), ({"kind": "offset", "offset": 4}, 4), ({"kind": "aos", "struct": 12}, 4),
         ({"kind": "random", "k": 8, "seed": 5}, 4), ({"kind": "contiguous", "size": 16}, 16), ({"kind": "stride", "k": 3, "size": 8}, 8)]
+GEMM = [dict(M=64, N=64, K=64, bm=1, bn=1, bk=64), dict(M=64, N=64, K=64, bm=16, bn=16, bk=16, block=[2, 3]),
+        dict(M=128, N=64, K=96, bm=32, bn=16, bk=8, tm=4, tn=2, stages=2, block=[3, 1]),
+        dict(M=4096, N=4096, K=4096, bm=128, bn=128, bk=8, tm=8, tn=8, stages=2, size=4),
+        dict(M=256, N=256, K=256, bm=64, bn=64, bk=16, tm=4, tn=4, size=2, block=[1, 2])]
 BANK = [{"kind": "stride", "k": 1}, {"kind": "stride", "k": 2}, {"kind": "stride", "k": 32}, {"kind": "column", "pad": 0, "col": 3},
         {"kind": "column", "pad": 1, "col": 3}, {"kind": "same", "col": 7}, {"kind": "random", "seed": 9}]
 
@@ -37,9 +41,10 @@ def test_js_and_python_agree():
     script = gpu + f"""
 const S = {json.dumps(SCHED)}, D = {json.dumps(DIV)};
 const r = GPU.rng(42), xs = Array.from({{ length: 5 }}, () => r());
-const A = {json.dumps(ADDR)}, B = {json.dumps(BANK)};
+const A = {json.dumps(ADDR)}, B = {json.dumps(BANK)}, G = {json.dumps(GEMM)};
 console.log(JSON.stringify({{ s: S.map((o) => GPU.schedule(o)), d: D.map((o) => GPU.diverge(o)), xs,
-  a: A.map(([o, sz]) => GPU.coalesce(GPU.addresses(o), sz)), b: B.map((o) => GPU.banks(GPU.bankWords(o))) }}));
+  a: A.map(([o, sz]) => GPU.coalesce(GPU.addresses(o), sz)), b: B.map((o) => GPU.banks(GPU.bankWords(o))),
+  g: G.map((o) => GPU.gemmTiles(o)) }}));
 """
     js = json.loads(subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout)
     r = sim.rng(42)
@@ -54,6 +59,9 @@ console.log(JSON.stringify({{ s: S.map((o) => GPU.schedule(o)), d: D.map((o) => 
         assert got == sim.coalesce(sim.addresses(**o), sz), o
     for o, got in zip(BANK, js["b"]):
         assert got == sim.banks(sim.bank_words(**o)), o
+    for o, got in zip(GEMM, js["g"]):
+        want = sim.gemm_tiles(**{**o, "block": tuple(o.get("block", (0, 0)))})
+        assert got == want, o
 
 
 def test_hand_computed_cases():
@@ -81,3 +89,19 @@ def test_memory_access_hand_cases():
     assert b(k=1) == 1 and b(k=2) == 2 and b(k=32) == 32 and b(k=3) == 1   # odd strides are free
     assert b(kind="column") == 32 and b(kind="column", pad=1) == 1         # a column of a 32×32 tile; padding fixes it
     assert b(kind="same") == 1                                            # broadcast
+
+
+def test_gemm_tiles_hand_cases():
+    g = sim.gemm_tiles
+    n = 64
+    r = g(M=n, N=n, K=n, bm=1, bn=1, bk=n)                                   # 不分块：每个输出读 A 的一行、B 的一列
+    assert r["g_read"] == 2 * n ** 3 and r["fma"] == n ** 3 and r["g_per_fma"] == 2
+    for b in (2, 4, 8, 16, 32):                                               # b×b 分块：显存读量降为 1/b
+        assert g(M=n, N=n, K=n, bm=b, bn=b, bk=b)["g_read"] == 2 * n ** 3 // b
+    for t in (1, 2, 4, 8):                                                    # t×t 寄存器分块：每次乘加读 2/t 次共享内存
+        assert g(M=n, N=n, K=n, bm=32, bn=32, bk=8, tm=t, tn=t)["smem_per_fma"] == 2 / t
+    r = g(M=4096, N=4096, K=4096, bm=128, bn=128, bk=8, tm=8, tn=8, stages=2)
+    assert r["threads"] == 256 and r["smem_bytes"] == 2 * (128 * 8 * 2) * 4 and r["acc_regs"] == 64
+    assert abs(r["intensity"] - 2 * 4096 ** 3 / ((2 * 4096 ** 3 / 128 + 4096 ** 2) * 4)) < 1e-12
+    st = g(M=64, N=64, K=64, bm=16, bn=16, bk=16, block=(2, 3))["steps"]
+    assert len(st) == 4 and st[1] == {"k0": 16, "a": [32, 48, 16, 32], "b": [16, 32, 48, 64]}

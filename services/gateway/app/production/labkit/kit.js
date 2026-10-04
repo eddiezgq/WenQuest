@@ -625,6 +625,27 @@ const GPU = {
     const load = per.map((s) => s.size);
     return { ways: Math.max(...load), load };
   },
+  // 部分 ⑤：分块矩阵乘法的数据流与读写计数（与 gpusim.gemm_tiles 逐行对应）
+  gemmTiles({ M = 64, N = 64, K = 64, bm = 16, bn = 16, bk = 16, tm = 1, tn = 1, stages = 1, size = 4, block = [0, 0] } = {}) {
+    if (Math.min(M, N, K, bm, bn, bk, tm, tn, stages, size) < 1) throw new Error("gemmTiles: sizes must be >= 1");
+    if (M % bm || N % bn || K % bk || bm % tm || bn % tn) throw new Error("gemmTiles: sizes must divide");
+    const [bi, bj] = block;
+    if (bi < 0 || bi >= M / bm || bj < 0 || bj >= N / bn) throw new Error("gemmTiles: block out of range");
+    const threads = (bm / tm) * (bn / tn);
+    let g = 0, s = 0, f = 0;
+    const steps = [];
+    for (let k0 = 0; k0 < K; k0 += bk) {
+      g += bm * bk + bk * bn;
+      s += bk * threads * (tm + tn);
+      f += bk * threads * tm * tn;
+      steps.push({ k0, a: [bi * bm, bi * bm + bm, k0, k0 + bk], b: [k0, k0 + bk, bj * bn, bj * bn + bn] });
+    }
+    const nb = (M / bm) * (N / bn);
+    const gRead = g * nb, sRead = s * nb, fma = f * nb, gWrite = M * N;
+    const flop = 2 * fma, moved = (gRead + gWrite) * size;
+    return { blocks: nb, threads, g_read: gRead, g_write: gWrite, s_read: sRead, fma, flop, bytes: moved, intensity: flop / moved,
+             smem_per_fma: sRead / fma, g_per_fma: gRead / fma, smem_bytes: stages * (bm * bk + bk * bn) * size, acc_regs: tm * tn, steps };
+  },
 };
 
 // ---------- tasks & progress ----------

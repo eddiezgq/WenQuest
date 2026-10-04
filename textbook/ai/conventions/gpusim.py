@@ -1,4 +1,4 @@
-"""GPU 执行模拟器的 Python 参考版（第 14 轮细则 2.5 节：① 线程束执行、② 线程束分化、③ 合并访问、④ 存储体冲突）。
+"""GPU 执行模拟器的 Python 参考版（第 14 轮细则 2.5 节：① 线程束执行、② 线程束分化、③ 合并访问、④ 存储体冲突、⑤ 分块矩阵乘法）。
 全书共用（conventions/ 在程序的搜索路径上）。
 
 平台实验工具包里的 `gpu` 模块（services/gateway/app/production/labkit/kit.js，`const GPU = {`）与本文件逐行对应；
@@ -221,3 +221,36 @@ def banks(words, nbanks=32):
         per[w % nbanks].add(w)
     load = [len(s) for s in per]
     return {"ways": max(load), "load": load}
+
+
+def gemm_tiles(M=64, N=64, K=64, bm=16, bn=16, bk=16, tm=1, tn=1, stages=1, size=4, block=(0, 0)):
+    """部分 ⑤：分块矩阵乘法 C = AB（A 为 M×K，B 为 K×N，行主序）的数据流与读写计数。
+
+    每个线程块负责 C 的一个 bm×bn 块，沿 K 方向每一步把 A 的 bm×bk 块与 B 的 bk×bn 块从显存读进共享内存；
+    每个线程负责 C 的 tm×tn 个元素（寄存器分块），这一步中对每个 kk 从共享内存读 A 的 tm 个数、B 的 tn 个数到寄存器，
+    做 tm·tn 次乘加；最后把 C 的块写回显存。bm = bn = 1 相当于不分块的朴素版：每个输出元素读 A 的一行、B 的一列。
+    stages = 2 表示双缓冲（共享内存放两份，读下一步的数据与计算这一步重叠），只影响共享内存用量，不影响读写次数。
+    要求各维整除（M % bm == 0 等）。所有线程块的工作相同，所以逐步模拟一个线程块，再乘以线程块数。
+    不模拟缓存：显存读量按“每次装入共享内存都从显存读”计。
+    返回显存读写的元素数、共享内存读的元素数、乘加次数、计算强度（FLOP/B，size 为每个元素的字节数）、
+    每次乘加读几次共享内存、每个线程块的线程数与共享内存字节数、每个线程的累加寄存器数，
+    以及线程块 block = (行块号, 列块号) 每一步装入的 A、B 块（[行起, 行止, 列起, 列止]，左闭右开）。"""
+    assert min(M, N, K, bm, bn, bk, tm, tn, stages, size) >= 1
+    assert M % bm == 0 and N % bn == 0 and K % bk == 0 and bm % tm == 0 and bn % tn == 0, "各维须整除"
+    bi, bj = block
+    assert 0 <= bi < M // bm and 0 <= bj < N // bn
+    threads = (bm // tm) * (bn // tn)
+    g = s = f = 0
+    steps = []
+    for k0 in range(0, K, bk):
+        g += bm * bk + bk * bn                      # 装入共享内存
+        s += bk * threads * (tm + tn)               # 每个 kk：每个线程读 tm + tn 个数
+        f += bk * threads * tm * tn                 # 每个 kk：每个线程 tm·tn 次乘加
+        steps.append({"k0": k0, "a": [bi * bm, bi * bm + bm, k0, k0 + bk], "b": [k0, k0 + bk, bj * bn, bj * bn + bn]})
+    nb = (M // bm) * (N // bn)
+    g_read, s_read, fma, g_write = g * nb, s * nb, f * nb, M * N
+    flop = 2 * fma
+    moved = (g_read + g_write) * size
+    return {"blocks": nb, "threads": threads, "g_read": g_read, "g_write": g_write, "s_read": s_read, "fma": fma, "flop": flop,
+            "bytes": moved, "intensity": flop / moved, "smem_per_fma": s_read / fma, "g_per_fma": g_read / fma,
+            "smem_bytes": stages * (bm * bk + bk * bn) * size, "acc_regs": tm * tn, "steps": steps}

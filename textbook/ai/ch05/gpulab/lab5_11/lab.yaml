@@ -1,0 +1,49 @@
+标题: ["GPU 实验 5.11 矩阵乘法：从朴素版到张量核心", "GPU Lab 5.11 Matrix multiplication: from naive to tensor cores"]
+目的: ["在真正的 GPU 上测出 4096×4096 矩阵乘法每个版本的速度——朴素、共享内存分块、寄存器分块、向量化、双缓冲、张量核心——与 cuBLAS 比较，画到屋顶线上；改变矩阵大小，观察波次量化。",
+       "Measure every version of a 4096×4096 matrix multiplication — naive, shared-memory tiles, register tiles, vectorised, double-buffered, tensor cores — against cuBLAS, plot them on the roofline, and see wave quantisation by changing the size."]
+显卡: basic
+结果:
+  - {名: naive_GFs, 说明: ["朴素版（x 对应列）", "naive (x → column)"], 单位: GFLOP/s}
+  - {名: tiled_GFs, 说明: ["共享内存分块 32×32", "shared-memory tiles 32×32"], 单位: GFLOP/s}
+  - {名: regtile_GFs, 说明: ["寄存器分块 8×8", "register tiles 8×8"], 单位: GFLOP/s}
+  - {名: vec_GFs, 说明: ["加 float4", "with float4"], 单位: GFLOP/s}
+  - {名: dbuf_GFs, 说明: ["加双缓冲", "with double buffering"], 单位: GFLOP/s}
+  - {名: cublas_GFs, 说明: ["cuBLAS 单精度", "cuBLAS FP32"], 单位: GFLOP/s}
+  - {名: wmma_GFs, 说明: ["WMMA 半精度", "WMMA FP16"], 单位: GFLOP/s}
+  - {名: cublas_h_GFs, 说明: ["cuBLAS 半精度", "cuBLAS FP16"], 单位: GFLOP/s}
+  - {名: h1024_GFs, 说明: ["cuBLAS 半精度，n = 1024", "cuBLAS FP16, n = 1024"], 单位: GFLOP/s}
+  - {名: h2048_GFs, 说明: ["cuBLAS 半精度，n = 2048", "cuBLAS FP16, n = 2048"], 单位: GFLOP/s}
+  - {名: d1024_GFs, 说明: ["双缓冲版，n = 1024", "double-buffered, n = 1024"], 单位: GFLOP/s}
+  - {名: d2048_GFs, 说明: ["双缓冲版，n = 2048", "double-buffered, n = 2048"], 单位: GFLOP/s}
+文件: [gemm.cu, check.cuh, bench.cuh]
+实际问题:
+  标题: ["小型 Transformer 的线性层", "The linear layers of the small Transformer"]
+  内容: ["第 2 章的小型 Transformer 一次前向计算的运算量几乎全在矩阵乘法上。同样的矩阵乘法，朴素写法和 cuBLAS 能差上百倍。差在哪里？",
+         "Almost all the work in a forward pass of the small Transformer of Chapter 2 is matrix multiplication. The same product can be a hundred times faster in cuBLAS than in a naive kernel. Where does the difference come from?"]
+原理:
+  - ["朴素版每次乘加从显存读两个数，计算强度约 0.25 FLOP/B（5.7 节）。", "The naive kernel reads two values per FMA: about 0.25 FLOP/B (Section 5.7)."]
+  - ["T×T 共享内存分块把显存读量降为 1/T；每个线程 t×t 的寄存器分块把共享内存读量降为每次乘加 2/t 个字（式 (5.9.1)）。", "T×T shared tiles cut memory reads by T; t×t register tiles cut shared reads to 2/t words per FMA (Eq. (5.9.1))."]
+  - ["一次 wmma::mma_sync 调用由整个线程束完成 16×16×16 的乘加；A10 的半精度张量核心峰值是单精度的 4 倍（5.10 节）。", "One wmma::mma_sync call has the whole warp do a 16×16×16 multiply-add; the A10 FP16 tensor peak is four times FP32 (Section 5.10)."]
+  - 式: "速度 = 2n³ / 耗时（FLOP/s）"
+步骤:
+  - ["运行第一格检查环境。", "Run the first cell."]
+  - ["编译运行 gemm.cu（n = 4096），记录各版本的 GFLOP/s，确认 correct 为 true（任务 1）。", "Compile and run gemm.cu (n = 4096); record each version and check correct is true (task 1)."]
+  - ["运行画图格，把各版本画到这块 GPU 的屋顶线上（任务 2）。", "Run the plotting cell to put each version on this GPU's roofline (task 2)."]
+  - ["用 n = 1024、2048 再运行，把双缓冲版（线程块 128×128，与算例 5.11.2 的假设相同）的速度与算例 5.11.2 的波次利用率对照；cuBLAS 的分块不同，只作参考（任务 3）。", "Run with n = 1024 and 2048; compare the double-buffered version (128×128 blocks, as assumed in Example 5.11.2) with the wave utilisation there; cuBLAS tiles differently and is for reference (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  4096×4096 矩阵乘法", "Table 1  4096×4096 matrix multiplication"]
+    表头: ["版本", "GFLOP/s", "占相应峰值", "比上一版提高"]
+    表头英文: ["Version", "GFLOP/s", "Fraction of peak", "Gain over previous"]
+    行: [["朴素", "{{naive_GFs}}", "", "—"], ["共享内存分块", "{{tiled_GFs}}", "", ""], ["寄存器分块", "{{regtile_GFs}}", "", ""], ["加 float4", "{{vec_GFs}}", "", ""], ["加双缓冲", "{{dbuf_GFs}}", "", ""], ["cuBLAS 单精度", "{{cublas_GFs}}", "", ""], ["WMMA 半精度", "{{wmma_GFs}}", "", ""], ["cuBLAS 半精度", "{{cublas_h_GFs}}", "", ""]]
+  - 标题: ["表 2  矩阵大小", "Table 2  Matrix size"]
+    表头: ["n", "1024", "2048", "4096"]
+    表头英文: ["n", "1024", "2048", "4096"]
+    行: [["双缓冲版（GFLOP/s）", "{{d1024_GFs}}", "{{d2048_GFs}}", "{{dbuf_GFs}}"], ["cuBLAS 半精度（GFLOP/s）", "{{h1024_GFs}}", "{{h2048_GFs}}", "{{cublas_h_GFs}}"]]
+注意:
+  - ["机器按秒计费：做完点“关机”。朴素版较慢，整个程序约需一分钟。", "Billed by the second: press Stop when done. The naive kernels are slow; the whole run takes about a minute."]
+  - ["测试数据是 −2 到 2 的整数，各版本的结果都是精确的整数，程序要求它们与 cuBLAS 逐位相同。", "The test data are integers from −2 to 2, so every version's result is exact; the program requires them to match cuBLAS bit for bit."]
+  - ["屋顶线上各版本的计算强度按“不计缓存”估计；L2 缓存使实际的显存流量更小，点可能出现在斜坡上方。", "The intensities on the roofline ignore caches; the L2 makes real traffic smaller, so points can sit above the slope."]
+思考题:
+  - ["哪一步提速最多？用 5.8、5.9 节的分析解释。", "Which step gains most? Explain with Sections 5.8 and 5.9."]
+  - ["如果 n = 1024 时双缓冲版明显慢于 n = 4096，用波次量化解释；还有什么别的原因？", "If the double-buffered version is clearly slower at n = 1024 than at 4096, explain with wave quantisation. What else might contribute?"]

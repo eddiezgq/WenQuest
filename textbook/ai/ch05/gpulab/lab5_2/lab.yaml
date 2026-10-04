@@ -1,0 +1,43 @@
+标题: ["GPU 实验 5.2 归约的五个版本", "GPU Lab 5.2 Five versions of a reduction"]
+目的: ["在真正的 GPU 上逐版测出归约的有效带宽：交错寻址、连续线程、顺序寻址、网格跨步、线程束洗牌，与 CUB 和显存带宽比较，说明每一步改了什么、为什么变快。",
+       "Measure the effective bandwidth of five reductions — interleaved, contiguous threads, sequential addressing, grid-stride, warp shuffle — against CUB and the memory bandwidth, and explain what each step changes."]
+显卡: basic
+结果:
+  - {名: v1_GBs, 说明: ["版本 1 交错寻址、取模分支", "v1 interleaved, modulo branch"], 单位: GB/s}
+  - {名: v2_GBs, 说明: ["版本 2 交错寻址、连续的线程", "v2 interleaved, contiguous threads"], 单位: GB/s}
+  - {名: v3_GBs, 说明: ["版本 3 顺序寻址", "v3 sequential addressing"], 单位: GB/s}
+  - {名: v4_GBs, 说明: ["版本 4 网格跨步", "v4 grid-stride"], 单位: GB/s}
+  - {名: v5_GBs, 说明: ["版本 5 线程束洗牌", "v5 warp shuffle"], 单位: GB/s}
+  - {名: cub_GBs, 说明: ["CUB DeviceReduce::Sum", "CUB DeviceReduce::Sum"], 单位: GB/s}
+  - {名: v5_x1_GBs, 说明: ["版本 5，每个 SM 1 个线程块", "v5, 1 block per SM"], 单位: GB/s}
+  - {名: v5_x24_GBs, 说明: ["版本 5，每个 SM 24 个线程块（四波）", "v5, 24 blocks per SM (four waves)"], 单位: GB/s}
+文件: [reduce.cu, check.cuh, bench.cuh]
+实际问题:
+  标题: ["光源老化监测：一帧的平均亮度", "Watching the lamp age: the mean brightness of a frame"]
+  内容: ["检测工位每帧算出全部像素的平均亮度，与开机时比较，判断光源是否老化。把几千万个数加起来，最快能多快？",
+         "Every frame the station computes the mean brightness of all pixels and compares it with the start-up value to see whether the lamp is ageing. How fast can tens of millions of numbers be added?"]
+原理:
+  - ["树形归约：n 个数 log₂n 层、n − 1 次加法（3.1 节）。线程块内在共享内存里做，线程块之间靠第二次启动。", "Tree reduction: log₂n levels, n − 1 additions (Section 3.1); inside a block in shared memory, across blocks by a second launch."]
+  - ["版本 1 的活动线程散在各个线程束里（分化）；版本 2 连在一起但跨步访问共享内存（存储体冲突）；版本 3 两者都没有（5.2.3 节）。", "v1 scatters busy threads over the warps (divergence); v2 packs them but strides through shared memory (bank conflicts); v3 has neither (Section 5.2.3)."]
+  - ["版本 4 让每个线程先顺序地加许多个数（布伦特定理）；版本 5 在线程束内用 __shfl_down_sync 交换寄存器（5.2.4、5.2.5 节）。", "v4 lets each thread add many values first (Brent's theorem); v5 exchanges registers within a warp with __shfl_down_sync (Sections 5.2.4, 5.2.5)."]
+  - 式: "有效带宽 = n × 4 字节 / 耗时，n = 2²⁵"
+步骤:
+  - ["运行第一格检查环境。", "Run the first cell."]
+  - ["编译运行 reduce.cu，记录六个结果的有效带宽，确认 correct 为 true（任务 1）。", "Compile and run reduce.cu; record the six bandwidths and check correct is true (task 1)."]
+  - ["默认每个 SM 放能同时驻留的线程块数（A10 上 6 个）。改成 1 和 24（./reduce 1、./reduce 24），比较版本 4、5 的有效带宽（任务 2）。", "By default each SM gets as many blocks as can be resident (6 on an A10). Try 1 and 24 (./reduce 1, ./reduce 24) and compare v4 and v5 (task 2)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  归约 2²⁵ 个单精度数", "Table 1  Reducing 2²⁵ floats"]
+    表头: ["版本", "有效带宽（GB/s）", "比上一版提高", "改了什么"]
+    表头英文: ["Version", "Bandwidth (GB/s)", "Gain over previous", "What changed"]
+    行: [["1 交错寻址", "{{v1_GBs}}", "—", ""], ["2 连续的线程", "{{v2_GBs}}", "", ""], ["3 顺序寻址", "{{v3_GBs}}", "", ""], ["4 网格跨步", "{{v4_GBs}}", "", ""], ["5 线程束洗牌", "{{v5_GBs}}", "", ""], ["CUB", "{{cub_GBs}}", "", ""]]
+  - 标题: ["表 2  线程块个数（版本 5）", "Table 2  Number of blocks (v5)"]
+    表头: ["每个 SM 的线程块数", "1", "能驻留的个数（默认）", "24"]
+    表头英文: ["Blocks per SM", "1", "as many as fit (default)", "24"]
+    行: [["有效带宽（GB/s）", "{{v5_x1_GBs}}", "{{v5_GBs}}", "{{v5_x24_GBs}}"]]
+注意:
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+  - ["浮点加法的顺序不同，各版本的和在最后几位上可能不同；程序按相对误差 10⁻⁴ 判断对错。", "Different addition orders give sums that differ in the last digits; the program accepts a relative error of 10⁻⁴."]
+思考题:
+  - ["版本 1 到版本 3 的差距，和版本 3 到版本 4 的差距，哪个大？为什么？", "Which gap is larger, v1 → v3 or v3 → v4? Why?"]
+  - ["如果每个 SM 只放 1 个线程块时版本 5 变慢了，原因是什么（3.7 节）？", "If v5 is slower with one block per SM, why (Section 3.7)?"]
