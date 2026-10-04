@@ -5,9 +5,9 @@
 // T_sb* = T_sw T_wc T_co T_og T_tb（式 (5.5.2)），用数值逆运动学求关节角，机械臂先到预抓取位姿（上方 50 mm），再下降。
 // 偏差 = 夹爪指尖中心（模型 wrist_3_link 上的 (0, 0.25, 0)，由三维模型独立算出）与真实抓取点之间的距离。
 WQ.lab({
-  title: ["实验 5.5 相机-机械臂-工件的坐标链", "Lab 5.5 The camera-arm-part chain"],
+  title: ["实验 5.5 相机-机械臂-工件的坐标链", "Lab 5.5 The camera–arm–workpiece chain of frames"],
   goal: ["相机看到齿轮坯，程序沿坐标链算出法兰的目标位姿，机械臂伸过去夹取。改变工件位置和相机安装误差，看偏差怎样变化。",
-         "The camera sees the gear blank, the program follows the chain to the flange target, and the arm reaches for it. Move the part and add a camera mounting error to see how the miss changes."],
+         "The camera sees the gear blank, the program follows the chain of frames to the target pose of the flange, and the arm reaches over and grips it. Move the workpiece and add a camera mounting error to see how the miss changes."],
   view: "3d",
   models: ["B-ARM-UR5E"],
   scenes: [
@@ -18,7 +18,7 @@ WQ.lab({
     { id: "car", name: ["倒车影像", "Reversing camera"], hide: ["ox", "oy", "oyaw", "err"],
       problem: { title: ["生活中的例子：倒车影像测距", "Everyday example: distance from a reversing camera"],
                  text: ["车尾相机高 1.0 m，看地面上车后 3.0 m 处的路锥。相机若装歪（俯仰），算出的距离就不对。图中按 1:4 缩小。",
-                        "The rear camera is 1.0 m high and sees a cone 3.0 m behind. If it is tilted wrongly, the distance is wrong. Drawn at 1:4."] } },
+                        "The rear camera is 1.0 m high and looks at a traffic cone on the ground 3.0 m behind the car. If the camera is mounted askew (in pitch), the computed distance is wrong. Drawn at 1:4."] } },
   ],
   params: [
     { id: "ox", name: ["齿轮坯 x（{w} 中）", "Gear blank x (in {w})"], min: 0.7, max: 0.9, step: 0.01, value: 0.8, unit: "m", digits: 2 },
@@ -35,7 +35,7 @@ WQ.lab({
       demo: { scene: "cell", set: { ox: 0.8, oy: 0.45, oyaw: 25, err: 0.5 }, press: ["grasp"], wait: 6 } },
     { id: "move", robot: true, text: ["δ = 0 时把齿轮坯挪动 5 cm 以上、转角改变 30° 以上，再抓取成功。", "With δ = 0, move the blank by 5 cm or more and turn it by 30° or more, then pick it successfully."],
       demo: { scene: "cell", set: { ox: 0.72, oy: 0.5, oyaw: 70, err: 0 }, press: ["grasp"], wait: 6 } },
-    { id: "car", text: ["倒车相机俯仰装歪 1° 时，读出 3 m 处路锥的测距误差。", "With a 1° pitch error, read the distance error for the cone 3 m behind."],
+    { id: "car", text: ["倒车相机俯仰装歪 1° 时，读出 3 m 处路锥的测距误差。", "With the reversing camera 1° askew in pitch, read off the distance error for the cone 3 m away."],
       demo: { scene: "car", set: { cerr: 1 }, press: [], wait: 1 } },
   ],
   think: ["同样 0.5° 的误差，若绕相机光轴，偏差只有零点几毫米。为什么？若把相机降低一半高度，绕 x_c 的偏差会变成多少？",

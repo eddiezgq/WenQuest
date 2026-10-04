@@ -4,16 +4,16 @@
 // 坐标系树：{w} 为根；{s}、{c} 挂在 {w} 下；{b} 挂在 {s} 下（T_sb(θ) 由第 12 章的指数积公式算出）；{t} 挂在 {b} 下；
 // {o} 挂在 {c} 下（T_co = T_wc⁻¹ T_wo，代表相机的测量）。关节角 θ = (j1, j2, 90°, −90°, −90°, 0°)。
 WQ.lab({
-  title: ["实验 5.4 搭建 UR5e 工作站的坐标系树", "Lab 5.4 Building the frame tree of a UR5e workcell"],
+  title: ["实验 5.4 搭建 UR5e 工作站的坐标系树", "Lab 5.4 Building the frame tree of a UR5e workstation"],
   goal: ["给 UR5e 工作站的每个坐标系找到父坐标系，调整安装位置和关节角，任选两个坐标系，读出它们之间的路径和位姿；体会“只动一条边，只动一棵子树”。",
-         "Give every frame of the UR5e workcell a parent, adjust the mounting and joint angles, pick any two frames and read the path and pose between them; see that moving one edge moves only one subtree."],
+         "Give every frame of the UR5e workstation a parent, adjust the mounting and joint angles, pick any two frames and read the path and pose between them; see that moving one edge moves only one subtree."],
   view: "3d",
   models: ["B-ARM-UR5E"],
   scenes: [
-    { id: "cell", robot: true, name: ["UR5e 工作站", "UR5e workcell"], hide: ["turn"],
+    { id: "cell", robot: true, name: ["UR5e 工作站", "UR5e workstation"], hide: ["turn"],
       problem: { title: ["机器人问题：相机看到的夹爪在哪里？", "Robot problem: where does the camera see the gripper?"],
                  text: ["工作站有工作台 {w}、基座 {s}、法兰 {b}、工具 {t}、相机 {c}、齿轮坯 {o}。把它们挂成一棵树，就能求任意两者之间的位姿。",
-                        "The workcell has the table {w}, base {s}, flange {b}, tool {t}, camera {c} and gear blank {o}. Hang them on a tree and any pose between two of them follows."] } },
+                        "The workstation has the table {w}, base {s}, flange {b}, tool {t}, camera {c} and gear blank {o}. Hang them on a tree and any pose between two of them follows."] } },
     { id: "susan", name: ["餐桌转盘", "Lazy Susan"], hide: ["bx", "by", "yaw", "j1", "j2", "from", "to"],
       problem: { title: ["生活中的例子：转盘上的菜", "Everyday example: dishes on a turntable"],
                  text: ["餐桌 {d} 上有转盘 {p}，三盘菜挂在转盘上。转动转盘只改变一条边，所有菜一起转。把鱼（红盘）转到你面前。",
@@ -37,7 +37,7 @@ WQ.lab({
       demo: { scene: "cell", set: { bx: 0.3, by: 0.4, yaw: 180, j1: 0, j2: -90, from: 4, to: 3 }, press: [], wait: 1 } },
     { id: "sub", robot: true, text: ["把关节 1 转到 30°：T_wc 不变，T_ct 改变——只有关节 1 以下的子树移动。", "Turn joint 1 to 30°: T_wc stays, T_ct changes — only the subtree below joint 1 moves."],
       demo: { scene: "cell", set: { bx: 0.3, by: 0.4, yaw: 180, j2: -90, from: 4, to: 3, j1: 30 }, press: [], wait: 1 } },
-    { id: "susan", text: ["转动转盘，把鱼（红盘）转到你面前（−y_d 方向）。", "Turn the table top so the fish (red plate) is in front of you (the −y_d direction)."],
+    { id: "susan", text: ["转动转盘，把鱼（红盘）转到你面前（−y_d 方向）。", "Turn the turntable so the fish (red plate) is in front of you (the −y_d direction)."],
       demo: { scene: "susan", set: { turn: 30 }, press: [], wait: 1 } },
   ],
   think: ["若把“相机看到的齿轮坯”既挂在 {c} 下，又按图纸挂在 {w} 下，树就有了回路。两条路算出的 T_wo 一般不会完全相同，应当怎样处理？",

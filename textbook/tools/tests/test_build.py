@@ -109,6 +109,13 @@ def test_an_animation_needs_its_static_figure(book):
     assert "data:image/svg+xml;base64" in frag and "图 4.1.2" in frag      # the figures are in the page itself
 
 
+def test_figures_are_numbered_in_order_of_appearance(book):
+    edit(book, "::: 图 4.1.1\n", "::: 图 4.1.2\n")
+    edit(book, "::: 图 4.1.2\nsrc: fig4_1_2", "::: 图 4.1.1\nsrc: fig4_1_2")
+    rep = run(book)
+    assert any(p.kind == "编号" and "图编号应按出现顺序从 1 起连续：4.1.2、4.1.1" in p.text for p in rep.errors)
+
+
 def test_animations_and_labs_are_packaged_and_checked(book):
     """Scenes must exist and pass the animation service's own check; labs must exist and pass the lab kit's check."""
     rep = run(book)

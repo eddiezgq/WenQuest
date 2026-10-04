@@ -16,7 +16,7 @@
   - ["记录“1 m/s 前进”的速度在 {m} 中的分量，验证它等于 (cos ψ, sin ψ)，与 AGV 的位置无关。",
      "Record the 1 m/s forward velocity in {m}; check it equals (cos ψ, sin ψ) whatever the position."]
   - ["切换到场景“博物馆里的游客”，让展品恰在游客正左方（任务 3），记录游客的位置和朝向。",
-     "Switch to “A visitor in a museum” and make the exhibit lie exactly to the visitor's left (task 3); record the pose."]
+     "Switch to “A visitor in a museum” and make the exhibit lie directly to the visitor's left (task 3); record the pose."]
 数据表:
   - 标题: ["表 1  Q 在 AGV 坐标系中的坐标（AGV 位于 (12.0, 5.0) m）", "Table 1  Q in the AGV frame (AGV at (12.0, 5.0) m)"]
     表头: ["航向 ψ", "q_v 手算 / m", "q_v 读数 / m", "距离 / m"]
@@ -27,7 +27,7 @@
     表头英文: ["x / m", "y / m", "ψ / °", "q_v / m", "Unique?"]
     行: [["", "", "", "", ""]]
 注意:
-  - ["航向从正东（地图 x 轴）逆时针量起；负值表示顺时针。", "The heading is measured counter-clockwise from east (map x axis); negative values are clockwise."]
+  - ["航向从正东（地图 x 轴）逆时针量起；负值表示顺时针。", "The heading is measured anticlockwise from east (map x axis); negative values are clockwise."]
   - ["手算时先减后转：先求 q_m − p_mv，再乘 R_mvᵀ。顺序颠倒会得到错误的结果。", "By hand, subtract first, then rotate: q_m − p_mv, then multiply by R_mvᵀ. The other order is wrong."]
   - ["读数保留 3 位小数即可与手算比较。", "Three decimals are enough when comparing with hand calculations."]
 思考题:

@@ -7,7 +7,7 @@ import math
 
 import numpy as np
 
-from _fig5 import C, arrow, axes3d, box3d, camera3, cylinder3, draw_ur, frame3, plane, table3
+from _fig5 import C, arrow, axes3d, box3d, camera3, crop3d, cylinder3, draw_ur, frame3, plane, table3
 from _frames import DEG, P_WC, T, T_bt, T_og, T_wc, T_ws, inv, rot_z, ur_ik
 from bookout import T as TT, figure, style
 
@@ -35,22 +35,23 @@ frame3(ax, Twc, 0.12, "{c}", off=(-0.02, -0.12, 0.06))
 frame3(ax, Two, 0.09, "{o}", off=(0.11, -0.05, -0.02))
 
 
-def chain_arrow(p, q, label, off, color="#d62728"):
+def chain_arrow(p, q, label, off, color="#d62728", at=0.5):
     p, q = np.asarray(p, float), np.asarray(q, float)
     ax.plot(*np.c_[p, q], color=color, lw=1.2, ls="--")
     d = q - p
     ax.scatter(*q, color=color, s=10)
-    m = p + 0.5 * d + np.asarray(off)
+    m = p + at * d + np.asarray(off)
     ax.text(*m, label, fontsize=11, color=color, ha="center")
 
 
-chain_arrow((0, 0, 0), Tws[:3, 3], r"$T_{ws}$", (0.0, -0.08, 0.04))
-chain_arrow((0, 0, 0), Twc[:3, 3], r"$T_{wc}$", (0.02, 0.06, 0.05))
+chain_arrow((0, 0, 0), Tws[:3, 3], r"$T_{ws}$", (0.0, -0.08, 0.04), color="#1f77b4")     # 机器人一侧：蓝
+chain_arrow((0, 0, 0), Twc[:3, 3], r"$T_{wc}$", (0.0, 0.0, 0.06), at=0.78)              # 相机一侧：红；标签避开机械臂
 chain_arrow(Twc[:3, 3], Two[:3, 3], r"$T_{co}$", (0.08, 0.0, 0.02))
 chain_arrow(Tws[:3, 3], Twb[:3, 3], r"$T_{sb}(\theta)$", (-0.12, 0.0, 0.08), color="#1f77b4")
-ax.text2D(0.01, 0.06, TT(r"闭合条件：$T_{ws}\,T_{sb}(\theta)\,T_{bt} = T_{wc}\,T_{co}\,T_{og}$",
+ax.text2D(0.01, 0.12, TT(r"闭合条件：$T_{ws}\,T_{sb}(\theta)\,T_{bt} = T_{wc}\,T_{co}\,T_{og}$",
                          r"Closure: $T_{ws}\,T_{sb}(\theta)\,T_{bt} = T_{wc}\,T_{co}\,T_{og}$"), transform=ax.transAxes, fontsize=11)
 box3d(ax, (-0.05, -0.05, 0.0), (1.25, 0.85, 0.95), zoom=1.0)
+crop3d(ax)
 figure(fig, "fig5_5_1")
 plt.close(fig)
 
@@ -74,12 +75,12 @@ ax.plot(*g2, "o", color="#d62728", ms=4)
 tt = np.linspace(math.atan2(r[1], r[0]), math.atan2(r[1], r[0]) + dshow, 20)
 ax.plot(cam[0] + 0.5 * np.cos(tt), cam[1] + 0.5 * np.sin(tt), color="#d62728", lw=1.2)
 ax.text(cam[0] - 0.07, cam[1] - 0.6, r"$\delta$", color="#d62728", fontsize=13)
-ax.text(cam[0] - 0.4, cam[1] - 0.45, r"$\rho$", fontsize=12)
+ax.text(*(cam + 0.45 * r + np.array([-0.04, 0.0])), r"$\rho$", fontsize=12, ha="right", va="center")   # 紧贴名义光线
 ax.annotate("", xy=g2, xytext=g, arrowprops=dict(arrowstyle="<->", color="#d62728", lw=1.0, shrinkA=2, shrinkB=2))
 ax.text((g[0] + g2[0]) / 2 - 0.02, g[1] - 0.12, r"$e \approx \delta\,\rho$", color="#d62728", fontsize=12, ha="center")
 ax.text(cam[0] - 0.05, cam[1] + 0.03, TT("相机", "camera"), fontsize=10, ha="right")
 ax.text(0.65, 0.09, TT("齿轮坯", "gear blank"), fontsize=9.5, color="#8a6d2b", ha="right")
-ax.text(-0.02, 0.92, TT("名义光线（实线）与实际光线（虚线）", "nominal ray (solid) and actual ray (dashed)"), fontsize=9.5)
+ax.text(-0.02, 0.92, TT("名义光线（实线）与实际光线（虚线）", "solid: nominal ray; dashed: actual ray"), fontsize=9.5)
 ax.text(-0.02, 0.84, TT("图中误差角放大画出", "error angle exaggerated in the drawing"), fontsize=9, color=C["muted"])
 ax.text(-0.02, -0.08, TT("台面（{w} 的 x 轴）", "table top (x axis of {w})"), fontsize=9, color=C["muted"])
 plane(ax, (-0.05, 1.3), (-0.14, 1.05))

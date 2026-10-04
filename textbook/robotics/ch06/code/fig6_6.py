@@ -1,7 +1,7 @@
 """6.6 节的示意图。
 
-图 6.6.1：算例 6.6.3（潘索）：两个不共面的力 f₁、f₂ 合成一个力旋量：沿中心轴的合力 f，加上绕中心轴的力偶矩 m；节距 h = m·f/|f|²。
-图 6.6.2：算例 6.6.1：UR5e 零位托住 5 kg 负载，侧视（x–z 平面）。关节 2、3、4 的轴垂直于纸面；
+图 6.6.2：算例 6.6.3（潘索）：两个不共面的力 f₁、f₂ 合成一个力旋量：沿中心轴的合力 f，加上绕中心轴的力偶矩 m；节距 h = m·f/|f|²。
+图 6.6.1：算例 6.6.1：UR5e 零位托住 5 kg 负载，侧视（x–z 平面）。关节 2、3、4 的轴垂直于纸面；
           关节 i 需要的力矩 = m𝔤 × 负载质心到该轴的水平距离（带符号）。
 """
 import math
@@ -13,7 +13,7 @@ from bookout import T, figure, style
 
 plt = style()
 
-# ---------------------------------------------------------------- 图 6.6.1
+# ---------------------------------------------------------------- 图 6.6.2
 P1, f1 = np.array([0.2, 0, 0]), np.array([0, 0, -10.0])
 P2, f2 = np.array([0, 0, 0.3]), np.array([0, 10.0, 0])
 fR = f1 + f2
@@ -52,10 +52,10 @@ ax.text(*(q + np.array([0.02, 0.0, -0.04])), "$q$", fontsize=12, color=C["accent
 ax.text2D(0.02, 0.96, T("灰：原来的两个力；金：中心轴上的合力；蓝：绕中心轴的力偶矩", "grey: the two forces; gold: resultant on the central axis; blue: couple about it"),
           transform=ax.transAxes, fontsize=9.5)
 tight3d(ax, np.vstack([L, [P1, P2, P1 + f1 * k, P2 + f2 * k, [0, 0, 0], q + fR * k]]), pad=0.04, zoom=1.15)
-figure(fig, "fig6_6_1")
+figure(fig, "fig6_6_2")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 6.6.2
+# ---------------------------------------------------------------- 图 6.6.1
 g, m = 9.81, 5.0
 j2, j3, j4 = np.array([0, H1]), np.array([-L1, H1]), np.array([-L1 - L2, H1])
 fl = UR_M[[0, 2], 3]
@@ -88,5 +88,5 @@ ax.text(-0.94, 0.62, "$z$", color=C["z"], fontsize=11)
 ax.text(-0.70, 0.45, T("从 −y 一侧看；关节轴 −ŷ 指向读者，逆时针为正", "seen from the −y side; joint axes −ŷ point at the reader, anticlockwise positive"), fontsize=8.5, color=C["muted"])
 ax.set_xlim(-1.02, 0.12)
 ax.set_ylim(-0.47, 0.68)
-figure(fig, "fig6_6_2")
+figure(fig, "fig6_6_1")
 plt.close(fig)

@@ -53,14 +53,14 @@ class Lesson(Base):
         self.caption("先转 60°：点和方向都跟着转", "Turn 60°: both the point and the direction turn", wait=0)
         self.play(th.animate.set_value(60.0), run_time=3, rate_func=smooth)
         self.wait(0.5)
-        self.caption("再平移 (2.4, 0.6)：点跟着移，方向的读数一点也不变", "Then shift by (2.4, 0.6): the point moves, the direction's numbers stay", wait=0)
+        self.caption("再平移 (2.4, 0.6)：点跟着移，方向的读数一点也不变", "Then translate by (2.4, 0.6): the point moves, the direction's numbers stay", wait=0)
         self.play(dx.animate.set_value(2.4), dy.animate.set_value(0.6), run_time=3, rate_func=smooth)
         self.wait(0.8)
         box = SurroundingRectangle(hv, color=BLUE, buff=0.12)
         self.play(Create(box))
-        self.caption("平移乘的是末位：末位为 0，平移就加不进来", "The shift multiplies the last entry: with 0 it never gets added")
+        self.caption("平移乘的是末位：末位为 0，平移就加不进来", "The translation is multiplied by the last entry: if that is 0, it never gets added")
         self.wait(1)
-        self.card([["齐次变换作用在点和方向上", "A homogeneous transform on points and directions"],
+        self.card([["齐次变换作用在点和方向上", "A homogeneous transformation on points and directions"],
                    MathTex(r"\begin{pmatrix} R & p \\ 0 & 1 \end{pmatrix}\begin{pmatrix} x \\ 1 \end{pmatrix} = \begin{pmatrix} Rx + p \\ 1 \end{pmatrix}", font_size=40),
                    MathTex(r"\begin{pmatrix} R & p \\ 0 & 1 \end{pmatrix}\begin{pmatrix} v \\ 0 \end{pmatrix} = \begin{pmatrix} Rv \\ 0 \end{pmatrix}", font_size=40),
                    ["点既转又移，方向只转不移", "points turn and move; directions only turn"]])

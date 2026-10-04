@@ -130,7 +130,7 @@ def workcell():
 
 
 __all__ = ["C", "AX", "arrow", "frame2", "plane", "axes3d", "equal3d", "frame3", "table3", "cylinder3", "camera3",
-           "ur_points", "draw_ur", "workcell", "inv", "T", "box3d"]
+           "ur_points", "draw_ur", "workcell", "inv", "T", "box3d", "crop3d"]
 
 
 def box3d(ax, lo, hi, zoom=1.0):
@@ -141,3 +141,43 @@ def box3d(ax, lo, hi, zoom=1.0):
     ax.set_zlim(lo[2], hi[2])
     ax.set_box_aspect(tuple(hi - lo), zoom=zoom)
 
+
+
+
+def crop3d(ax, pad=4):
+    """让 bbox_inches="tight" 只按三维坐标轴里实际画出的内容裁剪，而不是整个方形坐标轴框（否则上下留出大片空白）。
+    三维的线集合、面集合和文字不能直接给出范围，这里按投影后的坐标自己算。"""
+    from matplotlib import cbook
+    from matplotlib.collections import Collection
+    from matplotlib.lines import Line2D
+    from matplotlib.text import Text
+    from matplotlib.transforms import Bbox
+    from mpl_toolkits.mplot3d import proj3d
+
+    def tight(renderer=None, *args, **kwargs):
+        if renderer is None:
+            renderer = ax.get_figure(root=True)._get_renderer()
+        bbs = []
+        for a in ax.get_children():
+            if not a.get_visible() or a is ax.patch:
+                continue
+            if isinstance(a, Collection):
+                if hasattr(a, "_offsets3d"):                    # 散点：路径是记号形状，位置在 offsets 里
+                    pts = [a.get_offset_transform().transform(a.get_offsets())]
+                else:
+                    pts = [ax.transData.transform(p.vertices) for p in a.get_paths() if len(p.vertices)]
+                if pts:
+                    P = np.vstack(pts)
+                    bbs.append(Bbox([P.min(0), P.max(0)]))
+            elif isinstance(a, Line2D):
+                bbs.append(a.get_window_extent(renderer))
+            elif isinstance(a, Text) and a.get_text() and hasattr(a, "_z"):
+                x, y, _ = proj3d.proj_transform(a._x, a._y, a._z, ax.M)
+                with cbook._setattr_cm(a, _x=x, _y=y):
+                    bbs.append(Text.get_window_extent(a, renderer))
+            elif isinstance(a, Text) and a.get_text():          # text2D：普通的二维文字
+                bbs.append(a.get_window_extent(renderer))
+        bbs = [b for b in bbs if np.isfinite([b.x0, b.y0, b.x1, b.y1]).all()]
+        return Bbox.union(bbs).padded(pad)
+
+    ax.get_tightbbox = tight

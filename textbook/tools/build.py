@@ -740,6 +740,19 @@ def check_tags(sec: Section, rep: Report) -> None:
         sec.defines.add(f"节 {n}")
 
 
+FIG_DIRECTIVE = re.compile(r"(?m)^:::[ \t]*(?:图|Figure)[ \t]+([\d.]+)[ \t]*$")
+STRICT_FIG_ORDER = {"robotics"}      # other books: a warning only, until their figures are renumbered
+
+
+def check_figure_order(sec: Section, rep: Report, level: str = "error") -> None:
+    """The k-th ::: 图 directive of section N.M must be 图 N.M.k (numbered in order of appearance)."""
+    found = FIG_DIRECTIVE.findall(FENCE.sub("", sec.source))
+    want = [f"{sec.id}.{k}" for k in range(1, len(found) + 1)]
+    if found != want:
+        where = sec.id + ("（英文版）" if sec.lang == "en" else "")
+        rep.add(level, "编号", where, f"图编号应按出现顺序从 1 起连续：{'、'.join(found)}（应为 {'、'.join(want)}）")
+
+
 REF = re.compile(r"(" + "|".join(REF_KINDS) + r")\s*\(?(\d+\.\d+(?:\.\d+)?)\)?")
 EQ_LIST = re.compile(r"式\s*\((\d+\.\d+\.\d+)\)(?:\s*(?:和|与|、|至|到|–|-)\s*\((\d+\.\d+\.\d+)\))?")
 SEC_REF = re.compile(r"(?<![\d.])(\d+\.\d+)\s*节")
@@ -912,9 +925,11 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
             rep.add("error", "程序", "英文版", why)
     formulas: list = []
     figdir = book["root"].parent / "build" / book_name / "figs"
+    fig_level = "error" if book_name in STRICT_FIG_ORDER else "warning"
     for sec in sections:
         sec.figdir = figdir
         check_tags(sec, rep)
+        check_figure_order(sec, rep, fig_level)
         check_numbers(sec, rep)
         check_terms(sec, terms, rep)
         sec.html = render_section(sec, fill(sec, values, rep), values, rep, formulas)
@@ -931,6 +946,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         left = sorted(set(re.findall(r"[\u4e00-\u9fff]+", FENCE.sub("", sec.source))))
         if left:
             rep.add("error", "英文版", where, "正文里还有中文：" + "、".join(left[:8]))
+        check_figure_order(sec, rep, fig_level)
         check_numbers(sec, rep)
         for why in english.check_terms(zh.source, sec.source, gl_en):
             rep.add("error", "术语", where, why)

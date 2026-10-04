@@ -1,4 +1,4 @@
-"""动画 5.1.1（配图 5.1.1）：点 P 不动，坐标系 {b} 平移并转动；P 在 {b} 中的坐标随之变化，矢量三角形始终闭合。"""
+"""动画 5.1.1（配图 5.1.2）：点 P 不动，坐标系 {b} 平移并转动；P 在 {b} 中的坐标随之变化，矢量三角形始终闭合。"""
 from manim import *
 from wq_anim import *
 import numpy as np
@@ -45,7 +45,7 @@ class Lesson(Base):
                             .next_to(readout, DOWN, buff=0.25, aligned_edge=LEFT))
         self.play(FadeIn(fb), GrowArrow(vab), GrowArrow(vbP), Write(readout), Write(pab))
         self.caption("三支箭头首尾相接，这个矢量等式与坐标系无关",
-                     "The three arrows close head to tail, in every frame")
+                     "The three arrows close head to tail; the vector equation needs no frame")
 
         self.caption("{b} 平移：P 没有动，但 P 在 {b} 中的坐标变了", "Move {b}: P stays, its coordinates in {b} change", wait=0)
         self.play(ox.animate.set_value(1.2), oy.animate.set_value(1.9), run_time=3, rate_func=smooth)

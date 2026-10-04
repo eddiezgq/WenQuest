@@ -1,8 +1,8 @@
 """6.1 节的示意图。
 
-图 6.1.1：算例 6.1.2 的螺旋运动：零件从输送带（位姿 1）到夹具（位姿 2），等价于绕螺旋轴转 θ、同时沿轴移 d；
+图 6.1.2：算例 6.1.2 的螺旋运动：零件从输送带（位姿 1）到夹具（位姿 2），等价于绕螺旋轴转 θ、同时沿轴移 d；
           零件中心走过一段螺旋线。
-图 6.1.2：算例 6.1.1 的平面位移：两点连线的中垂线交于极点 c，绕 c 转 60° 完成整个位移。
+图 6.1.1：算例 6.1.1 的平面位移：两点连线的中垂线交于极点 c，绕 c 转 60° 完成整个位移。
 """
 import math
 
@@ -14,7 +14,7 @@ from bookout import T, figure, style
 plt = style()
 d = math.radians
 
-# ---------------------------------------------------------------- 图 6.1.1
+# ---------------------------------------------------------------- 图 6.1.2
 p1 = np.array([0.5, -0.2, 0.1])
 T1 = pose(np.eye(3), p1)
 T2 = pose(rot_z(d(90)), np.array([0.3, 0.4, 0.25]))
@@ -67,10 +67,10 @@ ax.text(*(c1 + np.array([0.0, 0.0, -0.095])), T("位姿 1（输送带）", "pose
 ax.text(*(c2 + np.array([0.0, 0.0, 0.06])), T("位姿 2（夹具）", "pose 2 (fixture)"), fontsize=9.5, color=C["accent"], ha="center")
 ax.text2D(1.0, 0.13, T("零件中心的\n螺旋线", "helix of the\npart centre"), transform=ax.transAxes, fontsize=9.5, color=C["accent"], ha="right")
 tight3d(ax, np.vstack([H, [q + [0, 0, z0]], [q + [0, 0, z1]], [c1 + [0.08, -0.06, -0.06]], [c2 + [-0.08, 0.08, 0.06]]]), pad=0.02, zoom=1.45)
-figure(fig, "fig6_1_1")
+figure(fig, "fig6_1_2")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 6.1.2
+# ---------------------------------------------------------------- 图 6.1.1
 def rot2(t):
     return np.array([[math.cos(t), -math.sin(t)], [math.sin(t), math.cos(t)]])
 
@@ -124,5 +124,5 @@ ax.text(0.585, 0.40, T("位姿 B", "pose B"), fontsize=10, color=C["accent"])
 ax.text(0.06, 0.40, T("两条中垂线\n交于极点 c", "the two perpendicular\nbisectors meet at the pole c"), fontsize=9.5, color=C["z"])
 ax.set_xlim(-0.05, 0.70)
 ax.set_ylim(-0.10, 0.55)
-figure(fig, "fig6_1_2")
+figure(fig, "fig6_1_1")
 plt.close(fig)

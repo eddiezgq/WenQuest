@@ -49,7 +49,7 @@ labs = [TT("$x_b$ 轴", "axis $x_b$"), TT("$y_b$ 轴", "axis $y_b$"), TT("$z_b$ 
 for j in range(4):
     ax2.text(x0 + (j + 0.5) * w, y0 + 4 * h + 0.25, labs[j], ha="center", fontsize=10, color=cols[j])
 ax2.text(x0 + 1.5 * w, 0.3, TT("方向：末位补 0", "directions: last entry 0"), ha="center", fontsize=9.5, color=C["muted"])
-ax2.text(x0 + 3.5 * w, 0.3, TT("点：末位补 1", "a point: last entry 1"), ha="center", fontsize=9.5, color=C["muted"])
+ax2.text(x0 + 3.5 * w, 0.3, TT("点：末位补 1", "point: last entry 1"), ha="center", fontsize=9.5, color=C["muted"])
 figure(fig, "fig5_2_1")
 plt.close(fig)
 
@@ -81,7 +81,7 @@ ax.text(*(q + R @ v * 0.45 + np.array([-0.32, 0.0])), r"$v'$", color="#1f77b4", 
 ax.text(-0.3, -0.75, TT(r"点：$(p,\,1)$ 经 $T$ 既转又移", r"a point $(p,\,1)$: turned and moved by $T$"), fontsize=10.5)
 ax.text(-0.3, -1.05, TT(r"方向：$(v,\,0)$ 经 $T$ 只转不移，$v' = Rv$", r"a direction $(v,\,0)$: only turned, $v' = Rv$"),
         fontsize=10.5, color="#1f77b4")
-ax.text(2.6, 2.6, TT("位移后", "after the displacement"), fontsize=9.5, color=C["accent"])
+ax.text(2.6, 2.6, TT("位移后", "after"), fontsize=9.5, color=C["accent"])
 ax.text(0.25, 1.0, TT("位移前", "before"), fontsize=9.5, color=C["muted"])
 plane(ax, (-0.45, 3.4), (-1.2, 2.9))
 figure(fig, "fig5_2_2")

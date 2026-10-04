@@ -1,8 +1,8 @@
 """6.2 节的示意图。
 
-图 6.2.1：李群与李代数的直观图景：SO(3) 画成一张弯曲的曲面，单位矩阵 I 处的切平面就是 so(3)；
+图 6.2.2：李群与李代数的直观图景：SO(3) 画成一张弯曲的曲面，单位矩阵 I 处的切平面就是 so(3)；
           切平面中的矢量 [ω] 经指数映射沿曲面走到 e^{[ω]t}。（示意图：真实的 SO(3) 是三维的，无法画出。）
-图 6.2.2：算例 6.2.1，t = 1 s 时的角速度矢量 ω：同一支箭头，在 {s} 中读出 ω_s，在 {b} 中读出 ω_b。
+图 6.2.1：算例 6.2.1，t = 1 s 时的角速度矢量 ω：同一支箭头，在 {s} 中读出 ω_s，在 {b} 中读出 ω_b。
 """
 import math
 
@@ -14,7 +14,7 @@ from bookout import T, figure, style
 plt = style()
 d = math.radians
 
-# ---------------------------------------------------------------- 图 6.2.1
+# ---------------------------------------------------------------- 图 6.2.2
 fig, ax = axes3d(plt, size=(5.8, 4.2), elev=24, azim=-70)
 Rr = 1.6
 u = np.linspace(-0.75, 0.75, 40)
@@ -45,10 +45,10 @@ ax.text(e[0] + 0.02, e[1] - 0.02, e[2] - 0.12, r"$e^{[\omega]t}$", color=C["x"],
 ax.text(-0.72, 0.5, 0.03, T("切空间 so(3)", "tangent space so(3)"), color=C["z"], fontsize=10)
 ax.text(-0.5, -0.55, -0.42, T("李群 SO(3)（示意）", "Lie group SO(3) (sketch)"), color=C["muted"], fontsize=10)
 tight3d(ax, np.array([[-0.8, -0.6, -0.45], [0.8, 0.6, 0.1]]), pad=0.05, zoom=0.95)
-figure(fig, "fig6_2_1")
+figure(fig, "fig6_2_2")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 6.2.2
+# ---------------------------------------------------------------- 图 6.2.1
 w1, w6 = UR_AXES[0][0], UR_AXES[5][0]
 r1, r6 = d(30), d(90)
 Rt = exp3(w1 * r1) @ exp3(w6 * r6) @ UR_M[:3, :3]
@@ -72,5 +72,5 @@ ax.text2D(0.02, 0.06, T("在 {s} 中读出：", "read in {s}: ") + r"$\omega_s =
 ax.text2D(0.02, 0.0, T("在 {b} 中读出：", "read in {b}: ") + r"$\omega_b = (0.52,\ 1.57,\ 0)$ rad/s", transform=ax.transAxes, fontsize=10)
 tight3d(ax, np.array([[-0.5, -0.9, -0.3], [0.9, 2.4, 2.2]]), pad=0.0, zoom=1.15)
 assert np.allclose(np.round(ws, 2), [0.79, -1.36, 0.52]) and np.allclose(np.round(wb, 2), [0.52, 1.57, 0])
-figure(fig, "fig6_2_2")
+figure(fig, "fig6_2_1")
 plt.close(fig)

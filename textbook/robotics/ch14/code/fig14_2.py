@@ -2,9 +2,9 @@
 
 图 14.2.1：2R 臂逆解的几何法：基座 O、肘点 E、目标 P 构成三角形；β 是 OP 的方向角，ψ 是大臂与 OP 的夹角，
            θ2 是小臂相对大臂延长线转过的角。虚线是关于 OP 对称的另一组解。
-图 14.2.2：(a) 平面 3R 臂到达 (0.6, 0.05) m、工具朝下的两组解，先由工具朝向求腕点 W；
+图 14.2.3：(a) 平面 3R 臂到达 (0.6, 0.05) m、工具朝下的两组解，先由工具朝向求腕点 W；
            (b) 只给末端位置 (0.75, 0.10) m 时的一族解：腕点在以 P 为圆心、半径 L3 的圆上，只有落在 2R 外圆以内的那一段可用。
-图 14.2.3：|dθ2/dr| 随 θ2 的变化（式 (14.2.7)）：手臂接近伸直或折回时，θ2 对目标位置极其敏感。
+图 14.2.2：|dθ2/dr| 随 θ2 的变化（式 (14.2.7)）：手臂接近伸直或折回时，θ2 对目标位置极其敏感。
 """
 import math
 
@@ -53,7 +53,7 @@ ax.text(-0.15, 0.58, T("实线：肘下（θ₂ > 0）；虚线：肘上（θ₂
 figure(fig, "fig14_2_1")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 14.2.2
+# ---------------------------------------------------------------- 图 14.2.3
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(9.6, 4.4))
 L = (l1, l2, l3)
 # (a)
@@ -95,10 +95,10 @@ a2.plot(*pB, "o", color=C["x"], ms=6, zorder=9)
 a2.text(pB[0] + 0.03, pB[1] + 0.02, "P", fontsize=11, color=C["x"])
 a2.text(0.53, -0.18, T("腕点可用的一段（实线）", "usable part of the wrist circle (solid)"), fontsize=9, color=C["accent"])
 a2.text(-0.1, 0.66, T("(b) 只给位置：一族解（图中画出肘下的一支）", "(b) position only: a family (elbow-down branch drawn)"), fontsize=10)
-figure(fig, "fig14_2_2")
+figure(fig, "fig14_2_3")
 plt.close(fig)
 
-# ---------------------------------------------------------------- 图 14.2.3
+# ---------------------------------------------------------------- 图 14.2.2
 fig, ax = plt.subplots(figsize=(6.2, 3.4))
 th = np.radians(np.linspace(0.2, 179.8, 900))
 r = np.sqrt(l1 ** 2 + l2 ** 2 + 2 * l1 * l2 * np.cos(th))
@@ -115,5 +115,5 @@ ax.set_xlim(0, 180)
 ax.spines["top"].set_visible(False)
 ax.spines["right"].set_visible(False)
 ax.text(60, 300, T("两端：手臂伸直（θ₂ = 0）或折回（θ₂ = 180°）", "ends: arm straight (θ₂ = 0) or folded (θ₂ = 180°)"), fontsize=9, color=C["muted"])
-figure(fig, "fig14_2_3")
+figure(fig, "fig14_2_2")
 plt.close(fig)
