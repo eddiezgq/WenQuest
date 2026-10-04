@@ -11,11 +11,12 @@ import math
 
 import numpy as np
 
-from _fig8 import BLUE, C, GREY, ORANGE, PURPLE, arrow, clean, draw_arm, target
+from _fig8 import BLUE, BOX, C, GREY, ORANGE, PURPLE, arrow, clean, draw_arm, target
 from _opt import L2R, arm_points, d, gradient_descent, ik_closed_2r, jac, newton, tip, tip_hessians
 from bookout import T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 L = L2R
 pd = np.array([0.5, 0.4])
 
@@ -151,12 +152,15 @@ ax.text(x0[0] - 0.04, x0[1] - 0.3, "$x$", fontsize=12)
 e = x0 + 0.85 * gn
 ax.text(e[0] + 0.04, e[1] + 0.02, r"$\nabla f(x)$", color=C["x"], fontsize=12)
 e = x0 - 0.85 * gn
-ax.text(e[0] - 0.55, e[1] - 0.22, T(r"$-\nabla f$：下降最快", r"$-\nabla f$: steepest descent"), color=C["accent"], fontsize=10)
+ax.text(e[0] - 0.55, e[1] - 0.08, T(r"$-\nabla f$：下降最快", "$-\\nabla f$: steepest\ndescent"), color=C["accent"], fontsize=10,
+        va="top", bbox=BOX, zorder=3)          # 白底压住等高线和切线，但在箭头之下
 e = x0 + 0.75 * u
 ax.text(e[0] - 0.2, e[1] + 0.08, "$u$", color=BLUE, fontsize=12)
-ax.text(-2.2, -1.95, T(r"虚线：等高线在 $x$ 处的切线，与 $\nabla f$ 垂直", r"dashed: tangent of the level curve at $x$, perpendicular to $\nabla f$"), fontsize=9.5)
+ax.text(-2.2, -1.95, T(r"虚线：等高线在 $x$ 处的切线，与 $\nabla f$ 垂直", r"dashed: tangent to the level curve at $x$, perpendicular to $\nabla f$"), fontsize=9.5,
+        bbox=BOX, zorder=6)
 ax.text(-2.2, -2.25, T(r"沿 $u$ 的变化率 $D_u f = \nabla f\cdot u = \|\nabla f\|\cos\varphi$",
-                       r"rate of change along $u$: $D_u f = \nabla f\cdot u = \|\nabla f\|\cos\varphi$"), fontsize=9.5)
+                       r"rate of change along $u$: $D_u f = \nabla f\cdot u = \|\nabla f\|\cos\varphi$"), fontsize=9.5,
+        bbox=BOX, zorder=6)
 ax.set_xlim(-2.25, 2.4)
 ax.set_ylim(-2.3, 2.1)
 figure(fig, "fig8_1_2")

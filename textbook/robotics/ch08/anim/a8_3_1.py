@@ -61,7 +61,7 @@ class Lesson(Base):
         edge = Line(P([-0.1, -0.1]), P([0.1, -0.1]), color=RED, stroke_width=7)
         self.play(Create(edge))
         self.caption("撞上边界 Δ₂ = −0.1：把这条约束加入工作集", "Blocked by Δ₂ = −0.1: add this constraint to the working set")
-        self.caption("第 2 步：只在这条边上找 q 的最小点", "Step 2: minimise q along this edge only", wait=0)
+        self.caption("第 2 步：只在这条边上找 q 的最小点", "Step 2: minimize q along this edge only", wait=0)
         self.play(dot.animate.move_to(P(x2)), run_time=1.5)
         g = Q @ x2 + c
         mu = g[1]

@@ -60,6 +60,15 @@ def path_gd(alpha, n):
     return out
 
 
+def count_gd(alpha, tol):
+    t = np.array([0.0, math.radians(90)])
+    k = 0
+    while np.linalg.norm(grad(t)) >= tol:
+        t = t - alpha * grad(t)
+        k += 1
+    return k
+
+
 def path_newton(n):
     t = np.array([0.0, math.radians(90)])
     out = [t.copy()]
@@ -94,15 +103,19 @@ class Lesson(Base):
                       bi(["牛顿法", "Newton's method"], 24, BLUE_C).move_to(np.array([3.4, 0.9, 0])))
         self.play(FadeIn(info[0]))
         gd = path_gd(3.0, 40)
-        self.caption("梯度下降：每一步沿 −∇f，垂直于等高线，在谷底两侧来回折返", "Gradient descent steps along −∇f, across the valley, zig-zagging", wait=0)
+        self.caption("梯度下降：每一步沿 −∇f，垂直于等高线，在谷底两侧来回折返", "Gradient descent steps along −∇f, across the valley, zigzagging", wait=0)
         segs = VGroup()
         for k in range(14):
             seg = Line(scr(gd[k]), scr(gd[k + 1]), color=ORANGE, stroke_width=4)
             segs.add(seg)
             self.play(Create(seg), run_time=0.28)
-        cnt = bi(["共需 83 步", "83 steps in all"], 22, ORANGE).next_to(info[0], DOWN, buff=0.15)
+        k3 = count_gd(3.0, 1e-8)                                     # 迭代到 ‖∇f‖ < 10⁻⁸ 的步数
+        lam = np.linalg.eigvalsh(hess(ts))
+        rate = max(abs(1 - 3.0 * lam[0]), abs(1 - 3.0 * lam[1]))     # 定理 8.1.6：后期每步误差缩小的倍数
+        cnt = bi(["共需 %d 步" % k3, "%d steps in all" % k3], 22, ORANGE).next_to(info[0], DOWN, buff=0.15)
         self.play(FadeIn(cnt))
-        self.caption("到 10⁻⁸ 的精度要 83 步：每步误差只缩小到约 85%", "83 steps to 10⁻⁸: the error shrinks only to about 85% per step")
+        self.caption("到 10⁻⁸ 的精度要 %d 步：每步误差只缩小到约 %.0f%%" % (k3, 100 * rate),
+                     "%d steps until ‖∇f‖ < 10⁻⁸; the error shrinks only to about %.0f%% of its value each step" % (k3, 100 * rate))
         self.play(FadeIn(info[1]))
         nw = path_newton(4)
         self.caption("牛顿法：用二次模型代替 f，直接跳到模型的最低点", "Newton's method jumps to the minimum of the quadratic model", wait=0)

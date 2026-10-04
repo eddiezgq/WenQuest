@@ -7,9 +7,9 @@ WQ.lab({
          "Solve an equality-constrained minimum-energy problem by the Lagrange–Newton method, read the Lagrange multipliers and check that they are the constraint forces."],
   scenes: [
     { id: "arm", robot: true, name: ["扭簧手臂", "Arm with joint springs"], hide: ["ell", "G"],
-      problem: { title: ["机器人问题：手把末端拉到 p_d，手臂摆成什么形态", "Robot problem: the hand pulls the tip to p_d; what posture does the arm take?"],
+      problem: { title: ["机器人问题：手把末端拉到 p_d，手臂摆成什么形态", "Robot problem: the hand pulls the end-effector to p_d; what configuration does the arm take?"],
                  text: ["三个关节装有扭簧。末端被固定在 p_d 后，手臂停在扭簧势能最小的形态。乘子 λ 的负值就是手的力。",
-                        "Each joint has a torsion spring. With the tip held at p_d, the arm settles where the spring energy is least. Minus the multiplier λ is the hand force."] } },
+                        "Each joint has a torsion spring. With the end-effector held at p_d, the arm settles where the spring energy is least. Minus the multiplier λ is the hand force."] } },
     { id: "rope", name: ["晾衣绳", "Clothes line"], hide: ["px", "py", "k1", "k2", "k3"],
       problem: { title: ["生活中的例子：衣架滑到哪里", "Everyday example: where does the hanger slide to?"],
                  text: ["衣架停在绳长约束下势能最小的位置。拉格朗日乘子就是绳的拉力。",
@@ -36,7 +36,7 @@ WQ.lab({
       demo: { scene: "rope", set: { ell: 2.1, G: 20 }, press: [], wait: 1 } },
   ],
   think: ["手的力为什么不与末端的位移同向？在默认参数下，竖直向下压末端，末端会往哪边偏？",
-          "Why is the hand force not along the tip displacement? With the default settings, if you press the tip straight down, which way does it also move?"],
+          "Why is the hand force not along the end-effector displacement? With the default settings, if you press the end-effector straight down, which way does it also move?"],
 
   L: [0.425, 0.392, 0.1], TC: [30, 60, -60].map((d) => d * Math.PI / 180),
   pts(t) { const p = [[0, 0]]; let a = 0; t.forEach((q, i) => { a += q; const l = p[p.length - 1]; p.push([l[0] + this.L[i] * Math.cos(a), l[1] + this.L[i] * Math.sin(a)]); }); return p; },
@@ -156,6 +156,6 @@ WQ.lab({
       api.arrow(e[0], e[1], e[0] - sc * s.lam[0], e[1] + sc * s.lam[1], api.css("--amber"), 3);
       api.label("F = −λ", e[0] - sc * s.lam[0] + 8, e[1] + sc * s.lam[1] + 4, api.css("--amber"), 13);
     }
-    api.label(api.T("虚线：自然形态 θ_c；红色弧线：扭簧力矩", "dashed: natural posture θ_c; red arcs: spring torques"), 12, h - 12, api.css("--muted"), 12);
+    api.label(api.T("虚线：自然形态 θ_c；红色弧线：扭簧力矩", "dashed: natural configuration θ_c; red arcs: spring torques"), 12, h - 12, api.css("--muted"), 12);
   },
 });

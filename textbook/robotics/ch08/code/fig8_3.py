@@ -10,11 +10,12 @@ import math
 import numpy as np
 from scipy.optimize import linprog
 
-from _fig8 import BLUE, C, GREY, ORANGE, PURPLE, arrow, clean, draw_arm, target
+from _fig8 import BLUE, BOX, C, GREY, ORANGE, PURPLE, arrow, clean, draw_arm, target
 from _opt import L2R, L3R, arm_points, d, jac, qp_active_set, tip, tip_hessians
 from bookout import T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 
 # ---------------------------------------------------------------- 图 8.3.1
 th = np.array([0.0, d(90)])
@@ -42,7 +43,8 @@ ax.fill([-0.1, 0.1, 0.1, -0.1], [-0.1, -0.1, 0.1, 0.1], color="#e3eef7", zorder=
 ax.plot([-0.1, 0.1, 0.1, -0.1, -0.1], [-0.1, -0.1, 0.1, 0.1, -0.1], color=BLUE, lw=1.2)
 ax.text(-0.095, 0.088, T("可行域\n|Δᵢ| ≤ 0.1 rad", "feasible set\n|Δᵢ| ≤ 0.1 rad"), fontsize=9, color=BLUE, va="top")
 ax.plot(*dfree, "o", color=C["ink"], ms=6, zorder=6)
-ax.text(dfree[0] + 0.008, dfree[1] - 0.005, T("无约束的解\n（末端一步到位）", "unconstrained\n(tip reached at once)"), fontsize=8.5)
+ax.text(dfree[0] + 0.008, dfree[1] - 0.005, T("无约束的解\n（末端一步到位）", "unconstrained solution\n(target reached in one step)"), fontsize=8.5,
+        bbox=BOX, zorder=6)
 ax.plot(*dclip, "s", color=ORANGE, ms=6, zorder=6)
 ax.plot([dclip[0], 0.05], [dclip[1], -0.125], color=ORANGE, lw=0.6)
 ax.text(0.052, -0.13, T("截断", "clipped"), fontsize=9, color=ORANGE)
@@ -53,12 +55,15 @@ hist = np.array([h[0] for h in r["history"]])
 ax.plot(hist[:, 0], hist[:, 1], "--", color=C["accent"], lw=1.0, zorder=5)
 ax.plot(hist[:, 0], hist[:, 1], ".", color=C["accent"], ms=7, zorder=5)
 ax.plot(*dq, "*", color=C["x"], ms=13, zorder=7)
-ax.text(dq[0] - 0.012, dq[1] - 0.03, T("二次规划的解 Δ*", "QP solution Δ*"), fontsize=9.5, color=C["x"], ha="right")
+ax.annotate(T("二次规划\n的解 Δ*", "QP\nsolution Δ*"), xy=tuple(dq), xytext=(-0.106, 0.03), fontsize=9.5, color=C["x"],
+            ha="right", va="center", arrowprops=dict(arrowstyle="-", color=C["x"], lw=0.6, shrinkA=2, shrinkB=7))   # 标注放在等高线外，用引线指向 Δ*
 g = Q @ dq + c
 gn = -g / np.linalg.norm(g) * 0.06
 arrow(ax, dq, dq + gn, C["x"], 1.6)
-ax.text(dq[0] + gn[0] + 0.005, dq[1] + gn[1] - 0.012, r"$-\nabla q(\Delta^*) = \mu_4\,a_4$", fontsize=10, color=C["x"])
-ax.text(-0.19, -0.3, T("虚线：有效集法的迭代（从 Δ = 0 出发）", "dashed: active-set iterates (from Δ = 0)"), fontsize=8.5, color=C["accent"])
+ax.text(dq[0] + gn[0] + 0.005, dq[1] + gn[1] - 0.012, r"$-\nabla q(\Delta^*) = \mu_4\,a_4$", fontsize=10, color=C["x"],
+        bbox=BOX, zorder=6)
+ax.text(-0.19, -0.3, T("虚线：有效集法的迭代（从 Δ = 0 出发）", "dashed: active-set iterates (from Δ = 0)"), fontsize=8.5, color=C["accent"],
+        bbox=BOX, zorder=6)
 ax.set_xlim(-0.2, 0.2)
 ax.set_ylim(-0.32, 0.12)
 ax.set_aspect("equal")
@@ -113,7 +118,7 @@ for a_, lw_ in ((ax, 1.0), (az, 2.2)):
     target(a_, pd3)
 ax.plot([0.38, 0.38, 0.6, 0.6, 0.38], [0.38, 0.51, 0.51, 0.38, 0.38], color=C["ink"], lw=0.6)
 ax.text(0.38, 0.53, T("右图放大", "enlarged on the right"), fontsize=8.5)
-ax.text(-0.08, -0.14, T(r"灰色虚线：自然形态 $\theta_c$；橙色虚线：不加限位的解；蓝色：加限位的解", r"grey dashed: natural posture $\theta_c$; orange dashed: without limits; blue: with limits"),
+ax.text(-0.08, -0.14, T(r"灰色虚线：自然形态 $\theta_c$；橙色虚线：不加限位的解；蓝色：加限位的解", r"grey dashed: natural configuration $\theta_c$; orange dashed: without limits; blue: with limits"),
         fontsize=8.5, color=C["ink"])
 ax.set_xlim(-0.12, 0.85)
 ax.set_ylim(-0.18, 0.75)

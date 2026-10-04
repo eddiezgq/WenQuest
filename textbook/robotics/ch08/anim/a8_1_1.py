@@ -74,7 +74,7 @@ class Lesson(Base):
         ug = always_redraw(u_group)
         pn = always_redraw(panel)
         self.play(FadeIn(ug), FadeIn(pn))
-        self.caption("蓝色单位方向 u 转一圈：沿 u 的变化率等于 ∇f 在 u 上的投影", "Turn the unit direction u: the rate of change is the projection of ∇f on u", wait=0)
+        self.caption("蓝色单位方向 u 转一圈：沿 u 的变化率等于 ∇f 在 u 上的投影", "Turn the unit direction u through a full circle: the rate of change is the projection of ∇f on u", wait=0)
         self.play(phi.animate.set_value(2 * math.pi), run_time=6, rate_func=linear)
         self.caption("φ = 0 时增加最快，φ = 180° 时减小最快", "Fastest increase at φ = 0, fastest decrease at φ = 180°", wait=0)
         self.play(phi.animate.set_value(math.pi), run_time=2)

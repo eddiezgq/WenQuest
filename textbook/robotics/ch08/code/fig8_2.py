@@ -9,11 +9,12 @@ import math
 
 import numpy as np
 
-from _fig8 import BLUE, C, GREY, ORANGE, arrow, clean, draw_arm, target
+from _fig8 import BLUE, BOX, C, GREY, ORANGE, arrow, clean, draw_arm, target
 from _opt import L3R, arm_points, d, jac, tip, tip_hessians
 from bookout import T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”（同 fig2_1.py）
 
 # ---------------------------------------------------------------- 图 8.2.1
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(10.0, 5.6), gridspec_kw=dict(width_ratios=[1.0, 0.75]))
@@ -39,10 +40,11 @@ a1.set_ylim(-1.6, 6.6)
 xs = np.linspace(0.05, 11, 400)
 for S, ls in ((20, ":"), (35, ":"), (50, "-"), (65, ":")):
     a2.plot(xs, S / xs, color=C["muted"] if S != 50 else BLUE, lw=0.9 if S != 50 else 1.4, ls=ls)
-    xl = 8.9 if S < 50 else 8.3
-    a2.text(xl, S / xl + 0.4, f"S = {S}", fontsize=8.5, color=C["muted"] if S != 50 else BLUE)
+    xl = 10.3 if S < 50 else 8.4
+    a2.text(xl, S / xl, f"S = {S}", fontsize=8.5, color=C["muted"] if S != 50 else BLUE, ha="center", va="center",
+            bbox=dict(fc="white", ec="none", pad=1.0), zorder=5)          # 标注嵌在曲线上，像等高线标注
 a2.plot([0, 10], [20, 0], color=C["ink"], lw=1.6)
-a2.text(0.35, 20.2, T("约束 2x + y = 20", "constraint 2x + y = 20"), fontsize=9.5)
+a2.text(9.0, 0.6, T("约束 2x + y = 20", "constraint 2x + y = 20"), fontsize=9.5, ha="right")
 xo, yo = 5.0, 10.0
 a2.plot(xo, yo, "o", color=C["x"], ms=6, zorder=6)
 gs = np.array([yo, xo]) / np.hypot(yo, xo) * 3.0
@@ -51,8 +53,9 @@ arrow(a2, (xo, yo), (xo + gs[0], yo + gs[1]), BLUE, 1.6)
 arrow(a2, (xo, yo), (xo + gh[0] * 0.75, yo + gh[1] * 0.75), C["x"], 2.2)
 a2.text(xo + gs[0] + 0.15, yo + gs[1] + 0.2, r"$\nabla S$", color=BLUE, fontsize=11)
 a2.text(xo + gh[0] * 0.75 + 0.1, yo + gh[1] * 0.75 - 1.4, r"$\nabla h$", color=C["x"], fontsize=11)
-a2.text(0.3, 4.2, T("最优点 (5, 10)：\n∇S ∥ ∇h，\n等高线与约束相切", "optimum (5, 10):\n∇S ∥ ∇h; the\nlevel curve\ntouches the line"),
-        fontsize=9, color=C["x"])
+a2.text(0.3, 3.0, T("最优点 (5, 10)：\n$\\nabla S \\parallel \\nabla h$，\n等高线与约束相切",
+                    "optimum (5, 10):\n$\\nabla S \\parallel \\nabla h$; the\nlevel curve\ntouches the line"),
+        fontsize=9, color=C["x"], bbox=BOX, zorder=5)
 x1, y1 = 2.0, 16.0
 a2.plot(x1, y1, "o", color=ORANGE, ms=5, zorder=6)
 g1 = np.array([y1, x1]) / np.hypot(y1, x1) * 3.0
@@ -60,7 +63,8 @@ arrow(a2, (x1, y1), (x1 + g1[0], y1 + g1[1]), ORANGE, 1.4)
 a2.text(x1 + g1[0] + 0.2, y1 + g1[1] - 0.3, r"$\nabla S$", color=ORANGE, fontsize=10)
 tdir = np.array([1.0, -2.0]) / math.sqrt(5) * 2.2
 arrow(a2, (x1, y1), (x1 + tdir[0], y1 + tdir[1]), C["accent"], 1.4, ms=9)
-a2.text(0.3, 9.9, T("沿约束走，\nS 还能增大", "along the\nconstraint\nS still grows"), fontsize=8.5, color=C["accent"])
+a2.text(0.3, 9.9, T("沿约束走，\nS 还能增大", "along the\nconstraint\nS still grows"), fontsize=8.5, color=C["accent"],
+        bbox=BOX, zorder=5)
 a2.set_xlim(0, 11)
 a2.set_ylim(0, 22)
 a2.set_aspect("equal")
@@ -94,8 +98,8 @@ ps = arm_points(x, L)
 draw_arm(ax, pc, GREY, lw=3.0, alpha=0.8, ls=(0, (4, 2)))
 draw_arm(ax, ps, BLUE, lw=3.5)
 target(ax, pd)
-ax.text(pc[-1][0] - 0.24, pc[-1][1] + 0.03, T(r"自然形态 $\theta_c$（扭簧不受力）", r"natural posture $\theta_c$ (springs relaxed)"), fontsize=9, color=C["muted"])
-ax.text(pd[0] + 0.03, pd[1] - 0.04, T("拉到 $p_d$ 后的\n平衡形态", "equilibrium with\nthe tip at $p_d$"), fontsize=9, color=BLUE)
+ax.text(pc[-1][0] - 0.24, pc[-1][1] + 0.03, T(r"自然形态 $\theta_c$（扭簧不受力）", r"natural configuration $\theta_c$ (springs relaxed)"), fontsize=9, color=C["muted"])
+ax.text(pd[0] + 0.03, pd[1] - 0.04, T("拉到 $p_d$ 后的\n平衡形态", "equilibrium with the\nend-effector at $p_d$"), fontsize=9, color=BLUE)
 s = 0.006
 arrow(ax, pd, pd + s * F, C["accent"], 2.2, ms=13)
 ax.text(pd[0] + s * F[0] + 0.02, pd[1] + s * F[1] - 0.05, T(r"手的力 $F = -\lambda$", r"hand force $F = -\lambda$"), fontsize=10, color=C["accent"])

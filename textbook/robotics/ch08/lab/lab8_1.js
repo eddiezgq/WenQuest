@@ -7,13 +7,13 @@ WQ.lab({
          "Solve the inverse kinematics of a planar 2R arm by gradient descent and by Newton's method, watch the iterates on the level curves, and see what the step-size limit and the condition number do."],
   scenes: [
     { id: "arm", robot: true, name: ["2R 臂的逆运动学", "Inverse kinematics of a 2R arm"], hide: ["kappa"],
-      problem: { title: ["机器人问题：关节转到多少度，末端才能到达目标", "Robot problem: which joint angles bring the tip to the target?"],
+      problem: { title: ["机器人问题：关节转到多少度，末端才能到达目标", "Robot problem: which joint angles bring the end-effector to the target?"],
                  text: ["把逆运动学写成 min f(θ) = ½‖p(θ) − p_d‖²，从起始形态出发一步步下山。右图是 f 的等高线，横轴 θ₁、纵轴 θ₂。",
                         "Write the inverse kinematics as min f(θ) = ½‖p(θ) − p_d‖² and walk downhill from the start. Right: level curves of f, θ₁ across, θ₂ up."] } },
     { id: "fog", name: ["雾中下山", "Downhill in fog"], hide: ["alpha", "t1", "t2"],
       problem: { title: ["生活中的例子：狭长的山谷", "Everyday example: a long narrow valley"],
                  text: ["在雾中只能感觉脚下最陡的方向。山谷越狭长（条件数 κ 越大），沿最陡方向走就越要来回折返。",
-                        "In fog you only feel the steepest slope underfoot. The narrower the valley (the larger κ), the more the steepest path zig-zags."] } },
+                        "In fog you only feel the steepest slope underfoot. The narrower the valley (the larger κ), the more the steepest path zigzags."] } },
   ],
   params: [
     { id: "method", name: ["方法：0 梯度下降 / 1 牛顿法", "Method: 0 gradient descent / 1 Newton"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
@@ -34,7 +34,7 @@ WQ.lab({
       demo: { scene: "fog", set: { kappa: 25, method: 0 }, press: ["start"], wait: 15 } },
   ],
   think: ["从 (0°, 17°) 出发用牛顿法，迭代收敛到 θ₂ = 0 的形态，梯度确实为零，末端却没有到达目标。这是什么点？为什么牛顿法分辨不出来？",
-          "Start Newton's method at (0°, 17°): it converges to θ₂ = 0 with zero gradient, yet the tip misses the target. What kind of point is it, and why can't Newton's method tell?"],
+          "Start Newton's method at (0°, 17°): it converges to θ₂ = 0 with zero gradient, yet the end-effector misses the target. What kind of point is it, and why can't Newton's method tell?"],
 
   L1: 0.425, L2: 0.392, PD: [0.5, 0.4],
   tip(t) { return [this.L1 * Math.cos(t[0]) + this.L2 * Math.cos(t[0] + t[1]), this.L1 * Math.sin(t[0]) + this.L2 * Math.sin(t[0] + t[1])]; },

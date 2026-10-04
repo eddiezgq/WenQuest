@@ -33,7 +33,7 @@ def P(v):
 
 class Lesson(Base):
     def construct(self):
-        self.title("8.5", "LM 步：在梯度方向与高斯-牛顿步之间", "The LM step: between the gradient and the Gauss-Newton step")
+        self.title("8.5", "LM 步：在梯度方向与高斯-牛顿步之间", "The LM step: between the gradient and the Gauss–Newton step")
         r0, J = tip(TH) - PD, jac(TH)
         A, g = J.T @ J, J.T @ r0
         step = lambda lam: -np.linalg.solve(A + lam * np.eye(2), g)
@@ -48,12 +48,12 @@ class Lesson(Base):
         self.caption("灰色：F(θ + Δ) 的等高线（以当前点为原点）", "Grey: level curves of F(θ + Δ), centred on the current point")
         dgn = step(0.0)
         gnp = Square(0.18, color=BLUE_C, fill_opacity=1).move_to(P(dgn))
-        gl = bi(["高斯-牛顿步（μ = 0）", "Gauss-Newton step (μ = 0)"], 20, BLUE_C).next_to(gnp, LEFT, buff=0.12)
+        gl = bi(["高斯-牛顿步（μ = 0）", "Gauss–Newton step (μ = 0)"], 20, BLUE_C).next_to(gnp, LEFT, buff=0.12)
         gd = -g / np.linalg.norm(g)
         garr = Arrow(P([0, 0]), P(0.35 * gd), buff=0, color=RED, stroke_width=6, max_tip_length_to_length_ratio=0.25)
         gal = MathTex(r"-\nabla F", color=RED, font_size=32).next_to(garr.get_end(), DOWN, buff=0.1)
         self.play(FadeIn(gnp), FadeIn(gl), GrowArrow(garr), FadeIn(gal))
-        self.caption("红色：负梯度方向；蓝色方块：高斯-牛顿步", "Red: the negative gradient; blue square: the Gauss-Newton step")
+        self.caption("红色：负梯度方向；蓝色方块：高斯-牛顿步", "Red: the negative gradient; blue square: the Gauss–Newton step")
         lgl = ValueTracker(math.log10(30.0))
 
         def moving():
@@ -82,13 +82,13 @@ class Lesson(Base):
         pn = always_redraw(panel)
         self.play(FadeIn(mv), FadeIn(tr), FadeIn(pn))
         self.caption("μ 大：步子短，方向接近负梯度；紫圈是信赖域", "Large μ: a short step close to the negative gradient; the purple circle is the trust region", wait=1.2)
-        self.caption("μ 减小：步子变长，逐渐转向高斯-牛顿步", "Smaller μ: the step grows and turns towards the Gauss-Newton step", wait=0)
+        self.caption("μ 减小：步子变长，逐渐转向高斯-牛顿步", "Smaller μ: the step grows and turns towards the Gauss–Newton step", wait=0)
         self.play(lgl.animate.set_value(-6.0), run_time=6, rate_func=smooth)
         self.wait(0.5)
-        self.caption("高斯-牛顿步越过了谷底，F 反而增大：ρ < 0，这一步被拒绝", "The Gauss-Newton step overshoots the valley and F grows: ρ < 0, the step is rejected", wait=1.5)
+        self.caption("高斯-牛顿步越过了谷底，F 反而增大：ρ < 0，这一步被拒绝", "The Gauss–Newton step overshoots the valley and F grows: ρ < 0, the step is rejected", wait=1.5)
         self.caption("LM 法于是加大 μ，在更小的信赖域内重新求步", "LM then raises μ and solves again inside a smaller trust region", wait=0)
         self.play(lgl.animate.set_value(math.log10(0.02)), run_time=2.5)
         self.wait(1.2)
-        self.card([["列文伯格-马夸特法", "The Levenberg-Marquardt method"],
+        self.card([["列文伯格-马夸特法", "The Levenberg–Marquardt method"],
                    MathTex(r"(J^{\mathsf T}J + \mu I)\,\Delta = -J^{\mathsf T} r", font_size=46),
-                   ["μ 在梯度下降与高斯-牛顿之间连续调节，由增益比 ρ 决定增减", "μ blends gradient descent and Gauss-Newton; the gain ratio ρ tells it to grow or shrink"]])
+                   ["μ 在梯度下降与高斯-牛顿之间连续调节，由增益比 ρ 决定增减", "μ blends gradient descent and Gauss–Newton; the gain ratio ρ tells it to grow or shrink"]])
