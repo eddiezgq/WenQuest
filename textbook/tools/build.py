@@ -589,7 +589,7 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
 # ---------------------------------------------------------------- 零件库链接（第 11 轮《机械设计》第 33 章修订，各书共用）
 # 正文写 [[零件:A-BRG-DG/6207]] 或 [[零件:D-RDC-HD-CSF]]：阅读页显示零件名和规格，点开是数字工厂零件库的对应页面；
 # 构建时核对编号（和规格）在零件库里存在（library/catalog）。
-PART = re.compile(r"\[\[零件:([A-Z][A-Z0-9-]+)(?:/([^\]\s]+))?\]\]")
+PART = re.compile(r"\[\[(?:零件|part):([A-Z][A-Z0-9-]+)(?:/([^\]\s]+))?\]\]")
 LIBRARY_DIR = ROOT / "library" / "catalog"
 LIBRARY_URL = os.environ.get("WQ_LIBRARY_URL", "https://factory.wenquestrobotics.com/library")
 _LIB: dict = {}

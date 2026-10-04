@@ -125,7 +125,10 @@ D.shaft(a1, [(z0, z1, d) for z0, z1, d, _ in L.LAY])
 for zc in L.Z_BRG:
     D.bearing(a1, zc, 12, 32, 10)
 OFF = [(-6, 24, "right"), (8, 24, "left"), (0, 24, "center"), (-4, -30, "right"), (6, -30, "left")]     # 标注错开，不重叠
+EN = {"针杆曲柄与平衡块": "crank and counterweight", "挑线凸轮": "take-up cam", "送布偏心轮": "feed eccentric",
+      "同步带轮": "timing pulley", "手轮与电机转子": "handwheel and motor rotor"}
 for (name, zm, mk), (dx, dy, ha) in zip(L.MASSES, OFF):
+    name = T(name, EN[name])
     a1.plot([zm], [0], "o", ms=4 + 20 * mk, mfc=D.GEAR, mec=D.INK, mew=0.8, zorder=5)
     a1.annotate(name, (zm, 0), xytext=(dx, dy), textcoords="offset points", ha=ha, fontsize=7,
                 arrowprops=dict(arrowstyle="-", color=D.MUTED, lw=0.6))

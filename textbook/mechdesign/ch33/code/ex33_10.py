@@ -106,7 +106,7 @@ life_inf = bool(fs["infinite"])
 
 def pose_txt(P):
     """姿态写成度（J1–J6 依次为 shoulder_pan … wrist_3），数字工厂“运动与动力分析”里填的就是度"""
-    return "、".join("J{} {:.0f}°".format(i + 1, math.degrees(v)).replace("-", "−") for i, v in enumerate(P.values()))
+    return T("、", ", ").join("J{} {:.0f}°".format(i + 1, math.degrees(v)).replace("-", "−") for i, v in enumerate(P.values()))
 
 
 # ---------------------------------------------------------------- 图
