@@ -378,6 +378,8 @@ function sorter(o = {}) {
 // shows OK or NOK. A light curtain (NC, safety) must stop the press. Inputs: B_Part, B_Clamped, B_Unclamped, B_PressUp,
 // B_PressDown, S_Hand1, S_Hand2, S_LC (light curtain, NC), AI_Force; outputs: Y_Clamp, Y_PressDown, Y_PressUp, H_OK, H_NOK.
 // Force at the bottom: about 5.6 kN for a good part (window 4–7 kN), 9.1 kN too tight, 2.1 kN too loose.
+// Operating elements (Chapter 15): e-stop (NC), mode switch, reset/home, single step, manual clamp and ram jog; lamps
+// Ready and Fault. The ram valve is a 5/3 closed-centre valve: with neither coil on, the ram stops where it is.
 function press(o = {}) {
   const io = [
     { name: "B_Part", addr: "%IX0.0", dir: "in", comment: ["工件在位", "Part present"] },
@@ -389,30 +391,46 @@ function press(o = {}) {
     { name: "S_Hand2", addr: "%IX0.6", dir: "in", comment: ["双手按钮右", "Two-hand button right"] },
     { name: "S_LC", addr: "%IX0.7", dir: "in", comment: ["安全光幕（常闭，挡光为 0）", "Light curtain (NC, 0 when broken)"] },
     { name: "AI_Force", addr: "%IW64", dir: "in", type: "INT", comment: ["压装力 0–27648 ↔ 0–10 kN", "Press force 0–27648 ↔ 0–10 kN"] },
+    { name: "S_EStop", addr: "%IX1.0", dir: "in", comment: ["急停（常闭，按下为 0）", "Emergency stop (NC, 0 when pressed)"] },
+    { name: "S_Auto", addr: "%IX1.1", dir: "in", comment: ["方式选择：1 自动 / 0 手动", "Mode switch: 1 auto / 0 manual"] },
+    { name: "S_Reset", addr: "%IX1.2", dir: "in", comment: ["复位（回原点）按钮", "Reset (home) button"] },
+    { name: "S_Step", addr: "%IX1.3", dir: "in", comment: ["单步按钮", "Single-step button"] },
+    { name: "S_JogClamp", addr: "%IX1.4", dir: "in", comment: ["手动：夹紧／松开", "Manual: clamp / unclamp"] },
+    { name: "S_JogDown", addr: "%IX1.5", dir: "in", comment: ["手动：压头下行（点动）", "Manual: ram down (jog)"] },
+    { name: "S_JogUp", addr: "%IX1.6", dir: "in", comment: ["手动：压头上行（点动）", "Manual: ram up (jog)"] },
     { name: "Y_Clamp", addr: "%QX0.0", dir: "out", comment: ["夹紧气缸", "Clamp cylinder"] },
     { name: "Y_PressDown", addr: "%QX0.1", dir: "out", comment: ["压头下行", "Ram down"] },
     { name: "Y_PressUp", addr: "%QX0.2", dir: "out", comment: ["压头上行", "Ram up"] },
     { name: "H_OK", addr: "%QX0.3", dir: "out", comment: ["合格灯（绿）", "OK lamp (green)"] },
     { name: "H_NOK", addr: "%QX0.4", dir: "out", comment: ["不合格灯（红）", "NOK lamp (red)"] },
+    { name: "H_Ready", addr: "%QX0.5", dir: "out", comment: ["就绪灯（白）：在原点、可以启动", "Ready lamp (white): at home, may start"] },
+    { name: "H_Fault", addr: "%QX0.6", dir: "out", comment: ["故障灯（黄）", "Fault lamp (amber)"] },
   ];
   const STROKE = 0.12, CONTACT = 0.085, SPEED = 0.06;   // ram stroke m, where the bearing meets the bore, ram speed m/s
   return {
     io,
     panel: [{ name: "B_Part", kind: "switch", label: ["放上工件", "Load part"] }, { name: "S_Hand1", kind: "push", label: ["双手左", "Hand L"] },
-            { name: "S_Hand2", kind: "push", label: ["双手右", "Hand R"] }, { name: "S_LC", kind: "nc-push", label: ["手伸进光幕", "Hand in curtain"] }],
+            { name: "S_Hand2", kind: "push", label: ["双手右", "Hand R"] },
+            { names: ["S_Hand1", "S_Hand2"], kind: "push", label: ["双手同时按住", "Both hands"] }, { name: "S_LC", kind: "nc-push", label: ["手伸进光幕", "Hand in curtain"] },
+            { name: "S_EStop", kind: "estop", label: ["急停（再按一次释放）", "E-stop (press again to release)"] }, { name: "S_Auto", kind: "switch", label: ["自动", "Auto"] },
+            { name: "S_Reset", kind: "push", label: ["复位", "Reset"] }, { name: "S_Step", kind: "push", label: ["单步", "Step"] },
+            { name: "S_JogClamp", kind: "switch", label: ["手动夹紧", "Jog clamp"] }, { name: "S_JogDown", kind: "push", label: ["手动下", "Jog down"] },
+            { name: "S_JogUp", kind: "push", label: ["手动上", "Jog up"] }],
     faults: [{ id: "tight", name: ["过盈太大（力超上限）", "Interference too large (force high)"] },
              { id: "loose", name: ["过盈太小（力不足）", "Interference too small (force low)"] },
-             { id: "clampWire", name: ["夹紧到位传感器断线", "Clamp sensor wire broken"] }],
+             { id: "clampWire", name: ["夹紧到位传感器断线", "Clamp sensor wire broken"] },
+             { id: "upStuck", name: ["压头上位开关粘连（常为 1）", "Ram-top switch stuck closed (always 1)"] }],
     reset(s, opt) {
-      s.f = (opt && opt.faults) || {}; s.t = 0; s.out = {}; s.clamp = 0; s.ram = 0; s.force = 0; s.hazard = false; s.seated = false;
+      s.f = (opt && opt.faults) || {}; s.t = 0; s.out = {}; s.clamp = o.clamp0 || 0; s.ram = o.ram0 || 0; s.force = 0; s.hazard = false; s.seated = false;
       s.rand = rng((opt && opt.seed) || 11); s.part = false; s.panelLC = true; s.peak = 0;
     },
     inputs(s) {
       const kN = s.force + (s.rand() - 0.5) * 0.05;   // ±0.025 kN noise
       return {
         B_Clamped: s.clamp > 0.97 && !s.f.clampWire, B_Unclamped: s.clamp < 0.03,
-        B_PressUp: s.ram < 0.002, B_PressDown: s.ram > STROKE - 0.002,
+        B_PressUp: s.ram < 0.002 || !!s.f.upStuck, B_PressDown: s.ram > STROKE - 0.002,
         AI_Force: Math.round(clamp(kN, 0, 10) / 10 * 27648),
+        S_EStop: true, S_LC: true,      // NC safety contacts: closed (TRUE) unless the panel or a test opens them
       };
     },
     step(dt, out, s, ins) {
@@ -423,6 +441,7 @@ function press(o = {}) {
       const dir = out.Y_PressDown && !out.Y_PressUp ? 1 : out.Y_PressUp && !out.Y_PressDown ? -1 : 0;
       // the part must be clamped before the ram touches it; the light curtain (read from the panel) is a hazard check
       const lcOk = s.panelLC;
+      if (ins && ins.S_EStop === false && dir !== 0) s.hazard = true;   // e-stop pressed but the ram still moves
       if (dir > 0 && !lcOk) { s.hazard = true; }
       if (dir > 0 && s.ram > 0.02 && s.clamp < 0.9) s.hazard = true;
       s.ram = clamp(s.ram + dir * SPEED * sec, 0, STROKE);

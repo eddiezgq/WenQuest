@@ -128,6 +128,7 @@ test("sorter: eight parts end up in the right bins with a FIFO tracking program;
 const PRESS = `PROGRAM Main
   VAR state : INT; tHands : TON; force : REAL; peak : REAL; END_VAR
   force := INT_TO_REAL(AI_Force) * 10.0 / 27648.0;
+  IF NOT S_EStop THEN state := 9; END_IF;
   CASE state OF
     0: Y_Clamp := FALSE; Y_PressDown := FALSE; Y_PressUp := NOT B_PressUp;
        tHands(IN := S_Hand1 OR S_Hand2, PT := T#500ms);
@@ -142,6 +143,9 @@ const PRESS = `PROGRAM Main
        END_IF;
     3: Y_PressDown := FALSE; Y_PressUp := TRUE;
        IF B_PressUp THEN Y_PressUp := FALSE; Y_Clamp := FALSE; IF NOT (H_OK OR H_NOK) THEN H_NOK := TRUE; END_IF; state := 0; END_IF;
+    9: (* emergency stop: the ram stops where it is; reset after the e-stop is released *)
+       Y_PressDown := FALSE; Y_PressUp := FALSE;
+       IF S_EStop AND S_Reset THEN state := 3; END_IF;
   END_CASE;
 END_PROGRAM`;
 const cycle = (extra = []) => ({ steps: [{ set: { S_LC: true, B_Part: true } }, { wait: 100 }, { set: { S_Hand1: true, S_Hand2: true } },
@@ -161,4 +165,14 @@ test("press-fit: good, tight and loose parts; the light curtain stops the ram", 
   const bad = PRESS.replace("Y_PressDown := S_Hand1 AND S_Hand2 AND S_LC;", "Y_PressDown := TRUE;").replace("IF NOT (S_Hand1 AND S_Hand2 AND S_LC) OR force > 8.0", "IF force > 8.0");
   const r = run(plant, bad, Object.assign({ id: "lc" }, cycle([{ wait: 1500 }, { set: { S_LC: false } }, { never: { hazard: true }, during: 500 }])));
   assert.equal(r.ok, false);
+});
+
+test("press-fit panel: a latching e-stop and one button holding both hand buttons (usable with a mouse)", () => {
+  const pr = W.press();
+  const est = pr.panel.find((p) => p.name === "S_EStop");
+  assert.equal(est.kind, "estop");
+  const both = pr.panel.find((p) => p.names);
+  assert.deepEqual(both.names, ["S_Hand1", "S_Hand2"]);
+  const io = new Set(pr.io.map((x) => x.name));
+  for (const p of pr.panel) for (const n of p.names || [p.name]) assert.ok(io.has(n), n);
 });

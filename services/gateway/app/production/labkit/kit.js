@@ -751,7 +751,8 @@ function build(id, def) {
   const bar = el("div", "stagebar");
   const buttons = (def.buttons && def.buttons.length ? def.buttons : def.view === "plc" ? [
     { id: "run", name: ["运行 RUN", "Run"], primary: true }, { id: "stop", name: ["停止 STOP", "Stop"] },
-    { id: "step", name: ["单步扫描", "One scan"] }, { id: "slow", name: ["慢放 ×0.1", "Slow ×0.1"] }, { id: "reset", name: ["复位设备", "Reset machine"] },
+    { id: "step", name: ["单步扫描", "One scan"] }, { id: "slow", name: ["慢放 ×0.1", "Slow ×0.1"] }, { id: "power", name: ["断电再上电", "Power cycle"] },
+    { id: "reset", name: ["复位设备", "Reset machine"] },
   ] : [
     { id: "start", name: ["开始", "Start"], primary: true }, { id: "reset", name: ["重置", "Reset"] },
   ]);

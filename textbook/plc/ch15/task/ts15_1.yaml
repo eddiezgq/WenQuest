@@ -1,0 +1,36 @@
+# 工程任务单 TS-15-1（配 15.1–15.7 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-15-1
+标题: [轴承压装工位的顺序控制程序, "Sequential control program for the bearing press-fit station"]
+角色: [电气工程师（PLC 编程）, electrical engineer (PLC programming)]
+背景:
+  - "装配线要上一台新的轴承压装工位：把轴承压进减速器盖，按最大压装力判定合格与否。机械和气动已经设计好，I/O 表已经定下（表 15.1.1）。项目经理要你交付全套控制程序：先写控制要求说明，再按状态机设计法写程序，最后用测试证明程序满足每一条要求。程序要在问渠虚拟压装工位上通过全部测试，经程序检查没有错误，才能下载到现场的 PLC。"
+  - "A new bearing press-fit station is coming to the assembly line: press a bearing into a gearbox cover and judge it by the peak force. Mechanics and pneumatics are done and the I/O list is fixed (Table 15.1.1). The project manager wants the full control program: a requirements specification first, then a state-machine program, and finally tests proving every requirement. It must pass all tests on the WenQuest virtual station and the program review before it may be downloaded to the plant PLC."
+输入:
+  - {名称: [压装工位的 I/O 表, "Press station I/O list"], 来源: [教材表 15.1.1；实验 15.3 的 I/O 页, "Table 15.1.1; I/O page of Lab 15.3"]}
+  - {名称: [工艺要求：压装力 4.0–7.0 kN 合格、超过 8 kN 过载, "Process limits: 4.0–7.0 kN good, over 8 kN overload"], 来源: [教材 15.1 节, Section 15.1]}
+  - {名称: [虚拟压装工位与故障注入, "Virtual press station with fault injection"], 来源: [实验 15.3, Lab 15.3]}
+交付物:
+  - {名称: [控制要求说明（2–3 页）, "Control requirements specification (2–3 pages)"], 验收: [七个部分齐全（设备、I/O、动作顺序、时间与节拍、异常、操作方式、安全）；每条要求编号、可检验, "All seven parts present (equipment, I/O, sequence, times and cycle, abnormal cases, modes, safety); every requirement numbered and testable"]}
+  - {名称: [状态转换图与状态—事件表, "State diagram and state-event table"], 验收: [含 INIT、HOMING、FAULT、ESTOP；状态—事件表没有空格或“？”, "Includes INIT, HOMING, FAULT, ESTOP; no blank or '?' cells in the table"]}
+  - {名称: [PLC 程序（PLCopen XML）, "PLC program (PLCopen XML)"], 验收: [按准则 15.3.1 的结构；状态变量不保持；在实验 15.3 中通过全部 9 个测试（含异常处理和断电重启），程序检查没有错误, "Structured per Guideline 15.3.1; state not retentive; passes all 9 tests of Lab 15.3 (including abnormal cases and power cycle) with no review errors"]}
+  - {名称: [测试用例清单与测试报告, "Test list and report"], 验收: [每条要求至少一个测试用例（写成“给输入—等—检查”的表格）；实验 15.3 已有的测试注明对应哪条要求，没有现成测试的要求（单步、点动、回原点超时等）在实验台上按用例手动执行，记录结果和截图, "At least one test case per requirement (as a set-wait-check table); map Lab 15.3's existing tests to requirements, and run the remaining cases (single step, jog, homing timeout, …) by hand on the bench with results and screenshots"]}
+工位: [PY, PLM]
+步骤:
+  - ["读表 15.1.1 和 15.1 节，写出控制要求说明的七个部分，给每条要求编号。", "Read Table 15.1.1 and Section 15.1; write the seven parts of the specification and number each requirement."]
+  - ["画状态转换图，列状态—事件表，补全所有格子。", "Draw the state diagram and fill every cell of the state-event table."]
+  - ["按准则 15.3.1 写程序：枚举状态、CASE 写转移、输出统一赋值；加上操作方式、超时、冲突检查、急停。", "Write the program per Guideline 15.3.1 with modes, timeouts, conflict checks and e-stop."]
+  - ["把每条要求写成测试用例；在实验 15.3 中运行全部测试直到通过，其余用例在实验台上手动执行；运行程序检查。", "Turn each requirement into a test case; run Lab 15.3's tests until all pass, run the remaining cases by hand, and review the program."]
+  - ["做一次断电重启试验：回程途中断电再上电，确认设备不动作。", "Power-cycle during the return stroke and confirm the station stays still."]
+  - ["导出 PLCopen XML，整理测试报告，提交审批。", "Export PLCopen XML, compile the test report and submit for approval."]
+评审要点:
+  - ["〔AI 检查〕程序检查没有错误；全部测试通过。", "[AI] No review errors; all tests pass."]
+  - ["〔AI 检查〕状态变量没有声明为 RETAIN；每个输出只赋值一次。", "[AI] The state variable is not RETAIN; every output is assigned once."]
+  - ["〔老师检查〕控制要求说明的每一条都能在测试清单里找到对应的测试。", "[Teacher] Every requirement maps to a test in the list."]
+  - ["〔老师检查〕安全条件（急停、光幕、双手、过载、互锁）写在输出上，不受操作方式影响。", "[Teacher] Safety conditions are on the outputs, independent of mode."]
+  - ["〔老师检查〕故障状态下压头停在原处、夹具保持；复位后经回原点恢复。", "[Teacher] In fault the ram stops where it is and the clamp holds; reset recovers through homing."]
+评分:
+  - {项: [控制要求说明, Specification], 分: 20, 标准: [七部分齐全，每条可检验, "Seven parts, every item testable"]}
+  - {项: [状态转换图与状态—事件表, Diagram and table], 分: 20, 标准: [状态完整，表无遗漏, "Complete states, no gaps"]}
+  - {项: [程序, Program], 分: 30, 标准: [结构规范，测试全过，检查无错, "Proper structure, all tests pass, no review errors"]}
+  - {项: [测试, Tests], 分: 30, 标准: [覆盖每条要求和三种故障、断电重启, "Covers every requirement, three faults and power cycle"]}
+学时: 4

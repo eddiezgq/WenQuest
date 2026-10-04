@@ -26,7 +26,9 @@ def _pair(x) -> bool:
 
 def meta(js: Path) -> dict:
     """The lab's data (functions dropped), read by running the program with a stand-in WQ.lab."""
-    code = ("const fs=require('fs');let d=null;global.WQ={lab:x=>{d=x}};"
+    kit = GATEWAY / "app" / "production" / "labkit"      # PLC labs name the virtual machines (WQPLANTS.press(), 第 18 轮)
+    code = (f"global.WQPLANTS=require({json.dumps(str(kit / 'plants.js'))});"
+            "const fs=require('fs');let d=null;global.WQ={lab:x=>{d=x}};"
             f"eval(fs.readFileSync({json.dumps(str(js))},'utf8'));process.stdout.write(JSON.stringify(d));")
     r = subprocess.run(["node", "-e", code], capture_output=True, text=True, timeout=30)
     if r.returncode != 0 or not r.stdout:

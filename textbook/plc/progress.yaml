@@ -14,4 +14,7 @@ parts_en:
   第九篇 新一代控制器: "Part IX  New Generations of Controllers"
   第十篇 典型设备的控制: "Part X  Controlling Typical Machines"
   第十一篇 综合项目: "Part XI  Capstone Projects"
-chapters: {}
+chapters:
+  15:
+    status: ai
+    title_en: "Sequential Control Design"

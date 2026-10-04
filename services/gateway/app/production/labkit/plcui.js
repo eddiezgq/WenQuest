@@ -6,7 +6,7 @@
 //            program: {st} or {decls, ladder}   (the starting program the student edits),
 //            watch: ["Main.state", ...], tests: [{id, name: [zh, en], steps: [...], faults}], },
 //   plant: { reset(s, {faults}), inputs(s) -> {name: value}, step(dt_ms, outputs, s), read(s, name),
-//            panel: [{name, kind: "push"|"nc-push"|"switch", label: [zh, en]}], faults: [{id, name: [zh, en]}] }
+//            panel: [{name, kind: "push"|"nc-push"|"switch"|"estop", label: [zh, en], names?: [..]}] (names: one push button holding several inputs; estop: latching NC), faults: [{id, name: [zh, en]}] }
 //   draw(api, s) sees api.plc.io (name -> value), api.plc.plant (the plant state), api.plc.rt (the runtime).
 //   A task with test: "<id>" is ticked when that test passes; check(api) may tick others with api.done(id).
 (function () {
@@ -585,12 +585,17 @@ function setup(L, K) {
     panel.innerHTML = "";
     (plant.panel || []).forEach((p) => {
       const b = biText(el("button", "btn opbtn " + p.kind), p.label);
+      const names = p.names || [p.name];   // names: one button holding several inputs (e.g. both hand buttons at once)
       if (p.kind === "switch") {
         b.setAttribute("aria-pressed", String(!!S.panel[p.name]));
         b.addEventListener("click", () => { S.panel[p.name] = !S.panel[p.name]; b.setAttribute("aria-pressed", String(S.panel[p.name])); });
+      } else if (p.kind === "estop") {      // latching e-stop with an NC contact: press to latch (input 0), press again to release (twist-to-release)
+        if (S.panel[p.name] === undefined) S.panel[p.name] = true;
+        b.setAttribute("aria-pressed", String(!S.panel[p.name]));
+        b.addEventListener("click", () => { S.panel[p.name] = !S.panel[p.name]; b.setAttribute("aria-pressed", String(!S.panel[p.name])); });
       } else {
-        const down = () => { S.panel[p.name] = p.kind !== "nc-push"; b.classList.add("down"); };
-        const up = () => { S.panel[p.name] = p.kind === "nc-push"; b.classList.remove("down"); };
+        const down = () => { names.forEach((n) => { S.panel[n] = p.kind !== "nc-push"; }); b.classList.add("down"); };
+        const up = () => { names.forEach((n) => { S.panel[n] = p.kind === "nc-push"; }); b.classList.remove("down"); };
         b.addEventListener("pointerdown", (e) => { e.preventDefault(); down(); try { b.setPointerCapture(e.pointerId); } catch (x) { /* old browser */ } });
         b.addEventListener("pointerup", up); b.addEventListener("pointercancel", up);
         b.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter") down(); });
@@ -676,6 +681,10 @@ function setup(L, K) {
     if (id === "stop") { api.running = false; }
     else if (id === "step") { if (!S.rt) load(); if (S.rt) { api.running = false; scanOnce(); syncIo(); } }
     else if (id === "slow") { S.speed = S.speed === 1 ? 0.1 : 1; }
+    else if (id === "power" && S.rt) {   // power off and on: outputs drop, RETAIN variables survive, the machine stays where it is
+      S.rt.restart(); syncIo();
+      say(T("已断电再上电：输出全部断开，保持型（RETAIN）变量保留，其余变量回到初值。", "Power cycled: outputs off, RETAIN variables kept, the rest back to initial values."), "ok");
+    }
     paintStatus();
   };
   const userReadouts = def.readouts;

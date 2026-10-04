@@ -782,6 +782,8 @@ function compile(src, opts = {}) {
   function lookupVar(name, scope, line) {
     const nm = name.toUpperCase();
     const v = scope.vars[nm];
+    if ((v || globalsByName[nm]) && enumOf[nm])
+      throw E("semantic", `${name} 既是变量又是枚举值，会混淆；把变量改名，或写成 ${types[enumOf[nm].t].name}#${name} / ${name} is both a variable and an enum value: rename the variable or write ${types[enumOf[nm].t].name}#${name}`, line);
     if (v && v.kind !== "external") return { kind: "local", v };
     if (globalsByName[nm]) return { kind: "global", v: globalsByName[nm] };
     if (v && v.kind === "external") throw E("semantic", `VAR_EXTERNAL ${name} 没有对应的全局变量 / no global ${name}`, line);
@@ -1369,6 +1371,18 @@ class Runtime {
     return o;
   }
   watch(path) { return this.project.watch(this.state, { read: (a) => this.read(a) }, path); }
+  // power off and on (Chapter 15.7): outputs drop, the program starts again; RETAIN variables keep their values
+  restart() {
+    const old = this.state;
+    this.state = this.project.newState();
+    for (const [pn, inst] of Object.entries(this.state.instances)) {
+      const u = this.project.pous[pn];
+      for (const v of u.vars) if (v.retain && old.instances[pn]) inst[v.name.toUpperCase()] = old.instances[pn][v.name.toUpperCase()];
+    }
+    for (const [n, g] of Object.entries(this.project.globals)) if (g.retain && n in old.globals) this.state.globals[n] = old.globals[n];
+    for (const io of this.io) if (io.dir === "out") this.image[io.addr] = io.addr[2] === "X" ? false : 0;
+    this.error = null; this.restarts = (this.restarts || 0) + 1;
+  }
   startTrace(names, max = 2000) { this.trace = { names, t: [], v: names.map(() => []), max }; }
   recordTrace() {
     const tr = this.trace;
@@ -1394,6 +1408,8 @@ function runTest(rtOpts, plant, test, opts = {}) {
   const manual = {};
   const log = [];
   const result = { id: test.id, ok: true, failures: [], log, time: 0 };
+  const trace = opts.trace ? { names: opts.trace, t: [], v: opts.trace.map(() => []) } : null;   // signals recorded every scan (book figures)
+  if (trace) result.trace = trace;
   const dt = rt.cycle;
   const advance = (ms, check) => {
     const end = rt.now + ms;
@@ -1406,6 +1422,7 @@ function runTest(rtOpts, plant, test, opts = {}) {
       }
       if (!rt.scan()) return false;
       if (plant && plant.step) plant.step(dt, rt.outputs(), ps, ins);
+      if (trace) { trace.t.push(rt.now); trace.names.forEach((n, k) => trace.v[k].push(val(n))); }
       if (check && check()) return true;
     }
     return null;
@@ -1423,6 +1440,17 @@ function runTest(rtOpts, plant, test, opts = {}) {
     if (s.set) { Object.assign(manual, s.set); log.push([rt.now, "set", s.set]); }
     if (s.release) { s.release.forEach((n) => delete manual[n]); }
     if (s.plant && plant && plant.command) plant.command(ps, s.plant);
+    if (s.power) {   // {power: ms}: the PLC is off for that long (outputs off, the machine coasts), then starts again
+      const offEnd = rt.now + s.power;
+      for (const io of rt.io) if (io.dir === "out") rt.image[io.addr] = io.addr[2] === "X" ? false : 0;   // outputs drop at once
+      while (rt.now < offEnd - 1e-9) {
+        if (plant && plant.step) plant.step(dt, Object.fromEntries(rt.io.filter((x) => x.dir === "out").map((x) => [x.name, x.addr[2] === "X" ? false : 0])), ps, manual);
+        rt.now += dt;
+        if (trace) { trace.t.push(rt.now); trace.names.forEach((n, k) => trace.v[k].push(val(n))); }
+      }
+      rt.restart();
+      log.push([rt.now, "power", s.power]);
+    }
     if (s.wait) { if (advance(s.wait) === false) break; }
     if (s.expect) {
       for (const [n, v] of Object.entries(s.expect)) {

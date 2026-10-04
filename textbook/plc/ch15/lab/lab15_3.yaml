@@ -1,0 +1,48 @@
+# 实验 15.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、任务取自 lab15_3.js。
+原理:
+  - ["状态机设计法（15.3 节）用一个枚举变量记住设备当前处于哪个状态。压装工位的自动循环有五个状态：等待（IDLE）、夹紧（CLAMPING）、压装（PRESSING）、回程（RETURNING）、松开（UNCLAMPING）。",
+     "The state-machine method (Section 15.3) keeps the machine's current state in one enumeration variable. The automatic cycle has five states: IDLE, CLAMPING, PRESSING, RETURNING and UNCLAMPING."]
+  - ["程序分两部分：CASE 语句只写转移，每个分支只写离开该状态的条件；CASE 之后统一写输出，每个输出只写一次，由状态决定，再与上安全条件（准则 15.3.1）。",
+     "The program has two parts: a CASE statement holds only the transitions, each branch only the conditions for leaving that state; after it every output is written once, from the state and then ANDed with the safety conditions (Guideline 15.3.1)."]
+  - ["压头下行是米利型输出：状态为 PRESSING、两个双手按钮按着、光幕无遮挡，三者同时满足才得电。安全条件写在输出上，任何时候一失去，输出在同一个扫描周期就断开。",
+     "Ram down is a Mealy output: PRESSING, both hand buttons held and the curtain clear. Written on the output, a safety condition drops the output in the same scan whenever it is lost."]
+  - 式: "F = AI_Force × 10 / 27648  (kN)；判定：4.0 kN ≤ F_max ≤ 7.0 kN 合格"
+  - ["测试用例把控制要求说明的每一条要求写成“给输入—等—检查”，在虚拟压装工位上按模拟时间自动执行。过盈太大、太小用故障注入模拟。",
+     "A test turns each requirement into 'set inputs, wait, check', run automatically against the virtual station in simulated time; too tight and too loose fits are injected faults."]
+步骤:
+  - ["打开实验 15.3，先在 I/O 与监视页对照表 15.1.1 认识每个 I/O 点；在操作面板上“放上工件”，看 B_Part 变为 1。",
+     "Open Lab 15.3; on the I/O & watch page match every point with Table 15.1.1; switch 'Load part' on the panel and see B_Part become 1."]
+  - ["画出压装工位的状态转换图（可参照图 15.2.2），列出每个状态的转移条件和输出，填入表 1。",
+     "Draw the state-transition diagram (see Figure 15.2.2), list each state's transitions and outputs, and fill in Table 1."]
+  - ["在程序框架的 CASE 里逐个状态写出转移；在输出部分写出 Y_Clamp、Y_PressDown、Y_PressUp。按“编译并下载”，改正编译错误。",
+     "Write each state's transitions in the CASE of the skeleton and the outputs Y_Clamp, Y_PressDown, Y_PressUp; press 'Compile & download' and fix any errors."]
+  - ["按“运行”，先拨到“自动”、按“复位”（15.3 节的程序不用这两个信号，不影响），再用操作面板手动做一个循环：放工件，按住“双手同时按住”（相当于两只手同时按下两个按钮），观察三维画面和时序图，记录各段时间填入表 2。",
+     "Press Run, switch to Auto and press Reset (a Section 15.3 program ignores them), then do one cycle by hand: load, hold 'Both hands' (both buttons together), watch the 3D view and timing chart, and record the times in Table 2."]
+  - ["到测试页按“运行全部测试”。对没有通过的测试，读失败信息，找出程序中对应的转移或输出，修改后重测，直到前五个测试全部通过（后四个标有“15.5 节”“15.7 节”的测试检验异常处理，学完 15.5 节再做）。",
+     "On the Tests page press 'Run all tests'. For each failure read the message, find the transition or output concerned, fix and rerun until the first five pass (the last four, marked 15.5 and 15.7, test abnormal handling; do them after Section 15.5)."]
+  - ["按“程序检查”，处理所有错误和提醒。故意删掉 Y_PressUp 行上的“AND NOT Y_PressDown”，再检查一次，记录检查给出的意见。",
+     "Press 'Review the program' and deal with every finding. Delete 'AND NOT Y_PressDown' from the Y_PressUp line on purpose, review again and record the finding."]
+  - ["在故障按钮里注入“过盈太大”，手动做一个循环，记录最大压装力和结果灯。",
+     "Inject 'interference too large', run a cycle by hand and record the peak force and the result lamp."]
+数据表:
+  - 标题: ["表 1  状态、转移与输出", "Table 1  States, transitions and outputs"]
+    表头: ["状态", "转移条件 → 下一状态", "Y_Clamp", "Y_PressDown", "Y_PressUp"]
+    表头英文: ["State", "Condition → next state", "Y_Clamp", "Y_PressDown", "Y_PressUp"]
+    行: [["IDLE", "", "", "", ""], ["CLAMPING", "", "", "", ""], ["PRESSING", "", "", "", ""], ["RETURNING", "", "", "", ""], ["UNCLAMPING", "", "", "", ""]]
+  - 标题: ["表 2  一个合格件循环的时间", "Table 2  Times of one good cycle"]
+    表头: ["阶段", "开始的信号", "结束的信号", "时间 / s"]
+    表头英文: ["Phase", "Starts with", "Ends with", "Time / s"]
+    行: [["夹紧", "", "", ""], ["压装", "", "", ""], ["回程", "", "", ""], ["松开", "", "", ""], ["整个循环", "", "", ""]]
+    行英文: [["Clamping", "", "", ""], ["Pressing", "", "", ""], ["Returning", "", "", ""], ["Unclamping", "", "", ""], ["Whole cycle", "", "", ""]]
+  - 标题: ["表 3  测试与检查记录", "Table 3  Tests and review"]
+    表头: ["测试或检查", "第一次结果", "修改了什么", "最终结果"]
+    表头英文: ["Test or review", "First result", "What you changed", "Final result"]
+    行: [["合格件", "", "", ""], ["过盈太小", "", "", ""], ["过盈太大", "", "", ""], ["挡光", "", "", ""], ["双手", "", "", ""], ["程序检查", "", "", ""]]
+    行英文: [["Good part", "", "", ""], ["Too loose", "", "", ""], ["Too tight", "", "", ""], ["Curtain", "", "", ""], ["Two-hand", "", "", ""], ["Review", "", "", ""]]
+注意:
+  - ["每个输出只在输出部分写一次，不要在 CASE 分支里给 Y_ 开头的输出赋值，否则会出现双线圈。", "Write each output once, in the output part; assigning Y_ outputs inside CASE branches creates double coils."]
+  - ["面板上的急停是锁定式的：按一次锁住（S_EStop 变 0），再按一次才释放，与真实急停按钮“按下锁住、旋转复位”相同。", "The panel e-stop latches: press once to latch (S_EStop goes 0), press again to release, like a real twist-to-release button."]
+  - ["测试在模拟时间里运行，比真实时间快得多；手动操作时是实时的，压装一次约需 2 s。", "Tests run in simulated time, much faster than real time; by hand it is real time, about 2 s per pressing stroke."]
+  - ["写好的程序保存在本机浏览器里；交作业时用“导出 PLCopen XML”导出程序文件。", "Your program is kept in this browser; hand it in with 'Export PLCopen XML'."]
+思考题:
+  - ["把下行阀改成纯摩尔型（Y_PressDown := state = PRESSING;），五个测试照样通过。为什么测试抓不到这个隐患？怎样的程序修改会让它变成真的危险？（提示：15.4 节的单步方式）", "Make ram down a pure Moore output (Y_PressDown := state = PRESSING;): all five tests still pass. Why can they not catch this weakness, and what later change would make it a real hazard? (Hint: single-step mode, Section 15.4.)"]
