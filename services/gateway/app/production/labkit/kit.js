@@ -520,9 +520,9 @@ function graph(ctx, o) {   // o = {x, y, w, h (pixels), xmin, xmax, ymin, ymax, 
   return G;
 }
 
-// ---------- GPU execution model (《人工智能》第 14 轮 2.5): a teaching model, not a GPU simulator ----------
+// ---------- GPU execution model (《人工智能》第 14 轮 2.5, parts 1-4): a teaching model, not a GPU simulator ----------
 // One SM; two kinds of instruction (global load, arithmetic); fixed load latency; no caches, no dual issue.
-// Line for line the same as textbook/ai/ch03/code/_gpusim.py (textbook/tools/tests/test_gpusim.py runs both).
+// Line for line the same as textbook/ai/conventions/gpusim.py (textbook/tools/tests/test_gpusim.py runs both).
 // schedule(): warps repeat "one load, then k arithmetic instructions that need it"; each scheduler issues at most one
 // instruction per cycle ('gto' greedy-then-oldest or 'lrr' loose round-robin); gap > 0: at most one load per gap cycles
 // per scheduler (bandwidth). util is measured over the second half of the run (steady state).
@@ -593,6 +593,37 @@ const GPU = {
       out.push({ mask: mask.map((b) => (b ? "1" : "0")).join(""), issued: seq.length, active: wa });
     }
     return { warps: out, issued, active, eff: active / (32 * issued), steps };
+  },
+  // part ③: byte addresses read by the 32 threads of a warp; coalesce() counts 32-byte sectors and 128-byte lines
+  addresses({ kind = "contiguous", size = 4, k = 1, offset = 0, struct = 16, seed = 1, base = 0 } = {}) {
+    const r = GPU.rng(seed), out = [];
+    for (let i = 0; i < 32; i++) {
+      const a = kind === "contiguous" ? i * size : kind === "stride" ? i * k * size : kind === "offset" ? i * size + offset
+        : kind === "aos" ? i * struct : kind === "random" ? Math.floor(r() * 32 * k) * size : (() => { throw new Error("kind " + kind); })();
+      out.push(base + a);
+    }
+    return out;
+  },
+  coalesce(addrs, size = 4) {
+    const sectors = new Set(), lines = new Set();
+    for (const a of addrs) for (let s = Math.floor(a / 32); s <= Math.floor((a + size - 1) / 32); s++) { sectors.add(s); lines.add(Math.floor(s / 4)); }
+    const requested = addrs.length * size, moved = sectors.size * 32;
+    return { sectors: sectors.size, lines: lines.size, requested, moved, eff: requested / moved, sector_list: [...sectors].sort((x, y) => x - y) };
+  },
+  // part ④: 4-byte word indices accessed by a warp in shared memory; banks() gives the conflict ways (broadcast counts once)
+  bankWords({ kind = "stride", k = 1, pad = 0, col = 0, seed = 1 } = {}) {
+    const r = GPU.rng(seed), out = [];
+    for (let i = 0; i < 32; i++) {
+      out.push(kind === "stride" ? i * k : kind === "column" ? i * (32 + pad) + col : kind === "same" ? col
+        : kind === "random" ? Math.floor(r() * 1024) : (() => { throw new Error("kind " + kind); })());
+    }
+    return out;
+  },
+  banks(words, nbanks = 32) {
+    const per = Array.from({ length: nbanks }, () => new Set());
+    for (const w of words) per[((w % nbanks) + nbanks) % nbanks].add(w);
+    const load = per.map((s) => s.size);
+    return { ways: Math.max(...load), load };
   },
 };
 

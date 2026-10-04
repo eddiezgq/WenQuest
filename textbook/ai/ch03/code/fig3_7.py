@@ -7,7 +7,7 @@
 """
 import numpy as np
 
-from _gpusim import little, schedule
+from gpusim import little, schedule
 from bookout import COLORS, T, figure, style
 
 plt = style()

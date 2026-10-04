@@ -105,6 +105,10 @@ jobs:
             sh ../../factory/deploy/fetch_menagerie.sh "$RUNNER_TEMP/menagerie" > /dev/null
             export WQ_MENAGERIE="$RUNNER_TEMP/menagerie"
           fi
+          if [ "${{ matrix.book }}" = ai ]; then   # 《人工智能》：CUDA 程序的编译检查（clang + NVIDIA 的头文件包）与 Numba 的 CUDA 模拟器
+            pip install -q nvidia-cuda-runtime-cu12 nvidia-cuda-nvcc-cu12 nvidia-cuda-cccl-cu12 nvidia-curand-cu12 numba
+            which clang++ > /dev/null || sudo apt-get install -y -qq clang > /dev/null
+          fi
           if [ "${{ matrix.book }}" = robotics ]; then   # the tools' own tests run once, with the book they use
             python -m pytest -q tests 2>&1 | tee /tmp/pytest.log || { grep -E "^(FAILED|E  )" /tmp/pytest.log | head -20 | sed 's/^/::error::/'; exit 1; }
           fi

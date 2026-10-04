@@ -1,6 +1,6 @@
 """动画 3.7.1（配图 3.7.1）：线程束调度器在等待显存时切换线程束。一个调度器带 4 个线程束，
 每个线程束“读一次显存，再做 4 条算术”；显存延迟取 12 个周期（为了看得清，远短于真实的约 700 个周期）。
-数据由与 GPU 执行模拟器（_gpusim.py，部分 ①）相同的规则逐周期算出：贪心后取最老的调度策略。"""
+数据由与 GPU 执行模拟器（gpusim.py，部分 ①）相同的规则逐周期算出：贪心后取最老的调度策略。"""
 from manim import *
 from wq_anim import *
 
@@ -8,7 +8,7 @@ N, K, L, SPAN = 4, 4, 12, 48
 
 
 def trace():
-    """与 _gpusim.schedule(policy='gto') 同样的规则，只算 SPAN 个周期。"""
+    """与 gpusim.schedule(policy='gto') 同样的规则，只算 SPAN 个周期。"""
     pc, ready, cur, rows = [0] * N, [0] * N, 0, [[] for _ in range(N)]
     for c in range(SPAN):
         def can(w):

@@ -1,4 +1,4 @@
-"""算例 3.7.1～3.7.3：延迟隐藏（GPU 执行模拟器的 Python 参考版 _gpusim.py，部分 ①）与占用率的计算。
+"""算例 3.7.1～3.7.3：延迟隐藏（GPU 执行模拟器的 Python 参考版 gpusim.py，部分 ①）与占用率的计算。
 
 式 (3.7.1)：一个调度器带 n 个线程束、每次读显存后做 k 条算术指令、延迟 L 个周期时，发射利用率
   U ≈ min(1, n (k+1) / (L + k))；要用满需要 n ≥ (L + k)/(k + 1) 个线程束。
@@ -7,7 +7,7 @@
 """
 import math
 
-from _gpusim import little, schedule
+from gpusim import little, schedule
 from bookout import out
 from gpus import GPUS, H100_LAT, H100_SM
 

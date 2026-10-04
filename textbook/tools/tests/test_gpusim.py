@@ -1,5 +1,5 @@
 """《人工智能》第 14 轮 2.5：GPU 执行模拟器的 JS 版（平台实验工具包 kit.js 的 GPU 模块）与 Python 参考版
-（textbook/ai/ch03/code/_gpusim.py）在同一组情形下结果完全相同；书中的算例数字由 Python 版算出。"""
+（textbook/ai/conventions/gpusim.py）在同一组情形下结果完全相同；书中的算例数字由 Python 版算出。"""
 import importlib.util
 import json
 import shutil
@@ -10,7 +10,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[3]
 KIT = ROOT / "services" / "gateway" / "app" / "production" / "labkit" / "kit.js"
-spec = importlib.util.spec_from_file_location("gpusim", ROOT / "textbook" / "ai" / "ch03" / "code" / "_gpusim.py")
+spec = importlib.util.spec_from_file_location("gpusim", ROOT / "textbook" / "ai" / "conventions" / "gpusim.py")
 sim = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sim)
 
@@ -23,6 +23,12 @@ DIV = [dict(cond=c, warps=w, pre=a, then=b, other=o, post=d, p=p, seed=sd)
                                        ("warp", 4, 1, 4, 4, 1, 0.5, 1), ("data", 4, 2, 6, 2, 2, 0.9, 7), ("data", 8, 0, 4, 4, 0, 0.1, 123)]]
 
 
+ADDR = [({"kind": "contiguous"}, 4), ({"kind": "stride", "k": 2}, 4), ({"kind": "offset", "offset": 4}, 4), ({"kind": "aos", "struct": 12}, 4),
+        ({"kind": "random", "k": 8, "seed": 5}, 4), ({"kind": "contiguous", "size": 16}, 16), ({"kind": "stride", "k": 3, "size": 8}, 8)]
+BANK = [{"kind": "stride", "k": 1}, {"kind": "stride", "k": 2}, {"kind": "stride", "k": 32}, {"kind": "column", "pad": 0, "col": 3},
+        {"kind": "column", "pad": 1, "col": 3}, {"kind": "same", "col": 7}, {"kind": "random", "seed": 9}]
+
+
 def test_js_and_python_agree():
     if not shutil.which("node"):
         pytest.skip("node is not installed")
@@ -31,7 +37,9 @@ def test_js_and_python_agree():
     script = gpu + f"""
 const S = {json.dumps(SCHED)}, D = {json.dumps(DIV)};
 const r = GPU.rng(42), xs = Array.from({{ length: 5 }}, () => r());
-console.log(JSON.stringify({{ s: S.map((o) => GPU.schedule(o)), d: D.map((o) => GPU.diverge(o)), xs }}));
+const A = {json.dumps(ADDR)}, B = {json.dumps(BANK)};
+console.log(JSON.stringify({{ s: S.map((o) => GPU.schedule(o)), d: D.map((o) => GPU.diverge(o)), xs,
+  a: A.map(([o, sz]) => GPU.coalesce(GPU.addresses(o), sz)), b: B.map((o) => GPU.banks(GPU.bankWords(o))) }}));
 """
     js = json.loads(subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout)
     r = sim.rng(42)
@@ -42,6 +50,10 @@ console.log(JSON.stringify({{ s: S.map((o) => GPU.schedule(o)), d: D.map((o) => 
     for o, got in zip(DIV, js["d"]):
         want = sim.diverge(**o)
         assert {k: got[k] for k in ("warps", "issued", "active", "steps")} == {k: want[k] for k in ("warps", "issued", "active", "steps")}, o
+    for (o, sz), got in zip(ADDR, js["a"]):
+        assert got == sim.coalesce(sim.addresses(**o), sz), o
+    for o, got in zip(BANK, js["b"]):
+        assert got == sim.banks(sim.bank_words(**o)), o
 
 
 def test_hand_computed_cases():
@@ -56,3 +68,16 @@ def test_hand_computed_cases():
         assert abs(u - sim.little(n, k, L, g)) < 0.04 * sim.little(n, k, L, g) + 1e-3, (n, k, L, g, u)
     lrr = sim.schedule(warps=16, latency=600, k=40, policy="lrr")["util"]
     assert lrr < 0.6                                                                # 松散轮转使线程束同步，延迟藏不住
+
+
+def test_memory_access_hand_cases():
+    c = lambda **o: sim.coalesce(sim.addresses(**o), o.get("size", 4))  # noqa: E731
+    assert c()["sectors"] == 4 and c()["eff"] == 1.0                       # 32 × 4 B in a row: 4 sectors, 1 line
+    assert c()["lines"] == 1
+    assert c(kind="stride", k=2)["sectors"] == 8                           # every other float: twice the traffic
+    assert c(kind="stride", k=32)["sectors"] == 32 and c(kind="stride", k=32)["eff"] == 0.125
+    assert c(kind="offset", offset=4)["sectors"] == 5                      # misaligned by one float: one extra sector
+    b = lambda **o: sim.banks(sim.bank_words(**o))["ways"]  # noqa: E731
+    assert b(k=1) == 1 and b(k=2) == 2 and b(k=32) == 32 and b(k=3) == 1   # odd strides are free
+    assert b(kind="column") == 32 and b(kind="column", pad=1) == 1         # a column of a 32×32 tile; padding fixes it
+    assert b(kind="same") == 1                                            # broadcast

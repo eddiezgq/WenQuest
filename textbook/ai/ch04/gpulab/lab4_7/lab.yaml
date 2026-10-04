@@ -1,0 +1,33 @@
+标题: ["GPU 实验 4.7 矩阵转置：合并访问与共享内存", "GPU Lab 4.7 Matrix transpose: coalescing and shared memory"]
+目的: ["测出矩阵转置四个版本的有效带宽：复制（上限）、朴素、共享内存分块、分块加填充，说明合并访问与存储体冲突各自的影响。",
+       "Measure the effective bandwidth of four transposes — copy (the ceiling), naive, shared-memory tiles and padded tiles — and explain the effects of coalescing and bank conflicts."]
+显卡: basic
+结果:
+  - {名: copy_GBs, 说明: ["复制（读写都合并）", "copy (both coalesced)"], 单位: GB/s}
+  - {名: naive_GBs, 说明: ["朴素转置（写不合并）", "naive transpose (uncoalesced writes)"], 单位: GB/s}
+  - {名: tiled_GBs, 说明: ["共享内存分块（有存储体冲突）", "shared-memory tiles (bank conflicts)"], 单位: GB/s}
+  - {名: padded_GBs, 说明: ["分块加一列填充", "tiles with one padding column"], 单位: GB/s}
+文件: [transpose.cu, check.cuh]
+实际问题:
+  标题: ["相机图像的旋转", "Rotating camera images"]
+  内容: ["检测工位的相机有一台装成竖向，它的图像要先转置（再左右翻转）才能和其他相机对齐。转置几乎不做运算，全看数据怎么搬。",
+         "One inspection camera is mounted on its side; its images must be transposed (then flipped) to match the others. A transpose does almost no arithmetic: it is all about moving data."]
+原理:
+  - ["一个线程束的一次读写按 32 字节扇区搬运；相邻线程访问相邻地址时合并成最少的扇区（式 (4.6.1)）。按列访问行主序矩阵时，每个线程各占一个扇区。", "A warp's access moves 32-byte sectors; adjacent threads at adjacent addresses coalesce into the fewest sectors (Eq. (4.6.1)). Column access of a row-major matrix costs one sector per thread."]
+  - ["共享内存 32 个存储体，按列读 32×32 的块时 32 个线程落在同一个存储体，32 路冲突；每行多留一个字，就分散到 32 个存储体（4.7 节）。", "Shared memory has 32 banks; reading a column of a 32×32 tile puts all 32 threads in one bank (32-way conflict); one extra word per row spreads them over all banks (Section 4.7)."]
+  - 式: "有效带宽 = 2 × n² × 4 字节 / 耗时"
+步骤:
+  - ["运行第一格检查环境。", "Run the first cell."]
+  - ["编译运行 transpose.cu，记录四个版本的带宽（任务 1），确认输出 correct 为 true。", "Compile and run transpose.cu; record the four bandwidths (task 1) and check correct is true."]
+  - ["用 ncu 能读计数器时，测朴素版写入的扇区数与共享内存版的存储体冲突数（任务 2，可选）。", "If ncu can read counters, measure the naive write sectors and the shared-memory bank conflicts (task 2, optional)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  矩阵转置（8192×8192 单精度）", "Table 1  Transpose (8192×8192 single precision)"]
+    表头: ["版本", "有效带宽（GB/s）", "占复制版的比例", "限制因素"]
+    表头英文: ["Version", "Bandwidth (GB/s)", "Fraction of copy", "Limited by"]
+    行: [["复制", "{{copy_GBs}}", "100%", "显存带宽"], ["朴素", "{{naive_GBs}}", "", ""], ["分块", "{{tiled_GBs}}", "", ""], ["分块加填充", "{{padded_GBs}}", "", ""]]
+注意:
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+思考题:
+  - ["比较朴素版与复制版的实测带宽之比和算例 4.7.1 按扇区数的估计。若实测的差距更小，可能的原因是什么？（提示：L2 缓存。）", "Compare the measured naive/copy bandwidth ratio with the sector estimate of Example 4.7.1. If the measured gap is smaller, what could explain it? (Hint: the L2 cache.)"]
+  - ["为什么共享内存版先要 __syncthreads() 再写出？去掉它会怎样？", "Why must the shared-memory version call __syncthreads() before writing? What happens without it?"]

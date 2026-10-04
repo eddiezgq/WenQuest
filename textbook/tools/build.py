@@ -44,6 +44,7 @@ from markdown_it import MarkdownIt
 import english
 import gpulab
 import gpurun
+import cucheck
 import labdocs
 import tasksheet
 
@@ -367,6 +368,28 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
             hit.write_text(json.dumps(v, ensure_ascii=False), encoding="utf-8")
             values[prog.stem] = v
     return values
+
+
+def check_cuda(book: dict, chapters: set[int], rep: "Report") -> None:
+    """书中的 CUDA 程序（code/ 与 gpulab/ 下的 .cu）都要能编译（cucheck.py，clang 的 CUDA 前端）；结果按文件内容缓存。"""
+    files = [f for ch in sorted(chapters) for d in ("code", "gpulab") for f in sorted((book["root"] / f"ch{ch:02d}" / d).rglob("*.cu"))]
+    if not files:
+        return
+    if not cucheck.available():
+        rep.add("warning", "程序", "CUDA", f"{len(files)} 个 CUDA 程序没有检查：缺少 clang++ 或 CUDA 头文件（pip install nvidia-cuda-runtime-cu12 nvidia-cuda-nvcc-cu12 nvidia-cuda-cccl-cu12 nvidia-curand-cu12）")
+        return
+    cache = book["root"].parent / "build" / book["book"] / "cucheck"
+    cache.mkdir(parents=True, exist_ok=True)
+    for f in files:
+        h = hashlib.sha256(f.read_bytes() + b"".join(p.read_bytes() for p in sorted(f.parent.glob("*.cuh")))).hexdigest()[:16]
+        hit = cache / f"{h}.ok"
+        if hit.exists():
+            continue
+        probs = cucheck.check(f)
+        for why in probs:
+            rep.add("error", "程序", str(f.relative_to(book["root"])), why)
+        if not probs:
+            hit.write_text("ok")
 
 
 PLACE = re.compile(r"\{\{\s*(\w+)\.(\w+)\s*(?::([^}]+))?\}\}")
@@ -876,6 +899,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     values = run_programs(book, {s.chapter for s in sections}, rep)
     # 书中数字的 GPU 实测记录（人工智能第 14 轮附 4.4 节）：code/runs/<名>/ 与 <名>.json
     status = {int(k): (v or {}).get("status", "draft") for k, v in (prog_meta.get("chapters") or {}).items()}
+    check_cuda(book, {s.chapter for s in sections}, rep)
     run_vals, run_probs = gpurun.values(book["root"], {s.chapter for s in sections}, status)
     values.update(run_vals)
     for level, where, text in run_probs:
