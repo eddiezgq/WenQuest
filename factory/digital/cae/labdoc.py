@@ -10,7 +10,8 @@ GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节�
           "lab10": os.path.join(HERE, "实验10_输出轴数控车削与键槽铣削编程.md"),
           "lab11": os.path.join(HERE, "实验11_减速器热平衡与输出轴轻量化.md"),
           "lab12": os.path.join(HERE, "实验12_一根轴的数字化设计与两个典型案例.md"),
-          "lab13": os.path.join(HERE, "实验13_减速器数字孪生与预测性维护.md")}
+          "lab13": os.path.join(HERE, "实验13_减速器数字孪生与预测性维护.md"),
+          "lab14": os.path.join(HERE, "实验14_减速器风扇冷却的流体与传热分析.md")}
 
 
 def _doc():
@@ -102,6 +103,8 @@ def report_template_docx(lab="lab8"):
         return lab12_template()
     if lab == "lab13":
         return lab13_template()
+    if lab == "lab14":
+        return lab14_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -431,6 +434,56 @@ def lab13_template():
     d.add_heading("六、选做（任务 6、7）", 1)
     d.add_paragraph("")
     d.add_heading("七、结论与讨论", 1)
+    d.add_paragraph("")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab14_template():
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 14　减速器风扇冷却的流体与传热分析　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、标准题核对（任务 1）", 1)
+    table([["题", "教材公式 / 文献", "平台", "差"], ["平行平板层流压降", "", "", ""], ["平板层流平均 Nu", "", "", ""],
+           ["湍流通道 C_f", "", "", ""], ["湍流通道 Nu", "", "", ""], ["绕圆柱 C_d（Re 40）", "", "", ""]])
+    d.add_paragraph("第 2 题手算过程：")
+    hint("为什么平板换热的算例要在平板前面留一段来流区？")
+    d.add_heading("二、箱体风扇冷却（任务 2）", 1)
+    table([["项目", "手算 / 记录"], ["Re = UL/ν", ""], ["层流边界层 h", ""], ["全湍流 h", ""], ["平台平均 h", ""],
+           ["阻力 / 压差 / 摩擦 N", ""], ["阻力系数 C_d", ""]])
+    table([["面", "h W/(m²·K)", "平均压力 Pa", "为什么大 / 小"], ["迎风端面", "", "", ""], ["侧面（前）", "", "", ""], ["侧面（后）", "", "", ""],
+           ["顶面", "", "", ""], ["背风端面", "", "", ""]])
+    d.add_paragraph("截图：表面压力、表面 h、流线（各一张）")
+    d.add_paragraph("AI 解释里对和不对的地方：")
+    d.add_heading("三、送到温度场（任务 3）", 1)
+    table([["散热系数来源", "K_s W/(m²·℃)", "公式油温 ℃", "有限元外表面平均 ℃", "有限元最高 ℃"], ["查表“通风良好”", "17.45", "", "", ""],
+           ["查表“风扇冷却”", "31", "", "", ""], ["CFD + 辐射", "", "", "", ""]])
+    hint("CFD 的 h 为什么比“风扇冷却 31–38”小？去掉辐射会差多少？")
+    d.add_heading("四、改一个条件（任务 4）", 1)
+    table([["改了什么", "平均 h", "总散热 W", "阻力 N", "解释"], ["基准（任务 2）", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]])
+    d.add_heading("五、选做（任务 5、6）", 1)
+    table([["AGV 风口布置", "驱动器平均 h", "工控机平均 h", "元件最高温度 ℃"], ["1 前下进、后上出", "", "", ""],
+           ["2 前上进、后上出", "", "", ""], ["3 前下进、后下出", "", "", ""]])
+    d.add_heading("六、结论与讨论", 1)
     d.add_paragraph("")
     buf = io.BytesIO()
     d.save(buf)

@@ -17,7 +17,7 @@ from cae import foam as F
 
 AIR = {"rho": 1.184, "mu": 1.849e-5, "cp": 1007.0, "k": 0.02551, "Pr": 0.7296, "M": 28.96}       # 25 ℃、1 atm（Incropera 附表 A.4）
 MAX_CELLS = 300_000
-LIMIT_S = 600
+LIMIT_S = 900
 NPROC = max(1, min(4, int(os.environ.get("WQ_CFD_NPROC", os.cpu_count() or 1))))      # 并行核数（最多 4）
 
 

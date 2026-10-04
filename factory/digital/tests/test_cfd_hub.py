@@ -66,3 +66,31 @@ def test_agv_box_example():
     assert set(g["inner"]) <= conv and set(g["drive"]) <= conv and not set(g["bottom"]) & conv
     with pytest.raises(ValueError):
         TP.params_of("agv_box", {"vent_h": 200})
+
+
+def test_lab14_documents():
+    import io
+    import docx
+    from cae import labdoc
+    g = docx.Document(io.BytesIO(labdoc.guide_docx("lab14")))
+    text = "\n".join(p.text for p in g.paragraphs)
+    assert "实验 14" in text and "散热系数" in text and "CFD" in text
+    t = docx.Document(io.BytesIO(labdoc.report_template_docx("lab14")))
+    cells = " ".join(c.text for tb in t.tables for r in tb.rows for c in r.cells)
+    assert "17.45" in cells and "AGV 风口布置" in cells
+
+
+def test_cfd_report():
+    import io
+    import docx
+    from cae import cfd_report
+    job = {"id": "x1", "title": "箱体 5 m/s", "owner_name": "甲", "created": 0,
+           "setup": {"flow": {"velocity_ms": 5, "direction": "+x", "air_t_c": 25}, "heat": {"wall_t_c": 70}, "domain": {"ground": True}},
+           "stats": {"cells": 100952, "cell_mm": 37.6, "level": 2, "turbulence": "kOmegaSST", "iterations": 800, "converged": False, "L_char_mm": 410,
+                     "Re": 131271, "drag_n": 0.683, "drag_pressure_n": 0.689, "drag_friction_n": -0.006, "Cd": 1.03, "frontal_m2": 0.045,
+                     "q_dyn_pa": 14.8, "h_mean": 20.0, "heat_w": 357.6, "area_m2": 0.3975, "wall_t_c": 70, "air_t_c": 25, "seconds": 222}}
+    aux = {"faces": [dict(f, force_n=[0.1, 0, 0], heat_w=f["heat_w"] or 0) for f in FACES]}
+    d = docx.Document(io.BytesIO(cfd_report.build(job, aux, [], "第一句。\n第二句。")))
+    text = "\n".join(p.text for p in d.paragraphs)
+    cells = " ".join(c.text for t in d.tables for r in t.rows for c in r.cells)
+    assert "流体分析报告" in text and "第二句" in text and "k-ω SST" in cells and "20.00" in cells and "面 4" in cells

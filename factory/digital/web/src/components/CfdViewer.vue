@@ -137,7 +137,7 @@ function move(e) {
 
 onMounted(() => {
   const el = box.value;
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });   // 报告要截图
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
   el.prepend(renderer.domElement);
   scene = new THREE.Scene();
@@ -155,6 +155,7 @@ watch(field, buildPart);
 watch(showLines, (v) => { if (lines) lines.visible = v; });
 watch(showSlice, (v) => { if (slice) slice.visible = v; });
 watch(() => [props.surface, props.aux], () => { buildPart(); buildLines(); buildSlice(); fit(); });
+defineExpose({ snapshot: () => renderer?.domElement.toDataURL('image/png'), setField: (f) => { field.value = f; } });
 onUnmounted(() => { cancelAnimationFrame(raf); ro?.disconnect(); renderer?.dispose(); });
 </script>
 

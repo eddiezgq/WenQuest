@@ -102,7 +102,7 @@ def rules_explain(st, faces):
     lam = st.get("turbulence") == "laminar"
     lines.append("风速 {} m/s 沿 {}，按零件长度 {} mm 算雷诺数 Re ≈ {:.0f}，{}。".format(
         st["velocity_ms"], st["direction"], st["L_char_mm"], st["Re"],
-        "属于层流（Re 小于约 5 万），用层流模型" if lam else "边界层会转成湍流，用 k-ω SST 湍流模型、壁面函数"))
+        "很小，整个流场按层流算" if lam else "按湍流算（k-ω SST 湍流模型、壁面函数）：零件是钝体，前缘一分离流动就乱了，风扇吹出的风本身也有湍流"))
     dp, df = st.get("drag_pressure_n") or 0, st.get("drag_friction_n") or 0
     lines.append("阻力 {:.3f} N，其中压差阻力 {:.3f} N、摩擦阻力 {:.3f} N——{}；阻力系数 C_d ≈ {:.2f}（按迎风面积 {:.0f} cm²、动压 {:.1f} Pa）。".format(
         st["drag_n"], dp, df, ("钝体以压差阻力为主：迎风面正压、背风面负压（尾流）" + ("；摩擦阻力接近零甚至为负，是因为侧面分离后有回流、局部摩擦力朝前" if df < 0.02 * abs(dp) else ""))
@@ -118,7 +118,12 @@ def rules_explain(st, faces):
         if hi and lo and hi is not lo:
             lines.append("各面差别大：面 {} 最大 {:.1f}，面 {} 最小 {:.1f}。迎风面和边界层刚开始的地方 h 大（边界层薄），"
                          "背风面、角落和贴近地面的地方 h 小（风到不了、空气已被加热）。".format(hi["id"], hi["h_w_m2k"], lo["id"], lo["h_w_m2k"]))
-        lines.append("可以用教材公式核对量级：平板湍流 Nu = 0.037 Re^0.8 Pr^(1/3)，h = Nu·k/L。点“送到温度场”就用这些 h 代替查表的散热系数。")
+        k_air, L = 0.0262, st["L_char_mm"] / 1000
+        h_lam = 0.664 * st["Re"] ** 0.5 * 0.73 ** (1 / 3) * k_air / L
+        h_tur = 0.037 * st["Re"] ** 0.8 * 0.73 ** (1 / 3) * k_air / L
+        lines.append("用教材平板公式核对量级（特征长度 {:.0f} mm）：层流边界层 Nu = 0.664·Re^½·Pr^⅓ → h ≈ {:.1f}；全湍流 Nu = 0.037·Re^0.8·Pr^⅓ → h ≈ {:.1f} W/(m²·K)。"
+                     "算出的平均 h 落在两者之间是正常的（前缘附近层流、分离和尾流区紊乱、背风面风小）。点“送到温度场”就用这些 h 代替查表的散热系数。".format(
+                         st["L_char_mm"], h_lam, h_tur))
     if not st.get("converged"):
         lines.append("注意：迭代到步数上限还没完全收敛（钝体尾流本身会摆动），阻力和 h 看前两三位有效数字即可；要更准可选“细”网格再算。")
     return {"text": "\n".join(lines), "engine": "rules"}

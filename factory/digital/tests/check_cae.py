@@ -188,3 +188,24 @@ if A.erp:
     assert st == "Resolved" and doc.get("wq_serial") == brg["serial"], (st, doc.get("wq_serial"))
     print("ERPNext：服务工单 {} 开单并已解决（设备 {}）".format(issue, brg["serial"]))
 print("数字孪生演练通过：{} 台，{} 轴承报警 → 维修单 {} → 维修完成、寿命复位".format(len(fl["units"]), brg["serial"], issue))
+
+# 第 16 轮：流体分析——真镜像里的 OpenFOAM：CPU 散热片示例进虚拟风洞（粗网格），流场 + 换热，送到温度场
+g = call("POST", "/api/cae/geometry/example/heatsink", {"params": {}}, token=tok)
+setup = {"flow": {"velocity_ms": 3, "direction": "+y", "air_t_c": 25}, "heat": {"wall_t_c": 70}, "domain": {"ground": True},
+         "mesh": {"cells_target": 30000, "level": 2}, "example": {"key": "heatsink", "params": g["example"]["params"]}}
+j = call("POST", "/api/cfd/jobs", {"step_sha": g["sha"], "setup": setup, "title": "演练：散热片"}, token=tok)
+t0 = time.time()
+while j["status"] not in ("done", "failed") and time.time() - t0 < 900:
+    time.sleep(5)
+    j = call("GET", "/api/cfd/jobs/" + j["id"], token=tok)
+print(json.dumps({k: v for k, v in (j.get("stats") or {}).items() if k != "residuals"} or j.get("error"), ensure_ascii=False))
+assert j["status"] == "done", j.get("error")
+st = j["stats"]
+assert st["drag_n"] > 0 and 5 < st["h_mean"] < 150 and st["heat_w"] > 0, st
+res = call("GET", "/api/cfd/jobs/{}/result".format(j["id"]), token=tok)
+assert len(res["surface"]["triangles"]) > 100 and res["aux"]["streamlines"] and res["aux"]["slice"]
+tt = call("POST", "/api/cfd/jobs/{}/to-thermal".format(j["id"]), {}, token=tok)
+assert tt["thermal"][0]["type"] == "heat_flux" and any(r.get("source") == "cfd" for r in tt["thermal"])
+assert call("GET", "/api/cae/lab14/guide.docx", raw=True)[:2] == b"PK"
+print("流体分析演练通过：{} 个单元，{} 秒，阻力 {:.4f} N，平均 h {:.1f} W/(m²·K)，送温度场 {} 行".format(
+    st["cells"], st["seconds"], st["drag_n"], st["h_mean"], len(tt["thermal"])))

@@ -477,7 +477,13 @@ def mount(app, H):
                        "手算轴承载荷与寿命核对；从油温残差和振动诊断散热变差、轴承损坏；开维修单进 ERPNext、维修后寿命复位；假如分析与机队数据反馈设计。",
             "mode": "teach", "products": ["WQR-105"], "tool_url": public_base(request) + "/twin",
             "guide_url": public_base(request) + "/api/cae/lab13/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab13/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab13/report-template.docx"}, {
+            "id": "lab14", "name": {"zh": "实验 14：减速器风扇冷却的流体与传热分析", "en": "Lab 14: CFD and heat transfer of fan cooling for a gearbox"},
+            "summary": "OpenFOAM 虚拟风洞：先用四道标准题（平板间层流、平板换热、湍流通道、绕圆柱）核对方法；WQR-105 箱体轴端风扇冷却的流场、"
+                       "阻力和各面散热系数 h，与平板公式比；h 加辐射送进有限元温度场算油温，和查表 K_s 比；改风速、风向、散热筋；选做 CPU 散热片风道、AGV 电控箱通风口布置。",
+            "mode": "teach", "products": ["WQR-105"], "tool_url": public_base(request) + "/cfd",
+            "guide_url": public_base(request) + "/api/cae/lab14/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab14/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

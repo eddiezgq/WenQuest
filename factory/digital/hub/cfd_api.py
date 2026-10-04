@@ -108,6 +108,17 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
         r = call("GET", "/cfd/jobs/{}/result".format(urllib.parse.quote(jid))).json()
         return cfd_ai.explain(llm_for(u), j["stats"], r["aux"]["faces"])
 
+    @app.post("/api/cfd/jobs/{jid}/report")
+    def cfd_report(jid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        """Word 报告：images = 浏览器截的三维图，ai_text = 页面上的解释"""
+        from fastapi import Response
+        j = mine(u, call("GET", "/jobs/" + urllib.parse.quote(jid)).json())
+        if j["kind"] != "cfd":
+            raise HTTPException(409, "标准题核对没有报告")
+        r = call("POST", "/jobs/{}/report".format(urllib.parse.quote(jid)), json=body)
+        return Response(r.content, media_type=r.headers.get("content-type"),
+                        headers={"Content-Disposition": r.headers.get("content-disposition", "attachment")})
+
     @app.post("/api/cfd/jobs/{jid}/to-thermal")
     def cfd_to_thermal(jid: str, u=Depends(user_of)):
         """把算出的散热系数送到温度场：零件（同一个 STEP）+ 每个面的对流行；示例零件带上它的发热和教材公式"""

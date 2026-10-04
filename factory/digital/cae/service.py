@@ -697,6 +697,13 @@ def report(jid: str, body: dict = Body(default={})):
         name = "动力学报告-{}.docx".format(j.get("item") or jid)
         return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         headers={"Content-Disposition": "attachment; filename*=UTF-8''" + urllib.parse.quote(name)})
+    if j.get("kind") == "cfd":
+        from cae import cfd_report as CR
+        aux = _read_json(_job_path(j["id"], "aux.json"))
+        data = CR.build(j, aux, (body.get("images") or [])[:4], body.get("ai_text") or j.get("ai_text"))
+        name = "流体分析报告-{}.docx".format(j.get("item") or jid)
+        return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        headers={"Content-Disposition": "attachment; filename*=UTF-8''" + urllib.parse.quote(name)})
     from cae import report as R
     imgs = (body.get("images") or [])[:4]
     data = R.build(j, imgs, body.get("ai_text") or j.get("ai_text"))

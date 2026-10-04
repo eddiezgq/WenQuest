@@ -1,7 +1,8 @@
 <template>
   <div class="page">
     <div class="page-title"><h1>流体分析</h1>
-      <span class="muted">零件放进虚拟风洞或风道：看风怎么走、阻力多大、每个面的散热系数 h 是多少——算出的 h 一键送进温度场，代替查表（OpenFOAM 求解）</span></div>
+      <span class="muted">零件放进虚拟风洞或风道：看风怎么走、阻力多大、每个面的散热系数 h 是多少——算出的 h 一键送进温度场，代替查表（OpenFOAM 求解）</span>
+      <span class="labs small">实验 14：<a href="/api/cae/lab14/guide.docx">指导书</a> · <a href="/api/cae/lab14/report-template.docx">报告模板</a></span></div>
 
     <div class="row">
       <section class="card side">
@@ -56,7 +57,7 @@
         <div v-else-if="job.status === 'failed'" class="jobbar failed">失败：{{ job.error }}</div>
         <div v-else-if="job.status !== 'done'" class="jobbar">计算中…（网格 → 流场 → 温度场，一般几分钟）</div>
         <template v-else-if="res && job.kind === 'cfd'">
-          <CfdViewer :surface="res.surface" :aux="res.aux" />
+          <CfdViewer ref="viewer" :surface="res.surface" :aux="res.aux" />
           <div class="cards">
             <div class="kpi"><span class="small muted">阻力</span><span class="big">{{ st.drag_n.toFixed(3) }} N</span>
               <span class="small">压差 {{ st.drag_pressure_n.toFixed(3) }} + 摩擦 {{ st.drag_friction_n.toFixed(3) }}；C_d ≈ {{ st.Cd?.toFixed(2) }}</span></div>
@@ -70,6 +71,7 @@
           <div class="line">
             <button v-if="st.heat_w != null" class="btn primary" type="button" @click="toThermal">把散热系数送到温度场 →</button>
             <button class="btn" type="button" :disabled="expBusy" @click="explain">{{ expBusy ? 'AI 正在看…' : '请 AI 解释结果' }}</button>
+            <button class="btn" type="button" :disabled="repBusy" @click="report">{{ repBusy ? '正在生成…' : '下载 Word 报告' }}</button>
           </div>
           <div v-if="exp" class="exp"><p v-for="(t, i) in exp.text.split('\n')" :key="i">{{ t }}</p>
             <div class="small muted">{{ exp.engine === 'rules' ? '（规则生成）' : '（由 AI 模型生成）' }}</div></div>
@@ -136,12 +138,13 @@ const TONE = { queued: 'mute', running: 'info', done: 'good', failed: 'bad' };
 const DIRS = { '+x': '沿 +X（从左往右）', '-x': '沿 −X', '+y': '沿 +Y（从前往后）', '-y': '沿 −Y', '+z': '沿 +Z（从下往上）', '-z': '沿 −Z（从上往下）' };
 const MESH = [{ k: 'c', label: '粗（快）', cells: 60000 }, { k: 'm', label: '中', cells: 120000 }, { k: 'f', label: '细（慢）', cells: 250000 }];
 const EX_DEFAULT = { housing: { dir: '+x', vel: 5, ground: true, wall: 70 }, heatsink: { dir: '+y', vel: 3, ground: true, wall: 70 },
-  agv_box: { dir: '+x', vel: 1.5, ground: true, wall: 50, level: 3, mesh: 'f' } };
+  agv_box: { dir: '+x', vel: 1.5, ground: true, wall: 50, level: 3, mesh: 'm' } };
 const teacher = computed(() => !!session.user?.teacher);
 const parts = ref([]), examples = ref([]), partSel = ref(''), exParams = ref({}), geo = ref(null);
 const vel = ref(5), dir = ref('+x'), tAir = ref(25), ground = ref(false), heat = ref(true), tWall = ref(70), meshK = ref('m'), title = ref('');
 const busy = ref(false), err = ref(''), job = ref(null), res = ref(null), jobs = ref([]), progress = ref('');
 const aiText = ref(''), aiBusy = ref(false), aiRes = ref(null), exp = ref(null), expBusy = ref(false);
+const viewer = ref(null), repBusy = ref(false);
 let pollT = null, exKey = null;
 
 const exSel = computed(() => (partSel.value.startsWith('ex:') ? examples.value.find((e) => 'ex:' + e.key === partSel.value) : null));
@@ -204,6 +207,26 @@ async function explain() {
   expBusy.value = true;
   try { exp.value = await post(`/cfd/jobs/${encodeURIComponent(job.value.id)}/explain`); } catch (e) { err.value = e.message; } finally { expBusy.value = false; }
 }
+const frame = () => new Promise((r) => requestAnimationFrame(() => r()));
+async function report() {
+  repBusy.value = true;
+  try {
+    const images = [];
+    const shots = [['p', '零件表面压力（Pa，相对来流）、流线（按速度着色）和水平速度截面']];
+    if (st.value.heat_w != null) shots.push(['h', '零件表面散热系数 h（W/(m²·K)）']);
+    for (const [f, cap] of shots) {
+      viewer.value.setField(f); await frame(); await frame(); await frame();
+      images.push({ data: viewer.value.snapshot(), caption: cap + '，色标蓝 → 红 = 低 → 高' });
+    }
+    const r = await fetch(`/api/cfd/jobs/${encodeURIComponent(job.value.id)}/report`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-wq-token': session.token }, body: JSON.stringify({ images, ai_text: exp.value?.text }) });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || '报告生成失败');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(await r.blob());
+    a.download = `流体分析报告-${job.value.id}.docx`;
+    document.body.appendChild(a); a.click(); a.remove();
+  } catch (e) { err.value = e.message; } finally { repBusy.value = false; }
+}
 async function aiFill() {
   aiBusy.value = true;
   try {
@@ -228,6 +251,7 @@ onUnmounted(() => clearTimeout(pollT));
 </script>
 
 <style scoped>
+.labs { margin-left: auto; white-space: nowrap; }
 .side { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 9px; align-self: flex-start; }
 .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
 .step { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-top: 6px; }
