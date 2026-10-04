@@ -125,7 +125,7 @@
           <h3>假如……</h3>
           <div class="whatif">
             <label>负载 <input v-model.number="wi.load" type="range" min="0.5" max="1.3" step="0.05"><b>{{ Math.round(wi.load * 100) }}%</b></label>
-            <label class="chk"><input v-model="wi.fan" type="checkbox"> 轴端加风扇（散热系数 17.45 → 31）</label>
+            <label class="chk"><input v-model="wi.fan" type="checkbox"> 轴端加风扇（散热系数 17.45 → {{ fan.k }}）<span class="small muted" :title="fan.src">{{ fan.src.startsWith('流体') ? '· 来自流体分析' : '· 教材值' }}</span></label>
             <label>输出轴材料 <select v-model="wi.mat"><option value="45-QT">45 钢调质（现行）</option><option value="40Cr-QT">40Cr 调质</option></select></label>
             <button class="btn" type="button" :disabled="wiBusy" @click="whatif">{{ wiBusy ? '计算中…' : '重算' }}</button>
           </div>
@@ -216,6 +216,7 @@ const H_ORDER = { red: 0, yellow: 1, green: 2 };
 const teacher = computed(() => !!session.user?.teacher);
 const fleet = ref(null), d = ref(null), sel = ref(route.query.serial || ''), faults = ref(null);
 const siteSel = ref(''), sortBy = ref('health'), showConsole = ref(false), range = ref(90);
+const fan = ref({ k: 31, src: '教材' });
 const wi = ref({ load: 0.8, fan: false, mat: '45-QT' }), wiRes = ref(null), wiBusy = ref(false);
 const exp = ref(null), expBusy = ref(false), pv = ref(null), ordBusy = ref(false), doneNote = ref({}), fb = ref(null);
 const mbdJobs = ref([]), robotList = ref([]), rb = ref({ job: '', hours: 16 }), rbBusy = ref(false);
@@ -306,7 +307,7 @@ async function setClock(v) { await post('/twin/clock', { days_per_min: v }); loa
 async function fault(serial, kind) { await post(`/twin/units/${encodeURIComponent(serial)}/fault`, { kind }); loadFaults(); }
 watch(showConsole, (v) => { if (v) loadFaults(); });
 
-onMounted(() => { loadFleet(); loadRobots(); timer = setInterval(() => { loadFleet(); get('/twin/robots').then((r) => { robotList.value = r.robots; }).catch(() => {}); }, 10000); });
+onMounted(() => { get('/twin/fan').then((r) => { fan.value = r; }).catch(() => {}); loadFleet(); loadRobots(); timer = setInterval(() => { loadFleet(); get('/twin/robots').then((r) => { robotList.value = r.robots; }).catch(() => {}); }, 10000); });
 onUnmounted(() => clearInterval(timer));
 </script>
 

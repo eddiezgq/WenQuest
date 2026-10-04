@@ -27,6 +27,7 @@ const routes = [
   { path: '/mbd', component: () => import('./pages/Mbd.vue') },
   { path: '/cam', component: () => import('./pages/Cam.vue') },
   { path: '/opt', component: () => import('./pages/Opt.vue') },
+  { path: '/cfd', component: () => import('./pages/Cfd.vue') },
   { path: '/twin', component: () => import('./pages/Twin.vue') },
   { path: '/tasks', component: () => import('./pages/Tasks.vue') },
   { path: '/tasks/review/:sid', component: () => import('./pages/TaskReview.vue') },

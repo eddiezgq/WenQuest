@@ -787,6 +787,22 @@ onMounted(async () => {
       mbdNote.value = '来自运动与动力分析：' + r.note + `；最大受力 ${r.peak_N.toFixed(0)} N，出现在 t = ${r.peak_t.toFixed(3)} s。`;
     } catch (e) { err.value = e.message; } finally { busy.value = false; }
   }
+  if (route.query.cfd) {                                           // 第 16 轮：流体分析算出的散热系数 → 温度场
+    busy.value = true;
+    try {
+      const r = await post(`/cfd/jobs/${encodeURIComponent(route.query.cfd)}/to-thermal`, {});
+      geo.value = r.geometry;
+      partSel.value = r.geometry.example ? 'ex:' + r.geometry.example.key : '';
+      analysis.value = 'thermal';
+      await nextTick();
+      thRows.value = r.thermal.map((l) => ({ key: ++thKey, kind: l.type, faces: Array.isArray(l.faces) ? [...l.faces] : [], rest: l.faces === 'rest',
+        value: l.value_c ?? l.power_w ?? 0, h: l.h_w_m2k ?? 17.45, tinf: l.t_inf_c ?? 20, film: '' }));
+      if (r.material_id) matId.value = r.material_id;
+      if (r.mesh_mm) meshOverride.value = r.mesh_mm;
+      title.value = r.title; active.value = -1;
+      mbdNote.value = '来自流体分析：' + r.note + '。';
+    } catch (e) { err.value = e.message; } finally { busy.value = false; }
+  }
   if (route.query.topo) {                                          // 第 14 轮：拓扑优化 → 拉伸成板件做有限元校核
     busy.value = true;
     try {

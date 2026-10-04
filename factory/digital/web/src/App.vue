@@ -84,6 +84,7 @@ const apps = computed(() => [
   { name: 'ERPNext', role: 'ERP / MRP', href: cfg.value.erpnext_url || '#', ext: true },
   { name: '设计台', role: 'CAD', href: '/work/engineer', route: '/work/engineer' },
   { name: '仿真与分析', role: 'CAE', href: '/cae', route: '/cae' },
+  { name: '流体分析', role: 'CFD', href: '/cfd', route: '/cfd' },
   { name: '运动与动力', role: 'MBD', href: '/mbd', route: '/mbd' },
   { name: '数控编程', role: 'CAM', href: '/cam', route: '/cam' },
   { name: '设计优化', role: 'OPT', href: '/opt', route: '/opt' },
@@ -94,7 +95,7 @@ const apps = computed(() => [
 const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
   '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
-  '/design': '设计发布与审批', '/members': '企业成员', '/configurator': '参数配置器', '/cae': '仿真与分析', '/mbd': '运动与动力分析', '/cam': '数控编程', '/opt': '设计优化', '/twin': '数字孪生', '/tasks': '我的任务',
+  '/design': '设计发布与审批', '/members': '企业成员', '/configurator': '参数配置器', '/cae': '仿真与分析', '/cfd': '流体分析', '/mbd': '运动与动力分析', '/cam': '数控编程', '/opt': '设计优化', '/twin': '数字孪生', '/tasks': '我的任务',
 }[route.path] || (route.path.startsWith('/design/') ? '设计审阅' : route.path.startsWith('/tasks/review/') ? '任务单审阅'
   : route.path.startsWith('/tasks/') ? '工程任务单' : '')));
 const clock = ref('');

@@ -67,7 +67,30 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
             "select data from twin_log where serial=%s and mode=%s order by day desc limit 30", (serial, u["mode"])))]
         if not logs:
             raise HTTPException(409, "还没有现场数据")
-        return TW.json_safe(W.compare(r["state"], logs, (r["as_built"] or {}).get("design"), load, bool(body.get("fan")), mat))
+        fk = fan_k()
+        out = W.compare(r["state"], logs, (r["as_built"] or {}).get("design"), load, bool(body.get("fan")), mat, fk["k"])
+        out["fan_src"] = fk["src"]
+        return TW.json_safe(out)
+
+    def fan_k():
+        """加风扇后的散热系数：本厂最近一次“WQR-105 箱体 + 换热”的流体分析（外表面平均对流 + 辐射）；没有就用教材 31"""
+        from twin import whatif as W
+        try:
+            from hub.cae_api import FACTORY_ID, call
+            from hub.cfd_api import h_rad
+            for j in call("GET", "/jobs", params={"factory": FACTORY_ID, "kind": "cfd", "limit": 50}).json()["jobs"]:
+                s, st = j.get("setup") or {}, j.get("stats") or {}
+                if j["status"] == "done" and (s.get("example") or {}).get("key") == "housing" and s.get("heat") and st.get("h_mean"):
+                    k = st["h_mean"] + h_rad(float(st.get("wall_t_c") or 70), float(st.get("air_t_c") or 25))
+                    return {"k": round(k, 1), "src": "流体分析“{}”：{} m/s 时对流 {:.1f} + 辐射 {:.1f}".format(
+                        j.get("title") or j["id"], st.get("velocity_ms"), st["h_mean"], k - st["h_mean"])}
+        except Exception:  # noqa: BLE001
+            pass
+        return {"k": W.K_FAN, "src": "教材：轴端装风扇约 31–38，取 31"}
+
+    @app.get("/api/twin/fan")
+    def twin_fan(u=Depends(user_of)):
+        return fan_k()
 
     def _detail(u, serial):
         d = TW.detail(H.db, u["mode"], serial)

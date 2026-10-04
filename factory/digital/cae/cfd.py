@@ -121,7 +121,8 @@ def write_mesh_dicts(case, stl, box, direction, cell, level, ground=False, insid
     faces = {"xmin": "(0 4 7 3)", "xmax": "(1 2 6 5)", "ymin": "(0 1 5 4)", "ymax": "(3 7 6 2)", "zmin": "(0 3 2 1)", "zmax": "(4 5 6 7)"}
     F.write(case, "system/blockMeshDict", "convertToMeters 1;\nvertices ({});\nblocks ( hex (0 1 2 3 4 5 6 7) ({} {} {}) simpleGrading (1 1 1) );\n"
             "boundary ( {} );\n".format(" ".join("({:.6g} {:.6g} {:.6g})".format(*p) for p in v), *n,
-                                         " ".join("{} {{ type patch; faces ({}); }}".format(k, f) for k, f in faces.items())))
+                                         " ".join("{} {{ type {}; faces ({}); }}".format(k, "wall" if (ground and k == "zmin") else "patch", f)
+                                                  for k, f in faces.items())))
     # 网格内一点（流体里）：在零件外、靠近风洞角落
     pin = inside if inside is not None else a + (b - a) * np.array([0.0731, 0.0687, 0.9123 if not ground else 0.9123])
     F.write(case, "system/snappyHexMeshDict", """castellatedMesh true; snap true; addLayers false;
