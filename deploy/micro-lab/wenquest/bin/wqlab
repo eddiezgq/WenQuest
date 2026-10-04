@@ -10,16 +10,20 @@
   wqlab results <目录>...             把各步的 result.json 合成“结果名 → 数值”，供问渠实验报告回填
 
 贯通项目（第 17 轮附二）：
-  wqlab device [--out 目录]           步骤一：SKY130 MOSFET 曲线与参数提取
-  wqlab nand2 [--wn 0.42] [--wp 0.97] [--schematic 网表] [--layout 脚本] [--out 目录]
-                                      步骤二：与非门版图、DRC、LVS，并与标准单元 nand2_1 比较
-  wqlab test <rtl 目录>               步骤三：运行 cocotb 测试（目录里有 src/ 和 test/）
+  wqlab start <目录>                  把四步的起始文件复制到自己的目录（含步骤二的起始版图）
+  wqlab device --script device_curves.py [--out 目录]
+                                      步骤一：SKY130 MOSFET 曲线与参数提取（不带 --script 时运行参考解）
+  wqlab nand2 --start 目录            步骤二：生成起始版图（四个管子已放好，没有连线）
+  wqlab nand2 --check 目录 --schematic 网表
+                                      步骤二：检查自己画的 目录/nand2.mag（DRC、LVS），并与标准单元 nand2_1 比较
+  wqlab test <rtl 目录> [--ref]       步骤三：运行 cocotb 测试（目录里有 src/ 和 test/）；--ref 用参考测试（教师评分）
   wqlab tt <rtl 目录> [--out 目录]    步骤四：按 Tiny Tapeout 格式跑 RTL→GDS 并检查流片就绪度
 
 结果格式与 GPU 实验的 wqgpu 一致：{"results": {名: 值}, "env": {工具版本与 PDK}}；回传问渠由以后的调度服务完成。
 """
 import argparse
 import glob
+import importlib.util
 import json
 import os
 import re
@@ -146,10 +150,22 @@ def flow(a):
 CAP = HOME / "capstone"
 
 
+def start(a):
+    """Copy the capstone starting files into the student's folder; make the step-two starting layout there."""
+    d = Path(a.dir).resolve()
+    if d.exists() and any(d.iterdir()):
+        sys.exit(f"{d} is not empty; choose a new folder")
+    shutil.copytree(CAP / "start", d, ignore=shutil.ignore_patterns("nand2_schematic_start.spice"))
+    nand2(argparse.Namespace(start=str(d / "step2_nand2"), check=None, wn=0.42, wp=0.97, schematic=None, out=None))
+    print(f"capstone files in {d}: step1_device, step2_nand2, step3_rtl, step4_chip (see README.md)")
+    return {"started": str(d)}
+
+
 def device(a):
     out = Path(a.out).resolve()
     os.environ.setdefault("WQ_PARAMS", str(CAP / "ch1_params.json"))
-    p = sh([sys.executable, str(CAP / "ref" / "step1_device" / "device_curves.py"), "--out", str(out)], timeout=1800)
+    script = Path(a.script).resolve() if a.script else CAP / "ref" / "step1_device" / "device_curves.py"
+    p = sh([sys.executable, str(script), "--out", str(out)], timeout=1800)
     sys.stdout.write(p.stdout[-2000:]); sys.stderr.write(p.stderr[-2000:])
     prm = json.loads((out / "params.json").read_text()) if (out / "params.json").exists() else {}
     res = {"vtn_v": prm.get("n", {}).get("vt"), "vtp_v": prm.get("p", {}).get("vt"),
@@ -173,22 +189,39 @@ def stdcell(name="sky130_fd_sc_hd__nand2_1") -> dict:
         m = re.search(rf"\.subckt {name}\b(.*?)\.ends", Path(f).read_text(errors="replace"), re.S | re.I)
         if m:
             ws = re.findall(r"(nfet|pfet)\S*\s.*?\bw=([\d.]+)", m.group(1), re.I)
-            out["nmos_w_um"] = sorted({float(w) for t, w in ws if t.lower() == "nfet"})
-            out["pmos_w_um"] = sorted({float(w) for t, w in ws if t.lower() == "pfet"})
+            um_ = lambda w: float(w) / 1e6 if float(w) > 100 else float(w)     # the library writes 0.65 μm as 650000 (×1e-6 scale)
+            out["nmos_w_um"] = sorted({um_(w) for t, w in ws if t.lower() == "nfet"})
+            out["pmos_w_um"] = sorted({um_(w) for t, w in ws if t.lower() == "pfet"})
             break
     return out
 
 
 def nand2(a):
+    """Step two. --start DIR: the four transistors placed, no wiring (open DIR/nand2.mag in Magic and draw the wires);
+    --check DIR: DRC, extraction and LVS of the layout DIR/nand2.mag against --schematic (your netlist);
+    neither: the reference layout (teachers, acceptance tests)."""
     os.environ.setdefault("MAGICRC", str(PDKPATH / "libs.tech" / "magic" / f"{PDK}.magicrc"))
     os.environ.setdefault("NETGEN_SETUP", str(PDKPATH / "libs.tech" / "netgen" / f"{PDK}_setup.tcl"))
-    script = Path(a.layout).resolve() if a.layout else CAP / "ref" / "step2_nand2" / "build_nand2.py"
-    sys.path.insert(0, str(script.parent))
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("student_nand2", script)
-    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
-    out = Path(a.out).resolve()
-    r = mod.build(a.wn, a.wp, out, Path(a.schematic).resolve() if a.schematic else None)
+    sys.path.insert(0, str(CAP / "tools"))
+    import layout
+    if a.start:
+        d = Path(a.start).resolve()
+        layout.place_nand2(d, a.wn, a.wp)
+        shutil.copy(CAP / "start" / "step2_nand2" / "nand2_schematic_start.spice", d / "nand2_schematic.spice")
+        print(f"{d}/nand2.mag: four transistors placed (W n {a.wn} μm, p {a.wp} μm). Open it with: magic -rcfile $MAGICRC {d}/nand2.mag")
+        print("Save with File → Save (the top cell only). Then: wqlab nand2 --check", d, "--schematic", d / "nand2_schematic.spice")
+        return {"started": str(d)}
+    if a.check:
+        d = Path(a.check).resolve()
+        if not a.schematic:
+            sys.exit("--check needs --schematic (your netlist of the NAND gate)")
+        r = layout.check(d, "nand2", Path(a.schematic).resolve())
+        out = d
+    else:
+        out = Path(a.out).resolve()
+        spec = importlib.util.spec_from_file_location("ref_nand2", CAP / "ref" / "step2_nand2" / "build_nand2.py")
+        mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+        r = mod.build(a.wn, a.wp, out, Path(a.schematic).resolve() if a.schematic else None)
     sc = stdcell()
     r["stdcell"] = sc
     if sc.get("area_um2"):
@@ -200,6 +233,11 @@ def nand2(a):
 
 def test(a):
     tdir = Path(a.rtl).resolve() / "test"
+    if a.ref:                       # teachers: the reference tests against the student's design
+        tdir = Path(a.rtl).resolve() / "test_ref"
+        if tdir.exists():
+            shutil.rmtree(tdir)
+        shutil.copytree(CAP / "ref" / "step3_rtl" / "test", tdir)
     t0 = time.time()
     p = subprocess.run(["make", "-C", str(tdir)], capture_output=True, text=True, timeout=1800)
     log = p.stdout + p.stderr
@@ -227,7 +265,7 @@ def tt(a):
         shutil.rmtree(design)
     design.mkdir(parents=True)
     shutil.copytree(rtl / "src", design / "src")
-    cfg = json.loads((Path(a.config).resolve() if a.config else CAP / "ref" / "step4_chip" / "config.json").read_text())
+    cfg = json.loads((Path(a.config).resolve() if a.config else CAP / "start" / "step4_chip" / "config.json").read_text())
     (design / "config.json").write_text(json.dumps(cfg, indent=2))
     # format checks from the Verilog (via Yosys: the top module and its ports)
     yj = out / "ports.json"
@@ -272,11 +310,15 @@ def main():
     p.add_argument("--schematic"); p.add_argument("--out", default="inv_build"); p.set_defaults(fn=inv)
     p = sub.add_parser("flow"); p.add_argument("config"); p.add_argument("--out"); p.set_defaults(fn=flow)
     p = sub.add_parser("results"); p.add_argument("dirs", nargs="+"); p.set_defaults(fn=results)
-    p = sub.add_parser("device"); p.add_argument("--out", default="step1_out"); p.set_defaults(fn=device)
+    p = sub.add_parser("start"); p.add_argument("dir"); p.set_defaults(fn=start)
+    p = sub.add_parser("device"); p.add_argument("--out", default="step1_out"); p.add_argument("--script", help="your device_curves.py")
+    p.set_defaults(fn=device)
     p = sub.add_parser("nand2"); p.add_argument("--wn", type=float, default=0.42); p.add_argument("--wp", type=float, default=0.97)
-    p.add_argument("--schematic"); p.add_argument("--layout", help="your own layout script (same interface as build_nand2.py)")
-    p.add_argument("--out", default="nand2_build"); p.set_defaults(fn=nand2)
-    p = sub.add_parser("test"); p.add_argument("rtl"); p.set_defaults(fn=test)
+    p.add_argument("--schematic"); p.add_argument("--start", metavar="DIR", help="make the starting layout (transistors placed) in DIR")
+    p.add_argument("--check", metavar="DIR", help="check your layout DIR/nand2.mag"); p.add_argument("--out", default="nand2_build")
+    p.set_defaults(fn=nand2)
+    p = sub.add_parser("test"); p.add_argument("rtl"); p.add_argument("--ref", action="store_true", help="run the reference tests (teachers)")
+    p.set_defaults(fn=test)
     p = sub.add_parser("tt"); p.add_argument("rtl"); p.add_argument("--config"); p.add_argument("--out"); p.set_defaults(fn=tt)
     a = ap.parse_args()
     r = a.fn(a)
@@ -284,7 +326,7 @@ def main():
         sys.exit(0 if r["drc_errors"] == 0 and r["lvs_match"] else 1)
     if a.cmd == "flow":
         sys.exit(0 if r["tapeout_ready"] else 1)
-    if a.cmd == "nand2":
+    if a.cmd in ("nand2",) and "started" not in r:
         sys.exit(0 if r["drc_errors"] == 0 and r["lvs_match"] else 1)
     if a.cmd == "test":
         sys.exit(0 if r["all_passed"] else 1)

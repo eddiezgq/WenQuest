@@ -1,0 +1,5 @@
+* 贯通项目步骤二：二输入与非门的原理图网表（LVS 用）。也可以在 Xschem 里画原理图，用 wqlab netlist 导出。
+* 端口顺序不要改：A B OUT VDD VSS。器件写法照第 1 章反相器（ch1/inv.spice），管宽要和版图一致。
+.subckt nand2 A B OUT VDD VSS
+* ===== 在这里完成：两个串联的 NMOS（中间节点起名 X）和两个并联的 PMOS =====
+.ends

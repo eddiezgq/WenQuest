@@ -163,7 +163,7 @@ select clear
 {paint}
 {lab}
 select top cell
-writeall force
+writeall force inv
 drc style drc(full)
 drc check
 drc catchup
