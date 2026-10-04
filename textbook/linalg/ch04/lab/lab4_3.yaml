@@ -1,0 +1,32 @@
+# 实验 4.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab4_3.js。
+原理:
+  - ["矩阵乘法就是变换的复合：(AB)x = A(Bx)，先做 B，再做 A。乘积从右往左读。", "Matrix multiplication is composition: (AB)x = A(Bx), B first, then A. Read products from right to left."]
+  - 式: "R(θ) = [[cos θ, −sin θ], [sin θ, cos θ]]；  S = [[1, k], [0, 1]]；  D = diag(sx, sy)"
+  - ["一般 AB ≠ BA。可以交换的例子：任何矩阵与 cI；两个对角矩阵；同一矩阵的幂；平面上两个绕原点的旋转。", "In general AB ≠ BA. Commuting examples: any matrix with cI; two diagonal matrices; powers of one matrix; two rotations of the plane about the origin."]
+  - ["AGV 的一次运动是一个 3×3 齐次变换 T = [[R, t], [0ᵀ, 1]]；“先做 T₁ 再做 T₂”（在车体坐标系中描述）的总变换是 T₁T₂（4.4 节）。", "Each AGV motion is a 3×3 homogeneous transform T = [[R, t], [0ᵀ, 1]]; doing T₁ and then T₂ (described in the body frame) gives T₁T₂ (Section 4.4)."]
+步骤:
+  - ["在“旋转与剪切”场景取 θ = 30°、k = 1（任务 1），把 AB、BA 记入表 1，与算例 4.3.1 比较。", "In the shear scene set θ = 30°, k = 1 (task 1); record AB and BA in Table 1 and compare with Example 4.3.1."]
+  - ["保持 k = 1，把 θ 从 −180° 拖到 180°，记下 ‖AB − BA‖ 为零的转角（任务 2）。", "Keep k = 1 and drag θ from −180° to 180°; note the angles where ‖AB − BA‖ = 0 (task 2)."]
+  - ["切换到“旋转与伸缩”场景，取 θ = 60°，调节 sx、sy，找出 AB = BA 的条件（任务 3），填入表 2。", "Switch to the stretch scene, set θ = 60°, adjust sx and sy and find when AB = BA (task 3); fill in Table 2."]
+  - ["切换到 AGV 场景，取 d = 1 m，改变 θ，记录两条路线的终点和距离（任务 4、5），填入表 3。", "Switch to the AGV scene, set d = 1 m, vary θ and record the end points and their distance (tasks 4 and 5) in Table 3."]
+数据表:
+  - 标题: ["表 1  旋转与剪切（θ = 30°，k = 1）", "Table 1  Rotation and shear (θ = 30°, k = 1)"]
+    表头: ["矩阵", "第 1 列", "第 2 列", "含义"]
+    表头英文: ["Matrix", "Column 1", "Column 2", "Meaning"]
+    行: [["AB", "", "", "先剪切再旋转"], ["BA", "", "", "先旋转再剪切"]]
+    行英文: [["AB", "", "", "shear, then rotate"], ["BA", "", "", "rotate, then shear"]]
+  - 标题: ["表 2  可以交换的情形", "Table 2  When the order does not matter"]
+    表头: ["场景", "θ", "k 或 (sx, sy)", "‖AB − BA‖", "结论"]
+    表头英文: ["Scene", "θ", "k or (sx, sy)", "‖AB − BA‖", "Conclusion"]
+    行: [["剪切", "", "", "", ""], ["剪切", "", "", "", ""], ["伸缩", "60°", "", "", ""], ["伸缩", "60°", "", "", ""]]
+    行英文: [["shear", "", "", "", ""], ["shear", "", "", "", ""], ["stretch", "60°", "", "", ""], ["stretch", "60°", "", "", ""]]
+  - 标题: ["表 3  AGV 的两条路线（d = 1 m）", "Table 3  The two AGV routes (d = 1 m)"]
+    表头: ["θ", "路线①终点", "路线②终点", "两终点距离 / m", "公式 2d|sin(θ/2)|"]
+    表头英文: ["θ", "Route ① end", "Route ② end", "Distance / m", "Formula 2d|sin(θ/2)|"]
+    行: [["30°", "", "", "", ""], ["90°", "", "", "", ""], ["135°", "", "", "", ""], ["180°", "", "", "", ""]]
+注意:
+  - ["图中灰色虚线是原来的小旗，黄色是变换后的小旗；红、绿箭头是 e₁、e₂ 的像，即乘积矩阵的两列。", "The dashed grey flag is the original, the yellow one the image; the red and green arrows are the images of e₁ and e₂, i.e. the columns of the product."]
+  - ["读数中的矩阵按行列出：[a, b; c, d] 表示第 1 行 (a, b)、第 2 行 (c, d)。", "Matrices are listed by rows: [a, b; c, d] means row 1 (a, b), row 2 (c, d)."]
+思考题:
+  - ["证明：2×2 矩阵 B 与所有旋转矩阵都可交换，当且仅当 B 形如 [[a, −b], [b, a]]。", "Prove that a 2×2 matrix B commutes with every rotation if and only if B has the form [[a, −b], [b, a]]."]
+  - ["表 3 中两终点的距离为什么是 2d|sin(θ/2)|？用两条路线终点的坐标推导。", "Why is the distance in Table 3 equal to 2d|sin(θ/2)|? Derive it from the end-point coordinates."]
