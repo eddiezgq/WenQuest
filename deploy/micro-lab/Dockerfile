@@ -6,9 +6,6 @@ FROM ${BASE}
 USER root
 ENV PDK=sky130A \
     WQ_HOME=/foss/wenquest
-# 中文字体：Xschem、KLayout 里的中文标注（如原理图标题）需要；文泉驿微米黑约 5 MB
-RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends fonts-wqy-microhei \
- && rm -rf /var/lib/apt/lists/*
 COPY wenquest /foss/wenquest
 RUN chmod -R a+rX /foss/wenquest \
  && chmod a+x /foss/wenquest/bin/wqlab \

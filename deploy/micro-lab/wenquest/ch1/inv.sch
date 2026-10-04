@@ -4,7 +4,7 @@ K {}
 V {}
 S {}
 E {}
-T {第 1 章参考解：CMOS 反相器（SKY130，Wp/Wn ≈ r）} -220 -230 0 0 0.4 0.4 {}
+T {Ch.1 reference: CMOS inverter (SKY130, Wp/Wn ~ r)} -220 -230 0 0 0.4 0.4 {}
 C {sky130_fd_pr/pfet_01v8.sym} 0 -100 0 0 {name=M2
 L=0.15
 W=0.97
