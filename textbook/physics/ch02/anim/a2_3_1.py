@@ -1,4 +1,4 @@
-"""动画 2.3.1（配图 2.3.3）：同一支箭头在两套坐标系里。坡道上 AGV 的重力 W 竖直向下，长度不变；坐标系从水平—竖直
+"""动画 2.3.1（配图 2.3.3）：同一支箭头在两套坐标系里。坡道上 AGV 的重力 F_g 竖直向下，长度不变；坐标系从水平—竖直
 转到沿坡—垂直坡面（转过 α），两个分量随之改变，读数显示分量和由分量算出的大小，大小始终不变。"""
 from manim import *
 from wq_anim import *
@@ -12,7 +12,7 @@ class Lesson(Base):
         self.title("2.3", "同一支箭头，两套分量", "One arrow, two sets of components")
         al = ValueTracker(0.0)
         o = np.array([-2.0, 1.0, 0])
-        Wv = vec(o, o + DOWN * W, RED, r"\boldsymbol W", LEFT)
+        Wv = vec(o, o + DOWN * W, RED, r"\boldsymbol F_\mathrm g", LEFT)
 
         def axes():
             t = np.radians(al.get_value())
@@ -37,9 +37,9 @@ class Lesson(Base):
             t = np.radians(al.get_value())
             wx, wy = -np.sin(t), -np.cos(t)          # 以 mg 为单位
             return VGroup(MathTex(r"\alpha = %.0f^\circ" % al.get_value(), font_size=34),
-                          MathTex(r"W_{x'} = %.3f\,mg" % wx, font_size=34, color=BLUE),
-                          MathTex(r"W_{y'} = %.3f\,mg" % wy, font_size=34, color=GREEN),
-                          MathTex(r"\sqrt{W_{x'}^2+W_{y'}^2} = %.3f\,mg" % np.hypot(wx, wy), font_size=34, color=RED)
+                          MathTex(r"F_{\mathrm g,x'} = %.3f\,mg" % wx, font_size=34, color=BLUE),
+                          MathTex(r"F_{\mathrm g,y'} = %.3f\,mg" % wy, font_size=34, color=GREEN),
+                          MathTex(r"\sqrt{F_{\mathrm g,x'}^2+F_{\mathrm g,y'}^2} = %.3f\,mg" % np.hypot(wx, wy), font_size=34, color=RED)
                           ).arrange(DOWN, aligned_edge=LEFT, buff=0.25).to_edge(RIGHT, buff=0.6).shift(UP * 0.4)
 
         ax = always_redraw(axes)

@@ -28,7 +28,7 @@ q = (-3.0, -4.0)
 rq = math.hypot(*q)
 t_atan2 = deg(math.atan2(q[1], q[0]))
 t_atan = deg(math.atan(q[1] / q[0]))
-out(r_list=r_list, r30=rr[0], y30=ys[0], y30n=-ys[0], Px=P[0], Py=P[1], rq=rq, t_atan2=t_atan2, t_atan2p=t_atan2 + 360, t_atan=t_atan)
+out(r_list=r_list, r30=rr[0], r30s=f"{rr[0]:.2f}", y30=ys[0], y30n=-ys[0], Px=P[0], Py=P[1], rq=rq, t_atan2=t_atan2, t_atan2p=t_atan2 + 360, t_atan=t_atan)
 
 # ---- 算例 2.6.2
 rho, phi, z = 0.40, 50.0, 0.12
@@ -41,7 +41,7 @@ X3 = R3 * math.sin(rad(pol)) * math.cos(rad(az))
 Y3 = R3 * math.sin(rad(pol)) * math.sin(rad(az))
 Z3 = R3 * math.cos(rad(pol))
 assert abs(math.sqrt(X3 ** 2 + Y3 ** 2 + Z3 ** 2) - R3) < 1e-12
-out(pol=pol, X3=X3, Y3=Y3, Z3=Z3)
+out(pol=pol, X3=X3, Y3=Y3, Z3=Z3, Zwrong=R3 * math.cos(rad(el)))
 
 # ---- 算例 2.6.4：大圆距离
 Re = 6371.0
@@ -63,7 +63,7 @@ dlat, dlon = sh[0] - bj[0], sh[1] - bj[1]
 km_deg = 2 * math.pi * Re / 360
 flat = math.hypot(dlat * km_deg, dlon * km_deg * math.cos(rad((bj[0] + sh[0]) / 2)))
 chord = Re * float(np.linalg.norm(u1 - u2))
-out(bj_str=f"{bj[0]:.2f}°N，{bj[1]:.2f}°E", sh_str=f"{sh[0]:.2f}°N，{sh[1]:.2f}°E",
+out(dlat=abs(dlat), dlon=abs(dlon), latm=(bj[0] + sh[0]) / 2, short=dist - chord, bj_str=f"{bj[0]:.2f}°N，{bj[1]:.2f}°E", sh_str=f"{sh[0]:.2f}°N，{sh[1]:.2f}°E",
     cosd=cosd, ang=ang, dist=dist, km_deg=km_deg, flat=flat, chord=chord, Re=Re)
 
 plt = style()
@@ -77,7 +77,7 @@ for (r0, t0), nm in (((2.4, 35.0), "P"), ((2.0, 150.0), "Q")):
     p = np.array([r0 * math.cos(rad(t0)), r0 * math.sin(rad(t0))])
     er = np.array([math.cos(rad(t0)), math.sin(rad(t0))]); et = np.array([-math.sin(rad(t0)), math.cos(rad(t0))])
     ax.plot([0, p[0]], [0, p[1]], color=d.MUTED, lw=1, ls="--")
-    ax.plot(*p, "o", color=d.INK, ms=4); ax.text(p[0] - 0.25, p[1] - 0.35, nm, fontsize=10)
+    ax.plot(*p, "o", color=d.INK, ms=4); ax.text(p[0] + 0.12, p[1] - 0.38, nm, fontsize=11)
     d.arrow(ax, p, p + 0.8 * er, d.VR, lw=2); ax.text(*(p + 0.95 * er), r"$\hat{\boldsymbol{e}}_r$", color=d.VR, fontsize=11, ha="center")
     d.arrow(ax, p, p + 0.8 * et, d.VA, lw=2); ax.text(*(p + 1.0 * et), r"$\hat{\boldsymbol{e}}_\theta$", color=d.VA, fontsize=11, ha="center")
 from matplotlib.patches import Arc
@@ -115,7 +115,7 @@ for k in range(2):
     ph = np.linspace(0, math.atan2(Pp[1], Pp[0]), 30)
     ax.plot(0.4 * np.cos(ph), 0.4 * np.sin(ph), 0 * ph, color=d.INK, lw=1); ax.text(0.45, 0.12, 0, r"$\varphi$", fontsize=11)
     if k == 0:
-        ax.text(Pp[0] * 0.75, Pp[1] * 0.75 + 0.12, 0.02, r"$\rho$", fontsize=12)
+        ax.text(Pp[0] * 0.72, Pp[1] * 0.72, -0.12, r"$\rho$", fontsize=12)
         ax.text(Pp[0] + 0.05, Pp[1], Pp[2] / 2, r"$z$", fontsize=12)
         ax.set_title(T("柱坐标 ", "cylindrical ") + r"$(\rho,\ \varphi,\ z)$", fontsize=9)
     else:

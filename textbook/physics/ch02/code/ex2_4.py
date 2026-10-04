@@ -35,7 +35,7 @@ cos2 = float(u @ t2 / np.linalg.norm(t2))
 ang2 = deg(math.acos(cos2))
 assert inside and cos2 < math.cos(rad(half))
 out(head=head, half=half, tmag=float(np.linalg.norm(t)), udott=float(u @ t), cosang=cosang, ang=ang, cos_half=math.cos(rad(half)),
-    cos2=cos2, ang2=ang2)
+    cos2=cos2, ang2=ang2, tiny=deg(math.acos(1 - 1e-8)))
 
 plt = style()
 # ---- 图 2.4.1：点积是投影；夹角决定正负
@@ -49,8 +49,8 @@ for ax, a_deg, lab in zip(axs, (35, 90, 135), (T("锐角：", "acute: ") + r"$\b
     d.arrow(ax, (0, 0), A, d.VA, label=r"$\boldsymbol{A}$", off=(-0.25, 0.1))
     ax.plot([A[0], A[0]], [A[1], 0], color=d.MUTED, lw=0.8, ls="--")
     if abs(A[0]) > 1e-9:
-        ax.plot([0, A[0]], [0, 0], color=d.VR, lw=4, solid_capstyle="butt", alpha=0.8)
-        ax.text(A[0] / 2, -0.35, r"$A\cos\theta$", color=d.VR, ha="center", fontsize=10)
+        ax.plot([0, A[0]], [-0.12, -0.12], color=d.VR, lw=4, solid_capstyle="butt", alpha=0.8)
+        ax.text(A[0] / 2, -0.42, r"$A\cos\theta$", color=d.VR, ha="center", fontsize=10)
     from matplotlib.patches import Arc
     ax.add_patch(Arc((0, 0), 0.9, 0.9, theta1=0, theta2=a_deg, color=d.MUTED))
     ax.text(0.6 * math.cos(rad(a_deg / 2)), 0.6 * math.sin(rad(a_deg / 2)), r"$\theta$", fontsize=10, color=d.MUTED)
