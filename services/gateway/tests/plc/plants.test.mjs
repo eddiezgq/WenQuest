@@ -250,3 +250,15 @@ test("star–delta: about a third of the direct starting current; the delta cont
   assert.ok(r.final.speed > 1440, String(r.final.speed));
   ok(P.runTest({ io: sd.io, st, cycle: 1 }, sd, { id: "weld", faults: { weld2: true }, steps: [...S1, { wait: 8000 }, { expect: { KM3_Closed: false, short: false } }] }));
 });
+
+test("pulse source: an ordinary input counts up to 1/(2·scan); at a multiple of the scan rate it sees nothing", () => {
+  const st = "PROGRAM Main\n  VAR cnt : CTU; END_VAR\n  cnt(CU := B1_Pulse, R := S2_Reset, PV := 30000);\nEND_PROGRAM\n";
+  const count = (f, cycle) => {
+    const p = W.pulser({ f });
+    return P.runTest({ io: p.io, st, cycle }, p, { id: "f", steps: [{ wait: 1000 }] }, { final: ["cnt.CV", "pulses"] }).final;
+  };
+  assert.deepEqual(count(50, 10), { "cnt.CV": 50, pulses: 50 });
+  assert.equal(count(100, 10)["cnt.CV"], 0);
+  assert.ok(count(60, 10)["cnt.CV"] < 60);
+  assert.equal(count(200, 1)["cnt.CV"], 200);
+});

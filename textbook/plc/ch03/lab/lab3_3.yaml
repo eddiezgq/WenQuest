@@ -1,0 +1,36 @@
+# 实验 3.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、任务取自 lab3_3.js。
+原理:
+  - ["PLC 的数字量输入是一只电阻加一只发光二极管（光电耦合器），电流只能朝一个方向流。公共端接 M 时电流从输入端子流入，要配 PNP 传感器；公共端接 L+ 时电流从输入端子流出，要配 NPN 传感器。输入电流在 2 mA 以上、端子与公共端之间的电压在 11 V 以上（3 型输入）时读为 1。",
+     "A PLC digital input is a resistor and an LED (an optocoupler): current flows one way only. With the common to M, current flows into the terminal: use a PNP sensor; with the common to L+, it flows out: use an NPN sensor. Above 2 mA and 11 V (type 3) the input reads 1."]
+  - ["线圈的电流不能突变。触点断开时线圈电流要找一条路，没有吸收电路就在触点之间产生几百伏的电压和电弧。续流二极管让电流在线圈和二极管之间环流，电压只有约 0.7 V，但电流按线圈的时间常数 L/R 慢慢衰减。",
+     "A coil's current cannot jump. When the contact opens the current needs a path; without a suppressor, hundreds of volts and an arc appear across the contact. A freewheeling diode lets the current circulate (≈0.7 V) but it decays slowly with the coil's time constant L/R."]
+  - 式: "I = 4 + 16·h/2000 (mA)，x = (I − 4)/16 × 27648，h = 2000·x/27648 (mm)"
+步骤:
+  - ["场景“传感器接数字量输入”：按任务 1 设置 PNP 传感器、公共端接 M，再改成 NPN 传感器、公共端接 L+，有料时读出各点电压和输入电流，填表 1。", "Scene 'sensor to a digital input': for task 1 set a PNP sensor with the common to M, then an NPN sensor with the common to L+; with a part present read the voltages and input current; fill in Table 1."]
+  - ["设成 PNP 传感器、公共端接 L+（任务 2）：传感器输出是 24 V，PLC 却读到 0。记下三个电压，解释原因；再试 NPN 传感器、公共端接 M。", "PNP sensor with the common to L+ (task 2): the sensor output is 24 V, yet the PLC reads 0. Record three voltages and explain; then try NPN with the common to M."]
+  - ["在电路编辑器里点一下传感器开关（模拟无料、有料），看电流怎样随之变化。", "Click the sensor switch in the circuit editor (no part / part) and watch the current change."]
+  - ["场景“输出断开电磁阀线圈”：吸收设为 0，输出设为 0（刚断开），读出最低电压（任务 3）；吸收设为 1 再做一次，读出最低电压和电流降到 30 % 的时间（任务 4），填表 2。", "Scene 'switching off a valve coil': suppressor 0, output 0 (just off): read the lowest voltage (task 3); repeat with suppressor 1: lowest voltage and time to 30 % (task 4); fill in Table 2."]
+  - ["场景“4–20 mA 液位计”：液位 0、25、50、75、100 %，读出电流、电压和 PLC 读到的数，填表 3；再把电缆设为断线（任务 6）。", "Scene '4–20 mA level': level 0, 25, 50, 75, 100 %; read the current, voltage and value; fill in Table 3; then cut the cable (task 6)."]
+数据表:
+  - 标题: ["表 1  传感器与输入的四种组合", "Table 1  Four sensor–input combinations"]
+    表头: ["传感器", "公共端", "Q 的电压 / V", "I0.0 的电压 / V", "输入电流 / mA", "PLC 读到"]
+    表头英文: ["Sensor", "Common", "Q / V", "I0.0 / V", "Current / mA", "Reads"]
+    行: [["PNP", "M", "", "", "", ""], ["NPN", "L+", "", "", "", ""], ["PNP", "L+", "", "", "", ""], ["NPN", "M", "", "", "", ""]]
+  - 标题: ["表 2  断开线圈", "Table 2  Switching off the coil"]
+    表头: ["吸收", "最低电压 / V", "降到 30 % 的时间 / ms", "说明"]
+    表头英文: ["Suppressor", "Lowest voltage / V", "Time to 30 % / ms", "Notes"]
+    行: [["没有", "", "", ""], ["续流二极管", "", "", ""]]
+    行英文: [["None", "", "", ""], ["Freewheeling diode", "", "", ""]]
+  - 标题: ["表 3  4–20 mA 回路", "Table 3  The 4–20 mA loop"]
+    表头: ["液位 / %", "电流 / mA", "电压 / V", "PLC 读到的数", "液位 / mm"]
+    表头英文: ["Level / %", "Current / mA", "Voltage / V", "Value", "Level / mm"]
+    行: [["0", "", "", "", ""], ["25", "", "", "", ""], ["50", "", "", "", ""], ["75", "", "", "", ""], ["100", "", "", "", ""], ["断线", "", "", "", ""]]
+    行英文: [["0", "", "", "", ""], ["25", "", "", "", ""], ["50", "", "", "", ""], ["75", "", "", "", ""], ["100", "", "", "", ""], ["Cut", "", "", "", ""]]
+注意:
+  - ["改参数时电路会按新参数重建；“刚断开”表示线圈里还有 0.2 A 电流、触点已经断开的那一刻。", "Changing a parameter rebuilds the circuit; 'just switched off' is the instant the contact has opened with 0.2 A still in the coil."]
+  - ["仿真里把触点断开处的漏电和分布参数简化成一只 2 kΩ 电阻：尖峰约为 0.2 A × 2 kΩ = 400 V，真实的大小与线路有关，但几百伏是常见的量级。这只电阻在触点断开后还让约 11 mA 的电流流过线圈，所以电流不会降到 0。", "The simulation lumps the open contact's leakage and strays into 2 kΩ: the spike is about 0.2 A × 2 kΩ = 400 V; real spikes depend on the wiring, but hundreds of volts are typical. The same resistor keeps about 11 mA in the coil after the contact opens, so the current does not reach 0."]
+  - ["真实设备上不要带电改接线；量几百伏的尖峰要用合适的示波器和高压探头。", "Never rewire live equipment; measuring spikes of hundreds of volts needs a suitable oscilloscope and high-voltage probe."]
+思考题:
+  - ["续流二极管让线圈释放变慢。在只靠按钮互锁、或者靠程序里固定延时换向的正反转电路里（2.3 节），这会带来什么危险？", "A freewheeling diode slows the release. In a reversing circuit relying only on the button interlock, or on a fixed delay in the program (Section 2.3), what danger does that bring?"]
+  - ["变送器两端至少要有十几伏才能工作。电源 24 V、输入电阻 250 Ω、电缆电阻 50 Ω 时，20 mA 下变送器两端还剩多少伏？", "A transmitter needs a minimum voltage across it. With 24 V, a 250 Ω input and 50 Ω of cable, how many volts are left across the transmitter at 20 mA?"]
+  - ["4–20 mA 回路的 4 mA 是“活零点”。如果采用 0–20 mA，PLC 还能分辨“液位为零”和“电缆断了”吗？", "4 mA is a live zero. With 0–20 mA, could the PLC still tell 'empty' from 'cable cut'?"]

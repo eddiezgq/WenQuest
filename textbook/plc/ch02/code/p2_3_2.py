@@ -19,7 +19,7 @@ SC = {"steps": [*S, {"wait": 9000}], "trace": ["current", "speed", "KM3_Closed"]
 r = run(prog, plant="stardelta", tests=tests, review=True, cycle=1, scenario=SC)
 assert not [x for x in r["review"] if x["level"] == "error"], r["review"]
 DOL = """PROGRAM Main
-  KM1_Main := (S1_Start OR KM1_Aux) AND S2_Stop AND F1_OL;
+  KM1_Main := (S1_Start OR KM1_Aux) AND S2_Stop AND F1_Overload;
   KM3_Delta := KM1_Main;
   KM2_Star := FALSE;
 END_PROGRAM

@@ -5,7 +5,7 @@ PROGRAM Main
   END_VAR
 
   (* 主接触器 KM1：按 S1 启动并自锁，停止按钮 S2、热继电器 F1 断开它 *)
-  KM1_Main := (S1_Start OR KM1_Aux) AND S2_Stop AND F1_OL;
+  KM1_Main := (S1_Start OR KM1_Aux) AND S2_Stop AND F1_Overload;
 
   (* KT1 从启动开始计时，切到三角形以后（KM3 吸合）退出 *)
   KT1(IN := KM1_Main AND NOT KM3_Aux, PT := T#5s);

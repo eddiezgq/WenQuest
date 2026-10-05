@@ -21,6 +21,9 @@ chapters:
   2:
     status: ai
     title_en: "Electrical Control Fundamentals"
+  3:
+    status: ai
+    title_en: "PLC Hardware"
   15:
     status: ai
     title_en: "Sequential Control Design"

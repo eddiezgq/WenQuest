@@ -633,7 +633,7 @@ function reversing(o = {}) {
     { name: "S2_Stop", addr: "%IX0.0", dir: "in", comment: ["停止按钮 S2（常闭，按下为 0）", "Stop button S2 (NC, 0 when pressed)"] },
     { name: "S1_Fwd", addr: "%IX0.1", dir: "in", comment: ["正转按钮 S1（常开）", "Forward button S1 (NO)"] },
     { name: "S3_Rev", addr: "%IX0.2", dir: "in", comment: ["反转按钮 S3（常开）", "Reverse button S3 (NO)"] },
-    { name: "F1_OL", addr: "%IX0.3", dir: "in", comment: ["热继电器 F1 辅助触点（常闭，过载为 0）", "Overload relay F1 (NC, 0 on overload)"] },
+    { name: "F1_Overload", addr: "%IX0.3", dir: "in", comment: ["热继电器 F1 辅助触点（常闭，过载为 0）", "Overload relay F1 (NC, 0 on overload)"] },
     { name: "KM1_Aux", addr: "%IX0.4", dir: "in", comment: ["接触器 KM1 的常开辅助触点（吸合为 1）", "Contactor KM1 auxiliary contact (NO, 1 when closed)"] },
     { name: "KM2_Aux", addr: "%IX0.5", dir: "in", comment: ["接触器 KM2 的常开辅助触点（吸合为 1）", "Contactor KM2 auxiliary contact (NO, 1 when closed)"] },
     { name: "KM1_Fwd", addr: "%QX0.0", dir: "out", comment: ["正转接触器 KM1 线圈", "Forward contactor KM1 coil"] },
@@ -656,7 +656,7 @@ function reversing(o = {}) {
     inputs(s) {
       let aux1 = s.k1.closed;
       if (s.gap > 0) aux1 = false;                                     // the worn seal-in contact springs open for a moment
-      const r = { S2_Stop: true, F1_OL: !s.m.tripped, KM1_Aux: aux1, KM2_Aux: s.k2.closed };
+      const r = { S2_Stop: true, F1_Overload: !s.m.tripped, KM1_Aux: aux1, KM2_Aux: s.k2.closed };
       if (o.operator) r.S1_Fwd = s.press > 0;                         // book only: an operator who restarts a stopped belt
       return r;
     },
@@ -744,7 +744,7 @@ function stardelta(o = {}) {
   const io = [
     { name: "S2_Stop", addr: "%IX0.0", dir: "in", comment: ["停止按钮 S2（常闭，按下为 0）", "Stop button S2 (NC, 0 when pressed)"] },
     { name: "S1_Start", addr: "%IX0.1", dir: "in", comment: ["启动按钮 S1（常开）", "Start button S1 (NO)"] },
-    { name: "F1_OL", addr: "%IX0.3", dir: "in", comment: ["热继电器 F1 辅助触点（常闭，过载为 0）", "Overload relay F1 (NC, 0 on overload)"] },
+    { name: "F1_Overload", addr: "%IX0.3", dir: "in", comment: ["热继电器 F1 辅助触点（常闭，过载为 0）", "Overload relay F1 (NC, 0 on overload)"] },
     { name: "KM1_Aux", addr: "%IX0.4", dir: "in", comment: ["主接触器 KM1 常开辅助触点", "Main contactor KM1 auxiliary (NO)"] },
     { name: "KM2_Aux", addr: "%IX0.5", dir: "in", comment: ["星形接触器 KM2 常开辅助触点", "Star contactor KM2 auxiliary (NO)"] },
     { name: "KM3_Aux", addr: "%IX0.6", dir: "in", comment: ["三角形接触器 KM3 常开辅助触点", "Delta contactor KM3 auxiliary (NO)"] },
@@ -762,7 +762,7 @@ function stardelta(o = {}) {
       s.f = (opt && opt.faults) || {}; s.t = 0; s.out = {}; s.k1 = contactor(); s.k2 = contactor(); s.k3 = contactor();
       s.m = newMotor({ TL: o.TL || 0.7 }); s.rand = rng((opt && opt.seed) || 5); s.blown = false; s.hazard = false; s.why = ""; s.shorts = 0; s.peakI = 0;
     },
-    inputs(s) { return { S2_Stop: true, F1_OL: !s.m.tripped, KM1_Aux: s.k1.closed, KM2_Aux: s.k2.closed, KM3_Aux: s.k3.closed }; },
+    inputs(s) { return { S2_Stop: true, F1_Overload: !s.m.tripped, KM1_Aux: s.k1.closed, KM2_Aux: s.k2.closed, KM3_Aux: s.k3.closed }; },
     step(dt, out, s, ins) {
       s.t += dt; s.out = out;
       if (ins) {
@@ -819,7 +819,27 @@ function stardelta(o = {}) {
   };
 }
 
-const API = { traffic, elevator, sorter, press, conveyor, reversing, stardelta, kit3d, rng };
+// ---------------------------------------------------------------- 7. a pulse source (Ch. 3, 20): a square wave on B1_Pulse
+// The PLC reads the input only at its scans, so pulses shorter than a scan are lost (o.f: frequency in Hz, 50 % duty).
+function pulser(o = {}) {
+  const io = [
+    { name: "B1_Pulse", addr: "%IX0.0", dir: "in", comment: ["脉冲输入（例如接近开关数齿）", "Pulse input (e.g. a proximity switch counting teeth)"] },
+    { name: "S2_Reset", addr: "%IX0.1", dir: "in", comment: ["清零按钮", "Reset button"] },
+  ];
+  const f = o.f || 10;
+  return {
+    io, panel: [{ name: "S2_Reset", kind: "push", label: ["清零", "Reset"] }], faults: [],
+    reset(s) { s.t = 0; s.pulses = 0; s.last = false; },
+    inputs(s) { return { B1_Pulse: Math.floor((s.t + 1e-9) * 2 * f / 1000) % 2 === 1 }; },
+    step(dt, out, s) {
+      s.t += dt;
+      s.pulses = Math.floor((s.t + 1e-9) * f / 1000 + 0.5);    // rising edges so far (edges at (k + ½)/f)
+    },
+    read(s, n) { if (n === "pulses") return s.pulses; return undefined; },
+  };
+}
+
+const API = { traffic, elevator, sorter, press, conveyor, reversing, stardelta, pulser, kit3d, rng };
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 else root.WQPLANTS = API;
 })(typeof window !== "undefined" ? window : globalThis);

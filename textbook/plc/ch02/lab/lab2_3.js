@@ -9,7 +9,7 @@ const C = (k, v) => ({ k, v });
 // 起始程序：正转一级已经画好（还没有互锁），反转一级由学生画
 const START = [
   { comment: ["正转：S1 启动，KM1 辅助触点自锁，S2 停止，F1 过载", "Forward: S1 starts, KM1 seals in, S2 stops, F1 overload"],
-    cells: [[C("NO", "S1_Fwd"), C("NO", "S2_Stop"), C("NO", "F1_OL"), C("WIRE"), C("WIRE"), C("COIL", "KM1_Fwd")],
+    cells: [[C("NO", "S1_Fwd"), C("NO", "S2_Stop"), C("NO", "F1_Overload"), C("WIRE"), C("WIRE"), C("COIL", "KM1_Fwd")],
             [C("NO", "KM1_Aux"), null, null, null, null, null]],
     links: [[0, 1]] },
   { comment: ["反转：照正转画（S3、KM2）", "Reverse: draw it like the forward rung (S3, KM2)"],
@@ -17,13 +17,13 @@ const START = [
 ];
 // 参考程序（任务的示范做法用，自动试做时载入）：程序 2.3.1（双重互锁）；NONE：拆掉全部互锁
 const SOL = { st: `PROGRAM Main
-  KM1_Fwd := (S1_Fwd OR KM1_Aux) AND NOT S3_Rev AND NOT KM2_Aux AND S2_Stop AND F1_OL;
-  KM2_Rev := (S3_Rev OR KM2_Aux) AND NOT S1_Fwd AND NOT KM1_Aux AND S2_Stop AND F1_OL;
+  KM1_Fwd := (S1_Fwd OR KM1_Aux) AND NOT S3_Rev AND NOT KM2_Aux AND S2_Stop AND F1_Overload;
+  KM2_Rev := (S3_Rev OR KM2_Aux) AND NOT S1_Fwd AND NOT KM1_Aux AND S2_Stop AND F1_Overload;
 END_PROGRAM
 ` };
 const NONE = { st: `PROGRAM Main
-  KM1_Fwd := (S1_Fwd OR KM1_Aux) AND S2_Stop AND F1_OL;
-  KM2_Rev := (S3_Rev OR KM2_Aux) AND S2_Stop AND F1_OL;
+  KM1_Fwd := (S1_Fwd OR KM1_Aux) AND S2_Stop AND F1_Overload;
+  KM2_Rev := (S3_Rev OR KM2_Aux) AND S2_Stop AND F1_Overload;
 END_PROGRAM
 ` };
 WQ.lab({

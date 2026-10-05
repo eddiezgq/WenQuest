@@ -1,0 +1,32 @@
+# 工程任务单 TS-3-1（配 3.3–3.7 节，第一篇篇首项目的第二个里程碑）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-3-1
+标题: [上料输送线的 PLC 选型与接线, "PLC selection and wiring of the feed conveyor"]
+角色: [电气设计工程师, electrical design engineer]
+背景:
+  - "上料输送线的继电器版电路图已经评审通过（TS-2-1）。项目决定改用 PLC 控制：急停仍用硬接线切断接触器，其余逻辑进 PLC；两个接触器的辅助触点接回 PLC 做反馈；末端和入口光电开关用 PNP 型；控制柜要预留以后加装一个称重传感器和一台变频器的位置。你负责选 PLC、编 I/O 分配表、画 PLC 接线图。"
+  - "The relay version of the feed conveyor (TS-2-1) has passed review. The project now moves to PLC control: the e-stop still cuts the contactors by hard wiring, everything else goes into the PLC; both contactors' auxiliary contacts are fed back; the entry and end photo sensors are PNP; the cabinet must leave room for a load cell and a frequency converter later. You select the PLC, write the I/O assignment table and draw the PLC wiring diagram."
+输入:
+  - {名称: [继电器版电路图与元件清单, "Relay circuit diagrams and parts list"], 来源: [TS-2-1 的交付物, "Deliverables of TS-2-1"]}
+  - {名称: [控制要求, "Control requirements"], 来源: [教材 1.1 节、TS-2-1, "Section 1.1, TS-2-1"]}
+  - {名称: [选型方法与示例, "Selection method and example"], 来源: [教材 3.7 节、表 3.7.1, "Section 3.7, Table 3.7.1"]}
+  - {名称: [至少两家厂商的一体式 PLC 样本, "Catalogues of compact PLCs from at least two makers"], 来源: [厂商网站, "Makers' websites"]}
+交付物:
+  - {名称: [选型计算书, "Selection calculation"], 格式: [docx, xlsx], 验收: [写清 I/O 点数与余量、输入输出类型、响应时间、通信、安全、24 V 电源容量、成本与供货；比较至少两个候选型号，给出结论和理由, "I/O count and spare, I/O types, response time, communication, safety, 24 V supply, cost and delivery; compare at least two candidates and conclude with reasons"]}
+  - {名称: [I/O 分配表, "I/O assignment table"], 格式: [xlsx], 验收: [每个点一行：地址、符号（按本书约定）、说明、器件、常开/常闭、PNP/NPN、端子号、线号；符号与表 3.7.1 一致，新增点有说明, "One row per point: address, symbol (book convention), description, device, NO/NC, PNP/NPN, terminal, wire number; symbols as in Table 3.7.1, additions explained"]}
+  - {名称: [PLC 接线图, "PLC wiring diagram"], 格式: [pdf], 验收: [画出 PLC 的电源、输入公共端与各输入、输出公共端与各输出、接触器线圈的吸收电路；急停的硬接线回路；与 I/O 分配表一致, "PLC supply, input common and inputs, output common and outputs, coil suppressors, the hard-wired e-stop circuit; agrees with the I/O table"]}
+工位: [PY, CAD, PLM]
+步骤:
+  - ["从 TS-2-1 的电路图出发，列出改用 PLC 后的全部输入和输出，确定哪些仍留在硬接线里（急停、接触器之间的互锁）。", "From the TS-2-1 diagrams list every input and output of the PLC version; decide what stays hard-wired (e-stop, the interlock between the contactors)."]
+  - ["编 I/O 分配表，按 3.7.2 节逐项计算，选出 PLC 型号，写选型计算书。", "Write the I/O table, work through Section 3.7.2 and choose the PLC; write the selection calculation."]
+  - ["画 PLC 接线图：注意输入公共端接哪一极、输出接触器线圈的吸收电路选哪种（3.4.3 节）。", "Draw the PLC wiring: which pole the input common goes to, which coil suppressor (Section 3.4.3)."]
+  - ["可选：在实验 3.3 里核对一个输入回路和一个输出回路的接法。", "Optional: check one input loop and one output loop in Lab 3.3."]
+  - ["提交，经评审后发布。", "Submit for review and release."]
+评审要点:
+  - ["〔老师检查〕急停仍为硬接线，PLC 只读急停状态；KM1、KM2 之间保留硬接线互锁。", "[Teacher] The e-stop stays hard-wired, the PLC only reads it; KM1–KM2 keep a hard-wired interlock."]
+  - ["〔老师检查〕输入公共端的接法与 PNP 传感器相配；停止、急停、热继电器为常闭接线。", "[Teacher] The input common suits the PNP sensors; stop, e-stop and overload are wired NC."]
+  - ["〔老师检查〕接触器线圈的吸收电路选择有理由（考虑释放时间）；余量、电源容量计算正确。", "[Teacher] The coil suppressor is justified (release time considered); spare and supply calculations are right."]
+评分:
+  - {项: [选型计算书, Selection calculation], 分: 40, 标准: [各项指标齐全、计算正确、比较有据, "Complete, correct, well-founded comparison"]}
+  - {项: [I/O 分配表, I/O table], 分: 30, 标准: [完整、符号规范、接法写清, "Complete, conventional symbols, wiring stated"]}
+  - {项: [PLC 接线图, Wiring diagram], 分: 30, 标准: [与 I/O 表一致、硬接线安全回路正确, "Agrees with the table, correct hard-wired safety circuit"]}
+学时: 4

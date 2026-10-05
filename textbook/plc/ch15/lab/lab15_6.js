@@ -134,7 +134,7 @@ END_PROGRAM
     { id: "jam", test: "jam", text: ["门卡住时绝不运行（测试通过）。", "Never moves with a jammed door (test passes)."], demo: { program: SOL, tests: true } },
     { id: "safe", test: "safe", text: ["连续呼梯无危险动作（测试通过）。", "No hazard with calls in a row (test passes)."], demo: { program: SOL, tests: true } },
     { id: "review", review: true, text: ["程序检查没有错误。", "The program check finds no errors."], demo: { program: SOL, review: true } },
-    { id: "f2", text: ["注入“2 楼平层传感器坏”，呼 2 楼，观察电梯怎样运行并解释。", "Inject 'floor-2 sensor dead', call floor 2, observe and explain."], demo: { program: SOL, faults: { f2dead: true }, panel: { S_C2: true }, release: 300, run: true, wait: 15 } },
+    { id: "f2", text: ["注入“2 楼平层传感器坏”，呼 2 楼，观察电梯怎样运行并解释。", "Inject 'floor-2 sensor dead', call floor 2, observe and explain."], demo: { program: SOL, faults: { f2dead: true }, panel: { S_C2: true }, run: true, wait: 25 } },   // the call stays pressed and the check gets time: no race on a busy machine
   ],
   check(api, s) {   // 2 楼传感器坏、2 楼的呼梯还亮着，轿厢却已经越过 2 楼：学生看到了这个现象
     if (s.f && s.f.f2dead && s.out && s.out.H_C2 && s.z > 4.0) api.done("f2");

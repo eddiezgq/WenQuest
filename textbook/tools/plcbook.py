@@ -32,12 +32,13 @@ def program(text: str, lang: str = "ST") -> dict:
 
 
 def run(text: str, *, lang: str = "ST", plant: str | None = None, io: list | None = None, tests: list | None = None,
-        scenario: dict | None = None, review: bool = False, cycle: int = 10, plant_opts: dict | None = None, must_pass: bool = True) -> dict:
+        scenario: dict | None = None, review: bool = False, cycle: int = 10, plant_opts: dict | None = None, must_pass: bool = True,
+        filter: int = 0) -> dict:
     node = shutil.which("node")
     if not node:
         raise SystemExit("plcbook: Node.js is needed to run the PLC programs")
     job = {"program": program(text, lang), "plant": plant, "io": io, "tests": tests or [], "scenario": scenario,
-           "review": review, "cycle": cycle, "plantOpts": plant_opts or {}}
+           "review": review, "cycle": cycle, "plantOpts": plant_opts or {}, "filter": filter}
     r = subprocess.run([node, str(HERE / "plcrun.mjs")], input=json.dumps(job, ensure_ascii=False), capture_output=True, text=True, timeout=600)
     if r.returncode != 0:
         raise SystemExit("plcbook: " + (r.stderr.strip().splitlines() or ["node failed"])[-1])
