@@ -1,6 +1,7 @@
 """33.10 协作机器人肩关节空心轴 RJ-201：载荷（数字工厂动力学）→ 谐波减速器选型核对（零件库）→ 按刚度定直径 →
 钢与铝合金比较 → 有限元核对扭转角和应力 → 按力矩记录算疲劳寿命 → 急停时的静强度（算例 33.10.1–33.10.4，图 33.10.1–33.10.3）。"""
 import math
+import os
 
 import numpy as np
 
@@ -87,6 +88,7 @@ sigma_p = T_peak * 1e3 / sp_area
 sigma_p_stop = hd["momentary"] * 1e3 / sp_area
 
 # ---- 有限元（数字工厂“仿真与分析”的同一套程序）：减速器法兰端面固定，大臂法兰外圆加峰值扭矩
+os.environ["WQ_MESH_THREADS"] = "1"     # 网格单线程生成：中文版、英文版各运行一次，网格和数字必须相同
 from cae import geometry as GEO, solve as SOL, fatigue as FAT, materials as MATS  # noqa: E402
 step = R.step_bytes(R.shaft_segments(R.SEAT))      # 轴本身：花键段、螺纹段按圆柱简化（与数字工厂案例件相同）
 faces, _, _ = GEO.faces(step)

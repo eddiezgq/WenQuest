@@ -72,13 +72,15 @@ def it(grade: int, d: float) -> int:
 
 def shaft_dev(letter: str, grade: int, d: float) -> tuple[int, int]:
     """轴的 (es, ei)，μm。"""
-    row = _row("iso286_shaft", d)
     T = it(grade, d)
-    if letter in ("f", "g", "h"):
-        es = row[letter]
-        return es, es - T
+    if letter == "h":
+        return 0, -T
     if letter == "js":
         return T / 2, -T / 2
+    row = _row("iso286_shaft", d)
+    if letter in ("f", "g"):
+        es = row[letter]
+        return es, es - T
     if letter == "k" and not 4 <= grade <= 7:
         raise ValueError("k 的基本偏差表只录入了 IT4–IT7")
     ei = row[letter]
@@ -86,18 +88,33 @@ def shaft_dev(letter: str, grade: int, d: float) -> tuple[int, int]:
 
 
 def hole_dev(letter: str, grade: int, d: float) -> tuple[int, int]:
-    """孔的 (ES, EI)，μm：只录入 H、JS、N9、P9。"""
+    """孔的 (ES, EI)，μm。H、JS 直接给出；F、G 由轴的 f、g 按“孔与同名的轴对称”求得（EI = −es）；
+    K、M、N（IT ≤ 8）和 P、R、S（IT ≤ 7）按 GB/T 1800.1 的特殊规则 ES = −ei + Δ，Δ = ITn − IT(n−1)；N9、P9 另录入。"""
     T = it(grade, d)
     if letter == "H":
         return T, 0
     if letter == "JS":
         return T / 2, -T / 2
+    if letter in ("F", "G"):
+        ei = -shaft_dev(letter.lower(), grade, d)[0]
+        return ei + T, ei
     if letter == "N" and grade == 9:
         return 0, -T
     if letter == "P" and grade == 9:
         es = _row("iso286_hole", d)["P9_ES"]
         return es, es - T
+    if (letter in ("K", "M", "N") and 3 <= grade <= 8) or (letter in ("P", "R", "S") and 3 <= grade <= 7):
+        ei_shaft = _row("iso286_shaft", d)[letter.lower()]
+        es = -ei_shaft + (T - it(grade - 1, d))
+        return es, es - T
     raise ValueError(f"孔的基本偏差 {letter}{grade} 尚未录入")
+
+
+def bearing_tol(d: float, D: float) -> dict:
+    """滚动轴承（向心轴承，普通级）的公差，μm：内径平均偏差、外径平均偏差、宽度偏差（GB/T 307.1 / ISO 492）"""
+    r = _row("iso492_inner", d)
+    o = _row("iso492_outer", D)
+    return {"d_hi": 0, "d_lo": r["dmp_lo"], "D_hi": 0, "D_lo": o["Dmp_lo"], "B_hi": 0, "B_lo": r["Bs_lo"]}
 
 
 def fit_limits(d: float, code: str) -> tuple[float, float]:

@@ -128,3 +128,16 @@ def test_api_teacher_injects_student_fills_8d_teacher_approves(db, monkeypatch):
         for k in ("WQ_AUTH", "WQ_SSO_URL"):
             os.environ.pop(k, None)
         importlib.reload(app_mod)
+
+
+def test_verify_stats_one_sided():
+    """跳动、对称度只有上限（下限 0）：验证用单边 Cpu，不按双边公式把能力算低（教材《机械设计》4.9.3 节）。"""
+    from hub import qproblem as Q
+    rng = random.Random(3)
+    rows = [{"data": {"value_mm": abs(rng.gauss(0.004, 0.0012)), "lower_tol_mm": 0.0, "upper_tol_mm": 0.012, "result": "pass"}}
+            for _ in range(20)]
+    s = Q._stats(rows)
+    assert s["one_sided"] and s["Cpk"] > 1.33                       # 双边公式只有约 1.1
+    two = [{"data": {"value_mm": rng.gauss(35.010, 0.0012), "lower_tol_mm": 35.002, "upper_tol_mm": 35.018, "result": "pass"}}
+           for _ in range(20)]
+    assert not Q._stats(two)["one_sided"]

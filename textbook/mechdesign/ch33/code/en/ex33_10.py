@@ -1,6 +1,7 @@
 """33.10 Cobot shoulder-joint hollow shaft RJ-201: load (digital-factory dynamics) -> harmonic reducer selection check (parts library) -> diameter sized by stiffness ->
 steel versus aluminum alloy -> FE check of twist angle and stress -> fatigue life from the torque record -> static strength at emergency stop (Examples 33.10.1-33.10.4, Figs. 33.10.1-33.10.3)."""
 import math
+import os
 
 import numpy as np
 
@@ -87,6 +88,7 @@ sigma_p = T_peak * 1e3 / sp_area
 sigma_p_stop = hd["momentary"] * 1e3 / sp_area
 
 # ---- Finite element (the same program as the digital factory "Simulation & Analysis"): reducer flange face fixed, peak torque applied on the outer circle of the big-arm flange
+os.environ["WQ_MESH_THREADS"] = "1"     # mesh with one thread: the Chinese and English runs must give the same mesh and numbers
 from cae import geometry as GEO, solve as SOL, fatigue as FAT, materials as MATS  # noqa: E402
 step = R.step_bytes(R.shaft_segments(R.SEAT))      # the shaft itself: spline and thread sections simplified to cylinders (same as the factory case part)
 faces, _, _ = GEO.faces(step)

@@ -1,6 +1,7 @@
 """33.11 工业平缝机上轴 LS-101：曲柄连杆惯性力与转矩波动 → 台阶处一转之内的应力变化 → 无限寿命安全系数（5 000 与
 5 500 r/min）→ 临界转速（梁单元 + 集中质量）与有限元固有频率（算例 33.11.1–33.11.3，图 33.11.1–33.11.3）。"""
 import math
+import os
 
 import numpy as np
 
@@ -72,6 +73,7 @@ cyc_h = L.N_MAX * 60
 # ---- 临界转速：梁单元 + 集中质量（33.7 节的方法）；不带集中质量的光轴与有限元固有频率对照
 nc, zb, modes = L.critical_speeds()
 nc0, _, _ = L.critical_speeds(masses=[])
+os.environ["WQ_MESH_THREADS"] = "1"     # 网格单线程生成：中文版、英文版各运行一次，网格和数字必须相同
 from cae import geometry as GEO, materials as MATS, modal as MO  # noqa: E402
 step = L.step_bytes()
 faces, _, _ = GEO.faces(step)

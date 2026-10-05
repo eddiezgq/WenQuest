@@ -1,0 +1,35 @@
+# 实验 4.8 的指导书与报告模板。目的、场景、参数、任务取自 lab4_8.js。
+原理:
+  - ["尺寸链里，封闭环（这里是轴向游隙）由各组成环决定：增环变大，封闭环变大；减环变大，封闭环变小。", "In a dimension chain the closing link (here the end play) is set by the component links: an increasing link raises it, a decreasing link lowers it."]
+  - 式: "游隙 = W − c₁ − c₂ − (B + 套筒 + 齿轮毂 + 轴上 25 + B)"
+  - ["极值法：每个环都同时取最不利的极限，封闭环的公差等于各环公差之和——保证 100% 装配，但要求各环公差很小。", "Worst case: all links at their worst limits at once; the closing tolerance is the sum of the link tolerances — 100% assembly, but tight link tolerances."]
+  - 式: "极值法 T₀ = Σ Tᵢ；方和根法 T₀ = √(Σ Tᵢ²)（各环正态、对中，σᵢ = Tᵢ/6）"
+  - ["蒙特卡洛法：按各环的实际分布随机抽样，直接数出合格率；分布不对称、不对中时也能用。", "Monte Carlo: draw each link from its actual distribution and count the yield directly; works for skewed or off-centre distributions too."]
+  - ["补偿环：装配时量出游隙，用调整垫片补到要求的范围。零件公差可以放宽，代价是装配时要测量、选垫片。", "Compensating link: measure the play at assembly and add shims to bring it into range. Parts may have wider tolerances; the price is measuring and choosing shims."]
+步骤:
+  - ["打开实验 4.8，场景“WQR-105 输出轴系”。参数取默认（公差倍数 1、轴承宽度标准差 0.015、不用补偿、抽样 20000 次），点“抽样”（任务 1），把极值法范围、方和根范围、抽样的平均值和标准差、合格率填入表 1。", "Open Lab 4.8, scene “WQR-105 output shaft”. With the defaults (tolerances × 1, bearing s.d. 0.015, no compensation, 20000 samples) press Sample (task 1); enter worst-case range, RSS range, sampled mean and s.d., and yield in Table 1."]
+  - ["公差倍数改为 0.5，再抽样（任务 2），填表 1。比较极值法范围与要求的 0.2 mm。", "Set the tolerance factor to 0.5 and sample again (task 2); fill in Table 1. Compare the worst-case range with the required 0.2 mm."]
+  - ["公差倍数放回 1，补偿环设为 1（调整垫片），抽样（任务 3），记下合格率、垫片平均厚度和最厚的垫片，填表 1。", "Tolerance factor back to 1, compensation 1 (shims), sample (task 3); note the yield, mean and thickest shim pack in Table 1."]
+  - ["把轴承宽度标准差从 0.005 改到 0.04（不用补偿），各抽样一次，填表 2：轴承厂的质量对合格率有多大影响？", "Vary the bearing s.d. from 0.005 to 0.04 (no compensation), sample each, fill in Table 2: how much does the bearing maker's quality matter?"]
+  - ["切换到“轮滑鞋的轮子”，补偿环 0 和 1 各抽样一次（任务 4；隔套分三档，装配前量出凸台宽度和隔套长度选一档），把抽样的最小、最大游隙和合格率填入表 3。", "Switch to “Inline-skate wheel”, sample with compensation 0 and 1 (task 4; three spacer grades, chosen after measuring rib and spacer), and enter the sampled min and max play and the yield in Table 3."]
+  - ["（选做）在自己的电脑上运行程序 4.8.1，把垫片的台阶从 0.05 改成 0.1，看合格率怎样变。", "(Optional) Run Program 4.8.1 on your computer and change the shim step from 0.05 to 0.1; see how the yield changes."]
+数据表:
+  - 标题: ["表 1  WQR-105 输出轴系的轴向游隙（要求 0.2–0.4 mm）", "Table 1  End play of the WQR-105 output shaft (0.2–0.4 mm required)"]
+    表头: ["方案", "极值法范围 / mm", "方和根 μ ± 3σ / mm", "抽样平均 / mm", "抽样标准差 / mm", "合格率 / %", "垫片平均 / 最厚 / mm"]
+    表头英文: ["Option", "Worst case / mm", "RSS μ ± 3σ / mm", "Sampled mean / mm", "Sampled s.d. / mm", "Yield / %", "Shims mean / max / mm"]
+    行: [["公差 × 1，不补偿", "", "", "", "", "", "—"], ["公差 × 0.5，不补偿", "", "", "", "", "", "—"], ["公差 × 1，垫片", "", "", "", "", "", ""]]
+  - 标题: ["表 2  轴承宽度的分散对合格率的影响（公差 × 1，不补偿）", "Table 2  Effect of bearing width scatter (tolerances × 1, no compensation)"]
+    表头: ["轴承宽度标准差 / mm", "抽样标准差 / mm", "合格率 / %"]
+    表头英文: ["Bearing s.d. / mm", "Sampled s.d. / mm", "Yield / %"]
+    行: [["0.005", "", ""], ["0.015", "", ""], ["0.04", "", ""]]
+  - 标题: ["表 3  轮滑鞋的轮子（要求 0.02–0.15 mm）", "Table 3  Inline-skate wheel (0.02–0.15 mm required)"]
+    表头: ["方案", "抽样的最小、最大游隙 / mm", "合格率 / %"]
+    表头英文: ["Option", "Sampled min, max play / mm", "Yield / %"]
+    行: [["不选配", "", ""], ["隔套分三档选配", "", ""]]
+注意:
+  - ["箱体两端面距离 W = 152 mm、端盖止口长度是本书设定的（数字工厂的箱体还没有这几个尺寸）；其余尺寸取 SH-301 B 版与 6207 的标准公差。", "The housing width W = 152 mm and the cap spigot lengths were set by this book (the factory housing does not define them yet); the rest come from SH-301 rev. B and the 6207 standard tolerances."]
+  - ["深沟球轴承本身还有轴向游隙，这里没有计入；轴承内外圈宽度按同一公差处理。", "The internal axial clearance of the ball bearings is ignored here; inner and outer ring widths take the same tolerance."]
+  - ["抽样用固定的随机数种子，同样的参数每次结果相同；改种子（程序 4.8.1 里）结果会有零点几个百分点的变化。", "Sampling uses a fixed seed, so the same settings give the same result; another seed (in Program 4.8.1) changes the yield by a few tenths of a percent."]
+思考题:
+  - ["两个轴承宽度的公差之和（0.24 mm）已经超过要求的游隙范围（0.2 mm）。这时再收紧箱体、套筒的公差还有没有用？除了垫片，还有哪些办法？", "The two bearing-width tolerances (0.24 mm) already exceed the allowed play range (0.2 mm). Does tightening the housing and sleeve still help? Besides shims, what else can be done?"]
+  - ["蒙特卡洛的合格率比方和根法算的低，原因在哪里？什么时候方和根法会偏于危险？", "The Monte Carlo yield is lower than RSS predicts. Why? When is RSS on the unsafe side?"]

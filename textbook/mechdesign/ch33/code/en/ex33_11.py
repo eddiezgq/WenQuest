@@ -1,6 +1,7 @@
 """33.11 Industrial lockstitch sewing machine upper shaft LS-101: crank-connecting-rod inertia force and torque fluctuation -> stress variation within one revolution at the steps -> infinite-life safety factor (5 000 and
 5 500 r/min) -> critical speed (beam elements + lumped mass) and FE natural frequency (Examples 33.11.1-33.11.3, Figs. 33.11.1-33.11.3)."""
 import math
+import os
 
 import numpy as np
 
@@ -72,6 +73,7 @@ cyc_h = L.N_MAX * 60
 # ---- Critical speed: beam elements + lumped mass (method of Section 33.7); bare shaft without lumped mass compared with FE natural frequency
 nc, zb, modes = L.critical_speeds()
 nc0, _, _ = L.critical_speeds(masses=[])
+os.environ["WQ_MESH_THREADS"] = "1"     # mesh with one thread: the Chinese and English runs must give the same mesh and numbers
 from cae import geometry as GEO, materials as MATS, modal as MO  # noqa: E402
 step = L.step_bytes()
 faces, _, _ = GEO.faces(step)

@@ -43,7 +43,7 @@ def mesh(gmsh, size_mm, fine_faces=()):
     gmsh.option.setNumber("Mesh.ElementOrder", 2)
     gmsh.option.setNumber("Mesh.HighOrderOptimize", 1)
     gmsh.option.setNumber("Mesh.Algorithm3D", 10)        # HXT，快
-    gmsh.option.setNumber("Mesh.MaxNumThreads3D", 2)
+    gmsh.option.setNumber("Mesh.MaxNumThreads3D", int(os.environ.get("WQ_MESH_THREADS", "2")))   # 教材程序设为 1：网格每次相同，数字可复现
     if fine_faces:                                        # 载荷、圆角处加密
         f = gmsh.model.mesh.field
         d = f.add("Distance")

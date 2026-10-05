@@ -12,3 +12,9 @@ program_deps:
   # 第 3 章：SH-301 B 版的尺寸（第 33 章）、案例件 RJ-201 的结构
   - textbook/mechdesign/ch33/code/_shaft.py
   - factory/digital/hub/case_parts.py
+  # 第 4 章：磨床的加工误差模型、质量模块、RJ-201 的轴承（零件库）、轴承座的设计规则（第 3 章）
+  - factory/digital/sim/errors.py
+  - factory/digital/hub/spc.py
+  - textbook/mechdesign/ch33/code/_rj.py
+  - textbook/mechdesign/ch03/code/_ch3.py
+  - library/catalog/A/A-BRG-DG/specs.csv

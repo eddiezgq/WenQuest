@@ -161,9 +161,12 @@ def _stats(rows):
     v = [r["data"]["value_mm"] for r in rows]
     lo, hi = rows[-1]["data"]["lower_tol_mm"], rows[-1]["data"]["upper_tol_mm"]
     c = spc.capability(v, lo, hi)
+    if lo == 0:          # 跳动、对称度这类只有上限的特性（下限 0 是自然界限）：用单边 Cpu、Ppu（教材《机械设计》4.9.3 节）
+        c["Cpk"] = (hi - c["mean"]) / (3 * c["sigma_within"]) if c["sigma_within"] > 0 else float("inf")
+        c["Ppk"] = (hi - c["mean"]) / (3 * c["s"]) if c["s"] > 0 else float("inf")
     cpk = c["Cpk"] if math.isfinite(c["Cpk"]) else None
     return {"n": len(v), "mean": c["mean"], "fails": sum(r["data"]["result"] == "fail" for r in rows),
-            "Cpk": cpk, "Ppk": c["Ppk"], "lsl": lo, "usl": hi}
+            "Cpk": cpk, "Ppk": c["Ppk"], "lsl": lo, "usl": hi, "one_sided": lo == 0}
 
 
 def close(db, sid, user):
