@@ -43,6 +43,15 @@ PY
 cat "$OUT/calib_compare.json"
 endstep
 
+step "6c 第 2、4 章参数复核：门的逻辑努力与寄生延时、导线参数（与仓库相差 ≤ 5 %）"
+CALIB_OUT="$OUT/calib" SKY130_LIB="$LIB" python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/calib_gates.py" --check > "$OUT/calib_gates.log" 2>&1 || { fail=1; echo "::error::门参数复核未通过"; }
+tail -14 "$OUT/calib_gates.log"
+TECH=$(ls "$PDKPATH"/libs.tech/magic/sky130A.tech 2>/dev/null | head -1)
+python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/wires.py" "$TECH" --check > "$OUT/wires.log" 2>&1 || { fail=1; echo "::error::导线参数复核未通过"; }
+cat "$OUT/wires.log"
+echo "::notice title=第 2、4 章参数复核::$(tail -1 "$OUT/calib_gates.log")；$(tail -1 "$OUT/wires.log")"
+endstep
+
 step "4c 8 位计数器 RTL→GDS（LibreLane）"
 mkdir -p "$OUT/counter8"
 wqlab flow "$CH1/counter8/config.json" --out "$OUT/counter8" || fail=1

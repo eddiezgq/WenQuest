@@ -6,5 +6,5 @@ parts_en:
   第三篇 从电路到芯片: "Part III  From Circuit to Chip"
 chapters:
   1:
-    status: draft
+    status: first
     title_en: "The CMOS Inverter"
