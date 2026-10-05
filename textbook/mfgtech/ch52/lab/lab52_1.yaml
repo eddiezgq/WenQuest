@@ -1,0 +1,25 @@
+# 实验 52.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab52_1.js。
+原理:
+  - ["夹具由定位元件、夹紧装置、对刀与导向元件、连接元件和夹具体组成，有的还有分度装置和其他装置。读一套夹具，按“工件 → 定位 → 夹紧 → 对刀导向 → 连接 → 夹具体”的顺序找零件，每一类回答一个问题：工件靠在哪里、怎样压住、刀具怎样对准、夹具怎样装到机床上。", "A fixture consists of locators, clamps, setting and guiding elements, connecting elements and the body, sometimes with indexing and other devices. Read it in the order work → locators → clamps → setting/guiding → connection → body; each group answers one question: where the work rests, how it is held, how the cutter is placed, how the fixture mounts."]
+  - ["JJ-301-50：V 形块两段工作面相当于两个短 V 形块，限制工件的 4 个自由度；轴向挡板顶住左轴肩，限制 1 个；绕轴线的转动不限制（不完全定位）。两个移动压板压住两端，直角对刀块配 3 mm 塞尺对刀，两个定位键使夹具在工作台上定向。", "JJ-301-50: the two lands of the V-block act as two short V-blocks and restrict 4 degrees of freedom; the axial stop takes 1 at the left shoulder; rotation about the axis is left free (partial location). Two sliding straps clamp the ends, a right-angle setting block with a 3 mm feeler sets the cutter, and two keys align the fixture on the table."]
+步骤:
+  - ["转动、缩放模型，对照图 52.1.3 和总图 52.1.5，找到工件、V 形块、挡板、压板、对刀块、定位键。", "Rotate and zoom the model; find the work, V-block, stop, straps, setting block and keys against Fig. 52.1.3 and the drawing 52.1.5."]
+  - ["把拆开程度拉到 1（任务 1），记下零件从下到上的顺序，它大致就是装配顺序（从上到下是拆卸顺序），填表 1。", "Set the explode to 1 (task 1); note the parts from bottom to top – roughly the assembly order (top to bottom is the order of taking apart) – in Table 1."]
+  - ["依次突出显示定位、夹紧、对刀导向、夹具体（任务 2–4），把每类零件的名称、数量和作用填入表 2。", "Highlight locating, clamping, setting/guiding and body in turn (tasks 2–4); enter the names, numbers and functions in Table 2."]
+  - ["装好状态下剖开（任务 5），看齿轮位外圆与 V 形块两个工作面的接触、V 形块顶点处的空刀槽。", "Section it assembled (task 5); look at the contact between the gear seat and the two V faces and the relief groove at the apex."]
+数据表:
+  - 标题: ["表 1  JJ-301-50 的装配顺序", "Table 1  Assembly order of JJ-301-50"]
+    表头: ["顺序", "零件", "装在哪个零件上", "怎样固定"]
+    表头英文: ["Order", "Part", "Mounted on", "Fixed by"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""], ["4", "", "", ""], ["5", "", "", ""], ["6", "", "", ""]]
+    行英文: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""], ["4", "", "", ""], ["5", "", "", ""], ["6", "", "", ""]]
+  - 标题: ["表 2  按作用分类", "Table 2  Parts by function"]
+    表头: ["类别", "零件（序号）", "数量", "作用"]
+    表头英文: ["Group", "Parts (item no.)", "Number", "Function"]
+    行: [["定位", "", "", ""], ["夹紧", "", "", ""], ["对刀导向", "", "", ""], ["连接", "", "", ""], ["夹具体", "", "", ""]]
+    行英文: [["Locating", "", "", ""], ["Clamping", "", "", ""], ["Setting/guiding", "", "", ""], ["Connecting", "", "", ""], ["Body", "", "", ""]]
+注意:
+  - ["模型来自零件库 E-ASM-JJ30150，与书中插图、总图和数字工厂是同一份；零件的“作用”按零件名自动归类，定位键归入夹具体（连接元件），压板后端的可调支承归入夹紧装置（它是压板的支点，不起定位作用）。", "The model is library entry E-ASM-JJ30150, the same as the book figures, the drawing and the digital factory. Functions are assigned from part names; the keys count as body (connecting elements) and the heel supports under the straps as clamping (they are the strap fulcrums, not locators)."]
+  - ["剖开只切过工件轴线的竖直平面，剖面不画剖面线，看到的是零件的内表面。", "The section is the vertical plane through the work axis; cut faces are not hatched, you see the inner surfaces."]
+思考题:
+  - ["夹具体上哪些面是加工面、哪些是毛坯面？哪些面的精度最高？为什么？", "Which faces of the body are machined, which are left as cast, and which need the highest accuracy? Why?"]

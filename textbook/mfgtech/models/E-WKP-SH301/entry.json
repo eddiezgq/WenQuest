@@ -1,0 +1,171 @@
+{
+ "schema": 1,
+ "id": "E-WKP-SH301",
+ "kind": "case",
+ "name": {
+  "zh": "SH-301 输出轴（各工序状态）",
+  "en": "Output shaft SH-301 (all process states)"
+ },
+ "category": "WKP",
+ "tags": [
+  "工装夹具",
+  "机床夹具"
+ ],
+ "standards": [],
+ "params": [
+  {
+   "key": "spacing",
+   "zh": "状态间距",
+   "en": "Spacing",
+   "role": "key",
+   "unit": "mm"
+  }
+ ],
+ "defaults": {
+  "spacing": 70.0
+ },
+ "model": {
+  "engine": "wqfix:local.sh301_states",
+  "formats": [
+   "glb",
+   "step",
+   "stl"
+  ],
+  "origin": "毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图",
+  "note": "尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）"
+ },
+ "source": {
+  "origin": "wenquest",
+  "license": "Apache-2.0",
+  "attribution": "问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-10-05",
+   "note": "自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表"
+  }
+ },
+ "teaching": {
+  "principle": "WQR-105 减速器的输出轴，《机械制造技术》第 50–57 章的主线零件。毛坯与五个工序状态（粗车、精车、铣键槽、磨外圆）各一个节点，由工艺规程（std/SH-301_process.yaml）的工序简图数据生成，橙色是该工序加工的面。",
+  "uses": [
+   "工艺过程、尺寸链、定位与夹具设计的教学案例"
+  ],
+  "courses": [
+   {
+    "course": "机械制造技术",
+    "chapter": "第 50 章 SH-301 的工艺过程"
+   },
+   {
+    "course": "机械制造技术",
+    "chapter": "第 53 章 工艺尺寸链"
+   }
+  ],
+  "labs": []
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "version": "2026.10.15",
+ "package": "https://github.com/eddiezgq/WenQuest/releases/download/library-v2026.10.15/E-WKP-SH301.zip",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {
+    "spacing": 70.0
+   },
+   "files": {
+    "glb": "E-WKP-SH301/default.glb",
+    "png": "E-WKP-SH301/default.png"
+   }
+  }
+ ],
+ "assembly": {
+  "parts": [
+   {
+    "node": "p01",
+    "name": "工件 SH-301 毛坯（工序 10 下料后）",
+    "number": null,
+    "role": "工件",
+    "color": "#e8c39e",
+    "explode_mm": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "home_mm": [
+     0.0,
+     140.0,
+     0.0
+    ]
+   },
+   {
+    "node": "p02",
+    "name": "工件 SH-301 工序 20 粗车后",
+    "number": null,
+    "role": "工件",
+    "color": "#e8c39e",
+    "explode_mm": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "home_mm": [
+     0.0,
+     70.0,
+     0.0
+    ]
+   },
+   {
+    "node": "p03",
+    "name": "工件 SH-301 工序 40 精车后",
+    "number": null,
+    "role": "工件",
+    "color": "#e8c39e",
+    "explode_mm": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "home_mm": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "node": "p04",
+    "name": "工件 SH-301 工序 50 铣键槽后",
+    "number": null,
+    "role": "工件",
+    "color": "#e8c39e",
+    "explode_mm": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "home_mm": [
+     0.0,
+     -70.0,
+     0.0
+    ]
+   },
+   {
+    "node": "p05",
+    "name": "工件 SH-301 工序 60 磨外圆后（成品）",
+    "number": null,
+    "role": "工件",
+    "color": "#e8c39e",
+    "explode_mm": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "home_mm": [
+     0.0,
+     -140.0,
+     0.0
+    ]
+   }
+  ]
+ }
+}

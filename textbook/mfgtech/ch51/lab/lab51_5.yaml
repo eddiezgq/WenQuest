@@ -1,0 +1,18 @@
+# 实验 51.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab51_5.js。
+原理:
+  - ["定位元件按工件的定位面分：平面用支承钉、支承板（可调支承、自位支承、辅助支承各有用途），外圆用 V 形块、定位套、半圆孔，内孔用定位销、心轴，中心孔用顶尖。分析一个元件，先看它与工件接触的面，再换算成相当的支承点数和限制的自由度（表 51.3.1）。", "Locators are grouped by the work surface: rest buttons and plates for planes, V-blocks, sleeves and half bores for outside diameters, pins and mandrels for bores, centres for centre holes. For each element look at the contact, then convert it into equivalent points and restricted freedoms (Table 51.3.1)."]
+  - ["对定位元件的要求：足够的精度、耐磨（淬硬）、足够的刚度、结构工艺性好、便于清除切屑（51.5.2）。", "Requirements: accuracy, wear resistance (hardened), rigidity, manufacturability and easy chip removal (51.5.2)."]
+步骤:
+  - ["元件从 1 看到 8，每个都转动、放大看工作面，把定位面、相当的支承点数和限制的自由度填入表 1。", "Go through elements 1 to 8, turning and zooming on the working faces; fill in Table 1."]
+  - ["完成任务 1–3：V 形块的对中性、圆柱销与菱形销的区别、两顶尖限制的自由度。", "Do tasks 1–3: self-centring of the V-block, cylindrical versus diamond pin, the freedoms of two centres."]
+数据表:
+  - 标题: ["表 1  常用定位元件", "Table 1  Common locators"]
+    表头: ["元件", "零件库编号", "工件定位面", "相当支承点数", "限制的自由度", "用在什么场合"]
+    表头英文: ["Element", "Library id", "Work surface", "Points", "Restricted freedoms", "Typical use"]
+    行: [["支承钉", "E-LOC-SPINA", "", "", "", ""], ["支承板", "E-LOC-SPLATE", "", "", "", ""], ["V 形块", "E-LOC-VB", "", "", "", ""], ["定位套", "E-LOC-SLEEVE", "", "", "", ""], ["圆柱定位销", "E-LOC-PIN", "", "", "", ""], ["菱形销", "E-LOC-DPIN", "", "", "", ""], ["圆柱心轴", "E-LOC-MANDREL", "", "", "", ""], ["两顶尖", "E-ACC-CENTERS", "", "", "", ""]]
+    行英文: [["Rest button", "E-LOC-SPINA", "", "", "", ""], ["Rest plate", "E-LOC-SPLATE", "", "", "", ""], ["V-block", "E-LOC-VB", "", "", "", ""], ["Sleeve", "E-LOC-SLEEVE", "", "", "", ""], ["Cylindrical pin", "E-LOC-PIN", "", "", "", ""], ["Diamond pin", "E-LOC-DPIN", "", "", "", ""], ["Mandrel", "E-LOC-MANDREL", "", "", "", ""], ["Centres", "E-ACC-CENTERS", "", "", "", ""]]
+注意:
+  - ["模型的尺寸是书中所用的示例规格，结构型式参照 JB/T 8004–8045 系列，设计时以标准为准。", "Sizes are the book's example sizes; the forms follow the JB/T 8004–8045 series; use the standards for design."]
+  - ["V 形块、定位套“短”还是“长”看接触长度与直径之比，表中两种情况都列出。", "Whether a V-block or sleeve counts as short or long depends on contact length over diameter; both cases are listed."]
+思考题:
+  - ["一面两销定位时，为什么第二个销要做成菱形销，而且削边的方向不能随便？", "In plane-and-two-pin location, why is the second pin a diamond pin, and why does the direction of the flats matter?"]

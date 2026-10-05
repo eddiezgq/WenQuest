@@ -1,0 +1,132 @@
+{
+ "schema": 1,
+ "id": "E-LOC-MANDREL",
+ "kind": "product",
+ "name": {
+  "zh": "圆柱心轴",
+  "en": "Cylindrical mandrel"
+ },
+ "category": "LOC",
+ "tags": [
+  "工装夹具",
+  "机床夹具"
+ ],
+ "standards": [],
+ "params": [
+  {
+   "key": "d",
+   "zh": "直径 d",
+   "en": "Diameter d",
+   "role": "key",
+   "unit": "mm"
+  },
+  {
+   "key": "L",
+   "zh": "长度 L",
+   "en": "Length L",
+   "role": "key",
+   "unit": "mm"
+  },
+  {
+   "key": "collar_d",
+   "zh": "台肩直径",
+   "en": "Collar diameter",
+   "role": "key",
+   "unit": "mm"
+  }
+ ],
+ "defaults": {
+  "d": 30.0,
+  "L": 60.0,
+  "collar_d": 50.0
+ },
+ "model": {
+  "engine": "wqfix:elements.mandrel",
+  "formats": [
+   "glb",
+   "step",
+   "stl"
+  ],
+  "origin": "毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图",
+  "note": "尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）",
+  "names": [
+   "心轴",
+   "压紧螺母"
+  ]
+ },
+ "source": {
+  "origin": "wenquest",
+  "license": "Apache-2.0",
+  "attribution": "问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-10-05",
+   "note": "自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表"
+  }
+ },
+ "teaching": {
+  "principle": "工件的孔套在心轴上、端面靠在台肩上定位，再用螺母压紧；间隙配合装卸方便，但有基准位移误差。",
+  "uses": [
+   "盘套类零件以孔定位车外圆、磨外圆"
+  ],
+  "courses": [
+   {
+    "course": "机械制造技术",
+    "chapter": "第 51 章 常用定位元件"
+   },
+   {
+    "course": "机械制造技术",
+    "chapter": "第 52 章 车床夹具"
+   }
+  ],
+  "labs": []
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "version": "2026.10.15",
+ "package": "https://github.com/eddiezgq/WenQuest/releases/download/library-v2026.10.15/E-LOC-MANDREL.zip",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {
+    "d": 30.0,
+    "L": 60.0,
+    "collar_d": 50.0
+   },
+   "files": {
+    "glb": "E-LOC-MANDREL/default.glb",
+    "png": "E-LOC-MANDREL/default.png"
+   }
+  }
+ ],
+ "assembly": {
+  "parts": [
+   {
+    "node": "p01",
+    "name": "心轴",
+    "number": null,
+    "role": "定位",
+    "color": "#b8c7d9",
+    "explode_mm": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "node": "p02",
+    "name": "压紧螺母",
+    "number": null,
+    "role": "标准件",
+    "color": "#b8c7d9",
+    "explode_mm": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ]
+ }
+}

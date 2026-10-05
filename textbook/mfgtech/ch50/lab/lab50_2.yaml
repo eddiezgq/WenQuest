@@ -1,0 +1,20 @@
+# 实验 50.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab50_2.js。
+原理:
+  - ["工艺过程由若干道工序组成，每道工序改变工件的一部分表面。把每道工序之后的工件（工序简图上的状态）连起来看，就能看出加工阶段的划分（粗车—调质—精车—铣键槽—磨削）、每道工序的余量，以及哪些面是后面工序的定位基准。", "A process is a series of operations, each changing part of the work's surface. Looking at the work after each operation (the state on the operation sketch) shows the stages (rough-turn, heat-treat, finish-turn, keyway, grind), each allowance and which faces serve as datums later."]
+  - 式: "直径余量 Z = d_前 − d_后，   单边余量 = Z / 2"
+步骤:
+  - ["状态从 0 拉到 4，每个状态记下工序、工作中心、加工的面、量出的总长和最大外圆，填表 1。", "Move the state from 0 to 4; for each record the operation, work centre, faces machined, measured length and largest diameter in Table 1."]
+  - ["找出总长第一次到 167 mm 的状态（任务 1）和键槽出现的状态（任务 2）。", "Find where the length first reaches 167 mm (task 1) and where the keyway appears (task 2)."]
+  - ["由工序 40 和工序 60 的齿轮位直径算出磨削余量（任务 3）；由毛坯和工序 20 算出粗车余量。", "From the gear-seat diameters after op 40 and op 60 compute the grinding allowance (task 3); from the blank and op 20 the roughing allowance."]
+  - ["剖开成品，看两端中心孔（任务 4），说出哪几道工序以它们为基准。", "Section the finished shaft and look at the centre holes (task 4); which operations use them as datums?"]
+数据表:
+  - 标题: ["表 1  SH-301 各工序之后的状态", "Table 1  SH-301 after each operation"]
+    表头: ["状态", "工序", "加工的面", "总长 / mm", "最大外圆 / mm", "余量（直径）/ mm"]
+    表头英文: ["State", "Operation", "Faces machined", "Length / mm", "Largest dia. / mm", "Allowance (dia.) / mm"]
+    行: [["毛坯", "10", "", "", "", "—"], ["工序 20 后", "20", "", "", "", ""], ["工序 40 后", "40", "", "", "", ""], ["工序 50 后", "50", "", "", "", "—"], ["工序 60 后", "60", "", "", "", ""]]
+    行英文: [["Blank", "10", "", "", "", "—"], ["After op 20", "20", "", "", "", ""], ["After op 40", "40", "", "", "", ""], ["After op 50", "50", "", "", "", "—"], ["After op 60", "60", "", "", "", ""]]
+注意:
+  - ["模型来自零件库 E-WKP-SH301，由工艺规程的工序简图数据生成；量出的尺寸是名义尺寸，没有公差。", "The model is library entry E-WKP-SH301, generated from the operation sketches in the process plan; measured sizes are nominal, without tolerances."]
+  - ["工序 30 是调质（热处理），不改变形状，没有单独的状态。", "Op 30 is heat treatment; it does not change the shape and has no state of its own."]
+思考题:
+  - ["为什么总长在工序 20 留了 1 mm、到工序 40 才车到 167？", "Why does op 20 leave 1 mm on the length and op 40 finish it to 167?"]

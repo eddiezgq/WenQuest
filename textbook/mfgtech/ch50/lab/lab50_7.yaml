@@ -1,0 +1,18 @@
+# 实验 50.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab50_7.js。
+原理:
+  - ["作业指导书按操作顺序写“怎么做”：每步一张图，标出关键点、所用工具和量具、自检方法和安全要求。工序卡写“做什么、做到什么程度”，作业指导书写“怎么做”，两者内容必须一致（定位基准、夹紧位置、拧紧扭矩、量具编号都取自工序卡）。", "A work instruction says how, step by step: one picture per step with the key point, tools, gauges, self-check and safety. The operation sheet says what and to what accuracy; the two must agree (datums, clamping points, torque and gauge numbers come from the sheet)."]
+  - ["SH-301 工序 50：齿轮位外圆放在 V 形块上、左轴肩贴紧挡板（限制 5 个自由度），两块移动压板压两端轴颈，定扭矩扳手拧到 5 N·m；铣刀朝挡板方向进给，使轴向切削力压向挡板。", "SH-301 op 50: gear seat on the V-block, left shoulder against the stop (5 degrees of freedom), two straps on the end journals, nuts to 5 N·m with a torque wrench; the cutter feeds toward the stop so the axial force pushes the work against it."]
+步骤:
+  - ["从第 1 步走到第 7 步，每一步把操作、要点、工具与量具记入表 1。", "Go from step 1 to 7 and enter each action, key point and tool in Table 1."]
+  - ["在第 3、5、7 步（任务 1–3）回答界面上的问题。", "Answer the questions at steps 3, 5 and 7 (tasks 1–3)."]
+  - ["对照工序卡（50.5 节）检查：作业指导书的每个要点在工序卡上有没有依据。", "Check against the operation sheet (Section 50.5): is every key point backed by the sheet?"]
+数据表:
+  - 标题: ["表 1  工序 50 的作业步骤", "Table 1  Steps of op 50"]
+    表头: ["步", "操作", "要点", "工具、量具", "工序卡上的依据"]
+    表头英文: ["Step", "Action", "Key point", "Tools, gauges", "Basis on the sheet"]
+    行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""], ["5", "", "", "", ""], ["6", "", "", "", ""], ["7", "", "", "", ""]]
+    行英文: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""], ["5", "", "", "", ""], ["6", "", "", "", ""], ["7", "", "", "", ""]]
+注意:
+  - ["模型来自零件库 E-ASM-JJ30150；工作台是示意画的。夹具在机床上的安装和对刀不在这七步里（换批时做，见第 52 章）。", "The model is library entry E-ASM-JJ30150; the table is schematic. Mounting the fixture and setting the cutter are not in these seven steps (done at changeover, Chapter 52)."]
+思考题:
+  - ["改成机器人上下料（第 69 章）以后，这七步里哪几步由机器人做？压板要怎样改？", "With robot loading (Chapter 69), which of the seven steps does the robot take over, and how must the straps change?"]

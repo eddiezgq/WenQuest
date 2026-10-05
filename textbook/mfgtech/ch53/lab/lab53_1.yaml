@@ -1,0 +1,20 @@
+# 实验 53.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab53_1.js。
+原理:
+  - ["SH-301 先铣键槽、后磨齿轮位。铣键槽时直接控制的是槽底到精车外圆下母线的 H；磨削使下母线向轴心移动，槽底不动，图纸要求的 d − t₁ 是磨完以后才形成的封闭环。", "SH-301 is keyway-milled before the gear seat is ground. Milling controls H, from the slot bottom to the turned bottom line; grinding moves the bottom line toward the axis while the slot bottom stays, so the drawing's d − t₁ is a closing link formed after grinding."]
+  - 式: "A0 = H − r1 + r2"
+  - ["H、r₂ 为增环，r₁ 为减环（回路法，53.1 节）。极值法：A₀max = Hmax − r₁min + r₂max，A₀min = Hmin − r₁max + r₂min（53.2 节）。", "H and r₂ are increasing links, r₁ decreasing (loop method, 53.1). Worst case: A₀max = Hmax − r₁min + r₂max, A₀min = Hmin − r₁max + r₂min (53.2)."]
+步骤:
+  - ["在“按工序卡”场景下，把三个环调到使 A₀ 最小、最大的两端（任务 1、2），记入表 1，与算例 53.2.1 比较。", "In “by the operation sheet”, set the three links to the ends giving the smallest and largest A₀ (tasks 1–2); enter in Table 1 and compare with Example 53.2.1."]
+  - ["换到“照图纸尺寸铣”，找一个各环都在公差内、磨后偏深的组合（任务 3），记入表 1。", "Switch to “milled to the drawing” and find a combination, all links within tolerance, that ends too deep (task 3)."]
+  - ["切到“磨削前”（任务 4），说明此时能量哪个尺寸、用什么量具（工序 50 用专用量规 G07 测 H）。", "Switch to “before grinding” (task 4); which size can be measured and with what (op 50 uses special gauge G07 for H)?"]
+数据表:
+  - 标题: ["表 1  键槽深度尺寸链的极值", "Table 1  Limits of the keyway-depth chain"]
+    表头: ["方案", "H / mm", "r₁ / mm", "r₂ / mm", "A₀ = d − t₁ / mm", "结论"]
+    表头英文: ["Case", "H / mm", "r₁ / mm", "r₂ / mm", "A₀ = d − t₁ / mm", "Verdict"]
+    行: [["工序卡，A₀ 最小", "", "", "", "", ""], ["工序卡，A₀ 最大", "", "", "", "", ""], ["照图纸铣，偏深", "", "", "", "", ""]]
+    行英文: [["Sheet, smallest A₀", "", "", "", "", ""], ["Sheet, largest A₀", "", "", "", "", ""], ["To drawing, too deep", "", "", "", "", ""]]
+注意:
+  - ["剖面按名义尺寸画，磨削余量单边只有 0.15 mm（直径 0.3 mm），在模型上看不出来；尺寸线示意各环的位置和方向，读数栏给出实际值。", "The section is drawn at nominal size; the grinding allowance, 0.15 mm a side (0.3 mm on the diameter), is invisible on the model. The dimension lines show where each link is; the readouts give the values."]
+  - ["键槽偏深无法返修，只能报废；偏浅可以再铣。", "A keyway that is too deep cannot be repaired and is scrap; one too shallow can be milled again."]
+思考题:
+  - ["工序卡上 H 的上偏差为什么是 −0.03 而不是 0？如果改成 0，会出现什么情况？", "Why is the upper deviation of H −0.03 rather than 0 on the sheet? What happens if it were 0?"]

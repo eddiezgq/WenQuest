@@ -1,0 +1,331 @@
+{
+ "schema": 1,
+ "id": "E-ASM-JJ30150",
+ "kind": "case",
+ "name": {
+  "zh": "键槽铣夹具 JJ-301-50",
+  "en": "Keyway milling fixture JJ-301-50"
+ },
+ "category": "ASM",
+ "tags": [
+  "工装夹具",
+  "机床夹具"
+ ],
+ "standards": [],
+ "params": [],
+ "defaults": {},
+ "model": {
+  "engine": "wqfix:local.jj30150_full",
+  "formats": [
+   "glb",
+   "step",
+   "stl"
+  ],
+  "origin": "毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图",
+  "note": "尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）",
+  "args": {
+   "work_state": "op40"
+  },
+  "roles": {
+   "可调支承": "夹紧",
+   "螺柱": "夹紧",
+   "垫圈螺母": "夹紧",
+   "弹簧": "夹紧"
+  }
+ },
+ "source": {
+  "origin": "wenquest",
+  "license": "Apache-2.0",
+  "attribution": "问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-10-05",
+   "note": "自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表"
+  }
+ },
+ "teaching": {
+  "principle": "SH-301 输出轴工序 50 铣键槽的专用夹具：两个 V 形块定位齿轮位两侧的外圆（限制四个自由度），止推板顶住轴肩端面，两块移动压板压紧，直角对刀块配塞尺对刀，两个定位键使夹具在工作台上定向。设计数据在数字工厂（std/JJ-301-50_fixture.yaml），书中第 52 章以它为主线。",
+  "uses": [
+   "键槽铣削"
+  ],
+  "courses": [
+   {
+    "course": "机械制造技术",
+    "chapter": "第 52 章 JJ-301-50 键槽铣夹具设计"
+   }
+  ],
+  "labs": []
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "version": "2026.10.15",
+ "package": "https://github.com/eddiezgq/WenQuest/releases/download/library-v2026.10.15/E-ASM-JJ30150.zip",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {},
+   "files": {
+    "glb": "E-ASM-JJ30150/default.glb",
+    "png": "E-ASM-JJ30150/default.png"
+   }
+  }
+ ],
+ "assembly": {
+  "parts": [
+   {
+    "node": "p01",
+    "name": "夹具体",
+    "number": 1,
+    "role": "夹具体",
+    "color": "#d9d3c7",
+    "explode_mm": [
+     0.0,
+     0.0,
+     -60.0
+    ]
+   },
+   {
+    "node": "p02",
+    "name": "定位键1",
+    "number": 2,
+    "role": "夹具体",
+    "color": "#c9ced3",
+    "explode_mm": [
+     0.0,
+     0.0,
+     -110.0
+    ]
+   },
+   {
+    "node": "p03",
+    "name": "定位键2",
+    "number": 2,
+    "role": "夹具体",
+    "color": "#c9ced3",
+    "explode_mm": [
+     0.0,
+     0.0,
+     -110.0
+    ]
+   },
+   {
+    "node": "p04",
+    "name": "V 形块",
+    "number": 3,
+    "role": "定位",
+    "color": "#b8c7d9",
+    "explode_mm": [
+     0.0,
+     0.0,
+     40.0
+    ]
+   },
+   {
+    "node": "p05",
+    "name": "轴向挡板",
+    "number": 4,
+    "role": "定位",
+    "color": "#b8c7d9",
+    "explode_mm": [
+     -60.0,
+     0.0,
+     40.0
+    ]
+   },
+   {
+    "node": "p06",
+    "name": "压板1",
+    "number": 5,
+    "role": "夹紧",
+    "color": "#c9ced3",
+    "explode_mm": [
+     0.0,
+     0.0,
+     130.0
+    ]
+   },
+   {
+    "node": "p07",
+    "name": "可调支承1",
+    "number": 6,
+    "role": "夹紧",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     60.0
+    ]
+   },
+   {
+    "node": "p08",
+    "name": "螺柱1",
+    "number": 7,
+    "role": "夹紧",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     85.0
+    ]
+   },
+   {
+    "node": "p09",
+    "name": "垫圈螺母1",
+    "number": 8,
+    "role": "夹紧",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     175.0
+    ]
+   },
+   {
+    "node": "p10",
+    "name": "弹簧1",
+    "number": 9,
+    "role": "夹紧",
+    "color": "#4a4f55",
+    "explode_mm": [
+     0.0,
+     0.0,
+     100.0
+    ]
+   },
+   {
+    "node": "p11",
+    "name": "压板2",
+    "number": 5,
+    "role": "夹紧",
+    "color": "#c9ced3",
+    "explode_mm": [
+     0.0,
+     0.0,
+     130.0
+    ]
+   },
+   {
+    "node": "p12",
+    "name": "可调支承2",
+    "number": 6,
+    "role": "夹紧",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     60.0
+    ]
+   },
+   {
+    "node": "p13",
+    "name": "螺柱2",
+    "number": 7,
+    "role": "夹紧",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     85.0
+    ]
+   },
+   {
+    "node": "p14",
+    "name": "垫圈螺母2",
+    "number": 8,
+    "role": "夹紧",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     175.0
+    ]
+   },
+   {
+    "node": "p15",
+    "name": "弹簧2",
+    "number": 9,
+    "role": "夹紧",
+    "color": "#4a4f55",
+    "explode_mm": [
+     0.0,
+     0.0,
+     100.0
+    ]
+   },
+   {
+    "node": "p16",
+    "name": "对刀块",
+    "number": 10,
+    "role": "对刀导向",
+    "color": "#b8c7d9",
+    "explode_mm": [
+     60.0,
+     0.0,
+     30.0
+    ]
+   },
+   {
+    "node": "p17",
+    "name": "T形槽螺栓1",
+    "number": 13,
+    "role": "标准件",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     -110.0
+    ]
+   },
+   {
+    "node": "p18",
+    "name": "螺母1",
+    "number": 13,
+    "role": "标准件",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     60.0
+    ]
+   },
+   {
+    "node": "p19",
+    "name": "T形槽螺栓2",
+    "number": 13,
+    "role": "标准件",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     -110.0
+    ]
+   },
+   {
+    "node": "p20",
+    "name": "螺母2",
+    "number": 13,
+    "role": "标准件",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     0.0,
+     0.0,
+     60.0
+    ]
+   },
+   {
+    "node": "p21",
+    "name": "工件 SH-301",
+    "number": null,
+    "role": "工件",
+    "color": "#e8c39e",
+    "explode_mm": [
+     0.0,
+     0.0,
+     95.0
+    ]
+   }
+  ]
+ }
+}

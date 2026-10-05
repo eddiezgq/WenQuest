@@ -1,0 +1,193 @@
+{
+ "schema": 1,
+ "id": "E-ASM-DRILLIDX",
+ "kind": "case",
+ "name": {
+  "zh": "回转式钻模",
+  "en": "Indexing drill jig"
+ },
+ "category": "ASM",
+ "tags": [
+  "工装夹具",
+  "机床夹具"
+ ],
+ "standards": [],
+ "params": [
+  {
+   "key": "n",
+   "zh": "分度数",
+   "en": "Divisions",
+   "role": "key"
+  }
+ ],
+ "defaults": {
+  "n": 6
+ },
+ "model": {
+  "engine": "wqfix:typical.drill_indexing",
+  "formats": [
+   "glb",
+   "step",
+   "stl"
+  ],
+  "origin": "毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图",
+  "note": "尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）"
+ },
+ "source": {
+  "origin": "wenquest",
+  "license": "Apache-2.0",
+  "attribution": "问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-10-05",
+   "note": "自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表"
+  }
+ },
+ "teaching": {
+  "principle": "工件装在回转分度盘上，转过一个分度、对定销插入定位，依次钻出圆周均布的孔；分度精度取决于分度盘和对定机构。",
+  "uses": [
+   "圆周均布孔"
+  ],
+  "courses": [
+   {
+    "course": "机械制造技术",
+    "chapter": "第 52 章 钻床夹具"
+   },
+   {
+    "course": "机械制造技术",
+    "chapter": "第 52 章 分度装置"
+   }
+  ],
+  "labs": []
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "version": "2026.10.15",
+ "package": "https://github.com/eddiezgq/WenQuest/releases/download/library-v2026.10.15/E-ASM-DRILLIDX.zip",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {
+    "n": 6
+   },
+   "files": {
+    "glb": "E-ASM-DRILLIDX/default.glb",
+    "png": "E-ASM-DRILLIDX/default.png"
+   }
+  }
+ ],
+ "assembly": {
+  "parts": [
+   {
+    "node": "p01",
+    "name": "夹具体",
+    "number": 1,
+    "role": "夹具体",
+    "color": "#d9d3c7",
+    "explode_mm": [
+     0.0,
+     0.0,
+     -60.0
+    ]
+   },
+   {
+    "node": "p02",
+    "name": "心轴",
+    "number": 2,
+    "role": "定位",
+    "color": "#b8c7d9",
+    "explode_mm": [
+     0.0,
+     0.0,
+     40.0
+    ]
+   },
+   {
+    "node": "p03",
+    "name": "分度盘",
+    "number": 3,
+    "role": "定位",
+    "color": "#c9ced3",
+    "explode_mm": [
+     -60.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "node": "p04",
+    "name": "对定销支架",
+    "number": 8,
+    "role": "定位",
+    "color": "#d9d3c7",
+    "explode_mm": [
+     0.0,
+     0.0,
+     60.0
+    ]
+   },
+   {
+    "node": "p05",
+    "name": "对定销",
+    "number": 4,
+    "role": "定位",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     -100.0,
+     0.0,
+     40.0
+    ]
+   },
+   {
+    "node": "p06",
+    "name": "工件（套筒）",
+    "number": null,
+    "role": "工件",
+    "color": "#e8c39e",
+    "explode_mm": [
+     0.0,
+     0.0,
+     120.0
+    ]
+   },
+   {
+    "node": "p07",
+    "name": "钻模板",
+    "number": 5,
+    "role": "对刀导向",
+    "color": "#c9ced3",
+    "explode_mm": [
+     0.0,
+     0.0,
+     120.0
+    ]
+   },
+   {
+    "node": "p08",
+    "name": "钻套",
+    "number": 6,
+    "role": "对刀导向",
+    "color": "#b8c7d9",
+    "explode_mm": [
+     0.0,
+     0.0,
+     170.0
+    ]
+   },
+   {
+    "node": "p09",
+    "name": "螺母",
+    "number": 7,
+    "role": "标准件",
+    "color": "#9aa3ab",
+    "explode_mm": [
+     60.0,
+     0.0,
+     0.0
+    ]
+   }
+  ]
+ }
+}

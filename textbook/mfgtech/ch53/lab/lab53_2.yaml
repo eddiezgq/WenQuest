@@ -1,0 +1,19 @@
+# 实验 53.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab53_2.js。
+原理:
+  - ["极值法按各组成环同时处于极限的最坏情况计算封闭环：增环取最大、减环取最小得 A₀max；增环取最小、减环取最大得 A₀min；封闭环公差等于各组成环公差之和（式 53.2.1–53.2.4）。", "The worst-case method puts every link at its worst limit at once: increasing links at maximum and decreasing at minimum give A₀max, the reverse gives A₀min; the closing tolerance is the sum of the link tolerances (Eqs. 53.2.1–53.2.4)."]
+  - 式: "A0 = 167 − 52 − 55,   T0 = T167 + T52 + T55"
+步骤:
+  - ["三个环都取名义值，读出 A₀ = 60。", "Put all three at nominal; read A₀ = 60."]
+  - ["只把 52 调到上偏差（任务 1），记下 A₀ 的变化方向；再只把 167 调到上偏差，比较两者的方向。", "Set only 52 to its upper limit (task 1) and note how A₀ moves; then only 167, and compare."]
+  - ["找出使 A₀ 最大、最小的组合（任务 2、3），记入表 1，与公式计算的结果比较。", "Find the combinations for the largest and smallest A₀ (tasks 2–3); enter them in Table 1 and compare with the formula."]
+数据表:
+  - 标题: ["表 1  齿轮位长度的极值（工序 40）", "Table 1  Limits of the gear-seat length (op 40)"]
+    表头: ["情况", "167 / mm", "52 / mm", "55 / mm", "A₀ / mm", "公式计算 / mm"]
+    表头英文: ["Case", "167 / mm", "52 / mm", "55 / mm", "A₀ / mm", "Formula / mm"]
+    行: [["名义", "167", "52", "55", "", "60"], ["A₀ 最大", "", "", "", "", ""], ["A₀ 最小", "", "", "", "", ""]]
+    行英文: [["Nominal", "167", "52", "55", "", "60"], ["Largest A₀", "", "", "", "", ""], ["Smallest A₀", "", "", "", "", ""]]
+注意:
+  - ["环的公差取自工艺规程的工序尺寸跟踪图（工序 40）：总长 ± 0.2、两个轴肩尺寸 ± 0.05。", "Tolerances come from the process plan's tolerance chart (op 40): overall length ± 0.2, the two shoulders ± 0.05."]
+  - ["尺寸变化只有零点几毫米，模型上看不出来，尺寸线按名义位置画。", "The changes are tenths of a millimetre, invisible on the model; the dimension lines are drawn at nominal positions."]
+思考题:
+  - ["按概率法（53.3 节），齿轮位长度的公差会是多少？为什么工厂里多数情况仍按极值法定工序尺寸？", "With the statistical method (53.3), what would the gear-seat tolerance be? Why do most shops still set operation sizes by the worst case?"]

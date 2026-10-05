@@ -1,0 +1,117 @@
+{
+ "schema": 1,
+ "id": "E-LOC-PIN",
+ "kind": "product",
+ "name": {
+  "zh": "圆柱定位销",
+  "en": "Cylindrical locating pin"
+ },
+ "category": "LOC",
+ "tags": [
+  "工装夹具",
+  "机床夹具",
+  "JB/T 8014"
+ ],
+ "standards": [
+  {
+   "code": "JB/T 8014",
+   "title": "定位销（结构型式参照）"
+  }
+ ],
+ "params": [
+  {
+   "key": "d",
+   "zh": "直径 d",
+   "en": "Diameter d",
+   "role": "key",
+   "unit": "mm"
+  },
+  {
+   "key": "h",
+   "zh": "工作段高 h",
+   "en": "Working height h",
+   "role": "key",
+   "unit": "mm"
+  }
+ ],
+ "defaults": {
+  "d": 16.0,
+  "h": 12.0
+ },
+ "model": {
+  "engine": "wqfix:elements.locating_pin",
+  "formats": [
+   "glb",
+   "step",
+   "stl"
+  ],
+  "origin": "毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图",
+  "note": "尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）",
+  "args": {
+   "kind": "cyl"
+  }
+ },
+ "source": {
+  "origin": "wenquest",
+  "license": "Apache-2.0",
+  "attribution": "问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-10-05",
+   "note": "自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表"
+  }
+ },
+ "teaching": {
+  "principle": "圆柱销插入工件的孔中定位：短销限制两个移动自由度，长销还限制两个转动自由度。与孔的配合常用 g6、f7，间隙是基准位移误差的来源。",
+  "uses": [
+   "以孔定位",
+   "一面两销中的圆柱销"
+  ],
+  "courses": [
+   {
+    "course": "机械制造技术",
+    "chapter": "第 51 章 一面两销定位"
+   },
+   {
+    "course": "机械制造技术",
+    "chapter": "第 52 章 定位元件"
+   }
+  ],
+  "labs": []
+ },
+ "factory": {
+  "erp_items": [],
+  "suppliers": []
+ },
+ "version": "2026.10.15",
+ "package": "https://github.com/eddiezgq/WenQuest/releases/download/library-v2026.10.15/E-LOC-PIN.zip",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {
+    "d": 16.0,
+    "h": 12.0
+   },
+   "files": {
+    "glb": "E-LOC-PIN/default.glb",
+    "png": "E-LOC-PIN/default.png"
+   }
+  }
+ ],
+ "assembly": {
+  "parts": [
+   {
+    "node": "p01",
+    "name": "圆柱定位销",
+    "number": null,
+    "role": "定位",
+    "color": "#b8c7d9",
+    "explode_mm": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ]
+ }
+}

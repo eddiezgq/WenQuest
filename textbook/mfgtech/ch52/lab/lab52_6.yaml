@@ -1,0 +1,21 @@
+# 实验 52.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab52_6.js。
+原理:
+  - ["分度装置由分度盘、对定销和锁紧机构组成。对定销插入分度孔确定转角，钻套引导钻头保证孔的位置；换位时先退刀、拔销，转过一个分度角再插销。", "An indexing device consists of an index plate, an index pin and a lock. The pin in an index hole fixes the angle and the bushing guides the drill; to index, retract the drill, withdraw the pin, turn one division and insert the pin again."]
+  - 式: "Δθ ≈ c / R，   e ≈ r·Δθ"
+  - ["c 为对定销与分度孔的间隙，R 为分度孔所在半径（本模型 48 mm），r 为工件上孔所在半径（套筒外圆 25 mm）。只算间隙一项；分度孔的孔距误差、回转轴的间隙另外叠加（52.6 节、程序 52.6.1）。", "c is the pin-to-hole clearance, R the radius of the index holes (48 mm in this model), r the radius of the hole on the work (sleeve, 25 mm). Only the clearance is counted; hole-spacing error and spindle clearance add to it (Section 52.6, Program 52.6.1)."]
+步骤:
+  - ["对定销插入、转角 0°，按“钻孔”（任务 1）。", "Pin in at 0°, press Drill (task 1)."]
+  - ["把转角调到 30°，对定销设为插入，再按“钻孔”（任务 2），记下提示。", "Set the angle to 30° with the pin in and press Drill (task 2); note the message."]
+  - ["对定销拔出，转到 60°，插入，钻第二个孔（任务 3）；照此钻完 6 个孔，看孔的分布。", "Pin out, turn to 60°, pin in, drill the second hole (task 3); go on to all six and look at the pattern."]
+  - ["间隙取 0、0.01、0.02、0.04、0.05 mm，读出转角误差和孔位误差，填表 1（任务 4）。", "Take clearances 0, 0.01, 0.02, 0.04, 0.05 mm; read the angle and position errors into Table 1 (task 4)."]
+数据表:
+  - 标题: ["表 1  对定销间隙与分度误差（R = 48 mm，r = 25 mm）", "Table 1  Pin clearance and indexing error (R = 48 mm, r = 25 mm)"]
+    表头: ["c / mm", "Δθ / ″", "e / µm", "手算 e / µm"]
+    表头英文: ["c / mm", "Δθ / ″", "e / µm", "Hand e / µm"]
+    行: [["0", "", "", ""], ["0.01", "", "", ""], ["0.02", "", "", ""], ["0.04", "", "", ""], ["0.05", "", "", ""]]
+    行英文: [["0", "", "", ""], ["0.01", "", "", ""], ["0.02", "", "", ""], ["0.04", "", "", ""], ["0.05", "", "", ""]]
+注意:
+  - ["模型来自零件库 E-ASM-DRILLIDX；钻出的孔用深色圆柱表示，“换一件新工件”清除。", "The model is library entry E-ASM-DRILLIDX; drilled holes are shown as dark cylinders, “New workpiece” clears them."]
+  - ["间隙引起的转角误差是可能的最大值（销偏向孔的一边），实际在 ±Δθ/2 之间变化，取决于转动时靠向哪一边。", "The clearance gives the largest possible angle error (pin against one side); in practice it varies within ±Δθ/2 depending on which side the plate rests on."]
+思考题:
+  - ["为什么钻孔前要先插对定销、钻完后先退刀再拔销？顺序反了会怎样？", "Why insert the pin before drilling and retract the drill before withdrawing it? What if the order were reversed?"]
