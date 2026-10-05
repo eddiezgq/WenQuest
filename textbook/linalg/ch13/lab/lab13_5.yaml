@@ -1,0 +1,19 @@
+# 实验 13.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab13_5.js。
+原理:
+  - ["单位惯量的关节 θ̈ = u，PD 控制 u = −K_p θ − K_d ω，每 T = 0.05 s 计算一次。用前向欧拉法离散化，状态 x = (θ, ω) 满足 x_{k+1} = A x_k，于是 x_k = Aᵏ x₀。", "A joint of unit inertia θ̈ = u with PD control u = −K_p θ − K_d ω computed every T = 0.05 s. With forward Euler the state x = (θ, ω) obeys x_{k+1} = A x_k, so x_k = Aᵏ x₀."]
+  - 式: "A = [[1, T], [−K_p T, 1 − K_d T]]；  λ² − (2 − K_d T)λ + (1 − K_d T + K_p T²) = 0；  稳定 ⇔ 两个特征值的模都小于 1"
+  - ["A 可对角化时 x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂：模 |λ| 决定衰减快慢，复特征值的辐角决定每步转过的角度（振荡）。二重特征值且只有一个特征向量时出现 k·λᵏ 项（13.7 节）。", "When A is diagonalizable x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂: the modulus |λ| sets the decay and the argument of a complex λ the angle turned per step (oscillation). A double eigenvalue with one eigenvector brings a k·λᵏ term (Section 13.7)."]
+步骤:
+  - ["K_p = 100 不变，K_d 取 4、10、20、30、40，按表 1 记录特征值、最大的模、振荡一周的步数和稳定所需步数。完成任务 1、2、3。", "Keep K_p = 100 and set K_d to 4, 10, 20, 30, 40; record the eigenvalues, the largest modulus, the steps per cycle and the settling steps in Table 1. Complete tasks 1, 2, 3."]
+  - ["令 K_d = 40，增大 K_p 直到两个特征值都为 0（任务 4），记录 A² 和第一步的控制力矩。", "Set K_d = 40 and raise K_p until both eigenvalues are 0 (task 4); record A² and the first control torque."]
+  - ["把 K_p 增大到 1000，观察特征值离开单位圆的位置。", "Raise K_p to 1000 and see where the eigenvalues leave the unit circle."]
+数据表:
+  - 标题: ["表 1  增益、特征值与响应（K_p = 100）", "Table 1  Gains, eigenvalues and response (K_p = 100)"]
+    表头: ["K_d", "特征值", "最大的模 ρ", "一周的步数", "稳定所需步数", "响应的样子"]
+    表头英文: ["K_d", "Eigenvalues", "Largest modulus ρ", "Steps per cycle", "Settling steps", "What the response looks like"]
+    行: [["4", "", "", "", "", ""], ["10", "", "", "", "", ""], ["20", "", "", "", "", ""], ["30", "", "", "", "", ""], ["40", "", "", "", "", ""]]
+注意:
+  - ["本实验用前向欧拉法得到的简化模型，它会给系统“加能量”：K_d 太小时，连续时间稳定的系统按这个模型会发散。实际控制器的输出在一个周期内保持不变（零阶保持），精确的离散模型稍有不同，结论也可能不同（13.5.6 节、35.1 节）。采样周期越短，两者越接近连续系统。", "This lab uses the simplified forward-Euler model, which adds energy: with too little K_d a system stable in continuous time diverges in this model. A real controller holds its output over a period (zero-order hold); the exact discrete model differs slightly and so may the conclusion (Sections 13.5.6, 35.1). The shorter the period, the closer both are to the continuous system."]
+  - ["实验中关节没有力矩限幅；真实电机的力矩有上限，增益过大时会饱和。", "The lab has no torque limit; a real motor saturates when the gains are too high."]
+思考题:
+  - ["稳定的条件“两个特征值的模都小于 1”能不能只用迹 t 和行列式 d 写出来？（提示：考虑 d < 1 与 |t| < 1 + d。）", "Can the condition 'both eigenvalues of modulus below 1' be written with the trace t and determinant d alone? (Hint: consider d < 1 and |t| < 1 + d.)"]

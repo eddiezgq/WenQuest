@@ -1,0 +1,22 @@
+# 实验 13.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab13_1.js。
+原理:
+  - ["若非零向量 x 满足 Ax = λx，称 x 为 A 的特征向量，λ 为特征值：x 所在的直线在变换下不动，长度乘以 λ。", "If a nonzero x satisfies Ax = λx, x is an eigenvector of A and λ its eigenvalue: the line through x is mapped to itself and lengths are multiplied by λ."]
+  - 式: "Ax = λx；  柔顺腕：F = K d，K = [[4, 1], [1, 4]] kN/m，主轴 (1, 1)/√2（5 kN/m）与 (1, −1)/√2（3 kN/m）"
+  - ["实验中转动单位向量 v 的方向，看 Av 与 v 的夹角；夹角为 0° 或 180° 时 v 就是特征向量，|Av| 就是 |λ|。柔顺腕场景中画的是位移 d = K⁻¹F，它与 F 共线的方向就是 K 的特征方向。", "Turn the unit vector v and watch the angle between v and Av; at 0° or 180° v is an eigenvector and |Av| = |λ|. The wrist scene draws d = K⁻¹F, which is collinear with F exactly along the eigen-directions of K."]
+步骤:
+  - ["在“柔顺腕”场景中，从 φ = 0° 起逐渐增大，至少按表 1 各行的角度记录位移方向与推力方向的夹角和刚度；找出硬、软两条主轴（任务 1、2）。", "In the wrist scene raise φ from 0° in steps of 15°, recording the angle between deflection and push and the stiffness in Table 1; find the stiff and soft axes (tasks 1, 2)."]
+  - ["切换到 A = [[3, 1], [0, 2]]，找出两个特征方向，记录伸缩倍数（任务 3）。量一量两个特征方向的夹角。", "Switch to A = [[3, 1], [0, 2]], find both eigen-directions and record the stretches (task 3). Measure the angle between the two directions."]
+  - ["切换到“旋转加伸缩”，让 φ 转过半圈以上（任务 4），记录夹角与 |Av|/|v| 是否随 φ 变化。", "Switch to the rotation scene and turn φ through more than half a turn (task 4); record whether the angle and |Av|/|v| change with φ."]
+数据表:
+  - 标题: ["表 1  柔顺腕：推力方向与位移方向", "Table 1  Wrist: push and deflection directions"]
+    表头: ["φ / °", "位移 d / mm", "夹角 / °", "刚度 / (kN/m)"]
+    表头英文: ["φ / °", "Deflection d / mm", "Angle / °", "Stiffness / (kN/m)"]
+    行: [["0", "", "", ""], ["15", "", "", ""], ["30", "", "", ""], ["45", "", "", ""], ["90", "", "", ""], ["135", "", "", ""]]
+  - 标题: ["表 2  三个矩阵的特征方向", "Table 2  Eigen-directions of the three matrices"]
+    表头: ["场景", "特征方向 φ / °", "伸缩倍数 λ", "两个方向的夹角 / °"]
+    表头英文: ["Scene", "Eigen-direction φ / °", "Stretch λ", "Angle between them / °"]
+    行: [["柔顺腕", "", "", ""], ["[[3, 1], [0, 2]]", "", "", ""], ["旋转加伸缩", "", "", ""]]
+注意:
+  - ["特征向量只确定到一个倍数：φ 与 φ + 180° 是同一个特征方向。", "An eigenvector is fixed only up to a multiple: φ and φ + 180° give the same eigen-direction."]
+思考题:
+  - ["对旋转加伸缩矩阵，λ 应当是什么样的数，Av = λv 才能成立？（13.6 节）", "For the rotation-and-stretch matrix, what kind of number must λ be for Av = λv to hold? (Section 13.6)"]
