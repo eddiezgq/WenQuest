@@ -1,0 +1,31 @@
+# 实验 6.8 的指导书与报告模板。目的、场景、参数、任务取自 lab6_8.js。
+原理:
+  - ["单件成本 = 材料费 + 单件加工时间 × 费率 + （每批的准备时间 + 一次性的编程时间）× 费率 ÷ 批量。前两项随批量不变，第三项摊到每件上，批量越大越小。", "Cost per part = material + run time × rate + (batch set-up + one-off programming) × rate ÷ batch size. The first two do not change with batch size; the third is shared and shrinks as the batch grows."]
+  - 式: "C(q) = C_mat + t_run·R + (t_setup + t_prog)·R / q"
+  - ["哪种做法便宜，取决于“固定的一次性费用”和“每件的变动费用”谁大：3D 打印几乎没有准备，单件贵；铣削准备和编程长、材料浪费多；钣金准备不多、每件很快。两条成本线的交点就是盈亏平衡批量。", "Which process wins depends on the fixed one-off cost versus the variable cost per part: printing has almost no set-up but a high cost per part; milling has long set-up and programming and wastes material; sheet metal has little set-up and is fast per part. Where two cost lines cross is the break-even batch."]
+步骤:
+  - ["打开实验 6.8，场景“XM540 舵机支架”，参数取默认（批量 1、加工中心 62 美元/小时），点“计算”（任务 1），把三种做法的单件成本、一批的工时、零件质量填入表 1 的第一行。", "Open Lab 6.8, scene “XM540 servo bracket”, defaults (batch 1, 62 USD/h); press Compute (task 1) and enter cost per part, batch hours and mass for the three processes in the first row of Table 1."]
+  - ["把批量依次改为 5、20、200 再计算（任务 2 是 200），填表 1 的其余各行；记下读数“钣金比打印便宜的最小批量”。", "Set the batch to 5, 20 and 200 and compute each time (task 2 is 200); fill in Table 1 and note the readout “smallest batch where sheet beats print”."]
+  - ["把打印机费率改为 10 美元/小时（自己的打印机，只算电费和折旧），批量 1 和 20 各算一次（任务 3），填表 2。", "Set the printer rate to 10 USD/h (your own printer: power and depreciation only), compute for 1 and 20 parts (task 3) and fill in Table 2."]
+  - ["切换到“墙上的置物架托架”，批量 2（任务 4），填表 3；再把批量改成 1000，看看钣金的单价。", "Switch to “Wall-shelf bracket”, batch 2 (task 4), fill in Table 3; then try 1000 and look at the sheet-metal price."]
+  - ["（选做）在自己的电脑上运行程序 6.8.1，把加工中心费率改成自己学校或附近工厂的费率，看盈亏平衡批量怎样变。", "(Optional) Run Program 6.8.1 on your computer with the machining rate of your school or a local shop and see how the break-even batch moves."]
+数据表:
+  - 标题: ["表 1  XM540 舵机支架（默认费率）", "Table 1  XM540 servo bracket (default rates)"]
+    表头: ["批量", "铣削 / 美元", "钣金 / 美元", "3D 打印 / 美元", "最便宜的", "一批的工时（铣 / 钣 / 打）/ h"]
+    表头英文: ["Batch", "Milling / USD", "Sheet / USD", "Printing / USD", "Cheapest", "Batch hours (mill / sheet / print) / h"]
+    行: [["1", "", "", "", "", ""], ["5", "", "", "", "", ""], ["20", "", "", "", "", ""], ["200", "", "", "", "", ""]]
+  - 标题: ["表 2  打印机费率 10 美元/小时", "Table 2  Printer rate 10 USD/h"]
+    表头: ["批量", "钣金 / 美元", "3D 打印 / 美元", "结论变了吗"]
+    表头英文: ["Batch", "Sheet / USD", "Printing / USD", "Did the answer change?"]
+    行: [["1", "", "", ""], ["20", "", "", ""]]
+  - 标题: ["表 3  置物架托架", "Table 3  Shelf bracket"]
+    表头: ["批量", "铣削 / 美元", "钣金 / 美元", "3D 打印 / 美元"]
+    表头英文: ["Batch", "Milling / USD", "Sheet / USD", "Printing / USD"]
+    行: [["2", "", "", ""], ["1000", "", "", ""]]
+注意:
+  - ["铣削费率默认取数字工厂立式加工中心 VMC-01；激光切割、折弯、打印费率，材料单价，切削参数和辅助时间都是本书设定的教学值（美元示意）。实际报价要问加工厂。", "The milling rate defaults to the factory's VMC-01; laser, brake and printer rates, material prices, cutting data and handling times are teaching values (USD). Ask the shop for real quotes."]
+  - ["三种做法的零件不完全一样：铣削件壁厚 4 mm，钣金件 2 mm，打印件 3 mm（PA12 刚度低）。它们的刚度、强度要另外核算（第 5 章选材、第 10 章以后的强度计算）。", "The three parts differ: 4 mm walls milled, 2 mm sheet, 3 mm printed (PA12 is less stiff). Their stiffness and strength must be checked separately."]
+  - ["置物架场景的钣金按激光切割加折弯算；商店里的托架是冲压的，要先做模具，单价才能降到几美分——这是第四种做法，实验里没有。", "The shelf scene costs sheet metal by laser cutting and bending; shop brackets are stamped with a die, which brings the price down to cents — a fourth process the lab leaves out."]
+思考题:
+  - ["程序 6.8.1 和这个实验用同一套模型。模型里没有排队、运输、检验和返工的时间，实际交货期会长得多——哪种做法的“不在模型里的时间”最长？", "Program 6.8.1 and this lab share one model. It leaves out queueing, shipping, inspection and rework, so real lead times are much longer — which process has the most time outside the model?"]
+  - ["铣削件的材料利用率只有百分之十几（程序 6.8.1）。如果改成从 L 形铝型材上截一段再铣孔，成本模型里哪几项会变？", "The milled bracket uses only about an eighth of its block (Program 6.8.1). If it were cut from an L-section extrusion and only drilled, which terms of the model would change?"]

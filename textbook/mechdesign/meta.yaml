@@ -21,3 +21,9 @@ program_deps:
   # 第 5 章：材料库（经 mdstd 读取）、UR5e 模型（小臂长度与腕部质量）
   - factory/digital/cae/materials.py
   - library/catalog/B/B-ARM-UR5E/entry.yaml
+  # 第 6 章：标准成本与工位费率、经济精度表、舵机外形（零件库）、SH-301 A 版的台阶
+  - factory/digital/hub/mrp.py
+  - factory/digital/hub/kpi.py
+  - factory/digital/std/econ_accuracy.yaml
+  - library/catalog/D/D-ACT-ROBOTIS-X/specs.csv
+  - factory/digital/freecad/wq_shaft.py
