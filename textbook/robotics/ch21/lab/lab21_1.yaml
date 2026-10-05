@@ -1,0 +1,25 @@
+# 实验 21.1 的指导书与报告模板。目的、场景、参数、任务取自 lab21_1.js。
+原理:
+  - 式: ["推力 f_i 沿 z_b；反扭矩 τ_i = σ_i c_τ f_i ẑ_b，c_τ = 0.0201 m，旋翼 1、3 的 σ = −1（逆时针转），2、4 的 σ = +1", "Thrust f_i along z_b; reaction torque τ_i = σ_i c_τ f_i ẑ_b, c_τ = 0.0201 m, σ = −1 for rotors 1, 3 (counter-clockwise), +1 for 2, 4"]
+  - 式: ["(f, m_x, m_y, m_z) = A (f_1, f_2, f_3, f_4)，A 的四行为 (1, 1, 1, 1)、(−l_y, l_y, l_y, −l_y)、(l_x, l_x, −l_x, −l_x)、(−c_τ, c_τ, −c_τ, c_τ)", "(f, m_x, m_y, m_z) = A (f_1, f_2, f_3, f_4); the rows of A are (1, 1, 1, 1), (−l_y, l_y, l_y, −l_y), (l_x, l_x, −l_x, −l_x), (−c_τ, c_τ, −c_τ, c_τ)"]
+  - 式: ["f_i = f/4 + s_{y,i} m_x/(4l_y) − s_{x,i} m_y/(4l_x) + σ_i m_z/(4c_τ)", "f_i = f/4 + s_{y,i} m_x/(4l_y) − s_{x,i} m_y/(4l_x) + σ_i m_z/(4c_τ)"]
+  - ["四个推力都平行于 z_b，机身受到的力在 x_b、y_b 方向上的分量永远为零；四个推力只能产生沿 z_b 的力和三个力矩。", "All four thrusts are parallel to z_b, so the force on the body never has x_b or y_b components; the rotors give only a force along z_b and three moments."]
+步骤:
+  - ["场景“推力与力矩”：先把四个推力都设为 3.25 N，记录总推力和三个力矩，按“开始”（任务 1）。", "Scene “Thrusts and moments”: set all four thrusts to 3.25 N, record the collective thrust and the moments, press Start (task 1)."]
+  - ["按表 1 的几组推力逐一设置，记录界面给出的 f、m_x、m_y、m_z，再用推力分配矩阵手算一遍，比较。其中一组只产生偏航力矩（任务 2），一组只产生使机头向下的俯仰力矩（任务 3）。", "Enter the thrust sets of Table 1 one by one, record f, m_x, m_y, m_z, compute them by hand with the allocation matrix and compare. One set gives only a yaw moment (task 2), one only a nose-down pitch moment (task 3)."]
+  - ["自己设计一组推力，使总推力为重力、只产生 m_x = 0.1 N·m，再设计一组只产生 m_z = 0.1 N·m，记录两组推力相对 3.25 N 的改变量，填入表 2。", "Design a set giving the weight as collective thrust and only m_x = 0.1 N·m, then one giving only m_z = 0.1 N·m; record the change of each thrust from 3.25 N in Table 2."]
+  - ["生活场景“直升机尾桨”：调节尾桨推力，按“开始”，观察机身是否打转，直到净偏航力矩不超过 0.2 N·m（任务 4）。", "Everyday scene “Helicopter tail rotor”: set the tail thrust, press Start and watch the body; repeat until the net yaw moment is at most 0.2 N·m (task 4)."]
+数据表:
+  - 标题: ["表 1  推力组合与机身受力", "Table 1  Thrust sets and the wrench on the body"]
+    表头: ["f₁ / N", "f₂ / N", "f₃ / N", "f₄ / N", "f / N", "m_x / (N·m)", "m_y / (N·m)", "m_z / (N·m)"]
+    行: [["3.25", "3.25", "3.25", "3.25", "", "", "", ""], ["2.50", "4.00", "2.50", "4.00", "", "", "", ""], ["3.75", "3.75", "2.75", "2.75", "", "", "", ""], ["2.75", "3.75", "3.75", "2.75", "", "", "", ""], ["5.00", "5.00", "5.00", "5.00", "", "", "", ""]]
+  - 标题: ["表 2  产生 0.1 N·m 力矩所需的推力改变", "Table 2  Thrust changes for a 0.1 N·m moment"]
+    表头: ["力矩", "Δf₁ / N", "Δf₂ / N", "Δf₃ / N", "Δf₄ / N", "|Δf| 之比"]
+    表头英文: ["Moment", "Δf₁ / N", "Δf₂ / N", "Δf₃ / N", "Δf₄ / N", "ratio of |Δf|"]
+    行: [["m_x = 0.1 N·m", "", "", "", "", "1"], ["m_z = 0.1 N·m", "", "", "", "", ""]]
+注意:
+  - ["“开始”后机身的转动只用来显示力矩的方向，转动的快慢不是真实的；四旋翼在力矩作用下怎样转动，要用第 28 章的动力学计算。", "The motion after Start only shows the direction of the moment, not how fast the body really turns; that needs the dynamics of Chapter 28."]
+  - ["偏航力矩的箭头放大了 9 倍画出，否则看不见。", "The yaw-moment arrow is drawn 9 times longer than the others, or it would not be visible."]
+  - ["直升机场景中的反扭矩和尾梁长度是示意值。", "The reaction torque and boom length of the helicopter are illustrative."]
+思考题:
+  - ["悬停时把某一个旋翼的推力调到 0，其余三个怎样调才能保持三个力矩为零？总推力还能等于重力吗？由此说明四旋翼一个电机失效时为什么难以保持姿态。", "At hover, set one rotor to zero. How must the other three be set to keep all moments zero? Can the collective thrust still equal the weight? Explain why a quadrotor with one failed motor can hardly hold its attitude."]

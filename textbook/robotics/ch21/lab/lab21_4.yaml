@@ -1,0 +1,25 @@
+# 实验 21.4 的指导书与报告模板。目的、场景、参数、任务取自 lab21_4.js。
+原理:
+  - 式: ["平坦输出 (p, ψ)：f = m‖p̈ + 𝔤ẑ‖，z_b = (p̈ + 𝔤ẑ)/‖p̈ + 𝔤ẑ‖；R 由 z_b 与 ψ 构造", "Flat outputs (p, ψ): f = m‖p̈ + gẑ‖, z_b = (p̈ + gẑ)/‖p̈ + gẑ‖; R is built from z_b and ψ"]
+  - 式: ["ω_x = −y_b·p⃛/‖p̈ + 𝔤ẑ‖，ω_y = x_b·p⃛/‖p̈ + 𝔤ẑ‖，ω_z = (cos θ ψ̇ − sin φ ω_y)/cos φ", "ω_x = −y_b·p⃛/‖p̈ + gẑ‖, ω_y = x_b·p⃛/‖p̈ + gẑ‖, ω_z = (cos θ ψ̇ − sin φ ω_y)/cos φ"]
+  - 式: ["最小化 ∫‖p⁽ᵏ⁾‖² dt：每段 2k − 1 次多项式，中间航点处 1～2k − 2 阶导数连续，起止点 1～k − 1 阶导数为零", "Minimise ∫‖p⁽ᵏ⁾‖² dt: degree 2k − 1 per segment, derivatives 1 to 2k − 2 continuous at interior waypoints, derivatives 1 to k − 1 zero at both ends"]
+  - 式: ["时间缩放 p_λ(t) = p(t/λ)：速度、加速度、加加速度分别缩小 λ、λ²、λ³ 倍", "Time scaling p_λ(t) = p(t/λ): velocity, acceleration and jerk shrink by λ, λ², λ³"]
+步骤:
+  - ["场景“数字工厂巡检”：按默认参数按“开始”（任务 1），记录最大倾角、总推力、角速度、最高速度。", "Scene “Digital-factory inspection”: press Start with the defaults (task 1); record the peak tilt, thrust, body rate and top speed."]
+  - ["k = 4，逐步缩短总时间，每次按“开始”，找出最大倾角刚好不超过 30° 的最短时间，填入表 1（任务 2）；再把 W2 的高度改为 5 m，重复。", "With k = 4, shorten the total time step by step, pressing Start each time, until the peak tilt just stays within 30°; fill in Table 1 (task 2). Repeat with W2 at 5 m."]
+  - ["总时间 20.4 s，把 k 依次设为 2、3、4，记录航点处角速度的跳变和起点的角速度，填入表 2（k = 2 为任务 3）。", "At 20.4 s, set k = 2, 3, 4 in turn and record the body-rate jump at the waypoints and the body rate at the start in Table 2 (k = 2 is task 3)."]
+  - ["生活场景“电梯”：k = 4，改变运行时间，找出最大加速度不超过 1 m/s² 的最短时间，运行一次（任务 4）；再比较 k = 2、3 时起动瞬间的加加速度。", "Everyday scene “Elevator”: with k = 4, change the travel time to find the shortest one with peak acceleration at most 1 m/s², and run it (task 4); then compare the jerk at the start for k = 2 and 3."]
+数据表:
+  - 标题: ["表 1  不超限的最短时间", "Table 1  Shortest time within the limits"]
+    表头: ["W2 高度 / m", "最短总时间 / s", "最大倾角 / (°)", "最大总推力 / N", "最大角速度 / (rad/s)", "起作用的限制"]
+    表头英文: ["W2 height / m", "Shortest time / s", "Peak tilt / (°)", "Peak thrust / N", "Peak body rate / (rad/s)", "Binding limit"]
+    行: [["3.5", "", "", "", "", ""], ["5.0", "", "", "", "", ""]]
+  - 标题: ["表 2  阶数 k 的比较（总时间 20.4 s）", "Table 2  Comparing the order k (20.4 s)"]
+    表头: ["k", "最大倾角 / (°)", "最大角速度 / (rad/s)", "航点处角速度跳变 / (rad/s)", "起点角速度 / (rad/s)"]
+    表头英文: ["k", "Peak tilt / (°)", "Peak body rate / (rad/s)", "Body-rate jump / (rad/s)", "Body rate at start / (rad/s)"]
+    行: [["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""]]
+注意:
+  - ["各段时间按程序 21.4.1 优化得到的比例分配，改变 W2 的高度后没有重新优化。", "The segment times use the ratios optimised in Program 21.4.1; they are not re-optimised when W2's height changes."]
+  - ["X2 放大 4 倍画出；倾角、推力、角速度的限制都是示意值。", "X2 is drawn 4 times larger; the limits on tilt, thrust and body rate are illustrative."]
+思考题:
+  - ["k = 3 的轨迹在中间航点处角速度、角加速度都连续，为什么仍不适合从悬停起飞？", "The k = 3 path has continuous body rate and angular acceleration at the interior waypoints; why is it still unsuited to starting from hover?"]

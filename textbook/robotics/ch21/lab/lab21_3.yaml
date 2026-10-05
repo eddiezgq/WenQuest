@@ -1,0 +1,25 @@
+# 实验 21.3 的指导书与报告模板。目的、场景、参数、任务取自 lab21_3.js。
+原理:
+  - 式: ["约束：x_b·(p̈ + 𝔤ẑ) = 0，y_b·(p̈ + 𝔤ẑ) = 0；输入矩阵 B(R) 的秩为 4 < 6", "Constraints: x_b·(p̈ + gẑ) = 0, y_b·(p̈ + gẑ) = 0; the input matrix B(R) has rank 4 < 6"]
+  - 式: ["高度不变的横移：ÿ = 𝔤 tan φ，f = m𝔤/cos φ", "Sideways at constant height: ÿ = g tan φ, f = mg/cos φ"]
+  - 式: ["全驱动的极限：T = 2√(d/a)，a = 𝔤 tan φ_max", "Fully actuated limit: T = 2√(d/a), a = g tan φ_max"]
+  - ["对称梯形的倾角曲线关于中点奇对称，终点速度自动为零；保持时间 h 由“位移等于 d”决定。", "The symmetric trapezoidal roll profile is odd about its midpoint, so the final speed is zero; the hold time h follows from “displacement equals d”."]
+步骤:
+  - ["场景“横移”：按默认参数按“开始”，记录 X2 用时、全驱动用时、峰值横滚角和最大侧向速度（任务 1）。", "Scene “Sideways move”: press Start with the defaults; record X2's time, the fully actuated time, the peak roll and the top lateral speed (task 1)."]
+  - ["保持 d = 2 m、倾角限制 25°，按表 1 改变横滚角速度限制（其中 1 rad/s 为任务 2），记录用时。", "Keep d = 2 m and 25°; change the roll-rate limit as in Table 1 (1 rad/s is task 2) and record the times."]
+  - ["保持 2 rad/s，按表 2 改变倾角限制（其中 40° 为任务 3）和距离，记录用时。", "Keep 2 rad/s; change the tilt limit (40° is task 3) and the distance as in Table 2 and record the times."]
+  - ["生活场景“热气球”：选择 h₁、h₂，按“开始”，直到热气球降落在离目标 100 m 以内（任务 4），记录所用的高度和落点。", "Everyday scene “Hot-air balloon”: choose h₁ and h₂, press Start, until the balloon lands within 100 m of the target (task 4); record the heights and the landing point."]
+数据表:
+  - 标题: ["表 1  横滚角速度限制的影响（d = 2 m，25°）", "Table 1  Effect of the roll-rate limit (d = 2 m, 25°)"]
+    表头: ["横滚角速度限制 / (rad/s)", "X2 用时 / s", "全驱动用时 / s", "多用 / %"]
+    表头英文: ["Roll-rate limit / (rad/s)", "X2 time / s", "Fully actuated / s", "Extra / %"]
+    行: [["0.5", "", "", ""], ["1", "", "", ""], ["2", "", "", ""], ["4", "", "", ""], ["8", "", "", ""]]
+  - 标题: ["表 2  倾角限制与距离的影响（2 rad/s）", "Table 2  Effect of the tilt limit and the distance (2 rad/s)"]
+    表头: ["d / m", "倾角限制 / (°)", "峰值横滚角 / (°)", "X2 用时 / s", "全驱动用时 / s"]
+    表头英文: ["d / m", "Tilt limit / (°)", "Peak roll / (°)", "X2 time / s", "Fully actuated / s"]
+    行: [["2", "15", "", "", ""], ["2", "25", "", "", ""], ["2", "40", "", "", ""], ["0.5", "25", "", "", ""], ["4", "25", "", "", ""]]
+注意:
+  - ["横移的倾角曲线只是一种简单的做法，不一定是时间最短的；实验只用它来比较各种限制的影响。", "The trapezoidal roll profile is a simple choice, not necessarily the fastest; the lab uses it to compare the limits."]
+  - ["热气球的风场和升降速度是示意值；场景按 1:200 缩小画出，播放放快 60 倍。", "The balloon's winds and climb rate are illustrative; the scene is drawn at 1:200 and played 60 times faster."]
+思考题:
+  - ["表 1 中，横滚角速度限制增大到多少以后，再增大对用时几乎没有帮助？为什么？", "In Table 1, beyond what roll-rate limit does a larger limit hardly help? Why?"]

@@ -1,0 +1,25 @@
+# 实验 21.2 的指导书与报告模板。目的、场景、参数、任务取自 lab21_2.js。
+原理:
+  - 式: ["推力加速度 t = p̈ + 𝔤ẑ = (f/m) z_b；f = m‖t‖，z_b = t/‖t‖", "Thrust acceleration t = p̈ + gẑ = (f/m) z_b; f = m‖t‖, z_b = t/‖t‖"]
+  - 式: ["保持高度：tan α = a_h/𝔤，f = m𝔤/cos α", "Constant height: tan α = a_h/g, f = mg/cos α"]
+  - 式: ["y_c = (−sin ψ, cos ψ, 0)，x_b = y_c × z_b/‖y_c × z_b‖，y_b = z_b × x_b", "y_c = (−sin ψ, cos ψ, 0), x_b = y_c × z_b/‖y_c × z_b‖, y_b = z_b × x_b"]
+  - 式: ["ω_b = W(φ, θ)(φ̇, θ̇, ψ̇)，W 的三列为 (1, 0, 0)、(0, cos φ, −sin φ)、(−sin θ, sin φ cos θ, cos φ cos θ)", "ω_b = W(φ, θ)(φ̇, θ̇, ψ̇); the columns of W are (1, 0, 0), (0, cos φ, −sin φ), (−sin θ, sin φ cos θ, cos φ cos θ)"]
+  - ["加速度只决定 z_b 和总推力；绕 z_b 的转动（机头朝向）由偏航角另行选择。", "The acceleration fixes only z_b and the thrust; the turn about z_b (where the nose points) is chosen separately through the yaw."]
+步骤:
+  - ["场景“加速度与倾角”：按表 1 逐行设置加速度和偏航角，按“开始”，记录总推力、倾角、俯仰角、横滚角，并用式 (21.2.3)～(21.2.6) 手算核对（任务 1、2）。", "Scene “Acceleration and tilt”: enter each row of Table 1, press Start, record thrust, tilt, pitch and roll, and check them by hand with Eqs. (21.2.3)–(21.2.6) (tasks 1, 2)."]
+  - ["场景“协调转弯”：按表 2 设置车速和半径，各飞一圈，记录坡度、总推力和陀螺仪读数（任务 3）。", "Scene “Coordinated turn”: set speed and radius as in Table 2, fly one lap each, record bank, thrust and gyro readings (task 3)."]
+  - ["生活场景“车内挂件”：把汽车加速度设为 2 m/s² 和 −4 m/s²（刹车），分别按“开始”，记录挂件的偏角（任务 4）。", "Everyday scene “Car ornament”: set the car's acceleration to 2 m/s² and −4 m/s² (braking), press Start each time and record the ornament's angle (task 4)."]
+数据表:
+  - 标题: ["表 1  加速度、偏航角与姿态", "Table 1  Acceleration, yaw and attitude"]
+    表头: ["a_x / (m/s²)", "a_y / (m/s²)", "a_z / (m/s²)", "ψ / (°)", "f / N", "倾角 / (°)", "θ / (°)", "φ / (°)"]
+    表头英文: ["a_x / (m/s²)", "a_y / (m/s²)", "a_z / (m/s²)", "ψ / (°)", "f / N", "tilt / (°)", "θ / (°)", "φ / (°)"]
+    行: [["2", "0", "0", "0", "", "", "", ""], ["2", "0", "0", "90", "", "", "", ""], ["1.5", "−1.0", "0.8", "60", "", "", "", ""], ["1.5", "−1.0", "0.8", "0", "", "", "", ""], ["0", "0", "3", "0", "", "", "", ""]]
+  - 标题: ["表 2  协调转弯", "Table 2  Coordinated turn"]
+    表头: ["v / (m/s)", "ρ / m", "坡度 / (°)", "f / N", "ω_y / (rad/s)", "ω_z / (rad/s)"]
+    表头英文: ["v / (m/s)", "ρ / m", "bank / (°)", "f / N", "ω_y / (rad/s)", "ω_z / (rad/s)"]
+    行: [["4", "5", "", "", "", ""], ["4", "2.5", "", "", "", ""], ["8", "10", "", "", "", ""]]
+注意:
+  - ["实验按式 (21.2.1) 计算，不计空气阻力。实际飞行中，匀速平飞也要稍稍前倾以平衡阻力。", "The lab uses Eq. (21.2.1) without air drag. In real flight a slight forward tilt is needed even at constant speed to balance the drag."]
+  - ["加速度计读数按质心处计算；X2 的 IMU 在质心下方约 3.4 cm，转动时读数还有很小的牵连项。", "The accelerometer is read at the centre of mass; X2's IMU sits about 3.4 cm below it and adds small transport terms when the body turns."]
+思考题:
+  - ["表 2 中 (4 m/s, 5 m) 与 (8 m/s, 10 m) 两种转弯的向心加速度哪个大？坡度和陀螺仪读数怎样随车速和半径变化？", "In Table 2, which turn has the larger centripetal acceleration, (4 m/s, 5 m) or (8 m/s, 10 m)? How do bank and gyro readings change with speed and radius?"]
