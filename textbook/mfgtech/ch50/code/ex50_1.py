@@ -1,4 +1,4 @@
-"""50.1 节：一份工艺规程给工厂里的谁用、用什么。读数字工厂里 SH-301 的工艺路线、BOM 和费率，算出图 50.1.1 里各部门拿到的数。"""
+"""50.1 节：一份工艺规程给工厂里的谁用、用什么。读数字工厂里 SH-301 的工艺路线、BOM 和费率，算出图 50.1.3 里各部门拿到的数。"""
 import _mfg as M
 from bookout import T, figure, out, style
 
@@ -22,7 +22,7 @@ out(routing=rt, n_ops=len(route), n_mach=len(mach), total_min=sum(m for _, m in 
     cnc_hours=hours["数控车床 CNC-L01"], n_tools=len(p["tool_list"]), n_gauges=len(p["gauges"]),
     n_chars=len(p["characteristics"]), n_insp=sum(len(o.get("inspect") or []) for o in p["operations"]))
 
-# ---- 图 50.1.1：一份工艺数据，各部门各取所需
+# ---- 图 50.1.3：一份工艺数据，各部门各取所需
 plt = style()
 fig, ax = plt.subplots(figsize=(7.2, 4.2))
 ax.set_xlim(-5, 5); ax.set_ylim(-3.2, 3.2); ax.axis("off")
@@ -50,4 +50,4 @@ for x, y, t, ls in users:
     box(x, y, 2.6, 0.95, t, ls, M.INK)
     ax.annotate("", xy=(x * 0.62, y * 0.62), xytext=(x * 0.28, y * 0.28),
                 arrowprops=dict(arrowstyle="-|>", color=M.MUTED, lw=1.0))
-figure(fig, "fig50_1_1")
+figure(fig, "fig50_1_3")
