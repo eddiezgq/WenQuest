@@ -1,0 +1,24 @@
+# 实验 12.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab12_1.js。
+原理:
+  - ["速度 v(t) ≥ 0 时，从 0 到 t 走过的距离等于速度曲线与时间轴之间的面积（12.1 节）。只有采样读数时，用矩形或梯形近似这块面积：左矩形和取每段起点的读数，右矩形和取终点的读数，梯形和取两者的平均。", "When v(t) ≥ 0, the distance from 0 to t is the area between the speed curve and the time axis (Section 12.1). With sampled readings, approximate it by rectangles or trapezoids: the left sum uses the reading at the start of each step, the right sum the one at the end, the trapezoid sum their average."]
+  - 式: "距离 ≈ Σ v(tₖ)Tₛ（左矩形），Σ v(tₖ₊₁)Tₛ（右矩形），Σ [v(tₖ) + v(tₖ₊₁)]Tₛ/2（梯形）"
+  - ["速度单调时，真实距离夹在左、右矩形和之间，两者之差等于 |v(t) − v(0)|·Tₛ，所以误差与 Tₛ 成正比（12.1 节，定理 12.1.1）。梯形和与中点和的误差约与 Tₛ² 成正比。", "For a monotone speed, the true distance lies between the left and right sums, which differ by |v(t) − v(0)|·Tₛ, so the error is proportional to Tₛ (Section 12.1, Theorem 12.1.1). The trapezoid and midpoint sums err roughly like Tₛ²."]
+步骤:
+  - ["在“AGV 速度数据”场景中，噪声取 0，统计到 t = 4 s。Tₛ 取 1、0.8、0.5、0.4、0.25、0.1 s，分别用左矩形、右矩形、梯形累加，把误差填入表 1（任务 1、2）。", "In 'AGV speed data', with no noise and t = 4 s, take Tₛ = 1, 0.8, 0.5, 0.4, 0.25, 0.1 s and record the errors of the left, right and trapezoid sums in Table 1 (tasks 1 and 2)."]
+  - ["Tₛ = 0.1 s，统计全程（t = 11 s），用梯形累加，噪声取 0、0.02、0.05、0.1 m/s，记录误差（任务 3）。", "With Tₛ = 0.1 s over the whole trip (t = 11 s), trapezoid rule, noise 0, 0.02, 0.05, 0.1 m/s: record the errors (task 3)."]
+  - ["在“黎曼和”场景中选 x³，n 取 4、8、16、32、64，把四种和的误差填入表 2，算出“误差 × n”与“误差 × n²”，看哪一个大致不变（任务 4）。", "In 'Riemann sums' choose x³ and n = 4, 8, 16, 32, 64; record the errors of the four sums in Table 2 and compute error × n and error × n², seeing which stays roughly constant (task 4)."]
+数据表:
+  - 标题: ["表 1  前 4 s 的距离误差（真实距离 3.36 m，无噪声）", "Table 1  Distance error over the first 4 s (true distance 3.36 m, no noise)"]
+    表头: ["Tₛ / s", "左矩形和的误差 / m", "右矩形和的误差 / m", "梯形和的误差 / m"]
+    表头英文: ["Tₛ / s", "left-sum error / m", "right-sum error / m", "trapezoid error / m"]
+    行: [["1", "", "", ""], ["0.8", "", "", ""], ["0.5", "", "", ""], ["0.4", "", "", ""], ["0.25", "", "", ""], ["0.1", "", "", ""]]
+  - 标题: ["表 2  ∫₀¹ x³ dx 的四种和的误差", "Table 2  Errors of four sums for ∫₀¹ x³ dx"]
+    表头: ["n", "左矩形", "右矩形", "梯形", "中点"]
+    表头英文: ["n", "left", "right", "trapezoid", "midpoint"]
+    行: [["4", "", "", "", ""], ["8", "", "", "", ""], ["16", "", "", "", ""], ["32", "", "", "", ""], ["64", "", "", "", ""]]
+注意:
+  - ["统计到的时刻取最接近 t 的采样时刻，读数里显示实际值；真实距离按这个时刻计算。", "The sum stops at the sampling instant nearest to t; the readout shows it, and the true distance is computed for that instant."]
+  - ["噪声由固定的随机数种子产生，同样的参数每次得到同样的读数。", "The noise comes from a fixed random seed, so the same settings always give the same readings."]
+思考题:
+  - ["噪声是随机的，有正有负。为什么累加很多个读数后，噪声造成的距离误差不太大？它大约随读数个数怎样增长？（第 48 章）", "Noise is random, positive and negative. Why does the distance error from noise stay fairly small after many readings? How does it grow with the number of readings? (Chapter 48)"]
+  - ["如果编码器有一个固定的偏差（例如读数总是多 0.01 m/s），距离误差会怎样随时间增长？这和随机噪声有什么不同？", "If the encoder has a constant bias (say readings always 0.01 m/s too high), how does the distance error grow with time? How does this differ from random noise?"]
