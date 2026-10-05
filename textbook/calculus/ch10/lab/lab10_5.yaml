@@ -1,0 +1,24 @@
+# 实验 10.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_5.js。
+原理:
+  - ["曲线 y = f(x) 在一点的曲率 κ = |y″|/(1 + y′²)^{3/2}，曲率圆的半径 R = 1/κ，圆心在法线上、曲线弯向的一侧（10.5 节）。", "The curvature of y = f(x) is κ = |y″|/(1 + y′²)^{3/2}; the circle of curvature has radius R = 1/κ with centre on the normal, on the side towards which the curve bends (Section 10.5)."]
+  - 式: "a_n = v²κ ≤ a_max  ⇒  v ≤ √(a_max/κ_max)；差速 AGV 的角速度 ω = vκ"
+  - ["换道路径横移 1 m，纵向长 L。三次多项式与余弦路径在入口处曲率从 0 突变，五次多项式路径的曲率从 0 连续变化。", "The lane change shifts 1 m over a length L. The cubic and cosine paths jump in curvature at the entry; the quintic path's curvature starts from 0 continuously."]
+步骤:
+  - ["在“曲率圆”场景中依次选五条曲线，移动探测点，记录曲率最大的点和最大曲率，填入表 1（任务 1 为 eˣ）。", "In 'Circle of curvature' take each of the five curves, move the probe, and record where the curvature is largest and its value in Table 1 (task 1 is eˣ)."]
+  - ["在“AGV 换道”场景中，L = 4 m，对三种路径分别读出最大曲率、入口处的曲率和允许的最高车速，填入表 2（任务 2、3）。", "In 'AGV lane change' with L = 4 m, read the largest curvature, the entry curvature and the highest allowed speed for each path into Table 2 (tasks 2 and 3)."]
+  - ["用五次多项式路径，车速取 2 m/s，逐步增大 L 直到运行通过，记录最小的 L（任务 4），与 v ∝ L 的估计比较。", "With the quintic path at 2 m/s, increase L until a run passes; record the smallest L (task 4) and compare with the estimate v ∝ L."]
+数据表:
+  - 标题: ["表 1  几条曲线的最大曲率", "Table 1  Largest curvature of several curves"]
+    表头: ["曲线", "曲率最大的点 x", "最大曲率 κ", "曲率半径"]
+    表头英文: ["curve", "point of largest κ", "largest κ", "radius"]
+    行: [["y = x²", "", "", ""], ["y = sin x", "", "", ""], ["y = eˣ", "", "", ""], ["y = x³", "", "", ""], ["y = ln x", "", "", ""]]
+  - 标题: ["表 2  三种换道路径（横移 1 m，L = 4 m）", "Table 2  Three lane-change paths (shift 1 m, L = 4 m)"]
+    表头: ["路径", "最大曲率 / (1/m)", "入口处曲率 / (1/m)", "允许的最高车速 / (m/s)"]
+    表头英文: ["path", "largest κ / (1/m)", "entry κ / (1/m)", "highest speed / (m/s)"]
+    行: [["三次多项式", "", "", ""], ["余弦", "", "", ""], ["五次多项式", "", "", ""]]
+    行英文: [["cubic", "", "", ""], ["cosine", "", "", ""], ["quintic", "", "", ""]]
+注意:
+  - ["y = x³ 在 x = 0 处曲率为零，曲率圆变成直线（半径无穷大），程序不画圆。", "y = x³ has zero curvature at x = 0; the circle becomes a straight line (infinite radius) and is not drawn."]
+思考题:
+  - ["三次多项式路径的最大曲率在入口处，余弦路径的最大曲率比五次多项式路径还小，为什么工程上仍偏爱五次多项式（或回旋线）？", "The cubic path is sharpest at its entry and the cosine path peaks lower than the quintic one; why do engineers still prefer the quintic (or a clothoid)?"]
+  - ["侧向加速度限制 v ≤ √(a/κ)。若路径确定，怎样让 AGV 在直线段开得快、弯道处自动减速？速度应当怎样随路程变化？（第 11 章）", "The limit v ≤ √(a/κ): with the path fixed, how can the AGV run fast on straights and slow automatically in bends? How should the speed vary along the path? (Chapter 11)"]
