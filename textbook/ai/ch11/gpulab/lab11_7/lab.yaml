@@ -1,0 +1,34 @@
+标题: ["GPU 实验 11.7 把模型导出到推理引擎并测速", "GPU Lab 11.7 Exporting a model to an inference engine"]
+目的: ["把同一个分类器分别用 PyTorch、torch.compile 和推理引擎（TensorRT 或 ONNX Runtime）跑一遍，比较批大小 1 的延迟与批 32 的吞吐量，并判断够不够每秒 60 帧的相机用。",
+       "Run one classifier with PyTorch, torch.compile and an inference engine (TensorRT or ONNX Runtime); compare batch-1 latency with batch-32 throughput and check whether it keeps up with a 60-frames-per-second camera."]
+显卡: basic
+结果:
+  - {名: eager_ms, 说明: ["批 1 延迟，PyTorch", "batch-1 latency, PyTorch"], 单位: ms}
+  - {名: compile_ms, 说明: ["批 1 延迟，torch.compile", "batch-1 latency, torch.compile"], 单位: ms}
+  - {名: engine_ms, 说明: ["批 1 延迟，推理引擎", "batch-1 latency, engine"], 单位: ms}
+  - {名: eager_fps, 说明: ["批 32 吞吐量", "throughput at batch 32"], 单位: "张/秒"}
+  - {名: engine, 说明: ["用的是哪个引擎", "which engine"], 单位: ""}
+文件: []
+实际问题:
+  标题: ["训练好了，上线还差一步", "Trained is not deployed"]
+  内容: ["训练框架的 `generate` 或 `forward` 能跑，但延迟与吞吐往往差推理引擎一截：引擎会做算子融合、常量折叠、为这张卡挑核函数，还能用上低精度。产线上这一截决定了要买几块卡。",
+         "A training framework runs the model, but an inference engine is usually faster: it fuses operators, folds constants, picks kernels for this card and uses low precision. On a line, that gap decides how many cards you buy."]
+原理:
+  - ["延迟与吞吐是两个指标：批大小 1 看延迟，批大的看吞吐；两者随批大小此消彼长（9.7 节）。", "Latency and throughput are different: batch 1 for latency, large batches for throughput; they trade off (Section 9.7)."]
+  - ["推理引擎的加速主要来自融合与为硬件挑核函数（第 7、8 章），不是换了更好的算法。", "Engine speedups come from fusion and hardware-specific kernels (Chapters 7, 8), not better algorithms."]
+步骤:
+  - ["运行第 1 节，记录 PyTorch 的延迟与吞吐（任务 1）。", "Run section 1 and record PyTorch latency and throughput (task 1)."]
+  - ["运行第 2 节，记录 torch.compile 与引擎的延迟，填入表 1（任务 2）。", "Run section 2 and record compile and engine latency; fill Table 1 (task 2)."]
+  - ["按第 3 节算一块 GPU 能服务几条产线（任务 3）。", "Use section 3 to estimate how many lines one GPU can serve (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  三种跑法", "Table 1  Three ways to run"]
+    表头: ["跑法", "批 1 延迟（ms）", "相对 PyTorch"]
+    表头英文: ["Runtime", "Batch-1 latency (ms)", "Relative to PyTorch"]
+    行: [["PyTorch", "", "1.00"], ["torch.compile", "", ""], ["推理引擎", "", ""]]
+注意:
+  - ["第一次 torch.compile 要编译几十秒，计时前已经预热过。", "The first torch.compile call takes tens of seconds; the timing loop warms up first."]
+  - ["机器上没有 TensorRT 时实验会退到 ONNX Runtime，结论一样，但具体数字不同——记录你用的是哪个。", "Without TensorRT the lab falls back to ONNX Runtime; the conclusions hold but the numbers differ — record which you used."]
+思考题:
+  - ["为什么批大小 1 时引擎的优势最明显？", "Why is the engine's advantage largest at batch size 1?"]
+  - ["相机提到每秒 120 帧时，先加卡还是先改模型？", "If the camera doubles to 120 frames per second, add GPUs or change the model first?"]

@@ -1,0 +1,25 @@
+# 实验 11.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab11_3.js。
+原理:
+  - ["交并比：两个框的交集面积除以并集面积，0 到 1 之间；检测通常以 0.5 或 0.75 为命中的阈值（11.3 节）。", "IoU is the intersection over the union of two boxes, between 0 and 1; detection usually calls 0.5 or 0.75 a hit (Section 11.3)."]
+  - ["非极大值抑制：按得分从高到低保留框，与已保留的框交并比超过阈值的丢弃（程序 11.3.1）。", "NMS keeps boxes by descending score, dropping any that overlap a kept box above a threshold (Program 11.3.1)."]
+  - ["查准率 = 命中 / (命中 + 误检)，查全率 = 命中 / (命中 + 漏检)；两者随得分阈值此消彼长。", "Precision = TP/(TP+FP), recall = TP/(TP+FN); the score threshold trades one for the other."]
+  - 式: "总代价 = 漏检数 × 漏检代价 + 误检数 × 误检代价"
+步骤:
+  - ["“交并比”场景：移动预测框，找出交并比跌破 0.5 的偏移量（任务 1）；再只改大小（任务 2）。", "IoU scene: shift the box until IoU falls below 0.5 (task 1); then change only its size (task 2)."]
+  - ["“非极大值抑制”场景：抑制阈值从 90% 调到 10%，填表 1（任务 3）。", "NMS scene: sweep the threshold from 90% to 10% and fill Table 1 (task 3)."]
+  - ["“阈值与代价”场景：漏检代价设成 10、50、100 元，各找出代价最小的阈值，填表 2（任务 4）。", "Threshold scene: with miss costs 10, 50 and 100, find the min-cost threshold each time and fill Table 2 (task 4)."]
+数据表:
+  - 标题: ["表 1  抑制阈值的影响", "Table 1  Effect of the NMS threshold"]
+    表头: ["抑制阈值", "保留的框数", "两个缺陷都有框吗"]
+    表头英文: ["NMS threshold", "Boxes kept", "Both defects covered"]
+    行: [["90%", "", ""], ["50%", "", ""], ["30%", "", ""], ["10%", "", ""]]
+  - 标题: ["表 2  代价与阈值", "Table 2  Cost and threshold"]
+    表头: ["漏检代价（元）", "代价最小的阈值", "此时的漏检 / 误检", "总代价"]
+    表头英文: ["Miss cost", "Min-cost threshold", "FN / FP there", "Total cost"]
+    行: [["10", "", "", ""], ["50", "", "", ""], ["100", "", "", ""]]
+注意:
+  - ["本实验的“检测结果”是固定的一组数，不是模型跑出来的；它只用来说明指标怎样算、阈值怎样选。", "The detections here are a fixed list, not a model's output; they only illustrate how the metrics and thresholds work."]
+  - ["交并比只看框，不看框里是什么；两个框完全重合也可能类别判错（11.3 节）。", "IoU looks only at boxes, not at content; two perfectly overlapping boxes can still carry the wrong class (Section 11.3)."]
+思考题:
+  - ["为什么“框大了”比“框偏了”更容易把交并比拉低？", "Why does an oversized box hurt IoU more than a shifted one?"]
+  - ["什么场合误检的代价反而更高？这时阈值应该往哪边移？", "When is a false alarm more costly than a miss, and which way should the threshold move then?"]

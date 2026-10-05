@@ -1,0 +1,35 @@
+标题: ["GPU 实验 11.1 用迁移学习训练零件分类器", "GPU Lab 11.1 Training a part classifier by transfer learning"]
+目的: ["在合成的零件图像上比较三种训练方式——从头训练、只训练最后一层、整个网络微调——的正确率与用时，理解预训练权重为什么在小数据上占便宜。",
+       "Compare three ways to train on synthetic part images — from scratch, linear probing and full fine-tuning — in accuracy and time, and see why pretrained weights pay off on small data."]
+显卡: basic
+结果:
+  - {名: scratch_acc, 说明: ["正确率，从头训练", "accuracy, from scratch"], 单位: "%"}
+  - {名: linear_acc, 说明: ["正确率，只训练最后一层", "accuracy, linear probe"], 单位: "%"}
+  - {名: finetune_acc, 说明: ["正确率，微调", "accuracy, fine-tuned"], 单位: "%"}
+  - {名: scratch_s, 说明: ["用时，从头训练", "time, from scratch"], 单位: s}
+  - {名: linear_s, 说明: ["用时，只训练最后一层", "time, linear probe"], 单位: s}
+  - {名: finetune_s, 说明: ["用时，微调", "time, fine-tuned"], 单位: s}
+文件: [data.py]
+实际问题:
+  标题: ["新上一种零件，只有几百张图", "A new part, only a few hundred images"]
+  内容: ["产线换了零件，缺陷样本要攒很久。从头训练一个网络需要大量数据；用在大数据集上预训练好的权重，只训练最后一层或微调整个网络，几百张图就能有可用的正确率。",
+         "When the line changes parts, defect samples take months to collect. Training from scratch needs a lot of data; starting from pretrained weights, a few hundred images can be enough."]
+原理:
+  - ["卷积网络的浅层学到的是通用特征（边缘、纹理），深层才是任务专用的（动画 11.2.1）。", "Shallow layers learn generic features (edges, textures); only deep layers are task-specific (Animation 11.2.1)."]
+  - ["线性探测冻住主干，只训练最后一层：参数少、快，但表达能力受限；微调整个网络更准，学习率要小。", "Linear probing freezes the backbone and trains only the head: fast but limited; fine-tuning is more accurate but needs a small learning rate."]
+步骤:
+  - ["运行前两格，看四类图像各长什么样、各有多少张。", "Run the first cells to see the four classes and their counts."]
+  - ["三种方式各训练 400 步，填入表 1（任务 2）。", "Train 400 steps each way and fill Table 1 (task 2)."]
+  - ["把步数减到 100 步重跑，比较三者的差距（任务 3）。", "Rerun with 100 steps and compare the gaps (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  三种训练方式", "Table 1  Three ways to train"]
+    表头: ["方式", "正确率（%）", "用时（s）"]
+    表头英文: ["Mode", "Accuracy (%)", "Time (s)"]
+    行: [["从头训练", "", ""], ["只训练最后一层", "", ""], ["微调", "", ""]]
+注意:
+  - ["数据是合成的：在它上面的正确率不代表真实产线上的正确率（11.8.5 节）。", "The data is synthetic: accuracy here does not transfer directly to a real line (Section 11.8.5)."]
+  - ["第一次运行要下载 ResNet-18 的预训练权重（约 45 MB）。", "The first run downloads the pretrained ResNet-18 weights (about 45 MB)."]
+思考题:
+  - ["数据越少，预训练的好处越大还是越小？为什么？", "Does pretraining help more or less as data shrinks, and why?"]
+  - ["哪些情况下微调反而不如只训练最后一层？", "When can linear probing beat full fine-tuning?"]

@@ -51,8 +51,7 @@ EPOCH_PER_YEAR = (4, 5)
 # ---------------------------------------------------------------- ImageNet 竞赛（ILSVRC）分类任务冠军的前五错误率
 # Russakovsky 等 2015 表 4 与各年官方结果；2012 年为 SuperVision（AlexNet）使用额外数据的提交，第二名 26.2%；
 # 人类：Russakovsky 等 2015 第 6.4 节，经过训练的标注者约 5.1%
-ILSVRC = [(2010, 28.2, "NEC-UIUC"), (2011, 25.8, "XRCE"), (2012, 15.3, "SuperVision"), (2013, 11.7, "Clarifai"),
-          (2014, 6.66, "GoogLeNet"), (2015, 3.57, "MSRA ResNet")]
+from ilsvrc import ILSVRC  # noqa: F401  全书共用的 ILSVRC 表（conventions/ilsvrc.py）
 ILSVRC_2012_SECOND = 26.2
 HUMAN_TOP5 = 5.1
 
