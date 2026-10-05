@@ -1,0 +1,39 @@
+标题: ["GPU 实验 7.7 为 PyTorch 写一个自定义 CUDA 算子", "GPU Lab 7.7 Writing a custom CUDA operator for PyTorch"]
+目的: ["把“加偏置 + GELU”写成一个融合的 CUDA 核函数，用 C++ 扩展接进 PyTorch，用 autograd.Function 接进自动微分，用梯度检查验证反向；与原生写法比较速度，并把它改成精确的 GELU。",
+       "Write bias + GELU as one fused CUDA kernel, bind it into PyTorch as a C++ extension and into autograd with autograd.Function, verify the backward with gradcheck, compare speed with the native code, and change it to the exact GELU."]
+显卡: basic
+结果:
+  - {名: fwd_err, 说明: ["前向与原生写法的最大差", "max forward difference from native"], 单位: ""}
+  - {名: gradcheck, 说明: ["梯度检查（1 通过）", "gradcheck (1 = pass)"], 单位: ""}
+  - {名: native_f_us, 说明: ["前向，原生", "forward, native"], 单位: μs}
+  - {名: fused_f_us, 说明: ["前向，融合", "forward, fused"], 单位: μs}
+  - {名: native_fb_us, 说明: ["前向加反向，原生", "forward + backward, native"], 单位: μs}
+  - {名: fused_fb_us, 说明: ["前向加反向，融合", "forward + backward, fused"], 单位: μs}
+  - {名: fused_GBs, 说明: ["融合前向达到的显存带宽", "bandwidth of the fused forward"], 单位: GB/s}
+文件: [bias_gelu.py]
+实际问题:
+  标题: ["框架里没有的那一个运算", "The one operation the framework lacks"]
+  内容: ["前馈网络里“加偏置、过 GELU”是两次读写显存。能不能自己写一个核函数一次做完，又不丢掉自动微分？",
+         "In the feed-forward network, adding the bias and applying GELU read and write memory twice. Can we do it in one kernel without losing autograd?"]
+原理:
+  - ["C++ 扩展：用 torch.utils.cpp_extension 把 CUDA 源程序编译成 Python 模块，核函数直接读写 PyTorch 张量的存储（7.7 节）。", "C++ extensions: torch.utils.cpp_extension compiles CUDA source into a Python module whose kernels read and write tensor storage directly (Section 7.7)."]
+  - ["autograd.Function：forward 里保存反向要用的张量，backward 里返回对每个输入的梯度。", "autograd.Function: save what the backward needs in forward; return a gradient for each input in backward."]
+  - 式: "GELU′(t) = ½(1 + tanh u) + ½ t (1 − tanh² u) · √(2/π) (1 + 3·0.044715 t²)，u = √(2/π)(t + 0.044715 t³)"
+步骤:
+  - ["运行第一格检查环境。", "Run the first cell."]
+  - ["编译 bias_gelu.py，与原生写法比较前向结果，做梯度检查（任务 1）。", "Build bias_gelu.py, compare the forward with native, run gradcheck (task 1)."]
+  - ["比较原生写法与融合算子的前向、前向加反向耗时，算出达到的带宽（任务 2）。", "Compare forward and forward+backward times, compute the bandwidth (task 2)."]
+  - ["把 GELU 改成精确定义，重新导入、检查（任务 3）。", "Change to the exact GELU, reload and check (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  原生写法与融合算子", "Table 1  Native code and the fused operator"]
+    表头: ["", "原生（μs）", "融合（μs）"]
+    表头英文: ["", "Native (μs)", "Fused (μs)"]
+    行: [["前向", "{{native_f_us}}", "{{fused_f_us}}"], ["前向加反向", "{{native_fb_us}}", "{{fused_fb_us}}"]]
+注意:
+  - ["第一次导入要编译约一分钟；改了源程序后用 importlib.reload 重新导入，PyTorch 发现源程序变了会自动重编。", "The first import compiles for about a minute; after editing, reload the module with importlib.reload and PyTorch rebuilds automatically."]
+  - ["梯度检查要用双精度、小张量，否则数值差分的误差太大、太慢。", "Run gradcheck in double precision on small tensors; otherwise finite differences are too inaccurate and slow."]
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+思考题:
+  - ["前向快了约一倍，前向加反向却快得少得多。按算例 7.7.1 的流量解释。", "The forward is about twice as fast, the forward+backward much less. Explain with the traffic of Example 7.7.1."]
+  - ["怎样把偏置梯度的求和也并进反向的核函数？这样能省多少流量？", "How could the bias-gradient sum be folded into the backward kernel? How much traffic would it save?"]

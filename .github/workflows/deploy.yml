@@ -94,6 +94,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: CUDA library headers for the compile check (《人工智能》; cached, the wheels are large)
+        if: matrix.book == 'ai'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/wq-cuda-headers
+          key: wq-cuda-headers-v1
       - name: Textbook build and checks (programs, numbers, formulas, references, terms) — ${{ matrix.book }}
         working-directory: textbook/tools
         run: |
@@ -115,12 +121,15 @@ jobs:
           fi
           if [ "${{ matrix.book }}" = ai ]; then   # 《人工智能》：CUDA 程序的编译检查（clang + NVIDIA 的头文件包）与 Numba 的 CUDA 模拟器
             pip install -q nvidia-cuda-runtime-cu12 nvidia-cuda-nvcc-cu12 nvidia-cuda-cccl-cu12 nvidia-curand-cu12 numba
-            # cuBLAS（第 5 章）与 NCCL（第 6 章）：软件包很大，只解出头文件
-            pip download -q --no-deps -d "$RUNNER_TEMP/blas" nvidia-cublas-cu12 nvidia-nccl-cu12
+            # cuBLAS（第 5 章）、NCCL（第 6 章）、cuDNN（第 7 章）：软件包很大（合计约 1.7 GB），只解出头文件，并缓存起来
+            hdr=~/.cache/wq-cuda-headers
+            if [ ! -f "$hdr/nvidia/cudnn/include/cudnn.h" ]; then
+              pip download -q --no-deps -d "$RUNNER_TEMP/blas" nvidia-cublas-cu12 nvidia-nccl-cu12 nvidia-cudnn-cu12
+              for lib in cublas nccl cudnn; do unzip -q -o "$RUNNER_TEMP"/blas/nvidia_${lib}*.whl "nvidia/$lib/include/*" -d "$hdr"; done
+              rm -rf "$RUNNER_TEMP/blas"
+            fi
             site="$(python -c 'import nvidia, os; print(os.path.dirname(list(nvidia.__path__)[0]))')"
-            unzip -q -o "$RUNNER_TEMP"/blas/nvidia_cublas*.whl 'nvidia/cublas/include/*' -d "$site"
-            unzip -q -o "$RUNNER_TEMP"/blas/nvidia_nccl*.whl 'nvidia/nccl/include/*' -d "$site"
-            rm -rf "$RUNNER_TEMP/blas"
+            cp -r "$hdr/nvidia/." "$site/nvidia/"
             which clang++ > /dev/null || sudo apt-get install -y -qq clang > /dev/null
           fi
           if [ "${{ matrix.book }}" = robotics ]; then   # the tools' own tests run once, with the book they use

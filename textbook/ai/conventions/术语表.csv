@@ -204,3 +204,17 @@
 6,重放,kernel replay,
 6,速度之光,Speed of Light (SOL),
 6,分层屋顶线,hierarchical roofline,
+7,尾处理,epilogue,矩阵乘法结果写回前顺带做的逐元素运算（加偏置、激活函数等）
+7,等步长批量矩阵乘法,strided batched GEMM,
+7,工作区,workspace,库函数临时借用的显存
+7,布局,layout,CuTe：坐标到位置的映射（形状 + 步长）
+7,急切执行,eager execution,
+7,分派器,dispatcher,
+7,分派键,dispatch key,
+7,缓存分配器,caching allocator,
+7,激活重计算,activation recomputation,也称激活检查点（activation checkpointing）
+7,自定义算子,custom operator,
+7,守卫,guard,
+7,图中断,graph break,
+7,句柄,handle,
+7,计算类型,compute type,矩阵乘法累加所用的精度

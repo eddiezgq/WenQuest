@@ -1,0 +1,43 @@
+标题: ["GPU 实验 7.6 一次训练迭代调用了哪些核函数", "GPU Lab 7.6 Which kernels does one training step launch?"]
+目的: ["用 torch.profiler 与 Nsight Systems 记录小型 Transformer 的一次训练迭代，数出核函数的个数，找出最费时的核函数，算出矩阵乘法占的时间；打开 TF32 再测。",
+       "Record one training step of the small Transformer with torch.profiler and Nsight Systems, count the kernels, find the most expensive ones and the share of time in matrix multiplication; then enable TF32 and measure again."]
+显卡: basic
+结果:
+  - {名: kernels, 说明: ["一次迭代的核函数个数", "kernels per step"], 单位: ""}
+  - {名: gemm_kernels, 说明: ["其中矩阵乘法", "of which GEMMs"], 单位: ""}
+  - {名: gemm_pct, 说明: ["矩阵乘法占 GPU 时间", "GEMM share of GPU time"], 单位: "%"}
+  - {名: gpu_ms, 说明: ["核函数时间之和", "sum of kernel times"], 单位: ms}
+  - {名: step_ms, 说明: ["一次迭代（单精度）", "one step (FP32)"], 单位: ms}
+  - {名: tf32_step_ms, 说明: ["一次迭代（允许 TF32）", "one step (TF32 allowed)"], 单位: ms}
+文件: [model.py, step.py]
+实际问题:
+  标题: ["一行 loss.backward() 背后", "Behind one line of loss.backward()"]
+  内容: ["训练循环只有三行：前向、反向、更新。GPU 上实际执行了多少个核函数？时间花在矩阵乘法上，还是花在那些不起眼的逐元素运算上？",
+         "The training loop is three lines: forward, backward, update. How many kernels actually run on the GPU? Is the time in matrix multiplication or in the inconspicuous pointwise operations?"]
+原理:
+  - ["PyTorch 急切执行：每个运算经分派器各发出一个或几个核函数；矩阵乘法交给 cuBLAS，其余由 ATen 自己的核函数完成（7.5 节）。", "Eager PyTorch: each operation goes through the dispatcher and launches one or a few kernels; GEMMs go to cuBLAS, the rest to ATen's own kernels (Section 7.5)."]
+  - ["反向时自动微分按记录的图倒序执行各运算的反向，每个反向又是一个或几个核函数（7.6 节）。", "In the backward pass autograd runs each operation's backward in reverse order of the recorded graph, each again one or a few kernels (Section 7.6)."]
+  - ["逐元素运算受显存带宽限制：运算量很小，时间不一定小（算例 7.1.1）。", "Pointwise operations are bandwidth-bound: tiny in FLOPs, not necessarily in time (Example 7.1.1)."]
+步骤:
+  - ["运行第一格检查环境。", "Run the first cell."]
+  - ["记录一次训练迭代，读 key_averages 表（第 1 格）。", "Record one step and read the key_averages table (cell 1)."]
+  - ["数出核函数个数、矩阵乘法的个数与时间占比，列出最费时的 10 个核函数（任务 1）。", "Count kernels and GEMMs, compute the GEMM time share, list the 10 most expensive kernels (task 1)."]
+  - ["比较单精度与允许 TF32 时一次迭代的耗时（任务 2）。", "Compare one step in FP32 and with TF32 allowed (task 2)."]
+  - ["用 Nsight Systems 记录 step.py，看前向、反向、更新三段各占多少（任务 3）。", "Record step.py with Nsight Systems and see how long forward, backward and update take (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  一次训练迭代", "Table 1  One training step"]
+    表头: ["项目", "数值"]
+    表头英文: ["Item", "Value"]
+    行: [["核函数个数", "{{kernels}}"], ["矩阵乘法核函数个数", "{{gemm_kernels}}"], ["矩阵乘法占 GPU 时间（%）", "{{gemm_pct}}"], ["一次迭代，单精度（ms）", "{{step_ms}}"], ["一次迭代，允许 TF32（ms）", "{{tf32_step_ms}}"]]
+  - 标题: ["表 2  最费时的 5 个核函数", "Table 2  The five most expensive kernels"]
+    表头: ["名字（前 40 个字符）", "时间（ms）", "属于哪个运算（前向 / 反向，哪一层）"]
+    表头英文: ["Name (first 40 chars)", "Time (ms)", "Which operation (forward / backward, which layer)"]
+    行: [["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""]]
+注意:
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+  - ["profiler 自身有开销，记录下来的那一次迭代比正常慢；耗时以第 3 格的事件计时为准。", "The profiler adds overhead; use the event timing of cell 3 for the step time."]
+  - ["trace.json 与 step.nsys-rep 可以下载到自己的电脑上查看。", "Download trace.json and step.nsys-rep to view them on your computer."]
+思考题:
+  - ["一次迭代的核函数个数，是算例 7.1.1 数出的一次前向的几倍？多出来的是什么（反向、优化器）？", "How many times the forward-pass kernel count of Example 7.1.1 is the per-step count? What are the extra ones (backward, optimizer)?"]
+  - ["允许 TF32 以后快了多少？为什么远不到矩阵乘法峰值之比（62.5 / 31.2）？", "How much faster with TF32? Why far less than the peak ratio (62.5 / 31.2)?"]

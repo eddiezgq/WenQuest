@@ -10,8 +10,11 @@ import sys
 def nccl_flags():
     if os.path.exists("/usr/include/nccl.h"):
         return ["-lnccl"]
-    if subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--user", "nvidia-nccl-cu12"]).returncode != 0:
-        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "nvidia-nccl-cu12"], check=True)   # 虚拟环境里不能用 --user
+    for extra in (["--user"], [], ["--user", "--break-system-packages"]):     # 虚拟环境里不能用 --user；Ubuntu 24.04 的系统 Python 要加后者
+        if subprocess.run([sys.executable, "-m", "pip", "install", "-q", *extra, "nvidia-nccl-cu12"]).returncode == 0:
+            break
+    else:
+        raise RuntimeError("装不上 nvidia-nccl-cu12")
     import site
     base = next(p for p in [os.path.join(d, "nvidia", "nccl") for d in site.getsitepackages() + [site.getusersitepackages()]]
                 if os.path.exists(p))

@@ -5,7 +5,7 @@
 #       （--cap-add SYS_ADMIN 让 Nsight Compute 能读性能计数器，宿主机驱动还需允许非管理员读计数器，见帮助文件）
 FROM nvidia/cuda:12.8.1-devel-ubuntu24.04
 ENV DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 PIP_BREAK_SYSTEM_PACKAGES=1
-RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip git curl \
+RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-dev ninja-build build-essential git curl \
     && rm -rf /var/lib/apt/lists/*
 RUN pip3 install --index-url https://download.pytorch.org/whl/cu128 torch \
     && pip3 install triton jupyterlab numpy matplotlib pyyaml
