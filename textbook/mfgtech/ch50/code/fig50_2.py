@@ -9,14 +9,14 @@ A, P = C.Assembly, C.Part
 LEN = 167.0
 
 # ---- 图 50.2.1：五个状态（本工序加工的面着色）
-states = [("blank", "工序 10 下料：Ø50 × 182"), ("op20", "工序 20 粗车（调质前）"), ("op40", "工序 40 精车（调质后）"),
-          ("op50", "工序 50 铣键槽"), ("op60", "工序 60 磨外圆（成品）")]
+states = [("blank", "(a) 工序 10 下料后：毛坯 Ø50 × 182"), ("op20", "(b) 工序 20 粗车后（调质前）"), ("op40", "(c) 工序 40 精车后（调质后）"),
+          ("op50", "(d) 工序 50 铣键槽后"), ("op60", "(e) 工序 60 磨外圆后（成品）")]
 pngs = []
 for st, _ in states:
     q = A(st)
     q.add(W.sh301(st, highlight=st != "blank"))
     pngs.append(R.render_png(q, 700, 300, camera={"dir": [0.35, -1.2, 0.55], "fit": [[-10, -26, -26], [178, 26, 26]]}))
-R.compose("fig50_2_1", pngs, 2, titles=[t + ("（橙色为本工序加工的面）" if i else "") for i, (_, t) in enumerate(states)])
+R.compose("fig50_2_1", pngs, 2, titles=[t for _, t in states])
 
 # ---- 图 50.2.2：工序 20 的两次安装
 def setup(n):
@@ -56,13 +56,16 @@ R.compose("fig50_2_2", [p1, p2], 2, titles=["安装 1：车右端面、钻右中
 # ---- 图 50.2.3：各工序的装夹：(a) 工序 40 两顶尖 + 鸡心夹头；(b) 工序 50 键槽铣夹具；(c) 工序 60 外圆磨床两顶尖
 lc = MA.lathe_centers(LEN, 0.0)
 lc.add(W.sh301("op40"))
-dog = S.tube("x", (0, 0), 26, 15, 12, 26) + S.box(12, 26, -6, 6, 24, 60)
+# 弯尾鸡心夹头：夹在左轴端，尾部沿轴向伸到拨盘的拨杆旁，贴住拨杆的侧面（主轴转动时拨杆推尾部带动工件）
+dog = S.tube("x", (0, 0), 26, 15, 12, 26) + S.box(12, 26, 14, 58, -20, -8) + S.box(-52, 26, 48, 58, -20, -8) \
+    + S.cyl("y", (19, 0), 4, 18, 32)
 lc.add(P("鸡心夹头", dog, "steel_dark"))
-pa = R.render_png(lc, 700, 420, camera={"dir": [0.45, -1.3, 0.5]})
+pa = R.render_png(lc, 700, 420, camera={"dir": [0.45, 1.3, 0.5]})    # 从拨杆一侧看，看得见夹头尾部贴住拨杆
 pb = R.render_png(J.assembly("op40", with_cutter=True), 700, 420, camera={"dir": M.ISO})
 gr = MA.lathe_centers(LEN, 0.0)
 gr.add(W.sh301("op60"))
+gr.add(P("鸡心夹头", dog, "steel_dark"))
 gr.add(P("砂轮（局部）", S.tube("x", (150 + 20.0, 0), 150, 50, 52, 112), "#9aa3ab"))
 pc = R.render_png(gr, 700, 420, camera={"dir": [0.45, -1.3, 0.5], "fit": [[-120, -60, -160], [300, 330, 160]]})
-R.compose("fig50_2_3", [pa, pb, pc], 3, titles=["(a) 工序 40 精车：两顶尖 + 鸡心夹头", "(b) 工序 50 铣键槽：键槽铣夹具 JJ-301-50", "(c) 工序 60 磨外圆：两顶尖，砂轮横向切入"])
+R.compose("fig50_2_3", [pa, pb, pc], 3, titles=["(a) 工序 40 精车：两顶尖 + 鸡心夹头", "(b) 工序 50 铣键槽：键槽铣夹具 JJ-301-50", "(c) 工序 60 磨外圆：两顶尖 + 鸡心夹头，砂轮横向进给"])
 out(n_fig3d=3)

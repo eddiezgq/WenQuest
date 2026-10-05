@@ -66,10 +66,9 @@ def vblock_sheet() -> Sheet:
     sh.roughness(face, "Ra 0.4", ang=-45)
     sh.roughness(mv.at((0, 22.0, apex + 22.0)), "Ra 0.4", ang=45)
     bl = mv.at((0, half, 0))
-    sh.line(bl, (bl[0] - 22, bl[1]))
-    sh.roughness((bl[0] - 14, bl[1]), "Ra 0.8")
-    sh.note((330, 26), "其余", 3.5)
-    sh.roughness((346, 30), "Ra 3.2")
+    sh.line(bl, (bl[0] - 40, bl[1]))
+    sh.roughness((bl[0] - 36, bl[1]), "Ra 0.8")
+    sh.roughness_rest((322, 30), "Ra 3.2")
     # 左视图：长度、工作面长度、孔的位置
     sh.dim(lv, (L, 0, H), (0, 0, H), f"{L:g}", offset=8)
     sh.dim(lv, (L, 0, 0), (L - land, 0, 0), f"{land:g}", offset=-10)
@@ -130,15 +129,14 @@ def setting_block_sheet() -> Sheet:
     c2 = mv.at((144, side, top + 11))                # 侧面对刀面（内角侧面）
     sh.gdt(c2, (x_right + 22, c2[1] - 22), "⊥", "0.005", "A")
     sh.roughness(mv.at((144, -4, top)), "Ra 0.4")
-    p_s = mv.at((144, side, top + 4))                # 侧面的粗糙度：水平引出到图外，符号站在引出线上
+    p_s = mv.at((144, side, top + 9))                # 侧面的粗糙度：水平引出到图外，符号站在引出线上
     sh.line(p_s, (x_right + 40, p_s[1]))
     sh.arrow(p_s, math.pi, 2.5)
     sh.roughness((x_right + 26, p_s[1]), "Ra 0.4")
     bl = mv.at((144, side + 20, 0))
-    sh.line(bl, (bl[0] - 20, bl[1]))
-    sh.roughness((bl[0] - 12, bl[1]), "Ra 0.8")
-    sh.note((330, 26), "其余", 3.5)
-    sh.roughness((346, 30), "Ra 3.2")
+    sh.line(bl, (bl[0] - 56, bl[1]))
+    sh.roughness((bl[0] - 52, bl[1]), "Ra 0.8")
+    sh.roughness_rest((322, 30), "Ra 3.2")
     # 左视图：长度、孔的 x 位置
     sh.dim(lv, (x1, 0, top + 14), (x0, 0, top + 14), f"{x1 - x0:g}", offset=8)
     sh.dim(lv, (158, 0, 0), (130, 0, 0), "28", offset=-26)

@@ -53,7 +53,7 @@ characteristics:         # 图纸全部特性；key: true 为关键特性（检�
   - {id: C6, name: 键槽对称度, spec: "0.02（对齿轮位轴线）", kind: geo}
   - {id: C7, name: 轴承位径向圆跳动, spec: "0.012（对 A–B 公共轴线）", kind: geo, key: true}
   - {id: C8, name: 齿轮位径向圆跳动, spec: "0.015（对 A–B 公共轴线）", kind: geo}
-  - {id: C9, name: 齿轮定位轴肩端面圆跳动, spec: "0.02（对 A–B 公共轴线）", kind: geo}
+  - {id: C9, name: 轴承定位轴肩端面圆跳动（齿轮位两端面）, spec: "0.02（对 A–B 公共轴线）", kind: geo}
   - {id: C10, name: 轴承位、齿轮位表面粗糙度, spec: "Ra 0.8 μm", kind: rough, qms: 轴承位粗糙度 Roughness Ra (μm)}
   - {id: C11, name: 其余表面粗糙度, spec: "轴端、键槽侧面 Ra 3.2 μm，其余 Ra 6.3 μm", kind: rough}
   - {id: C12, name: 总长与各段长度, spec: "167；未注公差按 GB/T 1804-m（±0.5）", nominal: 167, es: 0.5, ei: -0.5, kind: dim}
@@ -194,7 +194,7 @@ operations:
       - {char: "Ø35.3、Ø40.3（0/−0.039）", gauge: G03, freq: 首件、每 5 件}
       - {char: "轴端 Ø30 h8（C3）", gauge: G03, freq: 首件、每 5 件}
       - {char: "总长 167±0.2（工序控制，严于图纸 C12 的 ±0.5：由工艺尺寸跟踪图定出，保证齿轮位长度 60 和轴肩的精车余量，第 53 章）、各段长度", gauge: G02, freq: 首件、每 10 件}
-      - {char: "齿轮定位轴肩端面圆跳动 0.02（C9）", gauge: G05, freq: 首件、每 10 件}
+      - {char: "轴承定位轴肩端面圆跳动 0.02（C9）", gauge: G05, freq: 首件、每 10 件}
       - {char: "齿轮位跳动 ≤ 0.006（对两中心孔连线；保证铣键槽的对称度，第 51 章）", tir: 0.006, gauge: G05, freq: 首件、每 10 件}
   - seq: 50
     operation: 铣键槽 Keyway milling

@@ -187,7 +187,7 @@ class Sheet:
         p2 = (tip[0] + size * math.cos(a2), tip[1] + size * math.sin(a2))
         self.items.append(f'<path d="M{_f(tip[0])},{_f(tip[1])} L{_f(p1[0])},{_f(p1[1])} L{_f(p2[0])},{_f(p2[1])} Z" fill="{color}"/>')
 
-    def dim(self, view: View, p1, p2, text, offset=10.0, orient="h", size=3.5, color="#000", ext=True, text_shift=0.0):
+    def dim(self, view: View, p1, p2, text, offset=10.0, orient="h", size=3.5, color="#000", ext=True, text_shift=0.0, dev=None):
         """线性尺寸：三维点 p1、p2 在视图上的水平（h）、竖直（v）或沿两点（a）方向的距离；offset 是尺寸线离 p1（h：向上为正；v：向左为正）的距离（图纸 mm）。"""
         a, b = view.at(p1), view.at(p2)
         if orient == "h":
@@ -225,7 +225,20 @@ class Sheet:
         # 文字在尺寸线上方（竖直尺寸在左侧，字头朝左）
         off = 1.0
         tx, ty = mx + off * math.sin(math.radians(deg)), my - off * math.cos(math.radians(deg))
-        self.text((tx, ty), text, size, rot=deg, color=color)
+        if dev is None:
+            self.text((tx, ty), text, size, rot=deg, color=color)
+        else:                              # 上、下偏差叠写在基本尺寸之后（字高小一号，GB/T 4458.5）
+            es, ei = dev
+            fmt = lambda v: "0" if abs(v) < 1e-12 else f"{v:+g}".replace("-", "−")  # noqa: E731
+            sz = size * 0.72
+            wm = len(text) * size * 0.6
+            wd = max(len(fmt(es)), len(fmt(ei))) * sz * 0.6
+            x0 = tx - (wm + wd + 0.8) / 2
+            g = [f'<g transform="rotate({_f(deg)} {_f(tx)} {_f(ty)})" font-family="{FONT}" fill="{color}">',
+                 f'<text x="{_f(x0)}" y="{_f(ty)}" font-size="{size}">{escape(text)}</text>',
+                 f'<text x="{_f(x0 + wm + 0.8)}" y="{_f(ty - size * 0.55)}" font-size="{_f(sz)}">{escape(fmt(es))}</text>',
+                 f'<text x="{_f(x0 + wm + 0.8)}" y="{_f(ty + size * 0.1)}" font-size="{_f(sz)}">{escape(fmt(ei))}</text>', "</g>"]
+            self.items.append("".join(g))
         return tw
 
     def dia_dim(self, view: View, p_axis, d, text, along=(1, 0, 0), offset=0.0, size=3.5):
@@ -289,8 +302,9 @@ class Sheet:
         self.arrow(p, math.atan2(p[1] - q[1], p[0] - q[0]), 2.5)
         self.text(((q[0] + q2[0]) / 2, q[1] - 1.0), text, size)
 
-    def gdt(self, p, q, symbol, value, datum="", size=3.5):
-        """形位公差框格：引线从被测要素 p 指向框格左端 q（箭头在 p）。"""
+    def gdt(self, p, q, symbol, value, datum="", size=3.5, via=None):
+        """形位公差框格：引线从被测要素 p 指向框格左端 q（箭头在 p）。via：引线的折点（箭头沿 p→via 方向，
+        便于让箭头垂直于被测表面或与尺寸线对齐，GB/T 1182）。"""
         cells = [symbol, value] + ([datum] if datum else [])
         h = size * 2
         ws = [h] + [max(h, len(c) * size * 0.65 + 2) for c in cells[1:]]
@@ -304,8 +318,13 @@ class Sheet:
             else:
                 self.text((x + w / 2, q[1] + size * 0.36), c, size)
             x += w
-        self.line(p, (q[0], q[1]))
-        self.arrow(p, math.atan2(p[1] - q[1], p[0] - q[0]), 2.5)
+        if via is not None:
+            self.line(p, via)
+            self.line(via, (q[0], q[1]))
+            self.arrow(p, math.atan2(p[1] - via[1], p[0] - via[0]), 2.5)
+        else:
+            self.line(p, (q[0], q[1]))
+            self.arrow(p, math.atan2(p[1] - q[1], p[0] - q[0]), 2.5)
 
     def datum(self, p, letter, direction=(0, 1), size=3.5):
         """基准符号（GB/T 1182）：涂黑三角形贴在要素上，连线到方框和字母。direction：从要素指向方框（图纸坐标）。"""
@@ -332,9 +351,20 @@ class Sheet:
         if removal:
             g.append(f'<line x1="{_f(-h1 * 0.58)}" y1="{_f(-h1)}" x2="{_f(h1 * 0.58)}" y2="{_f(-h1)}" stroke="#000" stroke-width="{THIN}"/>')
         g.append(f'<line x1="{_f(h1 * 1.2)}" y1="{_f(-h1 * 2.1)}" x2="{_f(h1 * 1.2 + len(ra) * size * 0.62 + 2)}" y2="{_f(-h1 * 2.1)}" stroke="#000" stroke-width="{THIN}"/>')
-        g.append(f'<text x="{_f(h1 * 1.2 + 1)}" y="{_f(-h1 * 2.1 - 0.8)}" font-size="{size}" font-family="{FONT}">{escape(ra)}</text>')
+        # GB/T 131-2006：参数写在长横线的下方（位置 a）
+        g.append(f'<text x="{_f(h1 * 1.2 + 0.8)}" y="{_f(-h1 * 2.1 + size * 1.05)}" font-size="{size}" font-family="{FONT}">{escape(ra)}</text>')
         g.append("</g>")
         self.items.append("".join(g))
+
+    def roughness_rest(self, at, ra, size=3.5):
+        """其余表面的粗糙度（GB/T 131-2006）：标题栏附近写“符号 + 参数”，后面括号里画一个基本符号，表示图上另有标注。"""
+        x, y = at
+        self.roughness((x, y), ra, size=size)
+        h1 = size * 1.4
+        xb = x + h1 * 1.2 + len(ra) * size * 0.62 + 6
+        self.text((xb, y - 1), "（", size, anchor="middle")
+        self.roughness((xb + 4.5, y), "", size=size * 0.8)
+        self.text((xb + 11, y - 1), "）", size, anchor="middle")
 
     def centerline(self, view: View, p1, p2, extend=3.0):
         a, b = view.at(p1), view.at(p2)
@@ -388,14 +418,19 @@ class Sheet:
         R(tx, ty, 58, 24)
         T(tx + 29, ty + 9, self.company, 4.5, b=True)
         T(tx + 29, ty + 17, self.sheet_no, 3)
-        # 中：材料、比例、数量、重量
+        # 中：材料、比例、数量、质量
         R(tx + 58, ty, 72, 18); T(tx + 94, ty + 12, self.material, 5)
-        for i, (k, val) in enumerate((("比例", self.scale_text), ("数量", self.qty), ("重量", self.mass))):
+        for i, (k, val) in enumerate((("比例", self.scale_text), ("数量", self.qty), ("质量", self.mass))):
             x = tx + 58 + i * 24
             R(x, ty + 18, 24, 8); R(x, ty + 26, 24, 8)
             T(x + 12, ty + 23.5, k); T(x + 12, ty + 31.5, val)
         R(tx + 58, ty + 34, 72, 22)
-        T(tx + 94, ty + 47, "（第一角画法）", 3)
+        # 第一角画法的投影符号（GB/T 14692）：截锥的主视图（梯形，小端在右），左视图（两个同心圆）放在它的右边
+        cx, cy = tx + 86, ty + 46
+        s.append(f'<path d="M{_f(cx - 9)},{_f(cy - 4)} L{_f(cx - 1)},{_f(cy - 2)} L{_f(cx - 1)},{_f(cy + 2)} L{_f(cx - 9)},{_f(cy + 4)} Z" fill="none" stroke="#000" stroke-width="{THIN}"/>')
+        s.append(f'<line x1="{_f(cx - 11)}" y1="{_f(cy)}" x2="{_f(cx + 1)}" y2="{_f(cy)}" stroke="#000" stroke-width="0.18" stroke-dasharray="3 0.8 0.6 0.8"/>')
+        s.append(f'<circle cx="{_f(cx + 8)}" cy="{_f(cy)}" r="4" fill="none" stroke="#000" stroke-width="{THIN}"/>')
+        s.append(f'<circle cx="{_f(cx + 8)}" cy="{_f(cy)}" r="2" fill="none" stroke="#000" stroke-width="{THIN}"/>')
         # 右：图名、图号
         R(tx + 130, ty, 50, 28); T(tx + 155, ty + 17, self.title, 6 if len(self.title) <= 7 else 4.5, b=True)
         R(tx + 130, ty + 28, 50, 28); T(tx + 155, ty + 45, self.code, 5)

@@ -87,8 +87,14 @@ def dial_indicator(tip=(0, 0, 0), stem_dir=(0, 0, 1), base_at=(120, 0, -60)):
     a.add(Part("表座", S.box(base_at[0] - 30, base_at[0] + 30, base_at[1] - 25, base_at[1] + 25, base_at[2] - 55, base_at[2]), "rubber"))
     # 立杆、横杆
     post = S.cyl("z", (base_at[0], base_at[1]), 6, base_at[2], tz + 70)
-    arm = S.cyl("x", (base_at[1], tz + 64), 5, min(tx, base_at[0]), max(tx, base_at[0]))
-    a.add(Part("表杆", post + arm, "steel_dark"))
+    # 横杆：先沿 y 从立杆伸到表头所在的 y，再沿 x 伸到表头上方（表座不在表头正侧方时是 L 形）
+    bx, by = base_at[0], base_at[1]
+    arm = post
+    if abs(by - ty) > 0.5:
+        arm = arm + S.cyl("y", (bx, tz + 64), 5, min(by, ty) - 5, max(by, ty))
+    if abs(bx - tx) > 0.5:
+        arm = arm + S.cyl("x", (ty, tz + 64), 5, min(tx, bx) - 5, max(tx, bx) + 5)
+    a.add(Part("表杆", arm, "steel_dark"))
     stem = S.cyl("z", (tx, ty), 2.5, tz, tz + 22)
     dial = S.cyl("y", (tx, tz + 42), 28, ty - 8, ty + 8)
     a.add(Part("表头", stem + dial, "steel"))
