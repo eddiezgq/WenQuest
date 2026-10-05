@@ -22,7 +22,7 @@ class Lesson(Base):
         eps = ValueTracker(0.0)            # 度
 
         axis_i = Line(S(0, -0.68), S(0, 0.42), color=GREY_B, stroke_width=5)
-        lab_i = zh("轴 i", 22, GREY_B).next_to(axis_i.get_top(), LEFT, buff=0.15)
+        lab_i = bi(["轴 i", "axis i"], 22, GREY_B).next_to(axis_i.get_top(), LEFT, buff=0.15)
         frame0 = VGroup(Arrow(S(0, 0), S(0.12, 0), buff=0, color=RED, stroke_width=5),
                         Arrow(S(0, 0), S(0, 0.12), buff=0, color=BLUE, stroke_width=5))
         lab_f = MathTex(r"\{i-1\}", font_size=28).next_to(S(0, 0), LEFT, buff=0.15)
@@ -36,7 +36,7 @@ class Lesson(Base):
             return Line(S(*p0), S(*p1), color=WHITE, stroke_width=5)
 
         ax_n = always_redraw(axis_n)
-        lab_n = zh("轴 i+1", 22, WHITE).move_to(S(A + 0.2, 0.42))
+        lab_n = bi(["轴 i+1", "axis i+1"], 22, WHITE).move_to(S(A + 0.2, 0.42))
         self.add(ax_n, lab_n)
 
         def dh_marks():
@@ -64,7 +64,7 @@ class Lesson(Base):
                      "Tilt axis i+1 and the axes meet: a drops to 0, the origin of {i} jumps to the crossing")
         self.play(eps.animate.set_value(3.0), run_time=3.0, rate_func=smooth)
         self.play(eps.animate.set_value(0.5), run_time=1.5)
-        self.caption("ε 越小，交点越远：ε = 0.01° 时 d ≈ −2435 m", "The smaller ε, the farther the crossing: d ≈ −2435 m at ε = 0.01°")
+        self.caption("ε 越小，交点越远：ε = 0.01° 时 d ≈ −2435 m", "The smaller ε, the farther the crossing: d ≈ −2,435 m at ε = 0.01°")
         self.play(eps.animate.set_value(-0.5), run_time=0.8, rate_func=linear)
         self.caption("向另一侧偏转：d 从 −∞ 跳到 +∞——参数随几何不连续", "Tilt the other way: d jumps from −∞ to +∞; the parameters are not continuous")
 

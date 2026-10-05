@@ -13,7 +13,7 @@
   - ["φ = 90°，ε = 0.5°（任务 4），记录 DH 的 a、α、d，说明面外偏转为什么不引起突变。", "Set φ = 90°, ε = 0.5° (task 4); record DH a, α, d and explain why an out-of-plane tilt causes no jump."]
   - ["切换到“两支筷子”，调节 ε 使交点在约 1 m 处（任务 5），记录 ε，并用 d = a cot ε 验证。", "Switch to “chopsticks”, adjust ε so that they meet about 1 m away (task 5); record ε and check with d = a cot ε."]
 数据表:
-  - 标题: ["表 1  偏转角与三种参数（a = 0.425 m，φ = 0°）", "Table 1  Tilt and the three parameterisations (a = 0.425 m, φ = 0°)"]
+  - 标题: ["表 1  偏转角与三种参数（a = 0.425 m，φ = 0°）", "Table 1  Tilt and the three parameterizations (a = 0.425 m, φ = 0°)"]
     表头: ["ε / °", "DH a / m", "DH d / m", "哈亚蒂 β / °", "|S − S₀|"]
     表头英文: ["ε / °", "DH a / m", "DH d / m", "Hayati β / °", "|S − S₀|"]
     行: [["0", "", "", "", ""], ["0.01", "", "", "", ""], ["−0.01", "", "", "", ""], ["0.1", "", "", "", ""], ["1", "", "", "", ""]]

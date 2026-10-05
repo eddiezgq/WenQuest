@@ -33,7 +33,7 @@ WQ.lab({
       demo: { scene: "chop", set: { eps: 1.72, phi: 0 }, press: [] } },
   ],
   think: ["指数积的旋量轴 S 随 ε 的变化量与 ε 成正比，哈亚蒂的 β 等于 ε，而 DH 的 d 与 ε 成反比。做最小二乘标定时，哪一种参数化会出问题？为什么？",
-          "The change of the screw axis S is proportional to ε, Hayati's β equals ε, but DH d is inversely proportional to ε. In least-squares calibration, which parameterisation causes trouble, and why?"],
+          "The change of the screw axis S is proportional to ε, Hayati's β equals ε, but DH d is inversely proportional to ε. In least-squares calibration, which parameterization causes trouble, and why?"],
 
   A(api) { return api.scene === "chop" ? 0.03 : 0.425; },
   geo(api) {
