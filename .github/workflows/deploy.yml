@@ -115,9 +115,11 @@ jobs:
           fi
           if [ "${{ matrix.book }}" = ai ]; then   # 《人工智能》：CUDA 程序的编译检查（clang + NVIDIA 的头文件包）与 Numba 的 CUDA 模拟器
             pip install -q nvidia-cuda-runtime-cu12 nvidia-cuda-nvcc-cu12 nvidia-cuda-cccl-cu12 nvidia-curand-cu12 numba
-            # cuBLAS（第 5 章与它比较）：软件包 580 MB，只解出头文件
-            pip download -q --no-deps -d "$RUNNER_TEMP/blas" nvidia-cublas-cu12
-            unzip -q -o "$RUNNER_TEMP"/blas/*.whl 'nvidia/cublas/include/*' -d "$(python -c 'import nvidia, os; print(os.path.dirname(list(nvidia.__path__)[0]))')"
+            # cuBLAS（第 5 章）与 NCCL（第 6 章）：软件包很大，只解出头文件
+            pip download -q --no-deps -d "$RUNNER_TEMP/blas" nvidia-cublas-cu12 nvidia-nccl-cu12
+            site="$(python -c 'import nvidia, os; print(os.path.dirname(list(nvidia.__path__)[0]))')"
+            unzip -q -o "$RUNNER_TEMP"/blas/nvidia_cublas*.whl 'nvidia/cublas/include/*' -d "$site"
+            unzip -q -o "$RUNNER_TEMP"/blas/nvidia_nccl*.whl 'nvidia/nccl/include/*' -d "$site"
             rm -rf "$RUNNER_TEMP/blas"
             which clang++ > /dev/null || sudo apt-get install -y -qq clang > /dev/null
           fi

@@ -1,0 +1,19 @@
+# 实验 6.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab6_4.js。
+原理:
+  - ["α–β 模型：发一条 m 字节的消息要 α + m/β。小消息时延迟 α 主导，大消息时带宽 β 主导（6.4.2 节）。", "α–β model: an m-byte message costs α + m/β; latency dominates small messages, bandwidth large ones (Section 6.4.2)."]
+  - ["环形全归约 = 归约—散播 p − 1 步 + 全收集 p − 1 步，每块 GPU 共发出 2(p − 1)/p 倍的数组，达到下限（6.4.3 节）。", "Ring all-reduce = p − 1 reduce-scatter steps + p − 1 all-gather steps; each GPU sends 2(p − 1)/p of the array, the lower bound (Section 6.4.3)."]
+  - 式: "T_环形 = 2(p − 1)α + 2(p − 1)/p · n/β；总线带宽 = n/T × 2(p − 1)/p"
+步骤:
+  - ["“耗时与带宽”场景：默认设置下记录三种算法的耗时与总线带宽，填入表 1（任务 1）。", "Time and bandwidth: record all three algorithms at the defaults in Table 1 (task 1)."]
+  - ["消息改成 8 KiB，再记录一次（任务 2）；消息 1 MiB、GPU 数 64（任务 3）；链路改成 30 GB/s（任务 4）。", "Repeat with 8 KiB (task 2); 1 MiB and 64 GPUs (task 3); a 30 GB/s link (task 4)."]
+  - ["“环形全归约”场景：4 块 GPU，看完 6 步（任务 5）。", "Ring scene: 4 GPUs, watch all 6 steps (task 5)."]
+数据表:
+  - 标题: ["表 1  全归约的耗时（α = 2 μs）", "Table 1  All-reduce time (α = 2 μs)"]
+    表头: ["条件", "朴素", "环形", "树形"]
+    表头英文: ["Case", "Naive", "Ring", "Tree"]
+    行: [["8 块，16 GiB，300 GB/s", "", "", ""], ["8 块，8 KiB，300 GB/s", "", "", ""], ["64 块，1 MiB，300 GB/s", "", "", ""], ["8 块，16 GiB，30 GB/s", "", "", ""]]
+注意:
+  - ["这是模型：真实的 NCCL 还会同时开多个通道、在 NVSwitch 上做硬件归约、在小消息时换用别的协议，实测（表 6.4.1）与模型会有出入。", "A model: real NCCL runs several channels, can reduce in NVSwitch hardware and switches protocols for small messages, so measurements (Table 6.4.1) differ."]
+  - ["“环形全归约”场景最多画 8 块 GPU。", "The ring scene draws at most 8 GPUs."]
+思考题:
+  - ["消息多大时环形开始比树形快？这个分界随 GPU 数怎样变？", "From what message size does the ring beat the tree? How does that change with the GPU count?"]

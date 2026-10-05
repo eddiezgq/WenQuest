@@ -99,7 +99,7 @@ class AutoDL(Provider):
         return data.get("data")
 
     async def launch(self, tier: str, label: str) -> str:
-        spec = self.specs.get(tier)
+        spec = self.specs.get(tier) or (self.specs.get("basic") if tier == "profile" else None)   # 没配性能分析机型时用普通机型（实验里有读不到计数器的退路）
         if not spec or ":" not in spec:
             raise EngineError("gpu_unavailable", f"no AutoDL machine for {tier}", 503)
         gpu, image = spec.split(":", 1)
@@ -150,7 +150,7 @@ class Lambda(Provider):
         return data.get("data")
 
     async def launch(self, tier: str, label: str) -> str:
-        kind = self.types.get(tier)
+        kind = self.types.get(tier) or (self.types.get("basic") if tier == "profile" else None)
         if not kind:
             raise EngineError("gpu_unavailable", f"no Lambda machine for {tier}", 503)
         data = await self._call("POST", "/instance-operations/launch", json={

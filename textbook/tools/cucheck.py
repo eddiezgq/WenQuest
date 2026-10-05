@@ -3,7 +3,7 @@
 clang 分两步检查：设备端（编译成指定架构的机器码，经 ptxas）与主机端。只编译、不链接、不运行——运行与计时在云端 GPU 上做
 （gpurun.py、GPU 实验）。所需的 CUDA 头文件与 ptxas 来自 NVIDIA 在 PyPI 上发布的软件包
 （nvidia-cuda-runtime-cu12、nvidia-cuda-nvcc-cu12、nvidia-cuda-cccl-cu12、nvidia-curand-cu12；cuBLAS 的软件包有 580 MB，
-只需从中解出头文件 nvidia/cublas/include，见 .github/workflows/deploy.yml），本工具把它们拼成 clang 认得的 CUDA 目录。也可以用环境变量 WQ_CUDA_ROOT 指向一个完整的 CUDA 工具包。
+只需从中解出头文件 nvidia/cublas/include；NCCL 同样只解出 nvidia/nccl/include，见 .github/workflows/deploy.yml），本工具把它们拼成 clang 认得的 CUDA 目录。也可以用环境变量 WQ_CUDA_ROOT 指向一个完整的 CUDA 工具包。
 
     python3 textbook/tools/cucheck.py file.cu ...        # 逐个检查，打印问题
 """
@@ -39,14 +39,15 @@ def cuda_root() -> Path | None:
     if not (rt and cc and nvcc and (nvcc / "bin" / "ptxas").exists()):
         return None
     root = Path(tempfile.gettempdir()) / "wq-cuda-root"
-    blas = find("cublas/include")
-    stale = blas is not None and not (root / "include" / "cublas_v2.h").exists()   # 后来才装上 cuBLAS 头文件：重拼
+    blas, nccl = find("cublas/include"), find("nccl/include")
+    stale = (blas is not None and not (root / "include" / "cublas_v2.h").exists()) or \
+            (nccl is not None and not (root / "include" / "nccl.h").exists())        # 后来才装上 cuBLAS、NCCL 的头文件：重拼
     if stale or not (root / "include" / "cuda_runtime.h").exists():
         shutil.rmtree(root, ignore_errors=True)
         (root / "bin").mkdir(parents=True)
         inc = root / "include"
         inc.mkdir()
-        for src in (rt, cc, nvcc / "include", find("curand/include"), blas):
+        for src in (rt, cc, nvcc / "include", find("curand/include"), blas, nccl):
             if src:
                 for f in src.rglob("*"):
                     if f.is_file():

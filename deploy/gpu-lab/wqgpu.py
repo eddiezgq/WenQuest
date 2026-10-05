@@ -54,6 +54,9 @@ def env() -> dict:
     m = re.search(r"release ([\d.]+)", v)
     if m:
         e["nvcc"] = m.group(1)
+    if shutil.which("nsys"):
+        m = re.search(r"([\d.]{4,})", _run(["nsys", "--version"]))
+        e["nsys"] = m.group(1) if m else "yes"
     if shutil.which("ncu"):
         m = re.search(r"([\d.]{4,})", _run(["ncu", "--version"]))
         e["ncu"] = m.group(1) if m else "yes"
@@ -83,7 +86,8 @@ def check(need: tuple[str, ...] = ("gpu", "nvcc", "torch")) -> dict:
              "nvcc": "没有 nvcc：运行  conda install -y -c nvidia cuda-nvcc  或换带 CUDA 开发工具的镜像。",
              "torch": "没有 PyTorch：运行  pip install torch。",
              "triton": "没有 Triton：运行  pip install triton。",
-             "ncu": "没有 Nsight Compute 命令行（ncu）：本实验需要能读性能计数器的机器（第 7 章用虚拟机）。"}
+             "nsys": "没有 Nsight Systems 命令行（nsys）：换带 CUDA 开发工具的镜像，或从 NVIDIA 网站下载安装。",
+             "ncu": "没有 Nsight Compute 命令行（ncu）：本实验需要能读性能计数器的机器（虚拟机，或请管理员开放权限）。"}
     missing = [n for n in need if n not in e]
     for n in missing:
         print("  ✗", hints.get(n, n))

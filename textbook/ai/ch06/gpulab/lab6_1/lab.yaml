@@ -1,0 +1,38 @@
+标题: ["GPU 实验 6.1 三个流的重叠", "GPU Lab 6.1 Overlapping with three streams"]
+目的: ["测出一帧图像的上传、处理、传回时间，比较一个流与三个流处理 12 帧的总时间，用 Nsight Systems 画出时间线，亲眼看到传输与计算的重叠。",
+       "Measure the upload, processing and download time of a frame, compare 12 frames on one stream and on three, and draw the timeline with Nsight Systems to see transfers overlap computation."]
+显卡: basic
+结果:
+  - {名: h2d_ms, 说明: ["一帧上传", "upload per frame"], 单位: ms}
+  - {名: kern_ms, 说明: ["一帧处理", "processing per frame"], 单位: ms}
+  - {名: d2h_ms, 说明: ["一帧传回", "download per frame"], 单位: ms}
+  - {名: serial_ms, 说明: ["12 帧，一个流", "12 frames, one stream"], 单位: ms}
+  - {名: streams_ms, 说明: ["12 帧，三个流", "12 frames, three streams"], 单位: ms}
+  - {名: engines, 说明: ["复制引擎个数", "copy engines"], 单位: ""}
+  - {名: model_ms, 说明: ["式 (6.1.1) 的估计", "estimate by Eq. (6.1.1)"], 单位: ms}
+文件: [streams.cu, check.cuh, bench.cuh]
+实际问题:
+  标题: ["检测工位的流水线", "The inspection pipeline"]
+  内容: ["每帧彩色图像要从主机传到 GPU，处理完再把结果传回。传输比计算还慢，能不能在传下一帧的同时处理这一帧？",
+         "Each colour frame goes from the host to the GPU and the result comes back. Transfers take longer than the computation: can the next frame move while this one is processed?"]
+原理:
+  - ["同一个流里的操作按顺序执行，不同流之间可以重叠；复制引擎与 SM 是不同的硬件（6.1 节）。", "Operations in one stream run in order; different streams may overlap; copy engines and SMs are separate hardware (Section 6.1)."]
+  - ["异步复制要求主机一侧是锁页内存（cudaMallocHost）。", "Asynchronous copies need pinned host memory (cudaMallocHost)."]
+  - 式: "T ≈ (t_h + t_k + t_d) + (F − 1)·max(t_h, t_k, t_d)"
+步骤:
+  - ["运行第一格检查环境。", "Run the first cell."]
+  - ["编译运行 streams.cu，记录三段时间与两种做法的总时间，用式 (6.1.1) 算出估计值并比较（任务 1）。", "Compile and run streams.cu; record the three stage times and both totals, and compare with Eq. (6.1.1) (task 1)."]
+  - ["用 Nsight Systems 记录一次运行，看时间线上三个流的重叠（任务 2）。", "Record a run with Nsight Systems and look at the overlap of the three streams (task 2)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  一帧三段的时间与 12 帧的总时间", "Table 1  Stage times and 12-frame totals"]
+    表头: ["项目", "数值（ms）"]
+    表头英文: ["Item", "Value (ms)"]
+    行: [["上传", "{{h2d_ms}}"], ["处理", "{{kern_ms}}"], ["传回", "{{d2h_ms}}"], ["一个流", "{{serial_ms}}"], ["三个流", "{{streams_ms}}"], ["式 (6.1.1) 的估计", "{{model_ms}}"]]
+注意:
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+  - ["处理一帧的计算量在运行时自动调到与上传相当，所以不同 GPU 上的“处理”时间不同。", "The processing work is tuned at run time to match the upload, so it differs between GPUs."]
+  - ["Nsight Systems 的时间线文件（.nsys-rep）可以下载到自己的电脑上，用 Nsight Systems 图形界面打开。", "Download the timeline (.nsys-rep) and open it in the Nsight Systems GUI on your computer."]
+思考题:
+  - ["若只有一个复制引擎，三个流的总时间会怎样？", "With only one copy engine, how would the three-stream total change?"]
+  - ["把主机内存换成普通的 malloc，重叠还会发生吗？为什么？", "With ordinary malloc host memory, does overlap still happen? Why?"]

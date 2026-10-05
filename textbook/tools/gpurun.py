@@ -1,7 +1,7 @@
 """书中数字的 GPU 实测（《人工智能》第 14 轮附 4.4 节）。
 
 需要在 GPU 上测的程序放在 ``chNN/code/runs/<名>/``：
-- ``run.yaml``：显卡（basic / hopper / profile）、命令（默认 ``python3 run.py``）、说明；
+- ``run.yaml``：显卡（basic / hopper / profile / multi，multi 为 8 块 A100）、命令（默认 ``python3 run.py``）、说明；
 - 程序本身（.py、.cu 等）。命令运行结束时在当前文件夹写出 ``out.json``（{名称: 数值}）。
 
 实测记录是 ``chNN/code/runs/<名>.json``：程序指纹（本文件夹全部文件的 SHA-256）、时间、平台、机器型号、环境
@@ -34,7 +34,8 @@ ROOT = Path(__file__).resolve().parents[2]
 HELPER = ROOT / "deploy" / "gpu-lab" / "wqgpu.py"
 PENDING = "__pending__"
 LAMBDA = os.environ.get("LAMBDA_URL", "https://cloud.lambda.ai/api/v1")
-TYPES = {"basic": "gpu_1x_a10", "hopper": "gpu_1x_h100_sxm5", "profile": "gpu_1x_a10"}
+TYPES = {"basic": "gpu_1x_a10", "hopper": "gpu_1x_h100_sxm5", "profile": "gpu_1x_a10",
+         "multi": "gpu_8x_a100"}          # multi：8 块 A100 SXM（NVSwitch），第 6 章多 GPU 与集合通信
 
 
 def runs(book_root: Path, chapters: set[int]) -> list[tuple[int, str, Path]]:
@@ -95,9 +96,19 @@ def _scp(src: str, dst: str) -> None:
     subprocess.run(["scp", "-r", *_opts(), src, dst], check=True)
 
 
-def execute(folder: Path, region: str = "us-east-1") -> dict:
+def pick_region(kind: str, prefer: str = "us-east-1") -> str:
+    """有空闲机器的区域（多卡机器常常某个区域没有）；优先 prefer。都没有时报错，说明哪种机器没货。"""
+    info = _api("GET", "/instance-types").get(kind) or {}
+    regions = [r.get("name") for r in info.get("regions_with_capacity_available") or [] if r.get("name")]
+    if not regions:
+        raise RuntimeError(f"Lambda 上 {kind} 现在没有空闲的机器，稍后再试")
+    return prefer if prefer in regions else regions[0]
+
+
+def execute(folder: Path, region: str = "") -> dict:
     cfg = yaml.safe_load((folder / "run.yaml").read_text(encoding="utf-8")) or {}
     kind = TYPES[cfg.get("显卡", "basic")]
+    region = region or pick_region(kind)
     command = cfg.get("命令") or "python3 run.py"
     iid = _api("POST", "/instance-operations/launch", {"region_name": region, "instance_type_name": kind,
                                                        "ssh_key_names": [os.environ["LAMBDA_SSH_KEY_NAME"]], "name": f"wq-run-{folder.name}"})["instance_ids"][0]
@@ -132,7 +143,7 @@ def execute(folder: Path, region: str = "us-east-1") -> dict:
         _api("POST", "/instance-operations/terminate", {"instance_ids": [iid]})       # always stop the machine
 
 
-def main() -> None:
+def main() -> int:
     ap = argparse.ArgumentParser(description="书中数字的 GPU 实测")
     ap.add_argument("cmd", choices=["list", "run"])
     ap.add_argument("book")
@@ -141,6 +152,7 @@ def main() -> None:
     ap.add_argument("--stale", action="store_true", help="只测没有记录或指纹不符的")
     a = ap.parse_args()
     root = ROOT / "textbook" / a.book
+    failed = []
     for ch, name, folder in runs(root, {a.chapter}):
         if a.name and name != a.name:
             continue
@@ -148,8 +160,16 @@ def main() -> None:
         fresh = rec_p.exists() and json.loads(rec_p.read_text(encoding="utf-8")).get("fingerprint") == fingerprint(folder)
         print(f"{name}: {'有记录' if fresh else '待实测'}")
         if a.cmd == "run" and not (a.stale and fresh):
-            rec = execute(folder)
-            print("  ✓", rec["env"].get("gpu"), rec["values"])
+            try:                                            # 一个失败不影响其余的；最后统一报告
+                rec = execute(folder)
+                print("  ✓", rec["env"].get("gpu"), rec["values"])
+            except Exception as e:                          # noqa: BLE001
+                print(f"  ✗ {name}：{e}")
+                failed.append(name)
+    if failed:
+        print("没有测成：" + "、".join(failed))
+        return 1
+    return 0
 
 
 if __name__ == "__main__":

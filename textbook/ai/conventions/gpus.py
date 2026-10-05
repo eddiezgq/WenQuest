@@ -68,9 +68,15 @@ H100_SM = dict(
 # （S. Manjunath、R. Ramachandra，Concurrency Response of Plain Global Loads on the NVIDIA H100，arXiv:2608.15764，2026）
 H100_LAT = dict(l2=145e-9, hbm=353e-9)
 
-# 代表性的服务器 CPU（与第 1 章 _ch1.py 中 CPU 相同的教学假设，不对应某一型号）：64 核，3.0 GHz，每核每周期 64 FLOP（FP32），
-# 8 通道 DDR5-4800（307.2 GB/s）；访问内存的延迟取 100 ns（服务器 CPU 的常见量级，作估算用）
 # 主机与 GPU 之间的 PCIe 链路，每个方向的理论带宽（×16）：PCIe 4.0 每通道 16 GT/s、PCIe 5.0 32 GT/s，128b/130b 编码
 PCIE = {4: 16e9 * 16 * 128 / 130 / 8, 5: 32e9 * 16 * 128 / 130 / 8}
 
+# GPU 之间的互联（第 6 章），单位 B/s，每个 GPU 每个方向的总带宽（双向合计为它的两倍）。NVLink 每条链路每个方向 20 GB/s（第 1 代，P100）、25 GB/s（第 2—4 代），
+# 第 5 代 50 GB/s：V100 6 条、A100 12 条、H100 18 条、B200 18 条（NVIDIA V100/A100/H100 架构白皮书；HGX B200 数据手册）。
+# 机器之间：InfiniBand HDR 200 Gb/s、NDR 400 Gb/s，每块网卡每个方向（InfiniBand 规范；NVIDIA ConnectX-6/7 资料）。
+NVLINK = {"v100": 6 * 25e9, "a100": 12 * 25e9, "h100": 18 * 25e9, "b200": 18 * 50e9}
+IB = {"hdr": 200e9 / 8, "ndr": 400e9 / 8}
+
+# 代表性的服务器 CPU（与第 1 章 _ch1.py 中 CPU 相同的教学假设，不对应某一型号）：64 核，3.0 GHz，每核每周期 64 FLOP（FP32），
+# 8 通道 DDR5-4800（307.2 GB/s）；访问内存的延迟取 100 ns（服务器 CPU 的常见量级，作估算用）
 CPU = dict(cores=64, clock=3.0e9, flop_per_cycle=64, bw=8 * 4800e6 * 8, lat=100e-9, line=64)

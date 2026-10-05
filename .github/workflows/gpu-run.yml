@@ -49,6 +49,7 @@ jobs:
           [ "${{ inputs.stale }}" = "true" ] && args="$args --stale"
           python textbook/tools/gpurun.py $args
       - name: Commit the records
+        if: always()                    # 有一个没测成时，已测好的记录也要提交
         run: |
           git config user.name "WenQuest GPU runner"
           git config user.email "noreply@wenquestrobotics.com"

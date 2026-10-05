@@ -1,0 +1,39 @@
+标题: ["GPU 实验 6.5 读 Nsight Compute 报告", "GPU Lab 6.5 Reading a Nsight Compute report"]
+目的: ["用 Nsight Compute 分析第 5 章矩阵乘法的几个版本，从速度之光、内存负载、线程束停顿中找出瓶颈，与第 5、6 章的模型对照；改动一处再测。",
+       "Profile versions of the Chapter 5 matrix multiplication with Nsight Compute, find the bottleneck from Speed of Light, memory workload and warp stalls, compare with the models of Chapters 5 and 6, then change one thing and measure again."]
+显卡: profile
+结果:
+  - {名: can_profile, 说明: ["能否读性能计数器（1 能，0 不能）", "can read performance counters (1 yes, 0 no)"], 单位: ""}
+  - {名: tiled_GFs, 说明: ["tiled 的速度（正常运行）", "tiled speed (normal run)"], 单位: GFLOP/s}
+  - {名: vec_GFs, 说明: ["vec 的速度（正常运行）", "vec speed (normal run)"], 单位: GFLOP/s}
+  - {名: tiled_sm_pct, 说明: ["tiled 的 SM 利用率", "tiled SM throughput"], 单位: "%"}
+  - {名: vec_sm_pct, 说明: ["vec 的 SM 利用率", "vec SM throughput"], 单位: "%"}
+  - {名: tiled_mio, 说明: ["tiled 的 MIO throttle 停顿", "tiled MIO throttle stalls"], 单位: "%"}
+  - {名: vec_mio, 说明: ["vec 的 MIO throttle 停顿", "vec MIO throttle stalls"], 单位: "%"}
+  - {名: tiled_dram_GB, 说明: ["tiled 的实际显存流量（读 + 写）", "tiled DRAM traffic"], 单位: GB}
+文件: [gemm.cu, check.cuh, bench.cuh]
+实际问题:
+  标题: ["第 5 章的判断对不对", "Were Chapter 5's claims right?"]
+  内容: ["第 5 章说分块版被共享内存压住、寄存器分块版有存储体冲突、L2 让显存流量远小于估计。这些都是按模型推出来的，现在用硬件计数器检验。",
+         "Chapter 5 claimed the tiled kernel is held back by shared memory, the register-tiled one has bank conflicts, and the L2 keeps memory traffic far below the estimate. All from models; now check them against hardware counters."]
+原理:
+  - ["速度之光：计算与内存各用到峰值的百分之几，哪个高就受哪个限制，两个都低就是受延迟限制（6.5 节）。", "Speed of Light: the share of peak used by compute and by memory; the higher one is the limit, both low means latency-bound (Section 6.5)."]
+  - ["共享内存的预算：每个线程每次乘加最多读 0.25 次共享内存（5.8.2 节）；分层屋顶线中共享内存的屋脊约 2 FLOP/B（6.6 节）。", "Shared-memory budget: at most 0.25 reads per FMA per thread (Section 5.8.2); the shared-memory ridge is about 2 FLOP/B (Section 6.6)."]
+  - 式: "按某一层的计算强度 = 2n³ / 这一层搬运的字节数"
+步骤:
+  - ["运行第一格；编译 gemm.cu 正常运行一次，记下各版本的速度（任务 1）。", "Run the first cell; compile and run gemm.cu once and note each version's speed (task 1)."]
+  - ["用 ncu 分析 tiled、regtile、vec，读出 SM 与内存的利用率、实际显存流量、共享内存的访问与冲突、停顿原因，填入表 1（任务 2）。读不了计数器时，用书中表 6.5.1 的实测记录。", "Profile tiled, regtile and vec with ncu; fill Table 1 with SM and memory throughput, DRAM traffic, shared accesses and conflicts, and stalls (task 2). Without counter access, use the book's Table 6.5.1."]
+  - ["把 tiled 的块边长 T 改成 16，重新编译分析，与 32 比较（任务 3）。", "Change tiled's tile size T to 16, rebuild and profile; compare with 32 (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  三个版本的计数器", "Table 1  Counters of three versions"]
+    表头: ["版本", "SM 利用率", "内存利用率", "显存流量（GB）", "共享内存访问（百万次）", "存储体冲突（百万次）", "主要停顿"]
+    表头英文: ["Version", "SM %", "Memory %", "DRAM (GB)", "Shared accesses (M)", "Bank conflicts (M)", "Main stall"]
+    行: [["tiled", "{{tiled_sm_pct}}", "", "{{tiled_dram_GB}}", "", "", ""], ["regtile", "", "", "", "", "", ""], ["vec", "{{vec_sm_pct}}", "", "", "", "", ""]]
+注意:
+  - ["容器平台上普通用户往往读不到性能计数器（ERR_NVGPUCTRPERM），这时 ncu 会报错；用书中的实测记录完成分析即可。", "On container platforms ordinary users often cannot read counters (ERR_NVGPUCTRPERM); then complete the analysis with the book's recorded values."]
+  - ["ncu 会把被分析的核函数重放几十遍，程序要慢很多；只分析少数几个核函数（--kernel-name、--launch-count 1）。", "ncu replays the profiled kernel dozens of times; profile only a few kernels (--kernel-name, --launch-count 1)."]
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+思考题:
+  - ["实测的显存流量与“不计缓存”的估计差多少？说明了什么？", "How far is the measured DRAM traffic from the no-cache estimate? What does it show?"]
+  - ["vec 比 regtile 少了哪一类停顿？为什么？", "Which stall does vec have less of than regtile? Why?"]
