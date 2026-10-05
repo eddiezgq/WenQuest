@@ -44,12 +44,12 @@ cat "$OUT/calib_compare.json"
 endstep
 
 step "6c 第 2、4 章参数复核：门的逻辑努力与寄生延时、导线参数（与仓库相差 ≤ 5 %）"
-CALIB_OUT="$OUT/calib" SKY130_LIB="$LIB" python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/calib_gates.py" --check > "$OUT/calib_gates.log" 2>&1 || { fail=1; echo "::error::门参数复核未通过"; }
+CALIB_OUT="$OUT/calib" SKY130_LIB="$LIB" python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/calib_gates.py" --check > "$OUT/calib_gates.log" 2>&1 || { fail=1; echo "::error title=门参数复核未通过::$(tail -4 "$OUT/calib_gates.log" | tr '\n' ' ' | cut -c1-900)"; }
 tail -14 "$OUT/calib_gates.log"
 TECH=$(ls "$PDKPATH"/libs.tech/magic/sky130A.tech 2>/dev/null | head -1)
-python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/wires.py" "$TECH" --check > "$OUT/wires.log" 2>&1 || { fail=1; echo "::error::导线参数复核未通过"; }
+echo "tech file: $TECH"
+python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/wires.py" "$TECH" --check > "$OUT/wires.log" 2>&1 || { fail=1; echo "::error title=导线参数复核未通过::$(tail -4 "$OUT/wires.log" | tr '\n' ' ' | cut -c1-900)"; }
 cat "$OUT/wires.log"
-echo "::notice title=第 2、4 章参数复核::$(tail -1 "$OUT/calib_gates.log")；$(tail -1 "$OUT/wires.log")"
 endstep
 
 step "4c 8 位计数器 RTL→GDS（LibreLane）"
@@ -117,7 +117,10 @@ inv, c8 = s["inv"] or {}, s["counter8"] or {}
 print(f"::notice title=反相器::DRC {inv.get('drc_errors')}，LVS {inv.get('lvs_match')}，面积 {inv.get('area_um2')} μm²")
 print(f"::notice title=计数器 GDS::流片就绪 {c8.get('tapeout_ready')}，setup {c8.get('setup_ws_ns')} ns，hold {c8.get('hold_ws_ns')} ns，DRC {c8.get('magic_drc_errors')}，LVS {c8.get('lvs_errors')}，{c8.get('seconds')} s，内存峰值 {c8.get('peak_mem_mb')} MB")
 cc = s["calib_compare"] or {}
-print("::notice title=校准对照::" + "；".join(f"{k} {v['diff_pct']}%" for k, v in cc.items()))
+def last(p):
+    try: return open(os.path.join(o, p), encoding="utf-8").read().strip().splitlines()[-1][:300]
+    except Exception: return "无输出"
+print("::notice title=校准对照::" + "；".join(f"{k} {v['diff_pct']}%" for k, v in cc.items()) + f"。第 2、4 章：{last('calib_gates.log')}；{last('wires.log')}")
 cs = {k: j(f"capstone/{k}/result.json") or {} for k in ("step1", "step2", "step3", "step4")}
 s["capstone"] = cs
 json.dump(s, open(os.path.join(o, "summary.json"), "w"), indent=1, ensure_ascii=False)
