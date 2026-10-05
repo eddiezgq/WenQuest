@@ -73,7 +73,10 @@ def tessellate(shape, tol: float = 0.05, angular: float = 0.3, section_plane=Non
     face_color：face → 颜色或 None。返回 (vertices, triangles, on_section [bool...], colors [每个三角形的颜色或 None])。"""
     verts, tris, sec, cols = [], [], [], []
     for face in shape.faces():
-        vs, ts = face.tessellate(tol, angular)
+        try:
+            vs, ts = face.tessellate(tol, angular)
+        except AttributeError:          # 极小的退化面（布尔运算留下的碎面）没有网格，跳过
+            continue
         base = len(verts)
         verts.extend([[v.X, v.Y, v.Z] for v in vs])
         flag = False

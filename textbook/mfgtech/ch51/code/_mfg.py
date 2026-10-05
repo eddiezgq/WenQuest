@@ -1,4 +1,4 @@
-"""第 50、51 章共用：读数字工厂的数据（工厂数据、SH-301 工艺规程）、调用工艺文件生成器，把卡片做成书里的图。
+"""第 50–52 章共用（第 51 章另用 models3d/locating.py）：读数字工厂的数据（工厂数据、SH-301 工艺规程）、调用工艺文件生成器，把卡片做成书里的图。
 
 书里的卡片与数字工厂提交、审批、执行的是同一份数据（factory/digital/std/SH-301_process.yaml），
 由同一个程序生成（factory/digital/hub/cards.py）。卡片在书里是图：用浏览器把卡片排好版、截成图片，包在 SVG 里。
@@ -79,3 +79,38 @@ def deep(p):
 def tol():
     from hub import tolerance
     return tolerance
+
+
+def fx():
+    from hub import fixture
+    return fixture
+
+
+def fe():
+    from hub import fe2d
+    return fe2d
+
+
+def fixture_data(fid="JJ-301-50"):
+    return fx().load_fixture(fid)
+
+
+# ---------------------------------------------------------------- 三维图（第 13 轮 8.3）：数字工厂的三维模型 + render3d
+def m3d():
+    """返回 (core, workpiece, jj30150, elements, typical, machines, shapes) 七个模块。"""
+    from models3d import core, workpiece, jj30150, elements, typical, machines, shapes
+    return core, workpiece, jj30150, elements, typical, machines, shapes
+
+
+def r3d():
+    import render3d
+    return render3d
+
+
+ISO = [0.9, -1.25, 0.95]          # 书中三维图的常用视向（从右前上方看）
+
+
+def loc():
+    """第 51 章的补充模型：找正工具、更多定位元件、三坐标、手爪（models3d/locating.py）。"""
+    from models3d import locating
+    return locating

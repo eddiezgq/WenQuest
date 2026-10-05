@@ -47,7 +47,8 @@ function sectionMat(color) {
 function material(color, opacity) {
   return new THREE.MeshStandardMaterial({ color: new THREE.Color(color), roughness: 0.62, metalness: 0.12,
     transparent: opacity < 1, opacity, depthWrite: opacity >= 1, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
-    side: THREE.DoubleSide });
+    side: opacity < 1 ? THREE.FrontSide : THREE.DoubleSide,                 // 半透明件只画正面，背面叠上来会发暗
+    emissive: new THREE.Color(color).multiplyScalar(opacity < 1 ? 0.15 : 0) });
 }
 
 for (const p of S.parts) {
@@ -81,7 +82,7 @@ for (const p of S.parts) {
     const e = new THREE.LineSegments(new THREE.EdgesGeometry(g, S.edgeAngle ?? 28), EDGE);
     grp.add(e);
   }
-  if (S.outline !== false && (p.opacity ?? 1) > 0.35) grp.add(outlineMesh(g));
+  if (S.outline !== false && (p.opacity ?? 1) >= 0.99) grp.add(outlineMesh(g));
   grp.userData.base = new THREE.Vector3(0, 0, 0);
   grp.userData.explode = new THREE.Vector3(...(p.explode || [0, 0, 0]));
   scene.add(grp);
@@ -164,7 +165,7 @@ function applyState(st) {
     g.visible = ps.visible ?? true;
     if (ps.opacity !== undefined) for (const c of g.children) {
       if (!c.isMesh) continue;
-      if (c.userData.outline) { c.visible = ps.opacity > 0.35; continue; }
+      if (c.userData.outline) { c.visible = ps.opacity >= 0.99; continue; }
       for (const m of [].concat(c.material)) { m.transparent = ps.opacity < 1; m.opacity = ps.opacity; m.depthWrite = ps.opacity >= 1; }
     }
   }
@@ -232,7 +233,7 @@ function overlay(st) {
   // 遮挡检查：标注点被别的零件挡住（射线先碰到别的零件）就记下来，程序会报出来
   window.MISSES = [];
   const meshes = [];
-  for (const [name, g] of Object.entries(groups)) if (g.visible) for (const c of g.children) if (c.isMesh && !c.userData.outline) meshes.push([c, name]);
+  for (const [name, g] of Object.entries(groups)) if (g.visible) for (const c of g.children) if (c.isMesh && !c.userData.outline && [].concat(c.material).every((m) => (m.opacity ?? 1) > 0.7)) meshes.push([c, name]);   // 半透明的零件不算遮挡
   const ray = new THREE.Raycaster();
   for (const l of labels) {
     const P = new THREE.Vector3(...l.at);
@@ -299,7 +300,7 @@ function overlay(st) {
   }
   for (const t of st.texts || []) {                    // 固定位置的文字（标题、说明），pos 为比例
     el("text", { x: t.pos[0] * W, y: t.pos[1] * H, "font-size": t.fontSize || fs, "font-family": FONT, fill: t.color || "#1d2327",
-      "text-anchor": t.anchor || "start", "font-weight": t.bold ? 700 : 400, "paint-order": "stroke", stroke: "#fff", "stroke-width": 3 }, t.text);
+      "text-anchor": t.anchor || "start", "font-weight": t.bold ? 700 : 400, "paint-order": "stroke", stroke: "#fff", "stroke-width": t.halo ?? 4.5 }, t.text);
   }
 }
 
