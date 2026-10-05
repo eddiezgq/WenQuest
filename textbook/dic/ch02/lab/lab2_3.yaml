@@ -1,0 +1,28 @@
+# 实验 2.3 的指导书与报告模板。目的、场景、参数、任务取自 lab2_3.js（由 labs/micro/textbook/lab2_3.body.js 生成）。
+原理:
+  - ["以 τ 为单位，一级门的延时 d = g·h + p：g 为逻辑努力，h = Cout/Cin 为电气努力，p 为寄生延时。路径努力 F = G·B·H，G 为各级逻辑努力之积，B 为各级分支努力之积，H 为路径输出电容与输入电容之比。",
+     "In units of τ, a gate's delay is d = g·h + p, with logical effort g, electrical effort h = Cout/Cin and parasitic delay p. The path effort is F = G·B·H: the product of logical efforts, the product of branching efforts and the path's output-to-input capacitance ratio."]
+  - 式: "d = g·h + p        (2.3.1)；F = G·B·H        (2.3.2)"
+  - ["各级努力相等时延时最小：D = N·F^(1/N) + Σp；级数按 ln F / ln 4 估计，再比较相邻整数。尺寸从输出往回求：Cin,i = g_i·b_i·Cout,i / F^(1/N)。",
+     "The delay is minimum with equal stage efforts: D = N·F^(1/N) + Σp. Estimate N from ln F / ln 4 and compare neighbouring integers. Sizes follow from the output backwards: Cin,i = g_i·b_i·Cout,i / F^(1/N)."]
+  - 式: "D = N·F^(1/N) + Σp_i        (2.3.3)"
+步骤:
+  - ["先手算：G、B、H、F 和 ln F / ln 4，填入表 1。", "Compute G, B, H, F and ln F / ln 4 by hand and fill in Table 1."]
+  - ["选 2 级结构，调反相器的输入电容，找到延时最小的尺寸（任务 1），记下各级努力和总延时，填入表 2。", "Choose the 2-stage structure, find the inverter size with the smallest delay (task 1) and record the stage efforts and total delay in Table 2."]
+  - ["选 3 级、4 级结构，分别按 Cin,i = g_i·b_i·Cout,i / F^(1/N) 算出各级尺寸，在实验中设好并核对（任务 2、3），填入表 2；比较三种结构。", "For 3 and 4 stages compute the sizes from the formula, set and check them (tasks 2 and 3), fill in Table 2 and compare the three structures."]
+  - ["读出“换用仿真 g、p”的延时，看最快的结构是否改变。", "Read the delay with simulated g and p and see whether the fastest structure changes."]
+数据表:
+  - 标题: ["表 1  路径努力", "Table 1  Path effort"]
+    表头: ["G", "B", "H", "F = G·B·H", "ln F / ln 4"]
+    行: [["", "", "", "", ""]]
+  - 标题: ["表 2  三种结构的最优尺寸与延时", "Table 2  Optimal sizes and delays of the three structures"]
+    表头: ["结构", "各级输入电容 / Cinv", "各级努力", "D（手算）/ τ", "D（仿真 g、p）/ τ", "D / ps"]
+    表头英文: ["Structure", "Stage input caps / Cinv", "Stage efforts", "D (hand) / τ", "D (SPICE g, p) / τ", "D / ps"]
+    行: [["2 级", "", "", "", "", ""], ["3 级", "", "", "", "", ""], ["4 级", "", "", "", "", ""]]
+    行英文: [["2 stages", "", "", "", "", ""], ["3 stages", "", "", "", "", ""], ["4 stages", "", "", "", "", ""]]
+注意:
+  - ["第一级的输入电容由地址线的驱动能力定死（2 级结构中每个与非门输入只分到 Cin/4），实验只调后面各级。", "The first stage's input capacitance is fixed by the address line (in the 2-stage structure each NAND input gets Cin/4); the lab adjusts the later stages only."]
+  - ["分支努力 B = 4 出现在驱动 4 个与非门的那一级。", "The branching effort B = 4 sits at the stage that drives the 4 NAND gates."]
+思考题:
+  - ["为什么 4 级结构的努力延时更小，总延时却比 3 级大？", "Why does the 4-stage structure have a smaller effort delay but a larger total delay than 3 stages?"]
+  - ["如果每条输出还要驱动 300 μm 的连线，H 怎样变，最快的结构会变吗？", "If each output also drives a 300 μm wire, how does H change, and does the fastest structure change?"]

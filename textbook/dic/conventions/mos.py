@@ -138,6 +138,136 @@ def vdd_for_fo4(limit, ratio, lo=0.9, hi=VDD):
     return hi
 
 
+# ======================================================================= 第 2 章：门与逻辑努力
+# 参考反相器：Wn = Wmin、Wp = r·Wmin（两管等强）。门按“等效反相器”定尺寸，最坏情况下的上拉、下拉与参考反相器一样强。
+
+def r_ratio():
+    return kn / kp
+
+
+def tau():
+    """逻辑努力的时间单位 τ = 0.69·R·Cinv（s）：R 为参考反相器的等效电阻（两管相等），Cinv 为它的输入电容。
+    第 1 章反相器链每级延时 0.69RC1(γ + f) = τ(γ + f)，所以以 τ 为单位，反相器的寄生延时 p_inv = γ。"""
+    r = r_ratio()
+    R = (req_n(Wmin) + req_p(r * Wmin)) / 2
+    return 0.69 * R * cin(Wmin, r * Wmin)
+
+
+def gamma_self():
+    return Cd / Cg
+
+
+def le_g(kind, n):
+    """手算模型的逻辑努力：n 输入与非门 (n + r)/(1 + r)，或非门 (1 + n·r)/(1 + r)，反相器 1。"""
+    r = r_ratio()
+    if kind == "inv":
+        return 1.0
+    if kind == "nand":
+        return (n + r) / (1 + r)
+    if kind == "nor":
+        return (1 + n * r) / (1 + r)
+    raise ValueError(kind)
+
+
+def le_p(kind, n):
+    """手算模型的寄生延时（以 τ 为单位）：输出节点上的漏极宽度是参考反相器的 n 倍，p = n·γ（反相器 γ）。"""
+    return (1 if kind == "inv" else n) * gamma_self()
+
+
+def gate_widths(kind, n):
+    """等效反相器尺寸（μm）：返回 (每个 NMOS 宽, 每个 PMOS 宽)。"""
+    r = r_ratio()
+    if kind == "inv":
+        return Wmin, r * Wmin
+    if kind == "nand":
+        return n * Wmin, r * Wmin
+    if kind == "nor":
+        return Wmin, n * r * Wmin
+    raise ValueError(kind)
+
+
+def path_delay(gs, ps, B, H, N=None):
+    """路径的最小延时（以 τ 为单位）：D = N·F^(1/N) + ΣP，F = G·B·H。gs、ps 为各级的 g、p 列表。"""
+    G = 1.0
+    for g in gs:
+        G *= g
+    N = N or len(gs)
+    F = G * B * H
+    return N * F ** (1 / N) + sum(ps), F
+
+
+def stage_sizes(gs, bs, Cin, Cout):
+    """按每级努力相等，从输出往回求各级输入电容：Cin_i = g_i·b_i·Cout_i / f。返回 [Cin_1, …, Cin_N]，Cin_1 = Cin。"""
+    G, B = 1.0, 1.0
+    for g, b in zip(gs, bs):
+        G *= g
+        B *= b
+    N = len(gs)
+    f = (G * B * Cout / Cin) ** (1 / N)
+    caps, c = [], Cout
+    for g, b in reversed(list(zip(gs, bs))):
+        c = g * b * c / f
+        caps.append(c)
+    return list(reversed(caps)), f
+
+
+# ======================================================================= 第 4 章：导线
+WIRES = P["wires"]["layers"]
+
+
+def wire_r(layer, w):
+    """每微米电阻（Ω/μm）：方块电阻 / 线宽。"""
+    return WIRES[layer]["Rsq"] / w
+
+
+def wire_c(layer, w, s=None):
+    """每微米电容（F/μm）：对衬底的面积电容 + 两条边的边缘电容；给出间距 s 时再加两侧同层导线的耦合电容（邻线视为交流地）。"""
+    q = WIRES[layer]
+    c = q["Carea"] * w + 2 * q["Cfringe"]
+    if s is not None:
+        c += 2 * q["Kside"] / (s + q["s0"])
+    return c * 1e-18
+
+
+def wire_cc(layer, s):
+    """同层相邻两条导线之间每微米的耦合电容（F/μm）。"""
+    q = WIRES[layer]
+    return q["Kside"] / (s + q["s0"]) * 1e-18
+
+
+def wire_delay(Rd, Cself, Rw, Cw, CL):
+    """驱动器（电阻 Rd、自身漏极电容 Cself）经分布式 RC 线（总电阻 Rw、总电容 Cw）驱动 CL 的 50 % 延时（s）：
+    0.69·Rd·(Cself + Cw + CL) + 0.38·Rw·Cw + 0.69·Rw·CL。"""
+    return 0.69 * Rd * (Cself + Cw + CL) + 0.38 * Rw * Cw + 0.69 * Rw * CL
+
+
+def repeater_delay(Lw, layer, w, k, size, CL=None, s=None):
+    """长度 Lw（μm）的导线分成 k 段，每段前放一个 size 倍参考反相器的中继器，最后驱动 CL（默认一个同样的中继器的输入）。返回总延时（s）。"""
+    r = r_ratio()
+    R0 = (req_n(Wmin) + req_p(r * Wmin)) / 2
+    C0 = cin(Wmin, r * Wmin)
+    Rd, Cself, Cin_rep = R0 / size, gamma_self() * C0 * size, C0 * size
+    seg = Lw / k
+    Rw, Cw = wire_r(layer, w) * seg, wire_c(layer, w, s) * seg
+    CL = Cin_rep if CL is None else CL
+    t = 0.0
+    for i in range(k):
+        load = Cin_rep if i < k - 1 else CL
+        t += wire_delay(Rd, Cself, Rw, Cw, load)
+    return t
+
+
+def repeater_opt(Lw, layer, w, s=None):
+    """中继器的最优段数与尺寸（闭式解，连续变量）：k = Lw·√(0.38·r·c / (0.69·R0·C0·(1 + γ)))，size = √(R0·c / (r·C0))。"""
+    rr = r_ratio()
+    R0 = (req_n(Wmin) + req_p(rr * Wmin)) / 2
+    C0 = cin(Wmin, rr * Wmin)
+    rw, cw = wire_r(layer, w), wire_c(layer, w, s)
+    k = Lw * math.sqrt(0.38 * rw * cw / (0.69 * R0 * C0 * (1 + gamma_self())))
+    size = math.sqrt(R0 * cw / (rw * C0))
+    return k, size
+
+
 def reference():
     r = kn / kp
     pr = P["problems"]
@@ -174,4 +304,16 @@ def reference():
                   "P_low": dyn_power(q["N"], q["alpha"], q["Cgate"], q["Vlow"], q["f"]),
                   "Vlim": vdd_for_fo4(q["fo4max"], r), "fo4_low": fo4_tp(r, q["Vlow"])}
     out["r_lab"] = round(r * 20) / 20          # the symmetric ratio on the lab's 0.05-step slider
+    # 第 2 章
+    q23 = pr["p23"]
+    gn = le_g("nand", q23["n_addr"])
+    H23 = q23["Cout_units"] / q23["Cin_units"]
+    out["ch2"] = {"tau": tau(), "g": {}, "p": {}, "dec": {}}
+    for k, n in (("nand", 2), ("nand", 3), ("nor", 2), ("nor", 3)):
+        out["ch2"]["g"][f"{k}{n}"] = le_g(k, n)
+        out["ch2"]["p"][f"{k}{n}"] = le_p(k, n)
+    for N in (2, 3, 4):
+        gs = [gn] + [1.0] * (N - 1)
+        ps = [le_p("nand", q23["n_addr"])] + [le_p("inv", 1)] * (N - 1)
+        out["ch2"]["dec"][str(N)] = path_delay(gs, ps, q23["branch"], H23)[0]
     return out

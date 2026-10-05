@@ -25,3 +25,31 @@
 1,短路功耗,short-circuit power,
 1,速度饱和,velocity saturation,
 1,工艺角,process corner,
+2,下拉网络,pull-down network,
+2,上拉网络,pull-up network,
+2,与非门,NAND gate,
+2,或非门,NOR gate,
+2,对偶,duality,上拉网络与下拉网络互为对偶
+2,复合门,complex gate,如与或非门（AOI）、或与非门（OAI）
+2,参考反相器,reference inverter,本书取 Wn = Wmin、Wp = r·Wmin
+2,等效反相器,equivalent inverter,按最坏情况与参考反相器等强的尺寸
+2,地址译码器,address decoder,
+2,电气努力,electrical effort,h = Cout/Cin
+2,逻辑努力,logical effort,
+2,寄生延时,parasitic delay,
+2,级努力,stage effort,f = g·h
+2,分支努力,branching effort,
+2,路径努力,path effort,F = G·B·H
+2,有比逻辑,ratioed logic,
+2,传输管,pass transistor,
+2,传输门,transmission gate,
+2,底管,foot transistor,动态门中由时钟控制的下拉管
+2,预充,precharge,
+2,求值,evaluation,
+2,多米诺逻辑,domino logic,
+2,保持管,keeper,
+2,电荷分享,charge sharing,
+2,静态 CMOS 门,static CMOS gate,
+2,伪 NMOS,pseudo-NMOS,
+2,动态门,dynamic gate,
+2,体效应,body effect,

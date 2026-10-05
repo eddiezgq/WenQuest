@@ -8,3 +8,6 @@ chapters:
   1:
     status: first
     title_en: "The CMOS Inverter"
+  2:
+    status: draft
+    title_en: "Combinational Logic Gates"

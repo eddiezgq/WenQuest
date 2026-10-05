@@ -1,0 +1,29 @@
+# 实验 2.2 的指导书与报告模板。目的、场景、参数、任务取自 lab2_2.js（由 labs/micro/textbook/lab2_2.body.js 生成）。
+原理:
+  - ["n 个同样的管子串联，导通电阻是一个管子的 n 倍；并联时最坏情况只有一个导通。以两管等强的参考反相器（Wn = Wmin、Wp = r·Wmin）为标准，要求门在最坏情况下的上拉、下拉电阻都与它相同，这样定出的尺寸叫等效反相器尺寸。",
+     "n identical transistors in series have n times the on-resistance of one; in parallel, the worst case has only one conducting. Taking the reference inverter (Wn = Wmin, Wp = r·Wmin) as the standard and requiring the same worst-case pull-up and pull-down resistance gives the equivalent-inverter sizing."]
+  - 式: "与非门：NMOS 各 n·Wmin，PMOS 各 r·Wmin；或非门：NMOS 各 Wmin，PMOS 各 n·r·Wmin"
+  - ["每个输入的电容与参考反相器输入电容之比就是逻辑努力：与非门 (n + r)/(1 + r)，或非门 (1 + nr)/(1 + r)（表 2.2.1）。",
+     "The ratio of each input's capacitance to the reference inverter's is the logical effort: (n + r)/(1 + r) for a NAND, (1 + nr)/(1 + r) for a NOR (Table 2.2.1)."]
+  - 式: "g_NAND = (n + r)/(1 + r)，g_NOR = (1 + n·r)/(1 + r)        表 2.2.1"
+步骤:
+  - ["选“n 输入与非门”，n = 2、3、4，先用公式算出等效反相器尺寸，再在实验中调到最坏上拉、下拉电阻都约为 1（任务 1 为三输入），记下每个输入的电容和总栅宽，填入表 1。", "Choose the NAND scene with n = 2, 3, 4; compute the equivalent-inverter sizes, set them so both worst-case resistances are about 1 (task 1 is n = 3) and record the input capacitance and total width in Table 1."]
+  - ["选“n 输入或非门”，重复上一步（任务 2 为三输入），与同样输入数的与非门比较。", "Repeat for the NOR scene (task 2 is n = 3) and compare with the NAND of the same fan-in."]
+  - ["选“关节使能门”，按最坏情况定 A、B、C 的 NMOS 和 PMOS 宽度（任务 3），读出 A、B 输入的电容，填入表 2。", "Choose the enable-gate scene, size A, B, C for the worst case (task 3) and record the input capacitance of A and B in Table 2."]
+数据表:
+  - 标题: ["表 1  等效反相器尺寸", "Table 1  Equivalent-inverter sizing"]
+    表头: ["门", "NMOS 宽 / Wmin", "PMOS 宽 / Wmin", "最坏下拉 / 参考", "最坏上拉 / 参考", "每个输入的电容 / Cinv", "总栅宽 / 参考"]
+    表头英文: ["Gate", "NMOS / Wmin", "PMOS / Wmin", "Worst down / ref", "Worst up / ref", "Input cap / Cinv", "Total width / ref"]
+    行: [["二输入与非", "", "", "", "", "", ""], ["三输入与非", "", "", "", "", "", ""], ["四输入与非", "", "", "", "", "", ""], ["二输入或非", "", "", "", "", "", ""], ["三输入或非", "", "", "", "", "", ""], ["四输入或非", "", "", "", "", "", ""]]
+    行英文: [["NAND2", "", "", "", "", "", ""], ["NAND3", "", "", "", "", "", ""], ["NAND4", "", "", "", "", "", ""], ["NOR2", "", "", "", "", "", ""], ["NOR3", "", "", "", "", "", ""], ["NOR4", "", "", "", "", "", ""]]
+  - 标题: ["表 2  关节使能门 EN = ¬(A + B·C)", "Table 2  Joint enable gate EN = ¬(A + B·C)"]
+    表头: ["管子", "宽度 / Wmin", "说明"]
+    表头英文: ["Transistor", "Width / Wmin", "Note"]
+    行: [["A 的 NMOS", "", ""], ["B、C 的 NMOS", "", ""], ["A、B、C 的 PMOS", "", ""], ["A 输入电容 / Cinv", "", ""], ["B 输入电容 / Cinv", "", ""]]
+    行英文: [["NMOS of A", "", ""], ["NMOS of B, C", "", ""], ["PMOS of A, B, C", "", ""], ["Input cap of A / Cinv", "", ""], ["Input cap of B / Cinv", "", ""]]
+注意:
+  - ["电阻以参考反相器为 1：NMOS 宽 Wmin 的下拉电阻为 1，PMOS 宽 r·Wmin 的上拉电阻为 1。", "Resistances are relative to the reference inverter: an NMOS of width Wmin and a PMOS of width r·Wmin each count as 1."]
+  - ["实验用的是手算模型；仿真表明与非门的串联管比模型快约一成（2.2.3 节）。", "The lab uses the hand model; simulation shows series NMOS about 10 % faster than the model (Section 2.2.3)."]
+思考题:
+  - ["为什么 CMOS 设计偏爱与非门？输入数多于四个时应怎样实现？", "Why does CMOS design prefer NAND gates? How should gates with more than four inputs be built?"]
+  - ["把最晚到达的信号接到靠近输出的输入上为什么更快？本实验的模型能反映这一点吗？", "Why is it faster to connect the latest signal to the input nearest the output? Does this lab's model show it?"]

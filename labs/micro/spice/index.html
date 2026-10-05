@@ -155,6 +155,37 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       "f": 100000000.0,
       "Vlow": 1.2,
       "fo4max": 1e-10
+    },
+    "p23": {
+      "n_addr": 3,
+      "Cin_units": 2,
+      "Cout_units": 32,
+      "branch": 4
+    },
+    "p41": {
+      "L_um": 3000
+    },
+    "p42": {
+      "layer": "met2",
+      "w_um": 0.14,
+      "trunk_um": 1000,
+      "near_um": 400,
+      "far_um": 1600,
+      "leaf_load_units": 20,
+      "driver_size": 20
+    },
+    "p43": {
+      "L_um": 3000,
+      "layer": "met1",
+      "w_um": 0.14,
+      "load_units": 20
+    },
+    "p44": {
+      "layer": "met2",
+      "w_um": 0.14,
+      "len_um": 500,
+      "victim_size": 1,
+      "tr_ps": 100
     }
   },
   "wires": {
@@ -396,6 +427,41 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (m.fo4Tp(ratio, mid) > limit) lo = mid; else hi = mid; }
       return hi;
     };
+
+    /* ---------- 第 2 章：门与逻辑努力（与 conventions/mos.py 一一对应） ---------- */
+    const rr = kn / kp, gam = Cd / Cg;
+    m.tau = () => 0.69 * (m.reqN(Wmin) + m.reqP(rr * Wmin)) / 2 * m.cin(Wmin, rr * Wmin);
+    m.leG = (kind, n) => (kind === 'inv' ? 1 : kind === 'nand' ? (n + rr) / (1 + rr) : (1 + n * rr) / (1 + rr));
+    m.leP = (kind, n) => (kind === 'inv' ? 1 : n) * gam;
+    m.gateWidths = (kind, n) => (kind === 'inv' ? [Wmin, rr * Wmin] : kind === 'nand' ? [n * Wmin, rr * Wmin] : [Wmin, n * rr * Wmin]);
+    m.pathDelay = (gs, ps, B, H) => {
+      const G = gs.reduce((a, b) => a * b, 1), N = gs.length, F = G * B * H;
+      return { D: N * Math.pow(F, 1 / N) + ps.reduce((a, b) => a + b, 0), F };
+    };
+    m.stageSizes = (gs, bs, Cin0, Cout) => {
+      let G = 1, B = 1; gs.forEach((g, i) => { G *= g; B *= bs[i]; });
+      const N = gs.length, f = Math.pow(G * B * Cout / Cin0, 1 / N), caps = [];
+      let c = Cout;
+      for (let i = N - 1; i >= 0; i--) { c = gs[i] * bs[i] * c / f; caps.unshift(c); }
+      return { caps, f };
+    };
+    /* ---------- 第 4 章：导线 ---------- */
+    const WL = (P.wires || {}).layers || {};
+    m.wireR = (layer, w) => WL[layer].Rsq / w;
+    m.wireC = (layer, w, s) => { const q = WL[layer]; let c = q.Carea * w + 2 * q.Cfringe; if (s != null) c += 2 * q.Kside / (s + q.s0); return c * 1e-18; };
+    m.wireCc = (layer, s) => WL[layer].Kside / (s + WL[layer].s0) * 1e-18;
+    m.wireDelay = (Rd, Cself, Rw, Cw, CL) => 0.69 * Rd * (Cself + Cw + CL) + 0.38 * Rw * Cw + 0.69 * Rw * CL;
+    m.repeaterDelay = (Lw, layer, w, k, size, CL, s) => {
+      const R0 = (m.reqN(Wmin) + m.reqP(rr * Wmin)) / 2, C0 = m.cin(Wmin, rr * Wmin);
+      const Rd = R0 / size, Cself = gam * C0 * size, Cin = C0 * size, seg = Lw / k;
+      const Rw = m.wireR(layer, w) * seg, Cw = m.wireC(layer, w, s) * seg, last = CL == null ? Cin : CL;
+      let t = 0; for (let i = 0; i < k; i++) t += m.wireDelay(Rd, Cself, Rw, Cw, i < k - 1 ? Cin : last);
+      return t;
+    };
+    m.repeaterOpt = (Lw, layer, w, s) => {
+      const R0 = (m.reqN(Wmin) + m.reqP(rr * Wmin)) / 2, C0 = m.cin(Wmin, rr * Wmin), rw = m.wireR(layer, w), cw = m.wireC(layer, w, s);
+      return { k: Lw * Math.sqrt(0.38 * rw * cw / (0.69 * R0 * C0 * (1 + gam))), size: Math.sqrt(R0 * cw / (rw * C0)) };
+    };
     m.reference = () => {
       const r = kn / kp, pr = P.problems, out = { r, idsat_n_per_um: m.idsatN(1), idsat_p_per_um: m.idsatP(1) };
       const w = m.wnForVol(pr.p11.Iload, pr.p11.VOLmax);
@@ -419,6 +485,14 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       out.p15 = { P_VDD: m.dynPower(q.N, q.alpha, q.Cgate, VDD, q.f), P_low: m.dynPower(q.N, q.alpha, q.Cgate, q.Vlow, q.f),
                   Vlim: m.vddForFo4(q.fo4max, r), fo4_low: m.fo4Tp(r, q.Vlow) };
       out.r_lab = Math.round(r * 20) / 20;
+      const q23 = pr.p23, gn = m.leG('nand', q23.n_addr), H23 = q23.Cout_units / q23.Cin_units;
+      out.ch2 = { tau: m.tau(), g: {}, p: {} };
+      for (const [k, n] of [['nand', 2], ['nand', 3], ['nor', 2], ['nor', 3]]) { out.ch2.g[k + n] = m.leG(k, n); out.ch2.p[k + n] = m.leP(k, n); }
+      out.ch2.dec = {};
+      for (const N of [2, 3, 4]) {
+        const gs = [gn].concat(Array(N - 1).fill(1)), ps = [m.leP('nand', q23.n_addr)].concat(Array(N - 1).fill(m.leP('inv', 1)));
+        out.ch2.dec[N] = m.pathDelay(gs, ps, q23.branch, H23).D;
+      }
       return out;
     };
     return m;
