@@ -10,6 +10,8 @@ WQ_SIM_AUTOSTART（1 = 派工即开工，不等终端点“开工”）、WQ_TZ�
   set_speed      改倍速，data.speed
   set_problem    注入隐藏的加工问题（data.problem、data.magnitude，见 sim/errors.py）；clear_problems 清除
   apply_fix      下发 8D 的纠正措施（data.fix）：对症的问题消失
+  snapshot       发出全部内存状态（sim.snapshot，推演用；两种模式都可）
+  set_calendar   换班次日历（data.calendar：24 小时连续 / 按班次与加班；两种模式都可）
 """
 import logging
 import os
@@ -51,6 +53,20 @@ class Service:
 
     def sim_command(self, data, corr):
         cmd = data.get("command")
+        # 第 17 轮 C 期：快照和班次日历两种模式都接受（推演、加班在生产模式也要用）
+        if cmd == "snapshot":
+            self._publish(topic("machining", "sim", "snapshot"), "sim.snapshot", "sim",
+                          {"snapshot": self.eng.snapshot(), "request": data.get("request") or ""}, corr)
+            return True, "已发出快照"
+        if cmd == "set_calendar":
+            from sim.calendar import Calendar
+            try:
+                cal = Calendar.from_dict(data.get("calendar"))
+            except (ValueError, KeyError) as e:
+                return False, "班次日历不对：{}".format(e)
+            self.calendar = cal
+            self.eng.set_calendar(cal)
+            return True, "班次：{}".format("按班次" if cal.mode == "shift" else "24 小时连续")
         if self.mode != "teach":
             return False, "生产模式下不能控制仿真器"
         if cmd == "set_speed":
@@ -66,6 +82,8 @@ class Service:
             t = scenario.load(self.eng, self._publish, tz=self.tz)
             self.eng.clock = Clock(speed)
             self.eng.clock.t0_sim = t
+            if getattr(self, "calendar", None) is not None:   # 情景的历史按连续运转跑完，之后沿用当前班次设置
+                self.eng.set_calendar(self.calendar)
             self.speed = speed
             self.eng.publish_all_status()
             return True, "已载入实验 7 情景，倍速 {:g}".format(speed)
@@ -104,6 +122,8 @@ class Service:
                             log.info("虚拟 PLC：%s 收到程序（班次 %s）", unit, m["data"].get("run_id"))
                             continue
                         if unit == "sim":
+                            if m.get("mode") and m["mode"] != self.mode and m["data"].get("command") in ("set_calendar", "snapshot"):
+                                continue          # 另一个模式的班次 / 快照（教学、生产各有一套），不是发给这台仿真车间的
                             ok, reason = self.sim_command(m["data"], m.get("corr"))
                             self.bus.publish(topic("machining", "sim", "cmd/ack"), "machine.ack", "sim",
                                              {"accepted": ok, "reason": reason, "command": m["data"].get("command")},

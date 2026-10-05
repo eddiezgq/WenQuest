@@ -34,7 +34,7 @@ MACHINES = ("saw-01", "cnc-l01-a", "cnc-l01-b", "vmc-01", "hmc-01", "key-01",
             "hob-01", "ht-01", "grd-01", "qc-01", "asm-01", "test-01")
 
 CATEGORIES = ("status", "event", "cmd", "cmd/ack", "measurement", "ncr", "release", "gcode",
-              "alert", "briefing", "proposal", "torque", "telemetry")
+              "alert", "briefing", "proposal", "torque", "telemetry", "snapshot")
 RETAINED = ("status", "briefing")
 
 

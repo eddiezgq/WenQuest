@@ -81,6 +81,7 @@ class Hub:
         self.twin = None
         self.vplc = None
         self.ont = None
+        self.plan_snaps = None
         self.stop = threading.Event()
         self.last_brief = {}
         self._ncr_sent = set()
@@ -130,6 +131,42 @@ class Hub:
             self.ai.detector().init()                  # 厂情中枢的异常表（第 17 轮 B 期）
         except Exception:  # noqa: BLE001
             log.exception("异常表初始化失败")
+        self._start_plan()
+
+    def _start_plan(self):
+        """推演与动作（第 17 轮 C 期）：建表；把班次日历发给仿真车间；每 15 分钟拍一张快照"""
+        from hub.ont import actions as AC
+        from hub.ont import plan as P
+        try:
+            P.init(self.db)
+            AC.init(self.db)
+        except Exception:  # noqa: BLE001
+            log.exception("推演表初始化失败")
+            return
+        self.plan_snaps = P.Snapshots(self.db, self.mes)
+        threading.Thread(target=self._plan_loop, daemon=True, name="plan").start()
+
+    def _plan_loop(self):
+        from hub.ont import plan as P
+        last_cal, last_snap = 0.0, time.time() - 600            # 启动 5 分钟后拍第一张
+        while not self.stop.wait(15):
+            now = time.time()
+            for mode in self.active_modes():
+                try:
+                    if now - last_cal > 300:
+                        P.push_calendar(self.mes, self.db, mode)
+                    if now - last_snap > 900:
+                        self.plan_snaps.take(mode, timeout=5)
+                except Exception:  # noqa: BLE001
+                    log.exception("班次 / 快照出错")
+            if now - last_cal > 300:
+                last_cal = now
+            if now - last_snap > 900:
+                last_snap = now
+                try:
+                    self.db.x("delete from sim_snapshot where ts < now() - interval '30 days'")
+                except Exception:  # noqa: BLE001
+                    pass
 
     def on_message(self, tp, msg):
         t = msg["type"]
@@ -143,6 +180,11 @@ class Hub:
                 self.vplc.on_message(tp, msg)
             except Exception:  # noqa: BLE001
                 log.exception("虚拟 PLC 处理消息出错")
+        if t == "sim.snapshot" and self.plan_snaps is not None:
+            try:
+                self.plan_snaps.deliver(msg)
+            except Exception:  # noqa: BLE001
+                log.exception("保存快照出错")
         if t == "erp.doc":
             self.ai.on_erp_result(msg)
         elif t == "design.release":
@@ -1526,6 +1568,8 @@ _twin.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quo
 from hub.ont import api as _ont  # noqa: E402
 _ont.mount(app, H, user_of)
 _ont.mount_anomaly(app, H, user_of, who)          # 第 17 轮 B 期：异常、追因、态势、规则
+from hub.ont import plan_api as _plan  # noqa: E402
+_plan.mount(app, H, user_of, who)                 # 第 17 轮 C 期：班次、推演、动作、时间回看
 
 
 # ---------------------------------------------------------------- 虚拟 PLC（第 18 轮第 8 步《PLC 原理及实践》）

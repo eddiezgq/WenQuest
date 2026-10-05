@@ -42,9 +42,13 @@ DATA_SCHEMAS = {
         "cycle_time_s": NUM}),
     "machine.cmd": _obj(["command"], {
         "command": {"enum": ["dispatch", "start", "pause", "reset", "inject_fault",
-                                "load_scenario", "set_speed", "set_problem", "clear_problems", "apply_fix"]},
+                                "load_scenario", "set_speed", "set_problem", "clear_problems", "apply_fix",
+                                # 第 17 轮 C 期：班次日历、快照，以及动作执行器用的改派、调序、维修加急
+                                "set_calendar", "snapshot", "reassign", "reorder", "expedite_repair", "outsource"]},
         "qty": {"type": "integer", "minimum": 1}}),
     "machine.ack": _obj(["accepted"], {"accepted": {"type": "boolean"}}),
+    # 第 17 轮 C 期：仿真车间的完整状态快照（推演用），主题 wq/gearbox/machining/sim/snapshot
+    "sim.snapshot": _obj(["snapshot"], {"snapshot": _obj(["t", "epoch", "wos", "machines"]), "request": STR}),
     "quality.measurement": _obj(
         ["part_serial", "item", "characteristic", "nominal_mm", "lower_tol_mm", "upper_tol_mm",
          "value_mm", "result"],

@@ -26,24 +26,38 @@ types:
   Scenario:
     label: 场景
     label_en: Scenario
-    maturity: next
-    key: 场景编号
+    maturity: have
+    key: 场景编号，如 SC-00012
     title: "{key} {title}"
-    sources: [厂情中枢（17C 起）]
+    sources: [厂情中枢推演（scenario 表，第 17 轮 C 期）]
     props:
       title: {t: str, l: 名称}
+      changes: {t: json, l: 改动}
+      cost_total: {t: num, l: 多花的钱, u: "$"}
+      created_by: {t: str, l: 创建人}
+      created: {t: time, l: 创建时间}
     links:
       anomaly: {to: Anomaly, l: 针对, inv: 场景}
   ActionRun:
     label: 动作记录
     label_en: Action run
-    maturity: next
-    key: 动作编号
+    maturity: have
+    key: 动作编号，如 ACT-00007
     title: "{key} {title}"
-    sources: [厂情中枢（17C 起）]
+    sources: [厂情中枢动作（action 表，第 17 轮 C 期）]
     props:
       title: {t: str, l: 名称}
+      type: {t: str, l: 种类}
       status: {t: str, l: 状态}
+      initiator: {t: str, l: 发起人}
+      approver: {t: str, l: 批准人}
+      result: {t: str, l: 执行结果}
+      created: {t: time, l: 发起时间}
+      executed: {t: time, l: 执行时间}
+    links:
+      anomaly: {to: Anomaly, l: 处理, inv: 动作}
+      scenario: {to: Scenario, l: 来自, inv: 动作}
+      about: {to: "*", l: 作用于, inv: 动作}
   AiRun:
     label: AI 运行
     label_en: AI run

@@ -195,6 +195,13 @@ class ERP {
         const mr = await this.materialRequest(company, d.preview.material_requests, erpDate(new Date().toISOString()));
         out.push(this.doc('Material Request', mr, 'submitted', opt));
         created.push(['Material Request', mr.name]);
+      } else if (d.action === 'so_comment') {
+        // 第 17 轮 C 期：厂情中枢的“分批交货”等动作，在 ERPNext 销售订单上留一条备注（不改已提交的订单）
+        const pv = d.preview;
+        const c = await this.insert('Comment', { comment_type: 'Comment', reference_doctype: 'Sales Order',
+          reference_name: pv.sales_order, content: pv.content });
+        out.push(this.doc('Comment', c, 'created', opt));
+        created.push(['Comment', c.name]);
       } else if (d.action === 'twin_service_order') {
         // 第 15 轮：数字孪生开的维修单 → ERPNext 服务工单（Issue），设备序列号记在自定义字段里
         const pv = d.preview;

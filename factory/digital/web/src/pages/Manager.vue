@@ -15,6 +15,11 @@
             <input v-model.number="fault.minutes" type="number" min="5" max="480" style="width: 80px" aria-label="分钟">
             <input v-model="fault.reason" style="width: 120px" aria-label="原因">
             <button class="btn danger" @click="injectFault">注入</button></div></div>
+        <div class="field"><label>车间班次（第 17 轮 C 期）</label>
+          <div class="inline">
+            <select v-model="shiftMode" aria-label="班次模式"><option value="continuous">24 小时连续</option><option value="shift">按班次（周一至周五 08:00–17:00）</option></select>
+            <button class="btn" @click="setShift">应用</button></div>
+          <span class="small muted">按班次时可以在厂情中枢推演和批准“加班”</span></div>
         <div class="field"><label>重置实验 7 情景</label>
           <div class="inline">
             <label class="small"><input v-model="resetScores" type="checkbox"> 同时清空学生得分</label>
@@ -100,6 +105,11 @@ async function setSpeed() {
   await post('/mes/cmd', { unit: 'sim', command: 'set_speed', speed: speed.value });
   ctlMsg.value = `已把仿真倍速改为 ${speed.value}×`;
 }
+const shiftMode = ref('continuous');
+async function loadShift() { try { shiftMode.value = (await get('/ont/shifts')).calendar.mode; } catch (e) { /* 老版本没有 */ } }
+async function setShift() {
+  try { const r = await post('/ont/shifts', { mode: shiftMode.value }); ctlMsg.value = '车间班次：' + (r.calendar.mode === 'shift' ? '按班次' : '24 小时连续') + '，已发给仿真车间'; } catch (e) { ctlMsg.value = e.message; }
+}
 async function injectFault() {
   await post('/mes/cmd', { unit: fault.value.unit, command: 'inject_fault', minutes: fault.value.minutes, reason: fault.value.reason });
   ctlMsg.value = `已让 ${fault.value.unit.toUpperCase()} 停机 ${fault.value.minutes} 分钟（${fault.value.reason}）`;
@@ -110,6 +120,7 @@ async function reset() {
   ctlMsg.value = '已重置，情景约 5 秒后载入完成';
 }
 onMounted(async () => {
+  if (teach.value) loadShift();
   const list = await get('/work_orders');
   wos.value = list.filter((w) => w.started).map((w) => w.name);
   wo.value = wos.value[0] || '';

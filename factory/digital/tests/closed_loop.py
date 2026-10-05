@@ -317,6 +317,46 @@ def main():
     rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
     live = [x for x in rl if not x["waiting"]]
     check(len(live) == 20 and not [x["id"] for x in live if x["error"]], "规则 20 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
+
+    print("11. 厂情中枢：推演与动作（第 17 轮 C 期）")
+    r = hub("POST", "/api/ont/shifts", {"mode": "shift"}, teacher)
+    check(r["calendar"]["mode"] == "shift", "车间切到按班次")
+    hub("POST", "/api/mes/cmd", {"unit": "cnc-l01-b", "command": "inject_fault", "minutes": 240, "reason": "闭环测试：推演"}, teacher)
+    an = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"]
+                            if x["rule"] == "P1" and (x["subject"] or {}).get("key") == "cnc-l01-b"), None), "停机异常", 90, 2)
+    if an:
+        t0 = time.time()
+        o = hub("GET", "/api/ont/anomalies/{}/options".format(an["id"]), token=teacher)
+        kinds = [x["kind"] for x in o["options"]]
+        check(kinds[:1] == ["none"] and "overtime" in kinds and "expedite" in kinds and o["recommended"],
+              "预案推演 {} 个方案，用时 {:.1f} 秒，{}快照；{}".format(len(kinds), time.time() - t0, "精确" if o["exact"] else "近似", o["reason"]))
+        exp = next(x for x in o["options"] if x["kind"] == "expedite")
+        a = hub("POST", "/api/ont/actions", {"changes": exp["changes"], "anomaly_id": an["id"], "snapshot_id": o["snapshot_id"]}, teacher)
+        before = next(m for m in hub("GET", "/api/overview", token=teacher)["machines"] if m["unit"] == "cnc-l01-b")["down_until_s"] or 0
+        d = hub("POST", "/api/ont/actions/{}/approve".format(a["ids"][0]), {}, teacher)
+        check(d["status"] == "done", "维修加急：批准并执行（{}）".format(d["result"]["text"]))
+        after = wait(lambda: (lambda m: m if m["down_until_s"] is not None and m["down_until_s"] < before * 0.8 else None)(
+            next(m for m in hub("GET", "/api/overview", token=teacher)["machines"] if m["unit"] == "cnc-l01-b")), "车间停机缩短", 30, 2)
+        check(after is not None, "车间里 CNC-L01-B 的剩余停机从 {:.0f} 分钟缩短".format(before / 60))
+        ot = next(x for x in o["options"] if x["kind"] == "overtime")
+        a = hub("POST", "/api/ont/actions", {"changes": ot["changes"], "anomaly_id": an["id"]}, teacher)
+        d = hub("POST", "/api/ont/actions/{}/approve".format(a["ids"][0]), {}, teacher)
+        cal = hub("GET", "/api/ont/shifts", token=teacher)["calendar"]
+        check(d["status"] == "done" and any(v == ot["changes"][0]["minutes"] for v in cal["overtime"].values()),
+              "加班：班次表已改并发给车间（{}）".format(cal["overtime"]))
+    tomorrow = (dt.date.today() + dt.timedelta(days=1)).isoformat()
+    a = hub("POST", "/api/ont/actions", {"changes": [{"type": "urgent_purchase", "item": "BRG-6207", "qty": 10, "arrive": tomorrow}]}, teacher)
+    d = hub("POST", "/api/ont/actions/{}/approve".format(a["ids"][0]), {}, teacher)
+    check(d["status"] == "executing" and d["result"].get("proposal_id"), "紧急采购：交给 ERPNext（提议 {}）".format(d["result"].get("proposal_id")))
+    d = wait(lambda: (lambda x: x if x["status"] in ("done", "failed") else None)(hub("GET", "/api/ont/actions/{}".format(a["ids"][0]), token=teacher)),
+             "ERPNext 生成请购单", 120, 3)
+    check(d is not None and d["status"] == "done", "ERPNext 生成了请购单：{}".format((d or {}).get("result", {}).get("erp")))
+    mrs = [m for m in erp_docs("Material Request") if str(m.get("schedule_date"))[:10] == tomorrow]
+    check(bool(mrs), "ERPNext 里有需求日为 {} 的请购单（{}）".format(tomorrow, "、".join(m["name"] for m in mrs)))
+    hub("POST", "/api/mes/cmd", {"unit": "cnc-l01-b", "command": "reset"}, teacher)
+    hub("POST", "/api/ont/shifts", {"mode": "continuous"}, teacher)
+    acts = hub("GET", "/api/ont/actions?box=all", token=teacher)["actions"]
+    check(len(acts) >= 3, "动作收件箱里有 {} 个动作".format(len(acts)))
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位

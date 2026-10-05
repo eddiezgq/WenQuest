@@ -98,7 +98,7 @@ def load_catalog(path=RULE_DIR):
     out = {}
     for f in sorted(glob.glob(os.path.join(path, "*.yaml"))):
         name = os.path.basename(f)
-        if name.startswith("chains"):
+        if name.startswith(("chains", "playbooks")):
             continue
         doc = yaml.safe_load(open(f, encoding="utf-8")) or {}
         dom = doc.get("domain")

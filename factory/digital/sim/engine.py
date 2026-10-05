@@ -15,6 +15,7 @@ cycle_time_s、duration_s 等业务时长用仿真秒（零件实际要加工多
 import datetime as dt
 import heapq
 import itertools
+import os
 import random
 import time
 from collections import deque
@@ -23,6 +24,7 @@ from wqbus import UNITS, layout
 from wqbus.topics import unit_topic
 
 from sim import errors as ERR
+from sim.calendar import Calendar
 
 # 工序 → 可用设备（第一个是默认设备）
 OP_UNITS = {
@@ -157,6 +159,10 @@ class Engine:
         # 仿真 0 秒对应的工厂时间：默认为引擎创建时的真实时间；教学情景会改成情景开始的时刻
         self.epoch = dt.datetime.now(dt.timezone.utc) - dt.timedelta(seconds=self.clock.now())
         self.errors = ERR.ErrorModel(seed)       # 加工误差模型与问题情景（第 13 轮）
+        # 班次日历（第 17 轮 C 期）：默认 24 小时连续；按班次时下班后不再开新件
+        self.calendar = Calendar(tz=os.environ.get("WQ_TZ", "America/New_York"))
+        self._shift_wait = {}                    # 设备 → 已排好的开工时刻（仿真秒）
+        self.outsourced_done = []                # 外协回厂即完工的件：(时刻, 工单, 序列号)
 
     # ------------------------------------------------------------ 基础
     def now(self):
@@ -167,6 +173,39 @@ class Engine:
         t = self.now() if t is None else t
         v = self.epoch + dt.timedelta(seconds=t)
         return v.astimezone(dt.timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+    def factory_dt(self, t=None):
+        return self.epoch + dt.timedelta(seconds=self.now() if t is None else t)
+
+    def sim_t(self, when):
+        return (when - self.epoch).total_seconds()
+
+    def set_calendar(self, cal):
+        """换班次日历（加班、切换模式）：已在等开工的设备重新判断"""
+        self.calendar = cal
+        self._shift_wait.clear()
+        for m in self.machines.values():
+            self._try_start(m)
+
+    def _shift_closed(self, m, t):
+        """按班次且现在下班：排好下次开工的事件，返回 True"""
+        if self.calendar.mode == "continuous":
+            return False
+        now = self.factory_dt(t)
+        if self.calendar.is_open(m.unit, now):
+            return False
+        nxt = self.calendar.next_open(m.unit, now)
+        if nxt is not None:
+            ts = self.sim_t(nxt)
+            if self._shift_wait.get(m.unit) != ts:
+                self._shift_wait[m.unit] = ts
+                self.at(ts, "shift_open", unit=m.unit)
+        return True
+
+    def _ev_shift_open(self, t, unit):
+        if self._shift_wait.get(unit) is not None and self._shift_wait[unit] <= t + 1e-6:
+            self._shift_wait.pop(unit, None)
+        self._try_start(self.machines[unit])
 
     def at(self, t, kind, **payload):
         heapq.heappush(self.q, (t, next(self.seq), kind, payload))
@@ -274,7 +313,114 @@ class Engine:
             kind = "fault" if d.get("kind") == "fault" else "down"
             self._go_down(m, self.now(), minutes * 60, d.get("reason", "设备故障"), kind)
             return True, "已注入：{} {} 分钟".format(d.get("reason", "故障"), minutes)
+        if cmd == "reassign":                  # 第 17 轮 C 期：改派（同类设备）
+            return self._reassign(m, d)
+        if cmd == "reorder":                   # 调序 / 插单：把某工单的这道工序排到最前
+            job = self._find_job(m, d)
+            if job is None:
+                return False, "这台设备上没有该工序的派工"
+            m.jobs.remove(job)
+            m.jobs.insert(0, job)
+            first = [p for p in m.inbox if p.wo is job.wo and p.op_index == job.op_index]
+            m.inbox = deque(first + [p for p in m.inbox if p not in first])
+            self._try_start(m)
+            self._status(m, force=True)
+            return True, "已排到最前"
+        if cmd == "expedite_repair":           # 维修加急：剩余停机时间按比例缩短
+            if m.state not in ("down", "fault") or not m.down_until:
+                return False, "设备没有停机"
+            f = float(d.get("factor", 0.5))
+            if not 0 < f <= 1:
+                return False, "缩短比例应在 0–1 之间"
+            t = self.now()
+            m.down_until = t + (m.down_until - t) * f
+            self.at(m.down_until, "recover", unit=m.unit, until=m.down_until)
+            self._status(m, force=True)
+            return True, "预计 {:.0f} 分钟后恢复".format((m.down_until - t) / 60)
+        if cmd == "outsource":                 # 外协：接下来 qty 件这道工序送外面做，days 天后回来
+            return self._outsource(m, d)
         return False, "不支持的指令 " + cmd
+
+    def _reassign(self, m, d):
+        """d.to_unit：把 m 上某工单某工序的派工（含已送到、还没开工的件）换到同类设备"""
+        job = self._find_job(m, d)
+        to = self.machines.get(d.get("to_unit"))
+        if job is None:
+            return False, "这台设备上没有该工序的派工"
+        if to is None or to is m:
+            return False, "要改派到哪台设备？"
+        if to.unit not in OP_UNITS.get(job.op, []):
+            return False, "{} 不能做 {}".format(UNITS[to.unit][1], job.op)
+        m.jobs.remove(job)
+        job.unit = to.unit
+        to.jobs.append(job)
+        moving = [p for p in m.inbox if p.wo is job.wo and p.op_index == job.op_index]
+        for p in moving:
+            m.inbox.remove(p)
+            to.inbox.append(p)
+        # 已经在路上送往原设备的件，改送新设备
+        self.transfers = deque((p, f, to.unit if (t_ == m.unit and p.wo is job.wo and p.op_index == job.op_index) else t_)
+                               for p, f, t_ in self.transfers)
+        for a in self.agvs.values():
+            if a.task and a.task["to"] == m.unit and a.task["part"].wo is job.wo and a.task["part"].op_index == job.op_index:
+                a.task["to_override"] = to.unit
+        self._try_start(to)
+        self._try_start(m)
+        self._status(m, force=True)
+        self._status(to, force=True)
+        return True, "已改派到 {}（{} 件随之转过去）".format(to.unit.upper(), len(moving))
+
+    def _outsource(self, m, d):
+        job = self._find_job(m, d)
+        if job is None:
+            return False, "这台设备上没有该工序的派工"
+        qty, days = int(d.get("qty", 1)), float(d.get("days", 2))
+        left = job.qty - job.done - sum(1 for _, (p, j, *_r) in m.active.items() if j is job)
+        if not 1 <= qty <= left:
+            return False, "外协件数应在 1–{} 之间".format(left)
+        job.outsource = {"left": qty, "days": days, "sent": getattr(job, "outsource", {}).get("sent", 0)}
+        for p in [p for p in m.inbox if p.wo is job.wo and p.op_index == job.op_index]:
+            if job.outsource["left"] <= 0:
+                break
+            m.inbox.remove(p)
+            self._send_out(job, p)
+        self._status(m, force=True)
+        return True, "接下来 {} 件外协，{:g} 天后回厂".format(qty, days)
+
+    def _send_out(self, job, p):
+        o = job.outsource
+        o["left"] -= 1
+        o["sent"] += 1
+        job.qty -= 1                           # 本厂这道工序少做一件
+        self.at(self.now() + o["days"] * 86400, "outsource_back", wo=job.wo.name, serial=p.serial, op_index=job.op_index)
+        if job.done >= job.qty and job in self.machines[job.unit].jobs and not any(j is job for _, (pp, j, *_r) in self.machines[job.unit].active.items()):
+            self.machines[job.unit].jobs.remove(job)
+
+    def _ev_outsource_back(self, t, wo, serial, op_index):
+        w = self.wos[wo]
+        p = next(x for x in w.parts if x.serial == serial)
+        p.op_index = op_index + 1
+        nxt = w.jobs.get(p.op_index) if p.op_index < len(w.ops) else None
+        to = nxt.unit if nxt else ("store-02" if p.op_index >= len(w.ops) else OP_UNITS[w.ops[p.op_index][0]][0])
+        # 外协回厂不发 machine.event（桥接会把它当本厂报工）；最后一道就是外协的件，完工时刻记在这里给推演用
+        if p.op_index >= len(w.ops):
+            self.outsourced_done.append((t, wo, serial))
+        if to in self.machines:
+            self.machines[to].inbox.append(p)
+            self._try_start(self.machines[to])
+
+    def _ev_release(self, t, work_order, item, qty, corr=None):
+        """推演用：某时刻下达一张新工单（插单、等料的工单到料后下达），各工序派到首选设备"""
+        ops = routing_for(item)
+        for op, _ in ops:
+            self.command(OP_UNITS[op][0], {"command": "dispatch", "work_order": work_order, "operation": op, "qty": int(qty),
+                                           "item": item, "routing": ops}, corr or work_order)
+        for op, _ in ops:
+            j = self._find_job(self.machines[OP_UNITS[op][0]], {"work_order": work_order, "operation": op})
+            if j and not j.started:
+                j.started = True
+        for m in self.machines.values():
+            self._try_start(m)
 
     def _op_index(self, wo, op):
         if op is None:
@@ -307,6 +453,8 @@ class Engine:
                 return
             p, job = self._startable(m)
             if p is None:
+                break
+            if self._shift_closed(m, t):         # 下班了：正在做的件做完，不开新件
                 break
             if m.setup_job != job.key and not m.active:
                 # 新工序先调整（装夹、对刀、调程序）
@@ -379,7 +527,10 @@ class Engine:
             m.jobs.remove(job)
         # 送下一道
         p.op_index += 1
-        if p.op_index < len(job.wo.ops):
+        nxt_job = job.wo.jobs.get(p.op_index)
+        if nxt_job is not None and getattr(nxt_job, "outsource", None) and nxt_job.outsource["left"] > 0:
+            self._send_out(nxt_job, p)         # 下一道外协：直接送出厂
+        elif p.op_index < len(job.wo.ops):
             nxt = job.wo.jobs.get(p.op_index)
             to = nxt.unit if nxt else OP_UNITS[job.wo.ops[p.op_index][0]][0]
             self.transfers.append((p, unit, to))
@@ -474,7 +625,7 @@ class Engine:
         a.pos = task["path"][-1]
         a.task = None
         self._agv_status(a)
-        p, to = task["part"], task["to"]
+        p, to = task["part"], task.get("to_override") or task["to"]
         if to in self.machines:
             self.machines[to].inbox.append(p)
             self._try_start(self.machines[to])
@@ -531,14 +682,120 @@ class Engine:
             "down_for_s": round(t - m.down_since) if m.state in ("down", "fault") else None,
             "dispatched": [{"work_order": j.wo.name, "operation": j.op, "started": j.started,
                             "done": j.done, "qty": j.qty} for j in m.jobs],
+            "shift": self.calendar.mode,
+            "off_shift": self.calendar.mode == "shift" and not self.calendar.is_open(m.unit, self.factory_dt(t)),
         }
         key = (data["state"], data["work_order"], data["operation"], data["qty_done"], data["queue"],
-               data["job_started"], len(data["dispatched"]))
+               data["job_started"], len(data["dispatched"]), data["off_shift"])
         if not force and key == m.last_status:
             return
         m.last_status = key
         self.pub(unit_topic(m.unit, "status"), "machine.status", "sim/" + m.unit, data,
                  job.wo.corr if job else None)
+
+
+    # ------------------------------------------------------------ 快照（第 17 轮 C 期 C2）
+    def snapshot(self):
+        """把内存里的全部状态原样导出（可 JSON 化）；from_snapshot 能原样恢复，恢复后的随机数序列也相同"""
+        t = self.now()
+        tok = next(self.tokens)
+        self.tokens = itertools.count(tok)
+        sq = next(self.seq)
+        self.seq = itertools.count(sq)
+        rs = self.rng.getstate()
+        es = self.errors.rng.getstate()
+
+        def part(p):
+            return {"serial": p.serial, "op_index": p.op_index, "grind_wear": p.grind_wear, "result": p.result,
+                    "err": {k: list(v) if isinstance(v, tuple) else v for k, v in (getattr(p, "err", None) or {}).items()}}
+        wos = {}
+        for name, wo in self.wos.items():
+            wos[name] = {"item": wo.item, "qty": wo.qty, "ops": [list(o) for o in wo.ops], "corr": wo.corr,
+                         "parts": [part(p) for p in wo.parts],
+                         "jobs": {str(i): {"unit": j.unit, "started": j.started, "done": j.done, "good": j.good, "time_s": j.time_s,
+                                           "first_start": j.first_start, "qty": j.qty, "outsource": getattr(j, "outsource", None)}
+                                  for i, j in wo.jobs.items()}}
+        machines = {}
+        for u, m in self.machines.items():
+            machines[u] = {"jobs": [[j.wo.name, j.op_index] for j in m.jobs], "inbox": [[p.wo.name, p.serial] for p in m.inbox],
+                           "active": [[tk, p.wo.name, p.serial, j.op_index, st, en] for tk, (p, j, st, en) in m.active.items()],
+                           "state": m.state, "setup_until": m.setup_until, "setup_job": list(m.setup_job) if m.setup_job else None,
+                           "down_until": m.down_until, "down_reason": m.down_reason, "down_kind": m.down_kind,
+                           "down_since": getattr(m, "down_since", None), "tool_life": m.tool_life,
+                           "last_status": list(m.last_status) if m.last_status else None}
+        agvs = {}
+        for u, a in self.agvs.items():
+            tk = a.task
+            agvs[u] = {"pos": list(a.pos), "battery": a.battery, "heading": a.heading,
+                       "task": None if not tk else {"path": [list(x) for x in tk["path"]], "start": tk["start"], "end": tk["end"],
+                                                    "part": [tk["part"].wo.name, tk["part"].serial], "frm": tk["frm"], "to": tk["to"],
+                                                    "dist": tk["dist"], "to_override": tk.get("to_override")}}
+        return {"v": 1, "t": t, "epoch": self.epoch.isoformat(), "factory_now": self.factory_dt(t).isoformat(), "mode": self.mode,
+                "auto_start": self.auto_start, "status_every_s": self.status_every_s,
+                "rng": [rs[0], list(rs[1]), rs[2]], "err_rng": [es[0], list(es[1]), es[2]],
+                "err_active": self.errors.active, "tokens": tok, "seq": sq, "calendar": self.calendar.to_dict(),
+                "shift_wait": self._shift_wait, "wos": wos, "machines": machines, "agvs": agvs,
+                "transfers": [[p.wo.name, p.serial, f, to] for p, f, to in self.transfers],
+                "queue": [[qt, qs, k, pl] for qt, qs, k, pl in sorted(self.q)]}
+
+    @classmethod
+    def from_snapshot(cls, s, publish, clock):
+        """从快照恢复一个引擎（推演用的快进副本）。clock 的 now() 应等于快照的 t"""
+        e = cls(publish, clock, mode=s["mode"], auto_start=s["auto_start"], status_every_s=s.get("status_every_s", 2.0))
+        e.epoch = dt.datetime.fromisoformat(s["epoch"])
+        e.rng.setstate((s["rng"][0], tuple(s["rng"][1]), s["rng"][2]))
+        e.errors.rng.setstate((s["err_rng"][0], tuple(s["err_rng"][1]), s["err_rng"][2]))
+        e.errors.active = {k: dict(v) for k, v in (s.get("err_active") or {}).items()}
+        e.calendar = Calendar.from_dict(s.get("calendar"))
+        e._shift_wait = {k: v for k, v in (s.get("shift_wait") or {}).items()}
+        parts = {}
+        for name, w in s["wos"].items():
+            wo = WorkOrder.__new__(WorkOrder)
+            wo.name, wo.item, wo.qty, wo.corr = name, w["item"], w["qty"], w["corr"]
+            wo.ops = [tuple(o) for o in w["ops"]]
+            wo.parts = []
+            for x in w["parts"]:
+                p = Part(x["serial"], wo)
+                p.op_index, p.grind_wear, p.result = x["op_index"], x["grind_wear"], x["result"]
+                if x.get("err"):
+                    p.err = dict(x["err"])
+                wo.parts.append(p)
+                parts[(name, p.serial)] = p
+            wo.jobs = {}
+            for i, j in w["jobs"].items():
+                job = Job(wo, int(i), j["unit"])
+                job.started, job.done, job.good, job.time_s, job.first_start = j["started"], j["done"], j["good"], j["time_s"], j["first_start"]
+                job.qty = j.get("qty", job.qty)
+                if j.get("outsource"):
+                    job.outsource = dict(j["outsource"])
+                wo.jobs[int(i)] = job
+            e.wos[name] = wo
+        for u, x in s["machines"].items():
+            m = e.machines[u]
+            m.jobs = [e.wos[wn].jobs[i] for wn, i in x["jobs"]]
+            m.inbox = deque(parts[(wn, sn)] for wn, sn in x["inbox"])
+            m.active = {tk: (parts[(wn, sn)], e.wos[wn].jobs[i], st, en) for tk, wn, sn, i, st, en in x["active"]}
+            m.state, m.setup_until = x["state"], x["setup_until"]
+            m.setup_job = tuple(x["setup_job"]) if x["setup_job"] else None
+            m.down_until, m.down_reason, m.down_kind, m.tool_life = x["down_until"], x["down_reason"], x["down_kind"], x["tool_life"]
+            if x.get("down_since") is not None:
+                m.down_since = x["down_since"]
+            m.last_status = tuple(x["last_status"]) if x.get("last_status") else None
+        for u, x in s["agvs"].items():
+            a = e.agvs[u]
+            a.pos, a.battery, a.heading = tuple(x["pos"]), x["battery"], x["heading"]
+            tk = x["task"]
+            a.task = None if not tk else {"path": [tuple(p) for p in tk["path"]], "start": tk["start"], "end": tk["end"],
+                                          "part": parts[tuple(tk["part"])], "frm": tk["frm"], "to": tk["to"], "dist": tk["dist"]}
+            if tk and tk.get("to_override"):
+                a.task["to_override"] = tk["to_override"]
+        e.transfers = deque((parts[(wn, sn)], f, to) for wn, sn, f, to in s["transfers"])
+        e.q = [(qt, qs, k, pl) for qt, qs, k, pl in s["queue"]]
+        heapq.heapify(e.q)
+        e.seq = itertools.count(s["seq"])
+        e.tokens = itertools.count(s["tokens"])
+        e._last_periodic = time.time()          # 定时状态按真实时间发，副本不必一开始就补发一遍
+        return e
 
 
 _MACHINE_UNITS = {"saw-01", "cnc-l01-a", "cnc-l01-b", "vmc-01", "hmc-01", "key-01", "hob-01",

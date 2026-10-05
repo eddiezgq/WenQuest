@@ -6,6 +6,8 @@
         <button type="button" role="tab" :class="{ on: view === 'situation' }" @click="go({ view: 'situation' })">全厂态势</button>
         <button type="button" role="tab" :class="{ on: view === 'anomalies' }" @click="go({ view: 'anomalies' })">异常处理
           <span v-if="openCount" class="cnt">{{ openCount }}</span></button>
+        <router-link to="/ont/sim" class="tablink">推演工作台</router-link>
+        <router-link to="/ont/actions" class="tablink">动作收件箱</router-link>
         <router-link to="/ont/map" class="tablink">全貌地图与搜索</router-link>
         <router-link to="/ont/rules" class="tablink">规则目录</router-link>
       </span>
@@ -14,6 +16,14 @@
 
     <!-- 第一屏：全厂态势 -->
     <template v-if="view === 'situation'">
+      <div class="timebar card">
+        <span class="small"><b>时间</b></span>
+        <input v-model="atLocal" type="datetime-local" :max="maxLocal" :min="minLocal" aria-label="回看时刻" @change="loadHist">
+        <button class="btn sm ghost" @click="shift(-1)">往前 1 小时</button>
+        <button class="btn sm ghost" @click="shift(-24)">往前 1 天</button>
+        <button v-if="hist" class="btn sm primary" @click="backToNow">回到现在</button>
+        <span v-if="hist" class="small warnline">正在回看 {{ fmtTs(hist.at) }}（只能看，推演都从现在出发）</span>
+      </div>
       <div v-if="!sit" class="empty">读取中…</div>
       <template v-else>
         <div v-for="row in rows" :key="row.key" class="maprow">
@@ -39,6 +49,16 @@
           </div>
         </div>
         <p class="muted small">点卡片看这个领域的异常。指标每天记一次，小折线是近 7 天。</p>
+        <section v-if="hist" class="card">
+          <div class="card-head"><h2>那时开着的异常（{{ hist.anomalies.length }}）</h2>
+            <span v-if="hist.snapshot" class="muted small">设备状态取 {{ fmtTs(hist.snapshot.ts) }} 的快照（{{ hist.snapshot.exact ? '精确' : '近似' }}）</span></div>
+          <ul class="small hlist"><li v-for="a in hist.anomalies" :key="a.id"><span class="sev" :class="a.severity">{{ LVL[a.severity] }}</span>
+            <router-link :to="{ path: '/ont', query: { view: 'anomalies', a: a.id } }">{{ a.title }}</router-link>
+            <span class="muted"> · {{ fmtTs(a.first_seen) }} 起{{ a.closed_at ? '，' + fmtTs(a.closed_at) + ' 结束' : '' }}</span></li></ul>
+          <table v-if="hist.machines" class="t small"><thead><tr><th>设备</th><th>状态</th><th class="num">派工</th><th class="num">排队</th><th class="num">在做</th></tr></thead>
+            <tbody><tr v-for="(m, u) in hist.machines" :key="u"><td class="mono">{{ u.toUpperCase() }}</td><td>{{ m.state }}</td>
+              <td class="num">{{ m.jobs }}</td><td class="num">{{ m.queue }}</td><td class="num">{{ m.busy }}</td></tr></tbody></table>
+        </section>
       </template>
     </template>
 
@@ -120,7 +140,7 @@
               <button v-if="e.seq" class="linkbtn" @click="showSource(e.seq)">#{{ e.seq }}</button>
               <span v-else class="muted"> {{ e.name || e.item || e.id || e.ts || '' }}</span></li>
           </ul>
-          <div class="later small muted">推演与建议（“如果这样处理会怎样”）在 17C 加上。</div>
+          <OptionsPanel v-if="isOpen" :anomaly-id="sel.id" @adopted="loadSel" />
         </template>
       </section>
     </div>
@@ -140,9 +160,10 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { get, post, session } from '../lib/api';
-import { DOMAIN_COLOR, fmtVal, fmtTs as ts, lineage } from '../lib/ont';
+import { DOMAIN_COLOR, fmtVal, fmtTs as ts, fmtTs, lineage } from '../lib/ont';
 import ChainGraph from '../components/ChainGraph.vue';
 import ObjLink from '../components/ObjLink.vue';
+import OptionsPanel from '../components/OptionsPanel.vue';
 
 const ROLES = { planner: '计划员', engineer: '工艺员', operator: '操作工', quality: '质检员', manager: '厂长', sales: '销售' };
 const roleName = (r) => ROLES[r] || r;
@@ -163,7 +184,30 @@ const assignRole = ref('');
 const src = ref(null);
 const isTeacher = session.user?.teacher === true || session.user?.role === 'manager';
 const f = ref({ status: 'open', domain: route.query.domain || '', mine: !isTeacher });
-const openCount = computed(() => (sit.value?.total_open) || 0);
+const openCount = computed(() => (live.value?.total_open) || 0);
+const LVL = { critical: '严重', warn: '警告', info: '提示' };
+// 时间回看（C11）
+const live = ref(null);
+const hist = ref(null);
+const atLocal = ref('');
+const pad = (n) => String(n).padStart(2, '0');
+const toLocal = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const maxLocal = toLocal(new Date());
+const minLocal = toLocal(new Date(Date.now() - 7 * 86400e3));
+async function loadHist() {
+  if (!atLocal.value) return backToNow();
+  try {
+    hist.value = await get('/ont/history?at=' + encodeURIComponent(new Date(atLocal.value).toISOString()));
+    sit.value = hist.value;
+  } catch (e) { alert(e.message); }
+}
+function shift(h) {
+  const base = atLocal.value ? new Date(atLocal.value) : new Date();
+  const d = new Date(Math.max(Date.now() - 7 * 86400e3 + 60e3, base.getTime() + h * 3600e3));
+  atLocal.value = toLocal(d);
+  loadHist();
+}
+function backToNow() { hist.value = null; atLocal.value = ''; sit.value = live.value; }
 const isOpen = computed(() => sel.value && ['open', 'ack', 'doing'].includes(sel.value.status));
 
 const rows = computed(() => {
@@ -204,7 +248,9 @@ const links = computed(() => {
 
 function go(q) { router.push({ path: '/ont', query: { ...route.query, ...q } }); }
 
-async function loadSit() { try { sit.value = await get('/ont/situation'); } catch (e) { err.value = e.message; } }
+async function loadSit() {
+  try { live.value = await get('/ont/situation'); if (!hist.value) sit.value = live.value; } catch (e) { err.value = e.message; }
+}
 async function loadList() {
   try {
     const q = new URLSearchParams({ status: f.value.status, domain: f.value.domain, role: f.value.mine ? session.user?.role || '' : '' });
@@ -271,6 +317,12 @@ onUnmounted(() => clearInterval(timer));
 .spark polyline { fill: none; stroke: var(--c); stroke-width: 1.5; }
 .wait { color: var(--muted); }
 .foot { margin-top: auto; font-size: 11px; }
+.timebar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 8px 12px; margin-bottom: 10px; }
+.timebar input { height: 30px; border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; }
+.btn.sm { height: 30px; padding: 0 10px; }
+.warnline { color: var(--warn-ink); background: var(--warn-bg); padding: 2px 8px; border-radius: 4px; }
+.hlist { margin: 0 0 10px; padding-left: 0; list-style: none; }
+.hlist li { padding: 3px 0; }
 .three { display: grid; grid-template-columns: 320px minmax(0, 1fr) 320px; gap: 14px; align-items: start; }
 .filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; align-items: center; }
 .filters select { height: 30px; border: 1px solid var(--line); border-radius: 6px; }

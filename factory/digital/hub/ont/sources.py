@@ -108,6 +108,7 @@ def tables(B, db, mode):
                                                    "requested_by": r["requested_by"], "confirmed_by": r["confirmed_by"],
                                                    "created": _ts(r["created_at"])}, ts=_ts(r["created_at"]), upd_ts=_now(), text="提议")
     anomalies(B, db, mode)
+    plans(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -132,6 +133,42 @@ def anomalies(B, db, mode):
         for t, k in ((r["detail"] or {}).get("about") or []):
             if t in B.onto.types and k:
                 B.link(mode, "Anomaly", key, "about", k, to_type=t)
+
+
+def plans(B, db, mode):
+    """推演场景和动作（第 17 轮 C 期）"""
+    if not db.one("select to_regclass('action') is not null and to_regclass('scenario') is not null as ok")["ok"]:
+        return
+    for r in db.q("select id, title, changes, result->'cost_total' as cost, created_by, anomaly_id, created_at from scenario "
+                  "where mode=%s and created_at > now() - interval '60 days'", (mode,)):
+        key = "SC-{:05d}".format(r["id"])
+        B.obj(mode, "Scenario", key, {"title": r["title"], "changes": r["changes"], "cost_total": r["cost"], "created_by": r["created_by"],
+                                      "created": _ts(r["created_at"])}, ts=_ts(r["created_at"]), upd_ts=_now(), text="推演：" + r["title"])
+        if r["anomaly_id"]:
+            B.link(mode, "Scenario", key, "anomaly", "A-{:05d}".format(r["anomaly_id"]))
+    unit_of = {"reassign": "from_unit", "reorder": "unit", "expedite": "unit", "outsource": "unit"}
+    for r in db.q("select * from action where mode=%s and created_at > now() - interval '60 days'", (mode,)):
+        key = "ACT-{:05d}".format(r["id"])
+        p = r["params"] or {}
+        B.obj(mode, "ActionRun", key, {"title": r["title"], "type": r["type"], "status": r["status"], "initiator": r["initiator"],
+                                       "approver": r["approver"], "result": (r["result"] or {}).get("text") or (r["result"] or {}).get("error"),
+                                       "created": _ts(r["created_at"]), "executed": _ts(r["executed_at"])},
+              ts=_ts(r["created_at"]), upd_ts=_now(), text="起草：" + r["title"])
+        if r["anomaly_id"]:
+            B.link(mode, "ActionRun", key, "anomaly", "A-{:05d}".format(r["anomaly_id"]))
+        if r["scenario_id"]:
+            B.link(mode, "ActionRun", key, "scenario", "SC-{:05d}".format(r["scenario_id"]))
+        targets = []
+        if unit_of.get(r["type"]) and p.get(unit_of[r["type"]]):
+            targets.append(("Machine", p[unit_of[r["type"]]]))
+        if p.get("work_order"):
+            targets.append(("WorkOrder", p["work_order"]))
+        if p.get("item"):
+            targets.append(("Item", p["item"]))
+        if p.get("sales_order"):
+            targets.append(("SalesOrder", p["sales_order"]))
+        for t, k in targets:
+            B.link(mode, "ActionRun", key, "about", k, to_type=t)
 
 
 def twin(B, db, mode):

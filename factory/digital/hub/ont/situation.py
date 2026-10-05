@@ -91,26 +91,30 @@ def backfill(db, mode, now, days=6):
             continue
 
 
-def cards(db, detector, mode, now=None):
+def cards(db, detector, mode, now=None, live=True):
+    """live=False：时间回看（不记当天指标、异常按那时开着的算）"""
     from hub import kpi
     now = now or dt.datetime.now(dt.timezone.utc)
     detector.init()
     ov = kpi.overview(db, now, mode)
     M = metrics(db, mode, ov, now)
     today = now.astimezone(kpi.TZ).date()
-    record(db, mode, today, M)
-    if not db.one("select 1 as x from ont_metric_daily where mode=%s and day < %s limit 1", (mode, today)):
+    if live:
+        record(db, mode, today, M)
+    if live and not db.one("select 1 as x from ont_metric_daily where mode=%s and day < %s limit 1", (mode, today)):
         backfill(db, mode, now)
     trend = {}
-    for r in db.q("select day, domain, metric, value from ont_metric_daily where mode=%s and day > %s order by day",
-                  (mode, today - dt.timedelta(days=7))):
+    for r in db.q("select day, domain, metric, value from ont_metric_daily where mode=%s and day > %s and day <= %s order by day",
+                  (mode, today - dt.timedelta(days=7), today)):
         trend.setdefault((r["domain"], r["metric"]), []).append([r["day"].isoformat(), r["value"]])
     an = {}
-    for r in db.q("select domain, severity, count(*) as n from anomaly where mode=%s and status in ('open','ack','doing') group by 1, 2", (mode,)):
+    q = ("select domain, severity, count(*) as n from anomaly where mode=%s and status in ('open','ack','doing') group by 1, 2" if live else
+         "select domain, severity, count(*) as n from anomaly where mode=%s and first_seen <= %s and (closed_at is null or closed_at > %s) group by 1, 2")
+    for r in db.q(q, (mode,) if live else (mode, now, now)):
         an.setdefault(r["domain"], {})[r["severity"]] = r["n"]
-    live, waiting = {}, {}
+    running, waiting = {}, {}
     for rid, r in detector.catalog.items():
-        (waiting if r["waiting"] else live).setdefault(r["domain"], []).append(rid)
+        (waiting if r["waiting"] else running).setdefault(r["domain"], []).append(rid)
     out = []
     for d in S.get().domains:
         dom = d["domain"]
@@ -118,6 +122,6 @@ def cards(db, detector, mode, now=None):
             continue
         ms = [{"key": k, "label": lab, "value": v, "fmt": f, "trend": trend.get((dom, k), [])} for k, lab, v, f in M.get(dom, [])]
         out.append({"domain": dom, "label": d["label"], "row": d["row"], "order": d["order"], "metrics": ms,
-                    "anomalies": an.get(dom, {}), "rules_live": sorted(live.get(dom, [])), "rules_waiting": sorted(waiting.get(dom, [])),
+                    "anomalies": an.get(dom, {}), "rules_live": sorted(running.get(dom, [])), "rules_waiting": sorted(waiting.get(dom, [])),
                     "waiting": WAITING.get(dom) if not ms else None})
     return {"cards": out, "now": now.isoformat(), "total_open": sum(sum(x.values()) for x in an.values())}
