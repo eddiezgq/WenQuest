@@ -1,0 +1,22 @@
+# 实验 10.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_7.js。
+原理:
+  - ["差速 AGV 一次试验中左右轮转过 φ_R、φ_L（编码器读出），车走过的路程与航向变化为 d = r(φ_R + φ_L)/2，Δθ = (r/b)(φ_R − φ_L)。对未知量 r 与 k = r/b 它们是线性的（10.7 节）。", "In a run the wheels turn φ_R and φ_L (from the encoders); the distance and heading change are d = r(φ_R + φ_L)/2 and Δθ = (r/b)(φ_R − φ_L), linear in the unknowns r and k = r/b (Section 10.7)."]
+  - 式: "d_i = s_i r，Δθ_i = u_i k（s_i = (φ_R + φ_L)/2，u_i = φ_R − φ_L）；  权重 1/σ_d²、1/σ_θ²；  x̂ = (AᵀWA)⁻¹AᵀWy，协方差 (AᵀWA)⁻¹；  b̂ = r̂/k̂"
+  - ["路程与航向的单位和精度不同，按 1/σ² 加权（10.6 节）。这里 AᵀWA 是对角的，权重不改变 r̂、k̂，但标准差要由 (AᵀWA)⁻¹ 的对角元给出，权重必须正确。试验越多、每次的“信号”（s_i 或 u_i）越大，标准差越小。", "Distance and heading have different units and accuracies, so the rows are weighted by 1/σ² (Section 10.6). Here AᵀWA is diagonal, so the weights do not change r̂ and k̂, but the standard deviations come from the diagonal of (AᵀWA)⁻¹ and need the right weights. More runs and larger signals s_i, u_i make them smaller."]
+步骤:
+  - ["在“标定试验”场景中只做直线试验（转向 0 次），逐次增加到 3 次以上，记下 r̂、b̂ 及其标准差（任务 1，表 1）。", "In the calibration scene make straight runs only (no turns), at least 3; record r̂, b̂ and their standard deviations (task 1, Table 1)."]
+  - ["加入原地转向试验，调整两种试验的次数，在总数不超过 9 次的前提下使 r 的标准差小于 0.02 mm、b 的标准差小于 0.16 mm（任务 2；提示：σ_r 几乎只取决于直线试验的次数，先定直线次数，再加转向），记入表 1。", "Add turns in place and adjust both counts so that, with at most 9 runs, the standard deviation of r is below 0.02 mm and of b below 0.16 mm (task 2; hint: σ_r depends almost only on the number of straight runs, so fix that first, then add turns); record in Table 1."]
+  - ["切换到“检验”场景，比较图纸参数与标定参数推算的终点误差（任务 3），填表 2。", "Switch to the check scene and compare the end-point errors with the drawing values and with the calibrated values (task 3); fill in Table 2."]
+数据表:
+  - 标题: ["表 1  试验次数与标定结果", "Table 1  Runs and calibration results"]
+    表头: ["直线次数", "转向次数", "r̂ / mm", "σ_r / mm", "b̂ / mm", "σ_b / mm"]
+    表头英文: ["Straight runs", "Turns", "r̂ / mm", "σ_r / mm", "b̂ / mm", "σ_b / mm"]
+    行: [["3", "0", "", "", "", ""], ["2", "2", "", "", "", ""], ["", "", "", "", "", ""], ["", "", "", "", "", ""]]
+  - 标题: ["表 2  走正方形的终点误差", "Table 2  End-point error of the square"]
+    表头: ["参数", "r / mm", "b / mm", "终点误差 / mm"]
+    表头英文: ["Parameters", "r / mm", "b / mm", "End error / mm"]
+    行: [["图纸值", "75", "400", ""], ["标定值", "", "", ""]]
+注意:
+  - ["仿真中真实参数已知，便于检验；实际标定时只能看标准差和残差图判断结果是否可信。残差应当像随机噪声，没有明显的规律。", "The true values are known in simulation, which makes checking easy; in practice only the standard deviations and the residual plot tell whether the result is trustworthy. Residuals should look like random noise with no pattern."]
+思考题:
+  - ["若跟踪仪只能测终点位置、不能测航向，还能标定 b 吗？需要什么样的试验？（提示：走圆弧。）", "If the tracker measured only end positions, not heading, could b still be calibrated? What runs would be needed? (Hint: drive arcs.)"]

@@ -1,0 +1,19 @@
+# 实验 10.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_5.js。
+原理:
+  - ["用 d 次多项式 c₀ + c₁x + … + c_d x^d 拟合 n 个数据点，是一个 n × (d + 1) 的超定方程组 V c = y（V 为范德蒙德矩阵），取最小二乘解（10.4、10.5 节）。", "Fitting a degree-d polynomial to n points is an n × (d + 1) overdetermined system V c = y (V a Vandermonde matrix), solved in the least-squares sense (Sections 10.4, 10.5)."]
+  - 式: "训练误差 = √(Σ(p(x_i) − y_i)²/n)（训练点）；  检验误差 = 同样的式子（另外的检验点）；  d + 1 = n 时多项式插值，训练误差为零"
+  - ["次数越高，可调的系数越多，训练误差只降不升；但多出来的系数开始拟合噪声，在训练点之间乱摆，检验误差反而上升，这就是过拟合。", "A higher degree has more coefficients, so the training error never increases; but the extra coefficients start fitting the noise and swing between the points, so the test error rises: overfitting."]
+步骤:
+  - ["在 12 个训练点的场景中，从 1 次开始逐次增大，记录训练误差和检验误差（表 1），找出检验误差最小的次数（任务 1）。", "With 12 training points, increase the degree from 1 and record both errors (Table 1); find the degree with the smallest test error (task 1)."]
+  - ["增大到训练误差为零（任务 2），观察拟合曲线在训练点之间的形状，记下检验误差。", "Increase until the training error is zero (task 2); look at the curve between the points and record the test error."]
+  - ["切换到 36 个训练点的场景，重复表 1 的测量，取 11 次（任务 3），比较两个场景。", "Switch to 36 training points, repeat Table 1, set degree 11 (task 3) and compare the two scenes."]
+数据表:
+  - 标题: ["表 1  次数与误差（单位 mN）", "Table 1  Degree and error (mN)"]
+    表头: ["次数", "训练误差（12 点）", "检验误差（12 点）", "训练误差（36 点）", "检验误差（36 点）"]
+    表头英文: ["Degree", "Training (12)", "Test (12)", "Training (36)", "Test (36)"]
+    行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["5", "", "", "", ""], ["8", "", "", "", ""], ["10", "", "", "", ""], ["11", "", "", "", ""]]
+注意:
+  - ["测量噪声 σ = 30 mN。训练误差明显小于噪声时，说明模型在拟合噪声。", "The noise σ is 30 mN. A training error well below the noise means the model is fitting the noise."]
+  - ["温度先换算成 x = (T − 40)/20 再拟合；直接用 T 的幂次，范德蒙德矩阵非常病态（10.5 节）。", "Temperatures are scaled to x = (T − 40)/20 before fitting; powers of T itself make the Vandermonde matrix very ill-conditioned (Section 10.5)."]
+思考题:
+  - ["实际工作中没有“真实曲线”可看，也往往没有额外的检验数据。怎样选择次数？（提示：把数据分成几份轮流检验，即交叉验证。）", "In practice there is no true curve and often no separate test data. How would you choose the degree? (Hint: split the data and take turns testing, i.e. cross-validation.)"]

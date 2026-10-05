@@ -38,6 +38,9 @@ chapters:
   9:
     status: ai
     title_en: "Linear Maps"
+  10:
+    status: ai
+    title_en: "Orthogonality, Projections and Least Squares"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"
