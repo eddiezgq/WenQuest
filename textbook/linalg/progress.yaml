@@ -41,6 +41,9 @@ chapters:
   10:
     status: ai
     title_en: "Orthogonality, Projections and Least Squares"
+  11:
+    status: ai
+    title_en: "Orthogonal Bases and QR Factorization"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"

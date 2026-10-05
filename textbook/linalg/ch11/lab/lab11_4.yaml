@@ -1,0 +1,18 @@
+# 实验 11.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab11_4.js。
+原理:
+  - ["A = QR 有三种常用的求法：经典格拉姆–施密特逐列减去投影（11.2 节）；豪斯霍尔德反射每步消去一列对角线以下的元素；修正格拉姆–施密特每减一个投影就更新向量（11.2.3 节）；豪斯霍尔德反射每步消去一列对角线以下的元素；吉文斯旋转每步消去一个元素（11.4 节）。", "Ways to compute A = QR: classical Gram–Schmidt subtracts projections column by column (Section 11.2), modified Gram–Schmidt updates the vector after each projection; a Householder reflection clears one column below the diagonal; a Givens rotation clears one entry (Section 11.4)."]
+  - 式: "H = I − 2vvᵀ/vᵀv，v = x + sign(x₁)‖x‖e₁；  G = [[c, s], [−s, c]]，c = a/r，s = b/r；  正交性 ‖QᵀQ − I‖_F，分解误差 ‖QR − A‖_F（F 为弗罗贝尼乌斯范数：各元素平方和开方）"
+  - ["反射与旋转本身就是正交矩阵，乘起来仍然正交，所以 Q 的正交性只受舍入误差影响；格拉姆–施密特的 Q 是“减出来”的，列几乎相关时相减抵消，正交性会严重损失。", "Reflections and rotations are orthogonal, and so are their products, so Q stays orthogonal up to rounding; Gram–Schmidt builds Q by subtraction, and with nearly dependent columns cancellation destroys orthogonality."]
+步骤:
+  - ["在“豪斯霍尔德反射”场景、矩阵 1 下逐步按“下一步”，记下每一步后哪些元素变为零，直到上三角（任务 1），记录表 1。", "In the Householder scene with matrix 1, press Next step and note which entries become zero, until upper triangular (task 1); fill in Table 1."]
+  - ["切换到“吉文斯旋转”场景，同样做完（任务 2），记下旋转的次数。", "Switch to the Givens scene and finish (task 2); record the number of rotations."]
+  - ["把矩阵换成 2，在“经典格拉姆–施密特”场景中做完（任务 3），记下 ‖QᵀQ − I‖；在“修正格拉姆–施密特”场景中对矩阵 2 做完（任务 4）；再在另外两个场景中对矩阵 2 做完，比较。", "Switch to matrix 2 and finish classical Gram–Schmidt (task 3); record ‖QᵀQ − I‖; finish modified Gram–Schmidt on matrix 2 (task 4); then do matrix 2 in the other two scenes and compare."]
+数据表:
+  - 标题: ["表 1  三种方法的步数与精度", "Table 1  Steps and accuracy of the three methods"]
+    表头: ["方法", "矩阵", "步数", "‖QᵀQ − I‖", "‖QR − A‖"]
+    表头英文: ["Method", "Matrix", "Steps", "‖QᵀQ − I‖", "‖QR − A‖"]
+    行: [["豪斯霍尔德", "1", "", "", ""], ["吉文斯", "1", "", "", ""], ["经典格拉姆–施密特", "1", "", "", ""], ["修正格拉姆–施密特", "1", "", "", ""], ["豪斯霍尔德", "2", "", "", ""], ["吉文斯", "2", "", "", ""], ["经典格拉姆–施密特", "2", "", "", ""], ["修正格拉姆–施密特", "2", "", "", ""]]
+注意:
+  - ["矩阵 2 的数值很小（10⁻⁸）的元素在色块图上几乎看不出来，以读数为准。", "In matrix 2 the tiny (10⁻⁸) entries hardly show in the colour map; rely on the readouts."]
+思考题:
+  - ["对矩阵 2，格拉姆–施密特的 ‖QR − A‖ 很小，Q 却不正交。这说明“分解的误差小”与“Q 是正交矩阵”是两回事。用它解最小二乘会有什么后果？", "For matrix 2, Gram–Schmidt gives a small ‖QR − A‖ but a non-orthogonal Q. A small factorization error is not the same as an orthogonal Q. What happens if this Q is used for least squares?"]

@@ -1,0 +1,22 @@
+# 实验 11.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab11_6.js。
+原理:
+  - ["函数也可以看作向量，内积取 ⟨f, g⟩ = ∫ f g dx。在 [−π, π] 上 1、cos kx、sin kx 两两正交，在 [−1, 1] 上勒让德多项式两两正交（11.6 节）。", "Functions are vectors too, with inner product ⟨f, g⟩ = ∫ f g dx. On [−π, π] the functions 1, cos kx, sin kx are mutually orthogonal; on [−1, 1] so are the Legendre polynomials (Section 11.6)."]
+  - 式: "c_k = ⟨f, φ_k⟩/⟨φ_k, φ_k⟩；  方波：b_k = 4/(kπ)（k 奇）；  勒让德：c_k = (2k + 1)/2 ∫₋₁¹ f P_k dx；  离散等距采样时 cos kθ、sin kθ 也两两正交"
+  - ["正交基下，部分和就是向前几项张成的子空间的投影，是这个子空间里的最佳逼近（均方意义）；加一项不改变已有的系数。", "With an orthogonal basis the partial sum is the projection onto the span of the first terms, the best approximation there in the mean-square sense; adding a term leaves the earlier coefficients unchanged."]
+步骤:
+  - ["在方波场景中逐渐增大 N，记录均方根误差和过冲（表 1），直到均方根误差小于 0.1（任务 1）。", "In the square-wave scene increase N and record the RMS error and overshoot (Table 1) until the RMS error is below 0.1 (task 1)."]
+  - ["在编码器场景中把 K 从 0 增大到 8，记录残差和各阶幅值，找出最小的合适阶数（任务 2）。", "In the encoder scene raise K from 0 to 8, record the residual and amplitudes, and find the smallest adequate K (task 2)."]
+  - ["在勒让德场景中增大 d，记录最大误差，找出使最大误差小于 0.05 的最小次数（任务 3）。", "In the Legendre scene raise d, record the maximum error and find the smallest d giving less than 0.05 (task 3)."]
+数据表:
+  - 标题: ["表 1  方波：项数与误差", "Table 1  Square wave: terms and error"]
+    表头: ["N", "均方根误差", "过冲"]
+    表头英文: ["N", "RMS error", "Overshoot"]
+    行: [["1", "", ""], ["5", "", ""], ["15", "", ""], ["31", "", ""], ["61", "", ""]]
+  - 标题: ["表 2  编码器：谐波阶数与残差", "Table 2  Encoder: harmonics and residual"]
+    表头: ["K", "残差 / 角秒", "第 K 阶幅值 / 角秒"]
+    表头英文: ["K", "Residual / arcsec", "Amplitude of harmonic K / arcsec"]
+    行: [["0", "", ""], ["1", "", ""], ["2", "", ""], ["3", "", ""], ["4", "", ""], ["8", "", ""]]
+注意:
+  - ["编码器场景中的噪声约 2 角秒；残差降到噪声水平后，再增加阶数只是在拟合噪声。", "The encoder noise is about 2 arcsec; once the residual reaches it, more harmonics only fit noise."]
+思考题:
+  - ["方波的过冲为什么不随 N 增大而消失？均方根误差却在减小，这两件事矛盾吗？", "Why does the square wave's overshoot not vanish as N grows, while the RMS error keeps falling? Is that a contradiction?"]
