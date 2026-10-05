@@ -1,9 +1,9 @@
 <template>
   <div class="page">
-    <div v-if="err" class="err">{{ err }} <router-link to="/ont">回厂情中枢</router-link></div>
+    <div v-if="err" class="err">{{ err }} <router-link to="/ont/map">回厂情中枢</router-link></div>
     <template v-if="o">
       <header class="head card" :style="{ '--c': DOMAIN_COLOR[o.domain] }">
-        <div class="crumb small"><router-link to="/ont">厂情中枢</router-link> / <span>{{ domainLabel }}</span> /
+        <div class="crumb small"><router-link to="/ont/map">厂情中枢</router-link> / <span>{{ domainLabel }}</span> /
           <router-link :to="'/ont/' + o.type">{{ o.label }}</router-link></div>
         <div class="title">
           <span class="badge">{{ o.label }}</span>
@@ -51,6 +51,17 @@
       </div>
 
       <section class="card">
+        <div class="card-head"><h2>影响面</h2><span class="muted small">从这个对象出发，往上游找原因、往下游看影响（不开异常）</span>
+          <button v-if="!impact" class="more btn" :disabled="impactBusy" @click="loadImpact">{{ impactBusy ? '计算中…' : '算一下影响面' }}</button></div>
+        <template v-if="impact">
+          <ul class="small isum"><li v-for="(x, i) in impact.summary" :key="i">{{ x }}</li></ul>
+          <div class="impact"><ChainGraph :chain="impact" @edge="(e) => (ibasis = e)" /></div>
+          <p v-if="ibasis" class="small muted">依据：{{ ibasis.label }} —— {{ ibasis.basis.how }}<template v-if="ibasis.basis.seq">
+            <button class="src-btn" @click="showSource(ibasis.basis.seq, ibasis.label)">ⓘ #{{ ibasis.basis.seq }}</button></template></p>
+        </template>
+      </section>
+
+      <section class="card">
         <div class="card-head"><h2>相关对象</h2><span class="muted small">按关系分组；每组最多显示 50 个</span>
           <button class="more btn ghost sm" :disabled="!o.links.length" @click="exportCsv">导出 CSV</button></div>
         <p v-if="!o.links.length" class="muted small">还没有和其他对象的关系。</p>
@@ -86,6 +97,8 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import OntGraph from '../components/OntGraph.vue';
+import ChainGraph from '../components/ChainGraph.vue';
+import { get } from '../lib/api';
 import ObjLink from '../components/ObjLink.vue';
 import { ont, loadTypes, getObj, getTimeline, lineage, fmtVal, fmtTs, stateTone, toCsv, download, DOMAIN_COLOR } from '../lib/ont';
 
@@ -96,6 +109,13 @@ const err = ref('');
 const kind = ref('');
 const src = ref(null);
 const srcTitle = ref('');
+const impact = ref(null);
+const impactBusy = ref(false);
+const ibasis = ref(null);
+async function loadImpact() {
+  impactBusy.value = true;
+  try { impact.value = await get(`/ont/impact/${o.value.type}/${o.value.key.split('/').map(encodeURIComponent).join('/')}`); } catch (e) { alert(e.message); } finally { impactBusy.value = false; }
+}
 
 const KIND = { created: '出现', updated: '更新', processed: '加工', started: '开工', completed: '完工', runin: '跑合', nonconforming: '不合格',
   removed: '卸下', recovered: '恢复', down: '停机', recover: '恢复', tool_change: '换刀' };
@@ -128,6 +148,8 @@ function exportCsv() {
 async function load() {
   err.value = '';
   o.value = null;
+  impact.value = null;
+  ibasis.value = null;
   events.value = [];
   kind.value = '';
   const { type, key } = route.params;
@@ -163,6 +185,9 @@ watch(() => route.fullPath, () => { if (route.path.startsWith('/ont/')) load(); 
 .ts { color: var(--muted); }
 .chg { color: var(--muted); }
 .grp { margin-bottom: 8px; }
+.impact { min-height: 500px; display: flex; flex-direction: column; }
+.impact > * { flex: 1; }
+.isum { margin: 0 0 8px; padding-left: 18px; }
 .grp summary { cursor: pointer; padding: 4px 0; display: flex; gap: 8px; align-items: center; }
 .btn.sm { height: 28px; padding: 0 10px; }
 .src-modal { width: min(680px, 94vw); max-height: 86vh; overflow: auto; }

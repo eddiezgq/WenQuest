@@ -126,6 +126,10 @@ class Hub:
             log.exception("工厂本体初始化失败")
             return
         threading.Thread(target=self.ont.run, daemon=True, name="ontology").start()
+        try:
+            self.ai.detector().init()                  # 厂情中枢的异常表（第 17 轮 B 期）
+        except Exception:  # noqa: BLE001
+            log.exception("异常表初始化失败")
 
     def on_message(self, tp, msg):
         t = msg["type"]
@@ -1476,6 +1480,9 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     H.hist._last_state = {k: v for k, v in H.hist._last_state.items() if k[1] != "teach"}
     H.hist._failed_parts.clear()
     H.ai._sent = {k: v for k, v in H.ai._sent.items() if k[0] != "teach"}
+    H.ai.detector().init()                     # 厂情中枢的异常（第 17 轮 B 期）随情景一起清空
+    H.db.x("delete from anomaly_note where anomaly_id in (select id from anomaly where mode='teach')")
+    H.db.x("delete from anomaly where mode='teach'")
     H.db.x("update quality_problem set cleared_at=now(), cleared_how='scenario' where mode='teach' and cleared_at is null")
     H.twin.reset("teach")
     if H.ont is not None:
@@ -1518,6 +1525,7 @@ _twin.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quo
 # ---------------------------------------------------------------- 厂情中枢：工厂本体（第 17 轮 A 期）
 from hub.ont import api as _ont  # noqa: E402
 _ont.mount(app, H, user_of)
+_ont.mount_anomaly(app, H, user_of, who)          # 第 17 轮 B 期：异常、追因、态势、规则
 
 
 # ---------------------------------------------------------------- 虚拟 PLC（第 18 轮第 8 步《PLC 原理及实践》）

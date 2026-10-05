@@ -7,15 +7,22 @@ types:
   Anomaly:
     label: 异常
     label_en: Anomaly
-    maturity: next
-    key: 异常编号
+    maturity: have
+    key: 异常编号，如 A-00042
     title: "{key} {title}"
-    sources: [厂情中枢（17B 起）]
+    sources: [厂情中枢规则库（anomaly 表，第 17 轮 B 期）]
     props:
       title: {t: str, l: 标题}
+      rule: {t: str, l: 规则}
       domain: {t: str, l: 领域}
       severity: {t: str, l: 严重度}
       status: {t: str, l: 状态}
+      role: {t: str, l: 负责角色}
+      first_seen: {t: time, l: 首次发现}
+      last_seen: {t: time, l: 最近一次}
+      hits: {t: int, l: 次数}
+    links:
+      about: {to: "*", l: 涉及, inv: 异常}
   Scenario:
     label: 场景
     label_en: Scenario

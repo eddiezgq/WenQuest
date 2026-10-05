@@ -297,6 +297,26 @@ def main():
     have = [t for d in types["domains"] for t in d["types"] if t["maturity"] in ("have", "sim")]
     empty = [t["label"] for t in have if not t["count"]]
     print("  （有数据的对象类型 {} / {}；这一轮流程没碰到的：{}）".format(len(have) - len(empty), len(have), "、".join(empty) or "无"))
+
+    print("10. 厂情中枢：异常、追因与指挥台（第 17 轮 B 期）")
+    t0 = time.time()
+    hub("POST", "/api/mes/cmd", {"unit": "cnc-l01-b", "command": "inject_fault", "minutes": 120, "reason": "闭环测试：主轴过热"}, teacher)
+    an = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"]
+                            if x["rule"] == "P1" and (x["subject"] or {}).get("key") == "cnc-l01-b"), None), "停机异常", 90, 2)
+    check(an is not None and time.time() - t0 <= 60, "CNC-L01-B 停机后 {:.0f} 秒出现异常".format(time.time() - t0))
+    if an:
+        d = hub("GET", "/api/ont/anomalies/{}".format(an["id"]), token=teacher)
+        types = {n["type"] for n in d["chain"]["nodes"]}
+        check({"Machine", "Anomaly"} <= types and d["chain"]["summary"], "因果链：{}".format("；".join(d["chain"]["summary"])[:120]))
+        check(all(e["basis"]["how"] for e in d["chain"]["edges"]), "因果链每条边都有依据（{} 条）".format(len(d["chain"]["edges"])))
+        r = hub("POST", "/api/ont/anomalies/{}/close".format(an["id"]), {"text": "闭环测试：复位"}, teacher)
+        check(r["status"] == "closed", "异常可以关闭并留记录")
+    hub("POST", "/api/mes/cmd", {"unit": "cnc-l01-b", "command": "reset"}, teacher)
+    sit = hub("GET", "/api/ont/situation", token=teacher)
+    check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 3, "全厂态势 15 块，3 块待接入")
+    rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
+    live = [x for x in rl if not x["waiting"]]
+    check(len(live) == 20 and not [x["id"] for x in live if x["error"]], "规则 20 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位

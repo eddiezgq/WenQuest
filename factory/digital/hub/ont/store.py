@@ -192,9 +192,14 @@ class Batch:
     def event(self, mode, type_, key, ts, kind, text, seq=None, changes=None):
         self.events.append((mode, type_, key, ts, kind, text, Jsonb(changes) if changes else None, seq))
 
-    def link(self, mode, frm, frm_key, name, to_key, props=None, seq=None, ts=None):
+    def link(self, mode, frm, frm_key, name, to_key, props=None, seq=None, ts=None, to_type=None):
         spec = self.onto.link(frm, name)
-        k = (mode, frm + "." + name, frm, str(frm_key), spec["to"], str(to_key))
+        dst = spec["to"]
+        if dst == S.ANY:
+            if to_type not in self.onto.types:
+                raise KeyError("{}.{} 是通用链接，要给出目标类型（to_type）".format(frm, name))
+            dst = to_type
+        k = (mode, frm + "." + name, frm, str(frm_key), dst, str(to_key))
         cur = self.links.get(k)
         merged = dict((cur or {}).get("props") or {}, **{a: _j(b) for a, b in (props or {}).items() if b is not None})
         self.links[k] = {"props": merged, "seq": seq if seq is not None else (cur or {}).get("seq"), "ts": ts or (cur or {}).get("ts")}

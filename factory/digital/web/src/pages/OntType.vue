@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-title">
-      <h1><router-link to="/ont" class="back">厂情中枢</router-link> / {{ spec?.label || type }}</h1>
+      <h1><router-link to="/ont/map" class="back">全貌地图</router-link> / {{ spec?.label || type }}</h1>
       <span class="muted">{{ spec?.label_en }} · {{ spec?.domain_label }} · {{ spec?.maturity_label }}<template v-if="spec?.key"> · 编号：{{ spec.key }}</template></span>
     </div>
     <div v-if="err" class="err">{{ err }}</div>

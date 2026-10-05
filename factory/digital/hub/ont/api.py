@@ -18,6 +18,26 @@ def level(u):
     return 1
 
 
+def filter_chain(ch, lv):
+    """链条按敏感级别过滤：看不到的节点换成“原因待查”（不暴露类型和编号），边保留"""
+    onto = S.get()
+    if not ch:
+        return ch
+    nodes = []
+    for n in ch.get("nodes", []):
+        t = n["type"]
+        if t in onto.types and int(onto.types[t].get("sensitivity", 0) or 0) > lv:
+            nodes.append({"id": n["id"], "type": "Hidden", "key": "", "display": "原因待查", "label": "原因待查", "domain": n["domain"],
+                          "role": n["role"], "values": {}, "hidden": True})
+        else:
+            nodes.append(n)
+    hidden = {n["id"] for n in nodes if n.get("hidden")}
+    edges = [dict(e, basis={"how": "需要更高权限才能看到依据"} if (e["from"] in hidden or e["to"] in hidden) else e["basis"])
+             for e in ch.get("edges", [])]
+    summary = [x for x in ch.get("summary", []) if not hidden or "情景" not in x]
+    return dict(ch, nodes=nodes, edges=edges, summary=summary)
+
+
 def mount(app, H, user_of):
     onto = S.get()
 
@@ -120,7 +140,7 @@ def mount(app, H, user_of):
                                                                  "domain": onto.types[other[0]]["domain"], "label": onto.types[other[0]]["label"],
                                                                  "missing": True}, hop=hop)
                         nxt.append(other)
-                    ls = onto.links[(lr["src_type"], lr["type"].split(".", 1)[1])]
+                    ls = onto.links[(lr["src_type"], lr["type"].split(".", 1)[1])]  # 通用链接也在这里
                     eid = "{}>{}>{}".format(lr["type"], lr["src_type"] + "|" + lr["src_key"], lr["dst_type"] + "|" + lr["dst_key"])
                     edges[eid] = {"id": eid, "from": lr["src_type"] + "|" + lr["src_key"], "to": lr["dst_type"] + "|" + lr["dst_key"],
                                   "type": lr["type"], "label": ls["l"], "inverse": ls.get("inv", ""), "props": lr["props"], "seq": lr["src_seq"]}
@@ -153,26 +173,27 @@ def mount(app, H, user_of):
         groups = []
         for (ft, ln), ls in onto.links.items():
             out_ = ft == t
-            in_ = ls["to"] == t
+            in_ = ls["to"] in (t, S.ANY)
             for direction in (["out"] if out_ else []) + (["in"] if in_ else []):
-                other = ls["to"] if direction == "out" else ft
-                if not visible(u, other):
-                    continue
                 if direction == "out":
-                    rows = H.db.q("select l.dst_key as k, l.props, l.src_seq, o.display from ont_link l left join ont_object o on "
+                    rows = H.db.q("select l.dst_type as t, l.dst_key as k, l.props, l.src_seq, o.display from ont_link l left join ont_object o on "
                                   "o.mode=l.mode and o.type=l.dst_type and o.key=l.dst_key where l.mode=%s and l.type=%s and l.src_key=%s "
                                   "order by l.ts desc nulls last limit 51", (u["mode"], ft + "." + ln, key))
                     label = ls["l"]
                 else:
-                    rows = H.db.q("select l.src_key as k, l.props, l.src_seq, o.display from ont_link l left join ont_object o on "
-                                  "o.mode=l.mode and o.type=l.src_type and o.key=l.src_key where l.mode=%s and l.type=%s and l.dst_key=%s "
-                                  "order by l.ts desc nulls last limit 51", (u["mode"], ft + "." + ln, key))
+                    rows = H.db.q("select l.src_type as t, l.src_key as k, l.props, l.src_seq, o.display from ont_link l left join ont_object o on "
+                                  "o.mode=l.mode and o.type=l.src_type and o.key=l.src_key where l.mode=%s and l.type=%s and l.dst_type=%s "
+                                  "and l.dst_key=%s order by l.ts desc nulls last limit 51", (u["mode"], ft + "." + ln, t, key))
                     label = ls.get("inv") or ls["l"]
-                if rows:
+                by_type = {}
+                for x in rows[:50]:
+                    if visible(u, x["t"]):
+                        by_type.setdefault(x["t"], []).append(x)
+                for other, xs in by_type.items():
                     groups.append({"link": ft + "." + ln, "direction": direction, "label": label, "type": other,
                                    "type_label": onto.types[other]["label"], "more": len(rows) > 50,
                                    "items": [{"key": x["k"], "display": x["display"] or x["k"], "props": x["props"], "seq": x["src_seq"]}
-                                             for x in rows[:50]]})
+                                             for x in xs]})
         aliases = [a["alias"] for a in H.db.q("select alias from ont_alias where mode=%s and type=%s and key=%s", (u["mode"], t, key))]
         return {"type": t, "key": key, "display": r["display"], "label": spec["label"], "label_en": spec.get("label_en", ""),
                 "domain": spec["domain"], "maturity": spec["maturity"], "attrs": attrs, "links": groups, "aliases": aliases,
@@ -236,3 +257,162 @@ def mount(app, H, user_of):
             raise HTTPException(403, "只有厂长（教师）可以重建本体")
         n = H.ont.replay(u["mode"])
         return dict(H.ont.health(), replayed=n)
+
+
+# ================================================================== 第 17 轮 B 期：异常、追因、态势、规则
+def mount_anomaly(app, H, user_of, who):
+    import datetime as dt
+
+    from hub.ont import anomaly as A
+    from hub.ont import chain as CH
+    from hub.ont import narrate as NR
+    from hub.ont import situation as SIT
+    onto = S.get()
+
+    def D():
+        d = H.ai.detector()
+        d.init()
+        return d
+
+    def seen(u, a):
+        t = a.get("subject_type")
+        return not t or t not in onto.types or int(onto.types[t].get("sensitivity", 0) or 0) <= level(u)
+
+    def row(a, cat):
+        r = cat.get(a["rule"], {})
+        return {"id": a["id"], "key": "A-{:05d}".format(a["id"]), "rule": a["rule"], "rule_name": r.get("name"), "domain": a["domain"],
+                "domain_label": next((d["label"] for d in onto.domains if d["domain"] == a["domain"]), a["domain"]),
+                "subject": {"type": a["subject_type"], "key": a["subject_key"]} if a["subject_type"] else None,
+                "severity": a["severity"], "severity_label": A.LEVEL_LABEL[a["severity"]], "status": a["status"],
+                "status_label": A.STATUS_LABEL[a["status"]], "role": a["role"], "title": a["title"],
+                "text": (a["detail"] or {}).get("text"), "first_seen": a["first_seen"].isoformat(), "last_seen": a["last_seen"].isoformat(),
+                "hits": a["hits"], "assignee": a["assignee"], "closed_reason": a["closed_reason"], "reopened": a["reopened"]}
+
+    def can_act(u, a):
+        r = D().catalog.get(a["rule"], {})
+        return bool(u.get("teacher")) or u.get("role") == "manager" or u.get("role") in (r.get("role") or []) or u.get("role") == a["role"]
+
+    @app.get("/api/ont/anomalies")
+    def anomalies(status: str = "open", domain: str = "", role: str = "", limit: int = 300, u=Depends(user_of)):
+        d = D()
+        w, args = ["mode=%s"], [u["mode"]]
+        if status == "open":
+            w.append("status in ('open','ack','doing')")
+        elif status == "closed":
+            w.append("status in ('resolved','closed')")
+        if domain:
+            w.append("domain=%s")
+            args.append(domain)
+        if role:
+            w.append("role=%s")
+            args.append(role)
+        rows = H.db.q("select * from anomaly where {} order by case severity when 'critical' then 0 when 'warn' then 1 else 2 end, "
+                      "last_seen desc limit %s".format(" and ".join(w)), args + [max(1, min(int(limit), 1000))])
+        return {"anomalies": [row(a, d.catalog) for a in rows if seen(u, a)],
+                "last_round": d.last_round.get(u["mode"]), "levels": A.LEVEL_LABEL, "statuses": A.STATUS_LABEL}
+
+    def get_a(u, aid):
+        a = H.db.one("select * from anomaly where id=%s and mode=%s", (aid, u["mode"]))
+        if a is None or not seen(u, a):
+            raise HTTPException(404, "没有这个异常")
+        return a
+
+    @app.get("/api/ont/anomalies/{aid}")
+    def anomaly(aid: int, u=Depends(user_of)):
+        d = D()
+        a = get_a(u, aid)
+        if a["status"] in A.OPEN:
+            stale = not a["chain"] or dt.datetime.fromisoformat(a["chain"]["computed_at"]) < dt.datetime.now(dt.timezone.utc) - dt.timedelta(seconds=60)
+            if stale:
+                d.refresh_chains(u["mode"], A.Ctx(H.db, u["mode"]), every_s=60, ids=[aid])
+                a = get_a(u, aid)
+        r = d.catalog.get(a["rule"], {})
+        det = a["detail"] or {}
+        return dict(row(a, d.catalog), chain=filter_chain(a["chain"], level(u)), evidence=det.get("evidence") or [],
+                    hint=det.get("hint"), values=det.get("values") or {},
+                    rule_info={"id": a["rule"], "name": r.get("name"), "desc": r.get("desc"), "params": d.rule(a["rule"])["params"] if a["rule"] in d.catalog else {}},
+                    notes=[{"ts": n["ts"].isoformat(), "who": n["who"], "kind": n["kind"], "text": n["text"]} for n in d.notes(aid)],
+                    can_act=can_act(u, a), text_rules=NR.rules_text(a, filter_chain(a["chain"], level(u))))
+
+    @app.post("/api/ont/anomalies/{aid}/{kind}")
+    def anomaly_act(aid: int, kind: str, body: dict = Body(default={}), u=Depends(user_of)):
+        d = D()
+        a = get_a(u, aid)
+        if kind == "narrate":
+            return NR.narrate(H.ai.llm, a, filter_chain(a["chain"], level(u)))
+        if kind not in ("ack", "doing", "assign", "note", "close"):
+            raise HTTPException(404, "没有这个操作")
+        if kind != "note" and not can_act(u, a):
+            raise HTTPException(403, "这个异常由{}负责；你可以写备注".format(a["role"]))
+        try:
+            d.act(aid, who(u), kind, body.get("text", ""), body.get("role"))
+        except A.RuleError as e:
+            raise HTTPException(400, str(e))
+        return anomaly(aid, u)
+
+    @app.get("/api/ont/impact/{t}/{key:path}")
+    def impact(t: str, key: str, u=Depends(user_of)):
+        if t not in onto.types or int(onto.types[t].get("sensitivity", 0) or 0) > level(u):
+            raise HTTPException(404, "没有这类对象，或你没有权限查看")
+        return filter_chain(CH.for_object(A.Ctx(H.db, u["mode"]), t, key), level(u))
+
+    @app.get("/api/ont/situation")
+    def situation(u=Depends(user_of)):
+        return SIT.cards(H.db, D(), u["mode"])
+
+    @app.get("/api/ont/rules")
+    def rules(u=Depends(user_of)):
+        d = D()
+        out = []
+        counts = {r["rule"]: r for r in H.db.q("select rule, count(*) as n, max(first_seen) as last, "
+                                               "sum(case when status in ('open','ack','doing') then 1 else 0 end) as open "
+                                               "from anomaly where mode=%s group by rule", (u["mode"],))}
+        for rid, base in d.catalog.items():
+            r = d.rule(rid)
+            st = d.stats.get(rid, {})
+            c = counts.get(rid) or {}
+            out.append({"id": rid, "name": base["name"], "domain": base["domain"],
+                        "domain_label": next((x["label"] for x in onto.domains if x["domain"] == base["domain"]), base["domain"]),
+                        "severity": base["severity"], "role": base["role"], "enabled": r["enabled"], "waiting": base["waiting"],
+                        "params": r["params"], "defaults": base["params"], "desc": base.get("desc"), "hint": base.get("hint"),
+                        "fired": c.get("n", 0), "open": c.get("open", 0), "last_fired": c["last"].isoformat() if c.get("last") else None,
+                        "error": st.get("error"), "ms": st.get("ms"), "nodata": st.get("nodata", False)})
+        changes = [{"ts": x["ts"].isoformat(), "who": x["who"], "rule": x["rule"], "field": x["field"], "old": x["old"], "new": x["new"]}
+                   for x in H.db.q("select * from rule_change order by id desc limit 50")]
+        return {"rules": out, "changes": changes, "can_edit": bool(u.get("teacher")) and u.get("role") == "manager",
+                "last_round": d.last_round.get(u["mode"])}
+
+    @app.post("/api/ont/rules/{rid}")
+    def rule_set(rid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        if not (u.get("teacher") and u.get("role") == "manager"):
+            raise HTTPException(403, "只有厂长（教师）可以调整规则")
+        try:
+            D().set_rule(rid, who(u), body.get("enabled"), body.get("params"))
+        except KeyError:
+            raise HTTPException(404, "没有这条规则")
+        except (A.RuleError, ValueError, TypeError) as e:
+            raise HTTPException(400, str(e))
+        return rules(u)
+
+    @app.post("/api/ont/rules/{rid}/backtest")
+    def backtest(rid: str, body: dict = Body(default={}), u=Depends(user_of)):
+        """用历史检验：过去 days 天，每 step_h 小时按当时的数据跑一次（只算，不开异常）"""
+        d = D()
+        if rid not in d.catalog or d.catalog[rid]["waiting"]:
+            raise HTTPException(404, "没有这条规则，或它还没有数据")
+        days, step = max(1, min(int(body.get("days", 7)), 14)), max(1, int(body.get("step_h", 6)))
+        now = dt.datetime.now(dt.timezone.utc)
+        try:
+            params = d.cast_params(rid, body.get("params") or {})
+        except (A.RuleError, ValueError) as e:
+            raise HTTPException(400, str(e))
+        out = []
+        t = now - dt.timedelta(days=days)
+        while t <= now:
+            found, _ = d.detect(u["mode"], t, only={rid}, params={rid: params} if params else None)
+            fs = found.get(rid) or []
+            out.append({"at": t.isoformat(), "count": len(fs), "items": [{"key": f.fkey, "title": f.title, "severity": f.severity} for f in fs[:10]],
+                        "error": d.stats.get(rid, {}).get("error") if found.get(rid) is None else None})
+            t += dt.timedelta(hours=step)
+        return {"rule": rid, "points": out, "total": sum(p["count"] for p in out),
+                "note": "按每个时刻已入库的数据重算。读“当前状态”的规则（停机、库存、订单预测）回看过去时只能用当时最近一次的状态消息，结果是近似。"}

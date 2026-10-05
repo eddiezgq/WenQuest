@@ -245,6 +245,12 @@ class _FakeDB:
     def __init__(self, rows):
         self.rows = rows
 
+    def one(self, sql, args=None):
+        if "to_regclass" in sql:
+            return {"ok": False}                # 没有异常表
+        r = self.q(sql, args)
+        return r[0] if r else None
+
     def q(self, sql, args=None):
         for t, rows in self.rows.items():
             if " from {} ".format(t) in sql + " " or sql.rstrip().endswith("from " + t):

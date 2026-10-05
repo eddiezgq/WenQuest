@@ -33,74 +33,29 @@ class Assistant:
         """publish(topic, type, source, data, corr=None, mode=None)"""
         self.db, self.publish = db, publish
         self.llm = llm or LLM()
-        self._sent = {}            # 提醒去重：key → (level, 时间)
+        self._sent = {}            # 提醒去重：key → (level, 时间)（第 17 轮 B 期起由异常生命周期去重，这里只留给旧调用方）
+        self._detector = None
         self._lock = threading.Lock()
 
     # ================================================================ 提醒
     def evaluate(self, mode="teach", now=None):
-        """按规则检查全厂，返回新发出的提醒。"""
-        ov = kpi.overview(self.db, now, mode)
-        now = dt.datetime.fromisoformat(ov["now"])
-        found = []
-        # 设备停机
-        for m in ov["machines"]:
-            if m["state"] in ("down", "fault"):
-                mins = (m["down_until_s"] or 0) / 60
-                found.append(("down:" + m["unit"], "critical" if m["state"] == "fault" else "warn",
-                              "{} {}：{}".format(m["code"], "故障" if m["state"] == "fault" else "停机", m["reason"] or ""),
-                              "预计还要约 {:.0f} 分钟（仿真时间）；排队 {} 件{}".format(
-                                  mins, m["queue"], "，是本周瓶颈" if m.get("bottleneck") else ""),
-                              [{"topic": unit_topic(m["unit"], "status"), "ts": m["ts"]}],
-                              "查看受影响的订单；必要时安排加班或转移工序"))
-            elif m["tool_life_left"] is not None and m["tool_life_left"] < 0.15 and m["state"] != "idle":
-                found.append(("tool:" + m["unit"], "info", "{} 刀具剩余寿命 {:.0f}%".format(m["code"], m["tool_life_left"] * 100),
-                              "按当前节拍约再加工 {} 件后需{}".format(
-                                  max(1, int(m["tool_life_left"] * 30)), "修整砂轮" if m["unit"] == "grd-01" else "换刀"),
-                              [{"topic": unit_topic(m["unit"], "status"), "ts": m["ts"]}], "提前准备刀具，安排在换件间隙"))
-        # 质量趋势
-        ch = ov["quality"]["chart"]
-        if ch.get("points") and len(ch["points"]) >= 5:
-            band = (ch["upper"] - ch["lower"]) * 1000
-            if ch["margin_um"] <= band * 0.25 and ch["shift_um"] >= 2:
-                found.append(("trend:" + ch["characteristic"], "warn",
-                              "{} 测量值上移，趋近上限".format(ch["title"]),
-                              "最近 5 件均值 {:.4f} mm，比公差中值高 {:.1f} µm，距上限只余 {:.1f} µm，尚未超差".format(
-                                  ch["mean_last5"], ch["shift_um"], ch["margin_um"]),
-                              [{"topic": ch["src"], "id": p["id"]} for p in ch["points"][-5:]],
-                              "检查磨床 GRD-01 砂轮磨损，考虑提前修整"))
-        for n in ov["quality"]["ncr"]:
-            d = n["detail"]
-            found.append(("ncr:" + n["ncr_id"], "warn", "不合格品 {}：{} 超差".format(n["ncr_id"], n["part_serial"]),
-                          "{} 实测 {} mm，公差 {}–{}".format(d.get("name"), d.get("value_mm"), d.get("lower_tol_mm"),
-                                                         d.get("upper_tol_mm")),
-                          [{"topic": unit_topic("qc-01", "measurement"), "id": d.get("message_id")}],
-                          "质检员评审：返修、报废或让步接收"))
-        # 订单与物料
-        for o in ov["orders"]:
-            if o["tone"] == "bad":
-                found.append(("late:" + o["name"], "warn", "{} 可能延期：{}".format(o["name"], o["risk"]),
-                              "{} {} 台，交期 {}，预计 {} 完成；{}".format(
-                                  o["customer"].split(" ")[0], o["qty"], o["delivery_date"], o["projected"], o["work_orders"]),
-                              [{"topic": "wq/gearbox/office/erp/sales_order", "name": o["name"]}],
-                              "考虑加班、调整优先级或与客户沟通交期"))
-        for mt in ov["materials"]:
-            if mt["tone"] == "bad":
-                found.append(("stock:" + mt["code"], "warn", "{} {}".format(mt["code"], mt["status"]),
-                              "{} 库存 {}，安全库存 {}，在手工单与订单还需 {:g}".format(
-                                  mt["name"], mt["qty_text"], mt["safety"] if mt["safety"] is not None else "—", mt["need"]),
-                              [{"topic": "wq/gearbox/office/erp/bin", "item": mt["code"]}], "起草请购单"))
+        """按规则检查全厂，返回新发出的提醒。
+
+        第 17 轮 B 期起由厂情中枢的规则库检测（hub/ont/anomaly.py）：原来这里的停机、刀具、质量趋势、不合格品、
+        订单延期、缺料 6 项检查迁成规则 P1、P2、Q2、Q3、S1、W1，文字不变；异常新开、升级、重开时照旧发 ai.alert。"""
         out = []
-        with self._lock:
-            for key, level, title, detail, evidence, hint in found:
-                prev = self._sent.get((mode, key))
-                if prev and prev[0] == level and (now - prev[1]).total_seconds() < 7200:
-                    continue
-                self._sent[(mode, key)] = (level, now)
-                data = {"level": level, "title": title, "detail": detail, "evidence": evidence,
-                        "action_hint": hint, "key": key}
-                self.publish(topic("ai", "alert"), "ai.alert", "ai", data, None, mode)
-                out.append(data)
+        for data in self.detector().run(mode, now):
+            if not self.detector().catalog[data["rule"]].get("alert", True):
+                continue                     # 例如 V1：孪生自己已经发过提醒
+            self.publish(topic("ai", "alert"), "ai.alert", "ai", data, None, mode)
+            out.append(data)
         return out
+
+    def detector(self):
+        if self._detector is None:
+            from hub.ont.anomaly import Detector
+            self._detector = Detector(self.db)
+        return self._detector
 
     def on_design_release(self, msg):
         """设计改版：检查在制工单是否受影响（第六节第 2 步）。"""

@@ -9,6 +9,7 @@ import yaml
 HERE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DIR = os.environ.get("WQ_ONTOLOGY_DIR", os.path.join(HERE, "ontology"))
 MATURITY = {"have": "已有数据", "erp": "ERPNext 可启用", "capture": "待采集", "sim": "教学模拟", "next": "后续各期生成"}
+ANY = "*"                    # 通用链接的目标：任何类型（如“异常 —涉及→ 任何对象”）
 PROP_TYPES = {"str", "num", "int", "bool", "date", "time", "json"}
 ROWS = {"chain", "support", "core"}
 
@@ -30,6 +31,10 @@ class Ontology:
             raise KeyError("本体里没有对象类型 " + str(name))
         return t
 
+    def incoming_of(self, t):
+        """指向类型 t 的链接，含通用链接"""
+        return self.incoming.get(t, []) + self.incoming.get(ANY, [])
+
     def link(self, frm, name):
         s = self.links.get((frm, name))
         if s is None:
@@ -48,7 +53,7 @@ class Ontology:
                  "props": [{"name": p, "label": s["l"], "type": s["t"], "unit": s.get("u", ""), "series": bool(s.get("series")),
                             "sensitivity": s.get("s", self.types[n].get("sensitivity", 0))} for p, s in self.types[n]["props"].items()],
                  "links": [{"name": ln, "to": s["to"], "label": s["l"], "inverse": s.get("inv", "")} for ln, s in self.types[n]["links"].items()],
-                 "incoming": [{"from": f, "name": ln, "label": s.get("inv") or s["l"]} for f, ln, s in self.incoming.get(n, [])]}
+                 "incoming": [{"from": f, "name": ln, "label": s.get("inv") or s["l"]} for f, ln, s in self.incoming_of(n)]}
                 for n in d["types"]]})
         return out
 
@@ -99,7 +104,7 @@ def load(path=DIR):
         for ln, ls in t["links"].items():
             if not isinstance(ls, dict) or not ls.get("to") or not ls.get("l"):
                 raise OntologyError("{}.{}：链接要写 to 和 l".format(tn, ln))
-            if ls["to"] not in onto.types:
+            if ls["to"] != ANY and ls["to"] not in onto.types:
                 raise OntologyError("{}.{}：链接目标 {} 不是本体里的对象类型".format(tn, ln, ls["to"]))
             onto.links[(tn, ln)] = dict(ls, frm=tn, name=ln)
             onto.incoming.setdefault(ls["to"], []).append((tn, ln, ls))

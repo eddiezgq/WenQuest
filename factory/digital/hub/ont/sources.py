@@ -107,6 +107,7 @@ def tables(B, db, mode):
         B.obj(mode, "Proposal", r["proposal_id"], {"title": r["title"], "action": r["action"], "status": r["status"],
                                                    "requested_by": r["requested_by"], "confirmed_by": r["confirmed_by"],
                                                    "created": _ts(r["created_at"])}, ts=_ts(r["created_at"]), upd_ts=_now(), text="提议")
+    anomalies(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -115,6 +116,22 @@ def tables(B, db, mode):
             B.link(mode, "PlcRun", r["id"], "machine", r["unit"])
     except Exception:  # noqa: BLE001  —— 没有虚拟 PLC 表时跳过
         pass
+
+
+def anomalies(B, db, mode):
+    """厂情中枢的异常（第 17 轮 B 期）：开着的和 30 天内结束的，映射成本体对象，连到涉及的对象"""
+    if not db.one("select to_regclass('anomaly') is not null as ok")["ok"]:
+        return
+    for r in db.q("select * from anomaly where mode=%s and (status in ('open', 'ack', 'doing') or closed_at > now() - interval '30 days')",
+                  (mode,)):
+        key = "A-{:05d}".format(r["id"])
+        B.obj(mode, "Anomaly", key, {"title": r["title"], "rule": r["rule"], "domain": r["domain"], "severity": r["severity"],
+                                     "status": r["status"], "role": r["role"], "first_seen": _ts(r["first_seen"]),
+                                     "last_seen": _ts(r["last_seen"]), "hits": r["hits"]},
+              ts=_ts(r["first_seen"]), upd_ts=_now(), text="发现：" + r["title"])
+        for t, k in ((r["detail"] or {}).get("about") or []):
+            if t in B.onto.types and k:
+                B.link(mode, "Anomaly", key, "about", k, to_type=t)
 
 
 def twin(B, db, mode):

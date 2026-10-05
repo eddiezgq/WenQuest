@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <div class="page-title"><h1>厂情中枢</h1>
+    <div class="page-title"><h1><router-link to="/ont" class="back">厂情中枢</router-link> / 全貌地图</h1>
       <span class="muted">工厂本体：15 个业务领域、{{ nTypes }} 类对象，人、机、料、法、环、客户、服务、安全……都在一张图里，每个数字都能追到原始记录</span></div>
 
     <section class="card search-card">
@@ -123,6 +123,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.back { color: var(--muted); font-weight: 500; }
 .search { display: flex; gap: 8px; }
 .search input { flex: 1; height: 40px; border: 1px solid #C8CEC7; border-radius: 8px; padding: 0 12px; font-size: 14px; min-width: 0; }
 .search select { height: 40px; border: 1px solid #C8CEC7; border-radius: 8px; max-width: 160px; }
