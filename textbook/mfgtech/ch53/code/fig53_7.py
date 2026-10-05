@@ -23,6 +23,6 @@ names = ["L", "S1", "S2", "S3", "S4", "R"]
 for x, n in zip(xs, names):
     q.add(P(f"面 {n}", S.box(x - 0.4, x + 0.4, -1, 1, -3 * gap - 35, 35), "#c0504d", opacity=0.35))
 texts = [{"pos": [0.02, 0.17 + 0.235 * i], "text": t, "fontSize": 34, "anchor": "start"} for i, (_, t) in enumerate(states)]
-R.figure3d("fig53_7_2", q, 1400, 900, camera={"dir": [0, -1, 0.0], "fit": [[-110, 0, -3 * gap - 30], [185, 0, 40]]}, fontSize=18,
+R.figure3d("fig53_7_2", q, 1400, 900, camera={"dir": [0, -1, 0.0], "fit": [[-70, 0, -3 * gap - 30], [185, 0, 40]]}, fontSize=18,
            points=[{"at": (x, -30, 32), "r": 5, "color": "#c0504d", "text": n, "dx": -6, "dy": -10} for x, n in zip(xs, names)], texts=texts)
 out(n_fig3d=1)

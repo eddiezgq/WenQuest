@@ -18,28 +18,32 @@ tc = plan["tolerance_chart"]
 cuts = tc["cuts"]
 pos = {"L": -7.0, "R": 175.0}                              # 毛坯：左端面在 −7，总长 182（终件左端面在 0 附近）
 D = {"blank": 50.0}
-ROUGH = {("L", "S1"): 31.5, ("S1", "S2"): 36.5, ("S2", "S3"): 41.5, ("S3", "S4"): 36.5, ("S4", "R"): 31.5}
-FIN = {("L", "S1"): 30.0, ("S1", "S2"): 35.3, ("S2", "S3"): 40.3, ("S3", "S4"): 35.3, ("S4", "R"): 30.0}
 ORDER = ["L", "S1", "S2", "S3", "S4", "R"]
-seg_d = {k: 50.0 for k in ROUGH}
-
-
-def profile():
-    faces = [f for f in ORDER if f in pos]
-    pts = []
-    for a_, b_ in zip(faces, faces[1:]):
-        d = 50.0
-        for (s0, s1), dd in seg_d.items():
-            if ORDER.index(s0) >= ORDER.index(a_) and ORDER.index(s1) <= ORDER.index(b_):
-                d = min(d, dd) if (a_, b_) == (s0, s1) else d
-        d = seg_d.get((a_, b_), 50.0)
-        pts.append((pos[a_], pos[b_], d))
-    return pts
+X_S1 = 39.7          # 安装 1 车齿轮位 Ø41.5 时车到左轴承位左端（S1 的粗车位置附近），左边一段留在卡盘里
+# 每一刀之后各轴段的直径（按工序 20、40 的工步，示意）：列表里的端点是面名或绝对位置
+SHAPES = {
+    "blank": [("L", "R", 50.0)],
+    20.1: [("L", "R", 50.0)],
+    20.3: [("L", X_S1, 50.0), (X_S1, "S3", 41.5), ("S3", "R", 36.5)],
+    20.31: [("L", X_S1, 50.0), (X_S1, "S3", 41.5), ("S3", "S4", 36.5), ("S4", "R", 31.5)],
+    20.4: [("L", X_S1, 50.0), (X_S1, "S3", 41.5), ("S3", "S4", 36.5), ("S4", "R", 31.5)],
+    20.6: [("L", "S2", 36.5), ("S2", "S3", 41.5), ("S3", "S4", 36.5), ("S4", "R", 31.5)],
+    20.61: [("L", "S1", 31.5), ("S1", "S2", 36.5), ("S2", "S3", 41.5), ("S3", "S4", 36.5), ("S4", "R", 31.5)],
+    40.2: [("L", "S1", 31.5), ("S1", "S2", 36.5), ("S2", "S3", 41.5), ("S3", "S4", 36.5), ("S4", "R", 31.5)],
+    40.21: [("L", "S1", 31.5), ("S1", "S2", 36.5), ("S2", "S3", 40.3), ("S3", "R", 35.3)],
+    40.22: [("L", "S1", 31.5), ("S1", "S2", 36.5), ("S2", "S3", 40.3), ("S3", "S4", 35.3), ("S4", "R", 30.0)],
+    40.3: [("L", "S1", 31.5), ("S1", "S2", 36.5), ("S2", "S3", 40.3), ("S3", "S4", 35.3), ("S4", "R", 30.0)],
+    40.31: [("L", "S2", 35.3), ("S2", "S3", 40.3), ("S3", "S4", 35.3), ("S4", "R", 30.0)],
+    40.32: [("L", "S1", 30.0), ("S1", "S2", 35.3), ("S2", "S3", 40.3), ("S3", "S4", 35.3), ("S4", "R", 30.0)],
+}
+current = ["blank"]
 
 
 def shaft():
     s = None
-    for x0, x1, d in profile():
+    for a_, b_, d in SHAPES[current[0]]:
+        x0 = pos[a_] if isinstance(a_, str) else a_
+        x1 = pos[b_] if isinstance(b_, str) else b_
         c = S.cyl("x", (0, 0), d / 2, x0, x1)
         s = c if s is None else s + c
     return s
@@ -47,36 +51,17 @@ def shaft():
 
 def apply(c):
     pos[c["surf"]] = pos[c["ref"]] + c["nominal"]
-    seq = c["seq"]
-    # 直径随工序变化（示意）：工序 20 的粗车轴肩、工序 40 的精车轴肩完成相邻轴段的外圆
-    if seq < 40:
-        if c["surf"] == "S3":
-            seg_d[("S3", "S4")] = ROUGH[("S3", "S4")]; seg_d[("S4", "R")] = ROUGH[("S3", "S4")]
-        if c["surf"] == "S4":
-            seg_d[("S4", "R")] = ROUGH[("S4", "R")]
-        if c["surf"] == "S2":
-            seg_d[("S2", "S3")] = ROUGH[("S2", "S3")]; seg_d[("L", "S1")] = ROUGH[("S1", "S2")]; seg_d[("S1", "S2")] = ROUGH[("S1", "S2")]
-        if c["surf"] == "S1":
-            seg_d[("L", "S1")] = ROUGH[("L", "S1")]
-    else:
-        if c["surf"] == "S3":
-            seg_d[("S3", "S4")] = FIN[("S3", "S4")]; seg_d[("S4", "R")] = FIN[("S3", "S4")]
-        if c["surf"] == "S4":
-            seg_d[("S4", "R")] = FIN[("S4", "R")]
-        if c["surf"] == "S2":
-            seg_d[("S2", "S3")] = FIN[("S2", "S3")]; seg_d[("S1", "S2")] = FIN[("S1", "S2")]; seg_d[("L", "S1")] = FIN[("S1", "S2")]
-        if c["surf"] == "S1":
-            seg_d[("L", "S1")] = FIN[("L", "S1")]
+    current[0] = c["seq"]
 
 
 # 先把各刀后的形状算好（每个状态一个零件，按需显示）
 a = C.Assembly("跟踪图")
-states = [(dict(pos), dict(seg_d), None)]
+states = [(dict(pos), None, None)]
 a.add(C.Part("状态0", shaft(), "work"))
 for i, c in enumerate(cuts):
     apply(c)
     a.add(C.Part(f"状态{i + 1}", shaft(), "work"))
-    states.append((dict(pos), dict(seg_d), c))
+    states.append((dict(pos), None, c))
 CAM = {"dir": [0, -1, 0.0], "fit": [[-12, 0, -75], [182, 0, 60]]}
 v = R.Video(a, width=1280, height=720, fps=20)
 N = len(states)
@@ -96,7 +81,7 @@ def frame(k, cap, extra_dims=(), show_cut=True):
     for j, cc in enumerate(cuts[:12]):
         done = j < k
         texts.append({"pos": [0.06 + 0.31 * (j // 4), 0.8 + 0.045 * (j % 4)], "text": f"{cc['seq']:g}  {cc['ref']}→{cc['surf']}  {abs(cc['nominal']):g}",
-                      "fontSize": 17, "bold": j == k - 1, "color": "#c0504d" if j == k - 1 else ("#1d2327" if done else "#9aa3ab")})
+                      "fontSize": 17, "bold": show_cut and j == k - 1, "color": "#c0504d" if (show_cut and j == k - 1) else ("#1d2327" if done else "#9aa3ab")})
     return {"parts": parts, "camera": CAM, "points": pts, "dims": dims,
             "texts": [{"pos": [0.03, 0.08], "text": cap[0], "fontSize": 24, "bold": True},
                       {"pos": [0.03, 0.13], "text": cap[1], "fontSize": 17, "color": "#5b6770"}] + texts}

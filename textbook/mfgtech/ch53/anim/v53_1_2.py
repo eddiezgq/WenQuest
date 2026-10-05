@@ -34,12 +34,12 @@ def st(i, H_real, cap, wheel_dy=0.0):
     # 砂轮放在 −y 一侧，磨削点在 −y 方向；下母线在 −z
     return {"parts": parts, "camera": CAM,
             "dims": [{"a": (16, 2, -r_draw), "b": (16, 2, z_bot), "off": (0, 0, 0), "text": "d − t₁", "color": "#c0504d"}],
-            "points": [{"at": (16, 0, -r_draw), "r": 5, "color": "#c0504d"}, {"at": (16, 0, -RX0), "r": 4, "color": "#4f7fb8", "text": "磨前下母线", "dx": -130, "dy": 20}],
+            "points": [{"at": (16, 0, -r_draw), "r": 5, "color": "#c0504d"}, {"at": (16, 0, -RX0), "r": 4, "color": "#4f7fb8", "text": "磨前下母线", "dx": -150, "dy": -6}],
             "texts": [{"pos": [0.03, 0.08], "text": cap[0], "fontSize": 26, "bold": True},
                       {"pos": [0.03, 0.13], "text": cap[1], "fontSize": 18, "color": "#5b6770"},
                       {"pos": [0.68, 0.3], "text": f"铣键槽 H = {H_real:.3f}（取公差中间）", "fontSize": 22},
                       {"pos": [0.68, 0.36], "text": f"齿轮位半径 {r_real:.3f}（磨去单边 0.15）", "fontSize": 22},
-                      {"pos": [0.68, 0.44], "text": f"d − t₁ = {a0:.3f}", "fontSize": 30, "bold": True, "color": "#5a9e6f" if ok else "#c0504d"},
+                      {"pos": [0.68, 0.44], "text": (f"d − t₁ = {a0:.3f}" if i > 0 else "d − t₁ 还没形成（磨削后才有）"), "fontSize": 30 if i > 0 else 22, "bold": True, "color": ("#5a9e6f" if ok else "#c0504d") if i > 0 else "#5b6770"},
                       {"pos": [0.68, 0.5], "text": "图纸 35（0/−0.2），即 34.8–35.0", "fontSize": 18, "color": "#5b6770"}]}
 
 

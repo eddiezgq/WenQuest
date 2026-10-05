@@ -77,7 +77,7 @@ gauges:
   - {id: G08, name: 键槽对称度检具}
   - {id: G09, name: 表面粗糙度仪}
   - {id: G10, name: 布氏硬度计}
-  - {id: G11, name: 深度千分尺 0–25 mm（以键槽两侧的外圆母线为基准测槽深 t₁，d − t₁ = 实测 d − t₁，第 53 章）}
+  - {id: G11, name: 深度千分尺 0–25 mm（以键槽两侧的外圆母线为基准测槽深 t₁，d − t₁ = 实测外圆直径 d − t₁，第 53 章）}
 operations:
   - seq: 10
     operation: 下料 Sawing

@@ -36,9 +36,11 @@ pa = R.render_png(slot_section(r1), 640, 600, camera=cam, section=sec, fontSize=
 r1x = 22.0
 pb = R.render_png(slot_section(r1x, r2), 640, 600, camera={"dir": [-1, 0, 0], "fit": [[xk, -30, -28], [xk, 30, 28]]}, section=sec, fontSize=19,
                   dims=[{"a": (xk, 4, -r2), "b": (xk, 4, z_bot), "off": (0, 0, 0), "text": f"A₀ = d − t₁ = {z_bot + r2:g}", "color": red},
-                        {"a": (xk, -8, -r2), "b": (xk, -8, 0), "off": (0, 0, 0), "text": f"r₂ = {r2:g}"}],
-                  points=[{"at": (xk, 0, -r2), "r": 5, "color": red, "text": "磨后外圆下母线", "dx": 10, "dy": 22},
-                          {"at": (xk, 0, -r1x), "r": 4, "color": blue, "text": "磨前的下母线", "dx": -150, "dy": 26}])
+                        {"a": (xk, -8, -r2), "b": (xk, -8, 0), "off": (0, 0, 0), "text": f"r₂ = {r2:g}"},
+                        {"a": (xk, 14, -r1x), "b": (xk, 14, z_bot), "off": (0, 0, 0), "text": "H", "color": "#9aa3ab"},
+                        {"a": (xk, -18, -r1x), "b": (xk, -18, 0), "off": (0, 0, 0), "text": "r₁", "color": "#9aa3ab"}],
+                  points=[{"at": (xk, 0, -r2), "r": 5, "color": red, "text": "磨后外圆下母线", "dx": 12, "dy": 4},
+                          {"at": (xk, 0, -r1x), "r": 4, "color": blue, "text": "磨前的下母线", "dx": 10, "dy": 30}])
 R.compose("fig53_1_2", [pa, pb], 2, titles=["(a) 工序 50 铣键槽：直接控制 H（从精车外圆下母线量起）", "(b) 工序 60 磨齿轮位后：d − t1 是间接得到的封闭环（磨削余量放大画出）"])
 
 # ---- 图 53.1.3：齿轮位长度 60 的轴向尺寸链：167（增环）、52、55（减环）、60（封闭环）

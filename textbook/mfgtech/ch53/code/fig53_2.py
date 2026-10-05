@@ -1,5 +1,5 @@
 """53.2–53.6 节的三维图：测 H 与 d − t₁（图 53.2.1）、测量基准不重合与深度尺（图 53.4.1）、GR-203 插键槽后磨孔（图 53.5.1）、
-SH-301 调头车左端面同时影响两个尺寸（图 53.5.2）、渗碳层与镀层（图 53.6.1）。
+渗碳层与镀层（图 53.6.1）。
 模型：factory/digital/models3d；量具、齿轮等是简化的示意模型，与算例的尺寸一致；余量、层深按需要放大画出，图注写明。"""
 import math
 
@@ -29,31 +29,45 @@ def micrometer(z_lo, z_hi, x, y=0.0, blade=False):
     return q
 
 
-# ---- 图 53.2.1：(a) 工序 50 测 H：轴放在 V 形块上，刀口千分尺测杆伸进槽底，测砧顶下母线；(b) 工序 60 后测 d − t₁
-def meas(state, r):
-    q = A("测量")
-    w = W.sh301(state)
-    q.add(w)
-    for p in micrometer(-r, z_bot, xk, blade=True).parts:
+# ---- 图 53.2.1：(a) 工序 50 用键槽深度专用量规 G07 测 H（C 形量规：测砧顶精车外圆下母线，测头伸进槽底，示意）；
+# (b) 检验 C5 用深度千分尺 G11 测槽深 t₁（底座跨在键槽两侧的外圆上），d − t₁ = 实测外圆直径 d − t₁
+def meas_H():
+    q = A("测 H")
+    q.add(W.sh301("op50"))
+    for p in micrometer(-20.15, z_bot, xk, blade=True).parts:
         q.add(p)
     return q
+def meas_t():
+    q = A("测 t1")
+    q.add(W.sh301("op60"))
+    zb = (20.0 ** 2 - (b / 2) ** 2) ** 0.5             # 键槽两侧外圆的最高点
+    q.add(P("深度千分尺底座（跨在键槽两侧的外圆上）", S.box(xk - 6, xk + 6, -22, 22, zb, zb + 8), "#c9a24a", tags=("nocut",)))
+    q.add(P("测杆", S.cyl("z", (xk, 0), 1.5, z_bot, zb + 8), "hardened", tags=("nocut",)))
+    q.add(P("测微头", S.cyl("z", (xk, 0), 6, zb + 8, zb + 30) + S.cyl("z", (xk, 0), 9, zb + 30, zb + 60), "steel", tags=("nocut",)))
+    return q, zb
 cm = {"dir": [0.35, -1.0, 0.3], "fit": [[xk - 60, -20, -60], [xk + 60, 60, 120]]}
-pa = R.render_png(meas("op50", 20.15), 640, 560, camera=cm, section=((0, 0, 0), (0, -1, 0)), fontSize=19,
-                  labels=[{"at": (xk, 0, z_bot + 2), "text": "刀口测杆压在槽底", "style": "text", "pos": [0.7, 0.1], "part": "测微螺杆"},
+pa = R.render_png(meas_H(), 640, 560, camera=cm, section=((0, 0, 0), (0, -1, 0)), fontSize=19,
+                  dims=[{"a": (xk - 20, 0, -20.15), "b": (xk - 20, 0, z_bot), "off": (-8, 0, 0), "text": "H"}],
+                  labels=[{"at": (xk, 0, z_bot + 2), "text": "测头伸进槽底", "style": "text", "pos": [0.7, 0.1], "part": "测微螺杆"},
                           {"at": (xk, 0, -20.15 - 1), "text": "测砧顶精车外圆下母线", "style": "text", "pos": [0.7, 0.9], "part": "测砧"}])
-pb = R.render_png(meas("op60", 20.0), 640, 560, camera=cm, section=((0, 0, 0), (0, -1, 0)), fontSize=19,
-                  labels=[{"at": (xk, 0, -20.0 - 1), "text": "磨后外圆下母线", "style": "text", "pos": [0.7, 0.9], "part": "测砧"}])
-R.compose("fig53_2_1", [pa, pb], 2, titles=["(a) 工序 50 测 H = 35.15（−0.03/−0.20）（剖开）", "(b) 工序 60 后测 d − t1 = 35（0/−0.2）（剖开）"])
+qt, zb = meas_t()
+cm2 = {"dir": [0.35, -1.0, 0.3], "fit": [[xk - 60, -20, -40], [xk + 60, 30, 100]]}
+pb = R.render_png(qt, 640, 560, camera=cm2, section=((0, 0, 0), (0, -1, 0)), fontSize=19,
+                  dims=[{"a": (xk - 20, 0, z_bot), "b": (xk - 20, 0, 20.0), "off": (-8, 0, 0), "text": "t₁"},
+                        {"a": (xk + 28, 0, -20.0), "b": (xk + 28, 0, 20.0), "off": (10, 0, 0), "text": "d（实测）"}],
+                  labels=[{"at": (xk + 5, -22, zb + 4), "text": "底座跨在键槽两侧的外圆上", "style": "text", "pos": [0.5, 0.1], "part": "深度千分尺底座"}])
+R.compose("fig53_2_1", [pa, pb], 2, titles=["(a) 工序 50：键槽深度专用量规 G07 测 H（示意，剖开）", "(b) 检验 C5：深度千分尺 G11 测 t1，d − t1 = 实测 d − t1（剖开）"])
 
 # ---- 图 53.4.1：轴套：总长 A1 = 50，孔内台阶到内端面 A0 = 10 不好测，用深度尺从外端面测 A2 = 40
 sl = A("轴套")
 body = S.cyl("z", (0, 0), 30, 0, 50) - S.cyl("z", (0, 0), 20, 10, 51) - S.cyl("z", (0, 0), 12, -1, 11)
 sl.add(P("轴套", body, "work"))
-dg = S.box(-45, 45, -6, 6, 50, 58) + S.box(-19, -13, -2, 2, 10, 50) + S.box(30, 36, -4, 4, 58, 120)
-sl.add(P("深度尺（尺身靠外端面，测杆伸到台阶）", dg, "#c9a24a"))
-p4 = R.render_png(sl, 900, 640, camera={"dir": [0, -1, 0.25], "fit": [[-45, 0, -5], [45, 0, 125]]}, section=((0, 0, 0), (0, -1, 0)), fontSize=19,
+dg = S.box(-45, 45, -6, 6, 50, 58) - S.box(-19.5, -12.5, -2.5, 2.5, 49, 59)            # 尺框：靠在外端面上
+sl.add(P("深度尺尺框（靠外端面）", dg, "#c9a24a"))
+sl.add(P("深度尺尺身（穿过尺框，下端碰台阶）", S.box(-19, -13, -2, 2, 10, 120), "hardened"))
+p4 = R.render_png(sl, 900, 640, camera={"dir": [0, -1, 0.25], "fit": [[-55, 0, -25], [45, 0, 125]]}, section=((0, 0, 0), (0, -1, 0)), fontSize=19,
                   dims=[{"a": (32, 0, 0), "b": (32, 0, 50), "off": (14, 0, 0), "text": "A₁ = 50（0/−0.17）"},
-                        {"a": (-30, 0, 0), "b": (-30, 0, 10), "off": (-14, 0, 0), "text": "A₀ = 10", "color": red},
+                        {"a": (-30, 0, 0), "b": (-30, 0, 10), "off": (-14, 0, 0), "text": "A₀ = 10（0/−0.36）", "color": red},
                         {"a": (-13, 0, 10), "b": (-13, 0, 50), "off": (8, 0, 0), "text": "A₂（深度尺）", "color": blue}],
                   labels=[{"at": (-20, 0, 10), "text": "孔内台阶", "style": "text", "pos": [0.15, 0.5], "part": "轴套"}])
 R.save_figure("fig53_4_1", p4, 900, 640)
@@ -96,8 +110,9 @@ c2 = R.render_png(case(r_post, inner), 560, 460, camera=cc, section=((0, 0, 0), 
                   labels=[{"at": (20, 0, (inner + r_post) / 2), "text": "磨后层深 t0：变薄了", "style": "text", "pos": [0.5, 0.1], "part": "渗碳层"}])
 rod = A("镀铬")
 rod.add(P("活塞杆（镀前磨削）", S.cyl("x", (0, 0), 10.0 - 0.6, -20, 40), "steel"))
-rod.add(P("镀铬层（放大画出）", S.cyl("x", (0, 0), 10.0, 0, 40) - S.cyl("x", (0, 0), 9.4, -1, 41), "#d8dde8"))
+rod.add(P("镀铬层（放大画出）", S.cyl("x", (0, 0), 10.0, 0, 40) - S.cyl("x", (0, 0), 9.4, -1, 41), "#3f7fbf"))
 c3 = R.render_png(rod, 560, 460, camera={"dir": [0.6, -1.0, 0.5]}, section=((0, 0, 0), (0, -1, 0)), fontSize=18,
+                  dims=[{"a": (40, 0, -10), "b": (40, 0, 10), "off": (8, 0, 0), "text": "D"}, {"a": (-20, 0, -9.4), "b": (-20, 0, 9.4), "off": (-8, 0, 0), "text": "D₁"}],
                   labels=[{"at": (30, 0, 9.7), "text": "镀层厚度的变动直接进入镀后直径", "style": "text", "pos": [0.5, 0.1], "part": "镀铬层"}])
 R.compose("fig53_6_1", [c1, c2, c3], 3, titles=["(a) SH-101 轴承位渗碳后：层深 t1", "(b) 磨削后：层深 t0 = t1 − 磨去量", "(c) 活塞杆镀铬：镀后直径 = 镀前 + 2 × 镀层"])
 out(n_fig3d=5)
