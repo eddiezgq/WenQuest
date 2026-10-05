@@ -373,6 +373,8 @@ jobs:
       - name: Textbook animations (wait for the server to render them; report failures)
         if: env.SKIP != '1'
         continue-on-error: true
+        # 2026-10-04 this step hung for two hours and held up every later deploy (round 19)
+        timeout-minutes: 15
         run: |
           ssh "deploy@$HOST" '/opt/wenquest/deploy/textbook-media.sh 600' 2>&1 | tee /tmp/media.log
           grep '^FAILED' /tmp/media.log | head -n 9 | while read -r l; do echo "::warning title=Textbook animation::${l:0:1500}"; done || true
