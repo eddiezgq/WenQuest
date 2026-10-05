@@ -1059,6 +1059,48 @@ def process_preview(plan: dict = Body(...), u=Depends(user_of)):
     return {"findings": f, "suggested_score": process.suggested_score(f)}
 
 
+def _plan_of(body: dict) -> dict:
+    """工艺规程：网页上传的 YAML 原文（yaml）或数据（plan）。"""
+    if body.get("yaml"):
+        import yaml
+        text = str(body["yaml"])
+        if len(text) > 1_000_000:
+            raise HTTPException(413, "工艺规程太大（超过 1 MB）")
+        try:
+            plan = yaml.safe_load(text)
+        except yaml.YAMLError as e:
+            raise HTTPException(400, f"YAML 格式有错：{str(e)[:300]}")
+    else:
+        plan = body.get("plan")
+    if not isinstance(plan, dict) or not plan.get("item"):
+        raise HTTPException(400, "这不是一份工艺规程（要有 item、operations 等，可先下载参照工艺规程照着改）")
+    return json.loads(json.dumps(plan, ensure_ascii=False, default=str))      # YAML 里不带引号的日期等转成文字，才能存库
+
+
+@app.post("/api/process/check")
+def process_check(body: dict = Body(...), u=Depends(user_of)):
+    """“工艺规程与 AI 评审”页（第 13 轮 8.8（3a））：上传的工艺规程预检（不记录）或提交审批。"""
+    plan = _plan_of(body)
+    if not body.get("submit"):
+        try:
+            f = process.review(plan)
+        except (KeyError, TypeError, ValueError) as e:
+            raise HTTPException(400, f"工艺规程数据不完整，评审不了：{e!r}"[:400])
+        return {"findings": f, "suggested_score": process.suggested_score(f)}
+    _can_submit(u)
+    return _plm_call(process.submit, H.db, _emit_as(u), u["mode"], who(u), _uid(u), plan, (body.get("note") or "")[:500])
+
+
+@app.get("/api/process/reference/{item}")
+def process_reference(item: str, u=Depends(user_of)):
+    """参照工艺规程原文（std/<零件>_process.yaml），学生下载后照着改。"""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "std", f"{item}_process.yaml")
+    if item not in F.ITEMS or not os.path.exists(path):
+        raise HTTPException(404, "这个零件没有参照工艺规程")
+    with open(path, encoding="utf-8") as f:
+        return {"item": item, "yaml": f.read()}
+
+
 @app.post("/api/process/submit")
 def process_submit(body: dict = Body(...), u=Depends(user_of)):
     _can_submit(u)

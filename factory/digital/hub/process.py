@@ -280,12 +280,13 @@ def _review_v2(plan, say):
         elif not TL.ok_against(tol, e):
             say("定位误差", "warning", "“{}”的定位误差约 {:.4f} mm，超过工序公差 {:.3f} mm 的三分之一，留给加工和测量的余地太小。"
                 .format(lc.get("what", ""), e, tol), o["seq"])
-    # 2b 夹具：工序登记了夹具编号（fixture_id），且数字工厂有这套夹具的设计数据（std/<编号>_fixture.yaml）时，
+    # 2b 夹具：工序登记了夹具编号（fixture_id），且工序里写了夹具数据（fixture，学生自己的设计）或数字工厂有这套夹具的
+    #    设计数据（std/<编号>_fixture.yaml）时，
     #    核算夹紧力够不够、夹具精度预算是否满足（第 52 章，hub/fixture.py）
     from hub import fixture as FX
     for o in plan.get("operations") or []:
         if o.get("fixture_id"):
-            for level, text in FX.review(o["fixture_id"]):
+            for level, text in FX.review(o["fixture_id"], o.get("fixture") if isinstance(o.get("fixture"), dict) else None):
                 say("夹具", level, text, o["seq"])
     # 2c 加工精度预算（第 54 章，hub/accuracy.py）：工序登记了 accuracy（某个图纸特性的误差项）时，
     #    系统误差相加、随机误差平方和开方，合计不得超过公差；超过公差的四分之三提醒裕量不足

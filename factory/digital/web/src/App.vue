@@ -74,6 +74,7 @@ const nav = [
   { to: '/tasks', label: '我的任务' },
   { to: '/work/planner', label: '订单与计划', role: 'planner' },
   { to: '/work/engineer', label: '设计与工艺', role: 'engineer' },
+  { to: '/process', label: '工艺规程与 AI 评审', role: 'engineer' },
   { to: '/work/operator', label: '车间执行', role: 'operator' },
   { to: '/work/quality', label: '质量', role: 'quality' },
   { to: '/work/manager', label: '经营与成本', role: 'manager' },

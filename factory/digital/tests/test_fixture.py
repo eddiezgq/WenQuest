@@ -1,5 +1,6 @@
 """第 52 章夹具计算库。"""
 import math
+import os
 
 import pytest
 
@@ -44,3 +45,21 @@ def test_guides_and_fixture_file():
     r = F.analyse(F.load_fixture("JJ-301-50"))
     assert r["ok_clamp"] and all(b["ok"] for b in r["budgets"].values())
     assert F.review("JJ-301-50") == []
+
+
+def test_review_uses_student_fixture_data_in_the_operation():
+    """TS-52-1：学生把自己的夹具数据写在工序 50 的 fixture 里；把拧紧扭矩改为 1 N·m（hand_force 10、wrench 100），评审员指出夹紧力不够"""
+    import copy
+    from hub import fixture as FX, process
+    from hub.cards import load
+    base = FX.load_fixture("JJ-301-50")
+    assert FX.review("JJ-301-50") == [] or all(lv != "error" for lv, _ in FX.review("JJ-301-50"))
+    weak = copy.deepcopy(base)
+    weak["clamping"]["hand_force"] = 10
+    msgs = FX.review("JJ-301-50", weak)
+    assert any(lv == "error" and "夹紧力" in t for lv, t in msgs)
+    plan = load(os.path.join(os.path.dirname(__file__), "..", "std", "SH-301_process.yaml"))
+    op50 = next(o for o in plan["operations"] if o["seq"] == 50)
+    op50["fixture"] = weak
+    f = process.review(plan)
+    assert any(x["rule"] == "夹具" and x["level"] == "error" for x in f)

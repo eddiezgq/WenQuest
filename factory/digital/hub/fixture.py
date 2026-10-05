@@ -353,9 +353,10 @@ def analyse(fx: dict) -> dict:
     return res
 
 
-def review(fid: str) -> list:
-    """AI 工艺评审员调用：夹具的夹紧力是否够、精度预算是否满足。返回 [(级别, 文字)]。"""
-    fx = load_fixture(fid)
+def review(fid: str, data: dict | None = None) -> list:
+    """AI 工艺评审员调用：夹具的夹紧力是否够、精度预算是否满足。返回 [(级别, 文字)]。
+    data：学生自己设计的夹具数据（格式同 std/<编号>_fixture.yaml，写在工序的 fixture 里，任务单 TS-52-1）；没有时读数字工厂的参照数据。"""
+    fx = data or load_fixture(fid)
     if not fx:
         return []
     r = analyse(fx)

@@ -12,7 +12,7 @@
   - {名称: [仿真车间的键槽对称度数据, Keyway symmetry data from the simulated shop], 来源: [数字工厂“质量”页, "Digital factory Quality page"]}
 交付物:
   - {名称: [定位方案论证书（2–3 页）, "Locating scheme report (2–3 pages)"], 验收: [三种方案各有定位简图（定位符号与自由度数）、自由度分析结论、H 与对称度的定位误差计算（写出公式和代入的数）、按三分之一判据的结论；选定方案并说明理由, "Each scheme has a sketch with locating symbols and DOF counts, a DOF verdict, locating-error calculations for H and symmetry (formula and numbers), and a verdict by the one-third rule; one scheme chosen with reasons"]}
-  - {名称: [AI 预检记录, AI pre-check record], 验收: [把选定方案的 locate_check 写进工序 50，提交“AI 预检”，没有定位误差方面的意见；再故意把定位外圆的公差 Td 改为 0.3 mm（相当于在不控制公差的粗车外圆上定位），记录评审员给出的意见，并说明为什么 Td = 0.25 时评审员不提意见, "Put the chosen scheme's locate_check into operation 50 and run the AI pre-check with no locating comments; then deliberately set the locating OD tolerance Td to 0.3 mm (as if locating on an uncontrolled rough-turned OD), record the reviewer's comment, and explain why it says nothing at Td = 0.25"]}
+  - {名称: [AI 预检记录, AI pre-check record], 验收: [把选定方案的 locate_check 写进工序 50，提交“AI 预检”，没有定位误差方面的意见；再故意把定位外圆的公差 Td 改为 0.3 mm（相当于在不控制公差的粗车外圆上定位），记录评审员给出的意见，并说明为什么 Td = 0.25 时评审员不提意见, "Put the chosen scheme's locate_check into operation 50 and run the AI pre-check with no locating comments; then deliberately set the locating OD tolerance Td to 0.3 mm (as if locating on an uncontrolled rough-turned OD), record the reviewer's comment, and explain why it says nothing at Td = 0.25"], 类型: 工艺规程, 零件: SH-301}
   - {名称: [对称度数据复核, Symmetry data check], 验收: [从“质量”页读出最近 20 件的键槽对称度，算均值和最大值，判断与你的定位误差估计是否相符，说明差别从哪里来, "Read the last 20 keyway-symmetry values from the Quality page, give mean and maximum, judge whether they agree with your estimate, and explain any difference"]}
 工位: [PY, PLM, QMS]
 步骤:

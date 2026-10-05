@@ -46,7 +46,7 @@
                 <span v-if="d.kind === '文件'">✓ <a :href="got(d).files[0].url" target="_blank">{{ got(d).files[0].name }}</a></span>
                 <span v-else-if="d.kind === '设计发布'">✓ 设计发布 <router-link :to="'/design/' + got(d).plm">{{ got(d).plm }}</router-link></span>
                 <span v-else-if="d.kind === '分析'">✓ 仿真与分析 作业 <span class="mono">{{ got(d).job }}</span></span>
-                <span v-else-if="d.kind === '工艺规程'">✓ 工艺规程提交 <span class="mono">{{ got(d).process }}</span></span>
+                <span v-else-if="d.kind === '工艺规程'">✓ 工艺规程提交 <router-link class="mono" :to="'/process/' + got(d).process">{{ got(d).process }}</router-link></span>
                 <span v-else-if="d.kind === '更改单'">✓ {{ got(d).rows.length }} 项</span>
                 <span v-else-if="d.kind === 'PLC 程序'">✓ <a :href="got(d).files[0].url" target="_blank">{{ got(d).files[0].name }}</a>
                   <span v-if="!got(d).check?.ok" class="err">编译不过：{{ got(d).check?.error }}</span>
