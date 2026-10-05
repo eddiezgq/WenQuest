@@ -11,6 +11,9 @@ chapters:
   2:
     status: first
     title_en: "Combinational Logic Gates"
+  3:
+    status: first
+    title_en: "Sequential Elements"
   4:
     status: first
     title_en: "Interconnect"

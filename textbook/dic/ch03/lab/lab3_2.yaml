@@ -1,0 +1,30 @@
+# 实验 3.2 的指导书与报告模板。目的、场景、参数、任务取自 lab3_2.js（由 labs/micro/textbook/lab3_2.body.js 生成）。
+原理:
+  - ["发送触发器在一个时钟沿送出数据，经组合逻辑最慢的路径，必须在下一个时钟沿之前 tsu 到达接收触发器；时钟偏斜 δ 为接收端晚到的时间。", "Data launched at one clock edge must cross the slowest logic path and arrive tsu before the next edge; the clock skew δ is how much later the capture clock arrives."]
+  - 式: "T + δ ≥ tcq + tlogic,max + tsu        (3.2.2)"
+  - ["同一个时钟沿送出的新数据，经最快的路径，不能早于接收端保持窗口结束；这个条件里没有时钟周期。", "New data launched by the same edge must not arrive, along the fastest path, before the capture flip-flop's hold window ends; the clock period does not appear."]
+  - 式: "tcq + tlogic,min ≥ th + δ        (3.2.3)"
+  - ["行波进位加 1 电路的关键路径与位数成正比（每位约 11τ）；PWM 频率固定时，位数每加 1，时钟频率加倍。", "The ripple-carry incrementer's critical path grows linearly with width (about 11τ per bit); at a fixed PWM frequency each extra bit doubles the clock."]
+步骤:
+  - ["选“计数器的最高频率”，16 位，从 100 MHz 往上调，找到余量不为负的最高频率（任务 1）；再取 8、12 位重复，填入表 1。", "Choose “Counter maximum frequency”, 16 bits; raise the clock from 100 MHz to the highest frequency with non-negative slack (task 1); repeat for 8 and 12 bits and fill in Table 1."]
+  - ["选“20 kHz PWM 的位数”，PWM 20 kHz，从 16 位往下调，找到余量不为负的最大位数（任务 2）；把 PWM 改为 30 kHz 再找一次，填入表 2。", "Choose “Bits at 20 kHz PWM”; from 16 bits downwards find the largest width with non-negative slack (task 2); repeat at 30 kHz and fill in Table 2."]
+  - ["选“保持时间”，偏斜依次取 0、140、240 ps，记录余量；在 240 ps 时插入最少的反相器对使余量不为负（任务 3），填入表 3。", "Choose “Hold check”; set the skew to 0, 140 and 240 ps and record the slack; at 240 ps insert the fewest inverter pairs that make it non-negative (task 3); fill in Table 3."]
+数据表:
+  - 标题: ["表 1  计数器的最高时钟频率", "Table 1  Maximum counter clock"]
+    表头: ["位数", "加 1 电路延时 / ns", "最短周期 / ns", "最高频率 / MHz"]
+    表头英文: ["Bits", "Incrementer delay / ns", "Minimum period / ns", "Maximum frequency / MHz"]
+    行: [["8", "", "", ""], ["12", "", "", ""], ["16", "", "", ""]]
+  - 标题: ["表 2  PWM 频率固定时的可行位数", "Table 2  Feasible width at a fixed PWM frequency"]
+    表头: ["PWM / kHz", "最大位数", "时钟 / MHz", "余量 / ps"]
+    表头英文: ["PWM / kHz", "Largest width", "Clock / MHz", "Slack / ps"]
+    行: [["20", "", "", ""], ["30", "", "", ""]]
+  - 标题: ["表 3  保持时间检查", "Table 3  Hold check"]
+    表头: ["偏斜 δ / ps", "反相器对数", "保持时间余量 / ps", "满足？"]
+    表头英文: ["Skew δ / ps", "Inverter pairs", "Hold slack / ps", "Met?"]
+    行: [["0", "0", "", ""], ["140", "0", "", ""], ["240", "0", "", ""], ["240", "", "", ""]]
+注意:
+  - ["触发器参数（tcq、tsu、th）取自 SKY130 仿真，以 FO4 为单位换算到手算模型；加 1 电路按单位尺寸的门估算，没有计入连线。", "The flip-flop parameters (tcq, tsu, th) come from SKY130 simulation, converted through the hand model's FO4; the incrementer is estimated with unit-size gates and no wiring."]
+  - ["没有计入时钟抖动和工艺偏差；实际设计要在最慢条件下查建立时间、最快条件下查保持时间（第 8 章）。", "Clock jitter and process variation are not included; real designs check setup at the slow corner and hold at the fast corner (Chapter 8)."]
+思考题:
+  - ["为什么降低时钟频率能修正建立时间违例，却修正不了保持时间违例？", "Why does slowing the clock fix setup but not hold violations?"]
+  - ["插入的反相器对会不会让这一段路径的建立时间违例？在什么情况下会？", "Can the inserted inverter pairs cause a setup violation on this path? When would they?"]

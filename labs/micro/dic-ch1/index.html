@@ -304,6 +304,30 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       "len_um": 500,
       "victim_size": 1,
       "tr_ps": 100
+    },
+    "p31": {
+      "bits": 16,
+      "f_MHz": 100
+    },
+    "p32": {
+      "bits": 16,
+      "f_MHz": 100,
+      "pwm_kHz": 20,
+      "gate_fo4": 2
+    },
+    "p33": {
+      "rpm": 6000,
+      "lines": 1024,
+      "f_MHz": 100,
+      "slack_ps": 200,
+      "robots": 1000,
+      "years": 10
+    },
+    "p34": {
+      "n_ff": 2000,
+      "group": 16,
+      "idle": 0.9,
+      "f_MHz": 100
     }
   },
   "wires": {
@@ -588,6 +612,27 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       const R0 = (m.reqN(Wmin) + m.reqP(rr * Wmin)) / 2, C0 = m.cin(Wmin, rr * Wmin), rw = m.wireR(layer, w), cw = m.wireC(layer, w, s);
       return { k: Lw * Math.sqrt(0.38 * rw * cw / (0.69 * R0 * C0 * (1 + gam))), size: Math.sqrt(R0 * cw / (rw * C0)) };
     };
+    m.xtalk = (layer, w, s, Lw, size, tr) => {
+      const q = WL[layer], Cc = m.wireCc(layer, s) * Lw, Cg = (q.Carea * w + 2 * q.Cfringe) * 1e-18 * Lw + m.cin(Wmin, rr * Wmin);
+      const k = Cc / (Cc + Cg), t = m.reqN(size * Wmin) * (Cc + Cg);
+      return [Cc, Cg, VDD * k, VDD * k * t / tr * (1 - Math.exp(-tr / t)), t];
+    };
+    /* ---------- 第 3 章：时序元件（触发器参数来自 params.json 的 ff_sim，以 FO4 为单位） ---------- */
+    m.ffTiming = () => {
+      const f4 = m.fo4Tp(rr), F = P.ff_sim || {}, o = {};
+      for (const k of ['tcq', 'tsu', 'th', 'tau_m', 'T0']) o[k] = F[k] * f4;
+      return o;
+    };
+    m.setupSlack = (T, tl, skew) => { const t = m.ffTiming(); return T + (skew || 0) - (t.tcq + tl + t.tsu); };
+    m.holdSlack = (tl, skew) => { const t = m.ffTiming(); return t.tcq + tl - (t.th + (skew || 0)); };
+    m.syncTr = (n, fclk, slack) => { const t = m.ffTiming(); return slack + (n - 1) * (1 / fclk - t.tcq - t.tsu); };
+    m.mtbf = (tr, fclk, fdata) => { const t = m.ffTiming(); return Math.exp(tr / t.tau_m) / (t.T0 * fclk * fdata); };
+    m.ffTcqLe = () => [gam + 3, gam + 2, 2 * (1 + 2 * gam), gam + 5];
+    m.incDelay = (bits) => (bits - 1) * ((1 + 2 * gam) + (m.leG('nand', 2) + 4 + gam)) + (1 + 4 * gam);
+    m.tauMEst = () => {
+      const v = m.vm(Wmin, rr * Wmin), gm = kn * Wmin / L * (v - VTn) + kp * rr * Wmin / L * (VDD - v - VTp);
+      return m.cin(Wmin, rr * Wmin) * (1 + gam) / gm;
+    };
     m.reference = () => {
       const r = kn / kp, pr = P.problems, out = { r, idsat_n_per_um: m.idsatN(1), idsat_p_per_um: m.idsatP(1) };
       const w = m.wnForVol(pr.p11.Iload, pr.p11.VOLmax);
@@ -624,6 +669,11 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
       const q43 = pr.p43, CL43 = q43.load_units * m.cin(Wmin, r * Wmin);
       for (let k = 1; k <= 5; k++) out.ch4.rep[k] = m.repeaterDelay(q43.L_um, q43.layer, q43.w_um, k, 20, CL43);
       out.ch4.opt = m.repeaterOpt(q43.L_um, q43.layer, q43.w_um);
+      const q33 = pr.p33, f33 = q33.f_MHz * 1e6, fd = q33.rpm / 60 * q33.lines * 2;
+      out.ch3 = { ff: m.ffTiming(), tcq_le: m.ffTcqLe().reduce((a, b) => a + b, 0), tau_m_est: m.tauMEst(),
+                  inc16: m.incDelay(16), xtalk: m.xtalk('met2', 0.14, 0.14, 500, 1, 100e-12),
+                  setup: m.setupSlack(1 / f33, 1e-9, 50e-12), hold: m.holdSlack(0, 150e-12), mtbf: {} };
+      for (const n of [1, 2]) out.ch3.mtbf[n] = m.mtbf(m.syncTr(n, f33, q33.slack_ps * 1e-12), f33, fd);
       return out;
     };
     return m;

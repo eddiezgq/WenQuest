@@ -1,0 +1,24 @@
+# 实验 4.4 的指导书与报告模板。目的、场景、参数、任务取自 lab4_4.js（由 labs/micro/textbook/lab4_4.body.js 生成）。
+原理:
+  - ["干扰线的跳变经耦合电容 Cc 把电荷注入受害线。受害线悬空时跳动 VDD·Cc/(Cc + Cg)；由电阻为 R 的驱动器保持时，注入的电荷边进边泄放，峰值还要乘一个小于 1 的因子。", "An aggressor edge injects charge into the victim through Cc. A floating victim jumps by VDD·Cc/(Cc + Cg); a victim held by a driver of resistance R leaks the charge as it arrives, so the peak is multiplied by a factor below 1."]
+  - 式: "ΔVpeak = VDD·Cc/(Cc + Cg)·(τ/tr)(1 − e^(−tr/τ))，τ = R(Cc + Cg)        (4.4.2)"
+  - ["Cc 随间距 s 按 k/(s + s0) 减小；Cg 包括受害线的面积、边缘电容和接收门的输入电容。", "Cc falls with spacing as k/(s + s0); Cg includes the victim's area and fringe capacitance plus the receiver's input."]
+步骤:
+  - ["默认设置（最小间距、最小驱动、边沿 100 ps、500 μm）下读出 Cc、Cg、悬空跳动和噪声峰值，与噪声容限比较，填入表 1 第一行。", "With the defaults (minimum spacing and driver, 100 ps edge, 500 μm) read Cc, Cg, the floating jump and the peak, compare with the margin, and fill in the first row of Table 1."]
+  - ["只加大间距到 0.28 μm、只加大驱动到 4 倍、两者同时（任务 1），分别记入表 1。", "Widen the spacing alone to 0.28 μm, strengthen the driver alone to 4×, and both together (task 1); record each in Table 1."]
+  - ["驱动 2 倍，找到峰值低于容限的最小间距（任务 2）；回到最小间距、最小驱动，以 25 μm 为步长找到平行长度的上限（任务 3）；最后把边沿放慢到 1 ns 看峰值，填入表 2。", "With a 2× driver find the smallest spacing below the margin (task 2); back at minimum spacing and driver find the longest parallel run (task 3); finally slow the edge to 1 ns; fill in Table 2."]
+数据表:
+  - 标题: ["表 1  三种办法的效果（边沿 100 ps、500 μm）", "Table 1  Effect of the remedies (100 ps edge, 500 μm)"]
+    表头: ["间距 / μm", "驱动", "Cc / fF", "τ / ps", "峰值 / V", "低于容限？"]
+    表头英文: ["Spacing / μm", "Driver", "Cc / fF", "τ / ps", "Peak / V", "Below margin?"]
+    行: [["0.14", "1", "", "", "", ""], ["0.28", "1", "", "", "", ""], ["0.14", "4", "", "", "", ""], ["0.28", "4", "", "", "", ""]]
+  - 标题: ["表 2  临界值", "Table 2  Critical values"]
+    表头: ["条件", "临界值", "该值下的峰值 / V"]
+    表头英文: ["Condition", "Critical value", "Peak there / V"]
+    行: [["驱动 2 倍：最小间距", "", ""], ["最小间距、最小驱动：最长平行长度", "", ""], ["最小间距、最小驱动、500 μm、边沿 1 ns", "—", ""]]
+注意:
+  - ["受害线和干扰线都当作集总电容，驱动器当作固定电阻，干扰线的边沿是理想斜坡；邻线对边缘电容的遮挡没有计入，最小间距时误差较大。", "Both lines are lumped, the driver is a fixed resistance and the aggressor edge an ideal ramp; shielding of fringe capacitance by the neighbour is ignored, which matters most at minimum spacing."]
+  - ["噪声容限取参考反相器 NML、NMH 中较小的一个（第 1 章 1.2 节）。", "The noise margin is the smaller of the reference inverter's NML and NMH (Section 1.2)."]
+思考题:
+  - ["为什么平行长度缩短时，噪声下降得不如间距加大那么快？", "Why does shortening the parallel run reduce the noise less than widening the spacing?"]
+  - ["干扰线的边沿放慢到 1 ns，噪声为什么大大减小？这对 PWM 输出级的设计有什么启发？", "Why does a 1 ns edge reduce the noise so much? What does this suggest for the PWM output stage?"]

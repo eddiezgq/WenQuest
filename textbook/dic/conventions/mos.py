@@ -268,6 +268,77 @@ def repeater_opt(Lw, layer, w, s=None):
     return k, size
 
 
+def xtalk(layer, w, s, Lw, size, tr):
+    """串扰（4.4 节）：受害线（线宽 w、长 Lw μm，接收端 1 个参考反相器，由 size 倍反相器保持）与干扰线以间距 s 平行，
+    干扰线以上升时间 tr 跳变 VDD。返回 (Cc, Cg, 悬空时的跳动, 有驱动时的峰值, τ)。Cg 为面积 + 两侧边缘电容（邻线对边缘的遮挡不计）。"""
+    q = WIRES[layer]
+    r = r_ratio()
+    Cc = wire_cc(layer, s) * Lw
+    Cg = (q["Carea"] * w + 2 * q["Cfringe"]) * 1e-18 * Lw + cin(Wmin, r * Wmin)
+    k = Cc / (Cc + Cg)
+    tau_ = req_n(size * Wmin) * (Cc + Cg)
+    return Cc, Cg, VDD * k, VDD * k * tau_ / tr * (1 - math.exp(-tr / tau_)), tau_
+
+
+# ======================================================================= 第 3 章：时序元件
+# 触发器的时序参数来自 SKY130 仿真（calib/calib_ff.py），以同一仿真中的 FO4 为单位存在 params.json 的 ff_sim；
+# 书中换算成 ps 时乘手算模型的 FO4（参考反相器、两个边沿的平均），与第 2 章门参数的做法一致。
+
+def ff_timing():
+    """传输门主从触发器的时序参数（s）：tcq 时钟到输出、tsu 建立时间、th 保持时间、tau_m 亚稳态时间常数、T0 亚稳态窗口。"""
+    f4 = fo4_tp(r_ratio())
+    return {k: P["ff_sim"][k] * f4 for k in ("tcq", "tsu", "th", "tau_m", "T0")}
+
+
+def setup_slack(T, t_logic, skew=0.0):
+    """建立时间余量（s）：T + skew − (tcq + t_logic + tsu)。skew = 接收触发器的时钟比发送触发器晚到的时间。"""
+    t = ff_timing()
+    return T + skew - (t["tcq"] + t_logic + t["tsu"])
+
+
+def hold_slack(t_logic_min, skew=0.0):
+    """保持时间余量（s）：tcq + t_logic_min − (th + skew)。"""
+    t = ff_timing()
+    return t["tcq"] + t_logic_min - (t["th"] + skew)
+
+
+def sync_tr(n, fclk, slack):
+    """n 级同步器留给亚稳态的决断时间（s）：最后一级之后的逻辑留下的余量 slack，加上前 n − 1 级各一个 T − tcq − tsu。"""
+    t = ff_timing()
+    return slack + (n - 1) * (1 / fclk - t["tcq"] - t["tsu"])
+
+
+def mtbf(tr, fclk, fdata):
+    """平均故障间隔（s）：MTBF = e^(tr/τm) / (T0·fclk·fdata)。"""
+    t = ff_timing()
+    return math.exp(tr / t["tau_m"]) / (t["T0"] * fclk * fdata)
+
+
+def ff_tcq_le():
+    """tcq 的手算估计（以 τ 为单位）：两级本地时钟反相器（反相时钟驱动 3 个、同相时钟驱动 2 个参考输入），
+    从锁存器的传输门（按一个与参考反相器等强的电阻）与主锁存器反相器串联给从节点充电，最后一级反相器驱动 FO4 + 反馈反相器。"""
+    g = gamma_self()
+    return [g + 3, g + 2, 2 * (1 + 2 * g), g + 5]
+
+
+def inc_delay(bits):
+    """n 位行波进位加 1 电路的关键路径（以 τ 为单位），各门取等效反相器的单位尺寸（每个输入 g 个参考输入电容）：
+    每一位的进位 = 二输入与非门（带一个反相器）+ 反相器（驱动下一位的与非门和本位求和的异或门，异或门 g = 4、p = 4γ）；
+    最高位的异或门驱动触发器的数据输入（一个参考输入）。"""
+    g = gamma_self()
+    per_bit = (1 + 2 * g) + (le_g("nand", 2) + 4 + g)
+    return (bits - 1) * per_bit + (1 + 4 * g)
+
+
+def tau_m_est():
+    """亚稳态时间常数的手算估计（s）：τm ≈ C/gm。C 为交叉耦合反相器一个节点的电容（另一个反相器的输入 + 自身漏极），
+    gm 为参考反相器在 VM 处 NMOS 与 PMOS 跨导之和（两管都在饱和区）。"""
+    r = r_ratio()
+    v = vm(Wmin, r * Wmin)
+    gm = kn * Wmin / L * (v - VTn) + kp * r * Wmin / L * (VDD - v - VTp)
+    return cin(Wmin, r * Wmin) * (1 + gamma_self()) / gm
+
+
 def reference():
     r = kn / kp
     pr = P["problems"]
@@ -328,4 +399,11 @@ def reference():
         out["ch4"]["rep"][str(k)] = repeater_delay(q43["L_um"], q43["layer"], q43["w_um"], k, 20, CL43)
     k_opt, s_opt = repeater_opt(q43["L_um"], q43["layer"], q43["w_um"])
     out["ch4"]["opt"] = {"k": k_opt, "size": s_opt}
+    # 第 3 章
+    q33 = pr["p33"]
+    f33, fd = q33["f_MHz"] * 1e6, q33["rpm"] / 60 * q33["lines"] * 2
+    out["ch3"] = {"ff": ff_timing(), "tcq_le": sum(ff_tcq_le()), "tau_m_est": tau_m_est(),
+                  "setup": setup_slack(1 / f33, 1e-9, 50e-12), "hold": hold_slack(0.0, 150e-12),
+                  "inc16": inc_delay(16), "xtalk": list(xtalk("met2", 0.14, 0.14, 500, 1, 100e-12)),
+                  "mtbf": {str(n): mtbf(sync_tr(n, f33, q33["slack_ps"] * 1e-12), f33, fd) for n in (1, 2)}}
     return out

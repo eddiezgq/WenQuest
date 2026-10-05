@@ -11,7 +11,7 @@ import math
 import numpy as np
 
 from bookout import T, figure, out, style
-from mos import P, VDD, Wmin, cin, noise_margins, r_ratio, req_n, req_p, wire_c, wire_cc, WIRES
+from mos import P, VDD, Wmin, cin, noise_margins, r_ratio, wire_cc, xtalk, WIRES
 import _draw as d
 
 q = P["problems"]["p44"]
@@ -26,14 +26,9 @@ NM = min(nm["NML"], nm["NMH"])
 
 def noise(s, size, tr=tr):
     """受害线：对地电容 Cg（面积 + 两侧边缘，邻线对边缘电容的屏蔽忽略不计）+ 接收端 1 个参考反相器；耦合 Cc。
-    悬空时 ΔV = VDD·Cc/(Cc + Cg)；有驱动（电阻 R）时，斜坡跳变注入的峰值 VDD·Cc/(Cc+Cg)·(τ/tr)(1 − e^(−tr/τ))，τ = R(Cc + Cg)。"""
-    qq = WIRES[lay]
-    Cc = wire_cc(lay, s) * Lw
-    Cg = (qq["Carea"] * w + 2 * qq["Cfringe"]) * 1e-18 * Lw + C0
-    k = Cc / (Cc + Cg)
-    R = req_n(size * Wmin)
-    tau = R * (Cc + Cg)
-    return Cc, Cg, VDD * k, VDD * k * tau / tr * (1 - math.exp(-tr / tau)), tau
+    悬空时 ΔV = VDD·Cc/(Cc + Cg)；有驱动（电阻 R）时，斜坡跳变注入的峰值 VDD·Cc/(Cc+Cg)·(τ/tr)(1 − e^(−tr/τ))，τ = R(Cc + Cg)。
+    算法在 conventions/mos.py 的 xtalk()，与实验 4.4 共用。"""
+    return xtalk(lay, w, s, Lw, size, tr)
 
 
 Cc, Cg, dv_float, dv1, tau1 = noise(s0, 1)

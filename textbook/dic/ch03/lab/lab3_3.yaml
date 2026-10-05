@@ -1,0 +1,25 @@
+# 实验 3.3 的指导书与报告模板。目的、场景、参数、任务取自 lab3_3.js（由 labs/micro/textbook/lab3_3.body.js 生成）。
+原理:
+  - ["异步信号的边沿落进触发器的采样窗口时，触发器进入亚稳态，两个节点的电压差按 e^(t/τm) 增长；等待 tr 之后还没决断的概率按 e^(−tr/τm) 下降。", "When an asynchronous edge falls in the sampling window the flip-flop goes metastable and the node difference grows as e^(t/τm); the chance of still being unresolved after tr falls as e^(−tr/τm)."]
+  - 式: "MTBF = e^(tr/τm) / (T0·fclk·fdata)        (3.3.2)"
+  - ["n 级同步器的决断时间 tr ≈ 最后一级之后的逻辑留下的余量 + (n − 1)(T − tcq − tsu)。", "An n-stage synchronizer gives tr ≈ the slack after the last stage + (n − 1)(T − tcq − tsu)."]
+  - ["编码器每相每秒的边沿数 fdata = 转速 / 60 × 线数 × 2。要求：1000 台机器人连续工作 10 年，平均不到一次故障。", "Edges per second per phase fdata = speed / 60 × lines × 2. Target: 1000 robots running 10 years with less than one failure on average."]
+步骤:
+  - ["选“100 MHz 控制芯片”，打一拍，余量从 200 ps 往上调，找到达标的最小余量（任务 1），记录 200、500、1000 ps 时的 MTBF，填入表 1。", "Choose “100 MHz controller”, one stage; raise the slack from 200 ps to the smallest value that meets the target (task 1); record the MTBF at 200, 500 and 1000 ps in Table 1."]
+  - ["改为打两拍、余量为 0，确认达标（任务 2）；把转速改为 10000 r/min，看 MTBF 变化多少。", "Switch to two stages with zero slack and confirm (task 2); change the speed to 10000 rpm and see how much the MTBF changes."]
+  - ["选“1 GHz 时钟域”，余量为 0，找到达标的最少级数（任务 3），填入表 2。", "Choose “1 GHz domain” with zero slack and find the fewest stages that meet the target (task 3); fill in Table 2."]
+数据表:
+  - 标题: ["表 1  打一拍（100 MHz、6000 r/min）", "Table 1  One stage (100 MHz, 6000 rpm)"]
+    表头: ["余量 / ps", "决断时间 / ps", "一路信号的 MTBF", "机队的 MTBF", "达标？"]
+    表头英文: ["Slack / ps", "Resolution time / ps", "MTBF per signal", "Fleet MTBF", "Met?"]
+    行: [["200", "", "", "", ""], ["500", "", "", "", ""], ["1000", "", "", "", ""], ["", "", "", "", "最小达标值"]]
+  - 标题: ["表 2  不同时钟频率下需要的级数（余量 0，6000 r/min）", "Table 2  Stages needed at different clocks (zero slack, 6000 rpm)"]
+    表头: ["时钟 / MHz", "级数", "决断时间 / ps", "机队的 MTBF"]
+    表头英文: ["Clock / MHz", "Stages", "Resolution time / ps", "Fleet MTBF"]
+    行: [["100", "2", "", ""], ["1000", "2", "", ""], ["1000", "3", "", ""]]
+注意:
+  - ["τm、T0 取自 SKY130 触发器的仿真（tt，27 °C），对仿真步长和拟合范围敏感；低电压、慢工艺角时 τm 会明显变大。", "τm and T0 come from SKY130 flip-flop simulation (tt, 27 °C) and are sensitive to time step and fitting range; τm grows markedly at low voltage or the slow corner."]
+  - ["fdata 应取最坏情况（电机最高转速）。实验按每台机器人一路信号计算；一台机器人有 N 路（几个关节、每个两相）时故障率乘 N，所需决断时间多 τm·ln N。", "fdata should be the worst case (top motor speed). The lab counts one signal per robot; with N signals per robot (several joints, two phases each) the failure rate is N times higher and the needed resolution time grows by τm·ln N."]
+思考题:
+  - ["余量每增加 100 ps，MTBF 乘多少？转速加倍，余量要增加多少才能保持 MTBF 不变？", "By what factor does the MTBF grow per extra 100 ps of slack? If the speed doubles, how much more slack keeps the MTBF the same?"]
+  - ["为什么 A、B 两相可以各自打两拍，一个 8 位的计数值却不能逐位打两拍？", "Why may phases A and B be synchronized separately while an 8-bit count may not be synchronized bit by bit?"]
