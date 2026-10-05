@@ -16,7 +16,7 @@ PROGRAM Main
     state : E_Press := INIT;
     prev : E_Press := INIT;    (* 上一次扫描的状态：状态一变，计时重新开始 *)
     tState : TON;              (* 本状态已经停留的时间 *)
-    limit : TIME;              (* 本状态允许停留的最长时间 *)
+    maxTime : TIME;            (* 本状态允许停留的最长时间 *)
     faultCode : INT;               (* 故障代码：0 无；1 夹紧超时；2 压装超时；3 回程超时；4 松开超时；5 回原点超时；9 传感器冲突 *)
     clampHold : BOOL;          (* 进入故障或急停时夹具是否夹着：保持原样 *)
     auto, go, jog : BOOL;
@@ -42,14 +42,14 @@ PROGRAM Main
 
   (* 2. 状态时限：自动方式和回原点时才计时（单步时等的是人） *)
   CASE state OF
-    CLAMPING, UNCLAMPING: limit := T#1s;
-    PRESSING: limit := T#4s;
-    RETURNING: limit := T#5s;
-    HOMING: limit := T#5s;
+    CLAMPING, UNCLAMPING: maxTime := T#1s;
+    PRESSING: maxTime := T#4s;
+    RETURNING: maxTime := T#5s;
+    HOMING: maxTime := T#5s;
   ELSE
-    limit := T#1h;
+    maxTime := T#1h;
   END_CASE;
-  tState(IN := state = prev AND (auto OR state = HOMING), PT := limit);
+  tState(IN := state = prev AND (auto OR state = HOMING), PT := maxTime);
   prev := state;
 
   (* 3. 转移 *)

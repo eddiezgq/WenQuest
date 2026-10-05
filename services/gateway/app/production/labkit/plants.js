@@ -491,7 +491,99 @@ function press(o = {}) {
   };
 }
 
-const API = { traffic, elevator, sorter, press, kit3d, rng };
+// ---------------------------------------------------------------- 5. feed conveyor (Part I project: the digital factory's raw-store feed line)
+// A belt from the raw store to the band saw SAW-01. The operator (or the store robot) puts a bar on the entry; the PLC
+// runs the belt until the bar reaches the end sensor, where the saw's loader takes it away. Start (NO), stop (NC) and a
+// latching e-stop (NC); an overload relay contact (NC) of the motor; green running lamp, red fault lamp.
+// Inputs: S1_Start, S2_Stop, S0_EStop, F1_Overload, B1_Entry, B2_End; outputs: KM1_Run, H1_Run, H2_Fault.
+function conveyor(o = {}) {
+  const io = [
+    { name: "S1_Start", addr: "%IX0.0", dir: "in", comment: ["启动按钮 S1（常开）", "Start button S1 (NO)"] },
+    { name: "S2_Stop", addr: "%IX0.1", dir: "in", comment: ["停止按钮 S2（常闭，按下为 0）", "Stop button S2 (NC, 0 when pressed)"] },
+    { name: "S0_EStop", addr: "%IX0.2", dir: "in", comment: ["急停 S0（常闭，按下为 0）", "Emergency stop S0 (NC, 0 when pressed)"] },
+    { name: "F1_Overload", addr: "%IX0.3", dir: "in", comment: ["电机热继电器 F1 辅助触点（常闭，过载为 0）", "Motor overload relay F1 (NC, 0 on overload)"] },
+    { name: "B1_Entry", addr: "%IX0.4", dir: "in", comment: ["入口光电开关 B1（有料为 1）", "Entry photo sensor B1 (1 = part)"] },
+    { name: "B2_End", addr: "%IX0.5", dir: "in", comment: ["末端光电开关 B2（有料为 1）", "End photo sensor B2 (1 = part)"] },
+    { name: "KM1_Run", addr: "%QX0.0", dir: "out", comment: ["输送电机接触器 KM1", "Conveyor motor contactor KM1"] },
+    { name: "H1_Run", addr: "%QX0.1", dir: "out", comment: ["运行指示灯 H1（绿）", "Running lamp H1 (green)"] },
+    { name: "H2_Fault", addr: "%QX0.2", dir: "out", comment: ["故障指示灯 H2（红）", "Fault lamp H2 (red)"] },
+  ];
+  const L = 3.0, V = 0.25;                       // belt length m, belt speed m/s (about 12 s from entry to end)
+  const ENTRY = 0.15, END = 2.85;                // sensor positions m
+  return {
+    io,
+    panel: [{ name: "S1_Start", kind: "push", label: ["启动 S1", "Start S1"] }, { name: "S2_Stop", kind: "nc-push", label: ["停止 S2", "Stop S2"] },
+            { name: "S0_EStop", kind: "estop", label: ["急停 S0（再按一次释放）", "E-stop S0 (press again to release)"] },
+            { name: "PutPart", kind: "push", label: ["放一根料", "Put a bar"] }, { name: "TakePart", kind: "push", label: ["取走末端的料", "Take the bar away"] }],
+    faults: [{ id: "jam", name: ["卡料（带在转，料不走）", "Jam (belt runs, bar stuck)"] }, { id: "b2dead", name: ["末端光电 B2 坏（常为 0）", "End sensor B2 dead (always 0)"] },
+             { id: "overload", name: ["电机过载（热继电器动作）", "Motor overload (relay trips)"] }],
+    reset(s, opt) {
+      s.f = (opt && opt.faults) || {}; s.t = 0; s.out = {}; s.v = 0; s.parts = (o.parts || [0.15]).map((x) => ({ x })); s.hazard = false;
+      s.delivered = 0; s.runMs = 0; s.lastPut = false; s.lastTake = false; s.why = "";
+    },
+    inputs(s) {
+      const at = (x, w) => s.parts.some((p) => Math.abs(p.x - x) < w);
+      return { B1_Entry: at(ENTRY, 0.12), B2_End: !s.f.b2dead && at(END, 0.12), F1_Overload: !s.f.overload, S2_Stop: true, S0_EStop: true };
+    },
+    step(dt, out, s, ins) {
+      s.t += dt; s.out = out;
+      const sec = dt / 1000;
+      // the panel's "put a bar" / "take it away" (a test sets PutPart / TakePart the same way)
+      if (ins) {
+        if (ins.PutPart && !s.lastPut && !s.parts.some((p) => p.x < 0.5)) s.parts.push({ x: ENTRY });
+        if (ins.TakePart && !s.lastTake) s.parts = s.parts.filter((p) => { const gone = p.x > END - 0.2; if (gone) s.delivered++; return !gone; });
+        s.lastPut = !!ins.PutPart; s.lastTake = !!ins.TakePart;
+        if (ins.S0_EStop === false && out.KM1_Run) { s.hazard = true; s.why = "estop"; }
+        if (ins.F1_Overload === false && out.KM1_Run && s.f.overload) { s.hazard = true; s.why = "overload"; }
+      }
+      // the motor needs about 0.3 s to reach speed, stops in about 0.2 s
+      const target = out.KM1_Run ? V : 0;
+      s.v += (target - s.v) * Math.min(1, dt / (target ? 300 : 200));
+      if (out.KM1_Run) s.runMs += dt;
+      for (const p of s.parts) {
+        if (s.f.jam && p.x > 1.4 && p.x < 1.5) continue;            // stuck at the middle guide
+        const ahead = s.parts.some((q) => q !== p && q.x > p.x && q.x - p.x < 0.45);
+        if (!ahead) p.x = Math.min(L - 0.05, p.x + s.v * sec);       // a bar at the end stops against the end stop
+      }
+      // a bar pushed against the end stop while the belt keeps running: wear, not a hazard; running into a person is the hazard
+    },
+    read(s, n) {
+      if (n === "hazard") return s.hazard;
+      if (n === "delivered") return s.delivered;
+      if (n === "x") return s.parts.length ? Math.max(...s.parts.map((p) => p.x)) : 0;
+      if (n === "atEnd") return s.parts.some((p) => p.x > END - 0.12);
+      if (n === "runMs") return s.runMs;
+      return undefined;
+    },
+    build3d(st, THREE) {
+      const K = kit3d(st, THREE);
+      const v = { K, parts: [] };
+      K.box(L + 0.3, 0.08, 0.5, 0x2d333b, L / 2, 0.8, 0);
+      for (const x of [0.05, L - 0.05]) K.cyl(0.06, 0.52, 0x8c959f, x, 0.82, 0, null, "z");
+      for (const x of [0.2, L / 2, L - 0.2]) for (const z of [-0.22, 0.22]) K.box(0.06, 0.78, 0.06, 0x57606a, x, 0.39, z);
+      v.motor = K.cyl(0.12, 0.3, 0x6e7781, -0.1, 0.62, 0.42, null, "z");
+      K.label("M1", -0.1, 0.95, 0.5, 0.1);
+      const sensor = (x, name) => { K.box(0.06, 0.2, 0.06, 0x24292f, x, 0.95, -0.32); K.label(name, x, 1.2, -0.32, 0.1); return K.beam([x, 0.9, -0.29], [x, 0.9, 0.29], 0x9aa7b0); };
+      v.b1 = sensor(ENTRY, "B1"); v.b2 = sensor(END, "B2");
+      K.box(0.05, 0.25, 0.5, 0x6e7781, L + 0.02, 0.97, 0);          // end stop
+      K.box(0.4, 0.6, 0.15, 0xd0d7de, -0.5, 1.1, 0.6);              // control box with lamps
+      v.h1 = K.lamp(0.045, 0x2da44e, -0.6, 1.3, 0.69); v.h2 = K.lamp(0.045, 0xd1242f, -0.4, 1.3, 0.69);
+      K.label("H1", -0.6, 1.42, 0.7, 0.08); K.label("H2", -0.4, 1.42, 0.7, 0.08);
+      K.camera([1.2, 2.6, 4.2], [1.4, 0.8, 0]);
+      return v;
+    },
+    draw3d(v, s) {
+      const ins = this.inputs(s), o = s.out || {};
+      v.b1.userData.on(ins.B1_Entry); v.b2.userData.on(ins.B2_End);
+      v.h1.userData.on(o.H1_Run); v.h2.userData.on(o.H2_Fault);
+      v.motor.material = v.K.mat(o.KM1_Run ? 0x2da44e : 0x6e7781);
+      while (v.parts.length < s.parts.length) v.parts.push(v.K.box(0.4, 0.09, 0.09, 0xb08800, 0, 0, 0));
+      v.parts.forEach((m, i) => { const p = s.parts[i]; m.visible = !!p; if (p) m.position.set(p.x, 0.89, 0); });
+    },
+  };
+}
+
+const API = { traffic, elevator, sorter, press, conveyor, kit3d, rng };
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 else root.WQPLANTS = API;
 })(typeof window !== "undefined" ? window : globalThis);

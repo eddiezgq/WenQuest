@@ -1420,6 +1420,8 @@ function runTest(rtOpts, plant, test, opts = {}) {
         const v = io.name in manual ? manual[io.name] : io.name in fromPlant ? fromPlant[io.name] : undefined;
         if (v !== undefined) { rt.phys[io.addr] = v; ins[io.name] = v; }
       }
+      // operator actions on the machine that are not PLC inputs (e.g. "put a part") go to the machine only
+      for (const k in manual) if (!(k in ins) && !rt.io.some((x) => x.name === k)) ins[k] = manual[k];
       if (!rt.scan()) return false;
       if (plant && plant.step) plant.step(dt, rt.outputs(), ps, ins);
       if (trace) { trace.t.push(rt.now); trace.names.forEach((n, k) => trace.v[k].push(val(n))); }

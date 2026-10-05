@@ -1,0 +1,32 @@
+# 工程任务单 TS-1-1（配 1.4、1.7 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-1-1
+标题: [减速器产线自动化调研, "Automation survey of the gearbox line"]
+角色: [见习电气工程师（现场调研）, junior electrical engineer (site survey)]
+背景:
+  - "你刚进入一家自动化系统集成商，公司准备为问渠减速器厂改造产线的控制系统。项目经理要你先到现场“走一遍”：每个工作中心有哪些设备，用了哪些传感器和执行器，由什么控制，数据怎样进入 MES 和 ERP。问渠数字工厂就是这家工厂的在线复本：看板、车间终端、3D 车间、统一数据总线和 ERPNext 都可以看。"
+  - "You have just joined a system integrator that is about to upgrade the controls of the WenQuest gearbox plant. The project manager wants you to walk the line first: what machines each work centre has, which sensors and actuators, what controls them, and how the data reaches the MES and ERP. The WenQuest digital factory is an online copy of the plant: dashboards, shop-floor terminal, 3D shop, the data bus and ERPNext are all open to you."
+输入:
+  - {名称: [数字工厂的看板、3D 车间与车间终端, "Digital factory dashboards, 3D shop and terminal"], 来源: [问渠数字工厂, WenQuest digital factory]}
+  - {名称: [统一数据总线的消息, "Messages on the data bus"], 来源: [数字工厂“统一数据总线”页, "Digital factory bus page"]}
+  - {名称: [减速器 WQR-105 的工艺路线, "WQR-105 routing"], 来源: [ERPNext 的工艺路线与工单, "Routing and work orders in ERPNext"]}
+  - {名称: [本章 1.3–1.5 节, "Sections 1.3–1.5"], 来源: [教材第 1 章, Chapter 1]}
+交付物:
+  - {名称: [产线自动化调研表（Excel 或 Word）, "Line automation survey (Excel or Word)"], 格式: [xlsx, docx], 验收: [每个工作中心一行：设备、主要传感器（至少 2 种）、主要执行器（至少 2 种）、控制器类型、上传给 MES 的数据（至少 2 项）；数据来源注明, "One row per work centre: machines, main sensors (at least 2 kinds), main actuators (at least 2 kinds), controller type, data sent to the MES (at least 2 items), with sources"]}
+  - {名称: [自动化金字塔图（1 页）, "Automation pyramid (1 page)"], 格式: [pdf, png, docx], 验收: [把调研到的设备和系统画到 ISA-95 的五层上，标出各层之间传什么数据、大约多久一次, "Place the surveyed machines and systems on the five ISA-95 levels, with the data passed between levels and how often"]}
+  - {名称: [调研小结（1 页）, "Survey summary (1 page)"], 格式: [docx, pdf], 验收: [指出三处最值得改造的地方（例如没有联网的设备、靠人工记录的数据），说明理由, "Name three places most worth upgrading (e.g. machines not networked, data recorded by hand) with reasons"]}
+工位: [MES, ERP]
+步骤:
+  - ["登录问渠数字工厂，在 3D 车间和看板上认识 12 个工作中心和物流设备。", "Log in to the digital factory and get to know the 12 work centres and the logistics in the 3D shop and dashboards."]
+  - ["在 ERPNext 里查 WQR-105 及其零件的工艺路线，弄清每道工序在哪个工作中心做。", "Look up the routing of WQR-105 and its parts in ERPNext."]
+  - ["在“统一数据总线”页观察设备发出的消息，记下每类设备上传哪些数据。", "Watch the messages on the bus page and note what each kind of machine sends."]
+  - ["结合 1.3 节，推断每台设备的传感器、执行器和控制器（数字工厂里没有直接给出的，按同类设备的常见配置推断并注明“推断”）。", "Infer each machine's sensors, actuators and controller from Section 1.3 (mark inferences as such)."]
+  - ["填调研表，画金字塔图，写小结。", "Fill in the survey, draw the pyramid and write the summary."]
+评审要点:
+  - ["〔老师检查〕工作中心齐全，传感器、执行器、控制器的类型合理，推断的内容有注明。", "[Teacher] All work centres covered; plausible sensors, actuators and controllers; inferences marked."]
+  - ["〔老师检查〕金字塔图的分层正确：PLC 在第 1 层，看板在第 2 层，车间终端在第 3 层，统一数据总线贯穿各层，ERPNext 在第 4 层。", "[Teacher] Correct levels: PLCs at level 1, dashboards at level 2, terminals at level 3, the bus across levels, ERPNext at level 4."]
+  - ["〔老师检查〕改造建议有依据，不是泛泛而谈。", "[Teacher] Upgrade suggestions are grounded, not generic."]
+评分:
+  - {项: [调研表, Survey table], 分: 50, 标准: [工作中心齐全，各栏合理，来源清楚, "Complete, plausible, sourced"]}
+  - {项: [金字塔图, Pyramid], 分: 25, 标准: [分层正确，数据流清楚, "Correct levels and data flows"]}
+  - {项: [调研小结, Summary], 分: 25, 标准: [三处建议有依据, "Three grounded suggestions"]}
+学时: 2

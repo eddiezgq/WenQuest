@@ -176,3 +176,24 @@ test("press-fit panel: a latching e-stop and one button holding both hand button
   const io = new Set(pr.io.map((x) => x.name));
   for (const p of pr.panel) for (const n of p.names || [p.name]) assert.ok(io.has(n), n);
 });
+
+// ------------------------------------------------ feed conveyor (Part I project)
+test("feed conveyor: a bar travels to the end and the belt stops; stop, e-stop, overload, jam; operator actions reach the machine", () => {
+  const fs = require("node:fs");
+  const st = fs.readFileSync(new URL("../../../../textbook/plc/ch01/code/p1_1_1.st", import.meta.url), "utf8");
+  const cv = W.conveyor();
+  const start = [{ set: { S1_Start: true } }, { wait: 100 }, { set: { S1_Start: false } }];
+  ok(run(cv, st, { id: "run", steps: [...start, { until: { B2_End: true }, within: 15000 }, { wait: 50 }, { expect: { KM1_Run: false, H2_Fault: false, atEnd: true } },
+    { set: { TakePart: true } }, { wait: 50 }, { set: { TakePart: false, PutPart: true } }, { wait: 50 }, { set: { PutPart: false } }, { wait: 20 },
+    { expect: { delivered: 1, B1_Entry: true } }, ...start, { until: { B2_End: true }, within: 15000 }] }));
+  ok(run(cv, st, { id: "stop", steps: [...start, { wait: 2000 }, { set: { S2_Stop: false } }, { wait: 20 }, { expect: { KM1_Run: false } },
+    { set: { S2_Stop: true } }, { never: { KM1_Run: true }, during: 1000 }] }));
+  ok(run(cv, st, { id: "estop", steps: [...start, { wait: 2000 }, { set: { S0_EStop: false } }, { wait: 20 }, { expect: { KM1_Run: false, hazard: false } }] }));
+  ok(run(cv, st, { id: "jam", faults: { jam: true }, steps: [...start, { never: { H2_Fault: true }, during: 19000 }, { until: { H2_Fault: true }, within: 2000 },
+    { wait: 20 }, { expect: { KM1_Run: false } }, ...start, { wait: 50 }, { expect: { H2_Fault: false, KM1_Run: true } }] }));   // start resets the alarm and runs again
+  ok(run(cv, st, { id: "overload", faults: { overload: true }, steps: [...start, { wait: 50 }, { expect: { KM1_Run: false, H2_Fault: true } }] }));
+  // a program without the end sensor runs the bar into the end stop forever
+  const naive = st.replace(" AND NOT B2_End AND NOT jammed;", " AND NOT jammed;");
+  assert.equal(run(cv, naive, { id: "run", steps: [...start, { until: { B2_End: true }, within: 15000 }, { wait: 50 }, { expect: { KM1_Run: false } }] }).ok, false);
+  assert.ok(!P.review({ st }, cv.io).some((x) => x.level === "error"));
+});

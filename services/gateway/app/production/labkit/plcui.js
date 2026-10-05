@@ -655,6 +655,7 @@ function setup(L, K) {
       const v = x.name in S.panel ? S.panel[x.name] : x.name in fromPlant ? fromPlant[x.name] : undefined;
       if (v !== undefined) { rt.phys[x.addr] = v; ins[x.name] = v; }
     });
+    for (const k in S.panel) if (!(k in ins) && !io.some((x) => x.name === k)) ins[k] = S.panel[k];   // operator actions on the machine
     const ok = rt.scan();
     if (plant.step) plant.step(rt.cycle, rt.outputs(), S.ps, ins);
     if (!ok) { api.running = false; say(T("PLC 停机（STOP）：", "PLC stopped: ") + errText(rt.error), "bad"); }

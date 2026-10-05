@@ -1,0 +1,37 @@
+# 实验 1.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、任务取自 lab1_7.js。
+原理:
+  - ["PLC 的输入端子接按钮、开关、光电开关，输出端子接接触器线圈和指示灯；程序决定输出怎样随输入变化。实验台上的上料输送线有 6 个输入、3 个输出，I/O 表在“I/O 与监视”页。",
+     "PLC inputs take buttons, switches and photo sensors; outputs drive contactor coils and lamps; the program decides how outputs follow inputs. The bench conveyor has 6 inputs and 3 outputs (I/O & watch page)."]
+  - ["结构化文本里，一行赋值“输出 := 条件;”在每个扫描周期执行一次：条件为真，输出得电；为假，输出失电。",
+     "In Structured Text, an assignment 'output := condition;' runs once every scan: true energises the output, false de-energises it."]
+  - ["自锁：电机得电的条件里加上“或者电机已经在转”，按钮松开后电机继续得电，直到停止条件断开它。停止按钮、急停、热继电器都用常闭触点接线：正常时为 1，动作或断线时为 0。",
+     "Seal-in: add 'or the motor is already running' to the motor's condition, so it stays on after the button is released until a stop condition breaks it. Stop, e-stop and overload contacts are wired NC: 1 normally, 0 when operated or when the wire breaks."]
+  - 式: "KM1_Run := (S1_Start OR KM1_Run) AND S2_Stop AND S0_EStop AND F1_Overload AND NOT B2_End"
+步骤:
+  - ["打开实验 1.7，到“I/O 与监视”页，对照 1.1 节逐个认识 I/O 点；按操作面板上的启动、停止、急停，看 I/O 表里的值怎样变化，填入表 1。",
+     "Open Lab 1.7, go to the I/O & watch page and identify every point (Section 1.1); press start, stop and e-stop on the panel and record the values in Table 1."]
+  - ["第 1 步：把程序里的 H1_Run := FALSE; 改成 H1_Run := S1_Start;，按“编译并下载”，再按“运行”。按住、松开启动按钮，观察绿灯。到测试页运行测试。",
+     "Step 1: change H1_Run := FALSE; to H1_Run := S1_Start;, compile and download, run. Hold and release start; watch the green lamp; run the tests."]
+  - ["第 2 步：写出电机的自锁程序（参考“原理”里的式子，先不加 NOT B2_End），让 H1_Run 跟随 KM1_Run。按一下启动，观察三维画面里的棒料；按停止。运行测试。",
+     "Step 2: write the seal-in for the motor (the formula in 'Principle', without NOT B2_End for now); let H1_Run follow KM1_Run. Press start once, watch the bar; press stop; run the tests."]
+  - ["第 3 步：加上 AND NOT B2_End，让棒料到末端时自动停。按“取走末端的料”“放一根料”再送一次。记录棒料从入口到末端的时间，填入表 2。",
+     "Step 3: add AND NOT B2_End so the belt stops at the end. Use 'Take the bar away' and 'Put a bar' and run again. Record the travel time in Table 2."]
+  - ["按“程序检查”，处理所有错误；在故障按钮里注入“末端光电 B2 坏”，再运行一次，记录现象。",
+     "Review the program and fix every error; inject 'End sensor B2 dead', run again and record what happens."]
+数据表:
+  - 标题: ["表 1  I/O 点与操作面板", "Table 1  I/O points and the panel"]
+    表头: ["I/O 点", "地址", "常开 / 常闭", "不操作时的值", "操作时的值"]
+    表头英文: ["Point", "Address", "NO / NC", "Value at rest", "Value when operated"]
+    行: [["S1_Start", "", "", "", ""], ["S2_Stop", "", "", "", ""], ["S0_EStop", "", "", "", ""], ["F1_Overload", "", "", "", ""], ["B1_Entry", "", "", "", ""], ["B2_End", "", "", "", ""]]
+  - 标题: ["表 2  运行记录", "Table 2  Run record"]
+    表头: ["步骤", "测试结果", "现象与说明"]
+    表头英文: ["Step", "Test result", "Observations"]
+    行: [["第 1 步（灯）", "", ""], ["第 2 步（自锁）", "", ""], ["第 3 步（末端停）", "", ""], ["棒料从入口到末端的时间 / s", "", ""], ["注入 B2 坏的现象", "", ""]]
+    行英文: [["Step 1 (lamp)", "", ""], ["Step 2 (seal-in)", "", ""], ["Step 3 (stop at the end)", "", ""], ["Travel time entry to end / s", "", ""], ["With B2 dead", "", ""]]
+注意:
+  - ["每次改了程序都要按“编译并下载”才生效；程序有错时，下方会给出出错的行号。", "After every change, compile and download; errors are reported with line numbers."]
+  - ["急停按钮按一次锁住，再按一次才释放，和真实的急停按钮一样。", "The e-stop latches when pressed; press again to release, like a real one."]
+  - ["写好的程序保存在本机浏览器里，换一台电脑要重新写或导入。", "Your program is kept in this browser; on another computer write or import it again."]
+思考题:
+  - ["第 2 步的程序里，“OR KM1_Run”起什么作用？把它去掉，按一下 S1 会怎样？", "In step 2, what does 'OR KM1_Run' do? Remove it and press S1 once: what happens?"]
+  - ["注入“末端光电 B2 坏”以后，棒料顶到挡块上，电机还在转。程序 1.1.1 用什么办法发现这种情况？", "With B2 dead the bar runs against the end stop and the motor keeps running. How does Program 1.1.1 detect this?"]

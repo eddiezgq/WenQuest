@@ -15,6 +15,9 @@ parts_en:
   第十篇 典型设备的控制: "Part X  Controlling Typical Machines"
   第十一篇 综合项目: "Part XI  Capstone Projects"
 chapters:
+  1:
+    status: ai
+    title_en: "PLCs and Industrial Automation"
   15:
     status: ai
     title_en: "Sequential Control Design"
