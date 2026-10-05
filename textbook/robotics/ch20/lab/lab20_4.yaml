@@ -1,0 +1,26 @@
+# 实验 20.4 的指导书与报告模板。目的、场景、参数、任务取自 lab20_4.js。
+原理:
+  - 式: ["质心 c = Σ m_k c_k / m（式 (20.4.1)）；静止在水平地面上时 c_xy = Σ w_j p_j，w_j = f_jz/(m𝔤) ≥ 0，Σ w_j = 1（式 (20.4.3)）", "CoM c = Σ m_k c_k / m (Eq. (20.4.1)); at rest on level ground c_xy = Σ w_j p_j, w_j = f_jz/(m𝔤) ≥ 0, Σ w_j = 1 (Eq. (20.4.3))"]
+  - ["静止时能站住，当且仅当质心的竖直投影在支撑多边形（着地点的凸包）内（定理 20.4.1）。", "The robot can stand still if and only if the vertical projection of the CoM lies in the support polygon, the convex hull of the contact points (Theorem 20.4.1)."]
+  - ["静态稳定裕度 S：质心投影到支撑多边形各边的最短距离，内为正、外为负（定义 20.4.4）。", "Static stability margin S: shortest distance from the CoM projection to the edges of the support polygon, positive inside, negative outside (Definition 20.4.4)."]
+  - ["爬行步态要求 β ≥ 3/4，要有正的裕度则 β > 3/4：β = 3/4 时换腿瞬间两个支撑三角形只共用一条对角线，S 至多为零。", "The crawl needs β ≥ 3/4, and β > 3/4 for a positive margin: at β = 3/4 the two support triangles at a leg change share only a diagonal, so S is at most zero."]
+  - 式: ["S_min ≈ ½ η (β − 3/4) L_s sin α − δ（式 (20.4.4)）：裕度与四脚着地的过渡段中质心越过对角线的距离成正比", "S_min ≈ ½ η (β − 3/4) L_s sin α − δ (Eq. (20.4.4)): the margin is proportional to how far the CoM crosses the diagonal during the four-foot transition"]
+步骤:
+  - ["场景“Go2 爬行”：步态 0，A = 0，β 依次取 0.75、0.80、0.85、0.90，各按“开始”走一个周期，记录最小裕度，填入表 1（任务 1）。", "Scene “Go2 crawling”: gait 0, A = 0, β = 0.75, 0.80, 0.85, 0.90; press Start for one cycle each and record the smallest margin in Table 1 (task 1)."]
+  - ["A 改为 0.02 m 和 0.04 m，重复上一步；找出最小裕度不小于 5 mm 的组合（任务 2）。", "Set A to 0.02 m and 0.04 m and repeat; find a combination with a smallest margin of at least 5 mm (task 2)."]
+  - ["步态改为 1（小跑）走一个周期，观察支撑多边形变成线段，记录裕度（任务 3）。", "Switch to gait 1 (trot) for one cycle; watch the polygon collapse to a segment and record the margin (task 3)."]
+  - ["生活场景“单脚站立”：骨盆左移为 0 时把“抬起右脚”设为 1，读出裕度；再逐步左移骨盆，记录裕度变为正值时的移动量，最后在 0.145 m 处抬脚（任务 4）。", "Everyday scene “Standing on one foot”: with no pelvis shift set “lift right foot” to 1 and read the margin; then move the pelvis left step by step, record where the margin turns positive, and lift the foot at 0.145 m (task 4)."]
+数据表:
+  - 标题: ["表 1  爬行步态的最小静态稳定裕度（mm）", "Table 1  Smallest static stability margin of the crawl (mm)"]
+    表头: ["β", "A = 0", "A = 0.02 m", "A = 0.04 m"]
+    行: [["0.75", "", "", ""], ["0.80", "", "", ""], ["0.85", "", "", ""], ["0.90", "", "", ""]]
+  - 标题: ["表 2  G1 单脚站立", "Table 2  G1 on one foot"]
+    表头: ["骨盆左移 / m", "支撑", "裕度 S / mm", "站得住？"]
+    表头英文: ["pelvis left / m", "support", "margin S / mm", "stands?"]
+    行: [["0", "双脚", "", ""], ["0", "左脚", "", ""], ["0.10", "左脚", "", ""], ["0.145", "左脚", "", ""]]
+    行英文: [["0", "both feet", "", ""], ["0", "left foot", "", ""], ["0.10", "left foot", "", ""], ["0.145", "left foot", "", ""]]
+注意:
+  - ["Go2 在“跑步机”上：三维中机身只侧摆不前进，足迹和支撑多边形相对机身画出；质心由各连杆的质量和质心位置实时算出。", "Go2 is on a treadmill: in 3D the body only sways and does not advance; footprints and the polygon are drawn relative to the body; the CoM is computed from every link's mass and centre of mass."]
+  - ["静态稳定只适用于慢速运动；小跑等动态步态要用零力矩点和动力学分析（第 28 章）。", "Static stability only applies to slow motion; dynamic gaits such as the trot need the zero moment point and dynamics (Chapter 28)."]
+思考题:
+  - ["侧摆幅度从 2 cm 加到 4 cm，最小裕度几乎不再增加，这时限制裕度的是换腿过渡段的哪一端？要进一步提高裕度，应当怎样改变侧摆的相位或步幅？", "From 2 cm to 4 cm of sway the smallest margin hardly grows. Which end of the leg-change transition limits it then, and how should the phase of the sway or the stride change to raise it further?"]

@@ -1,0 +1,26 @@
+# 实验 20.2 的指导书与报告模板。目的、场景、参数、任务取自 lab20_2.js。
+原理:
+  - 式: ["浮动基座的正运动学：p_{s,i} = p_sb + R_sb p_{b,i}(θ_i)（式 (20.2.2)）", "Forward kinematics with a floating base: p_{s,i} = p_sb + R_sb p_{b,i}(θ_i) (Eq. (20.2.2))"]
+  - ["四只脚着地时，机器人是以机身为动平台的并联机构：给定机身位姿，每条腿由 p_{b,i} = T_sb⁻¹ p_{s,i} 单独求逆解（定理 20.2.1）。", "With four feet down the robot is a parallel mechanism with the body as the moving platform: given the body pose, each leg is solved on its own from p_{b,i} = T_sb⁻¹ p_{s,i} (Theorem 20.2.1)."]
+  - 式: ["支撑腿的速度关系：J_i θ̇_i = [p_{b,i}] ω_b − v_b（式 (20.2.5)）；腿式里程计：A V_b = y 的最小二乘（式 (20.2.8)）", "Stance-leg velocity: J_i θ̇_i = [p_{b,i}] ω_b − v_b (Eq. (20.2.5)); leg odometry: least squares of A V_b = y (Eq. (20.2.8))"]
+  - ["一只脚打滑时，它的方程与其余各腿矛盾，最小二乘的残差在这条腿上最大。", "When a foot slips its equations contradict the others; the least-squares residual is largest on that leg."]
+步骤:
+  - ["场景“Go2 机身位姿”：逐个改变俯仰、横滚、偏航、高度和侧移，每次只动一个滑块，记录刚好不可行时的值和原因，填入表 1（任务 1～3）。", "Scene “Go2 body pose”: change pitch, roll, yaw, height and shift one at a time; record the value at which the pose becomes infeasible and the reason in Table 1 (tasks 1–3)."]
+  - ["把机身高度依次设为 0.35、0.287、0.20、0.12 m，记录四条腿的小腿关节角和 |det J| 的最小值（任务 2）。", "Set the body height to 0.35, 0.287, 0.20, 0.12 m; record the calf angles and the smallest |det J| (task 2)."]
+  - ["打滑速度设为 0，按“开始”，记录里程计误差；再依次设为 0.02、0.05、0.10 m/s，记录误差和四条腿的残差，填入表 2（任务 4）。", "With zero slip press Start and record the odometry error; then set 0.02, 0.05, 0.10 m/s and record the errors and the four residuals in Table 2 (task 4)."]
+  - ["生活场景“扎马步”：让骨盆下降 0.10 m（任务 5），再左右移动，记录髋横滚和踝横滚的角度，找出侧移的极限。", "Everyday scene “Horse stance”: lower the pelvis by 0.10 m (task 5), then shift it sideways; record hip-roll and ankle-roll angles and find the limit of the shift."]
+数据表:
+  - 标题: ["表 1  机身单独运动的范围", "Table 1  Range of each body motion alone"]
+    表头: ["运动", "极限值", "不可行的腿", "原因"]
+    表头英文: ["motion", "limit", "failing leg", "reason"]
+    行: [["抬头（俯仰为负）", "", "", ""], ["低头", "", "", ""], ["横滚", "", "", ""], ["偏航", "", "", ""], ["下蹲", "", "", ""], ["升高", "", "", ""]]
+    行英文: [["nose up (negative pitch)", "", "", ""], ["nose down", "", "", ""], ["roll", "", "", ""], ["yaw", "", "", ""], ["crouch", "", "", ""], ["rise", "", "", ""]]
+  - 标题: ["表 2  打滑与腿式里程计", "Table 2  Slip and leg odometry"]
+    表头: ["打滑速度 / (m/s)", "|Δω| / (rad/s)", "|Δv| / (mm/s)", "残差 FL / FR / RL / RR (mm/s)"]
+    表头英文: ["slip / (m/s)", "|Δω| / (rad/s)", "|Δv| / (mm/s)", "residual FL / FR / RL / RR (mm/s)"]
+    行: [["0", "", "", ""], ["0.02", "", "", ""], ["0.05", "", "", ""], ["0.10", "", "", ""]]
+注意:
+  - ["足端按点接触处理，小球的滚动不计；关节速度由相隔 0.01 s 的两次逆解求差商，所以没有打滑时里程计也有很小的误差。", "Feet are point contacts and the rolling of the ball is ignored; joint rates come from two inverse solutions 0.01 s apart, so even without slip the odometry has a small error."]
+  - ["机身晃动 1.5 s 结束时才做一次最小二乘；实际的腿式里程计每个控制周期都做，并与 IMU 融合（第 46 章）。", "The least squares is done once, at the end of the 1.5 s sway; real leg odometry runs every control cycle and is fused with an IMU (Chapter 46)."]
+思考题:
+  - ["为什么打滑的误差会“摊”到全部六个速度分量上？剔除一条腿以后，剩下三条腿还能唯一地求出 V_b 吗？", "Why does the error of one slipping foot spread over all six velocity components? With one leg removed, do the remaining three still determine V_b uniquely?"]

@@ -1,0 +1,26 @@
+# 实验 20.1 的指导书与报告模板。目的、场景、参数、任务取自 lab20_1.js。
+原理:
+  - 式: ["p = p_h + Rot(x̂, θ₁)(x′, s_y d, z′)ᵀ，x′ = −l₁ sin θ₂ − l₂ sin(θ₂ + θ₃)，z′ = −l₁ cos θ₂ − l₂ cos(θ₂ + θ₃)（式 (20.1.5)、(20.1.6)）", "p = p_h + Rot(x̂, θ₁)(x′, s_y d, z′)ᵀ, x′ = −l₁ sin θ₂ − l₂ sin(θ₂ + θ₃), z′ = −l₁ cos θ₂ − l₂ cos(θ₂ + θ₃) (Eqs. (20.1.5), (20.1.6))"]
+  - 式: ["逆解：ρ² = r_y² + r_z² = d² + z′²，θ₁ = atan2(r_z, r_y) − atan2(z′, s_y d)；cos θ₃ = (D² − l₁² − l₂²)/(2l₁l₂)（式 (20.1.8)～(20.1.10)）", "Inverse: ρ² = r_y² + r_z² = d² + z′², θ₁ = atan2(r_z, r_y) − atan2(z′, s_y d); cos θ₃ = (D² − l₁² − l₂²)/(2l₁l₂) (Eqs. (20.1.8)–(20.1.10))"]
+  - ["一般有四组解；Go2 的小腿关节只能取负值（膝向后），ρ > 2d 时限位内只剩一组（定理 20.1.3）。", "In general there are four solutions; Go2's calf joint only takes negative values (knee back), and for ρ > 2d only one remains within the limits (Theorem 20.1.3)."]
+  - 式: ["det J = −l₁ l₂ z′ sin θ₃；静力 τ = Jᵀ f（式 (20.1.13)，16.5 节）", "det J = −l₁ l₂ z′ sin θ₃; statics τ = Jᵀ f (Eq. (20.1.13), Section 16.5)"]
+步骤:
+  - ["场景“Go2 落脚点”：先读出站立姿态（默认值）下的三个关节角和三个关节力矩，与算例 20.1.1、20.1.3 比较。", "Scene “Go2 foothold”: read the joint angles and torques of the standing pose (defaults) and compare with Examples 20.1.1 and 20.1.3."]
+  - ["把落脚点调到 (0.28, 0.17, −0.22) m（任务 1），记录三个关节角，与算例 20.1.2 比较。", "Move the foothold to (0.28, 0.17, −0.22) m (task 1); record the joint angles and compare with Example 20.1.2."]
+  - ["保持 y = 0.14 m、z = −0.265 m，逐步增大 x，记录刚好不可达时的 x 和原因（任务 2）；再减小 z 的绝对值，找出 D < D_min 的情形。", "Keep y = 0.14 m, z = −0.265 m and increase x; record the x at which the foot becomes unreachable and why (task 2); then reduce |z| to find D < D_min."]
+  - ["把落脚点放在大腿关节正下方，z 依次取 −0.33、−0.265、−0.20、−0.15 m，记录小腿关节力矩，填入表 2（任务 3）。", "Put the foothold straight below the thigh joint with z = −0.33, −0.265, −0.20, −0.15 m; record the calf torque in Table 2 (task 3)."]
+  - ["生活场景“上台阶”：把脚前移 0.25 m、抬高 0.15 m（任务 4），记录三个俯仰角；再找出抬高到多少时够不着。", "Everyday scene “Stepping up a stair”: move the foot 0.25 m forward and 0.15 m up (task 4); record the three pitch angles, then find how high is out of reach."]
+数据表:
+  - 标题: ["表 1  落脚点与关节角", "Table 1  Footholds and joint angles"]
+    表头: ["落脚点 p / m", "θ₁ / (°)", "θ₂ / (°)", "θ₃ / (°)", "ρ / m", "可达？"]
+    表头英文: ["foothold p / m", "θ₁ / (°)", "θ₂ / (°)", "θ₃ / (°)", "ρ / m", "reachable?"]
+    行: [["(0.195, 0.14, −0.265)", "", "", "", "", ""], ["(0.28, 0.17, −0.22)", "", "", "", "", ""], ["", "", "", "", "", ""], ["", "", "", "", "", ""]]
+  - 标题: ["表 2  机身高度与小腿关节力矩", "Table 2  Body height and calf torque"]
+    表头: ["z / m", "θ₂ / (°)", "θ₃ / (°)", "τ₃ / (N·m)", "τ₃ / (F·l₂)"]
+    表头英文: ["z / m", "θ₂ / (°)", "θ₃ / (°)", "τ₃ / (N·m)", "τ₃ / (F·l₂)"]
+    行: [["−0.33", "", "", "", ""], ["−0.265", "", "", "", ""], ["−0.20", "", "", "", ""], ["−0.15", "", "", "", ""]]
+注意:
+  - ["落脚点在机身坐标系中给出，机身不动；只移动左前腿，其余三条腿保持站立姿态。脚低于地面时模型会穿过地板，这不影响运动学计算。", "The foothold is given in the body frame and the body stays put; only the front-left leg moves, the other three keep the standing pose. A foot below the floor passes through it; the kinematics is unaffected."]
+  - ["站立力矩按四只脚平均分担体重计算（每只脚 m𝔤/4），没有考虑腿自身的重量。", "The standing torques assume the weight is shared equally (m𝔤/4 per foot) and ignore the legs' own weight."]
+思考题:
+  - ["为什么机身越低，小腿关节的力矩越大，而大腿关节的力矩始终为零？足端偏离大腿关节正下方时又会怎样？", "Why does the calf torque grow as the body lowers while the thigh torque stays zero? What happens when the foot is not straight below the thigh joint?"]

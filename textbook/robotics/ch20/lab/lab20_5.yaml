@@ -1,0 +1,25 @@
+# 实验 20.5 的指导书与报告模板。目的、场景、参数、任务取自 lab20_5.js。
+原理:
+  - 式: ["平面运动 (v, ω) 的瞬心在 {b} 的 (0, v/ω)；支撑脚在 {b} 中绕瞬心以 −ω 转（式 (20.5.1)），支撑行程 ℓ_i = 2d_i sin(ωβt_c/2)（式 (20.5.2)）", "For planar motion (v, ω) the ICR is at (0, v/ω) in {b}; stance feet circle it at −ω (Eq. (20.5.1)), stance stroke ℓ_i = 2d_i sin(ωβt_c/2) (Eq. (20.5.2))"]
+  - 式: ["多级任务优先级：Δq_k = Δq_{k−1} + (J_k N_{k−1})⁺(e_k − J_k Δq_{k−1})，N_k = N_{k−1} − (J_k N_{k−1})⁺ J_k N_{k−1}（式 (20.5.3)、(20.5.4)）", "Multi-level priority: Δq_k = Δq_{k−1} + (J_k N_{k−1})⁺(e_k − J_k Δq_{k−1}), N_k = N_{k−1} − (J_k N_{k−1})⁺ J_k N_{k−1} (Eqs. (20.5.3), (20.5.4))"]
+  - ["任务次序：两脚位姿 > 质心水平投影 > 手心位置 > 姿势。低一级的任务只在高一级任务的零空间里求解。", "Task order: feet poses > horizontal CoM > hand position > posture. A lower task is solved only in the null space of the higher ones."]
+步骤:
+  - ["场景“Go2 转弯”：v = 0.5 m/s、ω = 0.5 rad/s，按“开始”（任务 1），记录四只脚的支撑行程，与式 (20.5.2) 和算例 20.5.1 比较。", "Scene “Go2 turning”: v = 0.5 m/s, ω = 0.5 rad/s, press Start (task 1); record the four stance strokes and compare with Eq. (20.5.2) and Example 20.5.1."]
+  - ["保持 v = 0.5 m/s，ω 依次取 0、0.25、0.5、1.0 rad/s，记录内外侧的支撑行程，填入表 1；再取 v = 0（任务 2）。", "Keep v = 0.5 m/s and set ω = 0, 0.25, 0.5, 1.0 rad/s; record inner and outer strokes in Table 1; then set v = 0 (task 2)."]
+  - ["生活场景“弯腰取物”：质心任务打开，盒子放在前方 0.40 m、离地 0.35 m，等手到达盒子（任务 3），记录骨盆位置、质心和裕度。", "Everyday scene “Reaching down”: CoM task on, box 0.40 m ahead and 0.35 m high; wait for the hand to reach it (task 3) and record pelvis position, CoM and margin."]
+  - ["关掉质心任务重复上一步（任务 4）；再把盒子移到 0.50 m、0.30 m 处，比较两种情况，填入表 2。", "Switch the CoM task off and repeat (task 4); then move the box to 0.50 m, 0.30 m and compare; fill in Table 2."]
+数据表:
+  - 标题: ["表 1  转弯时的支撑行程", "Table 1  Stance strokes in a turn"]
+    表头: ["v / (m/s)", "ω / (rad/s)", "R / m", "内侧行程 / m", "外侧行程 / m"]
+    表头英文: ["v / (m/s)", "ω / (rad/s)", "R / m", "inner stroke / m", "outer stroke / m"]
+    行: [["0.5", "0", "", "", ""], ["0.5", "0.25", "", "", ""], ["0.5", "0.5", "", "", ""], ["0.5", "1.0", "", "", ""], ["0", "0.8", "", "", ""]]
+  - 标题: ["表 2  弯腰取物", "Table 2  Reaching down"]
+    表头: ["盒子 (x, z) / m", "质心任务", "骨盆 x / m", "质心 x / m", "裕度 / mm", "手的误差 / mm"]
+    表头英文: ["box (x, z) / m", "CoM task", "pelvis x / m", "CoM x / m", "margin / mm", "hand error / mm"]
+    行: [["(0.40, 0.35)", "开", "", "", "", ""], ["(0.40, 0.35)", "关", "", "", "", ""], ["(0.50, 0.30)", "开", "", "", "", ""], ["(0.50, 0.30)", "关", "", "", "", ""]]
+    行英文: [["(0.40, 0.35)", "on", "", "", "", ""], ["(0.40, 0.35)", "off", "", "", "", ""], ["(0.50, 0.30)", "on", "", "", "", ""], ["(0.50, 0.30)", "off", "", "", "", ""]]
+注意:
+  - ["全身逆运动学每帧迭代几步，模型逐渐移动到解；盒子太远或太低时手可能够不着，这时手的误差停在一个正值上，而脚和质心的任务仍然满足。", "The whole-body IK iterates a few steps per frame and the model moves gradually to the solution; when the box is too far or too low the hand error stays positive while the feet and CoM tasks still hold."]
+  - ["打开或关闭质心任务时，机器人先回到站立姿态再求解；同一个目标从不同的初值出发，可能得到不同的解（15.5 节）。", "Switching the CoM task restarts from standing; the same target can give different solutions from different starting poses (Section 15.5)."]
+思考题:
+  - ["把盒子放得很远、使手够不着：质心任务打开时，手的误差停在哪里？为什么脚和质心的任务不受影响？", "Put the box out of reach: with the CoM task on, where does the hand error settle? Why are the feet and CoM tasks unaffected?"]
