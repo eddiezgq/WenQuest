@@ -24,6 +24,10 @@
 	handle /api/v1/auth/* {
 		reverse_proxy web:80
 	}
+	# Public forms of the website (第 20 轮: interest registration for the sewing-machine kits).
+	handle /api/v1/public/* {
+		reverse_proxy web:80
+	}
 	handle {
 		root * /srv/site
 		try_files {path} {path}/ {path}.html

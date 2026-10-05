@@ -26,6 +26,7 @@ from . import gpulab
 from . import micro
 from . import catalog_api
 from . import course_pack
+from . import kit_interest
 from . import content
 from . import course_api
 from . import edit_api
@@ -124,6 +125,7 @@ def create_app() -> FastAPI:
     life_api.register(app, sys.modules[__name__])
     textbook_api.register(app, sys.modules[__name__])
     course_pack.register(app, sys.modules[__name__])
+    kit_interest.register(app, sys.modules[__name__])
     tasks_api.register(app, sys.modules[__name__])
     gpulab.register(app, sys.modules[__name__])
     micro.register(app, sys.modules[__name__])

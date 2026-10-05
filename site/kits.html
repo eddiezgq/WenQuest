@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>缝纫机真机套件意向登记 · Sewing-machine kits — WenQuest</title>
+<meta name="description" content="《缝纫机设计与制造》配套的真机套件：机头拆装套件（标配透明盖板）、开窗剖切展示机、整机、控制套件。登记意向，帮助我们决定备货。">
+<style>
+  :root { --paper:#f4f2ec; --ink:#121c21; --muted:#56656b; --line:#d6d2c6; --accent:#f2b705; --card:#fbfaf6; --ok:#1e8449; --bad:#b03a2e; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#0f181c; --ink:#e6ecee; --muted:#93a3a9; --line:#2a3a41; --card:#132025; --ok:#5fd08a; --bad:#ff7b6b; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:400 16px/1.7 "IBM Plex Sans","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
+  main { max-width:860px; margin:0 auto; padding:28px 16px 64px; }
+  .top { display:flex; justify-content:space-between; align-items:center; }
+  .top a { color:var(--muted); text-decoration:none; font-size:14px; }
+  button { font:inherit; font-size:13px; background:none; color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:4px 12px; cursor:pointer; }
+  h1 { font-family:"Noto Serif SC","Songti SC",Georgia,serif; font-size:30px; line-height:1.3; margin:24px 0 6px; }
+  h2 { font-size:18px; margin:28px 0 8px; }
+  .lead { color:var(--muted); max-width:62ch; }
+  .kits { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-top:14px; }
+  .kit { border:1px solid var(--line); background:var(--card); border-radius:12px; padding:12px 14px; }
+  .kit b { display:block; font-size:16px; }
+  .kit small { color:var(--muted); display:block; line-height:1.5; margin-top:4px; }
+  form { border:1px solid var(--line); background:var(--card); border-radius:14px; padding:16px; margin-top:12px; }
+  fieldset { border:0; padding:0; margin:0 0 14px; }
+  legend { font-weight:600; margin-bottom:6px; }
+  .opts { display:flex; flex-wrap:wrap; gap:8px 16px; }
+  .opts label { display:flex; align-items:center; gap:6px; font-size:15px; }
+  input[type=text], input[type=email], input[type=number], select, textarea { font:inherit; font-size:15px; color:var(--ink); background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:7px 10px; width:100%; max-width:420px; }
+  textarea { max-width:100%; min-height:80px; }
+  .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+  .hp { position:absolute; left:-9999px; }
+  .submit { background:var(--accent); color:#121c21; border:0; font-weight:600; font-size:15px; padding:9px 22px; }
+  .msg { margin-top:10px; font-size:15px; }
+  .msg.ok { color:var(--ok); } .msg.bad { color:var(--bad); }
+  .note { color:var(--muted); font-size:13px; }
+  html:not([lang="en"]) [data-en], html[lang="en"] [data-zh] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+<div class="top"><a href="/">← <span data-zh>问渠机器人学院</span><span data-en>WenQuest Robotics Academy</span></a><button id="lang" type="button">EN</button></div>
+
+<h1><span data-zh>缝纫机真机套件：意向登记</span><span data-en>Sewing-machine kits: register your interest</span></h1>
+<p class="lead"><span data-zh>《缝纫机设计与制造》在网上有虚拟样机和虚拟实验；我们也在准备价格不高的真机，让你在真机上把虚拟实验里调过的再调一遍。现在还没有开卖，请告诉我们你想要哪种、能接受什么价位，我们据此决定是否备货、备多少。登记不是订单，不用付款。</span><span data-en>The course <i>Sewing Machine Design and Manufacturing</i> comes with a virtual machine and virtual labs online. We are also preparing low-cost physical machines, so you can repeat on real hardware what you tuned in the virtual labs. They are not on sale yet: tell us which kit you would want and what price you would accept, and we will decide whether, and how many, to stock. Registering is not an order and costs nothing.</span></p>
+
+<h2><span data-zh>四种套件</span><span data-en>Four kits</span></h2>
+<div class="kits">
+  <div class="kit"><b><span data-zh>A · 机头拆装套件</span><span data-en>A · Machine-head kit</span></b><small><span data-zh>不带电机的工业平缝机头、手轮、工具、量具，《拆装与调机手册》。标配透明盖板（聚碳酸酯），零件编号与虚拟样机一致。</span><span data-en>Industrial lockstitch head without motor, hand wheel, tools and gauges, an assembly and adjustment manual. Clear polycarbonate covers as standard; part numbers match the virtual machine.</span></small></div>
+  <div class="kit"><b><span data-zh>A+ · 开窗剖切展示机</span><span data-en>A+ · Cut-away display machine</span></b><small><span data-zh>在 A 的基础上，机壳避开受力部位开窗、嵌透明板，整条传动链看得见。少量制作，适合实训室展示。</span><span data-en>Kit A with windows cut into the housing away from load-bearing areas and glazed, so the whole drive train is visible. Made in small numbers for training rooms.</span></small></div>
+  <div class="kit"><b><span data-zh>B · 整机</span><span data-en>B · Complete machine</span></b><small><span data-zh>机头、伺服电机、台板。先在国内供应；美国要先核实电压和安全认证。</span><span data-en>Head, servo motor and table. China first; for the US, voltage and safety certification are being checked.</span></small></div>
+  <div class="kit"><b><span data-zh>C · 控制套件</span><span data-en>C · Control kit</span></b><small><span data-zh>伺服电机、控制板、传感器，对应课程第 19–22 讲的电控原型平台；可装到 A 上做自己的控制器。</span><span data-en>Servo motor, controller board and sensors for the control-prototype platform of lessons 19–22; fits kit A to build your own controller.</span></small></div>
+</div>
+<p class="note"><span data-zh>机械安全：透明盖板照样是防护件；套件不会为了看得见而去掉任何防护。机针、皮带、旋梭处有夹伤和刺伤风险，手册首页有安全说明。</span><span data-en>Safety: the clear covers are guards like the originals; no guard is removed for visibility. Needle, belt and hook can pinch or puncture; the manual opens with safety instructions.</span></p>
+
+<h2><span data-zh>登记</span><span data-en>Register</span></h2>
+<form id="f" novalidate>
+  <fieldset><legend><span data-zh>想要的套件（可多选）</span><span data-en>Kits you would want (any)</span></legend>
+    <div class="opts">
+      <label><input type="checkbox" name="kits" value="A"> A</label><label><input type="checkbox" name="kits" value="A+"> A+</label>
+      <label><input type="checkbox" name="kits" value="B"> B</label><label><input type="checkbox" name="kits" value="C"> C</label></div></fieldset>
+  <fieldset><legend><span data-zh>机型（可多选）</span><span data-en>Machine type (any)</span></legend>
+    <div class="opts">
+      <label><input type="checkbox" name="machines" value="lockstitch" checked> <span data-zh>平缝机</span><span data-en>Lockstitch</span></label>
+      <label><input type="checkbox" name="machines" value="overlock"> <span data-zh>包缝机</span><span data-en>Overlock</span></label>
+      <label><input type="checkbox" name="machines" value="pattern"> <span data-zh>花样机</span><span data-en>Pattern sewer</span></label></div></fieldset>
+  <div class="row">
+    <div><label for="country"><span data-zh>国家或地区</span><span data-en>Country or region</span></label><br>
+      <input type="text" id="country" maxlength="60" autocomplete="country-name"></div>
+    <div><label for="who"><span data-zh>用途</span><span data-en>For</span></label><br>
+      <select id="who"><option value="self" data-zh-t="自学" data-en-t="Self-study">自学</option><option value="school" data-zh-t="院校教学或实训" data-en-t="School teaching or lab">院校教学或实训</option>
+        <option value="company" data-zh-t="企业培训" data-en-t="Company training">企业培训</option><option value="other" data-zh-t="其他" data-en-t="Other">其他</option></select></div>
+  </div>
+  <fieldset style="margin-top:12px"><legend><span data-zh>能接受的价位（单套，含运费）</span><span data-en>Price you would accept (per kit, shipping included)</span></legend>
+    <div class="opts" id="bands"></div></fieldset>
+  <div class="row">
+    <div><label for="qty"><span data-zh>数量（套）</span><span data-en>Quantity</span></label><br><input type="number" id="qty" min="1" max="500" value="1"></div>
+    <div><label for="email"><span data-zh>邮箱</span><span data-en>Email</span></label><br><input type="email" id="email" maxlength="254" autocomplete="email"></div>
+  </div>
+  <div style="margin-top:12px"><label for="note"><span data-zh>想说的（选填）</span><span data-en>Anything else (optional)</span></label><br><textarea id="note" maxlength="1000"></textarea></div>
+  <input class="hp" type="text" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <p class="opts" style="margin-top:12px"><label><input type="checkbox" id="consent"> <span data-zh>同意问渠就真机套件用邮件与我联系。登记不是订单，不用付款。</span><span data-en>I agree that WenQuest may email me about the kits. Registering is not an order.</span></label></p>
+  <button class="submit" type="submit"><span data-zh>提交登记</span><span data-en>Register</span></button>
+  <div class="msg" id="msg" role="status" aria-live="polite"></div>
+  <p class="note"><span data-zh>我们只保存表上填的内容和登记时间，只用来估计需求、就套件与你联系；写信给 <a href="mailto:info@wenquestrobotics.com">info@wenquestrobotics.com</a> 即可删除。详见<a href="privacy.html">隐私说明</a>。</span><span data-en>We keep only what you enter and the time, use it only to estimate demand and to contact you about the kits, and delete it on request (<a href="mailto:info@wenquestrobotics.com">info@wenquestrobotics.com</a>). See the <a href="privacy.html">privacy notice</a>.</span></p>
+</form>
+</main>
+<script>
+(() => {
+  const root = document.documentElement, btn = document.getElementById("lang"), $ = (id) => document.getElementById(id);
+  const BANDS = { CNY: ["2000 元以下", "2000–4000 元", "4000–8000 元", "8000 元以上"], USD: ["Under $300", "$300–600", "$600–1,000", "Over $1,000"] };
+  let l = null; try { l = localStorage.getItem("wq-site-lang"); } catch (e) {}
+  l = l || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+  const cur = () => /中国|china|^cn$|prc/i.test($("country").value.trim()) || (!$("country").value.trim() && l !== "en") ? "CNY" : "USD";
+  const bands = () => { const c = cur(), keep = (document.querySelector('input[name=band]:checked') || {}).value;
+    $("bands").innerHTML = BANDS[c].map((t, i) => `<label><input type="radio" name="band" value="${i + 1}"${keep === String(i + 1) ? " checked" : ""}> ${t}</label>`).join("") +
+      `<span class="note">${c === "CNY" ? (l === "en" ? "(RMB)" : "（人民币）") : (l === "en" ? "(US dollars)" : "（美元）")}</span>`; };
+  const set = (x) => { l = x; root.lang = x === "en" ? "en" : "zh-CN"; btn.textContent = x === "en" ? "中文" : "EN";
+    document.querySelectorAll("option[data-zh-t]").forEach((o) => { o.textContent = o.dataset[x === "en" ? "enT" : "zhT"]; });
+    try { localStorage.setItem("wq-site-lang", x); } catch (e) {} bands(); };
+  set(l); btn.onclick = () => set(l === "en" ? "zh" : "en");
+  $("country").addEventListener("input", bands);
+  const MSG = { zh: { ok: "已收到，谢谢！有了备货和价格的消息，我们会写信告诉你。", kits: "请至少选一种套件。", email: "请填写正确的邮箱。", consent: "请勾选同意联系。", country: "请填写国家或地区。", fail: "没能提交，请稍后再试，或写信给 info@wenquestrobotics.com。", rate: "提交太频繁，请稍后再试。" },
+                en: { ok: "Received, thank you! We will email you when there is news on stock and prices.", kits: "Please choose at least one kit.", email: "Please enter a valid email.", consent: "Please tick the box to agree to be contacted.", country: "Please enter your country or region.", fail: "Could not submit; please try again later or email info@wenquestrobotics.com.", rate: "Too many submissions; please try again later." } };
+  $("f").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const m = MSG[l === "en" ? "en" : "zh"], out = $("msg"), say = (t, ok) => { out.textContent = t; out.className = "msg " + (ok ? "ok" : "bad"); };
+    const kits = [...document.querySelectorAll("input[name=kits]:checked")].map((x) => x.value);
+    const machines = [...document.querySelectorAll("input[name=machines]:checked")].map((x) => x.value);
+    const email = $("email").value.trim(), country = $("country").value.trim();
+    if (!kits.length) return say(m.kits); if (!country) return say(m.country);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) return say(m.email); if (!$("consent").checked) return say(m.consent);
+    const body = { kits, machines, band: (document.querySelector("input[name=band]:checked") || {}).value || "", currency: cur(), who: $("who").value,
+      country, qty: Math.max(1, Math.min(500, +$("qty").value || 1)), email, note: $("note").value.trim(), lang: l, consent: true, website: $("website").value };
+    try {
+      const r = await fetch("/api/v1/public/kit-interest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (r.ok) { say(m.ok, true); $("f").querySelector(".submit").disabled = true; } else say(r.status === 429 ? m.rate : m.fail);
+    } catch (err) { say(m.fail); }
+  });
+})();
+</script>
+</body>
+</html>

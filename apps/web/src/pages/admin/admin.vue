@@ -160,6 +160,17 @@
               <view v-else class="wq-btn primary" :class="{ disabled: pk.status === 'running' }" @click="publishPack(pk, b)">{{ t("pack.publish") }}</view>
             </view>
           </view>
+          <!-- interest in the physical sewing-machine kits (round 20) -->
+          <view v-if="kits" class="wq-card pack">
+            <view class="wq-row pk-top">
+              <text class="a-name">{{ t("kit.title") }}</text>
+              <!-- #ifdef H5 -->
+              <text v-if="kits.count" class="wq-link" @click="downloadKits">{{ t("kit.csv") }} ›</text>
+              <!-- #endif -->
+            </view>
+            <text class="wq-muted block">{{ t("kit.count", { n: kits.count }) }}<text v-for="(n, k) in kits.units" :key="k"> · {{ k }} {{ t("kit.units", { n }) }}</text></text>
+            <text class="wq-muted block">{{ t("kit.hint") }}</text>
+          </view>
         </template>
         <text v-if="error" class="wq-error">{{ error }}</text>
       </template>
@@ -172,12 +183,27 @@ import { ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import { type AdminUser, type Application, type EnrolRequest, accountApi, loadAdmin } from "../../accountApi";
-import { api, ApiError, type CoursePack, token } from "../../api";
+import { api, ApiError, BASE, type CoursePack, type KitInterest, token } from "../../api";
 import { confirmAction } from "../../courseApi";
 import { errorText, t } from "../../i18n";
 
 const tab = ref<"apps" | "requests" | "users" | "committee" | "packs">("apps");
 const packs = ref<CoursePack[]>([]);
+const kits = ref<KitInterest | null>(null);
+async function loadKits() {
+  try { kits.value = await api.kitInterest(); } catch { kits.value = null; }
+}
+async function downloadKits() {   // H5 only: fetch with the token, then save the CSV
+  try {
+    const r = await fetch(BASE + "/api/v1/admin/kit-interest?format=csv", { headers: { Authorization: "Bearer " + token.value } });
+    if (!r.ok) throw new Error(String(r.status));
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(await r.blob());
+    a.download = "kit-interest.csv";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  } catch (e) { fail(e); }
+}
 let packTimer: ReturnType<typeof setTimeout> | undefined;
 async function loadPacks() {
   clearTimeout(packTimer);
@@ -263,7 +289,7 @@ function setTab(x: typeof tab.value) {
   if (x === "apps") loadApps();
   else if (x === "requests") loadReqs();
   else if (x === "committee") loadCommittee();
-  else if (x === "packs") loadPacks();
+  else if (x === "packs") { loadPacks(); loadKits(); }
   else loadUsers(0);
 }
 
