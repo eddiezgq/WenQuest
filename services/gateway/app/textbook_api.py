@@ -10,6 +10,7 @@ import html
 import json
 import logging
 import re
+import shutil
 import time
 from pathlib import Path
 from typing import Annotated
@@ -57,6 +58,17 @@ def pending(m) -> list[tuple[str, str, str]]:
             md = media_dir(m, d.name)
             err = md / f"{name}-{h}.err"
             if (md / f"{name}-{h}.mp4").exists() or (err.exists() and time.time() - err.stat().st_mtime < 86400):
+                continue
+            pre = d / "anim" / f"{name}-{h}.mp4"
+            if pre.exists() and (d / "anim" / f"{name}-{h}.png").exists():
+                # 三维动画（第 13 轮 8.3 R2）：构建时已做成视频，直接放进动画目录，不送渲染服务
+                md.mkdir(parents=True, exist_ok=True)
+                shutil.copy(d / "anim" / f"{name}-{h}.png", md / f"{name}-{h}.png")
+                shutil.copy(pre, md / f"{name}-{h}.mp4.tmp")
+                (md / f"{name}-{h}.mp4.tmp").replace(md / f"{name}-{h}.mp4")
+                for old in md.glob(f"{name}-*"):
+                    if h not in old.name:
+                        old.unlink(missing_ok=True)
                 continue
             if (d / "anim" / f"{name}.py").exists():
                 out.append((d.name, name, h))

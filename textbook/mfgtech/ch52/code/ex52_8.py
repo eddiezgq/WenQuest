@@ -1,4 +1,4 @@
-"""52.8 节：算例 52.8.1——SH-301 铣键槽用找正装夹、组合夹具还是专用夹具：每件的装夹成本随年产量变化，求分界点。图 52.8.1。
+"""52.8 节：算例 52.8.1——SH-301 铣键槽用找正装夹、组合夹具还是专用夹具：每件的装夹成本随年产量变化，求分界点。图 52.8.4。
 费用与时间是教学示意值（机床加人工按每分钟 1.5 元计）。"""
 import numpy as np
 
@@ -46,7 +46,7 @@ ax.set_ylabel(T("每件装夹成本 / 元", "fixturing cost per part / yuan"), f
 ax.legend(fontsize=7.5, frameon=False)
 for sp in ("top", "right"):
     ax.spines[sp].set_visible(False)
-figure(fig, "fig52_8_1")
+figure(fig, "fig52_8_4")
 at = {k: float(per_part(k, np.array([2000]))[0]) for k in opts}
 out(rate=rate, batch=batch, years=years, N1=N1, N2=N2, N3=N3, c_find=at["find"], c_mod=at["modular"], c_spec=at["special"],
     C_spec=opts["special"][0])

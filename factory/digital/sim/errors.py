@@ -140,3 +140,35 @@ class ErrorModel:
             d["active"] = {k: {"name": PROBLEMS[k]["name"], **v} for k, v in self.active.items()}
             d["history"] = self.history[-20:]
         return d
+
+
+def simulate(n: int, problem: str | None = None, magnitude=None, seed: int = 54, dress_every: int | None = None,
+             wear_per_part: float = 1 / 30, dress_below: float = 0.08) -> dict:
+    """不开整个仿真车间，按引擎的磨削节拍连续“磨”n 件 SH-301 并测量（第 54 章的算例与实验用）：
+    砂轮每磨一件寿命减 wear_per_part，剩余寿命低于 dress_below 时修整（与 sim/engine.py 的 WEAR_PER_PART、换刀规则相同，约每 28 件一次）；
+    给出 dress_every 时改为每磨这么多件修整一次（工艺规程 T05 的“每 10 件修整一次”）。problem 为注入的问题情景（从第 1 件起）。
+    返回 {"chars": CHARS, "values": {代号: [n 个测得值]}, "dress_after": [修整前最后一件的序号（从 0 起）]}。"""
+    class _P:
+        pass
+
+    model = ErrorModel(seed)
+    if problem:
+        model.inject(problem, magnitude)
+    rng = random.Random(seed)
+    life, done = 1.0, 0
+    vals = {c[0]: [] for c in CHARS}
+    dress = []
+    for i in range(n):
+        p = _P()
+        wear = 1 - life
+        p.grind_wear = wear
+        model.on_process("grd-01", p, wear)
+        model.on_process("key-01", p, 0.0)
+        for code, *_rest, v in model.measure(p, rng):
+            vals[code].append(v)
+        life = max(0.0, life - wear_per_part)
+        done += 1
+        if (dress_every and done >= dress_every) or (not dress_every and life < dress_below):
+            dress.append(i)
+            life, done = 1.0, 0
+    return {"chars": CHARS, "values": vals, "dress_after": dress}

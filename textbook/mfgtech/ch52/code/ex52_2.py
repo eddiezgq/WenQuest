@@ -1,5 +1,5 @@
 """52.2 节：夹紧的原则。图 52.2.1 夹紧力方向与作用点的正误对照；
-算例 52.2.1 薄壁套用三爪卡盘夹紧车内孔：松开后孔的圆度误差（薄圆环的傅里叶级数解），比较硬爪、软爪（扇形爪）、六爪；图 52.2.2。"""
+算例 52.2.1 薄壁套用三爪卡盘夹紧车内孔：松开后孔的圆度误差（薄圆环的傅里叶级数解），比较硬爪、软爪（扇形爪）、六爪；图 52.2.5。"""
 import math
 
 import numpy as np
@@ -85,7 +85,7 @@ ax.plot(np.linspace(0, 2 * math.pi, 200), np.ones(200), color=M.MUTED, lw=0.6, l
 ax.set_ylim(0, 1.6); ax.set_yticks([]); ax.set_xticks([]); ax.spines["polar"].set_visible(False); ax.grid(False)
 ax.legend(loc="center left", bbox_to_anchor=(1.05, 0.5), fontsize=7.5, frameon=False,
           title=T("夹紧时外圆的变形（放大）", "OD under clamping (magnified)"), title_fontsize=7.5)
-figure(fig, "fig52_2_2")
+figure(fig, "fig52_2_5")
 
 out(R=R, t=t, b=b, W=W, roark=roark, k_roark=k_roark, dD2=2 * two["w"][0], r_hard3=res["hard3"]["roundness"], r_soft3=res["soft3"]["roundness"],
     r_six=res["six"]["roundness"], r_soft6=res["soft6"]["roundness"], ratio_soft=res["hard3"]["roundness"] / res["soft3"]["roundness"],

@@ -1,4 +1,4 @@
-"""52.4 节：基本夹紧机构。斜楔的增力比与自锁（图 52.4.1 左）、圆偏心转角与夹紧力（图 52.4.1 右）；
+"""52.4 节：基本夹紧机构。斜楔的增力比与自锁（图 52.4.3 左）、圆偏心转角与夹紧力（图 52.4.3 右）；
 算例 52.4.1 JJ-301-50 的螺旋压板：定扭矩 5 N·m 能给出多大夹紧力，够不够；随手用长扳手拧紧会怎样；压板强度。
 算例 52.4.2 圆偏心的自锁与夹紧力。"""
 import math
@@ -56,7 +56,7 @@ for ax in axs:
     for sp in ("top", "right"):
         ax.spines[sp].set_visible(False)
 fig.tight_layout()
-figure(fig, "fig52_4_1")
+figure(fig, "fig52_4_3")
 
 out(need=need, M=sc["M_Nmm"] / 1000, W_screw=sc["W"], i_screw=sc["i"], lead=sc["lead_deg"], phi_e=sc["phi_e_deg"],
     ratio=st["ratio"], W_one=st["W"], W_have=W_have, margin=W_have / need, W_hand=W_hand, M_hand=sc_hand["M_Nmm"] / 1000,

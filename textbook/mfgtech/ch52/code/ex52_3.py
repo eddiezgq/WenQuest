@@ -1,5 +1,5 @@
 """52.3 节：算例 52.3.1——SH-301 铣键槽的切削力与需要的夹紧力。
-切削力按每齿逐角积分（Kienzle 单位切削力，数据表 std/kienzle.yaml），安全系数按分项选取；四个平衡条件取最大。图 52.3.1。"""
+切削力按每齿逐角积分（Kienzle 单位切削力，数据表 std/kienzle.yaml），安全系数按分项选取；四个平衡条件取最大。图 52.3.2。"""
 import math
 
 import numpy as np
@@ -35,7 +35,7 @@ assert abs(an["need"]["W"] - need["W"]) < 1e-9
 need_flat = FX.friction_clamp_required(f["Fy_peak"], Ks["K"], cl["mu1"], cl["mu2"])  # 若误用“平面摩擦”公式
 N1, N2 = FX.vblock_normal_forces(need["W"] + cl["G"], f["Fy_peak"], fx["locating"]["alpha"])
 
-# 图 52.3.1：一转之内作用在工件上的三个分力（重新逐角算一遍，画曲线）
+# 图 52.3.2：一转之内作用在工件上的三个分力（重新逐角算一遍，画曲线）
 kc11, mc, D, z, fz, ap = f["kc11"], f["mc"], c["D"], c["z"], c["fz"], c["ap"]
 th = np.linspace(0, 2 * math.pi, 721)
 FXs, FYs, FZs = [], [], []
@@ -63,7 +63,7 @@ ax.set_xlabel(T("铣刀转角 / °", "cutter rotation / °"), fontsize=8.5); ax.
 ax.legend(fontsize=7.5, frameon=False, ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.22))
 for sp in ("top", "right"):
     ax.spines[sp].set_visible(False)
-figure(fig, "fig52_3_1")
+figure(fig, "fig52_3_2")
 
 out(kc11=f["kc11"], mc=f["mc"], n=n, vf=vf, Fx_mean=f["Fx_mean"], Fy_mean=abs(f["Fy_mean"]), Fz_mean=f["Fz_mean"],
     Fx_peak=f["Fx_peak"], Fy_peak=f["Fy_peak"], Fz_peak=f["Fz_peak"], Fc=f["Fc_mean"], P=P * 1000, P_vol=P_vol * 1000,

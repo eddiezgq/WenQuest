@@ -93,3 +93,18 @@ def fe():
 
 def fixture_data(fid="JJ-301-50"):
     return fx().load_fixture(fid)
+
+
+# ---------------------------------------------------------------- 三维图（第 13 轮 8.3）：数字工厂的三维模型 + render3d
+def m3d():
+    """返回 (core, workpiece, jj30150, elements, typical, machines, shapes) 七个模块。"""
+    from models3d import core, workpiece, jj30150, elements, typical, machines, shapes
+    return core, workpiece, jj30150, elements, typical, machines, shapes
+
+
+def r3d():
+    import render3d
+    return render3d
+
+
+ISO = [0.9, -1.25, 0.95]          # 书中三维图的常用视向（从右前上方看）

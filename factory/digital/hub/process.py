@@ -287,6 +287,28 @@ def _review_v2(plan, say):
         if o.get("fixture_id"):
             for level, text in FX.review(o["fixture_id"]):
                 say("夹具", level, text, o["seq"])
+    # 2c 加工精度预算（第 54 章，hub/accuracy.py）：工序登记了 accuracy（某个图纸特性的误差项）时，
+    #    系统误差相加、随机误差平方和开方，合计不得超过公差；超过公差的四分之三提醒裕量不足
+    from hub import accuracy as AC
+    for o in plan.get("operations") or []:
+        for ab in o.get("accuracy") or []:
+            c = chars.get(ab.get("char"))
+            T = ab.get("T")
+            if c and "es" in c and T is None:
+                T = c["es"] - c["ei"]
+            if not T:
+                say("精度", "warning", "精度预算没有对应到图纸特性（char），也没有给出公差 T。", o["seq"])
+                continue
+            if c and "es" in c and abs((c["es"] - c["ei"]) - T) > 1e-9:
+                say("精度", "warning", "精度预算的公差 T = {:g} 与图纸特性 {} 的公差 {:g} 不一致。".format(T, ab["char"], c["es"] - c["ei"]), o["seq"])
+            r = AC.budget(ab.get("items") or [], T)
+            big = max(r["items"], key=lambda i: i["range"]) if r["items"] else None
+            if not r["ok"]:
+                say("精度", "error", "“{}”的精度预算合计 {:.4f} mm（系统误差 {:.4f} + 随机误差 {:.4f}），超过公差 {:g}，按这个方案会出废品；"
+                    "最大的一项是“{}”。".format(c["name"] if c else ab.get("char"), r["total"], r["sys"], r["rand"], T, big["name"]), o["seq"])
+            elif r["tight"]:
+                say("精度", "warning", "“{}”的精度预算合计 {:.4f} mm，占公差 {:g} 的 {:.0%}，裕量不足（工序能力偏低）；最大的一项是“{}”。"
+                    .format(c["name"] if c else ab.get("char"), r["total"], T, r["total"] / T, big["name"]), o["seq"])
     # 3 尺寸链：工艺规程里登记的尺寸链，按极值法算出的封闭环要落在图纸特性之内
     for ch in plan.get("chains") or []:
         links = [TL.Link(l["name"], l["nominal"], l.get("es", 0), l.get("ei", 0), l.get("sense", 1)) for l in ch["links"]]

@@ -126,6 +126,38 @@ def test_animations_are_rendered_once_and_shown(client, tmp_path):
     assert idx["anims_ready"] == 1 and idx["anims_total"] == 2 and "anims" not in idx
 
 
+def test_prebuilt_3d_animations_are_copied_not_rendered(client, tmp_path):
+    """三维动画（第 13 轮 8.3 R2）：构建时已做成视频，网关直接放进动画目录，不送渲染服务。"""
+    import asyncio
+    from app import textbook_api
+    from app.production import anim
+
+    built_book(tmp_path)
+    web = tmp_path / "robotics" / "web"
+    idx = json.loads((web / "index.json").read_text())
+    idx["anims"] = {"v4_1_1": "aaa111"}
+    (web / "index.json").write_text(json.dumps(idx, ensure_ascii=False))
+    ad = tmp_path / "robotics" / "anim"
+    ad.mkdir()
+    (ad / "v4_1_1.py").write_text("# 三维动画的场景程序（不送渲染服务）")
+    (ad / "v4_1_1-aaa111.mp4").write_bytes(b"MP4-3D")
+    (ad / "v4_1_1-aaa111.png").write_bytes(b"PNG-3D")
+    main.state.settings.data_dir = str(tmp_path / "data")
+    main.state.settings.animator_url = "http://animator.test"
+
+    async def must_not_render(url, code, timeout=600):
+        raise AssertionError("三维动画不应送渲染服务")
+    real = anim.render
+    anim.render = must_not_render
+    try:
+        assert textbook_api.pending(main) == []
+        assert asyncio.run(textbook_api.render_pending(main)) == 0
+    finally:
+        anim.render = real
+    md = tmp_path / "data" / "textbook-media" / "robotics"
+    assert (md / "v4_1_1-aaa111.mp4").read_bytes() == b"MP4-3D" and (md / "v4_1_1-aaa111.png").read_bytes() == b"PNG-3D"
+
+
 def test_virtual_labs_open_from_the_page(client, tmp_path):
     built_book(tmp_path)
     web = tmp_path / "robotics" / "web"

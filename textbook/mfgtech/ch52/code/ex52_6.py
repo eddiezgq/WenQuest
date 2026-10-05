@@ -1,5 +1,5 @@
 """52.6 节：对刀、导向与安装。算例 52.6.1 JJ-301-50 对刀块的位置（侧面、顶面）；
-算例 52.6.2 定位键在 T 形槽里的间隙引起的键槽歪斜；算例 52.6.3 箱座端面螺孔钻模的孔位误差（钻套引导，图 52.6.1）。"""
+算例 52.6.2 定位键在 T 形槽里的间隙引起的键槽歪斜；算例 52.6.3 箱座端面螺孔钻模的孔位误差（钻套引导，图 52.6.4）。"""
 import math
 
 import _mfg as M
@@ -19,7 +19,7 @@ zc = d_mid / 2 / math.sin(a)                        # 轴心到 V 形块理论�
 z_bottom = zc - d_mid / 2                           # 下母线高度
 z_slot = z_bottom + H_mid                           # 槽底高度
 s = fx["setting"]
-top = z_slot - s["feeler"]                          # 对刀块顶面 = 槽底 − 塞尺
+top = z_slot - s["feeler"]                          # 深度对刀面（内角底面）= 槽底 − 塞尺
 side = fx["cutting"]["D"] / 2 + s["feeler"]
 assert abs(round(top, 2) - s["top_from_v_apex"]) < 1e-9, f"夹具数据的对刀块高度应为 {top:.2f}"
 assert abs(side - s["side_from_v_plane"]) < 1e-9
@@ -77,7 +77,7 @@ ax.text(6.2, -1.0, T("工件", "workpiece"), fontsize=7.5)
 ax.text(-8.8, 11.4, T("钻头上端靠一侧、下端靠另一侧：\n偏移 X/2 + s·X/H（间隙放大画）", "drill touches opposite sides top and bottom:\noffset X/2 + s·X/H (clearance exaggerated)"),
         fontsize=7, va="bottom")
 ax.set_xlim(-9, 9); ax.set_ylim(-3, 13.2); ax.set_aspect("equal"); ax.axis("off")
-figure(fig, "fig52_6_1")
+figure(fig, "fig52_6_4")
 
 out(H_nom=H["nominal"], H_mid=H_mid, d_mid=d_mid, zc=zc, z_bottom=z_bottom, z_slot=z_slot, top=top, side=side, feeler=s["feeler"], dT_side=dT_side,
     key_X=ka["X"], key_th100=ka["theta"] * 100, key_skew=ka["skew"], key_skew_one=kb["skew"], skew_J=skew_J,

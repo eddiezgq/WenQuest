@@ -33,6 +33,7 @@ import html
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -111,6 +112,51 @@ def trial_labs(page_html: str, ids: list[str], rep: "Report", where: str) -> Non
             rep.add("error", "实验", where, f"实验 {lab.replace('-', '.')}：{p}")
 
 
+_A3D: dict = {}
+
+
+def anim3d_deps(book: dict) -> bytes:
+    """三维动画用到的书外文件（三维模型、渲染程序、数字工厂数据）：改了它们，视频要重做。"""
+    key = str(book["root"])
+    if key not in _A3D:
+        b = b"".join(p.read_bytes() for p in (TOOLS / "render3d.py", TOOLS / "render3d.js"))
+        meta_p = book["root"] / "meta.yaml"
+        if meta_p.exists():
+            for pat in (yaml.safe_load(meta_p.read_text(encoding="utf-8")) or {}).get("program_deps") or []:
+                b += b"".join(p.read_bytes() for p in sorted(ROOT.glob(pat)) if p.is_file())
+        _A3D[key] = b
+    return _A3D[key]
+
+
+def render_anim3d(book: dict, name: str, h: str, script: Path, anim_dir: Path, rep: "Report", where: str) -> None:
+    """运行三维动画的场景程序，得到 <名称>.mp4 和封面 <名称>.png；按散列缓存（build/<书>/anim3d/）。
+    视频放进输出的 anim/<名称>-<散列>.mp4，平台的动画目录里没有时直接复制过去，不再送渲染服务。"""
+    cache = book["root"].parent / "build" / book["book"] / "anim3d"
+    cache.mkdir(parents=True, exist_ok=True)
+    mp4, png = cache / f"{name}-{h}.mp4", cache / f"{name}-{h}.png"
+    if not (mp4.exists() and png.exists()):
+        tmp = cache / f"_{name}"
+        shutil.rmtree(tmp, ignore_errors=True)
+        tmp.mkdir()
+        env = {**os.environ, "WQ_ANIM_OUT": str(tmp), "PYTHONPATH": os.pathsep.join([str(TOOLS), str(book["root"] / "conventions")]),
+               "MPLBACKEND": "Agg", "WQ_LANG": "zh"}
+        try:
+            r = subprocess.run([sys.executable, script.name], cwd=script.parent, env=env, capture_output=True, text=True, timeout=900)
+        except subprocess.TimeoutExpired:
+            rep.add("error", "动画", where, f"三维动画 {name}：渲染超过 15 分钟")
+            return
+        if r.returncode != 0 or not (tmp / f"{name}.mp4").exists():
+            rep.add("error", "动画", where, f"三维动画 {name}：渲染出错：" + ((r.stderr.strip().splitlines() or ["没有生成视频"])[-1]))
+            return
+        for old in cache.glob(f"{name}-*"):
+            old.unlink()
+        shutil.move(str(tmp / f"{name}.mp4"), mp4)
+        shutil.move(str(tmp / f"{name}.png"), png)
+        shutil.rmtree(tmp, ignore_errors=True)
+    shutil.copy(mp4, anim_dir / f"{name}-{h}.mp4")
+    shutil.copy(png, anim_dir / f"{name}-{h}.png")
+
+
 def anim_check(code: str) -> str:
     """The animation service's own safety check (services/animator/app.py: check), without importing the service."""
     global _ANIM_CHECK
@@ -151,6 +197,7 @@ class Section:
     figdir: Path = Path(".")
     anim_figs: list = field(default_factory=list)
     anims: list = field(default_factory=list)
+    anims3d: list = field(default_factory=list)     # 三维动画：(名称, 散列, 场景程序路径)，构建时渲染
     labs: list = field(default_factory=list)
     labdocs: list = field(default_factory=list)
     gpulabs: list = field(default_factory=list)       # (number, folder, lab.yaml, notebook cells): 云端 GPU 实验
@@ -477,7 +524,7 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
     en = sec.lang == "en"
     meta, rest = {}, []
     for line in body.splitlines():
-        m = re.match(r"^(src|说明|模板|模型|caption|图|figure)\s*[:：]\s*(.*)$", line.strip())
+        m = re.match(r"^(src|说明|模板|模型|caption|图|figure|类型)\s*[:：]\s*(.*)$", line.strip())
         if m and not rest:
             meta[{"figure": "图"}.get(m.group(1), m.group(1))] = m.group(2).strip()
         else:
@@ -530,6 +577,12 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
         script = sec.path.parent / "anim" / f"{name}.py" if name else None
         if not script or not script.exists():
             rep.add("error", "动画", sec.id, f"{label}：没有场景程序（写 src: 名称，放在 anim/名称.py）")
+        elif meta.get("类型", "") == "三维":
+            # 三维动画（第 13 轮 8.3 R2）：场景程序用三维模型逐帧渲染（render3d.Video），构建时就做成视频，平台直接用
+            code = script.read_text(encoding="utf-8")
+            h = hashlib.sha256(code.encode() + anim3d_deps({"root": sec.path.parents[1]})).hexdigest()[:12]
+            sec.anims.append((name, h, code))
+            sec.anims3d.append((name, h, script))
         else:
             code = script.read_text(encoding="utf-8")
             why = anim_check(code)
@@ -1037,6 +1090,8 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         for name, h, code in sec.anims:
             (anim_dir / f"{name}.py").write_text(code, encoding="utf-8")
             index["anims"][name] = h
+        for name, h, script in sec.anims3d:
+            render_anim3d(book, name, h, script, anim_dir, rep, sec.id)
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
     lab_dir = out / "lab"
     lab_dir.mkdir(exist_ok=True)
