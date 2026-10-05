@@ -32,6 +32,9 @@ chapters:
   7:
     status: ai
     title_en: "Vector Spaces and Subspaces"
+  8:
+    status: ai
+    title_en: "The Four Fundamental Subspaces"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"

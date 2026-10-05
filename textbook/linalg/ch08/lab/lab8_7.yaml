@@ -1,0 +1,23 @@
+# 实验 8.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab8_7.js。
+原理:
+  - ["末端速度（角速度与线速度）ξ = J θ̇，J 是 6×7 雅可比矩阵。J 的秩为 6，由基本定理，零空间 N(J) 的维数为 7 − 6 = 1。", "The tool twist is ξ = J θ̇ with a 6×7 Jacobian of rank 6; by the fundamental theorem the null space N(J) has dimension 7 − 6 = 1."]
+  - 式: "J n = 0  ⇒  沿 n 转动关节时末端不动；  dim C(J) = 6，dim N(J) = 1，dim C(Jᵀ) = 6，dim N(Jᵀ) = 0"
+  - ["J 随姿态变化，零空间的方向也随之变化。程序在每一小步重新求零空间方向，再积分，得到一条“自运动”路径。", "J changes with the pose, and so does its null space. The program recomputes the null direction at every small step and integrates, giving a self-motion path."]
+步骤:
+  - ["在“零空间运动”场景逐渐增大运动量，找出肘部恰好移开 5.0 cm 时的运动量（任务 1）；记录各关节角的变化，指出哪几个关节在转动。", "In the null-space scene increase the motion until the elbow has moved exactly 5.0 cm (task 1); record the joint changes and note which joints turn."]
+  - ["把运动量调到负值，直到肘部移开 8 cm 以上（任务 2）；按表 1 记录法兰的位置漂移和姿态变化。", "Set negative values until the elbow has moved more than 8 cm (task 2); record the flange drift and rotation in Table 1."]
+  - ["切换到对照场景，读出 J 第 3 列线速度部分的长度 ℓ，预测法兰移动 40 mm 所需的关节 3 转角 0.04/ℓ；调到这个角度（任务 3），比较预测与实测，并按表 2 记录。", "Switch to the contrast scene, read the length ℓ of the linear part of column 3 of J, predict the joint-3 change 0.04/ℓ for a 40 mm flange move, set it (task 3), compare prediction and measurement, and fill in Table 2."]
+数据表:
+  - 标题: ["表 1  沿零空间运动", "Table 1  Motion along the null space"]
+    表头: ["运动量 / rad", "肘部位移 / cm", "法兰位移 / mm", "法兰姿态变化 / °", "转动的关节"]
+    表头英文: ["Motion / rad", "Elbow displacement / cm", "Flange drift / mm", "Flange rotation / °", "Joints that turn"]
+    行: [["−0.6", "", "", "", ""], ["−0.4", "", "", "", ""], ["−0.2", "", "", "", ""], ["0.2", "", "", "", ""], ["0.4", "", "", "", ""], ["0.6", "", "", "", ""]]
+  - 标题: ["表 2  对照：只转关节 3", "Table 2  Contrast: joint 3 alone"]
+    表头: ["关节 3 的改变 / rad", "预测法兰位移 ℓ·Δθ₃ / mm", "实测法兰位移 / mm", "肘部位移 / cm"]
+    表头英文: ["Change of joint 3 / rad", "Predicted flange move ℓ·Δθ₃ / mm", "Measured flange move / mm", "Elbow displacement / cm"]
+    行: [["0.1", "", "", ""], ["0.2", "", "", ""], ["0.4", "", "", ""]]
+注意:
+  - ["零空间运动时法兰位移不为严格的零，来自数值积分的截断误差；步长越小，漂移越小。对照场景中预测与实测的差别来自线性化：转角越大，差别越大。", "The flange drift in null-space motion is not exactly zero because of the integration's truncation error; smaller steps give less drift. In the contrast scene the gap between prediction and measurement comes from linearization and grows with the angle."]
+  - ["实际机器人还要检查关节极限；本实验不限制关节角。", "A real robot must also respect joint limits; this lab does not limit them."]
+思考题:
+  - ["六轴机械臂（如 UR5e）的 6×6 雅可比矩阵在一般位形下零空间是几维的？它能做自运动吗？", "What is the null-space dimension of a six-axis arm's 6×6 Jacobian in a general pose? Can it self-move?"]
