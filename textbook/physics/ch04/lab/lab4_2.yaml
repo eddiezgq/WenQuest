@@ -1,0 +1,25 @@
+# 实验 4.2 的指导书与报告模板。目的、场景、参数、任务取自 lab4_2.js。
+原理:
+  - ["x–t 图上一段直线的斜率就是这段时间的速度：v = Δx/Δt。斜率为正，物体沿 +x 运动；为负，沿 −x 运动（倒车）；为零，静止。v–t 图下的面积是位移，t 轴以下的面积为负（4.2 节）。",
+     "The slope of a straight stretch of an x–t graph is the velocity, v = Δx/Δt: positive means moving along +x, negative along −x (reversing), zero means at rest. The area under a v–t graph is the displacement; area below the t axis counts as negative (Section 4.2)."]
+  - 式: "v = Δx/Δt；Δx = v–t 图下的面积        (3.1.1)、(4.2.1)"
+  - ["平均速度 = 位移 / 时间。每 10 m 的平均速度 = 10 m / 这 10 m 所用的时间。", "Mean velocity = displacement / time; the mean speed over 10 m is 10 m divided by the time taken."]
+步骤:
+  - ["选“编排 AGV 的运动”。在灰线上读出每段起点和终点的 x，算出 4 段的速度，填入表 1，用滑块设好，点“提交”（任务 1）。提交后才画出 AGV 实际走出的 x–t 图。", "Choose “Programming the AGV”. Read x at the start and end of each stretch on the grey line, compute the four velocities in Table 1, set the sliders and press “Submit” (task 1); only then is the AGV's actual graph drawn."]
+  - ["选“识图”。由 v–t 图算出每段的位移（面积），画出 x–t 图的草图，再从 A～D 中选出对应的一幅，提交（任务 2）。选错一次会换一道题。在报告中写出另外三幅各错在哪里。", "Choose “Reading graphs”. Compute the displacement (area) of each stretch, sketch the x–t graph, pick the matching one among A–D and submit (task 2). A wrong answer brings up a different graph. In the report, say what is wrong with the other three."]
+  - ["选“百米赛跑”。把分段时间抄入表 2，算出每 10 m 所用的时间和平均速度，找出最快的一段，提交（任务 3）。", "Choose “The 100 m sprint”. Copy the splits into Table 2, compute the time and mean speed of each 10 m, find the fastest stretch and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  由 x–t 图读速度", "Table 1  Velocities from the x–t graph"]
+    表头: ["段", "起点 x / m", "终点 x / m", "Δx / m", "v = Δx/Δt / (m/s)"]
+    表头英文: ["Stretch", "x at start / m", "x at end / m", "Δx / m", "v = Δx/Δt / (m/s)"]
+    行: [["1（0～3 s）", "", "", "", ""], ["2（3～6 s）", "", "", "", ""], ["3（6～9 s）", "", "", "", ""], ["4（9～12 s）", "", "", "", ""]]
+  - 标题: ["表 2  博尔特百米的分段", "Table 2  Bolt's 100 m splits"]
+    表头: ["距离 / m", "时刻 / s", "这 10 m 用时 / s", "平均速度 / (m/s)"]
+    表头英文: ["Distance / m", "Time / s", "Time for 10 m / s", "Mean speed / (m/s)"]
+    行: [["10", "1.89", "", ""], ["20", "2.88", "", ""], ["30", "3.78", "", ""], ["40", "4.64", "", ""], ["50", "5.47", "", ""], ["60", "6.29", "", ""], ["70", "7.10", "", ""], ["80", "7.92", "", ""], ["90", "8.75", "", ""], ["100", "9.58", "", ""]]
+注意:
+  - ["每个任务都要点“提交”才判定。", "Each task is judged only when you press “Submit”."]
+  - ["第一段 10 m 的时间含起跑反应时间 0.146 s，所以它的平均速度特别小。", "The first 10 m includes the 0.146 s reaction time, which makes its mean speed especially low."]
+思考题:
+  - ["编排场景中，如果只要求 AGV 在 12 s 时到达同一个终点，速度的安排有多少种？为什么调度系统要规定整条 x–t 曲线，而不只规定终点？", "In the programming scene, how many velocity plans reach the same end point at 12 s? Why does the dispatcher fix the whole x–t curve rather than just the end point?"]
+  - ["由表 2 估计博尔特起跑后头 2 s 的平均加速度。", "From Table 2, estimate Bolt's mean acceleration over the first 2 s after the start."]

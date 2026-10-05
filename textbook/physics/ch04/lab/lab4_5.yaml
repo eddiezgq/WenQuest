@@ -1,0 +1,33 @@
+# 实验 4.5 的指导书与报告模板。目的、场景、参数、任务取自 lab4_5.js。
+原理:
+  - ["自由落体是加速度为 g 的匀加速运动。第一次闪光时小球已经在动，所以位置与时间的关系为 y = y₀ + v₀t + ½gt²，有三个未知参数。它对 y₀、v₀、g 是线性的，可以用最小二乘法拟合（1.6 节；三个参数时正规方程有三个，3.7 节）。手算或用电子表格时，可以把第一个像的读数 y₀ 减去，对 k ≥ 1 的各点作 (y_k − y₀)/t_k 对 t_k 的图，它是一条直线，截距为 v₀、斜率为 g/2，用式 (1.6.3)、(1.6.5) 求斜率及其不确定度，g = 2 × 斜率，u(g) = 2u(斜率)，扩展不确定度 U = 2u(g)（k = 2）。",
+     "Free fall is uniform acceleration g. The ball is already moving at the first flash, so y = y₀ + v₀t + ½gt² has three unknowns. It is linear in y₀, v₀ and g, so least squares applies (Section 1.6; three normal equations, Section 3.7). By hand or in a spreadsheet, subtract the first reading y₀ and plot (y_k − y₀)/t_k against t_k for k ≥ 1: a straight line with intercept v₀ and slope g/2. Eqs. (1.6.3) and (1.6.5) give the slope and its uncertainty; g = 2 × slope, u(g) = 2u(slope), U = 2u(g) (k = 2)."]
+  - 式: "y = y₀ + v₀t + ½gt²；t_k = k/f        (4.4.2)、(4.5.1)"
+  - ["二次方空气阻力 F = ½ρC_dAv² 使下落变慢。按自由落体公式由下落时间算出的“表观 g” = 2H/t² 偏小；落地速度与终端速度相比越小，偏差越小（4.5.4 节）。",
+     "Quadratic air drag F = ½ρC_dAv² slows the fall, so the “apparent g” = 2H/t² computed as if in free fall comes out low; the smaller the landing speed compared with the terminal speed, the smaller the error (Section 4.5.4)."]
+  - ["水滴：一滴落到盆底的同时下一滴离开龙头时，滴水间隔 1/f 等于下落时间 t，由 H = ½gt² 得 g = 2H·f²。", "Drops: when each drop lands as the next one leaves, the interval 1/f equals the fall time t, and H = ½gt² gives g = 2H·f²."]
+步骤:
+  - ["选“频闪照片”，频率取 20 Hz。把表中的 t 和 y 抄入表 1，用最小二乘法拟合（原理第 1 条的直线化方法，或程序 4.5.1），求 g、u(g) 和 U，把“你测得的 g”和“你算出的扩展不确定度 U”调到结果，点“提交”（任务 1）。", "Choose the strobe photo at 20 Hz. Copy t and y into Table 1, fit by least squares (the straight-line method above, or Program 4.5.1), find g, u(g) and U, set “Your g” and “Your U” and press “Submit” (task 1)."]
+  - ["把频率改为 30、40、50、60 Hz，各拟合一次，填入表 2。找出 U < 0.03 m/s² 的频率，提交该频率的 g 和 U（任务 2）。画出 u(g) 与读数个数 n 的关系。", "Repeat at 30, 40, 50 and 60 Hz and fill Table 2. Find a frequency with U < 0.03 m/s² and submit its g and U (task 2). Plot u(g) against the number of readings n."]
+  - ["选“钢球与乒乓球”。H 从 0.5 m 起每次加 0.5 m，记录两个球的表观 g，填入表 3，找出乒乓球表观 g 仍在 9.81 m/s² 的 5% 以内的最大高度，提交（任务 3）。", "Choose the two balls. Raise H in 0.5 m steps, record both apparent g values in Table 3, find the largest height at which the table-tennis ball is still within 5% of 9.81 m/s², and submit (task 3)."]
+  - ["选“水龙头的水滴”，调每秒滴数，点“开始”，直到“落地声与下一滴离开”显示几乎同时，由 H = 0.80 m 和滴水频率算出 g，调到“你算出的 g”，提交（任务 4）。", "Choose the dripping tap, press “Start”, adjust the drip rate until the splash and the next drop coincide, compute g from H = 0.80 m and the drip rate, set “Your g” and submit (task 4)."]
+数据表:
+  - 标题: ["表 1  频闪读数（f = 20 Hz）", "Table 1  Strobe readings (f = 20 Hz)"]
+    表头: ["k", "t / s", "y / mm", "(y − y₀)/t / (m/s)"]
+    表头英文: ["k", "t / s", "y / mm", "(y − y₀)/t / (m/s)"]
+    行: [["0", "", "", "—"], ["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""], ["4", "", "", ""], ["5", "", "", ""], ["6", "", "", ""], ["7", "", "", ""], ["斜率 ± u(斜率) / (m/s²)", "", "", ""], ["g = (ḡ ± U) m/s²，k = 2", "", "", ""]]
+  - 标题: ["表 2  不同频闪频率的结果", "Table 2  Results at different frequencies"]
+    表头: ["f / Hz", "n", "g / (m/s²)", "u(g) / (m/s²)", "U = 2u / (m/s²)"]
+    表头英文: ["f / Hz", "n", "g / (m/s²)", "u(g) / (m/s²)", "U = 2u / (m/s²)"]
+    行: [["20", "", "", "", ""], ["30", "", "", "", ""], ["40", "", "", "", ""], ["50", "", "", "", ""], ["60", "", "", "", ""]]
+  - 标题: ["表 3  表观 g 与下落高度", "Table 3  Apparent g against drop height"]
+    表头: ["H / m", "0.5", "1.0", "1.5", "2.0", "3.0", "5.0", "10"]
+    表头英文: ["H / m", "0.5", "1.0", "1.5", "2.0", "3.0", "5.0", "10"]
+    行: [["钢球 / (m/s²)", "", "", "", "", "", "", ""], ["乒乓球 / (m/s²)", "", "", "", "", "", "", ""]]
+注意:
+  - ["读数的误差按频率和序号确定，同一个频率的读数不变。当地的 g 和拟合结果都不显示；任务 1、2 只看你提交的 g 和 U 是否与这组读数的拟合一致。", "The reading errors are fixed by the frequency and the image number. Neither the local g nor the fit is shown; tasks 1 and 2 only check that your g and U agree with the fit to the readings."]
+  - ["不同频率的拟合结果会有差别，这正是不确定度的含义：它们应在各自的不确定度范围内一致。", "Fits at different frequencies differ; that is what uncertainty means. They should agree within their uncertainties."]
+  - ["每个任务都要点“提交”才判定。", "Each task is judged only when you press “Submit”."]
+思考题:
+  - ["如果把 v₀ 当作零，只拟合 y = ½gt²，结果会怎样？用表 1 的数据试一试。", "What happens if you take v₀ = 0 and fit y = ½gt² only? Try it with Table 1."]
+  - ["读数个数加倍，u(g) 大约减小到原来的多少？为什么不能靠无限提高频率把不确定度降到零？", "Doubling the number of readings shrinks u(g) by roughly what factor? Why can't a higher and higher frequency drive the uncertainty to zero?"]

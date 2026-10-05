@@ -1,0 +1,27 @@
+# 实验 4.7 的指导书与报告模板。目的、场景、参数、任务取自 lab4_7.js。
+原理:
+  - ["梯形速度曲线：以最大加速度 a_m 加速到最大速度 v_m，匀速，再以 a_m 减速停在终点。距离 L ≥ v_m²/a_m 时总时间 T = L/v_m + v_m/a_m；距离不够时变成三角形，T = 2√(L/a_m)（4.7.2 节）。",
+     "Trapezoidal profile: accelerate at a_m to v_m, cruise, then decelerate at a_m to stop at the target. For L ≥ v_m²/a_m the time is T = L/v_m + v_m/a_m; for shorter moves the profile becomes a triangle with T = 2√(L/a_m) (Section 4.7.2)."]
+  - 式: "T = L/v_m + v_m/a_m；S 形：T = L/v_m + v_m/a_m + a_m/j_m        (4.7.1)、(4.7.3)"
+  - ["S 形速度曲线限制加加速度 j = da/dt：加速度在 a/j 的时间内由零升到最大值。总时间多出 a/j，换来平稳：吊挂货物的残余摆动、乘客的不适都明显减小（4.7.3 节）。",
+     "The S-curve limits the jerk j = da/dt: the acceleration rises from zero to its maximum over a time a/j. The trip takes a/j longer but is smoother: the residual swing of a hanging load and passengers' discomfort drop markedly (Section 4.7.3)."]
+步骤:
+  - ["选“AGV 到站”。先用式 (4.7.1) 算出满足 8.0 s 的一组 v_m、a_m，设好后点“开始”看一趟，再点“提交”（任务 1）。把几组设置和到站时间填入表 1。", "Choose the AGV run. Use Eq. (4.7.1) to find v_m and a_m meeting 8.0 s, set them, press “Start” to watch a run and then “Submit” (task 1). Record several settings and times in Table 1."]
+  - ["在两个限制之内找出最短的到站时间，提交（任务 2），与式 (4.7.1) 的计算比较。", "Find the shortest possible time within both limits, submit (task 2) and compare with Eq. (4.7.1)."]
+  - ["选“龙门机器人防摆”。名义上升时间 a_m/j_m 从 0 起每次加 0.5 s，记录运动时间和停车后的摆幅，填入表 2。找出摆幅小于 30 mm 且运动时间不超过 7.5 s 的设置，提交（任务 3）。", "Choose the anti-sway gantry. Raise the rise time from 0 in 0.5 s steps, record the move time and residual swing in Table 2, find a setting with swing below 30 mm and time at most 7.5 s, and submit (task 3)."]
+  - ["选“电梯”，选加速度和加加速度，满足舒适要求并在 16 s 内到达，提交（任务 4），用式 (4.7.3) 核对时间。", "Choose the lift, pick acceleration and jerk that are comfortable and arrive within 16 s, submit (task 4) and check the time with Eq. (4.7.3)."]
+数据表:
+  - 标题: ["表 1  AGV 到站时间", "Table 1  AGV trip times"]
+    表头: ["v_m / (m/s)", "a_m / (m/s²)", "到站时间（实验）/ s", "式 (4.7.1) / s"]
+    表头英文: ["v_m / (m/s)", "a_m / (m/s²)", "Trip time (lab) / s", "Eq. (4.7.1) / s"]
+    行: [["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["1.5", "0.60", "", ""]]
+  - 标题: ["表 2  加速度上升时间与残余摆幅", "Table 2  Rise time and residual swing"]
+    表头: ["a_m/j_m / s", "0", "0.5", "1.0", "1.5", "2.0", "2.5", "3.0"]
+    表头英文: ["a_m/j_m / s", "0", "0.5", "1.0", "1.5", "2.0", "2.5", "3.0"]
+    行: [["运动时间 / s", "", "", "", "", "", "", ""], ["实际峰值加速度 / (m/s²)", "", "", "", "", "", "", ""], ["残余摆幅 / mm", "", "", "", "", "", "", ""]]
+注意:
+  - ["每个任务都要点“提交”才判定。“开始”只用来观看运动。", "Each task is judged only when you press “Submit”; “Start” just shows the motion."]
+  - ["防摆场景按单摆方程计算，没有作小角近似，也不计空气阻力，停车后货物会一直摆下去。", "The anti-sway scene solves the full pendulum equation without the small-angle approximation and without air drag, so the load keeps swinging after the stop."]
+思考题:
+  - ["AGV 场景中，若要求 5 s 内到站，在两个限制之内能做到吗？要放宽哪一个限制？", "Can the AGV reach the station within 5 s inside both limits? Which limit would have to be relaxed?"]
+  - ["由表 2 画出残余摆幅与名义上升时间的关系。上升时间与摆动周期 2π√(L/g) 相当时，摆幅降到了梯形曲线的百分之几？为什么上升时间较长时实际峰值加速度达不到 0.50 m/s²？", "Plot the residual swing against the rise time from Table 2. How small is the swing when the rise time is comparable with the period 2π√(L/g)?"]
