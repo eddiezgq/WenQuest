@@ -13,7 +13,7 @@ import time
 
 from hub import library as L
 
-REF = re.compile(r"\b([ABCD]-[A-Z0-9]{2,5}-[A-Z0-9]+(?:-[A-Z0-9]+)*)(?:/([A-Za-z0-9.×x*\-]+))?")
+REF = re.compile(r"\b([A-E]-[A-Z0-9]{2,5}-[A-Z0-9]+(?:-[A-Z0-9]+)*)(?:/([A-Za-z0-9.×x*\-]+))?")
 NUM = re.compile(r"(\d+(?:\.\d+)?)\s*(mm|毫米|kg|公斤|N·m|Nm|N|r/min|rpm|转|W|V|齿|个|台|[A-Za-z])?", re.I)
 TEETH = re.compile(r"(\d+)\s*齿")
 PROFILE = re.compile(r"\b(GT2|3M|5M)\b", re.I)

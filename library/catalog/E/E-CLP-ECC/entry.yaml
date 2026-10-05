@@ -1,0 +1,61 @@
+# E-CLP-ECC · 圆偏心轮（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-CLP-ECC
+kind: product
+name:
+  zh: 圆偏心轮
+  en: Circular eccentric cam
+category: CLP
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params:
+- key: D
+  zh: 外径 D
+  en: Outer diameter D
+  role: key
+  unit: mm
+- key: e
+  zh: 偏心距 e
+  en: Eccentricity e
+  role: key
+  unit: mm
+- key: B
+  zh: 宽度 B
+  en: Width B
+  role: key
+  unit: mm
+defaults:
+  D: 40.0
+  e: 2.5
+  B: 16.0
+model:
+  engine: wqfix:elements.eccentric
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+  args:
+    handle: 80.0
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 手柄转动圆偏心轮，靠半径的变化压紧工件，动作快；自锁条件是 e ≤ (D/2)·μ 左右，夹紧行程小，只适合尺寸变化小、振动小的场合。
+  uses:
+  - 快速手动夹紧
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 偏心夹紧机构
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

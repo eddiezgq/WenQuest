@@ -1,0 +1,53 @@
+# E-BAS-ZPC · 零点定位器（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-BAS-ZPC
+kind: product
+name:
+  zh: 零点定位器
+  en: Zero-point clamping module
+category: BAS
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params:
+- key: D
+  zh: 外径 D
+  en: Outer diameter D
+  role: key
+  unit: mm
+- key: H
+  zh: 高度 H
+  en: Height H
+  role: key
+  unit: mm
+defaults:
+  D: 138.0
+  H: 40.0
+model:
+  engine: wqfix:elements.zero_point_chuck
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 装在机床工作台上的模块，夹具底面的拉钉插入后自动定位并拉紧，重复定位精度约 0.005 mm；夹具在机外装好工件，换上去即可加工，换装时间以分钟计。
+  uses:
+  - 加工中心快速换装
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 零点定位系统
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

@@ -1,0 +1,53 @@
+# E-ACC-VISE · 机用平口钳（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-ACC-VISE
+kind: product
+name:
+  zh: 机用平口钳
+  en: Machine vise
+category: ACC
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params:
+- key: jaw_w
+  zh: 钳口宽
+  en: Jaw width
+  role: key
+  unit: mm
+- key: opening
+  zh: 钳口开度
+  en: Jaw opening
+  role: key
+  unit: mm
+defaults:
+  jaw_w: 125.0
+  opening: 60.0
+model:
+  engine: wqfix:machines.vise
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 固定钳口定位、活动钳口夹紧，是铣床、钻床上最常用的通用夹具；钳口面与导轨面的精度决定定位精度。
+  uses:
+  - 铣、钻小型零件
+  courses:
+  - course: 机械制造技术
+    chapter: 第 51 章 装夹方式
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

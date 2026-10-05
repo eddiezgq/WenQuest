@@ -1,0 +1,76 @@
+# E-LOC-VB · V 形块（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-LOC-VB
+kind: product
+name:
+  zh: V 形块
+  en: V-block
+category: LOC
+tags:
+- 工装夹具
+- 机床夹具
+- JB/T 8018.1
+standards:
+- code: JB/T 8018.1
+  title: V 形块（结构型式参照）
+params:
+- key: alpha
+  zh: V 形角 α
+  en: V angle α
+  role: key
+  unit: °
+- key: B
+  zh: 宽度 B
+  en: Width B
+  role: key
+  unit: mm
+- key: L
+  zh: 长度 L
+  en: Length L
+  role: key
+  unit: mm
+- key: H
+  zh: 高度 H
+  en: Height H
+  role: key
+  unit: mm
+- key: apex
+  zh: V 槽顶点离底面
+  en: Apex above base
+  role: key
+  unit: mm
+defaults:
+  alpha: 90.0
+  B: 72.0
+  L: 40.0
+  H: 40.0
+  apex: 14.0
+model:
+  engine: wqfix:elements.vblock
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 外圆柱面放在 V 形块上定位，对中性好：外圆直径变化时，工件轴线只在 V 形块的对称平面内上下移动。长 V 形块限制四个自由度，短 V 形块限制两个。90° 最常用。
+  uses:
+  - 轴类零件外圆定位
+  courses:
+  - course: 机械制造技术
+    chapter: 第 51 章 V 形块定位的误差
+  - course: 机械制造技术
+    chapter: 第 52 章 定位元件
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

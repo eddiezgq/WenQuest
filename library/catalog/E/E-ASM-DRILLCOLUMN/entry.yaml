@@ -1,0 +1,46 @@
+# E-ASM-DRILLCOLUMN · 滑柱式钻模（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-ASM-DRILLCOLUMN
+kind: case
+name:
+  zh: 滑柱式钻模
+  en: Slide-column drill jig
+category: ASM
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params:
+- key: lowered
+  zh: 钻模板落下比例
+  en: Plate lowered (0–1)
+  role: key
+defaults:
+  lowered: 1.0
+model:
+  engine: wqfix:typical.drill_column
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 钻模板装在两根滑柱上，转动手柄靠齿轮齿条使钻模板升降并压紧工件，同时完成夹紧和导向，是通用化的钻模结构。
+  uses:
+  - 中小件快速钻孔
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 钻床夹具
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

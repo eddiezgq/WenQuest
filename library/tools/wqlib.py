@@ -88,4 +88,8 @@ CATEGORY_NAMES = {
     "C": {"LNK": ("连杆机构", "Linkages"), "CAM": ("凸轮", "Cams"), "GER": ("齿轮与齿轮系", "Gears"), "WRM": ("蜗轮蜗杆", "Worm gears"),
           "BLT": ("带传动", "Belt drives"), "RAT": ("棘轮", "Ratchets"), "GNV": ("槽轮", "Geneva drives"),
           "SCN": ("丝杠螺母", "Lead screws"), "RED": ("减速器案例", "Reducer cases")},
+    "E": {"LOC": ("定位元件", "Locating elements"), "CLP": ("夹紧元件", "Clamping elements"),
+          "GDE": ("对刀与导向元件", "Setting and guiding elements"), "BAS": ("夹具体与连接元件", "Bases and connecting elements"),
+          "ACC": ("机床附件", "Machine-tool accessories"), "ASM": ("夹具总成", "Fixture assemblies"),
+          "WKP": ("案例工件", "Case workpieces")},
 }

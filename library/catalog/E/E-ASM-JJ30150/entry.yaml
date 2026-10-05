@@ -1,0 +1,47 @@
+# E-ASM-JJ30150 · 键槽铣夹具 JJ-301-50（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-ASM-JJ30150
+kind: case
+name:
+  zh: 键槽铣夹具 JJ-301-50
+  en: Keyway milling fixture JJ-301-50
+category: ASM
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params: []
+defaults: {}
+model:
+  engine: wqfix:local.jj30150_full
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+  args:
+    work_state: op40
+  roles:
+    可调支承: 夹紧
+    螺柱: 夹紧
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: SH-301 输出轴工序 50 铣键槽的专用夹具：两个 V 形块定位齿轮位两侧的外圆（限制四个自由度），止推板顶住轴肩端面，两块移动压板压紧，直角对刀块配塞尺对刀，两个定位键使夹具在工作台上定向。设计数据在数字工厂（std/JJ-301-50_fixture.yaml），书中第
+    52 章以它为主线。
+  uses:
+  - 键槽铣削
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 JJ-301-50 键槽铣夹具设计
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

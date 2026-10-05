@@ -25,6 +25,9 @@ def get_builder(entry):
     if eng.startswith("dh:"):
         from generators import b_dh
         return b_dh.build
+    if eng.startswith("wqfix:"):
+        from generators import e_fixture
+        return e_fixture.build
     if eng.startswith("menagerie:"):
         from generators import b_robot
         return b_robot.build

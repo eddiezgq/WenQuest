@@ -1,0 +1,41 @@
+# E-ASM-LINKED2D · 双向联动夹紧夹具（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-ASM-LINKED2D
+kind: case
+name:
+  zh: 双向联动夹紧夹具
+  en: Two-direction linked clamp
+category: ASM
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params: []
+defaults: {}
+model:
+  engine: wqfix:typical.linked_clamp_two_dir
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 一个夹紧动作通过杠杆同时从两个方向压紧工件，保证先后顺序和夹紧力分配。
+  uses:
+  - 需要两个方向同时夹紧的工件
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 联动夹紧机构
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

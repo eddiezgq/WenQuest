@@ -1,0 +1,56 @@
+# E-GDE-FEELER · 对刀塞尺（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-GDE-FEELER
+kind: product
+name:
+  zh: 对刀塞尺
+  en: Feeler gauge
+category: GDE
+tags:
+- 工装夹具
+- 机床夹具
+- JB/T 8032.1
+standards:
+- code: JB/T 8032.1
+  title: 对刀平塞尺（结构型式参照）
+params:
+- key: t
+  zh: 厚度 t
+  en: Thickness t
+  role: key
+  unit: mm
+- key: L
+  zh: 长度 L
+  en: Length L
+  role: key
+  unit: mm
+defaults:
+  t: 3.0
+  L: 60.0
+model:
+  engine: wqfix:elements.feeler
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 对刀时塞在刀齿与对刀块之间，避免刀具直接碰对刀块；常用厚度 1、3、5 mm，对刀尺寸要减去塞尺厚度。
+  uses:
+  - 铣床夹具对刀
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 对刀装置
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

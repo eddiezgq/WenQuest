@@ -103,7 +103,8 @@
               <div v-if="entry.source.origin === 'vendor' && entry.model.note" class="small proxy-note">{{ entry.model.note }}</div>
             </div>
             <div class="viewer" ref="viewerEl">
-              <div class="v-tools" v-if="entry.robot || entry.mechanism">
+              <div class="v-tools" v-if="entry.robot || entry.mechanism || canExplode">
+                <button v-if="canExplode" class="btn ghost" type="button" @click="toggleExplode">{{ exploded ? '装回' : '拆开' }}</button>
                 <button v-if="entry.mechanism?.motion" class="btn ghost" type="button" @click="toggleMotion"
                   :title="entry.mechanism.input?.path?.zh || ''">{{ playing ? '停止' : '播放运动' }}</button>
                 <button v-if="entry.robot && !entry.robot.parallel" class="btn ghost" type="button" @click="resetJoints('zero')">零位</button>
@@ -183,7 +184,18 @@
               <template v-else-if="dtab === '图纸'">
                 <a :href="fileUrl(curSize.files.svg)" target="_blank" rel="noopener" title="新窗口打开（可缩放、打印）">
                   <img class="drawing" :src="fileUrl(curSize.files.svg)" :alt="entry.name.zh + ' 二维图'"></a>
-                <p class="small muted">{{ entry.id.startsWith('A') ? '主视图 + 俯视/侧视图，标总体尺寸，主要尺寸见标题栏上方' : entry.id.startsWith('B') ? '关节示意图（零位）' : '机构运动简图（默认参数）' }}；点图在新窗口打开。格式见《数字工厂资源接口约定》2.4。</p>
+                <p class="small muted">{{ entry.id.startsWith('A') ? '主视图 + 俯视/侧视图，标总体尺寸，主要尺寸见标题栏上方' : entry.id.startsWith('B') ? '关节示意图（零位）' : entry.id.startsWith('E') ? '示意二维图（总体尺寸）' : '机构运动简图（默认参数）' }}；点图在新窗口打开。格式见《数字工厂资源接口约定》2.4。</p>
+              </template>
+              <template v-else-if="dtab === '零件表'">
+                <div class="tbl-wrap">
+                  <table class="t">
+                    <thead><tr><th>序号</th><th>零件</th><th>作用</th></tr></thead>
+                    <tbody><tr v-for="p in entry.assembly.parts" :key="p.node">
+                      <td class="mono">{{ p.number ?? '' }}</td><td><span class="swatch" :style="{ background: p.color }"></span>{{ p.name }}</td><td>{{ p.role }}</td>
+                    </tr></tbody>
+                  </table>
+                </div>
+                <p class="small muted">E 部分的模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）；点“拆开”按爆炸方向分开各零件。</p>
               </template>
               <template v-else-if="dtab === '机构'">
                 <div class="tbl-wrap">
@@ -337,13 +349,15 @@ const catName = (p, c) => index.value?.categories?.[p]?.[c]?.zh || c;
 const counts = computed(() => {
   const A = families.value.filter((f) => f.part === 'A');
   return { A: A.length, Asizes: A.reduce((n, f) => n + f.sizes.length, 0), B: families.value.filter((f) => f.part === 'B').length,
-    C: families.value.filter((f) => f.part === 'C').length, D: families.value.filter((f) => f.part === 'D').length };
+    C: families.value.filter((f) => f.part === 'C').length, D: families.value.filter((f) => f.part === 'D').length,
+    E: families.value.filter((f) => f.part === 'E').length };
 });
 const tabs = computed(() => [
   { key: 'A', name: 'A 标准件', count: counts.value.A },
   { key: 'B', name: 'B 机器人', count: counts.value.B },
   ...(counts.value.C ? [{ key: 'C', name: 'C 机构', count: counts.value.C }] : []),
   ...(counts.value.D ? [{ key: 'D', name: 'D 机器人零部件', count: counts.value.D }] : []),
+  ...(counts.value.E ? [{ key: 'E', name: 'E 工装夹具', count: counts.value.E }] : []),
   ...(index.value?.collections || []).map((c) => ({ key: 'F', name: c.name.zh, count: c.count })),
 ]);
 const pool = computed(() => families.value.filter((f) => f.part === part.value));
@@ -401,7 +415,7 @@ const sizeRows = computed(() => {
 });
 const dtabList = computed(() => {
   if (!entry.value) return [];
-  return [...(entry.value.datasheet ? ['参数'] : []), entry.value.robot ? '关节' : entry.value.kind === 'mechanism' ? '机构' : '规格', ...(curSize.value?.files?.svg ? ['图纸'] : []), ...(entry.value.teaching?.principle || entry.value.teaching?.uses ? ['教学'] : []), '来源'];
+  return [...(entry.value.datasheet ? ['参数'] : []), entry.value.robot ? '关节' : entry.value.kind === 'mechanism' ? '机构' : '规格', ...(entry.value.assembly?.parts?.length > 1 ? ['零件表'] : []), ...(curSize.value?.files?.svg ? ['图纸'] : []), ...(entry.value.teaching?.principle || entry.value.teaching?.uses ? ['教学'] : []), '来源'];
 });
 
 async function select(id, wantSize) {
@@ -513,6 +527,7 @@ function loadModel() {
     scene.add(model);
     fit(model);
     setupJoints();
+    exploded.value = false;
     const box = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
     viewNote.value = `拖动旋转 · 滚轮缩放 · 外形约 ${fmtLen(box.x)} × ${fmtLen(box.z)} × ${fmtLen(box.y)}（单位：米制）`;
   }, undefined, () => { viewNote.value = '模型读取失败'; });
@@ -526,6 +541,22 @@ function fit(obj) {
   camera.position.copy(c).add(new THREE.Vector3(1, 0.7, 1.2).normalize().multiplyScalar(dist));
   camera.near = dist / 200; camera.far = dist * 20; camera.updateProjectionMatrix();
   controls.target.copy(c);
+}
+
+// 夹具总成（E 部分）：按 entry.assembly.parts 的爆炸方向（毫米，Z 向上的模型坐标）拆开、装回
+const exploded = ref(false);
+const canExplode = computed(() => (entry.value?.assembly?.parts || []).some((p) => (p.explode_mm || []).some((x) => x)));
+function toggleExplode() {
+  if (!model) return;
+  exploded.value = !exploded.value;
+  for (const p of entry.value.assembly.parts) {
+    const n = model.getObjectByName(p.node);
+    if (!n) continue;
+    if (!n.userData.p0) n.userData.p0 = n.position.clone();
+    const e = p.explode_mm || [0, 0, 0];
+    n.position.copy(n.userData.p0);
+    if (exploded.value) n.position.add(new THREE.Vector3(e[0], e[1], e[2]).multiplyScalar(0.001));
+  }
 }
 
 // 关节（约定 R4）：子连杆节点在零位矩阵上叠加绕轴转动（转轴过 anchor）或沿轴移动
@@ -662,6 +693,7 @@ dl.kv dt { color: var(--muted); }
 dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 .pad-x { padding: 0 18px; margin: 0; }
 .proxy-note { color: var(--warn-ink); background: var(--warn-bg); border-radius: 6px; padding: 4px 8px; margin-top: 4px; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; border: 1px solid rgba(0, 0, 0, 0.25); vertical-align: -1px; }
 .dsrc { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
 .attr { margin-top: 10px; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 6px; padding: 8px 10px; font-size: 12px; }
 .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px;

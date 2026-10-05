@@ -1,0 +1,48 @@
+# E-ASM-MILLMULTI · 多件联动铣夹具（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-ASM-MILLMULTI
+kind: case
+name:
+  zh: 多件联动铣夹具
+  en: Multi-part linked milling fixture
+category: ASM
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params:
+- key: n
+  zh: 分度数
+  en: Divisions
+  role: key
+defaults:
+  n: 4
+model:
+  engine: wqfix:typical.mill_multi
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+  args:
+    linked: true
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 一次装夹几个工件，一个夹紧动作通过浮动元件同时压紧全部工件，各处夹紧力均匀；用于直线进给铣削，缩短辅助时间。
+  uses:
+  - 小件大批量铣削
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 铣床夹具
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

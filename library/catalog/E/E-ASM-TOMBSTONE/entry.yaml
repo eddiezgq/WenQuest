@@ -1,0 +1,46 @@
+# E-ASM-TOMBSTONE · 加工中心夹具塔（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-ASM-TOMBSTONE
+kind: case
+name:
+  zh: 加工中心夹具塔
+  en: Tombstone fixture
+category: ASM
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params:
+- key: parts_per_face
+  zh: 每面工件数
+  en: Parts per face
+  role: key
+defaults:
+  parts_per_face: 2
+model:
+  engine: wqfix:typical.tombstone
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 立柱的四个面上各装几个工件，卧式加工中心转台每转 90° 加工一面，一次装夹加工许多件，减少换刀与换装时间。
+  uses:
+  - 卧式加工中心批量加工
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 加工中心夹具
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

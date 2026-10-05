@@ -43,6 +43,15 @@ def _mesh(shape):
     return np.array([[p.X, p.Y, p.Z] for p in v], dtype=float), np.array(t, dtype=int)
 
 
+def _pbr(rgba):
+    """sRGB 颜色 → glTF 的 PBR 材质（baseColorFactor 是线性值；非金属，表面稍粗糙，与教材插图的颜色一致）"""
+    from trimesh.visual.material import PBRMaterial
+    lin = [(c / 255) / 12.92 if c / 255 <= 0.04045 else ((c / 255 + 0.055) / 1.055) ** 2.4 for c in rgba[:3]]
+    a = (rgba[3] if len(rgba) > 3 else 255) / 255
+    return PBRMaterial(baseColorFactor=lin + [a], metallicFactor=0.1, roughnessFactor=0.6, alphaMode="BLEND" if a < 0.999 else "OPAQUE",
+                       doubleSided=True)
+
+
 def glb_bytes(nodes, colors=None):
     """[(节点名, 形体)] → glb：根节点 root 把 Z 向上转成 Y 向上；顶点单位米（B.13）。"""
     import numpy as np
@@ -52,11 +61,32 @@ def glb_bytes(nodes, colors=None):
     scene.graph.update(frame_from=scene.graph.base_frame, frame_to="root", matrix=rot)
     palette = [(176, 184, 190, 255), (140, 150, 158, 255), (200, 170, 90, 255), (90, 100, 110, 255)]
     for i, (name, shape) in enumerate(nodes):
+        w = getattr(shape, "_wq", None) or {}          # E 部分：节点自带颜色（PBR 材质），按面着色的分成几块（generators/e_fixture.py）
+        if w:
+            if w.get("mesh"):
+                v, t, fc = w["mesh"]()
+                v, t = np.array(v, dtype=float) / 1000.0, np.array(t, dtype=int)
+                fc = [tuple(c) for c in fc]
+                groups = {}
+                for k, c in enumerate(fc):
+                    groups.setdefault(c, []).append(k)
+                pieces = [(c, trimesh.Trimesh(vertices=v, faces=t[idx], process=False)) for c, idx in groups.items()]
+            else:
+                m = _mesh(shape)
+                if m is None:
+                    continue
+                pieces = [(tuple(w["rgba"]), trimesh.Trimesh(vertices=m[0] / 1000.0, faces=m[1], process=True))]
+            scene.graph.update(frame_from="root", frame_to=name, matrix=np.eye(4))        # 节点 pNN 是一组，几何体挂在下面
+            for k, (c, mesh) in enumerate(pieces):
+                mesh.remove_unreferenced_vertices()
+                mesh.visual = trimesh.visual.TextureVisuals(material=_pbr(c))
+                scene.add_geometry(mesh, node_name=f"{name}_{k}", geom_name=f"{name}_{k}", parent_node_name=name)
+            continue
         m = _mesh(shape)
         if m is None:
             continue
         mesh = trimesh.Trimesh(vertices=m[0] / 1000.0, faces=m[1], process=True)
-        mesh.visual = trimesh.visual.ColorVisuals(mesh, face_colors=(colors or palette)[i % len(colors or palette)])
+        mesh.visual = trimesh.visual.ColorVisuals(mesh, face_colors=w.get("rgba") or (colors or palette)[i % len(colors or palette)])
         scene.add_geometry(mesh, node_name=name, geom_name=name, parent_node_name="root")
     return scene.export(file_type="glb")
 
@@ -68,7 +98,7 @@ def png_bytes(nodes, size_px=512):
     import matplotlib.pyplot as plt
     import numpy as np
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-    tris, shades = [], []
+    tris, shades, bases = [], [], []
     light = np.array([0.4, -0.6, 0.7])
     light /= np.linalg.norm(light)
     for _, shape in nodes:
@@ -81,15 +111,17 @@ def png_bytes(nodes, size_px=512):
         n /= np.maximum(np.linalg.norm(n, axis=1, keepdims=True), 1e-12)
         tris.append(t)
         shades.append(0.35 + 0.65 * np.abs(n @ light))
+        rgba = (getattr(shape, "_wq", None) or {}).get("rgba")     # E 部分按节点颜色，其余用统一的灰
+        bases.append(np.tile(np.array(rgba[:3]) / 255.0 * 0.85 if rgba else [0.55, 0.60, 0.64], (len(t), 1)))
     t = np.concatenate(tris)
     s = np.concatenate(shades)
+    base = np.concatenate(bases)
     if len(t) > 40000:                      # 太密的网格抽样画（只影响缩略图）
         idx = np.linspace(0, len(t) - 1, 40000).astype(int)
-        t, s = t[idx], s[idx]
+        t, s, base = t[idx], s[idx], base[idx]
     fig = plt.figure(figsize=(size_px / 100, size_px / 100), dpi=100)
     ax = fig.add_axes([0, 0, 1, 1], projection="3d")
-    base = np.array([0.55, 0.60, 0.64])
-    ax.add_collection3d(Poly3DCollection(t, facecolors=np.clip(base[None, :] * s[:, None] + 0.12, 0, 1), linewidths=0))
+    ax.add_collection3d(Poly3DCollection(t, facecolors=np.clip(base * s[:, None] + 0.12, 0, 1), linewidths=0))
     lo, hi = t.reshape(-1, 3).min(0), t.reshape(-1, 3).max(0)
     c, r = (lo + hi) / 2, (hi - lo).max() / 2 * 1.05
     ax.set_xlim(c[0] - r, c[0] + r); ax.set_ylim(c[1] - r, c[1] + r); ax.set_zlim(c[2] - r, c[2] + r)
@@ -147,6 +179,9 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
         else:
             (d / (code + ".glb")).write_bytes(glb_bytes(nodes))
             (d / (code + ".png")).write_bytes(png_bytes(nodes))
+            metas = [getattr(s, "_wq", {}).get("meta") for _, s in nodes]
+            if any(metas):                                 # E 部分：零件表（节点、零件名、序号、作用、爆炸方向）
+                extra["assembly"] = {"parts": [m for m in metas if m]}
         fmts = e["model"].get("formats", [])
         if cad_dir and ("step" in fmts or "stl" in fmts):
             from build123d import Compound, export_step, export_stl
@@ -206,6 +241,8 @@ def entry_json(e, rows, results, version):
             doc["robot"] = dict(doc.get("robot") or {}, **res["robot"])
         if res and res.get("mechanism"):
             doc["mechanism"] = res["mechanism"]
+        if res and res.get("assembly"):
+            doc["assembly"] = res["assembly"]
     return doc
 
 

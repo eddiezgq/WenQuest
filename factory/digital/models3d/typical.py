@@ -226,11 +226,12 @@ def mill_circular(stations=6):
     for k in range(stations):
         ang = 2 * math.pi * k / stations
         cx, cy = 150 * math.cos(ang), 150 * math.sin(ang)
-        a.add(Part(f"定位座{k + 1}", S.move(S.rot(E.vblock(B=50, L=40, H=30, apex=10, at=(0, 0, 0)), 0, 0, math.degrees(ang) + 90), cx, cy, 0), "hardened", 2))
+        a.add(Part(f"定位座{k + 1}", S.move(S.rot(E.vblock(B=50, L=40, H=30, apex=10, at=(0, 0, 0)), 0, 0, math.degrees(ang) + 90), cx, cy, 0), "hardened", 2,
+                   (40 * math.cos(ang), 40 * math.sin(ang), 30)))
         zc = E.v_axis_height(24, apex=10)
         piece = S.move(S.rot(S.cyl("x", (0, zc), 12, -25, 25), 0, 0, math.degrees(ang) + 90), cx, cy, 0)
-        a.add(Part(f"工件{k + 1}", piece, "work" if k != 1 else "machined"))
-    a.add(Part("铣刀", S.cyl("z", (150, 0), 40, 60, 90) + S.cyl("z", (150, 0), 18, 90, 150), "tool", tags=("nocut",)))
+        a.add(Part(f"工件{k + 1}", piece, "work" if k != 1 else "machined", None, (80 * math.cos(ang), 80 * math.sin(ang), 90)))
+    a.add(Part("铣刀", S.cyl("z", (150, 0), 40, 60, 90) + S.cyl("z", (150, 0), 18, 90, 150), "tool", explode=(0, 0, 120), tags=("nocut",)))
     return a
 
 
@@ -271,7 +272,8 @@ def tombstone(parts_per_face=2):
             for side in (-1, 1):
                 for n, s in E.swing_clamp(at=(0, 0, 0), arm=30, ang_deg=0, H=50).items():
                     s2 = S.rot(S.move(S.rot(s, 0, 90, 0), 61, side * 44, z0 + 62), 0, 0, 90 * f)
-                    a.add(Part(f"转角缸{f}{j}{'左右'[side > 0]}{n}", s2, "steel_dark", 5))
+                    a.add(Part(f"转角缸{f}{j}{'左右'[side > 0]}{n}", s2, "steel_dark", 5,
+                               tuple(40 * c for c in (math.cos(math.pi / 2 * f), math.sin(math.pi / 2 * f), 0))))
     return a
 
 
@@ -297,8 +299,8 @@ def linked_clamp_two_dir():
     """联动夹紧：一个螺钉推动压块，同时在两个方向（侧向和向下）夹紧一块方料（浮动压块 + 斜面）。"""
     a = Assembly("双向联动夹紧")
     a.add(Part("夹具体", S.box(-80, 80, -50, 50, -20, 0) + S.box(-80, -60, -50, 50, 0, 70) + S.box(-80, 80, 30, 50, 0, 70), "cast", 1))
-    a.add(Part("工件", S.box(-60, 30, -40, 30, 0, 50), "work"))
-    a.add(Part("浮动压块", S.prism("xz", [(30, 10), (52, 10), (52, 70), (10, 70), (10, 50), (30, 50)], -40, 20), "steel", 2))
-    a.add(Part("斜楔", S.box(52, 70, -30, 10, 10, 40), "steel", 3))
-    a.add(Part("螺钉", S.cyl("x", (-10, 25), 6, 70, 130) + S.hexagon("x", (-10, 25), 18, 130, 140), "steel_dark", 4))
+    a.add(Part("工件", S.box(-60, 30, -40, 30, 0, 50), "work", None, (0, 0, 90)))
+    a.add(Part("浮动压块", S.prism("xz", [(30, 10), (52, 10), (52, 70), (10, 70), (10, 50), (30, 50)], -40, 20), "steel", 2, (40, 0, 60)))
+    a.add(Part("斜楔", S.box(52, 70, -30, 10, 10, 40), "steel", 3, (90, 0, 0)))
+    a.add(Part("螺钉", S.cyl("x", (-10, 25), 6, 70, 130) + S.hexagon("x", (-10, 25), 18, 130, 140), "steel_dark", 4, (150, 0, 0)))
     return a

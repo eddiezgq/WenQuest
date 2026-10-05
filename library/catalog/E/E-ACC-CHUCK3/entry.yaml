@@ -1,0 +1,55 @@
+# E-ACC-CHUCK3 · 三爪自定心卡盘（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-ACC-CHUCK3
+kind: product
+name:
+  zh: 三爪自定心卡盘
+  en: Three-jaw self-centring chuck
+category: ACC
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params:
+- key: D
+  zh: 外径 D
+  en: Outer diameter D
+  role: key
+  unit: mm
+- key: grip
+  zh: 夹持直径
+  en: Gripping diameter
+  role: key
+  unit: mm
+defaults:
+  D: 160.0
+  grip: 40.0
+model:
+  engine: wqfix:machines.chuck3
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 三个卡爪同步移动，同时定心和夹紧，装夹方便；定心精度一般 0.05～0.1 mm，夹持长度短时限制两个自由度，长时限制四个。
+  uses:
+  - 车床上装夹回转体零件
+  courses:
+  - course: 机械制造技术
+    chapter: 第 50 章 工序与安装
+  - course: 机械制造技术
+    chapter: 第 51 章 常用定位元件
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

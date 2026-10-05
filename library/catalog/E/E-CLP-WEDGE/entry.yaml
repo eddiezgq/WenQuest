@@ -1,0 +1,65 @@
+# E-CLP-WEDGE · 斜楔（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-CLP-WEDGE
+kind: product
+name:
+  zh: 斜楔
+  en: Wedge
+category: CLP
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params:
+- key: alpha_deg
+  zh: 楔角 α
+  en: Wedge angle α
+  role: key
+  unit: °
+- key: L
+  zh: 长度 L
+  en: Length L
+  role: key
+  unit: mm
+- key: B
+  zh: 宽度 B
+  en: Width B
+  role: key
+  unit: mm
+- key: h0
+  zh: 小端高 h₀
+  en: Thin-end height h₀
+  role: key
+  unit: mm
+defaults:
+  alpha_deg: 8.0
+  L: 80.0
+  B: 24.0
+  h0: 10.0
+model:
+  engine: wqfix:elements.wedge
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 斜楔把水平推力变成垂直的夹紧力，楔角小于两处摩擦角之和时自锁；楔角越小增力比越大，但行程越小，常用 6°～8°。
+  uses:
+  - 气动夹紧的增力环节
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 斜楔夹紧机构
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

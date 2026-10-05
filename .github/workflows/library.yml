@@ -1,4 +1,5 @@
-# 零件库发布（数字工厂第 2 轮 L13 第一期、L14）：只在推送改动 library/ 时运行。
+# 零件库发布（数字工厂第 2 轮 L13 第一期、L14）：只在推送改动 library/ 时运行；E 部分（工装夹具）的模型来自
+# factory/digital/models3d 与 std/，这两处改了也重新发布（第 13 轮 8.7）。
 #   校验条目 → 测试 → 生成全部模型 → 发布到 GitHub Releases（library-vYYYY.MM.N）→ 解包到数字工厂服务器
 #   https://factory.<域名>/library/latest.json 指向最新版本。
 name: Parts library 零件库发布
@@ -8,6 +9,8 @@ on:
     branches: [main]
     paths:
       - "library/**"
+      - "factory/digital/models3d/**"
+      - "factory/digital/std/*.yaml"
       - ".github/workflows/library.yml"
   workflow_dispatch:
 

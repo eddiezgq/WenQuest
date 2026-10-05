@@ -1,0 +1,41 @@
+# E-ASM-DRILLFIXED · 固定式钻模（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-ASM-DRILLFIXED
+kind: case
+name:
+  zh: 固定式钻模
+  en: Fixed drill jig
+category: ASM
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params: []
+defaults: {}
+model:
+  engine: wqfix:typical.drill_fixed
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 钻模板固定在夹具体上，钻套引导钻头；工件以平面、孔和侧面定位，螺钉压块压紧。
+  uses:
+  - 中小批钻孔
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 钻床夹具
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []

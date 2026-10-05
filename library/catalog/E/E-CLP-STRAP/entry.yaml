@@ -1,0 +1,59 @@
+# E-CLP-STRAP · 移动压板（工装夹具，第 13 轮 8.7；由 tools/import_fixtures.py 生成，改表后重新运行）
+schema: 1
+id: E-CLP-STRAP
+kind: product
+name:
+  zh: 移动压板
+  en: Sliding strap clamp
+category: CLP
+tags:
+- 工装夹具
+- 机床夹具
+standards: []
+params:
+- key: L
+  zh: 长度 L
+  en: Length L
+  role: key
+  unit: mm
+- key: b
+  zh: 宽度 b
+  en: Width b
+  role: key
+  unit: mm
+- key: h
+  zh: 工作段高 h
+  en: Working height h
+  role: key
+  unit: mm
+defaults:
+  L: 110.0
+  b: 32.0
+  h: 14.0
+model:
+  engine: wqfix:elements.moving_strap
+  formats:
+  - glb
+  - step
+  - stl
+  origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
+  note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（造型程序 factory/digital/models3d，经 library/generators/e_fixture.py）
+  checked:
+    by: Claude
+    'on': '2026-10-05'
+    note: 自建；与教材插图同一个函数、同一组参数，零件库测试核对节点与零件表
+teaching:
+  principle: 螺母拧紧时压板以后端的支承为支点压住工件，杠杆比决定夹紧力；压板可沿长槽移动、绕螺柱转开，便于装卸工件。JJ-301-50 用两块移动压板压住轴的两端。
+  uses:
+  - 铣床、钻床夹具的螺旋压板夹紧
+  courses:
+  - course: 机械制造技术
+    chapter: 第 52 章 螺旋夹紧机构
+  labs: []
+factory:
+  erp_items: []
+  suppliers: []
