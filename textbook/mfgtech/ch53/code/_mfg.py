@@ -102,3 +102,23 @@ def chains_data():
 
 def link(name, nominal, es=0.0, ei=0.0, sense=1):
     return tol().Link(name, nominal, es, ei, sense)
+
+
+# ---------------------------------------------------------------- 三维图（第 13 轮 8.3）：数字工厂的三维模型 + render3d
+def m3d():
+    """返回 (core, workpiece, jj30150, elements, typical, machines, shapes) 七个模块。"""
+    from models3d import core, workpiece, jj30150, elements, typical, machines, shapes
+    return core, workpiece, jj30150, elements, typical, machines, shapes
+
+
+def r3d():
+    import render3d
+    return render3d
+
+
+def loc():
+    from models3d import locating
+    return locating
+
+
+ISO = [0.9, -1.25, 0.95]          # 书中三维图的常用视向（从右前上方看）
