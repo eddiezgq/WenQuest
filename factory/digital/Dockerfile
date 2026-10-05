@@ -34,6 +34,8 @@ COPY digital/sim/ digital/sim/
 # 虚拟 PLC（第 18 轮第 8 步）：班次在仿真车间里算、回放；PLC 引擎是学习平台实验台的同一份 JS（Debian 自带的 nodejs 运行）
 COPY digital/vplc/ digital/vplc/
 COPY digital/hub/ digital/hub/
+# 工厂本体定义（第 17 轮 A 期：15 个业务域的对象类型、属性、链接）
+COPY digital/ontology/ digital/ontology/
 COPY digital/twin/ digital/twin/
 COPY digital/freecad/ digital/freecad/
 COPY --from=menagerie /opt/menagerie /opt/menagerie

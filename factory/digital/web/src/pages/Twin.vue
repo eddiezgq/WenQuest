@@ -50,7 +50,7 @@
       <section class="card grow">
         <div v-if="!d" class="big-empty muted">左边点一台，看它的分身：三维健康图、运行曲线、寿命预测、出厂数据、“假如”分析。</div>
         <template v-else>
-          <div class="card-head"><h2 class="mono">{{ d.serial }}</h2>
+          <div class="card-head"><h2 class="mono"><ObjLink type="FieldUnit" :k="d.serial" /></h2>
             <span class="pill" :class="{ red: 'bad', yellow: 'warn', green: 'good' }[d.health]">{{ { red: '报警', yellow: '注意', green: '正常' }[d.health] }}</span>
             <span class="small muted">{{ d.customer || '现场接入' }} · {{ d.start_day }} 起运行 · 已运行 {{ d.state.run_h.toFixed(0) }} 小时、起动 {{ d.state.starts }} 次</span></div>
 
@@ -140,10 +140,10 @@
 
           <h3>出厂数据</h3>
           <div class="ab small">
-            <div>工单 <b class="mono">{{ d.as_built.work_order || '—' }}</b>；{{ d.as_built.note || '' }}</div>
+            <div>工单 <b class="mono"><ObjLink v-if="d.as_built.work_order" type="WorkOrder" :k="d.as_built.work_order" /><template v-else>—</template></b>；{{ d.as_built.note || '' }}</div>
             <div v-if="d.as_built.design">输出轴设计：SH-301 第 {{ d.as_built.design.revision ?? '—' }} 版，齿轮位 Ø{{ d.as_built.design.segments?.[2]?.[0] }}，材料 {{ d.as_built.design.material || '45-QT' }}</div>
             <div v-if="d.as_built.runin?.peak_nm">跑合试验：{{ d.as_built.runin.program }}，峰值 {{ d.as_built.runin.peak_nm }} N·m、运行平均 {{ d.as_built.runin.mean_run_nm }} N·m</div>
-            <div v-if="d.as_built.shaft">输出轴 <b class="mono">{{ d.as_built.shaft.serial }}</b>（{{ d.as_built.shaft.how }}）：
+            <div v-if="d.as_built.shaft">输出轴 <b class="mono"><ObjLink type="PartSerial" :k="d.as_built.shaft.serial" /></b>（{{ d.as_built.shaft.how }}）：
               <span v-for="(m, k) in d.as_built.shaft.meas" :key="k" class="meas">{{ m.name }} {{ m.value }}</span></div>
             <div v-if="!d.as_built.shaft && !d.as_built.runin" class="muted">这台是现场先接入的设备，没有出厂档案。</div>
           </div>
@@ -206,6 +206,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { get, post, session } from '../lib/api';
 import GearboxTwin from '../components/GearboxTwin.vue';
 import DayChart from '../components/DayChart.vue';
+import ObjLink from '../components/ObjLink.vue';
 
 const route = useRoute(), router = useRouter();
 const FAULT_NAME = { cooling: '散热变差', bearing: '轴承损坏', overload: '过载' };

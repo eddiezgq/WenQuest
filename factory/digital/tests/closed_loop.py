@@ -270,6 +270,33 @@ def main():
     check("提示" in ans["answer"] or "来源" in ans["answer"], "AI 回答（教学模式给提示）：" + ans["answer"][:60])
     bad = hub("GET", "/api/health")
     check(bad["ok"] and bad["bus"], "枢纽健康，历史库 {} 条消息".format(bad["messages"]))
+
+    print("9. 厂情中枢：工厂本体（第 17 轮 A 期）")
+    h = wait(lambda: (lambda x: x if x["behind"] == 0 else None)(hub("GET", "/api/ont/health", token=teacher)), "本体同步追上", 60, 2)
+    check(h is not None and h["errors"] == 0, "本体同步追上总线，没有跳过的消息（{}）".format(h))
+    o = hub("GET", "/api/ont/obj/SalesOrder/" + urllib.parse.quote(so), token=teacher)
+    check(any(g["link"] == "SalesOrder.customer" for g in o["links"]), "销售订单 {} 在本体里，连着客户".format(so))
+    o = hub("GET", "/api/ont/obj/WorkOrder/" + urllib.parse.quote(wo), token=teacher)
+    grp = {g["link"]: g for g in o["links"]}
+    check("OperationTask.work_order" in grp and len(grp["OperationTask.work_order"]["items"]) >= 7,
+          "工单 {} 连着 {} 道工序任务".format(wo, len(grp.get("OperationTask.work_order", {}).get("items", []))))
+    parts = hub("POST", "/api/ont/query", {"type": "PartSerial", "link": {"name": "PartSerial.work_order", "key": wo}}, teacher)["objects"]
+    check(len(parts) >= 10, "工单产出 {} 根零件实物".format(len(parts)))
+    if parts:
+        p0 = hub("GET", "/api/ont/obj/PartSerial/" + urllib.parse.quote(parts[0]["key"]), token=teacher)
+        proc = [i for g in p0["links"] if g["link"] == "PartSerial.processed" for i in g["items"]]
+        grd = [i for i in proc if (i["props"] or {}).get("machine") == "grd-01"]
+        check(len(proc) >= 7 and grd and grd[0]["props"].get("tool_life_pct") is not None,
+              "零件 {} 有 {} 条加工记录，磨削时砂轮剩余 {}%".format(parts[0]["key"], len(proc), grd[0]["props"].get("tool_life_pct") if grd else "?"))
+        meas = [g for g in p0["links"] if g["link"] == "Measurement.part"]
+        check(meas and len(meas[0]["items"]) >= 3, "零件挂着检验测量")
+    for q in ("6207", "A-BRG-DG/6207"):
+        r = hub("GET", "/api/ont/search?q=" + urllib.parse.quote(q), token=teacher)["results"]
+        check(r and r[0]["key"] == "BRG-6207", "搜“{}”找到物料 BRG-6207".format(q))
+    types = hub("GET", "/api/ont/types", token=teacher)
+    have = [t for d in types["domains"] for t in d["types"] if t["maturity"] in ("have", "sim")]
+    empty = [t["label"] for t in have if not t["count"]]
+    print("  （有数据的对象类型 {} / {}；这一轮流程没碰到的：{}）".format(len(have) - len(empty), len(have), "、".join(empty) or "无"))
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位

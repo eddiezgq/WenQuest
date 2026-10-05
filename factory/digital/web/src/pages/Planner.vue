@@ -21,7 +21,7 @@
             <thead><tr><th>物料</th><th class="num">毛需求</th><th class="num">占用</th><th class="num">库存</th><th class="num">在途</th>
               <th class="num">安全</th><th class="num">净需求</th><th>动作</th></tr></thead>
             <tbody><tr v-for="r in pv.mrp" :key="r.item_code" :class="{ need: r.net > 0 }">
-              <td><span class="mono">{{ r.item_code }}</span> <span class="muted small">{{ r.name.split(' ')[0] }}</span></td>
+              <td><ObjLink type="Item" :k="r.item_code" mono /> <span class="muted small">{{ r.name.split(' ')[0] }}</span></td>
               <td class="num">{{ n(r.gross) }}</td><td class="num">{{ n(r.committed) }}</td><td class="num">{{ n(r.stock) }}</td>
               <td class="num">{{ n(r.on_order) }}</td><td class="num">{{ n(r.safety) }}</td><td class="num">{{ n(r.net) }}</td><td>{{ r.action }}</td>
             </tr></tbody>
@@ -51,10 +51,10 @@
         <thead><tr><th>工单</th><th>物料</th><th class="num">数量</th><th class="num">完工</th><th>计划</th><th>销售订单</th><th>状态</th><th></th></tr></thead>
         <tbody>
           <tr v-for="w in wos" :key="w.name">
-            <td class="mono">{{ w.name }}<span v-if="w.demo" class="pill mute">演示</span></td>
-            <td class="mono">{{ w.production_item }}</td><td class="num">{{ w.qty }}</td><td class="num">{{ w.produced }}</td>
+            <td class="mono"><ObjLink type="WorkOrder" :k="w.name" /><span v-if="w.demo" class="pill mute">演示</span></td>
+            <td class="mono"><ObjLink type="Item" :k="w.production_item" /></td><td class="num">{{ w.qty }}</td><td class="num">{{ w.produced }}</td>
             <td class="mono small">{{ w.planned_start_date }} → {{ w.expected_delivery_date }}</td>
-            <td class="mono small">{{ w.sales_order }}</td>
+            <td class="mono small"><ObjLink v-if="w.sales_order" type="SalesOrder" :k="w.sales_order" /></td>
             <td><span class="pill" :class="w.status === 'Completed' ? 'good' : w.released ? 'info' : 'warn'">{{ woStatus(w) }}</span></td>
             <td><button v-if="!w.released && w.status !== 'Completed' && !w.demo" class="btn primary" :disabled="busy" @click="release(w.name)">下达车间</button></td>
           </tr>
@@ -72,6 +72,7 @@ import { get, post, session } from '../lib/api';
 import { short } from '../lib/fmt';
 import ProposalModal from '../components/ProposalModal.vue';
 import TaskBar from '../components/TaskBar.vue';
+import ObjLink from '../components/ObjLink.vue';
 
 const customers = ref([]);
 const f = ref({ customer: '', item: 'WQR-105', qty: 10, delivery_date: '2026-10-15' });

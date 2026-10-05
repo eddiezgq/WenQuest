@@ -21,9 +21,9 @@
           <button class="btn danger" @click="cmd('reset')">处理完毕，复位</button>
         </div>
         <div class="now">
-          <div><span class="muted small">当前工单</span><b class="mono">{{ cur.work_order || '—' }}</b></div>
+          <div><span class="muted small">当前工单</span><b class="mono"><ObjLink v-if="cur.work_order" type="WorkOrder" :k="cur.work_order" /><template v-else>—</template></b></div>
           <div><span class="muted small">工序</span><b>{{ cur.operation ? cur.operation.split(' ')[0] : '—' }}</b></div>
-          <div><span class="muted small">零件</span><b class="mono">{{ cur.part_serial || '—' }}</b></div>
+          <div><span class="muted small">零件</span><b class="mono"><ObjLink v-if="cur.part_serial && !/件在炉/.test(cur.part_serial)" type="PartSerial" :k="cur.part_serial" /><template v-else>{{ cur.part_serial || '—' }}</template></b></div>
           <div><span class="muted small">完成</span><b class="mono">{{ cur.qty_done || 0 }} / {{ cur.qty || 0 }}</b></div>
           <div><span class="muted small">主轴</span><b class="mono">{{ cur.spindle_rpm || 0 }} r/min</b></div>
           <div><span class="muted small">待加工</span><b class="mono">{{ cur.queue || 0 }} 件</b></div>
@@ -37,7 +37,7 @@
         <div v-if="!(cur.dispatched || []).length" class="empty">这台设备还没有派工，所以没有“开工”按钮。先到
           <router-link to="/work/planner">订单与计划</router-link> 下达工单（或请计划员下达），这里就会出现要做的工序。</div>
         <div v-for="j in cur.dispatched || []" :key="j.work_order + j.operation" class="job">
-          <div class="jinfo"><b class="mono">{{ j.work_order }}</b> {{ j.operation }}<span class="muted small"> · {{ j.done }} / {{ j.qty }} 件</span></div>
+          <div class="jinfo"><b class="mono"><ObjLink type="WorkOrder" :k="j.work_order" /></b> {{ j.operation }}<span class="muted small"> · {{ j.done }} / {{ j.qty }} 件</span></div>
           <span class="pill" :class="j.started ? 'good' : 'warn'">{{ j.started ? '已开工' : '待开工' }}</span>
           <button v-if="!j.started" class="btn primary big" @click="cmd('start', j)">开工</button>
           <button v-else class="btn ghost big" @click="cmd('pause', j)">暂停</button>
@@ -63,6 +63,7 @@ import { onBus } from '../lib/bus';
 import { useOverview } from '../lib/overview';
 import { STATE, timeOf } from '../lib/fmt';
 import TaskBar from '../components/TaskBar.vue';
+import ObjLink from '../components/ObjLink.vue';
 import BusNotice from '../components/BusNotice.vue';
 
 const route = useRoute();

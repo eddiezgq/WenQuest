@@ -80,6 +80,7 @@ class Hub:
         self.teach = None
         self.twin = None
         self.vplc = None
+        self.ont = None
         self.stop = threading.Event()
         self.last_brief = {}
         self._ncr_sent = set()
@@ -112,6 +113,19 @@ class Hub:
             log.exception("总线未就绪，后台继续重连")
         threading.Thread(target=self._loop, daemon=True, name="ai-loop").start()
         threading.Thread(target=self.twin.run, daemon=True, name="field-sim").start()
+        self._start_ont()
+
+    def _start_ont(self):
+        """厂情中枢的工厂本体（第 17 轮 A 期）：总线历史 → 对象和链接，后台增量同步"""
+        from hub.cae_api import FACTORY_ID, call
+        from hub.ont.sync import Sync
+        try:
+            self.ont = Sync(self.db, factory_id=FACTORY_ID, cae_call=call, modes=("teach", "prod"))
+            self.ont.init()
+        except Exception:  # noqa: BLE001  —— 本体出问题不影响工厂其他功能
+            log.exception("工厂本体初始化失败")
+            return
+        threading.Thread(target=self.ont.run, daemon=True, name="ontology").start()
 
     def on_message(self, tp, msg):
         t = msg["type"]
@@ -1422,6 +1436,8 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     H.ai._sent = {k: v for k, v in H.ai._sent.items() if k[0] != "teach"}
     H.db.x("update quality_problem set cleared_at=now(), cleared_how='scenario' where mode='teach' and cleared_at is null")
     H.twin.reset("teach")
+    if H.ont is not None:
+        H.ont.reset_mode("teach")
     H.mes.command("sim", "load_scenario", "teach", who(u), speed=float(body.get("speed", 1)))
     return {"reset": True}
 
@@ -1455,6 +1471,11 @@ _cfd.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quot
 # ---------------------------------------------------------------- 数字孪生（第 15 轮）
 from hub import twin_api as _twin  # noqa: E402
 _twin.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
+
+
+# ---------------------------------------------------------------- 厂情中枢：工厂本体（第 17 轮 A 期）
+from hub.ont import api as _ont  # noqa: E402
+_ont.mount(app, H, user_of)
 
 
 # ---------------------------------------------------------------- 虚拟 PLC（第 18 轮第 8 步《PLC 原理及实践》）

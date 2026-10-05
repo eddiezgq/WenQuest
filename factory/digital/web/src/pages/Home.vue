@@ -70,7 +70,7 @@
             </router-link>
           </div>
           <div class="agv small muted">
-            <span v-for="a in agvs" :key="a.unit">{{ a.unit.toUpperCase() }}：{{ a.task ? '运送 ' + a.load + '（' + a.task + '）' : '待命 · 电量 ' + Math.round((a.battery || 0) * 100) + '%' }}</span>
+            <span v-for="a in agvs" :key="a.unit"><ObjLink type="Agv" :k="a.unit">{{ a.unit.toUpperCase() }}</ObjLink>：<template v-if="a.task">运送 <ObjLink type="PartSerial" :k="a.load" mono />（{{ a.task }}）</template><template v-else>待命 · 电量 {{ Math.round((a.battery || 0) * 100) }}%</template></span>
             <span class="r">在制品 {{ ov.wip.now }} 件<template v-if="bott"> · {{ bott.code }} 前排队 {{ bott.queue }} 件</template></span>
           </div>
         </section>
@@ -80,8 +80,8 @@
           <div v-if="!ov.orders.length" class="empty">没有在手订单</div>
           <div v-for="o in ov.orders" :key="o.name" class="order">
             <div class="otop">
-              <span class="mono b">{{ o.name }}</span>
-              <span>{{ short(o.customer) }}</span>
+              <ObjLink type="SalesOrder" :k="o.name" mono class="b" />
+              <ObjLink type="Customer" :k="o.customer">{{ short(o.customer) }}</ObjLink>
               <span class="pill" :class="o.tone">{{ o.risk }}</span>
             </div>
             <span class="muted small">{{ o.item }} × {{ o.qty }} · 交期 {{ o.delivery_date.slice(5) }} · {{ o.work_orders }}</span>
@@ -158,6 +158,7 @@ import { kpiValue, opShort, pct, short, STATE, TONE, timeOf } from '../lib/fmt';
 import ControlChart from '../components/ControlChart.vue';
 import ProposalModal from '../components/ProposalModal.vue';
 import TaskBar from '../components/TaskBar.vue';
+import ObjLink from '../components/ObjLink.vue';
 
 const router = useRouter();
 const { ov, error, load, machines } = useOverview();

@@ -18,7 +18,7 @@
         <table class="t">
           <thead><tr><th>时间</th><th>零件</th><th>工单</th><th class="num">实测 mm</th><th class="num">公差</th><th>判定</th></tr></thead>
           <tbody><tr v-for="r in rows.slice().reverse().slice(0, 30)" :key="r.id">
-            <td class="small">{{ timeOf(r.ts) }}</td><td class="mono small">{{ r.part_serial }}</td><td class="mono small">{{ r.work_order }}</td>
+            <td class="small">{{ timeOf(r.ts) }}</td><td class="mono small"><ObjLink type="PartSerial" :k="r.part_serial" /></td><td class="mono small"><ObjLink v-if="r.work_order" type="WorkOrder" :k="r.work_order" /></td>
             <td class="num">{{ r.value_mm.toFixed(4) }}</td><td class="num small">{{ r.lower_tol_mm }}–{{ r.upper_tol_mm }}</td>
             <td><span class="pill" :class="r.result === 'pass' ? 'good' : 'bad'">{{ r.result === 'pass' ? '合格' : '超差' }}</span></td>
           </tr></tbody>
@@ -28,7 +28,7 @@
         <div class="card-head"><h2>不合格品</h2><span class="muted small">超差零件自动开单（quality/qc-01/ncr）</span></div>
         <div v-if="!ncr.length" class="empty">没有不合格品。</div>
         <div v-for="n in ncr" :key="n.ncr_id" class="ncr">
-          <div><b class="mono">{{ n.ncr_id }}</b> <span class="mono small">{{ n.part_serial }}</span>
+          <div><b class="mono"><ObjLink type="Ncr" :k="n.ncr_id" /></b> <span class="mono small"><ObjLink type="PartSerial" :k="n.part_serial" /></span>
             <span class="pill" :class="n.status === 'open' ? 'bad' : 'good'">{{ DISP[n.status] }}</span></div>
           <div class="small muted">{{ n.detail.name }} 实测 {{ n.detail.value_mm }} mm（{{ n.detail.lower_tol_mm }}–{{ n.detail.upper_tol_mm }}）</div>
           <div v-if="n.status === 'open'" class="acts">
@@ -82,6 +82,7 @@ import { bus } from '../lib/bus';
 import { timeOf } from '../lib/fmt';
 import ControlChart from '../components/ControlChart.vue';
 import TaskBar from '../components/TaskBar.vue';
+import ObjLink from '../components/ObjLink.vue';
 
 const CHARS = [
   { key: 'bearing_seat_d35', name: '轴承位直径 Ø35 k6' },

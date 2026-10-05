@@ -1,0 +1,75 @@
+domain: core
+order: 99
+label: 厂情中枢
+label_en: Ops center
+row: core
+types:
+  Anomaly:
+    label: 异常
+    label_en: Anomaly
+    maturity: next
+    key: 异常编号
+    title: "{key} {title}"
+    sources: [厂情中枢（17B 起）]
+    props:
+      title: {t: str, l: 标题}
+      domain: {t: str, l: 领域}
+      severity: {t: str, l: 严重度}
+      status: {t: str, l: 状态}
+  Scenario:
+    label: 场景
+    label_en: Scenario
+    maturity: next
+    key: 场景编号
+    title: "{key} {title}"
+    sources: [厂情中枢（17C 起）]
+    props:
+      title: {t: str, l: 名称}
+    links:
+      anomaly: {to: Anomaly, l: 针对, inv: 场景}
+  ActionRun:
+    label: 动作记录
+    label_en: Action run
+    maturity: next
+    key: 动作编号
+    title: "{key} {title}"
+    sources: [厂情中枢（17C 起）]
+    props:
+      title: {t: str, l: 名称}
+      status: {t: str, l: 状态}
+  AiRun:
+    label: AI 运行
+    label_en: AI run
+    maturity: next
+    key: 运行编号
+    title: "{key}"
+    sources: [厂情中枢（17D 起）]
+    props:
+      question: {t: str, l: 问题}
+  TaskSheet:
+    label: 工程任务单
+    label_en: Engineering task sheet
+    maturity: have
+    key: 任务单编号（内部 id）
+    title: "{code} {title}"
+    sources: [task_sheet 表]
+    props:
+      code: {t: str, l: 编号}
+      title: {t: str, l: 标题}
+      course: {t: str, l: 课程}
+      due: {t: date, l: 截止}
+      status: {t: str, l: 状态}
+  Proposal:
+    label: 提议
+    label_en: Proposal
+    maturity: have
+    key: 提议编号
+    title: "{key} {title}"
+    sources: [ai_proposal 表, ai.proposal]
+    props:
+      title: {t: str, l: 标题}
+      action: {t: str, l: 动作}
+      status: {t: str, l: 状态}
+      requested_by: {t: str, l: 发起}
+      confirmed_by: {t: str, l: 确认}
+      created: {t: time, l: 时间}
