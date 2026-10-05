@@ -1424,7 +1424,7 @@ function runTest(rtOpts, plant, test, opts = {}) {
       for (const k in manual) if (!(k in ins) && !rt.io.some((x) => x.name === k)) ins[k] = manual[k];
       if (!rt.scan()) return false;
       if (plant && plant.step) plant.step(dt, rt.outputs(), ps, ins);
-      if (trace) { trace.t.push(rt.now); trace.names.forEach((n, k) => trace.v[k].push(val(n))); }
+      if (trace && (!opts.every || rt.now - (trace.last ?? -1e9) >= opts.every - 1e-9)) { trace.last = rt.now; trace.t.push(rt.now); trace.names.forEach((n, k) => trace.v[k].push(val(n))); }
       if (check && check()) return true;
     }
     return null;
@@ -1474,6 +1474,8 @@ function runTest(rtOpts, plant, test, opts = {}) {
   if (rt.error) fail(`PLC 停机：${rt.error.message} / PLC stopped: ${rt.error.message}`);
   result.time = rt.now;
   result.scans = rt.scans;
+  if (opts.final) result.final = Object.fromEntries(opts.final.map((n) => [n, val(n)]));   // values at the end (book figures)
+  if (trace) delete trace.last;
   return result;
 }
 

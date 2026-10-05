@@ -1,6 +1,6 @@
 // Run a PLC program of the book (第 18 轮): node plcrun.mjs < job.json > result.json
 // job: { program: {st} | {decls, ladder}, io?: [...], plant?: "elevator" | ..., plantOpts?: {...}, cycle?: 10,
-//        tests?: [test, ...], scenario?: {steps, faults, trace: [names]}, review?: true }
+//        tests?: [test, ...], scenario?: {steps, faults, trace: [names], every?: ms, final?: [names]}, review?: true }
 // The engine and the virtual machines are the platform's own (services/gateway/app/production/labkit), so the book's
 // programs run exactly as in the students' lab.
 import { createRequire } from "node:module";
@@ -23,8 +23,8 @@ try {
     if (!r.ok) out.ok = false;
   }
   if (job.scenario) {
-    const r = P.runTest(rtOpts, plant, Object.assign({ id: "scenario" }, job.scenario), { trace: job.scenario.trace || [] });
-    out.scenario = { ok: r.ok, failures: r.failures.map((f) => f.msg), time: r.time, trace: r.trace, log: r.log };
+    const r = P.runTest(rtOpts, plant, Object.assign({ id: "scenario" }, job.scenario), { trace: job.scenario.trace || [], every: job.scenario.every, final: job.scenario.final });
+    out.scenario = { ok: r.ok, failures: r.failures.map((f) => f.msg), time: r.time, trace: r.trace, log: r.log, final: r.final };
   }
   if (job.review) out.review = P.review(job.program, io);
 } catch (e) {

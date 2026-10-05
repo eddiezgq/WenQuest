@@ -506,7 +506,7 @@ function conveyor(o = {}) {
     { name: "B2_End", addr: "%IX0.5", dir: "in", comment: ["末端光电开关 B2（有料为 1）", "End photo sensor B2 (1 = part)"] },
     { name: "KM1_Run", addr: "%QX0.0", dir: "out", comment: ["输送电机接触器 KM1", "Conveyor motor contactor KM1"] },
     { name: "H1_Run", addr: "%QX0.1", dir: "out", comment: ["运行指示灯 H1（绿）", "Running lamp H1 (green)"] },
-    { name: "H2_Fault", addr: "%QX0.2", dir: "out", comment: ["故障指示灯 H2（红）", "Fault lamp H2 (red)"] },
+    { name: "H2_Fault", addr: "%QX0.2", dir: "out", comment: ["故障指示灯 H2（黄）", "Fault lamp H2 (amber)"] },
   ];
   const L = 3.0, V = 0.25;                       // belt length m, belt speed m/s (about 12 s from entry to end)
   const ENTRY = 0.15, END = 2.85;                // sensor positions m
@@ -567,7 +567,7 @@ function conveyor(o = {}) {
       v.b1 = sensor(ENTRY, "B1"); v.b2 = sensor(END, "B2");
       K.box(0.05, 0.25, 0.5, 0x6e7781, L + 0.02, 0.97, 0);          // end stop
       K.box(0.4, 0.6, 0.15, 0xd0d7de, -0.5, 1.1, 0.6);              // control box with lamps
-      v.h1 = K.lamp(0.045, 0x2da44e, -0.6, 1.3, 0.69); v.h2 = K.lamp(0.045, 0xd1242f, -0.4, 1.3, 0.69);
+      v.h1 = K.lamp(0.045, 0x2da44e, -0.6, 1.3, 0.69); v.h2 = K.lamp(0.045, 0xd4a72c, -0.4, 1.3, 0.69);
       K.label("H1", -0.6, 1.42, 0.7, 0.08); K.label("H2", -0.4, 1.42, 0.7, 0.08);
       K.camera([1.2, 2.6, 4.2], [1.4, 0.8, 0]);
       return v;
@@ -583,7 +583,243 @@ function conveyor(o = {}) {
   };
 }
 
-const API = { traffic, elevator, sorter, press, conveyor, kit3d, rng };
+// ---------------------------------------------------------------- 6. motor control circuits (Ch. 2): reversing and star–delta
+// Contactors as they really behave: the coil needs PICK ms to pull the armature in, and after the coil is switched off the
+// armature holds DROP ms before the contacts open; the arc on an opening main contact lasts until the next current zero
+// (0–10 ms at 50 Hz), so a main contact keeps conducting a little after it opens. The auxiliary contacts are mechanically
+// linked to the main contacts (a welded main contact keeps the NO auxiliary contact closed, IEC 60947-4-1 mirror contacts).
+// An "interrupted" coil that is re-energised before DROP only makes the armature clack. Two contactors whose main contacts
+// conduct together short-circuit two phases: the circuit breaker Q1 trips at once (hazard "short").
+const PICK = 20, DROP = 12, CLACK = 4;      // ms: pick-up, drop-out, the shortest gap the armature notices
+function contactor() { return { coil: false, closed: false, on: 0, off: 1e9, arcUntil: -1, welded: false, clacks: 0, drops: 0, closes: 0 }; }
+function stepContactor(k, coil, s, dt, rand, weld) {
+  if (coil) {
+    if (k.off > 0 && k.off < 1e8 && k.closed && k.off >= CLACK) k.clacks++;      // re-energised before it dropped: a clack
+    k.on += dt; k.off = 0;
+    if (!k.closed && k.on >= PICK) { k.closed = true; k.closes++; if (weld) k.welded = true; }
+  } else {
+    k.off += dt; k.on = 0;
+    if (k.closed && k.off >= DROP && !k.welded) { k.closed = false; k.drops++; k.arcUntil = s.t + 10 * rand(); }
+  }
+  k.coil = coil;
+}
+const conducting = (k, s) => k.closed || s.t < k.arcUntil;
+// a squirrel-cage motor, per unit: slip sl = 1 − w (w = speed / synchronous speed, negative when reversed); current and
+// torque from a simple Kloss-type model, start current KI × In, load torque ∝ speed² (fan-like) plus friction
+function motorPU(m, supply, scale, dt, H) {
+  // supply: +1 forward, −1 reverse, 0 none; scale: 1 delta / direct, 1/3 star (voltage 1/√3 → current and torque 1/3)
+  const sec = dt / 1000;
+  let I = 0, T = 0;
+  if (supply) {
+    const sl = supply - m.w;                                   // slip relative to the rotating field (0…2)
+    const a = Math.abs(sl), sk = 0.22;
+    T = Math.sign(sl) * scale * 2 * m.Tk / (a / sk + sk / Math.max(a, 1e-4)) * (a < 1e-4 ? 0 : 1);
+    const Ia = m.KI * a / Math.sqrt(a * a + m.aI * m.aI) * Math.sqrt(1 + m.aI * m.aI);
+    I = scale * Math.sqrt(0.35 * 0.35 + Ia * Ia);
+  }
+  const TL = Math.sign(m.w) * (m.TL * m.w * m.w + 0.03);
+  m.w += (T - TL) / H * sec;
+  if (!supply && Math.abs(m.w) < 0.003) m.w = 0;
+  m.I = I;
+  // overload relay F1 (set to the rated current): a first-order thermal image, time constant 290 s, trips at 1.25 —
+  // class 10 of IEC 60947-4-1: 7.2 × setting trips in about 7 s (4–10 s), 1.2 × trips (in about 10 min), 1.05 × never
+  m.heat += (I * I - m.heat) / 290 * sec;
+  if (m.heat >= 1.25) m.tripped = true;
+}
+function newMotor(o) { return { w: 0, I: 0, heat: 0, tripped: false, Tk: o.Tk || 2.6, KI: o.KI || 6.5, aI: o.aI || 0.24, TL: o.TL || 0.6 }; }
+
+function reversing(o = {}) {
+  const io = [
+    { name: "S2_Stop", addr: "%IX0.0", dir: "in", comment: ["停止按钮 S2（常闭，按下为 0）", "Stop button S2 (NC, 0 when pressed)"] },
+    { name: "S1_Fwd", addr: "%IX0.1", dir: "in", comment: ["正转按钮 S1（常开）", "Forward button S1 (NO)"] },
+    { name: "S3_Rev", addr: "%IX0.2", dir: "in", comment: ["反转按钮 S3（常开）", "Reverse button S3 (NO)"] },
+    { name: "F1_OL", addr: "%IX0.3", dir: "in", comment: ["热继电器 F1 辅助触点（常闭，过载为 0）", "Overload relay F1 (NC, 0 on overload)"] },
+    { name: "KM1_Aux", addr: "%IX0.4", dir: "in", comment: ["接触器 KM1 的常开辅助触点（吸合为 1）", "Contactor KM1 auxiliary contact (NO, 1 when closed)"] },
+    { name: "KM2_Aux", addr: "%IX0.5", dir: "in", comment: ["接触器 KM2 的常开辅助触点（吸合为 1）", "Contactor KM2 auxiliary contact (NO, 1 when closed)"] },
+    { name: "KM1_Fwd", addr: "%QX0.0", dir: "out", comment: ["正转接触器 KM1 线圈", "Forward contactor KM1 coil"] },
+    { name: "KM2_Rev", addr: "%QX0.1", dir: "out", comment: ["反转接触器 KM2 线圈", "Reverse contactor KM2 coil"] },
+  ];
+  const NSYNC = 1500, IN = 1.9;          // 0.75 kW, 4-pole, 380 V: synchronous speed r/min, rated current A
+  return {
+    io,
+    panel: [{ name: "S2_Stop", kind: "nc-push", label: ["停止 S2", "Stop S2"] }, { name: "S1_Fwd", kind: "push", label: ["正转 S1", "Forward S1"] },
+            { name: "S3_Rev", kind: "push", label: ["反转 S3", "Reverse S3"] },
+            { name: "F1_Reset", kind: "push", label: ["热继电器复位", "Reset F1"] }, { name: "Q1_On", kind: "push", label: ["重新合上断路器 Q1", "Close breaker Q1 again"] }],
+    faults: [{ id: "weld1", name: ["KM1 主触点熔焊（第二次吸合时粘住，不再断开）", "KM1 main contacts weld (on the second closing they stay closed)"] },
+             { id: "auxbad", name: ["KM1 自锁触点接触不良（运转中偶尔断开几毫秒）", "KM1 seal-in contact intermittent (opens for ms while running)"] },
+             { id: "heavy", name: ["负载卡滞（电机堵转，热继电器动作）", "Load jammed (motor stalls, F1 trips)"] }],
+    reset(s, opt) {
+      s.f = (opt && opt.faults) || {}; s.t = 0; s.out = {}; s.k1 = contactor(); s.k2 = contactor(); s.m = newMotor({});
+      s.rand = rng((opt && opt.seed) || 7); s.blown = false; s.hazard = false; s.why = ""; s.shorts = 0;
+      s.gap = 0; s.gaps = 0; s.nextGap = 20000 + 280000 * s.rand(); s.lastF = false; s.lastR = false; s.press = 0; s.restartAt = -1; s.peakI = 0;
+    },
+    inputs(s) {
+      let aux1 = s.k1.closed;
+      if (s.gap > 0) aux1 = false;                                     // the worn seal-in contact springs open for a moment
+      const r = { S2_Stop: true, F1_OL: !s.m.tripped, KM1_Aux: aux1, KM2_Aux: s.k2.closed };
+      if (o.operator) r.S1_Fwd = s.press > 0;                         // book only: an operator who restarts a stopped belt
+      return r;
+    },
+    step(dt, out, s, ins) {
+      s.t += dt; s.out = out;
+      if (ins) {
+        if (ins.F1_Reset && s.m.heat < 1.0) s.m.tripped = false;
+        if (ins.Q1_On && !s.lastQ1) s.blown = false;
+        s.lastQ1 = !!ins.Q1_On;
+      }
+      stepContactor(s.k1, !!out.KM1_Fwd, s, dt, s.rand, s.f.weld1 && s.k1.closes >= 1);   // welds on its second closing
+      stepContactor(s.k2, !!out.KM2_Rev, s, dt, s.rand, false);
+      if (!s.blown && conducting(s.k1, s) && conducting(s.k2, s)) {     // L1 and L3 short-circuited through KM1 and KM2: Q1 trips
+        s.blown = true; s.hazard = true; s.why = "short"; s.shorts++;
+      }
+      const supply = s.blown ? 0 : (s.k1.closed && !s.k2.closed ? 1 : s.k2.closed && !s.k1.closed ? -1 : 0);
+      motorPU(s.m, supply, 1, dt, s.f.heavy ? 1e9 : 0.9);
+      if (s.f.heavy && supply) s.m.w = 0;                               // locked rotor
+      s.peakI = Math.max(s.peakI, s.m.I * IN);
+      // the worn seal-in contact: while the belt runs it springs open now and then (every 20–300 s; half of the gaps under 5 ms, up to 31 ms)
+      if (s.gap > 0) s.gap = Math.max(0, s.gap - dt);
+      if (o.gaps) for (const [t0, len] of o.gaps) if (s.t > t0 - dt && s.t <= t0) { s.gap = len; s.gaps++; }   // book figures: gaps at given times
+      if (s.f.auxbad && s.k1.closed && Math.abs(s.m.w) > 0.5 && s.gap === 0 && s.t >= s.nextGap) {
+        const u = s.rand(); s.gap = 1 + 30 * u * u * u; s.gaps++; s.nextGap = s.t + 20000 + 280000 * s.rand();
+      }
+      // book only: the operator presses forward again 8 s after the belt stopped by itself
+      if (o.operator) {
+        if (s.press > 0) s.press = Math.max(0, s.press - dt);
+        if (!s.k1.coil && s.press === 0 && s.restartAt < 0 && s.k1.closes > 0) s.restartAt = s.t + 8000;
+        if (s.restartAt >= 0 && s.t >= s.restartAt) { s.press = 300; s.restartAt = -1; }
+      }
+    },
+    read(s, n) {
+      switch (n) {
+        case "hazard": return s.hazard;
+        case "short": return s.shorts > 0;
+        case "Q1_Tripped": return s.blown;
+        case "speed": return Math.round(s.m.w * NSYNC);
+        case "current": return +(s.m.I * IN).toFixed(2);
+        case "peakCurrent": return +s.peakI.toFixed(2);
+        case "KM1_Main": return conducting(s.k1, s);
+        case "KM2_Main": return conducting(s.k2, s);
+        case "KM1_Closed": return s.k1.closed;
+        case "KM1_Moving": return s.k1.closed && !s.k1.coil && s.k1.off >= CLACK;   // the armature is on its way out (released, not yet open)
+        case "KM2_Closed": return s.k2.closed;
+        case "clacks": return s.k1.clacks;
+        case "drops": return s.k1.drops;
+        case "gaps": return s.gaps;
+        case "restarts": return s.k1.closes;
+        case "tripped": return s.m.tripped;
+      }
+      return undefined;
+    },
+    build3d(st, THREE) {
+      const K = kit3d(st, THREE);
+      const v = { K };
+      K.box(1.2, 0.05, 0.6, 0x57606a, 0.4, 0.5, 0);                              // base plate
+      v.motor = K.cyl(0.16, 0.42, 0x3d6f9e, 0.2, 0.72, 0, null, "x");
+      K.box(0.12, 0.08, 0.28, 0x3d6f9e, 0.2, 0.56, 0);
+      v.shaft = K.cyl(0.03, 0.3, 0x8c959f, 0.55, 0.72, 0, null, "x");
+      v.key = K.box(0.02, 0.12, 0.03, 0xd98c3a, 0.66, 0.72, 0);                // a mark on the coupling shows the rotation
+      v.fan = K.box(0.02, 0.26, 0.04, 0x24292f, -0.03, 0.72, 0);
+      K.label("M1", 0.2, 1.0, 0, 0.1);
+      K.box(0.9, 1.1, 0.12, 0xd0d7de, -0.9, 1.0, -0.2);                           // control cabinet
+      v.km1 = K.box(0.18, 0.24, 0.12, 0x8c959f, -1.1, 1.15, -0.08); K.label("KM1", -1.1, 1.38, -0.05, 0.08);
+      v.km2 = K.box(0.18, 0.24, 0.12, 0x8c959f, -0.8, 1.15, -0.08); K.label("KM2", -0.8, 1.38, -0.05, 0.08);
+      v.fu = K.box(0.36, 0.1, 0.1, 0xe6e6e6, -0.95, 0.8, -0.08); K.label("Q1", -0.95, 0.68, -0.05, 0.08);
+      v.f1 = K.lamp(0.035, 0xd98c3a, -0.6, 0.8, -0.08); K.label("F1", -0.6, 0.68, -0.05, 0.08);
+      K.camera([1.4, 1.9, 2.6], [-0.2, 0.85, 0]);
+      return v;
+    },
+    draw3d(v, s) {
+      v.km1.material = v.K.mat(s.k1.closed ? 0x2da44e : 0x8c959f);
+      v.km2.material = v.K.mat(s.k2.closed ? 0x2da44e : 0x8c959f);
+      v.fu.material = v.K.mat(s.blown ? 0xd1242f : 0xe6e6e6);
+      v.f1.userData.on(s.m.tripped);
+      v.ang = (v.ang || 0) + s.m.w * 0.9;
+      v.key.position.set(0.66, 0.72 + 0.04 * Math.cos(v.ang), 0.04 * Math.sin(v.ang)); v.key.rotation.x = -v.ang;
+      v.fan.rotation.x = v.ang;
+    },
+  };
+}
+
+function stardelta(o = {}) {
+  const io = [
+    { name: "S2_Stop", addr: "%IX0.0", dir: "in", comment: ["停止按钮 S2（常闭，按下为 0）", "Stop button S2 (NC, 0 when pressed)"] },
+    { name: "S1_Start", addr: "%IX0.1", dir: "in", comment: ["启动按钮 S1（常开）", "Start button S1 (NO)"] },
+    { name: "F1_OL", addr: "%IX0.3", dir: "in", comment: ["热继电器 F1 辅助触点（常闭，过载为 0）", "Overload relay F1 (NC, 0 on overload)"] },
+    { name: "KM1_Aux", addr: "%IX0.4", dir: "in", comment: ["主接触器 KM1 常开辅助触点", "Main contactor KM1 auxiliary (NO)"] },
+    { name: "KM2_Aux", addr: "%IX0.5", dir: "in", comment: ["星形接触器 KM2 常开辅助触点", "Star contactor KM2 auxiliary (NO)"] },
+    { name: "KM3_Aux", addr: "%IX0.6", dir: "in", comment: ["三角形接触器 KM3 常开辅助触点", "Delta contactor KM3 auxiliary (NO)"] },
+    { name: "KM1_Main", addr: "%QX0.0", dir: "out", comment: ["主接触器 KM1 线圈", "Main contactor KM1 coil"] },
+    { name: "KM2_Star", addr: "%QX0.1", dir: "out", comment: ["星形接触器 KM2 线圈", "Star contactor KM2 coil"] },
+    { name: "KM3_Delta", addr: "%QX0.2", dir: "out", comment: ["三角形接触器 KM3 线圈", "Delta contactor KM3 coil"] },
+  ];
+  const NSYNC = 1500, IN = 15.4;         // 7.5 kW, 4-pole, 380 V Δ
+  return {
+    io,
+    panel: [{ name: "S2_Stop", kind: "nc-push", label: ["停止 S2", "Stop S2"] }, { name: "S1_Start", kind: "push", label: ["启动 S1", "Start S1"] },
+            { name: "F1_Reset", kind: "push", label: ["热继电器复位", "Reset F1"] }, { name: "Q1_On", kind: "push", label: ["重新合上断路器 Q1", "Close breaker Q1 again"] }],
+    faults: [{ id: "weld2", name: ["KM2（星形）主触点熔焊", "KM2 (star) main contacts welded"] }],
+    reset(s, opt) {
+      s.f = (opt && opt.faults) || {}; s.t = 0; s.out = {}; s.k1 = contactor(); s.k2 = contactor(); s.k3 = contactor();
+      s.m = newMotor({ TL: o.TL || 0.7 }); s.rand = rng((opt && opt.seed) || 5); s.blown = false; s.hazard = false; s.why = ""; s.shorts = 0; s.peakI = 0;
+    },
+    inputs(s) { return { S2_Stop: true, F1_OL: !s.m.tripped, KM1_Aux: s.k1.closed, KM2_Aux: s.k2.closed, KM3_Aux: s.k3.closed }; },
+    step(dt, out, s, ins) {
+      s.t += dt; s.out = out;
+      if (ins) {
+        if (ins.F1_Reset && s.m.heat < 1.0) s.m.tripped = false;
+        if (ins.Q1_On && !s.lastQ1) s.blown = false;
+        s.lastQ1 = !!ins.Q1_On;
+      }
+      stepContactor(s.k1, !!out.KM1_Main, s, dt, s.rand, false);
+      stepContactor(s.k2, !!out.KM2_Star, s, dt, s.rand, s.f.weld2);
+      stepContactor(s.k3, !!out.KM3_Delta, s, dt, s.rand, false);
+      if (!s.blown && conducting(s.k1, s) && conducting(s.k2, s) && conducting(s.k3, s)) { s.blown = true; s.hazard = true; s.why = "short"; s.shorts++; }
+      const fed = !s.blown && s.k1.closed;
+      const scale = fed && s.k3.closed && !s.k2.closed ? 1 : fed && s.k2.closed && !s.k3.closed ? 1 / 3 : 0;
+      motorPU(s.m, scale ? 1 : 0, scale || 1, dt, 1.6);
+      s.peakI = Math.max(s.peakI, s.m.I * IN);
+    },
+    read(s, n) {
+      switch (n) {
+        case "hazard": return s.hazard;
+        case "short": return s.shorts > 0;
+        case "speed": return Math.round(s.m.w * NSYNC);
+        case "current": return +(s.m.I * IN).toFixed(1);
+        case "peakCurrent": return +s.peakI.toFixed(1);
+        case "KM1_Closed": return s.k1.closed;
+        case "KM2_Closed": return s.k2.closed;
+        case "KM3_Closed": return s.k3.closed;
+        case "KM2_Main": return conducting(s.k2, s);
+        case "KM3_Main": return conducting(s.k3, s);
+        case "tripped": return s.m.tripped;
+      }
+      return undefined;
+    },
+    build3d(st, THREE) {
+      const K = kit3d(st, THREE);
+      const v = { K };
+      K.box(1.4, 0.05, 0.7, 0x57606a, 0.5, 0.45, 0);
+      v.motor = K.cyl(0.24, 0.6, 0x3d6f9e, 0.3, 0.75, 0, null, "x");
+      v.fan = K.box(0.02, 0.4, 0.05, 0x24292f, -0.05, 0.75, 0);
+      v.key = K.box(0.02, 0.14, 0.03, 0xd98c3a, 0.85, 0.75, 0);
+      K.cyl(0.035, 0.4, 0x8c959f, 0.75, 0.75, 0, null, "x");
+      K.label("M1  7.5 kW", 0.3, 1.12, 0, 0.1);
+      K.box(1.2, 1.1, 0.12, 0xd0d7de, -1.0, 1.0, -0.2);
+      v.k = ["KM1", "KM2", "KM3"].map((n, i) => { K.label(n + ["", " Y", " Δ"][i], -1.35 + i * 0.35, 1.38, -0.05, 0.08); return K.box(0.2, 0.26, 0.12, 0x8c959f, -1.35 + i * 0.35, 1.15, -0.08); });
+      v.fu = K.box(0.4, 0.1, 0.1, 0xe6e6e6, -1.0, 0.8, -0.08); K.label("Q1", -1.0, 0.68, -0.05, 0.08);
+      K.camera([1.6, 2.0, 2.9], [-0.2, 0.85, 0]);
+      return v;
+    },
+    draw3d(v, s) {
+      [s.k1, s.k2, s.k3].forEach((k, i) => { v.k[i].material = v.K.mat(k.closed ? 0x2da44e : 0x8c959f); });
+      v.fu.material = v.K.mat(s.blown ? 0xd1242f : 0xe6e6e6);
+      v.ang = (v.ang || 0) + s.m.w * 0.9;
+      v.key.position.set(0.85, 0.75 + 0.05 * Math.cos(v.ang), 0.05 * Math.sin(v.ang)); v.fan.rotation.x = v.ang;
+    },
+  };
+}
+
+const API = { traffic, elevator, sorter, press, conveyor, reversing, stardelta, kit3d, rng };
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 else root.WQPLANTS = API;
 })(typeof window !== "undefined" ? window : globalThis);

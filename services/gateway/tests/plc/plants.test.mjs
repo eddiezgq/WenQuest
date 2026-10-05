@@ -197,3 +197,56 @@ test("feed conveyor: a bar travels to the end and the belt stops; stop, e-stop, 
   assert.equal(run(cv, naive, { id: "run", steps: [...start, { until: { B2_End: true }, within: 15000 }, { wait: 50 }, { expect: { KM1_Run: false } }] }).ok, false);
   assert.ok(!P.review({ st }, cv.io).some((x) => x.level === "error"));
 });
+
+// ------------------------------------------------ motor control circuits (Ch. 2): contactors with pick-up, drop-out and arc
+const run1 = (plant, st, t) => P.runTest({ io: plant.io, st, cycle: 1 }, plant, t);   // relay circuits: 1 ms scans
+test("reversing motor: the double interlock never shorts L1–L3; button interlock alone sometimes does, no interlock always", () => {
+  const fs = require("node:fs");
+  const st = fs.readFileSync(new URL("../../../../textbook/plc/ch02/code/p2_3_1.st", import.meta.url), "utf8");
+  const rv = W.reversing();
+  const F = [{ set: { S1_Fwd: true } }, { wait: 300 }, { set: { S1_Fwd: false } }];
+  const R = [{ set: { S3_Rev: true } }, { wait: 300 }, { set: { S3_Rev: false } }];
+  const S = [{ set: { S2_Stop: false } }, { wait: 300 }, { set: { S2_Stop: true } }];
+  const direct = { id: "direct", steps: [...F, { wait: 2000 }, ...R, { wait: 2000 }, { expect: { short: false, KM2_Closed: true, KM1_Closed: false } }] };
+  const button = st.replace(" AND NOT KM2_Aux", "").replace(" AND NOT KM1_Aux", "");
+  const none = button.replace(" AND NOT S3_Rev", "").replace(" AND NOT S1_Fwd", "");
+  let nb = 0, nn = 0;
+  for (let seed = 1; seed <= 40; seed++) {
+    ok(run1(rv, st, Object.assign({}, direct, { seed })));
+    if (!run1(rv, button, Object.assign({}, direct, { seed })).ok) nb++;
+    if (!run1(rv, none, Object.assign({}, direct, { seed })).ok) nn++;
+  }
+  assert.ok(nb > 0 && nb < 20, `button interlock only: ${nb}/40 shorts`);
+  assert.equal(nn, 40);
+  // KM1 welds on its second closing: the contactor interlock keeps KM2 out, the button interlock does not
+  const weld = { id: "weld", faults: { weld1: true }, steps: [...F, { wait: 2000 }, ...S, { wait: 2000 }, ...R, { wait: 2000 }, { expect: { KM2_Closed: true } },
+    ...S, { wait: 2000 }, ...F, { wait: 2000 }, ...R, { wait: 2000 }, { expect: { KM1_Closed: true, KM2_Closed: false, short: false } }] };
+  ok(run1(rv, st, weld));
+  assert.equal(run1(rv, button, weld).ok, false);
+  // a locked rotor trips the class-10 overload relay at 6.5 × in about 8.7 s
+  const r = run1(rv, st, { id: "ol", faults: { heavy: true }, steps: [...F, { until: { tripped: true }, within: 20000 }] });
+  ok(r);
+  assert.ok(r.time > 8000 && r.time < 9500, String(r.time));
+  // a seal-in contact that opens for 8 ms makes the armature clack; 16 ms drops the contactor
+  const g = W.reversing({ gaps: [[800, 8], [1600, 16]] });
+  const rg = P.runTest({ io: g.io, st, cycle: 1 }, g, { id: "gaps", steps: [...F, { wait: 1500 }] }, { final: ["clacks", "drops"] });
+  assert.deepEqual(rg.final, { clacks: 1, drops: 1 });
+  const io = new Set(rv.io.map((x) => x.name));
+  for (const p of rv.panel) assert.ok(io.has(p.name) || ["F1_Reset", "Q1_On"].includes(p.name), p.name);
+});
+
+test("star–delta: about a third of the direct starting current; the delta contactor waits for the star contactor", () => {
+  const fs = require("node:fs");
+  const st = fs.readFileSync(new URL("../../../../textbook/plc/ch02/code/p2_3_2.st", import.meta.url), "utf8");
+  const sd = W.stardelta();
+  const S1 = [{ set: { S1_Start: true } }, { wait: 300 }, { set: { S1_Start: false } }];
+  const r = P.runTest({ io: sd.io, st, cycle: 1 }, sd, { id: "sd", steps: [...S1, { wait: 3000 }, { expect: { KM2_Closed: true, KM3_Closed: false } },
+    { until: { KM3_Closed: true }, within: 3000 }, { wait: 200 }, { expect: { KM2_Closed: false, short: false } }] }, { final: ["peakCurrent", "speed"] });
+  ok(r);
+  const dol = st.replace("KM2_Star := KM1_Main AND NOT KT1.Q AND NOT KM3_Aux;", "KM2_Star := FALSE;").replace("(KT1.Q OR KM3_Aux) AND NOT KM2_Aux", "TRUE");
+  const rd = P.runTest({ io: sd.io, st: dol, cycle: 1 }, sd, { id: "dol", steps: [...S1, { wait: 3000 }] }, { final: ["peakCurrent"] });
+  const ratio = rd.final.peakCurrent / r.final.peakCurrent;
+  assert.ok(ratio > 2.3 && ratio < 3.2, String(ratio));
+  assert.ok(r.final.speed > 1440, String(r.final.speed));
+  ok(P.runTest({ io: sd.io, st, cycle: 1 }, sd, { id: "weld", faults: { weld2: true }, steps: [...S1, { wait: 8000 }, { expect: { KM3_Closed: false, short: false } }] }));
+});

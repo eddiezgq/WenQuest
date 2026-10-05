@@ -1,0 +1,35 @@
+# 工程任务单 TS-2-1（配 2.1–2.6 节，第一篇篇首项目的第一个里程碑）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-2-1
+标题: [上料输送线的继电器控制电路设计, "Relay control circuit of the feed conveyor"]
+角色: [电气设计工程师, electrical design engineer]
+背景:
+  - "问渠减速器厂的上料输送线（1.1 节）要先做一版继电器控制，作为改 PLC 之前的基准方案，也供维修电工看懂现有设备。你负责出电路图和元件清单。控制要求见 1.1 节：启动 S1、停止 S2、急停 S0、热继电器 F1 过载停机；棒料到末端光电开关 B2 自动停；电机转了 20 s 棒料还没到末端判为卡料，停机并亮红灯 H2，按启动复位；过载时 H2 也亮；运行时绿灯 H1 亮。另加一条：卡料时允许按住反转按钮 S3 点动退料（松开即停），退料与正转之间要有双重互锁。"
+  - "The WenQuest gearbox plant first wants a relay version of the feed conveyor control (Section 1.1), as the baseline before the PLC and so that maintenance electricians can read the existing machine. You draw the circuit diagrams and the parts list. Requirements as in Section 1.1: start S1, stop S2, e-stop S0, overload F1; stop when the bar reaches end sensor B2; jam alarm after 20 s of running without reaching B2 (stop, red lamp H2, reset with start); H2 also on overload; green H1 while running. One addition: while jammed the operator may hold reverse button S3 to jog the belt backwards (stops on release), with a double interlock between jogging back and running forward."
+输入:
+  - {名称: [控制要求, "Control requirements"], 来源: [教材 1.1 节与本任务单, "Section 1.1 and this sheet"]}
+  - {名称: [电动机铭牌：0.75 kW、400 V、1.9 A、四极, "Motor nameplate: 0.75 kW, 400 V, 1.9 A, 4-pole"], 来源: [2.1 节, "Section 2.1"]}
+  - {名称: [图形符号与代号, "Graphical symbols and designations"], 来源: [图 2.2.1、2.4 节、本书符号约定, "Fig. 2.2.1, Section 2.4, the book's conventions"]}
+  - {名称: [典型电路, "Typical circuits"], 来源: [图 2.1.1、2.3.1、2.3.2, "Figs. 2.1.1, 2.3.1, 2.3.2"]}
+交付物:
+  - {名称: [电路图（主电路与控制电路）, "Circuit diagrams (power and control)"], 格式: [pdf], 验收: [符号按 GB/T 4728 / IEC 60617，代号与图 2.2.1 一致；控制电路 DC 24 V；每条通路编号，线圈下标注其触点所在的通路；端子号（13-14、11-12、A1-A2、95-96）标全, "Symbols to GB/T 4728 / IEC 60617, designations as in Fig. 2.2.1; control at DC 24 V; numbered current paths, with each coil's contact locations noted; all terminal numbers (13-14, 11-12, A1-A2, 95-96) shown"]}
+  - {名称: [元件清单, "Parts list"], 格式: [xlsx], 验收: [每个器件一行：代号、名称、型号规格、数量、整定值或额定值、选型依据（如 KM1 的 AC-3 额定电流、F1 的整定电流、Q1 的脱扣特性、KT1 的延时范围、按钮和指示灯的颜色）, "One row per device: designation, name, type, quantity, setting or rating, and the reason (e.g. KM1's AC-3 current, F1's setting, Q1's tripping characteristic, KT1's range, button and lamp colors)"]}
+  - {名称: [端子图, "Terminal diagram"], 格式: [xlsx, pdf], 验收: [现场器件（按钮盒、B2、电动机）经端子排 X1 接入，每个端子写清柜内、现场两端和电缆芯号, "Field devices (button box, B2, motor) via terminal strip X1; each terminal with its inside and field ends and the cable core"]}
+  - {名称: [设计说明（1 页）, "Design note (1 page)"], 格式: [docx, pdf], 验收: [说明自锁、双重互锁、卡料报警各靠哪几个触点实现；列出至少 3 条你用来检查电路的“如果……会怎样”（例如 B2 断线、急停按下时按启动）, "Explain which contacts give the seal-in, the double interlock and the jam alarm; list at least 3 'what if' checks you made (e.g. B2 wire broken, start pressed with the e-stop down)"]}
+工位: [CAD, PLM, ERP]
+步骤:
+  - ["列出器件：输入（按钮、B2、F1 的辅助触点）、输出（KM1、KM2、H1、H2）、中间器件（KT1、KA2），确定代号。", "List the devices: inputs (buttons, B2, F1 contacts), outputs (KM1, KM2, H1, H2), auxiliaries (KT1, KA2), with designations."]
+  - ["画主电路：Q1、KM1（正转）、KM2（反转，对调 L1、L3）、F1、M1；算额定电流和启动电流，选 Q1、KM1、KM2、F1。", "Draw the power circuit: Q1, KM1 (forward), KM2 (reverse, L1/L3 swapped), F1, M1; compute rated and starting current; select Q1, KM1, KM2, F1."]
+  - ["画控制电路：先画正转（自锁、停止、急停、过载、B2），再加卡料报警（KT1 计时、KA2 记住），再加点动退料与双重互锁，最后画指示灯。", "Draw the control circuit: forward run first (seal-in, stop, e-stop, overload, B2), then the jam alarm (KT1 times, KA2 remembers), then the reverse jog with the double interlock, then the lamps."]
+  - ["对每一条要求，在电路图上走一遍电流：哪条通路通、哪条断；把走查记录写进设计说明。可选：把控制电路写成逻辑式，在 PLC 实验台的输送线上跑一遍（2.5 节）。", "Walk each requirement through the diagram: which paths conduct, which are open; record the walk-through in the design note. Optional: write the control circuit as logic and run it on the bench's conveyor (Section 2.5)."]
+  - ["编元件清单和端子图，在平台上提交，经审批发布（与机械图纸的发布流程相同）。", "Compile the parts list and terminal diagram; submit them on the platform for review and release (as with mechanical drawings)."]
+评审要点:
+  - ["〔老师检查〕急停和停止都能在任何状态下断开 KM1、KM2；急停按下时按启动无效。", "[Teacher] E-stop and stop break KM1 and KM2 in every state; start does nothing with the e-stop down."]
+  - ["〔老师检查〕正转与退料之间有按钮互锁和接触器互锁；退料是点动（没有自锁）。", "[Teacher] Button and contactor interlocks between forward and jog-back; jogging back has no seal-in."]
+  - ["〔老师检查〕卡料报警记得住（KA2 自锁），并且只能由启动按钮复位；复位后能再次启动。", "[Teacher] The jam alarm latches (KA2 seal-in) and only start resets it; the belt can be restarted after the reset."]
+  - ["〔老师检查〕F1 整定电流、KM 的 AC-3 额定电流、Q1 的脱扣特性与 2.1、2.2 节的计算一致；按钮、指示灯颜色符合 IEC 60204-1。", "[Teacher] F1 setting, KM AC-3 ratings and Q1's characteristic agree with Sections 2.1–2.2; button and lamp colors follow IEC 60204-1."]
+评分:
+  - {项: [电路图, Circuit diagrams], 分: 45, 标准: [功能完整、互锁正确、符号与代号规范、端子号齐全, "Complete function, correct interlocks, standard symbols and designations, terminal numbers"]}
+  - {项: [元件清单, Parts list], 分: 25, 标准: [选型有依据，整定值正确, "Grounded selection, correct settings"]}
+  - {项: [端子图, Terminal diagram], 分: 10, 标准: [与电路图一致, "Agrees with the circuit diagram"]}
+  - {项: [设计说明, Design note], 分: 20, 标准: [走查具体，至少 3 条“如果……会怎样”, "Concrete walk-through, at least 3 what-ifs"]}
+学时: 4

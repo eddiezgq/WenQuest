@@ -1,0 +1,44 @@
+# 实验 2.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、任务取自 lab2_3.js。
+原理:
+  - ["梯形图的一级就是电路图里的一条电流通路横过来画：触点串联是“与”，并联是“或”，常闭触点是“非”（2.5 节）。实验台把它按 1 ms 一次的扫描执行，比接触器的动作快一个数量级，近似继电器电路里各支路同时通电。",
+     "A rung of a ladder diagram is a current path of the circuit diagram turned sideways: series is AND, parallel is OR, an NC contact is NOT (Section 2.5). The bench scans it every 1 ms, an order of magnitude faster than a contactor, which approximates a relay circuit where all paths conduct at once."]
+  - ["接触器的辅助触点在实验台上是输入 KM1_Aux、KM2_Aux（吸合为 1）。电路图里 KM2 的常闭辅助触点，在梯形图里画成 KM2_Aux 的常闭触点。停止按钮 S2 和热继电器 F1 是常闭触点接到输入的：不动作时输入为 1，所以在梯形图里画常开触点。",
+     "On the bench the auxiliary contacts are inputs KM1_Aux, KM2_Aux (1 when closed). KM2's NC auxiliary contact of the circuit diagram becomes an NC contact of KM2_Aux. Stop S2 and overload F1 are NC contacts wired to inputs: 1 when not operated, so the ladder uses NO contacts for them."]
+  - ["虚拟接触器：线圈通电约 20 ms 后主触点闭合；断电约 12 ms 后打开，打开时电弧还要烧 0–10 ms。两个接触器的主触点同时导通，L1、L3 就经两个接触器短路，断路器 Q1 跳闸。",
+     "The virtual contactors close about 20 ms after the coil is energised, open about 12 ms after it is switched off, and the arc burns 0–10 ms more. If both contactors conduct at once, L1 and L3 are short-circuited and breaker Q1 trips."]
+  - 式: "KM1_Fwd := (S1_Fwd OR KM1_Aux) AND NOT S3_Rev AND NOT KM2_Aux AND S2_Stop AND F1_OL"
+步骤:
+  - ["打开实验 2.3，在“I/O 与监视”页认识 6 个输入、2 个输出，填表 1。",
+     "Open Lab 2.3; on the I/O & watch page identify the 6 inputs and 2 outputs; fill in Table 1."]
+  - ["第 1 步：起始程序已经画好正转一级（还没有互锁）。编译下载、运行，按 S1、按 S2，观察三维画面里接触器和电动机。运行测试。",
+     "Step 1: the starting program has the forward rung (no interlocks yet). Compile, download, run; press S1, then S2; watch the contactors and the motor. Run the tests."]
+  - ["第 2 步：照正转一级画出反转一级（S3、KM2_Aux、KM2_Rev）。停下后按 S3，电动机反转。运行测试。",
+     "Step 2: draw the reverse rung like the forward one (S3, KM2_Aux, KM2_Rev). After a stop, S3 reverses the motor. Run the tests."]
+  - ["第 3 步：正转时直接按 S3，记录现象；按“重新合上断路器 Q1”恢复。再同时按 S1、S3 试一次。",
+     "Step 3: press S3 while running forward and record what happens; close Q1 again. Try S1 and S3 together."]
+  - ["第 4 步：在两级里各加上对方按钮的常闭触点（按钮互锁）和对方接触器辅助触点的常闭触点（接触器互锁）。再做第 3 步，运行全部测试，记录在表 2。",
+     "Step 4: add the other button's NC contact (button interlock) and the other contactor's NC auxiliary contact (contactor interlock) to each rung. Repeat step 3; run all tests; record in Table 2."]
+  - ["第 5 步：注入“KM1 主触点熔焊”（第二次吸合时粘住），运行测试“KM1 主触点熔焊后按 S3”，记录结果。",
+     "Step 5: inject 'KM1 welds' (it sticks on the second closing); run the test 'KM1 welded, S3 pressed' and record."]
+  - ["第 6 步（比较）：只保留按钮互锁、去掉接触器互锁，在操作面板上做 10 次“正转运行中直接按 S3”（每次 Q1 跳闸后重新合上），记录短路几次；再运行熔焊测试。最后恢复双重互锁。",
+     "Step 6 (comparison): keep only the button interlock; on the panel, reverse directly while running forward 10 times (close Q1 again after each trip) and count the shorts; run the weld test. Then restore the double interlock."]
+数据表:
+  - 标题: ["表 1  I/O 点", "Table 1  I/O points"]
+    表头: ["I/O 点", "地址", "接的是什么触点（常开 / 常闭）", "不操作时的值"]
+    表头英文: ["Point", "Address", "Contact wired (NO / NC)", "Value at rest"]
+    行: [["S1_Fwd", "", "", ""], ["S2_Stop", "", "", ""], ["S3_Rev", "", "", ""], ["F1_OL", "", "", ""], ["KM1_Aux", "", "", ""], ["KM2_Aux", "", "", ""]]
+  - 标题: ["表 2  三种互锁做法的测试结果", "Table 2  Test results of three interlock designs"]
+    表头: ["做法", "直接换向 10 次中短路的次数", "S1、S3 同时按", "KM1 熔焊后按 S3"]
+    表头英文: ["Design", "Shorts in 10 direct reversals", "S1 and S3 together", "S3 with KM1 welded"]
+    行: [["不互锁", "", "", ""], ["只有按钮互锁", "", "", ""], ["双重互锁", "", "", ""]]
+    行英文: [["No interlock", "", "", ""], ["Button interlock only", "", "", ""], ["Double interlock", "", "", ""]]
+注意:
+  - ["梯形图编辑：点格子放元件，竖线把两行连成并联；每次改完按“编译并下载”。也可以切到 ST 用逻辑式写（程序 2.3.1）。",
+     "Ladder editing: click a cell to place an element; a vertical link makes a parallel branch; compile and download after each change. You may also write it in ST as logic (Program 2.3.1)."]
+  - ["Q1 跳闸后电动机不再得电，要按“重新合上断路器 Q1”；热继电器动作后要等它冷却一会儿才能复位。",
+     "After Q1 trips the motor gets no power until Q1 is closed again; after F1 trips, wait for it to cool before resetting."]
+  - ["这是仿真。真实的电动机上不要做“拆掉互锁”的试验：相间短路会烧坏触点，电弧会伤人。",
+     "This is a simulation. Never remove interlocks on a real motor: a phase-to-phase short burns contacts and the arc can injure."]
+思考题:
+  - ["只有按钮互锁、没有接触器互锁时，正转中直接按 S3 有时短路、有时不短路。为什么？什么情况下一定短路？", "With the button interlock alone, pressing S3 while running forward sometimes shorts and sometimes does not. Why? When does it always short?"]
+  - ["电路图里 KM2 的互锁触点是“常闭”的，而实验台的输入 KM2_Aux 来自 KM2 的常开辅助触点。两者在逻辑上为什么等价？在现场为什么最好真用常闭触点？", "In the circuit diagram KM2's interlock contact is NC, while the bench input KM2_Aux comes from an NO contact. Why are they logically equivalent? Why is a real NC contact better in the field?"]

@@ -219,3 +219,22 @@
 18,PackML,PackML,
 18,变更管理,change management,
 18,代码评审,code review,
+2,额定电流,rated current,
+2,启动电流,starting current,
+2,直接断开,positive opening operation,IEC 60947-5-1 附录 K
+2,脱扣特性,tripping characteristic,
+2,使用类别,utilization category,IEC 60947-4-1：AC-1、AC-3、AC-4
+2,吸合时间,closing time; pick-up time,
+2,释放时间,opening time; drop-out time,
+2,电弧,electric arc,
+2,触点熔焊,contact welding,
+2,失压保护,no-volt protection,
+2,竞争,race (contact race),
+2,相间短路,phase-to-phase short circuit,
+2,按钮互锁,push-button interlock,
+2,接触器互锁,contactor interlock,
+2,双重互锁,double interlock,
+2,机械互锁,mechanical interlock,
+2,反接制动,plugging; plug braking,
+2,电路图,circuit diagram,国内常叫电气原理图
+2,保护导体,protective conductor (PE),

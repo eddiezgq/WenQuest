@@ -18,6 +18,9 @@ chapters:
   1:
     status: ai
     title_en: "PLCs and Industrial Automation"
+  2:
+    status: ai
+    title_en: "Electrical Control Fundamentals"
   15:
     status: ai
     title_en: "Sequential Control Design"
