@@ -1,0 +1,17 @@
+# 实验 14.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab14_5.js。
+原理:
+  - ["二维高斯误差的协方差 Σ 对称正定。误差 x 落在椭圆 xᵀΣ⁻¹x ≤ c 内的概率由 c 决定，c = 5.991 时为 95%（自由度 2 的卡方分布）。", "The covariance Σ of a 2D Gaussian error is symmetric positive definite. The probability that x lies inside xᵀΣ⁻¹x ≤ c depends only on c; c = 5.991 gives 95% (chi-square with 2 degrees of freedom)."]
+  - 式: "Σ = Q diag(λ_max, λ_min) Qᵀ；  在主轴坐标下 u²/λ₁ + v²/λ₂ ≤ c；  半轴 √(c λ_max)、√(c λ_min)"
+  - ["主轴定理：Σ 的特征向量是椭圆的主轴，√λ 是沿主轴方向的标准差。ρ ≠ 0 时主轴相对坐标轴倾斜。", "Principal axes theorem: the eigenvectors of Σ are the ellipse's axes and √λ is the standard deviation along them. With ρ ≠ 0 the axes are tilted."]
+步骤:
+  - ["σx = 2、σy = 1.7（接近算例 14.5.2 的协方差），ρ 取 −0.6、0、0.6、0.9，按表 1 记录特征值、长轴方向和椭圆内的样本数。", "With σx = 2 and σy = 1.7 set ρ to −0.6, 0, 0.6, 0.9 and record the eigenvalues, the long-axis direction and the samples inside in Table 1."]
+  - ["完成任务 1～3，记录每种情况下的协方差矩阵。", "Complete tasks 1–3 and record the covariance matrix in each case."]
+数据表:
+  - 标题: ["表 1  相关系数与误差椭圆（σx = 2、σy = 1.7）", "Table 1  Correlation and error ellipse (σx = 2, σy = 1.7)"]
+    表头: ["ρ", "λ_max, λ_min / cm²", "长轴方向 / °", "95% 半轴 / cm", "椭圆内样本数"]
+    表头英文: ["ρ", "λ_max, λ_min / cm²", "Long axis / °", "95% semi-axes / cm", "Samples inside"]
+    行: [["−0.6", "", "", "", ""], ["0", "", "", "", ""], ["0.6", "", "", "", ""], ["0.9", "", "", "", ""]]
+注意:
+  - ["样本是固定的 1000 个随机数经变换得到的，所以椭圆内的样本数在 95% 附近波动，不会恰好是 950。", "The samples come from a fixed set of 1000 random numbers, so the count inside fluctuates around 95% rather than being exactly 950."]
+思考题:
+  - ["机器人规划路径时，常要求“95% 椭圆不碰到障碍物”。在走廊里，椭圆的长轴沿走廊方向有什么好处或坏处？", "Planners often require the 95% ellipse to stay clear of obstacles. In a corridor, is a long axis along the corridor good or bad, and why?"]

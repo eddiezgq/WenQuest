@@ -1,0 +1,23 @@
+# 实验 14.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab14_2.js。
+原理:
+  - ["平面两连杆臂的关节有弹性（关节刚度 k₁、k₂）。末端受力 F 时，关节转过 Δq = K_q⁻¹ Jᵀ F，末端位移 d = J Δq = C F，柔度矩阵 C = J K_q⁻¹ Jᵀ 是对称的，刚度矩阵 K_x = C⁻¹。", "The joints of a planar two-link arm are elastic (stiffness k₁, k₂). A tip force F turns the joints by Δq = K_q⁻¹ Jᵀ F and moves the tip by d = J Δq = C F; the compliance C = J K_q⁻¹ Jᵀ is symmetric and the stiffness is K_x = C⁻¹."]
+  - 式: "C = Q diag(c_soft, c_stiff) Qᵀ；  主刚度 1/c；  沿主轴推时 d 与 F 同向；  各向同性 ⇔ 两个主刚度相等"
+  - ["由谱定理，C 的两个特征向量互相垂直，是末端的软轴和硬轴；沿主轴推，位移与推力同向，其余方向位移偏向软轴。各个方向施加同样大小的力，位移的端点组成以主轴为轴的椭圆。", "By the spectral theorem the two eigenvectors of C are perpendicular: the soft and stiff axes. Along an axis the deflection follows the push; otherwise it swerves toward the soft axis. Equal pushes in all directions give deflection tips on an ellipse with these axes."]
+步骤:
+  - ["姿态 (0°, 90°)、k₂ = 1000：改变推力方向 φ，按表 1 记录位移和位移与推力的夹角；找出最软的方向（任务 1）。", "Pose (0°, 90°), k₂ = 1000: vary φ and record the deflection and its angle to the push in Table 1; find the softest direction (task 1)."]
+  - ["把 q₁ 转到 60°（任务 2），记录主刚度和软轴方向的变化。", "Turn q₁ to 60° (task 2); record how the principal stiffnesses and the soft axis change."]
+  - ["保持 k₂ = 1000，q₂ 取 30°、60°、90°、120°、150°，按表 2 记录主刚度；找出最软方向也超过 10000 N/m 的姿态（任务 3）。再同时调 q₂ 和 k₂，找出各向同性的组合（任务 4）。", "Keep k₂ = 1000 and set q₂ to 30°, 60°, 90°, 120°, 150°, recording the principal stiffnesses in Table 2; find a pose whose softest direction exceeds 10000 N/m (task 3). Then tune q₂ and k₂ together for an isotropic tip (task 4)."]
+数据表:
+  - 标题: ["表 1  推力方向与位移（姿态 (0°, 90°)，k₂ = 1000）", "Table 1  Push direction and deflection (pose (0°, 90°), k₂ = 1000)"]
+    表头: ["φ / °", "位移 d / mm", "|d| / mm", "夹角 / °"]
+    表头英文: ["φ / °", "Deflection d / mm", "|d| / mm", "Angle / °"]
+    行: [["0", "", "", ""], ["90", "", "", ""], ["147", "", "", ""], ["237", "", "", ""], ["270", "", "", ""]]
+  - 标题: ["表 2  姿态与主刚度（k₂ = 1000）", "Table 2  Pose and principal stiffness (k₂ = 1000)"]
+    表头: ["q₂ / °", "软 / (N/m)", "硬 / (N/m)", "比值", "软轴方向 / °"]
+    表头英文: ["q₂ / °", "Soft / (N/m)", "Stiff / (N/m)", "Ratio", "Soft axis / °"]
+    行: [["30", "", "", "", ""], ["60", "", "", "", ""], ["90", "", "", "", ""], ["120", "", "", "", ""], ["150", "", "", "", ""]]
+注意:
+  - ["模型只计关节的弹性，连杆当作刚体；实际机械臂的连杆和底座也会变形。", "Only joint elasticity is modelled; links are rigid. Real links and bases also deform."]
+  - ["q₂ 接近 0° 或 180° 时手臂接近奇异位形，某个方向的刚度极大（几乎推不动），另一方向仍有限。", "Near q₂ = 0° or 180° the arm is close to singular: one direction becomes extremely stiff while the other stays finite."]
+思考题:
+  - ["精加工时尺寸误差主要来自法向（切深方向）的变形；抛光时却希望工具在法向能贴合工件。两种工序分别应当怎样选择姿态？", "In finishing, dimensional error comes mainly from deflection along the surface normal (depth of cut); in polishing you want the tool to comply along the normal. How should the pose be chosen in each case?"]

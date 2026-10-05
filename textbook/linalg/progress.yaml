@@ -50,6 +50,9 @@ chapters:
   13:
     status: ai
     title_en: "Eigenvalues and Eigenvectors"
+  14:
+    status: ai
+    title_en: "Symmetric Matrices and the Spectral Theorem"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"
