@@ -1,0 +1,38 @@
+# 实验 17.1 的指导书与报告模板。目的、场景、参数、任务取自 lab17_1.js。
+原理:
+  - ["一项任务由 m 个数 x = f(θ) 描述，关节数 n > m 时机器人对这项任务是冗余的，冗余度 r = n − m。平面 3R 臂只管末端位置时 n = 3、m = 2、r = 1。",
+     "A task is described by m numbers x = f(θ); with n > m joints the robot is redundant for it, with degree of redundancy r = n − m. A planar 3R arm that only cares about the tip position has n = 3, m = 2, r = 1."]
+  - 式: ["Θ(x_d) = {θ : f(θ) = x_d}，在 J 满秩处是 n − m 维的光滑曲面，切空间为 N(J)          (17.1.4)", "Θ(x_d) = {θ : f(θ) = x_d}, a smooth (n − m)-dimensional surface where J has full rank, with tangent space N(J)          (17.1.4)"]
+  - ["以工具朝向 φ 为参数：腕点 w = p − l₃(cos φ, sin φ)，对每个 φ 用 2R 臂的解析解求出两组 θ₁、θ₂，再由 θ₃ = φ − θ₁ − θ₂ 得到第三个关节角。腕点必须在 2R 臂的圆环 [|l₁ − l₂|, l₁ + l₂] 以内。",
+     "Use the tool direction φ as the parameter: the wrist is w = p − l₃(cos φ, sin φ); for each φ the analytic 2R solution gives two pairs θ₁, θ₂, and θ₃ = φ − θ₁ − θ₂. The wrist must lie in the 2R annulus [|l₁ − l₂|, l₁ + l₂]."]
+  - ["冗余度为 1、关节都是转动关节时，自运动流形由若干条闭曲线组成（定理 17.1.1）。闭曲线的条数只在逆解集中出现奇异位形时改变；对只管位置的平面 3R 臂，临界距离为 |l₁ ± l₂ ± l₃|。",
+     "With one degree of redundancy and revolute joints, the self-motion manifold consists of closed curves (Theorem 17.1.1). Their number changes only when the inverse set contains a singular configuration; for the planar 3R arm and a position task the critical distances are |l₁ ± l₂ ± l₃|."]
+步骤:
+  - ["打开实验 17.1，场景“平面 3R 臂只管位置”，目标取 A = (0.5, 0.3) m。读出闭曲线的条数和可行的 φ 范围。分支取 0，按“开始”，看手臂走完一整圈（任务 1），记下右图中两条闭曲线的大致范围，填入表 1。",
+     "Open Lab 17.1, scene “Planar 3R arm, position only”, goal A = (0.5, 0.3) m. Read the number of closed curves and the feasible φ. With branch 0 press “Start” and watch the arm go once round (task 1); note the rough extent of the two closed curves in the right plot in Table 1."]
+  - ["目标改为 B = (0.75, 0.10) m，读出可行的 φ 范围，与式 (14.2.10) 比较。按“开始”，观察手臂在 θ₂ = 0 处从一族走到另一族（任务 2）。",
+     "Change the goal to B = (0.75, 0.10) m, read the feasible φ and compare with Eq. (14.2.10). Press “Start” and watch the arm pass from one family to the other at θ₂ = 0 (task 2)."]
+  - ["把目标放在 x 轴上，x 依次取 0.05、0.10、0.30、0.75、0.95 m，记录闭曲线的条数，与表 17.1.2 比较（任务 3、4），填入表 2。",
+     "Put the goal on the x axis at x = 0.05, 0.10, 0.30, 0.75 and 0.95 m in turn, record the number of closed curves and compare with Table 17.1.2 (tasks 3 and 4) in Table 2."]
+  - ["切换到“手指按住门铃”，改变手的朝向 φ 和分支，找到肘部最高的形态（任务 5），记录 φ、分支和肘高。",
+     "Switch to “A finger on a doorbell”, change the hand direction φ and the branch, and find the configuration with the highest elbow (task 5); record φ, the branch and the elbow height."]
+数据表:
+  - 标题: ["表 1  目标 A、B 的自运动流形", "Table 1  The self-motion manifolds of goals A and B"]
+    表头: ["目标", "d / m", "闭曲线条数", "可行的 φ 范围 / (°)", "θ₁ 的范围 / (°)", "θ₂ 的范围 / (°)"]
+    表头英文: ["Goal", "d / m", "Closed curves", "Feasible φ / (°)", "Range of θ₁ / (°)", "Range of θ₂ / (°)"]
+    行: [["A (0.5, 0.3)", "", "", "", "", ""], ["B (0.75, 0.10)", "", "", "", "", ""]]
+  - 标题: ["表 2  闭曲线的条数与目标距离", "Table 2  Number of closed curves and the goal distance"]
+    表头: ["x / m", "d / m", "闭曲线条数", "与哪个临界距离有关"]
+    表头英文: ["x / m", "d / m", "Closed curves", "Related critical distance"]
+    行: [["0.05", "", "", ""], ["0.10", "", "", ""], ["0.30", "", "", ""], ["0.75", "", "", ""], ["0.95", "", "", ""]]
+  - 标题: ["表 3  按住门铃时肘部的高度", "Table 3  Elbow height with a finger on the bell"]
+    表头: ["分支", "φ / (°)", "肘部比肩高 / m", "是否最高"]
+    表头英文: ["Branch", "φ / (°)", "Elbow above shoulder / m", "Highest?"]
+    行: [["0", "", "", ""], ["1", "", "", ""]]
+注意:
+  - ["右图是三维关节空间中的曲线在 (θ₁, θ₂) 平面上的投影；θ₃ 没有画出。角度都化到 ±180° 以内，曲线跨过 ±180° 时会在图的边上断开再接上。",
+     "The right plot is the projection of a curve in the three-dimensional joint space onto the (θ₁, θ₂) plane; θ₃ is not shown. Angles are wrapped to ±180°, so a curve crossing ±180° breaks at the edge of the plot and continues on the other side."]
+  - ["闭曲线的条数由 720 个 φ 的取值统计；目标恰好在临界距离附近时，统计可能不准。", "The number of closed curves is counted from 720 values of φ; right at a critical distance the count may be off."]
+思考题:
+  - ["表 17.1.2 中 d 从 0.10 m 增大到 0.30 m 时，闭曲线由一条变为两条。在这个过程中，是哪一个奇异位形出现在逆解集中？它对应的三根连杆是怎样排列的？",
+     "In Table 17.1.2, as d grows from 0.10 m to 0.30 m one closed curve becomes two. Which singular configuration appears in the inverse set on the way? How are the three links arranged in it?"]

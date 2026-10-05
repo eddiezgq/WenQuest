@@ -1,0 +1,39 @@
+# 实验 17.3 的指导书与报告模板。目的、场景、参数、任务取自 lab17_3.js。
+原理:
+  - ["冗余度分解：主任务（末端不动）之外的要求都放在主任务的零空间里，零空间中的关节运动不改变末端（定理 2.6.5）。",
+     "Redundancy resolution: every wish beyond the primary task (tip fixed) is pursued in the primary task's null space, where joint motion does not change the tip (Theorem 2.6.5)."]
+  - 式: ["θ̇ = J⁺(ẋ_d + K_p e) − k_H N∇H，N = I − J⁺J          (17.3.1)", "θ̇ = J⁺(ẋ_d + K_p e) − k_H N∇H,  N = I − J⁺J          (17.3.1)"]
+  - ["末端不动时，梯度投影使 H 单调减小，停在 ∇H = Jᵀλ（拉格朗日条件）的地方，即 H 在自运动流形上的驻点（定理 17.3.1）。这是局部的方法，只能找到最近的驻点。",
+     "With the tip still, gradient projection decreases H monotonically and stops where ∇H = Jᵀλ (the Lagrange condition), a stationary point of H on the self-motion manifold (Theorem 17.3.1). It is a local method and finds only the nearest one."]
+  - 式: ["ḋ = aθ̇ − uᵀȯ，a = uᵀJ_y；d < d_a 时 θ̇ = θ̇₁ + (aN)ᵀ[(aN)(aN)ᵀ + λ_o²]⁻¹(uᵀȯ + K_d(d_a − d) − aθ̇₁)          (17.3.6)、(17.3.7)",
+         "ḋ = aθ̇ − uᵀȯ, a = uᵀJ_y; for d < d_a, θ̇ = θ̇₁ + (aN)ᵀ[(aN)(aN)ᵀ + λ_o²]⁻¹(uᵀȯ + K_d(d_a − d) − aθ̇₁)          (17.3.6), (17.3.7)"]
+  - ["避障把“手臂到障碍物的距离”当作一维的次任务：uᵀȯ 抵消障碍物的接近，K_d(d_a − d) 把距离推回激活距离。aN = 0 时零空间里没有能改变距离的运动，这是算法奇异，阻尼 λ_o 防止关节速度过大。",
+     "Obstacle avoidance treats the arm-to-obstacle distance as a one-dimensional subtask: uᵀȯ cancels the obstacle's approach and K_d(d_a − d) pushes the distance back to the activation distance. When aN = 0 no null-space motion can change the distance, an algorithmic singularity; the damping λ_o keeps the joint speeds bounded."]
+步骤:
+  - ["打开实验 17.3，场景“平面 3R 臂的次要任务”，φ₀ = −60°。次要任务取 0，按“开始”，记录最小距离和末端误差（任务 1），填入表 1。",
+     "Open Lab 17.3, scene “Secondary tasks of a planar 3R arm”, φ₀ = −60°. With secondary task 0 press “Start” and record the minimum distance and the tip error (task 1) in Table 1."]
+  - ["次要任务取 1，激活距离 d_a 依次取 0.10、0.05、0.03、0.01 m，各运行一次，记录最小距离、末端误差和肘点路径的形状（任务 2、3）。",
+     "With secondary task 1 run with d_a = 0.10, 0.05, 0.03 and 0.01 m in turn; record the minimum distance, the tip error and the shape of the elbow path (tasks 2 and 3)."]
+  - ["次要任务取 2，φ₀ = −60°，增益 k 依次取 2、5、10，记录关节 1 最终离上限的距离（任务 4），填入表 2。",
+     "With secondary task 2 and φ₀ = −60°, set the gain k = 2, 5, 10 in turn and record how far joint 1 ends below its upper limit (task 4) in Table 2."]
+  - ["次要任务取 3，φ₀ 分别取 150° 和 −30°，k = 20，记录可操作度的起始值和终了值（任务 5）。哪一个起点的可操作度几乎没有提高？为什么？",
+     "With secondary task 3, φ₀ = 150° and −30°, k = 20, record the start and final manipulability (task 5). For which start does it hardly improve, and why?"]
+  - ["切换到“端着水杯在门口让路”，模式 0、1 各运行一次，记录最小距离和杯子的误差（任务 6）。",
+     "Switch to “Holding a cup in a doorway”; run modes 0 and 1 and record the minimum distance and the cup error (task 6)."]
+数据表:
+  - 标题: ["表 1  避障：激活距离的影响（φ₀ = −60°）", "Table 1  Obstacle avoidance: effect of the activation distance (φ₀ = −60°)"]
+    表头: ["次要任务", "d_a / m", "最小距离 / m", "末端最大误差 / mm"]
+    表头英文: ["Secondary task", "d_a / m", "Minimum distance / m", "Largest tip error / mm"]
+    行: [["0 无", "—", "", ""], ["1 避障", "0.10", "", ""], ["1 避障", "0.05", "", ""], ["1 避障", "0.03", "", ""], ["1 避障", "0.01", "", ""]]
+    行英文: [["0 none", "—", "", ""], ["1 obstacle", "0.10", "", ""], ["1 obstacle", "0.05", "", ""], ["1 obstacle", "0.03", "", ""], ["1 obstacle", "0.01", "", ""]]
+  - 标题: ["表 2  避限位与提高可操作度", "Table 2  Joint limits and manipulability"]
+    表头: ["次要任务", "φ₀ / (°)", "k", "关节 1 离上限 / (°)", "可操作度：起始 → 终了 / m²"]
+    表头英文: ["Secondary task", "φ₀ / (°)", "k", "Joint 1 below limit / (°)", "Manipulability: start → end / m²"]
+    行: [["2 避限位", "−60", "2", "", ""], ["2 避限位", "−60", "10", "", ""], ["3 可操作度", "150", "20", "", ""], ["3 可操作度", "−30", "20", "", ""]]
+    行英文: [["2 joint limits", "−60", "2", "", ""], ["2 joint limits", "−60", "10", "", ""], ["3 manipulability", "150", "20", "", ""], ["3 manipulability", "−30", "20", "", ""]]
+注意:
+  - ["末端误差来自欧拉法积分与比例反馈，在 0.1 mm 量级；它与次要任务无关，次要任务的项在零空间中。", "The tip error comes from Euler integration and the proportional feedback, of order 0.1 mm; it has nothing to do with the secondary task, whose term lies in the null space."]
+  - ["模式 2、3 中没有障碍物；模式 2 的限位只用来计算 H，并不强制。", "Modes 2 and 3 have no obstacle; in mode 2 the limits only enter H and are not enforced."]
+思考题:
+  - ["把模式 1 与模式 2 合在一起（先避障，再在剩下的零空间里避限位），平面 3R 臂还剩多少冗余度？会出现什么问题？与 17.4 节的三层优先级比较。",
+     "Combine modes 1 and 2 (avoid the obstacle first, then the limits in what remains of the null space). How much redundancy does the planar 3R arm have left, and what goes wrong? Compare with the three priority levels of Section 17.4."]

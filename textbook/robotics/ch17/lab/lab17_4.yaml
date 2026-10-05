@@ -1,0 +1,34 @@
+# 实验 17.4 的指导书与报告模板。目的、场景、参数、任务取自 lab17_4.js。
+原理:
+  - ["手的位姿固定时，七轴 Panda 的逆解组成一维的自运动闭曲线。沿这条曲线，关节 k 的变化率 dθ_k/ds = c_k/‖c‖，c_k = ±det J₍ₖ₎；θ_k 取极值的地方，正是锁住关节 k 后的六轴臂的奇异位形（定理 17.4.1）。c_k 在闭曲线上处处不为零时，θ_k 是这条曲线的整体参数。",
+     "With the hand pose fixed, the inverse solutions of the seven-axis Panda form a one-dimensional closed self-motion curve. Along it dθ_k/ds = c_k/‖c‖ with c_k = ±det J₍ₖ₎; θ_k has an extremum exactly where the six-axis arm obtained by locking joint k is singular (Theorem 17.4.1). If c_k never vanishes on the curve, θ_k is a global parameter of it."]
+  - 式: ["θ̇ = θ̇₁ + G(uᵀȯ + K_d(d_a − d) − aθ̇₁) − k_H(N − G aN)∇H，G = (aN)ᵀ/((aN)(aN)ᵀ + λ_o²)          (17.4.1)",
+         "θ̇ = θ̇₁ + G(uᵀȯ + K_d(d_a − d) − aθ̇₁) − k_H(N − G aN)∇H,  G = (aN)ᵀ/((aN)(aN)ᵀ + λ_o²)          (17.4.1)"]
+  - ["局部的优先级控制只能在运动中修正；起点不好时，障碍物来得快，修正所需的关节速度会超过上限。全局地沿自运动闭曲线挑选起始形态（规划）与局部控制配合，才能同时满足全部要求。",
+     "Local priority control can only correct during the motion; from a poor start, with a fast obstacle, the corrections need joint speeds beyond the limits. Choosing the start globally on the self-motion curve (planning) together with local control meets all the requirements."]
+步骤:
+  - ["打开实验 17.4，场景“协作工位搬运”。θ₃ 取 33°（离 ready 最近的起点），控制方式依次取 0、1、2，各按一次“开始”，记录四项指标（任务 1、2），填入表 1。",
+     "Open Lab 17.4, scene “Transfer on a collaborative cell”. With θ₃ = 33° (the start nearest to ready), run controls 0, 1 and 2 in turn and record the four measures (tasks 1 and 2) in Table 1."]
+  - ["控制方式取 1，θ₃ 从 −100° 到 100° 每隔 20° 取一个值，各运行一次，记录最小距离和可操作度的最小值，填入表 2；找出满足全部要求的 θ₃ 区间。",
+     "With control 1, run θ₃ from −100° to 100° in steps of 20° and record the minimum distance and the minimum manipulability in Table 2; find the θ₃ intervals that meet all the requirements."]
+  - ["在找到的区间里取一个 θ₃，分别用控制方式 1 和 2 运行（任务 3、4），比较。",
+     "Take a θ₃ in that interval and run controls 1 and 2 (tasks 3 and 4); compare."]
+  - ["切换到“伸手进车窗取包”，转动肘部摆角 ψ，找出手臂能从窗口穿过的 ψ 范围（任务 5）。",
+     "Switch to “Reaching through a car window”, turn the elbow angle ψ and find the range of ψ for which the arm passes through the window (task 5)."]
+数据表:
+  - 标题: ["表 1  θ₃ = 33° 出发的三种控制方式", "Table 1  Three controls from θ₃ = 33°"]
+    表头: ["控制方式", "最小距离 / m", "限位余量", "速度比", "最小可操作度", "是否满足全部要求"]
+    表头英文: ["Control", "Minimum distance / m", "Limit margin", "Speed ratio", "Minimum manipulability", "All requirements met?"]
+    行: [["0 锁住关节 3", "", "", "", "", ""], ["1 最小范数", "", "", "", "", ""], ["2 局部优先级", "", "", "", "", ""]]
+    行英文: [["0 joint 3 locked", "", "", "", "", ""], ["1 minimum norm", "", "", "", "", ""], ["2 local priority", "", "", "", "", ""]]
+  - 标题: ["表 2  沿自运动闭曲线挑选起始形态（控制方式 1）", "Table 2  Choosing the start on the self-motion curve (control 1)"]
+    表头: ["θ₃ / (°)", "最小距离 / m", "最小可操作度", "速度比", "是否满足全部要求"]
+    表头英文: ["θ₃ / (°)", "Minimum distance / m", "Minimum manipulability", "Speed ratio", "All requirements met?"]
+    行: [["−100", "", "", "", ""], ["−60", "", "", "", ""], ["−20", "", "", "", ""], ["20", "", "", "", ""], ["60", "", "", "", ""], ["100", "", "", "", ""]]
+注意:
+  - ["起始形态都在 A 点：手的位姿相同，只是手臂沿自运动闭曲线处在不同的位置。θ₃ 是这条闭曲线的整体参数，滑块的每个值对应唯一的形态。", "Every start is at A: the hand pose is the same, the arm is just at a different place on the self-motion curve. θ₃ is a global parameter of that curve, so each slider value gives one configuration."]
+  - ["控制方式 0 的起点固定为 θ₃ = 0 的形态，θ₃ 滑块不起作用。", "Control 0 always starts from the configuration with θ₃ = 0; the θ₃ slider has no effect."]
+  - ["距离按 17.2 节的连杆折线计算，是对真实手臂外形的近似；真实的协作应用还要按安全标准做风险评估。", "Distances use the link polyline of Section 17.2, an approximation of the real arm; a real collaborative application also needs a risk assessment to the safety standards."]
+思考题:
+  - ["控制方式 0 把 Panda 当作六轴臂用。在本例中它与控制方式 1 的结果相近，是巧合吗？在什么样的任务中，锁住一个关节会带来明显的损失？",
+     "Control 0 uses the Panda as a six-axis arm. Here its result is close to control 1; is that a coincidence? In what kind of task does locking a joint cost clearly?"]

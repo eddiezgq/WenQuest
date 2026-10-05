@@ -1,0 +1,36 @@
+# 实验 17.2 的指导书与报告模板。目的、场景、参数、任务取自 lab17_2.js。
+原理:
+  - ["冗余度为 1 时，雅可比矩阵 J（m×(m + 1)）的零空间是一条直线。它由广义叉积 c 张成：c 的各分量是删去一列后的 m×m 子式，带交替的正负号；Jc = 0，‖c‖² = det(JJᵀ)，即 ‖c‖ 就是可操作度（定理 17.2.1）。c 随形态连续变化，不会突然变号。",
+     "With one degree of redundancy the null space of the Jacobian J (m×(m + 1)) is a line spanned by the generalized cross product c, whose entries are the m×m minors with one column deleted, with alternating signs; Jc = 0 and ‖c‖² = det(JJᵀ), so ‖c‖ is the manipulability (Theorem 17.2.1). c varies continuously and never flips sign."]
+  - 式: ["c_i = (−1)^{m+1+i} det J₍ᵢ₎，dθ/ds = c/‖c‖          (17.2.2)、(17.2.4)", "c_i = (−1)^{m+1+i} det J₍ᵢ₎,  dθ/ds = c/‖c‖          (17.2.2), (17.2.4)"]
+  - ["沿 c 积分有截断误差，误差会积累，末端会离开目标。预测-校正法每走一步就用牛顿法把末端拉回目标；伪逆给出的校正与零空间垂直，不会让手臂沿流形倒退。",
+     "Integrating along c has truncation error, which accumulates and moves the tip off the goal. The predictor–corrector method pulls the tip back with Newton steps after every step; the pseudoinverse correction is orthogonal to the null space, so it does not push the arm back along the manifold."]
+  - 式: ["θ̇ = J⁺(ṗ_d + K_p(p_d − p)) + k_N (I − J⁺J)(θ₀ − θ)          (17.2.6)、(17.2.7)", "θ̇ = J⁺(ṗ_d + K_p(p_d − p)) + k_N (I − J⁺J)(θ₀ − θ)          (17.2.6), (17.2.7)"]
+  - ["只用伪逆时，关节速度满足 cᵀθ̇ = 0。这是一个普法夫约束；平面 3R 臂的 c · (∇ × c) 不为零，约束不可积，所以末端走一圈、关节不回到原处（定理 17.2.2）。加上零空间项以后，关节的运动收敛为一条每圈都重复的轨迹。",
+     "With the pseudoinverse alone the joint velocity satisfies cᵀθ̇ = 0, a Pfaffian constraint; for the planar 3R arm c · (∇ × c) ≠ 0, so the constraint is not integrable and the joints do not come back after a closed tip path (Theorem 17.2.2). With the null-space term the joint motion settles to a path that repeats every lap."]
+步骤:
+  - ["打开实验 17.2，场景“沿自运动流形走”。校正取 0，步长 h 依次取 0.3、0.1、0.05 rad，各按一次“开始”，记录末端最大漂移，填入表 1（任务 1）。",
+     "Open Lab 17.2, scene “Walking along the self-motion manifold”. With correction 0, set h = 0.3, 0.1 and 0.05 rad in turn, press “Start” each time and record the largest tip drift in Table 1 (task 1)."]
+  - ["校正改为 1，重复上一步（任务 2）。比较漂移随 h 的变化：不校正时漂移大约与 h 的几次方成正比？",
+     "Set the correction to 1 and repeat (task 2). How does the drift scale with h without correction?"]
+  - ["切换到“末端画圆：伪逆的漂移”，k_N = 0，圈数取 3，按“开始”，记录每圈结束时三个关节角相对起点的变化（任务 3），填入表 2。",
+     "Switch to “Tip on a circle: pseudoinverse drift”, k_N = 0, 3 laps; press “Start” and record the change of the three joints at the end of each lap (task 3) in Table 2."]
+  - ["k_N 取 2，圈数取 8，按“开始”，记录最后一圈的变化（任务 4）。再取 k_N = 0.5、4，比较收敛的快慢。",
+     "Set k_N = 2 and 8 laps, press “Start” and record the change in the last lap (task 4). Try k_N = 0.5 and 4 and compare how fast it settles."]
+  - ["切换到“擦桌子画圈”，分别取 k_N = 0 和 2 擦 6 圈，比较肩、肘每圈的变化（任务 5）。",
+     "Switch to “Wiping a table in circles” and wipe 6 laps with k_N = 0 and k_N = 2; compare the change of shoulder and elbow per lap (task 5)."]
+数据表:
+  - 标题: ["表 1  沿自运动流形走 20 rad：末端的最大漂移", "Table 1  Walking 20 rad along the self-motion manifold: largest tip drift"]
+    表头: ["步长 h / rad", "不校正 / mm", "校正 / mm"]
+    表头英文: ["Step h / rad", "Without correction / mm", "With correction / mm"]
+    行: [["0.3", "", ""], ["0.1", "", ""], ["0.05", "", ""]]
+  - 标题: ["表 2  末端画圆：每圈结束时关节角相对起点的变化", "Table 2  Tip on a circle: change of the joints at the end of each lap"]
+    表头: ["圈数", "k_N = 0：Δθ₁, Δθ₂, Δθ₃ / (°)", "k_N = 2：Δθ₁, Δθ₂, Δθ₃ / (°)"]
+    表头英文: ["Lap", "k_N = 0: Δθ₁, Δθ₂, Δθ₃ / (°)", "k_N = 2: Δθ₁, Δθ₂, Δθ₃ / (°)"]
+    行: [["1", "", ""], ["2", "", ""], ["3", "", ""], ["8", "", ""]]
+注意:
+  - ["场景 1 的“漂移”是末端离固定目标的最大距离；它与步长、积分方法有关，与手臂的形态关系不大。", "In scene 1 the drift is the largest distance of the tip from the fixed goal; it depends on the step and the integration method, hardly on the arm's configuration."]
+  - ["场景 2、3 用四阶龙格-库塔法、步长 4 ms 积分，末端误差在 10⁻⁶ mm 量级，关节的漂移不是积分误差。", "Scenes 2 and 3 integrate with fourth-order Runge–Kutta and a 4 ms step; the tip error is of order 10⁻⁶ mm, so the joint drift is not an integration error."]
+思考题:
+  - ["零空间项把关节拉向起始形态 θ₀，可收敛以后每圈结束时的关节角并不等于 θ₀。为什么？它停在哪里由什么决定？",
+     "The null-space term pulls the joints toward the start θ₀, yet after settling the joints at the end of a lap are not θ₀. Why? What decides where they settle?"]
