@@ -1,0 +1,27 @@
+# 实验 10.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_1.js。
+原理:
+  - ["SIMT：一个线程算一个输出，线程束（NVIDIA 32 道）或波前（AMD CDNA 64 道）一起执行同一条指令（第 3 章、10.2 节）。", "SIMT: one thread per output; a warp (32 lanes on NVIDIA) or wavefront (64 on AMD CDNA) executes one instruction together (Chapter 3, Section 10.2)."]
+  - ["线程束内归约要 log₂(宽度) 层洗牌：32 道 5 层、64 道 6 层；写死 16 的循环在 64 道上只归约一半（10.2.3 节）。", "An in-warp reduction takes log2(width) shuffle steps: 5 for 32 lanes, 6 for 64; a loop hard-coded to 16 reduces only half of a 64-lane wave (Section 10.2.3)."]
+  - ["立方单元：一条指令完成一次 16×16×16 的半精度矩阵乘加，单精度累加；片上缓冲由程序显式搬运（10.3 节）。", "Cube unit: one instruction does a 16×16×16 half-precision matrix multiply-accumulate with FP32 accumulation; buffers are moved explicitly (Section 10.3)."]
+  - 式: "三段流水：n 块数据要 n + 2 段（各段串行要 3n 段），气泡占 2/(n+2)"
+步骤:
+  - ["“SIMT”场景：把线程束宽度在 32 与 64 之间切换，记录波前数、归约层数、一次访存请求的字节数（任务 1）。", "SIMT scene: switch the warp width between 32 and 64 and record waves, reduction steps and bytes per request (task 1)."]
+  - ["改片上存储容量与分块 T，填表 1（任务 2）。", "Vary the on-chip memory and the tile size T; fill Table 1 (task 2)."]
+  - ["“立方单元”场景：读出指令条数与两种搬数据方式的显存读写（任务 3）。", "Cube scene: read the instruction count and the traffic of the two data-movement strategies (task 3)."]
+  - ["把数据块数从 1 加到 64，记录三段流水的加速与气泡（任务 4）。", "Raise the tiles from 1 to 64 and record the pipeline speedup and bubble (task 4)."]
+数据表:
+  - 标题: ["表 1  分块 T = 32 时片上存储允许驻留的线程块数", "Table 1  Blocks allowed by on-chip memory at T = 32"]
+    表头: ["片上存储（KB）", "每块共享内存（KB）", "可驻留块数"]
+    表头英文: ["On-chip memory (KB)", "Per block (KB)", "Blocks"]
+    行: [["64（CDNA 3）", "", ""], ["100（A10）", "", ""], ["160（CDNA 4）", "", ""]]
+  - 标题: ["表 2  三段流水", "Table 2  Three-stage pipeline"]
+    表头: ["数据块数", "流水（段）", "串行（段）", "加速", "气泡"]
+    表头英文: ["Tiles", "Pipelined", "Serial", "Speedup", "Bubble"]
+    行: [["1", "", "", "", ""], ["4", "", "", "", ""], ["16", "", "", "", ""], ["64", "", "", "", ""]]
+注意:
+  - ["这是按公式算的，不是仿真：没有计入访存延迟、存储体冲突、指令开销与调度，也不代表任何一款芯片的实际速度。", "These are formulas, not a simulation: no memory latency, bank conflicts, instruction overhead or scheduling, and they do not predict the speed of any real chip."]
+  - ["“片上存储允许驻留几块”只是其中一道限制；占用率还要看线程数与寄存器（算例 5.7.2）。", "Blocks allowed by on-chip memory is only one limit; occupancy also depends on threads and registers (Example 5.7.2)."]
+  - ["立方单元的缓冲容量各型号不同，华为没有公开具体数值，本实验只用“一次 16×16×16”这一条公开事实。", "Buffer sizes differ by model and Huawei does not publish them; this lab uses only the public fact that one instruction does 16×16×16."]
+思考题:
+  - ["线程束宽度从 32 变成 64，哪些写法会出错、哪些只是变慢？", "Which habits become wrong, and which merely become slower, when the warp width goes from 32 to 64?"]
+  - ["两种架构算的是同一个矩阵乘法，为什么“把数据留在片上多用几次”在两边都排第一？", "Both compute the same product; why is reusing data on chip the first optimization on both?"]

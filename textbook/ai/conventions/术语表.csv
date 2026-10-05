@@ -259,3 +259,13 @@
 9,首字延迟,time to first token (TTFT),
 9,检查点,checkpoint,
 9,平均故障间隔,mean time between failures (MTBF),
+10,波前,wavefront,AMD 上与线程束对应
+10,计算单元,compute unit (CU),AMD GPU 上与 SM 对应
+10,本地数据共享,local data share (LDS),AMD 上与共享内存对应
+10,矩阵核心,matrix core,AMD 上与张量核心对应
+10,达芬奇架构,DaVinci architecture,华为昇腾
+10,立方单元,cube unit,
+10,统一缓冲区,unified buffer (UB),
+10,脉动阵列,systolic array,
+10,向量单元,vector unit,达芬奇架构
+10,标量单元,scalar unit,达芬奇架构

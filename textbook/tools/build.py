@@ -46,6 +46,7 @@ import english
 import gpulab
 import gpurun
 import cucheck
+import hipcheck
 import labdocs
 import tasksheet
 
@@ -442,6 +443,30 @@ def check_cuda(book: dict, chapters: set[int], rep: "Report") -> None:
         if hit.exists():
             continue
         probs = cucheck.check(f)
+        for why in probs:
+            rep.add("error", "程序", str(f.relative_to(book["root"])), why)
+        if not probs:
+            hit.write_text("ok")
+
+
+def check_hip(book: dict, chapters: set[int], rep: "Report") -> None:
+    """书中的 HIP 程序（code/hip 下的 .hip.cpp）要能在 AMD 开源的 HIP-CPU 上编译、运行并自己核对结果
+    （hipcheck.py；速度与显存要在真正的 AMD 卡上测）。结果按文件内容缓存。"""
+    files = [f for ch in sorted(chapters) for f in sorted((book["root"] / f"ch{ch:02d}" / "code" / "hip").rglob("*.hip.cpp"))]
+    if not files:
+        return
+    if not hipcheck.available():
+        rep.add("warning", "程序", "HIP", f"{len(files)} 个 HIP 程序没有检查：缺少 g++、oneTBB（pip install tbb-devel）或 HIP-CPU 头文件")
+        return
+    cache = book["root"].parent / "build" / book["book"] / "hipcheck"
+    cache.mkdir(parents=True, exist_ok=True)
+    for f in files:
+        key = f.read_bytes() + b"".join(p.read_bytes() for p in sorted(f.parent.glob("*.h"))) + hipcheck.version().encode()
+        h = hashlib.sha256(key).hexdigest()[:16]
+        hit = cache / f"{h}.ok"
+        if hit.exists():
+            continue
+        probs = hipcheck.check(f)
         for why in probs:
             rep.add("error", "程序", str(f.relative_to(book["root"])), why)
         if not probs:
@@ -989,6 +1014,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     # 书中数字的 GPU 实测记录（人工智能第 14 轮附 4.4 节）：code/runs/<名>/ 与 <名>.json
     status = {int(k): (v or {}).get("status", "draft") for k, v in (prog_meta.get("chapters") or {}).items()}
     check_cuda(book, {s.chapter for s in sections}, rep)
+    check_hip(book, {s.chapter for s in sections}, rep)
     run_vals, run_probs = gpurun.values(book["root"], {s.chapter for s in sections}, status)
     values.update(run_vals)
     for level, where, text in run_probs:
