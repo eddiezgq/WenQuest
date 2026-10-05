@@ -66,7 +66,7 @@ rows = []
 order = sorted(sols, key=lambda x: (-labels(x[0])[0], -labels(x[0])[1], -labels(x[0])[2]))
 for i, (s, _) in enumerate(order, 1):
     sh, el, wr = labels(s)
-    deg = [f"{math.degrees(v):.2f}" for v in s]
+    deg = [f"{math.degrees(v):.2f}".replace("-", "−") for v in s]
     mark = tr("（即 θ*）", " (= θ*)") if same_solution(s, ths, 1e-9) else ""
     rows.append(f"| {i} | {names_sh[sh]} | {names_el[el]} | {tr('不翻', 'no') if wr > 0 else tr('翻', 'yes')} | " + " | ".join(deg) + " |")
     if mark:

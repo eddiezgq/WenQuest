@@ -3,7 +3,7 @@
 (1) 平面 2R 臂（l1 = 0.425 m、l2 = 0.392 m，UR5e 的大臂、小臂）：四个目标点的解的个数（定理 14.1.1）。
     圆环内的点有两组解，与第 7 章算例 7.3.4 用牛顿法得到的解比较（两种方法一致）。
 (2) 引理 14.1.1：A cos θ + B sin θ = C。式 (14.1.4)（两个 atan2）与式 (11.5.3)（arccos）、
-    半角代换后的二次方程 (14.1.5) 三种写法在一万组随机系数下互相核对。
+    半角代换后的二次方程 (14.1.6) 三种写法在一万组随机系数下互相核对。
 (3) 一般 6R 臂（随机 DH 参数）：从 600 个随机初值出发用数值法（阻尼最小二乘）求逆解，统计不同的解有几组；
     每一组都代回正运动学核对。理论上至多 16 组（拉加万与罗思，1990、1993）。
 """
@@ -43,7 +43,7 @@ nA = newton2r((0, 1), np.array(targets["A"]))
 nB = newton2r((1, -1), np.array(targets["A"]))
 assert np.allclose(nA, down, atol=1e-12) and np.allclose(nB, up, atol=1e-12)
 r_in = abs(l1 - l2)
-# 两组解关于基座与目标的连线对称：θ1 + θ1′ = 2 atan2(y, x) − ...，肘点互为镜像
+# 两组解关于基座与目标的连线对称：θ1 + θ1′ = 2 atan2(y, x)，肘点互为镜像
 beta = math.atan2(targets["A"][1], targets["A"][0])
 e_up = np.array([l1 * math.cos(up[0]), l1 * math.sin(up[0])])
 e_dn = np.array([l1 * math.cos(down[0]), l1 * math.sin(down[0])])
@@ -63,7 +63,7 @@ for _ in range(10000):
         assert s == []
         continue
     ac = [wrap(math.atan2(B, A) + sg * math.acos(C / rho)) for sg in (1, -1)]          # 式 (11.5.3)
-    # 半角代换 t = tan(θ/2)：(C + A) t² − 2B t + (C − A) = 0（式 (14.1.5)）
+    # 半角代换 t = tan(θ/2)：(C + A) t² − 2B t + (C − A) = 0（式 (14.1.5)、(14.1.6)）
     qa, qb, qc = C + A, -2 * B, C - A
     disc = qb * qb - 4 * qa * qc
     ts = [(-qb + sg * math.sqrt(max(disc, 0))) / (2 * qa) for sg in (1, -1)]

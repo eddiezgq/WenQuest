@@ -15,16 +15,16 @@ WQ.lab({
     { id: "ur", robot: true, name: ["八组逆解", "Eight solutions"],
       problem: { title: ["机器人问题：同一个位姿，选哪一种手臂", "Robot problem: one pose, which arm"],
                  text: ["用滑块给出法兰盘中心的位置和末端姿态（ZYX 欧拉角），八台 UR5e 同时显示全部逆解（红点是目标）。“解的编号”选中的一台不透明，测量区显示它的关节角和模型核对的误差。",
-                        "Sliders give the flange position and the tool orientation (ZYX Euler angles); eight UR5e show every solution at once (red dot = target). The one picked by “solution” is opaque; its joint angles and the model check are shown."] } },
+                        "Sliders give the position of the flange centre and the end-effector orientation (ZYX Euler angles); eight UR5e robots show every solution at once (red dot = target). The one picked by “solution” is opaque; its joint angles and the model check are shown."] } },
     { id: "switch", name: ["按墙上的开关", "Pressing a wall switch"], hide: ["px", "py", "pz", "yaw", "pitch", "roll"],
-      problem: { title: ["生活中的例子：伸手按开关，手臂可以怎样摆", "Everyday example: reaching a light switch, how can the arm sit"],
+      problem: { title: ["生活中的例子：伸手按开关，手臂可以怎样摆", "Everyday example: the ways to reach a light switch"],
                  text: ["法兰盘要正对墙上的开关按下去，就像人伸手按开关。有的姿势会撞到台面或穿过墙（标红），要从其余的里面挑。",
                         "The flange must press the switch on the wall head-on, as a person reaches for a switch. Some postures hit the table or pass through the wall (shown red); choose among the rest."] } },
   ],
   params: [
-    { id: "px", name: ["法兰中心 x", "flange x"], min: -0.85, max: 0.85, step: 0.0001, value: -0.4976, unit: "m", digits: 4 },
-    { id: "py", name: ["法兰中心 y", "flange y"], min: -0.85, max: 0.85, step: 0.0001, value: -0.442, unit: "m", digits: 4 },
-    { id: "pz", name: ["法兰中心 z", "flange z"], min: -0.4, max: 1.0, step: 0.0001, value: 0.2351, unit: "m", digits: 4 },
+    { id: "px", name: ["法兰中心 x", "flange centre x"], min: -0.85, max: 0.85, step: 0.0001, value: -0.4976, unit: "m", digits: 4 },
+    { id: "py", name: ["法兰中心 y", "flange centre y"], min: -0.85, max: 0.85, step: 0.0001, value: -0.442, unit: "m", digits: 4 },
+    { id: "pz", name: ["法兰中心 z", "flange centre z"], min: -0.4, max: 1.0, step: 0.0001, value: 0.2351, unit: "m", digits: 4 },
     { id: "yaw", name: ["偏航 ψ", "yaw ψ"], min: -180, max: 180, step: 0.01, value: 75, unit: "°", digits: 2 },
     { id: "pitch", name: ["俯仰 θ", "pitch θ"], min: -89, max: 89, step: 0.01, value: 0, unit: "°", digits: 2 },
     { id: "roll", name: ["横滚 φ", "roll φ"], min: -180, max: 180, step: 0.01, value: -90, unit: "°", digits: 2 },
@@ -37,9 +37,9 @@ WQ.lab({
       demo: { scene: "ur", set: { px: -0.4976, py: -0.442, pz: 0.2351, yaw: 75, pitch: 0, roll: -90, k: 3 }, press: [], wait: 1 } },
     { id: "down", robot: true, text: ["在同一目标下选一组肘下的解。", "At the same target pick an elbow-down solution."],
       demo: { scene: "ur", set: { px: -0.4976, py: -0.442, pz: 0.2351, yaw: 75, pitch: 0, roll: -90, k: 2 }, press: [], wait: 1 } },
-    { id: "flip", robot: true, text: ["选出与 θ* 只差手腕翻转的一组（第 1 组）：θ₅ 变号、θ₆ 相差 180°。", "Pick the solution that differs from θ* only by the wrist flip (number 1): θ₅ changes sign, θ₆ moves by 180°."],
+    { id: "flip", robot: true, text: ["选出肩、肘标签与 θ* 相同而手腕翻过来的一组（第 1 组）：θ₅ 变号、θ₆ 相差 180°。", "Pick the solution with the same shoulder and elbow labels as θ* but the wrist flipped (number 1): θ₅ changes sign, θ₆ moves by 180°."],
       demo: { scene: "ur", set: { px: -0.4976, py: -0.442, pz: 0.2351, yaw: 75, pitch: 0, roll: -90, k: 1 }, press: [], wait: 1 } },
-    { id: "shoulder", robot: true, text: ["把法兰中心移近基座轴线，使肩 A、肩 B 两组的 θ₁ 相差小于 40°（接近肩部奇异）。", "Bring the flange near the base axis until θ₁ of shoulders A and B differ by less than 40° (near the shoulder singularity)."],
+    { id: "shoulder", robot: true, text: ["把法兰中心移近基座轴线，使肩 A、肩 B 两组的 θ₁ 相差小于 40°（接近肩部奇异）。", "Bring the flange centre near the base axis until θ₁ of shoulders A and B differ by less than 40° (near the shoulder singularity)."],
       demo: { scene: "ur", set: { px: -0.1047, py: -0.093, pz: 0.2351, yaw: 75, pitch: 0, roll: -90, k: 1 }, press: [], wait: 1 } },
     { id: "switch", text: ["生活场景：选一组肩 B、既不碰台面也不穿墙的解按下开关。", "Everyday scene: press the switch with a shoulder-B solution that neither hits the table nor passes through the wall."],
       demo: { scene: "switch", set: { k: 7 }, press: [], wait: 1 } },
@@ -203,7 +203,7 @@ WQ.lab({
                   [["选中（肩 · 肘 · 腕）", "picked (shoulder · elbow · wrist)"], `${k + 1}: ${lab}`],
                   [["θ₁, θ₂, θ₃", "θ₁, θ₂, θ₃"], sel.th.slice(0, 3).map(d).join(", ")],
                   [["θ₄, θ₅, θ₆", "θ₄, θ₅, θ₆"], sel.th.slice(3).map(d).join(", ")],
-                  [["模型核对：法兰中心误差", "model check: flange error"], err.toExponential(1) + " m"]];
+                  [["模型核对：法兰中心误差", "model check: flange-centre error"], err.toExponential(1) + " m"]];
     if (api.scene === "switch") rows.push([["碰台面或穿墙", "hits table or wall"], this.blocked(sel.th) ? api.T("是", "yes") : api.T("否", "no")]);
     const A = sols.find((x) => x.sh === 1), B = sols.find((x) => x.sh === -1);
     if (A && B) rows.push([["肩 A、肩 B 的 θ₁ 之差", "θ₁ of shoulder A minus B"], d(Math.abs(this.wrap(A.th[0] - B.th[0])))]);

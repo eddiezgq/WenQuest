@@ -31,13 +31,13 @@ def ik3(phi):
 
 class Lesson(Base):
     def construct(self):
-        self.title("14.2", "末端不动，工具转向：一族解", "Tip fixed, tool turning: a family of solutions")
+        self.title("14.2", "末端不动，工具转向：一族解", "End-effector fixed, tool turning: a family of solutions")
         phi = ValueTracker(LO + 0.03)
         arcs = VGroup()
         for a0, a1, col, dash in ((-0.25, 0.55, BLUE_C, False),):
             t = np.linspace(a0, a1, 60)
             arcs.add(VMobject(color=col, stroke_width=2).set_points_smoothly([S((L1 + L2) * math.cos(s), (L1 + L2) * math.sin(s)) for s in t]))
-        lab_edge = zh("2R 的外圆", 22, BLUE_C).move_to(S(0.86 * math.cos(0.5), 0.86 * math.sin(0.5)) + RIGHT * 0.2)
+        lab_edge = bi(["2R 的外圆", "outer circle of the 2R arm"], 22, BLUE_C).next_to(S(0.70, 0.86 * math.sin(0.5)), LEFT, buff=0.15)   # 放在圆弧左侧，不让弧线穿过文字
         good = VMobject(color=YELLOW, stroke_width=4).set_points_smoothly(
             [S(P[0] - L3 * math.cos(f), P[1] - L3 * math.sin(f)) for f in np.linspace(LO, HI, 80)])
         bad = DashedVMobject(VMobject(color=GREY_B, stroke_width=3).set_points_smoothly(
@@ -67,11 +67,11 @@ class Lesson(Base):
                      "Position only: the tool angle φ may vary; the wrist moves on a small circle about P")
         self.play(phi.animate.set_value(B), run_time=4.0, rate_func=smooth)
         self.caption("腕点必须在 2R 的外圆以内：只有黄色的一段可用",
-                     "The wrist must stay inside the 2R reach: only the yellow arc is usable")
+                     "The wrist must stay inside the 2R reach: only the solid yellow arc is usable")
         self.play(phi.animate.set_value(HI - 0.03), run_time=4.5, rate_func=smooth)
-        self.caption("到达可行范围的端点：大臂、小臂伸直", "At the end of the range the upper and lower arm are straight", wait=1.0)
+        self.caption("到达可行范围的端点：大臂、小臂伸直", "At the ends of the range the upper arm and forearm are in line", wait=1.0)
         self.play(phi.animate.set_value(LO + 0.03), run_time=5.0, rate_func=smooth)
         self.wait(0.5)
-        self.card([["给定位置与朝向：两组解；只给位置：一族解", "Position and angle: two solutions; position only: a family"],
+        self.card([["给定位置与朝向：两组解；只给位置：一族解", "Position and orientation: two solutions; position only: a family"],
                    MathTex(r"\cos(\varphi - \beta) \ge \frac{r^2 + l_3^2 - (l_1 + l_2)^2}{2 r l_3}", font_size=40),
-                   ["先由工具朝向定腕点，再解 2R", "Fix the wrist from the tool angle, then solve the 2R"]])
+                   ["先由工具朝向定腕点，再解 2R", "Fix the wrist point from the tool angle, then solve the 2R"]])

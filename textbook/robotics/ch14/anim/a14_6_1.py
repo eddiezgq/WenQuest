@@ -57,15 +57,15 @@ class Lesson(Base):
 
         g = always_redraw(arms)
         self.add(g)
-        leg = VGroup(VGroup(Line(ORIGIN, RIGHT * 0.5, color=BLUE, stroke_width=8), zh("右手构型", 22, BLUE)).arrange(RIGHT, buff=0.15),
-                     VGroup(Line(ORIGIN, RIGHT * 0.5, color=ORANGE, stroke_width=8), zh("左手构型", 22, ORANGE)).arrange(RIGHT, buff=0.15)
+        leg = VGroup(VGroup(Line(ORIGIN, RIGHT * 0.5, color=BLUE, stroke_width=8), bi(["右手构型", "right-handed"], 22, BLUE)).arrange(RIGHT, buff=0.15),
+                     VGroup(Line(ORIGIN, RIGHT * 0.5, color=ORANGE, stroke_width=8), bi(["左手构型", "left-handed"], 22, ORANGE)).arrange(RIGHT, buff=0.15)
                      ).arrange(DOWN, aligned_edge=LEFT, buff=0.15).to_corner(UR, buff=0.6).shift(DOWN * 0.8)
         self.play(FadeIn(leg))
         self.caption("工具点沿直线走：两种构型都能跟随，彼此关于基座—工具连线对称",
                      "The tool runs along a line: both configurations follow, mirror images about the base–tool line", wait=0)
         self.play(y.animate.set_value(0.3), run_time=5.0, rate_func=smooth)
         self.caption("途中不能换手：换手要让 θ₂ 经过零，也就是手臂伸直",
-                     "No switching on the way: θ₂ would have to pass zero, the arm straight", wait=0.5)
+                     "No switching on the way: θ₂ would have to pass through zero (arm straight)", wait=0.5)
         self.play(y.animate.set_value(-0.3), run_time=4.0, rate_func=smooth)
         y.set_value(0.0)
         mode.set_value(1.0)

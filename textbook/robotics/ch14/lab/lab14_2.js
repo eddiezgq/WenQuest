@@ -8,7 +8,7 @@ WQ.lab({
          "Drag the target and see how many solutions there are and what they look like: elbow up and down, two solutions merging at the edge, and fixing the wrist first for a 3R arm."],
   scenes: [
     { id: "arm", robot: true, name: ["平面 2R/3R 臂", "Planar 2R/3R arm"],
-      problem: { title: ["机器人问题：末端要到这里，关节角是多少", "Robot problem: which joint angles put the tip here"],
+      problem: { title: ["机器人问题：末端要到这里，关节角是多少", "Robot problem: which joint angles put the end-effector here"],
                  text: ["拖动目标 (x, y)，选择 2R 或 3R（3R 还要给工具朝向 φ）。界面列出全部逆解，实线是选中的构型，虚线是另一组。",
                         "Drag the target (x, y); choose 2R or 3R (3R also needs the tool angle φ). All solutions are listed; the chosen one is solid, the other dashed."] } },
     { id: "lamp", name: ["台灯照到书上", "A desk lamp over a book"], hide: ["phi", "n3"],

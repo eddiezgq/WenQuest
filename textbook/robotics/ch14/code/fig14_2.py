@@ -3,7 +3,7 @@
 图 14.2.1：2R 臂逆解的几何法：基座 O、肘点 E、目标 P 构成三角形；β 是 OP 的方向角，ψ 是大臂与 OP 的夹角，
            θ2 是小臂相对大臂延长线转过的角。虚线是关于 OP 对称的另一组解。
 图 14.2.3：(a) 平面 3R 臂到达 (0.6, 0.05) m、工具朝下的两组解，先由工具朝向求腕点 W；
-           (b) 只给末端位置 (0.75, 0.10) m 时的一族解：腕点在以 P 为圆心、半径 L3 的圆上，只有落在 2R 外圆以内的那一段可用。
+           (b) 只给末端位置 (0.75, 0.10) m 时的一族解：腕点在以 P 为圆心、半径 l3 的圆上，只有落在 2R 外圆以内的那一段可用。
 图 14.2.2：|dθ2/dr| 随 θ2 的变化（式 (14.2.7)）：手臂接近伸直或折回时，θ2 对目标位置极其敏感。
 """
 import math
@@ -67,9 +67,9 @@ base_mark(a1)
 a1.plot(*w, "s", color=C["ink"], ms=5, zorder=9)
 a1.text(w[0] + 0.02, w[1] + 0.02, "W", fontsize=11)
 a1.plot(*p, "o", color=C["x"], ms=6, zorder=9)
-a1.text(p[0] - 0.07, p[1] - 0.03, "P", fontsize=11, color=C["x"])
+a1.text(p[0] + 0.025, p[1] - 0.01, "P", fontsize=11, color=C["x"])
 a1.annotate("", xy=(p[0] + 0.0, p[1] - 0.12), xytext=p, arrowprops=dict(arrowstyle="-|>", color=C["x"], lw=1.2))
-a1.text(p[0] + 0.02, p[1] - 0.15, r"$\varphi = -90^\circ$", fontsize=10, color=C["x"])
+a1.text(p[0] + 0.02, p[1] - 0.15, r"$\varphi = -90$°", fontsize=10, color=C["x"])
 a1.text(-0.1, 0.66, T("(a) 给定位置与朝向：两组解", "(a) position and orientation given: two solutions"), fontsize=10)
 # (b)
 plane(a2, (-0.12, 0.98), (-0.42, 0.72))
@@ -79,7 +79,7 @@ bB = math.atan2(pB[1], pB[0])
 half = math.acos((rB * rB + l3 * l3 - (l1 + l2) ** 2) / (2 * l3 * rB))
 t = np.linspace(-math.pi, math.pi, 400)
 a2.plot((l1 + l2) * np.cos(np.linspace(-0.5, 0.75, 100)), (l1 + l2) * np.sin(np.linspace(-0.5, 0.75, 100)), color=BLUE2, lw=1.2)
-a2.text(0.80 * math.cos(0.62) - 0.02, 0.80 * math.sin(0.62) + 0.03, T("2R 的外圆", "outer circle of the 2R"), fontsize=9, color=BLUE2)
+a2.text(0.61, 0.49, T("2R 的外圆", "outer circle of the 2R arm"), fontsize=9, color=BLUE2, ha="right")
 ok = np.array([abs(wrap(f - bB)) <= half for f in t])
 for k, (ls, col) in enumerate((("-", C["accent"]), (":", C["muted"]))):
     sel = ok if k == 0 else ~ok
@@ -93,7 +93,7 @@ for f in np.linspace(bB - half + 0.05, bB + half - 0.05, 9):
 base_mark(a2)
 a2.plot(*pB, "o", color=C["x"], ms=6, zorder=9)
 a2.text(pB[0] + 0.03, pB[1] + 0.02, "P", fontsize=11, color=C["x"])
-a2.text(0.53, -0.18, T("腕点可用的一段（实线）", "usable part of the wrist circle (solid)"), fontsize=9, color=C["accent"])
+a2.text(0.74, -0.30, T("腕点可用的一段（实线）", "usable part of the wrist circle (solid)"), fontsize=9, color=C["accent"], ha="right")
 a2.text(-0.1, 0.66, T("(b) 只给位置：一族解（图中画出肘下的一支）", "(b) position only: a family (elbow-down branch drawn)"), fontsize=10)
 figure(fig, "fig14_2_3")
 plt.close(fig)

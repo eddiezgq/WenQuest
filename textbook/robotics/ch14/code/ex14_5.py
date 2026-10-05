@@ -60,7 +60,7 @@ for i, (s, (sh, el, noflip)) in enumerate(ur_ordered(sols), 1):
     sols_ordered.append(s)
     m, e = f"{ep:.1e}".split("e")
     rows.append(f"| {i} | {sh} | {tr('上', 'up') if el == 'up' else tr('下', 'down')} | "
-                f"{tr('不翻', 'no') if noflip else tr('翻', 'yes')} | " + " | ".join(f"{math.degrees(x):.2f}" for x in s) +
+                f"{tr('不翻', 'no') if noflip else tr('翻', 'yes')} | " + " | ".join(f"{math.degrees(x):.2f}".replace("-", "−") for x in s) +
                 f" | ${m}\\times 10^{{{int(e)}}}$ |")
 assert star is not None
 table = "\n".join(rows)
@@ -147,4 +147,4 @@ out(pd=vec(pd, 4), pw=vec(pw, 4), rho=rho, base=base, gam=gam, t1a=t1s[0], t1b=t
     n_conv=n_conv, N=N, h8=100 * hist[8] / N, h6=100 * hist[6] / N, h4=100 * hist[4] / N, h2=100 * hist[2] / N,
     wp=wp, wR=wR, a0=100 * hist_any[0] / 2000, a8=100 * hist_any[8] / 2000,
     cur=vec(np.degrees(cur), 0), near=near, dmin=math.degrees(dist_sorted[0]), d2=math.degrees(dist_sorted[1]),
-    n_w=n_w, n_e=n_e, n_s=n_s, d4=D4, below=tr('、', ', ').join(str(i) for i in below), n_below=len(below))
+    n_w=n_w, n_e=n_e, n_s=n_s, d4=D4, below=tr('、'.join(str(i) for i in below), (', '.join(str(i) for i in below[:-1]) + ' and ' if len(below) > 1 else '') + str(below[-1])), n_below=len(below))

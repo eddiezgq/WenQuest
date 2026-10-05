@@ -65,9 +65,10 @@ for sg, col, name in ((1, C["z"], "A"), (-1, C["accent"], "B")):
     ax.plot(*foot, "o", color=col, ms=4)
     xl = -0.88 if sg > 0 else -0.25
     tip = foot + (xl - foot[0]) / d[0] * d
-    ax.text(*(tip + np.array([0.0 if sg > 0 else 0.03, 0.04 if sg > 0 else 0.0])), T(f"解 {name}", f"solution {name}"), fontsize=10, color=col)
+    ax.text(*(tip + np.array([0.0 if sg > 0 else -0.03, 0.04 if sg > 0 else 0.0])), T(f"肩 {name}", f"shoulder {name}"), fontsize=10, color=col,
+            ha="left" if sg > 0 else "right")                    # 肩 B 的标注放在线的左侧，避开圆
     ax.annotate("", xy=foot + 0.12 * w2, xytext=foot, arrowprops=dict(arrowstyle="-|>", color=col, lw=1.0))
 ax.text(0.03, -0.17, r"$d_4$", fontsize=11, color=BLUE2)
-ax.text(-0.93, 0.28, T("俯视：手臂平面与半径 $d_4$ 的圆相切，并经过 $p_w$", "top view: the arm plane touches the circle of radius $d_4$ and passes through $p_w$"), fontsize=9.5, color=C["ink"])
+ax.text(-0.93, 0.28, T("俯视：手臂平面与半径 $d_4$ 的圆相切，并经过 $p_w$", "top view: the arm plane is tangent to the circle\nof radius $d_4$ and passes through $p_w$"), fontsize=9.5, color=C["ink"])
 figure(fig, "fig14_5_1")
 plt.close(fig)

@@ -67,13 +67,13 @@ class Lesson(Base):
             if n == 2 and abs(ik(rr)[0][1]) < 1e-6:
                 n = 1
             txt = MathTex(r"r = %.3f\ \mathrm{m}" % rr, font_size=34, color=WHITE)
-            lab = zh(["无解", "一组解", "两组解"][min(n, 2)], 28, YELLOW)
+            lab = bi([["无解", "no solution"], ["一组解", "one solution"], ["两组解", "two solutions"]][min(n, 2)], 28, YELLOW)
             return VGroup(txt, lab).arrange(DOWN, aligned_edge=LEFT, buff=0.15).to_corner(UR, buff=0.6).shift(DOWN * 0.6)
 
         tg, ar, inf = always_redraw(target), always_redraw(arms), always_redraw(info)
         self.add(ar, tg, inf)
-        leg = VGroup(VGroup(Line(ORIGIN, RIGHT * 0.5, color=ORANGE, stroke_width=8), zh("肘下", 22, ORANGE)).arrange(RIGHT, buff=0.15),
-                     VGroup(Line(ORIGIN, RIGHT * 0.5, color=BLUE, stroke_width=8), zh("肘上", 22, BLUE)).arrange(RIGHT, buff=0.15)
+        leg = VGroup(VGroup(Line(ORIGIN, RIGHT * 0.5, color=ORANGE, stroke_width=8), bi(["肘下", "elbow down"], 22, ORANGE)).arrange(RIGHT, buff=0.15),
+                     VGroup(Line(ORIGIN, RIGHT * 0.5, color=BLUE, stroke_width=8), bi(["肘上", "elbow up"], 22, BLUE)).arrange(RIGHT, buff=0.15)
                      ).arrange(DOWN, aligned_edge=LEFT, buff=0.15).to_corner(UL, buff=0.6).shift(DOWN * 1.2)
         self.play(FadeIn(leg))
         self.caption("圆环内的目标有两组解：肘上、肘下，关于基座—目标连线对称",
@@ -81,11 +81,11 @@ class Lesson(Base):
         self.play(r.animate.set_value(0.75), run_time=3.0, rate_func=smooth)
         self.caption("目标越靠近外边界，两组解越接近", "The nearer the outer edge, the closer the two solutions")
         self.play(r.animate.set_value(L1 + L2), run_time=3.0, rate_func=smooth)
-        self.caption("恰在外边界上：手臂伸直，两组解合为一组", "On the edge: the arm is straight, the two become one", wait=1.5)
+        self.caption("恰在外边界上：手臂伸直，两组解合为一组", "On the edge: the arm is straight and the two become one", wait=1.5)
         self.play(r.animate.set_value(0.9), run_time=2.0, rate_func=linear)
         self.caption("越过边界：够不着，没有解", "Beyond the edge: out of reach, no solution", wait=1.2)
         self.play(r.animate.set_value(R_A), run_time=2.5, rate_func=smooth)
         self.wait(0.5)
         self.card([["2R 臂：圆环内两组，边界上一组，环外无解", "2R arm: two inside the ring, one on its edge, none outside"],
                    MathTex(r"|l_1 - l_2| < r < l_1 + l_2", font_size=40),
-                   ["两组解只在奇异位形（伸直、折回）处相遇", "The two meet only at singular postures (straight, folded)"]])
+                   ["两组解只在奇异位形（伸直、折回）处相遇", "The two meet only at singular configurations (straight, folded back)"]])

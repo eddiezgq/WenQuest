@@ -13,7 +13,7 @@ WQ.lab({
   view: "3d",
   models: ["B-SCA-WQ4", "B-PAR-DELTA"],
   scenes: [
-    { id: "scara", robot: true, name: ["SCARA：右手与左手", "SCARA: right and left hand"], hide: ["b1"],
+    { id: "scara", robot: true, name: ["SCARA：右手与左手", "SCARA: right- and left-handed"], hide: ["b1"],
       problem: { title: ["机器人问题：拧这颗螺钉，用哪只“手”", "Robot problem: which “hand” drives this screw"],
                  text: ["用滑块给出工具点的位置和工具转角 φ，选择右手或左手构型。界面显示两种构型的关节变量，并标出是否超出关节限位。",
                         "Sliders set the tool point and tool angle φ; choose the right- or left-handed configuration. Both sets of joint variables are shown, with any limit violations marked."] } },
@@ -34,7 +34,7 @@ WQ.lab({
     { id: "y", name: ["工具点 y", "tool y"], min: -0.6, max: 0.6, step: 0.005, value: 0.2, unit: "m", digits: 3 },
     { id: "z", name: ["工具点 z", "tool z"], min: 0.092, max: 0.242, step: 0.001, value: 0.15, unit: "m", digits: 3 },
     { id: "phi", name: ["工具转角 φ", "tool angle φ"], min: -180, max: 180, step: 1, value: 30, unit: "°", digits: 0 },
-    { id: "hand", name: ["构型：0 右手，1 左手", "hand: 0 right, 1 left"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
+    { id: "hand", name: ["构型：0 右手，1 左手", "configuration: 0 right-handed, 1 left-handed"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
     { id: "b1", name: ["Delta 支链 1：0 朝外，1 朝内（支链 2、3 取朝外）", "Delta leg 1: 0 out, 1 in (legs 2, 3 out)"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
   ],
   buttons: [{ id: "start", name: ["运行", "Run"], primary: true }, { id: "reset", name: ["重置", "Reset"] }],
@@ -162,7 +162,7 @@ WQ.lab({
               [["闭合误差（从模型读点）", "closure error (read off the model)"], f(this.closure(api) * 1000, 6) + " mm"],
               [["一圈中的最大闭合误差", "largest closure error on the loop"], f((s.maxErr || 0) * 1000, 6) + " mm"]];
     }
-    if (api.scene === "draw") return [[["正在画", "drawing"], s.phase === 0 ? api.T("右手构型", "right hand") : s.phase === 1 ? api.T("左手构型", "left hand") : api.T("两圈都画完了", "both done")]];
+    if (api.scene === "draw") return [[["正在画", "drawing"], s.phase === 0 ? api.T("右手构型", "right-handed") : s.phase === 1 ? api.T("左手构型", "left-handed") : api.T("两圈都画完了", "both done")]];
     const sols = this.scaraIK(api.p.x, api.p.y, api.p.z, api.p.phi * Math.PI / 180);
     if (!sols.length) return [[["状态", "status"], api.T("够不着：水平距离超出 0.1～0.6 m", "out of reach: horizontal distance outside 0.1–0.6 m")]];
     const q = sols[api.p.hand];
@@ -173,7 +173,7 @@ WQ.lab({
     if (near(api.p.x, -0.3) && near(api.p.y, 0.35) && this.inLim(q) && err < 1e-9) api.done("q");
     const row = (qq) => `(${d(qq[0])}, ${d(qq[1])}, ${f(qq[2], 3)} m, ${d(qq[3])})` + (this.inLim(qq) ? "" : api.T("  超限", "  over limit"));
     return [[["右手构型", "right-handed"], row(sols[0])], [["左手构型", "left-handed"], row(sols[1])],
-            [["当前构型", "chosen"], api.p.hand ? api.T("左手", "left") : api.T("右手", "right")],
+            [["当前构型", "chosen"], api.p.hand ? api.T("左手", "left-handed") : api.T("右手", "right-handed")],
             [["模型核对：工具点误差", "model check: tool point error"], err.toExponential(1) + " m"]];
   },
   draw(api, s) {

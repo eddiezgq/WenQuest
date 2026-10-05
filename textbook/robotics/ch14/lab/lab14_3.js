@@ -9,14 +9,14 @@
 WQ.lab({
   title: ["实验 14.3 帕登-卡汉子问题", "Lab 14.3 The Paden–Kahan subproblems"],
   goal: ["用子问题 2 让 UR5e 的手腕把末端 x 轴转到指定方向，用子问题 3 让肘部把腕点送到指定距离，并比较两组解。",
-         "Use Subproblem 2 to turn the UR5e's tool x axis to a given direction with the wrist, Subproblem 3 to set the shoulder–wrist distance with the elbow, and compare the two solutions."],
+         "Use Subproblem 2 to turn the UR5e's end-effector x-axis to a given direction with the wrist, Subproblem 3 to set the shoulder–wrist distance with the elbow, and compare the two solutions."],
   view: "3d",
   models: ["B-ARM-UR5E"],
   scenes: [
     { id: "wrist", robot: true, name: ["手腕：子问题 2", "Wrist: Subproblem 2"], hide: ["delta"],
-      problem: { title: ["机器人问题：末端 x 轴要指向这里", "Robot problem: point the tool x axis this way"],
+      problem: { title: ["机器人问题：末端 x 轴要指向这里", "Robot problem: point the end-effector x-axis this way"],
                  text: ["UR5e 处于零位，只转关节 5、6。用方位角和仰角给出目标方向（金色箭头），界面求出两组 (θ₅, θ₆)，红色箭头是模型的末端 x 轴。",
-                        "The UR5e is at home and only joints 5 and 6 turn. Azimuth and elevation give the target direction (gold arrow); both (θ₅, θ₆) are computed; the red arrow is the model's tool x axis."] } },
+                        "The UR5e is in the zero position and only joints 5 and 6 turn. Azimuth and elevation give the target direction (gold arrow); both (θ₅, θ₆) are computed; the red arrow is the model's end-effector x-axis."] } },
     { id: "elbow", robot: true, name: ["肘部：子问题 3", "Elbow: Subproblem 3"], hide: ["az", "el"],
       problem: { title: ["机器人问题：腕点离肩部要这么远", "Robot problem: put the wrist this far from the shoulder"],
                  text: ["只转关节 3，使关节 4 的中心离关节 2 的中心为 δ。界面按式 (14.3.10) 求出两个 θ₃，金色线段是两点的连线。",
@@ -30,21 +30,21 @@ WQ.lab({
     { id: "az", name: ["目标方位角", "target azimuth"], min: -180, max: 180, step: 0.5, value: 45, unit: "°", digits: 1 },
     { id: "el", name: ["目标仰角", "target elevation"], min: -89, max: 89, step: 0.01, value: -35.26, unit: "°", digits: 2 },
     { id: "delta", name: ["肩—腕距离 δ", "shoulder–wrist distance δ"], min: 0.14, max: 0.828, step: 0.0001, value: 0.6, unit: "m", digits: 4 },
-    { id: "sol", name: ["选择第几组解（0 或 1）", "which solution (0 or 1)"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
+    { id: "sol", name: ["选择第几组解（1 或 2）", "which solution (1 or 2)"], min: 1, max: 2, step: 1, value: 1, unit: "", digits: 0 },
   ],
   buttons: [{ id: "reset", name: ["重置", "Reset"] }],
   tasks: [
     { id: "ex", robot: true, text: ["复现算例 14.3.2：目标方向 (1, 1, −1)/√3（方位 45°、仰角 −35.26°），读出两组 (θ₅, θ₆)：(135°, −144.7°) 与 (−45°, −35.3°)。",
                                      "Example 14.3.2: direction (1, 1, −1)/√3 (azimuth 45°, elevation −35.26°); read (135°, −144.7°) and (−45°, −35.3°)."],
-      demo: { scene: "wrist", set: { az: 45, el: -35.26, sol: 0 }, press: [], wait: 1 } },
-    { id: "flip", robot: true, text: ["同一目标下切换到另一组解：末端 x 轴不变，手腕的形态翻了过来。", "Switch to the other solution at the same target: the tool x axis stays, the wrist flips over."],
       demo: { scene: "wrist", set: { az: 45, el: -35.26, sol: 1 }, press: [], wait: 1 } },
+    { id: "flip", robot: true, text: ["同一目标下切换到另一组解：末端 x 轴不变，手腕的形态翻了过来。", "Switch to the other solution at the same target: the end-effector x-axis stays, the wrist flips over."],
+      demo: { scene: "wrist", set: { az: 45, el: -35.26, sol: 2 }, press: [], wait: 1 } },
     { id: "elbow", robot: true, text: ["复现算例 14.3.3：δ = 0.6 m，读出两个 θ₃（±88.53°）。", "Example 14.3.3: δ = 0.6 m; read the two θ₃ (±88.53°)."],
-      demo: { scene: "elbow", set: { delta: 0.6, sol: 0 }, press: [], wait: 1 } },
-    { id: "merge", robot: true, text: ["把 δ 增大到 0.827 m 以上，两个解靠拢到 |θ₃| < 3°（手臂接近伸直）。", "Raise δ above 0.827 m until the two solutions close in to |θ₃| < 3° (arm nearly straight)."],
-      demo: { scene: "elbow", set: { delta: 0.8274, sol: 0 }, press: [], wait: 1 } },
+      demo: { scene: "elbow", set: { delta: 0.6, sol: 1 }, press: [], wait: 1 } },
+    { id: "merge", robot: true, text: ["把 δ 增大到 0.827 m 以上、接近有解的最大值（约 0.8274 m），两个解靠拢到 |θ₃| < 3°（手臂接近伸直）。", "Raise δ above 0.827 m, close to its largest value with a solution (about 0.8274 m), until the two solutions close in to |θ₃| < 3° (arm nearly straight)."],
+      demo: { scene: "elbow", set: { delta: 0.8274, sol: 1 }, press: [], wait: 1 } },
     { id: "cam", text: ["生活场景：对准方位 120°、仰角 30° 的星星，用“倒过来”的那组解。", "Everyday scene: aim at the star at azimuth 120°, elevation 30° with the upside-down solution."],
-      demo: { scene: "cam", set: { az: 120, el: 30, sol: 1 }, press: [], wait: 1 } },
+      demo: { scene: "cam", set: { az: 120, el: 30, sol: 2 }, press: [], wait: 1 } },
   ],
   think: ["两根垂直相交的轴能把一个方向转到任何方向吗？在什么方向上两组解会合成一组？",
           "Can two perpendicular intersecting axes turn one direction into any other? For which directions do the two solutions merge?"],
@@ -71,8 +71,8 @@ WQ.lab({
   },
   pose(api) {
     const z = [0, 0, 0, 0, 0, 0];
-    if (api.scene === "wrist") { const s = this.wristSols(this.dir(api))[api.p.sol]; z[4] = s.t5; z[5] = s.t6; }
-    if (api.scene === "elbow") { const s = this.elbowSols(api.p.delta); if (s.length) z[2] = s[Math.min(api.p.sol, s.length - 1)]; }
+    if (api.scene === "wrist") { const s = this.wristSols(this.dir(api))[api.p.sol - 1]; z[4] = s.t5; z[5] = s.t6; }
+    if (api.scene === "elbow") { const s = this.elbowSols(api.p.delta); if (s.length) z[2] = s[Math.min(api.p.sol - 1, s.length - 1)]; }
     const o = {}; this.J.forEach((n, i) => { o[n] = z[i]; }); return o;
   },
   S(arm, link, xyz) { const [x, y, z] = arm.local(link, xyz); return [-x, -y, z]; },
@@ -120,10 +120,10 @@ WQ.lab({
       const xb = [x[0] - o[0], x[1] - o[1], x[2] - o[2]], c = xb[0] * d[0] + xb[1] * d[1] + xb[2] * d[2];
       const err = Math.acos(Math.max(-1, Math.min(1, c))) * 180 / Math.PI;
       const ex = Math.abs(api.p.az - 45) < 0.6 && Math.abs(api.p.el + 35.26) < 0.6;
-      if (ex && err < 0.01) { api.done("ex"); if (api.p.sol === 1) api.done("flip"); }
+      if (ex && err < 0.01) { api.done("ex"); if (api.p.sol === 2) api.done("flip"); }
       return [[["目标方向 d", "target direction d"], `(${d.map((v) => api.fmt(v, 3)).join(", ")})`],
-              [["解 0 (θ₅, θ₆)", "solution 0 (θ₅, θ₆)"], `(${deg(ss[0].t5)}, ${deg(ss[0].t6)})`],
-              [["解 1 (θ₅, θ₆)", "solution 1 (θ₅, θ₆)"], `(${deg(ss[1].t5)}, ${deg(ss[1].t6)})`],
+              [["解 1 (θ₅, θ₆)", "solution 1 (θ₅, θ₆)"], `(${deg(ss[0].t5)}, ${deg(ss[0].t6)})`],
+              [["解 2 (θ₅, θ₆)", "solution 2 (θ₅, θ₆)"], `(${deg(ss[1].t5)}, ${deg(ss[1].t6)})`],
               [["模型末端 x 轴与 d 的夹角", "angle between model x_b and d"], api.fmt(err, 4) + "°"]];
     }
     if (api.scene === "elbow") {
@@ -135,11 +135,11 @@ WQ.lab({
               [["θ₃ 的解", "solutions for θ₃"], ss.length ? ss.map(deg).join(api.T("、", ", ")) : api.T("无解", "none")],
               [["模型上 |q₄ − q₂|", "|q₄ − q₂| on the model"], api.fmt(dist, 4) + " m"]];
     }
-    const cs = this.camSols(d), c = cs[api.p.sol];
-    if (Math.abs(api.p.az - 120) < 0.6 && Math.abs(api.p.el - 30) < 0.6 && api.p.sol === 1) api.done("cam");
-    return [[["解 0（方位, 仰角）", "solution 0 (pan, tilt)"], `(${deg(cs[0].a)}, ${deg(cs[0].b)})`],
-            [["解 1（方位, 仰角）", "solution 1 (pan, tilt)"], `(${deg(cs[1].a)}, ${deg(cs[1].b)})`],
-            [["当前", "current"], api.p.sol === 1 ? api.T("倒过来", "upside down") : api.T("正着", "upright")],
+    const cs = this.camSols(d), c = cs[api.p.sol - 1];
+    if (Math.abs(api.p.az - 120) < 0.6 && Math.abs(api.p.el - 30) < 0.6 && api.p.sol === 2) api.done("cam");
+    return [[["解 1（方位, 仰角）", "solution 1 (pan, tilt)"], `(${deg(cs[0].a)}, ${deg(cs[0].b)})`],
+            [["解 2（方位, 仰角）", "solution 2 (pan, tilt)"], `(${deg(cs[1].a)}, ${deg(cs[1].b)})`],
+            [["当前", "current"], api.p.sol === 2 ? api.T("倒过来", "upside down") : api.T("正着", "upright")],
             [["选中的解", "chosen"], `(${deg(c.a)}, ${deg(c.b)})`]];
   },
   draw(api, s) {
@@ -160,7 +160,7 @@ WQ.lab({
       K.seg.geometry.setFromPoints([new T.Vector3(...a), new T.Vector3(...b)]);
     }
     if (cam) {
-      const c = this.camSols(d)[api.p.sol];
+      const c = this.camSols(d)[api.p.sol - 1];
       K.pan.rotation.z = c.a; K.tilt.rotation.y = -c.b;
       K.star.position.set(0.9 * d[0], 0.9 * d[1], 0.72 + 0.9 * d[2]);
     }

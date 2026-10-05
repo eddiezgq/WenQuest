@@ -1,7 +1,7 @@
 # 实验 14.2 的指导书与报告模板。目的、场景、参数、任务取自 lab14_2.js。
 原理:
   - ["平面 2R 臂末端到基座的距离 r 只由 θ₂ 决定。由余弦定理得 cos θ₂；θ₂ 有正负两个值，对应肘下、肘上两种构型。",
-     "For a planar 2R arm the tip-to-base distance r depends only on θ₂. The law of cosines gives cos θ₂; its two signs are the elbow-down and elbow-up configurations."]
+     "For a planar 2R arm the distance r from the end-effector to the base depends only on θ₂. The law of cosines gives cos θ₂; its two signs are the elbow-down and elbow-up configurations."]
   - 式: "cos θ₂ = (x² + y² − l₁² − l₂²) / (2 l₁ l₂)          (14.2.2)"
   - 式: "θ₁ = atan2(y, x) − atan2(l₂ sin θ₂, l₁ + l₂ cos θ₂)          (14.2.4)"
   - ["边界附近不要直接取反余弦：1 − cos θ₂ 与 1 + cos θ₂ 用因式分解直接算出（式 (14.2.6)），再用 atan2 求 θ₂。",
@@ -14,7 +14,7 @@
   - ["把“构型”改为 1，观察选中的手臂换到肘上（任务 2）。说明两组解的肘点与基座—目标连线的关系。",
      "Set “branch” to 1: the chosen arm becomes elbow-up (task 2). Describe how the two elbow points relate to the base–target line."]
   - ["沿 OA 方向把目标逐步外移，每步记录离基座的距离和两组 θ₂，直到两组解的 |θ₂| 都小于 12°（任务 3），记入表 2。",
-     "Move the target outward along OA step by step, recording the distance and both θ₂, until both |θ₂| are under 12° (task 3); fill in Table 2."]
+     "Move the target outwards along OA step by step, recording the distance and both θ₂, until both |θ₂| are under 12° (task 3); fill in Table 2."]
   - ["连杆数改为 1（3R），目标 (0.6, 0.05) m，φ = −90°（任务 4）。读出腕点 W 和两组解，记入表 1。",
      "Set links = 1 (3R), target (0.6, 0.05) m, φ = −90° (task 4). Record the wrist point W and both solutions in Table 1."]
   - ["切换到“台灯照到书上”，把灯罩移到 (0.35, 0.25) m，选择灯臂向上拱起的一组（任务 5）。",
@@ -30,7 +30,7 @@
     表头英文: ["Target / m", "r / m", "θ₂ of solution 1 / (°)", "θ₂ of solution 2 / (°)", "Difference of θ₁ / (°)"]
     行: [["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]]
 注意:
-  - ["关节角按逆时针为正，单位为度；关节轴垂直于屏幕向外。", "Joint angles are counter-clockwise positive, in degrees; joint axes point out of the screen."]
+  - ["关节角按逆时针为正，单位为度；关节轴垂直于屏幕向外。", "Joint angles are positive anticlockwise, in degrees; joint axes point out of the screen."]
   - ["“构型”只在有两组解时起作用；只有一组解时两者相同。", "“Branch” matters only when there are two solutions; with one solution both are the same."]
   - ["3R 场景中腕点 W 用黑点标出；腕点在 2R 的圆环之外时无解。", "In the 3R case the wrist W is the black dot; if it lies outside the 2R ring there is no solution."]
 思考题:

@@ -89,7 +89,7 @@ class Lesson(Base):
         c2l = MathTex("c_2", font_size=32, color=YELLOW).next_to(c2d, LEFT, buff=0.08)
         self.play(FadeIn(c1d, scale=1.6), FadeIn(c2d, scale=1.6), FadeIn(c1l), FadeIn(c2l))
         self.caption("两圆都在以 r 为球心的球面上，交于 c₁、c₂：两组解",
-                     "Both circles lie on a sphere about r; they meet at c₁ and c₂: two solutions", wait=1.0)
+                     "Both circles lie on a sphere centred at r and meet at c₁ and c₂: two solutions", wait=1.0)
 
         mv = Dot(P3(p), radius=0.1, color=ORANGE)
         path1 = VMobject(color=ORANGE, stroke_width=5).set_points_smoothly(circle_pts(W2, p, 0, T2, 40))
@@ -100,6 +100,6 @@ class Lesson(Base):
         self.caption(f"再绕 ω₁ 转 θ₁ = {math.degrees(T1):.1f}°，到达 q", f"Then θ₁ = {math.degrees(T1):.1f}° about ω₁ to reach q", wait=0)
         self.play(Create(path2), MoveAlongPath(mv, path2), run_time=2.0)
         self.wait(1.0)
-        self.card([["子问题 2：中间点 c 在两个圆的交点上", "Subproblem 2: the middle point c is where two circles meet"],
+        self.card([["子问题 2：中间点 c 在两个圆的交点上", "Subproblem 2: the intermediate point c is where two circles meet"],
                    MathTex(r"c - r = \alpha\,\hat\omega_1 + \beta\,\hat\omega_2 + \gamma\,\hat\omega_1\times\hat\omega_2", font_size=40),
-                   ["求出 c 后，θ₂、θ₁ 各是一次子问题 1", "Once c is known, θ₂ and θ₁ are each a Subproblem 1"]])
+                   ["求出 c 后，θ₂、θ₁ 各是一次子问题 1", "Once c is known, θ₂ and θ₁ each need one Subproblem 1"]])

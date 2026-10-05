@@ -30,8 +30,8 @@
     表头英文: ["Arm", "Smallest angle / (°)", "Largest angle / (°)", "Largest closure error / mm"]
     行: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""]]
 注意:
-  - ["SCARA 的丝杠向下为正：θ₃ = 0 时工具点最高（0.242 m）。", "The SCARA screw is positive downward: at θ₃ = 0 the tool is highest (0.242 m)."]
-  - ["Delta 的主动臂转角从水平量起，向下为正；限位 −40°～90°。", "Delta arm angles are measured from horizontal, downward positive; limits −40° to 90°."]
+  - ["SCARA 的丝杠向下为正：θ₃ = 0 时工具点最高（0.242 m）。", "The SCARA screw is positive downwards: at θ₃ = 0 the tool is highest (0.242 m)."]
+  - ["Delta 的主动臂转角从水平量起，向下为正；限位 −40°～90°。", "Delta arm angles are measured from horizontal, positive downwards; limits −40° to 90°."]
   - ["“闭合误差”从三维模型上读点计算，是检查逆解与摆放是否一致的独立办法。", "The closure error is read off the 3D model, an independent check that the solution and the posing agree."]
 思考题:
   - ["Delta 的工作空间沿中心轴向下到哪里为止？此时三条支链处于什么形态？与 14.6.3 节的结果比较。", "How far down the central axis does the Delta reach? What shape are the legs in then? Compare with Section 14.6.3."]

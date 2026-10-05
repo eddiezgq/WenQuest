@@ -14,6 +14,7 @@ from _ik import DELTA, SC, delta_leg_sp3, ik2r, scara_ik
 from bookout import T, figure, style
 
 plt = style()
+plt.rcParams["axes.unicode_minus"] = True        # 刻度上的负号用真正的减号 “−”
 L1s, L2s = SC["L1"], SC["L2"]
 lim1, lim2 = math.radians(140), math.radians(145)
 
@@ -32,7 +33,7 @@ base_mark(a1)
 a1.plot(tgt[0], tgt[1], "o", color=C["x"], ms=7, zorder=9)
 d = np.array([math.cos(tgt[3]), math.sin(tgt[3])])
 a1.annotate("", xy=np.array(tgt[:2]) + 0.12 * d, xytext=tgt[:2], arrowprops=dict(arrowstyle="-|>", color=C["x"], lw=1.4))
-a1.text(tgt[0] + 0.1, tgt[1] + 0.09, r"$\varphi = 30^\circ$", fontsize=10, color=C["x"])
+a1.text(tgt[0] + 0.1, tgt[1] + 0.09, r"$\varphi = 30$°", fontsize=10, color=C["x"])
 a1.plot([0, tgt[0]], [0, tgt[1]], color=C["muted"], lw=0.8, ls=":")
 a1.text(-0.24, 0.57, T("(a) 同一目标的两种构型（俯视）", "(a) two configurations for one target (top view)"), fontsize=10)
 # (b)
@@ -80,14 +81,15 @@ for th in sols:
     a1.plot([Bk[0], E[0]], [Bk[1], E[1]], color=col, lw=5, solid_capstyle="round")
     a1.plot([E[0], Pk[0]], [E[1], Pk[1]], color=col, lw=2, ls="-" if ok else "--")
     a1.plot(*E, "o", color=col, ms=5)
-    a1.text(E[0] + 0.02, E[1] + 0.02, T(f"θ₁ = {math.degrees(th):.1f}°", f"θ₁ = {math.degrees(th):.1f}°"), fontsize=9.5, color=col)
+    lp = (E[0] + 0.03, E[1] - 0.005, "center") if ok else (E[0] + 0.02, E[1] + 0.02, "baseline")   # 可用解的标注放在端点右侧，避开虚线圆与阴影
+    a1.text(lp[0], lp[1], T(f"θ₁ = {math.degrees(th):.1f}°", f"θ₁ = {math.degrees(th):.1f}°".replace("-", "−")), fontsize=9.5, color=col, va=lp[2])
 a1.plot([-0.1, 0.6], [0, 0], color=C["ink"], lw=1.0)
 a1.plot(*Bk, "o", color=C["ink"], ms=5)
 a1.text(Bk[0] - 0.02, Bk[1] + 0.03, T("铰点", "hinge"), fontsize=9)
 a1.plot(*Pk, "s", color=C["x"], ms=6)
 a1.text(Pk[0] + 0.02, Pk[1] - 0.04, "P′₁", fontsize=11, color=C["x"])
 a1.text(-0.11, 0.27, T("(a) 支链 1 的竖直平面：两个解", "(a) leg 1, vertical plane: two solutions"), fontsize=10)
-a1.text(0.28, -0.36, T("浅蓝阴影：关节限位以内", "shaded: within the joint limits"), fontsize=8.5, color=C["muted"])
+a1.text(0.28, -0.36, T("浅蓝阴影：关节限位以内", "light blue: within\nthe joint limits"), fontsize=8.5, color=C["muted"])
 # (b)
 ang = np.arange(0, 361, 1.0)
 TH = np.array([[math.degrees(min(delta_leg_sp3(k, np.array([0.12 * math.cos(math.radians(a)), 0.12 * math.sin(math.radians(a)), -0.42])),

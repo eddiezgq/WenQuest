@@ -30,7 +30,7 @@ for i in range(6):
     q = Es[i][:3, :3] @ SW_Q[i] + Es[i][:3, 3]
     if i >= 3:
         line3d(ax, q, w, -0.2, 0.2, cols[i], lw=2.0)
-        end = {3: -0.27, 4: 0.23, 5: 0.27}[i]
+        end = {3: -0.27, 4: T(0.23, 0.26), 5: 0.27}[i]               # 英文 "axis 5" 稍向外移，免得压住轴线
         lift = np.array([0, 0, 0.07 if i == 5 else 0.012])
         label3d(ax, q + end * w + lift, T(f"轴 {i + 1}", f"axis {i + 1}"), cols[i], fs=9)
     else:
@@ -45,7 +45,7 @@ label3d(ax, (pw + Tb[:3, 3]) / 2 + np.array([0, 0, 0.04]), r"$D_6$", fs=11)
 label3d(ax, P[1] + np.array([0.03, 0.0, 0.02]), T("肩", "shoulder"), fs=9)
 label3d(ax, P[2] + np.array([0.03, 0.0, 0.03]), T("肘", "elbow"), fs=9)
 ax.plot([0.0, 0.0], [0.0, 0.0], [0.0, 0.16], color=C["muted"], lw=8, alpha=0.5)
-ax.text2D(0.0, 0.0, T(r"前三个关节把腕心 $p_w$ 送到位；后三个关节绕 $p_w$ 调整姿态", r"joints 1–3 place the wrist centre $p_w$; joints 4–6 turn the tool about it"),
+ax.text2D(0.0, 0.0, T(r"前三个关节把腕心 $p_w$ 送到位；后三个关节绕 $p_w$ 调整姿态", r"joints 1–3 place the wrist centre $p_w$; joints 4–6 set the orientation about it"),
           transform=ax.transAxes, fontsize=9, color=C["ink"])
 equal3d(ax, np.vstack([P, P[-1] + 0.3 * sw_fk(th)[:3, 0]]), pad=0.06, zoom=1.25)
 figure(fig, "fig14_4_1")
@@ -66,17 +66,17 @@ def axes_now(Slist, Q, W, th):
 
 fig = plt.figure(figsize=(9.8, 4.6))
 cases = [(T("(a) 球形手腕：轴 4、5、6 交于腕心", "(a) spherical wrist: axes 4, 5, 6 meet at one point"),
-          sw_chain, SW_S, SW_Q, SW_W, np.radians([0, 35, -75, 0, 55, 0]), (3, 4, 5), -60),
+          sw_chain, SW_S, SW_Q, SW_W, np.radians([0, 35, -75, 0, 55, 0]), (3, 4, 5), -60, {0: 0.28, 2: -0.24, 4: 0.26}),
          (T("(b) UR5e：轴 2、3、4 互相平行", "(b) UR5e: axes 2, 3, 4 are parallel"),
-          ur_chain, UR_S, UR_Q, UR_W, np.radians([0, -60, 80, -110, -90, 0]), (1, 2, 3), 35)]
-for k, (title, chain_f, Sl, Q, W, th, hi, az) in enumerate(cases):
+          ur_chain, UR_S, UR_Q, UR_W, np.radians([0, -60, 80, -110, -90, 0]), (1, 2, 3), 35, {2: 0.26, 3: -0.24, 4: 0.26})]
+for k, (title, chain_f, Sl, Q, W, th, hi, az, lab) in enumerate(cases):     # lab：个别轴号放在轴线另一端或更外侧，免得压住连杆和轴线
     _, ax = axes3d(plt, fig=fig, pos=121 + k, elev=22, azim=az)
     chain = chain_f(th)
     draw_chain(ax, chain, "#9aa6ad", lw=5)
     for i, (q, w) in enumerate(axes_now(Sl, Q, W, th)):
         col = C["accent"] if i in hi else C["muted"]
         line3d(ax, q, w, -0.16, 0.16, col, lw=2.4 if i in hi else 1.4)
-        label3d(ax, q + 0.2 * w, str(i + 1), col, fs=11, weight="bold")
+        label3d(ax, q + lab.get(i, 0.2) * w, str(i + 1), col, fs=11, weight="bold", ha="center", va="center")
     ax.text2D(0.02, 0.97, title, transform=ax.transAxes, fontsize=10)
     equal3d(ax, chain, pad=0.1, zoom=1.35)
 figure(fig, "fig14_4_2")

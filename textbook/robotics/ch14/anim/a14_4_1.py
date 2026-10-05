@@ -89,9 +89,9 @@ class Lesson(Base):
 
         rb, tb = always_redraw(robot), always_redraw(table)
         self.add(rb, tb)
-        lab = VGroup(Dot(radius=0.1, color=YELLOW), zh("腕心", 22, YELLOW)).arrange(RIGHT, buff=0.12).to_corner(UL, buff=0.6).shift(DOWN * 1.2)
+        lab = VGroup(Dot(radius=0.1, color=YELLOW), bi(["腕心", "wrist centre"], 22, YELLOW)).arrange(RIGHT, buff=0.12).to_corner(UL, buff=0.6).shift(DOWN * 1.2)
         self.play(FadeIn(lab))
-        self.caption("目标的位置不变、姿态在变：腕心不动", "Target position fixed, orientation changing: the wrist centre stays put")
+        self.caption("目标的位置不变、姿态在变：腕心不动", "Target position fixed, orientation changing: the wrist centre does not move")
         self.play(th[3].animate.set_value(math.radians(80)), th[4].animate.set_value(math.radians(25)),
                   th[5].animate.set_value(math.radians(60)), run_time=4.0, rate_func=smooth)
         self.caption("θ₁、θ₂、θ₃ 一直不变，只有手腕的三个关节在转",
@@ -121,6 +121,6 @@ class Lesson(Base):
         self.play(s.animate.set_value(1.0), run_time=4.5, rate_func=smooth)
         driver.clear_updaters()
         self.wait(0.5)
-        self.card([["球形手腕：位置与姿态分开求", "Spherical wrist: position and orientation solved apart"],
+        self.card([["球形手腕：位置与姿态分开求", "Spherical wrist: position and orientation solved separately"],
                    MathTex(r"e^{[\mathcal S_1]\theta_1}e^{[\mathcal S_2]\theta_2}e^{[\mathcal S_3]\theta_3}\,p_{w0} = T_d M^{-1} p_{w0}", font_size=38),
                    ["前三个关节定腕心，后三个关节定姿态", "Joints 1–3 place the wrist centre; joints 4–6 set the orientation"]])

@@ -11,9 +11,9 @@ WQ.lab({
   models: [],
   scenes: [
     { id: "arm", robot: true, name: ["球形手腕六轴臂", "Six-axis arm with a spherical wrist"], hide: ["tilt"],
-      problem: { title: ["机器人问题：位置和姿态能不能分开求", "Robot problem: can position and orientation be solved apart"],
+      problem: { title: ["机器人问题：位置和姿态能不能分开求", "Robot problem: can position and orientation be solved separately?"],
                  text: ["用滑块给出腕心的位置和末端的姿态（虚线坐标系是目标），界面求出 8 组逆解，用“解的编号”选择显示哪一组。金色小球是腕心。",
-                        "Sliders give the wrist-centre position and the tool orientation (dashed frame = target). All eight solutions are computed; “solution” picks the one shown. The gold ball is the wrist centre."] } },
+                        "Sliders give the wrist-centre position and the end-effector orientation (dashed frame = target). All eight solutions are computed; “solution” picks the one shown. The gold ball is the wrist centre."] } },
     { id: "cup", name: ["端水倒水", "Pouring a glass of water"], hide: ["wx", "wy", "wz", "yaw", "pitch", "roll", "k"],
       problem: { title: ["生活中的例子：手不动，只转手腕", "Everyday example: the hand stays, only the wrist turns"],
                  text: ["手（腕心）停在杯口上方不动，拖动“倾斜角”把杯子转过来倒水。观察哪几个关节在动。",
@@ -192,7 +192,7 @@ WQ.lab({
             [["θ₁, θ₂, θ₃（腕心）", "θ₁, θ₂, θ₃ (wrist centre)"], sel.th.slice(0, 3).map(d).join(", ")],
             [["θ₄, θ₅, θ₆（姿态）", "θ₄, θ₅, θ₆ (orientation)"], sel.th.slice(3).map(d).join(", ")],
             [["腕心", "wrist centre"], `(${Td.pw.map((v) => api.fmt(v, 3)).join(", ")}) m`],
-            [["末端误差（代回正运动学）", "tool error (back through FK)"], err.toExponential(1) + " m"]];
+            [["末端误差（代回正运动学）", "end-effector error (back through FK)"], err.toExponential(1) + " m"]];
   },
   draw(api, s) {
     const K = api.keep, T = api.three;

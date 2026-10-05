@@ -60,7 +60,7 @@ circle3d(ax, cpt, w, R0, C["z"], lw=1.4)
 sols = sp3(w, r, p0, qb, delta)
 pts = [cpt + rot(w, t) @ (p0 - cpt) for t in sols]
 ax.scatter(*p0, color=C["z"], s=26, depthshade=False)
-label3d(ax, p0 + np.array([0.04, -0.04, 0.04]), "p", C["z"], fs=12)
+label3d(ax, p0 + np.array([-0.08, -0.05, 0.03]), "p", C["z"], fs=12, ha="right")
 ax.scatter(*qb, color=C["x"], s=26, depthshade=False)
 label3d(ax, qb + np.array([0.04, 0.04, 0.04]), "q", C["x"], fs=12)
 for k, pp in enumerate(pts, 1):
@@ -75,7 +75,7 @@ qp = cpt + (qb - cpt) - w * ((qb - cpt) @ w)
 ax.plot(*np.array([qb, qp]).T, color=C["muted"], lw=0.8, ls=":")
 ax.scatter(*qp, color=C["muted"], s=10, depthshade=False)
 label3d(ax, qp + np.array([0.04, 0.0, -0.08]), "q′", C["muted"], fs=11)
-label3d(ax, r + np.array([-0.8, -0.9, 1.45]), T("(b) 子问题 3", "(b) Subproblem 3"), fs=11)
+label3d(ax, r + np.array(T([-0.8, -0.9, 1.45], [-1.2, -1.3, 1.45])), T("(b) 子问题 3", "(b) Subproblem 3"), fs=11)   # 英文标签较长，左移以免压住 ω
 equal3d(ax, [r - 0.2 * w, r + 1.3 * w, qb, cpt + np.array([-0.8, -0.8, 0]), cpt + np.array([0.8, 0.8, 0])], pad=0.02, zoom=1.05)
 figure(fig, "fig14_3_1")
 plt.close(fig)
@@ -111,7 +111,7 @@ for k, (_, _, c) in enumerate(sol, 1):
     ax.scatter(*c, color=C["accent"], s=40, depthshade=False)
     label3d(ax, c + np.array([0.05, 0.03, 0.06]), f"$c_{k}$", C["accent"], fs=12)
 ax.scatter(*r, color=C["ink"], s=14, depthshade=False)
-label3d(ax, r + np.array([0.05, -0.12, -0.12]), "r", fs=11)
+label3d(ax, r + np.array([-0.06, -0.03, -0.1]), "r", fs=11, ha="right", va="top")
 ax.text2D(0.02, 0.02, T("蓝圆：p 绕 ω₂ 转动的轨迹；红圆：q 绕 ω₁ 转动的轨迹；两圆的交点 c₁、c₂",
                          "blue: p turning about ω₂; red: q turning about ω₁; they meet at c₁ and c₂"), transform=ax.transAxes, fontsize=9, color=C["ink"])
 equal3d(ax, [np.array([-1.1, -1.1, -1.1]), np.array([1.1, 1.1, 1.1])], pad=0.0, zoom=1.2)
