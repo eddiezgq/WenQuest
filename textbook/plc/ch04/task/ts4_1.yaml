@@ -1,0 +1,31 @@
+# 工程任务单 TS-4-1（配 4.1–4.4 节，第一篇篇首项目的第三个里程碑）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-4-1
+标题: [上料输送线的最坏响应时间计算书, "Worst-case response time of the feed conveyor"]
+角色: [电气设计工程师, electrical design engineer]
+背景:
+  - "上料输送线的 PLC 已经选定（TS-3-1）。工艺提出一项新要求：棒料前端碰到末端光电开关 B2 以后，输送线必须在 0.2 s 内停住，棒料越过 B2 不得超过 25 mm，否则会撞上下游的定位挡块。项目经理要一份计算书回答：现在的设计能不能做到？做不到，改哪里最划算？输送带速 0.25 m/s；电动机断电后靠摩擦和负载自然停下，实测从接触器断开到输送带停住约 0.12 s（可按匀减速估算滑行距离）。"
+  - "The PLC of the feed conveyor has been chosen (TS-3-1). Process engineering adds a requirement: once a bar's front end reaches end sensor B2, the conveyor must stop within 0.2 s, and the bar must not travel more than 25 mm past B2, or it hits the downstream stop. The project manager wants a calculation answering: can the present design do it? If not, what is the cheapest change? Belt speed 0.25 m/s; after the contactor opens the motor coasts to rest by friction and load, measured at about 0.12 s from contactor open to standstill (estimate the coasting distance as uniform deceleration)."
+输入:
+  - {名称: [PLC 选型计算书与 I/O 分配表, "PLC selection calculation and I/O table"], 来源: [TS-3-1 的交付物, "Deliverables of TS-3-1"]}
+  - {名称: [响应时间的算法与示例, "How to compute the response time, with an example"], 来源: [教材 4.4 节、图 4.4.1, "Section 4.4, Fig. 4.4.1"]}
+  - {名称: [输入滤波、输出类型、接触器释放时间, "Input filter, output type, contactor release"], 来源: [教材 3.3.4、3.4 节，样本, "Sections 3.3.4, 3.4, catalogues"]}
+  - {名称: [PLC 程序的扫描时间, "Scan time of the PLC program"], 来源: [实验 4.3 的方法，或按样本估算, "As in Lab 4.3, or estimated from the catalogue"]}
+交付物:
+  - {名称: [响应时间计算书, "Response time calculation"], 格式: [ipynb, pdf], 验收: [列出从 B2 动作到输送带停住的每一段时间（传感器、输入滤波、扫描、输出、接触器释放、机械滑行），最好值与最坏值分开算；用 Python 做一次蒙特卡洛，给出分布和 99.9% 分位值；与 0.2 s、25 mm 的要求比较并下结论, "Every stage from B2 to standstill (sensor, input filter, scan, output, contactor release, coasting), best and worst separately; a Monte Carlo in Python with the distribution and the 99.9th percentile; compared with 0.2 s and 25 mm, with a conclusion"]}
+  - {名称: [改进建议（半页）, "Improvement proposal (half a page)"], 格式: [docx, pdf], 验收: [至少比较两种改法（例如缩短滤波、改晶体管输出、把停止逻辑放进中断或周期任务、加制动器），各算出能省多少时间、要花多少钱或冒什么风险, "Compare at least two changes (e.g. shorter filter, transistor output, the stop logic in an interrupt or periodic task, a brake), each with the time saved and the cost or risk"]}
+工位: [PY, PLM]
+步骤:
+  - ["画出信号链：B2 → 输入滤波 → 输入映像 → 程序 → 输出映像 → 输出 → KM1 线圈 → 主触点 → 电动机 → 输送带，标出每一段的时间来源（样本、实测或估算）。", "Draw the signal chain B2 → filter → input image → program → output image → output → KM1 coil → main contacts → motor → belt, with the source of each time (catalogue, measured, estimated)."]
+  - ["按 4.4 节的公式算最好值和最坏值，换算成棒料越过 B2 的距离。", "Compute best and worst cases with the formula of Section 4.4 and convert them into the distance past B2."]
+  - ["仿照图 4.4.1 写一段 Python 蒙特卡洛：B2 动作的时刻随机、扫描时间在一个范围内抖动、接触器释放时间在样本范围内随机，跑 10 万次，画分布。", "Write a Monte Carlo in Python like Fig. 4.4.1: random B2 instant, jittering scan time, random contactor release within the catalogue range; 100 000 runs; plot the distribution."]
+  - ["判断能否满足要求；不满足或余量不足时，比较改法，写改进建议。", "Decide whether the requirement is met; if not, or with little margin, compare changes and write the proposal."]
+  - ["在平台上提交，经评审后发布。", "Submit on the platform for review and release."]
+评审要点:
+  - ["〔老师检查〕最坏值用了两个最长的扫描周期，而不是一个；滤波、输出、接触器、滑行各段都没有漏。", "[Teacher] The worst case uses two of the longest scans, not one; no stage is left out."]
+  - ["〔老师检查〕蒙特卡洛的最大值不超过公式的最坏值；如果超过，说明了原因。", "[Teacher] The Monte Carlo maximum does not exceed the formula's worst case; if it does, the reason is given."]
+  - ["〔老师检查〕结论同时检查了时间（0.2 s）和距离（25 mm）两条要求；改进建议算出了效果。", "[Teacher] The conclusion checks both the time (0.2 s) and the distance (25 mm); the proposals quantify their effect."]
+评分:
+  - {项: [信号链与公式计算, Signal chain and formula], 分: 35, 标准: [各段齐全、来源清楚、最坏值正确, "All stages, sources stated, correct worst case"]}
+  - {项: [蒙特卡洛, Monte Carlo], 分: 30, 标准: [模型合理、代码能运行、分布与分位值正确, "Sound model, runnable code, correct distribution and percentile"]}
+  - {项: [结论与改进建议, Conclusion and proposals], 分: 35, 标准: [结论明确，至少两种改法有定量比较, "Clear conclusion, at least two quantified alternatives"]}
+学时: 3

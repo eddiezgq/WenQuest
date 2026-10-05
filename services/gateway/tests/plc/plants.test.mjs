@@ -262,3 +262,26 @@ test("pulse source: an ordinary input counts up to 1/(2·scan); at a multiple of
   assert.ok(count(60, 10)["cnt.CV"] < 60);
   assert.equal(count(200, 1)["cnt.CV"], 200);
 });
+
+test("scan model: the scan time grows with the program, the watchdog stops it, free cycles advance by the scan", () => {
+  const st = (n) => `PROGRAM Main
+  VAR cnt : CTU; n : DINT := ${n}; i : DINT; work : DINT; END_VAR
+  cnt(CU := B1_Part, R := S1_Reset, PV := 30000);
+  FOR i := 1 TO n DO work := work + 1; END_FOR;
+  H1_Count := B1_Part;
+END_PROGRAM`;
+  const run = (n, ms = 3000) => {
+    const p = W.counter({ fast2: true });
+    return P.runTest({ io: p.io, st: st(n), cycle: 1, scanModel: { base: 0.5, perStep: 1 }, cycleMode: "free", watchdog: 150, budget: 1e7 }, p,
+      { id: "c", steps: [{ wait: ms }] }, { final: ["cnt.CV", "parts", "Main.cnt.CV", "HSC1_CV", "$maxScan"] });
+  };
+  const a = run(1000), b = run(5000);
+  assert.ok(Math.abs(a.final.$maxScan - 2.5) < 0.2, a.final.$maxScan);
+  assert.ok(b.final.$maxScan > 10 && b.final.$maxScan < 11, b.final.$maxScan);
+  assert.ok(Math.abs(a.final["cnt.CV"] - a.final.parts) <= 1, JSON.stringify(a.final));        // short scan: every part counted
+  assert.ok(b.final["cnt.CV"] < 0.9 * b.final.parts, JSON.stringify(b.final));                   // 10.5 ms scan, 8 ms pulses: misses
+  assert.ok(b.final.parts - b.final.HSC1_CV <= 1);   // the hardware counter misses nothing (the image lags the plant by one scan)
+  const w = run(80000, 500);
+  assert.equal(w.ok, false);
+  assert.match(w.failures[0].msg, /看门狗|watchdog/);
+});

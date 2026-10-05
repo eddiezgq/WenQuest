@@ -839,7 +839,63 @@ function pulser(o = {}) {
   };
 }
 
-const API = { traffic, elevator, sorter, press, conveyor, reversing, stardelta, pulser, kit3d, rng };
+// ---------------------------------------------------------------- 8. a counting conveyor (Ch. 4): parts pass a photo sensor
+// Parts 40 mm long, 60 mm apart, pass B1_Part (1 while a part blocks the beam). Belt speed 0.5 m/s, or 2 m/s with the panel
+// switch Fast, or 5 m/s with VeryFast: the beam is blocked for 80, 20 or 8 ms. The PLC must count every part.
+function counter(o = {}) {
+  const io = [
+    { name: "B1_Part", addr: "%IX0.0", dir: "in", comment: ["计件光电开关 B1（有工件挡光为 1）", "Counting photo sensor B1 (1 while a part blocks it)"] },
+    { name: "S1_Reset", addr: "%IX0.1", dir: "in", comment: ["计数清零按钮 S1", "Reset button S1"] },
+    { name: "HSC1_CV", addr: "%ID1000", dir: "in", type: "DINT", comment: ["高速计数器 HSC1 的当前值（硬件对 B1 的上升沿计数，与扫描无关）", "High-speed counter HSC1 value (hardware counts B1's rising edges, independent of the scan)"] },
+    { name: "H1_Count", addr: "%QX0.0", dir: "out", comment: ["计件指示灯 H1（每数到一个闪一下）", "Count lamp H1 (blinks per part)"] },
+  ];
+  const LEN = 0.04, PITCH = 0.1;
+  const speed = (s) => (s.fast2 ? 5 : s.fast ? 2 : o.v || 0.5);
+  return {
+    io,
+    panel: [{ name: "S1_Reset", kind: "push", label: ["清零 S1", "Reset S1"] }, { name: "Fast", kind: "switch", label: ["带速 2 m/s", "Belt 2 m/s"] },
+            { name: "VeryFast", kind: "switch", label: ["带速 5 m/s", "Belt 5 m/s"] }],
+    faults: [],
+    reset(s) { s.t = 0; s.x = 0; s.parts = 0; s.since = 0; s.fast = !!o.fast; s.fast2 = !!o.fast2; s.out = {}; },
+    inputs(s) { const p = s.x % PITCH; return { B1_Part: p < LEN, HSC1_CV: s.parts }; },
+    step(dt, out, s, ins) {
+      s.t += dt; s.out = out;
+      if (ins && "Fast" in ins) s.fast = !!ins.Fast;
+      if (ins && "VeryFast" in ins) s.fast2 = !!ins.VeryFast;
+      const x0 = s.x;
+      s.x += speed(s) * dt / 1000;
+      const k = Math.floor(s.x / PITCH) - Math.floor(x0 / PITCH);   // a part's front edge reached the beam
+      s.parts += k;
+      s.since = ins && ins.S1_Reset ? 0 : s.since + k;                 // parts since the last press of S1 (the reference for the PLC's count)
+    },
+    read(s, n) {
+      if (n === "parts") return s.parts;
+      if (n === "since") return s.since;
+      if (n === "speed") return speed(s);
+      if (n === "pulseMs") return LEN / speed(s) * 1000;
+      return undefined;
+    },
+    build3d(st, THREE) {
+      const K = kit3d(st, THREE);
+      const v = { K, boxes: [] };
+      K.box(3.2, 0.06, 0.4, 0x2d333b, 0, 0.8, 0);
+      for (let i = 0; i < 32; i++) v.boxes.push(K.box(0.04 * 4, 0.12, 0.2, 0xb08800, 0, 0.89, 0));
+      K.box(0.06, 0.25, 0.06, 0x24292f, 0, 1.0, -0.3); K.label("B1", 0, 1.25, -0.3, 0.1);
+      v.beam = K.beam([0, 0.9, -0.27], [0, 0.9, 0.27], 0x9aa7b0);
+      v.h1 = K.lamp(0.05, 0x2da44e, 0.4, 1.25, -0.3); K.label("H1", 0.4, 1.4, -0.3, 0.08);
+      K.camera([0.8, 1.9, 2.4], [0, 0.85, 0]);
+      return v;
+    },
+    draw3d(v, s) {
+      v.beam.userData.on(this.inputs(s).B1_Part); v.h1.userData.on((s.out || {}).H1_Count);
+      // parts drawn 4x enlarged in pitch so they stay visible: the scene shows the rhythm, not the scale
+      const off = (s.x % PITCH) / PITCH;
+      v.boxes.forEach((m, i) => { const x = (i - 16 + off) * PITCH * 4 * 0.25 * 4; m.position.set(x - 0.08, 0.89, 0); m.visible = Math.abs(x) < 1.55; });
+    },
+  };
+}
+
+const API = { traffic, elevator, sorter, press, conveyor, reversing, stardelta, pulser, counter, kit3d, rng };
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 else root.WQPLANTS = API;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -24,6 +24,9 @@ chapters:
   3:
     status: ai
     title_en: "PLC Hardware"
+  4:
+    status: ai
+    title_en: "Scan Cycle and Execution Model"
   15:
     status: ai
     title_en: "Sequential Control Design"

@@ -2,7 +2,7 @@
 // with view: "plc" gets. The engine is WQPLC (plc.js); the kit (kit.js) calls WQPLCUI.setup(L, kit) for such a lab.
 //
 // A PLC lab supplies, besides the usual title, scenes, tasks and draw():
-//   plc:   { io: [{name, addr, dir: "in"|"out", type?, comment: [zh, en]}], lang: "ST"|"LD", cycle, filter,
+//   plc:   { io: [{name, addr, dir: "in"|"out", type?, comment: [zh, en]}], lang: "ST"|"LD", cycle, filter, scanModel?, cycleMode?, watchdog?,
 //            program: {st} or {decls, ladder}   (the starting program the student edits),
 //            watch: ["Main.state", ...], tests: [{id, name: [zh, en], steps: [...], faults}], },
 //   plant: { reset(s, {faults}), inputs(s) -> {name: value}, step(dt_ms, outputs, s), read(s, name),
@@ -618,7 +618,8 @@ function setup(L, K) {
 
   // ---------------------------------------------------------------- runtime
   function rtOptions() {
-    const base = { io, cycle: cfg.cycle || 10, filter: cfg.filter || 0, budget: cfg.budget || 100000 };
+    const base = { io, cycle: cfg.cycle || 10, filter: cfg.filter || 0, budget: cfg.budget || 100000, scanModel: cfg.scanModel || null,
+                   cycleMode: cfg.cycleMode || "fixed", watchdog: cfg.watchdog || 0 };
     try {
       const o = Object.assign(base, source()); new WQPLC.Runtime(o); return o;
     } catch (e) { S.err = e; say(errText(e), "bad"); return null; }
@@ -656,15 +657,22 @@ function setup(L, K) {
       if (v !== undefined) { rt.phys[x.addr] = v; ins[x.name] = v; }
     });
     for (const k in S.panel) if (!(k in ins) && !io.some((x) => x.name === k)) ins[k] = S.panel[k];   // operator actions on the machine
+    const t0 = rt.now;
     const ok = rt.scan();
-    if (plant.step) plant.step(rt.cycle, rt.outputs(), S.ps, ins);
-    if (!ok) { api.running = false; say(T("PLC 停机（STOP）：", "PLC stopped: ") + errText(rt.error), "bad"); }
+    if (plant.step) plant.step(ok ? rt.now - t0 : rt.cycle, rt.outputs(), S.ps, ins);
+    S.lastDt = ok ? rt.now - t0 : rt.cycle;
+    if (!ok) {
+      api.running = false; say(T("PLC 停机（STOP）：", "PLC stopped: ") + errText(rt.error), "bad");
+      if (def.check) def.check(api, S.ps);   // readouts (and with them the lab's check) stop once the run ends: let the check see the stop
+    }
     return ok;
   }
   function paintStatus() {
     const rt = S.rt;
     const st = !rt ? ["未下载", "No program"] : rt.error ? ["故障 STOP", "FAULT STOP"] : api.running ? ["运行 RUN", "RUN"] : ["停止 STOP", "STOP"];
-    status.textContent = P(st) + (rt ? T(` · 扫描 ${rt.scans} 次 · 周期 ${rt.cycle} ms`, ` · ${rt.scans} scans · cycle ${rt.cycle} ms`) : "");
+    const sm = rt && rt.scanModel && rt.scans ? T(` · 扫描时间 ${rt.lastScan.toFixed(2)} ms（最长 ${rt.maxScan.toFixed(2)}）` + (rt.overruns ? ` · 超时 ${rt.overruns} 次` : ""),
+                                                   ` · scan ${rt.lastScan.toFixed(2)} ms (max ${rt.maxScan.toFixed(2)})` + (rt.overruns ? ` · ${rt.overruns} overruns` : "")) : "";
+    status.textContent = P(st) + (rt ? T(` · 扫描 ${rt.scans} 次 · 周期 ${rt.cycle} ms`, ` · ${rt.scans} scans · cycle ${rt.cycle} ms`) + sm : "");
     status.className = "plcstatus " + (!rt || rt.error ? "bad" : api.running ? "run" : "");
   }
 
@@ -675,7 +683,9 @@ function setup(L, K) {
     if (!S.rt) { api.running = false; return; }
     S.acc += dt * 1000 * S.speed;
     let n = 0;
-    while (S.acc >= S.rt.cycle && n < 400) { S.acc -= S.rt.cycle; n++; if (!scanOnce()) break; }
+    while (S.acc >= (S.rt.scanModel ? Math.max(0.05, S.rt.lastScan || S.rt.cycle) : S.rt.cycle) && n < 2000) {   // variable scans (Ch. 4): consume the time each scan really took
+      const ok = scanOnce(); n++; S.acc -= S.lastDt; if (!ok) break;
+    }
     syncIo();
   };
   def.action = (id) => {

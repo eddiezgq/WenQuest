@@ -1282,6 +1282,12 @@ class Runtime {
     this.cycle = opts.cycle || 10;            // scan time setting, ms (the time one scan takes in the simulation)
     this.filter = opts.filter || 0;           // input filter, ms
     this.budget = opts.budget || 200000;      // statements per scan before the watchdog trips
+    // scan time model (Ch. 4): a scan takes base ms + perStep µs per statement executed; "free" cycling starts the next scan at
+    // once, "fixed" waits for the cycle time (a longer scan is an overrun). watchdog: ms per scan before the PLC stops.
+    this.scanModel = opts.scanModel || null;
+    this.cycleMode = opts.cycleMode || "fixed";
+    this.watchdog = opts.watchdog || 0;
+    this.lastScan = 0; this.minScan = Infinity; this.maxScan = 0; this.overruns = 0;
     this.io = (opts.io || []).map((x) => Object.assign({}, x, { addr: normAddr(x.addr) }));
     this.image = {};                          // the process image: "%IX0.0" -> value
     this.phys = {};                           // the physical inputs (before filtering)
@@ -1300,6 +1306,7 @@ class Runtime {
     this.project = compile(text, { io: this.io });
     this.state = this.project.newState();
     this.ladder = opts.ladder ? compileLadder(this.project, opts.ladder, this.project.programs[0]) : null;
+    this.ladderCells = opts.ladder ? opts.ladder.reduce((n, r) => n + r.cells.reduce((m, row) => m + row.filter(Boolean).length, 0), 0) : 0;
     this.error = null;
   }
   read(a) {
@@ -1348,7 +1355,14 @@ class Runtime {
         const self = this.state.instances[this.project.programs[0].toUpperCase()];
         env.globals = this.state.globals;
         this.ladder.forEach((r) => r({ self, env }));
+        env.steps += this.ladderCells || 0;
       } else this.project.execute(this.state, env);
+      if (this.scanModel) {
+        const t = (this.scanModel.base || 0) + env.steps * (this.scanModel.perStep || 0) / 1000;
+        this.lastScan = t; this.minScan = Math.min(this.minScan, t); this.maxScan = Math.max(this.maxScan, t);
+        if (this.watchdog && t > this.watchdog)
+          throw E("watchdog", `看门狗：扫描时间 ${t.toFixed(1)} ms 超过了 ${this.watchdog} ms / watchdog: scan time ${t.toFixed(1)} ms exceeds ${this.watchdog} ms`, 0);
+      }
     } catch (e) {
       this.error = e instanceof PlcError ? e : E("runtime", String(e.message || e));
       // a tripped watchdog (or any runtime error) puts the PLC in STOP: all outputs off
@@ -1356,7 +1370,11 @@ class Runtime {
       return false;
     }
     this.scans++;
-    this.now += this.cycle;
+    if (this.scanModel) {
+      const t = this.lastScan;
+      if (this.cycleMode === "free") this.now += t;
+      else { if (t > this.cycle) this.overruns++; this.now += Math.max(this.cycle, t); }
+    } else this.now += this.cycle;
     if (this.trace) this.recordTrace();
     return true;
   }
@@ -1422,8 +1440,9 @@ function runTest(rtOpts, plant, test, opts = {}) {
       }
       // operator actions on the machine that are not PLC inputs (e.g. "put a part") go to the machine only
       for (const k in manual) if (!(k in ins) && !rt.io.some((x) => x.name === k)) ins[k] = manual[k];
+      const t0 = rt.now;
       if (!rt.scan()) return false;
-      if (plant && plant.step) plant.step(dt, rt.outputs(), ps, ins);
+      if (plant && plant.step) plant.step(rt.now - t0, rt.outputs(), ps, ins);
       if (trace && (!opts.every || rt.now - (trace.last ?? -1e9) >= opts.every - 1e-9)) { trace.last = rt.now; trace.t.push(rt.now); trace.names.forEach((n, k) => trace.v[k].push(val(n))); }
       if (check && check()) return true;
     }
@@ -1432,6 +1451,11 @@ function runTest(rtOpts, plant, test, opts = {}) {
   const same = (a, b) => (typeof b === "number" && typeof a === "number" ? Math.abs(a - b) <= (opts.tol || 1e-6) : a === b);
   const fail = (msg) => { result.ok = false; result.failures.push({ at: rt.now, msg }); };
   const val = (n) => {
+    if (n === "$scan") return rt.lastScan;
+    if (n === "$maxScan") return rt.maxScan;
+    if (n === "$minScan") return rt.minScan === Infinity ? 0 : rt.minScan;
+    if (n === "$overruns") return rt.overruns;
+    if (n === "$scans") return rt.scans;
     const io = rt.io.find((x) => x.name === n);
     if (io) return rt.read(io.addr);
     if (plant && plant.read) { const v = plant.read(ps, n); if (v !== undefined) return v; }

@@ -15,11 +15,12 @@ const out = { ok: true, error: null, tests: [], review: [], scenario: null };
 try {
   const plant = job.plant ? W[job.plant](job.plantOpts || {}) : null;
   const io = job.io || (plant && plant.io) || [];
-  const rtOpts = Object.assign({ io, cycle: job.cycle || 10, filter: job.filter || 0 }, job.program);
+  const rtOpts = Object.assign({ io, cycle: job.cycle || 10, filter: job.filter || 0, scanModel: job.scanModel || null, cycleMode: job.cycleMode || "fixed",
+                                 watchdog: job.watchdog || 0 }, job.budget ? { budget: job.budget } : {}, job.program);
   new P.Runtime(rtOpts);   // compile errors surface here
   for (const t of job.tests || []) {
-    const r = P.runTest(rtOpts, plant, t);
-    out.tests.push({ id: t.id, ok: r.ok, failures: r.failures.map((f) => f.msg), time: r.time, scans: r.scans });
+    const r = P.runTest(rtOpts, plant, t, { final: t.final });
+    out.tests.push({ id: t.id, ok: r.ok, failures: r.failures.map((f) => f.msg), time: r.time, scans: r.scans, final: r.final });
     if (!r.ok) out.ok = false;
   }
   if (job.scenario) {

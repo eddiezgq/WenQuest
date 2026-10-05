@@ -1,0 +1,39 @@
+# 实验 4.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、任务取自 lab4_3.js。
+原理:
+  - ["PLC 每次扫描读一次输入（4.1 节）。一个脉冲要被程序看到，它的高电平必须跨过某一次“读输入”；它的低电平也要跨过一次，计数器才能看到下一个上升沿。所以脉冲宽度和两个脉冲之间的空档都要大于扫描时间（4.7 节）。",
+     "The PLC reads its inputs once per scan (Section 4.1). For the program to see a pulse, its high part must span a read; its low part must span one too, or the counter misses the next rising edge. Both the pulse and the gap must be longer than the scan time (Section 4.7)."]
+  - ["实验台的扫描时间按程序实际执行的语句数算：固定开销 0.5 ms，每条语句 1 µs；FOR 循环每转一圈约 2 条。PLC 自由循环：一次扫描结束马上开始下一次。扫描时间超过 150 ms，看门狗让 PLC 停机（4.3 节）。",
+     "The bench computes the scan time from the statements actually executed: 0.5 ms overhead plus 1 µs per statement; one turn of the FOR loop is about 2. The PLC runs free: each scan starts as soon as the last one ends. A scan over 150 ms trips the watchdog and the PLC stops (Section 4.3)."]
+  - ["计件输送线：工件长 40 mm、间距 100 mm。带速 0.5、2、5 m/s 时，工件挡光 80、20、8 ms，两件之间的空档 120、30、12 ms。高速计数器 HSC1 由硬件对 B1 的每个上升沿计数，与扫描无关，程序只读它的当前值 HSC1_CV。",
+     "Counting conveyor: parts 40 mm long at 100 mm pitch. At 0.5, 2 and 5 m/s a part blocks the beam for 80, 20 and 8 ms; the gaps are 120, 30 and 12 ms. High-speed counter HSC1 counts every rising edge of B1 in hardware, independent of the scan; the program just reads its value HSC1_CV."]
+  - 式: "T_scan ≈ 0.5 ms + 2 µs × n"
+步骤:
+  - ["打开实验 4.3，在“I/O 与监视”页找到 B1_Part、S1_Reset、HSC1_CV、H1_Count 和监视变量 cnt.CV、n。",
+     "Open Lab 4.3; on the I/O & watch page find B1_Part, S1_Reset, HSC1_CV, H1_Count and the watched cnt.CV and n."]
+  - ["第 1 步：起始程序 n = 1000。打开“带速 5 m/s”，运行。记下扫描时间；数满 50 件后比较计数器 cnt 与实际件数，填表 1 第一行。",
+     "Step 1: the starting program has n = 1000. Switch on 5 m/s and run. Note the scan time; after 50 parts compare cnt with the parts; fill in the first row of Table 1."]
+  - ["第 2 步：把 n 改成 2000、3000、4000、5000、7500……每次编译下载、运行、按 S1 清零，数 50 件以上，记下扫描时间和漏计的件数，填表 1。找出开始漏计的临界扫描时间。",
+     "Step 2: set n to 2000, 3000, 4000, 5000, 7500, …; each time compile, download, run, press S1 and count 50 or more parts; note the scan time and the misses in Table 1. Find the critical scan time."]
+  - ["第 3 步：n 取 5000（扫描约 10.5 ms，第 2 步里已经漏计），关掉“带速 5 m/s”、打开“带速 2 m/s”，按 S1 清零再数。记录结果，与第 2 步比较。",
+     "Step 3: set n = 5000 (scan about 10.5 ms, already missing in step 2); switch 5 m/s off and 2 m/s on, press S1 and count again. Record and compare with step 2."]
+  - ["第 4 步：把 n 改成 100000，下载运行。PLC 停机，抄下状态栏的提示，计算这时的扫描时间。",
+     "Step 4: set n = 100000, download and run. The PLC stops; copy the status message and compute the scan time."]
+  - ["第 5 步：n 回到 5000，带速 5 m/s。照程序 4.7.1 加上 base、countHsc 两个变量和读 HSC1_CV 的三行，下载运行，按 S1 清零，数 50 件以上，比较 cnt、countHsc 与实际件数，填表 2。",
+     "Step 5: n back to 5000, 5 m/s. Add the variables base and countHsc and the three lines that read HSC1_CV, as in Program 4.7.1; download, run, press S1, count 50 or more parts; compare cnt, countHsc and the parts in Table 2."]
+数据表:
+  - 标题: ["表 1  程序长度、扫描时间与漏计（带速 5 m/s）", "Table 1  Program length, scan time and misses (5 m/s)"]
+    表头: ["n", "扫描时间 / ms", "实际件数", "cnt", "漏计 / %"]
+    表头英文: ["n", "Scan / ms", "Parts", "cnt", "Missed / %"]
+    行: [["1000", "", "", "", ""], ["2000", "", "", "", ""], ["3000", "", "", "", ""], ["4000", "", "", "", ""], ["5000", "", "", "", ""], ["7500", "", "", "", ""], ["10000", "", "", "", ""]]
+  - 标题: ["表 2  两种计数方法（n = 5000）", "Table 2  Two ways of counting (n = 5000)"]
+    表头: ["带速", "实际件数", "cnt", "countHsc"]
+    表头英文: ["Belt speed", "Parts", "cnt", "countHsc"]
+    行: [["2 m/s", "", "", ""], ["5 m/s", "", "", ""]]
+注意:
+  - ["每次改了 n 都要“编译并下载”，再按 S1 清零：下载会让计数器回到 0，但“实际件数”从按 S1 起算更清楚。",
+     "Compile and download after every change of n, then press S1: downloading zeroes the counter, but counting the parts from S1 keeps things clear."]
+  - ["看门狗停机后要改小 n、重新下载才能再运行。真实的 PLC 看门狗动作后输出全部断开，要查明原因再复位。",
+     "After a watchdog stop, reduce n and download again. On a real PLC the watchdog turns all outputs off; find the cause before resetting."]
+思考题:
+  - ["带速 5 m/s 时工件挡光 8 ms、两件之间的空档 12 ms。扫描时间多长以内一定不漏？为什么扫描时间远大于 20 ms 时，数到的件数有时又会多起来一点？", "At 5 m/s a part blocks the beam for 8 ms and the gap is 12 ms. Up to what scan time is nothing ever missed? Why, with scans far above 20 ms, does the count sometimes go up a little again?"]
+  - ["不用高速计数器，还有哪些办法能让第 2 步的程序数对？各有什么代价？", "Without the high-speed counter, how else could the program of step 2 count correctly? What does each cost?"]
