@@ -1,0 +1,29 @@
+# 实验 19.3 的指导书与报告模板。目的、场景、参数、任务取自 lab19_3.js。
+原理:
+  - ["瑞典轮的接地辊子可以沿垂直于自身轴线的方向自由滚动，车轮不加侧向约束；它的转速由接地点速度在辊子轴线上的投影决定。", "The floor roller of a Swedish wheel rolls freely across its axis, so the wheel adds no sideways constraint; its speed is fixed by the projection of the contact velocity on the roller axis."]
+  - 式: ["θ̇ = aᵀv_P/(r cos γ)，θ̇ = H V_b", "θ̇ = aᵀv_P/(r cos γ), θ̇ = H V_b"]
+  - 式: ["麦克纳姆：θ̇_FL = (v_x − v_y − kω)/r，θ̇_FR = (v_x + v_y + kω)/r，θ̇_RL = (v_x + v_y − kω)/r，θ̇_RR = (v_x − v_y + kω)/r，k = l + w", "Mecanum: θ̇_FL = (v_x − v_y − kω)/r, θ̇_FR = (v_x + v_y + kω)/r, θ̇_RL = (v_x + v_y − kω)/r, θ̇_RR = (v_x − v_y + kω)/r, k = l + w"]
+  - 式: ["相容条件：θ̇_FL + θ̇_FR − θ̇_RL − θ̇_RR = 0", "Compatibility: θ̇_FL + θ̇_FR − θ̇_RL − θ̇_RR = 0"]
+  - 式: ["三轮全向：θ̇_i = (R_o ω − sin α_i v_x + cos α_i v_y)/r", "Three-wheel omni: θ̇_i = (R_o ω − sin α_i v_x + cos α_i v_y)/r"]
+步骤:
+  - ["场景“麦克纳姆 AGV”：依次给出表 1 中的车体运动，按“开始”，记录四个轮速和相容条件的值（任务 1～3）。", "Scene “Mecanum AGV”: enter the body motions of Table 1 in turn, press Start, and record the four wheel speeds and the compatibility value (tasks 1–3)."]
+  - ["把 v_x、v_y 同时加大，找出轮速刚好达到 20 rad/s 时的侧移速度和斜行速度，与算例 19.3.4 比较。", "Increase v_x and v_y and find the sideways and diagonal speeds at which a wheel just reaches 20 rad/s; compare with Example 19.3.4."]
+  - ["场景“装错辊子的车”：给 v_x = 0.3、v_y = −0.3 m/s（任务 4），记录轮速；再给 v_x = v_y = 0.3 m/s，比较。", "Scene “Rollers fitted wrongly”: v_x = 0.3, v_y = −0.3 m/s (task 4), record the wheel speeds; then v_x = v_y = 0.3 m/s and compare."]
+  - ["场景“三轮全向底盘”：给 v_x = −0.3 m/s（任务 5），记录三个轮速；再给 v_y = 0.5 m/s，与习题 19.3.5 的答案比较。", "Scene “Three-wheel omni base”: v_x = −0.3 m/s (task 5), record the three wheel speeds; then v_y = 0.5 m/s and compare with Exercise 19.3.5."]
+  - ["生活场景“平板推车”：ψ = 90°（任务 6），观察四个脚轮的转动；再取 ψ = 45°。", "Everyday scene “Flat trolley”: ψ = 90° (task 6), watch the castors swing; then ψ = 45°."]
+数据表:
+  - 标题: ["表 1  麦克纳姆 AGV 的轮速", "Table 1  Wheel speeds of the mecanum AGV"]
+    表头: ["运动", "v_x / (m/s)", "v_y / (m/s)", "ω / (rad/s)", "FL, FR, RL, RR / (rad/s)", "相容条件"]
+    表头英文: ["Motion", "v_x / (m/s)", "v_y / (m/s)", "ω / (rad/s)", "FL, FR, RL, RR / (rad/s)", "Compatibility"]
+    行: [["前进", "0.5", "0", "0", "", ""], ["侧移", "0", "0.3", "0", "", ""], ["斜行", "0.3", "0.3", "0", "", ""], ["原地转", "0", "0", "1", "", ""]]
+    行英文: [["Forward", "0.5", "0", "0", "", ""], ["Sideways", "0", "0.3", "0", "", ""], ["Diagonal", "0.3", "0.3", "0", "", ""], ["Spin", "0", "0", "1", "", ""]]
+  - 标题: ["表 2  装错的车与三轮底盘", "Table 2  Wrongly fitted rollers and the three-wheel base"]
+    表头: ["底盘", "车体运动", "各轮转速 / (rad/s)", "结论"]
+    表头英文: ["Chassis", "Body motion", "Wheel speeds / (rad/s)", "Conclusion"]
+    行: [["装错的车", "v_x = 0.3, v_y = −0.3", "", ""], ["装错的车", "v_x = v_y = 0.3", "", ""], ["三轮", "v_x = −0.3", "", ""], ["三轮", "v_y = 0.5", "", ""]]
+    行英文: [["Wrong rollers", "v_x = 0.3, v_y = −0.3", "", ""], ["Wrong rollers", "v_x = v_y = 0.3", "", ""], ["Three-wheel", "v_x = −0.3", "", ""], ["Three-wheel", "v_y = 0.5", "", ""]]
+注意:
+  - ["实验按纯滚动计算，没有考虑辊子的打滑和接地点半径的变化；真实的麦克纳姆车侧移和斜行时误差比前进时大。", "The lab assumes pure rolling and ignores roller slip and the changing contact radius; a real mecanum vehicle is less accurate sideways and diagonally than forwards."]
+  - ["车体运动在车体坐标系中给出：v_x 沿车头，v_y 向左，ω 逆时针为正。", "The body motion is given in the body frame: v_x along the heading, v_y to the left, ω anticlockwise positive."]
+思考题:
+  - ["若四个编码器读数不满足相容条件，你会怎样判断是哪一个轮子打滑？只有四个读数够吗？", "If the four encoder readings break the compatibility condition, how would you tell which wheel slipped? Are four readings enough?"]

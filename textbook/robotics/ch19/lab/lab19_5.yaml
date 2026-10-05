@@ -1,0 +1,29 @@
+# 实验 19.5 的指导书与报告模板。目的、场景、参数、任务取自 lab19_5.js。
+原理:
+  - 式: ["Δs = (Δs_R + Δs_L)/2，Δφ = (Δs_R − Δs_L)/b；圆弧精确更新 = 中点方向 × sinc(Δφ/2)·Δs", "Δs = (Δs_R + Δs_L)/2, Δφ = (Δs_R − Δs_L)/b; exact arc update = midpoint direction × sinc(Δφ/2)·Δs"]
+  - 式: ["两轮半径差 ε：曲率 κ = ε/b，直行 D 后横向偏离 y ≈ εD²/(2b)", "Radius difference ε: curvature κ = ε/b, cross-track offset after D, y ≈ εD²/(2b)"]
+  - ["轮距误差 ε_b 使里程计算出的转角是实际的 1 + ε_b 倍，误差与转过的总角度成正比。", "A track error ε_b makes odometry report 1 + ε_b times the true turn; the error grows with the total angle turned."]
+  - 式: ["随机误差：σ_x² = kD/2，σ_φ² = 2kD/b²，σ_y² = 2kD³/(3b²)", "Random error: σ_x² = kD/2, σ_φ² = 2kD/b², σ_y² = 2kD³/(3b²)"]
+  - ["正方形双向测试：两种系统误差在一个方向上部分抵消，在另一个方向上叠加，所以要两个方向都测。", "Two-way square test: the two systematic errors partly cancel in one direction and add in the other, so both directions must be run."]
+步骤:
+  - ["场景“更新公式”：依次用圆弧（任务 1）、中点、欧拉（任务 2）三种公式，T = 0.1 s 和 0.02 s，记录最大偏差，填入表 1。", "Scene “Update formula”: use the arc (task 1), midpoint and Euler (task 2) formulas with T = 0.1 s and 0.02 s; record the largest gap in Table 1."]
+  - ["场景“正方形双向测试”：ε = 0.3%、ε_b = 1%、不标定，按“开始”（任务 3），记录两个方向的终点误差；再分别只保留一种误差，看哪个方向受影响。", "Scene “Two-way square test”: ε = 0.3%, ε_b = 1%, no calibration, press Start (task 3) and record both end errors; then keep one error at a time and see which direction suffers."]
+  - ["打开“使用标定”再测（任务 4），记录两个方向的终点误差，填入表 2。", "Switch calibration on and test again (task 4); record both end errors in Table 2."]
+  - ["场景“随机打滑”：k = 20（任务 5），记录 20 次终点的横向标准差和预测值；再取 k = 5、80，看标准差是否按 √k 变化。", "Scene “Random slip”: k = 20 (task 5); record the cross-track spread of 20 runs and the prediction; then k = 5 and 80 and check the √k scaling."]
+  - ["生活场景“蒙眼走正方形”：按“开始”（任务 6），记录终点离起点的距离。", "Everyday scene “Blindfold square walk”: press Start (task 6) and record how far from the start you end."]
+数据表:
+  - 标题: ["表 1  三种更新公式的最大偏差", "Table 1  Largest gap of the three update formulas"]
+    表头: ["公式", "T = 0.1 s / mm", "T = 0.02 s / mm"]
+    表头英文: ["Formula", "T = 0.1 s / mm", "T = 0.02 s / mm"]
+    行: [["欧拉", "", ""], ["中点", "", ""], ["圆弧精确", "", ""]]
+    行英文: [["Euler", "", ""], ["Midpoint", "", ""], ["Exact arc", "", ""]]
+  - 标题: ["表 2  正方形双向测试的终点误差", "Table 2  End errors of the two-way square test"]
+    表头: ["ε / %", "ε_b / %", "标定", "逆时针 / cm", "顺时针 / cm"]
+    表头英文: ["ε / %", "ε_b / %", "Calibrated", "Anticlockwise / cm", "Clockwise / cm"]
+    行: [["0.3", "1.0", "否", "", ""], ["0.3", "0", "否", "", ""], ["0", "1.0", "否", "", ""], ["0.3", "1.0", "是", "", ""]]
+    行英文: [["0.3", "1.0", "no", "", ""], ["0.3", "0", "no", "", ""], ["0", "1.0", "no", "", ""], ["0.3", "1.0", "yes", "", ""]]
+注意:
+  - ["“使用标定”按真实参数控制，相当于标定完全准确；实际的标定有测量误差，误差不会降到零（算例 19.5.4）。", "“Use calibration” drives with the true parameters, i.e. a perfect calibration; a real one has measurement error and cannot reach zero (Example 19.5.4)."]
+  - ["随机打滑的程序用固定的随机数种子，同样的 k 每次结果相同，便于比较。", "The random slip uses a fixed seed, so the same k gives the same result each time, which makes comparison easy."]
+思考题:
+  - ["由表 2 的数据，能否分别求出两轮半径差和轮距误差？需要几个方程？这就是 UMBmark 的思路。", "From Table 2, can you work out the radius difference and the track error separately? How many equations do you need? That is the idea of UMBmark."]

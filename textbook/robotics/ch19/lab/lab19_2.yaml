@@ -1,0 +1,26 @@
+# 实验 19.2 的指导书与报告模板。目的、场景、参数、任务取自 lab19_2.js。
+原理:
+  - 式: ["v = r(ω_R + ω_L)/2，ω = r(ω_R − ω_L)/b，R = v/ω = (b/2)(ω_R + ω_L)/(ω_R − ω_L)", "v = r(ω_R + ω_L)/2, ω = r(ω_R − ω_L)/b, R = v/ω = (b/2)(ω_R + ω_L)/(ω_R − ω_L)"]
+  - 式: ["逆运动学：ω_R = (v + ωb/2)/r，ω_L = (v − ωb/2)/r；沿曲率 κ 的路线 ω_{R,L} = v(1 ± κb/2)/r", "Inverse kinematics: ω_R = (v + ωb/2)/r, ω_L = (v − ωb/2)/r; along a path of curvature κ, ω_{R,L} = v(1 ± κb/2)/r"]
+  - ["两轮匀速时车体中心走圆弧，位姿按 SE(2) 的指数精确更新（式 (19.2.7)），与步长无关。", "With constant wheel speeds the centre runs on an arc; the pose is updated exactly by the SE(2) exponential (Eq. (19.2.7)) whatever the step."]
+  - ["轮速限制 |v| + (b/2)|ω| ≤ rω_max；圆弧上车速还受横向加速度 v²/ρ ≤ a 的限制。", "Wheel limit |v| + (b/2)|ω| ≤ rω_max; on an arc the speed is also limited by the lateral acceleration v²/ρ ≤ a."]
+步骤:
+  - ["场景“轮速与瞬心”：按表 1 给出几组轮速，按“开始”，记录车速、角速度、转弯半径，并与式 (19.2.1)～(19.2.4) 的计算比较。其中一组使 R = 0.5 m（任务 1），一组原地转（任务 2）。",
+     "Scene “Wheel speeds and the ICR”: enter the wheel speeds of Table 1, press Start, record speed, turn rate and radius, and compare with Eqs. (19.2.1)–(19.2.4). One pair gives R = 0.5 m (task 1), one spins on the spot (task 2)."]
+  - ["场景“数字工厂路线”：默认参数下按“开始”（任务 3），记录行驶时间、圆弧上的车速和最大轮速；再把 ρ 改为 1.0 m（任务 4）、0.3 m，把 a 改为 0.3 m/s²，分别记录，填入表 2。",
+     "Scene “Digital-factory route”: press Start with the defaults (task 3) and record trip time, arc speed and largest wheel speed; then ρ = 1.0 m (task 4), 0.3 m, and a = 0.3 m/s². Fill in Table 2."]
+  - ["生活场景“扫地机器人”：按“开始”（任务 5），记录转弯半径为 0.5 m、1 m 时两轮转速之比。", "Everyday scene “Robot vacuum”: press Start (task 5); record the wheel-speed ratio when the radius is 0.5 m and 1 m."]
+数据表:
+  - 标题: ["表 1  轮速与车的运动", "Table 1  Wheel speeds and the motion"]
+    表头: ["ω_R / (rad/s)", "ω_L / (rad/s)", "v / (m/s)", "ω / (rad/s)", "R / m（读数）", "R / m（计算）"]
+    表头英文: ["ω_R / (rad/s)", "ω_L / (rad/s)", "v / (m/s)", "ω / (rad/s)", "R / m (read)", "R / m (computed)"]
+    行: [["10", "10", "", "", "", ""], ["12.6", "7.4", "", "", "", ""], ["5", "−5", "", "", "", ""], ["10", "0", "", "", "", ""]]
+  - 标题: ["表 2  车间路线的行驶时间", "Table 2  Trip time on the workshop route"]
+    表头: ["ρ / m", "a / (m/s²)", "路线长度 / m", "圆弧车速 / (m/s)", "行驶时间 / s"]
+    表头英文: ["ρ / m", "a / (m/s²)", "Route length / m", "Arc speed / (m/s)", "Trip time / s"]
+    行: [["0.5", "0.5", "", "", ""], ["1.0", "0.5", "", "", ""], ["0.3", "0.5", "", "", ""], ["0.5", "0.3", "", "", ""]]
+注意:
+  - ["实验按纯滚动、不侧滑计算，没有考虑电机的动态：轮速可以阶跃变化。真实的车在圆弧与直线相接处会稍稍冲出弯道。", "The lab assumes pure rolling and ignores motor dynamics: wheel speeds may jump. A real AGV overshoots a little where an arc meets a straight."]
+  - ["车间路线的播放速度是实际的 10 倍，界面中的时间是实际的行驶时间。", "The workshop route plays 10 times faster; the times shown are the real trip times."]
+思考题:
+  - ["工厂仿真按“路线长度 ÷ 1.0 m/s”估计行驶时间。根据表 2，这个估计偏小多少？如果调度要准确到 ±5%，应当怎样修正？", "The plant model estimates trip time as length ÷ 1.0 m/s. From Table 2, how much too small is it? How would you correct it for scheduling to ±5%?"]

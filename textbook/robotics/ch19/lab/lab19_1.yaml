@@ -1,0 +1,30 @@
+# 实验 19.1 的指导书与报告模板。目的、场景、参数、任务取自 lab19_1.js。
+原理:
+  - ["标准轮纯滚动、不侧滑：接地点的速度沿轮轴方向的分量为零。每个标准轮给车体加一个约束，所有约束排成约束矩阵 C(β)。",
+     "A standard wheel rolls without slipping: the contact point has no velocity along the axle. Each standard wheel adds one constraint; together they form the constraint matrix C(β)."]
+  - 式: ["第 i 行：(x_i cos β_i + y_i sin β_i, −sin β_i, cos β_i)，C(β) V_b = 0，V_b = (ω, v_x, v_y)", "Row i: (x_i cos β_i + y_i sin β_i, −sin β_i, cos β_i), C(β) V_b = 0, V_b = (ω, v_x, v_y)"]
+  - 式: ["可移动度 δm = 3 − rank C", "Degree of mobility δm = 3 − rank C"]
+  - ["瞬心定理：所有标准轮都不侧滑，当且仅当它们的轴线交于一点，即瞬心 (−v_y/ω, v_x/ω)。", "ICR theorem: no standard wheel slides if and only if all their axles meet at one point, the ICR (−v_y/ω, v_x/ω)."]
+  - 式: ["阿克曼条件：cot δo − cot δi = w/L；脚轮：β̇ = n·v_A/d − ω", "Ackermann condition: cot δo − cot δi = w/L; castor: β̇ = n·v_A/d − ω"]
+步骤:
+  - ["场景“AGV 底盘布置”，布置 0（差速）：取 v = 0.25 m/s，调 ω 使瞬心在左侧 0.5 m 处，按“开始”（任务 1）。再取 ω = 2v/0.26，看车绕左轮转。记入表 1。",
+     "Scene “AGV chassis layouts”, layout 0 (differential): v = 0.25 m/s, set ω so the ICR is 0.5 m to the left, press Start (task 1). Then try ω = 2v/0.26 and watch it pivot on the left wheel. Fill in Table 1."]
+  - ["布置 1（三轮车）：给 ω = 1 rad/s，按“开始”（任务 2），记录秩和车的实际运动。", "Layout 1 (tricycle): ω = 1 rad/s, press Start (task 2); record the rank and the actual motion."]
+  - ["布置 2（阿克曼）：δ = 30°，按“开始”（任务 3），记录两前轮转角和转弯半径，与算例 19.1.2 比较；再取 δ = 15°、40°。", "Layout 2 (Ackermann): δ = 30°, press Start (task 3); record both front angles and the radius, compare with Example 19.1.2; then δ = 15° and 40°."]
+  - ["布置 3（平行转向）：δ = 30°，按“开始”（任务 4），记录秩，指出哪个车轮必须侧滑。", "Layout 3 (parallel): δ = 30°, press Start (task 4); record the rank and name the wheel that must slide."]
+  - ["生活场景“购物车”：ψ = 90°，按“开始”（任务 5），观察两个脚轮甩过的角度和瞬心的位置；再取 ψ = 30°、0°。", "Everyday scene “Shopping cart”: ψ = 90°, press Start (task 5); watch the castor swing and the ICR; then ψ = 30° and 0°."]
+数据表:
+  - 标题: ["表 1  各种车轮布置的约束", "Table 1  Constraints of the wheel layouts"]
+    表头: ["布置", "rank C", "δm", "指令", "瞬心 R / m", "能否行驶"]
+    表头英文: ["Layout", "rank C", "δm", "Command", "ICR R / m", "Can it move?"]
+    行: [["差速", "", "", "v = 0.25, ω = ", "", ""], ["三轮车", "", "", "v = 0.3, ω = 1", "", ""], ["阿克曼 δ = 30°", "", "", "", "", ""], ["平行转向 δ = 30°", "", "", "", "", ""]]
+    行英文: [["Differential", "", "", "v = 0.25, ω = ", "", ""], ["Tricycle", "", "", "v = 0.3, ω = 1", "", ""], ["Ackermann δ = 30°", "", "", "", "", ""], ["Parallel δ = 30°", "", "", "", "", ""]]
+  - 标题: ["表 2  阿克曼转向的两前轮转角", "Table 2  Front-wheel angles under Ackermann steering"]
+    表头: ["δi / °", "δo / °", "R / m", "cot δo − cot δi"]
+    表头英文: ["δi / °", "δo / °", "R / m", "cot δo − cot δi"]
+    行: [["15", "", "", ""], ["30", "", "", ""], ["40", "", "", ""]]
+注意:
+  - ["约束矩阵只列标准轮；脚轮和瑞典轮不加约束，不列入。", "Only standard wheels enter the constraint matrix; castors and Swedish wheels add no constraint."]
+  - ["实验按纯滚动、不侧滑计算；真实的轮胎有弹性，平行转向的车仍能勉强转弯，代价是轮胎磨损和跑偏。", "The lab assumes pure rolling; real tyres are elastic, so a parallel-steered car still turns, at the cost of tyre wear and drift."]
+思考题:
+  - ["购物车被横着推时，车为什么绕后轴中点转？如果把车把装在前面（像拉车一样），横向拉会怎样？", "Why does the cart turn about the rear-axle centre when pushed sideways? What if the handle were at the front and you pulled sideways?"]

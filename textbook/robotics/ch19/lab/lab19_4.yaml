@@ -1,0 +1,28 @@
+# 实验 19.4 的指导书与报告模板。目的、场景、参数、任务取自 lab19_4.js。
+原理:
+  - 式: ["阿克曼条件：cot δo − cot δi = w/L；tan δi = L/(R − w/2)，tan δo = L/(R + w/2)", "Ackermann condition: cot δo − cot δi = w/L; tan δi = L/(R − w/2), tan δo = L/(R + w/2)"]
+  - 式: ["自行车模型：ẋ = v cos φ，ẏ = v sin φ，φ̇ = v tan δ / L，tan δ = L/R", "Bicycle model: ẋ = v cos φ, ẏ = v sin φ, φ̇ = v tan δ / L, tan δ = L/R"]
+  - 式: ["最小转弯半径（后轴中点）：R_min = L / tan δi,max + w/2", "Minimum turning radius (rear-axle centre): R_min = L / tan δi,max + w/2"]
+  - ["转向梯形是一个四杆机构，只能近似满足阿克曼条件；底角 λ 决定误差曲线的形状。", "The steering trapezoid is a four-bar linkage and meets the Ackermann condition only approximately; the base angle λ shapes the error curve."]
+  - ["汽车的横移是第二层李括号：侧方停车靠两段反向的圆弧，横移 2R(1 − cos α)。", "Sideways motion of a car is a second-level Lie bracket: parallel parking uses two opposite arcs, shifting 2R(1 − cos α)."]
+步骤:
+  - ["场景“转弯与瞬心”：阿克曼转向下，调 δi 使转弯半径为 3 m（任务 1），记录两前轮转角、后轮转速比；再取 δi = 15°、40°，填入表 1。",
+     "Scene “Turning and the ICR”: with Ackermann steering set δi for a 3 m radius (task 1); record both front angles and the rear-wheel ratio; then δi = 15° and 40°. Fill in Table 1."]
+  - ["改为平行转向，δi = 30°（任务 2），记录外侧前轮的侧偏角，观察轴线是否交于一点。", "Switch to parallel steering, δi = 30° (task 2); record the outer wheel's slip angle and see whether the axles meet."]
+  - ["场景“转向梯形”：从经验底角 18.4° 开始调 λ，找出最大误差最小的底角（任务 3），记入表 2。", "Scene “Steering trapezoid”: start from the rule-of-thumb 18.4° and adjust λ to the smallest worst error (task 3). Fill in Table 2."]
+  - ["场景“通道调头”：通道宽 5 m 时按“开始”，看是否碰墙；再改为 6 m（任务 4），记录车身扫过的宽度。", "Scene “Turning round”: press Start with a 5 m aisle and see whether it hits; then 6 m (task 4); record the width swept."]
+  - ["生活场景“侧方停车”：按“开始”（任务 5），记录每一阶段结束时的位置和车头方向。", "Everyday scene “Parallel parking”: press Start (task 5); record the position and heading at the end of each stage."]
+数据表:
+  - 标题: ["表 1  阿克曼转向", "Table 1  Ackermann steering"]
+    表头: ["δi / °", "δo / °", "R / m", "后轮转速比（外/内）"]
+    表头英文: ["δi / °", "δo / °", "R / m", "Rear-wheel ratio (outer/inner)"]
+    行: [["", "", "3.0", ""], ["15", "", "", ""], ["40", "", "", ""]]
+  - 标题: ["表 2  转向梯形的底角与误差", "Table 2  Trapezoid base angle and error"]
+    表头: ["λ / °", "横拉杆长 / m", "最大误差 / °"]
+    表头英文: ["λ / °", "Tie-rod length / m", "Worst error / °"]
+    行: [["0", "", ""], ["18.4", "", ""], ["22.5", "", ""], ["26", "", ""]]
+注意:
+  - ["自行车模型不考虑轮胎的侧偏，适合低速；高速时实际的转弯半径比模型大。", "The bicycle model ignores tyre slip and suits low speeds; at speed the real radius is larger than the model's."]
+  - ["调头宽度按车身外轮廓计算，没有留安全距离；实际的通道还要加上余量。", "The turning width uses the body outline without a safety margin; a real aisle needs extra room."]
+思考题:
+  - ["叉车用后轮转向。它的瞬心在哪条线上？转弯时车身哪一端向外甩？这对仓库里的行人意味着什么？", "A forklift steers with its rear wheels. On which line is its ICR? Which end swings out in a turn, and what does that mean for people in a warehouse?"]
