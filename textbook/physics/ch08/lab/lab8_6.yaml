@@ -1,0 +1,41 @@
+# 实验 8.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab8_6.js。
+原理:
+  - ["罚函数接触：物体穿入地面 δ 时，地面给它 kδ − c dδ/dt 的力（只推不拉）。这是一个很硬的弹簧，ω = √(k/m) 很大。对一直接触的弹簧，半隐式欧拉法稳定要求 ωh < 2（8.5 节）。",
+     "Penalty contact: penetrating the floor by δ gives a force kδ − c dδ/dt (push only). It is a very stiff spring with large ω = √(k/m). For a spring in permanent contact, semi-implicit Euler is stable only for ωh < 2 (Section 8.5)."]
+  - 式: "必要条件：ωh < 2；一次接触持续约 π/ω，要准，每次接触应有约 10 步：h ≲ π/(10ω)"
+  - ["ωh < 2 只是必要条件。接触只有一两步时，接触力时有时无，又有阻尼，线性的稳定性分析不再够用：即使在这个界限以内，反弹也可能比落下的高度还高好几倍。要准，每次接触要有约 10 步。",
+     "ωh < 2 is only necessary. When a contact spans one or two steps, the force switches on and off and there is damping, so the linear analysis no longer suffices: even inside the limit the ball can bounce several times higher than it fell. For accuracy, each contact needs about 10 steps."]
+  - ["冲量法：检测到穿入地面，就把物体放回地面、法向速度乘以 −e。任何步长都稳定，但接触过程的细节没有了，结果与步长有关（8.6.3 节）。",
+     "Impulse method: on penetration, put the body back on the floor and multiply the normal velocity by −e. It is stable at any step, but the details of the contact are lost and results depend on the step (Section 8.6.3)."]
+  - ["穿墙：引擎只在每一步结束的位置检查碰撞。一步走过的距离 vh 不超过墙厚加物体的直径时，无论从哪里出发，总有一步落在墙上；超过时，能否挡住取决于运气。连续碰撞检测检查整段路径，任何步长都能挡住。",
+     "Tunnelling: the engine checks only the positions at the end of each step. If the distance per step vh does not exceed the wall thickness plus the body's diameter, some step always lands in the wall wherever it starts; beyond that it is luck. Continuous collision detection checks the whole path and works at any step."]
+  - 式: "保证不穿墙：vh ≤ 墙厚 + 2r"
+步骤:
+  - ["选“网球落地”，接触 0（罚函数），k = 30 kN/m。步长从 0.1 ms 起每次加 0.1 ms，每次点“开始”，记下反弹高度与参考值之比，填入表 1。找出相差不超过 10%（且更小的步长都满足）的最大步长，调到这里，点“开始”，再点“提交”（任务 1）。它对应一次接触约几步？",
+     "Choose the floor, contact 0 (penalty), k = 30 kN/m. Raise the step from 0.1 ms in 0.1 ms increments, press “Start” each time and record the bounce ratio in Table 1. Find the largest step within 10% (with all smaller steps passing too), set it, press “Start” then “Submit” (task 1). How many steps per contact is that?"]
+  - ["再试 2.0、2.5、2.7 ms（都满足 ωh < 2），记录结果，说明“稳定”与“准确”的区别。",
+     "Also try 2.0, 2.5 and 2.7 ms (all with ωh < 2), record the results and explain the difference between “stable” and “accurate”."]
+  - ["k 改为 300 kN/m，重复第 1 步（任务 2），比较两个最大步长之比与 √(30/300) 是否相符。",
+     "Set k = 300 kN/m and repeat step 1 (task 2); compare the ratio of the two largest steps with √(30/300)."]
+  - ["接触改为 1（冲量法），步长 17 ms，点“开始”，比较反弹高度。",
+     "Switch to contact 1 (impulse), step 17 ms, press “Start” and compare the bounce."]
+  - ["选“游戏里的穿墙”，v = 60 m/s，连续碰撞检测关。由 vh ≤ 0.14 m 求出保证不穿墙的最大步长（1 ms 一档），点“开始”验证，提交（任务 3）。再试几个更大的步长，记入表 2：有的会挡住，有的会穿过，为什么？",
+     "Choose the wall, v = 60 m/s, detection off. From vh ≤ 0.14 m find the largest safe step (1 ms steps), press “Start” to check and submit (task 3). Try some larger steps for Table 2: some stop, some pass; why?"]
+  - ["开启连续碰撞检测，步长 33 ms、v = 100 m/s，点“开始”，提交（任务 4）。",
+     "Turn on continuous detection, step 33 ms, v = 100 m/s, press “Start” and submit (task 4)."]
+数据表:
+  - 标题: ["表 1  罚函数接触：反弹高度与参考值之比", "Table 1  Penalty contact: bounce ratio"]
+    表头: ["h / ms", "0.3", "0.5", "0.6", "1", "2", "2.5", "2.7"]
+    表头英文: ["h / ms", "0.3", "0.5", "0.6", "1", "2", "2.5", "2.7"]
+    行: [["k = 30 kN/m", "", "", "", "", "", "", ""], ["k = 300 kN/m", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  穿墙（v = 60 m/s）", "Table 2  Tunnelling (v = 60 m/s)"]
+    表头: ["h / ms", "2", "3", "5", "8", "9", "12"]
+    表头英文: ["h / ms", "2", "3", "5", "8", "9", "12"]
+    行: [["每步距离 / mm", "", "", "", "", "", ""], ["挡住 / 穿过", "", "", "", "", "", ""]]
+注意:
+  - ["参考值用罚函数、0.1 ms 步长算出，与恢复系数 0.75 给出的 0.56 m 略有差别，这是罚函数模型本身的特点。", "The reference uses penalty contact at 0.1 ms; it differs slightly from the 0.56 m implied by e = 0.75, which is a property of the penalty model itself."]
+  - ["反弹高度与步长的关系不是单调的：接触落在哪几步上，与步长的细节有关。步长接近稳定界限时，后面几次反弹甚至可能比前一次还高：接触力一会儿有、一会儿没有，8.3 节“能量不漂移”的性质不再严格成立。", "The bounce does not change monotonically with the step: which steps fall inside the contact depends on the details. Near the stability limit a later bounce can even be higher than the one before: the contact force switches on and off, so the no-drift property of Section 8.3 no longer holds exactly."]
+  - ["每个任务都要先点“开始”，再点“提交”才判定。", "For each task press “Start” first; the task is judged when you press “Submit”."]
+思考题:
+  - ["MuJoCo 的默认步长是 2 ms。按“每次接触约 10 步”，接触持续的时间至少要多长？MuJoCo 为什么给接触设一个时间常数（默认 0.02 s），并且默认不让它小于步长的两倍？", "MuJoCo's default step is 2 ms. With about 10 steps per contact, how long must a contact last at least? Why does MuJoCo give contacts a time constant (0.02 s by default) and by default keep it at least twice the step?"]
+  - ["表 2 中，步长超过安全值时为什么有时仍能挡住小球？在游戏里依赖这种“运气”会有什么后果？", "In Table 2, why is the ball sometimes stopped even above the safe step? What happens in a game that relies on that luck?"]

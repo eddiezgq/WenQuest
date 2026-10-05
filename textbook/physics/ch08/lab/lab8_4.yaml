@@ -1,0 +1,39 @@
+# 实验 8.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab8_4.js。
+原理:
+  - ["网球受重力和二次方空气阻力，状态矢量为 (x, y, v_x, v_y)，运动方程为 dv/dt = −g ŷ − k v v，k = ρC_dA/(2m)（8.1 节）。这个方程没有解析解，要数值求解。",
+     "The ball feels gravity and quadratic drag; the state is (x, y, v_x, v_y) and dv/dt = −g ŷ − k v v with k = ρC_dA/(2m) (Section 8.1). There is no closed-form solution, so it is solved numerically."]
+  - 式: "dv/dt = −g ŷ − k v v，k = ρC_dA/(2m)        (8.1.4)"
+  - ["参数辨识：调 C_d，使仿真轨迹与实测点的均方根偏差最小。前提是数值误差远小于测量误差；否则积分方法的误差会被“吸收”进 C_d，得到有偏的结果。",
+     "Parameter identification: tune C_d to minimise the RMS deviation between simulated path and data. This assumes the numerical error is far below the measurement error; otherwise the integrator's error is absorbed into C_d and biases it."]
+  - ["弹簧振子在相平面 (x, v/ω) 上的精确轨迹是圆。欧拉法每步使半径乘以 √(1 + (ωh)²)，向外盘旋；半隐式欧拉法在 ωh < 2 时沿闭合的斜椭圆运动，ωh 越接近 2，椭圆越扁，等于 2 时振幅线性增长；RK4 在 ωh ≤ 2√2 时不发散（8.5 节）。",
+     "In the (x, v/ω) phase plane the exact path is a circle. Euler multiplies the radius by √(1 + (ωh)²) per step and spirals out; semi-implicit Euler follows a closed tilted ellipse for ωh < 2, flatter as ωh approaches 2; RK4 stays bounded for ωh ≤ 2√2 (Section 8.5)."]
+  - 式: "半隐式欧拉法稳定：ωh < 2；RK4 稳定：ωh ≤ 2√2        (8.5.1)"
+步骤:
+  - ["选“发球机器人”，方法 2（RK4），步长 3（10 ms）。从 C_d = 0.45 起调 C_d，记下均方根偏差，填入表 1，找出使偏差最小的 C_d，提交（任务 1）。步长改为 5（50 ms）再找一次，结果变吗？",
+     "Choose the launcher, method 2 (RK4), step 3 (10 ms). Tune C_d from 0.45, record the RMS deviation in Table 1, find the C_d with the smallest deviation and submit (task 1). Repeat at step 5 (50 ms): does the result change?"]
+  - ["方法改为 0（欧拉法），步长 5（50 ms），重新拟合，提交这样得到的 C_d（任务 2）。再把步长依次减小到 1 ms，每次都重新拟合，填入表 2。",
+     "Switch to method 0 (Euler), step 5 (50 ms), fit again and submit that C_d (task 2). Then reduce the step to 1 ms, refitting each time, for Table 2."]
+  - ["选“相平面上的振子”，三种方法各取 ωh = 0.1、0.5、1.0，点“开始”，观察 20 个周期后离原点的距离，填入表 3。",
+     "Choose the oscillator; for each method try ωh = 0.1, 0.5 and 1.0, press “Start” and record the distance from the origin after 20 periods in Table 3."]
+  - ["方法 1（半隐式欧拉法）：ωh 从 1.5 起每次加 0.05，找出仍不发散的最大值，提交（任务 3）。RK4 呢？",
+     "Method 1 (semi-implicit Euler): raise ωh from 1.5 in 0.05 steps, find the largest value that does not blow up and submit (task 3). What about RK4?"]
+数据表:
+  - 标题: ["表 1  RK4 拟合（步长 10 ms）", "Table 1  RK4 fit (10 ms step)"]
+    表头: ["C_d", "0.45", "0.50", "0.55", "0.60", "0.65", "最佳值"]
+    表头英文: ["C_d", "0.45", "0.50", "0.55", "0.60", "0.65", "Best"]
+    行: [["均方根偏差 / mm", "", "", "", "", "", ""]]
+  - 标题: ["表 2  欧拉法拟合出的 C_d 与步长", "Table 2  Euler-fitted C_d against step"]
+    表头: ["步长 / ms", "50", "25", "10", "5", "2", "1"]
+    表头英文: ["Step / ms", "50", "25", "10", "5", "2", "1"]
+    行: [["拟合的 C_d", "", "", "", "", "", ""], ["最小均方根偏差 / mm", "", "", "", "", "", ""]]
+  - 标题: ["表 3  20 个周期后离原点的距离（精确解为 1；发散的写“发散”）", "Table 3  Distance from the origin after 20 periods (exact: 1)"]
+    表头: ["ωh", "欧拉法", "半隐式欧拉法", "RK4"]
+    表头英文: ["ωh", "Euler", "Semi-implicit", "RK4"]
+    行: [["0.1", "", "", ""], ["0.5", "", "", ""], ["1.0", "", "", ""]]
+注意:
+  - ["真实的 C_d 不显示。频闪读数的误差在 ±5 mm 以内，所以最小的均方根偏差约为几毫米；偏差远大于此，说明模型或积分不对。", "The true C_d is hidden. Readings are good to ±5 mm, so the smallest RMS deviation is a few millimetres; much more than that means the model or the integration is off."]
+  - ["半隐式欧拉法在 ωh 接近 2 时轨迹是很扁的椭圆，会超出单位圆很远，但并不发散；画面范围为 ±7。", "Near ωh = 2 the semi-implicit path is a very flat ellipse reaching far outside the unit circle but not diverging; the plot spans ±5."]
+  - ["每个任务都要点“提交”才判定。", "Each task is judged only when you press “Submit”."]
+思考题:
+  - ["由表 2，欧拉法拟合出的 C_d 随步长怎样变化？如果只有欧拉法、又不知道它的误差，你会怎样判断拟合结果是否可信？", "From Table 2, how does the Euler-fitted C_d change with step? With only Euler and no idea of its error, how would you judge whether a fit can be trusted?"]
+  - ["为什么拟合 C_d 时，RK4 的步长取 10 ms 或 50 ms 结果几乎一样？", "Why does the RK4 fit hardly change between 10 ms and 50 ms steps?"]
