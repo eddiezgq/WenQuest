@@ -79,7 +79,7 @@ jobs:
           cd library/build
           tar czf "library-web-$VER.tar.gz" -C library .
           cp "library/$VER/index.json" "index-$VER.json"
-          ls -la *.tar.gz packages | head -30
+          ls -la *.tar.gz packages | head -30 || true     # head 先退出时 ls 收到 SIGPIPE，pipefail 下会让本步失败（2026-10-05，条目多了以后）
           du -sh library
       - name: 发布到 GitHub Releases
         run: |

@@ -97,3 +97,12 @@ def test_ids_recognised_by_factory_and_gateway():
     if m:
         for e in E:
             assert re.match(m.group(1), e["id"]), e["id"]
+
+
+def test_variants_really_differ():
+    """同一个函数的不同型式（圆柱销与菱形销、三种钻套、三种支承钉）确实造出不同的形体"""
+    vol = {e["id"]: sum(s.volume for _, s in nodes(e)) for e in E if e["id"] in
+           ("E-LOC-PIN", "E-LOC-DPIN", "E-GDE-BUSHFIX", "E-GDE-BUSHREN", "E-GDE-BUSHQC", "E-LOC-SPINA", "E-LOC-SPINB", "E-LOC-SPINC")}
+    assert vol["E-LOC-DPIN"] < vol["E-LOC-PIN"] - 100
+    assert len({round(vol[k]) for k in ("E-GDE-BUSHFIX", "E-GDE-BUSHREN", "E-GDE-BUSHQC")}) == 3
+    assert len({round(vol[k]) for k in ("E-LOC-SPINA", "E-LOC-SPINB", "E-LOC-SPINC")}) == 3

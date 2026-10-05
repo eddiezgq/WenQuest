@@ -36,7 +36,7 @@ model:
   origin: 毫米制造型，Z 向上（glTF 里换成 Y 向上、米）；每个零件一个节点，节点颜色同教材插图
   note: 尺寸为书中示例规格（示意比例），设计时以所用标准为准；模型与教材插图、数字工厂用的是同一份（factory/digital/models3d）
   args:
-    kind: renewable
+    kind: renew
 source:
   origin: wenquest
   license: Apache-2.0
