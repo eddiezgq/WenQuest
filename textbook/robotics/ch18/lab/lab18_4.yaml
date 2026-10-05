@@ -1,0 +1,27 @@
+# 实验 18.4 的指导书与报告模板。目的、场景、参数、任务取自 lab18_4.js。
+原理:
+  - 式: ["速度关系：u_kᵀ v = (u_k · ∂E_k/∂θ_k) θ̇_k，即 A v = B θ̇，v = J θ̇，J = A⁻¹B", "Velocity relation: u_kᵀ v = (u_k · ∂E_k/∂θ_k) θ̇_k, i.e. A v = B θ̇, v = J θ̇, J = A⁻¹B"]
+  - 式: ["沿方向 d 的最大速度：v_d = ω_max / ‖J⁻¹ d‖∞；保证速度：v_g = ω_max / max_k ‖J⁻¹ 的第 k 行‖", "Top speed along d: v_d = ω_max / ‖J⁻¹ d‖∞; guaranteed speed: v_g = ω_max / max_k ‖row k of J⁻¹‖"]
+  - ["电机转速各自不超过 ω_max 时，平台能达到的速度构成一个平行六面体；v_g 是它的内切球半径，任何方向上不超过 v_g 的速度都能实现。",
+     "With each motor speed below ω_max the reachable platform velocities form a parallelepiped; v_g is the radius of its inscribed sphere, so any velocity no larger than v_g is possible in every direction."]
+  - 式: ["拾放循环（25/305/25 mm）的节拍下限：T = 2 Σ L_i / v_i，v_i 为第 i 段上 v_d 的最小值", "Pick-cycle bound (25/305/25 mm): T = 2 Σ L_i / v_i, where v_i is the smallest v_d on leg i"]
+  - ["绳索驱动的摄像机：每台绞车的收放速度等于摄像机速度在那根钢索方向上的分量。", "Cable-driven camera: each winch speed equals the camera velocity's component along its cable."]
+步骤:
+  - ["场景“工作空间与速度”：在静止位置 (0, 0, −0.42) m（任务 1）记录三个转角、沿 x、y、z 的最大速度和 v_g，填入表 1。", "Scene “Workspace and speed”: at rest (0, 0, −0.42) m (task 1) record the angles, the top speeds along x, y, z and v_g in Table 1."]
+  - ["保持 x = y = 0，把 z 从 −0.30 m 每次改变 0.05 m 到 −0.70 m，记录 v_g，找出它最大的高度和低于 1 m/s 的位置（任务 2）。", "Keep x = y = 0 and step z from −0.30 m to −0.70 m by 0.05 m; record v_g, find where it is largest and where it falls below 1 m/s (task 2)."]
+  - ["场景“拾放节拍”：按算例 18.4.3 设置并运行（任务 3），记录三段的速度和节拍下限，填入表 2；再改变中心、高度和方向，找一个节拍下限小于 0.23 s 的放置（任务 4）。",
+     "Scene “Pick-cycle time”: set up Example 18.4.3 and run it (task 3); record the leg speeds and the bound in Table 2; then change the centre, height and direction to find a placement under 0.23 s (task 4)."]
+  - ["生活场景“体育场的索拉摄像机”：按“运行”（任务 5），记录飞行速度和起止点的钢索长度。", "Everyday scene: press Run (task 5) and record the flight speed and the cable lengths at the start and the end."]
+数据表:
+  - 标题: ["表 1  中心轴上的速度能力", "Table 1  Speed capability on the central axis"]
+    表头: ["z / m", "θ₁ / °", "v_x / (m/s)", "v_y / (m/s)", "v_z / (m/s)", "v_g / (m/s)"]
+    行: [["−0.30", "", "", "", "", ""], ["−0.42", "", "", "", "", ""], ["−0.50", "", "", "", "", ""], ["−0.55", "", "", "", "", ""], ["−0.60", "", "", "", "", ""], ["−0.70", "", "", "", "", ""]]
+  - 标题: ["表 2  拾放循环的节拍下限", "Table 2  Pick-cycle time bounds"]
+    表头: ["中心 (x, y) / m", "高度 z / m", "方向", "三段速度 / (m/s)", "节拍下限 / s"]
+    表头英文: ["Centre (x, y) / m", "Height z / m", "Direction", "Leg speeds / (m/s)", "Cycle bound / s"]
+    行: [["(0, 0)", "−0.45", "x", "", ""], ["(0, 0)", "−0.40", "x", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["节拍只计电机转速限制，假定速度可以瞬间改变；计入加速度后实际节拍更长，第 22、23 章再讨论。", "Only the motor speed limit is counted and speeds are assumed to change instantly; with accelerations the real cycle is longer (Chapters 22 and 23)."]
+  - ["工作空间按主动臂限位 −40°～90° 计算，没有计入球关节的转角范围和杆件之间的碰撞。", "The workspace uses the arm limits −40° to 90° and ignores the ball joints' ranges and collisions between rods."]
+思考题:
+  - ["为什么上升段和下降段的最大匀速不同？用式 (18.4.4) 和两端主动臂的姿势解释。", "Why do the up and down legs have different top speeds? Explain with Eq. (18.4.4) and the arm postures at the two ends."]

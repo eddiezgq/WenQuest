@@ -1,0 +1,43 @@
+# 实验 18.1 的指导书与报告模板。目的、场景、参数、任务取自 lab18_1.js。
+原理:
+  - ["串联臂的工作空间是各段运动的“和”（闵可夫斯基和）：2R 臂是内半径 |L₂ − L₁|、外半径 L₁ + L₂ 的圆环。并联机构的工作空间是各支链工作空间的“交”（定理 18.1.1）。",
+     "A serial arm's workspace is the (Minkowski) sum of its segments: for a 2R arm, a ring from |L₂ − L₁| to L₁ + L₂. A parallel mechanism's workspace is the intersection of its legs' workspaces (Theorem 18.1.1)."]
+  - 式: ["五杆的闭环方程：|P − Aᵢ − l₁ e(θᵢ)| = l₂，i = 1, 2；逆解 θᵢ = atan2(P − Aᵢ) + σᵢ αᵢ，cos αᵢ = (l₁² + dᵢ² − l₂²)/(2 l₁ dᵢ)",
+         "Five-bar loop equations: |P − Aᵢ − l₁ e(θᵢ)| = l₂, i = 1, 2; inverse: θᵢ = atan2(P − Aᵢ) + σᵢ αᵢ, cos αᵢ = (l₁² + dᵢ² − l₂²)/(2 l₁ dᵢ)"]
+  - 式: ["速度关系：A ẋ = B θ̇，A 的行为 (P − Eᵢ)ᵀ，B = diag(l₁ (P − Eᵢ)·e′(θᵢ))；J = A⁻¹B",
+         "Velocity relation: A ẋ = B θ̇, rows of A are (P − Eᵢ)ᵀ, B = diag(l₁ (P − Eᵢ)·e′(θᵢ)); J = A⁻¹B"]
+  - ["电机转角误差 δθ 引起的末端误差 δx ≈ J δθ。两台电机的误差各在 ±ε 以内时，最大误差出现在误差矩形的角点上。",
+     "A motor-angle error δθ gives an end error δx ≈ J δθ. With each motor within ±ε, the largest error occurs at a corner of the error rectangle."]
+  - ["绳吊笔：逆解是两根绳长 ρᵢ = |P − Cᵢ|；正解是以两个滑轮为圆心、半径 ρ₁、ρ₂ 的两圆求交，取下方的交点。",
+     "Hanging pen: the inverse kinematics are the cord lengths ρᵢ = |P − Cᵢ|; the forward kinematics intersect two circles about the pulleys with radii ρ₁, ρ₂ and take the lower point."]
+步骤:
+  - ["场景“2R 臂与五杆”：把目标调到 (0, 0.35) m（任务 1），记录两台机器人的关节角、末端误差和 LCI，填入表 1，与算例 18.1.1、18.1.3 比较。",
+     "Scene “2R arm and five-bar”: set the target to (0, 0.35) m (task 1); record both sets of joint angles, end errors and LCIs in Table 1 and compare with Examples 18.1.1 and 18.1.3."]
+  - ["保持 x = 0，把 y 从 0.45 m 逐步减小到 0.15 m，每隔 0.05 m 记录两者的末端误差，填入表 1；观察五杆的误差椭圆在哪里变得细长。",
+     "Keep x = 0 and lower y from 0.45 m to 0.15 m in steps of 0.05 m; record both end errors in Table 1 and note where the five-bar's ellipse becomes long and thin."]
+  - ["找一个 2R 臂能到、五杆到不了的点（任务 2），再找一个五杆误差不到 2R 臂一半的点（任务 3），记入表 2。",
+     "Find a point the 2R arm reaches and the five-bar does not (task 2), and one where the five-bar's error is under half the 2R arm's (task 3); enter them in Table 2."]
+  - ["生活场景“墙上的绳吊笔”：把笔移到 (0.20, 0.00) m（任务 4），记录两根绳长和由绳长求回的笔位置；再按“运行”画圆（任务 5）。",
+     "Everyday scene: move the pen to (0.20, 0.00) m (task 4) and record both cord lengths and the pen position recovered from them; then press Run to draw the circle (task 5)."]
+数据表:
+  - 标题: ["表 1  沿 y 轴的比较", "Table 1  Comparison along the y axis"]
+    表头: ["目标 (x, y) / m", "2R：θ₁, θ₂ / °", "五杆：θ₁, θ₂ / °", "2R 误差 / mm", "五杆误差 / mm", "误差之比"]
+    表头英文: ["Target (x, y) / m", "2R: θ₁, θ₂ / °", "Five-bar: θ₁, θ₂ / °", "2R error / mm", "Five-bar error / mm", "Error ratio"]
+    行: [["(0, 0.45)", "", "", "", "", ""], ["(0, 0.40)", "", "", "", "", ""], ["(0, 0.35)", "", "", "", "", ""], ["(0, 0.30)", "", "", "", "", ""],
+         ["(0, 0.25)", "", "", "", "", ""], ["(0, 0.20)", "", "", "", "", ""], ["(0, 0.15)", "", "", "", "", ""]]
+  - 标题: ["表 2  工作空间与误差", "Table 2  Workspace and error"]
+    表头: ["要求", "找到的点 (x, y) / m", "说明"]
+    表头英文: ["Requirement", "Point found (x, y) / m", "Remark"]
+    行: [["2R 能到、五杆不能到", "", ""], ["五杆误差 < 2R 误差的一半", "", ""]]
+    行英文: [["2R reaches, five-bar does not", "", ""], ["Five-bar error < half the 2R error", "", ""]]
+  - 标题: ["表 3  绳吊笔", "Table 3  Hanging pen"]
+    表头: ["笔的位置 / m", "ρ₁ / m", "ρ₂ / m", "由绳长求回的位置 / m"]
+    表头英文: ["Pen position / m", "ρ₁ / m", "ρ₂ / m", "Position from the cords / m"]
+    行: [["(0.20, 0.00)", "", "", ""], ["(−0.30, −0.20)", "", "", ""]]
+注意:
+  - ["五杆只计肘部朝外、末端在上方的一种模式；不在这一模式里的点，界面报告“够不着”。", "The five-bar is kept in one mode (elbows out, end point above); points outside it are reported as out of reach."]
+  - ["误差按一阶近似 δx ≈ J δθ 计算，没有考虑杆长误差、关节间隙和杆件变形。", "Errors use the first-order δx ≈ J δθ and ignore link-length errors, joint play and link deflection."]
+  - ["绳子只能拉不能推：笔必须在两个滑轮下方，靠重力把绳拉直。", "Cords can only pull: the pen must hang below the pulleys so that gravity keeps them taut."]
+思考题:
+  - ["沿 y 轴往下走时，五杆的误差在 y ≈ 0.13 m 附近急剧增大。由式 (18.1.5)，此时 A 和 B 中哪一个接近奇异？机构是什么样子？",
+     "Going down the y axis, the five-bar's error grows sharply near y ≈ 0.13 m. By Eq. (18.1.5), which of A and B is nearly singular there? What does the mechanism look like?"]

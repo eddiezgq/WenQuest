@@ -1,0 +1,35 @@
+# 实验 18.3 的指导书与报告模板。目的、场景、参数、任务取自 lab18_3.js。
+原理:
+  - 式: ["逆解：lᵢ = |p + R bᵢ − aᵢ|，i = 1, …, 6", "Inverse kinematics: lᵢ = |p + R bᵢ − aᵢ|, i = 1, …, 6"]
+  - 式: ["腿长速度：l̇ = A 𝒱_s，A 的第 i 行为沿腿的单位力旋量 (aᵢ × ŝᵢ, ŝᵢ)", "Leg rates: l̇ = A 𝒱_s; row i of A is the unit wrench along leg i, (aᵢ × ŝᵢ, ŝᵢ)"]
+  - 式: ["正解的牛顿法：A Δ𝒱 = l − l(T)，T ← exp([Δ𝒱]) T", "Newton's method for the forward kinematics: A Δ𝒱 = l − l(T), T ← exp([Δ𝒱]) T"]
+  - ["牛顿法在解附近二次收敛：每一步残差大约平方一次。正解有多个（装配模式），初值决定收敛到哪一个；实时控制用上一周期的位姿作初值。",
+     "Newton's method converges quadratically near a solution: the residual is roughly squared each step. There are several forward solutions (assembly modes); the starting guess decides which one is found, so real-time control starts from the previous cycle's pose."]
+  - ["det A = 0 是 Stewart 平台的正运动学奇异：六条腿所在的直线线性相关，电动缸锁死时平台仍能一阶地运动。",
+     "det A = 0 is a direct singularity of the Stewart platform: the six leg lines are linearly dependent and the platform can still move to first order with the cylinders locked."]
+步骤:
+  - ["场景“Stewart 平台”：按算例 18.3.1 给出位姿（任务 1），记录六条腿长，填入表 1，与书中的数比较。", "Scene “Stewart platform”: set the pose of Example 18.3.1 (task 1), record the six lengths in Table 1 and compare with the book."]
+  - ["按“正解”（任务 2），记录每一步的残差，填入表 2；检查相邻两步的残差是否大致满足“后一个约为前一个的平方”。",
+     "Press Forward (task 2) and record each step's residual in Table 2; check that each residual is roughly the square of the one before."]
+  - ["回到原点位姿，分别只改横滚、俯仰、偏航，找出六条腿都在行程内的最大角度（任务 3），填入表 3。",
+     "Back at the home pose, change only roll, pitch or yaw and find the largest angle with all six legs within the stroke (task 3); fill in Table 3."]
+  - ["中心保持 (0, 0, 0.6) m，把偏航从 0 增大到 100°，记录 det A，找出它变号的角度（任务 4）。", "Keep the centre at (0, 0, 0.6) m, raise the yaw from 0 to 100°, record det A and find where it changes sign (task 4)."]
+  - ["生活场景“调平三脚桌”：调节腿 2、腿 3，使桌面水平（任务 5），记录两条腿的长度。", "Everyday scene: adjust legs 2 and 3 until the top is level (task 5) and record their lengths."]
+数据表:
+  - 标题: ["表 1  位姿 X1 的逆解", "Table 1  Inverse kinematics at pose X1"]
+    表头: ["l₁ / m", "l₂ / m", "l₃ / m", "l₄ / m", "l₅ / m", "l₆ / m"]
+    行: [["", "", "", "", "", ""]]
+  - 标题: ["表 2  正解的牛顿法", "Table 2  Newton's method for the forward kinematics"]
+    表头: ["迭代次数 k", "残差 / m", "残差 / (前一步残差)²"]
+    表头英文: ["Iteration k", "Residual / m", "Residual / (previous residual)²"]
+    行: [["0", "", "—"], ["1", "", ""], ["2", "", ""], ["3", "", ""], ["4", "", ""]]
+  - 标题: ["表 3  原点位置处的转角范围（行程 0.55～0.85 m）", "Table 3  Angular ranges at the home position (stroke 0.55–0.85 m)"]
+    表头: ["运动", "最大角度 / °", "先到行程的腿", "det A"]
+    表头英文: ["Motion", "Largest angle / °", "First leg at its limit", "det A"]
+    行: [["横滚", "", "", ""], ["俯仰（正）", "", "", ""], ["俯仰（负）", "", "", ""], ["偏航", "", "", ""]]
+    行英文: [["Roll", "", "", ""], ["Pitch (+)", "", "", ""], ["Pitch (−)", "", "", ""], ["Yaw", "", "", ""]]
+注意:
+  - ["计算不考虑万向节、球关节的转角范围和腿之间的碰撞；真实平台的可用范围还要再小一些。", "The computation ignores the angular ranges of the universal and ball joints and collisions between legs; a real platform reaches less."]
+  - ["偏航到 90° 时腿已超出行程，界面仍画出它，只为观察奇异；真实平台到不了那里。", "At 90° yaw the legs are beyond their stroke; it is drawn only to show the singularity. A real platform cannot get there."]
+思考题:
+  - ["六条腿的长度相同时，平台一定在原点位姿吗？由定理 18.3.3，至少还有哪一个位姿也满足？", "If all six legs have the same length, must the platform be at the home pose? By Theorem 18.3.3, which other pose at least also fits?"]

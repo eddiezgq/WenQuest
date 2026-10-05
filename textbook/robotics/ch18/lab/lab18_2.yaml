@@ -1,0 +1,36 @@
+# 实验 18.2 的指导书与报告模板。目的、场景、参数、任务取自 lab18_2.js。
+原理:
+  - ["给定两台电机的转角，五杆的末端是以两个肘点为圆心、半径 l₂ 的两圆之交；两个交点就是两种装配模式。",
+     "For given motor angles the five-bar's end point is where two circles of radius l₂ about the elbows meet; the two crossings are the two assembly modes."]
+  - 式: ["速度关系 A ẋ = B θ̇；静力 τ = Bᵀ A⁻ᵀ f", "Velocity relation A ẋ = B θ̇; statics τ = Bᵀ A⁻ᵀ f"]
+  - ["逆运动学奇异 det B = 0：某条支链伸直或折叠，电机能转而末端不动，末端失去一个方向的运动，沿那条支链的力由结构承受。",
+     "Inverse singularity det B = 0: a leg is straight or folded; the motor can turn while the end point stays, a direction of motion is lost, and force along that leg is carried by the structure."]
+  - ["正运动学奇异 det A = 0：两根从动杆共线，两圆相切，两种装配模式合一；电机锁死时末端仍能一阶地运动，某些方向的力无法平衡，电机力矩按 1/det A 增大。",
+     "Direct singularity det A = 0: the forearms are in line, the circles touch and the two assembly modes merge; with the motors locked the end point can still move to first order, some forces cannot be held, and motor torques grow like 1/det A."]
+  - 式: ["晾衣绳：T = m𝔤 / (2 sin α)，α = atan(2s / L)", "Clothesline: T = m𝔤 / (2 sin α), α = atan(2s / L)"]
+步骤:
+  - ["场景“五杆的奇异”：令 θ = (118.21°, 61.79°)（任务 1），记录末端位置、另一种装配模式的位置、det A、det B 和电机力矩，填入表 1。",
+     "Scene “Five-bar singularities”: set θ = (118.21°, 61.79°) (task 1); record the end point, the other mode, det A, det B and the torques in Table 1."]
+  - ["令 θ₂ = 180° − θ₁，把 θ₁ 从 118° 逐步增大到 138.59°，每隔几度记录一次（越接近 138.5° 步子越小），观察两种装配模式怎样靠近（任务 3、4）。",
+     "Keep θ₂ = 180° − θ₁ and raise θ₁ from 118° to 138.59°, recording every few degrees (smaller steps near 138.5°); watch the two assembly modes approach (tasks 3 and 4)."]
+  - ["令 θ = (72.54°, 107.46°)，两条支链伸直（任务 2），记录 det B 和电机力矩，说明此时谁承担了 20 N 的力。",
+     "Set θ = (72.54°, 107.46°) so both legs are straight (task 2); record det B and the torques and say what carries the 20 N."]
+  - ["生活场景“晾衣绳”：把下垂量从 1.0 m 逐步减小到 0.05 m，记录拉力，填入表 2（任务 5）。", "Everyday scene: reduce the sag from 1.0 m to 0.05 m and record the tension in Table 2 (task 5)."]
+数据表:
+  - 标题: ["表 1  五杆沿 θ₂ = 180° − θ₁ 的变化", "Table 1  The five-bar along θ₂ = 180° − θ₁"]
+    表头: ["θ₁ / °", "末端 y / m", "另一模式 y / m", "det A / m²", "det B / m⁴", "最大 |τ| / N·m"]
+    表头英文: ["θ₁ / °", "End y / m", "Other mode y / m", "det A / m²", "det B / m⁴", "Max |τ| / N·m"]
+    行: [["118.21", "", "", "", "", ""], ["125", "", "", "", "", ""], ["130", "", "", "", "", ""], ["135", "", "", "", "", ""], ["138", "", "", "", "", ""],
+         ["138.5", "", "", "", "", ""], ["138.59", "", "", "", "", ""]]
+  - 标题: ["表 2  晾衣绳的拉力（衣服 2 kg，柱距 4 m）", "Table 2  Clothesline tension (2 kg shirt, posts 4 m apart)"]
+    表头: ["下垂量 s / m", "α / °", "T / N", "T / (m𝔤)"]
+    表头英文: ["Sag s / m", "α / °", "T / N", "T / (m𝔤)"]
+    行: [["1.00", "", "", ""], ["0.50", "", "", ""], ["0.20", "", "", ""], ["0.10", "", "", ""], ["0.05", "", "", ""]]
+注意:
+  - ["计算假定杆件是刚体、关节没有间隙和摩擦；接近正运动学奇异时，真实机构的间隙和弹性会使末端明显晃动。",
+     "The links are rigid and the joints have no play or friction; near a direct singularity the play and elasticity of a real mechanism make the end point visibly wobble."]
+  - ["越过两圆相切的位置后，机构装不起来；真实机构在那里可能卡死或跳到另一种装配模式，实验中只能在屏幕上观察。",
+     "Beyond the point where the circles touch the mechanism cannot be assembled; a real one may jam there or jump to the other mode. Only watch it on screen."]
+思考题:
+  - ["两条支链都伸直时，电机力矩为零，为什么？这种位形对承重有利还是不利？对运动呢？",
+     "With both legs straight the motor torques are zero. Why? Is this configuration good or bad for carrying load? For moving?"]
