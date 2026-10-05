@@ -50,9 +50,9 @@ def back(slope, cap, n=14):
 
 c1 = ("1  表在检验棒左端对零，摇工作台", "Zero the indicator at the left end, then traverse the table")
 v.add(st(0, 0.0, c1), hold=0.8)
-sweep(0.025 / L, ("2  走过 60 mm，读数变了 0.025", "Over 60 mm the reading changes by 0.025"), col="#c0504d")
-v.add(st(-L, 0.025, ("超过 0.006（0.01/100）：夹具歪了", "More than 0.006 (0.01/100): the fixture is skewed"), "#c0504d"), hold=1.2)
-back(0.025 / L, ("3  松开 T 形槽螺栓，轻敲夹具右端，再拧紧", "Loosen the T-bolts, tap the right end, tighten again"))
+sweep(0.014 / L, ("2  走过 60 mm，读数变了 0.014", "Over 60 mm the reading changes by 0.014"), col="#c0504d")
+v.add(st(-L, 0.014, ("超过 0.006（0.01/100）：夹具歪了", "More than 0.006 (0.01/100): the fixture is skewed"), "#c0504d"), hold=1.2)
+back(0.014 / L, ("3  松开 T 形槽螺栓，轻敲夹具右端，再拧紧", "Loosen the T-bolts, tap the right end, tighten again"))
 v.add(st(0, 0.0, ("3  松开 T 形槽螺栓，轻敲夹具右端，再拧紧", "Loosen the T-bolts, tap the right end, tighten again")), hold=1.0)
 sweep(0.004 / L, ("4  再测：60 mm 上变化 0.004，合格", "Re-check: 0.004 over 60 mm — within limits"), col="#5a9e6f")
 v.add(st(-L, 0.004, ("找正结果记入夹具使用记录", "Record the alignment in the fixture log"), "#5a9e6f"), hold=2.0)

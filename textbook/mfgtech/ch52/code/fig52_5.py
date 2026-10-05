@@ -21,8 +21,8 @@ cy.add(P("活塞杆", S.cyl("x", (0, 0), 8, 70, 190), "hardened"))
 cy.add(P("气口", S.cyl("z", (-7, 0), 4, 0, 44) + S.cyl("z", (128, 0), 4, 0, 44), "steel_dark", tags=("nocut",)))
 pa = R.render_png(cy, 760, 520, camera={"dir": [0.6, -1.3, 0.6]}, section=((0, 0, 0), (0, -1, 0)),
                   labels=[{"at": (60, 0, 23.5), "text": "活塞与密封圈", "style": "text", "pos": [0.42, 0.1], "part": "活塞"},
-                          {"at": (30, 0, -27), "text": "无杆腔：推力 πD²p/4·η", "style": "text", "pos": [0.2, 0.9]},
-                          {"at": (100, 0, -27), "text": "有杆腔：拉力 π(D²−d²)p/4·η", "style": "text", "pos": [0.7, 0.9]}])
+                          {"at": (30, 0, -12), "text": "无杆腔：推力 πD²p/4·η", "style": "text", "pos": [0.3, 0.84]},
+                          {"at": (100, 0, -16), "text": "有杆腔：拉力 π(D²−d²)p/4·η", "style": "text", "pos": [0.62, 0.95]}])
 dp = A("膜片气室")
 dp.add(P("上壳", S.cyl("x", (0, 0), 50, 0, 18) - S.cyl("x", (0, 0), 44, 4, 19), "cast"))
 dp.add(P("下壳", S.cyl("x", (0, 0), 50, 22, 40) - S.cyl("x", (0, 0), 44, 21, 36) - S.cyl("x", (0, 0), 6.2, 35, 41), "cast"))
@@ -30,7 +30,8 @@ dp.add(P("橡胶膜片", S.cyl("x", (0, 0), 50, 18, 22), "rubber"))
 dp.add(P("推杆与托盘", S.cyl("x", (0, 0), 30, 22, 28) + S.cyl("x", (0, 0), 6, 28, 90), "hardened"))
 dp.add(P("回位弹簧", S.tube("x", (0, 0), 18, 16, 28, 36), "steel_dark"))
 pb = R.render_png(dp, 760, 520, camera={"dir": [0.6, -1.3, 0.6]}, section=((0, 0, 0), (0, -1, 0)),
-                  labels=[{"at": (20, 0, 40), "text": "橡胶膜片：没有滑动密封，行程短", "style": "text", "pos": [0.55, 0.1], "part": "橡胶膜片"}])
+                  labels=[{"at": (20, 0, 40), "text": "橡胶膜片：没有滑动密封，行程短", "style": "text", "pos": [0.55, 0.1], "part": "橡胶膜片"},
+                          {"at": (32, 0, -17), "text": "回位弹簧", "style": "text", "pos": [0.6, 0.88], "part": "回位弹簧"}])
 R.compose("fig52_5_1", [pa, pb], 2, titles=["(a) 活塞式气缸（剖开）", "(b) 膜片式气室（剖开）"])
 
 # ---- 图 52.5.2：气动夹紧回路（GB/T 786.1 一类图形符号的简化画法）
@@ -45,16 +46,19 @@ ax.add_patch(plt.Circle((6, 25), 3.2, fc="white", ec=M.INK)); ax.text(6, 25, "�
 box(13, 21, 12, 8, T("过滤减压阀（调到 0.5 MPa）", "filter-regulator 0.5 MPa")); ax.text(19, 25, "⊘", ha="center", va="center", fontsize=9)
 box(31, 21, 8, 8, T("压力开关", "pressure switch")); ax.text(35, 25, "P", ha="center", va="center", fontsize=8)
 box(45, 21, 18, 8, T("二位五通电磁阀", "5/2 solenoid valve")); line([54, 54], [21, 29]); ax.annotate("", xy=(52, 27), xytext=(47, 23), arrowprops=dict(arrowstyle="-|>", lw=0.7)); ax.annotate("", xy=(56, 23), xytext=(61, 27), arrowprops=dict(arrowstyle="-|>", lw=0.7))
-box(68, 33, 8, 6, T("单向阀（保压）", "check valve")); ax.text(72, 36, "◇", ha="center", va="center", fontsize=8)
-ax.add_patch(plt.Rectangle((80, 31), 16, 10, fc="white", ec=M.INK, lw=1.0)); line([88, 88], [31, 41]); line([88, 99], [36, 36], lw=2.0); ax.text(88, 44, T("转角缸 ×2（拉紧夹紧）", "swing clamps x2 (pull)"), ha="center", fontsize=7)
+box(68, 33, 8, 6, T("液控单向阀\n（断气保压）", "pilot check\nvalve")); ax.text(72, 36, "◇", ha="center", va="center", fontsize=8)
+ax.add_patch(plt.Rectangle((80, 31), 16, 10, fc="white", ec=M.INK, lw=1.0)); line([88, 88], [31, 41]); line([88, 99], [36, 36], lw=2.0); ax.text(90, 47.3, T("转角缸 ×2（有杆腔进气拉紧）", "swing clamps x2 (rod side pulls)"), ha="center", va="bottom", fontsize=7)
+ax.text(84.5, 36, T("无杆腔", "cap"), ha="center", va="center", fontsize=5.5); ax.text(93, 38.5, T("有杆腔", "rod"), ha="center", va="center", fontsize=5.5)
 for xs in ([9.2, 13], [25, 31], [39, 45]):
     line(xs, [25, 25])
-line([60, 60, 68], [29, 36, 36]); line([76, 80], [36, 36]); line([50, 50, 84, 84], [29, 46, 46, 41])
+line([60, 60, 68], [29, 36, 36]); line([76, 78.5, 78.5, 92, 92], [36, 36, 26, 26, 31])     # 夹紧：经液控单向阀进有杆腔
+line([50, 50, 84, 84], [29, 46, 46, 41])                                                  # 松开：进无杆腔
+line([72, 72], [46, 39], ls="--", lw=0.7)                                                 # 控制油（气）路：松开时打开单向阀
 ax.text(25, 9, T("气压低于设定值 → 不许启动主轴", "below set pressure → spindle interlocked"), ha="center", fontsize=7, color=M.RED)
 ax.text(78, 9, T("夹紧到位（位置开关）→ 机床、机器人", "clamped (position switch) → machine, robot"), ha="center", fontsize=7, color=M.ACCENT)
 figure(fig, "fig52_5_2")
 
-# ---- 图 52.5.3：转角缸的动作：松开（压板转开、抬起）→ 转 90°（抬起）→ 下拉夹紧
+# ---- 图 52.5.3：转角缸的夹紧动作：松开位置（压板抬起、转开）→ 边下行边转 90° → 直线下拉压紧（松开时反过来）
 def swing(ang, dz):
     q = A("转角缸")
     q.add(P("底座", S.box(-50, 80, -60, 60, -20, 0), "cast"))
@@ -63,7 +67,7 @@ def swing(ang, dz):
         q.add(P(n, S.move(s, 0, 0, dz if n != "缸体" else 0), "steel_dark" if n != "压板" else "steel"))
     return q
 ps = [R.render_png(swing(a_, dz), 560, 480, camera={"dir": [0.9, -1.3, 0.8], "fit": [[-50, -60, -20], [100, 60, 80]]}) for a_, dz in ((90, 8), (180, 8), (180, 0))]
-R.compose("fig52_5_3", ps, 3, titles=["(a) 松开：压板转开、抬起", "(b) 活塞杆一边上提一边转 90°", "(c) 再直线下拉，压紧"])
+R.compose("fig52_5_3", ps, 3, titles=["(a) 松开位置：压板抬起并转开", "(b) 夹紧：活塞杆一边下行一边转 90°，转到工件上方", "(c) 再直线下拉，压紧"])
 
 # ---- 图 52.5.5：JJ-301-50 的气动方案：两个转角缸代替移动压板；挡板上有到位检测
 pn = J.assembly("op40")

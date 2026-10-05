@@ -20,7 +20,7 @@ def sheet() -> Sheet:
                designer=fx.get("designer", ""), date=str(fx.get("date", "")))
     # 主视图：x 方向 −89…184、z −38…约 100；放在图纸左上
     fv = sh.view(shapes, "front", s, ref3=(0, 0, 0), at=(105, 82), hidden=False, phantom=work)
-    tv = sh.view(shapes, "top", s, ref3=(0, 0, 0), at=(105, 196), hidden=False, phantom=work)
+    tv = sh.view(shapes, "top", s, ref3=(0, 0, 0), at=(105, 185), hidden=False, phantom=work)
     lv = sh.view(shapes, "left", s, ref3=(30, 0, 0), at=(262, 82), hidden=False, section=((30, 0, 0), (-1, 0, 0)), nocut=(5, 6, 7, 8, 9, 13),
                  phantom=work, name="A–A")
     zc = g["zc"]
@@ -49,11 +49,12 @@ def sheet() -> Sheet:
     # 零件序号（主视图上方一行、俯视图右侧一列）
     sh.balloon_row(fv, [(1, (-70, 0, -15)), (4, (-3, 0, 40)), (3, (45, 0, 30)), (5, (-20, 0, zl + 7)), (8, (80, 0, zr + h + 6)),
                         (7, (80, 0, zr + h + 15)), (10, (148, 0, 40)), (13, (177, 0, -5))], along="x", at=16, gap=11)
-    sh.balloon_row(tv, [(2, (160, 0, 0)), (6, (80, g["heel_y"], 0)), (9, (-20, g["stud_y"] + 8, 0)), (11, (40, 30, 0)), (12, (144, 0, 0))],
-                   along="y", at=213, gap=10)
+    # 主视图下方一行：定位键（底面）、弹簧、可调支承（俯视图里被压板挡住）
+    sh.balloon_row(fv, [(2, (-40, 0, -34)), (9, (-20, 0, zl - 12)), (6, (80, 0, 20))], along="x", at=123, gap=14)
+    sh.balloon_row(tv, [(11, (40, 30, 0)), (12, (144, 0, 0))], along="y", at=213, gap=10)
     # 明细栏、技术要求
     sh.bom([(r[0], r[4], r[1], r[2], r[3], r[5]) for r in fx["parts"]])
-    sh.requirements(fx["requirements"], (32, 240))
+    sh.requirements(fx["requirements"], (32, 233))
     return sh
 
 

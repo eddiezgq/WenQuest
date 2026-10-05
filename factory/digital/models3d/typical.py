@@ -160,8 +160,13 @@ def drill_indexing(n=6):
     a.add(Part("夹具体", S.box(-80, 120, -60, 60, -20, 0) + S.box(-80, -50, -60, 60, 0, 130), "cast", 1, (0, 0, -60)))
     H = 80.0
     a.add(Part("心轴", S.cyl("x", (0, H), 14.9, -80, 100) + S.cyl("x", (0, H), 24, -50, -40), "hardened", 2, (0, 0, 40)))
-    plate, pin = E.index_plate(at=(-80, 0, H), D=120, n=n)
+    plate, _ = E.index_plate(at=(-80, 0, H), D=120, n=n)
     a.add(Part("分度盘", plate, "steel", 3, (-60, 0, 0)))
+    # 对定销装在固定于夹具体顶上的支架里，从外侧（−x）插进分度盘的分度孔；拔出时向 −x 拉
+    zr = H + 120 / 2 - 12
+    a.add(Part("对定销支架", S.box(-80, -50, -15, 15, 130, 142) + S.box(-132, -50, -15, 15, 142, 154)
+               + S.box(-132, -104, -15, 15, zr - 12, 154) - S.cyl("x", (0, zr), 5, -133, -103), "cast", 8, (0, 0, 60)))
+    pin = S.cyl("x", (0, zr), 4.9, -140, -84) + S.cyl("x", (0, zr), 9, -152, -140)
     a.add(Part("对定销", pin, "steel_dark", 4, (-100, 0, 40)))
     a.add(Part("工件（套筒）", sleeve_part(50, 30, 60, at=(0, 0, H)), "work", None, (0, 0, 120)))
     a.add(Part("钻模板", S.box(-10, 70, -30, 30, H + 40, H + 52) - S.cyl("z", (30, 0), 8, H + 39, H + 53) + S.box(-50, -10, -30, 30, H + 40, H + 52), "steel", 5, (0, 0, 120)))
@@ -182,7 +187,9 @@ def drill_column(lowered=1.0):
     a.add(Part("钻套", S.tube("z", (0, -10), 9, 5, 98 + lift, 116 + lift) + S.tube("z", (0, -10), 12, 5, 116 + lift, 120 + lift), "hardened", 4, (0, 0, 150)))
     a.add(Part("工件", S.cyl("z", (0, -10), 40, 0, 70) + S.cyl("z", (0, -10), 25, 70, 100) - S.cyl("z", (0, -10), 12, 85, 101), "work", None, (0, -90, 0)))
     a.add(Part("定位套", S.tube("z", (0, -10), 46, 40.2, 0, 14), "hardened", 5, (0, 0, -20)))
-    a.add(Part("手柄", S.cyl("x", (65, 30), 8, 90, 130) + S.cyl("z", (130, 65), 5, 30, 110) + S.cyl("z", (130, 65), 9, 110, 125), "steel_dark", 6, (60, 0, 0)))
+    handle = S.cyl("x", (65, 30), 8, 90, 130) + S.cyl("z", (130, 65), 5, 30, 110) + S.cyl("z", (130, 65), 9, 110, 125)
+    handle = S.rot(handle, -70 * (1 - lowered), 0, 0, about=(0, 65, 30))      # 齿轮轴转动，手柄跟着转：压下（夹紧）时手柄竖直
+    a.add(Part("手柄", handle, "steel_dark", 6, (60, 0, 0)))
     return a
 
 
@@ -257,12 +264,14 @@ def tombstone(parts_per_face=2):
     for f in range(4):
         for j in range(parts_per_face):
             z0 = 70 + j * 140
-            w = S.box(60, 100, -45, 45, z0, z0 + 100)
+            # 工件（宽 64）两侧带工艺凸台（y = ±32…±52、厚 15），转角缸装在塔柱里，压凸台，不挡住要加工的外表面（x = 100）
+            w = S.box(60, 100, -32, 32, z0, z0 + 100) + S.box(60, 75, -52, 52, z0 + 20, z0 + 80)
             w = S.rot(w, 0, 0, 90 * f)
             a.add(Part(f"工件{f}{j}", w, "work", None, tuple(80 * c for c in (math.cos(math.pi / 2 * f), math.sin(math.pi / 2 * f), 0))))
-            for n, s in E.swing_clamp(at=(0, 0, 0), arm=34, ang_deg=0).items():
-                s2 = S.rot(S.move(S.rot(s, 0, 90, 0), 112, 0, z0 + 50), 0, 0, 90 * f)
-                a.add(Part(f"转角缸{f}{j}{n}", s2, "steel_dark", 5))
+            for side in (-1, 1):
+                for n, s in E.swing_clamp(at=(0, 0, 0), arm=30, ang_deg=0, H=50).items():
+                    s2 = S.rot(S.move(S.rot(s, 0, 90, 0), 61, side * 44, z0 + 62), 0, 0, 90 * f)
+                    a.add(Part(f"转角缸{f}{j}{'左右'[side > 0]}{n}", s2, "steel_dark", 5))
     return a
 
 
@@ -276,8 +285,10 @@ def modular_fixture():
     zc = 40 + E.v_axis_height(40, apex=10)
     a.add(Part("工件（轴）", S.cyl("x", (0, zc), 20, -150, 150), "work", None, (0, 0, 140)))
     for k, x in enumerate((-90, 90)):
-        a.add(Part(f"压板{k + 1}", S.box(x - 12, x + 12, -70, 15, zc + 20, zc + 34), "steel", 4, (0, 0, 190)))
-        a.add(Part(f"螺栓{k + 1}", S.cyl("z", (x, -50), 6, -20, zc + 44) + S.hexagon("z", (x, -50), 18, zc + 34, zc + 44), "steel_dark", 5, (0, 0, 230)))
+        # 压板：前端压工件，螺栓在 T 形槽（y = −60）里，后端搭在后支承（方支承）上
+        a.add(Part(f"压板{k + 1}", S.box(x - 12, x + 12, -84, 15, zc + 20, zc + 34), "steel", 4, (0, 0, 190)))
+        a.add(Part(f"螺栓{k + 1}", S.cyl("z", (x, -60), 6, -20, zc + 44) + S.hexagon("z", (x, -60), 18, zc + 34, zc + 44), "steel_dark", 5, (0, 0, 230)))
+        a.add(Part(f"后支承{k + 1}", S.box(x - 12, x + 12, -84, -72, 0, zc + 20), "steel", 7, (0, -40, 0)))
     a.add(Part("角铁（侧向挡块）", S.box(140, 170, -40, 40, 0, 80), "steel", 6, (40, 0, 40)))
     return a
 

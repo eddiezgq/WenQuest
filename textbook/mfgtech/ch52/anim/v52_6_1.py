@@ -22,7 +22,7 @@ for k in range(N + 1):                    # 钻好 k 个孔的工件（孔在钻
     a.add(C.Part(f"工件{k}", s, "work"))
 a.add(C.Part("钻头", S.cyl("z", (30, 0), 4, 0, 90) + S.cyl("z", (30, 0), 9, 90, 150), "tool", tags=("nocut",)))
 ROT = ["分度盘", "心轴", "螺母"] + [f"工件{k}" for k in range(N + 1)]
-CAM = {"dir": [-0.9, -1.3, 0.75], "fit": [[-110, -70, -20], [130, 70, 200]], "zoom": 1.25}
+CAM = {"dir": [-0.9, -1.3, 0.75], "fit": [[-160, -70, -20], [130, 70, 250]], "zoom": 1.05}
 v = R.Video(a, width=1280, height=720, fps=20)
 
 

@@ -25,14 +25,14 @@ def sb(kind):
         q.add(P("塞尺（侧面）", S.box(-12, 12, -3, 0, -26, -9), feel))
         q.add(P("铣刀（三面刃局部）", S.cyl("y", (0, -9), 22, -40, -3) & S.box(-30, 30, -45, -3, -9, 40), "tool"))
     elif kind == "angle":
-        q.add(P("对刀块", E.setting_block("angle", at=(0, 0, -12), size=20), "hardened"))
-        q.add(P("塞尺（底面）", S.box(-12, 12, -16, -3, -12, -9), feel))
-        q.add(P("塞尺（侧面）", S.box(-12, 12, -3, 0, -9, 4), feel))
-        q.add(P("键槽铣刀", S.cyl("z", (0, -9), 6, -9, 40) - S.cbox(0, -9, 10, 14, 2, 20), "tool"))
+        q.add(P("对刀块", E.setting_block("angle", at=(0, 0, 0), size=20), "hardened"))     # 底座落在夹具体上（z = −30）
+        q.add(P("塞尺（底面）", S.box(-12, 12, -16, -3, 0, 3), feel))
+        q.add(P("塞尺（侧面）", S.box(-12, 12, -3, 0, 3, 16), feel))
+        q.add(P("键槽铣刀", S.cyl("z", (0, -9), 6, 3, 52) - S.cbox(0, -9, 22, 14, 2, 20), "tool"))
     else:
         q.add(P("对刀块", E.setting_block("side", at=(0, 0, -6), size=20), "hardened"))
-        q.add(P("塞尺", S.box(-12, 12, -3, 0, -30, -4), feel))
-        q.add(P("铣刀（侧刃局部）", S.cyl("z", (0, -15), 12, -40, 10), "tool"))
+        q.add(P("塞尺", S.box(-12, 12, -3, 0, -26, -4), feel))
+        q.add(P("铣刀（侧刃局部）", S.cyl("z", (0, -15), 12, -24, 10), "tool"))
     return q
 cam = {"dir": [0.9, -1.2, 0.8]}
 R.compose("fig52_6_1", [R.render_png(sb(k), 600, 480, camera=cam) for k in ("round", "square", "angle", "side")], 2,
@@ -57,9 +57,10 @@ def bush(kind):
     if kind == "special":
         q.parts.clear()
         q.add(P("钻模板", S.box(-40, 40, -40, 40, -22, 0) - S.cyl("z", (0, 0), 12, -23, 1), "steel"))
-        q.add(P("工件（斜面）", S.rot(S.box(-60, 60, -50, 50, -80, -40), 0, 25, 0, about=(0, 0, -40)), "work"))
-        q.add(P("加长钻套（下端按斜面切斜）", (S.tube("z", (0, 0), 12, 5, -50, 0) + S.tube("z", (0, 0), 15, 5, 0, 4))
-                - S.rot(S.box(-30, 30, -30, 30, -80, -40), 0, 25, 0, about=(0, 0, -40)), "hardened"))
+        # 工件斜面离钻模板留出空间；加长钻套伸到离斜面约 1 mm，下端按斜面切斜
+        q.add(P("工件（斜面）", S.rot(S.box(-60, 60, -50, 50, -105, -65), 0, 25, 0, about=(0, 0, -65)), "work"))
+        q.add(P("加长钻套（下端按斜面切斜）", (S.tube("z", (0, 0), 12, 5, -70, 0) + S.tube("z", (0, 0), 15, 5, 0, 4))
+                - S.rot(S.box(-30, 30, -30, 30, -105, -64), 0, 25, 0, about=(0, 0, -65)), "hardened"))
         return q
     for n, s in E.drill_bushing(kind, d=10, D=24 if kind == "fixed" else 24, H=22, at=(0, 0, 0)).items():
         q.add(P(n, s, "hardened" if n == "钻套" else ("steel" if n == "衬套" else "steel_dark")))
@@ -94,25 +95,25 @@ bb.add(P("镗模支架（局部）", S.box(-40, 40, -12, 12, 0, 90) - S.cyl("y",
 bb.add(P("回转镗套（装在滚动轴承里）", S.tube("y", (0, 45), 26.9, 16, -12, 12), "steel"))
 bb.add(P("滚动轴承（示意）", S.tube("y", (0, 45), 26.9, 22, -10, 10), "rubber"))
 bb.add(P("内套", S.tube("y", (0, 45), 21.9, 16, -16, 16), "hardened"))
-bb.add(P("镗杆", S.cyl("y", (0, 45), 15.9, -70, 70), "tool"))
+bb.add(P("镗杆", S.cyl("y", (0, 45), 15.9, -70, 70), "tool", tags=("nocut",)))    # 实心杆纵剖时按不剖画
 fb = A("固定镗套")
 fb.add(P("镗模支架（局部）", S.box(-40, 40, -12, 12, 0, 90) - S.cyl("y", (0, 45), 22, -13, 13), "cast"))
 fb.add(P("固定镗套", S.tube("y", (0, 45), 22, 16, -12, 12) + S.tube("y", (0, 45), 28, 16, -18, -12), "hardened"))
-fb.add(P("镗杆", S.cyl("y", (0, 45), 15.95, -70, 70), "tool"))
+fb.add(P("镗杆", S.cyl("y", (0, 45), 15.95, -70, 70), "tool", tags=("nocut",)))
 p1 = R.render_png(fb, 520, 440, camera={"dir": [1.0, -0.9, 0.6]}, section=((0, 0, 0), (1, 0, 0)))
 p2 = R.render_png(bb, 520, 440, camera={"dir": [1.0, -0.9, 0.6]}, section=((0, 0, 0), (1, 0, 0)))
 p3 = R.render_png(TY.boring_jig(), 720, 520, camera={"dir": [0.9, -1.3, 0.8]})
 R.compose("fig52_6_6", [p1, p2, p3], 3, titles=["(a) 固定镗套（剖开）", "(b) 回转镗套（剖开）：套随镗杆转", "(c) 双面导向的镗模：孔的位置由镗套决定"])
 
 # ---- 图 52.6.7：分度装置：(a) 回转式钻模的分度盘与对定销；(b) 圆锥对定销（剖开）消除间隙
-pa = R.render_png(TY.drill_indexing(6), 760, 560, camera={"dir": [-1.0, -1.2, 0.7]},
-                  labels=[{"at": (-87, -10, 80 + 48), "text": "对定销插在分度孔里", "style": "text", "pos": [0.04, 0.08], "anchor": "start", "part": "对定销"},
+pa = R.render_png(TY.drill_indexing(6), 760, 560, camera={"dir": [-1.0, -1.2, 0.7], "fit": [[-160, -70, -20], [120, 70, 190]]},
+                  labels=[{"at": (-145, -9, 128), "text": "对定销（装在支架里）插在分度孔里", "style": "text", "pos": [0.04, 0.08], "anchor": "start", "part": "对定销"},
                           {"at": (-94, -40, 80), "text": "分度盘（6 个分度孔）", "style": "text", "pos": [0.04, 0.9], "anchor": "start", "part": "分度盘"}])
 cp = A("圆锥对定销")
 cp.add(P("分度盘（局部）", S.box(-30, 30, -20, 20, -14, 0) - S.revolve([(-15, 0), (-15, 4), (1, 6.5), (1, 0)], "z", (0, 0)), "steel"))
 cp.add(P("对定销导套", S.box(-25, 25, -20, 20, 4, 40) - S.cyl("z", (0, 0), 7.05, 3, 41), "cast"))
-cp.add(P("圆锥对定销", S.revolve([(-14, 0), (-14, 3.8), (0, 6.3), (2, 7), (40, 7), (40, 0)], "z", (0, 0)) + S.cyl("z", (0, 0), 10, 40, 48), "hardened"))
-cp.add(P("拉钮", S.cyl("z", (0, 0), 12, 48, 58), "steel_dark"))
+cp.add(P("圆锥对定销", S.revolve([(-14, 0), (-14, 3.8), (0, 6.3), (2, 7), (40, 7), (40, 0)], "z", (0, 0)) + S.cyl("z", (0, 0), 10, 40, 48), "hardened", tags=("nocut",)))
+cp.add(P("拉钮", S.cyl("z", (0, 0), 12, 48, 58), "steel_dark", tags=("nocut",)))
 pb = R.render_png(cp, 560, 560, camera={"dir": [0.9, -1.2, 0.5]}, section=((0, 0, 0), (0, -1, 0)))
 R.compose("fig52_6_7", [pa, pb], 2, titles=["(a) 回转式钻模：拔出对定销、转 60°、插入，钻下一个孔", "(b) 圆锥对定销（剖开）：锥面插紧，消除间隙"])
 out(n_fig3d=6)

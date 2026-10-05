@@ -30,7 +30,7 @@ sym_rss = FX.budget(b_sym["items"], b_sym["T"], "rss")
 H_ext = FX.budget(b_H["items"], b_H["T"], "extreme")
 
 # 有限元：一段 V 形块工作面（长 18）承担一半的夹紧力
-# 两个压板离 V 形块两段工作面的外端各 20 mm、对称布置（见图 52.1.1），每段工作面各承担一半
+# 两个压板离 V 形块两段工作面的外端各 20 mm、对称布置（见图 52.2.2），每段工作面各承担一半
 W_land = (an["W_have"] + fx["clamping"]["G"]) / 2
 N_land = W_land / (2 * math.sin(math.pi / 4))
 hz = FX.hertz_line(N_land / fx["locating"]["v_land"], 40.3 / 2)
@@ -52,6 +52,7 @@ spread = {k: (hi - lo) * an["strap"]["ratio"] * 0.95 * r["drop"] / W_land for k,
 
 plt = style()
 fig, ax = plt.subplots(figsize=(5.4, 3.4))
+fig.patch.set_facecolor("white")
 r = res["steel"]
 m = r["mesh"]
 u = r["res"]["u"]

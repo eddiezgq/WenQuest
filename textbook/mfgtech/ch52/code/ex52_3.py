@@ -54,9 +54,10 @@ assert abs(max(abs(v) for v in FYs) - f["Fy_peak"]) / f["Fy_peak"] < 0.02
 plt = style()
 fig, ax = plt.subplots(figsize=(6.0, 2.6))
 deg = np.degrees(th)
-ax.plot(deg, FXs, color=M.ACCENT, lw=1.3, label=T("沿进给方向 $F_x$（推向挡板）", "along feed $F_x$ (toward the stop)"))
-ax.plot(deg, FYs, color=M.RED, lw=1.3, label=T("横向 $F_y$", "lateral $F_y$"))
-ax.plot(deg, FZs, color=M.WARM, lw=1.3, label=T("向上 $F_z$（把工件往上拔）", "upward $F_z$ (lifting the work)"))
+ax.plot(deg, FXs, color="#c0504d",  # 与图 52.3.1 的箭头同色
+        lw=1.3, label=T("沿进给方向 $F_x$（推向挡板）", "along feed $F_x$ (toward the stop)"))
+ax.plot(deg, FYs, color="#4f7fb8", lw=1.3, label=T("横向 $F_y$", "lateral $F_y$"))
+ax.plot(deg, FZs, color="#5a9e6f", lw=1.3, label=T("向上 $F_z$（把工件往上拔）", "upward $F_z$ (lifting the work)"))
 ax.axhline(0, color=M.MUTED, lw=0.5)
 ax.set_xlim(0, 360); ax.set_xticks([0, 90, 180, 270, 360])
 ax.set_xlabel(T("铣刀转角 / °", "cutter rotation / °"), fontsize=8.5); ax.set_ylabel("N", fontsize=8.5)

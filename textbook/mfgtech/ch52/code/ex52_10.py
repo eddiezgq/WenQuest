@@ -58,7 +58,7 @@ a2.fill_between(n / 1000, (mean - 3 * sd) * 1000, (mean + 3 * sd) * 1000, color=
 a2.plot(n / 1000, mean * 1000, color="#4f7fb8", lw=1.2, label=T("均值", "mean"))
 a2.plot(n / 1000, (mean + 3 * sd) * 1000, color="#4f7fb8", lw=0.8, ls="--", label=T("均值 + 3σ", "mean + 3σ"))
 a2.axhline(T_sym * 1000, color="#c0504d", lw=1.0)
-a2.text(1.25 * life / 1000 * 0.98, T_sym * 1000 + 0.5, ha="right", s= T("公差 0.020", "tolerance 0.020"), color="#c0504d", fontsize=7.5)
+a2.text(1.25 * life / 1000 * 0.98, T_sym * 1000 + 0.5, ha="right", s= T("公差 20 µm", "tolerance 20 µm"), color="#c0504d", fontsize=7.5)
 a2.axvline(life / 1000, color=M.INK, lw=0.8, ls=":")
 a2.text(life / 1000, 4, T(f" 更换（约 {life / 1000:.0f} 千件）", f" replace (≈{life / 1000:.0f}k parts)"), fontsize=7.5)
 for c in np.arange(check_every, 1.25 * life, check_every):
@@ -73,4 +73,4 @@ fig.tight_layout()
 figure(fig, "fig52_10_3")
 
 out(w0=w0, cx=abs(cx), k=k, mu=mu, sd=sd, w_limit=w_limit, w_limit_um=w_limit * 1000, cpk_new=cpk_new, inj=inj, w_inj=w_inj * 1000,
-    rate_um=rate * 1000 * 1000, life=life, check_every=check_every, checks=life / check_every)
+    rate_um=rate * 1000 * 1000, life=life, check_every=check_every, checks=math.floor(life / check_every))

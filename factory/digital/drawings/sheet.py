@@ -66,6 +66,25 @@ class View:
         return (self.ref2[0] + (uv[0] - u0) * self.scale, self.ref2[1] - (uv[1] - v0) * self.scale)
 
 
+def _dedupe(hid, vis, tol=0.05):
+    """虚线去重：前后两条重合的不可见边投影到同一位置，两条虚线相位不同会叠成实线；
+    与可见边重合的不可见边也不画。直线段按端点比较，统一从左上端开始画（相位一致）。"""
+    def key(pl):
+        a, b = (round(pl[0][0] / tol), round(pl[0][1] / tol)), (round(pl[-1][0] / tol), round(pl[-1][1] / tol))
+        return (min(a, b), max(a, b), len(pl))
+    seen = {key(pl) for pl in vis}
+    out = []
+    for pl in hid:
+        k = key(pl)
+        if k in seen:
+            continue
+        seen.add(k)
+        if len(pl) == 2 and (pl[1][0], pl[1][1]) < (pl[0][0], pl[0][1]):
+            pl = [pl[1], pl[0]]
+        out.append(pl)
+    return out
+
+
 def _edges_to_polylines(edges, view: View, tol=0.2):
     out = []
     for e in edges:
@@ -116,6 +135,12 @@ class Sheet:
                     if vs and all(abs((q.X - px) * nx + (q.Y - py) * ny + (q.Z - pz) * nz) < 1e-3 for q in vs):
                         hatch_faces.append((f, num if num is not None else k))
             else:
+                if section is not None:       # 按不剖处理的零件：整个落在被移去的一侧（剖切面前面）的不画
+                    (px, py, pz), (nx, ny, nz) = section
+                    bb = shp.bounding_box()
+                    corners = [(x, y, z) for x in (bb.min.X, bb.max.X) for y in (bb.min.Y, bb.max.Y) for z in (bb.min.Z, bb.max.Z)]
+                    if all((x - px) * nx + (y - py) * ny + (z - pz) * nz > 1e-6 for x, y, z in corners):
+                        continue
                 solids.append(shp)
         comp = bd.Compound(children=solids)
         far = 5000
@@ -214,6 +239,24 @@ class Sheet:
         self.line((x, a[1]), (x, b[1]))
         self.arrow((x, a[1]), math.pi / 2); self.arrow((x, b[1]), -math.pi / 2)
         self.text((x - 1.0, (a[1] + b[1]) / 2), text, size, rot=-90)
+
+    def angle_dim(self, view: View, apex, d1, d2, r, text, size=3.5):
+        """角度尺寸：顶点 apex（三维），两条边的方向 d1、d2（三维），尺寸线是半径 r（图纸 mm）的圆弧，两端箭头，文字在弧中间外侧。"""
+        c = view.at(apex)
+        def ang(d):
+            q = view.at(tuple(apex[i] + d[i] for i in range(3)))
+            return math.atan2(q[1] - c[1], q[0] - c[0])
+        a1, a2 = ang(d1), ang(d2)
+        if (a2 - a1) % (2 * math.pi) > math.pi:
+            a1, a2 = a2, a1
+        span = (a2 - a1) % (2 * math.pi)
+        n = 24
+        pts = [(c[0] + r * math.cos(a1 + span * i / n), c[1] + r * math.sin(a1 + span * i / n)) for i in range(n + 1)]
+        self.items.append('<polyline points="' + " ".join(f"{_f(x)},{_f(y)}" for x, y in pts) + f'" fill="none" stroke="#000" stroke-width="{THIN}"/>')
+        self.arrow(pts[0], a1 - math.pi / 2)
+        self.arrow(pts[-1], a2 + math.pi / 2)
+        am = a1 + span / 2
+        self.text((c[0] + (r + 4) * math.cos(am), c[1] + (r + 4) * math.sin(am) + size * 0.36), text, size)
 
     def balloon(self, p, q, text, r=3.5, size=3.5):
         """零件序号：引线从零件上的点 p（图纸坐标）到序号圆 q；圆圈、编号。"""
@@ -385,7 +428,7 @@ class Sheet:
         for v in self.views:
             for loops, ang, gap in v.hatch:
                 out.append(_hatch_svg(loops, ang, gap))
-            for pl in v.hid:
+            for pl in _dedupe(v.hid, v.vis):
                 out.append(_poly(pl, THIN, "3 1.2"))
             for pl in v.vis:
                 out.append(_poly(pl, THICK))

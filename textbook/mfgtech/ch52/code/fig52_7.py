@@ -32,15 +32,15 @@ R.compose("fig52_7_2", [q1, q2], 2, titles=["(a) 直线进给的多件铣夹具�
 cams = {"dir": [0.9, -1.3, 0.9]}
 d = [R.render_png(TY.drill_fixed(), 560, 460, camera=cams),
      R.render_png(TY.drill_indexing(6), 560, 460, camera={"dir": [-0.9, -1.3, 0.8]}),
-     R.render_png(TY.drill_tumble(), 560, 460, camera={"dir": [0.7, -1.3, 0.9]}),
+     R.render_png(TY.drill_tumble(), 560, 460, camera={"dir": [-0.9, 0.9, 0.9]}),
      R.render_png(TY.drill_cover(), 560, 460, camera=cams),
      R.render_png(TY.drill_column(1.0), 560, 460, camera=cams),
      R.render_png(TY.drill_column(0.0), 560, 460, camera=cams)]
-R.compose("fig52_7_3", d, 3, titles=["(a) 固定式（钻杠杆小头孔）", "(b) 回转式（钻套筒的径向孔）", "(c) 翻转式（三个面上的孔）",
+R.compose("fig52_7_3", d, 3, titles=["(a) 固定式（钻杠杆小头孔）", "(b) 回转式（钻套筒的径向孔）", "(c) 翻转式（顶面、后面、左面各一个钻套；从左后方看）",
                                      "(d) 盖板式（法兰盘上 6 个孔）", "(e) 滑柱式：压下手柄，钻模板压紧工件", "(e′) 滑柱式：抬起钻模板，装卸工件"])
 
 # ---- 图 52.7.4：加工中心的立柱式多面夹具（零点定位托盘，液压转角缸）
 R.figure3d("fig52_7_4", TY.tombstone(2), 1200, 900, camera={"dir": [1.0, -1.2, 0.7]},
            labels=[{"at": (-100, -100, 0), "text": "零点定位卡盘（托盘快换）", "style": "text", "pos": [0.03, 0.92], "anchor": "start", "part": "零点卡盘"},
-                   {"at": (112, 0, 120), "text": "液压转角缸", "style": "text", "pos": [0.85, 0.3], "part": "转角缸"}])
+                   {"at": (90, -44, 120), "text": "液压转角缸：压工件两侧的工艺凸台", "style": "text", "pos": [0.72, 0.1], "part": "转角缸"}])
 out(n_fig3d=4)

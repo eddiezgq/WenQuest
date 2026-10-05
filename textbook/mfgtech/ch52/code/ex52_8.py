@@ -6,7 +6,7 @@ import _mfg as M
 from bookout import T, figure, out, style
 
 rate = 1.5                     # 元/min
-batch = 50                     # 每批件数
+batch = 100                    # 每批件数
 opts = {
     # 名称: (夹具一次性费用 元, 每批的准备费用 元, 每批准备时间 min, 每件装夹找正时间 min)
     "find": (0.0, 0.0, 10.0, 8.0),          # 平口钳 + 千分表找正，每件找正
@@ -27,9 +27,10 @@ cost = {k: per_part(k, N) for k in opts}
 
 
 def cross(a, b):
+    """b 从这个产量起一直比 a 便宜（每批件数取整使曲线呈锯齿形，可能多次相交，取最后一次）。"""
     d = cost[a] - cost[b]
-    i = np.where(np.diff(np.sign(d)) != 0)[0]
-    return float(N[i[0] + 1]) if len(i) else None
+    bad = np.where(d < 0)[0]                    # a 还更便宜的产量
+    return float(N[bad[-1] + 1]) if len(bad) and bad[-1] + 1 < len(N) else float(N[0])
 
 
 N1 = cross("find", "modular")

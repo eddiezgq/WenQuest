@@ -18,12 +18,15 @@ a.add(P("夹具体", S.box(-90, 90, -40, 40, -30, 0) + S.box(-90, -70, -40, 40, 
 a.add(P("工件", S.box(-40, 60, -30, 30, 0, 40), "work"))
 alpha = 8.0
 wy = 26.0
-wedge = S.prism("xz", [(-60, 120), (100, 120), (100, 120 - 6), (-60, 120 - 6 - 160 * math.tan(math.radians(alpha)))], -wy / 2, wy / 2)
+# 薄端在左、厚端在右：Q 从右向左推，斜楔向薄端方向移动，滑柱上方的楔越来越厚，把滑柱往下压（夹紧）；反向拉出即松开
+t_a = math.tan(math.radians(alpha))
+wedge = S.prism("xz", [(-60, 120), (100, 120), (100, 120 - 6 - 160 * t_a), (-60, 120 - 6)], -wy / 2, wy / 2)
+z_under = 120 - 6 - (20 + 60) * t_a          # 滑柱处斜楔下表面的高度
 a.add(P("斜楔", wedge, "hardened"))
-plunger = S.cyl("z", (20, 0), 12, 40, 98) + S.cyl("z", (20, 0), 16, 40, 46)
+plunger = S.cyl("z", (20, 0), 12, 40, z_under) + S.cyl("z", (20, 0), 16, 40, 46)
 a.add(P("滑柱与压头", plunger, "steel"))
 pa = R.render_png(a, 760, 600, camera={"dir": [0.6, -1.3, 0.5]},
-                  arrows=[{"from": (150, 0, 117), "to": (102, 0, 117), "color": red, "text": "Q", "dx": 4, "dy": -10},
+                  arrows=[{"from": (150, 0, 108), "to": (102, 0, 108), "color": red, "text": "Q", "dx": 4, "dy": -10},
                           {"from": (20, -35, 75), "to": (20, -35, 42), "color": blue, "text": "W", "dx": 8}],
                   labels=[{"at": (40, -wy / 2, 108), "text": f"斜楔（楔角 α = {alpha:g}°）", "style": "text", "pos": [0.55, 0.12], "part": "斜楔"}])
 # 斜楔—杠杆组合：气缸推斜楔，斜楔经滚子推杠杆
@@ -34,13 +37,14 @@ lever = S.box(-60, 112, -10, 10, 40, 52) + S.cyl("y", (70, 46), 8, -14, 14)
 b.add(P("杠杆", lever, "steel"))
 b.add(P("压头", S.cyl("z", (-50, 0), 8, 30, 40), "steel"))
 b.add(P("滚子", S.cyl("y", (102, 30), 9, -9, 9), "hardened"))
+b.add(P("滚子叉架（固定在杠杆上）", S.box(94, 110, 9.5, 13, 24, 40) + S.box(94, 110, -13, -9.5, 24, 40) + S.cyl("y", (102, 30), 3, -14, 14), "steel"))
 b.add(P("斜楔", S.prism("xz", [(85, 0), (180, 0), (180, 21), (115, 21)], -12, 12), "hardened"))
 b.add(P("活塞杆", S.cyl("x", (0, 10), 6, 178, 205), "steel_dark"))
 b.add(P("气缸", S.cyl("x", (0, 10), 26, 205, 285) + S.box(280, 290, -30, 30, -20, 40), "steel_dark"))
 pb = R.render_png(b, 760, 600, camera={"dir": [0.6, -1.3, 0.55]},
                   arrows=[{"from": (-50, -40, 75), "to": (-50, -40, 42), "color": blue, "text": "W", "dx": 8}],
                   labels=[{"at": (140, -12, 12), "text": "斜楔（不要求自锁时 15°–30°）", "style": "text", "pos": [0.55, 0.88], "part": "斜楔"}])
-R.compose("fig52_4_1", [pa, pb], 2, titles=["(a) 斜楔—滑柱：推楔 Q，滑柱压紧 W（手动楔角 6°–8°，能自锁）", "(b) 斜楔—杠杆：气缸推斜楔，经滚子推杠杆压紧"])
+R.compose("fig52_4_1", [pa, pb], 2, titles=["(a) 斜楔—滑柱：Q 推斜楔向薄端方向移动，滑柱压紧 W（手动楔角 6°–8°，能自锁）", "(b) 斜楔—杠杆：气缸推斜楔，经滚子推杠杆压紧"])
 
 # ---- 图 52.4.2：四种螺旋夹紧
 pngs = []
@@ -62,7 +66,7 @@ c2.add(P("可调支承", S.cyl("z", (90, 0), 5, 34, 40), "steel_dark"))
 pngs.append(R.render_png(c2, 640, 520, camera={"dir": [0.3, -1.4, 0.45]},
                          dims=[{"a": (0, -16, 54), "b": (40, -16, 54), "off": (0, 0, 22), "text": "l₁ = 40"},
                                {"a": (40, -16, 54), "b": (90, -16, 54), "off": (0, 0, 22), "text": "l₂ = 50"}],
-                         arrows=[{"from": (0, -35, 80), "to": (0, -35, 42), "color": blue, "text": "W工件", "dx": -70}]))
+                         arrows=[{"from": (0, -35, 80), "to": (0, -35, 42), "color": blue, "text": "W（压工件）", "dx": -100}]))
 # (c) 回转压板：压板绕螺柱转开，让出装卸空间
 c3 = A("回转压板")
 c3.add(P("夹具体", S.box(-60, 80, -50, 50, -25, 0), "cast"))
@@ -76,36 +80,57 @@ pngs.append(R.render_png(c3, 640, 520, camera={"dir": [0.8, -1.3, 0.9]}))
 c4 = A("钩形压板")
 c4.add(P("夹具体", S.box(-60, 80, -50, 50, -25, 0), "cast"))
 c4.add(P("工件", S.tube("z", (0, 0), 30, 18, 0, 40), "work"))
-c4.add(P("钩形压板", S.cyl("z", (45, 0), 9, -20, 60) + S.box(10, 55, -10, 10, 40, 54), "steel"))
-c4.add(P("螺母", S.hexagon("z", (45, 0), 16, 54, 62) + S.cyl("z", (45, 0), 5, 54, 68), "steel_dark"))
+c4.add(P("导套", S.tube("z", (45, 0), 15, 9.2, 0, 30), "cast"))
+# 钩形压板：立柱在导套里可以转动和上下移动，横臂末端向下伸出钩头压在工件端面上；拧螺母把钩头往下拉
+c4.add(P("钩形压板", S.cyl("z", (45, 0), 9, -20, 62) + S.box(12, 55, -10, 10, 46, 58) + S.box(12, 26, -10, 10, 40, 46), "steel"))
+c4.add(P("螺母", S.hexagon("z", (45, 0), 16, 58, 66) + S.cyl("z", (45, 0), 5, 58, 72), "steel_dark"))
 pngs.append(R.render_png(c4, 640, 520, camera={"dir": [0.8, -1.3, 0.8]}))
 R.compose("fig52_4_2", pngs, 2, titles=["(a) 螺钉与活动压块", "(b) 移动压板（JJ-301-50 的件 5）", "(c) 回转压板：压板转开让出装卸空间（浅色为转开位置）", "(d) 钩形压板：钩头转开即可取件"])
 
 # ---- 图 52.4.4：圆偏心夹紧（D = 40、e = 2、手柄 100）
 def ecc(angle):
+    """圆偏心—压板：压板右端铰在立柱上（支点 x = 55），偏心轮压压板左端（x = −60），压头在中间（x = −20）压工件；
+    偏心轮的转轴装在夹具体上的两个支架里（工件两侧）。夹紧时（angle 0）偏心轮最低点正好贴住压板。"""
     q = A("偏心")
-    q.add(P("夹具体", S.box(-80, 80, -30, 30, -25, 0) + S.box(40, 70, -30, 30, 0, 70) - S.cyl("y", (55, 60), 4.5, -31, 31), "cast"))
-    q.add(P("工件", S.box(-70, 20, -25, 25, 0, 20), "work"))
-    q.add(P("压板", S.box(-50, 52, -12, 12, 20 + 0.0, 32), "steel"))
-    q.add(P("偏心轮", E.eccentric(at=(-30, 0, 54), D=40, e=2, B=16, handle=80, angle_deg=angle), "hardened"))
-    q.add(P("偏心轮支架（后侧）", S.box(-50, -10, 10, 18, 0, 70) - S.cyl("y", (-30, 54), 4, 9, 19), "cast"))
-    q.add(P("转轴", S.cyl("y", (-30, 54), 4, -10, 18), "steel_dark"))
+    zs, zt = 82.0, 60.0                         # 偏心轮转轴高度、压板顶面高度：zs − e − D/2 = zt
+    q.add(P("夹具体", S.box(-90, 80, -30, 30, -25, 0) + S.box(45, 65, -14, 14, 0, 66), "cast"))
+    q.add(P("工件", S.box(-40, 0, -12, 12, 0, 30), "work"))
+    q.add(P("压板", S.box(-75, 62, -10, 10, 48, zt), "steel"))
+    q.add(P("压头", S.cyl("z", (-20, 0), 7, 30, 48), "steel"))
+    q.add(P("压板铰销", S.cyl("y", (55, 54), 4, -16, 16), "steel_dark"))
+    q.add(P("偏心轮", E.eccentric(at=(-60, 0, zs), D=40, e=2, B=16, handle=80, angle_deg=angle), "hardened"))
+    q.add(P("偏心轮支架（后）", S.box(-70, -50, 12, 22, 0, zs + 10) - S.cyl("y", (-60, zs), 4, 11, 23), "cast"))
+    q.add(P("偏心轮支架（前，半透明画出）", S.box(-70, -50, -22, -12, 0, zs + 10) - S.cyl("y", (-60, zs), 4, -23, -11), "cast", opacity=0.3))
+    q.add(P("转轴", S.cyl("y", (-60, zs), 4, -24, 24), "steel_dark"))
     return q
-pe = [R.render_png(ecc(-120), 640, 520, camera={"dir": [0.25, -1.4, 0.35]}), R.render_png(ecc(0), 640, 520, camera={"dir": [0.25, -1.4, 0.35]})]
-R.compose("fig52_4_4", pe, 2, titles=["(a) 松开：手柄抬起，偏心轮离开压板", "(b) 夹紧：扳下手柄，偏心轮把压板压向工件"])
+ec_cam = {"dir": [0.25, -1.4, 0.35], "fit": [[-170, -30, -25], [80, 30, 180]]}
+pe = [R.render_png(ecc(-120), 640, 520, camera=ec_cam), R.render_png(ecc(0), 640, 520, camera=ec_cam)]
+R.compose("fig52_4_4", pe, 2, titles=["(a) 松开：手柄抬起，偏心轮离开压板（间隙约 3 mm）", "(b) 夹紧：扳下手柄，偏心轮压下压板左端，压头压紧工件"])
 
 # ---- 图 52.4.5：铰链夹紧（气缸 + 单臂铰链 + 杠杆）与快速夹钳
 h = A("铰链")
-h.add(P("夹具体", S.box(-120, 100, -30, 30, -25, 0) + S.box(40, 60, -30, 30, 0, 90), "cast"))
+# 单臂铰链：杠杆支点在 x = 20；右端销 B(95, 76) 接连杆；连杆下端 C 由水平气缸沿 −x 推动，在导轨上滑动；
+# C 从右边推向 B 的正下方，连杆越来越接近竖直，把杠杆右端往上顶的力越来越大，杠杆左端的压头向下压紧工件
+zp, xB, zC = 76.0, 95.0, 26.0
+xC = xB + 8.0                                  # 夹紧位置：连杆离竖直还差约 9°（不越过死点）
+h.add(P("夹具体", S.box(-120, 240, -30, 30, -25, 0) + S.box(10, 30, -30, 30, 0, zp) + S.box(80, 240, -30, 30, 0, zC - 8), "cast"))
 h.add(P("工件", S.box(-110, -20, -25, 25, 0, 30), "work"))
-lev = S.box(-80, 60, -8, 8, 70, 82) + S.cyl("y", (50, 76), 9, -12, 12)
+lev = S.box(-80, 100, -8, 8, zp - 6, zp + 6)
 h.add(P("杠杆", lev, "steel"))
-h.add(P("压头", S.cyl("z", (-70, 0), 7, 30, 70), "steel"))
-link = S.rot(S.box(-6, 6, -6, 6, 0, 60), 0, 10, 0)
-h.add(P("连杆", S.move(link, -10, 0, 12), "hardened"))
-for n, s in E.cylinder_pneu(50, 40, at=(-10, 0, -32), axis="z", ext=40).items():
-    h.add(P("气缸" + n, s, "steel_dark"))
-ph = R.render_png(h, 760, 600, camera={"dir": [0.4, -1.4, 0.5]}, arrows=[{"from": (-70, -40, 60), "to": (-70, -40, 32), "color": blue, "text": "W", "dx": 8}])
+h.add(P("支点销与销", S.cyl("y", (20, zp), 5, -14, 14) + S.cyl("y", (xB, zp), 4, -12, 12) + S.cyl("y", (xC, zC), 4, -12, 12), "steel_dark"))
+h.add(P("压头", S.cyl("z", (-70, 0), 7, 30, zp - 6), "steel"))
+L_link = math.hypot(xC - xB, zp - zC)
+ux, uz = (xB - xC) / L_link, (zp - zC) / L_link
+nx, nz = -uz * 6, ux * 6
+h.add(P("连杆", S.prism("xz", [(xC + nx, zC + nz), (xB + nx, zp + nz), (xB - nx, zp - nz), (xC - nx, zC - nz)], -5, 5), "hardened"))
+h.add(P("滑块", S.box(xC - 10, xC + 14, -12, 12, zC - 8, zC + 8), "steel"))
+h.add(P("气缸缸体", S.rot(E.cylinder_pneu(50, 40, at=(170, 0, zC), axis="x")["缸体"], 0, 0, 180, about=(170, 0, zC)), "steel_dark"))
+h.add(P("活塞杆（推向 −x）", S.cyl("x", (0, zC), 9, xC + 14, 170), "steel_dark"))
+ph = R.render_png(h, 760, 600, camera={"dir": [0.4, -1.4, 0.5]},
+                  arrows=[{"from": (-70, -40, 62), "to": (-70, -40, 34), "color": blue, "text": "W", "dx": 8},
+                          {"from": (165, -40, zC + 14), "to": (125, -40, zC + 14), "color": red, "text": "气缸推力", "textAt": "end", "dx": -10, "dy": -12}],
+                  labels=[{"at": (99, -5, 51), "text": "连杆接近竖直：增力最大", "style": "text", "pos": [0.7, 0.12], "part": "连杆"},
+                          {"at": (20, -14, zp), "text": "杠杆支点", "style": "text", "pos": [0.4, 0.1]}])
 tg = A("快速夹钳")
 tg.add(P("底板", S.box(-90, 90, -40, 40, -15, 0), "cast"))
 tg.add(P("工件", S.box(20, 90, -30, 30, 0, 25), "work"))

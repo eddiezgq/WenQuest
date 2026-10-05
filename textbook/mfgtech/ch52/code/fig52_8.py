@@ -19,7 +19,8 @@ hg.add(P("定位块（挡块）", S.box(-160, -125, -55, 5, 0, 70), "steel"))
 zc = 40 + E.v_axis_height(36, apex=10)
 hg.add(P("工件（轴）", S.cyl("x", (-25, zc), 18, -125, 130), "work"))
 for k, x in enumerate((-75, 75)):
-    hg.add(P(f"压板{k}", S.box(x - 12, x + 12, -60, 0, zc + 18, zc + 30), "steel"))
+    hg.add(P(f"压板{k}", S.box(x - 12, x + 12, -72, 0, zc + 18, zc + 30), "steel"))
+    hg.add(P(f"后支承{k}", S.box(x - 10, x + 10, -72, -60, 0, zc + 18), "steel"))
     hg.add(P(f"螺钉{k}", S.cyl("z", (x, -50), 5, -10, zc + 40) + S.hexagon("z", (x, -50), 16, zc + 30, zc + 38), "steel_dark"))
 for x in (-75, 75):
     for y in (-50, 0):
@@ -49,7 +50,7 @@ R.compose("fig52_8_2", [p1, p2], 2, titles=["(a) 零点定位卡盘与拉钉（�
 # ---- 图 52.8.3：平口钳上的 3D 打印仿形软爪：(a) 夹住异形件；(b) 把软爪拉开，看按工件形状打印出的型腔
 def vise_odd(sep):
     v = MA.vise(opening=70.0)
-    odd = (S.cyl("y", (0, -15), 30, -40, 40) & S.box(-34, 34, -45, 45, -45, 20)) + S.cyl("x", (-6, -12), 11, -38, 38)
+    odd = (S.cyl("y", (0, -15), 30, -40, 40) & S.box(-34, 34, -45, 45, -45, 20)) + S.cyl("x", (0, -12), 11, -40, 40)
     v.add(P("工件（异形件）", S.move(odd, 0, 0, 2.5 * sep), "work"))
     for sx in (-1, 1):
         jaw = S.box(min(sx * 22, sx * 35), max(sx * 22, sx * 35), -60, 60, -38, 0) - odd
@@ -57,7 +58,7 @@ def vise_odd(sep):
     return v
 pc = R.render_png(vise_odd(0), 700, 560, camera={"dir": [0.9, -1.3, 1.0]})
 one = C.Assembly("软爪")
-odd = (S.cyl("y", (0, -15), 30, -40, 40) & S.box(-34, 34, -45, 45, -45, 20)) + S.cyl("x", (-6, -12), 11, -38, 38)
+odd = (S.cyl("y", (0, -15), 30, -40, 40) & S.box(-34, 34, -45, 45, -45, 20)) + S.cyl("x", (0, -12), 11, -40, 40)
 one.add(P("打印软爪", S.box(22, 35, -60, 60, -38, 0) - odd, "#8fb0d8"))
 one.add(P("钢制钳口板", S.box(35, 41, -60, 60, -38, 0), "hardened"))
 pd = R.render_png(one, 700, 560, camera={"dir": [-1.0, -0.55, 0.35]},

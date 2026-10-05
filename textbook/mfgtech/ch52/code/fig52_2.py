@@ -25,7 +25,7 @@ for xl in (9.0, 51.0):                       # 两段工作面的中点
     cp = (xl, sy * Rg * s45, zc - Rg * s45)
     out_ = (xl, cp[1] + sy * 30 * s45, cp[2] - 30 * s45)
     arrows.append({"from": out_, "to": cp, "color": "#4f7fb8", "text": "N", "dx": -22, "dy": 8})
-arrows.append({"from": (-45, -19, zc), "to": (-7, -19, zc), "color": "#4f7fb8", "text": "挡板反力", "dx": -10, "dy": -14})
+arrows.append({"from": (1, -14, zc + Rg + 4), "to": (34, -14, zc + Rg + 4), "color": "#4f7fb8", "text": "挡板对轴肩的反力（向 +x）", "dx": -40, "dy": -14})
 k = W.plan()["part"]["keyway"]
 xk = 52.0 + float(k["offset_mm"]) + g["work_x0"] + 10
 arrows.append({"from": (xk + 40, 0, zc + 22), "to": (xk + 4, 0, zc + 22), "color": "#e0a030", "text": "轴向切削力（朝挡板）", "dx": 4, "dy": -18})
@@ -49,10 +49,10 @@ for x in (0, 110):
 b.add(C.Part("面铣刀", S.cyl("z", (215, 0), 32, 30.2, 52) + S.cyl("z", (215, 0), 14, 52, 90), "tool", tags=("nocut",)))
 R.figure3d("fig52_2_3", b, 1400, 820, camera={"dir": [0.5, -1.4, 0.45]}, section=((0, 0, 0), (0, -1, 0)),
            arrows=[{"from": (0, 0, 80), "to": (0, 0, 44), "color": "#c0504d", "text": "W"}, {"from": (110, 0, 80), "to": (110, 0, 44), "color": "#c0504d", "text": "W"},
-                   {"from": (245, -60, 24), "to": (215, -30, 24), "color": "#e0a030", "text": "切削力", "dx": 6}],
+                   {"from": (236, -40, 80), "to": (236, -40, 31), "color": "#e0a030", "text": "切削力（端铣，向下压工件）", "dx": 6}],
            labels=[{"at": (110, 0, 6), "text": "支承钉（三个：左端前后各一、中间一个，前面一个已剖去）", "style": "text", "pos": [0.3, 0.88], "part": "支承钉"},
                    {"at": (210, 0, 7), "text": "辅助支承：定位、夹紧之后再顶上并锁紧", "style": "text", "pos": [0.66, 0.9], "part": "辅助支承"},
-                   {"at": (215, 0, 70), "text": "加工面在悬伸端", "style": "text", "pos": [0.78, 0.12]}])
+                   {"at": (180, -40, 30), "text": "加工面在悬伸端（工件上表面）", "style": "text", "pos": [0.62, 0.1], "part": "工件"}])
 
 # ---- 图 52.2.4：薄壁套的四种夹法
 ROUT, RIN, BW = 40.0, 36.0, 30.0
