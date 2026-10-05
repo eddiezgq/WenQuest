@@ -1,0 +1,32 @@
+# 实验 5.7 的指导书与报告模板。目的、场景、参数、任务取自 lab5_7.js。
+原理:
+  - ["选材的四步：功能（承受弯矩的梁）、约束（刚度够、外径不超过关节）、目标（质量最小）、自由变量（壁厚或外径）。从这四样推出性能指数，指数大的材料好。", "Four steps: function (a beam in bending), constraints (stiff enough, diameter set by the joints), objective (minimum mass), free variable (wall or diameter). They give a performance index; the larger the better."]
+  - 式: "薄壁管 I = πD³t/8；悬臂 δ = FL³/(3EI) + 自重项；外径固定、壁厚自由：质量 ∝ ρ/E，性能指数 E/ρ"
+  - 式: "形状固定（t/D 不变）、外径自由：质量 ∝ ρ/E^(1/2)，性能指数 E^(1/2)/ρ"
+  - ["工艺约束（最小壁厚）不进性能指数，但会改变结果：所需壁厚比最小壁厚还薄时，只能取最小壁厚，材料就“浪费”了。", "A manufacturing limit (minimum wall) is not in the index but changes the answer: when the wall needed is thinner than the minimum, the minimum is used and material is wasted."]
+步骤:
+  - ["打开实验 5.7，场景“协作机器人小臂”，参数取默认（挠度 0.1 mm、外径 75 mm、负载 4 kg、考虑最小壁厚、外径固定），点“计算”（任务 1），从条形图的标注读出各材料的质量、壁厚 t 和外径 D，填入表 1（“所需壁厚”在关掉最小壁厚约束时读出）。", "Open Lab 5.7, scene “Cobot forearm”, defaults (0.1 mm, OD 75 mm, 4 kg, minimum wall on, fixed OD); press Compute (task 1) and enter each material's wall and mass in Table 1."]
+  - ["把“最小壁厚约束”设为 0 再计算（任务 2），填表 1 的另一列。对照图 5.7.2b 的 E/ρ，解释结果。", "Set minimum wall to 0 and compute (task 2); fill in the other column of Table 1. Explain the result with E/ρ in Fig. 5.7.2b."]
+  - ["把模式设为 1（形状固定、外径自由）再计算（任务 3），填表 2，写出这时的性能指数。", "Set mode to 1 (fixed shape, free OD) and compute (task 3); fill in Table 2 and write the index."]
+  - ["切换到“自行车车架的下管”，外径取 35 mm 和 50 mm 各算一次（任务 4），填表 3：钢和铝合金哪个轻？", "Switch to “Bicycle down tube”, compute with 35 mm and 50 mm OD (task 4) and fill in Table 3: is steel or aluminium lighter?"]
+  - ["（选做）在自己的电脑上运行程序 5.7.1，把允许挠度改成 0.05 mm，看排序是否变化。", "(Optional) Run Program 5.7.1 on your computer with 0.05 mm allowed deflection and see whether the ranking changes."]
+数据表:
+  - 标题: ["表 1  协作机器人小臂（外径 75 mm，挠度 0.1 mm）", "Table 1  Cobot forearm (OD 75 mm, 0.1 mm)"]
+    表头: ["材料", "所需壁厚 / mm", "实际壁厚 / mm", "质量（有最小壁厚）/ kg", "质量（无最小壁厚）/ kg"]
+    表头英文: ["Material", "Wall needed / mm", "Wall used / mm", "Mass (min wall) / kg", "Mass (no min wall) / kg"]
+    行: [["45 钢", "", "", "", ""], ["6061-T6 铝合金", "", "", "", ""], ["7075-T6 铝合金", "", "", "", ""], ["AZ31B 镁合金", "", "", "", ""], ["TC4 钛合金", "", "", "", ""], ["碳纤维层合板", "", "", "", ""], ["玻璃纤维层合板", "", "", "", ""]]
+  - 标题: ["表 2  形状固定、外径自由", "Table 2  Fixed shape, free OD"]
+    表头: ["材料", "外径 / mm", "质量 / kg", "排名"]
+    表头英文: ["Material", "OD / mm", "Mass / kg", "Rank"]
+    行: [["45 钢", "", "", ""], ["6061-T6 铝合金", "", "", ""], ["碳纤维层合板", "", "", ""]]
+  - 标题: ["表 3  自行车下管（挠度 1 mm）", "Table 3  Bicycle down tube (1 mm)"]
+    表头: ["外径 / mm", "钢的质量 / kg", "6061 的质量 / kg", "哪个轻"]
+    表头英文: ["OD / mm", "Steel mass / kg", "6061 mass / kg", "Lighter"]
+    行: [["35", "", "", ""], ["50", "", "", ""]]
+注意:
+  - ["外径、允许挠度、最小壁厚是本书设定的，实际设计要按关节结构、精度分配和工艺确定。只算了弯曲刚度，没有算扭转、连接处和局部屈曲。", "OD, allowed deflection and minimum walls were set by this book; a real design takes them from the joint layout, the accuracy budget and the process. Only bending stiffness is checked — not torsion, joints or local buckling."]
+  - ["碳纤维层合板按准各向同性铺层算（程序 5.5.1）；按受力方向铺层可以更轻，但要专门设计。", "CFRP is taken as a quasi-isotropic laminate (Program 5.5.1); a tailored lay-up can be lighter but needs its own design."]
+  - ["自行车场景按两端支承、中点受力的梁示意，不是车架的真实受力。", "The bicycle scene is a simply supported beam with a midspan load, a sketch rather than the real frame loading."]
+思考题:
+  - ["“外径固定”模式与程序 5.7.1 相同；“形状固定”模式和自行车场景不计自重，是实验另加的。实际的协作机器人小臂多用铝合金，很少用碳纤维。除了质量，还有哪些因素（连接、成本、导热、碰撞）？", "The fixed-OD mode matches Program 5.7.1; the fixed-shape mode and the bicycle ignore self-weight and are extras of this lab. Real cobot forearms are mostly aluminium, rarely carbon fibre. Besides mass, what else matters (joints, cost, heat, impact)?"]
+  - ["为什么钢车架的管子细、铝车架的管子粗？用表 3 和两种性能指数说明（提示：外径 35 mm 时钢和铝差不多重，50 mm 时钢被最小壁厚卡住）。", "Why are steel frame tubes slim and aluminium ones fat? Explain with Table 3 and the two indices."]

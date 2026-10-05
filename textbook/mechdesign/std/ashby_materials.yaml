@@ -1,0 +1,23 @@
+# 第 5 章选材图与小臂选材用的材料数据。数字工厂材料库（cae/materials.py）里有的材料直接用库里的值（lib 列）；
+# 库里没有的取典型值（M. F. Ashby《Materials Selection in Mechanical Design》第 5 版的材料性能图表与附录、厂商数据表的常见值），
+# 选材只用来比较量级。CFRP 层合板的 E 由程序 5.5.1 按经典层合理论算出（cfrp 行的 E 只作备查）。
+source: "Ashby, Materials Selection in Mechanical Design, 5th ed. (2017) 的典型值；厂商数据表"
+status: 待核对（典型值，非标准值）
+unit: {E: GPa, rho: g/cm³, sy: MPa}
+columns: [id, zh, en, cls, E, rho, sy, lib]
+rows:
+- [steel, 45 钢（调质）, 1045 steel (Q&T), metal, null, null, null, 45-QT]
+- [al6061, 6061-T6 铝合金, 6061-T6 aluminium, metal, null, null, null, 6061-T6]
+- [al7075, 7075-T6 铝合金, 7075-T6 aluminium, metal, null, null, null, 7075-T6]
+- [ss304, 304 不锈钢, 304 stainless steel, metal, null, null, null, "304"]
+- [ci, HT200 灰铸铁, HT200 grey iron, metal, null, null, null, HT200]
+- [mg, AZ31B 镁合金, AZ31B magnesium, metal, 45, 1.77, 200, null]
+- [ti, TC4（Ti-6Al-4V）钛合金, Ti-6Al-4V titanium, metal, 114, 4.43, 880, null]
+- [cfrp, 碳纤维层合板（准各向同性）, CFRP laminate (quasi-isotropic), composite, 50, 1.56, 500, null]
+- [gfrp, 玻璃纤维层合板（准各向同性）, GFRP laminate (quasi-isotropic), composite, 18, 1.9, 250, null]
+- [pa66, PA66 尼龙（干态）, PA66 nylon (dry), polymer, null, null, null, PA66]
+- [abs, ABS 塑料, ABS, polymer, null, null, null, ABS]
+- [peek, PEEK, PEEK, polymer, 3.6, 1.30, 95, null]
+- [pa12, PA12（选择性激光烧结）, PA12 (SLS), polymer, 1.7, 1.01, 48, null]
+- [wood, 云杉（顺纹）, spruce (along grain), natural, 10, 0.45, 40, null]
+- [alumina, 氧化铝陶瓷, alumina ceramic, ceramic, 380, 3.9, null, null]

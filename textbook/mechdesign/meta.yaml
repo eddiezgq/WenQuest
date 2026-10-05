@@ -18,3 +18,6 @@ program_deps:
   - textbook/mechdesign/ch33/code/_rj.py
   - textbook/mechdesign/ch03/code/_ch3.py
   - library/catalog/A/A-BRG-DG/specs.csv
+  # 第 5 章：材料库（经 mdstd 读取）、UR5e 模型（小臂长度与腕部质量）
+  - factory/digital/cae/materials.py
+  - library/catalog/B/B-ARM-UR5E/entry.yaml
