@@ -1,0 +1,40 @@
+# 实验 15.5 的指导书与报告模板。目的、场景、参数、任务取自 lab15_5.js。
+原理:
+  - ["数值逆解从一个起点出发，收敛到哪一组解由起点决定。收敛到某一组解的全部起点组成它的吸引域。离解近的地方吸引域成片，远处的边界往往支离破碎：起点差一点，结果就完全不同。",
+     "A numerical inverse kinematics solver starts from one point, and the start decides which solution it reaches. All starts that reach a given solution form its basin of attraction. Near the solutions the basins are solid; far away their boundaries are often fragmented: a slightly different start gives a completely different result."]
+  - 式: ["Δθ ← Δθ · min(1, s_max / max|Δθᵢ|)          (15.5.3)", "Δθ ← Δθ · min(1, s_max / max|Δθᵢ|)          (15.5.3)"]
+  - 式: ["T_d(s) = T₀ e^{s[V₀]}，V₀ = log(T₀⁻¹T_d)，s = 1/N, 2/N, …, 1          (15.5.4)", "T_d(s) = T₀ e^{s[V₀]},  V₀ = log(T₀⁻¹T_d),  s = 1/N, 2/N, …, 1          (15.5.4)"]
+  - ["限步长使每一步都不离开线性化可信的范围；延拓法让目标从起点的位姿逐段移到终点，每一段的初值都离解很近。路径上不碰奇异位形时，延拓法留在起点的那一支上（定理 15.5.2）；碰到奇异位形，那一段就会失败。",
+     "A step limit keeps every step where the linearisation can be trusted; continuation moves the goal from the start pose to the end in stages, so every stage starts close to its solution. If the path meets no singular configuration, continuation stays on the starting branch (Theorem 15.5.2); where it meets one, that stage fails."]
+步骤:
+  - ["打开实验 15.5，场景“UR5e 的初值平面”，起点 (θ₁, θ₃) = (−160°, 150°)。做法依次选 0、1、2，各按一次“求解”，记录结果的编号、构型标签和迭代次数，填入表 1（任务 1、2）。",
+     "Open Lab 15.5, scene “UR5e starting-point plane”, start (θ₁, θ₃) = (−160°, 150°). Choose methods 0, 1 and 2 in turn, press “Solve” each time, and record the solution number, posture labels and iterations in Table 1 (tasks 1 and 2)."]
+  - ["做法依次选 0、1、2，各按一次“画吸引域”，等整张图画完，记录收敛的比例和保持起点构型的比例，填入表 2（任务 3）。比较三张图的样子。",
+     "Choose methods 0, 1 and 2 in turn, press “Draw basins” each time, wait for the whole map, and record the share of converged starts and of starts that kept their posture in Table 2 (task 3). Compare the three maps."]
+  - ["在做法 0 的图上找一个颜色杂乱的区域，把起点在其中移动 10°，观察结果怎样变化。",
+     "On the map of method 0 find a region of mixed colours, move the start by 10° inside it and watch how the result changes."]
+  - ["切换到“分水岭”，落点 (0.0, 0.7)，步长 α 依次取 0.05、0.3、0.6，各按一次“求解”，记录雨滴流进哪个湖（任务 4），填入表 3。",
+     "Switch to “Watershed”, drop point (0.0, 0.7), step α = 0.05, 0.3 and 0.6, press “Solve” each time and record the lake the drop reaches (task 4) in Table 3."]
+数据表:
+  - 标题: ["表 1  起点 (θ₁, θ₃) = (−160°, 150°) 的结果", "Table 1  Results from the start (θ₁, θ₃) = (−160°, 150°)"]
+    表头: ["做法", "结果的编号（表 14.5.1）", "构型（肩 · 肘 · 腕）", "迭代次数", "与起点构型相同吗"]
+    表头英文: ["Method", "Solution number (Table 14.5.1)", "Posture (shoulder · elbow · wrist)", "Iterations", "Same posture as the start?"]
+    行: [["0 牛顿-拉夫森", "", "", "", ""], ["1 限步长", "", "", "", ""], ["2 延拓法", "", "", "", ""]]
+    行英文: [["0 Newton-Raphson", "", "", "", ""], ["1 step-limited", "", "", "", ""], ["2 continuation", "", "", "", ""]]
+  - 标题: ["表 2  初值平面上的统计（36 × 36 个起点）", "Table 2  Statistics over the plane of starts (36 × 36 starts)"]
+    表头: ["做法", "收敛的比例 / %", "保持起点构型的比例 / %", "图的样子"]
+    表头英文: ["Method", "Converged / %", "Kept the starting posture / %", "What the map looks like"]
+    行: [["0 牛顿-拉夫森", "", "", ""], ["1 限步长", "", "", ""], ["2 延拓法", "", "", ""]]
+    行英文: [["0 Newton-Raphson", "", "", ""], ["1 step-limited", "", "", ""], ["2 continuation", "", "", ""]]
+  - 标题: ["表 3  分水岭：落点 (0.0, 0.7)", "Table 3  Watershed: drop point (0.0, 0.7)"]
+    表头: ["步长 α", "流进的湖", "路径的样子"]
+    表头英文: ["Step α", "Lake reached", "Shape of the path"]
+    行: [["0.05", "", ""], ["0.3", "", ""], ["0.6", "", ""]]
+    行英文: [["0.05", "", ""], ["0.3", "", ""], ["0.6", "", ""]]
+注意:
+  - ["初值平面上其余四个关节取 θ* 的值，所以 θ* 本身（θ₁ = 30°、θ₃ = 90°）在图中，标为 θ*。网格比图 15.5.2 粗，统计数字会略有不同。", "The other four joints of the starts take the values of θ*, so θ* itself (θ₁ = 30°, θ₃ = 90°) is on the map, marked θ*. The grid is coarser than in Figure 15.5.1, so the statistics differ slightly."]
+  - ["牛顿-拉夫森法远离解时对舍入误差极其敏感：不同的计算机、不同的程序，在颜色杂乱的区域可能得到不同的结果。", "Far from the solutions Newton-Raphson is extremely sensitive to rounding: in the mixed-colour regions different computers or programs may give different results."]
+  - ["画一张吸引域图要算一千多次逆解，需要几秒钟。", "One basin map needs over a thousand inverse kinematics solutions and takes a few seconds."]
+思考题:
+  - ["实时控制中用上一个控制周期的关节角作初值，为什么几乎不会遇到本实验中“跳到别的解”的问题？什么时候仍然会？",
+     "In real-time control the previous cycle's joint angles are used as the start; why does the “jump to another solution” of this lab hardly ever happen there? When can it still happen?"]

@@ -1,0 +1,35 @@
+# 实验 15.3 的指导书与报告模板。目的、场景、参数、任务取自 lab15_3.js。
+原理:
+  - ["分解运动速率控制每个周期由末端速度求关节速度。精确求逆 θ̇ = J⁻¹(ṗ_d + K e) 在奇异附近给出极大的关节速度；雅可比转置 θ̇ = K_t Jᵀe 从不失控，但跟踪滞后；阻尼最小二乘在两者之间折中。",
+     "Resolved-motion rate control computes joint speeds from the tip speed every cycle. The exact inverse θ̇ = J⁻¹(ṗ_d + K e) gives huge joint speeds near a singularity; the Jacobian transpose θ̇ = K_t Jᵀe never runs away but lags; damped least squares compromises between them."]
+  - 式: "Δθ = Jᵀ(JJᵀ + λ²I)⁻¹ e = Σ σᵢ/(σᵢ² + λ²) (uᵢᵀe) vᵢ          (15.3.2)、(15.3.3)"
+  - 式: ["‖Δθ‖ ≤ ‖e‖/(2λ)          （定理 15.3.1）", "‖Δθ‖ ≤ ‖e‖/(2λ)          (Theorem 15.3.1)"]
+  - ["σ ≫ λ 的方向与精确求逆相同；σ ≪ λ 的方向基本放弃，误差留到离开奇异区以后由反馈消除。λ 越大，关节速度越小，跟踪误差越大。",
+     "Directions with σ ≫ λ are treated as by the exact inverse; directions with σ ≪ λ are largely given up, and feedback removes that error after the singular region. Larger λ means smaller joint speeds and larger tracking error."]
+步骤:
+  - ["打开实验 15.3，方法选 0（精确求逆），按“开始”，记录最大关节速度和最大跟踪误差，观察转速曲线的尖峰出现在哪里（任务 1）。",
+     "Open Lab 15.3, choose method 0 (exact inverse), press “Start”, record the peak joint speed and peak tracking error, and see where the speed spike occurs (task 1)."]
+  - ["方法选 2（阻尼最小二乘），λ 依次取 0.01、0.02、0.035、0.06、0.1 m，各运行一次，填入表 1（任务 2）。",
+     "Choose method 2 (damped least squares) and run with λ = 0.01, 0.02, 0.035, 0.06, 0.1 m; fill in Table 1 (task 2)."]
+  - ["方法选 1（雅可比转置），增益 K_t 取 100、200、400，各运行一次，比较跟踪误差（任务 3）。",
+     "Choose method 1 (Jacobian transpose) with gains K_t = 100, 200, 400 and compare the tracking errors (task 3)."]
+  - ["切换到“望远镜跟踪卫星”，δ = 2°，先用精确求逆，再用阻尼最小二乘（λ = 0.1、0.2、0.3），记录方位轴峰值转速和最大指向误差，填入表 2（任务 4）。",
+     "Switch to “Telescope tracking a satellite”, δ = 2°; first use the exact inverse, then damped least squares (λ = 0.1, 0.2, 0.3); record the peak azimuth speed and the peak pointing error in Table 2 (task 4)."]
+数据表:
+  - 标题: ["表 1  2R 臂：阻尼系数与关节速度、跟踪误差", "Table 1  2R arm: damping, joint speed and tracking error"]
+    表头: ["方法", "λ / m 或 K_t", "最大关节速度 / (°/s)", "最大跟踪误差 / mm"]
+    表头英文: ["Method", "λ / m or K_t", "Peak joint speed / (°/s)", "Peak tracking error / mm"]
+    行: [["精确求逆", "—", "", ""], ["阻尼最小二乘", "0.01", "", ""], ["阻尼最小二乘", "0.035", "", ""], ["阻尼最小二乘", "0.1", "", ""], ["雅可比转置", "200", "", ""]]
+    行英文: [["Exact inverse", "—", "", ""], ["Damped least squares", "0.01", "", ""], ["Damped least squares", "0.035", "", ""], ["Damped least squares", "0.1", "", ""], ["Jacobian transpose", "200", "", ""]]
+  - 标题: ["表 2  望远镜：方位轴转速与指向误差（δ = 2°）", "Table 2  Telescope: azimuth speed and pointing error (δ = 2°)"]
+    表头: ["方法", "λ", "方位轴峰值转速 / (°/s)", "最大指向误差 / (°)"]
+    表头英文: ["Method", "λ", "Peak azimuth speed / (°/s)", "Peak pointing error / (°)"]
+    行: [["精确求逆", "—", "", ""], ["阻尼最小二乘", "0.1", "", ""], ["阻尼最小二乘", "0.2", "", ""], ["阻尼最小二乘", "0.3", "", ""]]
+    行英文: [["Exact inverse", "—", "", ""], ["Damped least squares", "0.1", "", ""], ["Damped least squares", "0.2", "", ""], ["Damped least squares", "0.3", "", ""]]
+注意:
+  - ["关节速度上限 120°/s 只用来判断，程序没有限幅；精确求逆的关节速度可以远远超过它。", "The 120°/s limit is only used for judging; the program does not clip speeds, and the exact inverse can exceed it by far."]
+  - ["目标的最远点略超出臂长之和，此时任何方法都不可能零误差。", "The farthest target point lies just beyond the total reach; no method can have zero error there."]
+  - ["望远镜场景按 5 倍速显示，全程 30 s。", "The telescope scene runs at 5× speed; it lasts 30 s."]
+思考题:
+  - ["望远镜的俯仰角如果允许超过 90°（越过天顶翻到另一侧），卫星从头顶飞过时方位轴还需要快速转动吗？这与 UR5e 穿过手腕奇异时换到“腕翻”构型有什么相似之处？",
+     "If the telescope's elevation may exceed 90° (tipping over the zenith), must the azimuth still turn fast when a satellite passes overhead? How is this like the UR5e switching to the flipped wrist as it passes through the wrist singularity?"]

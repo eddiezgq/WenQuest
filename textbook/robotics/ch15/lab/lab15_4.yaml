@@ -1,0 +1,44 @@
+# 实验 15.4 的指导书与报告模板。目的、场景、参数、任务取自 lab15_4.js。
+原理:
+  - ["关节有限位：θ_min ≤ θ ≤ θ_max。不管限位的牛顿-拉夫森迭代给出哪一组解取决于起点，可能落在限位之外；每步截断到限位虽然守住了限位，却可能让迭代卡在限位上，停在不是驻点的地方。",
+     "Joints have limits: θ_min ≤ θ ≤ θ_max. The Newton-Raphson iteration that ignores them finds whichever solution its start leads to, possibly beyond the limits; clipping each step to the limits keeps them, but can leave the iteration stuck at a limit, at a point that is not stationary."]
+  - 式: ["min ‖J Δ − e‖² + λ²‖Δ‖²，θ_min − θ⁽ᵏ⁾ ≤ Δ ≤ θ_max − θ⁽ᵏ⁾          (15.4.3)", "min ‖J Δ − e‖² + λ²‖Δ‖²,  θ_min − θ⁽ᵏ⁾ ≤ Δ ≤ θ_max − θ⁽ᵏ⁾          (15.4.3)"]
+  - ["有界的一步是一个严格凸的二次规划：每一步都在限位以内，而且只要它不为零，就是加权误差的下降方向；它为零时，迭代停在误差在限位“盒子”上的驻点（定理 15.4.1）。",
+     "The bounded step is a strictly convex quadratic program: every step stays within the limits, and whenever it is not zero it is a descent direction of the weighted error; when it is zero the iteration rests at a stationary point of the error on the box of limits (Theorem 15.4.1)."]
+  - 式: ["Δθ = J₁⁺e₁ + (J₂N₁)⁺(e₂ − J₂J₁⁺e₁)，N₁ = I − J₁⁺J₁          (15.4.9)", "Δθ = J₁⁺e₁ + (J₂N₁)⁺(e₂ − J₂J₁⁺e₁),  N₁ = I − J₁⁺J₁          (15.4.9)"]
+  - ["两个任务冲突时，加权最小二乘让两个误差都留一点；任务优先级先满足主任务，次任务只在主任务的零空间里改进，做不到时停在最接近的地方（定理 15.4.3）。",
+     "When two tasks conflict, weighted least squares leaves some error in both; task priority meets the primary task first and improves the secondary one only within the primary task's null space, stopping at the closest it can get (Theorem 15.4.3)."]
+步骤:
+  - ["打开实验 15.4，场景“平面 3R 臂的关节限位”，目标取 x = 0.55 m、y = −0.20 m、φ_d = 150°。做法选 0，按“求解”，记录迭代次数、所得关节角和超出限位的关节（任务 1），填入表 1。",
+     "Open Lab 15.4, scene “Joint limits of a planar 3R arm”, goal x = 0.55 m, y = −0.20 m, φ_d = 150°. Choose method 0, press “Solve” and record the iterations, the joint angles and the joints beyond their limits (task 1) in Table 1."]
+  - ["同一目标，做法改为 1，按“求解”，等到迭代次数超过 150，记录位置误差和停在限位上的关节（任务 2）。",
+     "Same goal, method 1, press “Solve”; when the iteration count passes 150, record the position error and the joint sitting at its limit (task 2)."]
+  - ["同一目标，做法改为 2，按“求解”，记录迭代次数和所得关节角（任务 3）。再用“迭代一步”逐步观察：哪一步有关节碰到了限位？",
+     "Same goal, method 2, press “Solve” and record the iterations and joint angles (task 3). Then step with “One step”: at which step does a joint touch its limit?"]
+  - ["目标改为 x = 0.75 m、y = 0.10 m、φ_d = 160°，读出“可行的朝向范围”。做法选 3，按“求解”，记录位置误差和最终朝向（任务 4），填入表 2；再选做法 2 求解同一目标，比较。",
+     "Change the goal to x = 0.75 m, y = 0.10 m, φ_d = 160° and read the “feasible tool angles”. Choose method 3, press “Solve”, record the position error and the final tool angle (task 4) in Table 2; solve the same goal with method 2 and compare."]
+  - ["切换到“端一杯水放上架子”，架子放到 (0.55, 0.50) m，主任务分别取 0 和 1，各求解一次，记录杯子倾斜和手离架子的距离（任务 5），填入表 3。",
+     "Switch to “Putting a full cup on a shelf”, put the shelf at (0.55, 0.50) m, solve once with primary task 0 and once with 1, and record the cup tilt and the hand-to-shelf distance (task 5) in Table 3."]
+数据表:
+  - 标题: ["表 1  目标 (0.55, −0.20) m、φ_d = 150°：三种处理限位的做法", "Table 1  Goal (0.55, −0.20) m, φ_d = 150°: three ways of handling the limits"]
+    表头: ["做法", "迭代次数", "θ₁, θ₂, θ₃ / (°)", "位置误差 / mm", "超限或停在限位上的关节"]
+    表头英文: ["Method", "Iterations", "θ₁, θ₂, θ₃ / (°)", "Position error / mm", "Joints beyond or at a limit"]
+    行: [["0 不管限位", "", "", "", ""], ["1 每步截断", "", "", "", ""], ["2 有界的一步", "", "", "", ""]]
+    行英文: [["0 ignore limits", "", "", "", ""], ["1 clip each step", "", "", "", ""], ["2 bounded step", "", "", "", ""]]
+  - 标题: ["表 2  目标 (0.75, 0.10) m、φ_d = 160°：两个任务冲突", "Table 2  Goal (0.75, 0.10) m, φ_d = 160°: two conflicting tasks"]
+    表头: ["做法", "位置误差 / mm", "最终朝向 φ / (°)", "可行的朝向范围 / (°)"]
+    表头英文: ["Method", "Position error / mm", "Final tool angle φ / (°)", "Feasible tool angles / (°)"]
+    行: [["2 有界的一步（位姿一起求）", "", "", ""], ["3 任务优先级", "", "", ""]]
+    行英文: [["2 bounded step (whole pose)", "", "", ""], ["3 task priority", "", "", ""]]
+  - 标题: ["表 3  端水杯：主任务的选择（架子在 (0.55, 0.50) m）", "Table 3  The cup: choice of primary task (shelf at (0.55, 0.50) m)"]
+    表头: ["主任务", "杯子倾斜 / (°)", "手离架子 / mm", "肘的角度 / (°)"]
+    表头英文: ["Primary task", "Cup tilt / (°)", "Hand to shelf / mm", "Elbow angle / (°)"]
+    行: [["0 杯子竖直", "", "", ""], ["1 手到架子", "", "", ""]]
+    行英文: [["0 cup level", "", "", ""], ["1 hand on shelf", "", "", ""]]
+注意:
+  - ["关节角显示时已化到 ±180° 以内；判断是否超限也用化过的角。", "Joint angles are shown within ±180°; the limit check uses these values too."]
+  - ["做法 0、1 的一步加了 10⁻⁵ 的阻尼，只为防止手臂恰好伸直时除以零，对结果没有可见的影响。", "Methods 0 and 1 add a damping of 10⁻⁵ only to avoid division by zero when the arm is exactly straight; it has no visible effect."]
+  - ["做法 3 不考虑关节限位，只演示两个任务的优先级。", "Method 3 ignores the joint limits; it only shows the priority between two tasks."]
+思考题:
+  - ["端水杯时，如果以“手到架子”为主任务而架子够不着，主任务本身就做不到。这时迭代的结果有什么特点？实际的控制器应当怎样处理“主任务不可行”的情形？",
+     "With “hand on shelf” as the primary task and the shelf out of reach, the primary task itself cannot be met. What does the iteration do then? How should a real controller handle an infeasible primary task?"]

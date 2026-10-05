@@ -1,0 +1,37 @@
+# 实验 15.2 的指导书与报告模板。目的、场景、参数、任务取自 lab15_2.js。
+原理:
+  - ["在末端与目标之间挂一根虚拟弹簧，拉力 F = kₛ e 在各关节产生力矩 τ = Jᵀ F。关节转速与力矩成正比，就得到雅可比转置法；它也是 f = ½‖e‖² 的梯度下降。",
+     "Hang a virtual spring between the tip and the target; its pull F = kₛ e produces joint torques τ = Jᵀ F. Joint speeds in proportion to these torques give the Jacobian transpose method, which is also gradient descent on f = ½‖e‖²."]
+  - 式: "τ = Jᵀ F          (15.2.1)"
+  - 式: "Δθ = α Jᵀ e          (15.2.4)"
+  - 式: ["收敛条件 0 < α < 2/σ₁²；每步缩小倍数 max|1 − ασᵢ²|          (15.2.7)", "Convergence condition 0 < α < 2/σ₁²; reduction factor per step max|1 − ασᵢ²|          (15.2.7)"]
+  - 式: ["每步最优 α = eᵀJJᵀe / ‖JJᵀe‖²          (15.2.8)", "Optimal α per step = eᵀJJᵀe / ‖JJᵀe‖²          (15.2.8)"]
+  - ["连续时间下 ½‖e‖² 只减不增（定理 15.2.1）；平衡点除了解以外，只有 Jᵀe = 0 而 e ≠ 0 的奇异或不可达形态。",
+     "In continuous time ½‖e‖² never increases (Theorem 15.2.1); apart from solutions, the only rest points are singular or out-of-reach configurations where Jᵀe = 0 with e ≠ 0."]
+步骤:
+  - ["打开实验 15.2，目标 (0.45, 0.35) m，步长选 1（每步最优），按“开始”，记录迭代次数和最终关节角（任务 1）。",
+     "Open Lab 15.2, target (0.45, 0.35) m, step 1 (optimal each step); press “Start” and record the iterations and final joint angles (task 1)."]
+  - ["步长改为 0（固定），α 依次取 1、2、3，各求一次，记录迭代次数（任务 2）。读出测量区的步长上限 2/σ₁²。",
+     "Set the step to 0 (fixed) and take α = 1, 2, 3 in turn; record the iterations (task 2). Read the step limit 2/σ₁² in the measurements."]
+  - ["把 α 调到超过步长上限（例如 11），观察误差曲线（任务 3）。",
+     "Raise α above the limit (e.g. 11) and watch the error curve (task 3)."]
+  - ["步长改回 1，把目标移到 (0.95, 0.30) m，求解，读出最终误差和 ‖Jᵀe‖，说明手臂的形态（任务 4）。",
+     "Set the step back to 1, move the target to (0.95, 0.30) m and solve; read the final error and ‖Jᵀe‖ and describe the posture (task 4)."]
+  - ["切换到“折叠尺”，按“开始”，观察各节怎样转动（任务 5）；把记号移到够不着的地方再试一次。",
+     "Switch to “Folding ruler”, press “Start” and watch how the parts turn (task 5); move the mark out of reach and try again."]
+数据表:
+  - 标题: ["表 1  步长与迭代次数（目标 (0.45, 0.35) m）", "Table 1  Step size and iterations (target (0.45, 0.35) m)"]
+    表头: ["步长", "迭代次数", "最终误差 / µm", "是否收敛"]
+    表头英文: ["Step", "Iterations", "Final error / µm", "Converged?"]
+    行: [["每步最优", "", "", ""], ["α = 1", "", "", ""], ["α = 2", "", "", ""], ["α = 3", "", "", ""], ["α = 11", "", "", ""]]
+    行英文: [["Optimal each step", "", "", ""], ["α = 1", "", "", ""], ["α = 2", "", "", ""], ["α = 3", "", "", ""], ["α = 11", "", "", ""]]
+  - 标题: ["表 2  够不着的目标", "Table 2  An unreachable target"]
+    表头: ["目标 / m", "最终误差 / mm", "‖Jᵀe‖ / m²", "关节角 / (°)"]
+    表头英文: ["Target / m", "Final error / mm", "‖Jᵀe‖ / m²", "Joint angles / (°)"]
+    行: [["(0.95, 0.30)", "", "", ""]]
+注意:
+  - ["每改一个参数，手臂回到起始形态 (0°, 57.3°, −28.6°)；迭代中不要拖动滑块。", "Every change of a parameter returns the arm to the start (0°, 57.3°, −28.6°); do not move sliders while it iterates."]
+  - ["3R 臂只要求末端位置，有无穷多组解；不同步长可能停在不同的一组。", "The 3R arm is asked only for the tip position, so it has infinitely many solutions; different steps may end at different ones."]
+  - ["力矩弧线按 kₛ = 100 N/m 的弹簧画出，长度与力矩成正比。", "The torque arcs are drawn for a spring of kₛ = 100 N/m, their length in proportion to the torque."]
+思考题:
+  - ["为什么步长超过 2/σ₁² 时，误差在“刚”的方向上越摆越大，而在“软”的方向上仍在减小？", "Above 2/σ₁², why does the error swing ever wider in the stiff direction while it still shrinks in the soft one?"]
