@@ -1,0 +1,25 @@
+# 实验 8.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab8_1.js。
+原理:
+  - ["浮点数 = 符号 × 1.尾数 × 2^(指数 − 偏置)。指数位数决定范围，尾数位数决定精度：相对精度约为 2^(−尾数位数)（8.1 节）。", "A float = sign × 1.mantissa × 2^(exponent − bias). Exponent bits set the range, mantissa bits the precision: about 2^(−mantissa bits) relative (Section 8.1)."]
+  - ["比最小规格化数还小的数用次正规数表示，间隔固定，相对精度逐渐变差；再小就下溢为 0。", "Below the smallest normal number come the subnormals with a fixed spacing and decreasing relative precision; smaller still underflows to 0."]
+  - 式: "就近舍入：存进去的值与原数之差不超过相邻两个可表示数间隔的一半"
+步骤:
+  - ["“一个数的位”场景：x = 0.1，依次选 FP16 与 BF16，记录存进去的值与相对误差，填入表 1（任务 1）。", "Bits scene: x = 0.1 in FP16 and BF16; record the stored value and error in Table 1 (task 1)."]
+  - ["x = 70 000 在 FP16 与 BF16 中（任务 2）；x = 10^−6、10^−8 在 FP16 中（任务 3）；x = 500 在 E4M3 与 E5M2 中（任务 4）。", "x = 70,000 in FP16 and BF16 (task 2); x = 10^−6 and 10^−8 in FP16 (task 3); x = 500 in E4M3 and E5M2 (task 4)."]
+  - ["“范围与精度”场景：比较七种格式的范围与相对精度。", "Range scene: compare the ranges and precision of the seven formats."]
+  - ["“大数吃小数”场景：0.0001 加 10 000 次，FP16、BF16、FP32 各得多少（任务 5）。", "Swamping scene: 0.0001 added 10,000 times in FP16, BF16 and FP32 (task 5)."]
+数据表:
+  - 标题: ["表 1  一个数存进不同的格式", "Table 1  One number in different formats"]
+    表头: ["x", "格式", "存进去的值", "相对误差", "类别"]
+    表头英文: ["x", "Format", "Stored", "Relative error", "Kind"]
+    行: [["0.1", "FP16", "", "", ""], ["0.1", "BF16", "", "", ""], ["70 000", "FP16", "", "", ""], ["70 000", "BF16", "", "", ""], ["10^−8", "FP16", "", "", ""], ["500", "E4M3", "", "", ""]]
+  - 标题: ["表 2  0.0001 加 10 000 次", "Table 2  0.0001 added 10,000 times"]
+    表头: ["格式", "实际的和"]
+    表头英文: ["Format", "Computed sum"]
+    行: [["FP16", ""], ["BF16", ""], ["FP32", ""]]
+注意:
+  - ["E4M3 与 E2M1 溢出时按“饱和”处理（取最大值），这是训练与推理的库通常的做法；IEEE 格式溢出为无穷。", "E4M3 and E2M1 saturate on overflow, as libraries usually do; IEEE formats overflow to infinity."]
+  - ["实验里的舍入与书中程序 8.1.1 逐个数相同。", "The rounding matches Program 8.1.1 number for number."]
+思考题:
+  - ["FP16 与 BF16 都是 16 位：哪个范围大、哪个精度高？训练时各会在哪里出问题？", "FP16 and BF16 are both 16 bits: which has more range, which more precision? Where does each fail in training?"]
+  - ["为什么张量核心用低精度相乘、却用 FP32 累加？", "Why do tensor cores multiply in low precision but accumulate in FP32?"]

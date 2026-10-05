@@ -1,0 +1,41 @@
+标题: ["GPU 实验 8.5 把小型 Transformer 量化到 INT8 和 INT4", "GPU Lab 8.5 Quantizing the small Transformer to INT8 and INT4"]
+目的: ["在熵已知的合成语言上训练小型 Transformer，把权重量化到 INT8、INT4（逐张量、逐通道、分组），比较损失、权重大小，并测 INT8 张量核心的矩阵乘法。",
+       "Train the small Transformer on a synthetic language of known entropy, quantize its weights to INT8 and INT4 (per tensor, per channel, grouped), compare loss and size, and time an INT8 tensor-core GEMM."]
+显卡: basic
+结果:
+  - {名: H, 说明: ["熵下限 H", "entropy floor H"], 单位: ""}
+  - {名: fp32_loss, 说明: ["量化前的损失", "loss before quantization"], 单位: ""}
+  - {名: int8_loss, 说明: ["INT8 逐通道", "INT8 per channel"], 单位: ""}
+  - {名: int4c_loss, 说明: ["INT4 逐通道", "INT4 per channel"], 单位: ""}
+  - {名: int4g_loss, 说明: ["INT4 每 128 个一组", "INT4 groups of 128"], 单位: ""}
+  - {名: int4t_loss, 说明: ["INT4 逐张量", "INT4 per tensor"], 单位: ""}
+  - {名: int4g_MB, 说明: ["INT4 分组后的权重大小", "INT4 grouped weight size"], 单位: MB}
+  - {名: mm16_us, 说明: ["FP16 矩阵乘法", "FP16 GEMM"], 单位: μs}
+  - {名: mm8_us, 说明: ["INT8 矩阵乘法", "INT8 GEMM"], 单位: μs}
+文件: [model.py, lang.py]
+实际问题:
+  标题: ["工位上的模型要更小", "A smaller model for the workstation"]
+  内容: ["检测工位的边缘设备显存小、带宽低，逐词生成受读权重的时间限制。权重从 16 位压到 8 位、4 位，模型会变差多少？",
+         "The workstation's edge device has little memory and bandwidth, and token generation is bound by reading the weights. How much worse does the model get at 8 or 4 bits?"]
+原理:
+  - ["对称量化：q = round(x / s)，s = max|x| / (2^(b−1) − 1)；比例取得越“局部”（逐通道、分组），误差越小，要多存的比例越多（8.3 节）。", "Symmetric quantization: q = round(x / s), s = max|x| / (2^(b−1) − 1); more local scales (per channel, grouped) mean smaller error and more scales to store (Section 8.3)."]
+  - ["合成语言是一阶马尔可夫链，交叉熵不可能低于它的熵率 H；量化后损失升高多少，就是量化的代价（8.5 节）。", "The synthetic language is a first-order Markov chain; no model beats its entropy rate H, so the loss increase after quantization is its cost (Section 8.5)."]
+  - 式: "INT4 分组的权重字节数 ≈ 参数数 × 0.5 + (参数数 / 组大小) × 2"
+步骤:
+  - ["运行第一格；训练约 2 分钟，记下 H 与训练后的损失（第 1 格）。", "Run the first cell; train for about 2 minutes and note H and the loss (cell 1)."]
+  - ["做四种量化，填入表 1（任务 1）。", "Run the four quantizations and fill Table 1 (task 1)."]
+  - ["改变 INT4 的分组大小（任务 2）。", "Vary the INT4 group size (task 2)."]
+  - ["比较 FP16 与 INT8 矩阵乘法的耗时（任务 3）。", "Compare FP16 and INT8 GEMM times (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  量化后的损失", "Table 1  Loss after quantization"]
+    表头: ["做法", "损失", "比量化前高"]
+    表头英文: ["Method", "Loss", "Increase"]
+    行: [["量化前", "{{fp32_loss}}", "—"], ["INT8 逐通道", "{{int8_loss}}", ""], ["INT4 逐通道", "{{int4c_loss}}", ""], ["INT4 每 128 个一组", "{{int4g_loss}}", ""], ["INT4 逐张量", "{{int4t_loss}}", ""]]
+注意:
+  - ["这里用“量化再反量化”的权重做计算，结果与真正用整数存储、计算时反量化相同，但速度不代表真正的 INT4 核函数。", "We compute with quantize-dequantized weights: same results as true integer storage, but not the speed of real INT4 kernels."]
+  - ["训练的步数少，损失离 H 还有距离；量化的代价看“比量化前高”多少。", "With few training steps the loss stays above H; judge quantization by the increase."]
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+思考题:
+  - ["INT4 逐张量为什么差得多？哪些权重的比例被拉大了？", "Why is per-tensor INT4 so much worse? Whose scale gets stretched?"]
+  - ["权重小了一半，逐词生成就一定快一倍吗？还要什么条件？", "Does half the weight size always make token generation twice as fast? What else is needed?"]

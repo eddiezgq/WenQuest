@@ -1,0 +1,36 @@
+标题: ["GPU 实验 8.7 用 Triton 写融合的 softmax", "GPU Lab 8.7 A fused softmax in Triton"]
+目的: ["读懂并运行 Triton 的向量加法与融合的“缩放 + 因果掩码 + softmax”，与 PyTorch 急切执行、torch.compile 比较速度与达到的带宽；自己写一个融合的“加偏置 + GELU”。",
+       "Read and run Triton's vector add and the fused scale + causal mask + softmax, compare with eager PyTorch and torch.compile in speed and bandwidth, then write a fused bias + GELU yourself."]
+显卡: basic
+结果:
+  - {名: add_us, 说明: ["向量加法（2²⁶ 个数）", "vector add (2²⁶ numbers)"], 单位: μs}
+  - {名: eager_us, 说明: ["急切执行：缩放、掩码、softmax", "eager: scale, mask, softmax"], 单位: μs}
+  - {名: triton_us, 说明: ["Triton 融合", "Triton fused"], 单位: μs}
+  - {名: compile_us, 说明: ["torch.compile", "torch.compile"], 单位: μs}
+  - {名: triton_GBs, 说明: ["Triton 达到的带宽", "Triton bandwidth"], 单位: GB/s}
+文件: [add.py, kernels.py]
+实际问题:
+  标题: ["注意力里的三遍读写", "Three passes in attention"]
+  内容: ["注意力分数要先缩放、再掩掉未来的位置、再做 softmax。急切执行时这是三个核函数，同一个大矩阵在显存里来回三趟。能不能一趟做完？",
+         "Attention scores are scaled, masked and softmaxed: three kernels in eager mode, the same large matrix travelling through memory three times. Can it be one pass?"]
+原理:
+  - ["Triton 的核函数写“一个程序实例处理一块数据”，块内的线程分配、合并访问由编译器负责（8.6 节）。", "A Triton kernel describes what one program instance does with a block of data; the compiler handles threads and coalescing within the block (Section 8.6)."]
+  - ["融合后只读一遍、写一遍：流量是急切执行的三分之一（算例 8.7.1）。", "Fused, the data is read once and written once: a third of the eager traffic (Example 8.7.1)."]
+  - 式: "softmax(x)_j = exp(x_j − max x) / Σ_k exp(x_k − max x)"
+步骤:
+  - ["运行第一格；运行向量加法，试三种 BLOCK（第 1 格）。", "Run the first cell; run the vector add with three BLOCK sizes (cell 1)."]
+  - ["比较融合 softmax 与急切执行、torch.compile，填入表 1（任务 1）。", "Compare the fused softmax with eager and torch.compile; fill Table 1 (task 1)."]
+  - ["换更长的行，观察带宽的变化（任务 2）。", "Try longer rows and watch the bandwidth (task 2)."]
+  - ["自己写融合的“加偏置 + GELU”（任务 3）。", "Write a fused bias + GELU (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  注意力的缩放 + 掩码 + softmax（49 152 行 × 256）", "Table 1  Scale + mask + softmax of attention (49,152 rows × 256)"]
+    表头: ["做法", "耗时（μs）"]
+    表头英文: ["Method", "Time (μs)"]
+    行: [["急切执行", "{{eager_us}}"], ["Triton 融合", "{{triton_us}}"], ["torch.compile", "{{compile_us}}"]]
+注意:
+  - ["第一次调用 Triton 核函数要编译，几秒钟；计时前先运行一次。", "The first call of a Triton kernel compiles for a few seconds; run it once before timing."]
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+思考题:
+  - ["torch.compile 生成的也是 Triton 核函数。它和手写的比，快还是慢？为什么？", "torch.compile also generates Triton. Is it faster or slower than the hand-written kernel? Why?"]
+  - ["行很长时（如 T = 4096），整行放进一个程序实例还合适吗？可以怎样改？", "For very long rows (T = 4096), is a whole row per program instance still right? How could it change?"]
