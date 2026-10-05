@@ -1,0 +1,25 @@
+# 实验 13.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab13_6.js。
+原理:
+  - ["航向角是角速度的积分：θ(t) = θ(0) + ∫₀ᵗ ω dτ（13.6 节）。陀螺仪读数 ω̃ = ω + b + n，其中 b 是零偏（常值），n 是随机噪声。积分后，零偏贡献 bt，随时间线性增长；噪声的贡献正负相抵，标准差约为 σ√(Tₛt)，按 √t 增长。", "Heading is the integral of angular rate: θ(t) = θ(0) + ∫₀ᵗ ω dτ (Section 13.6). Gyro readings are ω̃ = ω + b + n, with a constant bias b and random noise n. After integration the bias contributes bt, growing linearly; the noise partly cancels, with standard deviation about σ√(Tₛt), growing like √t."]
+  - 式: "航向误差 ≈ b·t + 随机游走（标准差 σ√(Tₛt)）；标定后零偏的残差约为 σ/√N（N 为标定时的读数个数）"
+  - ["变上限积分 Φ(x) = ∫₀ˣ f(t) dt 在 f 连续的点可导，且 Φ′(x) = f(x)（13.1 节）。f 有跳跃的点，Φ 连续但有折角。", "Φ(x) = ∫₀ˣ f(t) dt is differentiable wherever f is continuous, with Φ′(x) = f(x) (Section 13.1). Where f jumps, Φ is continuous but has a corner."]
+步骤:
+  - ["在“AGV 陀螺仪”场景中，噪声取 0，不标定，零偏取 0.02、0.05、0.1°/s，运行 60 s 和 300 s，把航向误差填入表 1（任务 1）。", "In 'AGV gyro', with no noise and no calibration, set the bias to 0.02, 0.05, 0.1°/s, run 60 s and 300 s, and record the heading errors in Table 1 (task 1)."]
+  - ["零偏 0.05°/s，噪声 0.1°/s，运行 60 s，标定时间取 0、1、2、5、10 s，记录标定得到的零偏和标定后的误差，填入表 2（任务 2）。", "Bias 0.05°/s, noise 0.1°/s, 60 s; set the calibration time to 0, 1, 2, 5, 10 s and record the estimated bias and the calibrated error in Table 2 (task 2)."]
+  - ["零偏取 0，噪声 0.2°/s，运行时间取 150、300、600 s，记录误差并与 σ√(Tₛt) 比较（任务 3）。", "Zero bias, noise 0.2°/s, run 150, 300, 600 s; record the errors and compare with σ√(Tₛt) (task 3)."]
+  - ["在“变上限积分”场景中，对四个函数各取三个 x，比较 Φ 的数值斜率与 f(x)；选阶跃函数，取 x = 0.95、1.05，观察折角。再选 sin t，移动 x 找出 Φ 最大的位置，记录该处的 f(x)（任务 4）。", "In the second scene, for each function take three values of x and compare the numerical slope of Φ with f(x); for the step, try x = 0.95 and 1.05 and look at the corner. Then choose sin t, find where Φ is largest and record f(x) there (task 4)."]
+数据表:
+  - 标题: ["表 1  零偏造成的航向误差（无噪声，不标定）", "Table 1  Heading error from bias (no noise, no calibration)"]
+    表头: ["零偏 / (°/s)", "60 s 后的误差 / (°)", "300 s 后的误差 / (°)", "误差 ÷ 时间 / (°/s)"]
+    表头英文: ["bias / (°/s)", "error after 60 s / (°)", "error after 300 s / (°)", "error ÷ time / (°/s)"]
+    行: [["0.02", "", "", ""], ["0.05", "", "", ""], ["0.1", "", "", ""]]
+  - 标题: ["表 2  静止标定的效果（零偏 0.05°/s，噪声 0.1°/s，60 s）", "Table 2  Effect of calibration at rest (bias 0.05°/s, noise 0.1°/s, 60 s)"]
+    表头: ["标定时间 / s", "标定得到的零偏 / (°/s)", "标定后的误差 / (°)"]
+    表头英文: ["calibration time / s", "estimated bias / (°/s)", "calibrated error / (°)"]
+    行: [["0", "—", ""], ["1", "", ""], ["2", "", ""], ["5", "", ""], ["10", "", ""]]
+注意:
+  - ["噪声由固定的随机数种子产生，所有参数下噪声序列相同，只按 σ 缩放；改变运行时间等于截取同一条路径的不同长度。一次仿真只反映误差的量级，不同的噪声序列结果会有差别。", "Noise comes from a fixed random seed: the sequence is the same for all settings, only scaled by σ; changing the run time cuts the same path at a different length. One run shows only the order of magnitude; other noise sequences give different numbers."]
+  - ["标定期间小车静止，真实角速度为零，读数的平均值就是零偏的估计。标定时间越长，估计越准，但开机等待也越久。", "During calibration the vehicle is still, so the mean reading estimates the bias. Longer calibration is more accurate but delays start-up."]
+思考题:
+  - ["加速度计的零偏 b 使位置误差按 bt²/2 增长。为什么只靠惯性测量的导航系统必须定期用外部参照（GPS、二维码、激光雷达地图）校正？", "An accelerometer bias b makes the position error grow like bt²/2. Why must purely inertial navigation be corrected regularly by external references (GPS, markers, lidar maps)?"]
+  - ["零偏会随温度慢慢变化。若 AGV 连续工作 8 小时，只在开机时标定一次够不够？你会怎样设计在线标定？", "Bias drifts slowly with temperature. If an AGV runs for 8 hours, is calibrating once at start-up enough? How would you design online calibration?"]
