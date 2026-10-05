@@ -1,0 +1,30 @@
+# 实验 8.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab8_4.js。
+原理:
+  - ["牛顿法用 xₖ 处的切线代替曲线，取切线与横轴的交点作为下一个近似值（8.4.2 节）。", "Newton's method replaces the curve by its tangent at xₖ and takes the tangent's intercept as the next guess (Section 8.4.2)."]
+  - 式: "xₖ₊₁ = xₖ − f(xₖ)/f′(xₖ)；单根附近 eₖ₊₁ ≈ |f″/(2f′)|·eₖ²；重根时 eₖ₊₁ ≈ eₖ/2"
+  - ["离根远时切线可能把迭代带到更远处（发散），也可能形成循环；f′ = 0 时无法继续。实用的程序把牛顿法与二分法结合（8.4.5 节）。",
+     "Far from a root the tangent may send the iteration farther away (divergence) or into a cycle; it stops when f′ = 0. Practical codes combine Newton with bisection (Section 8.4.5)."]
+步骤:
+  - ["在“函数的根”场景中选 x² − 2，x₀ = 1，一步步迭代，把每步的 xₖ、误差 eₖ、eₖ/eₖ₋₁² 填入表 1（任务 1）。",
+     "In 'Roots of functions' choose x² − 2 with x₀ = 1, step through and record xₖ, eₖ and eₖ/eₖ₋₁² in Table 1 (task 1)."]
+  - ["选 arctan x，x₀ 分别取 1.0、1.35、1.4、1.5，各迭代 10 步，记录是否收敛（任务 2）。找出收敛与发散的分界大约在哪里。",
+     "Choose arctan x with x₀ = 1.0, 1.35, 1.4, 1.5; do 10 steps each and record whether it converges (task 2). Where is the boundary?"]
+  - ["选 x³ − 2x + 2，x₀ = 0（任务 3）；再取 x₀ = −1，比较。选 (x − 1)²，x₀ = 2，迭代 10 步，记录误差（任务 4）。",
+     "Choose x³ − 2x + 2 with x₀ = 0 (task 3), then x₀ = −1 and compare. Choose (x − 1)² with x₀ = 2, do 10 steps and record the errors (task 4)."]
+  - ["在“关节到达 95% 的时间”场景中，ζ 取 0.4、0.6、0.8，记录达到 |f| < 10⁻¹² 所需的步数和 t₉₅，填入表 2（任务 5）。",
+     "In 'Joint time to 95%', for ζ = 0.4, 0.6, 0.8 record the steps to reach |f| < 10⁻¹² and t₉₅ in Table 2 (task 5)."]
+数据表:
+  - 标题: ["表 1  牛顿法求 √2（x₀ = 1）", "Table 1  Newton's method for √2 (x₀ = 1)"]
+    表头: ["k", "xₖ", "eₖ", "eₖ / eₖ₋₁²"]
+    表头英文: ["k", "xₖ", "eₖ", "eₖ / eₖ₋₁²"]
+    行: [["1", "", "", "—"], ["2", "", "", ""], ["3", "", "", ""], ["4", "", "", ""], ["5", "", "", ""]]
+  - 标题: ["表 2  关节到达 95% 的时间（t₀ = 0.2 s）", "Table 2  Joint time to 95% (t₀ = 0.2 s)"]
+    表头: ["ζ", "0.4", "0.6", "0.8"]
+    表头英文: ["ζ", "0.4", "0.6", "0.8"]
+    行: [["t₉₅ / s", "", "", ""], ["牛顿法步数", "", "", ""]]
+    行英文: [["t₉₅ / s", "", "", ""], ["Newton steps", "", "", ""]]
+注意:
+  - ["eₖ / eₖ₋₁² 在最后一两步可能失真：误差已到机器精度，舍入误差占了主导。", "eₖ / eₖ₋₁² may look odd in the last steps: the error has reached machine precision and rounding dominates."]
+思考题:
+  - ["牛顿法用了 f′，二分法只用了 f 的符号。在什么情况下你宁可用二分法？能不能把两者结合起来？", "Newton uses f′; bisection only uses the sign of f. When would you prefer bisection? Can the two be combined?"]
+  - ["重根时牛顿法为什么变成线性收敛？若事先知道根的重数 m，怎样修改迭代公式恢复二次收敛？", "Why does Newton become linear at a double root? Knowing the multiplicity m, how would you modify the formula to restore quadratic convergence?"]
