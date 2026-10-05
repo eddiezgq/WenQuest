@@ -126,6 +126,9 @@ jobs:
           if [ "${{ matrix.book }}" = robotics ]; then   # the tools' own tests run once, with the book they use
             python -m pytest -q tests 2>&1 | tee /tmp/pytest.log || { grep -E "^(FAILED|E  )" /tmp/pytest.log | head -20 | sed 's/^/::error::/'; exit 1; }
           fi
+          if [ "${{ matrix.book }}" = dic ]; then   # 《数字集成电路设计》第 1 章实验由生成器嵌入微电子实验的同一模型（第 17 轮附三 6b）
+            node ../../labs/micro/tools/textbook_labs.js --check
+          fi
           b="${{ matrix.book }}"
           python build.py "$b" --pdf --labs 2>&1 | tee /tmp/build.log || { grep "✗" /tmp/build.log | head -20 | sed "s/^/::error::$b /"; exit 1; }
       - name: Keep the built textbook for the deploy

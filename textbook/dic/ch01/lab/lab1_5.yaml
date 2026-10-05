@@ -1,0 +1,26 @@
+# 实验 1.5 的指导书与报告模板。目的、场景、参数、任务取自 lab1_5.js（由 labs/micro/textbook/lab1_5.body.js 生成）。
+原理:
+  - ["每次输出 0→1 翻转，电源送出 CV_DD² 的能量，一半在充电时、一半在放电时变成热。N 个门、翻转率 α、时钟 f 时，动态功耗为 P = αCV_DD²fN（式 (1.5.1)）。",
+     "Each 0→1 output transition draws CVDD² from the supply; half becomes heat while charging and half while discharging. With N gates, activity α and clock f, the dynamic power is P = αCVDD²fN (Eq. (1.5.1))."]
+  - 式: "P_dyn = α C V_DD² f N        (1.5.1)"
+  - ["降低电压最省电，但饱和电流按 (V_DD − V_T)² 减小，等效电阻增大，门变慢。性能要求（例如 FO4 延时上限）定下了最低电压。",
+     "Lowering the supply saves the most power, but the saturation current falls as (VDD − VT)², the equivalent resistance rises and gates slow down. A performance requirement, such as an FO4 delay limit, sets the lowest supply."]
+步骤:
+  - ["按小车芯片的条件设好（α = 0.1，100 MHz，1.8 V），读出功耗（任务 1）；再分别改 α、f、V_DD，各记两组，填入表 1，验证功耗与 α、f 成正比、与 V_DD² 成正比。", "Set the robot chip's conditions (α = 0.1, 100 MHz, 1.8 V) and read the power (task 1); then vary α, f and VDD, two settings each, in Table 1 and check the proportionalities."]
+  - ["把电压降到 1.2 V，读出功耗和 FO4 延时（任务 2），判断是否满足 100 ps。", "Lower the supply to 1.2 V and read the power and FO4 delay (task 2); does it meet 100 ps?"]
+  - ["延时上限 100 ps，逐步降压，找到满足上限的最低电压（任务 3）；再把上限改为 80 ps 和 150 ps，各找一次，填入表 2。", "With a 100 ps limit, lower the supply step by step to the lowest value that meets it (task 3); repeat for 80 ps and 150 ps and fill in Table 2."]
+数据表:
+  - 标题: ["表 1  动态功耗与各因素的关系", "Table 1  Dynamic power versus each factor"]
+    表头: ["α", "f / MHz", "V_DD / V", "P / mW", "与第 1 行之比"]
+    表头英文: ["α", "f / MHz", "VDD / V", "P / mW", "Ratio to row 1"]
+    行: [["0.1", "100", "1.8", "", "1"], ["0.2", "100", "1.8", "", ""], ["0.1", "200", "1.8", "", ""], ["0.1", "100", "1.2", "", ""]]
+  - 标题: ["表 2  FO4 延时上限与最低电压", "Table 2  FO4 limit and the lowest supply"]
+    表头: ["FO4 上限 / ps", "最低 V_DD / V", "FO4 延时 / ps", "P / mW", "比 1.8 V 省 / %"]
+    表头英文: ["FO4 limit / ps", "Lowest VDD / V", "FO4 delay / ps", "P / mW", "Saved versus 1.8 V / %"]
+    行: [["80", "", "", "", ""], ["100", "", "", "", ""], ["150", "", "", "", ""]]
+注意:
+  - ["本书的 α 指每个时钟周期输出发生 0→1 翻转的概率；有的书指任一方向翻转的概率，那时公式前要乘 ½。", "Here α is the probability of a 0→1 output transition per clock cycle; some books count transitions in either direction and put ½ in front of the formula."]
+  - ["实验只算动态功耗，没有计入短路功耗和漏电（1.5.5 节）。", "The lab includes only dynamic power, not short-circuit power or leakage (Section 1.5.5)."]
+思考题:
+  - ["芯片只有一小部分时间需要全速时，怎样安排电压和频率最省电？", "If the chip needs full speed only part of the time, how should voltage and frequency be scheduled?"]
+  - ["只降频率不降电压，完成同样多的计算，消耗的能量会减少吗？", "If only the frequency is lowered, not the supply, does the energy for the same amount of work decrease?"]

@@ -1,0 +1,176 @@
+# 由 textbook/tools/outline.py 从提纲生成，请改提纲后重新生成，不要手改。
+book: dic
+title: 数字集成电路设计
+title_en: Digital Integrated Circuit Design
+source: docs/教材/数字集成电路设计/00_提纲.md
+parts:
+- title: 第一篇 基础
+- title: 第二篇 性能、功耗与运算
+- title: 第三篇 从电路到芯片
+chapters:
+- 'no': 1
+  title: CMOS 反相器
+  level: 基础
+  part: 第一篇 基础
+  sections:
+  - id: '1.1'
+    title: MOSFET 开关与 CMOS 反相器
+  - id: '1.2'
+    title: 电压传输特性与噪声容限
+  - id: '1.3'
+    title: 尺寸与对称
+  - id: '1.4'
+    title: 传播延时与反相器链
+  - id: '1.5'
+    title: 功耗
+- 'no': 2
+  title: 组合逻辑门
+  level: 基础
+  part: 第一篇 基础
+  sections:
+  - id: '2.1'
+    title: 静态 CMOS 门：与非门、或非门与复合门的串并联结构
+  - id: '2.2'
+    title: 门的尺寸：等效反相器与最坏情况
+  - id: '2.3'
+    title: 逻辑努力：电气努力、逻辑努力与最优级数
+  - id: '2.4'
+    title: 有比逻辑与传输管逻辑
+  - id: '2.5'
+    title: 动态逻辑与多米诺逻辑【进阶】
+- 'no': 3
+  title: 时序元件
+  level: 基础
+  part: 第一篇 基础
+  sections:
+  - id: '3.1'
+    title: 锁存器与触发器：结构与时序参数（建立、保持、时钟到输出）
+  - id: '3.2'
+    title: 时序约束：建立时间与保持时间的推导
+  - id: '3.3'
+    title: 亚稳态与同步器：为什么异步输入要打两拍
+  - id: '3.4'
+    title: 时钟门控与复位【进阶】
+- 'no': 4
+  title: 互连线
+  level: 基础
+  part: 第一篇 基础
+  sections:
+  - id: '4.1'
+    title: 导线的电阻与电容：SKY130 各金属层的参数
+  - id: '4.2'
+    title: RC 延时：Elmore 延时与分布式 RC 线
+  - id: '4.3'
+    title: 插入缓冲器：长线怎样变快
+  - id: '4.4'
+    title: 串扰与耦合【进阶】
+  - id: '4.5'
+    title: 电感与传输线效应【专题】
+- 'no': 5
+  title: 功耗与低功耗设计
+  level: 基础
+  part: 第二篇 性能、功耗与运算
+  sections:
+  - id: '5.1'
+    title: 动态功耗与短路功耗（接第 1.5 节）
+  - id: '5.2'
+    title: 漏电：亚阈值漏电、栅漏电与温度
+  - id: '5.3'
+    title: 降压与频率调节（DVFS）
+  - id: '5.4'
+    title: 时钟门控与电源门控
+  - id: '5.5'
+    title: 功耗分析的流程【进阶】
+- 'no': 6
+  title: 算术电路
+  level: 基础
+  part: 第二篇 性能、功耗与运算
+  sections:
+  - id: '6.1'
+    title: 加法器：行波进位、超前进位、进位选择
+  - id: '6.2'
+    title: 并行前缀加法器【进阶】
+  - id: '6.3'
+    title: 乘法器：阵列乘法器与 Booth 编码
+  - id: '6.4'
+    title: 移位器与比较器
+- 'no': 7
+  title: 存储器
+  level: 基础
+  part: 第二篇 性能、功耗与运算
+  sections:
+  - id: '7.1'
+    title: 存储器的组织：阵列、译码与灵敏放大
+  - id: '7.2'
+    title: SRAM 单元：读稳定与写能力
+  - id: '7.3'
+    title: 寄存器堆与 FIFO
+  - id: '7.4'
+    title: 非易失存储器概览【专题】
+- 'no': 8
+  title: 时钟与时序分析
+  level: 基础
+  part: 第二篇 性能、功耗与运算
+  sections:
+  - id: '8.1'
+    title: 同步系统的时序：时钟周期、偏斜与抖动
+  - id: '8.2'
+    title: 静态时序分析：路径、余量与关键路径
+  - id: '8.3'
+    title: 流水线与重定时
+  - id: '8.4'
+    title: 时钟树与时钟分布【进阶】
+  - id: '8.5'
+    title: 跨时钟域【进阶】
+- 'no': 9
+  title: 标准单元与版图
+  level: 基础
+  part: 第三篇 从电路到芯片
+  sections:
+  - id: '9.1'
+    title: 标准单元库：单元的版图规则、高度与电源轨
+  - id: '9.2'
+    title: 单元的特征化：延时表与功耗表（Liberty）
+  - id: '9.3'
+    title: 设计规则与版图检查（DRC、LVS、天线）
+  - id: '9.4'
+    title: 版图寄生参数提取
+- 'no': 10
+  title: 工艺偏差与可靠性
+  level: 进阶
+  part: 第三篇 从电路到芯片
+  sections:
+  - id: '10.1'
+    title: 工艺角与蒙特卡洛
+  - id: '10.2'
+    title: 电压、温度的影响
+  - id: '10.3'
+    title: 老化：电迁移、热载流子、偏压温度不稳定性
+  - id: '10.4'
+    title: 静电放电与闩锁【专题】
+- 'no': 11
+  title: 数字集成电路设计流程
+  level: 基础
+  part: 第三篇 从电路到芯片
+  sections:
+  - id: '11.1'
+    title: 从规格到 RTL：设计、验证与综合
+  - id: '11.2'
+    title: 物理设计：布局规划、布局、时钟树、布线
+  - id: '11.3'
+    title: 签核：时序、功耗、物理验证
+  - id: '11.4'
+    title: 开源芯片设计生态与共享流片
+- 'no': 12
+  title: 综合实验：机器人关节电机控制芯片
+  level: 基础
+  part: 第三篇 从电路到芯片
+  sections:
+  - id: '12.1'
+    title: 任务与规格：PWM 发生器与编码器计数器
+  - id: '12.2'
+    title: 单元：二输入与非门的版图（贯通项目步骤二）
+  - id: '12.3'
+    title: 模块：RTL 与验证（引用贯通项目步骤三）
+  - id: '12.4'
+    title: 芯片：按 Tiny Tapeout 格式跑出 GDS（引用贯通项目步骤四）

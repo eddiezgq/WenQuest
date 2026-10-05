@@ -1,0 +1,7 @@
+# 书的基本信息（第 10 轮的做法）：outline.py 从这里找提纲和书名。
+outline: docs/教材/数字集成电路设计/00_提纲.md
+title: 数字集成电路设计
+title_en: Digital Integrated Circuit Design
+# 书中程序读的书外文件：器件参数（与浏览器实验共用，第 17 轮 RM2）。改了它，程序的结果要重算。
+program_deps:
+  - labs/micro/kit/models/params.json

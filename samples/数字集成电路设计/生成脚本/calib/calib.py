@@ -144,7 +144,7 @@ def cin(ratio):
 def effective_vt(res):
     """Effective VTn, VTp (square law) that best reproduce VM, NML, NMH of the simulated transfer curves."""
     import importlib.util
-    spec = importlib.util.spec_from_file_location("wqmodel", HERE.parent / "model.py")
+    spec = importlib.util.spec_from_file_location("wqmodel", HERE.parents[3] / "textbook" / "dic" / "conventions" / "mos.py")   # 一个独立副本：拟合时要改它的参数
     M = importlib.util.module_from_spec(spec); spec.loader.exec_module(M)
     d = res["device"]
     best = None

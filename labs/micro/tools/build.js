@@ -6,6 +6,7 @@ const micro = path.join(root, 'labs/micro');
 
 execFileSync('python3', [path.join(root, 'samples/数字集成电路设计/生成脚本/model.py')], { stdio: 'inherit' });
 execFileSync('node', [path.join(micro, 'tools/check_model.js')], { stdio: 'inherit' });
+execFileSync('node', [path.join(micro, 'tools/textbook_labs.js')], { stdio: 'inherit' });   // 教材第 1 章实验（嵌入同一模型）
 
 const PAGES = [
   { src: 'dic-ch1/index.src.html', out: ['samples/数字集成电路设计/课程资料/第1章 CMOS反相器/虚拟实验/第1章虚拟实验（中英）.html', 'labs/micro/dic-ch1/index.html'] },

@@ -1,0 +1,27 @@
+# 实验 1.4 的指导书与报告模板。目的、场景、参数、任务取自 lab1_4.js（由 labs/micro/textbook/lab1_4.body.js 生成）。
+原理:
+  - ["最小反相器直接驱动大电容时总扇出 F = C_L/C_1 很大，延时与 F 成正比。插入 N 级逐级放大 f 倍的反相器，f^N = F，每级只驱动比自己大 f 倍的负载。",
+     "A minimum inverter driving a large load sees a huge total fan-out F = CL/C1 and a delay proportional to F. A chain of N stages, each f times larger than the previous one with f^N = F, lets every stage drive only f times its own size."]
+  - 式: "t(N) = N · 0.69 R C_1 (γ + F^(1/N))        (1.4.3)"
+  - ["N 太少每级扇出太大，N 太多自载延时 γ 累加，最优每级扇出满足 f(ln f − 1) = γ。SKY130 的 γ 约 1.6，最优扇出约 4，经验上 N ≈ ln F / ln 4。最优点附近曲线很平。",
+     "Too few stages leave each with too much fan-out; too many add up the self-loading γ. The best stage fan-out satisfies f(ln f − 1) = γ. For SKY130 γ is about 1.6 and the best fan-out about 4, so N ≈ ln F / ln 4. The curve is flat near the optimum."]
+  - 式: "f (ln f − 1) = γ        (1.4.4)"
+步骤:
+  - ["负载 10 pF，级数从 1 依次取到 10，记下每级扇出和总延时，填入表 1；找出最快的级数（任务 1），与 ln F / ln 4 比较。", "With 10 pF, step N from 1 to 10 and record the stage fan-out and total delay in Table 1; find the fastest N (task 1) and compare with ln F / ln 4."]
+  - ["在表 1 中找出总延时小于 0.35 ns 的最少级数（任务 2），说明它比最快的级数省下了什么；注意输出的相位。", "Find in Table 1 the fewest stages below 0.35 ns (task 2); state what it saves compared with the fastest chain and note the output phase."]
+  - ["负载改为 2 pF 和 20 pF，各找一次最快的级数（任务 3 为 2 pF），填入表 2。", "Repeat with 2 pF and 20 pF and find the fastest chain each time (task 3 is 2 pF); fill in Table 2."]
+数据表:
+  - 标题: ["表 1  驱动 10 pF 时总延时随级数的变化", "Table 1  Total delay versus stages for 10 pF"]
+    表头: ["N", "每级扇出 f", "总延时 / ps", "满足 0.35 ns", "输出相位"]
+    表头英文: ["N", "Stage fan-out f", "Total delay / ps", "Meets 0.35 ns", "Output phase"]
+    行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""], ["5", "", "", "", ""], ["6", "", "", "", ""], ["7", "", "", "", ""], ["8", "", "", "", ""], ["9", "", "", "", ""], ["10", "", "", "", ""]]
+  - 标题: ["表 2  不同负载下的最快级数", "Table 2  Fastest chain for different loads"]
+    表头: ["C_L / pF", "F", "ln F / ln 4", "最快级数", "最小延时 / ps"]
+    表头英文: ["CL / pF", "F", "ln F / ln 4", "Fastest N", "Minimum delay / ps"]
+    行: [["2", "", "", "", ""], ["10", "", "", "", ""], ["20", "", "", "", ""]]
+注意:
+  - ["每换一次负载，下方记录图会清空，只显示这个负载下试过的级数。", "The record chart below clears whenever the load changes and shows only the stages tried at that load."]
+  - ["式 (1.4.3) 把负载看成集中电容，没有考虑引脚电感和传输线效应（1.4.5 节）。", "Eq. (1.4.3) treats the load as a lumped capacitance and ignores pin inductance and transmission-line effects (Section 1.4.5)."]
+思考题:
+  - ["最快级数附近少用一级只慢几个百分点，却能省下哪些东西？", "One stage fewer than the optimum costs only a few per cent of delay; what does it save?"]
+  - ["若要求输出与输入同相，级数该怎么取？延时多少？", "If the output must be in phase with the input, how many stages should be used, and what is the delay?"]

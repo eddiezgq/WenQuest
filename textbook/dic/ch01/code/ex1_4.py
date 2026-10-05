@@ -1,0 +1,49 @@
+"""1.4 节的计算：传播延时与反相器链。
+
+算例 1.4.1  芯片把采样时钟送出引脚，驱动板上电流采样 ADC 的时钟输入和走线，负载约 10 pF。第一级为最小对称反相器：输入电容、总扇出 F、
+            只用一级时的延时。
+算例 1.4.2  N 级等比反相器链的总延时 t(N) = N·0.69·R·C1·(γ + F^(1/N))，N = 1～10；最快的级数与经验公式 ln F / ln 4 比较；
+            自载比 γ = Cd/Cg 下的最优每级扇出（f(ln f − 1) = γ）。
+算例 1.4.3  时序预算要求输出延时小于 tmax：满足要求的最少级数，以及比最快级数省下的总栅宽。
+图 1.4.1    总延时随级数的变化（对数坐标），标出 tmax。
+"""
+import math
+
+import numpy as np
+
+from bookout import T, figure, out, style
+from mos import Cd, Cg, P, Wmin, chain_delay, cin, fopt, kn, kp
+import _draw as d
+
+r = kn / kp
+CL = P["problems"]["p14"]["CL"]
+tmax = P["problems"]["p14"]["tmax"]
+C1 = cin(Wmin, r * Wmin)
+F = CL / C1
+t = {N: chain_delay(N, CL, r) for N in range(1, 11)}
+best = min(t, key=t.get)
+few = next(N for N in range(1, 11) if t[N] < tmax)
+gamma = Cd / Cg
+f_opt = fopt(gamma)
+out(CL_pf=CL * 1e12, C1_ff=C1 * 1e15, F=F, t1_ns=t[1] * 1e9, Nopt4=math.log(F) / math.log(4),
+    best=best, t_best_ps=t[best] * 1e12, f_best=F ** (1 / best), t_m1_ps=t[best - 1] * 1e12, t_p1_ps=t[best + 1] * 1e12,
+    gamma=gamma, fopt=f_opt, N_from_fopt=math.log(F) / math.log(f_opt),
+    tmax_ns=tmax * 1e9, few=few, t_few_ps=t[few] * 1e12, t4_ps=t[4] * 1e12, f6=F ** (1 / 6))
+out(table="；".join(f"{N} 级 {t[N] * 1e9:.3g} ns" if t[N] >= 1e-9 else f"{N} 级 {t[N] * 1e12:.0f} ps" for N in range(1, 11)))
+width = lambda N: sum((F ** (1 / N)) ** i for i in range(N))  # noqa: E731  各级宽度之和（以第一级为 1）
+out(best_m1=best - 1, best_p1=best + 1, few_m1=few - 1, t_fewm1_ps=t[few - 1] * 1e12,
+    w_best=width(best), w_few=width(few), w_save_pct=(1 - width(few) / width(best)) * 100)
+
+plt = style()
+fig, ax = plt.subplots(figsize=(5.4, 3.6))
+Ns = list(range(1, 11))
+ax.semilogy(Ns, [t[N] * 1e9 for N in Ns], "o-", color=d.NMOS, lw=1.6, ms=4)
+ax.axhline(tmax * 1e9, color=d.LOAD, lw=1.2, ls="--")
+ax.text(7.6, tmax * 1e9 * 1.45, T(f"要求 {tmax * 1e9:g} ns", f"limit {tmax * 1e9:g} ns"), color=d.LOAD, fontsize=9)
+ax.plot([best], [t[best] * 1e9], "o", color=d.MEAN, ms=8, mfc="none", mew=1.6)
+ax.text(best - 0.5, t[best] * 1e9 * 2.2, T(f"最快 {best} 级", f"fastest: {best}"), color=d.MEAN, fontsize=9)
+ax.set_xticks(Ns)
+ax.set_xlabel(T("级数 N", "number of stages N"))
+ax.set_ylabel(T("总延时 / ns", "total delay / ns"))
+d.spines(ax)
+figure(fig, "fig1_4_1")

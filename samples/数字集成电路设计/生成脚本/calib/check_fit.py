@@ -4,7 +4,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 res = json.loads((HERE / "result.json").read_text())
 P = json.loads((HERE / (sys.argv[1] if len(sys.argv) > 1 else "params.sky130.json")).read_text())
-spec = importlib.util.spec_from_file_location("model", HERE.parent / "model.py"); M = importlib.util.module_from_spec(spec)
+spec = importlib.util.spec_from_file_location("wqmodel", HERE.parents[3] / "textbook" / "dic" / "conventions" / "mos.py"); M = importlib.util.module_from_spec(spec)
 import types
 spec.loader.exec_module(M)
 for k in ("VDD", "VTn", "VTp", "kn", "kp", "L", "Wmin", "Cg", "Cd"):

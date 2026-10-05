@@ -1,0 +1,27 @@
+# 实验 1.2 的指导书与报告模板。目的、场景、参数、任务取自 lab1_2.js（由 labs/micro/textbook/lab1_2.body.js 生成）。
+原理:
+  - ["输入从 0 缓慢升到 V_DD，逐点由两管电流相等的条件求出输出，就得到电压传输特性（式 (1.2.1)）。两管同时饱和的中间段几乎竖直，对应的输入是开关阈值 V_M。",
+     "Raising the input slowly from 0 to VDD and solving for the output from equal drain currents at each point gives the voltage transfer characteristic (Eq. (1.2.1)). The nearly vertical middle, where both transistors are saturated, sits at the switching threshold VM."]
+  - 式: "V_M = [V_T + x(V_DD − V_T)] / (1 + x)，x = √(k′p·Wp / (k′n·Wn))        (1.2.2)"
+  - ["传输特性斜率为 −1 的两点定义 V_IL 和 V_IH。噪声容限 NM_L = V_IL − V_OL，NM_H = V_OH − V_IH：输入上叠加的干扰不超过它们时，下一级仍能判断正确。Wp/Wn = r = k′n/k′p 时两管一样强，V_M = V_DD/2，两侧的噪声容限相等。",
+     "The two points with slope −1 define VIL and VIH. The noise margins NML = VIL − VOL and NMH = VOH − VIH tell how much noise the input may carry while the next stage still decides correctly. With Wp/Wn = r = k′n/k′p the transistors are equally strong, VM = VDD/2 and the two margins are equal."]
+  - 式: "NM_L = V_IL − V_OL，NM_H = V_OH − V_IH        (1.2.4)"
+步骤:
+  - ["选“传输特性”，Wp/Wn = 1。拖动输入，读出 V_IL、V_M、V_IH 和对应的输出，填入表 1；把输入移到 V_IL，读增益（任务 2）。", "Choose “Transfer curve” with Wp/Wn = 1. Drag the input, read VM, VIL and VIH and fill in Table 1; move the input to VIL and read the gain (task 2)."]
+  - ["用式 (1.2.2) 算出使 V_M = 0.9 V 的尺寸比，再在实验中调 Wp/Wn 核对（任务 1）。记下这时的 V_IL、V_IH 和噪声容限，填入表 1。", "Compute with Eq. (1.2.2) the ratio that gives VM = 0.9 V and check it in the lab (task 1). Record VIL, VIH and the margins in Table 1."]
+  - ["选“编码器信号进入控制芯片”，干扰 ±0.3 V，在 Wp/Wn = 1 和对称尺寸下分别判断会不会误判；再加大干扰，找出对称尺寸下能承受的最大干扰（任务 3），填入表 2。", "Choose the encoder scene with ±0.3 V of noise; judge both sizings. Then raise the noise to find the largest tolerable amplitude for the symmetric sizing (task 3) and fill in Table 2."]
+数据表:
+  - 标题: ["表 1  两种尺寸的传输特性参数", "Table 1  Transfer-curve parameters for two sizings"]
+    表头: ["Wp/Wn", "V_M / V", "V_IL / V", "V_IH / V", "V_OL / V", "V_OH / V", "NM_L / V", "NM_H / V"]
+    表头英文: ["Wp/Wn", "VM / V", "VIL / V", "VIH / V", "VOL / V", "VOH / V", "NML / V", "NMH / V"]
+    行: [["1", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  干扰下的判断", "Table 2  Decisions under noise"]
+    表头: ["Wp/Wn", "干扰 / V", "0 的最坏输入 / V", "1 的最坏输入 / V", "是否在噪声容限内"]
+    表头英文: ["Wp/Wn", "Noise / V", "Worst input for 0 / V", "Worst input for 1 / V", "Within the margins?"]
+    行: [["1", "0.3", "", "", ""], ["", "0.3", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["V_IL、V_IH 由斜率为 −1 定义，不是输出为 V_DD/2 的点；V_M 才是输入等于输出的点。", "VIL and VIH are defined by slope −1, not by the output reaching VDD/2; VM is where input equals output."]
+  - ["平方律模型的噪声容限偏乐观，本书校准时用了比外推值小的有效阈值电压（1.2 节）。", "The square-law model is optimistic about noise margins; the calibration uses an effective threshold below the extrapolated value (Section 1.2)."]
+思考题:
+  - ["干扰越过了 V_IL 并不等于一定出错，为什么设计时仍以噪声容限为界？", "Crossing VIL does not always cause an error; why do designers still treat the noise margin as the limit?"]
+  - ["两个反相器串起来，第二级看到的干扰会变大还是变小？这与中间段的增益有什么关系？", "With two inverters in series, does the second stage see more or less noise? How does this relate to the gain in the middle region?"]

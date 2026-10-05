@@ -1,0 +1,26 @@
+# 实验 1.3 的指导书与报告模板。目的、场景、参数、任务取自 lab1_3.js（由 labs/micro/textbook/lab1_3.body.js 生成）。
+原理:
+  - ["输出翻转是导通的管子给负载电容充放电。用等效电阻 R_eq ≈ ¾V_DD/I_DSAT 概括这个过程，输出走到 50 % 的时间为 0.69R_eqC（式 (1.3.1)、(1.3.2)）。C 包括本级漏极电容 (Wn + Wp)C_d 和负载。",
+     "Switching is a conducting transistor charging or discharging the load. With the equivalent resistance R_eq ≈ ¾VDD/IDSAT the output reaches 50 % after 0.69R_eqC (Eqs. (1.3.1), (1.3.2)). C includes the stage's own drain capacitance (Wn + Wp)Cd and the load."]
+  - 式: "t_PHL = 0.69 R_eqn C，t_PLH = 0.69 R_eqp C，t_p = (t_PHL + t_PLH)/2        (1.3.2)"
+  - ["Wp/Wn = r 时两管等效电阻相等，上升下降一样快，与负载无关。平均延时最小的尺寸是 √r：加宽 PMOS 使上升变快，但增大了本级和下一级的电容，使下降变慢。",
+     "With Wp/Wn = r the equivalent resistances are equal and rise and fall are equally fast, whatever the load. The ratio with the smallest average delay is √r: widening the PMOS speeds up the rise but adds capacitance that slows the fall."]
+步骤:
+  - ["扇出为 4，Wp/Wn 依次取 1、1.5、2、2.5、3，记下 t_PHL、t_PLH、t_p，填入表 1；在波形图上看两个延时的差别。", "At fan-out 4 set Wp/Wn to 1, 1.5, 2, 2.5 and 3 and record tPHL, tPLH and tp in Table 1; compare the two delays on the waveforms."]
+  - ["调 Wp/Wn 使上升下降相差不到 3 %（任务 1）；再找平均延时最小的尺寸（任务 2），比较两者的 t_p 和输入电容。", "Make rise and fall agree within 3 % (task 1); then find the ratio with the smallest tp (task 2) and compare tp and input capacitance."]
+  - ["保持对称尺寸，把扇出改为 1 和 8，看上升下降是否仍然相等（任务 3），填入表 2。", "Keep the symmetric ratio and change the fan-out to 1 and 8: are rise and fall still equal (task 3)? Fill in Table 2."]
+数据表:
+  - 标题: ["表 1  扇出为 4 时延时随尺寸比的变化", "Table 1  Delays versus size ratio at fan-out 4"]
+    表头: ["Wp/Wn", "t_PHL / ps", "t_PLH / ps", "t_p / ps", "上升比下降慢 / %"]
+    表头英文: ["Wp/Wn", "tPHL / ps", "tPLH / ps", "tp / ps", "Rise slower by / %"]
+    行: [["1", "", "", "", ""], ["1.5", "", "", "", ""], ["2", "", "", "", ""], ["2.5", "", "", "", ""], ["3", "", "", "", ""]]
+  - 标题: ["表 2  对称尺寸在不同扇出下", "Table 2  Symmetric sizing at different fan-outs"]
+    表头: ["扇出", "Wp/Wn", "t_PHL / ps", "t_PLH / ps", "t_p / ps"]
+    表头英文: ["Fan-out", "Wp/Wn", "tPHL / ps", "tPLH / ps", "tp / ps"]
+    行: [["1", "", "", "", ""], ["4", "", "", "", ""], ["8", "", "", "", ""]]
+注意:
+  - ["平均延时在最小值附近变化很平，尺寸比差 0.1 延时只差千分之几，所以任务 2 的判据定得很严。", "The average delay is very flat near its minimum, so task 2 uses a tight criterion."]
+  - ["RC 模型在扇出为 1 或尺寸偏离对称很远时误差较大，单边延时可差 20 % 以上（1.3.5 节）。", "The RC model is less accurate at fan-out 1 or far from symmetric sizing; single-edge delays can be off by more than 20 % (Section 1.3.5)."]
+思考题:
+  - ["对称尺寸为什么与负载无关，而平均延时最小的尺寸几乎也与负载无关？", "Why does the symmetric ratio not depend on the load, and why does the best-average ratio hardly depend on it either?"]
+  - ["如果负载里有一大段与尺寸无关的连线电容，√r 这个结论会怎样变？", "If the load includes a large wire capacitance that does not scale with the gate, how does the √r result change?"]

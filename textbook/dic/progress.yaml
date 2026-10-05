@@ -1,0 +1,10 @@
+# 各章状态与英文标题（第 8 轮 2.1、2.2）。
+# status：draft 草稿 / ai AI 审稿 / first 初审 / team 团队审阅 / final 定稿。没写的章不列。
+parts_en:
+  第一篇 基础: "Part I  Foundations"
+  第二篇 性能、功耗与运算: "Part II  Performance, Power and Arithmetic"
+  第三篇 从电路到芯片: "Part III  From Circuit to Chip"
+chapters:
+  1:
+    status: draft
+    title_en: "The CMOS Inverter"
