@@ -26,6 +26,9 @@ def chuck_tail(long_grip):
     for p in ch.parts:
         if p.name.startswith("卡爪"):
             p.shape = p.shape & S.box(0, grip, -200, 200, -200, 200)
+            if long_grip:                          # 长夹持：卡爪夹持面加长到 55 mm
+                k = int(p.name[-1]) - 1
+                p.shape = p.shape + S.rot(S.box(0, grip, -11, 11, 15.0, 27.0), 120 * k + 90 - 90, 0, 0)
         q.add(p)
     off = 18.0                                    # 尾座中心比主轴中心低（实际零点几毫米，放大画出）
     w = W.sh301("op20").shape

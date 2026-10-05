@@ -55,7 +55,8 @@ def auxiliary_support(d=16.0, at=(0, 0, 0)):
     x, y, z = at
     body = S.box(x - 20, x + 20, y - 18, y + 18, z - 60, z - 22) - S.cyl("z", (x, y), d / 2 + 0.5, z - 61, z - 21)
     plunger = S.cyl("z", (x, y), d / 2, z - 50, z)
-    lock = S.cyl("y", (x, z - 40), 4, y - 30, y - 18) + S.cyl("y", (x, z - 40), 7, y - 36, y - 30)
+    body = body - S.cyl("y", (x, z - 40), 4, y - 19, y)          # 顶紧螺钉的螺孔
+    lock = S.cyl("y", (x, z - 40), 4, y - 30, y - d / 2) + S.cyl("y", (x, z - 40), 7, y - 36, y - 30)     # 顶紧螺钉拧到柱塞上
     return {"body": body, "plunger": plunger, "lock": lock}
 
 

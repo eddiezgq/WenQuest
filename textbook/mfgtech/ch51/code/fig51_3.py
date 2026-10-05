@@ -39,7 +39,7 @@ for p in jb.parts:
     if p.name.startswith("工件"):
         p.opacity = 0.7; p.color = "work_cut"
 pb = R.render_png(jb, 760, 560, camera={"dir": M.ISO, "fit": [[-60, -60, -30], [120, 60, 90]]},
-                  labels=[{"at": (9, -14.2, 34.2), "text": "V 形块两段工作面（长 V 形块）：4 点——y、z、绕 y、绕 z", "style": "text", "pos": [0.5, 0.92], "part": "V 形块"},
+                  labels=[{"at": (9, -14.2, 34.2), "text": "V 形块两段工作面（相当于长 V 形块）：4 点——y、z、绕 y、绕 z", "style": "text", "pos": [0.3, 0.92], "part": "V 形块"},
                           {"at": (-3, -22, 50), "text": "挡板：1 点——x", "style": "text", "pos": [0.15, 0.12], "part": "轴向挡板"},
                           {"at": (110, 0, g["zc"] + 20), "text": "绕轴线的转动不限制（键槽角向位置无要求）", "style": "text", "pos": [0.68, 0.08]}])
 R.compose("fig51_3_2", [pa, pb], 2, titles=["(a) 3–2–1：六个支承钉限制六个自由度（工件半透明）", "(b) SH-301 铣键槽：五个自由度"])

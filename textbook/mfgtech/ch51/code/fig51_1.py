@@ -52,7 +52,9 @@ fd = A("机器人放料")
 fd.add(P("夹具底板", S.box(-120, 120, -80, 80, -20, 0), "cast"))
 pins = ((-70, -35), (70, 35))
 for k, (px, py) in enumerate(pins):
-    fd.add(P(f"定位销{k + 1}", E.locating_pin(12, 14, "cyl" if k == 0 else "dia", at=(px, py, 0), flat_dir="x"), "hardened"))
+    import math
+    pin = E.locating_pin(12, 14, "cyl" if k == 0 else "dia", at=(0, 0, 0), flat_dir="x")     # 削边方向沿两销连线
+    fd.add(P(f"定位销{k + 1}", S.move(S.rot(pin, 0, 0, math.degrees(math.atan2(70, 140))), px, py, 0), "hardened"))
 plate = L.plate_with_holes(holes=pins, D=12.02, at=(1.5, -1.0, 22))      # 还没放到位：偏 1.5 mm，悬在销的上方
 fd.add(P("工件（板）", plate, "work"))
 for sx in (-1, 1):

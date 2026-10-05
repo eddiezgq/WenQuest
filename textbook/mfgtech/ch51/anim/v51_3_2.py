@@ -50,14 +50,14 @@ go(20, lambda t: st((14, -14, 60), 6 * (1 - t) + 6 * t, free, c0), hold=0.5)
 c1 = ("1  落到底面三个支承钉上", "1  Set it down on three pins below")
 go(20, lambda t: st((14, -14, 60 * (1 - t)), 6, free, c1))
 free = [f for f in free if f not in ("沿 z 移动", "绕 x 转动", "绕 y 转动")]
-v.add(st((14, -14, 0), 6, free, ("底面三点：限制 z、绕 x、绕 y", "Three points: z and rotations about x and y")), hold=1.2)
+v.add(st((14, -14, 0), 6, free, ("1  底面三点：限制 z、绕 x、绕 y", "Three points: z and rotations about x and y")), hold=1.2)
 c2 = ("2  推向侧面两个支承钉，转正", "2  Push it against the two side pins; it turns square")
 go(22, lambda t: st((14, -14 * (1 - t), 0), 6 * (1 - t), free, c2))
 free = [f for f in free if f not in ("沿 y 移动", "绕 z 转动")]
-v.add(st((14, 0, 0), 0, free, ("侧面两点：限制 y、绕 z", "Two points: y and rotation about z")), hold=1.2)
+v.add(st((14, 0, 0), 0, free, ("2  侧面两点：限制 y、绕 z", "Two points: y and rotation about z")), hold=1.2)
 c3 = ("3  推向端面一个支承钉", "3  Push it against the end pin")
 go(16, lambda t: st((14 * (1 - t), 0, 0), 0, free, c3))
 free = []
-v.add(st((0, 0, 0), 0, free, ("端面一点：限制 x——六个自由度全部限制", "One point: x — all six are fixed")), hold=1.5)
+v.add(st((0, 0, 0), 0, free, ("3  端面一点：限制 x——六个自由度全部限制", "One point: x — all six are fixed")), hold=1.5)
 v.add(st((0, 0, 0), 0, free, ("然后夹紧：夹紧力压向这三个面，不破坏定位", "Then clamp toward these faces without disturbing the location")), hold=2.0)
 v.save("v51_3_2")

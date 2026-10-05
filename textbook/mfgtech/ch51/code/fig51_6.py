@@ -37,8 +37,8 @@ def vb_pair():
     return q
 z1, z2 = E.v_axis_height(46, apex=10), E.v_axis_height(40, apex=10)
 pv = R.render_png(vb_pair(), 900, 640, camera={"dir": [1, 0, 0], "fit": [[0, -70, 0], [0, 70, 75]]}, fontSize=19,
-                  points=[{"at": (11, 0, z1), "r": 5, "color": blue, "text": "d_max 的轴心", "dx": 10, "dy": -8},
-                          {"at": (11, 0, z2), "r": 5, "color": red, "text": "d_min 的轴心", "dx": 10, "dy": 14},
+                  points=[{"at": (11, 0, z1), "r": 5, "color": blue, "text": "最大直径的轴心", "dx": 10, "dy": -8},
+                          {"at": (11, 0, z2), "r": 5, "color": red, "text": "最小直径的轴心", "dx": 10, "dy": 14},
                           {"at": (11, 0, z1 + 23), "r": 4, "color": blue}, {"at": (11, 0, z2 + 20), "r": 4, "color": red},
                           {"at": (11, 0, z1 - 23), "r": 4, "color": blue}, {"at": (11, 0, z2 - 20), "r": 4, "color": red}],
                   dims=[{"a": (11, 0, z2), "b": (11, 0, z1), "off": (0, -62, 0), "text": "轴心"},
@@ -89,7 +89,7 @@ def centers(dD):
     D = 6.7 + dD
     tip = D / 2 / math.tan(math.radians(30))
     shaft = S.cyl("x", (0, 0), 15, 0, 40) - W.center_hole(0.0, 1, d=3.15 + dD * 0.5, D=D)
-    q.add(P("工件", S.move(shaft, -tip + 6.7 / 2 / math.tan(math.radians(30)), 0, 0), "work_cut" if dD == 0 else orange))
+    q.add(P("工件", S.move(shaft, -tip + 6.7 / 2 / math.tan(math.radians(30)), 0, 0), "work_cut"))
     return q, -tip + 6.7 / 2 / math.tan(math.radians(30))
 c0, x0 = centers(0.0)
 c1, x1 = centers(6.0)
@@ -117,7 +117,7 @@ lc_.add(P("后顶尖", E.center(at=(LEN, 0, 0), toward=-1), "hardened"))
 for qq in MA.mill_spindle(kx + 6, 0, 20.15 - 1.0).parts:
     lc_.add(qq)
 pC = R.render_png(lc_, 700, 520, camera={"dir": [0.6, -1.3, 0.8], "fit": [[-60, -60, -40], [230, 60, 180]]})
-R.compose("fig51_8_1", [pA, pB, pC], 3, titles=["方案 A：两个短 V 形块 + 轴向挡板（JJ-301-50）", "方案 B：两顶尖（顶尖座或分度头）", "方案 C：三爪卡盘短夹持 + 后顶尖"])
+R.compose("fig51_8_1", [pA, pB, pC], 3, titles=["方案 A：V 形块（两段工作面）+ 轴向挡板（JJ-301-50）", "方案 B：两顶尖（顶尖座或分度头）", "方案 C：三爪卡盘短夹持 + 后顶尖"])
 
 # ---- 图 51.9.2：三坐标测量机测键槽对称度
 zc2 = E.v_axis_height(35.3, apex=14)

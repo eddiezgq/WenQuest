@@ -23,13 +23,13 @@ sa = tile([("A 型", E.support_pin("A", 16, 10, at=(-25, 0, 0)), "hardened"), ("
            ("C 型", E.support_pin("C", 16, 10, at=(25, 0, 0)), "hardened")], [0.8, -1.3, 0.9])
 sp = tile([("A 型支承板", E.support_plate(90, 18, 12, "A", at=(0, -16, 0), n=3), "hardened"), ("B 型支承板", E.support_plate(90, 18, 12, "B", at=(0, 16, 0), n=3), "hardened")],
           [0.8, -1.3, 1.0])
-adj = tile([("可调支承", E.adjustable_support(16, at=(0, 0, 0), H=40), "steel_dark"), ("支座", S.box(-25, 25, -25, 25, -50, -24) - S.cyl("z", (0, 0), 8, -51, -23), "cast"),
+adj = tile([("可调支承", E.adjustable_support(16, at=(0, 0, 0), H=40), "steel_dark"), ("支座", S.box(-25, 25, -25, 25, -54, -28) - S.cyl("z", (0, 0), 8, -55, -27), "cast"),
             ("毛坯（局部）", S.box(-40, 40, -30, 30, 0, 14), "work", 0.45)], [0.8, -1.3, 0.6])
 sas = L.self_aligning_support(at=(0, 0, 0), span=40)
 sa2 = tile([("摆块", sas["摆块"], blue), ("支座", sas["支座"], "cast"), ("销", sas["销"], "steel_dark"),
             ("工件（不平的毛坯面，局部）", S.rot(S.box(-45, 45, -25, 25, 0, 12), 0, -3, 0), "work", 0.45)], [0.6, -1.3, 0.5])
 aux = E.auxiliary_support(16, at=(0, 0, 0))
-ax_ = tile([("支座", aux["body"], "cast"), ("柱塞", aux["plunger"], blue), ("锁紧螺钉", aux["lock"], "steel_dark")], [0.8, -1.2, 0.6], section=((0, 0, 0), (0, -1, 0)))
+ax_ = tile([("支座", aux["body"], "cast"), ("柱塞", aux["plunger"], blue), ("锁紧螺钉", aux["lock"], "steel_dark")], [0.9, -1.2, 0.6], section=((0, 0, 0), (1, 0, 0)))
 R.compose("fig51_5_2", [sa, sp, adj, sa2, ax_], 3, titles=["(a) 支承钉：A 平头（精基准）、B 球头（毛坯面）、C 网纹（侧面）", "(b) 支承板：A 型光面、B 型斜槽（容屑）",
                                                           "(c) 可调支承：按批调高度，锁紧螺母锁住", "(d) 自位支承：两点接触，只起一个支承点的作用",
                                                           "(e) 辅助支承（剖开）：定位夹紧后再顶上锁紧，不参与定位"])
@@ -81,11 +81,13 @@ for n, s in fd.items():
 q.add(P("工件（轴端，剖开）", S.cyl("x", (0, 0), 25, 0, 70) - W.center_hole(0.0, 1, d=4, D=8.5), "work"))
 pf = R.render_png(q, 700, 480, camera={"dir": [0.3, -1.2, 0.4], "fit": [[-55, 0, -32], [50, 0, 32]]}, section=((0, 0, 0), (0, -1, 0)),
                   labels=[{"at": (-1.5, 0, 19), "text": "驱动齿压进端面：传扭矩，并确定轴向位置", "style": "text", "pos": [0.5, 0.08], "part": "驱动齿"},
-                          {"at": (-20, 0, 6), "text": "浮动顶尖：弹簧顶出，只定心", "style": "text", "pos": [0.4, 0.92], "part": "浮动顶尖"}])
+                          {"at": (-20, 0, 6), "text": "浮动顶尖：可轴向退让，只定心", "style": "text", "pos": [0.4, 0.92], "part": "浮动顶尖"}])
 bx = A("一面两销")
 bx.add(P("夹具底板", S.box(-140, 140, -100, 100, -25, 0), "cast"))
 for k, (px, py) in enumerate(((-110, -70), (110, 70))):
-    bx.add(P(f"定位销{k + 1}", E.locating_pin(12, 12, "cyl" if k == 0 else "dia", at=(px, py, 0), b=4, flat_dir="x"), "hardened" if k == 0 else blue))
+    pin = E.locating_pin(12, 12, "cyl" if k == 0 else "dia", at=(0, 0, 0), b=4, flat_dir="x")     # 削边方向沿两销连线
+    import math
+    bx.add(P(f"定位销{k + 1}", S.move(S.rot(pin, 0, 0, math.degrees(math.atan2(140, 220))), px, py, 0), "hardened" if k == 0 else blue))
 for x in (-60, 60):
     bx.add(P(f"支承板{x}", E.support_plate(120, 22, 8, at=(x, 0, 8), n=2), "hardened"))
 box = TY.box_part(L=250, B=170, at=(0, 0, 8))
@@ -95,6 +97,6 @@ bx.add(P("箱座（简化）", box, "work", opacity=0.55))
 pbx = R.render_png(bx, 700, 480, camera={"dir": [0.9, -1.3, 0.9]},
                    labels=[{"at": (-110, -70, 12), "text": "圆柱销", "style": "text", "pos": [0.12, 0.85], "part": "定位销1"},
                            {"at": (110, 70, 12), "text": "削边销", "style": "text", "pos": [0.85, 0.12], "part": "定位销2"},
-                           {"at": (60, -11, 8), "text": "支承板：底面三个自由度", "style": "text", "pos": [0.75, 0.9], "part": "支承板60"}])
-R.compose("fig51_5_5", [pf, pbx], 2, titles=["(a) 浮动前顶尖与端面驱动器（剖开）：顶尖定心、端面定轴向", "(b) 一面两销：底面 + 圆柱销 + 削边销，限制六个自由度"])
+                           {"at": (120, 0, 4), "text": "支承板：底面三个自由度", "style": "text", "pos": [0.75, 0.9], "part": "支承板60"}])
+R.compose("fig51_5_5", [pf, pbx], 2, titles=["(a) 浮动前顶尖与端面驱动器（剖开）：顶尖可轴向退让、只定心，端面定轴向", "(b) 一面两销：底面 + 圆柱销 + 削边销，限制六个自由度"])
 out(n_fig3d=4)

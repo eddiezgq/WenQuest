@@ -17,7 +17,8 @@ H_PIN = 14.0
 a = C.Assembly("机器人放料")
 a.add(C.Part("夹具底板", S.box(-120, 120, -80, 80, -20, 0), "cast"))
 for k, (px, py) in enumerate(pins):
-    a.add(C.Part(f"定位销{k + 1}", E.locating_pin(12, H_PIN, "cyl" if k == 0 else "dia", at=(px, py, 0), flat_dir="x"), "hardened"))
+    pin = E.locating_pin(12, H_PIN, "cyl" if k == 0 else "dia", at=(0, 0, 0), flat_dir="x")      # 削边方向沿两销连线
+    a.add(C.Part(f"定位销{k + 1}", S.move(S.rot(pin, 0, 0, 26.565), px, py, 0), "hardened"))
 a.add(C.Part("工件", L.plate_with_holes(holes=pins, D=12.02, at=(0, 0, 0)), "work"))
 GRIP = ["手指左", "手指右", "手爪体"]
 for sx, n in ((-1, "手指左"), (1, "手指右")):
