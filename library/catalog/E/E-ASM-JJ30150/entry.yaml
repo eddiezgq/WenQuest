@@ -25,6 +25,8 @@ model:
   roles:
     可调支承: 夹紧
     螺柱: 夹紧
+    垫圈螺母: 夹紧
+    弹簧: 夹紧
 source:
   origin: wenquest
   license: Apache-2.0
