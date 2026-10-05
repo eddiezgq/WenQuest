@@ -5,12 +5,12 @@
 WQ.lab({
   title: ["实验 13.4 同一台机器人，两种方法", "Lab 13.4 One robot, two methods"],
   goal: ["对 UR5e 和 Panda 分别用 DH 连乘和指数积计算末端位置，并与三维模型的读数互相核对；再换用厂商参数，看差别从哪里来。",
-         "Compute the tool position of the UR5e and the Panda both by DH products and by the PoE formula, check them against the 3D model, then switch to the maker's parameters and see where the difference comes from."],
+         "Compute the end-effector position of the UR5e and the Panda both by DH products and by the PoE formula, check them against the 3D model, then switch to the manufacturer's parameters and see where the difference comes from."],
   view: "3d",
   models: ["B-ARM-UR5E", "B-ARM-PANDA"],
   scenes: [
     { id: "ur", robot: true, name: ["UR5e：标准 DH 与指数积", "UR5e: standard DH and PoE"],
-      problem: { title: ["机器人问题：两套软件算出的末端对不上", "Robot problem: two programs disagree on the tool position"],
+      problem: { title: ["机器人问题：两套软件算出的末端对不上", "Robot problem: two programs disagree on the end-effector position"],
                  text: ["控制器用 DH 表，仿真软件用旋量轴。先确认两种方法本身给出同一个答案，再查参数是否相同。",
                         "The controller uses a DH table, the simulator uses screw axes. First check that the two methods agree, then check whether the parameters are the same."] } },
     { id: "panda", robot: true, name: ["Panda：Craig 表与指数积", "Panda: Craig table and PoE"],
@@ -30,20 +30,20 @@ WQ.lab({
     { id: "j5", name: ["关节 5 θ₅", "Joint 5 θ₅"], min: -180, max: 180, step: 1, value: 0, unit: "°", digits: 0 },
     { id: "j6", name: ["关节 6 θ₆", "Joint 6 θ₆"], min: -180, max: 180, step: 1, value: 0, unit: "°", digits: 0 },
     { id: "j7", name: ["关节 7 θ₇（Panda）", "Joint 7 θ₇ (Panda)"], min: -180, max: 180, step: 1, value: 0, unit: "°", digits: 0 },
-    { id: "tbl", name: ["UR5e 的 DH 表：0 零件库尺寸 / 1 厂商表", "UR5e DH table: 0 library model / 1 maker's table"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
+    { id: "tbl", name: ["UR5e 的 DH 表：0 零件库尺寸 / 1 厂商表", "UR5e DH table: 0 library model / 1 manufacturer's table"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
   ],
   tasks: [
     { id: "ur_ex", robot: true, text: ["UR5e，表取 0，设置算例 12.3.1 的关节角 (30°, −60°, 90°, −120°, −90°, 45°)：DH、指数积、三维模型三者一致。", "UR5e, table 0, Example 12.3.1 (30°, −60°, 90°, −120°, −90°, 45°): DH, PoE and the 3D model agree."],
       demo: { scene: "ur", set: { j1: 30, j2: -60, j3: 90, j4: -120, j5: -90, j6: 45, j7: 0, tbl: 0 }, press: [], wait: 1 } },
-    { id: "ur_vendor", robot: true, text: ["同一组关节角，表改为 1（厂商表）：DH 与指数积相差约 0.7 mm。用定理 13.3.1 解释。", "Same angles, table 1 (maker's): DH and PoE now differ by about 0.7 mm. Explain with Theorem 13.3.1."],
+    { id: "ur_vendor", robot: true, text: ["同一组关节角，表改为 1（厂商表）：DH 与指数积相差约 0.7 mm。用定理 13.3.1 解释。", "Same angles, table 1 (manufacturer's): DH and PoE now differ by about 0.7 mm. Explain with Theorem 13.3.1."],
       demo: { scene: "ur", set: { j1: 30, j2: -60, j3: 90, j4: -120, j5: -90, j6: 45, j7: 0, tbl: 1 }, press: [], wait: 1 } },
-    { id: "panda", robot: true, text: ["Panda：任意转动至少三个关节，Craig 表的 DH 连乘、换算出的指数积和三维模型三者之差都在 10⁻⁶ m 以下。", "Panda: turn at least three joints anyhow; the Craig-table product, the converted PoE and the 3D model agree to 10⁻⁶ m."],
+    { id: "panda", robot: true, text: ["Panda：任意转动至少三个关节，Craig 表的 DH 连乘、换算出的指数积和三维模型三者之差都在 10⁻⁶ m 以下。", "Panda: turn any three or more joints; the Craig-table product, the converted PoE and the 3D model agree to 10⁻⁶ m."],
       demo: { scene: "panda", set: { j1: 20, j2: -40, j3: 30, j4: -100, j5: 15, j6: 90, j7: 45, tbl: 0 }, press: [], wait: 1 } },
     { id: "lamp", text: ["台灯：转动关节 2、3、4 中的至少两个，DH 与指数积给出同一个灯罩位置。", "Lamp: turn at least two of joints 2, 3, 4; DH and PoE put the shade in the same place."],
       demo: { scene: "lamp", set: { j1: 0, j2: -70, j3: 60, j4: 40, j5: 0, j6: 0, j7: 0, tbl: 0 }, press: [], wait: 1 } },
   ],
   think: ["换用厂商表以后，差值随关节角变化，但从不超过 2.1 mm。这个上界是怎样得到的？为什么实际上达不到它？",
-          "With the maker's table the gap changes with the joint angles but never exceeds 2.1 mm. Where does this bound come from, and why is it never reached?"],
+          "With the manufacturer's table the gap changes with the joint angles but never exceeds 2.1 mm. Where does this bound come from, and why is it never reached?"],
 
   mul(A, B) { return A.map((r) => [0, 1, 2, 3].map((j) => r[0] * B[0][j] + r[1] * B[1][j] + r[2] * B[2][j] + r[3] * B[3][j])); },
   m3(A, B) { return A.map((r) => [0, 1, 2].map((j) => r[0] * B[0][j] + r[1] * B[1][j] + r[2] * B[2][j])); },
@@ -131,7 +131,7 @@ WQ.lab({
     const movedL = [p.j2, p.j3, p.j4].filter((x) => x !== 0).length;
     if (api.scene === "lamp" && movedL >= 2 && dDP < 1e-9) api.done("lamp");
     const v = (u) => `(${api.fmt(u[0], 4)}, ${api.fmt(u[1], 4)}, ${api.fmt(u[2], 4)}) m`;
-    const dhName = api.scene === "panda" ? ["DH（Craig 表）", "DH (Craig table)"] : (api.scene === "ur" && p.tbl === 1 ? ["DH（厂商表）", "DH (maker's table)"] : ["DH（零件库尺寸）", "DH (library model)"]);
+    const dhName = api.scene === "panda" ? ["DH（Craig 表）", "DH (Craig table)"] : (api.scene === "ur" && p.tbl === 1 ? ["DH（厂商表）", "DH (manufacturer's table)"] : ["DH（零件库尺寸）", "DH (library model)"]);
     const gap = (x) => (x < 1e-4 ? x.toExponential(1) + " m" : api.fmt(x * 1000, 2) + " mm");
     return [[dhName, v(a)], [["指数积", "PoE"], v(b)], [["三维模型", "3D model"], v(c)],
             [["DH 与指数积之差", "DH vs PoE"], gap(dDP)], [["指数积与模型之差", "PoE vs model"], gap(dPM)]];

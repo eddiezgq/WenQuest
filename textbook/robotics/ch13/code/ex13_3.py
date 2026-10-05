@@ -1,4 +1,4 @@
-"""算例 13.3.1–13.3.3：读 UR 公司公布的 UR5e 标准 DH 参数表。
+"""算例 13.3.1、13.3.2 与 13.3.3 节：读 UR 公司公布的 UR5e 标准 DH 参数表。
 
 数据：零件库条目 B-ARM-UR5E 的 dh.params，照录 UR 公司技术支持文章
 “DH parameters for calculations of kinematics and dynamics”中 UR5e 一栏（a, d, α）。
@@ -64,7 +64,7 @@ for kind, row, col, label in names:
 for (a1, al1, d1, _), (a2, al2, d2, _) in zip(model, vend):
     assert abs(al1 - al2) < 1e-6                      # 扭角相同：差别全在长度
 
-# 表 13.3.2 的行
+# 表 13.3.3 的行
 rows_cmp = []
 for (kind, row, col, label), dmm, c in zip(names, diffs, contrib):
     dtxt = "0" if abs(dmm) < 0.05 else f"{dmm:+.1f}"

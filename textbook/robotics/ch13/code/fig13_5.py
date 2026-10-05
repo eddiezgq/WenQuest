@@ -25,23 +25,26 @@ for k, ax in enumerate(axs):
     t = np.array([zc / math.cos(eps) - 0.2, 0.7 / math.cos(eps)]) if k == 0 else np.array([-0.4, 0.7])
     ax.plot(A + t * math.sin(eps), t * math.cos(eps), color="#5b6670", lw=2.2)
     ax.plot([A, A], [-0.4 if k else zc, 0.7], color=C["muted"], lw=1.0, ls=":")
-    ax.text(0.02, 0.62, T("轴 $i$", "axis $i$"), fontsize=10, color="#5b6670")
-    ax.text(A + 0.7 * math.sin(eps) + 0.03, 0.62, T("轴 $i+1$", "axis $i+1$"), fontsize=10, color="#5b6670")
-    ax.text(A + 0.03, 0.42, T("名义位置", "nominal"), fontsize=9, color=C["muted"])
+    # 文字用磅数偏移，两幅子图纵向比例不同也不会压到轴线上
+    ax.annotate(T("轴 $i$", "axis $i$"), xy=(0, 0.62), xytext=(5, 0), textcoords="offset points", fontsize=10, color="#5b6670")
+    ax.annotate(T("轴 $i+1$", "axis $i+1$"), xy=(A + 0.7 * math.sin(eps), 0.62), xytext=(6, 0), textcoords="offset points",
+                fontsize=10, color="#5b6670")
+    ax.annotate(T("名义位置", "nominal"), xy=(A, -0.3), xytext=(4, 0), textcoords="offset points",
+                fontsize=9, color=C["muted"])      # 写在交点下方、点线右侧：这里偏转后的轴 i+1 在点线左边
     ax.annotate("", xy=(0.0, 0.0), xytext=(0.0, 0.001))
     # {i−1}
     ax.annotate("", xy=(0.12, 0), xytext=(0, 0), arrowprops=dict(arrowstyle="-|>", color=C["x"], lw=1.4))
     ax.annotate("", xy=(0, 0.12), xytext=(0, 0), arrowprops=dict(arrowstyle="-|>", color=C["z"], lw=1.4))
-    ax.text(-0.3, 0.02, "{i-1}", fontsize=10)
+    ax.text(-0.3, 0.02, "{i−1}", fontsize=10)
     if k == 0:
         ax.plot([0], [zc], "o", color=C["accent"], ms=7)
         ax.annotate(T("两轴相交：{i} 的原点在这里\n$a_i = 0$，$d_i = -a\\cot\\varepsilon$", "axes meet: origin of {i} is here\n$a_i = 0$, $d_i = -a\\cot\\varepsilon$"),
-                    xy=(0, zc), xytext=(0.22, zc + 0.3), fontsize=9.5, color=C["accent"],
+                    xy=(0, zc), xytext=(0.24, zc + 0.12), fontsize=9.5, color=C["accent"],
                     arrowprops=dict(arrowstyle="->", color=C["accent"], lw=0.9))
         ax.annotate("", xy=(-0.12, zc), xytext=(-0.12, 0), arrowprops=dict(arrowstyle="<->", color=C["z"], lw=1.2))
         ax.text(-0.4, zc / 2, "$d_i$", fontsize=13, color=C["z"])
         ax.text(0.03, zc + 0.75, r"$\varepsilon$", fontsize=12, color=C["ink"])
-        ax.set_title(T("(a) DH：公垂线退化为交点，参数突变", "(a) DH: the normal collapses to an intersection; parameters jump"), fontsize=10, pad=14)
+        ax.set_title(T("(a) DH：公垂线退化为交点，参数突变", "(a) DH: the common normal degenerates to a point; parameters jump"), fontsize=10, pad=14)
     else:
         ax.plot([0, A], [0, 0], color=C["accent"], lw=1.8, ls="--")
         ax.plot([A], [0], "o", color=C["accent"], ms=7)
@@ -49,8 +52,9 @@ for k, ax in enumerate(axs):
         tt = np.linspace(math.pi / 2, math.pi / 2 - eps, 20)
         ax.plot(A + 0.35 * np.cos(tt), 0.35 * np.sin(tt), color=C["y"], lw=1.6)
         ax.text(A + 0.1, 0.36, r"$\beta = \varepsilon$", fontsize=11, color=C["y"])
-        ax.text(0.05, -0.3, T("与 {i−1} 的 xy 平面相交处：$a$ 不变，\n多出绕 $y$ 的转角 $\\beta$，随 ε 连续变化",
-                              "where it crosses the xy plane of {i-1}: $a$ unchanged,\nan extra turn $\\beta$ about $y$, continuous in ε"), fontsize=9.5, color=C["ink"])
+        ax.text(-0.5, -0.52, T("与 {i−1} 的 xy 平面相交处：$a$ 不变，\n多出绕 $y$ 的转角 $\\beta$，随 ε 连续变化",
+                               "where axis $i+1$ crosses the xy plane of {i−1}:\n$a$ unchanged, an extra angle $\\beta$ about $y$,\ncontinuous in ε"),
+                fontsize=9.5, color=C["ink"], va="top")          # 写在两轴下方，不与轴线相交
         ax.set_title(T("(b) 哈亚蒂：参数连续", "(b) Hayati: parameters stay continuous"), fontsize=10, pad=14)
 fig.text(0.5, 0.01, T("轴 $i+1$ 在两轴所在的平面内偏转 ε（图中放大为 12°；a = 0.425 m）", "Axis $i+1$ tilted by ε in the plane of the two axes (drawn at 12°; a = 0.425 m)"),
          ha="center", fontsize=9.5)
@@ -68,7 +72,7 @@ ax.loglog(e, np.sqrt(np.sin(er) ** 2 + (1 + A ** 2) * (1 - np.cos(er)) ** 2),   
 for x in (0.01,):
     y = A / math.tan(math.radians(x))
     ax.plot([x], [y], "o", color=C["accent"])
-    ax.annotate(T(f"ε = 0.01° 时 |d| ≈ {y:.0f} m", f"ε = 0.01°: |d| ≈ {y:.0f} m"), xy=(x, y), xytext=(0.05, 3e4), fontsize=9.5,
+    ax.annotate(T(f"ε = 0.01° 时 |d| ≈ {y:.0f} m", f"ε = 0.01°: |d| ≈ {y:,.0f} m"), xy=(x, y), xytext=(0.05, 3e4), fontsize=9.5,
                 arrowprops=dict(arrowstyle="->", color=C["muted"], lw=0.8))
 ax.set_xlabel(T("偏转角 ε / (°)", "tilt ε / (°)"))
 ax.set_ylim(1e-7, 1e6)

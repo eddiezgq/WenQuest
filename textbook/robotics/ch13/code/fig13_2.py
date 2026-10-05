@@ -44,14 +44,14 @@ ax.view_init(elev=20, azim=-60)
 ax.set_axis_off()
 line3d(ax, (0, 0, 0), (0, 0, 1), -0.1, 1.0, GREY, lw=2.2)
 line3d(ax, (0.7, 0, 0), (0, 0, 1), -0.1, 1.0, GREY, lw=2.2)
-for h in (0.3, 0.55, 0.8):
+for h in (0.45, 0.65, 0.85):                      # 不低于 0.4：避开 z_{i-1} 的标签
     ax.plot([0, 0.7], [0, 0], [h, h], color=C["muted"], lw=1.0, ls=":")
 ax.plot([0, 0.7], [0, 0], [0, 0], color=NORM, lw=1.8, ls="--")
 frame3d(ax, np.eye(4), 0.22, "", names=("x_{i-1}", None, "z_{i-1}"))
 F = np.eye(4)
 F[:3, 3] = [0.7, 0, 0]
 frame3d(ax, F, 0.22, "", names=("x_i", None, "z_i"))
-ax.text(0.12, 0.0, 0.9, T("公垂线有无穷多条", "infinitely many normals"), fontsize=9.5, color=C["muted"])
+ax.text(0.02, 0.0, 1.08, T("公垂线有无穷多条", "infinitely many normals"), fontsize=9.5, color=C["muted"])
 ax.text2D(0.5, 0.02, T("取过 $o_{i-1}$ 的一条（虚线）：$d_i = 0$", "take the one through $o_{i-1}$ (dashed): $d_i = 0$"),
           transform=ax.transAxes, fontsize=9.5, ha="center", color=NORM)
 equal3d(ax, [[0, 0, -0.1], [0, 0, 1.0], [0.7, 0, 1.0], [0.7, 0, -0.1]], pad=0.02, zoom=1.2)
@@ -94,7 +94,7 @@ for i, F in enumerate(Fs):
         continue
     frame3d(ax, F, 0.1, "{%d}" % i, fs=10, off=offs[i])
 ax.text2D(0.5, 0.06, T("零位时 {4} 与 {3} 重合（$d_4 = 0$），随 $\\theta_4$ 转动；{3} 在工具安装面中心，随丝杠升降",
-                       "At home {4} coincides with {3} ($d_4 = 0$) and turns with $\\theta_4$; {3} is at the tool mount and moves with the screw"),
+                       "At the zero position {4} coincides with {3} ($d_4 = 0$) and turns with $\\theta_4$; {3} is on the tool mount and moves with the screw"),
           transform=ax.transAxes, fontsize=9, color=C["ink"], ha="center")
 ax.text(-0.05, 0.0, 0.66, T("轴 1", "axis 1"), fontsize=9.5, color=GREY)
 ax.text(0.3, 0.0, 0.66, T("轴 2", "axis 2"), fontsize=9.5, color=GREY)
@@ -119,13 +119,19 @@ ax.set_axis_off()
 ax.plot(*P.T, color="#c3cbd0", lw=8, solid_capstyle="round", alpha=0.7)
 for i, (k, w, q) in enumerate(axes):
     line3d(ax, q, w, -0.12, 0.12, GREY, lw=1.0, ls="-.")
-offs = {0: (0.03, 0.03, -0.07), 1: (0.03, 0.04, 0.03), 2: (0.03, 0.04, 0.03), 3: (0.05, 0.05, 0.03),
-        4: (0.02, -0.02, 0.06), 5: (0.04, 0.03, -0.06), 6: (0.0, -0.07, -0.05)}
+# 标签避开点画的关节轴：{1}、{2}、{3} 的轴沿 y，标签不沿 y 偏移；{4} 的轴竖直，标签向旁边偏
+offs = {0: (0.03, 0.03, -0.07), 1: (0.03, 0.04, 0.03), 2: (0.05, 0.0, 0.05), 3: (0.06, 0.0, 0.05),
+        4: (-0.13, 0.0, 0.04), 5: (0.04, 0.03, -0.06), 6: (0.0, -0.07, -0.07)}
 for i, Fi in enumerate(F):
     frame3d(ax, Fi, 0.09, "{%d}" % i, fs=10, off=offs[i], lw=1.4)
-ax.text2D(0.0, 0.1, T("{1}、{2}、{3} 的原点都在 y = 0 的平面内，并不在关节实物的中心；{6} 在法兰盘中心，$z_6$ 沿法兰法线向外",
-                       "Origins of {1}, {2}, {3} lie in the plane y = 0, not at the joint centres; {6} is at the flange centre, $z_6$ along the flange normal"),
-          transform=ax.transAxes, fontsize=8.8)
 equal3d(ax, np.r_[P, [[0.05, 0.05, 0.25]]], pad=0.0, zoom=1.75)
+# 说明分两行，居中写在机械臂图形的正下方（图形在三维子图中偏左，按投影后的范围定位）
+from mpl_toolkits.mplot3d import proj3d
+fig.canvas.draw()
+px, py, _ = proj3d.proj_transform(P[:, 0], P[:, 1], P[:, 2], ax.get_proj())
+ux = ax.transAxes.inverted().transform(ax.transData.transform(np.c_[px, py]))[:, 0]
+ax.text2D((ux.min() + ux.max()) / 2, 0.1, T("{1}、{2}、{3} 的原点都在 y = 0 的平面内，并不在关节实物的中心；\n{6} 在法兰盘中心，$z_6$ 沿法兰法线向外",
+                       "Origins of {1}, {2}, {3} lie in the plane y = 0, not at the joint centres;\n{6} is at the flange centre, $z_6$ along the flange normal"),
+          transform=ax.transAxes, fontsize=8.8, ha="center", va="top")
 figure(fig, "fig13_2_3")
 plt.close(fig)

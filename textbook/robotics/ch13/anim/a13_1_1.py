@@ -52,8 +52,8 @@ class Lesson(Base):
         oi = np.array([A * np.cos(TH), A * np.sin(TH), D])
         axis_i = Line(P([0, 0, -0.3]), P([0, 0, 1.05]), color=GREY_B, stroke_width=5)
         axis_n = Line(P(oi - 0.55 * zi), P(oi + 0.6 * zi), color=GREY_B, stroke_width=5)
-        lab_i = zh("轴 i", 24, GREY_B).next_to(axis_i.get_end(), UP, buff=0.1)
-        lab_n = zh("轴 i+1", 24, GREY_B).next_to(axis_n.get_end(), UP, buff=0.1)
+        lab_i = bi(["轴 i", "axis i"], 24, GREY_B).next_to(axis_i.get_end(), UP, buff=0.1)
+        lab_n = bi(["轴 i+1", "axis i+1"], 24, GREY_B).next_to(axis_n.get_end(), UP, buff=0.1)
         normal = DashedLine(P([0, 0, D]), P(oi), color=YELLOW, stroke_width=4)
         lab_N = MathTex("N_i", color=YELLOW, font_size=32).next_to(normal.get_center(), UP, buff=0.12)
         self.play(Create(axis_i), Create(axis_n), FadeIn(lab_i), FadeIn(lab_n))
@@ -64,11 +64,11 @@ class Lesson(Base):
         moving = always_redraw(lambda: frame_mob(*pose(*[x.get_value() for x in f])))
         self.add(moving)
         self.caption("目标：把坐标系 {i−1}（在轴 i 上）搬到 {i}（在轴 i+1 上）",
-                     "Goal: carry frame {i-1} (on axis i) to frame {i} (on axis i+1)")
-        steps = [("① 绕 z 轴转 θᵢ：x 轴转到与公垂线 Nᵢ 平行", "1. Rotate θᵢ about z: x becomes parallel to Nᵢ"),
-                 ("② 沿 z 轴移 dᵢ：原点到达 Nᵢ 在轴 i 上的垂足", "2. Slide dᵢ along z: the origin reaches the foot of Nᵢ"),
-                 ("③ 沿新的 x 轴移 aᵢ：原点沿 Nᵢ 到达轴 i+1", "3. Slide aᵢ along the new x: along Nᵢ to axis i+1"),
-                 ("④ 绕 x 轴转 αᵢ：z 轴转到轴 i+1 上", "4. Rotate αᵢ about x: z now lies along axis i+1")]
+                     "Goal: carry frame {i−1} (on axis i) to frame {i} (on axis i+1)")
+        steps = [("① 绕 z 轴转 θᵢ：x 轴转到与公垂线 Nᵢ 平行", "1. Rotate through θᵢ about z: x becomes parallel to Nᵢ"),
+                 ("② 沿 z 轴移 dᵢ：原点到达 Nᵢ 在轴 i 上的垂足", "2. Translate by dᵢ along z: the origin reaches the foot of Nᵢ"),
+                 ("③ 沿新的 x 轴移 aᵢ：原点沿 Nᵢ 到达轴 i+1", "3. Translate by aᵢ along the new x: along Nᵢ to axis i+1"),
+                 ("④ 绕 x 轴转 αᵢ：z 轴转到轴 i+1 上", "4. Rotate through αᵢ about x: z now lies along axis i+1")]
         for k, (z_txt, e_txt) in enumerate(steps):
             self.caption(z_txt, e_txt, wait=0)
             self.play(f[k].animate.set_value(1.0), run_time=2.2)

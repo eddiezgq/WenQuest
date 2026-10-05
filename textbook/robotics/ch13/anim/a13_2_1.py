@@ -1,5 +1,5 @@
 """动画 13.2.1（配图 13.2.3）：为 UR5e 逐个建立连杆坐标系 {0}…{6}（零位）。
-每一步说明相邻两轴的关系（相交、平行）和读出的 DH 参数；数据与程序 13.2.1、表 13.3.2 相同（零件库模型的尺寸）。"""
+每一步说明相邻两轴的关系（相交、平行）和读出的 DH 参数；数据与程序 13.2.1、表 13.4.2 相同（零件库模型的尺寸）。"""
 from manim import *
 from wq_anim import *
 import numpy as np
@@ -58,15 +58,15 @@ class Lesson(Base):
         lines = VGroup(*[DashedLine(P(np.array(q) - 0.14 * np.array(w)), P(np.array(q) + 0.14 * np.array(w)), color=GREY_B,
                                     stroke_width=2, dash_length=0.08) for w, q in axes_pts])
         self.play(Create(body), Create(lines), run_time=1.5)
-        self.caption("零位的 UR5e：灰色是手臂，虚线是六根关节轴", "UR5e at home: grey arm, dashed lines are the six joint axes")
+        self.caption("零位的 UR5e：灰色是手臂，虚线是六根关节轴", "UR5e at the zero position: grey arm; dashed lines are the six joint axes")
         steps = [
-            ("{0}：z₀ 沿轴 1 竖直向上，原点在基座安装面中心", "{0}: z0 along axis 1, upward; origin at the centre of the base"),
-            ("{1}：轴 1、2 相交 → a₁ = 0，原点在交点，d₁ = 0.163 m，α₁ = 90°", "{1}: axes 1, 2 intersect: a1 = 0, origin at the crossing, d1 = 0.163 m, α1 = 90°"),
-            ("{2}：轴 2、3 平行 → 取 d₂ = 0；沿 x₂ 量得 a₂ = −0.425 m", "{2}: axes 2, 3 parallel: take d2 = 0; along x2, a2 = −0.425 m"),
-            ("{3}：轴 3、4 平行 → d₃ = 0，a₃ = −0.392 m", "{3}: axes 3, 4 parallel: d3 = 0, a3 = −0.392 m"),
-            ("{4}：轴 4、5 相交 → a₄ = 0，d₄ = 0.134 m，α₄ = 90°", "{4}: axes 4, 5 intersect: a4 = 0, d4 = 0.134 m, α4 = 90°"),
-            ("{5}：轴 5、6 相交 → a₅ = 0，d₅ = 0.1 m，α₅ = −90°", "{5}: axes 5, 6 intersect: a5 = 0, d5 = 0.1 m, α5 = −90°"),
-            ("{6}：原点在法兰盘中心，d₆ = 0.1 m，z₆ 沿法兰法线向外", "{6}: origin at the flange centre, d6 = 0.1 m, z6 along the flange normal"),
+            ("{0}：z₀ 沿轴 1 竖直向上，原点在基座安装面中心", "{0}: z₀ along axis 1, upward; origin at the centre of the base mounting face"),
+            ("{1}：轴 1、2 相交 → a₁ = 0，原点在交点，d₁ = 0.163 m，α₁ = 90°", "{1}: axes 1, 2 intersect: a₁ = 0, origin at the crossing, d₁ = 0.163 m, α₁ = 90°"),
+            ("{2}：轴 2、3 平行 → 取 d₂ = 0；沿 x₂ 量得 a₂ = −0.425 m", "{2}: axes 2, 3 parallel: take d₂ = 0; along x₂, a₂ = −0.425 m"),
+            ("{3}：轴 3、4 平行 → d₃ = 0，a₃ = −0.392 m", "{3}: axes 3, 4 parallel: d₃ = 0, a₃ = −0.392 m"),
+            ("{4}：轴 4、5 相交 → a₄ = 0，d₄ = 0.134 m，α₄ = 90°", "{4}: axes 4, 5 intersect: a₄ = 0, d₄ = 0.134 m, α₄ = 90°"),
+            ("{5}：轴 5、6 相交 → a₅ = 0，d₅ = 0.1 m，α₅ = −90°", "{5}: axes 5, 6 intersect: a₅ = 0, d₅ = 0.1 m, α₅ = −90°"),
+            ("{6}：原点在法兰盘中心，d₆ = 0.1 m，z₆ 沿法兰法线向外", "{6}: origin at the flange centre, d₆ = 0.1 m, z₆ along the flange normal"),
         ]
         prev = None
         for i, (z_txt, e_txt) in enumerate(steps):
@@ -84,7 +84,7 @@ class Lesson(Base):
             prev = f
         self.caption("{1}、{2}、{3} 的原点都在 y = 0 的平面内：坐标系由轴线决定，不必在关节实物的中心",
                      "Origins of {1}, {2}, {3} lie in the plane y = 0: frames follow the axis lines, not the joint housings", wait=2)
-        self.card([["UR5e 的 DH 参数（零件库尺寸）", "UR5e DH parameters (library model)"],
+        self.card([["UR5e 的 DH 参数（零件库尺寸）", "UR5e DH parameters (parts-library model)"],
                    MathTex(r"d_1 = 0.163,\ a_2 = -0.425,\ a_3 = -0.392,\ d_4 = 0.134,\ d_5 = d_6 = 0.1\ (\mathrm{m})", font_size=34),
                    MathTex(r"\alpha = (90^\circ,\ 0,\ 0,\ 90^\circ,\ -90^\circ,\ 0)", font_size=34),
-                   ["厂商手册中每个长度与此相差不到 1 mm（13.3 节）", "Each length in the maker's table differs by less than 1 mm (Section 13.3)"]])
+                   ["厂商手册中每个长度与此相差不到 1 mm（13.3 节）", "Each length in the manufacturer's table differs by less than 1 mm (Section 13.3)"]])

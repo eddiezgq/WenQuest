@@ -59,26 +59,27 @@ def scene(ax, mdh_frames: bool):
             r"$\alpha_i$", fontsize=12, color=C["z"])
     # a_{i−1}、α_{i−1}（只在改进 DH 中出现在这一行）
     if mdh_frames:
-        ax.text(-0.17, -0.02, -0.13, "$a_{i-1}$", fontsize=11, color=NORM)
+        ax.text(-0.06, -0.02, -0.22, "$a_{i-1}$", fontsize=11, color=NORM, ha="right")       # 写在公垂线下方，离开轴 i
         ax.plot(*np.array([[0, 0, 0], 0.4 * u_prev]).T, color=C["muted"], lw=0.9, ls=":")
         arc3d(ax, (0, 0, 0), u_prev, np.cross([1.0, 0, 0], u_prev), 0.3, 0.0, AL0, NORM)
         ax.text(0.02, 0.1, 0.36, r"$\alpha_{i-1}$", fontsize=11, color=NORM)
     if not mdh_frames:
         F0 = np.eye(4)
-        frame3d(ax, F0, 0.25, "{i−1}".replace("−", "-"), names=("x_{i-1}", None, "z_{i-1}"), off=(0.05, -0.08, -0.12))
+        frame3d(ax, F0, 0.25, "{i−1}", names=("x_{i-1}", None, "z_{i-1}"), off=(0.05, -0.08, -0.12))
         frame3d(ax, Fi, 0.25, "{i}", names=("x_i", None, "z_i"), off=(0.05, 0.05, -0.12))
     else:
         Fm_prev = np.eye(4)
         Fm_prev[:3, 0], Fm_prev[:3, 2] = [1, 0, 0], u_prev
         Fm_prev[:3, 1] = np.cross(u_prev, [1, 0, 0])
         Fm_prev[:3, 3] = p_prev
-        frame3d(ax, Fm_prev, 0.25, "{i-1}", names=("x_{i-1}", None, "z_{i-1}"), off=(-0.05, -0.1, -0.13))
+        frame3d(ax, Fm_prev, 0.25, "{i−1}", names=("x_{i-1}", None, "z_{i-1}"), off=(-0.22, -0.1, -0.13))
         Fm = Rz(TH) @ Tz(D)
         frame3d(ax, Fm, 0.25, "{i}", names=("x_i", None, "z_i"), off=(-0.12, 0.02, 0.02))
     equal3d(ax, [p_prev + 0.75 * u_prev, [0, 0, 1.0], o_i + 0.6 * z_i, o_i - 0.5 * z_i, [0, 0, -0.3], [0.6, 0.6, 0]], pad=0.0, zoom=1.25)
 
 
 fig = plt.figure(figsize=(10.4, 4.6))
+fig.subplots_adjust(left=0.02, right=0.86)          # 右侧留白：(b) 中“轴 i+1”的标签伸出子图
 ax = fig.add_subplot(121, projection="3d")
 ax.view_init(elev=18, azim=-62)
 ax.set_axis_off()
@@ -89,8 +90,8 @@ ax.view_init(elev=18, azim=-62)
 ax.set_axis_off()
 scene(ax, True)
 ax.set_title(T("(b) 改进 DH（Craig）：{i} 固定在轴 $i$ 上", "(b) Modified DH (Craig): {i} sits on axis $i$"), fontsize=10, y=0.98)
-fig.text(0.5, 0.06, T("同一组几何量：公垂线 $N_i$ 的长度 $a_i$、轴 $i$ 到轴 $i+1$ 的扭角 $\\alpha_i$；沿轴 $i$ 的距离 $d_i$ 和转角 $\\theta_i$",
-                      "Same geometry: length $a_i$ of the common normal $N_i$, twist $\\alpha_i$ from axis $i$ to $i+1$; offset $d_i$ and angle $\\theta_i$ along axis $i$"),
+fig.text(0.44, 0.06, T("同一组几何量：公垂线 $N_i$ 的长度 $a_i$、轴 $i$ 到轴 $i+1$ 的扭角 $\\alpha_i$；沿轴 $i$ 的距离 $d_i$ 和转角 $\\theta_i$",
+                      "Same geometry: length $a_i$ of the common normal $N_i$, twist $\\alpha_i$ from axis $i$ to $i+1$; offset $d_i$ along and angle $\\theta_i$ about axis $i$"),
          ha="center", fontsize=9.5, color=C["ink"])
 figure(fig, "fig13_1_1")
 plt.close(fig)
@@ -114,10 +115,10 @@ for ax, Fr, title in ((axs[0], Fs, T("(a) 标准 DH：{i} 在连杆 i 的末端�
             dx, dy = (0.04, -0.06)
         frame2d(ax, F[:2, 3], ang, 0.11, "{%d}" % i, fs=11, dx=dx, dy=dy)
     if Fr is Fm:
-        ax.annotate(T("末端还差 $X_3$：沿 $x_3$ 平移 $L_3$", "tool still needs $X_3$: shift $L_3$ along $x_3$"), xy=pts[-1], xytext=(0.48, 0.05),
+        ax.annotate(T("末端还差 $X_3$：沿 $x_3$ 平移 $L_3$", "end-effector still needs $X_3$: shift $L_3$ along $x_3$"), xy=pts[-1], xytext=(0.48, 0.05),
                     fontsize=9, color=C["ink"], arrowprops=dict(arrowstyle="->", color=C["muted"], lw=0.8))
     ax.set_title(title, fontsize=10)
-fig.text(0.5, 0.02, T("θ = (30°, 45°, −90°)；两种约定算出的末端位姿相同（算例 13.1.2）", "θ = (30°, 45°, −90°); both conventions give the same tool pose (Example 13.1.2)"),
+fig.text(0.5, 0.02, T("θ = (30°, 45°, −90°)；两种约定算出的末端位姿相同（算例 13.1.2）", "θ = (30°, 45°, −90°); both conventions give the same end-effector pose (Example 13.1.2)"),
          ha="center", fontsize=9.5, color=C["ink"])
 figure(fig, "fig13_1_2")
 plt.close(fig)

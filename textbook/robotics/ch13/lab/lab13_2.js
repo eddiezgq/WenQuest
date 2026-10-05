@@ -11,7 +11,7 @@ WQ.lab({
   models: ["B-ARM-UR5E"],
   scenes: [
     { id: "ur", robot: true, name: ["UR5e 连杆坐标系", "UR5e link frames"],
-      problem: { title: ["机器人问题：厂商的 DH 表是怎样量出来的", "Robot problem: how the maker's DH table is measured"],
+      problem: { title: ["机器人问题：厂商的 DH 表是怎样量出来的", "Robot problem: how the manufacturer's DH table is measured"],
                  text: ["按 13.2 节的步骤，从基座到法兰盘逐个建立 {0}…{6}。每建一个坐标系，就读出一行 a、α、d、θ。",
                         "Following Section 13.2, build {0}…{6} from the base to the flange. Each new frame gives one row a, α, d, θ."] } },
     { id: "lamp", name: ["只用关节 2、3、4（像台灯）", "Joints 2, 3, 4 only (like a desk lamp)"],
@@ -29,7 +29,7 @@ WQ.lab({
     { id: "j6", name: ["关节 6 θ₆", "Joint 6 θ₆"], min: -180, max: 180, step: 1, value: 0, unit: "°", digits: 0 },
   ],
   tasks: [
-    { id: "build", robot: true, text: ["零位下把 k 从 0 调到 6，逐个读出六行 DH 参数；确认 {6} 的原点就是法兰盘中心。", "At home step k from 0 to 6, read the six DH rows, and confirm that the origin of {6} is the flange centre."],
+    { id: "build", robot: true, text: ["零位下把 k 从 0 调到 6，逐个读出六行 DH 参数；确认 {6} 的原点就是法兰盘中心。", "At the zero position step k from 0 to 6, read the six DH rows, and confirm that the origin of {6} is the flange centre."],
       demo: { scene: "ur", set: { k: 6, j1: 0, j2: 0, j3: 0, j4: 0, j5: 0, j6: 0 }, press: [], wait: 1 } },
     { id: "follow", robot: true, text: ["k = 6 时只转动关节 2：{0}、{1} 不动，{2}…{6} 跟着大臂转。说明 {i} 固定在哪个连杆上。", "With k = 6 turn only joint 2: {0} and {1} stay, {2}…{6} turn with the upper arm. Which link carries {i}?"],
       demo: { scene: "ur", set: { k: 6, j1: 0, j2: -45, j3: 0, j4: 0, j5: 0, j6: 0 }, press: [], wait: 1 } },

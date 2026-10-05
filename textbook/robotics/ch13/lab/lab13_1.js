@@ -5,7 +5,7 @@
 WQ.lab({
   title: ["实验 13.1 标准 DH 与改进 DH", "Lab 13.1 Standard and modified DH"],
   goal: ["在平面 3R 臂上比较两种 DH 约定的连杆坐标系，验证它们算出同一个末端，并看看把表套错公式会怎样。",
-         "Compare the link frames of the two DH conventions on a planar 3R arm, check that they give the same tip, and see what happens when a table is put into the wrong formula."],
+         "Compare the link frames of the two DH conventions on a planar 3R arm, check that they give the same end-effector, and see what happens when a table is put into the wrong formula."],
   scenes: [
     { id: "sdh", robot: true, name: ["平面 3R 臂：标准 DH", "Planar 3R arm: standard DH"],
       problem: { title: ["机器人问题：手册上的 DH 表按哪种约定", "Robot problem: which convention is the manual's DH table in?"],
@@ -27,11 +27,11 @@ WQ.lab({
     { id: "wrong", name: ["表套错公式：0 否 / 1 是", "Table in the wrong formula: 0 no / 1 yes"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
   ],
   tasks: [
-    { id: "ex", robot: true, text: ["场景“标准 DH”，设置 θ = (30°, 45°, −90°)，读出末端位置（算例 13.1.2）。", "Scene “standard DH”: set θ = (30°, 45°, −90°) and read the tip (Example 13.1.2)."],
+    { id: "ex", robot: true, text: ["场景“标准 DH”，设置 θ = (30°, 45°, −90°)，读出末端位置（算例 13.1.2）。", "Scene “standard DH”: set θ = (30°, 45°, −90°) and read the end-effector position (Example 13.1.2)."],
       demo: { scene: "sdh", set: { t1: 30, t2: 45, t3: -90, wrong: 0 }, press: [] } },
-    { id: "mdh", robot: true, text: ["换到场景“改进 DH”，同一组关节角，验证末端位置不变；对照两张 DH 表，说出数值怎样错开一行。", "Switch to “modified DH” with the same angles: the tip is unchanged. Compare the two DH tables: how are the numbers shifted by one row?"],
+    { id: "mdh", robot: true, text: ["换到场景“改进 DH”，同一组关节角，验证末端位置不变；对照两张 DH 表，说出数值怎样错开一行。", "Switch to “modified DH” with the same angles: the end-effector is unchanged. Compare the two DH tables: how are the numbers shifted by one row?"],
       demo: { scene: "mdh", set: { t1: 30, t2: 45, t3: -90, wrong: 0 }, press: [] } },
-    { id: "wrong", robot: true, text: ["在场景“标准 DH”中把“表套错公式”设为 1：末端偏了多少？与算例 13.1.3 比较。", "In “standard DH” set “wrong formula” to 1: how far off is the tip? Compare with Example 13.1.3."],
+    { id: "wrong", robot: true, text: ["在场景“标准 DH”中把“表套错公式”设为 1：末端偏了多少？与算例 13.1.3 比较。", "In “standard DH” set “wrong formula” to 1: how far off is the end-effector? Compare with Example 13.1.3."],
       demo: { scene: "sdh", set: { t1: 30, t2: 45, t3: -90, wrong: 1 }, press: [] } },
     { id: "lamp", text: ["台灯：调出一个灯罩竖直朝下（θ₁ + θ₂ + θ₃ = −90°）、灯罩高度在 0.2～0.4 m 之间的姿势。", "Desk lamp: find a pose with the shade pointing straight down (θ₁ + θ₂ + θ₃ = −90°) at a height between 0.2 and 0.4 m."],
       demo: { scene: "lamp", set: { t1: 90, t2: -90, t3: -90, wrong: 0 }, press: [] } },
@@ -82,8 +82,8 @@ WQ.lab({
     const rows = tab.map(([a], i) => `(${api.fmt(a, 3)}, 0, 0, θ${i + 1})`).join("  ");
     return [[head, rows],
             [["公式", "formula"], M ? "Rot(x,α) Trans(x,a) Rot(z,θ) Trans(z,d)" : "Rot(z,θ) Trans(z,d) Trans(x,a) Rot(x,α)"],
-            [["末端位置（DH）", "tip (DH)"], `(${api.fmt(T[0][3], 4)}, ${api.fmt(T[1][3], 4)}) m`],
-            [["末端位置（几何）", "tip (geometry)"], `(${api.fmt(g[0], 4)}, ${api.fmt(g[1], 4)}) m`],
+            [["末端位置（DH）", "end-effector (DH)"], `(${api.fmt(T[0][3], 4)}, ${api.fmt(T[1][3], 4)}) m`],
+            [["末端位置（几何）", "end-effector (geometry)"], `(${api.fmt(g[0], 4)}, ${api.fmt(g[1], 4)}) m`],
             [["二者之差", "difference"], api.fmt(err, 4) + " m"]];
   },
   draw(api, s) {
@@ -112,6 +112,6 @@ WQ.lab({
     // 末端：DH 算出的（红点）
     const { T } = this.tip(api), e = X(T[0][3], T[1][3]);
     api.circle(e[0], e[1], 6, api.css("--red"));
-    if (api.p.wrong === 1) api.label(api.lang() === "en" ? "tip from the wrong formula" : "套错公式算出的“末端”", e[0] + 10, e[1] + 16, api.css("--red"), 13);
+    if (api.p.wrong === 1) api.label(api.lang() === "en" ? "end-effector from the wrong formula" : "套错公式算出的“末端”", e[0] + 10, e[1] + 16, api.css("--red"), 13);
   },
 });
