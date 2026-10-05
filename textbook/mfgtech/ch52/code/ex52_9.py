@@ -1,6 +1,6 @@
 """52.9 节：JJ-301-50 的夹具精度分析与刚度校核。
 算例 52.9.1 精度预算：各项误差由本章的公式算出，与夹具数据里登记的预算核对，再按极值法和平方和法合成；
-算例 52.9.2 V 形块截面的平面应力有限元（hub/fe2d.py）：夹紧力使工件轴心下沉多少，换成铝合金或 3D 打印尼龙会怎样；图 52.9.1。"""
+算例 52.9.2 V 形块截面的平面应力有限元（hub/fe2d.py）：夹紧力使工件轴心下沉多少，换成铝合金或 3D 打印尼龙会怎样；图 52.9.2（预算）、图 52.9.3（有限元）。"""
 import math
 
 import numpy as np
@@ -67,7 +67,31 @@ cb = fig.colorbar(tpc, ax=ax, shrink=0.8)
 cb.set_label(T("位移 / µm", "displacement / µm"), fontsize=8)
 ax.set_aspect("equal"); ax.axis("off")
 ax.set_title(T(f"V 形块截面（钢），位移放大 {mag:.0f} 倍", f"V-block section (steel), displacement × {mag:.0f}"), fontsize=8.5)
-figure(fig, "fig52_9_1")
+figure(fig, "fig52_9_3")
+
+# 图 52.9.2：精度预算：五项误差按极值法堆叠，与平方和合成、公差比较
+fig, axs = plt.subplots(1, 2, figsize=(7.2, 2.5))
+cols = ["#4f7fb8", "#9a8f78", "#5a9e6f", "#e0b84f", "#c0504d"]
+for ax, b, ttl in ((axs[0], b_sym, T("键槽对称度", "keyway symmetry")), (axs[1], b_H, T("槽底尺寸 H", "keyway depth H"))):
+    left = 0.0
+    for (kk, vv), c in zip(b["items"].items(), cols):
+        ax.barh(1, vv * 1000, left=left * 1000, color=c, height=0.5, label=kk)
+        if vv > 0.06 * max(sum(b["items"].values()), b["T"]):
+            ax.text((left + vv / 2) * 1000, 1, kk, ha="center", va="center", fontsize=7, color="white")
+        left += vv
+    rss = FX.budget(b["items"], b["T"], "rss")["total"]
+    ax.barh(0, rss * 1000, color=M.MUTED, height=0.5)
+    ax.axvline(b["T"] * 1000, color=M.INK, lw=1.2, ls="--")
+    ax.text(b["T"] * 1000, 1.45, T(f"公差 {b['T'] * 1000:g} µm", f"tolerance {b['T'] * 1000:g} µm"), ha="center", fontsize=7.5, bbox=dict(fc="white", ec="none", pad=1))
+    ax.text(left * 1000, 1, f"  {left * 1000:.1f}", va="center", fontsize=7.5)
+    ax.text(rss * 1000, 0, f"  {rss * 1000:.1f}", va="center", fontsize=7.5)
+    ax.set_yticks([0, 1], [T("平方和", "RSS"), T("极值相加", "worst case")], fontsize=8)
+    ax.set_xlabel("µm", fontsize=8)
+    ax.set_xlim(0, max(left, b["T"]) * 1000 * 1.25)
+    ax.set_ylim(-0.5, 1.75)
+    ax.set_title(ttl, fontsize=9)
+fig.tight_layout()
+figure(fig, "fig52_9_2")
 
 out(T_sym=b_sym["T"], sym_D=b_sym["items"]["ΔD"], sym_J=b_sym["items"]["ΔJ"], sym_A=b_sym["items"]["ΔA"], sym_T=b_sym["items"]["ΔT"],
     sym_G=b_sym["items"]["ΔG"], sym_ext=sym_ext["total"], sym_rss=sym_rss["total"], sym_ext_ok=sym_ext["ok"],

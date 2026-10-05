@@ -162,7 +162,11 @@ function applyState(st) {
       g.position.add(off);
     }
     g.visible = ps.visible ?? true;
-    if (ps.opacity !== undefined) g.children[0].material.forEach?.((m) => { m.transparent = ps.opacity < 1; m.opacity = ps.opacity; });
+    if (ps.opacity !== undefined) for (const c of g.children) {
+      if (!c.isMesh) continue;
+      if (c.userData.outline) { c.visible = ps.opacity > 0.35; continue; }
+      for (const m of [].concat(c.material)) { m.transparent = ps.opacity < 1; m.opacity = ps.opacity; m.depthWrite = ps.opacity >= 1; }
+    }
   }
 }
 

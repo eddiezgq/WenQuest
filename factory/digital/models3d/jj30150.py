@@ -20,6 +20,8 @@ from . import workpiece as W
 STD = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "std"))
 APEX = 20.0                  # V 形块顶点高度
 V_LEN = 60.0                 # V 形块长（= 齿轮位长度）
+VB_HOLES = [(12, -28, 6.8, 20), (48, 28, 6.8, 20), (48, -28, 8, 12), (12, 28, 8, 12)]   # V 形块底面的孔：x, y, 直径, 深（M8 底孔 6.8）
+SB_HOLES = [(144, -4, 5.0, 14), (144, 21, 5.0, 14), (139, 8.5, 6, 10), (149, 8.5, 6, 10)]   # 对刀块底面：2×M6 螺孔（底孔 5）、2×Ø6 销孔
 BODY = dict(x0=-75.0, x1=170.0, y0=-62.0, y1=100.0, t=30.0)
 STRAP_X = (-20.0, 80.0)      # 两个压板的位置：离 V 形块两端各 20 mm
 EAR = 14.0                   # U 形耳座伸出长度
@@ -111,6 +113,8 @@ def vblock():
     relief = _prism_yz([(-w - 6, H + 5), (0, APEX - r), (w + 6, H + 5)], land, V_LEN - land)
     s = s - relief
     s = s - _box(-1, V_LEN + 1, -1.5, 1.5, APEX - 3, APEX + 1)        # 顶点空刀槽
+    for x, y, d, depth in VB_HOLES:                                       # 底面：2×M8 螺孔（螺钉从夹具体下面拧入）、2×Ø8 销孔（与夹具体配作）
+        s = s - _cyl_z(x, y, -1, depth, d / 2)
     return s
 
 
@@ -176,7 +180,10 @@ def setting_block():
     g = geometry()
     side, top = g["setting_side"], g["setting_top"]
     prof = [(-12, 0), (side + 16, 0), (side + 16, top + 14), (side, top + 14), (side, top), (-12, top)]
-    return _prism_yz(prof, 135, 153) + _box(130, 158, -16, side + 20, 0, 6)
+    s = _prism_yz(prof, 135, 153) + _box(130, 158, -16, side + 20, 0, 6)
+    for x, y, d, depth in SB_HOLES:
+        s = s - _cyl_z(x, y, -1, depth, d / 2)
+    return s
 
 
 def key(kx: float):

@@ -254,7 +254,12 @@ class Sheet:
         x = q[0]
         for c, w in zip(cells, ws):
             self.items.append(f'<rect x="{_f(x)}" y="{_f(q[1] - h / 2)}" width="{_f(w)}" height="{_f(h)}" fill="#fff" stroke="#000" stroke-width="{THIN}"/>')
-            self.text((x + w / 2, q[1] + size * 0.36), c, size)
+            if c == "⌯":                 # 对称度符号：三条横线，中间长（字体里多半没有这个字符，画出来）
+                cx, cy = x + w / 2, q[1]
+                for dy, hw in ((-1.4, 1.6), (0, 2.6), (1.4, 1.6)):
+                    self.line((cx - hw, cy + dy), (cx + hw, cy + dy))
+            else:
+                self.text((x + w / 2, q[1] + size * 0.36), c, size)
             x += w
         self.line(p, (q[0], q[1]))
         self.arrow(p, math.atan2(p[1] - q[1], p[0] - q[0]), 2.5)

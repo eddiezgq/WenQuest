@@ -82,6 +82,8 @@ def dial_indicator(tip=(0, 0, 0), stem_dir=(0, 0, 1), base_at=(120, 0, -60)):
     """千分表与磁力表座（简化）：表头测杆末端在 tip，测杆沿 stem_dir（指向表）。"""
     a = Assembly("千分表")
     tx, ty, tz = tip
+    if tuple(stem_dir) != (0, 0, 1):
+        return _dial_side(a, tip, stem_dir, base_at)
     a.add(Part("表座", S.box(base_at[0] - 30, base_at[0] + 30, base_at[1] - 25, base_at[1] + 25, base_at[2] - 55, base_at[2]), "rubber"))
     # 立杆、横杆
     post = S.cyl("z", (base_at[0], base_at[1]), 6, base_at[2], tz + 70)
@@ -91,6 +93,32 @@ def dial_indicator(tip=(0, 0, 0), stem_dir=(0, 0, 1), base_at=(120, 0, -60)):
     dial = S.cyl("y", (tx, tz + 42), 28, ty - 8, ty + 8)
     a.add(Part("表头", stem + dial, "steel"))
     a.add(Part("表盘", S.cyl("y", (tx, tz + 42), 24, ty - 8.6, ty - 7.9), "#ffffff"))
+    return a
+
+
+def _dial_side(a, tip, stem_dir, base_at):
+    """测杆水平（沿 ±x 或 ±y）的千分表：表盘朝上，横杆从表座立杆伸到表头背后。"""
+    tx, ty, tz = tip
+    dx, dy, _ = stem_dir
+    ax = "x" if abs(dx) > 0.5 else "y"
+    sgn = dx if ax == "x" else dy
+    c = (tx + 42 * dx, ty + 42 * dy, tz)                      # 表盘中心
+    if ax == "x":
+        stem = S.cyl("x", (ty, tz), 2.5, min(tx, tx + 22 * sgn), max(tx, tx + 22 * sgn))
+    else:
+        stem = S.cyl("y", (tx, tz), 2.5, min(ty, ty + 22 * sgn), max(ty, ty + 22 * sgn))
+    dial = S.cyl("z", (c[0], c[1]), 28, tz - 8, tz + 8)
+    a.add(Part("表座", S.box(base_at[0] - 30, base_at[0] + 30, base_at[1] - 25, base_at[1] + 25, base_at[2] - 55, base_at[2]), "rubber"))
+    post = S.cyl("z", (base_at[0], base_at[1]), 6, min(base_at[2], tz + 40), max(base_at[2], tz + 40))
+    back = (c[0] + 30 * dx, c[1] + 30 * dy)
+    arm = S.cyl("z", back, 5, tz - 8, tz + 40)
+    if abs(back[0] - base_at[0]) > 1:
+        arm = arm + S.cyl("x", (base_at[1], tz + 40), 5, min(back[0], base_at[0]), max(back[0], base_at[0]))
+    if abs(back[1] - base_at[1]) > 1:
+        arm = arm + S.cyl("y", (back[0], tz + 40), 5, min(back[1], base_at[1]), max(back[1], base_at[1]))
+    a.add(Part("表杆", post + arm, "steel_dark"))
+    a.add(Part("表头", stem + dial, "steel"))
+    a.add(Part("表盘", S.cyl("z", (c[0], c[1]), 24, tz + 8, tz + 8.7), "#ffffff"))
     return a
 
 
