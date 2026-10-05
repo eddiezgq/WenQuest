@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>平缝机虚拟样机</title>
+<style>
+:root{--bg:#f3f5f6;--sheet:#ffffff;--ink:#17212b;--muted:#5d6b7a;--rule:#d9e0e6;--accent:#0f6e74;--ok:#1e8449;--bad:#c0392b;--warn:#b7791f;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;--f-mono:ui-monospace,"SFMono-Regular",Menlo,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e1317;--sheet:#151c22;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}}
+:root[data-theme="dark"]{--bg:#0e1317;--sheet:#151c22;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+header{padding:12px 18px 6px}
+header h1{margin:0;font-size:1.25rem}
+header .sub{color:var(--muted);font-size:.85rem}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;padding:0 18px 18px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;padding:0 10px 14px}}
+.stage{position:relative;border-radius:10px;overflow:hidden;background:radial-gradient(120% 90% at 50% 35%,#33414c 0%,#161d23 55%,#0a0d10 100%);min-height:420px;aspect-ratio:16/10}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.tags{position:absolute;inset:0;pointer-events:none;font:12px var(--f-mono)}
+.tag{position:absolute;transform:translate(-50%,-50%);background:rgba(255,255,255,.88);color:#17212b;border-radius:4px;padding:1px 5px;white-space:nowrap;border:1px solid rgba(0,0,0,.25)}
+.hud{position:absolute;left:10px;bottom:8px;color:#e8eef2;font:12px var(--f-mono);background:rgba(10,14,18,.6);padding:2px 7px;border-radius:5px;pointer-events:none}
+.hint{position:absolute;right:10px;bottom:8px;color:#c4ced6;font-size:12px;background:rgba(10,14,18,.6);padding:2px 7px;border-radius:5px;pointer-events:none}
+.side{display:flex;flex-direction:column;gap:10px}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:10px 12px}
+.panel h3{margin:0 0 6px;font-size:.95rem}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+button{font:inherit;font-size:.85rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 9px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+label{font-size:.85rem;color:var(--muted)}
+input[type=range]{width:100%}
+.row{display:flex;align-items:center;gap:8px}
+.row output{font-family:var(--f-mono);font-size:.85rem;min-width:4.5em;text-align:right}
+.info{font-size:.88rem;min-height:3.2em}
+.info b{font-family:var(--f-mono)}
+.note{color:var(--muted);font-size:.8rem}
+.back{display:inline-block;margin:0 18px 18px;color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <h1 data-t="title">平缝机虚拟样机</h1>
+  <div class="sub" data-t="sub">《缝纫机设计与制造》第 2、8 章 · 机构尺寸取第 3–8 章算例，外形为通用示意，不仿任何品牌</div>
+</header>
+<div class="wrap">
+  <div class="stage" id="stage">
+    <canvas id="cv" aria-label="平缝机三维模型"></canvas>
+    <div class="tags" id="tags"></div>
+    <div class="hud" id="hud"></div>
+    <div class="hint" data-t="hint">拖动旋转 · 滚轮或双指缩放 · 右键拖动平移 · 点零件看名称</div>
+  </div>
+  <div class="side">
+    <section class="panel">
+      <h3 data-t="hShow">外壳</h3>
+      <div class="seg" id="shell"></div>
+      <div class="row" style="margin-top:8px"><label for="explode" data-t="explode">拆开程度</label><input id="explode" type="range" min="0" max="1" step="0.01" value="0"><output id="oExplode">0%</output></div>
+      <div class="row"><label><input type="checkbox" id="tagsOn"> <span data-t="tagsOn">显示编号</span></label>
+        <label><input type="checkbox" id="spin" checked> <span data-t="spin">环绕镜头</span></label>
+        <label><input type="checkbox" id="tableOn" checked> <span data-t="tableOn">台板与线架</span></label></div>
+    </section>
+    <section class="panel">
+      <h3 data-t="hChain">机构（点击单独突出）</h3>
+      <div class="seg" id="chains"></div>
+    </section>
+    <section class="panel">
+      <h3 data-t="hRun">运转</h3>
+      <div class="row"><button id="play" aria-pressed="true" data-t="pause">暂停</button>
+        <select id="speed" aria-label="速度"></select></div>
+      <div class="row" style="margin-top:6px"><label for="ang" data-t="ang">主轴转角</label><input id="ang" type="range" min="0" max="359" step="1" value="0"><output id="oAng">0°</output></div>
+      <div class="seg" id="jumps" style="margin-top:6px"></div>
+    </section>
+    <section class="panel">
+      <h3 data-t="hInfo">零件</h3>
+      <div class="info" id="info"></div>
+    </section>
+    <div class="note" data-t="note">运动由问渠平缝机机构库算出：针杆按第 3 章曲柄滑块，挑线杆按第 4 章四连杆，旋梭转速为主轴 2 倍、梭尖在机针回升 2 mm 时到达机针，送布牙按第 6 章。透明盖板、开窗剖切与真机套件 A、A+ 一致，编号与拆装手册一致。</div>
+  </div>
+</div>
+<a class="back" href="../index.html" data-t="back">返回教材</a>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../../lib/lockstitch-kit.js" data-inline></script>
+<script src="../../lib/proto-lockstitch-mesh.js" data-inline></script>
+<script>
+(function(){
+const LANG=(document.documentElement.lang||'zh').slice(0,2)==='en'?'en':'zh';
+const TX={zh:{shell:[['solid','外观'],['clear','透明盖板（套件 A）'],['window','开窗剖切（A+）'],['xray','全透视']],
+  chains:[['all','全部'],['needle','刺布'],['takeup','挑线'],['hook','钩线'],['feed','送布'],['drive','传动']],
+  speeds:[['1','慢放 1/100'],['5','慢放 1/20'],['25','1/4 速'],['0.5','逐转 (2°/s)']],
+  jumps:[[0,'针杆最高'],[180,'针最低'],['phc','钩线'],['off','脱环'],[115,'牙落下']],
+  play:'播放',pause:'暂停',pick:'点一个零件，这里显示它的编号、名称和所属机构。',group:{frame:'机架',needle:'刺布机构',takeup:'挑线机构',hook:'钩线机构',feed:'送布机构',drive:'传动'},
+  hud:(f,x,r)=>`主轴 ${f.toFixed(0)}°　针杆位移 ${x.toFixed(1)} mm　旋梭 ${r.toFixed(0)}°`},
+ en:{shell:[['solid','Painted'],['clear','Clear covers (kit A)'],['window','Cut-away windows (A+)'],['xray','X-ray']],
+  chains:[['all','All'],['needle','Needle'],['takeup','Take-up'],['hook','Hook'],['feed','Feed'],['drive','Drive']],
+  speeds:[['1','Slow 1/100'],['5','Slow 1/20'],['25','1/4 speed'],['0.5','Crawl (2°/s)']],
+  jumps:[[0,'Needle top'],[180,'Needle bottom'],['phc','Loop catch'],['off','Loop release'],[115,'Dog drops']],
+  play:'Play',pause:'Pause',pick:'Click a part to see its number, name and mechanism.',group:{frame:'Frame',needle:'Needle-bar mechanism',takeup:'Take-up mechanism',hook:'Hook mechanism',feed:'Feed mechanism',drive:'Drive'},
+  hud:(f,x,r)=>`Shaft ${f.toFixed(0)}°  needle bar ${x.toFixed(1)} mm  hook ${r.toFixed(0)}°`}};
+const STR={en:{title:'Virtual lockstitch machine',sub:'Sewing Machine Design and Manufacturing, chapters 2 and 8 · mechanism dimensions from the worked examples of chapters 3–8; generic illustrative housing, not modelled on any brand',
+  hint:'Drag to rotate · wheel or pinch to zoom · right-drag to pan · click a part for its name',hShow:'Housing',explode:'Explode',tagsOn:'Show numbers',spin:'Orbit camera',tableOn:'Table and thread stand',
+  hChain:'Mechanisms (click to highlight)',hRun:'Running',pause:'Pause',ang:'Shaft angle',hInfo:'Part',
+  note:'Motion comes from the WenQuest lockstitch mechanism library: needle bar from the chapter 3 slider-crank, take-up lever from the chapter 4 four-bar, hook at twice shaft speed with its point reaching the needle at 2 mm needle rise, feed dog from chapter 6. Clear covers and cut-away windows match the physical kits A and A+; part numbers match the assembly manual.',back:'Back to the book'}};
+const T=TX[LANG];
+if(LANG==='en'){document.title=STR.en.title;document.querySelectorAll('[data-t]').forEach(e=>{const k=e.dataset.t;if(STR.en[k])e.textContent=STR.en[k];});}
+const $=id=>document.getElementById(id);
+const K=WQLS, M=WQLS_MESH, MT=M.meta, DEG=Math.PI/180;
+
+// ---------------------------------------------------------------- renderer, studio lighting
+const cv=$('cv'), stage=$('stage');
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,preserveDrawingBuffer:true});R.setClearColor(0x000000,0);
+R.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.05;
+R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;R.physicallyCorrectLights=true;
+const scene=new THREE.Scene();
+// environment: a small "photo studio" (soft boxes on a dark room), prefiltered for reflections
+(function(){const env=new THREE.Scene();const room=new THREE.Mesh(new THREE.BoxGeometry(10,6,10),new THREE.MeshBasicMaterial({color:0x1a2026,side:THREE.BackSide}));env.add(room);
+  const panel=(w,h,x,y,z,ry,rx,c)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide}));m.position.set(x,y,z);m.rotation.set(rx||0,ry||0,0);env.add(m);};
+  panel(4,1.6,0,2.9,0,0,Math.PI/2,0xffffff);panel(2.2,3,-4.9,0.6,1,Math.PI/2,0,0xdfe8ff);panel(2.2,3,4.9,0.4,-1.5,-Math.PI/2,0,0xfff1dc);panel(3,1.2,0,0.8,4.9,Math.PI,0,0x9fb3c8);
+  const pm=new THREE.PMREMGenerator(R);scene.environment=pm.fromScene(env,0.02).texture;})();
+const key=new THREE.DirectionalLight(0xffffff,2.4);key.position.set(-350,700,520);key.castShadow=true;
+key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-450,right:450,top:450,bottom:-450,near:10,far:2000});key.shadow.bias=-0.0004;scene.add(key);
+scene.add(new THREE.HemisphereLight(0xcfe3ff,0x20262c,0.55));
+const rim=new THREE.DirectionalLight(0x9fd1ff,1.1);rim.position.set(500,300,-600);scene.add(rim);
+// floor: soft shadow catcher + faint grid
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(4000,4000),new THREE.ShadowMaterial({opacity:0.35}));floor.rotation.x=-Math.PI/2;floor.position.y=-76;floor.receiveShadow=true;scene.add(floor);
+const grid=new THREE.GridHelper(1600,32,0x3a4752,0x26313a);grid.material.transparent=true;grid.material.opacity=0.35;grid.position.y=-75.9;scene.add(grid);
+
+// ---------------------------------------------------------------- materials
+const MAT={
+  paint:new THREE.MeshPhysicalMaterial({color:0x1d2b33,metalness:0.3,roughness:0.34,clearcoat:0.9,clearcoatRoughness:0.12,envMapIntensity:0.55}),
+  wood:new THREE.MeshStandardMaterial({color:0x4a3322,metalness:0,roughness:0.55,envMapIntensity:0.6}),
+  spool:new THREE.MeshStandardMaterial({color:0x2f6fd6,metalness:0,roughness:0.7}),
+  glass:new THREE.MeshPhysicalMaterial({color:0xffcf6b,metalness:0,roughness:0.05,transparent:true,opacity:0.6,clearcoat:1}),
+  plate:new THREE.MeshStandardMaterial({color:0xc9cfd4,metalness:1.0,roughness:0.28}),
+  steel:new THREE.MeshStandardMaterial({color:0xb9c0c7,metalness:1.0,roughness:0.32}),
+  chrome:new THREE.MeshStandardMaterial({color:0xe9eef2,metalness:1.0,roughness:0.12}),
+  brass:new THREE.MeshStandardMaterial({color:0xc9a24a,metalness:1.0,roughness:0.3}),
+  hook:new THREE.MeshStandardMaterial({color:0xd5dbe0,metalness:1.0,roughness:0.16}),
+  dark:new THREE.MeshStandardMaterial({color:0x3a4148,metalness:0.8,roughness:0.38}),
+  rubber:new THREE.MeshStandardMaterial({color:0x1d2124,metalness:0.0,roughness:0.85}),
+  pc:new THREE.MeshPhysicalMaterial({color:0xd8ecff,metalness:0,roughness:0.05,transparent:true,opacity:0.18,depthWrite:false,clearcoat:1,side:THREE.DoubleSide})};
+const PC_COVER=new THREE.MeshPhysicalMaterial({color:0xd8ecff,metalness:0,roughness:0.04,transparent:true,opacity:0.16,depthWrite:false,clearcoat:1,side:THREE.DoubleSide});
+const XRAY=new THREE.MeshPhysicalMaterial({color:0x7fa7c0,metalness:0.1,roughness:0.3,transparent:true,opacity:0.14,depthWrite:false,side:THREE.DoubleSide});
+
+// ---------------------------------------------------------------- meshes
+const b64=(s,T)=>{const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new T(u.buffer);};
+function geo(key){const m=M.mesh[key];const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(b64(m.v,Float32Array),3));g.setIndex(new THREE.BufferAttribute(b64(m.i,m.i32?Uint32Array:Uint16Array),1));
+  g.computeVertexNormals();return g;}
+const INFO={};M.parts.forEach(p=>INFO[p.key]=p);
+const root=new THREE.Group();scene.add(root);
+const node={}, meshes=[];
+function part(key,parent){const p=INFO[key]||{mat:'paint'};const g=new THREE.Group();const me=new THREE.Mesh(geo(key),MAT[p.mat]);
+  me.castShadow=p.mat!=='pc';me.receiveShadow=true;me.userData.key=key;me.userData.base=MAT[p.mat];g.add(me);(parent||root).add(g);node[key]=g;meshes.push(me);return g;}
+['body','details','oil','plate','slide','bush','presser','tension','guide','belt','face','top','rear','table','stand','spool'].forEach(k=>part(k));
+const bodyCut=part('body_cut');bodyCut.children[0].userData.key='body';bodyCut.visible=false;
+const panes=part('panes');panes.visible=false;
+// moving groups: pivot groups placed in world, meshes keep their absolute x
+const upper=new THREE.Group();upper.position.set(0,MT.HS,0);root.add(upper);
+const up=part('upper',upper);
+const rodG=new THREE.Group();root.add(rodG);part('rod',rodG);
+const nbG=new THREE.Group();root.add(nbG);part('nbar',nbG);
+const tkG=new THREE.Group();root.add(tkG);part('tklever',tkG);
+const lkG=new THREE.Group();root.add(lkG);part('tklink',lkG);
+const lowG=new THREE.Group();lowG.position.set(0,MT.YL,0);root.add(lowG);part('lower',lowG);
+const hookG=new THREE.Group();hookG.position.set(0,MT.YH,0);root.add(hookG);part('hook',hookG);
+const bcG=new THREE.Group();bcG.position.set(0,MT.YH,0);root.add(bcG);part('bcase',bcG);part('bstop',bcG);
+const dogG=new THREE.Group();root.add(dogG);part('dog',dogG);
+// fabric on the plate (two plies, semi-transparent cloth)
+const cloth=new THREE.Mesh(new THREE.BoxGeometry(150,1.5,120),new THREE.MeshStandardMaterial({color:0xd8c7a4,roughness:0.95,transparent:true,opacity:0.55}));
+cloth.position.set(MT.XN+20,2.4+0.75,-20);cloth.receiveShadow=true;root.add(cloth);
+// moving parts are modelled in local frames (shafts and hook on their axes, rod at its upper pin, needle bar at its lower pin
+// at top dead centre, take-up lever at its crank pin P, take-up link at its frame pivot Q, feed dog at its tooth tips)
+
+// ---------------------------------------------------------------- upper thread: spool → stand → guides → tension → take-up eye → needle eye
+const THREAD_MAT=new THREE.MeshStandardMaterial({color:0x3f86f0,roughness:0.55,metalness:0,emissive:0x0b2a5a});
+let threadMesh=null;
+function threadPath(f,x){
+  const L=K.takeup.linkPose(f,LK0),E=L?L.E:[66,-4];
+  const eyeY=Y_L0-x-MT.ROD_TO_CLAMP-MT.CLAMP_TO_TIP+2.6;
+  const P=[[330,70,-160],[330,322,-70],[300,236,-6],[60,224,10],[-10,216,32],[-36,198,52],[-36,192,55.2],[-30,206,50],
+    [MT.X_TK,MT.HS+E[1],E[0]],[-30,60,52],[-17,Y_L0-x-MT.ROD_TO_CLAMP-2,4],[-17,eyeY,0.6],[-17,eyeY,0]];
+  if(eyeY>4)P.push([-17,3.9,0],[-17,3.9,-3],[-17,3.9,-30]);else P.push([-17,3.9,0.4],[-17,3.9,-3],[-17,3.9,-30]);
+  return P.map(q=>new THREE.Vector3(q[0],q[1],q[2]));}
+function drawThread(f,x){if(threadMesh){root.remove(threadMesh);threadMesh.geometry.dispose();}
+  if(!$('tableOn').checked){threadMesh=null;return;}
+  const c=new THREE.CatmullRomCurve3(threadPath(f,x),false,'centripetal',0.2);
+  threadMesh=new THREE.Mesh(new THREE.TubeGeometry(c,260,0.6,6,false),THREAD_MAT);root.add(threadMesh);}
+// sewn seam behind the needle (decoration until the stitch formation of step 4)
+(function(){const g=new THREE.Group();for(let k=1;k<12;k++){const m=new THREE.Mesh(new THREE.CylinderGeometry(0.45,0.45,2.6,6),THREAD_MAT);m.rotation.x=Math.PI/2;m.position.set(-17,3.9,-3*k+1.5);g.add(m);}root.add(g);})();
+
+// ---------------------------------------------------------------- kinematics from the shared library
+const LK0=K.takeup.LK0, Y_L0=MT.HS+K.needle.RN-K.needle.LN, PHC=K.needle.PHC0;
+const FEED=K.feed.model(Object.assign({fab:'cotton',mode:'drop'},K.feed.STD));
+let phi=0;
+function pose(f){
+  upper.position.set(0,MT.HS,0);lowG.position.set(0,MT.YL,0);hookG.position.set(0,MT.YH,0);bcG.position.set(0,MT.YH,0);
+  upper.rotation.x=f*DEG; lowG.rotation.x=f*DEG; hookG.rotation.x=2*(f-PHC)*DEG;
+  const Cy=MT.HS+K.needle.RN*Math.cos(f*DEG), Cz=K.needle.RN*Math.sin(f*DEG), x=K.needle.xN(f), Ly=Y_L0-x;
+  rodG.position.set(0,Cy,Cz); rodG.rotation.x=Math.atan2(Cz,-(Ly-Cy));   // local (y = −l, z = 0) → from C to L
+  nbG.position.set(0,Y_L0-x,0);
+  const L=K.takeup.linkPose(f,LK0);
+  if(L){tkG.position.set(0,MT.HS+L.P[1],L.P[0]);tkG.rotation.x=-Math.atan2(L.M[1]-L.P[1],L.M[0]-L.P[0]);
+    lkG.position.set(0,MT.HS+L.Q[1],L.Q[0]);lkG.rotation.x=-Math.atan2(L.M[1]-L.Q[1],L.M[0]-L.Q[0]);}
+  dogG.position.set(0,FEED.Y(f),-FEED.X(f));
+  return {x,hook:((2*(f-PHC))%360+360)%360};
+}
+
+// ---------------------------------------------------------------- display modes, explode, chains
+const SHELL={solid:{body:1,cut:0,covers:'paint',panes:0},clear:{body:1,cut:0,covers:'pc',panes:0},window:{body:0,cut:1,covers:'pc',panes:1},xray:{body:1,cut:0,covers:'xray',panes:0}};
+let shell='solid', chain='all';
+function applyShell(){const s=SHELL[shell];node.body.visible=!!s.body;bodyCut.visible=!!s.cut;panes.visible=!!s.panes;
+  ['face','top','rear'].forEach(k=>{const m=node[k].children[0];m.userData.base=s.covers==='pc'?PC_COVER:s.covers==='xray'?XRAY:MAT.paint;m.castShadow=s.covers==='paint';});
+  const bm=node.body.children[0];bm.userData.base=shell==='xray'?XRAY:MAT.paint;bm.castShadow=shell!=='xray';
+  applyChain();}
+const DIM=new THREE.MeshStandardMaterial({color:0x56616b,metalness:0.2,roughness:0.6,transparent:true,opacity:0.22,depthWrite:false});
+function applyChain(){meshes.forEach(me=>{const p=INFO[me.userData.key]||{};const keep=chain==='all'||p.group===chain||p.group==='frame'&&false;
+  me.material=keep?me.userData.base:(p.group==='frame'?(me.userData.base===MAT.paint?XRAY:me.userData.base):DIM);});}
+// explode: covers outward, inner groups apart
+const EX={face:[-110,0,0],top:[0,110,0],rear:[0,0,-110],tension:[0,0,90],guide:[0,0,90],presser:[0,0,-60],
+  rod:[-60,40,0],nbar:[-60,0,0],tklever:[-90,0,60],tklink:[-90,0,40],upper:[0,90,0],lower:[0,-90,0],hook:[-80,-70,0],bcase:[-130,-70,0],dog:[0,-40,90],belt:[90,0,0],plate:[0,25,0],slide:[0,25,0]};
+let ex=0;
+const MOVING=[upper,lowG,hookG,bcG,rodG,nbG,tkG,lkG,dogG];
+const GRP=k=>({hook:hookG,bcase:bcG,upper,lower:lowG,rod:rodG,nbar:nbG,tklever:tkG,tklink:lkG,dog:dogG})[k]||node[k];
+function applyExplode(){for(const k in EX){const g=GRP(k);if(g)g.userData.ex=EX[k].map(v=>v*ex);}}
+
+// ---------------------------------------------------------------- camera (own orbit control: no extra library)
+const cam=new THREE.PerspectiveCamera(32,1,5,8000);
+const target=new THREE.Vector3(110,95,0);let yaw=-0.55,pitch=0.36,dist=1150;
+function placeCam(){cam.position.set(target.x+dist*Math.cos(pitch)*Math.sin(yaw),target.y+dist*Math.sin(pitch),target.z+dist*Math.cos(pitch)*Math.cos(yaw));cam.lookAt(target);}
+let drag=null;
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,b:e.button,moved:0};$('spin').checked=false;});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;drag.moved+=Math.abs(dx)+Math.abs(dy);
+  if(drag.b===2||e.shiftKey){const s=dist/900;const right=new THREE.Vector3().setFromMatrixColumn(cam.matrix,0),upv=new THREE.Vector3().setFromMatrixColumn(cam.matrix,1);
+    target.addScaledVector(right,-dx*s).addScaledVector(upv,dy*s);}else{yaw-=dx*0.006;pitch=Math.max(-0.2,Math.min(1.45,pitch+dy*0.005));}});
+cv.addEventListener('pointerup',e=>{if(drag&&drag.moved<4)pick(e);drag=null;});
+cv.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(140,Math.min(2600,dist*Math.exp(e.deltaY*0.0012)));},{passive:false});
+let pinch=null;cv.addEventListener('touchstart',e=>{if(e.touches.length===2)pinch=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);},{passive:true});
+cv.addEventListener('touchmove',e=>{if(e.touches.length===2&&pinch){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dist=Math.max(140,Math.min(2600,dist*pinch/d));pinch=d;}},{passive:true});
+
+// ---------------------------------------------------------------- picking and number tags
+const ray=new THREE.Raycaster(),mv=new THREE.Vector2();let picked=null;
+function pick(e){const r=cv.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(mv,cam);
+  const hit=ray.intersectObjects(meshes.filter(m=>m.visible&&m.parent.visible&&m.material!==DIM),false)[0];
+  if(picked){picked.material.emissive&&picked.material.emissive.setHex(0);}
+  if(!hit){picked=null;$('info').textContent=T.pick;return;}
+  const me=hit.object,p=INFO[me.userData.key];me.material=me.material.clone();me.material.emissive=new THREE.Color(0x2a5f66);picked=me;
+  $('info').innerHTML=`<b>${p.code}</b>　${LANG==='en'?p.en:p.zh}<br><span class="note">${T.group[p.group]}</span>`;}
+const ANCH={body:[200,-30,86],details:[300,120,60],oil:[150,172,45],face:[-66,140,0],top:[130,214,0],rear:[130,180,-42],plate:[-40,0,30],slide:[22,0,30],bush:[260,165.5,0],panes:[90,178,42],
+  upper:[200,165.5,0],rod:[-17,140,0],nbar:[-17,60,0],presser:[-17,40,-24],tklever:[-34,165,60],tklink:[-34,130,30],tension:[-36,192,60],guide:[-58,203,52],
+  lower:[150,-52,0],hook:[-10,-21,14],bcase:[-17,-21,-8],bstop:[-9,-6,0],dog:[-17,-4,8],belt:[306,60,24]};
+const tagsBox=$('tags');
+function drawTags(){tagsBox.innerHTML='';if(!$('tagsOn').checked)return;const w=cv.clientWidth,h=cv.clientHeight;
+  for(const k in ANCH){const p=INFO[k];if(!p)continue;if(k==='panes'&&!panes.visible)continue;const v=new THREE.Vector3(...ANCH[k]);
+    const g=k==='upper'?upper:null;const s=v.project(cam);if(s.z>1)continue;const d=document.createElement('div');d.className='tag';d.textContent=p.code;
+    d.style.left=((s.x+1)/2*w)+'px';d.style.top=((1-s.y)/2*h)+'px';tagsBox.appendChild(d);}}
+
+// ---------------------------------------------------------------- controls
+$('shell').innerHTML=T.shell.map(([k,l])=>`<button data-k="${k}" aria-pressed="${k===shell}">${l}</button>`).join('');
+$('shell').onclick=e=>{const b=e.target.closest('button');if(!b)return;shell=b.dataset.k;[...$('shell').children].forEach(x=>x.setAttribute('aria-pressed',x===b));applyShell();};
+$('chains').innerHTML=T.chains.map(([k,l])=>`<button data-k="${k}" aria-pressed="${k===chain}">${l}</button>`).join('');
+$('chains').onclick=e=>{const b=e.target.closest('button');if(!b)return;chain=b.dataset.k;[...$('chains').children].forEach(x=>x.setAttribute('aria-pressed',x===b));applyChain();};
+$('speed').innerHTML=T.speeds.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');$('speed').value='5';
+$('jumps').innerHTML=T.jumps.map(([v,l])=>`<button data-v="${v}">${l}</button>`).join('');
+$('jumps').onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=b.dataset.v;setPlay(false);phi=v==='phc'?PHC:v==='off'?PHC+135:+v;};
+let playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+function setPlay(p){playing=p;$('play').setAttribute('aria-pressed',p);$('play').textContent=p?T.pause:T.play;}
+setPlay(playing);
+$('play').onclick=()=>setPlay(!playing);
+$('ang').oninput=e=>{setPlay(false);phi=+e.target.value;};
+$('explode').oninput=e=>{ex=+e.target.value;$('oExplode').textContent=Math.round(ex*100)+'%';applyExplode();};
+$('info').textContent=T.pick;
+$('tableOn').onchange=()=>{const on=$('tableOn').checked;['table','stand','spool'].forEach(k=>node[k].visible=on);grid.visible=floor.visible=!on;};
+applyShell();applyExplode();$('tableOn').onchange();
+
+// ---------------------------------------------------------------- loop
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage);resize();
+let last=performance.now();
+function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;
+  if(playing){const v=+$('speed').value;const degps=v===0.5?2:5000*6/100*v/1;phi=(phi+dt*degps)%360;}   // 5000 r/min = 30000 °/s; 1/100 → 300 °/s
+  if($('spin').checked)yaw+=dt*0.08;
+  const P=pose(phi);drawThread(phi,P.x);
+  // explode offsets on top of the pose
+  for(const k in EX){const g=GRP(k);if(!g||!g.userData.ex)continue;const e=g.userData.ex;
+    if(MOVING.includes(g))g.position.add(new THREE.Vector3(e[0],e[1],e[2]));else g.position.set(e[0],e[1],e[2]);}
+  $('ang').value=Math.round(phi);$('oAng').textContent=Math.round(phi)+'°';
+  $('hud').textContent=T.hud(phi,P.x,P.hook);
+  placeCam();R.render(scene,cam);drawTags();
+  requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+window.__api={pose,setShell:k=>{shell=k;applyShell();},setChain:k=>{chain=k;applyChain();},setExplode:v=>{ex=v;applyExplode();},
+  setPhi:v=>{setPlay(false);phi=v;},cam:(y,p,d,t)=>{yaw=y;pitch=p;dist=d;if(t)target.set(...t);$('spin').checked=false;},tags:v=>{$('tagsOn').checked=v;}};
+})();
+</script>
+</body>
+</html>
