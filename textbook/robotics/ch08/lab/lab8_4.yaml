@@ -4,7 +4,7 @@
      "A convex set contains the segment between any two of its points; a convex function lies below its chords (Jensen's inequality). Every local minimum of a convex problem is global (Theorem 8.4.4)."]
   - ["L 形的可通行区域不是凸集。拆成两个凸区域 R₁、R₂，规定前一半航点在 R₁、后一半在 R₂、交界航点在两者的交集里，相邻航点间的线段就一定在可通行区域内，路径规划成为一个凸二次规划。",
      "The L-shaped free space is not convex. Split it into convex regions R₁ and R₂, put the first waypoints in R₁, the last in R₂ and the junction waypoint in both: every segment then lies in the free space and path planning becomes a convex QP."]
-  - 式: "障碍函数法：min t·f(x) − Σ log(bᵢ − aᵢᵀx)；  f(x*(t)) − p* ≤ m/t          (8.4.8)、(8.4.9)"
+  - 式: ["障碍函数法：min t·f(x) − Σ log(bᵢ − aᵢᵀx)；  f(x*(t)) − p* ≤ m/t          (8.4.8)、(8.4.9)", "Barrier method: min t·f(x) − Σ log(bᵢ − aᵢᵀx);  f(x*(t)) − p* ≤ m/t          (8.4.8), (8.4.9)"]
   - ["t 从 1 开始，每次乘 10，以上一次的解为初值用牛顿法定心；这些解连成中心路径，随 t 增大逼近最优解。",
      "Start at t = 1 and multiply by 10 each time, re-centring by Newton's method from the previous solution; the centres form the central path, which approaches the optimum as t grows."]
 步骤:

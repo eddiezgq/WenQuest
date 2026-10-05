@@ -2,7 +2,7 @@
 原理:
   - ["同一个刚体运动，在 {s} 中写成空间运动旋量 V_s，在 {b} 中写成物体运动旋量 V_b。两者由 {b} 相对 {s} 的位姿 T_sb = (R, p) 的伴随矩阵联系（式 (6.5.4)、(6.5.6)）：",
      "One rigid motion is the spatial twist V_s in {s} and the body twist V_b in {b}; they are related by the adjoint of the pose T_sb = (R, p) of {b} in {s} (Eqs. (6.5.4), (6.5.6)):"]
-  - 式: "V_s = [Ad_Tsb] V_b，[Ad_T] = [R  0; [p]R  R]，即 ω_s = R ω_b，v_s = R v_b + p × (R ω_b)"
+  - 式: ["V_s = [Ad_Tsb] V_b，[Ad_T] = [R  0; [p]R  R]，即 ω_s = R ω_b，v_s = R v_b + p × (R ω_b)", "V_s = [Ad_Tsb] V_b, [Ad_T] = [R  0; [p]R  R], i.e. ω_s = R ω_b, v_s = R v_b + p × (R ω_b)"]
   - ["平面情形：ω_s = ω，v_s = R(φ) v_b + ω (p_y, −p_x)。第二项来自“{s} 原点处那一点”与“{b} 原点”不是同一点。",
      "In the plane: ω_s = ω and v_s = R(φ) v_b + ω (p_y, −p_x). The second term appears because the point at {s}'s origin is not {b}'s origin."]
   - ["换坐标系不改变运动本身：角速度的大小、瞬心（三维中为螺旋轴）和节距都不变。", "Changing frames does not change the motion: the rate, the instantaneous centre (the screw axis in 3D) and the pitch stay the same."]

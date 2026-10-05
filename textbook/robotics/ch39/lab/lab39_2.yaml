@@ -1,7 +1,7 @@
 # 实验 39.2 的指导书与报告模板。目的、场景、参数、任务取自 lab39_2.js。
 原理:
   - ["应变片的电阻变化与应变成正比：ΔR/R = Kε，金属箔应变片 K ≈ 2。满量程应变 1000 με 时 ΔR/R 只有 0.2%。", "A strain gauge changes resistance in proportion to strain, ΔR/R = Kε with K ≈ 2; at 1000 με full scale ΔR/R is only 0.2%."]
-  - 式: "V_o = V_p − V_m，单臂 V_o ≈ V_ex·Kε/4，半桥 V_ex·Kε/2，全桥 V_ex·Kε          (39.2.3)、(39.2.4)"
+  - 式: ["V_o = V_p − V_m，单臂 V_o ≈ V_ex·Kε/4，半桥 V_ex·Kε/2，全桥 V_ex·Kε          (39.2.3)、(39.2.4)", "V_o = V_p − V_m, quarter bridge V_o ≈ V_ex·Kε/4, half bridge V_ex·Kε/2, full bridge V_ex·Kε          (39.2.3), (39.2.4)"]
   - ["三运放仪表放大器只放大两个输入之差，增益由一个电阻设定：", "The three-op-amp instrumentation amplifier amplifies only the difference of its inputs, with gain set by one resistor:"]
   - 式: "G = 1 + 2R/R_g，R = 24.7 kΩ          (39.2.5)"
   - ["增益要使满量程输出接近而不超过模数转换器的参考电压（本实验为 2.5 V）。", "The gain should bring full scale close to, but not above, the ADC reference (2.5 V here)."]

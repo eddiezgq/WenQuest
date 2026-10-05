@@ -5,7 +5,7 @@
   - ["扫描：在关节限位内随机抽取关节变量，算出末端位置，样本点组成可达工作空间的近似。", "Sampling: draw random joint values within the limits; the end-effector positions approximate the reachable workspace."]
   - ["UR5e 的灵巧性检查：法兰绕自身法线的转动由关节 6 完成，所以只需检查 100 个法兰法线方向。对每个方向用解析逆运动学判断有没有解；100 个都有解即在灵巧工作空间内。",
      "Dexterity check on the UR5e: turning about the flange normal is done by joint 6, so 100 normal directions suffice. Each is tested with the analytic inverse kinematics; all 100 solvable means dexterous."]
-  - 式: "体积 V = Σ 2πρ Δρ Δz（关节 1 可整周转动，工作空间绕基座轴线对称）"
+  - 式: ["体积 V = Σ 2πρ Δρ Δz（关节 1 可整周转动，工作空间绕基座轴线对称）", "Volume V = Σ 2πρ Δρ Δz (joint 1 turns through a full revolution, so the workspace is symmetric about the base axis)"]
   - ["SCARA 的水平内径由关节 2 的限位决定：r_min = √(L₁² + L₂² + 2L₁L₂ cos θ₂max)。", "The SCARA's inner radius is set by joint 2's limit: r_min = √(L₁² + L₂² + 2L₁L₂ cos θ₂max)."]
 步骤:
   - ["场景“UR5e”：按“扫描工作空间”（任务 1），旋转视角观察点云的形状，注意基座轴线附近和手臂正上方的情况。", "Scene “UR5e”: press “Sample the workspace” (task 1), rotate the view and look at the cloud, especially near the base axis."]

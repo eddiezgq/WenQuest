@@ -4,7 +4,7 @@
      "A twist V = (ω, v) fixes the whole velocity field: a point x of the body (or rigidly attached to it) moves at v + ω × x, where v is the velocity of the body point now at the origin (Eq. (6.3.2))."]
   - ["ω ≠ 0 时，存在一根直线，其上各点的速度都与 ω 平行，这就是瞬时螺旋轴；它过点 q = ω × v / |ω|²，节距 h = ω · v / |ω|²（式 (6.3.11)、(6.3.12)）。",
      "If ω ≠ 0 there is a line on which every velocity is parallel to ω, the instantaneous screw axis, through q = ω × v / |ω|², with pitch h = ω · v / |ω|² (Eqs. (6.3.11), (6.3.12))."]
-  - 式: "平面情形：ω = ω ẑ，v = (v_x, v_y, 0)，h = 0，q = (−v_y/ω, v_x/ω)"
+  - 式: ["平面情形：ω = ω ẑ，v = (v_x, v_y, 0)，h = 0，q = (−v_y/ω, v_x/ω)", "Planar case: ω = ω ẑ, v = (v_x, v_y, 0), h = 0, q = (−v_y/ω, v_x/ω)"]
   - ["平面运动中节距总为零，瞬时螺旋轴垂直于平面，它与平面的交点就是速度为零的瞬心。ω = 0 时是纯平移，瞬心在无穷远。",
      "In planar motion the pitch is always zero; the axis is normal to the plane and meets it at the instantaneous centre, where the velocity vanishes. With ω = 0 the motion is a pure translation and the centre is at infinity."]
 步骤:

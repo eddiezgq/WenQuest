@@ -5,7 +5,7 @@
   - 式: "(P_a)_ij = r_ik r_jl (P_b)_kl          (3.5.3)"
   - ["固定 i、j 以后，右边对 k、l 求和，共九项。表面坐标系中 P_b = diag(1, 1, 0)，只有 k = l = 1、2 的项可能不为零。表面绕 x 轴倾斜 θ 时，r_ij 是方向余弦矩阵 Rot(x, θ) 的元素。",
      "With i, j fixed, the right-hand side sums nine terms over k and l. In the surface frame P_b = diag(1, 1, 0), so only the terms k = l = 1, 2 can be non-zero. For a surface tilted by θ about x, r_ij are the entries of Rot(x, θ)."]
-  - 式: "总价 = p_i q_i = p₁q₁ + p₂q₂ + p₃q₃"
+  - 式: ["总价 = p_i q_i = p₁q₁ + p₂q₂ + p₃q₃", "Total = p_i q_i = p₁q₁ + p₂q₂ + p₃q₃"]
 步骤:
   - ["打开实验 3.5，选择场景“投影张量的分量”。取 θ = 20°，依次选择 (i, j) = (1, 1)、(2, 2)、(2, 3)、(3, 3)，记录不为零的项和它们的和，填入表 1。",
      "Open Lab 3.5, scene “Components of the projection tensor”. With θ = 20°, choose (i, j) = (1, 1), (2, 2), (2, 3), (3, 3) in turn and record the non-zero terms and their sum in Table 1."]

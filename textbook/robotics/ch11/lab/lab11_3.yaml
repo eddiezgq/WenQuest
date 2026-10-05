@@ -2,7 +2,7 @@
 原理:
   - ["构型空间是机器人所有可能构型的集合，维数等于自由度。转动关节的变量是角度，θ 与 θ + 360° 是同一个构型，所以平面 2R 臂的构型空间是环面 T²：关节角正方形的左右两边、上下两边分别粘合。",
      "The C-space is the set of all configurations; its dimension is the number of DOF. A revolute joint's variable is an angle, θ and θ + 360° being the same, so a planar 2R arm's C-space is the torus T²: the square's opposite edges are glued."]
-  - 式: "Δθ = wrap(θ_b − θ_a)，wrap 把角度化到 [−180°, 180°)          (11.3.1)"
+  - 式: ["Δθ = wrap(θ_b − θ_a)，wrap 把角度化到 [−180°, 180°)          (11.3.1)", "Δθ = wrap(θ_b − θ_a), where wrap maps the angle into [−180°, 180°)          (11.3.1)"]
   - ["构型空间障碍物：使机器人与障碍物相交的全部构型。在构型空间中，机器人是一个点，无碰撞的运动是一条不进入障碍物区域的曲线。",
      "C-obstacle: all configurations in which the robot meets an obstacle. In C-space the robot is a point and a collision-free motion is a curve that avoids those regions."]
   - ["正运动学不是一一对应的：平面 2R 臂到达同一点一般有肘上、肘下两组关节角。", "Forward kinematics is not one-to-one: a planar 2R arm generally reaches a point with elbow up and elbow down."]

@@ -4,7 +4,7 @@
      "The degrees of freedom are the fewest independent variables that fix the position of a body or mechanism. A rigid body has 3 in the plane and 6 in space (Theorem 1.4.1)."]
   - ["基座固定的开链机构，自由度等于各关节自由度之和；基座本身自由运动时，再加上基座的 3 或 6 个（定理 1.4.2）。",
      "For a fixed-base open chain the DOF equal the sum of the joints' DOF; a base that moves freely adds 3 or 6 (Theorem 1.4.2)."]
-  - 式: "m = f₁ + f₂ + ⋯ + fₙ  （+ 3 或 6）          (1.4.3)"
+  - 式: ["m = f₁ + f₂ + ⋯ + fₙ  （+ 3 或 6）          (1.4.3)", "m = f₁ + f₂ + ⋯ + fₙ  (+ 3 or 6)          (1.4.3)"]
   - ["执行器少于自由度的机器人称为欠驱动机器人，如 AGV（5 个自由度、2 台电机）、Go2（18 个、12 台）、四旋翼（6 个、4 个推力）。",
      "A robot with fewer actuators than DOF is underactuated: the AGV (5 DOF, 2 motors), Go2 (18, 12), the quadrotor (6, 4 thrusts)."]
   - ["差速驱动的车速与角速度由两轮转速决定：", "For differential drive the speed and turning rate follow from the two wheel speeds:"]

@@ -3,7 +3,7 @@
   - ["采样定理：要由采样值完整地恢复信号，采样频率必须高于信号最高频率的两倍。", "Sampling theorem: to recover a signal from its samples, sample faster than twice its highest frequency."]
   - 式: "f_s > 2 f_max          (39.3.4)"
   - ["高于奈奎斯特频率 f_s/2 的成分采样后表现为较低的表观频率：", "Components above the Nyquist frequency f_s/2 appear at a lower apparent frequency:"]
-  - 式: "f_a = |f − k f_s|，k 取使 f_a ≤ f_s/2 的整数          (39.3.5)"
+  - 式: ["f_a = |f − k f_s|，k 取使 f_a ≤ f_s/2 的整数          (39.3.5)", "f_a = |f − k f_s|, k being the integer that makes f_a ≤ f_s/2          (39.3.5)"]
 步骤:
   - ["打开实验 39.3，场景“电机振动”。设 f_s = 1000 Hz、f = 950 Hz，按“开始”观察，读出表观频率（任务 1），与式 (39.3.5) 比较。", "Open Lab 39.3, scene “Motor vibration”. Set f_s = 1000 Hz, f = 950 Hz, press Start, read the apparent frequency (task 1) and check Eq. (39.3.5)."]
   - ["保持 f = 950 Hz，逐步提高 f_s，找出不再混叠的最低采样频率（任务 2），填入表 2。", "Keep f = 950 Hz and raise f_s to the lowest rate with no aliasing (task 2); record in Table 2."]

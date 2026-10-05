@@ -20,6 +20,13 @@ GATEWAY = ROOT / "services" / "gateway"
 REQUIRED = ("原理", "步骤", "数据表", "注意")
 
 
+def _eq(f, i: int) -> str:
+    """A formula line: one string for both languages, or [中文, English] when it carries words."""
+    if isinstance(f, list):
+        return f[i]
+    return f.replace(")、(", "), (") if i else f      # equation numbers "(8.5.2)、(8.5.4)" in the English guide
+
+
 def _pair(x) -> bool:
     return isinstance(x, list) and len(x) == 2 and all(isinstance(s, str) and s.strip() for s in x)
 
@@ -46,8 +53,8 @@ def load(path: Path) -> tuple[dict | None, list[str]]:
         return None, [f"{path.name} 格式错误：{str(e).splitlines()[0]}"]
     bad = [f"{path.name} 缺少“{k}”" for k in REQUIRED if not g.get(k)]
     for x in g.get("原理") or []:
-        if not (_pair(x) or (isinstance(x, dict) and isinstance(x.get("式"), str))):
-            bad.append(f"{path.name}“原理”中每项应为 [中文, English] 或 式: 公式")
+        if not (_pair(x) or (isinstance(x, dict) and (isinstance(x.get("式"), str) or _pair(x.get("式"))))):
+            bad.append(f"{path.name}“原理”中每项应为 [中文, English] 或 式: 公式（含中文时写成 [中文, English]）")
     for key in ("步骤", "注意", "思考题"):
         for x in g.get(key) or []:
             if not _pair(x):
@@ -95,7 +102,7 @@ def guide(m: dict, g: dict, out: Path, no: str, where: tuple[str, str]) -> Path:
     d.bh("二、实验原理", "2  Principles")
     for x in g["原理"]:
         if isinstance(x, dict):
-            d.eq(x["式"])
+            d.eq(_eq(x["式"], 0))
         else:
             d.bp(x[0], x[1])
     gpu = m.get("gpu")
@@ -232,6 +239,12 @@ def english_problems(g: dict) -> list[str]:
     return bad
 
 
+def english_warnings(g: dict) -> list[str]:
+    """Formula lines that would show Chinese in the English guide: a 式 with words should be [中文, English]."""
+    return [f"“原理”的公式行有中文：写成 式: [中文, English]（{x['式'].strip()[:40]}）"
+            for x in g.get("原理") or [] if isinstance(x, dict) and isinstance(x.get("式"), str) and _CJK.search(x["式"])]
+
+
 def _en_tab(d, t: dict) -> None:
     d.p(t["标题"][1], indent=False)
     head, rows = _en_table(t)
@@ -254,7 +267,7 @@ def guide_en(m: dict, g: dict, out: Path, no: str, where: str) -> Path:
     d.h("2  Principles")
     for x in g["原理"]:
         if isinstance(x, dict):
-            d.eq(x["式"])
+            d.eq(_eq(x["式"], 1))
         else:
             d.p(x[1])
     d.h("3  The virtual lab")

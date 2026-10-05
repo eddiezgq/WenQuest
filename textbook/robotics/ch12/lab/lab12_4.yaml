@@ -2,7 +2,7 @@
 原理:
   - ["指数积 e^[S₁]θ₁ e^[S₂]θ₂ e^[S₃]θ₃ M 有两种正确的读法。从右往左（从外往里）：先转关节 3，各轴都在零位时的位置。从左往右（从里往外）：先转关节 1，然后把外侧各关节的轴搬到新位置，再转关节 2，依此类推。",
      "The product e^[S₁]θ₁ e^[S₂]θ₂ e^[S₃]θ₃ M has two correct readings. Right to left (outside-in): joint 3 first, every axis where it was at the zero position. Left to right (inside-out): joint 1 first, then move the outer axes to their new places, then joint 2, and so on."]
-  - 式: "e^[S₁]θ₁ e^[S₂]θ₂ = e^[S₂′]θ₂ e^[S₁]θ₁，  S₂′ = [Ad_E₁] S₂          （定理 12.4.1）"
+  - 式: ["e^[S₁]θ₁ e^[S₂]θ₂ = e^[S₂′]θ₂ e^[S₁]θ₁，  S₂′ = [Ad_E₁] S₂          （定理 12.4.1）", "e^[S₁]θ₁ e^[S₂]θ₂ = e^[S₂′]θ₂ e^[S₁]θ₁,  S₂′ = [Ad_E₁] S₂          (Theorem 12.4.1)"]
   - ["写反次序 e^[S₃]θ₃ e^[S₂]θ₂ e^[S₁]θ₁ M 是错误的：先绕 q₁ 转动以后，关节 2 已经不在零位处，再绕零位的 q₂ 转，就是绕空中的一点转。算出的末端可能落到工作空间（半径 L₁ + L₂ + L₃ = 0.917 m 的圆）以外。",
      "The reversed product e^[S₃]θ₃ e^[S₂]θ₂ e^[S₁]θ₁ M is wrong: after turning about q₁, joint 2 is no longer where it was at the zero position, so turning about the zero-position q₂ pivots about empty space. The computed tip may land outside the workspace (radius L₁ + L₂ + L₃ = 0.917 m)."]
 步骤:

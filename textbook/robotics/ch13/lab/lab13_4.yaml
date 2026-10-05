@@ -2,8 +2,8 @@
 原理:
   - ["DH 连乘：标准 DH 按式 (13.1.5)、改进 DH 按式 (13.1.8) 逐个连杆相乘。指数积：T = e^[S₁]θ₁ ⋯ e^[Sₙ]θₙ M。两种方法描述的是同一台机器人时，结果必须相同。",
      "DH product: multiply link by link with Eq. (13.1.5) (standard) or (13.1.8) (modified). PoE: T = e^[S₁]θ₁ ⋯ e^[Sₙ]θₙ M. For the same robot the two must agree."]
-  - 式: "标准 DH → 指数积 / standard DH → PoE:  Sᵢ = [Ad T₀,ᵢ₋₁(0)] (0, 0, 1, 0, 0, 0),  M = T₀ₙ(0)          (13.4.2)"
-  - 式: "改进 DH → 指数积 / modified DH → PoE:  Sᵢ = [Ad T₀ᵢ(0)] (0, 0, 1, 0, 0, 0)          (13.4.4)"
+  - 式: ["标准 DH → 指数积:  Sᵢ = [Ad T₀,ᵢ₋₁(0)] (0, 0, 1, 0, 0, 0),  M = T₀ₙ(0)          (13.4.2)", "standard DH → PoE:  Sᵢ = [Ad T₀,ᵢ₋₁(0)] (0, 0, 1, 0, 0, 0),  M = T₀ₙ(0)          (13.4.2)"]
+  - 式: ["改进 DH → 指数积:  Sᵢ = [Ad T₀ᵢ(0)] (0, 0, 1, 0, 0, 0)          (13.4.4)", "modified DH → PoE:  Sᵢ = [Ad T₀ᵢ(0)] (0, 0, 1, 0, 0, 0)          (13.4.4)"]
   - ["参数不同时，方法再一致结果也不同：UR5e 的厂商表与零件库尺寸的长度参数相差零点几毫米，由定理 13.3.1，末端相差 Σ(Δdᵢ z₍ᵢ₋₁₎ + Δaᵢ xᵢ)，不超过各项绝对值之和 2.1 mm。",
      "With different parameters the results differ no matter how consistent the methods are: the UR5e manufacturer's lengths differ from the library model by up to about 0.7 mm; by Theorem 13.3.1 the end-effector moves by Σ(Δdᵢ z₍ᵢ₋₁₎ + Δaᵢ xᵢ), at most the sum of magnitudes, 2.1 mm."]
 步骤:

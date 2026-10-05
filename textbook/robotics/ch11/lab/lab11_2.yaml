@@ -1,7 +1,7 @@
 # 实验 11.2 的指导书与报告模板。目的、场景、参数、任务取自 lab11_2.js。
 原理:
   - ["格吕布勒公式：N 个构件（含机架）、J 个关节、第 i 个关节自由度为 fᵢ 的机构，若约束彼此独立，自由度为", "Grübler's formula: for N links (ground included) and J joints with fᵢ degrees of freedom, if the constraints are independent,"]
-  - 式: "M = m(N − 1 − J) + Σ fᵢ ，平面 m = 3，空间 m = 6          (11.2.2)"
+  - 式: ["M = m(N − 1 − J) + Σ fᵢ ，平面 m = 3，空间 m = 6          (11.2.2)", "M = m(N − 1 − J) + Σ fᵢ , planar m = 3, spatial m = 6          (11.2.2)"]
   - ["按秩计算：把各运动构件的运动旋量和各关节速度当作未知数，每个关节给出“两侧构件运动旋量之差 = 关节允许的运动旋量”的方程，瞬时自由度 = 未知数个数 − 系数矩阵的秩。单回路时化为", "By rank: take the twists of the moving links and the joint rates as unknowns; each joint says the difference of the twists equals an allowed joint twist. Instantaneous mobility = unknowns − rank. For one loop this is"]
   - 式: "M_inst = n − rank(𝒮₁ ⋯ 𝒮ₙ) ≥ M          (11.2.6)"
   - ["两者不同，说明有重复的约束：过约束机构（如平行四边形加一根等长平行的曲柄），或机构处在奇异位置（如平行四边形机构的共线位置）。", "A difference means repeated constraints: an overconstrained mechanism (a parallelogram with an equal parallel extra crank) or a singular position (the collinear position of a parallelogram)."]

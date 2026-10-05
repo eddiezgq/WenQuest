@@ -2,7 +2,7 @@
 原理:
   - ["自然坐标沿轨迹本身的切线 e_t、主法线 e_n 分解运动。速度只有切向分量 v = ṡ e_t；加速度 a = s̈ e_t + κ ṡ² e_n，切向部分改变速率，法向部分改变方向（定理 10.5.1）。",
      "Natural coordinates use the tangent e_t and principal normal e_n of the path. The velocity is v = ṡ e_t; the acceleration is a = s̈ e_t + κ ṡ² e_n: the tangential part changes the speed, the normal part the direction (Theorem 10.5.1)."]
-  - 式: "a_t = s̈，  a_n = κ v²，  |a| = √(a_t² + a_n²)；  圆：κ = 1/R          (10.5.6)"
+  - 式: ["a_t = s̈，  a_n = κ v²，  |a| = √(a_t² + a_n²)；  圆：κ = 1/R          (10.5.6)", "a_t = s̈,  a_n = κ v²,  |a| = √(a_t² + a_n²);  circle: κ = 1/R          (10.5.6)"]
   - ["椭圆 x = a cos u、y = b sin u 的曲率 κ = ab / (a² sin²u + b² cos²u)^{3/2}，在长轴端点最大（a/b²），在短轴端点最小（b/a²）（式 (10.5.10)）。匀速运动时最大加速度出现在曲率最大处。",
      "The ellipse x = a cos u, y = b sin u has curvature κ = ab / (a² sin²u + b² cos²u)^{3/2}, largest at the ends of the major axis (a/b²) and smallest at the ends of the minor axis (b/a²) (Eq. (10.5.10)). At constant speed the largest acceleration is where the curvature is largest."]
 步骤:

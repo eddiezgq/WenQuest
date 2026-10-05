@@ -2,11 +2,11 @@
 原理:
   - ["闭链的关节变量之间有闭环方程，它们是完整约束：把构型空间削成低维的曲面。Delta 有 39 个关节变量，只有 3 个自由度。",
      "The joint variables of a closed chain obey loop-closure equations, which are holonomic constraints that cut the C-space down. The Delta has 39 joint variables but only 3 degrees of freedom."]
-  - 式: "Delta 第 k 条支链：|p + Rp e_k − E_k(θ_k)| = Lb，E_k = Rb e_k + La (cos θ_k e_k − sin θ_k z)"
+  - 式: ["Delta 第 k 条支链：|p + Rp e_k − E_k(θ_k)| = Lb，E_k = Rb e_k + La (cos θ_k e_k − sin θ_k z)", "Delta, leg k: |p + Rp e_k − E_k(θ_k)| = Lb, E_k = Rb e_k + La (cos θ_k e_k − sin θ_k z)"]
   - ["逆运动学：给定平台中心 p，每条支链单独解 A cos θ + B sin θ = C，θ = atan2(B, A) ± arccos(C / √(A² + B²))；|C| > √(A² + B²) 时这条支链够不着。",
      "Inverse kinematics: for a given platform centre p each leg solves A cos θ + B sin θ = C alone, θ = atan2(B, A) ± arccos(C / √(A² + B²)); if |C| > √(A² + B²) the leg cannot reach."]
   - ["正运动学：给定三个转角，平台中心是三个半径为 Lb 的球面的交点，一般有两个，取下方的一个。", "Forward kinematics: for given angles the platform centre is where three spheres of radius Lb meet; of the two points the lower one is taken."]
-  - 式: "差速 AGV：ẋ cos φ + ẏ sin φ = r(θ̇R + θ̇L)/2，ẋ sin φ − ẏ cos φ = 0，φ̇ = r(θ̇R − θ̇L)/b"
+  - 式: ["差速 AGV：ẋ cos φ + ẏ sin φ = r(θ̇R + θ̇L)/2，ẋ sin φ − ẏ cos φ = 0，φ̇ = r(θ̇R − θ̇L)/b", "Differential-drive AGV: ẋ cos φ + ẏ sin φ = r(θ̇R + θ̇L)/2, ẋ sin φ − ẏ cos φ = 0, φ̇ = r(θ̇R − θ̇L)/b"]
   - ["第三个约束可积：φ − r(θR − θL)/b = 常数；另两个不可积（非完整约束），车的位置不由轮转角决定，要由轮速的全部历史积分得到。",
      "The third constraint integrates to φ − r(θR − θL)/b = const; the other two do not (nonholonomic), so the position is not fixed by the wheel angles and must be integrated from the whole history of wheel speeds."]
 步骤:

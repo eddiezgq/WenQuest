@@ -2,8 +2,8 @@
 原理:
   - ["UR5e 法兰盘中心的位置由表 12.1.1 的旋量轴按指数积公式算出。手腕关节固定，求关节 1～3，使残差 r(θ) = p(θ) − p_d 为零：这是非线性最小二乘问题 min ½‖r(θ)‖²。",
      "The UR5e flange position follows from the screw axes of Table 12.1.1 by the product of exponentials. With the wrist fixed, find joints 1–3 so that r(θ) = p(θ) − p_d vanishes: the nonlinear least-squares problem min ½‖r(θ)‖²."]
-  - 式: "梯度 ∇F = Jᵀr；高斯-牛顿：JᵀJ Δ = −Jᵀr          (8.5.2)、(8.5.4)"
-  - 式: "LM：(JᵀJ + μI) Δ = −Jᵀr，阻尼系数 μ 由增益比 ρ 调整          (8.5.5)、(8.5.9)"
+  - 式: ["梯度 ∇F = Jᵀr；高斯-牛顿：JᵀJ Δ = −Jᵀr          (8.5.2)、(8.5.4)", "Gradient ∇F = Jᵀr; Gauss–Newton: JᵀJ Δ = −Jᵀr          (8.5.2), (8.5.4)"]
+  - 式: ["LM：(JᵀJ + μI) Δ = −Jᵀr，阻尼系数 μ 由增益比 ρ 调整          (8.5.5)、(8.5.9)", "LM: (JᵀJ + μI) Δ = −Jᵀr, damping parameter μ adjusted by the gain ratio ρ          (8.5.5), (8.5.9)"]
   - ["梯度下降只用一阶信息，线性收敛；牛顿法用完整的黑塞矩阵，二次收敛但要二阶导数；高斯-牛顿法用 JᵀJ 代替黑塞矩阵，零残差问题中几乎与牛顿法一样快；LM 法加阻尼，在 J 接近奇异时仍然稳健。",
      "Gradient descent uses first-order information and converges linearly; Newton uses the full Hessian and converges quadratically but needs second derivatives; Gauss–Newton replaces the Hessian by JᵀJ and is almost as fast on zero-residual problems; LM adds damping and stays robust when J is nearly singular."]
   - ["室内定位：残差为 ‖x − aᵢ‖ − ρᵢ，雅可比矩阵的第 i 行是从基站 i 指向 x 的单位向量。四个方程、三个未知数，解处残差不为零，高斯-牛顿法线性收敛。",

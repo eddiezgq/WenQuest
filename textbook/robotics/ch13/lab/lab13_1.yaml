@@ -2,8 +2,8 @@
 原理:
   - ["两条关节轴之间的相对位置由公垂线确定：公垂线的长度 a 和两轴的夹角 α 属于连杆，沿轴的距离 d 和转角 θ 属于关节。一个连杆加一个关节，正好四个数。",
      "The relative position of two joint axes is fixed by their common normal: its length a and the twist α belong to the link; the offset d along the axis and the angle θ about it belong to the joint. One link plus one joint: four numbers."]
-  - 式: "标准 DH / standard DH:  T(i−1,i) = Rot(z, θᵢ) Trans(z, dᵢ) Trans(x, aᵢ) Rot(x, αᵢ)          (13.1.4)"
-  - 式: "改进 DH / modified DH:  T(i−1,i) = Rot(x, αᵢ₋₁) Trans(x, aᵢ₋₁) Rot(z, θᵢ) Trans(z, dᵢ)          (13.1.7)"
+  - 式: ["标准 DH:  T(i−1,i) = Rot(z, θᵢ) Trans(z, dᵢ) Trans(x, aᵢ) Rot(x, αᵢ)          (13.1.4)", "standard DH:  T(i−1,i) = Rot(z, θᵢ) Trans(z, dᵢ) Trans(x, aᵢ) Rot(x, αᵢ)          (13.1.4)"]
+  - 式: ["改进 DH:  T(i−1,i) = Rot(x, αᵢ₋₁) Trans(x, aᵢ₋₁) Rot(z, θᵢ) Trans(z, dᵢ)          (13.1.7)", "modified DH:  T(i−1,i) = Rot(x, αᵢ₋₁) Trans(x, aᵢ₋₁) Rot(z, θᵢ) Trans(z, dᵢ)          (13.1.7)"]
   - ["标准 DH 把 {i} 放在关节 i+1 的轴上，改进 DH（Craig）放在关节 i 的轴上。同一台机器人的 a、α 数值相同，在改进 DH 的表中下移一行；整条链满足 T^S = T^M X_n（定理 13.1.2）。",
      "Standard DH puts {i} on the axis of joint i+1, modified DH (Craig) on the axis of joint i. For one robot the a and α values are the same but sit one row lower in the modified table; the whole chain obeys T^S = T^M X_n (Theorem 13.1.2)."]
   - ["平面 3R 臂：L₁ = 0.425 m，L₂ = 0.392 m，L₃ = 0.1 m。几何解法：末端 = 三段连杆矢量之和，每段的方向角为它以内各关节角之和。",

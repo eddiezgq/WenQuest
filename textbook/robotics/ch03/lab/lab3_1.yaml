@@ -5,7 +5,7 @@
   - 式: "d₁ = |d| cos α₁,   d₂ = |d| cos α₂,   d₃ = |d| cos α₃          (3.1.5)"
   - ["分量是箭头在坐标轴上的投影。坐标系 {b} 相对 {a} 绕 z 轴转过 β 时，箭头与 x_b 轴的夹角是 φ − β（φ 为箭头与 x_a 轴的夹角），所以 d 在 {b} 中的分量为 (|d| cos(φ − β), |d| sin(φ − β))。",
      "Components are projections of the arrow on the axes. If frame {b} is turned by β about z from {a}, the arrow makes the angle φ − β with x_b (φ is its angle to x_a), so its components in {b} are (|d| cos(φ − β), |d| sin(φ − β))."]
-  - 式: "|d| = √(d₁² + d₂² + d₃²)，在任何直角坐标系中算出的值都相同          (3.1.4)"
+  - 式: ["|d| = √(d₁² + d₂² + d₃²)，在任何直角坐标系中算出的值都相同          (3.1.4)", "|d| = √(d₁² + d₂² + d₃²), the same value in every Cartesian coordinate system          (3.1.4)"]
 步骤:
   - ["打开实验 3.1，选择场景“相机与机械臂”。保持 |d| = 0.36 m、φ = 34°，把 β 调到 0°，记下两套分量，确认它们相同。",
      "Open Lab 3.1, scene “Camera and arm”. Keep |d| = 0.36 m and φ = 34°, set β = 0°, record both sets of components and confirm they agree."]

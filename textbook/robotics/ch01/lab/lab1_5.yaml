@@ -3,7 +3,7 @@
   - ["数字工厂车间的布置、设备上下料点和 AGV 路线规则与工厂仿真相同：AGV 从起点的上下料点驶入最近的主通道，沿通道走到终点所在位置，必要时经左侧纵向通道换道，再驶入终点的上下料点。",
      "The workshop layout, the machines' docking points and the AGV routing rule are those of the factory simulation: from the start dock into the nearest main aisle, along it (changing aisles via the left cross aisle if needed), then into the goal dock."]
   - ["一次搬运的时间等于行驶时间加装、卸各一次：", "One move takes the driving time plus one loading and one unloading:"]
-  - 式: "t = L / v + 2 t_装卸          (1.5.1)"
+  - 式: ["t = L / v + 2 t_装卸          (1.5.1)", "t = L / v + 2 t_load          (1.5.1)"]
   - ["输出轴 SH-301 的七道工序在七台不同的设备上完成，最后送入成品库，共搬运七次（表 1.5.1）。", "The seven operations of output shaft SH-301 are on seven machines, then it goes to the finished store: seven moves (Table 1.5.1)."]
   - ["实验中仿真时钟比真实时间快：单次行驶快 40 倍，“SH-301 全程”快 80 倍；界面显示的时间是仿真时间。", "The simulated clock runs faster than real time: 40 times for one move, 80 times for the whole SH-301 route; the times shown are simulated."]
 步骤:

@@ -2,7 +2,7 @@
 原理:
   - ["扭簧手臂的末端被固定在 p_d，手臂停在扭簧势能最小的形态：min ½(θ − θ_c)ᵀK(θ − θ_c)，约束 p(θ) = p_d。这是一个等式约束优化问题。",
      "With the end-effector held at p_d, the spring arm settles in the configuration of least spring energy: min ½(θ − θ_c)ᵀK(θ − θ_c) subject to p(θ) = p_d, an equality-constrained problem."]
-  - 式: "拉格朗日条件：K(θ − θ_c) + J(θ)ᵀλ = 0，p(θ) − p_d = 0          (8.2.5)"
+  - 式: ["拉格朗日条件：K(θ − θ_c) + J(θ)ᵀλ = 0，p(θ) − p_d = 0          (8.2.5)", "Lagrange conditions: K(θ − θ_c) + J(θ)ᵀλ = 0, p(θ) − p_d = 0          (8.2.5)"]
   - ["拉格朗日-牛顿法用牛顿法解上面的方程组，每一步解一个 5×5 的线性方程组（式 (8.2.10)），在解附近二次收敛。",
      "The Lagrange–Newton method solves these equations by Newton's method, one 5×5 linear system per step (Eq. (8.2.10)); it converges quadratically near the solution."]
   - ["乘子是最优值对约束的变化率：把 p_d 挪动 δ，势能增加约 −λᵀδ。手做的功 Fᵀδ 全部变成势能，所以手的力 F = −λ，且扭簧力矩 τ = −K(θ − θ_c) 满足 τ + JᵀF = 0（式 (8.2.13)）。",

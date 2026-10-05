@@ -1117,6 +1117,8 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 labdocs.report(m, g, lab_dir / f"{stem}-report.docx", no, where)
         for sec in by_ch_en.get(ch, []):      # the English edition's lab documents (English only)
             for no, script, g in sec.labdocs:
+                for why in labdocs.english_warnings(g):
+                    rep.add("warning", "实验", sec.id + "（英文版）", f"Lab {no}：{why}")
                 bad = labdocs.english_problems(g)
                 for why in bad:
                     rep.add("error", "实验", sec.id + "（英文版）", f"Lab {no}：{why}")
