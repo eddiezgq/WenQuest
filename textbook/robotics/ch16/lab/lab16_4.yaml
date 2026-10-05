@@ -1,0 +1,36 @@
+# 实验 16.4 的指导书与报告模板。目的、场景、参数、任务取自 lab16_4.js。
+原理:
+  - ["单位关节速度球 ‖θ̇‖ ≤ 1 在雅可比矩阵下的像是一个椭球，半轴为 σ_i u_i（σ_i 为奇异值，u_i 为左奇异矢量）。可操作度是各半轴之积，条件数是最长与最短半轴之比。",
+     "The unit ball of joint velocities ‖θ̇‖ ≤ 1 is mapped by the Jacobian onto an ellipsoid with semi-axes σ_i u_i (σ_i the singular values, u_i the left singular vectors). The manipulability is the product of the semi-axes, the condition number the ratio of the longest to the shortest."]
+  - 式: "E = {ξ : ξᵀ (J Jᵀ)⁻¹ ξ ≤ 1}，w = σ₁σ₂⋯σ_m = √det(J Jᵀ)          (16.4.1)、(16.4.2)"
+  - ["线速度与角速度单位不同，要分开求椭球：J_v 是几何雅可比的后三行（法兰盘中心的速度），J_ω 是前三行。",
+     "Linear and angular velocities have different units, so their ellipsoids are found separately: J_v is the last three rows of the geometric Jacobian (velocity of the flange centre), J_ω the first three."]
+  - 式: ["姿态保持不变：E_h = {ṗ : ‖G ṗ‖ ≤ 1}，G 为 J_g⁻¹ 的后三列          (16.4.6)", "Orientation held: E_h = {ṗ : ‖G ṗ‖ ≤ 1}, G the last three columns of J_g⁻¹          (16.4.6)"]
+步骤:
+  - ["打开实验 16.4，场景“UR5e 的可操作度椭球”。ρ = 0.665 m、z = 0.235 m（θ*），椭球依次选 0、1、2，把三个半轴、可操作度和条件数填入表 1（任务 1）。",
+     "Open Lab 16.4, scene “Manipulability ellipsoids of the UR5e”. With ρ = 0.665 m and z = 0.235 m (θ*), choose ellipsoid 0, 1 and 2 in turn and enter the three semi-axes, the manipulability and the condition number in Table 1 (task 1)."]
+  - ["椭球选 0，z = 0.235 m，把 ρ 从 0.20 m 每次增加 0.05 m 到 0.90 m，记录可操作度、最短半轴、条件数和 θ₃，填入表 2；找出可操作度最大和条件数最小的 ρ（任务 2、4）。",
+     "Choose ellipsoid 0 and z = 0.235 m; increase ρ from 0.20 m to 0.90 m in steps of 0.05 m and record the manipulability, the shortest semi-axis, the condition number and θ₃ in Table 2; find the ρ of largest manipulability and of smallest condition number (tasks 2 and 4)."]
+  - ["把 ρ 调到 0.90 m，比较椭球 0 和椭球 1 的形状（任务 3）。", "Set ρ to 0.90 m and compare the shapes of ellipsoids 0 and 1 (task 3)."]
+  - ["切换到“人的手臂在书桌上”，把肘部角度从 30° 每次增加 30° 到 150°，记录椭圆的两个半轴和可操作度，填入表 3；找出可操作度最大的角度（任务 5）。",
+     "Switch to “A human arm at a desk”, set the elbow angle from 30° to 150° in steps of 30°, record the two semi-axes and the manipulability in Table 3, and find the angle of largest manipulability (task 5)."]
+数据表:
+  - 标题: ["表 1  UR5e 在 θ* 处的三种椭球", "Table 1  The three ellipsoids of the UR5e at θ*"]
+    表头: ["椭球", "三个半轴", "可操作度 w", "条件数 κ"]
+    表头英文: ["Ellipsoid", "Three semi-axes", "Manipulability w", "Condition number κ"]
+    行: [["0 姿态保持", "", "", ""], ["1 J_v（姿态可变）", "", "", ""], ["2 角速度", "", "", ""]]
+    行英文: [["0 orientation held", "", "", ""], ["1 J_v (orientation free)", "", "", ""], ["2 angular", "", "", ""]]
+  - 标题: ["表 2  姿态保持的线速度椭球随 ρ 的变化（z = 0.235 m）", "Table 2  The orientation-held velocity ellipsoid against ρ (z = 0.235 m)"]
+    表头: ["ρ / m", "可操作度 w / m³", "最短半轴 / m", "条件数 κ", "θ₃ / (°)"]
+    表头英文: ["ρ / m", "Manipulability w / m³", "Shortest semi-axis / m", "Condition number κ", "θ₃ / (°)"]
+    行: [["0.20", "", "", "", ""], ["0.30", "", "", "", ""], ["0.40", "", "", "", ""], ["0.50", "", "", "", ""], ["0.60", "", "", "", ""], ["0.70", "", "", "", ""], ["0.80", "", "", "", ""], ["0.90", "", "", "", ""]]
+  - 标题: ["表 3  人的手臂：手的可操作度椭圆", "Table 3  The human arm: manipulability ellipse of the hand"]
+    表头: ["肘部角度 θ₂ / (°)", "两个半轴 / m", "可操作度 w / m²", "条件数 κ"]
+    表头英文: ["Elbow angle θ₂ / (°)", "Two semi-axes / m", "Manipulability w / m²", "Condition number κ"]
+    行: [["30", "", "", ""], ["60", "", "", ""], ["90", "", "", ""], ["120", "", "", ""], ["150", "", "", ""]]
+注意:
+  - ["线速度椭球的半轴单位是 m（即每 rad/s 关节速度对应的 m/s），角速度椭球的半轴没有单位。", "The semi-axes of a velocity ellipsoid are in m (m/s per rad/s of joint speed); those of the angular-velocity ellipsoid have no unit."]
+  - ["逆解从 θ* 出发连续地求出，始终是同一支解；“够不着”表示这个位置在当前姿态下不可达。", "The inverse kinematics is followed continuously from θ*, so it always stays on the same branch; “out of reach” means the position cannot be reached with this orientation."]
+  - ["椭球按 ‖θ̇‖ ≤ 1 计算，是保守的估计；关节速度上限的长方体能做到的更多一些。", "The ellipsoid is computed for ‖θ̇‖ ≤ 1 and is a conservative estimate; the box of joint-speed limits allows somewhat more."]
+思考题:
+  - ["手臂伸到 ρ = 0.9 m 时，J_v 的椭球为什么不退化？抓取任务应该看哪一个椭球？", "Why does the J_v ellipsoid not degenerate at ρ = 0.9 m? Which ellipsoid should a picking task look at?"]

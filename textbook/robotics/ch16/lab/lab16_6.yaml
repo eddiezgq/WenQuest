@@ -1,0 +1,36 @@
+# 实验 16.6 的指导书与报告模板。目的、场景、参数、任务取自 lab16_6.js。
+原理:
+  - ["局部条件指标 LCI = 1/κ = σ_min/σ_max 介于 0 与 1 之间：1 表示各向同性（速度椭球是球），0 表示奇异。它与长度单位无关（只要椭球的各个方向单位相同）。",
+     "The local conditioning index LCI = 1/κ = σ_min/σ_max lies between 0 and 1: 1 means isotropic (the velocity ellipsoid is a sphere), 0 means singular. It does not depend on the unit of length (as long as all directions of the ellipsoid share a unit)."]
+  - 式: ["平面 2R 臂各向同性的充要条件：L₁ = √2 L₂，θ₂ = ±135°（定理 16.6.1）", "A planar 2R arm is isotropic if and only if L₁ = √2 L₂ and θ₂ = ±135° (Theorem 16.6.1)"]
+  - 式: "GCI = ∫_W (1/κ) dW / ∫_W dW          (16.6.4)"
+  - ["灵巧性地图把每个位置的 LCI 画成颜色，用来挑选工位；GCI 是 LCI 在整个工作空间上的平均，用来比较设计。",
+     "A dexterity map shows the LCI of every place as a colour and is used to choose working places; the GCI averages the LCI over the whole workspace and is used to compare designs."]
+步骤:
+  - ["打开实验 16.6，场景“UR5e 的灵巧性地图”。把法兰盘放在 θ*（ρ = 0.665 m、z = 0.235 m），记录 1/κ、三个半轴和可操作度（任务 1）。",
+     "Open Lab 16.6, scene “Dexterity map of the UR5e”. Put the flange at θ* (ρ = 0.665 m, z = 0.235 m) and record 1/κ, the three semi-axes and the manipulability (task 1)."]
+  - ["在地图上找出最亮的地方，记录它的 ρ、z 和 1/κ，填入表 1（任务 2）。", "Find the brightest place on the map and record its ρ, z and 1/κ in Table 1 (task 2)."]
+  - ["保持 z = 0.235 m，把 ρ 从 0.3 m 每次增加 0.1 m 到 0.9 m，再取 0.905 m，记录 1/κ，填入表 2（任务 3）。",
+     "Keep z = 0.235 m, increase ρ from 0.3 m to 0.9 m in steps of 0.1 m and then take 0.905 m; record 1/κ in Table 2 (task 3)."]
+  - ["切换到“设计 2R 臂”，调节 λ 和 θ₂，找到 κ < 1.01 的组合；再找出 GCI 最大的 λ，填入表 3（任务 4、5）。",
+     "Switch to “Designing a 2R arm”; adjust λ and θ₂ to find a combination with κ < 1.01, then the λ with the largest GCI; fill in Table 3 (tasks 4 and 5)."]
+  - ["切换到“书桌上的灵巧区”，移动零件，找出 1/κ ≥ 0.55 的区域，记录一个位置和那里的肘部弯曲角（任务 6）。",
+     "Switch to “The dexterous area on a desk”, move the part, find the area with 1/κ ≥ 0.55, and record one position and the elbow bend there (task 6)."]
+数据表:
+  - 标题: ["表 1  UR5e 的工位", "Table 1  Working places of the UR5e"]
+    表头: ["位置", "ρ / m", "z / m", "1/κ", "可操作度 w / m³"]
+    表头英文: ["Place", "ρ / m", "z / m", "1/κ", "Manipulability w / m³"]
+    行: [["θ*", "0.665", "0.235", "", ""], ["最灵巧处", "", "", "", ""]]
+    行英文: [["θ*", "0.665", "0.235", "", ""], ["most dexterous", "", "", "", ""]]
+  - 标题: ["表 2  z = 0.235 m 时 1/κ 随 ρ 的变化", "Table 2  1/κ against ρ at z = 0.235 m"]
+    表头: ["ρ / m", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "0.905"]
+    行: [["1/κ", "", "", "", "", "", "", "", ""]]
+  - 标题: ["表 3  2R 臂的设计", "Table 3  Design of the 2R arm"]
+    表头: ["λ", "θ₂ / (°)", "κ", "GCI"]
+    行: [["0.92", "", "", ""], ["", "135", "", ""], ["", "", "", ""]]
+注意:
+  - ["地图上的颜色只到 0.75；手臂伸直或接近肩部奇异（ρ = d₄）处颜色最暗。", "The colour scale stops at 0.75; it is darkest where the arm is straight or near the shoulder singularity (ρ = d₄)."]
+  - ["2R 臂的总长固定为 0.817 m，与 UR5e 的大臂加小臂相同。", "The total length of the 2R arm is fixed at 0.817 m, the same as the UR5e's upper arm and forearm."]
+  - ["书桌场景只考虑上臂和前臂在水平面内的转动，不计手腕和身体的移动。", "The desk scene only turns the upper arm and forearm in a horizontal plane, without the wrist or any movement of the body."]
+思考题:
+  - ["为什么 GCI 最大的长度比恰好也是能做到各向同性的长度比？只是巧合吗？试从 LCI 曲线的形状去解释。", "Why is the length ratio with the largest GCI also the one that can be isotropic? A coincidence? Try to explain it from the shape of the LCI curves."]

@@ -1,0 +1,30 @@
+# 实验 16.3 的指导书与报告模板。目的、场景、参数、任务取自 lab16_3.js。
+原理:
+  - ["雅可比矩阵降秩的形态称为奇异位形。六轴机械臂奇异的充分必要条件是 det J = 0；此时末端失去至少一个运动方向，关节有使末端不动的“自运动”，某些力旋量完全由结构承受。",
+     "A configuration where the Jacobian loses rank is singular. For a six-axis arm the condition is det J = 0; the end-effector then loses at least one direction of motion, the joints have a “self-motion” that leaves the end-effector still, and some wrenches are carried by the structure alone."]
+  - 式: "det J = −L₁L₂ sin θ₃ sin θ₅ · r，r = −L₁ cos θ₂ − L₂ cos(θ₂ + θ₃) + H₂ sin(θ₂ + θ₃ + θ₄)          (16.3.3)、(16.3.4)"
+  - ["三个因子分别对应肘部奇异（大臂与小臂共线）、手腕奇异（轴 6 与轴 2、3、4 平行）和肩部奇异（手腕点落在过基座轴线、垂直于手臂平面的竖直平面内）。",
+     "The three factors correspond to the elbow singularity (upper arm and forearm in line), the wrist singularity (axis 6 parallel to axes 2, 3 and 4) and the shoulder singularity (the wrist point in the vertical plane through the base axis perpendicular to the arm plane)."]
+步骤:
+  - ["打开实验 16.3，场景“UR5e 的奇异位形”。先在 θ* 处记录 det J、最小奇异值和三个因子，填入表 1 第一行。", "Open Lab 16.3, scene “Singular configurations of the UR5e”. Record det J, the smallest singular value and the three factors at θ* in the first row of Table 1."]
+  - ["只把 θ₃ 调到 0°，记录同样的量（任务 1）；恢复 θ₃ = 90°，只把 θ₅ 调到 0°，记录（任务 2）。", "Set only θ₃ to 0° and record the same quantities (task 1); restore θ₃ = 90°, set only θ₅ to 0° and record (task 2)."]
+  - ["恢复 θ*，只调 θ₂，直到 r 的绝对值小于 2 mm，记录此时的 θ₂（任务 3）。", "Return to θ*, adjust θ₂ only until |r| < 2 mm, and record θ₂ (task 3)."]
+  - ["在手腕奇异处按“自运动 2 s”，记录 θ₆ 转过的角度和法兰盘中心的最大位移；再在 θ* 处按一次，比较（任务 4）。填入表 2。",
+     "At the wrist singularity press “Self-motion 2 s” and record how far θ₆ turns and the largest flange-centre displacement; press it once more at θ* and compare (task 4). Fill in Table 2."]
+  - ["切换到“三轴云台的万向节锁”，把俯仰角从 0° 调到 90°，记录行列式，找出万向节锁（任务 5）。", "Switch to “Gimbal lock of a three-axis gimbal”, move the pitch from 0° to 90°, record the determinant and find the gimbal lock (task 5)."]
+数据表:
+  - 标题: ["表 1  四种形态下的雅可比矩阵", "Table 1  The Jacobian in four configurations"]
+    表头: ["形态", "det J / m³", "σ_min", "sin θ₃", "sin θ₅", "r / mm"]
+    表头英文: ["Configuration", "det J / m³", "σ_min", "sin θ₃", "sin θ₅", "r / mm"]
+    行: [["θ*", "", "", "", "", ""], ["θ₃ = 0（肘部）", "", "", "", "", ""], ["θ₅ = 0（手腕）", "", "", "", "", ""], ["θ₂ = ____（肩部）", "", "", "", "", ""]]
+    行英文: [["θ*", "", "", "", "", ""], ["θ₃ = 0 (elbow)", "", "", "", "", ""], ["θ₅ = 0 (wrist)", "", "", "", "", ""], ["θ₂ = ____ (shoulder)", "", "", "", "", ""]]
+  - 标题: ["表 2  自运动", "Table 2  Self-motion"]
+    表头: ["起始形态", "θ₆ 转过 / (°)", "法兰盘最大位移 / mm"]
+    表头英文: ["Starting configuration", "θ₆ turned / (°)", "Largest flange displacement / mm"]
+    行: [["手腕奇异", "", ""], ["θ*", "", ""]]
+    行英文: [["wrist singularity", "", ""], ["θ*", "", ""]]
+注意:
+  - ["行列式的单位是 m³（六列中有三行线速度），它的大小与长度单位有关，判断“接近奇异”时看最小奇异值和三个因子。", "The determinant is in m³ (three of the rows are linear velocities) and its size depends on the unit of length; to judge “near singular” look at the smallest singular value and the three factors."]
+  - ["自运动沿最小奇异值对应的方向进行，并不断把法兰盘拉回起点；不在奇异处时拉不回来，法兰盘会移动。", "The self-motion follows the direction of the smallest singular value and keeps pulling the flange back; away from a singularity it cannot be pulled back and the flange moves."]
+思考题:
+  - ["手腕奇异处，什么方向的力旋量完全由结构承受？用 16.3 节算例 16.3.2 的结果，在三维画面中指出它的作用线。", "At the wrist singularity, which wrench is carried by the structure alone? Using Example 16.3.2, point out its line of action in the 3D view."]

@@ -1,0 +1,31 @@
+# 实验 16.2 的指导书与报告模板。目的、场景、参数、任务取自 lab16_2.js。
+原理:
+  - ["几何雅可比把关节速度变成角速度和末端原点的速度，解析雅可比是姿态坐标与位置坐标对关节角的偏导数。两者只差姿态部分的一个 3×3 矩阵。",
+     "The geometric Jacobian maps joint velocities to the angular velocity and the velocity of the end-effector origin; the analytic Jacobian is the partial derivative of the orientation and position coordinates with respect to the joint angles. They differ only by a 3×3 matrix on the orientation part."]
+  - 式: "J_a = diag(B(η)⁻¹, I) J_g          (16.2.6)"
+  - 式: "ZYX: ω_s = ẑ α̇ + R_z(α) ŷ β̇ + R_z(α) R_y(β) x̂ γ̇，det B = −cos β          (16.2.7)"
+  - 式: "A(r) = I + (1 − cos φ)/φ² [r] + (φ − sin φ)/φ³ [r]²，det A = 2(1 − cos φ)/φ²          (16.2.10)"
+  - ["β → ±90° 时 B 奇异（万向节锁），欧拉角速率趋于无穷，但机器人的关节转速仍然有限：这是表示奇异，不是运动学奇异。旋转矢量的速率总是有限，但转角经过 180° 时坐标跳到反方向。",
+     "As β → ±90° the matrix B becomes singular (gimbal lock) and the Euler-angle rates grow without bound, while the robot's joint speeds stay finite: this is a representation singularity, not a kinematic one. The rotation-vector rate is always finite, but the coordinates jump to the opposite direction when the angle passes 180°."]
+步骤:
+  - ["打开实验 16.2，场景“法兰盘转过万向节锁附近”，δ = 1°，|ω| = 20°/s，按“开始”。转动结束后记录 β 的最大值、欧拉角速率的峰值、旋转矢量速率的峰值、关节转速的峰值，填入表 1（任务 1、3）。",
+     "Open Lab 16.2, scene “Flange turning past gimbal lock”, δ = 1°, |ω| = 20°/s, and press “Start”. When the turn ends, record the largest β and the peaks of the Euler-angle rate, the rotation-vector rate and the joint speed in Table 1 (tasks 1 and 3)."]
+  - ["δ 依次取 2°、5°、10°，重复上一步，比较欧拉角速率的峰值与 |ω|/sin δ（任务 2）。", "Repeat with δ = 2°, 5° and 10°, and compare the Euler-angle rate peak with |ω|/sin δ (task 2)."]
+  - ["保持 δ = 1°，把 |ω| 改为 10°/s，重复，检查峰值是否与 |ω| 成正比。", "Keep δ = 1°, change |ω| to 10°/s, repeat, and check that the peaks are proportional to |ω|."]
+  - ["切换到“手机指南针”，顶边抬起 30°、60°、85°、89.5°，每次把侧倾从 0 改为 1°，记录航向的变化，填入表 2（任务 4）。",
+     "Switch to “Phone compass”. With the top edge raised 30°, 60°, 85° and 89.5°, change the lean from 0 to 1° and record the change of heading in Table 2 (task 4)."]
+数据表:
+  - 标题: ["表 1  法兰盘转过万向节锁附近", "Table 1  The flange turning past gimbal lock"]
+    表头: ["δ / (°)", "|ω| / (°/s)", "β 最大值 / (°)", "|α̇| 峰值 / (°/s)", "|ω|/sin δ / (°/s)", "旋转矢量速率峰值 / (°/s)", "关节转速峰值 / (°/s)"]
+    表头英文: ["δ / (°)", "|ω| / (°/s)", "Largest β / (°)", "Peak |α̇| / (°/s)", "|ω|/sin δ / (°/s)", "Peak rotation-vector rate / (°/s)", "Peak joint speed / (°/s)"]
+    行: [["1", "20", "", "", "", "", ""], ["2", "20", "", "", "", "", ""], ["5", "20", "", "", "", "", ""], ["10", "20", "", "", "", "", ""], ["1", "10", "", "", "", "", ""]]
+  - 标题: ["表 2  手机指南针：侧倾 1° 引起的航向变化", "Table 2  Phone compass: heading change caused by a 1° lean"]
+    表头: ["顶边抬起 / (°)", "顶边水平投影长度", "航向变化 / (°)"]
+    表头英文: ["Top edge raised / (°)", "Length of horizontal projection", "Heading change / (°)"]
+    行: [["30", "", ""], ["60", "", ""], ["85", "", ""], ["89.5", "", ""]]
+注意:
+  - ["欧拉角显示在 −180° 到 180° 之间，α、γ 越过 ±180° 时读数会从一端跳到另一端，这不是真正的转动。", "Euler angles are shown between −180° and 180°; when α or γ crosses ±180° the reading jumps from one end to the other, which is not a real turn."]
+  - ["转动过程中法兰盘中心应当不动，测量区的“漂移”可用来检查数值积分的精度。", "The flange centre should stay put during the turn; the “drift” readout checks the accuracy of the numerical integration."]
+  - ["手机场景的航向取 ZYX 欧拉角中的偏航角，真实的指南针应用可能另有滤波。", "In the phone scene the heading is the yaw of the ZYX Euler angles; real compass apps may filter it further."]
+思考题:
+  - ["如果示教器改用 ZYZ 欧拉角显示姿态，算例 16.2.3 的转动还会让读数狂转吗？ZYZ 欧拉角的表示奇异在哪里？", "If the pendant showed ZYZ Euler angles instead, would the turn of Example 16.2.3 still make the readings spin? Where is the representation singularity of ZYZ Euler angles?"]

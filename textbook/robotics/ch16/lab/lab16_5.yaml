@@ -1,0 +1,43 @@
+# 实验 16.5 的指导书与报告模板。目的、场景、参数、任务取自 lab16_5.js。
+原理:
+  - ["机械臂静止时，末端对外施加的力旋量 F 与关节力矩 τ 满足 τ = Jᵀ F。由功率平衡得到：电机输入的功率 τᵀθ̇ 等于末端对外做功的功率 Fᵀ𝒱。τ_i 就是力旋量对关节 i 此刻的轴的力矩。",
+     "With the arm at rest, the wrench F applied by the end-effector and the joint torques τ satisfy τ = Jᵀ F. It follows from the power balance: the power τᵀθ̇ put in by the motors equals the power Fᵀ𝒱 delivered by the end-effector. τ_i is the moment of the wrench about the present axis of joint i."]
+  - 式: "τ = J_sᵀ F_s = J_bᵀ F_b = J_gᵀ F_g          (16.5.1)"
+  - ["力椭球 {F : ‖Jᵀ F‖ ≤ 1} 与速度椭球主轴相同、半轴互为倒数；沿任一方向，速度传递比与力传递比之积不超过 1，沿主轴等于 1。",
+     "The force ellipsoid {F : ‖Jᵀ F‖ ≤ 1} has the same axes as the velocity ellipsoid with reciprocal semi-axes; in any direction the product of the velocity and force transmission ratios is at most 1, and exactly 1 along the axes."]
+  - 式: ["由关节力矩估计外力：F̂ = (Jᵀ)⁺ τ，‖δF‖ ≤ ‖δτ‖ / σ_min          (16.5.7)、(16.5.8)", "Estimating the external wrench: F̂ = (Jᵀ)⁺ τ, ‖δF‖ ≤ ‖δτ‖ / σ_min          (16.5.7), (16.5.8)"]
+步骤:
+  - ["打开实验 16.5，场景“UR5e 向外施力”。仰角 −90°（竖直向下），大小 50 N，记录六个关节力矩及其占上限的比例，填入表 1（任务 1）。",
+     "Open Lab 16.5, scene “UR5e applying a force”. With elevation −90° (straight down) and 50 N, record the six joint torques and their share of the limits in Table 1 (task 1)."]
+  - ["保持竖直向下，逐渐加大力，直到某个关节达到上限，记录这个力和关节编号（任务 2）。", "Keep the force pointing down and increase it until one joint reaches its limit; record the force and the joint (task 2)."]
+  - ["改变方位角和仰角，记录几个方向上能平衡的最大力，填入表 2；找出最能扛力的方向（任务 3）。",
+     "Change the azimuth and elevation, record the largest force in several directions in Table 2, and find the direction that resists best (task 3)."]
+  - ["切换到“Panda 估计外力”。作用位置 0（手上），力 10 N，记录估计的力和残差；再改为位置 1（肘部），重复。改变噪声 σ，观察估计误差和报警的变化，填入表 3（任务 4、5）。",
+     "Switch to “Panda estimating an external force”. With position 0 (hand) and 10 N, record the estimated force and the residual; then repeat with position 1 (elbow). Change the noise σ and watch the estimate error and the alarm; fill in Table 3 (tasks 4 and 5)."]
+  - ["切换到“撬棍撬石头”，取 k = 2、4、6，按“开始”，记录手上的力和石头升起的高度，填入表 4（任务 6）。",
+     "Switch to “Prying a stone with a lever”; with k = 2, 4 and 6 press “Start” and record the hand force and how high the stone rises in Table 4 (task 6)."]
+数据表:
+  - 标题: ["表 1  UR5e 在 θ* 处向下压 50 N", "Table 1  UR5e at θ* pressing down with 50 N"]
+    表头: ["关节", "1", "2", "3", "4", "5", "6"]
+    表头英文: ["Joint", "1", "2", "3", "4", "5", "6"]
+    行: [["τ / (N·m)", "", "", "", "", "", ""], ["占上限 / %", "", "", "", "", "", ""]]
+    行英文: [["τ / (N·m)", "", "", "", "", "", ""], ["Share of limit / %", "", "", "", "", "", ""]]
+  - 标题: ["表 2  不同方向上能平衡的最大力", "Table 2  Largest force in different directions"]
+    表头: ["方位角 / (°)", "仰角 / (°)", "最大力 / N", "先达到上限的关节"]
+    表头英文: ["Azimuth / (°)", "Elevation / (°)", "Largest force / N", "Joint at its limit first"]
+    行: [["0", "−90", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+  - 标题: ["表 3  Panda 由关节力矩估计外力", "Table 3  Panda estimating the external force from joint torques"]
+    表头: ["作用位置", "力 / N", "σ / (N·m)", "估计的力 / N", "残差 / (N·m)", "是否报警"]
+    表头英文: ["Where", "Force / N", "σ / (N·m)", "Estimated force / N", "Residual / (N·m)", "Alarm"]
+    行: [["手上", "10", "0.05", "", "", ""], ["肘部", "10", "0.05", "", "", ""], ["手上", "10", "0.2", "", "", ""], ["肘部", "10", "0.2", "", "", ""]]
+    行英文: [["hand", "10", "0.05", "", "", ""], ["elbow", "10", "0.05", "", "", ""], ["hand", "10", "0.2", "", "", ""], ["elbow", "10", "0.2", "", "", ""]]
+  - 标题: ["表 4  撬棍", "Table 4  The lever"]
+    表头: ["k", "手上的力 / N", "手压下 / m", "石头升起 / m", "力的放大 × 速度的缩小"]
+    表头英文: ["k", "Hand force / N", "Hand down / m", "Stone up / m", "Force gain × speed reduction"]
+    行: [["2", "", "0.4", "", ""], ["4", "", "0.4", "", ""], ["6", "", "0.4", "", ""]]
+注意:
+  - ["UR5e 的关节力矩只计外力，不计手臂自重；实际可用的余量要小得多。", "The UR5e joint torques count the external force only, not the arm's own weight; the margin left in practice is much smaller."]
+  - ["Panda 的噪声是固定种子的随机数，同样的参数总得到同样的读数；噪声标准差是示意值。", "The Panda noise uses a fixed seed, so the same settings always give the same readings; the noise level is only indicative."]
+  - ["力的方向：方位角从 x_s 轴量起，逆时针为正；仰角向上为正。", "Direction of the force: azimuth measured from the x_s axis, counter-clockwise positive; elevation positive upwards."]
+思考题:
+  - ["肘部被推时，按“力在手上”估计出的力看起来也很合理。只看估计值能不能发现问题？残差为什么能？", "When the elbow is pushed, the force estimated as if on the hand also looks plausible. Can the estimate alone reveal the problem? Why can the residual?"]
