@@ -1,0 +1,24 @@
+# 实验 4.3 的指导书与报告模板。目的、场景、参数、任务取自 lab4_3.js（由 labs/micro/textbook/lab4_3.body.js 生成）。
+原理:
+  - ["把长 L 的导线分成 k 段，每段前放一个 s 倍参考反相器的中继器。每段的导线延时降到 1/k²，k 段合计降到 1/k，代价是多了 k 个中继器的延时；段数和尺寸都有最优值。", "Split a wire of length L into k segments with an s× repeater before each. Each segment's wire delay falls to 1/k², the total to 1/k, at the cost of k repeater delays; both k and s have optima."]
+  - 式: "k_opt = L·√(0.38·r·c / (0.69·R0·C0·(1 + γ)))，s_opt = √(R0·c / (r·C0))        (4.3.1)"
+  - ["最优段长 L/k_opt 与线长无关；中继之后，延时与线长成正比。上层厚金属电阻小，最优段长很长，往往不需要中继器。", "The optimal segment length L/k_opt does not depend on L; with repeaters the delay grows linearly with length. Thick upper metal has low resistance and a long optimal segment, often needing no repeater at all."]
+步骤:
+  - ["选“met1 最小线宽”，线长 3 mm，先用式 (4.3.1) 算出最优段数和尺寸；再在实验中调整，找到总延时不超过网格最小值 1.02 倍的组合（任务 1），填入表 1。", "Choose met1, 3 mm; compute the optimum from Eq. (4.3.1), then find a combination within 2 % of the grid minimum (task 1) and fill in Table 1."]
+  - ["线长改为 6 mm，再找最优（任务 2），比较 3 mm 与 6 mm 的最优延时和每毫米延时。", "Change to 6 mm and find the optimum again (task 2); compare the optimal and per-mm delays."]
+  - ["选“met3 最小线宽”，3 mm，中继器 20 倍，找出最快的段数（任务 3），填入表 2。", "Choose met3, 3 mm, 20× repeaters, and find the fastest number of segments (task 3); fill in Table 2."]
+数据表:
+  - 标题: ["表 1  met1 上的最优中继", "Table 1  Optimal repeaters on met1"]
+    表头: ["线长 / mm", "闭式解 k / s", "实验最优 k / s", "最优延时 / ps", "每毫米延时 / ps", "直接驱动（k = 1，s = 20）/ ps"]
+    表头英文: ["Length / mm", "Closed form k / s", "Lab optimum k / s", "Optimal delay / ps", "Delay per mm / ps", "Direct drive (k = 1, s = 20) / ps"]
+    行: [["3", "", "", "", "", ""], ["6", "", "", "", "", ""]]
+  - 标题: ["表 2  met3、3 mm、中继器 20 倍", "Table 2  met3, 3 mm, 20× repeaters"]
+    表头: ["段数 k", "总延时 / ps"]
+    表头英文: ["Segments k", "Total delay / ps"]
+    行: [["1", ""], ["2", ""], ["3", ""], ["4", ""]]
+注意:
+  - ["实验没有计入驱动第一个中继器的代价，求出的最优尺寸偏大；实际设计中第一个中继器常取小一些，或在前面加逐级放大的缓冲（4.3.3 节）。", "The lab does not count the cost of driving the first repeater, so the optimal size comes out too large; in practice the first repeater is made smaller or preceded by tapered buffers (Section 4.3.3)."]
+  - ["右图记录本线长、本尺寸下试过的段数，改线长或尺寸后会清空。", "The chart records the segment counts tried at the current length and size and clears when either changes."]
+思考题:
+  - ["为什么中继后的延时与线长成正比？", "Why does the delay grow linearly with length once repeaters are used?"]
+  - ["中继器也要耗电。算一下 met1 上 3 mm 线的最优中继器在 100 MHz 时钟下的功耗，与导线电容本身的功耗比较。", "Repeaters also consume power. Estimate the power of the optimal repeaters on the 3 mm met1 wire at 100 MHz and compare with the wire capacitance itself."]

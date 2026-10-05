@@ -1,0 +1,25 @@
+# 实验 4.2 的指导书与报告模板。目的、场景、参数、任务取自 lab4_2.js（由 labs/micro/textbook/lab4_2.body.js 生成）。
+原理:
+  - ["导线是分布式 RC 网络。一端加阶跃电压，远端的 50 % 延时约为 0.38RwCw，比集总模型的 0.69RC 小近一半。Rw、Cw 都与线长成正比，所以导线自身的延时与线长的平方成正比。",
+     "A wire is a distributed RC network. After a step at one end, the far end reaches 50 % at about 0.38RwCw, nearly half the lumped 0.69RC. Rw and Cw both grow with length, so the wire's own delay grows with the square of the length."]
+  - 式: "t50 ≈ 0.69·Rd·(Cself + Cw + CL) + 0.38·Rw·Cw + 0.69·Rw·CL        (4.2.4)"
+  - ["第一项是驱动器给全部电容充电，加大驱动器可以减小它；后两项是导线电阻的影响，驱动器帮不上忙。", "The first term is the driver charging all the capacitance and shrinks with a stronger driver; the last two come from the wire resistance and do not."]
+步骤:
+  - ["选“met1 最小线宽”，驱动器 40 倍，线长依次取 500、1000、2000、4000 μm，记下驱动项、导线项、估算和数值解的延时，填入表 1（任务 1 比较 1000 与 2000 μm）。", "Choose met1 with a 40× driver; set 500, 1000, 2000 and 4000 μm and record the terms, the estimate and the numerical delay in Table 1 (task 1 compares 1000 and 2000 μm)."]
+  - ["驱动器 20 倍，找到导线项与驱动项相等的线长（任务 2）；再把驱动器改为 40 倍，重新找，填入表 2。", "With a 20× driver find the length where the two terms are equal (task 2); repeat with 40× and fill in Table 2."]
+  - ["选“met3 最小线宽”，驱动器 20 倍，找出估算延时不超过 100 ps 的最长线长（任务 3），与 met1 比较。", "Choose met3 with a 20× driver and find the longest wire within 100 ps (task 3); compare with met1."]
+数据表:
+  - 标题: ["表 1  met1、驱动器 40 倍：延时随线长的变化", "Table 1  met1, 40× driver: delay versus length"]
+    表头: ["线长 / μm", "驱动项 / ps", "导线项 / ps", "估算 / ps", "数值解 / ps"]
+    表头英文: ["Length / μm", "Driver term / ps", "Wire term / ps", "Estimate / ps", "Numerical / ps"]
+    行: [["500", "", "", "", ""], ["1000", "", "", "", ""], ["2000", "", "", "", ""], ["4000", "", "", "", ""]]
+  - 标题: ["表 2  导线项等于驱动项的线长", "Table 2  Length where the wire term equals the driver term"]
+    表头: ["金属层", "驱动器尺寸", "线长 / μm", "该线长下的总延时 / ps"]
+    表头英文: ["Layer", "Driver size", "Length / μm", "Total delay / ps"]
+    行: [["met1", "20", "", ""], ["met1", "40", "", ""], ["met3", "20", "", ""]]
+注意:
+  - ["数值解把导线切成 40 段，驱动器当作固定电阻，输入为理想阶跃；它与估算式的差别主要来自 0.69、0.38 两个系数的近似。", "The numerical solution splits the wire into 40 sections with a fixed-resistance driver and an ideal step input; differences from the estimate come mainly from the 0.69 and 0.38 factors."]
+  - ["负载固定为 20 个参考反相器的输入电容。", "The load is fixed at 20 reference-inverter input capacitances."]
+思考题:
+  - ["驱动器加大能减小哪一项？线很长时，为什么只加大驱动器不够？", "Which term does a stronger driver reduce? Why is that not enough for a very long wire?"]
+  - ["met3 的单位长度电容与 met1 差不多，为什么能走得远得多？", "met3 has about the same capacitance per length as met1; why can it go so much farther?"]

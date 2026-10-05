@@ -316,4 +316,16 @@ def reference():
         gs = [gn] + [1.0] * (N - 1)
         ps = [le_p("nand", q23["n_addr"])] + [le_p("inv", 1)] * (N - 1)
         out["ch2"]["dec"][str(N)] = path_delay(gs, ps, q23["branch"], H23)[0]
+    # 第 4 章
+    out["ch4"] = {"r": {}, "c": {}, "cn": {}, "rep": {}}
+    for l, q in WIRES.items():
+        out["ch4"]["r"][l] = wire_r(l, q["wmin"])
+        out["ch4"]["c"][l] = wire_c(l, q["wmin"])
+        out["ch4"]["cn"][l] = wire_c(l, q["wmin"], q["smin"])
+    q43 = pr["p43"]
+    CL43 = q43["load_units"] * cin(Wmin, r * Wmin)
+    for k in range(1, 6):
+        out["ch4"]["rep"][str(k)] = repeater_delay(q43["L_um"], q43["layer"], q43["w_um"], k, 20, CL43)
+    k_opt, s_opt = repeater_opt(q43["L_um"], q43["layer"], q43["w_um"])
+    out["ch4"]["opt"] = {"k": k_opt, "size": s_opt}
     return out

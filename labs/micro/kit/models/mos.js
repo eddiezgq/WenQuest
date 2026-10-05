@@ -164,6 +164,11 @@
         const gs = [gn].concat(Array(N - 1).fill(1)), ps = [m.leP('nand', q23.n_addr)].concat(Array(N - 1).fill(m.leP('inv', 1)));
         out.ch2.dec[N] = m.pathDelay(gs, ps, q23.branch, H23).D;
       }
+      out.ch4 = { r: {}, c: {}, cn: {}, rep: {} };
+      for (const [l, q] of Object.entries(WL)) { out.ch4.r[l] = m.wireR(l, q.wmin); out.ch4.c[l] = m.wireC(l, q.wmin); out.ch4.cn[l] = m.wireC(l, q.wmin, q.smin); }
+      const q43 = pr.p43, CL43 = q43.load_units * m.cin(Wmin, r * Wmin);
+      for (let k = 1; k <= 5; k++) out.ch4.rep[k] = m.repeaterDelay(q43.L_um, q43.layer, q43.w_um, k, 20, CL43);
+      out.ch4.opt = m.repeaterOpt(q43.L_um, q43.layer, q43.w_um);
       return out;
     };
     return m;
