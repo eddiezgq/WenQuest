@@ -25,5 +25,5 @@
 注意:
   - ["误差到 10⁻¹⁶ 左右就不再减小：这时比较的是两个都带舍入误差的双精度数。", "Errors stop decreasing near 10⁻¹⁶: both numbers being compared carry rounding errors."]
 思考题:
-  - ["ln(1 + x) 的泰勒多项式在 x > 1 时次数越高越差，而 eˣ 的无论 x 多大最终都会收敛。区别在哪里？（第 16 章：收敛半径。）", "Taylor polynomials of ln(1 + x) get worse with degree for x > 1, while those of eˣ eventually converge for any x. What is the difference? (Chapter 16: radius of convergence.)"]
+  - ["ln(1 + x) 的泰勒多项式在 x > 1 时次数越高越差，而 eˣ 的无论 x 多大最终都会收敛。区别在哪里？（第 24 章：收敛半径。）", "Taylor polynomials of ln(1 + x) get worse with degree for x > 1, while those of eˣ eventually converge for any x. What is the difference? (Chapter 24: radius of convergence.)"]
   - ["计算机的数学库为什么先把 x 约化到一个小区间，再用多项式？约化本身会带来什么误差？", "Why do math libraries first reduce x to a small interval before applying a polynomial? What error does the reduction itself introduce?"]

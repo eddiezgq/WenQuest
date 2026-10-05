@@ -1,0 +1,24 @@
+# 实验 11.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab11_3.js。
+原理:
+  - ["速度不超过 V、加速度不超过 A 时，最短时间的运动是梯形速度曲线：以 A 加速到 V，匀速，再以 A 减速（11.3 节）。位移 D < V²/A 时达不到 V，退化为三角形。", "With speed at most V and acceleration at most A, the fastest motion is the trapezoidal profile: accelerate at A to V, cruise, decelerate at A (Section 11.3). If D < V²/A, V is never reached and the profile becomes a triangle."]
+  - 式: "T_梯形 = D/V + V/A（D ≥ V²/A），T_三角形 = 2√(D/A)，T_S形 = D/V + V/A + A/J（V ≥ A²/J 且 D ≥ V(V/A + A/J) 时；否则峰值速度由 v(v/A + A/J) = D 求出）"
+  - ["S 形曲线再限制加加速度不超过 J：加速度按斜坡变化，用 A/J 的额外时间换来有限的加加速度。五次多项式的速度、加速度峰值较高，在同样限值下用时更长。", "The S-curve also limits jerk to J: acceleration ramps up and down, costing an extra A/J of time for finite jerk. The quintic has higher peaks and needs longer under the same limits."]
+步骤:
+  - ["在“机械臂关节”场景中选梯形曲线，V = 180°/s，A = 400°/s²，D 取 10°、30°、60°、90°、180°，记录最短时间与实际最高速度，填入表 1（任务 1、2）。", "In 'Robot joint' choose the trapezoid with V = 180°/s, A = 400°/s²; for D = 10°, 30°, 60°, 90°, 180° record the minimum time and the peak speed in Table 1 (tasks 1 and 2)."]
+  - ["D = 90°，比较三种曲线（S 形取 J = 4000°/s³ 与 8000°/s³）的时间与峰值加加速度，填入表 2（任务 3、4）。", "With D = 90° compare the three profiles (S-curve with J = 4000 and 8000°/s³): time and peak jerk into Table 2 (tasks 3 and 4)."]
+  - ["在“电梯”场景中（加速度固定为 1 m/s²），运行 30 m，额定速度 2.5 m/s，改变加加速度 0.5、1、2 m/s³，记录运行时间（任务 5）。", "In 'Elevator' (acceleration fixed at 1 m/s²), travel 30 m at 2.5 m/s; for jerk 0.5, 1, 2 m/s³ record the travel time (task 5)."]
+数据表:
+  - 标题: ["表 1  梯形曲线（V = 180°/s，A = 400°/s²）", "Table 1  Trapezoid (V = 180°/s, A = 400°/s²)"]
+    表头: ["D / (°)", "最短时间 / s", "实际最高速度 / (°/s)", "梯形还是三角形"]
+    表头英文: ["D / (°)", "minimum time / s", "peak speed / (°/s)", "trapezoid or triangle"]
+    行: [["10", "", "", ""], ["30", "", "", ""], ["60", "", "", ""], ["90", "", "", ""], ["180", "", "", ""]]
+  - 标题: ["表 2  三种曲线的比较（D = 90°）", "Table 2  Three profiles compared (D = 90°)"]
+    表头: ["曲线", "时间 / s", "峰值加速度 / (°/s²)", "峰值加加速度 / (°/s³)"]
+    表头英文: ["profile", "time / s", "peak acceleration / (°/s²)", "peak jerk / (°/s³)"]
+    行: [["梯形", "", "", ""], ["S 形，J = 4000", "", "", ""], ["S 形，J = 8000", "", "", ""], ["五次多项式", "", "", ""]]
+    行英文: [["trapezoid", "", "", ""], ["S-curve, J = 4000", "", "", ""], ["S-curve, J = 8000", "", "", ""], ["quintic", "", "", ""]]
+注意:
+  - ["梯形曲线的加加速度在加速度跳变处是冲激（无穷大），图中用竖线表示。", "The trapezoid's jerk is an impulse (infinite) where the acceleration jumps; the plot shows it as vertical bars."]
+思考题:
+  - ["梯形曲线时间最短，为什么工业机器人和电梯仍普遍用 S 形曲线？加加速度为无穷大在物理上意味着什么？", "The trapezoid is fastest; why do industrial robots and lifts still use S-curves? What does infinite jerk mean physically?"]
+  - ["多个关节同时运动时，怎样让它们同时到达？最慢的关节决定了什么？", "When several joints move together, how do you make them arrive together? What does the slowest joint decide?"]

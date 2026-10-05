@@ -34,8 +34,8 @@ WQ.lab({
     { id: "odo", robot: true, text: ["在“AGV 里程计”中取 lg u = −4、泰勒公式 3 项：直接公式的相对误差超过 10⁻⁹，泰勒公式的小于 10⁻¹⁵。", "In 'AGV odometry' take lg u = −4 with 3 Taylor terms: the direct formula errs by more than 10⁻⁹, the Taylor formula by less than 10⁻¹⁵."],
       demo: { scene: "odo", set: { lu: -4, m: 3 }, wait: 1 } },
   ],
-  think: ["ln(1 + x) 的泰勒多项式在 x > 1 时次数越高越差，而 eˣ 的无论 x 多大最终都会收敛。区别在哪里？（第 16 章：收敛半径。）",
-          "Taylor polynomials of ln(1 + x) get worse with degree for x > 1, while those of eˣ eventually converge for any x. What is the difference? (Chapter 16: radius of convergence.)"],
+  think: ["ln(1 + x) 的泰勒多项式在 x > 1 时次数越高越差，而 eˣ 的无论 x 多大最终都会收敛。区别在哪里？（第 24 章：收敛半径。）",
+          "Taylor polynomials of ln(1 + x) get worse with degree for x > 1, while those of eˣ eventually converge for any x. What is the difference? (Chapter 24: radius of convergence.)"],
 
   // 第 k 阶导数在 t 处的值
   D(f, k, t) {
