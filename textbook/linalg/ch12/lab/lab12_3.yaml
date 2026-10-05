@@ -1,0 +1,23 @@
+# 实验 12.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab12_3.js。
+原理:
+  - ["平面三连杆臂的动能 T = ½ q̇ᵀM(q)q̇，质量矩阵 M 对称正定，⟨a, b⟩_M = aᵀMb 是关节速度空间上的内积（动能内积）。", "The kinetic energy of the planar three-link arm is T = ½ q̇ᵀM(q)q̇; the mass matrix M is symmetric positive definite and ⟨a, b⟩_M = aᵀMb is an inner product on joint velocities."]
+  - 式: "最小动能解 q̇ = J⁺_M v，J⁺_M = M⁻¹Jᵀ(JM⁻¹Jᵀ)⁻¹；  M = I 时为欧氏最小范数解 J⁺v = Jᵀ(JJᵀ)⁻¹v；  零空间投影 P = I − J⁺_M J"
+  - ["由最佳逼近定理，满足 Jq̇ = v 的关节速度中，动能最小的一个与零空间 N(J) 在动能内积下正交。P 是动能内积下到 N(J) 的正交投影，用它分解时两部分的动能可以相加；点积下的投影 I − J⁺J 分出的两部分在动能内积下不正交，有交叉项。", "By the best-approximation theorem, the joint velocity with Jq̇ = v and least kinetic energy is orthogonal to N(J) in the kinetic-energy inner product. P is the orthogonal projection onto N(J) in that inner product, so the energies of the two parts add up; the dot-product projection I − J⁺J leaves parts that are not orthogonal in it, with a cross term."]
+步骤:
+  - ["在“两种最小范数解”场景中，m₃ = 1 kg，把 φ 从 0° 每次增加 30° 到 150°，按表 1 记录两种解的关节速度与动能；找出省下一半以上动能的方向（任务 1）。", "In the first scene with m₃ = 1 kg, raise φ from 0° to 150° in steps of 30°; record both solutions and their kinetic energies in Table 1; find a direction that saves more than half (task 1)."]
+  - ["在 110°～140° 之间细调 φ，找出省得最多的方向（任务 2）。再把 m₃ 改为 4 kg 重复，比较最大节省。", "Fine-tune φ between 110° and 140° to find the largest saving (task 2). Repeat with m₃ = 4 kg and compare the largest saving."]
+  - ["切换到“零空间投影”场景，按表 2 改变 w，记录两种投影的零空间部分、两部分动能之和与交叉项；找出点积投影交叉项超过 0.1 J 的 w（任务 3）。", "Switch to the null-space scene, vary w as in Table 2 and record the null parts, the sum of the two energies and the cross term for both projections; find a w whose dot-product cross term exceeds 0.1 J (task 3)."]
+数据表:
+  - 标题: ["表 1  两种最小范数解（m₃ = 1 kg）", "Table 1  Two minimum-norm solutions (m₃ = 1 kg)"]
+    表头: ["φ / °", "J⁺v / (rad/s)", "动能 / J", "J⁺_M v / (rad/s)", "动能 / J", "省下 / %"]
+    表头英文: ["φ / °", "J⁺v / (rad/s)", "KE / J", "J⁺_M v / (rad/s)", "KE / J", "Saved / %"]
+    行: [["0", "", "", "", "", ""], ["30", "", "", "", "", ""], ["60", "", "", "", "", ""], ["90", "", "", "", "", ""], ["120", "", "", "", "", ""], ["150", "", "", "", "", ""]]
+  - 标题: ["表 2  两种零空间投影", "Table 2  Two null-space projections"]
+    表头: ["w / (rad/s)", "w 的动能 / J", "动能内积：两部分之和 / J", "动能内积：交叉项 / J", "点积：两部分之和 / J", "点积：交叉项 / J"]
+    表头英文: ["w / (rad/s)", "KE of w / J", "KE split: sum / J", "KE split: cross / J", "Dot split: sum / J", "Dot split: cross / J"]
+    行: [["(0, 0.5, −0.5)", "", "", "", "", ""], ["(1, 0, 0)", "", "", "", "", ""], ["(0, 0, 1)", "", "", "", "", ""], ["(−1, −1, −1)", "", "", "", "", ""]]
+注意:
+  - ["实验中姿态固定为 (30°, 60°, −45°)，机械臂在水平面内运动，不计重力；质量矩阵随姿态变化，换一个姿态结论的数值会变。", "The pose is fixed at (30°, 60°, −45°) and the arm moves in a horizontal plane without gravity; the mass matrix changes with the pose, and so do the numbers."]
+  - ["交叉项按 t ᵀ M n 计算（t、n 为两部分），动能之和与总动能相差的正是这一项。", "The cross term is tᵀMn for the two parts t and n; it is exactly the gap between the sum of the energies and the total."]
+思考题:
+  - ["实际控制器要在每个 1 ms 周期内重算 M(q) 和 J⁺_M。如果质量参数有 10% 的误差，在速度层面（次任务速度经 P 投影）末端还会不动吗？在力矩层面（次任务力矩经 Pᵀ 投影）末端还会不产生加速度吗？", "A real controller recomputes M(q) and J⁺_M every 1 ms. If the mass parameters are 10% off, does the tool still stay still at the velocity level (secondary velocity projected with P)? Does it still get no acceleration at the torque level (secondary torque projected with Pᵀ)?"]

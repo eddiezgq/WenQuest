@@ -1,0 +1,23 @@
+# 实验 12.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab12_5.js。
+原理:
+  - ["柔性关节的二自由度模型：M = diag(J_m, J_l)，K = [[k_p + k, −k], [−k, k]]，自由振动 M q̈ + K q = 0。A = M⁻¹K 一般不对称，但 MA = K 对称，所以 A 在 M-内积 ⟨u, v⟩_M = uᵀMv 下自伴。", "Two-degree-of-freedom model of a flexible joint: M = diag(J_m, J_l), K = [[k_p + k, −k], [−k, k]], free vibration M q̈ + K q = 0. A = M⁻¹K is in general not symmetric, but MA = K is, so A is self-adjoint in the M-inner product ⟨u, v⟩_M = uᵀMv."]
+  - 式: "A v = ω² v；  v₁ᵀ M v₂ = 0；  c_j = ⟨v_j, q₀⟩_M / ⟨v_j, v_j⟩_M；  q(t) = c₁ v₁ cos ω₁t + c₂ v₂ cos ω₂t"
+  - ["由自伴算子的性质，特征值 ω² 是正实数，不同频率的振型在 M-内积下正交；初始偏转可以直接按 M-内积分解，不必解方程组。对本模型可以算出 v₁·v₂ = 1 − J_m/J_l，与刚度无关，所以只有 J_m = J_l（M 是单位矩阵的倍数）时振型才在普通点积下也正交。", "Because A is self-adjoint, the eigenvalues ω² are positive and the modes of different frequencies are M-orthogonal; an initial offset splits onto them directly with the M-inner product. Only when M is a multiple of the identity are the modes orthogonal in the ordinary dot product too (for this model v₁·v₂ = 1 − J_m/J_l, whatever the stiffness)."]
+步骤:
+  - ["取 J_m = 2 kg·m²、J_l = 1 kg·m²、k = 3×10⁴ N·m/rad，θ₀ = 0°，记录两个固有频率、振型、点积与 M-内积、两个系数，按“播放”观察振动（表 1 第一行）。", "With J_m = 2 kg·m², J_l = 1 kg·m², k = 3×10⁴ N·m/rad and θ₀ = 0° record the frequencies, modes, dot and M-inner products and coefficients, and play the vibration (Table 1, first row)."]
+  - ["调整 θ₀，使 c₂/c₁ 接近零，播放：电机与连杆同步振动、比例不变（任务 1）。再使 c₁ 接近零，播放并读出频率（任务 2）。", "Adjust θ₀ until c₂/c₁ is near zero and play: motor and link move together in a fixed ratio (task 1). Then make c₁ near zero, play and read the frequency (task 2)."]
+  - ["改变 J_m、J_l、k，按表 1 记录；找出使振型在点积下也正交的转动惯量（任务 3）。", "Vary J_m, J_l and k and fill in Table 1; find the inertias for which the modes are orthogonal in the dot product too (task 3)."]
+数据表:
+  - 标题: ["表 1  固有频率与振型", "Table 1  Natural frequencies and modes"]
+    表头: ["J_m / (kg·m²)", "J_l / (kg·m²)", "k / (10⁴ N·m/rad)", "f₁, f₂ / Hz", "v₁, v₂", "v₁·v₂", "v₁ᵀMv₂"]
+    表头英文: ["J_m / (kg·m²)", "J_l / (kg·m²)", "k / (10⁴ N·m/rad)", "f₁, f₂ / Hz", "v₁, v₂", "v₁·v₂", "v₁ᵀMv₂"]
+    行: [["2", "1", "3", "", "", "", ""], ["2", "4", "3", "", "", "", ""], ["2", "1", "6", "", "", "", ""], ["1", "1", "3", "", "", "", ""]]
+  - 标题: ["表 2  初始偏转与振型系数（J_m = 2，J_l = 1，k = 3）", "Table 2  Initial offset and mode coefficients (J_m = 2, J_l = 1, k = 3)"]
+    表头: ["θ₀ / °", "q₀ / mrad", "c₁", "c₂", "振动的样子", "c₁v₁ + c₂v₂"]
+    表头英文: ["θ₀ / °", "q₀ / mrad", "c₁", "c₂", "What the motion looks like", "c₁v₁ + c₂v₂"]
+    行: [["0", "", "", "", "", ""], ["45", "", "", "", "", ""], ["", "", "", "", "只有第一振型", ""], ["", "", "", "", "只有第二振型", ""]]
+注意:
+  - ["模型没有阻尼，振动不会衰减；实际减速器有摩擦，振动会逐渐消失，但频率与振型基本不变。", "The model has no damping, so the vibration never dies out; a real gear has friction and the vibration decays, but the frequencies and modes hardly change."]
+  - ["动画的时间放慢了 50 倍，转角放大显示；读数以右侧数值为准。", "Time is slowed 50× and angles are exaggerated in the animation; rely on the readouts."]
+思考题:
+  - ["机械臂抓起重物相当于增大 J_l。两个固有频率怎样变化？为什么负载变化后位置控制器的参数要跟着调整？", "Picking up a heavy load is like increasing J_l. How do the two frequencies change? Why must the position controller be retuned when the load changes?"]
