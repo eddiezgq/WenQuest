@@ -1,0 +1,40 @@
+# 实验 7.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab7_4.js。
+原理:
+  - ["在以加速度 a₀ 平动的参考系中，给每个质点加上惯性力 −ma₀，牛顿第二定律的形式不变。惯性力没有施力物体，也没有反作用力。它与重力合成为有效重力 g − a₀。",
+     "In a frame translating with acceleration a₀, add the inertial force −ma₀ to every particle and Newton's second law keeps its form. The inertial force has no source and no reaction. Together with gravity it acts as an effective gravity g − a₀."]
+  - 式: "F_i = −ma₀；吊牌：tan θ = a₀/g        (7.4.2)、(7.4.4)"
+  - ["在匀速转动的参考系中，静止的质点受惯性离心力 mω²r，沿半径向外。转台上的零件不滑的条件是离心力不超过最大静摩擦力；在地面上看，就是静摩擦力足以提供向心力。两种说法结论相同。",
+     "In a uniformly rotating frame a particle at rest feels the centrifugal force mω²r outwards. A part on a turntable stays put while this does not exceed the largest static friction; from the ground, static friction must supply the centripetal force. Both give the same condition."]
+  - 式: "ω²r ≤ μ_s g        (7.4.6)"
+  - ["零件开始滑动后，在转台上看它还受科里奥利力 −2m ω × v′，垂直于相对速度：逆时针转动的转台上，向外滑的零件被推向后方（与转动方向相反的一侧），轨迹弯曲（7.5 节）。",
+     "Once the part slides, on the table it also feels the Coriolis force −2m ω × v′, perpendicular to its relative velocity: on an anticlockwise table a part sliding outwards is pushed backwards (against the rotation), so its path curves (Section 7.5)."]
+  - ["车里的水：在车的参考系中，水面垂直于有效重力，与水平面成 θ，tan θ = a/g。杯子半径为 R、水面离杯口 h 时，后壁处水面升高 R tan θ，超过 h 就洒出。",
+     "Water in a car: in the car's frame the surface is perpendicular to the effective gravity, tilted by θ with tan θ = a/g. In a cup of radius R filled to h below the rim, the water rises by R tan θ at the back wall and spills once that exceeds h."]
+步骤:
+  - ["选“加速的 AGV”，视角 0。选行程 1，点“开始”，等吊牌稳定后读出偏角 θ，算出 a = g tan θ，填入表 1。行程 2、3 同样测量；行程 2 的结果调到滑块上，提交（任务 1）。",
+     "Choose the AGV, view 0. Pick run 1, press “Start”, wait until the tag settles, read θ and compute a = g tan θ in Table 1. Do runs 2 and 3; set the run 2 result and submit (task 1)."]
+  - ["视角改为 1，再做一次，比较两个视角下的受力图：地面上看，拉力和重力的合力是什么方向？车厢里看，哪个力与它们平衡？AGV 匀速以后，吊牌怎样变化？",
+     "Switch to view 1 and repeat. Compare the force diagrams: from the ground, which way does tension plus weight point? Inside, what balances them? What happens to the tag once the AGV cruises?"]
+  - ["选“转台上的零件”，r = 0.15 m，视角 0，点“开始”，记下“开始滑动时的转速”，换算为 ω（rad/s），由 μ_s = ω²r/g 求 μ_s，填入表 2。r 再取 0.10 m、0.25 m 各测一次，三次结果应一致；取平均值提交（任务 2）。",
+     "Choose the turntable, r = 0.15 m, view 0, press “Start”, note the speed at which the part begins to slide, convert to ω in rad/s and find μ_s = ω²r/g in Table 2. Repeat at r = 0.10 m and 0.25 m; the results should agree. Submit the mean (task 2)."]
+  - ["视角改为 1，再做一次，画出转台上看到的零件轨迹，与地面上看到的比较，说明它为什么弯向后方。",
+     "Switch to view 1, repeat and sketch the path seen on the table. Compare it with the ground view and explain why it curves backwards."]
+  - ["选“车里的一杯水”，先由原理第 4 条算出不洒的最小加速时间，再从 8 s 起每次加 0.5 s 验证，提交（任务 3）。",
+     "Choose the cup of water. Compute the shortest no-spill time from item 4 of the principle, then check it from 8 s up in 0.5 s steps and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  用吊牌测加速度", "Table 1  Acceleration from the tag"]
+    表头: ["行程", "稳定偏角 θ / (°)", "a = g tan θ / (m/s²)"]
+    表头英文: ["Run", "Steady angle θ / (°)", "a = g tan θ / (m/s²)"]
+    行: [["1", "", ""], ["2", "", ""], ["3", "", ""]]
+  - 标题: ["表 2  转台上零件开始滑动的转速", "Table 2  Speed at which the part slides"]
+    表头: ["r / m", "转速 / (r/min)", "ω / (rad/s)", "μ_s = ω²r/g"]
+    表头英文: ["r / m", "Speed / (rev/min)", "ω / (rad/s)", "μ_s = ω²r/g"]
+    行: [["0.10", "", "", ""], ["0.15", "", "", ""], ["0.25", "", "", ""], ["平均", "", "", ""]]
+注意:
+  - ["转台在加速，零件还需要切向的摩擦力 m r α。α = 1.0 rad/s² 时它比向心力小得多，用 μ_s = ω²r/g 计算的误差只有千分之几。", "The table is speeding up, so the part also needs a tangential friction m r α; at α = 1.0 rad/s² it is far smaller than the centripetal part, and μ_s = ω²r/g is off by only a few parts in a thousand."]
+  - ["AGV 画面里各力按同一比例画，惯性力（橙）与拉力的水平分量大小相等。", "In the AGV view all forces are drawn to the same scale; the inertial force (orange) equals the horizontal part of the tension."]
+  - ["杯中水面在本实验中按“刚好不过冲”处理，判定按稳定时的倾角。真实的水起步时会来回晃，最高处会超过稳定值，所以实际要比算出的时间留些余量。", "The water surface here is modelled without overshoot and the task uses the steady tilt. Real water sloshes and briefly rises above the steady value, so leave some margin over the computed time."]
+  - ["每个任务都要点“提交”才判定。", "Each task is judged only when you press “Submit”."]
+思考题:
+  - ["在车厢里看，惯性力和拉力的水平分量平衡；在地面上看，拉力的水平分量使吊牌加速。这两种说法哪一种“对”？为什么两者算出的偏角相同？", "Inside, the inertial force balances the horizontal part of the tension; from the ground, that horizontal part accelerates the tag. Which is “right”? Why do both give the same angle?"]
+  - ["转台上看，零件刚开始滑动时速度为零，为什么科里奥利力起初为零？之后它沿什么方向？", "On the table the part starts from rest relative to it, so why is the Coriolis force zero at first? Which way does it point afterwards?"]

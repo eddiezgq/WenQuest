@@ -1,0 +1,43 @@
+# 实验 7.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab7_3.js。
+原理:
+  - ["两指夹爪从两侧夹住零件，每个指面的支持力就是夹紧力 F_N。指面上的静摩擦力可以沿指面内的任何方向，每个指面最大为 μ_s F_N，两指合起来最大为 2μ_s F_N。零件需要的摩擦力等于 m 乘“加速度减去重力加速度”在指面内的分量。",
+     "The two fingers clamp the part; the normal force on each face is the grip F_N. Static friction on a face can point anywhere in the face, up to μ_s F_N on each, 2μ_s F_N in total. The friction the part needs is m times the in-face component of (acceleration minus g)."]
+  - 式: "提起与平移：F_N ≥ m√((g + a_z)² + a_x²)/(2μ_s)，对运动的每一段都要满足        (7.1.5)"
+  - ["手臂转动时，两指沿切向夹紧，指面的支持力沿切向，能提供切向加速度所需的力，却不能提供向心力。向心力 mω²r 沿手臂指向转轴，只能由指面上的静摩擦力提供，同时摩擦力还要平衡重力。两者相互垂直。",
+     "When the arm swings with the fingers clamping along the tangent, the normal forces act along the tangent: they can supply the tangential force but not the centripetal force. The centripetal force mω²r points along the arm to the axis and must come from friction, which must also hold the weight. The two are perpendicular."]
+  - 式: "手臂转动：F_N ≥ m√(g² + (ω²r)²)/(2μ_s)（7.3.5 节）"
+  - ["双手夹起一排 n 本书：两只手各支撑总重量的一半 nmg/2；最外面一本书与第二本之间的接触面要支撑 (n/2 − 1)mg，越往中间越小。手与书、书与书的摩擦因数不同，所需的压力取两个条件中较大的一个。",
+     "Lifting a row of n books: each hand carries half the weight, nmg/2; the face between the outer book and the next carries (n/2 − 1)mg, less towards the middle. Hand–book and book–book coefficients differ, so the press needed is the larger of the two conditions."]
+  - 式: "F ≥ max(nmg/(2μ_h), (n/2 − 1)mg/μ_b)"
+步骤:
+  - ["选“提起与平移”，m = 0.60 kg。a_z = 0、a_x = 0 时，夹紧力从 2 N 起每次加 1 N，点“开始”，找出不滑落的最小夹紧力，与 mg/(2μ_s) 比较，填入表 1。",
+     "Choose “Lift and move”, m = 0.60 kg. With a_z = 0 and a_x = 0, raise the grip from 2 N in 1 N steps, press “Start” each time, find the smallest grip that holds and compare it with mg/(2μ_s) in Table 1."]
+  - ["a_z = 5.0 m/s²、a_x = 2.0 m/s²：先用式 (7.1.5) 算出最小夹紧力，再在实验中验证（略小于它时滑落，略大于它时夹住），提交（任务 1）。再改变 a_z 和 a_x，补全表 1。",
+     "With a_z = 5.0 m/s² and a_x = 2.0 m/s², compute the smallest grip with Eq. (7.1.5) first, then check it (slightly less slips, slightly more holds) and submit (task 1). Vary a_z and a_x to complete Table 1."]
+  - ["m = 0.80 kg，a_x = 3.0 m/s²，夹紧力 15 N：求允许的最大向上加速度，调到这个值（0.5 m/s² 一档）提交（任务 3）。",
+     "With m = 0.80 kg, a_x = 3.0 m/s² and a 15 N grip, find the largest upward acceleration, set it (0.5 m/s² steps) and submit (task 3)."]
+  - ["选“手臂转动”，m = 0.60 kg，r = 0.40 m。ω 取 0、3.0、6.0 rad/s，分别算出并验证最小夹紧力，填入表 2；ω = 6.0 rad/s 时提交（任务 2）。观察零件滑脱后相对手指沿什么方向滑、离开指尖后沿什么方向飞出。",
+     "Choose “Arm swinging”, m = 0.60 kg, r = 0.40 m. For ω = 0, 3.0 and 6.0 rad/s compute and check the smallest grip in Table 2; submit at ω = 6.0 rad/s (task 2). Watch which way the part slides relative to the fingers and which way it flies once it leaves the fingertips."]
+  - ["选“双手夹书”，n = 8。先用上面的公式算出所需的最小压力，判断是哪个条件起决定作用；再在实验中验证，提交（任务 4）。改变 n，填入表 3。",
+     "Choose the books, n = 8. Work out the smallest press and decide which condition governs; check it and submit (task 4). Vary n for Table 3."]
+数据表:
+  - 标题: ["表 1  提起与平移（m = 0.60 kg，μ_s = 0.45）", "Table 1  Lift and move (m = 0.60 kg, μ_s = 0.45)"]
+    表头: ["a_z / (m/s²)", "a_x / (m/s²)", "F_N 计算值 / N", "滑落的 F_N / N", "夹住的 F_N / N"]
+    表头英文: ["a_z / (m/s²)", "a_x / (m/s²)", "F_N computed / N", "F_N that slips / N", "F_N that holds / N"]
+    行: [["0", "0", "", "", ""], ["5.0", "0", "", "", ""], ["5.0", "2.0", "", "", ""], ["−4.0", "2.0", "", "", ""], ["0", "6.0", "", "", ""]]
+  - 标题: ["表 2  手臂转动（m = 0.60 kg，r = 0.40 m）", "Table 2  Arm swinging (m = 0.60 kg, r = 0.40 m)"]
+    表头: ["ω / (rad/s)", "ω²r / (m/s²)", "F_N 计算值 / N", "实验验证"]
+    表头英文: ["ω / (rad/s)", "ω²r / (m/s²)", "F_N computed / N", "Check"]
+    行: [["0", "", "", ""], ["3.0", "", "", ""], ["6.0", "", "", ""]]
+  - 标题: ["表 3  双手夹书（每本 0.50 kg）", "Table 3  Books (0.50 kg each)"]
+    表头: ["n", "nmg/(2μ_h) / N", "(n/2 − 1)mg/μ_b / N", "最小压力 / N", "不够时掉下来的是"]
+    表头英文: ["n", "nmg/(2μ_h) / N", "(n/2 − 1)mg/μ_b / N", "Smallest press / N", "What drops if short"]
+    行: [["2", "", "", "", ""], ["4", "", "", "", ""], ["8", "", "", "", ""], ["12", "", "", "", ""]]
+注意:
+  - ["提起与平移场景中，机械臂加速 0.6 s、匀速 0.6 s、再减速 0.6 s 停下，三段都要夹住。向下运动时，所需摩擦力最大的是末尾的减速段（加速度向上）。", "In “Lift and move” the arm accelerates for 0.6 s, cruises for 0.6 s and decelerates for 0.6 s; the part must hold in all three. For a downward move the critical stage is the final deceleration (acceleration upward)."]
+  - ["本实验不计安全系数，求的是理论上的最小值。实际设计时要乘以安全系数（7.1 节取 2）。", "No safety factor is used here; the values are theoretical minima. Real designs multiply by a safety factor (Section 7.1 uses 2)."]
+  - ["转动场景中，手臂起动时的切向力由两指的支持力之差提供，不需要摩擦力。", "In the swing, the tangential force during start-up comes from the difference of the two normal forces and needs no friction."]
+  - ["每个任务都要点“提交”才判定。", "Each task is judged only when you press “Submit”."]
+思考题:
+  - ["如果夹爪改为沿手臂方向（径向）夹紧，转动时向心力由什么提供？所需的夹紧力会怎样变化？", "If the fingers clamped along the arm (radially), what would provide the centripetal force in the swing? How would the grip needed change?"]
+  - ["双手夹书时，书越多，为什么越容易从中间掉下来？怎样用 μ_h 和 μ_b 判断从哪本书数起会先出问题？", "Why do longer rows of books tend to drop out in the middle? How do μ_h and μ_b tell you which condition fails first?"]

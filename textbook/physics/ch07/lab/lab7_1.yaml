@@ -1,0 +1,39 @@
+# 实验 7.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab7_1.js。
+原理:
+  - ["静摩擦力有上限 μ_s F_N。放在倾角为 θ 的斜面上的物体，F_N = mg cos θ，沿斜面向下的分量为 mg sin θ，不滑的条件是 tan θ ≤ μ_s。慢慢抬高斜面，物体刚开始滑动时的倾角（摩擦角）θ_c 满足 tan θ_c = μ_s，与物体的质量无关。",
+     "Static friction is at most μ_s F_N. On an incline of angle θ, F_N = mg cos θ and the downhill component is mg sin θ, so the body stays put while tan θ ≤ μ_s. Raising the incline slowly, the angle of friction θ_c at which it starts to slide satisfies tan θ_c = μ_s, whatever the mass."]
+  - 式: "tan θ_c = μ_s；u(μ_s) = u(θ_c)/cos²θ_c（角度化为弧度）        (7.1.3)"
+  - ["倾角大于摩擦角时，物体沿斜面匀加速下滑：ma = mg sin θ − μ_k mg cos θ。由静止滑过长度 L 用时 t，a = 2L/t²，于是 μ_k = (g sin θ − 2L/t²)/(g cos θ)。",
+     "Above the angle of friction the body slides down with constant acceleration: ma = mg sin θ − μ_k mg cos θ. From rest over length L in time t, a = 2L/t², so μ_k = (g sin θ − 2L/t²)/(g cos θ)."]
+  - 式: "μ_k = (g sin θ − 2L/t²)/(g cos θ)        (7.1.4)"
+  - ["计时误差的传递：a ∝ 1/t²，t 的相对误差在 a 中放大为两倍；g sin θ − a 又是两个相近的数相减，误差再被放大。秒表的误差主要来自人的反应，约几十毫秒；多次测量取平均，平均值的标准不确定度约为单次的 1/√n。光电门的误差在毫秒以下。",
+     "Propagating the timing error: a ∝ 1/t², so the relative error of t doubles in a; g sin θ − a is a difference of two close numbers, which magnifies it again. A stopwatch's error comes from human reaction, a few tens of milliseconds; averaging n runs shrinks the standard uncertainty of the mean to about 1/√n of a single run. Light gates are good to below a millisecond."]
+  - ["物体匀速下滑时 a = 0，由上式 tan θ = μ_k。滑梯的倾角接近这个值时，孩子被推一下就能匀速滑下。",
+     "Sliding at constant speed means a = 0, so tan θ = μ_k. A slide close to this angle gives a steady ride after a push."]
+步骤:
+  - ["选“抬高斜面”和一种材料。倾角从 0° 起每次加 0.5°，记下零件刚开始滑动的倾角 θ_c 和前一档（仍静止）的倾角，填入表 1；取两者的中点求 μ_s = tan θ_c 和 u(μ_s)。把“你测得的 μ_s”调到结果，点“提交”（任务 1）。对另外两种材料重复。",
+     "Choose “Raise the incline” and a material. Raise the angle from 0° in 0.5° steps; note the first angle at which the part slides and the last at which it stays, in Table 1. Take the midpoint, compute μ_s = tan θ_c and u(μ_s). Set “Your μ_s” and press “Submit” (task 1). Repeat for the other two materials."]
+  - ["选“测下滑时间”，材料与第 1 步相同，倾角取比摩擦角大 10° 左右，L = 0.6 m，计时选 1（光电门）。点“开始”，记下读数 t，由式 (7.1.4) 算出 μ_k，提交（任务 2）。",
+     "Choose “Time the slide”, same material, an angle about 10° above the angle of friction, L = 0.6 m, timer 1 (light gates). Press “Start”, note t, compute μ_k with Eq. (7.1.4) and submit (task 2)."]
+  - ["计时改为 0（秒表），其他不变，点“开始”测 5 次以上，读数填入表 2。分别用每次的 t 和平均时间算 μ_k，求单次结果的标准差，用平均时间算出的 μ_k 提交（任务 3）。",
+     "Switch to timer 0 (stopwatch), keep the rest, press “Start” 5 or more times and enter the readings in Table 2. Compute μ_k from each t and from the mean time, find the standard deviation of the single results, and submit the μ_k from the mean time (task 3)."]
+  - ["把 L 改为 1.2 m，用秒表再测 5 次，比较 μ_k 的分散程度。加长斜面为什么有帮助？",
+     "Change L to 1.2 m and time 5 more runs with the stopwatch. Compare the spread of μ_k. Why does a longer incline help?"]
+  - ["选“滑梯”，从 25° 起减小倾角，每次点“开始”，看速度—时间图：图线上升、水平还是下降。找到孩子匀速滑下的倾角，提交（任务 4），由 tan θ 读出 μ_k。",
+     "Choose the playground slide; lower the angle from 25°, press “Start” each time and watch the velocity–time graph rise, stay level or fall. Find the angle for a steady ride, submit (task 4) and read μ_k from tan θ."]
+数据表:
+  - 标题: ["表 1  摩擦角与静摩擦因数", "Table 1  Angle of friction and static coefficient"]
+    表头: ["材料", "仍静止的最大倾角 / (°)", "开始滑动的倾角 / (°)", "θ_c / (°)", "μ_s", "u(μ_s)"]
+    表头英文: ["Materials", "Largest angle at rest / (°)", "First sliding angle / (°)", "θ_c / (°)", "μ_s", "u(μ_s)"]
+    行: [["塑料零件盒—铝板", "", "", "", "", ""], ["硅胶指垫—铝板", "", "", "", "", ""], ["钢块—涂油钢板", "", "", "", "", ""]]
+  - 标题: ["表 2  下滑时间与动摩擦因数", "Table 2  Sliding time and kinetic coefficient"]
+    表头: ["计时方式", "θ / (°)", "L / m", "t / s", "a / (m/s²)", "μ_k"]
+    表头英文: ["Timer", "θ / (°)", "L / m", "t / s", "a / (m/s²)", "μ_k"]
+    行: [["光电门", "", "0.6", "", "", ""], ["秒表 1", "", "0.6", "", "", ""], ["秒表 2", "", "0.6", "", "", ""], ["秒表 3", "", "0.6", "", "", ""], ["秒表 4", "", "0.6", "", "", ""], ["秒表 5", "", "0.6", "", "", ""], ["秒表平均", "", "0.6", "", "", ""], ["单次 μ_k 的标准差", "", "", "", "", ""]]
+注意:
+  - ["三种材料的摩擦因数都不显示，要靠测量求出。实际的摩擦因数会随表面状态变化，本实验为了便于判定，取固定值。", "None of the coefficients is shown; you measure them. Real coefficients vary with the surface; here they are fixed so the tasks can be judged."]
+  - ["秒表读数的误差由设置和第几次测量确定，同一设置下重复测量会得到不同的读数；改变任一设置，重新从第 1 次记起。", "Stopwatch errors depend on the setting and the run number, so repeated runs differ; changing any setting starts a new record."]
+  - ["每个任务都要点“提交”才判定。", "Each task is judged only when you press “Submit”."]
+思考题:
+  - ["由表 1，哪种材料的摩擦角测得最准（相对不确定度最小）？为什么摩擦角很大时，同样的角度读数误差带来的 μ_s 误差更大？", "From Table 1, which material's angle of friction gives the most precise μ_s (smallest relative uncertainty)? Why does the same angle error matter more at large angles?"]
+  - ["本实验中秒表的误差是随机的，有时偏大、有时偏小。实际操作中，如果人按秒表总是开始按得晚、停止也按得晚，会产生什么样的误差？多次平均能消除它吗？怎样发现它？", "Here the stopwatch error is random, sometimes long and sometimes short. If in practice a person always starts late and stops late, what kind of error results? Does averaging remove it? How could you detect it?"]
