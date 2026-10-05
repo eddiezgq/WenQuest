@@ -1,0 +1,18 @@
+# 实验 9.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab9_6.js。
+原理:
+  - ["同一个线性映射在不同的基下有不同的矩阵。基矩阵 P 的各列是新基向量，新基下的矩阵是 P⁻¹AP（9.6 节）：先用 P 把新坐标变成标准坐标，用 A 作用，再用 P⁻¹ 变回新坐标。", "The same linear map has different matrices in different bases. With the new basis vectors as the columns of P, the matrix in the new basis is P⁻¹AP (Section 9.6): P turns new coordinates into standard ones, A acts, P⁻¹ turns back."]
+  - 式: "B = P⁻¹AP；  tr B = tr A；  det B = det A；  新基下矩阵的第 j 列 = A b_j 在新基下的坐标"
+  - ["一个基向量被映射成自己的倍数（A b = λ b）时，矩阵的相应列只有对角元 λ。把这样的向量选作基，矩阵最简单（第 13 章的特征向量）。", "When a basis vector is sent to a multiple of itself (A b = λ b), its column has only the diagonal entry λ. Choosing such vectors as the basis gives the simplest matrix (eigenvectors, Chapter 13)."]
+步骤:
+  - ["在反射场景中转动 b₁、b₂，观察 Ab₁、Ab₂（虚线箭头）与 P⁻¹AP；找出使矩阵为 diag(1, −1) 的基（任务 1），记入表 1。", "In the reflection scene turn b₁ and b₂, watching Ab₁, Ab₂ (dashed) and P⁻¹AP; find the basis giving diag(1, −1) (task 1); record it in Table 1."]
+  - ["让 b₁ 离开镜线，找出使矩阵为 [[0, 1], [1, 0]] 的 b₂（任务 2），说明 b₁、b₂ 与镜线的关系。", "With b₁ off the mirror line, find the b₂ giving [[0, 1], [1, 0]] (task 2); describe how b₁, b₂ and the mirror are related."]
+  - ["切换到投影场景，先找出使矩阵为 diag(1, 0) 的基，再找出使矩阵为 [[1, 0.5], [0, 0]] 的基（任务 3；提示：b₂ 在 30° 方向上的分量应为 0.5），每次记下迹与行列式。", "Switch to the projection scene; find the basis giving diag(1, 0), then one giving [[1, 0.5], [0, 0]] (task 3; hint: the component of b₂ along 30° should be 0.5); record the trace and determinant each time."]
+数据表:
+  - 标题: ["表 1  不同基下的矩阵", "Table 1  Matrices in different bases"]
+    表头: ["场景", "b₁ 的方向 / °", "b₂ 的方向 / °", "P⁻¹AP", "迹", "行列式"]
+    表头英文: ["Scene", "Direction of b₁ / °", "Direction of b₂ / °", "P⁻¹AP", "Trace", "Determinant"]
+    行: [["反射", "0", "90", "", "", ""], ["反射", "", "", "", "", ""], ["反射", "", "", "", "", ""], ["投影", "", "", "", "", ""], ["投影", "", "", "", "", ""]]
+注意:
+  - ["b₁、b₂ 方向相同时不构成基，P 不可逆，实验会给出提示。", "When b₁ and b₂ point the same way they are not a basis and P is not invertible; the lab says so."]
+思考题:
+  - ["投影场景中，能否找到一组基，使矩阵为 diag(1, 1)？为什么？（提示：秩与基无关。）", "In the projection scene, can any basis give diag(1, 1)? Why not? (Hint: rank does not depend on the basis.)"]

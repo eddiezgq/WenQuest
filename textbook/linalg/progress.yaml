@@ -35,6 +35,9 @@ chapters:
   8:
     status: ai
     title_en: "The Four Fundamental Subspaces"
+  9:
+    status: ai
+    title_en: "Linear Maps"
   18:
     status: ai
     title_en: "The Singular Value Decomposition"

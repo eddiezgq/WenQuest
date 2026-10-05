@@ -1,0 +1,22 @@
+# 实验 9.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab9_4.js。
+原理:
+  - ["线性映射的复合对应矩阵的乘积：先 T 后 S，矩阵是 [S][T]（9.4 节）。列向量左乘，所以“先绕 x 轴转 α、再绕 z 轴转 β”的矩阵是 Rz(β)Rx(α)。", "Composition of linear maps corresponds to the product of matrices: T first, then S, has matrix [S][T] (Section 9.4). With column vectors, 'turn α about x, then β about z' is Rz(β)Rx(α)."]
+  - 式: "Rx(α) = [[1, 0, 0], [0, cos α, −sin α], [0, sin α, cos α]]；  Rz(β) = [[cos β, −sin β, 0], [sin β, cos β, 0], [0, 0, 1]]；  cos φ = (tr(A₁ᵀA₂) − 1)/2"
+  - ["矩阵乘法一般不可交换，两种顺序得到不同的姿态；转角都很小时，差别约为两角（弧度）之积，是二阶小量。", "Matrix multiplication generally does not commute, so the two orders give different poses; for small angles the difference is about the product of the angles (in radians), a second-order quantity."]
+步骤:
+  - ["取 α = β = 90°（任务 1），记下两个矩阵和相差的角度，在表 1 中画出工件最后的朝向（顶面、红色端面朝哪里）。", "Set α = β = 90° (task 1); record both matrices and the angle between them; sketch where the top face and red end face point (Table 1)."]
+  - ["尝试 α = 180° 与不同的 β、以及 α、β 都取 ±180°，找出两种顺序结果相同的情形（任务 2）。", "Try α = 180° with various β, and α, β both ±180°, to find when the two orders agree (task 2)."]
+  - ["取越来越小的 α = β，记录相差的角度与 α·β，填表 2；再找两个不相等的非零转角，使两种顺序相差 0.85°～0.9°（任务 3）。", "Make α = β smaller and smaller and record the angle between the results and α·β in Table 2; then find two unequal nonzero angles for which the orders differ by 0.85°–0.9° (task 3)."]
+数据表:
+  - 标题: ["表 1  两种顺序的结果", "Table 1  Results of the two orders"]
+    表头: ["α / °", "β / °", "A₁ = Rz(β)Rx(α)", "A₂ = Rx(α)Rz(β)", "相差的角度 / °"]
+    表头英文: ["α / °", "β / °", "A₁ = Rz(β)Rx(α)", "A₂ = Rx(α)Rz(β)", "Angle between / °"]
+    行: [["90", "90", "", "", ""], ["180", "90", "", "", ""], ["", "", "", "", ""]]
+  - 标题: ["表 2  小转角", "Table 2  Small angles"]
+    表头: ["α = β / °", "相差的角度 / °", "α·β（弧度相乘后化为度）/ °", "比值"]
+    表头英文: ["α = β / °", "Angle between / °", "α·β (radians multiplied, in degrees) / °", "Ratio"]
+    行: [["30", "", "", ""], ["15", "", "", ""], ["10", "", "", ""], ["5", "", "", ""]]
+注意:
+  - ["转动都绕固定的基座坐标轴进行。若改为绕工件自身（随动）的坐标轴，顺序与矩阵乘法的左右正好相反（第 31 章）。", "Both turns are about the fixed base axes. About the part's own moving axes, the order of the matrix product reverses (Chapter 31)."]
+思考题:
+  - ["为什么绕两根互相垂直的轴各转 180° 时两种顺序结果相同？写出 Rx(180°) 与 Rz(180°) 验证。", "Why do turns of 180° about two perpendicular axes commute? Write out Rx(180°) and Rz(180°) to check."]
