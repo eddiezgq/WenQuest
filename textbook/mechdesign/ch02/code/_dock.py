@@ -3,7 +3,7 @@
 # 分功能：(中文, English, [(解法中文, 解法英文), ...])
 FUNCS = [
     ("走到桩前", "approach the dock", [("视觉标记导航", "visual-marker navigation"), ("红外信标", "infrared beacon"), ("地面导引条", "floor guide strip")]),
-    ("消除位置误差", "absorb position error", [("V 形导槽", "V-shaped guide"), ("浮动接触板", "floating contact plate"), ("锥销定位", "taper-pin locating"), ("磁力自对中", "magnetic self-centring")]),
+    ("消除位置误差", "absorb position error", [("V 形导槽", "V-shaped guide"), ("浮动接触板", "floating contact plate"), ("锥销定位", "taper-pin locating"), ("磁力自对中", "magnetic self-centering")]),
     ("接通电流", "make electrical contact", [("弹簧顶针", "spring pins"), ("刀片触点", "blade contacts"), ("无线感应", "inductive (wireless)"), ("插头插座", "plug and socket")]),
     ("保持接触", "hold contact", [("机身自重", "own weight"), ("永磁吸合", "permanent magnet"), ("机械卡扣", "mechanical latch")]),
     ("保护触点", "protect the contacts", [("翻盖", "flip cover"), ("毛刷", "brushes"), ("不设防护", "none")]),

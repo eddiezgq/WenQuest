@@ -1,10 +1,10 @@
 # 实验 4.8 的指导书与报告模板。目的、场景、参数、任务取自 lab4_8.js。
 原理:
   - ["尺寸链里，封闭环（这里是轴向游隙）由各组成环决定：增环变大，封闭环变大；减环变大，封闭环变小。", "In a dimension chain the closing link (here the end play) is set by the component links: an increasing link raises it, a decreasing link lowers it."]
-  - 式: "游隙 = W − c₁ − c₂ − (B + 套筒 + 齿轮毂 + 轴上 25 + B)"
+  - 式: ["游隙 = W − c₁ − c₂ − (B + 套筒 + 齿轮毂 + 轴上 25 + B)", "Clearance = W − c₁ − c₂ − (B + sleeve + gear hub + 25 on the shaft + B)"]
   - ["极值法：每个环都同时取最不利的极限，封闭环的公差等于各环公差之和——保证 100% 装配，但要求各环公差很小。", "Worst case: all links at their worst limits at once; the closing tolerance is the sum of the link tolerances — 100% assembly, but tight link tolerances."]
-  - 式: "极值法 T₀ = Σ Tᵢ；方和根法 T₀ = √(Σ Tᵢ²)（各环正态、对中，σᵢ = Tᵢ/6）"
-  - ["蒙特卡洛法：按各环的实际分布随机抽样，直接数出合格率；分布不对称、不对中时也能用。", "Monte Carlo: draw each link from its actual distribution and count the yield directly; works for skewed or off-centre distributions too."]
+  - 式: ["极值法 T₀ = Σ Tᵢ；方和根法 T₀ = √(Σ Tᵢ²)（各环正态、对中，σᵢ = Tᵢ/6）", "Worst case T₀ = Σ Tᵢ; root sum square T₀ = √(Σ Tᵢ²) (links normal and centered, σᵢ = Tᵢ/6)"]
+  - ["蒙特卡洛法：按各环的实际分布随机抽样，直接数出合格率；分布不对称、不对中时也能用。", "Monte Carlo: draw each link from its actual distribution and count the yield directly; works for skewed or off-center distributions too."]
   - ["补偿环：装配时量出游隙，用调整垫片补到要求的范围。零件公差可以放宽，代价是装配时要测量、选垫片。", "Compensating link: measure the play at assembly and add shims to bring it into range. Parts may have wider tolerances; the price is measuring and choosing shims."]
 步骤:
   - ["打开实验 4.8，场景“WQR-105 输出轴系”。参数取默认（公差倍数 1、轴承宽度标准差 0.015、不用补偿、抽样 20000 次），点“抽样”（任务 1），把极值法范围、方和根范围、抽样的平均值和标准差、合格率填入表 1。", "Open Lab 4.8, scene “WQR-105 output shaft”. With the defaults (tolerances × 1, bearing s.d. 0.015, no compensation, 20000 samples) press Sample (task 1); enter worst-case range, RSS range, sampled mean and s.d., and yield in Table 1."]
@@ -18,6 +18,7 @@
     表头: ["方案", "极值法范围 / mm", "方和根 μ ± 3σ / mm", "抽样平均 / mm", "抽样标准差 / mm", "合格率 / %", "垫片平均 / 最厚 / mm"]
     表头英文: ["Option", "Worst case / mm", "RSS μ ± 3σ / mm", "Sampled mean / mm", "Sampled s.d. / mm", "Yield / %", "Shims mean / max / mm"]
     行: [["公差 × 1，不补偿", "", "", "", "", "", "—"], ["公差 × 0.5，不补偿", "", "", "", "", "", "—"], ["公差 × 1，垫片", "", "", "", "", "", ""]]
+    行英文: [["tolerances × 1, no compensation", "", "", "", "", "", "—"], ["tolerances × 0.5, no compensation", "", "", "", "", "", "—"], ["tolerances × 1, shims", "", "", "", "", "", ""]]
   - 标题: ["表 2  轴承宽度的分散对合格率的影响（公差 × 1，不补偿）", "Table 2  Effect of bearing width scatter (tolerances × 1, no compensation)"]
     表头: ["轴承宽度标准差 / mm", "抽样标准差 / mm", "合格率 / %"]
     表头英文: ["Bearing s.d. / mm", "Sampled s.d. / mm", "Yield / %"]
@@ -26,6 +27,7 @@
     表头: ["方案", "抽样的最小、最大游隙 / mm", "合格率 / %"]
     表头英文: ["Option", "Sampled min, max play / mm", "Yield / %"]
     行: [["不选配", "", ""], ["隔套分三档选配", "", ""]]
+    行英文: [["no selective assembly", "", ""], ["spacer in three grades", "", ""]]
 注意:
   - ["箱体两端面距离 W = 152 mm、端盖止口长度是本书设定的（数字工厂的箱体还没有这几个尺寸）；其余尺寸取 SH-301 B 版与 6207 的标准公差。", "The housing width W = 152 mm and the cap spigot lengths were set by this book (the factory housing does not define them yet); the rest come from SH-301 rev. B and the 6207 standard tolerances."]
   - ["深沟球轴承本身还有轴向游隙，这里没有计入；轴承内外圈宽度按同一公差处理。", "The internal axial clearance of the ball bearings is ignored here; inner and outer ring widths take the same tolerance."]

@@ -87,7 +87,7 @@ for k, (c, item, why) in enumerate(diff):
     for x, t in zip(xs, (c, item, why)):
         a1.text(x, y, t, fontsize=6.6, va="center")
 y = yy - 0.13 * (len(diff) + 1)
-a1.text(0, y, T("不变：", "Unchanged: ") + "、".join(unchanged), fontsize=6.6, va="center", color=H.MUTED)
+a1.text(0, y, T("不变：", "Unchanged: ") + T("、", ", ").join(unchanged), fontsize=6.6, va="center", color=H.MUTED)
 a1.plot([0, 1], [yy - 0.065, yy - 0.065], color=H.INK, lw=0.6)
 a1.set_xlim(0, 1)
 a1.set_ylim(0, 1)

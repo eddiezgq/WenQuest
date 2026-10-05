@@ -35,7 +35,7 @@ for y, c, lab in ((hm, H.C_MILL, T("铣削", "milling")), (hs, H.C_SHEET, T("钣
     a1.loglog(qs, y, color=c, lw=1.2, label=lab)
 a1.legend(fontsize=6.3, frameon=False)
 a1.set_xlabel(T("批量 / 件", "Batch size"), fontsize=7.5)
-a1.set_ylabel(T("设备与人工工时 / h", "Machine and labour hours / h"), fontsize=7.5)
+a1.set_ylabel(T("设备与人工工时 / h", "Machine and labor hours / h"), fontsize=7.5)
 a1.tick_params(labelsize=6.5)
 a1.set_title(T("(b) 一批的工时（不含排队、运输）", "(b) Hours per batch (no queueing or shipping)"), fontsize=7.8)
 fig.tight_layout()

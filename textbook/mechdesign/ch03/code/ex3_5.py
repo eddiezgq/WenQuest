@@ -2,6 +2,7 @@
 轴承用规定画法（上半）和通用画法（下半）、齿轮按 GB/T 4459.2 画、序号与明细栏；明细栏由数字工厂的 BOM 生成，
 再加上第 33 章工程更改带来的变化（图 3.5.1）。"""
 import math
+import re
 
 import numpy as np
 
@@ -156,21 +157,21 @@ for i, r in enumerate(allrows):
         if r is None:
             val = head
         elif key == "name":
-            val = T(r["name"][0], r["name"][1] or r["name"][0])
+            val = T(r["name"][0], re.sub(r"\d+×\d+×\d+ (?=\d{4})", "", (r["name"][1] or r["name"][0]).replace("Parallel key", "Key")))
         elif key == "chg":
             val = {T("改", "chg."): T("B 版改", "changed"), T("新", "new"): T("B 版新增", "added")}.get(r.get("chg"), "")
         else:
             val = str(r.get(key, ""))
-        sh.text(xx + w / 2, y + rh / 2, val, size=FS * 0.78, va="center", color=H.MUTED if r is None else H.INK)
+        sh.text(xx + w / 2, y + rh / 2, val, size=FS * T(0.78, 0.7), va="center", color=H.MUTED if r is None else H.INK)
         sh.raw_line((xx + w, y), (xx + w, y + rh))
         xx += w
-sh.title_block(415, 5, {"name": T("输出轴组件", "Output shaft assy"), "material": "—", "drawn": T("问渠教材", "WenQuest"), "checked": "—",
+sh.title_block(415, 5, {"name": T("输出轴组件", "Shaft assembly"), "material": "—", "drawn": T("问渠教材", "WenQuest"), "checked": "—",
                         "scale": "1:1", "qty": "1", "date": "2026-10", "rev": "B", "no": "SA-300", "org": T("问渠数字工厂", "WenQuest factory"),
                         "title": "SA-300"})
 notes = [T("技术要求", "Technical requirements"),
          T("1. 齿轮与轴为过盈配合，热装（加热齿轮），不得锤击。", "1. Gear on shaft with interference: shrink fit (heat the gear), no hammering."),
          T("2. 轴承内圈靠紧轴肩和套筒，不得有间隙。", "2. Bearing inner rings tight against shoulder and sleeve, no gap."),
-         T("3. 装配后用手转动输出轴，转动灵活、无卡滞；出厂时在跑合试验台上检查空载温升和噪声。", "3. Turn the shaft by hand: it runs freely; no-load temperature rise and noise checked on the run-in bench.")]
+         T("3. 装配后用手转动输出轴，转动灵活、无卡滞；出厂时在跑合试验台上检查空载温升和噪声。", "3. Shaft turns freely by hand; no-load heat and noise checked on the run-in bench.")]
 for i, t in enumerate(notes):
     sh.text(30, 29 - i * 6.5, t, size=FS * (1.05 if i == 0 else 0.95), ha="left", va="center", weight="bold" if i == 0 else "normal")
 fig.subplots_adjust(0, 0, 1, 1)

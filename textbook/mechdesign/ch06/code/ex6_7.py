@@ -33,7 +33,7 @@ ORIG = [
     (T("定位销", "dowel pin"), 2, "pin", False, T("只为对准，可做成盖上的止口", "only for alignment; a spigot on the cap can do it")),
     (T("磁铁座", "magnet holder"), 1, "holder", True, T("随轴转，相对端盖运动", "turns with the shaft")),
     (T("磁铁", "magnet"), 1, "magnet", True, T("材料不同", "different material")),
-    (T("电缆密封接头", "cable gland"), 1, "gland", False, T("可做成盖上的密封套", "can be a sleeve moulded on the cap")),
+    (T("电缆密封接头", "cable gland"), 1, "gland", False, T("可做成盖上的密封套", "can be a sleeve molded on the cap")),
     (T("铭牌", "label"), 1, "label", False, T("可激光打标在盖上", "can be laser-marked on the cap")),
 ]
 NEW = [
@@ -44,7 +44,7 @@ NEW = [
 ]
 
 
-def analyse(parts):
+def analyze(parts):
     n = sum(q for _, q, *_ in parts)
     nmin = sum(q for _, q, _, ess, _ in parts if ess)
     tt = sum(q * sum(TIMES[k]) for _, q, k, _, _ in parts)
@@ -52,10 +52,10 @@ def analyse(parts):
     return n, nmin, tt, 3 * nmin / tt, rows
 
 
-n0, nmin0, t0, e0, rows0 = analyse(ORIG)
-n1, nmin1, t1, e1, rows1 = analyse(NEW)
-LABOUR = sum(F.WORKSTATIONS["装配工位 ASM-01"][1])          # 数字工厂装配工位费率 美元/小时
-c0, c1 = t0 / 3600 * LABOUR, t1 / 3600 * LABOUR
+n0, nmin0, t0, e0, rows0 = analyze(ORIG)
+n1, nmin1, t1, e1, rows1 = analyze(NEW)
+LABOR = sum(F.WORKSTATIONS["装配工位 ASM-01"][1])          # 数字工厂装配工位费率 美元/小时
+c0, c1 = t0 / 3600 * LABOR, t1 / 3600 * LABOR
 Q_YEAR = 20000                                               # 任务单 TS-6-1 的年产量（本书设定）
 
 # 算例 6.7.2：SA-300（数字工厂 BOM）
@@ -86,6 +86,6 @@ fig.tight_layout()
 figure(fig, "fig6_7_1")
 
 out(n0=n0, nmin0=nmin0, t0=t0, e0=100 * e0, n1=n1, nmin1=nmin1, t1=t1, e1=100 * e1, t_saved=100 * (1 - t1 / t0),
-    labour=LABOUR, c0=c0, c1=c1, t_screw=sum(TIMES["screw"]), t_screws0=6 * sum(TIMES["screw"]) + 6 * sum(TIMES["washer"]),
+    labour=LABOR, c0=c0, c1=c1, t_screw=sum(TIMES["screw"]), t_screws0=6 * sum(TIMES["screw"]) + 6 * sum(TIMES["washer"]),
     share_fast0=100 * (6 * sum(TIMES["screw"]) + 6 * sum(TIMES["washer"])) / t0,
     n_sa=n_sa, nmin_sa=nmin_sa, n_kinds_sa=len(sa), q_year=Q_YEAR, save_year=(c0 - c1) * Q_YEAR, save_h=(t0 - t1) * Q_YEAR / 3600)

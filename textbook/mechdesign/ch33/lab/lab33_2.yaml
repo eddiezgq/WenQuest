@@ -24,7 +24,7 @@
     行: [["WQR-105", "", "", "", "", "", ""], ["减速电机", "", "", "", "", "", "—"]]
     行英文: [["WQR-105", "", "", "", "", "", ""], ["Gearmotor", "", "", "", "", "", "—"]]
 注意:
-  - ["实验里轴肩的上限用 d + 0.33(D − d) 近似表示内圈挡边直径（6207 约 47 mm）；真实设计按轴承样本给出的安装尺寸 da,max 核对。", "The lab approximates the inner-ring land by d + 0.33(D − d) (about 47 mm for a 6207); a real design checks the catalogue's mounting dimension da,max."]
+  - ["实验里轴肩的上限用 d + 0.33(D − d) 近似表示内圈挡边直径（6207 约 47 mm）；真实设计按轴承样本给出的安装尺寸 da,max 核对。", "The lab approximates the inner-ring land by d + 0.33(D − d) (about 47 mm for a 6207); a real design checks the catalog's mounting dimension da,max."]
   - ["键的许用挤压应力取 135 MPa（钢制轮毂、静联结的中值），与数字工厂参数配置器一致；第 25 章详细讨论。", "The allowable key bearing stress is 135 MPa (steel hub, static joint), as in the factory configurator; Chapter 25 discusses it in detail."]
 思考题:
   - ["外伸段的联轴器键如果一定要短（例如轮毂只有 40 mm），还有哪些办法能传递 350 N·m？", "If the coupling key must stay short (a 40 mm hub, say), what else could transmit 350 N·m?"]

@@ -21,7 +21,7 @@ function links4_8(scene, comp, tol) {
   }
   // 轮滑鞋的轮子：两个 608 轴承的内圈夹着隔套（螺栓压紧），外圈靠在轮毂中间的凸台两侧。隔套比凸台长，轴承才不被螺栓压死。
   return { req: [0.02, 0.15], target: 0.08, step: 0.05, links: [
-    [["隔套长", "Spacer"], 8.0, -0.05, 0.05, 1, "m"], [["轮毂凸台宽（注塑）", "Hub rib (moulded)"], 7.92, -0.08, 0.08, -1, "m"]] };
+    [["隔套长", "Spacer"], 8.0, -0.05, 0.05, 1, "m"], [["轮毂凸台宽（注塑）", "Hub rib (molded)"], 7.92, -0.08, 0.08, -1, "m"]] };
 }
 function sample4_8(p, scene) {
   const comp = Math.round(p.comp) === 1, L = links4_8(scene, comp, p.tol), r = rng4_8(4801), n = Math.round(p.n);
@@ -62,7 +62,7 @@ WQ.lab({
          "Draw every link at random within its tolerance, compute the end play, repeat thousands of times; compare the distribution and yield with worst case and RSS; then try a shim pack as compensating link."],
   scenes: [
     { id: "robot", robot: true, name: ["WQR-105 输出轴系", "WQR-105 output shaft"],
-      problem: { title: ["工程问题：码垛线减速器输出轴的轴向游隙", "Engineering problem: end play of the palletising-line reducer's output shaft"],
+      problem: { title: ["工程问题：码垛线减速器输出轴的轴向游隙", "Engineering problem: end play of the palletizing-line reducer's output shaft"],
                  text: ["两个 6207 两端固定，端盖压住外圈。游隙太小，轴受热伸长后把轴承压死；太大，齿轮轴向窜动。要求 0.2–0.4 mm。八个尺寸串成一条链，公差能不能保证？",
                         "Two 6207s, fixed at both ends, the caps pressing the outer rings. Too little play and the warm shaft jams the bearings; too much and the gear shuttles. 0.2–0.4 mm is required. Can the tolerances of eight sizes in one chain guarantee it?"] } },
     { id: "life", name: ["轮滑鞋的轮子", "Inline-skate wheel"],
@@ -81,7 +81,7 @@ WQ.lab({
   tasks: [
     { id: "base", robot: true, text: ["按正文的公差（倍数 1）、不用垫片抽样：合格率多少？极值法的范围比要求宽多少倍？", "Sample with the text's tolerances (× 1) and no shims: what is the yield? How many times wider than required is the worst-case range?"],
       demo: { scene: "robot", set: { tol: 1, bsd: 0.015, comp: 0, n: 20000 }, press: ["start"], wait: 1 } },
-    { id: "tight", robot: true, text: ["把机加工零件的公差缩小到一半（0.5，止口长度随之重新对中）：合格率能到 100% 吗？极值法的范围呢？", "Halve the machined-part tolerances (0.5; the spigot is re-centred): does the yield reach 100%? And the worst-case range?"],
+    { id: "tight", robot: true, text: ["把机加工零件的公差缩小到一半（0.5，止口长度随之重新对中）：合格率能到 100% 吗？极值法的范围呢？", "Halve the machined-part tolerances (0.5; the spigot is re-centered): does the yield reach 100%? And the worst-case range?"],
       demo: { scene: "robot", set: { tol: 0.5, bsd: 0.015, comp: 0, n: 20000 }, press: ["start"], wait: 1 } },
     { id: "shim", robot: true, text: ["公差放回 1，用调整垫片（补偿环 = 1）：合格率、垫片最厚多少？", "Tolerances back to 1, use shims (compensation = 1): yield and the thickest shim pack?"],
       demo: { scene: "robot", set: { tol: 1, bsd: 0.015, comp: 1, n: 20000 }, press: ["start"], wait: 1 } },

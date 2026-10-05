@@ -441,10 +441,10 @@ class Sheet:
         self.raw_line((x0 + 105, y0 + 16), (x0 + 105, y0 + 32))
         self.raw_line((x0 + 75, y0 + 24), (x1, y0 + 24))
         s = FS * 0.95
-        cells = [((x0 + 7.5, y0 + 28), T("名称", "Name")), ((x0 + 7.5, y0 + 20), T("材料", "Material")), ((x0 + 7.5, y0 + 12), T("设计", "Drawn")),
-                 ((x0 + 7.5, y0 + 4), T("审核", "Checked")), ((x0 + 52.5, y0 + 28), T("比例", "Scale")), ((x0 + 52.5, y0 + 20), T("数量", "Qty")),
+        cells = [((x0 + 7.5, y0 + 28), T("名称", "Name")), ((x0 + 7.5, y0 + 20), T("材料", "Matl.")), ((x0 + 7.5, y0 + 12), T("设计", "Drawn")),
+                 ((x0 + 7.5, y0 + 4), T("审核", "Chkd.")), ((x0 + 52.5, y0 + 28), T("比例", "Scale")), ((x0 + 52.5, y0 + 20), T("数量", "Qty")),
                  ((x0 + 52.5, y0 + 12), T("日期", "Date")), ((x0 + 52.5, y0 + 4), T("版本", "Rev.")),
-                 ((x0 + 90, y0 + 28), T("图号", "Drawing no.")), ((x0 + 90, y0 + 20), T("单位", "Org."))]
+                 ((x0 + 90, y0 + 28), T("图号", "Dwg no.")), ((x0 + 90, y0 + 20), T("单位", "Org."))]
         for (cx, cy), t in cells:
             ax.text(cx, cy, t, fontsize=s, ha="center", va="center", color=MUTED)
         vals = [((x0 + 30, y0 + 28), rows.get("name", "")), ((x0 + 30, y0 + 20), rows.get("material", "")),

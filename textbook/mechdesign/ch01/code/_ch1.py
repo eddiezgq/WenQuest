@@ -20,7 +20,7 @@ from matplotlib.patches import FancyArrowPatch, FancyBboxPatch  # noqa: E402
 from bookout import COLORS, T          # noqa: E402
 
 INK, MUTED = COLORS["ink"], COLORS["muted"]
-PALE = {"blue": "#e8eef7", "green": "#eef6e8", "orange": "#fbefe0", "purple": "#f3e8f7", "teal": "#e8f4f4", "grey": "#eef0f2"}
+PALE = {"blue": "#e8eef7", "green": "#eef6e8", "orange": "#fbefe0", "purple": "#f3e8f7", "teal": "#e8f4f4", "gray": "#eef0f2"}
 
 
 def box(ax, x, y, w, h, text, fc="#ffffff", size=8.5, bold=False, ec=None, lw=0.8):

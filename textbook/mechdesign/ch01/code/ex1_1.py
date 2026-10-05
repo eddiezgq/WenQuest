@@ -41,13 +41,13 @@ for x, s in zip(xs, subs):
     H.arrow(ax, (3.9, 3.3), (x + 0.875, 2.7), H.MUTED)
     kids = [c for c, _ in F.BOMS[s][1]]
     for k, c in enumerate(kids):
-        col = H.PALE["orange"] if H.kind(c) == "make" else H.PALE["grey"]
+        col = H.PALE["orange"] if H.kind(c) == "make" else H.PALE["gray"]
         H.box(ax, x + 0.1, 1.6 - 0.36 * k, 1.55, 0.29, c, col, 7)
 others = [c for c, _ in F.BOMS["WQR-105"][1] if H.kind(c) != "sub"]
 ax.text(7.95, 2.45, T("另有总装件 {} 种\n（端盖、油封、螺钉、\n润滑油……）", "plus {} final-assembly\nitems (caps, seals,\nscrews, oil …)").format(len(others)),
         fontsize=7.5, va="center", color=H.MUTED)
 H.box(ax, 0.0, -0.95, 1.0, 0.3, T("自制零件", "made part"), H.PALE["orange"], 7)
-H.box(ax, 1.2, -0.95, 1.0, 0.3, T("外购件", "bought part"), H.PALE["grey"], 7)
+H.box(ax, 1.2, -0.95, 1.0, 0.3, T("外购件", "bought part"), H.PALE["gray"], 7)
 ax.set_xlim(-0.2, 9.6)
 ax.set_ylim(-1.05, 3.9)
 ax.axis("off")

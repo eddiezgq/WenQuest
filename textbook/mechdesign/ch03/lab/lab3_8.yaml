@@ -1,28 +1,29 @@
 # 实验 3.8 的指导书与报告模板。目的、场景、参数、任务取自 lab3_8.js。
 原理:
-  - ["参数化模型把“设计规则”写成程序：输入一个轴承型号，壁厚、中心高、底板、地脚孔都按规则算出来，再生成三维模型和三视图。改一个参数，模型、图纸和 BOM 里的规格一起变。", "A parametric model writes the design rules as a program: give a bearing and the wall, centre height, base and bolt holes follow, then the 3D model and views. Change one parameter and model, drawing and BOM spec change together."]
-  - 式: "壁厚 = round(系数 × D + 3)；圆弧半径 Ro = D/2 + 壁厚；中心高 H = 不小于 Ro + 2 的 R20 优先数"
-  - 式: "座宽 W = B + 14；底板宽 = W + 12；底板厚 = round(系数 × H)；地脚孔距 = 2(Ro + dh + 2)；底板长 = 孔距 + 3dh"
+  - ["参数化模型把“设计规则”写成程序：输入一个轴承型号，壁厚、中心高、底板、地脚孔都按规则算出来，再生成三维模型和三视图。改一个参数，模型、图纸和 BOM 里的规格一起变。", "A parametric model writes the design rules as a program: give a bearing and the wall, center height, base and bolt holes follow, then the 3D model and views. Change one parameter and model, drawing and BOM spec change together."]
+  - 式: ["壁厚 = round(系数 × D + 3)；圆弧半径 Ro = D/2 + 壁厚；中心高 H = 不小于 Ro + 2 的 R20 优先数", "Wall = round(factor × D + 3); arc radius Ro = D/2 + wall; center height H = the R20 preferred number not less than Ro + 2"]
+  - 式: ["座宽 W = B + 14；底板宽 = W + 12；底板厚 = round(系数 × H)；地脚孔距 = 2(Ro + dh + 2)；底板长 = 孔距 + 3dh", "Width W = B + 14; base width = W + 12; base thickness = round(factor × H); anchor-hole spacing = 2(Ro + dh + 2); base length = spacing + 3dh"]
   - ["地脚螺栓：D ≤ 52 用 M8，D ≤ 72 用 M10，更大用 M12；通孔按 GB/T 5277 中等装配。这些规则与程序 3.8.1 相同。", "Bolts: M8 for D ≤ 52, M10 for D ≤ 72, M12 above; clearance holes to GB/T 5277 medium. The rules are those of Program 3.8.1."]
   - ["“圆弧半径写死”模拟设计意图不对的草图：尺寸直接写成数，不跟轴承外径走（3.7 节）。", "“Arc radius fixed” mimics a sketch with the wrong design intent: the size is typed in instead of following the bearing OD (Section 3.7)."]
 步骤:
-  - ["打开实验 3.8，场景“码垛输送线的滚筒”。选 6207（序号 3），点“生成”（任务 1），把中心高、底板尺寸、地脚螺栓、质量填入表 1。", "Open Lab 3.8, scene “Palletising conveyor roller”. Choose 6207 (number 3) and press Generate (task 1); enter centre height, base, bolts and mass in Table 1."]
+  - ["打开实验 3.8，场景“码垛输送线的滚筒”。选 6207（序号 3），点“生成”（任务 1），把中心高、底板尺寸、地脚螺栓、质量填入表 1。", "Open Lab 3.8, scene “Palletizing conveyor roller”. Choose 6207 (number 3) and press Generate (task 1); enter center height, base, bolts and mass in Table 1."]
   - ["对照三视图，指出“长对正、高平齐、宽相等”各是哪几条线；说出俯视图里的虚线各代表什么。", "On the three views, point out the lines that show “length aligned, height aligned, width equal”; say what each dashed line in the top view stands for."]
   - ["改用 6209。先把“圆弧半径”设为 1（写死 48 mm）生成，记下壁厚；再设为 0 生成，记下壁厚（任务 2），填入表 1。", "Switch to 6209. Generate with “arc radius” = 1 (fixed 48 mm) and note the wall; then with 0 and note the wall (task 2); enter both in Table 1."]
   - ["切换到“跑步机的滚筒”，选 6205，底板厚系数取 0.25 和 0.35 各生成一次（任务 3），填入表 2。", "Switch to “Treadmill roller”, choose 6205, generate with base factor 0.25 and 0.35 (task 3); enter in Table 2."]
   - ["（选做）在自己的电脑上安装 build123d（pip install build123d），运行程序 3.8.1，把 6207 的 STEP 文件导入 FreeCAD 或数字工厂的“仿真与分析”，与本实验的尺寸对照。", "(Optional) Install build123d (pip install build123d), run Program 3.8.1 and open the 6207 STEP file in FreeCAD or the factory's Simulation & Analysis; compare with this lab."]
 数据表:
-  - 标题: ["表 1  码垛输送线滚筒的轴承座", "Table 1  Pillow blocks for the palletising conveyor"]
+  - 标题: ["表 1  码垛输送线滚筒的轴承座", "Table 1  Pillow blocks for the palletizing conveyor"]
     表头: ["轴承", "圆弧半径", "中心高 H / mm", "壁厚 / mm", "底板 L × 宽 × 厚 / mm", "地脚螺栓", "质量 / kg"]
     表头英文: ["Bearing", "Arc radius", "H / mm", "Wall / mm", "Base L × width × t / mm", "Bolts", "Mass / kg"]
     行: [["6207", "随 D", "", "", "", "", ""], ["6209", "写死 48", "", "", "", "", ""], ["6209", "随 D", "", "", "", "", ""]]
+    行英文: [["6207", "from D", "", "", "", "", ""], ["6209", "fixed at 48", "", "", "", "", ""], ["6209", "from D", "", "", "", "", ""]]
   - 标题: ["表 2  跑步机滚筒的轴承座（6205）", "Table 2  Treadmill roller blocks (6205)"]
     表头: ["底板厚系数", "底板厚 / mm", "质量 / kg"]
     表头英文: ["Base factor", "Base / mm", "Mass / kg"]
     行: [["0.25", "", ""], ["0.35", "", ""]]
 注意:
-  - ["质量按灰铸铁 HT200（7.2 g/cm³）近似估算，忽略圆角和起模斜度；实际铸件要加铸造圆角、起模斜度和加工余量（第 5、49 章）。", "Mass is estimated for grey iron HT200 (7.2 g/cm³), ignoring fillets and draft; a real casting adds fillets, draft and machining allowance (Chapters 5, 49)."]
+  - ["质量按灰铸铁 HT200（7.2 g/cm³）近似估算，忽略圆角和起模斜度；实际铸件要加铸造圆角、起模斜度和加工余量（第 5、49 章）。", "Mass is estimated for gray iron HT200 (7.2 g/cm³), ignoring fillets and draft; a real casting adds fillets, draft and machining allowance (Chapters 5, 49)."]
   - ["规则里的系数（0.12、0.25 等）是本书为教学定的，不是标准；正式产品要按载荷、刚度和铸造工艺校核（第 6 篇）。", "The factors in the rules (0.12, 0.25 …) were set by this book for teaching, not by a standard; a real product checks load, stiffness and casting (Part 6)."]
 思考题:
-  - ["程序 3.8.1 和这个实验用的是同一套设计规则。如果规则里“中心高取 R20 优先数”改成“中心高 = 圆弧半径 + 2”，产品系列会有什么变化？哪一种更好？", "Program 3.8.1 and this lab share the same design rules. If “centre height from R20” became “centre height = arc radius + 2”, how would the product series change? Which is better?"]
+  - ["程序 3.8.1 和这个实验用的是同一套设计规则。如果规则里“中心高取 R20 优先数”改成“中心高 = 圆弧半径 + 2”，产品系列会有什么变化？哪一种更好？", "Program 3.8.1 and this lab share the same design rules. If “center height from R20” became “center height = arc radius + 2”, how would the product series change? Which is better?"]
   - ["“圆弧半径写死”的模型在 6207 时完全正确，为什么换了轴承才出问题？在 CAD 里怎样检查一个模型的设计意图？", "The model with a fixed arc radius is perfectly right for a 6207; why does the problem only show with another bearing? How do you check a model's design intent in CAD?"]

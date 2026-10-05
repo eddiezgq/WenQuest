@@ -13,22 +13,22 @@ parts_en:
   第九篇 综合设计: "Part IX  Integrated Design Projects"
 chapters:
   1:
-    status: ai
+    status: first
     title_en: "What Mechanical Design Is: How Engineers Work"
   2:
-    status: ai
+    status: first
     title_en: "Design Process and Methods"
   3:
-    status: ai
+    status: first
     title_en: "Engineering Drawings and 3D Modelling"
   4:
-    status: ai
+    status: first
     title_en: "Limits and Fits, Geometrical Tolerances and Surface Texture"
   5:
-    status: ai
+    status: first
     title_en: "Engineering Materials and Material Selection"
   6:
-    status: ai
+    status: first
     title_en: "Manufacturing Processes and Design for Manufacture and Assembly"
   33:
     status: first

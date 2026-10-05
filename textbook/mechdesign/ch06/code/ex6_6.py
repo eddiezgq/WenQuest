@@ -16,7 +16,7 @@ MILL = [
      lambda v, d: (v in CORNER_R, "0.5/1/2/4")),
     ("M2", T("壁厚 ≥ 1 mm（铝）", "wall ≥ 1 mm (Al)"), "t / mm", t_m, t_m, lambda v, d: (v >= 1.0, "≥ 1")),
     ("M3", T("孔深 ≤ 4 倍孔径", "hole depth ≤ 4 × diameter"), "L/d", t_m / H.D_HOLE_UP, t_m / H.D_HOLE_UP, lambda v, d: (v <= 4, "≤ 4")),
-    ("M4", T("螺钉通孔按 GB/T 5277", "clearance holes per ISO 273"), "Ø / mm", 2.6, H.D_HOLE_UP, lambda v, d: (v in CLEAR_M25, "2.7/2.9/3.1")),
+    ("M4", T("螺钉通孔按 GB/T 5277", "clearance holes per GB/T 5277"), "Ø / mm", 2.6, H.D_HOLE_UP, lambda v, d: (v in CLEAR_M25, "2.7/2.9/3.1")),
     ("M5", T("装夹次数 ≤ 2（特征集中在两个方向）", "≤ 2 set-ups (features from two directions)"), T("次", "set-ups"), 3, H.milled()["setups"],
      lambda v, d: (v <= 2, "≤ 2")),
     ("M6", T("不注不必要的严公差（一般公差 m 级）", "no needless tight tolerances (general class m)"), T("严公差个数", "tight tols"), 6, 1,

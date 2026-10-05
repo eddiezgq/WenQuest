@@ -21,7 +21,7 @@ CHARS = [  # (中文, English, 目标值)
     ("轴承寿命 L10", "bearing life L10", "≥ {:,} h".format(life_default).replace(",", " ")),
     ("出厂价", "selling price", "{:.0f} USD".format(F.FG_SELLING_PRICE)),
     ("齿面硬度（小齿轮）", "pinion tooth hardness", "58–62 HRC"),
-    ("两级中心距", "centre distances", "{:.0f} / {:.0f} mm".format(C.A1, C.A2)),
+    ("两级中心距", "center distances", "{:.0f} / {:.0f} mm".format(C.A1, C.A2)),
     ("总效率", "overall efficiency", "{:.3f}".format(C.ETA)),
 ]
 # 关系强度（行：需求；列：工程特性）：9 强、3 中、1 弱、0 无（评审小组的打分，示意）
@@ -51,7 +51,7 @@ for i, (zh, en, wt) in enumerate(NEEDS):
     ax.text(x0 - 0.3, y + 0.5, str(wt), ha="center", va="center", fontsize=8, weight="bold", color="#2c6fbb")
     for j in range(nc):
         r = REL[i, j]
-        ax.add_patch(H.FancyBboxPatch((x0 + j + 0.04, y + 0.04), 0.92, 0.92, boxstyle="square,pad=0", fc=H.PALE["grey"] if r == 0 else
+        ax.add_patch(H.FancyBboxPatch((x0 + j + 0.04, y + 0.04), 0.92, 0.92, boxstyle="square,pad=0", fc=H.PALE["gray"] if r == 0 else
                                       {1: "#e8eef7", 3: "#a9c4e8", 9: "#2c6fbb"}[r], ec="white", lw=1))
         sym = {9: "●", 3: "○", 1: "△"}.get(r, "")
         ax.text(x0 + j + 0.5, y + 0.5, sym, ha="center", va="center", fontsize=9, color="white" if r == 9 else H.INK)

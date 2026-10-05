@@ -63,4 +63,4 @@ class Lesson(Base):
         self.card([["最大实体要求 Ⓜ", "Maximum material requirement Ⓜ"],
                    ["实效尺寸 = 最大实体尺寸 − 位置度公差（孔）", "Virtual condition = MMC − position tolerance (hole)"],
                    ["孔偏离最大实体多少，位置度公差就增大多少", "The position tolerance grows by the hole's departure from MMC"],
-                   ["只用在只要求能装上的地方；配合、对中的要素不用", "Use it where only assembly matters, not for fits or centring"]])
+                   ["只用在只要求能装上的地方；配合、对中的要素不用", "Use it where only assembly matters, not for fits or centering"]])

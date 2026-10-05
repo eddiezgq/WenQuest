@@ -42,10 +42,10 @@ WQ.lab({
   ],
   params: [
     { id: "q", name: ["批量", "Batch size"], min: 1, max: 1000, step: 1, value: 1, unit: "", digits: 0 },
-    { id: "rMill", name: ["加工中心费率", "Machining-centre rate"], min: 30, max: 150, step: 1, value: 62, unit: "USD/h", digits: 0 },
+    { id: "rMill", name: ["加工中心费率", "Machining-center rate"], min: 30, max: 150, step: 1, value: 62, unit: "USD/h", digits: 0 },
     { id: "rLaser", name: ["激光切割费率", "Laser-cutting rate"], min: 30, max: 200, step: 5, value: 80, unit: "USD/h", digits: 0 },
     { id: "rPrint", name: ["打印机费率", "Printer rate"], min: 5, max: 100, step: 1, value: 30, unit: "USD/h", digits: 0 },
-    { id: "pAl", name: ["铝块单价", "Aluminium block price"], min: 2, max: 15, step: 0.5, value: 6, unit: "USD/kg", digits: 1 },
+    { id: "pAl", name: ["铝块单价", "Aluminum block price"], min: 2, max: 15, step: 0.5, value: 6, unit: "USD/kg", digits: 1 },
     { id: "pPA", name: ["PA12 粉末单价", "PA12 powder price"], min: 20, max: 200, step: 5, value: 80, unit: "USD/kg", digits: 0 },
   ],
   buttons: [{ id: "start", name: ["计算", "Compute"], primary: true }, { id: "reset", name: ["清除", "Clear"] }],

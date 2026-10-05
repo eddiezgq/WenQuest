@@ -43,7 +43,7 @@ def build(fillets=True, keys=True):
     return s
 
 
-# Keyway positions (Section 33.2, _shaft.KEYWAYS): gear key centred on the hub (type A); the extension keyseat is open at the shaft end (type C)
+# Keyway positions (Section 33.2, _shaft.KEYWAYS): gear key centered on the hub (type A); the extension keyseat is open at the shaft end (type C)
 L_kg, L_kc = S.L_KEY_GEAR, S.L_KEY_CPL
 KEYWAYS = S.KEYWAYS
 

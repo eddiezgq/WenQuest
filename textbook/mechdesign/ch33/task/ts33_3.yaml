@@ -26,7 +26,7 @@
   - ["没有简单地把弯曲应力当作对称循环；随轴转动的力产生平均应力，这一点在计算书里说清楚", "Bending is not just assumed fully reversed; the mean stress from loads turning with the shaft is explained"]
   - ["台阶处的应力集中系数、缺口敏感系数、尺寸和表面系数有出处", "Stress-concentration, notch-sensitivity, size and surface factors at the step cite sources"]
   - ["有限元固有频率与梁单元法对照，轴承约束的选择有理由", "FE natural frequencies compared with the beam model; the bearing constraint is justified"]
-  - ["提速意见回到整台机器：轴之外的风险（机头振动、平衡）有分析", "The assessment looks at the whole machine: risks beyond the shaft (head vibration, balancing) are analysed"]
+  - ["提速意见回到整台机器：轴之外的风险（机头振动、平衡）有分析", "The assessment looks at the whole machine: risks beyond the shaft (head vibration, balancing) are analyzed"]
 评分:
   - {项: ["载荷与应力循环", "Loads and stress cycle"], 分: 25, 标准: ["惯性力、转矩正确；应力循环按旋转点计算", "Correct inertia force and torque; stress cycle for a rotating point"]}
   - {项: ["无限寿命与临界转速", "Infinite life and critical speed"], 分: 25, 标准: ["系数与安全系数正确；两种转速对比；临界转速与转速比正确", "Correct factors and safety; both speeds compared; correct critical speed and ratio"]}

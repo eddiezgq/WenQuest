@@ -137,7 +137,7 @@ figure(fig, "fig33_10_1")
 
 fig, ax = plt.subplots(figsize=(6.4, 3.6))
 seats = np.linspace(40, 55, 60)
-for m_, name, col in ((st, T("40Cr 钢", "40Cr steel"), D.MOMENT), (al, T("7075 铝合金", "7075 aluminium"), D.FORCE)):
+for m_, name, col in ((st, T("40Cr 钢", "40Cr steel"), D.MOMENT), (al, T("7075 铝合金", "7075 aluminum"), D.FORCE)):
     ax.plot(seats, [R.twist(T_peak * 1e3, R.segments(s_), G(m_), 30) * R.REACH_MM for s_ in seats], color=col, lw=1.6, label=name + T("，内孔 Ø30", ", bore Ø30"))
 ax.axhline(R.DEFLECT_BUDGET_MM, color=D.INK, ls="--", lw=0.9)
 ax.axhline(R.DEFLECT_BUDGET_MM / R.HAND_MARGIN, color=D.INK, ls=":", lw=0.9)

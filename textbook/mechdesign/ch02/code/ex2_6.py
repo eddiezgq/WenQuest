@@ -28,7 +28,7 @@ rows.sort(key=lambda x: x["i"])
 std = next(x for x in rows if x["z"] == [24, 72, 20, 70])
 dev_max = max(abs(x["dev"]) for x in rows)
 k3 = min(range(len(rows) - 2), key=lambda k: rows[k + 2]["i"] / rows[k]["i"])   # 挤得最紧的三个相邻传动比
-crowd = "、".join("{:g}".format(x["i"]) for x in rows[k3:k3 + 3])
+crowd = T("、", ", ").join("{:g}".format(x["i"]) for x in rows[k3:k3 + 3])
 
 plt = style()
 fig, ax = plt.subplots(figsize=(6.8, 3.2))

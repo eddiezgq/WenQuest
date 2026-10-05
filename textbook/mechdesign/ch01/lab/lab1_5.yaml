@@ -3,7 +3,7 @@
   - ["零件的强度 S 和它承受的应力 s 都不是确定的数：材料有分散，载荷有分散。把两者都看作正态分布的随机变量，平均值 μlim、μσ，变异系数（标准差 / 平均值）Clim、Cσ。",
      "A part's strength S and the stress s it carries are not fixed numbers: materials scatter and loads scatter. Treat both as normal random variables with means μlim, μσ and coefficients of variation (standard deviation / mean) Clim, Cσ."]
   - ["两条分布重叠的部分就是应力可能超过强度的情形。可靠性指标与可靠度：", "Where the two distributions overlap, the stress may exceed the strength. The reliability index and the reliability are:"]
-  - 式: "z = (S − 1) / √(S²·Clim² + Cσ²)，S = μlim / μσ，R = Φ(z)，失效概率 = 1 − R          (1.5.2)"
+  - 式: ["z = (S − 1) / √(S²·Clim² + Cσ²)，S = μlim / μσ，R = Φ(z)，失效概率 = 1 − R          (1.5.2)", "z = (S − 1) / √(S²·Clim² + Cσ²), S = μlim / μσ, R = Φ(z), probability of failure = 1 − R          (1.5.2)"]
   - ["同样的平均安全系数 S，分散越大，z 越小，失效概率越大。经验安全系数的取值，实际上是对分散和后果的估计。",
      "For the same mean safety factor S, more scatter means a smaller z and a larger probability of failure. An empirical safety factor is really an estimate of scatter and consequence."]
 步骤:
@@ -23,7 +23,7 @@
     行: [["外伸段", "0.08", "0.25", "1 × 10⁻⁶", "", "算例 1.5.2"], ["电梯钢丝绳", "0.05", "0.35", "1 × 10⁻⁷", "", "≥ 12（GB/T 7588.1）"]]
     行英文: [["Extension", "0.08", "0.25", "1 × 10⁻⁶", "", "Example 1.5.2"], ["Lift rope", "0.05", "0.35", "1 × 10⁻⁷", "", "≥ 12 (EN 81-20)"]]
 注意:
-  - ["正态分布的尾部是理想化的：失效概率小到百万分之一以下时，结果对分布形状非常敏感，只能用来比较方案，不能当作真实的事故率。", "The normal tail is an idealisation: below one in a million the result is very sensitive to the shape of the distribution, so use it to compare designs, not as a real accident rate."]
+  - ["正态分布的尾部是理想化的：失效概率小到百万分之一以下时，结果对分布形状非常敏感，只能用来比较方案，不能当作真实的事故率。", "The normal tail is an idealization: below one in a million the result is very sensitive to the shape of the distribution, so use it to compare designs, not as a real accident rate."]
   - ["电梯钢丝绳规范要求的安全系数远大于本实验算出的值，因为规范还考虑了磨损、锈蚀、疲劳使强度逐年下降，以及失效后果的严重性。", "Lift codes demand a much larger rope safety factor than this lab gives, because they also cover the loss of strength from wear, corrosion and fatigue over the years, and the gravity of a failure."]
   - ["这里的应力只考虑一次加载（静强度）。反复加载的零件还要考虑疲劳，见第 11 章和第 40 章。", "The stress here is a single loading (static strength). Repeatedly loaded parts also need a fatigue check — Chapters 11 and 40."]
 思考题:

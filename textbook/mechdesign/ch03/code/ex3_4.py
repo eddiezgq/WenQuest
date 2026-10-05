@@ -134,16 +134,16 @@ sh.text(346, 50, "( √ )", size=FS * 1.05, ha="left", va="bottom")
 
 # ---- 技术要求、标题栏
 notes = [T("技术要求", "Technical requirements"),
-         T("1. 铸件不得有砂眼、气孔、裂纹等缺陷。", "1. No sand holes, blowholes or cracks in the casting."),
+         T("1. 铸件不得有砂眼、气孔、裂纹等缺陷。", "1. No sand holes, blowholes or cracks."),
          T("2. 铸件经时效处理。", "2. Casting stress-relieved (aged)."),
          T("3. 未注铸造圆角 R3–R5。", "3. Unspecified casting radii R3–R5."),
-         T("4. 未注尺寸公差：加工面按 GB/T 1804-m，", "4. Untoleranced sizes: machined to GB/T 1804-m,"),
-         T("   铸造面按 GB/T 6414。", "   as-cast to GB/T 6414."),
+         T("4. 未注尺寸公差：加工面按 GB/T 1804-m，", "4. General tolerances: machined GB/T 1804-m,"),
+         T("   铸造面按 GB/T 6414。", "   as-cast GB/T 6414."),
          T("5. 非加工面涂底漆。", "5. Prime-paint unmachined surfaces.")]
 for i, t in enumerate(notes):
     sh.text(318, 125 - i * 8, t, size=FS * (1.1 if i == 0 else 0.95), ha="left", va="center", weight="bold" if i == 0 else "normal")
 sh.title_block(415, 5, {"name": T("轴承座", "Pillow block"), "material": "HT200", "drawn": T("问渠教材", "WenQuest"), "checked": "—",
-                        "scale": "1:1", "qty": "2", "date": "2026-10", "rev": "1", "no": "PB-6207", "org": T("教材示例", "Textbook example"),
+                        "scale": "1:1", "qty": "2", "date": "2026-10", "rev": "1", "no": "PB-6207", "org": T("教材示例", "Textbook"),
                         "title": "PB-6207"})
 fig.subplots_adjust(0, 0, 1, 1)
 figure(fig, "fig3_4_1")

@@ -18,12 +18,12 @@ function calc2_6(api) {
 WQ.lab({
   title: ["实验 2.6 产品族选型", "Lab 2.6 Choosing from a product family"],
   goal: ["WQR-105 是一个参数化产品族：外形和中心距不变，换齿数得到 16 种传动比。按客户的功率、转速和工况，从产品族里选出合适的型号，看是哪一条约束先“卡住”。",
-         "WQR-105 is a parametric family: same housing and centre distances, 16 ratios from different tooth counts. Pick the right variant for a customer's power, speed and duty, and see which constraint binds first."],
+         "WQR-105 is a parametric family: same housing and center distances, 16 ratios from different tooth counts. Pick the right variant for a customer's power, speed and duty, and see which constraint binds first."],
   scenes: [
-    { id: "robot", robot: true, name: ["码垛工位输送线", "Palletising-cell conveyor"],
-      problem: { title: ["工程问题：给机器人码垛工位的输送线选减速器", "Engineering problem: a gearbox for the conveyor of a robot palletising cell"],
+    { id: "robot", robot: true, name: ["码垛工位输送线", "Palletizing-cell conveyor"],
+      problem: { title: ["工程问题：给机器人码垛工位的输送线选减速器", "Engineering problem: a gearbox for the conveyor of a robot palletizing cell"],
                  text: ["码垛机器人旁边的辊道输送线，驱动辊需要约 100 r/min，电机 3 kW、4 极（1450 r/min），中等冲击（KA = 1.25），轴承寿命 10 000 h。产品族里哪一种传动比能用？",
-                        "The roller conveyor beside a palletising robot needs about 100 r/min at the drive roller; motor 3 kW, 4-pole (1450 r/min), moderate shock (KA = 1.25), bearing life 10 000 h. Which ratio of the family will do?"] } },
+                        "The roller conveyor beside a palletizing robot needs about 100 r/min at the drive roller; motor 3 kW, 4-pole (1450 r/min), moderate shock (KA = 1.25), bearing life 10 000 h. Which ratio of the family will do?"] } },
     { id: "life", name: ["车库门开门机", "Garage-door opener"],
       params: { P: { min: 0.37, max: 3, step: 0.01, value: 0.75 }, KA: { min: 1, max: 2, step: 0.05, value: 2 } },
       problem: { title: ["生活中的例子：车库卷帘门", "Everyday example: a roller garage door"],
@@ -38,10 +38,10 @@ WQ.lab({
     { id: "life", name: ["要求的轴承寿命", "Required bearing life"], min: 2000, max: 50000, step: 1000, value: 10000, unit: "h", digits: 0 },
   ],
   buttons: [{ id: "start", name: ["核对", "Check"], primary: true }, { id: "reset", name: ["清除", "Clear"] }],
-  legend: [{ color: "var(--blue)", name: ["利用率（≤ 1 可用）", "utilisation (≤ 1 is OK)"] }],
+  legend: [{ color: "var(--blue)", name: ["利用率（≤ 1 可用）", "utilization (≤ 1 is OK)"] }],
   tasks: [
     { id: "std", robot: true, text: ["标准型（i = 10.5）、4 kW、1450 r/min、KA = 1.25 核对一次，记下输出转矩、轴承寿命、键的挤压应力和三项利用率。",
-                                     "Check the standard variant (i = 10.5) at 4 kW, 1450 r/min, KA = 1.25; record output torque, bearing life, key stress and the three utilisations."],
+                                     "Check the standard variant (i = 10.5) at 4 kW, 1450 r/min, KA = 1.25; record output torque, bearing life, key stress and the three utilizations."],
       demo: { scene: "robot", set: { ratio: 13, P: 4, n1: 2, KA: 1.25, life: 10000 }, press: ["start"], wait: 1 } },
     { id: "pick", robot: true, text: ["输送线：3 kW、要求输出约 100 r/min（± 10%），找出能用的传动比。", "Conveyor: 3 kW, output about 100 r/min (± 10%); find the ratio that works."],
       demo: { scene: "robot", set: { ratio: 16, P: 3, n1: 2, KA: 1.25, life: 10000 }, press: ["start"], wait: 1 } },
@@ -78,7 +78,7 @@ WQ.lab({
     api.line(x0 - 10, base, x0 + 3 * bw * 1.4, base, css("--ink"), 1);
     const y1 = base - (base - top) / ymax;
     api.line(x0 - 10, y1, x0 + 3 * bw * 1.4, y1, css("--red"), 1, [5, 4]);
-    api.label(api.T("利用率 = 1", "utilisation = 1"), x0 + 3 * bw * 1.4, y1 - 6, css("--red"), 12, "right");
+    api.label(api.T("利用率 = 1", "utilization = 1"), x0 + 3 * bw * 1.4, y1 - 6, css("--red"), 12, "right");
     bars.forEach(([name, u], k) => {
       const x = x0 + k * bw * 1.4, hh = Math.min(u, ymax) / ymax * (base - top);
       api.rect(x, base - hh, bw, hh, u <= 1 ? css("--blue") : css("--red"), css("--ink"), 0);

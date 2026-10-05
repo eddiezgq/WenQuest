@@ -18,7 +18,7 @@ CURVES = []
 for g in H.steel_grades():
     E = H.lib(g["lib_id"])["E"]
     state = {"Q235": T("热轧", "hot rolled"), "45": T("正火", "normalized"), "40Cr": T("调质", "Q&T"), "20CrMnTi": T("淬火回火", "Q&T")}[g["grade"]]
-    CURVES.append((f"{g['grade']}（{state}）", E, g["ReL"], g["Rm"], g["A"], 0.015 if g["grade"] == "Q235" else 0.0, "GB"))
+    CURVES.append((T(f"{g['grade']}（{state}）", f"{g['grade']} ({state})"), E, g["ReL"], g["Rm"], g["A"], 0.015 if g["grade"] == "Q235" else 0.0, "GB"))
 al = H.lib("6061-T6")
 ss = H.lib("304")
 CURVES.append(("6061-T6", al["E"], al["sy"], al["sb"], 10, 0.0, T("材料库；A 为典型值", "library; A typical")))

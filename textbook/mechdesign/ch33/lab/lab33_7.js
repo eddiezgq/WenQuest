@@ -40,7 +40,7 @@ WQ.lab({
       demo: { scene: "life", set: { L: 600, d: 15, m: 30, n: 1200 }, press: ["start"], wait: 4 } },
   ],
   think: ["为什么挠性轴在越过临界转速以后挠度反而变小？这时圆盘的质心在轴线的哪一侧？",
-          "Why does a flexible shaft bend less once it is past the critical speed? Which side of the axis is the disk's centre of mass then?"],
+          "Why does a flexible shaft bend less once it is past the critical speed? Which side of the axis is the disk's center of mass then?"],
 
   reset(api, s) { s.n = 0; s.ph = 0; s.peak = 0; s.nPeak = 0; s.hist = []; },
   update(dt, api, s) {

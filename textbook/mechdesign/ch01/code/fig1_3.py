@@ -10,7 +10,7 @@ nodes = {
     "PLM": (2.45, 1.3, T("PLM 设计发布\n与审批（版本）", "PLM: release &\napproval (revisions)"), H.PALE["purple"]),
     "ERP": (4.9, 2.2, T("ERP（ERPNext）\n物料、BOM、工艺、\n订单、成本", "ERP (ERPNext)\nitems, BOM, routing,\norders, cost"), H.PALE["blue"]),
     "MES": (4.9, 0.4, T("MES 车间\n工单、数控程序、\n设备状态", "MES: shop floor\nwork orders, CNC,\nmachine status"), H.PALE["teal"]),
-    "QMS": (7.1, 1.3, T("QMS 质量\n检验、三坐标、\n不合格品", "QMS: quality\ninspection, CMM,\nnonconformance"), H.PALE["grey"]),
+    "QMS": (7.1, 1.3, T("QMS 质量\n检验、三坐标、\n不合格品", "QMS: quality\ninspection, CMM,\nnonconformance"), H.PALE["gray"]),
 }
 w, h = 1.85, 0.95
 for k, (x, y, txt, col) in nodes.items():

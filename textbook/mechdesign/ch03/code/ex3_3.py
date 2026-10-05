@@ -99,7 +99,7 @@ ax.set_yticklabels([FUN[f][2] for f in keys], fontsize=7)
 ax.invert_yaxis()
 ax.set_xlabel(T("累积的极限偏差 ±/mm（GB/T 1804-m，极值法）", "accumulated limit ± / mm (GB/T 1804-m, worst case)"), fontsize=7)
 ax.set_xlim(0, max(res[k][f][0] for k in res for f in keys) * 1.35)
-ax.legend(fontsize=6.5, frameon=False, loc="lower right")
+ax.legend(fontsize=6.5, frameon=False, loc="upper right")
 ax.tick_params(labelsize=7)
 ax.yaxis.tick_right()
 for s_ in ("top", "left"):

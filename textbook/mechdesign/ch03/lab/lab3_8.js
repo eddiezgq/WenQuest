@@ -22,10 +22,10 @@ WQ.lab({
   goal: ["选一个轴承型号，轴承座的全部尺寸按设计规则推出来，三视图同时重画——模型、图纸、BOM 里的规格都从同一组参数来。再试一试“设计意图不对”的模型改参数以后会怎样。",
          "Pick a bearing; every size of the pillow block follows from the design rules and the three views redraw — model, drawing and BOM all come from one set of parameters. Then see what happens when the design intent is wrong."],
   scenes: [
-    { id: "robot", robot: true, name: ["码垛输送线的滚筒", "Palletising conveyor roller"],
-      problem: { title: ["工程问题：码垛工位输送线滚筒的轴承座", "Engineering problem: pillow blocks for a palletising conveyor roller"],
+    { id: "robot", robot: true, name: ["码垛输送线的滚筒", "Palletizing conveyor roller"],
+      problem: { title: ["工程问题：码垛工位输送线滚筒的轴承座", "Engineering problem: pillow blocks for a palletizing conveyor roller"],
                  text: ["码垛机器人旁边的辊道输送线，滚筒轴 Ø35，两端各用一个轴承座支承，装在机架的横梁上。按轴承型号生成轴承座，读出中心高、底板长和地脚螺栓，交给机架设计。",
-                        "The roller conveyor beside a palletising robot has Ø35 roller shafts, each end in a pillow block bolted to the frame. Generate the block from the bearing and hand the centre height, base length and bolts to the frame designer."] } },
+                        "The roller conveyor beside a palletizing robot has Ø35 roller shafts, each end in a pillow block bolted to the frame. Generate the block from the bearing and hand the center height, base length and bolts to the frame designer."] } },
     { id: "life", name: ["跑步机的滚筒", "Treadmill roller"],
       problem: { title: ["生活中的例子：家用跑步机", "Everyday example: a home treadmill"],
                  text: ["跑步机前后两根滚筒带着跑带转，滚筒轴两端也是轴承座。轴细、载荷小，看看规格小一号时，底板厚度的系数怎样影响尺寸和质量。",
@@ -34,13 +34,13 @@ WQ.lab({
   params: [
     { id: "brg", name: ["轴承型号（0 = 6204 … 8 = 6212）", "Bearing (0 = 6204 … 8 = 6212)"], min: 0, max: 8, step: 1, value: 3, unit: "", digits: 0 },
     { id: "kw", name: ["壁厚系数（壁厚 = 系数 × D + 3）", "Wall factor (wall = factor × D + 3)"], min: 0.08, max: 0.2, step: 0.01, value: 0.12, unit: "", digits: 2 },
-    { id: "kt", name: ["底板厚系数（底板厚 = 系数 × 中心高）", "Base factor (base = factor × centre height)"], min: 0.15, max: 0.35, step: 0.01, value: 0.25, unit: "", digits: 2 },
+    { id: "kt", name: ["底板厚系数（底板厚 = 系数 × 中心高）", "Base factor (base = factor × center height)"], min: 0.15, max: 0.35, step: 0.01, value: 0.25, unit: "", digits: 2 },
     { id: "intent", name: ["圆弧半径（0 = 随轴承外径，1 = 写死 48 mm）", "Arc radius (0 = follows bearing OD, 1 = fixed 48 mm)"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
   ],
   buttons: [{ id: "start", name: ["生成", "Generate"], primary: true }, { id: "reset", name: ["清除", "Clear"] }],
-  legend: [{ color: "var(--ink)", name: ["可见轮廓（粗实线）", "visible outline (thick)"] }, { color: "var(--muted)", name: ["不可见轮廓（虚线）、中心线（点画线）", "hidden (dashed), centre lines (chain)"] }],
+  legend: [{ color: "var(--ink)", name: ["可见轮廓（粗实线）", "visible outline (thick)"] }, { color: "var(--muted)", name: ["不可见轮廓（虚线）、中心线（点画线）", "hidden (dashed), center lines (chain)"] }],
   tasks: [
-    { id: "std", robot: true, text: ["滚筒轴 Ø35 用 6207：生成轴承座，读出中心高 H、底板长 L、地脚螺栓规格。", "A Ø35 roller shaft takes a 6207: generate the block and read the centre height H, base length L and bolt size."],
+    { id: "std", robot: true, text: ["滚筒轴 Ø35 用 6207：生成轴承座，读出中心高 H、底板长 L、地脚螺栓规格。", "A Ø35 roller shaft takes a 6207: generate the block and read the center height H, base length L and bolt size."],
       demo: { scene: "robot", set: { brg: 3, kw: 0.12, kt: 0.25, intent: 0 }, press: ["start"], wait: 1 } },
     { id: "intent", robot: true, text: ["载荷加大，改用 6209。先按“圆弧半径写死 48 mm”生成，看壁厚剩多少；再改回“随轴承外径”。", "The load grows; use a 6209. First generate with the arc radius fixed at 48 mm and read the wall; then switch back to “follows bearing OD”."],
       demo: { scene: "robot", set: { brg: 5, kw: 0.12, kt: 0.25, intent: 1 }, press: ["start"], wait: 1 } },
@@ -48,7 +48,7 @@ WQ.lab({
       demo: { scene: "life", set: { brg: 1, kw: 0.12, kt: 0.35, intent: 0 }, press: ["start"], wait: 1 } },
   ],
   think: ["程序 3.8.1 和这个实验用的是同一套设计规则。如果规则里“中心高取 R20 优先数”改成“中心高 = 圆弧半径 + 2”，产品系列会有什么变化？哪一种更好？",
-          "Program 3.8.1 and this lab share the same design rules. If “centre height from R20” became “centre height = arc radius + 2”, how would the product series change? Which is better?"],
+          "Program 3.8.1 and this lab share the same design rules. If “center height from R20” became “center height = arc radius + 2”, how would the product series change? Which is better?"],
 
   reset(api, s) { s.g = null; },
   update(dt, api, s) {
@@ -63,7 +63,7 @@ WQ.lab({
     const g = geo3_8(api.p), f = api.fmt;
     return [
       [["轴承 d × D × B", "Bearing d × D × B"], g.code + "：" + g.d + " × " + g.D + " × " + g.B + " mm"],
-      [["中心高 H（R20）", "Centre height H (R20)"], f(g.H, 1) + " mm"],
+      [["中心高 H（R20）", "Center height H (R20)"], f(g.H, 1) + " mm"],
       [["壁厚", "Wall"], f(g.wall, 1) + " mm" + (g.wall < 8 ? api.T("（太薄！）", " (too thin!)") : "")],
       [["底板 L × 宽 × 厚", "Base L × width × thickness"], g.L + " × " + g.Wb + " × " + g.tb + " mm"],
       [["地脚螺栓、孔距", "Bolts, spacing"], "2 × " + g.bolt + "，" + f(g.Lh, 0) + " mm"],

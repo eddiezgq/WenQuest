@@ -143,7 +143,7 @@ for g, yc, lst in ((gap_t, Dm / 2, tops), (gap_b, -Dm / 2, bots)):
         sh.line((xs_(a) + dw, yc), (xs_(b) - dw, yc), "center")
 sh.line((-3, 0), (H0 + 3, 0), "center")
 sh.dim((0, -Dm / 2 - dw), (H0, -Dm / 2 - dw), -4, f"H₀ = {H0:g}", size=6.5)
-sh.text(H0 / 2, Dm / 2 + 4, T("中间各圈省略，用点画线连接簧丝中心", "middle coils omitted; centres joined by chain lines"), size=6.5)
+sh.text(H0 / 2, Dm / 2 + 4, T("中间各圈省略，用点画线连接簧丝中心", "middle coils omitted; centers joined by chain lines"), size=6.5)
 axs[1, 1].set_title(T(f"(d) 压缩弹簧 {spr['size'].replace('x', '×')}（GB/T 4459.4）", f"(d) Compression spring {spr['size'].replace('x', '×')} (GB/T 4459.4)"), fontsize=8)
 for a in axs.flat:
     a.autoscale()

@@ -80,7 +80,7 @@ class Lesson(Base):
 
         obj = always_redraw(body)
         self.play(Create(obj), run_time=2)
-        self.caption("码垛输送线滚筒的轴承座：先看它的三维形状", "A pillow block for a palletising conveyor roller: first its 3D shape")
+        self.caption("码垛输送线滚筒的轴承座：先看它的三维形状", "A pillow block for a palletizing conveyor roller: first its 3D shape")
         pV = always_redraw(lambda: plane([(-L / 2 - 10, YV, -10), (L / 2 + 10, YV, -10), (L / 2 + 10, YV, H + Ro + 10), (-L / 2 - 10, YV, H + Ro + 10)], BLUE))
         pH = always_redraw(lambda: plane([on_H((-L / 2 - 10, -Wb / 2 - 10)), on_H((L / 2 + 10, -Wb / 2 - 10)), on_H((L / 2 + 10, YV)), on_H((-L / 2 - 10, YV))], GREEN))
         pW = always_redraw(lambda: plane([on_W((-YV, -10)), on_W((Wb / 2 + 10, -10)), on_W((Wb / 2 + 10, H + Ro + 10)), on_W((-YV, H + Ro + 10))], ORANGE))

@@ -26,7 +26,7 @@ def mass(rho, t):
 
 class Lesson(Base):
     def construct(self):
-        self.title("5.7", "同一根小臂：钢、铝合金还是碳纤维", "One forearm: steel, aluminium or carbon fibre")
+        self.title("5.7", "同一根小臂：钢、铝合金还是碳纤维", "One forearm: steel, aluminum or carbon fiber")
         ys = [1.6, 0.0, -1.6]
         wall = VGroup(*[Rectangle(width=0.25, height=0.9, fill_color=GREY_D, fill_opacity=1, stroke_width=0).move_to([-5.3, y, 0]) for y in ys])
         self.play(FadeIn(wall))
@@ -65,7 +65,7 @@ class Lesson(Base):
         same = VGroup(*[beam(y, 1.2, c, 6) for (_, _, _, _, _, c), y in zip(MATS, ys)])
         self.play(*[Create(b) for b in same])
         self.play(LaggedStart(*[FadeIn(l) for l in labels2], lag_ratio=0.3))
-        self.caption("改壁厚，让三根管的挠度（计入自重）都正好是 0.10 mm：钢和铝合金几乎一样重，碳纤维最轻——比的是 E/ρ", "Change the walls so all three deflect exactly 0.10 mm: steel and aluminium weigh about the same, CFRP is lightest — it is E/ρ that counts", wait=2.5)
+        self.caption("改壁厚，让三根管的挠度（计入自重）都正好是 0.10 mm：钢和铝合金几乎一样重，碳纤维最轻——比的是 E/ρ", "Change the walls so all three deflect exactly 0.10 mm: steel and aluminum weigh about the same, CFRP is lightest — it is E/ρ that counts", wait=2.5)
         self.play(FadeOut(labels2))
         labels3 = VGroup()
         for (zn, en_, E, rho, tmin, c), y in zip(MATS, ys):

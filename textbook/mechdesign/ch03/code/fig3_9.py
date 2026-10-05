@@ -42,7 +42,7 @@ def pmi(pt, xy, text):
 
 bore_pt = P(D / 2 * math.cos(math.radians(150)), -W / 2, Hc + D / 2 * math.sin(math.radians(150)))
 pmi(bore_pt, (-115, 95), f"Ø{D} H7\n∥ 0.03 | A\nRa 1.6")
-pmi(P(0, -W / 2, Hc + Ro), (10, 125), f"{Hc:g}±0.05  " + T("（中心高，到基准 A）", "(centre height to datum A)"))
+pmi(P(0, -W / 2, Hc + Ro), (10, 125), f"{Hc:g}±0.05  " + T("（中心高，到基准 A）", "(center height to datum A)"))
 pmi(P(Lh / 2, -dh / 2, tb), (95, 75), f"2×Ø{dh:g}  " + T("孔距", "spacing ") + f" {Lh:g}")
 pmi(P(Ro * 0.8, -W / 2, tb + 8), (100, 20), T("前、后端面 Ra 3.2", "front and back faces Ra 3.2"))
 # 基准 A：底面（安装面）——方框字母 + 涂黑三角形，挂在底面上（GB/T 1182、ISO 5459）

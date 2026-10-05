@@ -913,6 +913,7 @@ def check_numbers(sec: Section, rep: Report) -> None:
     if ch.isdigit():                                    # 本章的节号（如 33.10、33.11）不是数据
         text = re.sub(rf"(?<![\d.]){ch}\.\d{{1,2}}(?![\d])", "", text)
     text = re.sub(r"\d+(?:\.\d+)+\s*节", "", text)       # 其他章的节号引用（如“52.10 节”）也不是数据
+    text = re.sub(r"\b(?:Sections?|Secs?\.|§)\s*\d+(?:\.\d+)+(?:\s*(?:,|and|–|-)\s*\d+(?:\.\d+)+)*", "", text)   # English section references (Section 33.10)
     for line_no, line in enumerate(text.splitlines(), 1):
         for m in NUMBER.finditer(line):
             digits = m.group(1).replace(".", "").lstrip("0")

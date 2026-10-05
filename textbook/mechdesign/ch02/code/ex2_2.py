@@ -33,7 +33,7 @@ for k, (name, (cz, ce, pick)) in enumerate(K.CONCEPTS.items()):
         x = 2.1 + j * 1.75 + 0.2 + k * 0.4
         ax.add_patch(H.FancyBboxPatch((x - 0.15, y + 0.13), 0.3, 0.2, boxstyle="round,pad=0.01", fc=cols[name], ec="none"))
         ax.text(x, y + 0.23, name, ha="center", va="center", fontsize=6.5, color="white", weight="bold")
-    ax.plot([], [], "s", color=cols[name], ms=7, label="{}：{}".format(name, T(cz, ce)))
+    ax.plot([], [], "s", color=cols[name], ms=7, label=T("{}：{}", "{}: {}").format(name, T(cz, ce)))
 ax.legend(fontsize=7, frameon=False, loc="upper center", bbox_to_anchor=(0.55, -0.02), ncol=4)
 ax.set_xlim(-0.1, 2.1 + ncol * 1.75)
 ax.set_ylim(-0.1, len(K.FUNCS) + 0.05)

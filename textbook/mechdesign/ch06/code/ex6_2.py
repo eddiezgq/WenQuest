@@ -36,7 +36,7 @@ erows = [r for r in econ["rows"] if "IT_min" in r]
 
 plt = style()
 fig, (a0, a1) = plt.subplots(1, 2, figsize=(7.6, 3.2), gridspec_kw={"width_ratios": [1.0, 1.15]})
-names = [op.split(" ")[0] for op, *_ in rows]
+names = [T(op.split(" ")[0], op.split(" ", 1)[1]) for op, *_ in rows]
 a0.barh(range(len(rows)), [c for *_, c in rows], color=H.C_MILL)
 for i, (op, m, r, c) in enumerate(rows):
     a0.text(c + 0.3, i, f"{m:g} min × {r:g} " + T("美元/h", "USD/h"), va="center", fontsize=6.2)

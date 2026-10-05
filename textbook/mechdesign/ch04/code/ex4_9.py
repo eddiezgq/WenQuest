@@ -96,6 +96,6 @@ out(N=N, n_chars=len(CH), lim_d35=lim["bearing_seat_d35"], lim_d40=lim["gear_sea
     Cp40=c40["Cp"], Cpk40=c40["Cpk"], Ppk40=c40["Ppk"], Cpkw=ckw["Cpk"], Cpw=ckw["Cp"], Ppkw=ckw["Ppk"],
     Cpk_ro=cro["Cpk"], Ppk_ro=cro["Ppk"], Cpk_sy=csy["Cpk"], Ppk_sy=csy["Ppk"],
     n_out_all=sum(c["n_out"] for c in caps.values()),
-    mpe=MPE, u_mpe=u_mpe, u_rep=u_rep, u_temp=u_temp, u_c=u_c, U=U, U_um=U_mm * 1000, n_dress=n_dress, base_new=base_new, base_now=H.BASE_D35, first_low=first_low, n_dress_now=n_dress_now, drift_um=drift_um, spread_um=spread_um, tol35_um=(hi35 - lo35) * 1000, out_pos="、".join(str(k) for k in out_pos), TU=TU, acc_lo=acc[0], acc_hi=acc[1],
+    mpe=MPE, u_mpe=u_mpe, u_rep=u_rep, u_temp=u_temp, u_c=u_c, U=U, U_um=U_mm * 1000, n_dress=n_dress, base_new=base_new, base_now=H.BASE_D35, first_low=first_low, n_dress_now=n_dress_now, drift_um=drift_um, spread_um=spread_um, tol35_um=(hi35 - lo35) * 1000, out_pos=T("、", ", ").join(str(k) for k in out_pos), TU=TU, acc_lo=acc[0], acc_hi=acc[1],
     n_meas=len(v), n_conform=n_conform, n_inzone=n_inzone, n_out35=n_out, n_reject_proven=n_reject_proven,
     Cpk_bad=cb["Cpk"], Ppk_bad=cb["Ppk"], n_out_bad=cb["n_out"], first_out=first_out, max_bad=max(vb))

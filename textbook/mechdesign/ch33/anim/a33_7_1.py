@@ -34,13 +34,13 @@ class Lesson(Base):
         dot = always_redraw(lambda: Dot(ax.c2p(r.get_value(), min(amp(r.get_value()), 6.8)), color=YELLOW))
         num = always_redraw(lambda: MathTex(r"n/n_\mathrm c = %.2f" % r.get_value(), font_size=30, color=YELLOW).move_to([-3.5, 2.4, 0]))
         self.add(trace, dot, num)
-        self.caption("圆盘的质心偏离轴线 e：旋转时离心力把轴弯曲", "The disk's centre of mass is off the axis by e; centrifugal force bends the shaft")
+        self.caption("圆盘的质心偏离轴线 e：旋转时离心力把轴弯曲", "The disk's center of mass is off the axis by e; centrifugal force bends the shaft")
         self.play(r.animate.set_value(0.7), run_time=3, rate_func=linear)
         self.caption("接近临界转速 nc：离心力与轴的弹性力“同拍”，挠度急剧增大", "Near the critical speed nc the bending grows sharply — resonance", wait=0)
         self.play(r.animate.set_value(1.0), run_time=3, rate_func=linear)
         self.wait(0.5)
         self.caption("快速越过以后，挠度又减小，趋于偏心距 e：质心转到了轴线内侧（自动定心）",
-                     "Past it, the bending falls back towards e: the centre of mass moves inside (self-centring)", wait=0)
+                     "Past it, the bending falls back towards e: the center of mass moves inside (self-centering)", wait=0)
         self.play(r.animate.set_value(2.4), run_time=4, rate_func=linear)
         self.wait(1)
         self.card([["临界转速", "Critical speed"],
