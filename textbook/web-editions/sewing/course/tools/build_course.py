@@ -30,6 +30,7 @@ COURSE = HERE.parent
 BOOK = COURSE.parent
 sys.path.insert(0, str(BOOK))
 from book import CH, PARTS  # noqa: E402
+from inline import inline  # noqa: E402
 
 BATCHES = [  # Eddie 第 16 轮 Q1：一门课 31 讲，分三批上线
     {"no": 1, "lessons": list(range(1, 9)), "exams": []},
@@ -636,6 +637,7 @@ def build_plan(d: dict, out: Path) -> None:
 
 def lab_copy(lang: str, lab_id: str, dest: Path) -> None:
     s = (BOOK / "src" / lang / "labs" / f"{lab_id}.html").read_text(encoding="utf-8")
+    s = inline(s)   # the shared mechanism library goes into the page (第 20 轮)
     s = re.sub(r'<a href="\.\./index\.html"[^>]*>[^<]*</a>', "", s)
     if "../" in s:
         raise SystemExit(f"lab {lang}/{lab_id} still points outside itself")

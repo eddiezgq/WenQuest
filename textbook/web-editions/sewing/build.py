@@ -176,8 +176,12 @@ def build_resources(lang):
 def copy_labs(lang):
     d = os.path.join(OUT, 'labs') if lang == 'zh' else os.path.join(OUT, 'en', 'labs')
     os.makedirs(d, exist_ok=True)
+    from inline import inline   # shared mechanism library, inlined so every lab stays one file (第 20 轮)
     for p in glob.glob(os.path.join(ROOT, 'src', lang, 'labs', '*.html')):
-        shutil.copy(p, d)
+        with open(p, encoding='utf-8') as f:
+            html = inline(f.read())
+        with open(os.path.join(d, os.path.basename(p)), 'w', encoding='utf-8') as f:
+            f.write(html)
 
 if __name__ == '__main__':
     import sys

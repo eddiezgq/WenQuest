@@ -141,14 +141,25 @@ svg text{font-family:var(--f-body)}
           <input id="delta" type="range" min="-30" max="30" step="1" value="0">
           <b id="d-val" style="font-family:var(--f-mono);min-width:4.5em">+0°</b>
         </div>
+        <div class="row">
+          <label for="upos">过线板位置 u（挑线供线，+ 多放线）</label>
+          <input id="upos" type="range" min="-12" max="24" step="1" value="0">
+          <b id="u-val" style="font-family:var(--f-mono);min-width:4.5em">0 mm</b>
+        </div>
+        <div class="row">
+          <label for="thick">布厚 t</label>
+          <input id="thick" type="range" min="0.5" max="5" step="0.1" value="1.5">
+          <b id="t-val" style="font-family:var(--f-mono);min-width:4.5em">1.5 mm</b>
+        </div>
         <div id="verdict" class="verdict ok"></div>
-        <div class="note">Δ &gt; 0 表示梭尖到得晚。拖动 Δ 后让动画走过钩线时刻，观察线环有没有被钩住，再找出不跳针的 Δ 范围。线环大小随回升量变化的规律为示意模型。</div>
+        <div class="note">Δ &gt; 0 表示梭尖到得晚。拖动 Δ 后让动画走过钩线时刻，观察线环有没有被钩住，再找出不跳针的 Δ 范围。线环大小随回升量变化的规律为示意模型；挑线杆放下多少线由第 4 章的挑线机构算出：针眼入布后欠线超过 1 mm，线环就张不开。厚料或少放线时试试。</div>
       </div>
     </section>
   </div>
 </div>
 </div>
 
+<script src="../../lib/lockstitch-kit.js" data-inline></script>
 <script>
 (()=>{
 const NS='http://www.w3.org/2000/svg';
@@ -173,11 +184,12 @@ const pl=pts=>pts.map(p=>p[0].toFixed(3)+','+p[1].toFixed(3)).join(' ');
 // ---------- state ----------
 let A=100+360*8;      // accumulated main-shaft angle (8 stitches already sewn)
 let playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
-let speed=40, delta=0, zoom=false;
+let speed=40, delta=0, zoom=false, upos=0, thick=1.5;
+const sup=d=>WQLS.loop.supply({u:upos,t:thick,phc:206+d});   // take-up supply from the shared library (chapter 4)
 const frozen=new Map(); // stitch index -> caught?
 const MEET0=206;
 const meetOf=()=>MEET0+delta;
-const caughtAt=d=>loopW(MEET0+d)>=0.5;
+const caughtAt=d=>loopW(MEET0+d)*sup(d).k>=0.5;
 const stitchIdx=a=>Math.floor((a-60)/360);
 function stitchOK(n,cur){ if(n<0)return true; if(frozen.has(n))return frozen.get(n); if(n<cur)return true; return caughtAt(delta);}
 
@@ -366,7 +378,7 @@ function render(){
   if(cs==='pre'){
     p2=[E,[xa,FT-.12]];
   } else if(cs==='in'){
-    const w=loopW(th)*2.4;
+    const w=loopW(th)*sup(delta).k*2.4;
     if(eY>2){const pts=[];for(let t=0;t<=1.0001;t+=.1){const y=eY+(2-eY)*t;const x=-.4-w*Math.sin(Math.PI*t)*1.0-w*.15;pts.push([t<1?x:-.5,y]);}
       p2=[[-.2,eY],...pts,[-.5,FT],...topSeg(-.5).slice(1)];}
     else p2=[[-.2,eY],[-.5,Math.max(eY,FT)],...topSeg(-.5).slice(1)];
@@ -410,7 +422,7 @@ function render(){
   document.getElementById('r-x').textContent=xN(th).toFixed(1)+' mm';
   document.getElementById('r-rise').textContent=th>180?rise(th).toFixed(2)+' mm':'—';
   document.getElementById('r-hook').textContent=Math.round(((2*th)%360+360)%360)+'°';
-  const lw=(cs==='in')?loopW(th):(cs==='caught'?1:null);
+  const lw=(cs==='in')?loopW(th)*sup(delta).k:(cs==='caught'?1:null);
   document.getElementById('r-loop').textContent=lw===null?'—':(cs==='caught'?'已钩住':Math.round(lw*100)+'%');
   let sewn=0; for(let j=0;j<=n;j++) if(j<n||cs==='done') sewn++;
   document.getElementById('r-n').textContent=n+(cs==='done'?1:0);
@@ -433,11 +445,13 @@ document.getElementById('speed').onchange=e=>speed=+e.target.value;
 document.getElementById('theta').oninput=e=>{playing=false;syncPlay();setTheta(+e.target.value);};
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{playing=false;syncPlay();const g=b.dataset.go;
   const m=meetOf();const v=g==='meet'?m:g==='wrap'?m+60:g==='off'?m+135:+g; setTheta(v);});
-function verdict(){const ok=caughtAt(delta);const r=rise(MEET0+delta);const v=document.getElementById('verdict');
-  v.className='verdict '+(ok?'ok':'bad');
-  v.textContent=`梭尖到达时机针已回升 ${r.toFixed(2)} mm → ${ok?'能钩住线环':(r<2.2?'钩得太早，线环还没张开 → 跳针':'钩得太晚，线环已收缩 → 跳针')}`;
+function verdict(){const ok=caughtAt(delta);const r=rise(MEET0+delta);const v=document.getElementById('verdict');const S=sup(delta),okR=loopW(MEET0+delta)>=0.5;
+  v.className='verdict '+(ok&&!S.short?'ok':'bad');
+  v.textContent=`梭尖到达时机针已回升 ${r.toFixed(2)} mm → ${ok?'能钩住线环':(!okR?(r<2.2?'钩得太早，线环还没张开 → 跳针':'钩得太晚，线环已收缩 → 跳针'):'挑线杆供线不够：针眼入布后欠线 '+S.neg.toFixed(1)+' mm，线环张不开 → 跳针')}${ok&&S.short?'；但绕梭时线不够（差 '+(-S.margin).toFixed(1)+' mm），旋梭硬拉面线，容易断线':''}`;
   document.getElementById('d-val').textContent=(delta>0?'+':'')+delta+'°';}
 document.getElementById('delta').oninput=e=>{delta=+e.target.value;verdict();render();};
+document.getElementById('upos').oninput=e=>{upos=+e.target.value;document.getElementById('u-val').textContent=(upos>0?'+':'')+upos+' mm';frozen.clear();verdict();render();};
+document.getElementById('thick').oninput=e=>{thick=+e.target.value;document.getElementById('t-val').textContent=thick.toFixed(1)+' mm';frozen.clear();verdict();render();};
 document.getElementById('zoom').onclick=e=>{zoom=!zoom;svg.setAttribute('viewBox',zoom?'-13 -6 26 36':'-30 -58 64 90');e.target.textContent=zoom?'看全图':'放大钩线区';};
 
 let last=performance.now();

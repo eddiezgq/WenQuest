@@ -101,13 +101,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
   </div>
 </div>
 </div>
+<script src="../../lib/lockstitch-kit.js" data-inline></script>
 <script>
 (()=>{
 const NS='http://www.w3.org/2000/svg', D=Math.PI/180;
 let r=15.5,l=55,n=5000,m=120,phi=60,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
-const X=(f,r_=r,l_=l)=>{const p=f*D,la=r_/l_;return r_*(1-Math.cos(p))-l_*(1-Math.sqrt(1-la*la*Math.sin(p)**2));};
-const V=(f,r_=r,l_=l,n_=n)=>{const w=n_*Math.PI/30,p=f*D,la=r_/l_,S=Math.sqrt(1-la*la*Math.sin(p)**2);return w*r_*Math.sin(p)*(1-la*Math.cos(p)/S)/1000;};
-const A=(f,r_=r,l_=l,n_=n)=>{const w=n_*Math.PI/30,p=f*D,la=r_/l_,S=Math.sqrt(1-la*la*Math.sin(p)**2);return w*w*r_*(Math.cos(p)-la*(Math.cos(2*p)+la*la*Math.sin(p)**4)/S**3)/1000;};
+const X=(f,r_=r,l_=l)=>WQLS.needle.X(f,r_,l_);   // the shared lockstitch mechanism library (lib/lockstitch-kit.js, chapter 3)
+const V=(f,r_=r,l_=l,n_=n)=>WQLS.needle.V(f,r_,l_,n_);
+const A=(f,r_=r,l_=l,n_=n)=>WQLS.needle.A(f,r_,l_,n_);
 const el=(tag,at,par)=>{const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);par.appendChild(e);return e;};
 // ---------- mechanism drawing (units: mm, y down, shaft at 0,0) ----------
 const mech=document.getElementById('mech');

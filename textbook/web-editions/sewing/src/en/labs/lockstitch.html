@@ -141,14 +141,25 @@ svg text{font-family:var(--f-body)}
           <input id="delta" type="range" min="-30" max="30" step="1" value="0">
           <b id="d-val" style="font-family:var(--f-mono);min-width:4.5em">+0°</b>
         </div>
+        <div class="row">
+          <label for="upos">Thread-guide position u (take-up supply, + more thread)</label>
+          <input id="upos" type="range" min="-12" max="24" step="1" value="0">
+          <b id="u-val" style="font-family:var(--f-mono);min-width:4.5em">0 mm</b>
+        </div>
+        <div class="row">
+          <label for="thick">Fabric thickness t</label>
+          <input id="thick" type="range" min="0.5" max="5" step="0.1" value="1.5">
+          <b id="t-val" style="font-family:var(--f-mono);min-width:4.5em">1.5 mm</b>
+        </div>
         <div id="verdict" class="verdict ok"></div>
-        <div class="note">Δ &gt; 0 means the hook point arrives late. Set Δ, let the animation run through the loop-catching moment and watch whether the loop is caught; then find the range of Δ that gives no skipped stitches. How loop size varies with needle rise is an illustrative model.</div>
+        <div class="note">Δ &gt; 0 means the hook point arrives late. Set Δ, let the animation run through the loop-catching moment and watch whether the loop is caught; then find the range of Δ that gives no skipped stitches. How loop size varies with needle rise is an illustrative model; how much thread the take-up lever releases is computed from the chapter 4 take-up mechanism: if the needle is short of thread by more than 1 mm after the eye enters the fabric, the loop cannot open. Try a thick fabric or less thread.</div>
       </div>
     </section>
   </div>
 </div>
 </div>
 
+<script src="../../lib/lockstitch-kit.js" data-inline></script>
 <script>
 (()=>{
 const NS='http://www.w3.org/2000/svg';
@@ -173,11 +184,12 @@ const pl=pts=>pts.map(p=>p[0].toFixed(3)+','+p[1].toFixed(3)).join(' ');
 // ---------- state ----------
 let A=100+360*8;      // accumulated main-shaft angle (8 stitches already sewn)
 let playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
-let speed=40, delta=0, zoom=false;
+let speed=40, delta=0, zoom=false, upos=0, thick=1.5;
+const sup=d=>WQLS.loop.supply({u:upos,t:thick,phc:206+d});   // take-up supply from the shared library (chapter 4)
 const frozen=new Map(); // stitch index -> caught?
 const MEET0=206;
 const meetOf=()=>MEET0+delta;
-const caughtAt=d=>loopW(MEET0+d)>=0.5;
+const caughtAt=d=>loopW(MEET0+d)*sup(d).k>=0.5;
 const stitchIdx=a=>Math.floor((a-60)/360);
 function stitchOK(n,cur){ if(n<0)return true; if(frozen.has(n))return frozen.get(n); if(n<cur)return true; return caughtAt(delta);}
 
@@ -366,7 +378,7 @@ function render(){
   if(cs==='pre'){
     p2=[E,[xa,FT-.12]];
   } else if(cs==='in'){
-    const w=loopW(th)*2.4;
+    const w=loopW(th)*sup(delta).k*2.4;
     if(eY>2){const pts=[];for(let t=0;t<=1.0001;t+=.1){const y=eY+(2-eY)*t;const x=-.4-w*Math.sin(Math.PI*t)*1.0-w*.15;pts.push([t<1?x:-.5,y]);}
       p2=[[-.2,eY],...pts,[-.5,FT],...topSeg(-.5).slice(1)];}
     else p2=[[-.2,eY],[-.5,Math.max(eY,FT)],...topSeg(-.5).slice(1)];
@@ -410,7 +422,7 @@ function render(){
   document.getElementById('r-x').textContent=xN(th).toFixed(1)+' mm';
   document.getElementById('r-rise').textContent=th>180?rise(th).toFixed(2)+' mm':'—';
   document.getElementById('r-hook').textContent=Math.round(((2*th)%360+360)%360)+'°';
-  const lw=(cs==='in')?loopW(th):(cs==='caught'?1:null);
+  const lw=(cs==='in')?loopW(th)*sup(delta).k:(cs==='caught'?1:null);
   document.getElementById('r-loop').textContent=lw===null?'—':(cs==='caught'?'caught':Math.round(lw*100)+'%');
   let sewn=0; for(let j=0;j<=n;j++) if(j<n||cs==='done') sewn++;
   document.getElementById('r-n').textContent=n+(cs==='done'?1:0);
@@ -433,11 +445,13 @@ document.getElementById('speed').onchange=e=>speed=+e.target.value;
 document.getElementById('theta').oninput=e=>{playing=false;syncPlay();setTheta(+e.target.value);};
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{playing=false;syncPlay();const g=b.dataset.go;
   const m=meetOf();const v=g==='meet'?m:g==='wrap'?m+60:g==='off'?m+135:+g; setTheta(v);});
-function verdict(){const ok=caughtAt(delta);const r=rise(MEET0+delta);const v=document.getElementById('verdict');
-  v.className='verdict '+(ok?'ok':'bad');
-  v.textContent=`Needle rise when the hook point arrives: ${r.toFixed(2)} mm → ${ok?'loop is caught':(r<2.2?'too early, loop not yet open → skipped stitch':'too late, loop has shrunk → skipped stitch')}`;
+function verdict(){const ok=caughtAt(delta);const r=rise(MEET0+delta);const v=document.getElementById('verdict');const S=sup(delta),okR=loopW(MEET0+delta)>=0.5;
+  v.className='verdict '+(ok&&!S.short?'ok':'bad');
+  v.textContent=`Needle rise when the hook point arrives: ${r.toFixed(2)} mm → ${ok?'loop is caught':(!okR?(r<2.2?'too early, loop not yet open → skipped stitch':'too late, loop has shrunk → skipped stitch'):'take-up supply too short: '+S.neg.toFixed(1)+' mm short after the eye enters the fabric, the loop cannot open → skipped stitch')}${ok&&S.short?'; but there is not enough thread to pass round the bobbin case ('+(-S.margin).toFixed(1)+' mm short): the hook drags the upper thread and it may break':''}`;
   document.getElementById('d-val').textContent=(delta>0?'+':'')+delta+'°';}
 document.getElementById('delta').oninput=e=>{delta=+e.target.value;verdict();render();};
+document.getElementById('upos').oninput=e=>{upos=+e.target.value;document.getElementById('u-val').textContent=(upos>0?'+':'')+upos+' mm';frozen.clear();verdict();render();};
+document.getElementById('thick').oninput=e=>{thick=+e.target.value;document.getElementById('t-val').textContent=thick.toFixed(1)+' mm';frozen.clear();verdict();render();};
 document.getElementById('zoom').onclick=e=>{zoom=!zoom;svg.setAttribute('viewBox',zoom?'-13 -6 26 36':'-30 -58 64 90');e.target.textContent=zoom?'Full view':'Zoom to loop catching';};
 
 let last=performance.now();

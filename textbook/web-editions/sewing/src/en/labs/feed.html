@@ -116,45 +116,18 @@ input[type=range]:disabled{opacity:.35}
   </div>
 </div>
 </div>
+<script src="../../lib/lockstitch-kit.js" data-inline></script>
 <script>
 (function(){
 const DEG=Math.PI/180,$=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-// ---------- needle bar (chapter 3 worked example) ----------
-const RN=15.5,LN=55,TIP0=18,EYE=2;
-const xN=f=>{const a=f*DEG,l=RN/LN;return RN*(1-Math.cos(a))-LN*(1-Math.sqrt(1-(l*Math.sin(a))**2));};
-const tip=f=>TIP0-xN(f);
-const cross=(lv)=>{let a=0,b=180;for(let i=0;i<60;i++){const m=(a+b)/2;if(tip(m)>lv)a=m;else b=m;}return (a+b)/2;};
-const FE=cross(-EYE);                 // needle-eye top reaches plate: 114.2°
-// ---------- feed mechanism (worked example) ----------
-const A=1.1,H0=0.8,HALF0=Math.acos((A-H0)/A)/DEG,PHL0=FE-HALF0,EFF0=(1-Math.cos(2*HALF0*DEG))/2;
-const FAB={lining:{t:0.4,mud:0.55,muf:0.15,F0:0.32,K:10,hreq:0.7,hmax:0.85,Pmark:1.4,name:'slippery lining'},
-           cotton:{t:1.5,mud:0.80,muf:0.25,F0:0.30,K:50,hreq:0.75,hmax:1.1,Pmark:2.0,name:'cotton'},
-           denim:{t:4.0,mud:0.85,muf:0.30,F0:0.75,K:40,hreq:0.95,hmax:1.5,Pmark:2.5,name:'denim'}};
-const MODEF={drop:1.0,needle:0.3,compound:0.08};
+// ---------- models: the shared lockstitch mechanism library (lib/lockstitch-kit.js, chapters 3 and 6) ----------
+const K=WQLS,{RN,LN,TIP0,EYE,tip,cross,FE,A,H0,HALF0,PHL0,EFF0,MODEF}=K.feed, xN=K.needle.xN;
+const FAB={};for(const k in K.feed.FAB)FAB[k]=Object.assign({},K.feed.FAB[k],{name:{"lining": "slippery lining", "cotton": "cotton", "denim": "denim"}[k]});
 const STD={s:3,dT:0,dP:0,h:0.8,P:1.0};
 const ST=Object.assign({fab:'cotton',mode:'drop',phi:0,play:true},STD);
-function model(o){o=o||ST;const f=FAB[o.fab];
-  const half=Math.acos(Math.max(-1,Math.min(1,(A-o.h)/A)))/DEG;
-  let phL,phF;if(o.mode==='drop'){phL=PHL0+o.dT;phF=FE+o.dT+o.dP;}else{phL=180;phF=180+half;}
-  const rise=phL-half,drop=phL+half,S=o.s/EFF0;
-  const X=p=>(S/2)*Math.cos((p-phF)*DEG),Y=p=>(o.h-A)+A*Math.cos((p-phL)*DEG);
-  const ain=cross(f.t),aout=360-ain;
-  let drag=0,back=0;const n=720,sg=o.s>=0?1:-1;
-  for(let i=0;i<n;i++){const p0=rise+(drop-rise)*i/n,p1=rise+(drop-rise)*(i+1)/n,dx=X(p1)-X(p0),pm=(((p0+p1)/2)%360+360)%360;
-    if(o.mode==='drop'&&pm>ain&&pm<aout)drag+=Math.abs(dx);if(dx*sg<0)back+=Math.abs(dx);}
-  const net=X(drop)-X(rise);
-  const mud=f.mud*Math.min(1,o.h/f.hreq);
-  const Pmin=o.mode==='compound'?f.F0/mud:f.F0/Math.max(mud-f.muf,1e-6);
-  const eps=Math.min(1,o.P/Pmin),act=eps*net;
-  const ply=f.muf*o.P/f.K*MODEF[o.mode]*400;
-  const marks=[];if(o.h>f.hmax+1e-9)marks.push('dog');if(o.P>f.Pmark+1e-9)marks.push('foot');
-  const eyeAtDrop=tip(((drop%360)+360)%360)+EYE;
-  return {half,phL,phF,rise:((rise%360)+360)%360,drop:((drop%360)+360)%360,riseRaw:rise,dropRaw:drop,S,X,Y,ain,aout,drag,back,net,act,eps,Pmin,ply,marks,eyeAtDrop,t:f.t};
-}
+function model(o){return K.feed.model(o||ST);}
 // fabric (lower ply) position within one revolution starting at phi=0: follows dog while gripped
-function fabPos(M,phi){ // displacement accumulated from 0..phi (deg), eps applied
-  let pos=0;const n=Math.max(2,Math.round(phi*2));
-  for(let i=0;i<n;i++){const p0=phi*i/n,p1=phi*(i+1)/n;if(M.Y((p0+p1)/2)>=0)pos+=M.X(p1)-M.X(p0);}return pos*M.eps;}
+const fabPos=K.feed.fabPos;
 // ---------- controls ----------
 const PRM=[['s','Stitch length (dial; negative = reverse)',-5,5,0.1,'mm'],['dT','Feed timing (horizontal and lift shifted together, a simplification in this lab; + = later)',-40,40,1,'°'],['dP','Phase of horizontal motion relative to lift (+ = horizontal later)',-40,40,1,'°'],['h','Dog height (tooth tip above plate)',0.5,1.5,0.05,'mm'],['P','Presser-foot pressure (relative, 1 = standard)',0.3,2.5,0.05,'']];
 $('prm').innerHTML=PRM.map(([k,l,mn,mx,st])=>`<label for="p_${k}">${l}</label><input id="p_${k}" type="range" min="${mn}" max="${mx}" step="${st}"><output id="o_${k}"></output>`).join('');
@@ -178,7 +151,7 @@ function verdict(M){const f=FAB[ST.fab];
   if(M.drag>0.05)return ['bad','Fabric moves while the needle is in it','The fabric was pushed '+M.drag.toFixed(2)+' mm with the needle in it: the needle is deflected — at best crooked stitches and uneven stitch length, at worst the needle strikes the hook and breaks. Advance the feed timing or reduce the phase difference.'];
   if(M.back>0.05)return ['warn','Back-drag','While above the plate the dog moves backwards for part of the stroke, pulling the fabric back '+M.back.toFixed(2)+' mm: the actual stitch is shorter and uneven. The horizontal motion is too early relative to the lift.'];
   if(Math.abs(M.act-ST.s)>0.15)return ['warn','Actual stitch length differs from the dial','Actual '+M.act.toFixed(2)+' mm, dial '+ST.s.toFixed(1)+' mm. Changing dog height or phase changes the grip interval, and the stitch length changes with it.'];
-  if(M.ply>3)return ['warn','Upper ply creeps (ply shift)','Over a 40 cm seam the upper ply ends '+M.ply.toFixed(1)+' mm longer than the lower (limit taken as 3 mm). The dog drives the lower ply while the foot holds back the upper. Reduce pressure, or switch to needle feed or compound feed.'];
+  if(M.ply>3)return ['warn','Upper ply creeps: seam pucker','Over a 40 cm seam the upper ply ends '+M.ply.toFixed(1)+' mm longer than the lower (limit taken as 3 mm). The dog drives the lower ply while the foot holds back the upper; the extra upper ply bulges between the stitches and the finished seam puckers. Reduce pressure, or switch to needle feed or compound feed.'];
   return ['ok',ST.s<0?'Reverse feed OK':'Feed OK','The fabric moves only while the needle is out of it; no back-drag, no slip, and ply shift is within the limit.'];}
 function meters(){const M=model();
   const m=[[M.act.toFixed(2)+' mm','Actual stitch length (dial '+ST.s.toFixed(1)+')',Math.abs(M.act-ST.s)<=0.15?'ok':'warn'],
@@ -228,6 +201,12 @@ function sideDraw(){
     g.fillStyle=css('--steel');g.globalAlpha=.4;const oy=T(0,ftop+0.8+(gr?1.5:0))[1];g.fillRect(T(-6,0)[0],oy,3.8*sc,0.8*sc);g.fillRect(T(2.2,0)[0],oy,3.8*sc,0.8*sc);}
   else{g.beginPath();g.moveTo(...T(-6,ftop+0.9));g.lineTo(...T(-5,ftop));g.lineTo(...T(6,ftop));g.lineTo(...T(6,ftop+0.9));g.closePath();g.fill();}
   g.globalAlpha=1;
+  // seam pucker (round 20): the upper ply that runs ahead bulges between the stitches behind the foot
+  if(M.ply>3){const amp=Math.min(0.9,(M.ply-3)*0.12),lam=Math.max(1.5,Math.abs(M.act)||3),x0=6.4,yb=fy0+t;
+    g.fillStyle=css('--cloth2');g.strokeStyle=css('--warn')||'#c0392b';g.lineWidth=1.6;g.beginPath();g.moveTo(...T(x0,yb));
+    for(let x=x0;x*sc<W/2+10;x+=0.1){const ph=(x-x0+up)/lam;g.lineTo(...T(x,yb+amp*Math.abs(Math.sin(Math.PI*ph))));}
+    g.lineTo(...T((W/2+10)/sc,yb));g.closePath();g.fill();g.stroke();
+    g.fillStyle=css('--warn')||'#c0392b';g.fillText('Seam pucker: the extra upper ply bulges',T(x0+0.3,0)[0],T(0,yb+amp+0.9)[1]);}
   // labels
   g.fillStyle=css('--muted');g.fillText('Throat plate',T(5,0)[0],T(0,-1.6)[1]);g.fillText('Feed dog',T(dx-dw/2,0)[0],T(0,dy-2.2)[1]);
   g.fillText(ST.mode==='compound'?'Inner foot (green) walks with the dog; outer foot holds alternately':'Presser foot',T(-7,0)[0],T(0,Math.min(ftop+3.4,7.2))[1]);

@@ -112,27 +112,15 @@ input[type=range]{accent-color:var(--accent);width:100%}
   </div>
 </div>
 </div>
+<script src="../../lib/lockstitch-kit.js" data-inline></script>
 <script>
 (function(){
 const DEG=Math.PI/180,$=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-// ---------- needle bar (chapter 3 worked example) ----------
-const RN=15.5,LN=55;
-const xN=f=>{const a=f*DEG,l=RN/LN;return RN*(1-Math.cos(a))-LN*(1-Math.sqrt(1-(l*Math.sin(a))**2));};
-const rise=f=>xN(180)-xN(f);
-let PHC0=206;{let a=181,b=240;for(let i=0;i<60;i++){const m=(a+b)/2;if(rise(m)<2)a=m;else b=m;}PHC0=(a+b)/2;}
-// ---------- loop model (schematic) ----------
-const H0=2.2, TB=0.15, D_REF=0.9, RH=13.5;
-const fLoop=h=>{h=Math.max(h,0);return (h/H0)**2*Math.exp(2*(1-h/H0));};
-const yTop=h=>0.5+0.9*Math.max(h,0);
-const FAB={woven:{W:0.75,sd:0.10},knit:{W:0.5,sd:0.15}};
+// ---------- models: the shared lockstitch mechanism library (lib/lockstitch-kit.js, chapters 3 and 5) ----------
+const K=WQLS, RN=K.needle.RN, LN=K.needle.LN, xN=K.needle.xN, rise=K.needle.rise;
+const {PHC0,H0,TB,D_REF,RH,fLoop,yTop,FAB}=K.hook;
 const ST={psi:0,dz:0,g:0.08,d:0.9,fab:'woven',phi:180,play:true};
-function geom(o){o=o||ST;
-  const fc=PHC0+o.psi/2, h=rise(fc), D=1.0-o.dz-(h-2.0), g=o.g-(o.d-D_REF)/2, W=FAB[o.fab].W;
-  const yt=yTop(h), y=D+0.15, wAt=(y>0&&y<yt)?W*fLoop(h)*Math.sin(Math.PI*y/yt):0;
-  let res;
-  if(g<=0.02)res='hit';else if(D<0.2)res='cut';else res=(wAt-(g+TB)>=0)?'ok':'skip';
-  return {fc,h,D,g,W,yt,wAt,margin:wAt-(g+TB),res};
-}
+function geom(o){return K.hook.geom(o||ST);}
 // ---------- controls ----------
 const PRM=[['psi','旋梭安装角（相对标准，梭尖转角；+ 为钩线推迟）',-30,30,0.5,'°'],['dz','针杆高度（相对标准，+ 为升高）',-1,1,0.05,'mm'],['g','梭尖与机针间隙（以 Nm 90 针调定）',0,0.4,0.01,'mm']];
 $('prm').innerHTML=PRM.map(([k,l,mn,mx,st])=>`<label for="p_${k}">${l}</label><input id="p_${k}" type="range" min="${mn}" max="${mx}" step="${st}"><output id="o_${k}"></output>`).join('');
@@ -152,10 +140,7 @@ const gauss=()=>{let u=0,v=0;while(!u)u=rnd();while(!v)v=rnd();return Math.sqrt(
 $('sew').onclick=()=>{
   const g0=geom(),sd=FAB[ST.fab].sd,out=[];
   for(let i=0;i<30;i++){
-    const dh=0.08*gauss(),dg=0.015*gauss(),kW=1+sd*gauss();
-    const h=g0.h+dh,D=1.0-ST.dz-(h-2.0),g=g0.g+dg,yt=yTop(h),y=D+0.15;
-    const w=(y>0&&y<yt)?g0.W*kW*fLoop(h)*Math.sin(Math.PI*y/yt):0;
-    out.push(g<=0.02?'hit':D<0.2?'cut':(w-(g+TB)>=0?'ok':'skip'));
+    out.push(K.hook.stitch(g0,ST,gauss));
   }
   lastTrial={cfg:Object.assign({},ST),res:out};
   $('stitches').innerHTML=out.map(r=>`<i class="${r}" title="${{ok:'正常',skip:'跳针',hit:'碰针',cut:'劈线'}[r]}"></i>`).join('');

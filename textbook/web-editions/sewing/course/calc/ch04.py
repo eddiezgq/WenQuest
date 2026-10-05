@@ -1,5 +1,5 @@
 """Chapter 4 (thread take-up): numbers used in course/lessons/ch04.json.
-Port of the model in Section 4.4-4.5 / virtual lab 4-1 (src/zh/labs/takeup.html)."""
+Port of the model in Section 4.4-4.5 / virtual lab 4-1 (since round 20 in the shared library src/lib/lockstitch-kit.js, used by src/zh/labs/takeup.html)."""
 import math
 DEG = math.pi / 180
 RN, LN = 15.5, 55.0

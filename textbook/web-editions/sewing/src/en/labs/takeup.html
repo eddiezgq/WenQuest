@@ -120,105 +120,20 @@ details summary{cursor:pointer;font-size:.84rem;color:var(--muted);margin-top:10
   </div>
 </div>
 </div>
+<script src="../../lib/lockstitch-kit.js" data-inline></script>
 <script>
 (function(){
 const DEG=Math.PI/180, $=id=>document.getElementById(id);
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-// ---------- needle bar (chapter 3 worked example) ----------
-const RN=15.5, LN=55;
-const xN=f=>{const a=f*DEG,l=RN/LN;return RN*(1-Math.cos(a))-LN*(1-Math.sqrt(1-(l*Math.sin(a))**2));};
-// ---------- hook & loop geometry (axial view of the hook, origin = hook centre) ----------
-const RH=13.5, RC=11.0, EYE_TDC=20, TIP_TDC=18;
-const YP=xN(206)-8;                       // needle-plate top above hook centre: beak passes 1.5 mm above the eye at a 206° catch
-function hullPerim(pts){
-  const p=pts.map(q=>[q[0],q[1]]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
-  if(p.length<2)return 0;
-  const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
-  const lo=[],up=[];
-  for(const q of p){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q);}
-  for(let i=p.length-1;i>=0;i--){const q=p[i];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q);}
-  const h=lo.slice(0,-1).concat(up.slice(0,-1));let s=0;
-  for(let i=0;i<h.length;i++){const a=h[i],b=h[(i+1)%h.length];s+=Math.hypot(b[0]-a[0],b[1]-a[1]);}
-  return s;
-}
-const smooth=u=>{u=Math.min(1,Math.max(0,u));return u*u*(3-2*u);};
-function loopPts(f,t,phc){
-  const x=xN(f),e=EYE_TDC-t-x,F=[0,YP+t],th=(90-2*(f-phc))*DEG,H=[RH*Math.cos(th),RH*Math.sin(th)];
-  const pts=[F,H],sw=2*(f-phc);
-  for(let a=0;a<sw;a+=1){const q=(90-a)*DEG;pts.push([RC*Math.cos(q),RC*Math.sin(q)]);}
-  if(e<0)pts.push([0,YP+t+e]);
-  return {pts,e,x,H,F};
-}
-function demandRaw(f,t,phc){
-  const x=xN(f),e=EYE_TDC-t-x;
-  if(f<phc)return 2*Math.max(0,-e);
-  const L=loopPts(f,t,phc),P=hullPerim(L.pts),tail=e<0?P+e:e+P;
-  return x+tail-(EYE_TDC-t);
-}
-function demand(f,t,s,phc){
-  const bot=phc+90,off=phc+135,c=s+t;
-  if(f<=bot)return demandRaw(f,t,phc);
-  if(f<=off){const Lb=demandRaw(bot,t,phc),u=smooth((f-bot)/(off-bot));return Lb*(1-u)+c*u;}
-  return c;
-}
-// ---------- take-up four-bar (worked example; coordinates in mm, origin = upper shaft centre, z to the right, y up) ----------
-const LK0={r:20.7,d:-6.8,Qz:21.5,Qy:-45.5,a:43.4,b:40.9,c:65.7,al:2.8};
-const AC=[122.2,-45.7], ADIR=[Math.cos(285.2*DEG),Math.sin(285.2*DEG)], B=[66.4,-117.7];
-const T_DISC=[178,-60], K_PIV=[158,-88], K_ARM=24;
-function linkPose(f,lk){
-  const q=(f+lk.d)*DEG,P=[-lk.r*Math.sin(q),-lk.r*Math.cos(q)],Q=[lk.Qz,lk.Qy];
-  const dz=Q[0]-P[0],dy=Q[1]-P[1],D=Math.hypot(dz,dy),tt=(lk.a*lk.a-lk.b*lk.b+D*D)/(2*D),h2=lk.a*lk.a-tt*tt;
-  if(!(h2>0))return null;
-  const h=Math.sqrt(h2),mz=P[0]+tt*dz/D,my=P[1]+tt*dy/D,M=[mz-h*dy/D,my+h*dz/D];
-  const uz=(M[0]-P[0])/lk.a,uy=(M[1]-P[1])/lk.a,ca=Math.cos(lk.al*DEG),sa=Math.sin(lk.al*DEG);
-  const E=[P[0]+lk.c*(uz*ca-uy*sa),P[1]+lk.c*(uz*sa+uy*ca)];
-  const w1=[P[0]-M[0],P[1]-M[1]],w2=[Q[0]-M[0],Q[1]-M[1]];
-  const mu=Math.acos(Math.max(-1,Math.min(1,(w1[0]*w2[0]+w1[1]*w2[1])/lk.a/lk.b)))/DEG;
-  return {P,M,E,Q,mu};
-}
-// ---------- cam mode: supply defined at 12 points (every 30°), periodic monotone cubic ----------
+// ---------- models: the shared lockstitch mechanism library (lib/lockstitch-kit.js, chapters 3–4) ----------
+const K=WQLS, RN=K.needle.RN, LN=K.needle.LN, xN=K.needle.xN;
+const {RH,RC,EYE_TDC,TIP_TDC,YP,hullPerim,smooth,loopPts,demandRaw,demand,LK0,AC,ADIR,B,T_DISC,K_PIV,K_ARM,linkPose,pchipPeriodic}=K.takeup;
 let camPts=null;
-function pchipPeriodic(ys){
-  const n=ys.length,h=30,dl=[];for(let i=0;i<n;i++)dl.push((ys[(i+1)%n]-ys[i])/h);
-  const m=[];for(let i=0;i<n;i++){const a=dl[(i-1+n)%n],b=dl[i];m.push(a*b<=0?0:2/(1/a+1/b));}
-  return f=>{f=((f%360)+360)%360;const i=Math.floor(f/h)%n,u=(f-i*h)/h,y0=ys[i],y1=ys[(i+1)%n],m0=m[i]*h,m1=m[(i+1)%n]*h;
-    const u2=u*u,u3=u2*u;return (2*u3-3*u2+1)*y0+(u3-2*u2+u)*m0+(-2*u3+3*u2)*y1+(u3-u2)*m1;};
-}
 // ---------- state ----------
 const ST={mode:'link',phi:0,play:true,spd:1,u:0,t:1.5,s:3,phc:206,stroke:10,rpm:5000,lk:Object.assign({},LK0)};
 const seen={early:false,late:false,bLo:false,bHi:false};
 let R=null;   // computed results
-function compute(){
-  const N=360,ph=[],S=new Array(N),D=new Array(N),E=[],mu=[];
-  let ok=true;
-  const A=[AC[0]+ST.u*ADIR[0],AC[1]+ST.u*ADIR[1]];
-  if(ST.mode==='link'){
-    const Lp=[];
-    for(let i=0;i<N;i++){const p=linkPose(i,ST.lk);if(!p){ok=false;break;}E.push(p.E);mu.push(p.mu);
-      Lp.push(Math.hypot(p.E[0]-A[0],p.E[1]-A[1])+Math.hypot(p.E[0]-B[0],p.E[1]-B[1]));}
-    if(!ok)return {ok:false};
-    const mx=Math.max(...Lp);for(let i=0;i<N;i++)S[i]=mx-Lp[i];
-  }else{
-    const fn=pchipPeriodic(camPts);for(let i=0;i<N;i++)S[i]=Math.max(0,fn(i));
-    const mn=Math.min(...S);for(let i=0;i<N;i++)S[i]-=mn;
-  }
-  let top=0;for(let i=1;i<N;i++)if(S[i]<S[top])top=i;
-  let bot=0;for(let i=1;i<N;i++)if(S[i]>S[bot])bot=i;
-  const c=ST.s+ST.t;
-  for(let i=0;i<N;i++)D[i]=i<top?c:demand(i,ST.t,ST.s,ST.phc);
-  const sl=S.map((v,i)=>v-D[i]);
-  let fin=0;while(fin<180&&xN(fin)<EYE_TDC-ST.t)fin++;   // needle eye enters the fabric
-  let margin=1e9,at=0;for(let i=ST.phc;i<=Math.min(359,ST.phc+135);i++)if(sl[i]<margin){margin=sl[i];at=i;}
-  let waste=-1e9;for(let i=ST.phc;i<=Math.min(359,ST.phc+90);i++)waste=Math.max(waste,sl[i]);
-  let pre=-1e9;for(let i=top;i<=fin;i++)pre=Math.max(pre,sl[i]);
-  let neg=0;for(let i=fin;i<ST.phc;i++)neg=Math.max(neg,-sl[i]);
-  // thread acceleration at ST.rpm: second difference of S
-  const w=ST.rpm*2*Math.PI/60;let acc=0;
-  for(let i=0;i<N;i++){const d2=(S[(i+1)%N]-2*S[i]+S[(i-1+N)%N])/(DEG*DEG);acc=Math.max(acc,Math.abs(d2));}
-  R={ok:true,S,D,sl,top,bot,fin,margin,at,waste,pre,neg,entry:sl[fin],c,Smax:S[bot],acc:acc*w*w/1000,
-     mu:mu.length?[Math.min(...mu),Math.max(...mu)]:null,E,A};
-  return R;
-}
+function compute(){R=K.takeup.compute(ST,camPts);return R;}
 // ---------- UI: parameters ----------
 const PRM=[
   ['u','Thread-guide position (+ more thread, − less)',-12,24,1,'mm','link'],
