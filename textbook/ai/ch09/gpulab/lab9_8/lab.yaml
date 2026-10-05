@@ -1,0 +1,34 @@
+标题: ["GPU 实验 9.8 用 vLLM 部署一个开源大模型", "GPU Lab 9.8 Serving an open model with vLLM"]
+目的: ["用开源推理引擎 vLLM 部署 Qwen2.5-0.5B-Instruct，测首字延迟、单条序列每个词元的时间与多条请求一起时的吞吐量，理解预填充与解码、连续批处理的作用。",
+       "Serve Qwen2.5-0.5B-Instruct with the open-source engine vLLM; measure time to first token, time per output token and throughput with many requests; understand prefill vs decode and continuous batching."]
+显卡: basic
+结果:
+  - {名: ttft_ms, 说明: ["首字延迟", "time to first token"], 单位: ms}
+  - {名: tpot_ms, 说明: ["单条序列每个词元的时间", "time per output token, one sequence"], 单位: ms}
+  - {名: batch_tok_s, 说明: ["256 条请求时的吞吐量", "throughput with 256 requests"], 单位: 词元/秒}
+  - {名: speedup, 说明: ["吞吐量是单条的几倍", "throughput vs one sequence"], 单位: 倍}
+文件: [serve.py]
+实际问题:
+  标题: ["工位旁的问答助手", "An assistant beside the workstation"]
+  内容: ["车间想给每个工位配一个回答工艺问题的助手。用户关心的是提问后多久开始出字，服务器关心的是一块 GPU 能同时服务多少人。",
+         "The plant wants an assistant at every workstation. Users care how soon text starts; the server cares how many users one GPU can serve."]
+原理:
+  - ["预填充一次处理整段提示词，受算力限制；解码每次生成一个词元，受读权重的带宽限制（9.7 节）。", "Prefill processes the whole prompt and is compute-bound; decode generates one token at a time and is bandwidth-bound (Section 9.7)."]
+  - ["连续批处理让多条序列共用一次读权重；分页注意力让键值缓存不浪费显存（9.7、9.8 节）。", "Continuous batching lets many sequences share each weight read; paged attention keeps the KV cache from wasting memory (Sections 9.7, 9.8)."]
+  - 式: "吞吐量（词元/秒）≈ 同时解码的序列数 ÷ 每一步的时间"
+步骤:
+  - ["运行第一格；安装 vLLM（第 1 格）。", "Run the first cell; install vLLM (cell 1)."]
+  - ["运行 serve.py，记录三个数，填入表 1（任务 1）。", "Run serve.py and fill Table 1 with the three numbers (task 1)."]
+  - ["改请求数与生成长度，观察吞吐量（任务 2）。", "Vary the request count and output length (task 2)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  Qwen2.5-0.5B-Instruct 在 A10 上", "Table 1  Qwen2.5-0.5B-Instruct on an A10"]
+    表头: ["项目", "数值"]
+    表头英文: ["Item", "Value"]
+    行: [["首字延迟（ms）", "{{ttft_ms}}"], ["每个词元（ms，单条）", "{{tpot_ms}}"], ["吞吐量（词元/秒，256 条）", "{{batch_tok_s}}"]]
+注意:
+  - ["第一次运行要从网上下载模型；国内平台上若下载慢，可设置环境变量 HF_ENDPOINT 指向镜像站，或改用 ModelScope 上的同名模型。", "The first run downloads the model; on slow networks set HF_ENDPOINT to a mirror or use the same model from ModelScope."]
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+思考题:
+  - ["首字延迟主要由什么决定？提示词加长一倍，它会怎样？", "What determines the time to first token? What if the prompt doubles?"]
+  - ["吞吐量随同时服务的序列数增长，什么时候不再增长？", "Throughput grows with concurrent sequences; when does it stop?"]

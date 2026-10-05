@@ -1,0 +1,20 @@
+# 实验 9.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab9_1.js。
+原理:
+  - ["训练运算量 ≈ 6ND：前向每个词元约 2N 次运算，反向约 4N 次（9.1 节）。", "Training compute ≈ 6ND: about 2N per token forward and 4N backward (Section 9.1)."]
+  - ["混合精度 + AdamW 每个参数 16 字节；ZeRO 依次切分优化器状态、梯度、参数（9.2 节）。", "Mixed precision + AdamW needs 16 bytes per parameter; ZeRO shards optimizer states, then gradients, then parameters (Section 9.2)."]
+  - 式: "训练天数 = 6ND ÷（GPU 数 × 峰值 × 利用率 40%）÷ 86 400"
+步骤:
+  - ["“训练”场景：默认设置下读出训练天数与 GPU 小时，与 Llama 2 报告的数对照（任务 1）。", "Training scene: read the days and GPU hours at the defaults and compare with Llama 2 (task 1)."]
+  - ["改 ZeRO 级别与 GPU 数，填表 1（任务 2）。", "Vary the ZeRO stage and GPU count; fill Table 1 (task 2)."]
+  - ["“推理”场景：700 亿参数的模型按 16、8、4 位存放（任务 3）；7B 模型 16 条长序列的键值缓存（任务 4）。", "Inference scene: a 70B model at 16, 8, 4 bits (task 3); KV cache of 16 long sequences for 7B (task 4)."]
+数据表:
+  - 标题: ["表 1  7B 模型每块 A100 上的模型状态", "Table 1  Model states per A100 for 7B"]
+    表头: ["ZeRO 级别", "8 块 GPU", "64 块 GPU"]
+    表头英文: ["ZeRO stage", "8 GPUs", "64 GPUs"]
+    行: [["0", "", ""], ["1", "", ""], ["2", "", ""], ["3", "", ""]]
+注意:
+  - ["这是估算：没有计入框架的工作区、通信缓冲、显存碎片，也没有计入张量并行、流水线并行对激活值的切分。", "These are estimates: no framework workspace, communication buffers or fragmentation, and no activation sharding by tensor or pipeline parallelism."]
+  - ["键值缓存按多头注意力计；分组查询注意力（如 8 个键值头）会小几倍。", "The KV cache assumes multi-head attention; grouped-query attention (e.g. 8 KV heads) is several times smaller."]
+思考题:
+  - ["ZeRO-3 把显存降到 1/P，代价是什么？", "ZeRO-3 cuts memory to 1/P; what is the cost?"]
+  - ["为什么推理服务常常是键值缓存、而不是权重，决定了能同时服务多少用户？", "Why does the KV cache, rather than the weights, often decide how many users a server can handle?"]

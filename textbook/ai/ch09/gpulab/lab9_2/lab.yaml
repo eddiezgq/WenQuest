@@ -1,0 +1,39 @@
+标题: ["GPU 实验 9.2 用 FSDP 训练约 8 亿参数的模型", "GPU Lab 9.2 Training a 0.8B Model with FSDP"]
+目的: ["把同一个约 8 亿参数的模型分别不包装、用 DDP、用 FSDP 训练，比较每步耗时、每块 GPU 的显存与每秒词元数，理解 ZeRO-3 怎样用通信换显存。",
+       "Train the same ~0.8B-parameter model unwrapped, with DDP and with FSDP; compare step time, memory per GPU and tokens per second, and see how ZeRO-3 trades communication for memory."]
+显卡: basic
+结果:
+  - {名: gpus, 说明: ["GPU 数", "GPUs"], 单位: ""}
+  - {名: params, 说明: ["参数个数", "parameters"], 单位: ""}
+  - {名: single_ms, 说明: ["每步，1 块 GPU", "step, 1 GPU"], 单位: ms}
+  - {名: ddp_ms, 说明: ["每步，DDP", "step, DDP"], 单位: ms}
+  - {名: fsdp_ms, 说明: ["每步，FSDP", "step, FSDP"], 单位: ms}
+  - {名: single_GB, 说明: ["显存峰值，1 块 GPU", "peak memory, 1 GPU"], 单位: GB}
+  - {名: ddp_GB, 说明: ["每块 GPU 显存峰值，DDP", "peak per GPU, DDP"], 单位: GB}
+  - {名: fsdp_GB, 说明: ["每块 GPU 显存峰值，FSDP", "peak per GPU, FSDP"], 单位: GB}
+文件: [model.py, train.py]
+实际问题:
+  标题: ["一块卡放不下的模型", "A model too big for one GPU"]
+  内容: ["模型一大，参数、梯度、优化器状态就超过一块 GPU 的显存。数据并行每块卡都存一整份，放不下；FSDP 把它们切开，每块卡只存一份的 1/P，用的时候再临时收集。",
+         "As models grow, parameters, gradients and optimizer states exceed one GPU. Data parallelism keeps a full copy per GPU; FSDP shards them, each GPU keeping 1/P and gathering on demand."]
+原理:
+  - ["DDP：每块 GPU 一份完整模型，反向时全归约梯度（6.4 节）。", "DDP: a full model per GPU; gradients all-reduced in backward (Section 6.4)."]
+  - ["FSDP（ZeRO-3）：参数、梯度、优化器状态切成 P 份；每层计算前全收集参数，反向后归约—散播梯度（9.2 节）。", "FSDP (ZeRO-3): shard everything P ways; all-gather parameters before each layer, reduce-scatter gradients after backward (Section 9.2)."]
+  - 式: "每块 GPU 的模型状态：DDP ≈ 16Ψ，FSDP ≈ 16Ψ / P（单精度参数 + AdamW）"
+步骤:
+  - ["运行第一格，看机器有几块 GPU。", "Run the first cell to see how many GPUs there are."]
+  - ["三种方式各训练 25 步，填入表 1（任务 1）。", "Train 25 steps each way and fill Table 1 (task 1)."]
+  - ["估算模型状态，与实测的显存峰值对照（任务 2）。", "Estimate the model states and compare with the measured peaks (task 2)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  三种方式（约 8 亿参数）", "Table 1  Three ways (~0.8B parameters)"]
+    表头: ["方式", "每步（ms）", "每块 GPU 显存峰值（GB）"]
+    表头英文: ["Method", "Step (ms)", "Peak per GPU (GB)"]
+    行: [["1 块 GPU", "{{single_ms}}", "{{single_GB}}"], ["DDP", "{{ddp_ms}}", "{{ddp_GB}}"], ["FSDP", "{{fsdp_ms}}", "{{fsdp_GB}}"]]
+注意:
+  - ["要看到切分的效果需要至少 2 块 GPU。只有 1 块时实验照常运行（P = 1），用书中表 9.2.1 在 8 块 A100 上的实测完成分析。", "Seeing the sharding needs at least 2 GPUs; with one GPU the lab still runs (P = 1); use Table 9.2.1 (8 A100s) for the analysis."]
+  - ["8 亿参数的模型在 24 GB 的 A10 上单卡训练约需 13 GB 模型状态加激活值，能放下。", "The 0.8B model needs about 13 GB of states plus activations on a 24 GB A10: it fits."]
+  - ["机器按秒计费：做完点“关机”。", "Billed by the second: press Stop when done."]
+思考题:
+  - ["FSDP 比 DDP 慢多少？多出来的时间花在哪里？", "How much slower is FSDP than DDP? Where does the extra time go?"]
+  - ["什么时候应该用 FSDP，什么时候 DDP 就够了？", "When should you use FSDP, and when is DDP enough?"]
