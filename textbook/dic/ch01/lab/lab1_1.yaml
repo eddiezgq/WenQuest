@@ -2,7 +2,7 @@
 原理:
   - ["CMOS 反相器由串在电源和地之间的 PMOS 和 NMOS 组成。输入为 1 时 NMOS 导通、PMOS 截止，负载电容经 NMOS 放电，输出为 0；输入为 0 时反过来。稳态时总有一个管子截止，电源到地没有直流通路。",
      "A CMOS inverter is a PMOS and an NMOS in series between the supply and ground. With input 1 the NMOS conducts and the PMOS is off, the load capacitor discharges through the NMOS and the output is 0; with input 0 it is the other way round. In steady state one transistor is always off, so there is no DC path from supply to ground."]
-  - 式: "线性区 I_D = k′(W/L)[(V_GS − V_T)V_DS − V_DS²/2]        (1.1.1)"
+  - 式: ["线性区 I_D = k′(W/L)[(V_GS − V_T)V_DS − V_DS²/2]        (1.1.1)", "linear region I_D = k′(W/L)[(V_GS − V_T)V_DS − V_DS²/2]        (1.1.1)"]
   - ["输出管脚要吸收直流负载电流 I 时，NMOS 工作在线性区，输出低电平由 I_D(V_DD, V_OL) = I 决定。要求 V_OL 不超过某个值时，管宽至少为 W = I·L / {k′[(V_DD − V_T)V_OL − V_OL²/2]}（式 (1.1.3)）。",
      "When the output pin sinks a DC load current I, the NMOS is in the linear region and VOL follows from I_D(V_DD, V_OL) = I. To keep VOL below a given value the width must be at least W = I·L / {k′[(V_DD − V_T)V_OL − V_OL²/2]} (Eq. (1.1.3))."]
   - 式: "W ≥ I·L / {k′[(V_DD − V_T)V_OL − V_OL²/2]}        (1.1.3)"

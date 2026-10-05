@@ -29,7 +29,8 @@ out(CL_pf=CL * 1e12, C1_ff=C1 * 1e15, F=F, t1_ns=t[1] * 1e9, Nopt4=math.log(F) /
     best=best, t_best_ps=t[best] * 1e12, f_best=F ** (1 / best), t_m1_ps=t[best - 1] * 1e12, t_p1_ps=t[best + 1] * 1e12,
     gamma=gamma, fopt=f_opt, N_from_fopt=math.log(F) / math.log(f_opt),
     tmax_ns=tmax * 1e9, few=few, t_few_ps=t[few] * 1e12, t4_ps=t[4] * 1e12, f6=F ** (1 / 6))
-out(table="；".join(f"{N} 级 {t[N] * 1e9:.3g} ns" if t[N] >= 1e-9 else f"{N} 级 {t[N] * 1e12:.0f} ps" for N in range(1, 11)))
+val = lambda N: f"{t[N] * 1e9:.3g} ns" if t[N] >= 1e-9 else f"{t[N] * 1e12:.0f} ps"  # noqa: E731
+out(table=T("；".join(f"{N} 级 {val(N)}" for N in range(1, 11)), "; ".join(f"N = {N}: {val(N)}" for N in range(1, 11))))
 width = lambda N: sum((F ** (1 / N)) ** i for i in range(N))  # noqa: E731  各级宽度之和（以第一级为 1）
 out(best_m1=best - 1, best_p1=best + 1, few_m1=few - 1, t_fewm1_ps=t[few - 1] * 1e12,
     w_best=width(best), w_few=width(few), w_save_pct=(1 - width(few) / width(best)) * 100)
