@@ -175,9 +175,11 @@ class Sync:
             self.stop.wait(every_s)
 
     def health(self):
-        top = self.db.one("select coalesce(max(seq), 0) as m from bus_message")["m"]
         cur = self.cursor()
-        return {"cursor": cur, "behind": max(0, top - cur), "lag_s": round(self.lag_s, 1), "errors": self.errors,
+        # 落后 = 游标之后、本体要处理的消息条数（其他类型的消息——提醒、遥测、PLC——不算，否则总线一直有流量时永远不为 0）
+        behind = self.db.one("select count(*) as n from bus_message where seq > %s and valid and type = any(%s)",
+                             (cur, list(MP.HANDLERS)))["n"]
+        return {"cursor": cur, "behind": behind, "lag_s": round(self.lag_s, 1), "errors": self.errors,
                 "last_error": self.last_error, "last_reconcile": self._last_reconcile, **self.stats}
 
 
