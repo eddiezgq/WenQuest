@@ -1,0 +1,24 @@
+# 实验 5.6 的指导书与报告模板。目的、场景、参数、任务取自 lab5_6.js。
+原理:
+  - ["伽利略变换：参考系 S′ 相对 S 以速度 u 平动时，r = r′ + ut，v = v′ + u，a = a′。“A 相对 C 的速度 = A 相对 B 的速度 + B 相对 C 的速度”（5.6 节）。",
+     "Galilean transformation: if S′ moves at u relative to S, then r = r′ + ut, v = v′ + u, a = a′; “velocity of A relative to C = velocity of A relative to B + velocity of B relative to C” (Section 5.6)."]
+  - 式: "v = v′ + u        (5.6.1)"
+  - ["传送带抓取：在传送带参考系中零件静止，夹爪只要竖直下降；换回地面参考系，夹爪的水平速度就等于传送带的速度。下降开始的时刻由“到达带面时夹爪与零件位置相同”决定。",
+     "Belt picking: in the belt frame the part is at rest and the gripper need only come straight down; in the ground frame its horizontal speed equals the belt speed. The start time follows from requiring gripper and part to be at the same place when the gripper reaches the belt."]
+  - ["侧风飞行：对地速度 = 相对空气的速度 + 风速。要对地正北飞，相对空气的速度必须有一个向西的分量抵消风速：sin φ = 风速/空速。车窗上的雨：雨相对车的速度 = 雨对地的速度 − 车对地的速度，雨痕与竖直方向的夹角 θ 满足 tan θ = 车速/雨速。",
+     "Crosswind: ground velocity = airspeed vector + wind. To fly due north the air velocity needs a westward component that cancels the wind: sin φ = wind/airspeed. Rain: rain relative to car = rain relative to ground − car relative to ground; the streak angle θ from the vertical satisfies tan θ = car speed / rain speed."]
+步骤:
+  - ["选“传送带抓取”。由“到达带面的时刻 t₀ + 0.50 s 时零件到达 x = 夹爪的水平位移”算出 t₀，设水平速度为传送带速度，提交（任务 1）。把观察参考系切换到 1（传送带），画出夹爪轨迹的草图。", "Choose the belt. From “at t₀ + 0.50 s the part reaches the gripper's horizontal position” find t₀, set the horizontal speed to the belt speed and submit (task 1). Switch the frame to 1 (belt) and sketch the gripper's path."]
+  - ["选“侧风中的无人机”。由 sin φ = 4.0/8.0 算出机头的偏角，设好后提交（任务 2），记下对地速度和用时。再把机头朝正北，记录东西偏差。", "Choose the drone. Compute the heading from sin φ = 4.0/8.0, set it and submit (task 2); note the ground speed and time. Then head due north and record the offset."]
+  - ["选“车窗上的雨”。在三种车速下用量角器读出雨痕的夹角（估读到 1°），填入表 1，分别算出雨速，取平均值，提交（任务 3）。车速多大时读角误差对结果影响最小？", "Choose the rain. Read the streak angle at three car speeds in Table 1, compute the rain speed each time, average and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  车速与雨痕的夹角", "Table 1  Car speed and streak angle"]
+    表头: ["车速 / (m/s)", "雨痕与竖直方向的夹角 / (°)", "雨速 = 车速 / tan θ / (m/s)"]
+    表头英文: ["Car speed / (m/s)", "Streak angle from vertical / (°)", "Rain speed = car speed / tan θ / (m/s)"]
+    行: [["", "", ""], ["", "", ""], ["", "", ""], ["平均", "", ""]]
+注意:
+  - ["每个任务都要点“提交”才判定；传送带和无人机的结果在提交后才画出、显示。", "Each task is judged only when you press “Submit”; the belt and drone results are drawn and shown only after submitting."]
+  - ["传送带场景中，夹爪下降时的水平速度与传送带相差太大，即使落点对准，也会推着零件滑动，不算抓稳。", "In the belt scene, a gripper whose horizontal speed differs much from the belt's pushes the part along even if it lands on it; that does not count as a firm grip."]
+思考题:
+  - ["若传送带在抓取时突然加速，在传送带参考系中零件还是静止的吗？伽利略变换还能直接用吗？", "If the belt suddenly speeds up during the pick, is the part still at rest in the belt frame? Can the Galilean transformation still be used directly?"]
+  - ["无人机的空速若只有 3.5 m/s，还能对地正北飞吗？为什么？", "Could the drone still fly due north if its airspeed were only 3.5 m/s? Why?"]

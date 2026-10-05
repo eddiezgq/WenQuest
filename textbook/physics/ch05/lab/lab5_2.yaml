@@ -1,0 +1,26 @@
+# 实验 5.2 的指导书与报告模板。目的、场景、参数、任务取自 lab5_2.js。
+原理:
+  - ["球斜着落入篮筐时，篮筐的有效开口是内径乘以 sin α（α 为入射角），减去球的直径后剩下的就是允许的偏差，入射越陡越容易进。不计空气阻力，抛体的水平运动是匀速的，竖直运动是加速度为 g 的匀加速运动：x = v₀ cos θ t，y = y₀ + v₀ sin θ t − ½gt²。要经过某一点 (X, Y)，所需的出手速度由式 (5.2.4) 给出；所需速度最小的出手角 θ = 45° + β/2，β 为目标相对出手点的仰角，在这个角度附近出手角的误差对落点几乎没有影响（5.2 节）。",
+     "Without drag, projectile motion is uniform horizontally and uniformly accelerated vertically: x = v₀ cos θ t, y = y₀ + v₀ sin θ t − ½gt². The speed needed to pass through (X, Y) is given by Eq. (5.2.4); the angle needing the least speed is θ = 45° + β/2, β being the target's elevation seen from the release point, and near it angle errors hardly move the landing point (Section 5.2)."]
+  - 式: "v₀² = gX² / [2cos²θ (X tan θ − (Y − y₀))]        (5.2.4)"
+  - ["测速：出手角 θ 和出手高度 y₀ 已知，测出平均落点 x̄，由 0 = y₀ + x̄ tan θ − g x̄²/(2v₀² cos²θ) 解出 v₀。落点的 A 类标准不确定度 u(x̄) = s/√n（式 (1.5.3)），按 u(v₀) = |dv₀/dx̄| u(x̄) 传递（可用 x̄ ± u 各算一次 v₀，取差的一半），U = 2u(v₀)。",
+     "Speed: with θ and y₀ known, the mean landing distance x̄ gives v₀ from 0 = y₀ + x̄ tan θ − g x̄²/(2v₀² cos²θ). The type A standard uncertainty is u(x̄) = s/√n (Eq. (1.5.3)), propagated as u(v₀) = |dv₀/dx̄| u(x̄) (compute v₀ at x̄ ± u and take half the difference); U = 2u(v₀)."]
+步骤:
+  - ["选“抛进料盒”（口宽 0.12 m，比算例 5.2.3 的料箱窄）。先用式 (5.2.4) 算出几个出手角所需的出手速度（表 1），设好后点“抛 10 次”，记录进盒的次数和落点范围。找出 10 次都进盒的设置（任务 1）。10 次抛掷的误差对所有设置都相同，所以可以公平地比较不同的出手角。", "Choose the tote (0.12 m mouth, narrower than in Example 5.2.3). Use Eq. (5.2.4) to compute the speed needed for several angles (Table 1), set them, press “Throw 10 times” and record how many go in and the spread. Find a setting with all ten in (task 1). The ten release errors are the same for every setting, so angles can be compared fairly."]
+  - ["选“由落点测出手速度”，点“清空记录”，再点“抛一次”至少 10 次，把落点填入表 2。求平均值、实验标准差 s 和 u(x̄)，反推 v₀ 和 U，调到滑块上，提交（任务 2）。", "Choose the speed measurement, clear the records and press “Throw once” at least ten times, filling Table 2. Compute the mean, s and u(x̄), work back to v₀ and U, set them and submit (task 2)."]
+  - ["选“罚球”。先由式 (5.2.4) 求所需速度最小的出手角，再在实验中试，用不超过 7.25 m/s 的速度投进，提交（任务 3）。记下入射角和允许的偏差。", "Choose the free throw. Find the angle needing the least speed from Eq. (5.2.4), try it, score with at most 7.25 m/s and submit (task 3); note the entry angle and the allowed offset."]
+数据表:
+  - 标题: ["表 1  抛进料箱", "Table 1  Into the bin"]
+    表头: ["出手角 / (°)", "所需速度（计算）/ (m/s)", "10 次中进盒", "落点范围 / m"]
+    表头英文: ["Angle / (°)", "Speed needed (calc.) / (m/s)", "In the bin (of 10)", "Spread / m"]
+    行: [["20", "", "", ""], ["30", "", "", ""], ["35", "", "", ""], ["45", "", "", ""], ["60", "", "", ""]]
+  - 标题: ["表 2  测出手速度的落点记录", "Table 2  Landing records"]
+    表头: ["次", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+    表头英文: ["Throw", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+    行: [["x / m", "", "", "", "", "", "", "", "", "", "", "", ""], ["x̄、s、u(x̄) / m", "", "", "", "", "", "", "", "", "", "", "", ""], ["v₀ = (v̄ ± U) m/s，k = 2", "", "", "", "", "", "", "", "", "", "", "", ""]]
+注意:
+  - ["料盒场景中，10 次抛掷的出手误差按序号确定，对所有设置都相同，前四次正是误差范围的四个角（速度 ±2%、角度 ±3°）。", "In the tote scene the ten release errors depend only on the throw number and are the same for every setting; the first four are the corners of the error range (±2% speed, ±3° angle)."]
+  - ["测速场景的判定按你自己的记录计算，不要求等于某个“标准答案”；记录在重置后保留，“清空记录”才会删除。", "The speed task is judged on your own records, not a fixed answer; the records survive a reset and are deleted only by “Clear records”."]
+思考题:
+  - ["表 1 中哪个出手角的落点范围最小？与所需速度最小的出手角比较。", "Which angle in Table 1 gives the smallest spread? Compare it with the angle needing the least speed."]
+  - ["测速时抛的次数加倍，U 大约变为原来的多少？落点的分散主要来自什么？", "If you double the number of throws, what happens to U roughly? What mainly causes the scatter?"]
