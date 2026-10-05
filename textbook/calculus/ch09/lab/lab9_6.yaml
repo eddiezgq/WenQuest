@@ -1,0 +1,29 @@
+# 实验 9.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab9_6.js。
+原理:
+  - ["n 次泰勒多项式 Pₙ 与 f 在展开点 a 处的函数值和前 n 阶导数都相同（9.5 节）。误差由拉格朗日余项给出，不超过 max|f⁽ⁿ⁺¹⁾|·|x − a|ⁿ⁺¹/(n + 1)!，最大值取在 a 与 x 之间。", "The degree-n Taylor polynomial Pₙ matches f and its first n derivatives at the expansion point a (Section 9.5). The Lagrange remainder bounds the error by max|f⁽ⁿ⁺¹⁾|·|x − a|ⁿ⁺¹/(n + 1)!, the maximum taken between a and x."]
+  - 式: "f(x) = Σₖ₌₀ⁿ f⁽ᵏ⁾(a)(x − a)ᵏ/k! + f⁽ⁿ⁺¹⁾(ξ)(x − a)ⁿ⁺¹/(n + 1)!"
+  - ["ln(1 + x) 的泰勒多项式只在 −1 < x ≤ 1 内随次数增加而收敛（9.6 节）。里程计公式 (1 − cos u)/u 在 u 很小时相消，改用泰勒公式 u/2 − u³/24 + u⁵/720 − ⋯（9.7 节）。",
+     "Taylor polynomials of ln(1 + x) converge with degree only for −1 < x ≤ 1 (Section 9.6). The odometry formula (1 − cos u)/u cancels for small u; use u/2 − u³/24 + u⁵/720 − ⋯ instead (Section 9.7)."]
+步骤:
+  - ["在“泰勒多项式”场景中选 sin x，a = 0，x = 0.785。次数 n 从 1 加到 13，把误差和拉格朗日余项的上界填入表 1（任务 1）。",
+     "In 'Taylor polynomials' choose sin x, a = 0, x = 0.785. Raise n from 1 to 13 and record the error and the Lagrange bound in Table 1 (task 1)."]
+  - ["选 ln(1 + x)，a = 0，x 分别取 0.5、1.0、1.5，次数取 5、10、20，记录误差（任务 2）。",
+     "Choose ln(1 + x), a = 0, x = 0.5, 1.0, 1.5 and degrees 5, 10, 20; record the errors (task 2)."]
+  - ["选 eˣ，x = 5，次数 8。展开点 a 取 0、2、4、4.5，记录误差（任务 3）。",
+     "Choose eˣ, x = 5, degree 8. For a = 0, 2, 4, 4.5 record the errors (task 3)."]
+  - ["在“AGV 里程计”场景中，泰勒公式取 1、2、3 项，lg u 取 −1、−2、−3、−4、−6，把两种公式的相对误差填入表 2（任务 4）。找出 3 项时的切换阈值。",
+     "In 'AGV odometry', with 1, 2, 3 Taylor terms and lg u = −1, −2, −3, −4, −6, record both relative errors in Table 2 (task 4). Find the switching threshold for 3 terms."]
+数据表:
+  - 标题: ["表 1  sin x 在 x = 0.785 处的泰勒多项式（a = 0）", "Table 1  Taylor polynomials of sin x at x = 0.785 (a = 0)"]
+    表头: ["n", "Pₙ(x)", "误差", "拉格朗日余项的上界"]
+    表头英文: ["n", "Pₙ(x)", "error", "Lagrange bound"]
+    行: [["1", "", "", ""], ["3", "", "", ""], ["5", "", "", ""], ["7", "", "", ""], ["9", "", "", ""], ["11", "", "", ""], ["13", "", "", ""]]
+  - 标题: ["表 2  里程计公式的相对误差", "Table 2  Relative errors of the odometry formula"]
+    表头: ["lg u", "直接公式", "泰勒 1 项", "泰勒 2 项", "泰勒 3 项"]
+    表头英文: ["lg u", "direct", "Taylor, 1 term", "Taylor, 2 terms", "Taylor, 3 terms"]
+    行: [["−1", "", "", "", ""], ["−2", "", "", "", ""], ["−3", "", "", "", ""], ["−4", "", "", "", ""], ["−6", "", "", "", ""]]
+注意:
+  - ["误差到 10⁻¹⁶ 左右就不再减小：这时比较的是两个都带舍入误差的双精度数。", "Errors stop decreasing near 10⁻¹⁶: both numbers being compared carry rounding errors."]
+思考题:
+  - ["ln(1 + x) 的泰勒多项式在 x > 1 时次数越高越差，而 eˣ 的无论 x 多大最终都会收敛。区别在哪里？（第 16 章：收敛半径。）", "Taylor polynomials of ln(1 + x) get worse with degree for x > 1, while those of eˣ eventually converge for any x. What is the difference? (Chapter 16: radius of convergence.)"]
+  - ["计算机的数学库为什么先把 x 约化到一个小区间，再用多项式？约化本身会带来什么误差？", "Why do math libraries first reduce x to a small interval before applying a polynomial? What error does the reduction itself introduce?"]
