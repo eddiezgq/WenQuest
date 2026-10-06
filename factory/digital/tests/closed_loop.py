@@ -443,7 +443,9 @@ def customer_and_service(teacher):
     check(len(us) >= 6, "现场设备 {} 台".format(len(us)))
     if not us:
         return
-    s = us[0]["serial"]
+    # 不碰有轴承报警的那台：后面“数字孪生”演练（check_cae）要用它开维修单
+    s = next((u["serial"] for u in us if "bearing" not in (u.get("alert_kinds") or []) and u["health"] != "green"),
+             next(u["serial"] for u in us if "bearing" not in (u.get("alert_kinds") or [])))
     cp = hub("POST", "/api/complaints", {"serial": s, "subject": "闭环测试：减速器异响", "severity": "serious", "channel": "电话"}, svc)
     iss = wait(lambda: next((x for x in erp_docs("Issue") if cp["key"] in (x.get("subject") or "") or "闭环测试：减速器异响" in (x.get("subject") or "")), None),
                "投诉进 ERPNext（Issue）", 120, 3)
@@ -458,7 +460,10 @@ def customer_and_service(teacher):
           "追溯链：{}".format("；".join(d["chain"]["summary"])[:120]))
     o = hub("GET", "/api/ont/anomalies/{}/options".format(an["id"]), token=teacher)
     check(o.get("service") and o["options"] and o["recommended"], "服务方案 {} 个：{}".format(len(o["options"]), (o.get("reason") or "")[:100]))
-    best = next(x for x in o["options"] if x["key"] == o["recommended"]) if o.get("recommended") else o["options"][0]
+    # 只采纳“只修出问题的”（不动排查范围里的其他设备），备件出库单独发一张
+    best = next(x for x in o["options"] if x["kind"] == "repair_one")
+    best = dict(best, changes=[c for c in best["changes"] if c["type"] != "spare_ship"] +
+                [{"type": "spare_ship", "items": [{"item_code": "BRG-6206", "qty": 1}]}])
     a = hub("POST", "/api/ont/actions", {"changes": best["changes"], "anomaly_id": an["id"]}, svc)
     check(len(a["ids"]) == len(best["changes"]), "售后起草并提交 {} 个动作".format(len(a["ids"])))
     for i in a["ids"]:
