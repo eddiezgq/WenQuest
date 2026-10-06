@@ -66,6 +66,17 @@ def upload(d: Path, privacy: str, playlist: str) -> str:
     return vid
 
 
+def check():
+    """授权检查：列出频道名和播放列表（约 2 个配额单位），不上传任何东西。"""
+    yt = client()
+    ch = yt.channels().list(part="snippet,statistics", mine=True).execute().get("items", [])
+    if not ch:
+        sys.exit("授权有效，但这个账号下没有 YouTube 频道")
+    for c in ch:
+        print(f"频道：{c['snippet']['title']}（{c['id']}），视频 {c['statistics'].get('videoCount')} 个")
+        print(f"::notice title=YouTube 授权有效::频道 {c['snippet']['title']}")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("dir")
@@ -75,4 +86,7 @@ if __name__ == "__main__":
     for k in ("YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN"):
         if not os.environ.get(k):
             sys.exit(f"没有设置 {k}")
-    upload(Path(a.dir), a.privacy, a.playlist)
+    if a.dir == "check":
+        check()
+    else:
+        upload(Path(a.dir), a.privacy, a.playlist)

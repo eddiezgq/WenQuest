@@ -11,7 +11,7 @@ on:
       task:
         description: "audition（试听）或 render（成片）"
         type: choice
-        options: [render, audition]
+        options: [render, audition, ytcheck]
         default: render
       lectures:
         description: "讲稿目录，空格分隔（如 docs/课程视频/线性代数/14-2）"
@@ -76,6 +76,23 @@ jobs:
           name: ${{ inputs.task == 'audition' && 'audition' || 'voice-clone' }}
           path: ${{ runner.temp }}/clone
           retention-days: 14
+
+  ytcheck:
+    if: inputs.task == 'ytcheck'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check the YouTube authorisation（只查频道，不上传）
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: |
+          pip install -q google-api-python-client google-auth
+          sh tools/video/logged.sh python tools/video/upload_youtube.py check
 
   render:
     needs: voice
