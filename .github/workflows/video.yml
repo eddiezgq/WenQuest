@@ -67,9 +67,9 @@ jobs:
           install -m 600 /dev/null "$RUNNER_TEMP/gpu_key" && printf '%s\n' "$SSH_PRIVATE" > "$RUNNER_TEMP/gpu_key"
           export LAMBDA_SSH_KEY_FILE="$RUNNER_TEMP/gpu_key"
           if [ "${{ inputs.task }}" = audition ]; then
-            python tools/video/clone.py audition --out "$RUNNER_TEMP/clone"
+            sh tools/video/logged.sh python tools/video/clone.py audition --out "$RUNNER_TEMP/clone"
           else
-            python tools/video/clone.py lectures ${{ inputs.lectures }} --engine ${{ inputs.engine }} --out "$RUNNER_TEMP/clone"
+            sh tools/video/logged.sh python tools/video/clone.py lectures ${{ inputs.lectures }} --engine ${{ inputs.engine }} --out "$RUNNER_TEMP/clone"
           fi
       - uses: actions/upload-artifact@v4
         with:
@@ -100,10 +100,14 @@ jobs:
           python -m playwright install --with-deps --only-shell chromium > /dev/null
           (cd textbook/tools && npm ci --no-audit --no-fund > /dev/null)
           sh services/voice/fetch_models.sh "$RUNNER_TEMP/models" > /dev/null
-      - name: Build the book's figures and lab pages（视频里的图和实验页）
+      - name: Build the book's figures and lab pages（视频里用到的节）
         run: |
-          for d in ${{ inputs.lectures }}; do python -c "import yaml,sys; print(yaml.safe_load(open(sys.argv[1]+'/讲稿.yaml'))['book'])" "$d"; done | sort -u > "$RUNNER_TEMP/books"
-          for b in $(cat "$RUNNER_TEMP/books"); do python textbook/tools/build.py "$b" --labs; done
+          for d in ${{ inputs.lectures }}; do python -c "import yaml,sys; y=yaml.safe_load(open(sys.argv[1]+'/讲稿.yaml')); print(y['book'], y['section'])" "$d"; done > "$RUNNER_TEMP/sections"
+          cd textbook
+          for b in $(cut -d' ' -f1 "$RUNNER_TEMP/sections" | sort -u); do
+            secs=$(awk -v b="$b" '$1==b{print $2}' "$RUNNER_TEMP/sections" | paste -sd, -)
+            sh ../tools/video/logged.sh python tools/build.py "$b" --only "$secs"
+          done
       - uses: actions/download-artifact@v4
         if: inputs.voice == 'clone'
         with:
@@ -118,7 +122,7 @@ jobs:
         run: |
           for d in ${{ inputs.lectures }}; do
             name=$(basename "$d")
-            python tools/video/make.py "$d" --lang ${{ inputs.lang }} --voice ${{ inputs.voice }} --out "$RUNNER_TEMP/videos/$name"
+            sh tools/video/logged.sh python tools/video/make.py "$d" --lang ${{ inputs.lang }} --voice ${{ inputs.voice }} --out "$RUNNER_TEMP/videos/$name"
             rm -rf "$RUNNER_TEMP/videos/$name/work"
           done
       - uses: actions/upload-artifact@v4
