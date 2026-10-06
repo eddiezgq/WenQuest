@@ -72,3 +72,9 @@ R['ex_E10_early_p'] = (1.0 - 0.4) * 0.6 / p(10)
 if __name__ == '__main__':
     for k, v in R.items():
         print(f'{k:16s} {v:.4f}')
+
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    out(**{k.replace('.', '_'): v for k, v in R.items()}, lead_mm=1.2 * 0.6, vmax_E12=p(12) / 1.2,
+        c_base=1.2 ** 2 / 20 * 1e3, run_s=w / 1e3 / 1.2, Dv=D0 / 1e3 / 1.2, acc_s=1.2 / 10, speedup_pct=(1.6 / 1.2 - 1) * 100)

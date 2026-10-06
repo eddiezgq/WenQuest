@@ -91,3 +91,22 @@ print("A 直度单侧 Cpk USL0.03 μ0.012 s0.004", round((0.03 - 0.012) / 0.012,
 for n in (3, 4, 5, 6, 7, 8, 9, 10):
     print(" A ARL δ0.8 n", n, round(arl(0.8, n), 1))
 print("A 每班单产能 梭道磨床增至 3 台", round(480 * 3 / 14, 1))
+
+# numbers quoted by the slides (第 24 轮 课件): only when WQ_BOOK_OUT is set
+import os as _os
+if _os.environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    _R = {name: M.simulate(**kw) for name, kw in cases}
+    _sh = 0.0091 / 2.326
+    _vr = 2 * math.pi * Rr * 10000 / 60
+    out(needles=300 * 0.5 * 300, r110=rel(110), r70=rel(70), r110_70=(110 / 70) ** 4, area=(0.9 / 1.62) ** 2 * 100, red=(1 - (0.9 / 1.62) ** 2) * 100,
+        vh=2 * math.pi * Rh * 10000 / 60, vr=_vr, km=_vr * 8 * 3600 / 1000, us=0.9e-3 / (2 * math.pi * Rh * 10000 / 60) * 1e6,
+        sh=_sh, cp=0.040 / (6 * _sh), cpk=min(USL - 0.3622, 0.3622 - LSL) / (3 * _sh), ppm0=ppm(0.362, 0.004),
+        cpk1=cp_cpk(0.366, 0.004)[1], ppm1=ppm(0.366, 0.004), ppmx=ppm(0.366, 0.004) / ppm(0.362, 0.004),
+        lcl=0.3622 - A2 * 0.0091, ucl=0.3622 + A2 * 0.0091, arl0=arl(0, 5), arl15=arl(1.0, 5), arl13=arl(1.0, 3), arl055=arl(0.5, 5),
+        sc=sc, y_int=_R["互换"]["pass_rate"] * 100, c_int=_R["互换"]["cost"], s99=10 / 2.576 / math.sqrt(2),
+        y_26=_R["互换 σ2.6"]["pass_rate"] * 100, c_26=_R["互换 σ2.6"]["cost"],
+        y_g2=_R["2组"]["pass_rate"] * 100, y_g3=_R["3组"]["pass_rate"] * 100, l_g3=_R["3组"]["left_rate"] * 100, c_g3=_R["3组"]["cost"],
+        y_g4=_R["4组"]["pass_rate"] * 100, l_g4=_R["4组"]["left_rate"] * 100, y_sm2=_R["3组 sm2"]["pass_rate"] * 100,
+        l_sh=_R["3组 梭道+4"]["left_rate"] * 100, c_sh=_R["3组 梭道+4"]["cost"], y_sh=_R["3组 梭道+4"]["pass_rate"] * 100, l_sh2=_R["3组 +4 +4"]["left_rate"] * 100,
+        save=(1 - _R["3组"]["cost"] / _R["互换 σ2.6"]["cost"]) * 100, cap_needle=480 / 6, cap_hook=480 * 2 / 14)

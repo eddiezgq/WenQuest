@@ -83,3 +83,16 @@ print("A n_zero 99.8/90", n_zero(0.998, 0.90), " 允许1", n_with(0.998, 0.90, 1
 print("A 99% 把握 p=1.2%", ceil(log(0.01) / log(1 - 0.012)), " 剪 3 s/次 分钟", round(ceil(log(0.01) / log(1 - 0.012)) * 3 / 60, 1))
 print("A Cpk mu 0.55 sd 0.11", round((1 - 0.55) / 0.33, 2), " 0.30 sd 0.05", round((1 - 0.30) / 0.15, 2))
 print("A r_lower 1200,1", round(r_lower(1200, 1), 4), " 1200,2", round(r_lower(1200, 2), 4), " max_fail 1200", max_fail(1200))
+
+# numbers quoted by the slides (第 24 轮 课件): only when WQ_BOOK_OUT is set
+import os as _os
+if _os.environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    out(n598=n_zero(0.995, 0.95), n2302=n_zero(0.999, 0.90), nx1=n_with(0.995, 0.95, 1), nx2=n_with(0.995, 0.95, 2),
+        nx3=n_with(0.995, 0.95, 3), raw=log(0.05) / log(0.995),
+        rl0=r_lower(1000, 0) * 100, rl1=r_lower(1000, 1) * 100, rl2=r_lower(1000, 2) * 100,
+        none50=(1 - 0.012) ** 50 * 100, det250=p_detect(0.012, 250) * 100, det5000=p_detect(0.17, 10) * 100,
+        det598=p_detect(0.005, 598) * 100, ncrit=(330 - 290) / (6 * 0.010),
+        ent514=290 + 6 * 514 * 0.008, ent1150=290 + 6 * 1150 * 0.008,
+        cpk300=(1 - 0.92) / (3 * 0.079), cpk200=(1 - 0.17) / (3 * 0.026),
+        rounds23=ceil(log(23, 2)), min23=ceil(log(23, 2)) * 16, hil_def=sum(default.values()), hil_new=sum(t226))

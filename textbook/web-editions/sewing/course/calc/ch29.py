@@ -74,3 +74,16 @@ print("3τ 时 E/E∞ =", 1-(1-R0)*math.exp(-3))
 print("Q=500", labor(500,12,L), labor(500,12,Cc))
 # 接力区人均
 print("60/7", 60/7)
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    r = line(200)
+    out(smv=SMV, ol=grp['4OL'], fl=grp['FL'], snl=grp['SNL'], mnl=grp['MNL'], olfl=(grp['4OL'] + grp['FL']) / SMV * 100,
+        takt_s=r['takt_s'], theo=r['theo'], nmin=math.ceil(r['theo']), N_op=r['N_op'], eff_op=r['eff_op'] * 100,
+        N_grp=r['N_grp'], saved=r['N_op'] - r['N_grp'], eff_grp=r['eff_grp'] * 100, g_ol=r['grp']['4OL'], g_fl=r['grp']['FL'], g_snl=r['grp']['SNL'], g_mnl=r['grp']['MNL'],
+        cap22=60 / b, cap23=60 / b2, bal22=SMV / (22 * b) * 100, suit1=1500 / 30, suit2=300 / 30, pbs_min=600 / 175 * 60, ups_min=55 / 191 * 60,
+        hand=hand, mach=mach, hand_people=140 * hand / 60, mach_min=140 * mach,
+        shirt=tot, small=(3.62 + 3.85 + 2.21) / tot * 100, parts=sum(parts.values()) / tot * 100, ease=3 / 47 * 100,
+        ff=ff, link=32 / ff * 100, wg=wg, knit_n=1000 * 17 / 60 / 22, linkers=1000 * 32 / 60 / 8, wg_n=1000 * 30 / 60 / 22,
+        r0=R0 * 100, L150=labor(150, 12, L), C150=labor(150, 12, Cc), cross=cross(12, L, Cc), cross2=cross(12, {**L, 'C': 1, 'tau': 4}, Cc),
+        ssL=12 / 0.7, ssC=12 / 0.58)

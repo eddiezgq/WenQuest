@@ -55,3 +55,24 @@ print("hw 控制限 σ=5um n=5: ±", round(3 * 0.005 / math.sqrt(5), 5))
 for h in (2, 4, 6):
     print("hw 漂移 5um/h σ=5um h=", h, "P %", round(pout(0.070 + 0.005 * h, sig=0.005) * 100, 2))
 print("hw Weibull a=1000 vs 4000，Δ=225:", round((1 - R(1225) / R(1000)) * 100, 2), round((1 - R(4225) / R(4000)) * 100, 2))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    o4, o1, ot = M.outcome(M.Q, M.RULES), M.outcome(M.Q, ("R1",)), M.outcome(M.Q, by="tol")
+    late = {h: M.outcome(M.Q, M.RULES, late_h=h)["affected"] for h in (1, 2, 4)}
+    fa = M.mc_detect(M.Q, M.RULES)["false"] * 100
+    use, cal, life = M.hook_forecast(M.fleet())
+    sv = [sum(s.values()) for s in M.savings()]
+    cum, pay = M.cashflow(M.PH, sv)
+    cum1, pay1 = M.cashflow(M.PH[:1], sv[:1])
+    hmc = [r for r in M.loads() if r[0].startswith("卧式")][0]
+    out(lim=3 * 6 / math.sqrt(5), ucl=0.070 + 3 * 0.006 / math.sqrt(5), lcl=0.070 - 3 * 0.006 / math.sqrt(5),
+        p4=pout(0.086) * 100, p5=pout(0.090) * 100, p6=pout(0.094) * 100,
+        n4=o4["n_alarm"], t4=o4["t_alarm"], a4=o4["affected"], last4=o4["last"], left4=o4["lot_left"],
+        n1=o1["n_alarm"], t1=o1["t_alarm"], a1=o1["affected"],
+        nt=ot["n_alarm"], tt=ot["t_alarm"], at=ot["affected"], rwt=ot["rework"], sht=ot["shipped"],
+        late1=late[1], late2=late[2], late4=late[4], per_h=(late[2] - o4["affected"]) / 2, fa4=fa,
+        hmc_cap=hmc[4], hmc_load=hmc[5], hmc_load68=180 * 16 / (4800 * 0.68) * 100, variants=2 ** 3,
+        sv1=sv[0], sv2=sv[1], sv3=sv[2], pay=pay, cum5=cum[-1], pay1=pay1, cum1=cum1[-1],
+        pay64=M.cashflow(M.PH, [sum(s.values()) for s in M.savings(dict(M.BASE, oee1=0.64))], dict(M.BASE, oee1=0.64))[1],
+        life=life, hooks_use=use, hooks_cal=cal, oee_save=800 * (1 - 60 / 68))

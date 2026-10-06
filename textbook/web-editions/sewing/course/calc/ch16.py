@@ -46,3 +46,15 @@ base = eff(12, 0.4, 45, b=8, S=15000, n=750, ncol=5)
 print("a3 base", base)
 print("a3 Th 20", eff(12, 0.4, 20, b=8, S=15000, n=750, ncol=5))
 print("a3 lam 0.2", eff(12, 0.2, 45, b=8, S=15000, n=750, ncol=5))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    E = {H: eff(H, 0.5, 40) for H in (4, 8, 15, 20)}
+    out(T800=WIN / (6 * 800) * 1000, a3=areq(3, 800), a5=areq(5, 800), a7=areq(7, 800), m8=mass(8), m15=mass(15),
+        am8=amax(8, 800), am15=amax(15, 800),
+        n8_3=nmax(3, 8, 800, 1e9), n8_5=nmax(5, 8, 800, 1e9), n8_7=nmax(7, 8, 800, 1e9),
+        n7_4=nmax(7, 4, 800, 1e9), n7_15=nmax(7, 15, 800, 1e9), n7_20=nmax(7, 20, 800, 1e9),
+        F850=FF + mass(8) * areq(7, 850), a850=areq(7, 850), F800=FF + mass(8) * areq(7, 800), sq=(1.1 ** 2 - 1) * 100,
+        **{f"eff{H}": E[H]["eff"] * 100 for H in E}, **{f"pph{H}": E[H]["pph"] for H in E},
+        Nb8=E[8]["Nb"], tot8=E[8]["tot"], Tb8=E[8]["Nb"] * (40 + 8 * 60 / 600 * 2), resew=8 * 60 / 600 * 2,
+        lam80=Tb_allowed / (20 * 2 * 41.6), th80=Tb_allowed / 20 - 1.6, rec30=ceil(30 / 12.1), tsew=20000 * 60 / 800 / 60)

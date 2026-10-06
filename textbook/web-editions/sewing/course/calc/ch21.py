@@ -130,3 +130,26 @@ print("作业2 Tpk", round(Tpk, 2), " Trms", round(Tpk * 0.816 * math.sqrt(WU / 
 print("作业3 E6: MCU1", round(vmax_mcu(p6, 1e-3), 3), " MCU0.5", round(vmax_mcu(p6, 0.5e-3), 3), " FPGA", round(vmax_fpga(p6), 3))
 for vv in (0.6, 1.0, 1.66):
     print("作业4 制动", vv, round(vv**2 / 40 * 1e3, 1), "mm")
+
+# numbers quoted by the slides (第 24 轮 课件): only when WQ_BOOK_OUT is set
+import os as _os
+if _os.environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    _dt = dt_window(WU, 1600); _a = C_S * 0.003 / _dt**2
+    _back = caps[:]
+    for i in range(len(_back) - 2, -1, -1):
+        _back[i] = min(_back[i], _back[i + 1] + 300)
+    _prev = 10**6
+    for i in range(len(_back)):
+        _back[i] = min(_back[i], _prev + 300); _prev = _back[i]
+    _r635, _r166, _r06 = row_time(0.635)[1], row_time(1.66)[1], row_time(0.6)[1]
+    out(dt1600=_dt * 1e3, a3=_a, vpk3=2 * 0.003 / _dt, rpm3=2 * 0.003 / _dt / Ph * 60, TX=torque(4, _a), JX=J_total(4) * 1e4,
+        rmsk=0.816 * math.sqrt(WU / 360), Tpk_lim=1.27 / (0.816 * math.sqrt(WU / 360)),
+        cX3=n_cap(3, 50), cY3=n_cap(3, 40), c45=n_cap(3 / math.sqrt(2), 40), cX6=n_cap(6, 50), cY6=n_cap(6, 40),
+        lag1600=6 * 1600 * 1.5e-3, look=" → ".join(str(x) for x in _back[:5]), **{f"lk{i}": x for i, x in enumerate(_back)},
+        t_needle=p5 / 0.6 * 1e3 / 1e3, t_seg=8 * p5 / 0.6, lead=0.6 * (Tr + 0.5e-3) * 1e3, lead_p=0.6 * (Tr + 0.5e-3) * 1e3 / p5,
+        q_err=0.6 * 0.5e-3 * 1e3, j_err=0.6 * J * 1e3, err=0.6 * (0.5e-3 + J) * 1e3, err_p=0.6 * (0.5e-3 + J) * 1e3 / p5,
+        vm1=vmax_mcu(p5, 1e-3), vm05=vmax_mcu(p5, 0.5e-3), vm025=vmax_mcu(p5, 0.25e-3), vf=vmax_fpga(p5),
+        D=row_time(0.6)[0] * 1e3, row06=_r06, rows06=3600 / _r06, rows635=3600 / _r635, rows166=3600 / _r166,
+        gain=(_r635 / _r166 - 1) * 100, vratio=1.66 / 0.635, brk166=1.66**2 / 40 * 1e3, brk635=0.635**2 / 40 * 1e3,
+        slope=slope, Tr_new=1.2 + slope)

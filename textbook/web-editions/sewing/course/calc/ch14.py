@@ -52,3 +52,17 @@ lo = 300 - 6 * 450 * 0.006; hi = 330 - 6 * 450 * 0.009; print("a2 @450 6-9 ms cm
 lo2 = 300 - 6 * 450 * 0.005; hi2 = 330 - 6 * 450 * 0.013; print("a2 drift 5-13 ms cmd", lo2, hi2, (lo2 + hi2) / 2, " width", 6 * 450 * 0.008)
 print("a2 fixed 295 under drift entry", 295 + 6 * 450 * 0.005, 295 + 6 * 450 * 0.013)
 print("a3 backtack 16 ms, 5 ms", bt(0.016), bt(0.005))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    s3, s5 = stop_trim(4000, 300), stop_trim(4000, 500)
+    out(A60=A60, AMAX=AMAX, acc=(rad(4000) - rad(400)) / A60,
+        d300=s3[0] * 1000, c300=s3[1] * 1000, p300=s3[2] * 1000, T300=s3[3],
+        d500=s5[0] * 1000, c500=s5[1] * 1000, p500=s5[2] * 1000, T500=s5[3],
+        save=s3[3] - s5[3], day=3000 * (s3[3] - s5[3]) / 60,
+        bt18=bt(0.018), bt20=bt(0.020), bt5=bt(0.005),
+        win610=30 / (6 * 0.004), win515=30 / (6 * 0.010), stoplim=rpm(sqrt(2 * AMAX * radians(41.7))),
+        e300lo=290 + 6 * 300 * 0.006, e300hi=290 + 6 * 300 * 0.010, e700lo=290 + 6 * 700 * 0.006, e700hi=290 + 6 * 700 * 0.010,
+        w300=6 * 300 * 0.004, w700=6 * 700 * 0.004, adv700=330 - 6 * 700 * 0.010,
+        cmdlo=300 - 6 * 500 * 0.006, cmdhi=330 - 6 * 500 * 0.010, cmdmid=(300 - 6 * 500 * 0.006 + 330 - 6 * 500 * 0.010) / 2,
+        T1A=20 + 2 * 0.2 * 4 * 1 * 100)

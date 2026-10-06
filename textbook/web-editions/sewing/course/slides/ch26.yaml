@@ -1,0 +1,602 @@
+# 第 26 讲 设备联网与数字孪生 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch26.键:格式}} 由课程包程序 course/calc/ch26.py 算出，不手写数字。
+lesson: 26
+code: [ch26]
+
+clips:
+  hero:          # 封面：实验 26-1 第①页，事件流每 3 秒换一段（深色显示）
+    page: iot
+    selector: "#pageA .col"
+    cover: true
+    vh: 1300
+    loop: 3
+    steps:
+      - {at: 0, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)';document.getElementById('msgjson').parentElement.style.display='none';document.getElementById('rerun').click()"}
+  events:        # 一刻钟的事件流：每 4 秒换一段
+    page: iot
+    selector: "#tl"
+    loop: 4
+    steps:
+      - {at: 0, press: "#rerun"}
+  rate:          # 第②页：五种上报方式轮流选中
+    page: iot
+    selector: "#rate"
+    loop: 15
+    steps:
+      - {at: 0, press: "#tabB", js: "var m=document.getElementById('mode');m.value='stitch';m.dispatchEvent(new Event('input'))"}
+      - {at: 3, js: "var m=document.getElementById('mode');m.value='segment';m.dispatchEvent(new Event('input'))"}
+      - {at: 6, js: "var m=document.getElementById('mode');m.value='piece';m.dispatchEvent(new Event('input'))"}
+      - {at: 9, js: "var m=document.getElementById('mode');m.value='minute';m.dispatchEvent(new Event('input'))"}
+      - {at: 12, js: "var m=document.getElementById('mode');m.value='tenmin';m.dispatchEvent(new Event('input'))"}
+  waterfall:     # OEE 瀑布：标准工况
+    page: iot
+    selector: "#wf"
+    steps:
+      - {at: 0, press: "#resetA"}
+  mirror:        # 数字孪生第一层：吊挂线实时状态（实验 12-2，自己循环）
+    page: hang
+    selector: "#rail"
+    steps:
+      - {at: 0, js: "var p=document.getElementById('playA');if(p.textContent.indexOf('暂停')<0)p.click()"}
+  predict:       # 第二层：产线仿真快进一个班，下班后重新开工
+    page: line
+    selector: "#cv"
+    vh: 1400
+    loop: 27
+    steps:
+      - {at: 0, press: ["#restart", "[data-s='20']"], js: "var p=document.getElementById('play');if(p.getAttribute('aria-pressed')==='false')p.click()"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 26 讲", "Lecture 26"]
+    title: ["设备联网与数字孪生", "Connected Machines and Digital Twins"]
+    sub: ["把锁在机器里的数字，变成车间看得懂的指标", "Turning the numbers locked in each machine into figures the floor can read"]
+    notes:
+      - "同学们好。前面几讲的电控缝纫机，控制器其实知道很多事：主轴转了多久、缝了多少针、剪了几次线、有没有断线。可这些数字一直锁在每台机器里。这一讲讲怎样把它们送出来：采什么、怎么送、送多少、算什么，最后再看数字孪生、远程运维和安全。"
+      - "Hello everyone. The electronically controlled machines of the last few lectures know a great deal: how long the spindle ran, how many stitches, how many trims, whether the thread broke. But those numbers stay locked inside each machine. Today we get them out: what to collect, how to send it, how much, and what to calculate. Then digital twins, remote service and security."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["7 号工位一个班次，到底做了多少件？", "Station 7, one shift: how many pieces, really?"]
+    facts:
+      - ["班次 480 min、休息 30 min；标准工时 0.6 min/件，效率 85%", "480 min shift, 30 min break; 0.6 min/piece standard, 85% efficiency"]
+      - ["等活 25 min、故障 12 min；断线每小时 1.5 次，3% 返修", "Waiting 25 min, faults 12 min; 1.5 thread breaks an hour, 3% rework"]
+      - ["每件 3 段、每段剪线；车间打算按剪线次数数件", "3 seams a piece, each trimmed; the shop plans to count by trims"]
+    notes:
+      - "先看车间问题。一条衬衫线给 7 号工位的平缝机装了联网模块。班次 480 分钟、休息 30，标准工时 0.6 分一件，效率 85%；等活 25 分钟、故障 12 分钟，断线每小时 1.5 次，3% 返修。车间打算按剪线次数数件。实际做了多少件？OEE 多少？剪线数件差多少？500 台每针都上报，一年存多少数据？最后回答。"
+      - "Here's the problem. A shirt line fits a connectivity module to the lockstitch machine at station 7. A 480-minute shift with a 30-minute break, 0.6 standard minutes a piece, 85 percent efficiency; 25 minutes waiting, 12 of faults, 1.5 thread breaks an hour, 3 percent rework. The shop plans to count pieces by trims. How many pieces really? What OEE? How far off is the trim count? And if 500 machines reported every stitch, how much data a year? We'll answer at the end."
+
+  - layout: section
+    num: "01"
+    title: ["数据从哪来、怎样组织", "Where the data come from and how to organise them"]
+
+  - layout: split
+    title: ["控制器知道的，和它不知道的", "What the controller knows, and what it doesn't"]
+    points:
+      - ["转速、针数、剪线、断线、故障码：本来就有", "Speed, stitches, trims, breaks, fault codes: already there"]
+      - ["谁在缝：上班刷一下工卡", "Who is sewing: a badge swipe at the start"]
+      - ["缝哪一件：工票条码或衣架编号", "Which piece: a ticket barcode or the hanger ID"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="10" y="20" width="420" height="440" rx="26" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="220" y="74" font-size="34" font-weight="800" fill="#5ee0d2" text-anchor="middle">控制器已经知道</text>
+          <text x="220" y="106" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">already in the controller</text>
+          <g font-size="30" fill="#f3f6fa">
+            <text x="50" y="170">● 主轴启停、转速</text>
+            <text x="50" y="225">● 针数（每转一针）</text>
+            <text x="50" y="280">● 剪线、倒缝、抬压脚</text>
+            <text x="50" y="335">● 断线（有检测的机型）</text>
+            <text x="50" y="390">● 故障码、参数</text>
+          </g>
+          <text x="220" y="440" font-size="24" fill="#5ee0d2" text-anchor="middle">不用加传感器</text>
+          <rect x="470" y="20" width="420" height="440" rx="26" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
+          <text x="680" y="74" font-size="34" font-weight="800" fill="#ff9c75" text-anchor="middle">需要外加</text>
+          <text x="680" y="106" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">must be added</text>
+          <text x="510" y="180" font-size="32" font-weight="700" fill="#f3f6fa">谁在缝？</text>
+          <text x="530" y="226" font-size="28" fill="#ffb38f">→ 读卡器刷工卡</text>
+          <text x="510" y="300" font-size="32" font-weight="700" fill="#f3f6fa">缝的是哪一件？</text>
+          <text x="530" y="346" font-size="28" fill="#ffb38f">→ 工票条码</text>
+          <text x="530" y="390" font-size="28" fill="#ffb38f">→ 衣架编号 RFID</text>
+          <path d="M220 470 L220 520 L680 520 L680 470" stroke="#f2b705" stroke-width="4" fill="none"/>
+          <path d="M450 520 L450 548" stroke="#f2b705" stroke-width="4"/>
+          <rect x="90" y="550" width="720" height="78" rx="18" fill="rgba(242,183,5,.12)"/>
+          <text x="450" y="600" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle">谁、何时、做了哪一件的哪道工序</text>
+        </svg>
+    notes:
+      - "先看数据从哪来。电控缝纫机的控制器本来就记着主轴启停和转速、针数、剪线倒缝抬压脚次数，有检测的机型还知道断线，再加上故障码和参数，不用加传感器。可它不知道谁在缝、缝的是哪一件：操作工上班刷工卡，件号靠工票条码或衣架编号。两类信息对上，才知道谁何时做了哪一件的哪道工序。"
+      - "Where do the data come from? To do its own job the controller already records spindle start, stop and speed, stitch count, trims, backtacks and foot lifts, thread breaks on machines with a detector, plus fault codes and parameters, with no extra sensors. But it doesn't know who is sewing or which piece: the operator swipes a badge, and the piece comes from a ticket barcode or hanger ID. Put both together and you know who did which operation on which piece, and when."
+
+  - layout: split
+    title: ["从缝纫机到看板：四层", "From machine to dashboard: four layers"]
+    points:
+      - ["电控通信口加联网模块，或网关汇总", "A control-box port plus a module, or a gateway"]
+      - ["老机器装电流互感器：只知道开停", "Old machines with a current clamp: on/off only"]
+      - ["向上是数据，向下是指令和参数", "Data go up; commands and parameters come down"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g font-size="26" fill="#f3f6fa">
+            <rect x="120" y="10" width="770" height="130" rx="20" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
+            <text x="150" y="62" font-size="32" font-weight="800" fill="#c4b5fd">应用层</text>
+            <text x="150" y="112">看板 · MES · 远程运维 · 数字孪生</text>
+            <rect x="120" y="170" width="770" height="130" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
+            <text x="150" y="222" font-size="32" font-weight="800" fill="#8fb6ff">平台层</text>
+            <text x="150" y="272">MQTT 代理 · 历史库 · 指标计算</text>
+            <rect x="120" y="330" width="770" height="130" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+            <text x="150" y="382" font-size="32" font-weight="800" fill="#5ee0d2">边缘层</text>
+            <text x="150" y="432">联网模块 · 网关 · 工位终端</text>
+            <rect x="120" y="490" width="770" height="130" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
+            <text x="150" y="542" font-size="32" font-weight="800" fill="#ff9c75">设备层</text>
+            <text x="150" y="592">缝纫机电控 · 读卡器 · 工票扫码</text>
+          </g>
+          <defs><marker id="u26" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker>
+            <marker id="d26" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fa3ba"/></marker></defs>
+          <path d="M36 590 L36 60" stroke="#f2b705" stroke-width="7" marker-end="url(#u26)"/>
+          <path d="M84 60 L84 590" stroke="#8fa3ba" stroke-width="5" stroke-dasharray="12 8" marker-end="url(#d26)"/>
+          <text x="36" y="34" font-size="26" font-weight="700" fill="#f2b705" text-anchor="middle">数据</text>
+          <text x="84" y="632" font-size="24" fill="#8fa3ba" text-anchor="middle">指令</text>
+        </svg>
+    notes:
+      - "数据怎么送出来？电控带通信口接联网模块，或电控集成联网，或者一组机器接网关，由网关转换协议、汇总上传。老机器没有通信口，可以在电源线上装电流互感器，但只能知道开停。整个系统分四层：设备层、边缘层、平台层、应用层；向上走状态、计数和事件，向下走派工、参数和固件。"
+      - "How do the data get out? A control-box port with a connectivity module, networking built into the control, or a gateway that converts protocols and aggregates for a group of machines. Old machines with no port can take a current clamp on the power cable, but that gives only on and off. The system has four layers, device, edge, platform and application; state, counters and events go up, dispatching, parameters and firmware come down."
+
+  - layout: split
+    title: ["设备数据分四类", "Machine data come in four kinds"]
+    points:
+      - ["几代机型，先统一成同一种结构", "Many models and generations: one common structure first"]
+      - ["状态对应 OPC UA Machinery 四种", "States map to the four of OPC UA for Machinery"]
+      - ["计数只增不减；事件发生在某一时刻", "Counters only go up; events happen at an instant"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g>
+            <rect x="10" y="10" width="430" height="300" rx="24" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
+            <text x="40" y="66" font-size="38" font-weight="800" fill="#8fb6ff">识别</text><text x="140" y="66" font-size="22" fill="#8fa3ba" class="en">identity</text>
+            <text x="40" y="126" font-size="27" fill="#f3f6fa">编号 · 型号 · 序列号</text>
+            <text x="40" y="170" font-size="27" fill="#f3f6fa">固件版本 · 产线工位</text>
+            <text x="40" y="270" font-size="26" fill="#8fb6ff">很少变化</text>
+          </g>
+          <g>
+            <rect x="460" y="10" width="430" height="300" rx="24" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+            <text x="490" y="66" font-size="38" font-weight="800" fill="#5ee0d2">状态</text><text x="590" y="66" font-size="22" fill="#8fa3ba" class="en">state</text>
+            <text x="490" y="126" font-size="26" fill="#f3f6fa">运行 → 正在执行</text>
+            <text x="490" y="168" font-size="26" fill="#f3f6fa">待机 → 可用但未执行</text>
+            <text x="490" y="210" font-size="26" fill="#f3f6fa">故障 → 停用</text>
+            <text x="490" y="252" font-size="26" fill="#f3f6fa">关机 → 不可用</text>
+          </g>
+          <g>
+            <rect x="10" y="330" width="430" height="300" rx="24" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+            <text x="40" y="386" font-size="38" font-weight="800" fill="#ffd75a">计数</text><text x="140" y="386" font-size="22" fill="#8fa3ba" class="en">counters</text>
+            <text x="40" y="446" font-size="27" fill="#f3f6fa">针数 · 剪线 · 件数</text>
+            <text x="40" y="490" font-size="27" fill="#f3f6fa">运行时间</text>
+            <text x="40" y="590" font-size="26" fill="#ffd75a">只增不减，报累计值</text>
+          </g>
+          <g>
+            <rect x="460" y="330" width="430" height="300" rx="24" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
+            <text x="490" y="386" font-size="38" font-weight="800" fill="#ff9c75">事件</text><text x="590" y="386" font-size="22" fill="#8fa3ba" class="en">events</text>
+            <text x="490" y="446" font-size="27" fill="#f3f6fa">开始缝 · 停下 · 剪线</text>
+            <text x="490" y="490" font-size="27" fill="#f3f6fa">断线 · 报警 · 换人</text>
+            <text x="490" y="590" font-size="26" fill="#ff9c75">在某一时刻发生</text>
+          </g>
+        </svg>
+    notes:
+      - "车间里常有几家企业、几代型号的缝纫机，数据要先统一成一种结构。一台设备的数据分四类：识别信息，编号、型号、固件、工位，很少变；状态，参照 OPC UA 机械通用规范，运行、待机、故障、关机对应四种状态；计数，只增不减的累计量；事件，在某一时刻发生的事。"
+      - "A floor often has machines from several makers and generations, so their data must first share one structure. Four kinds: identity, such as ID, model, firmware and station, which rarely changes; state, mapped with OPC UA for Machinery, running, idle, fault and off matching its four states; counters, quantities that only go up; and events, things that happen at an instant."
+
+  - layout: split
+    title: ["计数报累计值：丢一条也不怕", "Report counters cumulatively: a lost message doesn't matter"]
+    points:
+      - ["丢了一条，下一条照样补回来", "Lose one, and the next one makes it up"]
+      - ["重复收到一条，也不会多算", "Receive one twice, and nothing is double-counted"]
+      - ["接收方要识别归零，归零后接续", "The receiver must spot resets and carry on"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="20" y="44" font-size="26" fill="#8fa3ba">本班累计件数（示意）</text>
+          <path d="M40 250 L870 250" stroke="#2c3e5c" stroke-width="6" stroke-linecap="round"/>
+          <g font-size="44" font-weight="800" text-anchor="middle" class="en">
+            <circle cx="110" cy="250" r="16" fill="#2ec4b6"/><text x="110" y="200" fill="#5ee0d2">120</text>
+            <circle cx="310" cy="250" r="16" fill="#2ec4b6"/><text x="310" y="200" fill="#5ee0d2">128</text>
+            <circle cx="510" cy="250" r="16" fill="#ff7a45"/><text x="510" y="200" fill="#ff7a45">✗</text>
+            <circle cx="710" cy="250" r="16" fill="#2ec4b6"/><text x="710" y="200" fill="#5ee0d2">145</text>
+          </g>
+          <g font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">
+            <text x="110" y="300">10:00</text><text x="310" y="300">10:01</text><text x="510" y="300">10:02</text><text x="710" y="300">10:03</text>
+          </g>
+          <text x="510" y="340" font-size="26" fill="#ff9c75" text-anchor="middle">这一条丢了</text>
+          <path d="M310 380 C 360 450, 660 450, 710 380" stroke="#f2b705" stroke-width="4" fill="none"/>
+          <rect x="190" y="460" width="640" height="80" rx="18" fill="rgba(242,183,5,.12)"/>
+          <text x="510" y="512" font-size="32" font-weight="700" fill="#ffd75a" text-anchor="middle">145 − 128 = 17 件，一件不少</text>
+          <text x="450" y="600" font-size="26" fill="#f3f6fa" text-anchor="middle">若报“这一分钟做了几件”，丢一条就永远少了</text>
+        </svg>
+    notes:
+      - "计数的要点是报累计值，不报增量。看图，每分钟报一次本班累计件数：10 点 02 分那条丢了，10 点 03 分的 145 减 10 点 01 分的 128，中间 17 件一件不少；重复收到也不多算。若报“这一分钟做了几件”，丢一条就永远少了。接收方还要识别断电重启、换控制器造成的归零，再接着累计。"
+      - "The key with counters: report cumulative values, not increments. Here the machine reports the shift's running total every minute. The 10:02 message is lost, yet 145 at 10:03 minus 128 at 10:01 still gives all 17 pieces, and a duplicate does no harm. Report 'pieces this minute' and a lost message is lost for good. The receiver must also spot resets after a power cycle or controller swap and carry on."
+
+  - layout: figure
+    title: ["一台缝纫机的一刻钟：事件交错出现", "A quarter-hour on one machine: events interleave"]
+    visual: {video: events}
+    caption: ["蓝：主轴转 · 橙：剪线 · 红：断线 · 灰：等活 · 紫：故障", "Blue spindle · orange trims · red breaks · grey waiting · purple faults"]
+    notes:
+      - "这是实验 26-1 生成的一台平缝机一刻钟里的事件流，每隔几秒换一段。蓝色竖条是主轴在转，橙色短线是剪线，红色是断线停机，灰色是等活，紫色是设备故障。大家注意两点：第一，主轴转动是一小段一小段的，中间夹着拿布、对齐；第二，每缝完一段就剪一次线，所以剪线次数和件数有关系，但不完全对得上，后面会专门算。"
+      - "This is the event stream from Lab 26-1: a quarter-hour on one lockstitch machine, with a new segment every few seconds. Blue bars: the spindle turning. Orange ticks: trims. Red: thread-break stops. Grey: waiting for work. Purple: machine faults. Notice two things. The spindle runs in short bursts, with handling in between. And every seam ends with a trim, so trims are related to pieces, but not exactly. We'll do the numbers later."
+
+  - layout: section
+    num: "02"
+    title: ["通信：MQTT 与 OPC UA", "Communication: MQTT and OPC UA"]
+
+  - layout: split
+    title: ["MQTT：发布与订阅，像一个邮局", "MQTT: publish and subscribe, like a post office"]
+    points:
+      - ["设备发布到主题，不管谁来收", "Machines publish to topics, not caring who reads"]
+      - ["看板、MES、数据库各自订阅", "Dashboards, MES and databases each subscribe"]
+      - ["加看板、换数据库，设备不用改", "Add a dashboard or a database: no change on machines"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <defs><marker id="m26" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fa3ba"/></marker></defs>
+          <g font-size="26" font-weight="700" fill="#f3f6fa" text-anchor="middle">
+            <rect x="10" y="80" width="220" height="90" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="120" y="135">缝纫机 l03-06</text>
+            <rect x="10" y="275" width="220" height="90" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="120" y="330">缝纫机 l03-07</text>
+            <rect x="10" y="470" width="220" height="90" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="120" y="525">缝纫机 l03-08</text>
+            <rect x="670" y="80" width="220" height="90" rx="18" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="780" y="135">车间看板</text>
+            <rect x="670" y="275" width="220" height="90" rx="18" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="780" y="330">历史库</text>
+            <rect x="670" y="470" width="220" height="90" rx="18" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="780" y="525">MES 桥接</text>
+          </g>
+          <circle cx="450" cy="320" r="110" fill="rgba(76,141,255,.15)" stroke="#4c8dff" stroke-width="4"/>
+          <text x="450" y="310" font-size="34" font-weight="800" fill="#8fb6ff" text-anchor="middle">MQTT</text>
+          <text x="450" y="350" font-size="30" font-weight="700" fill="#8fb6ff" text-anchor="middle">代理</text>
+          <g stroke="#ff7a45" stroke-width="4" fill="none" marker-end="url(#m26)">
+            <path d="M232 125 L345 260"/><path d="M232 320 L336 320"/><path d="M232 515 L345 380"/></g>
+          <g stroke="#a78bfa" stroke-width="4" fill="none" marker-end="url(#m26)">
+            <path d="M555 260 L666 125"/><path d="M562 320 L666 320"/><path d="M555 380 L666 515"/></g>
+          <text x="230" y="620" font-size="28" fill="#ff9c75" text-anchor="middle">发布 publish</text>
+          <text x="680" y="620" font-size="28" fill="#c4b5fd" text-anchor="middle">订阅 subscribe</text>
+          <text x="450" y="40" font-size="24" fill="#8fa3ba" text-anchor="middle">双方互不认识</text>
+        </svg>
+    notes:
+      - "车间联网用得最多的协议之一是 MQTT，它像一个邮局：设备把消息发布到一个主题上，比如“3 号线 7 号工位 / 状态”，不关心谁来收；看板、MES、数据库各自订阅，由代理转发。双方互不认识，加看板、换数据库，设备一侧都不用改。消息头很小，无线和小模块也跑得动。"
+      - "One of the most used protocols on the floor is MQTT, which works like a post office. A machine publishes to a topic, say 'line 3 station 7 / status', without caring who reads it; dashboards, MES and databases each subscribe, and a broker forwards. Neither side knows the other, so adding a dashboard or a database changes nothing on the machines. The headers are tiny, so Wi-Fi and small modules cope."
+
+  - layout: split
+    title: ["服务质量：计数和事件用 QoS 1", "Quality of service: counters and events use QoS 1"]
+    points:
+      - ["QoS 1 至少送一次，可能重复", "QoS 1 delivers at least once, so it may duplicate"]
+      - ["按消息里自带的唯一编号去重", "De-duplicate by the unique ID inside the message"]
+      - ["报文标识符会重复使用，不能拿来去重", "Packet identifiers get reused, so they can't de-duplicate"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g>
+            <rect x="10" y="20" width="880" height="170" rx="24" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
+            <text x="50" y="100" font-size="56" font-weight="800" fill="#8fa3ba" class="en">0</text>
+            <text x="130" y="88" font-size="34" font-weight="700" fill="#f3f6fa">最多送一次</text>
+            <text x="130" y="140" font-size="27" fill="#8fa3ba">可能丢</text>
+          </g>
+          <g>
+            <rect x="10" y="230" width="880" height="170" rx="24" fill="rgba(242,183,5,.10)" stroke="#f2b705" stroke-width="4"/>
+            <text x="50" y="310" font-size="56" font-weight="800" fill="#f2b705" class="en">1</text>
+            <text x="130" y="298" font-size="34" font-weight="700" fill="#f3f6fa">至少送一次</text>
+            <text x="130" y="350" font-size="27" fill="#ffd75a">可能重复 → 接收方去重</text>
+            <rect x="620" y="282" width="240" height="66" rx="33" fill="#f2b705"/>
+            <text x="740" y="326" font-size="27" font-weight="800" fill="#0b1220" text-anchor="middle">计数 · 事件</text>
+          </g>
+          <g>
+            <rect x="10" y="440" width="880" height="170" rx="24" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
+            <text x="50" y="520" font-size="56" font-weight="800" fill="#8fa3ba" class="en">2</text>
+            <text x="130" y="508" font-size="34" font-weight="700" fill="#f3f6fa">恰好一次</text>
+            <text x="130" y="560" font-size="27" fill="#8fa3ba">开销最大</text>
+          </g>
+        </svg>
+    notes:
+      - "MQTT 的服务质量分三级：0 级最多送一次，可能丢；1 级至少送一次，可能重复；2 级恰好一次，开销最大。计数和事件一般用 1 级。会重复，接收方就要按消息内容里自带的唯一编号去重；MQTT 报文的标识符会重复使用，不能拿来去重。累计值在这里又帮了忙：重复一条也不会多算。"
+      - "MQTT has three levels of service. QoS 0 delivers at most once and may lose; QoS 1 at least once and may duplicate; QoS 2 exactly once, at the highest cost. Counters and events normally use QoS 1, so the receiver de-duplicates by the unique ID inside the message; the packet identifier gets reused and can't do that job. Cumulative counters help again: a duplicate never double-counts."
+
+  - layout: split
+    title: ["保留、遗嘱和通配符", "Retained messages, wills and wildcards"]
+    points:
+      - ["保留：新开的看板马上拿到当前状态", "Retained: a new dashboard gets current state at once"]
+      - ["遗嘱：心跳超时，代理替它发“离线”", "Will: on keep-alive timeout the broker says 'offline'"]
+      - ["+ 匹配一层；# 匹配其后所有层", "+ matches one level; # matches all levels below"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g font-size="30" fill="#f3f6fa" class="en">
+            <text x="20" y="50" font-weight="800">wq</text>
+            <path d="M40 62 L40 112 L80 112" stroke="#4b5f7d" stroke-width="3" fill="none"/>
+            <text x="90" y="122" font-weight="700">shirt</text>
+            <path d="M110 134 L110 184 L150 184" stroke="#4b5f7d" stroke-width="3" fill="none"/>
+            <text x="160" y="194" font-weight="700" fill="#8fb6ff">sewing</text>
+            <path d="M180 206 L180 256 L220 256 M180 256 L180 556 L220 556" stroke="#4b5f7d" stroke-width="3" fill="none"/>
+            <text x="230" y="266" font-weight="800" fill="#ff9c75">l03-07</text>
+            <path d="M250 278 L250 320 L290 320 M250 320 L250 380 L290 380 M250 380 L250 440 L290 440 M250 440 L250 500 L290 500" stroke="#4b5f7d" stroke-width="3" fill="none"/>
+            <text x="300" y="330" fill="#ffd75a" font-weight="700">status</text>
+            <text x="300" y="390">event</text>
+            <text x="300" y="450">counter</text>
+            <text x="300" y="510">cmd</text>
+            <text x="230" y="566" fill="#8fa3ba">l03-08 …</text>
+          </g>
+          <rect x="440" y="300" width="440" height="50" rx="12" fill="rgba(242,183,5,.14)"/>
+          <text x="455" y="334" font-size="24" fill="#ffd75a">保留 · 遗嘱 → offline</text>
+          <rect x="400" y="40" width="490" height="190" rx="22" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="420" y="88" font-size="26" fill="#5ee0d2">看板订阅全车间状态</text>
+          <text x="420" y="140" font-size="27" font-weight="700" fill="#f3f6fa" class="en">wq/shirt/sewing/<tspan fill="#f2b705">+</tspan>/status</text>
+          <text x="420" y="196" font-size="27" font-weight="700" fill="#f3f6fa" class="en">wq/shirt/<tspan fill="#f2b705">#</tspan></text>
+          <text x="660" y="196" font-size="22" fill="#8fa3ba">历史库全收</text>
+        </svg>
+    notes:
+      - "MQTT 有几个功能车间特别有用。保留消息：代理为每个主题存最新一条，新开的看板马上拿到每台机器的当前状态。遗嘱消息：设备连接时预留“我掉线了”，心跳超时后代理替它发出，看板显示离线；正常下线不会触发，要自己先发。通配符：加号匹配一层，井号匹配其后所有层。"
+      - "A few MQTT features matter on the floor. Retained messages: the broker keeps the latest per topic, so a newly opened dashboard gets every machine's state at once. Will messages: left at connect time, sent by the broker when the keep-alive times out, so the dashboard shows 'offline'; a clean disconnect doesn't fire it, so publish offline yourself. Wildcards: plus matches one level, hash everything below."
+
+  - layout: split
+    title: ["统一命名空间与消息信封", "The unified namespace and the message envelope"]
+    points:
+      - ["主题按 ISA-95 层级：工厂/车间/工位/类别", "Topics follow ISA-95: plant/area/station/category"]
+      - ["代理成为全厂唯一的实时数据源", "The broker becomes the plant's single real-time source"]
+      - ["仿真和真实设备只差 source 一个字段", "Simulated and real machines differ only in source"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="10" y="36" font-size="24" fill="#8fa3ba" class="en">wq/shirt/sewing/l03-07/counter</text>
+          <rect x="10" y="56" width="880" height="576" rx="22" fill="#0d1626" stroke="#22324d" stroke-width="2"/>
+          <g font-size="26" fill="#d3deea" font-family="DejaVu Sans Mono, monospace">
+            <text x="40" y="100">{</text>
+            <text x="70" y="140"><tspan fill="#8fb6ff">"v"</tspan>: 1,  <tspan fill="#8fb6ff">"id"</tspan>: "5f1c…",</text>
+            <text x="70" y="180"><tspan fill="#8fb6ff">"ts"</tspan>: "…T03:15:00.000Z",</text>
+            <text x="70" y="220"><tspan fill="#8fb6ff">"type"</tspan>: "machine.counter",</text>
+            <text x="70" y="260"><tspan fill="#8fb6ff">"source"</tspan>: <tspan fill="#ff9c75">"plc/l03-07"</tspan>,</text>
+            <text x="70" y="300"><tspan fill="#8fb6ff">"mode"</tspan>: "prod",</text>
+            <text x="70" y="340"><tspan fill="#8fb6ff">"corr"</tspan>: "WO-2026-00231",</text>
+            <text x="70" y="380"><tspan fill="#ffd75a">"data"</tspan>: {</text>
+            <text x="110" y="420"><tspan fill="#5ee0d2">"pieces_total"</tspan>: 285,</text>
+            <text x="110" y="460"><tspan fill="#5ee0d2">"trims_total"</tspan>: 874,</text>
+            <text x="110" y="500"><tspan fill="#5ee0d2">"run_time_s"</tspan>: 3586, …</text>
+            <text x="70" y="540">}</text>
+            <text x="40" y="580">}</text>
+          </g>
+          <path d="M600 120 L620 120 L620 350 L600 350" stroke="#8fb6ff" stroke-width="4" fill="none"/>
+          <text x="640" y="232" font-size="30" font-weight="800" fill="#8fb6ff">信封</text>
+          <text x="640" y="268" font-size="22" fill="#8fa3ba" class="en">envelope</text>
+          <path d="M600 395 L620 395 L620 520 L600 520" stroke="#5ee0d2" stroke-width="4" fill="none"/>
+          <text x="640" y="452" font-size="28" font-weight="800" fill="#5ee0d2">累计值</text>
+          <text x="640" y="488" font-size="22" fill="#8fa3ba">单位写进字段名</text>
+        </svg>
+    notes:
+      - "主题怎样命名，决定数据好不好找。按 ISA-95 层级，工厂、车间、工位、类别一层层往下，所有系统都在这棵主题树上收发，叫统一命名空间，代理就成了全厂唯一的实时数据源。问渠的每条消息是统一的 JSON：外层信封有版本、编号、时间、类型、来源，业务放 data。仿真和真实设备只差 source。"
+      - "How topics are named decides how easy data are to find. Follow ISA-95, plant, area, station, category, and have every system use one topic tree: the unified namespace, which makes the broker the plant's single real-time source. Every WenQuest message is the same JSON: an envelope with version, ID, time, type and source, and the business content in data. Simulated and real machines differ only in source."
+
+  - layout: points
+    title: ["OPC UA：带说明书的数据", "OPC UA: data that come with a manual"]
+    points:
+      - ["每个数据点带名称、单位、类型和所属部件", "Every data point carries name, unit, type and component"]
+      - ["设备→网关→平台：量大、网差，多用 MQTT", "Machine→gateway→platform: high volume, so mostly MQTT"]
+      - ["要被浏览、读写参数的设备：用 OPC UA", "Equipment to be browsed and written: OPC UA"]
+    foot: ["缝纫机还没有专门的配套规范，可先用 Machinery 通用模型描述识别和状态", "There is no companion specification for sewing machines yet; use the generic Machinery model for identity and state"]
+    notes:
+      - "另一种常用标准是 OPC UA，它不只传数值，还传“这个数是什么”：名称、单位、类型和所属部件，客户端连上就能浏览整个模型。两者不互相排斥：设备到网关到平台，数据量大、网络差，多用 MQTT；要被浏览、读写参数的高端设备和系统之间对接，用 OPC UA。缝纫机量大、数据简单，MQTT 往往就够了。"
+      - "The other common standard is OPC UA, which sends not just values but what they mean: name, unit, type and component, and a client can browse the whole model. They aren't rivals. Machine to gateway to platform, with heavy traffic and poor networks, usually MQTT; equipment whose parameters must be browsed and written, and system-to-system links, OPC UA. For numerous, simple sewing machines, MQTT is often enough."
+
+  - layout: section
+    num: "03"
+    title: ["数据量与指标", "Data volume and metrics"]
+
+  - layout: bignum
+    title: ["一台平缝机，一个班次", "One lockstitch machine, one shift"]
+    nums:
+      - {n: "{{ch26.pieces:.0f}} 件", n_en: "pieces", label: ["实际做的件数", "Pieces actually made"]}
+      - {n: "{{ch26.run:.0f}} min", n_en: "spindle time", label: ["主轴真正转动的时间", "Time the spindle really turns"]}
+      - {n: "{{ch26.kst:.0f}} 万针", n_en: "{{ch26.kst:.0f}}0 000 stitches", label: ["剪线约 {{ch26.trims:.0f}} 次", "About {{ch26.trims:.0f}} trims"]}
+    foot: ["每针一条：{{ch26.stitch_per:.0f}} 条/班；每分钟汇总一条：{{ch26.minute_per:.0f}} 条/班 —— 相差约 {{ch26.shrink:.0f}} 倍", "One per stitch: {{ch26.stitch_per:.0f}} a shift; one per minute: {{ch26.minute_per:.0f}} — about {{ch26.shrink:.0f}} times fewer"]
+    notes:
+      - "先算一台机器。这台平缝机一个班次缝约 {{ch26.pieces:.0f}} 件，主轴转约 {{ch26.run:.0f}} 分钟，平均每分钟 3000 针，约 {{ch26.kst:.0f}} 万针，剪线约 {{ch26.trims:.0f}} 次。每针报一条，一班三十几万条；每次踏板和剪线报一条，约 {{ch26.segment_per:.0f}} 条；每分钟汇总一条，约 {{ch26.minute_per:.0f}} 条。差了好几百倍。"
+      - "Start with one machine. In a shift it makes about {{ch26.pieces:.0f}} pieces, the spindle turns about {{ch26.run:.0f}} minutes at 3000 stitches a minute, roughly {{ch26.kst:.0f}}0 thousand stitches, with about {{ch26.trims:.0f}} trims. One message per stitch: over three hundred thousand a shift. Per pedal action and trim: about {{ch26.segment_per:.0f}}. One summary a minute: about {{ch26.minute_per:.0f}}. Hundreds of times apart."
+
+  - layout: figure
+    title: ["乘到 500 台：边缘汇总，事件即报", "Times 500: aggregate at the edge, report events at once"]
+    visual: {video: rate}
+    caption: ["每针上报一年 {{ch26.stitch_tb:.0f}} TB；计数每件或每分钟汇总、状态变化即报：约 {{ch26.minute_gb:.0f}}–{{ch26.piece_gb:.0f}} GB", "Per stitch {{ch26.stitch_tb:.0f}} TB/yr; aggregated + events: {{ch26.minute_gb:.0f}}–{{ch26.piece_gb:.0f}} GB/yr"]
+    notes:
+      - "乘到 500 台、两班、每年 300 天、每条 250 字节，图里五种方式轮流选一遍，纵坐标是对数。每针上报一年约 {{ch26.stitch_tb:.0f}} TB，大部分没人看；每 10 分钟汇总又太慢，停机 10 分钟后才显示。合理的是计数在边缘汇总、状态变化立即报，一年约 {{ch26.minute_gb:.0f}} 到 {{ch26.piece_gb:.0f}} GB，停机 5 秒内显示。"
+      - "Now 500 machines, two shifts, 300 days, 250 bytes a message; the chart cycles through the five strategies on a log scale. Every stitch: about {{ch26.stitch_tb:.0f}} terabytes a year, mostly unread. Every ten minutes: stoppages show ten minutes late. The sensible way aggregates counters at the edge and reports state changes at once: about {{ch26.minute_gb:.0f}} to {{ch26.piece_gb:.0f}} gigabytes a year, with stoppages shown within 5 seconds."
+
+  - layout: bignum
+    title: ["设备综合效率 OEE = A × P × Q", "Overall equipment effectiveness: OEE = A × P × Q"]
+    nums:
+      - {n: "{{ch26.A:.1f}}%", n_en: "A · availability", label: ["时间开动率：扣掉停机", "Deducts stoppages"]}
+      - {n: "{{ch26.P:.1f}}%", n_en: "P · performance", label: ["性能开动率：扣掉速度损失", "Deducts speed loss"]}
+      - {n: "{{ch26.Q:.1f}}%", n_en: "Q · quality", label: ["合格品率：扣掉返修", "Deducts rework"]}
+    foot: ["OEE ≈ {{ch26.OEE:.1f}}% = 合格件数 × 标准工时 ÷ 计划时间", "OEE ≈ {{ch26.OEE:.1f}}% = good pieces × standard minute ÷ planned time"]
+    notes:
+      - "衡量一个工位的综合表现用 OEE，它把损失分三类。A 扣停机：等活、故障、断线约 {{ch26.nb:.0f}} 次，450 分钟里运行约 {{ch26.oper:.0f}} 分钟，A 约 {{ch26.A:.1f}}%。P 扣速度损失：应做 {{ch26.due:.0f}} 件，实做 {{ch26.pieces:.0f}} 件，P 是 {{ch26.P:.0f}}%。Q 扣返修，{{ch26.Q:.0f}}%。三者相乘约 {{ch26.OEE:.1f}}%。"
+      - "OEE measures a station overall by splitting its losses three ways. A deducts stoppages: waiting, faults and about {{ch26.nb:.0f}} thread breaks leave about {{ch26.oper:.0f}} of 450 minutes, A about {{ch26.A:.1f}} percent. P deducts speed loss: {{ch26.due:.0f}} pieces due, {{ch26.pieces:.0f}} made, P {{ch26.P:.0f}} percent. Q deducts rework: {{ch26.Q:.0f}} percent. Multiplied: about {{ch26.OEE:.1f}} percent."
+
+  - layout: figure
+    title: ["一个班次的时间去了哪里", "Where the shift's time went"]
+    visual: {video: waterfall}
+    caption: ["速度损失约 {{ch26.speed:.0f}} min，最大；其次等活 25 min、故障 12 min", "Speed loss about {{ch26.speed:.0f}} min, the biggest; then waiting and faults"]
+    notes:
+      - "这是 OEE 瀑布图：从 450 分钟计划时间一级级扣掉等活、故障、断线，得到运行时间；再扣速度损失和返修，剩下绿色的合格品时间约 {{ch26.good_min:.0f}} 分钟。最大的损失是速度，约 {{ch26.speed:.0f}} 分钟。提醒一点：P 用的标准工时含手工拿放，衡量的是操作效率，手工工位的 OEE 不能和自动设备直接比。"
+      - "This is the OEE waterfall: from 450 planned minutes, step down through waiting, faults and thread breaks to running time, then through speed loss and rework to the green good-output time, about {{ch26.good_min:.0f}} minutes. The biggest loss is speed, about {{ch26.speed:.0f}} minutes. One caution: P uses a standard minute that includes handling, so it measures operator efficiency, and a manual station's OEE can't be compared directly with a machine's."
+
+  - layout: split
+    title: ["缝纫时间比例：最容易误读的数", "Sewing-time ratio: the easiest number to misread"]
+    points:
+      - ["主轴只转了约 {{ch26.run:.0f}} / 450 min", "The spindle turned only about {{ch26.run:.0f}} of 450 min"]
+      - ["其余在拿布、对齐、翻面、放下", "The rest: picking up, aligning, turning, putting down"]
+      - ["不能当“机器利用率”考核工人", "Never use it to judge operators as machine utilisation"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="20" y="60" font-size="28" fill="#8fa3ba">计划时间 450 min</text>
+          <rect x="20" y="90" width="860" height="120" rx="16" fill="#22324d"/>
+          <rect x="20" y="90" width="228" height="120" rx="16" fill="#2ec4b6"/>
+          <text x="134" y="166" font-size="44" font-weight="800" fill="#08101d" text-anchor="middle" class="en">{{ch26.ratio:.0f}}%</text>
+          <text x="560" y="166" font-size="32" font-weight="700" fill="#d3deea" text-anchor="middle">拿布 · 对齐 · 翻面 · 放下 · 停机</text>
+          <text x="20" y="260" font-size="28" fill="#5ee0d2">主轴真正转动 ≈ {{ch26.run:.0f}} min</text>
+          <rect x="20" y="320" width="860" height="290" rx="24" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <text x="60" y="390" font-size="32" font-weight="800" fill="#ffd75a">要提高它，靠的是</text>
+          <text x="60" y="450" font-size="30" fill="#f3f6fa">● 工位布置</text>
+          <text x="60" y="505" font-size="30" fill="#f3f6fa">● 辅助工具</text>
+          <text x="60" y="560" font-size="30" fill="#f3f6fa">● 自动单元（第 12 讲）</text>
+          <text x="840" y="560" font-size="30" fill="#ff9c75" text-anchor="end">不是让工人踩快一点</text>
+        </svg>
+    notes:
+      - "最容易被误读的数是缝纫时间比例：主轴真正转动的时间占计划时间多少。算例里主轴只转了约 {{ch26.run:.0f}} 分钟，约 {{ch26.ratio:.0f}}%。其余时间在拿布、对齐、翻面、放下，标准工时里本来就包括。所以不能拿它当机器利用率考核工人；要提高它，靠工位布置、辅助工具和自动单元。"
+      - "The number most easily misread is the sewing-time ratio, the share of planned time the spindle actually turns. Here it turns only about {{ch26.run:.0f}} minutes, about {{ch26.ratio:.0f}} percent. The rest is picking up, aligning, turning and putting down, already part of the standard minute. So never use it to judge operators as machine utilisation; raise it with better layout, aids and automatic units."
+
+  - layout: split
+    title: ["按剪线数件，为什么多算", "Why counting by trims comes out high"]
+    points:
+      - ["返工重缝、断线后重新起缝：都多剪一次", "Re-sewing and restarting after a break: one extra trim each"]
+      - ["{{ch26.trims:.0f}} ÷ 3 ≈ {{ch26.est:.0f}} 件，多算 {{ch26.err:.1f}}%", "{{ch26.trims:.0f}} ÷ 3 ≈ {{ch26.est:.0f}} pieces, {{ch26.err:.1f}}% high"]
+      - ["以衣架或工票为准，剪线用来核对", "Count by hanger or ticket; cross-check with trims"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="20" y="44" font-size="26" fill="#8fa3ba">三种数件方法的误差（算例，示意）</text>
+          <path d="M450 80 L450 540" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="8 8"/>
+          <text x="450" y="580" font-size="24" fill="#8fa3ba" text-anchor="middle">实际件数</text>
+          <text x="20" y="160" font-size="32" font-weight="700" fill="#f3f6fa">剪线</text>
+          <rect x="450" y="115" width="300" height="70" rx="12" fill="#ff7a45"/>
+          <text x="770" y="162" font-size="34" font-weight="800" fill="#ff9c75" class="en">+{{ch26.err:.1f}}%</text>
+          <text x="470" y="230" font-size="24" fill="#ffb38f">返工 + 断线，多剪线</text>
+          <text x="20" y="330" font-size="32" font-weight="700" fill="#f3f6fa">工票</text>
+          <rect x="190" y="285" width="260" height="70" rx="12" fill="#4c8dff"/>
+          <text x="170" y="332" font-size="34" font-weight="800" fill="#8fb6ff" text-anchor="end" class="en">−2%</text>
+          <text x="440" y="400" font-size="24" fill="#8fb6ff" text-anchor="end">2% 的扎漏扫，整扎地少</text>
+          <text x="20" y="490" font-size="32" font-weight="700" fill="#f3f6fa">衣架</text>
+          <rect x="440" y="445" width="20" height="70" rx="6" fill="#2ec4b6"/>
+          <text x="490" y="492" font-size="30" font-weight="700" fill="#5ee0d2">最准：逐件读编号</text>
+        </svg>
+    notes:
+      - "这是按原理编写的案例。车间按剪线次数除以段数数件、发计件工资，工人反映统计数比工票多。原因是返工重缝、断线后重新起缝都多剪一次线：剪线约 {{ch26.trims:.0f}} 次，除以 3 得约 {{ch26.est:.0f}} 件，多了 {{ch26.err:.1f}}%。工票漏扫则整扎地少；衣架计数最准。以衣架或工票为准，剪线用来核对。"
+      - "A case written from first principles. A shop counted pieces as trims divided by seams and paid piece rates on it, and operators found the count above their tickets. Re-sewing and restarting after a break each add a trim: about {{ch26.trims:.0f}} trims over 3 gives {{ch26.est:.0f}} pieces, {{ch26.err:.1f}} percent high. Missed ticket scans lose whole bundles; hangers are most accurate. Count by hanger or ticket and check with trims."
+
+  - layout: lab
+    title: ["动手试一试：缝纫机联网", "Try it: a connected sewing machine"]
+    shot: {page: iot, set: [press: "#resetA"]}
+    tasks:
+      - ["第①页读出件数、OEE 和计件误差", "Page ①: read pieces, OEE and the count error"]
+      - ["只改“件数怎样数”，让误差小于 1%", "Change only the counting method: get the error under 1%"]
+      - ["第②页：找出四项判据都满足的方式", "Page ②: find a strategy that meets all four criteria"]
+    notes:
+      - "实验 26-1 在问渠平台上自己做。第①页先恢复标准，读出件数、按剪线统计的件数和误差、A、P、Q 和 OEE，多换几段看事件流；再不改工况、只改件数怎样数，让误差小于 1%。第②页保持 500 台、250 字节、两班，五种上报方式都试一遍，找出四项判据都满足的方式。"
+      - "Lab 26-1 is on WenQuest. On page ①, reset to standard and read the pieces, the trim-based count and its error, A, P, Q and OEE, and step through a few event segments; then, without changing the conditions, change only the counting method to get the error under 1 percent. On page ②, keep 500 machines, 250 bytes and two shifts, try all five strategies and find one that meets all four criteria."
+
+  - layout: section
+    num: "04"
+    title: ["对接、孪生与安全", "Integration, twins and security"]
+
+  - layout: chain
+    title: ["缝纫机的数据要和生产计划对上", "Machine data must meet the production plan"]
+    steps: [["ERP 订单", "ERP order"], ["MES 拆单", "Work orders"], ["派到工位", "Dispatch"], ["缝纫机", "Machines"], ["吊挂", "Hangers"], ["报工", "Reporting"], ["工时", "Hours"], ["计件工资", "Piece pay"], ["成本", "Cost"]]
+    hot: [3, 4]
+    mark: ["联网数据", "connected data"]
+    foot: ["问渠做法：所有系统只和统一数据总线打交道，桥接程序在总线和 ERP 之间转换字段", "The WenQuest way: every system talks only to the unified bus; a bridge translates fields between the bus and ERP"]
+    notes:
+      - "缝纫机的数据只有和生产计划对上才有意义。MES 从 ERP 拿到订单，拆成工单和工序派到工位；缝纫机和吊挂报上来的件数和状态就是报工；再回 ERP 核算工时、计件工资和成本。问渠的做法是所有系统只和统一数据总线打交道，由桥接程序在总线和 ERP 之间转换字段。"
+      - "Machine data mean something only against the production plan. The MES takes orders from ERP, splits them into work orders and dispatches operations to stations; the pieces and states reported by machines and hangers are the completion reports, which go back to ERP for hours, piece pay and cost. In WenQuest every system talks only to the unified bus, with a bridge translating fields between the bus and ERP."
+
+  - layout: duo
+    title: ["数字孪生的两层意思", "The two layers of a digital twin"]
+    left: {video: mirror, label: ["实时镜像", "Real-time mirror"], note: ["每台机器、每个衣架都有虚拟对象", "A twin for every machine"]}
+    right: {video: predict, label: ["仿真预测：从现在“快进”", "Prediction: fast-forward from now"], note: ["提前看到哪道工序会堵", "See in advance which operation will jam"]}
+    notes:
+      - "数字孪生是和真实车间同步变化的虚拟车间，有两层意思。左边是实时镜像：每个工位、每个衣架都有对应的对象，状态随总线消息更新。右边是仿真预测：从当前实际状态出发把后面几小时快进一遍，提前看到哪道工序会堵，再比较几种调整方案。联网以后，这些模型的输入换成了实测数据。"
+      - "A digital twin is a virtual floor that changes in step with the real one, in two layers. On the left, the real-time mirror: every station and hanger has a counterpart updated from the bus. On the right, prediction: start from the actual state, fast-forward the next few hours to see which operation will jam, and compare a few fixes. Once connected, these models run on measured data."
+
+  - layout: points
+    title: ["远程运维与网络安全", "Remote service and network security"]
+    points:
+      - ["远程看故障码、推参数：先在一台上试", "Read faults, push parameters remotely: try one machine first"]
+      - ["固件双区升级、分批推送，能回退", "Firmware: dual-bank update, staged roll-out, rollback"]
+      - ["分网、加密、单独账号、按主题授权", "Separate networks, encryption, own accounts, per-topic rights"]
+    foot: ["个人数据：按《个人信息保护法》事先告知目的、方式和范围，只采必要的；展示尽量按工位", "Personal data: under the PIPL, tell workers the purpose, means and scope in advance and collect only what's needed; report by station"]
+    notes:
+      - "联网以后可以远程看故障码、换款时一次推参数，推之前先在一台上试。固件远程升级用双区升级、分批推送，出问题能退回。安全上：设备网和办公网分开、通信加密、每台设备单独账号、按主题授权，指令和改参都有记录。谁几点开工、每件几秒是操作工的个人信息，要事先告知、只采必要的。"
+      - "Once connected you can read fault codes remotely and push parameters to a line at a style change, after trying one machine first. Firmware updates use dual banks and staged roll-out so any machine can roll back. For security: separate device and office networks, encryption, an account per machine, per-topic rights, and a log of every command. Start times and seconds per piece are operators' personal data: tell them first and collect only what's needed."
+
+  - layout: split
+    title: ["机器人联系：同一套规则上总线", "Robot link: onto the bus by the same rules"]
+    points:
+      - ["状态用保留消息，掉线由遗嘱变“离线”", "State retained; the will turns it 'offline'"]
+      - ["循环数、抓取次数报累计值", "Cycle and pick counts reported cumulatively"]
+      - ["按夹爪闭合数件，重抓一次就多一件", "Count by gripper closures and every re-grip adds one"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="10" y="20" width="360" height="560" rx="26" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
+          <text x="190" y="70" font-size="30" font-weight="800" fill="#f3f6fa" text-anchor="middle">机器人工作站</text>
+          <rect x="120" y="470" width="140" height="60" rx="10" fill="#4b5f7d"/>
+          <path d="M190 470 L190 380 L280 260 L200 170" stroke="#ff7a45" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="190" cy="380" r="22" fill="#f2b705"/><circle cx="280" cy="260" r="20" fill="#f2b705"/>
+          <path d="M185 150 L170 125 M215 150 L230 125" stroke="#f3f6fa" stroke-width="8" stroke-linecap="round"/>
+          <defs><marker id="r26" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fa3ba"/></marker></defs>
+          <path d="M372 150 L440 150 M372 330 L440 330 M372 500 L440 500" stroke="#8fa3ba" stroke-width="4" marker-end="url(#r26)"/>
+          <rect x="450" y="90" width="440" height="130" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="470" y="140" font-size="25" fill="#5ee0d2" class="en">wq/…/robot-01/status</text>
+          <text x="470" y="190" font-size="26" fill="#f3f6fa">保留 · 遗嘱 → offline</text>
+          <rect x="450" y="265" width="440" height="130" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <text x="470" y="315" font-size="25" fill="#ffd75a" class="en">wq/…/robot-01/counter</text>
+          <text x="470" y="365" font-size="26" fill="#f3f6fa">循环数 · 抓取次数（累计）</text>
+          <rect x="450" y="440" width="440" height="130" rx="20" fill="rgba(255,122,69,.12)" stroke="#ff7a45" stroke-width="3"/>
+          <text x="470" y="490" font-size="26" font-weight="700" fill="#ff9c75">OEE = A × P × Q</text>
+          <text x="470" y="540" font-size="25" fill="#f3f6fa">P 用程序的理想节拍</text>
+        </svg>
+    notes:
+      - "这一套在机器人上完全一样。焊接或搬运机器人的状态用保留消息发到它的 status 主题，掉线由遗嘱消息变成离线；循环数、抓取次数报累计值。它的 OEE 也是 A 乘 P 乘 Q，只是 P 用程序的理想节拍。计件也有同样的坑：按夹爪闭合数件，重抓一次就多一件，要用视觉或到位信号核对。"
+      - "All of this carries over to robots. A welding or handling robot publishes its state as a retained message on its status topic, turned 'offline' by a will message, and reports cycle and pick counts cumulatively. Its OEE is the same A times P times Q, with P based on the program's ideal cycle. Counting has the same trap: count by gripper closures and every re-grip adds a part, so cross-check with vision or a part-present signal."
+
+  - layout: split
+    title: ["生活中的例子：智能电表报累计读数", "Everyday example: a smart meter reports its total"]
+    points:
+      - ["电表报的是表上的累计读数", "The meter reports its running total"]
+      - ["丢一次上报，下次读数照样算得出", "Miss one report and the next still gives the usage"]
+      - ["重复收到也不会多算电费", "A duplicate doesn't add to the bill"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="230" y="20" width="440" height="300" rx="36" fill="#111d31" stroke="#8fa3ba" stroke-width="4"/>
+          <rect x="280" y="80" width="340" height="110" rx="14" fill="#0b1a12" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="450" y="160" font-size="64" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="en">01206</text>
+          <text x="450" y="240" font-size="28" fill="#8fa3ba" text-anchor="middle">累计 kWh（示意）</text>
+          <path d="M60 470 L840 470" stroke="#2c3e5c" stroke-width="6" stroke-linecap="round"/>
+          <g font-size="38" font-weight="800" text-anchor="middle" class="en">
+            <circle cx="150" cy="470" r="14" fill="#2ec4b6"/><text x="150" y="430" fill="#5ee0d2">1200</text>
+            <circle cx="450" cy="470" r="14" fill="#ff7a45"/><text x="450" y="430" fill="#ff7a45">✗</text>
+            <circle cx="750" cy="470" r="14" fill="#2ec4b6"/><text x="750" y="430" fill="#5ee0d2">1206</text>
+          </g>
+          <g font-size="22" fill="#8fa3ba" text-anchor="middle" class="en"><text x="150" y="510">08:00</text><text x="450" y="510">09:00</text><text x="750" y="510">10:00</text></g>
+          <rect x="150" y="550" width="600" height="72" rx="18" fill="rgba(242,183,5,.12)"/>
+          <text x="450" y="597" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle">两小时用电 = 1206 − 1200 = 6 度</text>
+        </svg>
+    notes:
+      - "生活里有一个一模一样的例子：智能电表。它上报的是表上的累计读数，而不是这一刻用了多少度。中间丢了一次上报，没关系，下一次的读数减去上一次收到的读数，这段时间的用电照样算得出来；重复收到一次，也不会多收电费。缝纫机上报累计针数和件数，用的是同一个道理。"
+      - "There's an exact everyday parallel: the smart electricity meter. It reports the running total on its register, not how much was used just now. If one report is lost, no matter: the next reading minus the last one received still gives the usage for the period, and a duplicate doesn't add to the bill. A sewing machine reporting cumulative stitches and pieces relies on the very same idea."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["{{ch26.pieces:.0f}} 件，OEE {{ch26.OEE:.1f}}%，剪线数多了 {{ch26.err:.1f}}%", "{{ch26.pieces:.0f}} pieces, OEE {{ch26.OEE:.1f}}%, trim count {{ch26.err:.1f}}% high"]
+    rows:
+      - ["A × P × Q", "{{ch26.A:.1f}} × {{ch26.P:.0f}} × {{ch26.Q:.0f}}%"]
+      - ["最大损失：速度", "≈ {{ch26.speed:.0f}} min"]
+      - ["按剪线次数数件", "{{ch26.est:.0f}} 件"]
+    side: {big: "{{ch26.stitch_tb:.0f}} TB", text: ["500 台每针上报一年的数据；改为汇总 + 事件即报约 {{ch26.minute_gb:.0f}}–{{ch26.piece_gb:.0f}} GB", "A year of per-stitch data from 500 machines; aggregate + events: about {{ch26.minute_gb:.0f}}–{{ch26.piece_gb:.0f}} GB"]}
+    foot: ["记件以衣架或工票为准，剪线计数用来核对返工和断线", "Count by hanger or ticket; use trims to watch rework and thread breaks"]
+    notes:
+      - "回到开头的问题。运行时间约 {{ch26.oper:.0f}} 分钟，A 约 {{ch26.A:.1f}}%；实际做了约 {{ch26.pieces:.0f}} 件，P {{ch26.P:.0f}}%，Q {{ch26.Q:.0f}}%，OEE 约 {{ch26.OEE:.1f}}%。最大损失是速度，约 {{ch26.speed:.0f}} 分钟。按剪线数出 {{ch26.est:.0f}} 件，多了 {{ch26.err:.1f}}%。500 台每针上报一年约 {{ch26.stitch_tb:.0f}} TB；改成汇总加事件即报，只要 {{ch26.minute_gb:.0f}} 到 {{ch26.piece_gb:.0f}} GB。"
+      - "Back to our problem. Running time is about {{ch26.oper:.0f}} minutes, A about {{ch26.A:.1f}} percent; about {{ch26.pieces:.0f}} pieces were made, P {{ch26.P:.0f}}, Q {{ch26.Q:.0f}}, OEE about {{ch26.OEE:.1f}} percent. The biggest loss is speed, about {{ch26.speed:.0f}} minutes. Counting trims gives {{ch26.est:.0f}}, {{ch26.err:.1f}} percent high. Per-stitch reporting from 500 machines is about {{ch26.stitch_tb:.0f}} terabytes a year; aggregated with events, only {{ch26.minute_gb:.0f}} to {{ch26.piece_gb:.0f}} gigabytes."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["四类数据；计数报累计值，按编号去重", "Four kinds of data; cumulative counters, de-dup by ID"]
+      - ["MQTT + 统一命名空间；保留给状态、遗嘱标离线", "MQTT + unified namespace; retained state, will = offline"]
+      - ["边缘汇总、事件即报；OEE = A × P × Q", "Aggregate at the edge, report events; OEE = A × P × Q"]
+    after: ["作业 26：一条缝制线的联网方案与班次分析 · 测验 · 虚拟实验 26-1 报告 —— 在问渠学习平台完成", "Assignment 26 · quiz · Lab 26-1 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，设备数据分识别、状态、计数、事件四类，计数报累计值，按消息编号去重。第二，MQTT 加统一命名空间，让代理成为全厂唯一的实时数据源；保留消息给当前状态，遗嘱消息标出离线。第三，计数在边缘汇总、状态变化即报；OEE 等于 A 乘 P 乘 Q，剪线计数偏多要核对。"
+      - "Three things to remember. One: machine data come as identity, state, counters and events; counters are cumulative and de-duplicated by message ID. Two: MQTT with a unified namespace makes the broker the plant's single real-time source; retained messages give current state, will messages mark machines offline. Three: aggregate counters at the edge and report state changes at once; OEE is A times P times Q, and trim counts run high, so cross-check."

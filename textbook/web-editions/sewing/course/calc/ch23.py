@@ -130,3 +130,17 @@ for fn in (200, 250):
 # 作业：B10 —— 韦布尔
 beta_w, eta = 2.5, 8000
 print("A B10 h", round(eta * (-math.log(0.9)) ** (1 / beta_w)))
+
+# numbers quoted by the slides (第 24 轮 课件): only when WQ_BOOK_OUT is set
+import os as _os
+if _os.environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    _r = lambda n, fn=190: 2 * n / 60 / fn
+    out(wc=wc, sg=sg, y_int=((g_int >= GMIN) & (g_int <= GMAX)).mean() * 100, bad1000=(1 - ((g_int >= GMIN) & (g_int <= GMAX)).mean()) * 1000,
+        s99=0.03 / norm.ppf(0.995), k99=k, cost99=(1 / k - 1) * 100,
+        sa=sa, y_adj=((g_adj >= GMIN) & (g_adj <= GMAX)).mean() * 100, ss=ss, y_swap=((g_swap >= GMIN) & (g_swap <= GMAX)).mean() * 100,
+        f5000=2 * 5000 / 60, f5500=2 * 5500 / 60, r5000=_r(5000), r5500=_r(5500), a5000=amp(_r(5000), 0.03), a5500=amp(_r(5500), 0.03),
+        v5000=vib(5000), v5500=vib(5500), dB5500=noise(5500), Fup=(1.1**2 - 1) * 100, F445=368 * 1.21, vratio=vib(5500) / vib(5000),
+        fn2=fn2, rfix=2 * 5500 / 60 / fn2, vfix=vib(5500, fn=fn2), dBfix=noise(5500, fn=fn2), nres=fn2 * 30, nres100=round(fn2 * 30, -2),
+        vz06=vib(5500, z=0.06), vz10=vib(5500, z=0.10), vm08=vib(5500, m=0.8), vm06=vib(5500, m=0.6),
+        npeak=int(ns[int(np.argmax(vv))]))

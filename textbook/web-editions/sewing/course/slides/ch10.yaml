@@ -1,0 +1,375 @@
+# 第 10 讲 绷缝机与链缝机 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch10.键:格式}} 由课程包程序 course/calc/ch10.py 算出，不手写数字。
+# notes：讲者备注（放映时只给老师看，录课时当讲稿用）。
+lesson: 10
+code: [ch10]
+
+clips:
+  hero:          # 封面：实验 10-2 的线迹正反面，401 → 406 → 407 → 602 → 605 轮流，一直循环
+    page: coverstitch
+    selector: "#draw"
+    cover: true
+    dur: 15
+    loop: 15
+    steps:
+      - {at: 0, press: "[data-t='401']"}
+      - {at: 3, press: "[data-t='406']"}
+      - {at: 6, press: "[data-t='407']"}
+      - {at: 9, press: "[data-t='602']"}
+      - {at: 12, press: "[data-t='605']"}
+  front:         # 正视动画：401 线迹形成，自动转动
+    page: looper
+    selector: "#front"
+    dur: 10
+    steps:
+      - {at: 0, js: "var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+  ellipse:       # 俯视：弯针刀尖的扁椭圆轨迹
+    page: looper
+    selector: "#top"
+    vh: 1100
+    dur: 10
+    steps:
+      - {at: 0, js: "var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+  family:        # 实验 10-2：401 → 406 → 407 → 602 → 605 轮流显示正反面，一直循环
+    page: coverstitch
+    selector: "#draw"
+    dur: 15
+    loop: 15
+    steps:
+      - {at: 0, press: "[data-t='401']"}
+      - {at: 3, press: "[data-t='406']"}
+      - {at: 6, press: "[data-t='407']"}
+      - {at: 9, press: "[data-t='602']"}
+      - {at: 12, press: "[data-t='605']"}
+  bars:          # 同样轮流切换，看每根线的耗线比
+    page: coverstitch
+    selector: "#bars"
+    dur: 15
+    loop: 15
+    steps:
+      - {at: 0, press: "[data-t='401']"}
+      - {at: 3, press: "[data-t='406']"}
+      - {at: 6, press: "[data-t='407']"}
+      - {at: 9, press: "[data-t='602']"}
+      - {at: 12, press: "[data-t='605']"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 10 讲", "Lecture 10"]
+    title: ["绷缝机与链缝机", "Coverstitch and Chainstitch Machines"]
+    sub: ["弯针代替旋梭，线团代替梭芯", "A looper for a hook, a cone for a bobbin"]
+    notes:
+      - "同学们好。翻过一件 T 恤看下摆，正面两道直线，反面一张网把毛边盖住；再看牛仔裤后裆，两道结实的链式线迹。它们都不用旋梭和梭芯，而是用弯针成缝。这一讲看链缝和绷缝：401 线迹怎样形成，弯针定时有多大窗口，一批货要备多少线。"
+      - "Hello everyone. Turn a T-shirt over and look at the hem: two straight lines on the face, and a net covering the raw edge on the back. Look at the back rise of a pair of jeans: two strong rows of chainstitch. Neither uses a rotary hook or a bobbin; both are formed by a looper. Today: how stitch 401 forms, how wide the looper timing window is, and how much thread a batch of garments needs."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["一批 T 恤下摆要备几个线团", "How many cones for a batch of T-shirt hems"]
+    facts:
+      - ["1000 件，下摆 + 袖口每件 172 cm，406 两针三线", "1000 shirts, 172 cm of hem and cuffs each, stitch 406"]
+      - ["7 针/cm，布厚 0.5 mm，针距宽度 4.0 mm，损耗 12%", "7 stitches/cm, 0.5 mm fabric, 4.0 mm gauge, 12% wastage"]
+      - ["线团每个 5000 m；主管按资料耗线比 18 算总长", "5000 m per cone; the supervisor uses the published ratio of 18"]
+    notes:
+      - "车间问题。针织厂接了 1000 件 T 恤，下摆约 100 厘米、两个袖口约 72 厘米，每件 172 厘米，用筒式绷缝机缝 406 两针三线，针密每厘米 7 针，布厚 0.5 毫米，针距宽度 4 毫米，损耗按 12%，线团每个 5000 米。仓库主管按资料的耗线比 18 算出总长，打算总长除以 5000 来备线。每根线各要多少米、几个线团？他的算法错在哪？"
+      - "The shop-floor problem. A knitwear factory has an order for 1000 T-shirts: a hem of about 100 centimetres and two cuffs of about 72, 172 centimetres each, sewn in 406 two-needle three-thread on a cylinder-bed coverstitch machine, at 7 stitches per centimetre, fabric 0.5 millimetres, gauge 4 millimetres, wastage 12 percent, 5000 metres per cone. The store supervisor takes the published ratio of 18, works out a total length and plans to divide it by 5000. How much does each thread need, how many cones of each, and what's wrong with his method?"
+
+  - layout: section
+    num: "01"
+    title: ["链式线迹家族", "The chainstitch family"]
+
+  - layout: tiles
+    title: ["从 101 到 605", "From 101 to 605"]
+    tiles:
+      - {k: "101", name: ["单线链式", "Single-thread chain"], use: ["一环套一环：假缝、袋口", "Loop through loop: basting, sacks"]}
+      - {k: "401", name: ["双线链式", "Two-thread chain"], use: ["正面像 301：牛仔后裆", "Face like 301: jeans back rise"], hot: true}
+      - {k: "406", name: ["两针三线", "Two needles, three threads"], use: ["反面网状：T 恤下摆、袖口", "Net on the back: tee hems, cuffs"], hot: true}
+      - {k: "407", name: ["三针四线", "Three needles, four threads"], use: ["三针共用一根弯针", "Three needles share one looper"]}
+      - {k: "602", name: ["两针四线", "Two needles, four threads"], use: ["加装饰线，正面也覆盖", "A cover thread on the face too"]}
+      - {k: "605", name: ["三针五线", "Three needles, five threads"], use: ["领口、运动服拼缝", "Necklines, sportswear seams"]}
+    notes:
+      - "链式线迹是一个家族。101 单线链式，一环套一环，一拉全开，用于假缝和袋口。401 双线链式，针线环和弯针线互套，正面像 301，反面是链环，牛仔裤后裆就用它。406、407 是两针或三针共用一根弯针，反面网状覆盖，还属于 400 类；602、605 再加一根装饰线，正面也盖住，属于 600 类。"
+      - "Chainstitches form a family. 101, single-thread chain: loop through loop, and one pull opens it all; used for basting and sacks. 401, two-thread chain: needle loops and looper thread interlock; the face looks like 301 and the back is a chain, as on the back rise of jeans. 406 and 407 have two or three needles sharing one looper, with a net on the back; they're still class 400. 602 and 605 add a cover thread on the face as well; that makes them class 600."
+
+  - layout: split
+    title: ["链式线迹的得与失", "Gains and losses of chainstitch"]
+    points:
+      - ["得：大线团供线，长缝一口气缝完", "Gain: cone-fed, long seams in one go"]
+      - ["得：线环能拉开，伸长大，适合针织", "Gain: loops open up and stretch; good for knits"]
+      - ["失：耗线多；末端会脱散，不能靠回针锁住", "Loss: more thread; ends unravel, no back-tacking"]
+    visual: {video: family}
+    notes:
+      - "链式线迹的好处：线从大线团供给，没有梭芯，长缝一口气缝完；线环能被拉开，伸长量大，适合针织料；绷缝还能一道工序同时缝合和盖毛边。代价是耗线多，末端能脱散，也不能靠回针锁住。右边是虚拟实验 10-2，401、406、407、602、605 轮流显示正反面。"
+      - "What chainstitch gains: thread comes from large cones, with no bobbin, so long seams go in one pass; the loops can open up, so the seam stretches a lot, which suits knits; and a coverstitch seams and covers the raw edge in one operation. What it loses: it uses much more thread, its end can unravel, and it can't be locked by back-tacking. On the right, Virtual Lab 10-2 cycles through 401, 406, 407, 602 and 605, face and back."
+
+  - layout: section
+    num: "02"
+    title: ["401 线迹怎样形成", "How stitch 401 forms"]
+
+  - layout: chain
+    title: ["一针四个瞬间", "Four moments of one stitch"]
+    steps: [["① {{ch10.catch:.0f}}° 钩线", "catch the loop"], ["② 356° 撑开线环", "spread the loop"], ["③ {{ch10.fdown:.0f}}° 针进三角", "needle into triangle"], ["④ 176° 脱环收紧", "cast off, tighten"]]
+    hot: [0, 2]
+    mark: ["两个关键时刻", "the two critical moments"]
+    foot: ["钩线时刀尖在针后；下一针到弯针高度时，刀尖已绕到针前", "At the catch the point is behind the needle; when the next needle arrives, it is in front"]
+    notes:
+      - "401 一针分四个瞬间。第一，约 {{ch10.catch:.0f}} 度钩线：针回升约 {{ch10.rise:.1f}} 毫米，弯针刀尖从针后钻进线环。第二，针出布、送布，弯针左移到最左，约 356 度，把线环撑开。第三，约 {{ch10.fdown:.0f}} 度进三角：弯针回程绕到针前，下一针刺进刀身、弯针线和针线环围成的三角。第四，约 176 度弯针到最右，旧线环脱出、被收紧。成败就看第一和第三两个时刻。"
+      - "One 401 stitch has four moments. One, the catch at about {{ch10.catch:.0f}} degrees: the needle has risen about {{ch10.rise:.1f}} millimetres and the looper point enters the loop from behind the needle. Two, the needle leaves, the fabric feeds, and the looper reaches its leftmost point at about 356, spreading the loop. Three, at about {{ch10.fdown:.0f}} degrees the looper is on its way back, in front of the needle, and the next needle enters the triangle formed by the blade, the looper thread and the needle loop. Four, at about 176 the looper is rightmost and the old loop casts off and is pulled tight. Success depends on moments one and three."
+
+  - layout: split
+    title: ["正视：弯针来回，针上下", "Front view: looper across, needle up and down"]
+    points:
+      - ["钩线：刀尖必须在针后，恰好穿进线环", "Catch: the point must be behind the needle, right into the loop"]
+      - ["针到弯针高度：刀尖已到针前，还没退过针", "Needle arrives: the point is in front, not yet past it"]
+      - ["两个时刻由同一个弯针运动决定", "Both moments come from one looper motion"]
+    visual: {video: front}
+    notes:
+      - "这是虚拟实验 10-1 的正视动画。弯针在针后时画成浅色，在针前时画成深色。看两个时刻：钩线时，刀尖必须在针后，恰好穿进线环；下一针降到弯针高度时，刀尖必须已经绕到针前，但还没退过针，这样针才能刺进线三角。两个时刻都由同一个弯针运动决定，所以调一个，另一个也跟着变。"
+      - "This is the front-view animation from Virtual Lab 10-1. The looper is drawn light when it's behind the needle and dark when it's in front. Watch two moments. At the catch, the point must be behind the needle, going right into the loop. When the next needle comes down to looper height, the point must already be in front of the needle, but not yet past it, so the needle can enter the thread triangle. One looper motion decides both, so change one and the other changes too."
+
+  - layout: split
+    title: ["弯针刀尖走一个扁椭圆", "The looper point traces a flat ellipse"]
+    points:
+      - ["左右摆动定“何时到针”", "The left–right swing sets when it reaches the needle"]
+      - ["前后避针定“从哪面过”，相位差约 90°", "The front–back move sets which side; about 90° apart"]
+      - ["{{ch10.fdown:.0f}}°：刀尖在针左 {{ch10.xd:.1f}} mm、针前 {{ch10.yd:.2f}} mm", "At {{ch10.fdown:.0f}}°: point {{ch10.xd:.1f}} mm left and {{ch10.yd:.2f}} mm in front"]
+    visual: {video: ellipse}
+    notes:
+      - "从上往下看刀尖的轨迹，前后方向放大了 4 倍。弯针左右摆动，决定什么时候到针；前后避针运动，决定从针的哪一面过。两个运动都近似简谐，相位差约 90 度，合成一个扁椭圆：去程从针后过，回程从针前过。下一针到弯针高度的 {{ch10.fdown:.0f}} 度，刀尖在针左 {{ch10.xd:.1f}} 毫米、针前 {{ch10.yd:.2f}} 毫米。"
+      - "Here's the point's path seen from above, with front–back magnified four times. The left–right swing decides when the point reaches the needle; the front–back needle-avoiding move decides which side it passes. Both are roughly harmonic and about 90 degrees apart, so together they trace a flat ellipse: behind the needle on the way out, in front on the way back. At {{ch10.fdown:.0f}} degrees, when the next needle reaches looper height, the point is {{ch10.xd:.1f}} millimetres to the left and {{ch10.yd:.2f}} in front of the needle."
+
+  - layout: figure
+    title: ["能不能成缝：五条判据", "Will it sew? Five criteria"]
+    h: 620
+    visual:
+      svg: |
+        <svg viewBox="0 0 1700 620" width="100%" height="620">
+          <g font-size="44" font-weight="800" fill="#f2b705" class="en"><text x="0" y="70" class="en">①</text><text x="0" y="190" class="en">②</text><text x="0" y="310" class="en">③</text><text x="0" y="430" class="en">④</text><text x="0" y="550" class="en">⑤</text></g>
+          <g font-size="36" font-weight="700" fill="#f3f6fa"><text x="80" y="62">钩线时针的回升量</text><text x="80" y="182">钩线时刀尖在针眼上沿以上</text><text x="80" y="302">去程刀尖与针的间隙</text><text x="80" y="422">针到弯针高度：刀尖在针左、针前</text><text x="80" y="542">针在弯针高度以下时不撞针</text></g>
+          <g font-size="22" fill="#8fa3ba" class="en"><text x="80" y="96" class="en">needle rise at the catch: the loop is big enough</text><text x="80" y="216" class="en">point above the eye at the catch</text><text x="80" y="336" class="en">clearance on the outward stroke</text><text x="80" y="456" class="en">needle arrives: point left of and in front of it</text><text x="80" y="576" class="en">no collision below looper height</text></g>
+          <g font-size="38" font-weight="800" fill="#5ee0d2" text-anchor="end" class="en"><text x="1700" y="68" class="en">{{ch10.loop_lo:.1f}}–{{ch10.loop_hi:.1f}} mm</text><text x="1700" y="188" class="en">≥ 0.2 mm（标准 1.5）</text><text x="1700" y="308" class="en">0–0.1 mm</text><text x="1700" y="428" class="en">≥ 0.3 · ≥ 0.2 mm</text><text x="1700" y="548" class="en">间隙 ≥ 0</text></g>
+          <g stroke="#22324d" stroke-width="2"><path d="M0 120 L1700 120"/><path d="M0 240 L1700 240"/><path d="M0 360 L1700 360"/><path d="M0 480 L1700 480"/></g>
+        </svg>
+    caption: ["示意模型；间隙为负即撞针", "Illustrative model; negative clearance = collision"]
+    notes:
+      - "把成缝的条件写成五条判据。第一，钩线时针的回升量要在线环够大的范围里，示意模型约 {{ch10.loop_lo:.1f}} 到 {{ch10.loop_hi:.1f}} 毫米。第二，钩线时刀尖要在针眼上沿以上 0.2 毫米到线环顶部以下，标准 1.5。第三，去程刀尖与针的间隙 0 到 0.1 毫米，负值就是撞针。第四，针到弯针高度时刀尖在针左至少 0.3、针前至少 0.2。第五，针在弯针高度以下时不撞针。"
+      - "Write the conditions for a good stitch as five criteria. One: the needle rise at the catch must be in the range where the loop is big enough, about {{ch10.loop_lo:.1f}} to {{ch10.loop_hi:.1f}} millimetres in this model. Two: at the catch, the point must be at least 0.2 millimetres above the eye and below the top of the loop; standard is 1.5. Three: the clearance on the outward stroke is 0 to 0.1 millimetres; negative means hitting the needle. Four: when the needle reaches looper height, the point is at least 0.3 to its left and 0.2 in front. Five: no collision while the needle is below looper height."
+
+  - layout: figure
+    title: ["弯针定时的窗口：不到 8°", "The looper timing window: under 8°"]
+    h: 600
+    visual:
+      svg: |
+        <svg viewBox="0 0 1700 600" width="100%" height="600">
+          <g stroke="#1e2c45" stroke-width="2"><path d="M250 60 L250 300"/><path d="M450 60 L450 300"/><path d="M650 60 L650 300"/><path d="M850 60 L850 300"/><path d="M1050 60 L1050 300"/><path d="M1250 60 L1250 300"/><path d="M1450 60 L1450 300"/></g>
+          <g font-size="24" fill="#5f7189" text-anchor="middle" class="en"><text x="250" y="340" class="en">−6°</text><text x="450" y="340" class="en">−4°</text><text x="650" y="340" class="en">−2°</text><text x="850" y="340" fill="#d3deea" class="en">0</text><text x="1050" y="340" class="en">+2°</text><text x="1250" y="340" class="en">+4°</text><text x="1450" y="340" class="en">+6°</text></g>
+          <rect x="150" y="150" width="1400" height="70" rx="14" fill="rgba(255,122,69,.15)"/>
+          <rect x="500" y="150" width="750" height="70" rx="14" fill="#2ec4b6"/>
+          <path d="M850 120 L850 250" stroke="#f3f6fa" stroke-width="4"/>
+          <g font-size="34" font-weight="800" fill="#5ee0d2" class="en"><text x="480" y="130" text-anchor="end" class="en">{{ch10.w_lo:.1f}}°</text><text x="1260" y="130" class="en">+{{ch10.w_hi:.1f}}°</text></g>
+          <text x="150" y="275" font-size="30" font-weight="700" fill="#ffb38f">← 提前：判据④先坏，链环散开</text>
+          <text x="1550" y="275" font-size="30" font-weight="700" fill="#ffb38f" text-anchor="end">推迟：判据①先坏，跳针 →</text>
+          <g font-size="30" fill="#d3deea"><text x="150" y="430">弯针高度：+1.7 / −0.8 mm</text><text x="760" y="430">回退量：{{ch10.rr_lo:.2f}}–{{ch10.rr_hi:.2f}} mm</text><text x="1300" y="430">避针 ≥ {{ch10.emin:.2f}} mm</text></g>
+          <g font-size="22" fill="#8fa3ba" class="en"><text x="150" y="466" class="en">looper height</text><text x="760" y="466" class="en">retraction</text><text x="1300" y="466" class="en">avoidance</text></g>
+          <text x="850" y="560" font-size="26" fill="#8fa3ba" text-anchor="middle">6500 r/min：{{ch10.w_hi:.1f}} − ({{ch10.w_lo:.1f}}) = 7.5° 只有 {{ch10.w_ms:.2f}} ms</text>
+        </svg>
+    caption: ["单独移动一个量、其余保持标准（示意模型，不是调整规范）", "One quantity moved at a time (illustrative model, not an adjustment spec)"]
+    notes:
+      - "只动弯针定时，可用范围约负 3.5 到正 4 度，不到 8 度。两头原因不同：提前了，刀尖回来太早，判据四先坏，针扎不进三角，链环散开；推迟了，线环已经缩小，判据一先坏，跳针。弯针高度可抬约 1.7 毫米、降不过 0.8；回退量约 {{ch10.rr_lo:.2f}} 到 {{ch10.rr_hi:.2f}}；避针量至少约 {{ch10.emin:.2f}}。这些数字说明各量相互牵制，不是调整规范。"
+      - "Move only the looper timing, and the usable range is about minus 3.5 to plus 4 degrees, under 8. The two ends fail differently. Advance it and the point comes back too early: criterion four fails first, the needle misses the triangle and the chain falls apart. Retard it and the loop has already shrunk: criterion one fails first, a skipped stitch. The looper can be raised about 1.7 millimetres but lowered no more than 0.8; the retraction must be about {{ch10.rr_lo:.2f}} to {{ch10.rr_hi:.2f}}; the avoidance at least about {{ch10.emin:.2f}}. These numbers show how the settings constrain each other; they're not an adjustment spec."
+
+  - layout: points
+    title: ["说明书的调法：A = B", "The manual's method: A = B"]
+    points:
+      - ["针在最低点时，弯针大致在最右，先调好回退量", "Needle at bottom, looper about rightmost: set the retraction"]
+      - ["去程、回程经过针时，针眼上沿到刀尖距离相等", "Outward and return: the same eye-to-point distance"]
+      - ["本模型按 A = B：钩线回升 {{ch10.rise_ab:.2f}} mm，正在窗口上边", "In this model A = B gives a rise of {{ch10.rise_ab:.2f}} mm, at the window's edge"]
+    foot: ["经验调法和模型窗口互相印证：说明书的标准落在窗口之内", "The shop method and the model window agree: the manual's setting lies inside it"]
+    notes:
+      - "说明书的调法是这样的：针在最低点时，弯针大致在最右，先调好回退量；然后让弯针去程和回程经过针时，针眼上沿到刀尖的距离相等，叫 A 等于 B；再对准避针机构的刻线，调刀尖间隙和护针。本模型里按 A 等于 B 把最右放到 180 度，钩线回升 {{ch10.rise_ab:.2f}} 毫米，正在窗口上边。经验调法和模型窗口可以互相印证。"
+      - "The manual's method goes like this. With the needle at its lowest point, the looper should be about rightmost; set the retraction first. Then make the eye-to-point distance the same when the looper passes the needle going out and coming back: A equals B. Then line up the avoidance mark and set the point clearance and the needle guard. In this model, setting A equal to B puts the rightmost point at 180 degrees and gives a rise of {{ch10.rise_ab:.2f}} millimetres at the catch, right at the top of the window. The shop method and the model check each other."
+
+  - layout: lab
+    title: ["动手试一试：链缝弯针与 401 线迹", "Try it: the chainstitch looper and stitch 401"]
+    shot: {page: looper}
+    tasks:
+      - ["跳到“钩线时刻”“针到弯针高度”，看刀尖在针哪面", "Jump to the catch and to needle arrival; which side is the point?"]
+      - ["按“打乱”，逐一调回五个量，直到五条都满足", "Press “Scramble”, then restore the five settings until all pass"]
+      - ["只动弯针定时，找出两端各是哪条判据先变红", "Move only the timing; find which criterion fails first at each end"]
+    notes:
+      - "这个实验在问渠平台上做。先暂停，用两个按钮跳到钩线时刻和针到弯针高度，在正视图、俯视图上确认刀尖在针后还是针前。然后按“打乱”，看哪几条判据变红，逐一调回弯针定时、高度、避针量、间隙和回退量。最后只动弯针定时，每次半度，找出两端各是哪条判据先变红。"
+      - "Do this lab on WenQuest. First pause, and use the two buttons to jump to the catch and to the moment the needle reaches looper height; check in the front and top views whether the point is behind or in front of the needle. Then press Scramble, see which criteria turn red, and bring back the timing, height, avoidance, clearance and retraction one by one. Finally move only the looper timing, half a degree at a time, and find which criterion fails first at each end."
+
+  - layout: section
+    num: "03"
+    title: ["绷缝机：一排针、一根弯针、一个撑线器", "The coverstitch machine: needles, a looper, a spreader"]
+
+  - layout: split
+    title: ["绷缝机的成缝区", "The coverstitch stitch zone"]
+    points:
+      - ["弯针依次钩右、中、左针，各针高度略有阶差", "The looper takes right, middle, left in turn; needles slightly stepped"]
+      - ["撑线器在针杆下降 1.1 mm（约 {{ch10.spread:.0f}}°）时到最左", "The spreader is leftmost at 1.1 mm of descent (about {{ch10.spread:.0f}}°)"]
+      - ["针约 77° 降到撑线器高度：装饰线已铺好", "The needle reaches it at about 77°: the cover thread is laid"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="40" y="380" width="820" height="40" rx="6" fill="#e9dcc0"/><text x="50" y="460" font-size="22" fill="#8fa3ba">布 · fabric</text>
+          <g stroke="#c8d2de" stroke-width="12" stroke-linecap="round"><path d="M360 60 L360 330"/><path d="M450 60 L450 315"/><path d="M540 60 L540 300"/></g>
+          <g font-size="24" fill="#d3deea" text-anchor="middle"><text x="360" y="40">左</text><text x="450" y="40">中</text><text x="540" y="40">右</text></g>
+          <path d="M150 250 C 300 210, 600 210, 760 250" fill="none" stroke="#1f9d55" stroke-width="7"/>
+          <path d="M680 225 L820 225" stroke="#2ec4b6" stroke-width="14" stroke-linecap="round"/>
+          <text x="640" y="190" font-size="28" font-weight="700" fill="#5ee0d2">撑线器 · spreader</text>
+          <text x="40" y="310" font-size="26" font-weight="700" fill="#7fe3a8">装饰线 · cover thread</text>
+          <path d="M760 520 C 640 500, 420 500, 280 540" fill="none" stroke="#ff7a45" stroke-width="12" stroke-linecap="round"/>
+          <text x="560" y="590" font-size="28" font-weight="700" fill="#ffb38f">弯针：依次钩右、中、左</text>
+          <text x="560" y="622" font-size="20" fill="#8fa3ba" class="en">looper: right, middle, left</text>
+          <text x="40" y="120" font-size="24" fill="#8fa3ba">针距宽度 3.2–6.4 mm</text>
+          <text x="40" y="150" font-size="20" fill="#8fa3ba" class="en">gauge</text>
+        </svg>
+    notes:
+      - "绷缝机的成缝区是一排针、一根弯针、一个撑线器。针距宽度 3.2 到 6.4 毫米，每分钟 6500 针，针杆行程 31 毫米。弯针在布下依次钩右、中、左针，各针高度略有阶差。布上面是撑线器，它在针杆下降 1.1 毫米，约 {{ch10.spread:.0f}} 度时到最左，把装饰线横铺在针前；针尖约 77 度降到撑线器高度，正好压住装饰线。绷缝机也有差动送布。"
+      - "The coverstitch stitch zone has a row of needles, one looper and a spreader. The gauge is 3.2 to 6.4 millimetres, the speed 6500 stitches a minute, the needle-bar stroke 31 millimetres. Below the fabric, the looper takes the right, middle and left needles in turn, so the needles are set at slightly different heights. Above the fabric, the spreader is leftmost when the needle bar has come down 1.1 millimetres, about {{ch10.spread:.0f}} degrees, laying the cover thread across in front of the needles; the needle points reach it at about 77 degrees and catch it. Coverstitch machines have differential feed too."
+
+  - layout: section
+    num: "04"
+    title: ["耗线量：一批货要多少线", "Thread consumption: how much for a batch"]
+
+  - layout: bignum
+    title: ["资料数据：每缝 1 cm 用多少线", "Published data: thread per cm of seam"]
+    nums:
+      - {n: "2.5", n_en: "cm/cm", label: ["平缝 301", "Lockstitch 301"]}
+      - {n: "18", n_en: "cm/cm", label: ["绷缝 406", "Coverstitch 406"]}
+      - {n: "28", n_en: "cm/cm", label: ["绷缝 605", "Coverstitch 605"]}
+    foot: ["7 针/cm；绷缝是平缝的 7–11 倍，大部分在弯针线和装饰线", "At 7 st/cm; coverstitch uses 7–11 times a lockstitch, mostly looper and cover thread"]
+    notes:
+      - "耗线比就是每缝 1 厘米用多少厘米线，资料按每厘米 7 针给出，另加 10% 到 15% 损耗。平缝 301 是 2.5，401 是 5.5，406 是 18，602 是 25，605 是 28；包缝 504 是 14。绷缝是平缝的 7 到 11 倍。而且大部分在弯针线和装饰线上：406 的针线只占三成，602 只占两成。"
+      - "The consumption ratio is how many centimetres of thread go into one centimetre of seam; published figures assume 7 stitches per centimetre, plus 10 to 15 percent wastage. Lockstitch 301 is 2.5, 401 is 5.5, 406 is 18, 602 is 25 and 605 is 28; overlock 504 is 14. Coverstitch uses 7 to 11 times as much as lockstitch. And most of it is looper and cover thread: in 406 the needle threads are only about 30 percent, in 602 only 20."
+
+  - layout: split
+    title: ["几何模型：每根线分开算", "A geometric model, thread by thread"]
+    points:
+      - ["针线每针：针距 + 2 × 布厚 + 线环 1 mm", "Needle thread per stitch: length + 2 × thickness + 1 mm loop"]
+      - ["弯针线每针还要横跨两倍针距宽度", "Looper thread also crosses twice the gauge each stitch"]
+      - ["406：针线各 {{ch10.n406:.1f}}，弯针线 {{ch10.l406:.1f}}，合计 {{ch10.c406:.1f}}", "406: needles {{ch10.n406:.1f}} each, looper {{ch10.l406:.1f}}, total {{ch10.c406:.1f}}"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="0" y="20" width="900" height="600" rx="26" fill="#0f1a2d" stroke="#22324d" stroke-width="2"/>
+          <text x="40" y="80" font-size="24" fill="#8fa3ba">每针用线（mm）· thread per stitch</text>
+          <g font-family="DejaVu Serif, serif" font-style="italic" class="en">
+            <text x="40" y="190" font-size="42" fill="#8fbaff" class="en">针线 = s + 2t + 1</text>
+            <text x="40" y="330" font-size="38" fill="#ffb38f" class="en">弯针线 = n(2s + 1) + s + 2g</text>
+            <text x="40" y="470" font-size="42" fill="#7fe3a8" class="en">装饰线 = 2g + 0.6n</text></g>
+          <text x="40" y="580" font-size="22" fill="#8fa3ba">s 针距 · t 布厚 · g 针距宽度 · n 针数</text>
+        </svg>
+    notes:
+      - "用几何模型按每根线算。针线每针用：一个针距，加两倍布厚，加约 1 毫米线环。弯针线每针用：针数乘两倍针距加 1 毫米，再加一个针距和两倍针距宽度。针距 10 比 7，约 {{ch10.s_len:.2f}} 毫米，406 每根针线 {{ch10.n406:.1f}}，弯针线 {{ch10.l406:.1f}}，合计 {{ch10.c406:.1f}}，资料是 18。针越密，每厘米用线越多。"
+      - "The geometric model counts thread by thread. Each needle thread uses one stitch length, plus twice the fabric thickness, plus about 1 millimetre for the loop. The looper thread uses the number of needles times twice the stitch length plus 1 millimetre, plus a stitch length and twice the gauge. At 10 over 7, about {{ch10.s_len:.2f}} millimetres per stitch, 406 gives {{ch10.n406:.1f}} for each needle thread and {{ch10.l406:.1f}} for the looper, {{ch10.c406:.1f}} in all, against the published 18. The denser the stitches, the more thread per centimetre."
+
+  - layout: figure
+    title: ["五种线迹，每根线各用多少", "Five stitches, thread by thread"]
+    h: 520
+    visual: {video: bars}
+    caption: ["401 → 406 → 407 → 602 → 605 轮流；灰线为资料值", "Cycling 401 → 406 → 407 → 602 → 605; the grey line is the published value"]
+    notes:
+      - "这是虚拟实验 10-2 的耗线柱状图，五种线迹轮流显示。蓝色是针线，橙色是弯针线，绿色是装饰线，灰色竖线是资料给的值。看两件事：一是针线每根都只有 2 点几，大头在弯针线和装饰线；二是模型和资料大多相差不到 12%。布厚 0.5 毫米、每厘米 7 针时，401 合计 {{ch10.c401:.1f}}，406 是 {{ch10.c406:.1f}}，602 是 {{ch10.c602:.1f}}，605 是 {{ch10.c605:.1f}}。"
+      - "This is the consumption chart from Virtual Lab 10-2, cycling through the five stitches. Blue is needle thread, orange looper thread, green cover thread, and the grey line is the published figure. Notice two things. Each needle thread uses only a little over 2, so the bulk is looper and cover thread. And the model is mostly within 12 percent of the published data. At 0.5 millimetres and 7 stitches per centimetre, 401 totals {{ch10.c401:.1f}}, 406 {{ch10.c406:.1f}}, 602 {{ch10.c602:.1f}} and 605 {{ch10.c605:.1f}}."
+
+  - layout: lab
+    title: ["动手试一试：绷缝线迹与耗线量", "Try it: coverstitch and thread use"]
+    shot: {page: coverstitch}
+    tasks:
+      - ["切换五种线迹，比较每根线的耗线比", "Switch the five stitches and compare each thread's ratio"]
+      - ["按“T 恤下摆 + 袖口”预设，读出每根线几个线团", "Use the T-shirt preset and read the cones for each thread"]
+      - ["针密从 7 滑到 4：耗线比怎样变，为什么", "Slide from 7 to 4 st/cm: how does the ratio change, and why?"]
+    notes:
+      - "这个实验大家自己做。先切换 401、406、407、602、605，记录每根线的耗线比，和资料值比偏差。再按“T 恤下摆加袖口”预设，件数 1000、损耗 12%、线团 5000 米，读每根线的整批米数和线团数。最后把针密从 7 滑到 4，看合计耗线比怎么变，想想为什么针越稀每厘米用线越少。"
+      - "Do this lab yourselves. First switch between 401, 406, 407, 602 and 605, note each thread's ratio and how far it is from the published figure. Then use the T-shirt hem-and-cuffs preset, 1000 pieces, 12 percent wastage, 5000-metre cones, and read the batch length and cone count for each thread. Finally slide the stitch density from 7 down to 4, see how the total ratio changes, and think about why sparser stitches use less thread per centimetre."
+
+  - layout: section
+    num: "05"
+    title: ["算例：1000 件 T 恤的线", "Worked example: thread for 1000 T-shirts"]
+
+  - layout: bignum
+    title: ["整批用量（含 12% 损耗）", "Batch quantities, with 12% wastage"]
+    nums:
+      - {n: "{{ch10.b_n:.0f}} m", label: ["每根针线 × 2", "Each of the two needle threads"]}
+      - {n: "{{ch10.b_l:.0f}} m", label: ["弯针线：占 {{ch10.l_share:.0f}}%", "Looper thread: {{ch10.l_share:.0f}}% of the total"]}
+      - {n: "{{ch10.b_tot:.0f}} m", label: ["合计（资料 18：{{ch10.b_pub:.0f}}）", "Total (published 18: {{ch10.b_pub:.0f}})"]}
+    foot: ["每根线 = 耗线比 × 172 cm × 1000 件 × 1.12；模型比资料少约 {{ch10.b_less:.0f}}%", "Each thread = ratio × 172 cm × 1000 × 1.12; the model is about {{ch10.b_less:.0f}}% below the published figure"]
+    notes:
+      - "算整批。每根线的用量等于耗线比乘 172 厘米、乘 1000 件、再乘 1.12。针线耗线比 {{ch10.n406:.1f}}，每根约 {{ch10.b_n:.0f}} 米，两根一样；弯针线 {{ch10.l406:.1f}}，约 {{ch10.b_l:.0f}} 米，占了 {{ch10.l_share:.0f}}%。合计约 {{ch10.b_tot:.0f}} 米，按资料的 18 算是 {{ch10.b_pub:.0f}} 米，模型少约 {{ch10.b_less:.0f}}%。大批量之前，还要试缝实测。"
+      - "Now the batch. Each thread needs its ratio times 172 centimetres times 1000 pieces times 1.12. The needle threads, at {{ch10.n406:.1f}}, need about {{ch10.b_n:.0f}} metres each; the looper thread, at {{ch10.l406:.1f}}, about {{ch10.b_l:.0f}} metres, {{ch10.l_share:.0f}} percent of the total. Altogether about {{ch10.b_tot:.0f}} metres; the published 18 would give {{ch10.b_pub:.0f}}, so the model is about {{ch10.b_less:.0f}} percent lower. Before a big run, measure it with a test seam."
+
+  - layout: split
+    title: ["机器人联系：两轴合成与电子凸轮", "Robot link: two-axis synthesis and electronic cams"]
+    points:
+      - ["两轴各走一条正弦：幅值定形状，相位差定方向", "A sine on each axis: amplitudes set the shape, phase the direction"]
+      - ["窗口 7.5°，6500 r/min 下只有 {{ch10.w_ms:.2f}} ms", "A 7.5° window is only {{ch10.w_ms:.2f}} ms at 6500 r/min"]
+      - ["所以按主轴角度同步，不按时钟", "So synchronise by shaft angle, not by clock"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M60 140 C 120 60, 180 60, 240 140 S 360 220, 420 140" fill="none" stroke="#4c8dff" stroke-width="6"/>
+          <text x="60" y="50" font-size="26" fill="#8fbaff">X 轴：x = A sin ωt</text>
+          <path d="M60 360 C 120 300, 180 300, 240 360 S 360 420, 420 360" fill="none" stroke="#2ec4b6" stroke-width="6" transform="translate(-45,0)"/>
+          <text x="60" y="270" font-size="26" fill="#5ee0d2">Y 轴：y = B sin(ωt + 90°)</text>
+          <ellipse cx="680" cy="250" rx="190" ry="70" fill="none" stroke="#f2b705" stroke-width="8"/>
+          <circle cx="870" cy="250" r="14" fill="#f2b705"/>
+          <text x="680" y="370" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle">扁椭圆 · flat ellipse</text>
+          <text x="500" y="160" font-size="40" fill="#8fa3ba">→</text>
+          <rect x="40" y="470" width="820" height="130" rx="20" fill="#111d31" stroke="#22324d"/>
+          <text x="70" y="525" font-size="28" fill="#f3f6fa">传送带编码器 → 各轴目标位置（电子凸轮）</text>
+          <text x="70" y="570" font-size="22" fill="#8fa3ba" class="en">conveyor encoder → axis targets (electronic cam)</text>
+        </svg>
+    notes:
+      - "弯针的左右摆动和前后避针都近似简谐，相位差约 90 度，合成扁椭圆。SCARA 机器人或 X-Y 平台给两个轴各发一条正弦指令，同样合成圆或椭圆，幅值定形状，相位差定绕行方向。401 的定时窗口只有约 7.5 度，6500 转时只有 {{ch10.w_ms:.2f}} 毫秒，所以弯针和针杆必须按主轴角度同步。机器人跟随传送带抓取也一样：按传送带编码器的位置给目标，这就是电子凸轮。"
+      - "The looper's swing and its avoiding move are both roughly harmonic and about 90 degrees apart, so they make a flat ellipse. Send a sine command to each axis of a SCARA robot or an X–Y table and you get a circle or ellipse too: the amplitudes set the shape, the phase difference the direction. The 401 timing window is only about 7.5 degrees, just {{ch10.w_ms:.2f}} milliseconds at 6500 r/min, so looper and needle bar must be synchronised by shaft angle. A robot picking from a moving conveyor does the same: it sets targets from the conveyor encoder position. That's an electronic cam."
+
+  - layout: split
+    title: ["生活中：一拉就开的米袋口", "Everyday: the rice-sack seam that unzips"]
+    points:
+      - ["米袋、面粉袋常用单线链式封口", "Rice and flour sacks are closed with single-thread chain"]
+      - ["找对线头一拉，一环接一环脱开", "Pull the right end and it opens loop by loop"]
+      - ["末端没锁住会脱散：这里反倒成了方便", "An unsecured end unravels: here it's a convenience"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M150 120 L750 120 L700 600 L200 600 Z" fill="#e9dcc0"/>
+          <path d="M150 120 L750 120" stroke="#c9b48a" stroke-width="8"/>
+          <g fill="none" stroke="#2c6fd6" stroke-width="7"><ellipse cx="420" cy="160" rx="28" ry="14"/><ellipse cx="480" cy="160" rx="28" ry="14"/><ellipse cx="540" cy="160" rx="28" ry="14"/><ellipse cx="600" cy="160" rx="28" ry="14"/><ellipse cx="660" cy="160" rx="28" ry="14"/></g>
+          <path d="M392 160 C 340 140, 300 100, 250 60" fill="none" stroke="#2c6fd6" stroke-width="7"/>
+          <path d="M250 60 C 200 40, 140 70, 90 40" fill="none" stroke="#2c6fd6" stroke-width="7" stroke-dasharray="14 10"/>
+          <path d="M150 160 L380 160" stroke="#8fa3ba" stroke-width="3" stroke-dasharray="6 6"/>
+          <text x="40" y="30" font-size="28" font-weight="700" fill="#8fbaff">一拉 · pull</text>
+          <text x="450" y="400" font-size="40" font-weight="800" fill="#6b5a3a" text-anchor="middle">米 · RICE</text>
+          <text x="450" y="230" font-size="24" fill="#6b5a3a" text-anchor="middle">101 单线链式 · single-thread chain</text>
+        </svg>
+    notes:
+      - "生活中的链式线迹：米袋、面粉袋的袋口常用单线链式封口。找到对的那个线头一拉，整条缝像拉链一样一环接一环脱开。这正是链式线迹末端没锁住就会脱散的特点，在这里反倒成了方便。缝衣服时它是缺点，所以牛仔裤后裆的 401 末端要用回缝或别的线迹锁住。"
+      - "Chainstitch at home: rice and flour sacks are often closed with a single-thread chain. Find the right thread end, pull, and the whole seam comes undone loop by loop like a zip. That's the chainstitch's habit of unravelling from an unsecured end, which here becomes a convenience. On clothes it's a weakness, so the end of a 401 seam on jeans has to be secured by other means."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["线团按每根线算：针线各 {{ch10.k_n:.0f}} 个，弯针线 {{ch10.k_l:.0f}} 个", "Count cones per thread: {{ch10.k_n:.0f}} per needle thread, {{ch10.k_l:.0f}} for the looper"]
+    rows:
+      - ["针线（每根）", "{{ch10.b_n:.0f}} m · {{ch10.k_n:.0f}} 个"]
+      - ["弯针线", "{{ch10.b_l:.0f}} m · {{ch10.k_l:.0f}} 个"]
+      - ["合计", "{{ch10.b_tot:.0f}} m · {{ch10.k_tot:.0f}} 个"]
+    side: {big: "{{ch10.l_share:.0f}}%", text: ["弯针线占七成：总长除以 5000 不知道哪根线要几个", "The looper takes about 70%: a total ÷ 5000 can't tell which thread needs what"]}
+    foot: ["主管算出 7 个是碰巧；弯针线必须单独多备", "The supervisor's 7 is a coincidence; the looper thread must be stocked separately"]
+    notes:
+      - "回到开头。按模型，每根针线约 {{ch10.b_n:.0f}} 米，各 {{ch10.k_n:.0f}} 个线团；弯针线约 {{ch10.b_l:.0f}} 米，{{ch10.k_l:.0f}} 个；合计约 {{ch10.b_tot:.0f}} 米，{{ch10.k_tot:.0f}} 个。主管总长除以 5000 也得 7 个，数量碰巧相同，但他不知道哪根线要几个：弯针线占了 {{ch10.l_share:.0f}}%，一个线团只能挂在一根线上，弯针线必须单独多备。"
+      - "Back to the start. By the model, each needle thread needs about {{ch10.b_n:.0f}} metres, {{ch10.k_n:.0f}} cone each; the looper thread about {{ch10.b_l:.0f}} metres, {{ch10.k_l:.0f}} cones; about {{ch10.b_tot:.0f}} metres and {{ch10.k_tot:.0f}} cones in all. The supervisor's total divided by 5000 also gives 7, but only by coincidence: it says nothing about which thread needs how many. The looper thread takes {{ch10.l_share:.0f}} percent, and a cone feeds only one thread, so the looper thread must be stocked separately."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["401 成败在两个时刻：钩线、针进三角", "401 hinges on two moments: the catch and the needle entering the triangle"]
+      - ["弯针扁椭圆；定时窗口约 −3.5° 到 +4°", "A flat-ellipse looper; timing window about −3.5° to +4°"]
+      - ["耗线比按每根线算，线团逐根备", "Count consumption and cones thread by thread"]
+    after: ["作业 10：链缝弯针定时与绷缝备线 · 测验 · 实验 10-1、10-2 —— 在问渠学习平台完成", "Assignment 10: looper timing and thread planning · quiz · Labs 10-1, 10-2 — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，401 线迹的成败在两个时刻：钩线时刀尖在针后钻进线环；下一针到弯针高度时刀尖已在针前、针刺进线三角。第二，弯针的左右摆动和前后避针合成扁椭圆，定时窗口只有约负 3.5 到正 4 度。第三，耗线比按每根线算，线团逐根线备，弯针线要多备。作业、测验和两个实验都在问渠平台上完成。"
+      - "Three things to remember. One: a 401 stitch hinges on two moments: at the catch, the point enters the loop from behind the needle; when the next needle arrives, the point is in front and the needle enters the triangle. Two: the looper's swing and avoidance make a flat ellipse, and the timing window is only about minus 3.5 to plus 4 degrees. Three: count consumption thread by thread and stock cones the same way, with extra looper thread. The assignment, quiz and both labs are on WenQuest."

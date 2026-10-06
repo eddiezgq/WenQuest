@@ -31,3 +31,14 @@ for v in ([0.5, 1.0, 1.5], [0.6, 0.8, 1.0, 1.6], [0.7, 0.9, 1.4], [0.8, 1.2, 2.0
 print("WIP 20 at 126/h ->", round(20 / 126 * 60, 2), "min")
 print("rail 10/0.4 util at 150/h:", round(150 / (1500 / 9) * 100, 1), "%")
 print("Little coffee: 10 people / 2 per min =", 10 / 2, "min")
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    o = {N: tend(N, 5, 12, 2) for N in (1, 2, 3, 4)}
+    f2, f3 = tend(2, 3.5, 12, 2), tend(3, 3.5, 12, 2)
+    x, sh, S, fx = bb([0.5, 1.0, 1.5])
+    out(Nstar=17 / 7, Nstar35=15.5 / 5.5, o1=o[1][1], o2=o[2][1], o3=o[3][1], o4=o[4][1], pm2=o[2][1] / 2, pm3=o[3][1] / 3,
+        idle2=o[2][3], wait3=o[3][4], busy2=o[2][2] * 100, Tc2=o[2][0], Tc3=o[3][0],
+        g_mach=o[3][1] - o[2][1], g_fix=f2[1] - o[2][1], g_both=f3[1] - o[2][1], f2=f2[1], f3=f3[1], wait3f=f3[4],
+        rail=rail(12, 0.3, 6)[0], little=124 * 1100 / 3600, bneck=3600 / (35 / 1.1),
+        bb1=x[0], bb2=x[1], bbS=S, bbF=fx, coffee=10 / 2)

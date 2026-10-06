@@ -1,0 +1,455 @@
+# 第 17 讲 电脑横机（毛衣编织机）控制 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch17.键:格式}} 由课程包程序 course/calc/ch17.py 算出，不手写数字。
+# notes：讲者备注（放映时只给老师看，录课时当讲稿用）。
+# 二维实验页（knit、fpga）切成深色主题（data-theme=dark），三维样机换深色底，和课件底色一致。
+lesson: 17
+code: [ch17]
+lab: {no: "17-1", id: knit, title: ["虚拟实验 17-1 横机编织仿真", "Virtual lab 17-1 Flat knitting simulation"]}
+
+clips:
+  hero:          # 封面：横机三维样机，机头往复（深色底，关掉标注）
+    page: model-flatknit
+    selector: "#stage"
+    steps:
+      - {at: 0, press: ["#play", "#labels"], js: "document.querySelector('.stage').style.background='radial-gradient(120% 90% at 60% 35%,#22324d 0%,#0b1220 75%)'"}
+  beds:          # 透视：两块针床、机头、纱嘴，带标注
+    page: model-flatknit
+    selector: "#stage"
+    steps:
+      - {at: 0, press: ["[data-m=xray]", "#play"]}
+  needles:       # 针组特写：机头经过，针一枚枚升起
+    page: model-flatknit
+    selector: "#stage"
+    steps:
+      - {at: 0, press: ["[data-v=close]", "#play"]}
+  nocomp:        # 横机仿真：不补偿，红点是选错位置的针（一直往复编织）
+    page: knit
+    selector: "section:has(#bed)"
+    loop: 4
+    steps:
+      - {at: 0, js: "document.documentElement.setAttribute('data-theme','dark');var b=document.querySelector('[data-comp=none]');if(b.getAttribute('aria-pressed')!=='true')b.click();var p=document.getElementById('play');if(p.textContent.trim()==='开始编织')p.click()", press: "[data-slow='5']"}
+  rtcomp:        # 同上，按实时速度补偿
+    page: knit
+    selector: "section:has(#bed)"
+    loop: 4
+    steps:
+      - {at: 0, js: "document.documentElement.setAttribute('data-theme','dark');var b=document.querySelector('[data-comp=rt]');if(b.getAttribute('aria-pressed')!=='true')b.click();var p=document.getElementById('play');if(p.textContent.trim()==='开始编织')p.click()", press: "[data-slow='5']"}
+  fpga:          # 选针 FPGA：不补偿 → 固定 → 按实时速度，各跑一遍仿真，看误差柱
+    page: fpga
+    selector: "#err"
+    loop: 9
+    steps:
+      - {at: 0, js: "document.documentElement.setAttribute('data-theme','dark');var t=document.getElementById('err').parentElement;for(var e=t;e&&e!==document.body;e=e.parentElement){[].forEach.call(e.parentElement.children,function(c){if(c!==e)c.style.visibility='hidden'})}"}
+      - {at: 0.1, set: {c-cp: none}}
+      - {at: 0.3, press: "#runA"}
+      - {at: 3, set: {c-cp: fixed}}
+      - {at: 3.2, press: "#runA"}
+      - {at: 6, set: {c-cp: rt}}
+      - {at: 6.2, press: "#runA"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 17 讲", "Lecture 17"]
+    title: ["电脑横机控制", "Control of Computerised Flat Knitting Machines"]
+    sub: ["几百枚针，每行几百个决定", "Hundreds of needles, hundreds of decisions per course"]
+    notes:
+      - "同学们好。前面讲的缝纫机，都是一根针在同一个地方上下运动、布在走。今天换个角度：电脑横机，也就是毛衣编织机。它的布和针床不动，机头在动，针床上躺着几百枚针，机头每扫一趟，每枚针都要自己决定这一趟干什么。一件毛衣几百行，每行几百个决定。今天会看到，电控真正难的只有一件事：在对的位置作出对的决定。"
+      - "Welcome back. On every sewing machine so far, one needle moves up and down in one place while the fabric travels. Today, a different angle: the computerised flat knitting machine, the sweater knitter. Here the fabric and needle beds stay put and the carriage moves. Hundreds of needles lie in the beds, and every time the carriage sweeps across, each needle decides what to do on that pass. Hundreds of courses, hundreds of decisions each. We'll see that the electronics really has only one hard job: make the right decision at the right position."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["一片前片要织多久？提速值不值？", "How long per front panel? Is more speed worth it?"]
+    facts:
+      - ["E12 单系统横机，275 针，760 个横列", "E12 single-system machine, 275 needles, 760 courses"]
+      - ["机头 1.2 m/s、加速度 10 m/s²，固定提前量", "Carriage 1.2 m/s, 10 m/s², fixed selection lead"]
+      - ["方案：实时补偿 / 两系统机头 / 提速到 1.6 m/s", "Options: real-time lead / two systems / 1.6 m/s"]
+    notes:
+      - "先看车间问题。毛衫车间在一台 E12 单系统电脑横机上织提花毛衣前片：275 针，一共 760 个横列。机头最高 1.2 米每秒，加速度 10，控制器用固定提前量。设备科提了三个方案：A，改成按实时速度补偿，缩短换向余量；B，换两系统机头，两色在同一趟里织；C，把机头速度提到 1.6 米每秒。现在织一片要多久？哪个方案最值得做？这节课最后回答。"
+      - "Here's the problem. A knitwear floor is making jacquard sweater fronts on an E12 single-system flat knitting machine: 275 needles, 760 courses in all. The carriage tops out at 1.2 metres per second with 10 metres per second squared, and the controller uses a fixed selection lead. Engineering has three proposals. A: compensate by real-time speed and shorten the reversal margin. B: a two-system carriage that knits both colours in one pass. C: raise carriage speed to 1.6 metres per second. How long does a panel take now, and which option is worth it? We'll answer at the end."
+
+  - layout: section
+    num: "01"
+    title: ["针床、舌针与三角", "Needle beds, latch needles and cams"]
+
+  - layout: split
+    title: ["两块针床，机头骑在上面往复", "Two needle beds and a carriage riding over them"]
+    points:
+      - ["前后针床成倒 V 形，线圈在齿口形成", "Front and back beds form an inverted V; loops form at the gap"]
+      - ["机头的三角推针踵，纱嘴随机头送纱", "Carriage cams push the butts; yarn carriers feed yarn"]
+      - ["机号 E = 每英寸针数，针距 p = 25.4/E", "Gauge E = needles per inch, pitch p = 25.4/E"]
+    visual: {video: beds}
+    notes:
+      - "先看结构。横机有前后两块针床，截面是倒 V 形，夹角大约 100 度。每块床上铣了几百条针槽，每条槽里躺一枚舌针。两块床顶上的缝叫齿口，线圈就在这里形成，织好的布从齿口垂下去，被牵拉罗拉往下拉。机头骑在两块床上来回走，它的三角推着针升降，纱嘴跟着机头把纱送进针钩。针有多密，用机号 E 表示，就是每英寸多少枚针。"
+      - "First the structure. A flat machine has a front and a back needle bed forming an inverted V, about 100 degrees apart. Each bed has hundreds of slots with a latch needle in each. The gap at the top is the trick plate gap where loops form, and the knitted fabric hangs down from it, pulled by take-down rollers. The carriage rides over both beds; its cams push the needles up and down, and the yarn carriers travel with it, laying yarn into the hooks. How dense the needles are is the gauge E: needles per inch."
+
+  - layout: bignum
+    title: ["针距 p = 25.4 / E", "Pitch p = 25.4 / E"]
+    nums:
+      - {n: "{{ch17.p_E12:.2f}} mm", n_en: "E12", label: ["E12 横机的针距", "Pitch of an E12 machine"]}
+      - {n: "{{ch17.p_E7:.2f}} mm", n_en: "E7", label: ["E7 横机的针距", "Pitch of an E7 machine"]}
+      - {n: "{{ch17.needles:.0f}}", n_en: "needles", label: ["50 cm 宽前片的针数", "Needles across a 50 cm front"]}
+    foot: ["记住这个 p：一会儿它就变成选针控制最关键的数字", "Remember p: it becomes the key number for needle selection"]
+    notes:
+      - "针距 p 等于 25.4 除以机号。E12 的针距是 {{ch17.p_E12:.2f}} 毫米，粗针的 E7 是 {{ch17.p_E7:.2f}} 毫米。一件 50 厘米宽的前片，横密每厘米 5.5 针，就是 {{ch17.needles:.0f}} 针。请大家记住这个 p，等一会儿它就变成选针控制最关键的数字：机头每走过一个 p，选针器就要对下一枚针作一次决定。"
+      - "Pitch p is 25.4 over the gauge. An E12 machine has a pitch of {{ch17.p_E12:.2f}} millimetres; a coarse E7, {{ch17.p_E7:.2f}}. A 50-centimetre front at 5.5 stitches per centimetre is {{ch17.needles:.0f}} needles. Remember this p: in a moment it becomes the key number for needle selection, because every time the carriage moves one p, the selector has to decide about the next needle."
+
+  - layout: split
+    title: ["舌针成圈：针升多高，决定做什么", "Latch needle: how high it rises decides the stitch"]
+    points:
+      - ["针舌由旧线圈推开、关上，不用机构", "The old loop opens and closes the latch: no mechanism"]
+      - ["弯纱深度 d 决定线圈长度（度目）", "Stitch depth d sets loop length: the stitch cam"]
+      - ["编织、集圈、不编织、翻针：升得不一样高", "Knit, tuck, miss, transfer: different heights"]
+    visual: {video: needles}
+    notes:
+      - "舌针的妙处在于针舌不用机构开关：针往上走，旧线圈把针舌推开；针往下走，旧线圈又把针舌推上去关住针钩，然后自己从针头上脱出去。针往下拉到脱圈线以下多深，就是弯纱深度 d，决定新线圈多长，由度目三角的位置决定。针被推到的高度不同，结果就不同：退圈高度是编织，集圈高度是集圈，不升是不编织，推得更高就是翻针，把线圈交给对面针床。"
+      - "The beauty of a latch needle is that nothing has to open or close the latch. As the needle rises, the old loop pushes the latch open; as it descends, the old loop pushes the latch shut over the hook and slides off the head. How far below the knock-over line the needle is pulled, the stitch depth d, sets the length of the new loop, and that is set by the stitch cam. The height the needle reaches decides the result: clearing height knits, tuck height tucks, no rise misses, and higher still transfers the loop to the opposite bed."
+
+  - layout: split
+    title: ["三角是平移的凸轮；选针只是两个“是 / 否”", "Cams are sliding cams; selection is two yes/no"]
+    points:
+      - ["几百枚针一枚接一枚走同一条廓线", "Hundreds of needles follow one profile in turn"]
+      - ["S1、S2 都选中→编织；只选 S1→集圈", "S1 and S2 selected: knit; S1 only: tuck"]
+      - ["S1 不选→不编织：难在“在对的位置”", "S1 not selected: miss. The hard part is position"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <path d="M40 560 L860 560" stroke="#4b5f7d" stroke-width="2" stroke-dasharray="8 8"/>
+          <text x="860" y="632" font-size="22" fill="#8fa3ba" text-anchor="end">机头走向 →</text>
+          <path d="M40 500 L860 500" stroke="#8fa3ba" stroke-width="5" stroke-dasharray="14 10"/>
+          <path d="M40 500 L180 500 L267 300 L520 300 L640 560 L760 560 L860 500" fill="none" stroke="#2ec4b6" stroke-width="7" stroke-linejoin="round"/>
+          <path d="M40 500 L180 500 L330 140 L470 140 L620 560 L760 560 L860 500" fill="none" stroke="#f2b705" stroke-width="7" stroke-linejoin="round"/>
+          <path d="M180 80 L180 600" stroke="#ff7a45" stroke-width="4" stroke-dasharray="10 8"/>
+          <path d="M267 80 L267 600" stroke="#ff7a45" stroke-width="4" stroke-dasharray="10 8"/>
+          <text x="180" y="66" font-size="30" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">S1</text>
+          <text x="267" y="66" font-size="30" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">S2</text>
+          <text x="480" y="125" font-size="30" font-weight="700" fill="#f2b705">编织 · 退圈高度</text>
+          <text x="530" y="290" font-size="28" font-weight="700" fill="#5ee0d2">集圈</text>
+          <text x="60" y="485" font-size="26" fill="#8fa3ba">不编织</text>
+          <text x="690" y="594" font-size="24" fill="#d3deea" text-anchor="middle">弯纱深度 d</text>
+        </svg>
+    notes:
+      - "三角其实就是第 6 讲讲过的凸轮，只不过送布凸轮是转的，这里的三角是平移的，从动件是几百枚针，一枚接一枚走同一条廓线。不同的针怎么走不同的路？靠选针。两个选针点配合：S1、S2 都选中，针升到退圈高度，织一个圈；只选中 S1，针只升到集圈高度；S1 就没选中，针不动。电控对每枚针只作一两个是或否的判断，难的是在正确的位置作出。"
+      - "Unroll the carriage's cam plate onto a flat sheet and you get this picture. The cams are just the cams of Lecture 6, except the feed cam rotates and these slide, and the followers are hundreds of needles, one after another, all tracing the same profile. How do different needles take different paths? Selection. Two selection points work together: selected at S1 and S2, the needle rises to clearing height and knits; selected only at S1, it rises to tuck height; not selected at S1, it stays put. The electronics makes just one or two yes-or-no decisions per needle; the hard part is making them at exactly the right position."
+
+  - layout: bignum
+    title: ["选针器有多快", "How fast is a selector"]
+    nums:
+      - {n: "{{ch17.F_sel:.1f}} N", n_en: "force", label: ["B = 0.8 T、A = 10 mm²", "B = 0.8 T, A = 10 mm²"]}
+      - {n: "{{ch17.t_arm_ms:.2f}} ms", n_en: "armature travel", label: ["0.5 g 衔铁走 0.3 mm", "0.5 g armature, 0.3 mm stroke"]}
+      - {n: "0.6 ms", n_en: "delay T_d", label: ["加上电流上升：示例延迟", "Plus current rise: example delay"]}
+    foot: ["选针器只拨选针片，力小、行程小；减小行程和衔铁质量，比加大电流更有效", "A selector only flips a selector jack; cutting stroke and armature mass beats more current"]
+    notes:
+      - "每条针槽里是一组钢片：舌针、中间片、选针片和弹簧片。选针器不直接推舌针，只决定选针片的针踵进不进三角槽，所以只需要很小的力和行程。粗算一下：吸力 F 等于 B 方乘 A 除以两倍 μ0，约 {{ch17.F_sel:.1f}} 牛；0.5 克的衔铁走 0.3 毫米约 {{ch17.t_arm_ms:.2f}} 毫秒，再加上过压驱动下的电流上升，就是后面用的 0.6 毫秒。设计方向：减小行程和衔铁质量，比加大电流更有效。"
+      - "Each slot holds a set of steel parts: latch needle, intermediate jack, selector jack and spring jack. The selector doesn't push the needle; it only decides whether the selector jack's butt enters the cam track, so it needs very little force and stroke. A rough estimate: force is B squared times A over 2μ0, about {{ch17.F_sel:.1f}} newtons; a 0.5-gram armature crosses 0.3 millimetres in about {{ch17.t_arm_ms:.2f}} milliseconds, and with the current rise under overdrive that makes the 0.6 milliseconds we'll use. The lesson for design: a smaller stroke and lighter armature help more than more current."
+
+  - layout: section
+    num: "02"
+    title: ["按位置选针", "Selecting by position"]
+
+  - layout: bignum
+    title: ["留给每枚针的时间 t = p / v", "Time per needle t = p / v"]
+    nums:
+      - {n: "{{ch17.tn_E12_1_2:.2f}} ms", n_en: "E12 · 1.2 m/s", label: ["相邻两针之间的时间", "Time between two needles"]}
+      - {n: "{{ch17.lead_mm:.2f}} mm", n_en: "v · T_d", label: ["选针器延迟里机头又走的距离", "Travel during the selector delay"]}
+      - {n: "{{ch17.lag_E12:.2f}} p", n_en: "lag without lead", label: ["不补偿：滞后，超过允许的 0.25 p", "Uncompensated lag, over the 0.25 p allowed"]}
+    foot: ["动作时机由位置决定，不由时钟决定——和第 15 讲的离布窗口同一类问题", "Timing is set by position, not by the clock, just like Lecture 15's window"]
+    notes:
+      - "机头以速度 v 扫过针床，相邻两枚针之间的时间就是 p 除以 v。E12、1.2 米每秒，只有 {{ch17.tn_E12_1_2:.2f}} 毫秒，而且动作必须正好发生在选针片对准选针器的那一小段行程里。选针器有 0.6 毫秒延迟，这段时间机头又走了 {{ch17.lead_mm:.2f}} 毫米，是 {{ch17.lag_E12:.2f}} 个针距，超过允许的 0.25，所以指令必须提前发。时机由位置决定，不由时钟决定。"
+      - "As the carriage sweeps at speed v, the time between two needles is p over v. At E12 and 1.2 metres per second that's only {{ch17.tn_E12_1_2:.2f}} milliseconds, and the action has to land in the short stretch where the selector jack lines up with the selector. The selector lags 0.6 milliseconds, during which the carriage moves another {{ch17.lead_mm:.2f}} millimetres, {{ch17.lag_E12:.2f}} of a pitch, more than the 0.25 allowed. So the command must go out early. Timing is set by position, not by the clock."
+
+  - layout: split
+    title: ["按位置触发：x = xᵢ − c − v·T_d", "Trigger by position: x = xᵢ − c − v·T_d"]
+    points:
+      - ["第 i 枚针在 xᵢ = x₀ + i·p", "Needle i sits at xᵢ = x₀ + i·p"]
+      - ["选针点偏移 c，再提前 v·T_d", "Subtract the selector offset c, then lead by v·T_d"]
+      - ["FPGA 每个编码器脉冲比较一次，微秒级", "The FPGA compares on every encoder count, in microseconds"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <rect x="30" y="380" width="840" height="70" rx="8" fill="#1b2a44"/>
+          <g stroke="#8fa3ba" stroke-width="5"><path d="M90 380 L90 450"/><path d="M190 380 L190 450"/><path d="M290 380 L290 450"/><path d="M390 380 L390 450"/><path d="M490 380 L490 450"/><path d="M590 380 L590 450"/><path d="M690 380 L690 450"/><path d="M790 380 L790 450"/></g>
+          <path d="M590 375 L590 455" stroke="#f2b705" stroke-width="9"/>
+          <text x="590" y="495" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle" class="en">xᵢ</text>
+          <path d="M390 500 L490 500" stroke="#8fa3ba" stroke-width="3"/><path d="M390 488 L390 512 M490 488 L490 512" stroke="#8fa3ba" stroke-width="3"/>
+          <text x="440" y="540" font-size="26" fill="#8fa3ba" text-anchor="middle" class="en">p</text>
+          <rect x="120" y="150" width="360" height="160" rx="18" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="300" y="200" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle">机头</text>
+          <circle cx="430" cy="270" r="16" fill="#ff7a45"/><text x="430" y="245" font-size="22" fill="#ff9c75" text-anchor="middle">选针点</text>
+          <path d="M490 230 L600 230" stroke="#f3f6fa" stroke-width="5"/><path d="M610 230 l-18 -12 l0 24z" fill="#f3f6fa"/>
+          <text x="550" y="215" font-size="28" fill="#f3f6fa" text-anchor="middle" class="en">v</text>
+          <path d="M430 330 L590 330" stroke="#ff7a45" stroke-width="4" stroke-dasharray="10 6"/>
+          <text x="510" y="362" font-size="24" fill="#ff9c75" text-anchor="middle">提前 v·T_d</text>
+          <text x="450" y="100" font-size="36" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">x_cmd = xᵢ − c − v·T_d</text>
+          <text x="450" y="610" font-size="26" fill="#d3deea" text-anchor="middle">每行开始前，选针数据先装进 FPGA</text>
+        </svg>
+    notes:
+      - "怎么在对的位置发令？控制器从机头电机的编码器或光栅尺时时知道机头位置 x。第 i 枚针在 x0 加 i 乘 p，选针点在机头上偏移 c，理想动作位置是 xi 减 c；再减去延迟里要走的 v 乘 T_d，就是发令位置。每行开始前把选针数据装进 FPGA，FPGA 每收到一个编码器脉冲就比较一次，到点就发脉冲，延迟在微秒级。软件只负责每行一次把数据备好。"
+      - "How do we fire at the right place? The controller always knows carriage position x from the motor encoder or a linear scale. Needle i is at x0 plus i times p; the selection point is offset c on the carriage, so the ideal action point is xi minus c; subtract the distance covered during the delay, v times T_d, and that's where to fire. Before each course the selection data is loaded into the FPGA, which compares on every encoder count and fires when it gets there, within microseconds. Software only prepares the data once per course."
+
+  - layout: duo
+    title: ["不补偿就错选：红点是选错位置的针", "Without a lead, needles are mis-selected"]
+    left: {video: nocomp, label: ["不补偿", "No lead"], note: ["机头一快，红点就出来", "Red dots as soon as it speeds up"]}
+    right: {video: rtcomp, label: ["按实时速度补偿", "Lead by real-time speed"], note: ["加速、全速都对得上", "On target while accelerating and at speed"]}
+    notes:
+      - "这是横机编织仿真，慢放 5 倍。上面一排是后针床，下面是前针床，灰色区是换向余量，机头在这里减速、换向、再加速。红点表示选针位置误差超限的针。左边不补偿：机头一加速到高速，红点就一片片出来。右边按实时速度补偿：不管是在加速区还是全速区，选针都对得上。"
+      - "This is the knitting simulation, slowed five times. The upper row is the back bed, the lower row the front bed; the grey zones are the reversal margins, where the carriage slows, turns and speeds up again. A red dot marks a needle whose selection position error is out of tolerance. On the left, no lead: as soon as the carriage gets up to speed, red dots appear in patches. On the right, lead by real-time speed: selection is on target whether accelerating or at full speed."
+
+  - layout: split
+    title: ["提前量为什么要用实时速度", "Why the lead must use real-time speed"]
+    points:
+      - ["不补偿：全速时滞后 {{ch17.lag_E12:.2f}} p", "No lead: lags {{ch17.lag_E12:.2f}} p at full speed"]
+      - ["固定提前量：全速对，加速区反而超前", "Fixed lead: right at full speed, early while accelerating"]
+      - ["实时速度：只剩 T_d 的不确定，要定期标定", "Real-time: only T_d's uncertainty; calibrate it"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <rect x="60" y="205" width="800" height="250" fill="rgba(46,196,182,.12)"/>
+          <path d="M60 330 L860 330" stroke="#4b5f7d" stroke-width="3"/>
+          <path d="M360 80 L360 560" stroke="#4b5f7d" stroke-width="2" stroke-dasharray="8 8"/>
+          <text x="210" y="590" font-size="26" fill="#8fa3ba" text-anchor="middle">加速区</text>
+          <text x="610" y="590" font-size="26" fill="#8fa3ba" text-anchor="middle">全速区</text>
+          <text x="850" y="196" font-size="22" fill="#5ee0d2" text-anchor="end" class="en">+0.25 p</text>
+          <text x="850" y="478" font-size="22" fill="#5ee0d2" text-anchor="end" class="en">−0.25 p</text>
+          <path d="M60 302 L360 160 L860 160" fill="none" stroke="#ff7a45" stroke-width="7" stroke-linejoin="round"/>
+          <path d="M60 470 L360 330 L860 330" fill="none" stroke="#f2b705" stroke-width="7" stroke-linejoin="round" stroke-dasharray="16 8"/>
+          <path d="M60 322 C 200 338, 300 322, 400 336 S 700 322, 860 334" fill="none" stroke="#2ec4b6" stroke-width="6"/>
+          <text x="520" y="140" font-size="28" font-weight="700" fill="#ff9c75">不补偿：滞后</text>
+          <text x="80" y="520" font-size="28" font-weight="700" fill="#f2b705">固定：超前</text>
+          <text x="560" y="390" font-size="28" font-weight="700" fill="#5ee0d2">按实时速度</text>
+          <text x="70" y="60" font-size="24" fill="#8fa3ba">选针位置误差 / 针距</text>
+        </svg>
+    notes:
+      - "关键在于提前量里的 v 要用实时速度。机头每走一趟都要换向，换向后有一段加速区。完全不补偿，全速时滞后 {{ch17.lag_E12:.2f}} 个针距，超过允许的 0.25，机器只能慢跑。固定提前量按全速整定，全速区误差为零，但在加速区速度越低提前得越多，换向后第一段反而超前。只有按实时速度补偿，误差才只剩 T_d 本身不确定的那一点。T_d 还会随温度、电压变，所以要定期标定。"
+      - "The key is that the v in the lead must be the real-time speed. The carriage reverses every pass, and after each reversal there's an acceleration zone. With no lead it lags {{ch17.lag_E12:.2f}} of a pitch at full speed, beyond the 0.25 allowed, so the machine has to run slowly. A fixed lead tuned for full speed is exact there, but in the acceleration zone the slower it goes the more it leads, so right after reversal it fires early. Only a real-time lead leaves nothing but the uncertainty in T_d itself, and since T_d drifts with temperature and voltage, it has to be calibrated regularly."
+
+  - layout: split
+    title: ["一趟要走多远：D = w + L_k + 2c", "One pass: D = w + L_k + 2c"]
+    points:
+      - ["速度上限 v_max = p / T_c：机号越高越慢", "Speed limit v_max = p / T_c: finer gauge, slower"]
+      - ["换向余量 c ≥ v² / 2a = {{ch17.c_base:.0f}} mm", "Reversal margin c ≥ v² / 2a = {{ch17.c_base:.0f}} mm"]
+      - ["余量这段什么也不织，按织物宽度定换向点", "Nothing is knitted there; reverse at the fabric edge"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <g font-weight="700" text-anchor="middle">
+            <rect x="40" y="300" width="58" height="80" fill="#4b5f7d"/><text x="69" y="350" font-size="24" fill="#f3f6fa" class="en">c</text>
+            <rect x="98" y="300" width="466" height="80" fill="#2ec4b6"/><text x="331" y="350" font-size="28" fill="#08101d">织物宽 w = {{ch17.w:.0f}} mm</text>
+            <rect x="564" y="300" width="120" height="80" fill="#4c8dff"/><text x="624" y="350" font-size="24" fill="#08101d" class="en">L_k</text>
+            <rect x="684" y="300" width="58" height="80" fill="#4b5f7d"/><text x="713" y="350" font-size="24" fill="#f3f6fa" class="en">c</text>
+          </g>
+          <path d="M40 420 L742 420" stroke="#f2b705" stroke-width="4"/><path d="M40 405 L40 435 M742 405 L742 435" stroke="#f2b705" stroke-width="4"/>
+          <text x="391" y="466" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle">D = {{ch17.base_D:.0f}} mm</text>
+          <path d="M40 260 L98 140 L684 140 L742 260" fill="none" stroke="#f3f6fa" stroke-width="6" stroke-linejoin="round"/>
+          <text x="391" y="120" font-size="26" fill="#d3deea" text-anchor="middle">机头速度：在余量里加速、减速</text>
+          <text x="760" y="235" font-size="22" fill="#8fa3ba">换向</text>
+          <text x="450" y="560" font-size="26" fill="#d3deea" text-anchor="middle">t = D/v + v/a + 停顿</text>
+          <text x="450" y="600" font-size="22" fill="#8fa3ba" text-anchor="middle">L_k：三角座选针点跨度</text>
+        </svg>
+    notes:
+      - "机头能跑多快？如果选针器要在一个针距的时间里完成一次吸合释放，周期是 T_c，最高速度就是 p 除以 T_c，机号越高越慢。另外机头在织物两端要多走一段才能换向：三角座要完全离开最后一枚工作针，固定提前量还要求在第一枚针前就达到全速，减速、加速都要 v 方除以 2a，{{ch17.c_base:.0f}} 毫米。这段路什么也不织，所以控制器按织物实际宽度定换向点。"
+      - "How fast can the carriage go? If the selector must finish one engage-release cycle, period T_c, within one pitch time, the top speed is p over T_c: the finer the gauge, the slower. That's why fine-gauge machines use multi-stage selectors that share neighbouring needles between stages. And at each end the carriage has to overrun before reversing: the cam plate must clear the last working needle, and with a fixed lead it must be at full speed before the first needle, so braking and accelerating need v squared over 2a, {{ch17.c_base:.0f}} millimetres. Nothing is knitted there, so the controller reverses according to the actual fabric width."
+
+  - layout: lab
+    title: ["动手试一试：横机编织仿真", "Try it: flat knitting simulation"]
+    shot: {page: knit}
+    tasks:
+      - ["选“不补偿”，逐步提高机头速度，看何时出红点", "No lead: raise carriage speed; when do red dots appear?"]
+      - ["比较三种提前量在加速区和全速区的差别", "Compare the three leads while accelerating and at speed"]
+      - ["改换向余量，看一行和整片用时怎样变", "Vary the reversal margin; watch course and panel time"]
+    notes:
+      - "横机编织仿真在问渠平台上可以自己做。先选不补偿，把机头速度从 0.4 米每秒逐步提高，看多快开始出现错选，用 t_n 等于 p 除以 v 和 v 乘 T_d 解释。再比较固定提前量和按实时速度补偿，在加速区和全速区有什么不同。最后改换向余量，看一行和整片的用时怎样变化。结果填进实验报告。"
+      - "You can run the knitting simulation yourself on WenQuest. First choose no lead and raise the carriage speed step by step from 0.4 metres per second: when do mis-selections start? Explain it with t_n equals p over v and with v times T_d. Then compare the fixed lead with the real-time lead, in the acceleration zone and at full speed. Finally change the reversal margin and see how the time per course and per panel changes. Put the results in your report."
+
+  - layout: section
+    num: "03"
+    title: ["两级控制与 FPGA 选针", "Two-level control and FPGA selection"]
+
+  - layout: split
+    title: ["主控制器按行，机头板按针", "Main controller per course, carriage board per needle"]
+    points:
+      - ["主控制器：换向前备好下一行，几百毫秒", "Main controller: next course ready before reversal"]
+      - ["机头板 FPGA：逐针触发，每针一两毫秒", "Carriage FPGA: fires needle by needle, 1–2 ms each"]
+      - ["机头板装在机头上：只有电源和总线走拖链", "Board on the carriage: only power and bus in the chain"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <defs><marker id="m17a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6f84a3"/></marker></defs>
+          <g text-anchor="middle">
+            <rect x="60" y="40" width="780" height="140" rx="22" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
+            <text x="450" y="98" font-size="34" font-weight="700" fill="#9cc0ff">主控制器 · 按行</text>
+            <text x="450" y="146" font-size="24" fill="#8fa3ba">花型程序 → 方向、速度、选针、度目、纱嘴、摇床</text>
+            <rect x="60" y="280" width="780" height="140" rx="22" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+            <text x="450" y="338" font-size="34" font-weight="700" fill="#f2b705">机头板 FPGA · 按针</text>
+            <text x="450" y="386" font-size="24" fill="#8fa3ba">编码器位置比较 → 逐针发脉冲（微秒级）</text>
+            <rect x="60" y="500" width="240" height="100" rx="18" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="2"/><text x="180" y="560" font-size="28" font-weight="700" fill="#ff9c75">选针器 × 数十</text>
+            <rect x="330" y="500" width="240" height="100" rx="18" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="2"/><text x="450" y="560" font-size="28" font-weight="700" fill="#ff9c75">度目步进</text>
+            <rect x="600" y="500" width="240" height="100" rx="18" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="2"/><text x="720" y="560" font-size="28" font-weight="700" fill="#ff9c75">纱嘴电磁铁</text>
+          </g>
+          <g stroke="#6f84a3" stroke-width="5" marker-end="url(#m17a)"><path d="M450 184 L450 272"/><path d="M180 424 L180 492"/><path d="M450 424 L450 492"/><path d="M720 424 L720 492"/></g>
+          <text x="470" y="238" font-size="24" fill="#2ec4b6">电源 + 总线（走拖链）</text>
+        </svg>
+    notes:
+      - "控制分成两级，两级的时间尺度差得很远。主控制器按行工作：解析花型程序，在每次换向之前把下一行的方向、速度、选针数据、度目、纱嘴、摇床和牵拉都准备好，一行要织几百毫秒，时间很宽裕。机头控制板按针工作：FPGA 根据机头位置逐针触发选针器，每个针位只有一两毫秒。机头板装在机头上，几十路线圈就近接，只让电源和一条总线穿过拖链。"
+      - "Control is split into two levels with very different time scales. The main controller works per course: it parses the knitting program and, before each reversal, prepares the next course's direction, speed, selection data, stitch setting, yarn carriers, racking and take-down. A course takes hundreds of milliseconds, plenty of time. The carriage board works per needle: its FPGA fires the selectors by carriage position, with only a millisecond or two per needle. The board rides on the carriage so dozens of coils wire up locally and only power and one bus go through the cable chain. The price is vibration and acceleration; typical faults are loose connectors and broken cores in the chain cable."
+
+  - layout: figure
+    title: ["FPGA 选针通道：三种提前量的误差", "FPGA selection channel: error under three leads"]
+    h: 560
+    visual: {video: fpga}
+    caption: ["fire ⇔ pos + T_D / period ≥ target；依次运行：不补偿 → 固定 → 按实时速度", "fire ⇔ pos + T_D / period ≥ target; runs: none → fixed → real-time"]
+    notes:
+      - "把机头板的 FPGA 打开看。一条选针通道六个模块：正交解码、位置计数、测速、提前量、比较、脉冲发生。测速不算米每秒，而是数相邻两个计数之间隔了多少个时钟，叫 period；提前量就是 T_D 除以 period；比较器在 pos 加提前量大于等于目标位置时发 fire。图上是 12 枚针的位置误差，依次运行不补偿、固定、按实时速度三种设置，看误差柱怎样变化，绿色带是允许的正负 0.25 个针距。"
+      - "Let's open the carriage board's FPGA. One selection channel has six blocks: quadrature decoding, position counting, speed measurement, lead, comparison and pulse generation. Speed isn't computed in metres per second; the FPGA counts how many clock ticks pass between two encoder counts, the period, and the lead is T_D over period. The comparator fires when pos plus lead reaches the target. The chart shows the position error for 12 needles as the channel runs with no lead, a fixed lead and a real-time lead in turn. Watch the bars; the green band is plus or minus a quarter pitch."
+
+  - layout: lab
+    title: ["动手试一试：选针 FPGA", "Try it: the selection FPGA"]
+    shot: {page: fpga}
+    tasks:
+      - ["图形化搭建：三种提前量各运行一次", "Block mode: run each of the three leads"]
+      - ["看误差柱和线圈功率，选出能用的组合", "Read errors and coil power; pick a working set-up"]
+      - ["Verilog 关卡：补全解码器和比较器", "Verilog levels: complete the decoder and comparator"]
+    notes:
+      - "选针 FPGA 实验分两部分。A 部分图形化搭建：点上方的模块看原理、改设置，比如提前量、编码器倍频、测速方式、线圈驱动，运行仿真，看 12 枚针是否全部选对、最大误差多少、线圈功率是否超标。B 部分用 Verilog 自己写：按关卡补全正交解码、位置比较和提前量，编译后看波形。结果填进实验报告。"
+      - "The FPGA lab has two parts. Part A is block building: click the blocks to read how they work and change settings such as the lead, encoder multiplication, speed estimate and coil drive, then run the simulation and check that all 12 needles are selected, the maximum error, and whether coil power is within limits. Part B is writing Verilog yourself: complete the quadrature decoder, the position comparator and the lead, level by level, then compile and read the waveforms. Record the results in your report."
+
+  - layout: section
+    num: "04"
+    title: ["花型、线圈长度与全成型", "Patterns, loop length and whole garments"]
+
+  - layout: chain
+    title: ["从款式到上机：三层转换", "From design to machine: three translations"]
+    steps: [["款式", "design"], ["工艺单", "spec sheet"], ["意匠图", "pattern grid"], ["横列程序", "course program"], ["上机", "knit"]]
+    hot: [3]
+    mark: ["编译器", "compiler"]
+    foot: ["50 cm × 5.5 针/cm = {{ch17.needles:.0f}} 针；60 cm × 7 行/cm = {{ch17.courses:.0f}} 行（示例）。一个意匠行可拆成几个横列", "50 cm × 5.5/cm = {{ch17.needles:.0f}} needles; 60 cm × 7/cm = {{ch17.courses:.0f}} rows. One grid row may become several courses"]
+    notes:
+      - "一件毛衣从设计稿到上机要经过三层转换。第一步从款式到工艺单：横密、纵密先用小样片实测，前片宽 50 厘米、横密每厘米 5.5 针，就是 {{ch17.needles:.0f}} 针；衣长 60 厘米、纵密每厘米 7 行，就是 {{ch17.courses:.0f}} 行。第二步画意匠图，一格就是一枚针在一行里干什么。第三步编译成横列程序，每个横列是机头走一趟，两色提花的一个意匠行要拆成两个横列。编译器还要排纱嘴顺序、插翻针和摇床。"
+      - "A sweater goes through three translations on its way to the machine. First, design to spec sheet: measure the stitch and row density on a swatch; a 50-centimetre front at 5.5 stitches per centimetre is {{ch17.needles:.0f}} needles, a 60-centimetre length at 7 rows per centimetre is {{ch17.courses:.0f}} rows. Second, the pattern grid: one cell is what one needle does in one row. Third, compile into a course program, one course per carriage pass; a two-colour jacquard row becomes two courses. The compiler also orders the yarn carriers and inserts transfers and racking."
+
+  - layout: bignum
+    title: ["线圈长度闭环：测用纱，修度目", "Loop-length loop: measure yarn, adjust stitch depth"]
+    nums:
+      - {n: "+{{ch17.cl_dl:.3f}} mm", n_en: "Δl per loop", label: ["偏长 {{ch17.cl_dev_pct:.1f}}%（实测 1400 mm / 275 针）", "{{ch17.cl_dev_pct:.1f}}% long (1400 mm / 275 needles)"]}
+      - {n: "{{ch17.cl_dd:.3f}} mm", n_en: "Δd, k = 0.5", label: ["度目修正", "Stitch-depth correction"]}
+      - {n: "{{ch17.cl_steps:.0f}} 步", n_en: "steps of 0.01 mm", label: ["度目步进电机", "Stitch-cam stepper"]}
+    foot: ["Δd = −k·Δl / (∂l/∂d)：线圈两条腰，弯纱深 1 mm 线圈约长 2 mm；k 取小于 1，防止来回振荡", "Δd = −k·Δl / (∂l/∂d): two legs, so 1 mm deeper ≈ 2 mm longer loop; k < 1 avoids oscillation"]
+    notes:
+      - "度目只是开环设定。同一个度目值，纱线张力、摩擦、湿度、三角磨损一变，线圈长度就偏了，前后片对不齐。办法是在送纱路上装一个带编码器的测长轮，测出每个横列实际用纱 L_m，算出每个线圈的偏差。算例：275 针、目标 5 毫米，实测 1400 毫米，偏长 {{ch17.cl_dev_pct:.1f}}%，每圈多 {{ch17.cl_dl:.3f}} 毫米。线圈有两条腰，弯纱每深 1 毫米线圈长约 2 毫米；增益取 0.5，度目浅 {{ch17.cl_dd:.3f}} 毫米，步进电机退 2 步。"
+      - "The stitch setting is only open-loop. With the same setting, changes in yarn tension, friction, humidity or cam wear shift the loop length, and front and back panels won't match. The fix is a measuring wheel with an encoder in the yarn path that measures the yarn L_m used in each course, giving the error per loop. Example: 275 needles, target 5 millimetres, measured 1400 millimetres: {{ch17.cl_dev_pct:.1f}} percent long, {{ch17.cl_dl:.3f}} millimetres per loop. A loop has two legs, so 1 millimetre deeper means about 2 millimetres longer; with a gain of 0.5 the depth comes up {{ch17.cl_dd:.3f}} millimetres, two steps of the stepper."
+
+  - layout: points
+    title: ["全成型：下机就是一件衣服", "Whole garment: off the machine, a finished sweater"]
+    points:
+      - ["传统：先织衣片，再人工套口缝合", "Traditional: knit panels, then link them by hand"]
+      - ["前床织前身、后床织后身，两端相连成筒", "Front bed knits the front, back bed the back, joined into a tube"]
+      - ["双针床只能隔针织；省套口，但翻针多、难编程", "Two beds knit every other needle; saves linking, costs transfers"]
+    notes:
+      - "传统毛衣是先织出前片、后片、两只袖片，再用套口机一针一针对着套起来，是毛衫厂最费人力的工序之一。全成型编织下机就是一件成品：前床织前身、后床织后身，两边在针床两端连上成一个筒，两只袖子各成一个筒，织到袖窿时用翻针和摇床合并。难点在于线圈要翻到对面，对面必须有空针接，双针床只好隔针编织。省了套口和裁剪损耗，但是否合算要算账。"
+      - "A traditional sweater is knitted as front, back and two sleeves, then linked stitch by stitch on a linking machine, and matching every stitch by hand makes linking one of the most labour-hungry jobs in a knitwear plant. Whole-garment knitting comes off the machine finished: the front bed knits the front body, the back bed the back, joined at both ends into a tube, with each sleeve its own tube, merged at the armholes by transfers and racking. The catch is that a transferred loop needs an empty needle opposite, so an ordinary two-bed machine knits on alternate needles, effectively halving the gauge. It saves linking and cutting waste, but whether it pays has to be worked out."
+
+  - layout: section
+    num: "05"
+    title: ["算例：一片前片要织多久", "Worked example: time per front panel"]
+
+  - layout: bignum
+    title: ["现在：每趟 {{ch17.base_t:.2f}} s，一片 {{ch17.base_min:.1f}} min", "Now: {{ch17.base_t:.2f}} s per pass, {{ch17.base_min:.1f}} min per panel"]
+    nums:
+      - {n: "{{ch17.tn_E12_1_2:.2f}} ms", n_en: "> T_c 1.2 ms", label: ["每针时间：选针器跟得上", "Time per needle: the selector keeps up"]}
+      - {n: "{{ch17.base_D:.0f}} mm", n_en: "D per pass", label: ["{{ch17.w:.0f}} + 150 + 2 × {{ch17.c_base:.0f}}", "{{ch17.w:.0f}} + 150 + 2 × {{ch17.c_base:.0f}}"]}
+      - {n: "760", n_en: "passes", label: ["每片趟数", "Passes per panel"]}
+    foot: ["t = D/v + v/a + 停顿 = {{ch17.Dv:.2f}} + {{ch17.acc_s:.2f}} + 0.05 ≈ {{ch17.base_t:.2f}} s", "t = D/v + v/a + dwell = {{ch17.Dv:.2f}} + {{ch17.acc_s:.2f}} + 0.05 ≈ {{ch17.base_t:.2f}} s"]
+    notes:
+      - "把前面的内容串起来回答开头的问题。第一步，选针器跟得上吗？每针 {{ch17.tn_E12_1_2:.2f}} 毫秒，大于周期 1.2 毫秒，可以。第二步，固定提前量要求在第一枚针前达到全速，余量至少 {{ch17.c_base:.0f}} 毫米，一趟行程是 {{ch17.w:.0f}} 加 150 加两个 {{ch17.c_base:.0f}}，{{ch17.base_D:.0f}} 毫米。用时等于 D 除以 v，加 v 除以 a，再加换向停顿 0.05 秒，约 {{ch17.base_t:.2f}} 秒，760 趟就是 {{ch17.base_min:.1f}} 分钟。"
+      - "Now tie it together to answer the opening question. Step one: can the selector keep up? Each needle gets {{ch17.tn_E12_1_2:.2f}} milliseconds, more than the 1.2-millisecond cycle, so yes. Step two: a fixed lead needs full speed before the first needle, so the margin is at least {{ch17.c_base:.0f}} millimetres, and one pass is {{ch17.w:.0f}} plus 150 plus two {{ch17.c_base:.0f}}s, {{ch17.base_D:.0f}} millimetres. Time is D over v, plus v over a, plus a 0.05-second dwell at reversal: about {{ch17.base_t:.2f}} seconds, so 760 passes take {{ch17.base_min:.1f}} minutes."
+
+  - layout: bignum
+    title: ["三个方案：一片各要多久", "Three options: minutes per panel"]
+    nums:
+      - {n: "{{ch17.A_min:.1f}}", n_en: "A · real-time lead", label: ["A 实时补偿，余量 20 mm", "A: real-time lead, 20 mm margin"]}
+      - {n: "{{ch17.B_min:.1f}}", n_en: "B · two systems", label: ["B 两系统，760 → 460 趟", "B: two systems, 760 → 460 passes"]}
+      - {n: "{{ch17.C_min:.1f}}", n_en: "C · 1.6 m/s", label: ["C 提速到 1.6 m/s", "C: carriage at 1.6 m/s"]}
+    foot: ["提速 {{ch17.speedup_pct:.0f}}% 只快约 {{ch17.C_gain_pct:.0f}}%：v/a 和 v²/2a 都随 v 增大，t_n 也降到 {{ch17.tn_E12_1_6:.2f}} ms", "33% more speed, only {{ch17.C_gain_pct:.0f}}% faster: v/a and v²/2a grow with v, and t_n falls to {{ch17.tn_E12_1_6:.2f}} ms"]
+    notes:
+      - "比较三个方案。A，按实时速度补偿，不必在第一枚针前达到全速，余量减到 20 毫米，一片 {{ch17.A_min:.1f}} 分钟。B，换两系统机头，跨度变成 300 毫米，一趟慢一点，但两色同一趟织，趟数降到 460，一片 {{ch17.B_min:.1f}} 分钟。C，提速到 1.6 米每秒，余量增到 {{ch17.C_c:.0f}} 毫米，一片 {{ch17.C_min:.1f}} 分钟。为什么提速三成多只快约 {{ch17.C_gain_pct:.0f}}%？v 除以 a 和 v 方除以 2a 都随 v 变大，每针时间也降到 {{ch17.tn_E12_1_6:.2f}} 毫秒，逼近选针器周期。"
+      - "Compare the options. A: with a real-time lead the carriage needn't be at full speed before the first needle, the margin drops to 20 millimetres, and a panel takes {{ch17.A_min:.1f}} minutes. B: a two-system carriage spans 300 millimetres, so each pass is a little slower, but both colours go in one pass, 460 passes instead of 760, and a panel takes {{ch17.B_min:.1f}} minutes. C: 1.6 metres per second needs a {{ch17.C_c:.0f}}-millimetre margin and gives {{ch17.C_min:.1f}} minutes. Why is a third more speed only about {{ch17.C_gain_pct:.0f}} percent faster? Both v over a and v squared over 2a grow with v, and the time per needle drops to {{ch17.tn_E12_1_6:.2f}} milliseconds, close to the selector cycle."
+
+  - layout: split
+    title: ["机器人联系：按编码器位置触发相机和喷头", "Robot link: trigger by conveyor position"]
+    points:
+      - ["零件走到视场中心才拍照：按位置，不按时钟", "Shoot when the part reaches the centre: by position"]
+      - ["运动卡的“位置比较输出”：硬件逐计数比较", "Position-compare output: hardware checks every count"]
+      - ["相机、阀也有延迟：按实时速度提前 v·T_d", "Cameras and valves lag too: lead by v·T_d"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <rect x="30" y="420" width="840" height="60" rx="30" fill="#1b2a44" stroke="#4b5f7d" stroke-width="3"/>
+          <circle cx="60" cy="450" r="22" fill="#4b5f7d"/><circle cx="840" cy="450" r="22" fill="#4b5f7d"/>
+          <rect x="15" y="500" width="90" height="60" rx="10" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="60" y="540" font-size="22" fill="#5ee0d2" text-anchor="middle">编码器</text>
+          <rect x="220" y="370" width="90" height="50" rx="6" fill="#4c8dff" opacity=".4"/>
+          <rect x="400" y="370" width="90" height="50" rx="6" fill="#4c8dff"/>
+          <path d="M445 360 L445 230" stroke="#f2b705" stroke-width="3" stroke-dasharray="8 6"/>
+          <rect x="395" y="150" width="100" height="80" rx="12" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <circle cx="445" cy="190" r="22" fill="none" stroke="#f2b705" stroke-width="5"/>
+          <text x="445" y="130" font-size="26" font-weight="700" fill="#f2b705" text-anchor="middle">相机：到点就拍</text>
+          <path d="M680 160 L680 340" stroke="#c8d2de" stroke-width="16"/><path d="M670 340 L690 340 L680 370z" fill="#ff7a45"/>
+          <text x="680" y="130" font-size="26" font-weight="700" fill="#ff9c75" text-anchor="middle">点胶阀</text>
+          <path d="M520 470 L640 470" stroke="#f3f6fa" stroke-width="5"/><path d="M650 470 l-16 -11 l0 22z" fill="#f3f6fa"/>
+          <text x="450" y="600" font-size="26" fill="#d3deea" text-anchor="middle">x_cmd = xᵢ − c − v·T_d</text>
+        </svg>
+    notes:
+      - "机器人分拣线上，传送带电机的编码器给出带面位置，相机要在零件走到视场中心时拍照。这和横机选针是同一个问题：时机由位置决定，不由时钟决定。工程做法也一样：把目标位置装进运动控制卡或 FPGA 的位置比较输出，硬件每收到一个编码器计数就比较一次，到点就输出触发脉冲。相机、电磁阀也有延迟，带速变化时同样要按实时速度提前。"
+      - "On a robot sorting line, the conveyor motor's encoder gives belt position; the camera must fire when a part reaches the centre of view, and the dispensing robot must open its valve when the part reaches a set point. It's the same problem as needle selection: timing by position, not by the clock. The engineering is the same too: load the target positions into the position-compare output of a motion card or FPGA, which checks every encoder count in hardware and fires a trigger when it arrives. Cameras and valves have delays as well, so when belt speed varies they too must lead by the real-time speed."
+
+  - layout: split
+    title: ["生活中的例子：喷墨打印机", "Everyday example: the inkjet printer"]
+    points:
+      - ["打印头来回扫过纸面，每趟打一行", "The print head sweeps across, one band per pass"]
+      - ["每个喷孔走到位置才决定喷不喷", "Each nozzle decides to fire when it reaches its spot"]
+      - ["位置由光栅码带测出，加速时字也不歪", "An encoder strip gives position, so text stays straight"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <rect x="140" y="230" width="620" height="380" rx="6" fill="#e9e4d8"/>
+          <path d="M60 140 L840 140" stroke="#8fa3ba" stroke-width="4"/>
+          <g stroke="#4c8dff" stroke-width="2"><path d="M60 120 L840 120"/></g>
+          <g stroke="#9cc0ff" stroke-width="2">
+            <path d="M80 112 L80 128 M100 112 L100 128 M120 112 L120 128 M140 112 L140 128 M160 112 L160 128 M180 112 L180 128 M200 112 L200 128 M220 112 L220 128 M240 112 L240 128 M260 112 L260 128 M280 112 L280 128 M300 112 L300 128 M320 112 L320 128 M340 112 L340 128 M360 112 L360 128 M380 112 L380 128 M400 112 L400 128 M420 112 L420 128 M440 112 L440 128 M460 112 L460 128 M480 112 L480 128 M500 112 L500 128 M520 112 L520 128 M540 112 L540 128 M560 112 L560 128 M580 112 L580 128 M600 112 L600 128 M620 112 L620 128 M640 112 L640 128 M660 112 L660 128 M680 112 L680 128 M700 112 L700 128 M720 112 L720 128 M740 112 L740 128 M760 112 L760 128 M780 112 L780 128 M800 112 L800 128 M820 112 L820 128"/>
+          </g>
+          <text x="60" y="95" font-size="24" fill="#9cc0ff">光栅码带 = 位置</text>
+          <rect x="430" y="150" width="140" height="110" rx="14" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <text x="500" y="215" font-size="26" font-weight="700" fill="#f2b705" text-anchor="middle">打印头</text>
+          <path d="M590 205 L690 205" stroke="#f3f6fa" stroke-width="5"/><path d="M700 205 l-16 -11 l0 22z" fill="#f3f6fa"/>
+          <g fill="#0b1220"><circle cx="200" cy="300" r="7"/><circle cx="220" cy="300" r="7"/><circle cx="240" cy="300" r="7"/><circle cx="280" cy="300" r="7"/><circle cx="320" cy="300" r="7"/><circle cx="340" cy="300" r="7"/><circle cx="360" cy="300" r="7"/><circle cx="400" cy="300" r="7"/><circle cx="420" cy="300" r="7"/></g>
+          <text x="450" y="420" font-size="30" font-weight="700" fill="#16243b" text-anchor="middle">每个喷孔 ≈ 每枚针</text>
+          <text x="450" y="470" font-size="22" fill="#4b5f7d" text-anchor="middle" class="en">each nozzle ≈ each needle</text>
+        </svg>
+    notes:
+      - "生活里最像横机的是喷墨打印机。打印头沿导轨来回扫过纸面，每扫一趟打一行，每个喷孔都要在走到正确位置时决定喷还是不喷，这和横机机头扫过针床、每枚针决定织不织几乎一模一样。打印头的位置也是由一条光栅码带测出来的，按位置喷墨而不是按时间，所以打印头在开头加速的时候，字也不会歪。"
+      - "In everyday life the closest thing to a flat knitting machine is an inkjet printer. The print head sweeps back and forth across the paper, printing a band each pass, and every nozzle decides to fire or not when it reaches exactly the right spot, almost exactly like the carriage sweeping the beds and each needle deciding whether to knit. The head's position comes from an encoder strip, and it fires by position, not by time, which is why the text isn't skewed even while the head is accelerating at the start of a pass."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["方案 B 最值得：它减少的是趟数", "Option B wins: it cuts the number of passes"]
+    rows:
+      - ["现在（固定提前量）", "{{ch17.base_min:.1f}} min"]
+      - ["A 实时补偿 / C 提速", "{{ch17.A_min:.1f}} / {{ch17.C_min:.1f}} min"]
+      - ["B 两系统机头", "{{ch17.B_min:.1f}} min"]
+    side: {big: "{{ch17.C_gain_pct:.0f}}%", text: ["提速 {{ch17.speedup_pct:.0f}}%，一片只快这么多", "A third more speed buys only this much"]}
+    foot: ["B 的代价是机头更长更重；A 几乎不花钱，可以先做", "B's price is a longer, heavier carriage; A costs almost nothing, so do it first"]
+    notes:
+      - "回到开头的问题。现在每趟 {{ch17.base_t:.2f}} 秒，一片 {{ch17.base_min:.1f}} 分钟。方案 A 实时补偿，{{ch17.A_min:.1f}} 分钟；方案 C 提速到 1.6，{{ch17.C_min:.1f}} 分钟，提速三成多只快约 {{ch17.C_gain_pct:.0f}}%，而且每针时间逼近选针器周期；方案 B 两系统机头，{{ch17.B_min:.1f}} 分钟，收益最大，因为它减少的是趟数。代价是机头更长更重。方案 A 几乎只是改软件，可以先做。"
+      - "Back to the opening question. Now each pass takes {{ch17.base_t:.2f}} seconds and a panel {{ch17.base_min:.1f}} minutes. Option A, real-time lead: {{ch17.A_min:.1f}} minutes. Option C, 1.6 metres per second: {{ch17.C_min:.1f}} minutes; a third more speed buys only about {{ch17.C_gain_pct:.0f}} percent, and the time per needle approaches the selector cycle. Option B, a two-system carriage: {{ch17.B_min:.1f}} minutes, the biggest gain, because it reduces the number of passes. Its price is a longer, heavier carriage. Option A is little more than a software change, so do it first."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["三角把针的升降定死，电控只作“是 / 否”", "Cams fix the motion; electronics makes yes/no calls"]
+      - ["按位置触发：x = xᵢ − c − v(t)·T_d", "Fire by position: x = xᵢ − c − v(t)·T_d"]
+      - ["两级控制：主控按行，FPGA 按针", "Two levels: controller per course, FPGA per needle"]
+    after: ["作业 17 · 测验 · 虚拟实验 17-1、17-3 实验报告 —— 在问渠学习平台完成", "Assignment 17 · quiz · Labs 17-1 and 17-3 reports — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，横机是机头在动，三角是平移的凸轮，把针的升降定死，电控只需按位置对每枚针作一两个是或否判断。第二，选针要按位置触发，每针只有 p 除以 v 的时间，提前量要用实时速度。第三，两级控制：主控制器按行准备数据，机头板上的 FPGA 按针比较触发。作业、测验和两个实验的报告在问渠平台完成。"
+      - "Three things to remember. One: on a flat knitting machine the carriage moves, its cams are sliding cams that fix how needles move, and the electronics only makes one or two yes-or-no decisions per needle, by position. Two: selection fires by position; each needle gets only p over v, and the lead must use real-time speed. Three: two-level control, with the main controller preparing each course and the FPGA on the carriage firing needle by needle. The assignment, quiz and both lab reports are on WenQuest."

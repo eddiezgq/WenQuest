@@ -54,3 +54,15 @@ for k in ('nb', 'oper', 'pieces', 'A', 'P', 'Q', 'OEE', 'run', 'trims', 'est'):
 print("hw 剪线误差 %", round((st['est'] / st['pieces'] - 1) * 100, 2), "缝纫时间比例", round(st['run'] / st['planned'] * 100, 1))
 per_piece = st['pieces'] + 2 * (st['nb'] + 2)
 print("hw 每件汇总 每台每班", round(per_piece), "；300 台、2 班 条/s", round(per_piece * 300 / 28800, 2), "GB/年", round(per_piece * 300 * 2 * 300 * 250 / 1e9, 2))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    R = {m: dict(per=per, rate=per * 500 / (480 * 60), gb=per * 500 * 2 * 300 * 250 / 1e9) for m, per in modes.items()}
+    out(planned=s['planned'], nb=s['nb'], oper=s['oper'], pieces=s['pieces'], due=s['oper'] / s['p']['sam'],
+        good=s['pieces'] * s['Q'], A=s['A'] * 100, P=s['P'] * 100, Q=s['Q'] * 100, OEE=s['OEE'] * 100,
+        run=s['run'], ratio=s['run'] / s['planned'] * 100, kst=s['stitches'] / 1e4, trims=s['trims'], est=s['est'],
+        err=(s['est'] / s['pieces'] - 1) * 100, speed=s['oper'] * (1 - s['P']), rework=s['pieces'] * s['p']['defect'] * s['p']['sam'],
+        good_min=s['pieces'] * s['Q'] * s['p']['sam'],
+        **{f"{m}_per": v['per'] for m, v in R.items()}, **{f"{m}_rate": v['rate'] for m, v in R.items()},
+        **{f"{m}_gb": v['gb'] for m, v in R.items()}, stitch_tb=R['stitch']['gb'] / 1000,
+        shrink=R['stitch']['gb'] / R['minute']['gb'])

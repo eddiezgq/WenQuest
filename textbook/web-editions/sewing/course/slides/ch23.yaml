@@ -1,0 +1,366 @@
+# 第 23 讲 缝纫机的设计、制造与检测 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch23.键:格式}} 由课程包程序 course/calc/ch23.py 算出，不手写数字。
+lesson: 23
+code: [ch23]
+
+clips:
+  hero:          # 封面：三维平缝机，爆炸图一开一合，主轴一直转（setInterval 自己循环）
+    page: model-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, js: "var b=document.getElementById('play');if(b.textContent.trim()==='播放')b.click();var l=document.getElementById('labels');if(l.checked)l.click();document.querySelector('[data-m=explode]').click();var e=document.getElementById('ex'),t=0;setInterval(function(){t+=0.035;e.value=(0.5-0.5*Math.cos(t)).toFixed(3);e.dispatchEvent(new Event('input',{bubbles:true}))},50)"}
+  hist:          # 实验 23-1 ①：4000 台的间隙分布，完全互换 → 装配调整 → 调整后换针，轮流
+    page: tol
+    selector: "#hist"
+    loop: 9
+    steps:
+      - {at: 0, js: "function s(i,v){var e=document.getElementById(i);e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))}s('adjust','0');s('swap','0')"}
+      - {at: 3, js: "function s(i,v){var e=document.getElementById(i);e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))}s('adjust','1')"}
+      - {at: 6, js: "function s(i,v){var e=document.getElementById(i);e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))}s('swap','1')"}
+  contrib:       # 实验 23-1 ①：各环方差贡献，调整前后交替（被吸收的环变灰）
+    page: tol
+    selector: "#contrib"
+    loop: 6
+    steps:
+      - {at: 0, js: "function s(i,v){var e=document.getElementById(i);e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))}s('adjust','0');s('swap','0')"}
+      - {at: 3, js: "function s(i,v){var e=document.getElementById(i);e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))}s('adjust','1')"}
+  spec:          # 实验 23-1 ②：转速在 3000–6500 r/min 来回扫，看一阶、二阶分量怎样走向固有频率（setInterval 自己循环）
+    page: tol
+    selector: "#spec"
+    steps:
+      - {at: 0, js: "document.getElementById('tabB').click();var n=document.getElementById('n'),t=0;setInterval(function(){t+=0.03;n.value=Math.round(4750-1750*Math.cos(t));n.dispatchEvent(new Event('input',{bubbles:true}))},60)"}
+  sweep:         # 实验 23-1 ②：转速扫描曲线上的工作点来回移动（setInterval 自己循环）
+    page: tol
+    selector: "#sweep"
+    steps:
+      - {at: 0, js: "document.getElementById('tabB').click();var n=document.getElementById('n'),t=0;setInterval(function(){t+=0.03;n.value=Math.round(4750-1750*Math.cos(t));n.dispatchEvent(new Event('input',{bubbles:true}))},60)"}
+  fix:           # 实验 23-1 ②：机臂固有频率 190 ↔ 217 Hz（加筋前后）交替
+    page: tol
+    selector: "#sweep"
+    loop: 8
+    steps:
+      - {at: 0, js: "document.getElementById('tabB').click()", set: {n: 5500, fn: 190}}
+      - {at: 4, set: {fn: 217}}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 23 讲", "Lecture 23"]
+    title: ["设计、制造与检测", "Design, Build and Test"]
+    sub: ["图纸上算对，不等于造出来能用", "Right on paper is not yet right in the machine"]
+    notes:
+      - "同学们好。前面几讲把平缝机的机构一个个算清楚了，可图纸上算对，不等于造出来能用。今天看一台平缝机怎样从图纸走到量产：零件用什么材料和工艺，几十微米的间隙怎样保证，造好以后怎样测振动、噪声和寿命。最后用一个提速以后机器“叫”的案例，把这些串起来。"
+      - "Hello everyone. We've worked out the lockstitch mechanisms one by one, but being right on paper doesn't mean the machine works once built. Today we follow a lockstitch machine from drawing to production: what materials and processes the parts use, how a gap of tens of microns is guaranteed, and how vibration, noise and life are tested. A case where a sped-up machine starts to scream ties it all together."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["提速到 5500 以后，机器“叫”得厉害", "Sped up to 5500, the machines scream"]
+    facts:
+      - ["最高转速 5000 → 5500 r/min，只提了 10%", "Top speed 5000 → 5500 r/min, only 10% more"]
+      - ["振动是原来的三倍多，噪声升到约 {{ch23.dB5500:.0f}} dB(A)", "Vibration over three times higher, noise about {{ch23.dB5500:.0f}} dB(A)"]
+      - ["频谱里长的是二阶分量；机臂固有频率约 190 Hz", "The second order grows; the arm's natural frequency is about 190 Hz"]
+    notes:
+      - "一家服装厂买了一批提速版平缝机，最高转速从 5000 提到 5500。操作工反映高速时机器“叫”得厉害。样机测试：5500 转时机头振动是 5000 转时的三倍多，噪声从 83.5 升到约 {{ch23.dB5500:.0f}} 分贝。频谱里增大的是二阶分量，模态试验测得机臂一阶弯曲固有频率约 190 赫兹。转速只提 10%，振动为什么翻了三倍多？怎么治？这节课最后回答。"
+      - "A garment factory bought sped-up lockstitch machines: top speed raised from 5000 to 5500 r/min. Operators say the machines scream at high speed. On the test stand, vibration at 5500 is more than three times that at 5000, and noise rises from 83.5 to about {{ch23.dB5500:.0f}} dB(A). The spectrum shows the second order growing, and a modal test puts the arm's first bending frequency near 190 hertz. Why does 10 percent more speed triple the vibration, and how do we fix it? We'll answer at the end."
+
+  - layout: chain
+    title: ["一台平缝机从图纸到量产", "A lockstitch machine from drawing to production"]
+    steps: [["设计输入", "Inputs"], ["方案", "Concept"], ["详细设计", "Detail"], ["评审", "Review"], ["样机", "Prototype"], ["试验", "Tests"], ["小批试产", "Pilot"], ["量产", "Production"]]
+    hot: [0]
+    mark: ["起点", "start"]
+    foot: ["问题发现得越晚，改起来越贵；标准和专利在立项时就列为设计输入", "The later a problem is found, the more it costs; standards and patents are design inputs from day one"]
+    notes:
+      - "一个新机型从立项到量产，先是设计输入：目标市场要什么转速、针距、面料、噪声和价格，要满足哪些标准。然后是方案和详细设计，评审时请工艺、质量和售后一起看图。接着做样机、按大纲试验、改图，往往好几轮；再小批试产验证工装和检验方法，最后批量生产。最常见的教训是：问题发现得越晚，改起来越贵。"
+      - "A new model goes from launch to production like this. First the design inputs: the speed, stitch length, fabrics, noise and price the market wants, and the standards it must meet. Then concept and detailed design, with process, quality and service engineers reviewing the drawings. Then prototypes, tests and redesign, often several rounds; a pilot batch to prove the tooling and inspection methods; and finally production. The most common lesson: the later a problem is found, the more it costs to fix."
+
+  - layout: points
+    title: ["设计评审只问三件事", "A design review asks three questions"]
+    points:
+      - ["能不能经济地加工？", "Can it be made economically?"]
+      - ["能不能方便、准确地装配？", "Can it be assembled easily and accurately?"]
+      - ["坏了能不能修？", "Can it be repaired when it breaks?"]
+    foot: ["评审请工艺、质量和售后一起看图：他们最先看出图纸上看不出的问题", "Bring process, quality and service to the review: they see what the drawing hides"]
+    notes:
+      - "设计评审最要紧的是请工艺、质量和售后的人一起看图，问三个问题：第一，这个零件能不能经济地加工，公差是不是定得过紧；第二，能不能方便、准确地装上去，装配工够不够得着、看不看得见；第三，坏了能不能修，易损件好不好换。这三问在图纸阶段解决最便宜。"
+      - "What matters most in a design review is getting process, quality and service people to look at the drawings and ask three questions. One: can this part be made economically, or are the tolerances too tight? Two: can it be assembled easily and accurately; can the fitter reach it and see it? Three: can it be repaired; are the wear parts easy to change? These questions are cheapest to answer on paper."
+
+  - layout: tiles
+    title: ["关键零件：按工作条件选材料和工艺", "Key parts: materials and processes by duty"]
+    tiles:
+      - {k: "旋梭", name: ["高速滑动、要耐磨", "Fast sliding, wear"], use: ["淬硬、精磨梭道、研磨梭尖", "Hardened, ground race, lapped point"], hot: true}
+      - {k: "针杆", name: ["针杆与针杆套", "Needle bar and bush"], use: ["淬硬、精磨，配合间隙小", "Hardened, ground, close fit"]}
+      - {k: "送布牙", name: ["反复摩擦布料", "Rubs the fabric"], use: ["淬硬后磨齿", "Hardened, teeth ground"]}
+      - {k: "轴", name: ["上下轴、曲柄、连杆", "Shafts, cranks, links"], use: ["中碳钢调质，轴颈淬硬后磨", "Quenched-tempered, journals ground"]}
+      - {k: "机壳", name: ["整台机器的骨架", "The machine's frame"], use: ["灰铸铁、时效，轴孔一次装夹镗", "Grey iron, aged, bores in one setup"], hot: true}
+      - {k: "涂层", name: ["类金刚石碳 DLC", "Diamond-like carbon"], use: ["企业资料：硬度 +86%、发热 −33%", "Maker data: +86% hardness, −33% heat"]}
+    notes:
+      - "零件按工作条件分几类。高速滑动、要耐磨的，比如旋梭：梭尖在离机针不到 0.1 毫米的地方以十几米每秒掠过，所以要淬火，再精磨梭道、研磨梭尖。受交变载荷的轴、曲柄、连杆，用中碳钢调质，轴颈淬硬后磨削。机壳用灰铸铁，吸振好、刚度高，铸后时效消除内应力，关键轴孔一次装夹镗出。新出现的类金刚石碳涂层旋梭，据企业资料硬度提高 86%、发热减少 33%。"
+      - "Parts fall into groups by duty. Fast-sliding, wear-critical parts like the rotary hook, whose point sweeps past the needle at over ten metres a second less than 0.1 millimetre away, are hardened, with the race finely ground and the point lapped. Shafts, cranks and links under alternating load are quenched and tempered medium-carbon steel, with hardened, ground journals. The housing is grey cast iron, which damps vibration and is stiff; it is aged to relieve stress, and the key bores are machined in one setup. Newer diamond-like-carbon hooks are, by the maker's data, 86 percent harder and run 33 percent cooler."
+
+  - layout: section
+    num: "01"
+    title: ["尺寸链：几十微米的间隙从哪里来", "Tolerance chains: where a gap of microns comes from"]
+
+  - layout: split
+    title: ["梭尖间隙：八个环首尾相接", "Hook-point gap: eight links end to end"]
+    points:
+      - ["要求 0.04–0.10 mm", "Required: 0.04–0.10 mm"]
+      - ["针杆一侧四环，旋梭一侧三环", "Four links on the needle side, three on the hook side"]
+      - ["每一环的误差都传到间隙上", "Every link's error reaches the gap"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g font-size="25" fill="#08101d" font-weight="700" text-anchor="middle">
+            <rect x="20" y="60" width="200" height="70" rx="14" fill="#4c8dff"/><text x="120" y="104">针杆套孔位</text>
+            <rect x="240" y="60" width="200" height="70" rx="14" fill="#7aa5f0"/><text x="340" y="104">针杆游隙</text>
+            <rect x="460" y="60" width="200" height="70" rx="14" fill="#4c8dff"/><text x="560" y="104">针夹孔偏移</text>
+            <rect x="680" y="60" width="200" height="70" rx="14" fill="#ff7a45"/><text x="780" y="104">机针凹口面</text>
+            <rect x="680" y="160" width="200" height="70" rx="14" fill="#ff7a45"/><text x="780" y="204">装针偏转</text>
+            <rect x="20" y="460" width="200" height="70" rx="14" fill="#2ec4b6"/><text x="120" y="504">旋梭轴孔位</text>
+            <rect x="240" y="460" width="200" height="70" rx="14" fill="#2ec4b6"/><text x="340" y="504">梭尖到基准</text>
+            <rect x="460" y="460" width="200" height="70" rx="14" fill="#7fe3d8"/><text x="560" y="504">旋梭轴游隙</text></g>
+          <path d="M780 232 L780 330 M560 458 L560 400" stroke="#8fa3ba" stroke-width="4" stroke-dasharray="10 8"/>
+          <g transform="translate(560,320)"><rect width="320" height="90" rx="18" fill="rgba(242,183,5,.18)" stroke="#f2b705" stroke-width="4"/>
+            <text x="160" y="56" font-size="32" font-weight="800" fill="#f2b705" text-anchor="middle">间隙 0.07 mm</text></g>
+          <text x="20" y="300" font-size="26" fill="#8fbaff">针杆一侧（机壳 → 机针）</text>
+          <text x="20" y="600" font-size="26" fill="#5ee0d2">旋梭一侧（机壳 → 梭尖）</text>
+          <text x="20" y="40" font-size="24" fill="#ff9c75">橙色：换针时会变</text>
+        </svg>
+    notes:
+      - "第 5 章说，梭尖与机针凹口的间隙要保持在 0.04 到 0.1 毫米。这几十微米由一长串零件的尺寸和位置共同决定：一侧是机壳上针杆套孔的位置、针杆在针杆套里的游隙、针夹孔偏移、机针凹口面尺寸、装针时的偏转；另一侧是旋梭轴孔位置、梭尖到安装基准的距离、旋梭轴的径向游隙。八个环首尾相接，封闭在间隙这一环上，这就叫尺寸链。"
+      - "Chapter 5 said the gap between hook point and needle scarf must stay between 0.04 and 0.1 millimetre. Those tens of microns depend on a long string of part sizes and positions. On one side: the needle-bar bush bore in the housing, the needle bar's play in its bush, the needle clamp offset, the needle's scarf dimension and how it's twisted when fitted. On the other: the hook shaft bore, the hook point to its mounting datum, and the hook shaft's radial play. Eight links end to end, closing on the gap: that's a tolerance chain."
+
+  - layout: bignum
+    title: ["极值法太悲观，统计法看真实分布", "Worst case is too gloomy; statistics shows the real spread"]
+    nums:
+      - {n: "±{{ch23.wc:.3f}}", n_en: "mm", label: ["极值法：各环公差之和", "Worst case: sum of tolerances"]}
+      - {n: "{{ch23.sg:.4f}}", n_en: "mm σ", label: ["统计法 σg = √Σσi²", "Statistical σg = √Σσi²"]}
+      - {n: "{{ch23.y_int:.0f}}%", label: ["4000 台模拟：只有这么多合格", "4000-unit simulation: only this many pass"]}
+    foot: ["允许 ±0.03 mm：每 1000 台约 {{ch23.bad1000:.0f}} 台撞针或易跳针", "Allowed ±0.03 mm: about {{ch23.bad1000:.0f}} in 1000 hit the needle or skip stitches"]
+    notes:
+      - "算例给八个环各定一个公差，名义间隙 0.07。最保守的是极值法：假设每一环都偏到最不利的一端，范围就是公差之和，正负 {{ch23.wc:.3f}}，远超允许的正负 0.03。可各环同时偏到极限的机会微乎其微。统计法把每一环看成正态随机量，公差取正负 3σ，间隙的 σ 是各环 σ 平方和开方，约 {{ch23.sg:.4f}} 毫米。蒙特卡罗模拟 4000 台，约 {{ch23.y_int:.0f}}% 合格，每 1000 台约 {{ch23.bad1000:.0f}} 台要么撞针、要么容易跳针。"
+      - "The example gives each of the eight links a tolerance, around a nominal gap of 0.07. The most cautious method is worst case: every link at its worst extreme, so the range is the sum of tolerances, plus or minus {{ch23.wc:.3f}}, far beyond the allowed 0.03. But all links at their limits at once almost never happens. The statistical method treats each link as a normal variable with tolerance at three sigma; the gap's sigma is the root sum of squares, about {{ch23.sg:.4f}} millimetre. A Monte Carlo run of 4000 machines gives about {{ch23.y_int:.0f}} percent good; about {{ch23.bad1000:.0f}} in every thousand either hit the needle or tend to skip."
+
+  - layout: bignum
+    title: ["靠零件精度提到 99%：代价有多大", "Reaching 99% by part accuracy: the price"]
+    nums:
+      - {n: "{{ch23.s99:.4f}}", n_en: "mm σ", label: ["99% 合格要求的 σg", "σg needed for 99%"]}
+      - {n: "×{{ch23.k99:.1f}}", label: ["各环公差均匀收紧到", "Every tolerance tightened to"]}
+      - {n: "+{{ch23.cost99:.0f}}%", label: ["加工成本（公差减半、成本加倍）", "Machining cost (half tolerance, double cost)"]}
+    foot: ["按加工难易分配公差能便宜一些，但每一环仍要做得很准", "Allocating by difficulty saves a little, but every link must still be precise"]
+    notes:
+      - "如果坚持零件完全互换、装上就用，要把合格率提到 99%，间隙的 σ 就不能超过 0.03 除以 2.576，约 {{ch23.s99:.4f}} 毫米。各环均匀收紧，每一环都要收到原来的约 {{ch23.k99:.1f}} 倍。按“公差减半、成本加倍”的粗略经验，加工成本要增加约 {{ch23.cost99:.0f}}%。按各环加工难易分配公差可以便宜些，但还是比原来贵，而且每一环都得做得很准。"
+      - "If we insist on full interchangeability, parts fitted straight from the bin, then 99 percent good needs a gap sigma of at most 0.03 over 2.576, about {{ch23.s99:.4f}} millimetre. Tightening every link evenly means about {{ch23.k99:.1f}} of the original tolerance. By the rough rule that halving a tolerance doubles its cost, machining gets about {{ch23.cost99:.0f}} percent dearer. Allocating by how hard each link is to make saves some, but it's still dearer, and every link must be made precisely."
+
+  - layout: figure
+    title: ["装配时调整：一个可调环吸收整条链", "Adjust at assembly: one link absorbs the chain"]
+    visual: {video: hist}
+    h: 560
+    caption: ["互换 {{ch23.y_int:.0f}}% → 调整后几乎全部合格 → 换针 {{ch23.y_swap:.0f}}%", "Interchangeable → adjusted → new needle"]
+    notes:
+      - "工业平缝机的实际做法是装配时调整：旋梭可以沿轴向移动，装配工对着装上的那根针，用塞尺把间隙调到 0.07 再拧紧。看右边 4000 台的分布，三种情况轮流显示：完全互换时两边红色一大片；一调整，孔位、针夹孔、梭尖尺寸、机针这些环统统被吸收，σ 降到约 {{ch23.sa:.4f}}，几乎全部合格；可一换针，机针两环又回来，合格率降到约 {{ch23.y_swap:.0f}}%。"
+      - "What industrial lockstitch machines actually do is adjust at assembly. The hook can slide along its shaft; the fitter sets the gap to 0.07 against the needle actually fitted, with a feeler gauge, and tightens up. On the right, the distribution of 4000 machines cycles through three cases. Fully interchangeable: big red tails. Adjusted: the bore positions, clamp offset, hook dimension and needle links are all absorbed, sigma drops to about {{ch23.sa:.4f}}, and almost all pass. But change the needle and its two links come back: about {{ch23.y_swap:.0f}} percent."
+
+  - layout: figure
+    title: ["被吸收的环，可以放宽到 ±0.05", "Absorbed links can be loosened to ±0.05"]
+    visual: {video: contrib}
+    h: 560
+    caption: ["两个孔位各约 27%；调整后被吸收的四环变灰", "Absorbed links turn grey after adjustment"]
+    notes:
+      - "右边是各环对间隙波动的贡献，按方差算。完全互换时，针杆套孔位和旋梭轴孔位各占约 27%，是大头。一旦装配调整，这四个能被吸收的环变成灰色，不再影响间隙。更妙的是，被吸收的环可以放宽，比如放到正负 0.05 毫米，就算某一环批量偏移了，也照样被吸收；加工加调整的总成本反而更低。这就是调整法，它让大部分零件可以用经济精度加工。"
+      - "On the right is each link's contribution to gap variation, by variance. Fully interchangeable, the needle-bar bush bore and the hook shaft bore each account for about 27 percent: the big ones. Once we adjust at assembly, the four absorbable links turn grey; they no longer affect the gap. Better still, absorbed links can be loosened, say to plus or minus 0.05 millimetre; even a batch shift in one of them is absorbed, and machining plus adjustment costs less in total. That's the adjustment method: most parts can be made to economical accuracy."
+
+  - layout: points
+    title: ["换针以后：哪些环会反复回来", "After a needle change: which links come back"]
+    points:
+      - ["调整只对装上的那根针有效，机针是消耗品", "Adjustment holds for that needle only; needles are consumables"]
+      - ["新针的凹口面和装针偏转不同：两环回来", "A new needle's scarf and twist differ: two links return"]
+      - ["对策：机针厂公差更严；换针号后重调间隙", "Remedy: tighter needle tolerances; reset the gap after a size change"]
+    foot: ["能靠调整一次解决的环，和使用中反复出现的环：后者才是真正要控制精度的地方", "Links fixed once by adjustment, links that keep coming back in use: the latter are where accuracy really matters"]
+    notes:
+      - "调整有个前提：它只对当时装上的那根针有效。车间里机针断了、钝了就换，新针的凹口面尺寸和装针偏转都和原来不一样，这两环又回来了。要让换针后仍然合格，一是对机针精度提更严的要求，这要落到机针厂的公差上，下一讲会讲；二是换针号以后重新调间隙。尺寸链分析的真正价值在这里：分清哪些环能靠调整一次解决，哪些会在使用中反复出现。"
+      - "Adjustment has a catch: it only holds for the needle fitted at the time. On the floor, needles are changed when they break or blunt, and a new needle's scarf dimension and twist differ, so those two links return. To stay good after a change, either demand tighter needle accuracy, which lands on the needle maker's tolerances, next lecture's topic, or reset the gap after changing needle size. That's the real value of chain analysis: it separates links fixed once by adjustment from links that keep coming back in use."
+
+  - layout: lab
+    title: ["动手试一试：尺寸链与共振", "Try it: tolerance chains and resonance"]
+    shot: {page: tol}
+    tasks:
+      - ["不调整：33 元以内做到 99% 合格", "No adjustment: 99% good within 33 yuan"]
+      - ["装配调整、再换针：各自怎样分配公差", "Adjusted, then a new needle: how to set tolerances"]
+      - ["提速到 5500，让振动和噪声都达标", "At 5500 r/min, bring vibration and noise into spec"]
+    notes:
+      - "这个实验在问渠平台上可以自己做。第一页是梭尖间隙的尺寸链：先不调整、不换针，把合格率做到 99%、每台成本不超过 33 元，你会发现很紧；再打开装配调整，想想被吸收的环还要不要那么准；再换一根新针，看哪几环又回来了。第二页是提速与共振：把最高转速提到 5500，比较加筋、加阻尼、减轻往复质量三种办法，让振动和噪声都达标。"
+      - "You can do this lab yourself on WenQuest. Page one is the hook-gap chain. First, no adjustment and no needle change: reach 99 percent good at no more than 33 yuan per machine; you'll find it tight. Then switch on assembly adjustment and ask whether the absorbed links still need to be so precise. Then change the needle and see which links come back. Page two is speed and resonance: raise the top speed to 5500 and compare stiffening, damping and lighter reciprocating mass to bring vibration and noise into spec."
+
+  - layout: section
+    num: "02"
+    title: ["装配、检测与试验", "Assembly, inspection and testing"]
+
+  - layout: points
+    title: ["装配、调试、出厂检验与跑合", "Assembly, setting, final inspection, running-in"]
+    points:
+      - ["从里到外、从下到上；每步规定拧紧力矩", "Inside out, bottom up; set torque at every step"]
+      - ["针杆高度、钩线定时、梭尖间隙要按顺序联调", "Needle height, hook timing and gap set in order"]
+      - ["出厂：空运转、试缝；新机降速跑合", "Final: idle run and test sewing; run in new machines slowly"]
+    foot: ["出厂检验规则见 QB/T 4293-2012 等行业标准", "Inspection rules: QB/T 4293-2012 and other industry standards"]
+    notes:
+      - "装配大致从里到外、从下到上：先装上下轴、轴承和同步带，再装旋梭和送布，然后针杆、挑线和压脚，最后面板和电控，每一步都有规定的拧紧力矩和检查项目。装好后逐项调试，记住针杆高度、钩线时刻和间隙要按顺序联调，动了一个，另一个往往也要动。出厂前每台都要空运转查温升、异响、漏油，试缝查线迹和针距。新机运动副表面有微小凸起，头一段时间降速跑合。"
+      - "Assembly goes roughly inside out and bottom up: the upper and lower shafts, bearings and timing belt; then the hook and feed; then the needle bar, take-up and presser foot; finally the covers and control box, each step with a set tightening torque and checks. Then the settings, and remember that needle-bar height, hook timing and gap are set in order; touch one and another usually moves. Before shipping every machine runs idle, checked for heat, noise and oil leaks, and sews a test seam. New sliding surfaces have tiny peaks from machining, so new machines are run in at reduced speed."
+
+  - layout: figure
+    title: ["振动看频谱：一阶 = 主轴频率，二阶 = 两倍", "Read the spectrum: first order = shaft frequency, second = twice"]
+    visual: {video: spec}
+    h: 520
+    caption: ["转速来回扫：蓝为一阶，橙为二阶，灰为放大倍数", "Speed sweep: blue 1st order, orange 2nd"]
+    notes:
+      - "造好的机器要做振动试验：按 QB/T 1178-2006，在机头规定位置装加速度传感器，在规定转速下测。比总值更有用的是频谱：看主轴频率的一阶、两倍的二阶各有多大。右边转速在 3000 到 6500 之间来回扫：蓝色是一阶，橙色是二阶，灰线是机臂的放大倍数曲线。针杆惯性力有一阶和二阶两部分，平衡块只平衡一阶的一部分，所以二阶走到机臂固有频率附近时，振动猛涨。"
+      - "Finished machines get vibration tests: by QB/T 1178-2006, an accelerometer at set points on the head, at set speeds. More useful than the overall value is the spectrum: how big the first order at shaft frequency and the second order at twice that are. On the right, the speed sweeps back and forth from 3000 to 6500. Blue is the first order, orange the second, and the grey line is the arm's amplification curve. The needle bar's inertia force has first- and second-order parts, and balance weights cancel only part of the first, so when the second order nears the arm's natural frequency, vibration soars."
+
+  - layout: points
+    title: ["噪声、模态与寿命", "Noise, modes and life"]
+    points:
+      - ["噪声：5000 sti/min 时工位 83.5 dB(A)（ISO 10821）", "Noise: 83.5 dB(A) at the workstation at 5000 sti/min (ISO 10821)"]
+      - ["模态：力锤或有限元，激振频率要避开固有频率", "Modes: hammer test or FEA; keep excitation off natural frequencies"]
+      - ["寿命：韦布尔分布，B10 = 10% 失效的运转时间", "Life: Weibull; B10 = running time to 10% failures"]
+    foot: ["声压级是工人听到的；声功率级与位置和房间无关，用来比较机器", "Sound pressure is what the operator hears; sound power is independent of place and room, for comparing machines"]
+    notes:
+      - "噪声按 ISO 10821 和 11204 测：某企业标准平缝机 5000 针每分钟时工位声压级 83.5 分贝，声功率级 88.0 分贝，前者是工人听到的，后者用来比较不同机器。机壳、机臂、台板都有自己的固有频率，用力锤敲击或有限元算出来，工作转速内的一阶、二阶激振频率要避开它们。寿命数据用韦布尔分布分析：磨损类失效的形状参数大于 1；B10 是 10% 的机器失效对应的运转时间。"
+      - "Noise is measured to ISO 10821 and 11204: one maker's standard lockstitch machine at 5000 stitches a minute gives 83.5 dB(A) sound pressure at the workstation and 88.0 dB sound power. The first is what the operator hears; the second compares machines. Housing, arm and table each have natural frequencies, found by hammer test or finite elements, and the first- and second-order excitation across the working speeds must avoid them. Life data are analysed with the Weibull distribution: wear failures have a shape parameter above 1, and B10 is the running time by which 10 percent have failed."
+
+  - layout: section
+    num: "03"
+    title: ["案例：提速以后为什么“叫”", "Case: why it screams after the speed-up"]
+
+  - layout: figure
+    title: ["转速扫描：惯性力 +{{ch23.Fup:.0f}}%，振动 ×{{ch23.vratio:.1f}}", "Speed sweep: force +{{ch23.Fup:.0f}}%, vibration ×{{ch23.vratio:.1f}}"]
+    visual: {video: sweep}
+    h: 560
+    caption: ["5000 以上急升，约 {{ch23.npeak:.0f}} r/min 到峰值；红线 8 mm/s", "Steep above 5000, peak near {{ch23.npeak:.0f}}"]
+    notes:
+      - "回到导入问题。看右边的转速扫描，红点是当前转速，来回走一遍：振动在 5000 转以下几乎平的，5000 以上急升，约 {{ch23.npeak:.0f}} 转达到峰值，过了峰又降下来。频谱里长的是二阶分量。转速提高 10%，惯性力只增加约 {{ch23.Fup:.0f}}%，从 368 牛到约 {{ch23.F445:.0f}} 牛，振动却变成 {{ch23.vratio:.1f}} 倍。多出来的，不是力，而是放大倍数。"
+      - "Back to our problem. On the right, the speed sweep, with the red dot moving back and forth. Vibration is almost flat below 5000, rises steeply above it, peaks near {{ch23.npeak:.0f}} r/min, and falls again beyond the peak. The growth is in the second order. A 10 percent speed rise adds only about {{ch23.Fup:.0f}} percent to the inertia force, 368 to about {{ch23.F445:.0f}} newtons, yet vibration becomes {{ch23.vratio:.1f}} times larger. What grew isn't the force; it's the amplification."
+
+  - layout: split
+    title: ["放大倍数：频率比接近 1 就是共振", "Amplification: frequency ratio near 1 is resonance"]
+    points:
+      - ["5000 r/min：r = {{ch23.r5000:.2f}}，放大 {{ch23.a5000:.1f}} 倍", "5000 r/min: r = {{ch23.r5000:.2f}}, ×{{ch23.a5000:.1f}}"]
+      - ["5500 r/min：r = {{ch23.r5500:.2f}}，放大 {{ch23.a5500:.0f}} 倍", "5500 r/min: r = {{ch23.r5500:.2f}}, ×{{ch23.a5500:.0f}}"]
+      - ["转速 +10%，放大倍数多一倍半", "Speed +10%, amplification 2.5×"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M80 560 L870 560 M80 560 L80 60" stroke="#4b5f7d" stroke-width="3"/>
+          <path d="M630 560 L630 70" stroke="#4b5f7d" stroke-width="2" stroke-dasharray="8 8"/>
+          <polyline fill="none" stroke="#f3f6fa" stroke-width="5" points="80,523 102,522 124,521 146,519 168,518 190,516 212,515 234,513 256,511 278,508 300,505 322,502 344,498 366,494 388,489 410,483 432,475 454,466 476,455 498,439 520,418 536,397 553,368 570,329 586,272 597,222 608,165 619,113 630,93 641,121 652,178 663,237 674,287 685,327 696,359 713,394 734,426 756,449 778,465 800,478 822,488 850,497"/>
+          <circle cx="461" cy="463" r="14" fill="#2ec4b6"/><circle cx="495" cy="442" r="14" fill="#f2b705"/><circle cx="592" cy="249" r="16" fill="#ff7a45"/>
+          <text x="440" y="510" font-size="26" font-weight="700" fill="#5ee0d2" text-anchor="end">加筋后 {{ch23.rfix:.2f}}</text>
+          <text x="470" y="410" font-size="26" font-weight="700" fill="#f2b705" text-anchor="end">5000：×{{ch23.a5000:.1f}}</text>
+          <text x="570" y="240" font-size="28" font-weight="800" fill="#ff9c75" text-anchor="end">5500：×{{ch23.a5500:.0f}}</text>
+          <text x="640" y="100" font-size="24" fill="#8fa3ba">r = 1</text>
+          <text x="470" y="610" font-size="26" fill="#8fa3ba" text-anchor="middle">频率比 r = f / f_n</text>
+          <text x="90" y="50" font-size="26" fill="#8fa3ba">放大倍数（ζ = 0.03）</text>
+        </svg>
+    notes:
+      - "把机臂看成单自由度系统：响应等于静变形乘放大倍数，放大倍数是 1 除以根号下 (1 减 r 方) 方加 (2ζr) 方，r 是激振频率与固有频率之比。5000 转时二阶 {{ch23.f5000:.0f}} 赫兹，r 是 {{ch23.r5000:.2f}}，放大 {{ch23.a5000:.1f}} 倍；5500 转时 {{ch23.f5500:.0f}} 赫兹，r 是 {{ch23.r5500:.2f}}，放大约 {{ch23.a5500:.0f}} 倍。转速只多 10%，放大倍数多了一倍半，这就是共振。"
+      - "Treat the arm as a single-degree-of-freedom system: response equals static deflection times amplification, which is 1 over the square root of (1 minus r squared) squared plus (2 zeta r) squared, where r is excitation over natural frequency. At 5000 r/min the second order is {{ch23.f5000:.0f}} hertz, r is {{ch23.r5000:.2f}}, amplification {{ch23.a5000:.1f}}. At 5500 it's {{ch23.f5500:.0f}} hertz, r is {{ch23.r5500:.2f}}, amplification about {{ch23.a5500:.0f}}. Ten percent more speed, two and a half times the amplification: that's resonance."
+
+  - layout: bignum
+    title: ["三类改进，效果差得很远（5500 r/min）", "Three fixes, very different results (5500 r/min)"]
+    nums:
+      - {n: "{{ch23.vfix:.1f}}", n_en: "mm/s", label: ["加筋：刚度 +30%，f_n ≈ {{ch23.fn2:.0f}} Hz", "Ribs: stiffness +30%, f_n ≈ {{ch23.fn2:.0f}} Hz"]}
+      - {n: "{{ch23.vz10:.1f}}", n_en: "mm/s", label: ["加阻尼：ζ 0.03 → 0.10", "Damping: ζ 0.03 → 0.10"]}
+      - {n: "{{ch23.vm06:.1f}}", n_en: "mm/s", label: ["往复质量减 40%", "Reciprocating mass −40%"]}
+    foot: ["原设计 {{ch23.v5500:.1f}} mm/s；把固有频率移出工作范围最有效，阻尼和减重作辅助", "Original {{ch23.v5500:.1f}} mm/s; moving the natural frequency out of range works best, damping and mass help"]
+    notes:
+      - "办法有三类。第一是改结构：机臂内部加筋、加厚壁，模态刚度提高 30%，固有频率升到约 {{ch23.fn2:.0f}} 赫兹，5500 转时振动降到约 {{ch23.vfix:.1f}}。第二是加阻尼：阻尼比到 0.06 只降到 {{ch23.vz06:.1f}}，到 0.10 才 {{ch23.vz10:.1f}}。第三是从源头减激振：往复质量减 20% 只降到 {{ch23.vm08:.1f}}，减 40% 才 {{ch23.vm06:.1f}}。结论是把固有频率移出工作范围最有效，其余两类作辅助。"
+      - "There are three kinds of fix. One, change the structure: ribs and thicker walls inside the arm raise modal stiffness 30 percent and the natural frequency to about {{ch23.fn2:.0f}} hertz; at 5500, vibration drops to about {{ch23.vfix:.1f}}. Two, add damping: a damping ratio of 0.06 only gets to {{ch23.vz06:.1f}}, and 0.10 to {{ch23.vz10:.1f}}. Three, cut the excitation at its source: 20 percent less reciprocating mass gives {{ch23.vm08:.1f}}, 40 percent less {{ch23.vm06:.1f}}. Conclusion: moving the natural frequency out of the working range works best; the other two help."
+
+  - layout: figure
+    title: ["加筋前后：共振峰移出工作范围", "Before and after ribs: the peak moves out of range"]
+    visual: {video: fix}
+    h: 560
+    caption: ["机臂固有频率 190 ↔ 217 Hz（加筋前后）交替", "Arm natural frequency 190 ↔ 217 Hz"]
+    notes:
+      - "看实验里加筋前后的转速扫描交替显示。固有频率 190 赫兹时，共振峰落在 5700 转附近，5500 转的工作点已经爬到峰的半山腰；加筋到约 217 赫兹，峰移到约 {{ch23.nres100:.0f}} 转，整个工作范围都在红线以下，噪声约 {{ch23.dBfix:.0f}} 分贝，和原来 5000 转时相当。代价是改铸件模具、重量略增。改完还要重做扫描、噪声和寿命试验。"
+      - "Here the lab alternates the speed sweep before and after the ribs. At 190 hertz the resonance peak sits near 5700 r/min, and the 5500 operating point is already halfway up its slope. With ribs, at about 217 hertz, the peak moves to about {{ch23.nres100:.0f}} r/min and the whole working range stays under the red line; noise is about {{ch23.dBfix:.0f}} dB(A), like the old machine at 5000. The price is a modified casting pattern and a little more weight. After the change, the sweep, noise and life tests are all repeated."
+
+  - layout: points
+    title: ["标准与知识产权：立项时就是设计输入", "Standards and IP: design inputs from day one"]
+    points:
+      - ["安全 ISO 10821；电气安全与 EMC：IEC 60204-31", "Safety ISO 10821; electrical safety and EMC: IEC 60204-31"]
+      - ["产品、试验方法、检验规则：不要做完再“送检”", "Product, test-method and inspection standards: don't test at the end"]
+      - ["专利：按销售地区检索、规避设计、及时申请", "Patents: search by market, design around, file early"]
+    notes:
+      - "一台缝纫机要满足的标准大致分几类：安全标准，比如 ISO 10821，电气安全和电磁兼容的 IEC 60204-31；产品标准规定性能参数；试验方法标准规定振动、噪声、连续缝纫怎样测；检验规则规定出厂和型式检验。关键是一开始就把它们列成设计输入，而不是做完再去送检。专利也是三件事：方案定之前按销售地区检索，包括已公开未授权的申请；被保护的结构要规避设计；自己的创新及时申请。"
+      - "The standards a sewing machine must meet fall into a few groups: safety, such as ISO 10821, and electrical safety and EMC, IEC 60204-31; product standards for performance; test-method standards for how vibration, noise and continuous sewing are measured; and inspection rules for factory and type testing. The key is listing them as design inputs from the start, not sending the machine for testing at the end. Patents are three things too: search by sales region before fixing the concept, including published applications; design around protected structures; and file your own innovations promptly."
+
+  - layout: split
+    title: ["机器人联系：标定就是“调整法”", "Robot link: calibration is the adjustment method"]
+    points:
+      - ["TCP 误差也是一条尺寸链", "TCP error is a tolerance chain too"]
+      - ["激光跟踪仪标定，一次吸收误差", "Laser-tracker calibration absorbs it once"]
+      - ["换工具要重新标 TCP，像换针", "New tool, new TCP calibration, like a new needle"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="80" y="540" width="260" height="40" rx="10" fill="#22324d"/>
+          <path d="M210 540 L210 390 L420 250 L620 330" stroke="#c8d2de" stroke-width="28" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="210" cy="390" r="26" fill="#4c8dff"/><circle cx="420" cy="250" r="26" fill="#4c8dff"/>
+          <rect x="610" y="310" width="80" height="40" rx="8" fill="#ff7a45"/>
+          <circle cx="720" cy="330" r="12" fill="#f2b705"/>
+          <text x="740" y="320" font-size="28" font-weight="800" fill="#f2b705">TCP</text>
+          <g font-size="24" fill="#8fbaff"><text x="230" y="480">连杆长度</text><text x="270" y="250">关节零位</text><text x="470" y="210">减速器间隙</text></g>
+          <text x="600" y="400" font-size="24" fill="#ff9c75">工具长度：换工具就变</text>
+          <path d="M860 80 L740 300" stroke="#2ec4b6" stroke-width="4" stroke-dasharray="12 8"/>
+          <text x="860" y="60" font-size="26" fill="#5ee0d2" text-anchor="end">激光跟踪仪</text>
+        </svg>
+    notes:
+      - "机械臂末端 TCP 的定位误差也是一条尺寸链：各连杆长度、关节零位、减速器间隙、工具长度首尾相接。靠把每个零件都做准来保证零点一毫米级精度很贵，工业上的做法和梭尖间隙一样是调整：装好后用激光跟踪仪做运动学标定，把误差写进控制器参数，一次吸收。可标定只对当时装的那把工具有效，就像调好的间隙只对那根针有效，所以机器人每次换工具都要重新标定 TCP。"
+      - "A robot's tool-centre-point error is a tolerance chain too: link lengths, joint zeros, gearbox backlash and tool length, end to end. Making every part precise enough for a tenth of a millimetre is expensive, so industry does what we did with the hook gap: adjust. After assembly a laser tracker calibrates the kinematics and the errors go into the controller's parameters, absorbed once. But the calibration holds only for the tool fitted then, just as the gap holds only for that needle, so every tool change needs a new TCP calibration."
+
+  - layout: split
+    title: ["生活中的例子：洗衣机甩干时一阵猛抖", "Everyday example: the washer's shudder at spin-up"]
+    points:
+      - ["加速到某个转速，突然猛抖", "At one speed during spin-up, a sudden shudder"]
+      - ["再升上去，反而平稳了", "Speed up further and it calms down"]
+      - ["那一刻激振频率正好经过固有频率", "Excitation passes the natural frequency"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="250" y="80" width="400" height="460" rx="30" fill="#1a2a44" stroke="#c8d2de" stroke-width="6"/>
+          <circle cx="450" cy="330" r="140" fill="#0d1626" stroke="#8fa3ba" stroke-width="10"/>
+          <circle cx="450" cy="330" r="95" fill="none" stroke="#4c8dff" stroke-width="8" stroke-dasharray="20 14"/>
+          <rect x="280" y="110" width="140" height="30" rx="10" fill="#22324d"/>
+          <g stroke="#ff7a45" stroke-width="6" stroke-linecap="round" fill="none">
+            <path d="M220 200 Q200 230 220 260"/><path d="M190 180 Q160 230 190 280"/>
+            <path d="M680 200 Q700 230 680 260"/><path d="M710 180 Q740 230 710 280"/></g>
+          <text x="450" y="600" font-size="30" font-weight="700" fill="#ff9c75" text-anchor="middle">过了这个转速，反而平稳</text>
+        </svg>
+    notes:
+      - "生活里最常见的共振是洗衣机。甩干加速时，常在某个转速突然剧烈抖动，转速再升上去反而平稳了。那一刻，转筒的激振频率正好经过机体的固有频率，就是共振。今天机臂的问题一模一样，只是工作点恰好停在了峰的半山腰上。"
+      - "The most familiar resonance is the washing machine. As it spins up, at one particular speed it suddenly shudders, and once it's faster it runs smoothly again. At that moment the drum's excitation frequency is passing the machine's natural frequency: resonance. Our sewing-machine arm is exactly the same, except that its operating point happened to sit halfway up the peak."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["是共振：加筋，把固有频率移出去", "It's resonance: add ribs, move the natural frequency"]
+    rows:
+      - ["5000 r/min：{{ch23.f5000:.0f}} Hz，放大 {{ch23.a5000:.1f}} 倍", "{{ch23.v5000:.1f}} mm/s"]
+      - ["5500 r/min：{{ch23.f5500:.0f}} Hz，放大 {{ch23.a5500:.0f}} 倍", "{{ch23.v5500:.1f}} mm/s"]
+      - ["加筋后（{{ch23.fn2:.0f}} Hz）5500 r/min", "{{ch23.vfix:.1f}} mm/s"]
+    side: {big: "{{ch23.dBfix:.0f}}", text: ["加筋后 5500 r/min 噪声 dB(A)，与原 5000 r/min 相当", "dB(A) at 5500 after ribs, like the old 5000"]}
+    foot: ["代价：改铸件模具、重量略增，共振转速移到约 {{ch23.nres100:.0f}} r/min；改后重做扫描、噪声和寿命试验", "Price: new casting pattern, a little more weight, resonance moves to about {{ch23.nres100:.0f}} r/min; repeat sweep, noise and life tests"]
+    notes:
+      - "回到开头。5000 转时二阶激振 {{ch23.f5000:.0f}} 赫兹，频率比 {{ch23.r5000:.2f}}，放大约 {{ch23.a5000:.1f}} 倍，振动约 {{ch23.v5000:.1f}}；5500 转时 {{ch23.f5500:.0f}} 赫兹，频率比 {{ch23.r5500:.2f}}，放大约 {{ch23.a5500:.0f}} 倍，振动约 {{ch23.v5500:.1f}}，噪声约 {{ch23.dB5500:.0f}} 分贝。惯性力只增加约 {{ch23.Fup:.0f}}%，是二阶激振频率逼近了机臂固有频率，这是共振。加筋使刚度提高 30%，固有频率升到约 {{ch23.fn2:.0f}} 赫兹，振动约 {{ch23.vfix:.1f}}，噪声约 {{ch23.dBfix:.0f}} 分贝。"
+      - "Back to the start. At 5000 r/min the second-order excitation is {{ch23.f5000:.0f}} hertz, frequency ratio {{ch23.r5000:.2f}}, amplification about {{ch23.a5000:.1f}}, vibration about {{ch23.v5000:.1f}}. At 5500 it's {{ch23.f5500:.0f}} hertz, ratio {{ch23.r5500:.2f}}, amplification about {{ch23.a5500:.0f}}, vibration about {{ch23.v5500:.1f}}, and noise about {{ch23.dB5500:.0f}} dB(A). The inertia force grew only about {{ch23.Fup:.0f}} percent; the second-order excitation crept up to the arm's natural frequency. That's resonance. Ribs that raise stiffness 30 percent lift the natural frequency to about {{ch23.fn2:.0f}} hertz: vibration about {{ch23.vfix:.1f}}, noise about {{ch23.dBfix:.0f}} dB(A)."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["问题发现得越晚越贵；标准、专利是设计输入", "Late problems cost most; standards and patents are inputs"]
+      - ["尺寸链用统计法；调整法吸收大部分误差", "Chains by statistics; adjustment absorbs most error"]
+      - ["激振频率近固有频率就共振：先改结构", "Excitation near natural frequency resonates: fix the structure"]
+    after: ["作业 23：间隙尺寸链与提速共振分析 · 测验 · 实验 23-1 报告 —— 在问渠学习平台完成", "Assignment 23 · quiz · Lab 23-1 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，从设计输入到量产，问题发现得越晚越贵，标准和专利立项时就要列为设计输入。第二，尺寸链用统计法看真实分布；装配调整用一个可调环吸收大部分误差，但换针会让机针两环回来。第三，激振频率接近固有频率时振动急剧放大，治共振首选改结构，把固有频率移出工作范围。作业、测验和实验报告都在问渠平台上完成。下一讲看机针和旋梭怎样制造。"
+      - "Three things to remember. One: from design inputs to production, the later a problem is found the more it costs, and standards and patents are design inputs from day one. Two: analyse tolerance chains statistically; adjustment at assembly absorbs most of the error with one adjustable link, but a needle change brings two links back. Three: when excitation nears a natural frequency vibration soars; fix resonance first by changing the structure to move the natural frequency out of range. The assignment, quiz and lab report are on WenQuest. Next time: how needles and rotary hooks are made."

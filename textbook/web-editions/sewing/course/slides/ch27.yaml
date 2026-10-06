@@ -1,0 +1,473 @@
+# 第 27 讲 数字工厂：缝纫机工厂的整体信息化解决方案 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch27.键:格式}} 由课程包程序 course/calc/ch27.py 算出（调用教材模型 figsrc/ch27_model.py），不手写数字。
+lesson: 27
+code: [ch27]
+
+clips:
+  hero:          # 封面：实验 27-1 第①页，测量值和控制图逐台播放（深色显示），放完重放
+    page: factory
+    selector: "#pageA .col"
+    cover: true
+    vh: 1300
+    loop: 21
+    steps:
+      - {at: 0, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)';document.getElementById('log').parentElement.style.display='none';document.getElementById('replay').click()"}
+  bus:           # 总线上的消息：播放时逐条滚动，放完重放
+    page: factory
+    selector: "#log"
+    vh: 1250
+    loop: 21
+    steps:
+      - {at: 0, press: "#replay"}
+  meas:          # 逐台测量值：16 h 播放约 16 s，放完重放（每 21 s 重来一遍）
+    page: factory
+    selector: "#cv1"
+    loop: 21
+    steps:
+      - {at: 0, press: "#replay"}
+  xbar:          # X̄ 图：勾上 R1–R4 再播放
+    page: factory
+    selector: "#cv2"
+    loop: 21
+    steps:
+      - {at: 0, js: "['rR2','rR3','rR4'].forEach(function(i){var c=document.getElementById(i);if(!c.checked){c.checked=true;c.dispatchEvent(new Event('change'))}});document.getElementById('replay').click()"}
+  trace:         # 序列号—批次关系图（R1–R4 那次报警）
+    page: factory
+    selector: "#graph"
+    steps:
+      - {at: 0, js: "['rR2','rR3','rR4'].forEach(function(i){var c=document.getElementById(i);if(!c.checked){c.checked=true;c.dispatchEvent(new Event('change'))}})", press: "#tabB"}
+  roi:           # 累计现金流：关键设备 OEE 在 64%、68%、72% 之间轮换
+    page: factory
+    selector: "#cv4"
+    loop: 9
+    steps:
+      - {at: 0, press: "#tabC", set: {oee1: 0.64}}
+      - {at: 3, set: {oee1: 0.68}}
+      - {at: 6, set: {oee1: 0.72}}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 27 讲", "Lecture 27"]
+    title: ["数字工厂", "The Digital Factory"]
+    sub: ["缝纫机工厂的整体信息化解决方案", "An integrated IT solution for a sewing-machine plant"]
+    notes:
+      - "同学们好。上一讲我们站在服装厂里看缝纫机联网；这一讲换个位置，站到造缝纫机的工厂里。一家整机厂从接单、设计、加工、装配、调试到售后，信息怎样带着编号一路走下来？背景里是今天的虚拟实验：调试工位逐台测出的间隙，怎样经总线变成控制图和报警。"
+      - "Hello everyone. Last time we stood in a garment factory and connected its sewing machines. Today we move to the plant that builds them. From order, design, machining and assembly to adjustment and service, how does information travel through the plant with an ID attached? In the background is today's lab: clearances measured machine by machine at the adjustment station, turned into a control chart and alarms on the bus."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["梭尖间隙在悄悄变大", "The hook clearance is creeping up"]
+    facts:
+      - ["逐台测梭尖间隙：均值 0.070 mm、σ 6 μm，公差 0.04–0.10", "Every machine measured: mean 0.070 mm, σ 6 μm, tolerance 0.04–0.10"]
+      - ["第 46 台起装新批旋梭，间隙每小时漂移 4 μm", "From machine 46 a new hook lot: clearance drifts 4 μm an hour"]
+      - ["现在只在单台超差时开 NCR；第 8 h 发运", "Today an NCR opens only when one unit fails; shipping at hour 8"]
+    notes:
+      - "先看车间问题。调试工位逐台测梭尖间隙，稳定时均值 0.070 毫米、标准差 6 微米，公差 0.04 到 0.10。从第 46 台起换装一批新旋梭，它磨梭道时砂轮修整间隔被放宽了，间隙每小时漂 4 微米。系统现在只在单台超差时开不合格报告，第 8 小时发货。X̄ 图控制限多少？按超差和按判异规则处理，结果差多少？"
+      - "Here's the problem. The adjustment station measures every hook clearance: mean 0.070 millimetres and sigma 6 microns when stable, tolerance 0.04 to 0.10. From machine 46 a new hook lot goes in, ground with a relaxed wheel-dressing interval, and the clearance drifts 4 microns an hour. Today an NCR opens only when one machine fails, and a shipment leaves at hour 8. What are the X-bar limits, and how different is acting on failures from acting on run rules?"
+
+  - layout: section
+    num: "01"
+    title: ["七个断点与总体架构", "Seven breaks and the overall architecture"]
+
+  - layout: points
+    title: ["一张订单，七个断点", "One order, seven breaks"]
+    points:
+      - ["订单：WQ-LS-TED 200 台，10 天交货", "Order: 200 WQ-LS-TED, due in 10 days"]
+      - ["选项靠抄、外协没进 MRP、固件版本没人管", "Options copied by hand, outsourcing missing, firmware unmanaged"]
+      - ["停机下班才知道，间隙没人画趋势，追溯查不下去", "Stops found at shift end, no trend chart, traces dead-end"]
+    foot: ["共同点：信息都产生过，只是没有带上编号、记在一个能关联的地方", "What they share: the information existed, but never with an ID in one place where it could be linked"]
+    notes:
+      - "这家整机厂每天装 180 台。早上来了一张订单：WQ-LS-TED 200 台，10 天交货。信息散在表格、纸质工票和测试电脑里，它至少在七处断开：少油旋梭被抄成标准旋梭，DLC 外协没进 MRP，烧哪版固件全凭记忆，瓶颈停机下班才知道，间隙变大没人画图，客户投诉时查不出用的哪批旋梭。"
+      - "This plant builds 180 machines a day. An order arrives: 200 WQ-LS-TED, due in ten days. With information scattered over spreadsheets, paper tickets and test PCs, it breaks in at least seven places: the low-oil hook copied as standard, DLC outsourcing missing from MRP, firmware left to memory, a bottleneck stop noticed at shift end, a growing clearance nobody plots, and a complaint nobody can trace to a hook lot."
+
+  - layout: split
+    title: ["五层架构，两条规矩", "Five layers, two rules"]
+    points:
+      - ["历史库原样存下每条消息：唯一事实来源", "The historian keeps every message: the single source of truth"]
+      - ["规矩一：组件之间只经总线交换数据", "Rule one: components exchange data only via the bus"]
+      - ["规矩二：写操作要人确认，AI 只起草", "Rule two: writes need a human; AI only drafts"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g font-size="28" fill="#f3f6fa">
+            <rect x="10" y="10" width="880" height="100" rx="20" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
+            <text x="40" y="70" font-size="32" font-weight="800" fill="#c4b5fd">看板与 AI</text><text x="330" y="70">简报 · 提醒 · 起草提议</text>
+            <rect x="10" y="130" width="880" height="100" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
+            <text x="40" y="190" font-size="32" font-weight="800" fill="#8fb6ff">业务系统</text><text x="330" y="190" class="en">ERP · PLM · MES · QMS · WMS</text>
+            <rect x="10" y="250" width="880" height="100" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+            <text x="40" y="310" font-size="32" font-weight="800" fill="#5ee0d2">历史库</text><text x="330" y="310">每条消息原样存下</text>
+            <rect x="10" y="370" width="880" height="100" rx="20" fill="rgba(242,183,5,.12)" stroke="#f2b705" stroke-width="4"/>
+            <text x="40" y="430" font-size="32" font-weight="800" fill="#ffd75a">统一数据总线</text><text x="330" y="430">只往上发、从上收</text>
+            <rect x="10" y="490" width="880" height="100" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
+            <text x="40" y="550" font-size="32" font-weight="800" fill="#ff9c75">设备与产线</text><text x="330" y="550">机加工 · 装配 · 调试 · 测试</text>
+          </g>
+          <text x="450" y="628" font-size="23" fill="#8fa3ba" text-anchor="middle">换掉一层，其他各层不用改</text>
+        </svg>
+    notes:
+      - "整厂信息系统分五层：设备与产线；统一数据总线，所有设备和软件只往上发、从上收；历史库，每条消息原样存下，是唯一的事实来源；ERP、PLM、MES、QMS、WMS；最上面是看板和 AI。两条规矩：组件之间只经总线，换掉一层其他不用改；写操作要人确认，AI 只起草提议。"
+      - "The plant's information system has five layers: equipment and lines; the unified data bus, which every machine and program only publishes to and subscribes from; the historian, storing every message as the single source of truth; ERP, PLM, MES, QMS and WMS; and dashboards and AI on top. Two rules: components talk only through the bus, so one layer can change without the others; and writes need a person to confirm, with AI only drafting."
+
+  - layout: figure
+    title: ["总线上的消息：只增加、不改动", "Messages on the bus: add, never change"]
+    visual: {video: bus}
+    caption: ["调试工位逐台发 quality.measurement，附 hook_lot：装的是哪批旋梭", "Each record carries hook_lot: the hook lot fitted"]
+    notes:
+      - "这是总线上滚动的消息，最新的在上面。缝纫机厂的根主题是 wq/sewing，按“只增加、不改动”新增了装配、测试、服务三个区域。调试工位每测一台就发一条 quality.measurement，data 里除了测量值和上下限，还附一个 hook_lot 字段，记下这台装的是哪批旋梭。后面的追溯全靠它。"
+      - "These are the bus messages scrolling past, newest on top. The plant's root topic is wq/sewing, and following 'add, never change' it adds assembly, test and service areas. Each measurement at the adjustment station publishes a quality.measurement; besides the value and limits, data carries a hook_lot field recording which hook lot went in. Every trace later depends on it."
+
+  - layout: section
+    num: "02"
+    title: ["产品数据与瓶颈", "Product data and the bottleneck"]
+
+  - layout: split
+    title: ["机型 × 选项：8 种变型", "Model × options: 8 variants"]
+    points:
+      - ["T、E、D 三个选项各有各无：2 × 2 × 2", "Options T, E, D, each on or off: 2 × 2 × 2"]
+      - ["WQ-LS 作物料模板，T、E、D 作属性", "WQ-LS as an item template, T, E, D as attributes"]
+      - ["选项再多：配置器按规则即时生成 BOM", "More options: a configurator builds the BOM by rule"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="300" y="10" width="300" height="90" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="4"/>
+          <text x="450" y="68" font-size="40" font-weight="800" fill="#ffd75a" text-anchor="middle" class="en">WQ-LS</text>
+          <g font-size="26" fill="#d3deea">
+            <text x="20" y="160">T 自动剪线</text><text x="320" y="160">E 电子针距</text><text x="620" y="160">D 少油旋梭</text>
+          </g>
+          <g font-size="30" font-weight="700" class="en" text-anchor="middle">
+            <rect x="20" y="200" width="200" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="2"/><text x="120" y="252" fill="#d3deea">WQ-LS</text>
+            <rect x="240" y="200" width="200" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="2"/><text x="340" y="252" fill="#d3deea">-T</text>
+            <rect x="460" y="200" width="200" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="2"/><text x="560" y="252" fill="#d3deea">-E</text>
+            <rect x="680" y="200" width="200" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="2"/><text x="780" y="252" fill="#d3deea">-D</text>
+            <rect x="20" y="300" width="200" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="2"/><text x="120" y="352" fill="#d3deea">-TE</text>
+            <rect x="240" y="300" width="200" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="2"/><text x="340" y="352" fill="#d3deea">-TD</text>
+            <rect x="460" y="300" width="200" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="2"/><text x="560" y="352" fill="#d3deea">-ED</text>
+            <rect x="680" y="300" width="200" height="80" rx="16" fill="#f2b705"/><text x="780" y="352" fill="#0b1220">-TED</text>
+          </g>
+          <rect x="20" y="430" width="860" height="180" rx="22" fill="rgba(46,196,182,.10)" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="50" y="490" font-size="30" font-weight="700" fill="#5ee0d2">销售点选项 → 变型编码 + BOM</text>
+          <text x="50" y="545" font-size="27" fill="#f3f6fa">D 带出 DLC 外协（约 5 天），MRP 自然看到</text>
+          <text x="50" y="590" font-size="24" fill="#8fa3ba">断点 1、2 在接单时就被堵上</text>
+        </svg>
+    notes:
+      - "WQ-LS 有三个选项：自动剪线 T、电子针距 E、少油旋梭 D，各有各无，2 乘 2 乘 2 等于 {{ch27.variants}} 种变型。在 ERPNext 里把 WQ-LS 建成物料模板，T、E、D 作属性，生成 8 个变型，各挂一张 BOM。选项再多就由配置器按规则即时生成 BOM。销售点选项，MRP 自然看到 DLC 外协，断点 1、2 就堵上了。"
+      - "WQ-LS has three options, auto-trim T, electronic stitch length E and low-oil hook D, each on or off: 2 times 2 times 2, {{ch27.variants}} variants. In ERPNext, WQ-LS becomes an item template with T, E and D as attributes, generating eight variants, each with a BOM. With more options, a configurator builds the BOM by rule. Sales picks options, MRP sees the DLC outsourcing, and breaks one and two are closed."
+
+  - layout: split
+    title: ["EBOM、MBOM 与固件物料", "EBOM, MBOM and firmware as an item"]
+    points:
+      - ["EBOM 按功能，MBOM 按装配部件和工序", "EBOM by function; MBOM by assembly unit and operation"]
+      - ["BOM 跟着设计发布走，版本加一", "The BOM follows design release, version +1"]
+      - ["固件作为 BOM 的一行，数量 1、带版本", "Firmware is a BOM line: quantity 1, with a version"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="210" y="40" font-size="32" font-weight="800" fill="#8fb6ff" text-anchor="middle">EBOM 设计</text>
+          <text x="680" y="40" font-size="32" font-weight="800" fill="#ff9c75" text-anchor="middle">MBOM 车间</text>
+          <g font-size="26" fill="#f3f6fa">
+            <rect x="20" y="70" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="115">刺布机构</text>
+            <rect x="20" y="155" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="200">钩线机构</text>
+            <rect x="20" y="240" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="285">送布机构</text>
+            <rect x="20" y="325" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="370">电控</text>
+            <rect x="490" y="70" width="390" height="70" rx="14" fill="#111d31" stroke="#ff7a45" stroke-width="2"/><text x="510" y="115">机壳部件（镗孔后）</text>
+            <rect x="490" y="155" width="390" height="70" rx="14" fill="#111d31" stroke="#ff7a45" stroke-width="2"/><text x="510" y="200">旋梭 + DLC 外协</text>
+            <rect x="490" y="240" width="390" height="70" rx="14" fill="#111d31" stroke="#ff7a45" stroke-width="2"/><text x="510" y="285">总装 · 辅料</text>
+            <rect x="490" y="325" width="390" height="70" rx="14" fill="rgba(242,183,5,.14)" stroke="#f2b705" stroke-width="4"/><text x="510" y="370" fill="#ffd75a" font-weight="700" class="en">FW-WQSC-LS 1.5.0</text>
+          </g>
+          <path d="M410 230 L480 230" stroke="#8fa3ba" stroke-width="5"/><path d="M470 218 L484 230 L470 242" stroke="#8fa3ba" stroke-width="5" fill="none"/>
+          <rect x="20" y="440" width="860" height="170" rx="22" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <text x="50" y="495" font-size="29" font-weight="700" fill="#ffd75a">固件进了 BOM：</text>
+          <text x="50" y="545" font-size="27" fill="#f3f6fa">工单知道烧哪版 · 测试台能核对</text>
+          <text x="50" y="590" font-size="27" fill="#f3f6fa">序列号档案自动记下出厂固件</text>
+        </svg>
+    notes:
+      - "设计的 BOM 按功能组织，车间的 BOM 按装配部件和工序组织；从 EBOM 到 MBOM 要加进外协工序、辅料和装配时才绑定的固件。BOM 跟着设计发布走，发布新版本，物料版本加一。最值得记住的一条：固件在 BOM 里占一行，数量 1，带版本。工单知道烧哪版，测试台能核对，档案自动记下，断点 3 就没了。"
+      - "The design BOM is organised by function, the shop BOM by assembly units and operations; going from EBOM to MBOM adds outsourcing, consumables and the firmware bound at assembly. The BOM follows design release, bumping the item version. The one thing to remember: firmware gets its own BOM line, quantity one, with a version. The work order knows what to flash, the test bench can check it, the record keeps it, and break three is gone."
+
+  - layout: bignum
+    title: ["找瓶颈：负荷 = 需求 × 工时 ÷ 有效能力", "Finding the bottleneck: load = demand × time ÷ capacity"]
+    nums:
+      - {n: "{{ch27.hmc_cap:.0f}} 台", n_en: "per day", label: ["卧加 5 台 × 2 班、OEE 60% 的能力", "HMC capacity: 5 units, 2 shifts, OEE 60%"]}
+      - {n: "{{ch27.hmc_load:.0f}}%", n_en: "load", label: ["每天 180 台，每台 16 min", "180 a day at 16 min each"]}
+      - {n: "{{ch27.hmc_load68:.0f}}%", n_en: "at OEE 68%", label: ["才有应付停机和插单的余量", "Only then is there headroom"]}
+    foot: ["非瓶颈设备的 OEE 提高了，全厂产量并不增加：第一期先联网瓶颈设备", "Raising OEE off the bottleneck adds no output: phase one connects the bottleneck first"]
+    notes:
+      - "工艺路线进了 MES，就能算负荷：每天台数乘每台分钟，除以台数乘班数乘 480 再乘 OEE。卧加每台机壳 16 分钟，5 台两班、OEE 60%，能力恰好 {{ch27.hmc_cap:.0f}} 台，负荷 {{ch27.hmc_load:.0f}}%，就是瓶颈。OEE 提到 68%，负荷降到 {{ch27.hmc_load68:.0f}}%，才有余量。非瓶颈设备提高 OEE，全厂产量不增加，所以第一期先联网瓶颈。"
+      - "With routings in the MES you can compute load: machines a day times minutes each, over units times shifts times 480 times OEE. The horizontal machining centre takes 16 minutes per housing; five units, two shifts, OEE 60 percent give exactly {{ch27.hmc_cap:.0f}} a day, {{ch27.hmc_load:.0f}} percent load: the bottleneck. At 68 percent OEE the load falls to {{ch27.hmc_load68:.0f}}. Raising OEE elsewhere adds no output, so phase one connects the bottleneck."
+
+  - layout: section
+    num: "03"
+    title: ["质量闭环：控制图与判异", "Closing the quality loop: control charts and rules"]
+
+  - layout: figure
+    title: ["逐台测量：间隙在悄悄变大", "Machine by machine: the clearance creeps up"]
+    visual: {video: meas}
+    caption: ["蓝点 = 逐台测量值；黄底 = 新批旋梭；红虚线 = 公差限", "Blue: measurements; yellow: new lot; red: tolerance"]
+    notes:
+      - "看逐台播放的测量值，16 小时约 16 秒放完。前 2 小时，点子围着 0.070 跳；黄色底是装用新批旋梭的时段，从这里开始点子整体往上爬。注意，很长一段时间没有一个点超出红色公差线，只按超差处理的系统一声不吭。这就是漂移的麻烦：每一台都合格，整体却在变坏。"
+      - "Watch the measurements play machine by machine, sixteen hours in about sixteen seconds. For two hours the dots scatter around 0.070; the yellow band marks the new hook lot, and from there the cloud climbs. For a long time not one dot crosses the red tolerance line, so a system acting on failures stays silent. That's the trouble with drift: every unit passes while the process gets worse."
+
+  - layout: split
+    title: ["四个关口，现有两道关", "Four gates, two checks today"]
+    points:
+      - ["来料、零件、装配调试、出厂四个关口", "Four gates: incoming, parts, adjustment, final test"]
+      - ["关一：结论为 fail，历史库自动开 NCR", "Check one: a 'fail' result opens an NCR automatically"]
+      - ["关二“趋近上限”：为 σ≈1.2 μm 的磨床写的", "Check two, 'near the limit': written for σ ≈ 1.2 μm grinders"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M40 120 L860 120" stroke="#2c3e5c" stroke-width="10" stroke-linecap="round"/>
+          <g font-size="27" font-weight="700" text-anchor="middle">
+            <rect x="20" y="70" width="180" height="100" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="110" y="130" fill="#d3deea">来料</text>
+            <rect x="240" y="70" width="180" height="100" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="330" y="130" fill="#d3deea">零件</text>
+            <rect x="460" y="70" width="200" height="100" rx="18" fill="rgba(242,183,5,.14)" stroke="#f2b705" stroke-width="4"/><text x="560" y="130" fill="#ffd75a">装配调试</text>
+            <rect x="700" y="70" width="180" height="100" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="790" y="130" fill="#d3deea">出厂</text>
+          </g>
+          <text x="560" y="210" font-size="24" fill="#8fa3ba" text-anchor="middle">间隙 0.04–0.10 mm · 钩线定时 ±1.5°</text>
+          <rect x="20" y="260" width="860" height="150" rx="22" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="50" y="318" font-size="30" font-weight="800" fill="#5ee0d2">关一：超差 → 自动开 NCR</text>
+          <text x="50" y="370" font-size="26" fill="#d3deea">漂移时每台都合格，等到超差已经晚了</text>
+          <rect x="20" y="440" width="860" height="180" rx="22" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
+          <text x="50" y="498" font-size="30" font-weight="800" fill="#ff9c75">关二：“趋近上限”</text>
+          <text x="50" y="550" font-size="26" fill="#d3deea">为公差带 16 μm、σ≈1.2 μm 的磨床写的</text>
+          <text x="50" y="595" font-size="26" fill="#ffb38f">间隙公差带 60 μm、σ = 6 μm，还合适吗？</text>
+        </svg>
+    notes:
+      - "缝纫机厂有四个关口：来料、零件、装配调试、出厂。问渠现在有两道关。关一：测量结论是 fail，历史库自动开 NCR，可漂移时每台都合格，等到超差已经晚了。关二：AI 的“趋近上限”提醒，是为公差带 16 微米、σ 约 1.2 微米的磨床写的。梭尖间隙公差带 60 微米、σ 6 微米，它还合适吗？"
+      - "The plant has four gates: incoming, parts, assembly and adjustment, and final test. WenQuest already has two checks. Check one: a 'fail' result opens an NCR automatically, but during a drift every unit passes, and by the first failure it's late. Check two: the AI's 'near the limit' alert, written for grinders with a 16-micron band and sigma about 1.2. The hook clearance has a 60-micron band and sigma 6. Does it still fit?"
+
+  - layout: bignum
+    title: ["X̄ 图：连续 5 台一个子组", "X̄ chart: subgroups of 5 machines"]
+    nums:
+      - {n: "{{ch27.ucl:.4f}}", n_en: "UCL · mm", label: ["上控制限", "Upper control limit"]}
+      - {n: "0.070", n_en: "CL · mm", label: ["中心线 μ0", "Centre line μ0"]}
+      - {n: "{{ch27.lcl:.4f}}", n_en: "LCL · mm", label: ["下控制限", "Lower control limit"]}
+    foot: ["UCL/LCL = μ0 ± 3σ/√n = 0.070 ± {{ch27.lim:.1f}} μm；控制限用稳定时的数据算，不用公差限代替", "UCL/LCL = μ0 ± 3σ/√n = 0.070 ± {{ch27.lim:.1f}} μm; computed from stable data, never replaced by tolerances"]
+    notes:
+      - "合适的工具是 X̄ 控制图：连续 5 台一个子组，画子组均值。中心线 0.070 毫米，控制限是中心线加减 3σ 除以根号 n，约 {{ch27.lim:.1f}} 微米，上限约 {{ch27.ucl:.4f}}、下限约 {{ch27.lcl:.4f}} 毫米。两点：控制限用过程稳定时的数据算；它比公差窄得多，绝不能拿公差限代替。"
+      - "The right tool is an X-bar chart: subgroups of five machines, plotting the subgroup mean. The centre line is 0.070 millimetres and the limits are three sigma over root n either side, about {{ch27.lim:.1f}} microns: upper about {{ch27.ucl:.4f}}, lower about {{ch27.lcl:.4f}}. Two points: compute them from stable-process data, and never substitute the tolerance, which is much wider."
+
+  - layout: tiles
+    title: ["判异规则：在超差之前发现漂移", "Run rules: catch the drift before anything fails"]
+    tiles:
+      - {k: "R1", name: ["1 点在 3σ 外", "1 point beyond 3σ"], use: ["最经典，也最迟钝", "Classic, and slowest"]}
+      - {k: "R2", name: ["3 点中 2 点同侧 2σ 外", "2 of 3 beyond 2σ, same side"], use: ["本例第 {{ch27.n4}} 台报警", "Fires at machine {{ch27.n4}} here"], hot: true}
+      - {k: "R3", name: ["5 点中 4 点同侧 1σ 外", "4 of 5 beyond 1σ, same side"], use: ["对小漂移敏感", "Sensitive to small drifts"]}
+      - {k: "R4", name: ["连续 8 点在同侧", "8 in a row on one side"], use: ["慢漂移也能抓住", "Catches slow drifts"]}
+      - {k: "R0", name: ["现有“趋近上限”", "Existing 'near limit'"], use: ["逐台看，阈值为磨床定", "Per unit, tuned for grinders"]}
+      - {k: "NCR", name: ["单台超差", "A single failure"], use: ["一定开，但最晚", "Always fires, but last"]}
+    notes:
+      - "判异规则在超差之前发现漂移。R1 一点在 3σ 外，最迟钝；R2 连续 3 点中 2 点同侧 2σ 外；R3 连续 5 点中 4 点同侧 1σ 外；R4 连续 8 点在同侧。规则越多，发现越早，误报也越多。报警以 ai.alert 发出，证据是触发子组的消息编号，2 小时内不重复，再起草冻结批次的提议，由人确认。"
+      - "Run rules catch a drift before anything fails. R1, one point beyond 3 sigma, is the slowest; R2, two of three beyond 2 sigma on one side; R3, four of five beyond 1 sigma; R4, eight in a row on one side. More rules, earlier detection, more false alarms. Alarms go out as ai.alert with the triggering messages as evidence, not repeated within two hours, and the AI drafts a freeze proposal for a person to confirm."
+
+  - layout: figure
+    title: ["R1–R4 一起用：第 {{ch27.n4}} 台就报警", "R1–R4 together: the alarm at machine {{ch27.n4}}"]
+    visual: {video: xbar}
+    caption: ["红线 = 控制限，虚线 ±2σ，点线 ±1σ；橙圈 = 第一次报警", "Red: limits; dashed ±2σ; dotted ±1σ; orange: first alarm"]
+    notes:
+      - "把 R1 到 R4 都勾上再播放一遍。子组均值在黄色时段里一步步爬到 2σ 线外，第 {{ch27.n4}} 台、约 {{ch27.t4:.1f}} 小时由 R2 报警，这时离漂移开始才一个多小时，一台超差的都没有。只用 R1，要到第 {{ch27.n1}} 台、{{ch27.t1:.1f}} 小时；只按超差，要到第 {{ch27.nt}} 台、{{ch27.tt:.1f}} 小时才开第一张 NCR。"
+      - "Tick R1 through R4 and play it again. The subgroup means climb step by step past the two-sigma line in the yellow band, and at machine {{ch27.n4}}, about {{ch27.t4:.1f}} hours, R2 fires. That's barely an hour after the drift began, with not one machine out of tolerance. With R1 alone it takes until machine {{ch27.n1}}, {{ch27.t1:.1f}} hours; acting only on failures, the first NCR opens at machine {{ch27.nt}}, {{ch27.tt:.1f}} hours."
+
+  - layout: bignum
+    title: ["漂移后单台超差的概率", "Chance a single machine fails after the drift starts"]
+    nums:
+      - {n: "{{ch27.p4:.1f}}%", n_en: "after 4 h", label: ["均值 0.086 mm", "Mean 0.086 mm"]}
+      - {n: "{{ch27.p5:.1f}}%", n_en: "after 5 h", label: ["均值 0.090 mm", "Mean 0.090 mm"]}
+      - {n: "{{ch27.p6:.0f}}%", n_en: "after 6 h", label: ["均值 0.094 mm", "Mean 0.094 mm"]}
+    foot: ["P = 1 − Φ((USL − m)/σ) + Φ((LSL − m)/σ)，m = 0.070 + 0.004 h（mm）", "P = 1 − Φ((USL − m)/σ) + Φ((LSL − m)/σ), m = 0.070 + 0.004 h (mm)"]
+    notes:
+      - "为什么只按超差会这么晚？漂移 h 小时后均值等于 0.070 加 0.004h，单台超差概率是 1 减 Φ(上限减均值除以 σ) 加 Φ(下限减均值除以 σ)。漂移 4 小时约 {{ch27.p4:.1f}}%，5 小时约 {{ch27.p5:.1f}}%，6 小时约 {{ch27.p6:.0f}}%。前几小时几乎碰不到公差线，等频繁超差，这批旋梭早已装进上百台。"
+      - "Why does acting on failures come so late? After h hours the mean is 0.070 plus 0.004h, and a single machine fails with probability 1 minus Phi of upper limit minus mean over sigma, plus Phi of lower limit minus mean over sigma. After 4 hours about {{ch27.p4:.1f}} percent, 5 hours {{ch27.p5:.1f}}, 6 hours {{ch27.p6:.0f}}. For hours the dots barely reach the line; by the time failures are common, the lot is in over a hundred machines."
+
+  - layout: points
+    title: ["晚发现的代价，和误报的代价", "The cost of finding late, and of false alarms"]
+    points:
+      - ["每晚发现 1 h，受影响多约 {{ch27.per_h:.1f}} 台", "Each hour late adds about {{ch27.per_h:.1f}} affected machines"]
+      - ["R1–R4 在 1000 组随机数里误报率约 {{ch27.fa4:.0f}}%", "R1–R4 false-alarm rate over 1000 seeds: about {{ch27.fa4:.0f}}%"]
+      - ["报警后先围堵、后查因：冻结、复检、NCR、8D", "After an alarm: contain first, then find the cause"]
+    foot: ["8D 找到根因：砂轮修整间隔从 50 件放宽到 150 件，未经验证", "8D root cause: the dressing interval relaxed from 50 to 150 pieces without validation"]
+    notes:
+      - "每晚发现 1 小时，就多装进约 {{ch27.per_h:.1f}} 台，也就是一小时的产量。可规则也不是越多越好：R1 到 R4 一起用，1000 组随机数里 16 小时内至少误报一次的概率约 {{ch27.fa4:.0f}}%，误报多了大家就不理了。报警后先围堵后查因：冻结剩余旋梭、复检可疑整机、开 NCR，再用 8D 找根因。"
+      - "Every hour later means about {{ch27.per_h:.1f}} more affected machines, an hour's output. But more rules aren't free: with R1 to R4, over 1000 random seeds the chance of at least one false alarm in 16 hours is about {{ch27.fa4:.0f}} percent, and frequent false alarms get ignored. After an alarm, contain first: freeze the remaining hooks, re-inspect suspect machines, open an NCR, then run an 8D for the root cause."
+
+  - layout: section
+    num: "04"
+    title: ["追溯、版本、服务与实施", "Traceability, versions, service and roll-out"]
+
+  - layout: figure
+    title: ["序列号追溯：向后查原因，向前圈范围", "Tracing: back to the cause, forward to the scope"]
+    visual: {video: trace}
+    caption: ["向后：整机 → 批次 → 磨床 → 修整；向前：装了哪些、剩多少、发没发", "Back to the cause; forward to the scope"]
+    notes:
+      - "报警以后按序列号和批次查两个方向。向后溯源：报警的整机装的是旋梭批次 H2610-07，这批的工单在梭道磨床 GRD-H-02 上加工，再找到砂轮修整事件，原因就出来了。向前追踪：同批还装了哪些整机、仓库剩多少、有没有发货。没有逐台扫码，就只能按时段圈，范围大好几倍。"
+      - "After an alarm, follow serials and lots both ways. Backward to the cause: the alarmed machine carries hook lot H2610-07, whose work order ran on raceway grinder GRD-H-02, where the wheel-dressing event explains it. Forward to the scope: which other machines got the lot, how many hooks remain, and whether any shipped. Without scanning every machine you can only bound the scope by time, several times wider."
+
+  - layout: lab
+    title: ["动手试一试：质量闭环与追溯", "Try it: closing the quality loop and tracing"]
+    shot: {page: factory, set: [press: "#resetA"]}
+    tasks:
+      - ["第①页试不同判异规则：早报警又不误报", "Page ①: try rule sets that alarm early without false alarms"]
+      - ["第②页沿关系图圈出受影响的整机", "Page ②: follow the graph and bound the affected machines"]
+      - ["第③页：OEE 只到 64% 时怎样把回收期拉回来", "Page ③: with OEE stuck at 64%, recover the payback"]
+    notes:
+      - "实验 27-1 在问渠平台上自己做。第①页恢复标准、播放，记下报警台号和时刻；再依次勾选 R2、R3、R4，也试试 R0，看报警提前多少、无漂移时误报几次，找一组既早又不误报的规则。第②页沿关系图圈出受影响的整机。第③页把关键设备 OEE 调到 64%，看回收期怎样变，再想办法拉回来。"
+      - "Lab 27-1 is on WenQuest. On page ①, reset, play, and note the alarm's machine and time; then tick R2, R3 and R4 in turn, and try R0, checking how much earlier each fires and how many false alarms it gives without drift; find a set that's early and quiet. On page ②, follow the graph to bound the affected machines. On page ③, set key-equipment OEE to 64 percent, see the payback, then bring it back."
+
+  - layout: split
+    title: ["电控与软件的版本管理", "Version control for controls and software"]
+    points:
+      - ["固件、参数表、事件表、主控板：四个版本对象", "Firmware, parameters, event table, board: four versions"]
+      - ["兼容表：测试台和远程升级共同遵守", "A compatibility table both test bench and updates obey"]
+      - ["远程升级分三圈推送，出问题双区回滚", "Updates go out in three rings; dual-bank rollback"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <circle cx="300" cy="330" r="280" fill="rgba(46,196,182,.06)" stroke="#2ec4b6" stroke-width="3"/>
+          <circle cx="300" cy="330" r="175" fill="rgba(242,183,5,.08)" stroke="#f2b705" stroke-width="3"/>
+          <circle cx="300" cy="330" r="80" fill="rgba(255,122,69,.18)" stroke="#ff7a45" stroke-width="4"/>
+          <text x="300" y="342" font-size="38" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">1%</text>
+          <text x="300" y="215" font-size="36" font-weight="800" fill="#ffd75a" text-anchor="middle" class="en">10%</text>
+          <text x="300" y="110" font-size="34" font-weight="800" fill="#5ee0d2" text-anchor="middle">全部</text>
+          <g font-size="26" fill="#f3f6fa">
+            <text x="620" y="150" font-weight="700" fill="#ff9c75">先约 1%</text>
+            <text x="620" y="190">观察 72 h</text>
+            <text x="620" y="280" font-weight="700" fill="#ffd75a">比故障率</text>
+            <text x="620" y="320">每千运转小时</text>
+            <text x="620" y="360">新旧版本对比</text>
+            <text x="620" y="450" font-weight="700" fill="#5ee0d2">再 10%、再全部</text>
+            <text x="620" y="490">出问题双区回滚</text>
+          </g>
+        </svg>
+    notes:
+      - "电控和软件要管四个版本对象：固件、参数表、事件表和主控板硬件。兼容表规定谁配谁，比如 1.5 版固件要参数表 v8 以上、硬件 B 版以上，出厂测试和远程升级都按它。改版走工程变更。远程升级分三圈：先约 1% 观察 72 小时，按每千运转小时故障率和老版本比，再 10%、再全部，出问题双区回滚。"
+      - "Controls and software have four versioned objects: firmware, parameter table, event table and main-board revision. A compatibility table ties them, for example firmware 1.5 needs parameters v8 and board B or later, and both final test and remote updates obey it. Changes go through an ECO. Updates go out in three rings: about 1 percent watched for 72 hours against the old version by faults per thousand running hours, then 10 percent, then all, with dual-bank rollback."
+
+  - layout: split
+    title: ["服务数据回流：故障率与备件", "Service data coming back: fault rates and spares"]
+    points:
+      - ["故障按每千运转小时、按固件版本统计", "Faults per 1000 running hours, by firmware version"]
+      - ["旋梭寿命：韦布尔 β = 2.2、η = 5000 h", "Hook life: Weibull β = 2.2, η = 5000 h"]
+      - ["按每台累计小时预测，比按平均寿命少", "Per-machine hours predict fewer than mean life"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="20" y="44" font-size="28" font-weight="700" fill="#f3f6fa">下一季度旋梭需求（只）</text>
+          <rect x="60" y="120" width="240" height="380" rx="14" fill="#4b5f7d"/>
+          <text x="180" y="100" font-size="52" font-weight="800" fill="#d3deea" text-anchor="middle" class="en">{{ch27.hooks_cal:.0f}}</text>
+          <text x="180" y="550" font-size="27" fill="#d3deea" text-anchor="middle">按平均寿命</text>
+          <text x="180" y="588" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">≈ {{ch27.life:.0f}} h</text>
+          <rect x="380" y="247" width="240" height="253" rx="14" fill="#2ec4b6"/>
+          <text x="500" y="227" font-size="52" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="en">{{ch27.hooks_use:.0f}}</text>
+          <text x="500" y="550" font-size="27" fill="#5ee0d2" text-anchor="middle">按每台累计小时</text>
+          <text x="500" y="588" font-size="22" fill="#8fa3ba" text-anchor="middle">条件失效概率求和</text>
+          <rect x="660" y="140" width="230" height="260" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <text x="775" y="200" font-size="26" fill="#ffd75a" text-anchor="middle">P = 1 −</text>
+          <text x="775" y="250" font-size="26" fill="#ffd75a" text-anchor="middle" class="en">R(a+Δ)/R(a)</text>
+          <text x="775" y="320" font-size="24" fill="#d3deea" text-anchor="middle">机群还年轻</text>
+          <text x="775" y="358" font-size="24" fill="#d3deea" text-anchor="middle">平均法偏多</text>
+        </svg>
+    notes:
+      - "联网机器的数据首先属于服装厂，经同意只转发设备数据。故障码按每千运转小时、按固件版本统计，就能看出修改有没有用，比如 E-31 从 0.62 降到 0.18。备件预测：旋梭寿命按韦布尔分布，按每台自己的累计小时求下季度失效概率再加总，约 {{ch27.hooks_use:.0f}} 只，比按平均寿命的 {{ch27.hooks_cal:.0f}} 只少，因为机群还年轻。"
+      - "Connected-machine data belong first to the garment factory; with consent, only machine data come back. Count fault codes per thousand running hours by firmware version and you see whether a change worked: E-31 fell from 0.62 to 0.18. For spares, hook life is Weibull; sum each machine's conditional failure probability for next quarter and you need about {{ch27.hooks_use:.0f}} hooks, fewer than {{ch27.hooks_cal:.0f}} from mean life, because the fleet is young."
+
+  - layout: points
+    title: ["AI 在数字工厂里的位置", "Where AI sits in the digital factory"]
+    points:
+      - ["今日简报、主动提醒：每条都附证据", "Daily brief and alerts: each with its evidence"]
+      - ["问答的数字来自历史库，注明出处", "Answers draw numbers from the historian, with sources"]
+      - ["写入 ERP 只起草提议，人确认后执行", "Writes to ERP are drafts until a person confirms"]
+    foot: ["AI 选型只从零件库挑，库里没有就说没有；国内只配已备案的模型", "AI selection picks only from the parts library and says so when nothing fits; in China, only registered models"]
+    notes:
+      - "AI 在这里做几件事，都有边界。今日简报，每条附证据；主动提醒，按规则查全厂，比如判异规则、砂轮修整超限、固件和工单不符；问答和起草提议，比如问 200 台 10 天能不能交，它展开 BOM、看瓶颈，再起草加班或分批交货两份提议，由计划员选。选型只从零件库挑，没有就说没有。"
+      - "AI does a few things here, each bounded. A daily brief with evidence for every line. Alerts that check the plant by rule, such as run rules, overdue wheel dressing, or firmware not matching the work order. Questions and drafts: ask whether 200 can ship in ten days, and it expands the BOM, checks the bottleneck and drafts overtime or split delivery for the planner to choose. Part selection only from the library; if nothing fits, it says so."
+
+  - layout: figure
+    title: ["分三期实施：回收期对瓶颈 OEE 最敏感", "Three phases: payback hinges on bottleneck OEE"]
+    visual: {video: roi}
+    caption: ["三期全做第 {{ch27.pay}} 个月收回；OEE 只到 64% 时第 {{ch27.pay64}} 个月", "Payback month {{ch27.pay}}; at OEE 64%: month {{ch27.pay64}}"]
+    notes:
+      - "信息化不宜一次铺开，分三期：第一期主数据、ERP、总线与历史库、瓶颈联网；第二期装配扫码、质量系统；第三期服务回流、备件预测。年节省约 {{ch27.sv1:.0f}}、{{ch27.sv2:.0f}}、{{ch27.sv3:.0f}} 万元。图里关键设备 OEE 在 64%、68%、72% 之间轮换：三期全做第 {{ch27.pay}} 个月收回，OEE 只到 64% 要 {{ch27.pay64}} 个月。"
+      - "Roll out in three phases rather than all at once: master data, ERP, the bus and historian and the bottleneck first; assembly scanning and quality second; service data and spares third. Annual savings about {{ch27.sv1:.0f}}, {{ch27.sv2:.0f}} and {{ch27.sv3:.0f}} ten-thousand yuan. The chart cycles key-equipment OEE through 64, 68 and 72 percent: all three phases pay back in month {{ch27.pay}}, but at 64 percent only in month {{ch27.pay64}}."
+
+  - layout: split
+    title: ["机器人联系：机器人整机厂用同一套", "Robot link: a robot plant uses the same system"]
+    points:
+      - ["减速器批次、编码器序列号扫码绑定整机", "Reducer lots and encoder serials bound by scanning"]
+      - ["关节回差逐台测，X̄ 图发现批次漂移", "Joint backlash measured per unit; X̄ catches lot drift"]
+      - ["AI 只起草“冻结批次”，人确认才执行", "AI only drafts 'freeze the lot'; a person confirms"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="20" y="500" width="200" height="60" rx="10" fill="#4b5f7d"/>
+          <path d="M120 500 L120 380 L250 260 L380 300" stroke="#ff7a45" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="120" cy="380" r="26" fill="#f2b705"/><circle cx="250" cy="260" r="24" fill="#f2b705"/><circle cx="380" cy="300" r="20" fill="#f2b705"/>
+          <path d="M146 376 L460 120" stroke="#f2b705" stroke-width="2" stroke-dasharray="6 6"/>
+          <rect x="460" y="40" width="430" height="170" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <text x="485" y="92" font-size="27" font-weight="700" fill="#ffd75a">关节 2</text>
+          <text x="485" y="140" font-size="25" fill="#f3f6fa">减速器批次 · 电机序列号</text>
+          <text x="485" y="182" font-size="25" fill="#f3f6fa">编码器序列号 → 整机</text>
+          <rect x="460" y="240" width="430" height="150" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="485" y="292" font-size="26" fill="#5ee0d2" class="en">test.result</text>
+          <text x="485" y="340" font-size="25" fill="#f3f6fa">重复定位 mm · 回差 角分</text>
+          <rect x="460" y="420" width="430" height="170" rx="20" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
+          <text x="485" y="472" font-size="26" fill="#c4b5fd">固件 · 参数表 · 标定文件</text>
+          <text x="485" y="520" font-size="25" fill="#f3f6fa">带版本的物料</text>
+          <text x="485" y="562" font-size="25" fill="#f3f6fa">1% → 10% → 全部</text>
+        </svg>
+    notes:
+      - "把整机换成六轴机器人，这一讲的做法几乎原样适用。每个关节的减速器批次、电机和编码器序列号扫码绑定到整机；重复定位精度和关节回差用带单位的 test.result 上报。关节回差逐台测，用 X̄ 图加判异规则在超差前发现某批减速器在漂移，再圈出受影响的机器人。AI 只起草冻结提议。"
+      - "Swap the sewing machine for a six-axis robot and almost everything carries over. Each joint's reducer lot, motor and encoder serials are scanned and bound to the robot; repeatability and backlash go out as test.result with units. Measure backlash on every robot, and an X-bar chart with run rules spots a drifting reducer lot before failures, then bounds the affected robots. The AI only drafts the freeze."
+
+  - layout: split
+    title: ["生活中的例子：按批号召回牛奶", "Everyday example: recalling milk by lot number"]
+    points:
+      - ["出问题只召回那一批，不是全部下架", "Recall only the bad lot, not every carton"]
+      - ["前提：生产时印上批号、记下发往哪些店", "Provided each carton got a lot number and a destination"]
+      - ["装配时扫码绑定旋梭批次 = 给整机“印批号”", "Scanning hook lots at assembly = printing lot numbers"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g>
+            <path d="M80 160 L140 100 L220 100 L280 160 L280 440 L80 440 Z" fill="#f3f6fa"/>
+            <rect x="80" y="230" width="200" height="90" fill="#4c8dff"/>
+            <text x="180" y="290" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">牛奶</text>
+            <rect x="100" y="360" width="160" height="50" rx="8" fill="#ff7a45"/>
+            <text x="180" y="395" font-size="24" font-weight="700" fill="#fff" text-anchor="middle" class="en">LOT 0612</text>
+          </g>
+          <defs><marker id="m27" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fa3ba"/></marker></defs>
+          <path d="M300 300 L400 170 M300 300 L400 300 M300 300 L400 430" stroke="#8fa3ba" stroke-width="4" marker-end="url(#m27)"/>
+          <g font-size="28" font-weight="700">
+            <rect x="410" y="130" width="300" height="80" rx="16" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/><text x="440" y="182" fill="#ffb38f">门店 A：召回</text>
+            <rect x="410" y="260" width="300" height="80" rx="16" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/><text x="440" y="312" fill="#ffb38f">门店 C：召回</text>
+            <rect x="410" y="390" width="300" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="440" y="442" fill="#8fa3ba">其他批次：照卖</text>
+          </g>
+          <text x="450" y="560" font-size="28" fill="#5ee0d2" text-anchor="middle">批号 + 去向 = 只圈出该圈的</text>
+        </svg>
+    notes:
+      - "生活里最熟悉的追溯是牛奶召回。超市发现某一批牛奶有问题，会按盒子上印的批号召回，而不是把所有牛奶都下架；前提是每一盒在生产时就印上了批号，还记下了发往哪些门店。缝纫机厂在装配时扫码绑定旋梭批次，就是给每台整机印批号。没有这一步，出了问题只能按时段一大片一大片地圈。"
+      - "The traceability everyone knows is a milk recall. When a supermarket finds a problem with one batch, it recalls by the lot number printed on the carton instead of clearing every carton off the shelves. That works only because each carton got a lot number at production and the plant recorded which stores it went to. Scanning the hook lot into each machine at assembly is printing a lot number on every sewing machine. Without it, when something goes wrong you can only bound the problem by time, in big blocks."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["用 R1–R4：第 {{ch27.n4}} 台报警，一台没发出去", "With R1–R4: alarm at machine {{ch27.n4}}, nothing shipped"]
+    rows:
+      - ["X̄ 控制限（mm）", "{{ch27.lcl:.4f}}–{{ch27.ucl:.4f}}"]
+      - ["只按超差：第 {{ch27.nt}} 台、{{ch27.tt:.1f}} h", "{{ch27.at}} 台受影响"]
+      - ["R1–R4：第 {{ch27.n4}} 台、{{ch27.t4:.1f}} h", "{{ch27.a4}} 台受影响"]
+    side: {big: "{{ch27.sht}}", text: ["台已发货：只按超差时", "shipped when acting on failures only"]}
+    foot: ["R1–R4：受影响第 46–{{ch27.last4}} 台全在厂内、无一超差，冻结剩余 {{ch27.left4}} 只旋梭", "R1–R4: machines 46–{{ch27.last4}} all still in the plant, none failed; {{ch27.left4}} hooks frozen"]
+    notes:
+      - "回到开头的问题。控制限 0.070 加减 {{ch27.lim:.1f}} 微米。漂移 4、5、6 小时后单台超差约 {{ch27.p4:.1f}}%、{{ch27.p5:.1f}}%、{{ch27.p6:.0f}}%。只按超差，第一台超差在第 {{ch27.nt}} 台、{{ch27.tt:.1f}} 小时，受影响 {{ch27.at}} 台，已发走 {{ch27.sht}} 台。用 R1 到 R4，第 {{ch27.n4}} 台就报警，受影响 {{ch27.a4}} 台全在厂内，冻结剩余 {{ch27.left4}} 只旋梭。"
+      - "Back to our problem. The limits are 0.070 plus or minus {{ch27.lim:.1f}} microns. After 4, 5 and 6 hours a machine fails with probability about {{ch27.p4:.1f}}, {{ch27.p5:.1f}} and {{ch27.p6:.0f}} percent. Acting on failures, the first appears at machine {{ch27.nt}}, {{ch27.tt:.1f}} hours: {{ch27.at}} affected, {{ch27.sht}} shipped. With R1 to R4 the alarm comes at machine {{ch27.n4}}: {{ch27.a4}} affected, all in the plant, and {{ch27.left4}} hooks frozen."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["五层架构：只经总线，写操作要人确认", "Five layers: bus only; writes need a human"]
+      - ["X̄ 图加判异规则，在超差之前发现漂移", "X̄ chart and run rules catch drift before failures"]
+      - ["扫码绑定批次：向后查原因，向前圈范围", "Scan lots in: trace back to causes, forward to scope"]
+    after: ["作业 27：缝纫机厂的瓶颈、质量闭环与备件分析 · 测验 · 虚拟实验 27-1 报告 —— 在问渠学习平台完成", "Assignment 27 · quiz · Lab 27-1 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，七个断点的根源是信息没带编号记在能关联的地方；数字工厂分五层，只经总线，写操作要人确认。第二，X̄ 图控制限是 μ0 加减 3σ 除以根号 n，判异规则在超差前发现漂移，规则越多越早也越易误报。第三，装配扫码绑定批次，向后查原因、向前圈范围。"
+      - "Three things to remember. One: the seven breaks come from information without IDs in one linkable place; the digital factory has five layers, talks only through the bus, and needs a person to confirm writes. Two: X-bar limits are mu-zero plus or minus three sigma over root n; run rules catch drift before failures, earlier with more rules but with more false alarms. Three: scan lots in at assembly to trace back to causes and forward to the scope."

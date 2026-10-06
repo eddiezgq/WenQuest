@@ -100,3 +100,22 @@ if __name__ == '__main__':
         elif isinstance(v, tuple): v = tuple(round(x, 4) if isinstance(x, float) else x for x in v)
         elif isinstance(v, dict): v = {a: (round(b, 4) if isinstance(b, float) else b) for a, b in v.items()}
         print(k, v)
+# numbers quoted by the slides (第 24 轮 课件): only when WQ_BOOK_OUT is set
+if os.environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    Mx = M.monte(1000, n=300, calib=0.1, seed=7)
+    s_ = [m['stop'] - M.TARGET for m in Mx]; e_ = [m['entry'] for m in Mx]
+    out(deg_ms_300=R['deg_ms_300'], deg_ms_700=R['deg_ms_700'], tp_min=R['tp_min_ms'], tp_max=R['tp_max_ms'],
+        p300_lo=R['pull_deg_300'][0], p300_hi=R['pull_deg_300'][1], p300_sp=R['pull_deg_300'][2],
+        p700_lo=R['pull_deg_700'][0], p700_hi=R['pull_deg_700'][1], p300_mean=(R['pull_deg_300'][0] + R['pull_deg_300'][1]) / 2,
+        trim_c300=R['trim_on_centre_300'], ent_lo=300 + R['pull_deg_300'][0], ent_hi=300 + R['pull_deg_300'][1],
+        trel_latest=R['trel_on_latest_300'], nmax20=R['n_max_20deg'], hot_shift=R['hot_shift_deg_300'],
+        scan300=R['scan_err_300'], scan700=R['scan_err_700'], can05=R['can_0.5ms_deg_300'], cnt_deg=360 / 10000,
+        psuA=R['psu_peak_A'], psuW=R['psu_peak_W'], holdW=R['pfl_hold_W'], gap_ms=R['trim_trel_gap_ms'],
+        bt18=R['bt_nmax_18'], bt22=R['bt_nmax_22'], bt1500=R['bt_1500_22'],
+        bdc=R['zcal_bdc'], zoff=R['zcal_offset'], drop18=R['drop_1.8deg_mm'], res001=R['res_deg_0.01mm'],
+        res_gain=1.8 / R['res_deg_0.01mm'], vbw=R['vel_bw'], Jms=R['J_test_ms'], alpha60=R['alpha60'],
+        cnt125=R['ol_counts_1.25'], cnt14=R['ol_counts_1.4'], N1=R['ol_N1'], N2=R['ol_N2'], N1c=math.ceil(R['ol_N1']), N2c=math.ceil(R['ol_N2']), Nstop=math.ceil(R['ol_N1']) + math.ceil(R['ol_N2']),
+        Nb7000=R['ol_Nb_7000'][0], st7000=R['ol_Nb_7000'][1], Nb4000=R['ol_Nb_4000'][0], st4000=R['ol_Nb_4000'][1],
+        extra7000=R['ol_extra_mm_7000'], reuse=R['reuse'] * 100,
+        mc_ok=sum(m['all'] for m in Mx), mc_e_lo=min(e_), mc_e_hi=max(e_), mc_s_lo=min(s_), mc_s_hi=max(s_), mc_s_sd=st.pstdev(s_))

@@ -46,3 +46,13 @@ for law in ('MT', 'CY'):
     print("10 mm", law, "F at 5000 = %.0f N, max speed for 250 N = %.0f r/min" % (F, nmax))
 print("10 mm bight dphi %.1f vs allowed %.1f" % (10 / (2 * RH) / D, fL - fR))
 a5 = amax('MT', 5, 3200, 170); print("bartack 5 mm step @3200: %.0f m/s2; 8 mm step same accel -> n = %.0f" % (a5, 3200 * sqrt(5 / 8)))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    aMT, aCY, aSH = amax('MT', 8, 5000, 170), amax('CY', 8, 5000, 170), amax('SH', 8, 5000, 170)
+    sL = bis(lambda f: rise(f) - 3.8, 180.01, 300); sR = sL - 8 / (2 * RH) / D
+    out(win_exit=FEXIT, win_enter=FENTER, win=360 - FEXIT + FENTER, omega=2 * pi * 5000 / 60, beta=170 * D,
+        aMT=aMT, aCY=aCY, aSH=aSH, FMT=MASS * aMT, FCY=MASS * aCY, FSH=MASS * aSH,
+        r120=(170 / 120) ** 2, FCY120=MASS * amax('CY', 8, 5000, 120), FMT120=MASS * amax('MT', 8, 5000, 120),
+        CYless=(1 - aMT / aCY) * 100, dphi8=8 / (2 * RH) / D, catchL=sL, catchR=sR, riseR=rise(sR), wmax=2 * RH * (fL - fR) * D,
+        wmax5=2 * RH * (fL5 - fR5) * D, dphimax=fL - fR, cymin=b, a_emb=amax('MT', 3, 1200, 170), a_emb5000=amax('MT', 3, 5000, 170))

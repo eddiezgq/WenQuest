@@ -1,0 +1,437 @@
+# 第 31 讲 人工智能与制衣业 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch31.键:格式}} 由课程包程序 course/calc/ch31.py 算出，不手写数字。
+lesson: 31
+code: [ch31]
+
+clips:
+  hero:          # 封面：实验 31-1 得分分布，区分能力 d′ 从 1.5 增大到 4.5，次品分布慢慢分开（深色显示）
+    page: aiqc
+    selector: "#dist"
+    loop: 14
+    steps:
+      - {at: 0, set: {t: 1.88, dp: 1.5}, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)'"}
+      - {at: 1, set: {dp: 2.0}}
+      - {at: 2, set: {dp: 2.5}}
+      - {at: 3, set: {dp: 3.0}}
+      - {at: 4, set: {dp: 3.53}}
+      - {at: 5, set: {dp: 4.0}}
+      - {at: 6, set: {dp: 4.5}}
+      - {at: 8, set: {dp: 4.0}}
+      - {at: 9, set: {dp: 3.53}}
+      - {at: 10, set: {dp: 3.0}}
+      - {at: 11, set: {dp: 2.5}}
+      - {at: 12, set: {dp: 2.0}}
+  dist:          # 得分分布：阈值从左移到右再回来
+    page: aiqc
+    selector: "#dist"
+    loop: 14
+    steps:
+      - {at: 0, set: {dp: 3.53, t: 0.5}}
+      - {at: 1, set: {t: 1.0}}
+      - {at: 2, set: {t: 1.5}}
+      - {at: 3, set: {t: 1.88}}
+      - {at: 4, set: {t: 2.5}}
+      - {at: 5, set: {t: 3.0}}
+      - {at: 6, set: {t: 3.5}}
+      - {at: 8, set: {t: 3.0}}
+      - {at: 9, set: {t: 2.5}}
+      - {at: 10, set: {t: 1.88}}
+      - {at: 11, set: {t: 1.5}}
+      - {at: 12, set: {t: 1.0}}
+  roc:           # ROC 曲线上的圆点随阈值移动
+    page: aiqc
+    selector: "#roc"
+    loop: 14
+    steps:
+      - {at: 0, set: {dp: 3.53, t: 0.5}, js: "(function(){var k=document.getElementById('roc');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(k)&&!k.contains(e))e.style.visibility='hidden'})})()"}
+      - {at: 1, set: {t: 1.0}}
+      - {at: 2, set: {t: 1.5}}
+      - {at: 3, set: {t: 1.88}}
+      - {at: 4, set: {t: 2.5}}
+      - {at: 5, set: {t: 3.0}}
+      - {at: 6, set: {t: 3.5}}
+      - {at: 8, set: {t: 3.0}}
+      - {at: 9, set: {t: 2.5}}
+      - {at: 10, set: {t: 1.88}}
+      - {at: 11, set: {t: 1.5}}
+      - {at: 12, set: {t: 1.0}}
+  cost:          # 每 1000 件成本曲线上的圆点随阈值移动
+    page: aiqc
+    selector: "#cost"
+    loop: 14
+    steps:
+      - {at: 0, set: {dp: 3.53, t: 0.5}, js: "(function(){var k=document.getElementById('cost');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(k)&&!k.contains(e))e.style.visibility='hidden'})})()"}
+      - {at: 1, set: {t: 1.0}}
+      - {at: 2, set: {t: 1.5}}
+      - {at: 3, set: {t: 1.88}}
+      - {at: 4, set: {t: 2.5}}
+      - {at: 5, set: {t: 3.0}}
+      - {at: 6, set: {t: 3.5}}
+      - {at: 8, set: {t: 3.0}}
+      - {at: 9, set: {t: 2.5}}
+      - {at: 10, set: {t: 1.88}}
+      - {at: 11, set: {t: 1.5}}
+      - {at: 12, set: {t: 1.0}}
+  pdm:           # 预测性维护：滑动平均窗口 1 → 3 → 7 天轮换
+    page: aiqc
+    selector: "#sig"
+    loop: 9
+    steps:
+      - {at: 0, press: "#tab1", set: {w: 1}}
+      - {at: 3, set: {w: 3}}
+      - {at: 6, set: {w: 7}}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 31 讲", "Lecture 31"]
+    title: ["人工智能与制衣业", "Artificial Intelligence and Apparel Making"]
+    sub: ["用 AI，也判断 AI", "Use AI, and judge it too"]
+    notes:
+      - "同学们好，这是最后一讲。报道里的 AI 无所不能，车间里的 AI 却常常让人失望。要看清它，就像对待任何工程技术一样问三个问题：它吃什么数据，怎样评价，会在哪里出错。背景里是今天的虚拟实验：视觉质检给每件衣片打一个“像次品”的分，合格品和次品两堆分数分得越开，检测器就越好用。"
+      - "Hello everyone; this is the last lecture. In the news AI can do anything; on the shop floor it often disappoints. To see it clearly, ask what you'd ask of any technology: what data does it eat, how is it judged, and where does it go wrong? In the background is today's lab: a vision inspector gives every cut piece a 'looks defective' score, and the further apart the scores of good and bad pieces, the more useful the inspector."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["“召回率 95%”的视觉质检值得信吗？", "A vision inspector with '95% recall': trust it?"]
+    facts:
+      - ["领子工段装视觉质检：召回率 95%、误报率 3%", "Collar inspection: 95% recall, 3% false alarms"]
+      - ["这个工段的次品率是 2%", "The defect rate at this station is 2%"]
+      - ["漏检一件约 20 元，误报复检一件约 0.5 元", "A miss costs about ¥20; a false alarm ¥0.5 to recheck"]
+    notes:
+      - "先看车间问题。一家衬衫厂准备在领子工段装视觉质检。供应商的报告说：召回率 95%，误报率 3%。工段的次品率是 2%；漏检一件流到下道或客户手里，代价约 20 元；误报一件要人工复检，代价约 0.5 元。每 1000 件会报警多少件、其中真正是次品的占几成？阈值设在哪里成本最低？要精确率 80%、召回率 90%，检测器要改进到什么程度？最后回答。"
+      - "Here's the problem. A shirt factory plans to install vision inspection on the collar line. The supplier's report says recall 95 percent, false-alarm rate 3 percent. The station's defect rate is 2 percent; a missed defect reaching the next station or the customer costs about 20 yuan, and a false alarm costs about 0.5 yuan to recheck by hand. Out of 1000 pieces, how many alarms, and what share are real defects? Where should the threshold go to minimise cost? And to reach 80 percent precision with 90 percent recall, how much better must the inspector get? We'll answer at the end."
+
+  - layout: section
+    num: "01"
+    title: ["AI 在制衣业做什么", "What AI does in apparel making"]
+
+  - layout: figure
+    title: ["四类应用，各有各怕的", "Four kinds of application, each with its own weakness"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 1700 620" width="1700" height="620">
+          <g>
+            <rect x="0" y="0" width="830" height="290" rx="28" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+            <text x="40" y="80" font-size="52" font-weight="800" fill="#5ee0d2">感知</text>
+            <text x="40" y="150" font-size="32" fill="#f3f6fa">视觉质检 · 识别面料 · 追踪布边</text>
+            <text x="40" y="240" font-size="34" font-weight="700" fill="#ff9c75">怕“没见过”</text>
+          </g>
+          <g>
+            <rect x="870" y="0" width="830" height="290" rx="28" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
+            <text x="910" y="80" font-size="52" font-weight="800" fill="#8fb6ff">预测</text>
+            <text x="910" y="150" font-size="32" fill="#f3f6fa">销量 · 订单延期 · 设备故障</text>
+            <text x="910" y="240" font-size="34" font-weight="700" fill="#ff9c75">怕“世道变了”</text>
+          </g>
+          <g>
+            <rect x="0" y="330" width="830" height="290" rx="28" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+            <text x="40" y="410" font-size="52" font-weight="800" fill="#ffd75a">优化与生成</text>
+            <text x="40" y="480" font-size="32" fill="#f3f6fa">排料 · 排产 · 设计效果图</text>
+            <text x="40" y="570" font-size="34" font-weight="700" fill="#ff9c75">怕“目标写错”</text>
+          </g>
+          <g>
+            <rect x="870" y="330" width="830" height="290" rx="28" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
+            <text x="910" y="410" font-size="52" font-weight="800" fill="#c4b5fd">语言助手</text>
+            <text x="910" y="480" font-size="32" fill="#f3f6fa">读单据 · 答问题 · 起草</text>
+            <text x="910" y="570" font-size="34" font-weight="700" fill="#ff9c75">怕“说得通顺却不对”</text>
+          </g>
+        </svg>
+    notes:
+      - "按做什么分，制衣业的 AI 有四类。感知：从图像和信号里认东西，视觉质检、识别面料、追踪布边，它怕没见过，换了颜色、换了款就认不准。预测：从历史推将来，销量、延期、设备故障，它怕世道变了。优化与生成：在一堆方案里找好的或者造新的，排料、排产、设计图，它怕目标写错。语言助手：读单据、答问题，它怕说得通顺却不对。判断任何 AI 应用，都问三件事：吃什么数据、怎样评价、会在哪里出错。"
+      - "By what they do, AI applications in apparel fall into four kinds. Perception: recognising things in images and signals, such as vision inspection, fabric identification and edge tracking; its weakness is the unseen: a new colour or style and it misjudges. Prediction: projecting the past forward, such as sales, delays and machine failures; its weakness is a changed world. Optimisation and generation: finding good options or making new ones, such as markers, schedules and design images; its weakness is a wrongly stated goal. Language assistants: reading documents and answering questions; their weakness is sounding fluent while being wrong. For any AI application, ask three things: what data, how it's judged, and where it fails."
+
+  - layout: points
+    title: ["设计、打版与虚拟样衣", "Design, patterns and virtual samples"]
+    points:
+      - ["生成式模型出效果图；三维虚拟样衣模拟悬垂", "Generative design images; 3D virtual samples simulate drape"]
+      - ["弯曲刚度是布料模拟的参数：不准就偏硬偏软", "Bending rigidity drives the simulation: wrong, and it's too stiff or soft"]
+      - ["虚拟样衣代替不了试穿；设计师对作品负责", "No substitute for a fitting; designers own the result"]
+    foot: ["生成的设计涉及版权；定制打版靠成熟的规则和放码算法，AI 从历史订单里学特殊体型的修正", "Generated designs raise copyright questions; made-to-measure patterns rely on rules and grading, with AI learning corrections for special figures"]
+    notes:
+      - "在设计端，生成式模型可以根据文字或草图出效果图，让设计师快速试配色和细节；三维虚拟样衣软件把纸样缝在虚拟人台上，模拟悬垂和褶皱。上一讲的弯曲刚度正是这类软件要用的参数，参数不准，屏幕上的衣服就比真衣服硬或软。打版端，定制西服厂靠成熟的规则和放码算法，AI 可以从历史订单里学特殊体型的修正。边界要清楚：虚拟样衣代替不了试穿；生成的设计涉及版权，设计师要为最终作品负责。"
+      - "On the design side, generative models turn words or sketches into design images so designers can try colours and details quickly, and 3D virtual-sample software sews the patterns onto a virtual form and simulates drape and folds. Last lecture's bending rigidity is exactly a parameter that software needs: get it wrong and the on-screen garment is stiffer or softer than the real one. For patterns, made-to-measure suit plants rely on mature rules and grading algorithms, and AI can learn corrections for special figures from past orders. Be clear about the limits: a virtual sample doesn't replace a fitting, generated designs raise copyright questions, and the designer is responsible for the final work."
+
+  - layout: points
+    title: ["排料与排产：谁做什么", "Markers and scheduling: who does what"]
+    points:
+      - ["排料是组合优化：AI 给好的初始摆法", "Marker making is combinatorial: AI proposes good starts"]
+      - ["传统算法结果可解释，约束严格满足", "Classic algorithms are explainable and meet constraints"]
+      - ["AI 预测和建议，算法求解，人来决定", "AI predicts and suggests, algorithms solve, people decide"]
+    foot: ["利用率最后仍用几何计算核实；AI 更适合补难写成公式的部分，如新款工时和学习曲线", "Utilisation is still verified geometrically; AI fills in what's hard to write as formulas, such as new-style times and learning curves"]
+    notes:
+      - "排料本质上是组合优化：几十片不规则衣片摆进一张布，空隙越少越好，摆法多得无法穷举，所以排料软件一直用启发式算法和搜索。AI 可以更快给出好的初始摆法，但利用率最后仍要用几何计算核实。排产派工也一样：第 28 讲用动态规划求分组，吊挂按工位空闲派活，这些传统算法的长处是结果能解释，约束能严格满足。AI 更适合补难写成公式的部分，比如预测新款工时和学习曲线。分工是：AI 预测和建议，算法求解，人来决定。"
+      - "Marker making is combinatorial optimisation: dozens of irregular pieces packed onto fabric with as little waste as possible, with far too many arrangements to enumerate, so marker software has always used heuristics and search. AI can propose good starting layouts faster, but the utilisation is still verified by geometry. Scheduling is similar: Lecture 28 grouped operations by dynamic programming, and hanger systems dispatch to idle stations; these classic algorithms are explainable and meet precedence, machine and headcount constraints exactly. AI is better at what's hard to put into formulas, such as predicting new-style times and learning curves. The division of labour: AI predicts and suggests, algorithms solve, people decide."
+
+  - layout: section
+    num: "02"
+    title: ["视觉质检：先算清三个比例", "Vision inspection: get three ratios straight"]
+
+  - layout: split
+    title: ["混淆矩阵：每 1000 件的四格", "The confusion matrix: four cells per 1000 pieces"]
+    points:
+      - ["召回率：次品中被抓住的比例", "Recall: share of defects caught"]
+      - ["误报率：合格品中被报警的比例", "False-alarm rate: share of good pieces flagged"]
+      - ["精确率：报警中真正是次品的比例", "Precision: share of alarms that are real defects"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="400" y="50" font-size="28" font-weight="700" fill="#ff9c75" text-anchor="middle">实际次品</text>
+          <text x="720" y="50" font-size="28" font-weight="700" fill="#8fb6ff" text-anchor="middle">实际合格</text>
+          <text x="120" y="195" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">报警</text>
+          <text x="120" y="425" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">放行</text>
+          <rect x="240" y="80" width="320" height="210" rx="20" fill="rgba(46,196,182,.18)" stroke="#2ec4b6" stroke-width="3"/>
+          <text x="400" y="180" font-size="64" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="en">{{ch31.tp:.0f}}</text>
+          <text x="400" y="240" font-size="28" fill="#5ee0d2" text-anchor="middle">抓对</text>
+          <rect x="580" y="80" width="300" height="210" rx="20" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/>
+          <text x="730" y="180" font-size="64" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">{{ch31.fp:.1f}}</text>
+          <text x="730" y="240" font-size="28" fill="#ff9c75" text-anchor="middle">误报</text>
+          <rect x="240" y="310" width="320" height="210" rx="20" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/>
+          <text x="400" y="410" font-size="64" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">{{ch31.fn:.0f}}</text>
+          <text x="400" y="470" font-size="28" fill="#ff9c75" text-anchor="middle">漏检</text>
+          <rect x="580" y="310" width="300" height="210" rx="20" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
+          <text x="730" y="410" font-size="64" font-weight="800" fill="#d3deea" text-anchor="middle" class="en">{{ch31.tn:.0f}}</text>
+          <text x="730" y="470" font-size="28" fill="#d3deea" text-anchor="middle">正确放行</text>
+          <text x="450" y="590" font-size="27" fill="#ffd75a" text-anchor="middle">次品率 2%、召回 95%、误报 3%（每 1000 件）</text>
+        </svg>
+    notes:
+      - "视觉质检的结果可以排成一张四格表，叫混淆矩阵。按供应商的数，每 1000 件里，20 件次品抓住约 {{ch31.tp:.0f}} 件、漏检约 {{ch31.fn:.0f}} 件；980 件合格品里误报约 {{ch31.fp:.0f}} 件，正确放行约 {{ch31.tn:.0f}} 件。三个比例要分清：召回率是次品中被抓住的比例，误报率是合格品中被报警的比例，这两个是检测器自己的性质；精确率是报警中真正是次品的比例，它还要看次品率。"
+      - "Inspection results fit a four-cell table, the confusion matrix. With the supplier's figures, out of 1000 pieces the 20 defects split into about {{ch31.tp:.0f}} caught and {{ch31.fn:.0f}} missed, and the 980 good pieces into about {{ch31.fp:.0f}} false alarms and {{ch31.tn:.0f}} correctly passed. Keep three ratios apart. Recall is the share of defects caught, and the false-alarm rate is the share of good pieces flagged; these two belong to the inspector. Precision is the share of alarms that are real defects, and it also depends on the defect rate."
+
+  - layout: figure
+    title: ["得分分布与阈值：右移误报少，漏检多", "Scores and threshold: move right, fewer false alarms, more misses"]
+    visual: {video: dist}
+    caption: ["蓝 = 合格品得分 N(0,1)，橙 = 次品得分 N(d′,1)，竖线 = 报警阈值；d′ = 3.53", "Blue: good N(0,1); orange: defects N(d′,1); line: threshold"]
+    notes:
+      - "检测器给每件衣片打一个像次品的得分。合格品的得分服从均值 0、标准差 1 的正态分布，次品服从均值 d′ 的正态分布，d′ 叫区分能力，越大两堆分得越开。得分超过阈值 t 就报警。召回率等于 1 减 Φ(t 减 d′)，误报率等于 1 减 Φ(t)。看实验页阈值来回移动：右移，误报少了，漏检多了；左移相反。算例 d′ 3.53、阈值 1.88，召回率 {{ch31.tpr:.0f}}%，误报率 {{ch31.fpr:.0f}}%。"
+      - "The inspector gives each piece a 'looks defective' score. Good pieces score as a normal distribution with mean 0 and standard deviation 1; defects score with mean d-prime, the discriminability: the larger it is, the further apart the two heaps. A score above threshold t raises an alarm. Recall is one minus Phi of t minus d-prime; the false-alarm rate is one minus Phi of t. Watch the threshold sweep in the lab: move it right and false alarms fall but misses rise; move it left and the opposite. In our example, d-prime 3.53 and threshold 1.88 give {{ch31.tpr:.0f}} percent recall and {{ch31.fpr:.0f}} percent false alarms."
+
+  - layout: bignum
+    title: ["基础比例：次品越少，报警里误报越多", "Base rates: the rarer the defects, the more alarms are false"]
+    nums:
+      - {n: "{{ch31.prec:.0f}}%", n_en: "precision at 2%", label: ["1000 件报警 {{ch31.alarms:.0f}} 件，真次品 {{ch31.tp:.0f}}", "{{ch31.alarms:.0f}} alarms, {{ch31.tp:.0f}} real"]}
+      - {n: "{{ch31.prec10:.0f}}%", n_en: "at 10%", label: ["同一检测器，次品率 10%", "Same inspector, 10% defects"]}
+      - {n: "{{ch31.prec1:.0f}}%", n_en: "at 1%", label: ["次品率 1%", "1% defects"]}
+    foot: ["精确率 = πR ÷ [πR + (1 − π)F]；次品率 2% 时永远说“合格”也有 98% 的“准确率”", "Precision = πR ÷ [πR + (1 − π)F]; at 2% defects, always saying 'good' is 98% 'accurate'"]
+    notes:
+      - "这里有一个最容易被忽略的事：基础比例。次品率 2%，1000 件报警约 {{ch31.alarms:.0f}} 件，其中真正是次品的只有约 {{ch31.tp:.0f}} 件，精确率约 {{ch31.prec:.0f}}%，十次报警六次是误报。同一个检测器，次品率 10% 时精确率约 {{ch31.prec10:.0f}}%，次品率 1% 时只有约 {{ch31.prec1:.0f}}%。所以不能只看准确率：次品率 2% 时，一个永远说“合格”的检测器准确率也有 98%，可它一件次品都抓不住。"
+      - "Here's the thing most often missed: the base rate. At a 2 percent defect rate, 1000 pieces bring about {{ch31.alarms:.0f}} alarms, only about {{ch31.tp:.0f}} of them real, so precision is about {{ch31.prec:.0f}} percent: six alarms in ten are false. The same inspector at a 10 percent defect rate has about {{ch31.prec10:.0f}} percent precision, and at 1 percent only about {{ch31.prec1:.0f}}. So don't look at 'accuracy' alone: at 2 percent defects, an inspector that always says 'good' is 98 percent accurate and catches nothing."
+
+  - layout: duo
+    title: ["阈值一动：ROC 和成本一起动", "Move the threshold: ROC and cost move together"]
+    left: {video: roc, label: ["ROC 曲线", "ROC curve"], note: ["圆点 = 当前阈值", "Dot: current threshold"]}
+    right: {video: cost, label: ["每 1000 件成本", "Cost per 1000 pieces"], note: ["谷底就是最省的阈值", "The valley is the cheapest threshold"]}
+    notes:
+      - "把所有阈值下的召回率和误报率连起来，就是左边的 ROC 曲线，越靠左上角检测器越好。右边是每 1000 件的成本随阈值的变化：成本等于漏检件数乘漏检代价，加误报件数乘复检代价。阈值太低，误报多，成本高；阈值太高，漏检多，成本也高；中间有个谷底。看两张图上的圆点跟着阈值一起走：在 ROC 上沿曲线滑，在成本曲线上先下后上。"
+      - "Join up recall and false-alarm rate for every threshold and you get the ROC curve on the left; the closer it hugs the top-left corner, the better the inspector. On the right is cost per 1000 pieces against threshold: misses times the cost of a miss plus false alarms times the cost of a recheck. Too low a threshold means many false alarms and high cost; too high means many misses and high cost too; there's a valley in between. Watch the dots move with the threshold: sliding along the ROC curve, and down then up on the cost curve."
+
+  - layout: bignum
+    title: ["最省阈值 t* 约 {{ch31.tbest:.2f}}，每 1000 件约 {{ch31.cbest:.0f}} 元", "Cheapest threshold t* ≈ {{ch31.tbest:.2f}}, about ¥{{ch31.cbest:.0f}} per 1000"]
+    nums:
+      - {n: "{{ch31.tbest:.2f}}", n_en: "t* at 2%", label: ["C_m 20 元，C_f 0.5 元", "Miss ¥20, false alarm ¥0.5"]}
+      - {n: "{{ch31.t10:.2f}}", n_en: "t* at 10%", label: ["次品多，阈值放低", "More defects: lower threshold"]}
+      - {n: "{{ch31.t1:.2f}}", n_en: "t* at 1%", label: ["次品少，阈值抬高", "Fewer defects: higher threshold"]}
+    foot: ["t* = d′/2 + ln[(1 − π)C_f ÷ (πC_m)] ÷ d′：次品越少、误报越贵，t* 越大", "t* = d′/2 + ln[(1 − π)C_f ÷ (πC_m)] ÷ d′: rarer defects or dearer false alarms push t* up"]
+    notes:
+      - "成本最低的阈值可以直接算出来。在等方差正态模型下，t* 等于 d′ 除以 2，加上 (1 减 π) 乘 C_f 除以 π 乘 C_m 的自然对数，再除以 d′。次品率 2%、漏检 20 元、复检 0.5 元，t* 约 {{ch31.tbest:.2f}}，每 1000 件成本约 {{ch31.cbest:.0f}} 元，比供应商设的 1.88 略省。次品率 10% 时，最省阈值降到约 {{ch31.t10:.2f}}；1% 时升到约 {{ch31.t1:.2f}}。次品越少或误报越贵，阈值就越该抬高。"
+      - "The cheapest threshold can be computed directly. Under the equal-variance normal model, t-star equals d-prime over 2, plus the natural log of one minus pi times C_f over pi times C_m, divided by d-prime. At a 2 percent defect rate, 20 yuan per miss and 0.5 per recheck, t-star is about {{ch31.tbest:.2f}} and the cost about {{ch31.cbest:.0f}} yuan per 1000 pieces, slightly cheaper than the supplier's 1.88. At 10 percent defects the cheapest threshold falls to about {{ch31.t10:.2f}}; at 1 percent it rises to about {{ch31.t1:.2f}}. The rarer the defects or the dearer the false alarms, the higher the threshold should go."
+
+  - layout: points
+    title: ["只调阈值不够：要提高 d′", "Tuning the threshold isn't enough: raise d′"]
+    points:
+      - ["精确率 80% + 召回率 90%：只调阈值做不到", "80% precision with 90% recall: no threshold does it"]
+      - ["误报率须 ≤ {{ch31.fprmax:.2f}}%：d′ 从 3.53 提到约 {{ch31.dneed:.1f}}", "False alarms ≤ {{ch31.fprmax:.2f}}%: d′ from 3.53 to about {{ch31.dneed:.1f}}"]
+      - ["换色、换款、新缺陷都会让 d′ 下降", "New colours, styles and defects all lower d′"]
+    foot: ["持续收集误报和漏检样本、定期重训；换款先小批验证", "Keep collecting false alarms and misses, retrain regularly, and trial each new style in a small batch"]
+    notes:
+      - "如果车间要求精确率 80%、召回率 90% 同时达到，只调阈值是做不到的：在次品率 2% 下，要精确率 80%，误报率必须压到约 {{ch31.fprmax:.2f}}% 以下；同时召回率 90%，区分能力 d′ 必须从 3.53 提高到约 {{ch31.dneed:.1f}}。d′ 靠什么提高？更好的光源和相机、更多更准的训练样本。而且要小心，换面料颜色、换款式、出现没见过的缺陷，都会让 d′ 下降，所以要持续收集误报和漏检的样本、定期重训，换款先小批验证。"
+      - "If the floor wants 80 percent precision and 90 percent recall together, no threshold will do it. At a 2 percent defect rate, 80 percent precision needs the false-alarm rate below about {{ch31.fprmax:.2f}} percent, and with 90 percent recall as well, discriminability must rise from 3.53 to about {{ch31.dneed:.1f}}. How do you raise d-prime? Better lighting and cameras, more and better-labelled training samples. And beware: a new fabric colour, a new style or an unseen kind of defect all lower d-prime, so keep collecting the false alarms and misses, retrain regularly, and trial each new style in a small batch."
+
+  - layout: lab
+    title: ["动手试一试：AI 质检与预测维护", "Try it: AI inspection and predictive maintenance"]
+    shot: {page: aiqc, set: [press: "#reset0"]}
+    tasks:
+      - ["第①页：拖动阈值，找每 1000 件最省的点", "Page ①: drag the threshold to find the cheapest point"]
+      - ["改次品率，看精确率和报警件数怎样变", "Change the defect rate; watch precision and alarms"]
+      - ["第②页：调窗口和阈值，兼顾提前量与误报", "Page ②: balance lead time and false alarms"]
+    notes:
+      - "虚拟实验 31-1 在问渠平台上自己做。第①页先用默认值记下召回率、误报率、精确率、混淆矩阵和每 1000 件成本；拖动阈值，看得分分布上的竖线、ROC 和成本曲线上的圆点怎样移动，找出成本最低的阈值，用 t* 公式核对。再把次品率改成 10% 和 1%，看精确率怎样变。第②页预测性维护，组合调整滑动平均窗口和报警阈值，看检出率、提前量和误报怎样取舍。"
+      - "Lab 31-1 is on WenQuest. On page ①, record recall, false-alarm rate, precision, the confusion matrix and cost per 1000 with the defaults; drag the threshold and watch the line on the score plot and the dots on the ROC and cost curves move; find the cheapest threshold and check it with the t-star formula. Then set the defect rate to 10 and 1 percent and see how precision changes. Page ② is predictive maintenance: combine the moving-average window and alarm threshold and see how detection rate, lead time and false alarms trade off."
+
+  - layout: section
+    num: "03"
+    title: ["预测性维护", "Predictive maintenance"]
+
+  - layout: figure
+    title: ["信号、滑动平均与报警", "Signals, moving averages and alarms"]
+    visual: {video: pdm}
+    caption: ["细线 = 日值，粗线 = 滑动平均（窗口 1 → 3 → 7 天轮换），红线 = 阈值，▲ = 报警", "Thin: daily; thick: moving average (1, 3, 7 days); red: threshold; ▲: alarm"]
+    notes:
+      - "第二个典型应用是预测性维护。算例里 200 台机器、180 天，每台每天一个指标，比如振动或电机电流的有效值，正常时归一化为 1，叠加噪声 0.08；{{ch31.ndeg}} 台会在某天开始退化，指数增长，30 天后故障。看三台机器的信号：绿色健康，橙色和蓝色在退化。细线是每天的值，粗线是滑动平均，窗口在 1、3、7 天之间轮换。窗口越长，粗线越平，噪声引起的误报越少，但退化开始后越过阈值也越晚。"
+      - "The second classic application is predictive maintenance. In our example, 200 machines over 180 days each report one indicator a day, such as the RMS of vibration or motor current, normalised to 1 when healthy, with noise of 0.08; {{ch31.ndeg}} of them start to degrade on some day, growing exponentially until they fail 30 days later. Look at three machines: green is healthy, orange and blue degrade. The thin line is the daily value and the thick line the moving average, cycling through windows of 1, 3 and 7 days. The longer the window, the smoother the line and the fewer noise-driven false alarms, but the later it crosses the threshold once degradation starts."
+
+  - layout: bignum
+    title: ["提前量、误报、漏报：三个数一起看", "Lead time, false alarms, misses: judge all three"]
+    nums:
+      - {n: "{{ch31.lead1:.0f}} 天", n_en: "lead · daily, 1.15", label: ["单日值：全部检出、提前约 {{ch31.lead1:.0f}} 天", "Daily values: all caught, early"]}
+      - {n: "{{ch31.fpm1:.2f}}", n_en: "false / machine / month", label: ["每台每月误报，200 台约 {{ch31.fleet_fa:.0f}} 次", "200 machines: about {{ch31.fleet_fa:.0f}} a month"]}
+      - {n: "{{ch31.fpm3:.2f}}", n_en: "3-day mean, 1.12", label: ["误报压下来，提前约 {{ch31.lead3:.1f}} 天", "Few false alarms, {{ch31.lead3:.1f}} days early"]}
+    foot: ["滑动平均压误报，但会推迟报警；窗口拉到 7 天，提前量反而略降", "Averaging cuts false alarms but delays alarms; a 7-day window even loses a little lead time"]
+    notes:
+      - "评价预测性维护要三个数一起看：提前量、误报、漏报。用单日值、阈值 1.15，退化的机器全部检出，平均提前约 {{ch31.lead1:.0f}} 天，看着很好；可每台每月误报约 {{ch31.fpm1:.2f}} 次，200 台的车间一个月约 {{ch31.fleet_fa:.0f}} 次，机修工很快就不理它了。改用 3 天滑动平均、阈值 1.12，仍然全部检出，提前约 {{ch31.lead3:.1f}} 天，误报降到每台每月约 {{ch31.fpm3:.2f}} 次。窗口再拉长到 7 天，提前量反而略降。"
+      - "Predictive maintenance must be judged on three numbers together: lead time, false alarms and misses. With daily values and a threshold of 1.15, every degrading machine is caught about {{ch31.lead1:.0f}} days early on average, which looks great; but each machine raises about {{ch31.fpm1:.2f}} false alarms a month, around {{ch31.fleet_fa:.0f}} a month for a 200-machine floor, and the mechanics soon ignore it. A 3-day moving average with a threshold of 1.12 still catches them all, about {{ch31.lead3:.1f}} days early, with false alarms down to about {{ch31.fpm3:.2f}} per machine a month. Stretch the window to 7 days and the lead time even drops a little."
+
+  - layout: section
+    num: "04"
+    title: ["AI 缝纫机与按需生产", "AI sewing machines and make-to-order"]
+
+  - layout: split
+    title: ["AI 缝纫机：感知—识别—调参闭环", "AI sewing machine: sense, recognise, adjust"]
+    points:
+      - ["感知：压脚高度、主轴电流、送布负载", "Sense: foot height, spindle current, feed load"]
+      - ["识别：层数变了、遇到接缝还是换了面料", "Recognise: more plies, a seam, or new fabric"]
+      - ["调参：电子送布、张力、压脚改参数", "Adjust: electronic feed, tension, foot"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <defs><marker id="m31" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs>
+          <path d="M450 150 A 230 200 0 0 1 700 420" stroke="#f2b705" stroke-width="6" fill="none" marker-end="url(#m31)"/>
+          <path d="M610 520 A 230 200 0 0 1 290 520" stroke="#f2b705" stroke-width="6" fill="none" marker-end="url(#m31)"/>
+          <path d="M200 420 A 230 200 0 0 1 380 150" stroke="#f2b705" stroke-width="6" fill="none" marker-end="url(#m31)"/>
+          <g text-anchor="middle">
+            <rect x="290" y="30" width="320" height="130" rx="22" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+            <text x="450" y="85" font-size="36" font-weight="800" fill="#5ee0d2">感知</text>
+            <text x="450" y="130" font-size="24" fill="#d3deea">厚度 · 电流 · 负载</text>
+            <rect x="560" y="420" width="320" height="130" rx="22" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
+            <text x="720" y="475" font-size="36" font-weight="800" fill="#c4b5fd">识别</text>
+            <text x="720" y="520" font-size="24" fill="#d3deea">层数 · 接缝 · 面料</text>
+            <rect x="20" y="420" width="320" height="130" rx="22" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
+            <text x="180" y="475" font-size="36" font-weight="800" fill="#ff9c75">调参</text>
+            <text x="180" y="520" font-size="24" fill="#d3deea">针距 · 压力 · 张力 · 转速</text>
+          </g>
+          <text x="450" y="330" font-size="28" font-weight="700" fill="#ffd75a" text-anchor="middle">调参要有上下限</text>
+          <text x="450" y="370" font-size="24" fill="#8fa3ba" text-anchor="middle">关键动作要有保护</text>
+        </svg>
+    notes:
+      - "一件衣服有的地方一层布，有的地方四五层，比如牛仔裤过梗处；传统平缝机的针距、张力、压脚压力调好就固定了，厚薄突变处容易针距不匀、跳针、断针。AI 缝纫机是个闭环：感知，靠压脚高度看厚度、主轴电流看穿刺阻力、送布电机负载看送布阻力；识别，判断层数变了、遇到接缝还是换了面料；调参，由电子送布、电子张力、电子压脚执行，调完继续测。公开专利的例子就是在两个时刻测厚度再查表。"
+      - "Parts of a garment are one ply, parts four or five, like a jeans yoke crossing. A traditional lockstitch machine keeps its stitch length, tension and foot pressure fixed once set, so sudden thickness changes cause uneven stitches, skips and broken needles. An AI sewing machine closes a loop. Sense: foot height for thickness, spindle current for penetration resistance, feed-motor load for feed resistance. Recognise: more plies, a cross seam, or a different fabric. Adjust: electronic feed, tension and foot carry out the change, then sensing continues. A published patent's example simply measures thickness at two moments and looks up a table."
+
+  - layout: points
+    title: ["规则、查表还是学习", "Rules, look-up tables, or learning?"]
+    points:
+      - ["大部分是传感器、执行器和控制，AI 在识别", "Mostly sensors, actuators and control; AI recognises"]
+      - ["种类少、规律清楚：规则和查表就够", "Few cases, clear patterns: rules and tables suffice"]
+      - ["种类多才用学习模型：要标注数据，难解释", "Many cases favour learning: labelled data, harder to explain"]
+    foot: ["识别错了怎么办：四层误判成两层、压脚压力调小，送布就会打滑 —— 调参要有上下限和保护", "If recognition fails, four plies read as two, less foot pressure, and the feed slips: set limits and protections"]
+    notes:
+      - "从本课程的角度看，自动适应布料的大部分工作是传感器、执行器和控制逻辑，是第 13、14 讲的内容，AI 主要体现在识别那一步。怎么选方法？如果布料变化只有几种、规律清楚，规则和查表就够了，而且容易验证；如果要从多个信号里分辨很多种面料和工况，学习模型才有优势，但它要大量标注数据，出错时也更难解释。不管哪种，都要回答识别错了会怎样，所以调参要有上下限，关键动作要有第 18 讲那样的保护。"
+      - "From this course's point of view, most of 'adapting to the fabric' is sensors, actuators and control logic, the content of Lectures 13 and 14; AI shows up mainly in the recognition step. How to choose a method? If the fabric only varies in a few ways with clear patterns, rules and look-up tables are enough and easy to verify. If many fabrics and conditions must be told apart from several signals, learning models have the edge, but they need lots of labelled data and their mistakes are harder to explain. Either way, ask what happens when recognition is wrong, so set limits on adjustments and protect critical actions as in Lecture 18."
+
+  - layout: points
+    title: ["按需生产与语言助手的两条规矩", "Make-to-order, and two rules for language assistants"]
+    points:
+      - ["先卖、再生产：预测定首单，销售定追加", "Sell first, then make: forecasts set the first run"]
+      - ["联网和电子参数让换款一键下发", "Connectivity and electronic settings make changeovers one click"]
+      - ["语言助手：回答注明来源；起草只是提议", "Assistants cite sources; their drafts are only proposals"]
+    foot: ["问渠数字工厂的 AI 工厂助手：数字来自历史库并注明出处，人确认后才执行", "The WenQuest factory assistant cites the historian for every number; nothing runs until a person confirms"]
+    notes:
+      - "第 29 讲讲过小单快反，批量降到一两百件，一天换好几次款。AI 在这里的作用，是把先生产、再卖变成先卖、再生产：需求预测决定首单做多少，销售数据回来决定追不追加；排产系统把小单拼进合适的单元；设备联网和电子参数让换款时一键下发针距、张力和花样。语言助手也有位置，但有两条底线：回答要注明数据来源；起草的单据只是提议，人确认后才执行。"
+      - "Lecture 29 covered quick response: batches down to a hundred or two, several style changes a day. AI's role here is to turn 'make, then sell' into 'sell, then make': demand forecasts set the first run, and sales data decide whether to repeat; scheduling fits small orders into suitable cells; connected machines with electronic settings take new stitch lengths, tensions and patterns in one click at a changeover. Language assistants have a place too, with two bottom lines: answers must cite their data sources, and any document they draft is only a proposal until a person confirms it."
+
+  - layout: points
+    title: ["就业、技能与产业转移：几种观点", "Jobs, skills and relocation: several views"]
+    points:
+      - ["冲击大：柬埔寨约 88% 纺织服装鞋类岗位高风险", "Big impact: ~88% of Cambodian TCF jobs at high risk"]
+      - ["冲击慢：机器人仍卡在布料物理和回收期上", "Slow impact: robots still stuck on fabric physics and payback"]
+      - ["岗位在变：会调电子参数、懂电控、会用数据", "Changing jobs: setting electronics, controls and data"]
+    foot: ["国际劳工组织 2017 年的估计含近 50 万缝纫工；“高风险”是技术可能性，不等于岗位消失", "The ILO's 2017 estimate included nearly 500 000 sewers; 'high risk' is technical possibility, not jobs gone"]
+    notes:
+      - "自动化和 AI 对服装业就业的影响有争议，我们把几种观点并列。第一种认为冲击很大：国际劳工组织 2017 年的柬埔寨简报估计，约 88% 的纺织服装鞋类岗位面临被自动化替代的高风险，包括近 50 万名缝纫工。第二种认为会慢得多：缝制机器人还卡在布料物理和投资回收上，“高风险”只是技术可能性。第三种关注岗位怎么变。比较确定的是：懂机构、电控、工艺又懂数据的人，多数情景下更有优势。"
+      - "The effect of automation and AI on apparel jobs is disputed, so let's set several views side by side. One says the impact will be large: an ILO brief on Cambodia in 2017 estimated about 88 percent of textile, clothing and footwear jobs at high risk of automation, including nearly 500 thousand sewers. Another says it will be much slower: sewing robots are still held back by fabric physics and payback, and 'high risk' is only technical possibility. A third looks at how jobs change. What's fairly certain is that people who understand mechanisms, controls and processes, and data too, are better placed in most scenarios."
+
+  - layout: points
+    title: ["学生项目：用 AI，也判断 AI", "Student project: use AI, and judge it"]
+    points:
+      - ["在问渠数字工厂完成实验 7：读看板、问助手", "Do Lab 7 in the WenQuest factory: dashboards, assistant"]
+      - ["建工序数据，让 AI 找瓶颈并列出计算过程", "Build process data; have AI find the bottleneck, with workings"]
+      - ["自己用节拍、平衡率、利特尔法则逐条核对", "Check every step yourself: takt, balance, Little's law"]
+    foot: ["评分看的是能不能判断 AI：节拍和周期有没有弄混，改进有没有违反约束", "Graded on judging the AI: did it confuse takt and cycle, did its fix break a constraint?"]
+    notes:
+      - "最后是一个把后几讲串起来的学生项目，训练一种越来越重要的能力：用 AI，同时判断 AI。第一步，在问渠数字工厂完成实验 7，学会读看板、问 AI 工厂助手、查回答的数据来源。第二步，选一个款式，写出工序、标准工时、先后关系、分组和产量记录，可以用虚拟实验 28-1 和 29-1 生成，交给 AI，让它找瓶颈、提改进，并列出计算过程。第三步，自己用节拍、平衡率和利特尔法则逐条核对，写报告答辩。"
+      - "To finish, a student project that ties the last few lectures together and trains an increasingly important skill: using AI while judging it. First, do Lab 7 in the WenQuest Digital Factory and learn to read the dashboards, ask the AI factory assistant, and trace its data sources. Second, pick a style and write out operations, standard minutes, precedence, groups and output records, which Labs 28-1 and 29-1 can generate; give them to the AI and have it find the bottleneck, suggest improvements and show its workings. Third, check every step yourself with takt, balance and Little's law, then write it up and defend it."
+
+  - layout: split
+    title: ["机器人联系：抓取也是同一条 ROC", "Robot link: grasping sits on the same ROC"]
+    points:
+      - ["抓取点置信度过阈值才抓：抓错与漏抓", "Grasp only above a confidence threshold: wrong vs missed"]
+      - ["关节电流滑动平均再比阈值：预测维护", "Average joint current against a threshold: predictive upkeep"]
+      - ["力控打磨：感知—识别—调参，并设上下限", "Force-controlled grinding: sense, recognise, adjust, with limits"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="40" y="380" width="520" height="200" rx="20" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
+          <g fill="#4c8dff"><rect x="80" y="470" width="80" height="60" rx="8"/><rect x="180" y="450" width="80" height="80" rx="8"/><rect x="280" y="480" width="80" height="50" rx="8"/><rect x="380" y="460" width="80" height="70" rx="8"/></g>
+          <text x="300" y="610" font-size="26" fill="#8fa3ba" text-anchor="middle">料框</text>
+          <g font-size="26" font-weight="800" text-anchor="middle" class="en">
+            <text x="120" y="440" fill="#5ee0d2">0.92</text><text x="220" y="420" fill="#ff9c75">0.41</text><text x="320" y="450" fill="#5ee0d2">0.88</text><text x="420" y="430" fill="#ff9c75">0.35</text>
+          </g>
+          <path d="M300 60 L300 200 L380 260" stroke="#ff7a45" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="300" cy="200" r="18" fill="#f2b705"/>
+          <path d="M370 280 L360 310 M395 270 L410 300" stroke="#f3f6fa" stroke-width="7" stroke-linecap="round"/>
+          <rect x="600" y="80" width="280" height="200" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <text x="740" y="140" font-size="28" font-weight="700" fill="#ffd75a" text-anchor="middle">阈值 0.8</text>
+          <text x="740" y="190" font-size="24" fill="#d3deea" text-anchor="middle">低：抓空抓错多</text>
+          <text x="740" y="235" font-size="24" fill="#d3deea" text-anchor="middle">高：漏抓多</text>
+          <text x="740" y="340" font-size="26" fill="#5ee0d2" text-anchor="middle">按代价定阈值</text>
+        </svg>
+    notes:
+      - "这一套取舍在机器人上一模一样。料框抓取用视觉给每个候选抓取点打一个置信度，超过阈值才去抓：阈值低了抓空、抓错多，高了漏抓多，和质检的召回率与误报率是同一条 ROC 曲线，阈值同样按抓错一次和漏抓一次的代价来定。协作机器人的关节减速器磨损时，同样负载下电机电流会慢慢升高，对电流做滑动平均再和阈值比，就是预测性维护。力控打磨则对应 AI 缝纫机的感知—识别—调参闭环，同样要设上下限防止过载。"
+      - "The same trade-offs apply to robots. In bin picking, vision scores each candidate grasp point with a confidence, and the robot grasps only above a threshold: too low and it grabs air or the wrong part, too high and it skips good parts. That's the same ROC curve as inspection recall and false alarms, and the threshold should be set by the cost of a wrong grasp versus a missed one. When a cobot's joint reducer wears, motor current under the same load slowly rises; average it and compare with a threshold, and that's predictive maintenance. Force-controlled grinding mirrors the AI sewing machine's sense-recognise-adjust loop, with limits to prevent overload."
+
+  - layout: split
+    title: ["生活中的例子：老是误报的烟雾报警器", "Everyday example: the smoke alarm that cries wolf"]
+    points:
+      - ["一炒菜就响，响了十次都不是火灾", "It goes off whenever you fry; ten times, never a fire"]
+      - ["家里人就把电池拆了，真着火反而不响", "So someone takes the battery out, and it's silent in a fire"]
+      - ["精确率太低，人就不再相信报警", "Low precision teaches people to ignore alarms"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <circle cx="450" cy="170" r="120" fill="#111d31" stroke="#f3f6fa" stroke-width="5"/>
+          <circle cx="450" cy="170" r="30" fill="#ff7a45"/>
+          <g stroke="#ff7a45" stroke-width="6" fill="none" stroke-linecap="round"><path d="M600 110 q30 60 0 120"/><path d="M640 80 q50 90 0 180"/><path d="M300 110 q-30 60 0 120"/><path d="M260 80 q-50 90 0 180"/></g>
+          <g font-size="34" font-weight="800" text-anchor="middle">
+            <text x="110" y="410" fill="#ff9c75">✗</text><text x="190" y="410" fill="#ff9c75">✗</text><text x="270" y="410" fill="#ff9c75">✗</text><text x="350" y="410" fill="#ff9c75">✗</text><text x="430" y="410" fill="#ff9c75">✗</text>
+            <text x="510" y="410" fill="#ff9c75">✗</text><text x="590" y="410" fill="#ff9c75">✗</text><text x="670" y="410" fill="#ff9c75">✗</text><text x="750" y="410" fill="#ff9c75">✗</text><text x="830" y="410" fill="#ff9c75">✗</text>
+          </g>
+          <text x="450" y="470" font-size="28" fill="#d3deea" text-anchor="middle">十次报警，全是炒菜</text>
+          <rect x="150" y="520" width="600" height="80" rx="20" fill="rgba(242,183,5,.12)"/>
+          <text x="450" y="572" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle">阈值要按代价定</text>
+        </svg>
+    notes:
+      - "家里也有同样的事。厨房里的烟雾报警器一炒菜就响，响了十次都不是火灾，家里人就会把电池拆了，真着火时反而不响。报警的精确率太低，人就不再相信报警。车间里的视觉质检也一样，十次报警六次是误报，工人很快就不认真复检了。这正是车间质检要按代价定阈值、要算精确率的原因。"
+      - "The same thing happens at home. The kitchen smoke alarm goes off every time someone fries something; ten alarms and not one fire, so somebody pulls the battery, and in a real fire it stays silent. When alarm precision is too low, people stop believing alarms. Vision inspection on the floor is no different: if six alarms in ten are false, operators soon stop rechecking carefully. That's exactly why inspection thresholds must be set by cost, and why precision must be calculated."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["报警 {{ch31.alarms:.0f}} 件，真次品只有 {{ch31.prec:.0f}}%", "{{ch31.alarms:.0f}} alarms, only {{ch31.prec:.0f}}% real"]
+    rows:
+      - ["每 1000 件：抓住 / 误报", "{{ch31.tp:.0f}} / {{ch31.fp:.0f}} 件"]
+      - ["最省阈值 / 成本", "{{ch31.tbest:.2f}} · {{ch31.cbest:.0f}} 元"]
+      - ["精确率 80% + 召回率 90%", "d′ ≈ {{ch31.dneed:.1f}}"]
+    side: {big: "{{ch31.false10:.0f}} / 10", text: ["十次报警六次是误报：只调阈值不够，要提高 d′", "Six alarms in ten are false: raise d′, not just the threshold"]}
+    foot: ["召回率和误报率是检测器的性质，精确率还取决于次品率；阈值按漏检和误报的代价定", "Recall and false-alarm rate belong to the inspector; precision also depends on the defect rate; set thresholds by cost"]
+    notes:
+      - "回到开头的问题。1000 件中 20 件次品抓住约 {{ch31.tp:.0f}} 件，980 件合格品误报约 {{ch31.fp:.0f}} 件，共报警约 {{ch31.alarms:.0f}} 件，精确率约 {{ch31.prec:.0f}}%，十次报警六次是误报。按代价公式，最省阈值约 {{ch31.tbest:.2f}}，每 1000 件约 {{ch31.cbest:.0f}} 元。要精确率 80% 且召回率 90%，只调阈值做不到，必须把 d′ 从 3.53 提高到约 {{ch31.dneed:.1f}}。所以“召回率 95%”可以信，但它不等于“报警准”。"
+      - "Back to our problem. Of 1000 pieces, about {{ch31.tp:.0f}} of the 20 defects are caught, and about {{ch31.fp:.0f}} of the 980 good pieces are flagged by mistake: about {{ch31.alarms:.0f}} alarms in all, with precision about {{ch31.prec:.0f}} percent, six alarms in ten false. By the cost formula the cheapest threshold is about {{ch31.tbest:.2f}}, costing about {{ch31.cbest:.0f}} yuan per 1000 pieces. For 80 percent precision with 90 percent recall no threshold will do; d-prime must rise from 3.53 to about {{ch31.dneed:.1f}}. So '95 percent recall' can be believed, but it doesn't mean the alarms are right."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["问三件事：吃什么数据、怎样评价、哪里出错", "Ask: what data, how judged, where it fails"]
+      - ["精确率取决于次品率；阈值按代价定", "Precision depends on base rate; thresholds by cost"]
+      - ["AI 缝纫机多是控制，调参要有上下限", "AI machines are mostly control; adjust within limits"]
+    after: ["作业 31：为领子工段选一套视觉质检方案 · 测验 · 虚拟实验 31-1 报告 —— 在问渠学习平台完成", "Assignment 31 · quiz · Lab 31-1 report — on WenQuest"]
+    notes:
+      - "最后一讲记住三件事。第一，判断任何 AI 应用都问三件事：吃什么数据、怎样评价、会在哪里出错，四类应用各有怕的。第二，召回率和误报率是检测器的性质，精确率还取决于次品率；阈值按漏检和误报的代价定，要精确率和召回率同时高，只能提高 d′；预测性维护要同时看提前量、误报和漏报。第三，AI 缝纫机的大部分是传感器、执行器和控制，调参要有上下限和保护；语言助手要注明来源、由人确认。这门课到这里就结束了，谢谢大家。"
+      - "Three things to remember from the last lecture. One: of any AI application ask what data it eats, how it's judged and where it fails; each of the four kinds has its own weakness. Two: recall and false-alarm rate belong to the inspector, while precision also depends on the defect rate; set thresholds by the costs of misses and false alarms, and to have both high precision and high recall you must raise d-prime; judge predictive maintenance on lead time, false alarms and misses together. Three: an AI sewing machine is mostly sensors, actuators and control, so adjustments need limits and protection, and language assistants must cite sources and wait for a person to confirm. That's the end of the course. Thank you all."

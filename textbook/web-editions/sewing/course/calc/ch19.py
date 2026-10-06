@@ -51,3 +51,17 @@ R['sol_sizes'] = [(s['size'], s['stroke_mm'], s['force_at_stroke_N'], s['t_on_ms
 if __name__ == '__main__':
     for k, v in R.items():
         print(k, v if not isinstance(v, float) else round(v, 4))
+
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if os.environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    flat = {}
+    for k, v in R.items():
+        k = k.replace('.', '_')
+        if isinstance(v, dict):
+            flat.update({f"{k}_{a}": b for a, b in v.items() if isinstance(b, (int, float))})
+        elif isinstance(v, (int, float)):
+            flat[k] = v
+    s4 = M.spindle_need(M.REQ['LS'], M.item('D-MOT-PMSM', '400'))
+    out(**flat, LS_E_kin=s4['E_regen'] / 0.7, w5000=5000 * RPM, trim_on=6 * 300 * 0.0069, trim_off=6 * 300 * 0.0051,
+        bt_L30=6 * 1800 * 0.011, L30_trim=6 * 300 * 0.011, OL7_total=c7['total'], OL7_E=c7['spindle']['E_regen'])

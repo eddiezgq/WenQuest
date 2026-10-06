@@ -61,3 +61,12 @@ out["E 10° 窗口 @4500 ms"] = 10 / (4500 * 6) * 1000
 # 机器人联系：传送带抓取窗口（同样的 0.27 ms 量级对比）
 for k, v in out.items():
     print(f"{k}: {v:.4f}" if isinstance(v, float) else f"{k}: {v}")
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out as book_out
+    book_out(a20=angle_for_rise_exact(2.0), a20x=angle_for_rise_approx(2.0), a16=angle_for_rise_approx(1.6), a25=angle_for_rise_approx(2.5),
+             main25=angle_for_rise_approx(2.5) - angle_for_rise_approx(2.0), hook25=out["2.0→2.5 旋梭转角"],
+             r201=rise_exact(201), r211=rise_exact(211), vh=hook_speed(5000), win_ms=out["8° 窗口时间 ms @5000"],
+             win_mm=out["8° 窗口梭尖行程 mm"], off11=out["1:1 脱环角"], off11n=out["1:1 脱环角"] - 360,
+             gap110=out["问题 Nm90→110 间隙(0.06)"], move=out["问题 轴向移出量使间隙回到 0.06"], gap70=out["Nm90→70 间隙(0.06)"],
+             dgap=(1.1 - 0.9) / 2, delta2=angle_for_rise_approx(2.0) - 180, hookrpm=2 * 5000)

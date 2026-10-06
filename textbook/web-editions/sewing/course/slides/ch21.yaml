@@ -1,0 +1,433 @@
+# 第 21 讲 电子花样机与电脑横机电控原型 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch21.键:格式}} 由课程包程序 course/calc/ch21.py 算出，不手写数字。
+lesson: 21
+code: [ch21]
+
+clips:
+  hero:          # 封面：三维电子花样机，开着运动（自己一直转，不会停）
+    page: model-pattern
+    selector: "#stage"
+    steps:
+      - {at: 0, js: "var b=document.getElementById('play');if(b.textContent.trim()==='播放')b.click();var l=document.getElementById('labels');if(l.checked)l.click()"}
+  knit3d:        # 三维电脑横机：机头来回走（自己一直往复，不会停）
+    page: model-flatknit
+    selector: "#stage"
+    steps:
+      - {at: 0, js: "var b=document.getElementById('play');if(b.textContent.trim()==='播放')b.click()"}
+  bed:           # 实验 21-1：织一行（慢放 1/20，约 19 s），放完马上再织
+    page: proto-fk
+    selector: "#bed"
+    loop: 22
+    steps:
+      - {at: 0, press: "#play"}
+  zoom:          # 实验 21-1：织一行时逐针放大命令点、触发、衔铁动作
+    page: proto-fk
+    selector: "#zoom"
+    vh: 1100
+    loop: 22
+    steps:
+      - {at: 0, press: "#play"}
+  err:           # 实验 21-1：机头速度 0.6 ↔ 1.0 m/s 交替，看误差带怎样冲出验收线
+    page: proto-fk
+    selector: "#err"
+    loop: 8
+    steps:
+      - {at: 0, set: {vmax: 0.6}}
+      - {at: 4, set: {vmax: 1.0}}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 21 讲", "Lecture 21"]
+    title: ["花样机与横机原型", "Pattern Sewer and Knitter Prototypes"]
+    sub: ["电子花样机、电脑横机的电控原型", "Control prototypes of two machines"]
+    notes:
+      - "同学们好。上一讲的平缝机原型是主轴转一圈、几个电磁铁按角度动作。今天这两台不一样：电子花样机要按主轴转角连续移动模板，电脑横机要按机头位置逐针选针。它们都要按位置连续控制，我们一台一台来做时序预算。"
+      - "Hello everyone. Last time's lockstitch prototype was one spindle turn with a few solenoids firing by angle. Today's two machines are different. The pattern sewer moves its template continuously by spindle angle, and the flat-knitting machine selects needles one by one by carriage position. Both are continuous position control, and we'll do a timing budget for each."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["口袋盖花样机：电机够不够？", "Pocket-flap sewer: is the motor big enough?"]
+    facts:
+      - ["目标：3 mm 针距，1600 r/min", "Target: 3 mm stitches at 1600 r/min"]
+      - ["X、Y 各一台 400 W 伺服：额定 1.27、峰值 3.8 N·m", "One 400 W servo per axis: 1.27 rated, 3.8 N·m peak"]
+      - ["针离开布料的实用窗口只有 183.4°", "The usable window, needle out of the cloth, is only 183.4°"]
+    notes:
+      - "一家衬衫厂每天要缝几千个口袋盖，请实验室先做一台花样机原型。机头用现成平缝机头，X–Y 平台用导程 10 毫米的滚珠丝杠，两轴各一台 400 瓦伺服，额定 1.27 牛米、峰值 3.8 牛米。车间希望 3 毫米的针以每分钟 1600 转缝。模板只能在针离开布料的 183.4 度里走完一针。电机够不够？能跑多快？最后回答。"
+      - "A shirt factory sews thousands of pocket flaps a day and asks the lab for a pattern-sewer prototype. It uses a standard lockstitch head and an X–Y table on 10 mm lead ball screws, with a 400 W servo per axis: 1.27 newton-metres rated, 3.8 peak. The shop wants 3 mm stitches at 1600 r/min. The template may move only during the 183.4 degrees when the needle is out of the cloth. Is the motor big enough, and how fast can it sew? We'll answer at the end."
+
+  - layout: points
+    title: ["两台原型，一个问题：位置决定的窗口", "Two prototypes, one problem: a window set by position"]
+    points:
+      - ["花样机：针离开布料时，模板走完一针", "Pattern sewer: the template moves only while the needle is out"]
+      - ["横机：机头经过每枚针时，选针器动作", "Knitting machine: the selector acts as the carriage passes each needle"]
+      - ["先做时序预算，再选零件、再动手", "Timing budget first, then parts, then hands-on"]
+    foot: ["窗口 → 加速度、转矩、提前量、抖动 → 零件：电机买小了，靠试是试不出来的", "Window → acceleration, torque, lead, jitter → parts: an undersized motor won't be found by trial"]
+    notes:
+      - "两台机器的控制问题其实是同一个：动作必须落进一个由位置决定的窗口。花样机的模板只能在针离开布料的那一小段转角里移动；横机的选针器只能在机头经过每一枚针的那一小段行程里作决定。电机买小了、选针器做慢了，靠试是试不出来的，所以先从窗口出发做时序预算，一步步算到加速度、转矩、提前量和抖动，再去选零件。"
+      - "The two machines share one control problem: every action must land in a window set by position. The pattern sewer's template may move only in the small slice of spindle angle when the needle is out of the cloth; the knitting machine's selector must decide in the short stretch as the carriage passes each needle. An undersized motor or a slow selector won't be found by trial, so we start from the window and budget our way to acceleration, torque, lead and jitter, and only then choose parts."
+
+  - layout: section
+    num: "01"
+    title: ["花样机：从窗口算到电机", "Pattern sewer: from window to motor"]
+
+  - layout: split
+    title: ["花样机 = 平缝机头 + X–Y 平台", "Pattern sewer = lockstitch head + X–Y table"]
+    points:
+      - ["机头拆掉送布牙，模板带布走", "No feed dog: the template carries the work"]
+      - ["X–Y 平台行程 300 × 200 mm", "X–Y table travel 300 × 200 mm"]
+      - ["主轴模块与平缝原型共用", "Spindle module shared with the lockstitch prototype"]
+    visual: {video: hero}
+    notes:
+      - "花样机原型新增的东西只有两样：自制的 X–Y 平台和压框。机头就是拆掉送布牙的平缝机头，布夹在模板里，由平台带着走出花样。主轴、编码器、电磁铁这些模块和上一讲的平缝机原型共用。看这台三维样机，针每扎一次，模板就挪一步，挪的时机就是我们今天要算的。"
+      - "The pattern sewer adds just two things: a home-made X–Y table and a clamp frame. The head is a lockstitch head with its feed dog removed; the fabric is held in a template and the table moves it through the pattern. The spindle, encoder and solenoids are shared with last lecture's lockstitch prototype. Watch the model: each time the needle goes in and out, the template steps once. When it may step is what we calculate today."
+
+  - layout: split
+    title: ["丝杠还是同步带？先算惯量和刚度", "Ball screw or belt? Work out inertia and stiffness"]
+    points:
+      - ["丝杠：负载惯量约转子 1.2 倍", "Screw: load inertia about 1.2× the rotor"]
+      - ["同步带直驱：约 34 倍，晃动难压", "Belt: about 34×, and it sways"]
+      - ["小联轴器太重 → 1:1 带轮平行布置", "Couplings too heavy → 1:1 pulleys side by side"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="30" y="60" font-size="30" font-weight="700" fill="#c7d3e2">负载惯量 / 转子惯量</text>
+          <rect x="30" y="90" width="40" height="70" rx="8" fill="#2ec4b6"/>
+          <text x="90" y="138" font-size="34" font-weight="800" fill="#5ee0d2">丝杠 1.2×</text>
+          <rect x="30" y="190" width="840" height="70" rx="8" fill="#ff7a45"/>
+          <text x="850" y="238" font-size="34" font-weight="800" fill="#08101d" text-anchor="end">同步带 34×</text>
+          <text x="30" y="350" font-size="30" font-weight="700" fill="#c7d3e2">固有频率</text>
+          <g transform="translate(30,380)">
+            <rect width="400" height="200" rx="22" fill="rgba(46,196,182,.12)" stroke="#2ec4b6" stroke-width="3"/>
+            <text x="200" y="100" font-size="64" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="en">580 Hz</text>
+            <text x="200" y="155" font-size="28" fill="#c7d3e2" text-anchor="middle">丝杠 16×10</text></g>
+          <g transform="translate(470,380)">
+            <rect width="400" height="200" rx="22" fill="rgba(255,122,69,.12)" stroke="#ff7a45" stroke-width="3"/>
+            <text x="200" y="100" font-size="64" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">82 Hz</text>
+            <text x="200" y="155" font-size="28" fill="#c7d3e2" text-anchor="middle">同步带直驱</text></g>
+        </svg>
+    notes:
+      - "平台用丝杠还是同步带？用零件库里实有的规格算一算：丝杠方案折算到电机的负载惯量只有转子的 1.2 倍左右，刚度高一个数量级，固有频率约 580 赫兹；同步带直驱的负载惯量是转子的 34 倍，82 赫兹的晃动很难压住。所以选丝杠。还有个细节：库里最小的梅花联轴器自身惯量就是转子的 7 倍，会吃掉大半加速能力，所以电机和丝杠平行布置，中间用一对一比一的带轮。"
+      - "Ball screw or belt for the table? Work it out with real parts from the library. With the screw, the load inertia seen by the motor is only about 1.2 times the rotor's, the stiffness is an order of magnitude higher, and the natural frequency is about 580 hertz. A direct belt drive is 34 times the rotor, and an 82 hertz sway is hard to damp. So, the screw. One more detail: the smallest jaw coupling in the library is itself 7 times the rotor inertia and would eat most of the acceleration, so motor and screw sit side by side, linked by a pair of 1:1 pulleys."
+
+  - layout: bignum
+    title: ["从窗口到时间和加速度：1600 r/min、3 mm", "From window to time and acceleration: 1600 r/min, 3 mm"]
+    nums:
+      - {n: "{{ch21.dt1600:.1f}} ms", label: ["Δt = W_u / (6n)：走完一针的时间", "Δt = W_u / (6n): time for one stitch"]}
+      - {n: "{{ch21.a3:.1f}}", n_en: "m/s²", label: ["a = C·s/Δt²（S 形，C = 5.33）", "a = C·s/Δt² (S-curve, C = 5.33)"]}
+      - {n: "{{ch21.vpk3:.3f}}", n_en: "m/s", label: ["峰值速度 2.0·s/Δt", "Peak speed 2.0·s/Δt"]}
+    foot: ["S 形七段式加减速不激振平台，代价是峰值加速度系数从 4 升到 5.33", "A seven-segment S-curve doesn't excite the table; the price is a peak factor of 5.33 instead of 4"]
+    notes:
+      - "计算链从窗口开始。布加下模板 1.5 毫米时，两端各留 10 度，实用窗口 183.4 度。主轴每分钟 n 转，每度用六 n 分之一秒，1600 转时只有 {{ch21.dt1600:.1f}} 毫秒。固件用 S 形加减速，不激振平台，代价是峰值系数从 4 变成 5.33。代进去，3 毫米的针要 {{ch21.a3:.1f}} 米每二次方秒，峰值速度 {{ch21.vpk3:.3f}} 米每秒，电机约 {{ch21.rpm3:.0f}} 转，离额定转速还远。"
+      - "The chain starts from the window. With 1.5 millimetres of fabric and template, and 10 degrees kept at each end, the usable window is 183.4 degrees. At n r/min each degree takes one over 6n seconds, so at 1600 there are only {{ch21.dt1600:.1f}} milliseconds. The firmware uses an S-curve so the table isn't excited; the price is a peak factor of 5.33 instead of 4. A 3 mm stitch then needs {{ch21.a3:.1f}} metres per second squared, a peak speed of {{ch21.vpk3:.3f}} metres per second, about {{ch21.rpm3:.0f}} r/min at the motor, well below rated speed."
+
+  - layout: bignum
+    title: ["峰值转矩够了，卡住的是发热", "Peak torque is fine; heat is the limit"]
+    nums:
+      - {n: "{{ch21.TX:.2f}}", n_en: "N·m", label: ["X 轴峰值转矩（峰值 3.8）", "X-axis peak torque (3.8 available)"]}
+      - {n: "{{ch21.rmsk:.2f}}", n_en: "× T_pk", label: ["rms 转矩：0.816·√(183.4/360)", "rms torque: 0.816·√(183.4/360)"]}
+      - {n: "{{ch21.Tpk_lim:.2f}}", n_en: "N·m", label: ["rms ≤ 额定 1.27 → 峰值上限", "rms ≤ 1.27 rated → peak limit"]}
+    foot: ["设计加速度取 X 50、Y 40 m/s²；短时能力留作余量", "Design accelerations X 50, Y 40 m/s²; short-term capacity is kept as margin"]
+    notes:
+      - "转矩几乎全花在转子和丝杠上：四项惯量加起来约 {{ch21.JX:.3f}} 乘 10 的负 4 次方，乘角加速度，再加很小的摩擦项，X 轴峰值转矩约 {{ch21.TX:.2f}} 牛米，离峰值 3.8 很远。可连续缝纫会不会烫？要看均方根转矩：S 形的形状系数 0.816，最坏每针都用满窗口，合起来是峰值的 {{ch21.rmsk:.2f}} 倍，不得超过额定 1.27，所以峰值只能到 {{ch21.Tpk_lim:.2f}}。反算出设计加速度：X 取 50、Y 取 40。"
+      - "The torque goes almost entirely into the rotor and the screw. The four inertias add to about {{ch21.JX:.3f}} times ten to the minus four; times the angular acceleration, plus a small friction term, the X axis needs about {{ch21.TX:.2f}} newton-metres peak, far below 3.8. But will it overheat in continuous sewing? Look at rms torque. The S-curve form factor is 0.816, and in the worst case every stitch uses the whole window: together {{ch21.rmsk:.2f}} times the peak, which must stay within the 1.27 rating. So the peak may only reach {{ch21.Tpk_lim:.2f}}. Working back gives the design accelerations: 50 for X, 40 for Y."
+
+  - layout: bignum
+    title: ["针距–转速上限：3 mm 针能跑多快", "Speed limit by stitch: how fast can 3 mm go"]
+    nums:
+      - {n: "{{ch21.cX3:.0f}}", n_en: "r/min", label: ["沿 X（a = 50）：达标", "Along X (a = 50): meets target"]}
+      - {n: "{{ch21.cY3:.0f}}", n_en: "r/min", label: ["沿 Y（a = 40）：不到 1600", "Along Y (a = 40): below 1600"]}
+      - {n: "{{ch21.c45:.0f}}", n_en: "r/min", label: ["45° 斜向：两轴各走 s/√2", "At 45°: each axis moves s/√2"]}
+    foot: ["n_cap = W_u / (6√(C·s/a))，再与机头 2500 r/min 取小：写进固件自动降速，也是第 22 章的期望值", "n_cap = W_u / (6√(C·s/a)), capped at 2500: it goes into the firmware and becomes Chapter 22's expected values"]
+    notes:
+      - "把计算链倒过来，就能给每种针距定一个转速上限：走 s 所需的时间是根号下 C 乘 s 除以 a，窗口除以六倍这个时间，再和机头限速 2500 取小。3 毫米的针沿 X 能跑 {{ch21.cX3:.0f}}，满足 1600；沿 Y 质量大、设计加速度只有 40，只有 {{ch21.cY3:.0f}}；斜 45 度两轴各走 s 除以根号 2，反而能到 {{ch21.c45:.0f}}。这张表会写进固件做自动降速，也会变成第 22 章测试用例的期望值。"
+      - "Turn the chain around and every stitch length gets a speed limit. The time to move s is the square root of C times s over a; the window over six times that time is the limit, capped by the head's 2500 r/min. A 3 mm stitch along X can run at {{ch21.cX3:.0f}}, meeting 1600. Along Y the mass is bigger and the design acceleration only 40, so {{ch21.cY3:.0f}}. At 45 degrees each axis moves s over root two, and it reaches {{ch21.c45:.0f}}. This table goes into the firmware for automatic slow-down, and becomes the expected values of Chapter 22's test cases."
+
+  - layout: section
+    num: "02"
+    title: ["花样机固件：按转角插补", "Pattern-sewer firmware: interpolating by angle"]
+
+  - layout: split
+    title: ["前瞻限速：遇到慢针提前降速", "Look-ahead: slow down before a slow stitch"]
+    points:
+      - ["每针先按较慢的一轴定上限", "Each stitch first gets its slower-axis cap"]
+      - ["反向一遍：为后面的慢针提前减速", "Backward pass: brake early for a slow stitch"]
+      - ["正向一遍：每针最多加 300 r/min", "Forward pass: at most +300 r/min per stitch"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M40 540 L880 540" stroke="#4b5f7d" stroke-width="3"/>
+          <g font-size="24" font-weight="700" text-anchor="middle" class="en">
+            <rect x="50" y="160" width="80" height="380" rx="8" fill="#4c8dff"/><text x="90" y="145" fill="#f3f6fa">{{ch21.lk0:.0f}}</text>
+            <rect x="155" y="180" width="80" height="360" rx="8" fill="#f2b705"/><text x="195" y="165" fill="#f3f6fa">{{ch21.lk1:.0f}}</text>
+            <rect x="260" y="235" width="80" height="305" rx="8" fill="#f2b705"/><text x="300" y="220" fill="#f3f6fa">{{ch21.lk2:.0f}}</text>
+            <rect x="365" y="289" width="80" height="251" rx="8" fill="#f2b705"/><text x="405" y="274" fill="#f3f6fa">{{ch21.lk3:.0f}}</text>
+            <rect x="470" y="344" width="80" height="196" rx="8" fill="#ff7a45"/><text x="510" y="329" fill="#ff9c75">{{ch21.lk4:.0f}}</text>
+            <rect x="575" y="289" width="80" height="251" rx="8" fill="#2ec4b6"/><text x="615" y="274" fill="#f3f6fa">{{ch21.lk5:.0f}}</text>
+            <rect x="680" y="235" width="80" height="305" rx="8" fill="#2ec4b6"/><text x="720" y="220" fill="#f3f6fa">{{ch21.lk6:.0f}}</text>
+            <rect x="785" y="180" width="80" height="360" rx="8" fill="#2ec4b6"/><text x="825" y="165" fill="#f3f6fa">{{ch21.lk7:.0f}}</text></g>
+          <text x="510" y="585" font-size="26" font-weight="700" fill="#ff9c75" text-anchor="middle">6 mm 长针（沿 Y）</text>
+          <text x="40" y="60" font-size="28" fill="#c7d3e2">各针转速 r/min：2 mm 针中夹一针 6 mm</text>
+          <text x="40" y="100" font-size="24" fill="#f2b705">提前 4 针开始降</text>
+          <text x="880" y="100" font-size="24" fill="#5ee0d2" text-anchor="end">过后逐针加回</text>
+        </svg>
+    notes:
+      - "每针都有自己的上限，但主轴不能一针就从 2092 跳到 1080。前瞻分两遍：先从后往前扫，每一针不得比下一针快 300 转以上，遇到慢针就提前减速；再从前往后扫，每针不得比上一针快 300 以上，避免加速太猛。看图：一串 2 毫米的针中间夹一针沿 Y 的 6 毫米长针，提前 4 针开始降，到长针刚好降到 1080，过后再逐针加回去。这个计算在后台对整段花样做一次。"
+      - "Each stitch has its own cap, but the spindle can't jump from 2092 to 1080 in one stitch. Look-ahead runs two passes. Backward: no stitch may be more than 300 r/min faster than the next, so a slow stitch ahead brakes the spindle early. Forward: no stitch may be more than 300 faster than the one before, so acceleration isn't too harsh. In the chart, a run of 2 mm stitches has one 6 mm stitch along Y. Braking starts four stitches early, reaches 1080 right at the long stitch, then climbs back one stitch at a time. This is computed once per pattern segment, in the background."
+
+  - layout: split
+    title: ["窗口内插补：用预测角补偿延迟", "Interpolation in the window: predict to beat delay"]
+    points:
+      - ["插补每 1 ms 一次，只看主轴转角", "Every 1 ms, driven by spindle angle"]
+      - ["预测角 φp = φ + ω·Td", "Predicted angle φp = φ + ω·Td"]
+      - ["窗口外命令保持不变", "Outside the window the command holds"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <circle cx="300" cy="330" r="200" fill="none" stroke="#22324d" stroke-width="36"/>
+          <path d="M 100.1 335.9 A 200 200 0 1 1 499.9 335.9" fill="none" stroke="#2ec4b6" stroke-width="36"/>
+          <text x="300" y="320" font-size="32" font-weight="800" fill="#5ee0d2" text-anchor="middle">模板可动</text>
+          <text x="300" y="365" font-size="28" fill="#f3f6fa" text-anchor="middle" class="en">183.4°</text>
+          <text x="300" y="590" font-size="28" font-weight="700" fill="#ff9c75" text-anchor="middle">针在布中：不动</text>
+          <circle cx="126.8" cy="230" r="16" fill="#f3f6fa"/>
+          <circle cx="157.1" cy="190.1" r="16" fill="#f2b705"/>
+          <text x="80" y="215" font-size="30" font-weight="800" fill="#f3f6fa" text-anchor="end" class="en">φ</text>
+          <text x="140" y="160" font-size="30" font-weight="800" fill="#f2b705" text-anchor="end" class="en">φp</text>
+          <g transform="translate(560,170)">
+            <text x="0" y="0" font-size="28" fill="#c7d3e2">1600 r/min 时</text>
+            <text x="0" y="60" font-size="34" font-weight="800" fill="#f2b705">ω·Td = {{ch21.lag1600:.1f}}°</text>
+            <text x="0" y="110" font-size="28" fill="#c7d3e2">比两端余量 10° 还大</text>
+            <text x="0" y="200" font-size="26" fill="#8fa3ba">φ 必须来自主控</text>
+            <text x="0" y="240" font-size="26" fill="#8fa3ba">直接接的编码器</text></g>
+        </svg>
+    notes:
+      - "插补中断每毫秒跑一次，但它不按时间算，按主轴转角算。从发出位置命令到电机真正跟上有个总延迟 Td，约 1.5 毫秒，包括 CAN FD 传输和驱动器内部的一个插补周期；1600 转时相当于 {{ch21.lag1600:.1f}} 度，比两端留的 10 度还大，所以要用预测角 φ 加 ω Td 去查表。窗口内查 S 形表算出本针走了多少；窗口外命令一律不变。这是“针在布中模板不动”的软件保证。"
+      - "The interpolation interrupt runs every millisecond, but it works from spindle angle, not time. Between issuing a position command and the motor following there's a total delay Td of about 1.5 milliseconds: the CAN FD transfer plus one interpolation period inside the drive. At 1600 r/min that is {{ch21.lag1600:.1f}} degrees, more than the 10 degree margin at each end. So we look up the table with a predicted angle, phi plus omega Td. Inside the window, the S-curve table says how far this stitch has moved; outside it the command never changes. That's the software guarantee that the template never moves while the needle is in the cloth."
+
+  - layout: bignum
+    title: ["同步验证：针在布中，模板滑了多少", "Sync check: how far the template slides with the needle in"]
+    nums:
+      - {n: "0.18 mm", label: ["初调：位置环 40 Hz、前馈一半、无补偿", "First try: 40 Hz loop, half feed-forward, no prediction"]}
+      - {n: "0.002 mm", label: ["100 Hz、前馈 95%、预测角", "100 Hz, 95% feed-forward, predicted angle"]}
+    foot: ["调试由静到动：回原点 → 间隙与螺距补偿 → 5×5 针孔标定坐标 → 1600 r/min 同步验证", "Static to dynamic: homing → backlash and pitch → 5×5 hole calibration → sync check at 1600 r/min"]
+    notes:
+      - "调试按由静到动、由单轴到同步：先回原点，碰开关再找电机 Z 相；再测反向间隙和螺距误差做补偿；再在纸上刺 5 乘 5 个针孔标定坐标。最关键是同步验证：1600 转连续缝，按主轴角对齐命令和实际位置。初调时位置环只有约 40 赫兹、前馈只开一半、没做延迟补偿，针在布中模板还滑了 0.18 毫米；三项都改好后降到 0.002 毫米，也就是 2 个编码器计数。"
+      - "Bring-up goes from static to dynamic, single axis to synchronised. Home first: touch the switch, then find the motor's Z mark. Then measure backlash and screw-pitch error and compensate. Then prick a 5 by 5 grid of holes in paper to calibrate the coordinates. The key step is the sync check: sew continuously at 1600 r/min and line up command and actual position by spindle angle. At first, with a 40 hertz position loop, half feed-forward and no delay compensation, the template still slid 0.18 millimetres with the needle in. With all three fixed it's 0.002 millimetres, two encoder counts."
+
+  - layout: section
+    num: "03"
+    title: ["缩比横机：逐针选针的时序", "Scaled knitting machine: needle-by-needle timing"]
+
+  - layout: split
+    title: ["缩比横机：60 针、E5、8 段选针器", "Scaled knitter: 60 needles, E5, 8-segment selector"]
+    points:
+      - ["单系统、单针床，针距 5.08 mm", "One system, one bed, 5.08 mm gauge"]
+      - ["机头 200 W 伺服，0.01 mm/计数", "Carriage: 200 W servo, 0.01 mm per count"]
+      - ["同段两次动作隔 {{ch21.t_seg:.1f}} ms", "{{ch21.t_seg:.1f}} ms between firings of one segment"]
+    visual: {video: knit3d}
+    notes:
+      - "工业横机有几百枚针、两三个系统、两块针床，教学原型把它缩到最小：单系统、单针床、60 针、E5。粗针距的好处是针槽、三角、选针片都大，普通铣床和激光切割就能做，选针时间也宽。机头用 200 瓦伺服经同步带驱动，分辨率 0.01 毫米。选针器 8 段，相邻针轮流分到不同段，同一段两次动作隔 8 个针距，0.6 米每秒时有 {{ch21.t_seg:.1f}} 毫秒，远大于吸合加释放的 3 毫秒。"
+      - "Industrial flat-knitting machines have hundreds of needles, two or three systems and two beds. The teaching prototype shrinks it to the minimum: one system, one bed, 60 needles, gauge E5. The coarse gauge means big needle slots, cams and selector jacks that an ordinary mill or laser cutter can make, and generous selection time. The carriage is driven by a 200 watt servo through a belt, at 0.01 millimetre per count. The selector has 8 segments, so neighbouring needles go to different segments; one segment fires every 8 needles, {{ch21.t_seg:.1f}} milliseconds apart at 0.6 metres per second, far more than the 3 milliseconds to pull in and release."
+
+  - layout: figure
+    title: ["以机头位置为时间基准：织一行", "Carriage position is the time base: knitting one row"]
+    visual: {video: bed}
+    h: 520
+    caption: ["红线是选针点；机头每经过一枚针就要作一次决定", "Red line: the selection point, one decision per needle"]
+    notes:
+      - "这是实验 21-1 的针床和机头，慢放二十倍。上面是机头速度曲线：加速、匀速、减速，两端各停一下换向。下面红线是选针点，机头经过每一枚针时，选针器都要在这里作一次决定。注意这里的时间基准不再是主轴转角，而是机头位置：第 i 枚针应当在 c 加 i 加二分之一个针距处被选中。一行走下来 {{ch21.D:.1f}} 毫米，用时约 {{ch21.row06:.3f}} 秒。"
+      - "This is the needle bed and carriage of Lab 21-1, slowed twenty times. On top, the carriage speed: accelerate, cruise, decelerate, with a pause at each end to reverse. Below, the red line is the selection point; as the carriage passes each needle, the selector must decide right there. The time base is no longer spindle angle but carriage position: needle i should be selected at c plus i plus a half pitches. One row is {{ch21.D:.1f}} millimetres and takes about {{ch21.row06:.3f}} seconds."
+
+  - layout: split
+    title: ["提前量：补偿延迟，补偿不了抖动", "Lead: it cancels delay, not jitter"]
+    points:
+      - ["命令点 x_cmd = x_i − v(Tr + Tq/2)", "Command at x_cmd = x_i − v(Tr + Tq/2)"]
+      - ["MCU 每周期查一次：平均晚 Tq/2", "MCU checks once a cycle: Tq/2 late on average"]
+      - ["量化 ±vTq/2、离散 ±vJ 补不掉", "±vTq/2 and ±vJ can't be compensated"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M30 330 L880 330" stroke="#4b5f7d" stroke-width="4"/>
+          <text x="880" y="370" font-size="26" fill="#8fa3ba" text-anchor="end">机头位置 →</text>
+          <rect x="560" y="200" width="160" height="260" fill="rgba(46,196,182,.18)"/>
+          <text x="640" y="190" font-size="26" fill="#5ee0d2" text-anchor="middle">±0.1p 验收</text>
+          <path d="M640 150 L640 480" stroke="#f3f6fa" stroke-width="5"/>
+          <text x="640" y="520" font-size="32" font-weight="800" fill="#f3f6fa" text-anchor="middle" class="en">x_i</text>
+          <path d="M150 260 L150 400" stroke="#4c8dff" stroke-width="8"/>
+          <text x="150" y="440" font-size="28" font-weight="800" fill="#8fbaff" text-anchor="middle">命令点</text>
+          <path d="M160 285 L630 285" stroke="#f2b705" stroke-width="5" marker-end="url(#a21a)"/>
+          <text x="395" y="268" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle">提前 v(Tr + Tq/2)</text>
+          <rect x="590" y="355" width="100" height="40" rx="8" fill="#ff7a45"/>
+          <text x="640" y="590" font-size="26" fill="#ff9c75" text-anchor="middle">衔铁动作落点：±v(Tq/2 + J)</text>
+          <defs><marker id="a21a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs>
+        </svg>
+    notes:
+      - "横机固件只改一处：时间基准从主轴转角换成机头位置。选针器从接到命令到衔铁动作要 Tr，所以命令要提前 v 乘 Tr。还多一项二分之一 Tq：MCU 每个控制周期才查一次位置，过了命令点也要等到下个周期才发，平均晚半个周期；FPGA 每个计数比较一次，这项几乎为零。提前量能补偿固定的延迟，补偿不了的是量化的正负半个周期和响应时间的离散 J。"
+      - "The knitting firmware changes only one thing: the time base becomes carriage position instead of spindle angle. The selector takes Tr from command to armature motion, so the command goes v times Tr early. There's one more term, half of Tq: an MCU checks position once per control cycle, so after passing the command point it still waits for the next cycle, half a cycle late on average. An FPGA compares at every count, so that term almost vanishes. A lead can cancel a fixed delay; what it can't cancel is the quantisation of plus or minus half a cycle and the scatter J of the response time."
+
+  - layout: bignum
+    title: ["算例：E5、0.6 m/s、MCU 1 ms", "Worked example: E5, 0.6 m/s, MCU 1 ms"]
+    nums:
+      - {n: "{{ch21.lead:.2f}} mm", n_en: "≈ {{ch21.lead_p:.2f}} p", label: ["提前量 v(Tr + Tq/2)", "Lead v(Tr + Tq/2)"]}
+      - {n: "±{{ch21.q_err:.2f}}", n_en: "± {{ch21.j_err:.2f}} mm", label: ["量化 vTq/2 · 离散 vJ", "Quantisation vTq/2 · scatter vJ"]}
+      - {n: "{{ch21.err_p:.3f}} p", n_en: "{{ch21.err:.2f}} mm", label: ["最坏误差 ≤ 0.1p：验收通过", "Worst error ≤ 0.1p: passes"]}
+    foot: ["|e| ≤ 0.25p 才能正确选针；验收要求 ≤ 0.1p，留 2.5 倍余量", "Up to 0.25p the jack is still pushed correctly; acceptance asks ≤ 0.1p, a 2.5× margin"]
+    notes:
+      - "按标准参数算一遍：0.6 米每秒、Tr 1.5 毫秒、MCU 控制周期 1 毫秒。提前量 {{ch21.lead:.2f}} 毫米，约 {{ch21.lead_p:.2f}} 个针距，不补偿就已经贴着错选的边界了。补偿以后剩下补不掉的两项：量化 {{ch21.q_err:.2f}} 毫米，离散 {{ch21.j_err:.2f}} 毫米，合计 {{ch21.err:.2f}} 毫米，约 {{ch21.err_p:.3f}} 个针距。判据有两条：误差不超过四分之一针距才能正确选针；验收更严，不超过十分之一，留 2.5 倍余量。"
+      - "Run the standard numbers: 0.6 metres per second, Tr 1.5 milliseconds, a 1 millisecond MCU cycle. The lead is {{ch21.lead:.2f}} millimetres, about {{ch21.lead_p:.2f}} of a pitch; uncompensated, we'd already be at the edge of mis-selection. After compensation two terms remain: quantisation {{ch21.q_err:.2f}} millimetres and scatter {{ch21.j_err:.2f}}, together {{ch21.err:.2f}} millimetres, about {{ch21.err_p:.3f}} of a pitch. Two criteria: within a quarter pitch the jack is still pushed correctly; acceptance is stricter, a tenth of a pitch, a 2.5 times margin."
+
+  - layout: figure
+    title: ["放大一枚针：命令点、触发、衔铁动作", "Zoom on one needle: command, trigger, armature"]
+    visual: {video: zoom}
+    h: 420
+    caption: ["织一行时逐针放大：绿色带为 ±0.1p 验收范围", "Needle by needle; green is the ±0.1p band"]
+    notes:
+      - "把一枚针放大看。最上面一行是命令点，在针位前面提前量那么远；中间是触发，MCU 要等到下一个控制周期才真正发出，所以是一段范围；最下面是衔铁实际动作的位置，再叠上响应时间的离散。三段叠起来，落在绿色的十分之一针距带里就合格，超出四分之一针距就错选。织一行时它会一枚针一枚针地更新。"
+      - "Zoom in on one needle. The top row is the command point, one lead ahead of the needle. The middle is the trigger: an MCU only acts at its next control cycle, so it's a range. The bottom is where the armature actually moves, with the response scatter on top. Stack the three, and if the result stays in the green tenth-of-a-pitch band it passes; beyond a quarter pitch the needle is mis-selected. As the row is knitted it updates needle by needle."
+
+  - layout: figure
+    title: ["速度一高，误差带冲出验收线", "Go faster and the error band breaks out"]
+    visual: {video: err}
+    h: 560
+    caption: ["机头最高速度 0.6 ↔ 1.0 m/s 交替（MCU 1 ms）", "Top speed 0.6 ↔ 1.0 m/s (MCU 1 ms)"]
+    notes:
+      - "这是每枚针的选针误差，单位是针距。绿色是正负十分之一的验收带，浅黄是正负四分之一的允许窗口，深色是误差范围。机头速度在 0.6 和 1.0 米每秒之间切换：0.6 时误差带还在绿色里，1.0 时就冲出去了。最坏误差等于 v 乘二分之一 Tq 加 J，和速度成正比，所以速度上限就由它决定。"
+      - "This is the selection error of every needle, in pitches. Green is the plus-or-minus one-tenth acceptance band, pale yellow the quarter-pitch window, dark the error range. The carriage speed switches between 0.6 and 1.0 metres per second: at 0.6 the band stays inside the green, at 1.0 it breaks out. The worst error is v times half Tq plus J, proportional to speed, so that sets the speed limit."
+
+  - layout: bignum
+    title: ["机头最多能跑多快：MCU 还是 FPGA", "How fast can the carriage go: MCU or FPGA"]
+    nums:
+      - {n: "{{ch21.vm1:.3f}}", n_en: "m/s", label: ["MCU 1 ms：0.1p/(Tc/2 + J)", "MCU 1 ms: 0.1p/(Tc/2 + J)"]}
+      - {n: "{{ch21.vm025:.2f}}", n_en: "m/s", label: ["MCU 0.25 ms（公式估算）", "MCU 0.25 ms (formula)"]}
+      - {n: "{{ch21.vf:.2f}}", n_en: "m/s", label: ["FPGA 逐计数比较（公式估算）", "FPGA, every count (formula)"]}
+    foot: ["减小 Tr 没有用：它已被提前量补偿；卡住速度的是离散 J 和控制周期", "Shrinking Tr doesn't help, the lead already cancels it; scatter J and the control period set the limit"]
+    notes:
+      - "令最坏误差等于十分之一针距，就得到速度上限：MCU 1 毫秒时 {{ch21.vm1:.3f}} 米每秒；控制周期缩到 0.25 毫秒，公式估算约 {{ch21.vm025:.2f}}；换 FPGA 逐计数比较，量化只剩半个计数，上限由选针器自己的离散决定，约 {{ch21.vf:.2f}}。反直觉的是：减小 Tr 对上限没有帮助，因为它已经被提前量补偿了，卡住速度的是离散 J 和控制周期。所以 E5 原型先用 MCU 就够，要提速先上 FPGA。"
+      - "Set the worst error equal to a tenth of a pitch and you get the speed limit: {{ch21.vm1:.3f}} metres per second with a 1 millisecond MCU; with a 0.25 millisecond cycle the formula gives about {{ch21.vm025:.2f}}; with an FPGA comparing at every count, quantisation shrinks to half a count and the selector's own scatter sets the limit, about {{ch21.vf:.2f}}. Counter-intuitively, a smaller Tr doesn't help, because the lead already cancels it; the scatter J and the control period are what limit speed. So the E5 prototype starts with an MCU, and an FPGA is the first step to go faster."
+
+  - layout: bignum
+    title: ["速度 2.6 倍，产量只多 64%", "2.6× the speed, only 64% more rows"]
+    nums:
+      - {n: "{{ch21.rows635:.0f}}", n_en: "rows/h", label: ["MCU：0.635 m/s", "MCU: 0.635 m/s"]}
+      - {n: "{{ch21.rows166:.0f}}", n_en: "rows/h", label: ["FPGA：1.66 m/s", "FPGA: 1.66 m/s"]}
+      - {n: "+{{ch21.gain:.0f}}%", label: ["速度 ×{{ch21.vratio:.1f}}，产量只多这么多", "Speed ×{{ch21.vratio:.1f}}, output only this much more"]}
+    foot: ["加减速和换向停顿不随速度缩短；急停时 1.66 m/s 要走 {{ch21.brk166:.0f}} mm，0.635 m/s 只要 {{ch21.brk635:.0f}} mm", "Ramps and reversal pauses don't shrink; an emergency stop from 1.66 m/s takes {{ch21.brk166:.0f}} mm, from 0.635 only {{ch21.brk635:.0f}} mm"]
+    notes:
+      - "可是产量不和速度成正比。MCU 跑 0.635 米每秒，每小时约 {{ch21.rows635:.0f}} 行；FPGA 跑 1.66，每小时约 {{ch21.rows166:.0f}} 行，速度是 {{ch21.vratio:.1f}} 倍，产量只多 {{ch21.gain:.0f}}%。原因是加减速和每端 0.1 秒的换向停顿不随速度缩短。还有一点最容易漏掉：按 20 米每二次方秒急停，1.66 米每秒要走 {{ch21.brk166:.0f}} 毫米才停住，0.635 只要 {{ch21.brk635:.0f}} 毫米，提速以后限位开关外要留够距离。"
+      - "But output doesn't scale with speed. With the MCU at 0.635 metres per second we get about {{ch21.rows635:.0f}} rows an hour; with the FPGA at 1.66, about {{ch21.rows166:.0f}}. That's {{ch21.vratio:.1f}} times the speed but only {{ch21.gain:.0f}} percent more rows, because acceleration and the 0.1 second reversal pause at each end don't get shorter. And the item most easily missed: an emergency stop at 20 metres per second squared takes {{ch21.brk166:.0f}} millimetres from 1.66, but only {{ch21.brk635:.0f}} from 0.635. Go faster and leave enough room beyond the limit switches."
+
+  - layout: split
+    title: ["两速扫描：在整机上标定 Tr", "Two-speed scan: calibrating Tr on the machine"]
+    points:
+      - ["加偏置 δ，两种速度各织测试行", "Add an offset δ, knit test rows at two speeds"]
+      - ["100% 正确的 δ 区间：通过带", "The δ range that's 100% right: the pass band"]
+      - ["中点随速度移动，斜率 = Tr 误差", "Its midpoint moves with speed; slope = Tr error"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M60 520 L880 520" stroke="#4b5f7d" stroke-width="3"/>
+          <text x="880" y="565" font-size="26" fill="#8fa3ba" text-anchor="end">偏置 δ (mm)</text>
+          <text x="40" y="190" font-size="28" font-weight="700" fill="#c7d3e2">0.3 m/s</text>
+          <rect x="300" y="210" width="280" height="60" rx="10" fill="rgba(46,196,182,.35)" stroke="#2ec4b6" stroke-width="3"/>
+          <circle cx="440" cy="240" r="12" fill="#f2b705"/>
+          <text x="440" y="310" font-size="28" fill="#f2b705" text-anchor="middle" class="en">0.09</text>
+          <text x="40" y="380" font-size="28" font-weight="700" fill="#c7d3e2">0.9 m/s</text>
+          <rect x="520" y="400" width="180" height="60" rx="10" fill="rgba(255,122,69,.35)" stroke="#ff7a45" stroke-width="3"/>
+          <circle cx="610" cy="430" r="12" fill="#f2b705"/>
+          <text x="610" y="500" font-size="28" fill="#f2b705" text-anchor="middle" class="en">0.26</text>
+          <path d="M440 240 L610 430" stroke="#f2b705" stroke-width="4" stroke-dasharray="10 8"/>
+          <g transform="translate(60,40)"><rect width="820" height="90" rx="18" fill="rgba(242,183,5,.12)"/>
+            <text x="410" y="58" font-size="32" font-weight="800" fill="#f2b705" text-anchor="middle">斜率 {{ch21.slope:.2f}} ms → Tr ≈ {{ch21.Tr_new:.2f}} ms</text></g>
+          <text x="860" y="610" font-size="24" fill="#8fa3ba" text-anchor="end">高速时通过带变窄：反映离散 J</text>
+        </svg>
+    notes:
+      - "Tr 不能只信计算或样本，要在整机上标。办法叫两速扫描：固件按初值算提前量，再人为加一个偏置 δ，在低速和高速下各织“选、不选”交替的测试行，统计每个 δ 的正确率，100% 正确的那段就是通过带。通过带中点里混着两样东西：与速度无关的几何偏移，和与速度成正比的 Tr 误差。两种速度一减就分开了：中点从 0.09 移到 0.26 毫米，斜率 {{ch21.slope:.2f}} 毫秒，Tr 从 1.2 改到约 {{ch21.Tr_new:.2f}}。"
+      - "Don't trust a calculated or catalogue Tr; calibrate it on the machine. The method is a two-speed scan. The firmware computes the lead from an initial Tr, adds a deliberate offset delta, and knits alternating select and don't-select test rows at a low and a high speed. The delta range that's a hundred percent correct is the pass band. Its midpoint mixes a speed-independent geometric offset with a Tr error proportional to speed; two speeds separate them. The midpoint moves from 0.09 to 0.26 millimetres, a slope of {{ch21.slope:.2f}} milliseconds, so Tr goes from 1.2 to about {{ch21.Tr_new:.2f}}."
+
+  - layout: lab
+    title: ["动手试一试：缩比横机原型", "Try it: the scaled knitting prototype"]
+    shot: {page: proto-fk}
+    tasks:
+      - ["标准参数下找出满足验收的最高速度", "Find the top speed that passes with standard settings"]
+      - ["改用 FPGA 再找一次，比较每小时行数", "Switch to FPGA, find it again, compare rows per hour"]
+      - ["换 E7、固定提前量，调到 60 针全过", "E7 with a fixed lead: tune until all 60 pass"]
+    notes:
+      - "这台缩比横机在问渠平台上可以自己调。先用标准参数，一点点提高机头最高速度，看判据区什么时候变红，找出 60 枚针都满足验收的最高速度。再改用 FPGA 逐计数触发，重找一次，对比每小时行数提高了多少。最后换成更细的 E7 针床，用固定提前量，调提前量和换向余量，让 60 针全部合格。"
+      - "You can tune this scaled knitting machine yourself on WenQuest. First, with standard settings, raise the carriage top speed step by step and watch when the checks turn red: find the highest speed at which all 60 needles pass. Then switch to FPGA triggering at every count, find it again, and compare rows per hour. Finally move to the finer E7 bed with a fixed lead, and tune the lead and the reversal margin until all 60 needles pass."
+
+  - layout: split
+    title: ["机器人联系：按位置触发", "Robot link: triggering by position"]
+    points:
+      - ["传送带跟踪：按位置拍照、抓取", "Conveyor tracking: shoot and grip by encoder position"]
+      - ["提前 v ×（响应 + 半个周期）", "Lead = v × (response + half a cycle)"]
+      - ["0.6 m/s、±0.3 ms → ±{{ch21.j_err:.2f}} mm", "0.6 m/s, ±0.3 ms → ±{{ch21.j_err:.2f}} mm"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="30" y="420" width="840" height="60" rx="30" fill="#22324d"/>
+          <g fill="#4b5f7d"><circle cx="70" cy="450" r="22"/><circle cx="830" cy="450" r="22"/></g>
+          <rect x="560" y="360" width="90" height="60" rx="8" fill="#f2b705"/>
+          <path d="M700 80 L700 200 L605 280 L605 340" stroke="#c8d2de" stroke-width="18" fill="none" stroke-linecap="round"/>
+          <path d="M585 340 L585 360 M625 340 L625 360" stroke="#c8d2de" stroke-width="10"/>
+          <path d="M250 400 L520 400" stroke="#2ec4b6" stroke-width="5" marker-end="url(#a21r)"/>
+          <text x="250" y="380" font-size="28" font-weight="700" fill="#5ee0d2">v = 0.6 m/s</text>
+          <path d="M440 520 L560 520" stroke="#f2b705" stroke-width="5"/>
+          <text x="500" y="570" font-size="26" fill="#f2b705" text-anchor="middle">提前量</text>
+          <text x="40" y="70" font-size="30" font-weight="700" fill="#c7d3e2">硬件位置比较输出</text>
+          <text x="40" y="115" font-size="26" fill="#8fa3ba">相当于 FPGA 逐计数比较</text>
+          <defs><marker id="a21r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2ec4b6"/></marker></defs>
+        </svg>
+    notes:
+      - "机械臂从传送带上抓工件时，相机拍照和夹爪动作都按传送带编码器的位置触发，而不是按时间，这和横机按机头位置逐针选针完全对应。控制器给动作加提前量，速度乘响应时间加半个查询周期，就是选针的公式。提前量补偿不了抖动：传送带 0.6 米每秒、夹爪阀离散正负 0.3 毫秒，位置误差就有正负 {{ch21.j_err:.2f}} 毫米。所以高速分拣机器人用运动控制卡的硬件位置比较输出，相当于 FPGA 逐计数比较。"
+      - "When a robot picks parts from a conveyor, the camera and the gripper are triggered by the conveyor encoder's position, not by time, exactly like selecting needles by carriage position. The controller adds a lead of speed times the response time plus half a polling cycle, the same formula as needle selection. And the lead can't cancel jitter: at 0.6 metres per second, a valve scatter of plus or minus 0.3 milliseconds is plus or minus {{ch21.j_err:.2f}} millimetres. That's why high-speed picking robots use the motion card's hardware position-compare output, the equivalent of an FPGA comparing at every count."
+
+  - layout: split
+    title: ["生活中的例子：传球给跑动的队友", "Everyday example: passing to a running teammate"]
+    points:
+      - ["提前量 = 队友速度 × 飞行时间", "Lead the runner: speed × flight time"]
+      - ["出手总有一点忽早忽晚", "Your release is always a little early or late"]
+      - ["队友越快，落点偏差越大", "The faster the runner, the bigger the miss"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <circle cx="120" cy="420" r="40" fill="#4c8dff"/>
+          <text x="120" y="500" font-size="28" fill="#8fbaff" text-anchor="middle">传球</text>
+          <circle cx="430" cy="200" r="40" fill="#2ec4b6"/>
+          <path d="M480 200 L620 200" stroke="#2ec4b6" stroke-width="6" marker-end="url(#a21p)"/>
+          <text x="430" y="140" font-size="28" fill="#5ee0d2" text-anchor="middle">队友 v</text>
+          <path d="M160 400 Q 420 80 700 200" stroke="#f2b705" stroke-width="5" fill="none" stroke-dasharray="14 10"/>
+          <circle cx="700" cy="200" r="70" fill="rgba(255,122,69,.2)" stroke="#ff7a45" stroke-width="3"/>
+          <circle cx="700" cy="200" r="24" fill="#ff7a45"/>
+          <text x="700" y="320" font-size="28" font-weight="700" fill="#ff9c75" text-anchor="middle">落点散布 ±v·J</text>
+          <path d="M430 560 L700 560" stroke="#f2b705" stroke-width="5"/>
+          <text x="565" y="610" font-size="28" fill="#f2b705" text-anchor="middle">提前量 v·T</text>
+          <defs><marker id="a21p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2ec4b6"/></marker></defs>
+        </svg>
+    notes:
+      - "生活里最像选针的，是篮球传球。要传到跑动队友的前面，提前量大约是队友速度乘球的飞行时间，这就是选针的提前量。可你出手总有一点忽早忽晚，队友跑得越快，这点抖动造成的落点偏差就越大，这正是限制机头速度的离散 J。"
+      - "In everyday life the closest thing to needle selection is a basketball pass. You throw ahead of a running teammate; the lead is roughly their speed times the ball's flight time, just like the selection lead. But your release is always a little early or late, and the faster your teammate runs, the further off the ball lands. That's exactly the scatter J that limits the carriage speed."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["电机够用；沿 Y 的 3 mm 针要降速", "The motor is enough; 3 mm stitches along Y slow down"]
+    rows:
+      - ["1600 r/min 走一针的时间", "{{ch21.dt1600:.1f}} ms"]
+      - ["X 轴峰值转矩（峰值 3.8）", "{{ch21.TX:.2f}} N·m"]
+      - ["沿 Y 的 3 mm 针上限", "{{ch21.cY3:.0f}} r/min"]
+    side: {big: "{{ch21.cX3:.0f}}", text: ["沿 X 的 3 mm 针上限 r/min：达到 1600", "3 mm along X, r/min: meets 1600"]}
+    foot: ["设计加速度由发热（rms 转矩）定；沿 Y 的针段由前瞻自动降速", "Heat (rms torque) sets the design acceleration; look-ahead slows the Y stitches automatically"]
+    notes:
+      - "回到开头的问题。1600 转时模板要在 {{ch21.dt1600:.1f}} 毫秒内走完一针，3 毫米要 {{ch21.a3:.1f}} 米每二次方秒，X 轴峰值转矩约 {{ch21.TX:.2f}} 牛米，远低于 3.8，电机够用。可连续缝纫受均方根转矩限制，设计加速度只能取 X 50、Y 40。这样沿 X 的 3 毫米针能跑 {{ch21.cX3:.0f}} 转，达到 1600；沿 Y 只有 {{ch21.cY3:.0f}}，固件的前瞻会在这些针段自动降速。"
+      - "Back to our problem. At 1600 r/min the template has {{ch21.dt1600:.1f}} milliseconds per stitch; a 3 mm stitch needs {{ch21.a3:.1f}} metres per second squared, and the X axis peaks at about {{ch21.TX:.2f}} newton-metres, far below 3.8. The motor is big enough. But continuous sewing is limited by rms torque, so the design accelerations are only 50 for X and 40 for Y. A 3 mm stitch along X can then run at {{ch21.cX3:.0f}}, meeting 1600; along Y only {{ch21.cY3:.0f}}, and the firmware's look-ahead slows those stitches automatically."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["动作落进位置窗口：先做时序预算", "Actions land in position windows: budget timing first"]
+      - ["花样机：窗口定加速度，发热定设计值", "Pattern sewer: window sets acceleration, heat sets design"]
+      - ["横机：提前量补延迟，速度受 J 和周期限制", "Knitter: lead cancels delay; J and cycle limit speed"]
+    after: ["作业 21：花样机原型与缩比横机的时序预算 · 测验 · 实验 21-1 报告 —— 在问渠学习平台完成", "Assignment 21 · quiz · Lab 21-1 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，两台原型的控制问题相同：动作必须落进由位置决定的窗口，先做时序预算再选零件。第二，花样机由窗口算出时间和加速度，峰值转矩看惯量，设计加速度由发热决定，再用前瞻和预测角保证针在布中模板不动。第三，横机用提前量补偿延迟，最高速度由离散 J 和控制周期决定，不是 Tr。作业、测验和实验报告都在问渠平台上完成。下一讲讲自动化测试和持续迭代。"
+      - "Three things to remember. One: both prototypes share one control problem, actions landing in windows set by position, so budget the timing before choosing parts. Two: for the pattern sewer the window gives time and acceleration, inertia gives peak torque, heat sets the design acceleration, and look-ahead plus the predicted angle keep the template still while the needle is in. Three: the knitting machine's lead cancels delay, and its top speed is set by the scatter J and the control period, not by Tr. The assignment, quiz and lab report are on WenQuest. Next time: automated testing and continuous iteration."

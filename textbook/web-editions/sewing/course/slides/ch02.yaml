@@ -1,0 +1,340 @@
+# 第 2 讲 线迹的形成 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch02.键:格式}} 由课程包程序 course/calc/ch02.py 算出，不手写数字。
+# notes：讲者备注（放映时只给老师看，录课时当讲稿用）。
+lesson: 2
+code: [ch02]
+
+clips:
+  hero:          # 封面：三维样机开窗剖切，慢慢环绕
+    page: proto-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, press: "#shell [data-k=window]"}
+  chains:        # 四条传动链轮流突出（每 4 秒换一条，一直循环）
+    page: proto-lockstitch
+    selector: "#stage"
+    loop: 16
+    steps:
+      - {at: 0, press: ["#shell [data-k=xray]", "#chains [data-k=needle]"]}
+      - {at: 2, js: "var t=document.getElementById('tableOn');t.checked=false;t.onchange();window.__api.cam(-0.6,0.3,820,[110,80,0])"}
+      - {at: 4, press: "#chains [data-k=takeup]"}
+      - {at: 8, press: "#chains [data-k=hook]"}
+      - {at: 12, press: "#chains [data-k=feed]"}
+  form:          # 三维样机：看成线（放大钩线区，慢放 1/100，一直转）
+    page: proto-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, press: "#zoomBtn"}
+  mech:          # 动画 2-1：整个剖面，慢速
+    page: lockstitch
+    selector: "#mech"
+    steps:
+      - {at: 0, set: {speed: 40}, js: "var M=document.querySelector('#mech');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+  zoom:          # 动画 2-1：放大钩线区，很慢
+    page: lockstitch
+    selector: "#mech"
+    steps:
+      - {at: 0, press: "#zoom", set: {speed: 15}, js: "var M=document.querySelector('#mech');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+  timing:        # 动画 2-1：时序图，竖线随主轴走
+    page: lockstitch
+    selector: "#timing"
+    steps:
+      - {at: 0, set: {speed: 90}}
+  early:         # 实验 2-1：Δ = −10°
+    page: lockstitch
+    selector: "#mech"
+    steps:
+      - {at: 0, press: "#zoom", set: {speed: 40, delta: -10}, js: "var M=document.querySelector('#mech');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+  late:          # 实验 2-1：Δ = +10°
+    page: lockstitch
+    selector: "#mech"
+    steps:
+      - {at: 0, press: "#zoom", set: {speed: 40, delta: 10}, js: "var M=document.querySelector('#mech');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 2 讲", "Lecture 2"]
+    title: ["线迹的形成", "How a Stitch Is Formed"]
+    sub: ["一根主轴、四个动作、一针线迹", "One shaft, four motions, one stitch"]
+    notes:
+      - "上一讲我们知道了机器缝纫的共同思路：针尖开眼、只穿一半、在布底锁住线环。这一讲打开一台工业平缝机，看一针 301 锁式线迹到底是怎样形成的：线环从哪里来、梭尖什么时候去钩它、早了晚了会怎样。"
+      - "Last time we saw the shared idea of machine sewing: eye at the point, half way in, lock the loop below. Today we open up an industrial lockstitch machine and watch how one 301 stitch is actually formed: where the loop comes from, when the hook must catch it, and what happens if it's early or late."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["换了旋梭，为什么频繁跳针？", "A new hook, and now it skips stitches. Why?"]
+    facts:
+      - ["每分钟 5000 针缝衬衫，换装旋梭后布面频繁缺针", "Shirts at 5000 stitches/min; after a hook change, stitches go missing"]
+      - ["标准：梭尖在主轴约 206° 到达机针中心线", "Standard: the hook point reaches the needle at about 206°"]
+      - ["实测：216°，晚了 10°", "Measured: 216°, ten degrees late"]
+    notes:
+      - "先看车间问题。一台工业平缝机每分钟 5000 针缝衬衫，换装了一个新旋梭，布面开始频繁缺针。修机工拆下针板，用手转手轮检查：标准状态下梭尖应该在主轴转到 206 度左右到达机针中心线，这台机器实测是 216 度。晚了十度，问题有多大？这一讲最后回答。"
+      - "Here's the problem. An industrial lockstitch machine sews shirts at 5000 stitches a minute. After a new hook was fitted, stitches keep going missing. The mechanic takes off the throat plate and turns the handwheel by hand. The hook point should reach the needle centreline at about 206 degrees of the main shaft; on this machine it's 216. Ten degrees late. How much does that matter? We'll answer at the end."
+
+  - layout: section
+    num: "01"
+    title: ["打开机器：两根轴、四条传动链", "Inside the machine: two shafts, four drive trains"]
+
+  - layout: split
+    title: ["先看整机：一个“凹”字形铸件", "The whole machine: one U-shaped casting"]
+    points:
+      - ["立柱、机臂、机头和底板", "Pillar, arm and head; the bed sits in the table"]
+      - ["三类外部零件：带线、碰布、操作", "Parts that carry thread, touch cloth, or are for the operator"]
+      - ["线路：夹线器 → 挑线杆 → 机针", "Thread path: tension → take-up lever → needle"]
+    visual: {video: hero}
+    notes:
+      - "先认识整机。最常见的单针工业平缝机，外壳是一个凹字形的铸件：右边立柱，上面机臂，左端下垂的是机头，下面的底板嵌在台板里。外面能看到的零件分三类：带线的，夹线器、挑线杆、机针；碰布的，针、压脚、针板、送布牙；给人操作的，手轮、针距调节器、倒缝扳手。"
+      - "First, the whole machine. The common single-needle industrial lockstitch machine is one U-shaped casting: the pillar on the right, the arm across the top, the head hanging down at the left, and the bed set into the table. The visible parts fall into three groups: those that carry thread, the tension, take-up lever and needle; those that touch the cloth, the needle, presser foot, throat plate and feed dog; and those for the operator, the handwheel, stitch regulator and reverse lever."
+
+  - layout: figure
+    title: ["一根上轴、四条传动链", "One main shaft, four drive trains"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 1420 620" width="100%" height="100%"><defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6b7f9c"/></marker></defs><g transform="translate(20,200)"><rect width="220" height="240" rx="16" fill="rgba(242,183,5,.12)" stroke="#f2b705" stroke-width="3"/><text x="110.0" y="116.0" font-size="46" font-weight="700" fill="#f3f6fa" text-anchor="middle">上轴</text><text x="110.0" y="146.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">main shaft</text></g><text x="130" y="400" font-size="24" fill="#ffd27a" text-anchor="middle">转一圈 = 一针</text><path d="M240 320 C 270 320, 270 90, 300 90" stroke="#6b7f9c" stroke-width="4" fill="none"/><g transform="translate(310,30)"><rect width="330" height="120" rx="16" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="165.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">针杆曲柄</text><text x="165.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">crank</text></g><path d="M640 90 L690 90" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(700,30)"><rect width="330" height="120" rx="16" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="165.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">针杆连杆</text><text x="165.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">link</text></g><path d="M1030 90 L1080 90" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(1090,30)"><rect width="300" height="120" rx="16" fill="rgba(255,255,255,.04)" stroke="#4c8dff" stroke-width="3"/><text x="150.0" y="56.0" font-size="40" font-weight="700" fill="#f3f6fa" text-anchor="middle">刺布</text><text x="150.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">needle · 1 stroke</text></g><path d="M240 320 C 270 320, 270 240, 300 240" stroke="#6b7f9c" stroke-width="4" fill="none"/><g transform="translate(310,180)"><rect width="330" height="120" rx="16" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="165.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">挑线曲柄</text><text x="165.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">crank pin</text></g><path d="M640 240 L690 240" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(700,180)"><rect width="330" height="120" rx="16" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="165.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">四连杆</text><text x="165.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">four-bar</text></g><path d="M1030 240 L1080 240" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(1090,180)"><rect width="300" height="120" rx="16" fill="rgba(255,255,255,.04)" stroke="#a78bfa" stroke-width="3"/><text x="150.0" y="56.0" font-size="40" font-weight="700" fill="#f3f6fa" text-anchor="middle">挑线</text><text x="150.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">take-up · 1 swing</text></g><path d="M240 320 C 270 320, 270 390, 300 390" stroke="#6b7f9c" stroke-width="4" fill="none"/><g transform="translate(310,330)"><rect width="330" height="120" rx="16" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="165.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">同步带 1:1</text><text x="165.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">belt 1:1</text></g><path d="M640 390 L690 390" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(700,330)"><rect width="330" height="120" rx="16" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="165.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">下轴 → 齿轮 1:2</text><text x="165.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">hook shaft · gears</text></g><path d="M1030 390 L1080 390" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(1090,330)"><rect width="300" height="120" rx="16" fill="rgba(255,255,255,.04)" stroke="#ff7a45" stroke-width="3"/><text x="150.0" y="56.0" font-size="40" font-weight="700" fill="#f3f6fa" text-anchor="middle">钩线</text><text x="150.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">hook · 2 turns</text></g><path d="M240 320 C 270 320, 270 540, 300 540" stroke="#6b7f9c" stroke-width="4" fill="none"/><g transform="translate(310,480)"><rect width="330" height="120" rx="16" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="165.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">送布偏心轮</text><text x="165.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">feed eccentric</text></g><path d="M640 540 L690 540" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(700,480)"><rect width="330" height="120" rx="16" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="165.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">抬牙偏心轮</text><text x="165.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">lift eccentric</text></g><path d="M1030 540 L1080 540" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(1090,480)"><rect width="300" height="120" rx="16" fill="rgba(255,255,255,.04)" stroke="#2ec4b6" stroke-width="3"/><text x="150.0" y="56.0" font-size="40" font-weight="700" fill="#f3f6fa" text-anchor="middle">送布</text><text x="150.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">feed dog · ellipse</text></g></svg>
+    h: 640
+    notes:
+      - "把机壳变透明，里面只有两根轴：机臂里的上轴，也叫主轴，和底板里的下轴，由立柱里的同步带 1 比 1 连起来。一根上轴分出四条传动链：刺布、挑线、钩线、送布。中间没有离合器、没有会打滑的环节，所以四个动作永远同步。知道主轴转到多少度，就知道每个机构此刻在哪里。"
+      - "Make the casing transparent and there are just two shafts: the main shaft in the arm and the hook shaft in the bed, joined one to one by a timing belt in the pillar. From the main shaft come four drive trains: needle, take-up, hook and feed. There's no clutch and nothing that can slip, so the four motions are always in step. Know the shaft angle and you know where every mechanism is."
+
+  - layout: split
+    title: ["四条链，一条一条看", "The four trains, one at a time"]
+    points:
+      - ["刺布：曲柄滑块带针杆上下", "Needle: a slider-crank drives the needle bar"]
+      - ["挑线：四连杆带挑线杆摆动", "Take-up: a four-bar swings the lever"]
+      - ["钩线、送布：都从下轴取动力", "Hook and feed: both driven from the lower shaft"]
+    visual: {video: chains}
+    notes:
+      - "这是模型 2-1 虚拟样机，全透视模式，四条链轮流突出。先是刺布链，上轴前端的曲柄带针杆上下；接着是挑线链，挑线杆像一根摆动的手臂；然后是钩线链，经同步带、下轴、齿轮到旋梭；最后是送布链。注意送布的水平运动其实来自上轴的送布偏心轮，抬牙才来自下轴。课后大家在样机上自己点一点。"
+      - "This is the virtual prototype, Model 2-1, in X-ray mode, with the four trains highlighted in turn. First the needle train: a crank on the front of the main shaft drives the needle bar. Then take-up: the lever swings like an arm. Then the hook train: belt, lower shaft, gears, hook. Finally the feed train. Note that the feed's horizontal motion actually comes from a feed eccentric on the main shaft; only the lift comes from below. Try clicking through them yourself after class."
+
+  - layout: bignum
+    title: ["主轴转一圈，缝一针，旋梭转两圈", "One turn of the shaft, one stitch, two turns of the hook"]
+    nums:
+      - {n: "1 : 1", label: ["同步带：上轴与下轴同速", "Timing belt: both shafts at the same speed"]}
+      - {n: "× 2", n_en: "1 : 2 gears", label: ["下轴到旋梭：旋梭转两圈", "Lower shaft to hook: two turns per stitch"]}
+      - {n: "{{ch02.ms_stitch:.0f}} ms", n_en: "per stitch", label: ["5000 针/分时，一针的时间", "One stitch at 5000 per minute"]}
+    foot: ["送布：上轴给水平运动、下轴给上下运动，齿尖走一个近似椭圆", "Feed: horizontal motion from above, lift from below; the teeth trace a rough ellipse"]
+    notes:
+      - "记住三个数。同步带 1 比 1，上下轴同速；下轴到旋梭轴是 1 比 2 的齿轮，主轴转一圈、缝一针，旋梭转两圈，为什么非两圈不可，留给大家作业里想。每分钟 5000 针，一针只有 {{ch02.ms_stitch:.0f}} 毫秒，刺布、钩线、挑线、送布都要在这 {{ch02.ms_stitch:.0f}} 毫秒里对上。"
+      - "Three numbers. The belt is one to one, so both shafts turn at the same speed. From the lower shaft to the hook is a one-to-two gear pair: one turn of the main shaft, one stitch, two turns of the hook. Why it must be two is a question in your assignment. At 5000 stitches a minute one stitch lasts {{ch02.ms_stitch:.0f}} milliseconds, and needle, hook, take-up and feed all have to line up inside it."
+
+  - layout: section
+    num: "02"
+    title: ["301 锁式线迹与它的两个关键零件", "Lockstitch 301 and its two key parts"]
+
+  - layout: split
+    title: ["301：两根线在布厚中间交织", "301: two threads interlocking inside the cloth"]
+    points:
+      - ["面线带线环到布下，底线穿过", "The needle thread carries a loop below; the bobbin thread passes through"]
+      - ["拉紧后，交织点进到布厚中间", "Pulled tight, the interlace sinks to mid-fabric"]
+      - ["正反两面都只见直线，强度最好", "Both faces show straight lines; strongest seam"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><g transform="translate(0,150)"><rect x="40" y="60" width="820" height="70.0" fill="#d9c9a3"/><rect x="40" y="130.0" width="820" height="70.0" fill="#c9b78e"/><path d="M30 208 L40 130 L50 208 L235 208 L245 130 L255 208 L440 208 L450 130 L460 208 L645 208 L655 130 L665 208 L850 208 L860 130 L870 208" stroke="#ff7a45" stroke-width="9" fill="none" stroke-linejoin="round"/><path d="M30 52 L40 130 L50 52 L235 52 L245 130 L255 52 L440 52 L450 130 L460 52 L645 52 L655 130 L665 52 L850 52 L860 130 L870 52" stroke="#4c8dff" stroke-width="9" fill="none" stroke-linejoin="round"/><circle cx="40" cy="130" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="245" cy="130" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="450" cy="130" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="655" cy="130" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="860" cy="130" r="12" fill="none" stroke="#f2b705" stroke-width="4"/></g><text x="40" y="160" font-size="28" font-weight="700" fill="#8fb8ff">面线（针线） <tspan class="en" font-size="22" fill="#8fa3ba">needle thread</tspan></text><text x="40" y="420" font-size="28" font-weight="700" fill="#ffa47d">底线 <tspan class="en" font-size="22" fill="#8fa3ba">bobbin thread</tspan></text><path d="M450 290 L450 520" stroke="#f2b705" stroke-width="3" stroke-dasharray="8 6"/><text x="450" y="560" font-size="32" font-weight="700" fill="#f2b705" text-anchor="middle">交织点藏在布厚中间</text><text x="450" y="596" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">the interlace sits mid-fabric</text><text x="450" y="70" font-size="26" fill="#8fa3ba" text-anchor="middle">沿缝线剖开 · section along the seam</text></svg>
+    notes:
+      - "301 只有两根线：从机针穿过的面线，也叫针线；绕在梭芯上的底线。每一针，面线带着一个线环穿到布下，底线从线环里穿过去，然后面线被拉紧，把交织点拉进布料厚度的中间。交织点合适时，正反两面都只看到一段段直线，强度也最好。家用机和工业平缝机缝的都是它。"
+      - "Lockstitch 301 uses just two threads: the needle thread, through the eye of the needle, and the bobbin thread, wound on the bobbin. Each stitch, the needle thread carries a loop below the cloth, the bobbin thread passes through it, and the needle thread is pulled tight, drawing the interlace into the middle of the fabric. When it sits right, both faces show only straight dashes and the seam is strongest."
+
+  - layout: figure
+    title: ["张力平衡：翻过布看两面", "Tension balance: turn the cloth over"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 1720 580" width="100%" height="100%"><rect x="20" y="0" width="540" height="520" rx="24" fill="#101b2e" stroke="#2ec4b6" stroke-width="3"/><text x="290" y="62" font-size="38" font-weight="800" fill="#2ec4b6" text-anchor="middle">平衡</text><text x="290" y="96" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">balanced</text><g transform="translate(0,120)"><rect x="70" y="60" width="440" height="70.0" fill="#d9c9a3"/><rect x="70" y="130.0" width="440" height="70.0" fill="#c9b78e"/><path d="M60 208 L70 130 L80 208 L207 208 L217 130 L227 208 L353 208 L363 130 L373 208 L500 208 L510 130 L520 208" stroke="#ff7a45" stroke-width="9" fill="none" stroke-linejoin="round"/><path d="M60 52 L70 130 L80 52 L207 52 L217 130 L227 52 L353 52 L363 130 L373 52 L500 52 L510 130 L520 52" stroke="#4c8dff" stroke-width="9" fill="none" stroke-linejoin="round"/><circle cx="70" cy="130" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="217" cy="130" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="363" cy="130" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="510" cy="130" r="12" fill="none" stroke="#f2b705" stroke-width="4"/></g><text x="290" y="430" font-size="32" fill="#f3f6fa" text-anchor="middle">两面都是直线</text><text x="290" y="466" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">straight lines both sides</text><rect x="590" y="0" width="540" height="520" rx="24" fill="#101b2e" stroke="#ff7a45" stroke-width="3"/><text x="860" y="62" font-size="38" font-weight="800" fill="#ff7a45" text-anchor="middle">面线相对太紧</text><text x="860" y="96" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">needle thread too tight</text><g transform="translate(0,120)"><rect x="640" y="60" width="440" height="70.0" fill="#d9c9a3"/><rect x="640" y="130.0" width="440" height="70.0" fill="#c9b78e"/><path d="M630 208 L640 66 L650 208 L777 208 L787 66 L797 208 L923 208 L933 66 L943 208 L1070 208 L1080 66 L1090 208" stroke="#ff7a45" stroke-width="9" fill="none" stroke-linejoin="round"/><path d="M630 52 L640 66 L650 52 L777 52 L787 66 L797 52 L923 52 L933 66 L943 52 L1070 52 L1080 66 L1090 52" stroke="#4c8dff" stroke-width="9" fill="none" stroke-linejoin="round"/><circle cx="640" cy="66" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="787" cy="66" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="933" cy="66" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="1080" cy="66" r="12" fill="none" stroke="#f2b705" stroke-width="4"/></g><text x="860" y="430" font-size="32" fill="#f3f6fa" text-anchor="middle">正面露出底线小点</text><text x="860" y="466" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">bobbin dots on the face</text><rect x="1160" y="0" width="540" height="520" rx="24" fill="#101b2e" stroke="#ff7a45" stroke-width="3"/><text x="1430" y="62" font-size="38" font-weight="800" fill="#ff7a45" text-anchor="middle">底线相对太紧</text><text x="1430" y="96" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">bobbin thread too tight</text><g transform="translate(0,120)"><rect x="1210" y="60" width="440" height="70.0" fill="#d9c9a3"/><rect x="1210" y="130.0" width="440" height="70.0" fill="#c9b78e"/><path d="M1200 208 L1210 194 L1220 208 L1347 208 L1357 194 L1367 208 L1493 208 L1503 194 L1513 208 L1640 208 L1650 194 L1660 208" stroke="#ff7a45" stroke-width="9" fill="none" stroke-linejoin="round"/><path d="M1200 52 L1210 194 L1220 52 L1347 52 L1357 194 L1367 52 L1493 52 L1503 194 L1513 52 L1640 52 L1650 194 L1660 52" stroke="#4c8dff" stroke-width="9" fill="none" stroke-linejoin="round"/><circle cx="1210" cy="194" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="1357" cy="194" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="1503" cy="194" r="12" fill="none" stroke="#f2b705" stroke-width="4"/><circle cx="1650" cy="194" r="12" fill="none" stroke="#f2b705" stroke-width="4"/></g><text x="1430" y="430" font-size="32" fill="#f3f6fa" text-anchor="middle">反面露出面线小点</text><text x="1430" y="466" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">needle dots on the back</text><text x="20" y="560" font-size="24" fill="#8fa3ba">上面是布料正面，下面是反面 · face on top, back below</text></svg>
+    h: 600
+    notes:
+      - "交织点在哪里，由两根线的张力平衡决定，就像拔河。面线相对太紧，交织点被拉到上面，正面能看到底线的小点；底线相对太紧，反面能看到面线的小点。注意是相对：正面露底线，可能是面线紧了，也可能是底线松了。拿起缝好的布翻过来看两面，这是车间判断张力最快的办法，第 7 讲细讲。"
+      - "Where the interlace sits depends on the balance of the two tensions, like a tug of war. If the needle thread is relatively too tight, the interlace is pulled up and you see dots of bobbin thread on the face. If the bobbin thread is too tight, needle-thread dots show on the back. Relatively: bobbin dots on top could mean a tight needle thread or a slack bobbin. Turning the seam over is the fastest tension check on the shop floor; more in Lecture 7."
+
+  - layout: split
+    title: ["机针为什么两侧不对称", "Why the needle isn't symmetrical"]
+    points:
+      - ["长槽一侧：下行时线藏在槽里", "Long groove: the thread hides in it on the way down"]
+      - ["短槽一侧：回升时鼓出线环", "Short groove: rising, the thread is held and bulges into a loop"]
+      - ["凹口朝向梭尖，装反就跳针", "The scarf must face the hook; fit it wrong and it skips"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><text x="20" y="80" font-size="30" font-weight="700" fill="#f3f6fa">长槽一侧 <tspan class="en" font-size="22" fill="#8fa3ba">long-groove side</tspan></text><rect x="20" y="124" width="150" height="52" rx="10" fill="#c8d2de"/><path d="M170 136 L780 136 L860 150 L780 164 L170 164 Z" fill="#c8d2de"/><ellipse cx="740" cy="150" rx="20" ry="6" fill="#08101d"/><path d="M200 150 L715 150" stroke="#4c8dff" stroke-width="6"/><text x="450" y="210" font-size="26" fill="#8fb8ff" text-anchor="middle">线藏在槽里，不被布磨</text><text x="20" y="350" font-size="30" font-weight="700" fill="#f3f6fa">短槽 + 凹口一侧 <tspan class="en" font-size="22" fill="#8fa3ba">short groove + scarf side</tspan></text><rect x="20" y="394" width="150" height="52" rx="10" fill="#c8d2de"/><path d="M170 406 L780 406 L860 420 L780 434 L170 434 Z" fill="#c8d2de"/><ellipse cx="740" cy="420" rx="20" ry="6" fill="#08101d"/><path d="M680 420 L715 420" stroke="#4c8dff" stroke-width="6"/><path d="M600 406 Q 640 418 680 406" fill="#08101d" stroke="#f2b705" stroke-width="3"/><text x="600" y="380" font-size="26" fill="#f2b705" text-anchor="middle">凹口</text><path d="M716 424 C 700 490, 610 540, 600 490 C 594 460, 640 440, 690 430" stroke="#4c8dff" stroke-width="7" fill="none"/><text x="560" y="570" font-size="28" font-weight="700" fill="#8fb8ff" text-anchor="middle">回升时在这一侧鼓出线环</text><text x="560" y="602" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">the loop bulges out on this side</text><text x="740" y="120" font-size="24" fill="#8fa3ba" text-anchor="middle">针眼</text></svg>
+    notes:
+      - "线环从哪里来？看机针。机针两侧不对称：一侧有贯通针身的长槽，另一侧只在针眼附近有一段短槽，上方还磨出一个凹口。针往下扎，线藏在长槽里不被磨损；针过最低点开始回升，短槽一侧的线没有槽保护，被布夹住跟不上针，就在凹口这一侧鼓出线环。机针装反或转了角度，线环偏到别处，梭尖钩不到，就跳针。"
+      - "Where does the loop come from? Look at the needle. Its two sides differ: one has a long groove down the whole blade; the other has only a short groove near the eye, with a scarf ground above it. Going down, the thread hides in the long groove. Coming back up, the thread on the short-groove side is gripped by the cloth, can't keep up, and bulges out as a loop by the scarf. Fit the needle backwards or twisted, the loop goes elsewhere, the hook misses, and you get a skipped stitch."
+
+  - layout: split
+    title: ["旋梭：梭体转，梭壳不动", "The hook: the body turns, the bobbin case stays still"]
+    points:
+      - ["梭尖长在旋梭体边缘，随轴转动", "The hook point is on the rim of the turning body"]
+      - ["定位钩挡住梭床，梭壳不转", "A stop holds the bobbin-case holder; the case doesn't turn"]
+      - ["线环绕过不动的梭壳，套进底线", "The loop passes round the still case and takes in the bobbin thread"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><circle cx="430" cy="330" r="250" fill="none" stroke="#6b7f9c" stroke-width="44"/><path d="M680 330 A250 250 0 0 1 310 549" stroke="#2ec4b6" stroke-width="10" fill="none" marker-end="url(#ah)"/><defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2ec4b6"/></marker></defs><path d="M400 58 L490 98 L410 94 Z" fill="#f2b705"/><text x="510" y="80" font-size="28" font-weight="700" fill="#f2b705">梭尖 · hook point</text><circle cx="430" cy="330" r="170" fill="#1a2740" stroke="#c8d2de" stroke-width="5"/><circle cx="430" cy="330" r="110" fill="#ff7a45" opacity=".85"/><path d="M230 120 C 100 290, 180 550, 390 540" stroke="#4c8dff" stroke-width="8" fill="none" stroke-dasharray="20 10"/><rect x="416" y="140" width="28" height="44" fill="#c8d2de"/><text x="430" y="340" font-size="34" font-weight="800" fill="#08101d" text-anchor="middle">梭芯</text><text x="430" y="475" font-size="26" font-weight="700" fill="#f3f6fa" text-anchor="middle">梭壳 · 不动</text><text x="730" y="560" font-size="30" font-weight="700" fill="#5ee0d2">旋梭体转</text><text x="730" y="592" font-size="22" fill="#8fa3ba" class="en">hook body turns</text><text x="30" y="370" font-size="26" fill="#8fb8ff">线环</text><text x="30" y="400" font-size="20" fill="#8fa3ba" class="en">loop</text></svg>
+    notes:
+      - "再看旋梭。旋梭不是一个整体零件：旋梭体装在旋梭轴上转动，梭尖长在它的边缘上；梭床坐在梭道里，被机壳上的定位钩挡住，不跟着转；梭壳连同绕满底线的梭芯插在梭床中心柱上。所以梭尖带着线环绕过去的，是一个静止的梭壳，线环绕一圈，就把底线套进去了。一个转、一个不转，这是旋梭的巧妙之处。"
+      - "Now the hook. It isn't one part. The hook body turns on the hook shaft, with the point on its rim. The bobbin-case holder sits in the race but is held by a stop on the casing, so it doesn't turn. The bobbin case, with its full bobbin, fits on the holder's centre post. So the point carries the loop round a case that stays still, and one trip round takes in the bobbin thread. One part turns, one doesn't; that's the clever bit."
+
+  - layout: section
+    num: "03"
+    title: ["一针的五个阶段", "Five phases of one stitch"]
+
+  - layout: split
+    title: ["刺布与形成线环", "Piercing and forming the loop"]
+    points:
+      - ["刺布：机针带面线刺穿布料", "Piercing: the needle takes the thread down through the cloth"]
+      - ["180°：机针到达最低点", "180°: the needle reaches bottom dead centre"]
+      - ["回升约 2 mm：线环张得最大", "About 2 mm back up: the loop is at its widest"]
+    visual: {video: mech}
+    notes:
+      - "这是动画 2-1，顺着旋梭轴看过去的剖面，主轴转一圈缝一针。第一阶段刺布：机针带着面线下行，刺穿布料，线藏在长槽里。主轴转到 180 度，机针到最低点。第二阶段形成线环：机针开始回升，凹口一侧鼓出线环。请记住一个数字：针回升约 2 毫米时，线环张得最大、也最稳定。"
+      - "This is Animation 2-1, a section looking along the hook shaft; one turn of the main shaft makes one stitch. Phase one, piercing: the needle carries the thread down through the cloth, the thread hidden in the long groove. At 180 degrees the needle is at its lowest. Phase two, loop forming: the needle starts back up and a loop bulges out by the scarf. Remember one number: about 2 millimetres of rise, and the loop is at its widest and steadiest."
+
+  - layout: split
+    title: ["钩线与绕梭：放大看", "Catching and carrying the loop: close up"]
+    points:
+      - ["钩线：梭尖从凹口处钻进线环", "Catch: the point slips into the loop at the scarf"]
+      - ["绕梭：线环拉大，绕过梭壳", "Round the case: the loop is drawn wide and carried round"]
+      - ["挑线杆此时下行，给线环放线", "Meanwhile the take-up lever comes down to give thread"]
+    visual: {video: zoom}
+    notes:
+      - "把钩线区放大、放慢。第三阶段钩线，这一刻决定成败：恰在线环张得最大时，梭尖从机针凹口处掠过，钻进线环和机针之间把它钩住。第四阶段绕梭：旋梭继续转，把线环越拉越大，绕过装底线的梭壳。这时挑线杆在往下走，把线环需要的线放下来。"
+      - "Let's zoom in and slow down on the hook. Phase three, the catch, and this is the moment that decides everything. Just as the loop is widest, the hook point sweeps past the scarf and slips between loop and needle. Phase four: the hook keeps turning, drawing the loop larger and carrying it round the bobbin case. Meanwhile the take-up lever is coming down, paying out the thread the loop needs."
+
+  - layout: split
+    title: ["在三维样机上看成线", "Watch the stitch form on the 3D prototype"]
+    points:
+      - ["收紧：线环脱出，挑线杆收线", "Tighten: the loop slips off; the lever pulls the slack up fast"]
+      - ["交织点被拉进布厚中间", "The interlace is drawn into the cloth"]
+      - ["针出布后，送布牙才推一个针距", "Feed: only once the needle is out does the dog push one stitch"]
+    visual: {video: form}
+    notes:
+      - "第五阶段收紧与送布，换到三维样机上看，慢放一百倍。线环从旋梭上脱出，挑线杆快速上升，收回多余的线，交织点被拉进布中间。等机针离开布料以后，送布牙才把布向前推一个针距。五个阶段就是：刺布、形成线环、钩线、绕梭、收紧与送布。"
+      - "Phase five, tightening and feeding, on the 3D prototype at one-hundredth speed. The loop slips off the hook, the take-up lever rises fast and pulls the slack back up, and the interlace is drawn into the middle of the cloth. Only once the needle has left the fabric does the feed dog push the cloth forward one stitch length. So the five phases are: pierce, form the loop, catch, carry round, tighten and feed."
+
+  - layout: chain
+    title: ["五个阶段，四个动作", "Five phases, four motions"]
+    steps: [["刺布", "Pierce"], ["形成线环", "Loop"], ["钩线", "Catch"], ["绕梭", "Round case"], ["收紧送布", "Tighten · feed"]]
+    hot: [2]
+    mark: ["成败在此", "decisive"]
+    foot: ["刺布、钩线、挑线、送布由同一根主轴驱动：设计缝纫机，就是让它们在每个关键时刻对得上", "Needle, hook, take-up and feed share one shaft: designing the machine means making them meet at every key moment"]
+    notes:
+      - "把过程按执行件归纳，就是四个动作：刺布、钩线、挑线、送布。压脚始终压着布，一般不随主轴运动，不算在里面。五个阶段里最要命的是钩线：早了线环没张开，晚了线环已收缩，都会跳针。四个动作挂在同一根主轴上，相位固定，设计缝纫机，本质上就是让它们在每个关键时刻都对得上。"
+      - "Group the process by the parts that act and you get four motions: needle, hook, take-up and feed. The presser foot just holds the cloth and doesn't move with the shaft, so it isn't counted. Of the five phases the catch is the critical one: too early and the loop isn't open, too late and it's shrinking, and either way the stitch is skipped. All four motions hang on one shaft with fixed phases; designing a sewing machine is making them meet at every key moment."
+
+  - layout: section
+    num: "04"
+    title: ["时序图与跳针", "The timing chart and skipped stitches"]
+
+  - layout: split
+    title: ["时序图：抓住三个时刻", "The timing chart: three moments"]
+    points:
+      - ["180°：机针到最低点", "180°: needle at bottom dead centre"]
+      - ["约 206°：回升 2 mm，梭尖钩线", "About 206°: 2 mm back up, the hook catches"]
+      - ["约 {{ch02.out_fab:.0f}}°：机针出布，之后才送布", "About {{ch02.out_fab:.0f}}°: needle out, then feed"]
+    visual: {video: timing}
+    notes:
+      - "把四个动作画在同一张以主轴转角为横坐标的图上，就是运动时序图，红线是当前转角。读图抓住三个时刻：180 度，机针到最低点；206 度左右，机针回升约 2 毫米，梭尖钩线；{{ch02.out_fab:.0f}} 度左右，机针离开布料，之后送布牙才开始推布。针杆位移按第 3 讲的算例算出，下一讲推导。"
+      - "Draw all four motions against main-shaft angle on one chart and you have the timing chart; the red line is the current angle. Read it by three moments. 180 degrees: needle at its lowest. About 206: the needle is 2 millimetres back up and the hook catches. About {{ch02.out_fab:.0f}}: the needle leaves the cloth, and only then does the feed dog push. The needle motion comes from the Lecture 3 example; we derive it next time."
+
+  - layout: split
+    title: ["钩线窗口只有十度出头", "The catch window is barely ten degrees"]
+    points:
+      - ["模型中回升 {{ch02.h_lo:.1f}}–{{ch02.h_hi:.1f}} mm 可钩住", "Lab model: caught with {{ch02.h_lo:.1f}}–{{ch02.h_hi:.1f}} mm of rise"]
+      - ["对应主轴 {{ch02.win_lo:.0f}}°–{{ch02.win_hi:.0f}}°，宽约 {{ch02.win:.0f}}°", "That's {{ch02.win_lo:.0f}}°–{{ch02.win_hi:.0f}}°, about {{ch02.win:.0f}}° wide"]
+      - ["越往后升得越快：晚到更危险", "Past BDC the rise speeds up: late is worse than early"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><rect x="110" y="366" width="740" height="96" fill="rgba(46,196,182,.16)"/><path d="M110 540 L860 540 M110 540 L110 60" stroke="#4b5f7d" stroke-width="3"/><polyline points="110,540 117,540 125,540 132,540 140,539 147,539 154,538 162,538 169,537 177,536 184,536 191,535 199,534 206,533 214,531 221,530 228,529 236,527 243,526 251,524 258,523 265,521 273,519 280,517 288,515 295,513 302,511 310,509 317,506 325,504 332,501 339,499 347,496 354,493 362,490 369,487 376,484 384,481 391,478 399,475 406,472 413,468 421,465 428,461 436,457 443,454 450,450 458,446 465,442 473,438 480,434 487,430 495,426 502,421 510,417 517,412 524,408 532,403 539,399 547,394 554,389 561,384 569,379 576,374 584,369 591,364 598,359 606,353 613,348 621,343 628,337 635,332 643,326 650,320 658,315 665,309 672,303 680,297 687,291 695,285 702,279 709,273 717,267 724,261 732,254 739,248 746,242 754,235 761,229 769,222 776,216 783,209 791,202 798,195 806,189 813,182 820,175 828,168 835,161 843,154 850,147" fill="none" stroke="#f2b705" stroke-width="7" stroke-linecap="round"/><path d="M495 540 L495 426" stroke="#2ec4b6" stroke-width="3" stroke-dasharray="8 6"/><circle cx="495" cy="426" r="13" fill="#2ec4b6"/><text x="477" y="404" font-size="32" font-weight="800" fill="#2ec4b6" text-anchor="end" class="en">{{ch02.rise206:.1f}} mm</text><text x="495" y="580" font-size="26" fill="#2ec4b6" text-anchor="middle" class="en">206°</text><path d="M643 540 L643 326" stroke="#ff7a45" stroke-width="3" stroke-dasharray="8 6"/><circle cx="643" cy="326" r="13" fill="#ff7a45"/><text x="625" y="304" font-size="32" font-weight="800" fill="#ff7a45" text-anchor="end" class="en">{{ch02.rise216:.1f}} mm</text><text x="643" y="580" font-size="26" fill="#ff7a45" text-anchor="middle" class="en">216°</text><text x="120" y="580" font-size="24" fill="#8fa3ba" class="en">180°</text><text x="125" y="352" font-size="26" fill="#5ee0d2">能钩住 {{ch02.h_lo:.1f}}–{{ch02.h_hi:.1f}} mm</text><text x="120" y="50" font-size="26" fill="#8fa3ba">回升量 h（mm）· needle rise</text><text x="850" y="625" font-size="24" fill="#8fa3ba" text-anchor="end">主轴转角 φ · shaft angle</text></svg>
+    notes:
+      - "这条曲线是机针过最低点后的回升量。实验 2-1 的线环模型是示意的：回升在 {{ch02.h_lo:.1f}} 到 {{ch02.h_hi:.1f}} 毫米之间能钩住，对应主轴 {{ch02.win_lo:.0f}} 到 {{ch02.win_hi:.0f}} 度，窗口只有 {{ch02.win:.0f}} 度左右。注意曲线在最低点附近很平，越往后越陡：所以梭尖晚到十度，回升量的变化比早到十度大得多。"
+      - "This curve is the needle's rise after bottom dead centre. The loop model in Lab 2-1 is schematic: the loop is caught with {{ch02.h_lo:.1f}} to {{ch02.h_hi:.1f}} millimetres of rise, which is {{ch02.win_lo:.0f}} to {{ch02.win_hi:.0f}} degrees of shaft angle, a window only about {{ch02.win:.0f}} degrees wide. The curve is flat near the bottom and steepens after, so arriving ten degrees late changes the rise far more than arriving ten degrees early."
+
+  - layout: duo
+    title: ["梭尖早到、晚到，都会跳针", "Early or late, the stitch is skipped"]
+    left: {video: early, label: ["Δ = −10°：太早", "Δ = −10°: too early"], note: ["线环还没张开", "The loop isn't open yet"]}
+    right: {video: late, label: ["Δ = +10°：太晚", "Δ = +10°: too late"], note: ["线环已经收缩", "The loop is already shrinking"]}
+    notes:
+      - "用实验 2-1 看两种失败。左边把钩线时刻提前十度，梭尖到的时候线环还没张开，钻不进去；右边推后十度，线环已经收缩，梭尖扑了个空。两种情况机器都照常运转，针照常上下，布面上却少了一针，留下一段两倍长的线迹。这就是跳针。"
+      - "Lab 2-1 shows the two failures. On the left the catch is ten degrees early: the loop hasn't opened, and the point can't get in. On the right it's ten degrees late: the loop is already shrinking, and the point finds nothing. Either way the machine runs on, the needle goes up and down, but a stitch is missing, leaving a stitch twice as long. That's a skipped stitch."
+
+  - layout: lab
+    title: ["虚拟实验 2-1：钩线时刻与跳针", "Lab 2-1: hook timing and skipped stitches"]
+    shot: {page: lockstitch}
+    tasks:
+      - ["放大钩线区，逐 2° 走过钩线时刻", "Zoom on the hook; step through the catch 2° at a time"]
+      - ["把 Δ 从 −30° 调到 +30°，找不跳针的范围", "Sweep Δ from −30° to +30°; find where it never skips"]
+      - ["把范围换算成回升量和毫秒", "Convert that range to needle rise and milliseconds"]
+    notes:
+      - "现在大家自己做实验 2-1。先放大钩线区，用两度一步的按钮走过钩线那一刻，看梭尖怎样钻进线环。然后拖动钩线时刻偏差 Δ，从负 30 度到正 30 度，边界附近一度一度试，找出不跳针的范围。最后把这个范围换算成机针回升量和毫秒数，写进实验报告。"
+      - "Now try Lab 2-1 yourselves. Zoom in on the hook and step through the catch two degrees at a time; watch how the point gets into the loop. Then drag the hook-timing error Δ from minus 30 to plus 30 degrees, one degree at a time near the edges, and find the range with no skipped stitches. Finally convert that range into needle rise and milliseconds for your lab report."
+
+  - layout: bignum
+    title: ["十度有多长？", "How long is ten degrees?"]
+    nums:
+      - {n: "{{ch02.ms_stitch:.0f}} ms", n_en: "per stitch", label: ["5000 针/分时，一针", "One stitch at 5000/min"]}
+      - {n: "{{ch02.deg_per_ms:.0f}}°", n_en: "per ms", label: ["主轴每毫秒转过的角度", "Shaft angle turned each millisecond"]}
+      - {n: "{{ch02.ms10:.2f}} ms", n_en: "for 10°", label: ["10° 的时间", "The time for 10°"]}
+    foot: ["t = Δ / 360° × 60 / n：转速越高，同样的角度越短，定时只能靠机构，不能靠“估计”", "t = Δ / 360° × 60 / n: the faster it runs, the shorter each degree; timing must be built into the mechanism"]
+    notes:
+      - "十度是多长时间？每分钟 5000 针，一针 {{ch02.ms_stitch:.0f}} 毫秒，主轴每毫秒转 {{ch02.deg_per_ms:.0f}} 度，十度只有 {{ch02.ms10:.2f}} 毫秒，三分之一毫秒。转速越高，同样的角度对应的时间越短。这么短的时间，靠人的手、靠定时器估计都不行，只能靠机构的固定相位，这就是为什么钩线定时要调得那么准。"
+      - "How long is ten degrees? At 5000 stitches a minute one stitch takes {{ch02.ms_stitch:.0f}} milliseconds, the shaft turns {{ch02.deg_per_ms:.0f}} degrees each millisecond, and ten degrees is only {{ch02.ms10:.2f}} milliseconds, a third of a millisecond. The faster the machine, the shorter each degree. Nothing estimated by hand or by a timer can hit that; only the fixed phase of the mechanism can. That's why hook timing has to be set so precisely."
+
+  - layout: points
+    title: ["模型的边界", "Where the model stops"]
+    points:
+      - ["本讲把线看成不伸长、布看成刚性夹持", "Here thread doesn't stretch and cloth is held rigid"]
+      - ["线的弹性、捻向，布的厚度都改变线环", "Thread elasticity and twist, cloth thickness all change the loop"]
+      - ["厚料要大针大线环；弹性针织物易跳针", "Thick cloth needs a bigger needle and loop; stretch knits skip easily"]
+    foot: ["薄料缝得好、换厚牛仔布就跳针，并不奇怪（第 7 讲）", "Fine on light cloth, skipping on heavy denim: no surprise (Lecture 7)"]
+    notes:
+      - "说一下模型的边界。这一讲把线看成不能伸长的，把布看成被刚性夹住的，足以说明线迹怎样形成。实际上线有弹性、有捻向，布有厚度、有弹性，针有粗有细，都会改变线环的大小和形成时刻。所以车间里薄料缝得好好的，换厚牛仔布就跳针，并不奇怪，第 7 讲再细讲。"
+      - "A word on the model's limits. Here we treat the thread as not stretching and the cloth as held rigid; that's enough to explain how a stitch forms. Really, thread is elastic and twisted, cloth has thickness and stretch, and needles come in sizes, and all of these change how big the loop is and when it forms. So a machine that sews light cloth perfectly and skips on heavy denim is no surprise; more in Lecture 7."
+
+  - layout: split
+    title: ["机器人联系：时序图 ↔ 电子凸轮", "Robot link: the timing chart and the electronic cam"]
+    points:
+      - ["缝纫机：位置是主轴转角的函数", "Sewing machine: every position is a function of shaft angle"]
+      - ["传送带：手爪跟着编码器计数走", "Conveyor picking: the gripper follows the encoder count"]
+      - ["窗口太短：靠编码器，不靠定时器", "Windows this short need encoder feedback, not timers"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6b7f9c"/></marker></defs><text x="20" y="50" font-size="30" font-weight="800" fill="#f2b705">缝纫机 · sewing machine</text><g transform="translate(20,80)"><rect width="250" height="120" rx="16" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="125.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">主轴编码器</text><text x="125.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">shaft encoder</text></g><path d="M270 140 L330 140" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(340,80)"><rect width="230" height="120" rx="16" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="115.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">转角 φ</text><text x="115.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">angle</text></g><path d="M570 140 L630 140" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(640,80)"><rect width="240" height="120" rx="16" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="120.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">梭尖钩线</text><text x="120.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">hook catches</text></g><text x="20" y="300" font-size="30" font-weight="800" fill="#2ec4b6">机器人 · robot</text><g transform="translate(20,330)"><rect width="250" height="120" rx="16" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="125.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">传送带编码器</text><text x="125.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">conveyor encoder</text></g><path d="M270 390 L330 390" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(340,330)"><rect width="230" height="120" rx="16" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="115.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">计数</text><text x="115.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">counts</text></g><path d="M570 390 L630 390" stroke="#6b7f9c" stroke-width="4" marker-end="url(#ar2)"/><g transform="translate(640,330)"><rect width="240" height="120" rx="16" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="120.0" y="56.0" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">手爪合上</text><text x="120.0" y="86.0" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">gripper closes</text></g><rect x="20" y="500" width="860" height="120" rx="20" fill="rgba(255,122,69,.12)"/><text x="450" y="556" font-size="32" font-weight="700" fill="#ffb38f" text-anchor="middle">错过窗口 = 跳针 / 抓空</text><text x="450" y="594" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">miss the window: a skipped stitch, an empty grip</text></svg>
+    notes:
+      - "缝纫机四个动作挂在一根主轴上，每个机构的位置都可以写成主轴转角的函数。机器人在运动的传送带上抓工件也是这样：传送带上装一个编码器当主轴，控制器把手爪位置写成编码器计数的函数，叫电子凸轮。梭尖必须在那十度左右里钩线；手爪也必须在工件进入抓取窗口时合上，错过了就是机器人的跳针。"
+      - "A sewing machine's four motions hang on one shaft, so every position is a function of shaft angle. A robot picking parts off a moving conveyor works the same way. An encoder on the conveyor plays the main shaft, and the controller writes the gripper position as a function of the encoder count: an electronic cam. The hook must catch inside that ten-degree window; the gripper must close while the part is in its pick window. Miss it, and that's the robot's skipped stitch."
+
+  - layout: split
+    title: ["生活例子：跳大绳", "Everyday example: jumping into a long rope"]
+    points:
+      - ["绳刚甩起离地时才能冲进去", "Run in just as the rope sweeps past the ground and rises"]
+      - ["早了绳没到，晚了绳绊脚", "Too early, it isn't there; too late, it comes down on you"]
+      - ["钩线也一样：正在线环最大时", "The hook is the same: right when the loop is widest"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><ellipse cx="450" cy="300" rx="350" ry="230" fill="none" stroke="#4b5f7d" stroke-width="6" stroke-dasharray="14 10"/><path d="M120 390 A350 230 0 0 0 500 530" stroke="#f2b705" stroke-width="14" fill="none" stroke-linecap="round"/><circle cx="100" cy="300" r="16" fill="#f3f6fa"/><circle cx="800" cy="300" r="16" fill="#f3f6fa"/><path d="M80 540 L820 540" stroke="#2c3e5c" stroke-width="4"/><circle cx="450" cy="340" r="26" fill="#2ec4b6"/><path d="M450 366 L450 460 M410 400 L490 400 M450 460 L420 520 M450 460 L480 520" stroke="#2ec4b6" stroke-width="10" stroke-linecap="round"/><text x="250" y="600" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle">起跳窗口</text><text x="250" y="632" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">the window to jump in</text></svg>
+    notes:
+      - "生活里有一个很像的例子：跳大绳。两个人摇绳，第三个人要冲进去，必须在绳子刚扫过地面、向上甩起的那一小段时间里起跳：早了绳子还没过来，晚了绳子已经落下来绊脚。梭尖钩线也是这样，线环只在机针回升约 2 毫米前后张得最大，梭尖必须正好在那一刻到达。"
+      - "There's a familiar example: jumping into a long rope. Two people turn it, and the third has to run in during the short moment just after the rope sweeps past the ground and swings up. Too early and the rope isn't there yet; too late and it comes down on your feet. The hook is just the same: the loop is widest only around 2 millimetres of needle rise, and the point has to arrive right then."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["216° 钩线太晚，必然跳针", "Catching at 216° is too late: it will skip"]
+    rows:
+      - ["206° 时机针回升", "{{ch02.rise206:.1f}} mm"]
+      - ["能钩住的范围（实验模型）", "{{ch02.win_lo:.0f}}°–{{ch02.win_hi:.0f}}°"]
+      - ["216° 时机针回升", "{{ch02.rise216:.1f}} mm"]
+    side: {big: "{{ch02.ms10:.2f}}", text: ["10° 在每分钟 5000 针时只有约 {{ch02.ms10:.2f}} ms", "At 5000/min, 10° is only about {{ch02.ms10:.2f}} ms"]}
+    foot: ["重新安装旋梭，让梭尖约 206°（回升约 2 mm）到达机针中心线，并复核针杆高度", "Refit the hook so the point meets the needle at about 206° (2 mm rise), and re-check needle-bar height"]
+    notes:
+      - "回到开头的问题。206 度时机针回升约 {{ch02.rise206:.1f}} 毫米，线环正大；216 度时已经回升 {{ch02.rise216:.1f}} 毫米，线环开始收缩，超出了实验模型 {{ch02.win_lo:.0f}} 到 {{ch02.win_hi:.0f}} 度的窗口，所以必然跳针。这十度在每分钟 5000 针时只有约 {{ch02.ms10:.2f}} 毫秒。办法是重新安装旋梭，让梭尖在 206 度左右到达机针中心线，同时复核针杆高度，第 5 讲细讲。"
+      - "Back to our problem. At 206 degrees the needle has risen about {{ch02.rise206:.1f}} millimetres and the loop is wide open. At 216 it has risen {{ch02.rise216:.1f}} and the loop is shrinking, outside the lab model's window of {{ch02.win_lo:.0f}} to {{ch02.win_hi:.0f}} degrees, so the machine must skip. Those ten degrees last only about {{ch02.ms10:.2f}} milliseconds at 5000 a minute. The fix: refit the hook so the point reaches the needle at about 206 degrees, and re-check the needle-bar height; more in Lecture 5."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["一根上轴、四条传动链，四个动作永远同步", "One main shaft, four trains, always in step"]
+      - ["机针不对称造线环，旋梭 2:1、梭壳不动", "Asymmetric needle makes the loop; hook at 2:1, case still"]
+      - ["钩线窗口约 10°：早了晚了都跳针", "A catch window of about 10°: early or late, it skips"]
+    after: ["作业 2：跳针诊断与时序分析 · 测验 · 实验 2-1 报告 —— 在问渠学习平台完成", "Assignment 2 · quiz · Lab 2-1 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，一根上轴分出刺布、挑线、钩线、送布四条传动链，四个动作永远同步。第二，机针的长槽、短槽和凹口决定线环在哪一侧形成；旋梭转速是主轴的两倍、梭壳不动，线环才能套住底线。第三，钩线窗口只有十度左右，早了晚了都会跳针。下一讲，我们推导针杆的运动。"
+      - "Three things to remember. One: a single main shaft drives four trains, needle, take-up, hook and feed, always in step. Two: the needle's long groove, short groove and scarf decide where the loop forms; the hook turns twice per stitch round a still bobbin case, so the loop can take in the bobbin thread. Three: the catch window is only about ten degrees; early or late, the stitch is skipped. Next time: deriving the needle-bar motion."

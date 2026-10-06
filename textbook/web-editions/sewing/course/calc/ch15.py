@@ -80,3 +80,17 @@ Tlim = 1.27 / sqrt(0.57)
 aY = (Tlim - 0.05 * m * 9.8 * rp) / (m * rp + Jm / rp)
 print("a3 Y max accel under rated rms", aY, " Tpeak at that a", (m * aY + 0.05 * m * 9.8) * rp + Jm * aY / rp)
 print("a3 n_max 3mm along Y with aY, W15", nmax(W15, 3, a=aY))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    la = lookahead(caps, 300, 2680)
+    mo15, mo10 = motor(3, 50, 0.015), motor(3, 50, 0.010)
+    out(W15=W15, W3=W3, W6=W6, phi1=window(1.5)[0], phi2=window(1.5)[1],
+        tm3=tmove(3) * 1000, tm6=tmove(6) * 1000, v2a=1 / 50 * 1000,
+        n2=nmax(W15, 2), n3=nmax(W15, 3), n6=nmax(W15, 6), n10=nmax(W15, 10), n6t6=nmax(W6, 6), n3t6=nmax(W6, 3),
+        thick=(1 - W6 / W15) * 100, diag=(2 ** 0.25 - 1) * 100, cyc=sqrt(4 / 6.283), cycdt=sqrt(6.283 / 4),
+        k=(150e3 / 0.3 + 150e3 / 0.5) / 1000, fn=sqrt(800e3 / 3) / 2 / pi, Tn=1000 / (sqrt(800e3 / 3) / 2 / pi),
+        cyl=0.5e6 * pi * 0.032 ** 2 / 4, deg1ms=6 * 2800 * 1e-3,
+        **{f"la{i + 1}": int(v) for i, v in enumerate(la)},
+        F=mo15[0], Tpk=mo15[1], Trms=mo15[2], Tpk10=mo10[1], Trms10=mo10[2], frac=W15 / 360,
+        sol24=-5 * log(1 - 3 / 4), sol75=-5 * log(1 - 3 / 12.5), tvs=0.03 * 1.7 / 48 * 1000, sew60=60 * 60 / 2000)

@@ -72,9 +72,21 @@ for _ in range(40):
     if stats(r=mid) is None: hi = mid
     else: lo = mid
 print("critical crank radius ~", round(lo, 2), "mm")
+lo_crit = lo
 lo, hi = 4.36, 8
 for _ in range(40):
     mid = (lo + hi) / 2
     if stats(r=mid)[0] < 30: lo = mid
     else: hi = mid
 print("exact r for 30 deg swing:", round(lo, 2), "mm (rough estimate", round(r30, 2), ")")
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    sw, gmin, wmax = stats()
+    ent, lea = cross(1.5)
+    out(Dj=dstar(0.18, 0.85), Dr=dstar(0.30, 0.80), Df=dstar(0.10, 0.90),
+        Dc=dstar(-0.06, 0.95),            # 雪纺：虚拟实验 9-1 的面料参数 ε₀ = −6%、η = 0.95
+        Aj=wave(30, 0.18), Ar=wave(26, 0.30), sqj=sqrt(0.18),
+        enter=ent, leave=lea, infab=lea - ent, outfab=360 - (lea - ent),
+        omega=w, swing=sw, gmin=gmin, wmax=float(wmax), tip=float(wmax) * 0.038,
+        rough=degrees(2 * 4.36 / 22), rcrit=lo_crit, mob=6 * 3 - (5 + 3 + 3 + 5), ld=20 * dstar(0.18, 0.85))

@@ -54,3 +54,19 @@ r=payback(250000,0.98,n=8); print("8步 98% P", r['P'], "回收", r['months'], "
 # 报道核对
 print("22s 一件/天", 86400/22, "21 线", 21*86400/22, " 125万/年→/天", 1.25e6/365, "21线", 21*1.25e6/365, "80万/8.2万", 8e5/(21*86400/22))
 print("T恤加工 CO2 g", 0.105*0.57*1000, " 缝制占比", 0.098/0.105)
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    w97, w99, w999 = workflow(0.97, 10, 8, 30), workflow(0.99, 10, 8, 30), workflow(0.999, 10, 8, 30)
+    p2, p3, p99 = payback(250000, 0.97), payback(250000, 0.97, sh=3), payback(250000, 0.99)
+    e1, e2 = energy(500, 3550)
+    Bsh = B_fab(120, 20)
+    out(B_knit=B_fab(150, 14) * 1e6, B_shirt=Bsh * 1e6, B_suit=B_fab(250, 25) * 1e6, B_denim=B_fab(400, 35) * 1e6, B_steel=Bst,
+        steel_x=Bst / Bsh / 1e4, stand_shirt=(7.84 * Bsh / (120 / 1000 * G)) ** (1 / 3) * 100,
+        Fcr=F * 1e3, Wt=Wt * 1e3, Wratio=Wt / F, cL=(4 / math.pi ** 2) ** (1 / 3), c_need=(4 / math.pi ** 2) ** (1 / 3) * 50,
+        e_cl=e1 / 1e4, e_sv=e2 / 1e4, e_save=(e1 - e2) / 1e4, e_pct=(1 - 0.25 / 0.45) * 100, co2=(e1 - e2) * 0.57 / 1000,
+        P97=w97['P'] * 100, f97=w97['f'], cyc97=w97['cyc'], perh97=w97['perh'], int97=w97['intervh'], P99=w99['P'] * 100, int99=w99['intervh'], int999=w999['intervh'],
+        p90=0.9 ** 0.1 * 100, saved=p2['saved'] / 1e4, hc=p2['hc'] / 1e4, maint=0.1 * 250000 / 1e4,
+        pay2=p2['months'], pay3=p3['months'], pay99=p99['months'],
+        every_min=60 / w97['intervh'], costs=p2['hc'] / 1e4 + 0.1 * 250000 / 1e4, steel_m=Bst / Bsh / 1e6, claim21k=21 * 86400 / 22 / 1e3,
+        claim_line=86400 / 22, claim21=21 * 86400 / 22 / 1e4, claim_x=8e5 / (21 * 86400 / 22), tee_co2=0.105 * 0.57 * 1000)

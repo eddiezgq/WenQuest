@@ -96,3 +96,15 @@ out["E 牛仔 定时-4"] = feed(t=4.0, dT=-4)
 out["机器人 0.8% 30 cm"] = 0.008 * 300
 for k, v in out.items():
     print(k, ":", v)
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out as book_out
+    st, j0, j8, jh, h1, pm30 = out["标准定时"], out["牛仔 标准"], out["牛仔 定时-8"], out["牛仔 仅水平-8"], out["牙高1.0"], out["相位 -30（水平提前）"]
+    book_out(drop=FE, alpha=half(0.8), grip=2 * half(0.8), grip10=2 * half(1.0), rise=st[0], eff=EFF0, S3=3 / EFF0,
+             fin=cross(1.5), fout=360 - cross(1.5), infab=360 - 2 * cross(1.5), drag0=st[2],
+             dm10=out["定时 -10"][2], dp10=out["定时 +10"][2], dp20=out["定时 +20"][2],
+             back30=pm30[3], s30=pm30[4], fin4=cross(4.0), early4=cross(1.5) - cross(4.0), drag4=j0[2], drag48=j8[2],
+             drop48=j8[1], dragh8=jh[2], backh8=jh[3], h10rise=h1[0], h10drop=h1[1], h10s=h1[4], h10back=h1[3],
+             th3=out["θ(3)"], th5=out["θ(5)"], v3=out["v,a @5000 3mm"][0], a3=out["v,a @5000 3mm"][1], ga3=out["v,a @5000 3mm"][1] / 9.81,
+             nf_lo=out["针送布抓布区间"][0], nf_hi=out["针送布抓布区间"][1], pmin=Pmin, shift=out["衬里 错位@Pmin 40cm"],
+             nshift=out["针送布 错位(0.3)"], pct40=out["1% 40cm"])

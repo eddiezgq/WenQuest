@@ -51,3 +51,12 @@ Ea = 0.5 * 8e-4 * rad(4500) ** 2
 print("a3 KE", Ea, " V2", sqrt(310 ** 2 + 2 * 0.7 * Ea / 680e-6))
 Eal3 = 0.5 * 680e-6 * (400 ** 2 - 310 ** 2) / 0.7
 print("a3 brake needed above r/min", rpm(sqrt(2 * Eal3 / 8e-4)))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    out(bw=Kv / J, dmax=(Tmax + Tf) / J, err=degrees(Tf / (Kv * Kp)), res=360 / 4096, dM=60 / (4096 * 0.001),
+        relM=100 * 60 / (4096 * 0.001) / 200, relT=100 * 4096 * 200 / 60 / 1e7, cross=sqrt(60 / (4096 * 0.001) * 1e7 * 60 / 4096),
+        KE=E, V2=sqrt(310 ** 2 + 2 * 0.7 * E / 470e-6), nbrake=rpm(sqrt(2 * Eal / J)),
+        p400=deg_per(400, 6.9e-3), d400=deg_per(400, 12.9e-3), z400=deg_per(400, 5.1e-3), deg1ms=deg_per(400, 1e-3),
+        p600=deg_per(600, 6.9e-3), d600=deg_per(600, 12.9e-3), z600=deg_per(600, 5.1e-3),
+        nmax=20 / (6 * 6.9e-3), vce=24 + 48, eZ=0.5 * 0.08 * 1 ** 2 * 1000)

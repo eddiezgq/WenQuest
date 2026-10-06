@@ -1,0 +1,442 @@
+# 第 22 讲 自动化测试与持续迭代 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch22.键:格式}} 由课程包程序 course/calc/ch22.py 算出，不手写数字。
+lesson: 22
+code: [ch22]
+
+clips:
+  hero:          # 封面：三维平缝机样机，全透视（被测的就是这台平缝原型）
+    page: proto-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, press: "#shell [data-k=xray]"}
+  runs:          # 实验 22-1：HIL 层全选用例，依次跑 v1.3.2 → v1.4.0 → v1.4.1 → v1.4.2，结果表一红一绿地变，循环
+    page: testbench
+    selector: "section:has(#tbody)"
+    vh: 1400
+    loop: 16
+    steps:
+      - {at: 0, js: "document.querySelector('[data-l=hil]').click();document.getElementById('all').click();document.querySelector('[data-v=\"v1.3.2\"]').click();document.getElementById('run').click()"}
+      - {at: 4, js: "document.querySelector('[data-v=\"v1.4.0\"]').click();document.getElementById('run').click()"}
+      - {at: 8, js: "document.querySelector('[data-v=\"v1.4.1\"]').click();document.getElementById('run').click()"}
+      - {at: 12, js: "document.querySelector('[data-v=\"v1.4.2\"]').click();document.getElementById('run').click()"}
+  budget:        # 实验 22-1：v1.4.0 上同样约 4 小时，默认用例集（全绿、漏掉）与按风险挑的用例集（两条红）交替运行
+    page: testbench
+    selector: "section:has(#tbody)"
+    vh: 1400
+    loop: 8
+    steps:
+      - {at: 0, js: "document.querySelector('[data-l=hil]').click();document.querySelector('[data-v=\"v1.4.0\"]').click();document.getElementById('def').click();document.getElementById('run').click()"}
+      - {at: 4, js: "document.getElementById('none').click();['HIL-TRM-SW','HIL-POS-50','HIL-POS-1','HIL-FLT','HIL-XY','HIL-KN','HIL-BT','HIL-SOL'].forEach(function(k){document.querySelector('[data-c='+k+']').click()});document.getElementById('run').click()"}
+  calc:          # 实验 22-1：二项分布计算器，1000 次里失败 0、1、2、3 次时的置信下限，轮流显示
+    page: testbench
+    selector: "section:has(#cN)"
+    loop: 12
+    steps:
+      - {at: 0, set: {cR: 99.5, cC: 95, cX: 0, dN: 1000, dX: 0}, js: "document.body.style.visibility='hidden';document.querySelector('section:has(#cN)').style.visibility='visible'"}
+      - {at: 3, set: {dX: 1}}
+      - {at: 6, set: {dX: 2}}
+      - {at: 9, set: {dX: 3}}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 22 讲", "Lecture 22"]
+    title: ["自动化测试", "Automated Testing and Continuous Iteration"]
+    sub: ["持续迭代：工况、次数、模型都要够", "Iterate continuously: conditions, counts and models"]
+    notes:
+      - "同学们好。前两讲做出了三台原型，今天的问题是：怎么知道它们是好的，改了以后还是好的？答案是自动化测试：按规定的工况、足够的次数、足够真实的模型，每天让机器自己测一遍。我们从一次真实感很强的剪线故障讲起。"
+      - "Hello everyone. In the last two lectures we built three prototypes. Today's question: how do we know they work, and still work after every change? The answer is automated testing: defined conditions, enough repetitions and realistic models, run by the machine itself every day. We'll start from a very realistic trimming failure."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["固件升级后，偶尔剪不断线", "After a firmware update, trims occasionally fail"]
+    facts:
+      - ["v1.4.0“快速剪线”：停车剪线 0.38 s → 0.22 s", "v1.4.0 'fast trim': stop-and-trim 0.38 s → 0.22 s"]
+      - ["样机上 3000–4000 r/min 试缝几十次，全好", "Dozens of trials at 3000–4000 r/min on the prototype: all fine"]
+      - ["车间常一脚踩到 5000 r/min，电网电压不稳", "Operators floor it to 5000 r/min; the mains voltage wanders"]
+    notes:
+      - "一家西裤厂把平缝机固件从 v1.3.2 升级到 v1.4.0，新版本的快速剪线让从 4000 转停车剪线从 0.38 秒缩到约 0.22 秒。工程师上线前在样机上三四千转试了几十次，一次都没剪不断。可车间里操作工常常一脚踩到 5000 转再松开，厂区电压也不稳，几天后开始有零星的剪不断报修。为什么试的时候没发现？要测多少次才能放心？这节课回答。"
+      - "A trouser factory updated its lockstitch firmware from v1.3.2 to v1.4.0. The new fast trim cut stop-and-trim from 4000 r/min from 0.38 seconds to about 0.22. Before release, the engineer tried dozens of trims at three to four thousand r/min on the prototype; not one failed. But on the floor operators often floor the pedal to 5000 and let go, and the mains voltage wanders. Within days, occasional failed trims were reported. Why didn't testing catch it, and how many trials would be enough? That's today."
+
+  - layout: split
+    title: ["剪不断：发令时主轴还没降下来", "Failed trim: the spindle is still too fast"]
+    points:
+      - ["进刀晚过 330°，就剪不断", "Knife entry past 330° fails the trim"]
+      - ["10 ms 延迟：n ≤ {{ch22.ncrit:.0f}} r/min", "With 10 ms: command speed ≤ {{ch22.ncrit:.0f}} r/min"]
+      - ["恒功率区：高速时减速能力下降", "Constant-power region: less braking at speed"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M80 560 L870 560 M80 560 L80 60" stroke="#4b5f7d" stroke-width="3"/>
+          <rect x="80" y="60" width="790" height="260" fill="rgba(255,122,69,.12)"/>
+          <path d="M80 320 L870 320" stroke="#ff7a45" stroke-width="4" stroke-dasharray="12 8"/>
+          <text x="90" y="305" font-size="28" font-weight="700" fill="#ff9c75">330°：晚于此剪不断</text>
+          <path d="M80 560 L860 128" stroke="#f2b705" stroke-width="5"/>
+          <path d="M80 560 L860 214" stroke="#2ec4b6" stroke-width="5"/>
+          <text x="250" y="420" font-size="26" fill="#f2b705">10 ms</text>
+          <text x="330" y="520" font-size="26" fill="#5ee0d2">8 ms</text>
+          <circle cx="414" cy="412" r="14" fill="#2ec4b6"/>
+          <text x="414" y="470" font-size="26" fill="#5ee0d2" text-anchor="middle">正常电压 514</text>
+          <circle cx="828" cy="229" r="14" fill="#ff7a45"/>
+          <text x="790" y="390" font-size="26" fill="#ff9c75" text-anchor="middle">低压 10%：1150</text>
+          <circle cx="514" cy="320" r="12" fill="#f2b705"/>
+          <text x="475" y="300" font-size="26" fill="#f2b705" text-anchor="middle">{{ch22.ncrit:.0f}}</text>
+          <text x="470" y="610" font-size="26" fill="#8fa3ba" text-anchor="middle">290° 发令时的转速 n（r/min）</text>
+          <text x="90" y="50" font-size="26" fill="#8fa3ba">动刀进刀角</text>
+        </svg>
+    notes:
+      - "原因在这里。剪线电磁铁在剪线针 290 度发令，动刀进刀角等于 290 加 6nt，晚过 330 度就剪不断。延迟 10 毫秒时，发令转速必须不超过 {{ch22.ncrit:.0f}} 转。v1.4.0 减速按伺服 100% 能力规划，可伺服高于基速进入恒功率区，减速能力下降，基速还随电压变。从 5000 转停车，正常电压下发令时约 514 转，电压低 10% 时约 1150 转，进刀角到了 {{ch22.ent1150:.0f}} 度，必然剪不断。"
+      - "Here's the cause. The trim solenoid is commanded at 290 degrees of the trim stitch; knife entry is 290 plus 6nt, and past 330 the trim fails. With a 10 millisecond delay the command speed must be at most {{ch22.ncrit:.0f}} r/min. v1.4.0 planned braking at 100 percent of servo capability, but above base speed the servo enters its constant-power region and brakes less, and the base speed itself moves with voltage. Stopping from 5000, the command comes at about 514 r/min at normal voltage, but about 1150 when the voltage is 10 percent low: entry at {{ch22.ent1150:.0f}} degrees, a certain failure."
+
+  - layout: points
+    title: ["手工试缝为什么测不出", "Why hand trials missed it"]
+    points:
+      - ["工况：人只在 3000–4000 r/min 试，不挑低电压", "Conditions: people try 3000–4000, never low voltage"]
+      - ["次数：4750 r/min 试 50 次，{{ch22.none50:.0f}}% 的机会一次也看不到", "Count: 50 tries at 4750 r/min, a {{ch22.none50:.0f}}% chance of seeing nothing"]
+      - ["模型：SIL 用理想电机，没有恒功率区", "Model: SIL used an ideal motor, no constant-power region"]
+    foot: ["自动化测试 = 规定的工况 + 足够的次数 + 足够真实的模型，每晚都跑", "Automated testing = defined conditions + enough repetitions + realistic models, every night"]
+    notes:
+      - "手工试缝为什么测不出？三个原因，每一个都是今天要解决的问题。第一是工况：人习惯在三四千转试，很少一脚踩到五千再松开，更不会专挑电压低的时候。第二是次数：就算在 4750 转试，失败率 1.2%，试 50 次一次都看不到的概率约 {{ch22.none50:.0f}}%。第三是模型：SIL 用理想电机，没有恒功率区，所以全过；HIL 用样机实测的转矩–转速曲线，才把它暴露出来。"
+      - "Why did hand trials miss it? Three reasons, and each is a problem we solve today. Conditions: people habitually try three to four thousand r/min, rarely floor it to five thousand and let go, and never pick a low-voltage moment. Count: even at 4750, with a 1.2 percent failure rate, fifty tries have about a {{ch22.none50:.0f}} percent chance of showing nothing. Model: the SIL used an ideal motor with no constant-power region, so everything passed; the HIL, with the prototype's measured torque–speed curve, exposed it."
+
+  - layout: section
+    num: "01"
+    title: ["测试金字塔与测试台", "The test pyramid and the test bench"]
+
+  - layout: split
+    title: ["测试金字塔：越往下越快、越便宜", "The test pyramid: lower is faster and cheaper"]
+    points:
+      - ["单元、SIL：每次提交都跑", "Unit and SIL: every commit"]
+      - ["HIL：每晚 3–4 h，真板子、真时序", "HIL: 3–4 h nightly, real boards, real timing"]
+      - ["整机：每周；EOL：每台 3–5 min", "Full machine: weekly; EOL: 3–5 min per unit"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <polygon points="300,30 360,140 240,140" fill="#a78bfa"/>
+          <polygon points="240,150 360,150 420,250 180,250" fill="#ff7a45"/>
+          <polygon points="180,260 420,260 480,360 120,360" fill="#f2b705"/>
+          <polygon points="120,370 480,370 540,470 60,470" fill="#2ec4b6"/>
+          <polygon points="60,480 540,480 600,590 0,590" fill="#4c8dff"/>
+          <g font-size="30" font-weight="800" fill="#08101d" text-anchor="middle">
+            <text x="300" y="120">EOL</text><text x="300" y="212">整机</text><text x="300" y="322">HIL</text>
+            <text x="300" y="432">SIL</text><text x="300" y="548">单元测试</text></g>
+          <g font-size="26" fill="#c7d3e2">
+            <text x="390" y="100">每台 3–5 min</text><text x="450" y="210">约 2 天 · 每周</text><text x="510" y="320">3–4 h · 每晚</text>
+            <text x="570" y="430">5–10 min · 每次提交</text><text x="630" y="545">&lt; 1 min · 每次提交</text></g>
+          <path d="M870 560 L870 80" stroke="#8fa3ba" stroke-width="3" marker-end="url(#a22p)"/>
+          <text x="855" y="70" font-size="24" fill="#8fa3ba" text-anchor="end">越往上越真实</text>
+          <defs><marker id="a22p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fa3ba"/></marker></defs>
+        </svg>
+    notes:
+      - "把测试按离真机多远分层：最下面单元测试，几百个用例一分钟跑完，能抓逻辑错误，比如 359.9 度到 0 度的跨越；SIL 把固件接上机器模型，能做大量参数扫描，但模型里没有的物理它看不见；HIL 用真的主控板和驱动板，接实时仿真器，中断、总线、电磁铁延迟都是真的，还能注入故障；整机测试台测模型里根本没有的东西，比如线迹和噪声；出厂测试验证的是这一台装得对不对。"
+      - "Layer the tests by how far they are from the real machine. At the bottom, unit tests: hundreds of cases in a minute, catching logic errors such as the wrap from 359.9 to 0 degrees. SIL connects the firmware to a machine model for big parameter sweeps, but can't see physics the model lacks. HIL uses the real controller and driver boards on a real-time simulator, so interrupts, bus and solenoid delays are real, and faults can be injected. The full-machine bench measures what no model has, like stitch quality and noise. And end-of-line testing checks that this particular unit was assembled right."
+
+  - layout: points
+    title: ["缺陷要在能发现它的最低一层被发现", "Catch each defect at the lowest layer that can"]
+    points:
+      - ["单元里发现：改代码几分钟", "Found in a unit test: minutes to fix"]
+      - ["HIL 里发现：等一夜、再二分；整机上：要拆机头", "In HIL: a night plus bisecting; on the machine: open the head"]
+      - ["高层每抓到一个，就问：低一层能不能抓住它", "Each catch up high: could a lower layer catch it?"]
+    foot: ["本案例：把 HIL 的转矩–转速曲线搬进 SIL，同类问题几分钟就能抓住（HIL 仍不能取消）", "In our case: move HIL's torque–speed curve into SIL, so the same kind of bug is caught in minutes (HIL still stays)"]
+    notes:
+      - "分层的要点只有一句话：缺陷应该在能发现它的最低那一层被发现。同一个缺陷，在单元测试里发现，改代码几分钟；在 HIL 里发现，要等一夜、再二分定位；在整机上发现，要拆机头；到了用户那里，就是返修、索赔和名声。所以每当高层抓到一个缺陷，修完都要问：能不能在低一层加个用例抓住它？本案例就是把 HIL 的转矩–转速曲线连同电压系数搬进 SIL。注意这不等于取消 HIL。"
+      - "Layering comes down to one sentence: catch each defect at the lowest layer that can see it. The same bug costs minutes in a unit test; in HIL it costs a night plus bisecting; on the machine you open the head; at the customer it's repairs, claims and reputation. So whenever a higher layer catches a bug, ask after fixing it: could a lower layer catch it with a new case? In our case the HIL's torque–speed curve, with its voltage factor, moves into the SIL motor model. That doesn't mean dropping HIL."
+
+  - layout: points
+    title: ["先写编号需求，再写用例", "Numbered requirements first, then test cases"]
+    tag: ["追溯", "Traceability"]
+    points:
+      - ["REQ-TRM-01：剪线成功率 ≥ 99.5%（置信度 95%）", "REQ-TRM-01: trim success ≥ 99.5% (95% confidence)"]
+      - ["没有用例的需求，等于没有需求", "A requirement with no test case is no requirement"]
+      - ["每条结果带：需求、用例、序列号、固件、参数版本", "Every result carries requirement, case, serial, firmware, parameters"]
+    notes:
+      - "自动化测试的第一步不是写脚本，而是把要测什么写成编号的需求：编号、一句可以判定的话、一个数值判据和来源。比如 REQ-TRM-01：从三千转到最高转速任一转速停车剪线，成功率不低于 99.5%，置信度 95%。需求和用例排成一张表就是追溯矩阵，用例里打上需求标记，每次运行自动汇总。每条结果都带五样东西，少一样，几个月后这条记录就说不清了。"
+      - "The first step of automated testing isn't writing scripts; it's writing what to test as numbered requirements: an ID, one decidable sentence, a numeric criterion and a source. For example REQ-TRM-01: stop-and-trim from any speed between 3000 and top speed succeeds at least 99.5 percent of the time, at 95 percent confidence. Requirements against cases form the traceability matrix, generated automatically from tags in the test code. And every result carries five things; miss one and in a few months nobody can explain that record."
+
+  - layout: split
+    title: ["测试台的“真值”来自独立传感器", "The bench's truth comes from independent sensors"]
+    points:
+      - ["脚本经网关指挥原型、读回数据", "Scripts drive the prototype via the gateway"]
+      - ["只读原型自己的编码器，会一起错", "Read only its own encoder and both go wrong"]
+      - ["换型：适配板 + 插头 + 配置文件", "New model: adapter plate, plugs, config file"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <defs><marker id="a22a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fa3ba"/></marker></defs>
+          <g transform="translate(20,60)"><rect width="250" height="150" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
+            <text x="125" y="70" font-size="32" font-weight="700" fill="#f3f6fa" text-anchor="middle">测试计算机</text>
+            <text x="125" y="112" font-size="24" fill="#8fbaff" text-anchor="middle" class="en">pytest</text></g>
+          <g transform="translate(325,60)"><rect width="250" height="150" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+            <text x="125" y="70" font-size="32" font-weight="700" fill="#f3f6fa" text-anchor="middle">被测原型</text>
+            <text x="125" y="112" font-size="24" fill="#f2b705" text-anchor="middle">网关 · 主控 · 驱动</text></g>
+          <path d="M272 135 L317 135" stroke="#8fa3ba" stroke-width="4" marker-end="url(#a22a)"/>
+          <g transform="translate(20,280)"><rect width="860" height="300" rx="22" fill="rgba(46,196,182,.1)" stroke="#2ec4b6" stroke-width="3"/>
+            <text x="30" y="55" font-size="30" font-weight="800" fill="#5ee0d2">测试台模块（独立测量）</text>
+            <g font-size="27" fill="#f3f6fa"><text x="30" y="115">负载电机与测功</text><text x="450" y="115">编码器模拟</text>
+            <text x="30" y="170">HIL 实时仿真器</text><text x="450" y="170">行程传感器</text>
+            <text x="30" y="225">线迹相机</text><text x="450" y="225">温度 · 数据采集</text></g></g>
+          <path d="M450 212 L450 272" stroke="#8fa3ba" stroke-width="4" marker-end="url(#a22a)"/>
+          <path d="M145 272 L145 212" stroke="#8fa3ba" stroke-width="4" marker-end="url(#a22a)"/>
+        </svg>
+    notes:
+      - "要自动化，先得有一台能被程序指挥、能自己测量的测试台。左上是测试计算机，跑 Python 脚本，经网关给原型下命令、读数据；中间是被测原型；下面是测试台模块。最重要的一条：测试台要独立于被测原型测量。如果停针误差只读原型自己的编码器，编码器装偏了，原型和测试会一起正确地错下去。所以剪没剪断用线迹相机看，电磁铁延迟用行程传感器测。换型靠适配板、插头和配置文件，脚本本身不变。"
+      - "To automate, you need a bench that a program can command and that measures by itself. Top left, the test computer runs Python scripts and talks to the prototype through its gateway. In the middle, the prototype under test. Below, the bench modules. The key rule: the bench measures independently of the prototype. If stop error is read only from the prototype's own encoder, a misaligned encoder makes the prototype and the test agree on the same wrong answer. So a camera judges whether the thread was cut, and a stroke sensor measures solenoid delay. Changing models takes an adapter plate, a set of plugs and a config file; the scripts stay the same."
+
+  - layout: split
+    title: ["同一组用例，逐个版本跑一遍", "The same test set, version by version"]
+    points:
+      - ["参数化：6 个转速 × 250 次", "Parametrised: trim sweep, 6 speeds × 250"]
+      - ["回归靠 4750、5000 这两个点抓住", "The 4750 and 5000 points catch the regression"]
+      - ["同一用例可在 SIL、HIL、整机上跑", "One case runs on SIL, HIL and the machine"]
+    visual: {video: runs}
+    notes:
+      - "测试脚本用 Python 和 pytest。夹具负责连上样机、读三个版本号，测完不论成败都把执行器断电；结果按问渠数字工厂的统一信封发到总线。参数化把一个用例扩成一组：剪线用例按 3000 到 5000 六个转速各跑 250 次。看右边实验台依次跑 v1.3.2、v1.4.0、v1.4.1、v1.4.2：v1.4.0 的剪线扫描变红，回归就是靠 4750 和 5000 这两个点抓住的，只测 4000 它照样漏过去。"
+      - "Test scripts are Python with pytest. Fixtures connect to the prototype, read the three version numbers, and always switch the actuators off afterwards, pass or fail; results go onto the bus in the WenQuest digital-factory envelope. Parametrisation turns one case into a set: the trim case runs 250 times at each of six speeds from 3000 to 5000. Watch the bench run v1.3.2, v1.4.0, v1.4.1 and v1.4.2 in turn. On v1.4.0 the trim sweep turns red; the regression is caught by the 4750 and 5000 points. Testing only at 4000 would have missed it."
+
+  - layout: section
+    num: "02"
+    title: ["要测多少次：统计说了算", "How many trials: let statistics decide"]
+
+  - layout: bignum
+    title: ["零失效验证：n ≥ ln(1 − C) / ln R", "Zero-failure test: n ≥ ln(1 − C) / ln R"]
+    nums:
+      - {n: "{{ch22.n598:.0f}}", n_en: "trials", label: ["R = 99.5%、C = 95%，零失效", "R = 99.5%, C = 95%, zero failures"]}
+      - {n: "{{ch22.nx1:.0f}}", n_en: "trials", label: ["允许 1 次失败", "One failure allowed"]}
+      - {n: "{{ch22.nx3:.0f}}", n_en: "trials", label: ["允许 3 次失败", "Three failures allowed"]}
+    foot: ["如果可靠度只有 R，n 次全成功的概率是 Rⁿ ≤ 1 − C；好记的近似：n ≈ 3/(1 − R)", "If reliability were only R, n straight successes has probability Rⁿ ≤ 1 − C; rule of thumb: n ≈ 3/(1 − R)"]
+    notes:
+      - "剪线成功率要不低于 99.5%，试了 200 次全成功，够不够？不够。用统计的语言说：在置信度 C 下证明可靠度不低于 R。思路是反证：如果可靠度真的只有 R，连续 n 次全成功的概率是 R 的 n 次方，要求它不超过 1 减 C。代入 99.5% 和 95%，得 {{ch22.raw:.1f}}，取 {{ch22.n598:.0f}} 次。好记的近似是失效率倒数的三倍。允许失败 1 次要 {{ch22.nx1:.0f}} 次，2 次 {{ch22.nx2:.0f}}，3 次 {{ch22.nx3:.0f}}。"
+      - "Trim success must be at least 99.5 percent. Two hundred straight successes: is that enough? No. In statistical terms we must show, at confidence C, that reliability is at least R. Argue by contradiction: if reliability were only R, n straight successes would have probability R to the n, and we require that to be at most 1 minus C. With 99.5 and 95 percent that gives {{ch22.raw:.1f}}, so {{ch22.n598:.0f}} trials. A handy approximation is three times the reciprocal of the failure rate. Allowing one failure needs {{ch22.nx1:.0f}}, two {{ch22.nx2:.0f}}, three {{ch22.nx3:.0f}}."
+
+  - layout: split
+    title: ["有失效时：看置信下限，不看点估计", "With failures: use the lower bound, not the estimate"]
+    points:
+      - ["1000 次 0 失败：{{ch22.rl0:.2f}}%", "1000 trials, 0 failures: {{ch22.rl0:.2f}}%"]
+      - ["1 次失败：{{ch22.rl1:.2f}}%，合格", "1 failure: {{ch22.rl1:.2f}}%, passes"]
+      - ["2 次失败：{{ch22.rl2:.2f}}%，不合格", "2 failures: {{ch22.rl2:.2f}}%, fails"]
+    visual: {video: calc}
+    notes:
+      - "如果 n 次里失败了 x 次呢？点估计是 1 减 x 除以 n，但判定要用置信下限。失败次数服从二项分布，让“失败不超过 x 次”的概率恰好等于 1 减 C 的那个失效率，就是上限，这叫 Clopper–Pearson 方法。右边是实验台上的计算器，1000 次里失败 0、1、2、3 次轮流算：失败 1 次，下限 {{ch22.rl1:.2f}}%，满足；失败 2 次，点估计 99.8% 看着不错，下限却只有 {{ch22.rl2:.2f}}%。这就是“单点 1000 次最多 1 次失败”的来历。"
+      - "What if x of the n trials fail? The point estimate is 1 minus x over n, but decisions use the lower confidence bound. Failures follow a binomial distribution; the failure rate at which 'at most x failures' has probability exactly 1 minus C is the upper bound. That's the Clopper–Pearson method. On the right, the bench calculator cycles through 0, 1, 2 and 3 failures in 1000. One failure: lower bound {{ch22.rl1:.2f}} percent, which passes. Two failures: the estimate of 99.8 percent looks fine, but the bound is only {{ch22.rl2:.2f}}. That's where 'at most one failure in 1000 at each speed' comes from."
+
+  - layout: bignum
+    title: ["抓住回归：把次数花在最敏感的工况", "Catch the regression: spend trials where it's sensitive"]
+    nums:
+      - {n: "{{ch22.det250:.0f}}%", label: ["4750 r/min（p ≈ 1.2%）测 250 次", "250 trials at 4750 r/min (p ≈ 1.2%)"]}
+      - {n: "{{ch22.det5000:.0f}}%", label: ["5000 r/min（p ≈ 17%）只测 10 次", "Only 10 trials at 5000 r/min (p ≈ 17%)"]}
+      - {n: "{{ch22.n598:.0f}}", n_en: "trials", label: ["95% 把握抓住 p = 0.5%", "95% sure to catch p = 0.5%"]}
+    foot: ["P = 1 − (1 − p)ⁿ：同样 250 次，放在 4000 r/min 一次也看不到，放在最高转速几乎必然抓住", "P = 1 − (1 − p)ⁿ: the same 250 trials see nothing at 4000 r/min, and almost surely catch it at top speed"]
+    notes:
+      - "持续集成还要问另一个问题：它变坏了，测多少次能发现？至少看到一次失败的概率是 1 减 (1 减 p) 的 n 次方。在 4750 转，失效率 1.2%，测 250 次有 {{ch22.det250:.0f}}% 的把握；在 5000 转，失效率 17%，测 10 次就有 {{ch22.det5000:.0f}}%。要有 95% 把握抓住 0.5% 的回归，也要 {{ch22.n598:.0f}} 次，和零失效验证是同一个式子。原则：把有限的次数花在最可能出问题的工况上。"
+      - "Continuous integration asks a second question: if it got worse, how many trials until we see it? The chance of at least one failure is 1 minus (1 minus p) to the n. At 4750 r/min, with a 1.2 percent failure rate, 250 trials give {{ch22.det250:.0f}} percent; at 5000, with 17 percent, just 10 trials give {{ch22.det5000:.0f}} percent. To be 95 percent sure of catching a 0.5 percent regression takes {{ch22.n598:.0f}} trials, the same formula as zero-failure testing. The principle: spend your limited trials on the conditions most likely to fail."
+
+  - layout: bignum
+    title: ["连续量用 Cpk：一次合格不等于合格", "For measurements use Cpk: one pass is not a pass"]
+    nums:
+      - {n: "0.91°", label: ["Kp = 300 s⁻¹ 停针 1 次：看似合格", "Kp = 300 s⁻¹, one stop: looks fine"]}
+      - {n: "{{ch22.cpk300:.2f}}", n_en: "Cpk", label: ["同一设置停 50 次统计", "Same setting, 50 stops"]}
+      - {n: "≥ 1.33", n_en: "Cpk", label: ["上限离均值 4σ 才算稳", "4σ between mean and limit"]}
+    foot: ["停针只有上限 1°：Cpk = (USL − μ)/3σ；最大值 1.13° 早就超了", "Stop error has only an upper limit of 1°: Cpk = (USL − μ)/3σ; the maximum, 1.13°, already exceeds it"]
+    notes:
+      - "停针误差是连续量，可以用计量型指标。它只有上限 1 度，用单侧 Cpk，等于上限减均值，再除以三倍标准差，不低于 1.33 才说明上限离均值有 4 个 σ。案例里还藏着第二个问题：v1.3.2 把位置增益提到 300，单次停车 0.91 度，一路通过；换成停 50 次统计，Cpk 只有 {{ch22.cpk300:.2f}}，最大值 1.13 度早就超了。"
+      - "Stop error is a continuous measurement, so we can use a variables index. It has only an upper limit, 1 degree, so we use one-sided Cpk: upper limit minus mean, over three standard deviations. At least 1.33 means four sigma between the mean and the limit. Our case hides a second problem: v1.3.2 raised the position gain to 300, and a single stop at 0.91 degrees passed every time. Switch to 50 stops and Cpk is only {{ch22.cpk300:.2f}}; the maximum, 1.13 degrees, was over the limit all along."
+
+  - layout: lab
+    title: ["动手试一试：自动化测试台", "Try it: the automated test bench"]
+    shot: {page: testbench}
+    tasks:
+      - ["逐个版本跑，找出引入回归的版本和需求", "Run each version; find the regression and its requirement"]
+      - ["在 240 min 内选一组能抓住两个回归的用例", "Within 240 min, pick cases that catch both regressions"]
+      - ["用计算器求 99.5%/95% 的试验次数", "Use the calculator for 99.5%/95% trial counts"]
+    notes:
+      - "这台自动化测试台在问渠平台上可以自己操作。选固件版本、测试层级和用例，点运行，看哪条需求失败；逐个版本比较，找出是哪个版本引入了剪线回归。然后在每晚 240 分钟的 HIL 预算里重新挑一组用例：必须保留故障注入，还要同时抓住剪线和停针两个回归。最后用右边的计算器，算 99.5%、95% 需要的试验次数。"
+      - "You can operate this automated test bench on WenQuest. Pick a firmware version, a test layer and cases, press Run, and see which requirement fails; compare versions to find which one introduced the trim regression. Then, within the nightly 240-minute HIL budget, choose a new case set: keep fault injection, and catch both the trim and the stop regressions. Finally, use the calculator on the right to work out the trials needed for 99.5 percent at 95 percent confidence."
+
+  - layout: section
+    num: "03"
+    title: ["持续集成：每晚自动测一遍", "Continuous integration: test every night"]
+
+  - layout: split
+    title: ["三条流水线", "Three pipelines"]
+    points:
+      - ["每次推送约 12 min：失败不准合并", "Every push, about 12 min: no merge on failure"]
+      - ["每晚 4 h HIL：失败自动二分", "Nightly 4 h HIL: failures bisected automatically"]
+      - ["每周约 2 天：整机长跑、真剪线", "Weekly, about 2 days: long runs, real trims"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g transform="translate(20,40)"><rect width="860" height="150" rx="22" fill="rgba(76,141,255,.12)" stroke="#4c8dff" stroke-width="3"/>
+            <text x="30" y="60" font-size="34" font-weight="800" fill="#8fbaff">每次推送</text><text x="830" y="60" font-size="34" font-weight="800" fill="#8fbaff" text-anchor="end" class="en">12 min</text>
+            <text x="30" y="115" font-size="27" fill="#f3f6fa">交叉编译 · 单元 · SIL</text></g>
+          <g transform="translate(20,230)"><rect width="860" height="150" rx="22" fill="rgba(242,183,5,.12)" stroke="#f2b705" stroke-width="3"/>
+            <text x="30" y="60" font-size="34" font-weight="800" fill="#f2b705">每晚</text><text x="830" y="60" font-size="34" font-weight="800" fill="#f2b705" text-anchor="end" class="en">4 h</text>
+            <text x="30" y="115" font-size="27" fill="#f3f6fa">最新主干刷进 HIL 台架 · 回归</text></g>
+          <g transform="translate(20,420)"><rect width="860" height="150" rx="22" fill="rgba(46,196,182,.12)" stroke="#2ec4b6" stroke-width="3"/>
+            <text x="30" y="60" font-size="34" font-weight="800" fill="#5ee0d2">每周 / 候选版本</text><text x="830" y="60" font-size="34" font-weight="800" fill="#5ee0d2" text-anchor="end">约 2 天</text>
+            <text x="30" y="115" font-size="27" fill="#f3f6fa">整机长跑 · 1000 次真剪线 · 相机看线迹</text></g>
+        </svg>
+    notes:
+      - "持续集成的意思是：每一次提交都自动构建、自动测试，不通过的改动不准合并。它把金字塔变成三条流水线：每次推送跑交叉编译、单元和 SIL，约 12 分钟；每晚把最新主干刷进 HIL 台架跑 4 小时回归，失败了自动二分；每周或每个候选版本上整机测试台跑两天，真剪一千次，用相机看线迹。"
+      - "Continuous integration means every commit is built and tested automatically, and a change that fails may not be merged. It turns the pyramid into three pipelines. Every push: cross-compile, unit tests and SIL, about 12 minutes. Every night: the latest main branch is flashed onto the HIL rig for a four-hour regression run, with automatic bisecting on failure. Every week, or for each release candidate: two days on the full-machine bench, a thousand real trims, with a camera checking the stitches."
+
+  - layout: split
+    title: ["同样约 4 小时：漏掉，还是抓住", "The same 4 hours: miss it or catch it"]
+    points:
+      - ["默认用例集：全绿，两个都漏掉", "Default set: all green, both slip through"]
+      - ["按风险挑：剪线扫描、停针 50 次", "Risk-based: trim sweep, 50 stops"]
+      - ["故障注入照旧必跑", "Fault injection stays mandatory"]
+    visual: {video: budget}
+    notes:
+      - "看实验台在 v1.4.0 上交替跑两组用例，时间都在 4 小时以内。默认用例集里，剪线是 4000 转剪 1000 次，停针只停 1 次，结果全绿，两个回归一个都没抓住。换成按风险挑的一组：剪线改成转速扫描，停针改成 50 次统计，故障注入照旧必跑，结果剪线和停针两条需求同时变红。用例数量差不多，抓住缺陷的能力完全不同。"
+      - "Watch the bench alternate two test sets on v1.4.0, both within four hours. The default set trims 1000 times at 4000 r/min and stops just once: all green, and both regressions slip through. The risk-based set swaps in the trim speed sweep and 50-stop statistics, keeping the mandatory fault injection: now the trim and the stop requirements both turn red. Almost the same number of cases, a completely different ability to catch defects."
+  - layout: bignum
+    title: ["每晚 240 min：按风险分配时间", "240 minutes a night: allocate by risk"]
+    nums:
+      - {n: "80 min", label: ["剪线转速扫描 6 × 250", "Trim speed sweep, 6 × 250"]}
+      - {n: "35 min", label: ["故障注入 12 种 × 5 次（必跑）", "Fault injection, 12 × 5 (mandatory)"]}
+      - {n: "6 min", label: ["停针 50 次统计（Cpk）", "50 stops for Cpk"]}
+    foot: ["按“风险 × 能抓住的缺陷 ÷ 时间”挑：默认用例集 {{ch22.hil_def:.0f}} min，两个回归一个也抓不住", "Pick by risk × defects caught ÷ time: the default set takes {{ch22.hil_def:.0f}} min and catches neither regression"]
+    notes:
+      - "每晚只有 240 分钟，用例却越来越多，所以要按“风险乘能抓住的缺陷，再除以时间”来挑。反面例子是默认用例集：剪线定成 4000 转剪 1000 次，停针定成停 1 次，总共 {{ch22.hil_def:.0f}} 分钟，时间还更短，可两个回归一个都抓不住。换成剪线扫描 80 分钟、停针 50 次统计 6 分钟，再保留必跑的故障注入，两个都抓住。用例集本身也要测，办法是故意放进已知缺陷。"
+      - "There are only 240 minutes a night and ever more cases, so choose by risk times defects caught, divided by time. The bad example is the default set: trimming as 1000 trims at 4000 r/min, stopping as a single stop. It takes only {{ch22.hil_def:.0f}} minutes, yet catches neither regression. Swap in an 80-minute trim sweep and a 6-minute, 50-stop Cpk run, keep the mandatory fault injection, and both are caught. And test the test set itself, by deliberately planting known bugs."
+
+  - layout: split
+    title: ["失败自动定位到提交：二分", "Pinpointing the commit: bisection"]
+    points:
+      - ["k 轮查 2ᵏ 个提交：23 个要 {{ch22.rounds23:.0f}} 轮", "k rounds cover 2ᵏ commits: 23 need {{ch22.rounds23:.0f}}"]
+      - ["只重跑失败用例的最敏感工况", "Rerun only the failing case, at its worst point"]
+      - ["检出率不够会冤枉无辜提交", "Weak detection can blame the wrong commit"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g transform="translate(30,120)">
+            <rect x="0" y="0" width="840" height="60" rx="12" fill="#22324d"/>
+            <rect x="0" y="0" width="474" height="60" rx="12" fill="rgba(46,196,182,.5)"/>
+            <rect x="474" y="0" width="366" height="60" rx="12" fill="rgba(255,122,69,.55)"/>
+            <path d="M474 -20 L474 80" stroke="#f2b705" stroke-width="6"/>
+            <text x="474" y="-35" font-size="28" font-weight="800" fill="#f2b705" text-anchor="middle">第 14 个提交</text>
+            <text x="20" y="42" font-size="26" fill="#08101d" font-weight="700">好</text>
+            <text x="820" y="42" font-size="26" fill="#08101d" font-weight="700" text-anchor="end">坏</text></g>
+          <g font-size="27" fill="#c7d3e2">
+            <text x="30" y="270">第 1 轮：试第 12 个 → 好，往后找</text>
+            <text x="30" y="320">第 2 轮：试第 18 个 → 坏，往前找</text>
+            <text x="30" y="370">……</text>
+            <text x="30" y="420">第 {{ch22.rounds23:.0f}} 轮：锁定第 14 个</text></g>
+          <g transform="translate(30,470)"><rect width="840" height="110" rx="20" fill="rgba(242,183,5,.12)"/>
+            <text x="420" y="50" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle">每轮 16 min × {{ch22.rounds23:.0f}} 轮 = {{ch22.min23:.0f}} min</text>
+            <text x="420" y="90" font-size="24" fill="#8fa3ba" text-anchor="middle">5000 r/min 剪 250 次：坏提交平均失败 43 次</text></g>
+        </svg>
+    notes:
+      - "上一晚全绿，这一晚变红，中间合并了二十几个提交，是哪一个？二分法每次试中间那个：好就往后找，坏就往前找，k 轮能在 2 的 k 次方个提交里找到第一个坏的，23 个提交 {{ch22.rounds23:.0f}} 轮，约 {{ch22.min23:.0f}} 分钟。关键是只跑那一个失败用例，而且选它最敏感的工况：5000 转剪 250 次，坏提交平均失败 43 次，一轮就判清。如果选 4750 转，坏提交也只有约 95% 的概率露出来，二分可能冤枉无辜的提交。"
+      - "Last night all green, tonight red, and twenty-odd commits were merged in between. Which one? Bisection tests the middle one: good, look later; bad, look earlier. k rounds find the first bad commit among 2 to the k; 23 commits take {{ch22.rounds23:.0f}} rounds, about {{ch22.min23:.0f}} minutes. The key is to rerun only the failing case, at its most sensitive condition: 250 trims at 5000 r/min, where a bad commit fails 43 times on average, so each round is clear-cut. At 4750 a bad commit shows up only about 95 percent of the time, and bisection might blame an innocent commit."
+
+  - layout: section
+    num: "04"
+    title: ["从原型到工业级", "From prototype to industrial grade"]
+
+  - layout: chain
+    title: ["成熟度：每级都有能自动判定的退出条件", "Maturity: every stage exits on automatic criteria"]
+    steps: [["P0", "Runs"], ["P1", "Features"], ["EVT", "Engineering"], ["DVT", "Design"], ["PVT", "Production"], ["量产", "Mass prod."]]
+    hot: [2, 3, 4]
+    mark: ["验证三级", "three validation stages"]
+    foot: ["EVT：停针 Cpk ≥ 1.33、剪线单点 1000 次 ≤ 1 次、HIL 连续 10 晚全绿；评审只看数据", "EVT: stop Cpk ≥ 1.33, ≤ 1 failure in 1000 trims per point, 10 green nights; reviews look only at data"]
+    notes:
+      - "原型什么时候算做好了？靠人拍脑袋，它会一直停在“差不多”。电子行业用一串成熟度级别：P0 能动，P1 功能全，然后工程验证 EVT、设计验证 DVT、生产验证 PVT，最后量产。本章的做法是把每一级的退出条件都写成自动测试能判定的数字。比如 EVT：停针 Cpk 不低于 1.33，剪线每个转速点 1000 次最多 1 次失败，HIL 连续 10 晚全绿。评审只看数据。"
+      - "When is a prototype finished? Leave it to gut feeling and it stays at 'almost' forever. Electronics uses a ladder of maturity stages: P0 runs, P1 has all features, then engineering validation, EVT; design validation, DVT; production validation, PVT; then mass production. Here each stage's exit criteria are written as numbers an automated test can decide. EVT, for example: stop Cpk at least 1.33, at most one failure in 1000 trims at each speed, and ten green HIL nights in a row. Reviews look only at the data."
+
+  - layout: bignum
+    title: ["越往后，要回答的问题越不同", "Later stages answer different questions"]
+    nums:
+      - {n: "{{ch22.n2302:.0f}}", n_en: "trials", label: ["DVT：99.9%/90% 零失效", "DVT: 99.9%/90%, zero failures"]}
+      - {n: "±10%", n_en: "5–45 °C", label: ["多台样机、电压和温度", "Several units, voltages, temperatures"]}
+      - {n: "≥ 98%", label: ["PVT：出厂测试一次通过率", "PVT: end-of-line first-pass yield"]}
+    foot: ["DVT 问设计有没有余量；PVT 问按生产工艺装出来的一批是否一致", "DVT asks whether the design has margin; PVT asks whether a production batch is consistent"]
+    notes:
+      - "到了设计验证，剪线验证从 99.5%、95% 提到 99.9%、90%，要 {{ch22.n2302:.0f}} 次零失效，还要在多台样机、电压正负 10%、5 到 45 度下分别做，因为要回答的是设计本身有没有余量。到了生产验证，重点转向制造：按生产工艺装出来的一批是否一致，指标是出厂测试一次通过率不低于 98%。"
+      - "At design validation the trim requirement rises from 99.5 percent at 95 to 99.9 percent at 90 percent confidence: {{ch22.n2302:.0f}} trials with zero failures, repeated on several units, at plus or minus 10 percent voltage and from 5 to 45 degrees, because the question now is whether the design itself has margin. At production validation the focus moves to manufacturing: is a batch built with production processes consistent? The measure is an end-of-line first-pass yield of at least 98 percent."
+
+  - layout: points
+    title: ["出厂测试与现场数据回流", "End-of-line tests and field data"]
+    points:
+      - ["EOL 挑快的：零位、停针 10 次、剪线 20 次", "EOL picks fast checks: zero, 10 stops, 20 trims"]
+      - ["结果带序列号和版本，进历史库", "Results carry serial and versions, into the history"]
+      - ["每个现场新问题：一条 REQ + 一个用例", "Each new field problem: one REQ + one test case"]
+    foot: ["用例集跟着产品一起长大", "The test set grows with the product"]
+    notes:
+      - "量产以后每台下线都要过出厂测试。它挑快、能发现装配缺陷的项目：编码器零位、停针 10 次、剪线 20 次看有没有剪不断，而不是证明 99.5%，那是设计验证的事；再加线圈电流波形和电气安全，每台三五分钟。结果带序列号和版本号进历史库。机器到了用户车间联网以后，上报的剪线次数、故障码可以和出厂数据对起来。每发现一个新问题，就加一条需求、一个用例。"
+      - "In production every unit passes an end-of-line test. It picks quick checks that catch assembly faults: encoder zero, 10 stops, 20 trims to see that none fail. Not proving 99.5 percent; that's design validation's job. Add coil-current waveforms and electrical safety, three to five minutes a unit. Results go into the history database with serial and version numbers. Once machines are networked at customers, reported trim counts and fault codes can be matched to the factory data. Every new problem adds one requirement and one test case."
+
+  - layout: split
+    title: ["机器人联系：SIL、HIL 与抓取成功率", "Robot link: SIL, HIL and grasp success"]
+    points:
+      - ["同样的金字塔：单元、SIL、HIL、真机", "Same pyramid: unit, SIL, HIL, real robot"]
+      - ["电池电压降，高速段跟不上轨迹", "Battery sags: fast segments fall behind"]
+      - ["抓取 99.5%/95%：同样要 {{ch22.n598:.0f}} 次", "Grasp 99.5%/95%: also {{ch22.n598:.0f}} trials"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="60" y="500" width="300" height="40" rx="10" fill="#22324d"/>
+          <path d="M210 500 L210 380 L360 260 L520 300" stroke="#c8d2de" stroke-width="26" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="210" cy="380" r="22" fill="#4c8dff"/><circle cx="360" cy="260" r="22" fill="#4c8dff"/>
+          <path d="M520 300 L560 270 M520 300 L560 330" stroke="#f2b705" stroke-width="10" stroke-linecap="round"/>
+          <rect x="600" y="270" width="60" height="60" rx="8" fill="#ff7a45"/>
+          <g transform="translate(560,420)"><rect width="320" height="150" rx="20" fill="rgba(242,183,5,.12)" stroke="#f2b705" stroke-width="3"/>
+            <text x="160" y="70" font-size="52" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">{{ch22.n598:.0f}}</text>
+            <text x="160" y="120" font-size="26" fill="#c7d3e2" text-anchor="middle">次零失败抓放</text></g>
+          <text x="60" y="90" font-size="30" font-weight="700" fill="#c7d3e2">每晚自动抓放上千次</text>
+          <text x="60" y="135" font-size="26" fill="#8fa3ba">结果带固件版本和序列号上报</text>
+        </svg>
+    notes:
+      - "机械臂和移动机器人的控制软件同样按金字塔测：单元测试测逆运动学和状态机，SIL 把控制器接到物理仿真器跑轨迹，HIL 用真的关节驱动器接电机仿真器，最后才上真机。今天的回归在机器人上几乎一样：轨迹按电机 100% 能力规划，电池电压一降，电机基速降低，高速段跟不上，只有带实测转矩–转速曲线的 HIL 或真机能发现。抓取成功率要证明 99.5%，同样要 {{ch22.n598:.0f}} 次零失败。"
+      - "Robot arm and mobile robot software is tested on the same pyramid: unit tests for inverse kinematics and state machines, SIL with the controller on a physics simulator, HIL with real joint drivers on a motor simulator, and only then the real robot. Today's regression has a near-twin there: plan trajectories at 100 percent of motor capability, and when the battery sags the base speed drops and fast segments fall behind; only HIL with measured torque–speed curves, or the real robot, sees it. And proving 99.5 percent grasp success also takes {{ch22.n598:.0f}} straight successes."
+
+  - layout: split
+    title: ["生活中的例子：雨伞", "Everyday example: an umbrella"]
+    points:
+      - ["小雨里撑几次不漏", "A few drizzles, no leak"]
+      - ["不等于暴雨大风里也不漏", "Doesn't mean no leak in a storm"]
+      - ["要试，就挑最坏的天、试够次数", "To test it, pick the worst weather, enough times"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g transform="translate(220,330)">
+            <path d="M-170 0 A170 170 0 0 1 170 0 Z" fill="#4c8dff"/>
+            <path d="M0 0 L0 170 Q0 210 -40 210" stroke="#c8d2de" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <g stroke="#8fbaff" stroke-width="4" stroke-linecap="round"><path d="M-120 -220 L-126 -200"/><path d="M-20 -250 L-26 -230"/><path d="M90 -230 L84 -210"/></g>
+            <text x="0" y="280" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle">小雨：没漏</text></g>
+          <g transform="translate(660,330) rotate(-12)">
+            <path d="M-170 0 A170 170 0 0 1 170 0 Z" fill="#ff7a45"/>
+            <path d="M0 0 L0 170 Q0 210 -40 210" stroke="#c8d2de" stroke-width="10" fill="none" stroke-linecap="round"/></g>
+          <g stroke="#8fbaff" stroke-width="5" stroke-linecap="round">
+            <path d="M520 60 L480 140"/><path d="M590 40 L550 120"/><path d="M660 70 L620 150"/><path d="M730 40 L690 120"/><path d="M800 70 L760 150"/>
+            <path d="M560 160 L530 220"/><path d="M780 170 L750 230"/></g>
+          <text x="660" y="610" font-size="30" font-weight="700" fill="#ff9c75" text-anchor="middle">暴雨大风：试过吗？</text>
+        </svg>
+    notes:
+      - "生活里也是这样。新买的雨伞在毛毛雨里撑了几次都没漏，并不能说明它在大风暴雨里也不漏；要试，就得专门挑最坏的天气，试足够多次。测试的次数和工况，比“试过了”这三个字重要得多。"
+      - "Everyday life works the same way. A new umbrella that kept out a few drizzles tells you nothing about a gale and a downpour. To test it, pick the worst weather on purpose, and try enough times. How many times and under what conditions matter far more than the words 'we tried it'."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["把次数花在 5000 r/min，每晚抓住它", "Spend the trials at 5000 r/min and catch it every night"]
+    rows:
+      - ["10 ms 延迟时发令转速须 ≤", "{{ch22.ncrit:.0f}} r/min"]
+      - ["4750 r/min 试 50 次一次也看不到", "{{ch22.none50:.0f}}%"]
+      - ["每晚 4750 r/min 测 250 次抓住它", "{{ch22.det250:.0f}}%"]
+    side: {big: "{{ch22.n598:.0f}}", text: ["证明 99.5%（置信度 95%）的零失效次数", "Zero-failure trials to show 99.5% at 95% confidence"]}
+    foot: ["修复 v1.4.1：按实测转矩–转速曲线的 90% 规划，270° 时转速仍高就推迟一针剪线", "Fix v1.4.1: plan at 90% of the measured torque–speed curve; if still fast at 270°, trim one stitch later"]
+    notes:
+      - "回到开头。10 毫秒延迟时，发令转速超过 {{ch22.ncrit:.0f}} 转就剪不断，而 v1.4.0 从 5000 转停车、电压低时发令转速约 1150 转。有人在 4750 转试 50 次，{{ch22.none50:.0f}}% 的机会一次也看不到失败。要以 95% 置信度证明 99.5%，零失效要 {{ch22.n598:.0f}} 次。每晚在 4750 转测 250 次，抓住它的概率约 {{ch22.det250:.0f}}%；放在 5000 转，几次就能看到。修复版按实测曲线的 90% 规划，再加一道推迟一针的保险。"
+      - "Back to the start. With a 10 millisecond delay, a command speed above {{ch22.ncrit:.0f}} r/min means a failed trim, and v1.4.0 stopping from 5000 at low voltage commands at about 1150. Someone trying 50 times at 4750 has a {{ch22.none50:.0f}} percent chance of seeing no failure at all. Proving 99.5 percent at 95 percent confidence takes {{ch22.n598:.0f}} straight successes. Testing 250 times a night at 4750 catches it with about {{ch22.det250:.0f}} percent probability; at 5000 a handful of trials will do. The fix plans at 90 percent of the measured curve, with a backstop that trims one stitch later."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["测试金字塔：缺陷在最低能发现的一层抓住", "Test pyramid: catch each bug at the lowest layer"]
+      - ["次数由统计定：n ≥ ln(1 − C)/ln R", "Statistics sets the count: n ≥ ln(1 − C)/ln R"]
+      - ["持续集成 + 成熟度：退出条件都是数字", "CI + maturity: every exit criterion is a number"]
+    after: ["作业 22：剪线可靠性验证与每晚测试设计 · 测验 · 实验 22-1 报告 —— 在问渠学习平台完成", "Assignment 22 · quiz · Lab 22-1 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，测试金字塔：单元、SIL、HIL、整机、出厂，缺陷要在能发现它的最低一层被抓住。第二，测多少次由统计决定：零失效 n 不小于 ln(1 减 C) 除以 ln R，有失效看置信下限，抓回归把次数花在最敏感的工况。第三，持续集成每次提交、每晚、每周自动测，成熟度每一级的退出条件都写成数字。作业、测验和实验报告都在问渠平台上完成。下一讲看缝纫机怎样设计、制造和检测。"
+      - "Three things to remember. One: the test pyramid, unit, SIL, HIL, full machine and end-of-line, and catch each defect at the lowest layer that can. Two: statistics decides how many trials: zero-failure n is at least ln of 1 minus C over ln R; with failures use the lower bound; to catch regressions, spend trials on the most sensitive conditions. Three: continuous integration tests every commit, every night and every week, and every maturity stage exits on numbers. The assignment, quiz and lab report are on WenQuest. Next time: how the sewing machine is designed, built and inspected."

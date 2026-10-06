@@ -133,3 +133,15 @@ if __name__ == "__main__":
     print(f"phi=90: d={D_:.2f} p={p_:.2f} h={math.sqrt(lk['a']**2-p_**2):.2f}")
     # exam: 80 cm, s=2.5, t=1.0, 12 %
     print("exam 80 cm:", round(320 * 3.5 * 1.12 / 10, 1), "cm")
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    R = compute(); R3 = compute(t=3.0); Ru = compute(t=3.0, u=12); R198 = compute(phc=198); R214 = compute(phc=214)
+    nst = math.ceil(500 / 3.0)
+    out(Lmax=R['Lmax'], Lmin=R['Lmin'], Smax=R['Lmax'] - R['Lmin'], top=R['top'], bot=R['bot'], mu_lo=R['mu'][0], mu_hi=R['mu'][1],
+        fin=R['fin'], D180=R['D'][180], D206=R['D'][206], D250=R['D'][250], Dmax=R['D'][296], at=R['at'],
+        margin=R['margin'], waste=R['waste'], pre=R['pre'], sl102=R['sl'][102],
+        negmin=min(R['sl'][i] for i in range(R['fin'], 206)), acc=R['acc'] / 1000, q=R['c'],
+        m3=R3['margin'], neg3=R3['neg'], mu12=Ru['margin'], negu12=Ru['neg'], preu12=Ru['pre'],
+        w198=R198['waste'], m198=R198['margin'], m214=R214['margin'], w214=R214['waste'],
+        nst=nst, cm50=nst * R['c'] / 10, cm50w=nst * R['c'] * 1.15 / 10, e0=EYE_TDC - 1.5)

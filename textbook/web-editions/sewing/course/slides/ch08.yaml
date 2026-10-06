@@ -1,0 +1,458 @@
+# 第 8 讲 运动协调与整机动力学 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch08.键:格式}} 由课程包程序 course/calc/ch08.py 算出，不手写数字。
+# notes：讲者备注（放映时只给老师看，录课时当讲稿用）。
+lesson: 8
+code: [ch08]
+
+clips:
+  hero:          # 封面：三维样机全透视，慢慢环绕
+    page: proto-lockstitch
+    selector: "#stage"
+    dur: 10
+    steps:
+      - {at: 0, press: "#shell [data-k=xray]"}
+  chains:        # 四套机构轮流突出：刺布 → 挑线 → 钩线 → 送布 → 全部，一直循环
+    page: proto-lockstitch
+    selector: "#stage"
+    dur: 20
+    loop: 20
+    steps:
+      - {at: 0, press: ["#shell [data-k=xray]", "#chains [data-k=needle]"]}
+      - {at: 4, press: "#chains [data-k=takeup]"}
+      - {at: 8, press: "#chains [data-k=hook]"}
+      - {at: 12, press: "#chains [data-k=feed]"}
+      - {at: 16, press: "#chains [data-k=all]"}
+  hooktrack:     # 实验 8-1：旋梭定时来回移动（±9°，12 秒一个来回），时序轨道跟着变
+    page: timing
+    selector: "#tim"
+    dur: 12
+    loop: 12
+    steps:
+      - {at: 0, js: "clearInterval(window.__sw);var A=window.__api,t0=Date.now();window.__sw=setInterval(function(){var t=(Date.now()-t0)/1000;A.ST.dh=Math.round(9*Math.sin(t*2*Math.PI/12));A.changed();},250)"}
+  hookchecks:    # 同一个来回，看六条判据变红变绿（窄页面，判据框占满宽度）
+    page: timing
+    selector: "#checks"
+    vw: 760
+    vh: 1400
+    dur: 12
+    loop: 12
+    steps:
+      - {at: 0, js: "clearInterval(window.__sw);var A=window.__api,t0=Date.now();window.__sw=setInterval(function(){var t=(Date.now()-t0)/1000;A.ST.dh=Math.round(9*Math.sin(t*2*Math.PI/12));A.changed();},250)"}
+  ksweep:        # 平衡率 k 在 0 和 1 之间来回扫（12 秒一个来回），看合力轨迹由竖直拉长变成水平拉长
+    page: timing
+    selector: ".two"
+    vh: 1300
+    dur: 12
+    loop: 12
+    steps:
+      - {at: 0, js: "clearInterval(window.__sw);var A=window.__api,t0=Date.now();A.ST.n=5000;window.__sw=setInterval(function(){var t=(Date.now()-t0)/1000;A.ST.k=Math.round(20*(0.5-0.5*Math.cos(t*2*Math.PI/12)))/20;A.changed();},300)"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 8 讲", "Lecture 8"]
+    title: ["运动协调与 整⁠机⁠动⁠力⁠学", "Motion Coordination and Machine Dynamics"]
+    sub: ["四套机构，一根主轴", "Four mechanisms, one main shaft"]
+    notes:
+      - "同学们好。第 3 到第 7 讲，我们一讲一个机构：刺布、挑线、钩线、送布，再加上线张力。可在机器上，它们都挂在同一根主轴上，由同一个电机带着转。今天把它们放到一起看：一针里谁先谁后，一个动了别的怎么办，转速高了整台机器为什么会抖。"
+      - "Hello everyone. From Lecture 3 to Lecture 7 we took one mechanism at a time: needle, take-up, hook, feed, and thread tension. On the machine, though, they all hang on one main shaft, driven by one motor. Today we put them together: what happens in what order within a stitch, what happens to the others when one moves, and why the whole machine shakes at high speed."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["提速 20%，机头抖起来了", "20% faster, and the head starts to shake"]
+    facts:
+      - ["赶单：想从 5000 提到 6000 r/min；说明书标准型最高 5500", "To meet an order: 5000 → 6000 r/min; the manual's standard type tops out at 5500"]
+      - ["k = 0.45 时最大合力约 {{ch08.F5000:.0f}} N；针杆下止点约 {{ch08.NB5000:.0f}} N", "At k = 0.45 the maximum resultant is about {{ch08.F5000:.0f}} N; needle bar at BDC about {{ch08.NB5000:.0f}} N"]
+      - ["机针在布中与牙抓布只重叠 {{ch08.overlap:.1f}}°（101.7°–114.2°）", "Needle-in-fabric and dog gripping overlap only {{ch08.overlap:.1f}}° (101.7°–114.2°)"]
+    notes:
+      - "先看车间问题。一家衬衫厂为了赶单，想把一条线的平缝机从每分钟 5000 转提到 6000 转。按本讲的示意质量，平衡率取 0.45 时，5000 转下整机惯性力的最大合力约 {{ch08.F5000:.0f}} 牛，针杆下止点约 {{ch08.NB5000:.0f}} 牛。机针在布中和送布牙抓布只重叠 {{ch08.overlap:.1f}} 度。说明书上标准型最高 5500。提到 6000，会怎样？该定多少？最后回答。"
+      - "Here's the shop-floor problem. To meet an order, a shirt factory wants to take a line of lockstitch machines from 5000 to 6000 r/min. With this lecture's illustrative masses and a balance ratio of 0.45, the maximum resultant inertia force at 5000 is about {{ch08.F5000:.0f}} newtons, and the needle bar at bottom dead centre about {{ch08.NB5000:.0f}}. Needle-in-fabric and dog gripping overlap by only {{ch08.overlap:.1f}} degrees. The manual's standard type is rated 5500. What happens at 6000, and what speed should they choose? We'll answer at the end."
+
+  - layout: section
+    num: "01"
+    title: ["一根主轴，四套机构", "One shaft, four mechanisms"]
+
+  - layout: split
+    title: ["牵一发而动全身", "Pull one thread and the whole machine moves"]
+    points:
+      - ["旋梭推迟七八度：跳针少了，却开始断面线", "Hook retarded 7–8°: fewer skips, but the needle thread breaks"]
+      - ["4000 提到 5000 r/min：机头发抖、台板嗡嗡响", "4000 → 5000 r/min: the head shakes, the table hums"]
+      - ["惯性力 ∝ 转速²：提速 25%，力 ×{{ch08.r45:.2f}}", "Inertia ∝ speed²: 25% faster, ×{{ch08.r45:.2f}} the force"]
+    visual: {video: chains}
+    notes:
+      - "车间里常有这样两件事。一台机器缝针织物跳针，师傅把旋梭往后调了七八度，跳针少了，没多久开始断面线：旋梭定时还牵涉到挑线杆放的线够不够线环用。另一台机器从 4000 转提到 5000 转，机头发抖：惯性力和转速平方成正比，提速 25%，力变成 {{ch08.r45:.2f}} 倍。右边样机上四套机构轮流亮起，它们挂在同一根主轴上。"
+      - "Two things happen all the time. One machine skips on knits; the mechanic retards the hook seven or eight degrees, the skips fall, and soon the needle thread breaks: hook timing also decides whether the take-up gives the loop enough thread. Another machine goes from 4000 to 5000 r/min and the head shakes: inertia force goes with speed squared, so 25 percent faster means {{ch08.r45:.2f}} times the force. On the right, the four mechanisms light up in turn. They all hang on one shaft."
+
+  - layout: figure
+    title: ["一针按顺序走一遍", "One stitch, in order"]
+    h: 600
+    visual:
+      svg: |
+        <svg viewBox="0 0 1700 600" width="100%" height="600">
+          <rect x="80" y="276" width="1540" height="16" rx="4" fill="#1c2a42"/>
+          <rect x="471" y="276" width="670" height="16" rx="4" fill="#c8d2de"/>
+          <rect x="80" y="308" width="1540" height="16" rx="4" fill="#1c2a42"/>
+          <rect x="1474" y="308" width="146" height="16" rx="4" fill="#2ec4b6"/>
+          <rect x="80" y="308" width="488" height="16" rx="4" fill="#2ec4b6"/>
+          <path d="M80 300 L1620 300" stroke="#4b5f7d" stroke-width="3"/>
+          <g font-size="22" fill="#5f7189" text-anchor="middle" class="en"><text x="80" y="350" class="en">0°</text><text x="1620" y="350" class="en">360°</text></g>
+          <g text-anchor="middle">
+            <path d="M315 212 L315 276" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="6 6"/>
+            <text x="315" y="110" font-size="40" font-weight="800" fill="#f2b705" class="en">55°</text><text x="315" y="156" font-size="30" font-weight="700" fill="#f3f6fa">挑线收紧</text><text x="315" y="190" font-size="20" fill="#8fa3ba" class="en">take-up tightest</text>
+            <path d="M568 212 L568 276" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="6 6"/>
+            <text x="568" y="110" font-size="40" font-weight="800" fill="#f2b705" class="en">114.2°</text><text x="568" y="156" font-size="30" font-weight="700" fill="#f3f6fa">落牙</text><text x="568" y="190" font-size="20" fill="#8fa3ba" class="en">dog drops</text>
+            <path d="M961 212 L961 276" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="6 6"/>
+            <text x="961" y="110" font-size="40" font-weight="800" fill="#ff7a45" class="en">206°</text><text x="961" y="156" font-size="30" font-weight="700" fill="#f3f6fa">梭尖钩线</text><text x="961" y="190" font-size="20" fill="#8fa3ba" class="en">hook catches</text>
+            <path d="M1333 212 L1333 276" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="6 6"/>
+            <text x="1333" y="110" font-size="40" font-weight="800" fill="#f2b705" class="en">293°</text><text x="1333" y="156" font-size="30" font-weight="700" fill="#f3f6fa">放线最多</text><text x="1333" y="190" font-size="20" fill="#8fa3ba" class="en">most thread out</text>
+            <path d="M1539 212 L1539 276" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="6 6"/>
+            <text x="1539" y="110" font-size="40" font-weight="800" fill="#ff7a45" class="en">341°</text><text x="1539" y="156" font-size="30" font-weight="700" fill="#f3f6fa">脱环</text><text x="1539" y="190" font-size="20" fill="#8fa3ba" class="en">cast-off</text>
+            <path d="M515 324 L515 384" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="6 6"/>
+            <text x="515" y="428" font-size="40" font-weight="800" fill="#c8d2de" class="en">101.7°</text><text x="515" y="474" font-size="30" font-weight="700" fill="#f3f6fa">针尖入布</text><text x="515" y="506" font-size="20" fill="#8fa3ba" class="en">needle enters</text>
+            <path d="M850 324 L850 384" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="6 6"/>
+            <text x="850" y="428" font-size="40" font-weight="800" fill="#c8d2de" class="en">180°</text><text x="850" y="474" font-size="30" font-weight="700" fill="#f3f6fa">下止点</text><text x="850" y="506" font-size="20" fill="#8fa3ba" class="en">bottom dead centre</text>
+            <path d="M1185 324 L1185 384" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="6 6"/>
+            <text x="1185" y="428" font-size="40" font-weight="800" fill="#c8d2de" class="en">258.3°</text><text x="1185" y="474" font-size="30" font-weight="700" fill="#f3f6fa">针尖出布</text><text x="1185" y="506" font-size="20" fill="#8fa3ba" class="en">needle leaves</text>
+            <path d="M1474 324 L1474 384" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="6 6"/>
+            <text x="1474" y="428" font-size="40" font-weight="800" fill="#2ec4b6" class="en">325.8°</text><text x="1474" y="474" font-size="30" font-weight="700" fill="#f3f6fa">升牙推布</text><text x="1474" y="506" font-size="20" fill="#8fa3ba" class="en">dog rises</text>
+          </g>
+          <rect x="80" y="560" width="30" height="16" rx="4" fill="#c8d2de"/><text x="122" y="577" font-size="24" fill="#d3deea">机针在布中 <tspan class="en" font-size="20" fill="#8fa3ba">needle in fabric</tspan></text>
+          <rect x="560" y="560" width="30" height="16" rx="4" fill="#2ec4b6"/><text x="602" y="577" font-size="24" fill="#d3deea">送布牙抓布 <tspan class="en" font-size="20" fill="#8fa3ba">dog gripping</tspan></text>
+        </svg>
+    caption: ["0° 为针杆上止点；横轴是主轴转角", "0° is needle-bar TDC; the axis is shaft angle"]
+    notes:
+      - "把一针按主轴转角走一遍。0 度针杆在上止点；55 度挑线杆收线最紧，线迹收紧；101.7 度针尖入布；114.2 度送布牙落下；180 度下止点；回升约 2 毫米，206 度梭尖钩线；258.3 度针尖出布；293 度挑线杆放线最多；325.8 度送布牙升出开始推布；341 度前后脱环，挑线杆随即收紧，进入下一针。"
+      - "Let's walk through one stitch by shaft angle. At 0 degrees the needle bar is at top dead centre. At 55 the take-up is tightest and the stitch is set. At 101.7 the needle enters; at 114.2 the feed dog drops; 180 is bottom dead centre. After about 2 millimetres of rise, the hook catches the loop at 206. The needle leaves at 258.3. The take-up gives out the most thread at 293. The dog rises and starts feeding at 325.8. Around 341 the loop casts off, the take-up pulls it tight, and the next stitch begins."
+
+  - layout: split
+    title: ["一针的“相位预算”", "The phase budget of one stitch"]
+    points:
+      - ["针在布中与牙抓布只重叠 {{ch08.overlap:.1f}}°：5000 r/min 下仅 {{ch08.t5000:.2f}} ms", "Needle-in and dog-gripping overlap {{ch08.overlap:.1f}}°: only {{ch08.t5000:.2f}} ms at 5000 r/min"]
+      - ["梭尖带线环 135°，跨过机针出布", "The hook carries the loop for 135°, across the needle's exit"]
+      - ["55° 收线最紧时，牙还在推布", "At the 55° take-up, the dog is still feeding"]
+    visual: {svg: '<svg viewBox="0 0 900 660" width="100%" height="640"><circle cx="330" cy="330" r="240" fill="none" stroke="#1c2a42" stroke-width="36"/><circle cx="330" cy="330" r="195" fill="none" stroke="#1c2a42" stroke-width="36"/><circle cx="330" cy="330" r="150" fill="none" stroke="#1c2a42" stroke-width="36"/><circle cx="330" cy="330" r="105" fill="none" stroke="#1c2a42" stroke-width="36"/><path d="M582.6 382.3 A258.0 258.0 0 0 1 77.4 382.3 L112.6 375.0 A222.0 222.0 0 0 0 547.4 375.0Z" fill="#c8d2de" opacity="1"/><path d="M236.6 521.4 A213.0 213.0 0 0 1 260.7 128.6 L272.4 162.6 A177.0 177.0 0 0 0 252.4 489.1Z" fill="#ff7a45" opacity="1"/><path d="M467.6 233.6 A168.0 168.0 0 1 1 175.4 264.4 L208.5 278.4 A132.0 132.0 0 1 0 438.1 254.3Z" fill="#a78bfa" opacity="0.4"/><path d="M175.4 264.4 A168.0 168.0 0 0 1 467.6 233.6 L438.1 254.3 A132.0 132.0 0 0 0 208.5 278.4Z" fill="#a78bfa" opacity="1"/><path d="M260.9 228.3 A123.0 123.0 0 0 1 442.2 380.4 L409.4 365.7 A87.0 87.0 0 0 0 281.1 258.0Z" fill="#2ec4b6" opacity="1"/><path d="M596.3 385.2 A272.0 272.0 0 0 1 578.1 441.5 L567.2 436.6 A260.0 260.0 0 0 0 584.6 382.7Z" fill="#f2b705" opacity="1"/><text x="330" y="47" font-size="24" fill="#8fa3ba" text-anchor="middle" class="en">0°</text><text x="622" y="339" font-size="24" fill="#8fa3ba" text-anchor="middle" class="en">90°</text><text x="330" y="631" font-size="24" fill="#8fa3ba" text-anchor="middle" class="en">180°</text><text x="38" y="339" font-size="24" fill="#8fa3ba" text-anchor="middle" class="en">270°</text><text x="605" y="447" font-size="26" font-weight="800" fill="#f2b705" class="en">{{ch08.overlap:.1f}}°</text><text x="330" y="326" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">主轴一转</text><text x="330" y="360" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">one stitch</text><rect x="700" y="124" width="30" height="30" rx="6" fill="#c8d2de"/><text x="744" y="149" font-size="28" font-weight="700" fill="#f3f6fa">机针在布中</text><text x="744" y="183" font-size="22" fill="#8fa3ba" class="en">101.7°–258.3°</text><rect x="700" y="224" width="30" height="30" rx="6" fill="#ff7a45"/><text x="744" y="249" font-size="28" font-weight="700" fill="#f3f6fa">梭尖带线环</text><text x="744" y="283" font-size="22" fill="#8fa3ba" class="en">206°–341°</text><rect x="700" y="324" width="30" height="30" rx="6" fill="#a78bfa"/><text x="744" y="349" font-size="28" font-weight="700" fill="#f3f6fa">挑线收线</text><text x="744" y="383" font-size="22" fill="#8fa3ba" class="en">293°–55°</text><rect x="700" y="424" width="30" height="30" rx="6" fill="#2ec4b6"/><text x="744" y="449" font-size="28" font-weight="700" fill="#f3f6fa">送布牙抓布</text><text x="744" y="483" font-size="22" fill="#8fa3ba" class="en">325.8°–114.2°</text></svg>'}
+    notes:
+      - "把一针画成一个圆盘，从外到内：机针在布中、梭尖带着线环、挑线杆收线、送布牙抓布。看三件事。第一，机针在布中和送布牙抓布几乎首尾相接，只重叠 {{ch08.overlap:.1f}} 度，5000 转下只有 {{ch08.t5000:.2f}} 毫秒，这时牙的水平运动已经基本走完。第二，梭尖带线环的 135 度跨过了机针出布。第三，55 度收线最紧时，送布牙还在推布。"
+      - "Draw one stitch as a disc. From the outside in: needle in the fabric, hook carrying the loop, take-up pulling thread, feed dog gripping. Notice three things. First, needle-in and dog-gripping almost meet end to end, overlapping only {{ch08.overlap:.1f}} degrees, just {{ch08.t5000:.2f}} milliseconds at 5000 r/min, and by then the dog's horizontal motion is essentially done. Second, the hook's 135 degrees with the loop span the needle's exit. Third, when the take-up is tightest at 55, the dog is still feeding."
+
+  - layout: section
+    num: "02"
+    title: ["跨机构约束与相位窗口", "Cross-mechanism constraints and phase windows"]
+
+  - layout: points
+    title: ["前几讲的判据，放到一起", "The criteria from earlier lectures, side by side"]
+    points:
+      - ["旋梭：钩线时机针回升 1.6–2.5 mm", "Hook: needle rise at catch 1.6–2.5 mm"]
+      - ["挑线：入布前余线 ≤ 10 mm，入布后欠线 ≤ 1 mm", "Take-up: slack before entry ≤ 10 mm; shortfall after ≤ 1 mm"]
+      - ["送布：布在针中移动 ≤ 0.05 mm", "Feed: fabric moves ≤ 0.05 mm with the needle in"]
+    foot: ["钩线时刻也决定线环何时开始大量要线：旋梭与挑线是联动的", "Catch timing also sets when the loop starts taking thread: hook and take-up are coupled"]
+    notes:
+      - "前几讲各有各的判据，放到一起就是一组跨机构约束。旋梭：钩线时机针回升 1.6 到 2.5 毫米，对应主轴 {{ch08.rise_lo:.1f}} 到 {{ch08.rise_hi:.1f}} 度。挑线：针眼入布前多放的线不超过挑线簧行程 10 毫米，入布后欠线不超过 1 毫米，钩线到脱环还要留 1 毫米余量。送布：布在针中移动不超过 0.05 毫米。注意，钩线时刻同时决定线环什么时候开始要线，所以旋梭和挑线是联动的。"
+      - "Each earlier lecture had its own criteria; together they form a set of cross-mechanism constraints. Hook: the needle rises 1.6 to 2.5 millimetres at the catch, which is {{ch08.rise_lo:.1f}} to {{ch08.rise_hi:.1f}} degrees of shaft angle. Take-up: slack before the eye enters must stay within the 10-millimetre check-spring stroke, the shortfall after entry within 1 millimetre, and catch to cast-off needs a 1-millimetre margin. Feed: the fabric may move no more than 0.05 millimetres with the needle in. And the catch also decides when the loop starts taking thread, so hook and take-up are coupled."
+
+  - layout: duo
+    title: ["动一下旋梭定时，看全机", "Move the hook timing and watch the whole machine"]
+    left: {video: hooktrack, label: ["时序轨道：钩线区间来回平移", "Timing tracks: the catch band slides"], note: ["红底纹 = 违反判据的区间", "Red shading = criterion violated"]}
+    right: {video: hookchecks, label: ["六条判据：实时检查", "Six criteria, checked live"], note: ["回升量最先出界", "The rise goes out first"]}
+    notes:
+      - "这是虚拟实验 8-1，全机时序编辑器。现在旋梭定时在正负 9 度之间来回移动。左边看钩线区间在时序轨道上平移，右边六条判据实时检查。注意哪一条最先变红：是钩线时的回升量，两头都是它先出界。挑线余量也在变，旋梭每推迟 1 度，余量少约 0.1 到 0.2 毫米，只是还没用完。"
+      - "This is Virtual Lab 8-1, the whole-machine timing editor. The hook timing is swinging back and forth between plus and minus 9 degrees. On the left, the catch band slides along the timing tracks; on the right, the six criteria are checked live. Watch which one turns red first: it's the needle rise at the catch, at both ends. The take-up margin changes too, losing about 0.1 to 0.2 millimetres per degree of retard, but it isn't used up yet."
+
+  - layout: figure
+    title: ["三个机构的相位窗口", "Phase windows of the three mechanisms"]
+    h: 600
+    visual:
+      svg: |
+        <svg viewBox="0 0 1700 600" width="100%" height="600">
+          <g stroke="#1e2c45" stroke-width="2"><path d="M330 60 L330 540"/><path d="M511 60 L511 540"/><path d="M693 60 L693 540"/><path d="M874 60 L874 540"/><path d="M1056 60 L1056 540"/><path d="M1419 60 L1419 540"/><path d="M1600 60 L1600 540"/></g>
+          <path d="M1237 50 L1237 545" stroke="#8fa3ba" stroke-width="3"/>
+          <g font-size="22" fill="#5f7189" text-anchor="middle" class="en"><text x="330" y="580" class="en">−50°</text><text x="511" y="580" class="en">−40°</text><text x="693" y="580" class="en">−30°</text><text x="874" y="580" class="en">−20°</text><text x="1056" y="580" class="en">−10°</text><text x="1237" y="580" class="en" fill="#d3deea">0（标准）</text><text x="1419" y="580" class="en">+10°</text><text x="1600" y="580" class="en">+20°</text></g>
+          <g font-weight="700" fill="#f3f6fa"><text x="0" y="148" font-size="36">旋梭定时</text><text x="0" y="308" font-size="36">挑线相位</text><text x="0" y="468" font-size="36">送布定时</text></g>
+          <g font-size="20" fill="#8fa3ba" class="en"><text x="0" y="178" class="en">hook timing</text><text x="0" y="338" class="en">take-up phase</text><text x="0" y="498" class="en">feed timing</text></g>
+          <g fill="rgba(255,122,69,.13)"><rect x="330" y="118" width="1270" height="44" rx="10"/><rect x="330" y="278" width="1270" height="44" rx="10"/><rect x="330" y="438" width="1270" height="44" rx="10"/></g>
+          <g fill="#2ec4b6"><rect x="1186" y="118" width="109" height="44" rx="10"/><rect x="1183" y="278" width="163" height="44" rx="10"/><rect x="385" y="438" width="870" height="44" rx="10"/></g>
+          <g font-size="28" font-weight="800" fill="#5ee0d2" class="en"><text x="1176" y="205" text-anchor="end" class="en">−2.8°</text><text x="1305" y="205" class="en">+3.2°</text><text x="1173" y="365" text-anchor="end" class="en">−3°</text><text x="1356" y="365" class="en">+6°</text><text x="385" y="525" class="en">−47°</text><text x="1265" y="525" class="en">+1°</text></g>
+          <g font-size="24" fill="#ffb38f"><text x="1176" y="104" text-anchor="end">回升 &lt; 1.6 mm</text><text x="1305" y="104">回升 &gt; 2.5 mm</text><text x="1173" y="264" text-anchor="end">入布前余线 &gt; 10 mm</text><text x="1356" y="264">入布后欠线 &gt; 1 mm</text><text x="385" y="424">升牙离出布 &lt; 20°（示意）</text><text x="1265" y="424">布在针中移动 &gt; 0.05 mm</text></g>
+        </svg>
+    caption: ["单独移动一个、其余保持标准；+ 为推迟，绿色为可用", "One moved at a time, the rest at standard; + is retard, green is usable"]
+    notes:
+      - "单独移动一个机构，其余保持标准，算出可用窗口。旋梭约负 2.8 到正 3.2 度，两头都由回升量限制。挑线约负 3 到正 6 度，两头原因不同：提前了，入布前放出的线超过挑线簧收得住的 10 毫米；推迟了，入布后欠线超过 1 毫米。送布最不对称：推迟只能 1 度，提前可以到负 47 度。"
+      - "Move one mechanism at a time, keep the others at standard, and you get the usable windows. The hook: about minus 2.8 to plus 3.2 degrees, both ends limited by the needle rise. The take-up: about minus 3 to plus 6, for different reasons at each end. Advance it and the slack before entry exceeds the 10 millimetres the check spring can hold; retard it and the shortfall after entry exceeds 1 millimetre. The feed is the most lopsided: only 1 degree of retard, but up to minus 47 of advance."
+
+  - layout: points
+    title: ["读窗口：现场与设计", "Reading the windows: field and design"]
+    points:
+      - ["旋梭推迟七八度：挑线余量被用光，所以断线", "Hook retarded 7–8°: the take-up margin is used up, so the thread breaks"]
+      - ["挑线曲柄安装角设计时定死：误差控制在几度内", "Take-up crank angle is fixed in design: hold the error to a few degrees"]
+      - ["送布窗口呼应说明书：送布不匀时可提前", "The feed window matches the manual: advance it for uneven feeding"]
+    notes:
+      - "这几个窗口怎么用？开头那位师傅把旋梭推迟七八度，正好把挑线余量用光了，所以开始断面线。挑线曲柄的安装角在设计时就定死，现场不调，窗口告诉设计者，相位误差要控制在几度以内。送布窗口提前那一边很宽，这正好呼应说明书的说法：为了防止送布不匀，可以把送布定时提前。"
+      - "How do we use these windows? The mechanic at the start retarded the hook seven or eight degrees, which used up the take-up margin exactly, so the needle thread began to break. The take-up crank angle is fixed in design and not adjusted in the field; the window tells designers to hold its phase error within a few degrees. The feed window is wide on the advance side, which matches the manual: to prevent uneven feeding, you may advance the feed timing."
+
+  - layout: chain
+    title: ["设计定相位的顺序", "The order for fixing phases in design"]
+    steps: [["刺布 · 基准", "Needle bar · reference"], ["钩线 · 按回升量", "Catch · from the rise"], ["挑线 · 按钩线和耗线", "Take-up · from catch and use"], ["送布 · 针出布的空档", "Feed · while the needle is out"]]
+    hot: [0]
+    mark: ["定时基准", "timing reference"]
+    foot: ["顺序反过来，前面定好的东西就要返工", "Reverse the order and earlier decisions must be redone"]
+    notes:
+      - "这些窗口也说明了设计时确定相位的顺序。先定刺布机构，它是一切定时的基准；再按回升量定钩线时刻；再按钩线时刻和线环耗线量设计挑线机构；最后在机针出布的空档里安排送布。顺序反过来，前面定好的东西就要返工。"
+      - "The windows also tell us the order for fixing phases in design. First the needle bar, the reference for all timing. Then the catch, from the needle rise. Then the take-up, from the catch and the loop's thread consumption. Last, the feed, fitted into the gap while the needle is out of the fabric. Do it in the reverse order and what you fixed earlier has to be redone."
+
+  - layout: lab
+    title: ["动手试一试：全机时序编辑器", "Try it: the whole-machine timing editor"]
+    shot: {page: timing}
+    tasks:
+      - ["只拖“旋梭定时”，看哪条判据先变红", "Drag only the hook timing; see which criterion turns red first"]
+      - ["按“打乱三个相位”，再一个个调回来", "Press “Scramble”, then bring the three phases back one by one"]
+      - ["6000 r/min 下选平衡率，使最大合力 ≤ 550 N", "At 6000 r/min choose k so the maximum resultant is ≤ 550 N"]
+    notes:
+      - "这个实验大家在问渠平台上自己做。第一，只拖旋梭定时，看哪条判据先变红。第二，按“打乱三个相位”，看哪几条判据变红、在哪条轨道上，再把旋梭、挑线、送布一个个调回来。第三，把转速提到 6000 以上，选一个平衡率，让最大合力不超过 550 牛，同时六条判据都满足。"
+      - "Do this lab yourselves on WenQuest. One: drag only the hook timing and see which criterion turns red first. Two: press Scramble three phases, see which criteria turn red and on which tracks, then bring the hook, take-up and feed back one by one. Three: raise the speed above 6000 and choose a balance ratio so that the maximum resultant is no more than 550 newtons, with all six criteria still met."
+
+  - layout: section
+    num: "03"
+    title: ["整机惯性力与平衡块", "Machine inertia forces and the counterweight"]
+
+  - layout: split
+    title: ["整机惯性力从哪里来", "Where the machine's inertia forces come from"]
+    points:
+      - ["针杆往复：5000 r/min 下止点约 {{ch08.NB5000:.0f}} N", "Needle bar: about {{ch08.NB5000:.0f}} N at BDC at 5000 r/min"]
+      - ["挑线杆只有 25 g，惯性力却可达约 {{ch08.Ftk:.0f}} N", "The take-up lever weighs 25 g yet reaches about {{ch08.Ftk:.0f}} N"]
+      - ["所有惯性力都按转速平方增长", "Every inertia force grows with speed squared"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="0" y="40" font-size="24" fill="#8fa3ba">示意质量 · illustrative masses</text>
+          <g font-size="32" font-weight="700" fill="#f3f6fa">
+            <text x="0" y="120">针杆</text><text x="0" y="260">曲柄旋转部分</text><text x="0" y="400">挑线杆</text><text x="0" y="540">送布牙架</text></g>
+          <g font-size="20" fill="#8fa3ba" class="en">
+            <text x="0" y="150" class="en">needle bar · reciprocating</text><text x="0" y="290" class="en">crank · rotating</text><text x="0" y="430" class="en">take-up · plane motion</text><text x="0" y="570" class="en">feed carrier · reciprocating</text></g>
+          <g><rect x="300" y="88" width="480" height="56" rx="12" fill="#4c8dff"/><rect x="300" y="228" width="240" height="56" rx="12" fill="#4c8dff"/>
+            <rect x="300" y="368" width="100" height="56" rx="12" fill="#ff7a45"/><rect x="300" y="508" width="200" height="56" rx="12" fill="#4c8dff"/></g>
+          <g font-size="34" font-weight="800" fill="#f3f6fa" class="en"><text x="800" y="128" class="en">120 g</text><text x="560" y="268" class="en">60 g</text><text x="420" y="408" class="en">25 g</text><text x="520" y="548" class="en">50 g</text></g>
+          <text x="530" y="408" font-size="28" font-weight="700" fill="#ff9c75">≈ {{ch08.Ftk:.0f}} N！</text>
+          <text x="530" y="440" font-size="20" fill="#8fa3ba" class="en">CoM acceleration up to 10.7 km/s²</text>
+        </svg>
+    notes:
+      - "整机上产生惯性力的不只针杆。针杆往复，5000 转时下止点约 {{ch08.NB5000:.0f}} 牛；曲柄、曲柄销和连杆大头随主轴旋转；挑线杆做复杂的平面运动；送布牙架前后、上下往复。本讲取一组示意质量。挑线杆只有 25 克，可是它运动剧烈，质心加速度最大约每二次方秒 10.7 千米，惯性力可达 {{ch08.Ftk:.0f}} 牛左右，不能忽略。"
+      - "The needle bar isn't the only source of inertia force. It reciprocates, giving about {{ch08.NB5000:.0f}} newtons at bottom dead centre at 5000 r/min. The crank, crank pin and big end rotate with the shaft. The take-up lever moves in a complex plane motion, and the feed-dog carrier goes back and forth and up and down. Here we use illustrative masses. The take-up lever weighs only 25 grams, but it moves so violently, with a centre-of-mass acceleration up to 10.7 kilometres per second squared, that its force reaches about {{ch08.Ftk:.0f}} newtons. You can't ignore it."
+
+  - layout: figure
+    title: ["平衡率 k：从 0 扫到 1", "Balance ratio k, swept from 0 to 1"]
+    h: 560
+    visual: {video: ksweep}
+    caption: ["左：合力轨迹；右：竖直（红）与水平（蓝）分量", "Left: resultant locus; right: vertical (red), horizontal (blue)"]
+    notes:
+      - "针杆曲柄对面有一块平衡块，离心力和曲柄销同频、反向。平衡块的大小写成旋转质量加 k 倍往复质量，k 叫平衡率。现在 k 在 0 和 1 之间来回扫。k 小的时候，轨迹竖着拉长；k 大的时候，横着拉长；中间某处最接近一个圆，左上角的最大合力最小。"
+      - "Opposite the needle-bar crank sits a counterweight. Its centrifugal force has the same frequency as the crank pin's, in the opposite direction. We write its size as the rotating mass plus k times the reciprocating mass; k is the balance ratio. Here k sweeps back and forth between 0 and 1. With small k the locus is stretched vertically; with large k, horizontally. Somewhere in between it's closest to a circle, and the maximum resultant at the top left is smallest."
+
+  - layout: bignum
+    title: ["平衡块管一个方向，就丢另一个方向", "Fix one direction and you lose the other"]
+    nums:
+      - {n: "{{ch08.Fk0:.0f}} N", label: ["k = 0：只平衡旋转部分，力偏竖直", "k = 0: rotating part only; mostly vertical"]}
+      - {n: "{{ch08.F5000:.0f}} N", label: ["k = 0.45：轨迹最接近圆", "k = 0.45: the locus nearest a circle"]}
+      - {n: "{{ch08.Fk1:.0f}} N", label: ["k = 1：竖直抵消，水平冒出新力", "k = 1: vertical cancelled, a new horizontal force"]}
+    foot: ["5000 r/min 最大合力；只算针杆和曲柄最佳 k ≈ 0.6，加上挑线杆降到 0.45", "Maximum resultant at 5000 r/min; needle bar and crank alone give k ≈ 0.6, the take-up brings it to 0.45"]
+    notes:
+      - "5000 转下的数值：k 等于 0，只平衡旋转部分，最大合力约 {{ch08.Fk0:.0f}} 牛，主要在竖直方向；k 等于 1，往复质量的一阶力在竖直方向全部抵消，却在水平方向冒出同样大的新力，约 {{ch08.Fk1:.0f}} 牛；k 等于 0.45，降到约 {{ch08.F5000:.0f}} 牛。只算针杆和曲柄，最佳 k 约 0.6；挑线杆的一阶分量偏水平，所以降到 0.45 左右。"
+      - "The numbers at 5000 r/min. With k equal to 0, balancing only the rotating part, the maximum resultant is about {{ch08.Fk0:.0f}} newtons, mostly vertical. With k equal to 1, the first-order reciprocating force is cancelled vertically, but an equal new force appears horizontally: about {{ch08.Fk1:.0f}}. With k at 0.45 it drops to about {{ch08.F5000:.0f}}. Needle bar and crank alone would give a best k of about 0.6; the take-up's first-order component leans horizontal, which brings it down to about 0.45."
+
+  - layout: split
+    title: ["平衡块抵消不了二阶力", "The counterweight cannot touch the second order"]
+    points:
+      - ["竖直二阶来自针杆的 λ cos 2φ 项", "The vertical second order comes from the needle bar's λ cos 2φ term"]
+      - ["它是主轴转速的两倍，曲柄上的平衡块无能为力", "It runs at twice shaft speed; a crank counterweight can't reach it"]
+      - ["三阶、四阶只有几十牛以下", "Third and fourth orders are a few tens of newtons or less"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="0" y="40" font-size="24" fill="#8fa3ba">k = 0.45，5000 r/min 的各阶谐波 · harmonics</text>
+          <path d="M260 80 L260 560" stroke="#4b5f7d" stroke-width="3"/>
+          <g font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="end"><text x="240" y="160">竖直一阶</text><text x="240" y="320">竖直二阶</text><text x="240" y="480">水平一阶</text></g>
+          <g font-size="20" fill="#8fa3ba" text-anchor="end" class="en"><text x="240" y="190" class="en">vertical 1st</text><text x="240" y="350" class="en">vertical 2nd</text><text x="240" y="510" class="en">horizontal 1st</text></g>
+          <rect x="260" y="130" width="{{ch08.Hv1:.0f}}" height="64" rx="10" fill="#4c8dff"/>
+          <rect x="260" y="290" width="{{ch08.Hv2:.0f}}" height="64" rx="10" fill="#ff7a45"/>
+          <rect x="260" y="450" width="{{ch08.Hh1:.0f}}" height="64" rx="10" fill="#4c8dff"/>
+          <g font-size="38" font-weight="800" fill="#f3f6fa" class="en"><text x="510" y="176" class="en">{{ch08.Hv1:.0f}} N</text><text x="395" y="336" class="en">{{ch08.Hv2:.0f}} N</text><text x="614" y="496" class="en">{{ch08.Hh1:.0f}} N</text></g>
+          <text x="395" y="380" font-size="24" fill="#ffb38f">平衡块管不着 · out of its reach</text>
+        </svg>
+    notes:
+      - "把 k 等于 0.45 时的合力拆成各阶谐波：竖直方向一阶约 {{ch08.Hv1:.0f}} 牛、二阶约 {{ch08.Hv2:.0f}} 牛，水平方向一阶约 {{ch08.Hh1:.0f}} 牛，三阶、四阶都在几十牛以下。竖直二阶主要来自针杆，就是第 3 讲的 λ cos 2φ 项，频率是主轴的两倍，曲柄上的平衡块对它无能为力。所以平衡块永远消除不干净振动。"
+      - "Split the resultant at k equal to 0.45 into harmonics. Vertically, the first order is about {{ch08.Hv1:.0f}} newtons and the second about {{ch08.Hv2:.0f}}; horizontally, the first order is about {{ch08.Hh1:.0f}}; the third and fourth are a few tens of newtons or less. The vertical second order comes mainly from the needle bar, the lambda cos 2 phi term from Lecture 3. It runs at twice shaft frequency, and a counterweight on the crank can do nothing about it. That's why a counterweight never removes the vibration completely."
+
+  - layout: section
+    num: "04"
+    title: ["振动、润滑与转速上限", "Vibration, lubrication and the speed limit"]
+
+  - layout: split
+    title: ["振动和噪声怎样传出来", "How vibration and noise get out"]
+    points:
+      - ["减轻运动零件：空心针杆、轻量化挑线杆", "Lighter moving parts: hollow needle bar, light take-up"]
+      - ["选好平衡块；机头与台板间加弹性垫", "A good counterweight; elastic pads between head and table"]
+      - ["标准平缝机 5000 sti/min：工位约 83.5 dB(A)", "A standard machine at 5000 sti/min: about 83.5 dB(A) at the seat"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <defs><marker id="v8a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4b5f7d"/></marker></defs>
+          <g font-size="34" font-weight="700" fill="#f3f6fa" text-anchor="middle">
+            <rect x="40" y="20" width="340" height="86" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="210" y="74">惯性力</text>
+            <rect x="40" y="146" width="340" height="86" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="210" y="200">轴承</text>
+            <rect x="40" y="272" width="340" height="86" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="210" y="326">机壳</text>
+            <rect x="40" y="398" width="340" height="86" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="210" y="452">台板 · 机架</text>
+            <rect x="40" y="524" width="340" height="86" rx="18" fill="rgba(76,141,255,.12)" stroke="#4c8dff" stroke-width="3"/><text x="210" y="578">空气：噪声</text></g>
+          <g stroke="#4b5f7d" stroke-width="5" marker-end="url(#v8a)"><path d="M210 108 L210 140"/><path d="M210 234 L210 266"/><path d="M210 360 L210 392"/><path d="M210 486 L210 518"/></g>
+          <g font-size="28" font-weight="700" fill="#5ee0d2"><text x="430" y="58">① 减轻运动零件</text><text x="430" y="100">② 选好平衡块</text></g>
+          <text x="430" y="130" font-size="20" fill="#8fa3ba" class="en">cut the force at the source</text>
+          <path d="M385 63 L420 63 M385 92 L420 92" stroke="#2ec4b6" stroke-width="4"/>
+          <path d="M60 377 L360 377" stroke="#f2b705" stroke-width="10" stroke-dasharray="20 12"/>
+          <text x="430" y="372" font-size="28" font-weight="700" fill="#f2b705">③ 弹性垫：阻断传递</text>
+          <text x="430" y="404" font-size="20" fill="#8fa3ba" class="en">break the transmission path</text>
+        </svg>
+    notes:
+      - "惯性力通过轴承传到机壳，再传到台板和机架，就是振动；机壳和台板向空气辐射，就是噪声。降振有三条路：减轻运动零件，比如空心针杆、轻量化挑线杆；选好平衡块；机头和台板之间装弹性垫。前两条从源头减小惯性力，第三条阻断传递路径。说明书按国际标准给出噪声，某标准平缝机每分钟 5000 针时，工位 A 计权声压级 83.5 分贝。几十台一起开，就是劳动保护问题。"
+      - "Inertia force goes through the bearings into the housing, then into the table and stand: that's vibration. The housing and table radiate into the air: that's noise. There are three ways to cut it: lighter moving parts, like a hollow needle bar and a lightened take-up; a well-chosen counterweight; and elastic pads between head and table. The first two cut the force at its source; the third breaks the path. Manuals state noise to international standards: one standard machine at 5000 stitches a minute gives 83.5 dB A-weighted at the operator's seat. Dozens running together make it an occupational-health issue."
+
+  - layout: split
+    title: ["润滑：要可靠，又不能沾布", "Lubrication: reliable, yet no oil on the fabric"]
+    points:
+      - ["集中润滑：下轴带油泵，油送到旋梭和轴承", "Central lubrication: a pump on the lower shaft feeds hook and bearings"]
+      - ["旋梭油量：停机后用油量检查纸看油迹宽度", "Hook oil: after stopping, read the splash width on check paper"]
+      - ["新机型：半干式或微量润滑 + 伺服直驱", "New machines: semi-dry or minimal oil + direct servo drive"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <defs><marker id="o8a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4c8dff"/></marker></defs>
+          <path d="M160 420 L160 90 Q160 50 200 50 L790 50 Q830 50 830 90 L830 420" fill="none" stroke="#4b5f7d" stroke-width="5"/>
+          <rect x="40" y="420" width="840" height="80" rx="12" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
+          <path d="M210 100 L790 100" stroke="#c8d2de" stroke-width="12" stroke-linecap="round"/>
+          <text x="480" y="150" font-size="26" fill="#d3deea" text-anchor="middle">上轴 · upper shaft</text>
+          <path d="M790 100 L790 460" stroke="#8fa3ba" stroke-width="6"/>
+          <path d="M150 460 L860 460" stroke="#c8d2de" stroke-width="12" stroke-linecap="round"/>
+          <text x="480" y="402" font-size="22" fill="#8fa3ba" text-anchor="middle">下轴 · lower shaft</text>
+          <circle cx="110" cy="460" r="52" fill="#2a1c18" stroke="#ff7a45" stroke-width="5"/><text x="110" y="470" font-size="28" font-weight="700" fill="#ffb38f" text-anchor="middle">旋梭</text>
+          <rect x="40" y="540" width="840" height="80" rx="14" fill="rgba(76,141,255,.15)" stroke="#4c8dff" stroke-width="3"/>
+          <text x="460" y="592" font-size="28" font-weight="700" fill="#8fbaff" text-anchor="middle">油盘 · oil pan</text>
+          <circle cx="640" cy="520" r="32" fill="#0d1626" stroke="#4c8dff" stroke-width="4"/><text x="640" y="529" font-size="24" font-weight="700" fill="#8fbaff" text-anchor="middle">泵</text>
+          <path d="M610 515 L190 515 L170 500" fill="none" stroke="#4c8dff" stroke-width="5" stroke-dasharray="14 9" marker-end="url(#o8a)"/>
+          <path d="M672 515 L740 515 L740 130" fill="none" stroke="#4c8dff" stroke-width="5" stroke-dasharray="14 9" marker-end="url(#o8a)"/>
+          <text x="715" y="200" font-size="24" fill="#8fbaff" text-anchor="end">到轴承、针杆、挑线</text>
+          <text x="715" y="226" font-size="20" fill="#8fa3ba" text-anchor="end" class="en">to bearings, needle bar, take-up</text>
+          <g transform="translate(200,250)"><rect width="250" height="130" rx="12" fill="#f4efe3"/><path d="M40 72 L210 72" stroke="#c9a94a" stroke-width="16" stroke-linecap="round"/>
+            <text x="125" y="36" font-size="24" font-weight="700" fill="#6b5a3a" text-anchor="middle">油量检查纸</text><text x="125" y="114" font-size="22" fill="#6b5a3a" text-anchor="middle">看油迹宽度</text></g>
+          <path d="M215 385 L150 410" stroke="#c9a94a" stroke-width="4" stroke-dasharray="8 6"/>
+        </svg>
+    notes:
+      - "平缝机里有很多高速摩擦副：上下轴轴承、针杆和针杆套、挑线和连杆的铰链，还有转速是主轴两倍的旋梭。传统做法是集中润滑：底板下有油盘，下轴带动油泵，把油送到旋梭和各处轴承，多余的流回油盘。旋梭油量单独调：停机后立即用油量检查纸看油迹宽度，薄料型约 0.5 到 1 毫米，中厚、厚料型约 1 到 3 毫米。布料沾油最怕，所以新机型用半干式或微量润滑，再用伺服电机直接驱动主轴。"
+      - "A lockstitch machine has many high-speed friction pairs: shaft bearings, needle bar and bushing, the take-up and link joints, and the hook turning at twice shaft speed. The traditional answer is central lubrication: an oil pan under the bed, a pump on the lower shaft feeding the hook and bearings, surplus draining back. Hook oil is set on its own. Right after stopping, put oil-check paper under the hook and read the splash width: about 0.5 to 1 millimetre for light types, 1 to 3 for medium and heavy. Oil on fabric is dreaded, so new machines use semi-dry or minimal lubrication, with a servo motor driving the shaft directly."
+
+  - layout: bignum
+    title: ["转速的上限：说明书怎么写", "The speed limit: what the manual says"]
+    nums:
+      - {n: "5500", n_en: "sti/min", label: ["标准型", "Standard type"]}
+      - {n: "4000", n_en: "sti/min", label: ["薄料、中厚料、厚料型", "Light, medium and heavy types"]}
+      - {n: "3200", n_en: "sti/min", label: ["厚料型，针距 > 5 mm", "Heavy type, stitch > 5 mm"]}
+    foot: ["上限取决于最先到达极限的机构：针杆、挑线、梭尖、针热、振动、润滑", "The limit is whichever is reached first: needle bar, take-up, hook, needle heat, vibration, lubrication"]
+    notes:
+      - "一台平缝机能跑多快，取决于最先到达极限的那个机构：针杆惯性力、挑线杆线孔加速度、梭尖速度、机针发热、整机振动噪声、润滑。某说明书给出：标准型每分钟 5500 针，薄料、中厚料、厚料型都是 4000，厚料型针距大于 5 毫米降到 3200。薄料型也比标准型低，可见限制不只来自布厚。厚料大针距最低，一部分原因是粗针粗线张力大、针热多，针距大送布牙行程和加速度都大，这是本书的解读。"
+      - "How fast a lockstitch machine can run depends on whichever mechanism reaches its limit first: needle-bar inertia, take-up eye acceleration, hook speed, needle heat, machine vibration and noise, lubrication. One manual gives 5500 stitches a minute for the standard type, 4000 for the light, medium and heavy types, and 3200 for the heavy type with stitches over 5 millimetres. The light type is also below standard, so the limit isn't only about fabric thickness. Heavy material with long stitches is slowest; part of the reason, in this book's reading, is thicker needle and thread, more tension and needle heat, and a longer dog stroke with higher acceleration."
+
+  - layout: lab
+    title: ["动手试一试：综合调机", "Try it: diagnose a faulty machine"]
+    shot: {page: tune-lockstitch}
+    tasks:
+      - ["先试缝，看线迹正反面和机器表现", "Test-sew first: both faces of the seam, and how the machine behaves"]
+      - ["怀疑哪里先量哪里，一次只调一处", "Measure what you suspect; adjust one thing at a time"]
+      - ["30 针都合格，且没把好的地方调乱", "All 30 stitches good, and nothing else disturbed"]
+    notes:
+      - "虚拟实验 8-2 把第 4 到第 8 讲合起来用。页面给你一台有一到三个毛病的平缝机，只告诉你试缝时的现象，不告诉原因。先试缝，看线迹正反面；再用量具量可疑的地方；一次只调一处，调完再试缝，直到 30 针都合格。同一个现象往往有几种原因，要靠测量分辨。这和真机调机的步骤一样。"
+      - "Virtual Lab 8-2 brings Lectures 4 to 8 together. The page gives you a lockstitch machine with one to three faults. It tells you only what the test seam looks like, not why. Test-sew first and look at both faces of the seam; measure whatever you suspect; adjust one thing at a time and sew again, until all 30 stitches are good. One symptom often has several causes, so it's the measurements that tell them apart. These are the same steps as on a real machine."
+
+  - layout: section
+    num: "05"
+    title: ["算例：提到 6000 r/min 会怎样", "Worked example: what happens at 6000 r/min"]
+
+  - layout: bignum
+    title: ["惯性力 ∝ 转速²", "Inertia force ∝ speed²"]
+    nums:
+      - {n: "{{ch08.F4000:.0f}} N", label: ["4000 r/min", "at 4000 r/min"]}
+      - {n: "{{ch08.F5000:.0f}} N", label: ["5000 r/min", "at 5000 r/min"]}
+      - {n: "{{ch08.F6000:.0f}} N", label: ["6000 r/min：×{{ch08.r65:.2f}}", "6000 r/min: ×{{ch08.r65:.2f}}"]}
+    foot: ["k = 0.45 的最大合力；(6000/5000)² = {{ch08.r65:.2f}}，针杆下止点 {{ch08.NB5000:.0f}} → {{ch08.NB6000:.0f}} N", "Maximum resultant at k = 0.45; (6000/5000)² = {{ch08.r65:.2f}}; needle bar at BDC {{ch08.NB5000:.0f}} → {{ch08.NB6000:.0f}} N"]
+    notes:
+      - "所有惯性力都与转速平方成正比。同样 k 等于 0.45，4000 转最大合力约 {{ch08.F4000:.0f}} 牛，5000 转约 {{ch08.F5000:.0f}} 牛，6000 转乘以 6000 比 5000 的平方，也就是 {{ch08.r65:.2f}}，约 {{ch08.F6000:.0f}} 牛。针杆下止点从 {{ch08.NB5000:.0f}} 牛变成约 {{ch08.NB6000:.0f}} 牛。转速只加了 20%，力加了 {{ch08.up65:.0f}}%。"
+      - "Every inertia force goes with speed squared. At the same k of 0.45, the maximum resultant is about {{ch08.F4000:.0f}} newtons at 4000 and {{ch08.F5000:.0f}} at 5000. At 6000, multiply by six thousand over five thousand squared, {{ch08.r65:.2f}}: about {{ch08.F6000:.0f}} newtons. The needle bar at bottom dead centre goes from {{ch08.NB5000:.0f}} to about {{ch08.NB6000:.0f}}. The speed went up 20 percent; the force went up {{ch08.up65:.0f}}."
+
+  - layout: split
+    title: ["机器人联系：压力机上下料", "Robot link: tending a press"]
+    points:
+      - ["只能在滑块抬起、模具打开的相位里伸进去", "Reach in only while the ram is up and the die open"]
+      - ["以压力机曲轴编码器为主轴，电子凸轮跟随", "Follow the press crank encoder with an electronic cam"]
+      - ["节拍 15 → 18 次/分：加速度 ×{{ch08.robot:.2f}}", "15 → 18 strokes/min: acceleration ×{{ch08.robot:.2f}}"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M497.8 153.8 A230 230 0 1 1 202.2 153.8" fill="none" stroke="#4b5f7d" stroke-width="60"/>
+          <path d="M202.2 153.8 A230 230 0 0 1 497.8 153.8" fill="none" stroke="#2ec4b6" stroke-width="60"/>
+          <path d="M350 60 L350 120" stroke="#f2b705" stroke-width="6"/>
+          <text x="350" y="40" font-size="24" fill="#f2b705" text-anchor="middle">滑块上止点 · ram TDC</text>
+          <text x="350" y="330" font-size="34" font-weight="700" fill="#f3f6fa" text-anchor="middle">压力机曲轴一转</text>
+          <text x="350" y="366" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">one press stroke</text>
+          <text x="610" y="150" font-size="30" font-weight="800" fill="#5ee0d2">机器人可伸入</text>
+          <text x="610" y="182" font-size="20" fill="#8fa3ba" class="en">robot window (interlock)</text>
+          <text x="610" y="470" font-size="30" font-weight="700" fill="#c8d2de">滑块下行、冲压</text>
+          <text x="610" y="502" font-size="20" fill="#8fa3ba" class="en">ram down: robot out</text>
+          <text x="350" y="625" font-size="24" fill="#8fa3ba" text-anchor="middle">编码器 → 电子凸轮 → 机器人各轴</text>
+        </svg>
+    notes:
+      - "冲压线上的上下料机器人和送布一样：只能在压力机滑块抬起、模具打开的那段相位里伸进去取放工件，滑块下行之前必须退出，这就是“机针在布外才能送布”的翻版。控制上，机器人把压力机曲轴编码器当主轴，用电子凸轮跟随，并设互锁窗口。节拍从每分钟 15 次提到 18 次，轨迹形状不变，加速度和惯性力变成 {{ch08.robot:.2f}} 倍，同样的平方律。"
+      - "A robot loading and unloading a press works like the feed: it may reach in only during the phase when the ram is up and the die open, and must be out before the ram comes down. That's the counterpart of feeding only while the needle is out. In control terms, the robot treats the press crankshaft encoder as its main shaft, follows it with an electronic cam and sets interlock windows. Raise the press from 15 to 18 strokes a minute with the same path, and accelerations and inertia forces grow {{ch08.robot:.2f}} times: the same square law."
+
+  - layout: split
+    title: ["生活中：洗衣机甩干时“走路”", "Everyday: a washing machine walking in the spin"]
+    points:
+      - ["衣服堆一边：不平衡力 ∝ 转速²", "Laundry bunched to one side: imbalance force ∝ speed²"]
+      - ["甩干前先低速转几圈，把衣服摊匀", "It turns slowly first to spread the load"]
+      - ["检测到不平衡，就自动降速", "If it senses imbalance, it slows down"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="180" y="40" width="540" height="560" rx="40" fill="#111d31" stroke="#4b5f7d" stroke-width="5"/>
+          <circle cx="450" cy="340" r="200" fill="#0d1626" stroke="#c8d2de" stroke-width="8"/>
+          <circle cx="450" cy="340" r="150" fill="none" stroke="#22324d" stroke-width="3" stroke-dasharray="10 10"/>
+          <path d="M450 340 m-170 0 a170 170 0 0 1 120 -162 l40 120 z" fill="#ff7a45" opacity=".85"/>
+          <path d="M450 340 L270 160" stroke="#f2b705" stroke-width="10" stroke-linecap="round"/>
+          <path d="M250 140 l40 4 l-24 24 z" fill="#f2b705"/>
+          <text x="220" y="118" font-size="30" font-weight="800" fill="#f2b705">F ∝ n²</text>
+          <path d="M630 380 A200 200 0 0 1 560 510" fill="none" stroke="#2ec4b6" stroke-width="8"/>
+          <path d="M548 520 l2 -32 l28 18 z" fill="#2ec4b6"/>
+          <g stroke="#ff9c75" stroke-width="5" stroke-linecap="round"><path d="M150 610 l-30 20"/><path d="M750 610 l30 20"/><path d="M130 580 l-36 4"/><path d="M770 580 l36 4"/></g>
+        </svg>
+    notes:
+      - "生活中也有同样的事。衣服在滚筒里堆到一边，甩干时洗衣机剧烈抖动，甚至在地上走路：不平衡的离心力和转速平方成正比。所以洗衣机甩干前会先低速转几圈，把衣服摊匀，相当于选好平衡；检测到不平衡时，它还会自动降速。这和我们给平缝机选平衡率、不超说明书转速，是同一个道理。"
+      - "You see the same thing at home. When the laundry bunches to one side, the washing machine shakes hard during the spin and can even walk across the floor: the unbalanced centrifugal force grows with speed squared. So before spinning, it turns slowly a few times to spread the load, which is like choosing the balance; and when it senses imbalance, it slows itself down. Same idea as choosing a balance ratio and staying within the rated speed of a lockstitch machine."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["别越过设计转速：定在 5500 以内", "Stay within the design speed: 5500 or less"]
+    rows:
+      - ["6000：最大合力", "{{ch08.F6000:.0f}} N"]
+      - ["6000：针杆下止点", "{{ch08.NB6000:.0f}} N"]
+      - ["建议 5500：最大合力", "{{ch08.F5500:.0f}} N"]
+    side: {big: "×{{ch08.r65:.2f}}", text: ["{{ch08.overlap:.1f}}° 重叠：{{ch08.t5000:.2f}} → {{ch08.t6000:.2f}} ms，余量按时间变紧", "{{ch08.overlap:.1f}}° overlap: {{ch08.t5000:.2f}} → {{ch08.t6000:.2f}} ms"]}
+    foot: ["产量靠减少停机、平衡工序，而不是越过机器的设计转速", "Raise output by cutting downtime and balancing operations, not by exceeding the design speed"]
+    notes:
+      - "回到开头。提到 6000 转，乘以 {{ch08.r65:.2f}}：最大合力约 {{ch08.F6000:.0f}} 牛，针杆下止点约 {{ch08.NB6000:.0f}} 牛。{{ch08.overlap:.1f}} 度的重叠区从 {{ch08.t5000:.2f}} 毫秒缩短到 {{ch08.t6000:.2f}} 毫秒，相位余量按时间计变紧了。6000 已经超过说明书标准型的 5500，不宜长时间运转。建议不超过 5500，这时乘以 {{ch08.r55:.2f}}，最大合力约 {{ch08.F5500:.0f}} 牛，针杆约 {{ch08.NB5500:.0f}} 牛。产量要靠减少停机、平衡工序来提。"
+      - "Back to the start. At 6000, multiply by {{ch08.r65:.2f}}: the maximum resultant becomes about {{ch08.F6000:.0f}} newtons and the needle bar at bottom dead centre about {{ch08.NB6000:.0f}}. The {{ch08.overlap:.1f}}-degree overlap shrinks from {{ch08.t5000:.2f}} to {{ch08.t6000:.2f}} milliseconds, so the timing margins get tighter in time. And 6000 is above the manual's 5500 for the standard type, so it shouldn't be run for long. Keep to 5500 or less: multiply by {{ch08.r55:.2f}}, giving about {{ch08.F5500:.0f}} newtons resultant and {{ch08.NB5500:.0f}} on the needle bar. Raise output by cutting downtime and balancing the line instead."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["各机构挂在一根主轴上：动一个，查全机", "All mechanisms share one shaft: move one, check them all"]
+      - ["设计定相位：刺布 → 钩线 → 挑线 → 送布", "Design order: needle bar → catch → take-up → feed"]
+      - ["惯性力 ∝ 转速²；平衡率 k ≈ 0.45，二阶力消不掉", "Inertia ∝ speed²; k ≈ 0.45; the second order stays"]
+    after: ["作业 8：综合调机报告 · 测验 · 实验 8-1、8-2 —— 在问渠学习平台完成", "Assignment 8: diagnosis report · quiz · Labs 8-1 and 8-2 — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，各机构挂在同一根主轴上，动了一个机构的定时，就要回到全机时序图上检查别的机构。第二，设计时定相位的顺序：刺布、钩线、挑线、送布。第三，惯性力和转速平方成正比；平衡率取 0.45 左右最好，但竖直二阶力平衡块消不掉。作业是综合调机报告，测验和两个实验都在问渠平台上完成。"
+      - "Three things to remember. One: all the mechanisms hang on one main shaft, so whenever you change one timing, go back to the whole-machine timing diagram and check the others. Two: the design order for phases is needle bar, catch, take-up, feed. Three: inertia force goes with speed squared; a balance ratio around 0.45 is best, but the vertical second order can't be removed by the counterweight. The assignment is the machine diagnosis report; the quiz and both labs are on WenQuest."

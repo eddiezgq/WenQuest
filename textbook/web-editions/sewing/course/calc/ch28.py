@@ -106,3 +106,19 @@ for n in (3, 4, 5):
     C, cost = mm(n, 0.25, 0.05, 1.0, 0.5, 0.10)
     print("hw 一人多机 n=", n, "C", C, "每件成本", round(cost, 4))
 print("hw SAM 观测 0.52 评比 90% 宽放 15%", round(0.52 * 0.90 * 1.15, 4))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    o = ops(); ks = {i: math.ceil(o[i]['sam'] / 0.5 - 1e-9) for i in o}; tot = sum(x['sam'] for x in o.values())
+    N1 = sum(ks.values()); C1 = max(o[i]['sam'] / ks[i] for i in o)
+    r120, r150, r100, rimp = report(120), report(150), report(100), report(120, True)
+    c = {n: mm(n) for n in range(1, 7)}; c6 = {n: mm(n, t=0.6) for n in range(1, 7)}
+    best9 = min(c, key=lambda n: c[n][1]); best6 = min(c6, key=lambda n: c6[n][1])
+    out(total=tot, takt=60 / 120, N0=math.ceil(tot / 0.5 - 1e-9), one_N=N1, one_bal=tot / (N1 * C1) * 100,
+        auto_N=r120['N'], auto_bal=r120['bal'], N150=r150['N'], bal150=r150['bal'], N100=r100['N'], bal100=r100['bal'],
+        imp_total=rimp['total'], imp_N=rimp['N'], imp_bal=rimp['bal'],
+        out0=60 / 0.7, bal0=13.2 / (26 * 0.7) * 100, out1=60 / 0.55, bal1=13.2 / (26 * 0.55) * 100, gain=(0.7 / 0.55 - 1) * 100,
+        save=3 * 0.5 * 60 * 8 * 25, payback=200000 / (3 * 0.5 * 60 * 8 * 25),
+        sam=0.48 * 1.10 * 1.14, sam_s=0.48 * 1.10 * 1.14 * 60, basic=0.48 * 1.10,
+        nstar=(0.3 + 0.9) / 0.35, nstar6=(0.3 + 0.6) / 0.35, C3=c[3][0], C4=c[4][0], cost3=c[3][1], cost4=c[4][1],
+        best9=best9, best6=best6, cost6_best=c6[best6][1], idle3=(1 - 3 * 0.35 / 1.2) * 100, midle4=(1 - 1.2 / 1.4) * 100)

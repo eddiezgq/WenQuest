@@ -89,3 +89,18 @@ for m in (0.12, 0.10):
     print("m", m, "F6000", round(m*abs(acc(180,15.5,55,6000))))
 print("m max for 800 N at 6000:", round(800/abs(acc(180,15.5,55,6000))*1000,1))
 print("n max with m=120 g, F<=800:", round(1000*math.sqrt(800/(0.12*ab1))))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    r0, l0, m0 = 15.5, 55, 0.12
+    vm, fv = vmax(r0, l0, 5000)
+    aT, aB = acc(0, r0, l0, 5000), abs(acc(180, r0, l0, 5000))
+    F = {n: m0 * abs(acc(180, r0, l0, n)) for n in (3000, 4000, 5000, 6000)}
+    out(lam=r0 / l0, w=2 * math.pi * 5000 / 60, stroke=2 * r0, vmax=vm, fvmax=fv, aT=aT, aB=aB, gT=aT / 9.81, gB=aB / 9.81,
+        ratioTB=aT / aB, x90=x(90, r0, l0), rise2=rise_angle(r0, l0), d2=math.degrees(d), fin=f, fout=360 - f,
+        c20=rise_angle(15.5, 15.5 / 0.20), c40=rise_angle(15.5, 15.5 / 0.40),
+        a20=abs(acc(180, 15.5, 15.5 / 0.20, 5000)), a40=abs(acc(180, 15.5, 15.5 / 0.40, 5000)),
+        F3000=F[3000], F4000=F[4000], F5000=F[5000], F6000=F[6000], FT=m0 * aT, r56=F[6000] / F[5000],
+        F1=m0 * r0 / 1000 * (2 * math.pi * 5000 / 60) ** 2, F2=m0 * r0 / 1000 * (2 * math.pi * 5000 / 60) ** 2 * lam,
+        mmax=800 / abs(acc(180, r0, l0, 6000)) * 1000, nmax=1000 * math.sqrt(800 / (m0 * ab1)), Flim=800,
+        hz=5000 / 60, mass=m0 * 1000, gmass=aB / 9.81)

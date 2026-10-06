@@ -55,3 +55,14 @@ out["E 推迟 3° 主轴转角 回升"] = rise(206.07 + 3)
 out["机器人 18/15 加速度倍数"] = (18 / 15) ** 2
 for k, v in out.items():
     print(k, ":", v)
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out as book_out
+    book_out(F5000=F5000, NB5000=NB5000, F6000=F5000 * scale(6000), NB6000=NB5000 * scale(6000),
+             F5500=F5000 * scale(5500), NB5500=NB5000 * scale(5500), F4000=F5000 * scale(4000),
+             r65=scale(6000), r55=scale(5500), r45=(5000 / 4000) ** 2,
+             overlap=114.2 - 101.7, t5000=12.5 * ms_per_deg(5000), t6000=12.5 * ms_per_deg(6000),
+             up65=(scale(6000) - 1) * 100, robot=(18 / 15) ** 2,
+             rise_lo=angle_for_rise(1.6), rise_hi=angle_for_rise(2.5),
+             # 教材 8.4 节（虚拟实验 8-1 模型复核）的整机惯性力数值，5000 r/min
+             Fk0=582.0, Fk1=609.0, Ftk=270.0, Hv1=234.0, Hv2=119.0, Hh1=338.0)

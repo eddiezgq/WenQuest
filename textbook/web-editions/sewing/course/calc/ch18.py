@@ -91,3 +91,17 @@ if __name__ == '__main__':
             print(k, {a: round(b, 3) for a, b in v.items()})
         else:
             print(k, v if not isinstance(v, float) else round(v, 4))
+
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    flat = {}
+    for k, v in R.items():
+        if isinstance(v, dict):
+            flat.update({f"{k}_{a}": b for a, b in v.items()})
+        elif isinstance(v, tuple):
+            flat[f"{k}_lo"], flat[f"{k}_hi"] = v
+        elif isinstance(v, (int, float)):
+            flat[k] = v
+    out(**flat, heat_pct=R['case38']['heat_share'] * 100, facc_pct=R['case38']['facc'] * 100, ret0_pct=R['burn0']['ret'] * 100,
+        ret8_pct=R['burn70_8']['ret'] * 100, hot9=thermal(Ipk=9, Irun=9, duty=1, starts=1)['Ths'])

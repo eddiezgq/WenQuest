@@ -1,0 +1,448 @@
+# 第 9 讲 包缝机 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch09.键:格式}} 由课程包程序 course/calc/ch09.py 算出，不手写数字。
+# notes：讲者备注（放映时只给老师看，录课时当讲稿用）。
+lesson: 9
+code: [ch09]
+
+clips:
+  hero:          # 封面：三维包缝机透视，主轴一直转
+    page: model-overlock
+    selector: "#stage"
+    dur: 10
+    steps:
+      - {at: 0, press: "[data-m=xray]", js: "document.getElementById('stage').style.background='radial-gradient(120% 90% at 55% 35%,#2a3d5c 0%,#13213a 60%,#08101d 100%)';var l=document.getElementById('labels');if(l.checked)l.click();var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+  whole:         # 整机：斜视、透视，主轴慢转，看所有机构挂在一根主轴上
+    page: model-overlock
+    selector: "#stage"
+    dur: 10
+    steps:
+      - {at: 0, press: ["[data-m=xray]", "[data-v=iso]"], set: {spd: 30}, js: "var l=document.getElementById('labels');if(l.checked)l.click();var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+  close:         # 成缝区特写：针尖轨迹，很慢地转，三次交接一直循环
+    page: model-overlock
+    selector: "#stage"
+    dur: 12
+    steps:
+      - {at: 0, press: ["[data-m=xray]", "[data-v=close]"], set: {spd: 30}, js: "var c=document.getElementById('paths');if(!c.checked)c.click();var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+  front:         # 正面：上弯针“先竖后横”、下弯针“向左快、向右慢”
+    page: model-overlock
+    selector: "#stage"
+    dur: 12
+    steps:
+      - {at: 0, press: ["[data-m=xray]", "[data-v=front]"], set: {spd: 30}, js: "var c=document.getElementById('paths');if(!c.checked)c.click();var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+  rssr:          # 实验 9-2：下弯针 RSSR 三维动画（自动转动）
+    page: rssr
+    selector: "#cv"
+    dur: 10
+    steps:
+      - {at: 0, press: "[data-p=LL]", js: "var p=document.getElementById('play');if(p.getAttribute('aria-pressed')==='false')p.click()"}
+  feedsweep:     # 实验 9-1：两只送布牙，差动比在 0.8 和 1.6 之间来回（14 秒一个来回）
+    page: difffeed
+    selector: "#cvMech"
+    vh: 1100
+    dur: 14
+    loop: 14
+    steps:
+      - {at: 0, js: "clearInterval(window.__sw);var e=document.getElementById('dr'),t0=Date.now();window.__sw=setInterval(function(){var t=(Date.now()-t0)/1000;e.value=(1.2-0.4*Math.cos(t*2*Math.PI/14)).toFixed(2);e.dispatchEvent(new Event('input',{bubbles:true}));},400)"}
+  edge1:         # 汗布，D = 1.00：布边起波浪
+    page: difffeed
+    selector: "#cvEdge"
+    vh: 1100
+    dur: 10
+    steps:
+      - {at: 0, set: {dr: 1.0}}
+  edge12:        # 汗布，D = 1.20：布边平整
+    page: difffeed
+    selector: "#cvEdge"
+    vh: 1100
+    dur: 10
+    steps:
+      - {at: 0, set: {dr: 1.2}}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 9 讲", "Lecture 9"]
+    title: ["包缝机", "The Overlock Machine"]
+    sub: ["切边、缝合、锁边，一道完成", "Trim, seam and finish the edge in one pass"]
+    notes:
+      - "同学们好。拿一件针织 T 恤翻过来看侧缝，布边上包着一排密密的线圈，这就是包缝线迹，是包缝机缝的。这一讲我们看包缝机：它为什么长这个样子，一针要完成几次交接，弯针靠什么机构摆动，还有针织布为什么要两只送布牙。"
+      - "Hello everyone. Turn a knitted T-shirt inside out and look at the side seam: the edge is wrapped in a dense row of thread loops. That's an overlock stitch, made by an overlock machine. Today: why the machine looks the way it does, how many hand-overs one stitch needs, what mechanism swings the loopers, and why knit fabric needs two feed dogs."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["汗布 T 恤侧缝起波浪", "Wavy side seams on jersey T-shirts"]
+    facts:
+      - ["504 三线包缝合侧缝，差动比一直放在 1.0", "504 three-thread overlock, differential ratio left at 1.0"]
+      - ["侧缝布边鼓成波浪，波长约 30 mm", "The seam edge bulges into waves, about 30 mm long"]
+      - ["试缝：布边被拉长约 18%，牙多走的只有 0.85 传给布", "Test: the edge stretches about 18%; only 0.85 of extra travel reaches the fabric"]
+    notes:
+      - "车间问题：一家针织厂用高速三线包缝机合汗布 T 恤侧缝，差动比一直放在 1.0。质检发现侧缝布边鼓成波浪，波长约 30 毫米。试缝测得，差动比为 1 时布边被拉长约 18%，送布牙多走的距离只有约 0.85 能传给布。下周还要缝罗纹领口，罗纹拉长约 30%，传递比例约 0.80。波浪有多高？差动比该调到多少？"
+      - "The shop-floor problem. A knitwear factory joins jersey T-shirt side seams on a high-speed three-thread overlocker, with the differential ratio left at 1.0. Inspection finds the seam edge bulging into waves about 30 millimetres long. Test sewing shows the edge stretches about 18 percent at a ratio of 1, and only about 0.85 of the extra dog travel reaches the fabric. Next week they'll sew rib necklines: rib stretches about 30 percent, with a fraction of about 0.80. How high are the waves, and what ratio should each fabric use?"
+
+  - layout: section
+    num: "01"
+    title: ["为针织而生的机器", "A machine made for knits"]
+
+  - layout: split
+    title: ["需求决定结构", "The needs decide the structure"]
+    points:
+      - ["弹性：汗布可拉长 30% 以上，锁式线迹不能", "Elastic: jersey stretches 30%+; a lockstitch can't"]
+      - ["锁边：切齐、缝合、锁边一道完成", "Edge finishing: trim, seam and overcast in one pass"]
+      - ["连续高速：大线筒供线，主轴可达 7000 r/min", "Continuous and fast: cone-fed, up to 7000 r/min"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <defs><marker id="n9a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs>
+          <text x="170" y="36" font-size="24" fill="#8fa3ba" text-anchor="middle">需求 · need</text><text x="680" y="36" font-size="24" fill="#8fa3ba" text-anchor="middle">结构 · structure</text>
+          <g font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">
+            <rect x="0" y="60" width="340" height="110" rx="20" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="170" y="112">要切边</text>
+            <rect x="0" y="200" width="340" height="110" rx="20" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="170" y="252">要包住布边</text>
+            <rect x="0" y="340" width="340" height="110" rx="20" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="170" y="392">要有弹性</text>
+            <rect x="0" y="480" width="340" height="110" rx="20" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="170" y="532">针织易拉长</text>
+            <rect x="460" y="60" width="440" height="110" rx="20" fill="rgba(46,196,182,.12)" stroke="#2ec4b6" stroke-width="3"/><text x="680" y="112">上刀 + 下刀</text>
+            <rect x="460" y="200" width="440" height="110" rx="20" fill="rgba(46,196,182,.12)" stroke="#2ec4b6" stroke-width="3"/><text x="680" y="252">上弯针绕过布边</text>
+            <rect x="460" y="340" width="440" height="110" rx="20" fill="rgba(46,196,182,.12)" stroke="#2ec4b6" stroke-width="3"/><text x="680" y="392">弯针成圈，不用旋梭</text>
+            <rect x="460" y="480" width="440" height="110" rx="20" fill="rgba(46,196,182,.12)" stroke="#2ec4b6" stroke-width="3"/><text x="680" y="532">差动送布</text></g>
+          <g font-size="20" fill="#8fa3ba" text-anchor="middle" class="en"><text x="170" y="146" class="en">trim the edge</text><text x="170" y="286" class="en">wrap the edge</text><text x="170" y="426" class="en">stretch</text><text x="170" y="566" class="en">knits stretch</text>
+            <text x="680" y="146" class="en">upper and lower knives</text><text x="680" y="286" class="en">upper looper</text><text x="680" y="426" class="en">loopers, no rotary hook</text><text x="680" y="566" class="en">differential feed</text></g>
+          <g stroke="#f2b705" stroke-width="5" marker-end="url(#n9a)"><path d="M350 115 L450 115"/><path d="M350 255 L450 255"/><path d="M350 395 L450 395"/><path d="M350 535 L450 535"/></g>
+        </svg>
+    notes:
+      - "T 恤侧缝为什么不用平缝？三个原因。第一是弹性，汗布能拉长 30% 以上，锁式线迹几乎不能伸长，一拉就断。第二是锁边，针织物一剪开就卷边、脱散，包缝机一道工序完成切齐、缝合、锁边。第三是连续高速，线从大线筒直接供给，没有梭芯，主轴能到每分钟 7000 转。这几条需求，决定了包缝机的全部结构。"
+      - "Why not sew a T-shirt side seam with a lockstitch? Three reasons. Elasticity: jersey stretches more than 30 percent, while a lockstitch barely stretches and would snap. Edge finishing: a knit edge curls and runs once it's cut, and the overlocker trims, seams and overcasts in one pass. Speed and continuity: thread comes straight from big cones, there's no bobbin, and the shaft reaches 7000 r/min. These needs decide the whole structure of the machine."
+
+  - layout: split
+    title: ["整机：一根主轴带动一切", "The whole machine: one shaft drives everything"]
+    points:
+      - ["机头短，机针向操作者一侧斜 20°", "A short head; the needle leans 20° towards the operator"]
+      - ["偏心经球头连杆驱动两根弯针", "Eccentrics drive both loopers through ball-joint links"]
+      - ["没有上轴、下轴、同步带：紧凑、转速高", "No upper and lower shafts or belt: compact and fast"]
+    visual: {video: whole}
+    notes:
+      - "把外壳变成透明，可以看到所有机构都挂在一根主轴上。主轴左右贯穿底座，右端是手轮。主轴上的几个偏心，一个经球头连杆推动下弯针摆轴，一个推动上弯针摇杆，送布和切刀也由偏心驱动，针杆由机头里的曲柄带动。和平缝机比，没有上轴、下轴、同步带那套分工，所以结构紧凑，转速能很高。"
+      - "Make the housing transparent and you see that every mechanism hangs on one main shaft. It runs left to right through the base, with the handwheel at the right. One eccentric pushes the lower-looper shaft through a ball-joint link, another the upper-looper rocker; feed and knife are driven by eccentrics too, and the needle bar by a crank in the head. There's no upper shaft, lower shaft and timing belt as on a lockstitch machine, so it's compact and can run very fast."
+
+  - layout: split
+    title: ["504 三线包缝：三根线各管一段", "Stitch 504: three threads, three jobs"]
+    points:
+      - ["针线管穿透布料", "The needle thread goes through the fabric"]
+      - ["下弯针线管布底到布边，上弯针线管布边到布面", "Lower looper: back to edge; upper looper: edge to face"]
+      - ["没有死结，线能在套结处滑动：有弹性", "No tight knot; threads slide at the loops: elastic"]
+    visual: {svg: '<svg viewBox="0 0 900 640" width="100%" height="640"><rect x="130" y="50" width="770" height="240" fill="#e9dcc0"/><rect x="130" y="290" width="770" height="60" fill="#b9a57e"/><rect x="130" y="350" width="770" height="230" fill="#d9caa6"/><text x="0" y="175" font-size="30" font-weight="700" fill="#f3f6fa">布面</text><text x="0" y="203" font-size="20" fill="#8fa3ba" class="en">face</text><text x="0" y="326" font-size="30" font-weight="700" fill="#f3f6fa">布边</text><text x="0" y="354" font-size="20" fill="#8fa3ba" class="en">edge</text><text x="0" y="470" font-size="30" font-weight="700" fill="#f3f6fa">布底</text><text x="0" y="498" font-size="20" fill="#8fa3ba" class="en">back</text><path d="M180 90 L250 318 L320 90" fill="none" stroke="#1f9d55" stroke-width="7" stroke-linejoin="round"/><path d="M180 545 L250 322 L320 545" fill="none" stroke="#e0662f" stroke-width="7" stroke-linejoin="round"/><path d="M320 90 L390 318 L460 90" fill="none" stroke="#1f9d55" stroke-width="7" stroke-linejoin="round"/><path d="M320 545 L390 322 L460 545" fill="none" stroke="#e0662f" stroke-width="7" stroke-linejoin="round"/><path d="M460 90 L530 318 L600 90" fill="none" stroke="#1f9d55" stroke-width="7" stroke-linejoin="round"/><path d="M460 545 L530 322 L600 545" fill="none" stroke="#e0662f" stroke-width="7" stroke-linejoin="round"/><path d="M600 90 L670 318 L740 90" fill="none" stroke="#1f9d55" stroke-width="7" stroke-linejoin="round"/><path d="M600 545 L670 322 L740 545" fill="none" stroke="#e0662f" stroke-width="7" stroke-linejoin="round"/><path d="M740 90 L810 318 L880 90" fill="none" stroke="#1f9d55" stroke-width="7" stroke-linejoin="round"/><path d="M740 545 L810 322 L880 545" fill="none" stroke="#e0662f" stroke-width="7" stroke-linejoin="round"/><path d="M180 90 L320 90" stroke="#2c6fd6" stroke-width="8" stroke-linecap="round"/><path d="M320 90 L460 90" stroke="#2c6fd6" stroke-width="8" stroke-linecap="round"/><path d="M460 90 L600 90" stroke="#2c6fd6" stroke-width="8" stroke-linecap="round"/><path d="M600 90 L740 90" stroke="#2c6fd6" stroke-width="8" stroke-linecap="round"/><path d="M740 90 L880 90" stroke="#2c6fd6" stroke-width="8" stroke-linecap="round"/><ellipse cx="180" cy="545" rx="16" ry="11" fill="none" stroke="#2c6fd6" stroke-width="6"/><circle cx="180" cy="90" r="7" fill="#08101d"/><ellipse cx="320" cy="545" rx="16" ry="11" fill="none" stroke="#2c6fd6" stroke-width="6"/><circle cx="320" cy="90" r="7" fill="#08101d"/><ellipse cx="460" cy="545" rx="16" ry="11" fill="none" stroke="#2c6fd6" stroke-width="6"/><circle cx="460" cy="90" r="7" fill="#08101d"/><ellipse cx="600" cy="545" rx="16" ry="11" fill="none" stroke="#2c6fd6" stroke-width="6"/><circle cx="600" cy="90" r="7" fill="#08101d"/><ellipse cx="740" cy="545" rx="16" ry="11" fill="none" stroke="#2c6fd6" stroke-width="6"/><circle cx="740" cy="90" r="7" fill="#08101d"/><ellipse cx="880" cy="545" rx="16" ry="11" fill="none" stroke="#2c6fd6" stroke-width="6"/><circle cx="880" cy="90" r="7" fill="#08101d"/><rect x="0" y="604" width="34" height="12" rx="4" fill="#2c6fd6"/><text x="44" y="618" font-size="24" fill="#d3deea">针线 <tspan class="en" font-size="18" fill="#8fa3ba">needle</tspan></text><rect x="300" y="604" width="34" height="12" rx="4" fill="#e0662f"/><text x="344" y="618" font-size="24" fill="#d3deea">下弯针线 <tspan class="en" font-size="18" fill="#8fa3ba">lower looper</tspan></text><rect x="600" y="604" width="34" height="12" rx="4" fill="#1f9d55"/><text x="644" y="618" font-size="24" fill="#d3deea">上弯针线 <tspan class="en" font-size="18" fill="#8fa3ba">upper looper</tspan></text></svg>'}
+    notes:
+      - "图里把布边展开来画：上面是布面，中间是布边，下面是翻过来的布底。针线每针穿过布料；下弯针线从布底的针线圈里穿过，斜着走到布边；上弯针线在布边和下弯针线套住，再斜着回到布面，被下一针压住。三根线各管一段，没有死结，受拉时线能在套结处滑动，所以有弹性。514 多一根针，更牢；516 是 401 链缝加 504。"
+      - "Here the edge is drawn unfolded: the face on top, the edge in the middle, the back below. The needle thread goes through the fabric every stitch. The lower-looper thread passes through the needle loop on the back and runs to the edge. There it interlocks with the upper-looper thread, which runs back across the face and is held by the next needle stitch. Three threads, three jobs, no tight knot; under tension the threads slide at the loops, so the seam stretches. 514 adds a second needle and is stronger; 516 is a 401 chainstitch plus a 504."
+
+  - layout: section
+    num: "02"
+    title: ["一针三次“穿线环”", "Three loop entries in one stitch"]
+
+  - layout: bignum
+    title: ["三次交接：时刻要对，间隙要小", "Three hand-overs: right moment, tiny clearance"]
+    nums:
+      - {n: "213.6°", n_en: "gap 0.05 mm", label: ["下弯针尖钻进针线环", "Lower looper enters the needle loop"]}
+      - {n: "270.8°", n_en: "gap 0.10 mm", label: ["上弯针穿过下弯针线三角", "Upper looper through the lower-looper triangle"]}
+      - {n: "57.5°", n_en: "gap 0.10 mm", label: ["机针穿入上弯针线三角", "Needle through the upper-looper triangle"]}
+    foot: ["都是一个“尖”去穿一根线和它的载体之间张开的三角", "Each time a point passes through the triangle between a thread and its carrier"]
+    notes:
+      - "平缝机一针只有一次关键交接，包缝机一针要三次。第一次，213.6 度，针回升 2.6 毫米，下弯针尖从针后擦过，钻进针线环，间隙 0.05 毫米。第二次，270.8 度，上弯针从下弯针刀身和它的线之间穿过，间隙 0.10。第三次，57.5 度，机针从上弯针刀身和上弯针线之间穿过。共同点：一个尖穿一个三角，时刻要对，间隙要小。"
+      - "A lockstitch needs one critical hand-over per stitch; an overlock stitch needs three. First, at 213.6 degrees, with the needle 2.6 millimetres up, the lower-looper point slips behind the needle into the needle loop, with 0.05 millimetres clearance. Second, at 270.8, the upper looper passes between the lower looper's blade and its thread, 0.10 clearance. Third, at 57.5, the needle passes between the upper looper's blade and its thread. Each time, a point goes through a triangle: the timing must be right and the clearance tiny."
+
+  - layout: split
+    title: ["成缝区特写：看三次交接", "Close-up of the stitch zone"]
+    points:
+      - ["针线环、两个线三角，都只张开很短时间", "The loop and both triangles open only briefly"]
+      - ["早了还没张开，晚了已经收拢", "Too early, not yet open; too late, already closed"]
+      - ["间隙大了漏线环跳针，小了刮伤机针", "Too wide: skipped stitches; too tight: a damaged needle"]
+    visual: {video: close}
+    notes:
+      - "这是模型 9-1 的成缝区特写，主轴慢慢转，蓝线是针尖轨迹。注意看下弯针从右向左摆过来，从针后擦过；上弯针从下面竖直升上来，再翻过布边伸到针的左上方。线环和线三角都只张开很短的时间，早了还没张开，晚了已经收拢；间隙大了，尖从线外滑过去跳针，小了会刮伤甚至打断机针。"
+      - "This is the stitch-zone close-up of Model 9-1, with the shaft turning slowly and the needle-point path traced. Watch the lower looper swing from right to left, brushing past behind the needle; the upper looper rises straight up, then reaches over the edge to the upper left of the needle. The loop and the triangles are open only briefly: too early and they're not open yet, too late and they've closed. Too much clearance and the point misses the thread, a skipped stitch; too little and it scrapes or even breaks the needle."
+
+  - layout: section
+    num: "03"
+    title: ["斜针与下弯针的空间四杆", "The slanted needle and the looper's spatial four-bar"]
+
+  - layout: split
+    title: ["机针为什么斜 20°", "Why the needle leans 20°"]
+    points:
+      - ["下弯针摆轴与针平行：间隙处处相同", "Looper shaft parallel to the needle: equal clearance everywhere"]
+      - ["布厚 1.5 mm：{{ch09.enter:.1f}}° 入布，{{ch09.leave:.1f}}° 出布", "1.5 mm fabric: in at {{ch09.enter:.1f}}°, out at {{ch09.leave:.1f}}°"]
+      - ["布中 {{ch09.infab:.0f}}°，剩下 {{ch09.outfab:.0f}}° 用来送布", "{{ch09.infab:.0f}}° in the fabric, {{ch09.outfab:.0f}}° left for feeding"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="40" y="420" width="820" height="26" rx="6" fill="#2a3a55"/><text x="50" y="480" font-size="22" fill="#8fa3ba">针板 · throat plate</text>
+          <path d="M300 60 L300 420" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="10 8"/>
+          <path d="M300 60 L431 420" stroke="#c8d2de" stroke-width="16" stroke-linecap="round"/>
+          <path d="M430 418 L441 448" stroke="#c8d2de" stroke-width="8" stroke-linecap="round"/>
+          <path d="M300 160 A100 100 0 0 0 334 154" fill="none" stroke="#f2b705" stroke-width="5"/>
+          <text x="250" y="210" font-size="34" font-weight="800" fill="#f2b705" class="en">20°</text>
+          <text x="200" y="44" font-size="28" font-weight="700" fill="#f3f6fa">机针 <tspan class="en" font-size="20" fill="#8fa3ba">needle</tspan></text>
+          <path d="M660 90 L800 475" stroke="#2ec4b6" stroke-width="7" stroke-dasharray="18 10"/>
+          <text x="560" y="60" font-size="28" font-weight="700" fill="#5ee0d2">下弯针摆轴 <tspan class="en" font-size="20" fill="#8fa3ba">looper shaft</tspan></text>
+          <text x="480" y="290" font-size="30" font-weight="800" fill="#5ee0d2">∥ 平行</text>
+          <text x="480" y="324" font-size="22" fill="#8fa3ba" class="en">parallel</text>
+          <g font-size="24" fill="#d3deea"><text x="420" y="510">针尖：针板上 9.5 mm</text><text x="420" y="544">　　　针板下 13.5 mm</text></g>
+          <text x="40" y="610" font-size="24" fill="#ffb38f">弯针尖在与针垂直的平面里走圆弧：间隙 0.05 mm 保得住</text>
+        </svg>
+    notes:
+      - "为什么把针放斜？最直接的原因在下弯针。下弯针要从针后擦过，而且在针回升那一小段时间里一直贴着针。如果它绕一根和机针平行的轴摆动，弯针尖就在和针垂直的平面里走圆弧，针升到哪里，距离都不变，0.05 毫米的间隙就容易保证。针斜了，摆轴也跟着斜。布厚 1.5 毫米时，针在 {{ch09.enter:.1f}} 度入布、{{ch09.leave:.1f}} 度出布，剩下 {{ch09.outfab:.0f}} 度送布。"
+      - "Why slant the needle? The main reason is the lower looper. It must brush past behind the needle and stay close to it while the needle rises. If it swings about an axis parallel to the needle, its point moves on an arc in a plane perpendicular to the needle, so the distance stays the same wherever the needle is, and a 0.05-millimetre clearance is easy to hold. Slant the needle and the shaft slants with it. With 1.5 millimetres of fabric, the needle enters at {{ch09.enter:.1f}} degrees and leaves at {{ch09.leave:.1f}}, leaving {{ch09.outfab:.0f}} degrees for feeding."
+
+  - layout: split
+    title: ["下弯针：一个空间四杆机构", "The lower looper: a spatial four-bar"]
+    points:
+      - ["主轴左右向，摆轴斜 20°：不平行也不相交", "Shaft left–right, swing axis at 20°: neither parallel nor meeting"]
+      - ["曲柄 4.36 · 球头连杆 22.48 · 摆杆 22 mm", "Crank 4.36 · ball-joint link 22.48 · rocker 22 mm"]
+      - ["转动副—球铰—球铰—转动副：RSSR", "Revolute–spherical–spherical–revolute: RSSR"]
+    visual: {video: rssr}
+    notes:
+      - "下弯针的摆轴和针平行，斜 20 度；主轴是左右方向。两根轴既不平行也不相交，平面四杆机构用不上，只好用空间四杆。曲柄绕主轴转，半径 4.36 毫米；两端是球头的连杆长 22.48；摆杆长 22，绕摆轴摆动。两个转动副、两个球铰，所以叫 RSSR。右边是虚拟实验 9-2 的三维动画。"
+      - "The lower-looper shaft is parallel to the needle, at 20 degrees, while the main shaft runs left to right. The two axes neither intersect nor are parallel, so a planar four-bar won't do; it has to be a spatial four-bar. The crank turns with the main shaft, radius 4.36 millimetres; the link with a ball joint at each end is 22.48 long; the rocker, 22 long, swings about the looper shaft. Two revolute joints and two spherical joints: RSSR. On the right is the 3D animation from Virtual Lab 9-2."
+
+  - layout: split
+    title: ["摆角怎样算：连杆长度不变", "Finding the swing: the link length is constant"]
+    points:
+      - ["只用一条约束：|A − B| = b", "One constraint only: |A − B| = b"]
+      - ["正负号对应两种装配方式", "The ± sign gives the two assembly modes"]
+      - ["粗估 2r/c = {{ch09.rough:.1f}}°，精确 {{ch09.swing:.1f}}°", "Rough 2r/c = {{ch09.rough:.1f}}°, exact {{ch09.swing:.1f}}°"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="0" y="20" width="900" height="600" rx="26" fill="#0f1a2d" stroke="#22324d" stroke-width="2"/>
+          <g font-family="DejaVu Serif, serif" font-style="italic" fill="#f3f6fa" class="en">
+            <text x="50" y="120" font-size="46" class="en">|A − B| = b</text>
+            <text x="50" y="260" font-size="46" class="en">P cos θ + K sin θ = M</text>
+            <text x="50" y="400" font-size="38" class="en">θ = atan2(K, P) ± arccos(M/ρ)</text>
+            <text x="50" y="540" font-size="46" class="en" fill="#f2b705">|M| ≤ ρ = √(P² + K²)</text></g>
+          <g font-size="24" fill="#8fa3ba"><text x="60" y="165">连杆长度不变 · the link is rigid</text><text x="60" y="305">一次三角方程 · one trigonometric equation</text>
+            <text x="60" y="445">两个解 = 两种装配 · two assembly modes</text><text x="60" y="585" fill="#ffb38f">否则装不上：卡死 · otherwise it jams</text></g>
+        </svg>
+    notes:
+      - "摆角的分析全靠一条约束：连杆长度不变，A 到 B 的距离等于 b。把 B 写成摆轴中心加 c 乘摆杆方向，代进去，就得到一个一次三角方程，P cos θ 加 K sin θ 等于 M。解出 θ，有正负两个解，对应两种装配方式。条件是 M 的绝对值不超过根号 P 方加 K 方，否则连杆够不着，机构卡死。粗估摆角 2r 比 c 只有 {{ch09.rough:.1f}} 度，精确是 {{ch09.swing:.1f}} 度。"
+      - "The whole analysis rests on one constraint: the link length is constant, so the distance from A to B equals b. Write B as the rocker pivot plus c times the rocker direction, substitute, and you get one trigonometric equation: P cos theta plus K sin theta equals M. It has two solutions, plus and minus, for the two ways of assembling the mechanism. It only has a solution when the absolute value of M is at most the square root of P squared plus K squared; otherwise the link can't reach and the mechanism jams. The rough estimate 2r over c gives {{ch09.rough:.1f}} degrees; the exact swing is {{ch09.swing:.1f}}."
+
+  - layout: bignum
+    title: ["7000 r/min 时的下弯针", "The lower looper at 7000 r/min"]
+    nums:
+      - {n: "{{ch09.wmax:.0f}}", n_en: "rad/s", label: ["最大角速度：尖速约 {{ch09.tip:.1f}} m/s", "Peak angular speed: tip about {{ch09.tip:.1f}} m/s"]}
+      - {n: "{{ch09.gmin:.1f}}°", n_en: "min. transmission angle", label: ["最小传动角，经验下限 40°", "Minimum transmission angle; rule of thumb ≥ 40°"]}
+      - {n: "{{ch09.rcrit:.1f}}", n_en: "mm", label: ["曲柄半径超过它就卡死", "Crank radius beyond which it jams"]}
+    foot: ["dθ/dt = d·Ȧ / (d·t)：分母 d·t → 0 就是死点，速度和受力暴涨", "dθ/dt = d·Ȧ / (d·t): when d·t → 0 it's a dead point, speed and load blow up"]
+    notes:
+      - "速度怎么求？刚性连杆两端的速度在连杆方向上的分量相等，得到角速度等于 d 点乘 A 点的速度，除以 d 点乘 t。分母趋于零就是死点，速度和受力暴涨。传动角量的就是离死点有多远。算例机 7000 转时，摆杆角速度最大约 {{ch09.wmax:.0f}} 弧度每秒，弯针尖约 {{ch09.tip:.1f}} 米每秒；最小传动角 {{ch09.gmin:.1f}} 度，高于经验下限 40 度。曲柄半径超过约 {{ch09.rcrit:.1f}} 毫米，机构就装不上了。"
+      - "How do we get the speed? The two ends of a rigid link have equal velocity components along the link. That gives theta-dot as d dot A-dot over d dot t. When the denominator goes to zero, it's a dead point and speed and load blow up; the transmission angle measures how far we are from it. At 7000 r/min the rocker peaks at about {{ch09.wmax:.0f}} radians per second, the looper tip at about {{ch09.tip:.1f}} metres per second, and the minimum transmission angle is {{ch09.gmin:.1f}} degrees, above the usual 40-degree limit. Beyond a crank radius of about {{ch09.rcrit:.1f}} millimetres, the mechanism can no longer be assembled."
+
+  - layout: lab
+    title: ["动手试一试：空间四杆机构 RSSR", "Try it: the RSSR spatial four-bar"]
+    shot: {page: rssr}
+    tasks:
+      - ["只改曲柄半径，让摆角到 30°，和粗估比", "Change only the crank radius to reach a 30° swing; compare with the estimate"]
+      - ["移动摆杆位置，让最小传动角 ≥ 60°", "Move the rocker to raise the minimum transmission angle to 60°"]
+      - ["逐步加大 r，直到状态栏显示“卡死”", "Increase r until the status bar says it jams"]
+    notes:
+      - "这个实验在问渠平台上自己做。选“下弯针”预设，先拖着三维视图看清曲柄、球头连杆和摆杆。第一，只改曲柄半径，让摆角到 30 度，再和粗估式 2r 比 c 算出的半径比较。第二，调摆杆沿轴的位置，保持摆角，让最小传动角不小于 60 度。第三，逐步加大 r，直到装不上，记下临界半径。"
+      - "Do this lab on WenQuest. Pick the lower-looper preset and rotate the 3D view to see the crank, the ball-joint link and the rocker. One: change only the crank radius until the swing is 30 degrees, and compare the radius with the 2r over c estimate. Two: move the rocker along its axis, keeping the swing, until the minimum transmission angle is at least 60 degrees. Three: keep increasing r until the mechanism can't be assembled, and note the critical radius."
+
+  - layout: section
+    num: "04"
+    title: ["上弯针、切刀与时序", "The upper looper, the knives and the timing"]
+
+  - layout: split
+    title: ["上弯针：绕过布边的那一钩", "The upper looper: a hook round the edge"]
+    points:
+      - ["路径先竖后横：布边右侧上升，再向左平伸", "Up first, then across: rise beside the edge, then reach left"]
+      - ["摆动导杆：导杆在导套里滑动兼摆动", "Oscillating guide bar: slides and swings in its guide"]
+      - ["22° 到左上极限，距针 4.3 mm", "At 22° it reaches top left, 4.3 mm from the needle"]
+    visual: {video: front}
+    notes:
+      - "上弯针要绕过布边而不碰布，路径必须先竖后横：在布边右侧竖直上升，高过布面后向左平伸。算例机用摆动导杆：摇杆带着导杆一端摆动，导杆在一个会摆的导套里滑动。导套到摆杆铰点的距离由 44 毫米缩到 21 毫米，轨迹就由竖变横。22 度时到左上极限，离针 4.3 毫米，调机标准是 4 到 4.5。右边是模型的正面视角。"
+      - "The upper looper has to wrap round the edge without touching the fabric, so its path must go up first and then across: rising beside the edge, then reaching left above the fabric. The example machine uses an oscillating guide bar: a rocker swings one end of the bar, and the bar slides through a guide that itself pivots. As the distance from the guide to the pivot shrinks from 44 to 21 millimetres, the path turns from vertical to horizontal. At 22 degrees it reaches its top-left limit, 4.3 millimetres from the needle; the setting standard is 4 to 4.5. On the right, the model seen from the front."
+
+  - layout: split
+    title: ["两根弯针不能撞：靠不对称", "Keeping the loopers apart: asymmetry"]
+    points:
+      - ["162.5° 两根弯针最近：两尖相距 1.4 mm", "At 162.5° the loopers are closest: 1.4 mm apart"]
+      - ["下弯针向左快、向右慢：余量 0.7 → 1.4 mm", "Lower looper fast left, slow right: margin 0.7 → 1.4 mm"]
+      - ["代价是传动角", "The price is transmission angle"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="0" y="60" font-size="26" fill="#8fa3ba">下弯针一转的分配 · one turn of the lower looper</text>
+          <rect x="0" y="100" width="421" height="110" rx="16" fill="#4c8dff"/>
+          <rect x="429" y="100" width="471" height="110" rx="16" fill="#2ec4b6"/>
+          <text x="210" y="168" font-size="38" font-weight="800" fill="#08101d" text-anchor="middle">向左 168.5°</text>
+          <text x="664" y="168" font-size="38" font-weight="800" fill="#08101d" text-anchor="middle">向右 191.5°</text>
+          <text x="210" y="250" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">to the left: faster</text>
+          <text x="664" y="250" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">to the right: slower</text>
+          <text x="0" y="350" font-size="26" fill="#8fa3ba">162.5° 两尖距离 · closest gap</text>
+          <rect x="0" y="380" width="260" height="70" rx="12" fill="#ff7a45"/><text x="280" y="428" font-size="34" font-weight="800" fill="#ffb38f">0.7 mm <tspan font-size="22" font-weight="400" fill="#8fa3ba">对称摆动 · symmetric</tspan></text>
+          <rect x="0" y="480" width="520" height="70" rx="12" fill="#2ec4b6"/><text x="540" y="528" font-size="34" font-weight="800" fill="#5ee0d2">1.4 mm</text>
+          <text x="0" y="600" font-size="24" fill="#d3deea">不对称 → 时间余量；摆杆上移可换回传动角</text>
+        </svg>
+    notes:
+      - "两根弯针在 162.5 度最靠近，两尖相距 1.4 毫米。这 1.4 毫米是怎么来的？下弯针不是左右对称地摆，向左用 168.5 度，向右用 191.5 度，向左快、向右慢，让出了上弯针穿过的时间。如果对称摆动，各 180 度，余量只剩 0.7 毫米。代价是传动角：把摆杆上移 5 毫米，行程更对称，最小传动角提到 64 度。这是典型的设计取舍。"
+      - "The two loopers come closest at 162.5 degrees, 1.4 millimetres apart. Where does that come from? The lower looper doesn't swing symmetrically: it takes 168.5 degrees going left and 191.5 coming back, fast left and slow right, which makes time for the upper looper to pass. With a symmetric swing, 180 each way, the gap would be only 0.7 millimetres. The price is transmission angle: move the rocker up 5 millimetres and the strokes become more even and the minimum angle rises to 64 degrees. A classic design trade-off."
+
+  - layout: split
+    title: ["切边：布静止时切", "Trimming: cut while the fabric stands still"]
+    points:
+      - ["下刀固定：内侧边即切边线，距针 4 mm", "Fixed lower knife: its edge is the cut line, 4 mm from the needle"]
+      - ["上刀 180° 最低，正是送布停下的时候", "Upper knife lowest at 180°, while the feed is at rest"]
+      - ["两刀贴紧、重叠 0.5–1 mm；磨钝先换上刀", "Knives in contact, 0.5–1 mm overlap; replace the upper first"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="40" y="330" width="440" height="26" rx="4" fill="#e9dcc0"/>
+          <rect x="480" y="330" width="230" height="26" rx="4" fill="#e9dcc0" opacity=".45"/>
+          <text x="740" y="420" font-size="22" fill="#8fa3ba">切下的布条</text><text x="740" y="448" font-size="18" fill="#8fa3ba" class="en">trimmed strip</text>
+          <path d="M300 120 L300 480" stroke="#c8d2de" stroke-width="10"/><text x="300" y="100" font-size="26" fill="#f3f6fa" text-anchor="middle">机针</text>
+          <rect x="480" y="356" width="120" height="200" rx="8" fill="#8fa3ba"/>
+          <text x="540" y="600" font-size="26" font-weight="700" fill="#d3deea" text-anchor="middle">下刀（固定）</text>
+          <path d="M480 180 L600 160 L600 336 L480 352 Z" fill="#f2b705"/>
+          <text x="620" y="200" font-size="26" font-weight="700" fill="#f2b705">上刀 · 行程 6 mm</text>
+          <path d="M640 230 L640 300 M628 288 L640 304 L652 288" stroke="#f2b705" stroke-width="5" fill="none"/>
+          <path d="M300 420 L480 420" stroke="#ff7a45" stroke-width="4"/><path d="M300 405 L300 435 M480 405 L480 435" stroke="#ff7a45" stroke-width="4"/>
+          <text x="390" y="465" font-size="30" font-weight="800" fill="#ff9c75" text-anchor="middle">4 mm</text>
+          <text x="40" y="560" font-size="24" fill="#8fa3ba">线迹宽度 = 切边线到针</text>
+          <text x="40" y="590" font-size="20" fill="#8fa3ba" class="en">stitch width = knife edge to needle</text>
+        </svg>
+    notes:
+      - "切边机构由上下两把刀组成。下刀固定，它的内侧边就是切边线，离针 4 毫米，正好是线迹宽度。上刀上下运动，行程 6 毫米，最低时越过下刀 0.8 毫米。三个要素：切的时候布要静止，上刀 180 度最低，正好在送布停下的时候；两刀之间没有间隙，靠弹簧贴紧；重叠 0.5 到 1 毫米。下刀用硬质合金或高速钢，磨钝了先换上刀。"
+      - "The trimmer has two knives. The lower knife is fixed; its inner edge is the cut line, 4 millimetres from the needle, which is exactly the stitch width. The upper knife moves up and down with a 6-millimetre stroke, passing 0.8 millimetres below the lower knife's edge at the bottom. Three essentials: the fabric must be still while cutting, and the upper knife is lowest at 180 degrees, just when the feed stops; no gap between the knives, held together by a spring; and an overlap of 0.5 to 1 millimetre. The lower knife is carbide or high-speed steel; when they go dull, replace the upper knife first."
+
+  - layout: section
+    num: "05"
+    title: ["差动送布：让布边不起波浪", "Differential feed: keeping the edge flat"]
+
+  - layout: figure
+    title: ["两只送布牙，各走各的", "Two feed dogs, each with its own stroke"]
+    h: 520
+    visual: {video: feedsweep}
+    caption: ["差动比 D = s_d / s 在 0.8 和 1.6 之间来回", "The differential ratio D = s_d / s sweeps between 0.8 and 1.6"]
+    notes:
+      - "包缝机在针的前后各放一只送布牙。针后面的主送布牙每针送一个针距 s，针前面的差动牙送 s_d，两者之比叫差动比 D。D 大于 1，差动牙多送，把两牙之间的布推挤紧一点，抵消针织布被拉长；D 小于 1，少送，把薄滑的梭织布轻轻拉开。现在 D 在 0.8 和 1.6 之间来回，看两只牙的行程怎样变。"
+      - "An overlocker has one feed dog behind the needle and one in front. The main dog behind the needle feeds one stitch length s each stitch; the differential dog in front feeds s_d. Their ratio is the differential ratio D. With D greater than 1, the front dog feeds more and crowds the fabric between the dogs, cancelling the stretch of a knit. With D less than 1 it feeds less and gently pulls a slippery woven apart. Here D sweeps between 0.8 and 1.6; watch how the two strokes change."
+
+  - layout: split
+    title: ["布边为什么起波浪", "Why the edge goes wavy"]
+    points:
+      - ["布被拉长时缝上，松手布缩、线不缩", "Sewn while stretched: the fabric shrinks back, the thread doesn't"]
+      - ["平整差动比 D* = 1 + ε₀ / η", "Flat-edge ratio D* = 1 + ε₀ / η"]
+      - ["波浪高 A ≈ λ√ε / π", "Wave height A ≈ λ√ε / π"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <path d="M40 200 C 115 80, 190 80, 265 200 S 415 320, 490 200 S 640 80, 715 200 S 865 320, 865 260" fill="none" stroke="#ff7a45" stroke-width="8"/>
+          <path d="M40 200 L865 200" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="10 8"/>
+          <path d="M265 380 L715 380" stroke="#f2b705" stroke-width="4"/><path d="M265 365 L265 395 M715 365 L715 395" stroke="#f2b705" stroke-width="4"/>
+          <text x="490" y="430" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle">λ 波长 · wavelength</text>
+          <path d="M150 110 L150 200" stroke="#2ec4b6" stroke-width="4"/><path d="M135 110 L165 110 M135 200 L165 200" stroke="#2ec4b6" stroke-width="4"/>
+          <text x="175" y="160" font-size="30" font-weight="800" fill="#5ee0d2" class="en">A</text>
+          <rect x="40" y="480" width="825" height="130" rx="20" fill="#111d31" stroke="#22324d"/>
+          <text x="70" y="530" font-size="28" fill="#f3f6fa">缝线比布长 ε → 鼓成正弦波</text>
+          <text x="70" y="580" font-size="26" fill="#8fa3ba">弧长多出 (πA/λ)² = ε　→　A ≈ λ√ε/π</text>
+        </svg>
+    notes:
+      - "针织物缝的时候，压脚把上层布向后拖，主送布牙向前拉，布边被拉长了，线迹把这段拉长的布定了型。缝完一松手，布要缩回去，缝线不缩，多出来的长度只好鼓成波浪，俗称荷叶边。简化模型：设差动比 1 时布边拉长 ε₀，牙多走的距离只有 η 传给布，令布边应变为零，得到平整差动比 D* 等于 1 加 ε₀ 比 η。把波浪看成正弦，高度约 λ 根号 ε 除以 π。"
+      - "When knit fabric is sewn, the presser foot drags the top ply back and the main dog pulls forward, so the edge is stretched, and the stitches fix it in that stretched state. Let go and the fabric shrinks back, but the thread doesn't, so the extra length bulges into waves, the so-called lettuce or ruffled edge. A simple model: at D equal to 1 the edge stretches by epsilon-zero, and only a fraction eta of the extra dog travel reaches the fabric. Setting the edge strain to zero gives the flat-edge ratio D-star equals 1 plus epsilon-zero over eta. Treat the wave as a sine, and its height is about lambda root epsilon over pi."
+
+  - layout: duo
+    title: ["同一块汗布，换一个差动比", "Same jersey, a different ratio"]
+    left: {video: edge1, label: ["D = 1.00", "D = 1.00"], note: ["布边起波浪", "Wavy edge"]}
+    right: {video: edge12, label: ["D = 1.20", "D = 1.20"], note: ["布边平整", "Flat edge"]}
+    notes:
+      - "这是虚拟实验 9-1 里缝好的汗布布边。左边差动比 1.0，布边起波浪；右边调到 1.2，波浪基本消失。机器外面的差动调节杆，就是移动差动牙摆杆槽里的滑块，滑块往外，差动比变大。常见高速包缝机的调节范围是 1 比 0.7 到 1 比 2。"
+      - "This is the jersey edge as sewn in Virtual Lab 9-1. On the left, ratio 1.0: the edge is wavy. On the right, set to 1.2: the waves have basically gone. The differential lever on the outside of the machine moves a slider in the slotted arm of the differential dog; slide it outwards and the ratio goes up. A typical high-speed overlocker adjusts from 1 to 0.7 up to 1 to 2."
+
+  - layout: lab
+    title: ["动手试一试：差动送布", "Try it: differential feed"]
+    shot: {page: difffeed}
+    tasks:
+      - ["汗布：调 D，让布边应变落进绿色带", "Jersey: adjust D until the edge strain falls in the green band"]
+      - ["换罗纹、雪纺，各自找平整的 D", "Switch to rib and chiffon; find the flat-edge D for each"]
+      - ["故意调过头：做生菜边、收碎褶", "Overdo it on purpose: a lettuce edge, then gathers"]
+    notes:
+      - "差动送布的实验大家自己做。先选汗布，每次把差动比加 0.05，找出布边应变落进绿色带的那个值，和模型算的比一比。再换罗纹、换雪纺，各找一个让布边平整的差动比，注意雪纺要调到 1 以下。最后故意调过头：汗布调小做生菜边，雪纺调大收碎褶。同一个机构，调在不同位置，既能消除缺陷，也能做出工艺效果。"
+      - "Do the differential-feed lab yourselves. Start with jersey, raise the ratio 0.05 at a time, find where the edge strain falls in the green band, and compare with the model. Then switch to rib and to chiffon and find the flat-edge ratio for each; chiffon needs less than 1. Finally overdo it on purpose: turn jersey down for a lettuce edge, and chiffon up for gathers. One mechanism, set differently, can remove a defect or create an effect."
+
+  - layout: bignum
+    title: ["算例：汗布与罗纹", "Worked example: jersey and rib"]
+    nums:
+      - {n: "{{ch09.Aj:.1f}} mm", label: ["汗布 D = 1：30 × {{ch09.sqj:.3f}} / π", "Jersey at D = 1: 30 × {{ch09.sqj:.3f}} / π"]}
+      - {n: "{{ch09.Dj:.2f}}", n_en: "jersey D*", label: ["汗布：1 + 0.18 / 0.85", "Jersey: 1 + 0.18 / 0.85"]}
+      - {n: "{{ch09.Dr:.2f}}", n_en: "rib D*", label: ["罗纹：1 + 0.30 / 0.80", "Rib: 1 + 0.30 / 0.80"]}
+    foot: ["罗纹误用 D = 1：波浪约 {{ch09.Ar:.1f}} mm；两者都在 1:0.7 到 1:2 的调节范围内", "Rib at D = 1 by mistake: waves about {{ch09.Ar:.1f}} mm; both within the 1:0.7 to 1:2 range"]
+    notes:
+      - "代数算。汗布差动比为 1 时，布边应变 18%，根号 0.18 约 {{ch09.sqj:.3f}}，波浪高约 30 乘 {{ch09.sqj:.3f}} 除以 π，约 {{ch09.Aj:.1f}} 毫米，一眼就能看出的次品。平整差动比：汗布 1 加 0.18 除以 0.85，约 {{ch09.Dj:.2f}}；罗纹 1 加 0.30 除以 0.80，约 {{ch09.Dr:.2f}}。罗纹如果误用 1，波浪约 {{ch09.Ar:.1f}} 毫米。卫衣布约 {{ch09.Df:.2f}}，雪纺约 {{ch09.Dc:.2f}}，要小于 1。"
+      - "Let's put numbers in. Jersey at a ratio of 1 has an edge strain of 18 percent; the square root of 0.18 is about {{ch09.sqj:.3f}}, so the wave height is about 30 times {{ch09.sqj:.3f}} over pi, roughly {{ch09.Aj:.1f}} millimetres: a defect you see at a glance. The flat-edge ratio for jersey is 1 plus 0.18 over 0.85, about {{ch09.Dj:.2f}}; for rib, 1 plus 0.30 over 0.80, about {{ch09.Dr:.2f}}. Rib sewn at 1 by mistake would wave about {{ch09.Ar:.1f}} millimetres high. Fleece needs about {{ch09.Df:.2f}}, and chiffon about {{ch09.Dc:.2f}}, below 1."
+
+  - layout: split
+    title: ["机器人联系：Delta 并联机器人", "Robot link: the Delta parallel robot"]
+    points:
+      - ["每条支链也是转动副—球铰—球铰", "Each leg is also revolute–spherical–spherical"]
+      - ["两个解 = 机械臂逆解的“肘上、肘下”", "Two solutions = elbow-up and elbow-down"]
+      - ["d·t → 0 是奇异位形；传动角量离奇异多远", "d·t → 0 is a singularity; the transmission angle measures the distance"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="150" y="40" width="600" height="60" rx="14" fill="#2a3a55"/><text x="450" y="80" font-size="26" fill="#d3deea" text-anchor="middle">固定平台 · base (motors)</text>
+          <g stroke="#f2b705" stroke-width="18" stroke-linecap="round"><path d="M230 100 L150 280"/><path d="M450 100 L450 300"/><path d="M670 100 L750 280"/></g>
+          <g fill="#08101d" stroke="#f2b705" stroke-width="6"><circle cx="230" cy="100" r="18"/><circle cx="450" cy="100" r="18"/><circle cx="670" cy="100" r="18"/></g>
+          <g stroke="#2ec4b6" stroke-width="8"><path d="M140 280 L370 500"/><path d="M165 280 L395 500"/><path d="M440 300 L440 500"/><path d="M462 300 L462 500"/><path d="M740 280 L510 500"/><path d="M765 280 L535 500"/></g>
+          <g fill="#2ec4b6"><circle cx="152" cy="280" r="14"/><circle cx="451" cy="300" r="14"/><circle cx="752" cy="280" r="14"/><circle cx="383" cy="500" r="12"/><circle cx="451" cy="500" r="12"/><circle cx="522" cy="500" r="12"/></g>
+          <rect x="350" y="500" width="200" height="44" rx="10" fill="#ff7a45"/><text x="450" y="590" font-size="24" fill="#ffb38f" text-anchor="middle">动平台 · moving platform</text>
+          <g font-size="30" font-weight="800"><text x="190" y="80" fill="#f2b705" class="en">R</text><text x="80" y="290" fill="#5ee0d2" class="en">S</text><text x="300" y="520" fill="#5ee0d2" class="en">S</text></g>
+        </svg>
+    notes:
+      - "下弯针的 RSSR 只靠“连杆长度不变”一条约束，把主轴转角换成摆角。Delta 并联机器人每条支链也是转动副、球铰、球铰，控制器解的是同一类方程。正负两个解是两种装配方式，就像机械臂逆解里的肘上、肘下，程序必须选定一种并保持连续。分母 d 点乘 t 趋于零就是奇异位形，机器人设计同样要让工作区远离奇异。"
+      - "The lower-looper RSSR turns shaft angle into swing angle with one constraint: the link length is constant. Each leg of a Delta parallel robot is also revolute, spherical, spherical, and its controller solves the same kind of equation. The plus and minus solutions are two assembly modes, just like elbow-up and elbow-down in a robot arm's inverse kinematics; the program must pick one and stay on it. When d dot t goes to zero you're at a singularity, and robot designers likewise keep the working range well away from it."
+
+  - layout: split
+    title: ["生活中：手推布，就是差动送布", "Everyday: pushing the fabric is differential feed"]
+    points:
+      - ["家用机改针织 T 恤下摆，布边常起波浪", "Hemming a knit tee at home, the edge often waves"]
+      - ["手指在压脚前把布轻轻往针下推", "Fingers gently push the fabric towards the needle"]
+      - ["多推进一点布，抵消压脚拖拉的拉伸", "Feeding a little extra cancels the stretch from the foot"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <defs><marker id="l9a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2ec4b6"/></marker></defs>
+          <rect x="40" y="380" width="820" height="30" rx="6" fill="#2a3a55"/>
+          <path d="M40 368 C 120 360, 200 376, 280 368 C 360 360, 440 376, 520 368 L 860 368" fill="none" stroke="#e9dcc0" stroke-width="14"/>
+          <path d="M600 120 L600 350" stroke="#c8d2de" stroke-width="10"/><text x="620" y="140" font-size="26" fill="#f3f6fa">机针</text>
+          <path d="M520 300 L720 300 L740 352 L520 352 Z" fill="#8fa3ba"/><text x="760" y="320" font-size="26" fill="#d3deea">压脚</text>
+          <path d="M120 300 Q 200 240 300 270 L 330 300 Q 250 330 150 330 Z" fill="#ffb38f" opacity=".9"/>
+          <text x="140" y="220" font-size="30" font-weight="700" fill="#ffb38f">手指 = 差动牙</text>
+          <path d="M330 330 L470 330" stroke="#2ec4b6" stroke-width="8" marker-end="url(#l9a)"/>
+          <text x="400" y="470" font-size="28" fill="#5ee0d2" text-anchor="middle">多推一点布 · feed a little extra</text>
+        </svg>
+    notes:
+      - "生活中也有差动送布。用家用缝纫机改针织 T 恤的下摆，布边常常起波浪。有经验的人会一边缝，一边用手指在压脚前把布轻轻往针下推。手指就是那只差动送布牙：多推进一点布，正好抵消压脚拖拉造成的拉伸。"
+      - "Differential feed shows up at home too. Hem a knit T-shirt on a home machine and the edge often comes out wavy. Experienced sewers gently push the fabric towards the needle with their fingers in front of the presser foot as they sew. The fingers are the differential feed dog: feeding in a little extra fabric cancels the stretch caused by the drag of the presser foot."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["汗布调到 {{ch09.Dj:.2f}}，罗纹调到 {{ch09.Dr:.2f}}", "Jersey at {{ch09.Dj:.2f}}, rib at {{ch09.Dr:.2f}}"]
+    rows:
+      - ["汗布 D = 1：波浪高", "{{ch09.Aj:.1f}} mm"]
+      - ["汗布 平整差动比", "{{ch09.Dj:.2f}}"]
+      - ["罗纹 平整差动比", "{{ch09.Dr:.2f}}"]
+    side: {big: "D*", text: ["D* = 1 + ε₀ / η：拉得越长、传得越少，差动越大", "Stretch more, transmit less: more differential"]}
+    foot: ["两者都在 1:0.7 到 1:2 的调节范围内；模型参数要靠试缝测定", "Both lie within 1:0.7 to 1:2; the model's parameters come from test sewing"]
+    notes:
+      - "回到开头。汗布侧缝差动比 1.0 时，布边应变 18%，波浪高约 {{ch09.Aj:.1f}} 毫米，一眼就能看出。平整差动比 D* 等于 1 加 ε₀ 比 η：汗布约 {{ch09.Dj:.2f}}，罗纹约 {{ch09.Dr:.2f}}，罗纹误用 1 的话波浪约 {{ch09.Ar:.1f}} 毫米。两者都在算例机 1 比 0.7 到 1 比 2 的调节范围内。注意 ε₀ 和 η 是示意值，实际要靠试缝测定。"
+      - "Back to the start. Jersey side seams at a ratio of 1.0 have 18 percent edge strain, giving waves about {{ch09.Aj:.1f}} millimetres high, visible at a glance. The flat-edge ratio is 1 plus epsilon-zero over eta: about {{ch09.Dj:.2f}} for jersey and {{ch09.Dr:.2f}} for rib; rib at 1 by mistake would wave about {{ch09.Ar:.1f}} millimetres. Both are within the machine's 1 to 0.7 up to 1 to 2 range. Remember epsilon-zero and eta are illustrative; in practice you measure them by test sewing."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["504：三根线各管一段，一针三次穿线环", "504: three threads, three loop entries per stitch"]
+      - ["下弯针 RSSR：连杆长度不变 → 摆角、传动角", "Lower-looper RSSR: rigid link → swing and transmission angle"]
+      - ["差动比 D* = 1 + ε₀/η，波浪高 A ≈ λ√ε/π", "Ratio D* = 1 + ε₀/η; wave height A ≈ λ√ε/π"]
+    after: ["作业 9：成缝区与差动送布的校核 · 测验 · 实验 9-1、9-2 —— 在问渠学习平台完成", "Assignment 9: stitch zone and differential feed · quiz · Labs 9-1, 9-2 — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，504 线迹三根线各管一段，没有死结所以有弹性，一针要三次穿线环，时刻要对，间隙要小。第二，下弯针用空间四杆 RSSR，分析全靠连杆长度不变，得出摆角、角速度和传动角。第三，差动送布：平整差动比 1 加 ε₀ 比 η，波浪高约 λ 根号 ε 除以 π。作业、测验和两个实验都在问渠平台上完成。"
+      - "Three things to remember. One: in stitch 504 each of three threads has its own job, with no tight knot, so it stretches; each stitch needs three loop entries, at the right moment and with tiny clearance. Two: the lower looper is driven by a spatial RSSR four-bar, analysed entirely from the constant link length, which gives the swing, angular speed and transmission angle. Three: differential feed, with flat-edge ratio 1 plus epsilon-zero over eta and wave height about lambda root epsilon over pi. The assignment, the quiz and both labs are on WenQuest."

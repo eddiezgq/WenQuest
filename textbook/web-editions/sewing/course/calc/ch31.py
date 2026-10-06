@@ -81,3 +81,13 @@ for w in (1,2,3,4,5,7,10):
     ok=[(t,a) for t,a in c if a['fpm']<=0.1 and a['det']>=0.95]
     if ok: t,a=max(ok,key=lambda x:x[1]['lead']); print("窗口",w,"最佳阈值",t,round(a['lead'],2),round(a['fpm'],3))
 print("单点误报 0.85×200 =", 0.85*200)
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    r = inspect(0.02, 3.53, 1.88); bt = best_t(0.02, 3.53)
+    a1, a3 = alarms(M, 1.15, 1), alarms(M, 1.12, 3)
+    out(tpr=r['tpr'] * 100, fpr=r['fpr'] * 100, prec=r['prec'] * 100, alarms=r['alarms'], tp=r['tp'], fp=r['fp'], fn=r['fn'],
+        tn=1000 - r['tp'] - r['fp'] - r['fn'], cost188=r['cost'], prec10=inspect(0.10, 3.53, 1.88)['prec'] * 100,
+        prec1=inspect(0.01, 3.53, 1.88)['prec'] * 100, tbest=t_star(0.02, 3.53), cbest=inspect(0.02, 3.53, bt)['cost'],
+        t10=t_star(0.10, 3.53), t1=t_star(0.01, 3.53), fprmax=fpr_max * 100, dneed=N.inv_cdf(1 - fpr_max) + N.inv_cdf(0.9),
+        false10=(1 - r['prec']) * 10, lead1=a1['lead'], fpm1=a1['fpm'], lead3=a3['lead'], fpm3=a3['fpm'], ndeg=a1['ndeg'], fleet_fa=a1['fpm'] * 200)

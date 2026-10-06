@@ -1,0 +1,416 @@
+# 第 19 讲 电控原型平台与零件库 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch19.键:格式}} 由课程包程序 course/calc/ch19.py 算出（它调用本书的 figsrc/ch19_calc.py），不手写数字。
+# notes：讲者备注（放映时只给老师看，录课时当讲稿用）。
+# 实验页 config 切成深色主题（data-theme=dark）。封面用平缝机三维样机（本讲的原型就是一台平缝机机头）。
+lesson: 19
+code: [ch19]
+lab: {no: "19-1", id: config, title: ["虚拟实验 19-1 零件库快速配套器", "Virtual lab 19-1 Parts-library rapid configurator"]}
+
+clips:
+  hero:          # 封面：平缝机三维样机，开窗剖切，慢慢转
+    page: proto-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, press: "#shell [data-k=window]"}
+  bom:           # 四种机器轮流“自动配套”，BOM 跟着变
+    page: config
+    selector: "section:has(#bom)"
+    loop: 12
+    steps:
+      - {at: 0, js: "document.documentElement.setAttribute('data-theme','dark');var t=document.getElementById('bom').closest('section');for(var e=t;e&&e!==document.body;e=e.parentElement){[].forEach.call(e.parentElement.children,function(c){if(c!==e)c.style.visibility='hidden'})}", press: ["[data-k=LS]", "#btnAuto"]}
+      - {at: 3, press: ["[data-k=OL]", "#btnAuto"]}
+      - {at: 6, press: ["[data-k=PS]", "#btnAuto"]}
+      - {at: 9, press: ["[data-k=FK]", "#btnAuto"]}
+  crit:          # 平缝机判据：最优方案 → 电机换 250 W → 驱动器换 1.5 A，叉一条条冒出来
+    page: config
+    selector: "section:has(#checks)"
+    vw: 900
+    vh: 2400
+    loop: 9
+    steps:
+      - {at: 0, js: "document.documentElement.setAttribute('data-theme','dark')", press: ["[data-k=LS]", "#btnAuto"]}
+      - {at: 3, js: "var e=document.querySelector('[data-slot=mot]');e.value='250';e.dispatchEvent(new Event('change',{bubbles:true}))"}
+      - {at: 6, js: "var e=document.querySelector('[data-slot=mot]');e.value='400';e.dispatchEvent(new Event('change',{bubbles:true}));var d=document.querySelector('[data-slot=drv]');d.value='1A5';d.dispatchEvent(new Event('change',{bubbles:true}))"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 19 讲", "Lecture 19"]
+    title: ["电控原型平台 与零件库", "The Prototyping Platform and the Parts Library"]
+    sub: ["12 周，从教材到一台能缝的样机", "Twelve weeks from textbook to a prototype that sews"]
+    notes:
+      - "同学们好。第五篇的电控原理讲完了。现在问一个很实在的问题：能不能照着这些原理，自己动手做一台能缝的电控样机？设想一个三四人的小组，一个学期大约 12 周。难处不在动作应该怎么做，而在选哪个电机、多大电源、I/O 够不够，固件从哪写起，做出来怎么证明它好了。今天就讲这套方法：原型平台、零件库和快速配套。"
+      - "Welcome back. We've finished the control principles of Part Five. Now a very practical question: can we follow those principles and build an electronically controlled prototype that actually sews? Picture a team of three or four with one semester, about twelve weeks. The hard part isn't how the motions should work; it's which motor, what power supply, whether there's enough I/O, where to start the firmware, and how to prove it's good when it's done. Today: the prototyping platform, the parts library and rapid configuration."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["12 周做一台电控平缝机原型，选什么模块？", "A lockstitch prototype in 12 weeks: which modules?"]
+    facts:
+      - ["最高 5000 r/min，0 → 5000 不超过 0.15 s", "5000 r/min top speed, 0 → 5000 in at most 0.15 s"]
+      - ["每分钟起停 30 次，缝纫占一半时间", "30 starts a minute, sewing half the time"]
+      - ["剪线 3 mm、12 N，300 r/min 下折算 ≤ 20°", "Trim 3 mm, 12 N, within 20° at 300 r/min"]
+    notes:
+      - "先看问题。一个小组要把一台拆掉离合器电机的平缝机机头做成电控原型：脚踏调速，最高 5000 转，0 到 5000 转加速不超过 0.15 秒，负载折算惯量 5 乘 10 的负 4 次方；每分钟起停 30 次，缝纫占一半时间；松开脚踏自动剪线，剪线电磁铁行程 3 毫米、力 12 牛，在 300 转下吸合释放折算转角不超过 20 度。零件库里电机有 250、400、550、750 瓦，驱动器有 1.5、3、5 安。该怎么选？"
+      - "Here's the problem. A team wants to turn a lockstitch head, its clutch motor removed, into an electronically controlled prototype: pedal speed control, 5000 r/min top speed, 0 to 5000 in at most 0.15 seconds, load inertia 5 times 10 to the minus 4; 30 starts a minute, sewing half the time; automatic trimming when the pedal is released, with a trimming solenoid needing 3 millimetres and 12 newtons and, at 300 r/min, pull-in and release within 20 degrees of shaft angle. The library offers 250, 400, 550 and 750-watt motors and 1.5, 3 and 5-amp drives. How do we choose?"
+
+  - layout: section
+    num: "01"
+    title: ["一套平台，四种机器", "One platform, four machines"]
+
+  - layout: points
+    title: ["原型和产品差在哪里：确定性", "Prototype versus product: determinism"]
+    points:
+      - ["产品要每一次都对，并能被测出来、被证明", "A product must be right every time, and provably so"]
+      - ["一台、室温 → 电压 ±10%、5–45 °C、批量公差", "One unit at room temperature → ±10% volts, 5–45 °C, batch tolerance"]
+      - ["12 周能成：模块现成、参数清楚、接口统一", "Twelve weeks works: ready modules, clear specs, common interfaces"]
+    notes:
+      - "实验室原型和工业产品差在哪？第一反应可能是功能，其实功能往往差不多，差的是确定性。原型在额定电压、室温下一台能缝就行；产品要在电压正负 10%、5 到 45 度、一批零件的公差下每一次都对，还要两班制用十年。EMC 和安全要试验认证，测试要每条需求都有用例，固件、参数、BOM 都要有版本。12 周的节奏能成立，前提是模块现成、参数清楚、接口统一。"
+      - "What separates a lab prototype from an industrial product? You might say features, but the features are usually similar; the difference is determinism. A prototype just has to sew, one unit, at rated voltage and room temperature. A product must be right every single time at plus or minus 10 percent voltage, 5 to 45 degrees and a whole batch of part tolerances, for ten years of two-shift work. EMC and safety need certified tests, every requirement needs a test case, and firmware, parameters and BOM all need versions. A twelve-week schedule works only if the modules are ready-made, their parameters clear and their interfaces uniform."
+
+  - layout: split
+    title: ["参考架构：五层加机械", "Reference architecture: five layers plus mechanics"]
+    points:
+      - ["一根“主令”定时间，执行器按主令的位置动作", "One master sets the time; actuators act on its position"]
+      - ["2500 线编码器四倍频：每转 10000 个计数", "2500-line encoder ×4: 10 000 counts a turn"]
+      - ["主控、驱动板、电源、固件框架：四种机器共用", "Controller, drive boards, power, firmware: shared by all four"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <g font-weight="700" font-size="28">
+            <rect x="40" y="20" width="820" height="80" rx="16" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="70" y="72" fill="#c4b5fd">数字工厂接口</text>
+            <rect x="40" y="115" width="820" height="90" rx="16" fill="#111d31" stroke="#8fa3ba" stroke-width="3"/><text x="70" y="172" fill="#f3f6fa">人机与联网层</text><text x="830" y="172" font-size="22" font-weight="400" fill="#8fa3ba" text-anchor="end">网关 MQTT · 触摸屏</text>
+            <rect x="40" y="220" width="820" height="90" rx="16" fill="rgba(242,183,5,.15)" stroke="#f2b705" stroke-width="3"/><text x="70" y="277" fill="#f2b705">实时控制层</text><text x="830" y="277" font-size="22" font-weight="400" fill="#c9a94a" text-anchor="end">WQ-SC 主控 · Cortex-M4F + RTOS</text>
+            <rect x="40" y="325" width="820" height="90" rx="16" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="70" y="382" fill="#9cc0ff">驱动层</text><text x="830" y="382" font-size="22" font-weight="400" fill="#8fa3ba" text-anchor="end">伺服驱动 · 步进驱动 · 电磁铁驱动板</text>
+            <rect x="40" y="430" width="820" height="90" rx="16" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="70" y="487" fill="#5ee0d2">执行与传感层</text><text x="830" y="487" font-size="22" font-weight="400" fill="#8fa3ba" text-anchor="end">伺服电机 · 闭环步进 · 电磁铁 · 传感器</text>
+            <rect x="40" y="535" width="820" height="80" rx="16" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/><text x="70" y="587" fill="#ff9c75">机械</text><text x="830" y="587" font-size="22" font-weight="400" fill="#8fa3ba" text-anchor="end">机头、工作台、针床</text>
+          </g>
+        </svg>
+    notes:
+      - "四种机器看起来差别很大，电控骨架却相同：一根主令决定时间，若干执行器按主令的位置动作，传感器报状态，控制器在中间调度，再把数据送到车间系统。WQ-SC 把这个骨架固定成五层加机械。最下面执行与传感层：主轴是交流永磁同步伺服，2500 线编码器四倍频后每转一万个计数；送布、X–Y 用闭环步进；剪线、拨线用推拉电磁铁。往上是驱动层、实时控制层、人机与联网层，最上面是数字工厂接口。"
+      - "The four machines look very different, but their control skeleton is the same: one master sets the time, several actuators act according to the master's position, sensors report status, the controller schedules everything in between and sends data to the plant system. WQ-SC fixes that skeleton as five layers plus mechanics. At the bottom, actuators and sensors: the spindle is a permanent-magnet synchronous servo whose 2500-line encoder, multiplied by four, gives ten thousand counts a turn; feed and X–Y use closed-loop steppers; trimming and wiping use push-pull solenoids. Above that come the drive layer, the real-time control layer, the HMI and network layer, and at the top the digital-factory interface."
+
+  - layout: split
+    title: ["主轴转角是时间基准", "Shaft angle is the time base"]
+    points:
+      - ["写“主轴转到 205° 通电”，不写“上止点后 8 ms”", "Write “energise at 205°”, not “8 ms after TDC”"]
+      - ["执行器延迟折算成转角：θ = 6·n·t", "Convert actuator delay to angle: θ = 6·n·t"]
+      - ["横机的主令换成机头位置", "On the knitter the master is carriage position"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <circle cx="450" cy="320" r="230" fill="none" stroke="#22324d" stroke-width="26"/>
+          <path d="M352.8 528.4 A230 230 0 0 1 335 120.8" fill="none" stroke="#ff7a45" stroke-width="26"/>
+          <circle cx="450" cy="90" r="14" fill="#f3f6fa"/>
+          <text x="450" y="60" font-size="28" font-weight="700" fill="#f3f6fa" text-anchor="middle">0° 上止点</text>
+          <circle cx="352.8" cy="528.4" r="16" fill="#ff7a45"/>
+          <text x="330" y="590" font-size="28" font-weight="700" fill="#ff9c75" text-anchor="end">205° 剪线通电</text>
+          <text x="300" y="120" font-size="26" fill="#ff9c75" text-anchor="end">330° 断电</text>
+          <circle cx="659.8" cy="414.3" r="14" fill="#4c8dff"/>
+          <text x="690" y="440" font-size="26" font-weight="700" fill="#9cc0ff">114.2° 倒缝切换</text>
+          <text x="450" y="300" font-size="34" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">θ = 6·n·t</text>
+          <text x="450" y="350" font-size="24" fill="#d3deea" text-anchor="middle">延迟折算成转角</text>
+          <text x="450" y="390" font-size="22" fill="#8fa3ba" text-anchor="middle">按动作时的转速检查</text>
+        </svg>
+    notes:
+      - "为什么用主轴转角做时间基准？因为主轴转速并不恒定，起缝慢、中间快、剪线前又慢。剪线、倒缝、X–Y 移动都要对准机构的位置，比如针在不在布里、送布牙在不在针板下面。所以固件里写成主轴转到 205 度通电，而不是上止点后 8 毫秒通电，按转角写，任何转速都对得准。执行器有延迟，就把延迟折算成转角，6 乘 n 乘 t 度，按动作时的转速检查。横机没有主轴，主令换成机头位置。"
+      - "Why make shaft angle the time base? Because shaft speed isn't constant: slow at the start, fast in the middle, slow again before trimming. Trimming, backtacking and X–Y moves must line up with mechanism positions, such as whether the needle is in the fabric or the feed dog is below the plate. So the firmware says energise when the shaft reaches 205 degrees, not 8 milliseconds after top dead centre; written by angle, it lines up at any speed. Actuators have delays, so convert the delay into an angle, 6 times n times t degrees, and check it at the speed where the action happens. The flat knitter has no shaft, so its master is the carriage position."
+
+  - layout: figure
+    title: ["四种机器，一套模块：差在主令和执行器", "Four machines, one module set: they differ in master and actuators"]
+    h: 600
+    visual: {video: bom}
+    caption: ["配套器依次为平缝机、包缝机、花样机、横机自动配套：BOM 只换少数几行", "Configured in turn for lockstitch, overlock, pattern sewer and knitter: only a few BOM lines change"]
+    notes:
+      - "看零件库快速配套器依次给四种机器自动配套。主控、网关、电磁铁驱动、电源和固件框架完全共用，差别集中在三处：主令是什么、有几根位置轴、电磁铁做哪些动作。做完平缝机，包缝机只是换一张需求表、少几个电磁铁、多一个气阀；花样机多两根步进轴；横机把主令从主轴换成机头。蓝色编号是库里已有的条目，黄色行是和默认方案不同的地方。"
+      - "Watch the parts-library configurator set up the four machines in turn. Controller, gateway, solenoid drive, power supply and firmware framework are fully shared; the differences are concentrated in three places: what the master is, how many position axes there are, and which actions the solenoids perform. After the lockstitch machine, the overlock is just a new requirements table with fewer solenoids and an air valve; the pattern sewer adds two stepper axes; the knitter swaps the spindle master for the carriage. Blue part numbers are existing library entries; yellow rows differ from the default solution."
+
+  - layout: section
+    num: "02"
+    title: ["需求表与零件库", "Requirements and the parts library"]
+
+  - layout: points
+    title: ["需求表：每一行都能被计算或测试", "Requirements: every line can be calculated or tested"]
+    points:
+      - ["写数字，不写“高速”“可靠”", "Numbers, not “fast” or “reliable”"]
+      - ["每条有编号 REQ-…，将来对应测试用例", "Each has an ID, REQ-…, matched later by a test"]
+      - ["主轴、电磁铁、I/O、联网，一项项写清", "Spindle, solenoids, I/O, networking, each spelled out"]
+    notes:
+      - "快速配套是一条固定流水线：写需求表，按第 13 到 17 讲的公式算判据，到零件库里按性能参数筛，每类挑满足判据最便宜的规格，自动生成 BOM、接线表和固件配置，上测试台验证。第一步需求表，规矩只有一条：每一行都要能被计算或测试，所以写数字，不写高速、可靠。主轴写最高转速、加速时间、负载惯量、停针误差；电磁铁写行程、力和允许的折算转角；每条都有编号，将来对应一个测试用例。"
+      - "Rapid configuration is a fixed pipeline: write the requirements table, compute the criteria with the formulas of Lectures 13 to 17, filter the library by performance parameters, take the cheapest size that meets every criterion in each category, generate the BOM, wiring table and firmware configuration automatically, and verify on the test bench. Step one, the requirements, has a single rule: every line must be calculable or testable, so write numbers, not fast or reliable. For the spindle: top speed, acceleration time, load inertia, stopping accuracy; for solenoids: stroke, force and allowed angle. Every line gets an ID that a test case will later point to."
+
+  - layout: split
+    title: ["零件库：条目 + 规格表，参数分角色", "The parts library: entries, size tables, parameter roles"]
+    points:
+      - ["entry.yaml：身份、参数定义、出处", "entry.yaml: identity, parameter definitions, sources"]
+      - ["specs.csv：一行一个规格", "specs.csv: one row per size"]
+      - ["key 分规格，perf 是选型判据要比的", "key tells sizes apart; perf is what criteria compare"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <path d="M40 40 L210 40 L240 70 L860 70 L860 600 L40 600 Z" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
+          <text x="70" y="115" font-size="30" font-weight="700" fill="#9cc0ff" class="en">D-MOT-PMSM/</text>
+          <rect x="70" y="140" width="300" height="70" rx="12" fill="#16243b" stroke="#8fa3ba" stroke-width="2"/>
+          <text x="90" y="185" font-size="26" fill="#f3f6fa" class="en">entry.yaml</text>
+          <rect x="400" y="140" width="300" height="70" rx="12" fill="#16243b" stroke="#2ec4b6" stroke-width="2"/>
+          <text x="420" y="185" font-size="26" fill="#5ee0d2" class="en">specs.csv</text>
+          <g font-size="24" fill="#d3deea" class="en">
+            <text x="80" y="275" class="en">size</text><text x="270" y="275" class="en">rated N·m</text><text x="470" y="275" class="en">peak N·m</text><text x="680" y="275" class="en">price</text>
+          </g>
+          <g font-size="22" font-weight="700" class="en">
+            <text x="80" y="305" fill="#f2b705" class="en">key</text><text x="270" y="305" fill="#ff9c75" class="en">perf</text><text x="470" y="305" fill="#ff9c75" class="en">perf</text><text x="680" y="305" fill="#8fa3ba" class="en">info</text>
+          </g>
+          <path d="M70 320 L830 320" stroke="#4b5f7d" stroke-width="2"/>
+          <g font-size="26" fill="#f3f6fa" class="en">
+            <text x="80" y="365" class="en">250</text><text x="270" y="365" class="en">0.80</text><text x="470" y="365" class="en">2.0</text><text x="680" y="365" class="en">520</text>
+            <text x="80" y="415" class="en" fill="#f2b705">400</text><text x="270" y="415" class="en" fill="#f2b705">1.27</text><text x="470" y="415" class="en" fill="#f2b705">3.2</text><text x="680" y="415" class="en" fill="#f2b705">680</text>
+            <text x="80" y="465" class="en">550</text><text x="270" y="465" class="en">1.50</text><text x="470" y="465" class="en">4.5</text><text x="680" y="465" class="en">860</text>
+            <text x="80" y="515" class="en">750</text><text x="270" y="515" class="en">2.39</text><text x="470" y="515" class="en">7.2</text><text x="680" y="515" class="en">1050</text>
+          </g>
+          <text x="450" y="575" font-size="22" fill="#8fa3ba" text-anchor="middle">建议编号，示意参数，计划入库</text>
+        </svg>
+    notes:
+      - "快速配套要有一个参数清楚、能按参数检索的零件库。问渠零件与机器人库分四部分：标准件、机器人整机、机构、厂商器件。每个条目是一个目录，entry.yaml 写身份、参数定义和出处，specs.csv 是规格表，一行一个规格。关键是参数角色：key 区分规格，dim 是外形尺寸，perf 是性能参数，选型判据比的就是它，info 是说明。缝制电控模块还不在库里，本书给了建议编号，比如 D-MOT-PMSM 斜杠 400，计划入库。"
+      - "Rapid configuration needs a parts library with clear parameters you can search by. The WenQuest parts and robot library has four parts: standard parts, complete robots, mechanisms and vendor devices. Each entry is a directory: entry.yaml holds identity, parameter definitions and sources, and specs.csv is the size table, one row per size. The key idea is parameter roles: key tells sizes apart, dim is outline and mounting dimensions, perf is performance, which is what the selection criteria compare, and info is description. The sewing control modules aren't in the library yet; the book proposes numbers such as D-MOT-PMSM slash 400, planned for entry."
+
+  - layout: section
+    num: "03"
+    title: ["快速配套：算判据，挑最便宜的合格者", "Rapid configuration: compute criteria, take the cheapest that passes"]
+
+  - layout: bignum
+    title: ["主轴：400 W 是最便宜的合格者", "Spindle: 400 W is the cheapest that passes"]
+    nums:
+      - {n: "{{ch19.LS_400_T_acc:.2f}}", n_en: "N·m ≤ 2.56", label: ["加速转矩 ≤ 0.8 × 峰值 3.2", "Acceleration torque ≤ 0.8 × 3.2 peak"]}
+      - {n: "{{ch19.LS_400_T_rms:.2f}}", n_en: "N·m ≤ 1.27", label: ["间歇工况等效转矩 ≤ 额定", "RMS torque of the duty cycle ≤ rated"]}
+      - {n: "{{ch19.LS_400_ratio:.0f}}", n_en: "≤ 10", label: ["负载惯量 / 转子惯量", "Load / rotor inertia ratio"]}
+    foot: ["250 W：{{ch19.LS_250_T_acc:.2f}} > 1.60、{{ch19.LS_250_T_rms:.2f}} > 0.80，不行；550 W 合格但更贵", "250 W: {{ch19.LS_250_T_acc:.2f}} > 1.60 and {{ch19.LS_250_T_rms:.2f}} > 0.80, fails; 550 W passes but costs more"]
+    notes:
+      - "来算主轴。从静止加速到最高转速，所需转矩等于总惯量乘角加速度，再加库仑摩擦 0.15 牛米。400 瓦那档总惯量 6 乘 10 的负 4 次方，角加速度约 {{ch19.LS_400_alpha:.0f}}，加速转矩约 {{ch19.LS_400_T_acc:.2f}} 牛米，不超过 0.8 倍峰值 2.56。间歇工况的等效转矩 {{ch19.LS_400_T_rms:.2f}}，不超过额定 1.27；惯量比 {{ch19.LS_400_ratio:.0f}}，不超过 10。250 瓦加速转矩和等效转矩都不够；550 瓦也满足，但更贵。"
+      - "Now the spindle. Accelerating from rest to top speed takes total inertia times angular acceleration, plus 0.15 newton-metres of Coulomb friction. For the 400-watt motor the total inertia is 6 times 10 to the minus 4, the angular acceleration about {{ch19.LS_400_alpha:.0f}}, and the torque about {{ch19.LS_400_T_acc:.2f}} newton-metres, within 0.8 of the 3.2 peak, 2.56. The RMS torque over the duty cycle is {{ch19.LS_400_T_rms:.2f}}, within the 1.27 rating, and the inertia ratio is {{ch19.LS_400_ratio:.0f}}, within 10. The 250-watt motor falls short on both acceleration and RMS torque; the 550 passes too, but costs more."
+
+  - layout: bignum
+    title: ["驱动器：为什么 1.5 A 那档不行", "Drive: why the 1.5 A size fails"]
+    nums:
+      - {n: "{{ch19.LS_Ic:.2f}} A", n_en: "continuous", label: ["连续电流 = 等效转矩 / kt", "Continuous current = RMS torque / kt"]}
+      - {n: "{{ch19.LS_Ip:.2f}} A", n_en: "acceleration", label: ["加速电流", "Acceleration current"]}
+      - {n: "{{ch19.LS_400_E_regen:.1f}} J", n_en: "regenerated", label: ["急停：{{ch19.LS_E_kin:.0f}} J 动能的 70% 回馈", "E-stop: 70% of {{ch19.LS_E_kin:.0f}} J returns"]}
+    foot: ["1.5 A 档：{{ch19.LS_Ic:.2f}} > 1.5 A，{{ch19.LS_400_E_regen:.1f}} > 30 J，第一次急停就报过压；选 3 A 档（9 A、70 J）", "1.5 A drive: {{ch19.LS_Ic:.2f}} > 1.5 A and {{ch19.LS_400_E_regen:.1f}} > 30 J, so the first E-stop trips overvoltage; take 3 A (9 A, 70 J)"]
+    notes:
+      - "电机定了，配驱动器。电流等于转矩除以转矩常数：连续电流约 {{ch19.LS_Ic:.2f}} 安，加速电流约 {{ch19.LS_Ip:.2f}} 安。还有一条常被忽略的：急停。5000 转时的动能约 {{ch19.LS_E_kin:.0f}} 焦，70% 回馈到母线约 {{ch19.LS_400_E_regen:.1f}} 焦，驱动器必须吸收得下。更便宜的 1.5 安驱动器为什么不行？连续电流超了，能量也远超它的 30 焦。样机空转一切正常，一提到最高速急停，就报过压。所以选 3 安那档。"
+      - "With the motor chosen, pick the drive. Current is torque over the torque constant: about {{ch19.LS_Ic:.2f}} amps continuous and {{ch19.LS_Ip:.2f}} during acceleration. One criterion is often forgotten: the emergency stop. At 5000 r/min the kinetic energy is about {{ch19.LS_E_kin:.0f}} joules, and 70 percent of it, about {{ch19.LS_400_E_regen:.1f}}, comes back onto the DC link, which the drive must absorb. Why won't the cheaper 1.5-amp drive do? Its continuous rating is exceeded, and the energy is far beyond its 30 joules. The prototype idles happily, then trips on overvoltage the first time it's stopped hard from top speed. So take the 3-amp size."
+
+  - layout: split
+    title: ["判据一条条打勾", "Ticking off the criteria one by one"]
+    points:
+      - ["最优方案：全部打勾", "Best solution: everything ticked"]
+      - ["电机换 250 W：主轴转矩两条打叉", "Swap to 250 W: two spindle torque checks fail"]
+      - ["驱动器换 1.5 A：电流和急停能量打叉", "Swap to a 1.5 A drive: current and E-stop energy fail"]
+    visual: {video: crit}
+    notes:
+      - "这是配套器右边的判据栏，主轴、伺服驱动、电磁铁、电磁铁驱动，一条条列出需要和能给。先按自动配套，全部打勾；然后把电机换成 250 瓦，加速转矩和等效转矩两条打叉；再换回 400 瓦、把驱动器换成 1.5 安，连续电流和急停回馈能量打叉。每条判据都能指着数字说为什么，这就是快速配套和凭经验挑的区别。"
+      - "This is the criteria column of the configurator: spindle, servo drive, solenoids and solenoid driver, each showing what's needed and what's available. Auto-configure first and everything is ticked. Swap the motor to 250 watts and the acceleration torque and RMS torque checks fail. Put the 400 back and swap the drive to 1.5 amps, and the continuous current and E-stop energy checks fail. Every verdict can point to a number, and that's the difference between rapid configuration and picking by gut feeling."
+
+  - layout: bignum
+    title: ["电磁铁与电源", "Solenoids and power supply"]
+    nums:
+      - {n: "{{ch19.trim_on:.1f}}° / {{ch19.trim_off:.1f}}°", n_en: "M15 at 300 r/min", label: ["剪线选 M15：吸合 / 释放 ≤ 20°", "Trim with M15: on/off within 20°"]}
+      - {n: "{{ch19.M15_trim_max:.0f}}", n_en: "r/min max", label: ["M15 剪线最高可用转速", "Highest trimming speed for M15"]}
+      - {n: "{{ch19.bt_L30:.1f}}°", n_en: "L30 at 1800 r/min", label: ["倒缝选 L30：装进 201.6° 空闲角", "Backtack with L30: fits the 201.6° idle angle"]}
+    foot: ["24 V 电源：逻辑 8 W + 维持约 30 W + 强激磁一半 72 W，× 1.2 ≈ {{ch19.LS_psu_need:.0f}} W → 选 150 W", "24 V supply: 8 W logic + ~30 W hold + half of 72 W boost, × 1.2 ≈ {{ch19.LS_psu_need:.0f}} W → 150 W"]
+    notes:
+      - "电磁铁每个动作看三条：行程够不够，行程末端的力够不够，在转动中动作的还要看折算转角。剪线在 300 转下动作，M15 吸合 6.9 毫秒、释放 5.1 毫秒，折算 {{ch19.trim_on:.1f}} 度和 {{ch19.trim_off:.1f}} 度，都在 20 度以内，最高能用到约 {{ch19.M15_trim_max:.0f}} 转。倒缝在 1800 转下切换，L30 折算 {{ch19.bt_L30:.1f}} 度，装得进 201.6 度的空闲角。电源按逻辑、维持和一半强激磁加起来再乘 1.2，约 {{ch19.LS_psu_need:.0f}} 瓦，选 150 瓦。"
+      - "Each solenoid action gets three checks: enough stroke, enough force at the end of stroke, and, for actions while the shaft turns, the angle it turns through. Trimming happens at 300 r/min; the M15 pulls in in 6.9 milliseconds and releases in 5.1, which is {{ch19.trim_on:.1f}} and {{ch19.trim_off:.1f}} degrees, both within 20, and it works up to about {{ch19.M15_trim_max:.0f}} r/min. Backtack switching happens at 1800 r/min; the L30 takes {{ch19.bt_L30:.1f}} degrees, which fits in the 201.6-degree idle angle. The power supply: logic plus hold plus half the boost, times 1.2, about {{ch19.LS_psu_need:.0f}} watts, so a 150-watt supply."
+
+  - layout: chain
+    title: ["一份数据，生成三样东西", "One data set generates three outputs"]
+    steps: [["需求表", "requirements"], ["算判据", "criteria"], ["最便宜合格", "cheapest pass"], ["BOM", "BOM"], ["接线表", "wiring"], ["固件配置", "firmware"], ["测试台", "test bench"]]
+    hot: [3, 4, 5]
+    mark: ["同一份数据生成", "generated from one data set"]
+    foot: ["平缝机原型 BOM 示意总价 {{ch19.LS_total}} 元（机头不计）；接线表同时是固件 HAL 引脚和测试台接线", "Lockstitch prototype BOM about {{ch19.LS_total}} yuan (head excluded); the wiring table is also the HAL pin map and bench wiring"]
+    notes:
+      - "判据算完，筛选规则很简单：每一类模块逐个规格查判据，挑全部满足里最便宜的；有依赖关系的一起挑，电机和驱动器成对挑，电源最后挑。平缝机原型的结果是 14 行 BOM，示意总价 {{ch19.LS_total}} 元，机头是现成的不计在内。接线表由 I/O 计数直接排出。注意：这张接线表同时是固件 HAL 的引脚配置和测试台的接线依据，所以 BOM、接线表和固件配置必须由同一份数据生成，手抄就会对不上。"
+      - "With the criteria computed, the selection rule is simple: check every size in each category and take the cheapest that meets all criteria; pick dependent items together, motor and drive as a pair, power supply last. For the lockstitch prototype that gives a 14-line BOM at about {{ch19.LS_total}} yuan, not counting the head. The wiring table falls straight out of the I/O count. Note that this one table is also the firmware HAL pin configuration and the test-bench wiring, so BOM, wiring and firmware configuration must all be generated from the same data. Copy them by hand and they'll drift apart."
+
+  - layout: lab
+    title: ["动手试一试：零件库快速配套器", "Try it: the parts-library configurator"]
+    shot: {page: config}
+    tasks:
+      - ["平缝机默认需求：点“自动配套”，读判据", "Lockstitch defaults: auto-configure, read the criteria"]
+      - ["在 BOM 里手动换电机、驱动器，看哪条打叉", "Swap motor and drive by hand; see which checks fail"]
+      - ["换机种、改最高转速，看要换哪些模块", "Change machine and top speed; see which modules change"]
+    notes:
+      - "零件库快速配套器在问渠平台上可以自己做。先用平缝机的默认需求点自动配套，对着右边的判据读懂每一条为什么满足。然后在 BOM 的下拉框里手动换电机、驱动器、电磁铁，看哪条判据打叉、总价怎么变，验证自动挑出来的确实是最便宜的合格方案。最后换包缝机、花样机、横机，或者把最高转速提上去，看哪些模块必须换。结果填进实验报告。"
+      - "You can run the configurator yourself on WenQuest. Start with the lockstitch defaults, auto-configure, and use the criteria column to understand why each check passes. Then swap motor, drive and solenoids by hand in the BOM drop-downs and watch which checks fail and how the total changes, confirming the automatic choice really is the cheapest that passes. Finally switch to the overlock, pattern sewer or knitter, or raise the top speed, and see which modules have to change. Put the results in your report."
+
+  - layout: bignum
+    title: ["换机种：包缝机从 6000 提到 7000 r/min", "Changing machine: overlock from 6000 to 7000 r/min"]
+    nums:
+      - {n: "{{ch19.OL_total}} 元", n_en: "6000 r/min", label: ["同样 400 W + 3 A", "Same 400 W + 3 A"]}
+      - {n: "{{ch19.OL7000_400_regen:.1f}} J", n_en: "> 70 J", label: ["7000 r/min：急停回馈超出 3 A 档", "At 7000: E-stop energy beyond the 3 A drive"]}
+      - {n: "{{ch19.OL7_total}} 元", n_en: "550 W + 5 A", label: ["400 W 最高也只有 6000 r/min", "The 400 W tops out at 6000 r/min"]}
+    foot: ["需求改一个数字，配套器重新算一遍判据：要换的模块和多花的钱一目了然", "Change one number and the configurator re-runs every check: what must change and what it costs is plain"]
+    notes:
+      - "换一个机种看看。包缝机原型最高 6000 转，同样选到 400 瓦电机和 3 安驱动器，示意总价 {{ch19.OL_total}} 元。把它提到 7000 转，有两条判据变成叉：400 瓦电机最高只有 6000 转；急停回馈约 {{ch19.OL7000_400_regen:.1f}} 焦，超过 3 安驱动器的 70 焦。换成 550 瓦电机以后回馈更大，驱动器还得换 5 安那档，总价升到 {{ch19.OL7_total}} 元。需求改一个数字，要换什么、多花多少钱一目了然。"
+      - "Try another machine. The overlock prototype tops out at 6000 r/min and also gets the 400-watt motor and 3-amp drive, about {{ch19.OL_total}} yuan. Raise it to 7000 and two checks fail: the 400-watt motor only goes to 6000, and the E-stop energy, about {{ch19.OL7000_400_regen:.1f}} joules, exceeds the 3-amp drive's 70. With a 550-watt motor the energy is even higher, so the drive must move up to 5 amps too, and the total rises to {{ch19.OL7_total}} yuan. Change one number in the requirements and you see at once what must change and what it costs."
+
+  - layout: points
+    title: ["AI 选型助手：规矩比聪明更重要", "An AI selection assistant: rules matter more than cleverness"]
+    points:
+      - ["只从零件库里挑；写清“编号/规格”和依据", "Pick only from the library; give part/size and evidence"]
+      - ["库里没有就说没有，不编造编号或参数", "If it isn't there, say so; never invent parts or numbers"]
+      - ["判据计算和最终选择，由确定的程序完成", "Criteria and the final pick come from deterministic code"]
+    notes:
+      - "数字工厂里有一个 AI 选型功能：用户一句话提需求，它按关键词找条目、按数字筛规格。它有三条硬规矩：只从零件库里挑；每个推荐写成编号斜杠规格，并列出依据的那一行参数和出处；库里没有就说没有，不编造编号或参数。在快速配套里，AI 适合把口头需求整理成需求表里的数字，以及解释为什么这么选。判据计算和最终选择要由确定的程序完成。库里没有，本身就是一条入库需求。"
+      - "The digital factory has an AI selection feature: describe a need in a sentence and it finds entries by keyword and filters sizes by number. It follows three hard rules: pick only from the library; write each recommendation as part number slash size, with the parameter row and source it relied on; and if nothing suitable exists, say so, never inventing part numbers or parameters. In rapid configuration, AI is good at turning spoken needs into numbers for the requirements table and at explaining a choice. The criteria and the final choice must come from deterministic code. And not in the library is itself a request to add the part."
+
+  - layout: section
+    num: "04"
+    title: ["固件与测试", "Firmware and testing"]
+
+  - layout: split
+    title: ["固件：计数变角度，按角度查事件表", "Firmware: counts to angle, then the event table"]
+    points:
+      - ["角度（0.1°）= 计数 × 9/25，整数运算", "Angle (0.1°) = counts × 9/25, integer maths"]
+      - ["5000 r/min 时 0.1° 只有 {{ch19.us_per_0_1deg_5000:.1f}} μs：用比较中断", "At 5000 r/min 0.1° is {{ch19.us_per_0_1deg_5000:.1f}} μs: use compare interrupts"]
+      - ["事件表一行一个动作：换机头改参数不改代码", "One action per row: new head, new data, same code"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <rect x="30" y="30" width="840" height="580" rx="20" fill="#0b1424" stroke="#22324d" stroke-width="2"/>
+          <g font-size="26" font-weight="700" fill="#8fa3ba"><text x="60" y="90">动作</text><text x="300" y="90">起始角</text><text x="530" y="90">结束角</text><text x="720" y="90">输出</text></g>
+          <path d="M50 110 L850 110" stroke="#4b5f7d" stroke-width="2"/>
+          <g font-size="28" fill="#f3f6fa">
+            <text x="60" y="170" fill="#ff9c75">剪线</text><text x="300" y="170" class="en">205.0°</text><text x="530" y="170" class="en">330.0°</text><text x="720" y="170" class="en">DO1</text>
+            <text x="60" y="240" fill="#5ee0d2">拨线</text><text x="300" y="240">下一转 15°</text><text x="530" y="240" class="en">60°</text><text x="720" y="240" class="en">DO2</text>
+            <text x="60" y="310" fill="#9cc0ff">倒缝</text><text x="300" y="310" class="en">114.2°</text><text x="530" y="310">置位 / 复位</text><text x="720" y="310" class="en">DO3</text>
+          </g>
+          <path d="M50 350 L850 350" stroke="#4b5f7d" stroke-width="2"/>
+          <text x="450" y="420" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">counts × 9/25 → 0.1° (0–3599)</text>
+          <text x="450" y="480" font-size="26" fill="#d3deea" text-anchor="middle">下一个事件角 → 比较寄存器 → 计数一到就进中断</text>
+          <text x="450" y="560" font-size="24" fill="#8fa3ba" text-anchor="middle">剪线这一行按凸轮式剪线写（吸合约 12.4°）</text>
+        </svg>
+    notes:
+      - "现在看固件。工艺层围绕三样东西：计数变角度、按角度查事件表、用状态机管住周期，都是数据驱动的。编码器每转一万个计数，固件角度单位取 0.1 度，一转 0 到 3599，换算是计数乘 9 除以 25，整数运算。0.1 度在 300 转时约 {{ch19.us_per_0_1deg_300:.0f}} 微秒，在 5000 转时只有约 {{ch19.us_per_0_1deg_5000:.1f}} 微秒，所以不能靠任务轮询，而要预先算好下一个事件角对应的计数，写进编码器定时器的比较寄存器。事件表一行一个动作，换机头只改参数不改代码。"
+      - "Now the firmware. The process layer revolves around three data-driven things: counts to angle, an event table looked up by angle, and a state machine that governs the cycle. The encoder gives ten thousand counts a turn; the firmware's angle unit is 0.1 degree, 0 to 3599 per turn, and the conversion is counts times 9 over 25, in integers. At 300 r/min 0.1 degree lasts about {{ch19.us_per_0_1deg_300:.0f}} microseconds, at 5000 only about {{ch19.us_per_0_1deg_5000:.1f}}, so polling won't do: compute the count for the next event angle in advance and write it into the encoder timer's compare register. One action per row of the event table; a new head means new data, not new code."
+
+  - layout: chain
+    title: ["状态机管住一个工作周期", "A state machine governs the working cycle"]
+    steps: [["IDLE", "needle up"], ["RUN", "pedal speed"], ["SLOW", "trim speed"], ["TRIM", "trim stitch"], ["POSITION", "stop ±0.5°"], ["IDLE", "needle up"]]
+    hot: [3]
+    mark: ["事件表在这一针执行", "event table"]
+    foot: ["任何故障进 SAFE：断开电磁铁、主轴自由停、记故障码；故障清除且脚踏回中位才回 IDLE", "Any fault enters SAFE: solenoids off, spindle coasts, code logged; back to IDLE only when cleared and pedal neutral"]
+    notes:
+      - "工作周期由状态机管：IDLE 停在上针位，踩脚踏进 RUN 调速，松开进 SLOW 降到剪线转速，到 180 度以后进 TRIM，这一针事件表执行剪线、拨线，下一转 25 度切位置环进 POSITION，停稳到正负 0.5 度再回 IDLE。任何状态检测到故障，过流、编码器丢失、超时、急停、机头翻起，都进 SAFE：断开全部电磁铁，主轴自由停，记故障码；只有故障清除、脚踏回到中位才回 IDLE，防止一复位机器就转。"
+      - "A state machine governs the cycle. IDLE sits at needle-up; pressing the pedal enters RUN with speed control; releasing it enters SLOW, down to trimming speed; past 180 degrees comes TRIM, where the event table fires trimming and wiping on this stitch; at 25 degrees of the next turn it switches to the position loop in POSITION and, once settled within half a degree, returns to IDLE. Any fault in any state, overcurrent, lost encoder, timeout, emergency stop, head tilted up, goes to SAFE: all solenoids off, the spindle coasts, the fault is logged; only when the fault is cleared and the pedal is back in neutral does it return to IDLE, so a reset never starts the machine unexpectedly."
+
+  - layout: split
+    title: ["先在电脑上“缝”：SIL、HIL 与测试台", "Sew on the computer first: SIL, HIL and the bench"]
+    points:
+      - ["SIL：工艺层编译到电脑，接虚拟实验的模型", "SIL: the process layer on a PC, driving the lab models"]
+      - ["HIL：真主控 + 实时仿真台，夜里注入故障", "HIL: real controller and real-time simulator; nightly fault injection"]
+      - ["测试台：每个用例对应一条需求", "Bench: every test case maps to a requirement"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <defs><marker id="m19a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6f84a3"/></marker></defs>
+          <g text-anchor="middle">
+            <rect x="40" y="60" width="820" height="140" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
+            <text x="450" y="118" font-size="34" font-weight="800" fill="#9cc0ff">SIL 软件在环</text>
+            <text x="450" y="166" font-size="24" fill="#8fa3ba">50 μs 一步，比实时快几十倍，每次提交自动跑</text>
+            <rect x="40" y="250" width="820" height="140" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+            <text x="450" y="308" font-size="34" font-weight="800" fill="#f2b705">HIL 硬件在环</text>
+            <text x="450" y="356" font-size="24" fill="#8fa3ba">5000 r/min：每 50 μs 约 {{ch19.HIL_counts_50us:.0f}} 个计数，要均匀插值</text>
+            <rect x="40" y="440" width="820" height="140" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+            <text x="450" y="498" font-size="34" font-weight="800" fill="#5ee0d2">测试台 · 真机头</text>
+            <text x="450" y="546" font-size="24" fill="#8fa3ba">停针 ≤ ±1°，剪线 1000 次成功率 ≥ 99.5%</text>
+          </g>
+          <g stroke="#6f84a3" stroke-width="5" marker-end="url(#m19a)"><path d="M450 204 L450 242"/><path d="M450 394 L450 432"/></g>
+          <text x="450" y="625" font-size="24" fill="#d3deea" text-anchor="middle">同一套用例，只换被测对象和对象模型</text>
+        </svg>
+    notes:
+      - "样机装好以前，固件的大部分逻辑已经能测了。测试分三级，跑同一套用例，只换被测对象和对象模型。第一级软件在环：把工艺层、状态机、事件表编译成电脑程序，硬件抽象层换成仿真驱动，接上本书虚拟实验的模型，50 微秒一步，每次提交自动跑。第二级硬件在环：真主控、真固件，对象模型跑在实时仿真台上，5000 转时每 50 微秒约 {{ch19.HIL_counts_50us:.0f}} 个计数要均匀插值；最大用处是故障注入。第三级上测试台。"
+      - "Most of the firmware logic can be tested before the prototype is even assembled. There are three levels running the same test cases, with only the unit under test and the plant model changing. Level one, software in the loop: compile the process layer, state machine and event table for a PC, replace the hardware abstraction layer with simulated drivers and connect the book's lab models, 50 microseconds a step, run on every commit. Level two, hardware in the loop: the real controller and firmware against a plant model on a real-time simulator, which at 5000 r/min must interpolate about {{ch19.HIL_counts_50us:.0f}} encoder counts evenly every 50 microseconds; its biggest use is fault injection. Level three is the test bench."
+
+  - layout: chain
+    title: ["从原型到工业级：五道门", "From prototype to product: five gates"]
+    steps: [["P0 能动", "it moves"], ["P1 功能全", "full function"], ["EVT", "engineering"], ["DVT", "design"], ["PVT", "production"]]
+    hot: [1]
+    mark: ["原型的目标", "goal"]
+    foot: ["P1：用例通过率 ≥ 95%、停针 ≤ ±1°、剪线 ≥ 99.5%；需求和用例从 P0 起就编号，原型第一天就按数字工厂格式联网", "P1: ≥ 95% tests pass, stop within ±1°, ≥ 99.5% trims; IDs from P0, networked in factory format from day one"]
+    notes:
+      - "原型变成产品要过五道门：P0 能动，P1 功能全，然后是工程验证、设计验证和生产验证。原型的目标是 P1：用例通过率不低于 95%，停针误差不超过正负 1 度，剪线成功率不低于 99.5%。需求和用例从 P0 起就编号，电源、接地、屏蔽从 P1 起就按产品的做法。原型机从第一天就按数字工厂格式联网，几十轮迭代之后，要靠集中存起来的测试数据和版本，才说得清哪一版改好了什么。"
+      - "A prototype passes five gates on its way to becoming a product: P0, it moves; P1, full function; then engineering, design and production validation. The prototype's goal is P1: at least 95 percent of test cases passing, stopping within plus or minus 1 degree, and at least 99.5 percent successful trims. Requirements and test cases are numbered from P0, and power, grounding and shielding follow product practice from P1. The prototype is networked in the digital-factory format from day one, because after dozens of iterations only centrally stored test data and versions can tell you which version fixed what."
+
+  - layout: split
+    title: ["机器人联系：快速配套与位置凸轮", "Robot link: rapid configuration and position cams"]
+    points:
+      - ["龙门点胶机器人：同样先写数字化需求表", "A gantry dispenser starts with a numeric requirements table"]
+      - ["每根轴：T = Jα + T_f，再查惯量比、等效转矩", "Each axis: T = Jα + T_f, then inertia ratio and RMS torque"]
+      - ["“X 走到 120–180 mm 开阀”：位置凸轮开关", "“Valve open at X = 120–180 mm”: a position cam switch"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <rect x="40" y="100" width="820" height="40" rx="8" fill="#22324d"/>
+          <rect x="40" y="140" width="30" height="400" fill="#22324d"/><rect x="830" y="140" width="30" height="400" fill="#22324d"/>
+          <rect x="380" y="80" width="140" height="80" rx="10" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <path d="M450 160 L450 330" stroke="#c8d2de" stroke-width="16"/><path d="M438 330 L462 330 L450 360z" fill="#ff7a45"/>
+          <rect x="120" y="440" width="660" height="60" rx="8" fill="#e9dcc0"/>
+          <rect x="290" y="420" width="220" height="100" fill="rgba(46,196,182,.25)" stroke="#2ec4b6" stroke-width="3" stroke-dasharray="10 6"/>
+          <path d="M290 400 L510 400" stroke="#2ec4b6" stroke-width="4"/>
+          <text x="400" y="390" font-size="26" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="en">X = 120–180 mm</text>
+          <text x="400" y="570" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle">在这段开阀</text>
+          <path d="M560 120 L720 120" stroke="#f3f6fa" stroke-width="5"/><path d="M730 120 l-16 -11 l0 22z" fill="#f3f6fa"/>
+          <text x="640" y="80" font-size="26" fill="#f3f6fa" text-anchor="middle" class="en">X</text>
+          <text x="450" y="620" font-size="24" fill="#8fa3ba" text-anchor="middle">主令从主轴转角换成 X 轴位置</text>
+        </svg>
+    notes:
+      - "搭一台龙门点胶机器人，流程和 WQ-SC 一样：先写数字化的需求表，行程、速度、加速度、负载质量、重复定位精度；用 T 等于 J α 加 T_f 和惯量比、等效转矩判据给每根轴选伺服或闭环步进，从零件库挑满足判据的最便宜规格，再由同一份数据生成 BOM、I/O 表和控制器配置。点胶阀也不按时间写，而是写成 X 轴走到 120 到 180 毫米之间开阀，这就是运动控制器里的位置凸轮开关，和本讲的角度事件表一一对应。"
+      - "Building a gantry glue-dispensing robot follows the same process as WQ-SC. Write a numeric requirements table: stroke, speed, acceleration, payload, repeatability. Size a servo or closed-loop stepper for each axis with T equals J alpha plus T_f and the inertia-ratio and RMS-torque checks, pick the cheapest size in the library that passes, and generate BOM, I/O table and controller configuration from the same data. The glue valve isn't timed either: it's written as open while X is between 120 and 180 millimetres, the position cam switch of a motion controller, a one-to-one match with this lecture's angle event table."
+
+  - layout: split
+    title: ["生活中的例子：自己攒一台电脑", "Everyday example: building your own PC"]
+    points:
+      - ["先定需求：玩什么游戏、跑什么软件", "Needs first: which games, which software"]
+      - ["按接口和功率挑主板、CPU、显卡", "Pick board, CPU and graphics by interface and power"]
+      - ["功耗加起来乘个余量选电源", "Add up the power, add a margin, choose the PSU"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640">
+          <g font-weight="700" text-anchor="middle" font-size="28">
+            <rect x="40" y="60" width="240" height="110" rx="18" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="160" y="125" fill="#9cc0ff">CPU</text>
+            <rect x="330" y="60" width="240" height="110" rx="18" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="450" y="125" fill="#9cc0ff">显卡</text>
+            <rect x="620" y="60" width="240" height="110" rx="18" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="740" y="125" fill="#9cc0ff">主板 · 硬盘</text>
+          </g>
+          <text x="450" y="250" font-size="44" font-weight="800" fill="#f2b705" text-anchor="middle">Σ 功耗 × 余量 → 电源</text>
+          <rect x="250" y="300" width="400" height="120" rx="20" fill="rgba(242,183,5,.15)" stroke="#f2b705" stroke-width="3"/>
+          <text x="450" y="375" font-size="32" font-weight="700" fill="#f2b705" text-anchor="middle">电源</text>
+          <text x="450" y="500" font-size="26" fill="#d3deea" text-anchor="middle">WQ-SC：(8 + 30 + 72) W × 1.2 → 150 W</text>
+          <text x="450" y="550" font-size="22" fill="#8fa3ba" text-anchor="middle">逻辑 + 维持 + 一半强激磁</text>
+        </svg>
+    notes:
+      - "自己攒电脑也是一次快速配套：先定需求，玩什么游戏、跑什么软件；再按接口和功率挑主板、CPU、显卡；最后把各部件功耗加起来乘个余量选电源。这和本讲 24 伏电源按逻辑、维持加一半强激磁，再乘 1.2 来选，是同一个思路。攒电脑的人也会犯同样的错：只看峰值性能，忘了电源和散热，开机跑大程序就重启。"
+      - "Building your own PC is rapid configuration too. Decide the needs first: which games, which software. Then choose the motherboard, CPU and graphics card by interface and power. Finally add up every part's power, add a margin, and pick the power supply. That's exactly how this lecture sized the 24-volt supply: logic plus hold plus half the boost, times 1.2. And PC builders make the same mistakes: they look only at peak performance, forget the power supply and cooling, and the machine reboots under a heavy load."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["400 W 电机配 3 A 驱动器，剪线用 M15", "A 400 W motor, a 3 A drive, M15 for trimming"]
+    rows:
+      - ["主轴 400 W", "{{ch19.LS_400_T_acc:.2f}} ≤ 2.56 N·m"]
+      - ["驱动 3 A：急停回馈", "{{ch19.LS_400_E_regen:.1f}} ≤ 70 J"]
+      - ["剪线 M15（300 r/min）", "{{ch19.trim_on:.1f}}° ≤ 20°"]
+    side: {big: "{{ch19.LS_total}}", text: ["整套 BOM 示意总价（元），机头不计", "Indicative BOM total (yuan), head excluded"]}
+    foot: ["1.5 A 驱动器：连续电流 {{ch19.LS_Ic:.2f}} A 超额定，急停回馈 {{ch19.LS_400_E_regen:.1f}} J 远超 30 J——第一次急停就报过压", "1.5 A drive: {{ch19.LS_Ic:.2f}} A exceeds its rating and {{ch19.LS_400_E_regen:.1f}} J far exceeds 30 J, so the first E-stop trips overvoltage"]
+    notes:
+      - "回到开头的问题。选 400 瓦电机配 3 安驱动器：加速转矩 {{ch19.LS_400_T_acc:.2f}}，不超过 2.56；等效转矩 {{ch19.LS_400_T_rms:.2f}}，不超过 1.27；惯量比 {{ch19.LS_400_ratio:.0f}}。250 瓦两条都不够，550 瓦合格但更贵。更便宜的 1.5 安驱动器，连续电流 {{ch19.LS_Ic:.2f}} 安超额定，急停回馈 {{ch19.LS_400_E_regen:.1f}} 焦也吸收不了。M15 在 300 转下折算 {{ch19.trim_on:.1f}} 度和 {{ch19.trim_off:.1f}} 度，满足 20 度。整套 BOM 示意总价 {{ch19.LS_total}} 元。"
+      - "Back to the opening question. Choose the 400-watt motor with the 3-amp drive: acceleration torque {{ch19.LS_400_T_acc:.2f}}, within 2.56; RMS torque {{ch19.LS_400_T_rms:.2f}}, within 1.27; inertia ratio {{ch19.LS_400_ratio:.0f}}. The 250 fails both torque checks; the 550 passes but costs more. The cheaper 1.5-amp drive exceeds its continuous rating at {{ch19.LS_Ic:.2f}} amps and can't absorb the {{ch19.LS_400_E_regen:.1f}}-joule E-stop energy. The M15 takes {{ch19.trim_on:.1f}} and {{ch19.trim_off:.1f}} degrees at 300 r/min, within 20. The whole BOM comes to about {{ch19.LS_total}} yuan."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["五层加机械：同一套模块做出四种原型", "Five layers plus mechanics: one module set, four prototypes"]
+      - ["需求 → 判据 → 最便宜合格 → BOM / 接线 / 固件", "Requirements → criteria → cheapest pass → BOM / wiring / firmware"]
+      - ["按转角写事件表；SIL、HIL、测试台逐级验证", "Event tables by angle; verify through SIL, HIL and bench"]
+    after: ["作业 19 · 测验 · 虚拟实验 19-1 实验报告 —— 在问渠学习平台完成", "Assignment 19 · quiz · Lab 19-1 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，WQ-SC 用五层参考架构加机械，同一套主控、模块和固件框架做出四种原型，差别在主令和执行器组合。第二，快速配套：需求表写数字，按判据算，挑最便宜的合格规格，由同一份数据生成 BOM、接线表和固件配置；别忘了急停回馈和等效转矩。第三，固件按主轴转角写事件表、用状态机管周期，再经软件在环、硬件在环和测试台逐级验证。作业、测验和实验报告在问渠平台完成。"
+      - "Three things to remember. One: WQ-SC uses a five-layer reference architecture plus mechanics, building four prototypes from one controller, module set and firmware framework, differing in master and actuator mix. Two: rapid configuration: numbers in the requirements table, compute the criteria, take the cheapest size that passes, and generate BOM, wiring and firmware configuration from the same data, without forgetting E-stop energy and RMS torque. Three: the firmware writes its event table by shaft angle and runs the cycle with a state machine, verified step by step through software in the loop, hardware in the loop and the test bench. The assignment, quiz and lab report are on WenQuest."

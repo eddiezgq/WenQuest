@@ -1,0 +1,396 @@
+# 第 30 讲 缝制设备发展趋势 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch30.键:格式}} 由课程包程序 course/calc/ch30.py 算出，不手写数字。
+lesson: 30
+code: [ch30]
+
+clips:
+  hero:          # 封面：实验 30-1 第②页，单步成功率 0.90 → 0.999 轮换，曲线上的圆点跟着走（深色显示）
+    page: soft
+    selector: "#chain"
+    loop: 12
+    steps:
+      - {at: 0, press: "#tab1", set: {n: 10, p: 0.9}, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)'"}
+      - {at: 2, set: {p: 0.95}}
+      - {at: 4, set: {p: 0.97}}
+      - {at: 6, set: {p: 0.98}}
+      - {at: 8, set: {p: 0.99}}
+      - {at: 10, set: {p: 0.999}}
+  drape:         # 悬臂下垂：同上，不反色
+    page: soft
+    selector: "#drape"
+    loop: 12
+    steps:
+      - {at: 0, set: {L: 10, W: 120, c: 14}}
+      - {at: 1, set: {c: 20}}
+      - {at: 2, set: {c: 28}}
+      - {at: 3, set: {c: 40}}
+      - {at: 4, set: {c: 55}}
+      - {at: 5, set: {c: 75}}
+      - {at: 6, set: {c: 100}}
+      - {at: 7, set: {c: 140}}
+      - {at: 8, set: {c: 200}}
+      - {at: 9, set: {c: 300}}
+      - {at: 10, set: {c: 450}}
+  chain:         # 第②页：单步成功率 0.90 → 0.999 轮换，圆点沿曲线移动
+    page: soft
+    selector: "#chain"
+    loop: 12
+    steps:
+      - {at: 0, press: "#tab1", set: {n: 10, p: 0.9}}
+      - {at: 2, set: {p: 0.95}}
+      - {at: 4, set: {p: 0.97}}
+      - {at: 6, set: {p: 0.98}}
+      - {at: 8, set: {p: 0.99}}
+      - {at: 10, set: {p: 0.999}}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 30 讲", "Lecture 30"]
+    title: ["缝制设备发展趋势", "Trends in Sewing Equipment"]
+    sub: ["更省、更聪明、更少人、不缝", "Leaner, smarter, fewer hands, no stitches"]
+    notes:
+      - "同学们好。这一讲往前看：今后十年缝纫机和缝制车间会变成什么样？与其背新名词，不如问三个问题：哪些趋势已经成熟、正在普及；哪些还卡在物理和经济门槛上，比宣传慢得多；哪些在改变“缝”本身。背景里是今天的虚拟实验：一个多步流程，每步成功率高一点低一点，整条流程能不能不用人，差别大得很。"
+      - "Hello everyone. Today we look ahead: what will sewing machines and sewing floors become in the next ten years? Rather than memorising buzzwords, ask three questions. Which trends are mature and spreading? Which are stuck at physical and economic thresholds, moving far slower than the hype? And which are changing sewing itself? In the background is today's lab: a multi-step process where a little more or less success per step makes a big difference to whether it runs without people."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["机器人上料：单步成功率 97%，值不值？", "Robot loading: 97% per step, worth it?"]
+    facts:
+      - ["分离、提起、铺平、对位、上料共 10 步，每步 8 s", "Separate, lift, flatten, align, load: 10 steps of 8 s"]
+      - ["每次失败要人花 30 s 处理，再重做这一步", "Each failure takes a person 30 s, then the step is redone"]
+      - ["机器人 25 万元，顶替每班一人，两班制", "Robot ¥250k, replaces one person a shift, two shifts"]
+    notes:
+      - "先看车间问题。一家衬衫厂考虑用机器人把裁片从料堆送到缝纫机上：分离布片、提起、铺平、对位、上料，共 10 个动作，每个 8 秒，供应商说单步成功率 97%。每次失败要人花 30 秒处理，再重做这一步。机器人 25 万元，年维护费是价格的 10%，顶替每班一名操作工，两班制，每年 300 天，人工 0.5 元每分。整条流程无人完成的概率是多少？每小时要人插手几次？多久回本？最后回答。"
+      - "Here's the problem. A shirt factory is considering a robot to take cut pieces from a stack to the sewing machine: separate a ply, lift it, flatten it, align it, load it, ten actions of 8 seconds each, and the supplier quotes 97 percent success per step. Each failure takes a person 30 seconds to sort out, then the step is redone. The robot costs 250 thousand yuan, maintenance is 10 percent of the price a year, it replaces one operator per shift, two shifts, 300 days a year, labour at 0.5 yuan a minute. What's the chance the whole sequence runs unattended? How often per hour must a person step in? How long to pay back? We'll answer at the end."
+
+  - layout: section
+    num: "01"
+    title: ["四个方向", "Four directions"]
+
+  - layout: figure
+    title: ["更省、更聪明、更少人、不缝", "Leaner, smarter, fewer hands, no stitches"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 1700 620" width="1700" height="620">
+          <defs><linearGradient id="g30" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2ec4b6"/><stop offset="1" stop-color="#ff7a45"/></linearGradient></defs>
+          <g font-size="44" font-weight="800" text-anchor="middle">
+            <text x="230" y="60" fill="#5ee0d2">更省</text><text x="640" y="60" fill="#8fb6ff">更聪明</text><text x="1050" y="60" fill="#ffd75a">更少人</text><text x="1460" y="60" fill="#ff9c75">不缝</text>
+          </g>
+          <g font-size="30" fill="#f3f6fa" text-anchor="middle">
+            <rect x="60" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="230" y="168">伺服直驱</text>
+            <rect x="60" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="230" y="308">少油 · 降噪</text>
+            <rect x="470" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="640" y="168">电子送布·张力·压脚</text>
+            <rect x="470" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="640" y="308">联网 · 数字孪生</text>
+            <rect x="880" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="1050" y="168">花样机 · 自动单元</text>
+            <rect x="880" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="1050" y="308">机器人上料</text>
+            <rect x="880" y="380" width="340" height="110" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3" stroke-dasharray="10 8"/><text x="1050" y="448">人形机器人</text>
+            <rect x="1290" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="1460" y="168">全成型编织</text>
+            <rect x="1290" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="1460" y="308">焊接 · 粘合</text>
+            <rect x="1290" y="380" width="340" height="110" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="1460" y="448">数码印花</text>
+          </g>
+          <rect x="10" y="100" width="18" height="390" rx="9" fill="url(#g30)"/>
+          <text x="40" y="560" font-size="28" fill="#8fa3ba">越往下越新、越不成熟；“更少人”最受布的软和投资回收约束</text>
+        </svg>
+    notes:
+      - "图上分四列：更省、更聪明、更少人、不缝，每列越往下越新、越不成熟。更省最成熟，是伺服直驱；更聪明是电子送布、电子张力、电子压脚，加上联网和数字孪生；更少人从花样机、自动单元，到机器人上料，再到人形机器人；不缝是全成型编织、焊接粘合和数码印花。我们会在“更少人”这一列用力最多，因为它最受两件事约束：布太软，和投资能不能收回来。"
+      - "Four columns: leaner, smarter, fewer hands, no stitches; in each, the lower the newer and less mature. Leaner is the most mature: servo direct drive. Smarter means electronic feed, tension and presser foot, plus connectivity and digital twins. Fewer hands runs from pattern sewers and automatic units to robot loading and then humanoid robots. No stitches means whole-garment knitting, welding and bonding, and digital printing. We'll spend most time on fewer hands, because two things hold it back: fabric is soft, and the investment has to pay back."
+
+  - layout: bignum
+    title: ["最成熟的趋势：伺服直驱省电", "The most mature trend: servo direct drive saves power"]
+    nums:
+      - {n: "−{{ch30.e_pct:.0f}}%", n_en: "450 W → 250 W", label: ["离合器电机通电就空转", "A clutch motor idles whenever it's on"]}
+      - {n: "{{ch30.e_save:.1f}} 万", n_en: "kWh a year", label: ["500 台 × 3550 h：{{ch30.e_cl:.0f}} → {{ch30.e_sv:.0f}} 万 kWh", "500 machines × 3550 h"]}
+      - {n: "{{ch30.co2:.0f}} t", n_en: "CO₂", label: ["排放因子 0.57 kg/kWh", "At 0.57 kg per kWh"]}
+    foot: ["年节电 = 台数 × 开机小时 × 功率差：空等时间越多越划算，公开案例约 4 个月回本", "Saving = machines × hours × power difference: the more idle time, the bigger the saving; a published case paid back in 4 months"]
+    notes:
+      - "最成熟的趋势是省电。老式离合器电机一通电就以额定转速空转，踩脚踏才通过离合器带动机头；伺服电机只在缝的时候转，直驱又省掉了皮带。一份公开案例把平缝机换成伺服，平均功率从约 450 瓦降到 250 瓦，节电约 {{ch30.e_pct:.0f}}%，4 个月回本。放大到 500 台、每台每年开机 3550 小时：离合器约 {{ch30.e_cl:.0f}} 万度，伺服约 {{ch30.e_sv:.0f}} 万度，一年省 {{ch30.e_save:.1f}} 万度，约 {{ch30.co2:.0f}} 吨二氧化碳。空等时间越多，省得越多。"
+      - "The most mature trend is saving power. An old clutch motor spins at rated speed whenever it's switched on, and the pedal only engages the clutch; a servo turns only while sewing, and direct drive drops the belt too. A published retrofit cut average power from about 450 to 250 watts, about {{ch30.e_pct:.0f}} percent, paying back in four months. Scale to 500 machines running 3550 hours a year: about {{ch30.e_cl:.0f}} ten-thousand kilowatt-hours with clutch motors, {{ch30.e_sv:.0f}} with servos, saving {{ch30.e_save:.1f}} ten-thousand a year, about {{ch30.co2:.0f}} tonnes of CO2. The more idle time, the bigger the saving."
+
+  - layout: points
+    title: ["软件定义的缝纫机，成套智联", "Software-defined machines, connected systems"]
+    points:
+      - ["电子送布、张力、压脚：参数变成程序里的数", "Electronic feed, tension, foot: settings become numbers in software"]
+      - ["按段切换、按布料自动调、从网络下发", "Switched by segment, tuned to fabric, sent over the network"]
+      - ["单机自动 → 自动单元 → 吊挂单件流 → 联网", "Automatic machine → unit → hanger flow → network"]
+    foot: ["机构变简单，软件变复杂：机构工程师要懂控制，控制工程师要懂线迹；难点在系统集成", "Simpler mechanisms, harder software: designers must know control, controllers must know stitches; integration is the hard part"]
+    notes:
+      - "第二个方向是更聪明。电子送布、电子张力、电子压脚，把针距、张力、压力从机构里的螺钉和凸轮，变成程序里的数，可以按缝纫段切换、按布料自动调整、从网络下发。机构变简单了，软件变复杂了：机构工程师要懂控制，控制工程师要懂线迹。再往上是从单机自动到成套智联：花样机让一台机器走完一个花样，自动单元把上料、缝制、堆叠连起来，吊挂连成单件流，联网和数字孪生让管理者看到每台机器、每件衣服。难点在系统集成。"
+      - "The second direction is smarter. Electronic feed, tension and presser foot turn stitch length, tension and pressure from screws and cams into numbers in software: switched seam segment by segment, tuned to the fabric, downloaded over the network. Mechanisms get simpler and software harder: mechanism designers need to understand control, and control engineers need to understand stitches. Above that, from single automatic machines to connected systems: a pattern sewer runs a whole design, automatic units link loading, sewing and stacking, hanger systems make single-piece flow, and connectivity and digital twins show managers every machine and every garment. The hard part is integration."
+
+  - layout: section
+    num: "02"
+    title: ["布有多软：立不住，推不动", "How soft is cloth? It won't stand, it can't be pushed"]
+
+  - layout: bignum
+    title: ["弯曲刚度 B = w c³", "Bending rigidity B = w c³"]
+    nums:
+      - {n: "{{ch30.B_shirt:.1f}}", n_en: "μN·m · poplin", label: ["衬衫府绸：120 g/m²，c 20 mm", "Shirt poplin: 120 g/m², c 20 mm"]}
+      - {n: "{{ch30.B_denim:.0f}}", n_en: "μN·m · denim", label: ["牛仔布：400 g/m²，c 35 mm", "Denim: 400 g/m², c 35 mm"]}
+      - {n: "{{ch30.B_steel:.1f}}", n_en: "N·m · 1 mm steel", label: ["比府绸硬约 {{ch30.steel_x:.0f}} 万倍", "About {{ch30.steel_m:.1f}} million times stiffer"]}
+    foot: ["悬臂法：布条伸出台边，垂到规定角度时的伸出长度就是弯曲长度 c；B（μN·m）= 9.8×10⁻⁶ × 克重 × c³（mm）", "Cantilever test: the overhang at which the strip droops to a set angle is the bending length c"]
+    notes:
+      - "为什么机器人拿布这么难？先量一量布有多软。悬臂法：把布条从台边慢慢伸出去，垂到规定角度时的伸出长度叫弯曲长度 c。弯曲刚度等于单位面积重量乘 c 的三次方。针织汗布约 {{ch30.B_knit:.0f}}，衬衫府绸约 {{ch30.B_shirt:.1f}}，西服毛料约 {{ch30.B_suit:.0f}}，牛仔布约 {{ch30.B_denim:.0f}} 微牛·米；而 1 毫米钢板是 {{ch30.B_steel:.1f}} 牛·米，比府绸硬约 {{ch30.steel_x:.0f}} 万倍。机器人习惯拿的是钢板，不是布。"
+      - "Why is handling cloth so hard for robots? First measure how soft it is. The cantilever test: slide a strip out over the table edge until it droops to a set angle; that overhang is the bending length c. Bending rigidity is weight per area times c cubed. Single jersey is about {{ch30.B_knit:.0f}}, shirt poplin about {{ch30.B_shirt:.1f}}, suiting about {{ch30.B_suit:.0f}}, denim about {{ch30.B_denim:.0f}} micronewton-metres. A one-millimetre steel plate is {{ch30.B_steel:.1f}} newton-metres, roughly {{ch30.steel_m:.1f}} million times stiffer than poplin. Robots are used to handling steel, not cloth."
+
+  - layout: figure
+    title: ["立不住：伸出两倍弯曲长度就垂下来", "It won't stand: past twice the bending length it droops"]
+    visual: {video: drape}
+    caption: ["伸出 10 cm，c 从布调到纸板；衬衫布竖着只能立起约 {{ch30.stand_shirt:.0f}} cm", "Poplin stands only about {{ch30.stand_shirt:.0f}} cm"]
+    notes:
+      - "看实验页：布条从夹持边伸出 10 厘米，弯曲长度 c 从汗布那么软一路调到纸板那么硬，橙线就是当前材料。c 小的时候整条垂下去，汗布、府绸的弦角有 80 多度；牛仔布约 65 度；到纸板、钢板几乎不动。伸出约 2 倍弯曲长度时弦角约 42 度，这就是悬臂法的定义。竖着夹住，衬衫布只能立起约 {{ch30.stand_shirt:.0f}} 厘米。所以布一离开台面就不听话。"
+      - "Watch the lab: a strip sticks out 10 centimetres from the clamp while its bending length is raised from jersey-soft to card-stiff; the orange line is the current material. With small c the whole strip hangs down: jersey and poplin droop more than 80 degrees, denim about 65, while card and steel barely move. At an overhang of about twice the bending length the chord angle is about 42 degrees, which is how the test defines c. Clamped upright, shirt fabric stands only about {{ch30.stand_shirt:.0f}} centimetres. Lift cloth off the table and it stops doing what you want."
+
+  - layout: split
+    title: ["推不动：推布失稳", "It can't be pushed: buckling"]
+    points:
+      - ["一端夹住、一端推：推到 F_cr 就拱起", "Clamp one end, push the other: at F_cr it arches"]
+      - ["府绸 5 × 30 cm：F_cr ≈ {{ch30.Fcr:.1f}} mN，自重的 1/{{ch30.Wratio:.0f}}", "Poplin 5 × 30 cm: F_cr ≈ {{ch30.Fcr:.1f}} mN, 1/{{ch30.Wratio:.0f}} of its weight"]
+      - ["要推得动，c 得超过 {{ch30.c_need:.0f}} mm：比牛仔布还硬", "To push it, c must exceed {{ch30.c_need:.0f}} mm: stiffer than denim"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="20" y="380" width="860" height="24" rx="6" fill="#2a3a55"/>
+          <rect x="60" y="300" width="90" height="90" rx="10" fill="#4b5f7d"/>
+          <text x="105" y="290" font-size="24" fill="#8fa3ba" text-anchor="middle">夹住</text>
+          <path d="M150 372 C 300 372, 330 200, 450 200 C 570 200, 600 372, 750 372" stroke="#f2b705" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M150 372 L750 372" stroke="#f2b705" stroke-width="3" stroke-dasharray="10 10" opacity=".5"/>
+          <defs><marker id="m30" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff7a45"/></marker></defs>
+          <path d="M870 362 L780 362" stroke="#ff7a45" stroke-width="10" marker-end="url(#m30)"/>
+          <text x="830" y="335" font-size="30" font-weight="800" fill="#ff9c75" text-anchor="middle">推</text>
+          <text x="450" y="170" font-size="28" fill="#ffd75a" text-anchor="middle">一推就拱起</text>
+          <text x="450" y="450" font-size="26" fill="#8fa3ba" text-anchor="middle">长 L，宽 b</text>
+          <rect x="150" y="490" width="600" height="110" rx="22" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+          <text x="450" y="562" font-size="44" font-weight="800" fill="#ffd75a" text-anchor="middle" class="en">F<tspan font-size="28" dy="10">cr</tspan><tspan dy="-10"> = π²Bb / 4L²</tspan></text>
+        </svg>
+    notes:
+      - "布还推不动。一端夹住、另一端可以侧移的布条，就像一根细压杆，推力到临界力 F_cr 就拱起来，F_cr 等于 π 方乘 B 乘宽度 b，除以 4 倍长度平方。衬衫府绸 5 厘米长、30 厘米宽：临界力约 {{ch30.Fcr:.1f}} 毫牛，而它自己的重量约 {{ch30.Wt:.0f}} 毫牛，推力还不到自重的六分之一。推力要超过自重，c 得大于 0.74 倍 L：推 5 厘米，c 要超过 {{ch30.c_need:.0f}} 毫米，比牛仔布还硬。所以缝纫机用送布牙拖布，不推布。"
+      - "Cloth can't be pushed either. A strip clamped at one end and free to move sideways at the other behaves like a slender column: push it to the critical force F_cr and it arches. F_cr is pi squared times B times width b, over four times length squared. Shirt poplin 5 centimetres long and 30 wide buckles at about {{ch30.Fcr:.1f}} millinewtons, while it weighs about {{ch30.Wt:.0f}}: you can't even push with a sixth of its own weight. To push harder than its weight, c must exceed 0.74 L: for 5 centimetres, more than {{ch30.c_need:.0f}} millimetres, stiffer than denim. That's why a sewing machine drags fabric with its feed dog instead of pushing it."
+
+  - layout: split
+    title: ["机器人怎么拿布", "How robots pick up cloth"]
+    points:
+      - ["改进抓取：针刺、真空、静电、冷冻黏附", "Better grippers: needles, vacuum, electrostatic, freezing"]
+      - ["改变布：浸树脂暂时变硬，缝完洗掉", "Change the cloth: stiffen with resin, wash it out"]
+      - ["不让布离开台面：视觉在机头前纠偏", "Keep it on the table: vision steers it at the needle"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g font-size="28" font-weight="700" text-anchor="middle">
+            <rect x="20" y="20" width="410" height="260" rx="24" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
+            <g stroke="#8fb6ff" stroke-width="5"><path d="M130 90 L130 180 M180 90 L180 180 M230 90 L230 180 M280 90 L280 180 M330 90 L330 180"/></g>
+            <rect x="100" y="185" width="260" height="14" fill="#e9dcc0"/><text x="225" y="250" fill="#8fb6ff">针刺</text>
+            <rect x="470" y="20" width="410" height="260" rx="24" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+            <rect x="560" y="90" width="230" height="70" rx="12" fill="#22324d"/><g fill="#5ee0d2"><circle cx="600" cy="170" r="10"/><circle cx="650" cy="170" r="10"/><circle cx="700" cy="170" r="10"/><circle cx="750" cy="170" r="10"/></g>
+            <rect x="550" y="185" width="250" height="14" fill="#e9dcc0"/><text x="675" y="250" fill="#5ee0d2">真空 · 静电</text>
+            <rect x="20" y="310" width="410" height="300" rx="24" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
+            <rect x="100" y="420" width="260" height="30" rx="6" fill="#c4b5fd"/><text x="225" y="520" fill="#c4b5fd">浸树脂变硬</text><text x="225" y="560" font-size="22" fill="#8fa3ba">未见规模化应用</text>
+            <rect x="470" y="310" width="410" height="300" rx="24" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
+            <rect x="520" y="440" width="310" height="16" fill="#e9dcc0"/><rect x="520" y="456" width="310" height="10" fill="#2a3a55"/>
+            <path d="M700 360 L700 440" stroke="#d3deea" stroke-width="6"/><circle cx="600" cy="380" r="22" fill="none" stroke="#ffd75a" stroke-width="4"/>
+            <text x="675" y="520" fill="#ffd75a">贴着台面 + 视觉</text>
+          </g>
+        </svg>
+    notes:
+      - "机器人怎么拿布？有三条路。第一，改进抓取：针刺式用一排细针斜插进布里提起来；真空吸附、静电吸附靠吸；还有冷冻黏附，在夹爪上冻一层薄冰把布粘住。第二，改变布：浸一层水溶性树脂让它暂时变硬，缝完再洗掉，但还没见到规模化应用。第三，干脆不让布离开台面：让视觉实时识别布边，在机头前不断纠偏，这和缝纫机用送布牙拖布是同一个思路。"
+      - "How do robots pick up cloth? Three routes. First, better grippers: needle grippers stab rows of fine needles in at an angle and lift; vacuum and electrostatic grippers hold by suction or charge; freeze grippers glue the fabric with a thin film of ice. Second, change the cloth: soak it in a water-soluble resin so it's temporarily stiff, sew it, then wash the resin out; not yet seen at scale. Third, never let the cloth leave the table: vision tracks the edge in real time and steers it just ahead of the needle, the same idea as a feed dog dragging the fabric."
+
+  - layout: section
+    num: "03"
+    title: ["机器人上料：先核对数字，再算 pⁿ", "Robot loading: check the numbers, then compute pⁿ"]
+
+  - layout: points
+    title: ["一个没有落地的计划：先核对数字", "A plan that never happened: check the numbers first"]
+    points:
+      - ["2017 年宣称：21 条线、22 秒一件、日产 80 万件", "Claimed in 2017: 21 lines, 22 s a shirt, 800 000 a day"]
+      - ["86400 ÷ 22 ≈ {{ch30.claim_line:.0f}} 件/线；21 条约 {{ch30.claim21:.1f}} 万件", "86400 ÷ 22 ≈ {{ch30.claim_line:.0f}} per line; 21 lines ≈ {{ch30.claim21k:.0f}} 000"]
+      - ["差了约 {{ch30.claim_x:.0f}} 倍：数字自己就对不上", "About {{ch30.claim_x:.0f}} times off: the numbers don't agree"]
+    foot: ["2025 年的报道：全天候高速、合格率 98% 以上仍很难，换棉布批次、换缸色都要重新标定", "Reports in 2025: round-the-clock speed with over 98% yield is still hard; each cotton batch or dye lot needs recalibration"]
+    notes:
+      - "讲一个公开案例。2017 年，有缝制机器人公司和服装企业宣布建厂：21 条全自动 T 恤线，每 22 秒一件，每天 80 万件。我们自己算：一天 86400 秒除以 22，每条线约 {{ch30.claim_line:.0f}} 件，21 条约 {{ch30.claim21:.1f}} 万件，离 80 万差了约 {{ch30.claim_x:.0f}} 倍。数字自己就对不上。后来计划没有实现；2025 年的报道说，要做到全天候高速、合格率高于 98% 仍然很难，换棉布批次、换缸色都要停机标定。读新技术报道，先核对数字。"
+      - "Here's a public case. In 2017 a sewing-robot company and an apparel maker announced a plant with 21 fully automatic T-shirt lines, one shirt every 22 seconds, 800 thousand a day. Do the sums: 86400 seconds a day over 22 is about {{ch30.claim_line:.0f}} per line, so 21 lines make about {{ch30.claim21k:.0f}} thousand, roughly {{ch30.claim_x:.0f}} times short of 800 thousand. The numbers contradict themselves. The plan never happened, and reports in 2025 said round-the-clock high speed with yields above 98 percent is still hard; a new batch of cotton or a new dye lot means stopping to recalibrate. When you read about new technology, check the numbers first."
+
+  - layout: points
+    title: ["人形机器人进入车间：2026 年的进展", "Humanoid robots on the floor: progress in 2026"]
+    points:
+      - ["签约部署 2000 台：搬运、叠放、领口袋对位", "2000 units contracted: carrying, stacking, aligning collars"]
+      - ["分离布片约 97%，送料缝制约 98% 达标", "Ply separation ~97%; loading and sewing ~98% to spec"]
+      - ["“单个工序做得好，还跑不通整条流程”", "'Good at single steps, can't yet run the whole process'"]
+    foot: ["单动作 10 s 以内、对位精度约 2 mm；拿布就像“夹豆腐”", "Each action under 10 s, about 2 mm accuracy; handling cloth is like 'picking up tofu'"]
+    notes:
+      - "再看最新进展。2026 年，有机器人企业和缝制设备企业签约，向服装厂部署 2000 台定制人形机器人，做布料搬运、叠放、卸料，以及领子、口袋对位，单个动作 10 秒以内，对位精度约 2 毫米。公开报道的另一家给了更具体的数字：分离布片成功率约 97%，送料缝制约 98% 达标，回收期约 18 个月。但负责人也说，它能把单个工序做好，却还跑不通整条流程，拿布就像夹豆腐。这句话怎么用数学说清楚？看下一页。"
+      - "Now the latest. In 2026 a robot maker and a sewing-equipment maker signed to deploy 2000 custom humanoid robots in garment factories, carrying, stacking and unloading fabric and aligning collars and pockets, each action under 10 seconds with about 2 millimetres accuracy. Another company in published reports gave more specific numbers: about 97 percent success separating plies, about 98 percent of loading-and-sewing to spec, and payback in about 18 months. But its manager also said it does single steps well yet can't run the whole process unattended; handling fabric is like picking up tofu with chopsticks. How do we say that mathematically? Next slide."
+
+  - layout: figure
+    title: ["P = pⁿ：单步 97%，10 步只剩 {{ch30.P97:.0f}}%", "P = pⁿ: 97% a step, only {{ch30.P97:.0f}}% over 10 steps"]
+    visual: {video: chain}
+    caption: ["看 10 步那一点：要 90% 无人完成，单步须约 99%", "90% unattended needs about 99% a step"]
+    notes:
+      - "一个流程有 n 个动作，每步成功率 p，各步独立，那么整条流程不用人插手就做完的概率是 p 的 n 次方。实验页让单步成功率在 0.90 到 0.999 之间轮换，看横坐标 10 步的那个圆点。0.97 的 10 次方约 {{ch30.P97:.0f}}%，每 4 件约有 1 件要人处理；单步 99%，整条约 {{ch30.P99:.0f}}%。要让 10 步流程 90% 无人完成，单步成功率要约 {{ch30.p90:.2f}}%。单步看着挺高的 97%，一乘就不够了。"
+      - "A process has n actions, each succeeding with probability p, independently; the chance it finishes with no human help is p to the n. The lab cycles the per-step success from 0.90 to 0.999; watch the dot at ten steps. 0.97 to the tenth is about {{ch30.P97:.0f}} percent, so about one piece in four needs a person. At 99 percent per step, the whole is about {{ch30.P99:.0f}} percent. For 90 percent unattended over ten steps you need about {{ch30.p90:.2f}} percent per step. A respectable-looking 97 falls short once you multiply."
+
+  - layout: bignum
+    title: ["97% 时：每小时要人插手 {{ch30.int97:.0f}} 次", "At 97%: a person steps in {{ch30.int97:.0f}} times an hour"]
+    nums:
+      - {n: "{{ch30.f97:.2f}}", n_en: "failures / piece", label: ["每件期望失败 n(1−p)/p", "Expected failures per piece"]}
+      - {n: "{{ch30.cyc97:.0f}} s", n_en: "{{ch30.perh97:.0f}} / h", label: ["节拍：动作 + 处理失败", "Cycle incl. fixing failures"]}
+      - {n: "{{ch30.int97:.1f}}", n_en: "per hour", label: ["每小时人工干预次数", "Human interventions an hour"]}
+    foot: ["单步 99%：每小时约 {{ch30.int99:.1f}} 次；99.9%：不到 {{ch30.int999:.1f}} 次 —— 单步要过 99%，机器人旁边才能不站人", "At 99%: about {{ch30.int99:.1f}} an hour; at 99.9%: under {{ch30.int999:.1f}}; only beyond 99% can the robot work alone"]
+    notes:
+      - "再算插手次数。每件期望失败次数等于 n 乘 1 减 p 再除以 p：10 步、97%，约 {{ch30.f97:.2f}} 次。每步 8 秒，失败一次人处理 30 秒再重做，节拍约 {{ch30.cyc97:.0f}} 秒，每小时约 {{ch30.perh97:.0f}} 件，人工干预约 {{ch30.int97:.1f}} 次，也就是每 {{ch30.every_min:.0f}} 分钟就要人过去一趟，机器人旁边离不开人。单步 99%，每小时约 {{ch30.int99:.1f}} 次；99.9%，不到半次。所以单步要过 99%，机器人旁边才能不站人。"
+      - "Now the interventions. Expected failures per piece are n times one minus p, over p: ten steps at 97 percent gives about {{ch30.f97:.2f}}. With 8-second steps and 30 seconds of human fixing per failure plus a redo, the cycle is about {{ch30.cyc97:.0f}} seconds, about {{ch30.perh97:.0f}} pieces an hour, and about {{ch30.int97:.1f}} interventions an hour: someone has to walk over every {{ch30.every_min:.0f}} minutes, so a person can't leave the robot. At 99 percent it's about {{ch30.int99:.1f}} an hour; at 99.9, under half. Only beyond 99 percent per step can the robot be left alone."
+
+  - layout: bignum
+    title: ["算账：两班约 {{ch30.pay2:.0f}} 个月回本", "The sums: about {{ch30.pay2:.0f}} months to pay back on two shifts"]
+    nums:
+      - {n: "{{ch30.saved:.1f}} 万", n_en: "yuan saved a year", label: ["两班各省一人，0.5 元/分", "One person per shift, ¥0.5/min"]}
+      - {n: "−{{ch30.costs:.1f}} 万", n_en: "fixing + upkeep", label: ["处理失败 {{ch30.hc:.1f}} + 维护 {{ch30.maint:.1f}} 万", "Failures {{ch30.hc:.1f}} + upkeep {{ch30.maint:.1f}}"]}
+      - {n: "{{ch30.pay3:.0f}} 月", n_en: "on three shifts", label: ["改三班回收期", "Payback on three shifts"]}
+    foot: ["回收期 = 12 × 价格 ÷（年省人工 − 处理失败 − 维护）；班次和价格比成功率影响更大", "Payback = 12 × price ÷ (labour saved − failure handling − upkeep); shifts and price matter more than success rate"]
+    notes:
+      - "最后算钱。机器人顶替每班一人，两班，年省人工 2 乘 0.5 乘 60 乘 8 乘 300，等于 {{ch30.saved:.1f}} 万元；扣掉处理失败的人工约 {{ch30.hc:.1f}} 万元、维护 {{ch30.maint:.1f}} 万元，回收期约 {{ch30.pay2:.0f}} 个月。改成三班，约 {{ch30.pay3:.0f}} 个月；单步提到 99%，两班约 {{ch30.pay99:.0f}} 个月。可见班次和价格比成功率影响更大。还要注意，顶替一个人本身是乐观假设：这个流程每小时只有约 {{ch30.perh97:.0f}} 件。"
+      - "Finally, the money. Replacing one person per shift on two shifts saves 2 times 0.5 times 60 times 8 times 300, {{ch30.saved:.1f}} ten-thousand yuan a year. Take off about {{ch30.hc:.1f}} for failure handling and {{ch30.maint:.1f}} for maintenance and the payback is about {{ch30.pay2:.0f}} months. On three shifts, about {{ch30.pay3:.0f}}; at 99 percent per step on two shifts, about {{ch30.pay99:.0f}}. So shifts and price matter more than success rate. And 'replaces one person' is itself optimistic: this process manages only about {{ch30.perh97:.0f}} pieces an hour."
+
+  - layout: lab
+    title: ["动手试一试：软面料与机器人", "Try it: soft fabric and robots"]
+    shot: {page: soft, set: [press: "#tab0"]}
+    tasks:
+      - ["第①页：换几种面料，比较刚度与下垂", "Page ①: switch fabrics, compare rigidity and droop"]
+      - ["第②页：调单步成功率和班次，看回收期", "Page ②: vary success rate and shifts, watch payback"]
+      - ["第③页：改开机时间，看节电怎样变", "Page ③: change running hours, see the saving"]
+    notes:
+      - "虚拟实验 30-1 在问渠平台上自己做。第①页在材料下拉框里依次选四种面料、卡纸和钢板，伸出 10 厘米，记下弯曲刚度、弦角和推弯布条的力；再分别只拖克重和只拖弯曲长度，比较哪个起作用。第②页从 10 步、97% 开始，记下无人完成率、每小时干预和回收期，再调单步成功率、价格和班次。第③页改每台开机时间，看全厂节电和减排怎样变。"
+      - "Lab 30-1 is on WenQuest. On page ①, pick the four fabrics, card and steel in turn from the material list with a 10-centimetre overhang, and record rigidity, chord angle and the force to buckle a strip; then drag only the weight, then only the bending length, and see which matters. On page ②, start from ten steps at 97 percent, record unattended rate, interventions per hour and payback, then vary success rate, price and shifts. On page ③, change the running hours per machine and see how the plant's saving and emissions change."
+
+  - layout: points
+    title: ["还有哪些门槛", "What other hurdles remain"]
+    points:
+      - ["泛化：换面料、换款式就要重新学", "Generalising: new fabric or style means relearning"]
+      - ["感知：反光、灰尘干扰视觉", "Sensing: glare and lint confuse vision"]
+      - ["耐久与散热：两三班连续运转", "Endurance and cooling: two or three shifts nonstop"]
+    foot: ["还没有统一接口和安全标准；人形能用现有工位，专用上料机构或协作臂可能更简单可靠", "No common interfaces or safety standards yet; a humanoid fits existing stations, but a dedicated loader or cobot may be simpler and more reliable"]
+    notes:
+      - "除了成功率和回本，还有几道门槛。泛化：布料性能千差万别，换一种面料、换一个款式就要重新学。感知：面料反光、车间里的灰尘和线头会干扰视觉。耐久和散热：服装厂常常两三班连续运转，机器人要扛得住。另外还没有统一的接口和安全标准。人形机器人的好处是能用现有工位，不用改造车间；但很多场合，专用上料机构或协作臂可能更简单、更可靠。"
+      - "Beyond success rate and payback, there are more hurdles. Generalisation: fabrics vary enormously, so a new fabric or style means relearning. Sensing: shiny fabrics, dust and lint confuse vision. Endurance and cooling: garment plants often run two or three shifts nonstop, and the robot has to keep up. And there are no common interfaces or safety standards yet. A humanoid's advantage is that it fits existing workstations without rebuilding the floor; but in many cases a dedicated loading mechanism or a collaborative arm may be simpler and more reliable."
+
+  - layout: section
+    num: "04"
+    title: ["不缝的衣服与绿色制造", "Garments without stitches, and greener making"]
+
+  - layout: split
+    title: ["不缝的衣服", "Garments without stitches"]
+    points:
+      - ["全成型编织：整件下机，只适用针织", "Whole-garment knitting: off the machine whole; knits only"]
+      - ["超声波焊接：平整无针眼可防水，纯棉焊不上", "Ultrasonic welding: flat, waterproof; won't weld cotton"]
+      - ["热熔胶带粘合：温度、压力、时间要严控", "Hot-melt tape: tight control of heat, pressure, time"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <g>
+            <rect x="20" y="20" width="860" height="180" rx="24" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
+            <path d="M80 70 q20 -30 40 0 t40 0 t40 0 t40 0 M80 110 q20 -30 40 0 t40 0 t40 0 t40 0 M80 150 q20 -30 40 0 t40 0 t40 0 t40 0" stroke="#c4b5fd" stroke-width="5" fill="none"/>
+            <text x="320" y="100" font-size="32" font-weight="800" fill="#c4b5fd">全成型编织</text>
+            <text x="320" y="150" font-size="26" fill="#d3deea">省裁剪、套口、缝合；上机时间长</text>
+          </g>
+          <g>
+            <rect x="20" y="230" width="860" height="180" rx="24" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
+            <rect x="80" y="300" width="180" height="16" fill="#e9dcc0"/><rect x="80" y="318" width="180" height="16" fill="#cdbb95"/>
+            <g stroke="#5ee0d2" stroke-width="4"><path d="M120 270 v25 M150 270 v25 M180 270 v25 M210 270 v25"/></g>
+            <text x="320" y="310" font-size="32" font-weight="800" fill="#5ee0d2">超声波焊接</text>
+            <text x="320" y="360" font-size="26" fill="#d3deea">合成纤维局部熔融；纯棉焊不上</text>
+          </g>
+          <g>
+            <rect x="20" y="440" width="860" height="180" rx="24" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
+            <rect x="80" y="510" width="180" height="16" fill="#e9dcc0"/><rect x="80" y="528" width="180" height="8" fill="#ff7a45"/><rect x="80" y="538" width="180" height="16" fill="#cdbb95"/>
+            <text x="320" y="520" font-size="32" font-weight="800" fill="#ff9c75">热熔胶带粘合</text>
+            <text x="320" y="570" font-size="26" fill="#d3deea">对纤维要求低；和西服粘衬同一类</text>
+          </g>
+        </svg>
+    notes:
+      - "还有一条路是绕开缝纫。全成型编织，毛衫整件下机，省掉裁剪、套口和缝合，但只适用于针织，上机时间长、编程难。运动服、内衣、户外服装上，另两种方式越来越多：超声波焊接用高频振动让合成纤维在接缝处局部熔融，平整、没针眼、能防水，但纯棉焊不上；热熔胶带粘合用热压把胶膜熔进两层布之间，对纤维要求低一些，但温度、压力、时间要严格控制。这些不会让缝纫机消失，缝线接缝仍是最通用的连接方式。"
+      - "Another route goes around sewing altogether. Whole-garment knitting takes a sweater off the machine in one piece, skipping cutting, linking and seaming, but it only works for knits, and knitting takes long and is hard to program. In sportswear, underwear and outdoor wear two other methods are spreading. Ultrasonic welding uses high-frequency vibration to melt synthetic fibres locally at the seam: flat, no needle holes, waterproof, but cotton won't weld. Hot-melt tape bonding presses a film of adhesive between two layers with heat; it's less fussy about fibre but needs tight control of temperature, pressure and time. None of this makes sewing machines disappear; a sewn seam is still the most universal join."
+
+  - layout: bignum
+    title: ["数码印花与绿色制造", "Digital printing and greener manufacturing"]
+    nums:
+      - {n: "−36%", n_en: "water", label: ["数码印花对比圆网：用水", "Digital vs rotary screen: water"]}
+      - {n: "−41%", n_en: "wastewater", label: ["废水；用电 −35%", "Wastewater; power −35%"]}
+      - {n: "{{ch30.tee_co2:.0f}} g", n_en: "CO₂ per T-shirt", label: ["一件 T 恤加工约 0.105 kWh", "About 0.105 kWh to make a tee"]}
+    foot: ["环境负担大头在纺纱、织布、染整；换花型几乎无损耗，适合按需生产，少做卖不掉的衣服", "The big burden is spinning, weaving and dyeing; digital printing changes designs with almost no waste, suiting make-to-order"]
+    notes:
+      - "最后说绿色。服装的环境负担大头在纺纱、织布和染整，缝制本身不多：一件 T 恤从铺布到熨烫约 0.105 度电，其中缝制约 0.098 度，约 {{ch30.tee_co2:.0f}} 克二氧化碳。车间能做的是伺服省电、少油无油旋梭、降噪。染整里一个重要变化是数码印花，像喷墨打印机一样把染料直接喷到布上。一项对比研究显示，比圆网用水少 36%、用电少 35%、废水少 41%、布料损耗少 70%。更重要的是换花型几乎没有损耗，适合按需生产，少做卖不掉的衣服。"
+      - "Finally, the environment. Most of a garment's footprint comes from spinning, weaving and dyeing; sewing itself is small. Making a T-shirt from spreading to pressing takes about 0.105 kilowatt-hours, about 0.098 of it sewing, roughly {{ch30.tee_co2:.0f}} grams of CO2. The floor can do servo drives, low-oil or oil-free hooks and noise reduction. In dyeing and finishing, a big change is digital printing, spraying dye straight onto fabric like an inkjet. One comparison found 36 percent less water, 35 percent less power, 41 percent less wastewater and 70 percent less fabric waste than rotary screens. Even more, changing designs wastes almost nothing, which suits make-to-order: making fewer clothes nobody buys."
+
+  - layout: split
+    title: ["机器人联系：插线缆为什么夹在线头附近", "Robot link: why grip a cable near its tip"]
+    points:
+      - ["悬空的导线就是一端夹住的细压杆", "The free length of wire is a slender column"]
+      - ["F_cr ∝ 1/L²：夹近一半，能推的力大四倍", "F_cr ∝ 1/L²: grip twice as close, push four times harder"]
+      - ["料框抓取：每步成功率相乘，同样是 pⁿ", "Bin picking: success rates multiply, pⁿ again"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="700" y="220" width="160" height="180" rx="16" fill="#111d31" stroke="#8fa3ba" stroke-width="3"/>
+          <text x="780" y="440" font-size="26" fill="#8fa3ba" text-anchor="middle">连接器</text>
+          <rect x="690" y="285" width="40" height="50" fill="#22324d"/>
+          <text x="20" y="80" font-size="28" font-weight="700" fill="#ff9c75">夹得远：一推就弯</text>
+          <rect x="60" y="120" width="70" height="60" rx="10" fill="#4b5f7d"/>
+          <path d="M130 150 C 300 150, 360 80, 460 120 C 560 160, 600 260, 690 300" stroke="#ff7a45" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <text x="20" y="480" font-size="28" font-weight="700" fill="#5ee0d2">夹在线头附近：推得进去</text>
+          <path d="M60 310 L560 310" stroke="#2ec4b6" stroke-width="10" stroke-linecap="round"/>
+          <rect x="560" y="280" width="70" height="60" rx="10" fill="#2ec4b6"/>
+          <path d="M630 310 L688 310" stroke="#2ec4b6" stroke-width="10"/>
+          <rect x="120" y="530" width="660" height="80" rx="20" fill="rgba(242,183,5,.12)"/>
+          <text x="450" y="582" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle">悬空长度减半 → 临界力 × 4</text>
+        </svg>
+    notes:
+      - "推布失稳公式和机器人装配线束、软管时遇到的问题完全一样：机械手把导线推进连接器，悬空的那段导线就是一根一端夹住的细压杆。临界力和悬空长度的平方成反比，夹持点离线头近一半，能推的力就大四倍。所以线束装配机器人总是夹在线头附近，分几次短行程推进，或者改成拉的方式。多步上料的 p 的 n 次方规律，也适用于料框抓取：识别、抓取、姿态校正、放置，每一步的成功率相乘。"
+      - "The buckling formula is exactly the problem robots face assembling wiring harnesses and hoses. When a gripper pushes a wire into a connector, the unsupported length of wire is a slender column clamped at one end. The critical force goes inversely with the square of that length, so gripping twice as close to the tip lets you push four times harder. That's why harness robots grip near the tip and push in several short strokes, or pull instead. And the p-to-the-n rule applies to bin picking too: recognition, grasping, pose correction and placing, each success rate multiplied."
+
+  - layout: split
+    title: ["生活中的例子：推不动的毛巾", "Everyday example: a towel you can't push"]
+    points:
+      - ["拉着毛巾一角，它平平地跟着走", "Pull a corner and the towel follows flat"]
+      - ["从后面推，它马上皱成一团", "Push from behind and it bunches up at once"]
+      - ["所以缝纫机用送布牙“拖”布，不“推”布", "That's why feed dogs drag the fabric, not push it"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="20" y="250" width="860" height="20" rx="6" fill="#2a3a55"/>
+          <rect x="20" y="560" width="860" height="20" rx="6" fill="#2a3a55"/>
+          <defs><marker id="t30" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs>
+          <text x="20" y="60" font-size="30" font-weight="700" fill="#5ee0d2">拉：平平地跟着走</text>
+          <rect x="120" y="215" width="480" height="30" rx="6" fill="#4c8dff"/>
+          <path d="M600 230 L800 230" stroke="#f2b705" stroke-width="8" marker-end="url(#t30)"/>
+          <text x="20" y="370" font-size="30" font-weight="700" fill="#ff9c75">推：马上皱成一团</text>
+          <path d="M160 552 C 200 440, 240 440, 270 552 C 300 470, 340 470, 370 552 C 400 500, 430 500, 460 552 L 560 552" stroke="#4c8dff" stroke-width="28" fill="none" stroke-linejoin="round"/>
+          <path d="M800 545 L590 545" stroke="#f2b705" stroke-width="8" marker-end="url(#t30)"/>
+        </svg>
+    notes:
+      - "回家试一试：拉着一条毛巾的一角，它能在桌面上平平地跟着走；从后面推，它马上就皱成一团。这就是刚才推布失稳公式说的事：布的弯曲刚度太小，推力还没到自重的几分之一就拱起来了。这也是缝纫机用送布牙从下面拖布，而不是从后面推布的原因。"
+      - "Try it at home. Pull a towel by one corner and it slides flat across the table after you; push it from behind and it bunches up at once. That's the buckling formula we just saw: cloth's bending rigidity is so small that it arches before the push reaches a fraction of its weight. And it's why a sewing machine's feed dog drags the fabric from underneath instead of pushing it from behind."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["{{ch30.P97:.0f}}% 无人完成，每 {{ch30.every_min:.0f}} 分钟要人插手一次", "{{ch30.P97:.0f}}% unattended: a person steps in every {{ch30.every_min:.0f}} minutes"]
+    rows:
+      - ["无人完成率 0.97¹⁰", "{{ch30.P97:.1f}}%"]
+      - ["每小时人工干预", "{{ch30.int97:.0f}} 次"]
+      - ["回收期（两班 / 三班）", "{{ch30.pay2:.0f}} / {{ch30.pay3:.0f}} 月"]
+    side: {big: "{{ch30.p90:.0f}}%", text: ["要 90% 无人完成，单步成功率要约 {{ch30.p90:.0f}}%", "90% unattended needs about {{ch30.p90:.0f}}% per step"]}
+    foot: ["单步 99% 时干预降到每小时约 {{ch30.int99:.0f}} 次，两班回收期约 {{ch30.pay99:.0f}} 个月；班次和价格影响更大", "At 99% per step: about {{ch30.int99:.0f}} interventions an hour, payback about {{ch30.pay99:.0f}} months on two shifts"]
+    notes:
+      - "回到开头的问题。整条流程无人完成的概率 0.97 的 10 次方，约 {{ch30.P97:.1f}}%，每 4 件约有 1 件要人处理。每件期望失败约 {{ch30.f97:.2f}} 次，节拍约 {{ch30.cyc97:.0f}} 秒，每小时约 {{ch30.perh97:.0f}} 件，人工干预约 {{ch30.int97:.0f}} 次。年省人工 {{ch30.saved:.1f}} 万元，扣掉处理失败和维护，两班回收期约 {{ch30.pay2:.0f}} 个月，三班约 {{ch30.pay3:.0f}} 个月。要 90% 无人完成，单步要约 {{ch30.p90:.0f}}%，这时干预降到每小时约 {{ch30.int99:.0f}} 次。所以供应商的 97%，听起来高，乘起来不够。"
+      - "Back to our problem. The chance the whole sequence runs unattended is 0.97 to the tenth, about {{ch30.P97:.1f}} percent: one piece in four needs a person. Expected failures are about {{ch30.f97:.2f}} a piece, the cycle about {{ch30.cyc97:.0f}} seconds, output about {{ch30.perh97:.0f}} an hour, and about {{ch30.int97:.0f}} interventions an hour. Labour saved is {{ch30.saved:.1f}} ten-thousand yuan a year; after failure handling and maintenance, payback is about {{ch30.pay2:.0f}} months on two shifts and {{ch30.pay3:.0f}} on three. For 90 percent unattended you need about {{ch30.p90:.0f}} percent per step, which cuts interventions to about {{ch30.int99:.0f}} an hour. The supplier's 97 sounds high, but multiplied it isn't enough."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["伺服直驱最成熟：空等越多越省", "Servo direct drive is mature: more idle time, more saving"]
+      - ["布太软：立不住、推不动，所以要“拖”", "Cloth is soft: won't stand, can't be pushed, so drag it"]
+      - ["无人完成率 = pⁿ：单步要过 99%", "Unattended rate = pⁿ: each step must beat 99%"]
+    after: ["作业 30：一份自动化提案的工程评估 · 测验 · 虚拟实验 30-1 报告 —— 在问渠学习平台完成", "Assignment 30 · quiz · Lab 30-1 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，伺服直驱是最成熟的趋势：年节电等于台数乘开机小时乘功率差，空等时间越多越划算。第二，布几乎没有弯曲刚度：立不住，约 2 倍弯曲长度；推不动，临界力还不到自重的几分之一，所以缝纫机靠送布牙拖布，可行的自动化是让布贴着台面走。第三，多步流程的无人完成率是 p 的 n 次方，单步要过 99%，机器人旁边才能不站人；读新技术报道，先拿数字互相核对。"
+      - "Three things to remember. One: servo direct drive is the most mature trend; annual saving is machines times running hours times the power difference, so the more idle time the better. Two: cloth has almost no bending rigidity; it stands only about two bending lengths and buckles before you can push with a fraction of its weight, so machines drag fabric with feed dogs, and workable automation keeps it flat on the table. Three: a multi-step process runs unattended with probability p to the n, so each step must beat 99 percent before the robot can be left alone; and check the numbers in any report on new technology."

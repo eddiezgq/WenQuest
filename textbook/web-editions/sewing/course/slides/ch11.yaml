@@ -1,0 +1,410 @@
+# 第 11 讲 典型特种机的机构 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch11.键:格式}} 由课程包程序 course/calc/ch11.py 算出，不手写数字。
+# notes：讲者备注（放映时只给老师看，录课时当讲稿用）。
+lesson: 11
+code: [ch11]
+
+clips:
+  hero:          # 封面：实验 11-1 缝出的之字线迹，摆宽在 2–10 mm 之间来回（12 秒一个来回）
+    page: zigzag
+    selector: "#stitch"
+    cover: true
+    dur: 12
+    loop: 12
+    steps:
+      - {at: 0, js: "clearInterval(window.__sw);var e=document.getElementById('w'),t0=Date.now();window.__sw=setInterval(function(){var t=(Date.now()-t0)/1000;e.value=(6-4*Math.cos(t*2*Math.PI/12)).toFixed(1);e.dispatchEvent(new Event('input',{bubbles:true}));},300)"}
+  bight:         # 同上，放在机构页里
+    page: zigzag
+    selector: "#stitch"
+    dur: 12
+    loop: 12
+    steps:
+      - {at: 0, js: "clearInterval(window.__sw);var e=document.getElementById('w'),t0=Date.now();window.__sw=setInterval(function(){var t=(Date.now()-t0)/1000;e.value=(6-4*Math.cos(t*2*Math.PI/12)).toFixed(1);e.dispatchEvent(new Event('input',{bubbles:true}));},300)"}
+  pathsweep:     # 摆动区间由 230° 收到 130° 再放开（14 秒一个来回）：太宽针在布里横摆（红），太窄惯性力超限
+    page: zigzag
+    selector: "#path"
+    dur: 14
+    loop: 14
+    steps:
+      - {at: 0, js: "clearInterval(window.__sw);var a=document.getElementById('fs'),b=document.getElementById('fe'),t0=Date.now();window.__sw=setInterval(function(){var t=(Date.now()-t0)/1000,h=Math.round(90+25*Math.cos(t*2*Math.PI/14));a.value=360-h;b.value=h;a.dispatchEvent(new Event('input',{bubbles:true}));b.dispatchEvent(new Event('input',{bubbles:true}));},300)"}
+  checksweep:    # 同一个来回，看四条判据
+    page: zigzag
+    selector: "#checks"
+    dur: 14
+    loop: 14
+    steps:
+      - {at: 0, js: "clearInterval(window.__sw);var a=document.getElementById('fs'),b=document.getElementById('fe'),t0=Date.now();window.__sw=setInterval(function(){var t=(Date.now()-t0)/1000,h=Math.round(90+25*Math.cos(t*2*Math.PI/14));a.value=360-h;b.value=h;a.dispatchEvent(new Event('input',{bubbles:true}));b.dispatchEvent(new Event('input',{bubbles:true}));},300)"}
+  laws:          # 时序图：运动规律 修正梯形 → 摆线 → 简谐，每 4 秒换一次，一直循环
+    page: zigzag
+    selector: "#tim"
+    vh: 1100
+    dur: 12
+    loop: 12
+    steps:
+      - {at: 0, js: "var s=document.getElementById('law');s.selectedIndex=0;s.dispatchEvent(new Event('change',{bubbles:true}))"}
+      - {at: 4, js: "var s=document.getElementById('law');s.selectedIndex=1;s.dispatchEvent(new Event('change',{bubbles:true}))"}
+      - {at: 8, js: "var s=document.getElementById('law');s.selectedIndex=2;s.dispatchEvent(new Event('change',{bubbles:true}))"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 11 讲", "Lecture 11"]
+    title: ["典型特种机的机构", "Mechanisms of Typical Special Machines"]
+    sub: ["一个缝纫头，加一套平面运动", "A sewing head plus a planar motion"]
+    notes:
+      - "同学们好。锁眼、钉扣、套结、之字缝、绗缝、刺绣，这些机器统称特种机。它们看起来五花八门，结构却有一个共同点：一个缝纫头，加上针或布的平面运动。这一讲以之字缝机为主线，看横摆该放在哪段转角、用什么运动规律、摆宽受什么限制，再看锁眼、钉扣、刺绣机怎样用同一套道理。"
+      - "Hello everyone. Buttonholers, button sewers, bartackers, zigzag machines, quilters and embroidery machines are all called special machines. They look very different, but they share one structure: a sewing head plus a planar motion of the needle or the fabric. Today we follow the zigzag machine: where in the shaft angle the swing belongs, which motion law to use, and what limits the bight. Then we see how buttonholers, button sewers and embroidery machines use the same ideas."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["松紧带之字缝：区间能不能再压缩", "Zigzagging elastic: can the swing be squeezed?"]
+    facts:
+      - ["摆宽 8 mm，5000 r/min，摆针区间 275°–85°（170°），修正梯形", "8 mm bight, 5000 r/min, swing 275°–85° (170°), modified trapezoid"]
+      - ["摆架折算质量 150 g，横向惯性力限 250 N（示意）", "Frame mass 150 g at the needle; sideways limit 250 N (illustrative)"]
+      - ["工艺员：改用“更平稳”的摆线规律，区间压到 120°", "The engineer: switch to the “smoother” cycloid and squeeze to 120°"]
+    notes:
+      - "车间问题。内衣厂用电子之字缝机上松紧带，摆宽 8 毫米，每分钟 5000 转，摆针区间从主轴 275 度到 85 度，共 170 度，运动规律是修正梯形。摆架折算到针尖的质量约 150 克，横向惯性力按 250 牛限（示意值）。工艺员提了两点：改用更平稳的摆线规律；把区间压到 120 度，给送布多留时间。行不行？针在左右两端被钩住的时刻差多少？"
+      - "The shop-floor problem. An underwear factory sews elastic on an electronic zigzag machine: 8 millimetre bight, 5000 r/min, the needle swings from 275 to 85 degrees of shaft angle, 170 in all, with a modified-trapezoid motion law. The frame's mass referred to the needle is about 150 grams, and the sideways inertia force is limited to 250 newtons, an illustrative value. The process engineer proposes the smoother cycloidal law, and squeezing the swing to 120 degrees to give the feed more time. Will it work? And how far apart are the catching moments at the two ends?"
+
+  - layout: section
+    num: "01"
+    title: ["特种机：缝纫头 + 平面运动", "Special machines: a head plus planar motion"]
+
+  - layout: tiles
+    title: ["同一个结构，六种机器", "One structure, six machines"]
+    tiles:
+      - {k: "之字", name: ["之字缝机", "Zigzag"], use: ["针杆左右摆", "The needle bar swings"], hot: true}
+      - {k: "锁眼", name: ["锁眼机", "Buttonholer"], use: ["之字 + 套结 + 切刀", "Zigzag + bartack + knife"]}
+      - {k: "钉扣", name: ["钉扣机", "Button sewer"], use: ["扣夹按花样移动", "The clamp follows a pattern"]}
+      - {k: "套结", name: ["套结机", "Bartacker"], use: ["压框 X、Y 两向走", "The clamp moves in X and Y"]}
+      - {k: "绗缝", name: ["多针绗缝机", "Multi-needle quilter"], use: ["几十根针一起缝", "Dozens of needles at once"]}
+      - {k: "刺绣", name: ["电脑刺绣机", "Embroidery machine"], use: ["绣框走花样、换色", "The frame moves; colours change"]}
+    notes:
+      - "这六种机器看起来很不一样，结构却相同：一个缝纫头，加上针或布在平面里的运动，再加一些附加动作，比如切刀、换色。之字缝是针杆左右摆；锁眼是之字加两端套结再加切刀；钉扣机的扣夹、套结机的压框按花样在 X、Y 两个方向走；绗缝机一根横梁上几十根针；刺绣机的绣框走花样，还要换色。"
+      - "These six machines look very different, but their structure is the same: a sewing head, plus motion of the needle or the fabric in a plane, plus extra actions such as a knife or colour change. In the zigzag machine the needle bar swings sideways. A buttonholer is zigzag plus bartacks at both ends plus a knife. The clamp of a button sewer or the frame of a bartacker moves in X and Y along a pattern. A quilter carries dozens of needles on one beam. An embroidery machine moves its frame along the design and changes colour."
+
+  - layout: duo
+    title: ["硬约束：针在布中，不许横着动", "The hard rule: no sideways motion with the needle in"]
+    left: {video: pathsweep, label: ["针尖路径：区间收放", "Needle path as the interval changes"], note: ["红色 = 在布里横摆", "Red = swinging inside the fabric"]}
+    right: {video: checksweep, label: ["四条判据", "Four criteria"], note: ["太窄：惯性力超限", "Too narrow: force over the limit"]}
+    notes:
+      - "所有特种机都受同一条硬约束：针在布中时，针和布之间不能有水平相对运动。违反了，针被拉弯、针迹偏位，甚至撞针板断针。这是虚拟实验 11-1，摆动区间正在放大又收窄：太宽了，横摆伸进针在布里的时段，路径变红；太窄了，同样的摆宽挤在更短的转角里，惯性力超限。"
+      - "Every special machine obeys one hard rule: while the needle is in the fabric, needle and fabric must not move sideways relative to each other. Break it and the needle bends, stitches go astray, or the needle hits the plate and breaks. This is Virtual Lab 11-1, with the swing interval opening and closing. Too wide, and the swing runs into the time the needle is in the fabric: the path turns red. Too narrow, and the same bight is crammed into fewer degrees, so the inertia force goes over the limit."
+
+  - layout: section
+    num: "02"
+    title: ["之字缝机：横摆放在哪、怎么摆", "The zigzag machine: when and how to swing"]
+
+  - layout: split
+    title: ["304 之字线迹与摆针机构", "Stitch 304 and the swinging needle bar"]
+    points:
+      - ["304 是锁式，交织点左右交替，比 301 有弹性", "304 is a lockstitch, alternating sides; stretchier than 301"]
+      - ["针杆装在摆架里，绕上端支点左右摆", "The needle bar sits in a frame pivoted at the top"]
+      - ["电子式：步进电机直驱，最大摆宽 8 mm", "Electronic: a stepper drives it, up to 8 mm bight"]
+    visual: {video: bight}
+    notes:
+      - "之字线迹 304 还是锁式线迹，只是交织点交替落在左右两侧，比直线的 301 有弹性，适合松紧带和针织。针杆装在一个摆架里，摆架绕上端支点左右摆。机械式由之字凸轮经摆杆、连杆推动，改连杆作用半径就改摆宽；电子式用步进电机直接驱动，某型最大摆宽 8 毫米，每分钟 5000 针。右边摆宽在 2 到 10 毫米之间来回。"
+      - "The zigzag stitch 304 is still a lockstitch; the interlocks simply alternate left and right, so it stretches more than a straight 301 and suits elastic and knits. The needle bar sits in a frame that swings about a pivot at its top. On mechanical machines a zigzag cam drives it through a lever and link, and changing the link's working radius changes the bight; electronic machines drive it directly with a stepper motor, up to 8 millimetres at 5000 stitches a minute on one model. On the right, the bight sweeps between 2 and 10 millimetres."
+
+  - layout: split
+    title: ["针在布外的窗口：约 {{ch11.win:.0f}}°", "The out-of-fabric window: about {{ch11.win:.0f}}°"]
+    points:
+      - ["针 258.3° 离开布面，101.7° 再碰布面", "The needle leaves at 258.3° and touches again at 101.7°"]
+      - ["留 0.5 mm 余量：可用 {{ch11.win_exit:.0f}}°–{{ch11.win_enter:.0f}}°", "With a 0.5 mm margin: {{ch11.win_exit:.0f}}°–{{ch11.win_enter:.0f}}°"]
+      - ["送布和摆针共用这个窗口；布越厚越窄", "Feed and swing share it; thicker fabric narrows it"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <circle cx="330" cy="320" r="230" fill="none" stroke="#1c2a42" stroke-width="60"/>
+          <path d="M103.5 359.9 A230 230 0 1 1 556.5 359.9" fill="none" stroke="#2ec4b6" stroke-width="60"/>
+          <path d="M556.5 359.9 A230 230 0 0 1 103.5 359.9" fill="none" stroke="#c8d2de" stroke-width="60" opacity=".55"/>
+          <text x="330" y="40" font-size="24" fill="#8fa3ba" text-anchor="middle" class="en">0°（针杆最高）</text>
+          <text x="330" y="626" font-size="24" fill="#8fa3ba" text-anchor="middle" class="en">180°</text>
+          <text x="330" y="300" font-size="40" font-weight="800" fill="#5ee0d2" text-anchor="middle">≈ {{ch11.win:.0f}}°</text>
+          <text x="330" y="340" font-size="24" fill="#d3deea" text-anchor="middle">针在布外 · out of fabric</text>
+          <text x="330" y="470" font-size="26" fill="#c8d2de" text-anchor="middle">针在布中</text>
+          <text x="620" y="200" font-size="30" font-weight="800" fill="#5ee0d2">送布 + 横摆</text>
+          <text x="620" y="236" font-size="22" fill="#8fa3ba" class="en">feed + swing share it</text>
+          <text x="600" y="400" font-size="26" fill="#d3deea" class="en">{{ch11.win_enter:.0f}}°</text>
+          <text x="10" y="400" font-size="26" fill="#d3deea" class="en">{{ch11.win_exit:.0f}}°</text>
+        </svg>
+    notes:
+      - "横摆只能放在针在布外的那段转角里。算例取针杆行程 31 毫米、布厚 1.5 毫米：针在 258.3 度离开布面，101.7 度再碰到布面。要求摆动时针尖至少高出布面 0.5 毫米，可用的就是 {{ch11.win_exit:.0f}} 度到 {{ch11.win_enter:.0f}} 度，约 {{ch11.win:.0f}} 度。注意送布也在这个窗口里完成，和摆针共用；布越厚，窗口越窄。"
+      - "The sideways swing has to fit into the part of the turn when the needle is out of the fabric. In the worked example, with a 31-millimetre stroke and 1.5 millimetres of fabric, the needle leaves the surface at 258.3 degrees and touches it again at 101.7. Require the point to be at least 0.5 millimetres clear while swinging, and the usable window is {{ch11.win_exit:.0f}} to {{ch11.win_enter:.0f}} degrees, about {{ch11.win:.0f}}. Note that the feed happens in this same window, shared with the swing, and thicker fabric narrows it."
+
+  - layout: figure
+    title: ["三种运动规律：摆的方式不同", "Three motion laws: three ways to swing"]
+    h: 560
+    visual: {video: laws}
+    caption: ["修正梯形 → 摆线 → 简谐，每 4 秒换一次", "Modified trapezoid → cycloidal → harmonic, every 4 s"]
+    notes:
+      - "同样摆 8 毫米、同样 170 度，摆的方式可以不同。简谐，加速度是余弦，两端加速度突变，激起冲击和振动；摆线，加速度是正弦，两端为零，很平稳，可是峰值最大；修正梯形，加速度平顶、两端连续，峰值和简谐差不多。现在三种规律轮流切换，看下方针的横向位置曲线怎样变。"
+      - "Same 8-millimetre bight, same 170 degrees, but the swing can follow different laws. Harmonic: the acceleration is a cosine, jumping at both ends, which causes shocks and vibration. Cycloidal: the acceleration is a sine, zero at both ends, very smooth, but with the highest peak. Modified trapezoid: a flat-topped acceleration, continuous at both ends, with a peak about the same as harmonic. The three laws are cycling now; watch how the lower curve, the needle's sideways position, changes."
+
+  - layout: split
+    title: ["峰值加速度：a = C · w ω² / β²", "Peak acceleration: a = C · w ω² / β²"]
+    points:
+      - ["与摆宽、转速平方成正比，与摆动转角平方成反比", "∝ bight and speed², ∝ 1 / swing angle²"]
+      - ["“更平稳”的摆线，峰值反而最大", "The “smoother” cycloid has the highest peak"]
+      - ["修正梯形比摆线峰值低约 {{ch11.CYless:.0f}}%", "Modified trapezoid peaks about {{ch11.CYless:.0f}}% lower"]
+    visual: {svg: '<svg viewBox="0 0 900 640" width="100%" height="640"><path d="M300 105 L850 105" stroke="#2c3e5c" stroke-width="2"/><polyline points="300.0,40.8 305.5,40.9 311.0,41.0 316.5,41.1 322.0,41.4 327.5,41.6 333.0,42.0 338.5,42.4 344.0,42.9 349.5,43.4 355.0,44.0 360.5,44.6 366.0,45.4 371.5,46.1 377.0,47.0 382.5,47.8 388.0,48.8 393.5,49.8 399.0,50.8 404.5,51.9 410.0,53.1 415.5,54.3 421.0,55.6 426.5,56.9 432.0,58.2 437.5,59.6 443.0,61.1 448.5,62.6 454.0,64.1 459.5,65.7 465.0,67.3 470.5,68.9 476.0,70.6 481.5,72.3 487.0,74.1 492.5,75.9 498.0,77.7 503.5,79.5 509.0,81.4 514.5,83.3 520.0,85.2 525.5,87.1 531.0,89.0 536.5,91.0 542.0,93.0 547.5,95.0 553.0,97.0 558.5,99.0 564.0,101.0 569.5,103.0 575.0,105.0 580.5,107.0 586.0,109.0 591.5,111.0 597.0,113.0 602.5,115.0 608.0,117.0 613.5,119.0 619.0,121.0 624.5,122.9 630.0,124.8 635.5,126.7 641.0,128.6 646.5,130.5 652.0,132.3 657.5,134.1 663.0,135.9 668.5,137.7 674.0,139.4 679.5,141.1 685.0,142.7 690.5,144.3 696.0,145.9 701.5,147.4 707.0,148.9 712.5,150.4 718.0,151.8 723.5,153.1 729.0,154.4 734.5,155.7 740.0,156.9 745.5,158.1 751.0,159.2 756.5,160.2 762.0,161.2 767.5,162.2 773.0,163.0 778.5,163.9 784.0,164.6 789.5,165.4 795.0,166.0 800.5,166.6 806.0,167.1 811.5,167.6 817.0,168.0 822.5,168.4 828.0,168.6 833.5,168.9 839.0,169.0 844.5,169.1 850.0,169.2" fill="none" stroke="#8fa3ba" stroke-width="6" stroke-linejoin="round"/><text x="0" y="95" font-size="32" font-weight="700" fill="#8fa3ba">简谐</text><text x="0" y="127" font-size="20" fill="#8fa3ba" class="en">harmonic</text><text x="0" y="167" font-size="26" font-weight="800" fill="#f3f6fa" class="en">C = 4.93</text><path d="M300 305 L850 305" stroke="#2c3e5c" stroke-width="2"/><polyline points="300.0,305.0 305.5,299.9 311.0,294.8 316.5,289.7 322.0,284.7 327.5,279.8 333.0,274.9 338.5,270.2 344.0,265.6 349.5,261.2 355.0,257.0 360.5,252.9 366.0,249.1 371.5,245.5 377.0,242.1 382.5,238.9 388.0,236.0 393.5,233.4 399.0,231.1 404.5,229.1 410.0,227.3 415.5,225.9 421.0,224.8 426.5,224.0 432.0,223.5 437.5,223.3 443.0,223.5 448.5,224.0 454.0,224.8 459.5,225.9 465.0,227.3 470.5,229.1 476.0,231.1 481.5,233.4 487.0,236.0 492.5,238.9 498.0,242.1 503.5,245.5 509.0,249.1 514.5,252.9 520.0,257.0 525.5,261.2 531.0,265.6 536.5,270.2 542.0,274.9 547.5,279.8 553.0,284.7 558.5,289.7 564.0,294.8 569.5,299.9 575.0,305.0 580.5,310.1 586.0,315.2 591.5,320.3 597.0,325.3 602.5,330.2 608.0,335.1 613.5,339.8 619.0,344.4 624.5,348.8 630.0,353.0 635.5,357.1 641.0,360.9 646.5,364.5 652.0,367.9 657.5,371.1 663.0,374.0 668.5,376.6 674.0,378.9 679.5,380.9 685.0,382.7 690.5,384.1 696.0,385.2 701.5,386.0 707.0,386.5 712.5,386.7 718.0,386.5 723.5,386.0 729.0,385.2 734.5,384.1 740.0,382.7 745.5,380.9 751.0,378.9 756.5,376.6 762.0,374.0 767.5,371.1 773.0,367.9 778.5,364.5 784.0,360.9 789.5,357.1 795.0,353.0 800.5,348.8 806.0,344.4 811.5,339.8 817.0,335.1 822.5,330.2 828.0,325.3 833.5,320.3 839.0,315.2 844.5,310.1 850.0,305.0" fill="none" stroke="#ff7a45" stroke-width="6" stroke-linejoin="round"/><text x="0" y="295" font-size="32" font-weight="700" fill="#ff7a45">摆线</text><text x="0" y="327" font-size="20" fill="#8fa3ba" class="en">cycloidal</text><text x="0" y="367" font-size="26" font-weight="800" fill="#f3f6fa" class="en">C = 2π ≈ 6.28</text><path d="M300 505 L850 505" stroke="#2c3e5c" stroke-width="2"/><polyline points="300.0,505.0 305.5,497.0 311.0,489.2 316.5,481.6 322.0,474.4 327.5,467.6 333.0,461.5 338.5,456.0 344.0,451.3 349.5,447.5 355.0,444.6 360.5,442.6 366.0,441.6 371.5,441.5 377.0,441.5 382.5,441.5 388.0,441.5 393.5,441.5 399.0,441.5 404.5,441.5 410.0,441.5 415.5,441.5 421.0,441.5 426.5,441.5 432.0,441.5 437.5,441.5 443.0,441.5 448.5,441.5 454.0,441.5 459.5,441.5 465.0,441.5 470.5,441.5 476.0,441.5 481.5,441.5 487.0,441.5 492.5,441.5 498.0,441.5 503.5,441.5 509.0,441.6 514.5,442.6 520.0,444.6 525.5,447.5 531.0,451.3 536.5,456.0 542.0,461.5 547.5,467.6 553.0,474.4 558.5,481.6 564.0,489.2 569.5,497.0 575.0,505.0 580.5,513.0 586.0,520.8 591.5,528.4 597.0,535.6 602.5,542.4 608.0,548.5 613.5,554.0 619.0,558.7 624.5,562.5 630.0,565.4 635.5,567.4 641.0,568.4 646.5,568.5 652.0,568.5 657.5,568.5 663.0,568.5 668.5,568.5 674.0,568.5 679.5,568.5 685.0,568.5 690.5,568.5 696.0,568.5 701.5,568.5 707.0,568.5 712.5,568.5 718.0,568.5 723.5,568.5 729.0,568.5 734.5,568.5 740.0,568.5 745.5,568.5 751.0,568.5 756.5,568.5 762.0,568.5 767.5,568.5 773.0,568.5 778.5,568.5 784.0,568.4 789.5,567.4 795.0,565.4 800.5,562.5 806.0,558.7 811.5,554.0 817.0,548.5 822.5,542.4 828.0,535.6 833.5,528.4 839.0,520.8 844.5,513.0 850.0,505.0" fill="none" stroke="#2ec4b6" stroke-width="6" stroke-linejoin="round"/><text x="0" y="495" font-size="32" font-weight="700" fill="#2ec4b6">修正梯形</text><text x="0" y="527" font-size="20" fill="#8fa3ba" class="en">modified trapezoid</text><text x="0" y="567" font-size="26" font-weight="800" fill="#f3f6fa" class="en">C = 4.89</text><text x="575" y="630" font-size="22" fill="#8fa3ba" text-anchor="middle">加速度随摆动进程 · acceleration over the swing</text></svg>'}
+    notes:
+      - "峰值加速度等于 C 乘摆宽 w、乘主轴角速度平方，除以摆动所占转角 β 的平方。C 由运动规律决定：简谐约 4.93，摆线 2π 约 6.28，修正梯形约 4.89。所以加速度和摆宽成正比，和转速平方成正比，和摆动转角平方成反比。工艺员说的“更平稳”的摆线，两端是平稳，峰值却最大；修正梯形比摆线低约 {{ch11.CYless:.0f}}%，兼有两者长处。"
+      - "The peak acceleration is C times the bight w times the shaft angular speed squared, divided by the square of the swing angle beta. C depends on the motion law: about 4.93 harmonic, 2 pi or about 6.28 cycloidal, about 4.89 modified trapezoid. So acceleration goes with the bight and with speed squared, and inversely with the swing angle squared. The cycloid the engineer calls smoother is smooth at the ends, but its peak is the highest; the modified trapezoid peaks about {{ch11.CYless:.0f}} percent lower and has the best of both."
+
+  - layout: section
+    num: "03"
+    title: ["两端都要钩住", "Both ends must be caught"]
+
+  - layout: split
+    title: ["针在两端：钩线时刻不同", "At the two ends the catch comes at different times"]
+    points:
+      - ["旋梭转速是主轴 2 倍，梭尖从右向左扫", "The hook turns at 2× shaft speed, sweeping right to left"]
+      - ["Δφ = w / (2R)：8 mm 时约 {{ch11.dphi8:.0f}}°", "Δφ = w / (2R): about {{ch11.dphi8:.0f}}° at 8 mm"]
+      - ["右端先钩：针回升只有 {{ch11.riseR:.1f}} mm", "The right end is caught first: only {{ch11.riseR:.1f}} mm of rise"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <circle cx="450" cy="380" r="220" fill="none" stroke="#4b5f7d" stroke-width="4" stroke-dasharray="12 10"/>
+          <circle cx="450" cy="380" r="10" fill="#8fa3ba"/>
+          <path d="M450 380 L344 187" stroke="#ff7a45" stroke-width="4"/><path d="M450 380 L556 187" stroke="#4c8dff" stroke-width="4"/>
+          <path d="M405 300 A90 90 0 0 1 495 300" fill="none" stroke="#f2b705" stroke-width="5"/>
+          <text x="450" y="280" font-size="34" font-weight="800" fill="#f2b705" text-anchor="middle">2Δφ</text>
+          <g stroke="#c8d2de" stroke-width="12" stroke-linecap="round"><path d="M344 40 L344 175"/><path d="M556 40 L556 175"/></g>
+          <path d="M344 120 L556 120" stroke="#f2b705" stroke-width="3" stroke-dasharray="8 6"/>
+          <text x="450" y="108" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">w</text>
+          <text x="300" y="40" font-size="26" fill="#ffb38f" text-anchor="end">左端：后钩</text>
+          <text x="600" y="40" font-size="26" fill="#8fbaff">右端：先钩</text>
+          <path d="M700 260 A220 220 0 0 0 600 190" fill="none" stroke="#2ec4b6" stroke-width="8"/>
+          <path d="M600 190 l30 -2 l-14 26 z" fill="#2ec4b6"/>
+          <text x="640" y="330" font-size="26" fill="#5ee0d2">梭尖 · hook</text>
+          <text x="450" y="460" font-size="28" fill="#d3deea" text-anchor="middle">R = 13.5 mm</text>
+          <text x="450" y="560" font-size="22" fill="#8fa3ba" text-anchor="middle">梭尖转过 w/R，主轴只转一半：Δφ = w/(2R)</text>
+        </svg>
+    notes:
+      - "旋梭轴前后布置，梭尖经过针时沿左右方向运动。针在左右两端，梭尖要多转 w 比 R 的角度才能从一端走到另一端；旋梭转速是主轴 2 倍，所以主轴只差一半：Δφ 等于 w 比 2R。R 等于 13.5 毫米、摆宽 8 毫米时约 {{ch11.dphi8:.0f}} 度。梭尖从右向左，右端先钩，那时针回升只有约 {{ch11.riseR:.1f}} 毫米，左端回升 3.8，两端差近 3 毫米。"
+      - "The hook shaft runs front to back, so as the hook point passes the needle it moves left to right. With the needle at the two ends, the point has to turn an extra w over R to get from one to the other; the hook turns twice as fast as the shaft, so the shaft angle differs by half that: delta phi equals w over 2R. With R 13.5 millimetres and an 8-millimetre bight, that's about {{ch11.dphi8:.0f}} degrees. The point sweeps right to left, so the right end is caught first, when the needle has risen only about {{ch11.riseR:.1f}} millimetres, against 3.8 at the left: nearly 3 millimetres apart."
+
+  - layout: bignum
+    title: ["摆宽上限，由钩线窗口决定", "The maximum bight is set by the catching window"]
+    nums:
+      - {n: "{{ch11.wmax5:.1f}} mm", label: ["用第 5 讲旋梭窗口（回升 1.5–2.8 mm）", "With Lecture 5's hook window (1.5–2.8 mm rise)"]}
+      - {n: "{{ch11.wmax:.1f}} mm", label: ["用第 10 讲示意判据（1.0–4.2 mm）", "With Lecture 10's criterion (1.0–4.2 mm)"]}
+      - {n: "10 mm", label: ["说明书最大摆宽", "The manual's maximum"]}
+    foot: ["两端都要在线环够大时被钩住；真实窗口比第 5 讲宽得多，要靠实测", "Both ends must be caught while the loop is big enough; the real window is much wider than Lecture 5's, measure it"]
+    notes:
+      - "两端都要在线环够大的时候被钩住，这就限制了摆宽。如果用第 5 讲旋梭的窗口，回升约 1.5 到 2.8 毫米，摆宽上限只有约 {{ch11.wmax5:.1f}} 毫米；用第 10 讲的示意判据，回升 1.0 到 4.2 毫米，两端最多差约 {{ch11.dphimax:.0f}} 度，摆宽上限约 {{ch11.wmax:.1f}} 毫米。说明书最大能到 10 毫米，可见真实的线环窗口比第 5 讲的模型宽得多，要实测。"
+      - "Both ends must be caught while the loop is big enough, and that limits the bight. With Lecture 5's hook window, a rise of about 1.5 to 2.8 millimetres, the maximum bight is only about {{ch11.wmax5:.1f}} millimetres. With Lecture 10's illustrative criterion, 1.0 to 4.2, the two ends can differ by about {{ch11.dphimax:.0f}} degrees, which allows about {{ch11.wmax:.1f}} millimetres. The manual goes up to 10, so the real loop window is clearly much wider than the Lecture 5 model; it has to be measured."
+
+  - layout: points
+    title: ["两端的高度与间隙怎样调", "Setting height and clearance at the two ends"]
+    points:
+      - ["最左端：调针眼上沿到梭尖 0.2–0.5 mm", "Left end: eye top to hook point 0.2–0.5 mm"]
+      - ["最右端：调梭尖与针的间隙 0–0.05 mm", "Right end: hook-to-needle clearance 0–0.05 mm"]
+      - ["左端针回升多，离梭尖最近；右端针身最粗处最近", "Left: most rise, eye nearest; right: full needle diameter nearest"]
+    notes:
+      - "说明书的调法正好对应两端的差别：在最左端调针眼上沿到梭尖的距离，0.2 到 0.5 毫米；在最右端调梭尖和针的间隙，0 到 0.05 毫米。为什么？左端后钩，针回升多，针眼离梭尖最近，所以在这端定高度；右端针回升少，梭尖从针身全直径处经过，离得最近，所以在这端查间隙。"
+      - "The manual's procedure matches the difference between the ends. At the left end, set the distance from the top of the eye to the hook point, 0.2 to 0.5 millimetres. At the right end, set the clearance between hook point and needle, 0 to 0.05. Why? The left end is caught later, with more rise, so the eye is closest to the point there; that's where to set height. At the right end the needle has risen less and the point passes the full diameter of the needle, closest of all; that's where to check clearance."
+
+  - layout: lab
+    title: ["动手试一试：之字缝的摆针与钩线", "Try it: zigzag swing timing and catching"]
+    shot: {page: zigzag}
+    tasks:
+      - ["按“打乱”，先调摆动区间，再调旋梭定时", "Press “Scramble”; fix the swing interval first, then the hook timing"]
+      - ["换“摆线”，找出不超 250 N 的最窄区间", "Switch to cycloidal; find the narrowest interval under 250 N"]
+      - ["只调摆宽和旋梭定时，找出最大摆宽", "Using only bight and hook timing, find the maximum bight"]
+    notes:
+      - "这个实验大家在问渠平台上做。第一，按“打乱”，先调摆动开始和结束，让横摆离开红色区段，再调旋梭定时，使四条判据都满足。第二，换成摆线规律，摆宽 8 毫米、5000 转，找出惯性力不超过 250 牛、又全在布外的最窄区间。第三，只调摆宽和旋梭定时，找出两端都能钩住的最大摆宽，想一想说明书为什么在最左端定梭尖高度。"
+      - "Do this lab on WenQuest. One: press Scramble, adjust the swing start and end until the swing leaves the red segment, then the hook timing until all four criteria pass. Two: switch to the cycloidal law at 8 millimetres and 5000 r/min and find the narrowest interval that stays under 250 newtons and entirely out of the fabric. Three: using only the bight and hook timing, find the largest bight at which both ends are caught, and think about why the manual sets hook height at the left end."
+
+  - layout: section
+    num: "04"
+    title: ["锁眼、钉扣、套结与刺绣", "Buttonholes, buttons, bartacks and embroidery"]
+
+  - layout: split
+    title: ["锁眼机：平头与圆头", "Buttonholers: straight and keyhole"]
+    points:
+      - ["平头（衬衫）：304，两排之字 + 两端套结 + 切刀", "Straight (shirts): 304, two zigzag rows, two bartacks, a knife"]
+      - ["先缝后切边缘整齐，先切后缝不易脱纱", "Sew then cut: neat edges; cut then sew: less fraying"]
+      - ["圆头（西服、牛仔）：404 之字链式，内包衬线", "Keyhole (suits, jeans): 404 zigzag chain over a gimp"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="40" y="60" width="380" height="460" rx="20" fill="#e9dcc0"/>
+          <rect x="480" y="60" width="380" height="460" rx="20" fill="#e9dcc0"/>
+          <g stroke="#2c6fd6" stroke-width="5">
+            <path d="M190 140 l30 0 M190 152 l30 0 M190 164 l30 0 M190 176 l30 0 M190 188 l30 0 M190 200 l30 0 M190 212 l30 0 M190 224 l30 0 M190 236 l30 0 M190 248 l30 0 M190 260 l30 0 M190 272 l30 0 M190 284 l30 0 M190 296 l30 0 M190 308 l30 0 M190 320 l30 0 M190 332 l30 0 M190 344 l30 0 M190 356 l30 0 M190 368 l30 0 M190 380 l30 0 M190 392 l30 0 M190 404 l30 0 M190 416 l30 0 M190 428 l30 0"/>
+            <path d="M240 140 l30 0 M240 152 l30 0 M240 164 l30 0 M240 176 l30 0 M240 188 l30 0 M240 200 l30 0 M240 212 l30 0 M240 224 l30 0 M240 236 l30 0 M240 248 l30 0 M240 260 l30 0 M240 272 l30 0 M240 284 l30 0 M240 296 l30 0 M240 308 l30 0 M240 320 l30 0 M240 332 l30 0 M240 344 l30 0 M240 356 l30 0 M240 368 l30 0 M240 380 l30 0 M240 392 l30 0 M240 404 l30 0 M240 416 l30 0 M240 428 l30 0"/></g>
+          <rect x="185" y="112" width="90" height="22" rx="4" fill="#2c6fd6"/><rect x="185" y="436" width="90" height="22" rx="4" fill="#2c6fd6"/>
+          <path d="M230 145 L230 425" stroke="#6b5a3a" stroke-width="4"/>
+          <g stroke="#2c6fd6" stroke-width="5" fill="none">
+            <path d="M630 170 l-24 0 M630 185 l-24 0 M630 200 l-24 0 M630 215 l-24 0 M630 230 l-24 0 M630 245 l-24 0 M630 260 l-24 0 M630 275 l-24 0 M630 290 l-24 0 M630 305 l-24 0 M630 320 l-24 0 M630 335 l-24 0 M630 350 l-24 0 M630 365 l-24 0 M630 380 l-24 0 M630 395 l-24 0 M630 410 l-24 0"/>
+            <path d="M710 170 l24 0 M710 185 l24 0 M710 200 l24 0 M710 215 l24 0 M710 230 l24 0 M710 245 l24 0 M710 260 l24 0 M710 275 l24 0 M710 290 l24 0 M710 305 l24 0 M710 320 l24 0 M710 335 l24 0 M710 350 l24 0 M710 365 l24 0 M710 380 l24 0 M710 395 l24 0 M710 410 l24 0"/>
+            <circle cx="670" cy="140" r="52" stroke-width="22" stroke-dasharray="5 4"/></g>
+          <rect x="655" y="160" width="30" height="270" rx="6" fill="#08101d" opacity=".75"/><circle cx="670" cy="140" r="28" fill="#08101d" opacity=".75"/>
+          <rect x="630" y="434" width="80" height="20" rx="4" fill="#2c6fd6"/>
+          <text x="230" y="570" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">平头 · 304</text><text x="230" y="604" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">straight · shirts</text>
+          <text x="670" y="570" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">圆头 · 404</text><text x="670" y="604" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">keyhole · suits, jeans</text>
+        </svg>
+    notes:
+      - "锁眼机分平头和圆头。平头锁眼用在衬衫上，是 304 之字：先缝一排之字，再缝一个套结，换到另一边再一排之字和一个套结，最后切刀切开，共五步。先缝后切边缘整齐，先切后缝不容易脱纱。圆头锁眼用在西服、大衣、牛仔上，是 404 单针双线之字链式，里面包一根衬线；缝圆头的时候，针和弯针要绕圆心转。"
+      - "Buttonholers come in two kinds. The straight buttonhole on shirts is 304 zigzag: one row of zigzag, a bartack, the other row and the other bartack, then the knife cuts it open, five steps in all. Sewing first and then cutting gives neat edges; cutting first frays less. The keyhole buttonhole on suits, coats and jeans is 404, a single-needle two-thread zigzag chainstitch wrapped round a gimp cord; around the round end, needle and looper have to rotate about its centre."
+
+  - layout: split
+    title: ["钉扣机与套结机：花样凸轮", "Button sewers and bartackers: the pattern cam"]
+    points:
+      - ["蜗杆蜗轮大减速：凸轮一圈 = 一个花样", "A worm gear slows it: one cam turn = one pattern"]
+      - ["两条槽经 X、Y 杠杆推扣夹或压框", "Two grooves drive the clamp through X and Y levers"]
+      - ["每个台阶的升程要落在针在布外的转角里", "Each step's rise must fall in the out-of-fabric angle"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <circle cx="260" cy="320" r="220" fill="#111d31" stroke="#4b5f7d" stroke-width="4"/>
+          <path d="M260 160 L300 162 L302 190 L340 196 L338 226 L372 238 L366 268 L396 290 L384 318 L404 350 L386 376 L398 410 L372 430 L372 466" fill="none" stroke="#f2b705" stroke-width="10" stroke-linejoin="round"/>
+          <circle cx="260" cy="320" r="18" fill="#4b5f7d"/>
+          <text x="260" y="580" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle">台阶形槽 · stepped groove</text>
+          <g transform="translate(560,120)"><rect width="300" height="300" rx="16" fill="#e9dcc0"/>
+            <g fill="#2c6fd6"><circle cx="100" cy="100" r="22"/><circle cx="200" cy="100" r="22"/><circle cx="100" cy="200" r="22"/><circle cx="200" cy="200" r="22"/></g>
+            <g fill="#08101d"><circle cx="100" cy="100" r="8"/><circle cx="200" cy="100" r="8"/><circle cx="100" cy="200" r="8"/><circle cx="200" cy="200" r="8"/></g></g>
+          <path d="M560 470 L860 470" stroke="#5ee0d2" stroke-width="5"/><text x="870" y="478" font-size="28" fill="#5ee0d2" class="en">X</text>
+          <path d="M540 120 L540 420" stroke="#5ee0d2" stroke-width="5"/><text x="530" y="110" font-size="28" fill="#5ee0d2" class="en">Y</text>
+          <text x="710" y="530" font-size="26" fill="#d3deea" text-anchor="middle">扣夹按花样移动</text>
+          <text x="710" y="562" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">the clamp follows the pattern</text>
+        </svg>
+    notes:
+      - "钉扣机和套结机的机械式结构很像：主轴经蜗杆蜗轮大幅减速，带动一个花样凸轮，凸轮转一圈就是一个完整花样。凸轮上两条槽，经 X、Y 两根杠杆推动扣夹或压框。凸轮每转过一个台阶，扣夹移动一针；台阶的升程段必须对准针在布外的转角。钉扣机常用 101 单线链式，要有防脱装置；套结机用锁式，先打底再覆盖。"
+      - "Mechanical button sewers and bartackers are built alike: the shaft drives a pattern cam through a large worm-gear reduction, and one turn of the cam is one complete pattern. Two grooves on the cam drive the button clamp or work clamp through X and Y levers. Each step of the cam moves the clamp one stitch, and the rising part of every step must line up with the angle when the needle is out of the fabric. Button sewers often use a single-thread 101 chainstitch with an anti-unravel device; bartackers use lockstitch, an underlay first, then a cover."
+
+  - layout: split
+    title: ["从机械凸轮到电子凸轮", "From mechanical cam to electronic cam"]
+    points:
+      - ["钢凸轮的廓线，变成程序里的位移表", "The steel cam profile becomes a displacement table"]
+      - ["台阶对齐、运动规律、加速度：原样转到运动规划", "Step timing, motion law, acceleration: straight into motion planning"]
+      - ["约束不变：仍只能在针在布外时移动", "The rule stands: move only with the needle out"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <defs><marker id="e11" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs>
+          <g font-size="32" font-weight="700" fill="#f3f6fa" text-anchor="middle">
+            <rect x="40" y="40" width="360" height="120" rx="20" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="220" y="110">花样凸轮</text>
+            <rect x="500" y="40" width="360" height="120" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="680" y="110">位移表</text>
+            <rect x="40" y="260" width="360" height="120" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="220" y="330">主轴编码器角度</text>
+            <rect x="500" y="260" width="360" height="120" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="680" y="330">步进电机 X、Y</text></g>
+          <g font-size="20" fill="#8fa3ba" text-anchor="middle" class="en"><text x="220" y="145" class="en">pattern cam</text><text x="680" y="145" class="en">displacement table</text><text x="220" y="365" class="en">shaft encoder angle</text><text x="680" y="365" class="en">X and Y steppers</text></g>
+          <g stroke="#f2b705" stroke-width="5" marker-end="url(#e11)"><path d="M405 100 L490 100"/><path d="M405 320 L490 320"/><path d="M680 165 L680 250"/></g>
+          <rect x="40" y="450" width="820" height="140" rx="20" fill="rgba(255,122,69,.1)" stroke="#ff7a45" stroke-width="2"/>
+          <text x="450" y="512" font-size="30" font-weight="700" fill="#ffb38f" text-anchor="middle">针距大、摆宽大时仍要降速</text>
+          <text x="450" y="556" font-size="22" fill="#8fa3ba" text-anchor="middle">套结机：X &lt; 5 mm、Y &lt; 3.5 mm 时才可 3200 sti/min</text>
+        </svg>
+    notes:
+      - "电子化以后，钢制凸轮的廓线换成了程序里的位移表，控制器按主轴编码器的角度查表，给步进电机发位置。但设计问题一个没少：台阶要和针在布外的转角对齐，运动规律、峰值加速度，都原样转到了步进电机的运动规划里。约束也不变，移动仍只能在针在布外的转角里完成，所以针距大、摆宽大时还是要降速。某套结机只有 X 小于 5 毫米、Y 小于 3.5 毫米时才能开到每分钟 3200 针。"
+      - "With electronics, the profile of the steel cam becomes a displacement table in software; the controller reads the shaft encoder angle, looks up the table and commands the steppers. But none of the design problems goes away: the steps must still line up with the out-of-fabric angle, and the motion law and peak acceleration move straight into the stepper's motion planning. The rule hasn't changed either: moves still happen only while the needle is out, so long stitches and wide bights still mean lower speed. One bartacker reaches 3200 stitches a minute only when X is under 5 millimetres and Y under 3.5."
+
+  - layout: split
+    title: ["绗缝机与电脑刺绣机", "Quilting and embroidery machines"]
+    points:
+      - ["绗缝：一根横梁几十根针，每针一根弯针", "Quilter: dozens of needles on a beam, a looper each"]
+      - ["刺绣：9–15 根针杆，换色时针杆箱横移", "Embroidery: 9–15 needle bars; the head shifts to change colour"]
+      - ["绣框重：约 1200 r/min，只有平缝机的 1/4", "A heavy frame: about 1200 r/min, a quarter of a lockstitch"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="60" y="40" width="780" height="110" rx="16" fill="#2a3a55"/>
+          <g fill="#c8d2de"><rect x="110" y="150" width="14" height="80"/><rect x="170" y="150" width="14" height="80"/><rect x="230" y="150" width="14" height="80"/><rect x="290" y="150" width="14" height="150" fill="#f2b705"/><rect x="350" y="150" width="14" height="80"/><rect x="410" y="150" width="14" height="80"/><rect x="470" y="150" width="14" height="80"/><rect x="530" y="150" width="14" height="80"/><rect x="590" y="150" width="14" height="80"/></g>
+          <text x="450" y="105" font-size="28" font-weight="700" fill="#d3deea" text-anchor="middle">针杆箱 · needle-bar case</text>
+          <path d="M680 200 L800 200 M790 190 L805 200 L790 210" stroke="#5ee0d2" stroke-width="5" fill="none"/>
+          <text x="880" y="250" font-size="22" fill="#5ee0d2" text-anchor="end">换色：横移 · shift</text>
+          <rect x="100" y="320" width="700" height="250" rx="12" fill="none" stroke="#ff7a45" stroke-width="12"/>
+          <rect x="112" y="332" width="676" height="226" fill="#e9dcc0" opacity=".85"/>
+          <path d="M300 400 C 360 360, 420 470, 480 420 S 600 380, 640 460" fill="none" stroke="#2c6fd6" stroke-width="7"/>
+          <text x="450" y="610" font-size="26" fill="#ffb38f" text-anchor="middle">绣框 X、Y 移动：每针几毫米都要在针离布时走完</text>
+        </svg>
+    notes:
+      - "多针绗缝机一根横梁上装几十根针，每根针一根弯针，一次缝多道平行的 401。电脑刺绣机每个机头有 9 到 15 根针杆，一个驱动器只带动对准的那一根，换色时整个针杆箱横移。多头机共用上轴和下轴。刺绣机转速只有平缝机的四分之一左右，某型每分钟 1200 转，因为绣框很重，每针几毫米的移动都要在针离开布料的时候走完。"
+      - "A multi-needle quilter carries dozens of needles on one beam, each with its own looper, sewing many parallel rows of 401 at once. An embroidery head has 9 to 15 needle bars; one driver works only the bar lined up with it, and to change colour the whole needle-bar case shifts sideways. Multi-head machines share upper and lower shafts. Embroidery machines run at only about a quarter of lockstitch speed, about 1200 r/min on one model, because the frame is heavy and every move of a few millimetres must be finished while the needle is out of the fabric."
+
+  - layout: section
+    num: "05"
+    title: ["算例：换摆线、压到 120°", "Worked example: cycloid, and squeezing to 120°"]
+
+  - layout: bignum
+    title: ["8 mm、5000 r/min：横向惯性力", "8 mm at 5000 r/min: sideways inertia force"]
+    nums:
+      - {n: "{{ch11.FMT:.0f}} N", label: ["修正梯形，170°：{{ch11.aMT:.0f}} m/s²", "Modified trapezoid, 170°: {{ch11.aMT:.0f}} m/s²"]}
+      - {n: "{{ch11.FCY:.0f}} N", label: ["摆线，170°：{{ch11.aCY:.0f}} m/s²", "Cycloidal, 170°: {{ch11.aCY:.0f}} m/s²"]}
+      - {n: "{{ch11.FCY120:.0f}} N", label: ["摆线，压到 120°：×{{ch11.r120:.1f}}", "Cycloidal at 120°: ×{{ch11.r120:.1f}}"]}
+    foot: ["F = m · C w ω² / β²，m = 0.15 kg，ω = {{ch11.omega:.0f}} rad/s，β = {{ch11.beta:.2f}} rad；限值 250 N", "F = m · C w ω² / β², m = 0.15 kg, ω = {{ch11.omega:.0f}} rad/s, β = {{ch11.beta:.2f}} rad; limit 250 N"]
+    notes:
+      - "代数算。主轴角速度 {{ch11.omega:.0f}} 弧度每秒，170 度是 {{ch11.beta:.2f}} 弧度。修正梯形，峰值加速度约 {{ch11.aMT:.0f}} 米每二次方秒，乘 0.15 千克，惯性力约 {{ch11.FMT:.0f}} 牛；摆线约 {{ch11.aCY:.0f}}，惯性力约 {{ch11.FCY:.0f}} 牛，都在 250 牛以内。压到 120 度，加速度乘 170 比 120 的平方，约 {{ch11.r120:.1f}} 倍，摆线约 {{ch11.FCY120:.0f}} 牛，修正梯形约 {{ch11.FMT120:.0f}} 牛，都超限。"
+      - "Let's compute. The shaft turns at {{ch11.omega:.0f}} radians per second, and 170 degrees is {{ch11.beta:.2f}} radians. Modified trapezoid: a peak of about {{ch11.aMT:.0f}} metres per second squared; times 0.15 kilograms, about {{ch11.FMT:.0f}} newtons. Cycloidal: about {{ch11.aCY:.0f}}, giving about {{ch11.FCY:.0f}} newtons. Both are under 250. Squeeze to 120 degrees and the acceleration is multiplied by 170 over 120 squared, about {{ch11.r120:.1f}}: about {{ch11.FCY120:.0f}} newtons cycloidal and {{ch11.FMT120:.0f}} modified trapezoid, both over the limit."
+
+  - layout: split
+    title: ["机器人联系：时间标定与 S 形加减速", "Robot link: time scaling and S-curves"]
+    points:
+      - ["同样走 w，时间压缩一半，加速度变 4 倍", "Same distance in half the time: four times the acceleration"]
+      - ["S 形加减速和修正梯形是同一个思路", "S-curve profiles follow the same idea as the modified trapezoid"]
+      - ["点胶、焊接：工具离开工件时才大幅横移", "Dispensing, welding: big moves only with the tool off the part"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <text x="0" y="40" font-size="26" fill="#8fa3ba">加速度曲线 · acceleration profiles</text>
+          <path d="M40 220 L860 220" stroke="#2c3e5c" stroke-width="2"/>
+          <path d="M40 220 L40 100 L240 100 L240 340 L440 340 L440 220" fill="none" stroke="#8fa3ba" stroke-width="6"/>
+          <text x="140" y="85" font-size="26" fill="#c8d2de" text-anchor="middle">梯形速度：加速度突变</text>
+          <path d="M460 220 C 490 220, 500 110, 540 110 L 600 110 C 640 110, 650 220, 660 220 C 670 220, 680 330, 720 330 L 780 330 C 820 330, 830 220, 860 220" fill="none" stroke="#2ec4b6" stroke-width="6"/>
+          <text x="660" y="85" font-size="26" fill="#5ee0d2" text-anchor="middle">S 形：加速度连续</text>
+          <rect x="40" y="420" width="820" height="170" rx="20" fill="#111d31" stroke="#22324d"/>
+          <text x="450" y="490" font-size="40" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">a_peak ∝ w / T²</text>
+          <text x="450" y="545" font-size="24" fill="#8fa3ba" text-anchor="middle">时间减半 → 加速度、电机力矩 ×4</text>
+        </svg>
+    notes:
+      - "选摆针规律，就是机器人轨迹规划里的时间标定：同样走 w 的距离、限定在时间 T 内完成，峰值加速度和 w 比 T 平方成正比，时间压缩一半，加速度和电机力矩就变成 4 倍。伺服驱动器常用的 S 形加减速，限制加加速度，和修正梯形是同一个思路：加速度连续、不激起冲击，峰值又不太高。点胶、焊接机器人只能在工具离开工件时大幅横移，和针在布外才能摆是同一条约束。"
+      - "Choosing a swing law is the time-scaling step of robot trajectory planning: to cover a distance w in a time T, the peak acceleration goes with w over T squared, so halving the time quadruples the acceleration and the motor torque. The S-curve profiles of servo drives, which limit jerk, follow the same idea as the modified trapezoid: continuous acceleration, no shock, and a moderate peak. A dispensing or welding robot may make big sideways moves only while its tool is off the workpiece: the same rule as a needle that may swing only when it's out of the fabric."
+
+  - layout: split
+    title: ["生活中：订书机抬起时才能挪纸", "Everyday: move the paper only when the stapler is up"]
+    points:
+      - ["沿纸边钉一排：抬起时才能挪到下一个位置", "Stapling along an edge: move only while it's up"]
+      - ["压下时一挪，钉子就歪了", "Move while pressing and the staple goes crooked"]
+      - ["摆针、扣夹、绣框都一样：针离布时才能动", "Needle, clamp, frame: they move only when the needle is out"]
+    visual:
+      svg: |
+        <svg viewBox="0 0 900 640" width="100%" height="640">
+          <rect x="60" y="420" width="780" height="20" rx="4" fill="#e9dcc0"/>
+          <path d="M200 400 L560 330 L560 360 L200 410 Z" fill="#ff7a45"/>
+          <rect x="180" y="400" width="420" height="20" rx="6" fill="#8fa3ba"/>
+          <circle cx="210" cy="400" r="18" fill="#4b5f7d"/>
+          <path d="M640 380 L800 380 M790 370 L805 380 L790 390" stroke="#2ec4b6" stroke-width="6" fill="none"/>
+          <text x="720" y="350" font-size="26" fill="#5ee0d2" text-anchor="middle">抬起时挪纸</text>
+          <g stroke="#2c6fd6" stroke-width="6"><path d="M140 432 l24 0"/><path d="M640 432 l24 0"/><path d="M720 432 l24 0"/></g>
+          <text x="450" y="520" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">压下 = 针在布中：不许动</text>
+          <text x="450" y="560" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">pressed = needle in the fabric: no moving</text>
+        </svg>
+    notes:
+      - "生活中也有同一条约束。用订书机沿纸边钉一排钉子，只有订书机抬起时才能把纸挪到下一个位置；压下的时候一挪，钉子就歪了。之字缝的摆针、钉扣机的扣夹、刺绣机的绣框，都只能在针离开布料的那一小段时间里移动。"
+      - "The same rule shows up at home. Stapling a row along the edge of a sheet, you can slide the paper to the next spot only while the stapler is up; move it while pressing down and the staple goes in crooked. The zigzag needle, the button clamp and the embroidery frame likewise may move only in the short time the needle is out of the fabric."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["摆线勉强可以，压到 120° 不行", "Cycloid just about; 120° no"]
+    rows:
+      - ["修正梯形，170°", "{{ch11.FMT:.0f}} N"]
+      - ["摆线，170°", "{{ch11.FCY:.0f}} N"]
+      - ["摆线，120°", "{{ch11.FCY120:.0f}} N"]
+    side: {big: "{{ch11.dphi8:.0f}}°", text: ["两端钩线时刻差 Δφ = w/(2R) = 8/27 rad，右端先钩", "The two ends are caught Δφ = w/(2R) = 8/27 rad apart, right first"]}
+    foot: ["送布和摆针本来就在同一个窗口里同时进行：压缩摆针区间并不能给送布多出时间", "Feed and swing already share one window: a shorter swing gives the feed no extra time"]
+    notes:
+      - "回到开头。修正梯形约 {{ch11.FMT:.0f}} 牛，换摆线约 {{ch11.FCY:.0f}} 牛，都在 250 牛以内，可以换，但余量变小了。压到 120 度，摆线约 {{ch11.FCY120:.0f}} 牛，修正梯形约 {{ch11.FMT120:.0f}} 牛，都超限。而且送布和摆针本来就在同一个针在布外的窗口里同时进行，压缩摆针区间并不能给送布多出时间。两端钩线时刻差 8 比 27 弧度，约 {{ch11.dphi8:.0f}} 度，右端先钩。"
+      - "Back to the start. Modified trapezoid gives about {{ch11.FMT:.0f}} newtons and the cycloid about {{ch11.FCY:.0f}}, both under 250: the switch is possible, with less margin. Squeezed to 120 degrees, about {{ch11.FCY120:.0f}} cycloidal and {{ch11.FMT120:.0f}} modified trapezoid, both over the limit. And the feed and the swing already happen together in the same out-of-fabric window, so a shorter swing gives the feed no extra time at all. The two ends are caught 8 over 27 radians apart, about {{ch11.dphi8:.0f}} degrees, right end first."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["特种机：针在布中，针和布不能横向相对运动", "Special machines: no sideways relative motion with the needle in"]
+      - ["a = C·wω²/β²：区间用满窗口，修正梯形最好", "a = C·wω²/β²: use the whole window; modified trapezoid is best"]
+      - ["两端钩线差 Δφ = w/(2R)，摆宽受钩线窗口限制", "Ends differ by Δφ = w/(2R); the catch window limits the bight"]
+    after: ["作业 11：之字缝机加大摆宽的可行性核算 · 测验 · 实验 11-1 —— 在问渠学习平台完成", "Assignment 11: feasibility of a wider bight · quiz · Lab 11-1 — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，所有特种机都受同一条约束：针在布中时，针和布不能有横向相对运动，一切横移都挤在针在布外的转角里。第二，峰值加速度等于 C 乘 w 乘 ω 方除以 β 方，摆动区间要用满窗口，修正梯形峰值低又平稳。第三，之字缝两端钩线时刻差 w 比 2R，摆宽受钩线窗口限制。作业、测验和实验都在问渠平台上完成。"
+      - "Three things to remember. One: every special machine obeys the same rule: no sideways relative motion between needle and fabric while the needle is in, so every sideways move is squeezed into the out-of-fabric angle. Two: peak acceleration is C times w times omega squared over beta squared, so use the whole window, and the modified trapezoid is both low-peaked and smooth. Three: the two ends of a zigzag are caught w over 2R apart, so the bight is limited by the catching window. The assignment, quiz and lab are on WenQuest."

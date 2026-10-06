@@ -71,3 +71,15 @@ o = order('602', 172, 1000, 0.12, 5000); print("T-shirt 602:", [(n, round(v, 2),
 o = order('605', 80, 2000, 0.10, 5000, g=5.6); print("assign 605 neck 80cm x2000, g5.6:", [(n, round(v, 2), round(m), k) for n, v, m, k in o], "cones", sum(x[3] for x in o))
 print("301 vs 406 ratio", round(18 / 2.5, 1), " 605/301", round(28 / 2.5, 1))
 print("timing window width 7.5 deg at 6500 r/min = %.3f ms" % (7.5 / (6500 / 60 * 360) * 1000))
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    st = evaluate(STD); tb = order('406', 172, 1000, 0.12, 5000)
+    out(catch=st['fc'], rise=st['h'], fdown=st['fd'], xd=-st['xd'], yd=st['yd'] - RN, fret=st['fr'],
+        w_lo=ok[0], w_hi=ok[-1], w_ms=(ok[-1] - ok[0]) / (6500 / 60 * 360) * 1000, emin=em, rr_lo=rr[0], rr_hi=rr[-1],
+        rise_ab=rise(180 + dcOf(3.2)), loop_lo=RW[0], loop_hi=RW[1], spread=bis(lambda f: X(f) - 1.1, 0, 90),
+        c401=sum(v for _, v in cons('401')), c406=c406, c602=c602, c605=sum(v for _, v in cons('605', g=4.8)),
+        n406=cons('406')[0][1], l406=cons('406')[2][1], up602=(c602 / c406 - 1) * 100, c406_4=sum(v for _, v in cons('406', spc=4)),
+        b_n=tb[0][2], b_l=tb[2][2], b_tot=sum(x[2] for x in tb), b_pub=18 * 1.72 * 1000 * 1.12,
+        b_less=(1 - sum(x[2] for x in tb) / (18 * 1.72 * 1000 * 1.12)) * 100, k_n=tb[0][3], k_l=tb[2][3], k_tot=sum(x[3] for x in tb),
+        l_share=tb[2][2] / sum(x[2] for x in tb) * 100, pc_pub=18 * 1.72, s_len=10 / 7)
