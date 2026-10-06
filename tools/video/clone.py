@@ -68,9 +68,11 @@ os.makedirs("out", exist_ok=True)
 import whisper
 asr = whisper.load_model("small")
 prompts = {}
-for lang in ("zh", "en"):
-    src = f"sample_{lang}.wav"
-    if not os.path.exists(src):
+for src in sorted(glob.glob("sample_*.wav")):
+    lang = whisper.detect_language(asr, whisper.log_mel_spectrogram(whisper.pad_or_trim(whisper.load_audio(src)), asr.dims.n_mels).to(asr.device))[1]
+    lang = max(lang, key=lang.get)          # 按识别出的语言归类（文件名只是猜测）
+    if lang not in ("zh", "en"):
+        print(f"{src}: 识别为 {lang}，跳过", flush=True)
         continue
     r = asr.transcribe(src, language=lang, condition_on_previous_text=False)
     segs = [s for s in r["segments"] if s["end"] - s["start"] > 0.8 and s.get("no_speech_prob", 0) < 0.3]
@@ -111,8 +113,8 @@ for engine in job["engines"]:
             wav, ptext = prompts[lang]
             ptext = ("You are a helpful assistant.<|endofprompt|>" + ptext) if engine == "cv3" else ptext
             gen = cv.inference_zero_shot(text, ptext, wav, stream=False)
-        else:   # 只有中文样音：英文跨语种
-            wav = prompts["zh"][0]
+        else:   # 只有一种语言的样音：跨语种
+            wav = next(iter(prompts.values()))[0]
             t = ("You are a helpful assistant.<|endofprompt|>" + text) if engine == "cv3" else ("<|en|>" + text)
             gen = cv.inference_cross_lingual(t, wav, stream=False)
         parts = [o["tts_speech"].squeeze(0).cpu().numpy() for o in gen]
@@ -136,8 +138,8 @@ def decrypt_samples(dst: Path) -> list[str]:
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-ar", "24000", "-ac", "1", str(dst / f"sample_{lang}.wav")], check=True)
         raw.unlink()
         langs.append(lang)
-    if "zh" not in langs:
-        raise SystemExit("缺少中文样音 docs/课程视频/声音样本/zh.*.enc")
+    if not langs:
+        raise SystemExit("缺少样音 docs/课程视频/声音样本/*.enc")
     return langs
 
 
