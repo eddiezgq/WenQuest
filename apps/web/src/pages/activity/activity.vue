@@ -5,7 +5,7 @@
       <text class="error">{{ errorText(error) }}</text>
       <view class="btn" @click="load">{{ t("common.retry") }}</view>
     </view>
-    <view v-else-if="a" class="viewer" :class="{ wide: fileKind === 'lab' || fileKind === 'slides' }">
+    <view v-else-if="a" class="viewer" :class="{ wide: fileKind === 'lab' || fileKind === 'deck' || fileKind === 'slides' }">
       <view class="head">
         <text class="kind">{{ t("kind." + kindKey) }}</text>
         <text v-if="a.hidden" class="tag teacher">{{ t("course.teacherOnly") }}</text>
@@ -50,7 +50,7 @@
         </view>
 
         <!-- Virtual lab, running inside the page -->
-        <view v-else-if="fileKind === 'lab'">
+        <view v-else-if="fileKind === 'lab' || fileKind === 'deck'">
           <!-- #ifdef H5 -->
           <view ref="labBox" class="lab-box">
             <iframe class="lab" :src="absolute(file.lab_url || '')" :title="a.name"

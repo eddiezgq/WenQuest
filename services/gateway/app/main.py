@@ -321,6 +321,7 @@ def register(app: FastAPI) -> None:
             "role": "teacher" if teacher else "student",
             "visible": bool(c.get("visible", 1)),
             "classic_url": f"{state.settings.moodle_url.rstrip('/')}/course/view.php?id={courseid}",
+            "book": _pack_book(courseid),
         }
 
     @app.get("/api/v1/courses/{courseid}/outline")
@@ -412,7 +413,7 @@ def register(app: FastAPI) -> None:
                     kind = content.file_kind(f.get("filename"), f.get("mimetype"))
                     item = {"name": f.get("filename"), "size": f.get("filesize"),
                             "mimetype": f.get("mimetype"), "kind": kind, "url": sign(f["fileurl"])}
-                    if kind == "lab":
+                    if kind in ("lab", "deck"):
                         item["lab_url"] = item["url"].replace("/api/v1/files/", "/api/v1/labs/", 1)
                     files.append(item)
             base["files"] = files
@@ -652,6 +653,18 @@ def register(app: FastAPI) -> None:
             headers["Content-Range"] = f"bytes {start}-{end}/{total}"
             return Response(body[start:end + 1], status_code=206, media_type=ctype, headers=headers)
         return Response(body, media_type=ctype, headers=headers)
+
+
+def _pack_book(courseid: int) -> str:
+    """The web-edition book a course was published from (course packs), so its lessons open the book's chapters."""
+    d = Path(state.settings.data_dir) / "course-packs"
+    for p in sorted(d.glob("*.json")) if d.is_dir() else []:
+        try:
+            if int(json.loads(p.read_text(encoding="utf-8")).get("courseid") or 0) == courseid:
+                return p.stem
+        except (OSError, ValueError):
+            continue
+    return ""
 
 
 def _lecture_of(files: list[dict]) -> dict | None:

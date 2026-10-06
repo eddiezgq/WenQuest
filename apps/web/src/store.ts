@@ -47,13 +47,13 @@ export function moduleKind(m: Module): string {
 }
 
 export const KIND_ICON: Record<string, string> = {
-  reading: "文", video: "▶", slides: "◧", pdf: "▤", lab: "⚗", doc: "▤", sheet: "▦", image: "◩",
+  reading: "文", deck: "◧", book: "文", video: "▶", slides: "◧", pdf: "▤", lab: "⚗", doc: "▤", sheet: "▦", image: "◩",
   audio: "♪", file: "▢", link: "↗", assign: "✎", quiz: "?", forum: "✉",
 };
 
 /** A chapter-like section: has lessons, videos, slides or labs (not the course-info section). */
 export function isUnit(d: CourseData, s: Section): boolean {
-  return visibleModules(d, s).some((m) => ["reading", "video", "slides", "lab", "assign"].includes(moduleKind(m)));
+  return visibleModules(d, s).some((m) => ["reading", "deck", "video", "slides", "lab", "assign"].includes(moduleKind(m)));
 }
 
 export function findModule(d: CourseData, cmid: number): { section: Section; module: Module; index: number } | null {

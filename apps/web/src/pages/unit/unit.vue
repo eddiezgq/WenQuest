@@ -13,6 +13,22 @@
       </view>
 
       <view class="blocks">
+        <!-- 网页互动课件（第 24 轮）：放在最前面，就在这里放映 -->
+        <view v-if="groups.deck.length" class="block">
+          <text class="bh">{{ t("unit.slides") }}</text>
+          <!-- #ifdef H5 -->
+          <view ref="deckBox" class="deck-box">
+            <iframe v-if="deckUrl" class="deck" :src="deckUrl" :title="groups.deck[0].name"
+              sandbox="allow-scripts allow-popups allow-forms allow-modals allow-downloads" allow="fullscreen" />
+            <text v-else class="muted pad">{{ t("common.loading") }}</text>
+          </view>
+          <view class="deck-bar">
+            <text class="small muted">{{ t("unit.deckHint") }}</text>
+            <view class="ghost" @click="deckFull">⛶ {{ t("unit.deckFull") }}</view>
+          </view>
+          <!-- #endif -->
+          <view class="list"><ModuleRow v-for="m in groups.deck" :key="m.id" :m="m" :course-id="courseId" /></view>
+        </view>
         <view v-if="section.summary" class="block">
           <text class="bh">{{ t("unit.intro") }}</text>
           <text class="intro">{{ section.summary }}</text>
@@ -36,9 +52,16 @@
           </view>
         </view>
 
-        <view v-if="groups.reading.length" class="block">
+        <view v-if="groups.reading.length || bookChapter" class="block">
           <text class="bh">{{ t("unit.readings") }}</text>
-          <view class="list"><ModuleRow v-for="m in groups.reading" :key="m.id" :m="m" :course-id="courseId" /></view>
+          <view class="list">
+            <view v-if="bookChapter" class="book-row" @click="openBook">
+              <text class="book-ic">文</text>
+              <text class="book-name">{{ t("unit.bookChapter", { n: bookChapter }) }}</text>
+              <text class="muted">›</text>
+            </view>
+            <ModuleRow v-for="m in groups.reading" :key="m.id" :m="m" :course-id="courseId" />
+          </view>
         </view>
 
         <view v-if="groups.slides.length" class="block">
@@ -117,12 +140,15 @@ const prev = computed(() => (unitIndex.value > 0 ? unitList.value[unitIndex.valu
 const next = computed(() => (unitIndex.value >= 0 && unitIndex.value < unitList.value.length - 1 ? unitList.value[unitIndex.value + 1] : null));
 
 const groups = computed(() => {
-  const g: Record<string, Module[]> = { video: [], reading: [], slides: [], lab: [], guides: [], assign: [], other: [], teacher: [] };
+  const g: Record<string, Module[]> = { deck: [], video: [], reading: [], slides: [], lab: [], guides: [], assign: [], other: [], teacher: [] };
   if (!d.value || !section.value) return g;
   for (const m of visibleModules(d.value, section.value)) {
     if (m.hidden) { g.teacher.push(m); continue; }
     const k = moduleKind(m);
-    if (k === "video") g.video.push(m);
+    // 课程包课程：讲义和练习的文字页由网页版教材这一章代替
+    if (bookChapter.value && m.type === "page" && /^(讲义|练习)[：:]|^(Notes|Practice):/.test(m.name || "")) continue;
+    if (k === "deck") g.deck.push(m);
+    else if (k === "video") g.video.push(m);
     else if (k === "reading") g.reading.push(m);
     else if (k === "slides" || k === "pdf") g.slides.push(m);
     else if (k === "lab") g.lab.push(m);
@@ -132,6 +158,36 @@ const groups = computed(() => {
   }
   return g;
 });
+const bookChapter = computed(() => {
+  const b = (d.value?.info as any)?.book;
+  const mm = b ? /第\s*(\d+)\s*讲|Lesson\s+(\d+)/.exec(section.value?.name || "") : null;
+  return mm ? Number(mm[1] || mm[2]) : 0;
+});
+function openBook() {
+  const b = (d.value?.info as any)?.book;
+  uni.navigateTo({ url: `/pages/textbook/textbook?book=${b}&s=ch${String(bookChapter.value).padStart(2, "0")}.html` });
+}
+const deckUrl = ref("");
+const deckBox = ref<any>(null);
+let deckFor = 0;
+async function loadDeck() {
+  const m = groups.value.deck[0];
+  if (!m || deckFor === m.id) return;
+  deckFor = m.id;
+  deckUrl.value = "";
+  try {
+    const act: any = await api.activity(m.id);
+    const f = (act.files || [])[0];
+    deckUrl.value = f?.lab_url ? absolute(f.lab_url) : "";
+  } catch { deckFor = 0; }
+}
+watch(() => groups.value.deck.map((m) => m.id).join(","), () => { loadDeck(); }, { immediate: true });
+function deckFull() {
+  // #ifdef H5
+  const el = (deckBox.value?.$el || deckBox.value) as HTMLElement | null;
+  el?.requestFullscreen?.();
+  // #endif
+}
 const trackable = computed(() => (d.value && section.value ? visibleModules(d.value, section.value).filter((m) => m.has_completion) : []));
 const doneCount = computed(() => trackable.value.filter((m) => m.completed).length);
 const progress = computed(() => (trackable.value.length ? Math.round((doneCount.value / trackable.value.length) * 100) : 0));
@@ -215,4 +271,11 @@ watch(studentPreview, () => { videoIndex.value = 0; videoUrl.value = ""; lecture
 .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--wq-line); }
 .pg { color: var(--wq-link); cursor: pointer; max-width: 48%; }
 @media (max-width: 860px) { .b-name { font-size: 22px; } }
+.deck-box { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #0b1220; border-radius: 8px; overflow: hidden; margin-top: 8px; }
+.deck-box:fullscreen { border-radius: 0; aspect-ratio: auto; height: 100vh; }
+.deck { width: 100%; height: 100%; border: 0; display: block; }
+.deck-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 8px 0; }
+.book-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--wq-line); }
+.book-ic { width: 36px; height: 36px; border-radius: 8px; background: #e8f1f8; color: #1d4e75; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.book-name { flex: 1; }
 </style>

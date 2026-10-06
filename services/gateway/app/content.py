@@ -72,6 +72,8 @@ KINDS = {
 def file_kind(filename: str | None, mimetype: str | None = None) -> str:
     """What the frontend should do with a file: play it, show it, run it, or offer it for download."""
     ext = (filename or "").rsplit(".", 1)[-1].lower() if "." in (filename or "") else ""
+    if ext in ("html", "htm") and re.search(r"课件|slides", filename or "", re.I):
+        return "deck"   # 网页互动课件（第 24 轮）：放映，和实验页一样在隔离框里运行
     for kind, exts in KINDS.items():
         if ext in exts:
             return kind

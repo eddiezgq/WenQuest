@@ -191,7 +191,7 @@ async function open(b: string, sid = "") {
     webTitle.value = en.value && info.title_en ? info.title_en : info.title;
     if (!mp) {
       try {
-        webUrl.value = absolute((await api.textbookWeb(b, en.value ? "en" : "zh")).url);
+        webUrl.value = absolute((await api.textbookWeb(b, en.value ? "en" : "zh", /^ch\d{2}\.html$/.test(sid) ? sid : "")).url);
         // #ifdef H5
         history.replaceState(null, "", `#/pages/textbook/textbook?book=${b}`);
         // #endif

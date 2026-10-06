@@ -149,13 +149,14 @@ def register(app, m) -> None:
         return {"books": out}
 
     @app.get("/api/v1/textbooks/{book}/webed")
-    async def web_edition(book: str, sess: Annotated[Session, Depends(m.current)], lang: str = "zh"):
+    async def web_edition(book: str, sess: Annotated[Session, Depends(m.current)], lang: str = "zh", page: str = ""):
         """A web-edition book (第 15 轮): a signed link under which every page, lab and figure of the book opens."""
         if not (BOOK.match(book) and (root() / book / "webed" / "book.json").exists()):
             raise EngineError("not_found", "no such textbook", 404)
         w = json.loads((root() / book / "webed" / "book.json").read_text(encoding="utf-8"))
         tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "u": sess.user_id}).encode()).decode()
-        page = "en/index.html" if lang == "en" else "index.html"
+        ch = page if re.fullmatch(r"ch\d{2}\.html", page or "") else "index.html"
+        page = f"en/{ch}" if lang == "en" else ch
         return {"url": f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-web/{tok}/{page}",
                 "title": w.get("title", book), "title_en": w.get("title_en", "")}
 

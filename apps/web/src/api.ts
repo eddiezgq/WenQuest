@@ -26,7 +26,7 @@ export interface Course {
   /** 已下架: only its teachers still get it in the list */
   hidden?: boolean;
 }
-export type FileKind = "video" | "pdf" | "slides" | "lab" | "doc" | "sheet" | "image" | "audio" | "file";
+export type FileKind = "video" | "pdf" | "slides" | "deck" | "lab" | "doc" | "sheet" | "image" | "audio" | "file";
 export interface ModuleFile { name: string; size: number; mimetype: string; kind: FileKind }
 export interface Module {
   id: number;
@@ -60,6 +60,8 @@ export interface CourseInfo {
   /** false = 已下架 (students do not see the course) */
   visible?: boolean;
   classic_url: string;
+  /** 课程包课程：来自哪本网页版教材（讲义直接打开教材这一章） */
+  book?: string;
 }
 export interface Activity {
   id: number;
@@ -482,8 +484,8 @@ export const api = {
   refreshCoursePack: (book: string) => request<CoursePack>("POST", `/api/v1/admin/course-packs/${book}/refresh`),
   // 问渠教材（第 7 轮）
   textbooks: () => request<{ books: { book: string; title: string; title_en?: string; web?: boolean; labs?: number; chapters: number; sections?: number; written?: number }[] }>("GET", "/api/v1/textbooks"),
-  textbookWeb: (book: string, lang: "zh" | "en" = "zh") =>
-    request<{ url: string; title: string; title_en: string }>("GET", `/api/v1/textbooks/${book}/webed?lang=${lang}`),
+  textbookWeb: (book: string, lang: "zh" | "en" = "zh", page = "") =>
+    request<{ url: string; title: string; title_en: string }>("GET", `/api/v1/textbooks/${book}/webed?lang=${lang}&page=${encodeURIComponent(page)}`),
   textbook: (book: string) => request<TextbookIndex>("GET", `/api/v1/textbooks/${book}`),
   textbookSection: (book: string, sid: string, mp = false, lang: "zh" | "en" = "zh") =>
     request<TextbookSection>("GET", `/api/v1/textbooks/${book}/sections/${sid}?mp=${mp}&lang=${lang}`),
