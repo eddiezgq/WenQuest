@@ -230,6 +230,10 @@ jobs:
               echo "---------- 闭环测试 ----------"
               grep -v "ERPNext 进度" /tmp/logs/closed_loop.log | tail -n 60
             } > /tmp/logs/combined.log
+            grep -E "✗|^失败|^  - " /tmp/logs/closed_loop.log | head -30 > /tmp/logs/fail.log || true
+            [ -s /tmp/logs/fail.log ] && a 闭环失败项 /tmp/logs/fail.log 30
+            grep -iE "error|traceback|exception" /tmp/logs/hub.log | tail -n 20 > /tmp/logs/hub_err.log || true
+            [ -s /tmp/logs/hub_err.log ] && a 枢纽报错 /tmp/logs/hub_err.log 20
             a 诊断 /tmp/logs/combined.log 150
             a ERPNext日志 /tmp/logs/erp-files.log 60
             ls -la /tmp/logs > /tmp/logs/ls.txt; a 日志文件 /tmp/logs/ls.txt 30

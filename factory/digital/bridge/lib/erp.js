@@ -487,7 +487,15 @@ class ERP {
     const key = `${dt}.${fieldname}`;
     if (this.fieldsOk && this.fieldsOk.has(key)) return;
     const rows = await this.list('Custom Field', [['dt', '=', dt], ['fieldname', '=', fieldname]], ['name']);
-    if (!rows.length) await this.insert('Custom Field', { dt, fieldname, ...spec });
+    if (!rows.length) {
+      try {
+        await this.insert('Custom Field', { dt, fieldname, ...spec });
+      } catch (e) {
+        // 两张提议同时第一次用到这个字段时会并发建：另一张已经建好就不算错
+        const again = await this.list('Custom Field', [['dt', '=', dt], ['fieldname', '=', fieldname]], ['name']);
+        if (!again.length) throw e;
+      }
+    }
     (this.fieldsOk = this.fieldsOk || new Set()).add(key);
   }
 
