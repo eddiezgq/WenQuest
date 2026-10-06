@@ -36,7 +36,7 @@ def _cw(ch: str, size: float) -> float:
     em = size / 48 * 0.667          # Text(font_size=48) ≈ 0.667 units per em
     if "\u2e80" <= ch <= "\u9fff" or "\uff00" <= ch <= "\uffef" or ch in "“”‘’、。，；：？！（）《》":
         return em
-    return em * (0.32 if ch == " " else 0.56)
+    return em * (0.26 if ch == " " else 0.47)     # 拉丁字母实测平均约 0.45 em
 
 
 def rich(text: str, size=30, width=12.0, color=INK, line_gap=0.2):
@@ -96,7 +96,10 @@ def rich(text: str, size=30, width=12.0, color=INK, line_gap=0.2):
             if isinstance(m, MathTex):
                 m.align_to(g, ORIGIN)
         rows.append(g)
-    return VGroup(*rows).arrange(DOWN, aligned_edge=LEFT, buff=line_gap)
+    out = VGroup(*rows).arrange(DOWN, aligned_edge=LEFT, buff=line_gap)
+    if out.width > width:          # 估计偏小时，整体缩到限宽内
+        out.scale_to_fit_width(width)
+    return out
 
 
 def fit(m, w=None, h=None):
