@@ -126,7 +126,8 @@ for engine in job["engines"]:
 
 
 def decrypt_samples(dst: Path) -> list[str]:
-    key = os.environ.get("VOICE_KEY")
+    key = (os.environ.get("VOICE_KEY") or "").strip()      # 粘贴密钥时常带进空格、换行
+    os.environ["VOICE_KEY"] = key
     if not key:
         raise SystemExit("没有设置 VOICE_KEY（GitHub 仓库密钥），解不开样音")
     langs = []
@@ -134,7 +135,9 @@ def decrypt_samples(dst: Path) -> list[str]:
         lang = enc.name.split(".")[0]
         raw = dst / enc.name[:-4]
         subprocess.run(["openssl", "enc", "-d", "-aes-256-cbc", "-pbkdf2", "-iter", "200000", "-in", str(enc), "-out", str(raw),
-                        "-pass", "env:VOICE_KEY"], check=True)
+                        "-pass", "env:VOICE_KEY"], check=False)
+        if not raw.exists() or raw.stat().st_size == 0 or subprocess.run(["ffprobe", "-v", "error", str(raw)]).returncode:
+            raise SystemExit(f"解不开 {enc.name}：仓库密钥 VOICE_KEY 与加密时用的密码不一致（检查是否多了空格或少了字符）")
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-ar", "24000", "-ac", "1", str(dst / f"sample_{lang}.wav")], check=True)
         raw.unlink()
         langs.append(lang)
