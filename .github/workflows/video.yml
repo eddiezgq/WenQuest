@@ -144,6 +144,7 @@ jobs:
           for d in ${{ inputs.lectures }}; do
             name=$(basename "$d")
             sh tools/video/logged.sh python tools/video/make.py "$d" --lang ${{ inputs.lang }} --voice ${{ inputs.voice }} --out "$RUNNER_TEMP/videos/$name"
+            cp "$RUNNER_TEMP/videos/$name"/work/layout_*.log "$RUNNER_TEMP/videos/$name/" 2>/dev/null || true
             rm -rf "$RUNNER_TEMP/videos/$name/work"
             # 预览（关键画面拼图）和上传资料（文字）放回讲稿目录，便于不下载视频也能检查
             mkdir -p "$d/预览"
@@ -155,6 +156,7 @@ jobs:
               ffmpeg -y -loglevel error -i "$v/lecture.mp4" -vf "fps=1/$step,scale=640:-1,tile=4x6:padding=4" -frames:v 1 -q:v 4 "$d/预览/$lang.jpg"
               cp "$v/upload.md" "$d/预览/上传资料.$lang.md"
               cp "$v/lecture.srt" "$d/预览/字幕.$lang.srt"
+              cp "$RUNNER_TEMP/videos/$name/layout_$lang.log" "$d/预览/版面.$lang.log" 2>/dev/null || true
               echo "$lang: $(python -c "t=float('$len'); print(f'{int(t//60)}:{int(t%60):02d}')")（${{ inputs.voice }}，run ${{ github.run_id }}）" >> "$d/预览/说明.txt"
             done
           done

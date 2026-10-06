@@ -258,7 +258,7 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
     if shot.kind in ("title", "slide", "code", "homework", "outro"):
         js = work / f"spec_{shot.id}_{lang}.json"
         js.write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
-        raw = manim(HERE / "slides.py", "Shot", {"WQ_SHOT_SPEC": str(js)}, work, quality)
+        raw = manim(HERE / "slides.py", "Shot", {"WQ_SHOT_SPEC": str(js), "WQ_LAYOUT_LOG": str(work / f"layout_{lang}.log")}, work, quality)
     elif shot.kind == "anim":
         tmp = work / "anim" / f"{d['src']}_{lang}"
         tmp.mkdir(parents=True, exist_ok=True)

@@ -54,7 +54,7 @@ def rich(text: str, size=30, width=12.0, color=INK, line_gap=0.2):
 
     for tok in tokens:
         if tok.startswith("$") and tok.endswith("$") and len(tok) > 1:
-            m = MathTex(tok[1:-1], font_size=size * 1.12, color=color)
+            m = MathTex(tok[1:-1], font_size=size * 1.45, color=color)
             if cur and x + gap + m.width > width:
                 flush()
             cur.append(m)
@@ -146,7 +146,7 @@ class Shot(Scene):
     # ---------------------------------------------------------------- 幻灯
     def make_item(self, it, width):
         if "tex" in it:
-            return fit(MathTex(it["tex"], font_size=it.get("size", 42), color=WHITE), width, 2.4)
+            return fit(MathTex(it["tex"], font_size=it.get("size", 50), color=WHITE), width, 2.4)
         if "text" in it:
             return rich(it["text"], it.get("size", 32), width)
         if "img" in it:
@@ -173,9 +173,15 @@ class Shot(Scene):
             cx = 0 if (isinstance(m, MathTex) and not has_img) else XL + m.width / 2
             m.move_to([cx, y - m.height / 2, 0])
             y -= m.height + 0.42
+        shrink = 1.0
         if y < BOTTOM:      # too tall: shrink the left column to fit
             g = Group(*left)
-            g.scale((top - BOTTOM) / (top - y), about_point=[XL, top, 0])
+            shrink = (top - BOTTOM) / (top - y)
+            g.scale(shrink, about_point=[XL, top, 0])
+        if os.environ.get("WQ_LAYOUT_LOG"):     # 版面诊断（CI 里看不到画面时用）
+            with open(os.environ["WQ_LAYOUT_LOG"], "a", encoding="utf-8") as f:
+                f.write(json.dumps({"head": s.get("head"), "top": round(float(top), 2), "shrink": round(float(shrink), 3),
+                                    "items": [[round(float(m.width), 2), round(float(m.height), 2)] for m in mobs]}, ensure_ascii=False) + "\n")
         if right:
             rg = Group(*right).arrange(DOWN, buff=0.3)
             rg.scale_to_fit_width(6.9)
