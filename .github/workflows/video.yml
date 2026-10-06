@@ -38,7 +38,7 @@ on:
         options: [both, zh, en]
         default: both
 permissions:
-  contents: read
+  contents: write          # 预览图与上传资料（文字）提交回仓库
 concurrency:
   group: lecture-video
   cancel-in-progress: false
@@ -124,7 +124,27 @@ jobs:
             name=$(basename "$d")
             sh tools/video/logged.sh python tools/video/make.py "$d" --lang ${{ inputs.lang }} --voice ${{ inputs.voice }} --out "$RUNNER_TEMP/videos/$name"
             rm -rf "$RUNNER_TEMP/videos/$name/work"
+            # 预览（关键画面拼图）和上传资料（文字）放回讲稿目录，便于不下载视频也能检查
+            mkdir -p "$d/预览"
+            for lang in zh en; do
+              v="$RUNNER_TEMP/videos/$name/$lang"
+              [ -f "$v/lecture.mp4" ] || continue
+              len=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$v/lecture.mp4")
+              step=$(python -c "print(max(5, float('$len') / 24))")
+              ffmpeg -y -loglevel error -i "$v/lecture.mp4" -vf "fps=1/$step,scale=640:-1,tile=4x6:padding=4" -frames:v 1 -q:v 4 "$d/预览/$lang.jpg"
+              cp "$v/upload.md" "$d/预览/上传资料.$lang.md"
+              cp "$v/lecture.srt" "$d/预览/字幕.$lang.srt"
+              echo "$lang: $(python -c "t=float('$len'); print(f'{int(t//60)}:{int(t%60):02d}')")（${{ inputs.voice }}，run ${{ github.run_id }}）" >> "$d/预览/说明.txt"
+            done
           done
+      - name: Commit the previews
+        run: |
+          git config user.name "WenQuest video"
+          git config user.email "noreply@wenquestrobotics.com"
+          git add docs/课程视频
+          git diff --cached --quiet && exit 0
+          git commit -q -m "公开课视频预览：${{ inputs.lectures }}（${{ inputs.voice }}）"
+          git pull -q --rebase origin main && git push -q origin HEAD:main
       - uses: actions/upload-artifact@v4
         with:
           name: videos
