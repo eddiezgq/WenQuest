@@ -9,6 +9,10 @@ on:
       - ".github/workflows/factory.yml"
       - "library/**"
       - ".github/workflows/library.yml"
+      # 公开课视频（第 22 轮）单独由 video.yml 手动运行
+      - "tools/video/**"
+      - "docs/课程视频/**"
+      - ".github/workflows/video.yml"
   workflow_dispatch:
   # Weekly fresh build picks up Moodle security fixes from the stable branch.
   schedule:

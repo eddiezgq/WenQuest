@@ -1,0 +1,78 @@
+"""上传英文版到 YouTube（第 22 轮 2.4）：官方 YouTube Data API v3，Eddie 授权一次（刷新令牌存仓库密钥）。
+
+    python3 tools/video/upload_youtube.py OUT_DIR/en [--privacy private|unlisted|public] [--playlist "Linear Algebra (WenQuest)"]
+
+OUT_DIR/en 是 make.py 的输出：lecture.mp4、upload.json（标题、简介、标签）、cover_youtube.png、lecture.srt。
+环境变量：YT_CLIENT_ID、YT_CLIENT_SECRET、YT_REFRESH_TOKEN。
+注意：Google 审核通过前，接口上传的视频会被锁为私密（private），要 Eddie 在 YouTube Studio 里手动公开。
+配音是 AI 合成，status.containsSyntheticMedia = true（YouTube 的“改动或合成内容”声明）。
+每个视频约用 1600 + 50 + 400 + 50 配额单位，默认每天 10000 单位，约 4–5 个视频。
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+from pathlib import Path
+
+
+def client():
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+    creds = Credentials(None, refresh_token=os.environ["YT_REFRESH_TOKEN"], client_id=os.environ["YT_CLIENT_ID"],
+                        client_secret=os.environ["YT_CLIENT_SECRET"], token_uri="https://oauth2.googleapis.com/token",
+                        scopes=["https://www.googleapis.com/auth/youtube.upload", "https://www.googleapis.com/auth/youtube.force-ssl"])
+    return build("youtube", "v3", credentials=creds, cache_discovery=False)
+
+
+def playlist_id(yt, title: str) -> str:
+    req = yt.playlists().list(part="snippet", mine=True, maxResults=50)
+    while req:
+        r = req.execute()
+        for p in r.get("items", []):
+            if p["snippet"]["title"] == title:
+                return p["id"]
+        req = yt.playlists().list_next(req, r)
+    p = yt.playlists().insert(part="snippet,status", body={"snippet": {"title": title, "defaultLanguage": "en"},
+                                                           "status": {"privacyStatus": "public"}}).execute()
+    return p["id"]
+
+
+def upload(d: Path, privacy: str, playlist: str) -> str:
+    from googleapiclient.http import MediaFileUpload
+    meta = json.loads((d / "upload.json").read_text(encoding="utf-8"))
+    yt = client()
+    body = {"snippet": {"title": meta["title"][:100], "description": meta["description"][:5000], "tags": meta["tags"],
+                        "categoryId": "27", "defaultLanguage": "en", "defaultAudioLanguage": "en"},
+            "status": {"privacyStatus": privacy, "selfDeclaredMadeForKids": False, "containsSyntheticMedia": True,
+                       "license": "youtube", "embeddable": True}}
+    req = yt.videos().insert(part="snippet,status", body=body,
+                             media_body=MediaFileUpload(str(d / "lecture.mp4"), chunksize=8 * 1024 * 1024, resumable=True))
+    resp = None
+    while resp is None:
+        status, resp = req.next_chunk()
+        if status:
+            print(f"  {int(status.progress() * 100)}%", flush=True)
+    vid = resp["id"]
+    yt.thumbnails().set(videoId=vid, media_body=MediaFileUpload(str(d / "cover_youtube.png"))).execute()
+    if (d / "lecture.srt").exists():
+        yt.captions().insert(part="snippet", body={"snippet": {"videoId": vid, "language": "en", "name": "English"}},
+                             media_body=MediaFileUpload(str(d / "lecture.srt"), mimetype="application/octet-stream")).execute()
+    if playlist:
+        yt.playlistItems().insert(part="snippet", body={"snippet": {"playlistId": playlist_id(yt, playlist),
+                                                                    "resourceId": {"kind": "youtube#video", "videoId": vid}}}).execute()
+    print(f"https://youtu.be/{vid}  ({privacy})")
+    return vid
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("dir")
+    ap.add_argument("--privacy", default="private", choices=["private", "unlisted", "public"])
+    ap.add_argument("--playlist", default="Linear Algebra (WenQuest)")
+    a = ap.parse_args()
+    for k in ("YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN"):
+        if not os.environ.get(k):
+            sys.exit(f"没有设置 {k}")
+    upload(Path(a.dir), a.privacy, a.playlist)

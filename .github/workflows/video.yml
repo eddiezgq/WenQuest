@@ -1,0 +1,151 @@
+# 公开课视频（第 22 轮）：手动触发。讲稿在 docs/课程视频/<课>/<节>/讲稿.yaml，工具在 tools/video/。
+#   task = audition：用 Eddie 的样音在租用的 GPU 上试合成同一段中英文（Fun-CosyVoice3 与 CosyVoice2 各一份），供试听选定
+#   task = render  ：做成片（中英两版，字幕、封面、上传资料）。voice = kokoro（开源占位声音）或 clone（Eddie 本人声音，先在 GPU 上合成）
+# 结果在本次运行页面的 Artifacts 里下载（保留 14 天）。upload = youtube 时英文版私密上传到 YouTube（要 YT_* 三个密钥）；
+# B 站开放平台批下来之前，中文版由 Eddie 从 Artifacts 下载后自己上传。
+# 需要的仓库密钥：VOICE_KEY（样音密码）；clone 和 audition 还要 LAMBDA_KEY、LAMBDA_SSH_KEY_NAME、LAMBDA_SSH_PRIVATE_KEY（与 GPU 实测相同）。
+name: Lecture videos 公开课视频
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "audition（试听）或 render（成片）"
+        type: choice
+        options: [render, audition]
+        default: render
+      lectures:
+        description: "讲稿目录，空格分隔（如 docs/课程视频/线性代数/14-2）"
+        required: false
+        default: "docs/课程视频/线性代数/14-2"
+      voice:
+        description: "配音：kokoro（占位）或 clone（本人声音）"
+        type: choice
+        options: [kokoro, clone]
+        default: kokoro
+      engine:
+        description: "克隆模型：cv3（Fun-CosyVoice3）或 cv2（CosyVoice2）"
+        type: choice
+        options: [cv3, cv2]
+        default: cv3
+      upload:
+        description: "做完后上传：none（只出文件）或 youtube（英文版私密上传到 YouTube）"
+        type: choice
+        options: [none, youtube]
+        default: none
+      lang:
+        description: "语言"
+        type: choice
+        options: [both, zh, en]
+        default: both
+permissions:
+  contents: read
+concurrency:
+  group: lecture-video
+  cancel-in-progress: false
+
+jobs:
+  voice:
+    if: inputs.task == 'audition' || inputs.voice == 'clone'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Speak with Eddie's voice on a rented GPU（合成完即关机）
+        env:
+          VOICE_KEY: ${{ secrets.VOICE_KEY }}
+          LAMBDA_KEY: ${{ secrets.LAMBDA_KEY }}
+          LAMBDA_SSH_KEY_NAME: ${{ secrets.LAMBDA_SSH_KEY_NAME }}
+          SSH_PRIVATE: ${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}
+        run: |
+          test -n "$VOICE_KEY" || { echo "::error::没有设置 VOICE_KEY"; exit 1; }
+          test -n "$LAMBDA_KEY" || { echo "::error::没有设置 LAMBDA_KEY"; exit 1; }
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
+          pip install -q pyyaml numpy scipy matplotlib sympy
+          install -m 600 /dev/null "$RUNNER_TEMP/gpu_key" && printf '%s\n' "$SSH_PRIVATE" > "$RUNNER_TEMP/gpu_key"
+          export LAMBDA_SSH_KEY_FILE="$RUNNER_TEMP/gpu_key"
+          if [ "${{ inputs.task }}" = audition ]; then
+            python tools/video/clone.py audition --out "$RUNNER_TEMP/clone"
+          else
+            python tools/video/clone.py lectures ${{ inputs.lectures }} --engine ${{ inputs.engine }} --out "$RUNNER_TEMP/clone"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.task == 'audition' && 'audition' || 'voice-clone' }}
+          path: ${{ runner.temp }}/clone
+          retention-days: 14
+
+  render:
+    needs: voice
+    if: always() && inputs.task == 'render' && (needs.voice.result == 'success' || needs.voice.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Tools (Manim, LaTeX, fonts, ffmpeg, Chromium, Kokoro)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends fonts-noto-cjk fonts-dejavu ffmpeg libpango1.0-dev libcairo2-dev pkg-config \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science dvisvgm cm-super > /dev/null
+          pip install -q manim==0.21.0 sherpa-onnx pyyaml numpy scipy matplotlib sympy schemdraw==0.23 python-docx==1.2.0 markdown-it-py jsonschema Pillow
+          pip install -q -r services/labcheck/requirements.txt
+          python -m playwright install --with-deps --only-shell chromium > /dev/null
+          (cd textbook/tools && npm ci --no-audit --no-fund > /dev/null)
+          sh services/voice/fetch_models.sh "$RUNNER_TEMP/models" > /dev/null
+      - name: Build the book's figures and lab pages（视频里的图和实验页）
+        run: |
+          for d in ${{ inputs.lectures }}; do python -c "import yaml,sys; print(yaml.safe_load(open(sys.argv[1]+'/讲稿.yaml'))['book'])" "$d"; done | sort -u > "$RUNNER_TEMP/books"
+          for b in $(cat "$RUNNER_TEMP/books"); do python textbook/tools/build.py "$b" --labs; done
+      - uses: actions/download-artifact@v4
+        if: inputs.voice == 'clone'
+        with:
+          name: voice-clone
+          path: ${{ runner.temp }}/clone
+      - name: Make the videos
+        env:
+          WQ_MANIM: manim
+          WQ_TTS_MODELS: ${{ runner.temp }}/models
+          WQ_CLONE_DIR: ${{ runner.temp }}/clone/${{ inputs.engine }}
+          WQ_FOOTAGE: ${{ github.workspace }}/docs/课程视频/素材
+        run: |
+          for d in ${{ inputs.lectures }}; do
+            name=$(basename "$d")
+            python tools/video/make.py "$d" --lang ${{ inputs.lang }} --voice ${{ inputs.voice }} --out "$RUNNER_TEMP/videos/$name"
+            rm -rf "$RUNNER_TEMP/videos/$name/work"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: videos
+          path: ${{ runner.temp }}/videos
+          retention-days: 14
+
+  upload:
+    needs: render
+    if: inputs.task == 'render' && inputs.upload == 'youtube' && needs.render.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: videos
+          path: ${{ runner.temp }}/videos
+      - name: Upload the English versions to YouTube (private until Eddie publishes)
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: |
+          pip install -q google-api-python-client google-auth
+          for d in "$RUNNER_TEMP"/videos/*/en; do python tools/video/upload_youtube.py "$d" --privacy private; done

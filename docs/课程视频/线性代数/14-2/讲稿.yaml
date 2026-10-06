@@ -1,0 +1,310 @@
+# 《线性代数》公开课 第 14 章第 2 讲：谱定理（第 22 轮样片）
+# 格式见 tools/video/README.md。say 里每一行是一句配音和一条字幕；行首 “>” 表示说这句之前画面进入下一步
+# （幻灯：出现下一项；动画：进入下一段；实验：执行下一个操作）。中英两种语言 “>” 的个数必须相同。
+# “[字幕|读法]” 表示字幕显示前者、配音读后者（公式符号、数字的读法）。
+# {{程序.键:格式}} 由教材程序 linalg/ch14/code/ex14_2.py 的输出填入，不手写数字。
+book: linalg
+section: "14.2"
+code: [ex14_2]
+title: ["谱定理：A = QΛQᵀ", "The Spectral Theorem: A = QΛQᵀ"]
+chapter: ["第 14 章 对称矩阵与谱定理", "Chapter 14 Symmetric Matrices and the Spectral Theorem"]
+next: ["14.3 埃尔米特矩阵、酉矩阵与舒尔分解", "14.3 Hermitian and unitary matrices, Schur decomposition"]
+cover_formula: 'A = Q\Lambda Q^{\mathsf T}'
+
+shots:
+  - id: open
+    kind: title
+    say:
+      zh:
+        - 同学们好，欢迎来到问渠的线性代数课。
+        - 这一讲是第十四章第二节，谱定理。
+      en:
+        - Hi everyone, and welcome to Linear Algebra at WenQuest.
+        - This is Chapter 14, Section 2, the spectral theorem.
+
+  - id: problem
+    kind: slide
+    part: ["实际问题", "The problem"]
+    head: ["末端在哪个方向最软？", "In which direction is the tip softest?"]
+    items:
+      - img: fig14_2_1
+      - text: ["最软的方向？最硬的方向？相差多少？", "Softest direction? Stiffest? How different?"]
+      - text: ["任意方向的力，把末端顶向哪里？", "Where does a push in any direction move the tip?"]
+      - tex: 'K_x = Q\Lambda Q^{\mathsf T}\ ?'
+    say:
+      zh:
+        - 先看一个车间里的问题。
+        - ">机械臂握着砂轮磨削工件，或者拿着刀具去毛刺，工具压在工件上，工件也在反推工具，末端就会被顶开一点点。"
+        - 这一点点，可能就是零点几毫米的尺寸误差。
+        - ">所以工程师想知道：末端在哪个方向最软，哪个方向最硬，软硬相差多少？"
+        - ">还有更实际的一问：随便一个方向的力，会把末端顶向哪里？"
+        - 上一节我们证明了，末端的刚度矩阵是对称的，而对称矩阵的特征向量互相垂直。
+        - 如果这样的特征向量总能凑够一整组，刚度矩阵就相当于沿几个互相垂直的方向，各放了一根独立的弹簧。
+        - ">今天的谱定理，保证的正是这一点。"
+      en:
+        - Let's start with a problem from the shop floor.
+        - ">A robot arm holds a grinding wheel, or a deburring tool. The tool presses on the part, the part pushes back, and the tip of the arm gives way a little."
+        - That little bit can be a few tenths of a millimetre of error on the finished part.
+        - ">So an engineer wants to know: in which direction is the tip softest, in which is it stiffest, and how big is the difference?"
+        - ">And a more practical question: if you push in some arbitrary direction, where does the tip actually go?"
+        - In the last section we proved that the tip stiffness matrix is symmetric, and that the eigenvectors of a symmetric matrix are perpendicular.
+        - If we can always find a full set of them, the stiffness matrix is just a few independent springs along perpendicular directions.
+        - ">Today's result, the spectral theorem, guarantees exactly that."
+
+  - id: theorem
+    kind: slide
+    part: ["谱定理", "The theorem"]
+    head: ["定理 14.2.1（谱定理）", "Theorem 14.2.1 (the spectral theorem)"]
+    items:
+      - text: ["设 A 是 n 阶实对称矩阵，则", "Let A be a real symmetric n × n matrix. Then"]
+      - tex: 'A = Q\Lambda Q^{\mathsf T},\qquad Q^{\mathsf T}Q = I,\qquad \Lambda = \operatorname{diag}(\lambda_1, \dots, \lambda_n)'
+      - text: ["Q 的列：一组标准正交的特征向量；λᵢ：对应的特征值", "Columns of Q: orthonormal eigenvectors;  λᵢ: their eigenvalues"]
+      - text: ["反过来，Q Λ Qᵀ 一定对称", "Conversely, every Q Λ Qᵀ is symmetric"]
+    say:
+      zh:
+        - ">谱定理说：设 A 是一个 n 阶实对称矩阵，"
+        - ">那么一定能找到一个正交矩阵 Q 和一个实的对角矩阵 [Λ|Lambda]，使得 [A = QΛQᵀ|A 等于 Q 乘 Lambda 再乘 Q 的转置]。"
+        - 正交矩阵的意思是，[QᵀQ = I|Q 的转置乘 Q 等于单位矩阵]，它的各列两两垂直，长度都是一。
+        - ">Q 的各列，就是 A 的一组标准正交的特征向量；[Λ|Lambda] 对角线上的数，是对应的特征值。"
+        - ">反过来也成立：任何形如 [QΛQᵀ|Q Lambda Q 转置] 的矩阵，转置以后还是它自己，一定对称。"
+        - 所以，实对称，和能用正交矩阵对角化，是同一件事。
+      en:
+        - ">The spectral theorem says: let A be a real symmetric matrix of size n by n."
+        - ">Then there is an orthogonal matrix Q and a real diagonal matrix Lambda such that A equals Q times Lambda times Q transpose."
+        - Orthogonal means Q transpose times Q is the identity. The columns are perpendicular unit vectors.
+        - ">The columns of Q are an orthonormal set of eigenvectors of A, and the diagonal entries of Lambda are the matching eigenvalues."
+        - ">The converse is true too. Any matrix of the form Q Lambda Q transpose equals its own transpose, so it is symmetric."
+        - In other words, being real symmetric and being diagonalizable by an orthogonal matrix are the same thing.
+
+  - id: proof
+    kind: slide
+    part: ["证明思路", "Why it is true"]
+    head: ["对称性让一行一列同时消零", "Symmetry clears a row and a column at once"]
+    items:
+      - text: ["取实特征值 λ₁、单位特征向量 q₁，扩充为标准正交基 Q₁ = (q₁, U)", "Take a real eigenvalue λ₁ with unit eigenvector q₁; extend to an orthonormal basis Q₁ = (q₁, U)"]
+      - tex: 'Q_1^{\mathsf T}AQ_1 = \begin{pmatrix}\boldsymbol q_1^{\mathsf T}A\boldsymbol q_1 & \boldsymbol q_1^{\mathsf T}AU\\ U^{\mathsf T}A\boldsymbol q_1 & U^{\mathsf T}AU\end{pmatrix} = \begin{pmatrix}\lambda_1 & \boldsymbol 0^{\mathsf T}\\ \boldsymbol 0 & B\end{pmatrix}'
+      - tex: 'U^{\mathsf T}A\boldsymbol q_1 = \lambda_1U^{\mathsf T}\boldsymbol q_1 = \boldsymbol 0,\qquad \boldsymbol q_1^{\mathsf T}AU = (U^{\mathsf T}A\boldsymbol q_1)^{\mathsf T} = \boldsymbol 0^{\mathsf T}'
+      - text: ["B = UᵀAU 仍对称、小一阶：归纳下去", "B = UᵀAU is symmetric and one size smaller: induction"]
+    say:
+      zh:
+        - 证明用归纳法，我们只看最关键的一步。
+        - ">先取 A 的一个特征值 [λ₁|lambda 一]。上一节说过，它一定是实数。再取一个实的单位特征向量 [q₁|q 一]，把它扩充成一组标准正交基，拼成正交矩阵 [Q₁|Q 一]。"
+        - ">用 [Q₁|Q 一] 换一次坐标，看看 A 变成什么样子。"
+        - ">左下角是 [UᵀAq₁|U 转置乘 A 乘 q 一]，等于 [λ₁Uᵀq₁|lambda 一乘 U 转置乘 q 一]。U 的各列都和 [q₁|q 一] 垂直，所以它是零。"
+        - 关键在右上角：它正好是左下角的转置，所以也是零。
+        - 一般的矩阵，这样做只能让第一列消零；对称矩阵，第一行也跟着消零了。
+        - ">剩下的 B 还是对称矩阵，只是小了一阶。对 B 重复同样的做法，一层一层剥下去，最后就得到对角矩阵。"
+      en:
+        - The proof is by induction. Let's look only at the key step.
+        - ">Take an eigenvalue [λ₁|lambda one] of A. We showed last time it must be real. Take a real unit eigenvector [q₁|q one], extend it to an orthonormal basis, and put the basis into an orthogonal matrix [Q₁|Q one]."
+        - ">Now change coordinates with [Q₁|Q one] and see what A becomes."
+        - ">The lower-left block is [UᵀAq₁|U transpose A q one], which is [λ₁Uᵀq₁|lambda one times U transpose q one]. The columns of U are perpendicular to [q₁|q one], so this block is zero."
+        - Here is the key point. The upper-right block is the transpose of the lower-left block, so it is zero as well.
+        - For a general matrix this step clears only the first column. For a symmetric matrix the first row is cleared for free.
+        - ">What is left, B, is still symmetric and one size smaller. Repeat the same step on B, peel off one layer at a time, and you end with a diagonal matrix."
+
+  - id: consequences
+    kind: slide
+    part: ["推论", "Consequences"]
+    head: ["对称矩阵总能正交对角化", "Symmetric matrices are always orthogonally diagonalizable"]
+    items:
+      - text: ["一定可以对角化：几何重数 = 代数重数，特征向量不会不够用", "Always diagonalizable: geometric = algebraic multiplicity, never short of eigenvectors"]
+      - text: ["对角化用正交矩阵：Q⁻¹ = Qᵀ，不必求逆", "The diagonalizing matrix is orthogonal: Q⁻¹ = Qᵀ, no inverse needed"]
+      - text: ["国内教材：实对称矩阵必可正交相似对角化", "Often stated: every real symmetric matrix is orthogonally similar to a diagonal matrix"]
+      - text: ["程序：numpy.linalg.eigh，特征值从小到大，特征向量标准正交", "In code: numpy.linalg.eigh, eigenvalues ascending, eigenvectors orthonormal"]
+    say:
+      zh:
+        - 这个定理有几个直接的推论。
+        - ">第一，对称矩阵一定可以对角化。每个特征值的几何重数都等于代数重数，不会像上一章的剪切矩阵那样，特征向量不够用。"
+        - ">第二，对角化用的是正交矩阵，Q 的逆就是 Q 的转置，不需要求逆。"
+        - ">国内教材常说，实对称矩阵必可正交相似对角化，说的就是这件事。"
+        - ">写程序时，对称矩阵一律用 numpy 的 eigh。它给出的特征值从小到大排好，特征向量标准正交。"
+      en:
+        - The theorem has some immediate consequences.
+        - ">First, a symmetric matrix can always be diagonalized. Every eigenvalue has as many independent eigenvectors as its multiplicity, so we never run short, the way the shear matrix did in the last chapter."
+        - ">Second, the diagonalizing matrix is orthogonal. Its inverse is just its transpose, so there is nothing to invert."
+        - ">You will often see this stated as: every real symmetric matrix is orthogonally similar to a diagonal matrix."
+        - ">In code, always use numpy's eigh for symmetric matrices. It returns the eigenvalues in increasing order and an orthonormal set of eigenvectors."
+
+  - id: geometry
+    kind: anim
+    src: a14_2_1
+    part: ["几何意义", "The picture"]
+    say:
+      zh:
+        - 那么，[A = QΛQᵀ|A 等于 Q Lambda Q 转置]，在几何上是什么意思？我们看一段动画。
+        - 这里的 A 是一个[2×2|二乘二] 的对称矩阵 [(2 1; 1 2)|二、一、一、二]。它的特征值是 1 和 3，绿色和红色两个特征向量互相垂直。
+        - ">第一步，[Qᵀ|Q 转置] 是一次转动，把两个特征向量转到坐标轴上。"
+        - ">第二步，[Λ|Lambda] 沿坐标轴分别伸缩：横向 1 倍，纵向 3 倍，两个方向互不干扰。"
+        - ">第三步，Q 再转回去。单位圆变成了一个椭圆，它的主轴正好沿着两个特征向量。"
+        - ">最后，直接用 A 去变换单位圆。白线和刚才三步的结果完全重合。"
+        - ">一句话：对称矩阵，就是沿几个互相垂直的方向，各自伸缩。单位圆的像是椭圆，半轴长就是特征值的绝对值。"
+      en:
+        - So what does [A = QΛQᵀ|A equals Q Lambda Q transpose] mean geometrically? Let's watch.
+        - Here A is the [2 × 2|two by two] symmetric matrix [(2 1; 1 2)|two, one, one, two]. Its eigenvalues are 1 and 3, and the green and red eigenvectors are perpendicular.
+        - ">Step one. [Qᵀ|Q transpose] is a rotation. It turns the two eigenvectors onto the coordinate axes."
+        - ">Step two. [Λ|Lambda] stretches along the axes, by 1 horizontally and by 3 vertically. The two directions don't interfere."
+        - ">Step three. Q rotates back. The unit circle has become an ellipse whose axes lie along the eigenvectors."
+        - ">Finally, transform the circle by A directly. The white curve lands exactly on the result of the three steps."
+        - ">In one sentence: a symmetric matrix stretches space independently along perpendicular directions. The circle becomes an ellipse whose semi-axes are the absolute values of the eigenvalues."
+
+  - id: decomposition
+    kind: slide
+    part: ["谱分解", "Spectral decomposition"]
+    head: ["投影的加权和", "A weighted sum of projections"]
+    items:
+      - tex: 'A = \lambda_1\boldsymbol q_1\boldsymbol q_1^{\mathsf T} + \lambda_2\boldsymbol q_2\boldsymbol q_2^{\mathsf T} + \dots + \lambda_n\boldsymbol q_n\boldsymbol q_n^{\mathsf T}'
+      - text: ["Pᵢ = qᵢqᵢᵀ：向第 i 条主轴的投影；P₁ + … + Pₙ = I，PᵢPⱼ = 0", "Pᵢ = qᵢqᵢᵀ projects onto axis i;  P₁ + … + Pₙ = I,  PᵢPⱼ = 0"]
+      - tex: 'f(A) = Qf(\Lambda)Q^{\mathsf T} = \sum_i f(\lambda_i)\,\boldsymbol q_i\boldsymbol q_i^{\mathsf T}'
+      - tex: 'K = \begin{pmatrix}4 & 1\\ 1 & 4\end{pmatrix},\qquad K^{1/2} = {{ex14_2.Kh}}'
+    say:
+      zh:
+        - 把 [QΛQᵀ|Q Lambda Q 转置] 按列乘行展开，就得到另一种写法。
+        - ">[A = λ₁q₁q₁ᵀ + λ₂q₂q₂ᵀ + … + λₙqₙqₙᵀ|A 等于 lambda 一乘 q 一 q 一转置，加 lambda 二乘 q 二 q 二转置，一直加到第 n 项]。"
+        - ">每一个 [qᵢqᵢᵀ|q i 乘 q i 转置]，都是向第 i 条主轴的投影矩阵。它们加起来是单位矩阵，两两相乘是零。"
+        - 所以对称矩阵是若干个互相垂直的投影的加权和，权重就是特征值。作用在一个向量上，就是先投影到各条主轴，各乘上特征值，再加起来。这叫谱分解。
+        - ">有了它，矩阵的函数就好算了：[f(A)|A 的 f]，等于把每个特征值 [λ|lambda] 换成 [f(λ)|f 了 lambda]。"
+        - ">比如柔顺腕的刚度矩阵 K，[(4 1; 1 4)|四一一四]，特征值 3 和 5。把它们换成 [√3、√5|根号三、根号五]，就得到 K 的平方根。加权最小二乘、卡尔曼滤波里都要用到它。"
+      en:
+        - Multiply out [QΛQᵀ|Q Lambda Q transpose] as columns times rows, and you get another way to write it.
+        - ">[A = λ₁q₁q₁ᵀ + λ₂q₂q₂ᵀ + … + λₙqₙqₙᵀ|A equals lambda one q one q one transpose, plus lambda two q two q two transpose, and so on up to the n-th term]."
+        - ">Each [qᵢqᵢᵀ|q i q i transpose] is the projection onto the i-th axis. These projections add up to the identity, and any two of them multiply to zero."
+        - So a symmetric matrix is a weighted sum of perpendicular projections, and the weights are the eigenvalues. Applied to a vector, it projects onto each axis, scales by the eigenvalue, and adds the pieces. This is the spectral decomposition.
+        - ">It makes functions of a matrix easy. To get [f(A)|f of A], just replace each eigenvalue [λ|lambda] by [f(λ)|f of lambda]."
+        - ">For example, the compliant wrist has stiffness K equal to [(4 1; 1 4)|four, one, one, four], with eigenvalues 3 and 5. Replace them by [√3 and √5|root three and root five] and you have the square root of K. It shows up in weighted least squares and in Kalman filters."
+
+  - id: example
+    kind: slide
+    part: ["算例", "Worked example"]
+    head: ["两连杆臂末端的刚度椭圆", "The stiffness ellipse of a two-link arm"]
+    items:
+      - tex: 'K_x = (JK_q^{-1}J^{\mathsf T})^{-1} = {{ex14_2.Kx}}\ \mathrm{N/m}'
+      - text: ["主刚度 {{ex14_2.kmin:.0f}} 与 {{ex14_2.kmax:.0f}} N/m，相差约 {{ex14_2.ratio:.1f}} 倍；软轴 {{ex14_2.ang1p:.1f}}°，硬轴 {{ex14_2.ang2:.1f}}°", "Principal stiffness {{ex14_2.kmin:.0f}} and {{ex14_2.kmax:.0f}} N/m, about {{ex14_2.ratio:.1f}}×; soft axis {{ex14_2.ang1p:.1f}}°, stiff axis {{ex14_2.ang2:.1f}}°"]
+      - img: fig14_2_1
+      - text: ["向下推 10 N：分解 → 各除以主刚度 → 合成，d = (0.6, −0.8) mm，偏向软轴", "Push down 10 N: split → divide by stiffness → recombine, d = (0.6, −0.8) mm, swerving to the soft axis"]
+    say:
+      zh:
+        - 现在回到机械臂。平面两连杆臂，连杆长 0.4 米和 0.3 米，两个关节刚度分别是 2000 和 1000 [N·m/rad|牛米每弧度]。
+        - ">末端的柔度矩阵是 [C = JK_q⁻¹Jᵀ|J 乘 K q 的逆再乘 J 转置]，刚度矩阵是它的逆。在 (0°, 90°) 这个姿态，程序算出的刚度矩阵是对称的。"
+        - ">用 eigh 一算，两个主刚度是 {{ex14_2.kmin:.0f}} 和 {{ex14_2.kmax:.0f}} [N/m|牛每米]，相差四倍多。软轴在 {{ex14_2.ang1p:.0f}} 度方向，硬轴在 {{ex14_2.ang2:.0f}} 度方向，正好垂直。"
+        - ">现在竖直向下推 10 牛。按谱分解分三步走。"
+        - 第一步，把力分解到两条主轴上，软轴分到约 5.4 牛，硬轴分到约 8.4 牛。
+        - 第二步，各自除以主刚度。软轴上的位移约 0.94 毫米，硬轴上只有 0.35 毫米。
+        - ">第三步，合起来，位移是 [(0.6, −0.8)|零点六、负零点八] 毫米，和直接解方程的结果一样。"
+        - 注意，力是竖直向下的，位移却偏向软轴 37° 左右。各个方向推 10 牛，位移的端点连起来就是图上这个柔度椭圆。
+      en:
+        - Back to the robot. A planar two-link arm has links of 0.4 and 0.3 metres, and joint stiffnesses of 2000 and 1000 [N·m/rad|newton metres per radian].
+        - ">The tip compliance is [C = JK_q⁻¹Jᵀ|J times K q inverse times J transpose], and the tip stiffness is its inverse. At the pose (0°, 90°), the program gives this stiffness matrix, and it is symmetric."
+        - ">Running eigh, the principal stiffnesses are {{ex14_2.kmin:.0f}} and {{ex14_2.kmax:.0f}} [N/m|newtons per metre], more than four times apart. The soft axis points at {{ex14_2.ang1p:.0f}} degrees, the stiff axis at {{ex14_2.ang2:.0f}} degrees, perpendicular as promised."
+        - ">Now push straight down with 10 newtons. The spectral decomposition does it in three steps."
+        - Step one, split the force onto the two axes. About 5.4 newtons land on the soft axis and 8.4 on the stiff axis.
+        - Step two, divide each by its stiffness. The soft axis moves about 0.94 millimetres, the stiff axis only 0.35.
+        - ">Step three, add them back. The deflection is [(0.6, −0.8)|zero point six, minus zero point eight] millimetres, the same as solving the system directly."
+        - Notice that the push is straight down, yet the tip moves about 37 degrees toward the soft axis. Push with 10 newtons in every direction and the tips trace out this compliance ellipse.
+
+  - id: code
+    kind: code
+    src: ex14_2
+    from: "# 两连杆臂的末端刚度"
+    part: ["程序", "The program"]
+    head: ["程序 14.2.1", "Program 14.2.1"]
+    result:
+      - "kmin, kmax = {{ex14_2.kmin:.1f}}, {{ex14_2.kmax:.1f}}"
+      - "angles = {{ex14_2.ang1p:.1f}}°, {{ex14_2.ang2:.1f}}°"
+      - "d = (0.600, -0.800) mm"
+    say:
+      zh:
+        - 这些数字都来自本节的程序 14.2.1，书上的每个数都由程序算出。
+        - ">核心只有几行：算出柔度矩阵，求逆得到刚度矩阵，用 eigh 求特征值和特征向量，再把力投影到主轴上，除以主刚度，转回来。"
+        - ">运行结果就在下面。你可以在平台上直接运行它，改一改姿态和关节刚度，看看主刚度怎么变。"
+      en:
+        - All these numbers come from Program 14.2.1. Every number in the book is computed by a program.
+        - ">The heart of it is a few lines. Build the compliance, invert it to get the stiffness, call eigh, project the force onto the axes, divide by the stiffnesses, and rotate back."
+        - ">Here is the output. You can run it on the platform yourself, change the pose or the joint stiffness, and watch the principal stiffnesses change."
+
+  - id: lab
+    kind: lab
+    lab: "14-2"
+    part: ["虚拟实验", "Virtual lab"]
+    steps:
+      - {set: {q1: 0, q2: 90, k2: 1000, phi: 270}}
+      - {sweep: {phi: [270, 200]}, dur: 6}
+      - {sweep: {q1: [0, 40]}, dur: 5}
+      - {sweep: {q2: [90, 120], k2: [1000, 1800]}, dur: 6}
+    say:
+      zh:
+        - 下面打开实验 14.2，机械臂末端的刚度椭圆。
+        - ">画面上是一台平面两连杆臂，两个关节都有弹性。末端周围的椭圆就是柔度椭圆，长轴是软轴，短轴是硬轴。"
+        - ">拖动推力方向 [φ|phi] 看看：大多数方向上，位移和推力并不同向，总是偏向软轴。"
+        - 右边的读数给出位移与推力的夹角。只有推力恰好沿着主轴时，夹角才是零。最软的方向究竟在哪里，第一项任务留给你自己去找。
+        - ">再转动第一个关节，注意看两个主刚度的读数。"
+        - 主方向跟着手臂一起转，主刚度的数值却不变。为什么？这是本实验的思考题。
+        - ">最后，改变第二个关节的角度和刚度，椭圆会变扁，也会变圆。"
+        - 能不能让末端在各个方向一样硬？要什么姿态、什么刚度？四项任务完成后，系统会自动打勾，实验指导书和报告模板也都准备好了。
+      en:
+        - Now let's open Lab 14.2, the stiffness ellipse at a robot's tip.
+        - ">Here is a planar two-link arm with elastic joints. The ellipse around the tip is the compliance ellipse. Its long axis is the soft axis and its short axis is the stiff axis."
+        - ">Drag the push direction [φ|phi]. In most directions the deflection does not follow the push. It always swerves toward the soft axis."
+        - The readout on the right shows the angle between them. It is zero only when the push lies exactly on an axis. Where is the softest direction? That is the first task, and it is yours to find.
+        - ">Now turn the first joint, and keep an eye on the two principal stiffnesses."
+        - The axes turn with the arm, but the stiffness values do not change. Why not? That is the question to think about in this lab.
+        - ">Finally, change the angle and the stiffness of the second joint. The ellipse gets flatter, or rounder."
+        - Can you make the tip equally stiff in every direction? Which pose, which stiffness? Each of the four tasks is checked automatically, and the lab guide and report template are ready for you.
+
+  - id: factory
+    kind: clip
+    src: factory/f10_mbd.mp4
+    part: ["数字工厂", "Digital factory"]
+    say:
+      zh:
+        - 这一讲的内容，在问渠数字工厂里也用得上。
+        - ">这是数字工厂的运动与动力模块：用 MuJoCo 计算 UR5e 机械臂带 3 公斤负载的动作，画出各关节的力矩曲线，再自动选出电机和减速器。"
+        - 减速器不是刚体，它有扭转刚度，这正是今天公式里的关节刚度 k。
+        - 选定减速器以后，把它的扭转刚度代入 [C = JK_q⁻¹Jᵀ|J 乘 K q 的逆再乘 J 转置]，就能算出机械臂在加工姿态下的刚度椭圆，判断哪个方向会被顶开。
+        - 在平台上，你可以把这一讲学到的方法，用到数字工厂的真实机械臂和真实零件上。
+      en:
+        - What you learned today is used in the WenQuest digital factory as well.
+        - ">This is the motion and dynamics module. It uses MuJoCo to simulate a UR5e arm carrying a 3 kilogram load, plots the torque at every joint, and then picks the motors and gearboxes automatically."
+        - A gearbox is not rigid. It has a torsional stiffness, and that is exactly the joint stiffness k in today's formula.
+        - Once the gearbox is chosen, plug its stiffness into [C = JK_q⁻¹Jᵀ|J times K q inverse times J transpose], and you get the stiffness ellipse of the arm in its working pose, and you know which way the tool will be pushed.
+        - On the platform you can take today's method to real robot arms and real parts in the digital factory.
+
+  - id: homework
+    kind: homework
+    part: ["作业", "Homework"]
+    items: ["14.2.1", "14.2.3", "14.2.6", "14.2.7"]
+    say:
+      zh:
+        - 课后作业有四道题。
+        - ">第一题是计算：把一个二阶对称矩阵写成 [QΛQᵀ|Q Lambda Q 转置]，再写成谱分解。"
+        - ">第二题是证明：对称矩阵如果满足 [A² = A|A 平方等于 A]，它一定是正交投影矩阵。"
+        - ">第三题是编程：用谱分解计算矩阵指数，和 scipy 的结果比一比。"
+        - ">第四题是机器人：求另一个姿态下末端的主刚度和主方向，并且说明为什么转动第一个关节不改变主刚度。"
+        - 再加上实验 14.2 的实验报告。作业在平台上提交，AI 会当场给出反馈，告诉你哪一步对、哪一步要再想想。
+      en:
+        - There are four exercises for this lecture.
+        - ">The first is a computation. Write a [2 × 2|two by two] symmetric matrix as [QΛQᵀ|Q Lambda Q transpose], and as a spectral decomposition."
+        - ">The second is a proof. If a symmetric matrix satisfies [A² = A|A squared equals A], show it is an orthogonal projection."
+        - ">The third is programming. Compute a matrix exponential from the spectral decomposition and compare with scipy."
+        - ">The fourth is about the robot. Find the principal stiffnesses and axes at another pose, and explain why turning the first joint leaves them unchanged."
+        - Plus the report for Lab 14.2. Submit your work on the platform and the AI gives you feedback right away, step by step.
+
+  - id: outro
+    kind: outro
+    points:
+      - ["实对称矩阵 = 能用正交矩阵对角化：A = QΛQᵀ", "Real symmetric ⇔ orthogonally diagonalizable: A = QΛQᵀ"]
+      - ["几何上：转过去、沿主轴伸缩、转回来", "Geometrically: rotate, stretch along the axes, rotate back"]
+      - ["谱分解：投影的加权和；末端刚度椭圆的主轴就是特征向量", "Spectral decomposition: a weighted sum of projections; the stiffness ellipse's axes are eigenvectors"]
+    say:
+      zh:
+        - ">最后小结三句话。实对称矩阵，就是能用正交矩阵对角化的矩阵。"
+        - ">几何上，它就是转过去、沿主轴伸缩、再转回来。"
+        - ">谱分解把它写成投影的加权和，机械臂末端刚度椭圆的主轴，就是刚度矩阵的特征向量。"
+        - 这一讲的实验、程序、讲义和作业，都在问渠学习平台上，免费注册就能动手做。
+        - 下一讲，我们把谱定理推广到复数，讲埃尔米特矩阵、酉矩阵和舒尔分解。我们下次见。
+      en:
+        - ">To sum up in three sentences. A real symmetric matrix is exactly a matrix you can diagonalize with an orthogonal matrix."
+        - ">Geometrically, it rotates, stretches along perpendicular axes, and rotates back."
+        - ">The spectral decomposition writes it as a weighted sum of projections, and the axes of a robot's stiffness ellipse are the eigenvectors of its stiffness matrix."
+        - The lab, the program, the notes and the exercises are all on the WenQuest learning platform at [learn.wenquestrobotics.com|learn dot wenquest robotics dot com]. Sign up for free and try them yourself.
+        - Next time we take the spectral theorem into complex numbers, with Hermitian and unitary matrices and the Schur decomposition. See you then.
