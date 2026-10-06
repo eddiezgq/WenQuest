@@ -84,6 +84,12 @@ def build_chapter(lang, n):
         fr = fr.replace('src="img/', 'src="../img/').replace('href="img/', 'href="../img/')
         # English figures where they exist (img/en/<name>), else the original
         fr = re.sub(r'(src|href)="\.\./img/([^"/]+)\.png"', lambda m: f'{m.group(1)}="../img/en/{m.group(2)}.png"' if os.path.exists(os.path.join(ROOT, 'img', 'en', m.group(2) + '.webp')) else m.group(0), fr)
+    # 本章的网页互动课件（第 24 轮）：标题下放一个“放映课件”按钮
+    if os.path.exists(os.path.join(ROOT, 'course', 'slides', f'ch{n:02d}.yaml')):
+        href = ('' if lang == 'zh' else '../') + f'slides/ch{n:02d}.html'
+        btn = (f'<p class="deck-link"><a class="chip" href="{href}" target="_blank" rel="noopener"><b>{"课件" if lang == "zh" else "Slides"}</b>'
+               f'{"放映本讲网页课件（动画和实验在页里可操作）" if lang == "zh" else "Present the interactive web slides of this lecture"} ↗</a></p>')
+        fr = re.sub(r'(</h1>)', r'\1' + btn.replace('\\', '\\\\'), fr, count=1)
     # images are stored as WebP in the repository
     fr = re.sub(r'((?:src|href)="(?:\.\./)?img/[^"]+)\.png"', r'\1.webp"', fr)
     # side nav from h3 ids
@@ -196,6 +202,15 @@ if __name__ == '__main__':
         if os.path.exists(os.path.join(ROOT, f'res_{lang}.json')):
             build_index(lang); build_resources(lang)
         copy_labs(lang)
+    # 网页互动课件（第 24 轮）
+    sys.path.insert(0, os.path.join(ROOT, 'course', 'tools'))
+    import build_slides
+    from pathlib import Path
+    for y in sorted(glob.glob(os.path.join(ROOT, 'course', 'slides', 'ch*.yaml'))):
+        lid = os.path.splitext(os.path.basename(y))[0]
+        deck = build_slides.make_deck(lid, Path(OUT) / 'slides' / '_tmp')
+        shutil.move(str(deck), os.path.join(OUT, 'slides', f'{lid}.html'))
+    shutil.rmtree(os.path.join(OUT, 'slides', '_tmp'), ignore_errors=True)
     # new images
     for p in glob.glob(os.path.join(ROOT, 'img', '**', '*.webp'), recursive=True):
         rel = os.path.relpath(p, ROOT)

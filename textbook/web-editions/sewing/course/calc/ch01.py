@@ -34,4 +34,4 @@ if __import__("os").environ.get("WQ_BOOK_OUT"):
     from bookout import out
     F = {n: m * a_bdc(n) for n in (200, 4000, 5000, 6000)}
     out(F200=F[200], F4000=F[4000], F5000=F[5000], F6000=F[6000], a200=a_bdc(200), a5000=a_bdc(5000),
-        up56=(F[6000] / F[5000] - 1) * 100, ratio=F[5000] / F[200], hits6000=6000 / 60)
+        up56=(F[6000] / F[5000] - 1) * 100, r56=F[6000] / F[5000], ratio=F[5000] / F[200], hits6000=6000 / 60)

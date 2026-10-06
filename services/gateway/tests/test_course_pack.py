@@ -31,7 +31,8 @@ def moodle(request: httpx.Request) -> httpx.Response:
             FAIL["add"] -= 1
             return httpx.Response(200, json={"exception": "x", "errorcode": "boom", "message": "engine hiccup"})
         n = len({k for k in parse_qs(body) if k.startswith("activities[") and k.endswith("[type]")})
-        return httpx.Response(200, json={"courseid": 42, "sectionid": 1, "cmids": list(range(500, 500 + n))})
+        start = 500 + 10 * sum(1 for f, _ in CALLS if f == "local_wenquest_add_activities")   # every activity gets its own id
+        return httpx.Response(200, json={"courseid": 42, "sectionid": 1, "cmids": list(range(start, start + n))})
     if fn == "local_wenquest_create_quiz":
         CALLS.append((fn, body))
         return httpx.Response(200, json={"cmid": 900 + len(CALLS), "quizid": 1, "questions": 1})
@@ -162,3 +163,30 @@ def test_unknown_pack_and_batch(client, tmp_path):
     h = login(client)
     assert client.post("/api/v1/admin/course-packs/nope/publish", headers=h, json={"batch": 1}).status_code == 404
     assert client.post("/api/v1/admin/course-packs/sewing/publish", headers=h, json={"batch": 7}).status_code == 404
+
+
+def test_refresh_replaces_changed_files_in_place(client, tmp_path):
+    """第 24 轮：已发布讲次的课件由 PPT 换成网页课件——原活动原地换文件、改名，不新增、不删除活动。"""
+    pack(tmp_path)
+    h = login(client)
+    client.post("/api/v1/admin/course-packs/sewing/publish", headers=h, json={"batch": 1})
+    p = wait(client, h)
+    assert p["status"] == "done" and p["stale"] == 0
+    base = tmp_path / "textbook" / "sewing" / "course"
+    man = json.loads((base / "manifest.json").read_text())
+    (base / "files" / "ch01" / "deck.html").write_bytes(b"<html>new deck</html>")
+    man["lessons"][0]["activities"][1].update(file="files/ch01/deck.html", name=["课件（网页）", "Web slides"])
+    (base / "manifest.json").write_text(json.dumps(man, ensure_ascii=False))
+    p = client.get("/api/v1/admin/course-packs", headers=h).json()["packs"][0]
+    assert p["stale"] == 1
+    assert client.post("/api/v1/admin/course-packs/sewing/refresh", headers=login(client, "s")).status_code == 403
+    CALLS.clear()
+    r = client.post("/api/v1/admin/course-packs/sewing/refresh", headers=h)
+    assert r.status_code == 200, r.text
+    p = wait(client, h)
+    assert p["status"] == "done" and p["stale"] == 0
+    edits = [parse_qs(b) for f, b in CALLS if f == "local_wenquest_edit_course"]
+    assert [e["action"][0] for e in edits] == ["replacefile", "module"]
+    assert edits[0]["draftitemid"][0] != "0" and edits[0]["cmid"] == edits[1]["cmid"]
+    assert "multilang" in edits[1]["name"][0]
+    assert not any(f in ("local_wenquest_add_activities", "local_wenquest_create_quiz") for f, _ in CALLS)

@@ -689,10 +689,18 @@ def lesson_entry(d: dict, out: Path, tmp: Path) -> dict:
         return res
 
     acts += lab_acts({"动画"})
-    deck = f"第{no}讲-{title[0]}-课件（中英对照）.pptx"
-    build_deck(d, fdir / deck, tmp)
-    acts.append({"type": "resource", "name": pair(f"课件：第 {no} 讲 {title[0]}（中英对照）", f"Slides: Lesson {no} {title[1]} (bilingual)"),
-                 "file": f"{rel}/{deck}", "visible": 1})
+    if (COURSE / "slides" / f"ch{no:02d}.yaml").exists():      # 网页互动课件（第 24 轮，取代 PPT）
+        sys.path.insert(0, str(HERE))
+        import build_slides
+        deck = build_slides.make_deck(f"ch{no:02d}", fdir).name
+        acts.append({"type": "resource", "name": pair(f"课件：第 {no} 讲 {title[0]}（网页互动课件，中英对照）",
+                                                      f"Slides: Lesson {no} {title[1]} (interactive web slides, bilingual)"),
+                     "file": f"{rel}/{deck}", "visible": 1, "key": "deck"})
+    else:
+        deck = f"第{no}讲-{title[0]}-课件（中英对照）.pptx"
+        build_deck(d, fdir / deck, tmp)
+        acts.append({"type": "resource", "name": pair(f"课件：第 {no} 讲 {title[0]}（中英对照）", f"Slides: Lesson {no} {title[1]} (bilingual)"),
+                     "file": f"{rel}/{deck}", "visible": 1, "key": "deck"})
 
     # 练习 and its answer key (teachers only)
     def ex_page(lang: str, answers: bool) -> str:
@@ -791,7 +799,7 @@ def course_info(lessons: dict[int, dict]) -> dict:
           f"<p>全课 8 个单元、31 讲，建议共 {hours} 学时。每讲按“车间实际问题 → 概念 → 动画与虚拟实验 → 建模求解”展开，"
           "并配一个机器人联系和一个生活例子。</p>"
           "<h4>每讲包含</h4><ul><li>讲义（教材本章 + 本讲导入、解答与小结）</li><li>动画、虚拟实验或三维模型（中文版、英文版）</li>"
-          "<li>中英对照课件（PPT，备注里有讲稿）</li><li>练习（教材习题）</li><li>实验指导书与实验报告模板（Word）</li>"
+          "<li>网页互动课件（像 PPT 一样翻页，动画和实验嵌在页里可操作，中英对照，讲者窗口里有讲稿）</li><li>练习（教材习题）</li><li>实验指导书与实验报告模板（Word）</li>"
           "<li>作业 1 份、测验 1 份（自动评分）</li></ul>"
           "<h4>单元与各讲</h4><table><tr><th>单元</th><th>各讲</th></tr>" + "".join(rows_zh) + "</table>"
           "<h4>考核（建议）</h4><ul><li>每讲作业（含实验报告）30%</li><li>每讲测验 20%</li><li>期中考试（第 1–4 单元）20%</li><li>期末考试（全课）30%</li></ul>"
@@ -804,7 +812,7 @@ def course_info(lessons: dict[int, dict]) -> dict:
           f"<p>8 units, 31 lessons, about {hours} class hours. Every lesson runs shop-floor problem → concepts → animations and virtual labs → "
           "modelling and solving, with a robot link and an everyday example.</p>"
           "<h4>Every lesson has</h4><ul><li>Notes (the textbook chapter plus the lesson's opening, solution and summary)</li>"
-          "<li>Animations, virtual labs or 3D models (Chinese and English)</li><li>Bilingual slides (PPT, with the script in the notes)</li>"
+          "<li>Animations, virtual labs or 3D models (Chinese and English)</li><li>Interactive web slides (page by page like PPT, with live animations and labs, bilingual, script in the presenter view)</li>"
           "<li>Practice (the textbook exercises)</li><li>Lab guides and report templates (Word)</li><li>One assignment and one quiz (marked automatically)</li></ul>"
           "<h4>Units and lessons</h4><table><tr><th>Unit</th><th>Lessons</th></tr>" + "".join(rows_en) + "</table>"
           "<h4>Assessment (suggested)</h4><ul><li>Assignments with lab reports 30%</li><li>Lesson quizzes 20%</li><li>Midterm (units 1–4) 20%</li><li>Final (whole course) 30%</li></ul>"

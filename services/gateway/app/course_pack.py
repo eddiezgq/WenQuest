@@ -8,6 +8,7 @@ Progress lives in <data_dir>/course-packs/<book>.json.
 """
 
 import asyncio
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -91,7 +92,7 @@ def register(app, m) -> None:
             status = "failed"   # the gateway restarted mid-way: press again to continue
         return {"book": book, "title": man["course"]["fullname"][i], "version": man.get("version", ""),
                 "courseid": st["courseid"], "status": status, "error": st["error"], "progress": st["progress"],
-                "batches": batches, "updated": st.get("updated", 0)}
+                "batches": batches, "updated": st.get("updated", 0), "stale": len(stale(book, man, st))}
 
     async def call(sess: Session, fn: str, **kw: Any) -> dict:
         return await state.moodle.call(sess.moodle_token, fn, None, **kw)
@@ -179,6 +180,9 @@ def register(app, m) -> None:
                 cmids = [int(x) for x in r.get("cmids") or []]
                 rec["cmids"] += cmids
                 for a2, cmid in zip(acts[i:j], cmids):
+                    if a2["type"] == "resource" and cmid:
+                        st.setdefault("files", {})[str(cmid)] = file_hash(base, a2["file"])
+                for a2, cmid in zip(acts[i:j], cmids):
                     if a2["type"] == "assign" and cmid:
                         try:
                             await call(sess, "local_wenquest_edit_course", courseid=courseid, action="content", cmid=cmid,
@@ -189,6 +193,48 @@ def register(app, m) -> None:
             rec["done"] = i
             rec["at"] = int(time.time())
             save_state(book, st)
+
+    def file_hash(base: Path, rel: str) -> str:
+        p = (base / rel).resolve()
+        return hashlib.sha1(p.read_bytes()).hexdigest() if p.is_file() else ""
+
+    def stale(book: str, man: dict, st: dict) -> list[tuple[str, int, dict]]:
+        """Published file activities whose file in the current pack differs from what was uploaded (第 24 轮：
+        课件由 PPT 换成网页互动课件，以后改了课件、实验页也走这里)。Matched by position: a lesson's cmids are recorded
+        in the order of its activities. Older records without a hash count as changed once."""
+        base = manifest_path(book).parent
+        known = st.get("files", {})
+        out = []
+        for les in man["lessons"]:
+            rec = st["lessons"].get(str(les["no"]))
+            if not rec or not lesson_done(st, les):
+                continue
+            for a, cmid in zip(les["activities"], rec.get("cmids") or []):
+                if a["type"] == "resource" and cmid and known.get(str(cmid)) != file_hash(base, a["file"]):
+                    out.append((str(les["no"]), int(cmid), a))
+        return out
+
+    async def refresh_work(sess: Session, book: str) -> None:
+        man = load_manifest(book)
+        st = load_state(book)
+        base = manifest_path(book).parent
+        try:
+            todo = stale(book, man, st)
+            st["progress"] = {"done": 0, "total": len(todo), "current": ""}
+            save_state(book, st)
+            for _no, cmid, a in todo:
+                st["progress"]["current"] = ml(a["name"])
+                draft = await upload_files(sess, base, [a["file"]])
+                await call(sess, "local_wenquest_edit_course", courseid=st["courseid"], action="replacefile", cmid=cmid, draftitemid=draft)
+                await call(sess, "local_wenquest_edit_course", courseid=st["courseid"], action="module", cmid=cmid, name=ml(a["name"])[:250])
+                st.setdefault("files", {})[str(cmid)] = file_hash(base, a["file"])
+                st["progress"]["done"] += 1
+                save_state(book, st)
+            st.update(status="done", error="")
+            st["progress"]["current"] = ""
+        except Exception as exc:  # noqa: BLE001 - the administrator sees the reason and presses again
+            st.update(status="failed", error=(getattr(exc, "message", "") or str(exc))[:400])
+        save_state(book, st)
 
     async def work(sess: Session, book: str, batch: int) -> None:
         man = load_manifest(book)
@@ -235,6 +281,20 @@ def register(app, m) -> None:
             except (ValueError, KeyError):
                 continue
         return {"packs": out}
+
+    @app.post("/api/v1/admin/course-packs/{book}/refresh")
+    async def refresh(book: str, sess: Annotated[Session, Depends(m.current)], lang: str | None = None):
+        """Replace the files of already published lessons that changed in the pack (same activity, new file and name)."""
+        await m.accounts_require_admin(sess)
+        man = load_manifest(book)
+        if book in running and not running[book].done():
+            raise EngineError("busy", "already publishing", 409)
+        st = load_state(book)
+        st.update(status="running", error="")
+        save_state(book, st)
+        running[book] = asyncio.create_task(refresh_work(sess, book))
+        await asyncio.sleep(0)
+        return view(book, man, load_state(book), m.lang_of(lang, sess))
 
     @app.post("/api/v1/admin/course-packs/{book}/publish")
     async def publish(book: str, body: PublishIn, sess: Annotated[Session, Depends(m.current)], lang: str | None = None):

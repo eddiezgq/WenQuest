@@ -151,6 +151,10 @@
             </view>
             <text v-if="pk.status === 'running'" class="wq-tag info block">{{ t("pack.running", { d: pk.progress.done, n: pk.progress.total, c: pk.progress.current }) }}</text>
             <text v-if="pk.status === 'failed'" class="wq-error block">{{ t("pack.failed", { e: pk.error }) }}</text>
+            <view v-if="pk.stale" class="wq-row pk-batch">
+              <view class="pk-b"><text>{{ t("pack.stale", { n: pk.stale }) }}</text><text class="wq-muted">{{ t("pack.staleHint") }}</text></view>
+              <view class="wq-btn primary" :class="{ disabled: pk.status === 'running' }" @click="refreshPack(pk)">{{ t("pack.refresh") }}</view>
+            </view>
             <view v-for="b in pk.batches" :key="b.no" class="wq-row pk-batch">
               <view class="pk-b">
                 <text>{{ b.name }}</text>
@@ -216,6 +220,12 @@ async function publishPack(pk: CoursePack, b: CoursePack["batches"][number]) {
   if (pk.status === "running" || !(await confirmAction(t("pack.confirm", { b: b.name }), t("pack.publish"), t("common.cancel")))) return;
   error.value = "";
   try { await api.publishCoursePack(pk.book, b.no); } catch (e) { fail(e); }
+  loadPacks();
+}
+async function refreshPack(pk: CoursePack) {
+  if (pk.status === "running" || !(await confirmAction(t("pack.refreshConfirm", { n: pk.stale }), t("pack.refresh"), t("common.cancel")))) return;
+  error.value = "";
+  try { await api.refreshCoursePack(pk.book); } catch (e) { fail(e); }
   loadPacks();
 }
 function openCourse(id: number) {

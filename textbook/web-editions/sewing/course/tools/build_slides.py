@@ -215,6 +215,12 @@ html,body{width:1920px;height:1080px;background:var(--bg0);overflow:hidden}
 .summary .after{position:absolute;left:110px;right:110px;bottom:110px;padding:28px 36px;border-radius:22px;background:rgba(46,196,182,.1);border:1px solid rgba(46,196,182,.4)}
 .summary .after .zh{font-size:32px;color:#bff3ec}
 .summary .after .en{font-family:var(--enf);font-size:21px;color:var(--en);margin-top:6px}
+.svgbox svg{width:100%;height:100%}
+.points .body{top:290px}
+.figure .fbody{position:absolute;left:110px;right:110px;top:270px;display:flex;justify-content:center}
+.figure .fbody>div{width:100%}
+.figure .cap{position:absolute;left:110px;right:110px;bottom:100px;text-align:center}
+.figure .cap .zh{font-size:32px;color:#dbe4ef}.figure .cap .en{font-family:var(--enf);font-size:22px;color:var(--en);margin-left:16px}
 svg text{font-family:var(--zh)}
 svg .en{font-family:var(--enf)}
 """
@@ -362,9 +368,21 @@ def media(src: dict, ctx, h=640, white=False) -> str:
         return f'<div class="media live" data-live="{src["video"]}" style="height:{h}px"></div>'
     if "html" in src:
         return f'<div style="height:{h}px">{CUSTOM[src["html"]]()}</div>'
+    if "fig" in src:            # 教材插图 img/<名>.webp（英文版 img/en/），内联进课件
+        return f'<div class="media white" style="height:{h}px"><img src="{fig_uri(src["fig"])}"></div>'
+    if "svg" in src:            # 为幻灯片新画的图（SVG 原文写在 yaml 里）
+        return f'<div class="svgbox" style="height:{h}px">{src["svg"]}</div>'
     if "img" in src:
         return f'<div class="media{" white" if white else ""}" style="height:{h}px"><img src="{src["img"]}"></div>'
     return ""
+
+
+def fig_uri(name: str) -> str:
+    stem = Path(name).stem
+    f = BOOK / "img" / f"{stem}.webp"
+    if not f.exists():
+        raise SystemExit(f"no figure img/{stem}.webp")
+    return "data:image/webp;base64," + base64.b64encode(f.read_bytes()).decode("ascii")
 
 
 def L_cover(s, ctx):
@@ -401,8 +419,8 @@ def L_duo(s, ctx):
 def L_lab(s, ctx):
     tasks = "".join(f'<div class="task"><div class="k">{k + 1}</div><div><div class="zh">{e(t[0])}</div><div class="en">{e(t[1])}</div></div></div>'
                     for k, t in enumerate(s["tasks"]))
-    return (f'<div class="slide lab"><div class="grain"></div>{head(s["title"])}<div class="body"><div class="media white live" data-live="__lab" style="height:650px"></div>'
-            f'<div class="tasks"><div class="h">任务<span>Tasks</span></div>{tasks}<div class="go" data-act="fulllab">全屏做实验 ▶<span>Full-screen lab</span></div></div></div>{ctx["foot"]}</div>')
+    return (f'<div class="slide lab"><div class="grain"></div>{head(s["title"])}<div class="body"><div class="media white live" data-live="lab:{s["shot"]["page"]}" style="height:650px"></div>'
+            f'<div class="tasks"><div class="h">任务<span>Tasks</span></div>{tasks}<div class="go" data-act="fulllab" data-page="lab:{s["shot"]["page"]}">全屏做实验 ▶<span>Full-screen lab</span></div></div></div>{ctx["foot"]}</div>')
 
 
 def L_timeline(s, ctx):
@@ -486,14 +504,15 @@ def L_chain(s, ctx):
         parts.append(f'<div class="step{" hot" if k in hot else ""}"><div class="zh">{e(st[0])}</div><div class="en">{e(st[1])}</div></div>')
     fn = f'<div class="footnote"><div class="zh">{e(s["foot"][0])}</div><div class="en">{e(s["foot"][1])}</div></div>'
     return (f'<div class="slide chain"><div class="grain"></div>{head(s["title"])}<div class="flow">{"".join(parts)}</div>'
-            f'<div class="brace" style="left:{90 + 1740 * 5.3 / 9:.0f}px;width:{1740 * 2 / 9 + 40:.0f}px">▲ 本课程 · this course</div>{fn}{ctx["foot"]}</div>')
+            + (f'<div class="brace" style="left:{70 + 1780 * min(hot) / len(s["steps"]):.0f}px;width:{1780 * len(hot) / len(s["steps"]):.0f}px">▲ {e(s.get("mark", ["本课程", "this course"])[0])} · {e(s.get("mark", ["本课程", "this course"])[1])}</div>' if hot else "")
+            + f'{fn}{ctx["foot"]}</div>')
 
 
 def L_answer(s, ctx):
     rows = "".join(f'<div class="row"><div class="a">{e(r[0])}</div><div class="b">{e(r[1])}</div></div>' for r in s["rows"])
     return (f'<div class="slide answer"><div class="grain"></div>{head(s["title"], s.get("tag"))}<div class="rows">{rows}</div>'
-            f'<div class="side card"><div class="big">×{ctx["v"]["ch01"]["F6000"] / ctx["v"]["ch01"]["F5000"]:.2f}</div><div class="zh">5000 → 6000 针/分<br>转速 ×1.2，惯性力 ×1.2²</div>'
-            f'<div class="en">speed ×1.2, force ×1.2²</div></div>'
+            + (f'<div class="side card"><div class="big">{e(s["side"]["big"])}</div><div class="zh">{e(s["side"]["text"][0])}</div>'
+               f'<div class="en">{e(s["side"]["text"][1])}</div></div>' if s.get("side") else "") +
             f'<div class="footnote"><div class="zh">{e(s["foot"][0])}</div><div class="en">{e(s["foot"][1])}</div></div>{ctx["foot"]}</div>')
 
 
@@ -510,6 +529,17 @@ def L_roadmap(s, ctx):
         g.append(f'<text x="{x}" y="{ty}" font-size="34" font-weight="700" fill="#f3f6fa" text-anchor="middle">{e(p[k][0])}</text>')
         g.append(f'<text x="{x}" y="{ty + 34}" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">{e(p[k][1])}</text></g>')
     return f'<div class="slide roadmap"><div class="grain"></div>{head(s["title"])}<div class="road"><svg viewBox="0 0 1700 600" width="1700" height="600">{"".join(g)}</svg></div>{ctx["foot"]}</div>'
+
+
+def L_points(s, ctx):
+    fn = f'<div class="footnote"><div class="zh">{e(s["foot"][0])}</div><div class="en">{e(s["foot"][1])}</div></div>' if s.get("foot") else ""
+    return f'<div class="slide points"><div class="grain"></div>{head(s["title"], s.get("tag"))}<div class="body">{points(s["points"])}</div>{fn}{ctx["foot"]}</div>'
+
+
+def L_figure(s, ctx):
+    cap = f'<div class="cap"><span class="zh">{e(s["caption"][0])}</span><span class="en">{e(s["caption"][1])}</span></div>' if s.get("caption") else ""
+    return (f'<div class="slide figure"><div class="grain"></div>{head(s["title"])}<div class="fbody">{media(s["visual"], ctx, s.get("h", 640))}</div>'
+            f'{cap}{ctx["foot"]}</div>')
 
 
 def L_summary(s, ctx):
@@ -554,6 +584,7 @@ body.all #nav,body.all #bar{display:none}
 DECK_JS = r"""
 (function(){
 const D=JSON.parse(document.getElementById('deck-data').textContent);
+if(new URLSearchParams(location.search).has('presenter')){addEventListener('load',()=>{document.open();document.write(D.presenter);document.close();});return;}
 const stage=document.getElementById('stage'),slides=[...stage.children];
 const pages={};document.querySelectorAll('script[data-page]').forEach(s=>pages[s.dataset.page]=s.textContent);
 const dec=b64=>new TextDecoder().decode(Uint8Array.from(atob(b64),c=>c.charCodeAt(0)));
@@ -562,23 +593,22 @@ let cur=0,frag=0;
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(-50%,-50%) scale(${s})`;}
 addEventListener('resize',fit);fit();
 // live frames: the real lab or animation page, zoomed to the part the slide shows; still fully interactive
+// 活的页面：在课件里的框中运行实验或动画页。框里的页面和课件之间只靠消息说话（平台把课件放在沙箱里，不能直接伸手进框）
+const frames=new Map();
 function mount(el){if(el.querySelector('iframe'))return;const id=el.dataset.live,c=D.clips[id]||{};
   const f=document.createElement('iframe');const vw=c.vw||1600,vh=c.vh||900;f.width=vw;f.height=vh;f.setAttribute('allow','fullscreen');
-  f.srcdoc=dec(pages[c.page]);el.appendChild(f);
-  f.addEventListener('load',()=>{const w=f.contentWindow,doc=f.contentDocument;
-    const steps=c.steps||[];steps.forEach(st=>setTimeout(()=>{try{
-      [].concat(st.press||[]).forEach(sel=>{const b=doc.querySelector(sel);b&&b.click();});
-      Object.entries(st.set||{}).forEach(([k,v])=>{const e=doc.getElementById(k);if(!e)return;e.value=v;e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}));});
-      if(st.js)w.eval(st.js);}catch(e){console.warn(e)}},(st.at||0)*1000+300));
-    const place=()=>{const cw=el.clientWidth;let r={x:0,y:0,w:vw,h:vh};
-      if(c.selector){const t=doc.querySelector(c.selector);if(t){const b=t.getBoundingClientRect();r={x:b.left,y:b.top,w:b.width,h:b.height};}}
-      if(!el.dataset.h0)el.dataset.h0=el.clientHeight;const H0=+el.dataset.h0;
-      let s=c.cover?Math.max(cw/r.w,H0/r.h):Math.min(cw/r.w,H0/r.h);
-      if(c.selector&&!c.cover){const h=Math.round(r.h*s);el.style.height=h+'px';el.style.marginTop=Math.round((H0-h)/2)+'px';}
-      const ch2=el.clientHeight;
-      f.style.transform=`translate(${(cw-r.w*s)/2-r.x*s}px,${(ch2-r.h*s)/2-r.y*s}px) scale(${s})`;};
-    for(let t=0;t<=4000;t+=400)setTimeout(place,t);new ResizeObserver(place).observe(el);});}
-function unmount(el){const f=el.querySelector('iframe');if(f)f.remove();}
+  f.srcdoc=dec(pages[c.page]);el.appendChild(f);frames.set(f,{el,c,vw,vh});
+  f.addEventListener('load',()=>{const ask=()=>{try{f.contentWindow.postMessage({wqlive:1,steps:c.steps||[],selector:c.selector||''},'*')}catch(e){}};
+    ask();for(let t=400;t<=4000;t+=400)setTimeout(()=>{try{f.contentWindow.postMessage({wqlive:2,selector:c.selector||''},'*')}catch(e){}},t);
+    new ResizeObserver(()=>{try{f.contentWindow.postMessage({wqlive:2,selector:c.selector||''},'*')}catch(e){}}).observe(el);});}
+addEventListener('message',m=>{const d=m.data;if(!d||!d.wqrect)return;
+  for(const [f,o] of frames){if(f.contentWindow!==m.source)continue;const {el,c,vw,vh}=o;const cw=el.clientWidth;
+    const r=d.wqrect[2]>0?{x:d.wqrect[0],y:d.wqrect[1],w:d.wqrect[2],h:d.wqrect[3]}:{x:0,y:0,w:vw,h:vh};
+    if(!el.dataset.h0)el.dataset.h0=el.clientHeight;const H0=+el.dataset.h0;
+    const s=c.cover?Math.max(cw/r.w,H0/r.h):Math.min(cw/r.w,H0/r.h);
+    if(c.selector&&!c.cover){const h=Math.round(r.h*s);el.style.height=h+'px';el.style.marginTop=Math.round((H0-h)/2)+'px';}
+    const ch2=el.clientHeight;f.style.transform=`translate(${(cw-r.w*s)/2-r.x*s}px,${(ch2-r.h*s)/2-r.y*s}px) scale(${s})`;}});
+function unmount(el){const f=el.querySelector('iframe');if(f){frames.delete(f);f.remove();}}
 function frags(i){return [...slides[i].querySelectorAll('.frag')];}
 function show(i,f,send){i=Math.max(0,Math.min(slides.length-1,i));
   slides.forEach((s,k)=>{s.classList.toggle('on',k===i);if(Math.abs(k-i)>1||D.heavy.includes(k)&&k!==i)s.querySelectorAll('.live').forEach(unmount);});
@@ -601,12 +631,14 @@ addEventListener('touchend',e=>{if(tx==null)return;const d=e.changedTouches[0].c
 function full(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
 // full-screen lab
 document.querySelectorAll('[data-act=fulllab]').forEach(b=>{b.style.cursor='pointer';b.onclick=()=>{const fl=document.getElementById('fl');
-  fl.querySelector('iframe').srcdoc=dec(pages[D.clips.__lab.page]);fl.style.display='block';};});
+  fl.querySelector('iframe').srcdoc=dec(pages[D.clips[b.dataset.page].page]);fl.style.display='block';};});
 function closeLab(){const fl=document.getElementById('fl');if(fl.style.display==='block'){fl.style.display='none';fl.querySelector('iframe').srcdoc='';}}
 document.querySelector('#fl button').onclick=closeLab;
 // presenter window: notes (script), next page, timer; both windows stay in step
-let bc=null;try{bc=new BroadcastChannel('wq-deck-'+D.id);bc.onmessage=m=>{const d=m.data;if(d.cmd==='next')next();else if(d.cmd==='prev')prev();else if(d.cmd==='hello')bc.postMessage({i:cur,f:frag});else if(d.i!=null&&d.i!==cur)show(d.i,d.f,false);};}catch(e){}
-function presenter(){const w=open('','wq-presenter-'+D.id,'width=1100,height=760');if(!w)return;w.document.open();w.document.write(D.presenter);w.document.close();}
+// 讲者窗口用窗口间消息同步（平台里课件放在沙箱框里，广播频道不可用）
+let pw=null;const bc={postMessage:m=>{try{pw&&!pw.closed&&pw.postMessage(Object.assign({wqdeck:D.id},m),'*')}catch(e){}}};
+addEventListener('message',m=>{const d=m.data;if(!d||d.wqdeck!==D.id||m.source!==pw)return;if(d.cmd==='next')next();else if(d.cmd==='prev')prev();else if(d.cmd==='hello')bc.postMessage({i:cur,f:frag});});
+function presenter(){pw=open(location.href.split('#')[0].split('?')[0]+'?presenter=1','wq-presenter-'+D.id,'width=1100,height=760');}
 document.getElementById('bp').onclick=prev;document.getElementById('bn').onclick=next;document.getElementById('bs').onclick=presenter;document.getElementById('bf').onclick=full;
 const h=parseInt(location.hash.slice(1));show(isNaN(h)?0:h-1,document.body.classList.contains('all')?-1:0);
 addEventListener('hashchange',()=>{const h=parseInt(location.hash.slice(1));if(!isNaN(h)&&h-1!==cur)show(h-1,document.body.classList.contains('all')?-1:0);});
@@ -626,11 +658,11 @@ aside .lbl{color:#8fa3ba;font-size:14px;margin-bottom:6px}aside .nx{font-size:20
 <span class="sz"><button id="a">A−</button> <button id="b">A+</button></span><span class="t" id="tm">00:00</span><button id="r">计时清零</button></header>
 <main><div><div class="notes" id="nz"></div><div class="notes en" id="ne"></div></div><aside><div class="lbl">下一页</div><div class="nx" id="nx"></div></aside></main>
 <script>
-const D=__DATA__;const bc=new BroadcastChannel('wq-deck-'+D.id);let i=0,t0=Date.now(),fs=26;
+const D=__DATA__;const bc={postMessage:m=>opener&&opener.postMessage(Object.assign({wqdeck:D.id},m),'*')};let i=0,t0=Date.now(),fs=26;
 function draw(f){document.getElementById('pg').textContent=(i+1)+' / '+D.notes.length;document.getElementById('fr').textContent=f!=null?'· 第 '+f+' 步':'';
  document.getElementById('nz').textContent=D.notes[i][0]||'';document.getElementById('ne').textContent=D.notes[i][1]||'';
  document.getElementById('nx').textContent=D.titles[i+1]||'（最后一页）';}
-bc.onmessage=m=>{if(m.data.i!=null){i=m.data.i;draw(m.data.f);}};bc.postMessage({cmd:'hello'});
+addEventListener('message',m=>{const d=m.data;if(d&&d.wqdeck===D.id&&d.i!=null){i=d.i;draw(d.f);}});bc.postMessage({cmd:'hello'});
 document.getElementById('n').onclick=()=>bc.postMessage({cmd:'next'});document.getElementById('p').onclick=()=>bc.postMessage({cmd:'prev'});
 addEventListener('keydown',e=>{if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();bc.postMessage({cmd:'next'});}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();bc.postMessage({cmd:'prev'});}});
 document.getElementById('r').onclick=()=>t0=Date.now();
@@ -647,22 +679,28 @@ def mark_frags(html: str, layout: str) -> str:
     return html
 
 
+LIVE_AGENT = """<script>(function(){function rect(sel){if(!sel)return[0,0,0,0];var t=document.querySelector(sel);if(!t)return[0,0,0,0];var b=t.getBoundingClientRect();return[b.left,b.top,b.width,b.height];}
+addEventListener('message',function(m){var d=m.data;if(!d||!d.wqlive)return;if(d.wqlive===1){(d.steps||[]).forEach(function(st){setTimeout(function(){try{[].concat(st.press||[]).forEach(function(s){var b=document.querySelector(s);b&&b.click();});
+Object.keys(st.set||{}).forEach(function(k){var e=document.getElementById(k);if(!e)return;e.value=st.set[k];e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}));});if(st.js)(0,eval)(st.js);}catch(e){console.warn(e);}},(st.at||0)*1000+300);});}
+parent.postMessage({wqrect:rect(d.selector)},'*');});})();</script>"""
+
+
 def page_b64(name: str, lang="zh") -> str:
     sys.path.insert(0, str(BOOK))
     from inline import inline
     src = (BOOK / "src" / lang / "labs" / f"{name}.html").read_text(encoding="utf-8")
     src = inline(src)
     src = re.sub(r'<a href="\.\./index\.html"[^>]*>[^<]*</a>', "", src)
+    src = src.replace("</body>", LIVE_AGENT + "</body>", 1)
     return base64.b64encode(src.encode("utf-8")).decode("ascii")
 
 
 def build_deck(spec, lesson, slides_html, out: Path) -> Path:
     no = spec["lesson"]
     clips = dict(spec.get("clips") or {})
-    lab = next((s for s in spec["slides"] if s["layout"] == "lab"), None)
-    if lab:
-        clips["__lab"] = {"page": lab["shot"]["page"], "vw": 1400, "vh": 830,
-                          "steps": [{"press": x["press"]} for x in lab["shot"].get("set", []) if "press" in x]}
+    for lab in (s for s in spec["slides"] if s["layout"] == "lab"):
+        clips["lab:" + lab["shot"]["page"]] = {"page": lab["shot"]["page"], "vw": lab["shot"].get("vw", 1400), "vh": lab["shot"].get("vh", 830),
+                                               "steps": lab["shot"].get("steps") or [{"press": x["press"]} for x in lab["shot"].get("set", []) if "press" in x]}
     for c in clips.values():
         if c.get("selector") and "#stage" in c["selector"]:
             c["cover"] = True
@@ -714,17 +752,12 @@ async def preview(deck: Path, n: int, outdir: Path, only: set | None = None):
             print("! page errors:", errors[:3])
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("lesson")
-    ap.add_argument("--out", required=True)
-    ap.add_argument("--preview", default="", help="页码（逗号分隔）或 all：出预览截图")
-    a = ap.parse_args()
-    spec = yaml.safe_load((COURSE / "slides" / f"{a.lesson}.yaml").read_text(encoding="utf-8"))
+def make_deck(lesson_id: str, out: Path) -> Path:
+    """Build the deck of one lesson into out/ and return its path (used by build_course.py too)."""
+    spec = yaml.safe_load((COURSE / "slides" / f"{lesson_id}.yaml").read_text(encoding="utf-8"))
     values = run_programs(spec.get("code") or [])
     spec = fill(spec, values)
-    lesson = json.loads((COURSE / "lessons" / f"{a.lesson}.json").read_text(encoding="utf-8"))
-    out = Path(a.out)
+    lesson = json.loads((COURSE / "lessons" / f"{lesson_id}.json").read_text(encoding="utf-8"))
     out.mkdir(parents=True, exist_ok=True)
     slides = spec["slides"]
     pages = []
@@ -734,11 +767,22 @@ def main():
         ctx = {"foot": foot(spec["lesson"], k + 1, len(slides)), "v": values}
         pages.append(mark_frags(LAYOUTS[s["layout"]](s, ctx), s["layout"]))
     no = spec["lesson"]
-    deck = build_deck(spec, lesson, pages, out / f"第{no}讲-{lesson['title'][0]}-课件.html")
+    return build_deck(spec, lesson, pages, out / f"第{no}讲-{lesson['title'][0]}-课件.html")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("lesson")
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--preview", default="", help="页码（逗号分隔）或 all：出预览截图")
+    a = ap.parse_args()
+    out = Path(a.out)
+    deck = make_deck(a.lesson, out)
     print("deck:", deck, f"{deck.stat().st_size / 1e6:.2f} MB")
     if a.preview:
+        n = deck.read_text(encoding="utf-8").count('<div class="slide ')
         only = None if a.preview == "all" else {int(x) for x in a.preview.split(",")}
-        asyncio.run(preview(deck, len(slides), out, only))
+        asyncio.run(preview(deck, n, out, only))
 
 
 if __name__ == "__main__":
