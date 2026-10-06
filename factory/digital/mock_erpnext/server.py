@@ -43,10 +43,17 @@ REQUIRED = {
     "Quality Inspection Reading": ["specification"],
     "Stock Entry": ["stock_entry_type", "company", "items"],
     "Job Card Time Log": ["from_time", "to_time", "completed_qty"],
+    "Opportunity": ["opportunity_from", "party_name", "company", "transaction_date"],     # 第 18 轮 E1
+    "Quotation": ["quotation_to", "party_name", "company", "transaction_date", "items"],
+    "Quotation Item": ["item_code", "qty"],
+    "Contract": ["party_type", "party_name", "contract_terms"],
+    "Issue": ["subject"],
 }
 SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d}", "Job Card": "PO-JOB{n:05d}",
           "Material Request": "MAT-MR-{y}-{n:05d}", "Quality Inspection": "MAT-QA-{y}-{n:05d}",
-          "Stock Entry": "MAT-STE-{y}-{n:05d}", "Purchase Order": "PUR-ORD-{y}-{n:05d}"}
+          "Stock Entry": "MAT-STE-{y}-{n:05d}", "Purchase Order": "PUR-ORD-{y}-{n:05d}",
+          "Lead": "CRM-LEAD-{y}-{n:05d}", "Opportunity": "CRM-OPP-{y}-{n:05d}", "Quotation": "SAL-QTN-{y}-{n:05d}",
+          "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}"}
 
 
 def now_str():
@@ -133,6 +140,8 @@ class Mock:
         if dt_ == "BOM":
             n = sum(1 for d in self.db.get("BOM", {}).values() if d.get("item") == doc.get("item")) + 1
             return "BOM-{}-{:03d}".format(doc.get("item"), n)
+        if dt_ == "Customer" and doc.get("customer_name"):       # 真 ERPNext 默认按客户名命名
+            return doc["customer_name"]
         if dt_ == "Custom Field":
             return "{}-{}".format(doc.get("dt"), doc.get("fieldname"))
         return doc.get("name") or uuid.uuid4().hex[:10]
@@ -146,6 +155,9 @@ class Mock:
                 fields["wq_revision"] = {"fieldname": "wq_revision", "fieldtype": "Int"}
             if dt_ == "Work Order":
                 fields["wq_sales_order"] = {"fieldname": "wq_sales_order", "fieldtype": "Link"}
+            for cf in self.db.get("Custom Field", {}).values():          # 桥接加的自定义字段（第 18 轮 E1）
+                if cf.get("dt") == dt_:
+                    fields[cf["fieldname"]] = {"fieldname": cf["fieldname"], "fieldtype": cf.get("fieldtype", "Data")}
             for k, v in doc.items():
                 if k in META:
                     continue
@@ -239,6 +251,13 @@ class Mock:
                 wo["produced_qty"] = float(wo.get("produced_qty", 0)) + float(doc["fg_completed_qty"])
                 wo["status"] = "Completed" if wo["produced_qty"] >= float(wo["qty"]) else "In Process"
                 wo["modified"] = now_str()
+        elif dt_ == "Quotation":                       # 真 ERPNext：报价提交后状态 Open，关联的商机改为 Quotation
+            doc["status"] = "Open"
+            opp = self.db.get("Opportunity", {}).get(doc.get("opportunity") or "")
+            if opp:
+                opp.update(status="Quotation", modified=now_str())
+        elif dt_ == "Contract":
+            doc["status"] = "Active" if doc.get("is_signed") else "Unsigned"
         elif dt_ == "BOM" and doc.get("is_default"):
             for b in self.db["BOM"].values():
                 if b["item"] == doc["item"] and b["name"] != doc["name"]:
@@ -448,7 +467,8 @@ def update(doctype: str, name: str, body: dict = Body(...)):
         raise Err(404, "DoesNotExistError", "{} {} 不存在".format(doctype, name))
     body = {k: v for k, v in body.items() if k != "doctype"}
     M.validate(doctype, body, "修改 {} {}".format(doctype, name), partial=True)
-    if doc.get("docstatus") == 1 and any(k not in ("docstatus",) for k in body) and doctype not in ("Item",):
+    on_submit_ok = {cf["fieldname"] for cf in M.db.get("Custom Field", {}).values() if cf.get("dt") == doctype and cf.get("allow_on_submit")}
+    if doc.get("docstatus") == 1 and any(k not in ("docstatus",) and k not in on_submit_ok for k in body) and doctype not in ("Item",):
         raise Err(417, "UpdateAfterSubmitError", "{} {} 已提交，不能修改".format(doctype, name))
     submit = int(body.get("docstatus", doc.get("docstatus", 0))) == 1 and doc.get("docstatus", 0) == 0
     new = dict(doc)

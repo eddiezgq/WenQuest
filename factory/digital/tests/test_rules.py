@@ -249,3 +249,79 @@ def test_every_live_rule_has_a_test():
     for rid, r in A.load_catalog().items():
         if not r["waiting"]:
             assert any(n.startswith("test_{}_".format(rid)) for n in names), rid
+
+
+# ---------------------------------------------------------------- 第 18 轮 E1：市场与客户、客户服务
+CON = {"name": "CON-T-1", "party_name": "重点客户", "start_date": "2020-01-01", "end_date": "2099-12-31", "is_signed": 1, "status": "Active",
+       "docstatus": 1, "wq_penalty_per_day": 200, "wq_response_h": 24, "wq_warranty_months": 18}
+
+
+def _cp(i, customer, severity="normal", hours=1.0, status="open", responded=None, serial=None):
+    return {"id": i, "customer": customer, "serial": serial, "subject": "异响", "detail": None, "channel": "电话", "severity": severity,
+            "status": status, "responded_at": responded, "created_at": NOW - dt.timedelta(hours=hours)}
+
+
+def _cdb(complaints=(), follow=(), docs=None, extra=()):
+    tables = [("to_regclass", lambda a: [{"ok": True}]),
+              ("from complaint where", lambda a: list(complaints)),
+              ("from follow_up where", lambda a: list(follow))] + list(extra)
+    return FakeDB(docs=dict({"Contract": [CON]}, **(docs or {})), tables=tables)
+
+
+def test_C1_open_complaints_key_account_is_critical():
+    db = _cdb([_cp(1, "普通客户", "urgent"), _cp(2, "重点客户"), _cp(3, "普通客户", serial="WQR105-H2501-01")])
+    f = {x.fkey: x for x in run("C1", db)}
+    assert set(f) == {"CP-00001", "CP-00002", "CP-00003"}
+    assert f["CP-00001"].severity == "critical" and f["CP-00002"].severity == "critical"     # 紧急；合同有违约金的重点客户
+    assert f["CP-00003"].severity == "warn" and f["CP-00003"].subject == ("FieldUnit", "WQR105-H2501-01")
+    assert f["CP-00003"].values["units"] == ["WQR105-H2501-01"] and f["CP-00002"].subject == ("Complaint", "CP-00002")
+
+
+def test_C2_satisfaction_drop_needs_last_n_scores():
+    fu = [{"customer": "甲", "score": 3}, {"customer": "甲", "score": 3}, {"customer": "甲", "score": 4},
+          {"customer": "乙", "score": 5}, {"customer": "乙", "score": 4}, {"customer": "乙", "score": 4},
+          {"customer": "丙", "score": 1}, {"customer": "丙", "score": 2}]
+    f = run("C2", _cdb(follow=fu))
+    assert [x.fkey for x in f] == ["甲"] and f[0].values["avg"] == pytest.approx(3.33, abs=0.01)
+
+
+def test_C3_complaint_overdue_uses_contract_response_time():
+    db = _cdb([_cp(1, "重点客户", hours=30), _cp(2, "重点客户", hours=10), _cp(3, "重点客户", hours=40, responded=NOW),
+               _cp(4, "没合同的客户", hours=20), _cp(5, "没合同的客户", hours=26)])
+    f = {x.fkey: x for x in run("C3", db)}
+    assert set(f) == {"CP-00001", "CP-00005"}                         # 合同 24 小时；没合同按默认 24 小时
+    assert f["CP-00001"].values["limit_h"] == 24
+
+
+def test_C4_batch_complaints_same_wheel():
+    wheel = {"WQR105-A-01": ("SH-1", "grd-01/S2", "WO-1"), "WQR105-A-02": ("SH-2", "grd-01/S2", "WO-2"), "WQR105-A-03": ("SH-3", "grd-01/S3", "WO-3")}
+    shafts = {v[0]: (k, v) for k, v in wheel.items()}
+    extra = [("type='PartSerial.installed_in'", lambda a: [{"src_key": wheel[a[1]][0]}] if a[1] in wheel else []),
+             ("type='PartSerial.processed'", lambda a: [{"props": {"tool": shafts[a[1]][1][1], "machine": "grd-01"}}]),
+             ("type='PartSerial' and key", lambda a: [{"wo": shafts[a[1]][1][2]}])]
+    db = _cdb([_cp(1, "甲", serial="WQR105-A-01"), _cp(2, "乙", serial="WQR105-A-02"), _cp(3, "丙", serial="WQR105-A-03")], extra=extra)
+    f = run("C4", db)
+    assert [x.fkey for x in f] == ["Tool:grd-01/S2"] and f[0].values["units"] == ["WQR105-A-01", "WQR105-A-02"]
+    assert run("C4", _cdb([_cp(1, "甲", serial="WQR105-A-01")], extra=extra)) == []
+
+
+def test_C5_quote_expiring_within_days():
+    from hub import kpi
+    today = NOW.astimezone(kpi.TZ).date()
+    qs = [{"name": "SAL-QTN-1", "status": "Open", "valid_till": (today + dt.timedelta(days=2)).isoformat(), "party_name": "甲", "grand_total": 6600},
+          {"name": "SAL-QTN-2", "status": "Open", "valid_till": (today + dt.timedelta(days=10)).isoformat(), "party_name": "乙"},
+          {"name": "SAL-QTN-3", "status": "Ordered", "valid_till": today.isoformat(), "party_name": "丙"},
+          {"name": "SAL-QTN-4", "status": "Open", "valid_till": (today - dt.timedelta(days=1)).isoformat(), "party_name": "丁"}]
+    f = run("C5", FakeDB(docs={"Quotation": qs}))
+    assert [x.fkey for x in f] == ["SAL-QTN-1"] and f[0].values["days_left"] == 2
+
+
+def test_R3_late_order_with_contract_penalty():
+    orders = [{"name": "SO-1", "customer": "重点客户", "tone": "bad", "projected": "2026-10-23", "delivery_date": "2026-10-20"},
+              {"name": "SO-2", "customer": "重点客户", "tone": "bad", "projected": "2026-10-21", "delivery_date": "2026-10-20"},
+              {"name": "SO-3", "customer": "普通客户", "tone": "bad", "projected": "2026-10-25", "delivery_date": "2026-10-20"},
+              {"name": "SO-4", "customer": "重点客户", "tone": "good", "projected": "2026-10-19", "delivery_date": "2026-10-20"}]
+    f = {x.fkey: x for x in run("R3", FakeDB(docs={"Contract": [CON]}), ov={"orders": orders})}
+    assert set(f) == {"SO-1", "SO-2"}
+    assert f["SO-1"].values["penalty"] == 600 and f["SO-1"].severity == "critical"      # 3 天 × $200 ≥ $500
+    assert f["SO-2"].severity == "warn"

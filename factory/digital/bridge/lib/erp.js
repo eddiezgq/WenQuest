@@ -164,6 +164,10 @@ class ERP {
         });
         out.push(this.doc('Sales Order', soDoc, 'submitted', opt));
         created.push(['Sales Order', soDoc.name]);
+        if (pv.contract) {        // 第 18 轮 E1：合同转订单，订单号回填到合同
+          await this.ensureCrmFields();
+          out.push(this.doc('Contract', await this.update('Contract', pv.contract, { wq_sales_order: soDoc.name }), 'updated', opt));
+        }
         for (const w of pv.work_orders || []) {
           const bom = await this.defaultBom(w.production_item);
           // ERPNext 只允许生产“订单上那个物料”的工单填 sales_order；零件工单（如 SH-301）把订单号记在
@@ -216,6 +220,12 @@ class ERP {
           resolution_details: `已完成：${pv.what}${pv.note ? '。' + pv.note : ''}（问渠数字工厂 · 数字孪生）` });
         out.push(this.doc('Issue', iss, 'updated', opt));
         created.push(['Issue', iss.name]);
+      } else if (d.action.startsWith('crm_') || ['complaint_issue', 'service_orders', 'service_order_done', 'spare_ship'].includes(d.action)) {
+        // 第 18 轮 E1：客户与服务（线索、商机、报价、合同、投诉、服务工单、备件出库）
+        for (const r of await this.crmService(d.action, d.preview)) {
+          out.push(this.doc(r[0], r[1], r[2], opt));
+          created.push([r[0], r[1].name]);
+        }
       } else {
         return [];      // 其他提议（如下达工单）由工作台的 MES 执行
       }
@@ -227,6 +237,85 @@ class ERP {
     const last = out[out.length - 1].payload.data;
     last.proposal_done = true;
     last.created = created;
+    return out;
+  }
+
+  // ------------------------------------------------------------ 第 18 轮 E1：客户与服务
+  async ensureCrmFields() {
+    const F = [
+      ['Lead', 'wq_note', { label: '备注 Note', fieldtype: 'Small Text', insert_after: 'company_name' }],
+      ['Contract', 'wq_penalty_per_day', { label: '延期违约金 $/天 Penalty per day', fieldtype: 'Currency', insert_after: 'end_date' }],
+      ['Contract', 'wq_response_h', { label: '投诉响应时限（小时）Response hours', fieldtype: 'Float', insert_after: 'wq_penalty_per_day' }],
+      ['Contract', 'wq_warranty_months', { label: '保修期（月）Warranty months', fieldtype: 'Int', insert_after: 'wq_response_h' }],
+      ['Contract', 'wq_amount', { label: '合同金额 Amount', fieldtype: 'Currency', insert_after: 'wq_warranty_months' }],
+      ['Contract', 'wq_quotation', { label: '报价单 Quotation', fieldtype: 'Data', insert_after: 'wq_amount' }],
+      ['Contract', 'wq_sales_order', { label: '销售订单 Sales order', fieldtype: 'Data', insert_after: 'wq_quotation', allow_on_submit: 1 }],
+      ['Issue', 'wq_serial', { label: '设备序列号 Serial', fieldtype: 'Data', insert_after: 'subject' }],
+      ['Issue', 'wq_kind', { label: '类别 Kind', fieldtype: 'Data', insert_after: 'wq_serial' }],
+      ['Issue', 'wq_engineer', { label: '服务工程师 Engineer', fieldtype: 'Data', insert_after: 'wq_kind' }],
+      ['Issue', 'wq_day', { label: '计划上门日 Visit day', fieldtype: 'Date', insert_after: 'wq_engineer' }],
+    ];
+    for (const [dt, f, spec] of F) await this.ensureCustomField(dt, f, spec);
+  }
+
+  async customerFor(name) {
+    const rows = await this.list('Customer', [['name', '=', name]], ['name']);
+    if (rows.length) return name;
+    const terr = await this.list('Territory', [['is_group', '=', 1], ['parent_territory', 'in', ['', null]]], ['name']);
+    const doc = await this.insert('Customer', { customer_name: name, customer_type: 'Company', customer_group: '减速器客户 Gearbox Customers',
+      ...(terr.length ? { territory: terr[0].name } : {}) });
+    return doc.name;
+  }
+
+  async crmService(action, pv) {
+    await this.ensureCrmFields();
+    const company = await this.getCompany();
+    const today = erpDate(new Date().toISOString());
+    const out = [];
+    if (action === 'crm_lead') {
+      const lead = await this.insert('Lead', { lead_name: pv.lead_name, company_name: pv.company_name, status: 'Lead', wq_note: pv.note || '' });
+      out.push(['Lead', lead, 'created']);
+    } else if (action === 'crm_opportunity') {
+      const opp = await this.insert('Opportunity', { opportunity_from: pv.from, party_name: pv.party, status: 'Open', company,
+        transaction_date: today, currency: 'USD', opportunity_amount: pv.amount || 0, expected_closing: pv.expected_closing || null });
+      out.push(['Opportunity', opp, 'created']);
+      if (pv.from === 'Lead') out.push(['Lead', await this.update('Lead', pv.party, { status: 'Opportunity' }), 'updated']);
+    } else if (action === 'crm_quotation') {
+      let to = pv.quotation_to || 'Customer';
+      let party = pv.party;
+      if (to === 'Customer') party = await this.customerFor(party);
+      const q = await this.insert('Quotation', { quotation_to: to, party_name: party, company, transaction_date: today,
+        valid_till: pv.valid_till, order_type: 'Sales', ...(pv.opportunity ? { opportunity: pv.opportunity } : {}),
+        items: pv.items.map((i) => ({ item_code: i.item_code, qty: i.qty, rate: i.rate })), docstatus: 1 });
+      out.push(['Quotation', q, 'submitted']);
+      if (pv.opportunity) out.push(['Opportunity', await this.get('Opportunity', pv.opportunity), 'updated']);
+    } else if (action === 'crm_contract') {
+      const cust = await this.customerFor(pv.customer);
+      const c = await this.insert('Contract', { party_type: 'Customer', party_name: cust, contract_terms: pv.text,
+        start_date: pv.start, end_date: pv.end, is_signed: 1, signee: pv.signee || cust,
+        ...(pv.quotation ? { document_type: 'Quotation', document_name: pv.quotation } : {}),
+        wq_penalty_per_day: pv.penalty_per_day || 0, wq_response_h: pv.response_h || 24, wq_warranty_months: pv.warranty_months || 12,
+        wq_amount: pv.amount || 0, wq_quotation: pv.quotation || '', docstatus: 1 });
+      out.push(['Contract', c, 'submitted']);
+    } else if (action === 'crm_contract_order') {
+      out.push(['Contract', await this.update('Contract', pv.contract, { wq_sales_order: pv.sales_order }), 'updated']);
+    } else if (action === 'complaint_issue') {
+      const iss = await this.insert('Issue', { subject: pv.subject, description: `${pv.customer || ''}\n${pv.description || ''}`.trim(),
+        status: 'Open', wq_serial: pv.serial || '', wq_kind: '投诉 complaint' });
+      out.push(['Issue', iss, 'created']);
+    } else if (action === 'service_orders') {
+      for (const o of pv.orders) {
+        const iss = await this.insert('Issue', { subject: o.subject, description: `${o.customer || ''}\n${o.description || ''}`.trim(),
+          status: 'Open', wq_serial: o.serial || '', wq_kind: o.kind || '服务 service', wq_engineer: o.engineer || '', wq_day: o.day || null });
+        out.push(['Issue', iss, 'created']);
+      }
+    } else if (action === 'service_order_done') {
+      out.push(['Issue', await this.update('Issue', pv.issue, { status: 'Resolved', resolution_details: pv.text || '已完成' }), 'updated']);
+    } else if (action === 'spare_ship') {
+      const se = await this.insert('Stock Entry', { stock_entry_type: 'Material Issue', purpose: 'Material Issue', company,
+        remarks: pv.note || '', items: pv.items.map((i) => ({ item_code: i.item_code, qty: i.qty, s_warehouse: WH.purchased })), docstatus: 1 });
+      out.push(['Stock Entry', se, 'submitted']);
+    }
     return out;
   }
 
@@ -474,7 +563,7 @@ class ERP {
   // ------------------------------------------------------------ 5. ERPNext → 总线（轮询）
   async poll() {
     const out = [];
-    for (const dt of ['Sales Order', 'Work Order', 'Material Request', 'Purchase Order']) {
+    for (const dt of ['Sales Order', 'Work Order', 'Material Request', 'Purchase Order', 'Lead', 'Opportunity', 'Quotation', 'Contract', 'Issue']) {
       const since = this.lastModified[dt];
       const filters = since ? [['modified', '>', since]] : [];
       const rows = await this.list(dt, filters, ['name', 'modified'], { order_by: 'modified asc', limit: 200 });
@@ -538,6 +627,18 @@ function summarize(doctype, d) {
       return pick(['item_code', 'warehouse', 'actual_qty', 'ordered_qty', 'reserved_qty', 'projected_qty', 'stock_uom']);
     case 'File':
       return pick(['file_name', 'file_url', 'attached_to_doctype', 'attached_to_name']);
+    case 'Lead':
+      return pick(['lead_name', 'company_name', 'status', 'wq_note', 'creation']);
+    case 'Opportunity':
+      return pick(['opportunity_from', 'party_name', 'status', 'opportunity_amount', 'expected_closing', 'transaction_date']);
+    case 'Quotation':
+      return { ...pick(['quotation_to', 'party_name', 'status', 'docstatus', 'valid_till', 'grand_total', 'total', 'opportunity', 'transaction_date']),
+        items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, rate: i.rate })) };
+    case 'Contract':
+      return pick(['party_type', 'party_name', 'status', 'docstatus', 'is_signed', 'start_date', 'end_date', 'wq_penalty_per_day',
+        'wq_response_h', 'wq_warranty_months', 'wq_amount', 'wq_quotation', 'wq_sales_order']);
+    case 'Issue':
+      return pick(['subject', 'status', 'customer', 'opening_date', 'resolution_date', 'wq_serial', 'wq_kind', 'wq_engineer', 'wq_day']);
     default:
       return {};
   }

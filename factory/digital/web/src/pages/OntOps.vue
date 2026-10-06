@@ -227,6 +227,8 @@ function fmt(v, f) {
   if (v === null || v === undefined) return '—';
   if (f === 'pct') return (v * 100).toFixed(1) + '%';
   if (f === 'pct_signed') return (v > 0 ? '+' : '') + (v * 100).toFixed(1) + '%';
+  if (f === 'usd') return '$' + Math.round(v).toLocaleString();
+  if (f === 'num') return Number(v).toLocaleString(undefined, { maximumFractionDigits: 1 });
   return String(v);
 }
 function spark(tr) {

@@ -51,7 +51,12 @@ TYPES = {
     "urgent_purchase": {"label": "紧急采购", "costly": True},
     "outsource": {"label": "外协", "costly": True},
     "split_delivery": {"label": "分批交货", "costly": False},
+    # 第 18 轮 E1：客户与服务（发起：售后、厂长；批量 / 过保免费 / 备件花钱，要厂长批）
+    "service_batch": {"label": "服务派工", "costly": True, "service": True},
+    "spare_ship": {"label": "备件出库", "costly": True, "service": True},
+    "customer_notice": {"label": "客户通知", "costly": False, "service": True},
 }
+SERVICE_INITIATORS = ("service", "manager", "sales")
 STATUS = {"draft": "草稿", "submitted": "待批准", "approved": "已批准", "rejected": "已驳回", "executing": "执行中",
           "done": "已完成", "failed": "执行失败"}
 INITIATORS = ("planner", "manager")
@@ -80,23 +85,47 @@ def title_of(t, p):
         return "外协：{} {} {} 件".format(p["work_order"], p["operation"].split(" ")[0], p["qty"])
     if t == "split_delivery":
         return "分批交货：{} 先交 {} 台（{}）".format(p["sales_order"], p["first_qty"], p["first_date"])
+    if t == "service_batch":
+        jobs = p.get("jobs") or []
+        rep = sum(1 for j in jobs if j["kind"] != "inspect")
+        return "服务派工：{} 台（维修 {}、点检 {}）{}".format(len(jobs), rep, len(jobs) - rep, "：" + jobs[0]["serial"] if len(jobs) == 1 else "")
+    if t == "spare_ship":
+        return "备件出库：" + "、".join("{} × {}".format(i["item_code"], i["qty"]) for i in p.get("items") or [])
+    if t == "customer_notice":
+        return "预防性服务通知：{} 个客户".format(len(p.get("customers") or []))
     return t
+
+
+def is_costly(a):
+    """单张、保修期内的服务派工不算花钱（售后主管就能批）；其余按动作种类"""
+    t, p = a["type"], a.get("params") or {}
+    if t == "service_batch":
+        jobs = p.get("jobs") or []
+        return not (len(jobs) == 1 and p.get("in_warranty"))
+    return TYPES[t]["costly"]
 
 
 def log(db, aid, who, kind, text):
     db.x("insert into action_log (action_id, who, kind, text) values (%s,%s,%s,%s)", (aid, who, kind, text))
 
 
-def can_initiate(u):
-    return bool(u.get("teacher")) or u.get("role") in INITIATORS
+def can_initiate(u, t=None):
+    if u.get("teacher"):
+        return True
+    if t and TYPES.get(t, {}).get("service"):
+        return u.get("role") in SERVICE_INITIATORS
+    return u.get("role") in INITIATORS or (t is None and u.get("role") in SERVICE_INITIATORS)
 
 
 def can_approve(u, a):
     """返回 (能否, 原因)"""
-    costly = TYPES[a["type"]]["costly"]
+    costly = is_costly(a)
+    service = TYPES[a["type"]].get("service")
     if costly and u.get("role") != "manager":
         return False, "这是要花钱的动作，要厂长批准"
-    if not costly and u.get("role") not in ("manager", "planner"):
+    if not costly and service and u.get("role") not in ("manager", "service", "sales"):
+        return False, "要售后或厂长批准"
+    if not costly and not service and u.get("role") not in ("manager", "planner"):
         return False, "要计划员或厂长批准"
     if a["initiator"] == u.get("name"):
         if a["mode"] == "prod":
@@ -109,8 +138,8 @@ def can_approve(u, a):
 def create(db, mode, u, type_, params, scenario_id=None, anomaly_id=None, trial=None):
     if type_ not in TYPES:
         raise ActionError("不认识的动作 " + str(type_))
-    if not can_initiate(u):
-        raise ActionError("动作由计划员或厂长发起")
+    if not can_initiate(u, type_):
+        raise ActionError("服务类动作由售后或厂长发起" if TYPES[type_].get("service") else "动作由计划员或厂长发起")
     p = dict(params)
     p["type"] = type_
     r = db.one("insert into action (mode, type, title, params, scenario_id, anomaly_id, initiator, initiator_role, trial) "
@@ -218,6 +247,25 @@ def execute(H, a, u, who):
                            mode, u.get("name"), "分批交货 {}".format(p["sales_order"]), source="ont", role=u.get("role"))
         H.ai.decide(pid, u.get("name"), True, role=u.get("role"))
         return {"text": "已交 ERPNext 在订单上留交货安排（提议 {}）".format(pid), "proposal_id": pid}, "executing"
+    if t == "service_batch":
+        from hub import service as SV
+        r = SV.create_jobs(H, mode, p.get("jobs") or [], u.get("name"), anomaly_id=a["anomaly_id"], action_id=a["id"],
+                           complaint_id=p.get("complaint_id"), batch_kind=p.get("kind") or "repair_one")
+        if p.get("complaint_id"):
+            SV.respond(db, int(p["complaint_id"]), u.get("name"), "doing", "已派服务工单")
+        names = sorted({x["engineer_name"] for x in r["plan"] if x.get("engineer_name")})
+        return {"text": "已派 {} 张服务工单（工程师 {}），交 ERPNext 开服务工单（提议 {}）".format(len(r["jobs"]), "、".join(names) or "待定", r["proposal_id"]),
+                "proposal_id": r["proposal_id"], "jobs": r["jobs"], "batch_id": r["batch_id"]}, "executing" if r["proposal_id"] else "done"
+    if t == "spare_ship":
+        from hub import service as SV
+        pid = SV.ship_spares(H, mode, p.get("items") or [], u.get("name"), "服务备件（动作 ACT-{:05d}）".format(a["id"]))
+        return {"text": "已交 ERPNext 出库（提议 {}）".format(pid), "proposal_id": pid}, "executing"
+    if t == "customer_notice":
+        from hub import service as SV
+        rows = SV.notice(H, mode, p.get("customers") or [], u.get("name"), a["id"], send=True, emails=p.get("emails"))
+        sent = sum(1 for x in rows if x["status"] == "sent")
+        return {"text": "通知 {} 个客户：{}".format(len(rows), "已发邮件 {} 封".format(sent) if sent else
+                                                ("教学模式只记录、不发出" if mode == "teach" else "没有邮箱，已记录，请人工联系")), "notices": rows}, "done"
     raise ActionError("没有执行器：" + t)
 
 
@@ -251,7 +299,7 @@ def notes(db, aid):
 
 def row(a):
     return {"id": a["id"], "key": "ACT-{:05d}".format(a["id"]), "type": a["type"], "type_label": TYPES[a["type"]]["label"],
-            "costly": TYPES[a["type"]]["costly"], "title": a["title"], "params": a["params"], "status": a["status"],
+            "costly": is_costly(a), "title": a["title"], "params": a["params"], "status": a["status"],
             "status_label": STATUS[a["status"]], "scenario_id": a["scenario_id"], "anomaly_id": a["anomaly_id"],
             "initiator": a["initiator"], "approver": a["approver"], "trial": a["trial"], "result": a["result"],
             "created_at": a["created_at"].isoformat(), "decided_at": a["decided_at"].isoformat() if a["decided_at"] else None,
@@ -260,6 +308,10 @@ def row(a):
 
 def trial(db, snaps, mode, changes, scenario_snapshot=None):
     """试运行：用最新快照推演“做”与“不做”"""
+    svc = [c for c in changes if TYPES.get(c.get("type"), {}).get("service")]
+    if svc and len(svc) == len(changes):
+        return service_trial(db, mode, svc)
+    changes = [c for c in changes if not TYPES.get(c.get("type"), {}).get("service")]
     sid = None
     if scenario_snapshot is not None:
         snap = scenario_snapshot
@@ -270,3 +322,24 @@ def trial(db, snaps, mode, changes, scenario_snapshot=None):
     r = P.simulate(snap, changes, ctx)
     keep = ("sales_orders", "cost_total", "costs", "overtime_min", "overtime_units", "checks", "ok")
     return dict({k: r[k] for k in keep}, base={k: base[k] for k in ("sales_orders", "cost_total")}, at=snap["factory_now"], snapshot_id=sid)
+
+
+def service_trial(db, mode, changes):
+    """服务类动作的“试运行”：按排班估算（不进车间仿真，E1-7）"""
+    from hub import service as SV
+    costs, checks, est = [], [], None
+    for c in changes:
+        if c["type"] == "service_batch":
+            est = SV.estimate(db, mode, c.get("jobs") or [])
+            costs += [{"what": "人工 {} 人天".format(est["person_days"]), "usd": est["cost"]["labor"]},
+                      {"what": "差旅", "usd": est["cost"]["travel"]}, {"what": "备件", "usd": est["cost"]["parts"]}]
+            if est["unplanned"]:
+                checks.append({"ok": False, "text": "{} 台 21 天内排不进".format(len(est["unplanned"]))})
+            else:
+                checks.append({"ok": True, "text": "{} 天做完（到 {}），工程师 {}".format(est["days"], est["finish"], "、".join(est["engineers"]))})
+        elif c["type"] == "spare_ship":
+            checks.append({"ok": True, "text": "出库 " + "、".join("{} × {}".format(i["item_code"], i["qty"]) for i in c.get("items") or [])})
+    total = round(sum(x["usd"] for x in costs), 2)
+    return {"sales_orders": [], "cost_total": total, "costs": [x for x in costs if x["usd"]], "overtime_min": 0, "overtime_units": 0,
+            "checks": checks, "ok": all(x["ok"] for x in checks), "base": {"sales_orders": [], "cost_total": 0},
+            "at": SV.field_today(db, mode).isoformat(), "snapshot_id": None, "service": est}

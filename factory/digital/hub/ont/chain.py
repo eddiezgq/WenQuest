@@ -220,13 +220,13 @@ def chain_quality(c, parts, unit=None, char=None, anchor=ANCHOR):
     return g
 
 
-def chain_field(c, units, anchor=ANCHOR):
+def chain_field(c, units, anchor=ANCHOR, label="报警", how="规则 V1（数字孪生健康度）"):
     g = Chain(c, "field")
     wheels, scope_units, customers = {}, set(), set()
     for u in units:
         fu = g.obj("FieldUnit", u) or {}
         fn = g.node("FieldUnit", u, role="subject", values={"健康度": fu.get("health"), "报警": True})
-        g.edge(anchor, fn, "报警", "规则 V1（数字孪生健康度）")
+        g.edge(anchor, fn, label, how)
         for b in g.links("PartSerial.became", dst=u):
             an = g.node("PartSerial", b["src_key"], role="cause")
             g.edge(fn, an, "出厂总成", "链接 PartSerial.became")
@@ -247,7 +247,7 @@ def chain_field(c, units, anchor=ANCHOR):
             if not shipped:
                 not_shipped.add(shaft)
     scope_units -= set(units)
-    g.summary.append("报警设备 {} 台：{}".format(len(units), "、".join(units)))
+    g.summary.append("{}设备 {} 台：{}".format("投诉的" if label == "投诉" else "报警", len(units), "、".join(units)))
     if wheels:
         g.summary.append("它们的输出轴由 {} 磨削".format("、".join(sorted(wheels))))
     g.summary.append("同一片砂轮磨出的轴装在另外 {} 台现场设备上{}".format(
@@ -420,8 +420,15 @@ def for_anomaly(c, a):
             return chain_stock(c, [x["item"] for x in v.get("lines") or []])
         if rule == "F1":
             return chain_cost(c, sk)
-        if rule == "S1":
+        if rule in ("S1", "R3"):
             return chain_late(c, so=sk)
+        if rule in ("C1", "C3", "C4"):                  # 第 18 轮 E1：投诉 → 现场设备 → 出厂数据 → 同批 → 排查范围
+            us = [x for x in (v.get("units") or []) if x]
+            if us:
+                return chain_field(c, us, label="投诉", how="客户投诉（规则 {}）".format(rule))
+            g = Chain(c, "none")
+            g.summary.append("这张投诉没有设备序列号，追不到出厂数据；先联系客户确认设备铭牌")
+            return g
         if rule == "S2":
             return chain_late(c, wo=sk)
         return chain_generic(c, st, sk) if st else Chain(c, "none")

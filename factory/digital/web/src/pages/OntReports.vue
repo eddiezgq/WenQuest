@@ -36,6 +36,9 @@
           <table class="tbl small"><thead><tr><th>订单</th><th>客户</th><th>交期</th><th>预计</th><th>情况</th></tr></thead>
             <tbody><tr v-for="o in d.risk_orders" :key="o.name"><td class="mono">{{ o.name }}</td><td>{{ o.customer }}</td><td>{{ o.delivery_date }}</td>
               <td>{{ o.projected || '—' }}</td><td>{{ o.risk }}</td></tr></tbody></table></template>
+        <template v-if="d.service"><h3>客户与服务</h3>
+          <p class="small">新投诉 {{ d.service.new_complaints }} 张、开着 {{ d.service.open_complaints }} 张 · 完成服务 {{ d.service.jobs_done }} 单、待上门 {{ d.service.open_jobs }} 单 ·
+            满意度 {{ d.service.satisfaction ?? '—' }} · 平均响应 {{ d.service.response_h ?? '—' }} 小时 · 保修成本 ${{ Math.round(d.service.warranty_cost || 0).toLocaleString() }}</p></template>
         <h3>动作</h3>
         <p class="small">共 {{ d.actions.total }} 个<template v-for="(n, s) in d.actions.by_status" :key="s"> · {{ ST[s] || s }} {{ n }}</template></p>
         <ul v-if="d.actions.executed.length" class="small"><li v-for="a in d.actions.executed" :key="a.key">{{ a.key }} {{ a.title }}（{{ ST[a.status] }}）</li></ul>

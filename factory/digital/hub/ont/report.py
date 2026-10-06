@@ -105,6 +105,18 @@ def build(db, mode, kind, start, end):
         if _has(db, "retro") else []
     data["retros"] = [{"key": "RT-{:05d}".format(r["id"]), "title": r["title"], "finish_pct": (r["deviation"] or {}).get("finish_pct"),
                        "cost_diff": (r["deviation"] or {}).get("cost_diff")} for r in rts]
+    # ---- 客户与服务（第 18 轮 E1）
+    try:
+        from hub import service as SV
+        SV.init(db)
+        sk = SV.kpis(db, mode)
+        nc = db.one("select count(*) as n from complaint where mode=%s and created_at >= %s and created_at < %s", (mode, start, end))["n"]
+        jd = db.one("select count(*) as n from service_job where mode=%s and status='done' and done_day is not null and created_at < %s "
+                    "and id in (select job_id from follow_up where mode=%s and created_at >= %s and created_at < %s)", (mode, end, mode, start, end))["n"]
+        data["service"] = {"new_complaints": nc, "jobs_done": jd, "open_complaints": sk["open_complaints"], "open_jobs": sk["open_jobs"],
+                           "satisfaction": sk["satisfaction"], "response_h": sk["response_h"], "warranty_cost": sk["warranty_cost"]}
+    except Exception:  # noqa: BLE001
+        data["service"] = None
     # ---- 今天（本周）要关注的 3 件
     focus = []
     for a in still:
@@ -175,6 +187,10 @@ def text_of(kind, data):
     ac = data["actions"]
     if ac["total"]:
         lines.append("动作：{} 个（{}）。".format(ac["total"], "、".join("{} {}".format(_ST.get(s, s), n) for s, n in ac["by_status"].items())))
+    sv = data.get("service")
+    if sv and (sv["new_complaints"] or sv["open_complaints"] or sv["jobs_done"] or sv["open_jobs"]):
+        lines.append("客户与服务：新投诉 {} 张、开着 {} 张；完成服务 {} 单、待上门 {} 单；满意度 {}。".format(
+            sv["new_complaints"], sv["open_complaints"], sv["jobs_done"], sv["open_jobs"], "{:g} 分".format(sv["satisfaction"]) if sv["satisfaction"] is not None else "—"))
     if data["risk_orders"]:
         lines.append("交付风险：" + "；".join("{} {}".format(o["name"], o["risk"]) for o in data["risk_orders"]) + "。")
     if data["retros"]:

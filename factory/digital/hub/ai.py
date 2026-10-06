@@ -374,7 +374,7 @@ class Assistant:
 
 
 ROLE_NAMES = {"planner": "计划员", "engineer": "工艺员", "operator": "操作工", "quality": "质检员", "manager": "厂长",
-              "approver": "审批人", "sales": "销售"}
+              "approver": "审批人", "service": "售后", "sales": "销售"}
 
 
 def _cust_keys(c):

@@ -56,7 +56,7 @@ EXPEDITE_COST = 300.0             # 维修加急默认费用（美元，可在�
 URGENT_PCT = 0.15                 # 紧急采购加急费：货值的 15%
 OUTSOURCE_MARKUP = 1.3            # 外协单价：本厂工时成本 × 1.3 + 每批运费
 OUTSOURCE_FREIGHT = 50.0
-PENALTY_PER_DAY = {"SAL-ORD-2026-00019": 200.0}    # 教学数据里一张订单有违约条款（每晚一个工作日）
+# 违约金按客户合同的条款算（第 18 轮 E1-3，hub/crm.py）：context() 给每张订单带上 penalty_per_day；没有合同不算
 DOWNSTREAM_DAYS = {"WQR-105": 1}  # 输出轴做完后：装配、跑合、出厂检验（与看板估算一致）
 HORIZON_DAYS = 10
 LIMIT_S = 30.0
@@ -459,7 +459,7 @@ def _result(eng, events, t0, start_dt, watch, ctx, applied, checks, costs, cal, 
                 row["split"] = {"first_qty": k, "first_date": d1.isoformat(), "first_projected": p1.isoformat(),
                                 "first_late_days": kpi.working_days_between(d1, p1) if p1 > d1 else 0}
                 row["late_days"] = max(row["split"]["first_late_days"], kpi.working_days_between(due, proj) if proj > due else 0)
-        pen = PENALTY_PER_DAY.get(so["name"])
+        pen = so.get("penalty_per_day")
         if pen and row["late_days"] and row["late_days"] > 0:
             costs.append({"what": "{} 违约金（晚 {} 天）".format(so["name"], row["late_days"]), "usd": pen * row["late_days"]})
         sos.append(row)
@@ -535,4 +535,9 @@ def context(db, mode, now=None):
             else:
                 row["pending"] = {"short": [], "release_at": None, "note": "待排产（不缺料，计划员还没下达）"}
         sos.append(row)
+    from hub import crm
+    pens = crm.penalty_map(db, mode, sos, today)
+    for row in sos:
+        if row["name"] in pens:
+            row["penalty_per_day"] = pens[row["name"]]
     return {"sales_orders": sos, "releases": releases}

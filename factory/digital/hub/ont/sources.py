@@ -110,6 +110,7 @@ def tables(B, db, mode):
     anomalies(B, db, mode)
     plans(B, db, mode)
     agent_objs(B, db, mode)
+    service_objs(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -215,6 +216,53 @@ def agent_objs(B, db, mode):
                 B.link(mode, "Retro", key, "action", "ACT-{:05d}".format(r["action_id"]))
 
 
+def service_objs(B, db, mode):
+    """客户与服务（第 18 轮 E1）：投诉、服务工程师、服务工单的派工、回访与满意度、保修"""
+    if not db.one("select to_regclass('complaint') is not null as ok")["ok"]:
+        return
+    from hub import service as SV
+    for r in db.q("select * from complaint where mode=%s and created_at > now() - interval '180 days'", (mode,)):
+        key = "CP-{:05d}".format(r["id"])
+        B.obj(mode, "Complaint", key, {"subject": r["subject"], "severity": SV.SEVERITY.get(r["severity"]), "status": SV.STATUS.get(r["status"]),
+                                       "date": _ts(r["created_at"])[:10] if r["created_at"] else None, "channel": r["channel"], "issue": r["issue"]},
+              ts=_ts(r["created_at"]), upd_ts=_now(), text="登记：" + r["subject"])
+        if r["customer"]:
+            B.obj(mode, "Customer", r["customer"], {"name": r["customer"]})
+            B.link(mode, "Complaint", key, "customer", r["customer"])
+        if r["serial"]:
+            B.link(mode, "Complaint", key, "field_unit", r["serial"])
+    for e in db.q("select * from engineer where mode=%s", (mode,)):
+        B.obj(mode, "ServiceEngineer", e["id"], {"name": e["name"], "region": e["region"]})
+    for j in db.q("select * from service_job where mode=%s and created_at > now() - interval '180 days'", (mode,)):
+        if j["issue"]:
+            B.obj(mode, "ServiceOrder", j["issue"], {"engineer": j["engineer"], "visit_day": str(j["day"]) if j["day"] else None,
+                                                     "action": SV.kind_label(j["kind"]), "opened": _ts(j["created_at"])[:10]})
+            if j["engineer"]:
+                B.link(mode, "ServiceOrder", j["issue"], "engineer", j["engineer"])
+            B.link(mode, "ServiceOrder", j["issue"], "unit", j["serial"])
+    for f in db.q("select * from follow_up where mode=%s and created_at > now() - interval '180 days'", (mode,)):
+        key = "FU-{:05d}".format(f["id"])
+        B.obj(mode, "FollowUp", key, {"score": float(f["score"]) if f["score"] is not None else None, "due": str(f["due_day"]) if f["due_day"] else None},
+              ts=_ts(f["created_at"]), upd_ts=_now(), text="回访")
+        j = db.one("select issue from service_job where id=%s", (f["job_id"],)) if f["job_id"] else None
+        if j and j["issue"]:
+            B.link(mode, "FollowUp", key, "order", j["issue"])
+        if f["score"] is not None:
+            sk = "SV-{:05d}".format(f["id"])
+            B.obj(mode, "SatisfactionSurvey", sk, {"score": float(f["score"]), "date": _ts(f["done_at"])[:10] if f["done_at"] else None,
+                                                   "comment": f["comment"]}, ts=_ts(f["done_at"]), upd_ts=_now(), text="打分")
+            if f["customer"]:
+                B.link(mode, "SatisfactionSurvey", sk, "customer", f["customer"])
+            if j and j["issue"]:
+                B.link(mode, "SatisfactionSurvey", sk, "job", j["issue"])
+    try:
+        for s_, u in SV.units(db, mode).items():
+            B.obj(mode, "Warranty", s_, {"until": u["warranty_until"], "in_warranty": u["in_warranty"]})
+            B.link(mode, "Warranty", s_, "unit", s_)
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def twin(B, db, mode):
     from hub import twin as TW
     try:
@@ -241,8 +289,14 @@ def twin(B, db, mode):
         B.link(mode, "PartSerial", s, "became", s)
         sh = (ab.get("shaft") or {}).get("serial")
         if sh:
-            B.obj(mode, "PartSerial", sh, {"item": "SH-301", "work_order": (ab.get("shaft") or {}).get("work_order")})
+            sb = TW.seed_batch(s) if (ab.get("shaft") or {}).get("how") == "情景数据" else None
+            B.obj(mode, "PartSerial", sh, {"item": "SH-301", "work_order": sb[1] if sb else (ab.get("shaft") or {}).get("work_order")})
             B.link(mode, "PartSerial", sh, "installed_in", s)
+            if sb:                 # 情景设备：出厂前的磨削记录（同批的轴同一片砂轮，第 18 轮 E1）
+                op = "{}/5".format(sb[1])
+                B.obj(mode, "OperationTask", op, {"work_order": sb[1], "op_index": 5, "operation": "磨外圆 Cylindrical grinding"})
+                B.link(mode, "PartSerial", sh, "processed", op, {"machine": "grd-01", "tool": sb[0], "operation": "磨外圆 Cylindrical grinding",
+                                                                  "tool_life_pct": sb[2], "seed": True})
     for e in db.q("select id, serial, ts, day, title, status, detail from twin_event where mode=%s and kind='order'", (mode,)):
         key = (e["detail"] or {}).get("issue") or "TW-{}".format(e["id"])
         B.obj(mode, "ServiceOrder", key, {"subject": e["title"], "status": e["status"], "action": (e["detail"] or {}).get("action"),

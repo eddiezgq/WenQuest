@@ -70,6 +70,17 @@ def slots(db, mode="teach"):
     r = db.one("select corr from bus_message where type='machine.event' and mode=%s and corr like 'MFG-WO-%%' "
                "and payload->'data'->>'event'='op_complete' order by ts desc limit 1", (mode,))
     s["wo"] = r["corr"] if r else "—"
+    # 第 18 轮 E1：投诉、它的异常、投诉的设备和客户（简称）
+    try:
+        c = db.one("select id, serial, customer from complaint where mode=%s order by id limit 1", (mode,))
+    except Exception:  # noqa: BLE001  （老库没有投诉表）
+        c = None
+    s["complaint"] = "CP-{:05d}".format(c["id"]) if c else "CP-?????"
+    s["complaint_serial"] = (c or {}).get("serial") or "—"
+    s["complaint_customer"] = ((c or {}).get("customer") or "—").split(" ")[0]
+    a = db.one("select id from anomaly where mode=%s and rule='C1' and detail->'values'->>'complaint'=%s order by id desc limit 1",
+               (mode, s["complaint"]))
+    s["complaint_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
     return s
 
 
@@ -193,8 +204,31 @@ def sandbox(dsn, name="wq_eval_sandbox", llm=None, now=None):
     s.init()
     s.replay()
     ai = Assistant(db, lambda *a: None, llm)
+    H = types.SimpleNamespace(db=db, ai=ai, plan_snaps=EngineSnaps(db, eng), mes=None)
+    H.twin = field_scene(H, h)
+    s.reconcile()
     ai.detector().run("teach", now)
-    return types.SimpleNamespace(db=db, ai=ai, plan_snaps=EngineSnaps(db, eng), mes=None), eng
+    return H, eng
+
+
+def field_scene(H, hist, mode="teach"):
+    """第 18 轮 E1：客户现场的 12 台情景设备，加一条投诉（轴承报警那台），客户与服务的评测题用"""
+    import wqbus
+    from hub import service as SV
+    from hub import twin as TW
+    tw = TW.TwinService(H.db, lambda tp, ty, src, data, corr=None, mode=None: hist.handle(tp, wqbus.make(ty, src, data, mode=mode or "teach", corr=corr)))
+    tw.init()
+    tw.seed(mode)
+    SV.init(H.db)
+    SV.seed_engineers(H.db, mode)
+    us = SV.units(H.db, mode)
+    bad = sorted(us.values(), key=lambda x: (-x["risk"], x["serial"]))
+    bad = next((x for x in bad if "bearing" in (x.get("alert_kinds") or [])), bad[0] if bad else None)
+    if bad and not H.db.one("select 1 as x from complaint where mode=%s limit 1", (mode,)):
+        SV.create_complaint(H, mode, {"serial": bad["serial"], "subject": "运转时有异响，轴承位置发热", "severity": "serious", "channel": "电话"},
+                            "评测·情景")
+    return tw
+
 
 
 def history(db, limit=20):

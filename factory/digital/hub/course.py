@@ -489,7 +489,14 @@ def mount(app, H):
                        "比较交期、成本和加班，选一个并说明理由；提交后再看厂情中枢的建议和 AI 分析（比对模式）；采纳、批准、执行，最后看推演与实际的自动复盘。",
             "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab15",
             "guide_url": public_base(request) + "/api/cae/lab15/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab15/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab15/report-template.docx"}, {
+            "id": "lab16", "name": {"zh": "实验 16：客户投诉的追溯、召回与服务决策", "en": "Lab 16: complaint traceability, recall and service decisions"},
+            "summary": "老师注入批次投诉：同一片砂轮磨的几根输出轴装在不同客户的现场，陆续出轴承问题。学生从投诉的设备往回追到输出轴、砂轮，"
+                       "再往前找出同批次的设备、列排查范围，用数字孪生标出高风险的；比较“只修 / 修 + 高风险点检 / 整批排查”三个方案的客户数、费用、天数和遗漏风险，"
+                       "选一个并说明理由（比对模式）；起草派工、备件出库和客户通知，批准、执行，最后看工程师上门和客户回访。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab16",
+            "guide_url": public_base(request) + "/api/cae/lab16/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab16/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

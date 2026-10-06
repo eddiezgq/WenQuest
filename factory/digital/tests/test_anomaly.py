@@ -89,12 +89,13 @@ def db():
     return d
 
 
-def test_catalog_loads_20_live_rules_and_waiting_ones():
+def test_catalog_loads_26_live_rules_and_waiting_ones():
     from hub.ont import anomaly as A
     c = A.load_catalog()
     live = [r for r in c.values() if not r["waiting"]]
-    assert len(live) == 20
-    assert {r["domain"] for r in c.values() if r["waiting"]} >= {"ehs", "people", "energy", "customer"}
+    assert len(live) == 26                                            # 第 18 轮 E1：C1–C5、R3 上线
+    assert {k for k, r in c.items() if not r["waiting"]} >= {"C1", "C2", "C3", "C4", "C5", "R3"}
+    assert {r["domain"] for r in c.values() if r["waiting"]} >= {"ehs", "people", "energy"}
 
 
 def test_catalog_rejects_missing_function(tmp_path):

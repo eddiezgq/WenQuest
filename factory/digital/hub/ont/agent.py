@@ -50,6 +50,7 @@ KEEP_DAYS = 180
 NUM = re.compile(r"(?<![A-Za-z\-\d])\d[\d,]*(?:\.\d+)?")
 REF = re.compile(r"\[(\d{1,3})\]")
 MACHINES = [u for u, v in UNITS.items() if v[0] in ("machining", "quality")]
+SV_RULES = ("C1", "C3", "C4", "V1", "V2")             # 这几类异常的方案按服务派工估算（与 hub.service.SERVICE_RULES 相同）
 INTENTS = {
     "draft": "起草动作", "machine": "设备停机的影响与对策", "handle": "某个异常怎么处理", "order": "新订单能不能接（算料）",
     "cost": "工单成本为什么超", "late": "订单为什么晚 / 交期", "bottleneck": "瓶颈在哪", "material": "物料够不够",
@@ -367,6 +368,8 @@ class Tools:
                  "chain": CH.for_object(self._ctx(), "Machine", unit), "title": hyp}
         else:
             return {"error": "要给出异常编号，或假设哪台设备停机多久"}
+        if a.get("rule") in SV_RULES:
+            return self._service_options(a)
         try:
             ev = PB.evaluate(a, st, self._ctx_plan(st))
         except P.PlanError as e:
@@ -396,20 +399,161 @@ class Tools:
             out["recommended"], out["reason"] = ev["recommended"], ev["reason"]
         return out
 
+    def _service_options(self, a):
+        """投诉、现场报警、批次问题：方案按工程师排班估算（第 18 轮 E1-3），不进车间仿真"""
+        from hub import service as SV
+        ev = SV.anomaly_options(self.db, self.mode, a)
+        locked = self.locked(self.u, a.get("id"))
+        today = SV.field_today(self.db, self.mode).isoformat()
+        opts = []
+        for o in ev["options"]:
+            s = o["service"]
+            title = "{} {}".format(o["key"], o["label"])
+            scid = self._save_scenario(title, None, o["changes"], o["result"], a.get("id"))
+            item = {"key": o["key"], "label": o["label"], "kind": o["kind"], "note": o["note"], "changes": o["changes"],
+                    "ref": self.run.scenario(scid, title), "scenario_id": scid, "sales_orders": [],
+                    "units": s["units"], "customers": s["customers"], "engineers": s["engineers"], "days": s["days"], "finish": s["finish"],
+                    "spares": s["spares"], "cost": s["cost"], "cost_total": s["cost"]["total"], "overtime_min": 0, "ok": o["result"]["ok"],
+                    "failed_checks": [c["text"] for c in o["result"]["checks"] if not c["ok"]], "uncovered_high": o["uncovered_high"]}
+            if not locked:
+                item["recommended"] = o["recommended"]
+            opts.append(item)
+        out = {"options": opts, "affected": [], "service": True, "scope": ev.get("scope"), "snapshot_id": None, "exact": True,
+               "hypothesis": None, "factory_now": today, "anomaly_id": a.get("id"), "anomaly_ref": self.run.anomaly(a)}
+        if not opts:
+            out["note"] = ev.get("reason")
+        elif locked:
+            out["note"] = "比对模式：你提交自己的分析之前，不显示建议和推荐理由"
+        else:
+            out["recommended"], out["reason"] = ev["recommended"], ev["reason"]
+        return out
+
+    # ---- ⑩ 客户 360
+    def customer_360(self, customer):
+        from hub import service_api as SA
+        name = self._customer_name(customer)
+        if not name:
+            return {"error": "没有找到客户“{}”".format(customer)}
+        r = SA.c360(self.db, self.mode, name)
+        if r.get("contract") and not self._visible("Contract"):        # 合同是 2 级敏感：看不到就不给条款
+            r["contract"] = {"name": r["contract"]["name"], "hidden": "合同条款你没有权限查看"}
+        r["ref"] = self.run.obj("Customer", name, name.split(" ")[0])
+        r["page"] = self.run.page("c360:" + name, "客户与服务 · 客户 360（{}）".format(name.split(" ")[0]), "/service?tab=c360&customer=" + name)
+        for c in r["complaints"]:
+            c["ref"] = self.run.obj("Complaint", c["key"])
+        for u in r["units"]:
+            u["ref"] = self.run.obj("FieldUnit", u["serial"])
+        for o in r["orders"]:
+            o["ref"] = self.run.obj("SalesOrder", o["name"])
+        if r.get("contract"):
+            r["contract"] = dict(r["contract"], ref=self.run.obj("Contract", r["contract"]["name"]))
+        r["counts"] = {"orders": len(r["orders"]), "units": len(r["units"]), "red": sum(1 for x in r["units"] if x["health"] == "red"),
+                       "yellow": sum(1 for x in r["units"] if x["health"] == "yellow"),
+                       "open_complaints": sum(1 for c in r["complaints"] if c["status"] != "已关闭"), "jobs": len(r["jobs"])}
+        return r
+
+    def _customer_name(self, q):
+        q = (q or "").strip()
+        if not q:
+            return None
+        names = set(F.CUSTOMERS)
+        for m in self.db.erp_docs("Customer", self.mode):
+            names.add(m["data"].get("customer_name") or m["data"]["name"])
+        from hub import service as SV
+        for u in SV.units(self.db, self.mode).values():
+            names.add(u["customer"])
+        ql = q.lower()
+        for n in sorted(names, key=len):
+            if n and (n.lower() == ql or ql in n.lower()):
+                return n
+        from hub.ai import _cust_keys
+        for n in sorted(names, key=len):
+            if n and any(k and len(k) >= 2 and k in q for k in _cust_keys(n)):
+                return n
+        for word, site in SITE_WORDS:
+            if word in q:
+                from twin import field as TF
+                return TF.SITES[site]["customer"]
+        return None
+
+    # ---- ⑪ 投诉追溯与排查范围
+    def complaint_scope(self, complaint=None, serial=None):
+        """投诉（CP-xxxxx）或设备序列号 → 同批次（同一片砂轮、同一张工单）的设备，以及它们现在的健康度"""
+        from hub import service as SV
+        from hub.ont import anomaly as A
+        from hub.ont import chain as CH
+        cid = None
+        if complaint:
+            m = re.search(r"(\d+)", str(complaint))
+            cid = int(m.group(1)) if m else None
+            c = self.db.one("select * from complaint where mode=%s and id=%s", (self.mode, cid)) if cid else None
+            if c is None:
+                return {"error": "没有这个投诉：{}".format(complaint)}
+            serial = serial or c["serial"]
+        if not serial:
+            return {"error": "要给投诉号（CP-xxxxx）或设备序列号"}
+        us = SV.units(self.db, self.mode)
+        if serial not in us:
+            return {"error": "现场设备里没有 {}（出厂数据查不到，无法追溯）".format(serial)}
+        ch = CH.chain_field(A.Ctx(self.db, self.mode), [serial], label="投诉" if cid else "报警").out()
+        chain = self._chain(ch)
+        others = [s for s in (ch.get("scope") or {}).get("check_units", []) if s != serial and s in us]
+        rows = sorted([us[s] for s in others], key=lambda x: -x["risk"])
+        out = {"serial": serial, "unit_ref": self.run.obj("FieldUnit", serial), "customer": us[serial]["customer"],
+               "health": us[serial]["health"], "chain": chain,
+               "check_units": [{"serial": x["serial"], "customer": x["customer"], "site": x["site"], "health": x["health"],
+                                "worst_bearing_used": x["worst_bearing"]["used"], "in_warranty": x["in_warranty"], "risk": x["risk"],
+                                "ref": self.run.obj("FieldUnit", x["serial"])} for x in rows],
+               "customers": sorted({x["customer"] for x in rows})}
+        if cid:
+            out["complaint"] = "CP-{:05d}".format(cid)
+            out["complaint_ref"] = self.run.obj("Complaint", out["complaint"])
+            a = self.db.one("select * from anomaly where mode=%s and rule in ('C1','C3','C4') and detail->'values'->>'complaint'=%s "
+                            "order by id desc limit 1", (self.mode, out["complaint"]))
+            if a:
+                out["anomaly_id"] = a["id"]
+                out["anomaly_ref"] = self.run.anomaly(a)
+        return out
+
+    # ---- ⑫ 服务派工估算
+    def service_estimate(self, serials, kind="inspect"):
+        """几台设备上门（inspect 点检 / bearing 换轴承）：按工程师排班估算天数、人天、备件、费用（只算不排）"""
+        from hub import service as SV
+        us = SV.units(self.db, self.mode)
+        if isinstance(serials, str):
+            serials = re.findall(r"WQR105-[A-Z0-9]+-\d{2}", serials.upper()) or [serials]
+        wanted = []
+        for s in serials or []:
+            if s not in us:
+                continue
+            k = "repair:bearing:" + us[s]["worst_bearing"]["id"] if kind == "bearing" else ("inspect" if kind == "inspect" else SV.repair_kind(us[s]))
+            wanted.append({"serial": s, "kind": k})
+        if not wanted:
+            return {"error": "没有找到这些现场设备"}
+        est = SV.estimate(self.db, self.mode, wanted)
+        est["page"] = self.run.page("service-schedule", "客户与服务 · 工程师排班", "/service?tab=service")
+        for j in est["jobs"]:
+            j["ref"] = self.run.obj("FieldUnit", j["serial"])
+        return est
+
     # ---- ⑨ 起草动作（只起草）
     def draft_action(self, changes, anomaly_id=None, scenario_id=None, snapshot_id=None):
         from hub.ont import actions as AC
         from hub.ont import plan as P
         if self.mode == "teach" and not self.u.get("teacher"):
             return {"error": "教学模式下 AI 不代做：请自己在推演工作台或指挥台采纳方案"}
-        if not AC.can_initiate(self.u):
-            return {"error": "动作由计划员或厂长发起"}
         changes = [c for c in (changes or []) if c.get("type") in AC.TYPES]
         if not changes:
             return {"error": "没有可以起草的动作（假设停机、插单只能用于推演）"}
+        if not all(AC.can_initiate(self.u, c["type"]) for c in changes):
+            svc = any(AC.TYPES[c["type"]].get("service") for c in changes)
+            return {"error": "服务动作由售后、销售或厂长发起" if svc else "动作由计划员或厂长发起"}
         try:
-            sid, st, exact = self._snap(snapshot_id)
-            tr = dict(AC.trial(self.db, self.H.plan_snaps, self.mode, changes, st), snapshot_id=sid)
+            if all(AC.TYPES[c["type"]].get("service") for c in changes):
+                tr = AC.trial(self.db, self.H.plan_snaps, self.mode, changes)
+            else:
+                sid, st, exact = self._snap(snapshot_id)
+                tr = dict(AC.trial(self.db, self.H.plan_snaps, self.mode, changes, st), snapshot_id=sid)
             ids = [AC.create(self.db, self.mode, self.u, c["type"], c, scenario_id, anomaly_id, tr) for c in changes]
         except (AC.ActionError, P.PlanError) as e:
             return {"error": str(e)}
@@ -475,13 +619,20 @@ def _summary(out):
                  ("links", "{} 条关系"), ("nodes", "链条 {} 个节点"), ("drafted", "起草 {} 个动作")):
         if k in out:
             return f.format(len(out[k]))
+    if "check_units" in out:
+        return "同批次 {} 台".format(len(out["check_units"]))
+    if "units" in out and "complaints" in out:
+        return "客户 360：{} 台设备、{} 个投诉".format(len(out["units"]), len(out["complaints"]))
+    if "person_days" in out:
+        return "派工 {} 台，{} 天".format(out["units"], out["days"])
     if "sales_orders" in out:
         return "推演：多花 ${:,.0f}".format(out.get("cost_total") or 0)
     return "完成"
 
 
 TOOL_NAMES = ["search_objects", "get_object", "neighbors", "impact", "metrics", "list_anomalies", "get_anomaly", "simulate",
-              "compare_options", "draft_action", "query_messages", "work_order_cost", "plan_order", "propose_order"]
+              "compare_options", "draft_action", "query_messages", "work_order_cost", "plan_order", "propose_order",
+              "customer_360", "complaint_scope", "service_estimate"]
 
 _S = lambda **p: {"type": "object", "properties": p}                                    # noqa: E731
 _CH = {"type": "array", "items": {"type": "object"}, "description": "改动清单（与推演工作台相同）：reassign / reorder / overtime / expedite / "
@@ -504,6 +655,16 @@ TOOLS = [
      "input_schema": _S(anomaly_id={"type": "integer"}, down_unit={"type": "string"}, down_minutes={"type": "number"})},
     {"name": "draft_action", "description": "把方案起草成动作草稿（只起草，不提交、不执行；要人在动作收件箱提交、审批）。教学模式学生不可用",
      "input_schema": dict(_S(changes=_CH, anomaly_id={"type": "integer"}, scenario_id={"type": "integer"}), required=["changes"])},
+    {"name": "customer_360", "description": "客户 360：一个客户的合同条款（违约金、响应时限、保修期）、订单、现场设备健康度、投诉、服务单、满意度。"
+     "customer 可以是客户名或简称，也可以说“港口”“矿山”“食品厂”",
+     "input_schema": dict(_S(customer={"type": "string"}), required=["customer"])},
+    {"name": "complaint_scope", "description": "投诉追溯与排查范围：从投诉（CP-xxxxx）或设备序列号往回追到出厂的输出轴、加工它的工单和砂轮，"
+     "再找出同一批次装在别的客户那里的设备（按风险排序）",
+     "input_schema": _S(complaint={"type": "string"}, serial={"type": "string"})},
+    {"name": "service_estimate", "description": "服务派工估算（只算不排）：几台现场设备上门，按 6 位工程师的排班算几天做完、几个人天、备件、费用、保修内多少。"
+     "kind：inspect 点检 / bearing 换轴承 / auto 按报警决定",
+     "input_schema": dict(_S(serials={"type": "array", "items": {"type": "string"}}, kind={"type": "string", "enum": ["inspect", "bearing", "auto"]}),
+                          required=["serials"])},
     {"name": "query_messages", "description": "查总线历史消息。types 如 [\"machine.event\"]，topic_like 用 SQL like，corr 为工单号或提议号",
      "input_schema": _S(types={"type": "array", "items": {"type": "string"}}, topic_like={"type": "string"}, corr={"type": "string"},
                         hours={"type": "number"}, limit={"type": "integer"})},
@@ -610,6 +771,7 @@ class Agent:
 
 
 # ====================================================================== 规则版
+SITE_WORDS = [("港口", "port"), ("码头", "port"), ("矿", "mine"), ("皮带", "mine"), ("食品", "food"), ("包装线", "food")]
 UNIT_NAMES = sorted([(UNITS[k][1], k) for k in MACHINES], key=lambda x: -len(x[0]))
 ALIASES = {"磨床": "grd-01", "车床a": "cnc-l01-a", "车床b": "cnc-l01-b", "锯床": "saw-01", "热处理": "ht-01", "键槽": "key-01",
            "滚齿": "hob-01", "检验站": "qc-01"}
@@ -691,6 +853,13 @@ class Rules:
             return "draft"
         if re.search(r"(\d+)\s*台.*?(\d{1,2})\s*月\s*(\d{1,2})\s*日", q) and re.search(r"订单|安排|接单|生产|交货|WQR", q):
             return "order"
+        if re.search(r"CP-\d{5}", q) or re.search(r"投诉|召回|排查范围|同一?批|这批|装在谁|还装在|追溯", q):
+            return "complaint"
+        if re.search(r"派工|工程师|上门|排班|点检|服务单|售后|保修", q):
+            return "service"
+        if not re.search(r"SAL-ORD|A-\d{5}", q) and (re.search(r"客户|满意度|合同|商机|报价|线索|漏斗", q) or
+                                                       (any(w in q for w, _ in SITE_WORDS) and re.search(r"怎么了|情况|最近|怎么样", q))):
+            return "customer"
         if re.search(r"A-\d{5}", q) or (re.search(r"怎么办|怎么处理|方案|对策|建议", q) and not find_machine(q)):
             return "handle"
         if find_machine(q) and re.search(r"停|坏|故障|影响|怎么办|方案", q):
@@ -723,6 +892,11 @@ class Rules:
         "cost": "提示：成本差异 = 实际 − 标准。标准只按单件工时算；实际还要加上每道工序的调整时间和换刀。在“厂长”工作区打开工单的成本分解，看哪道工序差得最多。",
         "bottleneck": "提示：瓶颈是负荷最满、前面排队最多的设备。对比“车间实况”各台设备的排队件数，再看“本周计划与实际”下方的说明。",
         "draft": "教学模式下 AI 不代做：请在指挥台或推演工作台自己采纳方案，生成动作。",
+        "customer": "提示：打开“客户与服务”页，选这个客户看客户 360：合同条款（违约金、响应时限、保修期）、现场设备的健康度、开着的投诉、最近的回访分。"
+                    "想一想：哪一项最需要先处理？",
+        "complaint": "提示：从投诉的那台设备出发往回追——它装的是哪根输出轴？那根轴是哪张工单、哪片砂轮磨的？同一片砂轮还磨了哪些轴、装到了谁家？"
+                     "先自己列出排查范围，再到指挥台里对照因果链。",
+        "service": "提示：在“客户与服务”页的排班表里看 6 位工程师的空闲。同区域每人每天 2 单、跨区域 1 单；想一想：先修哪台、谁去、几天能做完、要带几件备件？",
     }
 
     def _hint(self, intent):
@@ -736,6 +910,14 @@ class Rules:
 
     def _options_text(self, r):
         lines = []
+        if r.get("service"):
+            for o in r["options"]:
+                lines.append("{} {}：{} 台设备、{} 个客户，派 {}，{} 天做完（到 {}），备件 {}，花 ${:,.0f}（保修内 ${:,.0f}）{} [{}]".format(
+                    o["key"], o["label"], o["units"], len(o["customers"]), "、".join(o["engineers"]) or "—", o["days"], o["finish"] or "—",
+                    "、".join("{} × {}".format(k, v) for k, v in o["spares"].items()) or "不用",
+                    o["cost"]["total"], o["cost"]["warranty"],
+                    "（还有 {} 台高风险设备没覆盖）".format(len(o["uncovered_high"])) if o["uncovered_high"] else "", o["ref"]))
+            return lines
         for o in r["options"]:
             sos = "；".join(self._so_line(s) for s in o["sales_orders"] if s["name"] in r["affected"]) or "没有受影响的订单"
             lines.append("{} {}：{}，多花 ${:,.0f}{}{} [{}]".format(o["key"], o["label"], sos, o["cost_total"],
@@ -832,6 +1014,117 @@ class Rules:
         offer = self._draft_offer(r)
         if offer:
             out.append(offer)
+        return "\n".join(out)
+
+    # ---- 客户与服务（第 18 轮 E1）
+    def a_customer(self, q):
+        if self.student:
+            return self._hint("customer")
+        name = self.t._customer_name(q)
+        if not name:
+            lst = [a for a in self.t.list_anomalies(domain="customer")["anomalies"]] + self.t.list_anomalies(domain="service")["anomalies"]
+            if not lst:
+                return "没听出是哪个客户。可以说客户名或简称，例如“东港码头最近怎么了？”。现在没有开着的客户或服务异常。"
+            return "\n".join(["没听出是哪个客户。现在开着的客户与服务异常："] +
+                             ["· {} {} [{}]：{}".format(a["severity"], a["key"], a["ref"], a["title"]) for a in lst[:6]])
+        r = self.t.customer_360(name)
+        if r.get("error"):
+            return r["error"]
+        k = r["counts"]
+        out = ["{} [{}]：".format(name, r["ref"])]
+        c = r.get("contract")
+        if c and c.get("hidden"):
+            out.append("合同 {} [{}]：{}。".format(c["name"], c["ref"], c["hidden"]))
+        elif c:
+            out.append("合同 {} [{}]：延期违约金 {}，投诉响应 {:g} 小时，保修 {} 个月。".format(
+                c["name"], c["ref"], "${:g}/天".format(c["penalty_per_day"]) if c["penalty_per_day"] else "无",
+                c.get("response_h") or 24, c.get("warranty_months") or 12))
+        else:
+            out.append("没有生效的合同（按默认：响应 24 小时、保修 12 个月）。")
+        if r["orders"]:
+            out.append("订单：" + "；".join("{} 交期 {} [{}]".format(o["name"], o["delivery_date"], o["ref"]) for o in r["orders"][:4]) + "。")
+        if r["units"]:
+            bad = [u for u in r["units"] if u["health"] in ("red", "yellow")]
+            out.append("现场设备 {} 台{}".format(k["units"], "，都正常。" if not bad else "，要注意的：" + "；".join(
+                "{} [{}] {}{}".format(u["serial"], u["ref"], "红" if u["health"] == "red" else "黄",
+                                      "（{}）".format("、".join(u["alerts"][:2])) if u["alerts"] else "") for u in bad[:5]) + "。"))
+        opens = [x for x in r["complaints"] if x["status"] != "已关闭"]
+        if opens:
+            out.append("开着的投诉：" + "；".join("{} [{}] {}（{}，{}）".format(x["key"], x["ref"], x["subject"], x["severity"], x["status"])
+                                            for x in opens[:4]) + "。")
+        else:
+            out.append("没有开着的投诉。")
+        if r["jobs"]:
+            out.append("服务单：" + "；".join("{} {} {}".format(j["key"], j["serial"], j["kind"]) for j in r["jobs"][:3]) + "。")
+        out.append("回访满意度：{}。".format("{:g} 分（最近 {} 次）".format(r["satisfaction"], r["surveys"]) if r["satisfaction"] is not None else "还没有回访打分"))
+        out.append("详见 [{}]。".format(r["page"]))
+        return "\n".join(out)
+
+    def a_complaint(self, q):
+        if self.student:
+            return self._hint("complaint")
+        m = re.search(r"CP-(\d{5})", q)
+        sm = re.search(r"(WQR105-[A-Z0-9]+-\d{2})", q.upper())
+        cid = None
+        if m:
+            cid = "CP-" + m.group(1)
+        elif not sm:
+            row = self.t.db.one("select id from complaint where mode=%s and status<>'closed' order by id desc limit 1", (self.t.mode,)) \
+                if self.t.db.one("select to_regclass('complaint') is not null as ok")["ok"] else None
+            if row is None:
+                return "现在没有开着的投诉。要追某台设备，请给序列号（如 WQR105-H2504-06）。"
+            cid = "CP-{:05d}".format(row["id"])
+        r = self.t.complaint_scope(complaint=cid, serial=sm.group(1) if sm else None)
+        if r.get("error"):
+            return r["error"]
+        out = ["{}{} [{}]（{}）：".format("投诉 {} [{}]，设备 ".format(r["complaint"], r["complaint_ref"]) if r.get("complaint") else "设备 ",
+                                    r["serial"], r["unit_ref"], r["customer"])]
+        if r["chain"]["summary"]:
+            out.append("追溯：" + "；".join(r["chain"]["summary"][:4]) + "。")
+        if r["check_units"]:
+            out.append("同批次的输出轴还装在 {} 台设备上（{} 个客户），按风险排：".format(len(r["check_units"]), len(r["customers"])))
+            for x in r["check_units"][:8]:
+                out.append("· {} [{}] {}，健康度{}，最先到期的轴承已用 {:.0f}%{}".format(
+                    x["serial"], x["ref"], x["customer"], {"red": "红", "yellow": "黄"}.get(x["health"], "绿"), x["worst_bearing_used"] * 100,
+                    "，保修内" if x["in_warranty"] else "，已过保"))
+        else:
+            out.append("同批次没有装到别的设备上，排查范围只有这一台。")
+        if r.get("anomaly_id"):
+            o = self.t.compare_options(anomaly_id=r["anomaly_id"])
+            if not o.get("error") and o.get("options"):
+                out.append("对应异常 A-{:05d} [{}]，按排班估算了 {} 个方案：".format(r["anomaly_id"], r["anomaly_ref"], len(o["options"])))
+                out += self._options_text(o)
+                if o.get("reason"):
+                    out.append(o["reason"])
+                offer = self._draft_offer(o)
+                if offer:
+                    out.append(offer)
+        return "\n".join(out)
+
+    def a_service(self, q):
+        if self.student:
+            return self._hint("service")
+        sers = re.findall(r"WQR105-[A-Z0-9]+-\d{2}", q.upper())
+        if not sers:
+            from hub import service as SV
+            us = SV.units(self.t.db, self.t.mode)
+            sers = [u["serial"] for u in sorted(us.values(), key=lambda x: -x["risk"]) if u["health"] in ("red", "yellow")]
+            if not sers:
+                return "现场设备都正常，没有要上门的。"
+        kind = "bearing" if re.search(r"换.{0,2}轴承", q) else "inspect" if re.search(r"点检|检查", q) else "auto"
+        r = self.t.service_estimate(sers, kind)
+        if r.get("error"):
+            return r["error"]
+        out = ["{} 台设备上门（{}）：派 {}，{} 天做完（{} 到 {}），{:g} 个人天；备件 {}；共 ${:,.0f}，其中保修内由工厂承担 ${:,.0f}，向客户收 ${:,.0f}。".format(
+            r["units"], {"bearing": "换轴承", "inspect": "点检"}.get(kind, "按报警修"), "、".join(r["engineers"]) or "—", r["days"], r["start"],
+            r["finish"] or "—", r["person_days"], "、".join("{} × {}".format(k, v) for k, v in r["spares"].items()) or "不用",
+            r["cost"]["total"], r["cost"]["warranty"], r["cost"]["billable"])]
+        for j in r["jobs"][:8]:
+            out.append("· {} [{}] {}：{} {}{}".format(j["serial"], j["ref"], j["customer"], j.get("day") or "排不进", j.get("engineer_name") or "",
+                                                     "（跨区域）" if j.get("other_region") else ""))
+        if r["unplanned"]:
+            out.append("还有 {} 台 21 天内排不进。".format(len(r["unplanned"])))
+        out.append("这是估算，没有真的排班；排班表 [{}]。".format(r["page"]))
         return "\n".join(out)
 
     def a_draft(self, q):
@@ -974,8 +1267,10 @@ class Rules:
         if not lst:
             return "现在没有开着的异常，全厂运行平稳。"
         out = ["现在开着 {} 个异常（按严重程度）：".format(len(lst))]
-        for a in lst[:8]:
+        for a in lst[:15]:
             out.append("· {} {} [{}]：{}".format(a["severity"], a["key"], a["ref"], a["title"]))
+        if len(lst) > 15:
+            out.append("……还有 {} 个，见厂情中枢异常清单。".format(len(lst) - 15))
         out.append("问“A-xxxxx 怎么处理？”可以看推演出的方案。")
         return "\n".join(out)
 

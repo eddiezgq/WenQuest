@@ -10,6 +10,9 @@ from hub.ont import plan as P
 from hub.ont import playbook as PB
 
 
+SERVICE_RULES = ("C1", "C3", "C4", "V1", "V2")
+
+
 def mount(app, H, user_of, who):
     def snaps():
         return H.plan_snaps
@@ -109,11 +112,16 @@ def mount(app, H, user_of, who):
         a = H.db.one("select * from anomaly where id=%s and mode=%s", (aid, u["mode"]))
         if a is None:
             raise HTTPException(404, "没有这个异常")
-        sid, st, exact = snap_of(u, snapshot_id or None)
-        try:
-            r = PB.evaluate(a, st, ctx_for(u, st))
-        except P.PlanError as e:
-            raise HTTPException(400, str(e))
+        if a["rule"] in SERVICE_RULES:          # 第 18 轮 E1：投诉、现场报警的处理方案按派工排班估算，不进车间仿真
+            from hub import service as SV
+            r = SV.anomaly_options(H.db, u["mode"], a)
+            sid, st, exact = None, {"factory_now": SV.field_today(H.db, u["mode"]).isoformat(), "calendar": {}}, True
+        else:
+            sid, st, exact = snap_of(u, snapshot_id or None)
+            try:
+                r = PB.evaluate(a, st, ctx_for(u, st))
+            except P.PlanError as e:
+                raise HTTPException(400, str(e))
         locked = H.compare_locked(u, aid) if hasattr(H, "compare_locked") else False
         if locked:                          # 实验 15 比对模式：学生提交自己的分析前，不显示建议和推荐理由
             r = dict(r, reason=None, recommended=None, options=[dict(o, recommended=False) for o in r["options"]], locked=True)
@@ -124,7 +132,7 @@ def mount(app, H, user_of, who):
             p = NR.polish(H.ai.llm, r["reason"], facts, "把推荐理由改写成给厂长看的两三句话：推荐哪个、为什么、代价是什么")
             r = dict(r, reason=p["text"], reason_by=p["by"])
         return dict(r, snapshot_id=sid, exact=exact, factory_now=st["factory_now"], shift_mode=(st.get("calendar") or {}).get("mode"),
-                    can_initiate=AC.can_initiate(u))
+                    can_initiate=AC.can_initiate(u, "service_batch" if r.get("service") else "reassign"))
 
     # ---------------------------------------------------------------- 动作
     @app.get("/api/ont/actions")
@@ -160,10 +168,13 @@ def mount(app, H, user_of, who):
             raise HTTPException(400, "没有要做的动作")
         ids = []
         try:
-            sid, st, exact = snap_of(u, body.get("snapshot_id"))
-            if H.db.one("select 1 as x from sim_snapshot where id=%s and ts < now() - interval '2 hours'", (sid,)):
-                raise AC.ActionError("这是过去的快照，只能做复盘推演，不能变成动作；请用最新快照")
-            tr = dict(AC.trial(H.db, snaps(), u["mode"], changes, st), snapshot_id=sid)
+            if all(AC.TYPES.get(c.get("type"), {}).get("service") for c in changes):
+                tr = AC.service_trial(H.db, u["mode"], changes)           # 服务类：按排班估算，不用车间快照
+            else:
+                sid, st, exact = snap_of(u, body.get("snapshot_id"))
+                if H.db.one("select 1 as x from sim_snapshot where id=%s and ts < now() - interval '2 hours'", (sid,)):
+                    raise AC.ActionError("这是过去的快照，只能做复盘推演，不能变成动作；请用最新快照")
+                tr = dict(AC.trial(H.db, snaps(), u["mode"], changes, st), snapshot_id=sid)
             for c in changes:
                 t = c.get("type")
                 if t in ("insert_order", "breakdown"):

@@ -68,6 +68,7 @@ export const ROLES = [
   { key: 'quality', name: '质检员', en: 'Quality inspector' },
   { key: 'approver', name: '审批人', en: 'Approver', prod: true },
   { key: 'sales', name: '销售', en: 'Sales', prod: true },
+  { key: 'service', name: '售后', en: 'Customer service' },
 ];
 // 学生可选的岗位（厂长只给老师，第 3 轮 D3）
 // 企业版（第 8 轮）：审批人、销售只在生产模式；企业成员在生产模式只能用授权给他的角色

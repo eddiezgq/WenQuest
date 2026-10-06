@@ -12,7 +12,8 @@ GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节�
           "lab12": os.path.join(HERE, "实验12_一根轴的数字化设计与两个典型案例.md"),
           "lab13": os.path.join(HERE, "实验13_减速器数字孪生与预测性维护.md"),
           "lab14": os.path.join(HERE, "实验14_减速器风扇冷却的流体与传热分析.md"),
-          "lab15": os.path.join(HERE, "实验15_车间异常的追因推演与决策.md")}
+          "lab15": os.path.join(HERE, "实验15_车间异常的追因推演与决策.md"),
+          "lab16": os.path.join(HERE, "实验16_客户投诉的追溯召回与服务决策.md")}
 
 
 def _doc():
@@ -108,6 +109,8 @@ def report_template_docx(lab="lab8"):
         return lab14_template()
     if lab == "lab15":
         return lab15_template()
+    if lab == "lab16":
+        return lab16_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -537,6 +540,54 @@ def lab15_template():
            ["复盘找到的原因", ""], ["“如果当时选别的”：哪个更好", ""]])
     d.add_heading("七、结论与讨论", 1)
     hint("推演靠得住吗？什么情况下推演会偏？人和 AI 在决策里各该做什么？")
+    d.add_paragraph("")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab16_template():
+    """实验 16 报告模板（第 18 轮 E1-12）"""
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 16　客户投诉的追溯、召回与服务决策　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、投诉（任务 1）", 1)
+    table([["项目", "记录"], ["投诉编号、客户、现象", ""], ["设备序列号、投运日期、是否在保修期内", ""], ["合同响应时限 / 实际首次响应时间", ""]])
+    d.add_heading("二、追溯链：我追的与系统的", 1)
+    table([["环节", "我手工追的", "系统的因果链", "一致吗？不一致的原因"], ["设备 → 出厂总成 → 输出轴", "", "", ""], ["输出轴 → 工单、磨削砂轮", "", "", ""],
+           ["同一片砂轮磨的其他轴", "", "", ""], ["装在哪些设备、哪些客户（排查范围）", "", "", ""]])
+    hint("每一环写依据：哪一页、哪个对象卡、哪条链接。")
+    table([["排查范围里的设备", "客户", "健康度", "最先到期的轴承已用", "保修内？", "高风险？（任务 2）"], ["", "", "", "", "", ""], ["", "", "", "", "", ""],
+           ["", "", "", "", "", ""]])
+    d.add_heading("三、三个服务方案（任务 3）", 1)
+    table([["方案", "设备 / 客户数", "工程师", "几天做完", "备件", "费用（保修内 / 向客户收）", "漏掉的高风险设备"], ["A 只修出问题的", "", "", "", "", "", ""],
+           ["B 修 + 高风险点检", "", "", "", "", "", ""], ["C 整批排查", "", "", "", "", "", ""]])
+    d.add_heading("四、我的选择与中枢的建议", 1)
+    table([["项目", "记录"], ["选的方案", ""], ["理由（费用、风险、客户）", ""], ["代价", ""], ["中枢建议的方案与理由", ""],
+           ["一样吗？不一样时谁更合理", ""], ["AI 助手怎么回答的，哪句有依据、哪句没有", ""]])
+    d.add_heading("五、执行与回访（任务 4、5）", 1)
+    table([["项目", "记录"], ["动作编号、批准人、执行结果", ""], ["ERPNext 服务单（Issue）、备件出库单编号", ""], ["客户通知（发给谁、内容要点）", ""],
+           ["计划上门日 / 实际完成日", ""], ["回访分数与扣分原因", ""], ["保修内工厂实际承担的费用", ""]])
+    d.add_heading("六、结论与讨论", 1)
+    hint("召回范围怎么定？什么时候值得整批排查？保修费用算在哪里、怎样从源头减少？")
     d.add_paragraph("")
     buf = io.BytesIO()
     d.save(buf)
