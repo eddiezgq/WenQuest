@@ -312,8 +312,10 @@ class Detector:
             a = cur.get(f.fkey)
             if a:
                 up = LEVELS[f.severity] > LEVELS[a["severity"]]
-                db.x("update anomaly set last_seen=%s, hits=hits+1, misses=0, title=%s, detail=%s, severity=%s where id=%s",
-                     (now, f.title, Jsonb(detail), f.severity if up or LEVELS[f.severity] < LEVELS[a["severity"]] else a["severity"],
+                # 标题变了（例如停机原因、时长变了）就清掉旧的因果链，下次打开立即重算，不让链条说法和标题对不上
+                db.x("update anomaly set last_seen=%s, hits=hits+1, misses=0, chain=case when title is distinct from %s then null else chain end, "
+                     "title=%s, detail=%s, severity=%s where id=%s",
+                     (now, f.title, f.title, Jsonb(detail), f.severity if up or LEVELS[f.severity] < LEVELS[a["severity"]] else a["severity"],
                       a["id"]))
                 if up:
                     self.note(a["id"], "system", "escalate", "严重度升为“{}”：{}".format(LEVEL_LABEL[f.severity], f.title))

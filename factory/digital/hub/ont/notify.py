@@ -404,8 +404,8 @@ def banner(db, mode, limit=3):
     books = PB.catalog()[0]
     rows = db.q("select * from anomaly where mode=%s and status in ('open','ack','doing') and "
                 "(severity='critical' or (severity='warn' and rule = any(%s))) "
-                "order by (rule = any(%s)) desc, case severity when 'critical' then 0 else 1 end, last_seen desc limit %s",
-                (mode, list(books), list(books), limit))     # 先放能推演处理方案的（停机、缺料、交期），再放其他严重的
+                "order by coalesce(array_position(%s::text[], rule), 99), case severity when 'critical' then 0 else 1 end, first_seen desc limit %s",
+                (mode, list(books), list(books), limit))     # 先放能推演处理方案的，按预案目录的顺序（停机 → 交期 → 缺料），再放其他严重的
     out = []
     for a in rows:
         sc = ((a["chain"] or {}).get("scope") or {})

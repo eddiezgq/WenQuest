@@ -12,10 +12,10 @@ s.prep(L)
 tk = s.t["token"]
 api("POST", "/api/scenario/reset", {"speed": 60, "scores": False}, tk); time.sleep(20)
 api("POST", "/api/ont/shifts", {"mode": "shift"}, tk)
-api("POST", "/api/mes/cmd", {"unit": "grd-01", "command": "inject_fault", "minutes": 1200, "reason": "主轴轴承损坏，等备件"}, tk)
+api("POST", "/api/mes/cmd", {"unit": "grd-01", "command": "inject_fault", "minutes": 2400, "reason": "主轴轴承损坏，等备件"}, tk)
 aid = None
 for _ in range(60):
-    xs = [x for x in api("GET", "/api/ont/anomalies", tok=tk)["anomalies"] if x["rule"] == "P1" and (x["subject"] or {}).get("key") == "grd-01"]
+    xs = [x for x in api("GET", "/api/ont/anomalies", tok=tk)["anomalies"] if x["rule"] == "P1" and (x["subject"] or {}).get("key") == "grd-01" and "备件" in x["title"]]
     if xs:
         aid = xs[0]["id"]; break
     time.sleep(2)
@@ -32,7 +32,7 @@ s.wait(2500); s.hover(".drawer .msg.assistant .ref >> nth=2", pause=2500); s.key
 s.click(".drawer .x", pause=800)
 s.say(L[4]); s.scroll(500, pause=600)
 s.click(".op .opt.rec button:has-text('采纳')", pause=2000)
-s.go("/ont/actions", 3000)
+s.go("/ont/actions?box=all", 3000)
 s.click("button:has-text('批准并执行') >> nth=0", pause=3500)
 s.hover(".act >> nth=0", pause=2000)
 # 车间快进到工单做完，等自动复盘（这段剪掉）

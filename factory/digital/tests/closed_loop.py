@@ -267,7 +267,9 @@ def main():
     check(out["value"] >= good, "本周完工 {} 件（含本批 {}）".format(out["value"], good))
     ans = hub("POST", "/api/ai/chat", {"messages": [{"role": "user", "content": "{} 的实际成本比标准高多少？为什么？".format(wo)}]},
               mgr)
-    check("提示" in ans["answer"] or "来源" in ans["answer"], "AI 回答（教学模式给提示）：" + ans["answer"][:60])
+    # 第 17 轮 D 期起后台是 AI 代理：学生得到提示；老师得到带引用 [n] 的完整回答，且数字核对通过
+    check("提示" in ans["answer"] or ("[1]" in ans["answer"] and (ans.get("check") or {}).get("ok")),
+          "AI 回答（学生给提示 / 老师带引用、数字核对通过）：" + ans["answer"][:60])
     bad = hub("GET", "/api/health")
     check(bad["ok"] and bad["bus"], "枢纽健康，历史库 {} 条消息".format(bad["messages"]))
 
