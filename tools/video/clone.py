@@ -152,11 +152,31 @@ def encrypt_sample(src: Path, lang: str) -> Path:
     return out
 
 
+def temp_ssh_key(G, work: Path) -> tuple[str, str]:
+    """No SSH key in the secrets: make a one-off key pair and register it with Lambda (removed again afterwards)."""
+    key = work / "wq_voice_key"
+    subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(key)], check=True)
+    name = f"wq-voice-{int(time.time())}"
+    kid = G._api("POST", "/ssh-keys", {"name": name, "public_key": (work / "wq_voice_key.pub").read_text().strip()}).get("id", "")
+    os.environ["LAMBDA_SSH_KEY_FILE"] = str(key)
+    return name, kid
+
+
 def gpu_session(job: dict, work: Path, out: Path):
     import gpurun as G
+    kid = ""
+    if os.environ.get("LAMBDA_SSH_KEY_FILE") and os.environ.get("LAMBDA_SSH_KEY_NAME"):
+        key_name = os.environ["LAMBDA_SSH_KEY_NAME"]
+    else:
+        key_name, kid = temp_ssh_key(G, work)
     region = G.pick_region(GPU)
-    iid = G._api("POST", "/instance-operations/launch", {"region_name": region, "instance_type_name": GPU,
-                                                         "ssh_key_names": [os.environ["LAMBDA_SSH_KEY_NAME"]], "name": "wq-voice"})["instance_ids"][0]
+    try:
+        iid = G._api("POST", "/instance-operations/launch", {"region_name": region, "instance_type_name": GPU,
+                                                             "ssh_key_names": [key_name], "name": "wq-voice"})["instance_ids"][0]
+    except Exception:
+        if kid:
+            G._api("DELETE", f"/ssh-keys/{kid}")
+        raise
     t0 = time.time()
     try:
         ip = ""
@@ -181,6 +201,11 @@ def gpu_session(job: dict, work: Path, out: Path):
     finally:
         G._api("POST", "/instance-operations/terminate", {"instance_ids": [iid]})
         print(f"GPU 机器已关机，用时 {(time.time() - t0) / 60:.0f} 分钟", flush=True)
+        if kid:
+            try:
+                G._api("DELETE", f"/ssh-keys/{kid}")
+            except Exception as e:      # the machine is already off; a leftover public key is harmless
+                print(f"临时 SSH 公钥没删掉：{e}", flush=True)
 
 
 def main():
