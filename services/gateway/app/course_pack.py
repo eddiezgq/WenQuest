@@ -10,6 +10,7 @@ Progress lives in <data_dir>/course-packs/<book>.json.
 import asyncio
 import hashlib
 import json
+import re
 import time
 from pathlib import Path
 from typing import Annotated, Any
@@ -92,7 +93,7 @@ def register(app, m) -> None:
             status = "failed"   # the gateway restarted mid-way: press again to continue
         return {"book": book, "title": man["course"]["fullname"][i], "version": man.get("version", ""),
                 "courseid": st["courseid"], "status": status, "error": st["error"], "progress": st["progress"],
-                "batches": batches, "updated": st.get("updated", 0), "stale": len(stale(book, man, st))}
+                "batches": batches, "updated": st.get("updated", 0), "stale": len(stale(book, man, st)), "skipped": st.get("skipped", 0)}
 
     async def call(sess: Session, fn: str, **kw: Any) -> dict:
         return await state.moodle.call(sess.moodle_token, fn, None, **kw)
@@ -214,6 +215,30 @@ def register(app, m) -> None:
                     out.append((str(les["no"]), int(cmid), a))
         return out
 
+    def norm(t: str) -> str:
+        """A Moodle activity name as plain text: multilang spans keep the Chinese one, tags and spaces dropped."""
+        m_ = re.search(r'<span[^>]*lang="zh[^"]*"[^>]*>(.*?)</span>', t or "", re.S)
+        t = m_.group(1) if m_ else (t or "")
+        return re.sub(r"\s+", "", re.sub(r"<[^>]+>", "", t))
+
+    def stem(t: str) -> str:
+        return re.split(r"[（(]", t, 1)[0]
+
+    def match(a: dict, cmid: int, names: dict[int, str], sec: list[tuple[int, str]], res: list[dict]) -> int:
+        """The live file activity for manifest activity a: same name, else the one name before the bracket."""
+        want = {norm(a["name"][0]), norm(a["name"][1]), norm(ml(a["name"]))}
+        if names.get(cmid) in want:
+            return cmid
+        hit = [i for i, n in sec if n in want]
+        if len(hit) == 1:
+            return hit[0]
+        st_ = stem(norm(a["name"][0]))
+        if sum(stem(norm(x["name"][0])) == st_ for x in res) == 1:
+            hit = [i for i, n in sec if stem(n) == st_]
+            if len(hit) == 1:
+                return hit[0]
+        return 0
+
     async def refresh_work(sess: Session, book: str) -> None:
         man = load_manifest(book)
         st = load_state(book)
@@ -223,36 +248,44 @@ def register(app, m) -> None:
             st["progress"] = {"done": 0, "total": len(todo), "current": ""}
             save_state(book, st)
             # The recorded cmids follow the manifest's activity order at publishing time; if the pack gained or lost
-            # activities since then, a position can point at a quiz or assignment. Check against the live course and,
-            # where needed, take the resource at the same place among the section's file activities.
-            mods: dict[int, str] = {}
-            by_sec: dict[int, list[int]] = {}
+            # activities since then, a position points at the wrong activity. So each file is matched to the live
+            # course by name within its section (the recorded cmid is used only when its name agrees), and a file
+            # that cannot be matched is left alone and counted instead of stopping the whole update.
+            live: dict[int, list[tuple[int, str]]] = {}
+            names: dict[int, str] = {}
             try:
                 for sec in await state.moodle.call(sess.moodle_token, "core_course_get_contents", None, courseid=st["courseid"]) or []:
                     for mo in sec.get("modules") or []:
-                        mods[int(mo["id"])] = mo.get("modname", "")
                         if mo.get("modname") == "resource":
-                            by_sec.setdefault(int(sec.get("section", -1)), []).append(int(mo["id"]))
+                            nm = norm(mo.get("name", ""))
+                            live.setdefault(int(sec.get("section", -1)), []).append((int(mo["id"]), nm))
+                            names[int(mo["id"])] = nm
             except Exception:  # noqa: BLE001 - without the listing, trust the record
-                mods = {}
+                live = {}
             lessons = {str(x["no"]): x for x in man["lessons"]}
+            skipped = 0
             for no, cmid, a in todo:
                 st["progress"]["current"] = ml(a["name"])
-                if mods and mods.get(cmid) != "resource":
-                    les = lessons[no]
-                    res = [x for x in les["activities"] if x["type"] == "resource"]
-                    live = by_sec.get(int(les["section"]), [])
-                    k = next(i for i, x in enumerate(res) if x is a)
-                    if len(live) != len(res):
-                        raise EngineError("pack_mismatch", f"{ml(les['name'])}: {len(live)}/{len(res)}", 409)
-                    rec = st["lessons"][no]
-                    rec["cmids"][les["activities"].index(a)] = cmid = live[k]
-                draft = await upload_files(sess, base, [a["file"]])
-                await call(sess, "local_wenquest_edit_course", courseid=st["courseid"], action="replacefile", cmid=cmid, draftitemid=draft)
-                await call(sess, "local_wenquest_edit_course", courseid=st["courseid"], action="module", cmid=cmid, name=ml(a["name"])[:250])
-                st.setdefault("files", {})[str(cmid)] = file_hash(base, a["file"])
-                st["progress"]["done"] += 1
+                try:
+                    if live:
+                        les = lessons[no]
+                        found = match(a, cmid, names, live.get(int(les["section"]), []),
+                                      [x for x in les["activities"] if x["type"] == "resource"])
+                        if not found:
+                            skipped += 1
+                            continue
+                        if found != cmid:
+                            st["lessons"][no]["cmids"][les["activities"].index(a)] = cmid = found
+                    draft = await upload_files(sess, base, [a["file"]])
+                    await call(sess, "local_wenquest_edit_course", courseid=st["courseid"], action="replacefile", cmid=cmid, draftitemid=draft)
+                    await call(sess, "local_wenquest_edit_course", courseid=st["courseid"], action="module", cmid=cmid, name=ml(a["name"])[:250])
+                    st.setdefault("files", {})[str(cmid)] = file_hash(base, a["file"])
+                    names[cmid] = norm(ml(a["name"]))
+                    st["progress"]["done"] += 1
+                except EngineError:
+                    skipped += 1
                 save_state(book, st)
+            st["skipped"] = skipped
             st.update(status="done", error="")
             st["progress"]["current"] = ""
         except Exception as exc:  # noqa: BLE001 - the administrator sees the reason and presses again

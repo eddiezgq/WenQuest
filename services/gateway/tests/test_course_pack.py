@@ -209,9 +209,9 @@ def test_refresh_finds_the_file_when_the_record_is_shifted(client, tmp_path):
     st["lessons"]["1"]["cmids"] = [page, assign, deck, quiz, plan]   # recorded out of step with the course
     st["files"].pop(str(deck), None)
     sp.write_text(json.dumps(st))
-    CONTENTS["v"] = [{"section": 2, "modules": [{"id": page, "modname": "page"}, {"id": deck, "modname": "resource"},
+    CONTENTS["v"] = [{"section": 2, "modules": [{"id": page, "modname": "page"}, {"id": deck, "modname": "resource", "name": "课件"},
                                                  {"id": assign, "modname": "assign"}, {"id": quiz, "modname": "quiz"},
-                                                 {"id": plan, "modname": "resource"}]}]
+                                                 {"id": plan, "modname": "resource", "name": '<span lang="zh_cn" class="multilang">教案</span><span lang="en" class="multilang">Plan</span>'}]}]
     CALLS.clear()
     client.post("/api/v1/admin/course-packs/sewing/refresh", headers=h)
     p = wait(client, h)
